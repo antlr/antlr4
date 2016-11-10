@@ -69,11 +69,11 @@ public:
   <namedActions.members>
   virtual std::string getGrammarFileName() const override;
   virtual const std::vector\<std::string>& getRuleNames() const override;
-  
+
   virtual const std::vector\<std::string>& getModeNames() const override;
   virtual const std::vector\<std::string>& getTokenNames() const override; // deprecated, use vocabulary instead
   virtual dfa::Vocabulary& getVocabulary() const override;
-  
+
   virtual const std::vector\<uint16_t> getSerializedATN() const override;
   virtual const atn::ATN& getATN() const override;
 
@@ -81,29 +81,29 @@ public:
   virtual void action(RuleContext *context, size_t ruleIndex, size_t actionIndex) override;
   <endif>
   <if (sempredFuncs)>
-  virtual bool sempred(RuleContext *_localctx, size_t ruleIndex, size_t predicateIndex) override;  
+  virtual bool sempred(RuleContext *_localctx, size_t ruleIndex, size_t predicateIndex) override;
   <endif>
-  
+
 private:
   static std::vector\<dfa::DFA> _decisionToDFA;
   static atn::PredictionContextCache _sharedContextCache;
   static std::vector\<std::string> _ruleNames;
   static std::vector\<std::string> _tokenNames;
   static std::vector\<std::string> _modeNames;
-  
+
   static std::vector\<std::string> _literalNames;
   static std::vector\<std::string> _symbolicNames;
   static dfa::Vocabulary _vocabulary;
   <atn>
-  
+
   <namedActions.declarations>
 
   // Individual action functions triggered by action() above.
   <actionFuncs.values; separator="\n">
-  
+
   // Individual semantic predicate functions triggered by sempred() above.
   <sempredFuncs.values; separator="\n">
-  
+
   struct Initializer {
     Initializer();
   };
@@ -127,15 +127,15 @@ std::string <lexer.name>::getGrammarFileName() const {
 const std::vector\<std::string>& <lexer.name>::getRuleNames() const {
   return _ruleNames;
 }
-  
+
 const std::vector\<std::string>& <lexer.name>::getModeNames() const {
   return _modeNames;
 }
-  
+
 const std::vector\<std::string>& <lexer.name>::getTokenNames() const {
   return _tokenNames;
 }
-  
+
 dfa::Vocabulary& <lexer.name>::getVocabulary() const {
   return _vocabulary;
 }
@@ -206,7 +206,7 @@ dfa::Vocabulary <lexer.name>::_vocabulary(_literalNames, _symbolicNames);
 std::vector\<std::string> <lexer.name>::_tokenNames;
 
 <lexer.name>::Initializer::Initializer() {
-  // This code could be in a static initializer lambda, but VS doesn't allow access to private class members from there. 
+  // This code could be in a static initializer lambda, but VS doesn't allow access to private class members from there.
 	for (size_t i = 0; i \< _symbolicNames.size(); ++i) {
 		std::string name = _vocabulary.getLiteralName(i);
 		if (name.empty()) {
@@ -219,7 +219,7 @@ std::vector\<std::string> <lexer.name>::_tokenNames;
       _tokenNames.push_back(name);
     }
 	}
-  
+
   <atn>
 }
 
@@ -234,7 +234,7 @@ RuleActionFunction(r, actions) ::= <<
 void <r.factory.grammar.name>::<r.name>Action(<r.ctxType> *context, size_t actionIndex) {
   switch (actionIndex) {
     <actions: {index | case <index>: <actions.(index)> break;}; separator="\n">
-  
+
   default:
     break;
   }
@@ -252,7 +252,7 @@ RuleSempredFunction(r, actions) ::= <<
 bool <if (r.factory.g.lexer)><lexer.name><else><parser.name><endif>::<r.name>Sempred(<r.ctxType> *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
     <actions: {index | case <index>: return <actions.(index)>}; separator=";\n">;
-    
+
   default:
     break;
   }
@@ -288,11 +288,11 @@ public:
   virtual const std::vector\<std::string>& getTokenNames() const override { return _tokenNames; }; // deprecated: use vocabulary instead.
   virtual const std::vector\<std::string>& getRuleNames() const override;
   virtual dfa::Vocabulary& getVocabulary() const override;
- 
+
   <namedActions.members>
-  
+
   <parser.funcs: {f | class <f.name; format = "cap">Context;};  separator = "\n"> <! Forward declare context classes. !>
-  
+
   <funcs; separator = "\n">
 
   <if (sempredFuncs)>
@@ -305,14 +305,14 @@ private:
   static atn::PredictionContextCache _sharedContextCache;
   static std::vector\<std::string> _ruleNames;
   static std::vector\<std::string> _tokenNames;
-  
+
   static std::vector\<std::string> _literalNames;
   static std::vector\<std::string> _symbolicNames;
   static dfa::Vocabulary _vocabulary;
   <atn>
-  
+
   <namedActions.declarations>
-  
+
   struct Initializer {
     Initializer();
   };
@@ -344,7 +344,7 @@ dfa::Vocabulary& <parser.name>::getVocabulary() const {
 }
 
 <namedActions.definitions>
-  
+
 <funcs; separator = "\n\n">
 
 <if (sempredFuncs)>
@@ -352,7 +352,7 @@ bool <parser.name>::sempred(RuleContext *context, size_t ruleIndex, size_t predi
   switch (ruleIndex) {
   <parser.sempredFuncs.values: {f |
   case <f.ruleIndex>: return <f.name>Sempred(dynamic_cast\<<f.ctxType> *>(context), predicateIndex);}; separator="\n">
-  
+
   default:
     break;
   }
@@ -420,7 +420,7 @@ SerializedATN(model) ::= <<
 <model.segments: {segment | _serializedATN.insert(_serializedATN.end(), serializedATNSegment<i0>,
   serializedATNSegment<i0> + sizeof(serializedATNSegment<i0>) / sizeof(serializedATNSegment<i0>[0]));
 }>
-  
+
 <else>
 <! only one segment, can be inlined !>
 _serializedATN = {
@@ -502,10 +502,10 @@ LeftRecursiveRuleFunction(currentRule, args, code, locals, ruleCtx, altLabelCtxs
   <parser.name>::<currentRule.ctxType> *previousContext = _localctx;
   size_t startState = <currentRule.startState>;
   enterRecursionRule(_localctx, <currentRule.startState>, <parser.name>::Rule<currentRule.name; format = "cap">, precedence);
-  
+
     <namedActions.init>
 <! TODO: untested !>    <locals; separator = "\n">
-  
+
   auto onExit = finally([=] {
   <if (finallyAction)><finallyAction><endif>
     unrollRecursionContexts(parentContext);
@@ -581,7 +581,7 @@ AltLabelStructDeclHeader(struct, attrs, getters, dispatchMethods) ::= <<
 class <struct.name> : public <currentRule.name; format = "cap">Context {
 public:
   <struct.name>(<currentRule.name; format = "cap">Context *ctx);
-  
+
   <if (attrs)><attrs: {a | <a>}; separator = "\n"><endif>
   <getters: {g | <g>}; separator = "\n">
   <dispatchMethods; separator = "\n">
@@ -636,6 +636,7 @@ default:
 LL1OptionalBlockHeader(choice, alts, error) ::= "<! Required but unused. !>"
 LL1OptionalBlock(choice, alts, error) ::= <<
 setState(<choice.stateNumber>);
+_errHandler->sync(this);
 switch (_input->LA(1)) {
   <choice.altLook, alts: {look, alt | <cases(ttypes = look)> {
   <alt>
@@ -650,6 +651,7 @@ default:
 LL1OptionalBlockSingleAltHeader(choice, expr, alts, preamble, error, followExpr) ::= "<! Required but unused. !>"
 LL1OptionalBlockSingleAlt(choice, expr, alts, preamble, error, followExpr) ::= <<
 setState(<choice.stateNumber>);
+_errHandler->sync(this);
 
 <preamble; separator = "\n">
 if (<expr>) {
@@ -946,7 +948,7 @@ AddToLabelList(a) ::= <<
 
 TokenLabelType() ::= "<file.TokenLabelType; null = {Token}> *"
 
-TokenDeclHeader(t) ::= "<TokenLabelType()><t.name> = nullptr;" 
+TokenDeclHeader(t) ::= "<TokenLabelType()><t.name> = nullptr;"
 TokenDecl(t) ::= "<! Variable Declaration !>"
 
 TokenTypeDeclHeader(t) ::= "<! Local Variable !>"
