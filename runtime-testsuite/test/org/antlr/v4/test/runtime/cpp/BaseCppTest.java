@@ -93,6 +93,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.Locale;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -530,6 +531,23 @@ public abstract class BaseCppTest {
 		return execModule("Test.cpp");
 	}
 
+  private static String detectedOS;
+  public static String getOS() {
+    if (detectedOS == null) {
+      String os = System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH);
+      if ((os.indexOf("mac") >= 0) || (os.indexOf("darwin") >= 0)) {
+        detectedOS = "mac";
+      } else if (os.indexOf("win") >= 0) {
+        detectedOS = "windows";
+      } else if (os.indexOf("nux") >= 0) {
+        detectedOS = "linux";
+      } else {
+        detectedOS = "unknown";
+      }
+    }
+    return detectedOS;
+  }
+
 	public List<String> allCppFiles(String path) {
 		ArrayList<String> files = new ArrayList<String>();
 		File folder = new File(path);
@@ -565,40 +583,46 @@ public abstract class BaseCppTest {
 		return output;
   }
   
+  private String runCommand(String command[], String workPath, String description) throws Exception {
+    ProcessBuilder builder = new ProcessBuilder(command);
+		builder.directory(new File(workPath));
+
+    return runProcess(builder, description);
+  }
+  
   // TODO: add a buildRuntimeOnWindows variant.
   private boolean buildRuntime() {
     String runtimePath = locateRuntime();
     System.out.println("Building ANTLR4 C++ runtime (if necessary) at "+ runtimePath);
     
     try {
-  		ArrayList<String> args = new ArrayList<String>();
-  		args.add("cmake");
-  		args.add(".");
-  		args.add("-DCMAKE_BUILD_TYPE=release");
-  		ProcessBuilder builder = new ProcessBuilder(args.toArray(new String[0]));
-  		builder.directory(new File(runtimePath));
-  		if (runProcess(builder, "antlr runtime cmake") == null)
+      String command[] = { "cmake", ".", "-DCMAKE_BUILD_TYPE=release" };
+      if (runCommand(command, runtimePath, "antlr runtime cmake") == null)
   		  return false;
 		}
 		catch (Exception e) {
 			System.err.println("can't configure antlr cpp runtime cmake file");
-			e.printStackTrace(System.err);
 		}
 		
     try {
-  		ArrayList<String> args = new ArrayList<String>();
-  		args.add("make");
-  		args.add("-j");
-  		args.add("8"); // Assuming a reasonable amount of available CPU cores.
-  		ProcessBuilder builder = new ProcessBuilder(args.toArray(new String[0]));
-  		builder.directory(new File(runtimePath));
-  		if (runProcess(builder, "building antlr runtime") == null)
+      String command[] = { "make", "-j", "8" }; // Assuming a reasonable amount of available CPU cores.
+  		if (runCommand(command, runtimePath, "building antlr runtime") == null)
   		  return false;
 		}
 		catch (Exception e) {
 			System.err.println("can't compile antlr cpp runtime");
-			//e.printStackTrace(System.err);
 		}
+		
+		/* for debugging
+		try {
+      String command[] = { "ls", "-la" };
+  		String output = runCommand(command, runtimePath + "/dist/", "printing library folder content");
+			System.out.println(output);
+		}
+		catch (Exception e) {
+			System.err.println("can't print folder content");
+		}
+		*/
 		
 		return true;
   }
@@ -606,7 +630,6 @@ public abstract class BaseCppTest {
   static boolean runtimeBuiltOnce = false;
   
 	public String execModule(String fileName) {
-		String compilerPath = locateCompiler();
 		String runtimePath = locateRuntime();
 		String includePath = runtimePath + "/runtime/src";
 		String binPath = new File(new File(tmpdir), "a.out").getAbsolutePath();
@@ -614,88 +637,66 @@ public abstract class BaseCppTest {
 		
     // Build runtime using cmake once.
     if (!runtimeBuiltOnce) {
+      try {
+        String command[] = { "clang++", "--version" };
+        String output = runCommand(command, tmpdir, "printing compiler version");
+        System.out.println("Compiler version is: " + output);
+      }
+      catch (Exception e) {
+        System.err.println("Can't get compiler version");
+      }
+			
       runtimeBuiltOnce = true;
       if (!buildRuntime()) {
+        System.out.println("C++ runtime build failed\n");
         return null;
       }
+      System.out.println("C++ runtime build succeeded\n");
     }
     
-		// Create symlink to the runtime.
-		// TODO: make this platform neutral.
-		try {
-			ArrayList<String> args = new ArrayList<String>();
-			args.add("ln");
-			args.add("-s");
-			args.add(runtimePath + "/dist/libantlr4-runtime.dylib"); // TODO: make this platform neutral
-			ProcessBuilder builder = new ProcessBuilder(args.toArray(new String[0]));
-			builder.directory(new File(tmpdir));
-			String output = runProcess(builder, "sym linking C++ runtime");
-			if (output == null)
+		// Create symlink to the runtime. Currently only used on OSX.
+		String libExtension = (getOS() == "mac") ? "dylib" : "so";
+    try {
+      String command[] = { "ln", "-s", runtimePath + "/dist/libantlr4-runtime." + libExtension };
+      if (runCommand(command, tmpdir, "sym linking C++ runtime") == null)
 			  return null;
 		}
 		catch (Exception e) {
 			System.err.println("can't exec module: " + fileName);
-			//e.printStackTrace(System.err);
 		}
 		
-		// Compile the test code.
 		try {
-			ArrayList<String> args = new ArrayList<String>();
-			args.add(compilerPath);
-			args.add("-std=c++11");
-			args.add("-I");
-			args.add(includePath);
-			args.add("-L");
-			args.add(".");
-			args.add("-lantlr4-runtime");
-			args.addAll(allCppFiles(tmpdir));
-			ProcessBuilder builder = new ProcessBuilder(args.toArray(new String[0]));
-			builder.directory(new File(tmpdir));
-			String output = runProcess(builder, "building test binary");
-			if (output == null) {
+      List<String> command2 = new ArrayList<String>(Arrays.asList("clang++", "-std=c++11", "-I", includePath, "-L.", "-lantlr4-runtime"));
+      command2.addAll(allCppFiles(tmpdir));
+  		if (runCommand(command2.toArray(new String[0]), tmpdir, "building test binary") == null)
 				return null;
-			}
 		}
 		catch (Exception e) {
-			System.err.println("can't compile module: " + fileName);
-			//e.printStackTrace(System.err);
+			System.err.println("can't compile test module: " + e.getMessage());
 			return null;
 		}
 
-		// Now run the newly minted binary.
+		// Now run the newly minted binary. Reset the error output, as we could have got compiler warnings which are not relevant here.
+		this.stderrDuringParse = null;
 		try {
 			ProcessBuilder builder = new ProcessBuilder(binPath, inputPath);
 			builder.directory(new File(tmpdir));
+			Map<String, String> env = builder.environment();
+      env.put("LD_PRELOAD", runtimePath + "/dist/libantlr4-runtime.so"); // For linux.
 			String output = runProcess(builder, "running test binary");
-		  
+
+      /* for debugging
+		  System.out.println("=========================================================");
+		  System.out.println(output);
+		  System.out.println("=========================================================");
+		  */
 			return output;
 		}
 		catch (Exception e) {
-			System.err.println("can't exec module: " + fileName);
-			//e.printStackTrace(System.err);
+			System.err.println("can't exec module: " + fileName + "\nerror is: "+ e.getMessage());
 		}
 		
 		return null;
-	}
-
-	private String locateTool(String tool) {
-		String[] roots = { "/usr/bin/", "/usr/local/bin/" };
-		for(String root : roots) {
-			if(new File(root + tool).exists())
-				return root + tool;
-		}
-		throw new RuntimeException("Could not locate " + tool);
-	}
-
-	protected String locateCompiler() {
-		String propName = getPropertyPrefix() + "-compiler";
-   		String prop = System.getProperty(propName);
-   		if(prop==null || prop.length()==0)
-   			prop = locateTool("g++");  // Also try cc
-		File file = new File(prop);
-		if(!file.exists())
-			throw new RuntimeException("Missing system property:" + propName);
-		return file.getAbsolutePath();
 	}
 
 	protected String locateRuntime() {
