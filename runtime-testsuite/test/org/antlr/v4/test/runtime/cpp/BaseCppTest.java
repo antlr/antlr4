@@ -685,7 +685,7 @@ public abstract class BaseCppTest {
 		}
 		
 		try {
-      List<String> command2 = new ArrayList<String>(Arrays.asList("clang++", "-std=c++11", "-I", includePath, "-L.", "-lantlr4-runtime"));
+      List<String> command2 = new ArrayList<String>(Arrays.asList("clang++", "-std=c++11", "-I", includePath, "-L.", "-lantlr4-runtime", "-Wno-type-limits"));
       command2.addAll(allCppFiles(tmpdir));
   		String output = runCommand(command2.toArray(new String[0]), tmpdir, "building test binary");
 			if (output == null) {
