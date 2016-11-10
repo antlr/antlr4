@@ -586,26 +586,8 @@ public abstract class BaseCppTest {
   private String runCommand(String command[], String workPath, String description) throws Exception {
     ProcessBuilder builder = new ProcessBuilder(command);
 		builder.directory(new File(workPath));
-		
-		Process process = builder.start();
-		StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
-		StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
-		stdoutVacuum.start();
-		stderrVacuum.start();
-		int errcode = process.waitFor();
-		stdoutVacuum.join();
-		stderrVacuum.join();
-		String output = stdoutVacuum.toString();
-		if (stderrVacuum.toString().length() > 0) {
-			this.stderrDuringParse = stderrVacuum.toString();
-			System.err.println("exec stderrVacuum: "+ stderrVacuum);
-		}
-		if (errcode != 0) {
-			this.stderrDuringParse = "execution failed with error code: " + errcode;
-			System.err.println(description + " exited with error code: " + errcode);
-		}
-		
-		return output;
+
+    return runProcess(builder, description);
   }
   
   // TODO: add a buildRuntimeOnWindows variant.
@@ -631,6 +613,7 @@ public abstract class BaseCppTest {
 			System.err.println("can't compile antlr cpp runtime");
 		}
 		
+		/* for debugging
 		try {
       String command[] = { "ls", "-la" };
   		String output = runCommand(command, runtimePath + "/dist/", "printing library folder content");
@@ -639,6 +622,7 @@ public abstract class BaseCppTest {
 		catch (Exception e) {
 			System.err.println("can't print folder content");
 		}
+		*/
 		
 		return true;
   }
@@ -670,7 +654,7 @@ public abstract class BaseCppTest {
       System.out.println("C++ runtime build succeeded\n");
     }
     
-		// Create symlink to the runtime.
+		// Create symlink to the runtime. Currently only used on OSX.
 		String libExtension = (getOS() == "mac") ? "dylib" : "so";
     try {
       String command[] = { "ln", "-s", runtimePath + "/dist/libantlr4-runtime." + libExtension };
@@ -700,10 +684,12 @@ public abstract class BaseCppTest {
 			Map<String, String> env = builder.environment();
       env.put("LD_PRELOAD", runtimePath + "/dist/libantlr4-runtime.so"); // For linux.
 			String output = runProcess(builder, "running test binary");
-		  
+
+      /* for debugging
 		  System.out.println("=========================================================");
 		  System.out.println(output);
 		  System.out.println("=========================================================");
+		  */
 			return output;
 		}
 		catch (Exception e) {
