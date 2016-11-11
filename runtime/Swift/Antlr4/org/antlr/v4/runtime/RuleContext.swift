@@ -168,7 +168,9 @@ open class RuleContext: RuleNode {
     open func getRuleIndex() -> Int {
         return -1
     }
-
+    
+    open func getAltNumber() -> Int { return ATN.INVALID_ALT_NUMBER }
+    open func setAltNumber(_ altNumber: Int) { }
 
     open override func getChild(_ i: Int) -> Tree? {
         return nil
