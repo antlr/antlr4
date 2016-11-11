@@ -346,8 +346,22 @@ let walker =  ParseTreeWalker()
 try! walker.walk(LeafListener(), <s>)
 >>
 
+
 TreeNodeWithAltNumField(X) ::= <<
-// TODO
+@parser::members {
+open class MyRuleNode: ParserRuleContext {
+	public var altNum: Int = 0
+    override
+	public init(_ parent: ParserRuleContext?, _ invokingStateNumber: Int) {
+        super.init(parent, invokingStateNumber)
+    }
+    override
+	open func getAltNumber() -> Int { return altNum }
+
+	override
+	open func setAltNumber(_ altNum: Int) { self.altNum = altNum }
+}
+}
 >>
 
 TokenGetterListener(X) ::= <<
