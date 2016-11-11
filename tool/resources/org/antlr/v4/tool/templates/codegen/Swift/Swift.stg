@@ -48,7 +48,7 @@ SwiftTypeMap ::= [
 ]
 // args must be <object-model-object>, <fields-resulting-in-STs>
 
-ParserFile(file, parser, namedActions) ::= <<
+ParserFile(file, parser, namedActions,contextSuperClass) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 <if(file.genPackage)>
 <!package <file.genPackage>;!>
@@ -826,7 +826,7 @@ CaptureNextTokenType(d) ::= "<d.varName> = try _input.LA(1)"
 
 StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers,
            superClass={ParserRuleContext}) ::= <<
-open class <struct.name>: <superClass><if(interfaces)>, <interfaces; separator=", "><endif> {
+open class <struct.name>:<if(contextSuperClass)><contextSuperClass><else>ParserRuleContext<endif><if(interfaces)>, <interfaces; separator=", "><endif> {
 	<attrs:{a | public var <a>}; separator="\n">
 	<getters:{g | <g>}; separator="\n">
 	<! <if(ctorAttrs)>public init(_ parent: ParserRuleContext,_ invokingState: Int) { super.init(parent, invokingState)  }<endif> !>
