@@ -662,6 +662,7 @@ open class Parser: Recognizer<ParserATNSimulator> {
     }
 
     public func enterOuterAlt(_ localctx: ParserRuleContext, _ altNum: Int) throws {
+        localctx.setAltNumber(altNum)
         // if we have new localctx, make sure we replace existing ctx
         // that is previous child of parse tree
         if _buildParseTrees && _ctx! !== localctx {
