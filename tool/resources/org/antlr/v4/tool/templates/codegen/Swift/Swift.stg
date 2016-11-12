@@ -59,7 +59,7 @@ import Antlr4
 <parser>
 >>
 
-ListenerFile(file, header) ::= <<
+ListenerFile(file, header, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 <if(file.genPackage)>
 <!package <file.genPackage>;!>
@@ -98,7 +98,7 @@ func exit<lname; format="cap">(_ ctx: <file.parserName>.<lname; format="cap">Con
 }
 >>
 
-BaseListenerFile(file, header) ::= <<
+BaseListenerFile(file, header, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 <if(file.genPackage)>
 <!package <file.genPackage>;!>
@@ -157,7 +157,7 @@ open func exit<lname; format="cap">(_ ctx: <file.parserName>.<lname; format="cap
 }
 >>
 
-VisitorFile(file, header) ::= <<
+VisitorFile(file, header, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 <if(file.genPackage)>
 <!package <file.genPackage>;!>
@@ -192,7 +192,7 @@ open func visit<lname; format="cap">(_ ctx: <file.parserName>.<lname; format="ca
 }
 >>
 
-BaseVisitorFile(file, header) ::= <<
+BaseVisitorFile(file, header, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 <if(file.genPackage)>
 <!package <file.genPackage>;!>
