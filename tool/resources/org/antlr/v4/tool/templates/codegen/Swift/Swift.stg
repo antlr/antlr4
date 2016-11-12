@@ -363,7 +363,7 @@ open override func getVocabulary() -> Vocabulary {
 }
 
 public override init(_ input:TokenStream)throws {
-    RuntimeMetaData.checkVersion("4.5.1", RuntimeMetaData.VERSION)
+    RuntimeMetaData.checkVersion("4.5.3", RuntimeMetaData.VERSION)
 	try super.init(input)
 	_interp = ParserATNSimulator(self,<p.name>._ATN,<p.name>._decisionToDFA, <parser.name>._sharedContextCache)
 }
@@ -491,7 +491,7 @@ CodeBlockForAlt(currentAltCodeBlock, locals, preamble, ops) ::= <<
 
 LL1AltBlock(choice, preamble, alts, error) ::= <<
 setState(<choice.stateNumber>)
-<!try _errHandler.sync(self);!>
+try _errHandler.sync(self)
 <if(choice.label)><labelref(choice.label)> = try _input.LT(1)<endif>
 <preamble; separator="\n">
 switch (<parser.name>.Tokens(rawValue: try _input.LA(1))!) {
@@ -505,7 +505,7 @@ default:
 
 LL1OptionalBlock(choice, alts, error) ::= <<
 setState(<choice.stateNumber>)
-<!try _errHandler.sync(self);!>
+try _errHandler.sync(self)
 switch (<parser.name>.Tokens(rawValue: try _input.LA(1))!) {
 <choice.altLook,alts:{look,alt| <cases(ttypes=look)>
  	<alt>
@@ -517,7 +517,7 @@ default:
 
 LL1OptionalBlockSingleAlt(choice, expr, alts, preamble, error, followExpr) ::= <<
 setState(<choice.stateNumber>)
-<!try _errHandler.sync(self);!>
+try _errHandler.sync(self)
 <preamble; separator="\n">
 if (<expr>) {
 	<alts; separator="\n">
@@ -553,7 +553,7 @@ repeat {
 
 AltBlock(choice, preamble, alts, error) ::= <<
 setState(<choice.stateNumber>)
-<!try _errHandler.sync(self);!>
+try _errHandler.sync(self)
 <if(choice.label)><labelref(choice.label)> = try _input.LT(1)<endif>
 <preamble; separator="\n">
 switch(try getInterpreter().adaptivePredict(_input,<choice.decision>, _ctx)) {
@@ -567,7 +567,7 @@ default: break
 
 OptionalBlock(choice, alts, error) ::= <<
 setState(<choice.stateNumber>)
-<!try _errHandler.sync(self);!>
+try _errHandler.sync(self)
 switch (try getInterpreter().adaptivePredict(_input,<choice.decision>,_ctx)) {
 <alts:{alt |
 case <i><if(!choice.ast.greedy)>+1<endif>:
