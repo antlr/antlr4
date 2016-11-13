@@ -184,6 +184,12 @@ public class Antlr4Mojo extends AbstractMojo {
 	@Parameter(defaultValue = "${basedir}/src/main/antlr4/imports")
     private File libDirectory;
 
+    /**
+     * The directory where build status information is located.
+     */
+    @Parameter(defaultValue = "${project.build.directory}/maven-status/antlr4", readonly=true)
+    private File statusDirectory;
+
 	@Component
 	private BuildContext buildContext;
 
@@ -249,13 +255,19 @@ public class Antlr4Mojo extends AbstractMojo {
             outputDir.mkdirs();
         }
 
+        GrammarDependencies dependencies = new GrammarDependencies(sourceDirectory, libDirectory, arguments, getDependenciesStatusFile(), getLog());
+
 		// Now pick up all the files and process them with the Tool
 		//
 
 		List<List<String>> argumentSets;
+        Set<File> grammarFiles;
+        Set<File> importGrammarFiles;
         try {
 			List<String> args = getCommandArguments();
-            argumentSets = processGrammarFiles(args, sourceDirectory);
+            grammarFiles = getGrammarFiles(sourceDirectory);
+            importGrammarFiles = getImportFiles(sourceDirectory);
+            argumentSets = processGrammarFiles(args, grammarFiles, dependencies, sourceDirectory);
         } catch (InclusionScanException ie) {
             log.error(ie);
             throw new MojoExecutionException("Fatal error occured while evaluating the names of the grammar files to analyze", ie);
@@ -272,6 +284,14 @@ public class Antlr4Mojo extends AbstractMojo {
 				throw new MojoFailureException("Error creating an instanceof the ANTLR tool.", e);
 			}
 
+            try {
+                dependencies.analyze(grammarFiles, importGrammarFiles, tool);
+            } catch (Exception e) {
+                log.error("Dependency analysis failed, see exception report for details",
+                    e);
+                throw new MojoFailureException("Dependency analysis failed.", e);
+            }
+
 			// Set working directory for ANTLR to be the base source directory
 			tool.inputDirectory = sourceDirectory;
 
@@ -287,6 +307,12 @@ public class Antlr4Mojo extends AbstractMojo {
         if (project != null) {
             // Tell Maven that there are some new source files underneath the output directory.
             addSourceRoot(this.getOutputDirectory());
+        }
+
+        try {
+            dependencies.save();
+        } catch (IOException ex) {
+            log.warn("Could not save grammar dependency status", ex);
         }
     }
 
@@ -355,22 +381,11 @@ public class Antlr4Mojo extends AbstractMojo {
      * @param sourceDirectory
      * @exception InclusionScanException
      */
-
-    private List<List<String>> processGrammarFiles(List<String> args, File sourceDirectory) throws InclusionScanException {
-        // Which files under the source set should we be looking for as grammar files
-        SourceMapping mapping = new SuffixMapping("g4", Collections.<String>emptySet());
-
-        // What are the sets of includes (defaulted or otherwise).
-        Set<String> includes = getIncludesPatterns();
-
-        // Now, to the excludes, we need to add the imports directory
-        // as this is autoscanned for imported grammars and so is auto-excluded from the
-        // set of grammar fields we should be analyzing.
-        excludes.add("imports/**");
-
-        SourceInclusionScanner scan = new SimpleSourceInclusionScanner(includes, excludes);
-        scan.addSourceMapping(mapping);
-        Set<File> grammarFiles = scan.getIncludedSources(sourceDirectory, null);
+    private List<List<String>> processGrammarFiles(
+        List<String> args,
+        Set<File> grammarFiles,
+        GrammarDependencies dependencies,
+        File sourceDirectory) throws InclusionScanException {
 
         // We don't want the plugin to run for every grammar, regardless of whether
         // it's changed since the last compilation. Check the mtime of the tokens vs
@@ -381,7 +396,8 @@ public class Antlr4Mojo extends AbstractMojo {
             String tokensFileName = grammarFile.getName().split("\\.")[0] + ".tokens";
             File outputFile = new File(outputDirectory, tokensFileName);
             if ( (! outputFile.exists()) ||
-                 outputFile.lastModified() < grammarFile.lastModified() ) {
+                 outputFile.lastModified() < grammarFile.lastModified() ||
+                 dependencies.isDependencyChanged(grammarFile)) {
                 grammarFilesToProcess.add(grammarFile);
             }
         }
@@ -430,6 +446,37 @@ public class Antlr4Mojo extends AbstractMojo {
 		return result;
 	}
 
+    private Set<File> getImportFiles(File sourceDirectory) throws InclusionScanException {
+        Set<String> includes = new HashSet<String>();
+        includes.add("*.g4");
+        includes.add("*.tokens");
+
+        SourceInclusionScanner scan = new SimpleSourceInclusionScanner(includes,
+                Collections.<String>emptySet());
+        scan.addSourceMapping(new SuffixMapping("G4", "g4"));
+
+        return scan.getIncludedSources(libDirectory, null);
+    }
+
+	private Set<File> getGrammarFiles(File sourceDirectory) throws InclusionScanException
+	{
+		// Which files under the source set should we be looking for as grammar files
+		SourceMapping mapping = new SuffixMapping("g4", Collections.<String>emptySet());
+
+		// What are the sets of includes (defaulted or otherwise).
+		Set<String> includes = getIncludesPatterns();
+
+		// Now, to the excludes, we need to add the imports directory
+		// as this is autoscanned for imported grammars and so is auto-excluded from the
+		// set of grammar fields we should be analyzing.
+		excludes.add("imports/**");
+
+		SourceInclusionScanner scan = new SimpleSourceInclusionScanner(includes, excludes);
+		scan.addSourceMapping(mapping);
+
+		return scan.getIncludedSources(sourceDirectory, null);
+	}
+
 	private static String getPackageName(String relativeFolderPath) {
 		if (relativeFolderPath.contains("..")) {
 			throw new UnsupportedOperationException("Cannot handle relative paths containing '..'");
@@ -448,6 +495,16 @@ public class Antlr4Mojo extends AbstractMojo {
             return Collections.singleton("**/*.g4");
         }
         return includes;
+    }
+
+    private File getDependenciesStatusFile() {
+        File statusFile = new File(statusDirectory, "dependencies.ser");
+
+        if (!statusFile.getParentFile().exists()) {
+            statusFile.getParentFile().mkdirs();
+        }
+
+        return statusFile;
     }
 
 	private final class CustomTool extends Tool {

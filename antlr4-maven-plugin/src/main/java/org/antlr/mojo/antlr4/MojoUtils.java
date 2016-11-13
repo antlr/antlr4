@@ -1,9 +1,46 @@
 package org.antlr.mojo.antlr4;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+
+import java.security.MessageDigest;
 
 
 class MojoUtils {
+    /**
+     * Creates the MD5 checksum for the given file.
+     *
+     * @param   file  the file.
+     *
+     * @return  the checksum.
+     */
+    public static byte[] checksum(File file) {
+        try {
+            InputStream in = new FileInputStream(file);
+            byte[] buffer = new byte[2048];
+            MessageDigest complete = MessageDigest.getInstance("MD5");
+
+            try {
+                int n;
+
+                do {
+                    n = in.read(buffer);
+
+                    if (n > 0) {
+                        complete.update(buffer, 0, n);
+                    }
+                } while (n != -1);
+            } finally {
+                in.close();
+            }
+
+            return complete.digest();
+        } catch (Exception ex) {
+            throw new RuntimeException("Could not create checksum " + file, ex);
+        }
+    }
+
     /**
      * Given the source directory File object and the full PATH to a grammar, produce the
      * path to the named grammar file in relative terms to the {@code sourceDirectory}.
