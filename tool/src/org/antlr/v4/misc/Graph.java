@@ -32,6 +32,7 @@ package org.antlr.v4.misc;
 import org.antlr.v4.runtime.misc.OrderedHashSet;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,13 +45,13 @@ import java.util.Set;
 public class Graph<T> {
 
 	public static class Node<T> {
-		T payload;
-		List<Node<T>> edges; // points at which nodes?
+		public T payload;
+		public List<Node<T>> edges = Collections.emptyList(); // points at which nodes?
 
 		public Node(T payload) { this.payload = payload; }
 
 		public void addEdge(Node<T> n) {
-			if ( edges==null ) edges = new ArrayList<Node<T>>();
+			if ( edges==Collections.EMPTY_LIST ) edges = new ArrayList<Node<T>>();
 			if ( !edges.contains(n) ) edges.add(n);
 		}
 
@@ -68,7 +69,7 @@ public class Graph<T> {
 		a_node.addEdge(b_node);
 	}
 
-	protected Node<T> getNode(T a) {
+	public Node<T> getNode(T a) {
 		Node<T> existing = nodes.get(a);
 		if ( existing!=null ) return existing;
 		Node<T> n = new Node<T>(a);
