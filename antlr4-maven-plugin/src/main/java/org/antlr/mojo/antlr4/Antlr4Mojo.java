@@ -405,7 +405,7 @@ public class Antlr4Mojo extends AbstractMojo {
 
 			getLog().debug("Grammar file '" + grammarFile.getPath() + "' detected.");
 
-			String relPathBase = findSourceSubdir(sourceDirectory, grammarFile.getPath());
+			String relPathBase = MojoUtils.findSourceSubdir(sourceDirectory, grammarFile);
 			String relPath = relPathBase + grammarFile.getName();
 			getLog().debug("  ... relative path is: " + relPath);
 
@@ -448,32 +448,6 @@ public class Antlr4Mojo extends AbstractMojo {
             return Collections.singleton("**/*.g4");
         }
         return includes;
-    }
-
-    /**
-     * Given the source directory File object and the full PATH to a grammar,
-     * produce the path to the named grammar file in relative terms to the
-     * {@code sourceDirectory}. This will then allow ANTLR to produce output
-     * relative to the base of the output directory and reflect the input
-     * organization of the grammar files.
-     *
-     * @param sourceDirectory The source directory {@link File} object
-     * @param grammarFileName The full path to the input grammar file
-     * @return The path to the grammar file relative to the source directory
-     */
-    private String findSourceSubdir(File sourceDirectory, String grammarFileName) {
-        String srcPath = sourceDirectory.getPath() + File.separator;
-
-        if (!grammarFileName.startsWith(srcPath)) {
-            throw new IllegalArgumentException("expected " + grammarFileName + " to be prefixed with " + sourceDirectory);
-        }
-
-        File unprefixedGrammarFileName = new File(grammarFileName.substring(srcPath.length()));
-		if (unprefixedGrammarFileName.getParent() == null) {
-			return "";
-		}
-
-        return unprefixedGrammarFileName.getParent() + File.separator;
     }
 
 	private final class CustomTool extends Tool {
