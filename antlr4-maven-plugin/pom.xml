@@ -50,7 +50,7 @@
 
   <properties>
     <mavenVersion>3.3.9</mavenVersion>
-    <takariLifecycleVersion>1.12.2</takariLifecycleVersion>
+    <takariLifecycleVersion>1.11.12</takariLifecycleVersion>
   </properties>
 
   <!-- ============================================================================= -->
