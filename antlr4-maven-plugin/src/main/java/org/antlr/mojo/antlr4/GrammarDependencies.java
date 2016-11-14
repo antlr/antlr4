@@ -56,7 +56,7 @@ class GrammarDependencies {
      *
      * @return  self-reference.
      */
-    public String getPackage(List<String> arguments) {
+    private String getPackage(List<String> arguments) {
         int index = (arguments != null) ? arguments.indexOf("-package") : -1;
 
         return (index > -1)
@@ -90,7 +90,7 @@ class GrammarDependencies {
      * @return  self-reference.
      */
     public GrammarDependencies analyze(Set<File> grammarFiles,
-        Set<File> importGrammarFiles, Tool tool) {
+        Set<File> importGrammarFiles, Tool tool) throws IOException {
         log.debug("Analysing grammar dependencies " + sourceDirectory);
 
         // for dependency analysis we require all grammars
@@ -141,7 +141,7 @@ class GrammarDependencies {
      *
      * @return  {@code true} if a grammar used by the given grammar has been modified.
      */
-    public boolean isDependencyChanged(File grammarFile) {
+    public boolean isDependencyChanged(File grammarFile) throws IOException {
         String grammarPath = getRelativePath(grammarFile);
 
         for (Map.Entry<File, Map.Entry<byte[], Collection<String>>> e : grammars.entrySet()) {

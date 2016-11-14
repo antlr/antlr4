@@ -268,9 +268,9 @@ public class Antlr4Mojo extends AbstractMojo {
             grammarFiles = getGrammarFiles(sourceDirectory);
             importGrammarFiles = getImportFiles(sourceDirectory);
             argumentSets = processGrammarFiles(args, grammarFiles, dependencies, sourceDirectory);
-        } catch (InclusionScanException ie) {
-            log.error(ie);
-            throw new MojoExecutionException("Fatal error occured while evaluating the names of the grammar files to analyze", ie);
+        } catch (Exception e) {
+            log.error(e);
+            throw new MojoExecutionException("Fatal error occured while evaluating the names of the grammar files to analyze", e);
         }
 
 		log.debug("Output directory base will be " + outputDirectory.getAbsolutePath());
@@ -385,7 +385,7 @@ public class Antlr4Mojo extends AbstractMojo {
         List<String> args,
         Set<File> grammarFiles,
         GrammarDependencies dependencies,
-        File sourceDirectory) throws InclusionScanException {
+        File sourceDirectory) throws InclusionScanException, IOException {
 
         // We don't want the plugin to run for every grammar, regardless of whether
         // it's changed since the last compilation. Check the mtime of the tokens vs

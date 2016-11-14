@@ -3,8 +3,10 @@ package org.antlr.mojo.antlr4;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.io.IOException;
 
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 
 class MojoUtils {
@@ -15,7 +17,7 @@ class MojoUtils {
      *
      * @return  the checksum.
      */
-    public static byte[] checksum(File file) {
+    public static byte[] checksum(File file) throws IOException {
         try {
             InputStream in = new FileInputStream(file);
             byte[] buffer = new byte[2048];
@@ -36,8 +38,8 @@ class MojoUtils {
             }
 
             return complete.digest();
-        } catch (Exception ex) {
-            throw new RuntimeException("Could not create checksum " + file, ex);
+        } catch (NoSuchAlgorithmException ex) {
+            throw new IOException("Could not create checksum " + file, ex);
         }
     }
 
