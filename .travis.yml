@@ -4,7 +4,6 @@ script:
   - mvn install
 
 jdk:
-  - openjdk6
   - oraclejdk7
   - oraclejdk8
 
