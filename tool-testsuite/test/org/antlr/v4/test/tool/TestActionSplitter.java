@@ -34,7 +34,8 @@ import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.Token;
 import org.antlr.v4.parse.ActionSplitter;
 import org.antlr.v4.semantics.BlankActionSplitterListener;
-import org.antlr.v4.test.runtime.java.BaseTest;
+import org.antlr.v4.test.runtime.java.BaseJavaTest;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -42,7 +43,13 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-public class TestActionSplitter extends BaseTest {
+public class TestActionSplitter extends BaseJavaTest {
+	@Before
+	@Override
+	public void testSetUp() throws Exception {
+		super.testSetUp();
+	}
+
     static String[] exprs = {
         "foo",		"['foo'<" + ActionSplitter.TEXT + ">]",
         "$x",		"['$x'<" + ActionSplitter.ATTR + ">]",

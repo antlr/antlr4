@@ -1,4 +1,0 @@
-TestTemplates ::= [
-	"LexerDelegatorInvokesDelegateRule": [],
-	"LexerDelegatorRuleOverridesDelegate": []
-]

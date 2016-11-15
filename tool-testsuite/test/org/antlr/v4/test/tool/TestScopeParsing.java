@@ -31,13 +31,14 @@
 package org.antlr.v4.test.tool;
 
 import org.antlr.v4.parse.ScopeParser;
-import org.antlr.v4.test.runtime.java.BaseTest;
+import org.antlr.v4.test.runtime.java.BaseJavaTest;
 import org.antlr.v4.tool.Grammar;
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class TestScopeParsing extends BaseTest {
+public class TestScopeParsing extends BaseJavaTest {
     String[] argPairs = {
         "",                                 "{}",
         " ",                                "{}",
@@ -55,6 +56,12 @@ public class TestScopeParsing extends BaseTest {
         "i,j",                              "{i=null i, j=null j}",
         "i,j, k",                           "{i=null i, j=null j, k=null k}",
     };
+
+	@Before
+	@Override
+	public void testSetUp() throws Exception {
+		super.testSetUp();
+	}
 
     @Test public void testArgs() throws Exception {
         for (int i = 0; i < argPairs.length; i+=2) {

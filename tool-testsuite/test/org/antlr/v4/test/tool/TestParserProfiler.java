@@ -36,10 +36,11 @@ import org.antlr.v4.runtime.LexerInterpreter;
 import org.antlr.v4.runtime.ParserInterpreter;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.atn.DecisionInfo;
-import org.antlr.v4.test.runtime.java.BaseTest;
+import org.antlr.v4.test.runtime.java.BaseJavaTest;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
 import org.antlr.v4.tool.Rule;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -48,12 +49,13 @@ import java.util.Arrays;
 import static org.junit.Assert.assertEquals;
 
 @SuppressWarnings("unused")
-public class TestParserProfiler extends BaseTest {
+public class TestParserProfiler extends BaseJavaTest {
 	LexerGrammar lg;
 
+	@Before
 	@Override
-	public void setUp() throws Exception {
-		super.setUp();
+	public void testSetUp() throws Exception {
+		super.testSetUp();
 		lg = new LexerGrammar(
 				"lexer grammar L;\n" +
 				"WS : [ \\r\\t\\n]+ -> channel(HIDDEN) ;\n" +
@@ -238,7 +240,7 @@ public class TestParserProfiler extends BaseTest {
 			"PLUS : '+' ;\n" +
 			"MULT : '*' ;\n";
 
-		String found = execParser("T.g4", grammar, "TParser", "TLexer", "s",
+		String found = execParser("T.g4", grammar, "TParser", "TLexer", null, null, "s",
 								  "xyz;abc;z.q", false, true);
 		String expecting =
 			"[{decision=0, contextSensitivities=0, errors=0, ambiguities=0, SLL_lookahead=6, SLL_ATNTransitions=4, " +
