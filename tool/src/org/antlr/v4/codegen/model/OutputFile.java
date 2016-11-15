@@ -41,7 +41,7 @@ import java.util.Map;
 public abstract class OutputFile extends OutputModelObject {
 	public final String fileName;
 	public final String grammarFileName;
-	public final String ANTLRVersion;
+    public final String ANTLRVersion;
     public final String TokenLabelType;
     public final String InputSymbolType;
 
@@ -50,7 +50,7 @@ public abstract class OutputFile extends OutputModelObject {
         this.fileName = fileName;
         Grammar g = factory.getGrammar();
 		grammarFileName = g.fileName;
-		ANTLRVersion = Tool.VERSION;
+        ANTLRVersion = Tool.VERSION;
         TokenLabelType = g.getOptionString("TokenLabelType");
         InputSymbolType = TokenLabelType;
     }

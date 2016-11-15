@@ -31,22 +31,56 @@
 package org.antlr.v4.misc;
 
 import java.util.HashMap;
+import java.util.Map.Entry;
 
-/** Count how many of each key we have; not thread safe */
-public class FrequencySet<T> extends HashMap<T, MutableInt> {
-	public int count(T key) {
-		MutableInt value = get(key);
-		if (value == null) return 0;
-		return value.v;
+/**
+ * Object that counts the minimum and maximum number of occurrences for each key.
+ */
+public class FrequencySet<T> extends HashMap<T, FrequencyRange> {
+
+	public FrequencySet() {}
+
+	public FrequencySet(FrequencySet<T> that) {
+		super(that);
 	}
+
+	/**
+	 * A missing value is equivalent to a value that occurs zero times.
+     */
+	@Override
+	public FrequencyRange get(Object key) {
+		FrequencyRange value = super.get(key);
+		return value == null ? FrequencyRange.NONE : value;
+	}
+
+	/**
+	 * Updates this set to include all the possibilities allowed by another set.
+     */
+	public void union(FrequencySet<T> that) {
+		for (Entry<T, FrequencyRange> thatEntry : that.entrySet()) {
+			final T key = thatEntry.getKey();
+			put(key, get(key).union(thatEntry.getValue()));
+		}
+		for (Entry<T, FrequencyRange> thisEntry : entrySet()) {
+			final T key = thisEntry.getKey();
+			if (!that.containsKey(key)) {
+				// Key present only in this set.
+				put(key, thisEntry.getValue().union(FrequencyRange.NONE));
+			}
+		}
+	}
+
+	public void addAll(FrequencySet<T> that) {
+		for (Entry<T, FrequencyRange> entry : that.entrySet()) {
+			add(entry.getKey(), entry.getValue());
+		}
+	}
+
 	public void add(T key) {
-		MutableInt value = get(key);
-		if (value == null) {
-			value = new MutableInt(1);
-			put(key, value);
-		}
-		else {
-			value.v++;
-		}
+		add(key, FrequencyRange.ONE);
+	}
+
+	public void add(T key, FrequencyRange newValue) {
+		put(key, get(key).plus(newValue));
 	}
 }

@@ -46,4 +46,8 @@ public abstract class OutputModelObject {
 		this.factory = factory;
 		this.ast = ast;
 	}
+
+	public String getNullAnnotationsPackage() {
+		return factory.getGrammar().getOptionString("nullAnnotationsPackage");
+	}
 }
