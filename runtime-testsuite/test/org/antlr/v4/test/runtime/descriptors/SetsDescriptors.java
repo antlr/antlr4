@@ -15,7 +15,7 @@ public class SetsDescriptors {
 		@CommentHasStringValue
 		public String output;
 
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "a";
 		public String grammarName = "T";
 
@@ -32,7 +32,7 @@ public class SetsDescriptors {
 
 	public static class ComplementSet extends BaseParserTestDescriptor {
 		public String input = "a";
-		public String output = "";
+		public String output = null;
 		/**
 		line 1:0 token recognition error at: 'a'
 		line 1:1 missing {} at '<EOF>'
@@ -56,7 +56,7 @@ public class SetsDescriptors {
 	public static class LexerOptionalSet extends BaseParserTestDescriptor {
 		public String input = "ac";
 		public String output = "ac\n";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "a";
 		public String grammarName = "T";
 
@@ -73,7 +73,7 @@ public class SetsDescriptors {
 	public static class LexerPlusSet extends BaseParserTestDescriptor {
 		public String input = "abaac";
 		public String output = "abaac\n";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "a";
 		public String grammarName = "T";
 
@@ -90,7 +90,7 @@ public class SetsDescriptors {
 	public static class LexerStarSet extends BaseParserTestDescriptor {
 		public String input = "abaac";
 		public String output = "abaac\n";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "a";
 		public String grammarName = "T";
 
@@ -107,7 +107,7 @@ public class SetsDescriptors {
 	public static class NotChar extends BaseParserTestDescriptor {
 		public String input = "x";
 		public String output = "x\n";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "a";
 		public String grammarName = "T";
 
@@ -124,7 +124,7 @@ public class SetsDescriptors {
 	public static class NotCharSet extends BaseParserTestDescriptor {
 		public String input = "x";
 		public String output = "x\n";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "a";
 		public String grammarName = "T";
 
@@ -141,7 +141,7 @@ public class SetsDescriptors {
 	public static class NotCharSetWithLabel extends BaseParserTestDescriptor {
 		public String input = "x";
 		public String output = "x\n";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "a";
 		public String grammarName = "T";
 
@@ -158,7 +158,7 @@ public class SetsDescriptors {
 	public static class NotCharSetWithRuleRef3 extends BaseParserTestDescriptor {
 		public String input = "x";
 		public String output = "x\n";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "a";
 		public String grammarName = "T";
 
@@ -177,7 +177,7 @@ public class SetsDescriptors {
 	public static class OptionalLexerSingleElement extends BaseParserTestDescriptor {
 		public String input = "bc";
 		public String output = "bc\n";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "a";
 		public String grammarName = "T";
 
@@ -194,7 +194,7 @@ public class SetsDescriptors {
 	public static class OptionalSet extends BaseParserTestDescriptor {
 		public String input = "ac";
 		public String output = "ac\n";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "a";
 		public String grammarName = "T";
 
@@ -210,7 +210,7 @@ public class SetsDescriptors {
 	public static class OptionalSingleElement extends BaseParserTestDescriptor {
 		public String input = "bc";
 		public String output = "bc\n";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "a";
 		public String grammarName = "T";
 
@@ -227,7 +227,7 @@ public class SetsDescriptors {
 	public static class ParserNotSet extends BaseParserTestDescriptor {
 		public String input = "zz";
 		public String output = "z\n";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "a";
 		public String grammarName = "T";
 
@@ -243,7 +243,7 @@ public class SetsDescriptors {
 	public static class ParserNotToken extends BaseParserTestDescriptor {
 		public String input = "zz";
 		public String output = "zz\n";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "a";
 		public String grammarName = "T";
 
@@ -259,7 +259,7 @@ public class SetsDescriptors {
 	public static class ParserNotTokenWithLabel extends BaseParserTestDescriptor {
 		public String input = "zz";
 		public String output = "z\n";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "a";
 		public String grammarName = "T";
 
@@ -275,7 +275,7 @@ public class SetsDescriptors {
 	public static class ParserSet extends BaseParserTestDescriptor {
 		public String input = "x";
 		public String output = "x\n";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "a";
 		public String grammarName = "T";
 
@@ -291,7 +291,7 @@ public class SetsDescriptors {
 	public static class PlusLexerSingleElement extends BaseParserTestDescriptor {
 		public String input = "bbbbc";
 		public String output = "bbbbc\n";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "a";
 		public String grammarName = "T";
 
@@ -308,7 +308,7 @@ public class SetsDescriptors {
 	public static class PlusSet extends BaseParserTestDescriptor {
 		public String input = "abaac";
 		public String output = "abaac\n";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "a";
 		public String grammarName = "T";
 
@@ -324,7 +324,7 @@ public class SetsDescriptors {
 	public static class RuleAsSet extends BaseParserTestDescriptor {
 		public String input = "b";
 		public String output = "b\n";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "a";
 		public String grammarName = "T";
 
@@ -340,7 +340,7 @@ public class SetsDescriptors {
 	public static class SeqDoesNotBecomeSet extends BaseParserTestDescriptor {
 		public String input = "34";
 		public String output = "34\n";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "a";
 		public String grammarName = "T";
 
@@ -357,7 +357,7 @@ public class SetsDescriptors {
 	}
 
 	public static abstract class StarLexerSingleElement extends BaseParserTestDescriptor {
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "a";
 		public String grammarName = "T";
 
@@ -384,7 +384,7 @@ public class SetsDescriptors {
 	public static class StarSet extends BaseParserTestDescriptor {
 		public String input = "abaac";
 		public String output = "abaac\n";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "a";
 		public String grammarName = "T";
 

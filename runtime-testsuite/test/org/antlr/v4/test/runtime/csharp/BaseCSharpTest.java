@@ -36,7 +36,7 @@ import org.antlr.v4.runtime.TokenSource;
 import org.antlr.v4.runtime.WritableToken;
 import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.test.runtime.ErrorQueue;
-import org.antlr.v4.test.runtime.SingleTest;
+import org.antlr.v4.test.runtime.RuntimeTestSupport;
 import org.antlr.v4.tool.ANTLRMessage;
 import org.antlr.v4.tool.DefaultToolListener;
 import org.antlr.v4.tool.GrammarSemanticsMessage;
@@ -77,7 +77,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class BaseCSharpTest implements SingleTest {
+public class BaseCSharpTest implements RuntimeTestSupport {
 	public static final String newline = System.getProperty("line.separator");
 	public static final String pathSep = System.getProperty("path.separator");
 

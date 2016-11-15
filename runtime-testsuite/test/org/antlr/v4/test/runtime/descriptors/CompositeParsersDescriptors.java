@@ -11,7 +11,7 @@ public class CompositeParsersDescriptors {
 	public static class BringInLiteralsFromDelegate extends BaseCompositeParserTestDescriptor {
 		public String input = "=a";
 		public String output = "S.a\n";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "M";
 
@@ -43,7 +43,7 @@ public class CompositeParsersDescriptors {
 	public static class CombinedImportsCombined extends BaseCompositeParserTestDescriptor {
 		public String input = "x 34 9";
 		public String output = "S.x\n";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "M";
 
@@ -92,7 +92,7 @@ public class CompositeParsersDescriptors {
 		@CommentHasStringValue
 		public String output;
 
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "M";
 
@@ -161,7 +161,7 @@ public class CompositeParsersDescriptors {
 	public static class DelegatorAccessesDelegateMembers extends BaseCompositeParserTestDescriptor {
 		public String input = "b";
 		public String output = "foo\n";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "M";
 
@@ -196,7 +196,7 @@ public class CompositeParsersDescriptors {
 	public static class DelegatorInvokesDelegateRule extends BaseCompositeParserTestDescriptor {
 		public String input = "b";
 		public String output = "S.a\n";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "M";
 
@@ -229,7 +229,7 @@ public class CompositeParsersDescriptors {
 	public static class DelegatorInvokesDelegateRuleWithArgs extends BaseCompositeParserTestDescriptor {
 		public String input = "b";
 		public String output = "S.a1000\n";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "M";
 
@@ -262,7 +262,7 @@ public class CompositeParsersDescriptors {
 	public static class DelegatorInvokesDelegateRuleWithReturnStruct extends BaseCompositeParserTestDescriptor {
 		public String input = "b";
 		public String output = "S.ab\n";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "M";
 
@@ -295,7 +295,7 @@ public class CompositeParsersDescriptors {
 	public static class DelegatorInvokesFirstVersionOfDelegateRule extends BaseCompositeParserTestDescriptor {
 		public String input = "b";
 		public String output = "S.a\n";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "M";
 
@@ -336,7 +336,7 @@ public class CompositeParsersDescriptors {
 	public static class DelegatorRuleOverridesDelegate extends BaseCompositeParserTestDescriptor {
 		public String input = "c";
 		public String output = "S.a\n";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "a";
 		public String grammarName = "M";
 
@@ -375,7 +375,7 @@ public class CompositeParsersDescriptors {
 		@CommentHasStringValue
 		public String output;
 
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "a";
 		public String grammarName = "M";
 
@@ -416,7 +416,7 @@ public class CompositeParsersDescriptors {
 	public static class DelegatorRuleOverridesLookaheadInDelegate extends BaseCompositeParserTestDescriptor {
 		public String input = "float x = 3;";
 		public String output = "JavaDecl: floatx=3;\n";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "prog";
 		public String grammarName = "M";
 
@@ -458,8 +458,8 @@ public class CompositeParsersDescriptors {
 	 */
 	public static class ImportLexerWithOnlyFragmentRules extends BaseCompositeParserTestDescriptor {
 		public String input = "test test";
-		public String output = "";
-		public String errors = "";
+		public String output = null;
+		public String errors = null;
 		public String startRule = "program";
 		public String grammarName = "Test";
 
@@ -499,8 +499,8 @@ public class CompositeParsersDescriptors {
 
 	public static class ImportedGrammarWithEmptyOptions extends BaseCompositeParserTestDescriptor {
 		public String input = "b";
-		public String output = "";
-		public String errors = "";
+		public String output = null;
+		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "M";
 
@@ -533,8 +533,8 @@ public class CompositeParsersDescriptors {
 
 	public static class ImportedRuleWithAction extends BaseCompositeParserTestDescriptor {
 		public String input = "b";
-		public String output = "";
-		public String errors = "";
+		public String output = null;
+		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "M";
 
@@ -573,7 +573,7 @@ public class CompositeParsersDescriptors {
 		@CommentHasStringValue
 		public String output;
 
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "a";
 		public String grammarName = "M";
 

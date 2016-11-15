@@ -14,7 +14,7 @@ public class ListenersDescriptors {
 		@CommentHasStringValue
 		public String output;
 
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "T";
 
@@ -57,7 +57,7 @@ public class ListenersDescriptors {
 		@CommentHasStringValue
 		public String output;
 
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "T";
 
@@ -100,7 +100,7 @@ public class ListenersDescriptors {
 		@CommentHasStringValue
 		public String output;
 
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "T";
 
@@ -132,7 +132,7 @@ public class ListenersDescriptors {
 	}
 
 	public static abstract class RuleGetters extends BaseParserTestDescriptor {
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "T";
 
@@ -184,7 +184,7 @@ public class ListenersDescriptors {
 	}
 
 	public static abstract class TokenGetters extends BaseParserTestDescriptor {
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "T";
 

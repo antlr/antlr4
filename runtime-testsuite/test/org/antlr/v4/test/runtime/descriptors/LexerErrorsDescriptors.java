@@ -54,7 +54,7 @@ public class LexerErrorsDescriptors {
 	}
 
 	public static abstract class EnforcedGreedyNestedBraces extends BaseLexerTestDescriptor {
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "";
 		public String grammarName = "L";
 
@@ -212,7 +212,7 @@ public class LexerErrorsDescriptors {
 	}
 
 	public static abstract class StringsEmbeddedInActions extends BaseLexerTestDescriptor {
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "";
 		public String grammarName = "L";
 

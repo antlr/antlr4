@@ -1,6 +1,13 @@
 package org.antlr.v4.test.runtime;
 
-public interface SingleTest {
+/** This interface describes functionality needed to execute a runtime test.
+ *  Unfortunately the Base*Test.java files are big junk drawers. This is
+ *  an attempt to make it more obvious what new target implementers have to
+ *  implement.
+ *
+ *  @since 4.6
+ */
+public interface RuntimeTestSupport {
 	void testSetUp() throws Exception;
 	void testTearDown() throws Exception;
 	void eraseTempDir();

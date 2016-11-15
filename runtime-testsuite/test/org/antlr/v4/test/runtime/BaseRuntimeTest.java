@@ -23,6 +23,14 @@ import java.util.List;
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assume.assumeFalse;
 
+/** This class represents a single runtime test. It pulls data from
+ *  a {@link RuntimeTestDescriptor} and uses junit to trigger a test.
+ *  The only functionality needed to execute a test is defined in
+ *  {@link RuntimeTestSupport}. All of the various test rig classes
+ *  derived from this one. E.g., see {@link org.antlr.v4.test.runtime.java.TestParserExec}.
+ *
+ *  @since 4.6.
+ */
 public abstract class BaseRuntimeTest {
 	public final static String[] Targets = {
 		"Cpp",
@@ -36,10 +44,10 @@ public abstract class BaseRuntimeTest {
 		"Node", "Safari", "Firefox", "Explorer", "Chrome"
 	};
 
-	protected SingleTest delegate;
+	protected RuntimeTestSupport delegate;
 	protected RuntimeTestDescriptor descriptor;
 
-	public BaseRuntimeTest(RuntimeTestDescriptor descriptor, SingleTest delegate) {
+	public BaseRuntimeTest(RuntimeTestDescriptor descriptor, RuntimeTestSupport delegate) {
 		this.descriptor = descriptor;
 		this.delegate = delegate;
 	}

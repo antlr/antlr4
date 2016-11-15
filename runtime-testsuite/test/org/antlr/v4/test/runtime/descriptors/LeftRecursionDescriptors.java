@@ -5,7 +5,7 @@ import org.antlr.v4.test.runtime.CommentHasStringValue;
 
 public class LeftRecursionDescriptors {
 	public static abstract class AmbigLR extends BaseParserTestDescriptor {
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "prog";
 		public String grammarName = "Expr";
 
@@ -38,31 +38,31 @@ public class LeftRecursionDescriptors {
 
 	public static class AmbigLR_1 extends AmbigLR {
 		public String input = "1\n";
-		public String output = "";
+		public String output = null;
 	}
 
 	public static class AmbigLR_2 extends AmbigLR {
 		public String input = "a = 5\n";
-		public String output = "";
+		public String output = null;
 	}
 
 	public static class AmbigLR_3 extends AmbigLR {
 		public String input = "b = 6\n";
-		public String output = "";
+		public String output = null;
 	}
 
 	public static class AmbigLR_4 extends AmbigLR {
 		public String input = "a+b*2\n";
-		public String output = "";
+		public String output = null;
 	}
 
 	public static class AmbigLR_5 extends AmbigLR {
 		public String input = "(1+2)*3\n";
-		public String output = "";
+		public String output = null;
 	}
 
 	public static abstract class Declarations extends BaseParserTestDescriptor {
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "T";
 
@@ -90,7 +90,7 @@ public class LeftRecursionDescriptors {
 	public static class Declarations_1 extends Declarations {
 		public String input = "a";
 		public String output = "(s (declarator a) <EOF>)\n";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "T";
 
@@ -166,7 +166,7 @@ public class LeftRecursionDescriptors {
 	 * https://github.com/antlr/antlr4/issues/161
 	 */
 	public static abstract class DirectCallToLeftRecursiveRule extends BaseParserTestDescriptor {
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "a";
 		public String grammarName = "T";
 
@@ -199,7 +199,7 @@ public class LeftRecursionDescriptors {
 	}
 
 	public static abstract class Expressions extends BaseParserTestDescriptor {
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "T";
 
@@ -259,7 +259,7 @@ public class LeftRecursionDescriptors {
 	}
 
 	public static abstract class JavaExpressions extends BaseParserTestDescriptor {
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "T";
 
@@ -388,7 +388,7 @@ public class LeftRecursionDescriptors {
 	}
 
 	public static abstract class LabelsOnOpSubrule extends BaseParserTestDescriptor {
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "T";
 
@@ -428,7 +428,7 @@ public class LeftRecursionDescriptors {
 	 * https://github.com/antlr/antlr4/issues/625
 	 */
 	public static abstract class MultipleActionsPredicatesOptions extends BaseParserTestDescriptor {
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "T";
 
@@ -469,7 +469,7 @@ public class LeftRecursionDescriptors {
 	 * https://github.com/antlr/antlr4/issues/625
 	 */
 	public static abstract class MultipleActions extends BaseParserTestDescriptor {
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "T";
 
@@ -491,7 +491,7 @@ public class LeftRecursionDescriptors {
 	public static class MultipleActions_1 extends MultipleActions {
 		public String input = "4";
 		public String output = "(s (e 4))\n";
-		public String errors = "";
+		public String errors = null;
 	}
 
 	public static class MultipleActions_2 extends MultipleActions {
@@ -513,7 +513,7 @@ public class LeftRecursionDescriptors {
 	public static abstract class MultipleAlternativesWithCommonLabel extends BaseParserTestDescriptor {
 		public String startRule = "s";
 		public String grammarName = "T";
-		public String errors = "";
+		public String errors = null;
 
 		/**
 		 grammar T;
@@ -566,7 +566,7 @@ public class LeftRecursionDescriptors {
 	public static class PrecedenceFilterConsidersContext extends BaseParserTestDescriptor {
 		public String input = "aa";
 		public String output = "(prog (statement (letterA a)) (statement (letterA a)) <EOF>)\n";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "prog";
 		public String grammarName = "T";
 
@@ -584,7 +584,7 @@ public class LeftRecursionDescriptors {
 	}
 
 	public static abstract class PrefixAndOtherAlt extends BaseParserTestDescriptor {
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "T";
 
@@ -616,7 +616,7 @@ public class LeftRecursionDescriptors {
 	}
 
 	public static abstract class PrefixOpWithActionAndLabel extends BaseParserTestDescriptor {
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "T";
 
@@ -653,7 +653,7 @@ public class LeftRecursionDescriptors {
 	}
 
 	public static abstract class ReturnValueAndActionsAndLabels extends BaseParserTestDescriptor {
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "T";
 
@@ -707,7 +707,7 @@ public class LeftRecursionDescriptors {
 	 * to a ternary operator).
 	 */
 	public static abstract class ReturnValueAndActionsList extends BaseParserTestDescriptor {
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "T";
 
@@ -759,7 +759,7 @@ public class LeftRecursionDescriptors {
 	 * This test treats the `,` and `>>` operators separately.
 	 */
 	public static abstract class ReturnValueAndActionsList2 extends BaseParserTestDescriptor {
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "T";
 
@@ -803,7 +803,7 @@ public class LeftRecursionDescriptors {
 	}
 
 	public static abstract class ReturnValueAndActions extends BaseParserTestDescriptor {
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "T";
 
@@ -848,7 +848,7 @@ public class LeftRecursionDescriptors {
 	public static class SemPred extends BaseParserTestDescriptor {
 		public String input = "x y z";
 		public String output = "(s (a (a (a x) y) z))\n";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "T";
 
@@ -888,7 +888,7 @@ public class LeftRecursionDescriptors {
 	}
 
 	public static abstract class Simple extends BaseParserTestDescriptor {
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "T";
 
@@ -927,7 +927,7 @@ public class LeftRecursionDescriptors {
 	 * https://github.com/antlr/antlr4/issues/542
 	 */
 	public static abstract class TernaryExprExplicitAssociativity extends BaseParserTestDescriptor {
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "T";
 
@@ -994,7 +994,7 @@ public class LeftRecursionDescriptors {
 	}
 
 	public static abstract class TernaryExpr extends BaseParserTestDescriptor {
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "T";
 
@@ -1067,8 +1067,8 @@ public class LeftRecursionDescriptors {
 	 */
 	public static abstract class WhitespaceInfluence extends BaseParserTestDescriptor {
 		public String input = "Test(1,3)";
-		public String output = "";
-		public String errors = "";
+		public String output = null;
+		public String errors = null;
 		public String startRule = "prog";
 		public String grammarName = "Expr";
 
@@ -1129,11 +1129,11 @@ public class LeftRecursionDescriptors {
 
 	public static class WhitespaceInfluence_1 extends WhitespaceInfluence {
 		public String input = "Test(1,3)";
-		public String output = "";
+		public String output = null;
 	}
 
 	public static class WhitespaceInfluence_2 extends WhitespaceInfluence {
 		public String input = "Test(1, 3)";
-		public String output = "";
+		public String output = null;
 	}
 }
