@@ -43,7 +43,7 @@ public class ParserErrorsDescriptors {
 	public static class ContextListGetters extends BaseParserTestDescriptor {
 		public String input = "abab";
 		public String output = "abab\n";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "T";
 
@@ -63,7 +63,7 @@ public class ParserErrorsDescriptors {
 
 	public static abstract class DuplicatedLeftRecursiveCall extends BaseParserTestDescriptor {
 		public String output = "";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "start";
 		public String grammarName = "T";
 
@@ -106,7 +106,7 @@ public class ParserErrorsDescriptors {
 	public static class InvalidATNStateRemoval extends BaseParserTestDescriptor {
 		public String input = "x:x";
 		public String output = "";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "start";
 		public String grammarName = "T";
 
@@ -146,7 +146,7 @@ public class ParserErrorsDescriptors {
 	public static class LL1ErrorInfo extends BaseParserTestDescriptor {
 		public String input = "dog and software";
 		public String output = "{'hardware', 'software'}\n";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "start";
 		public String grammarName = "T";
 

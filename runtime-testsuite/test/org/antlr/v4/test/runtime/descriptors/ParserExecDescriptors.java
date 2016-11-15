@@ -7,7 +7,7 @@ public class ParserExecDescriptors {
 	public static class APlus extends BaseParserTestDescriptor {
 		public String input = "a b c";
 		public String output = "abc\n";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "a";
 		public String grammarName = "T";
 
@@ -27,7 +27,7 @@ public class ParserExecDescriptors {
 	public static class AStar_1 extends BaseParserTestDescriptor {
 		public String input = "";
 		public String output = "\n";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "a";
 		public String grammarName = "T";
 
@@ -47,7 +47,7 @@ public class ParserExecDescriptors {
 	public static class AStar_2 extends BaseParserTestDescriptor {
 		public String input = "a b c";
 		public String output = "abc\n";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "a";
 		public String grammarName = "T";
 
@@ -67,7 +67,7 @@ public class ParserExecDescriptors {
 	public static class AorAPlus extends BaseParserTestDescriptor {
 		public String input = "a b c";
 		public String output = "abc\n";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "a";
 		public String grammarName = "T";
 
@@ -87,7 +87,7 @@ public class ParserExecDescriptors {
 	public static class AorAStar_1 extends BaseParserTestDescriptor {
 		public String input = "";
 		public String output = "\n";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "a";
 		public String grammarName = "T";
 
@@ -107,7 +107,7 @@ public class ParserExecDescriptors {
 	public static class AorAStar_2 extends BaseParserTestDescriptor {
 		public String input = "a b c";
 		public String output = "abc\n";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "a";
 		public String grammarName = "T";
 
@@ -127,7 +127,7 @@ public class ParserExecDescriptors {
 	public static class AorB extends BaseParserTestDescriptor {
 		public String input = "34";
 		public String output = "alt 2\n";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "a";
 		public String grammarName = "T";
 
@@ -150,7 +150,7 @@ public class ParserExecDescriptors {
 	public static class AorBPlus extends BaseParserTestDescriptor {
 		public String input = "a 34 c";
 		public String output = "a34c\n";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "a";
 		public String grammarName = "T";
 
@@ -172,7 +172,7 @@ public class ParserExecDescriptors {
 	public static class AorBStar_1 extends BaseParserTestDescriptor {
 		public String input = "";
 		public String output = "\n";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "a";
 		public String grammarName = "T";
 
@@ -194,7 +194,7 @@ public class ParserExecDescriptors {
 	public static class AorBStar_2 extends BaseParserTestDescriptor {
 		public String input = "a 34 c";
 		public String output = "a34c\n";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "a";
 		public String grammarName = "T";
 
@@ -216,7 +216,7 @@ public class ParserExecDescriptors {
 	public static class Basic extends BaseParserTestDescriptor {
 		public String input = "abc 34";
 		public String output = "abc34\n";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "a";
 		public String grammarName = "T";
 
@@ -242,7 +242,7 @@ public class ParserExecDescriptors {
 	public static class EOFInClosure extends BaseParserTestDescriptor {
 		public String input = "x";
 		public String output = "";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "prog";
 		public String grammarName = "T";
 
@@ -265,7 +265,7 @@ public class ParserExecDescriptors {
 		@CommentHasStringValue
 		public String output;
 
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "start";
 		public String grammarName = "T";
 
@@ -293,7 +293,7 @@ public class ParserExecDescriptors {
 		@CommentHasStringValue
 		public String output;
 
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "start";
 		public String grammarName = "T";
 
@@ -321,7 +321,7 @@ public class ParserExecDescriptors {
 		@CommentHasStringValue
 		public String output;
 
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "start";
 		public String grammarName = "T";
 
@@ -349,7 +349,7 @@ public class ParserExecDescriptors {
 		@CommentHasStringValue
 		public String output;
 
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "start";
 		public String grammarName = "T";
 
@@ -371,7 +371,7 @@ public class ParserExecDescriptors {
 	public static class LL1OptionalBlock_1 extends BaseParserTestDescriptor {
 		public String input = "";
 		public String output = "\n";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "a";
 		public String grammarName = "T";
 
@@ -392,7 +392,7 @@ public class ParserExecDescriptors {
 	public static class LL1OptionalBlock_2 extends BaseParserTestDescriptor {
 		public String input = "a";
 		public String output = "a\n";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "a";
 		public String grammarName = "T";
 
@@ -424,7 +424,7 @@ public class ParserExecDescriptors {
 		@CommentHasStringValue
 		public String output;
 
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "start";
 		public String grammarName = "T";
 
@@ -446,7 +446,7 @@ public class ParserExecDescriptors {
 	public static class Labels extends BaseParserTestDescriptor {
 		public String input = "abc 34;";
 		public String output = "";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "a";
 		public String grammarName = "T";
 
@@ -471,7 +471,7 @@ public class ParserExecDescriptors {
 	public static class ListLabelForClosureContext extends BaseParserTestDescriptor {
 		public String input = "a";
 		public String output = "";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "expression";
 		public String grammarName = "T";
 
@@ -510,7 +510,7 @@ public class ParserExecDescriptors {
 	public static class ListLabelsOnSet extends BaseParserTestDescriptor {
 		public String input = "abc 34;";
 		public String output = "";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "a";
 		public String grammarName = "T";
 
@@ -536,7 +536,7 @@ public class ParserExecDescriptors {
 	public static class MultipleEOFHandling extends BaseParserTestDescriptor {
 		public String input = "x";
 		public String output = "";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "prog";
 		public String grammarName = "T";
 
@@ -556,7 +556,7 @@ public class ParserExecDescriptors {
 	public static class Optional_1 extends BaseParserTestDescriptor {
 		public String input = "x";
 		public String output = "";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "stat";
 		public String grammarName = "T";
 
@@ -574,7 +574,7 @@ public class ParserExecDescriptors {
 	public static class Optional_2 extends BaseParserTestDescriptor {
 		public String input = "if x";
 		public String output = "";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "stat";
 		public String grammarName = "T";
 
@@ -592,7 +592,7 @@ public class ParserExecDescriptors {
 	public static class Optional_3 extends BaseParserTestDescriptor {
 		public String input = "if x else x";
 		public String output = "";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "stat";
 		public String grammarName = "T";
 
@@ -610,7 +610,7 @@ public class ParserExecDescriptors {
 	public static class Optional_4 extends BaseParserTestDescriptor {
 		public String input = "if if x else x";
 		public String output = "";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "stat";
 		public String grammarName = "T";
 
@@ -633,7 +633,7 @@ public class ParserExecDescriptors {
 	public static class ParserProperty extends BaseParserTestDescriptor {
 		public String input = "abc";
 		public String output = "valid\n";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "a";
 		public String grammarName = "T";
 
@@ -657,7 +657,7 @@ public class ParserExecDescriptors {
 	public static class PredicatedIfIfElse extends BaseParserTestDescriptor {
 		public String input = "if x if x a else b";
 		public String output = "";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "T";
 
@@ -683,7 +683,7 @@ public class ParserExecDescriptors {
 	public static class PredictionIssue334 extends BaseParserTestDescriptor {
 		public String input = "a";
 		public String output = "(file_ (item a) <EOF>)\n";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "file_";
 		public String grammarName = "T";
 
@@ -715,7 +715,7 @@ public class ParserExecDescriptors {
 	public static class ReferenceToATN_1 extends BaseParserTestDescriptor {
 		public String input = "";
 		public String output = "\n";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "a";
 		public String grammarName = "T";
 
@@ -734,7 +734,7 @@ public class ParserExecDescriptors {
 	public static class ReferenceToATN_2 extends BaseParserTestDescriptor {
 		public String input = "a 34 c";
 		public String output = "a34c\n";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "a";
 		public String grammarName = "T";
 

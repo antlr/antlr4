@@ -7,7 +7,7 @@ public class ParseTreesDescriptors {
 	public static class AltNum extends BaseParserTestDescriptor {
 		public String input = "xyz";
 		public String output = "(a:3 x (b:2 y) z)\n";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "T";
 
@@ -99,7 +99,7 @@ public class ParseTreesDescriptors {
 	public static class RuleRef extends BaseParserTestDescriptor {
 		public String input = "yx";
 		public String output = "(a (b y) x)\n";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "T";
 
@@ -153,7 +153,7 @@ public class ParseTreesDescriptors {
 	public static class Token2 extends BaseParserTestDescriptor {
 		public String input = "xy";
 		public String output = "(a x y)\n";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "T";
 
@@ -184,7 +184,7 @@ public class ParseTreesDescriptors {
 		@CommentHasStringValue
 		public String output;
 
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "T";
 
@@ -210,7 +210,7 @@ public class ParseTreesDescriptors {
 	public static class TwoAltLoop extends BaseParserTestDescriptor {
 		public String input = "xyyxyxz";
 		public String output = "(a x y y x y x z)\n";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "T";
 
@@ -235,7 +235,7 @@ public class ParseTreesDescriptors {
 	public static class TwoAlts extends BaseParserTestDescriptor {
 		public String input = "y";
 		public String output = "(a y)\n";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "T";
 

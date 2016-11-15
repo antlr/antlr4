@@ -11,7 +11,7 @@ public class PerformanceDescriptors {
 	 */
 	public static abstract class ExpressionGrammar extends BaseParserTestDescriptor {
 		public String output = "";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "program";
 		public String grammarName = "Expr";
 

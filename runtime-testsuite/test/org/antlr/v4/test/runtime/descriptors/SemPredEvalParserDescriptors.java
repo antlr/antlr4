@@ -14,7 +14,7 @@ public class SemPredEvalParserDescriptors {
 		@CommentHasStringValue
 		public String output;
 
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "T";
 
@@ -48,7 +48,7 @@ public class SemPredEvalParserDescriptors {
 		@CommentHasStringValue
 		public String output;
 
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "T";
 
@@ -77,7 +77,7 @@ public class SemPredEvalParserDescriptors {
 	public static class AtomWithClosureInTranslatedLRRule extends BaseParserTestDescriptor {
 		public String input = "a+b+a";
 		public String output = "";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "start";
 		public String grammarName = "T";
 
@@ -106,7 +106,7 @@ public class SemPredEvalParserDescriptors {
 		@CommentHasStringValue
 		public String output;
 
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "T";
 
@@ -131,7 +131,7 @@ public class SemPredEvalParserDescriptors {
 	public static class DependentPredNotInOuterCtxShouldBeIgnored extends BaseParserTestDescriptor {
 		public String input = "a;";
 		public String output = "alt 2\n";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "T";
 
@@ -160,7 +160,7 @@ public class SemPredEvalParserDescriptors {
 	public static class DisabledAlternative extends BaseParserTestDescriptor {
 		public String input = "hello";
 		public String output = "";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "cppCompilationUnit";
 		public String grammarName = "T";
 
@@ -179,7 +179,7 @@ public class SemPredEvalParserDescriptors {
 	public static class IndependentPredNotPassedOuterCtxToAvoidCastException extends BaseParserTestDescriptor {
 		public String input = "a;";
 		public String output = "alt 2\n";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "T";
 
@@ -231,7 +231,7 @@ public class SemPredEvalParserDescriptors {
 		@CommentHasStringValue
 		public String output;
 
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "T";
 
@@ -287,11 +287,11 @@ public class SemPredEvalParserDescriptors {
 	public static class PredFromAltTestedInLoopBack_2 extends PredFromAltTestedInLoopBack {
 		public String input = "s\n\n\nx\n\n";
 		public String output = "(file_ (para (paraContent s) \\n \\n) (para (paraContent \\n x) \\n \\n) <EOF>)\n";
-		public String errors = "";
+		public String errors = null;
 	}
 
 	public static abstract class PredTestedEvenWhenUnAmbig extends BaseParserTestDescriptor {
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "primary";
 		public String grammarName = "T";
 
@@ -336,7 +336,7 @@ public class SemPredEvalParserDescriptors {
 		@CommentHasStringValue
 		public String output;
 
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "T";
 
@@ -370,7 +370,7 @@ public class SemPredEvalParserDescriptors {
 	public static class PredicateDependentOnArg2 extends BaseParserTestDescriptor {
 		public String input = "a b";
 		public String output = "";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "T";
 
@@ -403,7 +403,7 @@ public class SemPredEvalParserDescriptors {
 		@CommentHasStringValue
 		public String output;
 
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "T";
 
@@ -433,7 +433,7 @@ public class SemPredEvalParserDescriptors {
 		@CommentHasStringValue
 		public String output;
 
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "T";
 
@@ -462,7 +462,7 @@ public class SemPredEvalParserDescriptors {
 		@CommentHasStringValue
 		public String output;
 
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "T";
 
@@ -542,7 +542,7 @@ public class SemPredEvalParserDescriptors {
 		@CommentHasStringValue
 		public String output;
 
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "T";
 
@@ -579,7 +579,7 @@ public class SemPredEvalParserDescriptors {
 		@CommentHasStringValue
 		public String output;
 
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "T";
 
@@ -684,7 +684,7 @@ public class SemPredEvalParserDescriptors {
 	public static class UnpredicatedPathsInAlt extends BaseParserTestDescriptor {
 		public String input = "x 4";
 		public String output = "alt 1\n";
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "T";
 

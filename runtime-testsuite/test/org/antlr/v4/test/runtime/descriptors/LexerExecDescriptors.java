@@ -22,7 +22,7 @@ public class LexerExecDescriptors {
 		@CommentHasStringValue
 		public String output;
 
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "";
 		public String grammarName = "L";
 
@@ -53,7 +53,7 @@ public class LexerExecDescriptors {
 		@CommentHasStringValue
 		public String output;
 
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "";
 		public String grammarName = "L";
 
@@ -79,7 +79,7 @@ public class LexerExecDescriptors {
 		@CommentHasStringValue
 		public String output;
 
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "";
 		public String grammarName = "L";
 
@@ -103,7 +103,7 @@ public class LexerExecDescriptors {
 		@CommentHasStringValue
 		public String output;
 
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "";
 		public String grammarName = "L";
 
@@ -129,7 +129,7 @@ public class LexerExecDescriptors {
 		@CommentHasStringValue
 		public String output;
 
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "";
 		public String grammarName = "L";
 
@@ -159,7 +159,7 @@ public class LexerExecDescriptors {
 		@CommentHasStringValue
 		public String output;
 
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "";
 		public String grammarName = "L";
 
@@ -186,7 +186,7 @@ public class LexerExecDescriptors {
 		@CommentHasStringValue
 		public String output;
 
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "";
 		public String grammarName = "L";
 
@@ -210,7 +210,7 @@ public class LexerExecDescriptors {
 		@CommentHasStringValue
 		public String output;
 
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "";
 		public String grammarName = "L";
 
@@ -234,7 +234,7 @@ public class LexerExecDescriptors {
 		@CommentHasStringValue
 		public String output;
 
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "";
 		public String grammarName = "L";
 
@@ -258,7 +258,7 @@ public class LexerExecDescriptors {
 		@CommentHasStringValue
 		public String output;
 
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "";
 		public String grammarName = "L";
 
@@ -282,7 +282,7 @@ public class LexerExecDescriptors {
 		@CommentHasStringValue
 		public String output;
 
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "";
 		public String grammarName = "L";
 
@@ -306,7 +306,7 @@ public class LexerExecDescriptors {
 		@CommentHasStringValue
 		public String output;
 
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "";
 		public String grammarName = "L";
 
@@ -329,7 +329,7 @@ public class LexerExecDescriptors {
 		@CommentHasStringValue
 		public String output;
 
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "";
 		public String grammarName = "L";
 
@@ -344,7 +344,7 @@ public class LexerExecDescriptors {
 	}
 
 	public static abstract class EOFSuffixInFirstRule extends BaseLexerTestDescriptor {
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "";
 		public String grammarName = "L";
 
@@ -389,7 +389,7 @@ public class LexerExecDescriptors {
 		@CommentHasStringValue
 		public String output;
 
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "";
 		public String grammarName = "L";
 
@@ -413,7 +413,7 @@ public class LexerExecDescriptors {
 		@CommentHasStringValue
 		public String output;
 
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "";
 		public String grammarName = "L";
 
@@ -443,7 +443,7 @@ public class LexerExecDescriptors {
 		@CommentHasStringValue
 		public String output;
 
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "";
 		public String grammarName = "L";
 
@@ -472,7 +472,7 @@ public class LexerExecDescriptors {
 		@CommentHasStringValue
 		public String output;
 
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "";
 		public String grammarName = "L";
 
@@ -507,7 +507,7 @@ public class LexerExecDescriptors {
 		@CommentHasStringValue
 		public String output;
 
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "";
 		public String grammarName = "L";
 
@@ -541,7 +541,7 @@ public class LexerExecDescriptors {
 		@CommentHasStringValue
 		public String output;
 
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "";
 		public String grammarName = "L";
 
@@ -572,7 +572,7 @@ public class LexerExecDescriptors {
 		@CommentHasStringValue
 		public String output;
 
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "";
 		public String grammarName = "L";
 
@@ -598,7 +598,7 @@ public class LexerExecDescriptors {
 		@CommentHasStringValue
 		public String output;
 
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "";
 		public String grammarName = "L";
 
@@ -629,7 +629,7 @@ public class LexerExecDescriptors {
 		@CommentHasStringValue
 		public String output;
 
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "";
 		public String grammarName = "L";
 
@@ -659,7 +659,7 @@ public class LexerExecDescriptors {
 		@CommentHasStringValue
 		public String output;
 
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "";
 		public String grammarName = "L";
 
@@ -683,7 +683,7 @@ public class LexerExecDescriptors {
 		@CommentHasStringValue
 		public String output;
 
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "";
 		public String grammarName = "L";
 
@@ -705,7 +705,7 @@ public class LexerExecDescriptors {
 		@CommentHasStringValue
 		public String output;
 
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "";
 		public String grammarName = "L";
 
@@ -733,7 +733,7 @@ public class LexerExecDescriptors {
 		@CommentHasStringValue
 		public String output;
 
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "";
 		public String grammarName = "L";
 
@@ -778,7 +778,7 @@ public class LexerExecDescriptors {
 		@CommentHasStringValue
 		public String output;
 
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "";
 		public String grammarName = "PositionAdjustingLexer";
 
@@ -832,7 +832,7 @@ public class LexerExecDescriptors {
 		@CommentHasStringValue
 		public String output;
 
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "";
 		public String grammarName = "L";
 
@@ -846,7 +846,7 @@ public class LexerExecDescriptors {
 	}
 
 	public static abstract class RecursiveLexerRuleRefWithWildcardPlus extends BaseLexerTestDescriptor {
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "";
 		public String grammarName = "L";
 
@@ -896,7 +896,7 @@ public class LexerExecDescriptors {
 	}
 
 	public static abstract class RecursiveLexerRuleRefWithWildcardStar extends BaseLexerTestDescriptor {
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "";
 		public String grammarName = "L";
 
@@ -958,7 +958,7 @@ public class LexerExecDescriptors {
 		@CommentHasStringValue
 		public String output;
 
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "";
 		public String grammarName = "L";
 
@@ -985,7 +985,7 @@ public class LexerExecDescriptors {
 		@CommentHasStringValue
 		public String output;
 
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "";
 		public String grammarName = "L";
 
@@ -1018,7 +1018,7 @@ public class LexerExecDescriptors {
 		@CommentHasStringValue
 		public String output;
 
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "";
 		public String grammarName = "L";
 
@@ -1051,7 +1051,7 @@ public class LexerExecDescriptors {
 		@CommentHasStringValue
 		public String output;
 
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "";
 		public String grammarName = "L";
 

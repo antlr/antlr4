@@ -8,6 +8,12 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/** An abstract but mostly complete test descriptor that pulls values
+ *  for the various runtime test descriptor methods such as {@link #getInput()}
+ *  from fields using reflection.
+ *
+ *  @since 4.6
+ */
 public abstract class BaseRuntimeTestDescriptor implements RuntimeTestDescriptor {
 	protected String targetName;
 
@@ -78,20 +84,6 @@ public abstract class BaseRuntimeTestDescriptor implements RuntimeTestDescriptor
 		}
 		catch (Exception nsfe) {
 			System.err.println("No start rule specified for test "+getTestName());
-		}
-		return null;
-	}
-
-	@Override
-	public String getAfterGrammar() {
-		try {
-			Field f = this.getClass().getField("afterGrammar");
-			String s = stringIndentation((String)f.get(this));
-			if ( s.length()==0 ) return null;
-			return s;
-		}
-		catch (Exception nsfe) {
-			; // we are optional
 		}
 		return null;
 	}

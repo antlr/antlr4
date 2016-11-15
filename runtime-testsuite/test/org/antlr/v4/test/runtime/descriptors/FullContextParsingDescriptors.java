@@ -205,7 +205,7 @@ public class FullContextParsingDescriptors {
 	}
 
 	public static abstract class FullContextIF_THEN_ELSEParse extends BaseDebugParserTestDescriptor {
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "T";
 

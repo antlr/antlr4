@@ -21,7 +21,7 @@ public class SemPredEvalLexerDescriptors {
 		@CommentHasStringValue
 		public String output;
 
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "";
 		public String grammarName = "L";
 
@@ -52,7 +52,7 @@ public class SemPredEvalLexerDescriptors {
 
 		public String output;
 
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "";
 		public String grammarName = "L";
 
@@ -82,7 +82,7 @@ public class SemPredEvalLexerDescriptors {
 
 		public String output;
 
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "";
 		public String grammarName = "L";
 
@@ -118,7 +118,7 @@ public class SemPredEvalLexerDescriptors {
 		@CommentHasStringValue // 	no 'm'-> transition...conflicts with pred
 		public String output;
 
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "";
 		public String grammarName = "L";
 
@@ -158,7 +158,7 @@ public class SemPredEvalLexerDescriptors {
 		@CommentHasStringValue
 		public String output;
 
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "";
 		public String grammarName = "L";
 
@@ -193,7 +193,7 @@ public class SemPredEvalLexerDescriptors {
 		@CommentHasStringValue
 		public String output;
 
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "";
 		public String grammarName = "L";
 
@@ -226,7 +226,7 @@ public class SemPredEvalLexerDescriptors {
 		@CommentHasStringValue
 		public String output;
 
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "";
 		public String grammarName = "L";
 

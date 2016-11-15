@@ -20,7 +20,7 @@ public class CompositeLexersDescriptors {
 		@CommentHasStringValue
 		public String output;
 
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "";
 		public String grammarName = "M";
 
@@ -60,7 +60,7 @@ public class CompositeLexersDescriptors {
 		@CommentHasStringValue
 		public String output;
 
-		public String errors = "";
+		public String errors = null;
 		public String startRule = "";
 		public String grammarName = "M";
 
