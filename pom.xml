@@ -75,6 +75,9 @@
     <module>tool</module>
     <module>antlr4-maven-plugin</module>
     <module>tool-testsuite</module>
+    <module>runtime-testsuite/annotations</module>
+    <module>runtime-testsuite/processors</module>
+    <module>runtime-testsuite-legacy</module>
     <module>runtime-testsuite</module>
   </modules>
 

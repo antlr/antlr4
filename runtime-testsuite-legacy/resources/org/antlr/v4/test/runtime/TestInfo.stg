@@ -1,0 +1,111 @@
+file(className, descriptors) ::= <<
+package org.antlr.v4.test.runtime.xxx.tests.junk;
+
+import org.antlr.v4.runtime.misc.Pair;
+import org.antlr.v4.test.runtime.CommentHasStringValue;
+import org.antlr.v4.test.runtime.xxx.*;
+import org.antlr.v4.test.runtime.xxx.tests.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class <className> {
+	<descriptors; separator="\n\n">
+}
+>>
+
+rig(targetName, groupName, go, subdir) ::= <<
+package org.antlr.v4.test.runtime.xxx.tests.<subdir:{s|<s>.}><targetName; format="lower">;
+
+import org.antlr.v4.test.runtime.xxx.RuntimeTestDescriptor;
+import org.antlr.v4.test.runtime.xxx.XXXBaseTest;
+import org.antlr.v4.test.runtime.xxx.descriptors.*;
+import org.junit.*;
+import org.junit.runner.*;
+import org.junit.runners.Parameterized;
+
+@RunWith(Parameterized.class)
+public class Test<groupName> extends XXXBaseTest {
+	public Test<groupName>(RuntimeTestDescriptor descriptor) {
+		super(descriptor,new Base<targetName>Test());
+	}
+
+	<if(go)>
+	@BeforeClass
+	public static void groupSetUp() throws Exception { BaseGoTest.groupSetUp(); }
+
+	@AfterClass
+	public static void groupTearDown() throws Exception { BaseGoTest.groupTearDown(); }
+	<endif>
+
+	@Parameterized.Parameters(name="{0}")
+	public static RuntimeTestDescriptor[] getAllTestDescriptors() {
+		return XXXBaseTest.getRuntimeTestDescriptors(<groupName>Descriptors.class, "<targetName>");
+	}
+}
+>>
+
+descriptor(testName, TestType, Input, LongInput, Errors, LongErrors, Rule, Output, LongOutput,
+           grammar, slaveGrammars, grammarName, LongAfterGrammar) ::= <<
+public static class <testName> extends Base<TestType>TestDescriptor {
+	<if(LongInput)>
+	/**
+	<LongInput>
+	 */
+	@CommentHasStringValue
+	public String input;<\n>
+	<else>
+	public String input = "<Input>";
+	<endif>
+	<if(LongOutput)>
+	/**
+	<LongOutput>
+	 */
+	@CommentHasStringValue
+	public String output;<\n>
+	<else>
+	public String output = "<Output>";
+	<endif>
+	<if(LongErrors)>
+	/**
+	<LongErrors>
+	 */
+	@CommentHasStringValue
+	public String errors;<\n>
+	<else>
+	public String errors = "<Errors>";
+	<endif>
+	public String startRule = "<Rule>";
+	public String grammarName = "<grammarName>";
+
+	<if(LongAfterGrammar)>
+	/**
+	<LongAfterGrammar>
+	 */
+	@CommentHasStringValue
+	public String afterGrammar;
+	<endif>
+
+	/**
+	 <grammar>
+	 */
+	@CommentHasStringValue
+	public String grammar;
+
+	<if(slaveGrammars)>
+	<slaveGrammars:{sg |
+/**
+<sg.grammar>
+ */
+@CommentHasStringValue
+public String slaveGrammar<sg.name>;
+	}>
+	@Override
+	public List\<Pair\<String, String>\> getSlaveGrammars() {
+		List\<Pair\<String,String>\> slaves = new ArrayList\<Pair\<String, String>\>();
+		<slaveGrammars:{sg | slaves.add(new Pair\<String, String>("<sg.name>",slaveGrammar<sg.name>));<\n>}>
+		return slaves;
+	\}
+	<endif>
+}
+>>

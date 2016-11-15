@@ -35,10 +35,11 @@ import org.antlr.v4.automata.LexerATNFactory;
 import org.antlr.v4.automata.ParserATNFactory;
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.semantics.SemanticPipeline;
-import org.antlr.v4.test.runtime.java.BaseTest;
-import org.antlr.v4.test.runtime.java.ErrorQueue;
+import org.antlr.v4.test.runtime.ErrorQueue;
+import org.antlr.v4.test.runtime.java.BaseJavaTest;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
+import org.junit.Before;
 import org.junit.Test;
 import org.stringtemplate.v4.AutoIndentWriter;
 import org.stringtemplate.v4.InstanceScope;
@@ -56,7 +57,13 @@ import java.util.List;
 
 import static org.junit.Assert.assertFalse;
 
-public class TestCodeGeneration extends BaseTest {
+public class TestCodeGeneration extends BaseJavaTest {
+	@Before
+	@Override
+	public void testSetUp() throws Exception {
+		super.testSetUp();
+	}
+
 	@Test public void testArgDecl() throws Exception { // should use template not string
 		/*ErrorQueue equeue = */new ErrorQueue();
 		String g =

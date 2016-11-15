@@ -29,12 +29,12 @@
  */
 package org.antlr.v4.test.tool;
 
+import org.antlr.v4.gui.Trees;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.InterpreterRuleContext;
 import org.antlr.v4.runtime.LexerInterpreter;
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.gui.Trees;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.GrammarParserInterpreter;
 import org.antlr.v4.tool.LexerGrammar;
@@ -135,7 +135,7 @@ public class TestGrammarParserInterpreter {
 		ParseTree t = parser.parse(g.rules.get(startRule).index);
 		InterpreterTreeTextProvider nodeTextProvider = new InterpreterTreeTextProvider(g.getRuleNames());
 		String treeStr = Trees.toStringTree(t, nodeTextProvider);
-		System.out.println("parse tree: "+treeStr);
+//		System.out.println("parse tree: "+treeStr);
 		assertEquals(expectedParseTree, treeStr);
 		return (InterpreterRuleContext)t;
 	}

@@ -30,15 +30,16 @@
 
 package org.antlr.v4.test.tool;
 
-import org.antlr.v4.test.runtime.java.BaseTest;
+import org.antlr.v4.test.runtime.java.BaseJavaTest;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.LexerGrammar;
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
 /** */
-public class TestSymbolIssues extends BaseTest {
+public class TestSymbolIssues extends BaseJavaTest {
     static String[] A = {
         // INPUT
         "grammar A;\n" +
@@ -129,6 +130,12 @@ public class TestSymbolIssues extends BaseTest {
 		// YIELDS
 		"error(" + ErrorType.MODE_CONFLICTS_WITH_TOKEN.code + "): F.g4:3:0: mode M1 conflicts with token with same name\n"
 	};
+
+	@Before
+	@Override
+	public void testSetUp() throws Exception {
+		super.testSetUp();
+	}
 
     @Test public void testA() { super.testErrors(A, false); }
     @Test public void testB() { super.testErrors(B, false); }
