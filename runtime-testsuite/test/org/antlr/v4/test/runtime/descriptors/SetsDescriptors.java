@@ -32,7 +32,7 @@ public class SetsDescriptors {
 
 	public static class ComplementSet extends BaseParserTestDescriptor {
 		public String input = "a";
-		public String output = "";
+		public String output = null;
 		/**
 		line 1:0 token recognition error at: 'a'
 		line 1:1 missing {} at '<EOF>'

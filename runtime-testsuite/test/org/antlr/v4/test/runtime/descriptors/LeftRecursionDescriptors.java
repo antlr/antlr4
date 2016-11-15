@@ -38,27 +38,27 @@ public class LeftRecursionDescriptors {
 
 	public static class AmbigLR_1 extends AmbigLR {
 		public String input = "1\n";
-		public String output = "";
+		public String output = null;
 	}
 
 	public static class AmbigLR_2 extends AmbigLR {
 		public String input = "a = 5\n";
-		public String output = "";
+		public String output = null;
 	}
 
 	public static class AmbigLR_3 extends AmbigLR {
 		public String input = "b = 6\n";
-		public String output = "";
+		public String output = null;
 	}
 
 	public static class AmbigLR_4 extends AmbigLR {
 		public String input = "a+b*2\n";
-		public String output = "";
+		public String output = null;
 	}
 
 	public static class AmbigLR_5 extends AmbigLR {
 		public String input = "(1+2)*3\n";
-		public String output = "";
+		public String output = null;
 	}
 
 	public static abstract class Declarations extends BaseParserTestDescriptor {
@@ -1067,7 +1067,7 @@ public class LeftRecursionDescriptors {
 	 */
 	public static abstract class WhitespaceInfluence extends BaseParserTestDescriptor {
 		public String input = "Test(1,3)";
-		public String output = "";
+		public String output = null;
 		public String errors = null;
 		public String startRule = "prog";
 		public String grammarName = "Expr";
@@ -1129,11 +1129,11 @@ public class LeftRecursionDescriptors {
 
 	public static class WhitespaceInfluence_1 extends WhitespaceInfluence {
 		public String input = "Test(1,3)";
-		public String output = "";
+		public String output = null;
 	}
 
 	public static class WhitespaceInfluence_2 extends WhitespaceInfluence {
 		public String input = "Test(1, 3)";
-		public String output = "";
+		public String output = null;
 	}
 }

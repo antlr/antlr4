@@ -10,7 +10,7 @@ public class PerformanceDescriptors {
 	 * https://github.com/antlr/antlr4/issues/192
 	 */
 	public static abstract class ExpressionGrammar extends BaseParserTestDescriptor {
-		public String output = "";
+		public String output = null;
 		public String errors = null;
 		public String startRule = "program";
 		public String grammarName = "Expr";

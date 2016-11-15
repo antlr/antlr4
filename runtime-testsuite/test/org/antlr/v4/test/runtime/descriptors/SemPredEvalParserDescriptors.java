@@ -76,7 +76,7 @@ public class SemPredEvalParserDescriptors {
 	 */
 	public static class AtomWithClosureInTranslatedLRRule extends BaseParserTestDescriptor {
 		public String input = "a+b+a";
-		public String output = "";
+		public String output = null;
 		public String errors = null;
 		public String startRule = "start";
 		public String grammarName = "T";
@@ -159,7 +159,7 @@ public class SemPredEvalParserDescriptors {
 	 */
 	public static class DisabledAlternative extends BaseParserTestDescriptor {
 		public String input = "hello";
-		public String output = "";
+		public String output = null;
 		public String errors = null;
 		public String startRule = "cppCompilationUnit";
 		public String grammarName = "T";
@@ -202,7 +202,7 @@ public class SemPredEvalParserDescriptors {
 
 	public static class NoTruePredsThrowsNoViableAlt extends BaseParserTestDescriptor {
 		public String input = "y 3 x 4";
-		public String output = "";
+		public String output = null;
 		public String errors = "line 1:0 no viable alternative at input 'y'\n";
 		public String startRule = "s";
 		public String grammarName = "T";
@@ -317,7 +317,7 @@ public class SemPredEvalParserDescriptors {
 
 	public static class PredTestedEvenWhenUnAmbig_2 extends PredTestedEvenWhenUnAmbig {
 		public String input = "enum";
-		public String output = "";
+		public String output = null;
 		public String errors = "line 1:0 no viable alternative at input 'enum'\n";
 	}
 
@@ -369,7 +369,7 @@ public class SemPredEvalParserDescriptors {
 	 */
 	public static class PredicateDependentOnArg2 extends BaseParserTestDescriptor {
 		public String input = "a b";
-		public String output = "";
+		public String output = null;
 		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "T";
@@ -484,7 +484,7 @@ public class SemPredEvalParserDescriptors {
 
 	public static class SimpleValidate extends BaseParserTestDescriptor {
 		public String input = "x";
-		public String output = "";
+		public String output = null;
 		public String errors = "line 1:0 no viable alternative at input 'x'\n";
 		public String startRule = "s";
 		public String grammarName = "T";
@@ -709,7 +709,7 @@ public class SemPredEvalParserDescriptors {
 
 	public static class ValidateInDFA extends BaseParserTestDescriptor {
 		public String input = "x ; y";
-		public String output = "";
+		public String output = null;
 		/**
 		line 1:0 no viable alternative at input 'x'
 		line 1:4 no viable alternative at input 'y'

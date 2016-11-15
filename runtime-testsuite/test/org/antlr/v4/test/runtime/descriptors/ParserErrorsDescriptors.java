@@ -62,7 +62,7 @@ public class ParserErrorsDescriptors {
 	}
 
 	public static abstract class DuplicatedLeftRecursiveCall extends BaseParserTestDescriptor {
-		public String output = "";
+		public String output = null;
 		public String errors = null;
 		public String startRule = "start";
 		public String grammarName = "T";
@@ -105,7 +105,7 @@ public class ParserErrorsDescriptors {
 	 */
 	public static class InvalidATNStateRemoval extends BaseParserTestDescriptor {
 		public String input = "x:x";
-		public String output = "";
+		public String output = null;
 		public String errors = null;
 		public String startRule = "start";
 		public String grammarName = "T";
@@ -128,7 +128,7 @@ public class ParserErrorsDescriptors {
 	 */
 	public static class InvalidEmptyInput extends BaseParserTestDescriptor {
 		public String input = "";
-		public String output = "";
+		public String output = null;
 		public String errors = "line 1:0 missing ID at '<EOF>'\n";
 		public String startRule = "start";
 		public String grammarName = "T";
@@ -173,7 +173,7 @@ public class ParserErrorsDescriptors {
 
 	public static class LL2 extends BaseParserTestDescriptor {
 		public String input = "ae";
-		public String output = "";
+		public String output = null;
 		public String errors = "line 1:1 no viable alternative at input 'ae'\n";
 		public String startRule = "a";
 		public String grammarName = "T";
@@ -192,7 +192,7 @@ public class ParserErrorsDescriptors {
 
 	public static class LL3 extends BaseParserTestDescriptor {
 		public String input = "abe";
-		public String output = "";
+		public String output = null;
 		public String errors = "line 1:2 no viable alternative at input 'abe'\n";
 		public String startRule = "a";
 		public String grammarName = "T";
@@ -211,7 +211,7 @@ public class ParserErrorsDescriptors {
 
 	public static class LLStar extends BaseParserTestDescriptor {
 		public String input = "aaae";
-		public String output = "";
+		public String output = null;
 		public String errors = "line 1:3 no viable alternative at input 'aaae'\n";
 		public String startRule = "a";
 		public String grammarName = "T";
@@ -230,7 +230,7 @@ public class ParserErrorsDescriptors {
 
 	public static class MultiTokenDeletionBeforeLoop extends BaseParserTestDescriptor {
 		public String input = "aacabc";
-		public String output = "";
+		public String output = null;
 		public String errors = "line 1:1 extraneous input 'a' expecting {'b', 'c'}\n";
 		public String startRule = "a";
 		public String grammarName = "T";
@@ -246,7 +246,7 @@ public class ParserErrorsDescriptors {
 
 	public static class MultiTokenDeletionBeforeLoop2 extends BaseParserTestDescriptor {
 		public String input = "aacabc";
-		public String output = "";
+		public String output = null;
 		public String errors = "line 1:1 extraneous input 'a' expecting {'b', 'z', 'c'}\n";
 		public String startRule = "a";
 		public String grammarName = "T";
@@ -262,7 +262,7 @@ public class ParserErrorsDescriptors {
 
 	public static class MultiTokenDeletionDuringLoop extends BaseParserTestDescriptor {
 		public String input = "abaaababc";
-		public String output = "";
+		public String output = null;
 		/**
 		line 1:2 extraneous input 'a' expecting {'b', 'c'}
 		line 1:6 extraneous input 'a' expecting {'b', 'c'}
@@ -284,7 +284,7 @@ public class ParserErrorsDescriptors {
 
 	public static class MultiTokenDeletionDuringLoop2 extends BaseParserTestDescriptor {
 		public String input = "abaaababc";
-		public String output = "";
+		public String output = null;
 		/**
 		line 1:2 extraneous input 'a' expecting {'b', 'z', 'c'}
 		line 1:6 extraneous input 'a' expecting {'b', 'z', 'c'}
@@ -306,7 +306,7 @@ public class ParserErrorsDescriptors {
 
 	public static class NoViableAltAvoidance extends BaseParserTestDescriptor {
 		public String input = "a.";
-		public String output = "";
+		public String output = null;
 		public String errors = "line 1:1 mismatched input '.' expecting '!'\n";
 		public String startRule = "s";
 		public String grammarName = "T";
@@ -327,7 +327,7 @@ public class ParserErrorsDescriptors {
 
 	public static class SingleSetInsertion extends BaseParserTestDescriptor {
 		public String input = "ad";
-		public String output = "";
+		public String output = null;
 		public String errors = "line 1:1 missing {'b', 'c'} at 'd'\n";
 		public String startRule = "a";
 		public String grammarName = "T";
@@ -360,7 +360,7 @@ public class ParserErrorsDescriptors {
 
 	public static class SingleTokenDeletion extends BaseParserTestDescriptor {
 		public String input = "aab";
-		public String output = "";
+		public String output = null;
 		public String errors = "line 1:1 extraneous input 'a' expecting 'b'\n";
 		public String startRule = "a";
 		public String grammarName = "T";
@@ -376,7 +376,7 @@ public class ParserErrorsDescriptors {
 
 	public static class SingleTokenDeletionBeforeAlt extends BaseParserTestDescriptor {
 		public String input = "ac";
-		public String output = "";
+		public String output = null;
 		public String errors = "line 1:0 extraneous input 'a' expecting {'b', 'c'}\n";
 		public String startRule = "a";
 		public String grammarName = "T";
@@ -395,7 +395,7 @@ public class ParserErrorsDescriptors {
 
 	public static class SingleTokenDeletionBeforeLoop extends BaseParserTestDescriptor {
 		public String input = "aabc";
-		public String output = "";
+		public String output = null;
 		/**
 		line 1:1 extraneous input 'a' expecting {<EOF>, 'b'}
 		line 1:3 token recognition error at: 'c'
@@ -417,7 +417,7 @@ public class ParserErrorsDescriptors {
 
 	public static class SingleTokenDeletionBeforeLoop2 extends BaseParserTestDescriptor {
 		public String input = "aabc";
-		public String output = "";
+		public String output = null;
 		/**
 		line 1:1 extraneous input 'a' expecting {<EOF>, 'b', 'z'}
 		line 1:3 token recognition error at: 'c'
@@ -439,7 +439,7 @@ public class ParserErrorsDescriptors {
 
 	public static class SingleTokenDeletionBeforePredict extends BaseParserTestDescriptor {
 		public String input = "caaab";
-		public String output = "";
+		public String output = null;
 		public String errors = "line 1:0 extraneous input 'c' expecting 'a'\n";
 		public String startRule = "a";
 		public String grammarName = "T";
@@ -475,7 +475,7 @@ public class ParserErrorsDescriptors {
 
 	public static class SingleTokenDeletionDuringLoop extends BaseParserTestDescriptor {
 		public String input = "ababbc";
-		public String output = "";
+		public String output = null;
 		public String errors = "line 1:2 extraneous input 'a' expecting {'b', 'c'}\n";
 		public String startRule = "a";
 		public String grammarName = "T";
@@ -491,7 +491,7 @@ public class ParserErrorsDescriptors {
 
 	public static class SingleTokenDeletionDuringLoop2 extends BaseParserTestDescriptor {
 		public String input = "ababbc";
-		public String output = "";
+		public String output = null;
 		public String errors = "line 1:2 extraneous input 'a' expecting {'b', 'z', 'c'}\n";
 		public String startRule = "a";
 		public String grammarName = "T";
@@ -507,7 +507,7 @@ public class ParserErrorsDescriptors {
 
 	public static class SingleTokenDeletionExpectingSet extends BaseParserTestDescriptor {
 		public String input = "aab";
-		public String output = "";
+		public String output = null;
 		public String errors = "line 1:1 extraneous input 'a' expecting {'b', 'c'}\n";
 		public String startRule = "a";
 		public String grammarName = "T";
@@ -523,7 +523,7 @@ public class ParserErrorsDescriptors {
 
 	public static class SingleTokenInsertion extends BaseParserTestDescriptor {
 		public String input = "ac";
-		public String output = "";
+		public String output = null;
 		public String errors = "line 1:1 missing 'b' at 'c'\n";
 		public String startRule = "a";
 		public String grammarName = "T";
@@ -539,7 +539,7 @@ public class ParserErrorsDescriptors {
 
 	public static class TokenMismatch extends BaseParserTestDescriptor {
 		public String input = "aa";
-		public String output = "";
+		public String output = null;
 		public String errors = "line 1:1 mismatched input 'a' expecting 'b'\n";
 		public String startRule = "a";
 		public String grammarName = "T";
@@ -555,7 +555,7 @@ public class ParserErrorsDescriptors {
 
 	public static class TokenMismatch2 extends BaseParserTestDescriptor {
 		public String input = "( ~FORCE_ERROR~ ";
-		public String output = "";
+		public String output = null;
 		public String errors = "line 1:2 mismatched input '~FORCE_ERROR~' expecting {')', ID}\n";
 		public String startRule = "stat";
 		public String grammarName = "T";

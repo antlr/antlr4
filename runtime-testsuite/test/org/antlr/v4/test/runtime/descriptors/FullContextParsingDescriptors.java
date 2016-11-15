@@ -1,10 +1,10 @@
 package org.antlr.v4.test.runtime.descriptors;
 
-import org.antlr.v4.test.runtime.BaseDebugParserTestDescriptor;
+import org.antlr.v4.test.runtime.BaseDiagnosticParserTestDescriptor;
 import org.antlr.v4.test.runtime.CommentHasStringValue;
 
 public class FullContextParsingDescriptors {
-	public static class AmbigYieldsCtxSensitiveDFA extends BaseDebugParserTestDescriptor {
+	public static class AmbigYieldsCtxSensitiveDFA extends BaseDiagnosticParserTestDescriptor {
 		public String input = "abc";
 		/**
 		Decision 0:
@@ -28,7 +28,7 @@ public class FullContextParsingDescriptors {
 		public String grammar;
 	}
 
-	public static class AmbiguityNoLoop extends BaseDebugParserTestDescriptor {
+	public static class AmbiguityNoLoop extends BaseDiagnosticParserTestDescriptor {
 		public String input = "a@";
 		public String output = "alt 1\n";
 		/**
@@ -61,7 +61,7 @@ public class FullContextParsingDescriptors {
 		public String grammar;
 	}
 
-	public static class CtxSensitiveDFATwoDiffInput extends BaseDebugParserTestDescriptor {
+	public static class CtxSensitiveDFATwoDiffInput extends BaseDiagnosticParserTestDescriptor {
 		public String input = "$ 34 abc @ 34 abc";
 		/**
 		Decision 2:
@@ -99,7 +99,7 @@ public class FullContextParsingDescriptors {
 
 	}
 
-	public static abstract class CtxSensitiveDFA extends BaseDebugParserTestDescriptor {
+	public static abstract class CtxSensitiveDFA extends BaseDiagnosticParserTestDescriptor {
 		public String startRule = "s";
 		public String grammarName = "T";
 
@@ -156,7 +156,7 @@ public class FullContextParsingDescriptors {
 		public String errors;
 	}
 
-	public static abstract class ExprAmbiguity extends BaseDebugParserTestDescriptor {
+	public static abstract class ExprAmbiguity extends BaseDiagnosticParserTestDescriptor {
 		public String startRule = "s";
 		public String grammarName = "T";
 
@@ -204,7 +204,7 @@ public class FullContextParsingDescriptors {
 		public String errors;
 	}
 
-	public static abstract class FullContextIF_THEN_ELSEParse extends BaseDebugParserTestDescriptor {
+	public static abstract class FullContextIF_THEN_ELSEParse extends BaseDiagnosticParserTestDescriptor {
 		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "T";
@@ -346,7 +346,7 @@ public class FullContextParsingDescriptors {
 	 * Tests predictions for the following case involving closures.
 	 * http://www.antlr.org/wiki/display/~admin/2011/12/29/Flaw+in+ANTLR+v3+LL(*)+analysis+algorithm
 	 */
-	public static class LoopsSimulateTailRecursion extends BaseDebugParserTestDescriptor {
+	public static class LoopsSimulateTailRecursion extends BaseDiagnosticParserTestDescriptor {
 		public String input = "a(i)<-x";
 		public String output = "pass: a(i)<-x\n";
 		/**
@@ -381,7 +381,7 @@ public class FullContextParsingDescriptors {
 
 	}
 
-	public static class SLLSeesEOFInLLGrammar extends BaseDebugParserTestDescriptor {
+	public static class SLLSeesEOFInLLGrammar extends BaseDiagnosticParserTestDescriptor {
 		public String input = "34 abc";
 		/**
 		Decision 0:

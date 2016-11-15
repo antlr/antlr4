@@ -458,7 +458,7 @@ public class CompositeParsersDescriptors {
 	 */
 	public static class ImportLexerWithOnlyFragmentRules extends BaseCompositeParserTestDescriptor {
 		public String input = "test test";
-		public String output = "";
+		public String output = null;
 		public String errors = null;
 		public String startRule = "program";
 		public String grammarName = "Test";
@@ -499,7 +499,7 @@ public class CompositeParsersDescriptors {
 
 	public static class ImportedGrammarWithEmptyOptions extends BaseCompositeParserTestDescriptor {
 		public String input = "b";
-		public String output = "";
+		public String output = null;
 		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "M";
@@ -533,7 +533,7 @@ public class CompositeParsersDescriptors {
 
 	public static class ImportedRuleWithAction extends BaseCompositeParserTestDescriptor {
 		public String input = "b";
-		public String output = "";
+		public String output = null;
 		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "M";
