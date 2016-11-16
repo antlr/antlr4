@@ -103,12 +103,14 @@ public class ScopeParser {
 
 		String declarator = decl.a.substring(0, rightEdgeOfDeclarator + 1);
 		Pair<Integer, Integer> p;
-		if (decl.a.indexOf(':') != -1) {
-			// declarator has type appear after the name
+		String text = decl.a;
+		text = text.replaceAll("::","");
+		if ( text.contains(":") ) {
+			// declarator has type appearing after the name like "x:T"
 			p = _parsePostfixDecl(attr, declarator, action, g);
 		}
 		else {
-			// declarator has type appear before the name
+			// declarator has type appearing before the name like "T x"
 			p = _parsePrefixDecl(attr, declarator, action, g);
 		}
 		int idStart = p.a;

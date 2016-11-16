@@ -61,6 +61,9 @@ public class TestScopeParsing extends BaseJavaTest {
         "char *[3] foo = {1,2,3}",     	    "foo:char *[3]={1,2,3}", // not valid C really, C is "type name" however so this is cool (this was broken in 4.5 anyway)
 		"String[] headers",					"headers:String[]",
 
+	    // C++
+	    "std::vector<std::string> x",       "x:std::vector<std::string>", // yuck. Don't choose :: as the : of a declaration
+
         // python/ruby style
         "i",                                "i",
         "i,j",                              "i, j",
