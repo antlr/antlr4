@@ -741,36 +741,40 @@ bitsetInlineComparison(s, bits) ::= <%
 %>
 
 InvokeRule(r, argExprsChunks) ::= <<
-p.SetState(<r.stateNumber>)
-<if(r.labels)>
+{
+	p.SetState(<r.stateNumber>)
+	<if(r.labels)>
 
-<if(r.ast.options.p)>
-var _x = p.<r.name>(<r.ast.options.p><if(argExprsChunks)>, <endif><argExprsChunks>)
-<else>
-var _x = p.<r.name; format="cap">(<argExprsChunks>)
-<endif>
+	<if(r.ast.options.p)>
+	var _x = p.<r.name>(<r.ast.options.p><if(argExprsChunks)>, <endif><argExprsChunks>)
+	<else>
+	var _x = p.<r.name; format="cap">(<argExprsChunks>)
+	<endif>
 
 
-<r.labels:{l | <labelref(l)> = _x}; separator="\n">
-<else>
-<if(r.ast.options.p)>
-p.<r.name>(<r.ast.options.p><if(argExprsChunks)>, <endif><argExprsChunks>)
-<else>
-p.<r.name; format="cap">(<argExprsChunks>)
-<endif>
-<endif>
+	<r.labels:{l | <labelref(l)> = _x}; separator="\n">
+	<else>
+	<if(r.ast.options.p)>
+	p.<r.name>(<r.ast.options.p><if(argExprsChunks)>, <endif><argExprsChunks>)
+	<else>
+	p.<r.name; format="cap">(<argExprsChunks>)
+	<endif>
+	<endif>
+}
 >>
 
 MatchToken(m) ::= <<
-p.SetState(<m.stateNumber>)
-<if(m.labels)>
+{
+	p.SetState(<m.stateNumber>)
+	<if(m.labels)>
 
-var _m = p.Match(<parser.name><m.name>)
+	var _m = p.Match(<parser.name><m.name>)
 
-<m.labels:{l | <labelref(l)> = _m}; separator="\n">
-<else>
-p.Match(<parser.name><m.name>)
-<endif>
+	<m.labels:{l | <labelref(l)> = _m}; separator="\n">
+	<else>
+	p.Match(<parser.name><m.name>)
+	<endif>
+}
 >>
 
 MatchSet(m, expr, capture) ::= "<CommonSetStuff(m, expr, capture, false)>"
