@@ -32,7 +32,6 @@ package org.antlr.v4.parse;
 
 import org.antlr.runtime.BaseRecognizer;
 import org.antlr.runtime.CommonToken;
-import org.antlr.v4.runtime.misc.IntegerList;
 import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.tool.Attribute;
 import org.antlr.v4.tool.AttributeDict;
@@ -49,7 +48,8 @@ import java.util.List;
  * rule[arg1, arg2, ..., argN] returns [ret1, ..., retN]
  * <p>
  * text is target language dependent.  Java/C#/C/C++ would
- * use "int i" but ruby/python would use "i".
+ * use "int i" but ruby/python would use "i". Languages with
+ * postfix types like Go, Swift use "x : T" notation or "T x".
  */
 public class ScopeParser {
 	/**
@@ -97,7 +97,7 @@ public class ScopeParser {
 		int equalsIndex = decl.a.indexOf('=');
 		if (equalsIndex > 0) {
 			// everything after the '=' is the init value
-			attr.initValue = decl.a.substring(equalsIndex + 1, decl.a.length());
+			attr.initValue = decl.a.substring(equalsIndex + 1, decl.a.length()).trim();
 			rightEdgeOfDeclarator = equalsIndex - 1;
 		}
 
