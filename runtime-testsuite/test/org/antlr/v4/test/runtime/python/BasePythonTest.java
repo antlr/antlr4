@@ -95,6 +95,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import static org.antlr.v4.test.runtime.java.BaseJavaTest.antlrLock;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -138,10 +139,13 @@ public abstract class BasePythonTest implements RuntimeTestSupport {
 		// new output dir for each test
 		String propName = getPropertyPrefix() + "-test-dir";
 		String prop = System.getProperty(propName);
-		if(prop!=null && prop.length()>0)
+		if(prop!=null && prop.length()>0) {
 			tmpdir = prop;
-		else
-			tmpdir = new File(System.getProperty("java.io.tmpdir"), getClass().getSimpleName()+"-"+System.currentTimeMillis()).getAbsolutePath();
+		}
+		else {
+			tmpdir = new File(System.getProperty("java.io.tmpdir"), getClass().getSimpleName()+
+				"-"+Thread.currentThread().getName()+"-"+System.currentTimeMillis()).getAbsolutePath();
+		}
 		antlrToolErrors = new StringBuilder();
 	}
 
@@ -375,7 +379,9 @@ public abstract class BasePythonTest implements RuntimeTestSupport {
 		if (defaultListener) {
 			antlr.addListener(new DefaultToolListener(antlr));
 		}
-		antlr.processGrammarsOnCommandLine();
+		synchronized (antlrLock) {
+			antlr.processGrammarsOnCommandLine();
+		}
 
 		if ( !defaultListener && !equeue.errors.isEmpty() ) {
 			for (int i = 0; i < equeue.errors.size(); i++) {

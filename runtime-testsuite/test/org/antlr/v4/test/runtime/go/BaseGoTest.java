@@ -95,13 +95,10 @@ import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.assertTrue;
+import static org.antlr.v4.test.runtime.java.BaseJavaTest.antlrLock;
 import static org.junit.Assert.assertArrayEquals;
 
 public class BaseGoTest implements RuntimeTestSupport {
-	// -J-Dorg.antlr.v4.test.BaseTest.level=FINE
-	// private static final Logger LOGGER =
-	// Logger.getLogger(BaseTest.class.getName());
-
 	public File overall_tmpdir = null;
 	public File tmpdir = null; // this is where the parser package is stored, typically inside the tmpdir
 	private static File tmpGopath = null;
@@ -209,11 +206,14 @@ public class BaseGoTest implements RuntimeTestSupport {
 	public void testSetUp() throws Exception {
 		// new output dir for each test
 		String prop = System.getProperty("antlr-go-test-dir");
-		if (prop != null && prop.length() > 0)
+		if (prop != null && prop.length() > 0) {
 			overall_tmpdir = new File(prop);
-		else
+		}
+		else {
+			String threadName = Thread.currentThread().getName();
 			overall_tmpdir = new File(System.getProperty("java.io.tmpdir"),
-			                          getClass().getSimpleName() + "-" + System.currentTimeMillis());
+			                          getClass().getSimpleName()+"-"+threadName+"-"+System.currentTimeMillis());
+		}
 
 		if ( overall_tmpdir.exists())
 			this.eraseDirectory(overall_tmpdir);
@@ -348,7 +348,9 @@ public class BaseGoTest implements RuntimeTestSupport {
 		if (defaultListener) {
 			antlr.addListener(new DefaultToolListener(antlr));
 		}
-		antlr.processGrammarsOnCommandLine();
+		synchronized (antlrLock) {
+			antlr.processGrammarsOnCommandLine();
+		}
 
 		if ( !defaultListener && !equeue.errors.isEmpty() ) {
 			for (int i = 0; i < equeue.errors.size(); i++) {

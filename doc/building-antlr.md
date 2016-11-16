@@ -38,17 +38,24 @@ Checking connectivity... done.
 $ cd antlr4
 $ mvn compile
 ..
+[INFO] ------------------------------------------------------------------------
 [INFO] Reactor Summary:
 [INFO] 
-[INFO] ANTLR 4 ............................................ SUCCESS [  0.447 s]
-[INFO] ANTLR 4 Runtime .................................... SUCCESS [  3.113 s]
-[INFO] ANTLR 4 Tool ....................................... SUCCESS [ 14.408 s]
-[INFO] ANTLR 4 Maven plugin ............................... SUCCESS [  1.276 s]
-[INFO] ANTLR 4 Runtime Test Generator ..................... SUCCESS [  0.773 s]
-[INFO] ANTLR 4 Tool Tests ................................. SUCCESS [  6.920 s]
+[INFO] ANTLR 4 ............................................ SUCCESS [  0.432 s]
+[INFO] ANTLR 4 Runtime .................................... SUCCESS [  4.334 s]
+[INFO] ANTLR 4 Tool ....................................... SUCCESS [  1.686 s]
+[INFO] ANTLR 4 Maven plugin ............................... SUCCESS [  1.654 s]
+[INFO] ANTLR 4 Runtime Test Annotations ................... SUCCESS [  0.096 s]
+[INFO] ANTLR 4 Runtime Test Processors .................... SUCCESS [  0.025 s]
+[INFO] ANTLR 4 Runtime Tests (2nd generation) ............. SUCCESS [  1.932 s]
+[INFO] ANTLR 4 Tool Tests ................................. SUCCESS [  0.018 s]
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
-...
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 10.324 s
+[INFO] Finished at: 2016-11-16T13:49:38-08:00
+[INFO] Final Memory: 42M/488M
+[INFO] ------------------------------------------------------------------------
 ```
 
 # Testing tool and targets
@@ -81,38 +88,119 @@ antlr reports warnings from [-visitor, -Dlanguage=CSharp, -o, /var/folders/s1/h3
 [INFO] ------------------------------------------------------------------------
 [INFO] Reactor Summary:
 [INFO] 
-[INFO] ANTLR 4 ............................................ SUCCESS [  0.462 s]
-[INFO] ANTLR 4 Runtime .................................... SUCCESS [  9.163 s]
-[INFO] ANTLR 4 Tool ....................................... SUCCESS [  3.683 s]
-[INFO] ANTLR 4 Maven plugin ............................... SUCCESS [  1.897 s]
-[INFO] ANTLR 4 Runtime Test Generator ..................... SUCCESS [07:11 min]
-[INFO] ANTLR 4 Tool Tests ................................. SUCCESS [ 16.694 s]
+[INFO] ANTLR 4 ............................................ SUCCESS [  0.445 s]
+[INFO] ANTLR 4 Runtime .................................... SUCCESS [  3.392 s]
+[INFO] ANTLR 4 Tool ....................................... SUCCESS [  1.373 s]
+[INFO] ANTLR 4 Maven plugin ............................... SUCCESS [  1.519 s]
+[INFO] ANTLR 4 Runtime Test Annotations ................... SUCCESS [  0.086 s]
+[INFO] ANTLR 4 Runtime Test Processors .................... SUCCESS [  0.014 s]
+[INFO] ANTLR 4 Runtime Tests (2nd generation) ............. SUCCESS [06:39 min]
+[INFO] ANTLR 4 Tool Tests ................................. SUCCESS [  6.922 s]
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time: 07:43 min
-...
+[INFO] Total time: 06:53 min
+[INFO] Finished at: 2016-11-16T15:36:56-08:00
+[INFO] Final Memory: 44M/458M
+[INFO] ------------------------------------------------------------------------
 ```
 
-You should see these jars (building 4.5.2-SNAPSHOT):
+Note: That is actually result of running the much faster:
+
+`mvn -Dparallel=methods -DthreadCount=4 install`
+
+
+You should see these jars (when building 4.6-SNAPSHOT):
 
 ```bash
 /Users/parrt/.m2/repository/org/antlr $ find antlr4* -name '*.jar'
-antlr4/4.5/antlr4-4.5.jar
-antlr4/4.5.2-SNAPSHOT/antlr4-4.5.2-SNAPSHOT-tests.jar
-antlr4/4.5.2-SNAPSHOT/antlr4-4.5.2-SNAPSHOT.jar
-antlr4-maven-plugin/4.5/antlr4-maven-plugin-4.5.jar
-antlr4-maven-plugin/4.5.2-SNAPSHOT/antlr4-maven-plugin-4.5.2-SNAPSHOT.jar
-antlr4-runtime/4.5/antlr4-runtime-4.5.jar
-antlr4-runtime/4.5.2-SNAPSHOT/antlr4-runtime-4.5.2-SNAPSHOT.jar
-antlr4-runtime-testsuite/4.5.2-SNAPSHOT/antlr4-runtime-testsuite-4.5.2-SNAPSHOT-tests.jar
-antlr4-runtime-testsuite/4.5.2-SNAPSHOT/antlr4-runtime-testsuite-4.5.2-SNAPSHOT.jar
-antlr4-tool-testsuite/4.5.2-SNAPSHOT/antlr4-tool-testsuite-4.5.2-SNAPSHOT.jar
+antlr4-maven-plugin/4.6-SNAPSHOT/antlr4-maven-plugin-4.6-SNAPSHOT.jar
+antlr4-runtime-test-annotation-processors/4.6-SNAPSHOT/antlr4-runtime-test-annotation-processors-4.6-SNAPSHOT.jar
+antlr4-runtime-test-annotations/4.6-SNAPSHOT/antlr4-runtime-test-annotations-4.6-SNAPSHOT.jar
+antlr4-runtime-testsuite/4.6-SNAPSHOT/antlr4-runtime-testsuite-4.6-SNAPSHOT-tests.jar
+antlr4-runtime-testsuite/4.6-SNAPSHOT/antlr4-runtime-testsuite-4.6-SNAPSHOT.jar
+antlr4-runtime/4.6-SNAPSHOT/antlr4-runtime-4.6-SNAPSHOT.jar
+antlr4-tool-testsuite/4.6-SNAPSHOT/antlr4-tool-testsuite-4.6-SNAPSHOT.jar
+antlr4/4.6-SNAPSHOT/antlr4-4.6-SNAPSHOT-tests.jar
+antlr4/4.6-SNAPSHOT/antlr4-4.6-SNAPSHOT.jar
 ```
 
-Note that ANTLR is written in itself, which is why maven downloads antlr4-4.5.jar for boostrapping 4.5.2-SNAPSHOT purposes.
+Note that ANTLR is written in itself, which is why maven downloads antlr4-4.5.jar for boostrapping 4.6-SNAPSHOT purposes.
+
+## Running test subsets
+
+### Run one test group across targets
+
+```bash
+$ mvn -Dtest=TestParserExec test
+-------------------------------------------------------
+ T E S T S
+-------------------------------------------------------
+Running org.antlr.v4.test.runtime.cpp.TestParserExec
+...
+Tests run: 32, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 114.283 sec
+Running org.antlr.v4.test.runtime.csharp.TestParserExec
+...
+```
+
+Or run all lexer related tests:
+
+```
+$ mvn -Dtest=Test*Lexer* test
+-------------------------------------------------------
+ T E S T S
+-------------------------------------------------------
+Running org.antlr.v4.test.runtime.cpp.TestCompositeLexers
+...
+```
+
+### Run all tests for a single target
+
+```bash
+$ mvn -Dtest=java.* test
+...
+```
+
+Or run all lexer related tests in Java target only:
+
+```bash
+$ mvn -Dtest=java.*Lexer* test
+...
+-------------------------------------------------------
+ T E S T S
+-------------------------------------------------------
+Running org.antlr.v4.test.runtime.java.TestCompositeLexers
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.277 sec
+Running org.antlr.v4.test.runtime.java.TestLexerErrors
+Tests run: 12, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.376 sec
+Running org.antlr.v4.test.runtime.java.TestLexerExec
+Tests run: 38, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 10.07 sec
+Running org.antlr.v4.test.runtime.java.TestSemPredEvalLexer
+Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.255 sec
+
+Results :
+
+Tests run: 59, Failures: 0, Errors: 0, Skipped: 0
+```
+
+## Testing in parallel
+
+Use this to run tests in parallel:
+
+```bash
+$ mvn -Dparallel=methods -DthreadCount=4 test
+...
+-------------------------------------------------------
+ T E S T S
+-------------------------------------------------------
+Concurrency config is parallel='methods', perCoreThreadCount=true, threadCount=4, useUnlimitedThreads=false
+...
+```
+
+This can be combined with other `-D` above.
 
 ## Building without testing
+
 To build without running the tests (saves a lot of time), do this:
 
 ```bash

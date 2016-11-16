@@ -93,6 +93,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import static org.antlr.v4.test.runtime.java.BaseJavaTest.antlrLock;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -124,10 +125,13 @@ public class BaseCppTest implements RuntimeTestSupport {
 		// new output dir for each test
 		String propName = getPropertyPrefix() + "-test-dir";
 		String prop = System.getProperty(propName);
-		if(prop!=null && prop.length()>0)
+		if(prop!=null && prop.length()>0) {
 			tmpdir = prop;
-		else
-			tmpdir = new File(System.getProperty("java.io.tmpdir"), getClass().getSimpleName()+"-"+System.currentTimeMillis()).getAbsolutePath();
+		}
+		else {
+			tmpdir = new File(System.getProperty("java.io.tmpdir"),
+			                  getClass().getSimpleName()+"-"+Thread.currentThread().getName()+"-"+System.currentTimeMillis()).getAbsolutePath();
+		}
 		antlrToolErrors = new StringBuilder();
 	}
 
@@ -363,7 +367,9 @@ public class BaseCppTest implements RuntimeTestSupport {
 		if (defaultListener) {
 			antlr.addListener(new DefaultToolListener(antlr));
 		}
-		antlr.processGrammarsOnCommandLine();
+		synchronized (antlrLock) {
+			antlr.processGrammarsOnCommandLine();
+		}
 
 		if ( !defaultListener && !equeue.errors.isEmpty() ) {
 			for (int i = 0; i < equeue.errors.size(); i++) {
@@ -645,7 +651,7 @@ public class BaseCppTest implements RuntimeTestSupport {
 		return true;
 	}
 
-	static boolean runtimeBuiltOnce = false;
+	static Boolean runtimeBuiltOnce = false;
 
 	public String execModule(String fileName) {
 		String runtimePath = locateRuntime();
@@ -654,22 +660,24 @@ public class BaseCppTest implements RuntimeTestSupport {
 		String inputPath = new File(new File(tmpdir), "input").getAbsolutePath();
 
 		// Build runtime using cmake once.
-		if (!runtimeBuiltOnce) {
-			try {
-				String command[] = { "clang++", "--version" };
-				String output = runCommand(command, tmpdir, "printing compiler version");
-				System.out.println("Compiler version is: " + output);
-			}
-			catch (Exception e) {
-				System.err.println("Can't get compiler version");
-			}
+		synchronized (runtimeBuiltOnce) {
+			if ( !runtimeBuiltOnce ) {
+				try {
+					String command[] = {"clang++", "--version"};
+					String output = runCommand(command, tmpdir, "printing compiler version");
+					System.out.println("Compiler version is: "+output);
+				}
+				catch (Exception e) {
+					System.err.println("Can't get compiler version");
+				}
 
-			runtimeBuiltOnce = true;
-			if (!buildRuntime()) {
-				System.out.println("C++ runtime build failed\n");
-				return null;
+				runtimeBuiltOnce = true;
+				if ( !buildRuntime() ) {
+					System.out.println("C++ runtime build failed\n");
+					return null;
+				}
+				System.out.println("C++ runtime build succeeded\n");
 			}
-			System.out.println("C++ runtime build succeeded\n");
 		}
 
 		// Create symlink to the runtime. Currently only used on OSX.
