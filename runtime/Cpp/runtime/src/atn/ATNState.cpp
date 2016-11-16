@@ -75,6 +75,12 @@ void ATNState::addTransition(Transition *e) {
 }
 
 void ATNState::addTransition(size_t index, Transition *e) {
+  for (Transition *transition : transitions)
+    if (transition->target->stateNumber == e->target->stateNumber) {
+      delete e;
+      return;
+    }
+
   if (transitions.empty()) {
     epsilonOnlyTransitions = e->isEpsilon();
   } else if (epsilonOnlyTransitions != e->isEpsilon()) {
