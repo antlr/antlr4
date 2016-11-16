@@ -1,0 +1,299 @@
+writeln(s) ::= <<Console.WriteLine(<s>);>>
+write(s) ::= <<Console.Write(<s>);>>
+writeList(s) ::= <<Console.WriteLine(<s; separator="+">);>>
+
+False() ::= "false"
+
+True() ::= "true"
+
+Not(v) ::= "!<v>"
+
+Assert(s) ::= <<Debug.Assert(<s>);>>
+
+Cast(t,v) ::= "((<t>)<v>)"
+
+Append(a,b) ::= "<a> + <b>"
+
+Concat(a,b) ::= "<a><b>"
+
+DeclareLocal(s,v) ::= "Object <s> = <v>;"
+
+AssertIsList(v) ::= "System.Collections.IList __ttt__ = <v>;" // just use static type system
+
+AssignLocal(s,v) ::= "<s> = <v>;"
+
+InitIntMember(n,v) ::= <%int <n> = <v>;%>
+
+InitBooleanMember(n,v) ::= <%bool <n> = <v>;%>
+
+GetMember(n) ::= <%this.<n>%>
+
+SetMember(n,v) ::= <%this.<n> = <v>;%>
+
+AddMember(n,v) ::= <%this.<n> += <v>;%>
+
+PlusMember(v,n) ::= <%<v> + this.<n>%>
+
+MemberEquals(n,v) ::= <%this.<n> == <v>%>
+
+ModMemberEquals(n,m,v) ::= <%this.<n> % <m> == <v>%>
+
+ModMemberNotEquals(n,m,v) ::= <%this.<n> % <m> != <v>%>
+
+DumpDFA() ::= "this.DumpDFA();"
+
+Pass() ::= ""
+
+StringList() ::= "List\<String>"
+
+BuildParseTrees() ::= "this.BuildParseTree = true;"
+
+BailErrorStrategy() ::= <%ErrorHandler = new BailErrorStrategy();%>
+
+ToStringTree(s) ::= <%<s>.ToStringTree(this)%>
+
+Column() ::= "this.Column"
+
+Text() ::= "this.Text"
+
+ValEquals(a,b) ::= <%<a>==<b>%>
+
+TextEquals(a) ::= <%this.Text.Equals("<a>")%>
+
+PlusText(a) ::= <%"<a>" + this.Text%>
+
+InputText() ::= "this.TokenStream.GetText()"
+
+LTEquals(i, v) ::= <%this.TokenStream.Lt(<i>).Text.Equals(<v>)%>
+
+LANotEquals(i, v) ::= <%this.InputStream.La(<i>)!=<v>%>
+
+TokenStartColumnEquals(i) ::= <%this.TokenStartColumn==<i>%>
+
+ImportListener(X) ::= ""
+
+GetExpectedTokenNames() ::= "this.GetExpectedTokens().ToString(this.Vocabulary)"
+
+RuleInvocationStack() ::= "GetRuleInvocationStackAsString()"
+
+LL_EXACT_AMBIG_DETECTION() ::= <<Interpreter.PredictionMode = PredictionMode.LlExactAmbigDetection;>>
+
+ParserToken(parser, token) ::= <%<parser>.<token>%>
+
+Production(p) ::= <%<p>%>
+
+Result(r) ::= <%<r>%>
+
+ParserPropertyMember() ::= <<
+@members {
+bool Property() {
+	return true;
+}
+}
+>>
+
+ParserPropertyCall(p, call) ::= "<p>.<call>"
+
+PositionAdjustingLexer() ::= <<
+
+public override IToken NextToken() {
+	if (!(Interpreter is PositionAdjustingLexerATNSimulator)) {
+		Interpreter = new PositionAdjustingLexerATNSimulator(this, _ATN);
+	}
+
+	return base.NextToken();
+}
+
+public override IToken Emit() {
+	switch (Type) {
+	case TOKENS:
+		HandleAcceptPositionForKeyword("tokens");
+		break;
+
+	case LABEL:
+		HandleAcceptPositionForIdentifier();
+		break;
+
+	default:
+		break;
+	}
+
+	return base.Emit();
+}
+
+private bool HandleAcceptPositionForIdentifier() {
+	string tokenText = this.Text;
+	int identifierLength = 0;
+	while (identifierLength \< tokenText.Length && IsIdentifierChar(tokenText[identifierLength])) {
+		identifierLength++;
+	}
+
+	if (InputStream.Index > TokenStartCharIndex + identifierLength) {
+		int offset = identifierLength - 1;
+		getInterpreter().ResetAcceptPosition((ICharStream)InputStream, TokenStartCharIndex + offset, TokenStartLine, TokenStartColumn + offset);
+		return true;
+	}
+
+	return false;
+}
+
+private bool HandleAcceptPositionForKeyword(string keyword) {
+	if (InputStream.Index > TokenStartCharIndex + keyword.Length) {
+		int offset = keyword.Length - 1;
+		getInterpreter().ResetAcceptPosition((ICharStream)InputStream, TokenStartCharIndex + offset, TokenStartLine, TokenStartColumn + offset);
+		return true;
+	}
+
+	return false;
+}
+
+public PositionAdjustingLexerATNSimulator getInterpreter() {
+	return (PositionAdjustingLexerATNSimulator)base.Interpreter;
+}
+
+private static bool IsIdentifierChar(char c) {
+	return Char.IsLetterOrDigit(c) || c == '_';
+}
+
+public class PositionAdjustingLexerATNSimulator : LexerATNSimulator {
+
+	public PositionAdjustingLexerATNSimulator(Lexer recog, ATN atn)
+	: base(recog, atn)
+	{
+	}
+
+	public void ResetAcceptPosition(ICharStream input, int index, int line, int column) {
+		input.Seek(index);
+		this.Line = line;
+		this.Column = column;
+		Consume(input);
+	}
+
+}
+
+>>
+
+BasicListener(X) ::= <<
+@parser::members {
+public class LeafListener : TBaseListener {
+	public override void VisitTerminal(ITerminalNode node) {
+		Console.WriteLine(node.Symbol.Text);
+	}
+}
+}
+>>
+
+WalkListener(s) ::= <<
+ParseTreeWalker walker = new ParseTreeWalker();
+walker.Walk(new LeafListener(), <s>);
+>>
+
+TreeNodeWithAltNumField(X) ::= <<
+@parser::members {
+public class MyRuleNode : ParserRuleContext {
+	public int altNum;
+	public MyRuleNode(ParserRuleContext parent, int invokingStateNumber): base(parent, invokingStateNumber)
+	{
+	}
+	public override int getAltNumber() { return altNum; }
+	public override void setAltNumber(int altNum) { this.altNum = altNum; }
+}
+}
+>>
+
+TokenGetterListener(X) ::= <<
+@parser::members {
+public class LeafListener : TBaseListener {
+	public override void ExitA(TParser.AContext ctx) {
+		if (ctx.ChildCount==2)
+		{
+			StringBuilder sb = new StringBuilder ("[");
+			foreach (ITerminalNode node in ctx.INT ()) {
+				sb.Append (node.ToString ());
+				sb.Append (", ");
+			}
+			sb.Length = sb.Length - 2;
+			sb.Append ("]");
+			Console.Write ("{0} {1} {2}", ctx.INT (0).Symbol.Text,
+				ctx.INT (1).Symbol.Text, sb.ToString());
+		}
+		else
+			Console.WriteLine(ctx.ID().Symbol);
+	}
+}
+}
+>>
+
+RuleGetterListener(X) ::= <<
+@parser::members {
+public class LeafListener : TBaseListener {
+	public override void ExitA(TParser.AContext ctx) {
+		if (ctx.ChildCount==2) {
+			Console.Write("{0} {1} {2}",ctx.b(0).Start.Text,
+				ctx.b(1).Start.Text,ctx.b()[0].Start.Text);
+		} else
+			Console.WriteLine(ctx.b(0).Start.Text);
+	}
+}
+}
+>>
+
+
+LRListener(X) ::= <<
+@parser::members {
+public class LeafListener : TBaseListener {
+	public override void ExitE(TParser.EContext ctx) {
+		if (ctx.ChildCount==3) {
+			Console.Write("{0} {1} {2}\n",ctx.e(0).Start.Text,
+				ctx.e(1).Start.Text, ctx.e()[0].Start.Text);
+		} else
+			Console.WriteLine(ctx.INT().Symbol.Text);
+	}
+}
+}
+>>
+
+LRWithLabelsListener(X) ::= <<
+@parser::members {
+public class LeafListener : TBaseListener {
+	public override void ExitCall(TParser.CallContext ctx) {
+		Console.Write("{0} {1}",ctx.e().Start.Text,ctx.eList());
+	}
+	public override void ExitInt(TParser.IntContext ctx) {
+		Console.WriteLine(ctx.INT().Symbol.Text);
+	}
+}
+}
+>>
+
+ImportVisitor(X) ::= ""
+BasicVisitor(X) ::= ""
+WalkVisitor(s) ::= ""
+LRWithLabelsVisitor(X) ::= ""
+RuleGetterVisitor(X) ::= ""
+LRVisitor(x) ::= ""
+TokenGetterVisitor(x) ::= ""
+
+DeclareContextListGettersFunction() ::= <<
+void foo() {
+	SContext s = null;
+	AContext[] a = s.a();
+	BContext[] b = s.b();
+}
+>>
+
+Declare_foo() ::= <<public void foo() {Console.WriteLine("foo");}>>
+
+Invoke_foo() ::= "this.foo();"
+
+Declare_pred() ::= <<bool pred(bool v) {
+	Console.WriteLine("eval="+v.ToString().ToLower());
+	return v;
+}
+>>
+
+Invoke_pred(v) ::= <<this.pred(<v>)>>
+ParserTokenType(t) ::= "Parser.<t>"
+ContextRuleFunction(ctx, rule) ::= "<ctx>.<rule>"
+StringType() ::= "String"
+ContextMember(ctx, subctx, member) ::= "<ctx>.<subctx>.<member>"

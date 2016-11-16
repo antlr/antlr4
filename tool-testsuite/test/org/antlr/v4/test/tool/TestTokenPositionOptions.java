@@ -33,9 +33,10 @@ import org.antlr.runtime.Token;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.misc.IntervalSet;
-import org.antlr.v4.test.runtime.java.BaseTest;
+import org.antlr.v4.test.runtime.java.BaseJavaTest;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.ast.GrammarAST;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -43,7 +44,13 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-public class TestTokenPositionOptions extends BaseTest {
+public class TestTokenPositionOptions extends BaseJavaTest {
+	@Before
+	@Override
+	public void testSetUp() throws Exception {
+		super.testSetUp();
+	}
+
 	@Test public void testLeftRecursionRewrite() throws Exception {
 		Grammar g = new Grammar(
 				"grammar T;\n" +

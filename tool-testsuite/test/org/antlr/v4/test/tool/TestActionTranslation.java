@@ -30,13 +30,20 @@
 
 package org.antlr.v4.test.tool;
 
-import org.antlr.v4.test.runtime.java.BaseTest;
+import org.antlr.v4.test.runtime.java.BaseJavaTest;
 import org.antlr.v4.tool.Grammar;
+import org.junit.Before;
 import org.junit.Test;
 
 /** */
 @SuppressWarnings("unused")
-public class TestActionTranslation extends BaseTest {
+public class TestActionTranslation extends BaseJavaTest {
+	@Before
+	@Override
+	public void testSetUp() throws Exception {
+		super.testSetUp();
+	}
+
 	String attributeTemplate =
 		"attributeTemplate(members,init,inline,finally,inline2) ::= <<\n" +
 		"parser grammar A;\n"+

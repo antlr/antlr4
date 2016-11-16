@@ -30,13 +30,20 @@
 
 package org.antlr.v4.test.tool;
 
-import org.antlr.v4.test.runtime.java.BaseTest;
+import org.antlr.v4.test.runtime.java.BaseJavaTest;
 import org.antlr.v4.tool.ErrorType;
+import org.junit.Before;
 import org.junit.Test;
 
 /** */
-public class TestLeftRecursionToolIssues extends BaseTest {
+public class TestLeftRecursionToolIssues extends BaseJavaTest {
 	protected boolean debug = false;
+
+	@Before
+	@Override
+	public void testSetUp() throws Exception {
+		super.testSetUp();
+	}
 
 	@Test public void testCheckForNonLeftRecursiveRule() throws Exception {
 		String grammar =
