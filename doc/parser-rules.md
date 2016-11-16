@@ -380,8 +380,17 @@ The attributes defined within those [...] can be used like any other variable. H
 add[int x] returns [int result] : '+=' INT {$result = $x + $INT.int;} ;
 ```
 
-As with the grammar level, you can specify rule-level named actions. For rules, the valid names are init and after. As the names imply, parsers execute init actions immediately before trying to match the associated rule and execute after actions immediately after matching the rule. ANTLR after actions do not execute as part of the finally code block of the generated rule function. Use the ANTLR finally action to place code in the generated rule function finally code block.
-The actions come after any argument, return value, or local attribute definition actions. The row rule preamble from Section 10.2, Accessing Token and Rule Attributes illustrates the syntax nicely:
+The args, locals, and return `[...]` are generally in the target language but with some constraints. The `[...]` string is a comma-separated list of declarations either with prefix or postfix type notation or no-type notation. The elements can have initializer such as `[int x = 32, float y]` but don't go too crazy as we are parsing this generic text manually in [ScopeParser](https://github.com/antlr/antlr4/blob/master/tool/src/org/antlr/v4/parse/ScopeParser.java).  
+
+* Java, CSharp, C++ use `int x` notation but C++ must use a slightly altered notation for array references, `int[] x`, to fit in the *type* *id* syntax.
+* Go and Swift give the type after the variable name, but Swift requires a `:` in between. Go `i int`, Swift `i:int`.  For Go target, you must either use `int i` or `i:int`.
+* Python and JavaScript don't specify static types so actions are just identifier lists such as `[i,j]`.
+
+Technically any target could use either notation. For examples, see [TestScopeParsing](https://github.com/antlr/antlr4/blob/master/tool-testsuite/test/org/antlr/v4/test/tool/TestScopeParsing.java).
+
+As with the grammar level, you can specify rule-level named actions. For rules, the valid names are `init` and `after`. As the names imply, parsers execute init actions immediately before trying to match the associated rule and execute after actions immediately after matching the rule. ANTLR after actions do not execute as part of the finally code block of the generated rule function. Use the ANTLR finally action to place code in the generated rule function finally code block.
+
+The actions come after any argument, return value, or local attribute definition actions. The `row` rule preamble from Section 10.2, Accessing Token and Rule Attributes illustrates the syntax nicely:
 actions/CSV.g4
 
 ```
