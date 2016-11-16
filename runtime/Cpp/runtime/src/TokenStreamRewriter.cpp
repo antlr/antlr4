@@ -33,12 +33,10 @@
 #include "misc/Interval.h"
 #include "Token.h"
 #include "TokenStream.h"
-#include "support/CPPUtils.h"
 
 #include "TokenStreamRewriter.h"
 
 using namespace antlr4;
-using namespace antlrcpp;
 
 using antlr4::misc::Interval;
 
@@ -113,7 +111,7 @@ void TokenStreamRewriter::ReplaceOp::InitializeInstanceFields() {
 const std::string TokenStreamRewriter::DEFAULT_PROGRAM_NAME = "default";
 
 TokenStreamRewriter::TokenStreamRewriter(TokenStream *tokens) : tokens(tokens) {
-  _programs.insert({ DEFAULT_PROGRAM_NAME, std::vector<RewriteOperation*>(PROGRAM_INIT_SIZE) });
+  _programs[DEFAULT_PROGRAM_NAME].reserve(PROGRAM_INIT_SIZE);
 }
 
 TokenStreamRewriter::~TokenStreamRewriter() {
@@ -254,17 +252,16 @@ void TokenStreamRewriter::setLastRewriteTokenIndex(const std::string &programNam
 }
 
 std::vector<TokenStreamRewriter::RewriteOperation*>& TokenStreamRewriter::getProgram(const std::string &name) {
-  std::vector<TokenStreamRewriter::RewriteOperation*> &is = _programs[name];
-  if (is.empty()) {
-    is = initializeProgram(name);
+  auto iterator = _programs.find(name);
+  if (iterator == _programs.end()) {
+    return initializeProgram(name);
   }
-  return is;
+  return iterator->second;
 }
 
-std::vector<TokenStreamRewriter::RewriteOperation*> TokenStreamRewriter::initializeProgram(const std::string &name) {
-  std::vector<TokenStreamRewriter::RewriteOperation*> is(PROGRAM_INIT_SIZE);
-  _programs.insert({ name, is });
-  return is;
+std::vector<TokenStreamRewriter::RewriteOperation*>& TokenStreamRewriter::initializeProgram(const std::string &name) {
+  _programs[name].reserve(PROGRAM_INIT_SIZE);
+  return _programs[name];
 }
 
 std::string TokenStreamRewriter::getText() {
@@ -339,16 +336,12 @@ std::unordered_map<size_t, TokenStreamRewriter::RewriteOperation*> TokenStreamRe
   // WALK REPLACES
   for (size_t i = 0; i < rewrites.size(); ++i) {
     TokenStreamRewriter::RewriteOperation *op = rewrites[i];
-    if (op == nullptr) {
+    ReplaceOp *rop = dynamic_cast<ReplaceOp *>(op);
+    if (rop == nullptr)
       continue;
-    }
-    if (!is<ReplaceOp *>(op)) {
-      continue;
-    }
-    ReplaceOp *rop = static_cast<ReplaceOp*>(op);
+
     // Wipe prior inserts within range
-    InsertBeforeOp *type = nullptr;
-    std::vector<InsertBeforeOp *> inserts = getKindOfOps(rewrites, type, i);
+    std::vector<InsertBeforeOp *> inserts = getKindOfOps<InsertBeforeOp>(rewrites, i);
     for (auto iop : inserts) {
       if (iop->index == rop->index) {
         // E.g., insert before 2, delete 2..2; update replace
@@ -364,8 +357,7 @@ std::unordered_map<size_t, TokenStreamRewriter::RewriteOperation*> TokenStreamRe
       }
     }
     // Drop any prior replaces contained within
-    ReplaceOp* type2 = nullptr;
-    std::vector<ReplaceOp*> prevReplaces = getKindOfOps(rewrites, type2, i);
+    std::vector<ReplaceOp*> prevReplaces = getKindOfOps<ReplaceOp>(rewrites, i);
     for (auto prevRop : prevReplaces) {
       if (prevRop->index >= rop->index && prevRop->lastIndex <= rop->lastIndex) {
         // delete replace as it's a no-op.
@@ -395,16 +387,13 @@ std::unordered_map<size_t, TokenStreamRewriter::RewriteOperation*> TokenStreamRe
   // WALK INSERTS
   for (size_t i = 0; i < rewrites.size(); i++) {
     RewriteOperation *op = rewrites[i];
-    if (op == nullptr) {
+    InsertBeforeOp *iop = dynamic_cast<InsertBeforeOp *>(rewrites[i]);
+    if (iop == nullptr)
       continue;
-    }
-    if (!is<InsertBeforeOp*>(op)) {
-      continue;
-    }
-    InsertBeforeOp *iop = static_cast<InsertBeforeOp*>(rewrites[i]);
+
     // combine current insert with prior if any at same index
 
-    std::vector<InsertBeforeOp*> prevInserts = getKindOfOps(rewrites, iop, i);
+    std::vector<InsertBeforeOp *> prevInserts = getKindOfOps<InsertBeforeOp>(rewrites, i);
     for (auto prevIop : prevInserts) {
       if (prevIop->index == iop->index) { // combine objects
                                           // convert to strings...we're in process of toString'ing
@@ -416,8 +405,7 @@ std::unordered_map<size_t, TokenStreamRewriter::RewriteOperation*> TokenStreamRe
       }
     }
     // look for replaces where iop.index is in range; error
-    ReplaceOp *type = nullptr;
-    std::vector<ReplaceOp*> prevReplaces = getKindOfOps(rewrites, type, i);
+    std::vector<ReplaceOp*> prevReplaces = getKindOfOps<ReplaceOp>(rewrites, i);
     for (auto rop : prevReplaces) {
       if (iop->index == rop->index) {
         rop->text = catOpText(&iop->text, &rop->text);
