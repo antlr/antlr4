@@ -125,9 +125,13 @@ public abstract class BaseRuntimeTest {
 		                                   descriptor.getInput(),
 		                                   descriptor.showDiagnosticErrors()
 		                                  );
-
-		assertEquals(descriptor.getOutput(), found);
-		assertEquals(descriptor.getErrors(), delegate.getParseErrors());
+		if(delegate instanceof RuntimeTestAssert) {
+			((RuntimeTestAssert)delegate).assertEqualStrings(descriptor.getOutput(), found);
+			((RuntimeTestAssert)delegate).assertEqualStrings(descriptor.getErrors(), delegate.getParseErrors());
+		} else {
+			assertEquals(descriptor.getOutput(), found);
+			assertEquals(descriptor.getErrors(), delegate.getParseErrors());
+		}
 	}
 
 	public void testLexer(RuntimeTestDescriptor descriptor) throws Exception {
@@ -161,9 +165,15 @@ public abstract class BaseRuntimeTest {
 		grammar = grammarST.render();
 
 		String found = delegate.execLexer(grammarName+".g4", grammar, grammarName, descriptor.getInput(), descriptor.showDFA());
-		assertEquals(descriptor.getOutput(), found);
-		assertEquals(descriptor.getANTLRToolErrors(), delegate.getANTLRToolErrors());
-		assertEquals(descriptor.getErrors(), delegate.getParseErrors());
+		if(delegate instanceof RuntimeTestAssert) {
+			((RuntimeTestAssert)delegate).assertEqualStrings(descriptor.getOutput(), found);
+			((RuntimeTestAssert)delegate).assertEqualStrings(descriptor.getANTLRToolErrors(), delegate.getANTLRToolErrors());
+			((RuntimeTestAssert)delegate).assertEqualStrings(descriptor.getErrors(), delegate.getParseErrors());
+		} else {
+			assertEquals(descriptor.getOutput(), found);
+			assertEquals(descriptor.getANTLRToolErrors(), delegate.getANTLRToolErrors());
+			assertEquals(descriptor.getErrors(), delegate.getParseErrors());
+		}
 	}
 
 	// ---- support ----

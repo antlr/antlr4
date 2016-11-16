@@ -36,6 +36,7 @@ import org.antlr.v4.runtime.TokenSource;
 import org.antlr.v4.runtime.WritableToken;
 import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.test.runtime.ErrorQueue;
+import org.antlr.v4.test.runtime.RuntimeTestAssert;
 import org.antlr.v4.test.runtime.RuntimeTestSupport;
 import org.antlr.v4.tool.ANTLRMessage;
 import org.antlr.v4.tool.DefaultToolListener;
@@ -56,6 +57,7 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -77,7 +79,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class BaseCSharpTest implements RuntimeTestSupport {
+public class BaseCSharpTest implements RuntimeTestSupport, RuntimeTestAssert {
 	public static final String newline = System.getProperty("line.separator");
 	public static final String pathSep = System.getProperty("path.separator");
 
@@ -568,11 +570,9 @@ public class BaseCSharpTest implements RuntimeTestSupport {
 	}
 
 	public String execTest() {
+		String exec = locateExec();
+		String[] args = getExecTestArgs(exec);
 		try {
-			String exec = locateExec();
-			String[] args = isWindows() ?
-				new String[] { exec, new File(tmpdir, "input").getAbsolutePath() } :
-				new String[] { "mono", exec, new File(tmpdir, "input").getAbsolutePath() };
 			ProcessBuilder pb = new ProcessBuilder(args);
 			pb.directory(new File(tmpdir));
 			Process process = pb.start();
@@ -597,6 +597,15 @@ public class BaseCSharpTest implements RuntimeTestSupport {
 			e.printStackTrace(System.err);
 		}
 		return null;
+	}
+
+	private String[] getExecTestArgs(String exec) {
+		if(isWindows())
+			return new String[] { exec, new File(tmpdir, "input").getAbsolutePath() } ;
+		else {
+			String mono = locateTool("mono");
+			return new String[] { mono, exec, new File(tmpdir, "input").getAbsolutePath() };
+		}
 	}
 
 	public void testErrors(String[] pairs, boolean printTree) {
@@ -895,6 +904,11 @@ public class BaseCSharpTest implements RuntimeTestSupport {
 		org.junit.Assert.assertEquals(msg, a, b);
 	}
 
+	@Override
+	public void assertEqualStrings(String a, String b) {
+		assertEquals(a, b);
+	}
+	
 	protected static void assertEquals(String a, String b) {
 		a = absorbExpectedDifferences(a);
 		b = absorbActualDifferences(b);
