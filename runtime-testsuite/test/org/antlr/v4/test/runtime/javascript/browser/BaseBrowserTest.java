@@ -97,6 +97,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import static org.antlr.v4.test.runtime.java.BaseJavaTest.antlrLock;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -137,10 +138,12 @@ public abstract class BaseBrowserTest implements RuntimeTestSupport {
 	public void testSetUp() throws Exception {
 		// new output dir for each test
 		String prop = System.getProperty("antlr-javascript-test-dir");
-		if(prop!=null && prop.length()>0)
+		if(prop!=null && prop.length()>0) {
 			httpdir = prop;
-		else
-			httpdir = new File(System.getProperty("java.io.tmpdir"), getClass().getSimpleName()+"-"+System.currentTimeMillis()).getAbsolutePath();
+		}
+		else {
+			httpdir = new File(System.getProperty("java.io.tmpdir"), getClass().getSimpleName()+"-"+Thread.currentThread().getName()+"-"+System.currentTimeMillis()).getAbsolutePath();
+		}
 		File dir = new File(httpdir);
 		if(dir.exists())
 			this.eraseFiles(dir);
@@ -291,7 +294,9 @@ public abstract class BaseBrowserTest implements RuntimeTestSupport {
 		if (defaultListener) {
 			antlr.addListener(new DefaultToolListener(antlr));
 		}
-		antlr.processGrammarsOnCommandLine();
+		synchronized (antlrLock) {
+			antlr.processGrammarsOnCommandLine();
+		}
 
 		if ( !defaultListener && !equeue.errors.isEmpty() ) {
 			for (int i = 0; i < equeue.errors.size(); i++) {

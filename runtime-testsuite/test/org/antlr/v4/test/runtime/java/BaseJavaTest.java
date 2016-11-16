@@ -88,7 +88,6 @@ import java.io.StringReader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -100,8 +99,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertFalse;
@@ -110,9 +107,6 @@ import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertArrayEquals;
 
 public class BaseJavaTest implements RuntimeTestSupport {
-	// -J-Dorg.antlr.v4.test.BaseTest.level=FINE
-	private static final Logger LOGGER = Logger.getLogger(BaseJavaTest.class.getName());
-
 	public static final String newline = System.getProperty("line.separator");
 	public static final String pathSep = System.getProperty("path.separator");
 
@@ -143,7 +137,7 @@ public class BaseJavaTest implements RuntimeTestSupport {
 	 * directories for all tests which completed successfully, and preserving
 	 * the directories for tests which failed.</p>
 	 */
-	public static final boolean PRESERVE_TEST_DIR = Boolean.parseBoolean(System.getProperty("antlr.preserve-test-dir"));
+	public static final boolean PRESERVE_TEST_DIR = true; //Boolean.parseBoolean(System.getProperty("antlr.preserve-test-dir"));
 
 	/**
 	 * The base test directory is the directory where generated files get placed
@@ -204,9 +198,12 @@ public class BaseJavaTest implements RuntimeTestSupport {
 
 	@Override
 	public void testSetUp() throws Exception {
+//		STGroup.verbose = true;
+//		System.err.println("testSetUp "+Thread.currentThread().getName());
 		if ( CREATE_PER_TEST_DIRECTORIES ) {
 			// new output dir for each test
-			String testDirectory = getClass().getSimpleName()+"-"+System.currentTimeMillis();
+			String threadName = Thread.currentThread().getName();
+			String testDirectory = getClass().getSimpleName()+"-"+threadName+"-"+System.nanoTime();
 			tmpdir = new File(BASE_TEST_DIR, testDirectory).getAbsolutePath();
 		}
 		else {
@@ -247,11 +244,6 @@ public class BaseJavaTest implements RuntimeTestSupport {
 
 	protected org.antlr.v4.Tool newTool(String[] args) {
 		Tool tool = new Tool(args);
-		return tool;
-	}
-
-	protected Tool newTool() {
-		org.antlr.v4.Tool tool = new Tool(new String[]{"-o", tmpdir});
 		return tool;
 	}
 
@@ -507,7 +499,9 @@ public class BaseJavaTest implements RuntimeTestSupport {
 		if ( defaultListener ) {
 			antlr.addListener(new DefaultToolListener(antlr));
 		}
-		antlr.processGrammarsOnCommandLine();
+		synchronized (antlrLock) {
+			antlr.processGrammarsOnCommandLine();
+		}
 
 		if ( !defaultListener && !equeue.errors.isEmpty() ) {
 			for (int i = 0; i<equeue.errors.size(); i++) {
@@ -563,7 +557,8 @@ public class BaseJavaTest implements RuntimeTestSupport {
 
 	public ParseTree execParser(String startRuleName, String input,
 	                            String parserName, String lexerName)
-		throws Exception {
+		throws Exception
+	{
 		Pair<Parser, Lexer> pl = getParserAndLexer(input, parserName, lexerName);
 		Parser parser = pl.a;
 		return execStartRule(startRuleName, parser);
@@ -635,6 +630,9 @@ public class BaseJavaTest implements RuntimeTestSupport {
 		                  listenerName, visitorName, startRuleName, input, showDiagnosticErrors, false);
 	}
 
+	/** ANTLR isn't thread-safe to process grammars so we use a global lock for testing */
+	public static final Object antlrLock = new Object();
+
 	public String execParser(String grammarFileName,
 	                         String grammarStr,
 	                         String parserName,
@@ -647,10 +645,10 @@ public class BaseJavaTest implements RuntimeTestSupport {
 	                         boolean profile)
 	{
 		boolean success = rawGenerateAndBuildRecognizer(grammarFileName,
-														grammarStr,
-														parserName,
-														lexerName,
-														"-visitor");
+		                                                grammarStr,
+		                                                parserName,
+		                                                lexerName,
+		                                                "-visitor");
 		assertTrue(success);
 		writeFile(tmpdir, "input", input);
 		return rawExecRecognizer(parserName,
@@ -771,32 +769,8 @@ public class BaseJavaTest implements RuntimeTestSupport {
 					this.stderrDuringParse = stderrVacuum.toString();
 				}
 				return output;
-			} catch (MalformedURLException ex) {
-				LOGGER.log(Level.SEVERE, null, ex);
-				throw new RuntimeException(ex);
-			} catch (IOException ex) {
-				LOGGER.log(Level.SEVERE, null, ex);
-				throw new RuntimeException(ex);
-			} catch (InterruptedException ex) {
-				LOGGER.log(Level.SEVERE, null, ex);
-				throw new RuntimeException(ex);
-			} catch (IllegalAccessException ex) {
-				LOGGER.log(Level.SEVERE, null, ex);
-				throw new RuntimeException(ex);
-			} catch (IllegalArgumentException ex) {
-				LOGGER.log(Level.SEVERE, null, ex);
-				throw new RuntimeException(ex);
-			} catch (InvocationTargetException ex) {
-				LOGGER.log(Level.SEVERE, null, ex);
-				throw new RuntimeException(ex);
-			} catch (NoSuchMethodException ex) {
-				LOGGER.log(Level.SEVERE, null, ex);
-				throw new RuntimeException(ex);
-			} catch (SecurityException ex) {
-				LOGGER.log(Level.SEVERE, null, ex);
-				throw new RuntimeException(ex);
-			} catch (ClassNotFoundException ex) {
-				LOGGER.log(Level.SEVERE, null, ex);
+			}
+			catch (Exception ex) {
 				throw new RuntimeException(ex);
 			}
 		}

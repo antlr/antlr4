@@ -57,7 +57,6 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -75,6 +74,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static org.antlr.v4.test.runtime.java.BaseJavaTest.antlrLock;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -162,7 +162,7 @@ public class BaseCSharpTest implements RuntimeTestSupport, RuntimeTestAssert {
 	public void testSetUp() throws Exception {
 		if (CREATE_PER_TEST_DIRECTORIES) {
 			// new output dir for each test
-			String testDirectory = getClass().getSimpleName() + "-" + System.currentTimeMillis();
+			String testDirectory = getClass().getSimpleName() + "-"+Thread.currentThread().getName()+ "-" + System.currentTimeMillis();
 			tmpdir = new File(BASE_TEST_DIR, testDirectory).getAbsolutePath();
 		}
 		else {
@@ -265,7 +265,9 @@ public class BaseCSharpTest implements RuntimeTestSupport, RuntimeTestAssert {
 		if (defaultListener) {
 			antlr.addListener(new DefaultToolListener(antlr));
 		}
-		antlr.processGrammarsOnCommandLine();
+		synchronized (antlrLock) {
+			antlr.processGrammarsOnCommandLine();
+		}
 
 		if ( !defaultListener && !equeue.errors.isEmpty() ) {
 			for (int i = 0; i < equeue.errors.size(); i++) {
@@ -908,7 +910,7 @@ public class BaseCSharpTest implements RuntimeTestSupport, RuntimeTestAssert {
 	public void assertEqualStrings(String a, String b) {
 		assertEquals(a, b);
 	}
-	
+
 	protected static void assertEquals(String a, String b) {
 		a = absorbExpectedDifferences(a);
 		b = absorbActualDifferences(b);
@@ -928,19 +930,20 @@ public class BaseCSharpTest implements RuntimeTestSupport, RuntimeTestAssert {
 			a = a.replaceAll("\\^", "");
 		// work around the algo difference for full context
 		a = stripOutUnwantedLinesWith(a, "reportAttemptingFullContext","reportContextSensitivity", "reportAmbiguity");
-		if(a.isEmpty())
+		if(a.isEmpty()) {
 			a = null;
+		}
 		return a;
 	}
 
 	private static String absorbActualDifferences(String a) {
-		if(a==null)
-			return a;
+		if(a==null)	return a;
 		// work around the algo difference for full context
 		// work around the algo difference for semantic predicates
 		a = stripOutUnwantedLinesWith(a, "reportContextSensitivity","eval=false");
-		if(a.isEmpty())
+		if(a.isEmpty()) {
 			a = null;
+		}
 		return a;
 	}
 
