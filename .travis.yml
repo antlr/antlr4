@@ -1,7 +1,7 @@
 sudo: true
 language: java
 script:
-  - mvn install
+  - mvn -Dparallel=methods -DthreadCount=4 install
 
 jdk:
   - oraclejdk7
