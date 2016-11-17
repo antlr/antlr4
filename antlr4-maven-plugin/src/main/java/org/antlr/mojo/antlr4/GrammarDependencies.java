@@ -150,7 +150,7 @@ class GrammarDependencies {
             Collection<String> usages = e.getValue().getValue();
 
             if (usages.contains(grammarPath)) {
-                if (!Arrays.equals(MojoUtils.checksum(depGrammarFile), checksum)) {
+                if (!depGrammarFile.exists() || !Arrays.equals(MojoUtils.checksum(depGrammarFile), checksum)) {
                     log.debug("  " + grammarPath + ": dependency " +
                         depGrammarFile.getName() + " changed");
 

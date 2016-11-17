@@ -5,6 +5,7 @@ import io.takari.maven.testing.TestResources;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecution;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -13,6 +14,7 @@ import static org.junit.Assert.*;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -31,6 +33,9 @@ import java.util.regex.Pattern;
 
 
 public class Antlr4MojoTest {
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
     @Rule
     public final TestResources resources = new TestResources();
 
@@ -268,6 +273,42 @@ public class Antlr4MojoTest {
                     processAndReset(output));
             } finally {
                 write(parserGrammar, original);
+            }
+        } finally {
+            System.out.flush();
+            System.setOut(stdout.getValue());
+        }
+    }
+
+    @Test
+    public void processWhenDependencyRemoved() throws Exception {
+        Map.Entry<ByteArrayOutputStream, PrintStream> stdout = redirect();
+        ByteArrayOutputStream output = stdout.getKey();
+
+        try {
+            File baseDir = resources.getBasedir("dependencyRemoved");
+            File antlrDir = new File(baseDir, "src/main/antlr4");
+
+            File baseGrammar = new File(antlrDir, "imports/HelloBase.g4");
+
+            MavenProject project = maven.readMavenProject(baseDir);
+            MavenSession session = maven.newMavenSession(project);
+            MojoExecution exec = maven.newMojoExecution("antlr4");
+
+            maven.executeMojo(session, project, exec);
+
+            String t = text(baseGrammar);
+
+            try {
+                // if the base grammar no longer exists, processing must be performed
+                baseGrammar.delete();
+
+                thrown.expect(MojoExecutionException.class);
+                thrown.expectMessage("ANTLR 4 caught 1 build errors.");
+
+                maven.executeMojo(session, project, exec);
+            } finally {
+                write(baseGrammar, t);
             }
         } finally {
             System.out.flush();
