@@ -50,11 +50,12 @@ class GrammarDependencies {
     }
 
     /**
-     * Sets the package to use.
+     * Determines the package to use.
      *
      * @param   arguments  the tool arguments.
      *
-     * @return  self-reference.
+     * @return  the package. Returns {@code null} to indicate that no package should be
+     *          used.
      */
     private String getPackage(List<String> arguments) {
         int index = (arguments != null) ? arguments.indexOf("-package") : -1;
