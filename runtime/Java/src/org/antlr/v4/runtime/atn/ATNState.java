@@ -191,7 +191,22 @@ public abstract class ATNState {
 			epsilonOnlyTransitions = false;
 		}
 
-		transitions.add(index, e);
+		boolean alreadyPresent = false;
+//		for (Transition t : transitions) {
+//			if ( t.target.stateNumber == e.target.stateNumber ) {
+//				if ( t.label()!=null && e.label()!=null && t.label().equals(e.label()) ) {
+//					System.err.println("Repeated transition upon "+e.label()+" from "+stateNumber+"->"+t.target.stateNumber);
+//					alreadyPresent = true;
+//				}
+//				else if ( t.isEpsilon() && e.isEpsilon() ) {
+//					System.err.println("Repeated epsilon transition from "+stateNumber+"->"+t.target.stateNumber);
+//					alreadyPresent = true;
+//				}
+//			}
+//		}
+		if ( !alreadyPresent ) {
+			transitions.add(index, e);
+		}
 	}
 
 	public Transition transition(int i) { return transitions.get(i); }
