@@ -46,7 +46,9 @@ public class Graph<T> {
 
 	public static class Node<T> {
 		public T payload;
-		public List<Node<T>> edges = Collections.emptyList(); // points at which nodes?
+
+		@SuppressWarnings("unchecked")
+		public List<Node<T>> edges = Collections.EMPTY_LIST; // points at which nodes?
 
 		public Node(T payload) { this.payload = payload; }
 
