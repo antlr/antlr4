@@ -21,7 +21,7 @@ decl: type ID ';'
 
 ## Token Attributes
 
-All tokens have a collection of predefined, read-only attributes. The attributes include useful token properties such as the token type and text matched for a token. Actions can access these attributes via $ label.attribute where label labels a particular instance of a token reference (a and b in the example below are used in the action code as $a and $b). Often, a particular token is only referenced once in the rule, in which case the token name itself can be used unambiguously in the action code (token INT can be used as $INT in the action). The following example illustrates token attribute expression syntax:
+All tokens have a collection of predefined, read-only attributes. The attributes include useful token properties such as the token type and text matched for a token. Actions can access these attributes via `$label.attribute` where label labels a particular instance of a token reference (`a` and `b` in the example below are used in the action code as `$a` and `$b`). Often, a particular token is only referenced once in the rule, in which case the token name itself can be used unambiguously in the action code (token `INT` can be used as `$INT` in the action). The following example illustrates token attribute expression syntax:
 
 ```
 r : INT {int x = $INT.line;}
@@ -34,7 +34,7 @@ The action within the `(...)?` subrule can see the `INT` token matched before it
 
 Because there are two references to the `FLOAT` token, a reference to `$FLOAT` in an action is not unique; you must use labels to specify which token reference you’re interested in.
 
-Token references within different alternatives are unique because only one of them can be matched for any invocation of the rule. For example, in the following rule, actions in both alternatives can reference $ID directly without using a label:
+Token references within different alternatives are unique because only one of them can be matched for any invocation of the rule. For example, in the following rule, actions in both alternatives can reference `$ID` directly without using a label:
 
 ```
  	r : ... ID {System.out.println($ID.text);}
@@ -72,7 +72,7 @@ Most of the time you access the attributes of the token, but sometimes it is use
 
 ## Parser Rule Attributes
 
-ANTLR predefines a number of read-only attributes associated with parser rule references that are available to actions. Actions can access rule attributes only for references that precede the action. The syntax is $ r.attr for rule name r or a label assigned to a rule reference. For example, $expr.text returns the complete text matched by a preceding invocation of rule expr:
+ANTLR predefines a number of read-only attributes associated with parser rule references that are available to actions. Actions can access rule attributes only for references that precede the action. The syntax is `$r.attr` for rule name `r` or a label assigned to a rule reference. For example, `$expr.text` returns the complete text matched by a preceding invocation of rule `expr`:
 
 ```
 returnStat : 'return' expr {System.out.println("matched "+$expr.text);} ;
@@ -101,7 +101,7 @@ returnStat : 'return' expr {System.out.println("first token "+$start.getText());
 
 ## Dynamically-Scoped Attributes
 
-You can pass information to and from rules using parameters and return values, just like functions in a general-purpose programming language. Programming languages don’t allow functions to access the local variables or parameters of invoking functions, however. For example, the following reference to local variable xfrom a nested method call is illegal in Java:
+You can pass information to and from rules using parameters and return values, just like functions in a general-purpose programming language. Programming languages don’t allow functions to access the local variables or parameters of invoking functions, however. For example, the following reference to local variable `x` form a nested method call is illegal in Java:
 
 ```java
 void f() {
@@ -116,7 +116,7 @@ void h() {
 }
 ```
 
-Variable x is available only within the scope of f, which is the text lexically delimited by curly brackets. For this reason, Java is said to use lexical scoping. Lexical scoping is the norm for most programming languages. Languages that allow methods further down in the call chain to access local variables defined earlier are said to use dynamic scoping. The term dynamic refers to the fact that a compiler cannot statically determine the set of visible variables. This is because the set of variables visible to a method changes depending on who calls that method.
+Variable `x` is available only within the scope of `f`, which is the text lexically delimited by curly brackets. For this reason, Java is said to use lexical scoping. Lexical scoping is the norm for most programming languages. Languages that allow methods further down in the call chain to access local variables defined earlier are said to use dynamic scoping. The term dynamic refers to the fact that a compiler cannot statically determine the set of visible variables. This is because the set of variables visible to a method changes depending on who calls that method.
 
 It turns out that, in the grammar realm, distant rules sometimes need to communicate with each other, mostly to provide context information to rules matched below in the rule invocation chain. (Naturally, this assumes that you are using actions directly in the grammar instead of the parse-tree listener event mechanism.) ANTLR allows dynamic scoping in that actions can access attributes from invoking rules using syntax `$r::x` where `r` is a rule name and `x` is an attribute within that rule. It is up to the programmer to ensure that `r` is in fact an invoking rule of the current rule. A runtime exception occurs if `r` is not in the current call chain when you access `$r::x`.
 
@@ -176,7 +176,7 @@ $ grun DynScope prog
  	symbols=[i]
 ```
 
-There’s an important difference between a simple field declaration in a `@members` action and dynamic scoping. symbols is a local variable and so there is a copy for each invocation of rule `block`. That’s exactly what we want for nested blocks so that we can reuse the same input variable name in an inner block. For example, the following nested code block redefines i in the inner scope. This new definition must hide the definition in the outer scope.
+There’s an important difference between a simple field declaration in a `@members` action and dynamic scoping. symbols is a local variable and so there is a copy for each invocation of rule `block`. That’s exactly what we want for nested blocks so that we can reuse the same input variable name in an inner block. For example, the following nested code block redefines `i` in the inner scope. This new definition must hide the definition in the outer scope.
 
 ```
 {
