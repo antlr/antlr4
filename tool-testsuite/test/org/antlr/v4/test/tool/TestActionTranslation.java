@@ -176,6 +176,45 @@ public class TestActionTranslation extends BaseJavaTest {
 		testActions(attributeTemplate, "inline", action, expected);
     }
 
+	/**
+	 * Regression test for issue #1295
+     * $e.v yields incorrect value 0 in "e returns [int v] : '1' {$v = 1;} | '(' e ')' {$v = $e.v;} ;"
+	 * https://github.com/antlr/antlr4/issues/1295
+	 */
+	@Test public void testRuleRefsRecursive() throws Exception {
+        String recursiveTemplate =
+            "recursiveTemplate(inline) ::= <<\n" +
+            "parser grammar A;\n"+
+            "e returns [int v]\n" +
+            "    :   INT {$v = $INT.int;}\n" +
+            "    |   '(' e ')' {\n" +
+            "		 #inline#<inline>#end-inline#\n" +
+            "		 }\n" +
+            "    ;\n" +
+            ">>";
+        String leftRecursiveTemplate =
+            "recursiveTemplate(inline) ::= <<\n" +
+            "parser grammar A;\n"+
+            "e returns [int v]\n" +
+            "    :   a=e op=('*'|'/') b=e  {$v = eval($a.v, $op.type, $b.v);}\n" +
+            "    |   INT {$v = $INT.int;}\n" +
+            "    |   '(' e ')' {\n" +
+            "		 #inline#<inline>#end-inline#\n" +
+            "		 }\n" +
+            "    ;\n" +
+            ">>";
+        // ref to value returned from recursive call to rule
+        String action = "$v = $e.v;";
+		String expected = "((EContext)_localctx).v =  ((EContext)_localctx).e.v;";
+		testActions(recursiveTemplate, "inline", action, expected);
+		testActions(leftRecursiveTemplate, "inline", action, expected);
+        // ref to predefined attribute obtained from recursive call to rule
+        action = "$v = $e.text.length();";
+        expected = "((EContext)_localctx).v =  (((EContext)_localctx).e!=null?_input.getText(((EContext)_localctx).e.start,((EContext)_localctx).e.stop):null).length();";
+		testActions(recursiveTemplate, "inline", action, expected);
+		testActions(leftRecursiveTemplate, "inline", action, expected);
+	}
+
 	@Test public void testRefToTextAttributeForCurrentRule() throws Exception {
         String action = "$ctx.text; $text";
 
