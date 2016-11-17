@@ -48,15 +48,6 @@ public class CompositeParsersDescriptors {
 		public String grammarName = "M";
 
 		/**
-		writeFile(tmpdir, "M.g4", grammar);
-		ErrorQueue equeue = new ErrorQueue();
-		new Grammar(tmpdir+"/M.g4", grammar, equeue);
-		assertEquals("unexpected errors: " + equeue, 0, equeue.errors.size());
-		 */
-		@CommentHasStringValue
-		public String afterGrammar;
-
-		/**
 		 grammar M;
 		 import S;
 		 s : x INT;
