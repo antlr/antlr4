@@ -365,6 +365,20 @@ public class TestATNConstruction extends BaseJavaTest {
 				"RuleStop_a_1-EOF->s9\n";
 		checkRuleATN(g, "a", expecting);
 	}
+	@Test public void testEmptyOrEmpty() throws Exception {
+		Grammar g = new Grammar(
+			"parser grammar P;\n"+
+			"a : | ;");
+		String expecting =
+			"RuleStart_a_0->BlockStart_4\n"+
+			"BlockStart_4->s2\n"+
+			"BlockStart_4->s3\n"+
+			"s2->BlockEnd_5\n"+
+			"s3->BlockEnd_5\n"+
+			"BlockEnd_5->RuleStop_a_1\n"+
+			"RuleStop_a_1-EOF->s6\n";
+		checkRuleATN(g, "a", expecting);
+	}
 	@Test public void testAStar() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar P;\n"+
