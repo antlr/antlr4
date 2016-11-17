@@ -36,9 +36,6 @@ public interface RuntimeTestDescriptor {
 	/** The rule at which parsing should start */
 	String getStartRule(); // TODO: alter tests to use same default start rule?
 
-	/** Initialization code */
-	//String getAfterGrammar(); // TODO: only a few use. make part of testrig or rename?
-
 	/** For lexical tests, dump the DFA of the default lexer mode to stdout */
 	boolean showDFA();
 

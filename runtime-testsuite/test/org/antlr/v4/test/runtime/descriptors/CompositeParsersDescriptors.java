@@ -97,21 +97,6 @@ public class CompositeParsersDescriptors {
 		public String grammarName = "M";
 
 		/**
-		writeFile(tmpdir, "M.g4", grammar);
-		ErrorQueue equeue = new ErrorQueue();
-		Grammar g = new Grammar(tmpdir+"/M.g4", grammar, equeue);
-		String expectedTokenIDToTypeMap = "{EOF=-1, B=1, A=2, C=3, WS=4}";
-		String expectedStringLiteralToTypeMap = "{'a'=2, 'b'=1, 'c'=3}";
-		String expectedTypeToTokenList = "[B, A, C, WS]";
-		assertEquals(expectedTokenIDToTypeMap, g.tokenNameToTypeMap.toString());
-		assertEquals(expectedStringLiteralToTypeMap, sort(g.stringLiteralToTypeMap).toString());
-		assertEquals(expectedTypeToTokenList, realElements(g.typeToTokenList).toString());
-		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
-		 */
-		@CommentHasStringValue
-		public String afterGrammar;
-
-		/**
 		 // The lexer will create rules to match letters a, b, c.
 		 // The associated token types A, B, C must have the same value
 		 // and all import'd parsers.  Since ANTLR regenerates all imports

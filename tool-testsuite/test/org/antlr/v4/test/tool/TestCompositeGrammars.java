@@ -72,6 +72,50 @@ public class TestCompositeGrammars extends BaseJavaTest {
 		assertEquals(equeue.size(), 0);
 	}
 
+	@Test public void testDelegatesSeeSameTokenType() throws Exception {
+		String slaveS =
+			"parser grammar S;\n"+
+			"tokens { A, B, C }\n"+
+			"x : A ;\n";
+		String slaveT =
+			"parser grammar T;\n"+
+			"tokens { C, B, A } // reverse order\n"+
+			"y : A ;\n";
+
+		mkdir(tmpdir);
+		writeFile(tmpdir, "S.g4", slaveS);
+		writeFile(tmpdir, "T.g4", slaveT);
+
+		String master =
+			"// The lexer will create rules to match letters a, b, c.\n"+
+			"// The associated token types A, B, C must have the same value\n"+
+			"// and all import'd parsers.  Since ANTLR regenerates all imports\n"+
+			"// for use with the delegator M, it can generate the same token type\n"+
+			"// mapping in each parser:\n"+
+			"// public static final int C=6;\n"+
+			"// public static final int EOF=-1;\n"+
+			"// public static final int B=5;\n"+
+			"// public static final int WS=7;\n"+
+			"// public static final int A=4;\n"+
+			"grammar M;\n"+
+			"import S,T;\n"+
+			"s : x y ; // matches AA, which should be 'aa'\n"+
+			"B : 'b' ; // another order: B, A, C\n"+
+			"A : 'a' ;\n"+
+			"C : 'c' ;\n"+
+			"WS : (' '|'\\n') -> skip ;\n";
+		writeFile(tmpdir, "M.g4", master);
+		ErrorQueue equeue = new ErrorQueue();
+		Grammar g = new Grammar(tmpdir+"/M.g4", master, equeue);
+		String expectedTokenIDToTypeMap = "{EOF=-1, B=1, A=2, C=3, WS=4}";
+		String expectedStringLiteralToTypeMap = "{'a'=2, 'b'=1, 'c'=3}";
+		String expectedTypeToTokenList = "[B, A, C, WS]";
+		assertEquals(expectedTokenIDToTypeMap, g.tokenNameToTypeMap.toString());
+		assertEquals(expectedStringLiteralToTypeMap, sort(g.stringLiteralToTypeMap).toString());
+		assertEquals(expectedTypeToTokenList, realElements(g.typeToTokenList).toString());
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
+	}
+
 	@Test public void testErrorInImportedGetsRightFilename() throws Exception {
 		String slave =
 			"parser grammar S;\n" +
