@@ -126,12 +126,12 @@ public abstract class BaseRuntimeTest {
 		                                   descriptor.showDiagnosticErrors()
 		                                  );
 		if ( delegate instanceof RuntimeTestAssert ) {
-			((RuntimeTestAssert)delegate).assertEqualStrings(descriptor.getOutput(), found);
 			((RuntimeTestAssert)delegate).assertEqualStrings(descriptor.getErrors(), delegate.getParseErrors());
+			((RuntimeTestAssert)delegate).assertEqualStrings(descriptor.getOutput(), found);
 		}
 		else {
-			assertEquals(descriptor.getOutput(), found);
 			assertEquals(descriptor.getErrors(), delegate.getParseErrors());
+			assertEquals(descriptor.getOutput(), found);
 		}
 	}
 
