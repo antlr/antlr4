@@ -338,6 +338,15 @@ public class Grammar implements AttributeResolver {
         this.text = grammarText;
 		this.fileName = fileName;
 		this.tool = new Tool();
+		ANTLRToolListener hush = new ANTLRToolListener() {
+			@Override
+			public void info(String msg) { }
+			@Override
+			public void error(ANTLRMessage msg) { }
+			@Override
+			public void warning(ANTLRMessage msg) { }
+		};
+		tool.addListener(hush); // we want to hush errors/warnings
 		this.tool.addListener(listener);
 		org.antlr.runtime.ANTLRStringStream in = new org.antlr.runtime.ANTLRStringStream(grammarText);
 		in.name = fileName;

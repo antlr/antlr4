@@ -1,10 +1,9 @@
 sudo: true
 language: java
 script:
-  - mvn install
+  - mvn -Dparallel=methods -DthreadCount=4 install
 
 jdk:
-  - openjdk6
   - oraclejdk7
   - oraclejdk8
 
@@ -32,6 +31,8 @@ addons:
   apt:
     sources:
       - ubuntu-toolchain-r-test
+      - llvm-toolchain-precise-3.7
     packages:
       - g++-5
       - uuid-dev
+      - clang-3.7

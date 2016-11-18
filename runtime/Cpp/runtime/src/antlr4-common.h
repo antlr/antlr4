@@ -82,7 +82,7 @@
     typedef std::basic_string<__int32> i32string;
   #endif
 
-  #ifdef _WINDLL
+#ifdef ANTLR4CPP_DLL
     #define SHARED_LIB 1
     #ifdef ANTLR4CPP_EXPORTS
       #define ANTLR4CPP_PUBLIC __declspec(dllexport)
@@ -108,7 +108,7 @@
   #define EXPIMP_TEMPLATE
 #else
   #define GUID_LIBUUID
-  #if __GNUC__ >= 4
+  #if __GNUC__ >= 6
     #define ANTLR4CPP_PUBLIC __attribute__ ((visibility ("default")))
   #else
     #define ANTLR4CPP_PUBLIC

@@ -1,0 +1,295 @@
+writeln(s) ::= <<document.getElementById('output').value += <s> + '\\n';>>
+write(s) ::= <<document.getElementById('output').value += <s>;>>
+writeList(s) ::= <<document.getElementById('output').value += <s; separator="+">;>>
+
+False() ::= "false"
+
+True() ::= "true"
+
+Not(v) ::= "!<v>"
+
+Assert(s) ::= ""
+
+Cast(t,v) ::= "<v>"
+
+Append(a,b) ::= "<a> + <b>"
+
+Concat(a,b) ::= "<a><b>"
+
+DeclareLocal(s,v) ::= "var <s> = <v>;"
+
+AssertIsList(v) ::= <<if ( !(v instanceof Array) ) {throw "value is not an array";}>>
+
+AssignLocal(s,v) ::= "<s> = <v>;"
+
+InitIntMember(n,v) ::= <%this.<n> = <v>;%>
+
+InitBooleanMember(n,v) ::= <%this.<n> = <v>;%>
+
+GetMember(n) ::= <%this.<n>%>
+
+SetMember(n,v) ::= <%this.<n> = <v>;%>
+
+AddMember(n,v) ::= <%this.<n> += <v>;%>
+
+PlusMember(v,n) ::= <%<v> + this.<n>%>
+
+MemberEquals(n,v) ::= <%this.<n> === <v>%>
+
+ModMemberEquals(n,m,v) ::= <%this.<n> % <m> === <v>%>
+
+ModMemberNotEquals(n,m,v) ::= <%this.<n> % <m> != <v>%>
+
+DumpDFA() ::= "this.dumpDFA();"
+
+Pass() ::= ""
+
+StringList() ::= "list"
+
+BuildParseTrees() ::= "this.buildParseTrees = true;"
+
+BailErrorStrategy() ::= <%this._errHandler = new antlr4.error.BailErrorStrategy();%>
+
+ToStringTree(s) ::= <%<s>.toStringTree(null, this)%>
+
+Column() ::= "this.column"
+
+Text() ::= "this.text"
+
+ValEquals(a,b) ::= <%<a>===<b>%>
+
+TextEquals(a) ::= <%this.text==="<a>"%>
+
+PlusText(a) ::= <%"<a>" + this.text%>
+
+InputText() ::= "this._input.getText()"
+
+LTEquals(i, v) ::= <%this._input.LT(<i>).text===<v>%>
+
+LANotEquals(i, v) ::= <%this._input.LA(<i>)!=<v>%>
+
+TokenStartColumnEquals(i) ::= <%this._tokenStartColumn===<i>%>
+
+ImportListener(X) ::= <<
+@parser::header {
+var <X>Listener = require('./<X>Listener').<X>Listener;
+}
+>>
+
+GetExpectedTokenNames() ::= "this.getExpectedTokens().toString(this.literalNames)"
+
+RuleInvocationStack() ::= "antlr4.Utils.arrayToString(this.getRuleInvocationStack())"
+
+LL_EXACT_AMBIG_DETECTION() ::= <<this._interp.predictionMode = antlr4.atn.PredictionMode.LL_EXACT_AMBIG_DETECTION;>>
+
+ParserToken(parser, token) ::= <%<parser>.<token>%>
+
+Production(p) ::= <%<p>%>
+
+Result(r) ::= <%<r>%>
+
+ParserPropertyMember() ::= <<
+@members {
+this.Property = function() {
+    return true;
+}
+}
+>>
+
+ParserPropertyCall(p, call) ::= "<p>.<call>"
+
+PositionAdjustingLexer() ::= <<
+
+PositionAdjustingLexer.prototype.resetAcceptPosition = function(index, line, column) {
+	this._input.seek(index);
+	this.line = line;
+	this.column = column;
+	this._interp.consume(this._input);
+};
+
+PositionAdjustingLexer.prototype.nextToken = function() {
+	if (!("resetAcceptPosition" in this._interp)) {
+		var lexer = this;
+		this._interp.resetAcceptPosition = function(index, line, column) { lexer.resetAcceptPosition(index, line, column); };
+	}
+	return antlr4.Lexer.prototype.nextToken.call(this);
+};
+
+PositionAdjustingLexer.prototype.emit = function() {
+	switch(this._type) {
+	case PositionAdjustingLexer.TOKENS:
+		this.handleAcceptPositionForKeyword("tokens");
+		break;
+	case PositionAdjustingLexer.LABEL:
+		this.handleAcceptPositionForIdentifier();
+		break;
+	}
+	return antlr4.Lexer.prototype.emit.call(this);
+};
+
+PositionAdjustingLexer.prototype.handleAcceptPositionForIdentifier = function() {
+	var tokenText = this.text;
+	var identifierLength = 0;
+	while (identifierLength \< tokenText.length &&
+		PositionAdjustingLexer.isIdentifierChar(tokenText[identifierLength])
+	) {
+		identifierLength += 1;
+	}
+	if (this._input.index > this._tokenStartCharIndex + identifierLength) {
+		var offset = identifierLength - 1;
+		this._interp.resetAcceptPosition(this._tokenStartCharIndex + offset,
+				this._tokenStartLine, this._tokenStartColumn + offset);
+		return true;
+	} else {
+		return false;
+	}
+};
+
+PositionAdjustingLexer.prototype.handleAcceptPositionForKeyword = function(keyword) {
+	if (this._input.index > this._tokenStartCharIndex + keyword.length) {
+		var offset = keyword.length - 1;
+		this._interp.resetAcceptPosition(this._tokenStartCharIndex + offset,
+			this._tokenStartLine, this._tokenStartColumn + offset);
+		return true;
+	} else {
+		return false;
+	}
+};
+
+PositionAdjustingLexer.isIdentifierChar = function(c) {
+	return c.match(/^[0-9a-zA-Z_]+$/);
+}
+
+>>
+
+BasicListener(X) ::= <<
+@parser::members {
+this.LeafListener = function() {
+    this.visitTerminal = function(node) {
+    	document.getElementById('output').value += node.symbol.text + '\\n';
+    };
+    return this;
+};
+this.LeafListener.prototype = Object.create(<X>Listener.prototype);
+this.LeafListener.prototype.constructor = this.LeafListener;
+}
+>>
+
+WalkListener(s) ::= <<
+var walker = new antlr4.tree.ParseTreeWalker();
+walker.walk(new this.LeafListener(), <s>);
+>>
+
+TreeNodeWithAltNumField(X) ::= <<
+@parser::header {
+MyRuleNode = function(parent, invokingState) {
+	antlr4.ParserRuleContext.call(this, parent, invokingState);
+	this.altNum = 0;
+	return this;
+};
+
+MyRuleNode.prototype = Object.create(antlr4.ParserRuleContext.prototype);
+MyRuleNode.prototype.constructor = MyRuleNode;
+}
+>>
+
+
+TokenGetterListener(X) ::= <<
+@parser::members {
+this.LeafListener = function() {
+    this.exitA = function(ctx) {
+    	var str;
+        if(ctx.getChildCount()===2) {
+            str = ctx.INT(0).symbol.text + ' ' + ctx.INT(1).symbol.text + ' ' + antlr4.Utils.arrayToString(ctx.INT());
+        } else {
+            str = ctx.ID().symbol.toString();
+        }
+    	document.getElementById('output').value += str + '\\n';
+    };
+    return this;
+};
+this.LeafListener.prototype = Object.create(<X>Listener.prototype);
+this.LeafListener.prototype.constructor = this.LeafListener;
+}
+>>
+
+RuleGetterListener(X) ::= <<
+@parser::members {
+this.LeafListener = function() {
+    this.exitA = function(ctx) {
+    	var str;
+        if(ctx.getChildCount()===2) {
+            str = ctx.b(0).start.text + ' ' + ctx.b(1).start.text + ' ' + ctx.b()[0].start.text;
+        } else {
+            str = ctx.b(0).start.text;
+        }
+    	document.getElementById('output').value += str + '\\n';
+    };
+    return this;
+};
+this.LeafListener.prototype = Object.create(<X>Listener.prototype);
+this.LeafListener.prototype.constructor = this.LeafListener;
+}
+>>
+
+
+LRListener(X) ::= <<
+@parser::members {
+this.LeafListener = function() {
+    this.exitE = function(ctx) {
+    	var str;
+        if(ctx.getChildCount()===3) {
+            str = ctx.e(0).start.text + ' ' + ctx.e(1).start.text + ' ' + ctx.e()[0].start.text;
+        } else {
+            str = ctx.INT().symbol.text;
+        }
+    	document.getElementById('output').value += str + '\\n';
+    };
+    return this;
+};
+this.LeafListener.prototype = Object.create(<X>Listener.prototype);
+this.LeafListener.prototype.constructor = this.LeafListener;
+}
+>>
+
+LRWithLabelsListener(X) ::= <<
+@parser::members {
+this.LeafListener = function() {
+    this.exitCall = function(ctx) {
+    	var str = ctx.e().start.text + ' ' + ctx.eList();
+    	document.getElementById('output').value += str + '\\n';
+    };
+    this.exitInt = function(ctx) {
+        var str = ctx.INT().symbol.text;
+    	document.getElementById('output').value += str + '\\n';
+    };
+    return this;
+};
+this.LeafListener.prototype = Object.create(<X>Listener.prototype);
+this.LeafListener.prototype.constructor = this.LeafListener;
+}
+>>
+
+DeclareContextListGettersFunction() ::= <<
+	function foo() {
+		var s = new SContext();
+	    var a = s.a();
+	    var b = s.b();
+    };
+>>
+
+Declare_foo() ::= "this.foo = function() {document.getElementById('output').value += 'foo' + '\\n';};"
+
+Invoke_foo() ::= "this.foo();"
+
+Declare_pred() ::= <<this.pred = function(v) {
+	document.getElementById('output').value += 'eval=' + v.toString() + '\\n';
+	return v;
+};
+>>
+
+Invoke_pred(v) ::= <<this.pred(<v>)>>
+ParserTokenType(t) ::= "Parser.<t>"
+ContextRuleFunction(ctx, rule) ::= "<ctx>.<rule>"
+StringType() ::= "String"
+ContextMember(ctx, subctx, member) ::= "<ctx>.<subctx>.<member>"

@@ -55,9 +55,9 @@
 
   <!-- ============================================================================= -->
 
-  <!-- What are we depedent on for the Mojos to execute? We need the plugin 
-    API itself and of course we need the ANTLR Tool and runtime and any of their 
-    dependencies, which we inherit. The Tool itself provides us with all the 
+  <!-- What are we depedent on for the Mojos to execute? We need the plugin
+    API itself and of course we need the ANTLR Tool and runtime and any of their
+    dependencies, which we inherit. The Tool itself provides us with all the
     dependencies, so we need only name it here. -->
   <dependencies>
 
@@ -78,8 +78,8 @@
       <artifactId>plexus-build-api</artifactId>
       <version>0.0.7</version>
     </dependency>
-    <!-- The version of ANTLR tool that this version of the plugin controls. 
-      We have decided that this should be in lockstep with ANTLR itself, other 
+    <!-- The version of ANTLR tool that this version of the plugin controls.
+      We have decided that this should be in lockstep with ANTLR itself, other
       than -1 -2 -3 etc patch releases. -->
     <dependency>
       <groupId>org.antlr</groupId>

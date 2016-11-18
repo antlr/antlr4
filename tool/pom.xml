@@ -54,7 +54,6 @@
 
   <build>
     <sourceDirectory>src</sourceDirectory>
-    <testSourceDirectory>test</testSourceDirectory>
     <testResources>
       <testResource>
         <directory>test</directory>

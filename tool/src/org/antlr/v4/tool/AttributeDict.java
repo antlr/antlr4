@@ -65,7 +65,7 @@ public class AttributeDict {
         predefinedTokenDict.add(new Attribute("int"));
     }
 
-    public static enum DictType {
+    public enum DictType {
         ARG, RET, LOCAL, TOKEN,
 		PREDEFINED_RULE, PREDEFINED_LEXER_RULE,
     }

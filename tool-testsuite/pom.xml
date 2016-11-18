@@ -31,21 +31,16 @@
       <groupId>org.antlr</groupId>
       <artifactId>antlr4-runtime-testsuite</artifactId>
       <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.antlr</groupId>
-      <artifactId>antlr4</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.antlr</groupId>
-      <artifactId>antlr4</artifactId>
-      <version>${project.version}</version>
       <type>test-jar</type>
     </dependency>
     <dependency>
       <groupId>org.antlr</groupId>
-      <artifactId>antlr4-runtime-testsuite</artifactId>
+      <artifactId>antlr4</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.antlr</groupId>
+      <artifactId>antlr4</artifactId>
       <version>${project.version}</version>
       <type>test-jar</type>
     </dependency>
@@ -59,6 +54,7 @@
 
   <build>
     <sourceDirectory>src</sourceDirectory>
+    <testSourceDirectory>test</testSourceDirectory>
     <plugins>
       <plugin>
         <groupId>com.googlecode.maven-download-plugin</groupId>
@@ -78,6 +74,9 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <version>2.12.4</version>
         <configuration>
+          <includes>
+            <include>**/Test*.java</include>
+          </includes>
           <systemPropertyVariables>
             <antlr-python2-runtime>../../antlr4-python2/src</antlr-python2-runtime>
             <antlr-python3-runtime>../../antlr4-python3/src</antlr-python3-runtime>

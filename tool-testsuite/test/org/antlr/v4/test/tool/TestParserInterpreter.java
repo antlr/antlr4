@@ -35,15 +35,22 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.LexerInterpreter;
 import org.antlr.v4.runtime.ParserInterpreter;
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.test.runtime.java.BaseTest;
+import org.antlr.v4.test.runtime.java.BaseJavaTest;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
 
-public class TestParserInterpreter extends BaseTest {
+public class TestParserInterpreter extends BaseJavaTest {
+	@Before
+	@Override
+	public void testSetUp() throws Exception {
+		super.testSetUp();
+	}
+
 	@Test public void testEmptyStartRule() throws Exception {
 		LexerGrammar lg = new LexerGrammar(
 			"lexer grammar L;\n" +
@@ -356,7 +363,6 @@ public class TestParserInterpreter extends BaseTest {
 		CommonTokenStream tokens = new CommonTokenStream(lexEngine);
 		ParserInterpreter parser = g.createParserInterpreter(tokens);
 		ParseTree t = parser.parse(g.rules.get(startRule).index);
-		System.out.println("parse tree: "+t.toStringTree(parser));
 		assertEquals(expectedParseTree, t.toStringTree(parser));
 		return t;
 	}

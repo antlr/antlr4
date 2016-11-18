@@ -108,3 +108,6 @@ YYYY/MM/DD, github id, Full name, email
 2016/10/21, FloorGoddijn, Floor Goddijn, floor.goddijn[at]aimms.com
 2016/11/01, RYDB3RG, Kai Stammerjohann, RYDB3RG@users.noreply.github.com
 2016/11/05, runner-mei, meifakun, runner.mei@gmail.com
+2016/11/15, hanjoes, Hanzhou Shi, hanzhou87@gmail.com
+2016/11/16, sridharxp, Sridharan S, aurosridhar@gmail.com
+2016/11/06, NoodleOfDeath, Thom Morgan, github@bytemeapp.com

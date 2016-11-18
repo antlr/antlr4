@@ -30,12 +30,13 @@
 
 package org.antlr.v4.test.tool;
 
-import org.antlr.v4.test.runtime.java.BaseTest;
-import org.antlr.v4.test.runtime.java.ErrorQueue;
+import org.antlr.v4.test.runtime.ErrorQueue;
+import org.antlr.v4.test.runtime.java.BaseJavaTest;
 import org.antlr.v4.tool.ANTLRMessage;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.GrammarSemanticsMessage;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
@@ -43,8 +44,14 @@ import java.io.File;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-public class TestCompositeGrammars extends BaseTest {
+public class TestCompositeGrammars extends BaseJavaTest {
 	protected boolean debug = false;
+
+	@Before
+	@Override
+	public void testSetUp() throws Exception {
+		super.testSetUp();
+	}
 
 	@Test public void testImportFileLocationInSubdir() throws Exception {
 		String slave =
@@ -63,6 +70,50 @@ public class TestCompositeGrammars extends BaseTest {
 		writeFile(tmpdir, "M.g4", master);
 		ErrorQueue equeue = antlr("M.g4", false, "-lib", subdir);
 		assertEquals(equeue.size(), 0);
+	}
+
+	@Test public void testDelegatesSeeSameTokenType() throws Exception {
+		String slaveS =
+			"parser grammar S;\n"+
+			"tokens { A, B, C }\n"+
+			"x : A ;\n";
+		String slaveT =
+			"parser grammar T;\n"+
+			"tokens { C, B, A } // reverse order\n"+
+			"y : A ;\n";
+
+		mkdir(tmpdir);
+		writeFile(tmpdir, "S.g4", slaveS);
+		writeFile(tmpdir, "T.g4", slaveT);
+
+		String master =
+			"// The lexer will create rules to match letters a, b, c.\n"+
+			"// The associated token types A, B, C must have the same value\n"+
+			"// and all import'd parsers.  Since ANTLR regenerates all imports\n"+
+			"// for use with the delegator M, it can generate the same token type\n"+
+			"// mapping in each parser:\n"+
+			"// public static final int C=6;\n"+
+			"// public static final int EOF=-1;\n"+
+			"// public static final int B=5;\n"+
+			"// public static final int WS=7;\n"+
+			"// public static final int A=4;\n"+
+			"grammar M;\n"+
+			"import S,T;\n"+
+			"s : x y ; // matches AA, which should be 'aa'\n"+
+			"B : 'b' ; // another order: B, A, C\n"+
+			"A : 'a' ;\n"+
+			"C : 'c' ;\n"+
+			"WS : (' '|'\\n') -> skip ;\n";
+		writeFile(tmpdir, "M.g4", master);
+		ErrorQueue equeue = new ErrorQueue();
+		Grammar g = new Grammar(tmpdir+"/M.g4", master, equeue);
+		String expectedTokenIDToTypeMap = "{EOF=-1, B=1, A=2, C=3, WS=4}";
+		String expectedStringLiteralToTypeMap = "{'a'=2, 'b'=1, 'c'=3}";
+		String expectedTypeToTokenList = "[B, A, C, WS]";
+		assertEquals(expectedTokenIDToTypeMap, g.tokenNameToTypeMap.toString());
+		assertEquals(expectedStringLiteralToTypeMap, sort(g.stringLiteralToTypeMap).toString());
+		assertEquals(expectedTypeToTokenList, realElements(g.typeToTokenList).toString());
+		assertEquals("unexpected errors: "+equeue, 0, equeue.errors.size());
 	}
 
 	@Test public void testErrorInImportedGetsRightFilename() throws Exception {
@@ -418,11 +469,11 @@ public class TestCompositeGrammars extends BaseTest {
 			"grammar NewJava;\n" +
 			"import Java;\n";
 
-		System.out.println("dir "+tmpdir);
 		mkdir(tmpdir);
 		writeFile(tmpdir, "Java.g4", slave);
-		String found = execParser("NewJava.g4", master, "NewJavaParser", "NewJavaLexer", "compilationUnit", "package Foo;", debug);
-		assertEquals("", found);
+		String found = execParser("NewJava.g4", master, "NewJavaParser", "NewJavaLexer",
+		                          null, null, "compilationUnit", "package Foo;", debug);
+		assertEquals(null, found);
 		assertNull(stderrDuringParse);
 	}
 
@@ -446,11 +497,11 @@ public class TestCompositeGrammars extends BaseTest {
 			"import Java;\n" +
 			"s : e ;\n";
 
-		System.out.println("dir "+tmpdir);
 		mkdir(tmpdir);
 		writeFile(tmpdir, "Java.g4", slave);
-		String found = execParser("T.g4", master, "TParser", "TLexer", "s", "a=b", debug);
-		assertEquals("", found);
+		String found = execParser("T.g4", master, "TParser", "TLexer",
+		                          null, null, "s", "a=b", debug);
+		assertEquals(null, found);
 		assertNull(stderrDuringParse);
 	}
 }
