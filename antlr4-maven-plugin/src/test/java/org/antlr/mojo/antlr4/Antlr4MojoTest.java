@@ -11,25 +11,15 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import static org.junit.Assert.*;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.AbstractMap;
-import java.util.ArrayList;
+import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 
 public class Antlr4MojoTest {
@@ -44,317 +34,323 @@ public class Antlr4MojoTest {
 
     @Test
     public void importTokens() throws Exception {
-        Map.Entry<ByteArrayOutputStream, PrintStream> stdout = redirect();
-        ByteArrayOutputStream output = stdout.getKey();
+        Path baseDir = resources.getBasedir("importTokens").toPath();
+        Path antlrDir = baseDir.resolve("src/main/antlr4");
+        Path generatedSources = baseDir.resolve("target/generated-sources/antlr4");
 
-        try {
-            File baseDir = resources.getBasedir("importTokens");
-            File antlrDir = new File(baseDir, "src/main/antlr4");
+        Path genParser = generatedSources.resolve("test/SimpleParser.java");
+        Path tokens = antlrDir.resolve("imports/SimpleLexer.tokens");
 
-            File tokens = new File(antlrDir, "imports/SimpleLexer.tokens");
+        MavenProject project = maven.readMavenProject(baseDir.toFile());
+        MavenSession session = maven.newMavenSession(project);
+        MojoExecution exec = maven.newMojoExecution("antlr4");
 
-            MavenProject project = maven.readMavenProject(baseDir);
-            MavenSession session = maven.newMavenSession(project);
-            MojoExecution exec = maven.newMojoExecution("antlr4");
+        ////////////////////////////////////////////////////////////////////////
+        // 1st - all grammars have to be processed
+        ////////////////////////////////////////////////////////////////////////
 
-            ////////////////////////////////////////////////////////////////////////
-            // 1st - all grammars have to be processed
-            ////////////////////////////////////////////////////////////////////////
+        assertFalse(Files.exists(genParser));
+
+        maven.executeMojo(session, project, exec);
+
+        assertTrue(Files.exists(genParser));
+
+        ////////////////////////////////////////////////////////////////////////
+        // 2nd - nothing has been modified, no grammars have to be processed
+        ////////////////////////////////////////////////////////////////////////
+
+        {
+            byte[] sum = checksum(genParser);
 
             maven.executeMojo(session, project, exec);
 
-            assertEquals(Arrays.asList("test/SimpleParser.g4"), processAndReset(output));
+            assertTrue(Arrays.equals(sum, checksum(genParser)));
+        }
 
-            ////////////////////////////////////////////////////////////////////////
-            // 2nd - nothing has been modified, no grammars have to be processed
-            ////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
+        // 3rd - the imported grammar changed, every dependency has to be processed
+        ////////////////////////////////////////////////////////////////////////
+
+        try(Change change = Change.of(tokens, "DOT=4")) {
+            byte[] sum = checksum(genParser);
 
             maven.executeMojo(session, project, exec);
 
-            assertEquals(Collections.emptyList(), processAndReset(output));
-
-            ////////////////////////////////////////////////////////////////////////
-            // 3rd - the imported grammar changed, every dependency has to be processed
-            ////////////////////////////////////////////////////////////////////////
-
-            String original = modify(tokens);
-
-            try {
-                maven.executeMojo(session, project, exec);
-
-                assertEquals(Arrays.asList("test/SimpleParser.g4"),
-                    processAndReset(output));
-            } finally {
-                write(tokens, original);
-            }
-        } finally {
-            System.setOut(stdout.getValue());
+            assertFalse(Arrays.equals(sum, checksum(genParser)));
         }
     }
 
     @Test
     public void importsCustomLayout() throws Exception {
-        Map.Entry<ByteArrayOutputStream, PrintStream> stdout = redirect();
-        ByteArrayOutputStream output = stdout.getKey();
+        Path baseDir = resources.getBasedir("importsCustom").toPath();
+        Path antlrDir = baseDir.resolve("src/main/antlr4");
+        Path generatedSources = baseDir.resolve("src/main/java");
 
-        try {
-            File baseDir = resources.getBasedir("importsCustom");
-            File antlrDir = new File(baseDir, "src/main/antlr4");
-            File generatedSources = new File(baseDir, "target/generated-sources/antlr4");
+        Path genTestLexer = generatedSources.resolve("foo/TestLexer.java");
+        Path genTestParser = generatedSources.resolve("foo/TestParser.java");
+        Path genHello = generatedSources.resolve("foo/HelloParser.java");
 
-            File baseGrammar = new File(antlrDir, "imports/TestBaseLexer.g4");
-            File lexerGrammar = new File(antlrDir, "TestLexer.g4");
-            File parserGrammar = new File(antlrDir, "TestParser.g4");
-            File lexerTokens = new File(generatedSources, "TestLexer.tokens");
+        Path baseGrammar = antlrDir.resolve("imports/TestBaseLexer.g4");
+        Path lexerGrammar = antlrDir.resolve("TestLexer.g4");
+        Path parserGrammar = antlrDir.resolve("TestParser.g4");
 
-            Xpp3Dom outputDirectory = TestMavenRuntime.newParameter("outputDirectory",
-                    "src/main/java/com/foo");
-            Xpp3Dom arguments = new Xpp3Dom("arguments");
-            arguments.addChild(TestMavenRuntime.newParameter("argument", "-package"));
-            arguments.addChild(TestMavenRuntime.newParameter("argument", "foo"));
+        Xpp3Dom outputDirectory = TestMavenRuntime.newParameter("outputDirectory",
+                "src/main/java/foo");
+        Xpp3Dom arguments = new Xpp3Dom("arguments");
+        arguments.addChild(TestMavenRuntime.newParameter("argument", "-package"));
+        arguments.addChild(TestMavenRuntime.newParameter("argument", "foo"));
 
-            MavenProject project = maven.readMavenProject(baseDir);
-            MavenSession session = maven.newMavenSession(project);
-            MojoExecution exec = maven.newMojoExecution("antlr4", outputDirectory,
-                    arguments);
+        MavenProject project = maven.readMavenProject(baseDir.toFile());
+        MavenSession session = maven.newMavenSession(project);
+        MojoExecution exec = maven.newMojoExecution("antlr4", outputDirectory, arguments);
 
-            ////////////////////////////////////////////////////////////////////////
-            // 1st - all grammars have to be processed
-            ////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
+        // 1st - all grammars have to be processed
+        ////////////////////////////////////////////////////////////////////////
+
+        assertFalse(Files.exists(genHello));
+        assertFalse(Files.exists(genTestParser));
+        assertFalse(Files.exists(genTestLexer));
+
+        maven.executeMojo(session, project, exec);
+
+        assertTrue(Files.exists(genHello));
+        assertTrue(Files.exists(genTestParser));
+        assertTrue(Files.exists(genTestLexer));
+
+        ////////////////////////////////////////////////////////////////////////
+        // 2nd - nothing has been modified, no grammars have to be processed
+        ////////////////////////////////////////////////////////////////////////
+
+        {
+            byte[] testLexerSum = checksum(genTestLexer);
+            byte[] testParserSum = checksum(genTestParser);
+            byte[] helloSum = checksum(genHello);
 
             maven.executeMojo(session, project, exec);
 
-            assertEquals(Arrays.asList("Hello.g4", "TestLexer.g4", "TestParser.g4"),
-                processAndReset(output));
+            assertTrue(Arrays.equals(testLexerSum, checksum(genTestLexer)));
+            assertTrue(Arrays.equals(testParserSum, checksum(genTestParser)));
+            assertTrue(Arrays.equals(helloSum, checksum(genHello)));
+        }
 
-            ////////////////////////////////////////////////////////////////////////
-            // 2nd - nothing has been modified, no grammars have to be processed
-            ////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
+        // 3rd - the imported grammar changed, every dependency has to be processed
+        ////////////////////////////////////////////////////////////////////////
+
+        // modify the grammar to make checksum comparison detect a change
+        try(Change change = Change.of(baseGrammar, "DOT: '.' ;")) {
+            byte[] testLexerSum = checksum(genTestLexer);
+            byte[] testParserSum = checksum(genTestParser);
+            byte[] helloSum = checksum(genHello);
 
             maven.executeMojo(session, project, exec);
 
-            assertEquals(Collections.emptyList(), processAndReset(output));
+            assertFalse(Arrays.equals(testLexerSum, checksum(genTestLexer)));
+            assertFalse(Arrays.equals(testParserSum, checksum(genTestParser)));
+            assertTrue(Arrays.equals(helloSum, checksum(genHello)));
+        }
 
-            ////////////////////////////////////////////////////////////////////////
-            // 3rd - the imported grammar changed, every dependency has to be processed
-            ////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
+        // 4th - the lexer grammar changed, the parser grammar has to be processed as well
+        ////////////////////////////////////////////////////////////////////////
 
-            // modify the grammar to make checksum comparison detect a change
-            String original = modify(baseGrammar);
+        // modify the grammar to make checksum comparison detect a change
+        try(Change change = Change.of(lexerGrammar, "fragment DOT : '.';")) {
+            byte[] testLexerSum = checksum(genTestLexer);
+            byte[] testParserSum = checksum(genTestParser);
+            byte[] helloSum = checksum(genHello);
 
-            try {
-                maven.executeMojo(session, project, exec);
+            maven.executeMojo(session, project, exec);
 
-                assertEquals(Arrays.asList("TestLexer.g4", "TestParser.g4"),
-                    processAndReset(output));
-            } finally {
-                write(baseGrammar, original);
-            }
+            assertFalse(Arrays.equals(testLexerSum, checksum(genTestLexer)));
+            assertFalse(Arrays.equals(testParserSum, checksum(genTestParser)));
+            assertTrue(Arrays.equals(helloSum, checksum(genHello)));
+        }
 
-            ////////////////////////////////////////////////////////////////////////
-            // 4th - the lexer grammar changed, the parser grammar has to be processed as well
-            ////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
+        // 5th - the parser grammar changed, no other grammars have to be processed
+        ////////////////////////////////////////////////////////////////////////
 
-            // modify the grammar to make checksum comparison detect a change
-            original = modify(lexerGrammar);
+        // modify the grammar to make checksum comparison detect a change
+        try(Change change = Change.of(parserGrammar, " t : WS* ;")) {
+            byte[] testLexerSum = checksum(genTestLexer);
+            byte[] testParserSum = checksum(genTestParser);
+            byte[] helloSum = checksum(genHello);
 
-            try {
-                lexerTokens.delete();
+            maven.executeMojo(session, project, exec);
 
-                maven.executeMojo(session, project, exec);
-
-                assertEquals(Arrays.asList("TestLexer.g4", "TestParser.g4"),
-                    processAndReset(output));
-            } finally {
-                write(lexerGrammar, original);
-            }
-
-            ////////////////////////////////////////////////////////////////////////
-            // 5th - the parser grammar changed, no other grammars have to be processed
-            ////////////////////////////////////////////////////////////////////////
-
-            // modify the grammar to make checksum comparison detect a change
-            original = modify(parserGrammar);
-
-            try {
-                maven.executeMojo(session, project, exec);
-
-                assertEquals(Arrays.asList("TestParser.g4"), processAndReset(output));
-            } finally {
-                write(parserGrammar, original);
-            }
-        } finally {
-            System.out.flush();
-            System.setOut(stdout.getValue());
+            assertTrue(Arrays.equals(testLexerSum, checksum(genTestLexer)));
+            assertFalse(Arrays.equals(testParserSum, checksum(genTestParser)));
+            assertTrue(Arrays.equals(helloSum, checksum(genHello)));
         }
     }
 
     @Test
     public void importsStandardLayout() throws Exception {
-        Map.Entry<ByteArrayOutputStream, PrintStream> stdout = redirect();
-        ByteArrayOutputStream output = stdout.getKey();
+        Path baseDir = resources.getBasedir("importsStandard").toPath();
+        Path antlrDir = baseDir.resolve("src/main/antlr4");
+        Path generatedSources = baseDir.resolve("target/generated-sources/antlr4");
 
-        try {
-            File baseDir = resources.getBasedir("importsStandard");
-            File antlrDir = new File(baseDir, "src/main/antlr4");
-            File generatedSources = new File(baseDir, "target/generated-sources/antlr4");
+        Path genTestLexer = generatedSources.resolve("test/TestLexer.java");
+        Path genTestParser = generatedSources.resolve("test/TestParser.java");
+        Path genHello = generatedSources.resolve("test/HelloParser.java");
 
-            File baseGrammar = new File(antlrDir, "imports/TestBaseLexer.g4");
-            File lexerGrammar = new File(antlrDir, "test/TestLexer.g4");
-            File parserGrammar = new File(antlrDir, "test/TestParser.g4");
-            File lexerTokens = new File(generatedSources, "TestLexer.tokens");
+        Path baseGrammar = antlrDir.resolve("imports/TestBaseLexer.g4");
+        Path lexerGrammar = antlrDir.resolve("test/TestLexer.g4");
+        Path parserGrammar = antlrDir.resolve("test/TestParser.g4");
 
-            MavenProject project = maven.readMavenProject(baseDir);
-            MavenSession session = maven.newMavenSession(project);
-            MojoExecution exec = maven.newMojoExecution("antlr4");
+        MavenProject project = maven.readMavenProject(baseDir.toFile());
+        MavenSession session = maven.newMavenSession(project);
+        MojoExecution exec = maven.newMojoExecution("antlr4");
 
-            ////////////////////////////////////////////////////////////////////////
-            // 1st - all grammars have to be processed
-            ////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
+        // 1st - all grammars have to be processed
+        ////////////////////////////////////////////////////////////////////////
+
+        assertFalse(Files.exists(genHello));
+        assertFalse(Files.exists(genTestParser));
+        assertFalse(Files.exists(genTestLexer));
+
+        maven.executeMojo(session, project, exec);
+
+        assertTrue(Files.exists(genHello));
+        assertTrue(Files.exists(genTestParser));
+        assertTrue(Files.exists(genTestLexer));
+
+        ////////////////////////////////////////////////////////////////////////
+        // 2nd - nothing has been modified, no grammars have to be processed
+        ////////////////////////////////////////////////////////////////////////
+
+        {
+            byte[] testLexerSum = checksum(genTestLexer);
+            byte[] testParserSum = checksum(genTestParser);
+            byte[] helloSum = checksum(genHello);
 
             maven.executeMojo(session, project, exec);
 
-            assertEquals(Arrays.asList("test/Hello.g4", "test/TestLexer.g4",
-                    "test/TestParser.g4"), processAndReset(output));
+            assertTrue(Arrays.equals(testLexerSum, checksum(genTestLexer)));
+            assertTrue(Arrays.equals(testParserSum, checksum(genTestParser)));
+            assertTrue(Arrays.equals(helloSum, checksum(genHello)));
+        }
 
-            ////////////////////////////////////////////////////////////////////////
-            // 2nd - nothing has been modified, no grammars have to be processed
-            ////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
+        // 3rd - the imported grammar changed, every dependency has to be processed
+        ////////////////////////////////////////////////////////////////////////
+
+        // modify the grammar to make checksum comparison detect a change
+        try(Change change = Change.of(baseGrammar, "DOT: '.' ;")) {
+            byte[] testLexerSum = checksum(genTestLexer);
+            byte[] testParserSum = checksum(genTestParser);
+            byte[] helloSum = checksum(genHello);
 
             maven.executeMojo(session, project, exec);
 
-            assertEquals(Collections.emptyList(), processAndReset(output));
+            assertFalse(Arrays.equals(testLexerSum, checksum(genTestLexer)));
+            assertFalse(Arrays.equals(testParserSum, checksum(genTestParser)));
+            assertTrue(Arrays.equals(helloSum, checksum(genHello)));
+        }
 
-            ////////////////////////////////////////////////////////////////////////
-            // 3rd - the imported grammar changed, every dependency has to be processed
-            ////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
+        // 4th - the lexer grammar changed, the parser grammar has to be processed as well
+        ////////////////////////////////////////////////////////////////////////
 
-            // modify the grammar to make checksum comparison detect a change
-            String original = modify(baseGrammar);
+        // modify the grammar to make checksum comparison detect a change
+        try(Change change = Change.of(lexerGrammar)) {
+            byte[] testLexerSum = checksum(genTestLexer);
+            byte[] testParserSum = checksum(genTestParser);
+            byte[] helloSum = checksum(genHello);
 
-            try {
-                maven.executeMojo(session, project, exec);
+            maven.executeMojo(session, project, exec);
 
-                assertEquals(Arrays.asList("test/TestLexer.g4", "test/TestParser.g4"),
-                    processAndReset(output));
-            } finally {
-                write(baseGrammar, original);
-            }
+            assertFalse(Arrays.equals(testLexerSum, checksum(genTestLexer)));
+            assertFalse(Arrays.equals(testParserSum, checksum(genTestParser)));
+            assertTrue(Arrays.equals(helloSum, checksum(genHello)));
+        }
 
-            ////////////////////////////////////////////////////////////////////////
-            // 4th - the lexer grammar changed, the parser grammar has to be processed as well
-            ////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
+        // 5th - the parser grammar changed, no other grammars have to be processed
+        ////////////////////////////////////////////////////////////////////////
 
-            // modify the grammar to make checksum comparison detect a change
-            original = modify(lexerGrammar);
+        // modify the grammar to make checksum comparison detect a change
+        try(Change change = Change.of(parserGrammar, " t : WS* ;")) {
+            byte[] testLexerSum = checksum(genTestLexer);
+            byte[] testParserSum = checksum(genTestParser);
+            byte[] helloSum = checksum(genHello);
 
-            try {
-                lexerTokens.delete();
+            maven.executeMojo(session, project, exec);
 
-                maven.executeMojo(session, project, exec);
-
-                assertEquals(Arrays.asList("test/TestLexer.g4", "test/TestParser.g4"),
-                    processAndReset(output));
-            } finally {
-                write(lexerGrammar, original);
-            }
-
-            ////////////////////////////////////////////////////////////////////////
-            // 5th - the parser grammar changed, no other grammars have to be processed
-            ////////////////////////////////////////////////////////////////////////
-
-            // modify the grammar to make checksum comparison detect a change
-            original = modify(parserGrammar);
-
-            try {
-                maven.executeMojo(session, project, exec);
-
-                assertEquals(Arrays.asList("test/TestParser.g4"),
-                    processAndReset(output));
-            } finally {
-                write(parserGrammar, original);
-            }
-        } finally {
-            System.out.flush();
-            System.setOut(stdout.getValue());
+            assertTrue(Arrays.equals(testLexerSum, checksum(genTestLexer)));
+            assertFalse(Arrays.equals(testParserSum, checksum(genTestParser)));
+            assertTrue(Arrays.equals(helloSum, checksum(genHello)));
         }
     }
 
     @Test
     public void processWhenDependencyRemoved() throws Exception {
-        Map.Entry<ByteArrayOutputStream, PrintStream> stdout = redirect();
-        ByteArrayOutputStream output = stdout.getKey();
+        Path baseDir = resources.getBasedir("dependencyRemoved").toPath();
+        Path antlrDir = baseDir.resolve("src/main/antlr4");
 
-        try {
-            File baseDir = resources.getBasedir("dependencyRemoved");
-            File antlrDir = new File(baseDir, "src/main/antlr4");
+        Path baseGrammar = antlrDir.resolve("imports/HelloBase.g4");
 
-            File baseGrammar = new File(antlrDir, "imports/HelloBase.g4");
+        MavenProject project = maven.readMavenProject(baseDir.toFile());
+        MavenSession session = maven.newMavenSession(project);
+        MojoExecution exec = maven.newMojoExecution("antlr4");
 
-            MavenProject project = maven.readMavenProject(baseDir);
-            MavenSession session = maven.newMavenSession(project);
-            MojoExecution exec = maven.newMojoExecution("antlr4");
+        maven.executeMojo(session, project, exec);
+
+        try(Change temp = Change.of(baseGrammar)) {
+            // if the base grammar no longer exists, processing must be performed
+            Files.delete(baseGrammar);
+
+            thrown.expect(MojoExecutionException.class);
+            thrown.expectMessage("ANTLR 4 caught 1 build errors.");
 
             maven.executeMojo(session, project, exec);
+        }
+    }
 
-            String t = text(baseGrammar);
+    private byte[] checksum(Path path) throws IOException {
+        return MojoUtils.checksum(path.toFile());
+    }
+
+    private static class Change implements AutoCloseable {
+        final Path file;
+        final byte[] original;
+
+        public Change(Path file, String change) {
+            this.file = file;
 
             try {
-                // if the base grammar no longer exists, processing must be performed
-                baseGrammar.delete();
-
-                thrown.expect(MojoExecutionException.class);
-                thrown.expectMessage("ANTLR 4 caught 1 build errors.");
-
-                maven.executeMojo(session, project, exec);
-            } finally {
-                write(baseGrammar, t);
+                original = Files.readAllBytes(file);
+            } catch (IOException ex) {
+                throw new RuntimeException("Could not read file " + file);
             }
-        } finally {
-            System.out.flush();
-            System.setOut(stdout.getValue());
-        }
-    }
 
-    private List<String> processAndReset(ByteArrayOutputStream output) {
-        Pattern pattern = Pattern.compile("Processing grammar: (.+)");
-        Matcher matcher = pattern.matcher(output.toString());
+            String text = new String(original, StandardCharsets.UTF_8) + change;
 
-        // we reset here simply for convenience
-        output.reset();
-
-        List<String> result = new ArrayList<String>();
-
-        while (matcher.find()) {
-            result.add(matcher.group(1));
+            write(file, text.getBytes(StandardCharsets.UTF_8));
         }
 
-        Collections.sort(result);
+        private void write(Path file, byte[] data) {
+            try {
+                Files.write(file, data);
+            } catch (IOException ex) {
+                throw new RuntimeException("Could not write file " + file);
+            }
+        }
 
-        return result;
-    }
+        public static Change of(Path file, String change) {
+            return new Change(file, change);
+        }
 
-    private String modify(File file) throws IOException {
-        String content = text(file);
-        write(file, content + "\n");
+        public static Change of(Path file) {
+            return new Change(file, "\n");
+        }
 
-        return content;
-    }
-
-    private void write(File file, String text) throws IOException {
-        Files.write(file.toPath(), text.getBytes(StandardCharsets.UTF_8));
-    }
-
-    private String text(File file) throws IOException {
-        return new String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8);
-    }
-
-    private Map.Entry<ByteArrayOutputStream, PrintStream> redirect() {
-        // there does not seem to be a clean way to intercept logging output
-        ByteArrayOutputStream buf = new ByteArrayOutputStream();
-        PrintStream old = System.out;
-        System.setOut(new PrintStream(buf));
-
-        return new AbstractMap.SimpleEntry<ByteArrayOutputStream, PrintStream>(buf, old);
+        @Override
+        public void close() {
+            write(file, original);
+        }
     }
 }
