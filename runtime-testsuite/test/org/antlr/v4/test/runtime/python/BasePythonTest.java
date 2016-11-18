@@ -56,9 +56,11 @@ import org.antlr.v4.runtime.atn.LexerATNSimulator;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntegerList;
 import org.antlr.v4.runtime.misc.Interval;
+import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.semantics.SemanticPipeline;
-import org.antlr.v4.test.runtime.java.ErrorQueue;
+import org.antlr.v4.test.runtime.ErrorQueue;
+import org.antlr.v4.test.runtime.RuntimeTestSupport;
 import org.antlr.v4.tool.ANTLRMessage;
 import org.antlr.v4.tool.DOTGenerator;
 import org.antlr.v4.tool.DefaultToolListener;
@@ -66,7 +68,6 @@ import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.GrammarSemanticsMessage;
 import org.antlr.v4.tool.LexerGrammar;
 import org.antlr.v4.tool.Rule;
-import org.junit.Before;
 import org.junit.rules.TestRule;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
@@ -100,7 +101,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public abstract class BasePythonTest {
+public abstract class BasePythonTest implements RuntimeTestSupport {
 	// -J-Dorg.antlr.v4.test.BaseTest.level=FINE
 	// private static final Logger LOGGER = Logger.getLogger(BaseTest.class.getName());
 	public static final String newline = System.getProperty("line.separator");
@@ -109,9 +110,12 @@ public abstract class BasePythonTest {
 	public String tmpdir = null;
 
 	/** If error during parser execution, store stderr here; can't return
-     *  stdout and stderr.  This doesn't trap errors from running antlr.
-     */
+	 *  stdout and stderr.  This doesn't trap errors from running antlr.
+	 */
 	protected String stderrDuringParse;
+
+	/** Errors found while running antlr */
+	protected StringBuilder antlrToolErrors;
 
 	@org.junit.Rule
 	public final TestRule testWatcher = new TestWatcher() {
@@ -129,18 +133,46 @@ public abstract class BasePythonTest {
 		return "antlr-" + getLanguage().toLowerCase();
 	}
 
-    @Before
-	public void setUp() throws Exception {
-        // new output dir for each test
-    	String propName = getPropertyPrefix() + "-test-dir";
-    	String prop = System.getProperty(propName);
-    	if(prop!=null && prop.length()>0)
-    		tmpdir = prop;
-    	else
-    		tmpdir = new File(System.getProperty("java.io.tmpdir"), getClass().getSimpleName()+"-"+System.currentTimeMillis()).getAbsolutePath();
-    }
+	@Override
+	public void testSetUp() throws Exception {
+		// new output dir for each test
+		String propName = getPropertyPrefix() + "-test-dir";
+		String prop = System.getProperty(propName);
+		if(prop!=null && prop.length()>0)
+			tmpdir = prop;
+		else
+			tmpdir = new File(System.getProperty("java.io.tmpdir"), getClass().getSimpleName()+"-"+System.currentTimeMillis()).getAbsolutePath();
+		antlrToolErrors = new StringBuilder();
+	}
 
-    protected org.antlr.v4.Tool newTool(String[] args) {
+	@Override
+	public void testTearDown() throws Exception {
+	}
+
+	@Override
+	public String getTmpDir() {
+		return tmpdir;
+	}
+
+	@Override
+	public String getStdout() {
+		return null;
+	}
+
+	@Override
+	public String getParseErrors() {
+		return stderrDuringParse;
+	}
+
+	@Override
+	public String getANTLRToolErrors() {
+		if ( antlrToolErrors.length()==0 ) {
+			return null;
+		}
+		return antlrToolErrors.toString();
+	}
+
+	protected org.antlr.v4.Tool newTool(String[] args) {
 		Tool tool = new Tool(args);
 		return tool;
 	}
@@ -227,8 +259,8 @@ public abstract class BasePythonTest {
 	}
 
 	public List<String> getTokenTypes(LexerGrammar lg,
-									  ATN atn,
-									  CharStream input)
+	                                  ATN atn,
+	                                  CharStream input)
 	{
 		LexerATNSimulator interp = new LexerATNSimulator(atn,new DFA[] { new DFA(atn.modeToStartState.get(Lexer.DEFAULT_MODE)) },null);
 		List<String> tokenTypes = new ArrayList<String>();
@@ -324,7 +356,6 @@ public abstract class BasePythonTest {
 
 	/** Return true if all is ok, no errors */
 	protected ErrorQueue antlr(String fileName, String grammarFileName, String grammarStr, boolean defaultListener, String... extraOptions) {
-		System.out.println("dir "+tmpdir);
 		mkdir(tmpdir);
 		writeFile(tmpdir, fileName, grammarStr);
 		final List<String> options = new ArrayList<String>();
@@ -347,20 +378,21 @@ public abstract class BasePythonTest {
 		antlr.processGrammarsOnCommandLine();
 
 		if ( !defaultListener && !equeue.errors.isEmpty() ) {
-			System.err.println("antlr reports errors from "+options);
 			for (int i = 0; i < equeue.errors.size(); i++) {
 				ANTLRMessage msg = equeue.errors.get(i);
-				System.err.println(msg);
+				antlrToolErrors.append(msg.toString());
 			}
-			System.out.println("!!!\ngrammar:");
-			System.out.println(grammarStr);
-			System.out.println("###");
+			try {
+				antlrToolErrors.append(new String(Utils.readFile(tmpdir+"/"+grammarFileName)));
+			}
+			catch (IOException ioe) {
+				antlrToolErrors.append(ioe.toString());
+			}
 		}
 		if ( !defaultListener && !equeue.warnings.isEmpty() ) {
-			System.err.println("antlr reports warnings from "+options);
 			for (int i = 0; i < equeue.warnings.size(); i++) {
 				ANTLRMessage msg = equeue.warnings.get(i);
-				System.err.println(msg);
+				// antlrToolErrors.append(msg); warnings are hushed
 			}
 		}
 
@@ -368,36 +400,34 @@ public abstract class BasePythonTest {
 	}
 
 	protected String execLexer(String grammarFileName,
-							   String grammarStr,
-							   String lexerName,
-							   String input)
+	                           String grammarStr,
+	                           String lexerName,
+	                           String input)
 	{
 		return execLexer(grammarFileName, grammarStr, lexerName, input, false);
 	}
 
-	protected String execLexer(String grammarFileName,
-							   String grammarStr,
-							   String lexerName,
-							   String input,
-							   boolean showDFA)
+	@Override
+	public  String execLexer(String grammarFileName,
+	                         String grammarStr,
+	                         String lexerName,
+	                         String input,
+	                         boolean showDFA)
 	{
 		boolean success = rawGenerateAndBuildRecognizer(grammarFileName,
-									  grammarStr,
-									  null,
-									  lexerName,"-no-listener");
+		                                                grammarStr,
+		                                                null,
+		                                                lexerName,"-no-listener");
 		assertTrue(success);
 		writeFile(tmpdir, "input", input);
 		writeLexerTestFile(lexerName, showDFA);
 		String output = execModule("Test.py");
-		if ( stderrDuringParse!=null && stderrDuringParse.length()>0 ) {
-			System.err.println(stderrDuringParse);
-		}
 		return output;
 	}
 
 	public ParseTree execStartRule(String startRuleName, Parser parser)
 		throws IllegalAccessException, InvocationTargetException,
-			   NoSuchMethodException
+		NoSuchMethodException
 	{
 		Method startRule = null;
 		Object[] args = null;
@@ -414,64 +444,64 @@ public abstract class BasePythonTest {
 		return result;
 	}
 
-	protected String execParser(String grammarFileName,
-			String grammarStr,
-			String parserName,
-			String lexerName,
-			String listenerName,
-			String visitorName,
-			String startRuleName,
-			String input,
-			boolean debug) {
-		return execParser(grammarFileName, grammarStr, parserName, lexerName,
-				listenerName, visitorName, startRuleName, input, debug, false);
+	public String execParser(String grammarFileName,
+	                         String grammarStr,
+	                         String parserName,
+	                         String lexerName,
+	                         String listenerName,
+	                         String visitorName,
+	                         String startRuleName,
+	                         String input,
+	                         boolean showDiagnosticErrors) {
+		return execParser_(grammarFileName, grammarStr, parserName, lexerName,
+		                   listenerName, visitorName, startRuleName, input, showDiagnosticErrors, false);
 	}
 
-	protected String execParser(String grammarFileName,
-								String grammarStr,
-								String parserName,
-								String lexerName,
-								String listenerName,
-								String visitorName,
-								String startRuleName,
-								String input,
-								boolean debug,
-								boolean trace)
+	public String execParser_(String grammarFileName,
+	                          String grammarStr,
+	                          String parserName,
+	                          String lexerName,
+	                          String listenerName,
+	                          String visitorName,
+	                          String startRuleName,
+	                          String input,
+	                          boolean debug,
+	                          boolean trace)
 	{
 		boolean success = rawGenerateAndBuildRecognizer(grammarFileName,
-														grammarStr,
-														parserName,
-														lexerName,
-														"-visitor");
+		                                                grammarStr,
+		                                                parserName,
+		                                                lexerName,
+		                                                "-visitor");
 		assertTrue(success);
 		writeFile(tmpdir, "input", input);
 		rawBuildRecognizerTestFile(parserName,
-								 lexerName,
-								 listenerName,
-								 visitorName,
-								 startRuleName,
-								 debug,
-								 trace);
+		                           lexerName,
+		                           listenerName,
+		                           visitorName,
+		                           startRuleName,
+		                           debug,
+		                           trace);
 		return execRecognizer();
 	}
 
 	/** Return true if all is well */
 	protected boolean rawGenerateAndBuildRecognizer(String grammarFileName,
-													String grammarStr,
-													String parserName,
-													String lexerName,
-													String... extraOptions)
+	                                                String grammarStr,
+	                                                String parserName,
+	                                                String lexerName,
+	                                                String... extraOptions)
 	{
 		return rawGenerateAndBuildRecognizer(grammarFileName, grammarStr, parserName, lexerName, false, extraOptions);
 	}
 
 	/** Return true if all is well */
 	protected boolean rawGenerateAndBuildRecognizer(String grammarFileName,
-													String grammarStr,
-													String parserName,
-													String lexerName,
-													boolean defaultListener,
-													String... extraOptions)
+	                                                String grammarStr,
+	                                                String parserName,
+	                                                String lexerName,
+	                                                boolean defaultListener,
+	                                                String... extraOptions)
 	{
 		ErrorQueue equeue =
 			antlr(grammarFileName, grammarFileName, grammarStr, defaultListener, extraOptions);
@@ -497,24 +527,24 @@ public abstract class BasePythonTest {
 	}
 
 	protected void rawBuildRecognizerTestFile(String parserName,
-									   String lexerName,
-									   String listenerName,
-									   String visitorName,
-									   String parserStartRuleName,
-									   boolean debug,
-									   boolean trace)
+	                                          String lexerName,
+	                                          String listenerName,
+	                                          String visitorName,
+	                                          String parserStartRuleName,
+	                                          boolean debug,
+	                                          boolean trace)
 	{
-        this.stderrDuringParse = null;
+		this.stderrDuringParse = null;
 		if ( parserName==null ) {
 			writeLexerTestFile(lexerName, false);
 		}
 		else {
 			writeParserTestFile(parserName,
-						  lexerName,
-						  listenerName,
-						  visitorName,
-						  parserStartRuleName,
-						  debug, trace);
+			                    lexerName,
+			                    listenerName,
+			                    visitorName,
+			                    parserStartRuleName,
+			                    debug, trace);
 		}
 	}
 
@@ -540,9 +570,11 @@ public abstract class BasePythonTest {
 			stdoutVacuum.join();
 			stderrVacuum.join();
 			String output = stdoutVacuum.toString();
+			if ( output.length()==0 ) {
+				output = null;
+			}
 			if ( stderrVacuum.toString().length()>0 ) {
 				this.stderrDuringParse = stderrVacuum.toString();
-				System.err.println("exec stderrVacuum: "+ stderrVacuum);
 			}
 			return output;
 		}
@@ -564,9 +596,9 @@ public abstract class BasePythonTest {
 
 	protected String locatePython() {
 		String propName = getPropertyPrefix() + "-python";
-    	String prop = System.getProperty(propName);
-    	if(prop==null || prop.length()==0)
-    		prop = locateTool(getPythonExecutable());
+		String prop = System.getProperty(propName);
+		if(prop==null || prop.length()==0)
+			prop = locateTool(getPythonExecutable());
 		File file = new File(prop);
 		if(!file.exists())
 			throw new RuntimeException("Missing system property:" + propName);
@@ -594,9 +626,9 @@ public abstract class BasePythonTest {
 	}
 
 	public void testErrors(String[] pairs, boolean printTree) {
-        for (int i = 0; i < pairs.length; i+=2) {
-            String input = pairs[i];
-            String expect = pairs[i+1];
+		for (int i = 0; i < pairs.length; i+=2) {
+			String input = pairs[i];
+			String expect = pairs[i+1];
 
 			String[] lines = input.split("\n");
 			String fileName = getFilenameFromFirstLineOfGrammar(lines[0]);
@@ -610,9 +642,9 @@ public abstract class BasePythonTest {
 			msg = msg.replace("\r","\\r");
 			msg = msg.replace("\t","\\t");
 
-            assertEquals("error in: "+msg,expect,actual);
-        }
-    }
+			assertEquals("error in: "+msg,expect,actual);
+		}
+	}
 
 	public String getFilenameFromFirstLineOfGrammar(String line) {
 		String fileName = "A" + Tool.GRAMMAR_EXTENSION;
@@ -754,7 +786,7 @@ public abstract class BasePythonTest {
 	}
 
 	protected void checkGrammarSemanticsError(ErrorQueue equeue,
-											  GrammarSemanticsMessage expectedMessage)
+	                                          GrammarSemanticsMessage expectedMessage)
 		throws Exception
 	{
 		ANTLRMessage foundMsg = null;
@@ -766,7 +798,7 @@ public abstract class BasePythonTest {
 		}
 		assertNotNull("no error; "+expectedMessage.getErrorType()+" expected", foundMsg);
 		assertTrue("error is not a GrammarSemanticsMessage",
-				   foundMsg instanceof GrammarSemanticsMessage);
+		           foundMsg instanceof GrammarSemanticsMessage);
 		assertEquals(Arrays.toString(expectedMessage.getArgs()), Arrays.toString(foundMsg.getArgs()));
 		if ( equeue.size()!=1 ) {
 			System.err.println(equeue);
@@ -774,7 +806,7 @@ public abstract class BasePythonTest {
 	}
 
 	protected void checkGrammarSemanticsWarning(ErrorQueue equeue,
-											    GrammarSemanticsMessage expectedMessage)
+	                                            GrammarSemanticsMessage expectedMessage)
 		throws Exception
 	{
 		ANTLRMessage foundMsg = null;
@@ -786,7 +818,7 @@ public abstract class BasePythonTest {
 		}
 		assertNotNull("no error; "+expectedMessage.getErrorType()+" expected", foundMsg);
 		assertTrue("error is not a GrammarSemanticsMessage",
-				   foundMsg instanceof GrammarSemanticsMessage);
+		           foundMsg instanceof GrammarSemanticsMessage);
 		assertEquals(Arrays.toString(expectedMessage.getArgs()), Arrays.toString(foundMsg.getArgs()));
 		if ( equeue.size()!=1 ) {
 			System.err.println(equeue);
@@ -794,7 +826,7 @@ public abstract class BasePythonTest {
 	}
 
 	protected void checkError(ErrorQueue equeue,
-							  ANTLRMessage expectedMessage)
+	                          ANTLRMessage expectedMessage)
 		throws Exception
 	{
 		//System.out.println("errors="+equeue);
@@ -815,12 +847,12 @@ public abstract class BasePythonTest {
 		assertArrayEquals(expectedMessage.getArgs(), foundMsg.getArgs());
 	}
 
-    public static class FilteringTokenStream extends CommonTokenStream {
-        public FilteringTokenStream(TokenSource src) { super(src); }
-        Set<Integer> hide = new HashSet<Integer>();
-        @Override
-        protected boolean sync(int i) {
-            if (!super.sync(i)) {
+	public static class FilteringTokenStream extends CommonTokenStream {
+		public FilteringTokenStream(TokenSource src) { super(src); }
+		Set<Integer> hide = new HashSet<Integer>();
+		@Override
+		protected boolean sync(int i) {
+			if (!super.sync(i)) {
 				return false;
 			}
 
@@ -830,11 +862,11 @@ public abstract class BasePythonTest {
 			}
 
 			return true;
-        }
-        public void setTokenTypeChannel(int ttype, int channel) {
-            hide.add(ttype);
-        }
-    }
+		}
+		public void setTokenTypeChannel(int ttype, int channel) {
+			hide.add(ttype);
+		}
+	}
 
 	public static void writeFile(String dir, String fileName, String content) {
 		try {
@@ -857,76 +889,77 @@ public abstract class BasePythonTest {
 	}
 
 	protected abstract void writeParserTestFile(String parserName,
-			 String lexerName,
-			 String listenerName,
-			 String visitorName,
-			 String parserStartRuleName,
-			 boolean debug,
-			 boolean setTrace);
+	                                            String lexerName,
+	                                            String listenerName,
+	                                            String visitorName,
+	                                            String parserStartRuleName,
+	                                            boolean debug,
+	                                            boolean setTrace);
 
 
 
 	protected abstract void writeLexerTestFile(String lexerName, boolean showDFA);
 
 	public void writeRecognizer(String parserName, String lexerName,
-								String listenerName, String visitorName,
-								String parserStartRuleName, boolean debug, boolean trace) {
+	                            String listenerName, String visitorName,
+	                            String parserStartRuleName, boolean debug, boolean trace) {
 		if ( parserName==null ) {
 			writeLexerTestFile(lexerName, debug);
 		}
 		else {
 			writeParserTestFile(parserName,
-						  lexerName,
-						  listenerName,
-						  visitorName,
-						  parserStartRuleName,
-						  debug,
-						  trace);
+			                    lexerName,
+			                    listenerName,
+			                    visitorName,
+			                    parserStartRuleName,
+			                    debug,
+			                    trace);
 		}
 	}
 
 
-    protected void eraseFiles(final String filesEndingWith) {
-        File tmpdirF = new File(tmpdir);
-        String[] files = tmpdirF.list();
-        for(int i = 0; files!=null && i < files.length; i++) {
-            if ( files[i].endsWith(filesEndingWith) ) {
-                new File(tmpdir+"/"+files[i]).delete();
-            }
-        }
-    }
+	protected void eraseFiles(final String filesEndingWith) {
+		File tmpdirF = new File(tmpdir);
+		String[] files = tmpdirF.list();
+		for(int i = 0; files!=null && i < files.length; i++) {
+			if ( files[i].endsWith(filesEndingWith) ) {
+				new File(tmpdir+"/"+files[i]).delete();
+			}
+		}
+	}
 
-    protected void eraseFiles(File dir) {
-       String[] files = dir.list();
-        for(int i = 0; files!=null && i < files.length; i++) {
-            new File(dir,files[i]).delete();
-        }
-    }
+	protected void eraseFiles(File dir) {
+		String[] files = dir.list();
+		for(int i = 0; files!=null && i < files.length; i++) {
+			new File(dir,files[i]).delete();
+		}
+	}
 
-    protected void eraseTempDir() {
-    	boolean doErase = true;
-    	String propName = getPropertyPrefix() + "-erase-test-dir";
-    	String prop = System.getProperty(propName);
-    	if(prop!=null && prop.length()>0)
-    		doErase = Boolean.getBoolean(prop);
-        if(doErase) {
-        	File tmpdirF = new File(tmpdir);
-	        if ( tmpdirF.exists() ) {
-	            eraseFiles(tmpdirF);
-	            tmpdirF.delete();
-	        }
-        }
-    }
+	@Override
+	public void eraseTempDir() {
+		boolean doErase = true;
+		String propName = getPropertyPrefix() + "-erase-test-dir";
+		String prop = System.getProperty(propName);
+		if(prop!=null && prop.length()>0)
+			doErase = Boolean.getBoolean(prop);
+		if(doErase) {
+			File tmpdirF = new File(tmpdir);
+			if ( tmpdirF.exists() ) {
+				eraseFiles(tmpdirF);
+				tmpdirF.delete();
+			}
+		}
+	}
 
-    protected void eraseTempPyCache() {
-        File tmpdirF = new File(tmpdir+"/__pycache__");
-        if ( tmpdirF.exists() ) {
-            eraseFiles(tmpdirF);
-            tmpdirF.delete();
-        }
-    }
+	protected void eraseTempPyCache() {
+		File tmpdirF = new File(tmpdir+"/__pycache__");
+		if ( tmpdirF.exists() ) {
+			eraseFiles(tmpdirF);
+			tmpdirF.delete();
+		}
+	}
 
-    public String getFirstLineOfException() {
+	public String getFirstLineOfException() {
 		if ( this.stderrDuringParse ==null ) {
 			return null;
 		}
@@ -935,33 +968,33 @@ public abstract class BasePythonTest {
 		return lines[0].substring(prefix.length(),lines[0].length());
 	}
 
-    /**
-     * When looking at a result set that consists of a Map/HashTable
-     * we cannot rely on the output order, as the hashing algorithm or other aspects
-     * of the implementation may be different on differnt JDKs or platforms. Hence
-     * we take the Map, convert the keys to a List, sort them and Stringify the Map, which is a
-     * bit of a hack, but guarantees that we get the same order on all systems. We assume that
-     * the keys are strings.
-     *
-     * @param m The Map that contains keys we wish to return in sorted order
-     * @return A string that represents all the keys in sorted order.
-     */
-    public <K, V> String sortMapToString(Map<K, V> m) {
-        // Pass in crap, and get nothing back
-        //
-        if  (m == null) {
-            return null;
-        }
+	/**
+	 * When looking at a result set that consists of a Map/HashTable
+	 * we cannot rely on the output order, as the hashing algorithm or other aspects
+	 * of the implementation may be different on differnt JDKs or platforms. Hence
+	 * we take the Map, convert the keys to a List, sort them and Stringify the Map, which is a
+	 * bit of a hack, but guarantees that we get the same order on all systems. We assume that
+	 * the keys are strings.
+	 *
+	 * @param m The Map that contains keys we wish to return in sorted order
+	 * @return A string that represents all the keys in sorted order.
+	 */
+	public <K, V> String sortMapToString(Map<K, V> m) {
+		// Pass in crap, and get nothing back
+		//
+		if  (m == null) {
+			return null;
+		}
 
-        System.out.println("Map toString looks like: " + m.toString());
+		System.out.println("Map toString looks like: " + m.toString());
 
-        // Sort the keys in the Map
-        //
-        TreeMap<K, V> nset = new TreeMap<K, V>(m);
+		// Sort the keys in the Map
+		//
+		TreeMap<K, V> nset = new TreeMap<K, V>(m);
 
-        System.out.println("Tree map looks like: " + nset.toString());
-        return nset.toString();
-    }
+		System.out.println("Tree map looks like: " + nset.toString());
+		return nset.toString();
+	}
 
 	public List<String> realElements(List<String> elements) {
 		return elements.subList(Token.MIN_USER_TOKEN_TYPE, elements.size());

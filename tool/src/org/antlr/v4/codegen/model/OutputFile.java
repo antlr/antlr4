@@ -33,6 +33,10 @@ package org.antlr.v4.codegen.model;
 import org.antlr.v4.Tool;
 import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.ast.ActionAST;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public abstract class OutputFile extends OutputModelObject {
 	public final String fileName;
@@ -50,4 +54,13 @@ public abstract class OutputFile extends OutputModelObject {
         TokenLabelType = g.getOptionString("TokenLabelType");
         InputSymbolType = TokenLabelType;
     }
+
+	public Map<String, Action> buildNamedActions(Grammar g) {
+		Map<String, Action> namedActions = new HashMap<String, Action>();
+		for (String name : g.namedActions.keySet()) {
+			ActionAST ast = g.namedActions.get(name);
+			namedActions.put(name, new Action(factory, ast));
+		}
+		return namedActions;
+	}
 }

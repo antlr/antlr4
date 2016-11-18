@@ -122,17 +122,14 @@ namespace antlr4 {
 
     virtual void rollback(size_t instructionIndex);
 
-    /// <summary>
     /// Rollback the instruction stream for a program so that
-    ///  the indicated instruction (via instructionIndex) is no
-    ///  longer in the stream.  UNTESTED!
-    /// </summary>
+    /// the indicated instruction (via instructionIndex) is no
+    /// longer in the stream.  UNTESTED!
     virtual void rollback(const std::string &programName, size_t instructionIndex);
 
     virtual void deleteProgram();
 
-    /// <summary>
-    /// Reset the program so that no instructions exist </summary>
+    /// Reset the program so that no instructions exist.
     virtual void deleteProgram(const std::string &programName);
     virtual void insertAfter(Token *t, const std::string& text);
     virtual void insertAfter(size_t index, const std::string& text);
@@ -161,7 +158,7 @@ namespace antlr4 {
     virtual size_t getLastRewriteTokenIndex();
     
     /// Return the text from the original tokens altered per the
-    ///  instructions given to this rewriter.
+    /// instructions given to this rewriter.
     virtual std::string getText();
 
     /** Return the text from the original tokens altered per the
@@ -169,46 +166,40 @@ namespace antlr4 {
      */
     std::string getText(std::string programName);
     
-    /// <summary>
     /// Return the text associated with the tokens in the interval from the
-    ///  original token stream but with the alterations given to this rewriter.
-    ///  The interval refers to the indexes in the original token stream.
-    ///  We do not alter the token stream in any way, so the indexes
-    ///  and intervals are still consistent. Includes any operations done
-    ///  to the first and last token in the interval. So, if you did an
-    ///  insertBefore on the first token, you would get that insertion.
-    ///  The same is true if you do an insertAfter the stop token.
-    /// </summary>
+    /// original token stream but with the alterations given to this rewriter.
+    /// The interval refers to the indexes in the original token stream.
+    /// We do not alter the token stream in any way, so the indexes
+    /// and intervals are still consistent. Includes any operations done
+    /// to the first and last token in the interval. So, if you did an
+    /// insertBefore on the first token, you would get that insertion.
+    /// The same is true if you do an insertAfter the stop token.
     virtual std::string getText(const misc::Interval &interval);
 
     virtual std::string getText(const std::string &programName, const misc::Interval &interval);
 
   protected:
     class RewriteOperation {
-    private:
-      TokenStreamRewriter *const outerInstance;
-
     public:
       /// What index into rewrites List are we?
-      virtual ~RewriteOperation() {};
-
-      /// Token buffer index.
       size_t index;
       std::string text;
 
-      RewriteOperation(TokenStreamRewriter *outerInstance, size_t index);
-      RewriteOperation(TokenStreamRewriter *outerInstance, size_t index, const std::string& text);
-
-      /// Execute the rewrite operation by possibly adding to the buffer.
-      ///  Return the index of the next token to operate on.
-
+      /// Token buffer index.
       size_t instructionIndex;
 
-      virtual size_t execute(std::string *buf);
+      RewriteOperation(TokenStreamRewriter *outerInstance, size_t index);
+      RewriteOperation(TokenStreamRewriter *outerInstance, size_t index, const std::string& text);
+      virtual ~RewriteOperation() {};
 
+      /// Execute the rewrite operation by possibly adding to the buffer.
+      /// Return the index of the next token to operate on.
+
+      virtual size_t execute(std::string *buf);
       virtual std::string toString();
 
     private:
+      TokenStreamRewriter *const outerInstance;
       void InitializeInstanceFields();
     };
 
@@ -306,25 +297,22 @@ namespace antlr4 {
 
     virtual std::string catOpText(std::string *a, std::string *b);
 
-    /// <summary>
-    /// Get all operations before an index of a particular kind </summary>
-    template <typename T, typename T1>
-    std::vector<T*> getKindOfOps(std::vector<T1*> rewrites, T * /*kind*/, size_t before) {
-      std::vector<T*> ops = std::vector<T*>();
+    /// Get all operations before an index of a particular kind.
+    template <typename T>
+    std::vector<T *> getKindOfOps(std::vector<RewriteOperation *> rewrites, size_t before) {
+      std::vector<T *> ops;
       for (size_t i = 0; i < before && i < rewrites.size(); i++) {
-        TokenStreamRewriter::RewriteOperation *op = dynamic_cast<RewriteOperation*>(rewrites[i]);
-        if (op == nullptr) { // ignore deleted
+        T *op = dynamic_cast<T *>(rewrites[i]);
+        if (op == nullptr) { // ignore deleted or non matching entries
           continue;
         }
-        if (op != nullptr) {
-          ops.push_back(dynamic_cast<T*>(op));
-        }
+        ops.push_back(op);
       }
       return ops;
     }
 
   private:
-    std::vector<RewriteOperation*> initializeProgram(const std::string &name);
+    std::vector<RewriteOperation *>& initializeProgram(const std::string &name);
 
   };
 

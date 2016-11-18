@@ -36,7 +36,6 @@ import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.ActionAST;
 import org.antlr.v4.tool.ast.AltAST;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -69,11 +68,7 @@ public class ListenerFile extends OutputFile {
 		Grammar g = factory.getGrammar();
 		parserName = g.getRecognizerName();
 		grammarName = g.name;
-		namedActions = new HashMap<String, Action>();
-		for (String name : g.namedActions.keySet()) {
-			ActionAST ast = g.namedActions.get(name);
-			namedActions.put(name, new Action(factory, ast));
-		}
+		namedActions = buildNamedActions(factory.getGrammar());
 		for (Rule r : g.rules.values()) {
 			Map<String, List<Pair<Integer,AltAST>>> labels = r.getAltLabels();
 			if ( labels!=null ) {

@@ -108,7 +108,7 @@
   #define EXPIMP_TEMPLATE
 #else
   #define GUID_LIBUUID
-  #if __GNUC__ >= 4
+  #if __GNUC__ >= 6
     #define ANTLR4CPP_PUBLIC __attribute__ ((visibility ("default")))
   #else
     #define ANTLR4CPP_PUBLIC

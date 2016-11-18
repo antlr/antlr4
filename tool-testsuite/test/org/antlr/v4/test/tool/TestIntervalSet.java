@@ -33,17 +33,24 @@ package org.antlr.v4.test.tool;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.IntervalSet;
-import org.antlr.v4.test.runtime.java.BaseTest;
+import org.antlr.v4.test.runtime.java.BaseJavaTest;
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class TestIntervalSet extends BaseTest {
+public class TestIntervalSet extends BaseJavaTest {
 
     /** Public default constructor used by TestRig */
     public TestIntervalSet() {
+	}
+
+	@Before
+	@Override
+	public void testSetUp() throws Exception {
+		super.testSetUp();
 	}
 
 	@Test public void testSingleElement() throws Exception {

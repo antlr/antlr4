@@ -41,12 +41,13 @@ import org.antlr.v4.runtime.atn.LexerATNSimulator;
 import org.antlr.v4.runtime.atn.PredictionContextCache;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntegerList;
-import org.antlr.v4.test.runtime.java.BaseTest;
+import org.antlr.v4.test.runtime.java.BaseJavaTest;
 import org.antlr.v4.tool.DOTGenerator;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LeftRecursiveRule;
 import org.antlr.v4.tool.LexerGrammar;
 import org.antlr.v4.tool.Rule;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -58,7 +59,13 @@ import static org.junit.Assert.assertTrue;
 // NOTICE: TOKENS IN LEXER, PARSER MUST BE SAME OR TOKEN TYPE MISMATCH
 // NOTICE: TOKENS IN LEXER, PARSER MUST BE SAME OR TOKEN TYPE MISMATCH
 
-public class TestATNParserPrediction extends BaseTest {
+public class TestATNParserPrediction extends BaseJavaTest {
+	@Before
+	@Override
+	public void testSetUp() throws Exception {
+		super.testSetUp();
+	}
+
 	@Test public void testAorB() throws Exception {
 		LexerGrammar lg = new LexerGrammar(
 		"lexer grammar L;\n" +
@@ -520,7 +527,7 @@ public class TestATNParserPrediction extends BaseTest {
 		LexerATNSimulator lexInterp =
 		new LexerATNSimulator(lexatn,new DFA[] { new DFA(lexatn.modeToStartState.get(Lexer.DEFAULT_MODE)) },new PredictionContextCache());
 		IntegerList types = getTokenTypesViaATN(inputString, lexInterp);
-		System.out.println(types);
+//		System.out.println(types);
 
 		semanticProcess(lg);
 		g.importVocab(lg);
@@ -532,15 +539,15 @@ public class TestATNParserPrediction extends BaseTest {
 		DOTGenerator dot = new DOTGenerator(g);
 
 		Rule r = g.getRule("a");
-		if ( r!=null) System.out.println(dot.getDOT(atn.ruleToStartState[r.index]));
+//		if ( r!=null) System.out.println(dot.getDOT(atn.ruleToStartState[r.index]));
 		r = g.getRule("b");
-		if ( r!=null) System.out.println(dot.getDOT(atn.ruleToStartState[r.index]));
+//		if ( r!=null) System.out.println(dot.getDOT(atn.ruleToStartState[r.index]));
 		r = g.getRule("e");
-		if ( r!=null) System.out.println(dot.getDOT(atn.ruleToStartState[r.index]));
+//		if ( r!=null) System.out.println(dot.getDOT(atn.ruleToStartState[r.index]));
 		r = g.getRule("ifstat");
-		if ( r!=null) System.out.println(dot.getDOT(atn.ruleToStartState[r.index]));
+//		if ( r!=null) System.out.println(dot.getDOT(atn.ruleToStartState[r.index]));
 		r = g.getRule("block");
-		if ( r!=null) System.out.println(dot.getDOT(atn.ruleToStartState[r.index]));
+//		if ( r!=null) System.out.println(dot.getDOT(atn.ruleToStartState[r.index]));
 
 		// Check ATN prediction
 //		ParserATNSimulator interp = new ParserATNSimulator(atn);
@@ -576,7 +583,7 @@ public class TestATNParserPrediction extends BaseTest {
 		for (int i=0; i<inputString.length; i++) {
 			// Check DFA
 			IntegerList types = getTokenTypesViaATN(inputString[i], lexInterp);
-			System.out.println(types);
+//			System.out.println(types);
 			TokenStream input = new IntTokenStream(types);
 			try {
 				interp.adaptivePredict(input, decision, ParserRuleContext.EMPTY);

@@ -30,12 +30,13 @@
 
 package org.antlr.v4.test.tool;
 
-import org.antlr.v4.test.runtime.java.BaseTest;
-import org.antlr.v4.test.runtime.java.ErrorQueue;
+import org.antlr.v4.test.runtime.ErrorQueue;
+import org.antlr.v4.test.runtime.java.BaseJavaTest;
 import org.antlr.v4.tool.ANTLRMessage;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.GrammarSemanticsMessage;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
@@ -43,8 +44,14 @@ import java.io.File;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-public class TestCompositeGrammars extends BaseTest {
+public class TestCompositeGrammars extends BaseJavaTest {
 	protected boolean debug = false;
+
+	@Before
+	@Override
+	public void testSetUp() throws Exception {
+		super.testSetUp();
+	}
 
 	@Test public void testImportFileLocationInSubdir() throws Exception {
 		String slave =
@@ -418,11 +425,11 @@ public class TestCompositeGrammars extends BaseTest {
 			"grammar NewJava;\n" +
 			"import Java;\n";
 
-		System.out.println("dir "+tmpdir);
 		mkdir(tmpdir);
 		writeFile(tmpdir, "Java.g4", slave);
-		String found = execParser("NewJava.g4", master, "NewJavaParser", "NewJavaLexer", "compilationUnit", "package Foo;", debug);
-		assertEquals("", found);
+		String found = execParser("NewJava.g4", master, "NewJavaParser", "NewJavaLexer",
+		                          null, null, "compilationUnit", "package Foo;", debug);
+		assertEquals(null, found);
 		assertNull(stderrDuringParse);
 	}
 
@@ -446,11 +453,11 @@ public class TestCompositeGrammars extends BaseTest {
 			"import Java;\n" +
 			"s : e ;\n";
 
-		System.out.println("dir "+tmpdir);
 		mkdir(tmpdir);
 		writeFile(tmpdir, "Java.g4", slave);
-		String found = execParser("T.g4", master, "TParser", "TLexer", "s", "a=b", debug);
-		assertEquals("", found);
+		String found = execParser("T.g4", master, "TParser", "TLexer",
+		                          null, null, "s", "a=b", debug);
+		assertEquals(null, found);
 		assertNull(stderrDuringParse);
 	}
 }

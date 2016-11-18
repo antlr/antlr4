@@ -54,8 +54,10 @@ import org.antlr.v4.runtime.atn.LexerATNSimulator;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntegerList;
 import org.antlr.v4.runtime.misc.Interval;
+import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.semantics.SemanticPipeline;
-import org.antlr.v4.test.runtime.java.ErrorQueue;
+import org.antlr.v4.test.runtime.ErrorQueue;
+import org.antlr.v4.test.runtime.RuntimeTestSupport;
 import org.antlr.v4.tool.ANTLRMessage;
 import org.antlr.v4.tool.DOTGenerator;
 import org.antlr.v4.tool.DefaultToolListener;
@@ -68,7 +70,6 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
-import org.junit.Before;
 import org.junit.rules.TestRule;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
@@ -102,7 +103,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public abstract class BaseBrowserTest {
+public abstract class BaseBrowserTest implements RuntimeTestSupport {
 	// -J-Dorg.antlr.v4.test.BaseTest.level=FINE
 	// private static final Logger LOGGER = Logger.getLogger(BaseTest.class.getName());
 
@@ -113,9 +114,12 @@ public abstract class BaseBrowserTest {
 	public String tmpdir = null;
 
 	/** If error during parser execution, store stderr here; can't return
-     *  stdout and stderr.  This doesn't trap errors from running antlr.
-     */
+	 *  stdout and stderr.  This doesn't trap errors from running antlr.
+	 */
 	protected String stderrDuringParse;
+
+	/** Errors found while running antlr */
+	protected StringBuilder antlrToolErrors;
 
 	@org.junit.Rule
 	public final TestRule testWatcher = new TestWatcher() {
@@ -128,21 +132,42 @@ public abstract class BaseBrowserTest {
 
 	};
 
-    @Before
-	public void setUp() throws Exception {
-        // new output dir for each test
-    	String prop = System.getProperty("antlr-javascript-test-dir");
-    	if(prop!=null && prop.length()>0)
-    		httpdir = prop;
-    	else
-    		httpdir = new File(System.getProperty("java.io.tmpdir"), getClass().getSimpleName()+"-"+System.currentTimeMillis()).getAbsolutePath();
-    	File dir = new File(httpdir);
-    	if(dir.exists())
-    		this.eraseFiles(dir);
-    	tmpdir = new File(httpdir, "parser").getAbsolutePath();
-    }
 
-    protected org.antlr.v4.Tool newTool(String[] args) {
+	@Override
+	public void testSetUp() throws Exception {
+		// new output dir for each test
+		String prop = System.getProperty("antlr-javascript-test-dir");
+		if(prop!=null && prop.length()>0)
+			httpdir = prop;
+		else
+			httpdir = new File(System.getProperty("java.io.tmpdir"), getClass().getSimpleName()+"-"+System.currentTimeMillis()).getAbsolutePath();
+		File dir = new File(httpdir);
+		if(dir.exists())
+			this.eraseFiles(dir);
+		tmpdir = new File(httpdir, "parser").getAbsolutePath();
+	}
+
+	@Override
+	public String getTmpDir() {
+		return tmpdir;
+	}
+
+	@Override
+	public String getStdout() {
+		return null;
+	}
+
+	@Override
+	public String getParseErrors() {
+		return stderrDuringParse;
+	}
+
+	@Override
+	public String getANTLRToolErrors() {
+		return null;
+	}
+
+	protected org.antlr.v4.Tool newTool(String[] args) {
 		Tool tool = new Tool(args);
 		return tool;
 	}
@@ -216,8 +241,8 @@ public abstract class BaseBrowserTest {
 	}
 
 	public List<String> getTokenTypes(LexerGrammar lg,
-									  ATN atn,
-									  CharStream input)
+	                                  ATN atn,
+	                                  CharStream input)
 	{
 		LexerATNSimulator interp = new LexerATNSimulator(atn,new DFA[] { new DFA(atn.modeToStartState.get(Lexer.DEFAULT_MODE)) },null);
 		List<String> tokenTypes = new ArrayList<String>();
@@ -247,7 +272,6 @@ public abstract class BaseBrowserTest {
 
 	/** Return true if all is ok, no errors */
 	protected ErrorQueue antlr(String fileName, String grammarFileName, String grammarStr, boolean defaultListener, String... extraOptions) {
-		System.out.println("dir "+tmpdir);
 		mkdir(tmpdir);
 		writeFile(tmpdir, fileName, grammarStr);
 		final List<String> options = new ArrayList<String>();
@@ -270,86 +294,104 @@ public abstract class BaseBrowserTest {
 		antlr.processGrammarsOnCommandLine();
 
 		if ( !defaultListener && !equeue.errors.isEmpty() ) {
-			System.err.println("antlr reports errors from "+options);
 			for (int i = 0; i < equeue.errors.size(); i++) {
 				ANTLRMessage msg = equeue.errors.get(i);
-				System.err.println(msg);
+				antlrToolErrors.append(msg.toString());
 			}
-			System.out.println("!!!\ngrammar:");
-			System.out.println(grammarStr);
-			System.out.println("###");
+			try {
+				antlrToolErrors.append(new String(Utils.readFile(tmpdir+"/"+grammarFileName)));
+			}
+			catch (IOException ioe) {
+				antlrToolErrors.append(ioe.toString());
+			}
 		}
 		if ( !defaultListener && !equeue.warnings.isEmpty() ) {
-			System.err.println("antlr reports warnings from "+options);
 			for (int i = 0; i < equeue.warnings.size(); i++) {
 				ANTLRMessage msg = equeue.warnings.get(i);
-				System.err.println(msg);
+				// antlrToolErrors.append(msg); warnings are hushed
 			}
 		}
 
 		return equeue;
 	}
 
-	protected String execLexer(String grammarFileName,
-							   String grammarStr,
-							   String lexerName,
-							   String input, boolean showDFA) throws Exception
+	@Override
+	public String execLexer(String grammarFileName,
+	                        String grammarStr,
+	                        String lexerName,
+	                        String input, boolean showDFA)
 	{
 		boolean success = rawGenerateAndBuildRecognizer(grammarFileName,
-									  grammarStr,
-									  null,
-									  lexerName,"-no-listener");
+		                                                grammarStr,
+		                                                null,
+		                                                lexerName,"-no-listener");
 		assertTrue(success);
 		writeLexerTestFile(lexerName, showDFA);
-		String output = execHtmlPage("Test.html", input);
-		if ( stderrDuringParse!=null && stderrDuringParse.length()>0 ) {
-			System.err.println(stderrDuringParse);
+		String output = null;
+		try {
+			output = execHtmlPage("Test.html", input);
+		}
+		catch (Exception e) {
+			e.printStackTrace(System.err);
 		}
 		return output;
 	}
 
-	protected String execParser(String grammarFileName,
-								String grammarStr,
-								String parserName,
-								String lexerName,
-								String listenerName,
-								String visitorName,
-								String startRuleName,
-								String input,
-								boolean debug) throws Exception
+	@Override
+	public String execParser(String grammarFileName,
+	                         String grammarStr,
+	                         String parserName,
+	                         String lexerName,
+	                         String listenerName,
+	                         String visitorName,
+	                         String startRuleName,
+	                         String input,
+	                         boolean showDiagnosticErrors)
 	{
 		boolean success = rawGenerateAndBuildRecognizer(grammarFileName,
-														grammarStr,
-														parserName,
-														lexerName,
-														"-visitor");
+		                                                grammarStr,
+		                                                parserName,
+		                                                lexerName,
+		                                                "-visitor");
 		assertTrue(success);
 		rawBuildRecognizerTestFile(parserName,
-								 lexerName,
-								 listenerName,
-								 visitorName,
-								 startRuleName,
-								 debug);
-		return execRecognizer(input);
+		                           lexerName,
+		                           listenerName,
+		                           visitorName,
+		                           startRuleName,
+		                           showDiagnosticErrors);
+		String result = null;
+		try {
+			result = execRecognizer(input);
+		}
+		catch (Exception e) {
+			e.printStackTrace(System.err);
+		}
+		return result;
+	}
+
+	@Override
+	public void testTearDown() throws Exception {
+
 	}
 
 	/** Return true if all is well */
 	protected boolean rawGenerateAndBuildRecognizer(String grammarFileName,
-													String grammarStr,
-													String parserName,
-													String lexerName,
-													String... extraOptions)
+	                                                String grammarStr,
+	                                                String parserName,
+	                                                String lexerName,
+	                                                String... extraOptions)
 	{
 		return rawGenerateAndBuildRecognizer(grammarFileName, grammarStr, parserName, lexerName, false, extraOptions);
 	}
 
 	/** Return true if all is well */
 	protected boolean rawGenerateAndBuildRecognizer(String grammarFileName,
-													String grammarStr,
-													String parserName,
-													String lexerName,
-													boolean defaultListener,
-													String... extraOptions)
+	                                                String grammarStr,
+	                                                String parserName,
+	                                                String lexerName,
+	                                                boolean defaultListener,
+	                                                String... extraOptions)
 	{
 		ErrorQueue equeue =
 			antlr(grammarFileName, grammarFileName, grammarStr, defaultListener, extraOptions);
@@ -375,22 +417,22 @@ public abstract class BaseBrowserTest {
 	}
 
 	protected void rawBuildRecognizerTestFile(String parserName,
-									   String lexerName,
-									   String listenerName,
-									   String visitorName,
-									   String parserStartRuleName, boolean debug)
+	                                          String lexerName,
+	                                          String listenerName,
+	                                          String visitorName,
+	                                          String parserStartRuleName, boolean debug)
 	{
-        this.stderrDuringParse = null;
+		this.stderrDuringParse = null;
 		if ( parserName==null ) {
 			writeLexerTestFile(lexerName, false);
 		}
 		else {
 			writeParserTestFile(parserName,
-						  lexerName,
-						  listenerName,
-						  visitorName,
-						  parserStartRuleName,
-						  debug);
+			                    lexerName,
+			                    listenerName,
+			                    visitorName,
+			                    parserStartRuleName,
+			                    debug);
 		}
 	}
 
@@ -437,7 +479,7 @@ public abstract class BaseBrowserTest {
 			}
 		}
 	}
-	
+
 	protected static WebDriver driver;
 
 	public String execHtmlPage(String fileName, String input) throws Exception {
@@ -499,9 +541,9 @@ public abstract class BaseBrowserTest {
 	}
 
 	public void testErrors(String[] pairs, boolean printTree) {
-        for (int i = 0; i < pairs.length; i+=2) {
-            String input = pairs[i];
-            String expect = pairs[i+1];
+		for (int i = 0; i < pairs.length; i+=2) {
+			String input = pairs[i];
+			String expect = pairs[i+1];
 
 			String[] lines = input.split("\n");
 			String fileName = getFilenameFromFirstLineOfGrammar(lines[0]);
@@ -515,9 +557,9 @@ public abstract class BaseBrowserTest {
 			msg = msg.replace("\r","\\r");
 			msg = msg.replace("\t","\\t");
 
-            assertEquals("error in: "+msg,expect,actual);
-        }
-    }
+			assertEquals("error in: "+msg,expect,actual);
+		}
+	}
 
 	public String getFilenameFromFirstLineOfGrammar(String line) {
 		String fileName = "A" + Tool.GRAMMAR_EXTENSION;
@@ -624,7 +666,7 @@ public abstract class BaseBrowserTest {
 	}
 
 	protected void checkGrammarSemanticsError(ErrorQueue equeue,
-											  GrammarSemanticsMessage expectedMessage)
+	                                          GrammarSemanticsMessage expectedMessage)
 		throws Exception
 	{
 		ANTLRMessage foundMsg = null;
@@ -636,7 +678,7 @@ public abstract class BaseBrowserTest {
 		}
 		assertNotNull("no error; "+expectedMessage.getErrorType()+" expected", foundMsg);
 		assertTrue("error is not a GrammarSemanticsMessage",
-				   foundMsg instanceof GrammarSemanticsMessage);
+		           foundMsg instanceof GrammarSemanticsMessage);
 		assertEquals(Arrays.toString(expectedMessage.getArgs()), Arrays.toString(foundMsg.getArgs()));
 		if ( equeue.size()!=1 ) {
 			System.err.println(equeue);
@@ -644,7 +686,7 @@ public abstract class BaseBrowserTest {
 	}
 
 	protected void checkGrammarSemanticsWarning(ErrorQueue equeue,
-											    GrammarSemanticsMessage expectedMessage)
+	                                            GrammarSemanticsMessage expectedMessage)
 		throws Exception
 	{
 		ANTLRMessage foundMsg = null;
@@ -656,7 +698,7 @@ public abstract class BaseBrowserTest {
 		}
 		assertNotNull("no error; "+expectedMessage.getErrorType()+" expected", foundMsg);
 		assertTrue("error is not a GrammarSemanticsMessage",
-				   foundMsg instanceof GrammarSemanticsMessage);
+		           foundMsg instanceof GrammarSemanticsMessage);
 		assertEquals(Arrays.toString(expectedMessage.getArgs()), Arrays.toString(foundMsg.getArgs()));
 		if ( equeue.size()!=1 ) {
 			System.err.println(equeue);
@@ -664,7 +706,7 @@ public abstract class BaseBrowserTest {
 	}
 
 	protected void checkError(ErrorQueue equeue,
-							  ANTLRMessage expectedMessage)
+	                          ANTLRMessage expectedMessage)
 		throws Exception
 	{
 		//System.out.println("errors="+equeue);
@@ -685,12 +727,12 @@ public abstract class BaseBrowserTest {
 		assertArrayEquals(expectedMessage.getArgs(), foundMsg.getArgs());
 	}
 
-    public static class FilteringTokenStream extends CommonTokenStream {
-        public FilteringTokenStream(TokenSource src) { super(src); }
-        Set<Integer> hide = new HashSet<Integer>();
-        @Override
-        protected boolean sync(int i) {
-            if (!super.sync(i)) {
+	public static class FilteringTokenStream extends CommonTokenStream {
+		public FilteringTokenStream(TokenSource src) { super(src); }
+		Set<Integer> hide = new HashSet<Integer>();
+		@Override
+		protected boolean sync(int i) {
+			if (!super.sync(i)) {
 				return false;
 			}
 
@@ -700,11 +742,11 @@ public abstract class BaseBrowserTest {
 			}
 
 			return true;
-        }
-        public void setTokenTypeChannel(int ttype, int channel) {
-            hide.add(ttype);
-        }
-    }
+		}
+		public void setTokenTypeChannel(int ttype, int channel) {
+			hide.add(ttype);
+		}
+	}
 
 	public static void writeFile(String dir, String fileName, String content) {
 		try {
@@ -727,204 +769,205 @@ public abstract class BaseBrowserTest {
 	}
 
 	protected void writeParserTestFile(String parserName,
-			 String lexerName,
-			 String listenerName,
-			 String visitorName,
-			 String parserStartRuleName, boolean debug) {
+	                                   String lexerName,
+	                                   String listenerName,
+	                                   String visitorName,
+	                                   String parserStartRuleName, boolean debug) {
 		String html = "<!DOCTYPE html>\r\n" +
-		"<html>\r\n" +
-	    "	<head>\r\n" +
-        "		<script src='lib/require.js'></script>\r\n" +
-        "		<script>\r\n" +
-        "			antlr4 = null;\r\n" +
-        "			listener = null;\r\n" +
-        "			TreeShapeListener = null;\r\n" +
-        "			" + lexerName + " = null;\r\n" +
-        "			" + parserName + " = null;\r\n" +
-        "			" + listenerName + " = null;\r\n" +
-        "			" + visitorName + " = null;\r\n" +
-        "			printer = function() {\r\n" +
-        "				this.println = function(s) { document.getElementById('output').value += s + '\\n'; }\r\n" +
-        "				this.print = function(s) { document.getElementById('output').value += s; }\r\n" +
-        "				return this;\r\n" +
-        "			};\r\n" +
-		"\r\n" +
-		"			loadParser = function() {\r\n" +
-        "				try {\r\n" +
-        "					antlr4 = require('antlr4/index');\r\n" +
-		"					" + lexerName + " = require('./parser/" + lexerName + "');\n" +
-		"					" + parserName + " = require('./parser/" + parserName + "');\n" +
-		"					" + listenerName + " = require('./parser/" + listenerName + "');\n" +
-		"					" + visitorName + " = require('./parser/" + visitorName + "');\n" +
-        "				} catch (ex) {\r\n" +
-        "					document.getElementById('errors').value = ex.toString();\r\n" +
-        "				}\r\n" +
-		"\r\n" +
-		"				listener = function() {\r\n" +
-		"					antlr4.error.ErrorListener.call(this);\r\n" +
-		"					return this;\r\n" +
-		"				}\r\n" +
-		"				listener.prototype = Object.create(antlr4.error.ErrorListener.prototype);\r\n" +
-		"				listener.prototype.constructor = listener;\r\n" +
-		"				listener.prototype.syntaxError = function(recognizer, offendingSymbol, line, column, msg, e) {\r\n" +
-		"    				document.getElementById('errors').value += 'line ' + line + ':' + column + ' ' + msg + '\\r\\n';\r\n" +
-		"				};\r\n" +
-		"\r\n" +
-        "				TreeShapeListener = function() {\r\n" +
-        "					antlr4.tree.ParseTreeListener.call(this);\r\n" +
-        "					return this;\r\n" +
-        "				};\r\n" +
-		"\r\n" +
-		"				TreeShapeListener.prototype = Object.create(antlr4.tree.ParseTreeListener.prototype);\r\n" +
-		"				TreeShapeListener.prototype.constructor = TreeShapeListener;\r\n" +
-		"\r\n" +
-		"				TreeShapeListener.prototype.enterEveryRule = function(ctx) {\r\n" +
-		"					for(var i=0;i<ctx.getChildCount; i++) {\r\n" +
-		"						var child = ctx.getChild(i);\r\n" +
-		"						var parent = child.parentCtx;\r\n" +
-		"						if(parent.getRuleContext() !== ctx || !(parent instanceof antlr4.tree.RuleNode)) {\r\n" +
-		"							throw 'Invalid parse tree shape detected.';\r\n" +
-		"						}\r\n" +
-		"					}\r\n" +
-		"				};\r\n" +
-		"			}\r\n" +
-		"\r\n" +
-		"			test = function() {\r\n" +
-		"				document.getElementById('output').value = ''\r\n" +
-		"				var input = document.getElementById('input').value;\r\n" +
-		"    			var stream = new antlr4.InputStream(input);\n" +
-		"    			var lexer = new " + lexerName + "." + lexerName + "(stream);\n" +
-		"				lexer._listeners = [new listener()];\r\n" +
-	    "    			var tokens = new antlr4.CommonTokenStream(lexer);\n" +
-	    "				var parser = new " + parserName + "." + parserName + "(tokens);\n" +
-	    "				parser._listeners.push(new listener());\n" +
-	    (debug ?
-	    "				parser._listeners.push(new antlr4.error.DiagnosticErrorListener());\n" : "") +
-	    "    			parser.buildParseTrees = true;\n" +
-	    "    			parser.printer = new printer();\n" +
-		"    			var tree = parser." + parserStartRuleName + "();\n" +
-		"    			antlr4.tree.ParseTreeWalker.DEFAULT.walk(new TreeShapeListener(), tree);\n" +
-		"			};\r\n" +
-		"\r\n" +
-        "		</script>\r\n" +
-	    "	</head>\r\n" +
-	    "	<body>\r\n" +
-	    "		<textarea id='input'></textarea><br>\r\n" +
-	    "		<button id='load' type='button' onclick='loadParser()'>Load</button><br>\r\n" +
-	    "		<button id='submit' type='button' onclick='test()'>Test</button><br>\r\n" +
-	    "		<textarea id='output'></textarea><br>\r\n" +
-	    "		<textarea id='errors'></textarea><br>\r\n" +
-	    "	</body>\r\n" +
-	    "</html>\r\n";
+			"<html>\r\n" +
+			"	<head>\r\n" +
+			"		<script src='lib/require.js'></script>\r\n" +
+			"		<script>\r\n" +
+			"			antlr4 = null;\r\n" +
+			"			listener = null;\r\n" +
+			"			TreeShapeListener = null;\r\n" +
+			"			" + lexerName + " = null;\r\n" +
+			"			" + parserName + " = null;\r\n" +
+			"			" + listenerName + " = null;\r\n" +
+			"			" + visitorName + " = null;\r\n" +
+			"			printer = function() {\r\n" +
+			"				this.println = function(s) { document.getElementById('output').value += s + '\\n'; }\r\n" +
+			"				this.print = function(s) { document.getElementById('output').value += s; }\r\n" +
+			"				return this;\r\n" +
+			"			};\r\n" +
+			"\r\n" +
+			"			loadParser = function() {\r\n" +
+			"				try {\r\n" +
+			"					antlr4 = require('antlr4/index');\r\n" +
+			"					" + lexerName + " = require('./parser/" + lexerName + "');\n" +
+			"					" + parserName + " = require('./parser/" + parserName + "');\n" +
+			"					" + listenerName + " = require('./parser/" + listenerName + "');\n" +
+			"					" + visitorName + " = require('./parser/" + visitorName + "');\n" +
+			"				} catch (ex) {\r\n" +
+			"					document.getElementById('errors').value = ex.toString();\r\n" +
+			"				}\r\n" +
+			"\r\n" +
+			"				listener = function() {\r\n" +
+			"					antlr4.error.ErrorListener.call(this);\r\n" +
+			"					return this;\r\n" +
+			"				}\r\n" +
+			"				listener.prototype = Object.create(antlr4.error.ErrorListener.prototype);\r\n" +
+			"				listener.prototype.constructor = listener;\r\n" +
+			"				listener.prototype.syntaxError = function(recognizer, offendingSymbol, line, column, msg, e) {\r\n" +
+			"    				document.getElementById('errors').value += 'line ' + line + ':' + column + ' ' + msg + '\\r\\n';\r\n" +
+			"				};\r\n" +
+			"\r\n" +
+			"				TreeShapeListener = function() {\r\n" +
+			"					antlr4.tree.ParseTreeListener.call(this);\r\n" +
+			"					return this;\r\n" +
+			"				};\r\n" +
+			"\r\n" +
+			"				TreeShapeListener.prototype = Object.create(antlr4.tree.ParseTreeListener.prototype);\r\n" +
+			"				TreeShapeListener.prototype.constructor = TreeShapeListener;\r\n" +
+			"\r\n" +
+			"				TreeShapeListener.prototype.enterEveryRule = function(ctx) {\r\n" +
+			"					for(var i=0;i<ctx.getChildCount; i++) {\r\n" +
+			"						var child = ctx.getChild(i);\r\n" +
+			"						var parent = child.parentCtx;\r\n" +
+			"						if(parent.getRuleContext() !== ctx || !(parent instanceof antlr4.tree.RuleNode)) {\r\n" +
+			"							throw 'Invalid parse tree shape detected.';\r\n" +
+			"						}\r\n" +
+			"					}\r\n" +
+			"				};\r\n" +
+			"			}\r\n" +
+			"\r\n" +
+			"			test = function() {\r\n" +
+			"				document.getElementById('output').value = ''\r\n" +
+			"				var input = document.getElementById('input').value;\r\n" +
+			"    			var stream = new antlr4.InputStream(input);\n" +
+			"    			var lexer = new " + lexerName + "." + lexerName + "(stream);\n" +
+			"				lexer._listeners = [new listener()];\r\n" +
+			"    			var tokens = new antlr4.CommonTokenStream(lexer);\n" +
+			"				var parser = new " + parserName + "." + parserName + "(tokens);\n" +
+			"				parser._listeners.push(new listener());\n" +
+			(debug ?
+				"				parser._listeners.push(new antlr4.error.DiagnosticErrorListener());\n" : "") +
+			"    			parser.buildParseTrees = true;\n" +
+			"    			parser.printer = new printer();\n" +
+			"    			var tree = parser." + parserStartRuleName + "();\n" +
+			"    			antlr4.tree.ParseTreeWalker.DEFAULT.walk(new TreeShapeListener(), tree);\n" +
+			"			};\r\n" +
+			"\r\n" +
+			"		</script>\r\n" +
+			"	</head>\r\n" +
+			"	<body>\r\n" +
+			"		<textarea id='input'></textarea><br>\r\n" +
+			"		<button id='load' type='button' onclick='loadParser()'>Load</button><br>\r\n" +
+			"		<button id='submit' type='button' onclick='test()'>Test</button><br>\r\n" +
+			"		<textarea id='output'></textarea><br>\r\n" +
+			"		<textarea id='errors'></textarea><br>\r\n" +
+			"	</body>\r\n" +
+			"</html>\r\n";
 		writeFile(httpdir, "Test.html", html);
 	};
 
 
 	protected void writeLexerTestFile(String lexerName, boolean showDFA) {
 		String html = "<!DOCTYPE html>\r\n" +
-		"<html>\r\n" +
-	    "	<head>\r\n" +
-        "		<script src='lib/require.js'></script>\r\n" +
-        "		<script>\r\n" +
-        "			antlr4 = null;\r\n" +
-        "			listener = null;\r\n" +
-        "			" + lexerName + " = null;\r\n" +
- 		"\r\n" +
-		"			loadLexer = function() {\r\n" +
-        "				try {\r\n" +
-        "					antlr4 = require('antlr4/index');\r\n" +
-		"					" + lexerName + " = require('./parser/" + lexerName + "');\r\n" +
-        "				} catch (ex) {\r\n" +
-        "					document.getElementById('errors').value = ex.toString();\r\n" +
-        "				}\r\n" +
-		"				listener = function() {\r\n" +
-		"					antlr4.error.ErrorListener.call(this);\r\n" +
-		"					return this;\r\n" +
-		"				}\r\n" +
-		"				listener.prototype = Object.create(antlr4.error.ErrorListener.prototype);\r\n" +
-		"				listener.prototype.constructor = listener;\r\n" +
-		"				listener.prototype.syntaxError = function(recognizer, offendingSymbol, line, column, msg, e) {\r\n" +
-		"    				document.getElementById('errors').value += 'line ' + line + ':' + column + ' ' + msg + '\\r\\n';\r\n" +
-		"				};\r\n" +
-		"			}\r\n" +
-		"\r\n" +
-		"			test = function() {\r\n" +
-		"				document.getElementById('output').value = ''\r\n" +
-		"				var input = document.getElementById('input').value;\r\n" +
-		"    			var chars = new antlr4.InputStream(input);\r\n" +
-		"    			var lexer = new " + lexerName + "." + lexerName + "(chars);\r\n" +
-		"				lexer._listeners = [new listener()];\r\n" +
-	    "    			var stream = new antlr4.CommonTokenStream(lexer);\r\n" +
-		"    			stream.fill();\r\n" +
-	    "    			for(var i=0; i<stream.tokens.length; i++) {\r\n" +
-	    "					document.getElementById('output').value += stream.tokens[i].toString() + '\\r\\n';\r\n" +
-		"    			}\n" +
-		(showDFA ?
-		"    			document.getElementById('output').value += lexer._interp.decisionToDFA[antlr4.Lexer.DEFAULT_MODE].toLexerString();\r\n"
-						:"") +
-		"			};\r\n" +
-		"\r\n" +
-        "		</script>\r\n" +
-	    "	</head>\r\n" +
-	    "	<body>\r\n" +
-	    "		<textarea id='input'></textarea><br>\r\n" +
-	    "		<button id='load' type='button' onclick='loadLexer()'>Load</button><br>\r\n" +
-	    "		<button id='submit' type='button' onclick='test()'>Test</button><br>\r\n" +
-	    "		<textarea id='output'></textarea><br>\r\n" +
-	    "		<textarea id='errors'></textarea><br>\r\n" +
-	    "	</body>\r\n" +
-	    "</html>\r\n";
+			"<html>\r\n" +
+			"	<head>\r\n" +
+			"		<script src='lib/require.js'></script>\r\n" +
+			"		<script>\r\n" +
+			"			antlr4 = null;\r\n" +
+			"			listener = null;\r\n" +
+			"			" + lexerName + " = null;\r\n" +
+			"\r\n" +
+			"			loadLexer = function() {\r\n" +
+			"				try {\r\n" +
+			"					antlr4 = require('antlr4/index');\r\n" +
+			"					" + lexerName + " = require('./parser/" + lexerName + "');\r\n" +
+			"				} catch (ex) {\r\n" +
+			"					document.getElementById('errors').value = ex.toString();\r\n" +
+			"				}\r\n" +
+			"				listener = function() {\r\n" +
+			"					antlr4.error.ErrorListener.call(this);\r\n" +
+			"					return this;\r\n" +
+			"				}\r\n" +
+			"				listener.prototype = Object.create(antlr4.error.ErrorListener.prototype);\r\n" +
+			"				listener.prototype.constructor = listener;\r\n" +
+			"				listener.prototype.syntaxError = function(recognizer, offendingSymbol, line, column, msg, e) {\r\n" +
+			"    				document.getElementById('errors').value += 'line ' + line + ':' + column + ' ' + msg + '\\r\\n';\r\n" +
+			"				};\r\n" +
+			"			}\r\n" +
+			"\r\n" +
+			"			test = function() {\r\n" +
+			"				document.getElementById('output').value = ''\r\n" +
+			"				var input = document.getElementById('input').value;\r\n" +
+			"    			var chars = new antlr4.InputStream(input);\r\n" +
+			"    			var lexer = new " + lexerName + "." + lexerName + "(chars);\r\n" +
+			"				lexer._listeners = [new listener()];\r\n" +
+			"    			var stream = new antlr4.CommonTokenStream(lexer);\r\n" +
+			"    			stream.fill();\r\n" +
+			"    			for(var i=0; i<stream.tokens.length; i++) {\r\n" +
+			"					document.getElementById('output').value += stream.tokens[i].toString() + '\\r\\n';\r\n" +
+			"    			}\n" +
+			(showDFA ?
+				"    			document.getElementById('output').value += lexer._interp.decisionToDFA[antlr4.Lexer.DEFAULT_MODE].toLexerString();\r\n"
+				:"") +
+			"			};\r\n" +
+			"\r\n" +
+			"		</script>\r\n" +
+			"	</head>\r\n" +
+			"	<body>\r\n" +
+			"		<textarea id='input'></textarea><br>\r\n" +
+			"		<button id='load' type='button' onclick='loadLexer()'>Load</button><br>\r\n" +
+			"		<button id='submit' type='button' onclick='test()'>Test</button><br>\r\n" +
+			"		<textarea id='output'></textarea><br>\r\n" +
+			"		<textarea id='errors'></textarea><br>\r\n" +
+			"	</body>\r\n" +
+			"</html>\r\n";
 		writeFile(httpdir, "Test.html", html);
 	}
 
 	public void writeRecognizer(String parserName, String lexerName,
-								String listenerName, String visitorName,
-								String parserStartRuleName, boolean debug) {
+	                            String listenerName, String visitorName,
+	                            String parserStartRuleName, boolean debug) {
 		if ( parserName==null )
 			writeLexerTestFile(lexerName, debug);
 		else
 			writeParserTestFile(parserName,
-						  lexerName,
-						  listenerName,
-						  visitorName,
-						  parserStartRuleName,
-						  debug);
+			                    lexerName,
+			                    listenerName,
+			                    visitorName,
+			                    parserStartRuleName,
+			                    debug);
 	}
 
 
-    protected void eraseFiles(final String filesEndingWith) {
-        File tmpdirF = new File(httpdir);
-        String[] files = tmpdirF.list();
-        for(int i = 0; files!=null && i < files.length; i++) {
-            if ( files[i].endsWith(filesEndingWith) ) {
-                new File(httpdir+"/"+files[i]).delete();
-            }
-        }
-    }
+	protected void eraseFiles(final String filesEndingWith) {
+		File tmpdirF = new File(httpdir);
+		String[] files = tmpdirF.list();
+		for(int i = 0; files!=null && i < files.length; i++) {
+			if ( files[i].endsWith(filesEndingWith) ) {
+				new File(httpdir+"/"+files[i]).delete();
+			}
+		}
+	}
 
-    protected void eraseFiles(File dir) {
-       String[] files = dir.list();
-        for(int i = 0; files!=null && i < files.length; i++) {
-            new File(dir,files[i]).delete();
-        }
-    }
+	protected void eraseFiles(File dir) {
+		String[] files = dir.list();
+		for(int i = 0; files!=null && i < files.length; i++) {
+			new File(dir,files[i]).delete();
+		}
+	}
 
-    protected void eraseTempDir() {
-       	boolean doErase = true;
-    	String propName = "antlr-javascript-erase-test-dir";
-    	String prop = System.getProperty(propName);
-    	if(prop!=null && prop.length()>0)
-    		doErase = Boolean.getBoolean(prop);
-        if(doErase) {
-	        File tmpdirF = new File(httpdir);
-	        if ( tmpdirF.exists() ) {
-	            eraseFiles(tmpdirF);
-	            tmpdirF.delete();
-	        }
-        }
-    }
+	@Override
+	public  void eraseTempDir() {
+		boolean doErase = true;
+		String propName = "antlr-javascript-erase-test-dir";
+		String prop = System.getProperty(propName);
+		if(prop!=null && prop.length()>0)
+			doErase = Boolean.getBoolean(prop);
+		if(doErase) {
+			File tmpdirF = new File(httpdir);
+			if ( tmpdirF.exists() ) {
+				eraseFiles(tmpdirF);
+				tmpdirF.delete();
+			}
+		}
+	}
 
-   public String getFirstLineOfException() {
+	public String getFirstLineOfException() {
 		if ( this.stderrDuringParse ==null ) {
 			return null;
 		}
@@ -933,33 +976,33 @@ public abstract class BaseBrowserTest {
 		return lines[0].substring(prefix.length(),lines[0].length());
 	}
 
-    /**
-     * When looking at a result set that consists of a Map/HashTable
-     * we cannot rely on the output order, as the hashing algorithm or other aspects
-     * of the implementation may be different on differnt JDKs or platforms. Hence
-     * we take the Map, convert the keys to a List, sort them and Stringify the Map, which is a
-     * bit of a hack, but guarantees that we get the same order on all systems. We assume that
-     * the keys are strings.
-     *
-     * @param m The Map that contains keys we wish to return in sorted order
-     * @return A string that represents all the keys in sorted order.
-     */
-    public <K, V> String sortMapToString(Map<K, V> m) {
-        // Pass in crap, and get nothing back
-        //
-        if  (m == null) {
-            return null;
-        }
+	/**
+	 * When looking at a result set that consists of a Map/HashTable
+	 * we cannot rely on the output order, as the hashing algorithm or other aspects
+	 * of the implementation may be different on differnt JDKs or platforms. Hence
+	 * we take the Map, convert the keys to a List, sort them and Stringify the Map, which is a
+	 * bit of a hack, but guarantees that we get the same order on all systems. We assume that
+	 * the keys are strings.
+	 *
+	 * @param m The Map that contains keys we wish to return in sorted order
+	 * @return A string that represents all the keys in sorted order.
+	 */
+	public <K, V> String sortMapToString(Map<K, V> m) {
+		// Pass in crap, and get nothing back
+		//
+		if  (m == null) {
+			return null;
+		}
 
-        System.out.println("Map toString looks like: " + m.toString());
+		System.out.println("Map toString looks like: " + m.toString());
 
-        // Sort the keys in the Map
-        //
-        TreeMap<K, V> nset = new TreeMap<K, V>(m);
+		// Sort the keys in the Map
+		//
+		TreeMap<K, V> nset = new TreeMap<K, V>(m);
 
-        System.out.println("Tree map looks like: " + nset.toString());
-        return nset.toString();
-    }
+		System.out.println("Tree map looks like: " + nset.toString());
+		return nset.toString();
+	}
 
 	public List<String> realElements(List<String> elements) {
 		return elements.subList(Token.MIN_USER_TOKEN_TYPE, elements.size());

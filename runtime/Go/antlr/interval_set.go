@@ -72,11 +72,9 @@ func (i *IntervalSet) addInterval(v *Interval) {
 		i.intervals = append(i.intervals, v)
 	} else {
 		// find insert pos
-		for k := 0; k < len(i.intervals); k++ {
-			interval := i.intervals[k]
-			// ditinct range -> insert
+		for k, interval := range i.intervals {
+			// distinct range -> insert
 			if v.stop < interval.start {
-				// i.intervals = splice(k, 0, v)
 				i.intervals = append(i.intervals[0:k], append([]*Interval{v}, i.intervals[k:]...)...)
 				return
 			} else if v.stop == interval.start {
@@ -84,7 +82,19 @@ func (i *IntervalSet) addInterval(v *Interval) {
 				return
 			} else if v.start <= interval.stop {
 				i.intervals[k] = NewInterval(intMin(interval.start, v.start), intMax(interval.stop, v.stop))
-				i.reduce(k)
+
+				// if not applying to end, merge potential overlaps
+				if k < len(i.intervals)-1 {
+					l := i.intervals[k]
+					r := i.intervals[k+1]
+					// if r contained in l
+					if l.stop >= r.stop {
+						i.intervals = append(i.intervals[0:k+1], i.intervals[k+2:]...)
+					} else if l.stop >= r.start { // partial overlap
+						i.intervals[k] = NewInterval(l.start, r.stop)
+						i.intervals = append(i.intervals[0:k+1], i.intervals[k+2:]...)
+					}
+				}
 				return
 			}
 		}
@@ -101,22 +111,6 @@ func (i *IntervalSet) addSet(other *IntervalSet) *IntervalSet {
 		}
 	}
 	return i
-}
-
-func (i *IntervalSet) reduce(k int) {
-	// only need to reduce if k is not the last
-	if k < len(i.intervals)-1 {
-		l := i.intervals[k]
-		r := i.intervals[k+1]
-		// if r contained in l
-		if l.stop >= r.stop {
-			i.intervals = i.intervals[0 : len(i.intervals)-1] // pop(k + 1)
-			i.reduce(k)
-		} else if l.stop >= r.start {
-			i.intervals[k] = NewInterval(l.start, r.stop)
-			i.intervals = i.intervals[0 : len(i.intervals)-1] // i.intervals.pop(k + 1)
-		}
-	}
 }
 
 func (i *IntervalSet) complement(start int, stop int) *IntervalSet {

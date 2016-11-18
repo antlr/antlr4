@@ -36,7 +36,7 @@ var _ = strconv.Itoa
 
 >>
 
-ListenerFile(file, header) ::= <<
+ListenerFile(file, header, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 
 <if(file.genPackage)>
@@ -60,7 +60,7 @@ Exit<lname; format="cap">(c *<lname; format="cap">Context)}; separator="\n\n">
 
 >>
 
-BaseListenerFile(file, header) ::= <<
+BaseListenerFile(file, header, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 
 <if(file.genPackage)>
@@ -96,7 +96,7 @@ func (s *Base<file.grammarName>Listener) Exit<lname; format="cap">(ctx *<lname; 
 
 >>
 
-VisitorFile(file, header) ::= <<
+VisitorFile(file, header, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 
 <if(file.genPackage)>
@@ -122,7 +122,7 @@ type <file.grammarName>Visitor interface {
 }
 >>
 
-BaseVisitorFile(file, header) ::= <<
+BaseVisitorFile(file, header, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 
 <if(file.genPackage)>
@@ -840,10 +840,10 @@ catch (<catchArg>) {
 LexerSkipCommand() ::= "p.Skip()"
 LexerMoreCommand() ::= "p.More()"
 LexerPopModeCommand() ::= "p.PopMode()"
-LexerTypeCommand(arg) ::= "p.SetType(<arg>)"
-LexerChannelCommand(arg) ::= "p.SetChannel(<arg>)"
-LexerModeCommand(arg) ::= "p.SetMode(<arg>)"
-LexerPushModeCommand(arg) ::= "p.PushMode(<arg>)"
+LexerTypeCommand(arg, grammar)     ::= "p.SetType(<arg>)"
+LexerChannelCommand(arg, grammar)  ::= "p.SetChannel(<arg>)"
+LexerModeCommand(arg, grammar)     ::= "p.SetMode(<arg>)"
+LexerPushModeCommand(arg, grammar) ::= "p.PushMode(<arg>)"
 
 ActionText(t) ::= "<t.text>"
 ActionTemplate(t) ::= "<t.st>"
