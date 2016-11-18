@@ -74,7 +74,7 @@ struct Any
 
     auto derived = dynamic_cast<Derived<T> *>(_ptr);
 
-    return derived;
+    return derived != nullptr;
   }
 
   template<class U>
@@ -155,6 +155,11 @@ private:
   Base *_ptr;
 
 };
+
+  template<> inline 
+  Any::Any(std::nullptr_t&& ) : _ptr(nullptr) {
+  }
+
 
 } // namespace antlrcpp
 
