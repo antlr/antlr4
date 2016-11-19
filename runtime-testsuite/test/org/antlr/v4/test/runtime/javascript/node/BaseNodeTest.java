@@ -450,21 +450,35 @@ public class BaseNodeTest implements RuntimeTestSupport {
 		return null;
 	}
 
+	private boolean canExecute(String tool) {
+		try {
+			ProcessBuilder builder = new ProcessBuilder(tool, "--version");
+			builder.redirectErrorStream(true);
+			Process process = builder.start();
+			StreamVacuum vacuum = new StreamVacuum(process.getInputStream());
+			vacuum.start();
+			process.waitFor();
+			vacuum.join();
+			return process.exitValue() == 0;
+		}
+		catch (Exception e) {
+			;
+		}
+		return false;
+	}
+
 	private String locateNodeJS() {
 		// typically /usr/local/bin/node
 		String propName = "antlr-javascript-nodejs";
 		String prop = System.getProperty(propName);
-		if (prop == null || prop.length() == 0) {
-			prop = locateTool("nodejs"); // seems to be nodejs on ubuntu
+
+		if ( prop!=null && prop.length()!=0 ) {
+			return prop;
 		}
-		if ( prop==null ) {
-			prop = locateTool("node"); // seems to be node on mac
+		if (canExecute("nodejs")) {
+			return "nodejs"; // nodejs on Debian without node-legacy package
 		}
-		File file = new File(prop);
-		if (!file.exists()) {
-			throw new RuntimeException("Missing system property:" + propName);
-		}
-		return prop;
+		return "node"; // everywhere else
 	}
 
 	private String locateRuntime() {
