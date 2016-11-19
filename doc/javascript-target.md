@@ -70,7 +70,7 @@ Right now, there is no npm package available, so you need to register a link ins
 $ npm link antlr4
 ```
 
-This will install antlr4 using the package.son descriptor that comes with the script.
+This will install antlr4 using the package.json descriptor that comes with the script.
  
 ## How do I run the generated lexer and/or parser?
 
