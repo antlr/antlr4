@@ -70,7 +70,8 @@ $ brew install node
 To run the tests and **install into local repository** `~/.m2/repository/org/antlr`, do this:
 
 ```bash
-$ mvn install
+$ mvn install -DskipTests=true   # make sure all artifacts are visible on this machine
+$ mvn install                    # now "do it with feeling"
 ...
 -------------------------------------------------------
  T E S T S
