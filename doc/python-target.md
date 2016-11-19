@@ -32,7 +32,7 @@ We will not document here how to refer to the runtime from your Python project, 
 
 ## How do I run the generated lexer and/or parser?
 
-Let's suppose that your grammar is named, as above, "MyGrammar". Let's suppose this parser comprises a rule named "StartRule". The tool will have generated for you the following files:
+Let's suppose that your grammar is named, as above, "MyGrammar". Let's suppose this parser comprises a rule named "startRule". The tool will have generated for you the following files:
 
 * MyGrammarLexer.py
 * MyGrammarParser.py
@@ -54,7 +54,7 @@ def main(argv):
     lexer = MyGrammarLexer(input)
     stream = CommonTokenStream(lexer)
     parser = MyGrammarParser(stream)
-    tree = parser.StartRule()
+    tree = parser.startRule()
  
 if __name__ == '__main__':
     main(sys.argv)
@@ -96,7 +96,7 @@ In order to execute this listener, you would simply add the following lines to t
  
 ```
        ...
-       tree = parser.StartRule() - only repeated here for reference
+       tree = parser.startRule() - only repeated here for reference
    printer = KeyPrinter()
    walker = ParseTreeWalker()
    walker.walk(printer, tree)
