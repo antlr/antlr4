@@ -521,6 +521,19 @@ public class Tool {
 			// Make grammars depend on any tokenVocab options
 			if ( tokenVocabNode!=null ) {
 				String vocabName = tokenVocabNode.getText();
+				// Strip quote characters if any
+				int len = vocabName.length();
+				int firstChar = vocabName.charAt(0);
+				int lastChar = vocabName.charAt(len - 1);
+				if (len >= 2 && firstChar == '\'' && lastChar == '\'') {
+					vocabName = vocabName.substring(1, len-1);
+				}
+				// If the name contains a path delimited by forward slashes,
+				// use only the part after the last slash as the name
+				int lastSlash = vocabName.lastIndexOf('/');
+				if (lastSlash >= 0) {
+					vocabName = vocabName.substring(lastSlash + 1);
+				}
 				g.addEdge(grammarName, vocabName);
 			}
 			// add cycle to graph so we always process a grammar if no error
