@@ -47,8 +47,3 @@ You will find the [Book source code](http://pragprog.com/titles/tpantlr2/source_
 [This repository](https://github.com/antlr/grammars-v4) is a collection of grammars without actions where the
 root directory name is the all-lowercase name of the language parsed
 by the grammar. For example, java, cpp, csharp, c, etc...
-
-Travis Status
----------
-
-<a href="https://travis-ci.org/antlr/antlr4"><img src="https://api.travis-ci.org/antlr/antlr4.png"></a>
