@@ -85,7 +85,7 @@ class PredictionContext(object):
         return self.getReturnState(len(self) - 1) == self.EMPTY_RETURN_STATE
 
     def getReturnState(self, index:int):
-        raise "illegal!"
+        raise Exception("illegal!")
 
     def __hash__(self):
         return self.cachedHashCode
