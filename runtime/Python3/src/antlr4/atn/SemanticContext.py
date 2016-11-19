@@ -36,9 +36,9 @@
 #  <p>I have scoped the {@link AND}, {@link OR}, and {@link Predicate} subclasses of
 #  {@link SemanticContext} within the scope of this outer class.</p>
 #
-from io import StringIO
 from antlr4.Recognizer import Recognizer
 from antlr4.RuleContext import RuleContext
+from io import StringIO
 
 
 class SemanticContext(object):
@@ -115,7 +115,7 @@ def orContext(a:SemanticContext, b:SemanticContext):
     else:
         return result
 
-def filterPrecedencePredicates(collection:list):
+def filterPrecedencePredicates(collection:set):
     return [context for context in collection if isinstance(context, PrecedencePredicate)]
 
 
