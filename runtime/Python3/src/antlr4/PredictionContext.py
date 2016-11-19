@@ -28,10 +28,8 @@
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 #  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #/
-from io import StringIO
-from antlr4.RuleContext import RuleContext
 from antlr4.atn.ATN import ATN
-from antlr4.atn.ATNState import ATNState
+from io import StringIO
 
 
 class PredictionContext(object):
@@ -70,7 +68,7 @@ class PredictionContext(object):
     #  }
     # </pre>
     #/
-    
+
     def __init__(self, cachedHashCode:int):
         self.cachedHashCode = cachedHashCode
 
@@ -85,7 +83,7 @@ class PredictionContext(object):
         return self.getReturnState(len(self) - 1) == self.EMPTY_RETURN_STATE
 
     def getReturnState(self, index:int):
-        raise "illegal!"
+        raise IllegalStateException("illegal!")
 
     def __hash__(self):
         return self.cachedHashCode
