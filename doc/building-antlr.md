@@ -130,9 +130,12 @@ Note that ANTLR is written in itself, which is why maven downloads antlr4-4.5.ja
 
 ## Running test subsets
 
+*From the `runtime-testsuite` dir*
+
 ### Run one test group across targets
 
 ```bash
+$ cd runtime-testsuite
 $ mvn -Dtest=TestParserExec test
 -------------------------------------------------------
  T E S T S
