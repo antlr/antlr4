@@ -713,7 +713,7 @@ public class Tool {
 	 *
 	 *  The output dir -o spec takes precedence if it's absolute.
 	 *  E.g., if the grammar file dir is absolute the output dir is given
-	 *  precendence. "-o /tmp /usr/lib/t.g4" results in "/tmp/T.java" as
+	 *  precedence. "-o /tmp /usr/lib/t.g4" results in "/tmp/T.java" as
 	 *  output (assuming t.g4 holds T.java).
 	 *
 	 *  If no -o is specified, then just write to the directory where the

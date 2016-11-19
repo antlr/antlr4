@@ -120,7 +120,7 @@ public class Utils {
 		return b;
 	}
 
-	/** Find exact object type or sublass of cl in list */
+	/** Find exact object type or subclass of cl in list */
 	public static <T> T find(List<?> ops, Class<T> cl) {
 		for (Object o : ops) {
 			if ( cl.isInstance(o) ) return cl.cast(o);

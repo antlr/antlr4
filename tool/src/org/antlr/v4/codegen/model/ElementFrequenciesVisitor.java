@@ -65,7 +65,7 @@ public class ElementFrequenciesVisitor extends GrammarTreeVisitor {
 	 * @param b The second set.
 	 * @param clip The maximum value to allow for any output.
 	 * @return The sum of the two sets, with the individual elements clipped
-	 * to the maximum value gived by {@code clip}.
+	 * to the maximum value given by {@code clip}.
 	 */
 	protected static FrequencySet<String> combineAndClip(FrequencySet<String> a, FrequencySet<String> b, int clip) {
 		FrequencySet<String> result = new FrequencySet<String>();

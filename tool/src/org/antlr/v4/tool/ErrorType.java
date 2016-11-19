@@ -328,9 +328,9 @@ public enum ErrorType {
 	/**
 	 * Compiler Error 79.
 	 *
-	 * <p>missing arguments(s) on rule reference: <em>rule</em></p>
+	 * <p>missing argument(s) on rule reference: <em>rule</em></p>
 	 */
-	MISSING_RULE_ARGS(79, "missing arguments(s) on rule reference: <arg>", ErrorSeverity.ERROR),
+	MISSING_RULE_ARGS(79, "missing argument(s) on rule reference: <arg>", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 80.
 	 *

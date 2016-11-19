@@ -111,3 +111,4 @@ YYYY/MM/DD, github id, Full name, email
 2016/11/15, hanjoes, Hanzhou Shi, hanzhou87@gmail.com
 2016/11/16, sridharxp, Sridharan S, aurosridhar@gmail.com
 2016/11/06, NoodleOfDeath, Thom Morgan, github@bytemeapp.com
+2016/11/01, sebkur, Sebastian Kürten, sebastian@topobyte.de
