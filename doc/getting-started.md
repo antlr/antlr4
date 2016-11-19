@@ -29,7 +29,7 @@ It's also a good idea to put this in your `.bash_profile` or whatever your start
 3. Create aliases for the ANTLR Tool, and `TestRig`.
 ```
 $ alias antlr4='java -Xmx500M -cp "/usr/local/lib/antlr-4.5-complete.jar:$CLASSPATH" org.antlr.v4.Tool'
-$ alias grun='java org.antlr.v4.runtime.misc.TestRig'
+$ alias grun='java org.antlr.v4.gui.TestRig'
 ```
 
 ### WINDOWS
@@ -51,12 +51,12 @@ SET CLASSPATH=.;C:\Javalib\antlr-4.5-complete.jar;%CLASSPATH%
 java org.antlr.v4.Tool %*
 ```
 ```
-java org.antlr.v4.runtime.misc.TestRig %*
+java org.antlr.v4.gui.TestRig %*
 ```
   * Or, use doskey commands:
 ```
 doskey antlr4=java org.antlr.v4.Tool $*
-doskey grun =java org.antlr.v4.runtime.misc.TestRig $*
+doskey grun =java org.antlr.v4.gui.TestRig $*
 ```
 
 ### Testing the installation
