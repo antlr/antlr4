@@ -30,6 +30,7 @@
 package org.antlr.v4.test.runtime.java;
 
 import org.antlr.v4.Tool;
+import org.antlr.v4.analysis.AnalysisPipeline;
 import org.antlr.v4.automata.ATNFactory;
 import org.antlr.v4.automata.ATNPrinter;
 import org.antlr.v4.automata.LexerATNFactory;
@@ -912,6 +913,9 @@ public class BaseJavaTest implements RuntimeTestSupport {
 			ATNFactory factory = new ParserATNFactory(g);
 			if ( g.isLexer() ) factory = new LexerATNFactory((LexerGrammar)g);
 			g.atn = factory.createATN();
+
+            AnalysisPipeline anal = new AnalysisPipeline(g);
+            anal.process();
 
 			CodeGenerator gen = new CodeGenerator(g);
 			ST outputFileST = gen.generateParser(false);
