@@ -44,6 +44,7 @@ Let's suppose that your grammar is named, as above, "MyGrammar". Let's suppose t
 Now a fully functioning script might look like the following:
  
 ```python
+import sys
 from antlr4 import *
 from MyGrammarLexer import MyGrammarLexer
 from MyGrammarParser import MyGrammarParser
