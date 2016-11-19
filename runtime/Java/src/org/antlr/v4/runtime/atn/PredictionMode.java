@@ -545,7 +545,11 @@ public enum PredictionMode {
 		return all;
 	}
 
-	/** Get union of all alts from configs. @since 4.5.1 */
+	/**
+	 * Get union of all alts from configs.
+	 * 
+	 * @since 4.5.1
+	 */
 	public static BitSet getAlts(ATNConfigSet configs) {
 		BitSet alts = new BitSet();
 		for (ATNConfig config : configs) {
