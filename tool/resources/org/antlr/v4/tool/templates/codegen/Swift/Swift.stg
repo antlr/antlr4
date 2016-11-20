@@ -287,7 +287,6 @@ case  <f.ruleIndex>:
 	<atn>
    public static let _serializedATN : String = <parser.name>ATN().jsonString
    public static let _ATN: ATN = ATNDeserializer().deserializeFromJson(_serializedATN)
-        	<!  //ATNDeserializer().deserialize(Array(  <parser.name>._serializedATN.characters));!>
 }
 >>
 
@@ -363,7 +362,7 @@ open override func getVocabulary() -> Vocabulary {
 }
 
 public override init(_ input:TokenStream)throws {
-    RuntimeMetaData.checkVersion("4.5.3", RuntimeMetaData.VERSION)
+    RuntimeMetaData.checkVersion("4.6", RuntimeMetaData.VERSION)
 	try super.init(input)
 	_interp = ParserATNSimulator(self,<p.name>._ATN,<p.name>._decisionToDFA, <parser.name>._sharedContextCache)
 }
@@ -1004,36 +1003,15 @@ open class <lexer.name>: <superClass; null="Lexer"> {
 	<atn>
     public static let _serializedATN: String = <lexer.name>ATN().jsonString
 	public static let _ATN: ATN = ATNDeserializer().deserializeFromJson(_serializedATN)
-
-    	<! ATNDeserializer().deserialize(Array(  <lexer.name>._serializedATN.characters));!>
 }
 >>
 
+/** Don't need to define anything. The tool generates a XParserATN.swift file (and same for lexer)
+ *  which is referenced from static field _serializedATN.  This json string is passed to
+ *  deserializeFromJson(). Note this is not the "serialization as array of ints" that other targets
+ *  do. It is more or less the output of ATNPrinter which gets read back in.
+ */
 SerializedATN(model) ::= <<
-<! <if(rest(model.segments))>!>
-<! requires segmented representation
-private static let _serializedATNSegments: Int = <length(model.segments)>
-<model.segments:{segment|private static final String _serializedATNSegment<i0> =
-	"<segment; wrap={"+<\n><\t>"}>";}; separator="\n">
-public static let _serializedATN: String = Utils.join(
-	[
-		<model.segments:{segment | _serializedATNSegment<i0>}; separator=",\n">
-	],
-	""
-);!>
-<! <else>  !>
-<! only one segment, can be inlined !>
-<!public   static let _serializedATN: String = "<model.serialized2Json>" !>
-<!	"<model.serialized; wrap={"+<\n><\t>"}>";!>
-
-<! <endif> !>
-<!//public static let _ATN: ATN =
-//	  ATNDeserializer().deserialize(Array(  <lexer.name>._serializedATN.characters));
-!>
-<!	org.antlr.v4.tool.DOTGenerator dot = new org.antlr.v4.tool.DOTGenerator(null);!>
-<!	System.out.println(dot.getDOT(_ATN.decisionToState.get(0), ruleNames, false));!>
-<!	System.out.println(dot.getDOT(_ATN.ruleToStartState[2], ruleNames, false));!>
-
 >>
 
 /** Using a type to init value map, try to init a type; if not in table
