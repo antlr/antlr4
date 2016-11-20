@@ -456,6 +456,8 @@ public class Antlr4Mojo extends AbstractMojo {
 	}
 
     private Set<File> getImportFiles(File sourceDirectory) throws InclusionScanException {
+        if (!libDirectory.exists()) return Collections.emptySet();
+
         Set<String> includes = new HashSet<String>();
         includes.add("*.g4");
         includes.add("*.tokens");
