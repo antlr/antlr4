@@ -28,8 +28,10 @@
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 #  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #/
-from antlr4.RuleContext import RuleContext
 from io import StringIO
+from antlr4.RuleContext import RuleContext
+from antlr4.atn.ATN import ATN
+from antlr4.atn.ATNState import ATNState
 
 
 class PredictionContext(object):
