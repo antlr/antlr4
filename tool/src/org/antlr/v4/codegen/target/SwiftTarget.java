@@ -21,9 +21,6 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.*;
 
-/**
- * Created by janyou on 15/9/15.
- */
 public class SwiftTarget extends Target {
 
     /**
@@ -54,7 +51,7 @@ public class SwiftTarget extends Target {
 
     @Override
     public String getVersion() {
-        return "4.5.3"; // Java and tool versions move in lock step
+        return "4.6"; // Java and tool versions move in lock step
     }
 
     public Set<String> getBadWords() {

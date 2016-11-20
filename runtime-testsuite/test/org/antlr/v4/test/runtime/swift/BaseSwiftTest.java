@@ -15,6 +15,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -26,463 +27,563 @@ import static org.junit.Assert.assertTrue;
 
 public class BaseSwiftTest implements RuntimeTestSupport {
 
-    public static class StreamVacuum implements Runnable {
-        StringBuilder buf = new StringBuilder();
-        BufferedReader in;
-        Thread sucker;
-        public StreamVacuum(InputStream in) {
-            this.in = new BufferedReader( new InputStreamReader(in) );
-        }
-        public void start() {
-            sucker = new Thread(this);
-            sucker.start();
-        }
-        @Override
-        public void run() {
-            try {
-                String line = in.readLine();
-                while (line!=null) {
-                    buf.append(line);
-                    buf.append('\n');
-                    line = in.readLine();
-                }
-            }
-            catch (IOException ioe) {
-                System.err.println("can't read output from process");
-            }
-        }
-        /** wait for the thread to finish */
-        public void join() throws InterruptedException {
-            sucker.join();
-        }
-        @Override
-        public String toString() {
-            return buf.toString();
-        }
-    }
+	/**
+	 * The base test directory is the directory where generated files get placed
+	 * during unit test execution.
+	 */
+	private static final String BASE_TEST_DIR;
 
-    public String tmpdir = null;
+	private static String ANTLR_FRAMEWORK_DIR;
 
-    /** Errors found while running antlr */
-    protected StringBuilder antlrToolErrors;
+	/**
+	 * Common routine to setup the ANTLR4 runtime.
+	 */
+	static {
+		String baseTestDir = System.getProperty("antlr-swift-test-dir");
+		if (baseTestDir == null || baseTestDir.isEmpty()) {
+			baseTestDir = System.getProperty("java.io.tmpdir");
+		}
 
-    /** If error during parser execution, store stderr here; can't return
-     *  stdout and stderr.  This doesn't trap errors from running antlr.
-     */
-    protected String stderrDuringParse;
+		if (!new File(baseTestDir).isDirectory()) {
+			throw new UnsupportedOperationException("The specified base test directory does not exist: " + baseTestDir);
+		}
 
-    @Override
-    public void testSetUp() throws Exception {
-        // new output dir for each test
-        String propName =  "antlr-swift-test-dir";
-        String prop = System.getProperty(propName);
-        if(prop!=null && prop.length()>0) {
-            tmpdir = prop;
-        }
-        else {
-            tmpdir = new File(System.getProperty("java.io.tmpdir"), getClass().getSimpleName()+
-                    "-"+Thread.currentThread().getName()+"-"+System.currentTimeMillis()).getAbsolutePath();
-        }
-        antlrToolErrors = new StringBuilder();
+		BASE_TEST_DIR = baseTestDir;
 
-    }
+		//add antlr.swift
+		final ClassLoader loader = Thread.currentThread().getContextClassLoader();
 
-    @Override
-    public void testTearDown() throws Exception {
+		final URL swiftRuntime = loader.getResource("Swift/Antlr4");
+		if (swiftRuntime == null) {
+			throw new RuntimeException("Swift runtime file not found at:" + swiftRuntime.getPath());
+		}
+		String swiftRuntimePath = swiftRuntime.getPath();
 
-    }
+		try {
+			String commandLine = "find " + swiftRuntimePath + "/ -iname *.swift -not -name merge.swift -exec cat {} ;";
+			ProcessBuilder builder = new ProcessBuilder(commandLine.split(" "));
+			builder.redirectError(ProcessBuilder.Redirect.INHERIT);
+			Process p = builder.start();
+			StreamVacuum stdoutVacuum = new StreamVacuum(p.getInputStream());
+			stdoutVacuum.start();
+			p.waitFor();
+			stdoutVacuum.join();
 
-    @Override
-    public void eraseTempDir() {
+			String antlrSwift = stdoutVacuum.toString();
+			//write to Antlr4
+			ANTLR_FRAMEWORK_DIR = new File(BASE_TEST_DIR, "Antlr4").getAbsolutePath();
+			mkdir(ANTLR_FRAMEWORK_DIR);
+			writeFile(ANTLR_FRAMEWORK_DIR, "Antlr4.swift", antlrSwift);
+			//compile Antlr4  module
+			buildAntlr4Framework();
+			String argsString;
+		} catch (IOException e) {
+			System.out.println(e.getMessage());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+			public void run() {
+				// shutdown logic
+				eraseAntlrFrameWorkDir();
+			}
+		});
+	}
 
-    }
+	private static void eraseFilesIn(String dirName) {
+		if (dirName == null) {
+			return;
+		}
 
-    @Override
-    public String getTmpDir() {
-        return tmpdir;
-    }
+		File dir = new File(dirName);
+		String[] files = dir.list();
+		if (files != null) for (String file : files) {
+			new File(dirName + "/" + file).delete();
+		}
+	}
 
-    @Override
-    public String getStdout() {
-        return null;
-    }
+	private static void eraseAntlrFrameWorkDir() {
+		File frameworkdir = new File(ANTLR_FRAMEWORK_DIR);
+		if (frameworkdir.exists()) {
+			eraseFilesIn(ANTLR_FRAMEWORK_DIR);
+			frameworkdir.delete();
+		}
+	}
 
-    @Override
-    public String getParseErrors() {
-        return stderrDuringParse;
-    }
+	private static boolean buildAntlr4Framework() throws Exception {
+		String argsString = "xcrun -sdk macosx swiftc -emit-library -emit-module Antlr4.swift -module-name Antlr4 -module-link-name Antlr4 -Xlinker -install_name -Xlinker " + ANTLR_FRAMEWORK_DIR + "/libAntlr4.dylib ";
+		return runProcess(argsString, ANTLR_FRAMEWORK_DIR);
+	}
 
-    @Override
-    public String getANTLRToolErrors() {
-        if (antlrToolErrors.length() == 0) {
-            return null;
-        }
-        return antlrToolErrors.toString();
-    }
+	public static class StreamVacuum implements Runnable {
+		StringBuilder buf = new StringBuilder();
+		BufferedReader in;
+		Thread sucker;
 
-    @Override
-    public String execLexer(String grammarFileName, String grammarStr, String lexerName, String input, boolean showDFA) {
-        boolean success = rawGenerateAndBuildRecognizer(grammarFileName,
-                grammarStr,
-                null,
-                lexerName,"-no-listener");
-        assertTrue(success);
-        writeFile(tmpdir, "input", input);
-        writeLexerTestFile(lexerName, showDFA);
-        String output = execModule("Test.swift");
-        return output;
-    }
+		public StreamVacuum(InputStream in) {
+			this.in = new BufferedReader(new InputStreamReader(in));
+		}
 
-    @Override
-    public String execParser(String grammarFileName, String grammarStr, String parserName, String lexerName, String listenerName, String visitorName, String startRuleName, String input, boolean showDiagnosticErrors) {
-        return null;
-    }
+		public void start() {
+			sucker = new Thread(this);
+			sucker.start();
+		}
 
-    public static void writeFile(String dir, String fileName, String content) {
-        try {
-            File f = new File(dir, fileName);
-            FileWriter w = new FileWriter(f);
-            BufferedWriter bw = new BufferedWriter(w);
-            bw.write(content);
-            bw.close();
-            w.close();
-        }
-        catch (IOException ioe) {
-            System.err.println("can't write file");
-            ioe.printStackTrace(System.err);
-        }
-    }
+		@Override
+		public void run() {
+			try {
+				String line = in.readLine();
+				while (line != null) {
+					buf.append(line);
+					buf.append('\n');
+					line = in.readLine();
+				}
+			} catch (IOException ioe) {
+				System.err.println("can't read output from process");
+			}
+		}
 
-    protected void writeParserTestFile(String parserName,
-                                       String lexerName,
-                                       String parserStartRuleName,
-                                       boolean debug,
-                                       boolean profile)
-    {
+		/**
+		 * wait for the thread to finish
+		 */
+		public void join() throws InterruptedException {
+			sucker.join();
+		}
 
-        ST outputFileST = new ST(
-                "import Antlr4\n" +
-                        "import Foundation\n" +
-                        "setbuf(__stdoutp, nil)\n" +
-                        "class TreeShapeListener: ParseTreeListener{\n" +
-                        "    func visitTerminal(_ node: TerminalNode){ }\n" +
-                        "    func visitErrorNode(_ node: ErrorNode){ }\n" +
-                        "    func enterEveryRule(_ ctx: ParserRuleContext) throws { }\n" +
-                        "    func exitEveryRule(_ ctx: ParserRuleContext) throws {\n" +
-                        "        for i in 0..\\<ctx.getChildCount() {\n" +
-                        "            let parent = ctx.getChild(i)?.getParent()\n" +
-                        "            if (!(parent is RuleNode) || (parent as! RuleNode ).getRuleContext() !== ctx) {\n" +
-                        "                throw ANTLRError.illegalState(msg: \"Invalid parse tree shape detected.\")\n" +
-                        "            }\n" +
-                        "        }\n" +
-                        "    }\n" +
-                        "}\n" +
-                        "\n" +
-                        "do {\n" +
-                        "let args = CommandLine.arguments\n" +
-                        "let input = ANTLRFileStream(args[1])\n" +
-                        "let lex = <lexerName>(input)\n" +
-                        "let tokens = CommonTokenStream(lex)\n" +
-                        "<createParser>\n" +
-                        "parser.setBuildParseTree(true)\n" +
-                        "<profile>\n" +
-                        "let tree = try parser.<parserStartRuleName>()\n" +
-                        "<if(profile)>print(profiler.getDecisionInfo().description)<endif>\n" +
-                        "try ParseTreeWalker.DEFAULT.walk(TreeShapeListener(), tree)\n" +
-                        "}catch ANTLRException.cannotInvokeStartRule {\n" +
-                        "    print(\"error occur: cannotInvokeStartRule\")\n" +
-                        "}catch ANTLRException.recognition(let e )   {\n" +
-                        "    print(\"error occur\\(e)\")\n" +
-                        "}catch {\n" +
-                        "    print(\"error occur\")\n" +
-                        "}\n"
-        );
-        ST createParserST = new ST("       let parser = try <parserName>(tokens)\n");
-        if ( debug ) {
-            createParserST =
-                    new ST(
-                            "        let parser = try <parserName>(tokens)\n" +
-                                    "        parser.addErrorListener(DiagnosticErrorListener())\n");
-        }
-        if ( profile ) {
-            outputFileST.add("profile",
-                    "let profiler = ProfilingATNSimulator(parser)\n" +
-                            "parser.setInterpreter(profiler)");
-        }
-        else {
-            outputFileST.add("profile", new ArrayList<Object>());
-        }
-        outputFileST.add("createParser", createParserST);
-        outputFileST.add("parserName", parserName);
-        outputFileST.add("lexerName", lexerName);
-        outputFileST.add("parserStartRuleName", parserStartRuleName);
-        writeFile(tmpdir, "main.swift", outputFileST.render());
-    }
+		@Override
+		public String toString() {
+			return buf.toString();
+		}
+	}
 
-    protected void writeLexerTestFile(String lexerName, boolean showDFA) {
-        ST outputFileST = new ST(
-                "import Antlr4\n" +
-                        "import Foundation\n" +
-                        "setbuf(__stdoutp, nil)\n" +
-                        "let args = CommandLine.arguments\n" +
-                        "let input = ANTLRFileStream(args[1])\n" +
-                        "let lex = <lexerName>(input)\n" +
-                        "let tokens = CommonTokenStream(lex)\n" +
-                        "do {\n" +
-                        "    try tokens.fill()\n" +
-                        "}catch ANTLRException.cannotInvokeStartRule {\n" +
-                        "    print(\"error occur: cannotInvokeStartRule\")\n" +
-                        "}catch ANTLRException.recognition(let e )   {\n" +
-                        "    print(\"error occur\\(e)\")\n" +
-                        "}catch {\n" +
-                        "    print(\"error occur\")\n" +
-                        "}\n" +
-                        "for t in tokens.getTokens() {\n" +
-                        "  print(t)\n" +
-                        "}\n" +
-                        (showDFA?"print(lex.getInterpreter().getDFA(Lexer.DEFAULT_MODE).toLexerString(), terminator: \"\" )\n":"") );
+	public String tmpdir = null;
 
-        outputFileST.add("lexerName", lexerName);
-        writeFile(tmpdir, "main.swift", outputFileST.render());
-    }
+	/**
+	 * Errors found while running antlr
+	 */
+	private StringBuilder antlrToolErrors;
 
-    public String execModule(String fileName) {
-        String runtimePath = locateRuntime();
-        String includePath = runtimePath + "/runtime/src";
-        String binPath = new File(new File(tmpdir), "a.out").getAbsolutePath();
-        String inputPath = new File(new File(tmpdir), "input").getAbsolutePath();
+	/**
+	 * If error during parser execution, store stderr here; can't return
+	 * stdout and stderr.  This doesn't trap errors from running antlr.
+	 */
+	protected String stderrDuringParse;
 
-        // Build runtime using cmake once.
-        synchronized (runtimeBuiltOnce) {
-            if ( !runtimeBuiltOnce ) {
-                try {
-                    String command[] = {"clang++", "--version"};
-                    String output = runCommand(command, tmpdir, "printing compiler version");
-                    System.out.println("Compiler version is: "+output);
-                }
-                catch (Exception e) {
-                    System.err.println("Can't get compiler version");
-                }
+	@Override
+	public void testSetUp() throws Exception {
+		// new output dir for each test
+		String propName = "antlr-swift-test-dir";
+		String prop = System.getProperty(propName);
+		if (prop != null && prop.length() > 0) {
+			tmpdir = prop;
+		} else {
+			tmpdir = new File(System.getProperty("java.io.tmpdir"), getClass().getSimpleName() +
+					"-" + Thread.currentThread().getName() + "-" + System.currentTimeMillis()).getAbsolutePath();
+		}
+		antlrToolErrors = new StringBuilder();
 
-                runtimeBuiltOnce = true;
-                if ( !buildRuntime() ) {
-                    System.out.println("C++ runtime build failed\n");
-                    return null;
-                }
-                System.out.println("C++ runtime build succeeded\n");
-            }
-        }
+	}
 
-        // Create symlink to the runtime. Currently only used on OSX.
-        String libExtension = (getOS().equals("mac")) ? "dylib" : "so";
-        try {
-            String command[] = { "ln", "-s", runtimePath + "/dist/libantlr4-runtime." + libExtension };
-            if (runCommand(command, tmpdir, "sym linking C++ runtime") == null)
-                return null;
-        }
-        catch (Exception e) {
-            System.err.println("can't exec module: " + fileName);
-        }
+	@Override
+	public void testTearDown() throws Exception {
 
-        try {
-            List<String> command2 = new ArrayList<String>(Arrays.asList("clang++", "-std=c++11", "-I", includePath, "-L.", "-lantlr4-runtime"));
-            command2.addAll(allCppFiles(tmpdir));
-            if (runCommand(command2.toArray(new String[0]), tmpdir, "building test binary") == null) {
-                return null;
-            }
-        }
-        catch (Exception e) {
-            System.err.println("can't compile test module: " + e.getMessage());
-            return null;
-        }
+	}
 
-        // Now run the newly minted binary. Reset the error output, as we could have got compiler warnings which are not relevant here.
-        this.stderrDuringParse = null;
-        try {
-            ProcessBuilder builder = new ProcessBuilder(binPath, inputPath);
-            builder.directory(new File(tmpdir));
-            Map<String, String> env = builder.environment();
-            env.put("LD_PRELOAD", runtimePath + "/dist/libantlr4-runtime.so"); // For linux.
-            String output = runProcess(builder, "running test binary");
-            if ( output.length()==0 ) {
-                output = null;
-            }
+	@Override
+	public void eraseTempDir() {
 
-      /* for debugging
-		  System.out.println("=========================================================");
-		  System.out.println(output);
-		  System.out.println("=========================================================");
-		  */
-            return output;
-        }
-        catch (Exception e) {
-            System.err.println("can't exec module: " + fileName + "\nerror is: "+ e.getMessage());
-        }
+	}
 
-        return null;
-    }
+	@Override
+	public String getTmpDir() {
+		return tmpdir;
+	}
 
-    protected String locateRuntime() {
-        final ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        final URL runtimeSrc = loader.getResource("Cpp");
-        if (runtimeSrc == null) {
-            throw new RuntimeException("Cannot find runtime");
-        }
-        return runtimeSrc.getPath();
-    }
+	@Override
+	public String getStdout() {
+		return null;
+	}
 
-    private String runProcess(ProcessBuilder builder, String description) throws Exception {
-        Process process = builder.start();
-        StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
-        StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
-        stdoutVacuum.start();
-        stderrVacuum.start();
-        int errcode = process.waitFor();
-        stdoutVacuum.join();
-        stderrVacuum.join();
-        String output = stdoutVacuum.toString();
-        if ( stderrVacuum.toString().length()>0 ) {
-            this.stderrDuringParse = stderrVacuum.toString();
-        }
-        if (errcode != 0) {
-            String err = "execution failed with error code: "+errcode;
-            if ( this.stderrDuringParse!=null ) {
-                this.stderrDuringParse += err;
-            }
-            else {
-                this.stderrDuringParse = err;
-            }
-        }
+	@Override
+	public String getParseErrors() {
+		return stderrDuringParse;
+	}
 
-        return output;
-    }
+	@Override
+	public String getANTLRToolErrors() {
+		if (antlrToolErrors.length() == 0) {
+			return null;
+		}
+		return antlrToolErrors.toString();
+	}
 
-    private String runCommand(String command[], String workPath, String description) throws Exception {
-        ProcessBuilder builder = new ProcessBuilder(command);
-        builder.directory(new File(workPath));
+	@Override
+	public String execLexer(String grammarFileName, String grammarStr, String lexerName, String input, boolean showDFA) {
+		boolean success = rawGenerateRecognizer(grammarFileName,
+				grammarStr,
+				null,
+				lexerName);
+		assertTrue(success);
+		writeFile(tmpdir, "input", input);
+		writeLexerTestFile(lexerName, showDFA);
+		addSourceFiles("main.swift");
 
-        return runProcess(builder, description);
-    }
+		compile();
+		String output = execTest();
+		if (stderrDuringParse != null && stderrDuringParse.length() > 0) {
+			System.err.println(stderrDuringParse);
+		}
+		return output;
+	}
 
-    /** Return true if all is well */
-    protected boolean rawGenerateRecognizer(String grammarFileName,
-                                            String grammarStr,
-                                            String parserName,
-                                            String lexerName,
-                                            String... extraOptions)
-    {
-        return rawGenerateRecognizer(grammarFileName, grammarStr, parserName, lexerName, false, extraOptions);
-    }
+	private String execTest() {
+		try {
+			String exec = tmpdir + "/" + EXEC_NAME;
+			String[] args =
+					new String[]{exec, "input"};//new File(tmpdir, "input").getAbsolutePath()
+			ProcessBuilder pb = new ProcessBuilder(args);
+			pb.directory(new File(tmpdir));
+			Process p = pb.start();
+			StreamVacuum stdoutVacuum = new StreamVacuum(p.getInputStream());
+			StreamVacuum stderrVacuum = new StreamVacuum(p.getErrorStream());
+			stdoutVacuum.start();
+			stderrVacuum.start();
+			p.waitFor();
+			stdoutVacuum.join();
+			stderrVacuum.join();
+			String output = stdoutVacuum.toString();
+			if ( output.length()==0 ) {
+				output = null;
+			}
+			if (stderrVacuum.toString().length() > 0) {
+				this.stderrDuringParse = stderrVacuum.toString();
+				System.err.println("execTest stderrVacuum: " + stderrVacuum);
+			}
+			return output;
+		} catch (Exception e) {
+			System.err.println("can't exec recognizer");
+			e.printStackTrace(System.err);
+		}
+		return null;
+	}
 
-    /** Return true if all is well */
-    protected boolean rawGenerateRecognizer(String grammarFileName,
-                                            String grammarStr,
-                                            String parserName,
-                                            String lexerName,
-                                            boolean defaultListener,
-                                            String... extraOptions)
-    {
-        ErrorQueue equeue = antlr(grammarFileName, grammarStr, defaultListener, extraOptions);
-        if (!equeue.errors.isEmpty()) {
-            return false;
-        }
+	private Set<String> sourceFiles = new HashSet<String>();
 
-        List<String> files = new ArrayList<String>();
-        if ( lexerName!=null ) {
-            files.add(lexerName+".swift");
-            files.add(lexerName+"ATN.swift");
-        }
-        if ( parserName!=null ) {
-            files.add(parserName+".swift");
-            files.add(parserName+"ATN.swift");
-            Set<String> optionsSet = new HashSet<String>(Arrays.asList(extraOptions));
-            String grammarName = grammarFileName.substring(0, grammarFileName.lastIndexOf('.'));
-            if (!optionsSet.contains("-no-listener")) {
-                files.add(grammarName+"Listener.swift");
-                files.add(grammarName+"BaseListener.swift");
-            }
-            if (optionsSet.contains("-visitor")) {
-                files.add(grammarName+"Visitor.swift");
-                files.add(grammarName+"BaseVisitor.swift");
-            }
-        }
-        addSourceFiles(files.toArray(new String[files.size()]));
-        return true;
-    }
+	private void addSourceFiles(String... files) {
+		Collections.addAll(this.sourceFiles, files);
+	}
 
-    protected ErrorQueue antlr(String grammarFileName, boolean defaultListener, String... extraOptions) {
-        final List<String> options = new ArrayList<String>();
-        Collections.addAll(options, extraOptions);
-        options.add("-Dlanguage=Swift");
-        if ( !options.contains("-o") ) {
-            options.add("-o");
-            options.add(tmpdir);
-        }
-        if ( !options.contains("-lib") ) {
-            options.add("-lib");
-            options.add(tmpdir);
-        }
-        if ( !options.contains("-encoding") ) {
-            options.add("-encoding");
-            options.add("UTF-8");
-        }
-        options.add(new File(tmpdir,grammarFileName).toString());
+	public boolean compile() {
+		try {
+			return buildProject();
+		} catch (Exception e) {
+			return false;
+		}
+	}
 
-        final String[] optionsA = new String[options.size()];
-        options.toArray(optionsA);
-        Tool antlr = newTool(optionsA);
-        ErrorQueue equeue = new ErrorQueue(antlr);
-        antlr.addListener(equeue);
-        if (defaultListener) {
-            antlr.addListener(new DefaultToolListener(antlr));
-        }
-        antlr.processGrammarsOnCommandLine();
+	private static final String EXEC_NAME = "Test";
 
-        if ( !defaultListener && !equeue.errors.isEmpty() ) {
-            System.err.println("antlr reports errors from "+options);
-            for (int i = 0; i < equeue.errors.size(); i++) {
-                ANTLRMessage msg = equeue.errors.get(i);
-                System.err.println(msg);
-            }
-            System.out.println("!!!\ngrammar:");
-            try {
-                System.out.println(new String(Utils.readFile(tmpdir+"/"+grammarFileName)));
-            }
-            catch (IOException ioe) {
-                System.err.println(ioe.toString());
-            }
-            System.out.println("###");
-        }
-        if ( !defaultListener && !equeue.warnings.isEmpty() ) {
-            System.err.println("antlr reports warnings from "+options);
-            for (int i = 0; i < equeue.warnings.size(); i++) {
-                ANTLRMessage msg = equeue.warnings.get(i);
-                System.err.println(msg);
-            }
-        }
+	private boolean buildProject() throws Exception {
+		String fileList = sourceFiles.toString().replace("[", "").replace("]", "")
+				.replace(", ", " ");
 
-        return equeue;
-    }
+		String argsString = "xcrun -sdk macosx swiftc " + fileList + " -o " + EXEC_NAME + " -I " + ANTLR_FRAMEWORK_DIR + " -L " + ANTLR_FRAMEWORK_DIR + " -module-link-name Antlr4";
+		return runProcess(argsString, tmpdir);
+	}
 
-    protected ErrorQueue antlr(String grammarFileName, String grammarStr, boolean defaultListener, String... extraOptions) {
-        System.out.println("dir "+tmpdir);
-        mkdir(tmpdir);
-        writeFile(tmpdir, grammarFileName, grammarStr);
-        return antlr(grammarFileName, defaultListener, extraOptions);
-    }
+	private static boolean runProcess(String argsString, String execPath) throws IOException, InterruptedException {
+		String[] args = argsString.split(" ");
+		System.err.println("Starting build " + argsString);//Utils.join(args, " "))
+		Process process = Runtime.getRuntime().exec(args, null, new File(execPath));
+		StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
+		StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
+		stdoutVacuum.start();
+		stderrVacuum.start();
+		process.waitFor();
+		stdoutVacuum.join();
+		stderrVacuum.join();
+		if (stderrVacuum.toString().length() > 0) {
+			//this.stderrDuringParse = stderrVacuum.toString();
+			System.err.println("buildProject stderrVacuum: " + stderrVacuum);
+		}
+		return process.exitValue() == 0;
+	}
 
-    protected static void mkdir(String dir) {
-        File f = new File(dir);
-        f.mkdirs();
-    }
+	@Override
+	public String execParser(String grammarFileName, String grammarStr, String parserName, String lexerName, String listenerName, String visitorName, String startRuleName, String input, boolean showDiagnosticErrors) {
+		return execParser(grammarFileName, grammarStr, parserName,
+				lexerName, startRuleName, input, showDiagnosticErrors, false);
+	}
 
-    protected Tool newTool(String[] args) {
-        Tool tool = new Tool(args);
-        return tool;
-    }
+	protected String execParser(String grammarFileName,
+								String grammarStr,
+								String parserName,
+								String lexerName,
+								String startRuleName,
+								String input, boolean debug,boolean profile)
+	{
+		boolean success = rawGenerateRecognizer(grammarFileName,
+				grammarStr,
+				parserName,
+				lexerName,
+				"-visitor");
+		assertTrue(success);
+		writeFile(tmpdir, "input", input);
+		return rawExecRecognizer(parserName,
+				lexerName,
+				startRuleName,
+				debug,profile);
+	}
 
-    protected Tool newTool() {
-        Tool tool = new Tool(new String[] {"-o", tmpdir});
-        return tool;
-    }
+	protected String rawExecRecognizer(String parserName,
+									   String lexerName,
+									   String parserStartRuleName,
+									   boolean debug,
+									   boolean profile)
+	{
+		this.stderrDuringParse = null;
+		if ( parserName==null ) {
+			writeLexerTestFile(lexerName, false);
+		}
+		else {
+			writeParserTestFile(parserName,
+					lexerName,
+					parserStartRuleName,
+					debug,
+					profile);
+		}
+
+		addSourceFiles("main.swift");
+		return execRecognizer();
+	}
+
+	public String execRecognizer() {
+		compile();
+		return execTest();
+	}
+
+	public static void writeFile(String dir, String fileName, String content) {
+		try {
+			File f = new File(dir, fileName);
+			FileWriter w = new FileWriter(f);
+			BufferedWriter bw = new BufferedWriter(w);
+			bw.write(content);
+			bw.close();
+			w.close();
+		} catch (IOException ioe) {
+			System.err.println("can't write file");
+			ioe.printStackTrace(System.err);
+		}
+	}
+
+	protected void writeParserTestFile(String parserName,
+									   String lexerName,
+									   String parserStartRuleName,
+									   boolean debug,
+									   boolean profile) {
+
+		ST outputFileST = new ST(
+				"import Antlr4\n" +
+						"import Foundation\n" +
+						"setbuf(__stdoutp, nil)\n" +
+						"class TreeShapeListener: ParseTreeListener{\n" +
+						"    func visitTerminal(_ node: TerminalNode){ }\n" +
+						"    func visitErrorNode(_ node: ErrorNode){ }\n" +
+						"    func enterEveryRule(_ ctx: ParserRuleContext) throws { }\n" +
+						"    func exitEveryRule(_ ctx: ParserRuleContext) throws {\n" +
+						"        for i in 0..\\<ctx.getChildCount() {\n" +
+						"            let parent = ctx.getChild(i)?.getParent()\n" +
+						"            if (!(parent is RuleNode) || (parent as! RuleNode ).getRuleContext() !== ctx) {\n" +
+						"                throw ANTLRError.illegalState(msg: \"Invalid parse tree shape detected.\")\n" +
+						"            }\n" +
+						"        }\n" +
+						"    }\n" +
+						"}\n" +
+						"\n" +
+						"do {\n" +
+						"let args = CommandLine.arguments\n" +
+						"let input = ANTLRFileStream(args[1])\n" +
+						"let lex = <lexerName>(input)\n" +
+						"let tokens = CommonTokenStream(lex)\n" +
+						"<createParser>\n" +
+						"parser.setBuildParseTree(true)\n" +
+						"<profile>\n" +
+						"let tree = try parser.<parserStartRuleName>()\n" +
+						"<if(profile)>print(profiler.getDecisionInfo().description)<endif>\n" +
+						"try ParseTreeWalker.DEFAULT.walk(TreeShapeListener(), tree)\n" +
+						"}catch ANTLRException.cannotInvokeStartRule {\n" +
+						"    print(\"error occur: cannotInvokeStartRule\")\n" +
+						"}catch ANTLRException.recognition(let e )   {\n" +
+						"    print(\"error occur\\(e)\")\n" +
+						"}catch {\n" +
+						"    print(\"error occur\")\n" +
+						"}\n"
+		);
+		ST createParserST = new ST("       let parser = try <parserName>(tokens)\n");
+		if (debug) {
+			createParserST =
+					new ST(
+							"        let parser = try <parserName>(tokens)\n" +
+									"        parser.addErrorListener(DiagnosticErrorListener())\n");
+		}
+		if (profile) {
+			outputFileST.add("profile",
+					"let profiler = ProfilingATNSimulator(parser)\n" +
+							"parser.setInterpreter(profiler)");
+		} else {
+			outputFileST.add("profile", new ArrayList<Object>());
+		}
+		outputFileST.add("createParser", createParserST);
+		outputFileST.add("parserName", parserName);
+		outputFileST.add("lexerName", lexerName);
+		outputFileST.add("parserStartRuleName", parserStartRuleName);
+		writeFile(tmpdir, "main.swift", outputFileST.render());
+	}
+
+	protected void writeLexerTestFile(String lexerName, boolean showDFA) {
+		ST outputFileST = new ST(
+						"import Antlr4\n" +
+						"import Foundation\n" +
+
+						"setbuf(__stdoutp, nil)\n" +
+						"let args = CommandLine.arguments\n" +
+						"let input = ANTLRFileStream(args[1])\n" +
+						"let lex = <lexerName>(input)\n" +
+						"let tokens = CommonTokenStream(lex)\n" +
+
+						"do {\n" +
+						"	try tokens.fill()\n" +
+						"} catch ANTLRException.cannotInvokeStartRule {\n" +
+						"	print(\"error occur: cannotInvokeStartRule\")\n" +
+						"} catch ANTLRException.recognition(let e )   {\n" +
+						"	print(\"error occur\\(e)\")\n" +
+						"} catch {\n" +
+						"	print(\"error occur\")\n" +
+						"}\n" +
+
+						"for t in tokens.getTokens() {\n" +
+						"	print(t)\n" +
+						"}\n" +
+						(showDFA ? "print(lex.getInterpreter().getDFA(Lexer.DEFAULT_MODE).toLexerString(), terminator: \"\" )\n" : ""));
+
+		outputFileST.add("lexerName", lexerName);
+		writeFile(tmpdir, "main.swift", outputFileST.render());
+	}
+
+	/**
+	 * Return true if all is well
+	 */
+	private boolean rawGenerateRecognizer(String grammarFileName,
+										  String grammarStr,
+										  String parserName,
+										  String lexerName,
+										  String... extraOptions) {
+		return rawGenerateRecognizer(grammarFileName, grammarStr, parserName, lexerName, false, extraOptions);
+	}
+
+	/**
+	 * Return true if all is well
+	 */
+	private boolean rawGenerateRecognizer(String grammarFileName,
+										  String grammarStr,
+										  String parserName,
+										  String lexerName,
+										  boolean defaultListener,
+										  String... extraOptions) {
+		ErrorQueue equeue = antlr(grammarFileName, grammarStr, defaultListener, extraOptions);
+		if (!equeue.errors.isEmpty()) {
+			return false;
+		}
+
+		List<String> files = new ArrayList<String>();
+		if (lexerName != null) {
+			files.add(lexerName + ".swift");
+			files.add(lexerName + "ATN.swift");
+		}
+		if (parserName != null) {
+			files.add(parserName + ".swift");
+			files.add(parserName + "ATN.swift");
+			Set<String> optionsSet = new HashSet<String>(Arrays.asList(extraOptions));
+			String grammarName = grammarFileName.substring(0, grammarFileName.lastIndexOf('.'));
+			if (!optionsSet.contains("-no-listener")) {
+				files.add(grammarName + "Listener.swift");
+				files.add(grammarName + "BaseListener.swift");
+			}
+			if (optionsSet.contains("-visitor")) {
+				files.add(grammarName + "Visitor.swift");
+				files.add(grammarName + "BaseVisitor.swift");
+			}
+		}
+		addSourceFiles(files.toArray(new String[files.size()]));
+		return true;
+	}
+
+	protected ErrorQueue antlr(String grammarFileName, boolean defaultListener, String... extraOptions) {
+		final List<String> options = new ArrayList<>();
+		Collections.addAll(options, extraOptions);
+		options.add("-Dlanguage=Swift");
+		if (!options.contains("-o")) {
+			options.add("-o");
+			options.add(tmpdir);
+		}
+		if (!options.contains("-lib")) {
+			options.add("-lib");
+			options.add(tmpdir);
+		}
+		if (!options.contains("-encoding")) {
+			options.add("-encoding");
+			options.add("UTF-8");
+		}
+		options.add(new File(tmpdir, grammarFileName).toString());
+
+		final String[] optionsA = new String[options.size()];
+		options.toArray(optionsA);
+		Tool antlr = newTool(optionsA);
+		ErrorQueue equeue = new ErrorQueue(antlr);
+		antlr.addListener(equeue);
+		if (defaultListener) {
+			antlr.addListener(new DefaultToolListener(antlr));
+		}
+		antlr.processGrammarsOnCommandLine();
+
+		if (!defaultListener && !equeue.errors.isEmpty()) {
+			for (int i = 0; i < equeue.errors.size(); i++) {
+				ANTLRMessage msg = equeue.errors.get(i);
+				System.err.println(msg);
+			}
+			try {
+				System.out.println(new String(Utils.readFile(tmpdir + "/" + grammarFileName)));
+			} catch (IOException ioe) {
+				System.err.println(ioe.toString());
+			}
+		}
+		if (!defaultListener && !equeue.warnings.isEmpty()) {
+			for (int i = 0; i < equeue.warnings.size(); i++) {
+				ANTLRMessage msg = equeue.warnings.get(i);
+				System.err.println(msg);
+			}
+		}
+
+		return equeue;
+	}
+
+	protected ErrorQueue antlr(String grammarFileName, String grammarStr, boolean defaultListener, String... extraOptions) {
+		System.out.println("dir " + tmpdir);
+		mkdir(tmpdir);
+		writeFile(tmpdir, grammarFileName, grammarStr);
+		return antlr(grammarFileName, defaultListener, extraOptions);
+	}
+
+	protected static void mkdir(String dir) {
+		File f = new File(dir);
+		f.mkdirs();
+	}
+
+	protected Tool newTool(String[] args) {
+		return new Tool(args);
+	}
+
+	protected Tool newTool() {
+		return new Tool(new String[]{"-o", tmpdir});
+	}
 }

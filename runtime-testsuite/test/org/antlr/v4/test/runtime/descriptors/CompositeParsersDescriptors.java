@@ -412,8 +412,8 @@ public class CompositeParsersDescriptors {
 		parser grammar S;
 		type_ : 'int' ;
 		decl : type_ ID ';'
-			| type_ ID init ';' {<write("\"JavaDecl: \" + $text")>};
-		init : '=' INT;
+			| type_ ID init_ ';' {<write("\"JavaDecl: \" + $text")>};
+		init_ : '=' INT;
 		 */
 		@CommentHasStringValue
 		public String slaveGrammarS;
