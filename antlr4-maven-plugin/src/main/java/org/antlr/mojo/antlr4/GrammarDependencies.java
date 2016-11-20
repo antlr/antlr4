@@ -233,8 +233,7 @@ class GrammarDependencies {
                     String value = option.getChild(1).getText();
 
                     if ("tokenVocab".equals(key)) {
-                        // make sure to have the name unquoted
-                        String name = value.replaceAll("\\A'|'\\Z", "");
+                        String name = stripQuotes(value);
                         // the grammar name may be qualified, but we resolve the path anyway
                         String grammarName = stripPath(name);
                         String grammarPath = MojoUtils.findSourceSubdir(sourceDirectory,
@@ -306,4 +305,7 @@ class GrammarDependencies {
         return str.replaceAll("^.*[/\\\\]", "");
     }
 
+    private String stripQuotes(String str) {
+        return str.replaceAll("\\A'|'\\Z", "");
+    }
 }
