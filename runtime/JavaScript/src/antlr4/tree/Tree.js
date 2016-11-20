@@ -87,11 +87,12 @@ function ParseTreeVisitor() {
 }
 
 ParseTreeVisitor.prototype.visit = function(ctx) {
-	if (Utils.isArray(ctx)) {
-		var self = this;
-		return ctx.map(function(child) { return visitAtom(self, child)});
+ 	if (Utils.isArray(ctx)) {
+		return ctx.map(function(child) {
+            return ctx.accept(this);
+        }, this);
 	} else {
-		return visitAtom(this, ctx);
+		return ctx.accept(this);
 	}
 };
 
@@ -105,10 +106,6 @@ ParseTreeVisitor.prototype.visitTerminal = function(node) {
 ParseTreeVisitor.prototype.visitErrorNode = function(node) {
 };
 
-
-var visitAtom = function(visitor, ctx) {
-	return ctx.accept(visitor);
-};
 
 function ParseTreeListener() {
 	return this;
