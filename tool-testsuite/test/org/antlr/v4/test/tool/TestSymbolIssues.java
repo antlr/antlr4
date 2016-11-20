@@ -65,7 +65,7 @@ public class TestSymbolIssues extends BaseJavaTest {
 			"warning(" + ErrorType.IMPLICIT_TOKEN_DEFINITION.code + "): A.g4:10:20: implicit definition of token Y in parser\n" +
 			"warning(" + ErrorType.IMPLICIT_TOKEN_DEFINITION.code + "): A.g4:11:4: implicit definition of token FJKD in parser\n" +
 			"error(" + ErrorType.RULE_HAS_NO_ARGS.code + "): A.g4:9:37: rule b has no defined parameters\n" +
-			"error(" + ErrorType.MISSING_RULE_ARGS.code + "): A.g4:10:31: missing arguments(s) on rule reference: a\n"
+			"error(" + ErrorType.MISSING_RULE_ARGS.code + "): A.g4:10:31: missing argument(s) on rule reference: a\n"
     };
 
     static String[] B = {

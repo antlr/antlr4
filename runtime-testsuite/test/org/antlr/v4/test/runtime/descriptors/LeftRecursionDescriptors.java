@@ -558,6 +558,12 @@ public class LeftRecursionDescriptors {
 		public String output = "12\n";
 	}
 
+	/** Test for https://github.com/antlr/antlr4/issues/1295 in addition to #433. */
+	public static class MultipleAlternativesWithCommonLabel_5 extends MultipleAlternativesWithCommonLabel {
+		public String input = "(99)+3";
+		public String output = "102\n";
+	}
+
 	/**
 	 * This is a regression test for antlr/antlr4#509 "Incorrect rule chosen in
 	 * unambiguous grammar".

@@ -50,7 +50,7 @@ public class Array2DHashSet<T> implements Set<T> {
 	/** How many elements in set */
 	protected int n = 0;
 
-	protected int threshold = (int)(INITAL_CAPACITY * LOAD_FACTOR); // when to expand
+	protected int threshold = (int)Math.floor(INITAL_CAPACITY * LOAD_FACTOR); // when to expand
 
 	protected int currentPrime = 1; // jump by 4 primes each expand or whatever
 	protected int initialBucketCapacity = INITAL_BUCKET_CAPACITY;
@@ -407,6 +407,7 @@ public class Array2DHashSet<T> implements Set<T> {
 	public void clear() {
 		buckets = createBuckets(INITAL_CAPACITY);
 		n = 0;
+		threshold = (int)Math.floor(INITAL_CAPACITY * LOAD_FACTOR);
 	}
 
 	@Override
