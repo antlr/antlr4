@@ -95,7 +95,13 @@ public class Antlr4Mojo extends AbstractMojo {
 	 * specify grammar file encoding; e.g., euc-jp
 	 */
 	@Parameter(property = "project.build.sourceEncoding")
-	protected String encoding;
+	protected String inputEncoding;
+
+	/**
+	 * specify output file encoding; defaults to source encoding
+	 */
+	@Parameter(property = "project.build.sourceEncoding")
+	protected String outputEncoding;
 
 	/**
 	 * Generate parse tree listener interface and base class.
@@ -310,9 +316,9 @@ public class Antlr4Mojo extends AbstractMojo {
 			args.add("-atn");
 		}
 
-		if (encoding != null && !encoding.isEmpty()) {
+		if ( inputEncoding!= null && !inputEncoding.isEmpty()) {
 			args.add("-encoding");
-			args.add(encoding);
+			args.add(inputEncoding);
 		}
 
 		if (listener) {
@@ -515,7 +521,7 @@ public class Antlr4Mojo extends AbstractMojo {
 			URI relativePath = project.getBasedir().toURI().relativize(outputFile.toURI());
 			getLog().debug("  Writing file: " + relativePath);
 			OutputStream outputStream = buildContext.newFileOutputStream(outputFile);
-			return new BufferedWriter(new OutputStreamWriter(outputStream));
+			return new BufferedWriter(new OutputStreamWriter(outputStream, outputEncoding));
 		}
 	}
 }
