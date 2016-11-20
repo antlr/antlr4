@@ -59,6 +59,7 @@ import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.net.URI;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -233,6 +234,8 @@ public class Antlr4Mojo extends AbstractMojo {
     public void execute() throws MojoExecutionException, MojoFailureException {
 
         Log log = getLog();
+
+		outputEncoding = validateEncoding(outputEncoding);
 
         if (log.isDebugEnabled()) {
             for (String e : excludes) {
@@ -554,5 +557,14 @@ public class Antlr4Mojo extends AbstractMojo {
 			OutputStream outputStream = buildContext.newFileOutputStream(outputFile);
 			return new BufferedWriter(new OutputStreamWriter(outputStream, outputEncoding));
 		}
+	}
+
+	/**
+	 * Validates the given encoding.
+	 *
+	 * @return  the validated encoding. If {@code null} was provided, returns the platform default encoding.
+	 */
+	private String validateEncoding(String encoding) {
+		return (encoding == null) ? Charset.defaultCharset().name() : Charset.forName(encoding.trim()).name();
 	}
 }
