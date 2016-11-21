@@ -582,6 +582,7 @@ public class BaseCppTest implements RuntimeTestSupport {
 	}
 
 	private String runProcess(ProcessBuilder builder, String description) throws Exception {
+//		System.out.println("BUILDER: "+builder.command());
 		Process process = builder.start();
 		StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
 		StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
@@ -593,6 +594,7 @@ public class BaseCppTest implements RuntimeTestSupport {
 		String output = stdoutVacuum.toString();
 		if ( stderrVacuum.toString().length()>0 ) {
 			this.stderrDuringParse = stderrVacuum.toString();
+//			System.err.println(this.stderrDuringParse);
 		}
 		if (errcode != 0) {
 			String err = "execution failed with error code: "+errcode;
@@ -620,7 +622,7 @@ public class BaseCppTest implements RuntimeTestSupport {
 		System.out.println("Building ANTLR4 C++ runtime (if necessary) at "+ runtimePath);
 
 		try {
-			String command[] = { "cmake", ".", "-DCMAKE_BUILD_TYPE=release" };
+			String command[] = { "cmake", ".", /*"-DCMAKE_CXX_COMPILER=clang++",*/ "-DCMAKE_BUILD_TYPE=release" };
 			if (runCommand(command, runtimePath, "antlr runtime cmake") == null)
 				return false;
 		}
@@ -688,11 +690,13 @@ public class BaseCppTest implements RuntimeTestSupport {
 				return null;
 		}
 		catch (Exception e) {
-			System.err.println("can't exec module: " + fileName);
+			System.err.println("can't create link to " + runtimePath + "/dist/libantlr4-runtime." + libExtension);
+			e.printStackTrace(System.err);
+			return null;
 		}
 
 		try {
-			List<String> command2 = new ArrayList<String>(Arrays.asList("clang++", "-std=c++11", "-I", includePath, "-L.", "-lantlr4-runtime"));
+			List<String> command2 = new ArrayList<String>(Arrays.asList("clang++", "-std=c++11", "-I", includePath, "-L.", "-lantlr4-runtime", "-o", "a.out"));
 			command2.addAll(allCppFiles(tmpdir));
 			if (runCommand(command2.toArray(new String[0]), tmpdir, "building test binary") == null) {
 				return null;
@@ -700,6 +704,7 @@ public class BaseCppTest implements RuntimeTestSupport {
 		}
 		catch (Exception e) {
 			System.err.println("can't compile test module: " + e.getMessage());
+			e.printStackTrace(System.err);
 			return null;
 		}
 
@@ -709,7 +714,7 @@ public class BaseCppTest implements RuntimeTestSupport {
 			ProcessBuilder builder = new ProcessBuilder(binPath, inputPath);
 			builder.directory(new File(tmpdir));
 			Map<String, String> env = builder.environment();
-			env.put("LD_PRELOAD", runtimePath + "/dist/libantlr4-runtime.so"); // For linux.
+			env.put("LD_PRELOAD", runtimePath + "/dist/libantlr4-runtime." + libExtension);
 			String output = runProcess(builder, "running test binary");
 			if ( output.length()==0 ) {
 				output = null;
@@ -723,7 +728,8 @@ public class BaseCppTest implements RuntimeTestSupport {
 			return output;
 		}
 		catch (Exception e) {
-			System.err.println("can't exec module: " + fileName + "\nerror is: "+ e.getMessage());
+			System.err.println("can't exec module: " + fileName);
+			e.printStackTrace(System.err);
 		}
 
 		return null;
