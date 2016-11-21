@@ -1,7 +1,7 @@
 version: '4.6-SNAPSHOT+AppVeyor.{build}'
 os: Windows Server 2012
 build_script:
-  - mvn compile -q --batch-mode 
+  - mvn -DskipTests install -q --batch-mode 
 test_script:
   - mvn install -q -Dantlr-python2-python="C:\Python27\python.exe" -Dantlr-python3-python="C:\Python35\python.exe" -Dantlr-javascript-nodejs="C:\Program Files (x86)\nodejs\node.exe" --batch-mode
 build:
