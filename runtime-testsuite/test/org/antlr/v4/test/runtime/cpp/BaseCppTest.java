@@ -622,7 +622,7 @@ public class BaseCppTest implements RuntimeTestSupport {
 		System.out.println("Building ANTLR4 C++ runtime (if necessary) at "+ runtimePath);
 
 		try {
-			String command[] = { "cmake", ".", "-DCMAKE_CXX_COMPILER=clang++", "-DCMAKE_BUILD_TYPE=release" };
+			String command[] = { "cmake", ".", /*"-DCMAKE_CXX_COMPILER=clang++",*/ "-DCMAKE_BUILD_TYPE=release" };
 			if (runCommand(command, runtimePath, "antlr runtime cmake") == null)
 				return false;
 		}
