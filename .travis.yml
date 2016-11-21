@@ -1,30 +1,26 @@
 sudo: true
 
-language: java
-
-matrix:
-  include:
-  - os: linux
-    jdk: oraclejdk8
-  - os: osx
-    osx_image: xcode8
-
-script:
-  - mvn -Dparallel=methods -DthreadCount=4 install
-
-jdk:
-  - oraclejdk7
-  - oraclejdk8
-
-before_install:
-  - if [[ $TRAVIS_OS_NAME == osx ]]; then ./travis/before_install-macos.sh; fi
-  - if [[ $TRAVIS_OS_NAME == linux ]]; then ./travis/before_install-linux.sh; fi
-
 env:
   - CXX=g++-5
 
-compiler:
-  - clang
+matrix:
+  include:
+    - os: linux
+      compiler: clang
+      language: java
+      jdk: oraclejdk7
+    - os: osx
+      compiler: clang
+      language: java
+      osx_image: xcode8.1
+
+script:
+  - if [[ $TRAVIS_OS_NAME == osx ]]; then cd runtime-testsuite; ../.travis/run-tests-macos.sh; fi
+  - if [[ $TRAVIS_OS_NAME == linux ]]; then cd runtime-testsuite; ../.travis/run-tests-linux.sh; fi
+
+before_install:
+  - if [[ $TRAVIS_OS_NAME == osx ]]; then ./.travis/before-install-macos.sh; fi
+  - if [[ $TRAVIS_OS_NAME == linux ]]; then ./.travis/before-install-linux.sh; fi
 
 addons:
   apt:

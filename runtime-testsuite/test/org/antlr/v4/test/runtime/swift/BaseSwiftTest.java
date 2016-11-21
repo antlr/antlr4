@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static org.antlr.v4.test.runtime.java.BaseJavaTest.antlrLock;
 import static org.junit.Assert.assertTrue;
 
 public class BaseSwiftTest implements RuntimeTestSupport {
@@ -77,10 +78,9 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 			//compile Antlr4  module
 			buildAntlr4Framework();
 			String argsString;
-		} catch (IOException e) {
-			System.out.println(e.getMessage());
-		} catch (Exception e) {
-			e.printStackTrace();
+		}
+		catch (Exception e) {
+			e.printStackTrace(System.err);
 		}
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			public void run() {
@@ -138,8 +138,10 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 					buf.append('\n');
 					line = in.readLine();
 				}
-			} catch (IOException ioe) {
+			}
+			catch (IOException ioe) {
 				System.err.println("can't read output from process");
+				ioe.printStackTrace(System.err);
 			}
 		}
 
@@ -230,9 +232,6 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 
 		compile();
 		String output = execTest();
-		if (stderrDuringParse != null && stderrDuringParse.length() > 0) {
-			System.err.println(stderrDuringParse);
-		}
 		return output;
 	}
 
@@ -257,10 +256,10 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 			}
 			if (stderrVacuum.toString().length() > 0) {
 				this.stderrDuringParse = stderrVacuum.toString();
-				System.err.println("execTest stderrVacuum: " + stderrVacuum);
 			}
 			return output;
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			System.err.println("can't exec recognizer");
 			e.printStackTrace(System.err);
 		}
@@ -293,7 +292,7 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 
 	private static boolean runProcess(String argsString, String execPath) throws IOException, InterruptedException {
 		String[] args = argsString.split(" ");
-		System.err.println("Starting build " + argsString);//Utils.join(args, " "))
+//		System.err.println("Starting build " + argsString);//Utils.join(args, " "))
 		Process process = Runtime.getRuntime().exec(args, null, new File(execPath));
 		StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
 		StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
@@ -519,18 +518,18 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 	}
 
 	protected ErrorQueue antlr(String grammarFileName, boolean defaultListener, String... extraOptions) {
-		final List<String> options = new ArrayList<>();
+		final List<String> options = new ArrayList<String>();
 		Collections.addAll(options, extraOptions);
 		options.add("-Dlanguage=Swift");
-		if (!options.contains("-o")) {
+		if ( !options.contains("-o") ) {
 			options.add("-o");
 			options.add(tmpdir);
 		}
-		if (!options.contains("-lib")) {
+		if ( !options.contains("-lib") ) {
 			options.add("-lib");
 			options.add(tmpdir);
 		}
-		if (!options.contains("-encoding")) {
+		if ( !options.contains("-encoding") ) {
 			options.add("-encoding");
 			options.add("UTF-8");
 		}
@@ -541,26 +540,28 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 		Tool antlr = newTool(optionsA);
 		ErrorQueue equeue = new ErrorQueue(antlr);
 		antlr.addListener(equeue);
-		if (defaultListener) {
+		if ( defaultListener ) {
 			antlr.addListener(new DefaultToolListener(antlr));
 		}
-		antlr.processGrammarsOnCommandLine();
+		synchronized (antlrLock) {
+			antlr.processGrammarsOnCommandLine();
+		}
 
-		if (!defaultListener && !equeue.errors.isEmpty()) {
-			for (int i = 0; i < equeue.errors.size(); i++) {
+		if ( !defaultListener && !equeue.errors.isEmpty() ) {
+			for (int i = 0; i<equeue.errors.size(); i++) {
 				ANTLRMessage msg = equeue.errors.get(i);
-				System.err.println(msg);
+				antlrToolErrors.append(msg.toString());
 			}
 			try {
-				System.out.println(new String(Utils.readFile(tmpdir + "/" + grammarFileName)));
+				antlrToolErrors.append(new String(Utils.readFile(tmpdir+"/"+grammarFileName)));
 			} catch (IOException ioe) {
-				System.err.println(ioe.toString());
+				antlrToolErrors.append(ioe.toString());
 			}
 		}
-		if (!defaultListener && !equeue.warnings.isEmpty()) {
-			for (int i = 0; i < equeue.warnings.size(); i++) {
+		if ( !defaultListener && !equeue.warnings.isEmpty() ) {
+			for (int i = 0; i<equeue.warnings.size(); i++) {
 				ANTLRMessage msg = equeue.warnings.get(i);
-				System.err.println(msg);
+				// antlrToolErrors.append(msg); warnings are hushed
 			}
 		}
 
@@ -568,7 +569,6 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 	}
 
 	protected ErrorQueue antlr(String grammarFileName, String grammarStr, boolean defaultListener, String... extraOptions) {
-		System.out.println("dir " + tmpdir);
 		mkdir(tmpdir);
 		writeFile(tmpdir, grammarFileName, grammarStr);
 		return antlr(grammarFileName, defaultListener, extraOptions);
