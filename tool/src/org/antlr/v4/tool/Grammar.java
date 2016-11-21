@@ -392,6 +392,8 @@ public class Grammar implements AttributeResolver {
 		if ( ast==null ) return;
         GrammarAST i = (GrammarAST)ast.getFirstChildWithType(ANTLRParser.IMPORT);
         if ( i==null ) return;
+	    Set<String> visited = new HashSet<>();
+	    visited.add(this.name);
         importedGrammars = new ArrayList<Grammar>();
         for (Object c : i.getChildren()) {
             GrammarAST t = (GrammarAST)c;
@@ -402,6 +404,9 @@ public class Grammar implements AttributeResolver {
             }
             else if ( t.getType()==ANTLRParser.ID ) {
                 importedGrammarName = t.getText();
+			}
+			if ( visited.contains(importedGrammarName) ) { // ignore circular refs
+				continue;
 			}
 			Grammar g;
 			try {
