@@ -7,6 +7,8 @@ Most programmers do not need the information on this page because they will simp
 
 I will assume that the root directory is `/tmp` for the purposes of explaining how to build ANTLR in this document.
 
+*As of 4.6, ANTLR tool and Java-target runtime requires Java 7.*
+
 # Get the source
 
 The first step is to get the Java source code from the ANTLR 4 repository at github. You can download the repository from github, but the easiest thing to do is simply clone the repository on your local disk:
@@ -58,14 +60,25 @@ $ mvn compile
 [INFO] ------------------------------------------------------------------------
 ```
 
-# Testing tool and targets
+# Installing libs to mvn cache locally
 
-In order to perform the tests on all target languages, make sure that you have `mono` and `nodejs` installed. For example, on OS X:
+To skip the tests (which require all the target languages be installed) and **install into local repository** `~/.m2/repository/org/antlr`, do this:
 
 ```bash
-$ brew install mono
-$ brew install node
+$ mvn install -DskipTests=true   # make sure all artifacts are visible on this machine
 ```
+
+# Testing tool and targets
+
+In order to perform the tests on all target languages, you need to have the following languages installed:
+
+* `mono` (e.g., `brew install mono`)
+* `nodejs`
+* Python 2.7
+* Python 3.5
+* Go
+* Swift 3 (via XCode 8.x) tested currently only osx
+* clang (for C++ target)
 
 To run the tests and **install into local repository** `~/.m2/repository/org/antlr`, do this:
 
