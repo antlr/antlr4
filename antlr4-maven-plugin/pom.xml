@@ -48,6 +48,11 @@
   <!-- Ancilliary information for completeness -->
   <inceptionYear>2009</inceptionYear>
 
+  <properties>
+    <mavenVersion>3.3.9</mavenVersion>
+    <takariLifecycleVersion>1.11.12</takariLifecycleVersion>
+  </properties>
+
   <!-- ============================================================================= -->
 
   <!-- What are we depedent on for the Mojos to execute? We need the plugin
@@ -62,11 +67,6 @@
       <artifactId>maven-plugin-api</artifactId>
       <version>3.0.5</version>
       <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-project</artifactId>
-      <version>2.2.1</version>
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
@@ -94,20 +94,49 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.apache.maven.shared</groupId>
-      <artifactId>maven-plugin-testing-harness</artifactId>
-      <version>1.1</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>org.apache.maven.plugin-tools</groupId>
       <artifactId>maven-plugin-annotations</artifactId>
       <version>3.2</version>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>io.takari.maven.plugins</groupId>
+        <artifactId>takari-plugin-testing</artifactId>
+        <version>2.9.0</version>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-core</artifactId>
+        <version>${mavenVersion}</version>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-compat</artifactId>
+        <version>${mavenVersion}</version>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-utils</artifactId>
+        <version>3.0.15</version>
+        <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-project</artifactId>
+      <version>2.2.1</version>
+    </dependency>
   </dependencies>
 
   <build>
+    <testSourceDirectory>src/test</testSourceDirectory>
+    <testResources>
+      <testResource>
+        <directory>src/test/resources</directory>
+      </testResource>
+    </testResources>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -132,6 +161,21 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+         <groupId>io.takari.maven.plugins</groupId>
+         <artifactId>takari-lifecycle-plugin</artifactId>
+         <version>${takariLifecycleVersion}</version>
+         <extensions>true</extensions>
+         <executions>
+           <execution>
+             <id>testProperties</id>
+             <phase>process-test-resources</phase>
+             <goals>
+               <goal>testProperties</goal>
+             </goals>
+           </execution>
+         </executions>
+       </plugin>
     </plugins>
   </build>
 

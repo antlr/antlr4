@@ -116,3 +116,4 @@ YYYY/MM/DD, github id, Full name, email
 2016/04/13, renatahodovan, Renata Hodovan, reni@inf.u-szeged.hu
 2016/11/05, ewanmellor, Ewan Mellor, github@ewanmellor.org
 2016/11/06, janyou, Janyou, janyou.antlr@outlook.com
+2016/11/20, marcohu, Marco Hunsicker, antlr@hunsicker.de
