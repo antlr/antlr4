@@ -594,7 +594,7 @@ public class BaseCppTest implements RuntimeTestSupport {
 		String output = stdoutVacuum.toString();
 		if ( stderrVacuum.toString().length()>0 ) {
 			this.stderrDuringParse = stderrVacuum.toString();
-			System.err.println(this.stderrDuringParse);
+//			System.err.println(this.stderrDuringParse);
 		}
 		if (errcode != 0) {
 			String err = "execution failed with error code: "+errcode;
