@@ -38,27 +38,29 @@ Receiving objects: 100% (59858/59858), 31.10 MiB | 819.00 KiB/s, done.
 Resolving deltas: 100% (31898/31898), done.
 Checking connectivity... done.
 $ cd antlr4
-$ mvn compile
-..
+$ mvn -DskipTests install
+...
 [INFO] ------------------------------------------------------------------------
 [INFO] Reactor Summary:
 [INFO] 
-[INFO] ANTLR 4 ............................................ SUCCESS [  0.432 s]
-[INFO] ANTLR 4 Runtime .................................... SUCCESS [  4.334 s]
-[INFO] ANTLR 4 Tool ....................................... SUCCESS [  1.686 s]
-[INFO] ANTLR 4 Maven plugin ............................... SUCCESS [  1.654 s]
-[INFO] ANTLR 4 Runtime Test Annotations ................... SUCCESS [  0.096 s]
-[INFO] ANTLR 4 Runtime Test Processors .................... SUCCESS [  0.025 s]
-[INFO] ANTLR 4 Runtime Tests (2nd generation) ............. SUCCESS [  1.932 s]
-[INFO] ANTLR 4 Tool Tests ................................. SUCCESS [  0.018 s]
+[INFO] ANTLR 4 ............................................ SUCCESS [  0.287 s]
+[INFO] ANTLR 4 Runtime .................................... SUCCESS [  4.915 s]
+[INFO] ANTLR 4 Tool ....................................... SUCCESS [  1.315 s]
+[INFO] ANTLR 4 Maven plugin ............................... SUCCESS [  2.393 s]
+[INFO] ANTLR 4 Runtime Test Annotations ................... SUCCESS [  0.078 s]
+[INFO] ANTLR 4 Runtime Test Processors .................... SUCCESS [  0.019 s]
+[INFO] ANTLR 4 Runtime Tests (2nd generation) ............. SUCCESS [  1.986 s]
+[INFO] ANTLR 4 Tool Tests ................................. SUCCESS [  0.513 s]
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time: 10.324 s
-[INFO] Finished at: 2016-11-16T13:49:38-08:00
-[INFO] Final Memory: 42M/488M
+[INFO] Total time: 12.005 s
+[INFO] Finished at: 2016-11-21T11:42:42-08:00
+[INFO] Final Memory: 52M/434M
 [INFO] ------------------------------------------------------------------------
 ```
+
+We do `install` not `compile` as tool tests and such refer to modules that must be pulled from the maven install local cache.
 
 # Installing libs to mvn cache locally
 
