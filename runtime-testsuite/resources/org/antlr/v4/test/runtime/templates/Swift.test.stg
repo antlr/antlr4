@@ -1,0 +1,309 @@
+writeln(s) ::= <<print(<s>)>>
+
+write(s) ::= <<print(<s>, terminator: "")>>
+
+False() ::= "false"
+
+True() ::= "true"
+
+Not(v) ::= "!<v>"
+
+Assert(s) ::= ""
+
+Cast(t,v) ::= "((<v> as! <t>))"
+
+Append(a,b) ::= "<a> + <b>"
+
+Concat(a,b) ::= "<a><b>"
+
+DeclareLocal(s,v) ::= "var <s> = <v>"
+
+AssertIsList(v) ::= "var __ttt__ = <v>;" // just use static type system
+
+AssignLocal(s,v) ::= "<s> = <v>"
+
+InitIntMember(n,v) ::= <%var <n> = <v>%>
+
+InitBooleanMember(n,v) ::= <%var <n> = <v>%>
+
+GetMember(n) ::= <%self.<n>%>
+
+SetMember(n,v) ::= <%self.<n> = <v>%>
+
+AddMember(n,v) ::= <%self.<n> += <v>%>
+
+PlusMember(v,n) ::= <%<v> + self.<n>%>
+
+MemberEquals(n,v) ::= <%self.<n> == <v>%>
+
+ModMemberEquals(n,m,v) ::= <%self.<n> % <m> == <v>%>
+
+ModMemberNotEquals(n,m,v) ::= <%self.<n> % <m> != <v>%>
+
+DumpDFA() ::= "self.dumpDFA()"
+
+Pass() ::= ""
+
+StringList() ::= "Array\<String>"
+
+BuildParseTrees() ::= "setBuildParseTree(true)"
+
+BailErrorStrategy() ::= <%setErrorHandler(BailErrorStrategy())%>
+
+ToStringTree(s) ::= <%<s>.toStringTree(self)%>
+
+Column() ::= "self.getCharPositionInLine()"
+
+Text() ::= "self.getText()"
+
+ValEquals(a,b) ::= <%<a>==<b>%>
+
+TextEquals(a) ::= <%self.getText() == "<a>"%>
+
+PlusText(a) ::= <%"<a>" + self.getText()%>
+
+InputText() ::= "try self._input.getText()"
+
+LTEquals(i, v) ::= <%try self._input.LT(<i>)?.getText() == <v>%>
+
+LANotEquals(i, v) ::= <%try self._input.LA(<i>) != <v>%>
+
+TokenStartColumnEquals(i) ::= <%self._tokenStartCharPositionInLine == <i>%>
+
+ImportListener(X) ::= ""
+
+GetExpectedTokenNames() ::= "try self.getExpectedTokens().toString(self.tokenNames)"
+
+RuleInvocationStack() ::= "getRuleInvocationStack().description.replacingOccurrences(of: \"\\\"\", with: \"\")"
+
+LL_EXACT_AMBIG_DETECTION() ::= <<_interp.setPredictionMode(PredictionMode.LL_EXACT_AMBIG_DETECTION);>>
+
+ParserToken(parser, token) ::= <%<parser>.Tokens.<token>.rawValue%>
+
+Production(p) ::= <%<p>%>
+
+Result(r) ::= <%<r>%>
+
+ParserPropertyMember() ::= <<
+@members {
+func Property() -> Bool {
+  return true
+}
+}
+>>
+
+ParserPropertyCall(parser, property) ::= <<
+<parser>.<property>
+>>
+
+PositionAdjustingLexer() ::= <<
+
+override
+open func nextToken() throws -> Token {
+	if (!(_interp is PositionAdjustingLexerATNSimulator)) {
+		_interp = PositionAdjustingLexerATNSimulator(self, PositionAdjustingLexer._ATN, PositionAdjustingLexer._decisionToDFA, PositionAdjustingLexer._sharedContextCache)
+	}
+
+	return try super.nextToken()
+}
+
+override
+open func emit() -> Token  {
+	switch (_type) {
+	case PositionAdjustingLexer.TOKENS:
+		handleAcceptPositionForKeyword("tokens")
+	case PositionAdjustingLexer.LABEL:
+		handleAcceptPositionForIdentifier()
+	default:
+		break
+	}
+	return super.emit()
+}
+
+private func handleAcceptPositionForIdentifier() -> Bool {
+	let tokenText = getText()
+	var identifierLength = 0
+	while ((identifierLength \< tokenText.length)  &&  isIdentifierChar(tokenText[tokenText.characters.index(tokenText.startIndex, offsetBy: identifierLength)])) {
+		identifierLength += 1
+	}
+
+	if (getInputStream()!.index() > _tokenStartCharIndex + identifierLength) {
+		let offset = identifierLength - 1
+		(getInterpreter() as! PositionAdjustingLexerATNSimulator).resetAcceptPosition(getInputStream()!, _tokenStartCharIndex + offset, _tokenStartLine, _tokenStartCharPositionInLine + offset)
+		return true
+	}
+
+	return false
+}
+
+private func handleAcceptPositionForKeyword(_ keyword:String) -> Bool  {
+	if  getInputStream()!.index() > _tokenStartCharIndex + keyword.length   {
+		let offset = keyword.length  - 1
+		(getInterpreter() as! PositionAdjustingLexerATNSimulator).resetAcceptPosition(getInputStream()!, _tokenStartCharIndex + offset, _tokenStartLine, _tokenStartCharPositionInLine + offset)
+		return true
+	}
+
+	return false
+}
+
+
+//public func getInterpreter() -> PositionAdjustingLexerATNSimulator {
+//	return super.getInterpreter() as! PositionAdjustingLexerATNSimulator
+//}
+
+private  func isIdentifierChar(_ c: Character) -> Bool  {
+	return (c >= "0" && c \<= "9") || (c >= "a" && c \<= "z") || c >= "A" && c \<= "Z" || c == "_"
+}
+
+class PositionAdjustingLexerATNSimulator: LexerATNSimulator {
+
+	  init(_ recog: Lexer,_ atn: ATN,
+				 _ decisionToDFA: [DFA],
+				 _ sharedContextCache:PredictionContextCache)
+	{
+		super.init(recog, atn, decisionToDFA, sharedContextCache)
+	}
+
+   func resetAcceptPosition(_ input: CharStream,_ index: Int,_ line: Int,_ charPositionInLine: Int) {
+		try! input.seek(index)
+		self.line = line
+		self.charPositionInLine = charPositionInLine
+		try! consume(input)
+	}
+
+}
+
+>>
+
+BasicListener(X) ::= <<
+@parser::members {
+open class LeafListener: TBaseListener {
+    override
+	open func visitTerminal(_ node: TerminalNode) {
+		print(node.getSymbol()?.getText() ?? "")
+	}
+}
+}
+>>
+
+WalkListener(s) ::= <<
+let walker =  ParseTreeWalker()
+try! walker.walk(LeafListener(), <s>)
+>>
+
+
+TreeNodeWithAltNumField(X) ::= <<
+@parser::members {
+open class MyRuleNode: ParserRuleContext {
+	public var altNum: Int = 0
+    override
+	public init(_ parent: ParserRuleContext?, _ invokingStateNumber: Int) {
+        super.init(parent, invokingStateNumber)
+    }
+    override
+	open func getAltNumber() -> Int { return altNum }
+
+	override
+	open func setAltNumber(_ altNum: Int) { self.altNum = altNum }
+}
+}
+>>
+
+TokenGetterListener(X) ::= <<
+@parser::members {
+open class LeafListener: TBaseListener {
+    override
+	open func exitA(_ ctx: TParser.AContext) {
+		if (ctx.getChildCount() == 2) {
+			print("\(ctx.INT(0)?.getSymbol()?.getText() ?? "") \(ctx.INT(1)?.getSymbol()?.getText() ?? "") \(ctx.INT())")
+		}
+		else {
+			print(ctx.ID()?.getSymbol() ?? "")
+		}
+	}
+}
+}
+>>
+
+RuleGetterListener(X) ::= <<
+@parser::members {
+open class LeafListener: TBaseListener {
+    override
+	open func exitA(_ ctx: TParser.AContext) {
+		if (ctx.getChildCount() == 2) {
+			print("\(ctx.b(0)?.start?.getText() ?? "") \(ctx.b(1)?.start?.getText() ?? "") \(ctx.b()[0].start?.getText() ?? "")")
+		} else {
+			print(ctx.b(0)?.start?.getText() ?? "")
+		}
+	}
+}
+}
+>>
+
+
+LRListener(X) ::= <<
+@parser::members {
+open class LeafListener: TBaseListener {
+    override
+	open func exitE(_ ctx: TParser.EContext) {
+		if (ctx.getChildCount() == 3) {
+		    print("\(ctx.e(0)?.start?.getText() ?? "") \(ctx.e(1)?.start?.getText() ?? "") \(ctx.e()[0].start?.getText() ?? "")")
+		} else {
+			print(ctx.INT()?.getSymbol()?.getText() ?? "")
+	   }
+	}
+}
+}
+>>
+
+LRWithLabelsListener(X) ::= <<
+@parser::members {
+open class LeafListener: TBaseListener {
+    override
+	open func exitCall(_ ctx: TParser.CallContext) {
+		print("\(ctx.e()?.start?.getText() ?? "") \(ctx.eList()!)")
+	}
+	override
+	open func exitInt(_ ctx: TParser.IntContext) {
+		print(ctx.INT()?.getSymbol()?.getText() ?? "")
+	}
+}
+}
+>>
+
+ImportVisitor(X) ::= ""
+BasicVisitor(X) ::= ""
+WalkVisitor(s) ::= ""
+LRWithLabelsVisitor(X) ::= ""
+RuleGetterVisitor(X) ::= ""
+LRVisitor(x) ::= ""
+TokenGetterVisitor(x) ::= ""
+
+DeclareContextListGettersFunction() ::= <<
+func foo() {
+	//let s: SContext? = nil
+	//let a: [AContext]? = s?.a()
+	//let b: [BContext]? = s?.b()
+}
+>>
+
+Declare_foo() ::= <<
+	public func foo() {print("foo")}
+>>
+
+Invoke_foo() ::= "foo()"
+
+Declare_pred() ::= <<
+func pred(_ v: Bool) -> Bool {
+	print("eval=\(v)")
+	return v
+}
+>>
+
+StringType() ::= "String"
+
+Invoke_pred(v) ::= <<self.pred(<v>)>>
+
+ContextRuleFunction(ctx, rule) ::= "<ctx>.<rule>"
+
+ContextMember(ctx, subctx, member) ::= "<ctx>.<subctx>!.<member>"
