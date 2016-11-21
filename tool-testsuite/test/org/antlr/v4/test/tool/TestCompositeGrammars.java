@@ -69,7 +69,19 @@ public class TestCompositeGrammars extends BaseJavaTest {
 			"WS : (' '|'\\n') -> skip ;\n" ;
 		writeFile(tmpdir, "M.g4", master);
 		ErrorQueue equeue = antlr("M.g4", false, "-lib", subdir);
-		assertEquals(equeue.size(), 0);
+		assertEquals(0, equeue.size());
+	}
+
+	// Test for https://github.com/antlr/antlr4/issues/1317
+	@Test public void testImportSelfLoop() throws Exception {
+		mkdir(tmpdir);
+		String master =
+			"grammar M;\n" +
+			"import M;\n" +
+			"s : 'a' ;\n";
+		writeFile(tmpdir, "M.g4", master);
+		ErrorQueue equeue = antlr("M.g4", false, "-lib", tmpdir);
+		assertEquals(0, equeue.size());
 	}
 
 	@Test public void testDelegatesSeeSameTokenType() throws Exception {
