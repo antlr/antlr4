@@ -316,8 +316,9 @@ public class Antlr4Mojo extends AbstractMojo {
 			args.add("-atn");
 		}
 
-		if ( inputEncoding!= null && !inputEncoding.isEmpty()) {
+		if ( inputEncoding!=null && !inputEncoding.isEmpty()) {
 			args.add("-encoding");
+			outputEncoding = inputEncoding;
 			args.add(inputEncoding);
 		}
 
@@ -521,7 +522,12 @@ public class Antlr4Mojo extends AbstractMojo {
 			URI relativePath = project.getBasedir().toURI().relativize(outputFile.toURI());
 			getLog().debug("  Writing file: " + relativePath);
 			OutputStream outputStream = buildContext.newFileOutputStream(outputFile);
-			return new BufferedWriter(new OutputStreamWriter(outputStream, outputEncoding));
+			if ( outputEncoding!=null && !outputEncoding.isEmpty()) {
+				return new BufferedWriter(new OutputStreamWriter(outputStream, outputEncoding));
+			}
+			else {
+				return new BufferedWriter(new OutputStreamWriter(outputStream));
+			}
 		}
 	}
 }
