@@ -1,10 +1,4 @@
 #!/bin/bash
 
-mvn -Dtest=java.* test
-mvn -Dtest=csharp.* test
-mvn -Dtest=python2.* test
-mvn -Dtest=python3.* test
-mvn -Dtest=node.* test
-mvn -Dtest=go.* test
-#mvn -Dtest=cpp.* test
+# only test swift as we develop on os x so likely well tested and its dog slow on travis
 mvn -Dtest=swift.* test
