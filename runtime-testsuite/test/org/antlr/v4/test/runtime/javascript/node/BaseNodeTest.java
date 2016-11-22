@@ -274,6 +274,10 @@ public class BaseNodeTest implements RuntimeTestSupport {
 		options.add(tmpdir);
 		options.add("-lib");
 		options.add(tmpdir);
+		if ( !options.contains("-encoding") ) {
+			options.add("-encoding");
+			options.add("UTF-8");
+		}
 		options.add(new File(tmpdir, grammarFileName).toString());
 
 		final String[] optionsA = new String[options.size()];

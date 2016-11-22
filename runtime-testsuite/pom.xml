@@ -81,7 +81,7 @@
         <directory>../runtime</directory>
       </resource>
     </resources>
-    <plugins> 
+    <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
@@ -97,7 +97,7 @@
             <include>${antlr.tests.swift}</include>
           </includes>
         </configuration>
-      </plugin>    
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
@@ -109,10 +109,10 @@
             </goals>
           </execution>
         </executions>
-      </plugin>      
+      </plugin>
     </plugins>
   </build>
-  
+
   <profiles>
     <profile>
       <id>includeSwiftTests</id>
@@ -153,7 +153,7 @@
                 </configuration>
               </execution>
             </executions>
-          </plugin>        
+          </plugin>
         </plugins>
       </build>
     </profile>
@@ -169,9 +169,9 @@
                 <include>**/Test*.java</include>
               </includes>
             </configuration>
-          </plugin>            
+          </plugin>
         </plugins>
       </build>
-    </profile>      
-  </profiles>  
+    </profile>
+  </profiles>
 </project>
