@@ -338,6 +338,10 @@ public class BaseGoTest implements RuntimeTestSupport {
 		options.add(tmpdir.getPath());
 		options.add("-lib");
 		options.add(tmpdir.getPath());
+		if ( !options.contains("-encoding") ) {
+			options.add("-encoding");
+			options.add("UTF-8");
+		}
 		options.add(new File(tmpdir, grammarFileName).getPath());
 
 		final String[] optionsA = new String[options.size()];
