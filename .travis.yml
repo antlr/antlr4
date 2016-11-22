@@ -1,8 +1,5 @@
 sudo: true
 
-env:
-  - CXX=g++-5
-
 matrix:
   include:
     - os: linux

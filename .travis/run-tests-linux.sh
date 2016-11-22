@@ -1,10 +1,10 @@
 #!/bin/bash
 
-mvn -Dtest=java.* test
-mvn -Dtest=csharp.* test
-mvn -Dtest=python2.* test
-mvn -Dtest=python3.* test
-mvn -Dtest=node.* test
-mvn -Dtest=go.* test
-mvn -Dtest=cpp.* test
-#mvn -Dtest=swift.* test
+mvn -Dparallel=methods -DthreadCount=4 -Dtest=java.* test
+mvn -Dparallel=methods -DthreadCount=4 -Dtest=csharp.* test
+mvn -Dparallel=methods -DthreadCount=4 -Dtest=python2.* test
+mvn -Dparallel=methods -DthreadCount=4 -Dtest=python3.* test
+mvn -Dparallel=methods -DthreadCount=4 -Dtest=node.* test
+mvn -Dparallel=methods -DthreadCount=4 -Dtest=go.* test
+mvn -Dtest=cpp.* test # timeout due to no output for 10 min on travis if in parallel
+#mvn -Dparallel=methods -DthreadCount=4 -Dtest=swift.* test
