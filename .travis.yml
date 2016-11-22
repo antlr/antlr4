@@ -1,11 +1,9 @@
 sudo: true
 
-env:
-  - CXX=g++-5
-
 matrix:
   include:
     - os: linux
+      env: CXX=g++-5
       compiler: clang
       language: java
       jdk: oraclejdk7
