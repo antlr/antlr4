@@ -283,7 +283,7 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 		String fileList = sourceFiles.toString().replace("[", "").replace("]", "")
 				.replace(", ", " ");
 
-		String argsString = "xcrun -sdk macosx swiftc " + fileList + " -o " + EXEC_NAME + " -I " + ANTLR_FRAMEWORK_DIR + " -L " + ANTLR_FRAMEWORK_DIR + " -module-link-name Antlr4";
+		String argsString = "xcrun -sdk macosx swiftc " + fileList + " -o " + EXEC_NAME + " -I " + ANTLR_FRAMEWORK_DIR + " -L " + ANTLR_FRAMEWORK_DIR + " -module-link-name Antlr4 -suppress-warnings";
 		return runProcess(argsString, tmpdir);
 	}
 
