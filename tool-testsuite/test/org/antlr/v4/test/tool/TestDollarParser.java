@@ -1,13 +1,12 @@
 package org.antlr.v4.test.tool;
 
-import org.antlr.v4.test.runtime.java.BaseJavaTest;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-public class TestDollarParser extends BaseJavaTest {
+public class TestDollarParser extends BaseJavaToolTest {
 	@Before
 	@Override
 	public void testSetUp() throws Exception {

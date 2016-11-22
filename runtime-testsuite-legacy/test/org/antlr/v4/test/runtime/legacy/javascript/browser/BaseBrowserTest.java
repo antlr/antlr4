@@ -498,39 +498,6 @@ public abstract class BaseBrowserTest {
 		return file.getAbsolutePath();
 	}
 
-	public void testErrors(String[] pairs, boolean printTree) {
-        for (int i = 0; i < pairs.length; i+=2) {
-            String input = pairs[i];
-            String expect = pairs[i+1];
-
-			String[] lines = input.split("\n");
-			String fileName = getFilenameFromFirstLineOfGrammar(lines[0]);
-			ErrorQueue equeue = antlr(fileName, fileName, input, false);
-
-			String actual = equeue.toString(true);
-			actual = actual.replace(tmpdir + File.separator, "");
-			System.err.println(actual);
-			String msg = input;
-			msg = msg.replace("\n","\\n");
-			msg = msg.replace("\r","\\r");
-			msg = msg.replace("\t","\\t");
-
-            assertEquals("error in: "+msg,expect,actual);
-        }
-    }
-
-	public String getFilenameFromFirstLineOfGrammar(String line) {
-		String fileName = "A" + Tool.GRAMMAR_EXTENSION;
-		int grIndex = line.lastIndexOf("grammar");
-		int semi = line.lastIndexOf(';');
-		if ( grIndex>=0 && semi>=0 ) {
-			int space = line.indexOf(' ', grIndex);
-			fileName = line.substring(space+1, semi)+Tool.GRAMMAR_EXTENSION;
-		}
-		if ( fileName.length()==Tool.GRAMMAR_EXTENSION.length() ) fileName = "A" + Tool.GRAMMAR_EXTENSION;
-		return fileName;
-	}
-
 	List<ANTLRMessage> getMessagesOfType(List<ANTLRMessage> msgs, Class<? extends ANTLRMessage> c) {
 		List<ANTLRMessage> filtered = new ArrayList<ANTLRMessage>();
 		for (ANTLRMessage m : msgs) {

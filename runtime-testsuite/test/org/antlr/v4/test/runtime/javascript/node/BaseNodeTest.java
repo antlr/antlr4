@@ -54,13 +54,11 @@ import org.antlr.v4.runtime.atn.LexerATNSimulator;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntegerList;
 import org.antlr.v4.runtime.misc.Interval;
-import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.test.runtime.ErrorQueue;
 import org.antlr.v4.test.runtime.RuntimeTestSupport;
 import org.antlr.v4.tool.ANTLRMessage;
 import org.antlr.v4.tool.DOTGenerator;
-import org.antlr.v4.tool.DefaultToolListener;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.GrammarSemanticsMessage;
 import org.antlr.v4.tool.LexerGrammar;
@@ -89,7 +87,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import static org.antlr.v4.test.runtime.java.BaseJavaTest.antlrLock;
+import static org.antlr.v4.test.runtime.BaseRuntimeTest.antlrOnString;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -260,60 +258,6 @@ public class BaseNodeTest implements RuntimeTestSupport {
 		return tokenTypes;
 	}
 
-	/** Return true if all is ok, no errors */
-	protected ErrorQueue antlr(String fileName, String grammarFileName,
-	                           String grammarStr, boolean defaultListener, String... extraOptions) {
-		if(grammarStr!=null) {
-			mkdir(tmpdir);
-			writeFile(tmpdir, fileName, grammarStr);
-		}
-		final List<String> options = new ArrayList<String>();
-		Collections.addAll(options, extraOptions);
-		options.add("-Dlanguage=JavaScript");
-		options.add("-o");
-		options.add(tmpdir);
-		options.add("-lib");
-		options.add(tmpdir);
-		if ( !options.contains("-encoding") ) {
-			options.add("-encoding");
-			options.add("UTF-8");
-		}
-		options.add(new File(tmpdir, grammarFileName).toString());
-
-		final String[] optionsA = new String[options.size()];
-		options.toArray(optionsA);
-		Tool antlr = newTool(optionsA);
-		ErrorQueue equeue = new ErrorQueue(antlr);
-		antlr.addListener(equeue);
-		if (defaultListener) {
-			antlr.addListener(new DefaultToolListener(antlr));
-		}
-		synchronized (antlrLock) {
-			antlr.processGrammarsOnCommandLine();
-		}
-
-		if ( !defaultListener && !equeue.errors.isEmpty() ) {
-			for (int i = 0; i < equeue.errors.size(); i++) {
-				ANTLRMessage msg = equeue.errors.get(i);
-				antlrToolErrors.append(msg.toString());
-			}
-			try {
-				antlrToolErrors.append(new String(Utils.readFile(tmpdir+"/"+grammarFileName)));
-			}
-			catch (IOException ioe) {
-				antlrToolErrors.append(ioe.toString());
-			}
-		}
-		if ( !defaultListener && !equeue.warnings.isEmpty() ) {
-			for (int i = 0; i < equeue.warnings.size(); i++) {
-				ANTLRMessage msg = equeue.warnings.get(i);
-				// antlrToolErrors.append(msg); warnings are hushed
-			}
-		}
-
-		return equeue;
-	}
-
 	protected String execLexer(String grammarFileName, String grammarStr,
 	                           String lexerName, String input) {
 		return execLexer(grammarFileName, grammarStr, lexerName, input, false);
@@ -361,8 +305,8 @@ public class BaseNodeTest implements RuntimeTestSupport {
 	protected boolean rawGenerateAndBuildRecognizer(String grammarFileName,
 	                                                String grammarStr, String parserName, String lexerName,
 	                                                boolean defaultListener, String... extraOptions) {
-		ErrorQueue equeue = antlr(grammarFileName, grammarFileName, grammarStr,
-				defaultListener, extraOptions);
+		ErrorQueue equeue = antlrOnString(getTmpDir(), "JavaScript", grammarFileName, grammarStr,
+		                                  defaultListener, extraOptions);
 		if (!equeue.errors.isEmpty()) {
 			return false;
 		}
@@ -499,40 +443,6 @@ public class BaseNodeTest implements RuntimeTestSupport {
 
 	private boolean isWindows() {
 		return System.getProperty("os.name").toLowerCase().contains("windows");
-	}
-
-	public void testErrors(String[] pairs, boolean printTree) {
-		for (int i = 0; i < pairs.length; i += 2) {
-			String input = pairs[i];
-			String expect = pairs[i + 1];
-
-			String[] lines = input.split("\n");
-			String fileName = getFilenameFromFirstLineOfGrammar(lines[0]);
-			ErrorQueue equeue = antlr(fileName, fileName, input, false);
-
-			String actual = equeue.toString(true);
-			actual = actual.replace(tmpdir + File.separator, "");
-			System.err.println(actual);
-			String msg = input;
-			msg = msg.replace("\n", "\\n");
-			msg = msg.replace("\r", "\\r");
-			msg = msg.replace("\t", "\\t");
-
-			assertEquals("error in: " + msg, expect, actual);
-		}
-	}
-
-	public String getFilenameFromFirstLineOfGrammar(String line) {
-		String fileName = "A" + Tool.GRAMMAR_EXTENSION;
-		int grIndex = line.lastIndexOf("grammar");
-		int semi = line.lastIndexOf(';');
-		if (grIndex >= 0 && semi >= 0) {
-			int space = line.indexOf(' ', grIndex);
-			fileName = line.substring(space + 1, semi) + Tool.GRAMMAR_EXTENSION;
-		}
-		if (fileName.length() == Tool.GRAMMAR_EXTENSION.length())
-			fileName = "A" + Tool.GRAMMAR_EXTENSION;
-		return fileName;
 	}
 
 	// void ambig(List<Message> msgs, int[] expectedAmbigAlts, String

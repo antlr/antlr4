@@ -37,7 +37,6 @@ import org.antlr.v4.runtime.IntStream;
 import org.antlr.v4.runtime.LexerInterpreter;
 import org.antlr.v4.runtime.UnbufferedCharStream;
 import org.antlr.v4.runtime.misc.Interval;
-import org.antlr.v4.test.runtime.java.BaseJavaTest;
 import org.antlr.v4.tool.LexerGrammar;
 import org.junit.Before;
 import org.junit.Test;
@@ -48,7 +47,7 @@ import java.io.StringReader;
 import static org.junit.Assert.assertEquals;
 
 @SuppressWarnings("unused")
-public class TestUnbufferedCharStream extends BaseJavaTest {
+public class TestUnbufferedCharStream extends BaseJavaToolTest {
 	@Before
 	@Override
 	public void testSetUp() throws Exception {

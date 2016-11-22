@@ -34,7 +34,6 @@ import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNDeserializer;
 import org.antlr.v4.runtime.atn.ATNSerializer;
 import org.antlr.v4.runtime.misc.Utils;
-import org.antlr.v4.test.runtime.java.BaseJavaTest;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
 import org.junit.Before;
@@ -44,7 +43,7 @@ import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
 
-public class TestATNDeserialization extends BaseJavaTest {
+public class TestATNDeserialization extends BaseJavaToolTest {
 	@Before
 	@Override
 	public void testSetUp() throws Exception {

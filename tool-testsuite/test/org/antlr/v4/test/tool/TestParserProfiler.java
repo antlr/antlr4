@@ -36,7 +36,6 @@ import org.antlr.v4.runtime.LexerInterpreter;
 import org.antlr.v4.runtime.ParserInterpreter;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.atn.DecisionInfo;
-import org.antlr.v4.test.runtime.java.BaseJavaTest;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
 import org.antlr.v4.tool.Rule;
@@ -49,7 +48,7 @@ import java.util.Arrays;
 import static org.junit.Assert.assertEquals;
 
 @SuppressWarnings("unused")
-public class TestParserProfiler extends BaseJavaTest {
+public class TestParserProfiler extends BaseJavaToolTest {
 	LexerGrammar lg;
 
 	@Before

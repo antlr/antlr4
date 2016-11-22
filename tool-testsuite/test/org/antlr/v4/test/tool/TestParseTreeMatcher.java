@@ -12,7 +12,6 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.pattern.ParseTreeMatch;
 import org.antlr.v4.runtime.tree.pattern.ParseTreePattern;
 import org.antlr.v4.runtime.tree.pattern.ParseTreePatternMatcher;
-import org.antlr.v4.test.runtime.java.BaseJavaTest;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -25,7 +24,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-public class TestParseTreeMatcher extends BaseJavaTest {
+public class TestParseTreeMatcher extends BaseJavaToolTest {
 	@Before
 	@Override
 	public void testSetUp() throws Exception {

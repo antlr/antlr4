@@ -33,7 +33,6 @@ import org.antlr.runtime.Token;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.misc.IntervalSet;
-import org.antlr.v4.test.runtime.java.BaseJavaTest;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.junit.Before;
@@ -44,7 +43,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-public class TestTokenPositionOptions extends BaseJavaTest {
+public class TestTokenPositionOptions extends BaseJavaToolTest {
 	@Before
 	@Override
 	public void testSetUp() throws Exception {

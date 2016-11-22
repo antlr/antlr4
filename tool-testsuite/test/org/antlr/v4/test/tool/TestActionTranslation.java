@@ -30,14 +30,13 @@
 
 package org.antlr.v4.test.tool;
 
-import org.antlr.v4.test.runtime.java.BaseJavaTest;
 import org.antlr.v4.tool.Grammar;
 import org.junit.Before;
 import org.junit.Test;
 
 /** */
 @SuppressWarnings("unused")
-public class TestActionTranslation extends BaseJavaTest {
+public class TestActionTranslation extends BaseJavaToolTest {
 	@Before
 	@Override
 	public void testSetUp() throws Exception {

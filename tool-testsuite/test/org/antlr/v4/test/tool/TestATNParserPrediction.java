@@ -41,7 +41,6 @@ import org.antlr.v4.runtime.atn.LexerATNSimulator;
 import org.antlr.v4.runtime.atn.PredictionContextCache;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntegerList;
-import org.antlr.v4.test.runtime.java.BaseJavaTest;
 import org.antlr.v4.tool.DOTGenerator;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LeftRecursiveRule;
@@ -59,7 +58,7 @@ import static org.junit.Assert.assertTrue;
 // NOTICE: TOKENS IN LEXER, PARSER MUST BE SAME OR TOKEN TYPE MISMATCH
 // NOTICE: TOKENS IN LEXER, PARSER MUST BE SAME OR TOKEN TYPE MISMATCH
 
-public class TestATNParserPrediction extends BaseJavaTest {
+public class TestATNParserPrediction extends BaseJavaToolTest {
 	@Before
 	@Override
 	public void testSetUp() throws Exception {
