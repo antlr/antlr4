@@ -32,7 +32,6 @@ package org.antlr.v4.test.tool;
 
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.parse.ScopeParser;
-import org.antlr.v4.test.runtime.java.BaseJavaTest;
 import org.antlr.v4.tool.Attribute;
 import org.antlr.v4.tool.Grammar;
 import org.junit.Before;
@@ -48,7 +47,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
-public class TestScopeParsing extends BaseJavaTest {
+public class TestScopeParsing extends BaseJavaToolTest {
     static String[] argPairs = {
         "",                                 "",
         " ",                                "",

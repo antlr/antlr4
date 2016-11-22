@@ -1,11 +1,8 @@
 package org.antlr.v4.test.runtime.swift;
 
 import org.antlr.v4.Tool;
-import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.test.runtime.ErrorQueue;
 import org.antlr.v4.test.runtime.RuntimeTestSupport;
-import org.antlr.v4.tool.ANTLRMessage;
-import org.antlr.v4.tool.DefaultToolListener;
 import org.stringtemplate.v4.ST;
 
 import java.io.BufferedReader;
@@ -23,7 +20,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static org.antlr.v4.test.runtime.java.BaseJavaTest.antlrLock;
+import static org.antlr.v4.test.runtime.BaseRuntimeTest.antlrOnString;
 import static org.junit.Assert.assertTrue;
 
 public class BaseSwiftTest implements RuntimeTestSupport {
@@ -489,7 +486,7 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 										  String lexerName,
 										  boolean defaultListener,
 										  String... extraOptions) {
-		ErrorQueue equeue = antlr(grammarFileName, grammarStr, defaultListener, extraOptions);
+		ErrorQueue equeue = antlrOnString(getTmpDir(), "Swift", grammarFileName, grammarStr, defaultListener, extraOptions);
 		if (!equeue.errors.isEmpty()) {
 			return false;
 		}
@@ -515,63 +512,6 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 		}
 		addSourceFiles(files.toArray(new String[files.size()]));
 		return true;
-	}
-
-	protected ErrorQueue antlr(String grammarFileName, boolean defaultListener, String... extraOptions) {
-		final List<String> options = new ArrayList<String>();
-		Collections.addAll(options, extraOptions);
-		options.add("-Dlanguage=Swift");
-		if ( !options.contains("-o") ) {
-			options.add("-o");
-			options.add(tmpdir);
-		}
-		if ( !options.contains("-lib") ) {
-			options.add("-lib");
-			options.add(tmpdir);
-		}
-		if ( !options.contains("-encoding") ) {
-			options.add("-encoding");
-			options.add("UTF-8");
-		}
-		options.add(new File(tmpdir, grammarFileName).toString());
-
-		final String[] optionsA = new String[options.size()];
-		options.toArray(optionsA);
-		Tool antlr = newTool(optionsA);
-		ErrorQueue equeue = new ErrorQueue(antlr);
-		antlr.addListener(equeue);
-		if ( defaultListener ) {
-			antlr.addListener(new DefaultToolListener(antlr));
-		}
-		synchronized (antlrLock) {
-			antlr.processGrammarsOnCommandLine();
-		}
-
-		if ( !defaultListener && !equeue.errors.isEmpty() ) {
-			for (int i = 0; i<equeue.errors.size(); i++) {
-				ANTLRMessage msg = equeue.errors.get(i);
-				antlrToolErrors.append(msg.toString());
-			}
-			try {
-				antlrToolErrors.append(new String(Utils.readFile(tmpdir+"/"+grammarFileName)));
-			} catch (IOException ioe) {
-				antlrToolErrors.append(ioe.toString());
-			}
-		}
-		if ( !defaultListener && !equeue.warnings.isEmpty() ) {
-			for (int i = 0; i<equeue.warnings.size(); i++) {
-				ANTLRMessage msg = equeue.warnings.get(i);
-				// antlrToolErrors.append(msg); warnings are hushed
-			}
-		}
-
-		return equeue;
-	}
-
-	protected ErrorQueue antlr(String grammarFileName, String grammarStr, boolean defaultListener, String... extraOptions) {
-		mkdir(tmpdir);
-		writeFile(tmpdir, grammarFileName, grammarStr);
-		return antlr(grammarFileName, defaultListener, extraOptions);
 	}
 
 	protected static void mkdir(String dir) {

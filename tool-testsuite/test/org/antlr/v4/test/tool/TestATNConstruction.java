@@ -37,7 +37,6 @@ import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.test.runtime.ErrorQueue;
-import org.antlr.v4.test.runtime.java.BaseJavaTest;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
@@ -55,7 +54,7 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class TestATNConstruction extends BaseJavaTest {
+public class TestATNConstruction extends BaseJavaToolTest {
 	@Before
 	@Override
 	public void testSetUp() throws Exception {
