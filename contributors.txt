@@ -117,3 +117,4 @@ YYYY/MM/DD, github id, Full name, email
 2016/11/05, ewanmellor, Ewan Mellor, github@ewanmellor.org
 2016/11/06, janyou, Janyou, janyou.antlr@outlook.com
 2016/11/20, marcohu, Marco Hunsicker, antlr@hunsicker.de
+2016/09/02, lygav, Vladimir (Vladi) Lyga, lyvladi@gmail.com
