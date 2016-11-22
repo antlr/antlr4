@@ -17,6 +17,7 @@ ANTLR project lead and supreme dictator for life
 * [Mike Lischke](http://www.soft-gems.net/) (C++ completed target)
 * Dan McLaughlin (C++ initial target)
 * David Sisson (C++ initial target and test)
+* [Ewan Mellor](https://github.com/ewanmellor), [Janyou](https://github.com/janyou), [Hanzhou Shi](https://github.com/hanjoes) (Swift target)
 
 ## Useful information
 
@@ -25,7 +26,7 @@ ANTLR project lead and supreme dictator for life
 * [Official site](http://www.antlr.org/)
 * [Documentation](https://github.com/antlr/antlr4/blob/master/doc/index.md)
 * [FAQ](https://github.com/antlr/antlr4/blob/master/doc/faq/index.md)
-* [ANTLR code generation targets](https://github.com/antlr/antlr4/blob/master/doc/targets.md)<br>(Currently: Java, C#, Python2|3, JavaScript, Go, C++)
+* [ANTLR code generation targets](https://github.com/antlr/antlr4/blob/master/doc/targets.md)<br>(Currently: Java, C#, Python2|3, JavaScript, Go, C++, Swift)
 * [Java API](http://www.antlr.org/api/Java/index.html)
 * [ANTLR v3](http://www.antlr3.org/)
 * [v3 to v4 Migration, differences](https://github.com/antlr/antlr4/blob/master/doc/faq/general.md)
