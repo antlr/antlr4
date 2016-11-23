@@ -17,7 +17,8 @@ ANTLR project lead and supreme dictator for life
 * [Mike Lischke](http://www.soft-gems.net/) (C++ completed target)
 * Dan McLaughlin (C++ initial target)
 * David Sisson (C++ initial target and test)
-* [Ewan Mellor](https://github.com/ewanmellor), [Janyou](https://github.com/janyou), [Hanzhou Shi](https://github.com/hanjoes) (Swift target)
+* [Janyou](https://github.com/janyou) (Swift target)
+* [Ewan Mellor](https://github.com/ewanmellor), [Hanzhou Shi](https://github.com/hanjoes) (Swift target merging)
 
 ## Useful information
 
