@@ -1552,6 +1552,60 @@ public class ParserATNSimulator extends ATNSimulator {
         }
 
 		for (int i=0; i<p.getNumberOfTransitions(); i++) {
+			// This block implements first-edge elimination of ambiguous LR
+			// alternatives as part of dynamic disambiguation during prediction.
+			// See antlr/antlr4#1398.
+			if (i == 0
+				&& p.getStateType() == ATNState.STAR_LOOP_ENTRY
+				&& ((StarLoopEntryState)p).isPrecedenceDecision
+				&& !config.context.hasEmptyPath()) {
+
+				// When suppress is true, it means the outgoing edge i==0 is
+				// ambiguous with the outgoing edge i==1, and thus the closure
+				// operation can dynamically disambiguate by suppressing this
+				// edge during the closure operation.
+				boolean suppress = true;
+
+				// Require all return states to return back to the same rule
+				// that p is in.
+				int limit = config.context.size();
+				for (int j = 0; j < limit; j++) {
+					ATNState returnState = atn.states.get(config.context.getReturnState(j));
+					suppress = suppress && returnState.ruleIndex == p.ruleIndex;
+				}
+
+				// Further check to make sure this isn't a 0-precedence entry.
+				// See antlr/antlr4#679.
+				if (suppress) {
+					RuleStopState ruleStopState = atn.ruleToStopState[p.ruleIndex];
+					for (int j = 0; j < limit; j++) {
+						for (Transition transition : ruleStopState.transitions) {
+							if (transition.getSerializationType() != Transition.EPSILON) {
+								continue;
+							}
+
+							if (((EpsilonTransition)transition).outermostPrecedenceReturn() != p.ruleIndex) {
+								continue;
+							}
+
+							int returnStateNumber = config.context.getReturnState(j);
+							suppress = returnStateNumber != transition.target.stateNumber;
+							if (!suppress) {
+								break;
+							}
+						}
+
+						if (!suppress) {
+							break;
+						}
+					}
+				}
+
+				if (suppress) {
+					continue;
+				}
+			}
+
 			Transition t = p.transition(i);
 			boolean continueCollecting =
 				!(t instanceof ActionTransition) && collectPredicates;
