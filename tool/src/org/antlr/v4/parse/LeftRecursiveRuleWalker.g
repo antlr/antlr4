@@ -127,7 +127,7 @@ binary
 
 prefix
 	:	^(	ALT elementOptions?
-			({!((CommonTree)input.LT(1)).getText().equals(ruleName)}? element)+
+			element+
 			recurse epsilonElement*
 		 )
          {setAltAssoc((AltAST)$ALT,currentOuterAltNumber);}
