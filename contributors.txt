@@ -123,3 +123,4 @@ YYYY/MM/DD, github id, Full name, email
 2016/11/25, MrSampson, Oliver Sampson, olsam@quickaudio.com
 2016/11/29, millergarym, Gary Miller, miller.garym@gmail.com
 2016/11/29, wxio, Gary Miller, gm@wx.io
+2016/11/29, Naios, Denis Blank, naios@users.noreply.github.com
