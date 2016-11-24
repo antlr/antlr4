@@ -36,8 +36,11 @@ import org.antlr.v4.runtime.misc.Pair;
 
 import java.io.InvalidClassException;
 import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -527,6 +530,9 @@ public class ATNDeserializer {
 	 * @param atn The ATN.
 	 */
 	protected void markPrecedenceDecisions(ATN atn) {
+		// Map rule index -> precedence decision for that rule
+		Map<Integer, StarLoopEntryState> rulePrecedenceDecisions = new HashMap<>();
+
 		for (ATNState state : atn.states) {
 			if (!(state instanceof StarLoopEntryState)) {
 				continue;
@@ -540,9 +546,28 @@ public class ATNDeserializer {
 				ATNState maybeLoopEndState = state.transition(state.getNumberOfTransitions() - 1).target;
 				if (maybeLoopEndState instanceof LoopEndState) {
 					if (maybeLoopEndState.epsilonOnlyTransitions && maybeLoopEndState.transition(0).target instanceof RuleStopState) {
+						rulePrecedenceDecisions.put(state.ruleIndex, (StarLoopEntryState)state);
 						((StarLoopEntryState)state).isPrecedenceDecision = true;
+						((StarLoopEntryState)state).precedenceLoopbackStates = new BitSet(atn.states.size());
 					}
 				}
+			}
+		}
+
+		// After marking precedence decisions, we go back through and fill in
+		// StarLoopEntryState.precedenceLoopbackStates.
+		for (Map.Entry<Integer, StarLoopEntryState> precedenceDecision : rulePrecedenceDecisions.entrySet()) {
+			for (Transition transition : atn.ruleToStopState[precedenceDecision.getKey()].transitions) {
+				if (transition.getSerializationType() != Transition.EPSILON) {
+					continue;
+				}
+
+				EpsilonTransition epsilonTransition = (EpsilonTransition)transition;
+				if (epsilonTransition.outermostPrecedenceReturn() != -1) {
+					continue;
+				}
+
+				precedenceDecision.getValue().precedenceLoopbackStates.set(transition.target.stateNumber);
 			}
 		}
 	}

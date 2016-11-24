@@ -33,6 +33,8 @@ package org.antlr.v4.runtime.atn;
 import org.antlr.v4.runtime.ParserInterpreter;
 import org.antlr.v4.runtime.dfa.DFA;
 
+import java.util.BitSet;
+
 public final class StarLoopEntryState extends DecisionState {
 	public StarLoopbackState loopBackState;
 
@@ -47,6 +49,23 @@ public final class StarLoopEntryState extends DecisionState {
 	 * @see DFA#isPrecedenceDfa()
 	 */
 	public boolean isPrecedenceDecision;
+
+	/**
+	 * For precedence decisions, this set marks states <em>S</em> which have all
+	 * of the following characteristics:
+	 *
+	 * <ul>
+	 * <li>One or more invocation sites of the current rule returns to
+	 * <em>S</em>.</li>
+	 * <li>The closure from <em>S</em> includes the current decision without
+	 * passing through any rule invocations or stepping out of the current
+	 * rule.</li>
+	 * </ul>
+	 *
+	 * <p>This field is {@code null} when {@link #isPrecedenceDecision} is
+	 * {@code false}.</p>
+	 */
+	public BitSet precedenceLoopbackStates;
 
 	@Override
 	public int getStateType() {

@@ -1552,6 +1552,33 @@ public class ParserATNSimulator extends ATNSimulator {
         }
 
 		for (int i=0; i<p.getNumberOfTransitions(); i++) {
+			// This block implements first-edge elimination of ambiguous LR
+			// alternatives as part of dynamic disambiguation during prediction.
+			// See antlr/antlr4#1398.
+			if (i == 0
+				&& p.getStateType() == ATNState.STAR_LOOP_ENTRY
+				&& ((StarLoopEntryState)p).isPrecedenceDecision
+				&& !config.context.hasEmptyPath()) {
+
+				StarLoopEntryState precedenceDecision = (StarLoopEntryState)p;
+
+				// When suppress is true, it means the outgoing edge i==0 is
+				// ambiguous with the outgoing edge i==1, and thus the closure
+				// operation can dynamically disambiguate by suppressing this
+				// edge during the closure operation.
+				boolean suppress = true;
+				for (int j = 0; j < config.context.size(); j++) {
+					if (!precedenceDecision.precedenceLoopbackStates.get(config.context.getReturnState(j))) {
+						suppress = false;
+						break;
+					}
+				}
+
+				if (suppress) {
+					continue;
+				}
+			}
+
 			Transition t = p.transition(i);
 			boolean continueCollecting =
 				!(t instanceof ActionTransition) && collectPredicates;
