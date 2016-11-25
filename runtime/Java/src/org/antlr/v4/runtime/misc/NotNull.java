@@ -38,6 +38,7 @@ import java.lang.annotation.Target;
 /** @deprecated THIS IS HERE FOR BACKWARD COMPATIBILITY WITH 4.5 ONLY.  It will
  *  disappear in 4.6+
  */
+@Deprecated
 @Documented
 @Retention(RetentionPolicy.CLASS)
 @Target({ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER, ElementType.LOCAL_VARIABLE})
