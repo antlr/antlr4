@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.antlr</groupId>
     <artifactId>antlr4-master</artifactId>
-    <version>4.5.4-SNAPSHOT</version>
+    <version>4.6-SNAPSHOT</version>
   </parent>
   <artifactId>antlr4-tool-testsuite</artifactId>
   <name>ANTLR 4 Tool Tests</name>
@@ -31,21 +31,16 @@
       <groupId>org.antlr</groupId>
       <artifactId>antlr4-runtime-testsuite</artifactId>
       <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.antlr</groupId>
-      <artifactId>antlr4</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.antlr</groupId>
-      <artifactId>antlr4</artifactId>
-      <version>${project.version}</version>
       <type>test-jar</type>
     </dependency>
     <dependency>
       <groupId>org.antlr</groupId>
-      <artifactId>antlr4-runtime-testsuite</artifactId>
+      <artifactId>antlr4</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.antlr</groupId>
+      <artifactId>antlr4</artifactId>
       <version>${project.version}</version>
       <type>test-jar</type>
     </dependency>
@@ -59,6 +54,7 @@
 
   <build>
     <sourceDirectory>src</sourceDirectory>
+    <testSourceDirectory>test</testSourceDirectory>
     <plugins>
       <plugin>
         <groupId>com.googlecode.maven-download-plugin</groupId>
@@ -78,10 +74,14 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <version>2.12.4</version>
         <configuration>
+          <includes>
+            <include>**/Test*.java</include>
+          </includes>
           <systemPropertyVariables>
             <antlr-python2-runtime>../../antlr4-python2/src</antlr-python2-runtime>
             <antlr-python3-runtime>../../antlr4-python3/src</antlr-python3-runtime>
             <antlr-csharp-runtime-project>../../antlr4-csharp/runtime/CSharp/Antlr4.Runtime/Antlr4.Runtime.mono.csproj</antlr-csharp-runtime-project>
+            <antlr-cpp-runtime>../../antlr4-cpp/src</antlr-cpp-runtime>
             <antlr-javascript-runtime>../../antlr4-javascript/src</antlr-javascript-runtime>
           </systemPropertyVariables>
         </configuration>

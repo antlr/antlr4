@@ -7,20 +7,22 @@ Most programmers do not need the information on this page because they will simp
 
 I will assume that the root directory is `/tmp` for the purposes of explaining how to build ANTLR in this document.
 
+*As of 4.6, ANTLR tool and Java-target runtime requires Java 7.*
+
 # Get the source
 
 The first step is to get the Java source code from the ANTLR 4 repository at github. You can download the repository from github, but the easiest thing to do is simply clone the repository on your local disk:
 
 ```bash
 $ cd /tmp
-/tmp $ git clone git@github.com:antlr/antlr4.git
+/tmp $ git clone https://github.com/antlr/antlr4.git
 Cloning into 'antlr4'...
-remote: Counting objects: 43273, done.
-remote: Compressing objects: 100% (57/57), done.
-remote: Total 43273 (delta 26), reused 0 (delta 0)
-Receiving objects: 100% (43273/43273), 18.76 MiB | 1.60 MiB/s, done.
-Resolving deltas: 100% (22419/22419), done.
+remote: Counting objects: 61480, done.
+remote: Total 61480 (delta 0), reused 0 (delta 0), pack-reused 61480
+Receiving objects: 100% (61480/61480), 31.24 MiB | 7.18 MiB/s, done.
+Resolving deltas: 100% (32970/32970), done.
 Checking connectivity... done.
+Checking out files: 100% (1427/1427), done.
 ```
 
 # Compile
@@ -36,34 +38,55 @@ Receiving objects: 100% (59858/59858), 31.10 MiB | 819.00 KiB/s, done.
 Resolving deltas: 100% (31898/31898), done.
 Checking connectivity... done.
 $ cd antlr4
-$ mvn compile
-..
+$ mvn -DskipTests install
+...
+[INFO] ------------------------------------------------------------------------
 [INFO] Reactor Summary:
 [INFO] 
-[INFO] ANTLR 4 ............................................ SUCCESS [  0.447 s]
-[INFO] ANTLR 4 Runtime .................................... SUCCESS [  3.113 s]
-[INFO] ANTLR 4 Tool ....................................... SUCCESS [ 14.408 s]
-[INFO] ANTLR 4 Maven plugin ............................... SUCCESS [  1.276 s]
-[INFO] ANTLR 4 Runtime Test Generator ..................... SUCCESS [  0.773 s]
-[INFO] ANTLR 4 Tool Tests ................................. SUCCESS [  6.920 s]
+[INFO] ANTLR 4 ............................................ SUCCESS [  0.287 s]
+[INFO] ANTLR 4 Runtime .................................... SUCCESS [  4.915 s]
+[INFO] ANTLR 4 Tool ....................................... SUCCESS [  1.315 s]
+[INFO] ANTLR 4 Maven plugin ............................... SUCCESS [  2.393 s]
+[INFO] ANTLR 4 Runtime Test Annotations ................... SUCCESS [  0.078 s]
+[INFO] ANTLR 4 Runtime Test Processors .................... SUCCESS [  0.019 s]
+[INFO] ANTLR 4 Runtime Tests (2nd generation) ............. SUCCESS [  1.986 s]
+[INFO] ANTLR 4 Tool Tests ................................. SUCCESS [  0.513 s]
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
-...
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 12.005 s
+[INFO] Finished at: 2016-11-21T11:42:42-08:00
+[INFO] Final Memory: 52M/434M
+[INFO] ------------------------------------------------------------------------
+```
+
+We do `install` not `compile` as tool tests and such refer to modules that must be pulled from the maven install local cache.
+
+# Installing libs to mvn cache locally
+
+To skip the tests (which require all the target languages be installed) and **install into local repository** `~/.m2/repository/org/antlr`, do this:
+
+```bash
+$ mvn install -DskipTests=true   # make sure all artifacts are visible on this machine
 ```
 
 # Testing tool and targets
 
-In order to perform the tests on all target languages, make sure that you have `mono` and `nodejs` installed. For example, on OS X:
+In order to perform the tests on all target languages, you need to have the following languages installed:
 
-```bash
-$ brew install mono
-$ brew install node
-```
+* `mono` (e.g., `brew install mono`)
+* `nodejs`
+* Python 2.7
+* Python 3.5
+* Go
+* Swift 3 (via XCode 8.x) tested currently only osx
+* clang (for C++ target)
 
 To run the tests and **install into local repository** `~/.m2/repository/org/antlr`, do this:
 
 ```bash
-$ mvn install
+$ mvn install -DskipTests=true   # make sure all artifacts are visible on this machine
+$ mvn install                    # now "do it with feeling"
 ...
 -------------------------------------------------------
  T E S T S
@@ -81,38 +104,123 @@ antlr reports warnings from [-visitor, -Dlanguage=CSharp, -o, /var/folders/s1/h3
 [INFO] ------------------------------------------------------------------------
 [INFO] Reactor Summary:
 [INFO] 
-[INFO] ANTLR 4 ............................................ SUCCESS [  0.462 s]
-[INFO] ANTLR 4 Runtime .................................... SUCCESS [  9.163 s]
-[INFO] ANTLR 4 Tool ....................................... SUCCESS [  3.683 s]
-[INFO] ANTLR 4 Maven plugin ............................... SUCCESS [  1.897 s]
-[INFO] ANTLR 4 Runtime Test Generator ..................... SUCCESS [07:11 min]
-[INFO] ANTLR 4 Tool Tests ................................. SUCCESS [ 16.694 s]
+[INFO] ANTLR 4 ............................................ SUCCESS [  0.445 s]
+[INFO] ANTLR 4 Runtime .................................... SUCCESS [  3.392 s]
+[INFO] ANTLR 4 Tool ....................................... SUCCESS [  1.373 s]
+[INFO] ANTLR 4 Maven plugin ............................... SUCCESS [  1.519 s]
+[INFO] ANTLR 4 Runtime Test Annotations ................... SUCCESS [  0.086 s]
+[INFO] ANTLR 4 Runtime Test Processors .................... SUCCESS [  0.014 s]
+[INFO] ANTLR 4 Runtime Tests (2nd generation) ............. SUCCESS [06:39 min]
+[INFO] ANTLR 4 Tool Tests ................................. SUCCESS [  6.922 s]
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time: 07:43 min
-...
+[INFO] Total time: 06:53 min
+[INFO] Finished at: 2016-11-16T15:36:56-08:00
+[INFO] Final Memory: 44M/458M
+[INFO] ------------------------------------------------------------------------
 ```
 
-You should see these jars (building 4.5.2-SNAPSHOT):
+Note: That is actually result of running the much faster:
+
+`mvn -Dparallel=methods -DthreadCount=4 install`
+
+
+You should see these jars (when building 4.6-SNAPSHOT):
 
 ```bash
 /Users/parrt/.m2/repository/org/antlr $ find antlr4* -name '*.jar'
-antlr4/4.5/antlr4-4.5.jar
-antlr4/4.5.2-SNAPSHOT/antlr4-4.5.2-SNAPSHOT-tests.jar
-antlr4/4.5.2-SNAPSHOT/antlr4-4.5.2-SNAPSHOT.jar
-antlr4-maven-plugin/4.5/antlr4-maven-plugin-4.5.jar
-antlr4-maven-plugin/4.5.2-SNAPSHOT/antlr4-maven-plugin-4.5.2-SNAPSHOT.jar
-antlr4-runtime/4.5/antlr4-runtime-4.5.jar
-antlr4-runtime/4.5.2-SNAPSHOT/antlr4-runtime-4.5.2-SNAPSHOT.jar
-antlr4-runtime-testsuite/4.5.2-SNAPSHOT/antlr4-runtime-testsuite-4.5.2-SNAPSHOT-tests.jar
-antlr4-runtime-testsuite/4.5.2-SNAPSHOT/antlr4-runtime-testsuite-4.5.2-SNAPSHOT.jar
-antlr4-tool-testsuite/4.5.2-SNAPSHOT/antlr4-tool-testsuite-4.5.2-SNAPSHOT.jar
+antlr4-maven-plugin/4.6-SNAPSHOT/antlr4-maven-plugin-4.6-SNAPSHOT.jar
+antlr4-runtime-test-annotation-processors/4.6-SNAPSHOT/antlr4-runtime-test-annotation-processors-4.6-SNAPSHOT.jar
+antlr4-runtime-test-annotations/4.6-SNAPSHOT/antlr4-runtime-test-annotations-4.6-SNAPSHOT.jar
+antlr4-runtime-testsuite/4.6-SNAPSHOT/antlr4-runtime-testsuite-4.6-SNAPSHOT-tests.jar
+antlr4-runtime-testsuite/4.6-SNAPSHOT/antlr4-runtime-testsuite-4.6-SNAPSHOT.jar
+antlr4-runtime/4.6-SNAPSHOT/antlr4-runtime-4.6-SNAPSHOT.jar
+antlr4-tool-testsuite/4.6-SNAPSHOT/antlr4-tool-testsuite-4.6-SNAPSHOT.jar
+antlr4/4.6-SNAPSHOT/antlr4-4.6-SNAPSHOT-tests.jar
+antlr4/4.6-SNAPSHOT/antlr4-4.6-SNAPSHOT.jar
 ```
 
-Note that ANTLR is written in itself, which is why maven downloads antlr4-4.5.jar for boostrapping 4.5.2-SNAPSHOT purposes.
+Note that ANTLR is written in itself, which is why maven downloads antlr4-4.5.jar for boostrapping 4.6-SNAPSHOT purposes.
 
-To build without running the tests (saves about 8 minutes), do this:
+## Running test subsets
+
+*From the `runtime-testsuite` dir*
+
+### Run one test group across targets
+
+```bash
+$ cd runtime-testsuite
+$ mvn -Dtest=TestParserExec test
+-------------------------------------------------------
+ T E S T S
+-------------------------------------------------------
+Running org.antlr.v4.test.runtime.cpp.TestParserExec
+...
+Tests run: 32, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 114.283 sec
+Running org.antlr.v4.test.runtime.csharp.TestParserExec
+...
+```
+
+Or run all lexer related tests:
+
+```
+$ mvn -Dtest=Test*Lexer* test
+-------------------------------------------------------
+ T E S T S
+-------------------------------------------------------
+Running org.antlr.v4.test.runtime.cpp.TestCompositeLexers
+...
+```
+
+### Run all tests for a single target
+
+```bash
+$ mvn -Dtest=java.* test
+...
+```
+
+Or run all lexer related tests in Java target only:
+
+```bash
+$ mvn -Dtest=java.*Lexer* test
+...
+-------------------------------------------------------
+ T E S T S
+-------------------------------------------------------
+Running org.antlr.v4.test.runtime.java.TestCompositeLexers
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.277 sec
+Running org.antlr.v4.test.runtime.java.TestLexerErrors
+Tests run: 12, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.376 sec
+Running org.antlr.v4.test.runtime.java.TestLexerExec
+Tests run: 38, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 10.07 sec
+Running org.antlr.v4.test.runtime.java.TestSemPredEvalLexer
+Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.255 sec
+
+Results :
+
+Tests run: 59, Failures: 0, Errors: 0, Skipped: 0
+```
+
+## Testing in parallel
+
+Use this to run tests in parallel:
+
+```bash
+$ mvn -Dparallel=methods -DthreadCount=4 test
+...
+-------------------------------------------------------
+ T E S T S
+-------------------------------------------------------
+Concurrency config is parallel='methods', perCoreThreadCount=true, threadCount=4, useUnlimitedThreads=false
+...
+```
+
+This can be combined with other `-D` above.
+
+## Building without testing
+
+To build without running the tests (saves a lot of time), do this:
 
 ```bash
 mvn -DskipTests install

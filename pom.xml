@@ -7,7 +7,7 @@
   </parent>
   <groupId>org.antlr</groupId>
   <artifactId>antlr4-master</artifactId>
-  <version>4.5.4-SNAPSHOT</version>
+  <version>4.6-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>ANTLR 4</name>
@@ -49,11 +49,23 @@
       </roles>
     </developer>
     <developer>
+      <name>Peter Boyer</name>
+      <roles>
+        <role>Developer - Go</role>
+      </roles>
+    </developer>
+    <developer>
       <name>Jim Idle</name>
       <email>jimi@idle.ws</email>
       <url>http://www.linkedin.com/in/jimidle</url>
       <roles>
         <role>Developer - Maven Plugin</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Mike Lischke</name>
+      <roles>
+        <role>Developer - C++ Target</role>
       </roles>
     </developer>
   </developers>
@@ -63,6 +75,9 @@
     <module>tool</module>
     <module>antlr4-maven-plugin</module>
     <module>tool-testsuite</module>
+    <module>runtime-testsuite/annotations</module>
+    <module>runtime-testsuite/processors</module>
+    <!-- <module>runtime-testsuite-legacy</module>  -->
     <module>runtime-testsuite</module>
   </modules>
 
@@ -70,8 +85,8 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <antlr.testinprocess>true</antlr.testinprocess>
-    <maven.compiler.source>1.6</maven.compiler.source>
-    <maven.compiler.target>1.6</maven.compiler.target>
+    <maven.compiler.source>1.7</maven.compiler.source>
+    <maven.compiler.target>1.7</maven.compiler.target>
   </properties>
 
   <mailingLists>

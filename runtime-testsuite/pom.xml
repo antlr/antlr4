@@ -1,56 +1,74 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.antlr</groupId>
-    <artifactId>antlr4-master</artifactId>
-    <version>4.5.4-SNAPSHOT</version>
-  </parent>
-  <artifactId>antlr4-runtime-testsuite</artifactId>
-  <name>ANTLR 4 Runtime Test Generator</name>
-  <description>A collection of tests for ANTLR 4 Runtime libraries.</description>
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.antlr</groupId>
+		<artifactId>antlr4-master</artifactId>
+		<version>4.6-SNAPSHOT</version>
+	</parent>
+	<artifactId>antlr4-runtime-testsuite</artifactId>
+	<name>ANTLR 4 Runtime Tests (2nd generation)</name>
+	<description>A collection of tests for ANTLR 4 Runtime libraries.</description>
 
-  <prerequisites>
-    <maven>3.0</maven>
-  </prerequisites>
+	<prerequisites>
+		<maven>3.0</maven>
+	</prerequisites>
 
-  <inceptionYear>2009</inceptionYear>
+	<inceptionYear>2009</inceptionYear>
 
-  <dependencies>
-    <dependency>
-      <groupId>org.antlr</groupId>
-      <artifactId>ST4</artifactId>
-      <version>4.0.8</version>
-    </dependency>
-    <dependency>
-      <groupId>org.antlr</groupId>
-      <artifactId>antlr4</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.antlr</groupId>
-      <artifactId>antlr4-runtime</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.11</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.seleniumhq.selenium</groupId>
-      <artifactId>selenium-java</artifactId>
-      <version>2.46.0</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-server</artifactId>
-      <version>8.1.16.v20140903</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
+	<dependencies>
+		<dependency>
+			<groupId>org.antlr</groupId>
+			<artifactId>ST4</artifactId>
+			<version>4.0.8</version>
+		</dependency>
+		<dependency>
+			<groupId>org.antlr</groupId>
+			<artifactId>antlr4</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.antlr</groupId>
+			<artifactId>antlr4-runtime</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.12</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-java</artifactId>
+			<version>2.46.0</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-server</artifactId>
+			<version>8.1.16.v20140903</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish</groupId>
+			<artifactId>javax.json</artifactId>
+			<version>1.0.4</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.antlr</groupId>
+			<artifactId>antlr4-runtime-test-annotations</artifactId>
+			<version>4.6-SNAPSHOT</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.antlr</groupId>
+			<artifactId>antlr4-runtime-test-annotation-processors</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+	</dependencies>
 
   <build>
     <sourceDirectory>src</sourceDirectory>
@@ -63,21 +81,23 @@
         <directory>../runtime</directory>
       </resource>
     </resources>
-    <plugins> 
+    <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.12.4</version>
+        <version>2.19.1</version>
         <configuration>
           <includes>
             <include>**/csharp/Test*.java</include>
             <include>**/java/Test*.java</include>
+            <include>**/go/Test*.java</include>
             <include>**/javascript/node/Test*.java</include>
-            <include>**/python2/Test*.java</include> 
+            <include>**/python2/Test*.java</include>
             <include>**/python3/Test*.java</include>
+            <include>${antlr.tests.swift}</include>
           </includes>
         </configuration>
-      </plugin>    
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
@@ -89,11 +109,23 @@
             </goals>
           </execution>
         </executions>
-      </plugin>      
+      </plugin>
     </plugins>
   </build>
-  
+
   <profiles>
+    <profile>
+      <id>includeSwiftTests</id>
+      <activation>
+        <os>
+          <family>mac</family>
+        </os>
+      </activation>
+      <properties>
+        <antlr.tests.swift>**/swift/Test*.java</antlr.tests.swift>
+      </properties>
+    </profile>
+
     <profile>
       <id>gen</id>
       <build>
@@ -121,7 +153,7 @@
                 </configuration>
               </execution>
             </executions>
-          </plugin>        
+          </plugin>
         </plugins>
       </build>
     </profile>
@@ -137,9 +169,9 @@
                 <include>**/Test*.java</include>
               </includes>
             </configuration>
-          </plugin>            
+          </plugin>
         </plugins>
       </build>
-    </profile>      
-  </profiles>  
+    </profile>
+  </profiles>
 </project>

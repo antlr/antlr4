@@ -48,6 +48,7 @@ import org.antlr.v4.runtime.atn.DecisionState;
 import org.antlr.v4.runtime.atn.PredictionMode;
 import org.antlr.v4.runtime.atn.RuleStartState;
 import org.antlr.v4.runtime.atn.StarLoopEntryState;
+import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.tree.Trees;
 
 import java.lang.reflect.Constructor;
@@ -292,22 +293,26 @@ public class GrammarParserInterpreter extends ParserInterpreter {
 	 *                               ambig input.
 	 */
 	public static List<ParserRuleContext> getAllPossibleParseTrees(Grammar g,
-																   Parser originalParser,
-																   TokenStream tokens,
-																   int decision,
-																   BitSet alts,
-																   int startIndex,
-																   int stopIndex,
-																   int startRuleIndex)
-		throws RecognitionException
-	{
+	                                                               Parser originalParser,
+	                                                               TokenStream tokens,
+	                                                               int decision,
+	                                                               BitSet alts,
+	                                                               int startIndex,
+	                                                               int stopIndex,
+	                                                               int startRuleIndex)
+		throws RecognitionException {
 		List<ParserRuleContext> trees = new ArrayList<ParserRuleContext>();
 		// Create a new parser interpreter to parse the ambiguous subphrase
 		ParserInterpreter parser = deriveTempParserInterpreter(g, originalParser, tokens);
 
+		if ( stopIndex>=(tokens.size()-1) ) { // if we are pointing at EOF token
+			// EOF is not in tree, so must be 1 less than last non-EOF token
+			stopIndex = tokens.size()-2;
+		}
+
 		// get ambig trees
 		int alt = alts.nextSetBit(0);
-		while (alt >= 0) {
+		while ( alt>=0 ) {
 			// re-parse entire input for all ambiguous alternatives
 			// (don't have to do first as it's been parsed, but do again for simplicity
 			//  using this temp parser.)
@@ -318,15 +323,14 @@ public class GrammarParserInterpreter extends ParserInterpreter {
 				(GrammarInterpreterRuleContext) Trees.getRootOfSubtreeEnclosingRegion(t, startIndex, stopIndex);
 			// Use higher of overridden decision tree or tree enclosing all tokens
 			if ( Trees.isAncestorOf(parser.getOverrideDecisionRoot(), ambigSubTree) ) {
-				ambigSubTree = (GrammarInterpreterRuleContext)parser.getOverrideDecisionRoot();
+				ambigSubTree = (GrammarInterpreterRuleContext) parser.getOverrideDecisionRoot();
 			}
 			trees.add(ambigSubTree);
-			alt = alts.nextSetBit(alt + 1);
+			alt = alts.nextSetBit(alt+1);
 		}
 
 		return trees;
 	}
-
 
 	/** Return a list of parse trees, one for each alternative in a decision
 	 *  given the same input.
@@ -355,25 +359,25 @@ public class GrammarParserInterpreter extends ParserInterpreter {
 	 * @since 4.5.1
 	 */
 	public static List<ParserRuleContext> getLookaheadParseTrees(Grammar g,
-																 ParserInterpreter originalParser,
-																 TokenStream tokens,
-																 int startRuleIndex,
-																 int decision,
-																 int startIndex,
-																 int stopIndex)
-	{
+	                                                             ParserInterpreter originalParser,
+	                                                             TokenStream tokens,
+	                                                             int startRuleIndex,
+	                                                             int decision,
+	                                                             int startIndex,
+	                                                             int stopIndex) {
 		List<ParserRuleContext> trees = new ArrayList<ParserRuleContext>();
 		// Create a new parser interpreter to parse the ambiguous subphrase
 		ParserInterpreter parser = deriveTempParserInterpreter(g, originalParser, tokens);
-		BailButConsumeErrorStrategy errorHandler = new BailButConsumeErrorStrategy();
-		parser.setErrorHandler(errorHandler);
 
 		DecisionState decisionState = originalParser.getATN().decisionToState.get(decision);
 
-		for (int alt=1; alt<=decisionState.getTransitions().length; alt++) {
+		for (int alt = 1; alt<=decisionState.getTransitions().length; alt++) {
 			// re-parse entire input for all ambiguous alternatives
 			// (don't have to do first as it's been parsed, but do again for simplicity
 			//  using this temp parser.)
+			GrammarParserInterpreter.BailButConsumeErrorStrategy errorHandler =
+				new GrammarParserInterpreter.BailButConsumeErrorStrategy();
+			parser.setErrorHandler(errorHandler);
 			parser.reset();
 			parser.addDecisionOverride(decision, startIndex, alt);
 			ParserRuleContext tt = parser.parse(startRuleIndex);
@@ -381,10 +385,17 @@ public class GrammarParserInterpreter extends ParserInterpreter {
 			if ( errorHandler.firstErrorTokenIndex>=0 ) {
 				stopTreeAt = errorHandler.firstErrorTokenIndex; // cut off rest at first error
 			}
+			Interval overallRange = tt.getSourceInterval();
+			if ( stopTreeAt>overallRange.b ) {
+				// If we try to look beyond range of tree, stopTreeAt must be EOF
+				// for which there is no EOF ref in grammar. That means tree
+				// will not have node for stopTreeAt; limit to overallRange.b
+				stopTreeAt = overallRange.b;
+			}
 			ParserRuleContext subtree =
 				Trees.getRootOfSubtreeEnclosingRegion(tt,
-													  startIndex,
-													  stopTreeAt);
+				                                      startIndex,
+				                                      stopTreeAt);
 			// Use higher of overridden decision tree or tree enclosing all tokens
 			if ( Trees.isAncestorOf(parser.getOverrideDecisionRoot(), subtree) ) {
 				subtree = parser.getOverrideDecisionRoot();

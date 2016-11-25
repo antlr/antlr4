@@ -39,11 +39,11 @@ import org.antlr.v4.runtime.atn.BlockStartState;
 import org.antlr.v4.runtime.atn.LexerATNSimulator;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntegerList;
-import org.antlr.v4.test.runtime.java.BaseTest;
 import org.antlr.v4.tool.DOTGenerator;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
 import org.antlr.v4.tool.Rule;
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -52,7 +52,13 @@ import static org.junit.Assert.assertEquals;
 	// NOTICE: TOKENS IN LEXER, PARSER MUST BE SAME OR TOKEN TYPE MISMATCH
 	// NOTICE: TOKENS IN LEXER, PARSER MUST BE SAME OR TOKEN TYPE MISMATCH
 
-public class TestATNInterpreter extends BaseTest {
+public class TestATNInterpreter extends BaseJavaToolTest {
+	@Before
+	@Override
+	public void testSetUp() throws Exception {
+		super.testSetUp();
+	}
+
 	@Test public void testSimpleNoBlock() throws Exception {
 		LexerGrammar lg = new LexerGrammar(
 			"lexer grammar L;\n" +
@@ -384,7 +390,7 @@ public class TestATNInterpreter extends BaseTest {
 		ATN lexatn = createATN(lg, true);
 		LexerATNSimulator lexInterp = new LexerATNSimulator(lexatn,new DFA[] { new DFA(lexatn.modeToStartState.get(Lexer.DEFAULT_MODE)) },null);
 		IntegerList types = getTokenTypesViaATN(inputString, lexInterp);
-		System.out.println(types);
+//		System.out.println(types);
 
 		g.importVocab(lg);
 
@@ -392,7 +398,7 @@ public class TestATNInterpreter extends BaseTest {
 		ATN atn = f.createATN();
 
 		IntTokenStream input = new IntTokenStream(types);
-		System.out.println("input="+input.types);
+//		System.out.println("input="+input.types);
 		ParserInterpreterForTesting interp = new ParserInterpreterForTesting(g, input);
 		ATNState startState = atn.ruleToStartState[g.getRule("a").index];
 		if ( startState.transition(0).target instanceof BlockStartState ) {
@@ -400,9 +406,9 @@ public class TestATNInterpreter extends BaseTest {
 		}
 
 		DOTGenerator dot = new DOTGenerator(g);
-		System.out.println(dot.getDOT(atn.ruleToStartState[g.getRule("a").index]));
+//		System.out.println(dot.getDOT(atn.ruleToStartState[g.getRule("a").index]));
 		Rule r = g.getRule("e");
-		if ( r!=null ) System.out.println(dot.getDOT(atn.ruleToStartState[r.index]));
+//		if ( r!=null ) System.out.println(dot.getDOT(atn.ruleToStartState[r.index]));
 
 		int result = interp.matchATN(input, startState);
 		assertEquals(expected, result);

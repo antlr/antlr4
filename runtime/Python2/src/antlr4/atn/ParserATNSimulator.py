@@ -443,7 +443,7 @@ class ParserATNSimulator(ATNSimulator):
 
             if D.requiresFullContext and self.predictionMode != PredictionMode.SLL:
                 # IF PREDS, MIGHT RESOLVE TO SINGLE ALT => SLL (or syntax error)
-                conflictingAlts = None
+                conflictingAlts = D.configs.conflictingAlts
                 if D.predicates is not None:
                     if ParserATNSimulator.debug:
                         print("DFA state has preds in DFA sim LL failover")

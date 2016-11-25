@@ -188,7 +188,7 @@ SingletonPredictionContext.prototype.hashString = function() {
 SingletonPredictionContext.prototype.toString = function() {
 	var up = this.parentCtx === null ? "" : this.parentCtx.toString();
 	if (up.length === 0) {
-		if (this.returnState === this.EMPTY_RETURN_STATE) {
+		if (this.returnState === PredictionContext.EMPTY_RETURN_STATE) {
 			return "$";
 		} else {
 			return "" + this.returnState;

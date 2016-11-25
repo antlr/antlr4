@@ -32,7 +32,7 @@ package org.antlr.v4.test.runtime.python3;
 import org.antlr.v4.test.runtime.python.BasePythonTest;
 import org.stringtemplate.v4.ST;
 
-public abstract class BasePython3Test extends BasePythonTest {
+public class BasePython3Test extends BasePythonTest {
 
 	@Override
 	protected String getLanguage() {

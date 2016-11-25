@@ -30,7 +30,7 @@
 
 package org.antlr.v4.test.tool;
 
-import org.antlr.v4.test.runtime.java.BaseTest;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -69,8 +69,12 @@ import static org.junit.Assert.assertTrue;
  *  Nongreedy loops match as much input as possible while still allowing
  *  the remaining input to match.
  */
-public class TestParserExec extends BaseTest {
-
+public class TestParserExec extends BaseJavaToolTest {
+	@Before
+	@Override
+	public void testSetUp() throws Exception {
+		super.testSetUp();
+	}
 
 	/**
 	 * This is a regression test for antlr/antlr4#118.
@@ -86,7 +90,8 @@ public class TestParserExec extends BaseTest {
 			"ID : 'a'..'z'+ ;\n"+
 			"INT : '0'..'9'+ ;\n"+
 			"WS : (' '|'\\t'|'\\n')+ -> skip ;\n";
-		String result = execParser("T.g4", grammar, "TParser", "TLexer", "s",
+		String result = execParser("T.g4", grammar, "TParser", "TLexer",
+		                           null, null, "s",
 								   "abc 34", true);
 		String expecting =
 			"Decision 0:\n" +
@@ -105,8 +110,8 @@ public class TestParserExec extends BaseTest {
 	// TODO: port to test framework (can we simplify the Psl grammar?)
 	@Test public void testFailedPredicateExceptionState() throws Exception {
 		String grammar = load("Psl.g4", "UTF-8");
-		String found = execParser("Psl.g4", grammar, "PslParser", "PslLexer", "floating_constant", " . 234", false);
-		assertEquals("", found);
+		String found = execParser("Psl.g4", grammar, "PslParser", "PslLexer", null, null, "floating_constant", " . 234", false);
+		assertEquals(null, found);
 		assertEquals("line 1:6 rule floating_constant DEC:A floating-point constant cannot have internal white space\n", stderrDuringParse);
 	}
 
@@ -145,8 +150,9 @@ public class TestParserExec extends BaseTest {
 														"ModeTagsLexer");
 		assertTrue(success);
 
-		String found = execParser("ModeTagsParser.g4", parserGrammar, "ModeTagsParser", "ModeTagsLexer", "file", "", false);
-		assertEquals("", found);
+		String found = execParser("ModeTagsParser.g4", parserGrammar, "ModeTagsParser", "ModeTagsLexer",
+		                          null, null, "file", "", false);
+		assertEquals(null, found);
 		assertNull(stderrDuringParse);
 	}
 
@@ -173,7 +179,8 @@ public class TestParserExec extends BaseTest {
 			"WS : [ \\t\\n\\r]+ -> skip ; // toss out all whitespace\n";
 
 		String input = "2 9 10 3 1 2 3";
-		String found = execParser("Data.g4", grammar, "DataParser", "DataLexer", "file", input, false);
+		String found = execParser("Data.g4", grammar, "DataParser", "DataLexer",
+		                          null, null, "file", input, false);
 		assertEquals("6\n", found);
 		assertNull(stderrDuringParse);
 	}

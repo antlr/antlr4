@@ -41,19 +41,17 @@ var SemanticContext = require('./SemanticContext').SemanticContext;
 var merge = require('./../PredictionContext').merge;
 
 function hashATNConfig(c) {
-	return c.shortHashString();
+	return c.hashStringForConfigSet();
 }
 
 function equalATNConfigs(a, b) {
 	if ( a===b ) {
 		return true;
-	}
-	if ( a===null || b===null ) {
+	} else if ( a===null || b===null ) {
 		return false;
-	}
-	return a.state.stateNumber===b.state.stateNumber &&
-		a.alt===b.alt && a.semanticContext.equals(b.semanticContext);
-}
+	} else
+       return a.equalsForConfigSet(b);
+ }
 
 
 function ATNConfigSet(fullCtx) {

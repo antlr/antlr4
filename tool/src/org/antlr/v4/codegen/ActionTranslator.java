@@ -211,26 +211,21 @@ public class ActionTranslator implements ActionSplitterListener {
 			return;
 		}
 		Attribute a = node.resolver.resolveToAttribute(x.getText(), y.getText(), node);
+		if ( a==null ) {
+			// Added in response to https://github.com/antlr/antlr4/issues/1211
+			gen.g.tool.errMgr.grammarError(ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE,
+			                               gen.g.fileName, x,
+			                               x.getText(),
+			                               "rule");
+			return;
+		}
 		switch ( a.dict.type ) {
 			case ARG: chunks.add(new ArgRef(nodeContext,y.getText())); break; // has to be current rule
 			case RET:
-				if ( factory.getCurrentRuleFunction()!=null &&
-					factory.getCurrentRuleFunction().name.equals(x.getText()) )
-				{
-					chunks.add(new RetValueRef(rf.ruleCtx, y.getText())); break;
-				}
-				else {
-					chunks.add(new QRetValueRef(nodeContext, getRuleLabel(x.getText()), y.getText())); break;
-				}
+				chunks.add(new QRetValueRef(nodeContext, getRuleLabel(x.getText()), y.getText()));
+				break;
 			case PREDEFINED_RULE:
-				if ( factory.getCurrentRuleFunction()!=null &&
-					factory.getCurrentRuleFunction().name.equals(x.getText()) )
-				{
-					chunks.add(getRulePropertyRef(y));
-				}
-				else {
-					chunks.add(getRulePropertyRef(x, y));
-				}
+				chunks.add(getRulePropertyRef(x, y));
 				break;
 			case TOKEN:
 				chunks.add(getTokenPropertyRef(x, y));

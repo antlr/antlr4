@@ -338,6 +338,15 @@ public class Grammar implements AttributeResolver {
         this.text = grammarText;
 		this.fileName = fileName;
 		this.tool = new Tool();
+		ANTLRToolListener hush = new ANTLRToolListener() {
+			@Override
+			public void info(String msg) { }
+			@Override
+			public void error(ANTLRMessage msg) { }
+			@Override
+			public void warning(ANTLRMessage msg) { }
+		};
+		tool.addListener(hush); // we want to hush errors/warnings
 		this.tool.addListener(listener);
 		org.antlr.runtime.ANTLRStringStream in = new org.antlr.runtime.ANTLRStringStream(grammarText);
 		in.name = fileName;
@@ -383,6 +392,8 @@ public class Grammar implements AttributeResolver {
 		if ( ast==null ) return;
         GrammarAST i = (GrammarAST)ast.getFirstChildWithType(ANTLRParser.IMPORT);
         if ( i==null ) return;
+	    Set<String> visited = new HashSet<>();
+	    visited.add(this.name);
         importedGrammars = new ArrayList<Grammar>();
         for (Object c : i.getChildren()) {
             GrammarAST t = (GrammarAST)c;
@@ -393,6 +404,9 @@ public class Grammar implements AttributeResolver {
             }
             else if ( t.getType()==ANTLRParser.ID ) {
                 importedGrammarName = t.getText();
+			}
+			if ( visited.contains(importedGrammarName) ) { // ignore circular refs
+				continue;
 			}
 			Grammar g;
 			try {

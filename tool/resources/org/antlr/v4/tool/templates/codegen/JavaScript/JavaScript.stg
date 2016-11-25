@@ -60,7 +60,7 @@ var <file.grammarName>Visitor = require('./<file.grammarName>Visitor').<file.gra
 <parser>
 >>
 
-ListenerFile(file, header) ::= <<
+ListenerFile(file, header, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 var antlr4 = require('antlr4/index');
 
@@ -88,10 +88,9 @@ exports.<file.grammarName>Listener = <file.grammarName>Listener;
 >>
 
 
-VisitorFile(file, header) ::= <<
+VisitorFile(file, header, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 var antlr4 = require('antlr4/index');
-<header>
 
 // This class defines a complete generic visitor for a parse tree produced by <file.parserName>.
 
@@ -106,6 +105,7 @@ function <file.grammarName>Visitor() {
 <file.visitorNames:{lname |
 // Visit a parse tree produced by <file.parserName>#<lname>.
 <file.grammarName>Visitor.prototype.visit<lname; format="cap"> = function(ctx) {
+  return this.visitChildren(ctx);
 \};
 
 }; separator="\n">
@@ -340,6 +340,7 @@ CodeBlockForAlt(currentAltCodeBlock, locals, preamble, ops) ::= <<
 
 LL1AltBlock(choice, preamble, alts, error) ::= <<
 this.state = <choice.stateNumber>;
+this._errHandler.sync(this);
 <if(choice.label)><labelref(choice.label)> = this._input.LT(1);<endif>
 <preamble; separator="\n">
 switch(this._input.LA(1)) {
@@ -353,6 +354,7 @@ default:
 
 LL1OptionalBlock(choice, alts, error) ::= <<
 this.state = <choice.stateNumber>;
+this._errHandler.sync(this);
 switch (this._input.LA(1)) {
 <choice.altLook,alts:{look,alt| <cases(ttypes=look)>
 	<alt>
@@ -364,6 +366,7 @@ default:
 
 LL1OptionalBlockSingleAlt(choice, expr, alts, preamble, error, followExpr) ::= <<
 this.state = <choice.stateNumber>;
+this._errHandler.sync(this);
 <preamble; separator="\n">
 if(<expr>) {
     <alts; separator="\n">
@@ -553,10 +556,10 @@ catch (<catchArg>) {
 LexerSkipCommand()  ::= "this.skip()"
 LexerMoreCommand()  ::= "this.more()"
 LexerPopModeCommand() ::= "this.popMode()"
-LexerTypeCommand(arg)      ::= "this._type = <arg>"
-LexerChannelCommand(arg)   ::= "this._channel = <arg>"
-LexerModeCommand(arg)      ::= "this._mode = <arg>"
-LexerPushModeCommand(arg)  ::= "this.pushMode(<arg>)"
+LexerTypeCommand(arg, grammar)      ::= "this._type = <arg>"
+LexerChannelCommand(arg, grammar)   ::= "this._channel = <arg>"
+LexerModeCommand(arg, grammar)      ::= "this._mode = <arg>"
+LexerPushModeCommand(arg, grammar)  ::= "this.pushMode(<arg>)"
 
 ActionText(t) ::= "<t.text>"
 ActionTemplate(t) ::= "<t.st>"
@@ -819,15 +822,15 @@ function <lexer.name>(input) {
 
 <rest(lexer.modes):{m| <lexer.name>.<m> = <i>;}; separator="\n">
 
-<lexer.name>.modeNames = [ <lexer.modes:{m| "<m>"}; separator=", ", wrap, anchor> ];
+<lexer.name>.prototype.modeNames = [ <lexer.modes:{m| "<m>"}; separator=", ", wrap, anchor> ];
 
-<lexer.name>.literalNames = [ <lexer.literalNames:{t | <t>}; null="null", separator=", ", wrap, anchor> ];
+<lexer.name>.prototype.literalNames = [ <lexer.literalNames:{t | <t>}; null="null", separator=", ", wrap, anchor> ];
 
-<lexer.name>.symbolicNames = [ <lexer.symbolicNames:{t | <t>}; null="null", separator=", ", wrap, anchor> ];
+<lexer.name>.prototype.symbolicNames = [ <lexer.symbolicNames:{t | <t>}; null="null", separator=", ", wrap, anchor> ];
 
-<lexer.name>.ruleNames = [ <lexer.ruleNames:{r | "<r>"}; separator=", ", wrap, anchor> ];
+<lexer.name>.prototype.ruleNames = [ <lexer.ruleNames:{r | "<r>"}; separator=", ", wrap, anchor> ];
 
-<lexer.name>.grammarFileName = "<lexer.grammarFileName>";
+<lexer.name>.prototype.grammarFileName = "<lexer.grammarFileName>";
 
 <namedActions.members>
 

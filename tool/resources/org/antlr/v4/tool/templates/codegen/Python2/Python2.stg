@@ -58,7 +58,7 @@ from io import StringIO
 
 >>
 
-ListenerFile(file, header) ::= <<
+ListenerFile(file, header, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 from antlr4 import *
 <header>
@@ -80,7 +80,7 @@ def exit<lname; format="cap">(self, ctx):
 >>
 
 
-VisitorFile(file, header) ::= <<
+VisitorFile(file, header, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 from antlr4 import *
 <header>
@@ -314,12 +314,13 @@ CodeBlockForAlt(currentAltCodeBlock, locals, preamble, ops) ::= <<
 
 LL1AltBlock(choice, preamble, alts, error) ::= <<
 self.state = <choice.stateNumber>
+self._errHandler.sync(self)
 <if(choice.label)><labelref(choice.label)> = _input.LT(1)<endif>
 <preamble; separator="\n">
 token = self._input.LA(1)
 <choice.altLook,alts:{look,alt| <cases(ttypes=look)>
     <alt>
-	}; separator="\nel">
+    pass}; separator="\nel">
 else:
     <error>
 
@@ -327,6 +328,7 @@ else:
 
 LL1OptionalBlock(choice, alts, error) ::= <<
 self.state = <choice.stateNumber>
+self._errHandler.sync(self)
 token = self._input.LA(1)
 <choice.altLook,alts:{look,alt| <cases(ttypes=look)>
     <alt>
@@ -337,6 +339,7 @@ else:
 
 LL1OptionalBlockSingleAlt(choice, expr, alts, preamble, error, followExpr) ::= <<
 self.state = <choice.stateNumber>
+self._errHandler.sync(self)
 <preamble; separator="\n">
 if <expr>:
     <alts; separator="\n">
@@ -523,10 +526,10 @@ LexerSkipCommand()  ::= "skip()"
 LexerMoreCommand()  ::= "more()"
 LexerPopModeCommand() ::= "popMode()"
 
-LexerTypeCommand(arg)      ::= "_type = <arg>"
-LexerChannelCommand(arg)   ::= "_channel = <arg>"
-LexerModeCommand(arg)      ::= "_mode = <arg>"
-LexerPushModeCommand(arg)  ::= "pushMode(<arg>)"
+LexerTypeCommand(arg, grammar)      ::= "_type = <arg>"
+LexerChannelCommand(arg, grammar)   ::= "_channel = <arg>"
+LexerModeCommand(arg, grammar)      ::= "_mode = <arg>"
+LexerPushModeCommand(arg, grammar)  ::= "pushMode(<arg>)"
 
 ActionText(t) ::= "<t.text>"
 ActionTemplate(t) ::= "<t.st>"

@@ -63,9 +63,10 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.antlr.v4.runtime.tree.TerminalNode;
-import org.antlr.v4.test.runtime.java.BaseTest;
-import org.antlr.v4.test.runtime.java.ErrorQueue;
+import org.antlr.v4.test.runtime.BaseRuntimeTest;
+import org.antlr.v4.test.runtime.ErrorQueue;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
@@ -107,7 +108,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 @SuppressWarnings("unused")
-public class TestPerformance extends BaseTest {
+public class TestPerformance extends BaseJavaToolTest {
     /**
      * Parse all java files under this package within the JDK_SOURCE_ROOT
      * (environment variable or property defined on the Java command line).
@@ -408,6 +409,12 @@ public class TestPerformance extends BaseTest {
 
     private final AtomicIntegerArray tokenCount = new AtomicIntegerArray(PASSES);
 
+	@Before
+	@Override
+	public void testSetUp() throws Exception {
+		super.testSetUp();
+	}
+
     @Test
     @org.junit.Ignore
     public void compileJdk() throws IOException, InterruptedException, ExecutionException {
@@ -699,7 +706,7 @@ public class TestPerformance extends BaseTest {
 	}
 
     @Override
-    protected void eraseTempDir() {
+    public void eraseTempDir() {
         if (DELETE_TEMP_FILES) {
             super.eraseTempDir();
         }
@@ -1954,8 +1961,7 @@ public class TestPerformance extends BaseTest {
 			"\n" +
 			"rule_%d_%d : EOF;\n";
 
-		System.out.println("dir "+tmpdir);
-		mkdir(tmpdir);
+		BaseRuntimeTest.mkdir(tmpdir);
 
 		long startTime = System.nanoTime();
 
@@ -1970,7 +1976,7 @@ public class TestPerformance extends BaseTest {
 			}
 		}
 
-		ErrorQueue equeue = antlr("Level_0_1.g4", false);
+		ErrorQueue equeue = BaseRuntimeTest.antlrOnString(tmpdir, "Java", "Level_0_1.g4", false);
 		Assert.assertTrue(equeue.errors.isEmpty());
 
 		long endTime = System.nanoTime();

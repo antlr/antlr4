@@ -32,17 +32,23 @@ package org.antlr.v4.test.tool;
 
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNSerializer;
-import org.antlr.v4.test.runtime.java.BaseTest;
 import org.antlr.v4.tool.DOTGenerator;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
 
-public class TestATNSerialization extends BaseTest {
+public class TestATNSerialization extends BaseJavaToolTest {
+	@Before
+	@Override
+	public void testSetUp() throws Exception {
+		super.testSetUp();
+	}
+
 	@Test public void testSimpleNoBlock() throws Exception {
 		Grammar g = new Grammar(
 			"parser grammar T;\n"+
@@ -127,7 +133,6 @@ public class TestATNSerialization extends BaseTest {
 			"3->1 EPSILON 0,0,0\n";
 		ATN atn = createATN(g, true);
 		DOTGenerator gen = new DOTGenerator(g);
-		System.out.println(gen.getDOT(atn.ruleToStartState[0]));
 		String result = ATNSerializer.getDecoded(atn, Arrays.asList(g.getTokenNames()));
 		assertEquals(expecting, result);
 	}

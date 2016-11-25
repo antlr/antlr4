@@ -3,7 +3,7 @@
   <parent>
     <groupId>org.antlr</groupId>
     <artifactId>antlr4-master</artifactId>
-    <version>4.5.4-SNAPSHOT</version>
+    <version>4.6-SNAPSHOT</version>
   </parent>
   <artifactId>antlr4</artifactId>
   <name>ANTLR 4 Tool</name>
@@ -50,11 +50,15 @@
       <artifactId>org.abego.treelayout.core</artifactId>
       <version>1.0.1</version>
     </dependency>
+    <dependency>
+      <groupId>javax.json</groupId>
+      <artifactId>javax.json-api</artifactId>
+      <version>RELEASE</version>
+    </dependency>
   </dependencies>
 
   <build>
     <sourceDirectory>src</sourceDirectory>
-    <testSourceDirectory>test</testSourceDirectory>
     <testResources>
       <testResource>
         <directory>test</directory>

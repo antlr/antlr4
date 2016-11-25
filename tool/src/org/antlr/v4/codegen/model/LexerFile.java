@@ -31,25 +31,21 @@
 package org.antlr.v4.codegen.model;
 
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.tool.Grammar;
-import org.antlr.v4.tool.ast.ActionAST;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class LexerFile extends OutputFile {
 	public String genPackage; // from -package cmd-line
+	public boolean genListener; // from -listener cmd-line
+	public boolean genVisitor; // from -visitor cmd-line
 	@ModelElement public Lexer lexer;
 	@ModelElement public Map<String, Action> namedActions;
 
 	public LexerFile(OutputModelFactory factory, String fileName) {
 		super(factory, fileName);
-		namedActions = new HashMap<String, Action>();
-		Grammar g = factory.getGrammar();
-		for (String name : g.namedActions.keySet()) {
-			ActionAST ast = g.namedActions.get(name);
-			namedActions.put(name, new Action(factory, ast));
-		}
+		namedActions = buildNamedActions(factory.getGrammar());
 		genPackage = factory.getGrammar().tool.genPackage;
+		genListener = factory.getGrammar().tool.gen_listener;
+		genVisitor = factory.getGrammar().tool.gen_visitor;
 	}
 }

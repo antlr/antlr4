@@ -36,9 +36,9 @@
 #  <p>I have scoped the {@link AND}, {@link OR}, and {@link Predicate} subclasses of
 #  {@link SemanticContext} within the scope of this outer class.</p>
 #
-from io import StringIO
 from antlr4.Recognizer import Recognizer
 from antlr4.RuleContext import RuleContext
+from io import StringIO
 
 
 class SemanticContext(object):
@@ -115,14 +115,8 @@ def orContext(a:SemanticContext, b:SemanticContext):
     else:
         return result
 
-def filterPrecedencePredicates(collection:list):
-    result = []
-    for context in collection:
-        if isinstance(context, PrecedencePredicate):
-            if result is None:
-                result = []
-            result.append(context)
-    return result
+def filterPrecedencePredicates(collection:set):
+    return [context for context in collection if isinstance(context, PrecedencePredicate)]
 
 
 class Predicate(SemanticContext):
@@ -188,13 +182,11 @@ class AND(SemanticContext):
     def __init__(self, a:SemanticContext, b:SemanticContext):
         operands = set()
         if isinstance( a, AND ):
-            for o in a.opnds:
-                operands.add(o)
+            operands.update(a.opnds)
         else:
             operands.add(a)
         if isinstance( b, AND ):
-            for o in b.opnds:
-                operands.add(o)
+            operands.update(b.opnds)
         else:
             operands.add(b)
 
@@ -204,7 +196,7 @@ class AND(SemanticContext):
             reduced = min(precedencePredicates)
             operands.add(reduced)
 
-        self.opnds = [ o for o in operands ]
+        self.opnds = list(operands)
 
     def __eq__(self, other):
         if self is other:
@@ -227,11 +219,8 @@ class AND(SemanticContext):
     # The evaluation of predicates by this context is short-circuiting, but
     # unordered.</p>
     #
-    def eval(self, parser:Recognizer , outerContext:RuleContext ):
-        for opnd in self.opnds:
-            if not opnd.eval(parser, outerContext):
-                return False
-        return True
+    def eval(self, parser:Recognizer, outerContext:RuleContext):
+        return all(opnd.eval(parser, outerContext) for opnd in self.opnds)
 
     def evalPrecedence(self, parser:Recognizer, outerContext:RuleContext):
         differs = False
@@ -278,13 +267,11 @@ class OR (SemanticContext):
     def __init__(self, a:SemanticContext, b:SemanticContext):
         operands = set()
         if isinstance( a, OR ):
-            for o in a.opnds:
-                operands.add(o)
+            operands.update(a.opnds)
         else:
             operands.add(a)
         if isinstance( b, OR ):
-            for o in b.opnds:
-                operands.add(o)
+            operands.update(b.opnds)
         else:
             operands.add(b)
 
@@ -292,10 +279,10 @@ class OR (SemanticContext):
         if len(precedencePredicates)>0:
             # interested in the transition with the highest precedence
             s = sorted(precedencePredicates)
-            reduced = s[len(s)-1]
+            reduced = s[-1]
             operands.add(reduced)
 
-        self.opnds = [ o for o in operands ]
+        self.opnds = list(operands)
 
     def __eq__(self, other):
         if self is other:
@@ -316,10 +303,7 @@ class OR (SemanticContext):
     # unordered.</p>
     #
     def eval(self, parser:Recognizer, outerContext:RuleContext):
-        for opnd in self.opnds:
-            if opnd.eval(parser, outerContext):
-                return True
-        return False
+        return any(opnd.eval(parser, outerContext) for opnd in self.opnds)
 
     def evalPrecedence(self, parser:Recognizer, outerContext:RuleContext):
         differs = False

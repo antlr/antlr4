@@ -34,7 +34,7 @@
   <parent>
     <groupId>org.antlr</groupId>
     <artifactId>antlr4-master</artifactId>
-    <version>4.5.4-SNAPSHOT</version>
+    <version>4.6-SNAPSHOT</version>
   </parent>
   <artifactId>antlr4-maven-plugin</artifactId>
   <packaging>maven-plugin</packaging>
@@ -48,11 +48,16 @@
   <!-- Ancilliary information for completeness -->
   <inceptionYear>2009</inceptionYear>
 
+  <properties>
+    <mavenVersion>3.3.9</mavenVersion>
+    <takariLifecycleVersion>1.11.12</takariLifecycleVersion>
+  </properties>
+
   <!-- ============================================================================= -->
 
-  <!-- What are we depedent on for the Mojos to execute? We need the plugin 
-    API itself and of course we need the ANTLR Tool and runtime and any of their 
-    dependencies, which we inherit. The Tool itself provides us with all the 
+  <!-- What are we depedent on for the Mojos to execute? We need the plugin
+    API itself and of course we need the ANTLR Tool and runtime and any of their
+    dependencies, which we inherit. The Tool itself provides us with all the
     dependencies, so we need only name it here. -->
   <dependencies>
 
@@ -64,11 +69,6 @@
       <scope>compile</scope>
     </dependency>
     <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-project</artifactId>
-      <version>2.2.1</version>
-    </dependency>
-    <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-compiler-api</artifactId>
       <version>2.2</version>
@@ -78,8 +78,8 @@
       <artifactId>plexus-build-api</artifactId>
       <version>0.0.7</version>
     </dependency>
-    <!-- The version of ANTLR tool that this version of the plugin controls. 
-      We have decided that this should be in lockstep with ANTLR itself, other 
+    <!-- The version of ANTLR tool that this version of the plugin controls.
+      We have decided that this should be in lockstep with ANTLR itself, other
       than -1 -2 -3 etc patch releases. -->
     <dependency>
       <groupId>org.antlr</groupId>
@@ -94,20 +94,49 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.apache.maven.shared</groupId>
-      <artifactId>maven-plugin-testing-harness</artifactId>
-      <version>1.1</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>org.apache.maven.plugin-tools</groupId>
       <artifactId>maven-plugin-annotations</artifactId>
       <version>3.2</version>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>io.takari.maven.plugins</groupId>
+        <artifactId>takari-plugin-testing</artifactId>
+        <version>2.9.0</version>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-core</artifactId>
+        <version>${mavenVersion}</version>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-compat</artifactId>
+        <version>${mavenVersion}</version>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-utils</artifactId>
+        <version>3.0.15</version>
+        <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-project</artifactId>
+      <version>2.2.1</version>
+    </dependency>
   </dependencies>
 
   <build>
+    <testSourceDirectory>src/test</testSourceDirectory>
+    <testResources>
+      <testResource>
+        <directory>src/test/resources</directory>
+      </testResource>
+    </testResources>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -132,6 +161,21 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+         <groupId>io.takari.maven.plugins</groupId>
+         <artifactId>takari-lifecycle-plugin</artifactId>
+         <version>${takariLifecycleVersion}</version>
+         <extensions>true</extensions>
+         <executions>
+           <execution>
+             <id>testProperties</id>
+             <phase>process-test-resources</phase>
+             <goals>
+               <goal>testProperties</goal>
+             </goals>
+           </execution>
+         </executions>
+       </plugin>
     </plugins>
   </build>
 

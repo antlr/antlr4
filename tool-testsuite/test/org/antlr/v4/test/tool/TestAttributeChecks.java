@@ -31,13 +31,21 @@
 package org.antlr.v4.test.tool;
 
 import org.antlr.runtime.RecognitionException;
-import org.antlr.v4.test.runtime.java.BaseTest;
 import org.antlr.v4.tool.ErrorType;
+import org.junit.Before;
 import org.junit.Test;
 import org.stringtemplate.v4.ST;
+import org.stringtemplate.v4.STGroup;
+import org.stringtemplate.v4.misc.ErrorBuffer;
 
 /** */
-public class TestAttributeChecks extends BaseTest {
+public class TestAttributeChecks extends BaseJavaToolTest {
+	@Before
+	@Override
+	public void testSetUp() throws Exception {
+		super.testSetUp();
+	}
+
     String attributeTemplate =
         "parser grammar A;\n"+
         "@members {<members>}\n" +
@@ -56,7 +64,7 @@ public class TestAttributeChecks extends BaseTest {
         "c   :   ;\n";
 
     String[] membersChecks = {
-		"$a",			"error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:2:11: unknown attribute reference a in $a\n",
+	    "$a",			"error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:2:11: unknown attribute reference a in $a\n",
         "$a.y",			"error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:2:11: unknown attribute reference a in $a.y\n",
     };
 
@@ -265,7 +273,9 @@ public class TestAttributeChecks extends BaseTest {
         for (int i = 0; i < pairs.length; i+=2) {
             String action = pairs[i];
             String expected = pairs[i+1];
-            ST st = new ST(template);
+	        STGroup g = new STGroup('<','>');
+	        g.setListener(new ErrorBuffer()); // hush warnings
+            ST st = new ST(g, template);
             st.add(location, action);
             String grammar = st.render();
             testErrors(new String[] {grammar, expected}, false);

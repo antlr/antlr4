@@ -31,17 +31,21 @@
 package org.antlr.v4.test.tool;
 
 import org.antlr.v4.Tool;
-import org.antlr.v4.test.runtime.java.BaseTest;
 import org.antlr.v4.tool.ErrorType;
+import org.junit.Before;
 import org.junit.Test;
 
-public class TestToolSyntaxErrors extends BaseTest {
+public class TestToolSyntaxErrors extends BaseJavaToolTest {
     static String[] A = {
-        // INPUT
-        "grammar A;\n" +
-        "",
-        // YIELDS
-        "error(" + ErrorType.NO_RULES.code + "): A.g4::: grammar A has no rules\n",
+	    // INPUT
+		"grammar A;\n" +
+		"",
+		// YIELDS
+		"error(" + ErrorType.NO_RULES.code + "): A.g4::: grammar A has no rules\n",
+
+		"lexer grammar A;\n" +
+		"",
+		"error(" + ErrorType.NO_RULES.code + "): A.g4::: grammar A has no rules\n",
 
 		"A;",
 		"error(" + ErrorType.SYNTAX_ERROR.code + "): A.g4:1:0: syntax error: 'A' came as a complete surprise to me\n",
@@ -73,6 +77,12 @@ public class TestToolSyntaxErrors extends BaseTest {
 		"error(" + ErrorType.SYNTAX_ERROR.code + "): A.g4:2:11: syntax error: mismatched input ')' expecting SEMI while matching a rule\n" +
 		"error(" + ErrorType.SYNTAX_ERROR.code + "): A.g4:2:15: syntax error: mismatched input ';' expecting COLON while matching a lexer rule\n",
     };
+
+	@Before
+	@Override
+	public void testSetUp() throws Exception {
+		super.testSetUp();
+	}
 
 	@Test public void testA() { super.testErrors(A, true); }
 

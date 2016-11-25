@@ -29,13 +29,19 @@
  */
 package org.antlr.v4.test.tool;
 
-import org.antlr.v4.test.runtime.java.BaseTest;
 import org.antlr.v4.tool.ErrorType;
+import org.junit.Before;
 import org.junit.Test;
 
 /** Test errors with the set stuff in lexer and parser */
-public class TestErrorSets extends BaseTest {
+public class TestErrorSets extends BaseJavaToolTest {
 	protected boolean debug = false;
+
+	@Before
+	@Override
+	public void testSetUp() throws Exception {
+		super.testSetUp();
+	}
 
 	/** Public default constructor used by TestRig */
 	public TestErrorSets() {

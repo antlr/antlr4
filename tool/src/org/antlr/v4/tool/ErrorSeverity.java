@@ -61,7 +61,7 @@ public enum ErrorSeverity {
     /**
      * Standard constructor to build an instance of the Enum entries
      *
-     * @param text The human readable string representing the serverity level
+     * @param text The human readable string representing the severity level
      */
     private ErrorSeverity(String text) { this.text = text; }
 }

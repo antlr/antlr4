@@ -52,7 +52,7 @@ using DFA = Antlr4.Runtime.Dfa.DFA;
 <endif>
 >>
 
-ListenerFile(file, header) ::= <<
+ListenerFile(file, header, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 <if(file.genPackage)>
 namespace <file.genPackage> {
@@ -96,7 +96,7 @@ void Exit<lname; format="cap">([NotNull] <csIdentifier.(file.parserName)>.<lname
 <endif>
 >>
 
-BaseListenerFile(file, header) ::= <<
+BaseListenerFile(file, header, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 <if(file.genPackage)>
 namespace <file.genPackage> {
@@ -159,7 +159,7 @@ public virtual void Exit<lname; format="cap">([NotNull] <csIdentifier.(file.pars
 <endif>
 >>
 
-VisitorFile(file, header) ::= <<
+VisitorFile(file, header, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 <if(file.genPackage)>
 namespace <file.genPackage> {
@@ -195,7 +195,7 @@ Result Visit<lname; format="cap">([NotNull] <csIdentifier.(file.parserName)>.<ln
 <endif>
 >>
 
-BaseVisitorFile(file, header) ::= <<
+BaseVisitorFile(file, header, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 <if(file.genPackage)>
 namespace <file.genPackage> {
@@ -537,6 +537,7 @@ CodeBlockForAlt(currentAltCodeBlock, locals, preamble, ops) ::= <<
 
 LL1AltBlock(choice, preamble, alts, error) ::= <<
 State = <choice.stateNumber>;
+ErrorHandler.Sync(this);
 <if(choice.label)><labelref(choice.label)> = TokenStream.Lt(1);<endif>
 <preamble; separator="\n">
 switch (TokenStream.La(1)) {
@@ -550,6 +551,7 @@ default:
 
 LL1OptionalBlock(choice, alts, error) ::= <<
 State = <choice.stateNumber>;
+ErrorHandler.Sync(this);
 switch (TokenStream.La(1)) {
 <choice.altLook,alts:{look,alt| <cases(ttypes=look)>
 	<alt>
@@ -561,6 +563,7 @@ default:
 
 LL1OptionalBlockSingleAlt(choice, expr, alts, preamble, error, followExpr) ::= <<
 State = <choice.stateNumber>;
+ErrorHandler.Sync(this);
 <preamble; separator="\n">
 if (<expr>) {
 	<alts; separator="\n">
@@ -740,10 +743,10 @@ LexerSkipCommand()  ::= "Skip();"
 LexerMoreCommand()  ::= "More();"
 LexerPopModeCommand() ::= "PopMode();"
 
-LexerTypeCommand(arg)      ::= "_type = <tokenType.(arg)>;"
-LexerChannelCommand(arg)   ::= "_channel = <channelName.(arg)>;"
-LexerModeCommand(arg)      ::= "_mode = <modeName.(arg)>;"
-LexerPushModeCommand(arg)  ::= "PushMode(<modeName.(arg)>);"
+LexerTypeCommand(arg, grammar)      ::= "_type = <tokenType.(arg)>;"
+LexerChannelCommand(arg, grammar)   ::= "_channel = <channelName.(arg)>;"
+LexerModeCommand(arg, grammar)      ::= "_mode = <modeName.(arg)>;"
+LexerPushModeCommand(arg, grammar)  ::= "PushMode(<modeName.(arg)>);"
 
 ActionText(t) ::= "<t.text>"
 ActionTemplate(t) ::= "<t.st>"
