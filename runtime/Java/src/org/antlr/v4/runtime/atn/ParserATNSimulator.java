@@ -293,7 +293,8 @@ public class ParserATNSimulator extends ATNSimulator {
 	public static final boolean dfa_debug = false;
 	public static final boolean retry_debug = false;
 
-	public static final boolean TURN_OFF_LR_LOOP_ENTRY_BRANCH_OPT = Boolean.parseBoolean(System.getProperty("TURN_OFF_LR_LOOP_ENTRY_BRANCH_OPT"));
+	/** Just in case this optimization is bad, add an ENV variable to turn it off */
+	public static final boolean TURN_OFF_LR_LOOP_ENTRY_BRANCH_OPT = Boolean.parseBoolean(System.getenv("TURN_OFF_LR_LOOP_ENTRY_BRANCH_OPT"));
 
 	protected final Parser parser;
 
@@ -1694,6 +1695,8 @@ public class ParserATNSimulator extends ATNSimulator {
 	 * making a decision in stat seeing through expr. It is only when
 	 * parsing rule expr that we must use the precedence to get the
 	 * right interpretation and, hence, parse tree.
+	 *
+	 * @since 4.6
 	 */
 	protected boolean canDropLoopEntryEdgeInLeftRecursiveRule(ATNConfig config) {
 		if ( TURN_OFF_LR_LOOP_ENTRY_BRANCH_OPT ) return false;
