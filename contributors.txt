@@ -92,4 +92,4 @@ YYYY/MM/DD, github id, Full name, email
 2016/03/27, beardlybread, Bradley Steinbacher, bradley.j.steinbacher@gmail.com
 2016/03/29, msteiger, Martin Steiger, antlr@martin-steiger.de
 2016/03/28, gagern, Martin von Gagern, gagern@ma.tum.de
-2016/09/23, ghosthop, Dmitry Shakhtanov, sudstrike@gmail.com
+2016/09/23, ghosthope, Dmitry Shakhtanov, sudstrike@gmail.com
