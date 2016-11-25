@@ -16,19 +16,19 @@ If you are going to integrate ANTLR into your existing build system using mvn, a
 1. Download
 ```
 $ cd /usr/local/lib
-$ curl -O http://www.antlr.org/download/antlr-4.5-complete.jar
+$ curl -O http://www.antlr.org/download/antlr-4.5.3-complete.jar
 ```
 Or just download in browser from website:
     [http://www.antlr.org/download.html](http://www.antlr.org/download.html)
 and put it somewhere rational like `/usr/local/lib`.
-2. Add `antlr-4.5-complete.jar` to your `CLASSPATH`:
+2. Add `antlr-4.5.3-complete.jar` to your `CLASSPATH`:
 ```
 $ export CLASSPATH=".:/usr/local/lib/antlr-4.5-complete.jar:$CLASSPATH"
 ```
 It's also a good idea to put this in your `.bash_profile` or whatever your startup script is.
 3. Create aliases for the ANTLR Tool, and `TestRig`.
 ```
-$ alias antlr4='java -Xmx500M -cp "/usr/local/lib/antlr-4.5-complete.jar:$CLASSPATH" org.antlr.v4.Tool'
+$ alias antlr4='java -Xmx500M -cp "/usr/local/lib/antlr-4.5.3-complete.jar:$CLASSPATH" org.antlr.v4.Tool'
 $ alias grun='java org.antlr.v4.gui.TestRig'
 ```
 
