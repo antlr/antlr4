@@ -31,7 +31,6 @@
 package org.antlr.v4.test.tool;
 
 import org.antlr.v4.runtime.Token;
-import org.antlr.v4.test.runtime.java.BaseJavaTest;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
 import org.junit.Test;
@@ -45,7 +44,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class TestTokenTypeAssignment extends BaseJavaTest {
+public class TestTokenTypeAssignment extends BaseJavaToolTest {
 
 	@Test
 		public void testParserSimpleTokens() throws Exception {

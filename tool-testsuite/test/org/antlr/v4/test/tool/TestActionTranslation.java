@@ -30,14 +30,13 @@
 
 package org.antlr.v4.test.tool;
 
-import org.antlr.v4.test.runtime.java.BaseJavaTest;
 import org.antlr.v4.tool.Grammar;
 import org.junit.Before;
 import org.junit.Test;
 
 /** */
 @SuppressWarnings("unused")
-public class TestActionTranslation extends BaseJavaTest {
+public class TestActionTranslation extends BaseJavaToolTest {
 	@Before
 	@Override
 	public void testSetUp() throws Exception {
@@ -176,6 +175,13 @@ public class TestActionTranslation extends BaseJavaTest {
 		testActions(attributeTemplate, "inline", action, expected);
     }
 
+    /** Added in response to https://github.com/antlr/antlr4/issues/1211 */
+	@Test public void testUnknownAttr() throws Exception {
+		String action = "$qqq.text";
+		String expected = ""; // was causing an exception
+		testActions(attributeTemplate, "inline", action, expected);
+	}
+
 	/**
 	 * Regression test for issue #1295
      * $e.v yields incorrect value 0 in "e returns [int v] : '1' {$v = 1;} | '(' e ')' {$v = $e.v;} ;"
@@ -236,67 +242,7 @@ public class TestActionTranslation extends BaseJavaTest {
     }
 
 
-    @Test public void testDynamicRuleScopeRefInSubrule() throws Exception {
-        String action = "$a::n;";
-    }
-    @Test public void testRuleScopeFromAnotherRule() throws Exception {
-        String action = "$a::n;"; // must be qualified
-    }
-    @Test public void testFullyQualifiedRefToCurrentRuleParameter() throws Exception {
-        String action = "$a.i;";
-    }
-    @Test public void testFullyQualifiedRefToCurrentRuleRetVal() throws Exception {
-        String action = "$a.i;";
-    }
-    @Test public void testSetFullyQualifiedRefToCurrentRuleRetVal() throws Exception {
-        String action = "$a.i = 1;";
-    }
-    @Test public void testIsolatedRefToCurrentRule() throws Exception {
-        String action = "$a;";
-    }
-    @Test public void testIsolatedRefToRule() throws Exception {
-        String action = "$x;";
-    }
-    @Test public void testFullyQualifiedRefToLabelInCurrentRule() throws Exception {
-        String action = "$a.x;";
-    }
-    @Test public void testFullyQualifiedRefToListLabelInCurrentRule() throws Exception {
-        String action = "$a.x;"; // must be qualified
-    }
-    @Test public void testFullyQualifiedRefToTemplateAttributeInCurrentRule() throws Exception {
-        String action = "$a.st;"; // can be qualified
-    }
-    @Test public void testRuleRefWhenRuleHasScope() throws Exception {
-        String action = "$b.start;";
-    }
-    @Test public void testDynamicScopeRefOkEvenThoughRuleRefExists() throws Exception {
-        String action = "$b::n;";
-    }
-    @Test public void testRefToTemplateAttributeForCurrentRule() throws Exception {
-        String action = "$st=null;";
-    }
-
-    @Test public void testRefToStartAttributeForCurrentRule() throws Exception {
-        String action = "$start;";
-    }
-
-    @Test public void testTokenLabelFromMultipleAlts() throws Exception {
-        String action = "$ID.text;"; // must be qualified
-    }
-    @Test public void testRuleLabelFromMultipleAlts() throws Exception {
-        String action = "$b.text;"; // must be qualified
-    }
-    @Test public void testUnqualifiedRuleScopeAttribute() throws Exception {
-        String action = "$n;"; // must be qualified
-    }
-    @Test public void testRuleAndTokenLabelTypeMismatch() throws Exception {
-    }
-    @Test public void testListAndTokenLabelTypeMismatch() throws Exception {
-    }
-    @Test public void testListAndRuleLabelTypeMismatch() throws Exception {
-    }
-    @Test public void testArgReturnValueMismatch() throws Exception {
-    }
+/*
     @Test public void testSimplePlusEqualLabel() throws Exception {
         String action = "$ids.size();"; // must be qualified
     }
@@ -477,6 +423,6 @@ public class TestActionTranslation extends BaseJavaTest {
 	}
 	@Test public void testGenericsAsReturnValue() throws Exception {
 	}
-
+*/
 	// TODO: nonlocal $rule::x
 }

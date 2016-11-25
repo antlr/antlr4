@@ -1,31 +1,24 @@
 sudo: true
-language: java
-script:
-  - mvn -Dparallel=methods -DthreadCount=4 install
 
-jdk:
-  - oraclejdk7
-  - oraclejdk8
+matrix:
+  include:
+    - os: linux
+      env: CXX=g++-5
+      compiler: clang
+      language: java
+      jdk: oraclejdk7
+    - os: osx
+      compiler: clang
+      language: java
+      osx_image: xcode8.1
+
+script:
+  - if [[ $TRAVIS_OS_NAME == osx ]]; then cd runtime-testsuite; ../.travis/run-tests-macos.sh; fi
+  - if [[ $TRAVIS_OS_NAME == linux ]]; then cd runtime-testsuite; ../.travis/run-tests-linux.sh; fi
 
 before_install:
-  - sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
-  - sudo add-apt-repository ppa:fkrull/deadsnakes -y
-  - sudo add-apt-repository ppa:rwky/nodejs -y
-  - sudo apt-get update -qq
-  - sudo apt-get install -qq python3.5
-  - sudo apt-get install -qq nodejs
-  - echo "deb http://download.mono-project.com/repo/debian wheezy/snapshots/3.12.1 main" | sudo tee /etc/apt/sources.list.d/mono-xamarin.list
-  - sudo apt-get install -qq mono-complete
-  - eval "$(sudo gimme 1.7.3)"
-  - go version ; go env
-  - python --version
-  - python3 --version
-
-env:
-  - CXX=g++-5
-
-compiler:
-  - clang
+  - if [[ $TRAVIS_OS_NAME == osx ]]; then ./.travis/before-install-macos.sh; fi
+  - if [[ $TRAVIS_OS_NAME == linux ]]; then ./.travis/before-install-linux.sh; fi
 
 addons:
   apt:

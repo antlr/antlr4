@@ -32,7 +32,6 @@ package org.antlr.v4.test.tool;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.Vocabulary;
 import org.antlr.v4.runtime.VocabularyImpl;
-import org.antlr.v4.test.runtime.java.BaseJavaTest;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,7 +40,7 @@ import org.junit.Test;
  *
  * @author Sam Harwell
  */
-public class TestVocabulary extends BaseJavaTest {
+public class TestVocabulary extends BaseJavaToolTest {
 	@Before
 	@Override
 	public void testSetUp() throws Exception {

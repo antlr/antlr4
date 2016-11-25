@@ -59,6 +59,7 @@ import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.net.URI;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -190,6 +191,12 @@ public class Antlr4Mojo extends AbstractMojo {
 	@Parameter(defaultValue = "${basedir}/src/main/antlr4/imports")
     private File libDirectory;
 
+    /**
+     * The directory where build status information is located.
+     */
+    @Parameter(defaultValue = "${project.build.directory}/maven-status/antlr4", readonly=true)
+    private File statusDirectory;
+
 	@Component
 	private BuildContext buildContext;
 
@@ -228,6 +235,8 @@ public class Antlr4Mojo extends AbstractMojo {
 
         Log log = getLog();
 
+		outputEncoding = validateEncoding(outputEncoding);
+
         if (log.isDebugEnabled()) {
             for (String e : excludes) {
                 log.debug("ANTLR: Exclude: " + e);
@@ -255,16 +264,22 @@ public class Antlr4Mojo extends AbstractMojo {
             outputDir.mkdirs();
         }
 
+        GrammarDependencies dependencies = new GrammarDependencies(sourceDirectory, libDirectory, arguments, getDependenciesStatusFile(), getLog());
+
 		// Now pick up all the files and process them with the Tool
 		//
 
 		List<List<String>> argumentSets;
+        Set<File> grammarFiles;
+        Set<File> importGrammarFiles;
         try {
 			List<String> args = getCommandArguments();
-            argumentSets = processGrammarFiles(args, sourceDirectory);
-        } catch (InclusionScanException ie) {
-            log.error(ie);
-            throw new MojoExecutionException("Fatal error occured while evaluating the names of the grammar files to analyze", ie);
+            grammarFiles = getGrammarFiles(sourceDirectory);
+            importGrammarFiles = getImportFiles(sourceDirectory);
+            argumentSets = processGrammarFiles(args, grammarFiles, dependencies, sourceDirectory);
+        } catch (Exception e) {
+            log.error(e);
+            throw new MojoExecutionException("Fatal error occured while evaluating the names of the grammar files to analyze", e);
         }
 
 		log.debug("Output directory base will be " + outputDirectory.getAbsolutePath());
@@ -277,6 +292,14 @@ public class Antlr4Mojo extends AbstractMojo {
 				log.error("The attempt to create the ANTLR 4 build tool failed, see exception report for details", e);
 				throw new MojoFailureException("Error creating an instanceof the ANTLR tool.", e);
 			}
+
+            try {
+                dependencies.analyze(grammarFiles, importGrammarFiles, tool);
+            } catch (Exception e) {
+                log.error("Dependency analysis failed, see exception report for details",
+                    e);
+                throw new MojoFailureException("Dependency analysis failed.", e);
+            }
 
 			// Set working directory for ANTLR to be the base source directory
 			tool.inputDirectory = sourceDirectory;
@@ -293,6 +316,12 @@ public class Antlr4Mojo extends AbstractMojo {
         if (project != null) {
             // Tell Maven that there are some new source files underneath the output directory.
             addSourceRoot(this.getOutputDirectory());
+        }
+
+        try {
+            dependencies.save();
+        } catch (IOException ex) {
+            log.warn("Could not save grammar dependency status", ex);
         }
     }
 
@@ -316,8 +345,9 @@ public class Antlr4Mojo extends AbstractMojo {
 			args.add("-atn");
 		}
 
-		if ( inputEncoding!= null && !inputEncoding.isEmpty()) {
+		if ( inputEncoding!=null && !inputEncoding.isEmpty()) {
 			args.add("-encoding");
+			outputEncoding = inputEncoding;
 			args.add(inputEncoding);
 		}
 
@@ -361,22 +391,11 @@ public class Antlr4Mojo extends AbstractMojo {
      * @param sourceDirectory
      * @exception InclusionScanException
      */
-
-    private List<List<String>> processGrammarFiles(List<String> args, File sourceDirectory) throws InclusionScanException {
-        // Which files under the source set should we be looking for as grammar files
-        SourceMapping mapping = new SuffixMapping("g4", Collections.<String>emptySet());
-
-        // What are the sets of includes (defaulted or otherwise).
-        Set<String> includes = getIncludesPatterns();
-
-        // Now, to the excludes, we need to add the imports directory
-        // as this is autoscanned for imported grammars and so is auto-excluded from the
-        // set of grammar fields we should be analyzing.
-        excludes.add("imports/**");
-
-        SourceInclusionScanner scan = new SimpleSourceInclusionScanner(includes, excludes);
-        scan.addSourceMapping(mapping);
-        Set<File> grammarFiles = scan.getIncludedSources(sourceDirectory, null);
+    private List<List<String>> processGrammarFiles(
+        List<String> args,
+        Set<File> grammarFiles,
+        GrammarDependencies dependencies,
+        File sourceDirectory) throws InclusionScanException, IOException {
 
         // We don't want the plugin to run for every grammar, regardless of whether
         // it's changed since the last compilation. Check the mtime of the tokens vs
@@ -387,7 +406,8 @@ public class Antlr4Mojo extends AbstractMojo {
             String tokensFileName = grammarFile.getName().split("\\.")[0] + ".tokens";
             File outputFile = new File(outputDirectory, tokensFileName);
             if ( (! outputFile.exists()) ||
-                 outputFile.lastModified() < grammarFile.lastModified() ) {
+                 outputFile.lastModified() < grammarFile.lastModified() ||
+                 dependencies.isDependencyChanged(grammarFile)) {
                 grammarFilesToProcess.add(grammarFile);
             }
         }
@@ -411,7 +431,7 @@ public class Antlr4Mojo extends AbstractMojo {
 
 			getLog().debug("Grammar file '" + grammarFile.getPath() + "' detected.");
 
-			String relPathBase = findSourceSubdir(sourceDirectory, grammarFile.getPath());
+			String relPathBase = MojoUtils.findSourceSubdir(sourceDirectory, grammarFile);
 			String relPath = relPathBase + grammarFile.getName();
 			getLog().debug("  ... relative path is: " + relPath);
 
@@ -436,6 +456,39 @@ public class Antlr4Mojo extends AbstractMojo {
 		return result;
 	}
 
+    private Set<File> getImportFiles(File sourceDirectory) throws InclusionScanException {
+        if (!libDirectory.exists()) return Collections.emptySet();
+
+        Set<String> includes = new HashSet<String>();
+        includes.add("*.g4");
+        includes.add("*.tokens");
+
+        SourceInclusionScanner scan = new SimpleSourceInclusionScanner(includes,
+                Collections.<String>emptySet());
+        scan.addSourceMapping(new SuffixMapping("G4", "g4"));
+
+        return scan.getIncludedSources(libDirectory, null);
+    }
+
+	private Set<File> getGrammarFiles(File sourceDirectory) throws InclusionScanException
+	{
+		// Which files under the source set should we be looking for as grammar files
+		SourceMapping mapping = new SuffixMapping("g4", Collections.<String>emptySet());
+
+		// What are the sets of includes (defaulted or otherwise).
+		Set<String> includes = getIncludesPatterns();
+
+		// Now, to the excludes, we need to add the imports directory
+		// as this is autoscanned for imported grammars and so is auto-excluded from the
+		// set of grammar fields we should be analyzing.
+		excludes.add("imports/**");
+
+		SourceInclusionScanner scan = new SimpleSourceInclusionScanner(includes, excludes);
+		scan.addSourceMapping(mapping);
+
+		return scan.getIncludedSources(sourceDirectory, null);
+	}
+
 	private static String getPackageName(String relativeFolderPath) {
 		if (relativeFolderPath.contains("..")) {
 			throw new UnsupportedOperationException("Cannot handle relative paths containing '..'");
@@ -456,30 +509,14 @@ public class Antlr4Mojo extends AbstractMojo {
         return includes;
     }
 
-    /**
-     * Given the source directory File object and the full PATH to a grammar,
-     * produce the path to the named grammar file in relative terms to the
-     * {@code sourceDirectory}. This will then allow ANTLR to produce output
-     * relative to the base of the output directory and reflect the input
-     * organization of the grammar files.
-     *
-     * @param sourceDirectory The source directory {@link File} object
-     * @param grammarFileName The full path to the input grammar file
-     * @return The path to the grammar file relative to the source directory
-     */
-    private String findSourceSubdir(File sourceDirectory, String grammarFileName) {
-        String srcPath = sourceDirectory.getPath() + File.separator;
+    private File getDependenciesStatusFile() {
+        File statusFile = new File(statusDirectory, "dependencies.ser");
 
-        if (!grammarFileName.startsWith(srcPath)) {
-            throw new IllegalArgumentException("expected " + grammarFileName + " to be prefixed with " + sourceDirectory);
+        if (!statusFile.getParentFile().exists()) {
+            statusFile.getParentFile().mkdirs();
         }
 
-        File unprefixedGrammarFileName = new File(grammarFileName.substring(srcPath.length()));
-		if (unprefixedGrammarFileName.getParent() == null) {
-			return "";
-		}
-
-        return unprefixedGrammarFileName.getParent() + File.separator;
+        return statusFile;
     }
 
 	private final class CustomTool extends Tool {
@@ -521,7 +558,21 @@ public class Antlr4Mojo extends AbstractMojo {
 			URI relativePath = project.getBasedir().toURI().relativize(outputFile.toURI());
 			getLog().debug("  Writing file: " + relativePath);
 			OutputStream outputStream = buildContext.newFileOutputStream(outputFile);
-			return new BufferedWriter(new OutputStreamWriter(outputStream, outputEncoding));
+			if ( outputEncoding!=null && !outputEncoding.isEmpty()) {
+				return new BufferedWriter(new OutputStreamWriter(outputStream, outputEncoding));
+			}
+			else {
+				return new BufferedWriter(new OutputStreamWriter(outputStream));
+			}
 		}
+	}
+
+	/**
+	 * Validates the given encoding.
+	 *
+	 * @return  the validated encoding. If {@code null} was provided, returns the platform default encoding.
+	 */
+	private String validateEncoding(String encoding) {
+		return (encoding == null) ? Charset.defaultCharset().name() : Charset.forName(encoding.trim()).name();
 	}
 }

@@ -30,13 +30,12 @@
 
 package org.antlr.v4.test.tool;
 
-import org.antlr.v4.test.runtime.java.BaseJavaTest;
 import org.antlr.v4.tool.ErrorType;
 import org.junit.Before;
 import org.junit.Test;
 
 /** */
-public class TestLeftRecursionToolIssues extends BaseJavaTest {
+public class TestLeftRecursionToolIssues extends BaseJavaToolTest {
 	protected boolean debug = false;
 
 	@Before

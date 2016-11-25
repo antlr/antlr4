@@ -117,12 +117,13 @@ public abstract class PredictionContext {
 
 	public abstract int getReturnState(int index);
 
-	/** This means only the {@link #EMPTY} context is in set. */
+	/** This means only the {@link #EMPTY} (wildcard? not sure) context is in set. */
 	public boolean isEmpty() {
 		return this == EMPTY;
 	}
 
 	public boolean hasEmptyPath() {
+		// since EMPTY_RETURN_STATE can only appear in the last position, we check last one
 		return getReturnState(size() - 1) == EMPTY_RETURN_STATE;
 	}
 

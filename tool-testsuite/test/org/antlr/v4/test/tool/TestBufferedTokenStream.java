@@ -37,14 +37,13 @@ import org.antlr.v4.runtime.LexerInterpreter;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenSource;
 import org.antlr.v4.runtime.TokenStream;
-import org.antlr.v4.test.runtime.java.BaseJavaTest;
 import org.antlr.v4.tool.LexerGrammar;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class TestBufferedTokenStream extends BaseJavaTest {
+public class TestBufferedTokenStream extends BaseJavaToolTest {
 	@Before
 	@Override
 	public void testSetUp() throws Exception {

@@ -186,9 +186,13 @@ class ATNConfigSet(object):
     def __contains__(self, config):
         if self.configLookup is None:
             raise UnsupportedOperationException("This method is not implemented for readonly sets.")
-        h = hash(config)
+        h = config.hashCodeForConfigSet()
         l = self.configLookup.get(h, None)
-        return l is not None and config in l
+        if l is not None:
+            for c in l:
+                if config.equalsForConfigSet(c):
+                    return True
+        return False
 
     def clear(self):
         if self.readonly:

@@ -30,7 +30,6 @@
 
 package org.antlr.v4.test.tool;
 
-import org.antlr.v4.test.runtime.java.BaseJavaTest;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.LexerGrammar;
 import org.junit.Before;
@@ -39,7 +38,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
 /** */
-public class TestSymbolIssues extends BaseJavaTest {
+public class TestSymbolIssues extends BaseJavaToolTest {
     static String[] A = {
         // INPUT
         "grammar A;\n" +

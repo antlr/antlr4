@@ -56,14 +56,12 @@ import org.antlr.v4.runtime.atn.LexerATNSimulator;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntegerList;
 import org.antlr.v4.runtime.misc.Interval;
-import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.test.runtime.ErrorQueue;
 import org.antlr.v4.test.runtime.RuntimeTestSupport;
 import org.antlr.v4.tool.ANTLRMessage;
 import org.antlr.v4.tool.DOTGenerator;
-import org.antlr.v4.tool.DefaultToolListener;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.GrammarSemanticsMessage;
 import org.antlr.v4.tool.LexerGrammar;
@@ -93,7 +91,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import static org.antlr.v4.test.runtime.java.BaseJavaTest.antlrLock;
+import static org.antlr.v4.test.runtime.BaseRuntimeTest.antlrOnString;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -346,53 +344,6 @@ public class BaseCppTest implements RuntimeTestSupport {
 		return "Cpp";
 	}
 
-	/** Return true if all is ok, no errors */
-	protected ErrorQueue antlr(String fileName, String grammarFileName, String grammarStr, boolean defaultListener, String... extraOptions) {
-		mkdir(tmpdir);
-		writeFile(tmpdir, fileName, grammarStr);
-		final List<String> options = new ArrayList<String>();
-		Collections.addAll(options, extraOptions);
-		options.add("-Dlanguage=" + getLanguage());
-		options.add("-o");
-		options.add(tmpdir);
-		options.add("-lib");
-		options.add(tmpdir);
-		options.add(new File(tmpdir,grammarFileName).toString());
-
-		final String[] optionsA = new String[options.size()];
-		options.toArray(optionsA);
-		Tool antlr = newTool(optionsA);
-		ErrorQueue equeue = new ErrorQueue(antlr);
-		antlr.addListener(equeue);
-		if (defaultListener) {
-			antlr.addListener(new DefaultToolListener(antlr));
-		}
-		synchronized (antlrLock) {
-			antlr.processGrammarsOnCommandLine();
-		}
-
-		if ( !defaultListener && !equeue.errors.isEmpty() ) {
-			for (int i = 0; i < equeue.errors.size(); i++) {
-				ANTLRMessage msg = equeue.errors.get(i);
-				antlrToolErrors.append(msg.toString());
-			}
-			try {
-				antlrToolErrors.append(new String(Utils.readFile(tmpdir+"/"+grammarFileName)));
-			}
-			catch (IOException ioe) {
-				antlrToolErrors.append(ioe.toString());
-			}
-		}
-		if ( !defaultListener && !equeue.warnings.isEmpty() ) {
-			for (int i = 0; i < equeue.warnings.size(); i++) {
-				ANTLRMessage msg = equeue.warnings.get(i);
-				// antlrToolErrors.append(msg); warnings are hushed
-			}
-		}
-
-		return equeue;
-	}
-
 	protected String execLexer(String grammarFileName,
 	                           String grammarStr,
 	                           String lexerName,
@@ -498,7 +449,7 @@ public class BaseCppTest implements RuntimeTestSupport {
 	                                                String... extraOptions)
 	{
 		ErrorQueue equeue =
-			antlr(grammarFileName, grammarFileName, grammarStr, defaultListener, extraOptions);
+			antlrOnString(getTmpDir(), "Cpp", grammarFileName, grammarStr, defaultListener, extraOptions);
 		if (!equeue.errors.isEmpty()) {
 			return false;
 		}
@@ -582,6 +533,7 @@ public class BaseCppTest implements RuntimeTestSupport {
 	}
 
 	private String runProcess(ProcessBuilder builder, String description) throws Exception {
+//		System.out.println("BUILDER: "+builder.command());
 		Process process = builder.start();
 		StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
 		StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
@@ -593,6 +545,7 @@ public class BaseCppTest implements RuntimeTestSupport {
 		String output = stdoutVacuum.toString();
 		if ( stderrVacuum.toString().length()>0 ) {
 			this.stderrDuringParse = stderrVacuum.toString();
+//			System.err.println(this.stderrDuringParse);
 		}
 		if (errcode != 0) {
 			String err = "execution failed with error code: "+errcode;
@@ -620,7 +573,7 @@ public class BaseCppTest implements RuntimeTestSupport {
 		System.out.println("Building ANTLR4 C++ runtime (if necessary) at "+ runtimePath);
 
 		try {
-			String command[] = { "cmake", ".", "-DCMAKE_BUILD_TYPE=release" };
+			String command[] = { "cmake", ".", /*"-DCMAKE_CXX_COMPILER=clang++",*/ "-DCMAKE_BUILD_TYPE=release" };
 			if (runCommand(command, runtimePath, "antlr runtime cmake") == null)
 				return false;
 		}
@@ -688,11 +641,13 @@ public class BaseCppTest implements RuntimeTestSupport {
 				return null;
 		}
 		catch (Exception e) {
-			System.err.println("can't exec module: " + fileName);
+			System.err.println("can't create link to " + runtimePath + "/dist/libantlr4-runtime." + libExtension);
+			e.printStackTrace(System.err);
+			return null;
 		}
 
 		try {
-			List<String> command2 = new ArrayList<String>(Arrays.asList("clang++", "-std=c++11", "-I", includePath, "-L.", "-lantlr4-runtime"));
+			List<String> command2 = new ArrayList<String>(Arrays.asList("clang++", "-std=c++11", "-I", includePath, "-L.", "-lantlr4-runtime", "-o", "a.out"));
 			command2.addAll(allCppFiles(tmpdir));
 			if (runCommand(command2.toArray(new String[0]), tmpdir, "building test binary") == null) {
 				return null;
@@ -700,6 +655,7 @@ public class BaseCppTest implements RuntimeTestSupport {
 		}
 		catch (Exception e) {
 			System.err.println("can't compile test module: " + e.getMessage());
+			e.printStackTrace(System.err);
 			return null;
 		}
 
@@ -709,7 +665,7 @@ public class BaseCppTest implements RuntimeTestSupport {
 			ProcessBuilder builder = new ProcessBuilder(binPath, inputPath);
 			builder.directory(new File(tmpdir));
 			Map<String, String> env = builder.environment();
-			env.put("LD_PRELOAD", runtimePath + "/dist/libantlr4-runtime.so"); // For linux.
+			env.put("LD_PRELOAD", runtimePath + "/dist/libantlr4-runtime." + libExtension);
 			String output = runProcess(builder, "running test binary");
 			if ( output.length()==0 ) {
 				output = null;
@@ -723,7 +679,8 @@ public class BaseCppTest implements RuntimeTestSupport {
 			return output;
 		}
 		catch (Exception e) {
-			System.err.println("can't exec module: " + fileName + "\nerror is: "+ e.getMessage());
+			System.err.println("can't exec module: " + fileName);
+			e.printStackTrace(System.err);
 		}
 
 		return null;
@@ -736,39 +693,6 @@ public class BaseCppTest implements RuntimeTestSupport {
 			throw new RuntimeException("Cannot find runtime");
 		}
 		return runtimeSrc.getPath();
-	}
-
-	public void testErrors(String[] pairs, boolean printTree) {
-		for (int i = 0; i < pairs.length; i+=2) {
-			String input = pairs[i];
-			String expect = pairs[i+1];
-
-			String[] lines = input.split("\n");
-			String fileName = getFilenameFromFirstLineOfGrammar(lines[0]);
-			ErrorQueue equeue = antlr(fileName, fileName, input, false);
-
-			String actual = equeue.toString(true);
-			actual = actual.replace(tmpdir + File.separator, "");
-			System.err.println(actual);
-			String msg = input;
-			msg = msg.replace("\n","\\n");
-			msg = msg.replace("\r","\\r");
-			msg = msg.replace("\t","\\t");
-
-			assertEquals("error in: "+msg,expect,actual);
-		}
-	}
-
-	public String getFilenameFromFirstLineOfGrammar(String line) {
-		String fileName = "A" + Tool.GRAMMAR_EXTENSION;
-		int grIndex = line.lastIndexOf("grammar");
-		int semi = line.lastIndexOf(';');
-		if ( grIndex>=0 && semi>=0 ) {
-			int space = line.indexOf(' ', grIndex);
-			fileName = line.substring(space+1, semi)+Tool.GRAMMAR_EXTENSION;
-		}
-		if ( fileName.length()==Tool.GRAMMAR_EXTENSION.length() ) fileName = "A" + Tool.GRAMMAR_EXTENSION;
-		return fileName;
 	}
 
 	List<ANTLRMessage> getMessagesOfType(List<ANTLRMessage> msgs, Class<? extends ANTLRMessage> c) {

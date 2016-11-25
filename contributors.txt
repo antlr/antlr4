@@ -1,4 +1,4 @@
-ANTLR Project Contributors Certification of Origin and Rights
+﻿ANTLR Project Contributors Certification of Origin and Rights
 
 All contributors to ANTLR v4 must formally agree to abide by this
 certificate of origin by signing on the bottom with their github
@@ -114,3 +114,7 @@ YYYY/MM/DD, github id, Full name, email
 2016/11/06, NoodleOfDeath, Thom Morgan, github@bytemeapp.com
 2016/11/01, sebkur, Sebastian Kürten, sebastian@topobyte.de
 2016/04/13, renatahodovan, Renata Hodovan, reni@inf.u-szeged.hu
+2016/11/05, ewanmellor, Ewan Mellor, github@ewanmellor.org
+2016/11/06, janyou, Janyou, janyou.antlr@outlook.com
+2016/11/20, marcohu, Marco Hunsicker, antlr@hunsicker.de
+2016/09/02, lygav, Vladimir (Vladi) Lyga, lyvladi@gmail.com
