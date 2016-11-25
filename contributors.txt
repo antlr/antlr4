@@ -118,3 +118,4 @@ YYYY/MM/DD, github id, Full name, email
 2016/11/06, janyou, Janyou, janyou.antlr@outlook.com
 2016/11/20, marcohu, Marco Hunsicker, antlr@hunsicker.de
 2016/09/02, lygav, Vladimir (Vladi) Lyga, lyvladi@gmail.com
+2016/11/25, MrSampson, Oliver Sampson, olsam@quickaudio.com
