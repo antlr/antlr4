@@ -1,66 +1,44 @@
 sudo: true
 
-os:
- - linux
- - osx
- 
 language: java
 
-jdk: 
- - oraclejdk7
- - oraclejdk8
- 
 compiler: clang
 
-osx_image: xcode8.1
-
-env:
- - TARGET=java
- - TARGET=csharp
- - TARGET=python2
- - TARGET=python3
- - TARGET=javascript
- - TARGET=cpp
- - TARGET=go
- - TARGET=swift
- 
 matrix:
-  exclude:
+  include:
     - os: linux
-      env: TARGET=swift
-    - os: linux
-      env: TARGET=csharp
       jdk: oraclejdk7
-    - os: linux
-      env: TARGET=python2
-      jdk: oraclejdk7
-    - os: linux
-      env: TARGET=python3
-      jdk: oraclejdk7
-    - os: linux
-      env: TARGET=javascript
-      jdk: oraclejdk7
-    - os: linux
       env: TARGET=cpp
-      jdk: oraclejdk7
     - os: linux
-      env: TARGET=go
       jdk: oraclejdk7
-    - os: osx
       env: TARGET=java
-    - os: osx
+    - os: linux
+      jdk: oraclejdk8
+      env: TARGET=java
+    - os: linux
+      jdk: oraclejdk7
       env: TARGET=csharp
-    - os: osx
+    - os: linux
+      jdk: oraclejdk7
       env: TARGET=python2
-    - os: osx
+    - os: linux
+      jdk: oraclejdk7
       env: TARGET=python3
-    - os: osx
+    - os: linux
+      jdk: oraclejdk7
       env: TARGET=javascript
-    - os: osx
-      env: TARGET=cpp
-    - os: osx
+    - os: linux
+      jdk: oraclejdk7
       env: TARGET=go
-      
+    - os: osx
+      compiler: clang
+      osx_image: xcode8.1
+      env: TARGET=swift
+    - os: osx
+      compiler: clang
+      osx_image: xcode8.1
+      env: TARGET=cpp
+
 before_install:
   - ./.travis/before-install-$TRAVIS_OS_NAME-$TARGET.sh
 

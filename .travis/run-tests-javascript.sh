@@ -1,3 +1,3 @@
 #!/bin/bash
 
-mvn -Dparallel=methods -DthreadCount=4 -Dtest=node.* test
+mvn -q -Dparallel=methods -DthreadCount=4 -Dtest=node.* test
