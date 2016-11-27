@@ -25,9 +25,38 @@ env:
  - TARGET=swift
  
 matrix:
+  include:
+    - env: TARGET=cpp
+      addons:
+		  apt:
+		    sources:
+		      - ubuntu-toolchain-r-test
+		      - llvm-toolchain-precise-3.7
+		    packages:
+		      - g++-5
+		      - uuid-dev
+		      - clang-3.7
   exclude:
     - os: linux
       env: TARGET=swift
+    - os: linux
+      env: TARGET=csharp
+      jdk: oraclejdk7
+    - os: linux
+      env: TARGET=python2
+      jdk: oraclejdk7
+    - os: linux
+      env: TARGET=python3
+      jdk: oraclejdk7
+    - os: linux
+      env: TARGET=javascript
+      jdk: oraclejdk7
+    - os: linux
+      env: TARGET=cpp
+      jdk: oraclejdk7
+    - os: linux
+      env: TARGET=go
+      jdk: oraclejdk7
     - os: osx
       env: TARGET=java
     - os: osx
@@ -42,24 +71,6 @@ matrix:
       env: TARGET=cpp
     - os: osx
       env: TARGET=go
-    - os: osx
-      env: TARGET=csharp
-      jdk: oraclejdk7
-    - os: osx
-      env: TARGET=python2
-      jdk: oraclejdk7
-    - os: osx
-      env: TARGET=python3
-      jdk: oraclejdk7
-    - os: osx
-      env: TARGET=javascript
-      jdk: oraclejdk7
-    - os: osx
-      env: TARGET=cpp
-      jdk: oraclejdk7
-    - os: osx
-      env: TARGET=go
-      jdk: oraclejdk7
       
 before_install:
   - ./.travis/before-install-$TRAVIS_OS_NAME-$TARGET.sh
@@ -68,12 +79,3 @@ script:
   - cd runtime-testsuite
   - ../.travis/run-tests-$TARGET.sh
 
-addons:
-  apt:
-    sources:
-      - ubuntu-toolchain-r-test
-      - llvm-toolchain-precise-3.7
-    packages:
-      - g++-5
-      - uuid-dev
-      - clang-3.7
