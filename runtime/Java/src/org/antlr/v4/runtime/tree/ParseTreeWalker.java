@@ -34,7 +34,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
 
 public class ParseTreeWalker {
-    public static final ParseTreeWalker DEFAULT = new ParseTreeWalker();
+    public static final ParseTreeWalker DEFAULT = new IterativeParseTreeWalker();
 
     public void walk(ParseTreeListener listener, ParseTree t) {
 		if ( t instanceof ErrorNode) {

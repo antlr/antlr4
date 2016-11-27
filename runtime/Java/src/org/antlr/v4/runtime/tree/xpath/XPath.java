@@ -85,6 +85,7 @@ public class XPath {
 			throw new IllegalArgumentException("Could not read path: "+path, ioe);
 		}
 		XPathLexer lexer = new XPathLexer(in) {
+			@Override
 			public void recover(LexerNoViableAltException e) { throw e;	}
 		};
 		lexer.removeErrorListeners();
