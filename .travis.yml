@@ -1,24 +1,52 @@
 sudo: true
 
+language: java
+
+env:
+ - TARGET=java
+ - TARGET=csharp
+ - TARGET=python2
+ - TARGET=python3
+ - TARGET=javascript
+ - TARGET=cpp
+ - TARGET=go
+ - TARGET=swift
+ 
 matrix:
   include:
     - os: linux
       env: CXX=g++-5
       compiler: clang
-      language: java
       jdk: oraclejdk7
     - os: osx
       compiler: clang
-      language: java
       osx_image: xcode8.1
+  exclude:
+    - os: linux
+      env: TARGET=swift
+    - os: osx
+      env: TARGET=java
+    - os: osx
+      env: TARGET=csharp
+    - os: osx
+      env: TARGET=python2
+    - os: osx
+      env: TARGET=python3
+    - os: osx
+      env: TARGET=javascript
+    - os: osx
+      env: TARGET=cpp
+    - os: osx
+      env: TARGET=go
+      
+before_install:
+  - ./.travis/before-install-$TRAVIS_OS_NAME-$TARGET.sh
+  - fi
 
 script:
-  - if [[ $TRAVIS_OS_NAME == osx ]]; then cd runtime-testsuite; ../.travis/run-tests-macos.sh; fi
-  - if [[ $TRAVIS_OS_NAME == linux ]]; then cd runtime-testsuite; ../.travis/run-tests-linux.sh; fi
-
-before_install:
-  - if [[ $TRAVIS_OS_NAME == osx ]]; then ./.travis/before-install-macos.sh; fi
-  - if [[ $TRAVIS_OS_NAME == linux ]]; then ./.travis/before-install-linux.sh; fi
+  - cd runtime-testsuite
+  - ../.travis/run-tests-$TARGET.sh
+  - fi
 
 addons:
   apt:
