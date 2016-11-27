@@ -32,6 +32,10 @@ matrix:
             - g++-5
             - uuid-dev
             - clang-3.7
+    - os: osx
+      compiler: clang
+      osx_image: xcode8.1
+      env: TARGET=swift
     - os: linux
       jdk: oraclejdk7
       env: TARGET=java
@@ -53,10 +57,6 @@ matrix:
     - os: linux
       jdk: oraclejdk7
       env: TARGET=go
-    - os: osx
-      compiler: clang
-      osx_image: xcode8.1
-      env: TARGET=swift
 
 before_install:
   - ./.travis/before-install-$TRAVIS_OS_NAME-$TARGET.sh
