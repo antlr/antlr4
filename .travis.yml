@@ -10,10 +10,28 @@ matrix:
       env: 
         - TARGET=cpp
         - CXX=g++-5
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-precise-3.7
+          packages:
+            - g++-5
+            - uuid-dev
+            - clang-3.7
     - os: osx
       compiler: clang
       osx_image: xcode8.1
       env: TARGET=cpp
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-precise-3.7
+          packages:
+            - g++-5
+            - uuid-dev
+            - clang-3.7
     - os: linux
       jdk: oraclejdk7
       env: TARGET=java
@@ -47,12 +65,3 @@ script:
   - cd runtime-testsuite
   - ../.travis/run-tests-$TARGET.sh
 
-addons:
-  apt:
-    sources:
-      - ubuntu-toolchain-r-test
-      - llvm-toolchain-precise-3.7
-    packages:
-      - g++-5
-      - uuid-dev
-      - clang-3.7
