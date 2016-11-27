@@ -63,5 +63,4 @@ before_install:
 
 script:
   - cd runtime-testsuite; ../.travis/run-tests-$TARGET.sh
-  - if [[ $TARGET == java ]]; then cd tool-testsuite; mvn test; fi
 
