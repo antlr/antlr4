@@ -2,11 +2,10 @@ sudo: true
 
 language: java
 
-compiler: clang
-
 matrix:
   include:
     - os: linux
+      compiler: clang
       jdk: oraclejdk7
       env: 
         - TARGET=cpp
