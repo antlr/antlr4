@@ -25,17 +25,6 @@ env:
  - TARGET=swift
  
 matrix:
-  include:
-    - env: TARGET=cpp
-      addons:
-        apt:
-          sources:
-              - ubuntu-toolchain-r-test
-              - llvm-toolchain-precise-3.7
-            packages:
-              - g++-5
-              - uuid-dev
-              - clang-3.7
   exclude:
     - os: linux
       env: TARGET=swift
@@ -79,3 +68,12 @@ script:
   - cd runtime-testsuite
   - ../.travis/run-tests-$TARGET.sh
 
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+      - llvm-toolchain-precise-3.7
+    packages:
+      - g++-5
+      - uuid-dev
+      - clang-3.7
