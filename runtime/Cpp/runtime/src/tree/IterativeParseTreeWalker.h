@@ -1,8 +1,7 @@
-﻿/*
+/*
  * [The "BSD license"]
- *  Copyright (c) 2016 Mike Lischke
- *  Copyright (c) 2013 Terence Parr
- *  Copyright (c) 2013 Dan McLaughlin
+ *  Copyright (c) 2012 Terence Parr
+ *  Copyright (c) 2012 Sam Harwell
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -29,43 +28,26 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "tree/ErrorNode.h"
-#include "ParserRuleContext.h"
-#include "tree/ParseTreeListener.h"
-#include "support/CPPUtils.h"
+#pragma once
 
-#include "tree/IterativeParseTreeWalker.h"
+#include "antlr4-common.h"
+
 #include "tree/ParseTreeWalker.h"
 
-using namespace antlr4::tree;
-using namespace antlrcpp;
+namespace antlr4 {
+namespace tree {
 
-ParseTreeWalker ParseTreeWalker::DEFAULT = IterativeParseTreeWalker();
+  class ParseTreeListener;
+  
+  /**
+   * An iterative (read: non-recursive) pre-order and post-order tree walker that
+   * doesn't use the thread stack but heap-based stacks. Makes it possible to
+   * process deeply nested parse trees.
+   */
+  class ANTLR4CPP_PUBLIC IterativeParseTreeWalker : public ParseTreeWalker {
+  public:
+    virtual void walk(ParseTreeListener *listener, ParseTree *t) const override;
+  };
 
-void ParseTreeWalker::walk(ParseTreeListener *listener, ParseTree *t) const {
-  if (is<ErrorNode *>(t)) {
-    listener->visitErrorNode(dynamic_cast<ErrorNode *>(t));
-    return;
-  } else if (is<TerminalNode *>(t)) {
-    listener->visitTerminal(dynamic_cast<TerminalNode *>(t));
-    return;
-  }
-
-  enterRule(listener, t);
-  for (auto &child : t->children) {
-    walk(listener, child);
-  }
-  exitRule(listener, t);
-}
-
-void ParseTreeWalker::enterRule(ParseTreeListener *listener, ParseTree *r) const {
-  ParserRuleContext *ctx = dynamic_cast<ParserRuleContext *>(r);
-  listener->enterEveryRule(ctx);
-  ctx->enterRule(listener);
-}
-
-void ParseTreeWalker::exitRule(ParseTreeListener *listener, ParseTree *r) const {
-  ParserRuleContext *ctx = dynamic_cast<ParserRuleContext *>(r);
-  ctx->exitRule(listener);
-  listener->exitEveryRule(ctx);
-}
+} // namespace tree
+} // namespace antlr4

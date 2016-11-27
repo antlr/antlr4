@@ -812,6 +812,12 @@
 		27B36AC91DACE7AF0069C868 /* RuleContextWithAltNum.h in Headers */ = {isa = PBXBuildFile; fileRef = 27B36AC51DACE7AF0069C868 /* RuleContextWithAltNum.h */; };
 		27B36ACA1DACE7AF0069C868 /* RuleContextWithAltNum.h in Headers */ = {isa = PBXBuildFile; fileRef = 27B36AC51DACE7AF0069C868 /* RuleContextWithAltNum.h */; };
 		27B36ACB1DACE7AF0069C868 /* RuleContextWithAltNum.h in Headers */ = {isa = PBXBuildFile; fileRef = 27B36AC51DACE7AF0069C868 /* RuleContextWithAltNum.h */; };
+		27D414521DEB0D3D00D0F3F9 /* IterativeParseTreeWalker.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27D414501DEB0D3D00D0F3F9 /* IterativeParseTreeWalker.cpp */; };
+		27D414531DEB0D3D00D0F3F9 /* IterativeParseTreeWalker.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27D414501DEB0D3D00D0F3F9 /* IterativeParseTreeWalker.cpp */; };
+		27D414541DEB0D3D00D0F3F9 /* IterativeParseTreeWalker.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27D414501DEB0D3D00D0F3F9 /* IterativeParseTreeWalker.cpp */; };
+		27D414551DEB0D3D00D0F3F9 /* IterativeParseTreeWalker.h in Headers */ = {isa = PBXBuildFile; fileRef = 27D414511DEB0D3D00D0F3F9 /* IterativeParseTreeWalker.h */; };
+		27D414561DEB0D3D00D0F3F9 /* IterativeParseTreeWalker.h in Headers */ = {isa = PBXBuildFile; fileRef = 27D414511DEB0D3D00D0F3F9 /* IterativeParseTreeWalker.h */; };
+		27D414571DEB0D3D00D0F3F9 /* IterativeParseTreeWalker.h in Headers */ = {isa = PBXBuildFile; fileRef = 27D414511DEB0D3D00D0F3F9 /* IterativeParseTreeWalker.h */; };
 		27DB449D1D045537007E790B /* XPath.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27DB448B1D045537007E790B /* XPath.cpp */; };
 		27DB449E1D045537007E790B /* XPath.h in Headers */ = {isa = PBXBuildFile; fileRef = 27DB448C1D045537007E790B /* XPath.h */; };
 		27DB449F1D045537007E790B /* XPathElement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27DB448D1D045537007E790B /* XPathElement.cpp */; };
@@ -1150,6 +1156,8 @@
 		27AC52CF1CE773A80093AAAB /* antlr4-runtime.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "antlr4-runtime.h"; sourceTree = "<group>"; };
 		27B36AC41DACE7AF0069C868 /* RuleContextWithAltNum.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RuleContextWithAltNum.cpp; sourceTree = "<group>"; };
 		27B36AC51DACE7AF0069C868 /* RuleContextWithAltNum.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RuleContextWithAltNum.h; sourceTree = "<group>"; };
+		27D414501DEB0D3D00D0F3F9 /* IterativeParseTreeWalker.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = IterativeParseTreeWalker.cpp; sourceTree = "<group>"; };
+		27D414511DEB0D3D00D0F3F9 /* IterativeParseTreeWalker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IterativeParseTreeWalker.h; sourceTree = "<group>"; };
 		27DB448B1D045537007E790B /* XPath.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = XPath.cpp; sourceTree = "<group>"; wrapsLines = 0; };
 		27DB448C1D045537007E790B /* XPath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XPath.h; sourceTree = "<group>"; wrapsLines = 0; };
 		27DB448D1D045537007E790B /* XPathElement.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = XPathElement.cpp; sourceTree = "<group>"; wrapsLines = 0; };
@@ -1499,6 +1507,8 @@
 				276E5CFB1CDB57AA003FF4B4 /* ErrorNode.h */,
 				276E5CFC1CDB57AA003FF4B4 /* ErrorNodeImpl.cpp */,
 				276E5CFD1CDB57AA003FF4B4 /* ErrorNodeImpl.h */,
+				27D414501DEB0D3D00D0F3F9 /* IterativeParseTreeWalker.cpp */,
+				27D414511DEB0D3D00D0F3F9 /* IterativeParseTreeWalker.h */,
 				276566DF1DA93BFB000869BE /* ParseTree.cpp */,
 				276E5CFE1CDB57AA003FF4B4 /* ParseTree.h */,
 				276E5D001CDB57AA003FF4B4 /* ParseTreeListener.h */,
@@ -1721,6 +1731,7 @@
 				276E5E411CDB57AA003FF4B4 /* NotSetTransition.h in Headers */,
 				276E5E891CDB57AA003FF4B4 /* RangeTransition.h in Headers */,
 				27DB44D21D0463DB007E790B /* XPathRuleElement.h in Headers */,
+				27D414571DEB0D3D00D0F3F9 /* IterativeParseTreeWalker.h in Headers */,
 				276E601B1CDB57AA003FF4B4 /* ParseTreePattern.h in Headers */,
 				276E5DFC1CDB57AA003FF4B4 /* LexerCustomAction.h in Headers */,
 				276E5FE81CDB57AA003FF4B4 /* TokenStreamRewriter.h in Headers */,
@@ -1795,6 +1806,7 @@
 				276E5EA01CDB57AA003FF4B4 /* SemanticContext.h in Headers */,
 				276E5F5D1CDB57AA003FF4B4 /* ListTokenSource.h in Headers */,
 				276E5F8D1CDB57AA003FF4B4 /* ParserInterpreter.h in Headers */,
+				27D414561DEB0D3D00D0F3F9 /* IterativeParseTreeWalker.h in Headers */,
 				276E5DDD1CDB57AA003FF4B4 /* LexerActionExecutor.h in Headers */,
 				276E5F4B1CDB57AA003FF4B4 /* Lexer.h in Headers */,
 				276E5F631CDB57AA003FF4B4 /* Interval.h in Headers */,
@@ -2046,6 +2058,7 @@
 				276E5E3F1CDB57AA003FF4B4 /* NotSetTransition.h in Headers */,
 				276E5E871CDB57AA003FF4B4 /* RangeTransition.h in Headers */,
 				276E60191CDB57AA003FF4B4 /* ParseTreePattern.h in Headers */,
+				27D414551DEB0D3D00D0F3F9 /* IterativeParseTreeWalker.h in Headers */,
 				276E5DFA1CDB57AA003FF4B4 /* LexerCustomAction.h in Headers */,
 				276E5FE61CDB57AA003FF4B4 /* TokenStreamRewriter.h in Headers */,
 				276E5DEE1CDB57AA003FF4B4 /* LexerATNSimulator.h in Headers */,
@@ -2263,6 +2276,7 @@
 				27B36AC81DACE7AF0069C868 /* RuleContextWithAltNum.cpp in Sources */,
 				276E5F101CDB57AA003FF4B4 /* DFASerializer.cpp in Sources */,
 				276E5F2E1CDB57AA003FF4B4 /* FailedPredicateException.cpp in Sources */,
+				27D414541DEB0D3D00D0F3F9 /* IterativeParseTreeWalker.cpp in Sources */,
 				276E5F8B1CDB57AA003FF4B4 /* ParserInterpreter.cpp in Sources */,
 				276E5D4E1CDB57AA003FF4B4 /* AmbiguityInfo.cpp in Sources */,
 				276E5F161CDB57AA003FF4B4 /* DFAState.cpp in Sources */,
@@ -2402,6 +2416,7 @@
 				27B36AC71DACE7AF0069C868 /* RuleContextWithAltNum.cpp in Sources */,
 				276E5F0F1CDB57AA003FF4B4 /* DFASerializer.cpp in Sources */,
 				276E5F2D1CDB57AA003FF4B4 /* FailedPredicateException.cpp in Sources */,
+				27D414531DEB0D3D00D0F3F9 /* IterativeParseTreeWalker.cpp in Sources */,
 				276E5F8A1CDB57AA003FF4B4 /* ParserInterpreter.cpp in Sources */,
 				276E5D4D1CDB57AA003FF4B4 /* AmbiguityInfo.cpp in Sources */,
 				276E5F151CDB57AA003FF4B4 /* DFAState.cpp in Sources */,
@@ -2541,6 +2556,7 @@
 				27B36AC61DACE7AF0069C868 /* RuleContextWithAltNum.cpp in Sources */,
 				276E5F0E1CDB57AA003FF4B4 /* DFASerializer.cpp in Sources */,
 				276E5F2C1CDB57AA003FF4B4 /* FailedPredicateException.cpp in Sources */,
+				27D414521DEB0D3D00D0F3F9 /* IterativeParseTreeWalker.cpp in Sources */,
 				27DB44A71D045537007E790B /* XPathTokenAnywhereElement.cpp in Sources */,
 				276E5F891CDB57AA003FF4B4 /* ParserInterpreter.cpp in Sources */,
 				276E5D4C1CDB57AA003FF4B4 /* AmbiguityInfo.cpp in Sources */,
