@@ -8,6 +8,12 @@ matrix:
   include:
     - os: linux
       jdk: oraclejdk7
+      env: 
+        - TARGET=cpp
+        - CXX=g++-5
+    - os: osx
+      compiler: clang
+      osx_image: xcode8.1
       env: TARGET=cpp
     - os: linux
       jdk: oraclejdk7
@@ -34,10 +40,6 @@ matrix:
       compiler: clang
       osx_image: xcode8.1
       env: TARGET=swift
-    - os: osx
-      compiler: clang
-      osx_image: xcode8.1
-      env: TARGET=cpp
 
 before_install:
   - ./.travis/before-install-$TRAVIS_OS_NAME-$TARGET.sh
