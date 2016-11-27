@@ -62,10 +62,11 @@ matrix:
       jdk: oraclejdk7
       
 before_install:
-  - ./.travis/before-install-$TRAVIS_OS_NAME-$TARGET.sh; fi
+  - ./.travis/before-install-$TRAVIS_OS_NAME-$TARGET.sh
 
 script:
-  - cd runtime-testsuite; ../.travis/run-tests-$TARGET.sh; fi
+  - cd runtime-testsuite
+  - ../.travis/run-tests-$TARGET.sh
 
 addons:
   apt:
