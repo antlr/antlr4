@@ -7,7 +7,7 @@ matrix:
     - os: linux
       compiler: clang
       jdk: oraclejdk7
-      env: 
+      env:
         - TARGET=cpp
         - CXX=g++-5
       addons:
@@ -62,6 +62,6 @@ before_install:
   - ./.travis/before-install-$TRAVIS_OS_NAME-$TARGET.sh
 
 script:
-  - cd runtime-testsuite
-  - ../.travis/run-tests-$TARGET.sh
+  - cd runtime-testsuite; ../.travis/run-tests-$TARGET.sh
+  - if [[ $TARGET == java ]]; then cd tool-testsuite; mvn test; fi
 
