@@ -295,14 +295,20 @@ class BufferedTokenStream(TokenStream):
 
     # Get the text of all tokens in this buffer.#/
     def getText(self, interval=None):
+        """
+
+        :param interval:
+        :type interval: antlr4.IntervalSet.Interval
+        :return:
+        """
         self.lazyInit()
         self.fill()
         if interval is None:
             interval = (0, len(self.tokens)-1)
-        start = interval[0]
+        start = interval.start
         if isinstance(start, Token):
             start = start.tokenIndex
-        stop = interval[1]
+        stop = interval.stop
         if isinstance(stop, Token):
             stop = stop.tokenIndex
         if start is None or stop is None or start<0 or stop<0:
