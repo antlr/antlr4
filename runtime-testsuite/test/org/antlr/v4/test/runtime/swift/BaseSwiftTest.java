@@ -53,7 +53,7 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 
 		final URL swiftRuntime = loader.getResource("Swift/Antlr4");
 		if (swiftRuntime == null) {
-			throw new RuntimeException("Swift runtime file not found at:" + swiftRuntime.getPath());
+			throw new RuntimeException("Swift runtime file not found at: " + swiftRuntime.getPath());
 		}
 		String swiftRuntimePath = swiftRuntime.getPath();
 

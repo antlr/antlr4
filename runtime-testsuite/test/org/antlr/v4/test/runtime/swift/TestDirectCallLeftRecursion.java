@@ -2,19 +2,18 @@ package org.antlr.v4.test.runtime.swift;
 
 import org.antlr.v4.test.runtime.BaseRuntimeTest;
 import org.antlr.v4.test.runtime.RuntimeTestDescriptor;
-import org.antlr.v4.test.runtime.descriptors.LexerErrorsDescriptors;
+import org.antlr.v4.test.runtime.descriptors.DirectCallLeftRecursionDescriptors;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
-public class TestLexerErrors extends BaseRuntimeTest {
-	public TestLexerErrors(RuntimeTestDescriptor descriptor) {
+public class TestDirectCallLeftRecursion extends BaseRuntimeTest {
+	public TestDirectCallLeftRecursion(RuntimeTestDescriptor descriptor) {
 		super(descriptor,new BaseSwiftTest());
 	}
 
 	@Parameterized.Parameters(name="{0}")
 	public static RuntimeTestDescriptor[] getAllTestDescriptors() {
-		return BaseRuntimeTest.getRuntimeTestDescriptors(LexerErrorsDescriptors.class, "Swift");
+		return BaseRuntimeTest.getRuntimeTestDescriptors(DirectCallLeftRecursionDescriptors.class, "Java");
 	}
 }
-
