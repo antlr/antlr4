@@ -95,6 +95,8 @@ public class LexerATNFactory extends ParserATNFactory {
 		COMMON_CONSTANTS.put("MIN_CHAR_VALUE", Lexer.MIN_CHAR_VALUE);
 	}
 
+	private List<String> ruleCommands = new ArrayList<String>();
+
 	/**
 	 * Maps from an action index to a {@link LexerAction} object.
 	 */
@@ -157,6 +159,12 @@ public class LexerATNFactory extends ParserATNFactory {
 
 		ATNOptimizer.optimize(g, atn);
 		return atn;
+	}
+
+	@Override
+	public Handle rule(GrammarAST ruleAST, String name, Handle blk) {
+		ruleCommands.clear();
+		return super.rule(ruleAST, name, blk);
 	}
 
 	@Override
@@ -389,7 +397,7 @@ public class LexerATNFactory extends ParserATNFactory {
 	@Override
 	public Handle tokenRef(TerminalAST node) {
 		// Ref to EOF in lexer yields char transition on -1
-		if ( node.getText().equals("EOF") ) {
+		if (node.getText().equals("EOF") ) {
 			ATNState left = newState(node);
 			ATNState right = newState(node);
 			left.addTransition(new AtomTransition(right, IntStream.EOF));
@@ -398,9 +406,14 @@ public class LexerATNFactory extends ParserATNFactory {
 		return _ruleRef(node);
 	}
 
-
-	protected LexerAction createLexerAction(GrammarAST ID, GrammarAST arg) {
+	private LexerAction createLexerAction(GrammarAST ID, GrammarAST arg) {
 		String command = ID.getText();
+
+		if (ruleCommands.contains(command)) {
+			g.tool.errMgr.grammarError(ErrorType.DUPLICATED_COMMAND, g.fileName, ID.getToken(), command);
+		}
+		ruleCommands.add(command);
+
 		if ("skip".equals(command) && arg == null) {
 			return LexerSkipAction.INSTANCE;
 		}

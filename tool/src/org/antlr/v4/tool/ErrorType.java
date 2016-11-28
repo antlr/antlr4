@@ -975,6 +975,14 @@ public enum ErrorType {
 	 * <pre>C: 'test' '';</pre>
 	 */
 	EMPTY_STRINGS_NOT_ALLOWED(171, "string literals cannot be empty", ErrorSeverity.ERROR),
+	/*
+	* Compiler Warning 172.
+	*
+	* <p>lexer rule has a duplicated commands</p>
+	*
+	* <p>TOKEN: 'asdf' -> mode(MODE1), mode(MODE2);</p>
+	* */
+	DUPLICATED_COMMAND(172, "duplicated command <arg>", ErrorSeverity.WARNING),
 
 	/*
 	 * Backward incompatibility errors

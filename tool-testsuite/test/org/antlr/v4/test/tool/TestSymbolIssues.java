@@ -247,4 +247,27 @@ public class TestSymbolIssues extends BaseJavaToolTest {
 
 		testErrors(test, false);
 	}
+
+	// https://github.com/antlr/antlr4/issues/1388
+	@Test public void testDuplicatedCommands() throws Exception {
+		String[] test = {
+			"lexer grammar Lexer;\n" +
+			"channels { CHANNEL1, CHANNEL2 }\n" +
+			"tokens { TEST1, TEST2 }\n" +
+			"TOKEN: 'aaaa' -> mode(MODE1), mode(MODE2);\n" +
+			"mode MODE1;\n" +
+			"MODE1_TOKEN: 'bbbb';\n" +
+			"mode MODE2;\n" +
+			"MODE2_TOKEN: 'bbbb';\n" +
+			"MODE2_TOKEN1: 'cccc' -> type(TEST1), type(TEST2);\n" +
+			"MODE2_TOKEN2: 'dddd' -> channel(CHANNEL1), channel(CHANNEL2), channel(DEFAULT_TOKEN_CHANNEL);",
+
+			"warning(" + ErrorType.DUPLICATED_COMMAND.code + "): Lexer.g4:4:30: duplicated command mode\n" +
+			"warning(" + ErrorType.DUPLICATED_COMMAND.code + "): Lexer.g4:9:37: duplicated command type\n" +
+			"warning(" + ErrorType.DUPLICATED_COMMAND.code + "): Lexer.g4:10:43: duplicated command channel\n" +
+			"warning(" + ErrorType.DUPLICATED_COMMAND.code + "): Lexer.g4:10:62: duplicated command channel\n"
+		};
+
+		testErrors(test, false);
+	}
 }
