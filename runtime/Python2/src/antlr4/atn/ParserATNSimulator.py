@@ -347,7 +347,7 @@ class ParserATNSimulator(ATNSimulator):
                 # should continue or complete.
                 #
                 if not dfa.precedenceDfa and isinstance(dfa.atnStartState, StarLoopEntryState):
-                    if dfa.atnStartState.precedenceRuleDecision:
+                    if dfa.atnStartState.isPrecedenceDecision:
                         dfa.setPrecedenceDfa(True)
 
                 fullCtx = False
@@ -1300,15 +1300,16 @@ class ParserATNSimulator(ATNSimulator):
     # @since 4.6
     #
     def canDropLoopEntryEdgeInLeftRecursiveRule(self, config):
+        # return False
         p = config.state
         # First check to see if we are in StarLoopEntryState generated during
         # left-recursion elimination. For efficiency, also check if
         # the context has an empty stack case. If so, it would mean
         # global FOLLOW so we can't perform optimization
         # Are we the special loop entry/exit state? or SLL wildcard
-        if p.getStateType() != ATNState.STAR_LOOP_ENTRY \
-                or not p.isPrecedenceDecision \
-                or config.context.isEmpty()   \
+        if p.stateType != ATNState.STAR_LOOP_ENTRY  \
+                or not p.isPrecedenceDecision       \
+                or config.context.isEmpty()         \
                 or config.context.hasEmptyPath():
             return False
 
@@ -1316,72 +1317,51 @@ class ParserATNSimulator(ATNSimulator):
         # that p is in.
         numCtxs = len(config.context)
         for i in range(0, numCtxs):  # for each stack context
-            returnState = atn.states.get(config.context.getReturnState(i));
-    if (returnState.ruleIndex != p.ruleIndex) return false;
+            returnState = self.atn.states[config.context.getReturnState(i)]
+            if returnState.ruleIndex != p.ruleIndex:
+                return False
 
+        decisionStartState = p.transitions[0].target
+        blockEndStateNum = decisionStartState.endState.stateNumber
+        blockEndState = self.atn.states[blockEndStateNum]
 
+        # Verify that the top of each stack context leads to loop entry/exit
+        # state through epsilon edges and w/o leaving rule.
+        for i in range(0, numCtxs):  # for each stack context
+            returnStateNumber = config.context.getReturnState(i)
+            returnState = self.atn.states[returnStateNumber]
+            # all states must have single outgoing epsilon edge
+            if len(returnState.transitions) != 1 or not returnState.transitions[0].isEpsilon:
+                return False
 
-}
+            # Look for prefix op case like 'not expr', (' type ')' expr
+            returnStateTarget = returnState.transitions[0].target
+            if returnState.stateType == ATNState.BLOCK_END and returnStateTarget is p:
+                continue
 
-BlockStartState
-decisionStartState = (BlockStartState)
-p.transition(0).target;
-int
-blockEndStateNum = decisionStartState.endState.stateNumber;
-BlockEndState
-blockEndState = (BlockEndState)
-atn.states.get(blockEndStateNum);
+            # Look for 'expr op expr' or case where expr's return state is block end
+            # of (...)* internal block; the block end points to loop back
+            # which points to p but we don't need to check that
+            if returnState is blockEndState:
+                continue
 
-# Verify that the top of each stack context leads to loop entry/exit
-# state through epsilon edges and w/o leaving rule.
-for (int
-i = 0;
-i < numCtxs;
-i + +) {  # for each stack context
-int
-returnStateNumber = config.context.getReturnState(i);
-ATNState
-returnState = atn.states.get(returnStateNumber);
-# all states must have single outgoing epsilon edge
-if (returnState.getNumberOfTransitions() != 1 | |
-!returnState.transition(0).isEpsilon() )
-{
-return false;
-}
-# Look for prefix op case like 'not expr', (' type ')' expr
-ATNState
-returnStateTarget = returnState.transition(0).target;
-if (returnState.getStateType() == BLOCK_END & & returnStateTarget == p)
-{
-continue;
-}
-# Look for 'expr op expr' or case where expr's return state is block end
-# of (...)* internal block; the block end points to loop back
-# which points to p but we don't need to check that
-if (returnState == blockEndState) {
-continue;
-}
-# Look for ternary expr ? expr : expr. The return state points at block end,
-# which points at loop entry state
-if (returnStateTarget == blockEndState) {
-continue;
-}
-# Look for complex prefix 'between expr and expr' case where 2nd expr's
-# return state points at block end state of (...)* internal block
-if (returnStateTarget.getStateType() == BLOCK_END & &
-    returnStateTarget.getNumberOfTransitions() == 1 & &
-    returnStateTarget.transition(0).isEpsilon() & &
-    returnStateTarget.transition(0).target == p )
-    {
-continue;
-}
+            # Look for ternary expr ? expr : expr. The return state points at block end,
+            # which points at loop entry state
+            if returnStateTarget is blockEndState:
+                continue
 
-# anything else ain't conforming
-return false;
-}
+            # Look for complex prefix 'between expr and expr' case where 2nd expr's
+            # return state points at block end state of (...)* internal block
+            if returnStateTarget.stateType == ATNState.BLOCK_END \
+                and len(returnStateTarget.transitions) == 1 \
+                and returnStateTarget.transitions[0].isEpsilon \
+                and returnStateTarget.transitions[0].target is p:
+                    continue
 
-return true;
-}
+            # anything else ain't conforming
+            return False
+
+        return True
 
 
     def getRuleName(self, index):
