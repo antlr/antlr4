@@ -412,8 +412,7 @@ public class LexerATNFactory extends ParserATNFactory {
 		}
 		else if ("mode".equals(command) && arg != null) {
 			String modeName = arg.getText();
-			checkMode(modeName, arg.token);
-			Integer mode = getConstantValue(modeName, arg.getToken());
+			Integer mode = getModeConstantValue(modeName, arg.getToken());
 			if (mode == null) {
 				return null;
 			}
@@ -422,8 +421,7 @@ public class LexerATNFactory extends ParserATNFactory {
 		}
 		else if ("pushMode".equals(command) && arg != null) {
 			String modeName = arg.getText();
-			checkMode(modeName, arg.token);
-			Integer mode = getConstantValue(modeName, arg.getToken());
+			Integer mode = getModeConstantValue(modeName, arg.getToken());
 			if (mode == null) {
 				return null;
 			}
@@ -432,8 +430,7 @@ public class LexerATNFactory extends ParserATNFactory {
 		}
 		else if ("type".equals(command) && arg != null) {
 			String typeName = arg.getText();
-			checkToken(typeName, arg.token);
-			Integer type = getConstantValue(typeName, arg.getToken());
+			Integer type = getTokenConstantValue(typeName, arg.getToken());
 			if (type == null) {
 				return null;
 			}
@@ -442,8 +439,7 @@ public class LexerATNFactory extends ParserATNFactory {
 		}
 		else if ("channel".equals(command) && arg != null) {
 			String channelName = arg.getText();
-			checkChannel(channelName, arg.token);
-			Integer channel = getConstantValue(channelName, arg.getToken());
+			Integer channel = getChannelConstantValue(channelName, arg.getToken());
 			if (channel == null) {
 				return null;
 			}
@@ -455,54 +451,66 @@ public class LexerATNFactory extends ParserATNFactory {
 		}
 	}
 
-	protected void checkMode(String modeName, Token token) {
-		if (!modeName.equals("DEFAULT_MODE") && COMMON_CONSTANTS.containsKey(modeName)) {
-			g.tool.errMgr.grammarError(ErrorType.MODE_CONFLICTS_WITH_COMMON_CONSTANTS, g.fileName, token, token.getText());
-		}
-	}
-
-	protected void checkToken(String tokenName, Token token) {
-		if (!tokenName.equals("EOF") && COMMON_CONSTANTS.containsKey(tokenName)) {
-			g.tool.errMgr.grammarError(ErrorType.TOKEN_CONFLICTS_WITH_COMMON_CONSTANTS, g.fileName, token, token.getText());
-		}
-	}
-
-	protected void checkChannel(String channelName, Token token) {
-		if (!channelName.equals("HIDDEN") && !channelName.equals("DEFAULT_TOKEN_CHANNEL") && COMMON_CONSTANTS.containsKey(channelName)) {
-			g.tool.errMgr.grammarError(ErrorType.CHANNEL_CONFLICTS_WITH_COMMON_CONSTANTS, g.fileName, token, token.getText());
-		}
-	}
-
-	protected Integer getConstantValue(String name, Token token) {
-		if (name == null) {
+	private Integer getModeConstantValue(String modeName, Token token) {
+		if (modeName == null) {
 			return null;
 		}
 
-		Integer commonConstant = COMMON_CONSTANTS.get(name);
-		if (commonConstant != null) {
-			return commonConstant;
-		}
-
-		int tokenType = g.getTokenType(name);
-		if (tokenType != org.antlr.v4.runtime.Token.INVALID_TYPE) {
-			return tokenType;
-		}
-
-		int channelValue = g.getChannelValue(name);
-		if (channelValue >= org.antlr.v4.runtime.Token.MIN_USER_CHANNEL_VALUE) {
-			return channelValue;
+		if (modeName.equals("DEFAULT_MODE")) {
+			return Lexer.DEFAULT_MODE;
 		}
 
 		List<String> modeNames = new ArrayList<String>(((LexerGrammar)g).modes.keySet());
-		int mode = modeNames.indexOf(name);
+		int mode = modeNames.indexOf(modeName);
 		if (mode >= 0) {
 			return mode;
 		}
 
+		return tryParseInt(modeName, token);
+	}
+
+	private Integer getTokenConstantValue(String tokenName, Token token) {
+		if (tokenName == null) {
+			return null;
+		}
+
+		if (tokenName.equals("EOF")) {
+			return Lexer.EOF;
+		}
+
+		int tokenType = g.getTokenType(tokenName);
+		if (tokenType != org.antlr.v4.runtime.Token.INVALID_TYPE) {
+			return tokenType;
+		}
+
+		return tryParseInt(tokenName, token);
+	}
+
+	private Integer getChannelConstantValue(String channelName, Token token) {
+		if (channelName == null) {
+			return null;
+		}
+
+		if (channelName.equals("HIDDEN")) {
+			return Lexer.HIDDEN;
+		}
+		if (channelName.equals("DEFAULT_TOKEN_CHANNEL")) {
+			return Lexer.DEFAULT_TOKEN_CHANNEL;
+		}
+
+		int channelValue = g.getChannelValue(channelName);
+		if (channelValue >= org.antlr.v4.runtime.Token.MIN_USER_CHANNEL_VALUE) {
+			return channelValue;
+		}
+
+		return tryParseInt(channelName, token);
+	}
+
+	private Integer tryParseInt(String name, Token token) {
 		try {
 			return Integer.parseInt(name);
 		} catch (NumberFormatException ex) {
-			g.tool.errMgr.grammarError(ErrorType.UNKNOWN_LEXER_CONSTANT, g.fileName, token, currentRule.name, token != null ? token.getText() : null);
+			g.tool.errMgr.grammarError(ErrorType.UNKNOWN_OR_WRONG_LEXER_CONSTANT, g.fileName, token, currentRule.name, token != null ? token.getText() : null);
 			return null;
 		}
 	}

@@ -127,7 +127,7 @@ public class TestSymbolIssues extends BaseJavaToolTest {
 		"M1: 'b';\n",
 
 		// YIELDS
-		"error(" + ErrorType.MODE_CONFLICTS_WITH_TOKEN.code + "): F.g4:3:0: mode M1 conflicts with token with same name\n"
+		"error(" + ErrorType.DECLARATION_CONFLICTS_WITH_COMMON_CONSTANTS.code + "): F.g4:3:0: cannot declare mode, token or channel with reserved name M1\n"
 	};
 
 	@Before
@@ -204,9 +204,9 @@ public class TestSymbolIssues extends BaseJavaToolTest {
 			"C: 'c';",
 
 			"error(" + ErrorType.RESERVED_RULE_NAME.code + "): L.g4:5:0: cannot declare a rule with reserved name MIN_CHAR_VALUE\n" +
-			"error(" + ErrorType.MODE_CONFLICTS_WITH_COMMON_CONSTANTS.code + "): L.g4:4:0: cannot use or declare mode with reserved name MAX_CHAR_VALUE\n" +
-			"error(" + ErrorType.CHANNEL_CONFLICTS_WITH_COMMON_CONSTANTS.code + "): L.g4:2:11: cannot use or declare channel with reserved name SKIP\n" +
-			"error(" + ErrorType.CHANNEL_CONFLICTS_WITH_COMMON_CONSTANTS.code + "): L.g4:2:17: cannot use or declare channel with reserved name HIDDEN\n"
+			"error(" + ErrorType.DECLARATION_CONFLICTS_WITH_COMMON_CONSTANTS.code + "): L.g4:4:0: cannot declare mode, token or channel with reserved name MAX_CHAR_VALUE\n" +
+			"error(" + ErrorType.DECLARATION_CONFLICTS_WITH_COMMON_CONSTANTS.code + "): L.g4:2:11: cannot declare mode, token or channel with reserved name SKIP\n" +
+			"error(" + ErrorType.DECLARATION_CONFLICTS_WITH_COMMON_CONSTANTS.code + "): L.g4:2:17: cannot declare mode, token or channel with reserved name HIDDEN\n"
 		};
 
 		testErrors(test, false);
@@ -222,9 +222,27 @@ public class TestSymbolIssues extends BaseJavaToolTest {
 			"E: 'e' -> type(EOF);\n" +
 			"F: 'f' -> pushMode(DEFAULT_MODE);",
 
-			"error(" + ErrorType.CHANNEL_CONFLICTS_WITH_COMMON_CONSTANTS.code + "): L.g4:2:18: cannot use or declare channel with reserved name SKIP\n" +
-			"error(" + ErrorType.TOKEN_CONFLICTS_WITH_COMMON_CONSTANTS.code + "): L.g4:3:15: cannot use or declare token with reserved name MORE\n" +
-			"error(" + ErrorType.MODE_CONFLICTS_WITH_COMMON_CONSTANTS.code + "): L.g4:4:15: cannot use or declare mode with reserved name SKIP\n"
+			"warning(" + ErrorType.UNKNOWN_OR_WRONG_LEXER_CONSTANT.code + "): L.g4:2:18: rule A contains a lexer command with an unrecognized or wrong constant value; lexer interpreters may produce incorrect output\n" +
+			"warning(" + ErrorType.UNKNOWN_OR_WRONG_LEXER_CONSTANT.code + "): L.g4:3:15: rule B contains a lexer command with an unrecognized or wrong constant value; lexer interpreters may produce incorrect output\n" +
+			"warning(" + ErrorType.UNKNOWN_OR_WRONG_LEXER_CONSTANT.code + "): L.g4:4:15: rule C contains a lexer command with an unrecognized or wrong constant value; lexer interpreters may produce incorrect output\n"
+		};
+
+		testErrors(test, false);
+	}
+
+	// https://github.com/antlr/antlr4/issues/1411
+	@Test public void testWrongIdForTypeChannelModeCommand() throws Exception {
+		String[] test = {
+			"lexer grammar L;\n" +
+			"tokens { TOKEN1 }\n" +
+			"channels { CHANNEL1 }\n" +
+			"TOKEN: 'asdf' -> type(CHANNEL1), channel(MODE1), mode(TOKEN1);\n" +
+			"mode MODE1;\n" +
+			"MODE1_TOKEN: 'qwer';",
+
+			"warning(" + ErrorType.UNKNOWN_OR_WRONG_LEXER_CONSTANT.code + "): L.g4:4:22: rule TOKEN contains a lexer command with an unrecognized or wrong constant value; lexer interpreters may produce incorrect output\n" +
+			"warning(" + ErrorType.UNKNOWN_OR_WRONG_LEXER_CONSTANT.code + "): L.g4:4:41: rule TOKEN contains a lexer command with an unrecognized or wrong constant value; lexer interpreters may produce incorrect output\n" +
+			"warning(" + ErrorType.UNKNOWN_OR_WRONG_LEXER_CONSTANT.code + "): L.g4:4:54: rule TOKEN contains a lexer command with an unrecognized or wrong constant value; lexer interpreters may produce incorrect output\n"
 		};
 
 		testErrors(test, false);
