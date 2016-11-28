@@ -14,6 +14,6 @@ public class TestExpressionsLeftRecursion extends BaseRuntimeTest {
 
 	@Parameterized.Parameters(name="{0}")
 	public static RuntimeTestDescriptor[] getAllTestDescriptors() {
-		return BaseRuntimeTest.getRuntimeTestDescriptors(ExpressionsLeftRecursionDescriptors.class, "Java");
+		return BaseRuntimeTest.getRuntimeTestDescriptors(ExpressionsLeftRecursionDescriptors.class, "Firefox");
 	}
 }

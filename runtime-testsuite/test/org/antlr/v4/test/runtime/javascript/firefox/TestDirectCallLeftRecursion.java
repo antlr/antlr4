@@ -14,6 +14,6 @@ public class TestDirectCallLeftRecursion extends BaseRuntimeTest {
 
 	@Parameterized.Parameters(name="{0}")
 	public static RuntimeTestDescriptor[] getAllTestDescriptors() {
-		return BaseRuntimeTest.getRuntimeTestDescriptors(DirectCallLeftRecursionDescriptors.class, "Java");
+		return BaseRuntimeTest.getRuntimeTestDescriptors(DirectCallLeftRecursionDescriptors.class, "Firefox");
 	}
 }

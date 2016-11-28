@@ -14,6 +14,6 @@ public class TestReturnValueLeftRecursion extends BaseRuntimeTest {
 
 	@Parameterized.Parameters(name="{0}")
 	public static RuntimeTestDescriptor[] getAllTestDescriptors() {
-		return BaseRuntimeTest.getRuntimeTestDescriptors(ReturnValueLeftRecursionDescriptors.class, "Java");
+		return BaseRuntimeTest.getRuntimeTestDescriptors(ReturnValueLeftRecursionDescriptors.class, "Explorer");
 	}
 }

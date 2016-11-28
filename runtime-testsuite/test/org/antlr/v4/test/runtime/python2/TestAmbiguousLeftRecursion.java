@@ -14,6 +14,6 @@ public class TestAmbiguousLeftRecursion extends BaseRuntimeTest {
 
 	@Parameterized.Parameters(name="{0}")
 	public static RuntimeTestDescriptor[] getAllTestDescriptors() {
-		return BaseRuntimeTest.getRuntimeTestDescriptors(AmbiguousLeftRecursionDescriptors.class, "Java");
+		return BaseRuntimeTest.getRuntimeTestDescriptors(AmbiguousLeftRecursionDescriptors.class, "Python2");
 	}
 }
