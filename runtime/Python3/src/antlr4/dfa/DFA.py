@@ -27,6 +27,7 @@
 #  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 #  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+from antlr4.atn.ATNState import StarLoopEntryState
 
 from antlr4.atn.ATNConfigSet import ATNConfigSet
 from antlr4.atn.ATNState import DecisionState
@@ -48,6 +49,15 @@ class DFA(object):
         # {@code false}. This is the backing field for {@link #isPrecedenceDfa},
         # {@link #setPrecedenceDfa}.
         self.precedenceDfa = False
+
+        if isinstance(atnStartState, StarLoopEntryState):
+            if atnStartState.isPrecedenceDecision:
+                self.precedenceDfa = True
+                precedenceState = DFAState(configs=ATNConfigSet())
+                precedenceState.edges = []
+                precedenceState.isAcceptState = False
+                precedenceState.requiresFullContext = False
+                self.s0 = precedenceState
 
 
     # Get the start state for a specific precedence value.
@@ -112,7 +122,7 @@ class DFA(object):
         if self.precedenceDfa != precedenceDfa:
             self._states = dict()
             if precedenceDfa:
-                precedenceState = DFAState(ATNConfigSet())
+                precedenceState = DFAState(configs=ATNConfigSet())
                 precedenceState.edges = []
                 precedenceState.isAcceptState = False
                 precedenceState.requiresFullContext = False
