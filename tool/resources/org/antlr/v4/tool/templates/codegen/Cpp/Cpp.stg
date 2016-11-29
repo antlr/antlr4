@@ -1048,8 +1048,8 @@ virtual antlrcpp::Any accept(tree::ParseTreeVisitor *visitor) override;
 VisitorDispatchMethod(method) ::=  <<
 
 antlrcpp::Any <parser.name>::<struct.name>::accept(tree::ParseTreeVisitor *visitor) {
-  if (dynamic_cast\<<parser.grammarName>Visitor*>(visitor) != nullptr)
-    return ((<parser.grammarName>Visitor *)visitor)->visit<struct.derivedFromName; format="cap">(this);
+  if (auto parserVisitor = dynamic_cast\<<parser.grammarName>Visitor*>(visitor))
+    return parserVisitor->visit<struct.derivedFromName; format="cap">(this);
   else
     return visitor->visitChildren(this);
 }
