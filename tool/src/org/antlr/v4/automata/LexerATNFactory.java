@@ -409,7 +409,7 @@ public class LexerATNFactory extends ParserATNFactory {
 	private LexerAction createLexerAction(GrammarAST ID, GrammarAST arg) {
 		String command = ID.getText();
 
-		if (ruleCommands.contains(command)) {
+		if (ruleCommands.contains(command) && !command.equals("pushMode") && !command.equals("popMode")) {
 			g.tool.errMgr.grammarError(ErrorType.DUPLICATED_COMMAND, g.fileName, ID.getToken(), command);
 		}
 		ruleCommands.add(command);
