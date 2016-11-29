@@ -485,7 +485,7 @@ ATNDeserializer.prototype.stateIsEndStateFor = function(state, idx) {
 
 //
 // Analyze the {@link StarLoopEntryState} states in the specified ATN to set
-// the {@link StarLoopEntryState//precedenceRuleDecision} field to the
+// the {@link StarLoopEntryState//isPrecedenceDecision} field to the
 // correct value.
 //
 // @param atn The ATN.
@@ -505,7 +505,7 @@ ATNDeserializer.prototype.markPrecedenceDecisions = function(atn) {
             if (maybeLoopEndState instanceof LoopEndState) {
                 if ( maybeLoopEndState.epsilonOnlyTransitions &&
                         (maybeLoopEndState.transitions[0].target instanceof RuleStopState)) {
-                    state.precedenceRuleDecision = true;
+                    state.isPrecedenceDecision = true;
                 }
             }
         }

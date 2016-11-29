@@ -262,6 +262,7 @@ var Set = Utils.Set;
 var BitSet = Utils.BitSet;
 var DoubleDict = Utils.DoubleDict;
 var ATN = require('./ATN').ATN;
+var ATNState = require('./ATNState').ATNState;
 var ATNConfig = require('./ATNConfig').ATNConfig;
 var ATNConfigSet = require('./ATNConfigSet').ATNConfigSet;
 var Token = require('./../Token').Token;
@@ -359,16 +360,7 @@ ParserATNSimulator.prototype.adaptivePredict = function(input, decision, outerCo
                                    " exec LA(1)==" + this.getLookaheadName(input) +
                                    ", outerContext=" + outerContext.toString(this.parser.ruleNames));
             }
-            // If this is not a precedence DFA, we check the ATN start state
-            // to determine if this ATN start state is the decision for the
-            // closure block that determines whether a precedence rule
-            // should continue or complete.
-            //
-            if (!dfa.precedenceDfa && (dfa.atnStartState instanceof StarLoopEntryState)) {
-                if (dfa.atnStartState.precedenceRuleDecision) {
-                    dfa.setPrecedenceDfa(true);
-                }
-            }
+
             var fullCtx = false;
             var s0_closure = this.computeStartState(dfa.atnStartState, RuleContext.EMPTY, fullCtx);
 
@@ -379,6 +371,7 @@ ParserATNSimulator.prototype.adaptivePredict = function(input, decision, outerCo
                 // appropriate start state for the precedence level rather
                 // than simply setting DFA.s0.
                 //
+                dfa.s0.configs = s0_closure; // not used for prediction but useful to know start configs anyway
                 s0_closure = this.applyPrecedenceFilter(s0_closure);
                 s0 = this.addDFAState(dfa, new DFAState(null, s0_closure));
                 dfa.setPrecedenceStartState(this.parser.getPrecedence(), s0);
@@ -1293,6 +1286,9 @@ ParserATNSimulator.prototype.closure_ = function(config, configs, closureBusy, c
         // both epsilon transitions and non-epsilon transitions.
     }
     for(var i = 0;i<p.transitions.length; i++) {
+        if(i==0 && this.canDropLoopEntryEdgeInLeftRecursiveRule(config))
+            continue;
+
         var t = p.transitions[i];
         var continueCollecting = collectPredicates && !(t instanceof ActionTransition);
         var c = this.getEpsilonTarget(config, t, continueCollecting, depth === 0, fullCtx, treatEofAsEpsilon);
@@ -1336,6 +1332,69 @@ ParserATNSimulator.prototype.closure_ = function(config, configs, closureBusy, c
         }
     }
 };
+
+
+ParserATNSimulator.prototype.canDropLoopEntryEdgeInLeftRecursiveRule = function(config) {
+    // return False
+    var p = config.state;
+    // First check to see if we are in StarLoopEntryState generated during
+    // left-recursion elimination. For efficiency, also check if
+    // the context has an empty stack case. If so, it would mean
+    // global FOLLOW so we can't perform optimization
+    // Are we the special loop entry/exit state? or SLL wildcard
+    if(p.stateType != ATNState.STAR_LOOP_ENTRY || !p.isPrecedenceDecision ||
+           config.context.isEmpty() || config.context.hasEmptyPath())
+        return false;
+
+    // Require all return states to return back to the same rule that p is in.
+    var numCtxs = config.context.length;
+    for(var i=0; i<numCtxs; i++) { // for each stack context
+        var returnState = this.atn.states[config.context.getReturnState(i)];
+        if (returnState.ruleIndex != p.ruleIndex)
+            return false;
+    }
+
+    var decisionStartState = p.transitions[0].target;
+    var blockEndStateNum = decisionStartState.endState.stateNumber;
+    var blockEndState = this.atn.states[blockEndStateNum];
+
+    // Verify that the top of each stack context leads to loop entry/exit
+    // state through epsilon edges and w/o leaving rule.
+    for(var i=0; i<numCtxs; i++) { // for each stack context
+        var returnStateNumber = config.context.getReturnState(i);
+        var returnState = this.atn.states[returnStateNumber];
+        // all states must have single outgoing epsilon edge
+        if (returnState.transitions.length != 1 || !returnState.transitions[0].isEpsilon)
+            return false;
+
+        // Look for prefix op case like 'not expr', (' type ')' expr
+        var returnStateTarget = returnState.transitions[0].target;
+        if ( returnState.stateType == ATNState.BLOCK_END && returnStateTarget == p )
+            continue;
+
+        // Look for 'expr op expr' or case where expr's return state is block end
+        // of (...)* internal block; the block end points to loop back
+        // which points to p but we don't need to check that
+        if ( returnState == blockEndState )
+            continue;
+
+        // Look for ternary expr ? expr : expr. The return state points at block end,
+        // which points at loop entry state
+        if ( returnStateTarget == blockEndState )
+            continue;
+
+        // Look for complex prefix 'between expr and expr' case where 2nd expr's
+        // return state points at block end state of (...)* internal block
+        if (returnStateTarget.stateType == ATNState.BLOCK_END && returnStateTarget.transitionslength == 1
+                && returnStateTarget.transitions[0].isEpsilon && returnStateTarget.transitions[0].target == p)
+            continue;
+
+        // anything else ain't conforming
+        return false;
+    }
+    return true;
+};
+
 
 ParserATNSimulator.prototype.getRuleName = function( index) {
     if (this.parser!==null && index>=0) {

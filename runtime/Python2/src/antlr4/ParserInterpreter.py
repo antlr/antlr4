@@ -69,7 +69,7 @@ class ParserInterpreter(Parser):
         for state in atn.states:
             if not isinstance(state, StarLoopEntryState):
                 continue
-            if state.precedenceRuleDecision:
+            if state.isPrecedenceDecision:
                 self.pushRecursionContextStates.add(state.stateNumber)
         # get atn simulator that knows how to do predictions
         self._interp = ParserATNSimulator(self, atn, self.decisionToDFA, self.sharedContextCache)

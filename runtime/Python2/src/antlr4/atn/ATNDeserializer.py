@@ -368,7 +368,7 @@ class ATNDeserializer (object):
 
     #
     # Analyze the {@link StarLoopEntryState} states in the specified ATN to set
-    # the {@link StarLoopEntryState#precedenceRuleDecision} field to the
+    # the {@link StarLoopEntryState#isPrecedenceDecision} field to the
     # correct value.
     #
     # @param atn The ATN.
@@ -387,7 +387,7 @@ class ATNDeserializer (object):
                 if isinstance(maybeLoopEndState, LoopEndState):
                     if maybeLoopEndState.epsilonOnlyTransitions and \
                             isinstance(maybeLoopEndState.transitions[0].target, RuleStopState):
-                        state.precedenceRuleDecision = True
+                        state.isPrecedenceDecision = True
 
     def verifyATN(self, atn):
         if not self.deserializationOptions.verifyATN:
