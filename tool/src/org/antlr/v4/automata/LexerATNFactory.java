@@ -408,28 +408,7 @@ public class LexerATNFactory extends ParserATNFactory {
 
 	private LexerAction createLexerAction(GrammarAST ID, GrammarAST arg) {
 		String command = ID.getText();
-
-		if (ruleCommands.contains(command) && !command.equals("pushMode") && !command.equals("popMode")) {
-			g.tool.errMgr.grammarError(ErrorType.DUPLICATED_COMMAND, g.fileName, ID.getToken(), command);
-		}
-		String firstCommand = null;
-		if ((ruleCommands.contains("skip") && (command.equals("more") || command.equals("type") || command.equals("channel")))) {
-			firstCommand = "skip";
-		}
-		else if ((ruleCommands.contains("more") && (command.equals("type") || command.equals("channel") || command.equals("skip")))) {
-			firstCommand = "more";
-		}
-		else if ((ruleCommands.contains("type") && (command.equals("skip") || command.equals("more")))) {
-			firstCommand = "type";
-		}
-		else if ((ruleCommands.contains("channel") && (command.equals("skip") || command.equals("more")))) {
-			firstCommand = "channel";
-		}
-		if (firstCommand != null) {
-			g.tool.errMgr.grammarError(ErrorType.INCOMPATIBLE_COMMANDS, g.fileName, ID.getToken(), firstCommand, command);
-		}
-
-		ruleCommands.add(command);
+		checkCommands(command, ID.getToken());
 
 		if ("skip".equals(command) && arg == null) {
 			return LexerSkipAction.INSTANCE;
@@ -479,6 +458,45 @@ public class LexerATNFactory extends ParserATNFactory {
 		else {
 			return null;
 		}
+	}
+
+	private void checkCommands(String command, Token commandToken) {
+		if (!command.equals("pushMode") && !command.equals("popMode")) {
+			if (ruleCommands.contains(command)) {
+				g.tool.errMgr.grammarError(ErrorType.DUPLICATED_COMMAND, g.fileName, commandToken, command);
+			} else if (!ruleCommands.equals("mode")) {
+				String firstCommand = null;
+
+				if (command.equals("skip")) {
+					if (ruleCommands.contains("more")) {
+						firstCommand = "more";
+					} else if (ruleCommands.contains("type")) {
+						firstCommand = "type";
+					} else if (ruleCommands.contains("channel")) {
+						firstCommand = "channel";
+					}
+				} else if (command.equals("more")) {
+					if (ruleCommands.contains("skip")) {
+						firstCommand = "skip";
+					} else if (ruleCommands.contains("type")) {
+						firstCommand = "type";
+					} else if (ruleCommands.contains("channel")) {
+						firstCommand = "channel";
+					}
+				} else if (command.equals("type") || command.equals("channel")) {
+					if (ruleCommands.contains("more")) {
+						firstCommand = "more";
+					} else if (ruleCommands.contains("skip")) {
+						firstCommand = "skip";
+					}
+				}
+
+				if (firstCommand != null) {
+					g.tool.errMgr.grammarError(ErrorType.INCOMPATIBLE_COMMANDS, g.fileName, commandToken, firstCommand, command);
+				}
+			}
+		}
+		ruleCommands.add(command);
 	}
 
 	private Integer getModeConstantValue(String modeName, Token token) {
