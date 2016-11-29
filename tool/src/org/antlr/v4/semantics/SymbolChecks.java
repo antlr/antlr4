@@ -283,7 +283,7 @@ public class SymbolChecks {
 
 				if (g.getTokenType(modeName) != Token.INVALID_TYPE) {
 					Rule rule = lexerGrammar.modes.get(modeName).iterator().next();
-					g.tool.errMgr.grammarError(ErrorType.DECLARATION_CONFLICTS_WITH_COMMON_CONSTANTS, g.fileName, rule.ast.parent.getToken(), modeName);
+					g.tool.errMgr.grammarError(ErrorType.MODE_CONFLICTS_WITH_TOKEN, g.fileName, rule.ast.parent.getToken(), modeName);
 				}
 			}
 		}

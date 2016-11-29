@@ -960,13 +960,27 @@ public enum ErrorType {
 	/**
 	 * Compiler Error 170.
 	 *
+	 * <pre>
+	 * mode M1;
+	 * A1: 'a'; // ok
+	 * mode M2;
+	 * A2: 'a'; // ok
+	 * M1: 'b'; // error 170
+	 * </pre>
+	 *
+	 * <p>mode <em>name</em> conflicts with token with same name</p>
+	 */
+	MODE_CONFLICTS_WITH_TOKEN(170, "mode <arg> conflicts with token with same name", ErrorSeverity.ERROR),
+	/**
+	 * Compiler Error 171.
+	 *
 	 * <p>can not declare mode, token or channel with reserved name</p>
 	 *
 	 * <p>Reserved names: HIDDEN, DEFAULT_TOKEN_CHANNEL, DEFAULT_MODE, SKIP, MORE, EOF, MAX_CHAR_VALUE, MIN_CHAR_VALUE.
 	 */
-	DECLARATION_CONFLICTS_WITH_COMMON_CONSTANTS(170, "cannot declare mode, token or channel with reserved name <arg>", ErrorSeverity.ERROR),
+	DECLARATION_CONFLICTS_WITH_COMMON_CONSTANTS(171, "cannot declare mode, token or channel with reserved name <arg>", ErrorSeverity.ERROR),
 	/**
-	 * Compiler Error 171.
+	 * Compiler Error 172.
 	 *
 	 * <p>string literals cannot be empty</p>
 	 *
@@ -974,22 +988,22 @@ public enum ErrorType {
 	 * <pre>B: '';</pre>
 	 * <pre>C: 'test' '';</pre>
 	 */
-	EMPTY_STRINGS_NOT_ALLOWED(171, "string literals cannot be empty", ErrorSeverity.ERROR),
+	EMPTY_STRINGS_NOT_ALLOWED(172, "string literals cannot be empty", ErrorSeverity.ERROR),
 	/*
-	* Compiler Warning 172.
+	* Compiler Warning 173.
 	*
 	* <p>lexer rule has a duplicated commands</p>
 	*
 	* <p>TOKEN: 'asdf' -> mode(MODE1), mode(MODE2);</p>
 	* */
-	DUPLICATED_COMMAND(172, "duplicated command <arg>", ErrorSeverity.WARNING),
-	/* Compiler Waring 173
+	DUPLICATED_COMMAND(173, "duplicated command <arg>", ErrorSeverity.WARNING),
+	/* Compiler Waring 174.
 	*
 	* <p>incompatible commands <em>command1</em> and <em>command2</em></p>
 	*
 	* <p>T00: 'a00' -> skip, more;</p>
 	 */
-	INCOMPATIBLE_COMMANDS(173, "incompatible commands <arg> and <arg2>", ErrorSeverity.WARNING),
+	INCOMPATIBLE_COMMANDS(174, "incompatible commands <arg> and <arg2>", ErrorSeverity.WARNING),
 
 	/*
 	 * Backward incompatibility errors

@@ -127,7 +127,7 @@ public class TestSymbolIssues extends BaseJavaToolTest {
 		"M1: 'b';\n",
 
 		// YIELDS
-		"error(" + ErrorType.DECLARATION_CONFLICTS_WITH_COMMON_CONSTANTS.code + "): F.g4:3:0: cannot declare mode, token or channel with reserved name M1\n"
+		"error(" + ErrorType.MODE_CONFLICTS_WITH_TOKEN.code + "): F.g4:3:0: mode M1 conflicts with token with same name\n"
 	};
 
 	@Before
