@@ -293,7 +293,7 @@ public class SemanticPipeline {
 			}
 
 			if (LexerATNFactory.COMMON_CONSTANTS.containsKey(channelName)) {
-				g.tool.errMgr.grammarError(ErrorType.DECLARATION_CONFLICTS_WITH_COMMON_CONSTANTS, g.fileName, channel.token, channelName);
+				g.tool.errMgr.grammarError(ErrorType.CHANNEL_CONFLICTS_WITH_COMMON_CONSTANTS, g.fileName, channel.token, channelName);
 			}
 
 			if (outermost instanceof LexerGrammar) {

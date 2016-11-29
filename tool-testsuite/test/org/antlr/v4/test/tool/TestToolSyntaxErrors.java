@@ -657,8 +657,8 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 			"WHITESPACE: [ \\t]+      -> channel(WHITESPACE_CHANNEL);\n";
 
 		String expected =
-			"warning(" + ErrorType.UNKNOWN_OR_WRONG_LEXER_CONSTANT.code + "): T.g4:10:35: rule COMMENT contains a lexer command with an unrecognized or wrong constant value; lexer interpreters may produce incorrect output\n" +
-			"warning(" + ErrorType.UNKNOWN_OR_WRONG_LEXER_CONSTANT.code + "): T.g4:11:35: rule WHITESPACE contains a lexer command with an unrecognized or wrong constant value; lexer interpreters may produce incorrect output\n" +
+			"warning(" + ErrorType.UNKNOWN_LEXER_CONSTANT.code + "): T.g4:10:35: rule COMMENT contains a lexer command with an unrecognized constant value; lexer interpreters may produce incorrect output\n" +
+			"warning(" + ErrorType.UNKNOWN_LEXER_CONSTANT.code + "): T.g4:11:35: rule WHITESPACE contains a lexer command with an unrecognized constant value; lexer interpreters may produce incorrect output\n" +
 			"error(" + ErrorType.CHANNELS_BLOCK_IN_COMBINED_GRAMMAR.code + "): T.g4:3:0: custom channels are not supported in combined grammars\n";
 
 		String[] pair = { grammar, expected };
@@ -686,7 +686,7 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 
 		// WHITESPACE_CHANNEL and COMMENT_CHANNEL are defined, but NEWLINE_CHANNEL is not
 		String expected =
-			"warning(" + ErrorType.UNKNOWN_OR_WRONG_LEXER_CONSTANT.code + "): T.g4:10:34: rule NEWLINE contains a lexer command with an unrecognized or wrong constant value; lexer interpreters may produce incorrect output\n";
+			"warning(" + ErrorType.UNKNOWN_LEXER_CONSTANT.code + "): T.g4:10:34: rule NEWLINE contains a lexer command with an unrecognized constant value; lexer interpreters may produce incorrect output\n";
 
 		String[] pair = { grammar, expected };
 		super.testErrors(pair, true);
