@@ -412,6 +412,23 @@ public class LexerATNFactory extends ParserATNFactory {
 		if (ruleCommands.contains(command) && !command.equals("pushMode") && !command.equals("popMode")) {
 			g.tool.errMgr.grammarError(ErrorType.DUPLICATED_COMMAND, g.fileName, ID.getToken(), command);
 		}
+		String firstCommand = null;
+		if ((ruleCommands.contains("skip") && (command.equals("more") || command.equals("type") || command.equals("channel")))) {
+			firstCommand = "skip";
+		}
+		else if ((ruleCommands.contains("more") && (command.equals("type") || command.equals("channel") || command.equals("skip")))) {
+			firstCommand = "more";
+		}
+		else if ((ruleCommands.contains("type") && (command.equals("skip") || command.equals("more")))) {
+			firstCommand = "type";
+		}
+		else if ((ruleCommands.contains("channel") && (command.equals("skip") || command.equals("more")))) {
+			firstCommand = "channel";
+		}
+		if (firstCommand != null) {
+			g.tool.errMgr.grammarError(ErrorType.INCOMPATIBLE_COMMANDS, g.fileName, ID.getToken(), firstCommand, command);
+		}
+
 		ruleCommands.add(command);
 
 		if ("skip".equals(command) && arg == null) {

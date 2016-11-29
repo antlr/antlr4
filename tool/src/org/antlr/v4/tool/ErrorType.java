@@ -983,6 +983,13 @@ public enum ErrorType {
 	* <p>TOKEN: 'asdf' -> mode(MODE1), mode(MODE2);</p>
 	* */
 	DUPLICATED_COMMAND(172, "duplicated command <arg>", ErrorSeverity.WARNING),
+	/* Compiler Waring 173
+	*
+	* <p>incompatible commands <em>command1</em> and <em>command2</em></p>
+	*
+	* <p>T00: 'a00' -> skip, more;</p>
+	 */
+	INCOMPATIBLE_COMMANDS(173, "incompatible commands <arg> and <arg2>", ErrorSeverity.WARNING),
 
 	/*
 	 * Backward incompatibility errors

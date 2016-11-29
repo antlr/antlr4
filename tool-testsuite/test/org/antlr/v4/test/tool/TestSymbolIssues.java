@@ -254,18 +254,57 @@ public class TestSymbolIssues extends BaseJavaToolTest {
 			"lexer grammar Lexer;\n" +
 			"channels { CHANNEL1, CHANNEL2 }\n" +
 			"tokens { TEST1, TEST2 }\n" +
-			"TOKEN: 'aaaa' -> mode(MODE1), mode(MODE2);\n" +
+			"TOKEN: 'a' -> mode(MODE1), mode(MODE2);\n" +
+			"TOKEN1: 'b' -> pushMode(MODE1), mode(MODE2);\n" +
+			"TOKEN2: 'c' -> pushMode(MODE1), pushMode(MODE2); // pushMode is not duplicate\n" +
+			"TOKEN3: 'd' -> popMode, popMode;                 // popMode is not duplicate\n" +
 			"mode MODE1;\n" +
-			"MODE1_TOKEN: 'bbbb';\n" +
+			"MODE1_TOKEN: 'e';\n" +
 			"mode MODE2;\n" +
-			"MODE2_TOKEN: 'bbbb';\n" +
-			"MODE2_TOKEN1: 'cccc' -> type(TEST1), type(TEST2);\n" +
-			"MODE2_TOKEN2: 'dddd' -> channel(CHANNEL1), channel(CHANNEL2), channel(DEFAULT_TOKEN_CHANNEL);",
+			"MODE2_TOKEN: 'f';\n" +
+			"MODE2_TOKEN1: 'g' -> type(TEST1), type(TEST2);\n" +
+			"MODE2_TOKEN2: 'h' -> channel(CHANNEL1), channel(CHANNEL2), channel(DEFAULT_TOKEN_CHANNEL);",
 
-			"warning(" + ErrorType.DUPLICATED_COMMAND.code + "): Lexer.g4:4:30: duplicated command mode\n" +
-			"warning(" + ErrorType.DUPLICATED_COMMAND.code + "): Lexer.g4:9:37: duplicated command type\n" +
-			"warning(" + ErrorType.DUPLICATED_COMMAND.code + "): Lexer.g4:10:43: duplicated command channel\n" +
-			"warning(" + ErrorType.DUPLICATED_COMMAND.code + "): Lexer.g4:10:62: duplicated command channel\n"
+			"warning(" + ErrorType.DUPLICATED_COMMAND.code + "): Lexer.g4:4:27: duplicated command mode\n" +
+			"warning(" + ErrorType.DUPLICATED_COMMAND.code + "): Lexer.g4:12:34: duplicated command type\n" +
+			"warning(" + ErrorType.DUPLICATED_COMMAND.code + "): Lexer.g4:13:40: duplicated command channel\n" +
+			"warning(" + ErrorType.DUPLICATED_COMMAND.code + "): Lexer.g4:13:59: duplicated command channel\n"
+		};
+
+		testErrors(test, false);
+	}
+
+	// https://github.com/antlr/antlr4/issues/1388
+	@Test public void testIncompatibleCommands() throws Exception {
+		String[] test = {
+				"lexer grammar L;\n" +
+				"channels { CHANNEL1 }\n" +
+				"tokens { TYPE1 }\n" +
+				"// Incompatible\n" +
+				"T00: 'a00' -> skip, more;\n" +
+				"T01: 'a01' -> skip, type(TYPE1);\n" +
+				"T02: 'a02' -> skip, channel(CHANNEL1);\n" +
+				"T03: 'a03' -> more, type(TYPE1);\n" +
+				"T04: 'a04' -> more, channel(CHANNEL1);\n" +
+				"T05: 'a05' -> more, skip;\n" +
+				"T06: 'a06' -> type(TYPE1), skip;\n" +
+				"T07: 'a07' -> type(TYPE1), more;\n" +
+				"T08: 'a08' -> channel(CHANNEL1), skip;\n" +
+				"T09: 'a09' -> channel(CHANNEL1), more;\n" +
+				"// Allowed\n" +
+				"T10: 'a10' -> type(TYPE1), channel(CHANNEL1);\n" +
+				"T11: 'a11' -> channel(CHANNEL1), type(TYPE1);",
+
+				"warning(" + ErrorType.INCOMPATIBLE_COMMANDS.code + "): L.g4:5:20: incompatible commands skip and more\n" +
+				"warning(" + ErrorType.INCOMPATIBLE_COMMANDS.code + "): L.g4:6:20: incompatible commands skip and type\n" +
+				"warning(" + ErrorType.INCOMPATIBLE_COMMANDS.code + "): L.g4:7:20: incompatible commands skip and channel\n" +
+				"warning(" + ErrorType.INCOMPATIBLE_COMMANDS.code + "): L.g4:8:20: incompatible commands more and type\n" +
+				"warning(" + ErrorType.INCOMPATIBLE_COMMANDS.code + "): L.g4:9:20: incompatible commands more and channel\n" +
+				"warning(" + ErrorType.INCOMPATIBLE_COMMANDS.code + "): L.g4:10:20: incompatible commands more and skip\n" +
+				"warning(" + ErrorType.INCOMPATIBLE_COMMANDS.code + "): L.g4:11:27: incompatible commands type and skip\n" +
+				"warning(" + ErrorType.INCOMPATIBLE_COMMANDS.code + "): L.g4:12:27: incompatible commands type and more\n" +
+				"warning(" + ErrorType.INCOMPATIBLE_COMMANDS.code + "): L.g4:13:33: incompatible commands channel and skip\n" +
+				"warning(" + ErrorType.INCOMPATIBLE_COMMANDS.code + "): L.g4:14:33: incompatible commands channel and more\n"
 		};
 
 		testErrors(test, false);
