@@ -121,3 +121,5 @@ YYYY/MM/DD, github id, Full name, email
 2016/09/02, lygav, Vladimir (Vladi) Lyga, lyvladi@gmail.com
 2016/09/23, ghosthope, Dmitry Shakhtanov, sudstrike@gmail.com
 2016/11/25, MrSampson, Oliver Sampson, olsam@quickaudio.com
+2016/11/29, millergarym, Gary Miller, miller.garym@gmail.com
+2016/11/29, wxio, Gary Miller, gm@wx.io
