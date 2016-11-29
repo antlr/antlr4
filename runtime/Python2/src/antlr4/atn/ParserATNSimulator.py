@@ -341,15 +341,6 @@ class ParserATNSimulator(ATNSimulator):
                                        " exec LA(1)==" + self.getLookaheadName(input) +
                                        ", outerContext=" + outerContext.toString(self.parser.literalNames, None))
 
-                # If this is not a precedence DFA, we check the ATN start state
-                # to determine if this ATN start state is the decision for the
-                # closure block that determines whether a precedence rule
-                # should continue or complete.
-                #
-                if not dfa.precedenceDfa and isinstance(dfa.atnStartState, StarLoopEntryState):
-                    if dfa.atnStartState.isPrecedenceDecision:
-                        dfa.setPrecedenceDfa(True)
-
                 fullCtx = False
                 s0_closure = self.computeStartState(dfa.atnStartState, ParserRuleContext.EMPTY, fullCtx)
 
@@ -360,6 +351,7 @@ class ParserATNSimulator(ATNSimulator):
                     # appropriate start state for the precedence level rather
                     # than simply setting DFA.s0.
                     #
+                    dfa.s0.configs = s0_closure # not used for prediction but useful to know start configs anyway
                     s0_closure = self.applyPrecedenceFilter(s0_closure)
                     s0 = self.addDFAState(dfa, DFAState(configs=s0_closure))
                     dfa.setPrecedenceStartState(self.parser.getPrecedence(), s0)
@@ -1170,8 +1162,10 @@ class ParserATNSimulator(ATNSimulator):
 
         first = True
         for t in p.transitions:
-            if first and self.canDropLoopEntryEdgeInLeftRecursiveRule(config):
-                continue
+            if first:
+                first = False
+                if self.canDropLoopEntryEdgeInLeftRecursiveRule(config):
+                    continue
 
             continueCollecting = collectPredicates and not isinstance(t, ActionTransition)
             c = self.getEpsilonTarget(config, t, continueCollecting, depth == 0, fullCtx, treatEofAsEpsilon)
