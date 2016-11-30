@@ -480,6 +480,10 @@ func (p *<parser.name>) <currentRule.name>(_p int<args:{a | , <a.name> <a.type>}
 		}
 	}()
 
+	<if(currentRule.hasLookaheadBlock)>
+	var _alt int
+	<endif>
+
 	<if(code)>
 	<code>
 
