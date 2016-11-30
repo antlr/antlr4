@@ -407,7 +407,7 @@ func (p *<parser.name>) <currentRule.name; format="cap">(<currentRule.args:{a | 
 	}()
 	
 	<if(currentRule.hasLookaheadBlock)>
-	var _int alt
+	var _alt int
 	<endif>
 
 	<if(code)>
