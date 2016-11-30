@@ -528,8 +528,10 @@ class TestTokenStreamRewriter(unittest.TestCase):
 
         self.assertEquals('afoofoo', rewriter.getDefaultText())
 
-    # Test for fix for: https://github.com/antlr/antlr4/issues/550
     def testPreservesOrderOfContiguousInserts(self):
+        """
+        Test for fix for: https://github.com/antlr/antlr4/issues/550
+        """
         input = InputStream('aa')
         lexer = TestLexer(input)
         stream = CommonTokenStream(lexer=lexer)
