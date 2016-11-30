@@ -461,12 +461,10 @@ public class BufferedTokenStream implements TokenStream {
 
 	@Override
 	public String getText(Interval interval) {
-		lazyInit();
-		fill();
 		int start = interval.a;
 		int stop = interval.b;
 		if ( start<0 || stop<0 ) return "";
-		lazyInit();
+		fill();
         if ( stop>=tokens.size() ) stop = tokens.size()-1;
 
 		StringBuilder buf = new StringBuilder();

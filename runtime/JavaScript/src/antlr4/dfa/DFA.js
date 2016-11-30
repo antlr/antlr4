@@ -29,6 +29,7 @@
 //  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 var DFAState = require('./DFAState').DFAState;
+var StarLoopEntryState = require('../atn/ATNState').StarLoopEntryState;
 var ATNConfigSet = require('./../atn/ATNConfigSet').ATNConfigSet;
 var DFASerializer = require('./DFASerializer').DFASerializer;
 var LexerDFASerializer = require('./DFASerializer').LexerDFASerializer;
@@ -58,6 +59,17 @@ function DFA(atnStartState, decision) {
 	// {@code false}. This is the backing field for {@link //isPrecedenceDfa},
 	// {@link //setPrecedenceDfa}.
 	this.precedenceDfa = false;
+    if (atnStartState instanceof StarLoopEntryState)
+    {
+        if (atnStartState.isPrecedenceDecision) {
+            this.precedenceDfa = true;
+            precedenceState = new DFAState(null, new ATNConfigSet());
+            precedenceState.edges = [];
+            precedenceState.isAcceptState = false;
+            precedenceState.requiresFullContext = false;
+            this.s0 = precedenceState;
+        }
+    }
 	return this;
 }
 
@@ -125,7 +137,7 @@ DFA.prototype.setPrecedenceDfa = function(precedenceDfa) {
 	if (this.precedenceDfa!==precedenceDfa) {
 		this._states = new DFAStatesSet();
 		if (precedenceDfa) {
-			var precedenceState = new DFAState(new ATNConfigSet());
+			var precedenceState = new DFAState(null, new ATNConfigSet());
 			precedenceState.edges = [];
 			precedenceState.isAcceptState = false;
 			precedenceState.requiresFullContext = false;

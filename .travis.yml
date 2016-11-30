@@ -1,31 +1,66 @@
 sudo: true
 
+language: java
+
 matrix:
   include:
     - os: linux
-      env: CXX=g++-5
       compiler: clang
-      language: java
       jdk: oraclejdk7
+      env:
+        - TARGET=cpp
+        - CXX=g++-5
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-precise-3.7
+          packages:
+            - g++-5
+            - uuid-dev
+            - clang-3.7
     - os: osx
       compiler: clang
-      language: java
       osx_image: xcode8.1
-
-script:
-  - if [[ $TRAVIS_OS_NAME == osx ]]; then cd runtime-testsuite; ../.travis/run-tests-macos.sh; fi
-  - if [[ $TRAVIS_OS_NAME == linux ]]; then cd runtime-testsuite; ../.travis/run-tests-linux.sh; fi
+      env: TARGET=cpp
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-precise-3.7
+          packages:
+            - g++-5
+            - uuid-dev
+            - clang-3.7
+    - os: osx
+      compiler: clang
+      osx_image: xcode8.1
+      env: TARGET=swift
+    - os: linux
+      jdk: oraclejdk7
+      env: TARGET=java
+    - os: linux
+      jdk: oraclejdk8
+      env: TARGET=java
+    - os: linux
+      jdk: oraclejdk7
+      env: TARGET=csharp
+    - os: linux
+      jdk: oraclejdk7
+      env: TARGET=python2
+    - os: linux
+      jdk: oraclejdk7
+      env: TARGET=python3
+    - os: linux
+      jdk: oraclejdk7
+      env: TARGET=javascript
+    - os: linux
+      jdk: oraclejdk7
+      env: TARGET=go
 
 before_install:
-  - if [[ $TRAVIS_OS_NAME == osx ]]; then ./.travis/before-install-macos.sh; fi
-  - if [[ $TRAVIS_OS_NAME == linux ]]; then ./.travis/before-install-linux.sh; fi
+  - ./.travis/before-install-$TRAVIS_OS_NAME-$TARGET.sh
 
-addons:
-  apt:
-    sources:
-      - ubuntu-toolchain-r-test
-      - llvm-toolchain-precise-3.7
-    packages:
-      - g++-5
-      - uuid-dev
-      - clang-3.7
+script:
+  - cd runtime-testsuite; ../.travis/run-tests-$TARGET.sh
+
