@@ -40,7 +40,6 @@
 # {@link CommonTokenStream}.</p>
 from io import StringIO
 
-from antlr4.IntervalSet import Interval
 from antlr4.Token import Token
 from antlr4.error.Errors import IllegalStateException
 
@@ -306,11 +305,11 @@ class BufferedTokenStream(TokenStream):
         self.lazyInit()
         self.fill()
         if interval is None:
-            interval = Interval(0, len(self.tokens)-1)
-        start = interval.start
+            interval = (0, len(self.tokens)-1)
+        start = interval[0]
         if isinstance(start, Token):
             start = start.tokenIndex
-        stop = interval.stop
+        stop = interval[1]
         if isinstance(stop, Token):
             stop = stop.tokenIndex
         if start is None or stop is None or start<0 or stop<0:
