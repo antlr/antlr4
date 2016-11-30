@@ -107,7 +107,8 @@ public class PerformanceDescriptors {
 
 		@Override
 		public boolean ignore(String targetName) {
-			return !Arrays.asList("Java", "Python2", "Python3", "Node").contains(targetName);
+//			return !Arrays.asList("Java", "Python2", "Python3", "Node").contains(targetName);
+			return !Arrays.asList("Java").contains(targetName);
 		}
 	}
 
