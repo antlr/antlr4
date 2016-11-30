@@ -49,6 +49,26 @@ public abstract class BaseRuntimeTest {
 		"Node", "Safari", "Firefox", "Explorer", "Chrome"
 	};
 
+	static {
+		// Add heartbeat thread to gen minimal output for travis, appveyor to
+		// avoid timeout.
+		Thread t = new Thread("heartbeat") {
+			@Override
+			public void run() {
+				while (true) {
+					System.out.print('.');
+					try {
+						Thread.sleep(5000);
+					}
+					catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		};
+		t.start();
+	}
+
 	/** ANTLR isn't thread-safe to process grammars so we use a global lock for testing */
 	public static final Object antlrLock = new Object();
 
