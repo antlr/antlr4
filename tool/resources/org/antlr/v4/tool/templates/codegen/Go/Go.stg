@@ -405,6 +405,10 @@ func (p *<parser.name>) <currentRule.name; format="cap">(<currentRule.args:{a | 
 			<endif>
 		}
 	}()
+	
+	<if(currentRule.hasLookaheadBlock)>
+	var _alt int
+	<endif>
 
 	<if(code)>
 	<code>
@@ -475,6 +479,10 @@ func (p *<parser.name>) <currentRule.name>(_p int<args:{a | , <a.name> <a.type>}
 			}
 		}
 	}()
+
+	<if(currentRule.hasLookaheadBlock)>
+	var _alt int
+	<endif>
 
 	<if(code)>
 	<code>
@@ -663,7 +671,7 @@ la_ := p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), <choice.decision>,
 StarBlock(choice, alts, Sync, iteration) ::= <<
 p.SetState(<choice.stateNumber>)
 p.GetErrorHandler().Sync(p)
-_alt := p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), <choice.decision>, p.GetParserRuleContext())
+_alt = p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), <choice.decision>, p.GetParserRuleContext())
 
 for _alt != <choice.exitAlt> && _alt != antlr.ATNInvalidAltNumber {
 	if _alt == 1<if(!choice.ast.greedy)>+1<endif> {
@@ -683,7 +691,7 @@ for _alt != <choice.exitAlt> && _alt != antlr.ATNInvalidAltNumber {
 PlusBlock(choice, alts, error) ::= <<
 p.SetState(<choice.blockStartStateNumber>)<! alt block decision !>
 p.GetErrorHandler().Sync(p)
-_alt := 1<if(!choice.ast.greedy)>+1<endif>
+_alt = 1<if(!choice.ast.greedy)>+1<endif>
 for ok := true; ok; ok = _alt != <choice.exitAlt> && _alt != antlr.ATNInvalidAltNumber {
 	switch _alt {
 	<if(alts)>
