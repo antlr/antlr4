@@ -889,9 +889,8 @@ public class TestTokenStreamRewriter extends BaseJavaToolTest {
 		assertEquals(expecting, result);
 	}
 
-	// Test for https://github.com/antlr/antlr4/issues/550
+	// Test Fix for https://github.com/antlr/antlr4/issues/550
 	@Test
-	@Ignore
 	public void testPreservesOrderOfContiguousInserts() throws Exception {
 		LexerGrammar g = new LexerGrammar(
 											 "lexer grammar T;\n"+

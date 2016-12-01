@@ -120,10 +120,10 @@ public class TokenStreamRewriter {
 	// Define the rewrite operation hierarchy
 
 	public class RewriteOperation {
-	/** What index into rewrites List are we? */
-	protected int instructionIndex;
-	/** Token buffer index. */
-	protected int index;
+		/** What index into rewrites List are we? */
+		protected int instructionIndex;
+		/** Token buffer index. */
+		protected int index;
 		protected Object text;
 
 		protected RewriteOperation(int index) {
@@ -165,6 +165,13 @@ public class TokenStreamRewriter {
 			return index+1;
 		}
 	}
+
+    class InsertAfterOp extends InsertBeforeOp {
+
+        public InsertAfterOp(int index, Object text) {
+            super(index, text);
+        }
+    }
 
 	/** I'm going to try replacing range from x..y with (y-x)+1 ReplaceOp
 	 *  instructions.
@@ -255,7 +262,10 @@ public class TokenStreamRewriter {
 
 	public void insertAfter(String programName, int index, Object text) {
 		// to insert after, just insert before next index (even if past end)
-		insertBefore(programName,index+1, text);
+        RewriteOperation op = new InsertAfterOp(index + 1, text);
+        List<RewriteOperation> rewrites = getProgram(programName);
+        op.instructionIndex = rewrites.size();
+        rewrites.add(op);
 	}
 
 	public void insertBefore(Token t, Object text) {
@@ -546,13 +556,16 @@ public class TokenStreamRewriter {
 			// combine current insert with prior if any at same index
 			List<? extends InsertBeforeOp> prevInserts = getKindOfOps(rewrites, InsertBeforeOp.class, i);
 			for (InsertBeforeOp prevIop : prevInserts) {
-				if ( prevIop.index == iop.index ) { // combine objects
-					// convert to strings...we're in process of toString'ing
-					// whole token buffer so no lazy eval issue with any templates
-					iop.text = catOpText(iop.text,prevIop.text);
-					// delete redundant prior insert
-					rewrites.set(prevIop.instructionIndex, null);
-				}
+				if ( prevIop.index == iop.index && InsertAfterOp.class.isInstance(prevIop) ) {
+                    iop.text = catOpText(prevIop.text, iop.text);
+                    rewrites.set(prevIop.instructionIndex, null);
+                } else if ( prevIop.index == iop.index && InsertBeforeOp.class.isInstance(prevIop) ) { // combine objects
+                    // convert to strings...we're in process of toString'ing
+                    // whole token buffer so no lazy eval issue with any templates
+                    iop.text = catOpText(iop.text,prevIop.text);
+                    // delete redundant prior insert
+                    rewrites.set(prevIop.instructionIndex, null);
+                }
 			}
 			// look for replaces where iop.index is in range; error
 			List<? extends ReplaceOp> prevReplaces = getKindOfOps(rewrites, ReplaceOp.class, i);
