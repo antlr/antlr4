@@ -1276,6 +1276,9 @@ ParserATNSimulator.prototype.closureCheckingStopState = function(config, configs
     this.closure_(config, configs, closureBusy, collectPredicates, fullCtx, depth, treatEofAsEpsilon);
 };
 
+var drops = [];
+var odds = 0;
+
 // Do the actual work of walking epsilon edges//
 ParserATNSimulator.prototype.closure_ = function(config, configs, closureBusy, collectPredicates, fullCtx, depth, treatEofAsEpsilon) {
     var p = config.state;
@@ -1286,8 +1289,16 @@ ParserATNSimulator.prototype.closure_ = function(config, configs, closureBusy, c
         // both epsilon transitions and non-epsilon transitions.
     }
     for(var i = 0;i<p.transitions.length; i++) {
-        if(i==0 && this.canDropLoopEntryEdgeInLeftRecursiveRule(config))
-            continue;
+        if(i==0) {
+            if(drops.length==100)
+                drops = [];
+            if (this.canDropLoopEntryEdgeInLeftRecursiveRule(config)) {
+                drops.push(odds);
+                odds = odds + 1;
+                continue;
+            } else
+                odds = odds + 1;
+        }
 
         var t = p.transitions[i];
         var continueCollecting = collectPredicates && !(t instanceof ActionTransition);
@@ -1342,6 +1353,8 @@ ParserATNSimulator.prototype.canDropLoopEntryEdgeInLeftRecursiveRule = function(
     // the context has an empty stack case. If so, it would mean
     // global FOLLOW so we can't perform optimization
     // Are we the special loop entry/exit state? or SLL wildcard
+    if(p.stateType != ATNState.STAR_LOOP_ENTRY)
+        return false;
     if(p.stateType != ATNState.STAR_LOOP_ENTRY || !p.isPrecedenceDecision ||
            config.context.isEmpty() || config.context.hasEmptyPath())
         return false;
@@ -1690,7 +1703,7 @@ ParserATNSimulator.prototype.addDFAState = function(dfa, D) {
     if (D == ATNSimulator.ERROR) {
         return D;
     }
-    var hash = D.hashString();
+    var hash = "key_" + D.hashCode();
     var existing = dfa.states[hash] || null;
     if(existing!==null) {
         return existing;

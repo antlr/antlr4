@@ -36,12 +36,13 @@
 
 var ATN = require('./ATN').ATN;
 var Utils = require('./../Utils');
+var Hash = Utils.Hash;
 var Set = Utils.Set;
 var SemanticContext = require('./SemanticContext').SemanticContext;
 var merge = require('./../PredictionContext').merge;
 
 function hashATNConfig(c) {
-	return c.hashStringForConfigSet();
+	return c.hashCodeForConfigSet();
 }
 
 function equalATNConfigs(a, b) {
@@ -92,7 +93,7 @@ function ATNConfigSet(fullCtx) {
 	this.hasSemanticContext = false;
 	this.dipsIntoOuterContext = false;
 
-	this.cachedHashString = "-1";
+	this.cachedHashCode = -1;
 
 	return this;
 }
@@ -121,7 +122,7 @@ ATNConfigSet.prototype.add = function(config, mergeCache) {
 	}
 	var existing = this.configLookup.add(config);
 	if (existing === config) {
-		this.cachedHashString = "-1";
+		this.cachedHashCode = -1;
 		this.configs.push(config); // track order here
 		return true;
 	}
@@ -186,36 +187,31 @@ ATNConfigSet.prototype.addAll = function(coll) {
 };
 
 ATNConfigSet.prototype.equals = function(other) {
-	if (this === other) {
-		return true;
-	} else if (!(other instanceof ATNConfigSet)) {
-		return false;
-	}
-	return this.configs !== null && this.configs.equals(other.configs) &&
-			this.fullCtx === other.fullCtx &&
-			this.uniqueAlt === other.uniqueAlt &&
-			this.conflictingAlts === other.conflictingAlts &&
-			this.hasSemanticContext === other.hasSemanticContext &&
-			this.dipsIntoOuterContext === other.dipsIntoOuterContext;
+	return this === other ||
+		(other instanceof ATNConfigSet &&
+		Utils.equalArrays(this.configs, other.configs) &&
+		this.fullCtx === other.fullCtx &&
+		this.uniqueAlt === other.uniqueAlt &&
+		this.conflictingAlts === other.conflictingAlts &&
+		this.hasSemanticContext === other.hasSemanticContext &&
+		this.dipsIntoOuterContext === other.dipsIntoOuterContext);
 };
 
-ATNConfigSet.prototype.hashString = function() {
+ATNConfigSet.prototype.hashCode = function() {
 	if (this.readOnly) {
-		if (this.cachedHashString === "-1") {
-			this.cachedHashString = this.hashConfigs();
+		if (this.cachedHashCode === -1) {
+			this.cachedHashCode = this.hashConfigs();
 		}
-		return this.cachedHashString;
+		return this.cachedHashCode;
 	} else {
 		return this.hashConfigs();
 	}
 };
 
 ATNConfigSet.prototype.hashConfigs = function() {
-	var s = "";
-	this.configs.map(function(c) {
-		s += c.toString();
-	});
-	return s;
+	var hash = new Hash();
+    hash.update(this.configs);
+	return hash.finish();
 };
 
 Object.defineProperty(ATNConfigSet.prototype, "length", {
@@ -247,7 +243,7 @@ ATNConfigSet.prototype.clear = function() {
 		throw "This set is readonly";
 	}
 	this.configs = [];
-	this.cachedHashString = "-1";
+	this.cachedHashCode = -1;
 	this.configLookup = new Set();
 };
 

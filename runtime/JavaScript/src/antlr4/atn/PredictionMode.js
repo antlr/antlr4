@@ -41,6 +41,7 @@ var RuleStopState = require('./ATNState').RuleStopState;
 var ATNConfigSet = require('./ATNConfigSet').ATNConfigSet;
 var ATNConfig = require('./ATNConfig').ATNConfig;
 var SemanticContext = require('./SemanticContext').SemanticContext;
+var Hash = require("../Utils").Hash;
 
 function PredictionMode() {
 	return this;
@@ -520,7 +521,13 @@ PredictionMode.getConflictingAltSubsets = function(configs) {
     var configToAlts = {};
 	for(var i=0;i<configs.items.length;i++) {
 		var c = configs.items[i];
-        var key = "key_" + c.state.stateNumber + "/" + c.context;
+		var hash = new Hash();
+		hash.update(c.state.stateNumber);
+		if(!c.context.updateHashCode)
+		    c;
+		c.context.updateHashCode(hash);
+		var hashed = hash.finish()
+        var key = "key_" + hashed;
         var alts = configToAlts[key] || null;
         if (alts === null) {
             alts = new BitSet();

@@ -78,7 +78,7 @@ Recognizer.prototype.getTokenTypeMap = function() {
 // <p>Used for XPath and tree pattern compilation.</p>
 //
 Recognizer.prototype.getRuleIndexMap = function() {
-    var ruleNames = this.getRuleNames();
+    var ruleNames = this.ruleNames;
     if (ruleNames===null) {
         throw("The current recognizer does not provide a list of rule names.");
     }

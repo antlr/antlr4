@@ -30,9 +30,7 @@
 
 // A lexer is recognizer that draws input symbols from a character stream.
 //  lexer grammars result in a subclass of this object. A Lexer object
-//  uses simplified match() and error recovery mechanisms in the interest
-//  of speed.
-///
+//  uses simplified match() and error recovery mechanisms in the interest of speed.
 
 var Token = require('./Token').Token;
 var Recognizer = require('./Recognizer').Recognizer;
@@ -152,6 +150,7 @@ Lexer.prototype.nextToken = function() {
 				try {
 					ttype = this._interp.match(this._input, this._mode);
 				} catch (e) {
+				    console.log(e.stack);
 					this.notifyListeners(e); // report error
 					this.recover(e);
 				}

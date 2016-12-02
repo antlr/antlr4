@@ -38,10 +38,17 @@
 //
 
 var Set = require('./../Utils').Set;
+var Hash = require('./../Utils').Hash;
 
 function SemanticContext() {
 	return this;
 }
+
+SemanticContext.prototype.hashCode = function() {
+    var hash = new Hash();
+    this.updateHashCode(hash);
+    return hash.finish();
+};
 
 // For context independent predicates, we evaluate them without a local
 // context (i.e., null context). That way, we can evaluate them without
@@ -135,8 +142,8 @@ Predicate.prototype.evaluate = function(parser, outerContext) {
 	return parser.sempred(localctx, this.ruleIndex, this.predIndex);
 };
 
-Predicate.prototype.hashString = function() {
-	return "" + this.ruleIndex + "/" + this.predIndex + "/" + this.isCtxDependent;
+Predicate.prototype.updateHashCode = function(hash) {
+	hash.update(this.ruleIndex, this.predIndex, this.isCtxDependent);
 };
 
 Predicate.prototype.equals = function(other) {
@@ -179,8 +186,8 @@ PrecedencePredicate.prototype.compareTo = function(other) {
 	return this.precedence - other.precedence;
 };
 
-PrecedencePredicate.prototype.hashString = function() {
-	return "31";
+PrecedencePredicate.prototype.updateHashCode = function(hash) {
+    hash.update(31);
 };
 
 PrecedencePredicate.prototype.equals = function(other) {
@@ -258,8 +265,8 @@ AND.prototype.equals = function(other) {
 	}
 };
 
-AND.prototype.hashString = function() {
-	return "" + this.opnds + "/AND";
+AND.prototype.updateHashCode = function(hash) {
+    hash.update(this.opnds, "AND");
 };
 //
 // {@inheritDoc}
@@ -362,8 +369,8 @@ OR.prototype.constructor = function(other) {
 	}
 };
 
-OR.prototype.hashString = function() {
-	return "" + this.opnds + "/OR"; 
+OR.prototype.updateHashCode = function(hash) {
+    hash.update(this.opnds, "OR");
 };
 
 // <p>
