@@ -464,7 +464,9 @@ public class LexerATNFactory extends ParserATNFactory {
 		if (!command.equals("pushMode") && !command.equals("popMode")) {
 			if (ruleCommands.contains(command)) {
 				g.tool.errMgr.grammarError(ErrorType.DUPLICATED_COMMAND, g.fileName, commandToken, command);
-			} else if (!ruleCommands.equals("mode")) {
+			}
+
+			if (!ruleCommands.equals("mode")) {
 				String firstCommand = null;
 
 				if (command.equals("skip")) {
@@ -496,6 +498,7 @@ public class LexerATNFactory extends ParserATNFactory {
 				}
 			}
 		}
+
 		ruleCommands.add(command);
 	}
 
