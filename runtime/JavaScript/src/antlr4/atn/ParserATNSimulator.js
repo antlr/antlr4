@@ -1385,7 +1385,7 @@ ParserATNSimulator.prototype.canDropLoopEntryEdgeInLeftRecursiveRule = function(
 
         // Look for complex prefix 'between expr and expr' case where 2nd expr's
         // return state points at block end state of (...)* internal block
-        if (returnStateTarget.stateType == ATNState.BLOCK_END && returnStateTarget.transitionslength == 1
+        if (returnStateTarget.stateType == ATNState.BLOCK_END && returnStateTarget.transitions.length == 1
                 && returnStateTarget.transitions[0].isEpsilon && returnStateTarget.transitions[0].target == p)
             continue;
 
