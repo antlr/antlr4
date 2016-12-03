@@ -39,6 +39,7 @@
 # {@link Token#HIDDEN_CHANNEL}, use a filtering token stream such a
 # {@link CommonTokenStream}.</p>
 from io import StringIO
+
 from antlr4.Token import Token
 from antlr4.error.Errors import IllegalStateException
 
@@ -293,8 +294,14 @@ class BufferedTokenStream(TokenStream):
     def getSourceName(self):
         return self.tokenSource.getSourceName()
 
-    # Get the text of all tokens in this buffer.#/
     def getText(self, interval=None):
+        """
+        Get the text of all tokens in this buffer.
+
+        :param interval:
+        :type interval: antlr4.IntervalSet.Interval
+        :return: string
+        """
         self.lazyInit()
         self.fill()
         if interval is None:
@@ -317,9 +324,12 @@ class BufferedTokenStream(TokenStream):
                 buf.write(t.text)
             return buf.getvalue()
 
-
-    # Get all tokens from lexer until EOF#/
     def fill(self):
+        """
+        Get all tokens from lexer until EOF
+
+        :return: None
+        """
         self.lazyInit()
         while self.fetch(1000)==1000:
             pass
