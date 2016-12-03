@@ -21,93 +21,27 @@ You will find Swift runtime (framework project) in
 antlr4/runtime/Swift 
 ```
 
-#### 4. Example
+#### 4. Example playground
 
-The example from [here](https://github.com/janyou/Antlr-Swift-Runtime/tree/master/Test)
+The Swift runtime includes an Xcode playground to get started with.
 
-(1). Hello.g4
+In Xcode, open `antlr4/runtime/Swift/Antlr4.xcworkspace`.  Select
+"Antlr4 OSX > My Mac" as the build target, and build the project as normal.
+The playground should then be active.
 
+The playground includes a simple grammar called "Hello", and an example for
+walking the parse tree.  You should see in the playground output that it is
+printing messages for each node in the parse tree as it walks.
 
-```
-grammar Hello;
-r  : 'hello' ID ;          
-ID : [a-z]+ ;              
-WS : [ \t\r\n]+ -> skip ;  
-```
+The playground shows how to create a lexer, token stream, and parser, and
+how to execute the parse.
 
-(2). generate lexer/parser/visitor from Hello.g4 file
-
-```
-$ antlr4 -Dlanguage=Swift -visitor -o gen Hello.g4
-```
-
-in gen folder：
+The grammar is defined in the playground's `Resources/Hello.g4`.  The parser
+was generated from the grammar using Antlr4 like this:
 
 ```
-Hello.tokens
-HelloBaseListener.swift
-HelloBaseVisitor.swift
-HelloLexer.swift
-HelloLexer.tokens
-HelloLexerATN.swift
-HelloListener.swift
-HelloParser.swift
-HelloParserATN.swift
-HelloVisitor.swift 
+cd 'antlr4/runtime/Swift/Antlr4 playground.playground/Resources'
+antlr4 -Dlanguage=Swift -visitor -o ../Sources/Autogen Hello.g4
 ```
 
-(3). make a custom listener
-
-```
-public class HelloWalker: HelloBaseListener{
-    public override func enterR(_ ctx: HelloParser.RContext) {
-        print( "enterR: " + ((ctx.ID()?.getText()) ?? ""))
-    }
-
-    public override func exitR(_ ctx: HelloParser.RContext) {
-        print( "exitR  ")
-    }
-}
-
-```
-
-(4). call and run
-
-
-
-add TestHello.txt
-
-```
-hello world
-```
-
-run:
-
-```
-import Antlr4
-
-....
-
-do {
-
-	let textFileName = "TestHello.txt"
-	if let textFilePath = Bundle.main.path(forResource: textFileName, ofType: nil) {
-    	let lexer =  HelloLexer(ANTLRFileStream(textFilePath))
-    	let tokens =  CommonTokenStream(lexer)
-    	let parser = try HelloParser(tokens)
-    	let tree = try parser.r()
-    	let walker = ParseTreeWalker()
-    	try walker.walk(HelloWalker(),tree)
-	} else {
-    	print("error occur: can not open \(textFileName)")
-	}
-
-}catch ANTLRException.cannotInvokeStartRule {
-    print("error occur: CannotInvokeStartRule")
-}catch ANTLRException.recognition(let e )   {
-    print("error occur\(e)")
-}catch {
-    print("error occur")
-}
-```
-
+The example tree walker is in `Sources/HelloWalker.swift`.
