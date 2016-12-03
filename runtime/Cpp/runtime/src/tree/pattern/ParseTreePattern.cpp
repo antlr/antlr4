@@ -29,7 +29,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "ParseTree.h"
+#include "tree/ParseTree.h"
 #include "tree/pattern/ParseTreePatternMatcher.h"
 #include "tree/pattern/ParseTreeMatch.h"
 
