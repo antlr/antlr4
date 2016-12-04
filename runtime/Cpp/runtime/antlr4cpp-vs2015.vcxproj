@@ -430,6 +430,7 @@
     <ClCompile Include="src\TokenStream.cpp" />
     <ClCompile Include="src\TokenStreamRewriter.cpp" />
     <ClCompile Include="src\tree\ErrorNodeImpl.cpp" />
+    <ClCompile Include="src\tree\ParseTree.cpp" />
     <ClCompile Include="src\tree\ParseTreeWalker.cpp" />
     <ClCompile Include="src\tree\pattern\ParseTreeMatch.cpp" />
     <ClCompile Include="src\tree\pattern\ParseTreePattern.cpp" />
@@ -439,7 +440,6 @@
     <ClCompile Include="src\tree\pattern\TextChunk.cpp" />
     <ClCompile Include="src\tree\pattern\TokenTagToken.cpp" />
     <ClCompile Include="src\tree\TerminalNodeImpl.cpp" />
-    <ClCompile Include="src\tree\Tree.cpp" />
     <ClCompile Include="src\tree\Trees.cpp" />
     <ClCompile Include="src\tree\xpath\XPath.cpp" />
     <ClCompile Include="src\tree\xpath\XPathElement.cpp" />
