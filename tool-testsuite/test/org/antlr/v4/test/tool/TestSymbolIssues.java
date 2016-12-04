@@ -240,9 +240,9 @@ public class TestSymbolIssues extends BaseJavaToolTest {
 			"mode MODE1;\n" +
 			"MODE1_TOKEN: 'qwer';",
 
-			"warning(" + ErrorType.UNKNOWN_LEXER_CONSTANT.code + "): L.g4:4:22: rule TOKEN contains a lexer command with an unrecognized constant value; lexer interpreters may produce incorrect output\n" +
-			"warning(" + ErrorType.UNKNOWN_LEXER_CONSTANT.code + "): L.g4:4:41: rule TOKEN contains a lexer command with an unrecognized constant value; lexer interpreters may produce incorrect output\n" +
-			"warning(" + ErrorType.UNKNOWN_LEXER_CONSTANT.code + "): L.g4:4:54: rule TOKEN contains a lexer command with an unrecognized constant value; lexer interpreters may produce incorrect output\n"
+			"error(" + ErrorType.CONSTANT_VALUE_IS_NOT_A_RECOGNIZED_TOKEN_NAME.code + "): L.g4:4:22: CHANNEL1 is not a recognized token name\n" +
+			"error(" + ErrorType.CONSTANT_VALUE_IS_NOT_A_RECOGNIZED_CHANNEL_NAME.code + "): L.g4:4:41: MODE1 is not a recognized channel name\n" +
+			"error(" + ErrorType.CONSTANT_VALUE_IS_NOT_A_RECOGNIZED_MODE_NAME.code + "): L.g4:4:54: TOKEN1 is not a recognized mode name\n"
 		};
 
 		testErrors(test, false);
