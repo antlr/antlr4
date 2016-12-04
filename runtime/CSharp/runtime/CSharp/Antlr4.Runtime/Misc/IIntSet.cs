@@ -1,5 +1,5 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 using System.Collections.Generic;
@@ -37,7 +37,7 @@ namespace Antlr4.Runtime.Misc
         /// treated as though it were an empty set.
         /// </param>
         /// <returns>
-        /// 
+        ///
         /// <c>this</c>
         /// (to support chained calls)
         /// </returns>
@@ -206,7 +206,7 @@ namespace Antlr4.Runtime.Misc
         /// if this set contains no elements.
         /// </summary>
         /// <returns>
-        /// 
+        ///
         /// <see langword="true"/>
         /// if the current set contains no elements; otherwise,
         /// <see langword="false"/>
@@ -248,7 +248,7 @@ namespace Antlr4.Runtime.Misc
         /// </summary>
         /// <param name="el">The element to check for.</param>
         /// <returns>
-        /// 
+        ///
         /// <see langword="true"/>
         /// if the set contains
         /// <paramref name="el"/>

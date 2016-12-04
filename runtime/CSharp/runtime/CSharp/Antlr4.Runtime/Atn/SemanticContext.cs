@@ -1,5 +1,5 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 using System;
@@ -42,7 +42,7 @@ namespace Antlr4.Runtime.Atn
         /// , which is semantically equivalent to
         /// a predicate of the form
         /// <c/>
-        /// 
+        ///
         /// true}?}.
         /// </summary>
         public static readonly SemanticContext None = new SemanticContext.Predicate();
@@ -91,7 +91,7 @@ namespace Antlr4.Runtime.Atn
         /// precedence predicate evaluation.</li>
         /// <li>A non-
         /// <see langword="null"/>
-        /// 
+        ///
         /// <see cref="SemanticContext"/>
         /// : the new simplified
         /// semantic context after precedence predicates are evaluated.</li>

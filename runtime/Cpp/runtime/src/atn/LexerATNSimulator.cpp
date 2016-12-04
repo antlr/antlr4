@@ -1,5 +1,5 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
@@ -163,7 +163,7 @@ size_t LexerATNSimulator::execATN(CharStream *input, dfa::DFAState *ds0) {
     if (t != Token::EOF) {
       consume(input);
     }
-    
+
     if (target->isAcceptState) {
       captureSimState(input, target);
       if (t == Token::EOF) {
@@ -368,7 +368,7 @@ bool LexerATNSimulator::closure(CharStream *input, const Ref<LexerATNConfig> &co
 
 Ref<LexerATNConfig> LexerATNSimulator::getEpsilonTarget(CharStream *input, const Ref<LexerATNConfig> &config, Transition *t,
   ATNConfigSet *configs, bool speculative, bool treatEofAsEpsilon) {
-  
+
   Ref<LexerATNConfig> c = nullptr;
   switch (t->getSerializationType()) {
     case Transition::RULE: {
@@ -451,7 +451,7 @@ Ref<LexerATNConfig> LexerATNSimulator::getEpsilonTarget(CharStream *input, const
           break;
         }
       }
-      
+
       break;
 
     default: // To silence the compiler. Other transition types are not used here.

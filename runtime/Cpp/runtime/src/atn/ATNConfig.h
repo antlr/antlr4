@@ -1,5 +1,5 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
@@ -30,10 +30,10 @@ namespace atn {
         return lhs == rhs;
       }
     };
-    
+
 
     using Set = std::unordered_set<Ref<ATNConfig>, Hasher, Comparer>;
-    
+
     /// The ATN state associated with this configuration.
     ATNState * state;
 

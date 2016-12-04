@@ -1,5 +1,5 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
@@ -49,7 +49,7 @@ namespace antlr4 {
      * the same source and input stream share a reference to the same
      * {@link Pair} containing these values.</p>
      */
-    
+
     std::pair<TokenSource *, CharStream *> _source; // ml: pure references, usually from statically allocated classes.
 
     /**
@@ -149,7 +149,7 @@ namespace antlr4 {
     virtual CharStream *getInputStream() const override;
 
     virtual std::string toString() const override;
-    
+
   private:
     void InitializeInstanceFields();
   };

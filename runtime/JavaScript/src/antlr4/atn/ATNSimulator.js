@@ -1,6 +1,6 @@
 //
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 ///
@@ -10,7 +10,7 @@ var ATNConfigSet = require('./ATNConfigSet').ATNConfigSet;
 var getCachedPredictionContext = require('./../PredictionContext').getCachedPredictionContext;
 
 function ATNSimulator(atn, sharedContextCache) {
-	
+
     // The context cache maps all PredictionContext objects that are ==
     //  to a single cached copy. This cache is shared across all contexts
     //  in all ATNConfigs in all DFA states.  We rebuild each ATNConfigSet

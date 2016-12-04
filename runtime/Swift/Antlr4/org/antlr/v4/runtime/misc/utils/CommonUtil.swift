@@ -1,5 +1,5 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
@@ -36,23 +36,23 @@ infix operator >>>  : BitwiseShiftPrecedence
 func >>>(lhs: Int32, rhs: Int32) -> Int32 {
     let left = UInt32(bitPattern: lhs)
     let right = UInt32(bitPattern: rhs) % 32
-    
+
     return Int32(bitPattern: left >> right)
 }
 
 func >>>(lhs: Int64, rhs: Int64) -> Int64 {
     let left = UInt64(bitPattern: lhs)
     let right = UInt64(bitPattern: rhs) % 64
-    
+
     return Int64(bitPattern: left >> right)
 }
 
 func >>>(lhs: Int, rhs: Int) -> Int {
     let numberOfBits: UInt = MemoryLayout<UInt>.size == MemoryLayout<UInt64>.size ? 64 : 32
-    
+
     let left = UInt(bitPattern: lhs)
     let right = UInt(bitPattern: rhs) % numberOfBits
-    
+
     return Int(bitPattern: left >> right)
 }
 
@@ -93,7 +93,7 @@ public func RuntimeException(_ message: String = "", file: String = #file, funct
 public func toInt(_ c: Character) -> Int {
     return c.unicodeValue
 }
- 
+
 public func toInt32(_ data: [Character], _ offset: Int) -> Int {
     return data[offset].unicodeValue | (data[offset + 1].unicodeValue << 16)
 }
@@ -117,15 +117,15 @@ public func == <Element : Equatable>(
         if lhsCount != rhs.count {
             return false
         }
-        
+
         // Test referential equality.
         if lhsCount == 0 || lhs._buffer.identity == rhs._buffer.identity {
             return true
         }
-        
+
         var streamLHS = lhs.makeIterator()
         var streamRHS = rhs.makeIterator()
-        
+
         var nextLHS = streamLHS.next()
         while nextLHS != nil {
             let nextRHS = streamRHS.next()
@@ -140,12 +140,12 @@ public func == <Element : Equatable>(
             }
             nextLHS = streamLHS.next()
         }
-        
+
         return true
-        
+
 }
 public func ArrayEquals<T:Equatable>(_ a: [T], _ a2: [T]) -> Bool {
-    
+
     if a2.count != a.count {
         return false
     }

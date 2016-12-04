@@ -1,5 +1,5 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
@@ -39,7 +39,7 @@ struct Any
 
   Any(const Any&& that) : _ptr(that.clone()) {
   }
-  
+
   template<typename U>
   Any(U&& value) : _ptr(new Derived<StorageType<U>>(std::forward<U>(value))) {
   }
@@ -132,7 +132,7 @@ private:
 
 };
 
-  template<> inline 
+  template<> inline
   Any::Any(std::nullptr_t&& ) : _ptr(nullptr) {
   }
 

@@ -1,5 +1,5 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
@@ -42,7 +42,7 @@ namespace atn {
     static const Ref<SemanticContext> NONE;
 
     virtual ~SemanticContext() {};
-    
+
     virtual size_t hashCode() const = 0;
     virtual std::string toString() const = 0;
     virtual bool operator == (const SemanticContext &other) const = 0;
@@ -115,7 +115,7 @@ namespace atn {
     virtual bool operator == (const SemanticContext &other) const override;
     virtual std::string toString() const override;
   };
-  
+
   class ANTLR4CPP_PUBLIC SemanticContext::PrecedencePredicate : public SemanticContext {
   public:
     const int precedence;
@@ -153,7 +153,7 @@ namespace atn {
 
     virtual std::vector<Ref<SemanticContext>> getOperands() const = 0;
   };
-  
+
   /**
    * A semantic context which is true whenever none of the contained contexts
    * is false.
@@ -199,7 +199,7 @@ namespace atn {
     virtual Ref<SemanticContext> evalPrecedence(Recognizer *parser, RuleContext *parserCallStack) override;
     virtual std::string toString() const override;
   };
-  
+
 } // namespace atn
 } // namespace antlr4
 

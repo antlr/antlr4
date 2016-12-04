@@ -1,5 +1,5 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
@@ -156,7 +156,7 @@ public class IntervalSet: IntSet, Hashable, CustomStringConvertible {
                 return
             }
             // if disjoint and after r, a future iteration will handle it
-            
+
             i += 1
         }
         // ok, must be after last interval (and disjoint from last interval)
@@ -175,7 +175,7 @@ public class IntervalSet: IntSet, Hashable, CustomStringConvertible {
 
     @discardableResult
     public func addAll(_ set: IntSet?) throws -> IntSet {
- 
+
         guard let set = set else {
              return self
         }
@@ -238,7 +238,7 @@ public class IntervalSet: IntSet, Hashable, CustomStringConvertible {
      */
 
     public func subtract(_ left: IntervalSet?, _ right: IntervalSet?) throws -> IntervalSet {
- 
+
         guard let left = left , !left.isNil() else {
             return try IntervalSet()
         }
@@ -355,7 +355,7 @@ public class IntervalSet: IntSet, Hashable, CustomStringConvertible {
                         if intersection == nil {
                             intersection = try IntervalSet()
                         }
- 
+
                         try intersection!.add(mine.intersection(theirs))
                         j += 1
                     } else {
@@ -659,7 +659,7 @@ public class IntervalSet: IntSet, Hashable, CustomStringConvertible {
             let I: Interval = intervals[i]
             let a: Int = I.a
             let b: Int = I.b
-            
+
             for v in a...b  {
                 values.append(v)
             }
@@ -675,7 +675,7 @@ public class IntervalSet: IntSet, Hashable, CustomStringConvertible {
             let I: Interval = intervals[i]
             let a: Int = I.a
             let b: Int = I.b
- 
+
             for v in a...b  {
                 values.append(v)
             }

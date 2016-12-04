@@ -1,5 +1,5 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
@@ -104,29 +104,29 @@ public func ==(lhs: LexerATNConfig, rhs: LexerATNConfig) -> Bool {
     }
 
 
-    
+
     if lhs.state.stateNumber != rhs.state.stateNumber {
         return false
     }
     if lhs.alt != rhs.alt {
         return false
     }
-    
+
     if lhs.isPrecedenceFilterSuppressed() != rhs.isPrecedenceFilterSuppressed() {
         return false
     }
-    
+
     if lhs.getLexerActionExecutor() == nil && rhs.getLexerActionExecutor() != nil {
         return false
     } else if lhs.getLexerActionExecutor() != nil && rhs.getLexerActionExecutor() == nil {
         return false
     } else if lhs.getLexerActionExecutor() == nil && rhs.getLexerActionExecutor() == nil {
-        
+
     } else if !(lhs.getLexerActionExecutor()! == rhs.getLexerActionExecutor()!) {
         return false
     }
-    
-    
+
+
     var contextCompare = false
 
     if lhs.context == nil && rhs.context == nil {
@@ -138,10 +138,10 @@ public func ==(lhs: LexerATNConfig, rhs: LexerATNConfig) -> Bool {
     } else {
         contextCompare = (lhs.context! == rhs.context!)
     }
-    
+
     if !contextCompare{
         return false
     }
-    
+
     return  lhs.semanticContext == rhs.semanticContext
 }

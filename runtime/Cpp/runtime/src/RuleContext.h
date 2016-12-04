@@ -1,5 +1,5 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
@@ -129,7 +129,7 @@ namespace antlr4 {
     virtual std::string toString(const std::vector<std::string> &ruleNames, RuleContext *stop);
 
     bool operator == (const RuleContext &other) { return this == &other; } // Simple address comparison.
-    
+
   private:
     void InitializeInstanceFields();
   };

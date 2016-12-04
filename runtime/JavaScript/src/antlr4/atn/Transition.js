@@ -1,5 +1,5 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 //
@@ -216,7 +216,7 @@ ActionTransition.prototype.matches = function(symbol, minVocabSymbol,  maxVocabS
 ActionTransition.prototype.toString = function() {
 	return "action_" + this.ruleIndex + ":" + this.actionIndex;
 };
-        
+
 
 // A transition containing a set of values.
 function SetTransition(target, set) {
@@ -237,7 +237,7 @@ SetTransition.prototype.constructor = SetTransition;
 SetTransition.prototype.matches = function(symbol, minVocabSymbol,  maxVocabSymbol) {
 	return this.label.contains(symbol);
 };
-        
+
 
 SetTransition.prototype.toString = function() {
 	return this.label.toString();
@@ -301,7 +301,7 @@ PrecedencePredicateTransition.prototype.getPredicate = function() {
 PrecedencePredicateTransition.prototype.toString = function() {
 	return this.precedence + " >= _p";
 };
-        
+
 exports.Transition = Transition;
 exports.AtomTransition = AtomTransition;
 exports.SetTransition = SetTransition;

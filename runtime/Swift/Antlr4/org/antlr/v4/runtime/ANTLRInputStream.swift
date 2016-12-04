@@ -1,5 +1,5 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 /**
@@ -46,27 +46,27 @@ public class ANTLRInputStream: CharStream {
      public convenience init(_ r : Reader) throws; IOException {
          self.init(r, INITIAL_BUFFER_SIZE, READ_BUFFER_SIZE);
      }
- 
+
      public convenience init(_ r : Reader, _ initialSize : Int) throws; IOException {
          self.init(r, initialSize, READ_BUFFER_SIZE);
      }
- 
+
      public init(_ r : Reader, _ initialSize : Int, _ readChunkSize : Int) throws; IOException {
          load(r, initialSize, readChunkSize);
      }
- 
+
      public convenience init(_ input : InputStream) throws; IOException {
          self.init(InputStreamReader(input), INITIAL_BUFFER_SIZE);
      }
- 
+
      public convenience init(_ input : InputStream, _ initialSize : Int) throws; IOException {
          self.init(InputStreamReader(input), initialSize);
      }
- 
+
      public convenience init(_ input : InputStream, _ initialSize : Int, _ readChunkSize : Int) throws; IOException {
          self.init(InputStreamReader(input), initialSize, readChunkSize);
      }
- 
+
      public func load(r : Reader, _ size : Int, _ readChunkSize : Int)
          throws; IOException
      {
@@ -120,7 +120,7 @@ public class ANTLRInputStream: CharStream {
             assert(LA(1) == ANTLRInputStream.EOF, "Expected: LA(1)==IntStream.EOF")
 
             throw ANTLRError.illegalState(msg: "annot consume EOF")
-             
+
         }
 
         // print("prev p="+p+", c="+(char)data[p]);

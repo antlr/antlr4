@@ -1,5 +1,5 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
@@ -14,7 +14,7 @@ namespace antlr4 {
   class ANTLR4CPP_PUBLIC TokenFactory {
   public:
     virtual ~TokenFactory() {};
-    
+
     /// This is the method used to create tokens in the lexer and in the
     /// error handling strategy. If text!=null, than the start and stop positions
     /// are wiped to -1 in the text override is set in the CommonToken.

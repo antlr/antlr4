@@ -1,5 +1,5 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
@@ -142,7 +142,7 @@ open class RuleContext: RuleNode {
     open func getRuleIndex() -> Int {
         return -1
     }
-    
+
     open func getAltNumber() -> Int { return ATN.INVALID_ALT_NUMBER }
     open func setAltNumber(_ altNumber: Int) { }
 
@@ -229,7 +229,7 @@ open class RuleContext: RuleNode {
         let p2: RuleContext? = nil
         return toString(p1, p2)
     }
-    
+
      open override var debugDescription: String {
          return description
     }

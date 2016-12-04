@@ -1,5 +1,5 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 namespace Antlr4.Runtime.Sharpen
@@ -71,7 +71,7 @@ namespace Antlr4.Runtime.Sharpen
                 bitCount += (uint)acc;
             }
 
-            // count the bits of the remaining bytes (MAX 29*8) using 
+            // count the bits of the remaining bytes (MAX 29*8) using
             // "Counting bits set, in parallel" from the "Bit Twiddling Hacks",
             // the code uses wikipedia's 64-bit popcount_3() implementation:
             // http://en.wikipedia.org/wiki/Hamming_weight#Efficient_implementation

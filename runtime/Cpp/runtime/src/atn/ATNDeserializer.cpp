@@ -1,5 +1,5 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
@@ -591,7 +591,7 @@ Guid ATNDeserializer::toUUID(const unsigned short *data, size_t offset) {
 Transition *ATNDeserializer::edgeFactory(const ATN &atn, size_t type, size_t /*src*/, size_t trg, size_t arg1,
                                          size_t arg2, size_t arg3,
   const std::vector<misc::IntervalSet> &sets) {
-  
+
   ATNState *target = atn.states[trg];
   switch (type) {
     case Transition::EPSILON:

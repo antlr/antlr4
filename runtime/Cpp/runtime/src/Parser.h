@@ -1,5 +1,5 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
@@ -172,7 +172,7 @@ namespace antlr4 {
     /// </summary>
     /// <seealso cref= #addParseListener </seealso>
     virtual void removeParseListeners();
-    
+
     /// <summary>
     /// Notify any parse listeners of an enter rule event.
     /// </summary>
@@ -184,7 +184,7 @@ namespace antlr4 {
     /// </summary>
     /// <seealso cref= #addParseListener </seealso>
     virtual void triggerExitRuleEvent();
-    
+
     /// <summary>
     /// Gets the number of syntax errors reported during parsing. This value is
     /// incremented each time <seealso cref="#notifyErrorListeners"/> is called.
@@ -354,18 +354,18 @@ namespace antlr4 {
     virtual std::string getSourceName();
 
     atn::ParseInfo getParseInfo() const;
-    
+
     /**
      * @since 4.3
      */
     void setProfile(bool profile);
-    
+
     /// <summary>
     /// During a parse is sometimes useful to listen in on the rule entry and exit
     ///  events as well as token matches. This is for quick and dirty debugging.
     /// </summary>
     virtual void setTrace(bool trace);
-    
+
     /**
      * Gets whether a {@link TraceListener} is registered as a parse listener
      * for the parser.
@@ -394,7 +394,7 @@ namespace antlr4 {
     TokenStream *_input;
 
     std::vector<int> _precedenceStack;
-    
+
     /// <summary>
     /// Specifies whether or not the parser should construct a parse tree during
     /// the parsing process. The default value is {@code true}.
@@ -413,10 +413,10 @@ namespace antlr4 {
     /// incremented each time <seealso cref="#notifyErrorListeners"/> is called.
     /// </summary>
     size_t _syntaxErrors;
-    
+
     /** Indicates parser has match()ed EOF token. See {@link #exitRule()}. */
     bool _matchedEOF;
-    
+
     virtual void addContextToParseTree();
 
     // All rule contexts created during a parse run. This is cleared when calling reset().

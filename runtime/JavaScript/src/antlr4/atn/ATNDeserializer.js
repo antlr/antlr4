@@ -1,5 +1,5 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
@@ -67,14 +67,14 @@ function initArray( length, value) {
 }
 
 function ATNDeserializer (options) {
-	
+
     if ( options=== undefined || options === null ) {
         options = ATNDeserializationOptions.defaultOptions;
     }
     this.deserializationOptions = options;
     this.stateFactories = null;
     this.actionFactories = null;
-    
+
     return this;
 }
 
@@ -192,7 +192,7 @@ ATNDeserializer.prototype.readStates = function(atn) {
         pair = endStateNumbers[j];
         pair[0].endState = atn.states[pair[1]];
     }
-    
+
     var numNonGreedyStates = this.readInt();
     for (j=0; j<numNonGreedyStates; j++) {
         stateNumber = this.readInt();
@@ -388,7 +388,7 @@ ATNDeserializer.prototype.generateRuleBypassTransition = function(atn, idx) {
 
     var excludeTransition = null;
     var endState = null;
-    
+
     if (atn.ruleToStartState[idx].isPrecedenceRule) {
         // wrap from the beginning of the rule to the StarLoopEntryState
         endState = null;
@@ -406,7 +406,7 @@ ATNDeserializer.prototype.generateRuleBypassTransition = function(atn, idx) {
     } else {
         endState = atn.ruleToStopState[idx];
     }
-    
+
     // all non-excluded transitions that currently target end state need to
 	// target blockEnd instead
     for(i=0; i<atn.states.length; i++) {
@@ -566,7 +566,7 @@ function createByteToHex() {
 }
 
 var byteToHex = createByteToHex();
-	
+
 ATNDeserializer.prototype.readUUID = function() {
 	var bb = [];
 	for(var i=7;i>=0;i--) {
@@ -661,6 +661,6 @@ ATNDeserializer.prototype.lexerActionFactory = function(type, data1, data2) {
         return this.actionFactories[type](data1, data2);
     }
 };
-   
+
 
 exports.ATNDeserializer = ATNDeserializer;

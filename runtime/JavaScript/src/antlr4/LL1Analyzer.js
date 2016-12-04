@@ -1,6 +1,6 @@
 //
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 ///
@@ -89,7 +89,7 @@ LL1Analyzer.prototype.LOOK = function(s, stopState, ctx) {
     this._LOOK(s, stopState, lookContext, r, new Set(), new BitSet(), seeThruPreds, true);
     return r;
 };
-    
+
 //*
 // Compute set of tokens that can follow {@code s} in the ATN in the
 // specified {@code ctx}.

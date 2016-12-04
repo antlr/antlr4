@@ -1,5 +1,5 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
@@ -15,7 +15,7 @@ namespace dfa {
   class ANTLR4CPP_PUBLIC Vocabulary {
   public:
     virtual ~Vocabulary() {};
-    
+
     /// Gets an empty <seealso cref="Vocabulary"/> instance.
     ///
     /// <para>
@@ -25,7 +25,7 @@ namespace dfa {
     static const Vocabulary EMPTY_VOCABULARY;
 
     Vocabulary() {};
-    
+
     /// <summary>
     /// Constructs a new instance of <seealso cref="Vocabulary"/> from the specified
     /// literal and symbolic token names.
@@ -187,6 +187,6 @@ namespace dfa {
     std::vector<std::string> const _displayNames;
     const size_t _maxTokenType = 0;
   };
-  
+
 } // namespace atn
 } // namespace antlr4

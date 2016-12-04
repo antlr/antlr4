@@ -1,5 +1,5 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
@@ -18,7 +18,7 @@ namespace atn {
     class SimState {
     public:
       virtual ~SimState() {};
-      
+
     protected:
       size_t index;
       size_t line;
@@ -92,7 +92,7 @@ namespace atn {
     virtual void reset() override;
 
     virtual void clearDFA() override;
-    
+
   protected:
     virtual size_t matchATN(CharStream *input);
     virtual size_t execATN(CharStream *input, dfa::DFAState *ds0);

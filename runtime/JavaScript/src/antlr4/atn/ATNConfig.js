@@ -1,6 +1,6 @@
 //
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 ///
@@ -139,7 +139,7 @@ ATNConfig.prototype.toString = function() {
 
 function LexerATNConfig(params, config) {
 	ATNConfig.call(this, params, config);
-    
+
     // This is the backing field for {@link //getLexerActionExecutor}.
 	var lexerActionExecutor = params.lexerActionExecutor || null;
     this.lexerActionExecutor = lexerActionExecutor || (config!==null ? config.lexerActionExecutor : null);

@@ -1,15 +1,15 @@
 /*
  * Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
 package org.antlr.v4.runtime.tree;
 
+import org.antlr.v4.runtime.misc.IntegerStack;
+
 import java.util.ArrayDeque;
 import java.util.Deque;
-
-import org.antlr.v4.runtime.misc.IntegerStack;
 
 /**
  * An iterative (read: non-recursive) pre-order and post-order tree walker that

@@ -1,5 +1,5 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 using Antlr4.Runtime;
@@ -123,7 +123,7 @@ namespace Antlr4.Runtime
         /// </summary>
         /// <param name="recognizer">the parser instance</param>
         /// <returns>
-        /// 
+        ///
         /// <see langword="true"/>
         /// if the parser is currently recovering from a parse
         /// error, otherwise

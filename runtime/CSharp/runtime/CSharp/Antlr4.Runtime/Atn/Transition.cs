@@ -1,5 +1,5 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 using System;
@@ -54,7 +54,7 @@ namespace Antlr4.Runtime.Atn
         /// .</p>
         /// </remarks>
         /// <returns>
-        /// 
+        ///
         /// <see langword="true"/>
         /// if traversing this transition in the ATN does not
         /// consume an input symbol; otherwise,

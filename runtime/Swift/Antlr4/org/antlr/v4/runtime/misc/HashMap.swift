@@ -1,5 +1,5 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
@@ -8,7 +8,7 @@ final class Entry<K: Hashable,V>: CustomStringConvertible {
     final var value: V
     final var next: Entry<K,V>!
     final var hash: Int
-    
+
     /**
      * Creates new entry.
      */
@@ -18,27 +18,27 @@ final class Entry<K: Hashable,V>: CustomStringConvertible {
         key = k
         hash = h
     }
-    
+
     final func getKey() -> K {
         return key
     }
-    
+
     final func getValue() -> V {
         return value
     }
-    
+
     final func setValue(_ newValue: V) -> V {
         let oldValue: V = value
         value = newValue
         return oldValue
     }
-    
+
     final var hashValue: Int {
         return  key.hashValue
     }
-    
+
     var description: String { return "\(getKey())=\(getValue())" }
-    
+
 }
 func == <K: Hashable, V: Equatable>(lhs: Entry<K,V>, rhs: Entry<K,V>) -> Bool {
     if lhs === rhs {
@@ -69,47 +69,47 @@ func == <K: Hashable, V: Equatable>(lhs: Entry<K,V?>, rhs: Entry<K,V?>) -> Bool 
 
 public final class HashMap<K: Hashable,V>: Sequence
 {
-    
+
     /**
      * The default initial capacity - MUST be a power of two.
      */
     let DEFAULT_INITIAL_CAPACITY: Int = 16
-    
+
     /**
      * The maximum capacity, used if a higher value is implicitly specified
      * by either of the constructors with arguments.
      * MUST be a power of two <= 1<<30.
      */
     let MAXIMUM_CAPACITY: Int = 1 << 30
-    
+
     /**
      * The load factor used when none specified in constructor.
      */
     let DEFAULT_LOAD_FACTOR: Float = 0.75
-    
+
     /**
      * The table, resized as necessary. Length MUST Always be a power of two.
      */
      var table: [Entry<K,V>?]
-    
+
     /**
      * The number of key-value mappings contained in this map.
      */
      var size: Int = 0
-    
+
     /**
      * The next size value at which to resize (capacity * load factor).
      * @serial
      */
     var threshold: Int = 0
-    
+
     /**
      * The load factor for the hash table.
      *
      * @serial
      */
      var loadFactor: Float = 0
-    
+
     /**
      * The number of times this HashMap has been structurally modified
      * Structural modifications are those that change the number of mappings in
@@ -118,7 +118,7 @@ public final class HashMap<K: Hashable,V>: Sequence
      * the HashMap fail-fast.  (See ConcurrentModificationException).
      */
     var modCount: Int = 0
-    
+
     public init(count: Int) {
         var initialCapacity = count
         if (count < 0)
@@ -136,7 +136,7 @@ public final class HashMap<K: Hashable,V>: Sequence
                 initialCapacity <<= 1
             }
         }
-        
+
         self.loadFactor = DEFAULT_LOAD_FACTOR
         threshold = Int(Float(initialCapacity) * loadFactor)
         table =  [Entry<K,V>?](repeating: nil, count: initialCapacity)
@@ -146,7 +146,7 @@ public final class HashMap<K: Hashable,V>: Sequence
         threshold = Int(Float(DEFAULT_INITIAL_CAPACITY) * DEFAULT_LOAD_FACTOR)
         table =  [Entry<K,V>?](repeating: nil, count: DEFAULT_INITIAL_CAPACITY)
     }
-    
+
     static func hash(_ h: Int) -> Int {
         var h = h
         // This function ensures that hashCodes that differ only by
@@ -155,14 +155,14 @@ public final class HashMap<K: Hashable,V>: Sequence
         h ^= (h >>> 20) ^ (h >>> 12)
         return h ^ (h >>> 7) ^ (h >>> 4)
     }
-    
+
     /**
      * Returns index for hash code h.
      */
     static func indexFor(_ h: Int, _ length: Int) -> Int {
         return h & (length-1)
     }
-    
+
     /**
      * Returns <tt>true</tt> if this map contains no key-value mappings.
      *
@@ -183,7 +183,7 @@ public final class HashMap<K: Hashable,V>: Sequence
             }
         }
     }
-    
+
     public final var count: Int {
         return size
     }
@@ -228,7 +228,7 @@ public final class HashMap<K: Hashable,V>: Sequence
     public final func containsKey(_ key: K) -> Bool {
         return getEntry(key) != nil
     }
-    
+
     /**
      * Returns the entry associated with the specified key in the
      * HashMap.  Returns null if the HashMap contains no mapping
@@ -247,8 +247,8 @@ public final class HashMap<K: Hashable,V>: Sequence
 
         return nil
     }
-    
-    
+
+
     /**
      * Associates the specified value with the specified key in this map.
      * If the map previously contained a mapping for the key, the old
@@ -263,7 +263,7 @@ public final class HashMap<K: Hashable,V>: Sequence
      */
     @discardableResult
     public final func put(_ key: K, _ value: V) -> V? {
-        
+
         let hash: Int = HashMap.hash(key.hashValue)
         let i: Int = HashMap.indexFor(hash, table.count)
         var e = table[i]
@@ -275,13 +275,13 @@ public final class HashMap<K: Hashable,V>: Sequence
             }
             e = eWrap.next
         }
-        
-        
+
+
         modCount += 1
         addEntry(hash, key, value, i)
         return nil
     }
-    
+
     /**
      * Adds a new entry with the specified key, value and hash code to
      * the specified bucket.  It is the responsibility of this
@@ -318,18 +318,18 @@ public final class HashMap<K: Hashable,V>: Sequence
             threshold = Int.max
             return
         }
-        
+
         var newTable  = [Entry<K,V>?](repeating: nil, count: newCapacity)
         transfer(&newTable)
         table = newTable
         threshold = Int(Float(newCapacity) * loadFactor)
     }
-    
+
     /**
      * Transfers all entries from current table to newTable.
      */
     final func transfer(_ newTable: inout [Entry<K,V>?]) {
-        
+
         let newCapacity: Int = newTable.count
         let length = table.count
         for  j in 0..<length {
@@ -365,14 +365,14 @@ public final class HashMap<K: Hashable,V>: Sequence
         }
         return nil
     }
-    
- 
+
+
     final func removeEntryForKey(_ key: K) -> Entry<K,V>? {
         let hash: Int = HashMap.hash(Int(key.hashValue))
         let i = Int(HashMap.indexFor(hash, Int(table.count)))
         var prev  = table[i]
         var e  = prev
-        
+
         while let eWrap = e {
             let next  = eWrap.next
             var _: AnyObject
@@ -388,10 +388,10 @@ public final class HashMap<K: Hashable,V>: Sequence
             prev = eWrap
             e = next
         }
-        
+
         return e
     }
-    
+
     public final var values: [V]{
         var valueList: [V] = [V]()
         let length = table.count
@@ -405,13 +405,13 @@ public final class HashMap<K: Hashable,V>: Sequence
                     if let eOption = eOption  {
                         valueList.append(eOption.value)
                     }
-                    
+
                 }
             }
         }
         return valueList
     }
-    
+
     public final var keys: [K]{
         var keyList: [K] = [K]()
         let length = table.count
@@ -425,28 +425,28 @@ public final class HashMap<K: Hashable,V>: Sequence
                     if let eOption = eOption  {
                         keyList.append(eOption.key )
                     }
-                    
+
                 }
             }
         }
         return keyList
     }
-    
- 
+
+
     public func makeIterator() ->  AnyIterator<(K,V)> {
         var _next: Entry<K,V>? // next entry to return
         let expectedModCount: Int = modCount // For fast-fail
         var index: Int = 0 // current slot
         //var current: HashMapEntry<K,V> // current entry
         if size > 0{ // advance to first entry
-            
+
             while index < table.count &&  _next == nil
             {
                 _next = table[index]
                 index += 1
             }
         }
-        
+
         return AnyIterator {
             if self.modCount != expectedModCount
             {
@@ -466,9 +466,9 @@ public final class HashMap<K: Hashable,V>: Sequence
             } else {
                 return nil
             }
-            
+
         }
-        
+
     }
-    
+
 }

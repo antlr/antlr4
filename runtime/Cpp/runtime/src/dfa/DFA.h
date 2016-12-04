@@ -1,5 +1,5 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
@@ -39,7 +39,7 @@ namespace dfa {
      * @see Parser#getPrecedence()
      */
     bool isPrecedenceDfa() const;
-    
+
     /**
      * Get the start state for a specific precedence value.
      *
@@ -51,7 +51,7 @@ namespace dfa {
      * @see #isPrecedenceDfa()
      */
     DFAState* getPrecedenceStartState(int precedence) const;
-    
+
     /**
      * Set the start state for a specific precedence value.
      *
@@ -63,7 +63,7 @@ namespace dfa {
      * @see #isPrecedenceDfa()
      */
     void setPrecedenceStartState(int precedence, DFAState *startState, std::recursive_mutex &mutex);
-    
+
     /// Return a list of all states in this DFA, ordered by state number.
     virtual std::vector<DFAState *> getStates() const;
 

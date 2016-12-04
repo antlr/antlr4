@@ -1,6 +1,6 @@
 #
 # Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
-# Use is of this file is governed by the BSD 3-clause license that
+# Use of this file is governed by the BSD 3-clause license that
 # can be found in the LICENSE.txt file in the project root.
 #
 
@@ -291,7 +291,7 @@ class ParserATNSimulator(ATNSimulator):
         self._input = input
         self._startIndex = input.index
         self._outerContext = outerContext
-        
+
         dfa = self.decisionToDFA[decision]
         self._dfa = dfa
         m = input.mark()
@@ -669,7 +669,7 @@ class ParserATNSimulator(ATNSimulator):
         # For full-context reach operations, separate handling is required to
         # ensure that the alternative matching the longest overall sequence is
         # chosen when multiple such configurations can match the input.
-        
+
         skippedStopStates = None
 
         # First figure out where we can reach on input t

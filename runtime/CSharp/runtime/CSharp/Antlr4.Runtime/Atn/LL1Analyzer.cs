@@ -1,5 +1,5 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 using System.Collections.Generic;
@@ -232,7 +232,7 @@ namespace Antlr4.Runtime.Atn
         /// for this argument.
         /// </param>
         /// <param name="seeThruPreds">
-        /// 
+        ///
         /// <see langword="true"/>
         /// to true semantic predicates as
         /// implicitly

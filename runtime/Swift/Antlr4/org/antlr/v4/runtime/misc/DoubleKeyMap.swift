@@ -1,5 +1,5 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
@@ -12,9 +12,9 @@
 
 public struct DoubleKeyMap<Key1:Hashable, Key2:Hashable, Value> {
     private var data: HashMap<Key1, HashMap<Key2, Value>> = HashMap<Key1, HashMap<Key2, Value>>()
-    @discardableResult 
+    @discardableResult
     public mutating func put(_ k1: Key1, _ k2: Key2, _ v: Value) -> Value? {
- 
+
         var data2 = data[k1]
         var prev: Value? = nil
         if data2 == nil {
@@ -29,12 +29,12 @@ public struct DoubleKeyMap<Key1:Hashable, Key2:Hashable, Value> {
     }
 
     public  func get(_ k1: Key1, _ k2: Key2) -> Value? {
- 
+
         if let data2 = data[k1] {
             return data2[k2]
         }
             return nil
- 
+
     }
 
     public func get(_ k1: Key1) -> HashMap<Key2, Value>? {

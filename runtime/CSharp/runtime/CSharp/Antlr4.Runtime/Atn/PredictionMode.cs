@@ -1,5 +1,5 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 using System.Collections.Generic;
@@ -156,10 +156,10 @@ namespace Antlr4.Runtime.Atn
         /// conflicting subsets should fall back to full LL, even if the
         /// configuration sets don't resolve to the same alternative (e.g.
         /// <c/>
-        /// 
+        ///
         /// 1,2}} and
         /// <c/>
-        /// 
+        ///
         /// 3,4}}. If there is at least one non-conflicting
         /// configuration, SLL could continue with the hopes that more lookahead will
         /// resolve via one of those non-conflicting configurations.</p>
@@ -282,7 +282,7 @@ namespace Antlr4.Runtime.Atn
         /// </summary>
         /// <param name="configs">the configuration set to test</param>
         /// <returns>
-        /// 
+        ///
         /// <see langword="true"/>
         /// if any configuration in
         /// <paramref name="configs"/>
@@ -314,7 +314,7 @@ namespace Antlr4.Runtime.Atn
         /// </summary>
         /// <param name="configs">the configuration set to test</param>
         /// <returns>
-        /// 
+        ///
         /// <see langword="true"/>
         /// if all configurations in
         /// <paramref name="configs"/>
@@ -504,7 +504,7 @@ namespace Antlr4.Runtime.Atn
         /// <c>(s', 2, y)</c>
         /// yields non-conflicting set
         /// <c/>
-        /// 
+        ///
         /// 3}} U conflicting sets
         /// <c/>
         /// min(
@@ -513,7 +513,7 @@ namespace Antlr4.Runtime.Atn
         /// min(
         /// 1,2})} =
         /// <c/>
-        /// 
+        ///
         /// 1,3}} =&gt; continue
         /// </li>
         /// <li>
@@ -528,7 +528,7 @@ namespace Antlr4.Runtime.Atn
         /// <c>(s'', 1, z)</c>
         /// yields non-conflicting set
         /// <c/>
-        /// 
+        ///
         /// 1}} U conflicting sets
         /// <c/>
         /// min(
@@ -537,7 +537,7 @@ namespace Antlr4.Runtime.Atn
         /// min(
         /// 1,2})} =
         /// <c/>
-        /// 
+        ///
         /// 1}} =&gt; stop and predict 1</li>
         /// <li>
         /// <c>(s, 1, x)</c>
@@ -549,17 +549,17 @@ namespace Antlr4.Runtime.Atn
         /// <c>(s', 2, y)</c>
         /// yields conflicting, reduced sets
         /// <c/>
-        /// 
+        ///
         /// 1}} U
         /// <c/>
-        /// 
+        ///
         /// 1}} =
         /// <c/>
-        /// 
+        ///
         /// 1}} =&gt; stop and predict 1, can announce
         /// ambiguity
         /// <c/>
-        /// 
+        ///
         /// 1,2}}</li>
         /// <li>
         /// <c>(s, 1, x)</c>
@@ -571,13 +571,13 @@ namespace Antlr4.Runtime.Atn
         /// <c>(s', 3, y)</c>
         /// yields conflicting, reduced sets
         /// <c/>
-        /// 
+        ///
         /// 1}} U
         /// <c/>
-        /// 
+        ///
         /// 2}} =
         /// <c/>
-        /// 
+        ///
         /// 1,2}} =&gt; continue</li>
         /// <li>
         /// <c>(s, 1, x)</c>
@@ -589,13 +589,13 @@ namespace Antlr4.Runtime.Atn
         /// <c>(s', 4, y)</c>
         /// yields conflicting, reduced sets
         /// <c/>
-        /// 
+        ///
         /// 1}} U
         /// <c/>
-        /// 
+        ///
         /// 3}} =
         /// <c/>
-        /// 
+        ///
         /// 1,3}} =&gt; continue</li>
         /// </ul>
         /// <p><strong>EXACT AMBIGUITY DETECTION</strong></p>
@@ -613,7 +613,7 @@ namespace Antlr4.Runtime.Atn
         /// {1,2}, {1,3}}}, then regular LL prediction would terminate
         /// because the resolved set is
         /// <c/>
-        /// 
+        ///
         /// 1}}. To determine what the real
         /// ambiguity is, we have to know whether the ambiguity is between one and
         /// two or one and three so we keep going. We can only stop prediction when
@@ -622,7 +622,7 @@ namespace Antlr4.Runtime.Atn
         /// A=
         /// {1,2}}} or
         /// <c/>
-        /// 
+        ///
         /// {1,2},{1,2}}}, etc...</p>
         /// </remarks>
         public static int ResolvesToJustOneViableAlt(IEnumerable<BitSet> altsets)
@@ -638,7 +638,7 @@ namespace Antlr4.Runtime.Atn
         /// </summary>
         /// <param name="altsets">a collection of alternative subsets</param>
         /// <returns>
-        /// 
+        ///
         /// <see langword="true"/>
         /// if every
         /// <see cref="Antlr4.Runtime.Sharpen.BitSet"/>
@@ -662,7 +662,7 @@ namespace Antlr4.Runtime.Atn
         /// </summary>
         /// <param name="altsets">a collection of alternative subsets</param>
         /// <returns>
-        /// 
+        ///
         /// <see langword="true"/>
         /// if
         /// <paramref name="altsets"/>
@@ -693,7 +693,7 @@ namespace Antlr4.Runtime.Atn
         /// </summary>
         /// <param name="altsets">a collection of alternative subsets</param>
         /// <returns>
-        /// 
+        ///
         /// <see langword="true"/>
         /// if
         /// <paramref name="altsets"/>
@@ -723,7 +723,7 @@ namespace Antlr4.Runtime.Atn
         /// </summary>
         /// <param name="altsets">a collection of alternative subsets</param>
         /// <returns>
-        /// 
+        ///
         /// <see langword="true"/>
         /// if every member of
         /// <paramref name="altsets"/>

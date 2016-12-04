@@ -1,6 +1,6 @@
 #
 # Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
-# Use is of this file is governed by the BSD 3-clause license that
+# Use of this file is governed by the BSD 3-clause license that
 # can be found in the LICENSE.txt file in the project root.
 #
 
@@ -17,7 +17,7 @@ class Interval(object):
 
     def __contains__(self, item):
         return item in self.range
-    
+
     def __len__(self):
         return self.stop - self.start
 

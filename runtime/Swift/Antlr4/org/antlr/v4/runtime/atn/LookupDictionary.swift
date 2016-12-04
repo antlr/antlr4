@@ -1,5 +1,5 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
@@ -20,7 +20,7 @@ public enum LookupDictionaryType: Int {
 public struct LookupDictionary {
     private var type: LookupDictionaryType
 //    private var cache: HashMap<Int, [ATNConfig]> = HashMap<Int, [ATNConfig]>()
-//   
+//
     private var cache: HashMap<Int, ATNConfig> = HashMap<Int, ATNConfig>()
     public init(type: LookupDictionaryType = LookupDictionaryType.lookup) {
         self.type = type
@@ -64,7 +64,7 @@ public struct LookupDictionary {
 //    public mutating func getOrAdd(config: ATNConfig) -> ATNConfig {
 //
 //        let h = hash(config)
-//        
+//
 //        if let configList = cache[h] {
 //            let length = configList.count
 //            for i in 0..<length {
@@ -81,17 +81,17 @@ public struct LookupDictionary {
 //
 //    }
         public mutating func getOrAdd(_ config: ATNConfig) -> ATNConfig {
-    
+
             let h = hash(config)
-    
+
             if let configList = cache[h] {
                 return configList
             } else {
                 cache[h] = config
             }
-    
+
             return config
-    
+
         }
     public var isEmpty: Bool {
         return cache.isEmpty
@@ -112,21 +112,21 @@ public struct LookupDictionary {
 //
 //    }
     public func contains(_ config: ATNConfig) -> Bool {
-        
+
         let h = hash(config)
         if let _ = cache[h] {
             return true
         }
-        
+
         return false
-        
+
     }
     public mutating func removeAll() {
-        cache.clear() 
+        cache.clear()
     }
 
 }
 
 
 
- 
+

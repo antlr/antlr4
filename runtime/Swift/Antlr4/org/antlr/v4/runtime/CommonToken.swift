@@ -1,5 +1,5 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
@@ -168,9 +168,9 @@ public class CommonToken: WritableToken {
                 return "<EOF>"
             }
         }
-        
+
         return nil
-        
+
     }
 
     /**
@@ -272,7 +272,7 @@ public class CommonToken: WritableToken {
         desc.append("\(start):\(stop)='\(txt)',")
         desc.append("<\(type)>\(channelStr),")
         desc.append("\(line):\(getCharPositionInLine())]")
-   
+
         return desc.toString()
     }
 

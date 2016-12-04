@@ -1,5 +1,5 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
@@ -81,7 +81,7 @@ namespace antlr4 {
      * prediction.
      */
     void setInterpreter(atn::ATNSimulator *interpreter);
-    
+
     /// What is the error header, normally line/character position information?
     virtual std::string getErrorHeader(RecognitionException *e);
 
@@ -151,7 +151,7 @@ namespace antlr4 {
     ProxyErrorListener _proxListener; // Manages a collection of listeners.
 
     size_t _stateNumber;
-    
+
     void InitializeInstanceFields();
 
   };

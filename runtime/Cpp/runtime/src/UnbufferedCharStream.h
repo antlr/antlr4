@@ -1,5 +1,5 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
@@ -92,7 +92,7 @@ namespace antlr4 {
     size_t _currentCharIndex;
 
     std::wistream &_input;
-    
+
     /// <summary>
     /// Make sure we have 'want' elements from current position <seealso cref="#p p"/>.
     /// Last valid {@code p} index is {@code data.length-1}. {@code p+need-1} is

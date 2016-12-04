@@ -1,5 +1,5 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
@@ -28,7 +28,7 @@ namespace antlr4 {
   class ANTLR4CPP_PUBLIC IntStream {
   public:
     static const size_t EOF = (size_t)-1;
-    
+
     /// The value returned by <seealso cref="#LA LA()"/> when the end of the stream is
     /// reached.
     /// No explicit EOF definition. We got EOF on all platforms.
@@ -41,7 +41,7 @@ namespace antlr4 {
     static const std::string UNKNOWN_SOURCE_NAME;
 
     virtual ~IntStream() {};
-    
+
     /// <summary>
     /// Consumes the current symbol in the stream. This method has the following
     /// effects:

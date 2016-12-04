@@ -1,5 +1,5 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
@@ -28,7 +28,7 @@ public class LL1Analyzer {
      */
     public func getDecisionLookahead(_ s: ATNState?) throws -> [IntervalSet?]? {
 //		print("LOOK("+s.stateNumber+")");
- 
+
         guard let s = s else {
              return nil
         }
@@ -157,12 +157,12 @@ public class LL1Analyzer {
                 try look.add(CommonToken.EPSILON)
                 return
             }
-            
+
             if ctx.isEmpty() && addEOF {
                 try look.add(CommonToken.EOF)
                 return
             }
-            
+
         }
 
         if s is RuleStopState {
@@ -170,20 +170,20 @@ public class LL1Analyzer {
                 try look.add(CommonToken.EPSILON)
                 return
             }
-            
+
             if ctx.isEmpty() && addEOF {
                 try look.add(CommonToken.EOF)
                 return
             }
-            
-            
+
+
             if ctx != PredictionContext.EMPTY {
                 // run thru all possible stack tops in ctx
                 let length = ctx.size()
                 for i in 0..<length {
                     var returnState: ATNState = atn.states[(ctx.getReturnState(i))]!
-                    
-                    
+
+
                     var removed: Bool = try calledRuleStack.get(returnState.ruleIndex!)
                     //TODO  try
                     //try {

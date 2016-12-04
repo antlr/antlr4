@@ -1,5 +1,5 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
@@ -148,7 +148,7 @@ namespace pattern {
 
     /// Split "<ID> = <e:expr>;" into 4 chunks for tokenizing by tokenize().
     virtual std::vector<Chunk> split(const std::string &pattern);
-    
+
   protected:
     std::string _start;
     std::string _stop;
@@ -169,7 +169,7 @@ namespace pattern {
   private:
     Lexer *_lexer;
     Parser *_parser;
-    
+
     void InitializeInstanceFields();
   };
 

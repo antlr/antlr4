@@ -1,5 +1,5 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
@@ -90,7 +90,7 @@ public class ListTokenSource: TokenSource {
                     // have to calculate the result from the line/column of the previous
                     // token, along with the text of the token.
                     let lastToken: Token = tokens[tokens.count - 1]
-                    
+
                     if let tokenText = lastToken.getText() {
                         let lastNewLine: Int = tokenText.lastIndexOf("\n")
                         if lastNewLine >= 0 {
@@ -208,7 +208,7 @@ public class ListTokenSource: TokenSource {
         if sourceName != nil {
             return sourceName!
         }
- 
+
         if let inputStream = getInputStream() {
             return inputStream.getSourceName()
         }

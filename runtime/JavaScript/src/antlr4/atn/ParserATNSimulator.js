@@ -1,6 +1,6 @@
 //
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 //
@@ -311,7 +311,7 @@ ParserATNSimulator.prototype.adaptivePredict = function(input, decision, outerCo
     this._input = input;
     this._startIndex = input.index;
     this._outerContext = outerContext;
-    
+
     var dfa = this.decisionToDFA[decision];
     this._dfa = dfa;
     var m = input.mark();
@@ -718,7 +718,7 @@ ParserATNSimulator.prototype.computeReachSet = function(closure, t, fullCtx) {
     // For full-context reach operations, separate handling is required to
     // ensure that the alternative matching the longest overall sequence is
     // chosen when multiple such configurations can match the input.
-    
+
     var skippedStopStates = null;
 
     // First figure out where we can reach on input t
@@ -1109,7 +1109,7 @@ ParserATNSimulator.prototype.getSynValidOrSemInvalidAltThatFinishedDecisionEntry
     }
     return ATN.INVALID_ALT_NUMBER;
 };
-    
+
 ParserATNSimulator.prototype.getAltThatFinishedDecisionEntryRule = function(configs) {
     var alts = [];
     for(var i=0;i<configs.items.length; i++) {
@@ -1711,7 +1711,7 @@ ParserATNSimulator.prototype.reportContextSensitivity = function(dfa, prediction
         this.parser.getErrorListenerDispatch().reportContextSensitivity(this.parser, dfa, startIndex, stopIndex, prediction, configs);
     }
 };
-    
+
 // If context sensitive parsing, we know it's ambiguity not conflict//
 ParserATNSimulator.prototype.reportAmbiguity = function(dfa, D, startIndex, stopIndex,
                                exact, ambigAlts, configs ) {
@@ -1724,5 +1724,5 @@ ParserATNSimulator.prototype.reportAmbiguity = function(dfa, D, startIndex, stop
         this.parser.getErrorListenerDispatch().reportAmbiguity(this.parser, dfa, startIndex, stopIndex, exact, ambigAlts, configs);
     }
 };
-            
+
 exports.ParserATNSimulator = ParserATNSimulator;

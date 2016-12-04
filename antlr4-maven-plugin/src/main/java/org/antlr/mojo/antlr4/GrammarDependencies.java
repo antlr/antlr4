@@ -1,19 +1,17 @@
 /*
  * Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
 package org.antlr.mojo.antlr4;
 
 import org.antlr.runtime.tree.Tree;
-
 import org.antlr.v4.Tool;
 import org.antlr.v4.misc.Graph;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.antlr.v4.tool.ast.GrammarRootAST;
-
 import org.apache.maven.plugin.logging.Log;
 
 import java.io.File;
@@ -22,7 +20,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;

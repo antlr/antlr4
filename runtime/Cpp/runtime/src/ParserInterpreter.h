@@ -1,5 +1,5 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
@@ -37,14 +37,14 @@ namespace antlr4 {
     ~ParserInterpreter();
 
     virtual void reset() override;
-    
+
     virtual const atn::ATN& getATN() const override;
 
     // @deprecated
     virtual const std::vector<std::string>& getTokenNames() const override;
 
     virtual const dfa::Vocabulary& getVocabulary() const override;
-    
+
     virtual const std::vector<std::string>& getRuleNames() const override;
     virtual std::string getGrammarFileName() const override;
 
@@ -95,9 +95,9 @@ namespace antlr4 {
      *  @since 4.5.1
      */
     void addDecisionOverride(int decision, int tokenIndex, int forcedAlt);
-    
+
     Ref<InterpreterRuleContext> getOverrideDecisionRoot() const;
-    
+
     /** Return the root of the parse, which can be useful if the parser
      *  bails out. You still can access the top node. Note that,
      *  because of the way left recursive rules add children, it's possible
@@ -132,7 +132,7 @@ namespace antlr4 {
      *  associated with left operand of an alt like "expr '*' expr".
      */
     std::stack<std::pair<ParserRuleContext *, size_t>> _parentContextStack;
-    
+
     /** We need a map from (decision,inputIndex)->forced alt for computing ambiguous
      *  parse trees. For now, we allow exactly one override.
      */
@@ -147,7 +147,7 @@ namespace antlr4 {
      */
     Ref<InterpreterRuleContext> _overrideDecisionRoot;
     InterpreterRuleContext* _rootContext;
-    
+
     virtual atn::ATNState *getATNState();
     virtual void visitState(atn::ATNState *p);
 

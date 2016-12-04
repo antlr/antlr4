@@ -1,8 +1,8 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
- 
+
 
 /** A semantic predicate failed during validation.  Validation of predicates
  *  occurs when normally parsing the alternative just like matching a token.
@@ -10,7 +10,7 @@
  *  prediction.
  */
 public class FailedPredicateException: RecognitionException<ParserATNSimulator> {
-	private final var ruleIndex: Int 
+	private final var ruleIndex: Int
 	private final var predicateIndex: Int
 	private final var predicate: String?
 
@@ -26,7 +26,7 @@ public class FailedPredicateException: RecognitionException<ParserATNSimulator> 
 									_ predicate: String?,
 									_ message: String?) throws
 	{
-		
+
 		let s: ATNState  = recognizer.getInterpreter().atn.states[recognizer.getState()]!
 
 		let trans: AbstractPredicateTransition = s.transition(0) as! AbstractPredicateTransition
@@ -40,9 +40,9 @@ public class FailedPredicateException: RecognitionException<ParserATNSimulator> 
 		}
 
 		self.predicate = predicate
-        
+
         super.init(FailedPredicateException.formatMessage(predicate!, message), recognizer  , recognizer.getInputStream()!, recognizer._ctx)
-        
+
 		try self.setOffendingToken(recognizer.getCurrentToken())
 	}
 

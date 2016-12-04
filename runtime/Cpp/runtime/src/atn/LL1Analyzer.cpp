@@ -1,5 +1,5 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
@@ -40,7 +40,7 @@ std::vector<misc::IntervalSet> LL1Analyzer::getDecisionLookahead(ATNState *s) co
     antlrcpp::BitSet callRuleStack;
     _LOOK(s->transitions[alt]->target, nullptr, PredictionContext::EMPTY,
           look[alt], lookBusy, callRuleStack, seeThruPreds, false);
-    
+
     // Wipe out lookahead for this alternative if we found nothing
     // or we had a predicate when we !seeThruPreds
     if (look[alt].size() == 0 || look[alt].contains(HIT_PRED)) {
@@ -68,7 +68,7 @@ misc::IntervalSet LL1Analyzer::LOOK(ATNState *s, ATNState *stopState, RuleContex
 
 void LL1Analyzer::_LOOK(ATNState *s, ATNState *stopState, Ref<PredictionContext> const& ctx, misc::IntervalSet &look,
   ATNConfig::Set &lookBusy, antlrcpp::BitSet &calledRuleStack, bool seeThruPreds, bool addEOF) const {
-  
+
   Ref<ATNConfig> c = std::make_shared<ATNConfig>(s, 0, ctx);
 
   if (lookBusy.count(c) > 0) // Keep in mind comparison is based on members of the class, not the actual instance.

@@ -1,5 +1,5 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
@@ -13,7 +13,7 @@ namespace atn {
   class ANTLR4CPP_PUBLIC StarLoopEntryState final : public DecisionState {
   public:
     StarLoopEntryState();
-    
+
     /**
      * Indicates whether this state can benefit from a precedence DFA during SLL
      * decision making.
@@ -25,7 +25,7 @@ namespace atn {
      * @see DFA#isPrecedenceDfa()
      */
     bool isPrecedenceDecision = false;
-    
+
     StarLoopbackState *loopBackState = nullptr;
 
     virtual size_t getStateType() override;

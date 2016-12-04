@@ -1,5 +1,5 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
@@ -31,26 +31,26 @@
 
 public class DFAState: Hashable, CustomStringConvertible {
     public var stateNumber: Int = -1
-    
-    
+
+
     public var configs: ATNConfigSet = ATNConfigSet()
-    
+
     /** {@code edges[symbol]} points to target of symbol. Shift up by 1 so (-1)
      *  {@link org.antlr.v4.runtime.Token#EOF} maps to {@code edges[0]}.
      */
-    
+
     public var edges: [DFAState?]!
-    
+
     public var isAcceptState: Bool = false
-    
+
     /** if accept state, what ttype do we match or alt do we predict?
      *  This is set to {@link org.antlr.v4.runtime.atn.ATN#INVALID_ALT_NUMBER} when {@link #predicates}{@code !=null} or
      *  {@link #requiresFullContext}.
      */
     public var prediction: Int! = 0
-    
+
     public var lexerActionExecutor: LexerActionExecutor!
-    
+
     /**
      * Indicates that this state was created during SLL prediction that
      * discovered a conflict between the configurations in the state. Future
@@ -58,7 +58,7 @@ public class DFAState: Hashable, CustomStringConvertible {
      * full context prediction if this field is true.
      */
     public var requiresFullContext: Bool = false
-    
+
     /** During SLL parsing, this is a list of predicates associated with the
      *  ATN configurations of the DFA state. When we have predicates,
      *  {@link #requiresFullContext} is {@code false} since full context prediction evaluates predicates
@@ -71,13 +71,13 @@ public class DFAState: Hashable, CustomStringConvertible {
      *
      *  <p>This list is computed by {@link org.antlr.v4.runtime.atn.ParserATNSimulator#predicateDFAState}.</p>
      */
-    
+
     public var predicates: [PredPrediction]?
-    
+
     /** Map a predicate to a predicted alternative. */
-    
+
     public class PredPrediction: CustomStringConvertible {
-        
+
         public final var pred: SemanticContext
         // never null; at least SemanticContext.NONE
         public final var alt: Int
@@ -85,44 +85,44 @@ public class DFAState: Hashable, CustomStringConvertible {
             self.alt = alt
             self.pred = pred
         }
-        
-        
+
+
         public var description: String {
-            
+
             return "(\(pred),\(alt))"
-            
+
         }
     }
-    
+
     public init() {
     }
-    
+
     public init(_ stateNumber: Int) {
         self.stateNumber = stateNumber
     }
-    
+
     public init(_ configs: ATNConfigSet) {
         self.configs = configs
     }
-    
+
     /** Get the set of all alts mentioned by all ATN configurations in this
      *  DFA state.
      */
     public func getAltSet() -> Set<Int>? {
 
         let alts = configs.getAltSet()
-        
+
         return alts
     }
-    
-    
+
+
     public var hashValue: Int {
         var hash: Int = MurmurHash.initialize(7)
         hash = MurmurHash.update(hash, configs.hashValue)
         hash = MurmurHash.finish(hash, 1)
         return hash
     }
-    
+
     /**
      * Two {@link org.antlr.v4.runtime.dfa.DFAState} instances are equal if their ATN configuration sets
      * are the same. This method is used to see if a state already exists.
@@ -136,7 +136,7 @@ public class DFAState: Hashable, CustomStringConvertible {
      * exists that has this exact set of ATN configurations. The
      * {@link #stateNumber} is irrelevant.</p>
      */
-    
+
     public var description: String {
         let buf: StringBuilder = StringBuilder()
         buf.append(stateNumber).append(":").append(configs)
@@ -150,12 +150,12 @@ public class DFAState: Hashable, CustomStringConvertible {
         }
         return buf.toString()
     }
-    
-    
+
+
 }
 
 public func ==(lhs: DFAState, rhs: DFAState) -> Bool {
-    
+
     if lhs === rhs {
         return true
     }

@@ -1,5 +1,5 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
@@ -130,7 +130,7 @@ namespace antlr4 {
     virtual void Delete(const std::string &programName, Token *from, Token *to);
 
     virtual size_t getLastRewriteTokenIndex();
-    
+
     /// Return the text from the original tokens altered per the
     /// instructions given to this rewriter.
     virtual std::string getText();
@@ -139,7 +139,7 @@ namespace antlr4 {
      *  instructions given to this rewriter in programName.
      */
     std::string getText(std::string programName);
-    
+
     /// Return the text associated with the tokens in the interval from the
     /// original token stream but with the alterations given to this rewriter.
     /// The interval refers to the indexes in the original token stream.

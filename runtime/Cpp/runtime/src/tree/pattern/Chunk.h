@@ -1,5 +1,5 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
@@ -23,7 +23,7 @@ namespace pattern {
   class ANTLR4CPP_PUBLIC Chunk {
   public:
     virtual ~Chunk() {};
-    
+
     /// This method returns a text representation of the tag chunk. Labeled tags
     /// are returned in the form {@code label:tag}, and unlabeled tags are
     /// returned as just the tag name.
@@ -32,7 +32,7 @@ namespace pattern {
       return str;
     }
   };
-  
+
 } // namespace pattern
 } // namespace tree
 } // namespace antlr4

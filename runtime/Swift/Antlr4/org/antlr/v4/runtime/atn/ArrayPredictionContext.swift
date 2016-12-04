@@ -1,5 +1,5 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
@@ -10,12 +10,12 @@ public class ArrayPredictionContext: PredictionContext {
      *  returnState == {@link #EMPTY_RETURN_STATE}.
      */
     public final var parents: [PredictionContext?]
-    
+
     /** Sorted for merge, no duplicates; if present,
      *  {@link #EMPTY_RETURN_STATE} is always last.
      */
     public final let returnStates: [Int]
-    
+
     public convenience init(_ a: SingletonPredictionContext) {
 //        if a.parent == nil {
 //            // print("parent is nil")
@@ -24,42 +24,42 @@ public class ArrayPredictionContext: PredictionContext {
         let parents = [a.parent]
         self.init(parents, [a.returnState])
     }
-    
+
     public init(_ parents: [PredictionContext?], _ returnStates: [Int]) {
-        
+
         self.parents = parents
         self.returnStates = returnStates
         super.init(PredictionContext.calculateHashCode(parents, returnStates))
     }
-    
+
     override
     final public func isEmpty() -> Bool {
         // since EMPTY_RETURN_STATE can only appear in the last position, we
         // don't need to verify that size==1
         return returnStates[0] == PredictionContext.EMPTY_RETURN_STATE
     }
-    
+
     override
     final public func size() -> Int {
         return returnStates.count
     }
-    
+
     override
     final public func getParent(_ index: Int) -> PredictionContext? {
         return parents[index]
     }
-    
+
     override
     final public func getReturnState(_ index: Int) -> Int {
         return returnStates[index]
     }
-    
+
     //	@Override
     //	public int findReturnState(int returnState) {
     //		return Arrays.binarySearch(returnStates, returnState);
     //	}
-    
-    
+
+
     override
     public var description: String {
         if isEmpty() {
@@ -68,7 +68,7 @@ public class ArrayPredictionContext: PredictionContext {
         let buf: StringBuilder = StringBuilder()
         buf.append("[")
         let length = returnStates.count
-        
+
         for i in 0..<length {
             if i > 0 {
                 buf.append(", ")
@@ -88,7 +88,7 @@ public class ArrayPredictionContext: PredictionContext {
         buf.append("]")
         return buf.toString()
     }
-    
+
     internal final func combineCommonParents() {
 
         let length = parents.count
@@ -102,13 +102,13 @@ public class ArrayPredictionContext: PredictionContext {
                 }
             }
         }
-        
+
         for p in 0..<length {
             if let parent: PredictionContext = parents[p] {
                 parents[p] = uniqueParents[parent]
             }
         }
-        
+
     }
 }
 
@@ -120,9 +120,9 @@ public func ==(lhs: ArrayPredictionContext, rhs: ArrayPredictionContext) -> Bool
     if lhs.hashValue != rhs.hashValue {
         return false
     }
-    
+
     // return lhs.returnStates == rhs.returnStates && lhs.parents == rhs.parents
-    
+
     return ArrayEquals(lhs.returnStates, rhs.returnStates) && ArrayEquals(lhs.parents, rhs.parents)
 }
 

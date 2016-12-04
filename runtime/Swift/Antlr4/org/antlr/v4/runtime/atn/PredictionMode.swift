@@ -1,5 +1,5 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
@@ -71,8 +71,8 @@ public enum PredictionMode {
      * behavior for syntactically-incorrect inputs.</p>
      */
     case LL_EXACT_AMBIG_DETECTION
-    
-    
+
+
     /**
      * Computes the SLL prediction termination condition.
      *
@@ -208,10 +208,10 @@ public enum PredictionMode {
      * {@link org.antlr.v4.runtime.atn.RuleStopState}, otherwise {@code false}
      */
     public static func hasConfigInRuleStopState(_ configs: ATNConfigSet) -> Bool {
-        
+
         return  configs.hasConfigInRuleStopState
     }
-    
+
     /**
      * Checks if all configurations in {@code configs} are in a
      * {@link org.antlr.v4.runtime.atn.RuleStopState}. Configurations meeting this condition have reached
@@ -223,7 +223,7 @@ public enum PredictionMode {
      * {@link org.antlr.v4.runtime.atn.RuleStopState}, otherwise {@code false}
      */
     public static func allConfigsInRuleStopStates(_ configs: ATNConfigSet) -> Bool {
-        
+
         return configs.allConfigsInRuleStopStates
     }
 
@@ -426,13 +426,13 @@ public enum PredictionMode {
      * others, otherwise {@code false}
      */
     public static func allSubsetsEqual(_ altsets: Array<BitSet>) -> Bool {
-        
+
         let first: BitSet = altsets[0]
         for it in altsets {
             if it != first {
                 return false
             }
-            
+
         }
         return true
     }
@@ -470,9 +470,9 @@ public enum PredictionMode {
 
     /** Get union of all alts from configs. @since 4.5.1 */
     public static func getAlts(_ configs: ATNConfigSet) throws -> BitSet {
-    
+
         return try configs.getAltBitSet()
-        
+
     }
 
     /**
@@ -484,12 +484,12 @@ public enum PredictionMode {
      * alt and not pred
      * </pre>
      */
-    
+
     public static func getConflictingAltSubsets(_ configs: ATNConfigSet) throws -> Array<BitSet> {
- 
+
         return try configs.getConflictingAltSubsets()
     }
-    
+
     /**
      * Get a map from state to alt subset from a configuration set. For each
      * configuration {@code c} in {@code configs}:
@@ -499,7 +499,7 @@ public enum PredictionMode {
      * </pre>
      */
     public static func getStateToAltMap(_ configs: ATNConfigSet) throws -> HashMap<ATNState, BitSet> {
- 
+
         return try configs.getStateToAltMap()
     }
 

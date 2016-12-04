@@ -1,6 +1,6 @@
 #
 # Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
-# Use is of this file is governed by the BSD 3-clause license that
+# Use of this file is governed by the BSD 3-clause license that
 # can be found in the LICENSE.txt file in the project root.
 
 # This implementation of {@link TokenStream} loads tokens from a
@@ -60,14 +60,14 @@ class BufferedTokenStream(TokenStream):
         # {@link #tokens} is trivial with this field.</li>
         # <ul>
         self.fetchedEOF = False
-        
+
     def mark(self):
         return 0
-    
+
     def release(self, marker:int):
         # no resources to release
         pass
-    
+
     def reset(self):
         self.seek(0)
 

@@ -1,5 +1,5 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 using System;
@@ -420,7 +420,7 @@ namespace Antlr4.Runtime.Atn
         /// this rule would have a lower priority.
         /// </remarks>
         /// <returns>
-        /// 
+        ///
         /// <see langword="true"/>
         /// if an accept state is reached, otherwise
         /// <see langword="false"/>
@@ -613,7 +613,7 @@ namespace Antlr4.Runtime.Atn
         /// <param name="ruleIndex">The rule containing the predicate.</param>
         /// <param name="predIndex">The index of the predicate within the rule.</param>
         /// <param name="speculative">
-        /// 
+        ///
         /// <see langword="true"/>
         /// if the current index in
         /// <paramref name="input"/>
@@ -621,7 +621,7 @@ namespace Antlr4.Runtime.Atn
         /// one character before the predicate's location.
         /// </param>
         /// <returns>
-        /// 
+        ///
         /// <see langword="true"/>
         /// if the specified predicate evaluates to
         /// <see langword="true"/>

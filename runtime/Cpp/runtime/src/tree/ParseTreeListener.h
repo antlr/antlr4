@@ -1,5 +1,5 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
@@ -24,7 +24,7 @@ namespace tree {
   class ANTLR4CPP_PUBLIC ParseTreeListener {
   public:
     virtual ~ParseTreeListener() {};
-    
+
     virtual void visitTerminal(TerminalNode *node) = 0;
     virtual void visitErrorNode(ErrorNode *node) = 0;
     virtual void enterEveryRule(ParserRuleContext *ctx) = 0;

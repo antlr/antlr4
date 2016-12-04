@@ -1,5 +1,5 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
@@ -25,12 +25,12 @@ public final class ArrayList<T>: ExpressibleByArrayLiteral  {
         for element in elements {
              array.append(element)
         }
-    
+
     }
     public init(count: Int, repeatedValue: T) {
         array =  Array<T>( repeating: repeatedValue, count: count)
     }
-    
+
     public init(arrayLiteral elements: T...) {
         array = Array<T>()
         for element in elements {
@@ -55,18 +55,18 @@ public func == <Element: Equatable>(lhs: ArrayList<Element>, rhs: ArrayList<Elem
     if lhs === rhs {
         return true
     }
-    
+
     if lhs.count != rhs.count {
         return false
     }
-    
+
     let length = lhs.count
     for i in 0..<length {
         if lhs[i] != rhs[i] {
             return false
         }
     }
-    
+
     return true
 }
 
@@ -74,13 +74,13 @@ public func == <Element: Equatable>(lhs: ArrayList<Element?>, rhs: ArrayList<Ele
     if lhs === rhs {
         return true
     }
-    
+
     if lhs.count != rhs.count {
         return false
     }
-    
+
     let length = lhs.count
-    
+
     for i in 0..<length {
         if lhs[i] == nil && rhs[i] != nil {
             return false
@@ -92,6 +92,6 @@ public func == <Element: Equatable>(lhs: ArrayList<Element?>, rhs: ArrayList<Ele
             return false
         }
     }
-    
+
     return true
 }

@@ -1,5 +1,5 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 using Antlr4.Runtime;
@@ -67,7 +67,7 @@ namespace Antlr4.Runtime
         /// <param name="startIndex">the input index where the decision started</param>
         /// <param name="stopIndex">the input input where the ambiguity was identified</param>
         /// <param name="exact">
-        /// 
+        ///
         /// <see langword="true"/>
         /// if the ambiguity is exactly known, otherwise
         /// <see langword="false"/>

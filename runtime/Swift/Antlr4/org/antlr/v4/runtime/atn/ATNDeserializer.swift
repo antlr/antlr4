@@ -1,5 +1,5 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
@@ -308,7 +308,7 @@ public class ATNDeserializer {
                     if !(t is RuleTransition) {
                         continue
                     }
-                    
+
                     let ruleTransition: RuleTransition = t as! RuleTransition
                     var outermostPrecedenceReturn: Int = -1
                     if atn.ruleToStartState[ruleTransition.target.ruleIndex!].isPrecedenceRule {
@@ -316,7 +316,7 @@ public class ATNDeserializer {
                             outermostPrecedenceReturn = ruleTransition.target.ruleIndex!
                         }
                     }
-                    
+
                     let returnTransition: EpsilonTransition = EpsilonTransition(ruleTransition.followState, outermostPrecedenceReturn)
                     atn.ruleToStopState[ruleTransition.target.ruleIndex!].addTransition(returnTransition)
                 }
@@ -324,26 +324,26 @@ public class ATNDeserializer {
         }
 
         for state: ATNState? in atn.states {
-            
+
             if let state = state as? BlockStartState {
                 // we need to know the end state to set its start state
                 if state.endState == nil {
                     throw ANTLRError.illegalState(msg: "state.endState == nil")
-                    
+
                 }
-                
+
                 // block end states can only be associated to a single block start state
                 if let endState = state.endState {
                     if endState.startState != nil {
                         throw ANTLRError.illegalState(msg: "state.endState.startState != nil")
-                        
+
                     }
-                    
+
                     endState.startState = state
                 }
             }
-            
-            
+
+
             if let loopbackState = state as? PlusLoopbackState {
                 let length = loopbackState.getNumberOfTransitions()
                 for i in 0..<length {
@@ -418,7 +418,7 @@ public class ATNDeserializer {
                             if !(transition is ActionTransition) {
                                 continue
                             }
-                            
+
                             let ruleIndex: Int = (transition as! ActionTransition).ruleIndex
                             let actionIndex: Int = (transition as! ActionTransition).actionIndex
                             let lexerAction: LexerCustomAction = LexerCustomAction(ruleIndex, actionIndex)
@@ -469,16 +469,16 @@ public class ATNDeserializer {
                             if state.ruleIndex != i {
                                 continue
                             }
-                            
+
                             if !(state is StarLoopEntryState) {
                                 continue
                             }
-                            
+
                             let maybeLoopEndState: ATNState = state.transition(state.getNumberOfTransitions() - 1).target
                             if !(maybeLoopEndState is LoopEndState) {
                                 continue
                             }
-                            
+
                             if maybeLoopEndState.epsilonOnlyTransitions && maybeLoopEndState.transition(0).target is RuleStopState {
                                 endState = state
                                 break
@@ -503,7 +503,7 @@ public class ATNDeserializer {
                             if transition === excludeTransition! {
                                 continue
                             }
-                            
+
                             if transition.target == endState {
                                 transition.target = bypassStop
                             }
@@ -668,14 +668,14 @@ public class ATNDeserializer {
         atn.ruleToStopState = [RuleStopState](repeating: RuleStopState(), count: nrules)
 
         for state: ATNState? in atn.states {
-            
+
             if let stopState = state as? RuleStopState {
                 if let index = stopState.ruleIndex {
                     atn.ruleToStopState[index] = stopState
                     atn.ruleToStartState[index].stopState = stopState
                 }
             }
-            
+
         }
 
 
@@ -761,7 +761,7 @@ public class ATNDeserializer {
                                     outermostPrecedenceReturn = targetRuleIndex
                                 }
                             }
-                            
+
                             let returnTransition: EpsilonTransition = EpsilonTransition(ruleTransition.followState, outermostPrecedenceReturn)
                             atn.ruleToStopState[targetRuleIndex].addTransition(returnTransition)
                         }
@@ -777,7 +777,7 @@ public class ATNDeserializer {
                     // block end states can only be associated to a single block start state
                     if stateEndState.startState != nil {
                         throw ANTLRError.illegalState(msg: "state.endState.startState != nil")
-                        
+
                     }
                     stateEndState.startState = state
                 }
@@ -785,7 +785,7 @@ public class ATNDeserializer {
                     throw ANTLRError.illegalState(msg: "state.endState == nil")
                 }
 
-                
+
             }
 
             if let loopbackState = state as? PlusLoopbackState {
@@ -857,7 +857,7 @@ public class ATNDeserializer {
                             if !(transition is ActionTransition) {
                                 continue
                             }
-                            
+
                             let ruleIndex: Int = (transition as! ActionTransition).ruleIndex
                             let actionIndex: Int = (transition as! ActionTransition).actionIndex
                             let lexerAction: LexerCustomAction = LexerCustomAction(ruleIndex, actionIndex)
@@ -908,16 +908,16 @@ public class ATNDeserializer {
                             if state.ruleIndex != i {
                                 continue
                             }
-                            
+
                             if !(state is StarLoopEntryState) {
                                 continue
                             }
-                            
+
                             let maybeLoopEndState: ATNState = state.transition(state.getNumberOfTransitions() - 1).target
                             if !(maybeLoopEndState is LoopEndState) {
                                 continue
                             }
-                            
+
                             if maybeLoopEndState.epsilonOnlyTransitions && maybeLoopEndState.transition(0).target is RuleStopState {
                                 endState = state
                                 break
@@ -942,7 +942,7 @@ public class ATNDeserializer {
                             if transition === excludeTransition! {
                                 continue
                             }
-                            
+
                             if transition.target == endState {
                                 transition.target = bypassStop
                             }
@@ -986,7 +986,7 @@ public class ATNDeserializer {
     internal func markPrecedenceDecisions(_ atn: ATN) {
         for state: ATNState? in atn.states {
             if let state = state as? StarLoopEntryState {
-                
+
                 /* We analyze the ATN to determine if this ATN decision state is the
                  * decision for the closure block that determines whether a
                  * precedence rule should continue or complete.
@@ -1011,7 +1011,7 @@ public class ATNDeserializer {
             guard let state = state else {
                 continue
             }
-            
+
             try checkCondition(state.onlyHasEpsilonTransitions() || state.getNumberOfTransitions() <= 1)
 
             if let state = state as? PlusBlockStartState {

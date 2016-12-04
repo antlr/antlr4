@@ -1,5 +1,5 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
@@ -98,7 +98,7 @@ size_t PredictionContext::calculateHashCode(const std::vector<std::weak_ptr<Pred
 
 Ref<PredictionContext> PredictionContext::merge(const Ref<PredictionContext> &a,
   const Ref<PredictionContext> &b, bool rootIsWildcard, PredictionContextMergeCache *mergeCache) {
-  
+
   assert(a && b);
 
   // share same graph if both same
@@ -539,7 +539,7 @@ void PredictionContext::getAllContextNodes_(const Ref<PredictionContext> &contex
 }
 
 std::string PredictionContext::toString() const {
-  
+
   return antlrcpp::toString(this);
 }
 

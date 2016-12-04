@@ -1,6 +1,6 @@
 #
 # Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
-# Use is of this file is governed by the BSD 3-clause license that
+# Use of this file is governed by the BSD 3-clause license that
 # can be found in the LICENSE.txt file in the project root.
 #/
 from antlr4.IntervalSet import IntervalSet, Interval
@@ -12,7 +12,7 @@ from antlr4.atn.Transition import WildcardTransition, NotSetTransition, Abstract
 
 
 class LL1Analyzer (object):
-    
+
     #* Special value added to the lookahead sets to indicate that we hit
     #  a predicate during analysis if {@code seeThruPreds==false}.
     #/

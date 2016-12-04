@@ -1,6 +1,6 @@
 //
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 //
@@ -16,7 +16,7 @@ var Interval = require('./../IntervalSet').Interval;
 var IntervalSet = require('./../IntervalSet').IntervalSet;
 
 function ErrorStrategy() {
-	
+
 }
 
 ErrorStrategy.prototype.reset = function(recognizer){
@@ -742,7 +742,7 @@ BailErrorStrategy.prototype.recover = function(recognizer, e) {
     }
     throw new ParseCancellationException(e);
 };
-    
+
 // Make sure we don't attempt to recover inline; if the parser
 // successfully recovers, it won't throw an exception.
 //

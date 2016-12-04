@@ -1,5 +1,5 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
@@ -108,7 +108,7 @@ ParseTreePattern ParseTreePatternMatcher::compile(const std::string &pattern, in
   if (tokens.LA(1) != Token::EOF) {
     throw StartRuleDoesNotConsumeFullPattern();
   }
-  
+
   return ParseTreePattern(this, pattern, patternRuleIndex, tree);
 }
 
@@ -267,7 +267,7 @@ std::vector<Chunk> ParseTreePatternMatcher::split(const std::string &pattern) {
   size_t p = 0;
   size_t n = pattern.length();
   std::vector<Chunk> chunks;
-  
+
   // find all start and stop indexes first, then collect
   std::vector<size_t> starts;
   std::vector<size_t> stops;
@@ -312,7 +312,7 @@ std::vector<Chunk> ParseTreePatternMatcher::split(const std::string &pattern) {
     std::string text = pattern.substr(0, starts[0]);
     chunks.push_back(TextChunk(text));
   }
-  
+
   for (size_t i = 0; i < ntags; i++) {
     // copy inside of <tag>
     std::string tag = pattern.substr(starts[i] + _start.length(), stops[i] - (starts[i] + _start.length()));

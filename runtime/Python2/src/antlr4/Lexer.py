@@ -1,5 +1,5 @@
 # Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
-# Use is of this file is governed by the BSD 3-clause license that
+# Use of this file is governed by the BSD 3-clause license that
 # can be found in the LICENSE.txt file in the project root.
 #/
 
@@ -37,7 +37,7 @@ class Lexer(Recognizer, TokenSource):
         self._tokenFactorySourcePair = (self, input)
 
         self._interp = None # child classes must populate this
-        
+
         # The goal of all lexer rules/methods is to create a token object.
         #  self is an instance variable as multiple rules may collaborate to
         #  create a single token.  nextToken will return self object after

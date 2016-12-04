@@ -1,5 +1,5 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
@@ -33,7 +33,7 @@ public class DiagnosticErrorListener: BaseErrorListener {
      * When {@code true}, only exactly known ambiguities are reported.
      */
     internal final var exactOnly: Bool
-    
+
     /**
      * Initializes a new instance of {@link org.antlr.v4.runtime.DiagnosticErrorListener} which only
      * reports exact ambiguities.
@@ -41,7 +41,7 @@ public class DiagnosticErrorListener: BaseErrorListener {
     public convenience override init() {
         self.init(true)
     }
-    
+
     /**
      * Initializes a new instance of {@link org.antlr.v4.runtime.DiagnosticErrorListener}, specifying
      * whether all ambiguities or only exact ambiguities are reported.
@@ -52,7 +52,7 @@ public class DiagnosticErrorListener: BaseErrorListener {
     public init(_ exactOnly: Bool) {
         self.exactOnly = exactOnly
     }
-    
+
     override
     public func reportAmbiguity(_ recognizer: Parser,
         _ dfa: DFA,
@@ -64,16 +64,16 @@ public class DiagnosticErrorListener: BaseErrorListener {
             if exactOnly && !exact {
                 return
             }
-            
+
             let format: String = "reportAmbiguity d=%@: ambigAlts=%@, input='%@'"
             let decision: String = getDecisionDescription(recognizer, dfa)
             let conflictingAlts: BitSet = try getConflictingAlts(ambigAlts, configs)
             let text: String = try recognizer.getTokenStream()!.getText(Interval.of(startIndex, stopIndex))
-            
+
             let message: String = NSString(format: format as NSString, decision, conflictingAlts.description, text) as String
             try recognizer.notifyErrorListeners(message)
     }
-    
+
     override
     public func reportAttemptingFullContext(_ recognizer: Parser,
         _ dfa: DFA,
@@ -87,7 +87,7 @@ public class DiagnosticErrorListener: BaseErrorListener {
             let message: String = NSString(format: format as NSString, decision, text) as String
             try recognizer.notifyErrorListeners(message)
     }
-    
+
     override
     public func reportContextSensitivity(_ recognizer: Parser,
         _ dfa: DFA,
@@ -101,25 +101,25 @@ public class DiagnosticErrorListener: BaseErrorListener {
             let message: String = NSString(format: format as NSString, decision, text) as String
             try recognizer.notifyErrorListeners(message)
     }
-    
+
     internal func getDecisionDescription(_ recognizer: Parser, _ dfa: DFA) -> String {
         let decision: Int = dfa.decision
         let ruleIndex: Int = dfa.atnStartState.ruleIndex!
-        
+
         var ruleNames: [String] = recognizer.getRuleNames()
         if ruleIndex < 0 || ruleIndex >= ruleNames.count {
             return String(decision)
         }
-        
+
         let ruleName: String = ruleNames[ruleIndex]
         //if (ruleName == nil || ruleName.isEmpty()) {
         if ruleName.isEmpty {
             return String(decision)
         }
-        
+
         return NSString(format: "%d (%@)", decision, ruleName) as String
     }
-    
+
     /**
      * Computes the set of conflicting or ambiguous alternatives from a
      * configuration set, if that information was not already provided by the

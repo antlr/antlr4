@@ -1,5 +1,5 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
@@ -77,7 +77,7 @@ open class Parser: Recognizer<ParserATNSimulator> {
      */
     //private let bypassAltsAtnCache : Dictionary<String, ATN> =
     //	WeakHashMap<String, ATN>();  MapTable<NSString, ATN>
-    
+
     private let bypassAltsAtnCache: HashMap<String, ATN> = HashMap<String, ATN>()
     /**
      * The error handling strategy for the parser. The default value is a new
@@ -580,7 +580,7 @@ open class Parser: Recognizer<ParserATNSimulator> {
             return o
         }
         let hasListener: Bool = _parseListeners != nil && !_parseListeners!.isEmpty
-        
+
         if _buildParseTrees || hasListener {
             if _errHandler.inErrorRecoveryMode(self) {
                 let node: ErrorNode = _ctx.addErrorNode(o)
@@ -602,7 +602,7 @@ open class Parser: Recognizer<ParserATNSimulator> {
     }
 
     internal func addContextToParseTree() {
-        
+
         // add current context to parent if we have a parent
         if let parent = _ctx?.parent as? ParserRuleContext {
             parent.addChild(_ctx!)
@@ -979,7 +979,7 @@ open class Parser: Recognizer<ParserATNSimulator> {
         }
         synced(_interp.decisionToDFA as AnyObject) {
             [unowned self] in
- 
+
             for d in 0..<_interp.decisionToDFA.count {
                 let dfa: DFA = _interp.decisionToDFA[d]
                 s.append(dfa.toString(self.getVocabulary()))

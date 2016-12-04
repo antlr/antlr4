@@ -1,6 +1,6 @@
 ﻿
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
@@ -12,7 +12,7 @@ namespace antlr4 {
 namespace atn {
 
   class SingletonPredictionContext;
-  
+
   class ANTLR4CPP_PUBLIC ArrayPredictionContext : public PredictionContext {
   public:
     /// Parent can be empty only if full ctx mode and we make an array

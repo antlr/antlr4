@@ -1,5 +1,5 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 using System;
@@ -372,7 +372,7 @@ outer_continue: ;
 
 		public virtual int TokenStartCharIndex
 		{
-			get 
+			get
 			{
 				return _tokenStartCharIndex;
 			}
@@ -380,7 +380,7 @@ outer_continue: ;
 
 		public virtual int TokenStartLine
 		{
-			get 
+			get
 			{
 				return _tokenStartLine;
 			}
@@ -388,7 +388,7 @@ outer_continue: ;
 
 		public virtual int TokenStartColumn
 		{
-			get 
+			get
 			{
 				return _tokenStartColumn;
 			}

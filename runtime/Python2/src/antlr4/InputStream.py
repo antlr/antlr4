@@ -1,25 +1,25 @@
-# 
+#
 # Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
-# Use is of this file is governed by the BSD 3-clause license that
+# Use of this file is governed by the BSD 3-clause license that
 # can be found in the LICENSE.txt file in the project root.
-# 
+#
 import unittest
 
 
-# 
-#  Vacuum all input from a string and then treat it like a buffer. 
+#
+#  Vacuum all input from a string and then treat it like a buffer.
 #
 from antlr4.Token import Token
 
 
 class InputStream (object):
-    
+
     def __init__(self, data):
         self.name = "<empty>"
         self.strdata = unicode(data)
         self._loadString()
 
-    def _loadString(self):    
+    def _loadString(self):
         self._index = 0
         self.data = [ord(c) for c in self.strdata]
         self._size = len(self.data)
@@ -91,7 +91,7 @@ class InputStream (object):
 
 
 class TestInputStream(unittest.TestCase):
-    
+
     def testStream(self):
         stream = InputStream("abcde")
         self.assertEqual(0, stream.index)
@@ -104,5 +104,4 @@ class TestInputStream(unittest.TestCase):
         self.assertEqual("bcd", stream.getText(1, 3))
         stream.reset()
         self.assertEqual(0, stream.index)
-        
-        
+

@@ -1,5 +1,5 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
@@ -202,7 +202,7 @@ open class Recognizer<ATNInterpreter:ATNSimulator> {
             return "<no token>"
         }
         var s: String
-        
+
         if let text = t.getText() {
             s = text
         } else {

@@ -1,5 +1,5 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
@@ -136,7 +136,7 @@ namespace antlr4 {
      * <ul>
      */
     bool _fetchedEOF;
-    
+
     /// <summary>
     /// Make sure index {@code i} in tokens has a token.
     /// </summary>
@@ -150,7 +150,7 @@ namespace antlr4 {
     /// </summary>
     /// <returns> The actual number of elements added to the buffer. </returns>
     virtual size_t fetch(size_t n);
-    
+
     virtual Token* LB(size_t k);
 
     /// Allowed derived classes to modify the behavior of operations which change
@@ -187,7 +187,7 @@ namespace antlr4 {
      * as though it were on every channel.</p>
      */
     virtual ssize_t previousTokenOnChannel(size_t i, size_t channel);
-    
+
     virtual std::vector<Token *> filterForChannel(size_t from, size_t to, ssize_t channel);
 
     bool isInitialized() const;

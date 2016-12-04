@@ -1,5 +1,5 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
@@ -54,7 +54,7 @@ namespace tree {
 
     /** @deprecated */
     static std::vector<ParseTree *> descendants(ParseTree *t);
-    
+
     /** Find smallest subtree of t enclosing range startTokenIndex..stopTokenIndex
      *  inclusively using postorder traversal.  Recursive depth-first-search.
      *
@@ -69,7 +69,7 @@ namespace tree {
      *  @since 4.5.1
      */
     static ParseTree* findNodeSuchThat(ParseTree *t, Ref<misc::Predicate> const& pred);
-    
+
   private:
     Trees();
   };

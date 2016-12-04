@@ -1,5 +1,5 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
@@ -90,7 +90,7 @@ ParserRuleContext* ParserInterpreter::parse(size_t startRuleIndex) {
   atn::RuleStartState *startRuleStartState = _atn.ruleToStartState[startRuleIndex];
 
   _rootContext = createInterpreterRuleContext(nullptr, atn::ATNState::INVALID_STATE_NUMBER, startRuleIndex);
-  
+
   if (startRuleStartState->isLeftRecursiveRule) {
     enterRecursionRule(_rootContext, startRuleStartState->stateNumber, startRuleIndex, 0);
   } else {
@@ -114,7 +114,7 @@ ParserRuleContext* ParserInterpreter::parse(size_t startRuleIndex) {
             return _rootContext;
           }
         }
-        
+
         visitRuleStopState(p);
         break;
 
@@ -128,7 +128,7 @@ ParserRuleContext* ParserInterpreter::parse(size_t startRuleIndex) {
           getContext()->exception = std::current_exception();
           recover(e);
         }
-        
+
         break;
     }
   }

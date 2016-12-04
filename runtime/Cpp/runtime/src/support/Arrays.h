@@ -1,5 +1,5 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
@@ -8,7 +8,7 @@
 #include "antlr4-common.h"
 
 namespace antlrcpp {
-  
+
   class ANTLR4CPP_PUBLIC Arrays {
   public:
 
@@ -22,7 +22,7 @@ namespace antlrcpp {
       for (size_t i = 0; i < a.size(); ++i)
         if (a[i] != b[i]) // Requires that the != operator is supported by the template type.
           return false;
-      
+
       return true;
     }
 
@@ -37,7 +37,7 @@ namespace antlrcpp {
 
       return true;
     }
-    
+
     template <typename T>
     static bool equals(const std::vector<std::weak_ptr<T>> &a, const std::vector<std::weak_ptr<T>> &b) {
       if (a.size() != b.size())
@@ -61,7 +61,7 @@ namespace antlrcpp {
 
       return true;
     }
-    
+
     template <typename T>
     static std::string toString(const std::vector<T> &source) {
       std::string result = "[";

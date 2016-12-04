@@ -1,6 +1,6 @@
 #
 # Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
-# Use is of this file is governed by the BSD 3-clause license that
+# Use of this file is governed by the BSD 3-clause license that
 # can be found in the LICENSE.txt file in the project root.
 #/
 from antlr4.PredictionContext import getCachedPredictionContext
@@ -12,7 +12,7 @@ class ATNSimulator(object):
 
     # Must distinguish between missing edge and edge we know leads nowhere#/
     ERROR = DFAState(0x7FFFFFFF, ATNConfigSet())
- 
+
     # The context cache maps all PredictionContext objects that are ==
     #  to a single cached copy. This cache is shared across all contexts
     #  in all ATNConfigs in all DFA states.  We rebuild each ATNConfigSet

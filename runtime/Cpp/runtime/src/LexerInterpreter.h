@@ -1,5 +1,5 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
@@ -28,7 +28,7 @@ namespace antlr4 {
     virtual const std::vector<std::string>& getTokenNames() const override;
     virtual const std::vector<std::string>& getRuleNames() const override;
     virtual const std::vector<std::string>& getModeNames() const override;
-    
+
     virtual const dfa::Vocabulary& getVocabulary() const override;
 
   protected:

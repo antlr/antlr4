@@ -1,5 +1,5 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
@@ -14,12 +14,12 @@ public class Trees {
     TreePostScriptGenerator(ruleNames, t, fontName, fontSize)
     return psgen.getPS()
     }
-    
+
     public class func getPS(t: Tree, _ ruleNames: Array<String>) -> String {
     return getPS(t, ruleNames, "Helvetica", 11)
     }
     //TODO: write to file
-    
+
     public class func writePS(t: Tree, _ ruleNames: Array<String>,
     _ fileName: String,
     _ fontName: String, _ fontSize: Int)
@@ -34,7 +34,7 @@ public class Trees {
     bw.close()
     }
     }
-    
+
     public class func writePS(t: Tree, _ ruleNames: Array<String>, _ fileName: String)
     throws {
     writePS(t, ruleNames, fileName, "Helvetica", 11)

@@ -1,5 +1,5 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 using System;
@@ -246,31 +246,31 @@ namespace Antlr4.Runtime.Atn
     /// <p>
     /// Let's say we have a set of SLL conflicting alternatives
     /// <c/>
-    /// 
+    ///
     /// 1, 2, 3}} and
     /// a smaller LL set called <em>s</em>. If <em>s</em> is
     /// <c/>
-    /// 
+    ///
     /// 2, 3}}, then SLL
     /// parsing will get an error because SLL will pursue alternative 1. If
     /// <em>s</em> is
     /// <c/>
-    /// 
+    ///
     /// 1, 2}} or
     /// <c/>
-    /// 
+    ///
     /// 1, 3}} then both SLL and LL will
     /// choose the same alternative because alternative one is the minimum of either
     /// set. If <em>s</em> is
     /// <c/>
-    /// 
+    ///
     /// 2}} or
     /// <c/>
-    /// 
+    ///
     /// 3}} then SLL will get a syntax
     /// error. If <em>s</em> is
     /// <c/>
-    /// 
+    ///
     /// 1}} then SLL will succeed.</p>
     /// <p>
     /// Of course, if the input is invalid, then we will get an error for sure in
@@ -722,7 +722,7 @@ namespace Antlr4.Runtime.Atn
         /// </remarks>
         /// <param name="state">The DFA state to check.</param>
         /// <param name="useContext">
-        /// 
+        ///
         /// <see langword="true"/>
         /// if the prediction algorithm is currently
         /// considering the full parser context; otherwise,
@@ -731,7 +731,7 @@ namespace Antlr4.Runtime.Atn
         /// algorithm is currently performing a local context prediction.
         /// </param>
         /// <returns>
-        /// 
+        ///
         /// <see langword="true"/>
         /// if the specified
         /// <paramref name="state"/>
@@ -1297,7 +1297,7 @@ namespace Antlr4.Runtime.Atn
         /// cache
         /// </param>
         /// <returns>
-        /// 
+        ///
         /// <paramref name="configs"/>
         /// if all configurations in
         /// <paramref name="configs"/>

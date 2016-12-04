@@ -1,11 +1,10 @@
 /*
  * Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 package org.antlr.v4.runtime.misc;
 
-import java.lang.IllegalArgumentException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;

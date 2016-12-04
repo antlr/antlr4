@@ -1,5 +1,5 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
@@ -68,7 +68,7 @@
 
 public class ATNState: Hashable, CustomStringConvertible {
     public static let INITIAL_NUM_TRANSITIONS: Int = 4
-    
+
     // constants for serialization
     public static let INVALID_TYPE: Int = 0
     public static let BASIC: Int = 1
@@ -83,9 +83,9 @@ public class ATNState: Hashable, CustomStringConvertible {
     public static let STAR_LOOP_ENTRY: Int = 10
     public static let PLUS_LOOP_BACK: Int = 11
     public static let LOOP_END: Int = 12
-    
+
     public static let serializationNames: Array<String> =
-    
+
     ["INVALID",
         "BASIC",
         "RULE_START",
@@ -99,38 +99,38 @@ public class ATNState: Hashable, CustomStringConvertible {
         "STAR_LOOP_ENTRY",
         "PLUS_LOOP_BACK",
         "LOOP_END"]
-    
-    
+
+
     public static let INVALID_STATE_NUMBER: Int = -1
-    
+
     /** Which ATN are we in? */
     public final var atn: ATN? = nil
-    
+
     public final var stateNumber: Int = INVALID_STATE_NUMBER
-    
+
     public final var ruleIndex: Int?
     // at runtime, we don't have Rule objects
-    
+
     public final var epsilonOnlyTransitions: Bool = false
-    
+
     /** Track the transitions emanating from this ATN state. */
     internal final var transitions: Array<Transition> = Array<Transition>()
     //Array<Transition>(INITIAL_NUM_TRANSITIONS);
-    
+
     /** Used to cache lookahead during parsing, not used during construction */
     public final var nextTokenWithinRule: IntervalSet?
-    
-    
+
+
     public var hashValue: Int {
         return stateNumber
     }
-    
-    
+
+
     public func isNonGreedyExitState() -> Bool {
         return false
     }
-    
-    
+
+
     public func toString() -> String {
         return description
     }
@@ -141,51 +141,51 @@ public class ATNState: Hashable, CustomStringConvertible {
     public final func getTransitions() -> [Transition] {
         return transitions
     }
-    
+
     public final func getNumberOfTransitions() -> Int {
         return transitions.count
     }
-    
+
     public final func addTransition(_ e: Transition) {
         addTransition(transitions.count, e)
     }
-    
+
     public final func addTransition(_ index: Int, _ e: Transition) {
         if transitions.isEmpty {
             epsilonOnlyTransitions = e.isEpsilon()
         } else {
             if epsilonOnlyTransitions != e.isEpsilon() {
-                
+
                 print("ATN state %d has both epsilon and non-epsilon transitions.\n", String(stateNumber))
                 epsilonOnlyTransitions = false
             }
         }
         transitions.insert(e, at: index)
-        
+
     }
-    
+
     public final func transition(_ i: Int) -> Transition {
         return transitions[i]
     }
-    
+
     public final func setTransition(_ i: Int, _ e: Transition) {
         transitions[i] = e
     }
-    
+
     public final func removeTransition(_ index: Int) -> Transition {
-        
+
         return transitions.remove(at: index)
     }
-    
+
     public func getStateType() -> Int {
         RuntimeException(#function + " must be overridden")
         return 0
     }
-    
+
     public final func onlyHasEpsilonTransitions() -> Bool {
         return epsilonOnlyTransitions
     }
-    
+
     public final func setRuleIndex(_ ruleIndex: Int) {
         self.ruleIndex = ruleIndex
     }
@@ -197,6 +197,6 @@ public func ==(lhs: ATNState, rhs: ATNState) -> Bool {
     }
     // are these states same object?
     return lhs.stateNumber == rhs.stateNumber
-    
+
 }
- 
+

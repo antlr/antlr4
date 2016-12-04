@@ -1,5 +1,5 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
@@ -19,7 +19,7 @@ namespace antlr4 {
 
   public:
     void addErrorListener(ANTLRErrorListener *listener);
-    void removeErrorListener(ANTLRErrorListener *listener);    
+    void removeErrorListener(ANTLRErrorListener *listener);
     void removeErrorListeners();
 
     void syntaxError(IRecognizer *recognizer, Token *offendingSymbol, size_t line, size_t charPositionInLine,

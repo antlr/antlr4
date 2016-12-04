@@ -1,5 +1,5 @@
 /* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
- * Use is of this file is governed by the BSD 3-clause license that
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
@@ -264,7 +264,7 @@ Token* DefaultErrorStrategy::getMissingSymbol(Parser *recognizer) {
     { current->getTokenSource(), current->getTokenSource()->getInputStream() },
     expectedTokenType, tokenText, Token::DEFAULT_CHANNEL, INVALID_INDEX, INVALID_INDEX,
     current->getLine(), current->getCharPositionInLine()));
-  
+
   return _errorSymbols.back().get();
 }
 
