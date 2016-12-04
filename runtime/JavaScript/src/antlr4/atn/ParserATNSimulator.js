@@ -315,6 +315,8 @@ ParserATNSimulator.prototype = Object.create(ATNSimulator.prototype);
 ParserATNSimulator.prototype.constructor = ParserATNSimulator;
 
 ParserATNSimulator.prototype.debug = false;
+ParserATNSimulator.prototype.debug_closure = false;
+ParserATNSimulator.prototype.debug_add = false;
 ParserATNSimulator.prototype.debug_list_atn_decisions = false;
 ParserATNSimulator.prototype.dfa_debug = false;
 ParserATNSimulator.prototype.retry_debug = false;
@@ -746,7 +748,7 @@ ParserATNSimulator.prototype.computeReachSet = function(closure, t, fullCtx) {
     // First figure out where we can reach on input t
     for (var i=0; i<closure.items.length;i++) {
         var c = closure.items[i];
-        if(this.debug) {
+        if(this.debug_add) {
             console.log("testing " + this.getTokenName(t) + " at " + c);
         }
         if (c.state instanceof RuleStopState) {
@@ -755,7 +757,7 @@ ParserATNSimulator.prototype.computeReachSet = function(closure, t, fullCtx) {
                     skippedStopStates = [];
                 }
                 skippedStopStates.push(c);
-                if(this.debug) {
+                if(this.debug_add) {
                     console.log("added " + c + " to skippedStopStates");
                 }
             }
@@ -767,7 +769,7 @@ ParserATNSimulator.prototype.computeReachSet = function(closure, t, fullCtx) {
             if (target!==null) {
                 var cfg = new ATNConfig({state:target}, c);
                 intermediate.add(cfg, this.mergeCache);
-                if(this.debug) {
+                if(this.debug_add) {
                     console.log("added " + cfg + " to intermediate");
                 }
             }
@@ -1225,9 +1227,9 @@ ParserATNSimulator.prototype.closure = function(config, configs, closureBusy, co
 
 
 ParserATNSimulator.prototype.closureCheckingStopState = function(config, configs, closureBusy, collectPredicates, fullCtx, depth, treatEofAsEpsilon) {
-    if (this.debug) {
+    if (this.debug || this.debug_closure) {
         console.log("closure(" + config.toString(this.parser,true) + ")");
-        console.log("configs(" + configs.toString() + ")");
+        // console.log("configs(" + configs.toString() + ")");
         if(config.reachesIntoOuterContext>50) {
             throw "problem";
         }
@@ -1447,7 +1449,8 @@ ParserATNSimulator.prototype.getEpsilonTarget = function(config, t, collectPredi
 
 ParserATNSimulator.prototype.actionTransition = function(config, t) {
     if (this.debug) {
-        console.log("ACTION edge " + t.ruleIndex + ":" + t.actionIndex);
+        var index = t.actionIndex==-1 ? 65535 : t.actionIndex;
+        console.log("ACTION edge " + t.ruleIndex + ":" + index);
     }
     return new ATNConfig({state:t.target}, config);
 };
@@ -1588,11 +1591,12 @@ ParserATNSimulator.prototype.getTokenName = function( t) {
         return "EOF";
     }
     if( this.parser!==null && this.parser.literalNames!==null) {
-        if (t >= this.parser.literalNames.length) {
+        if (t >= this.parser.literalNames.length && t >= this.parser.symbolicNames.length) {
             console.log("" + t + " ttype out of range: " + this.parser.literalNames);
             console.log("" + this.parser.getInputStream().getTokens());
         } else {
-            return this.parser.literalNames[t] + "<" + t + ">";
+            var name = this.parser.literalNames[t] || this.parser.symbolicNames[t];
+            return name + "<" + t + ">";
         }
     }
     return "" + t;
@@ -1679,8 +1683,9 @@ ParserATNSimulator.prototype.addDFAEdge = function(dfa, from_, t, to) {
     from_.edges[t+1] = to; // connect
 
     if (this.debug) {
-        var names = this.parser===null ? null : this.parser.literalNames;
-        console.log("DFA=\n" + dfa.toString(names));
+        var literalNames = this.parser===null ? null : this.parser.literalNames;
+        var symbolicNames = this.parser===null ? null : this.parser.symbolicNames;
+        console.log("DFA=\n" + dfa.toString(literalNames, symbolicNames));
     }
     return to;
 };
