@@ -972,7 +972,7 @@ public enum ErrorType {
 	 */
 	MODE_CONFLICTS_WITH_TOKEN(170, "mode <arg> conflicts with token with same name", ErrorSeverity.ERROR),
 	/**
-	 * Compiler Error 172.
+	 * Compiler Error 171.
 	 *
 	 * <p>can not use or declare token with reserved name</p>
 	 *
