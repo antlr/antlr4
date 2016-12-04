@@ -831,7 +831,7 @@ public enum ErrorType {
 	 *
 	 * @since 4.2
 	 */
-	UNKNOWN_OR_WRONG_LEXER_CONSTANT(155, "rule <arg> contains a lexer command with an unrecognized or wrong constant value; lexer interpreters may produce incorrect output", ErrorSeverity.WARNING),
+	UNKNOWN_LEXER_CONSTANT(155, "rule <arg> contains a lexer command with an unrecognized constant value; lexer interpreters may produce incorrect output", ErrorSeverity.WARNING),
 	/**
 	 * Compiler Error 156.
 	 *
@@ -972,38 +972,85 @@ public enum ErrorType {
 	 */
 	MODE_CONFLICTS_WITH_TOKEN(170, "mode <arg> conflicts with token with same name", ErrorSeverity.ERROR),
 	/**
-	 * Compiler Error 171.
+	 * Compiler Error 172.
 	 *
-	 * <p>can not declare mode, token or channel with reserved name</p>
+	 * <p>can not use or declare token with reserved name</p>
 	 *
-	 * <p>Reserved names: HIDDEN, DEFAULT_TOKEN_CHANNEL, DEFAULT_MODE, SKIP, MORE, EOF, MAX_CHAR_VALUE, MIN_CHAR_VALUE.
+	 * <p>Reserved names: HIDDEN, DEFAULT_TOKEN_CHANNEL, SKIP, MORE, MAX_CHAR_VALUE, MIN_CHAR_VALUE.
+	 *
+	 * <p>Can be used but cannot be declared: EOF</p>
 	 */
-	DECLARATION_CONFLICTS_WITH_COMMON_CONSTANTS(171, "cannot declare mode, token or channel with reserved name <arg>", ErrorSeverity.ERROR),
+	TOKEN_CONFLICTS_WITH_COMMON_CONSTANTS(171, "cannot use or declare token with reserved name <arg>", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 172.
 	 *
-	 * <p>string literals cannot be empty</p>
+	 * <p>can not use or declare channel with reserved name</p>
+	 *
+	 * <p>Reserved names: DEFAULT_MODE, SKIP, MORE, EOF, MAX_CHAR_VALUE, MIN_CHAR_VALUE.
+	 *
+	 * <p>Can be used but cannot be declared: HIDDEN, DEFAULT_TOKEN_CHANNEL</p>
+	 */
+	CHANNEL_CONFLICTS_WITH_COMMON_CONSTANTS(172, "cannot use or declare channel with reserved name <arg>", ErrorSeverity.ERROR),
+	/**
+	 * Compiler Error 173.
+	 *
+	 * <p>can not use or declare mode with reserved name</p>
+	 *
+	 * <p>Reserved names: HIDDEN, DEFAULT_TOKEN_CHANNEL, SKIP, MORE, MAX_CHAR_VALUE, MIN_CHAR_VALUE.
+	 *
+	 * <p>Can be used and cannot declared: DEFAULT_MODE</p>
+	 */
+	MODE_CONFLICTS_WITH_COMMON_CONSTANTS(173, "cannot use or declare mode with reserved name <arg>", ErrorSeverity.ERROR),
+	/**
+	 * Compiler Error 174.
+	 *
+	 * <p>empty strings not allowed</p>
 	 *
 	 * <pre>A: '''test''';</pre>
 	 * <pre>B: '';</pre>
 	 * <pre>C: 'test' '';</pre>
 	 */
-	EMPTY_STRINGS_NOT_ALLOWED(172, "string literals cannot be empty", ErrorSeverity.ERROR),
+	EMPTY_STRINGS_NOT_ALLOWED(174, "string literals cannot be empty", ErrorSeverity.ERROR),
+	/**
+	 * Compiler Error 175.
+	 *
+	 * <p><em>name</em> is not a recognized token name</p>
+	 *
+	 * <pre>TOKEN: 'a' -> type(CHANNEL1); // error 175</pre>
+	 */
+	CONSTANT_VALUE_IS_NOT_A_RECOGNIZED_TOKEN_NAME(175, "<arg> is not a recognized token name", ErrorSeverity.ERROR),
+	/**
+	 * Compiler Error 176.
+	 *
+	 * <p><em>name</em>is not a recognized mode name</p>
+	 *
+	 * <pre>TOKEN: 'a' -> channel(MODE1); // error 176</pre>
+	 */
+	CONSTANT_VALUE_IS_NOT_A_RECOGNIZED_MODE_NAME(176, "<arg> is not a recognized mode name", ErrorSeverity.ERROR),
+	/**
+	 * Compiler Error 177.
+	 *
+	 * <p><em>name</em> is not a recognized channel name</p>
+	 *
+	 * <pre>TOKEN: 'a' -> mode(TOKEN1); // error 177</pre>
+	 */
+	CONSTANT_VALUE_IS_NOT_A_RECOGNIZED_CHANNEL_NAME(177, "<arg> is not a recognized channel name", ErrorSeverity.ERROR),
 	/*
-	* Compiler Warning 173.
+	* Compiler Warning 178.
 	*
 	* <p>lexer rule has a duplicated commands</p>
 	*
 	* <p>TOKEN: 'asdf' -> mode(MODE1), mode(MODE2);</p>
 	* */
-	DUPLICATED_COMMAND(173, "duplicated command <arg>", ErrorSeverity.WARNING),
-	/* Compiler Waring 174.
+	DUPLICATED_COMMAND(178, "duplicated command <arg>", ErrorSeverity.WARNING),
+	/*
+	* Compiler Waring 179.
 	*
 	* <p>incompatible commands <em>command1</em> and <em>command2</em></p>
 	*
 	* <p>T00: 'a00' -> skip, more;</p>
 	 */
-	INCOMPATIBLE_COMMANDS(174, "incompatible commands <arg> and <arg2>", ErrorSeverity.WARNING),
+	INCOMPATIBLE_COMMANDS(179, "incompatible commands <arg> and <arg2>", ErrorSeverity.WARNING),
 
 	/*
 	 * Backward incompatibility errors

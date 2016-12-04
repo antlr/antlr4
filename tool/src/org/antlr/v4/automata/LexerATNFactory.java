@@ -516,8 +516,17 @@ public class LexerATNFactory extends ParserATNFactory {
 		if (mode >= 0) {
 			return mode;
 		}
+		else if (COMMON_CONSTANTS.containsKey(modeName)) {
+			g.tool.errMgr.grammarError(ErrorType.MODE_CONFLICTS_WITH_COMMON_CONSTANTS, g.fileName, token, token.getText());
+			return null;
+		}
 
-		return tryParseInt(modeName, token);
+		try {
+			return Integer.parseInt(modeName);
+		} catch (NumberFormatException ex) {
+			g.tool.errMgr.grammarError(ErrorType.CONSTANT_VALUE_IS_NOT_A_RECOGNIZED_MODE_NAME, g.fileName, token, token.getText());
+			return null;
+		}
 	}
 
 	private Integer getTokenConstantValue(String tokenName, Token token) {
@@ -533,8 +542,17 @@ public class LexerATNFactory extends ParserATNFactory {
 		if (tokenType != org.antlr.v4.runtime.Token.INVALID_TYPE) {
 			return tokenType;
 		}
+		else if (COMMON_CONSTANTS.containsKey(tokenName)) {
+			g.tool.errMgr.grammarError(ErrorType.TOKEN_CONFLICTS_WITH_COMMON_CONSTANTS, g.fileName, token, token.getText());
+			return null;
+		}
 
-		return tryParseInt(tokenName, token);
+		try {
+			return Integer.parseInt(tokenName);
+		} catch (NumberFormatException ex) {
+			g.tool.errMgr.grammarError(ErrorType.CONSTANT_VALUE_IS_NOT_A_RECOGNIZED_TOKEN_NAME, g.fileName, token, token.getText());
+			return null;
+		}
 	}
 
 	private Integer getChannelConstantValue(String channelName, Token token) {
@@ -545,8 +563,12 @@ public class LexerATNFactory extends ParserATNFactory {
 		if (channelName.equals("HIDDEN")) {
 			return Lexer.HIDDEN;
 		}
-		if (channelName.equals("DEFAULT_TOKEN_CHANNEL")) {
+		else if (channelName.equals("DEFAULT_TOKEN_CHANNEL")) {
 			return Lexer.DEFAULT_TOKEN_CHANNEL;
+		}
+		else if (COMMON_CONSTANTS.containsKey(channelName)) {
+			g.tool.errMgr.grammarError(ErrorType.CHANNEL_CONFLICTS_WITH_COMMON_CONSTANTS, g.fileName, token, token.getText());
+			return null;
 		}
 
 		int channelValue = g.getChannelValue(channelName);
@@ -554,14 +576,10 @@ public class LexerATNFactory extends ParserATNFactory {
 			return channelValue;
 		}
 
-		return tryParseInt(channelName, token);
-	}
-
-	private Integer tryParseInt(String name, Token token) {
 		try {
-			return Integer.parseInt(name);
+			return Integer.parseInt(channelName);
 		} catch (NumberFormatException ex) {
-			g.tool.errMgr.grammarError(ErrorType.UNKNOWN_OR_WRONG_LEXER_CONSTANT, g.fileName, token, currentRule.name, token != null ? token.getText() : null);
+			g.tool.errMgr.grammarError(ErrorType.CONSTANT_VALUE_IS_NOT_A_RECOGNIZED_CHANNEL_NAME, g.fileName, token, token.getText());
 			return null;
 		}
 	}
