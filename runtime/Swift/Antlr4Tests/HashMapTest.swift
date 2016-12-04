@@ -1,9 +1,13 @@
+/* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
+ * Use is of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
+
 //
 //  HashMapTest.swift
 //  Antlr4
 //
 //  Created by janyou on 16/4/8.
-//  Copyright © 2016 jlabs. All rights reserved.
 //
 
 import XCTest
@@ -14,7 +18,7 @@ class HashMapTest: XCTestCase {
         super.setUp()
         // Put setup code here. This method is called before the invocation of each test method in the class.
     }
-    
+
     override func tearDown() {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
         super.tearDown()
@@ -26,7 +30,7 @@ class HashMapTest: XCTestCase {
         map["b"] = 2
         XCTAssert(map["a"] == 1)
         XCTAssert(map["b"] == 2)
-        
+
         for (k,v) in map {
             print("\(k) : \(v)")
         }
@@ -39,12 +43,12 @@ class HashMapTest: XCTestCase {
         print("isEmpty:\(map.isEmpty) ")
         XCTAssert(map.isEmpty  == false)
         print("\(map)")
-        
+
         map.remove("a")
         print("\(map.count)")
-        
+
         map["b"] = nil
-        
+
         print("\(map.count)")
         for (k,v) in map {
             print("\(k) : \(v)")

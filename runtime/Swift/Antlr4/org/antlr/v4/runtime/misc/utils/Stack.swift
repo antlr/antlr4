@@ -1,9 +1,13 @@
+/* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
+ * Use is of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
+
 //
 //  Stack.swift
 //  antlr.swift
 //
 //  Created by janyou on 15/9/8.
-//  Copyright © 2015 jlabs. All rights reserved.
 //
 
 import Foundation

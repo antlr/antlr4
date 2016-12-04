@@ -1,9 +1,13 @@
+/* Copyright (c) 2012 The ANTLR Project Contributors. All rights reserved.
+ * Use is of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
+
 //
 //  ArrayWrapper.swift
 //  Antlr4
 //
 //  Created by janyou on 16/6/21.
-//  Copyright © 2016 jlabs. All rights reserved.
 //
 
 import Foundation
