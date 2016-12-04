@@ -1011,6 +1011,30 @@ public enum ErrorType {
 	 * <pre>C: 'test' '';</pre>
 	 */
 	EMPTY_STRINGS_NOT_ALLOWED(174, "string literals cannot be empty", ErrorSeverity.ERROR),
+	/**
+	 * Compiler Error 175.
+	 *
+	 * <p><em>name</em> is not a recognized token name</p>
+	 *
+	 * <pre>TOKEN: 'a' -> type(CHANNEL1); // error 175</pre>
+	 */
+	CONSTANT_VALUE_IS_NOT_A_RECOGNIZED_TOKEN_NAME(175, "<arg> is not a recognized token name", ErrorSeverity.ERROR),
+	/**
+	 * Compiler Error 176.
+	 *
+	 * <p><em>name</em>is not a recognized mode name</p>
+	 *
+	 * <pre>TOKEN: 'a' -> channel(MODE1); // error 176</pre>
+	 */
+	CONSTANT_VALUE_IS_NOT_A_RECOGNIZED_MODE_NAME(176, "<arg> is not a recognized mode name", ErrorSeverity.ERROR),
+	/**
+	 * Compiler Error 177.
+	 *
+	 * <p><em>name</em> is not a recognized channel name</p>
+	 *
+	 * <pre>TOKEN: 'a' -> mode(TOKEN1); // error 177</pre>
+	 */
+	CONSTANT_VALUE_IS_NOT_A_RECOGNIZED_CHANNEL_NAME(177, "<arg> is not a recognized channel name", ErrorSeverity.ERROR),
 
 	/*
 	 * Backward incompatibility errors
