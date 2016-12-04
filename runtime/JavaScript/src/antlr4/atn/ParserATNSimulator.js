@@ -1278,8 +1278,6 @@ ParserATNSimulator.prototype.closureCheckingStopState = function(config, configs
     this.closure_(config, configs, closureBusy, collectPredicates, fullCtx, depth, treatEofAsEpsilon);
 };
 
-var drops = [];
-var odds = 0;
 
 // Do the actual work of walking epsilon edges//
 ParserATNSimulator.prototype.closure_ = function(config, configs, closureBusy, collectPredicates, fullCtx, depth, treatEofAsEpsilon) {
@@ -1291,16 +1289,8 @@ ParserATNSimulator.prototype.closure_ = function(config, configs, closureBusy, c
         // both epsilon transitions and non-epsilon transitions.
     }
     for(var i = 0;i<p.transitions.length; i++) {
-        if(i==0) {
-            if(drops.length==100)
-                drops = [];
-            if (this.canDropLoopEntryEdgeInLeftRecursiveRule(config)) {
-                drops.push(odds);
-                odds = odds + 1;
-                continue;
-            } else
-                odds = odds + 1;
-        }
+        if(i==0 && this.canDropLoopEntryEdgeInLeftRecursiveRule(config))
+            continue;
 
         var t = p.transitions[i];
         var continueCollecting = collectPredicates && !(t instanceof ActionTransition);
