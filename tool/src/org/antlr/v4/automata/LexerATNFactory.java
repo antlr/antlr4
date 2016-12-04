@@ -461,6 +461,7 @@ public class LexerATNFactory extends ParserATNFactory {
 	}
 
 	private void checkCommands(String command, Token commandToken) {
+		// Command combinations list: https://github.com/antlr/antlr4/issues/1388#issuecomment-263344701
 		if (!command.equals("pushMode") && !command.equals("popMode")) {
 			if (ruleCommands.contains(command)) {
 				g.tool.errMgr.grammarError(ErrorType.DUPLICATED_COMMAND, g.fileName, commandToken, command);
