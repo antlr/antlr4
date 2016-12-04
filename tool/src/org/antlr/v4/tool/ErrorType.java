@@ -1024,7 +1024,7 @@ public enum ErrorType {
 	 *
 	 * <p><em>name</em>is not a recognized mode name</p>
 	 *
-	 * <pre>TOKEN: 'a' -> channel(MODE1); // error 176</pre>
+	 * <pre>TOKEN: 'a' -> mode(MODE1); // error 176</pre>
 	 */
 	CONSTANT_VALUE_IS_NOT_A_RECOGNIZED_MODE_NAME(176, "<arg> is not a recognized mode name", ErrorSeverity.ERROR),
 	/**
@@ -1032,7 +1032,7 @@ public enum ErrorType {
 	 *
 	 * <p><em>name</em> is not a recognized channel name</p>
 	 *
-	 * <pre>TOKEN: 'a' -> mode(TOKEN1); // error 177</pre>
+	 * <pre>TOKEN: 'a' -> channel(TOKEN1); // error 177</pre>
 	 */
 	CONSTANT_VALUE_IS_NOT_A_RECOGNIZED_CHANNEL_NAME(177, "<arg> is not a recognized channel name", ErrorSeverity.ERROR),
 	/*
