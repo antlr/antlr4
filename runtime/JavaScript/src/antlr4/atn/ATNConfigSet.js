@@ -198,21 +198,25 @@ ATNConfigSet.prototype.equals = function(other) {
 };
 
 ATNConfigSet.prototype.hashCode = function() {
+    var hash = new Hash();
+    this.updateHashCode(hash);
+    return hash.finish();
+};
+
+
+ATNConfigSet.prototype.updateHashCode = function(hash) {
 	if (this.readOnly) {
 		if (this.cachedHashCode === -1) {
-			this.cachedHashCode = this.hashConfigs();
+            var hash = new Hash();
+            hash.update(this.configs);
+			this.cachedHashCode = hash.finish();
 		}
-		return this.cachedHashCode;
+        hash.update(this.cachedHashCode);
 	} else {
-		return this.hashConfigs();
+        hash.update(this.configs);
 	}
 };
 
-ATNConfigSet.prototype.hashConfigs = function() {
-	var hash = new Hash();
-    hash.update(this.configs);
-	return hash.finish();
-};
 
 Object.defineProperty(ATNConfigSet.prototype, "length", {
 	get : function() {

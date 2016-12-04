@@ -162,6 +162,11 @@ LexerActionExecutor.prototype.hashCode = function() {
 	return this.cachedHashCode;
 };
 
+LexerActionExecutor.prototype.updateHashCode = function(hash) {
+    hash.update(this.cachedHashCode);
+};
+
+
 LexerActionExecutor.prototype.equals = function(other) {
 	if (this === other) {
 		return true;

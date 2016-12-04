@@ -64,13 +64,13 @@ function standardEqualsFunction(a, b) {
     return a.equals(b);
 }
 
-function standardHashFunction(a) {
+function standardHashCodeFunction(a) {
     return a.hashCode();
 }
 
 function Set(hashFunction, equalsFunction) {
     this.data = {};
-    this.hashFunction = hashFunction || standardHashFunction;
+    this.hashFunction = hashFunction || standardHashCodeFunction;
     this.equalsFunction = equalsFunction || standardEqualsFunction;
     return this;
 }
@@ -91,9 +91,8 @@ Set.prototype.add = function (value) {
     var hash = this.hashFunction(value);
     var key = "hash_" + hash;
     if (key in this.data) {
-        var i;
         var values = this.data[key];
-        for (i = 0; i < values.length; i++) {
+        for (var i = 0; i < values.length; i++) {
             if (this.equalsFunction(value, values[i])) {
                 return values[i];
             }
@@ -114,9 +113,8 @@ Set.prototype.get = function (value) {
     var hash = this.hashFunction(value);
     var key = "hash_" + hash;
     if (key in this.data) {
-        var i;
         var values = this.data[key];
-        for (i = 0; i < values.length; i++) {
+        for (var i = 0; i < values.length; i++) {
             if (this.equalsFunction(value, values[i])) {
                 return values[i];
             }
@@ -194,10 +192,109 @@ BitSet.prototype.toString = function () {
     return "{" + this.values().join(", ") + "}";
 };
 
+function Map(hashFunction, equalsFunction) {
+    this.data = {};
+    this.hashFunction = hashFunction || standardHashCodeFunction;
+    this.equalsFunction = equalsFunction || standardEqualsFunction;
+    return this;
+}
+
+Object.defineProperty(Map.prototype, "length", {
+    get: function () {
+        var l = 0;
+        for (var hashKey in this.data) {
+            if (hashKey.indexOf("hash_") === 0) {
+                l = l + this.data[hashKey].length;
+            }
+        }
+        return l;
+    }
+});
+
+Map.prototype.put = function (key, value) {
+    var hashKey = "hash_" + this.hashFunction(key);
+    if (hashKey in this.data) {
+        var entries = this.data[hashKey];
+        for (var i = 0; i < entries.length; i++) {
+            var entry = entries[i];
+            if (this.equalsFunction(key, entry.key)) {
+                var oldValue = entry.value;
+                entry.value = value;
+                return oldValue;
+            }
+        }
+        entries.push({key:key, value:value});
+        return value;
+    } else {
+        this.data[hashKey] = [{key:key, value:value}];
+        return value;
+    }
+};
+
+Map.prototype.containsKey = function (key) {
+    var hashKey = "hash_" + this.hashFunction(key);
+    if(hashKey in this.data) {
+        var entries = this.data[hashKey];
+        for (var i = 0; i < entries.length; i++) {
+            var entry = entries[i];
+            if (this.equalsFunction(key, entry.key))
+                return true;
+        }
+    }
+    return false;
+};
+
+Map.prototype.get = function (key) {
+    var hashKey = "hash_" + this.hashFunction(key);
+    if(hashKey in this.data) {
+        var entries = this.data[hashKey];
+        for (var i = 0; i < entries.length; i++) {
+            var entry = entries[i];
+            if (this.equalsFunction(key, entry.key))
+                return entry.value;
+        }
+    }
+    return null;
+};
+
+Map.prototype.entries = function () {
+    var l = [];
+    for (var key in this.data) {
+        if (key.indexOf("hash_") === 0) {
+            l = l.concat(this.data[key]);
+        }
+    }
+    return l;
+};
+
+
+Map.prototype.getKeys = function () {
+    return this.entries().map(function(e) {
+        return e.key;
+    });
+};
+
+
+Map.prototype.getValues = function () {
+    return this.entries().map(function(e) {
+            return e.value;
+    });
+};
+
+
+Map.prototype.toString = function () {
+    var ss = this.entries().map(function(entry) {
+        return '{' + entry.key + ':' + entry.value + '}';
+    });
+    return '[' + ss.join(", ") + ']';
+};
+
+
 function AltDict() {
     this.data = {};
     return this;
 }
+
 
 AltDict.prototype.get = function (key) {
     key = "k-" + key;
@@ -248,8 +345,12 @@ Hash.prototype.update = function () {
                 case 'boolean':
                     k = value;
                     break;
-                default:
+                case 'string':
                     k = value.hashCode();
+                    break;
+                default:
+                    value.updateHashCode(this);
+                    continue;
             }
             k = k * 0xCC9E2D51;
             k = (k << 15) | (k >>> (32 - 15));
@@ -273,7 +374,7 @@ Hash.prototype.finish = function () {
     return hash;
 }
 
-exports.hashStuff = function() {
+function hashStuff() {
     var hash = new Hash();
     hash.update.apply(arguments);
     return hash.finish();
@@ -304,13 +405,13 @@ function escapeWhitespace(s, escapeSpaces) {
     return s;
 }
 
-exports.titleCase = function (str) {
+function titleCase(str) {
     return str.replace(/\w\S*/g, function (txt) {
         return txt.charAt(0).toUpperCase() + txt.substr(1);
     });
 };
 
-exports.equalArrays = function(a, b)
+function equalArrays(a, b)
 {
     if (!Array.isArray(a) || !Array.isArray(b))
         return false;
@@ -327,10 +428,14 @@ exports.equalArrays = function(a, b)
     return true;
 };
 
+exports.Hash = Hash;
 exports.Set = Set;
+exports.Map = Map;
 exports.BitSet = BitSet;
 exports.AltDict = AltDict;
 exports.DoubleDict = DoubleDict;
+exports.hashStuff = hashStuff;
 exports.escapeWhitespace = escapeWhitespace;
 exports.arrayToString = arrayToString;
-exports.Hash = Hash;
+exports.titleCase = titleCase;
+exports.equalArrays = equalArrays;

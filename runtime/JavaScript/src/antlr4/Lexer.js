@@ -35,6 +35,7 @@
 var Token = require('./Token').Token;
 var Recognizer = require('./Recognizer').Recognizer;
 var CommonTokenFactory = require('./CommonTokenFactory').CommonTokenFactory;
+var RecognitionException  = require('./error/Errors').RecognitionException;
 var LexerNoViableAltException = require('./error/Errors').LexerNoViableAltException;
 
 function TokenSource() {
@@ -150,9 +151,13 @@ Lexer.prototype.nextToken = function() {
 				try {
 					ttype = this._interp.match(this._input, this._mode);
 				} catch (e) {
-				    console.log(e.stack);
-					this.notifyListeners(e); // report error
-					this.recover(e);
+				    if(e instanceof RecognitionException) {
+                        this.notifyListeners(e); // report error
+                        this.recover(e);
+                    } else {
+                        console.log(e.stack);
+                        throw e;
+                    }
 				}
 				if (this._input.LA(1) === Token.EOF) {
 					this._hitEOF = true;

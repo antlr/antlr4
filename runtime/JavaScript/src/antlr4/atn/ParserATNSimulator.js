@@ -1703,8 +1703,7 @@ ParserATNSimulator.prototype.addDFAState = function(dfa, D) {
     if (D == ATNSimulator.ERROR) {
         return D;
     }
-    var hash = "key_" + D.hashCode();
-    var existing = dfa.states[hash] || null;
+    var existing = dfa.states.get(D);
     if(existing!==null) {
         return existing;
     }
@@ -1713,7 +1712,7 @@ ParserATNSimulator.prototype.addDFAState = function(dfa, D) {
         D.configs.optimizeConfigs(this);
         D.configs.setReadonly(true);
     }
-    dfa.states[hash] = D;
+    dfa.states.add(D);
     if (this.debug) {
         console.log("adding new DFA state: " + D);
     }
