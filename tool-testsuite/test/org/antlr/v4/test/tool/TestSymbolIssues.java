@@ -229,4 +229,22 @@ public class TestSymbolIssues extends BaseJavaToolTest {
 
 		testErrors(test, false);
 	}
+
+	// https://github.com/antlr/antlr4/issues/1411
+	@Test public void testWrongIdForTypeChannelModeCommand() throws Exception {
+		String[] test = {
+			"lexer grammar L;\n" +
+			"tokens { TOKEN1 }\n" +
+			"channels { CHANNEL1 }\n" +
+			"TOKEN: 'asdf' -> type(CHANNEL1), channel(MODE1), mode(TOKEN1);\n" +
+			"mode MODE1;\n" +
+			"MODE1_TOKEN: 'qwer';",
+
+			"error(" + ErrorType.CONSTANT_VALUE_IS_NOT_A_RECOGNIZED_TOKEN_NAME.code + "): L.g4:4:22: CHANNEL1 is not a recognized token name\n" +
+			"error(" + ErrorType.CONSTANT_VALUE_IS_NOT_A_RECOGNIZED_CHANNEL_NAME.code + "): L.g4:4:41: MODE1 is not a recognized channel name\n" +
+			"error(" + ErrorType.CONSTANT_VALUE_IS_NOT_A_RECOGNIZED_MODE_NAME.code + "): L.g4:4:54: TOKEN1 is not a recognized mode name\n"
+		};
+
+		testErrors(test, false);
+	}
 }
