@@ -190,5 +190,14 @@ namespace Antlr4.Runtime
             }
             return tokenType.ToString();
         }
+
+		[return: NotNull]
+		string[] GetLiteralNames() { return literalNames; }
+
+		[return: NotNull]
+		string[] GetSymbolicNames() { return symbolicNames; }
+
+		[return: NotNull]
+		string[] GetDisplayNames() { return displayNames; }
     }
 }
