@@ -178,7 +178,7 @@ public class VocabularyImpl implements Vocabulary {
 
 	@Override
 	public String getDisplayName(int tokenType) {
-		if (tokenType >= Token.MIN_USER_TOKEN_TYPE && tokenType < displayNames.length) {
+		if (tokenType >= 0 && tokenType < displayNames.length) {
 			String displayName = displayNames[tokenType];
 			if (displayName != null) {
 				return displayName;
