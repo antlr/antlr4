@@ -192,12 +192,12 @@ namespace Antlr4.Runtime
         }
 
 		[return: NotNull]
-		string[] GetLiteralNames() { return literalNames; }
+		public virtual string[] GetLiteralNames() { return literalNames; }
 
 		[return: NotNull]
-		string[] GetSymbolicNames() { return symbolicNames; }
+		public virtual string[] GetSymbolicNames() { return symbolicNames; }
 
 		[return: NotNull]
-		string[] GetDisplayNames() { return displayNames; }
+		public virtual string[] GetDisplayNames() { return displayNames; }
     }
 }
