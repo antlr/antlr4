@@ -40,6 +40,12 @@ public interface Vocabulary {
 	/**
 	 * Returns the highest token type value. It can be used to iterate from
 	 * zero to that number, inclusively, thus querying all stored entries.
+	 * This not the number of token types emitted by the lexer. Not all
+	 * token types have literal or symbolic names, for example, if a lexer
+	 * is using the tokenVocab option. Even if token types are contiguously
+	 * used, this is the maximum valid token type, not the number of
+	 * valid token types. That number is getMaxTokenType()+1.
+	 *
 	 * @return the highest token type value
 	 */
 	int getMaxTokenType();
