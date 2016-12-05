@@ -44,7 +44,7 @@ public interface Vocabulary {
 	 * token types have literal or symbolic names, for example, if a lexer
 	 * is using the tokenVocab option. Even if token types are contiguously
 	 * used, this is the maximum valid token type, not the number of
-	 * valid token types. That number is getMaxTokenType()+1.
+	 * valid token types. That number is {@code getMaxTokenType()+1}.
 	 *
 	 * @return the highest token type value
 	 */
