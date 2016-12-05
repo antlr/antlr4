@@ -165,7 +165,7 @@ public interface Vocabulary {
 	 *  in the returned array. The first possibly valid entry is
 	 *  {@link Token#MIN_USER_TOKEN_TYPE}.
 	 *
-	 * @return The non-null array of literal names assigned to tokens.
+	 * @return The non-null array of literal names assigned to tokens; size is not guaranteed to be max tokentype + 1.
 	 *
 	 * @since 4.6
 	 */
@@ -179,7 +179,7 @@ public interface Vocabulary {
 	 *
 	 *  EOF has no entry in the return array as its token type is -1.
 	 *
-	 * @return The non-null array of symbol names assigned to tokens.
+	 * @return The non-null array of symbol names assigned to tokens; size is not guaranteed to be max tokentype + 1.
 	 *
 	 * @since 4.6
 	 */
@@ -193,7 +193,7 @@ public interface Vocabulary {
 	 *
 	 *  EOF has no entry in the return array as its token type is -1.
 	 *
-	 * @return The non-null array of display names assigned to tokens.
+	 * @return The non-null array of display names assigned to tokens; size is not guaranteed to be max tokentype + 1.
 	 *
 	 * @since 4.6
 	 */
