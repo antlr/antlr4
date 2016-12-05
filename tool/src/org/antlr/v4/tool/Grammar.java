@@ -897,12 +897,6 @@ public class Grammar implements AttributeResolver {
 	 */
 	public int getMaxCharValue() {
 		return org.antlr.v4.runtime.Lexer.MAX_CHAR_VALUE;
-//		if ( generator!=null ) {
-//			return generator.target.getMaxCharValue(generator);
-//		}
-//		else {
-//			return Label.MAX_CHAR_VALUE;
-//		}
 	}
 
 	/** Return a set of all possible token or char types for this grammar */

@@ -46,6 +46,9 @@ public interface Vocabulary {
 	 * used, this is the maximum valid token type, not the number of
 	 * valid token types. That number is {@code getMaxTokenType()+1}.
 	 *
+	 * The minimum token type is technically not 0, {@see Token#INVALID_TYPE},
+	 * but {@link Token#MIN_USER_TOKEN_TYPE}.
+	 *
 	 * @return the highest token type value
 	 */
 	int getMaxTokenType();
