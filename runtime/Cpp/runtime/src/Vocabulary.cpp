@@ -125,3 +125,7 @@ std::string Vocabulary::getDisplayName(size_t tokenType) const {
 
   return std::to_string(tokenType);
 }
+
+std::vector<std::string> Vocabulary::getLiteralNames() const { return _literalNames; }
+std::vector<std::string> Vocabulary::getSymbolicNames() const { return _symbolicNames; }
+std::vector<std::string> Vocabulary::getDisplayNames() const { return _displayNames; }

@@ -41,7 +41,7 @@ namespace dfa {
   class ANTLR4CPP_PUBLIC Vocabulary {
   public:
     virtual ~Vocabulary() {};
-    
+
     /// Gets an empty <seealso cref="Vocabulary"/> instance.
     ///
     /// <para>
@@ -51,7 +51,7 @@ namespace dfa {
     static const Vocabulary EMPTY_VOCABULARY;
 
     Vocabulary() {};
-    
+
     /// <summary>
     /// Constructs a new instance of <seealso cref="Vocabulary"/> from the specified
     /// literal and symbolic token names.
@@ -207,12 +207,16 @@ namespace dfa {
     /// other user-visible messages which reference specific token types. </returns>
     virtual std::string getDisplayName(size_t tokenType) const;
 
+    virtual std::vector<std::string> getLiteralNames() const;
+    virtual std::vector<std::string> getSymbolicNames() const;
+    virtual std::vector<std::string> getDisplayNames() const;
+
   private:
     std::vector<std::string> const _literalNames;
     std::vector<std::string> const _symbolicNames;
     std::vector<std::string> const _displayNames;
     const size_t _maxTokenType = 0;
   };
-  
+
 } // namespace atn
 } // namespace antlr4
