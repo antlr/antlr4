@@ -67,7 +67,7 @@ public class TestVocabulary extends BaseJavaToolTest {
 		Vocabulary vocabulary = VocabularyImpl.fromTokenNames(tokenNames);
 		Assert.assertNotNull(vocabulary);
 		Assert.assertEquals("EOF", vocabulary.getSymbolicName(Token.EOF));
-		for (int i = 0; i < tokenNames.length; i++) {
+		for (int i = Token.MIN_USER_TOKEN_TYPE; i <= vocabulary.getMaxTokenType(); i++) {
 			Assert.assertEquals(tokenNames[i], vocabulary.getDisplayName(i));
 
 			if (tokenNames[i].startsWith("'")) {
@@ -107,6 +107,7 @@ public class TestVocabulary extends BaseJavaToolTest {
 		assertEquals("Z", v.getDisplayName(3));
 		assertEquals("A", v.getDisplayName(4));
 		assertEquals("B", v.getDisplayName(5));
+		assertEquals("X", v.getSymbolicName(1));
 		assertEquals(5, g.getTokenType("B"));
 	}
 }
