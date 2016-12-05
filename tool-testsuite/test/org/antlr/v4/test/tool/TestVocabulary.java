@@ -67,6 +67,7 @@ public class TestVocabulary extends BaseJavaToolTest {
 		Vocabulary vocabulary = VocabularyImpl.fromTokenNames(tokenNames);
 		Assert.assertNotNull(vocabulary);
 		Assert.assertEquals("EOF", vocabulary.getSymbolicName(Token.EOF));
+		Assert.assertEquals(vocabulary.getMaxTokenType(), tokenNames.length-1);
 		for (int i = Token.MIN_USER_TOKEN_TYPE; i <= vocabulary.getMaxTokenType(); i++) {
 			Assert.assertEquals(tokenNames[i], vocabulary.getDisplayName(i));
 
