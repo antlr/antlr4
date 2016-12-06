@@ -36,13 +36,14 @@
 // efficiently, ensuring that actions appearing only at the end of the rule do
 // not cause bloating of the {@link DFA} created for the lexer.</p>
 
+var hashStuff = require("../Utils").hashStuff;
 var LexerIndexedCustomAction = require('./LexerAction').LexerIndexedCustomAction;
 
 function LexerActionExecutor(lexerActions) {
 	this.lexerActions = lexerActions === null ? [] : lexerActions;
 	// Caches the result of {@link //hashCode} since the hash code is an element
 	// of the performance-critical {@link LexerATNConfig//hashCode} operation.
-	this._hashString = lexerActions.toString(); // "".join([str(la) for la in
+	this.cachedHashCode = hashStuff(lexerActions); // "".join([str(la) for la in
 	// lexerActions]))
 	return this;
 }
@@ -157,16 +158,21 @@ LexerActionExecutor.prototype.execute = function(lexer, input, startIndex) {
 	}
 };
 
-LexerActionExecutor.prototype.hashString = function() {
-	return this._hashString;
+LexerActionExecutor.prototype.hashCode = function() {
+	return this.cachedHashCode;
 };
+
+LexerActionExecutor.prototype.updateHashCode = function(hash) {
+    hash.update(this.cachedHashCode);
+};
+
 
 LexerActionExecutor.prototype.equals = function(other) {
 	if (this === other) {
 		return true;
 	} else if (!(other instanceof LexerActionExecutor)) {
 		return false;
-	} else if (this._hashString != other._hashString) {
+	} else if (this.cachedHashCode != other.cachedHashCode) {
 		return false;
 	} else if (this.lexerActions.length != other.lexerActions.length) {
 		return false;

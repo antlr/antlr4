@@ -28,21 +28,14 @@
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 //  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+var Set = require("../Utils").Set;
 var DFAState = require('./DFAState').DFAState;
 var StarLoopEntryState = require('../atn/ATNState').StarLoopEntryState;
 var ATNConfigSet = require('./../atn/ATNConfigSet').ATNConfigSet;
 var DFASerializer = require('./DFASerializer').DFASerializer;
 var LexerDFASerializer = require('./DFASerializer').LexerDFASerializer;
 
-function DFAStatesSet() {
-	return this;
-}
 
-Object.defineProperty(DFAStatesSet.prototype, "length", {
-	get : function() {
-		return Object.keys(this).length;
-	}
-});
 
 function DFA(atnStartState, decision) {
 	if (decision === undefined) {
@@ -53,7 +46,7 @@ function DFA(atnStartState, decision) {
 	this.decision = decision;
 	// A set of all DFA states. Use {@link Map} so we can get old state back
 	// ({@link Set} only allows you to see if it's there).
-	this._states = new DFAStatesSet();
+	this._states = new Set();
 	this.s0 = null;
 	// {@code true} if this DFA is for a precedence decision; otherwise,
 	// {@code false}. This is the backing field for {@link //isPrecedenceDfa},
@@ -157,12 +150,7 @@ Object.defineProperty(DFA.prototype, "states", {
 
 // Return a list of all states in this DFA, ordered by state number.
 DFA.prototype.sortedStates = function() {
-	// states_ is a map of state/state, where key=value
-	var keys = Object.keys(this._states);
-	var list = [];
-	for(var i=0;i<keys.length;i++) {
-		list.push(this._states[keys[i]]);
-	}
+	var list = this._states.values();
 	return list.sort(function(a, b) {
 		return a.stateNumber - b.stateNumber;
 	});

@@ -145,7 +145,7 @@ LexerATNSimulator.prototype.reset = function() {
 LexerATNSimulator.prototype.matchATN = function(input) {
 	var startState = this.atn.modeToStartState[this.mode];
 
-	if (this.debug) {
+	if (LexerATNSimulator.debug) {
 		console.log("matchATN mode " + this.mode + " start: " + startState);
 	}
 	var old_mode = this.mode;
@@ -160,14 +160,14 @@ LexerATNSimulator.prototype.matchATN = function(input) {
 
 	var predict = this.execATN(input, next);
 
-	if (this.debug) {
+	if (LexerATNSimulator.debug) {
 		console.log("DFA after matchATN: " + this.decisionToDFA[old_mode].toLexerString());
 	}
 	return predict;
 };
 
 LexerATNSimulator.prototype.execATN = function(input, ds0) {
-	if (this.debug) {
+	if (LexerATNSimulator.debug) {
 		console.log("start state closure=" + ds0.configs);
 	}
 	if (ds0.isAcceptState) {
@@ -178,7 +178,7 @@ LexerATNSimulator.prototype.execATN = function(input, ds0) {
 	var s = ds0; // s is current/from DFA state
 
 	while (true) { // while more work
-		if (this.debug) {
+		if (LexerATNSimulator.debug) {
 			console.log("execATN loop starting closure: " + s.configs);
 		}
 
@@ -246,7 +246,7 @@ LexerATNSimulator.prototype.getExistingTargetState = function(s, t) {
 	if(target===undefined) {
 		target = null;
 	}
-	if (this.debug && target !== null) {
+	if (LexerATNSimulator.debug && target !== null) {
 		console.log("reuse state " + s.stateNumber + " edge to " + target.stateNumber);
 	}
 	return target;
@@ -310,7 +310,7 @@ LexerATNSimulator.prototype.getReachableConfigSet = function(input, closure,
 		if (currentAltReachedAcceptState && cfg.passedThroughNonGreedyDecision) {
 			continue;
 		}
-		if (this.debug) {
+		if (LexerATNSimulator.debug) {
 			console.log("testing %s at %s\n", this.getTokenName(t), cfg
 					.toString(this.recog, true));
 		}
@@ -337,7 +337,7 @@ LexerATNSimulator.prototype.getReachableConfigSet = function(input, closure,
 
 LexerATNSimulator.prototype.accept = function(input, lexerActionExecutor,
 		startIndex, index, line, charPos) {
-	if (this.debug) {
+	if (LexerATNSimulator.debug) {
 		console.log("ACTION %s\n", lexerActionExecutor);
 	}
 	// seek to after last char in token
@@ -379,13 +379,13 @@ LexerATNSimulator.prototype.computeStartState = function(input, p) {
 LexerATNSimulator.prototype.closure = function(input, config, configs,
 		currentAltReachedAcceptState, speculative, treatEofAsEpsilon) {
 	var cfg = null;
-	if (this.debug) {
+	if (LexerATNSimulator.debug) {
 		console.log("closure(" + config.toString(this.recog, true) + ")");
 	}
 	if (config.state instanceof RuleStopState) {
-		if (this.debug) {
+		if (LexerATNSimulator.debug) {
 			if (this.recog !== null) {
-				console.log("closure at %s rule stop %s\n", this.recog.getRuleNames()[config.state.ruleIndex], config);
+				console.log("closure at %s rule stop %s\n", this.recog.ruleNames[config.state.ruleIndex], config);
 			} else {
 				console.log("closure at rule stop %s\n", config);
 			}
@@ -458,7 +458,7 @@ LexerATNSimulator.prototype.getEpsilonTarget = function(input, config, trans,
 		// states reached by traversing predicates. Since this is when we
 		// test them, we cannot cash the DFA state target of ID.
 
-		if (this.debug) {
+		if (LexerATNSimulator.debug) {
 			console.log("EVAL rule " + trans.ruleIndex + ":" + trans.predIndex);
 		}
 		configs.hasSemanticContext = true;
@@ -584,7 +584,7 @@ LexerATNSimulator.prototype.addDFAEdge = function(from_, tk, to, cfgs) {
 		// Only track edges within the DFA bounds
 		return to;
 	}
-	if (this.debug) {
+	if (LexerATNSimulator.debug) {
 		console.log("EDGE " + from_ + " -> " + to + " upon " + tk);
 	}
 	if (from_.edges === null) {
@@ -615,9 +615,8 @@ LexerATNSimulator.prototype.addDFAState = function(configs) {
 		proposed.lexerActionExecutor = firstConfigWithRuleStopState.lexerActionExecutor;
 		proposed.prediction = this.atn.ruleToTokenType[firstConfigWithRuleStopState.state.ruleIndex];
 	}
-	var hash = proposed.hashString();
 	var dfa = this.decisionToDFA[this.mode];
-	var existing = dfa.states[hash] || null;
+	var existing = dfa.states.get(proposed);
 	if (existing!==null) {
 		return existing;
 	}
@@ -625,7 +624,7 @@ LexerATNSimulator.prototype.addDFAState = function(configs) {
 	newState.stateNumber = dfa.states.length;
 	configs.setReadonly(true);
 	newState.configs = configs;
-	dfa.states[hash] = newState;
+	dfa.states.add(newState);
 	return newState;
 };
 

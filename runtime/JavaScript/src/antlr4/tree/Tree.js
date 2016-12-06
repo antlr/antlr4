@@ -87,7 +87,7 @@ function ParseTreeVisitor() {
 }
 
 ParseTreeVisitor.prototype.visit = function(ctx) {
- 	if (Utils.isArray(ctx)) {
+ 	if (Array.isArray(ctx)) {
 		return ctx.map(function(child) {
             return ctx.accept(this);
         }, this);
