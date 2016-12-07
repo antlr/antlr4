@@ -36,7 +36,7 @@ parser grammar ANTLRParser;
 options {
 	// Target language is Java, which is the default but being specific
 	// here as this grammar is also meant as a good example grammar for
-	// for users.
+	// users.
 	language      = Java;
 
 	// The output of this grammar is going to be an AST upon which
@@ -85,7 +85,7 @@ tokens {
     WILDCARD;
     // A generic node indicating a list of something when we don't
     // really need to distinguish what we have a list of as the AST
-    // will 'kinow' by context.
+    // will 'know' by context.
     //
     LIST;
     ELEMENT_OPTIONS;      // TOKEN<options>
@@ -140,7 +140,7 @@ Deque<String> paraphrases = new ArrayDeque<String>();
 public void grammarError(ErrorType etype, org.antlr.runtime.Token token, Object... args) { }
 }
 
-// The main entry point for parsing a V3 grammar from top to toe. This is
+// The main entry point for parsing a V4 grammar from top to toe. This is
 // the method call from whence to obtain the AST for the parse.
 //
 grammarSpec
@@ -158,14 +158,14 @@ if ( options!=null ) {
       // There now follows zero or more declaration sections that should
       // be given to us before the rules are declared
       //
-// A number of things can be declared/stated before the grammar rules
-// 'proper' are parsed. These include grammar imports (delegate), grammar
-// options, imaginary token declarations, global scope declarations,
-// and actions such as @header. In this rule we allow any number of
-// these constructs in any order so that the grammar author is not
-// constrained by some arbitrary order of declarations that nobody
-// can remember. In the next phase of the parse, we verify that these
-// constructs are valid, not repeated and so on.
+      // A number of things can be declared/stated before the grammar rules
+      // 'proper' are parsed. These include grammar imports (delegate), grammar
+      // options, imaginary token declarations, global scope declarations,
+      // and actions such as @header. In this rule we allow any number of
+      // these constructs in any order so that the grammar author is not
+      // constrained by some arbitrary order of declarations that nobody
+      // can remember. In the next phase of the parse, we verify that these
+      // constructs are valid, not repeated and so on.
       sync ( prequelConstruct sync )*
 
 	  // We should now see at least one ANTLR EBNF style rule
@@ -177,7 +177,7 @@ if ( options!=null ) {
 	  modeSpec*
 
       // And we force ANTLR to process everything it finds in the input
-      // stream by specifying hte need to match End Of File before the
+      // stream by specifying the need to match End Of File before the
       // parse is complete.
       //
       EOF
@@ -187,10 +187,10 @@ if ( options!=null ) {
       // that our tree walkers are expecting.
       //
 
-      -> ^(grammarType       // The grammar type is our root AST node
-             id              // We need to identify the grammar of course
+      -> ^(grammarType         // The grammar type is our root AST node
+             id                // We need to identify the grammar of course
              prequelConstruct* // The set of declarations we accumulated
-             rules           // And of course, we need the set of rules we discovered
+             rules             // And of course, we need the set of rules we discovered
              modeSpec*
          )
 	;
@@ -270,8 +270,8 @@ delegateGrammars
 	: IMPORT delegateGrammar (COMMA delegateGrammar)* SEMI -> ^(IMPORT delegateGrammar+)
 	;
 
-// A possibly named grammar file that should be imported to this gramamr
-// and delgated to for the rules it specifies
+// A possibly named grammar file that should be imported to this grammar
+// and delegated for the rules it specifies
 delegateGrammar
     :   id ASSIGN^ id
     |   id
@@ -364,7 +364,7 @@ parserRule
 		Grammar.setNodeOptions($tree, options);
 	}
 }
-    : // Start with the rule name. Here we do not distinguish between
+    :     // Start with the rule name. Here we do not distinguish between
 	  // parser or lexer rules, the semantic verification phase will
 	  // reject any rules that make no sense, such as lexer rules in
 	  // a pure parser or tree parser.
@@ -373,7 +373,7 @@ parserRule
 	  // Immediately following the rulename, there may be a specification
 	  // of input parameters for the rule. We do not do anything with the
 	  // parameters here except gather them for future phases such as
-	  // semantic verifcation, type assignment etc. We require that
+	  // semantic verification, type assignment etc. We require that
 	  // the input parameters are the next syntactically significant element
 	  // following the rule id.
 	  ARG_ACTION?
@@ -389,14 +389,14 @@ parserRule
 	  // As usual we just accept anything that is syntactically valid for
 	  // one form of the rule or another and let the semantic verification
 	  // phase throw out anything that is invalid.
-// At the rule level, a programmer may specify a number of sections, such
-// as scope declarations, rule return elements, @ sections (which may be
-// language target specific) and so on. We allow any number of these in any
-// order here and as usual rely onthe semantic verification phase to reject
-// anything invalid using its addinotal context information. Here we are
-// context free and just accept anything that is a syntactically correct
-// construct.
-//
+	  // At the rule level, a programmer may specify a number of sections, such
+	  // as scope declarations, rule return elements, @ sections (which may be
+	  // language target specific) and so on. We allow any number of these in any
+	  // order here and as usual rely on the semantic verification phase to reject
+	  // anything invalid using its additional context information. Here we are
+	  // context free and just accept anything that is a syntactically correct
+	  // construct.
+	  //
       rulePrequels
 
       COLON
@@ -725,7 +725,7 @@ labeledElement
 		)
 	;
 
-// A block of gramamr structure optionally followed by standard EBNF
+// A block of grammar structure optionally followed by standard EBNF
 // notation, or ANTLR specific notation. I.E. ? + ^ and so on
 ebnf
     : block
@@ -758,7 +758,7 @@ lexerAtom
 	;
 
 atom
-	:	// Qualified reference delegate.rule. This must be
+	:   // Qualified reference delegate.rule. This must be
 	    // lexically contiguous (no spaces either side of the DOT)
 	    // otherwise it is two references with a wildcard in between
 	    // and not a qualified reference.
@@ -864,7 +864,7 @@ if ( options!=null ) {
 // Character Range
 //
 // Specifies a range of characters. Valid for lexer rules only, but
-// we do not check that here, the tree walkers shoudl do that.
+// we do not check that here, the tree walkers should do that.
 // Note also that the parser also allows through more than just
 // character literals so that we can produce a much nicer semantic
 // error about any abuse of the .. operator.
