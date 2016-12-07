@@ -47,8 +47,14 @@ function LexerAction(action) {
     return this;
 }
 
-LexerAction.prototype.hashString = function() {
-    return "" + this.actionType;
+LexerAction.prototype.hashCode = function() {
+    var hash = new Hash();
+    this.updateHashCode(hash);
+    return hash.finish()
+};
+
+LexerAction.prototype.updateHashCode = function(hash) {
+    hash.update(this.actionType);
 };
 
 LexerAction.prototype.equals = function(other) {
@@ -96,8 +102,8 @@ LexerTypeAction.prototype.execute = function(lexer) {
     lexer.type = this.type;
 };
 
-LexerTypeAction.prototype.hashString = function() {
-	return "" + this.actionType + this.type;
+LexerTypeAction.prototype.updateHashCode = function(hash) {
+    hash.update(this.actionType, this.type);
 };
 
 
@@ -132,8 +138,8 @@ LexerPushModeAction.prototype.execute = function(lexer) {
     lexer.pushMode(this.mode);
 };
 
-LexerPushModeAction.prototype.hashString = function() {
-    return "" + this.actionType + this.mode;
+LexerPushModeAction.prototype.updateHashCode = function(hash) {
+    hash.update(this.actionType, this.mode);
 };
 
 LexerPushModeAction.prototype.equals = function(other) {
@@ -215,8 +221,8 @@ LexerModeAction.prototype.execute = function(lexer) {
     lexer.mode(this.mode);
 };
 
-LexerModeAction.prototype.hashString = function() {
-	return "" + this.actionType + this.mode;
+LexerModeAction.prototype.updateHashCode = function(hash) {
+    hash.update(this.actionType, this.mode);
 };
 
 LexerModeAction.prototype.equals = function(other) {
@@ -268,8 +274,8 @@ LexerCustomAction.prototype.execute = function(lexer) {
     lexer.action(null, this.ruleIndex, this.actionIndex);
 };
 
-LexerCustomAction.prototype.hashString = function() {
-    return "" + this.actionType + this.ruleIndex + this.actionIndex;
+LexerCustomAction.prototype.updateHashCode = function(hash) {
+    hash.update(this.actionType, this.ruleIndex, this.actionIndex);
 };
 
 LexerCustomAction.prototype.equals = function(other) {
@@ -301,8 +307,8 @@ LexerChannelAction.prototype.execute = function(lexer) {
     lexer._channel = this.channel;
 };
 
-LexerChannelAction.prototype.hashString = function() {
-    return "" + this.actionType + this.channel;
+LexerChannelAction.prototype.updateHashCode = function(hash) {
+    hash.update(this.actionType, this.channel);
 };
 
 LexerChannelAction.prototype.equals = function(other) {
@@ -357,8 +363,8 @@ LexerIndexedCustomAction.prototype.execute = function(lexer) {
     this.action.execute(lexer);
 };
 
-LexerIndexedCustomAction.prototype.hashString = function() {
-    return "" + this.actionType + this.offset + this.action;
+LexerIndexedCustomAction.prototype.updateHashCode = function(hash) {
+    hash.update(this.actionType, this.offset, this.action);
 };
 
 LexerIndexedCustomAction.prototype.equals = function(other) {

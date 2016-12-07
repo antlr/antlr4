@@ -405,6 +405,10 @@ func (p *<parser.name>) <currentRule.name; format="cap">(<currentRule.args:{a | 
 			<endif>
 		}
 	}()
+	
+	<if(currentRule.hasLookaheadBlock)>
+	var _alt int
+	<endif>
 
 	<if(code)>
 	<code>
@@ -475,6 +479,10 @@ func (p *<parser.name>) <currentRule.name>(_p int<args:{a | , <a.name> <a.type>}
 			}
 		}
 	}()
+
+	<if(currentRule.hasLookaheadBlock)>
+	var _alt int
+	<endif>
 
 	<if(code)>
 	<code>
@@ -663,7 +671,7 @@ la_ := p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), <choice.decision>,
 StarBlock(choice, alts, Sync, iteration) ::= <<
 p.SetState(<choice.stateNumber>)
 p.GetErrorHandler().Sync(p)
-_alt := p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), <choice.decision>, p.GetParserRuleContext())
+_alt = p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), <choice.decision>, p.GetParserRuleContext())
 
 for _alt != <choice.exitAlt> && _alt != antlr.ATNInvalidAltNumber {
 	if _alt == 1<if(!choice.ast.greedy)>+1<endif> {
@@ -683,7 +691,7 @@ for _alt != <choice.exitAlt> && _alt != antlr.ATNInvalidAltNumber {
 PlusBlock(choice, alts, error) ::= <<
 p.SetState(<choice.blockStartStateNumber>)<! alt block decision !>
 p.GetErrorHandler().Sync(p)
-_alt := 1<if(!choice.ast.greedy)>+1<endif>
+_alt = 1<if(!choice.ast.greedy)>+1<endif>
 for ok := true; ok; ok = _alt != <choice.exitAlt> && _alt != antlr.ATNInvalidAltNumber {
 	switch _alt {
 	<if(alts)>
@@ -741,36 +749,40 @@ bitsetInlineComparison(s, bits) ::= <%
 %>
 
 InvokeRule(r, argExprsChunks) ::= <<
-p.SetState(<r.stateNumber>)
-<if(r.labels)>
+{
+	p.SetState(<r.stateNumber>)
+	<if(r.labels)>
 
-<if(r.ast.options.p)>
-var _x = p.<r.name>(<r.ast.options.p><if(argExprsChunks)>, <endif><argExprsChunks>)
-<else>
-var _x = p.<r.name; format="cap">(<argExprsChunks>)
-<endif>
+	<if(r.ast.options.p)>
+	var _x = p.<r.name>(<r.ast.options.p><if(argExprsChunks)>, <endif><argExprsChunks>)
+	<else>
+	var _x = p.<r.name; format="cap">(<argExprsChunks>)
+	<endif>
 
 
-<r.labels:{l | <labelref(l)> = _x}; separator="\n">
-<else>
-<if(r.ast.options.p)>
-p.<r.name>(<r.ast.options.p><if(argExprsChunks)>, <endif><argExprsChunks>)
-<else>
-p.<r.name; format="cap">(<argExprsChunks>)
-<endif>
-<endif>
+	<r.labels:{l | <labelref(l)> = _x}; separator="\n">
+	<else>
+	<if(r.ast.options.p)>
+	p.<r.name>(<r.ast.options.p><if(argExprsChunks)>, <endif><argExprsChunks>)
+	<else>
+	p.<r.name; format="cap">(<argExprsChunks>)
+	<endif>
+	<endif>
+}
 >>
 
 MatchToken(m) ::= <<
-p.SetState(<m.stateNumber>)
-<if(m.labels)>
+{
+	p.SetState(<m.stateNumber>)
+	<if(m.labels)>
 
-var _m = p.Match(<parser.name><m.name>)
+	var _m = p.Match(<parser.name><m.name>)
 
-<m.labels:{l | <labelref(l)> = _m}; separator="\n">
-<else>
-p.Match(<parser.name><m.name>)
-<endif>
+	<m.labels:{l | <labelref(l)> = _m}; separator="\n">
+	<else>
+	p.Match(<parser.name><m.name>)
+	<endif>
+}
 >>
 
 MatchSet(m, expr, capture) ::= "<CommonSetStuff(m, expr, capture, false)>"

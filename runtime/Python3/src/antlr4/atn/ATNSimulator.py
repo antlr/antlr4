@@ -37,7 +37,7 @@ from antlr4.dfa.DFAState import DFAState
 class ATNSimulator(object):
 
     # Must distinguish between missing edge and edge we know leads nowhere#/
-    ERROR = DFAState(ATNConfigSet())
+    ERROR = DFAState(configs=ATNConfigSet())
     ERROR.stateNumber = 0x7FFFFFFF
 
     # The context cache maps all PredictionContext objects that are ==

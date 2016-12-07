@@ -3,6 +3,8 @@ package org.antlr.v4.test.runtime.descriptors;
 import org.antlr.v4.test.runtime.BaseParserTestDescriptor;
 import org.antlr.v4.test.runtime.CommentHasStringValue;
 
+import java.util.Arrays;
+
 public class PerformanceDescriptors {
 	/*
 	 * This is a regression test for antlr/antlr4#192 "Poor performance of
@@ -105,7 +107,8 @@ public class PerformanceDescriptors {
 
 		@Override
 		public boolean ignore(String targetName) {
-			return !targetName.equals("Java");
+//			return !Arrays.asList("Java", "Python2", "Python3", "Node").contains(targetName);
+			return !Arrays.asList("Java").contains(targetName);
 		}
 	}
 
