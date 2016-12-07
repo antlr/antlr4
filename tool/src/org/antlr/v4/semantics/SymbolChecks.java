@@ -43,6 +43,7 @@ import org.antlr.v4.tool.LabelElementPair;
 import org.antlr.v4.tool.LexerGrammar;
 import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.GrammarAST;
+import org.antlr.v4.tool.LabelType;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -94,10 +95,10 @@ public class SymbolChecks {
     }
 
     public void process() {
-        // methods affect fields, but no side-effects outside this object
+		// methods affect fields, but no side-effects outside this object
 		// So, call order sensitive
 		// First collect all rules for later use in checkForLabelConflict()
-		if ( g.rules!=null ) {
+		if (g.rules != null) {
 			for (Rule r : g.rules.values()) nameToRuleMap.put(r.name, r);
 		}
 		checkReservedNames(g.rules.values());
@@ -107,41 +108,39 @@ public class SymbolChecks {
 	}
 
 	public void checkActionRedefinitions(List<GrammarAST> actions) {
-		if ( actions==null ) return;
+		if (actions == null) return;
 		String scope = g.getDefaultActionScope();
 		String name;
 		GrammarAST nameNode;
 		for (GrammarAST ampersandAST : actions) {
-			nameNode = (GrammarAST)ampersandAST.getChild(0);
-			if ( ampersandAST.getChildCount()==2 ) {
+			nameNode = (GrammarAST) ampersandAST.getChild(0);
+			if (ampersandAST.getChildCount() == 2) {
 				name = nameNode.getText();
-			}
-			else {
+			} else {
 				scope = nameNode.getText();
-                name = ampersandAST.getChild(1).getText();
-            }
-            Set<String> scopeActions = actionScopeToActionNames.get(scope);
-            if ( scopeActions==null ) { // init scope
-                scopeActions = new HashSet<String>();
-                actionScopeToActionNames.put(scope, scopeActions);
-            }
-            if ( !scopeActions.contains(name) ) {
-                scopeActions.add(name);
-            }
-            else {
-                errMgr.grammarError(ErrorType.ACTION_REDEFINITION,
-                                          g.fileName, nameNode.token, name);
-            }
-        }
-    }
+				name = ampersandAST.getChild(1).getText();
+			}
+			Set<String> scopeActions = actionScopeToActionNames.get(scope);
+			if (scopeActions == null) { // init scope
+				scopeActions = new HashSet<String>();
+				actionScopeToActionNames.put(scope, scopeActions);
+			}
+			if (!scopeActions.contains(name)) {
+				scopeActions.add(name);
+			} else {
+				errMgr.grammarError(ErrorType.ACTION_REDEFINITION,
+						g.fileName, nameNode.token, name);
+			}
+		}
+	}
 
-    public void checkForTokenConflicts(List<GrammarAST> tokenIDRefs) {
+	public void checkForTokenConflicts(List<GrammarAST> tokenIDRefs) {
 //        for (GrammarAST a : tokenIDRefs) {
 //            Token t = a.token;
 //            String ID = t.getText();
 //            tokenIDs.add(ID);
 //        }
-    }
+	}
 
     /** Make sure a label doesn't conflict with another symbol.
      *  Labels must not conflict with: rules, tokens, scope names,
@@ -150,43 +149,54 @@ public class SymbolChecks {
      *  for repeated defs.
      */
     public void checkForLabelConflicts(Collection<Rule> rules) {
-        for (Rule r : rules) {
-            checkForAttributeConflicts(r);
-            Map<String, LabelElementPair> labelNameSpace =
-                new HashMap<String, LabelElementPair>();
-            for (int i=1; i<=r.numberOfAlts; i++) {
+		for (Rule r : rules) {
+			checkForAttributeConflicts(r);
+			Map<String, LabelElementPair> labelNameSpace =
+					new HashMap<String, LabelElementPair>();
+			for (int i = 1; i <= r.numberOfAlts; i++) {
 				if (r.hasAltSpecificContexts()) {
 					labelNameSpace.clear();
 				}
 
-                Alternative a = r.alt[i];
-                for (List<LabelElementPair> pairs : a.labelDefs.values() ) {
-                    for (LabelElementPair p : pairs) {
-                        checkForLabelConflict(r, p.label);
-                        String name = p.label.getText();
-                        LabelElementPair prev = labelNameSpace.get(name);
-                        if ( prev==null ) labelNameSpace.put(name, p);
-                        else checkForTypeMismatch(prev, p);
-                    }
-                }
-            }
-        }
-    }
+				Alternative a = r.alt[i];
+				for (List<LabelElementPair> pairs : a.labelDefs.values()) {
+					for (LabelElementPair p : pairs) {
+						checkForLabelConflict(r, p.label);
+						String name = p.label.getText();
+						LabelElementPair prev = labelNameSpace.get(name);
+						if (prev == null) labelNameSpace.put(name, p);
+						else checkForTypeMismatch(prev, p);
+					}
+				}
+			}
+		}
+	}
 
-    void checkForTypeMismatch(LabelElementPair prevLabelPair,
-                                        LabelElementPair labelPair)
-    {
-        // label already defined; if same type, no problem
-        if ( prevLabelPair.type != labelPair.type ) {
-            String typeMismatchExpr = labelPair.type+"!="+prevLabelPair.type;
-            errMgr.grammarError(
-                ErrorType.LABEL_TYPE_CONFLICT,
-                g.fileName,
-                labelPair.label.token,
-                labelPair.label.getText(),
-                typeMismatchExpr);
-        }
-    }
+    void checkForTypeMismatch(LabelElementPair prevLabelPair, LabelElementPair labelPair) {
+		// label already defined; if same type, no problem
+		if (prevLabelPair.type != labelPair.type) {
+			String typeMismatchExpr = labelPair.type + "!=" + prevLabelPair.type;
+			errMgr.grammarError(
+					ErrorType.LABEL_TYPE_CONFLICT,
+					g.fileName,
+					labelPair.label.token,
+					labelPair.label.getText(),
+					typeMismatchExpr);
+		}
+		if (!prevLabelPair.element.getText().equals(labelPair.element.getText()) &&
+			(prevLabelPair.type.equals(LabelType.RULE_LABEL) || prevLabelPair.type.equals(LabelType.RULE_LIST_LABEL)) &&
+			(labelPair.type.equals(LabelType.RULE_LABEL) || labelPair.type.equals(LabelType.RULE_LIST_LABEL))) {
+
+			String prevLabelOp = prevLabelPair.type.equals(LabelType.RULE_LIST_LABEL) ? "+=" : "=";
+			String labelOp = labelPair.type.equals(LabelType.RULE_LIST_LABEL) ? "+=" : "=";
+			errMgr.grammarError(
+					ErrorType.LABEL_TYPE_CONFLICT,
+					g.fileName,
+					labelPair.label.token,
+					labelPair.label.getText() + labelOp + labelPair.element.getText(),
+					prevLabelPair.label.getText() + prevLabelOp + prevLabelPair.element.getText());
+		}
+	}
 
 	public void checkForLabelConflict(Rule r, GrammarAST labelID) {
 		String name = labelID.getText();
