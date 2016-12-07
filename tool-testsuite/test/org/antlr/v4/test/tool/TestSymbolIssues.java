@@ -309,4 +309,39 @@ public class TestSymbolIssues extends BaseJavaToolTest {
 
 		testErrors(test, false);
 	}
+
+	// https://github.com/antlr/antlr4/issues/1409
+	@Test public void testLabelsForTokensWithMixedTypes() {
+		String[] test = {
+				"grammar L;\n" +
+				"\n" +
+				"rule1                                    // Correct (Alternatives)\n" +
+				"    : t1 = a  #aLabel\n" +
+				"    | t1 = b  #bLabel\n" +
+				"    ;\n" +
+				"rule2                         //Incorrect type casting in generated code (RULE_LABEL)\n" +
+				"    : t2 = a | t2 = b\n" +
+				"    ;\n" +
+				"rule3\n" +
+				"    : t3 += a+ b t3 += c+     //Incorrect type casting in generated code (RULE_LIST_LABEL)\n" +
+				"    ;\n" +
+				"rule4\n" +
+				"    : a t4 = A b t4 = B c                // Correct (TOKEN_LABEL)\n" +
+				"    ;\n" +
+				"rule5\n" +
+				"    : a t5 += A b t5 += B c              // Correct (TOKEN_LIST_LABEL)\n" +
+				"    ;\n" +
+				"a: A;\n" +
+				"b: B;\n" +
+				"c: C;\n" +
+				"A: 'a';\n" +
+				"B: 'b';\n" +
+				"C: 'c';\n",
+
+				"error(" + ErrorType.LABEL_TYPE_CONFLICT.code + "): L.g4:8:15: label t2=b type mismatch with previous definition: t2=a\n" +
+				"error(" + ErrorType.LABEL_TYPE_CONFLICT.code + "): L.g4:11:17: label t3+=c type mismatch with previous definition: t3+=a\n"
+		};
+
+		testErrors(test, false);
+	}
 }
