@@ -282,6 +282,10 @@ func (b *BaseLexer) setInputStream(input CharStream) {
 	b.tokenFactorySourcePair = &TokenSourceCharStreamPair{b, b.input}
 }
 
+func (b *BaseLexer) GetTokenSourceCharStreamPair() *TokenSourceCharStreamPair {
+	return b.tokenFactorySourcePair
+}
+
 // By default does not support multiple emits per NextToken invocation
 // for efficiency reasons. Subclass and override l method, NextToken,
 // and GetToken (to push tokens into a list and pull from that list

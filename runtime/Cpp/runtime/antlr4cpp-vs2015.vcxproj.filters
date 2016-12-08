@@ -812,9 +812,6 @@
     <ClCompile Include="src\tree\TerminalNodeImpl.cpp">
       <Filter>Source Files\tree</Filter>
     </ClCompile>
-    <ClCompile Include="src\tree\Tree.cpp">
-      <Filter>Source Files\tree</Filter>
-    </ClCompile>
     <ClCompile Include="src\tree\Trees.cpp">
       <Filter>Source Files\tree</Filter>
     </ClCompile>
@@ -937,6 +934,9 @@
     </ClCompile>
     <ClCompile Include="src\Vocabulary.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tree\ParseTree.cpp">
+      <Filter>Source Files\tree</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

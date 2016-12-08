@@ -8,7 +8,7 @@ This page lists the available and upcoming ANTLR runtimes. Please note that you 
 * [JavaScript](javascript-target.md)
 * [Go](go-target.md)
 * [C++](cpp-target.md)
-* Swift (not yet available)
+* [Swift](swift-target.md)
 
 ## Target feature parity
 

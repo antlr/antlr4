@@ -39,7 +39,6 @@ import org.antlr.v4.runtime.atn.BlockStartState;
 import org.antlr.v4.runtime.atn.LexerATNSimulator;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntegerList;
-import org.antlr.v4.test.runtime.java.BaseJavaTest;
 import org.antlr.v4.tool.DOTGenerator;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
@@ -53,7 +52,7 @@ import static org.junit.Assert.assertEquals;
 	// NOTICE: TOKENS IN LEXER, PARSER MUST BE SAME OR TOKEN TYPE MISMATCH
 	// NOTICE: TOKENS IN LEXER, PARSER MUST BE SAME OR TOKEN TYPE MISMATCH
 
-public class TestATNInterpreter extends BaseJavaTest {
+public class TestATNInterpreter extends BaseJavaToolTest {
 	@Before
 	@Override
 	public void testSetUp() throws Exception {

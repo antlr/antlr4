@@ -31,7 +31,6 @@
 package org.antlr.v4.test.tool;
 
 import org.antlr.runtime.RecognitionException;
-import org.antlr.v4.test.runtime.java.BaseJavaTest;
 import org.antlr.v4.tool.ErrorType;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,7 +39,7 @@ import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.misc.ErrorBuffer;
 
 /** */
-public class TestAttributeChecks extends BaseJavaTest {
+public class TestAttributeChecks extends BaseJavaToolTest {
 	@Before
 	@Override
 	public void testSetUp() throws Exception {
@@ -65,7 +64,7 @@ public class TestAttributeChecks extends BaseJavaTest {
         "c   :   ;\n";
 
     String[] membersChecks = {
-		"$a",			"error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:2:11: unknown attribute reference a in $a\n",
+	    "$a",			"error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:2:11: unknown attribute reference a in $a\n",
         "$a.y",			"error(" + ErrorType.UNKNOWN_SIMPLE_ATTRIBUTE.code + "): A.g4:2:11: unknown attribute reference a in $a.y\n",
     };
 

@@ -30,6 +30,7 @@
 package org.antlr.v4.test.runtime.java;
 
 import org.antlr.v4.Tool;
+import org.antlr.v4.analysis.AnalysisPipeline;
 import org.antlr.v4.automata.ATNFactory;
 import org.antlr.v4.automata.ATNPrinter;
 import org.antlr.v4.automata.LexerATNFactory;
@@ -60,10 +61,10 @@ import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.semantics.SemanticPipeline;
+import org.antlr.v4.test.runtime.BaseRuntimeTest;
 import org.antlr.v4.test.runtime.ErrorQueue;
 import org.antlr.v4.test.runtime.RuntimeTestSupport;
 import org.antlr.v4.tool.ANTLRMessage;
-import org.antlr.v4.tool.DefaultToolListener;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.GrammarSemanticsMessage;
 import org.antlr.v4.tool.LexerGrammar;
@@ -474,62 +475,6 @@ public class BaseJavaTest implements RuntimeTestSupport {
 		return ok;
 	}
 
-	protected ErrorQueue antlr(String grammarFileName, boolean defaultListener, String... extraOptions) {
-		final List<String> options = new ArrayList<String>();
-		Collections.addAll(options, extraOptions);
-		if ( !options.contains("-o") ) {
-			options.add("-o");
-			options.add(tmpdir);
-		}
-		if ( !options.contains("-lib") ) {
-			options.add("-lib");
-			options.add(tmpdir);
-		}
-		if ( !options.contains("-encoding") ) {
-			options.add("-encoding");
-			options.add("UTF-8");
-		}
-		options.add(new File(tmpdir, grammarFileName).toString());
-
-		final String[] optionsA = new String[options.size()];
-		options.toArray(optionsA);
-		Tool antlr = newTool(optionsA);
-		ErrorQueue equeue = new ErrorQueue(antlr);
-		antlr.addListener(equeue);
-		if ( defaultListener ) {
-			antlr.addListener(new DefaultToolListener(antlr));
-		}
-		synchronized (antlrLock) {
-			antlr.processGrammarsOnCommandLine();
-		}
-
-		if ( !defaultListener && !equeue.errors.isEmpty() ) {
-			for (int i = 0; i<equeue.errors.size(); i++) {
-				ANTLRMessage msg = equeue.errors.get(i);
-				antlrToolErrors.append(msg.toString());
-			}
-			try {
-				antlrToolErrors.append(new String(Utils.readFile(tmpdir+"/"+grammarFileName)));
-			} catch (IOException ioe) {
-				antlrToolErrors.append(ioe.toString());
-			}
-		}
-		if ( !defaultListener && !equeue.warnings.isEmpty() ) {
-			for (int i = 0; i<equeue.warnings.size(); i++) {
-				ANTLRMessage msg = equeue.warnings.get(i);
-				// antlrToolErrors.append(msg); warnings are hushed
-			}
-		}
-
-		return equeue;
-	}
-
-	protected ErrorQueue antlr(String grammarFileName, String grammarStr, boolean defaultListener, String... extraOptions) {
-		mkdir(tmpdir);
-		writeFile(tmpdir, grammarFileName, grammarStr);
-		return antlr(grammarFileName, defaultListener, extraOptions);
-	}
-
 	protected String execLexer(String grammarFileName,
 	                           String grammarStr,
 	                           String lexerName,
@@ -677,7 +622,7 @@ public class BaseJavaTest implements RuntimeTestSupport {
 													String... extraOptions)
 	{
 		ErrorQueue equeue =
-			antlr(grammarFileName, grammarStr, defaultListener, extraOptions);
+			BaseRuntimeTest.antlrOnString(getTmpDir(), "Java", grammarFileName, grammarStr, defaultListener, extraOptions);
 		if (!equeue.errors.isEmpty()) {
 			return false;
 		}
@@ -689,11 +634,14 @@ public class BaseJavaTest implements RuntimeTestSupport {
 		if ( parserName!=null ) {
 			files.add(parserName+".java");
 			Set<String> optionsSet = new HashSet<String>(Arrays.asList(extraOptions));
+			String grammarName = grammarFileName.substring(0, grammarFileName.lastIndexOf('.'));
 			if (!optionsSet.contains("-no-listener")) {
-				files.add(grammarFileName.substring(0, grammarFileName.lastIndexOf('.'))+"BaseListener.java");
+				files.add(grammarName+"Listener.java");
+				files.add(grammarName+"BaseListener.java");
 			}
 			if (optionsSet.contains("-visitor")) {
-				files.add(grammarFileName.substring(0, grammarFileName.lastIndexOf('.'))+"BaseVisitor.java");
+				files.add(grammarName+"Visitor.java");
+				files.add(grammarName+"BaseVisitor.java");
 			}
 		}
 		boolean allIsWell = compile(files.toArray(new String[files.size()]));
@@ -807,39 +755,6 @@ public class BaseJavaTest implements RuntimeTestSupport {
 		return null;
 	}
 
-	public void testErrors(String[] pairs, boolean printTree) {
-        for (int i = 0; i < pairs.length; i+=2) {
-            String input = pairs[i];
-            String expect = pairs[i+1];
-
-			String[] lines = input.split("\n");
-			String fileName = getFilenameFromFirstLineOfGrammar(lines[0]);
-			ErrorQueue equeue = antlr(fileName, input, false);
-
-			String actual = equeue.toString(true);
-			actual = actual.replace(tmpdir + File.separator, "");
-//			System.err.println(actual);
-			String msg = input;
-			msg = msg.replace("\n","\\n");
-			msg = msg.replace("\r","\\r");
-			msg = msg.replace("\t","\\t");
-
-            assertEquals("error in: "+msg,expect,actual);
-        }
-    }
-
-	public String getFilenameFromFirstLineOfGrammar(String line) {
-		String fileName = "A" + Tool.GRAMMAR_EXTENSION;
-		int grIndex = line.lastIndexOf("grammar");
-		int semi = line.lastIndexOf(';');
-		if ( grIndex>=0 && semi>=0 ) {
-			int space = line.indexOf(' ', grIndex);
-			fileName = line.substring(space+1, semi)+Tool.GRAMMAR_EXTENSION;
-		}
-		if ( fileName.length()==Tool.GRAMMAR_EXTENSION.length() ) fileName = "A" + Tool.GRAMMAR_EXTENSION;
-		return fileName;
-	}
-
 //	void ambig(List<Message> msgs, int[] expectedAmbigAlts, String expectedAmbigInput)
 //		throws Exception
 //	{
@@ -912,6 +827,9 @@ public class BaseJavaTest implements RuntimeTestSupport {
 			ATNFactory factory = new ParserATNFactory(g);
 			if ( g.isLexer() ) factory = new LexerATNFactory((LexerGrammar)g);
 			g.atn = factory.createATN();
+
+            AnalysisPipeline anal = new AnalysisPipeline(g);
+            anal.process();
 
 			CodeGenerator gen = new CodeGenerator(g);
 			ST outputFileST = gen.generateParser(false);
@@ -1055,11 +973,6 @@ public class BaseJavaTest implements RuntimeTestSupport {
 			System.err.println("can't write file");
 			ioe.printStackTrace(System.err);
 		}
-	}
-
-	protected void mkdir(String dir) {
-		File f = new File(dir);
-		f.mkdirs();
 	}
 
 	protected void writeTestFile(String parserName,

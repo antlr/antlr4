@@ -34,6 +34,7 @@
 // ambiguities.
 
 var Set = require('./../Utils').Set;
+var Map = require('./../Utils').Map;
 var BitSet = require('./../Utils').BitSet;
 var AltDict = require('./../Utils').AltDict;
 var ATN = require('./ATN').ATN;
@@ -41,6 +42,9 @@ var RuleStopState = require('./ATNState').RuleStopState;
 var ATNConfigSet = require('./ATNConfigSet').ATNConfigSet;
 var ATNConfig = require('./ATNConfig').ATNConfig;
 var SemanticContext = require('./SemanticContext').SemanticContext;
+var Hash = require("../Utils").Hash;
+var hashStuff = require('./../Utils').hashStuff;
+var equalArrays = require('./../Utils').equalArrays;
 
 function PredictionMode() {
 	return this;
@@ -515,27 +519,20 @@ PredictionMode.getAlts = function(altsets) {
 // map[c] U= c.{@link ATNConfig//alt alt} // map hash/equals uses s and x, not
 // alt and not pred
 // </pre>
-//
+
 PredictionMode.getConflictingAltSubsets = function(configs) {
-    var configToAlts = {};
-	for(var i=0;i<configs.items.length;i++) {
-		var c = configs.items[i];
-        var key = "key_" + c.state.stateNumber + "/" + c.context;
-        var alts = configToAlts[key] || null;
+    var configToAlts = new Map();
+    configToAlts.hashFunction = function(cfg) { hashStuff(cfg.state.stateNumber, cfg.context); };
+    configToAlts.equalsFunction = function(c1, c2) { return c1.state.stateNumber==c2.state.stateNumber && c1.context.equals(c2.context);}
+    configs.items.map(function(cfg) {
+        var alts = configToAlts.get(cfg);
         if (alts === null) {
             alts = new BitSet();
-            configToAlts[key] = alts;
+            configToAlts.put(cfg, alts);
         }
-        alts.add(c.alt);
-	}
-	var values = [];
-	for(var k in configToAlts) {
-		if(k.indexOf("key_")!==0) {
-			continue;
-		}
-		values.push(configToAlts[k]);
-	}
-    return values;
+        alts.add(cfg.alt);
+	});
+    return configToAlts.getValues();
 };
 
 //

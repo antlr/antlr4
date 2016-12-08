@@ -7,7 +7,6 @@ import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.antlr.v4.runtime.tree.xpath.XPath;
-import org.antlr.v4.test.runtime.java.BaseJavaTest;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -18,7 +17,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class TestXPath extends BaseJavaTest {
+public class TestXPath extends BaseJavaToolTest {
 	public static final String grammar =
 		"grammar Expr;\n" +
 		"prog:   func+ ;\n" +

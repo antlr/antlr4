@@ -30,9 +30,10 @@
 ///
 
 var RuleContext = require('./RuleContext').RuleContext;
+var Hash = require('./Utils').Hash;
 
-function PredictionContext(cachedHashString) {
-	this.cachedHashString = cachedHashString;
+function PredictionContext(cachedHashCode) {
+	this.cachedHashCode = cachedHashCode;
 }
 
 // Represents {@code $} in local context prediction, which means wildcard.
@@ -83,17 +84,19 @@ PredictionContext.prototype.hasEmptyPath = function() {
 	return this.getReturnState(this.length - 1) === PredictionContext.EMPTY_RETURN_STATE;
 };
 
-PredictionContext.prototype.hashString = function() {
-	return this.cachedHashString;
+PredictionContext.prototype.hashCode = function() {
+	return this.cachedHashCode;
 };
 
+
+PredictionContext.prototype.updateHashCode = function(hash) {
+    hash.update(this.cachedHashCode);
+};
+/*
 function calculateHashString(parent, returnState) {
 	return "" + parent + returnState;
 }
-
-function calculateEmptyHashString() {
-	return "";
-}
+*/
 
 // Used to cache {@link PredictionContext} objects. Its used for the shared
 // context cash associated with contexts in DFA states. This cache
@@ -131,9 +134,13 @@ Object.defineProperty(PredictionContextCache.prototype, "length", {
 });
 
 function SingletonPredictionContext(parent, returnState) {
-	var hashString = parent !== null ? calculateHashString(parent, returnState)
-			: calculateEmptyHashString();
-	PredictionContext.call(this, hashString);
+	var hashCode = 0;
+	if(parent !== null) {
+		var hash = new Hash();
+		hash.update(parent, returnState);
+        hashCode = hash.finish();
+	}
+	PredictionContext.call(this, hashCode);
 	this.parentCtx = parent;
 	this.returnState = returnState;
 }
@@ -169,7 +176,7 @@ SingletonPredictionContext.prototype.equals = function(other) {
 		return true;
 	} else if (!(other instanceof SingletonPredictionContext)) {
 		return false;
-	} else if (this.hashString() !== other.hashString()) {
+	} else if (this.hashCode() !== other.hashCode()) {
 		return false; // can't be same if hash is different
 	} else {
 		if(this.returnState !== other.returnState)
@@ -181,14 +188,10 @@ SingletonPredictionContext.prototype.equals = function(other) {
 	}
 };
 
-SingletonPredictionContext.prototype.hashString = function() {
-	return this.cachedHashString;
-};
-
 SingletonPredictionContext.prototype.toString = function() {
 	var up = this.parentCtx === null ? "" : this.parentCtx.toString();
 	if (up.length === 0) {
-		if (this.returnState === this.EMPTY_RETURN_STATE) {
+		if (this.returnState === PredictionContext.EMPTY_RETURN_STATE) {
 			return "$";
 		} else {
 			return "" + this.returnState;
@@ -233,8 +236,10 @@ function ArrayPredictionContext(parents, returnStates) {
 	// from {@link //EMPTY} and non-empty. We merge {@link //EMPTY} by using
 	// null parent and
 	// returnState == {@link //EMPTY_RETURN_STATE}.
-	var hash = calculateHashString(parents, returnStates);
-	PredictionContext.call(this, hash);
+	var h = new Hash();
+	h.update(parents, returnStates);
+	var hashCode = h.finish();
+	PredictionContext.call(this, hashCode);
 	this.parents = parents;
 	this.returnStates = returnStates;
 	return this;
@@ -268,7 +273,7 @@ ArrayPredictionContext.prototype.equals = function(other) {
 		return true;
 	} else if (!(other instanceof ArrayPredictionContext)) {
 		return false;
-	} else if (this.hashString !== other.hashString()) {
+	} else if (this.hashCode() !== other.hashCode()) {
 		return false; // can't be same if hash is different
 	} else {
 		return this.returnStates === other.returnStates &&
@@ -318,7 +323,7 @@ function predictionContextFromRuleContext(atn, outerContext) {
 	var transition = state.transitions[0];
 	return SingletonPredictionContext.create(parent, transition.followState.stateNumber);
 }
-
+/*
 function calculateListsHashString(parents, returnStates) {
 	var s = "";
 	parents.map(function(p) {
@@ -329,7 +334,7 @@ function calculateListsHashString(parents, returnStates) {
 	});
 	return s;
 }
-
+*/
 function merge(a, b, rootIsWildcard, mergeCache) {
 	// share same graph if both same
 	if (a === b) {

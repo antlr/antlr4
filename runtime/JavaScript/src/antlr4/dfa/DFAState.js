@@ -31,6 +31,7 @@
 
 var ATNConfigSet = require('./../atn/ATNConfigSet').ATNConfigSet;
 var Utils = require('./../Utils');
+var Hash = Utils.Hash;
 var Set = Utils.Set;
 
 // Map a predicate to a predicted alternative.///
@@ -142,26 +143,33 @@ DFAState.prototype.getAltSet = function() {
 // {@link //stateNumber} is irrelevant.</p>
 DFAState.prototype.equals = function(other) {
 	// compare set of ATN configurations in this set with other
-	if (this === other) {
-		return true;
-	} else if (!(other instanceof DFAState)) {
-		return false;
-	} else {
-		return this.configs.equals(other.configs);
-	}
+	return this === other ||
+			(other instanceof DFAState &&
+				this.configs.equals(other.configs));
 };
 
 DFAState.prototype.toString = function() {
-	return "" + this.stateNumber + ":" + this.hashString();
+	var s = "" + this.stateNumber + ":" + this.configs;
+	if(this.isAcceptState) {
+        s = s + "=>";
+        if (this.predicates !== null)
+            s = s + this.predicates;
+        else
+            s = s + this.prediction;
+    }
+	return s;
 };
 
-DFAState.prototype.hashString = function() {
-	return "" +  this.configs +
-			(this.isAcceptState ?
-					"=>" + (this.predicates !== null ?
-								this.predicates :
-								this.prediction) :
-					"");
+DFAState.prototype.hashCode = function() {
+	var hash = new Hash();
+	hash.update(this.configs);
+	if(this.isAcceptState) {
+        if (this.predicates !== null)
+            hash.update(this.predicates);
+        else
+            hash.update(this.prediction);
+    }
+    return hash.finish();
 };
 
 exports.DFAState = DFAState;

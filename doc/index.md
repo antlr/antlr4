@@ -51,6 +51,8 @@ This documentation is a reference and summarizes grammar syntax and the key sema
 
 * [Runtime Libraries and Code Generation Targets](targets.md)
 
+* [Parsing binary streams](parsing-binary-files.md)
+ 
 * [Parser and lexer interpreters](interpreters.md)
 
 * [Resources](resources.md)

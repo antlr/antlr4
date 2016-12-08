@@ -94,6 +94,7 @@ YYYY/MM/DD, github id, Full name, email
 2016/03/27, beardlybread, Bradley Steinbacher, bradley.j.steinbacher@gmail.com
 2016/03/29, msteiger, Martin Steiger, antlr@martin-steiger.de
 2016/03/28, gagern, Martin von Gagern, gagern@ma.tum.de
+2016/07/10, twz123, Tom Wieczorek, tom.wieczorek@zalando.de
 2016/07/20, chrisheller, Chris Heller, chris.heller.greyheller@gmail.com
 2016/07/20, nburles, Nathan Burles, nburles@gmail.com
 2016/07/20, kosl90, Li Liqiang, kos1990l@gmail.com
@@ -103,6 +104,7 @@ YYYY/MM/DD, github id, Full name, email
 2016/08/08, wjkohnen, Wolfgang Johannes Kohnen, wjkohnen-go-antlr@ko-sys.com
 2016/08/11, BurtHarris, Ralph "Burt" Harris, Burt_Harris_antlr4@azxs.33mail.com
 2016/08/19, andjo403, Andreas Jonson, andjo403@hotmail.com
+2016/09/27, harriman, Kurt Harriman, harriman@acm.org
 2016/10/13, cgudrian, Christian Gudrian, christian.gudrian@gmx.de
 2016/10/13, nielsbasjes, Niels Basjes, niels@basjes.nl
 2016/10/21, FloorGoddijn, Floor Goddijn, floor.goddijn[at]aimms.com
@@ -111,3 +113,16 @@ YYYY/MM/DD, github id, Full name, email
 2016/11/15, hanjoes, Hanzhou Shi, hanzhou87@gmail.com
 2016/11/16, sridharxp, Sridharan S, aurosridhar@gmail.com
 2016/11/06, NoodleOfDeath, Thom Morgan, github@bytemeapp.com
+2016/11/01, sebkur, Sebastian Kürten, sebastian@topobyte.de
+2016/04/13, renatahodovan, Renata Hodovan, reni@inf.u-szeged.hu
+2016/11/05, ewanmellor, Ewan Mellor, github@ewanmellor.org
+2016/11/06, janyou, Janyou, janyou.antlr@outlook.com
+2016/11/20, marcohu, Marco Hunsicker, antlr@hunsicker.de
+2016/09/02, lygav, Vladimir (Vladi) Lyga, lyvladi@gmail.com
+2016/09/23, ghosthope, Dmitry Shakhtanov, sudstrike@gmail.com
+2016/11/25, MrSampson, Oliver Sampson, olsam@quickaudio.com
+2016/11/29, millergarym, Gary Miller, miller.garym@gmail.com
+2016/11/29, wxio, Gary Miller, gm@wx.io
+2016/11/29, Naios, Denis Blank, naios@users.noreply.github.com
+2016/12/01, samtatasurya, Samuel Tatasurya, xemradiant@gmail.com
+2016/12/03, redxdev, Samuel Bloomberg, sam@redxdev.com

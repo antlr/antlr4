@@ -30,7 +30,6 @@
 
 package org.antlr.v4.test.tool;
 
-import org.antlr.v4.test.runtime.java.BaseJavaTest;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -70,7 +69,7 @@ import static org.junit.Assert.assertTrue;
  *  Nongreedy loops match as much input as possible while still allowing
  *  the remaining input to match.
  */
-public class TestParserExec extends BaseJavaTest {
+public class TestParserExec extends BaseJavaToolTest {
 	@Before
 	@Override
 	public void testSetUp() throws Exception {

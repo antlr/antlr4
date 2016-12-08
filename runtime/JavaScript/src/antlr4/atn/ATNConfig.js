@@ -39,6 +39,8 @@
 
 var DecisionState = require('./ATNState').DecisionState;
 var SemanticContext = require('./SemanticContext').SemanticContext;
+var Hash = require("../Utils").Hash;
+
 
 function checkParams(params, isCfg) {
 	if(params===null) {
@@ -96,10 +98,16 @@ ATNConfig.prototype.checkContext = function(params, config) {
 	}
 };
 
-ATNConfig.prototype.hashString = function() {
-    return "" + this.state.stateNumber + "/" + this.alt + "/" +
-        (this.context===null ? "" : this.context.hashString()) +
-        "/" + this.semanticContext.hashString();
+
+ATNConfig.prototype.hashCode = function() {
+    var hash = new Hash();
+    this.updateHashCode(hash);
+    return hash.finish();
+};
+
+
+ATNConfig.prototype.updateHashCode = function(hash) {
+    hash.update(this.state.stateNumber, this.alt, this.context, this.semanticContext);
 };
 
 // An ATN configuration is equal to another if both have
@@ -120,9 +128,13 @@ ATNConfig.prototype.equals = function(other) {
     }
 };
 
-ATNConfig.prototype.hashStringForConfigSet = function() {
-    return "" + this.state.stateNumber + "/" + this.alt + "/" + this.semanticContext;
+
+ATNConfig.prototype.hashCodeForConfigSet = function() {
+    var hash = new Hash();
+    hash.update(this.state.stateNumber, this.alt, this.semanticContext);
+    return hash.finish();
 };
+
 
 ATNConfig.prototype.equalsForConfigSet = function(other) {
     if (this === other) {
@@ -162,31 +174,21 @@ function LexerATNConfig(params, config) {
 LexerATNConfig.prototype = Object.create(ATNConfig.prototype);
 LexerATNConfig.prototype.constructor = LexerATNConfig;
 
-LexerATNConfig.prototype.hashString = function() {
-    return "" + this.state.stateNumber + this.alt + this.context +
-            this.semanticContext + (this.passedThroughNonGreedyDecision ? 1 : 0) +
-            this.lexerActionExecutor;
+LexerATNConfig.prototype.updateHashCode = function(hash) {
+    hash.update(this.state.stateNumber, this.alt, this.context, this.semanticContext, this.passedThroughNonGreedyDecision, this.lexerActionExecutor);
 };
 
 LexerATNConfig.prototype.equals = function(other) {
-    if (this === other) {
-        return true;
-    } else if (!(other instanceof LexerATNConfig)) {
-        return false;
-    } else if (this.passedThroughNonGreedyDecision !== other.passedThroughNonGreedyDecision) {
-        return false;
-    } else if (this.lexerActionExecutor ?
-            !this.lexerActionExecutor.equals(other.lexerActionExecutor)
-            : !other.lexerActionExecutor) {
-        return false;
-    } else {
-        return ATNConfig.prototype.equals.call(this, other);
-    }
+    return this === other ||
+            (other instanceof LexerATNConfig &&
+            this.passedThroughNonGreedyDecision == other.passedThroughNonGreedyDecision &&
+            (this.lexerActionExecutor ? this.lexerActionExecutor.equals(other.lexerActionExecutor) : !other.lexerActionExecutor) &&
+            ATNConfig.prototype.equals.call(this, other));
 };
 
-LexerATNConfig.prototype.hashStringForConfigSet = LexerATNConfig.prototype.hashString;
+LexerATNConfig.prototype.hashCodeForConfigSet = LexerATNConfig.prototype.hashCode;
 
-LexerATNConfig.prototype.equalsForConfigSet = LexerATNConfig.prototype.eqials;
+LexerATNConfig.prototype.equalsForConfigSet = LexerATNConfig.prototype.equals;
 
 
 LexerATNConfig.prototype.checkNonGreedyDecision = function(source, target) {

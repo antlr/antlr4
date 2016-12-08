@@ -262,7 +262,7 @@ class StarLoopEntryState(DecisionState):
         self.stateType = self.STAR_LOOP_ENTRY
         self.loopBackState = None
         # Indicates whether this state can benefit from a precedence DFA during SLL decision making.
-        self.precedenceRuleDecision = None
+        self.isPrecedenceDecision = None
 
 # Mark the end of a * or + loop.
 class LoopEndState(ATNState):

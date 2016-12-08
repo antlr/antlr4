@@ -285,8 +285,8 @@ public class TreeViewer extends JComponent {
     private static final String DIALOG_DIVIDER_LOC_PREFS_KEY    = "dialog_divider_location";
     private static final String DIALOG_VIEWER_SCALE_PREFS_KEY   = "dialog_viewer_scale";
 
-	protected static JDialog showInDialog(final TreeViewer viewer) {
-		final JDialog dialog = new JDialog();
+	protected static JFrame showInDialog(final TreeViewer viewer) {
+		final JFrame dialog = new JFrame();
 		dialog.setTitle("Parse Tree Inspector");
 
         final Preferences prefs = Preferences.userNodeForPackage(TreeViewer.class);
@@ -393,6 +393,7 @@ public class TreeViewer extends JComponent {
 
 		// make viz
         WindowListener exitListener = new WindowAdapter() {
+	        @Override
             public void windowClosing(WindowEvent e) {
                 prefs.putInt(DIALOG_WIDTH_PREFS_KEY, (int) dialog.getSize().getWidth());
                 prefs.putInt(DIALOG_HEIGHT_PREFS_KEY, (int) dialog.getSize().getHeight());
@@ -431,7 +432,7 @@ public class TreeViewer extends JComponent {
 		return dialog;
 	}
 
-	private static void generatePNGFile(TreeViewer viewer, JDialog dialog) {
+	private static void generatePNGFile(TreeViewer viewer, JFrame dialog) {
 		BufferedImage bi = new BufferedImage(viewer.getSize().width,
 											 viewer.getSize().height,
 											 BufferedImage.TYPE_INT_ARGB);
@@ -536,14 +537,14 @@ public class TreeViewer extends JComponent {
 	}
 
 
-	public Future<JDialog> open() {
+	public Future<JFrame> open() {
 		final TreeViewer viewer = this;
 		viewer.setScale(1.5);
-		Callable<JDialog> callable = new Callable<JDialog>() {
-			JDialog result;
+		Callable<JFrame> callable = new Callable<JFrame>() {
+			JFrame result;
 
 			@Override
-			public JDialog call() throws Exception {
+			public JFrame call() throws Exception {
 				SwingUtilities.invokeAndWait(new Runnable() {
 					@Override
 					public void run() {
@@ -566,7 +567,7 @@ public class TreeViewer extends JComponent {
 	}
 
 	public void save(String fileName) throws IOException, PrintException {
-		JDialog dialog = new JDialog();
+		JFrame dialog = new JFrame();
 		Container contentPane = dialog.getContentPane();
 		((JComponent) contentPane).setBorder(BorderFactory.createEmptyBorder(
 				10, 10, 10, 10));

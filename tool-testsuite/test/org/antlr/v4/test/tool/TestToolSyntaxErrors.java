@@ -31,18 +31,21 @@
 package org.antlr.v4.test.tool;
 
 import org.antlr.v4.Tool;
-import org.antlr.v4.test.runtime.java.BaseJavaTest;
 import org.antlr.v4.tool.ErrorType;
 import org.junit.Before;
 import org.junit.Test;
 
-public class TestToolSyntaxErrors extends BaseJavaTest {
+public class TestToolSyntaxErrors extends BaseJavaToolTest {
     static String[] A = {
-        // INPUT
-        "grammar A;\n" +
-        "",
-        // YIELDS
-        "error(" + ErrorType.NO_RULES.code + "): A.g4::: grammar A has no rules\n",
+	    // INPUT
+		"grammar A;\n" +
+		"",
+		// YIELDS
+		"error(" + ErrorType.NO_RULES.code + "): A.g4::: grammar A has no rules\n",
+
+		"lexer grammar A;\n" +
+		"",
+		"error(" + ErrorType.NO_RULES.code + "): A.g4::: grammar A has no rules\n",
 
 		"A;",
 		"error(" + ErrorType.SYNTAX_ERROR.code + "): A.g4:1:0: syntax error: 'A' came as a complete surprise to me\n",
@@ -654,8 +657,8 @@ public class TestToolSyntaxErrors extends BaseJavaTest {
 			"WHITESPACE: [ \\t]+      -> channel(WHITESPACE_CHANNEL);\n";
 
 		String expected =
-			"warning(" + ErrorType.UNKNOWN_LEXER_CONSTANT.code + "): T.g4:10:35: rule COMMENT contains a lexer command with an unrecognized constant value; lexer interpreters may produce incorrect output\n" +
-			"warning(" + ErrorType.UNKNOWN_LEXER_CONSTANT.code + "): T.g4:11:35: rule WHITESPACE contains a lexer command with an unrecognized constant value; lexer interpreters may produce incorrect output\n" +
+			"error(" + ErrorType.CONSTANT_VALUE_IS_NOT_A_RECOGNIZED_CHANNEL_NAME.code + "): T.g4:10:35: COMMENT_CHANNEL is not a recognized channel name\n" +
+			"error(" + ErrorType.CONSTANT_VALUE_IS_NOT_A_RECOGNIZED_CHANNEL_NAME.code + "): T.g4:11:35: WHITESPACE_CHANNEL is not a recognized channel name\n" +
 			"error(" + ErrorType.CHANNELS_BLOCK_IN_COMBINED_GRAMMAR.code + "): T.g4:3:0: custom channels are not supported in combined grammars\n";
 
 		String[] pair = { grammar, expected };
@@ -683,7 +686,7 @@ public class TestToolSyntaxErrors extends BaseJavaTest {
 
 		// WHITESPACE_CHANNEL and COMMENT_CHANNEL are defined, but NEWLINE_CHANNEL is not
 		String expected =
-			"warning(" + ErrorType.UNKNOWN_LEXER_CONSTANT.code + "): T.g4:10:34: rule NEWLINE contains a lexer command with an unrecognized constant value; lexer interpreters may produce incorrect output\n";
+			"error(" + ErrorType.CONSTANT_VALUE_IS_NOT_A_RECOGNIZED_CHANNEL_NAME.code + "): T.g4:10:34: NEWLINE_CHANNEL is not a recognized channel name\n";
 
 		String[] pair = { grammar, expected };
 		super.testErrors(pair, true);

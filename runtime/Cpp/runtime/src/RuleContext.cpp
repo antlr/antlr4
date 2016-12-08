@@ -78,9 +78,6 @@ std::string RuleContext::getText() {
 
   std::stringstream ss;
   for (size_t i = 0; i < children.size(); i++) {
-    if (i > 0)
-      ss << ", ";
-
     ParseTree *tree = children[i];
     if (tree != nullptr)
       ss << tree->getText();

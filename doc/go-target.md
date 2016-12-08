@@ -13,7 +13,7 @@ Each target language for ANTLR has a runtime package for running parser generate
 Get the runtime and install it on your GOPATH:
 
 ```bash
-go get github.com/antlr/antlr4
+go get github.com/antlr/antlr4/runtime/Go/antlr
 ```
 
 #### 3. Set the release tag (optional)

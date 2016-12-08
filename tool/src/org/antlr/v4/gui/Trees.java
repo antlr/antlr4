@@ -15,13 +15,13 @@ import java.util.concurrent.Future;
 
 public class Trees {
 	/** Call this method to view a parse tree in a dialog box visually. */
-	public static Future<JDialog> inspect(Tree t, List<String> ruleNames) {
+	public static Future<JFrame> inspect(Tree t, List<String> ruleNames) {
 		TreeViewer viewer = new TreeViewer(ruleNames, t);
 		return viewer.open();
 	}
 
 	/** Call this method to view a parse tree in a dialog box visually. */
-	public static Future<JDialog> inspect(Tree t, Parser parser) {
+	public static Future<JFrame> inspect(Tree t, Parser parser) {
 		List<String> ruleNames = parser != null ? Arrays.asList(parser.getRuleNames()) : null;
 		return inspect(t, ruleNames);
 	}

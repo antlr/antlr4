@@ -39,7 +39,6 @@ import org.antlr.v4.test.runtime.ErrorQueue;
 import org.antlr.v4.test.runtime.RuntimeTestSupport;
 import org.antlr.v4.test.runtime.SpecialRuntimeTestAssert;
 import org.antlr.v4.tool.ANTLRMessage;
-import org.antlr.v4.tool.DefaultToolListener;
 import org.antlr.v4.tool.GrammarSemanticsMessage;
 import org.junit.rules.TestRule;
 import org.junit.rules.TestWatcher;
@@ -74,7 +73,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.antlr.v4.test.runtime.java.BaseJavaTest.antlrLock;
+import static org.antlr.v4.test.runtime.BaseRuntimeTest.antlrOnString;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -238,65 +237,6 @@ public class BaseCSharpTest implements RuntimeTestSupport, SpecialRuntimeTestAss
 		}
 	}
 
-
-	protected ErrorQueue antlr(String grammarFileName, boolean defaultListener, String... extraOptions) {
-		final List<String> options = new ArrayList<String>();
-		Collections.addAll(options, extraOptions);
-		options.add("-Dlanguage=CSharp");
-		if ( !options.contains("-o") ) {
-			options.add("-o");
-			options.add(tmpdir);
-		}
-		if ( !options.contains("-lib") ) {
-			options.add("-lib");
-			options.add(tmpdir);
-		}
-		if ( !options.contains("-encoding") ) {
-			options.add("-encoding");
-			options.add("UTF-8");
-		}
-		options.add(new File(tmpdir,grammarFileName).toString());
-
-		final String[] optionsA = new String[options.size()];
-		options.toArray(optionsA);
-		Tool antlr = newTool(optionsA);
-		ErrorQueue equeue = new ErrorQueue(antlr);
-		antlr.addListener(equeue);
-		if (defaultListener) {
-			antlr.addListener(new DefaultToolListener(antlr));
-		}
-		synchronized (antlrLock) {
-			antlr.processGrammarsOnCommandLine();
-		}
-
-		if ( !defaultListener && !equeue.errors.isEmpty() ) {
-			for (int i = 0; i < equeue.errors.size(); i++) {
-				ANTLRMessage msg = equeue.errors.get(i);
-				antlrToolErrors.append(msg.toString());
-			}
-			try {
-				antlrToolErrors.append(new String(Utils.readFile(tmpdir+"/"+grammarFileName)));
-			}
-			catch (IOException ioe) {
-				antlrToolErrors.append(ioe.toString());
-			}
-		}
-		if ( !defaultListener && !equeue.warnings.isEmpty() ) {
-			for (int i = 0; i < equeue.warnings.size(); i++) {
-				ANTLRMessage msg = equeue.warnings.get(i);
-				// antlrToolErrors.append(msg); warnings are hushed
-			}
-		}
-
-		return equeue;
-	}
-
-	protected ErrorQueue antlr(String grammarFileName, String grammarStr, boolean defaultListener, String... extraOptions) {
-		mkdir(tmpdir);
-		writeFile(tmpdir, grammarFileName, grammarStr);
-		return antlr(grammarFileName, defaultListener, extraOptions);
-	}
-
 	protected String execLexer(String grammarFileName,
 	                           String grammarStr,
 	                           String lexerName,
@@ -380,7 +320,7 @@ public class BaseCSharpTest implements RuntimeTestSupport, SpecialRuntimeTestAss
 	                                        boolean defaultListener,
 	                                        String... extraOptions)
 	{
-		ErrorQueue equeue = antlr(grammarFileName, grammarStr, defaultListener, extraOptions);
+		ErrorQueue equeue = antlrOnString(getTmpDir(), "CSharp", grammarFileName, grammarStr, defaultListener, extraOptions);
 		if (!equeue.errors.isEmpty()) {
 			return false;
 		}
@@ -494,7 +434,7 @@ public class BaseCSharpTest implements RuntimeTestSupport, SpecialRuntimeTestAss
 	}
 
 	private String locateTool(String tool) {
-		String[] roots = { "/usr/bin/", "/usr/local/bin/" };
+		String[] roots = { "/opt/local/bin/", "/usr/bin/", "/usr/local/bin/" };
 		for(String root : roots) {
 			if(new File(root + tool).exists())
 				return root + tool;
@@ -609,40 +549,6 @@ public class BaseCSharpTest implements RuntimeTestSupport, SpecialRuntimeTestAss
 			return new String[] { mono, exec, new File(tmpdir, "input").getAbsolutePath() };
 		}
 	}
-
-	public void testErrors(String[] pairs, boolean printTree) {
-		for (int i = 0; i < pairs.length; i+=2) {
-			String input = pairs[i];
-			String expect = pairs[i+1];
-
-			String[] lines = input.split("\n");
-			String fileName = getFilenameFromFirstLineOfGrammar(lines[0]);
-			ErrorQueue equeue = antlr(fileName, input, false);
-
-			String actual = equeue.toString(true);
-			actual = actual.replace(tmpdir + File.separator, "");
-			System.err.println(actual);
-			String msg = input;
-			msg = msg.replace("\n","\\n");
-			msg = msg.replace("\r","\\r");
-			msg = msg.replace("\t","\\t");
-
-			org.junit.Assert.assertEquals("error in: "+msg,expect,actual);
-		}
-	}
-
-	public String getFilenameFromFirstLineOfGrammar(String line) {
-		String fileName = "A" + Tool.GRAMMAR_EXTENSION;
-		int grIndex = line.lastIndexOf("grammar");
-		int semi = line.lastIndexOf(';');
-		if ( grIndex>=0 && semi>=0 ) {
-			int space = line.indexOf(' ', grIndex);
-			fileName = line.substring(space+1, semi)+Tool.GRAMMAR_EXTENSION;
-		}
-		if ( fileName.length()==Tool.GRAMMAR_EXTENSION.length() ) fileName = "A" + Tool.GRAMMAR_EXTENSION;
-		return fileName;
-	}
-
 
 	List<ANTLRMessage> getMessagesOfType(List<ANTLRMessage> msgs, Class<? extends ANTLRMessage> c) {
 		List<ANTLRMessage> filtered = new ArrayList<ANTLRMessage>();
