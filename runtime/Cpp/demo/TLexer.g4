@@ -37,10 +37,6 @@ void myBarLexerAction() { /* do something*/ };
 
 channels { CommentsChannel, DirectiveChannel }
 
-tokens {
-	DUMMY	
-}
-
 Return: 'return';
 Continue: 'continue';
 
