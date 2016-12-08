@@ -1,9 +1,13 @@
+/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
+
 //
 //  BitSet.swift
 //  Antlr.swift
 //
 //  Created by janyou on 15/9/8.
-//  Copyright © 2015 jlabs. All rights reserved.
 //
 
 import Foundation
@@ -568,7 +572,7 @@ public class BitSet: Hashable, CustomStringConvertible {
             let wordOption2: Int64 = (words[sourceIndex + 1] << Int64(-fromIndex % 64))
             let wordOption = wordOption1 | wordOption2
             result.words[i] = wordAligned ? words[sourceIndex] : wordOption
-            
+
             i += 1
             sourceIndex += 1
         }
@@ -577,12 +581,12 @@ public class BitSet: Hashable, CustomStringConvertible {
         let lastWordMask: Int64 = BitSet.WORD_MASK >>> Int64(-toIndex)
         let toIndexTest = ((toIndex - 1) & BitSet.BIT_INDEX_MASK)
         let fromIndexTest = (fromIndex & BitSet.BIT_INDEX_MASK)
-        
+
         let wordOption1: Int64 = (words[sourceIndex] >>> Int64(fromIndex))
         let wordOption2: Int64 = (words[sourceIndex + 1] & lastWordMask)
         let wordOption3: Int64 = (64 + Int64(-fromIndex % 64))
         let wordOption = wordOption1 | wordOption2 << wordOption3
-        
+
         let wordOption4 = (words[sourceIndex] & lastWordMask)
         let wordOption5 = wordOption4 >>> Int64(fromIndex)
         result.words[targetWords - 1] =
@@ -715,7 +719,7 @@ public class BitSet: Hashable, CustomStringConvertible {
             if u == wordsInUse {
                 return wordsInUse * BitSet.BITS_PER_WORD
             }
-            
+
             word = ~words[u]
         }
     }
@@ -917,7 +921,7 @@ public class BitSet: Hashable, CustomStringConvertible {
         i = i + (i >>> 16)
         i = i + (i >>> 32)
 
-        return Int(i) & 0x7f 
+        return Int(i) & 0x7f
     }
 
     /**
@@ -1068,7 +1072,7 @@ public class BitSet: Hashable, CustomStringConvertible {
              h ^= words[i] * (i + 1)
              i -= 1
         }
-        
+
         return Int(Int32((h >> 32) ^ h))
     }
 

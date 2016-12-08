@@ -1,33 +1,7 @@
-/*
-* [The "BSD license"]
-*  Copyright (c) 2012 Terence Parr
-*  Copyright (c) 2012 Sam Harwell
-*  Copyright (c) 2015 Janyou
-*  All rights reserved.
-*
-*  Redistribution and use in source and binary forms, with or without
-*  modification, are permitted provided that the following conditions
-*  are met:
-*
-*  1. Redistributions of source code must retain the above copyright
-*     notice, this list of conditions and the following disclaimer.
-*  2. Redistributions in binary form must reproduce the above copyright
-*     notice, this list of conditions and the following disclaimer in the
-*     documentation and/or other materials provided with the distribution.
-*  3. The name of the author may not be used to endorse or promote products
-*     derived from this software without specific prior written permission.
-*
-*  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-*  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-*  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-*  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-*  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-*  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-*  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-*  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-*  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-*  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
+/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
 
 
 import Foundation
@@ -163,11 +137,11 @@ public class PredictionContext: Hashable, CustomStringConvertible {
         for i in 0..<length {
             hash = MurmurHash.update(hash, returnStates[i])
         }
-        
+
         hash = MurmurHash.finish(hash, 2 * parents.count)
         return hash
     }
-    
+
     // dispatch
     public static func merge(
         _ a: PredictionContext,
@@ -179,18 +153,18 @@ public class PredictionContext: Hashable, CustomStringConvertible {
             // assert ( a != nil && b != nil,"Expected: a!=null&&b!=null");
             //assert ( a!=nil && b!=nil,"Expected: a!=null&&b!=null"); // must be empty context, never null
             // share same graph if both same
-            
-            
+
+
             if a == b {
                 return a
             }
-            
+
             if (a is SingletonPredictionContext && b is SingletonPredictionContext) {
                 return mergeSingletons(a as! SingletonPredictionContext,
                     b as! SingletonPredictionContext,
                     rootIsWildcard, &mergeCache)
             }
-            
+
             // At least one of a or b is array
             // If one is $ and rootIsWildcard, return $ as * wildcard
             if (rootIsWildcard) {
@@ -201,7 +175,7 @@ public class PredictionContext: Hashable, CustomStringConvertible {
                     return b
                 }
             }
-            
+
             // convert singleton so both are arrays to normalize
             if (a is SingletonPredictionContext) {
                 a = ArrayPredictionContext(a as! SingletonPredictionContext)
@@ -212,7 +186,7 @@ public class PredictionContext: Hashable, CustomStringConvertible {
             return mergeArrays(a as! ArrayPredictionContext, b as! ArrayPredictionContext,
                 rootIsWildcard, &mergeCache)
     }
-    
+
     /**
      * Merge two {@link org.antlr.v4.runtime.atn.SingletonPredictionContext} instances.
      *
@@ -245,7 +219,7 @@ public class PredictionContext: Hashable, CustomStringConvertible {
         _ b: SingletonPredictionContext,
         _ rootIsWildcard: Bool,
         _ mergeCache: inout DoubleKeyMap<PredictionContext, PredictionContext, PredictionContext>?) -> PredictionContext {
- 
+
             if let mergeCache = mergeCache {
                 var previous: PredictionContext? = mergeCache.get(a, b)
                 if previous != nil {
@@ -256,15 +230,15 @@ public class PredictionContext: Hashable, CustomStringConvertible {
                     return previous!
                 }
             }
-            
-        
+
+
             if let rootMerge = mergeRoot(a, b, rootIsWildcard) {
                 if mergeCache != nil {
                     mergeCache!.put(a, b, rootMerge)
                 }
                 return rootMerge
             }
-            
+
             if (a.returnState == b.returnState) {
                 // a == b
                 let parent: PredictionContext = merge(a.parent!, b.parent!, rootIsWildcard, &mergeCache);
@@ -329,7 +303,7 @@ public class PredictionContext: Hashable, CustomStringConvertible {
                 return a_
             }
     }
-    
+
     /**
      * Handle case where at least one of {@code a} or {@code b} is
      * {@link #EMPTY}. In the following diagrams, the symbol {@code $} is used
@@ -401,7 +375,7 @@ public class PredictionContext: Hashable, CustomStringConvertible {
             }
             return nil
     }
-    
+
     /**
      * Merge two {@link org.antlr.v4.runtime.atn.ArrayPredictionContext} instances.
      *
@@ -426,7 +400,7 @@ public class PredictionContext: Hashable, CustomStringConvertible {
         _ b: ArrayPredictionContext,
         _ rootIsWildcard: Bool,
         _ mergeCache: inout DoubleKeyMap<PredictionContext, PredictionContext, PredictionContext>?) -> PredictionContext {
-            
+
             if (mergeCache != nil) {
                 var previous: PredictionContext? = mergeCache!.get(a, b)
                 if (previous != nil) {
@@ -437,18 +411,18 @@ public class PredictionContext: Hashable, CustomStringConvertible {
                     return previous!
                 }
             }
-            
+
             // merge sorted payloads a + b => M
             var i: Int = 0 // walks a
             var j: Int = 0 // walks b
             var k: Int = 0// walks target M array
-            
+
             let aReturnStatesLength = a.returnStates.count
             let bReturnStatesLength = b.returnStates.count
-        
+
             let mergedReturnStatesLength = aReturnStatesLength + bReturnStatesLength
             var mergedReturnStates: [Int] = [Int](repeating: 0, count: mergedReturnStatesLength)
-            
+
             var mergedParents: [PredictionContext?] = [PredictionContext?](repeating: nil, count: mergedReturnStatesLength)
             //new PredictionContext[a.returnStates.length + b.returnStates.length];
             // walk and merge to yield mergedParents, mergedReturnStates
@@ -456,7 +430,7 @@ public class PredictionContext: Hashable, CustomStringConvertible {
             let bReturnStates = b.returnStates
             let aParents = a.parents
             let bParents = b.parents
- 
+
             while i < aReturnStatesLength && j < bReturnStatesLength {
                 let a_parent: PredictionContext? = aParents[i]
                 let b_parent: PredictionContext? = bParents[j]
@@ -472,8 +446,8 @@ public class PredictionContext: Hashable, CustomStringConvertible {
                     var ax_ax: Bool = (a_parent != nil && b_parent != nil)
                     ax_ax = ax_ax  && a_parent! == b_parent!
 //                    let ax_ax: Bool = (a_parent != nil && b_parent != nil) && a_parent! == b_parent!  // ax+ax -> ax
-                    
-                    
+
+
                     if (both$ || ax_ax) {
                         mergedParents[k] = a_parent // choose left
                         mergedReturnStates[k] = payload
@@ -499,10 +473,10 @@ public class PredictionContext: Hashable, CustomStringConvertible {
                 }
                 k += 1
             }
-            
+
             // copy over any payloads remaining in either array
             if (i < aReturnStatesLength) {
-                
+
                 for p in i..<aReturnStatesLength {
                     mergedParents[k] = aParents[p]
                     mergedReturnStates[k] = aReturnStates[p]
@@ -515,7 +489,7 @@ public class PredictionContext: Hashable, CustomStringConvertible {
                     k += 1
                 }
             }
-            
+
             // trim merged if we combined a few that had same stack tops
             if (k < mergedParents.count) {
                 // write index < last position; trim
@@ -533,10 +507,10 @@ public class PredictionContext: Hashable, CustomStringConvertible {
                 mergedParents = Array(mergedParents[0 ..< k])
                 mergedReturnStates = Array(mergedReturnStates[0 ..< k])
             }
-            
+
             let M: ArrayPredictionContext =
             ArrayPredictionContext(mergedParents, mergedReturnStates)
-            
+
             // if we created same array as a or b, return that instead
             // TODO: track whether this is possible above during merge sort for speed
             if M == a {
@@ -551,18 +525,18 @@ public class PredictionContext: Hashable, CustomStringConvertible {
                 }
                 return b
             }
-            
+
             //modify by janyou
             //combineCommonParents(&mergedParents)
             M.combineCommonParents()
-            
+
             if mergeCache != nil {
                 mergeCache!.put(a, b, M)
             }
             // print("merge array 4 \(M)")
             return M
     }
-    
+
     /**
      * Make pass over all <em>M</em> {@code parents}; merge any {@code equals()}
      * ones.
@@ -579,15 +553,15 @@ public class PredictionContext: Hashable, CustomStringConvertible {
 //                }
 //            }
 //        }
-//        
+//
 //        for p in 0..<length {
 //            if let parent: PredictionContext = parents[p] {
 //                parents[p] = uniqueParents[parent]
 //            }
 //        }
-//        
+//
 //    }
-    
+
     public static func toDOTString(_ context: PredictionContext?) -> String {
         if (context == nil) {
             return ""
@@ -595,12 +569,12 @@ public class PredictionContext: Hashable, CustomStringConvertible {
         let buf: StringBuilder = StringBuilder()
         buf.append("digraph G {\n")
         buf.append("rankdir=LR;\n")
-        
+
         var nodes: Array<PredictionContext> = getAllContextNodes(context!)
-        
+
         nodes.sort(by: { $0.id > $1.id })
-        
-        
+
+
         for current: PredictionContext in nodes {
             if (current is SingletonPredictionContext) {
                 let s: String = String(current.id)
@@ -634,7 +608,7 @@ public class PredictionContext: Hashable, CustomStringConvertible {
             buf.append("]")
             buf.append("\"];\n")
         }
-        
+
         for current: PredictionContext in nodes {
             if (current === EMPTY) {
                 continue
@@ -656,11 +630,11 @@ public class PredictionContext: Hashable, CustomStringConvertible {
                 }
             }
         }
-        
+
         buf.append("}\n")
         return buf.toString()
     }
-    
+
     // From Sam
     public static func getCachedContext(
         _ context: PredictionContext,
@@ -669,18 +643,18 @@ public class PredictionContext: Hashable, CustomStringConvertible {
             if (context.isEmpty()) {
                 return context
             }
-            
+
             var existing: PredictionContext? = visited[context]
             if (existing != nil) {
                 return existing!
             }
-            
+
             existing = contextCache.get(context)
             if (existing != nil) {
                 visited[context] = existing!
                 return existing!
             }
-            
+
             var changed: Bool = false
             var parents: [PredictionContext?] = [PredictionContext?](repeating: nil, count: context.size())
             let length = parents.count
@@ -689,30 +663,30 @@ public class PredictionContext: Hashable, CustomStringConvertible {
                 if context.getParent(i) == nil {
                     return context
                 }
-                
+
                 let parent: PredictionContext = getCachedContext(context.getParent(i)!, contextCache, visited)
                 //modified by janyou != !==
                 if (changed || parent !== context.getParent(i)) {
                     if (!changed) {
                         parents = [PredictionContext?](repeating: nil, count: context.size())
-                        
+
                         for j in 0..<context.size() {
                             parents[j] = context.getParent(j)
                         }
-                        
+
                         changed = true
                     }
-                    
+
                     parents[i] = parent
                 }
             }
-            
+
             if (!changed) {
                 contextCache.add(context)
                 visited[context] = context
                 return context
             }
-            
+
             var updated: PredictionContext
             if (parents.count == 0) {
                 updated = EMPTY
@@ -724,16 +698,16 @@ public class PredictionContext: Hashable, CustomStringConvertible {
                     updated = ArrayPredictionContext(parents, arrayPredictionContext.returnStates)
                 }
             }
-            
+
             contextCache.add(updated)
             visited[updated] = updated
             visited[context] = updated
-            
+
             return updated
     }
-    
-    
-    
+
+
+
     // ter's recursive version of Sam's getAllNodes()
     public static func getAllContextNodes(_ context: PredictionContext) -> Array<PredictionContext> {
         var nodes: Array<PredictionContext> = Array<PredictionContext>()
@@ -742,12 +716,12 @@ public class PredictionContext: Hashable, CustomStringConvertible {
         getAllContextNodes_(context, &nodes, visited)
         return nodes
     }
-    
+
     public static func getAllContextNodes_(_ context: PredictionContext?,
                                            _ nodes: inout Array<PredictionContext>,
                                            _ visited: HashMap<PredictionContext, PredictionContext>) {
         //if (context == nil || visited.keys.contains(context!)) {
-        
+
         guard let context = context , visited[context] == nil else {
             return
         }
@@ -758,16 +732,16 @@ public class PredictionContext: Hashable, CustomStringConvertible {
             getAllContextNodes_(context.getParent(i), &nodes, visited)
         }
     }
-    
+
     public func toString<T:ATNSimulator>(_ recog: Recognizer<T>) -> String {
         return NSStringFromClass(PredictionContext.self)
         //		return toString(recog, ParserRuleContext.EMPTY);
     }
-    
+
     public func toStrings<T:ATNSimulator>(_ recognizer: Recognizer<T>, _ currentState: Int) -> [String] {
         return toStrings(recognizer, PredictionContext.EMPTY, currentState)
     }
-    
+
     // FROM SAM
     public func toStrings<T:ATNSimulator>(_ recognizer: Recognizer<T>?, _ stop: PredictionContext, _ currentState: Int) -> [String] {
         var result: Array<String> = Array<String>()
@@ -786,26 +760,26 @@ public class PredictionContext: Hashable, CustomStringConvertible {
                         while (1 << bits) < p.size() {
                             bits += 1
                         }
-                        
+
                         let mask: Int = (1 << bits) - 1
                         index = (perm >> offset) & mask
-                        
+
                         //last &= index >= p.size() - 1;
                         //last = Bool(Int(last) & (index >= p.size() - 1));
                         last = last && (index >= p.size() - 1)
-                        
+
                         if (index >= p.size()) {
                             continue outer
                         }
                         offset += bits
                     }
-                    
+
                     if let recognizer = recognizer {
                         if (localBuffer.length > 1) {
                             // first char is '[', if more than that this isn't the first rule
                             localBuffer.append(" ")
                         }
-                        
+
                         let atn: ATN = recognizer.getATN()
                         let s: ATNState = atn.states[stateNumber]!
                         let ruleName: String = recognizer.getRuleNames()[s.ruleIndex!]
@@ -817,7 +791,7 @@ public class PredictionContext: Hashable, CustomStringConvertible {
                                     // first char is '[', if more than that this isn't the first rule
                                     localBuffer.append(" ")
                                 }
-                                
+
                                 localBuffer.append(p.getReturnState(index))
                             }
                         }
@@ -827,19 +801,19 @@ public class PredictionContext: Hashable, CustomStringConvertible {
                 }
                 localBuffer.append("]")
                 result.append(localBuffer.toString())
-                
+
                 if (last) {
                     break
                 }
-                
+
                 perm += 1
         }
-        
+
         return result
     }
-    
+
     public var description: String {
-        
+
         return String(describing: PredictionContext.self) + "@" + String(Unmanaged.passUnretained(self).toOpaque().hashValue)
     }
 }
@@ -853,7 +827,7 @@ public func ==(lhs: RuleContext, rhs: ParserRuleContext) -> Bool {
 }
 
 public func ==(lhs: PredictionContext, rhs: PredictionContext) -> Bool {
-    
+
     if lhs === rhs {
         return true
     }
@@ -864,11 +838,11 @@ public func ==(lhs: PredictionContext, rhs: PredictionContext) -> Bool {
     if (lhs is SingletonPredictionContext) && (rhs is SingletonPredictionContext) {
         return (lhs as! SingletonPredictionContext) == (rhs as! SingletonPredictionContext)
     }
-    
+
     if (lhs is ArrayPredictionContext) && (rhs is ArrayPredictionContext) {
         return (lhs as! ArrayPredictionContext) == (rhs as! ArrayPredictionContext)
     }
-    
+
     return false
 }
 
