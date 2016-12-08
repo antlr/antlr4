@@ -3,13 +3,14 @@
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
-package org.antlr.v4.test.tool;
+package org.antlr.v4.test.runtime.java.api;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.LexerInterpreter;
 import org.antlr.v4.runtime.TokenStreamRewriter;
 import org.antlr.v4.runtime.misc.Interval;
+import org.antlr.v4.test.runtime.java.BaseJavaTest;
 import org.antlr.v4.tool.LexerGrammar;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,7 +18,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class TestTokenStreamRewriter extends BaseJavaToolTest {
+public class TestTokenStreamRewriter extends BaseJavaTest {
 
 	/** Public default constructor used by TestRig */
 	public TestTokenStreamRewriter() {
