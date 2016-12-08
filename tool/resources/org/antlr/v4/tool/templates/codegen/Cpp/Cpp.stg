@@ -500,6 +500,7 @@ LeftRecursiveRuleFunction(currentRule, args, code, locals, ruleCtx, altLabelCtxs
   size_t parentState = getState();
   <parser.name>::<currentRule.ctxType> *_localctx = _tracker.createInstance\<<currentRule.ctxType>\>(_ctx, parentState<currentRule.args: {a | , <a.name>}>);
   <parser.name>::<currentRule.ctxType> *previousContext = _localctx;
+  (void)previousContext;
   size_t startState = <currentRule.startState>;
   enterRecursionRule(_localctx, <currentRule.startState>, <parser.name>::Rule<currentRule.name; format = "cap">, precedence);
 
@@ -948,19 +949,19 @@ AddToLabelList(a) ::= <<
 
 TokenLabelType() ::= "<file.TokenLabelType; null = {Token}> *"
 
-TokenDeclHeader(t) ::= "<TokenLabelType()><t.name> = nullptr;"
+TokenDeclHeader(t) ::= "<TokenLabelType()><t.name> = nullptr"
 TokenDecl(t) ::= "<! Variable Declaration !>"
 
 TokenTypeDeclHeader(t) ::= "<! Local Variable !>"
 TokenTypeDecl(t) ::= "size_t <t.name> = 0;"
 
-TokenListDeclHeader(t) ::= "std::vector\<Token *> <t.name>;"
+TokenListDeclHeader(t) ::= "std::vector\<Token *> <t.name>"
 TokenListDecl(t) ::= "<! Variable Declaration !>"
 
-RuleContextDeclHeader(r) ::= "<parser.name>::<r.ctxName> *<r.name> = nullptr;"
+RuleContextDeclHeader(r) ::= "<parser.name>::<r.ctxName> *<r.name> = nullptr"
 RuleContextDecl(r) ::= "<! Variable Declaration !>"
 
-RuleContextListDeclHeader(rdecl) ::= "std::vector\<<rdecl.ctxName> *> <rdecl.name>;"
+RuleContextListDeclHeader(rdecl) ::= "std::vector\<<rdecl.ctxName> *> <rdecl.name>"
 RuleContextListDecl(rdecl) ::= "<! Variable Declaration !>"
 
 ContextTokenGetterDeclHeader(t) ::= "tree::TerminalNode *<t.name>();"
