@@ -263,10 +263,10 @@ bool <if (r.factory.g.lexer)><lexer.name><else><parser.name><endif>::<r.name>Sem
 
 //--------------------------------------------------------------------------------------------------
 
-ParserHeader(parser, funcs, atn, sempredFuncs, superClass = {Parser}) ::= <<
+ParserHeader(parser, funcs, atn, sempredFuncs, superClass = {antlr4::Parser}) ::= <<
 <namedActions.context>
 
-class <parser.name> : public antlr4::<superClass> {
+class <parser.name> : public <superClass> {
 public:
 <if (parser.tokens)>
   enum {
