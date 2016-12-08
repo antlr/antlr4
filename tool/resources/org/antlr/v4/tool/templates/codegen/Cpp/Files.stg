@@ -47,8 +47,6 @@ LexerFileHeader(file, lexer, namedActions) ::= <<
 
 <namedActions.postinclude>
 
-using namespace antlr4;
-
 <if(file.genPackage)>namespace <file.genPackage> {<endif>
 
 <lexer>
