@@ -12,10 +12,5 @@ public enum LabelType {
     TOKEN_LABEL,
     RULE_LIST_LABEL,
     TOKEN_LIST_LABEL,
-    LEXER_STRING_LABEL,         // used in lexer for x='a'
-    SUBRULE_LABEL,              // x=(...)
-    SUBRULE_LIST_LABEL,         // x+=(...)
-    WILDCARD_TREE_LABEL,        // Used in tree grammar x=.
-    WILDCARD_TREE_LIST_LABEL    // Used in tree grammar x+=.
-    ;
+    LEXER_STRING_LABEL;         // used in lexer for x='a'
 }
