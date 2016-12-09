@@ -328,7 +328,10 @@ class Parser (Recognizer):
                 node = self._ctx.addTokenNode(o)
             if hasListener:
                 for listener in self._parseListeners:
-                    listener.visitTerminal(node)
+                    if isinstance(node, ErrorNode):
+                        listener.visitErrorNode(node)
+                    elif isinstance(node, TerminalNode):
+                        listener.visitTerminal(node)
         return o
 
     def addContextToParseTree(self):
