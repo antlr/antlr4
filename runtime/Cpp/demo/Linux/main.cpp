@@ -30,7 +30,7 @@ int main(int , const char **) {
   }
 
   TParser parser(&tokens);
-  Ref<tree::ParseTree> tree = parser.main();
+  tree::ParseTree* tree = parser.main();
 
   std::cout << tree->toStringTree(&parser) << std::endl << std::endl;
 
