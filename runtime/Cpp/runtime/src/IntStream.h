@@ -53,7 +53,11 @@ namespace antlr4 {
   /// </summary>
   class ANTLR4CPP_PUBLIC IntStream {
   public:
-    static const size_t EOF = (size_t)-1;
+#if defined(_MSC_VER) && _MSC_VER == 1900
+    static const size_t EOF = (__int32)-1; /* typedef std::basic_string<__int32> i32string; */
+#else
+    static const size_t EOF = (char32_t)-1;/* typedef basic_string<char32_t> u32string; */
+#endif
     
     /// The value returned by <seealso cref="#LA LA()"/> when the end of the stream is
     /// reached.
