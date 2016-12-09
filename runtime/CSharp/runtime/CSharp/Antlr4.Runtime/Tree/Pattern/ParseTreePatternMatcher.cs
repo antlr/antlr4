@@ -138,7 +138,7 @@ namespace Antlr4.Runtime.Tree.Pattern
             {
             }
         }
-
+        
         [System.Serializable]
         public class StartRuleDoesNotConsumeFullPattern : Exception
         {

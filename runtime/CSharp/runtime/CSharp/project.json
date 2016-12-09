@@ -1,0 +1,16 @@
+{
+  "buildOptions": {
+    "define": [ "DEBUG", "TRACE", "DOTNETCORE", "NET40PLUS", "NET45PLUS" ],
+    "keyFile": "../Antlr4.snk",
+    "xmlDoc": true
+  },
+  "dependencies": {
+    "NETStandard.Library": "1.6.0"
+  },
+  "frameworks": {
+    "netstandard1.5": {
+      "imports": "dnxcore50"
+    }
+  },
+  "version": "4.5.3-*"
+}
