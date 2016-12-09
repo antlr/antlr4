@@ -31,12 +31,6 @@
     </dependency>
     <dependency>
       <groupId>org.antlr</groupId>
-      <artifactId>antlr4</artifactId>
-      <version>${project.version}</version>
-      <type>test-jar</type>
-    </dependency>
-    <dependency>
-      <groupId>org.antlr</groupId>
       <artifactId>antlr4-runtime-testsuite</artifactId>
       <version>${project.version}</version>
       <type>test-jar</type>
@@ -76,6 +70,18 @@
             <antlr-javascript-runtime>../../antlr4-javascript/src</antlr-javascript-runtime>
           </systemPropertyVariables>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>2.6</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>test-jar</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
