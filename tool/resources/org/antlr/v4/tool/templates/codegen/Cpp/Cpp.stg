@@ -153,7 +153,7 @@ const atn::ATN& <lexer.name>::getATN() const {
 <if (actionFuncs)>
 void <lexer.name>::action(RuleContext *context, size_t ruleIndex, size_t actionIndex) {
   switch (ruleIndex) {
-    <lexer.actionFuncs.values: {f | case <f.ruleIndex>: <f.name>Action(dynamic_cast\<RuleContext *>(context), actionIndex); break;}; separator="\n">
+    <lexer.actionFuncs.values: {f | case <f.ruleIndex>: <f.name>Action(context, actionIndex); break;}; separator="\n">
 
   default:
     break;
@@ -164,7 +164,7 @@ void <lexer.name>::action(RuleContext *context, size_t ruleIndex, size_t actionI
 <if (sempredFuncs)>
 bool <lexer.name>::sempred(RuleContext *context, size_t ruleIndex, size_t predicateIndex) {
   switch (ruleIndex) {
-    <lexer.sempredFuncs.values: {f | case <f.ruleIndex>: return <f.name>Sempred(dynamic_cast\<RuleContext *>(context), predicateIndex);}; separator="\n">
+    <lexer.sempredFuncs.values: {f | case <f.ruleIndex>: return <f.name>Sempred(context, predicateIndex);}; separator="\n">
 
   default:
     break;
