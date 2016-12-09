@@ -44,11 +44,11 @@
 
   <build>
     <sourceDirectory>src</sourceDirectory>
-    <testResources>
-      <testResource>
-        <directory>test</directory>
-      </testResource>
-    </testResources>
+    <resources>
+      <resource>
+        <directory>resources</directory>
+      </resource>
+    </resources>
     <plugins>
       <plugin>
         <groupId>org.antlr</groupId>

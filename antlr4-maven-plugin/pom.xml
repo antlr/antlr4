@@ -98,6 +98,11 @@
   </dependencies>
 
   <build>
+    <resources>
+      <resource>
+        <directory>resources</directory>
+      </resource>
+    </resources>
     <testSourceDirectory>src/test</testSourceDirectory>
     <testResources>
       <testResource>

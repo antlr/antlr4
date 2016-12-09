@@ -145,17 +145,6 @@
   </dependencyManagement>
 
   <build>
-    <resources>
-      <resource>
-        <directory>resources</directory>
-      </resource>
-    </resources>
-    <testSourceDirectory>test</testSourceDirectory>
-    <testResources>
-      <testResource>
-        <directory>test</directory>
-      </testResource>
-    </testResources>
     <pluginManagement>
       <plugins>
         <plugin>

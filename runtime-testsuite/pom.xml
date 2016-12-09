@@ -71,16 +71,18 @@
 	</dependencies>
 
 	<build>
-		<sourceDirectory>src</sourceDirectory>
 		<testSourceDirectory>test</testSourceDirectory>
-		<resources>
-			<resource>
+		<testResources>
+			<testResource>
 				<directory>resources</directory>
-			</resource>
-			<resource>
+			</testResource>
+			<testResource>
 				<directory>../runtime</directory>
-			</resource>
-		</resources>
+				<excludes>
+					<exclude>Java/**</exclude>
+				</excludes>
+			</testResource>
+		</testResources>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
