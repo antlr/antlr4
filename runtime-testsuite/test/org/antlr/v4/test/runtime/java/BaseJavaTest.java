@@ -779,7 +779,7 @@ public class BaseJavaTest implements RuntimeTestSupport {
 //		System.out.println(dot.getDOT(g.atn.ruleToStartState[g.getRule(ruleName).index]));
 
 		Rule r = g.getRule(ruleName);
-		ATNState startState = g.atn.ruleToStartState[r.index];
+		ATNState startState = g.getATN().ruleToStartState[r.index];
 		ATNPrinter serializer = new ATNPrinter(g, startState);
 		String result = serializer.asString();
 
