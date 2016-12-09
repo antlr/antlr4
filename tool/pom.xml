@@ -17,24 +17,6 @@
 
   <dependencies>
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.11</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.seleniumhq.selenium</groupId>
-      <artifactId>selenium-java</artifactId>
-      <version>2.44.0</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-server</artifactId>
-      <version>8.1.16.v20140903</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>org.antlr</groupId>
       <artifactId>antlr4-runtime</artifactId>
       <version>${project.version}</version>
@@ -43,13 +25,11 @@
       <groupId>org.antlr</groupId>
       <artifactId>antlr-runtime</artifactId>
       <version>3.5.2</version>
-      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.antlr</groupId>
       <artifactId>ST4</artifactId>
       <version>4.0.8</version>
-      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.abego.treelayout</groupId>
