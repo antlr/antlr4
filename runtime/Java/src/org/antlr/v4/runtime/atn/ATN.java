@@ -138,8 +138,14 @@ public class ATN {
 	 * {@link RuleStopState} of the outermost context without matching any
 	 * symbols, {@link Token#EOF} is added to the returned set.
 	 *
-	 * <p>If {@code context} is {@code null}, it is treated as
-	 * {@link ParserRuleContext#EMPTY}.</p>
+	 * <p>If {@code context} is {@code null}, it is treated as {@link ParserRuleContext#EMPTY}.</p>
+	 *
+	 * Note that this does NOT give you the set of all tokens that could
+	 * appear at a given token position.  This function always computes
+	 * what token(s) can come next specific to a single context (call stack),
+	 * which is what you want for error reporting and recovery.  Getting
+	 * all *possible* tokens given a partial input stream is a separate
+	 * computation. See https://github.com/antlr/antlr4/issues/1428
 	 *
 	 * @param stateNumber the ATN state number
 	 * @param context the full parse context
