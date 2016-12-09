@@ -145,6 +145,7 @@ class IntervalSet(object):
                 elif v<i.stop-1:
                     x = range(i.start, v)
                     i.start = v + 1
+                    self.intervals[k] = range(v + 1, i.stop)
                     self.intervals.insert(k, x)
                     return
                 k += 1
