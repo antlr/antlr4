@@ -15,11 +15,6 @@
   <artifactId>antlr4-tool-testsuite</artifactId>
   <name>ANTLR 4 Tool Tests</name>
   <description>A collection of tests for ANTLR 4 Runtime libraries.</description>
-
-  <prerequisites>
-    <maven>3.0</maven>
-  </prerequisites>
-
   <inceptionYear>2009</inceptionYear>
 
   <dependencies>
@@ -39,13 +34,11 @@
     <dependency>
       <groupId>org.antlr</groupId>
       <artifactId>ST4</artifactId>
-      <version>4.0.8</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.11</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -57,7 +50,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.12.4</version>
         <configuration>
           <includes>
             <include>**/Test*.java</include>
@@ -74,7 +66,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
-        <version>2.6</version>
         <executions>
           <execution>
             <goals>
