@@ -109,6 +109,11 @@ public class ParseTreesDescriptors {
 		 */
 		@CommentHasStringValue
 		public String grammar;
+
+		@Override
+		public boolean ignore(String targetName) {
+			return !targetName.equals("Java");
+		}
 	}
 
 	public static class NoViableAlt extends BaseParserTestDescriptor {
