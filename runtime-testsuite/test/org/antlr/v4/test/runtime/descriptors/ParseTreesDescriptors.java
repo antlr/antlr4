@@ -74,9 +74,9 @@ public class ParseTreesDescriptors {
 
 	}
 
-	public static class ExtraTokensShouldBeInTree extends BaseParserTestDescriptor {
+	public static class ExtraTokensAndAltLabels extends BaseParserTestDescriptor {
 		public String input = "${ ? a ?}";
-		public String output = "(s ${ ? (v a) ? })\n";
+		public String output = "(s ${ (v ? a) ? })\n";
 		public String errors =
 			"line 1:3 extraneous input '?' expecting {'a', 'b'}\n"+
 			"line 1:7 extraneous input '?' expecting '}'\n";
