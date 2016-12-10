@@ -8,11 +8,13 @@ package org.antlr.v4.gui;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.DiagnosticErrorListener;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.atn.PredictionMode;
 
@@ -194,8 +196,13 @@ public class TestRig {
 			tokens.fill();
 
 			if ( showTokens ) {
-				for (Object tok : tokens.getTokens()) {
-					System.out.println(tok);
+				for (Token tok : tokens.getTokens()) {
+					if ( tok instanceof CommonToken ) {
+						System.out.println(((CommonToken)tok).toString(lexer));
+					}
+					else {
+						System.out.println(tok.toString());
+					}
 				}
 			}
 
