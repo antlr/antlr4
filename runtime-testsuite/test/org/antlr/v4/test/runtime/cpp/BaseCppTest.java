@@ -589,7 +589,7 @@ public class BaseCppTest implements RuntimeTestSupport {
 		String inputPath = new File(new File(tmpdir), "input").getAbsolutePath();
 		String cxx = System.getenv("CXX");// clang++, g++-5, ...
 		if (cxx==null || cxx.length()==0) {
-			cxx = String("clang++");// FIXME: with $> export CXX="clang++"
+			cxx = new String("clang++");// FIXME: with $> export CXX="clang++"
 		}
 
 		// Build runtime using cmake once.
