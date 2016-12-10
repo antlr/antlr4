@@ -138,3 +138,24 @@ For the parser there are the same actions as shown above for the lexer. In addit
 * **@parser::basevisitordefinitions**
 
 and should be self explanatory now. Note: there is no *context* action for listeners or visitors, simply because they would be even less used than the other actions and there are so many already.
+
+## FAQ
+
+### ANTLR cannot generate Cpp code as of version x.x.x
+
+Example stacktrace:
+
+```
+error(31):  ANTLR cannot generate Cpp code as of version 4.5.3
+Exception in thread "main" java.lang.NullPointerException
+	at org.antlr.v4.analysis.LeftRecursiveRuleAnalyzer.getArtificialOpPrecRule(LeftRecursiveRuleAnalyzer.java:235)
+	at org.antlr.v4.analysis.LeftRecursiveRuleTransformer.translateLeftRecursiveRule(LeftRecursiveRuleTransformer.java:140)
+	at org.antlr.v4.analysis.LeftRecursiveRuleTransformer.translateLeftRecursiveRules(LeftRecursiveRuleTransformer.java:95)
+	at org.antlr.v4.semantics.SemanticPipeline.process(SemanticPipeline.java:93)
+	at org.antlr.v4.Tool.processNonCombinedGrammar(Tool.java:399)
+	at org.antlr.v4.Tool.process(Tool.java:386)
+	at org.antlr.v4.Tool.processGrammarsOnCommandLine(Tool.java:345)
+	at org.antlr.v4.Tool.main(Tool.java:192)
+```
+
+Solution: you are using the default jar, which does not support Cpp target as of version 4.5.3. Use the 4.5.4-SNAPSHOT available from Soft-Gems site
