@@ -5,7 +5,6 @@ import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.test.runtime.java.BaseJavaTest;
-import org.antlr.v4.tool.DOTGenerator;
 import org.antlr.v4.tool.Grammar;
 import org.junit.Test;
 
@@ -97,41 +96,48 @@ public class TestExpectedTokens extends BaseJavaTest {
 	@Test public void testFollowIncludedInLeftRecursiveRule() throws Exception {
 		String gtext =
 			"grammar T;\n" +
+			"s : expr EOF ;\n" +
 			"expr : L expr R\n"+
 			"     | expr PLUS expr\n"+
 			"     | ID\n"+
 			"     ;\n";
 		Grammar g = new Grammar(gtext);
 		String atnText =
-			"RuleStart_expr_0->BlockStart_8\n"+
-			"BlockStart_8->s2\n"+
-			"BlockStart_8->s7\n"+
-			"s2-action_0:-1->s3\n"+
-			"s7-ID->BlockEnd_9\n"+
-			"s3-L->s4\n"+
-			"BlockEnd_9->StarLoopEntry_15\n"+
-			"s4-expr->RuleStart_expr_0\n"+
-			"StarLoopEntry_15->StarBlockStart_13\n"+
-			"StarLoopEntry_15->s16\n"+
-			"s5-R->s6\n"+
-			"StarBlockStart_13->s10\n"+
-			"s16->RuleStop_expr_1\n"+
-			"s6->BlockEnd_9\n"+
-			"s10-2 >= _p->s11\n"+
-			"RuleStop_expr_1->s5\n"+
-			"RuleStop_expr_1->BlockEnd_14\n"+
-			"s11-PLUS->s12\n"+
-			"s12-expr->RuleStart_expr_0\n"+
-			"BlockEnd_14->StarLoopBack_17\n"+
-			"StarLoopBack_17->StarLoopEntry_15\n";
+			"RuleStart_expr_2->BlockStart_13\n"+
+			"BlockStart_13->s7\n"+
+			"BlockStart_13->s12\n"+
+			"s7-action_1:-1->s8\n"+
+			"s12-ID->BlockEnd_14\n"+
+			"s8-L->s9\n"+
+			"BlockEnd_14->StarLoopEntry_20\n"+
+			"s9-expr->RuleStart_expr_2\n"+
+			"StarLoopEntry_20->StarBlockStart_18\n"+
+			"StarLoopEntry_20->s21\n"+
+			"s10-R->s11\n"+
+			"StarBlockStart_18->s15\n"+
+			"s21->RuleStop_expr_3\n"+
+			"s11->BlockEnd_14\n"+
+			"s15-2 >= _p->s16\n"+
+			"RuleStop_expr_3->s5\n"+
+			"RuleStop_expr_3->s10\n"+
+			"RuleStop_expr_3->BlockEnd_19\n"+
+			"s16-PLUS->s17\n"+
+			"s17-expr->RuleStart_expr_2\n"+
+			"BlockEnd_19->StarLoopBack_22\n"+
+			"StarLoopBack_22->StarLoopEntry_20\n";
 		checkRuleATN(g, "expr", atnText);
 
 		ATN atn = g.getATN();
-		DOTGenerator gen = new DOTGenerator(g);
-		String dot = gen.getDOT(atn.states.get(0), g.getRuleNames(), false);
-		System.out.println(dot);
-		int blkStartStateNumber = 9;
-		IntervalSet tokens = atn.getExpectedTokens(blkStartStateNumber, null);
-		assertEquals("{<EOF>, PLUS}", tokens.toString(g.getTokenNames()));
+
+//		DOTGenerator gen = new DOTGenerator(g);
+//		String dot = gen.getDOT(atn.states.get(2), g.getRuleNames(), false);
+//		System.out.println(dot);
+
+		// Simulate call stack after input '(x'
+		ParserRuleContext callStackFrom_s = new ParserRuleContext(null, 4);
+		ParserRuleContext callStackFrom_expr = new ParserRuleContext(callStackFrom_s, 9);
+		int afterID = 14;
+		IntervalSet tokens = atn.getExpectedTokens(afterID, callStackFrom_expr);
+		assertEquals("{R, PLUS}", tokens.toString(g.getTokenNames()));
 	}
 }
