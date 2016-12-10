@@ -34,13 +34,15 @@
       <artifactId>antlr4-runtime-testsuite</artifactId>
       <version>${project.version}</version>
 			<scope>test</scope>
+			<type>test-jar</type>
     </dependency>
     <dependency>
       <groupId>org.antlr</groupId>
       <artifactId>antlr4</artifactId>
       <version>${project.version}</version>
 			<scope>test</scope>
-    </dependency>
+			<type>test-jar</type>
+		</dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>

@@ -22,7 +22,7 @@
       <plugin>
         <groupId>org.antlr</groupId>
         <artifactId>antlr4-maven-plugin</artifactId>
-        <version>4.5</version>
+        <version>4.5.3</version> <!-- use older version to process XPathLexer.g4, avoiding cyclic build dependency -->
         <executions>
           <execution>
             <id>antlr</id>
@@ -60,7 +60,6 @@
       </plugin>
       <plugin>
         <artifactId>maven-jar-plugin</artifactId>
-        <version>2.4</version>
         <configuration>
           <archive>
             <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
