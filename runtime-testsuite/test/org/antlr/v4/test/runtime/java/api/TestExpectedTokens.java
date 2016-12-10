@@ -93,6 +93,8 @@ public class TestExpectedTokens extends BaseJavaTest {
 		assertEquals("{A, B}", tokens.toString(g.getTokenNames()));
 	}
 
+	// Test for https://github.com/antlr/antlr4/issues/1480
+	// can't reproduce
 	@Test public void testFollowIncludedInLeftRecursiveRule() throws Exception {
 		String gtext =
 			"grammar T;\n" +
@@ -133,11 +135,16 @@ public class TestExpectedTokens extends BaseJavaTest {
 //		String dot = gen.getDOT(atn.states.get(2), g.getRuleNames(), false);
 //		System.out.println(dot);
 
-		// Simulate call stack after input '(x'
+		// Simulate call stack after input '(x' from rule s
 		ParserRuleContext callStackFrom_s = new ParserRuleContext(null, 4);
 		ParserRuleContext callStackFrom_expr = new ParserRuleContext(callStackFrom_s, 9);
 		int afterID = 14;
 		IntervalSet tokens = atn.getExpectedTokens(afterID, callStackFrom_expr);
+		assertEquals("{R, PLUS}", tokens.toString(g.getTokenNames()));
+
+		// Simulate call stack after input '(x' from within rule expr
+		callStackFrom_expr = new ParserRuleContext(null, 9);
+		tokens = atn.getExpectedTokens(afterID, callStackFrom_expr);
 		assertEquals("{R, PLUS}", tokens.toString(g.getTokenNames()));
 	}
 }
