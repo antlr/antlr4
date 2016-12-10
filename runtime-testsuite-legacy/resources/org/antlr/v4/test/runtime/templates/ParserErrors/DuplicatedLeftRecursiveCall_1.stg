@@ -1,7 +1,0 @@
-import "DuplicatedLeftRecursiveCall.stg"
-
-Input() ::= "x"
-
-Output() ::= ""
-
-Errors() ::= ""

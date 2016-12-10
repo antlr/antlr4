@@ -1,9 +1,0 @@
-import "DirectCallToLeftRecursiveRule.stg"
-
-Input() ::= "x y"
-
-Output() ::= <<
-(a (a x) y)<\n>
->>
-
-Errors() ::= ""

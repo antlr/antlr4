@@ -1,9 +1,0 @@
-import "TernaryExpr.stg"
-
-Input() ::= "a?b: c?d:e"
-
-Output() ::= <<
-(s (e (e a) ? (e b) : (e (e c) ? (e d) : (e e))) \<EOF>)<\n>
->>
-
-Errors() ::= ""
