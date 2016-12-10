@@ -3,7 +3,10 @@
 The C++ target supports all platforms that can either run MS Visual Studio 2013 (or newer), XCode 7 (or newer) or CMake (C++11 required). All build tools can either create static or dynamic libraries, both as 64bit or 32bit arch. Additionally, XCode can create an iOS library.
 
 ## How to create a C++ lexer or parser?
-This is pretty much the same as creating a Java lexer or parser, except you need to specify the language target, for example:
+
+1. Download the jar from the Soft-Gems site, **not** the one from antlr.org
+1. Install the tools as described in antlr.org: `antlr4`, `grun`. Pointing to the jar you downloaded
+1. Generate it: this is pretty much the same as creating a Java lexer or parser, except you need to specify the language target `Cpp`:
 
 ```
 $ antlr4 -Dlanguage=Cpp MyGrammar.g4
