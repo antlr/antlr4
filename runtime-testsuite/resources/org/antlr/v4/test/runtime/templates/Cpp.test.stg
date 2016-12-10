@@ -167,11 +167,11 @@ tree::ParseTreeWalker::DEFAULT.walk(&listener, <s>);
 
 TreeNodeWithAltNumField(X) ::= <<
 @parser::members {
-class MyRuleNode : public ParserRuleContext {
+class MyRuleNode : public antlr4::ParserRuleContext {
 public:
   size_t altNum;
-	MyRuleNode(ParserRuleContext *parent, int invokingStateNumber)
-		: ParserRuleContext(parent, invokingStateNumber) {
+	MyRuleNode(antlr4::ParserRuleContext *parent, int invokingStateNumber)
+		: antlr4::ParserRuleContext(parent, invokingStateNumber) {
 	}
 	virtual size_t getAltNumber() const override { return altNum; }
 	virtual void setAltNumber(size_t altNum) override { this->altNum = altNum; }
