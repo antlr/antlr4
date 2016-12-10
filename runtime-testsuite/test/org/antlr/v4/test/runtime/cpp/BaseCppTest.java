@@ -588,6 +588,9 @@ public class BaseCppTest implements RuntimeTestSupport {
 		String binPath = new File(new File(tmpdir), "a.out").getAbsolutePath();
 		String inputPath = new File(new File(tmpdir), "input").getAbsolutePath();
 		String cxx = System.getenv("CXX");// clang++, g++-5, ...
+		if (!cxx || cxx.length()==0) {
+			cxx = String("clang++");// FIXME: with $> export CXX="clang++"
+		}
 
 		// Build runtime using cmake once.
 		synchronized (runtimeBuiltOnce) {
