@@ -64,7 +64,7 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.11</version>
+      <version>4.12</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -105,6 +105,11 @@
   </dependencies>
 
   <build>
+    <resources>
+      <resource>
+        <directory>resources</directory>
+      </resource>
+    </resources>
     <testSourceDirectory>src/test</testSourceDirectory>
     <testResources>
       <testResource>
