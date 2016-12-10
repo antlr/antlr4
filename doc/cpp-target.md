@@ -4,7 +4,7 @@ The C++ target supports all platforms that can either run MS Visual Studio 2013 
 
 ## How to create a C++ lexer or parser?
 
-1. Download the jar from the Soft-Gems site, **not** the one from antlr.org
+1. Download the jar from the [Soft-Gems site][soft-gems], **not** the one from antlr.org
 1. Install the tools as described in antlr.org: `antlr4`, `grun`. Pointing to the jar you downloaded
 1. Generate it: this is pretty much the same as creating a Java lexer or parser, except you need to specify the language target `Cpp`:
 
@@ -158,4 +158,6 @@ Exception in thread "main" java.lang.NullPointerException
 	at org.antlr.v4.Tool.main(Tool.java:192)
 ```
 
-Solution: you are using the default jar, which does not support Cpp target as of version 4.5.3. Use the 4.5.4-SNAPSHOT available from Soft-Gems site
+Solution: you are using the default jar, which does not support Cpp target as of version 4.5.3. Use the 4.5.4-SNAPSHOT available from [Soft-Gems site][soft-gems]
+
+[soft-gems]: http://www.soft-gems.net/index.php/tools/49-the-antlr4-c-target-is-here
