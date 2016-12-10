@@ -150,7 +150,8 @@ public class LL1Analyzer {
 			if (ctx == null) {
 				look.add(Token.EPSILON);
 				return;
-			} else if (ctx.isEmpty() && addEOF) {
+			}
+			else if (ctx.isEmpty() && addEOF) {
 				look.add(Token.EOF);
 				return;
 			}
@@ -160,26 +161,26 @@ public class LL1Analyzer {
             if ( ctx==null ) {
                 look.add(Token.EPSILON);
                 return;
-            } else if (ctx.isEmpty() && addEOF) {
+            }
+            else if (ctx.isEmpty() && addEOF) {
 				look.add(Token.EOF);
 				return;
 			}
 
 			if ( ctx != PredictionContext.EMPTY ) {
 				// run thru all possible stack tops in ctx
-				for (int i = 0; i < ctx.size(); i++) {
-					ATNState returnState = atn.states.get(ctx.getReturnState(i));
-//					System.out.println("popping back to "+retState);
-
-					boolean removed = calledRuleStack.get(returnState.ruleIndex);
-					try {
-						calledRuleStack.clear(returnState.ruleIndex);
+				boolean removed = calledRuleStack.get(s.ruleIndex);
+				try {
+					calledRuleStack.clear(s.ruleIndex);
+					for (int i = 0; i < ctx.size(); i++) {
+						ATNState returnState = atn.states.get(ctx.getReturnState(i));
+//					    System.out.println("popping back to "+retState);
 						_LOOK(returnState, stopState, ctx.getParent(i), look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
 					}
-					finally {
-						if (removed) {
-							calledRuleStack.set(returnState.ruleIndex);
-						}
+				}
+				finally {
+					if (removed) {
+						calledRuleStack.set(s.ruleIndex);
 					}
 				}
 				return;

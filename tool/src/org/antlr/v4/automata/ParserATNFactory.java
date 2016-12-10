@@ -113,7 +113,10 @@ public class ParserATNFactory implements ATNFactory {
 
 		for (Triple<Rule, ATNState, ATNState> pair : preventEpsilonClosureBlocks) {
 			LL1Analyzer analyzer = new LL1Analyzer(atn);
-			if (analyzer.LOOK(pair.b, pair.c, null).contains(org.antlr.v4.runtime.Token.EPSILON)) {
+			ATNState blkStart = pair.b;
+			ATNState blkStop = pair.c;
+			IntervalSet lookahead = analyzer.LOOK(blkStart, blkStop, null);
+			if ( lookahead.contains(org.antlr.v4.runtime.Token.EPSILON)) {
 				ErrorType errorType = pair.a instanceof LeftRecursiveRule ? ErrorType.EPSILON_LR_FOLLOW : ErrorType.EPSILON_CLOSURE;
 				g.tool.errMgr.grammarError(errorType, g.fileName, ((GrammarAST)pair.a.ast.getChild(0)).getToken(), pair.a.name);
 			}
