@@ -317,6 +317,40 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 		super.testErrors(pair, true);
 	}
 
+	// Test for https://github.com/antlr/antlr4/issues/1203
+	@Test public void testEpsilonNestedClosureAnalysis() {
+		String grammar =
+			"grammar T;\n"+
+			"s : (a a)* ;\n"+
+			"a : 'foo'* ;\n";
+		String expected =
+			"error(" + ErrorType.EPSILON_CLOSURE.code + "): T.g4:2:0: rule s contains a closure with at least one alternative that can match an empty string\n";
+
+		String[] pair = new String[] {
+			grammar,
+			expected
+		};
+
+		super.testErrors(pair, true);
+	}
+
+	// Test for https://github.com/antlr/antlr4/issues/1203
+	@Test public void testEpsilonOptionalAndClosureAnalysis() {
+		String grammar =
+			"grammar T;\n"+
+			"s : (a a)? ;\n"+
+			"a : 'foo'* ;\n";
+		String expected =
+			"warning(" + ErrorType.EPSILON_OPTIONAL.code + "): T.g4:2:0: rule s contains an optional block with at least one alternative that can match an empty string\n";
+
+		String[] pair = new String[] {
+			grammar,
+			expected
+		};
+
+		super.testErrors(pair, true);
+	}
+
 	@Test public void testEpsilonOptionalAnalysis() {
 		String grammar =
 			"grammar A;\n"
