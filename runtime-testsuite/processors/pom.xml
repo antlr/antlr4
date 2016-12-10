@@ -44,16 +44,10 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
 					<verbose>true</verbose>
-					<source>${maven.compiler.source}</source>
-					<target>${maven.compiler.target}</target>
 					<compilerArgument>
 						-proc:none
 					</compilerArgument>
 				</configuration>
-			</plugin>
-			<plugin>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.4</version>
 			</plugin>
 		</plugins>
 	</build>
