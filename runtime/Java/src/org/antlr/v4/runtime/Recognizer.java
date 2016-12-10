@@ -69,7 +69,7 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 			Map<String, Integer> result = tokenTypeMapCache.get(vocabulary);
 			if (result == null) {
 				result = new HashMap<String, Integer>();
-				for (int i = 0; i < getATN().maxTokenType; i++) {
+				for (int i = 0; i <= getATN().maxTokenType; i++) {
 					String literalName = vocabulary.getLiteralName(i);
 					if (literalName != null) {
 						result.put(literalName, i);
