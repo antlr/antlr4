@@ -1,9 +1,0 @@
-import "TernaryExpr.stg"
-
-Input() ::= "a"
-
-Output() ::= <<
-(s (e a) \<EOF>)<\n>
->>
-
-Errors() ::= ""

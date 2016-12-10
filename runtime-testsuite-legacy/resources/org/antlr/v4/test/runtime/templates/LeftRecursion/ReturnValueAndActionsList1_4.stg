@@ -1,9 +1,0 @@
-import "ReturnValueAndActionsList1.stg"
-
-Input() ::= "a*b,c,x*y>>r"
-
-Output() ::= <<
-(s (expr (expr (expr a) * (expr b)) , (expr c) , (expr (expr x) * (expr y)) \>> (expr r)) \<EOF>)<\n>
->>
-
-Errors() ::= ""

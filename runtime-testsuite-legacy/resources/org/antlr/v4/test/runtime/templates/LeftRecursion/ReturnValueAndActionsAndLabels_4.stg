@@ -1,9 +1,0 @@
-import "ReturnValueAndActionsAndLabels.stg"
-
-Input() ::= "i++*3"
-
-Output() ::= <<
-12<\n>
->>
-
-Errors() ::= ""

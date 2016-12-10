@@ -1,9 +1,0 @@
-import "StarLexerSingleElement.stg"
-
-Input() ::= "c"
-
-Output() ::= <<
-c<\n>
->>
-
-Errors() ::= ""

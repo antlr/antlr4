@@ -1,9 +1,0 @@
-import "JavaExpressions.stg"
-
-Input() ::= "(T)x"
-
-Output() ::= <<
-(s (e ( (typespec T) ) (e x)) \<EOF>)<\n>
->>
-
-Errors() ::= ""
