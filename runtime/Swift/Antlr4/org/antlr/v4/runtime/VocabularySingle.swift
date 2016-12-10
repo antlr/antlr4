@@ -160,6 +160,10 @@ public class Vocabulary: Hashable {
         return String(tokenType)
     }
 
+    public func getLiteralNames() -> [String?] { return literalNames }
+    public func getSymbolicNames() -> [String?] { return symbolicNames }
+    public func getDisplayNames() -> [String?] { return displayNames }
+
     public var hashValue: Int {
         return Unmanaged.passUnretained(self).toOpaque().hashValue
 //        return unsafeAddress(of: self).hashValue

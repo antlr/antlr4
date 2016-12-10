@@ -181,6 +181,10 @@ namespace dfa {
     /// other user-visible messages which reference specific token types. </returns>
     virtual std::string getDisplayName(size_t tokenType) const;
 
+    virtual std::vector<std::string> getLiteralNames() const;
+    virtual std::vector<std::string> getSymbolicNames() const;
+    virtual std::vector<std::string> getDisplayNames() const;
+
   private:
     std::vector<std::string> const _literalNames;
     std::vector<std::string> const _symbolicNames;

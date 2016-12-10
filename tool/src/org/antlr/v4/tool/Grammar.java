@@ -873,12 +873,6 @@ public class Grammar implements AttributeResolver {
 	 */
 	public int getMaxCharValue() {
 		return org.antlr.v4.runtime.Lexer.MAX_CHAR_VALUE;
-//		if ( generator!=null ) {
-//			return generator.target.getMaxCharValue(generator);
-//		}
-//		else {
-//			return Label.MAX_CHAR_VALUE;
-//		}
 	}
 
 	/** Return a set of all possible token or char types for this grammar */
@@ -896,7 +890,10 @@ public class Grammar implements AttributeResolver {
 		return IntervalSet.of(Lexer.MIN_CHAR_VALUE, getMaxCharValue());
 	}
 
-	/** How many token types have been allocated so far? */
+	/** How many token types have been allocated so far?
+	 *  Because we don't count type 0, the max token type is
+	 *  same as the number of tokens.
+	 */
 	public int getMaxTokenType() {
 		return typeToTokenList.size() - 1; // don't count 0 (invalid)
 	}

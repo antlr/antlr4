@@ -143,12 +143,6 @@ public class SwiftTarget extends Target {
                 writeFile(parserAtnJSON,g,jsonFileName);
             }
         }
-
-//        else if (g instanceof ParseR) {
-//            System.out.println("parserGrammar");
-//        }
-//
-        //getCodeGenerator().write(outputFileST, fileName);
     }
 
     private String getLexerOrParserATNJson(Grammar g, String fileName) {
@@ -161,8 +155,7 @@ public class SwiftTarget extends Target {
         return JSON;
     }
 
-    private  void writeFile(String content,Grammar g,String fileName) {
-
+    private void writeFile(String content,Grammar g,String fileName) {
         try {
             Writer w =    this.getCodeGenerator().tool.getOutputFileWriter(g, fileName);
             w.write(content);
@@ -174,6 +167,7 @@ public class SwiftTarget extends Target {
                     fileName);
         }
     }
+
     @Override
     protected STGroup loadTemplates() {
         STGroup result = targetTemplates.get();
@@ -185,6 +179,7 @@ public class SwiftTarget extends Target {
 
         return result;
     }
+
     //added by janyou -->
     public String serializeTojson(ATN atn) {
         JsonObjectBuilder builder =  Json.createObjectBuilder();

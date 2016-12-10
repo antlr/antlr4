@@ -169,5 +169,49 @@ namespace Antlr4.Runtime
         /// </returns>
         [return: NotNull]
         string GetDisplayName(int tokenType);
+
+		/** Gets the list of literals ('this' from rules like {@code THIS : 'this';})
+		 *  found in the associated recognizer. Literal at index i is
+		 *  associated with token type i.  Token types without literals
+		 *  (such as {@code ID : [A-Z]+;}) have null entries
+		 *  in the returned array. The first possibly valid entry is
+		 *  {@link Token#MIN_USER_TOKEN_TYPE}.
+		 *
+		 * @return The non-null array of literal names assigned to tokens; size is not guaranteed to be max tokentype + 1.
+		 *
+		 * @since 4.6
+		 */
+        [return: NotNull]
+		string[] GetLiteralNames();
+
+		/** Gets the list of symbolic names (ID from rules like {@code ID : [A-Z]+;})
+		 *  found in the associated recognizer. Name at index i is
+		 *  associated with token type i. All tokens have a symbol name and so
+		 *  all entries in array at {@link Token#MIN_USER_TOKEN_TYPE} and above
+		 *  have a non-null entry.
+		 *
+		 *  EOF has no entry in the return array as its token type is -1.
+		 *
+		 * return The non-null array of symbol names assigned to tokens; size is not guaranteed to be max tokentype + 1.
+		 *
+		 * since 4.6
+		 */
+		[return: NotNull]
+		string[] GetSymbolicNames();
+
+		/** Gets the list of display names as computed by {@link #getDisplayName(int)}
+		 *  found in the associated recognizer. Name at index i is
+		 *  associated with token type i. All tokens have a display name and so
+		 *  all entries in array at {@link Token#MIN_USER_TOKEN_TYPE} and above
+		 *  have a non-null entry.
+		 *
+		 *  EOF has no entry in the return array as its token type is -1.
+		 *
+		 * return The non-null array of display names assigned to tokens; size is not guaranteed to be max tokentype + 1.
+		 *
+		 * since 4.6
+		 */
+		[return: NotNull]
+		string[] GetDisplayNames();
     }
 }

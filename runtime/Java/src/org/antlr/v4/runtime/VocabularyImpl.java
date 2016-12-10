@@ -132,7 +132,7 @@ public class VocabularyImpl implements Vocabulary {
 
 	@Override
 	public String getLiteralName(int tokenType) {
-		if (tokenType >= 0 && tokenType < literalNames.length) {
+		if (tokenType >= Token.MIN_USER_TOKEN_TYPE && tokenType < literalNames.length) {
 			return literalNames[tokenType];
 		}
 
@@ -141,7 +141,7 @@ public class VocabularyImpl implements Vocabulary {
 
 	@Override
 	public String getSymbolicName(int tokenType) {
-		if (tokenType >= 0 && tokenType < symbolicNames.length) {
+		if (tokenType >= Token.MIN_USER_TOKEN_TYPE && tokenType < symbolicNames.length) {
 			return symbolicNames[tokenType];
 		}
 
@@ -172,5 +172,20 @@ public class VocabularyImpl implements Vocabulary {
 		}
 
 		return Integer.toString(tokenType);
+	}
+
+	@Override
+	public String[] getLiteralNames() {
+		return literalNames;
+	}
+
+	@Override
+	public String[] getSymbolicNames() {
+		return symbolicNames;
+	}
+
+	@Override
+	public String[] getDisplayNames() {
+		return displayNames;
 	}
 }

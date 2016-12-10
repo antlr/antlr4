@@ -8,9 +8,12 @@ package org.antlr.v4.test.tool;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.Vocabulary;
 import org.antlr.v4.runtime.VocabularyImpl;
+import org.antlr.v4.tool.Grammar;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import static junit.framework.TestCase.assertEquals;
 
 /**
  *
@@ -40,7 +43,8 @@ public class TestVocabulary extends BaseJavaToolTest {
 		Vocabulary vocabulary = VocabularyImpl.fromTokenNames(tokenNames);
 		Assert.assertNotNull(vocabulary);
 		Assert.assertEquals("EOF", vocabulary.getSymbolicName(Token.EOF));
-		for (int i = 0; i < tokenNames.length; i++) {
+		Assert.assertEquals(vocabulary.getMaxTokenType(), tokenNames.length-1);
+		for (int i = 0; i <= vocabulary.getMaxTokenType(); i++) {
 			Assert.assertEquals(tokenNames[i], vocabulary.getDisplayName(i));
 
 			if (tokenNames[i].startsWith("'")) {
@@ -58,4 +62,29 @@ public class TestVocabulary extends BaseJavaToolTest {
 		}
 	}
 
+
+	/** Test for https://github.com/antlr/antlr4/issues/1309
+	 *  Hmm...can't reproduce. Seems ok.
+	 */
+	@Test
+	public void testLastTokenType() throws Exception {
+		Grammar g = new Grammar(
+			"grammar T;\n" +
+			"tokens {\n"+
+			"   X, Y, Z\n" +  // tokens 1, 2, 3
+			"}\n" +
+			"a : A B ;\n" +   // tokens 4, 5
+			"X : 'x' ;\n"
+		);
+		assertEquals(5, g.getMaxTokenType());
+		Vocabulary v = g.getVocabulary();
+		assertEquals(5, v.getMaxTokenType());
+		assertEquals("'x'", v.getDisplayName(1));
+		assertEquals("Y", v.getDisplayName(2));
+		assertEquals("Z", v.getDisplayName(3));
+		assertEquals("A", v.getDisplayName(4));
+		assertEquals("B", v.getDisplayName(5));
+		assertEquals("X", v.getSymbolicName(1));
+		assertEquals(5, g.getTokenType("B"));
+	}
 }
