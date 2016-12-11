@@ -1,31 +1,6 @@
-/*
- * [The "BSD license"]
- *  Copyright (c) 2013 Terence Parr
- *  Copyright (c) 2013 Sam Harwell
- *  All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions
- *  are met:
- *
- *  1. Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  2. Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  3. The name of the author may not be used to endorse or promote products
- *     derived from this software without specific prior written permission.
- *
- *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- *  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- *  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
  */
 using System.Collections.Generic;
 using Antlr4.Runtime.Atn;
@@ -181,10 +156,10 @@ namespace Antlr4.Runtime.Atn
         /// conflicting subsets should fall back to full LL, even if the
         /// configuration sets don't resolve to the same alternative (e.g.
         /// <c/>
-        /// 
+        ///
         /// 1,2}} and
         /// <c/>
-        /// 
+        ///
         /// 3,4}}. If there is at least one non-conflicting
         /// configuration, SLL could continue with the hopes that more lookahead will
         /// resolve via one of those non-conflicting configurations.</p>
@@ -307,7 +282,7 @@ namespace Antlr4.Runtime.Atn
         /// </summary>
         /// <param name="configs">the configuration set to test</param>
         /// <returns>
-        /// 
+        ///
         /// <see langword="true"/>
         /// if any configuration in
         /// <paramref name="configs"/>
@@ -339,7 +314,7 @@ namespace Antlr4.Runtime.Atn
         /// </summary>
         /// <param name="configs">the configuration set to test</param>
         /// <returns>
-        /// 
+        ///
         /// <see langword="true"/>
         /// if all configurations in
         /// <paramref name="configs"/>
@@ -529,7 +504,7 @@ namespace Antlr4.Runtime.Atn
         /// <c>(s', 2, y)</c>
         /// yields non-conflicting set
         /// <c/>
-        /// 
+        ///
         /// 3}} U conflicting sets
         /// <c/>
         /// min(
@@ -538,7 +513,7 @@ namespace Antlr4.Runtime.Atn
         /// min(
         /// 1,2})} =
         /// <c/>
-        /// 
+        ///
         /// 1,3}} =&gt; continue
         /// </li>
         /// <li>
@@ -553,7 +528,7 @@ namespace Antlr4.Runtime.Atn
         /// <c>(s'', 1, z)</c>
         /// yields non-conflicting set
         /// <c/>
-        /// 
+        ///
         /// 1}} U conflicting sets
         /// <c/>
         /// min(
@@ -562,7 +537,7 @@ namespace Antlr4.Runtime.Atn
         /// min(
         /// 1,2})} =
         /// <c/>
-        /// 
+        ///
         /// 1}} =&gt; stop and predict 1</li>
         /// <li>
         /// <c>(s, 1, x)</c>
@@ -574,17 +549,17 @@ namespace Antlr4.Runtime.Atn
         /// <c>(s', 2, y)</c>
         /// yields conflicting, reduced sets
         /// <c/>
-        /// 
+        ///
         /// 1}} U
         /// <c/>
-        /// 
+        ///
         /// 1}} =
         /// <c/>
-        /// 
+        ///
         /// 1}} =&gt; stop and predict 1, can announce
         /// ambiguity
         /// <c/>
-        /// 
+        ///
         /// 1,2}}</li>
         /// <li>
         /// <c>(s, 1, x)</c>
@@ -596,13 +571,13 @@ namespace Antlr4.Runtime.Atn
         /// <c>(s', 3, y)</c>
         /// yields conflicting, reduced sets
         /// <c/>
-        /// 
+        ///
         /// 1}} U
         /// <c/>
-        /// 
+        ///
         /// 2}} =
         /// <c/>
-        /// 
+        ///
         /// 1,2}} =&gt; continue</li>
         /// <li>
         /// <c>(s, 1, x)</c>
@@ -614,13 +589,13 @@ namespace Antlr4.Runtime.Atn
         /// <c>(s', 4, y)</c>
         /// yields conflicting, reduced sets
         /// <c/>
-        /// 
+        ///
         /// 1}} U
         /// <c/>
-        /// 
+        ///
         /// 3}} =
         /// <c/>
-        /// 
+        ///
         /// 1,3}} =&gt; continue</li>
         /// </ul>
         /// <p><strong>EXACT AMBIGUITY DETECTION</strong></p>
@@ -638,7 +613,7 @@ namespace Antlr4.Runtime.Atn
         /// {1,2}, {1,3}}}, then regular LL prediction would terminate
         /// because the resolved set is
         /// <c/>
-        /// 
+        ///
         /// 1}}. To determine what the real
         /// ambiguity is, we have to know whether the ambiguity is between one and
         /// two or one and three so we keep going. We can only stop prediction when
@@ -647,7 +622,7 @@ namespace Antlr4.Runtime.Atn
         /// A=
         /// {1,2}}} or
         /// <c/>
-        /// 
+        ///
         /// {1,2},{1,2}}}, etc...</p>
         /// </remarks>
         public static int ResolvesToJustOneViableAlt(IEnumerable<BitSet> altsets)
@@ -663,7 +638,7 @@ namespace Antlr4.Runtime.Atn
         /// </summary>
         /// <param name="altsets">a collection of alternative subsets</param>
         /// <returns>
-        /// 
+        ///
         /// <see langword="true"/>
         /// if every
         /// <see cref="Antlr4.Runtime.Sharpen.BitSet"/>
@@ -687,7 +662,7 @@ namespace Antlr4.Runtime.Atn
         /// </summary>
         /// <param name="altsets">a collection of alternative subsets</param>
         /// <returns>
-        /// 
+        ///
         /// <see langword="true"/>
         /// if
         /// <paramref name="altsets"/>
@@ -718,7 +693,7 @@ namespace Antlr4.Runtime.Atn
         /// </summary>
         /// <param name="altsets">a collection of alternative subsets</param>
         /// <returns>
-        /// 
+        ///
         /// <see langword="true"/>
         /// if
         /// <paramref name="altsets"/>
@@ -748,7 +723,7 @@ namespace Antlr4.Runtime.Atn
         /// </summary>
         /// <param name="altsets">a collection of alternative subsets</param>
         /// <returns>
-        /// 
+        ///
         /// <see langword="true"/>
         /// if every member of
         /// <paramref name="altsets"/>

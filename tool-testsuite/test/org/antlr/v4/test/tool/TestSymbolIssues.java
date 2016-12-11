@@ -1,31 +1,7 @@
 /*
- * [The "BSD license"]
- *  Copyright (c) 2012 Terence Parr
- *  Copyright (c) 2012 Sam Harwell
- *  All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions
- *  are met:
- *
- *  1. Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  2. Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  3. The name of the author may not be used to endorse or promote products
- *     derived from this software without specific prior written permission.
- *
- *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- *  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- *  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
  */
 
 package org.antlr.v4.test.tool;
@@ -305,6 +281,41 @@ public class TestSymbolIssues extends BaseJavaToolTest {
 				"warning(" + ErrorType.INCOMPATIBLE_COMMANDS.code + "): L.g4:12:27: incompatible commands type and more\n" +
 				"warning(" + ErrorType.INCOMPATIBLE_COMMANDS.code + "): L.g4:13:33: incompatible commands channel and skip\n" +
 				"warning(" + ErrorType.INCOMPATIBLE_COMMANDS.code + "): L.g4:14:33: incompatible commands channel and more\n"
+		};
+
+		testErrors(test, false);
+	}
+
+	// https://github.com/antlr/antlr4/issues/1409
+	@Test public void testLabelsForTokensWithMixedTypes() {
+		String[] test = {
+				"grammar L;\n" +
+				"\n" +
+				"rule1                                    // Correct (Alternatives)\n" +
+				"    : t1 = a  #aLabel\n" +
+				"    | t1 = b  #bLabel\n" +
+				"    ;\n" +
+				"rule2                         //Incorrect type casting in generated code (RULE_LABEL)\n" +
+				"    : t2 = a | t2 = b\n" +
+				"    ;\n" +
+				"rule3\n" +
+				"    : t3 += a+ b t3 += c+     //Incorrect type casting in generated code (RULE_LIST_LABEL)\n" +
+				"    ;\n" +
+				"rule4\n" +
+				"    : a t4 = A b t4 = B c                // Correct (TOKEN_LABEL)\n" +
+				"    ;\n" +
+				"rule5\n" +
+				"    : a t5 += A b t5 += B c              // Correct (TOKEN_LIST_LABEL)\n" +
+				"    ;\n" +
+				"a: A;\n" +
+				"b: B;\n" +
+				"c: C;\n" +
+				"A: 'a';\n" +
+				"B: 'b';\n" +
+				"C: 'c';\n",
+
+				"error(" + ErrorType.LABEL_TYPE_CONFLICT.code + "): L.g4:8:15: label t2=b type mismatch with previous definition: t2=a\n" +
+				"error(" + ErrorType.LABEL_TYPE_CONFLICT.code + "): L.g4:11:17: label t3+=c type mismatch with previous definition: t3+=a\n"
 		};
 
 		testErrors(test, false);

@@ -1,3 +1,9 @@
+<!--
+  ~ Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+  ~ Use of this file is governed by the BSD 3-clause license that
+  ~ can be found in the LICENSE.txt file in the project root.
+  -->
+
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
@@ -30,7 +36,7 @@
   <developers>
     <developer>
       <name>Terence Parr</name>
-      <url>http://antlr.org/wiki/display/~admin/Home</url>
+      <url>http://parrt.cs.usfca.edu</url>
       <roles>
         <role>Project lead - ANTLR</role>
       </roles>
@@ -77,7 +83,6 @@
     <module>tool-testsuite</module>
     <module>runtime-testsuite/annotations</module>
     <module>runtime-testsuite/processors</module>
-    <!-- <module>runtime-testsuite-legacy</module>  -->
     <module>runtime-testsuite</module>
   </modules>
 
@@ -114,7 +119,6 @@
         <directory>resources</directory>
       </resource>
     </resources>
-    <testSourceDirectory>test</testSourceDirectory>
     <testResources>
       <testResource>
         <directory>test</directory>
@@ -125,6 +129,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
+          <version>3.6.0</version>
           <configuration>
             <source>${maven.compiler.source}</source>
             <target>${maven.compiler.target}</target>

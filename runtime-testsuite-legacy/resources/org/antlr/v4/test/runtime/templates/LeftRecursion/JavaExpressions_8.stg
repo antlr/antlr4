@@ -1,9 +1,0 @@
-import "JavaExpressions.stg"
-
-Input() ::= "new A().b"
-
-Output() ::= <<
-(s (e (e new (typespec A) ( )) . b) \<EOF>)<\n>
->>
-
-Errors() ::= ""

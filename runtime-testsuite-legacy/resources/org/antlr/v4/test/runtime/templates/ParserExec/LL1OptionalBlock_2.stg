@@ -1,9 +1,0 @@
-import "LL1OptionalBlock.stg"
-
-Input() ::= "a"
-
-Output() ::= <<
-a<\n>
->>
-
-Errors() ::= ""

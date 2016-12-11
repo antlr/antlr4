@@ -1,32 +1,6 @@
-﻿/*
- * [The "BSD license"]
- *  Copyright (c) 2016 Mike Lischke
- *  Copyright (c) 2013 Terence Parr
- *  Copyright (c) 2013 Dan McLaughlin
- *  All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions
- *  are met:
- *
- *  1. Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  2. Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  3. The name of the author may not be used to endorse or promote products
- *     derived from this software without specific prior written permission.
- *
- *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- *  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- *  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+﻿/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
  */
 
 #pragma once
@@ -198,7 +172,7 @@ namespace antlr4 {
     /// </summary>
     /// <seealso cref= #addParseListener </seealso>
     virtual void removeParseListeners();
-    
+
     /// <summary>
     /// Notify any parse listeners of an enter rule event.
     /// </summary>
@@ -210,7 +184,7 @@ namespace antlr4 {
     /// </summary>
     /// <seealso cref= #addParseListener </seealso>
     virtual void triggerExitRuleEvent();
-    
+
     /// <summary>
     /// Gets the number of syntax errors reported during parsing. This value is
     /// incremented each time <seealso cref="#notifyErrorListeners"/> is called.
@@ -380,18 +354,18 @@ namespace antlr4 {
     virtual std::string getSourceName();
 
     atn::ParseInfo getParseInfo() const;
-    
+
     /**
      * @since 4.3
      */
     void setProfile(bool profile);
-    
+
     /// <summary>
     /// During a parse is sometimes useful to listen in on the rule entry and exit
     ///  events as well as token matches. This is for quick and dirty debugging.
     /// </summary>
     virtual void setTrace(bool trace);
-    
+
     /**
      * Gets whether a {@link TraceListener} is registered as a parse listener
      * for the parser.
@@ -420,7 +394,7 @@ namespace antlr4 {
     TokenStream *_input;
 
     std::vector<int> _precedenceStack;
-    
+
     /// <summary>
     /// Specifies whether or not the parser should construct a parse tree during
     /// the parsing process. The default value is {@code true}.
@@ -439,10 +413,10 @@ namespace antlr4 {
     /// incremented each time <seealso cref="#notifyErrorListeners"/> is called.
     /// </summary>
     size_t _syntaxErrors;
-    
+
     /** Indicates parser has match()ed EOF token. See {@link #exitRule()}. */
     bool _matchedEOF;
-    
+
     virtual void addContextToParseTree();
 
     // All rule contexts created during a parse run. This is cleared when calling reset().

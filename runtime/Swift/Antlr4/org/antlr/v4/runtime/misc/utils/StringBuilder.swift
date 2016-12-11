@@ -1,9 +1,13 @@
+/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
+
 //
 //  StringBuilder.swift
 //   antlr.swift
 //
 //  Created by janyou on 15/9/4.
-//  Copyright © 2015 jlabs. All rights reserved.
 //
 
 import Foundation
@@ -60,4 +64,4 @@ public func +=<T:CustomStringConvertible>(lhs: StringBuilder, rhs: T) {
 public func +(lhs: StringBuilder, rhs: StringBuilder) -> StringBuilder {
     return StringBuilder(string: lhs.toString() + rhs.toString())
 }
- 
+
