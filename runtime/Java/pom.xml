@@ -96,7 +96,7 @@
 						<phase>process-classes</phase>
 						<configuration>
 							<instructions>
-								<Bundle-SymbolicName>org.antlr.antlr4-runtime-osgi</Bundle-SymbolicName>
+								<Bundle-SymbolicName>org.antlr.antlr4-runtime</Bundle-SymbolicName>
 							</instructions>
 						</configuration>
 						<goals>
