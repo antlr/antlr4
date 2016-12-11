@@ -209,14 +209,19 @@ dfa::DFAState *LexerATNSimulator::getExistingTargetState(dfa::DFAState *s, size_
     return nullptr;
   }
 
-  dfa::DFAState *target = s->edges[t - MIN_DFA_EDGE];
+  _edgeLock.readLock();
+  auto iterator = s->edges.find(t - MIN_DFA_EDGE);
 #if DEBUG_ATN == 1
-  if (target != nullptr) {
-    std::cout << std::string("reuse state ") << s->stateNumber << std::string(" edge to ") << target->stateNumber << std::endl;
+  if (iterator != s->edges.end()) {
+    std::cout << std::string("reuse state ") << s->stateNumber << std::string(" edge to ") << iterator->second->stateNumber << std::endl;
   }
 #endif
+  _edgeLock.readUnlock();
 
-  return target;
+  if (iterator == s->edges.end())
+    return nullptr;
+
+  return iterator->second;
 }
 
 dfa::DFAState *LexerATNSimulator::computeTargetState(CharStream *input, dfa::DFAState *s, size_t t) {
@@ -551,8 +556,9 @@ void LexerATNSimulator::addDFAEdge(dfa::DFAState *p, size_t t, dfa::DFAState *q)
     return;
   }
 
-  std::lock_guard<std::recursive_mutex> lck(_mutex);
+  _edgeLock.writeLock();
   p->edges[t - MIN_DFA_EDGE] = q; // connect
+  _edgeLock.writeUnlock();
 }
 
 dfa::DFAState *LexerATNSimulator::addDFAState(ATNConfigSet *configs) {
@@ -578,22 +584,23 @@ dfa::DFAState *LexerATNSimulator::addDFAState(ATNConfigSet *configs) {
 
   dfa::DFA &dfa = _decisionToDFA[_mode];
 
-  {
-    std::lock_guard<std::recursive_mutex> lck(_mutex);
-
-    if (!dfa.states.empty()) {
-      auto iterator = dfa.states.find(proposed);
-      if (iterator != dfa.states.end()) {
-        delete proposed;
-        return *iterator;
-      }
+  _stateLock.writeLock();
+  if (!dfa.states.empty()) {
+    auto iterator = dfa.states.find(proposed);
+    if (iterator != dfa.states.end()) {
+      delete proposed;
+      _stateLock.writeUnlock();
+      return *iterator;
     }
-
-    proposed->stateNumber = (int)dfa.states.size();
-    proposed->configs->setReadonly(true);
-    dfa.states.insert(proposed);
-    return proposed;
   }
+
+  proposed->stateNumber = (int)dfa.states.size();
+  proposed->configs->setReadonly(true);
+
+  dfa.states.insert(proposed);
+  _stateLock.writeUnlock();
+
+  return proposed;
 }
 
 dfa::DFA& LexerATNSimulator::getDFA(size_t mode) {

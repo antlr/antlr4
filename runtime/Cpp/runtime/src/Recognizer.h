@@ -168,7 +168,7 @@ namespace antlr4 {
     atn::ATNSimulator *_interpreter; // Set and deleted in descendants (or the profiler).
 
     // Mutex to manage synchronized access for multithreading.
-    std::recursive_mutex _mutex;
+    std::mutex _mutex;
 
   private:
     static std::map<const dfa::Vocabulary*, std::map<std::string, size_t>> _tokenTypeMapCache;

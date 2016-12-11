@@ -1096,7 +1096,7 @@
 		276E5CE51CDB57AA003FF4B4 /* Arrays.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Arrays.cpp; sourceTree = "<group>"; };
 		276E5CE61CDB57AA003FF4B4 /* Arrays.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Arrays.h; sourceTree = "<group>"; };
 		276E5CE71CDB57AA003FF4B4 /* BitSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BitSet.h; sourceTree = "<group>"; };
-		276E5CE81CDB57AA003FF4B4 /* CPPUtils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CPPUtils.cpp; sourceTree = "<group>"; };
+		276E5CE81CDB57AA003FF4B4 /* CPPUtils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CPPUtils.cpp; sourceTree = "<group>"; wrapsLines = 0; };
 		276E5CE91CDB57AA003FF4B4 /* CPPUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = CPPUtils.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		276E5CEA1CDB57AA003FF4B4 /* Declarations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Declarations.h; sourceTree = "<group>"; };
 		276E5CEB1CDB57AA003FF4B4 /* guid.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = guid.cpp; sourceTree = "<group>"; };
