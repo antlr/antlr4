@@ -22,7 +22,7 @@
       <plugin>
         <groupId>org.antlr</groupId>
         <artifactId>antlr4-maven-plugin</artifactId>
-        <version>4.5</version>
+        <version>4.5.3</version> <!-- use older version to process XPathLexer.g4, avoiding cyclic build dependency -->
         <executions>
           <execution>
             <id>antlr</id>
@@ -46,10 +46,6 @@
             <configuration>
               <instructions>
                 <Bundle-SymbolicName>org.antlr.antlr4-runtime-osgi</Bundle-SymbolicName>
-                <Implementation-Title>ANTLR 4 Runtime</Implementation-Title>
-                <Implementation-Vendor>ANTLR</Implementation-Vendor>
-                <Implementation-Vendor-Id>org.antlr</Implementation-Vendor-Id>
-                <Implementation-Version>${project.version}</Implementation-Version>
               </instructions>
             </configuration>
             <goals>
@@ -60,10 +56,12 @@
       </plugin>
       <plugin>
         <artifactId>maven-jar-plugin</artifactId>
-        <version>2.4</version>
+        <version>3.0.0</version>
         <configuration>
           <archive>
-            <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+            <manifest>
+              <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+            </manifest>
           </archive>
         </configuration>
       </plugin>
