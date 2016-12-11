@@ -41,7 +41,6 @@
       <artifactId>antlr4</artifactId>
       <version>${project.version}</version>
 			<scope>test</scope>
-			<type>test-jar</type>
 		</dependency>
     <dependency>
       <groupId>junit</groupId>
