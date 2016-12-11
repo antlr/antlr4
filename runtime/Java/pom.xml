@@ -19,6 +19,38 @@
   <build>
     <sourceDirectory>src</sourceDirectory>
     <plugins>
+      <plugin> <!-- attach src to jar -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin> <!-- attach javadoc to jar -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>2.10.4</version>
+        <configuration>
+          <javadocVersion>1.7</javadocVersion>
+          <includeDependencySources>false</includeDependencySources>
+          <dependencySourceIncludes>
+            <dependencySourceInclude>org.antlr:*</dependencySourceInclude>
+          </dependencySourceIncludes>
+        </configuration>
+        <executions>
+          <execution>
+            <id>attach-javadocs</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>org.antlr</groupId>
         <artifactId>antlr4-maven-plugin</artifactId>

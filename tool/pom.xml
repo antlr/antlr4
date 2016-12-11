@@ -52,6 +52,38 @@
       </testResource>
     </testResources>
     <plugins>
+      <plugin> <!-- attach src to jar -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+			<plugin> <!-- attach javadoc to jar -->
+     <groupId>org.apache.maven.plugins</groupId>
+     <artifactId>maven-javadoc-plugin</artifactId>
+     <version>2.10.4</version>
+     <configuration>
+       <javadocVersion>1.7</javadocVersion>
+       <includeDependencySources>false</includeDependencySources>
+       <dependencySourceIncludes>
+         <dependencySourceInclude>org.antlr:*</dependencySourceInclude>
+       </dependencySourceIncludes>
+     </configuration>
+     <executions>
+       <execution>
+         <id>attach-javadocs</id>
+         <goals>
+           <goal>jar</goal>
+         </goals>
+       </execution>
+     </executions>
+   </plugin>
       <plugin> <!-- this makes a fat jar with all dependencies -->
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
@@ -60,7 +92,11 @@
           <execution>
             <phase>package</phase>
             <configuration>
-              <dependencyReducedPomLocation>${project.build.directory}/dependency-reduced-pom.xml</dependencyReducedPomLocation>
+							<minimizeJar>false</minimizeJar>
+							<createDependencyReducedPom>false</createDependencyReducedPom>
+							<createSourcesJar>true</createSourcesJar>
+							<shadedArtifactAttached>true</shadedArtifactAttached>
+              <shadedClassifierName>complete</shadedClassifierName>
             </configuration>
             <goals>
               <goal>shade</goal>
@@ -68,6 +104,27 @@
           </execution>
         </executions>
       </plugin>
+      <!-- can't get this to add bundle items
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <version>2.5.4</version>
+        <executions>
+          <execution>
+            <id>bundle-manifest</id>
+            <phase>process-classes</phase>
+            <configuration>
+              <instructions>
+                <Bundle-SymbolicName>org.antlr.antlr4-tool-osgi</Bundle-SymbolicName>
+              </instructions>
+            </configuration>
+            <goals>
+              <goal>manifest</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      -->
       <plugin> <!-- this just jars up tool stuff and sets main class -->
         <artifactId>maven-jar-plugin</artifactId>
         <version>3.0.0</version>
