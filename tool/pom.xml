@@ -45,56 +45,53 @@
   </dependencies>
 
   <build>
-    <sourceDirectory>src</sourceDirectory>
-    <testResources>
-      <testResource>
-        <directory>test</directory>
-      </testResource>
-    </testResources>
-    <plugins>
-      <plugin> <!-- attach src to jar -->
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-source-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>attach-sources</id>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-			<plugin> <!-- attach javadoc to jar -->
-     <groupId>org.apache.maven.plugins</groupId>
-     <artifactId>maven-javadoc-plugin</artifactId>
-     <version>2.10.4</version>
-     <configuration>
-       <javadocVersion>1.7</javadocVersion>
-       <includeDependencySources>false</includeDependencySources>
-       <dependencySourceIncludes>
-         <dependencySourceInclude>org.antlr:*</dependencySourceInclude>
-       </dependencySourceIncludes>
-     </configuration>
-     <executions>
-       <execution>
-         <id>attach-javadocs</id>
-         <goals>
-           <goal>jar</goal>
-         </goals>
-       </execution>
-     </executions>
-   </plugin>
-      <plugin> <!-- this makes a fat jar with all dependencies -->
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-shade-plugin</artifactId>
-        <version>2.3</version>
-        <executions>
-          <execution>
+		<sourceDirectory>src</sourceDirectory>
+		<testResources>
+			<testResource>
+				<directory>test</directory>
+			</testResource>
+		</testResources>
+		<plugins>
+			<plugin> <!-- create src jar -->
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin> <!-- create javadoc jar -->
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.10.4</version>
+				<configuration>
+					<javadocVersion>1.7</javadocVersion>
+					<failOnError>false</failOnError>
+				</configuration>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin> <!-- this makes a fat jar with all dependencies -->
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>2.3</version>
+				<executions>
+					<execution>
             <phase>package</phase>
             <configuration>
 							<minimizeJar>false</minimizeJar>
 							<createDependencyReducedPom>false</createDependencyReducedPom>
-							<createSourcesJar>true</createSourcesJar>
+							<!--<createSourcesJar>true</createSourcesJar>-->
 							<shadedArtifactAttached>true</shadedArtifactAttached>
               <shadedClassifierName>complete</shadedClassifierName>
             </configuration>
