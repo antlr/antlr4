@@ -46,10 +46,6 @@
             <configuration>
               <instructions>
                 <Bundle-SymbolicName>org.antlr.antlr4-runtime-osgi</Bundle-SymbolicName>
-                <Implementation-Title>ANTLR 4 Runtime</Implementation-Title>
-                <Implementation-Vendor>ANTLR</Implementation-Vendor>
-                <Implementation-Vendor-Id>org.antlr</Implementation-Vendor-Id>
-                <Implementation-Version>${project.version}</Implementation-Version>
               </instructions>
             </configuration>
             <goals>
