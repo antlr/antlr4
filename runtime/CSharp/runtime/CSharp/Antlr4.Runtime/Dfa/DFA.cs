@@ -189,9 +189,10 @@ namespace Antlr4.Runtime.Dfa
 			return serializer.ToString();
 		}
 
-		public String toLexerString()
+		public String ToLexerString()
 		{
-			if (s0 == null) return "";
+			if (s0 == null) 
+				return "";
 			DFASerializer serializer = new LexerDFASerializer(this);
 			return serializer.ToString();
 		}

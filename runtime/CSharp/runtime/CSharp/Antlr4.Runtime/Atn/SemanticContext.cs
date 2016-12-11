@@ -399,7 +399,7 @@ namespace Antlr4.Runtime.Atn
                 SemanticContext result = operands[0];
                 for (int i = 1; i < operands.Count; i++)
                 {
-                    result = SemanticContext.AndOp(result, operands[i]);
+                    result = SemanticContext.And(result, operands[i]);
                 }
                 return result;
             }
@@ -531,7 +531,7 @@ namespace Antlr4.Runtime.Atn
                 SemanticContext result = operands[0];
                 for (int i = 1; i < operands.Count; i++)
                 {
-                    result = SemanticContext.OrOp(result, operands[i]);
+                    result = SemanticContext.Or(result, operands[i]);
                 }
                 return result;
             }
@@ -542,7 +542,7 @@ namespace Antlr4.Runtime.Atn
             }
         }
 
-        public static SemanticContext AndOp(SemanticContext a, SemanticContext b)
+        public static SemanticContext And(SemanticContext a, SemanticContext b)
         {
             if (a == null || a == NONE)
             {
@@ -561,7 +561,7 @@ namespace Antlr4.Runtime.Atn
         }
 
         /// <seealso cref="ParserATNSimulator.GetPredsForAmbigAlts(Antlr4.Runtime.Sharpen.BitSet, ATNConfigSet, int)"/>
-        public static SemanticContext OrOp(SemanticContext a, SemanticContext b)
+        public static SemanticContext Or(SemanticContext a, SemanticContext b)
         {
             if (a == null)
             {

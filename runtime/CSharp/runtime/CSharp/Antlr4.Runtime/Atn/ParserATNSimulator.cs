@@ -1275,7 +1275,7 @@ namespace Antlr4.Runtime.Atn
 			{
 				if (ambigAlts[c.alt])
 				{
-					altToPred[c.alt] = new SemanticContext.OR(altToPred[c.alt], c.semanticContext);
+					altToPred[c.alt] = SemanticContext.Or(altToPred[c.alt], c.semanticContext);
 				}
 			}
 
@@ -1960,8 +1960,7 @@ namespace Antlr4.Runtime.Atn
 					}
 				}
 				else {
-					SemanticContext newSemCtx =
-						new SemanticContext.AND(config.semanticContext, pt.Predicate);
+					SemanticContext newSemCtx = SemanticContext.And(config.semanticContext, pt.Predicate);
 					c = new ATNConfig(config, pt.target, newSemCtx);
 				}
 			}
@@ -2012,8 +2011,7 @@ namespace Antlr4.Runtime.Atn
 					}
 				}
 				else {
-					SemanticContext newSemCtx =
-						new SemanticContext.AND(config.semanticContext, pt.Predicate);
+					SemanticContext newSemCtx = SemanticContext.And(config.semanticContext, pt.Predicate);
 					c = new ATNConfig(config, pt.target, newSemCtx);
 				}
 			}

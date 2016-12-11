@@ -64,9 +64,9 @@ PlusText(a) ::= <%"<a>" + this.Text%>
 
 InputText() ::= "this.TokenStream.GetText()"
 
-LTEquals(i, v) ::= <%this.TokenStream.Lt(<i>).Text.Equals(<v>)%>
+LTEquals(i, v) ::= <%this.TokenStream.LT(<i>).Text.Equals(<v>)%>
 
-LANotEquals(i, v) ::= <%this.InputStream.La(<i>)!=<v>%>
+LANotEquals(i, v) ::= <%this.InputStream.LA(<i>)!=<v>%>
 
 TokenStartColumnEquals(i) ::= <%this.TokenStartColumn==<i>%>
 

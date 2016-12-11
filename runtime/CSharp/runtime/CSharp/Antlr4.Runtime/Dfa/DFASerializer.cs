@@ -82,35 +82,35 @@ namespace Antlr4.Runtime.Dfa
             if (dfa.states != null)
             {
                 List<DFAState> states = new List<DFAState>(dfa.states.Values);
-                states.Sort(new _IComparer_103());
+				states.Sort((x,y)=>x.stateNumber - y.stateNumber);
                 foreach (DFAState s in states)
                 {
-                    foreach (DFAState edge in s.edges)
-                    {
-                        buf.Append(GetStateString(s));
-                    }
-                }
+					int n = s.edges != null ? s.edges.Length : 0;
+					for (int i = 0; i < n; i++)
+					{
+						DFAState t = s.edges[i];
+						if (t != null && t.stateNumber != int.MaxValue)
+						{
+							buf.Append(GetStateString(s));
+							String label = GetEdgeLabel(i);
+							buf.Append("-");
+							buf.Append(label);
+							buf.Append("->");
+							buf.Append(GetStateString(t));
+							buf.Append('\n');
+						}
+					}
+	            }
             }
             string output = buf.ToString();
             if (output.Length == 0)
             {
                 return null;
             }
-            //return Utils.sortLinesInString(output);
             return output;
         }
 
-        private sealed class _IComparer_103 : IComparer<DFAState>
-        {
-            public _IComparer_103()
-            {
-            }
 
-            public int Compare(DFAState o1, DFAState o2)
-            {
-                return o1.stateNumber - o2.stateNumber;
-            }
-        }
 
         protected internal virtual string GetContextLabel(int i)
         {

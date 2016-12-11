@@ -691,7 +691,7 @@ public class BaseCSharpTest implements RuntimeTestSupport, SpecialRuntimeTestAss
 				"        tokens.Fill();\n" +
 				"        foreach (object t in tokens.GetTokens())\n" +
 				"			Console.WriteLine(t);\n" +
-				(showDFA?"Console.Write(lex.Interpreter.GetDFA(Lexer.DefaultMode).ToLexerString());\n":"")+
+				(showDFA?"        Console.Write(lex.Interpreter.GetDFA(Lexer.DEFAULT_MODE).ToLexerString());\n":"")+
 				"    }\n" +
 				"}"
 		);
