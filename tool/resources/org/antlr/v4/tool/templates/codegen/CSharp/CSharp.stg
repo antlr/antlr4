@@ -964,6 +964,8 @@ Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
 [System.CodeDom.Compiler.GeneratedCode("ANTLR", "<file.ANTLRVersion>")]
 [System.CLSCompliant(false)]
 public partial class <csIdentifier.(lexer.name)> : <superClass; null="Lexer"> {
+	protected static DFA[] decisionToDFA;
+	protected static PredictionContextCache sharedContextCache = new PredictionContextCache();
 	public const int
 		<lexer.tokens:{k | <tokenType.(k)>=<lexer.tokens.(k)>}; separator=", ", wrap, anchor>;
 	<if(lexer.channels)>
@@ -984,7 +986,7 @@ public partial class <csIdentifier.(lexer.name)> : <superClass; null="Lexer"> {
 	public <csIdentifier.(lexer.name)>(ICharStream input)
 		: base(input)
 	{
-		Interpreter = new LexerATNSimulator(this,_ATN);
+		Interpreter = new LexerATNSimulator(this, _ATN, decisionToDFA, sharedContextCache);
 	}
 
 	<vocabulary(lexer.literalNames, lexer.symbolicNames)>
@@ -997,6 +999,12 @@ public partial class <csIdentifier.(lexer.name)> : <superClass; null="Lexer"> {
 
 	public override string SerializedAtn { get { return _serializedATN; } }
 
+	static <csIdentifier.(lexer.name)>() {
+		decisionToDFA = new DFA[_ATN.NumberOfDecisions];
+		for (int i = 0; i \< _ATN.NumberOfDecisions; i++) {
+			decisionToDFA[i] = new DFA(_ATN.GetDecisionState(i), i);
+		}
+	}
 	<dumpActions(lexer, "", actionFuncs, sempredFuncs)>
 	<atn>
 }
@@ -1014,6 +1022,8 @@ private static string _serializeATN()
 
 public static readonly ATN _ATN =
 	new ATNDeserializer().Deserialize(_serializedATN.ToCharArray());
+
+
 >>
 
 initValue(typeName) ::= <<

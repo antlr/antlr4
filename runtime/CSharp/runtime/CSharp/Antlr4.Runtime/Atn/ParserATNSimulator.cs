@@ -356,11 +356,11 @@ namespace Antlr4.Runtime.Atn
 				{
 					// the start state for a precedence DFA depends on the current
 					// parser precedence, and is provided by a DFA method.
-					s0 = dfa.GetPrecedenceStartState(parser.Precedence, false);
+					s0 = dfa.GetPrecedenceStartState(parser.Precedence);
 				}
 				else {
 					// the start state for a "regular" DFA is just s0
-					s0 = dfa.s0.Get();
+					s0 = dfa.s0;
 				}
 
 				if (s0 == null)
@@ -387,19 +387,20 @@ namespace Antlr4.Runtime.Atn
 						 * appropriate start state for the precedence level rather
 						 * than simply setting DFA.s0.
 						 */
-						dfa.s0.Get().configSet = s0_closure; // not used for prediction but useful to know start configs anyway
+						dfa.s0.configSet = s0_closure; // not used for prediction but useful to know start configs anyway
 						s0_closure = ApplyPrecedenceFilter(s0_closure);
 						s0 = AddDFAState(dfa, new DFAState(s0_closure));
 						dfa.SetPrecedenceStartState(parser.Precedence, s0);
 					}
 					else {
 						s0 = AddDFAState(dfa, new DFAState(s0_closure));
-						dfa.s0.Set(s0);
+						dfa.s0 = s0;
 					}
 				}
 
 				int alt = ExecATN(dfa, s0, input, index, outerContext);
-				if (debug) Console.WriteLine("DFA after predictATN: " + dfa.ToString(parser.Vocabulary));
+				if (debug) 
+					Console.WriteLine("DFA after predictATN: " + dfa.ToString(parser.Vocabulary));
 				return alt;
 			}
 			finally
@@ -803,8 +804,7 @@ namespace Antlr4.Runtime.Atn
 			the fact that we should predict alternative 1.  We just can't say for
 			sure that there is an ambiguity without looking further.
 			*/
-			ReportAmbiguity(dfa, D, startIndex, input.Index, foundExactAmbig,
-							reach.getAlts(), reach);
+			ReportAmbiguity(dfa, D, startIndex, input.Index, foundExactAmbig, reach.GetAlts(), reach);
 
 			return predictedAlt;
 		}
@@ -1792,7 +1792,7 @@ namespace Antlr4.Runtime.Atn
 			// the context has an empty stack case. If so, it would mean
 			// global FOLLOW so we can't perform optimization
 			if (p.StateType != StateType.StarLoopEntry ||
-				!((StarLoopEntryState)p).precedenceRuleDecision || // Are we the special loop entry/exit state?
+			    !((StarLoopEntryState)p).isPrecedenceDecision || // Are we the special loop entry/exit state?
 				 config.context.IsEmpty ||                      // If SLL wildcard
 				 config.context.HasEmptyPath)
 			{

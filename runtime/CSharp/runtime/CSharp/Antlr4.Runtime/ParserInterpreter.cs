@@ -82,7 +82,7 @@ namespace Antlr4.Runtime
                 {
                     continue;
                 }
-                if (((StarLoopEntryState)state).precedenceRuleDecision)
+				if (((StarLoopEntryState)state).isPrecedenceDecision)
                 {
                     this.pushRecursionContextStates.Set(state.stateNumber);
                 }

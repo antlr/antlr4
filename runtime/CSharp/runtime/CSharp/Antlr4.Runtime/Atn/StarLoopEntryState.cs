@@ -51,7 +51,7 @@ namespace Antlr4.Runtime.Atn
         /// .</p>
         /// </remarks>
         /// <seealso cref="Antlr4.Runtime.Dfa.DFA.IsPrecedenceDfa()"/>
-        public bool precedenceRuleDecision;
+        public bool isPrecedenceDecision;
 
         public override Antlr4.Runtime.Atn.StateType StateType
         {

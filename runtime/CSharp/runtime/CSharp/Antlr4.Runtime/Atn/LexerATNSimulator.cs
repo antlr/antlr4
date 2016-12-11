@@ -113,8 +113,9 @@ namespace Antlr4.Runtime.Atn
 				{
 					return MatchATN(input);
 				}
-				else {
-					return ExecATN(input, dfa.s0.Get());
+				else 
+				{
+					return ExecATN(input, dfa.s0);
 				}
 			}
 			finally
@@ -158,14 +159,14 @@ namespace Antlr4.Runtime.Atn
 			DFAState next = AddDFAState(s0_closure);
 			if (!suppressEdge)
 			{
-				decisionToDFA[mode].s0.Set(next);
+				decisionToDFA[mode].s0 = next;
 			}
 
 			int predict = ExecATN(input, next);
 
 			if (debug)
 			{
-				Console.WriteLine("DFA after matchATN: " + decisionToDFA[old_mode].ToLexerString());
+				Console.WriteLine("DFA after matchATN: " + decisionToDFA[old_mode].ToString());
 			}
 
 			return predict;
@@ -760,8 +761,9 @@ namespace Antlr4.Runtime.Atn
 			DFA dfa = decisionToDFA[mode];
 			lock (dfa.states)
 			{
-				DFAState existing = dfa.states[proposed];
-				if (existing != null) return existing;
+				DFAState existing;
+				if(dfa.states.TryGetValue(proposed, out existing))
+					return existing;
 
 				DFAState newState = proposed;
 

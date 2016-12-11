@@ -74,7 +74,7 @@ namespace Antlr4.Runtime.Dfa
 
         public override string ToString()
         {
-            if (dfa.s0.Get() == null)
+            if (dfa.s0 == null)
             {
                 return null;
             }

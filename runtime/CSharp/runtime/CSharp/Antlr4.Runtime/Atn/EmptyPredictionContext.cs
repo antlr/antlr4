@@ -34,12 +34,12 @@ using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
-#pragma warning disable 0659 // 'class' overrides Object.Equals(object o) but does not override Object.GetHashCode()
+	#pragma warning disable 0659 // 'class' overrides Object.Equals(object o) but does not override Object.GetHashCode()
     public sealed class EmptyPredictionContext : SingletonPredictionContext
     {
         
         internal EmptyPredictionContext()
-            : base(null, EMPTY_RETURN_STATE)
+            : base(null, EMPTY_RETURN_STATE) 
         {
         }
 
@@ -47,12 +47,12 @@ namespace Antlr4.Runtime.Atn
 
         public override PredictionContext GetParent(int index)
         {
-            throw new ArgumentOutOfRangeException();
+            return null;
         }
 
         public override int GetReturnState(int index)
         {
-            throw new ArgumentOutOfRangeException();
+            return returnState;
         }
 
   
@@ -60,19 +60,11 @@ namespace Antlr4.Runtime.Atn
         {
             get
             {
-                return 0;
+                return 1;
             }
         }
 
         public override bool IsEmpty
-        {
-            get
-            {
-                return true;
-            }
-        }
-
-        public override bool HasEmptyPath
         {
             get
             {
@@ -85,7 +77,12 @@ namespace Antlr4.Runtime.Atn
             return this == o;
         }
 
-        public override string[] ToStrings(IRecognizer recognizer, int currentState)
+		public override string ToString()
+		{
+			return "$";
+		}
+    
+		public override string[] ToStrings(IRecognizer recognizer, int currentState)
         {
             return new string[] { "[]" };
         }

@@ -32,6 +32,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Atn;
+using Antlr4.Runtime.Dfa;
 using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Sharpen;
 
@@ -50,6 +51,9 @@ namespace Antlr4.Runtime
         [NotNull]
         private readonly IVocabulary vocabulary;
 
+		protected DFA[] decisionToDFA;
+		protected PredictionContextCache sharedContextCache = new PredictionContextCache();
+
         public LexerInterpreter(string grammarFileName, IVocabulary vocabulary, IEnumerable<string> ruleNames, IEnumerable<string> modeNames, ATN atn, ICharStream input)
             : base(input)
         {
@@ -62,7 +66,12 @@ namespace Antlr4.Runtime
             this.ruleNames = ruleNames.ToArray();
             this.modeNames = modeNames.ToArray();
             this.vocabulary = vocabulary;
-            this.Interpreter = new LexerATNSimulator(this, atn, null, null);
+			this.decisionToDFA = new DFA[atn.NumberOfDecisions];
+			for (int i = 0; i < decisionToDFA.Length; i++)
+			{
+				decisionToDFA[i] = new DFA(atn.GetDecisionState(i), i);
+			}
+			this.Interpreter = new LexerATNSimulator(this, atn, decisionToDFA, sharedContextCache);
         }
 
         public override ATN Atn

@@ -98,7 +98,7 @@ PositionAdjustingLexer() ::= <<
 
 public override IToken NextToken() {
 	if (!(Interpreter is PositionAdjustingLexerATNSimulator)) {
-		Interpreter = new PositionAdjustingLexerATNSimulator(this, _ATN);
+		Interpreter = new PositionAdjustingLexerATNSimulator(this, _ATN, decisionToDFA, sharedContextCache);
 	}
 
 	return base.NextToken();
@@ -157,8 +157,8 @@ private static bool IsIdentifierChar(char c) {
 
 public class PositionAdjustingLexerATNSimulator : LexerATNSimulator {
 
-	public PositionAdjustingLexerATNSimulator(Lexer recog, ATN atn)
-	: base(recog, atn)
+	public PositionAdjustingLexerATNSimulator(Lexer recog, ATN atn, DFA[] decisionToDFA, PredictionContextCache sharedContextCache)
+	: base(recog, atn, decisionToDFA, sharedContextCache)
 	{
 	}
 

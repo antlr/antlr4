@@ -31,11 +31,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Sharpen;
-using IEnumerable = System.Collections.IEnumerable;
-using IEnumerator = System.Collections.IEnumerator;
 
 namespace Antlr4.Runtime.Atn
 {
@@ -58,7 +55,7 @@ namespace Antlr4.Runtime.Atn
 		public ConfigHashSet configLookup;
 
 		/** Track the elements as they are added to the set; supports get(i) */
-		public List<ATNConfig> configs = new List<ATNConfig>(7);
+		public ArrayList<ATNConfig> configs = new ArrayList<ATNConfig>(7);
 
 		// TODO: these fields make me pretty uncomfortable but nice to pack up info together, saves recomputation
 		// TODO: can we track conflicts as they are added to save scanning configs later?
@@ -157,9 +154,15 @@ namespace Antlr4.Runtime.Atn
 		}
 
 		/** Return a List holding list of configs */
-		public List<ATNConfig> elements() { return configs; }
+		public List<ATNConfig> Elements
+		{
+			get
+			{
+				return configs;
+			}
+		}
 
-		public HashSet<ATNState> getStates()
+		public HashSet<ATNState> GetStates()
 		{
 			HashSet<ATNState> states = new HashSet<ATNState>();
 			foreach (ATNConfig c in configs)
@@ -178,7 +181,7 @@ namespace Antlr4.Runtime.Atn
 		 * @since 4.3
 		 */
 
-		public BitSet getAlts()
+		public BitSet GetAlts()
 		{
 			BitSet alts = new BitSet();
 			foreach (ATNConfig config in configs)
@@ -188,7 +191,7 @@ namespace Antlr4.Runtime.Atn
 			return alts;
 		}
 
-		public List<SemanticContext> getPredicates()
+		public List<SemanticContext> GetPredicates()
 		{
 			List<SemanticContext> preds = new List<SemanticContext>();
 			foreach (ATNConfig c in configs)
@@ -201,7 +204,7 @@ namespace Antlr4.Runtime.Atn
 			return preds;
 		}
 
-		public ATNConfig get(int i) { return configs[i]; }
+		public ATNConfig Get(int i) { return configs[i]; }
 
 		public void OptimizeConfigs(ATNSimulator interpreter)
 		{
@@ -290,7 +293,7 @@ namespace Antlr4.Runtime.Atn
 				throw new Exception("This method is not implemented for readonly sets.");
 			}
 
-			return configLookup.Contains((ATNConfig)o);
+			return configLookup.ContainsKey((ATNConfig)o);
 		}
 
 
@@ -319,7 +322,18 @@ namespace Antlr4.Runtime.Atn
 		public override String ToString()
 		{
 			StringBuilder buf = new StringBuilder();
-			buf.Append(elements().ToString());
+			buf.Append('[');
+			List<ATNConfig> cfgs = Elements;
+			if (cfgs.Count > 0)
+			{
+				foreach (ATNConfig c in cfgs)
+				{
+					buf.Append(c.ToString());
+					buf.Append(", ");
+				}
+				buf.Length = buf.Length - 2;
+			}
+			buf.Append(']');
 			if (hasSemanticContext)
 				buf.Append(",hasSemanticContext=")
 				   .Append(hasSemanticContext);
@@ -348,12 +362,31 @@ namespace Antlr4.Runtime.Atn
 		public class LexerConfigHashSet : ConfigHashSet
 		{
 			public LexerConfigHashSet()
-
+				: base(new ObjectEqualityComparator())
 			{
 			}
 		}
 	}
 
+	public class ObjectEqualityComparator : IEqualityComparer<ATNConfig>
+	{
+
+
+		public int GetHashCode(ATNConfig o)
+		{
+			if (o == null)
+				return 0;
+			else
+				return o.GetHashCode();
+		}
+
+		public bool Equals(ATNConfig a, ATNConfig b)
+		{
+			if (a == b) return true;
+			if (a == null || b == null) return false;
+			return a.Equals(b);
+		}
+	}
 
 	/**
 	* The reason that we need this is because we don't want the hash map to use
@@ -362,8 +395,13 @@ namespace Antlr4.Runtime.Atn
 	* the number of objects associated with ATNConfigs. The other solution is to
 	* use a hash table that lets us specify the equals/hashcode operation.
 	*/
-	public class ConfigHashSet : HashSet<ATNConfig>
+	public class ConfigHashSet : Dictionary<ATNConfig, ATNConfig>
 	{
+		public ConfigHashSet(IEqualityComparer<ATNConfig> comparer)
+			: base(comparer)
+		{
+		}
+
 
 		public ConfigHashSet()
 			: base(new ConfigEqualityComparator())
@@ -372,11 +410,12 @@ namespace Antlr4.Runtime.Atn
 
 		public ATNConfig GetOrAdd(ATNConfig config)
 		{
-			if (this.Contains(config))
-				return null; // TODO
+			ATNConfig existing;
+			if (this.TryGetValue(config, out existing))
+				return existing; 
 			else
 			{
-				this.Add(config);
+				this.Put(config, config);
 				return config;
 			}
 		}

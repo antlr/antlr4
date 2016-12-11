@@ -88,14 +88,6 @@ namespace Antlr4.Runtime.Atn
             }
         }
 
-        public override bool HasEmptyPath
-        {
-            get
-            {
-                return false;
-            }
-        }
-
         public override bool Equals(object o)
         {
             if (o == this)
@@ -109,12 +101,26 @@ namespace Antlr4.Runtime.Atn
                     return false;
                 }
             }
-            Antlr4.Runtime.Atn.SingletonPredictionContext other = (Antlr4.Runtime.Atn.SingletonPredictionContext)o;
-            if (this.GetHashCode() != other.GetHashCode())
+            if (this.GetHashCode() != o.GetHashCode())
             {
                 return false;
             }
+			Antlr4.Runtime.Atn.SingletonPredictionContext other = (Antlr4.Runtime.Atn.SingletonPredictionContext)o;
             return returnState == other.returnState && parent.Equals(other.parent);
         }
+
+		public override string ToString()
+		{
+			string up = parent != null ? parent.ToString() : "";
+			if (up.Length == 0)
+			{
+				if (returnState == EMPTY_RETURN_STATE)
+				{
+					return "$";
+				}
+				return returnState.ToString();
+			}
+			return returnState.ToString() + " " + up;
+		}
     }
 }

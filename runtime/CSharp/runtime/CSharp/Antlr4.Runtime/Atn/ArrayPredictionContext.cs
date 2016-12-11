@@ -28,16 +28,14 @@
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 using System;
-using System.Collections.Generic;
 using System.Text;
-using Antlr4.Runtime.Atn;
-using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
 
 
+	#pragma warning disable 0659 // 'class' overrides Object.Equals(object o) but does not override Object.GetHashCode()
 	public class ArrayPredictionContext : PredictionContext
 	{
 		/** Parent can be null only if full ctx mode and we make an array

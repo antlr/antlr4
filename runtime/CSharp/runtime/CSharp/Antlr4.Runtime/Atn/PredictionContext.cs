@@ -27,11 +27,8 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
-using Antlr4.Runtime;
-using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Sharpen;
 
@@ -39,9 +36,9 @@ namespace Antlr4.Runtime.Atn
 {
 	public abstract class PredictionContext
 	{
-		public static readonly EmptyPredictionContext EMPTY = new EmptyPredictionContext();
-
 		public static readonly int EMPTY_RETURN_STATE = int.MaxValue;
+
+		public static readonly EmptyPredictionContext EMPTY = new EmptyPredictionContext();
 
 		private static readonly int INITIAL_HASH = 1;
 

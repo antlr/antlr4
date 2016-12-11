@@ -87,7 +87,6 @@
     <Compile Include="Atn\LookaheadEventInfo.cs" />
     <Compile Include="Atn\LoopEndState.cs" />
     <Compile Include="Atn\NotSetTransition.cs" />
-    <Compile Include="Atn\OrderedATNConfigSet.cs" />
     <Compile Include="Atn\ParseInfo.cs" />
     <Compile Include="Atn\ParserATNSimulator.cs" />
     <Compile Include="Atn\PlusBlockStartState.cs" />
@@ -235,6 +234,7 @@
     <Compile Include="Misc\Pair.cs" />
     <Compile Include="Atn\LexerATNConfig.cs" />
     <Compile Include="Atn\MergeCache.cs" />
+    <Compile Include="Misc\ArrayList.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -86,12 +86,12 @@ namespace Antlr4.Runtime.Misc
         {
             if (els == null)
             {
-                intervals = new List<Interval>(2);
+                intervals = new ArrayList<Interval>(2);
             }
             else
             {
                 // most sets are 1 or 2 elements
-                intervals = new List<Interval>(els.Length);
+                intervals = new ArrayList<Interval>(els.Length);
                 foreach (int e in els)
                 {
                     Add(e);
@@ -783,9 +783,9 @@ namespace Antlr4.Runtime.Misc
             }
         }
 
-        public virtual List<int> ToIntegerList()
+        public virtual ArrayList<int> ToIntegerList()
         {
-            List<int> values = new List<int>(Count);
+            ArrayList<int> values = new ArrayList<int>(Count);
             int n = intervals.Count;
             for (int i = 0; i < n; i++)
             {
@@ -802,7 +802,7 @@ namespace Antlr4.Runtime.Misc
 
         public virtual IList<int> ToList()
         {
-            IList<int> values = new List<int>();
+            IList<int> values = new ArrayList<int>();
             int n = intervals.Count;
             for (int i = 0; i < n; i++)
             {

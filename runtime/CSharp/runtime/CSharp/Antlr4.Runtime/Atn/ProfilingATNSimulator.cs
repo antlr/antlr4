@@ -210,7 +210,7 @@ namespace Antlr4.Runtime.Atn
 			conflictingAltResolvedBySLL = conflictingAlts.NextSetBit(0);
 		}
 		else {
-				conflictingAltResolvedBySLL = configs.getAlts().NextSetBit(0);
+				conflictingAltResolvedBySLL = configs.GetAlts().NextSetBit(0);
 		}
 		decisions[currentDecision].LL_Fallback++;
 		base.ReportAttemptingFullContext(dfa, conflictingAlts, configs, startIndex, stopIndex);
@@ -236,7 +236,7 @@ namespace Antlr4.Runtime.Atn
 			prediction = ambigAlts.NextSetBit(0);
 		}
 		else {
-				prediction = configSet.getAlts().NextSetBit(0);
+				prediction = configSet.GetAlts().NextSetBit(0);
 		}
 			if (configSet.fullCtx && prediction != conflictingAltResolvedBySLL)
 		{
@@ -245,9 +245,7 @@ namespace Antlr4.Runtime.Atn
 			// are showing a conflict, hence an ambiguity, but if they resolve
 			// to different minimum alternatives we have also identified a
 			// context sensitivity.
-			decisions[currentDecision].contextSensitivities.Add(
-					new ContextSensitivityInfo(currentDecision, null /*configs*/, input, startIndex, stopIndex)
-			);
+			decisions[currentDecision].contextSensitivities.Add( new ContextSensitivityInfo(currentDecision, null /*configs*/, input, startIndex, stopIndex) );
 		}
 		decisions[currentDecision].ambiguities.Add(
 			new AmbiguityInfo(currentDecision, null /*configs, ambigAlts*/,

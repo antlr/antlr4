@@ -610,7 +610,7 @@ namespace Antlr4.Runtime.Atn
                     {
                         if (maybeLoopEndState.epsilonOnlyTransitions && maybeLoopEndState.Transition(0).target is RuleStopState)
                         {
-                            ((StarLoopEntryState)state).precedenceRuleDecision = true;
+							((StarLoopEntryState)state).isPrecedenceDecision = true;
                         }
                     }
                 }
