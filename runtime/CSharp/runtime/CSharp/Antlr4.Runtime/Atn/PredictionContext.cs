@@ -37,477 +37,573 @@ using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
-    public abstract class PredictionContext
-    {
-        [NotNull]
-        public static readonly Antlr4.Runtime.Atn.PredictionContext EmptyLocal = EmptyPredictionContext.LocalContext;
+	public abstract class PredictionContext
+	{
+		public static readonly EmptyPredictionContext EMPTY = new EmptyPredictionContext();
 
-        [NotNull]
-        public static readonly Antlr4.Runtime.Atn.PredictionContext EmptyFull = EmptyPredictionContext.FullContext;
+		public static readonly int EMPTY_RETURN_STATE = int.MaxValue;
 
-        public const int EmptyLocalStateKey = int.MinValue;
+		private static readonly int INITIAL_HASH = 1;
 
-        public const int EmptyFullStateKey = int.MaxValue;
+		protected internal static int CalculateEmptyHashCode()
+		{
+			int hash = MurmurHash.Initialize(INITIAL_HASH);
+			hash = MurmurHash.Finish(hash, 0);
+			return hash;
+		}
 
-        private const int InitialHash = 1;
+		protected internal static int CalculateHashCode(PredictionContext parent, int returnState)
+		{
+			int hash = MurmurHash.Initialize(INITIAL_HASH);
+			hash = MurmurHash.Update(hash, parent);
+			hash = MurmurHash.Update(hash, returnState);
+			hash = MurmurHash.Finish(hash, 2);
+			return hash;
+		}
 
-        /// <summary>
-        /// Stores the computed hash code of this
-        /// <see cref="PredictionContext"/>
-        /// . The hash
-        /// code is computed in parts to match the following reference algorithm.
-        /// <pre>
-        /// private int referenceHashCode() {
-        /// int hash =
-        /// <see cref="Antlr4.Runtime.Misc.MurmurHash.Initialize()">MurmurHash.initialize</see>
-        /// (
-        /// <see cref="InitialHash"/>
-        /// );
-        /// for (int i = 0; i &lt;
-        /// <see cref="Size()"/>
-        /// ; i++) {
-        /// hash =
-        /// <see cref="Antlr4.Runtime.Misc.MurmurHash.Update(int, int)">MurmurHash.update</see>
-        /// (hash,
-        /// <see cref="GetParent(int)">getParent</see>
-        /// (i));
-        /// }
-        /// for (int i = 0; i &lt;
-        /// <see cref="Size()"/>
-        /// ; i++) {
-        /// hash =
-        /// <see cref="Antlr4.Runtime.Misc.MurmurHash.Update(int, int)">MurmurHash.update</see>
-        /// (hash,
-        /// <see cref="GetReturnState(int)">getReturnState</see>
-        /// (i));
-        /// }
-        /// hash =
-        /// <see cref="Antlr4.Runtime.Misc.MurmurHash.Finish(int, int)">MurmurHash.finish</see>
-        /// (hash, 2 *
-        /// <see cref="Size()"/>
-        /// );
-        /// return hash;
-        /// }
-        /// </pre>
-        /// </summary>
-        private readonly int cachedHashCode;
+		protected internal static int CalculateHashCode(PredictionContext[] parents, int[] returnStates)
+		{
+			int hash = MurmurHash.Initialize(INITIAL_HASH);
+			foreach (PredictionContext parent in parents)
+			{
+				hash = MurmurHash.Update(hash, parent);
+			}
+			foreach (int returnState in returnStates)
+			{
+				hash = MurmurHash.Update(hash, returnState);
+			}
+			hash = MurmurHash.Finish(hash, 2 * parents.Length);
+			return hash;
+		}
 
-        protected internal PredictionContext(int cachedHashCode)
-        {
-            this.cachedHashCode = cachedHashCode;
-        }
+		private readonly int cachedHashCode;
 
-        protected internal static int CalculateEmptyHashCode()
-        {
-            int hash = MurmurHash.Initialize(InitialHash);
-            hash = MurmurHash.Finish(hash, 0);
-            return hash;
-        }
+		protected internal PredictionContext(int cachedHashCode)
+		{
+			this.cachedHashCode = cachedHashCode;
+		}
 
-        protected internal static int CalculateHashCode(Antlr4.Runtime.Atn.PredictionContext parent, int returnState)
-        {
-            int hash = MurmurHash.Initialize(InitialHash);
-            hash = MurmurHash.Update(hash, parent);
-            hash = MurmurHash.Update(hash, returnState);
-            hash = MurmurHash.Finish(hash, 2);
-            return hash;
-        }
+		public static PredictionContext FromRuleContext(ATN atn, RuleContext outerContext)
+		{
+			if (outerContext == null)
+				outerContext = ParserRuleContext.EMPTY;
+			if (outerContext.Parent == null || outerContext == ParserRuleContext.EMPTY)
+				return PredictionContext.EMPTY;
+			PredictionContext parent = PredictionContext.FromRuleContext(atn, outerContext.Parent);
+			ATNState state = atn.states[outerContext.invokingState];
+			RuleTransition transition = (RuleTransition)state.Transition(0);
+			return parent.GetChild(transition.followState.stateNumber);
+		}
 
-        protected internal static int CalculateHashCode(Antlr4.Runtime.Atn.PredictionContext[] parents, int[] returnStates)
-        {
-            int hash = MurmurHash.Initialize(InitialHash);
-            foreach (Antlr4.Runtime.Atn.PredictionContext parent in parents)
-            {
-                hash = MurmurHash.Update(hash, parent);
-            }
-            foreach (int returnState in returnStates)
-            {
-                hash = MurmurHash.Update(hash, returnState);
-            }
-            hash = MurmurHash.Finish(hash, 2 * parents.Length);
-            return hash;
-        }
+		public abstract int Size
+		{
+			get;
+		}
 
-        public abstract int Size
-        {
-            get;
-        }
+		public abstract PredictionContext GetParent(int index);
 
-        public abstract int GetReturnState(int index);
+		public abstract int GetReturnState(int index);
 
-        public abstract int FindReturnState(int returnState);
+		public virtual bool IsEmpty
+		{
+			get
+			{
+				return this == EMPTY;
+			}
+		}
 
-        [return: NotNull]
-        public abstract Antlr4.Runtime.Atn.PredictionContext GetParent(int index);
+		public virtual bool HasEmptyPath
+		{
+			get
+			{
+				return GetReturnState(Size - 1) == EMPTY_RETURN_STATE;
+			}
+		}
 
-        protected internal abstract Antlr4.Runtime.Atn.PredictionContext AddEmptyContext();
+		public sealed override int GetHashCode()
+		{
+			return cachedHashCode;
+		}
 
-        protected internal abstract Antlr4.Runtime.Atn.PredictionContext RemoveEmptyContext();
 
-        public static Antlr4.Runtime.Atn.PredictionContext FromRuleContext(ATN atn, RuleContext outerContext)
-        {
-            return FromRuleContext(atn, outerContext, true);
-        }
 
-        public static Antlr4.Runtime.Atn.PredictionContext FromRuleContext(ATN atn, RuleContext outerContext, bool fullContext)
-        {
-            if (outerContext.IsEmpty)
-            {
-                return fullContext ? EmptyFull : EmptyLocal;
-            }
-            Antlr4.Runtime.Atn.PredictionContext parent;
-            if (outerContext.Parent != null)
-            {
-                parent = Antlr4.Runtime.Atn.PredictionContext.FromRuleContext(atn, outerContext.Parent, fullContext);
-            }
-            else
-            {
-                parent = fullContext ? EmptyFull : EmptyLocal;
-            }
-            ATNState state = atn.states[outerContext.invokingState];
-            RuleTransition transition = (RuleTransition)state.Transition(0);
-            return parent.GetChild(transition.followState.stateNumber);
-        }
+		internal static PredictionContext Merge(PredictionContext a, PredictionContext b, bool rootIsWildcard, MergeCache mergeCache)
+		{
+			if (a == b || a.Equals(b))
+			{
+				return a;
+			}
+			if (a is SingletonPredictionContext && b is SingletonPredictionContext)
+			{
+				return MergeSingletons((SingletonPredictionContext)a,
+									   (SingletonPredictionContext)b,
+									   rootIsWildcard, mergeCache);
+			}
 
-        private static Antlr4.Runtime.Atn.PredictionContext AddEmptyContext(Antlr4.Runtime.Atn.PredictionContext context)
-        {
-            return context.AddEmptyContext();
-        }
+			// At least one of a or b is array
+			// If one is $ and rootIsWildcard, return $ as * wildcard
+			if (rootIsWildcard)
+			{
+				if (a is EmptyPredictionContext)
+					return a;
+				if (b is EmptyPredictionContext)
+					return b;
+			}
 
-        private static Antlr4.Runtime.Atn.PredictionContext RemoveEmptyContext(Antlr4.Runtime.Atn.PredictionContext context)
-        {
-            return context.RemoveEmptyContext();
-        }
+			// convert singleton so both are arrays to normalize
+			if (a is SingletonPredictionContext)
+			{
+				a = new ArrayPredictionContext((SingletonPredictionContext)a);
+			}
+			if (b is SingletonPredictionContext)
+			{
+				b = new ArrayPredictionContext((SingletonPredictionContext)b);
+			}
+			return MergeArrays((ArrayPredictionContext)a, (ArrayPredictionContext)b,
+							   rootIsWildcard, mergeCache);
+		}
 
-        public static Antlr4.Runtime.Atn.PredictionContext Join(Antlr4.Runtime.Atn.PredictionContext context0, Antlr4.Runtime.Atn.PredictionContext context1)
-        {
-            return Join(context0, context1, PredictionContextCache.Uncached);
-        }
+		public static PredictionContext MergeSingletons(
+	SingletonPredictionContext a,
+	SingletonPredictionContext b,
+	bool rootIsWildcard,
+	MergeCache mergeCache)
+		{
+			if (mergeCache != null)
+			{
+				PredictionContext previous = mergeCache.Get(a, b);
+				if (previous != null) return previous;
+				previous = mergeCache.Get(b, a);
+				if (previous != null) return previous;
+			}
 
-        internal static Antlr4.Runtime.Atn.PredictionContext Join(Antlr4.Runtime.Atn.PredictionContext context0, Antlr4.Runtime.Atn.PredictionContext context1, PredictionContextCache contextCache)
-        {
-            if (context0 == context1)
-            {
-                return context0;
-            }
-            if (context0.IsEmpty)
-            {
-                return IsEmptyLocal(context0) ? context0 : AddEmptyContext(context1);
-            }
-            else
-            {
-                if (context1.IsEmpty)
-                {
-                    return IsEmptyLocal(context1) ? context1 : AddEmptyContext(context0);
-                }
-            }
-            int context0size = context0.Size;
-            int context1size = context1.Size;
-            if (context0size == 1 && context1size == 1 && context0.GetReturnState(0) == context1.GetReturnState(0))
-            {
-                Antlr4.Runtime.Atn.PredictionContext merged = contextCache.Join(context0.GetParent(0), context1.GetParent(0));
-                if (merged == context0.GetParent(0))
-                {
-                    return context0;
-                }
-                else
-                {
-                    if (merged == context1.GetParent(0))
-                    {
-                        return context1;
-                    }
-                    else
-                    {
-                        return merged.GetChild(context0.GetReturnState(0));
-                    }
-                }
-            }
-            int count = 0;
-            Antlr4.Runtime.Atn.PredictionContext[] parentsList = new Antlr4.Runtime.Atn.PredictionContext[context0size + context1size];
-            int[] returnStatesList = new int[parentsList.Length];
-            int leftIndex = 0;
-            int rightIndex = 0;
-            bool canReturnLeft = true;
-            bool canReturnRight = true;
-            while (leftIndex < context0size && rightIndex < context1size)
-            {
-                if (context0.GetReturnState(leftIndex) == context1.GetReturnState(rightIndex))
-                {
-                    parentsList[count] = contextCache.Join(context0.GetParent(leftIndex), context1.GetParent(rightIndex));
-                    returnStatesList[count] = context0.GetReturnState(leftIndex);
-                    canReturnLeft = canReturnLeft && parentsList[count] == context0.GetParent(leftIndex);
-                    canReturnRight = canReturnRight && parentsList[count] == context1.GetParent(rightIndex);
-                    leftIndex++;
-                    rightIndex++;
-                }
-                else
-                {
-                    if (context0.GetReturnState(leftIndex) < context1.GetReturnState(rightIndex))
-                    {
-                        parentsList[count] = context0.GetParent(leftIndex);
-                        returnStatesList[count] = context0.GetReturnState(leftIndex);
-                        canReturnRight = false;
-                        leftIndex++;
-                    }
-                    else
-                    {
-                        System.Diagnostics.Debug.Assert(context1.GetReturnState(rightIndex) < context0.GetReturnState(leftIndex));
-                        parentsList[count] = context1.GetParent(rightIndex);
-                        returnStatesList[count] = context1.GetReturnState(rightIndex);
-                        canReturnLeft = false;
-                        rightIndex++;
-                    }
-                }
-                count++;
-            }
-            while (leftIndex < context0size)
-            {
-                parentsList[count] = context0.GetParent(leftIndex);
-                returnStatesList[count] = context0.GetReturnState(leftIndex);
-                leftIndex++;
-                canReturnRight = false;
-                count++;
-            }
-            while (rightIndex < context1size)
-            {
-                parentsList[count] = context1.GetParent(rightIndex);
-                returnStatesList[count] = context1.GetReturnState(rightIndex);
-                rightIndex++;
-                canReturnLeft = false;
-                count++;
-            }
-            if (canReturnLeft)
-            {
-                return context0;
-            }
-            else
-            {
-                if (canReturnRight)
-                {
-                    return context1;
-                }
-            }
-            if (count < parentsList.Length)
-            {
-                parentsList = Arrays.CopyOf(parentsList, count);
-                returnStatesList = Arrays.CopyOf(returnStatesList, count);
-            }
-            if (parentsList.Length == 0)
-            {
-                // if one of them was EMPTY_LOCAL, it would be empty and handled at the beginning of the method
-                return EmptyFull;
-            }
-            else
-            {
-                if (parentsList.Length == 1)
-                {
-                    return new SingletonPredictionContext(parentsList[0], returnStatesList[0]);
-                }
-                else
-                {
-                    return new ArrayPredictionContext(parentsList, returnStatesList);
-                }
-            }
-        }
+			PredictionContext rootMerge = MergeRoot(a, b, rootIsWildcard);
+			if (rootMerge != null)
+			{
+				if (mergeCache != null) mergeCache.Put(a, b, rootMerge);
+				return rootMerge;
+			}
 
-        public static bool IsEmptyLocal(Antlr4.Runtime.Atn.PredictionContext context)
-        {
-            return context == EmptyLocal;
-        }
+			if (a.returnState == b.returnState)
+			{ // a == b
+				PredictionContext parent = Merge(a.parent, b.parent, rootIsWildcard, mergeCache);
+				// if parent is same as existing a or b parent or reduced to a parent, return it
+				if (parent == a.parent) return a; // ax + bx = ax, if a=b
+				if (parent == b.parent) return b; // ax + bx = bx, if a=b
+												  // else: ax + ay = a'[x,y]
+												  // merge parents x and y, giving array node with x,y then remainders
+												  // of those graphs.  dup a, a' points at merged array
+												  // new joined parent so create new singleton pointing to it, a'
+				PredictionContext a_ = SingletonPredictionContext.Create(parent, a.returnState);
+				if (mergeCache != null) mergeCache.Put(a, b, a_);
+				return a_;
+			}
+			else { // a != b payloads differ
+				   // see if we can collapse parents due to $+x parents if local ctx
+				int[] payloads = new int[2];
+				PredictionContext[] parents = new PredictionContext[2];
+				PredictionContext pc;
+				PredictionContext singleParent = null;
+				if (a == b || (a.parent != null && a.parent.Equals(b.parent)))
+				{ // ax + bx = [a,b]x
+					singleParent = a.parent;
+				}
+				if (singleParent != null)
+				{   // parents are same
+					// sort payloads and use same parent
+					if (a.returnState > b.returnState)
+					{
+						payloads[0] = b.returnState;
+						payloads[1] = a.returnState;
+					}
+					else {
+						payloads[0] = a.returnState;
+						payloads[1] = b.returnState;
+					}
+					parents[0] = singleParent;
+					parents[1] = singleParent;
+					pc = new ArrayPredictionContext(parents, payloads);
+					if (mergeCache != null)
+						mergeCache.Put(a, b, pc);
+					return pc;
+				}
+				// parents differ and can't merge them. Just pack together
+				// into array; can't merge.
+				// ax + by = [ax,by]
+				// sort by payload
+				if (a.returnState > b.returnState)
+				{
+					payloads[0] = b.returnState;
+					payloads[1] = a.returnState;
+					parents[0] = b.parent;
+					parents[1] = a.parent;
+				}
+				else {
+					payloads[0] = a.returnState;
+					payloads[1] = b.returnState;
+					parents[0] = a.parent;
+					parents[1] = b.parent;
+				}
+				pc = new ArrayPredictionContext(parents, payloads);
+				if (mergeCache != null) 
+					mergeCache.Put(a, b, pc);
+				return pc;
+			}
+		}
 
-        public static Antlr4.Runtime.Atn.PredictionContext GetCachedContext(Antlr4.Runtime.Atn.PredictionContext context, ConcurrentDictionary<Antlr4.Runtime.Atn.PredictionContext, Antlr4.Runtime.Atn.PredictionContext> contextCache, PredictionContext.IdentityHashMap visited)
-        {
-            if (context.IsEmpty)
-            {
-                return context;
-            }
-            Antlr4.Runtime.Atn.PredictionContext existing;
-            if (visited.TryGetValue(context, out existing))
-            {
-                return existing;
-            }
-            if (contextCache.TryGetValue(context, out existing))
-            {
-                visited[context] = existing;
-                return existing;
-            }
-            bool changed = false;
-            Antlr4.Runtime.Atn.PredictionContext[] parents = new Antlr4.Runtime.Atn.PredictionContext[context.Size];
-            for (int i = 0; i < parents.Length; i++)
-            {
-                Antlr4.Runtime.Atn.PredictionContext parent = GetCachedContext(context.GetParent(i), contextCache, visited);
-                if (changed || parent != context.GetParent(i))
-                {
-                    if (!changed)
-                    {
-                        parents = new Antlr4.Runtime.Atn.PredictionContext[context.Size];
-                        for (int j = 0; j < context.Size; j++)
-                        {
-                            parents[j] = context.GetParent(j);
-                        }
-                        changed = true;
-                    }
-                    parents[i] = parent;
-                }
-            }
-            if (!changed)
-            {
-                existing = contextCache.GetOrAdd(context, context);
-                visited[context] = existing;
-                return context;
-            }
-            // We know parents.length>0 because context.isEmpty() is checked at the beginning of the method.
-            Antlr4.Runtime.Atn.PredictionContext updated;
-            if (parents.Length == 1)
-            {
-                updated = new SingletonPredictionContext(parents[0], context.GetReturnState(0));
-            }
-            else
-            {
-                ArrayPredictionContext arrayPredictionContext = (ArrayPredictionContext)context;
-                updated = new ArrayPredictionContext(parents, arrayPredictionContext.returnStates, context.cachedHashCode);
-            }
-            existing = contextCache.GetOrAdd(updated, updated);
-            visited[updated] = existing;
-            visited[context] = existing;
-            return updated;
-        }
+		public static PredictionContext MergeArrays(
+	ArrayPredictionContext a,
+	ArrayPredictionContext b,
+	bool rootIsWildcard,
+	MergeCache mergeCache)
+		{
+			if (mergeCache != null)
+			{
+				PredictionContext previous = mergeCache.Get(a, b);
+				if (previous != null) 
+					return previous;
+				previous = mergeCache.Get(b, a);
+				if (previous != null) 
+					return previous;
+			}
 
-        public virtual Antlr4.Runtime.Atn.PredictionContext AppendContext(int returnContext, PredictionContextCache contextCache)
-        {
-            return AppendContext(Antlr4.Runtime.Atn.PredictionContext.EmptyFull.GetChild(returnContext), contextCache);
-        }
+			// merge sorted payloads a + b => M
+			int i = 0; // walks a
+			int j = 0; // walks b
+			int k = 0; // walks target M array
 
-        public abstract Antlr4.Runtime.Atn.PredictionContext AppendContext(Antlr4.Runtime.Atn.PredictionContext suffix, PredictionContextCache contextCache);
+			int[] mergedReturnStates =
+				new int[a.returnStates.Length + b.returnStates.Length];
+			PredictionContext[] mergedParents =
+				new PredictionContext[a.returnStates.Length + b.returnStates.Length];
+			// walk and merge to yield mergedParents, mergedReturnStates
+			while (i < a.returnStates.Length && j < b.returnStates.Length)
+			{
+				PredictionContext a_parent = a.parents[i];
+				PredictionContext b_parent = b.parents[j];
+				if (a.returnStates[i] == b.returnStates[j])
+				{
+					// same payload (stack tops are equal), must yield merged singleton
+					int payload = a.returnStates[i];
+					// $+$ = $
+					bool both_dollar = payload == EMPTY_RETURN_STATE &&
+									a_parent == null && b_parent == null;
+					bool ax_ax = (a_parent != null && b_parent != null) &&
+									a_parent.Equals(b_parent); // ax+ax -> ax
+					if (both_dollar || ax_ax ) {
+						mergedParents[k] = a_parent; // choose left
+						mergedReturnStates[k] = payload;
+					}
+				else { // ax+ay -> a'[x,y]
+						PredictionContext mergedParent =
+							Merge(a_parent, b_parent, rootIsWildcard, mergeCache);
+						mergedParents[k] = mergedParent;
+						mergedReturnStates[k] = payload;
+					}
+					i++; // hop over left one as usual
+					j++; // but also skip one in right side since we merge
+				}
+				else if (a.returnStates[i] < b.returnStates[j])
+				{ // copy a[i] to M
+					mergedParents[k] = a_parent;
+					mergedReturnStates[k] = a.returnStates[i];
+					i++;
+				}
+				else { // b > a, copy b[j] to M
+					mergedParents[k] = b_parent;
+					mergedReturnStates[k] = b.returnStates[j];
+					j++;
+				}
+				k++;
+			}
 
-        public virtual Antlr4.Runtime.Atn.PredictionContext GetChild(int returnState)
-        {
-            return new SingletonPredictionContext(this, returnState);
-        }
+			// copy over any payloads remaining in either array
+			if (i < a.returnStates.Length)
+			{
+				for (int p = i; p < a.returnStates.Length; p++)
+				{
+					mergedParents[k] = a.parents[p];
+					mergedReturnStates[k] = a.returnStates[p];
+					k++;
+				}
+			}
+			else {
+				for (int p = j; p < b.returnStates.Length; p++)
+				{
+					mergedParents[k] = b.parents[p];
+					mergedReturnStates[k] = b.returnStates[p];
+					k++;
+				}
+			}
 
-        public abstract bool IsEmpty
-        {
-            get;
-        }
+			// trim merged if we combined a few that had same stack tops
+			if (k < mergedParents.Length)
+			{ // write index < last position; trim
+				if (k == 1)
+				{ // for just one merged element, return singleton top
+					PredictionContext a_ = SingletonPredictionContext.Create(mergedParents[0], mergedReturnStates[0]);
+					if (mergeCache != null) mergeCache.Put(a, b, a_);
+					return a_;
+				}
+				mergedParents = Arrays.CopyOf(mergedParents, k);
+				mergedReturnStates = Arrays.CopyOf(mergedReturnStates, k);
+			}
 
-        public abstract bool HasEmpty
-        {
-            get;
-        }
+			PredictionContext M = new ArrayPredictionContext(mergedParents, mergedReturnStates);
 
-        public sealed override int GetHashCode()
-        {
-            return cachedHashCode;
-        }
+			// if we created same array as a or b, return that instead
+			// TODO: track whether this is possible above during merge sort for speed
+			if (M.Equals(a))
+			{
+				if (mergeCache != null) 
+					mergeCache.Put(a, b, a);
+				return a;
+			}
+			if (M.Equals(b))
+			{
+				if (mergeCache != null) 
+					mergeCache.Put(a, b, b);
+				return b;
+			}
 
-        public abstract override bool Equals(object o);
+			CombineCommonParents(mergedParents);
 
-        //@Override
-        //public String toString() {
-        //	return toString(null, Integer.MAX_VALUE);
-        //}
-        public virtual string[] ToStrings(IRecognizer recognizer, int currentState)
-        {
-            return ToStrings(recognizer, Antlr4.Runtime.Atn.PredictionContext.EmptyFull, currentState);
-        }
+			if (mergeCache != null) 
+				mergeCache.Put(a, b, M);
+			return M;
+		}
 
-        public virtual string[] ToStrings(IRecognizer recognizer, Antlr4.Runtime.Atn.PredictionContext stop, int currentState)
-        {
-            List<string> result = new List<string>();
-            for (int perm = 0; ; perm++)
-            {
-                int offset = 0;
-                bool last = true;
-                Antlr4.Runtime.Atn.PredictionContext p = this;
-                int stateNumber = currentState;
-                StringBuilder localBuffer = new StringBuilder();
-                localBuffer.Append("[");
-                while (!p.IsEmpty && p != stop)
-                {
-                    int index = 0;
-                    if (p.Size > 0)
-                    {
-                        int bits = 1;
-                        while ((1 << bits) < p.Size)
-                        {
-                            bits++;
-                        }
-                        int mask = (1 << bits) - 1;
-                        index = (perm >> offset) & mask;
-                        last &= index >= p.Size - 1;
-                        if (index >= p.Size)
-                        {
-                            goto outer_continue;
-                        }
-                        offset += bits;
-                    }
-                    if (recognizer != null)
-                    {
-                        if (localBuffer.Length > 1)
-                        {
-                            // first char is '[', if more than that this isn't the first rule
-                            localBuffer.Append(' ');
-                        }
-                        ATN atn = recognizer.Atn;
-                        ATNState s = atn.states[stateNumber];
-                        string ruleName = recognizer.RuleNames[s.ruleIndex];
-                        localBuffer.Append(ruleName);
-                    }
-                    else
-                    {
-                        if (p.GetReturnState(index) != EmptyFullStateKey)
-                        {
-                            if (!p.IsEmpty)
-                            {
-                                if (localBuffer.Length > 1)
-                                {
-                                    // first char is '[', if more than that this isn't the first rule
-                                    localBuffer.Append(' ');
-                                }
-                                localBuffer.Append(p.GetReturnState(index));
-                            }
-                        }
-                    }
-                    stateNumber = p.GetReturnState(index);
-                    p = p.GetParent(index);
-                }
-                localBuffer.Append("]");
-                result.Add(localBuffer.ToString());
-                if (last)
-                {
-                    break;
-                }
-outer_continue: ;
-            }
+		protected static void CombineCommonParents(PredictionContext[] parents)
+		{
+			Dictionary<PredictionContext, PredictionContext> uniqueParents = new Dictionary<PredictionContext, PredictionContext>();
 
-            return result.ToArray();
-        }
+			for (int p = 0; p < parents.Length; p++)
+			{
+				PredictionContext parent = parents[p];
+				if (!uniqueParents.ContainsKey(parent))
+				{ // don't replace
+					uniqueParents.Put(parent, parent);
+				}
+			}
 
-        public sealed class IdentityHashMap : Dictionary<PredictionContext, PredictionContext>
-        {
-            public IdentityHashMap()
-                : base(PredictionContext.IdentityEqualityComparator.Instance)
-            {
-            }
-        }
+			for (int p = 0; p < parents.Length; p++)
+			{
+				parents[p] = uniqueParents.Get(parents[p]);
+			}
+		}
 
-        public sealed class IdentityEqualityComparator : EqualityComparer<PredictionContext>
-        {
-            public static readonly PredictionContext.IdentityEqualityComparator Instance = new PredictionContext.IdentityEqualityComparator();
+		public static PredictionContext MergeRoot(SingletonPredictionContext a,
+											  SingletonPredictionContext b,
+											  bool rootIsWildcard)
+		{
+			if (rootIsWildcard)
+			{
+				if (a == PredictionContext.EMPTY) 
+					return PredictionContext.EMPTY;  // * + b = *
+				if (b == PredictionContext.EMPTY) 
+					return PredictionContext.EMPTY;  // a + * = *
+			}
+			else {
+				if (a == EMPTY && b == EMPTY) return EMPTY; // $ + $ = $
+				if (a == EMPTY)
+				{ // $ + x = [$,x]
+					int[] payloads = { b.returnState, EMPTY_RETURN_STATE };
+					PredictionContext[] parents = { b.parent, null };
+					PredictionContext joined =
+						new ArrayPredictionContext(parents, payloads);
+					return joined;
+				}
+				if (b == EMPTY)
+				{ // x + $ = [$,x] ($ is always first if present)
+					int[] payloads = { a.returnState, EMPTY_RETURN_STATE };
+					PredictionContext[] parents = { a.parent, null };
+					PredictionContext joined =
+						new ArrayPredictionContext(parents, payloads);
+					return joined;
+				}
+			}
+			return null;
+		}
 
-            private IdentityEqualityComparator()
-            {
-            }
 
-            public override int GetHashCode(PredictionContext obj)
-            {
-                return obj.GetHashCode();
-            }
+		public static PredictionContext GetCachedContext(PredictionContext context, PredictionContextCache contextCache, PredictionContext.IdentityHashMap visited)
+		{
+			if (context.IsEmpty)
+			{
+				return context;
+			}
 
-            public override bool Equals(PredictionContext a, PredictionContext b)
-            {
-                return a == b;
-            }
-        }
-    }
+			PredictionContext existing = visited.Get(context);
+			if (existing != null)
+			{
+				return existing;
+			}
+
+			existing = contextCache.Get(context);
+			if (existing != null)
+			{
+				visited.Put(context, existing);
+				return existing;
+			}
+
+			bool changed = false;
+			PredictionContext[] parents = new PredictionContext[context.Size];
+			for (int i = 0; i < parents.Length; i++)
+			{
+				PredictionContext parent = GetCachedContext(context.GetParent(i), contextCache, visited);
+				if (changed || parent != context.GetParent(i))
+				{
+					if (!changed)
+					{
+						parents = new PredictionContext[context.Size];
+						for (int j = 0; j < context.Size; j++)
+						{
+							parents[j] = context.GetParent(j);
+						}
+
+						changed = true;
+					}
+
+					parents[i] = parent;
+				}
+			}
+
+			if (!changed)
+			{
+				contextCache.Add(context);
+				visited.Put(context, context);
+				return context;
+			}
+
+			PredictionContext updated;
+			if (parents.Length == 0)
+			{
+				updated = EMPTY;
+			}
+			else if (parents.Length == 1)
+			{
+				updated = SingletonPredictionContext.Create(parents[0], context.GetReturnState(0));
+			}
+			else {
+				ArrayPredictionContext arrayPredictionContext = (ArrayPredictionContext)context;
+				updated = new ArrayPredictionContext(parents, arrayPredictionContext.returnStates);
+			}
+
+			contextCache.Add(updated);
+			visited.Put(updated, updated);
+			visited.Put(context, updated);
+
+			return updated;
+		}
+
+		public virtual PredictionContext GetChild(int returnState)
+		{
+			return new SingletonPredictionContext(this, returnState);
+		}
+
+
+		public virtual string[] ToStrings(IRecognizer recognizer, int currentState)
+		{
+			return ToStrings(recognizer, PredictionContext.EMPTY, currentState);
+		}
+
+		public virtual string[] ToStrings(IRecognizer recognizer, PredictionContext stop, int currentState)
+		{
+			List<string> result = new List<string>();
+			for (int perm = 0; ; perm++)
+			{
+				int offset = 0;
+				bool last = true;
+				PredictionContext p = this;
+				int stateNumber = currentState;
+				StringBuilder localBuffer = new StringBuilder();
+				localBuffer.Append("[");
+				while (!p.IsEmpty && p != stop)
+				{
+					int index = 0;
+					if (p.Size > 0)
+					{
+						int bits = 1;
+						while ((1 << bits) < p.Size)
+						{
+							bits++;
+						}
+						int mask = (1 << bits) - 1;
+						index = (perm >> offset) & mask;
+						last &= index >= p.Size - 1;
+						if (index >= p.Size)
+						{
+							goto outer_continue;
+						}
+						offset += bits;
+					}
+					if (recognizer != null)
+					{
+						if (localBuffer.Length > 1)
+						{
+							// first char is '[', if more than that this isn't the first rule
+							localBuffer.Append(' ');
+						}
+						ATN atn = recognizer.Atn;
+						ATNState s = atn.states[stateNumber];
+						string ruleName = recognizer.RuleNames[s.ruleIndex];
+						localBuffer.Append(ruleName);
+					}
+					else
+					{
+						if (p.GetReturnState(index) != EMPTY_RETURN_STATE)
+						{
+							if (!p.IsEmpty)
+							{
+								if (localBuffer.Length > 1)
+								{
+									// first char is '[', if more than that this isn't the first rule
+									localBuffer.Append(' ');
+								}
+								localBuffer.Append(p.GetReturnState(index));
+							}
+						}
+					}
+					stateNumber = p.GetReturnState(index);
+					p = p.GetParent(index);
+				}
+				localBuffer.Append("]");
+				result.Add(localBuffer.ToString());
+				if (last)
+				{
+					break;
+				}
+			outer_continue:;
+			}
+
+			return result.ToArray();
+		}
+
+		public sealed class IdentityHashMap : Dictionary<PredictionContext, PredictionContext>
+		{
+			public IdentityHashMap()
+				: base(PredictionContext.IdentityEqualityComparator.Instance)
+			{
+			}
+		}
+
+		public sealed class IdentityEqualityComparator : EqualityComparer<PredictionContext>
+		{
+			public static readonly PredictionContext.IdentityEqualityComparator Instance = new PredictionContext.IdentityEqualityComparator();
+
+			private IdentityEqualityComparator()
+			{
+			}
+
+			public override int GetHashCode(PredictionContext obj)
+			{
+				return obj.GetHashCode();
+			}
+
+			public override bool Equals(PredictionContext a, PredictionContext b)
+			{
+				return a == b;
+			}
+		}
+	}
 }

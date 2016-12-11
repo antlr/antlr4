@@ -125,7 +125,7 @@ namespace Antlr4.Runtime
                     result[symbolicName] = i;
                 }
             }
-            result["EOF"] = TokenConstants.Eof;
+            result["EOF"] = TokenConstants.EOF;
             return result;
         }
 
@@ -280,7 +280,7 @@ namespace Antlr4.Runtime
             string s = t.Text;
             if (s == null)
             {
-                if (t.Type == TokenConstants.Eof)
+                if (t.Type == TokenConstants.EOF)
                 {
                     s = "<EOF>";
                 }

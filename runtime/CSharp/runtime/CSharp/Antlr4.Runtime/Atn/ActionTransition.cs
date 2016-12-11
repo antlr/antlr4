@@ -58,7 +58,7 @@ namespace Antlr4.Runtime.Atn
         {
             get
             {
-                return Antlr4.Runtime.Atn.TransitionType.Action;
+                return Antlr4.Runtime.Atn.TransitionType.ACTION;
             }
         }
 

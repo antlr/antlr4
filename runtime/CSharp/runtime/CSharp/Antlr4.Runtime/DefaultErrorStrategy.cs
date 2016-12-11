@@ -288,9 +288,9 @@ namespace Antlr4.Runtime
                 return;
             }
             ITokenStream tokens = ((ITokenStream)recognizer.InputStream);
-            int la = tokens.La(1);
+            int la = tokens.LA(1);
             // try cheaper subset first; might get lucky. seems to shave a wee bit off
-            if (recognizer.Atn.NextTokens(s).Contains(la) || la == TokenConstants.Eof)
+            if (recognizer.Atn.NextTokens(s).Contains(la) || la == TokenConstants.EOF)
             {
                 return;
             }
@@ -349,7 +349,7 @@ namespace Antlr4.Runtime
             string input;
             if (tokens != null)
             {
-                if (e.StartToken.Type == TokenConstants.Eof)
+                if (e.StartToken.Type == TokenConstants.EOF)
                 {
                     input = "<EOF>";
                 }
@@ -613,7 +613,7 @@ namespace Antlr4.Runtime
         /// </returns>
         protected internal virtual bool SingleTokenInsertion(Parser recognizer)
         {
-            int currentSymbolType = ((ITokenStream)recognizer.InputStream).La(1);
+            int currentSymbolType = ((ITokenStream)recognizer.InputStream).LA(1);
             // if current token is consistent with what could come after current
             // ATN state, then we know we're missing a token; error recovery
             // is free to conjure up and insert the missing token
@@ -665,7 +665,7 @@ namespace Antlr4.Runtime
         [return: Nullable]
         protected internal virtual IToken SingleTokenDeletion(Parser recognizer)
         {
-            int nextTokenType = ((ITokenStream)recognizer.InputStream).La(2);
+            int nextTokenType = ((ITokenStream)recognizer.InputStream).LA(2);
             IntervalSet expecting = GetExpectedTokens(recognizer);
             if (expecting.Contains(nextTokenType))
             {
@@ -709,7 +709,7 @@ namespace Antlr4.Runtime
             int expectedTokenType = expecting.MinElement;
             // get any element
             string tokenText;
-            if (expectedTokenType == TokenConstants.Eof)
+            if (expectedTokenType == TokenConstants.EOF)
             {
                 tokenText = "<missing EOF>";
             }
@@ -718,8 +718,8 @@ namespace Antlr4.Runtime
                 tokenText = "<missing " + recognizer.Vocabulary.GetDisplayName(expectedTokenType) + ">";
             }
             IToken current = currentSymbol;
-            IToken lookback = ((ITokenStream)recognizer.InputStream).Lt(-1);
-            if (current.Type == TokenConstants.Eof && lookback != null)
+            IToken lookback = ((ITokenStream)recognizer.InputStream).LT(-1);
+            if (current.Type == TokenConstants.EOF && lookback != null)
             {
                 current = lookback;
             }
@@ -761,7 +761,7 @@ namespace Antlr4.Runtime
             string s = GetSymbolText(t);
             if (s == null)
             {
-                if (GetSymbolType(t) == TokenConstants.Eof)
+                if (GetSymbolType(t) == TokenConstants.EOF)
                 {
                     s = "<EOF>";
                 }
@@ -808,7 +808,7 @@ namespace Antlr4.Runtime
                 recoverSet.AddAll(follow);
                 ctx = ctx.Parent;
             }
-            recoverSet.Remove(TokenConstants.Epsilon);
+            recoverSet.Remove(TokenConstants.EPSILON);
             //		System.out.println("recover set "+recoverSet.toString(recognizer.getTokenNames()));
             return recoverSet;
         }
@@ -818,13 +818,13 @@ namespace Antlr4.Runtime
         protected internal virtual void ConsumeUntil(Parser recognizer, IntervalSet set)
         {
             //		System.err.println("consumeUntil("+set.toString(recognizer.getTokenNames())+")");
-            int ttype = ((ITokenStream)recognizer.InputStream).La(1);
-            while (ttype != TokenConstants.Eof && !set.Contains(ttype))
+            int ttype = ((ITokenStream)recognizer.InputStream).LA(1);
+            while (ttype != TokenConstants.EOF && !set.Contains(ttype))
             {
                 //System.out.println("consume during recover LA(1)="+getTokenNames()[input.LA(1)]);
                 //			recognizer.getInputStream().consume();
                 recognizer.Consume();
-                ttype = ((ITokenStream)recognizer.InputStream).La(1);
+                ttype = ((ITokenStream)recognizer.InputStream).LA(1);
             }
         }
     }

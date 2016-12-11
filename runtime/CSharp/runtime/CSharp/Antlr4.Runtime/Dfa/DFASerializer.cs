@@ -85,40 +85,9 @@ namespace Antlr4.Runtime.Dfa
                 states.Sort(new _IComparer_103());
                 foreach (DFAState s in states)
                 {
-                    IEnumerable<KeyValuePair<int, DFAState>> edges = s.EdgeMap;
-                    IEnumerable<KeyValuePair<int, DFAState>> contextEdges = s.ContextEdgeMap;
-                    foreach (KeyValuePair<int, DFAState> entry in edges)
+                    foreach (DFAState edge in s.edges)
                     {
-                        if ((entry.Value == null || entry.Value == ATNSimulator.Error) && !s.IsContextSymbol(entry.Key))
-                        {
-                            continue;
-                        }
-                        bool contextSymbol = false;
-                        buf.Append(GetStateString(s)).Append("-").Append(GetEdgeLabel(entry.Key)).Append("->");
-                        if (s.IsContextSymbol(entry.Key))
-                        {
-                            buf.Append("!");
-                            contextSymbol = true;
-                        }
-                        DFAState t = entry.Value;
-                        if (t != null && t.stateNumber != int.MaxValue)
-                        {
-                            buf.Append(GetStateString(t)).Append('\n');
-                        }
-                        else
-                        {
-                            if (contextSymbol)
-                            {
-                                buf.Append("ctx\n");
-                            }
-                        }
-                    }
-                    if (s.IsContextSensitive)
-                    {
-                        foreach (KeyValuePair<int, DFAState> entry_1 in contextEdges)
-                        {
-                            buf.Append(GetStateString(s)).Append("-").Append(GetContextLabel(entry_1.Key)).Append("->").Append(GetStateString(entry_1.Value)).Append("\n");
-                        }
+                        buf.Append(GetStateString(s));
                     }
                 }
             }
@@ -145,16 +114,9 @@ namespace Antlr4.Runtime.Dfa
 
         protected internal virtual string GetContextLabel(int i)
         {
-            if (i == PredictionContext.EmptyFullStateKey)
+			if (i == PredictionContext.EMPTY_RETURN_STATE)
             {
-                return "ctx:EMPTY_FULL";
-            }
-            else
-            {
-                if (i == PredictionContext.EmptyLocalStateKey)
-                {
-                    return "ctx:EMPTY_LOCAL";
-                }
+                return "ctx:EMPTY";
             }
             if (atn != null && i > 0 && i <= atn.states.Count)
             {
@@ -175,19 +137,19 @@ namespace Antlr4.Runtime.Dfa
 
         internal virtual string GetStateString(DFAState s)
         {
-            if (s == ATNSimulator.Error)
+			if (s == ATNSimulator.ERROR)
             {
                 return "ERROR";
             }
 
 			int n = s.stateNumber;
-			string baseStateStr = (s.IsAcceptState ? ":" : "") + "s" + n + (s.IsContextSensitive ? "^" : "");
-			if ( s.IsAcceptState ) {
+			string baseStateStr = (s.isAcceptState ? ":" : "") + "s" + n ;
+			if ( s.isAcceptState ) {
 				if ( s.predicates!=null ) {
 					return baseStateStr + "=>" + Arrays.ToString(s.predicates);
 				}
 				else {
-					return baseStateStr + "=>" + s.Prediction;
+					return baseStateStr + "=>" + s.prediction;
 				}
 			}
 			else {

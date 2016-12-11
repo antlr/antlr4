@@ -151,7 +151,7 @@ namespace Antlr4.Runtime.Tree
         {
             if (Symbol != null)
             {
-                if (Symbol.Type == TokenConstants.Eof)
+                if (Symbol.Type == TokenConstants.EOF)
                 {
                     return "<EOF>";
                 }

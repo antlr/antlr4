@@ -70,7 +70,7 @@ namespace Antlr4.Runtime.Atn
         /// 
         /// true}?}.
         /// </summary>
-        public static readonly SemanticContext None = new SemanticContext.Predicate();
+        public static readonly SemanticContext NONE = new SemanticContext.Predicate();
 
         /// <summary>
         /// For context independent predicates, we evaluate them without a local
@@ -99,7 +99,7 @@ namespace Antlr4.Runtime.Atn
         /// evaluated, which will be one of the following values.
         /// <ul>
         /// <li>
-        /// <see cref="None"/>
+        /// <see cref="NONE"/>
         /// : if the predicate simplifies to
         /// <see langword="true"/>
         /// after
@@ -210,7 +210,7 @@ namespace Antlr4.Runtime.Atn
             {
                 if (parser.Precpred(parserCallStack, precedence))
                 {
-                    return SemanticContext.None;
+                    return SemanticContext.NONE;
                 }
                 else
                 {
@@ -380,7 +380,7 @@ namespace Antlr4.Runtime.Atn
                     }
                     else
                     {
-                        if (evaluated != None)
+                        if (evaluated != NONE)
                         {
                             // Reduce the result by skipping true elements
                             operands.Add(evaluated);
@@ -394,7 +394,7 @@ namespace Antlr4.Runtime.Atn
                 if (operands.Count == 0)
                 {
                     // all elements were true, so the AND context is true
-                    return None;
+                    return NONE;
                 }
                 SemanticContext result = operands[0];
                 for (int i = 1; i < operands.Count; i++)
@@ -505,10 +505,10 @@ namespace Antlr4.Runtime.Atn
                 {
                     SemanticContext evaluated = context.EvalPrecedence(parser, parserCallStack);
                     differs |= (evaluated != context);
-                    if (evaluated == None)
+                    if (evaluated == NONE)
                     {
                         // The OR context is true if any element is true
-                        return None;
+                        return NONE;
                     }
                     else
                     {
@@ -544,11 +544,11 @@ namespace Antlr4.Runtime.Atn
 
         public static SemanticContext AndOp(SemanticContext a, SemanticContext b)
         {
-            if (a == null || a == None)
+            if (a == null || a == NONE)
             {
                 return b;
             }
-            if (b == null || b == None)
+            if (b == null || b == NONE)
             {
                 return a;
             }
@@ -571,9 +571,9 @@ namespace Antlr4.Runtime.Atn
             {
                 return a;
             }
-            if (a == None || b == None)
+            if (a == NONE || b == NONE)
             {
-                return None;
+                return NONE;
             }
             SemanticContext.OR result = new SemanticContext.OR(a, b);
             if (result.opnds.Length == 1)

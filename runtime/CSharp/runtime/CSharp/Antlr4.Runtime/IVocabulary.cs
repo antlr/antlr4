@@ -121,7 +121,7 @@ namespace Antlr4.Runtime
         /// <li>The implicitly defined
         /// <c>EOF</c>
         /// token, which has the token type
-        /// <see cref="TokenConstants.Eof"/>
+        /// <see cref="TokenConstants.EOF"/>
         /// .</li>
         /// </ul>
         /// <p>The following table shows examples of lexer rules and the literal

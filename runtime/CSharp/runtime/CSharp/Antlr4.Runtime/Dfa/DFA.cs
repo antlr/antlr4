@@ -56,9 +56,6 @@ namespace Antlr4.Runtime.Dfa
         [NotNull]
         public readonly AtomicReference<DFAState> s0 = new AtomicReference<DFAState>();
 
-        [NotNull]
-        public readonly AtomicReference<DFAState> s0full = new AtomicReference<DFAState>();
-
         public readonly int decision;
 
         /// <summary>From which ATN state did we create this DFA?</summary>
@@ -70,9 +67,6 @@ namespace Antlr4.Runtime.Dfa
         private readonly int minDfaEdge;
 
         private readonly int maxDfaEdge;
-
-        [NotNull]
-        private static readonly Antlr4.Runtime.Dfa.EmptyEdgeMap<DFAState> emptyPrecedenceEdges = new Antlr4.Runtime.Dfa.EmptyEdgeMap<DFAState>(0, 200);
 
         [NotNull]
         private readonly Antlr4.Runtime.Dfa.EmptyEdgeMap<DFAState> emptyEdgeMap;
@@ -99,12 +93,12 @@ namespace Antlr4.Runtime.Dfa
             this.decision = decision;
             if (this.atnStartState.atn.grammarType == ATNType.Lexer)
             {
-                minDfaEdge = LexerATNSimulator.MinDfaEdge;
-                maxDfaEdge = LexerATNSimulator.MaxDfaEdge;
+                minDfaEdge = LexerATNSimulator.MIN_DFA_EDGE;
+				maxDfaEdge = LexerATNSimulator.MAX_DFA_EDGE;
             }
             else
             {
-                minDfaEdge = TokenConstants.Eof;
+                minDfaEdge = TokenConstants.EOF;
                 maxDfaEdge = atnStartState.atn.maxTokenType;
             }
             this.emptyEdgeMap = new Antlr4.Runtime.Dfa.EmptyEdgeMap<DFAState>(minDfaEdge, maxDfaEdge);
@@ -206,26 +200,23 @@ namespace Antlr4.Runtime.Dfa
             }
             set
             {
-                bool precedenceDfa = value;
                 // s0.get() and s0full.get() are never null for a precedence DFA
                 // s0full.get() is never null for a precedence DFA
                 // s0.get() is never null for a precedence DFA
                 lock (this)
                 {
-                    if (this.precedenceDfa != precedenceDfa)
+                    if (this.precedenceDfa != value)
                     {
                         this.states.Clear();
-                        if (precedenceDfa)
+                        if (value)
                         {
-                            this.s0.Set(new DFAState(emptyPrecedenceEdges, EmptyContextEdgeMap, new ATNConfigSet()));
-                            this.s0full.Set(new DFAState(emptyPrecedenceEdges, EmptyContextEdgeMap, new ATNConfigSet()));
+                            this.s0.Set(new DFAState(new ATNConfigSet()));
                         }
                         else
                         {
                             this.s0.Set(null);
-                            this.s0full.Set(null);
                         }
-                        this.precedenceDfa = precedenceDfa;
+                        this.precedenceDfa = value;
                     }
                 }
             }
@@ -248,14 +239,8 @@ namespace Antlr4.Runtime.Dfa
             {
                 throw new InvalidOperationException("Only precedence DFAs may contain a precedence start state.");
             }
-            if (fullContext)
-            {
-                return s0full.Get().GetTarget(precedence);
-            }
-            else
-            {
-                return s0.Get().GetTarget(precedence);
-            }
+            return s0.Get().edges[precedence];
+           
         }
 
         /// <summary>Set the start state for a specific precedence value.</summary>
@@ -268,7 +253,7 @@ namespace Antlr4.Runtime.Dfa
         /// </param>
         /// <exception cref="System.InvalidOperationException">if this is not a precedence DFA.</exception>
         /// <seealso cref="IsPrecedenceDfa()"/>
-        public void SetPrecedenceStartState(int precedence, bool fullContext, DFAState startState)
+        public void SetPrecedenceStartState(int precedence, DFAState startState)
         {
             if (!IsPrecedenceDfa)
             {
@@ -278,19 +263,9 @@ namespace Antlr4.Runtime.Dfa
             {
                 return;
             }
-            if (fullContext)
+            lock (s0)
             {
-                lock (s0full)
-                {
-                    s0full.Get().SetTarget(precedence, startState);
-                }
-            }
-            else
-            {
-                lock (s0)
-                {
-                    s0.Get().SetTarget(precedence, startState);
-                }
+				s0.Get().edges[precedence] = startState;
             }
         }
 
@@ -299,25 +274,13 @@ namespace Antlr4.Runtime.Dfa
             get
             {
                 if (IsPrecedenceDfa)
-                {
-                    return s0.Get().EdgeMap.Count == 0 && s0full.Get().EdgeMap.Count == 0;
-                }
-                return s0.Get() == null && s0full.Get() == null;
+                    return s0.Get().edges.Length == 0 ;
+                else
+					return s0.Get() == null;
             }
         }
 
-        public virtual bool IsContextSensitive
-        {
-            get
-            {
-                if (IsPrecedenceDfa)
-                {
-                    return s0full.Get().EdgeMap.Count != 0;
-                }
-                return s0full.Get() != null;
-            }
-        }
-
+ 
         public virtual DFAState AddState(DFAState state)
         {
             state.stateNumber = Interlocked.Increment(ref nextStateNumber) - 1;

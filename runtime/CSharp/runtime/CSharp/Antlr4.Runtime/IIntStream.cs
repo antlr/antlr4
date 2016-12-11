@@ -45,7 +45,7 @@ namespace Antlr4.Runtime
     /// the stream was constructed. The following is a list of initializing methods:</p>
     /// <ul>
     /// <li>
-    /// <see cref="La(int)"/>
+    /// <see cref="LA(int)"/>
     /// </li>
     /// <li>
     /// <see cref="Consume()"/>
@@ -88,7 +88,7 @@ namespace Antlr4.Runtime
         /// if an attempt is made to consume the the
         /// end of the stream (i.e. if
         /// <c>LA(1)==</c>
-        /// <see cref="IntStreamConstants.Eof">EOF</see>
+        /// <see cref="IntStreamConstants.EOF">EOF</see>
         /// before calling
         /// <c>consume</c>
         /// ).
@@ -140,7 +140,7 @@ namespace Antlr4.Runtime
         /// <paramref name="i"/>
         /// represents a position at or beyond the end of the stream,
         /// this method returns
-        /// <see cref="IntStreamConstants.Eof"/>
+        /// <see cref="IntStreamConstants.EOF"/>
         /// .</p>
         /// <p>The return value is unspecified if
         /// <c>i&lt;0</c>
@@ -155,7 +155,7 @@ namespace Antlr4.Runtime
         /// if the stream does not support
         /// retrieving the value of the specified symbol
         /// </exception>
-        int La(int i);
+        int LA(int i);
 
         /// <summary>
         /// A mark provides a guarantee that
@@ -286,7 +286,7 @@ namespace Antlr4.Runtime
         /// <li>
         /// <c>LA(1)</c>
         /// returns
-        /// <see cref="IntStreamConstants.Eof"/>
+        /// <see cref="IntStreamConstants.EOF"/>
         /// </li>
         /// </ul>
         /// This operation is guaranteed to not throw an exception if
@@ -346,11 +346,11 @@ namespace Antlr4.Runtime
     {
         /// <summary>
         /// The value returned by
-        /// <see cref="IIntStream.La(int)">LA()</see>
+        /// <see cref="IIntStream.LA(int)">LA()</see>
         /// when the end of the stream is
         /// reached.
         /// </summary>
-        public const int Eof = -1;
+        public const int EOF = -1;
 
         /// <summary>
         /// The value returned by

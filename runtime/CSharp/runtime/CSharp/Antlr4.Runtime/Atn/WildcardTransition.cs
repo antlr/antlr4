@@ -44,7 +44,7 @@ namespace Antlr4.Runtime.Atn
         {
             get
             {
-                return Antlr4.Runtime.Atn.TransitionType.Wildcard;
+                return Antlr4.Runtime.Atn.TransitionType.WILDCARD;
             }
         }
 

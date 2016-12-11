@@ -65,7 +65,7 @@ namespace Antlr4.Runtime.Atn
         {
             get
             {
-                return Antlr4.Runtime.Atn.TransitionType.Predicate;
+                return Antlr4.Runtime.Atn.TransitionType.PREDICATE;
             }
         }
 

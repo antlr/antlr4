@@ -32,6 +32,7 @@ using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
+	/*
     /// <author>Sam Harwell</author>
     public class OrderedATNConfigSet : ATNConfigSet
     {
@@ -64,4 +65,5 @@ namespace Antlr4.Runtime.Atn
             return left.Equals(right);
         }
     }
+	*/
 }

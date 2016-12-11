@@ -86,7 +86,7 @@ namespace Antlr4.Runtime.Atn
                 HashSet<ATNConfig> lookBusy = new HashSet<ATNConfig>();
                 bool seeThruPreds = false;
                 // fail to get lookahead upon pred
-                Look(s.Transition(alt).target, null, PredictionContext.EmptyLocal, look[alt], lookBusy, new BitSet(), seeThruPreds, false);
+                Look(s.Transition(alt).target, null, PredictionContext.EMPTY, look[alt], lookBusy, new BitSet(), seeThruPreds, false);
                 // Wipe out lookahead for this alternative if we found nothing
                 // or we had a predicate when we !seeThruPreds
                 if (look[alt].Count == 0 || look[alt].Contains(HitPred))
@@ -111,7 +111,7 @@ namespace Antlr4.Runtime.Atn
         /// and the end of the rule containing
         /// <paramref name="s"/>
         /// is reached,
-        /// <see cref="TokenConstants.Epsilon"/>
+        /// <see cref="TokenConstants.EPSILON"/>
         /// is added to the result set.
         /// If
         /// <paramref name="ctx"/>
@@ -119,7 +119,7 @@ namespace Antlr4.Runtime.Atn
         /// <see langword="null"/>
         /// and the end of the outermost rule is
         /// reached,
-        /// <see cref="TokenConstants.Eof"/>
+        /// <see cref="TokenConstants.EOF"/>
         /// is added to the result set.</p>
         /// </summary>
         /// <param name="s">the ATN state</param>
@@ -157,7 +157,7 @@ namespace Antlr4.Runtime.Atn
         /// and the end of the rule containing
         /// <paramref name="s"/>
         /// is reached,
-        /// <see cref="TokenConstants.Epsilon"/>
+        /// <see cref="TokenConstants.EPSILON"/>
         /// is added to the result set.
         /// If
         /// <paramref name="ctx"/>
@@ -165,7 +165,7 @@ namespace Antlr4.Runtime.Atn
         /// <c>PredictionContext#EMPTY_LOCAL</c>
         /// and the end of the outermost rule is
         /// reached,
-        /// <see cref="TokenConstants.Eof"/>
+        /// <see cref="TokenConstants.EOF"/>
         /// is added to the result set.</p>
         /// </summary>
         /// <param name="s">the ATN state</param>
@@ -216,7 +216,7 @@ namespace Antlr4.Runtime.Atn
         /// or the end of the rule containing
         /// <paramref name="s"/>
         /// is reached,
-        /// <see cref="TokenConstants.Epsilon"/>
+        /// <see cref="TokenConstants.EPSILON"/>
         /// is added to the result set. If
         /// <paramref name="ctx"/>
         /// is not
@@ -228,7 +228,7 @@ namespace Antlr4.Runtime.Atn
         /// and
         /// <paramref name="stopState"/>
         /// or the end of the outermost rule is reached,
-        /// <see cref="TokenConstants.Eof"/>
+        /// <see cref="TokenConstants.EOF"/>
         /// is added to the result set.
         /// </summary>
         /// <param name="s">the ATN state.</param>
@@ -271,7 +271,7 @@ namespace Antlr4.Runtime.Atn
         /// </param>
         /// <param name="addEOF">
         /// Add
-        /// <see cref="TokenConstants.Eof"/>
+        /// <see cref="TokenConstants.EOF"/>
         /// to the result if the end of the
         /// outermost context is reached. This parameter has no effect if
         /// <paramref name="ctx"/>
@@ -282,37 +282,30 @@ namespace Antlr4.Runtime.Atn
         protected internal virtual void Look(ATNState s, ATNState stopState, PredictionContext ctx, IntervalSet look, HashSet<ATNConfig> lookBusy, BitSet calledRuleStack, bool seeThruPreds, bool addEOF)
         {
             //		System.out.println("_LOOK("+s.stateNumber+", ctx="+ctx);
-            ATNConfig c = ATNConfig.Create(s, 0, ctx);
+            ATNConfig c = new ATNConfig(s, 0, ctx);
             if (!lookBusy.Add(c))
             {
                 return;
             }
             if (s == stopState)
             {
-                if (PredictionContext.IsEmptyLocal(ctx))
+                if (ctx == null)
                 {
-                    look.Add(TokenConstants.Epsilon);
+                    look.Add(TokenConstants.EPSILON);
                     return;
                 }
-                else
-                {
-                    if (ctx.IsEmpty)
-                    {
-                        if (addEOF)
-                        {
-                            look.Add(TokenConstants.Eof);
-                        }
-                        return;
-                    }
+                else if (ctx.IsEmpty && addEOF) {
+                    look.Add(TokenConstants.EOF);
+                   return;
                 }
             }
             if (s is RuleStopState)
             {
-                if (ctx.IsEmpty && !PredictionContext.IsEmptyLocal(ctx))
+                if (ctx.IsEmpty && !ctx.IsEmpty)
                 {
                     if (addEOF)
                     {
-                        look.Add(TokenConstants.Eof);
+                        look.Add(TokenConstants.EOF);
                     }
                     return;
                 }
@@ -322,7 +315,7 @@ namespace Antlr4.Runtime.Atn
                     calledRuleStack.Clear(s.ruleIndex);
                     for (int i = 0; i < ctx.Size; i++)
                     {
-                        if (ctx.GetReturnState(i) == PredictionContext.EmptyFullStateKey)
+                        if (ctx.GetReturnState(i) == PredictionContext.EMPTY_RETURN_STATE)
                         {
                             continue;
                         }

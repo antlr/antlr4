@@ -152,6 +152,18 @@ namespace Antlr4.Runtime.Sharpen
             _data[element] &= ~(1UL << (index % BitsPerElement));
         }
 
+		public bool this[int index]
+		{
+			get
+			{
+				return Get(index);
+			}
+			set
+			{
+				Set(index);
+			}
+		}
+
         public bool Get(int index)
         {
             if (index < 0)

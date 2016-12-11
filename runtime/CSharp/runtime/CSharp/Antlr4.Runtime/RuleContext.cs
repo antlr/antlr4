@@ -224,7 +224,7 @@ namespace Antlr4.Runtime
 	 * option contextSuperClass.
 	 * to set it.
 	 */
-	public virtual int getAltNumber() { return Atn.ATN.InvalidAltNumber; }
+	public virtual int getAltNumber() { return Atn.ATN.INVALID_ALT_NUMBER; }
 
 	/* Set the outer alternative number for this context node. Default
 	 * implementation does nothing to avoid backing field overhead for

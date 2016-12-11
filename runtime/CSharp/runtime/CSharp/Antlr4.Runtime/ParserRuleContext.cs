@@ -59,7 +59,7 @@ namespace Antlr4.Runtime
     /// </remarks>
     public class ParserRuleContext : RuleContext
     {
-        private static readonly Antlr4.Runtime.ParserRuleContext Empty = new Antlr4.Runtime.ParserRuleContext();
+		public static readonly Antlr4.Runtime.ParserRuleContext EMPTY = new Antlr4.Runtime.ParserRuleContext();
 
         /// <summary>
         /// If we are debugging or building a parse tree for a visitor,
@@ -137,7 +137,7 @@ namespace Antlr4.Runtime
             get
             {
                 //	public List<Integer> states;
-                return Empty;
+                return EMPTY;
             }
         }
 

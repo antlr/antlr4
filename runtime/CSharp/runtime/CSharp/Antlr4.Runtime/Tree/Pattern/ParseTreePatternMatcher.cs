@@ -347,7 +347,7 @@ namespace Antlr4.Runtime.Tree.Pattern
                 throw new ParseTreePatternMatcher.CannotInvokeStartRule(e);
             }
             // Make sure tree pattern compilation checks for a complete parse
-            if (tokens.La(1) != TokenConstants.Eof)
+            if (tokens.LA(1) != TokenConstants.EOF)
             {
                 throw new ParseTreePatternMatcher.StartRuleDoesNotConsumeFullPattern();
             }
@@ -587,7 +587,7 @@ namespace Antlr4.Runtime.Tree.Pattern
                     AntlrInputStream @in = new AntlrInputStream(textChunk.Text);
                     lexer.SetInputStream(@in);
                     IToken t = lexer.NextToken();
-                    while (t.Type != TokenConstants.Eof)
+                    while (t.Type != TokenConstants.EOF)
                     {
                         tokens.Add(t);
                         t = lexer.NextToken();

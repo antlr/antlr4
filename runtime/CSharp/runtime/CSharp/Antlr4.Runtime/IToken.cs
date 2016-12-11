@@ -156,11 +156,11 @@ namespace Antlr4.Runtime
         /// During lookahead operations, this "token" signifies we hit rule end ATN state
         /// and did not follow it despite needing to.
         /// </remarks>
-        public const int Epsilon = -2;
+        public const int EPSILON = -2;
 
         public const int MinUserTokenType = 1;
 
-        public const int Eof = IntStreamConstants.Eof;
+        public const int EOF = IntStreamConstants.EOF;
 
         /// <summary>
         /// All tokens go to the parser (unless skip() is called in that rule)

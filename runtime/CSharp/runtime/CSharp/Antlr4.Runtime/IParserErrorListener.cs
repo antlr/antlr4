@@ -79,7 +79,7 @@ namespace Antlr4.Runtime
         /// least the <em>minimum</em> potentially viable alternative is truly
         /// viable.</p>
         /// <p>When the
-        /// <see cref="Antlr4.Runtime.Atn.PredictionMode.LlExactAmbigDetection"/>
+        /// <see cref="Antlr4.Runtime.Atn.PredictionMode.LL_EXACT_AMBIG_DETECTION"/>
         /// prediction
         /// mode is used, the parser is required to identify exact ambiguities so
         /// <paramref name="exact"/>
@@ -99,7 +99,7 @@ namespace Antlr4.Runtime
         /// . This is always
         /// <see langword="true"/>
         /// when
-        /// <see cref="Antlr4.Runtime.Atn.PredictionMode.LlExactAmbigDetection"/>
+        /// <see cref="Antlr4.Runtime.Atn.PredictionMode.LL_EXACT_AMBIG_DETECTION"/>
         /// is used.
         /// </param>
         /// <param name="ambigAlts">

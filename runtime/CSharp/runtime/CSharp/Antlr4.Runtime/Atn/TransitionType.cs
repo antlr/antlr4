@@ -34,16 +34,16 @@ namespace Antlr4.Runtime.Atn
 {
     public enum TransitionType
     {
-        Invalid,
-        Epsilon,
-        Range,
-        Rule,
-        Predicate,
-        Atom,
-        Action,
-        Set,
-        NotSet,
-        Wildcard,
-        Precedence
+		INVALID,
+        EPSILON,
+        RANGE,
+        RULE,
+        PREDICATE,
+        ATOM,
+        ACTION,
+        SET,
+        NOT_SET,
+        WILDCARD,
+        PRECEDENCE
     }
 }

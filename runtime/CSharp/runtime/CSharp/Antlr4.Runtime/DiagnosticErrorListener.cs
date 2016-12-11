@@ -159,7 +159,7 @@ namespace Antlr4.Runtime
         /// The set of conflicting or ambiguous alternatives, as
         /// reported by the parser.
         /// </param>
-        /// <param name="configs">The conflicting or ambiguous configuration set.</param>
+        /// <param name="configSet">The conflicting or ambiguous configuration set.</param>
         /// <returns>
         /// Returns
         /// <paramref name="reportedAlts"/>
@@ -167,20 +167,20 @@ namespace Antlr4.Runtime
         /// <see langword="null"/>
         /// , otherwise
         /// returns the set of alternatives represented in
-        /// <paramref name="configs"/>
+        /// <paramref name="configSet"/>
         /// .
         /// </returns>
         [return: NotNull]
-        protected internal virtual BitSet GetConflictingAlts(BitSet reportedAlts, ATNConfigSet configs)
+		protected internal virtual BitSet GetConflictingAlts(BitSet reportedAlts, ATNConfigSet configSet)
         {
             if (reportedAlts != null)
             {
                 return reportedAlts;
             }
             BitSet result = new BitSet();
-            foreach (ATNConfig config in configs)
+			foreach (ATNConfig config in configSet.configs)
             {
-                result.Set(config.Alt);
+                result.Set(config.alt);
             }
             return result;
         }

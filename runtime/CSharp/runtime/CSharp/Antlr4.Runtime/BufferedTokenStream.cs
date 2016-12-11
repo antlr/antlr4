@@ -89,7 +89,7 @@ namespace Antlr4.Runtime
         /// <see cref="p"/>
         /// <c>]</c>
         /// should be
-        /// <see cref="Lt(int)">LT(1)</see>
+        /// <see cref="LT(int)">LT(1)</see>
         /// .
         /// <p>This field is set to -1 when the stream is first constructed or when
         /// <see cref="SetTokenSource(ITokenSource)"/>
@@ -104,7 +104,7 @@ namespace Antlr4.Runtime
 
         /// <summary>
         /// Indicates whether the
-        /// <see cref="TokenConstants.Eof"/>
+        /// <see cref="TokenConstants.EOF"/>
         /// token has been fetched from
         /// <see cref="_tokenSource"/>
         /// and added to
@@ -122,7 +122,7 @@ namespace Antlr4.Runtime
         /// and
         /// <see cref="p"/>
         /// instead of calling
-        /// <see cref="La(int)"/>
+        /// <see cref="LA(int)"/>
         /// .</li>
         /// <li>
         /// <see cref="Fetch(int)"/>
@@ -209,7 +209,7 @@ namespace Antlr4.Runtime
                 // not yet initialized
                 skipEofCheck = false;
             }
-            if (!skipEofCheck && La(1) == IntStreamConstants.Eof)
+            if (!skipEofCheck && LA(1) == IntStreamConstants.EOF)
             {
                 throw new InvalidOperationException("cannot consume EOF");
             }
@@ -268,7 +268,7 @@ namespace Antlr4.Runtime
                     ((IWritableToken)t).TokenIndex = tokens.Count;
                 }
                 tokens.Add(t);
-                if (t.Type == TokenConstants.Eof)
+                if (t.Type == TokenConstants.EOF)
                 {
                     fetchedEOF = true;
                     return i + 1;
@@ -303,7 +303,7 @@ namespace Antlr4.Runtime
             for (int i = start; i <= stop; i++)
             {
                 IToken t = tokens[i];
-                if (t.Type == TokenConstants.Eof)
+                if (t.Type == TokenConstants.EOF)
                 {
                     break;
                 }
@@ -312,9 +312,9 @@ namespace Antlr4.Runtime
             return subset;
         }
 
-        public virtual int La(int i)
+        public virtual int LA(int i)
         {
-            return Lt(i).Type;
+            return LT(i).Type;
         }
 
         protected internal virtual IToken Lb(int k)
@@ -327,7 +327,7 @@ namespace Antlr4.Runtime
         }
 
         [return: NotNull]
-        public virtual IToken Lt(int k)
+        public virtual IToken LT(int k)
         {
             LazyInit();
             if (k == 0)
@@ -477,7 +477,7 @@ namespace Antlr4.Runtime
             IToken token = tokens[i];
             while (token.Channel != channel)
             {
-                if (token.Type == TokenConstants.Eof)
+                if (token.Type == TokenConstants.EOF)
                 {
                     return i;
                 }
@@ -520,7 +520,7 @@ namespace Antlr4.Runtime
             while (i >= 0)
             {
                 IToken token = tokens[i];
-                if (token.Type == TokenConstants.Eof || token.Channel == channel)
+                if (token.Type == TokenConstants.EOF || token.Channel == channel)
                 {
                     return i;
                 }
@@ -681,7 +681,7 @@ namespace Antlr4.Runtime
             for (int i = start; i <= stop; i++)
             {
                 IToken t = tokens[i];
-                if (t.Type == TokenConstants.Eof)
+                if (t.Type == TokenConstants.EOF)
                 {
                     break;
                 }

@@ -149,7 +149,7 @@ namespace Antlr4.Runtime
             return tokens[i - bufferStartIndex];
         }
 
-        public virtual IToken Lt(int i)
+        public virtual IToken LT(int i)
         {
             if (i == -1)
             {
@@ -163,15 +163,15 @@ namespace Antlr4.Runtime
             }
             if (index >= n)
             {
-                System.Diagnostics.Debug.Assert(n > 0 && tokens[n - 1].Type == TokenConstants.Eof);
+                System.Diagnostics.Debug.Assert(n > 0 && tokens[n - 1].Type == TokenConstants.EOF);
                 return tokens[n - 1];
             }
             return tokens[index];
         }
 
-        public virtual int La(int i)
+        public virtual int LA(int i)
         {
-            return Lt(i).Type;
+            return LT(i).Type;
         }
 
         public virtual ITokenSource TokenSource
@@ -210,7 +210,7 @@ namespace Antlr4.Runtime
 
         public virtual void Consume()
         {
-            if (La(1) == TokenConstants.Eof)
+            if (LA(1) == TokenConstants.EOF)
             {
                 throw new InvalidOperationException("cannot consume EOF");
             }
@@ -271,7 +271,7 @@ namespace Antlr4.Runtime
         {
             for (int i = 0; i < n; i++)
             {
-                if (this.n > 0 && tokens[this.n - 1].Type == TokenConstants.Eof)
+                if (this.n > 0 && tokens[this.n - 1].Type == TokenConstants.EOF)
                 {
                     return i;
                 }

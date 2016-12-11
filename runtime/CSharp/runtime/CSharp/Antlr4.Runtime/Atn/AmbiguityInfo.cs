@@ -56,7 +56,7 @@ namespace Antlr4.Runtime.Atn
     /// configuration set is not equal to the minimum represented alternative in the
     /// conflicting SLL configuration set. Grammars and inputs which result in this
     /// scenario are unable to use
-    /// <see cref="PredictionMode.Sll"/>
+    /// <see cref="PredictionMode.SLL"/>
     /// , which in turn means
     /// they cannot use the two-stage parsing strategy to improve parsing performance
     /// for that input.</p>

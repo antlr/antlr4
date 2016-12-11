@@ -40,7 +40,7 @@ namespace Antlr4.Runtime.Atn
 {
     public class ATN
     {
-        public const int InvalidAltNumber = 0;
+        public const int INVALID_ALT_NUMBER = 0;
 
         [NotNull]
         public readonly IList<ATNState> states = new List<ATNState>();
@@ -99,7 +99,7 @@ namespace Antlr4.Runtime.Atn
         [NotNull]
         public readonly IList<TokensStartState> modeToStartState = new List<TokensStartState>();
 
-        private readonly ConcurrentDictionary<PredictionContext, PredictionContext> contextCache = new ConcurrentDictionary<PredictionContext, PredictionContext>();
+        private readonly PredictionContextCache contextCache = new PredictionContextCache();
 
         [NotNull]
 		public DFA[] decisionToDFA = new DFA[0];
@@ -116,30 +116,7 @@ namespace Antlr4.Runtime.Atn
             this.maxTokenType = maxTokenType;
         }
 
-        public void ClearDFA()
-        {
-            decisionToDFA = new DFA[decisionToState.Count];
-            for (int i = 0; i < decisionToDFA.Length; i++)
-            {
-                decisionToDFA[i] = new DFA(decisionToState[i], i);
-            }
-            modeToDFA = new DFA[modeToStartState.Count];
-            for (int i_1 = 0; i_1 < modeToDFA.Length; i_1++)
-            {
-                modeToDFA[i_1] = new DFA(modeToStartState[i_1]);
-            }
-            contextCache.Clear();
-            LL1Table.Clear();
-        }
-
-        public virtual int ContextCacheSize
-        {
-            get
-            {
-                return contextCache.Count;
-            }
-        }
-
+ 
         public virtual PredictionContext GetCachedContext(PredictionContext context)
         {
             return PredictionContext.GetCachedContext(context, contextCache, new PredictionContext.IdentityHashMap());
@@ -175,7 +152,7 @@ namespace Antlr4.Runtime.Atn
         /// <paramref name="s"/>
         /// and
         /// staying in same rule.
-        /// <see cref="TokenConstants.Epsilon"/>
+        /// <see cref="TokenConstants.EPSILON"/>
         /// is in set if we reach end of
         /// rule.
         /// </summary>
@@ -186,7 +163,7 @@ namespace Antlr4.Runtime.Atn
             {
                 return s.nextTokenWithinRule;
             }
-            s.nextTokenWithinRule = NextTokens(s, PredictionContext.EmptyLocal);
+			s.nextTokenWithinRule = NextTokens(s, PredictionContext.EMPTY);
             s.nextTokenWithinRule.SetReadonly(true);
             return s.nextTokenWithinRule;
         }
@@ -254,7 +231,7 @@ namespace Antlr4.Runtime.Atn
         /// <see cref="RuleStopState"/>
         /// of the outermost context without matching any
         /// symbols,
-        /// <see cref="TokenConstants.Eof"/>
+        /// <see cref="TokenConstants.EOF"/>
         /// is added to the returned set.
         /// <p>If
         /// <paramref name="context"/>
@@ -285,25 +262,25 @@ namespace Antlr4.Runtime.Atn
             RuleContext ctx = context;
             ATNState s = states[stateNumber];
             IntervalSet following = NextTokens(s);
-            if (!following.Contains(TokenConstants.Epsilon))
+            if (!following.Contains(TokenConstants.EPSILON))
             {
                 return following;
             }
             IntervalSet expected = new IntervalSet();
             expected.AddAll(following);
-            expected.Remove(TokenConstants.Epsilon);
-            while (ctx != null && ctx.invokingState >= 0 && following.Contains(TokenConstants.Epsilon))
+            expected.Remove(TokenConstants.EPSILON);
+            while (ctx != null && ctx.invokingState >= 0 && following.Contains(TokenConstants.EPSILON))
             {
                 ATNState invokingState = states[ctx.invokingState];
                 RuleTransition rt = (RuleTransition)invokingState.Transition(0);
                 following = NextTokens(rt.followState);
                 expected.AddAll(following);
-                expected.Remove(TokenConstants.Epsilon);
+                expected.Remove(TokenConstants.EPSILON);
                 ctx = ctx.Parent;
             }
-            if (following.Contains(TokenConstants.Epsilon))
+            if (following.Contains(TokenConstants.EPSILON))
             {
-                expected.Add(TokenConstants.Eof);
+                expected.Add(TokenConstants.EOF);
             }
             return expected;
         }

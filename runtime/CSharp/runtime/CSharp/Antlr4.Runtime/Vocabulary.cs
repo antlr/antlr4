@@ -52,7 +52,7 @@ namespace Antlr4.Runtime
         /// <see cref="GetDisplayName(int)"/>
         /// returns the numeric value for all tokens
         /// except
-        /// <see cref="TokenConstants.Eof"/>
+        /// <see cref="TokenConstants.EOF"/>
         /// .</p>
         /// </summary>
         [NotNull]
@@ -160,7 +160,7 @@ namespace Antlr4.Runtime
             {
                 return symbolicNames[tokenType];
             }
-            if (tokenType == TokenConstants.Eof)
+            if (tokenType == TokenConstants.EOF)
             {
                 return "EOF";
             }

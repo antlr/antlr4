@@ -177,7 +177,7 @@ namespace Antlr4.Runtime.Tree.Xpath
                         break;
                     }
 
-                    case TokenConstants.Eof:
+                    case TokenConstants.EOF:
                     {
                         goto loop_break;
                     }
@@ -224,7 +224,7 @@ loop_break: ;
         /// </summary>
         protected internal virtual XPathElement GetXPathElement(IToken wordToken, bool anywhere)
         {
-            if (wordToken.Type == TokenConstants.Eof)
+            if (wordToken.Type == TokenConstants.EOF)
             {
                 throw new ArgumentException("Missing path element at end of path");
             }

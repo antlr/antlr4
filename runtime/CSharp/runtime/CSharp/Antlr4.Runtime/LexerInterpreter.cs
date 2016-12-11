@@ -62,7 +62,7 @@ namespace Antlr4.Runtime
             this.ruleNames = ruleNames.ToArray();
             this.modeNames = modeNames.ToArray();
             this.vocabulary = vocabulary;
-            this.Interpreter = new LexerATNSimulator(this, atn);
+            this.Interpreter = new LexerATNSimulator(this, atn, null, null);
         }
 
         public override ATN Atn

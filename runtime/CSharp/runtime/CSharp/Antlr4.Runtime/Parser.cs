@@ -50,12 +50,12 @@ namespace Antlr4.Runtime
         {
             public virtual void EnterEveryRule(ParserRuleContext ctx)
             {
-                System.Console.Out.WriteLine("enter   " + this._enclosing.RuleNames[ctx.RuleIndex] + ", LT(1)=" + this._enclosing._input.Lt(1).Text);
+                System.Console.Out.WriteLine("enter   " + this._enclosing.RuleNames[ctx.RuleIndex] + ", LT(1)=" + this._enclosing._input.LT(1).Text);
             }
 
             public virtual void ExitEveryRule(ParserRuleContext ctx)
             {
-                System.Console.Out.WriteLine("exit    " + this._enclosing.RuleNames[ctx.RuleIndex] + ", LT(1)=" + this._enclosing._input.Lt(1).Text);
+                System.Console.Out.WriteLine("exit    " + this._enclosing.RuleNames[ctx.RuleIndex] + ", LT(1)=" + this._enclosing._input.LT(1).Text);
             }
 
             public virtual void VisitErrorNode(IErrorNode node)
@@ -683,7 +683,7 @@ namespace Antlr4.Runtime
         {
             get
             {
-                return _input.Lt(1);
+                return _input.LT(1);
             }
         }
 
@@ -795,7 +795,7 @@ namespace Antlr4.Runtime
         {
             State = state;
             _ctx = localctx;
-            _ctx.Start = _input.Lt(1);
+            _ctx.Start = _input.LT(1);
             if (_buildParseTrees)
             {
                 AddContextToParseTree();
@@ -817,7 +817,7 @@ namespace Antlr4.Runtime
                 localctx.AddChild(factoredContext);
             }
             _ctx = localctx;
-            _ctx.Start = _input.Lt(1);
+            _ctx.Start = _input.LT(1);
             if (_buildParseTrees)
             {
                 AddContextToParseTree();
@@ -830,7 +830,7 @@ namespace Antlr4.Runtime
 
         public virtual void ExitRule()
         {
-            _ctx.Stop = _input.Lt(-1);
+            _ctx.Stop = _input.LT(-1);
             // trigger event on _ctx, before it reverts to parent
             if (_parseListeners != null)
             {
@@ -886,7 +886,7 @@ namespace Antlr4.Runtime
             State = state;
             _precedenceStack.Add(precedence);
             _ctx = localctx;
-            _ctx.Start = _input.Lt(1);
+            _ctx.Start = _input.LT(1);
             if (_parseListeners != null)
             {
                 TriggerEnterRuleEvent();
@@ -904,7 +904,7 @@ namespace Antlr4.Runtime
             ParserRuleContext previous = _ctx;
             previous.Parent = localctx;
             previous.invokingState = state;
-            previous.Stop = _input.Lt(-1);
+            previous.Stop = _input.LT(-1);
             _ctx = localctx;
             _ctx.Start = previous.Start;
             if (_buildParseTrees)
@@ -921,7 +921,7 @@ namespace Antlr4.Runtime
         public virtual void UnrollRecursionContexts(ParserRuleContext _parentctx)
         {
             _precedenceStack.RemoveAt(_precedenceStack.Count - 1);
-            _ctx.Stop = _input.Lt(-1);
+            _ctx.Stop = _input.LT(-1);
             ParserRuleContext retctx = _ctx;
             // save current ctx (return value)
             // unroll so _ctx is as it was before call to recursive method
@@ -978,7 +978,7 @@ namespace Antlr4.Runtime
             return precedence >= _precedenceStack[_precedenceStack.Count - 1];
         }
 
-        public override IAntlrErrorListener<IToken> ErrorListenerDispatch
+        public new IParserErrorListener ErrorListenerDispatch
         {
             get
             {
@@ -1026,11 +1026,11 @@ namespace Antlr4.Runtime
                 return true;
             }
             //        System.out.println("following "+s+"="+following);
-            if (!following.Contains(TokenConstants.Epsilon))
+            if (!following.Contains(TokenConstants.EPSILON))
             {
                 return false;
             }
-            while (ctx != null && ctx.invokingState >= 0 && following.Contains(TokenConstants.Epsilon))
+            while (ctx != null && ctx.invokingState >= 0 && following.Contains(TokenConstants.EPSILON))
             {
                 ATNState invokingState = atn.states[ctx.invokingState];
                 RuleTransition rt = (RuleTransition)invokingState.Transition(0);
@@ -1041,7 +1041,7 @@ namespace Antlr4.Runtime
                 }
                 ctx = (ParserRuleContext)ctx.Parent;
             }
-            if (following.Contains(TokenConstants.Epsilon) && symbol == TokenConstants.Eof)
+            if (following.Contains(TokenConstants.EPSILON) && symbol == TokenConstants.EOF)
             {
                 return true;
             }
@@ -1219,7 +1219,7 @@ namespace Antlr4.Runtime
                 {
                     if (interp is ProfilingATNSimulator)
                     {
-                        Interpreter = new ParserATNSimulator(this, Atn);
+                        Interpreter = new ParserATNSimulator(this, Atn, null, null);
                     }
                 }
             }

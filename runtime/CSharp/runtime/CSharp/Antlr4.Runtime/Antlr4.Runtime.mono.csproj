@@ -25,7 +25,7 @@
     <DefineConstants>DEBUG;TRACE;NET35PLUS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <NoWarn>1591</NoWarn>
+    <NoWarn>1591 0659</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Optimize>true</Optimize>
@@ -232,6 +232,9 @@
     <Compile Include="Dfa\IEdgeMap.cs" />
     <Compile Include="Dfa\SingletonEdgeMap.cs" />
     <Compile Include="Dfa\SparseEdgeMap.cs" />
+    <Compile Include="Misc\Pair.cs" />
+    <Compile Include="Atn\LexerATNConfig.cs" />
+    <Compile Include="Atn\MergeCache.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

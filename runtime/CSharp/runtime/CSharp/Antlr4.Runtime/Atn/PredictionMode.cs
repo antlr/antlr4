@@ -58,21 +58,21 @@ namespace Antlr4.Runtime.Atn
         /// <p>
         /// When using this prediction mode, the parser will either return a correct
         /// parse tree (i.e. the same parse tree that would be returned with the
-        /// <see cref="Ll"/>
+        /// <see cref="LL"/>
         /// prediction mode), or it will report a syntax error. If a
         /// syntax error is encountered when using the
-        /// <see cref="Sll"/>
+        /// <see cref="SLL"/>
         /// prediction mode,
         /// it may be due to either an actual syntax error in the input or indicate
         /// that the particular combination of grammar and input requires the more
         /// powerful
-        /// <see cref="Ll"/>
+        /// <see cref="LL"/>
         /// prediction abilities to complete successfully.</p>
         /// <p>
         /// This prediction mode does not provide any guarantees for prediction
         /// behavior for syntactically-incorrect inputs.</p>
         /// </remarks>
-        public static readonly PredictionMode Sll = new PredictionMode();
+        public static readonly PredictionMode SLL = new PredictionMode();
 
         /// <summary>The LL(*) prediction mode.</summary>
         /// <remarks>
@@ -91,13 +91,13 @@ namespace Antlr4.Runtime.Atn
         /// This prediction mode does not provide any guarantees for prediction
         /// behavior for syntactically-incorrect inputs.</p>
         /// </remarks>
-        public static readonly PredictionMode Ll = new PredictionMode();
+        public static readonly PredictionMode LL = new PredictionMode();
 
         /// <summary>The LL(*) prediction mode with exact ambiguity detection.</summary>
         /// <remarks>
         /// The LL(*) prediction mode with exact ambiguity detection. In addition to
         /// the correctness guarantees provided by the
-        /// <see cref="Ll"/>
+        /// <see cref="LL"/>
         /// prediction mode,
         /// this prediction mode instructs the prediction algorithm to determine the
         /// complete and exact set of ambiguous alternatives for every ambiguous
@@ -111,7 +111,7 @@ namespace Antlr4.Runtime.Atn
         /// This prediction mode does not provide any guarantees for prediction
         /// behavior for syntactically-incorrect inputs.</p>
         /// </remarks>
-        public static readonly PredictionMode LlExactAmbigDetection = new PredictionMode();
+        public static readonly PredictionMode LL_EXACT_AMBIG_DETECTION = new PredictionMode();
 
         /// <summary>A Map that uses just the state and the stack context as the key.</summary>
         /// <remarks>A Map that uses just the state and the stack context as the key.</remarks>
@@ -141,8 +141,8 @@ namespace Antlr4.Runtime.Atn
             public override int GetHashCode(ATNConfig o)
             {
                 int hashCode = MurmurHash.Initialize(7);
-                hashCode = MurmurHash.Update(hashCode, o.State.stateNumber);
-                hashCode = MurmurHash.Update(hashCode, o.Context);
+                hashCode = MurmurHash.Update(hashCode, o.state.stateNumber);
+                hashCode = MurmurHash.Update(hashCode, o.context);
                 hashCode = MurmurHash.Finish(hashCode, 2);
                 return hashCode;
             }
@@ -157,7 +157,7 @@ namespace Antlr4.Runtime.Atn
                 {
                     return false;
                 }
-                return a.State.stateNumber == b.State.stateNumber && a.Context.Equals(b.Context);
+                return a.state.stateNumber == b.state.stateNumber && a.context.Equals(b.context);
             }
         }
 
@@ -265,34 +265,33 @@ namespace Antlr4.Runtime.Atn
         /// <see cref="ATNConfigSet"/>
         /// will merge everything ignoring predicates.</p>
         /// </remarks>
-        public static bool HasSLLConflictTerminatingPrediction(PredictionMode mode, ATNConfigSet configs)
+		public static bool HasSLLConflictTerminatingPrediction(PredictionMode mode, ATNConfigSet configSet)
         {
-            if (AllConfigsInRuleStopStates(configs))
+			if (AllConfigsInRuleStopStates(configSet.configs))
             {
                 return true;
             }
             // pure SLL mode parsing
-            if (mode == PredictionMode.Sll)
+            if (mode == PredictionMode.SLL)
             {
                 // Don't bother with combining configs from different semantic
                 // contexts if we can fail over to full LL; costs more time
                 // since we'll often fail over anyway.
-                if (configs.HasSemanticContext)
+                if (configSet.hasSemanticContext)
                 {
                     // dup configs, tossing out semantic predicates
                     ATNConfigSet dup = new ATNConfigSet();
-                    foreach (ATNConfig c in configs)
+					foreach (ATNConfig c in configSet.configs)
                     {
-                        c.Transform(c.State, SemanticContext.None, false);
-                        dup.Add(c);
+						dup.Add(new ATNConfig(c, SemanticContext.NONE));
                     }
-                    configs = dup;
+                    configSet = dup;
                 }
             }
             // now we have combined contexts for configs with dissimilar preds
             // pure SLL or combined SLL+LL mode parsing
-            ICollection<BitSet> altsets = GetConflictingAltSubsets(configs);
-            bool heuristic = HasConflictingAltSet(altsets) && !HasStateAssociatedWithOneAlt(configs);
+			ICollection<BitSet> altsets = GetConflictingAltSubsets(configSet.configs);
+			bool heuristic = HasConflictingAltSet(altsets) && !HasStateAssociatedWithOneAlt(configSet.configs);
             return heuristic;
         }
 
@@ -320,7 +319,7 @@ namespace Antlr4.Runtime.Atn
         {
             foreach (ATNConfig c in configs)
             {
-                if (c.State is RuleStopState)
+                if (c.state is RuleStopState)
                 {
                     return true;
                 }
@@ -352,7 +351,7 @@ namespace Antlr4.Runtime.Atn
         {
             foreach (ATNConfig config in configs)
             {
-                if (!(config.State is RuleStopState))
+                if (!(config.state is RuleStopState))
                 {
                     return false;
                 }
@@ -776,7 +775,7 @@ namespace Antlr4.Runtime.Atn
         /// Returns the unique alternative predicted by all alternative subsets in
         /// <paramref name="altsets"/>
         /// . If no such alternative exists, this method returns
-        /// <see cref="ATN.InvalidAltNumber"/>
+        /// <see cref="ATN.INVALID_ALT_NUMBER"/>
         /// .
         /// </summary>
         /// <param name="altsets">a collection of alternative subsets</param>
@@ -787,7 +786,7 @@ namespace Antlr4.Runtime.Atn
             {
                 return all.NextSetBit(0);
             }
-            return ATN.InvalidAltNumber;
+            return ATN.INVALID_ALT_NUMBER;
         }
 
         /// <summary>
@@ -844,7 +843,7 @@ namespace Antlr4.Runtime.Atn
                     alts = new BitSet();
                     configToAlts[c] = alts;
                 }
-                alts.Set(c.Alt);
+                alts.Set(c.alt);
             }
             return configToAlts.Values;
         }
@@ -871,12 +870,12 @@ namespace Antlr4.Runtime.Atn
             foreach (ATNConfig c in configs)
             {
                 BitSet alts;
-                if (!m.TryGetValue(c.State, out alts))
+                if (!m.TryGetValue(c.state, out alts))
                 {
                     alts = new BitSet();
-                    m[c.State] = alts;
+                    m[c.state] = alts;
                 }
-                alts.Set(c.Alt);
+                alts.Set(c.alt);
             }
             return m;
         }
@@ -904,7 +903,7 @@ namespace Antlr4.Runtime.Atn
                 if (viableAlts.Cardinality() > 1)
                 {
                     // more than 1 viable alt
-                    return ATN.InvalidAltNumber;
+                    return ATN.INVALID_ALT_NUMBER;
                 }
             }
             return viableAlts.NextSetBit(0);

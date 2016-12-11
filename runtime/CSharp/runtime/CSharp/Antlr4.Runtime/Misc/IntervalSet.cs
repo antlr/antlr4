@@ -664,7 +664,7 @@ namespace Antlr4.Runtime.Misc
                 int b = I.b;
                 if (a == b)
                 {
-                    if (a == TokenConstants.Eof)
+                    if (a == TokenConstants.EOF)
                     {
                         buf.Append("<EOF>");
                     }
@@ -746,13 +746,13 @@ namespace Antlr4.Runtime.Misc
         [return: NotNull]
         protected internal virtual string ElementName(IVocabulary vocabulary, int a)
         {
-            if (a == TokenConstants.Eof)
+            if (a == TokenConstants.EOF)
             {
                 return "<EOF>";
             }
             else
             {
-                if (a == TokenConstants.Epsilon)
+                if (a == TokenConstants.EPSILON)
                 {
                     return "<EPSILON>";
                 }
