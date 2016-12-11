@@ -34,12 +34,12 @@
     <dependency>
       <groupId>org.abego.treelayout</groupId>
       <artifactId>org.abego.treelayout.core</artifactId>
-      <version>1.0.1</version>
+      <version>1.0.3</version>
     </dependency>
     <dependency>
       <groupId>javax.json</groupId>
       <artifactId>javax.json-api</artifactId>
-      <version>RELEASE</version>
+      <version>1.0</version>
     </dependency>
   </dependencies>
 
