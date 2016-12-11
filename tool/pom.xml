@@ -91,7 +91,6 @@
             <configuration>
 							<minimizeJar>false</minimizeJar>
 							<createDependencyReducedPom>false</createDependencyReducedPom>
-							<!--<createSourcesJar>true</createSourcesJar>-->
 							<shadedArtifactAttached>true</shadedArtifactAttached>
               <shadedClassifierName>complete</shadedClassifierName>
             </configuration>

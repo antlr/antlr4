@@ -36,7 +36,7 @@
 					</execution>
 				</executions>
 			</plugin>
-			<plugin>
+			<plugin> <!-- run dot on the images used by PredictionContext.java -->
 				<groupId>us.bryon</groupId>
 				<artifactId>graphviz-maven-plugin</artifactId>
 				<version>1.0</version>
