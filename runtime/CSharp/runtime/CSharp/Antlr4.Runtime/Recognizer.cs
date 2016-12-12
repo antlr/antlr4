@@ -85,7 +85,7 @@ namespace Antlr4.Runtime
         protected virtual IDictionary<string, int> CreateTokenTypeMap(IVocabulary vocabulary)
         {
             var result = new Dictionary<string, int>();
-            for (int i = 0; i < Atn.maxTokenType; i++)
+            for (int i = 0; i <= Atn.maxTokenType; i++)
             {
                 string literalName = vocabulary.GetLiteralName(i);
                 if (literalName != null)
