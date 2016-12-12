@@ -1230,11 +1230,14 @@ namespace Antlr4.Runtime.Atn
 					 * filter the prediction context for alternatives predicting alt>1
 					 * (basically a graph subtraction algorithm).
 					 */
-					PredictionContext context = statesFromAlt1[config.state.stateNumber];
-					if (context != null && context.Equals(config.context))
+					PredictionContext ctx;
+					if (statesFromAlt1.TryGetValue(config.state.stateNumber, out ctx))
 					{
-						// eliminated
-						continue;
+						if (ctx != null && ctx.Equals(config.context))
+						{
+							// eliminated
+							continue;
+						}
 					}
 				}
 
@@ -1275,7 +1278,7 @@ namespace Antlr4.Runtime.Atn
 			{
 				if (ambigAlts[c.alt])
 				{
-					altToPred[c.alt] = SemanticContext.Or(altToPred[c.alt], c.semanticContext);
+					altToPred[c.alt] = SemanticContext.OrOp(altToPred[c.alt], c.semanticContext);
 				}
 			}
 
@@ -1556,7 +1559,8 @@ namespace Antlr4.Runtime.Atn
 												int depth,
 												bool treatEofAsEpsilon)
 		{
-			if (debug) Console.WriteLine("closure(" + config.ToString(parser, true) + ")");
+			if (debug) 
+				Console.WriteLine("closure(" + config.ToString(parser, true) + ")");
 
 			if (config.state is RuleStopState)
 			{
@@ -1960,7 +1964,7 @@ namespace Antlr4.Runtime.Atn
 					}
 				}
 				else {
-					SemanticContext newSemCtx = SemanticContext.And(config.semanticContext, pt.Predicate);
+					SemanticContext newSemCtx = SemanticContext.AndOp(config.semanticContext, pt.Predicate);
 					c = new ATNConfig(config, pt.target, newSemCtx);
 				}
 			}
@@ -2011,7 +2015,7 @@ namespace Antlr4.Runtime.Atn
 					}
 				}
 				else {
-					SemanticContext newSemCtx = SemanticContext.And(config.semanticContext, pt.Predicate);
+					SemanticContext newSemCtx = SemanticContext.AndOp(config.semanticContext, pt.Predicate);
 					c = new ATNConfig(config, pt.target, newSemCtx);
 				}
 			}
@@ -2324,20 +2328,19 @@ namespace Antlr4.Runtime.Atn
 																				  exact, ambigAlts, configs);
 		}
 
-		public void SetPredictionMode(PredictionMode mode)
+		public PredictionMode PredictionMode
 		{
-			this.mode = mode;
+			get
+			{
+				return this.mode;
+			}
+			set
+			{
+				this.mode = value;
+			}
 		}
 
 
-		public PredictionMode GetPredictionMode()
-		{
-			return mode;
-		}
-
-		/**
-		 * @since 4.3
-		 */
 		public Parser getParser()
 		{
 			return parser;

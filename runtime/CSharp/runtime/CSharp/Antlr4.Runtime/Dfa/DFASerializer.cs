@@ -132,7 +132,7 @@ namespace Antlr4.Runtime.Dfa
 
         protected internal virtual string GetEdgeLabel(int i)
         {
-            return vocabulary.GetDisplayName(i);
+            return vocabulary.GetDisplayName(i - 1);
         }
 
         internal virtual string GetStateString(DFAState s)
@@ -143,7 +143,7 @@ namespace Antlr4.Runtime.Dfa
             }
 
 			int n = s.stateNumber;
-			string baseStateStr = (s.isAcceptState ? ":" : "") + "s" + n ;
+			string baseStateStr = (s.isAcceptState ? ":" : "") + "s" + n + (s.requiresFullContext ? "^" : "");
 			if ( s.isAcceptState ) {
 				if ( s.predicates!=null ) {
 					return baseStateStr + "=>" + Arrays.ToString(s.predicates);

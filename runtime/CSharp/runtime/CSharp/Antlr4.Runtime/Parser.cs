@@ -1163,9 +1163,9 @@ namespace Antlr4.Runtime
         public virtual void DumpDFA()
         {
             bool seenOne = false;
-			for (int d = 0; d < Interpreter.atn.decisionToDFA.Length; d++)
+			for (int d = 0; d < Interpreter.decisionToDFA.Length; d++)
             {
-				DFA dfa = Interpreter.atn.decisionToDFA[d];
+				DFA dfa = Interpreter.decisionToDFA[d];
 				if (dfa.states.Count>0)
                 {
                     if (seenOne)

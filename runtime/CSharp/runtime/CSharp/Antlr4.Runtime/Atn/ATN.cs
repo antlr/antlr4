@@ -139,9 +139,8 @@ namespace Antlr4.Runtime.Atn
         /// 's rule.
         /// </summary>
         [return: NotNull]
-        public virtual IntervalSet NextTokens(ATNState s, PredictionContext ctx)
+        public virtual IntervalSet NextTokens(ATNState s, RuleContext ctx)
         {
-            Args.NotNull("ctx", ctx);
             LL1Analyzer anal = new LL1Analyzer(this);
             IntervalSet next = anal.Look(s, ctx);
             return next;
@@ -163,7 +162,7 @@ namespace Antlr4.Runtime.Atn
             {
                 return s.nextTokenWithinRule;
             }
-			s.nextTokenWithinRule = NextTokens(s, PredictionContext.EMPTY);
+			s.nextTokenWithinRule = NextTokens(s, null);
             s.nextTokenWithinRule.SetReadonly(true);
             return s.nextTokenWithinRule;
         }

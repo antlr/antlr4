@@ -76,7 +76,7 @@ GetExpectedTokenNames() ::= "this.GetExpectedTokens().ToString(this.Vocabulary)"
 
 RuleInvocationStack() ::= "GetRuleInvocationStackAsString()"
 
-LL_EXACT_AMBIG_DETECTION() ::= <<Interpreter.PredictionMode = PredictionMode.LlExactAmbigDetection;>>
+LL_EXACT_AMBIG_DETECTION() ::= <<Interpreter.PredictionMode = PredictionMode.LL_EXACT_AMBIG_DETECTION;>>
 
 ParserToken(parser, token) ::= <%<parser>.<token>%>
 

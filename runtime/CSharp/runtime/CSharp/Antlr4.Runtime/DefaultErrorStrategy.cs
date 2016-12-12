@@ -620,8 +620,7 @@ namespace Antlr4.Runtime
             ATNState currentState = recognizer.Interpreter.atn.states[recognizer.State];
             ATNState next = currentState.Transition(0).target;
             ATN atn = recognizer.Interpreter.atn;
-			IntervalSet expectingAtLL2 = atn.NextTokens(next, PredictionContext.FromRuleContext(atn, recognizer.RuleContext));
-            //		System.out.println("LT(2) set="+expectingAtLL2.toString(recognizer.getTokenNames()));
+			IntervalSet expectingAtLL2 = atn.NextTokens(next, recognizer.RuleContext);
             if (expectingAtLL2.Contains(currentSymbolType))
             {
                 ReportMissingToken(recognizer);
