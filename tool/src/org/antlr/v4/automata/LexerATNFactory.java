@@ -1,31 +1,7 @@
 /*
- * [The "BSD license"]
- *  Copyright (c) 2012 Terence Parr
- *  Copyright (c) 2012 Sam Harwell
- *  All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions
- *  are met:
- *
- *  1. Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  2. Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  3. The name of the author may not be used to endorse or promote products
- *     derived from this software without specific prior written permission.
- *
- *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- *  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- *  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
  */
 
 package org.antlr.v4.automata;
@@ -95,6 +71,8 @@ public class LexerATNFactory extends ParserATNFactory {
 		COMMON_CONSTANTS.put("MIN_CHAR_VALUE", Lexer.MIN_CHAR_VALUE);
 	}
 
+	private List<String> ruleCommands = new ArrayList<String>();
+
 	/**
 	 * Maps from an action index to a {@link LexerAction} object.
 	 */
@@ -157,6 +135,12 @@ public class LexerATNFactory extends ParserATNFactory {
 
 		ATNOptimizer.optimize(g, atn);
 		return atn;
+	}
+
+	@Override
+	public Handle rule(GrammarAST ruleAST, String name, Handle blk) {
+		ruleCommands.clear();
+		return super.rule(ruleAST, name, blk);
 	}
 
 	@Override
@@ -389,7 +373,7 @@ public class LexerATNFactory extends ParserATNFactory {
 	@Override
 	public Handle tokenRef(TerminalAST node) {
 		// Ref to EOF in lexer yields char transition on -1
-		if ( node.getText().equals("EOF") ) {
+		if (node.getText().equals("EOF") ) {
 			ATNState left = newState(node);
 			ATNState right = newState(node);
 			left.addTransition(new AtomTransition(right, IntStream.EOF));
@@ -398,9 +382,10 @@ public class LexerATNFactory extends ParserATNFactory {
 		return _ruleRef(node);
 	}
 
-
-	protected LexerAction createLexerAction(GrammarAST ID, GrammarAST arg) {
+	private LexerAction createLexerAction(GrammarAST ID, GrammarAST arg) {
 		String command = ID.getText();
+		checkCommands(command, ID.getToken());
+
 		if ("skip".equals(command) && arg == null) {
 			return LexerSkipAction.INSTANCE;
 		}
@@ -451,6 +436,49 @@ public class LexerATNFactory extends ParserATNFactory {
 		}
 	}
 
+	private void checkCommands(String command, Token commandToken) {
+		// Command combinations list: https://github.com/antlr/antlr4/issues/1388#issuecomment-263344701
+		if (!command.equals("pushMode") && !command.equals("popMode")) {
+			if (ruleCommands.contains(command)) {
+				g.tool.errMgr.grammarError(ErrorType.DUPLICATED_COMMAND, g.fileName, commandToken, command);
+			}
+
+			if (!ruleCommands.equals("mode")) {
+				String firstCommand = null;
+
+				if (command.equals("skip")) {
+					if (ruleCommands.contains("more")) {
+						firstCommand = "more";
+					} else if (ruleCommands.contains("type")) {
+						firstCommand = "type";
+					} else if (ruleCommands.contains("channel")) {
+						firstCommand = "channel";
+					}
+				} else if (command.equals("more")) {
+					if (ruleCommands.contains("skip")) {
+						firstCommand = "skip";
+					} else if (ruleCommands.contains("type")) {
+						firstCommand = "type";
+					} else if (ruleCommands.contains("channel")) {
+						firstCommand = "channel";
+					}
+				} else if (command.equals("type") || command.equals("channel")) {
+					if (ruleCommands.contains("more")) {
+						firstCommand = "more";
+					} else if (ruleCommands.contains("skip")) {
+						firstCommand = "skip";
+					}
+				}
+
+				if (firstCommand != null) {
+					g.tool.errMgr.grammarError(ErrorType.INCOMPATIBLE_COMMANDS, g.fileName, commandToken, firstCommand, command);
+				}
+			}
+		}
+
+		ruleCommands.add(command);
+	}
+
 	private Integer getModeConstantValue(String modeName, Token token) {
 		if (modeName == null) {
 			return null;
@@ -459,15 +487,15 @@ public class LexerATNFactory extends ParserATNFactory {
 		if (modeName.equals("DEFAULT_MODE")) {
 			return Lexer.DEFAULT_MODE;
 		}
+		if (COMMON_CONSTANTS.containsKey(modeName)) {
+			g.tool.errMgr.grammarError(ErrorType.MODE_CONFLICTS_WITH_COMMON_CONSTANTS, g.fileName, token, token.getText());
+			return null;
+		}
 
 		List<String> modeNames = new ArrayList<String>(((LexerGrammar)g).modes.keySet());
 		int mode = modeNames.indexOf(modeName);
 		if (mode >= 0) {
 			return mode;
-		}
-		else if (COMMON_CONSTANTS.containsKey(modeName)) {
-			g.tool.errMgr.grammarError(ErrorType.MODE_CONFLICTS_WITH_COMMON_CONSTANTS, g.fileName, token, token.getText());
-			return null;
 		}
 
 		try {
@@ -486,14 +514,14 @@ public class LexerATNFactory extends ParserATNFactory {
 		if (tokenName.equals("EOF")) {
 			return Lexer.EOF;
 		}
+		if (COMMON_CONSTANTS.containsKey(tokenName)) {
+			g.tool.errMgr.grammarError(ErrorType.TOKEN_CONFLICTS_WITH_COMMON_CONSTANTS, g.fileName, token, token.getText());
+			return null;
+		}
 
 		int tokenType = g.getTokenType(tokenName);
 		if (tokenType != org.antlr.v4.runtime.Token.INVALID_TYPE) {
 			return tokenType;
-		}
-		else if (COMMON_CONSTANTS.containsKey(tokenName)) {
-			g.tool.errMgr.grammarError(ErrorType.TOKEN_CONFLICTS_WITH_COMMON_CONSTANTS, g.fileName, token, token.getText());
-			return null;
 		}
 
 		try {
@@ -512,10 +540,10 @@ public class LexerATNFactory extends ParserATNFactory {
 		if (channelName.equals("HIDDEN")) {
 			return Lexer.HIDDEN;
 		}
-		else if (channelName.equals("DEFAULT_TOKEN_CHANNEL")) {
+		if (channelName.equals("DEFAULT_TOKEN_CHANNEL")) {
 			return Lexer.DEFAULT_TOKEN_CHANNEL;
 		}
-		else if (COMMON_CONSTANTS.containsKey(channelName)) {
+		if (COMMON_CONSTANTS.containsKey(channelName)) {
 			g.tool.errMgr.grammarError(ErrorType.CHANNEL_CONFLICTS_WITH_COMMON_CONSTANTS, g.fileName, token, token.getText());
 			return null;
 		}

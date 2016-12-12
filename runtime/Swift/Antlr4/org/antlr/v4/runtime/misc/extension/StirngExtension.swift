@@ -1,3 +1,8 @@
+/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
+
 //import Cocoa
 
 #if os(OSX)
@@ -22,9 +27,9 @@ public extension String {
     func split(_ separator: String) -> [String] {
         return self.components(separatedBy: separator)
     }
- 
+
     func replaceAll(_ from: String, replacement: String) -> String {
-    
+
         return self.replacingOccurrences(of: from, with: replacement, options: NSString.CompareOptions.literal, range: nil)
     }
 
@@ -54,7 +59,7 @@ public extension String {
 
         let startRange = self.characters.index(self.startIndex, offsetBy: startIndex)
         let range = self.range(of: target, options: NSString.CompareOptions.literal, range: startRange..<self.endIndex)
- 
+
         if let range = range {
 
             return self.characters.distance(from: self.startIndex, to: range.lowerBound)
@@ -102,7 +107,7 @@ public extension String {
         let end = self.characters.index(self.startIndex, offsetBy: range.upperBound)
         return self.substring(with: start ..< end)
     }
-    
+
     subscript(integerIndex: Int) -> Character {
         let index = characters.index(startIndex, offsetBy: integerIndex)
         return self[index]

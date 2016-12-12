@@ -1,3 +1,8 @@
+/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
+
 import Foundation
 
 //https://github.com/pNre/ExSwift/blob/master/ExSwift/Array.swift
@@ -27,7 +32,7 @@ extension Array {
 
     /**
     Removes the last element from self and returns it.
-    
+
     :returns: The removed element
     */
     mutating func pop() -> Element {
@@ -35,7 +40,7 @@ extension Array {
     }
     /**
     Same as append.
-    
+
     :param: newElement Element to append
     */
     mutating func push(_ newElement: Element) {
@@ -55,7 +60,7 @@ extension Array {
 
     /**
     Checks if test returns true for all the elements in self
-    
+
     :param: test Function to call for each element
     :returns: True if test returns true for all the elements in self
     */
@@ -71,7 +76,7 @@ extension Array {
 
     /**
     Checks if test returns true for any element of self.
-    
+
     :param: test Function to call for each element
     :returns: true if test returns true for any element of self
     */
@@ -117,4 +122,4 @@ extension Array {
 
 }
 
- 
+

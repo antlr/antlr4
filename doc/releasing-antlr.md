@@ -85,6 +85,47 @@ Here is the file template
 </settings>
 ```
 
+## Maven deploy snapshot
+
+The goal is to get a snapshot, such as `4.6-SNAPSHOT`, to the staging server: [antlr4 tool](https://oss.sonatype.org/content/repositories/snapshots/org/antlr/antlr4) and [antlr4 java runtime](https://oss.sonatype.org/content/repositories/snapshots/org/antlr/antlr4-runtime).
+
+Do this:
+
+```bash
+$ mvn deploy -DskipTests
+...
+[INFO] --- maven-deploy-plugin:2.7:deploy (default-deploy) @ antlr4-tool-testsuite ---
+Downloading: https://oss.sonatype.org/content/repositories/snapshots/org/antlr/antlr4-tool-testsuite/4.6-SNAPSHOT/maven-metadata.xml
+Uploading: https://oss.sonatype.org/content/repositories/snapshots/org/antlr/antlr4-tool-testsuite/4.6-SNAPSHOT/antlr4-tool-testsuite-4.6-20161211.173752-1.jar
+Uploaded: https://oss.sonatype.org/content/repositories/snapshots/org/antlr/antlr4-tool-testsuite/4.6-SNAPSHOT/antlr4-tool-testsuite-4.6-20161211.173752-1.jar (3 KB at 3.4 KB/sec)
+Uploading: https://oss.sonatype.org/content/repositories/snapshots/org/antlr/antlr4-tool-testsuite/4.6-SNAPSHOT/antlr4-tool-testsuite-4.6-20161211.173752-1.pom
+Uploaded: https://oss.sonatype.org/content/repositories/snapshots/org/antlr/antlr4-tool-testsuite/4.6-SNAPSHOT/antlr4-tool-testsuite-4.6-20161211.173752-1.pom (3 KB at 6.5 KB/sec)
+Downloading: https://oss.sonatype.org/content/repositories/snapshots/org/antlr/antlr4-tool-testsuite/maven-metadata.xml
+Downloaded: https://oss.sonatype.org/content/repositories/snapshots/org/antlr/antlr4-tool-testsuite/maven-metadata.xml (371 B at 1.4 KB/sec)
+Uploading: https://oss.sonatype.org/content/repositories/snapshots/org/antlr/antlr4-tool-testsuite/4.6-SNAPSHOT/maven-metadata.xml
+Uploaded: https://oss.sonatype.org/content/repositories/snapshots/org/antlr/antlr4-tool-testsuite/4.6-SNAPSHOT/maven-metadata.xml (774 B at 1.8 KB/sec)
+Uploading: https://oss.sonatype.org/content/repositories/snapshots/org/antlr/antlr4-tool-testsuite/maven-metadata.xml
+Uploaded: https://oss.sonatype.org/content/repositories/snapshots/org/antlr/antlr4-tool-testsuite/maven-metadata.xml (388 B at 0.9 KB/sec)
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary:
+[INFO] 
+[INFO] ANTLR 4 ............................................ SUCCESS [  4.073 s]
+[INFO] ANTLR 4 Runtime .................................... SUCCESS [ 13.828 s]
+[INFO] ANTLR 4 Tool ....................................... SUCCESS [ 14.032 s]
+[INFO] ANTLR 4 Maven plugin ............................... SUCCESS [  6.547 s]
+[INFO] ANTLR 4 Runtime Test Annotations ................... SUCCESS [  2.519 s]
+[INFO] ANTLR 4 Runtime Test Processors .................... SUCCESS [  2.385 s]
+[INFO] ANTLR 4 Runtime Tests (2nd generation) ............. SUCCESS [ 15.276 s]
+[INFO] ANTLR 4 Tool Tests ................................. SUCCESS [  2.233 s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 01:01 min
+[INFO] Finished at: 2016-12-11T09:37:54-08:00
+[INFO] Final Memory: 44M/470M
+[INFO] ------------------------------------------------------------------------
+```
+
 ## Maven release
 
 The maven deploy lifecycle phased deploys the artifacts and the poms for the ANTLR project to the [sonatype remote staging server](https://oss.sonatype.org/content/repositories/snapshots/).

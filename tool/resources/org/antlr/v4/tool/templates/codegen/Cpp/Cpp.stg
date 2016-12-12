@@ -40,7 +40,7 @@ cppTypeInitMap ::= [
     default: "nullptr" // anything other than a primitive type is an object
 ]
 
-LexerHeader(lexer, atn, actionFuncs, sempredFuncs, superClass = {Lexer}) ::= <<
+LexerHeader(lexer, atn, actionFuncs, sempredFuncs, superClass = {antlr4::Lexer}) ::= <<
 <namedActions.context>
 
 class <lexer.name> : public <superClass> {
@@ -63,7 +63,7 @@ public:
   };
 <endif>
 
-  <lexer.name>(CharStream *input);
+  <lexer.name>(antlr4::CharStream *input);
   ~<lexer.name>();
 
   <namedActions.members>
@@ -72,28 +72,28 @@ public:
 
   virtual const std::vector\<std::string>& getModeNames() const override;
   virtual const std::vector\<std::string>& getTokenNames() const override; // deprecated, use vocabulary instead
-  virtual dfa::Vocabulary& getVocabulary() const override;
+  virtual antlr4::dfa::Vocabulary& getVocabulary() const override;
 
   virtual const std::vector\<uint16_t> getSerializedATN() const override;
-  virtual const atn::ATN& getATN() const override;
+  virtual const antlr4::atn::ATN& getATN() const override;
 
   <if (actionFuncs)>
-  virtual void action(RuleContext *context, size_t ruleIndex, size_t actionIndex) override;
+  virtual void action(antlr4::RuleContext *context, size_t ruleIndex, size_t actionIndex) override;
   <endif>
   <if (sempredFuncs)>
-  virtual bool sempred(RuleContext *_localctx, size_t ruleIndex, size_t predicateIndex) override;
+  virtual bool sempred(antlr4::RuleContext *_localctx, size_t ruleIndex, size_t predicateIndex) override;
   <endif>
 
 private:
-  static std::vector\<dfa::DFA> _decisionToDFA;
-  static atn::PredictionContextCache _sharedContextCache;
+  static std::vector\<antlr4::dfa::DFA> _decisionToDFA;
+  static antlr4::atn::PredictionContextCache _sharedContextCache;
   static std::vector\<std::string> _ruleNames;
   static std::vector\<std::string> _tokenNames;
   static std::vector\<std::string> _modeNames;
 
   static std::vector\<std::string> _literalNames;
   static std::vector\<std::string> _symbolicNames;
-  static dfa::Vocabulary _vocabulary;
+  static antlr4::dfa::Vocabulary _vocabulary;
   <atn>
 
   <namedActions.declarations>
@@ -263,7 +263,7 @@ bool <if (r.factory.g.lexer)><lexer.name><else><parser.name><endif>::<r.name>Sem
 
 //--------------------------------------------------------------------------------------------------
 
-ParserHeader(parser, funcs, atn, sempredFuncs, superClass = {Parser}) ::= <<
+ParserHeader(parser, funcs, atn, sempredFuncs, superClass = {antlr4::Parser}) ::= <<
 <namedActions.context>
 
 class <parser.name> : public <superClass> {
@@ -280,14 +280,14 @@ public:
   };
 <endif>
 
-  <parser.name>(TokenStream *input);
+  <parser.name>(antlr4::TokenStream *input);
   ~<parser.name>();
 
   virtual std::string getGrammarFileName() const override;
-  virtual const atn::ATN& getATN() const override { return _atn; };
+  virtual const antlr4::atn::ATN& getATN() const override { return _atn; };
   virtual const std::vector\<std::string>& getTokenNames() const override { return _tokenNames; }; // deprecated: use vocabulary instead.
   virtual const std::vector\<std::string>& getRuleNames() const override;
-  virtual dfa::Vocabulary& getVocabulary() const override;
+  virtual antlr4::dfa::Vocabulary& getVocabulary() const override;
 
   <namedActions.members>
 
@@ -296,19 +296,19 @@ public:
   <funcs; separator = "\n">
 
   <if (sempredFuncs)>
-  virtual bool sempred(RuleContext *_localctx, size_t ruleIndex, size_t predicateIndex) override;
+  virtual bool sempred(antlr4::RuleContext *_localctx, size_t ruleIndex, size_t predicateIndex) override;
   <sempredFuncs.values; separator = "\n">
   <endif>
 
 private:
-  static std::vector\<dfa::DFA> _decisionToDFA;
-  static atn::PredictionContextCache _sharedContextCache;
+  static std::vector\<antlr4::dfa::DFA> _decisionToDFA;
+  static antlr4::atn::PredictionContextCache _sharedContextCache;
   static std::vector\<std::string> _ruleNames;
   static std::vector\<std::string> _tokenNames;
 
   static std::vector\<std::string> _literalNames;
   static std::vector\<std::string> _symbolicNames;
-  static dfa::Vocabulary _vocabulary;
+  static antlr4::dfa::Vocabulary _vocabulary;
   <atn>
 
   <namedActions.declarations>
@@ -406,7 +406,7 @@ std::vector\<std::string> <parser.name>::_tokenNames;
 >>
 
 SerializedATNHeader(model) ::= <<
-static atn::ATN _atn;
+static antlr4::atn::ATN _atn;
 static std::vector\<uint16_t> _serializedATN;
 >>
 
@@ -526,15 +526,15 @@ LeftRecursiveRuleFunction(currentRule, args, code, locals, ruleCtx, altLabelCtxs
 >>
 
 StructDeclHeader(struct, ctorAttrs, attrs, getters, dispatchMethods, interfaces, extensionMembers) ::= <<
-class <struct.name> : public <if (contextSuperClass)><contextSuperClass><else>ParserRuleContext<endif><if(interfaces)>, <interfaces; separator=", "><endif> {
+class <struct.name> : public <if (contextSuperClass)><contextSuperClass><else>antlr4::ParserRuleContext<endif><if(interfaces)>, <interfaces; separator=", "><endif> {
 public:
   <attrs: {a | <a>;}; separator="\n">
-  <if (ctorAttrs)><struct.name>(ParserRuleContext *parent, size_t invokingState);<endif>
-  <struct.name>(ParserRuleContext *parent, size_t invokingState<ctorAttrs: {a | , <a>}>);
+  <if (ctorAttrs)><struct.name>(antlr4::ParserRuleContext *parent, size_t invokingState);<endif>
+  <struct.name>(antlr4::ParserRuleContext *parent, size_t invokingState<ctorAttrs: {a | , <a>}>);
 <if (struct.provideCopyFrom)> <! don't need copy unless we have subclasses !>
-  <struct.name>() : ParserRuleContext() { }
+  <struct.name>() : antlr4::ParserRuleContext() { }
   void copyFrom(<struct.name> *context);
-  using ParserRuleContext::copyFrom;
+  using antlr4::ParserRuleContext::copyFrom;
 <endif>
 
   virtual size_t getRuleIndex() const override;
@@ -948,13 +948,13 @@ AddToLabelList(a) ::= <<
 
 TokenLabelType() ::= "<file.TokenLabelType; null = {Token}> *"
 
-TokenDeclHeader(t) ::= "<TokenLabelType()><t.name> = nullptr;"
+TokenDeclHeader(t) ::= "antlr4::<TokenLabelType()><t.name> = nullptr;"
 TokenDecl(t) ::= "<! Variable Declaration !>"
 
 TokenTypeDeclHeader(t) ::= "<! Local Variable !>"
 TokenTypeDecl(t) ::= "size_t <t.name> = 0;"
 
-TokenListDeclHeader(t) ::= "std::vector\<Token *> <t.name>;"
+TokenListDeclHeader(t) ::= "std::vector\<antlr4::Token *> <t.name>;"
 TokenListDecl(t) ::= "<! Variable Declaration !>"
 
 RuleContextDeclHeader(r) ::= "<parser.name>::<r.ctxName> *<r.name> = nullptr;"
@@ -963,7 +963,7 @@ RuleContextDecl(r) ::= "<! Variable Declaration !>"
 RuleContextListDeclHeader(rdecl) ::= "std::vector\<<rdecl.ctxName> *> <rdecl.name>;"
 RuleContextListDecl(rdecl) ::= "<! Variable Declaration !>"
 
-ContextTokenGetterDeclHeader(t) ::= "tree::TerminalNode *<t.name>();"
+ContextTokenGetterDeclHeader(t) ::= "antlr4::tree::TerminalNode *<t.name>();"
 ContextTokenGetterDecl(t) ::= <<
 tree::TerminalNode* <parser.name>::<t.ctx.name>::<t.name>() {
   return getToken(<parser.name>::<t.name>, 0);
@@ -971,7 +971,7 @@ tree::TerminalNode* <parser.name>::<t.ctx.name>::<t.name>() {
 
 >>
 
-ContextTokenListGetterDeclHeader(t) ::= "std::vector\<tree::TerminalNode *> <t.name>();"
+ContextTokenListGetterDeclHeader(t) ::= "std::vector\<antlr4::tree::TerminalNode *> <t.name>();"
 ContextTokenListGetterDecl(t) ::= <<
 std::vector\<tree::TerminalNode *> <parser.name>::<t.ctx.name>::<t.name>() {
   return getTokens(<parser.name>::<t.name>);
@@ -979,7 +979,7 @@ std::vector\<tree::TerminalNode *> <parser.name>::<t.ctx.name>::<t.name>() {
 
 >>
 
-ContextTokenListIndexedGetterDeclHeader(t) ::= "tree::TerminalNode* <t.name>(size_t i);"
+ContextTokenListIndexedGetterDeclHeader(t) ::= "antlr4::tree::TerminalNode* <t.name>(size_t i);"
 ContextTokenListIndexedGetterDecl(t)  ::= <<
 tree::TerminalNode* <parser.name>::<t.ctx.name>::<t.name>(size_t i) {
   return getToken(<parser.name>::<t.name>, i);
@@ -1012,7 +1012,7 @@ ContextRuleListIndexedGetterDecl(r) ::= <<
 
 >>
 
-LexerRuleContext() ::= "RuleContext"
+LexerRuleContext() ::= "antlr4::RuleContext"
 
 // The rule context name is the rule followed by a suffix; e.g. r becomes rContext.
 RuleContextNameSuffix() ::= "Context"
@@ -1031,7 +1031,7 @@ CaptureNextTokenTypeHeader(d) ::= "<! Required but unused. !>"
 CaptureNextTokenType(d) ::= "<d.varName> = _input->LA(1);"
 
 ListenerDispatchMethodHeader(method) ::= <<
-virtual void <if (method.isEnter)>enter<else>exit<endif>Rule(tree::ParseTreeListener *listener) override;
+virtual void <if (method.isEnter)>enter<else>exit<endif>Rule(antlr4::tree::ParseTreeListener *listener) override;
 >>
 ListenerDispatchMethod(method) ::= <<
 void <parser.name>::<struct.name>::<if (method.isEnter)>enter<else>exit<endif>Rule(tree::ParseTreeListener *listener) {
@@ -1043,7 +1043,7 @@ void <parser.name>::<struct.name>::<if (method.isEnter)>enter<else>exit<endif>Ru
 
 VisitorDispatchMethodHeader(method) ::= <<
 
-virtual antlrcpp::Any accept(tree::ParseTreeVisitor *visitor) override;
+virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
 >>
 VisitorDispatchMethod(method) ::=  <<
 

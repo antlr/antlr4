@@ -1,9 +1,0 @@
-import "TernaryExprExplicitAssociativity.stg"
-
-Input() ::= "a*b"
-
-Output() ::= <<
-(s (e (e a) * (e b)) \<EOF>)<\n>
->>
-
-Errors() ::= ""

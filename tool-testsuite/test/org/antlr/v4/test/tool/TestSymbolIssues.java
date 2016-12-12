@@ -1,31 +1,7 @@
 /*
- * [The "BSD license"]
- *  Copyright (c) 2012 Terence Parr
- *  Copyright (c) 2012 Sam Harwell
- *  All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions
- *  are met:
- *
- *  1. Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  2. Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  3. The name of the author may not be used to endorse or promote products
- *     derived from this software without specific prior written permission.
- *
- *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- *  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- *  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
  */
 
 package org.antlr.v4.test.tool;
@@ -243,6 +219,103 @@ public class TestSymbolIssues extends BaseJavaToolTest {
 			"error(" + ErrorType.CONSTANT_VALUE_IS_NOT_A_RECOGNIZED_TOKEN_NAME.code + "): L.g4:4:22: CHANNEL1 is not a recognized token name\n" +
 			"error(" + ErrorType.CONSTANT_VALUE_IS_NOT_A_RECOGNIZED_CHANNEL_NAME.code + "): L.g4:4:41: MODE1 is not a recognized channel name\n" +
 			"error(" + ErrorType.CONSTANT_VALUE_IS_NOT_A_RECOGNIZED_MODE_NAME.code + "): L.g4:4:54: TOKEN1 is not a recognized mode name\n"
+		};
+
+		testErrors(test, false);
+	}
+
+	// https://github.com/antlr/antlr4/issues/1388
+	@Test public void testDuplicatedCommands() throws Exception {
+		String[] test = {
+			"lexer grammar Lexer;\n" +
+			"channels { CHANNEL1, CHANNEL2 }\n" +
+			"tokens { TEST1, TEST2 }\n" +
+			"TOKEN: 'a' -> mode(MODE1), mode(MODE2);\n" +
+			"TOKEN1: 'b' -> pushMode(MODE1), mode(MODE2);\n" +
+			"TOKEN2: 'c' -> pushMode(MODE1), pushMode(MODE2); // pushMode is not duplicate\n" +
+			"TOKEN3: 'd' -> popMode, popMode;                 // popMode is not duplicate\n" +
+			"mode MODE1;\n" +
+			"MODE1_TOKEN: 'e';\n" +
+			"mode MODE2;\n" +
+			"MODE2_TOKEN: 'f';\n" +
+			"MODE2_TOKEN1: 'g' -> type(TEST1), type(TEST2);\n" +
+			"MODE2_TOKEN2: 'h' -> channel(CHANNEL1), channel(CHANNEL2), channel(DEFAULT_TOKEN_CHANNEL);",
+
+			"warning(" + ErrorType.DUPLICATED_COMMAND.code + "): Lexer.g4:4:27: duplicated command mode\n" +
+			"warning(" + ErrorType.DUPLICATED_COMMAND.code + "): Lexer.g4:12:34: duplicated command type\n" +
+			"warning(" + ErrorType.DUPLICATED_COMMAND.code + "): Lexer.g4:13:40: duplicated command channel\n" +
+			"warning(" + ErrorType.DUPLICATED_COMMAND.code + "): Lexer.g4:13:59: duplicated command channel\n"
+		};
+
+		testErrors(test, false);
+	}
+
+	// https://github.com/antlr/antlr4/issues/1388
+	@Test public void testIncompatibleCommands() throws Exception {
+		String[] test = {
+				"lexer grammar L;\n" +
+				"channels { CHANNEL1 }\n" +
+				"tokens { TYPE1 }\n" +
+				"// Incompatible\n" +
+				"T00: 'a00' -> skip, more;\n" +
+				"T01: 'a01' -> skip, type(TYPE1);\n" +
+				"T02: 'a02' -> skip, channel(CHANNEL1);\n" +
+				"T03: 'a03' -> more, type(TYPE1);\n" +
+				"T04: 'a04' -> more, channel(CHANNEL1);\n" +
+				"T05: 'a05' -> more, skip;\n" +
+				"T06: 'a06' -> type(TYPE1), skip;\n" +
+				"T07: 'a07' -> type(TYPE1), more;\n" +
+				"T08: 'a08' -> channel(CHANNEL1), skip;\n" +
+				"T09: 'a09' -> channel(CHANNEL1), more;\n" +
+				"// Allowed\n" +
+				"T10: 'a10' -> type(TYPE1), channel(CHANNEL1);\n" +
+				"T11: 'a11' -> channel(CHANNEL1), type(TYPE1);",
+
+				"warning(" + ErrorType.INCOMPATIBLE_COMMANDS.code + "): L.g4:5:20: incompatible commands skip and more\n" +
+				"warning(" + ErrorType.INCOMPATIBLE_COMMANDS.code + "): L.g4:6:20: incompatible commands skip and type\n" +
+				"warning(" + ErrorType.INCOMPATIBLE_COMMANDS.code + "): L.g4:7:20: incompatible commands skip and channel\n" +
+				"warning(" + ErrorType.INCOMPATIBLE_COMMANDS.code + "): L.g4:8:20: incompatible commands more and type\n" +
+				"warning(" + ErrorType.INCOMPATIBLE_COMMANDS.code + "): L.g4:9:20: incompatible commands more and channel\n" +
+				"warning(" + ErrorType.INCOMPATIBLE_COMMANDS.code + "): L.g4:10:20: incompatible commands more and skip\n" +
+				"warning(" + ErrorType.INCOMPATIBLE_COMMANDS.code + "): L.g4:11:27: incompatible commands type and skip\n" +
+				"warning(" + ErrorType.INCOMPATIBLE_COMMANDS.code + "): L.g4:12:27: incompatible commands type and more\n" +
+				"warning(" + ErrorType.INCOMPATIBLE_COMMANDS.code + "): L.g4:13:33: incompatible commands channel and skip\n" +
+				"warning(" + ErrorType.INCOMPATIBLE_COMMANDS.code + "): L.g4:14:33: incompatible commands channel and more\n"
+		};
+
+		testErrors(test, false);
+	}
+
+	// https://github.com/antlr/antlr4/issues/1409
+	@Test public void testLabelsForTokensWithMixedTypes() {
+		String[] test = {
+				"grammar L;\n" +
+				"\n" +
+				"rule1                                    // Correct (Alternatives)\n" +
+				"    : t1 = a  #aLabel\n" +
+				"    | t1 = b  #bLabel\n" +
+				"    ;\n" +
+				"rule2                         //Incorrect type casting in generated code (RULE_LABEL)\n" +
+				"    : t2 = a | t2 = b\n" +
+				"    ;\n" +
+				"rule3\n" +
+				"    : t3 += a+ b t3 += c+     //Incorrect type casting in generated code (RULE_LIST_LABEL)\n" +
+				"    ;\n" +
+				"rule4\n" +
+				"    : a t4 = A b t4 = B c                // Correct (TOKEN_LABEL)\n" +
+				"    ;\n" +
+				"rule5\n" +
+				"    : a t5 += A b t5 += B c              // Correct (TOKEN_LIST_LABEL)\n" +
+				"    ;\n" +
+				"a: A;\n" +
+				"b: B;\n" +
+				"c: C;\n" +
+				"A: 'a';\n" +
+				"B: 'b';\n" +
+				"C: 'c';\n",
+
+				"error(" + ErrorType.LABEL_TYPE_CONFLICT.code + "): L.g4:8:15: label t2=b type mismatch with previous definition: t2=a\n" +
+				"error(" + ErrorType.LABEL_TYPE_CONFLICT.code + "): L.g4:11:17: label t3+=c type mismatch with previous definition: t3+=a\n"
 		};
 
 		testErrors(test, false);

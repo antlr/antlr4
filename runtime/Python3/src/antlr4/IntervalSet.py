@@ -1,3 +1,9 @@
+#
+# Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+# Use of this file is governed by the BSD 3-clause license that
+# can be found in the LICENSE.txt file in the project root.
+#
+
 from io import StringIO
 import unittest
 from antlr4.Token import Token
@@ -138,7 +144,7 @@ class IntervalSet(object):
                 # split existing range
                 elif v<i.stop-1:
                     x = range(i.start, v)
-                    i.start = v + 1
+                    self.intervals[k] = range(v + 1, i.stop)
                     self.intervals.insert(k, x)
                     return
                 k += 1

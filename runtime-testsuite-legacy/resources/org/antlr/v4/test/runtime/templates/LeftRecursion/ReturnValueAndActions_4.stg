@@ -1,9 +1,0 @@
-import "ReturnValueAndActions.stg"
-
-Input() ::= "(1+2)*3"
-
-Output() ::= <<
-9<\n>
->>
-
-Errors() ::= ""

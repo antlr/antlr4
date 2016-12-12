@@ -1,9 +1,0 @@
-import "AorAStar.stg"
-
-Input() ::= "a b c"
-
-Output() ::= <<
-abc<\n>
->>
-
-Errors() ::= ""

@@ -1,32 +1,8 @@
 //
-// [The "BSD license"]
-//  Copyright (c) 2012 Terence Parr
-//  Copyright (c) 2012 Sam Harwell
-//  Copyright (c) 2014 Eric Vergnaud
-//  All rights reserved.
-//
-//  Redistribution and use in source and binary forms, with or without
-//  modification, are permitted provided that the following conditions
-//  are met:
-//
-//  1. Redistributions of source code must retain the above copyright
-//     notice, this list of conditions and the following disclaimer.
-//  2. Redistributions in binary form must reproduce the above copyright
-//     notice, this list of conditions and the following disclaimer in the
-//     documentation and/or other materials provided with the distribution.
-//  3. The name of the author may not be used to endorse or promote products
-//     derived from this software without specific prior written permission.
-//
-//  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-//  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-//  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-//  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-//  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-//  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-//  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-//  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-//  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
 //
 
 // A tree structure used to record the semantic context in which
@@ -38,10 +14,17 @@
 //
 
 var Set = require('./../Utils').Set;
+var Hash = require('./../Utils').Hash;
 
 function SemanticContext() {
 	return this;
 }
+
+SemanticContext.prototype.hashCode = function() {
+    var hash = new Hash();
+    this.updateHashCode(hash);
+    return hash.finish();
+};
 
 // For context independent predicates, we evaluate them without a local
 // context (i.e., null context). That way, we can evaluate them without
@@ -135,8 +118,8 @@ Predicate.prototype.evaluate = function(parser, outerContext) {
 	return parser.sempred(localctx, this.ruleIndex, this.predIndex);
 };
 
-Predicate.prototype.hashString = function() {
-	return "" + this.ruleIndex + "/" + this.predIndex + "/" + this.isCtxDependent;
+Predicate.prototype.updateHashCode = function(hash) {
+	hash.update(this.ruleIndex, this.predIndex, this.isCtxDependent);
 };
 
 Predicate.prototype.equals = function(other) {
@@ -179,8 +162,8 @@ PrecedencePredicate.prototype.compareTo = function(other) {
 	return this.precedence - other.precedence;
 };
 
-PrecedencePredicate.prototype.hashString = function() {
-	return "31";
+PrecedencePredicate.prototype.updateHashCode = function(hash) {
+    hash.update(31);
 };
 
 PrecedencePredicate.prototype.equals = function(other) {
@@ -258,8 +241,8 @@ AND.prototype.equals = function(other) {
 	}
 };
 
-AND.prototype.hashString = function() {
-	return "" + this.opnds + "/AND";
+AND.prototype.updateHashCode = function(hash) {
+    hash.update(this.opnds, "AND");
 };
 //
 // {@inheritDoc}
@@ -362,8 +345,8 @@ OR.prototype.constructor = function(other) {
 	}
 };
 
-OR.prototype.hashString = function() {
-	return "" + this.opnds + "/OR"; 
+OR.prototype.updateHashCode = function(hash) {
+    hash.update(this.opnds, "OR");
 };
 
 // <p>

@@ -1,9 +1,0 @@
-import "Expressions.stg"
-
-Input() ::= "a-1"
-
-Output() ::= <<
-(s (e (e a) - (e 1)) \<EOF>)<\n>
->>
-
-Errors() ::= ""

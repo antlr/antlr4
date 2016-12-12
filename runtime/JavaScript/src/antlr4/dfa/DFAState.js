@@ -1,36 +1,13 @@
 //
-// [The "BSD license"]
-//  Copyright (c) 2012 Terence Parr
-//  Copyright (c) 2012 Sam Harwell
-//  Copyright (c) 2014 Eric Vergnaud
-//  All rights reserved.
-//
-//  Redistribution and use in source and binary forms, with or without
-//  modification, are permitted provided that the following conditions
-//  are met:
-//
-//  1. Redistributions of source code must retain the above copyright
-//     notice, this list of conditions and the following disclaimer.
-//  2. Redistributions in binary form must reproduce the above copyright
-//     notice, this list of conditions and the following disclaimer in the
-//     documentation and/or other materials provided with the distribution.
-//  3. The name of the author may not be used to endorse or promote products
-//     derived from this software without specific prior written permission.
-//
-//  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-//  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-//  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-//  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-//  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-//  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-//  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-//  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-//  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
 ///
 
 var ATNConfigSet = require('./../atn/ATNConfigSet').ATNConfigSet;
 var Utils = require('./../Utils');
+var Hash = Utils.Hash;
 var Set = Utils.Set;
 
 // Map a predicate to a predicted alternative.///
@@ -142,26 +119,33 @@ DFAState.prototype.getAltSet = function() {
 // {@link //stateNumber} is irrelevant.</p>
 DFAState.prototype.equals = function(other) {
 	// compare set of ATN configurations in this set with other
-	if (this === other) {
-		return true;
-	} else if (!(other instanceof DFAState)) {
-		return false;
-	} else {
-		return this.configs.equals(other.configs);
-	}
+	return this === other ||
+			(other instanceof DFAState &&
+				this.configs.equals(other.configs));
 };
 
 DFAState.prototype.toString = function() {
-	return "" + this.stateNumber + ":" + this.hashString();
+	var s = "" + this.stateNumber + ":" + this.configs;
+	if(this.isAcceptState) {
+        s = s + "=>";
+        if (this.predicates !== null)
+            s = s + this.predicates;
+        else
+            s = s + this.prediction;
+    }
+	return s;
 };
 
-DFAState.prototype.hashString = function() {
-	return "" +  this.configs +
-			(this.isAcceptState ?
-					"=>" + (this.predicates !== null ?
-								this.predicates :
-								this.prediction) :
-					"");
+DFAState.prototype.hashCode = function() {
+	var hash = new Hash();
+	hash.update(this.configs);
+	if(this.isAcceptState) {
+        if (this.predicates !== null)
+            hash.update(this.predicates);
+        else
+            hash.update(this.prediction);
+    }
+    return hash.finish();
 };
 
 exports.DFAState = DFAState;

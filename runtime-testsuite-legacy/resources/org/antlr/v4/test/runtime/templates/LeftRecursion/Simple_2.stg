@@ -1,9 +1,0 @@
-import "Simple.stg"
-
-Input() ::= "x y"
-
-Output() ::= <<
-(s (a (a x) y))<\n>
->>
-
-Errors() ::= ""

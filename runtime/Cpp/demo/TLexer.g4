@@ -66,8 +66,9 @@ OpenCurly: '{' -> pushMode(Mode1);
 CloseCurly: '}' -> popMode;
 QuestionMark: '?';
 Comma: ',' -> skip;
-Dollar: '$' -> more, mode(Mode1), type(DUMMY);
-		   
+Dollar: '$' -> more, mode(Mode1);
+Ampersand: '&' -> type(DUMMY);
+ 
 String: '"' .*? '"';
 Foo: {canTestFoo()}? 'foo' {isItFoo()}? { myFooLexerAction(); };
 Bar: 'bar' {isItBar()}? { myBarLexerAction(); };

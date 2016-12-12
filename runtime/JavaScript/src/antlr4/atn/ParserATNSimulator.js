@@ -1,32 +1,8 @@
 //
-// [The "BSD license"]
-//  Copyright (c) 2012 Terence Parr
-//  Copyright (c) 2012 Sam Harwell
-//  Copyright (c) 2014 Eric Vergnaud
-//  All rights reserved.
-//
-//  Redistribution and use in source and binary forms, with or without
-//  modification, are permitted provided that the following conditions
-//  are met:
-//
-//  1. Redistributions of source code must retain the above copyright
-//     notice, this list of conditions and the following disclaimer.
-//  2. Redistributions in binary form must reproduce the above copyright
-//     notice, this list of conditions and the following disclaimer in the
-//     documentation and/or other materials provided with the distribution.
-//  3. The name of the author may not be used to endorse or promote products
-//     derived from this software without specific prior written permission.
-//
-//  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-//  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-//  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-//  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-//  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-//  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-//  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-//  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-//  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
 //
 
 //
@@ -315,6 +291,8 @@ ParserATNSimulator.prototype = Object.create(ATNSimulator.prototype);
 ParserATNSimulator.prototype.constructor = ParserATNSimulator;
 
 ParserATNSimulator.prototype.debug = false;
+ParserATNSimulator.prototype.debug_closure = false;
+ParserATNSimulator.prototype.debug_add = false;
 ParserATNSimulator.prototype.debug_list_atn_decisions = false;
 ParserATNSimulator.prototype.dfa_debug = false;
 ParserATNSimulator.prototype.retry_debug = false;
@@ -333,7 +311,7 @@ ParserATNSimulator.prototype.adaptivePredict = function(input, decision, outerCo
     this._input = input;
     this._startIndex = input.index;
     this._outerContext = outerContext;
-    
+
     var dfa = this.decisionToDFA[decision];
     this._dfa = dfa;
     var m = input.mark();
@@ -740,13 +718,13 @@ ParserATNSimulator.prototype.computeReachSet = function(closure, t, fullCtx) {
     // For full-context reach operations, separate handling is required to
     // ensure that the alternative matching the longest overall sequence is
     // chosen when multiple such configurations can match the input.
-    
+
     var skippedStopStates = null;
 
     // First figure out where we can reach on input t
     for (var i=0; i<closure.items.length;i++) {
         var c = closure.items[i];
-        if(this.debug) {
+        if(this.debug_add) {
             console.log("testing " + this.getTokenName(t) + " at " + c);
         }
         if (c.state instanceof RuleStopState) {
@@ -755,7 +733,7 @@ ParserATNSimulator.prototype.computeReachSet = function(closure, t, fullCtx) {
                     skippedStopStates = [];
                 }
                 skippedStopStates.push(c);
-                if(this.debug) {
+                if(this.debug_add) {
                     console.log("added " + c + " to skippedStopStates");
                 }
             }
@@ -767,7 +745,7 @@ ParserATNSimulator.prototype.computeReachSet = function(closure, t, fullCtx) {
             if (target!==null) {
                 var cfg = new ATNConfig({state:target}, c);
                 intermediate.add(cfg, this.mergeCache);
-                if(this.debug) {
+                if(this.debug_add) {
                     console.log("added " + cfg + " to intermediate");
                 }
             }
@@ -1131,7 +1109,7 @@ ParserATNSimulator.prototype.getSynValidOrSemInvalidAltThatFinishedDecisionEntry
     }
     return ATN.INVALID_ALT_NUMBER;
 };
-    
+
 ParserATNSimulator.prototype.getAltThatFinishedDecisionEntryRule = function(configs) {
     var alts = [];
     for(var i=0;i<configs.items.length; i++) {
@@ -1225,9 +1203,9 @@ ParserATNSimulator.prototype.closure = function(config, configs, closureBusy, co
 
 
 ParserATNSimulator.prototype.closureCheckingStopState = function(config, configs, closureBusy, collectPredicates, fullCtx, depth, treatEofAsEpsilon) {
-    if (this.debug) {
+    if (this.debug || this.debug_closure) {
         console.log("closure(" + config.toString(this.parser,true) + ")");
-        console.log("configs(" + configs.toString() + ")");
+        // console.log("configs(" + configs.toString() + ")");
         if(config.reachesIntoOuterContext>50) {
             throw "problem";
         }
@@ -1275,6 +1253,7 @@ ParserATNSimulator.prototype.closureCheckingStopState = function(config, configs
     }
     this.closure_(config, configs, closureBusy, collectPredicates, fullCtx, depth, treatEofAsEpsilon);
 };
+
 
 // Do the actual work of walking epsilon edges//
 ParserATNSimulator.prototype.closure_ = function(config, configs, closureBusy, collectPredicates, fullCtx, depth, treatEofAsEpsilon) {
@@ -1342,6 +1321,8 @@ ParserATNSimulator.prototype.canDropLoopEntryEdgeInLeftRecursiveRule = function(
     // the context has an empty stack case. If so, it would mean
     // global FOLLOW so we can't perform optimization
     // Are we the special loop entry/exit state? or SLL wildcard
+    if(p.stateType != ATNState.STAR_LOOP_ENTRY)
+        return false;
     if(p.stateType != ATNState.STAR_LOOP_ENTRY || !p.isPrecedenceDecision ||
            config.context.isEmpty() || config.context.hasEmptyPath())
         return false;
@@ -1434,7 +1415,8 @@ ParserATNSimulator.prototype.getEpsilonTarget = function(config, t, collectPredi
 
 ParserATNSimulator.prototype.actionTransition = function(config, t) {
     if (this.debug) {
-        console.log("ACTION edge " + t.ruleIndex + ":" + t.actionIndex);
+        var index = t.actionIndex==-1 ? 65535 : t.actionIndex;
+        console.log("ACTION edge " + t.ruleIndex + ":" + index);
     }
     return new ATNConfig({state:t.target}, config);
 };
@@ -1575,11 +1557,12 @@ ParserATNSimulator.prototype.getTokenName = function( t) {
         return "EOF";
     }
     if( this.parser!==null && this.parser.literalNames!==null) {
-        if (t >= this.parser.literalNames.length) {
+        if (t >= this.parser.literalNames.length && t >= this.parser.symbolicNames.length) {
             console.log("" + t + " ttype out of range: " + this.parser.literalNames);
             console.log("" + this.parser.getInputStream().getTokens());
         } else {
-            return this.parser.literalNames[t] + "<" + t + ">";
+            var name = this.parser.literalNames[t] || this.parser.symbolicNames[t];
+            return name + "<" + t + ">";
         }
     }
     return "" + t;
@@ -1666,8 +1649,9 @@ ParserATNSimulator.prototype.addDFAEdge = function(dfa, from_, t, to) {
     from_.edges[t+1] = to; // connect
 
     if (this.debug) {
-        var names = this.parser===null ? null : this.parser.literalNames;
-        console.log("DFA=\n" + dfa.toString(names));
+        var literalNames = this.parser===null ? null : this.parser.literalNames;
+        var symbolicNames = this.parser===null ? null : this.parser.symbolicNames;
+        console.log("DFA=\n" + dfa.toString(literalNames, symbolicNames));
     }
     return to;
 };
@@ -1690,8 +1674,7 @@ ParserATNSimulator.prototype.addDFAState = function(dfa, D) {
     if (D == ATNSimulator.ERROR) {
         return D;
     }
-    var hash = D.hashString();
-    var existing = dfa.states[hash] || null;
+    var existing = dfa.states.get(D);
     if(existing!==null) {
         return existing;
     }
@@ -1700,7 +1683,7 @@ ParserATNSimulator.prototype.addDFAState = function(dfa, D) {
         D.configs.optimizeConfigs(this);
         D.configs.setReadonly(true);
     }
-    dfa.states[hash] = D;
+    dfa.states.add(D);
     if (this.debug) {
         console.log("adding new DFA state: " + D);
     }
@@ -1728,7 +1711,7 @@ ParserATNSimulator.prototype.reportContextSensitivity = function(dfa, prediction
         this.parser.getErrorListenerDispatch().reportContextSensitivity(this.parser, dfa, startIndex, stopIndex, prediction, configs);
     }
 };
-    
+
 // If context sensitive parsing, we know it's ambiguity not conflict//
 ParserATNSimulator.prototype.reportAmbiguity = function(dfa, D, startIndex, stopIndex,
                                exact, ambigAlts, configs ) {
@@ -1741,5 +1724,5 @@ ParserATNSimulator.prototype.reportAmbiguity = function(dfa, D, startIndex, stop
         this.parser.getErrorListenerDispatch().reportAmbiguity(this.parser, dfa, startIndex, stopIndex, exact, ambigAlts, configs);
     }
 };
-            
+
 exports.ParserATNSimulator = ParserATNSimulator;

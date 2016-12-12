@@ -125,3 +125,5 @@ YYYY/MM/DD, github id, Full name, email
 2016/11/29, wxio, Gary Miller, gm@wx.io
 2016/11/29, Naios, Denis Blank, naios@users.noreply.github.com
 2016/12/01, samtatasurya, Samuel Tatasurya, xemradiant@gmail.com
+2016/12/03, redxdev, Samuel Bloomberg, sam@redxdev.com
+2016/12/11, Gaulouis, Gaulouis, gaulouis.com@gmail.com
