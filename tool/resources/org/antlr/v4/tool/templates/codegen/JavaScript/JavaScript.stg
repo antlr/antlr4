@@ -236,7 +236,7 @@ case <index>:
  * overriding implementation impossible to maintain.
  */
 RuleSempredFunction(r, actions) ::= <<
-<if(parser)><parser.name><else><lexer.name><endif>.prototype.<r.name>_sempred = function(localctx, predIndex) {
+<if (r.factory.g.lexer)><lexer.name><else><parser.name><endif>.prototype.<r.name>_sempred = function(localctx, predIndex) {
 	switch(predIndex) {
 		<actions:{index| case <index>:
 	return <actions.(index)>;}; separator="\n">
