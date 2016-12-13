@@ -696,7 +696,9 @@ setState(<m.stateNumber>)
 <capture>
 if (<if(invert)><m.varName> \<= 0 || <else>!<endif>(<expr>)) {
 	<if(m.labels)><m.labels:{l | <labelref(l)> = }><endif>try _errHandler.recoverInline(self)<if(m.labels)> as Token<endif>
-} else {
+}
+else {
+	_errHandler.reportMatch(self)
 	try consume()
 }
 >>
