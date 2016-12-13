@@ -8,12 +8,13 @@
 #include "tree/ParseTreeListener.h"
 #include "support/CPPUtils.h"
 
+#include "tree/IterativeParseTreeWalker.h"
 #include "tree/ParseTreeWalker.h"
 
 using namespace antlr4::tree;
 using namespace antlrcpp;
 
-ParseTreeWalker ParseTreeWalker::DEFAULT;
+ParseTreeWalker ParseTreeWalker::DEFAULT = IterativeParseTreeWalker();
 
 void ParseTreeWalker::walk(ParseTreeListener *listener, ParseTree *t) const {
   if (is<ErrorNode *>(t)) {
@@ -26,7 +27,7 @@ void ParseTreeWalker::walk(ParseTreeListener *listener, ParseTree *t) const {
 
   enterRule(listener, t);
   for (auto &child : t->children) {
-    walk(listener, dynamic_cast<ParseTree *>(child));
+    walk(listener, child);
   }
   exitRule(listener, t);
 }
