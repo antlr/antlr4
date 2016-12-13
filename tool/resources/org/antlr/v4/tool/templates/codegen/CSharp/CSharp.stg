@@ -720,6 +720,7 @@ if ( <if(invert)><m.varName> \<= 0 || <else>!<endif>(<expr>) ) {
 	<if(m.labels)><m.labels:{l | <labelref(l)> = }><endif>ErrorHandler.RecoverInline(this);
 }
 else {
+	ErrorHandler.ReportMatch(this);
     Consume();
 }
 >>

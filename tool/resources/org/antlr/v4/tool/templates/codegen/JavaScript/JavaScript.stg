@@ -523,6 +523,7 @@ this.state = <m.stateNumber>;
     <if(m.labels)><m.labels:{l | <labelref(l)> = }><endif>this._errHandler.recoverInline(this);
 }
 else {
+	this._errHandler.reportMatch(this);
     this.consume();
 }
 >>
