@@ -315,7 +315,7 @@ bool SemanticContext::operator != (const SemanticContext &other) const {
   return !(*this == other);
 }
 
-Ref<SemanticContext> SemanticContext::evalPrecedence(Recognizer * /*parser*/, RuleContext */*parserCallStack*/) {
+Ref<SemanticContext> SemanticContext::evalPrecedence(Recognizer * /*parser*/, RuleContext * /*parserCallStack*/) {
   return shared_from_this();
 }
 

@@ -393,9 +393,6 @@
     <ClInclude Include="src\tree\TerminalNodeImpl.h">
       <Filter>Header Files\tree</Filter>
     </ClInclude>
-    <ClInclude Include="src\tree\Tree.h">
-      <Filter>Header Files\tree</Filter>
-    </ClInclude>
     <ClInclude Include="src\tree\Trees.h">
       <Filter>Header Files\tree</Filter>
     </ClInclude>
@@ -539,6 +536,9 @@
     </ClInclude>
     <ClInclude Include="src\support\Any.h">
       <Filter>Source Files\support</Filter>
+    </ClInclude>
+    <ClInclude Include="src\tree\IterativeParseTreeWalker.h">
+      <Filter>Header Files\tree</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -936,6 +936,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\tree\ParseTree.cpp">
+      <Filter>Source Files\tree</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tree\IterativeParseTreeWalker.cpp">
       <Filter>Source Files\tree</Filter>
     </ClCompile>
   </ItemGroup>
