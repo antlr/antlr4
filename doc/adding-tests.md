@@ -2,9 +2,7 @@
 
 ## Introduction
 
-Because ANTLR supports multiple target languages, the unit tests are broken into two groups: the unit tests that test the tool itself (in `tool-testsuite`) and the unit tests that test the parser runtimes (in `antlr4/runtime-testsuite`).  The tool tests are straightforward because they are Java code testing Java code; see the section at the bottom of this file.
-
-The runtime tests must be specified in a generic fashion to work across language targets. Furthermore, we must test the various targets from Java. This usually means Java launching processes to compile, say, C++ and run parsers.
+A general overview of unit testing in ANTLR can be found in the [Functional Testing in ANTLR](testing.md) document. Here we look closer at how to write new tests and what needs to be considered, especially for cross target tests.
 
 As of 4.6, we use [a Java descriptor object](https://github.com/antlr/antlr4/blob/master/runtime-testsuite/test/org/antlr/v4/test/runtime/RuntimeTestDescriptor.java) to describe each runtime test.  Unit tests are grouped together into categories such as [ParserExecDescriptors](https://github.com/antlr/antlr4/blob/master/runtime-testsuite/test/org/antlr/v4/test/runtime/descriptors/ParserExecDescriptors.java), which has multiple nested descriptor objects, one per test. For example, here is the start of that file:
 
@@ -34,40 +32,6 @@ The mysterious `@CommentHasStringValue` annotation is a bit of a hack that allow
 
 The grammars are strings representing StringTemplates (`ST` objects) so `<writeln("$text")>` will get replace when the unit test file is generated (`Test.java`, `Test.cs`, ...). The `writeln` template must be defined per target.  Here are all of the 
 [Target templates for runtime tests](https://github.com/antlr/antlr4/tree/master/runtime-testsuite/resources/org/antlr/v4/test/runtime/templates).
-
-## Running the runtime tests
-
-A single test rig is sufficient to test all targets against all descriptors using the [junit parameterized tests](https://github.com/junit-team/junit4/wiki/parameterized-tests) mechanism. But, that is inconvenient because we often want to test just a single target or perhaps even just a single test within a single group of a single target. I have automatically generated a bunch of
-[Target runtime test rigs](https://github.com/antlr/antlr4/tree/master/runtime-testsuite/test/org/antlr/v4/test/runtime) that allow developers such flexibility. For example, here are the Python3 test rigs in intellij:
-
-<img src=images/testrigs.png width=300>
-
-And the result of testing the entire subdirectory:
-
-<img src=images/python3-tests.png width=400>
-
-From `mvn`, on the commandline, you will see:
-
-```bash
--------------------------------------------------------
- T E S T S
--------------------------------------------------------
-Running org.antlr.v4.test.runtime.javascript.node.TestCompositeLexers
-Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.581 sec
-Running org.antlr.v4.test.runtime.javascript.node.TestLexerErrors
-Tests run: 12, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.721 sec
-Running org.antlr.v4.test.runtime.javascript.node.TestSemPredEvalParser
-Tests run: 26, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 6.084 sec
-Running org.antlr.v4.test.runtime.javascript.node.TestSets
-Tests run: 23, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.798 sec
-Running org.antlr.v4.test.runtime.javascript.node.TestPerformance
-Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.505 sec
-Running org.antlr.v4.test.runtime.javascript.node.TestSemPredEvalLexer
-Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.994 sec
-Running org.antlr.v4.test.runtime.javascript.node.TestLexerExec
-Tests run: 38, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 8.433 sec
-...
-```
 
 ## Adding a runtime test
 
