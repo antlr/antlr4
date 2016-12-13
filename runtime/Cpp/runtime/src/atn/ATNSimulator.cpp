@@ -16,6 +16,8 @@ using namespace antlr4::dfa;
 using namespace antlr4::atn;
 
 const Ref<DFAState> ATNSimulator::ERROR = std::make_shared<DFAState>(INT32_MAX);
+antlrcpp::SingleWriteMultipleReadLock ATNSimulator::_stateLock;
+antlrcpp::SingleWriteMultipleReadLock ATNSimulator::_edgeLock;
 
 ATNSimulator::ATNSimulator(const ATN &atn, PredictionContextCache &sharedContextCache)
 : atn(atn), _sharedContextCache(sharedContextCache) {
@@ -30,7 +32,8 @@ PredictionContextCache& ATNSimulator::getSharedContextCache() {
 }
 
 Ref<PredictionContext> ATNSimulator::getCachedContext(Ref<PredictionContext> const& context) {
-  std::lock_guard<std::recursive_mutex> lck(_mutex);
+  // This function requires a lock as it might modify the cache, however the only path so far where it is called from
+  // (addDFAState -> optimizeConfigs) already has _stateLock aquired. Adding another lock here would then deadlock.
   std::map<Ref<PredictionContext>, Ref<PredictionContext>> visited;
   return PredictionContext::getCachedContext(context, _sharedContextCache, visited);
 }

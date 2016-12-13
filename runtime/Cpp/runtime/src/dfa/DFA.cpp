@@ -71,7 +71,7 @@ DFAState* DFA::getPrecedenceStartState(int precedence) const {
   return iterator->second;
 }
 
-void DFA::setPrecedenceStartState(int precedence, DFAState *startState, std::recursive_mutex &mutex) {
+void DFA::setPrecedenceStartState(int precedence, DFAState *startState, SingleWriteMultipleReadLock &lock) {
   if (!isPrecedenceDfa()) {
     throw IllegalStateException("Only precedence DFAs may contain a precedence start state.");
   }
@@ -81,8 +81,9 @@ void DFA::setPrecedenceStartState(int precedence, DFAState *startState, std::rec
   }
 
   {
-    std::unique_lock<std::recursive_mutex> lock(mutex);
+    lock.writeLock();
     s0->edges[precedence] = startState;
+    lock.writeUnlock();
   }
 }
 

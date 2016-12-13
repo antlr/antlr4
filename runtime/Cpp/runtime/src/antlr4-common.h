@@ -32,6 +32,7 @@
 #include <mutex>
 #include <exception>
 #include <bitset>
+#include <condition_variable>
 
 // Defines for the Guid class and other platform dependent stuff.
 #ifdef _WIN32
@@ -58,21 +59,17 @@
     typedef std::basic_string<__int32> i32string;
   #endif
 
-#ifdef ANTLR4CPP_DLL
-    #define SHARED_LIB 1
-    #ifdef ANTLR4CPP_EXPORTS
-      #define ANTLR4CPP_PUBLIC __declspec(dllexport)
-      #define EXPIMP_TEMPLATE
+  #ifdef ANTLR4CPP_EXPORTS
+    #define ANTLR4CPP_PUBLIC __declspec(dllexport)
+  #else
+    #ifdef ANTLR4CPP_STATIC
+      #define ANTLR4CPP_PUBLIC
     #else
       #define ANTLR4CPP_PUBLIC __declspec(dllimport)
-      #define EXPIMP_TEMPLATE extern
     #endif
-  #else
-    #define ANTLR4CPP_PUBLIC
-    #define EXPIMP_TEMPLATE
   #endif
 
-  EXPIMP_TEMPLATE class ANTLR4CPP_PUBLIC std::exception; // Needed for VS 2015.
+  class ANTLR4CPP_PUBLIC std::exception; // Needed for VS 2015.
 
 #elif __APPLE__
   #define GUID_CFUUID
