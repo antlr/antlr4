@@ -22,15 +22,17 @@ Edit the repository looking for 4.5 or whatever and update it. Bump version in t
  * runtime/Python3/setup.py
  * runtime/Python3/src/antlr4/Recognizer.py
  * runtime/CSharp/runtime/CSharp/Antlr4.Runtime/Properties/AssemblyInfo.cs
+ * runtime/CSharp/build/version.ps1
  * runtime/JavaScript/src/antlr4/package.json
  * runtime/JavaScript/src/antlr4/Recognizer.js
+ * runtime/Cpp/VERSION
+ * runtime/Cpp/runtime/src/RuntimeMetaData.cpp
+ * runtime/Cpp/cmake/ExternalAntlr4Cpp.cmake
  * tool/src/org/antlr/v4/codegen/target/CppTarget.java
  * tool/src/org/antlr/v4/codegen/target/CSharpTarget.java
  * tool/src/org/antlr/v4/codegen/target/JavaScriptTarget.java
  * tool/src/org/antlr/v4/codegen/target/Python2Target.java
  * tool/src/org/antlr/v4/codegen/target/Python3Target.java
- * runtime/Cpp/VERSION
- * runtime/Cpp/RuntimeMetaData.cpp
  
 Here is a simple script to display any line from the critical files with, say, `4.5` in it:
 
