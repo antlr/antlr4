@@ -586,7 +586,7 @@ namespace Antlr4.Runtime.Misc
             }
 
             IList<Type> typesToCheck = GetTypesToCheck(assembly);
-            List<Tuple<RuleDependencyAttribute, ICustomAttributeProvider>> dependencies = new List<Tuple<RuleDependencyAttribute, ICustomAttributeProvider>>();
+            ArrayList<Tuple<RuleDependencyAttribute, ICustomAttributeProvider>> dependencies = new ArrayList<Tuple<RuleDependencyAttribute, ICustomAttributeProvider>>();
             foreach (Type clazz in typesToCheck)
             {
                 dependencies.AddRange(GetDependencies(clazz));
@@ -601,7 +601,7 @@ namespace Antlr4.Runtime.Misc
                     IList<Tuple<RuleDependencyAttribute, ICustomAttributeProvider>> list;
                     if (!recognizerDependencies.TryGetValue(recognizerType, out list))
                     {
-                        list = new List<Tuple<RuleDependencyAttribute, ICustomAttributeProvider>>();
+                        list = new ArrayList<Tuple<RuleDependencyAttribute, ICustomAttributeProvider>>();
                         recognizerDependencies[recognizerType] = list;
                     }
                     list.Add(dependency);
@@ -851,7 +851,7 @@ namespace Antlr4.Runtime.Misc
 
         public static IList<Tuple<RuleDependencyAttribute, ICustomAttributeProvider>> GetDependencies(Type clazz)
         {
-            IList<Tuple<RuleDependencyAttribute, ICustomAttributeProvider>> result = new List<Tuple<RuleDependencyAttribute, ICustomAttributeProvider>>();
+            IList<Tuple<RuleDependencyAttribute, ICustomAttributeProvider>> result = new ArrayList<Tuple<RuleDependencyAttribute, ICustomAttributeProvider>>();
 
             GetElementDependencies(AsCustomAttributeProvider(clazz), result);
             foreach (ConstructorInfo ctor in clazz.GetConstructors(AllDeclaredMembers))
@@ -909,7 +909,7 @@ namespace Antlr4.Runtime.Misc
                 }
                 foreach (Transition transition in state.transitions)
                 {
-                    if (transition.TransitionType != TransitionType.Rule)
+                    if (transition.TransitionType != TransitionType.RULE)
                     {
                         continue;
                     }

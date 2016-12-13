@@ -113,8 +113,7 @@ public class PerformanceDescriptors {
 
 		@Override
 		public boolean ignore(String targetName) {
-//			return !Arrays.asList("Java", "Python2", "Python3", "Node").contains(targetName);
-			return !Arrays.asList("Java").contains(targetName);
+			return !Arrays.asList("Java", "CSharp", "Python2", "Python3", "Node").contains(targetName);
 		}
 	}
 
@@ -196,6 +195,12 @@ public class PerformanceDescriptors {
 		 */
 		@CommentHasStringValue
 		public String input;
+
+		@Override
+		public boolean ignore(String targetName) {
+			// passes, but still too slow in Python and JavaScript
+			return !Arrays.asList("Java", "CSharp").contains(targetName);
+		}
 	}
 
 	public static class DropLoopEntryBranchInLRRule_5 extends DropLoopEntryBranchInLRRule {

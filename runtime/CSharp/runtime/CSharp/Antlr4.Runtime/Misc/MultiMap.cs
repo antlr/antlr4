@@ -2,9 +2,7 @@
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
-using System;
 using System.Collections.Generic;
-using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime.Misc
@@ -19,7 +17,7 @@ namespace Antlr4.Runtime.Misc
             IList<V> elementsForKey;
             if (!TryGetValue(key, out elementsForKey))
             {
-                elementsForKey = new List<V>();
+                elementsForKey = new ArrayList<V>();
                 this[key] = elementsForKey;
             }
             elementsForKey.Add(value);
@@ -27,7 +25,7 @@ namespace Antlr4.Runtime.Misc
 
         public virtual IList<Tuple<K, V>> GetPairs()
         {
-            IList<Tuple<K, V>> pairs = new List<Tuple<K, V>>();
+            IList<Tuple<K, V>> pairs = new ArrayList<Tuple<K, V>>();
             foreach (KeyValuePair<K, IList<V>> pair in this)
             {
                 foreach (V value in pair.Value)

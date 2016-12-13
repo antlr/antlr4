@@ -42,7 +42,7 @@ namespace Antlr4.Runtime.Atn
         {
             get
             {
-                return Antlr4.Runtime.Atn.TransitionType.Epsilon;
+                return Antlr4.Runtime.Atn.TransitionType.EPSILON;
             }
         }
 

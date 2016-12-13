@@ -22,7 +22,7 @@ namespace Antlr4.Runtime.Atn
         {
             get
             {
-                return Antlr4.Runtime.Atn.TransitionType.Precedence;
+                return Antlr4.Runtime.Atn.TransitionType.PRECEDENCE;
             }
         }
 

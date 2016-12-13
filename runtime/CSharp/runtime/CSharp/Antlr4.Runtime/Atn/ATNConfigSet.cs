@@ -6,651 +6,418 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Sharpen;
-using IEnumerable = System.Collections.IEnumerable;
-using IEnumerator = System.Collections.IEnumerator;
 
 namespace Antlr4.Runtime.Atn
 {
-    /// <author>Sam Harwell</author>
-    public class ATNConfigSet : IEnumerable<ATNConfig>
-    {
-        /// <summary>
-        /// This maps (state, alt) -&gt; merged
-        /// <see cref="ATNConfig"/>
-        /// . The key does not account for
-        /// the
-        /// <see cref="ATNConfig.SemanticContext()"/>
-        /// of the value, which is only a problem if a single
-        /// <c>ATNConfigSet</c>
-        /// contains two configs with the same state and alternative
-        /// but different semantic contexts. When this case arises, the first config
-        /// added to this map stays, and the remaining configs are placed in
-        /// <see cref="unmerged"/>
-        /// .
-        /// <p/>
-        /// This map is only used for optimizing the process of adding configs to the set,
-        /// and is
-        /// <see langword="null"/>
-        /// for read-only sets stored in the DFA.
-        /// </summary>
-        private readonly Dictionary<long, ATNConfig> mergedConfigs;
+	public class ATNConfigSet
+	{
 
-        /// <summary>
-        /// This is an "overflow" list holding configs which cannot be merged with one
-        /// of the configs in
-        /// <see cref="mergedConfigs"/>
-        /// but have a colliding key. This
-        /// occurs when two configs in the set have the same state and alternative but
-        /// different semantic contexts.
-        /// <p/>
-        /// This list is only used for optimizing the process of adding configs to the set,
-        /// and is
-        /// <see langword="null"/>
-        /// for read-only sets stored in the DFA.
-        /// </summary>
-        private readonly List<ATNConfig> unmerged;
 
-        /// <summary>This is a list of all configs in this set.</summary>
-        /// <remarks>This is a list of all configs in this set.</remarks>
-        private readonly List<ATNConfig> configs;
+		/** Indicates that the set of configurations is read-only. Do not
+		 *  allow any code to manipulate the set; DFA states will point at
+		 *  the sets and they must not change. This does not protect the other
+		 *  fields; in particular, conflictingAlts is set after
+		 *  we've made this readonly.
+		 */
+		protected bool readOnly = false;
 
-        private int uniqueAlt;
+		/**
+		 * All configs but hashed by (s, i, _, pi) not including context. Wiped out
+		 * when we go readonly as this set becomes a DFA state.
+		 */
+		public ConfigHashSet configLookup;
 
-        private ConflictInfo conflictInfo;
+		/** Track the elements as they are added to the set; supports get(i) */
+		public ArrayList<ATNConfig> configs = new ArrayList<ATNConfig>(7);
 
-        private bool hasSemanticContext;
+		// TODO: these fields make me pretty uncomfortable but nice to pack up info together, saves recomputation
+		// TODO: can we track conflicts as they are added to save scanning configs later?
+		public int uniqueAlt;
+		/** Currently this is only used when we detect SLL conflict; this does
+		 *  not necessarily represent the ambiguous alternatives. In fact,
+		 *  I should also point out that this seems to include predicated alternatives
+		 *  that have predicates that evaluate to false. Computed in computeTargetState().
+		 */
+		public BitSet conflictingAlts;
 
-        private bool dipsIntoOuterContext;
+		// Used in parser and lexer. In lexer, it indicates we hit a pred
+		// while computing a closure operation.  Don't make a DFA state from this.
+		public bool hasSemanticContext;
+		public bool dipsIntoOuterContext;
 
-        /// <summary>
-        /// When
-        /// <see langword="true"/>
-        /// , this config set represents configurations where the entire
-        /// outer context has been consumed by the ATN interpreter. This prevents the
-        /// <see cref="ParserATNSimulator.Closure(ATNConfigSet, ATNConfigSet, bool, bool, PredictionContextCache, bool)"/>
-        /// from pursuing the global FOLLOW when a
-        /// rule stop state is reached with an empty prediction context.
-        /// <p/>
-        /// Note:
-        /// <c>outermostConfigSet</c>
-        /// and
-        /// <see cref="dipsIntoOuterContext"/>
-        /// should never
-        /// be true at the same time.
-        /// </summary>
-        private bool outermostConfigSet;
+		/** Indicates that this configuration set is part of a full context
+		 *  LL prediction. It will be used to determine how to merge $. With SLL
+		 *  it's a wildcard whereas it is not for LL context merge.
+		 */
+		public readonly bool fullCtx;
 
-        private int cachedHashCode = -1;
+		private int cachedHashCode = -1;
 
-        public ATNConfigSet()
-        {
-            // Used in parser and lexer. In lexer, it indicates we hit a pred
-            // while computing a closure operation.  Don't make a DFA state from this.
-            this.mergedConfigs = new Dictionary<long, ATNConfig>();
-            this.unmerged = new List<ATNConfig>();
-            this.configs = new List<ATNConfig>();
-            this.uniqueAlt = ATN.InvalidAltNumber;
-        }
+		public ATNConfigSet(bool fullCtx)
+		{
+			configLookup = new ConfigHashSet();
+			this.fullCtx = fullCtx;
+		}
 
-        protected internal ATNConfigSet(Antlr4.Runtime.Atn.ATNConfigSet set, bool @readonly)
-        {
-            if (@readonly)
-            {
-                this.mergedConfigs = null;
-                this.unmerged = null;
-            }
-            else
-            {
-                if (!set.IsReadOnly)
-                {
-                    this.mergedConfigs = new Dictionary<long, ATNConfig>(set.mergedConfigs);
-                    this.unmerged = new List<ATNConfig>(set.unmerged);
-                }
-                else
-                {
-                    this.mergedConfigs = new Dictionary<long, ATNConfig>(set.configs.Count);
-                    this.unmerged = new List<ATNConfig>();
-                }
-            }
-            this.configs = new List<ATNConfig>(set.configs);
-            this.dipsIntoOuterContext = set.dipsIntoOuterContext;
-            this.hasSemanticContext = set.hasSemanticContext;
-            this.outermostConfigSet = set.outermostConfigSet;
-            if (@readonly || !set.IsReadOnly)
-            {
-                this.uniqueAlt = set.uniqueAlt;
-                this.conflictInfo = set.conflictInfo;
-            }
-        }
+		public ATNConfigSet()
+		: this(true)
+		{
+		}
 
-        /// <summary>
-        /// Get the set of all alternatives represented by configurations in this
-        /// set.
-        /// </summary>
-        /// <remarks>
-        /// Get the set of all alternatives represented by configurations in this
-        /// set.
-        /// </remarks>
-        [NotNull]
-        public virtual BitSet RepresentedAlternatives
-        {
-            get
-            {
-                // if (!readonly && set.isReadOnly()) -> addAll is called from clone()
-                if (conflictInfo != null)
-                {
-                    return (BitSet)conflictInfo.ConflictedAlts.Clone();
-                }
-                BitSet alts = new BitSet();
-                foreach (ATNConfig config in this)
-                {
-                    alts.Set(config.Alt);
-                }
-                return alts;
-            }
-        }
+		public ATNConfigSet(ATNConfigSet old)
+			: this(old.fullCtx)
+		{
+			AddAll(old.configs);
+			this.uniqueAlt = old.uniqueAlt;
+			this.conflictingAlts = old.conflictingAlts;
+			this.hasSemanticContext = old.hasSemanticContext;
+			this.dipsIntoOuterContext = old.dipsIntoOuterContext;
+		}
 
-        public bool IsReadOnly
-        {
-            get
-            {
-                return mergedConfigs == null;
-            }
-        }
+		public bool Add(ATNConfig config)
+		{
+			return Add(config, null);
+		}
 
-        public virtual bool IsOutermostConfigSet
-        {
-            get
-            {
-                return outermostConfigSet;
-            }
-            set
-            {
-                bool outermostConfigSet = value;
-                if (this.outermostConfigSet && !outermostConfigSet)
-                {
-                    throw new InvalidOperationException();
-                }
-                System.Diagnostics.Debug.Assert(!outermostConfigSet || !dipsIntoOuterContext);
-                this.outermostConfigSet = outermostConfigSet;
-            }
-        }
+		/**
+		 * Adding a new config means merging contexts with existing configs for
+		 * {@code (s, i, pi, _)}, where {@code s} is the
+		 * {@link ATNConfig#state}, {@code i} is the {@link ATNConfig#alt}, and
+		 * {@code pi} is the {@link ATNConfig#semanticContext}. We use
+		 * {@code (s,i,pi)} as key.
+		 *
+		 * <p>This method updates {@link #dipsIntoOuterContext} and
+		 * {@link #hasSemanticContext} when necessary.</p>
+		 */
+		public bool Add(ATNConfig config, MergeCache mergeCache)
+		{
+			if (readOnly)
+				throw new Exception("This set is readonly");
+			if (config.semanticContext != SemanticContext.NONE)
+			{
+				hasSemanticContext = true;
+			}
+			if (config.OuterContextDepth > 0)
+			{
+				dipsIntoOuterContext = true;
+			}
+			ATNConfig existing = configLookup.GetOrAdd(config);
+			if (existing == config)
+			{ // we added this new one
+				cachedHashCode = -1;
+				configs.Add(config);  // track order here
+				return true;
+			}
+			// a previous (s,i,pi,_), merge with it and save result
+			bool rootIsWildcard = !fullCtx;
+			PredictionContext merged = PredictionContext.Merge(existing.context, config.context, rootIsWildcard, mergeCache);
+			 // no need to check for existing.context, config.context in cache
+			 // since only way to create new graphs is "call rule" and here. We
+			 // cache at both places.
+			existing.reachesIntoOuterContext = Math.Max(existing.reachesIntoOuterContext, config.reachesIntoOuterContext);
 
-        public virtual HashSet<ATNState> States
-        {
-            get
-            {
-                HashSet<ATNState> states = new HashSet<ATNState>();
-                foreach (ATNConfig c in this.configs)
-                {
-                    states.Add(c.State);
-                }
-                return states;
-            }
-        }
+			// make sure to preserve the precedence filter suppression during the merge
+			if (config.IsPrecedenceFilterSuppressed)
+			{
+				existing.SetPrecedenceFilterSuppressed(true);
+			}
 
-        public virtual void OptimizeConfigs(ATNSimulator interpreter)
-        {
-            if (configs.Count == 0)
-            {
-                return;
-            }
-            for (int i = 0; i < configs.Count; i++)
-            {
-                ATNConfig config = configs[i];
-                config.Context = interpreter.atn.GetCachedContext(config.Context);
-            }
-        }
+			existing.context = merged; // replace context; no need to alt mapping
+			return true;
+		}
 
-        public virtual Antlr4.Runtime.Atn.ATNConfigSet Clone(bool @readonly)
-        {
-            Antlr4.Runtime.Atn.ATNConfigSet copy = new Antlr4.Runtime.Atn.ATNConfigSet(this, @readonly);
-            if (!@readonly && this.IsReadOnly)
-            {
-                copy.AddAll(configs);
-            }
-            return copy;
-        }
+		/** Return a List holding list of configs */
+		public List<ATNConfig> Elements
+		{
+			get
+			{
+				return configs;
+			}
+		}
 
-        public virtual int Count
-        {
-            get
-            {
-                return configs.Count;
-            }
-        }
+		public HashSet<ATNState> GetStates()
+		{
+			HashSet<ATNState> states = new HashSet<ATNState>();
+			foreach (ATNConfig c in configs)
+			{
+				states.Add(c.state);
+			}
+			return states;
+		}
 
-        public virtual bool IsEmpty()
-        {
-            return configs.Count == 0;
-        }
+		/**
+		 * Gets the complete set of represented alternatives for the configuration
+		 * set.
+		 *
+		 * @return the set of represented alternatives in this configuration set
+		 *
+		 * @since 4.3
+		 */
 
-        public virtual bool Contains(object o)
-        {
-            if (!(o is ATNConfig))
-            {
-                return false;
-            }
-            ATNConfig config = (ATNConfig)o;
-            long configKey = GetKey(config);
-            ATNConfig mergedConfig;
-            if (mergedConfigs.TryGetValue(configKey, out mergedConfig) && CanMerge(config, configKey, mergedConfig))
-            {
-                return mergedConfig.Contains(config);
-            }
-            foreach (ATNConfig c in unmerged)
-            {
-                if (c.Contains(config))
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
+		public BitSet GetAlts()
+		{
+			BitSet alts = new BitSet();
+			foreach (ATNConfig config in configs)
+			{
+				alts.Set(config.alt);
+			}
+			return alts;
+		}
 
-        public virtual IEnumerator<ATNConfig> GetEnumerator()
-        {
-            return configs.GetEnumerator();
-        }
+		public List<SemanticContext> GetPredicates()
+		{
+			List<SemanticContext> preds = new List<SemanticContext>();
+			foreach (ATNConfig c in configs)
+			{
+				if (c.semanticContext != SemanticContext.NONE)
+				{
+					preds.Add(c.semanticContext);
+				}
+			}
+			return preds;
+		}
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+		public ATNConfig Get(int i) { return configs[i]; }
 
-        public virtual object[] ToArray()
-        {
-            return configs.ToArray();
-        }
+		public void OptimizeConfigs(ATNSimulator interpreter)
+		{
+			if (readOnly)
+				throw new Exception("This set is readonly");
+			if (configLookup.Count == 0)
+				return;
 
-        public virtual bool Add(ATNConfig e)
-        {
-            return Add(e, null);
-        }
+			foreach (ATNConfig config in configs)
+			{
+				//			int before = PredictionContext.getAllContextNodes(config.context).size();
+				config.context = interpreter.getCachedContext(config.context);
+				//			int after = PredictionContext.getAllContextNodes(config.context).size();
+				//			System.out.println("configs "+before+"->"+after);
+			}
+		}
 
-        public virtual bool Add(ATNConfig e, PredictionContextCache contextCache)
-        {
-            EnsureWritable();
-            System.Diagnostics.Debug.Assert(!outermostConfigSet || !e.ReachesIntoOuterContext);
-            if (contextCache == null)
-            {
-                contextCache = PredictionContextCache.Uncached;
-            }
-            bool addKey;
-            long key = GetKey(e);
-            ATNConfig mergedConfig;
-            addKey = !mergedConfigs.TryGetValue(key, out mergedConfig);
-            if (mergedConfig != null && CanMerge(e, key, mergedConfig))
-            {
-                mergedConfig.OuterContextDepth = Math.Max(mergedConfig.OuterContextDepth, e.OuterContextDepth);
-                if (e.PrecedenceFilterSuppressed)
-                {
-                    mergedConfig.PrecedenceFilterSuppressed = true;
-                }
-                PredictionContext joined = PredictionContext.Join(mergedConfig.Context, e.Context, contextCache);
-                UpdatePropertiesForMergedConfig(e);
-                if (mergedConfig.Context == joined)
-                {
-                    return false;
-                }
-                mergedConfig.Context = joined;
-                return true;
-            }
-            for (int i = 0; i < unmerged.Count; i++)
-            {
-                ATNConfig unmergedConfig = unmerged[i];
-                if (CanMerge(e, key, unmergedConfig))
-                {
-                    unmergedConfig.OuterContextDepth = Math.Max(unmergedConfig.OuterContextDepth, e.OuterContextDepth);
-                    if (e.PrecedenceFilterSuppressed)
-                    {
-                        unmergedConfig.PrecedenceFilterSuppressed = true;
-                    }
-                    PredictionContext joined = PredictionContext.Join(unmergedConfig.Context, e.Context, contextCache);
-                    UpdatePropertiesForMergedConfig(e);
-                    if (unmergedConfig.Context == joined)
-                    {
-                        return false;
-                    }
-                    unmergedConfig.Context = joined;
-                    if (addKey)
-                    {
-                        mergedConfigs[key] = unmergedConfig;
-                        unmerged.RemoveAt(i);
-                    }
-                    return true;
-                }
-            }
-            configs.Add(e);
-            if (addKey)
-            {
-                mergedConfigs[key] = e;
-            }
-            else
-            {
-                unmerged.Add(e);
-            }
-            UpdatePropertiesForAddedConfig(e);
-            return true;
-        }
+		public bool AddAll(ICollection<ATNConfig> coll)
+		{
+			foreach (ATNConfig c in coll) Add(c);
+			return false;
+		}
 
-        private void UpdatePropertiesForMergedConfig(ATNConfig config)
-        {
-            // merged configs can't change the alt or semantic context
-            dipsIntoOuterContext |= config.ReachesIntoOuterContext;
-            System.Diagnostics.Debug.Assert(!outermostConfigSet || !dipsIntoOuterContext);
-        }
+		public override bool Equals(Object o)
+		{
+			if (o == this)
+			{
+				return true;
+			}
+			else if (!(o is ATNConfigSet))
+			{
+				return false;
+			}
 
-        private void UpdatePropertiesForAddedConfig(ATNConfig config)
-        {
-            if (configs.Count == 1)
-            {
-                uniqueAlt = config.Alt;
-            }
-            else
-            {
-                if (uniqueAlt != config.Alt)
-                {
-                    uniqueAlt = ATN.InvalidAltNumber;
-                }
-            }
-            hasSemanticContext |= !SemanticContext.None.Equals(config.SemanticContext);
-            dipsIntoOuterContext |= config.ReachesIntoOuterContext;
-            System.Diagnostics.Debug.Assert(!outermostConfigSet || !dipsIntoOuterContext);
-        }
+			//		System.out.print("equals " + this + ", " + o+" = ");
+			ATNConfigSet other = (ATNConfigSet)o;
+			bool same = configs != null &&
+				configs.Equals(other.configs) &&  // includes stack context
+				this.fullCtx == other.fullCtx &&
+				this.uniqueAlt == other.uniqueAlt &&
+				this.conflictingAlts == other.conflictingAlts &&
+				this.hasSemanticContext == other.hasSemanticContext &&
+				this.dipsIntoOuterContext == other.dipsIntoOuterContext;
 
-        protected internal virtual bool CanMerge(ATNConfig left, long leftKey, ATNConfig right)
-        {
-            if (left.State.stateNumber != right.State.stateNumber)
-            {
-                return false;
-            }
-            if (leftKey != GetKey(right))
-            {
-                return false;
-            }
-            return left.SemanticContext.Equals(right.SemanticContext);
-        }
+			//		System.out.println(same);
+			return same;
+		}
 
-        protected internal virtual long GetKey(ATNConfig e)
-        {
-            long key = e.State.stateNumber;
-            key = (key << 12) | (e.Alt & 0xFFFL);
-            return key;
-        }
 
-        public virtual bool Remove(object o)
-        {
-            EnsureWritable();
-            throw new NotSupportedException("Not supported yet.");
-        }
+		public override int GetHashCode()
+		{
+			if (IsReadOnly)
+			{
+				if (cachedHashCode == -1)
+				{
+					cachedHashCode = configs.GetHashCode();
+				}
 
-        public virtual bool ContainsAll(IEnumerable<ATNConfig> c)
-        {
-            foreach (ATNConfig o in c)
-            {
-                if (!Contains(o))
-                {
-                    return false;
-                }
-            }
-            return true;
-        }
+				return cachedHashCode;
+			}
 
-        public virtual bool AddAll(IEnumerable<ATNConfig> c)
-        {
-            return AddAll(c, null);
-        }
+			return configs.GetHashCode();
+		}
 
-        public virtual bool AddAll(IEnumerable<ATNConfig> c, PredictionContextCache contextCache)
-        {
-            EnsureWritable();
-            bool changed = false;
-            foreach (ATNConfig group in c)
-            {
-                changed |= Add(group, contextCache);
-            }
-            return changed;
-        }
+		public int Count
+		{
+			get
+			{
+				return configs.Count;
+			}
+		}
 
-        public virtual bool RetainAll<_T0>(ICollection<_T0> c)
-        {
-            EnsureWritable();
-            throw new NotSupportedException("Not supported yet.");
-        }
+		public bool Empty
+		{
+			get
+			{
 
-        public virtual bool RemoveAll<_T0>(ICollection<_T0> c)
-        {
-            EnsureWritable();
-            throw new NotSupportedException("Not supported yet.");
-        }
+				return configs.Count == 0;
+			}
+		}
 
-        public virtual void Clear()
-        {
-            EnsureWritable();
-            mergedConfigs.Clear();
-            unmerged.Clear();
-            configs.Clear();
-            dipsIntoOuterContext = false;
-            hasSemanticContext = false;
-            uniqueAlt = ATN.InvalidAltNumber;
-            conflictInfo = null;
-        }
+		public bool Contains(Object o)
+		{
+			if (configLookup == null)
+			{
+				throw new Exception("This method is not implemented for readonly sets.");
+			}
 
-        public override bool Equals(object obj)
-        {
-            if (this == obj)
-            {
-                return true;
-            }
-            if (!(obj is Antlr4.Runtime.Atn.ATNConfigSet))
-            {
-                return false;
-            }
-            Antlr4.Runtime.Atn.ATNConfigSet other = (Antlr4.Runtime.Atn.ATNConfigSet)obj;
-            return this.outermostConfigSet == other.outermostConfigSet && Utils.Equals(conflictInfo, other.conflictInfo) && configs.SequenceEqual(other.configs);
-        }
+			return configLookup.ContainsKey((ATNConfig)o);
+		}
 
-        public override int GetHashCode()
-        {
-            if (IsReadOnly && cachedHashCode != -1)
-            {
-                return cachedHashCode;
-            }
-            int hashCode = 1;
-            hashCode = 5 * hashCode ^ (outermostConfigSet ? 1 : 0);
-            hashCode = 5 * hashCode ^ SequenceEqualityComparer<ATNConfig>.Default.GetHashCode(configs);
-            if (IsReadOnly)
-            {
-                cachedHashCode = hashCode;
-            }
-            return hashCode;
-        }
 
-        public override string ToString()
-        {
-            return ToString(false);
-        }
+		public void Clear()
+		{
+			if (readOnly)
+				throw new Exception("This set is readonly");
+			configs.Clear();
+			cachedHashCode = -1;
+			configLookup.Clear();
+		}
 
-        public virtual string ToString(bool showContext)
-        {
-            StringBuilder buf = new StringBuilder();
-            List<ATNConfig> sortedConfigs = new List<ATNConfig>(configs);
-            sortedConfigs.Sort(new _IComparer_475());
-            buf.Append("[");
-            for (int i = 0; i < sortedConfigs.Count; i++)
-            {
-                if (i > 0)
-                {
-                    buf.Append(", ");
-                }
-                buf.Append(sortedConfigs[i].ToString(null, true, showContext));
-            }
-            buf.Append("]");
-            if (hasSemanticContext)
-            {
-                buf.Append(",hasSemanticContext=").Append(hasSemanticContext);
-            }
-            if (uniqueAlt != ATN.InvalidAltNumber)
-            {
-                buf.Append(",uniqueAlt=").Append(uniqueAlt);
-            }
-            if (conflictInfo != null)
-            {
-                buf.Append(",conflictingAlts=").Append(conflictInfo.ConflictedAlts);
-                if (!conflictInfo.IsExact)
-                {
-                    buf.Append("*");
-                }
-            }
-            if (dipsIntoOuterContext)
-            {
-                buf.Append(",dipsIntoOuterContext");
-            }
-            return buf.ToString();
-        }
+		public bool IsReadOnly
+		{
+			get
+			{
+				return readOnly;
+			}
+			set
+			{
+				this.readOnly = value;
+				configLookup = null; // can't mod, no need for lookup cache
+			}
+		}
 
-        private sealed class _IComparer_475 : IComparer<ATNConfig>
-        {
-            public _IComparer_475()
-            {
-            }
+		public override String ToString()
+		{
+			StringBuilder buf = new StringBuilder();
+			buf.Append('[');
+			List<ATNConfig> cfgs = Elements;
+			if (cfgs.Count > 0)
+			{
+				foreach (ATNConfig c in cfgs)
+				{
+					buf.Append(c.ToString());
+					buf.Append(", ");
+				}
+				buf.Length = buf.Length - 2;
+			}
+			buf.Append(']');
+			if (hasSemanticContext)
+				buf.Append(",hasSemanticContext=")
+				   .Append(hasSemanticContext);
+			if (uniqueAlt != ATN.INVALID_ALT_NUMBER)
+				buf.Append(",uniqueAlt=")
+				   .Append(uniqueAlt);
+			if (conflictingAlts != null)
+				buf.Append(",conflictingAlts=")
+				   .Append(conflictingAlts);
+			if (dipsIntoOuterContext)
+				buf.Append(",dipsIntoOuterContext");
+			return buf.ToString();
+		}
 
-            public int Compare(ATNConfig o1, ATNConfig o2)
-            {
-                if (o1.Alt != o2.Alt)
-                {
-                    return o1.Alt - o2.Alt;
-                }
-                else
-                {
-                    if (o1.State.stateNumber != o2.State.stateNumber)
-                    {
-                        return o1.State.stateNumber - o2.State.stateNumber;
-                    }
-                    else
-                    {
-                        return string.CompareOrdinal(o1.SemanticContext.ToString(), o2.SemanticContext.ToString());
-                    }
-                }
-            }
-        }
 
-        public virtual int UniqueAlt
-        {
-            get
-            {
-                return uniqueAlt;
-            }
-        }
+	}
 
-        public virtual bool HasSemanticContext
-        {
-            get
-            {
-                return hasSemanticContext;
-            }
-        }
+	public class OrderedATNConfigSet : ATNConfigSet
+	{
 
-        public virtual void ClearExplicitSemanticContext()
-        {
-            EnsureWritable();
-            hasSemanticContext = false;
-        }
+		public OrderedATNConfigSet()
+		{
+			this.configLookup = new LexerConfigHashSet();
+		}
 
-        public virtual void MarkExplicitSemanticContext()
-        {
-            EnsureWritable();
-            hasSemanticContext = true;
-        }
+		public class LexerConfigHashSet : ConfigHashSet
+		{
+			public LexerConfigHashSet()
+				: base(new ObjectEqualityComparator())
+			{
+			}
+		}
+	}
 
-        public virtual ConflictInfo ConflictInformation
-        {
-            get
-            {
-                return conflictInfo;
-            }
-            set
-            {
-                ConflictInfo conflictInfo = value;
-                EnsureWritable();
-                this.conflictInfo = conflictInfo;
-            }
-        }
+	public class ObjectEqualityComparator : IEqualityComparer<ATNConfig>
+	{
 
-        public virtual BitSet ConflictingAlts
-        {
-            get
-            {
-                if (conflictInfo == null)
-                {
-                    return null;
-                }
-                return conflictInfo.ConflictedAlts;
-            }
-        }
 
-        public virtual bool IsExactConflict
-        {
-            get
-            {
-                if (conflictInfo == null)
-                {
-                    return false;
-                }
-                return conflictInfo.IsExact;
-            }
-        }
+		public int GetHashCode(ATNConfig o)
+		{
+			if (o == null)
+				return 0;
+			else
+				return o.GetHashCode();
+		}
 
-        public virtual bool DipsIntoOuterContext
-        {
-            get
-            {
-                return dipsIntoOuterContext;
-            }
-        }
+		public bool Equals(ATNConfig a, ATNConfig b)
+		{
+			if (a == b) return true;
+			if (a == null || b == null) return false;
+			return a.Equals(b);
+		}
+	}
 
-        public virtual ATNConfig this[int index]
-        {
-            get
-            {
-                return configs[index];
-            }
-        }
+	/**
+	* The reason that we need this is because we don't want the hash map to use
+	* the standard hash code and equals. We need all configurations with the same
+	* {@code (s,i,_,semctx)} to be equal. Unfortunately, this key effectively doubles
+	* the number of objects associated with ATNConfigs. The other solution is to
+	* use a hash table that lets us specify the equals/hashcode operation.
+	*/
+	public class ConfigHashSet : Dictionary<ATNConfig, ATNConfig>
+	{
+		public ConfigHashSet(IEqualityComparer<ATNConfig> comparer)
+			: base(comparer)
+		{
+		}
 
-        public virtual void Remove(int index)
-        {
-            EnsureWritable();
-            ATNConfig config = configs[index];
-            configs.Remove(config);
-            long key = GetKey(config);
-            ATNConfig existing;
-            if (mergedConfigs.TryGetValue(key, out existing) && existing == config)
-            {
-                mergedConfigs.Remove(key);
-            }
-            else
-            {
-                for (int i = 0; i < unmerged.Count; i++)
-                {
-                    if (unmerged[i] == config)
-                    {
-                        unmerged.RemoveAt(i);
-                        return;
-                    }
-                }
-            }
-        }
 
-        protected internal void EnsureWritable()
-        {
-            if (IsReadOnly)
-            {
-                throw new InvalidOperationException("This ATNConfigSet is read only.");
-            }
-        }
-    }
+		public ConfigHashSet()
+			: base(new ConfigEqualityComparator())
+		{
+		}
+
+		public ATNConfig GetOrAdd(ATNConfig config)
+		{
+			ATNConfig existing;
+			if (this.TryGetValue(config, out existing))
+				return existing; 
+			else
+			{
+				this.Put(config, config);
+				return config;
+			}
+		}
+
+	}
+
+	public class ConfigEqualityComparator : IEqualityComparer<ATNConfig>
+	{
+
+
+		public int GetHashCode(ATNConfig o)
+		{
+			int hashCode = 7;
+			hashCode = 31 * hashCode + o.state.stateNumber;
+			hashCode = 31 * hashCode + o.alt;
+			hashCode = 31 * hashCode + o.semanticContext.GetHashCode();
+			return hashCode;
+		}
+
+		public bool Equals(ATNConfig a, ATNConfig b)
+		{
+			if (a == b) return true;
+			if (a == null || b == null) return false;
+			return a.state.stateNumber == b.state.stateNumber
+				&& a.alt == b.alt
+				&& a.semanticContext.Equals(b.semanticContext);
+		}
+	}
+
 }
