@@ -78,7 +78,7 @@ namespace atn {
     virtual bool operator == (const PredictionContext &o) const = 0;
     virtual bool operator != (const PredictionContext &o) const;
 
-    /// This means only the EMPTY context is in set.
+    /// This means only the EMPTY (wildcard? not sure) context is in set.
     virtual bool isEmpty() const;
     virtual bool hasEmptyPath() const;
     virtual size_t hashCode() const;

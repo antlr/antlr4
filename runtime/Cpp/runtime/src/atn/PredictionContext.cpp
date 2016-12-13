@@ -57,6 +57,7 @@ bool PredictionContext::isEmpty() const {
 }
 
 bool PredictionContext::hasEmptyPath() const {
+  // since EMPTY_RETURN_STATE can only appear in the last position, we check last one
   return getReturnState(size() - 1) == EMPTY_RETURN_STATE;
 }
 
@@ -504,11 +505,12 @@ Ref<PredictionContext> PredictionContext::getCachedContext(const Ref<PredictionC
     updated = EMPTY;
   } else if (parents.size() == 1) {
     updated = SingletonPredictionContext::create(parents[0], context->getReturnState(0));
+    contextCache.insert(updated);
   } else {
     updated = std::make_shared<ArrayPredictionContext>(parents, std::dynamic_pointer_cast<ArrayPredictionContext>(context)->returnStates);
+    contextCache.insert(updated);
   }
 
-  contextCache.insert(updated);
   visited[updated] = updated;
   visited[context] = updated;
 

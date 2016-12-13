@@ -21,6 +21,11 @@
 #include "atn/RuleStopState.h"
 #include "atn/ATNConfigSet.h"
 #include "atn/ATNConfig.h"
+
+#include "atn/StarLoopEntryState.h"
+#include "atn/BlockStartState.h"
+#include "atn/BlockEndState.h"
+
 #include "misc/Interval.h"
 #include "ANTLRErrorListener.h"
 
@@ -38,6 +43,8 @@ using namespace antlr4;
 using namespace antlr4::atn;
 
 using namespace antlrcpp;
+
+const bool ParserATNSimulator::TURN_OFF_LR_LOOP_ENTRY_BRANCH_OPT = ParserATNSimulator::getLrLoopSetting();
 
 ParserATNSimulator::ParserATNSimulator(const ATN &atn, std::vector<dfa::DFA> &decisionToDFA,
                                        PredictionContextCache &sharedContextCache)
@@ -875,6 +882,9 @@ void ParserATNSimulator::closure_(Ref<ATNConfig> const& config, ATNConfigSet *co
   }
 
   for (size_t i = 0; i < p->transitions.size(); i++) {
+    if (i == 0 && canDropLoopEntryEdgeInLeftRecursiveRule(config.get()))
+      continue;
+
     Transition *t = p->transitions[i];
     bool continueCollecting = !is<ActionTransition*>(t) && collectPredicates;
     Ref<ATNConfig> c = getEpsilonTarget(config, t, continueCollecting, depth == 0, fullCtx, treatEofAsEpsilon);
@@ -930,6 +940,84 @@ void ParserATNSimulator::closure_(Ref<ATNConfig> const& config, ATNConfigSet *co
       closureCheckingStopState(c, configs, closureBusy, continueCollecting, fullCtx, newDepth, treatEofAsEpsilon);
     }
   }
+}
+
+bool ParserATNSimulator::canDropLoopEntryEdgeInLeftRecursiveRule(ATNConfig *config) const {
+  if (TURN_OFF_LR_LOOP_ENTRY_BRANCH_OPT)
+    return false;
+
+  ATNState *p = config->state;
+
+  // First check to see if we are in StarLoopEntryState generated during
+  // left-recursion elimination. For efficiency, also check if
+  // the context has an empty stack case. If so, it would mean
+  // global FOLLOW so we can't perform optimization
+  if ( p->getStateType() != ATNState::STAR_LOOP_ENTRY ||
+      !((StarLoopEntryState *)p)->isPrecedenceDecision || // Are we the special loop entry/exit state?
+      config->context->isEmpty() ||                      // If SLL wildcard
+      config->context->hasEmptyPath())
+  {
+    return false;
+  }
+
+  // Require all return states to return back to the same rule
+  // that p is in.
+  size_t numCtxs = config->context->size();
+  for (size_t i = 0; i < numCtxs; i++) { // for each stack context
+    ATNState *returnState = atn.states[config->context->getReturnState(i)];
+    if (returnState->ruleIndex != p->ruleIndex)
+      return false;
+  }
+
+  BlockStartState *decisionStartState = (BlockStartState *)p->transitions[0]->target;
+  size_t blockEndStateNum = decisionStartState->endState->stateNumber;
+  BlockEndState *blockEndState = (BlockEndState *)atn.states[blockEndStateNum];
+
+  // Verify that the top of each stack context leads to loop entry/exit
+  // state through epsilon edges and w/o leaving rule.
+  for (size_t i = 0; i < numCtxs; i++) {                           // for each stack context
+    size_t returnStateNumber = config->context->getReturnState(i);
+    ATNState *returnState = atn.states[returnStateNumber];
+    // All states must have single outgoing epsilon edge.
+    if (returnState->transitions.size() != 1 || !returnState->transitions[0]->isEpsilon())
+    {
+      return false;
+    }
+
+    // Look for prefix op case like 'not expr', (' type ')' expr
+    ATNState *returnStateTarget = returnState->transitions[0]->target;
+    if (returnState->getStateType() == ATNState::BLOCK_END && returnStateTarget == p) {
+      continue;
+    }
+
+    // Look for 'expr op expr' or case where expr's return state is block end
+    // of (...)* internal block; the block end points to loop back
+    // which points to p but we don't need to check that
+    if (returnState == blockEndState) {
+      continue;
+    }
+
+    // Look for ternary expr ? expr : expr. The return state points at block end,
+    // which points at loop entry state
+    if (returnStateTarget == blockEndState) {
+      continue;
+    }
+
+    // Look for complex prefix 'between expr and expr' case where 2nd expr's
+    // return state points at block end state of (...)* internal block
+    if (returnStateTarget->getStateType() == ATNState::BLOCK_END &&
+        returnStateTarget->transitions.size() == 1 &&
+        returnStateTarget->transitions[0]->isEpsilon() &&
+        returnStateTarget->transitions[0]->target == p)
+    {
+      continue;
+    }
+
+    // Anything else ain't conforming.
+    return false;
+  }
+
+  return true;
 }
 
 std::string ParserATNSimulator::getRuleName(size_t index) {
@@ -1251,6 +1339,14 @@ atn::PredictionMode ParserATNSimulator::getPredictionMode() {
 
 Parser* ParserATNSimulator::getParser() {
   return parser;
+}
+
+bool ParserATNSimulator::getLrLoopSetting() {
+  char *var = std::getenv("TURN_OFF_LR_LOOP_ENTRY_BRANCH_OPT");
+  if (var == nullptr)
+    return false;
+  std::string value(var);
+  return value == "true" || value == "1";
 }
 
 void ParserATNSimulator::InitializeInstanceFields() {

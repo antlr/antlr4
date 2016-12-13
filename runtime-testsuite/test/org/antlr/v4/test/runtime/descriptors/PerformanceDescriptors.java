@@ -113,7 +113,7 @@ public class PerformanceDescriptors {
 
 		@Override
 		public boolean ignore(String targetName) {
-			return !Arrays.asList("Java", "CSharp", "Python2", "Python3", "Node").contains(targetName);
+			return !Arrays.asList("Java", "CSharp", "Python2", "Python3", "Node", "Cpp").contains(targetName);
 		}
 	}
 
