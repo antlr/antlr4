@@ -484,14 +484,14 @@ class DefaultErrorStrategy(ErrorStrategy):
         expecting = self.getExpectedTokens(recognizer)
         expectedTokenType = expecting[0] # get any element
         if expectedTokenType==Token.EOF:
-            tokenText = "<missing EOF>"
+            tokenText = u"<missing EOF>"
         else:
             name = None
             if expectedTokenType < len(recognizer.literalNames):
                 name = recognizer.literalNames[expectedTokenType]
             if name is None and expectedTokenType < len(recognizer.symbolicNames):
                 name = recognizer.symbolicNames[expectedTokenType]
-            tokenText = "<missing " + str(name) + ">"
+            tokenText = u"<missing " + unicode(name) + u">"
         current = currentSymbol
         lookback = recognizer.getTokenStream().LT(-1)
         if current.type==Token.EOF and lookback is not None:
