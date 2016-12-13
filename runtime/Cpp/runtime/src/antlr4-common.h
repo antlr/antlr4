@@ -32,6 +32,7 @@
 #include <mutex>
 #include <exception>
 #include <bitset>
+#include <condition_variable>
 
 // Defines for the Guid class and other platform dependent stuff.
 #ifdef _WIN32
