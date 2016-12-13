@@ -9,6 +9,8 @@ var Recognizer = require('./Recognizer').Recognizer;
 var DefaultErrorStrategy = require('./error/ErrorStrategy').DefaultErrorStrategy;
 var ATNDeserializer = require('./atn/ATNDeserializer').ATNDeserializer;
 var ATNDeserializationOptions = require('./atn/ATNDeserializationOptions').ATNDeserializationOptions;
+var TerminalNode = require('./tree/Tree').TerminalNode;
+var ErrorNode = require('./tree/Tree').ErrorNode;
 
 function TraceListener(parser) {
 	ParseTreeListener.call(this);
@@ -387,7 +389,11 @@ Parser.prototype.consume = function() {
         node.invokingState = this.state;
 		if (hasListener) {
 			this._parseListeners.map(function(listener) {
-				listener.visitTerminal(node);
+				if (node instanceof ErrorNode || (node.isErrorNode !== undefined && node.isErrorNode())) {
+					listener.visitErrorNode(node);
+				} else if (node instanceof TerminalNode) {
+					listener.visitTerminal(node);
+				}
 			});
 		}
 	}

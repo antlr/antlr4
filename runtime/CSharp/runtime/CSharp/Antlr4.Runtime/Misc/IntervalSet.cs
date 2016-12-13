@@ -6,9 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Antlr4.Runtime;
-using Antlr4.Runtime.Misc;
-using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime.Misc
 {
@@ -61,12 +58,12 @@ namespace Antlr4.Runtime.Misc
         {
             if (els == null)
             {
-                intervals = new List<Interval>(2);
+                intervals = new ArrayList<Interval>(2);
             }
             else
             {
                 // most sets are 1 or 2 elements
-                intervals = new List<Interval>(els.Length);
+                intervals = new ArrayList<Interval>(els.Length);
                 foreach (int e in els)
                 {
                     Add(e);
@@ -639,7 +636,7 @@ namespace Antlr4.Runtime.Misc
                 int b = I.b;
                 if (a == b)
                 {
-                    if (a == TokenConstants.Eof)
+                    if (a == TokenConstants.EOF)
                     {
                         buf.Append("<EOF>");
                     }
@@ -721,13 +718,13 @@ namespace Antlr4.Runtime.Misc
         [return: NotNull]
         protected internal virtual string ElementName(IVocabulary vocabulary, int a)
         {
-            if (a == TokenConstants.Eof)
+            if (a == TokenConstants.EOF)
             {
                 return "<EOF>";
             }
             else
             {
-                if (a == TokenConstants.Epsilon)
+                if (a == TokenConstants.EPSILON)
                 {
                     return "<EPSILON>";
                 }
@@ -758,9 +755,9 @@ namespace Antlr4.Runtime.Misc
             }
         }
 
-        public virtual List<int> ToIntegerList()
+        public virtual ArrayList<int> ToIntegerList()
         {
-            List<int> values = new List<int>(Count);
+            ArrayList<int> values = new ArrayList<int>(Count);
             int n = intervals.Count;
             for (int i = 0; i < n; i++)
             {
@@ -777,7 +774,7 @@ namespace Antlr4.Runtime.Misc
 
         public virtual IList<int> ToList()
         {
-            IList<int> values = new List<int>();
+            IList<int> values = new ArrayList<int>();
             int n = intervals.Count;
             for (int i = 0; i < n; i++)
             {

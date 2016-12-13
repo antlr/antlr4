@@ -30,7 +30,7 @@ namespace Antlr4.Runtime.Atn
         {
             get
             {
-                return Antlr4.Runtime.Atn.TransitionType.Set;
+                return Antlr4.Runtime.Atn.TransitionType.SET;
             }
         }
 

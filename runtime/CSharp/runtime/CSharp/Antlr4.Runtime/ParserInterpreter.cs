@@ -5,7 +5,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Antlr4.Runtime;
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Sharpen;
@@ -57,13 +56,13 @@ namespace Antlr4.Runtime
                 {
                     continue;
                 }
-                if (((StarLoopEntryState)state).precedenceRuleDecision)
+				if (((StarLoopEntryState)state).isPrecedenceDecision)
                 {
                     this.pushRecursionContextStates.Set(state.stateNumber);
                 }
             }
             // get atn simulator that knows how to do predictions
-            Interpreter = new ParserATNSimulator(this, atn);
+            Interpreter = new ParserATNSimulator(this, atn, null, null);
         }
 
         public override ATN Atn
@@ -186,7 +185,7 @@ namespace Antlr4.Runtime
             Transition transition = p.Transition(edge - 1);
             switch (transition.TransitionType)
             {
-                case TransitionType.Epsilon:
+                case TransitionType.EPSILON:
                 {
                     if (pushRecursionContextStates.Get(p.stateNumber) && !(transition.target is LoopEndState))
                     {
@@ -196,17 +195,17 @@ namespace Antlr4.Runtime
                     break;
                 }
 
-                case TransitionType.Atom:
+                case TransitionType.ATOM:
                 {
 					Match(((AtomTransition)transition).token);
                     break;
                 }
 
-                case TransitionType.Range:
-                case TransitionType.Set:
-                case TransitionType.NotSet:
+                case TransitionType.RANGE:
+                case TransitionType.SET:
+                case TransitionType.NOT_SET:
                 {
-                    if (!transition.Matches(TokenStream.La(1), TokenConstants.MinUserTokenType, 65535))
+                    if (!transition.Matches(TokenStream.LA(1), TokenConstants.MinUserTokenType, 65535))
                     {
 						ErrorHandler.RecoverInline(this);
                     }
@@ -214,13 +213,13 @@ namespace Antlr4.Runtime
                     break;
                 }
 
-                case TransitionType.Wildcard:
+                case TransitionType.WILDCARD:
                 {
                     MatchWildcard();
                     break;
                 }
 
-                case TransitionType.Rule:
+                case TransitionType.RULE:
                 {
                     RuleStartState ruleStartState = (RuleStartState)transition.target;
                     int ruleIndex = ruleStartState.ruleIndex;
@@ -236,7 +235,7 @@ namespace Antlr4.Runtime
                     break;
                 }
 
-                case TransitionType.Predicate:
+                case TransitionType.PREDICATE:
                 {
                     PredicateTransition predicateTransition = (PredicateTransition)transition;
 					if (!Sempred(RuleContext, predicateTransition.ruleIndex, predicateTransition.predIndex))
@@ -246,14 +245,14 @@ namespace Antlr4.Runtime
                     break;
                 }
 
-                case TransitionType.Action:
+                case TransitionType.ACTION:
                 {
                     ActionTransition actionTransition = (ActionTransition)transition;
 					Action(RuleContext, actionTransition.ruleIndex, actionTransition.actionIndex);
                     break;
                 }
 
-                case TransitionType.Precedence:
+                case TransitionType.PRECEDENCE:
                 {
 					if (!Precpred(RuleContext, ((PrecedencePredicateTransition)transition).precedence))
                     {

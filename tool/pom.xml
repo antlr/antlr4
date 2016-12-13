@@ -57,7 +57,6 @@
 				<artifactId>maven-source-plugin</artifactId>
 				<executions>
 					<execution>
-						<id>attach-sources</id>
 						<goals>
 							<goal>jar</goal>
 						</goals>
@@ -74,9 +73,8 @@
 				</configuration>
 				<executions>
 					<execution>
-						<id>attach-javadocs</id>
 						<goals>
-							<goal>jar</goal>
+							<goal>javadoc</goal>
 						</goals>
 					</execution>
 				</executions>
@@ -111,7 +109,7 @@
             <phase>process-classes</phase>
             <configuration>
               <instructions>
-                <Bundle-SymbolicName>org.antlr.antlr4-tool-osgi</Bundle-SymbolicName>
+                <Bundle-SymbolicName>org.antlr.antlr4-tool</Bundle-SymbolicName>
               </instructions>
             </configuration>
             <goals>

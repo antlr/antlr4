@@ -21,17 +21,17 @@ namespace Antlr4.Runtime
         /// Get the
         /// <see cref="IToken"/>
         /// instance associated with the value returned by
-        /// <see cref="IIntStream.La(int)">LA(k)</see>
+        /// <see cref="IIntStream.LA(int)">LA(k)</see>
         /// . This method has the same pre- and post-conditions as
-        /// <see cref="IIntStream.La(int)"/>
+        /// <see cref="IIntStream.LA(int)"/>
         /// . In addition, when the preconditions of this method
         /// are met, the return value is non-null and the value of
         /// <c>LT(k).getType()==LA(k)</c>
         /// .
         /// </summary>
-        /// <seealso cref="IIntStream.La(int)"/>
+        /// <seealso cref="IIntStream.LA(int)"/>
         [return: NotNull]
-        IToken Lt(int k);
+        IToken LT(int k);
 
         /// <summary>
         /// Gets the

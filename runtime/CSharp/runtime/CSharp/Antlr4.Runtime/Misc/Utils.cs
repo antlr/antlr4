@@ -5,7 +5,6 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime.Misc
@@ -17,7 +16,7 @@ namespace Antlr4.Runtime.Misc
 #if NET40PLUS
             return string.Join(separator, items);
 #else
-            List<string> elements = new List<string>();
+            ArrayList<string> elements = new ArrayList<string>();
             foreach (T item in items)
             {
                 if (item == null)
@@ -133,7 +132,7 @@ namespace Antlr4.Runtime.Misc
             return m;
         }
 
-        public static char[] ToCharArray(List<int> data)
+        public static char[] ToCharArray(ArrayList<int> data)
         {
             if (data == null)
             {

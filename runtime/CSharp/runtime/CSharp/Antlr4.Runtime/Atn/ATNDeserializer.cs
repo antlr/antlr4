@@ -441,7 +441,7 @@ namespace Antlr4.Runtime.Atn
 				if (atn.grammarType == ATNType.Lexer) {
 					int tokenType = ReadInt ();
 					if (tokenType == unchecked((int)(0xFFFF))) {
-						tokenType = TokenConstants.Eof;
+						tokenType = TokenConstants.EOF;
 					}
 					atn.ruleToTokenType [i_5] = tokenType;
 				}
@@ -585,7 +585,7 @@ namespace Antlr4.Runtime.Atn
                     {
                         if (maybeLoopEndState.epsilonOnlyTransitions && maybeLoopEndState.Transition(0).target is RuleStopState)
                         {
-                            ((StarLoopEntryState)state).precedenceRuleDecision = true;
+							((StarLoopEntryState)state).isPrecedenceDecision = true;
                         }
                     }
                 }
@@ -683,7 +683,7 @@ namespace Antlr4.Runtime.Atn
             {
                 RuleStartState startState = atn.ruleToStartState[i];
                 ATNState middleState = startState;
-                while (middleState.OnlyHasEpsilonTransitions && middleState.NumberOfOptimizedTransitions == 1 && middleState.GetOptimizedTransition(0).TransitionType == TransitionType.Epsilon)
+                while (middleState.OnlyHasEpsilonTransitions && middleState.NumberOfOptimizedTransitions == 1 && middleState.GetOptimizedTransition(0).TransitionType == TransitionType.EPSILON)
                 {
                     middleState = middleState.GetOptimizedTransition(0).target;
                 }
@@ -699,16 +699,16 @@ namespace Antlr4.Runtime.Atn
                 }
                 switch (matchTransition.TransitionType)
                 {
-                    case TransitionType.Atom:
-                    case TransitionType.Range:
-                    case TransitionType.Set:
+                    case TransitionType.ATOM:
+                    case TransitionType.RANGE:
+                    case TransitionType.SET:
                     {
                         ruleToInlineTransition[i] = matchTransition;
                         break;
                     }
 
-                    case TransitionType.NotSet:
-                    case TransitionType.Wildcard:
+                    case TransitionType.NOT_SET:
+                    case TransitionType.WILDCARD:
                     {
                         // not implemented yet
                         continue;
@@ -765,19 +765,19 @@ namespace Antlr4.Runtime.Atn
                     optimizedTransitions.Add(new EpsilonTransition(intermediateState));
                     switch (effective.TransitionType)
                     {
-                        case TransitionType.Atom:
+                        case TransitionType.ATOM:
                         {
 							intermediateState.AddTransition(new AtomTransition(target, ((AtomTransition)effective).token));
                             break;
                         }
 
-                        case TransitionType.Range:
+                        case TransitionType.RANGE:
                         {
                             intermediateState.AddTransition(new RangeTransition(target, ((RangeTransition)effective).from, ((RangeTransition)effective).to));
                             break;
                         }
 
-                        case TransitionType.Set:
+                        case TransitionType.SET:
                         {
                             intermediateState.AddTransition(new SetTransition(target, effective.Label));
                             break;
@@ -821,7 +821,7 @@ namespace Antlr4.Runtime.Atn
                 {
                     Transition transition = state.GetOptimizedTransition(i);
                     ATNState intermediate = transition.target;
-                    if (transition.TransitionType != TransitionType.Epsilon || ((EpsilonTransition)transition).OutermostPrecedenceReturn != -1 || intermediate.StateType != StateType.Basic || !intermediate.OnlyHasEpsilonTransitions)
+                    if (transition.TransitionType != TransitionType.EPSILON || ((EpsilonTransition)transition).OutermostPrecedenceReturn != -1 || intermediate.StateType != StateType.Basic || !intermediate.OnlyHasEpsilonTransitions)
                     {
                         if (optimizedTransitions != null)
                         {
@@ -831,7 +831,7 @@ namespace Antlr4.Runtime.Atn
                     }
                     for (int j = 0; j < intermediate.NumberOfOptimizedTransitions; j++)
                     {
-                        if (intermediate.GetOptimizedTransition(j).TransitionType != TransitionType.Epsilon || ((EpsilonTransition)intermediate.GetOptimizedTransition(j)).OutermostPrecedenceReturn != -1)
+                        if (intermediate.GetOptimizedTransition(j).TransitionType != TransitionType.EPSILON || ((EpsilonTransition)intermediate.GetOptimizedTransition(j)).OutermostPrecedenceReturn != -1)
                         {
                             if (optimizedTransitions != null)
                             {
@@ -1044,7 +1044,7 @@ nextTransition_continue: ;
                 IList<Transition> transitions = optimizedPath ? state.optimizedTransitions : state.transitions;
                 foreach (Transition t in transitions)
                 {
-                    if (t.TransitionType != TransitionType.Epsilon)
+                    if (t.TransitionType != TransitionType.EPSILON)
                     {
                         return false;
                     }
@@ -1087,16 +1087,16 @@ nextTransition_continue: ;
             ATNState target = atn.states[trg];
             switch (type)
             {
-                case TransitionType.Epsilon:
+                case TransitionType.EPSILON:
                 {
                     return new EpsilonTransition(target);
                 }
 
-                case TransitionType.Range:
+                case TransitionType.RANGE:
                 {
                     if (arg3 != 0)
                     {
-                        return new RangeTransition(target, TokenConstants.Eof, arg2);
+                        return new RangeTransition(target, TokenConstants.EOF, arg2);
                     }
                     else
                     {
@@ -1104,28 +1104,28 @@ nextTransition_continue: ;
                     }
                 }
 
-                case TransitionType.Rule:
+                case TransitionType.RULE:
                 {
                     RuleTransition rt = new RuleTransition((RuleStartState)atn.states[arg1], arg2, arg3, target);
                     return rt;
                 }
 
-                case TransitionType.Predicate:
+                case TransitionType.PREDICATE:
                 {
                     PredicateTransition pt = new PredicateTransition(target, arg1, arg2, arg3 != 0);
                     return pt;
                 }
 
-                case TransitionType.Precedence:
+                case TransitionType.PRECEDENCE:
                 {
                     return new PrecedencePredicateTransition(target, arg1);
                 }
 
-                case TransitionType.Atom:
+                case TransitionType.ATOM:
                 {
                     if (arg3 != 0)
                     {
-                        return new AtomTransition(target, TokenConstants.Eof);
+                        return new AtomTransition(target, TokenConstants.EOF);
                     }
                     else
                     {
@@ -1133,23 +1133,23 @@ nextTransition_continue: ;
                     }
                 }
 
-                case TransitionType.Action:
+                case TransitionType.ACTION:
                 {
                     ActionTransition a = new ActionTransition(target, arg1, arg2, arg3 != 0);
                     return a;
                 }
 
-                case TransitionType.Set:
+                case TransitionType.SET:
                 {
                     return new SetTransition(target, sets[arg1]);
                 }
 
-                case TransitionType.NotSet:
+                case TransitionType.NOT_SET:
                 {
                     return new NotSetTransition(target, sets[arg1]);
                 }
 
-                case TransitionType.Wildcard:
+                case TransitionType.WILDCARD:
                 {
                     return new WildcardTransition(target);
                 }

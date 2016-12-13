@@ -51,6 +51,15 @@ class ParserRuleContext(RuleContext):
         self.exception = None
 
     #* COPY a ctx (I'm deliberately not using copy constructor)#/
+    #
+    # This is used in the generated parser code to flip a generic XContext
+    # node for rule X to a YContext for alt label Y. In that sense, it is
+    # not really a generic copy function.
+    #
+    # If we do an error sync() at start of a rule, we might add error nodes
+    # to the generic XContext so this function must copy those nodes to
+    # the YContext as well else they are lost!
+    #/
     def copyFrom(self, ctx:ParserRuleContext):
         # from RuleContext
         self.parentCtx = ctx.parentCtx
@@ -58,6 +67,15 @@ class ParserRuleContext(RuleContext):
         self.children = None
         self.start = ctx.start
         self.stop = ctx.stop
+
+        # copy any error nodes to alt label node
+        if ctx.children is not None:
+            self.children = []
+            # reset parent pointer for any error nodes
+            for child in ctx.children:
+                if isinstance(child, ErrorNodeImpl):
+                    self.children.append(child)
+                    child.parentCtx = self
 
     # Double dispatch methods for listeners
     def enterRule(self, listener:ParseTreeListener):

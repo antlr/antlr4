@@ -20,9 +20,9 @@ namespace Antlr4.Runtime
     /// <see cref="BufferedTokenStream.GetText()"/>
     /// . The channel filtering is only used for code
     /// accessing tokens via the lookahead methods
-    /// <see cref="BufferedTokenStream.La(int)"/>
+    /// <see cref="BufferedTokenStream.LA(int)"/>
     /// ,
-    /// <see cref="Lt(int)"/>
+    /// <see cref="LT(int)"/>
     /// , and
     /// <see cref="Lb(int)"/>
     /// .</p>
@@ -84,7 +84,7 @@ namespace Antlr4.Runtime
         /// or have the
         /// <see cref="IToken.Type()"/>
         /// equal to
-        /// <see cref="TokenConstants.Eof"/>
+        /// <see cref="TokenConstants.EOF"/>
         /// will be returned by the
         /// token stream lookahead methods.
         /// </summary>
@@ -123,7 +123,7 @@ namespace Antlr4.Runtime
             return tokens[i];
         }
 
-        public override IToken Lt(int k)
+        public override IToken LT(int k)
         {
             //System.out.println("enter LT("+k+")");
             LazyInit();
@@ -165,7 +165,7 @@ namespace Antlr4.Runtime
                 {
                     n++;
                 }
-                if (t.Type == TokenConstants.Eof)
+                if (t.Type == TokenConstants.EOF)
                 {
                     break;
                 }

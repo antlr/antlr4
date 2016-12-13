@@ -3,7 +3,6 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 using System.Collections.Generic;
-using Antlr4.Runtime.Dfa;
 using Antlr4.Runtime.Sharpen;
 
 #if NET45PLUS

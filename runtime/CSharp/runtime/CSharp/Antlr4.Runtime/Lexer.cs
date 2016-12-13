@@ -21,7 +21,7 @@ namespace Antlr4.Runtime
     /// </remarks>
     public abstract class Lexer : Recognizer<int, LexerATNSimulator>, ITokenSource
     {
-        public const int DefaultMode = 0;
+        public const int DEFAULT_MODE = 0;
 
         public const int DefaultTokenChannel = TokenConstants.DefaultChannel;
 
@@ -82,7 +82,7 @@ namespace Antlr4.Runtime
 
         private readonly Stack<int> _modeStack = new Stack<int>();
 
-		private int _mode = Antlr4.Runtime.Lexer.DefaultMode;
+		private int _mode = Antlr4.Runtime.Lexer.DEFAULT_MODE;
 
         /// <summary>
         /// You can set the text for the current token to override what is in
@@ -116,7 +116,7 @@ namespace Antlr4.Runtime
             _tokenStartLine = -1;
             _text = null;
             _hitEOF = false;
-            _mode = Antlr4.Runtime.Lexer.DefaultMode;
+            _mode = Antlr4.Runtime.Lexer.DEFAULT_MODE;
             _modeStack.Clear();
             Interpreter.Reset();
         }
@@ -171,7 +171,7 @@ namespace Antlr4.Runtime
                             Recover(e);
                             ttype = TokenTypes.Skip;
                         }
-                        if (_input.La(1) == IntStreamConstants.Eof)
+                        if (_input.LA(1) == IntStreamConstants.EOF)
                         {
                             _hitEOF = true;
                         }
@@ -330,7 +330,7 @@ outer_continue: ;
         {
             int cpos = Column;
 			int line = Line;
-            IToken eof = _factory.Create(_tokenFactorySourcePair, TokenConstants.Eof, null, TokenConstants.DefaultChannel, _input.Index, _input.Index - 1, line, cpos);
+            IToken eof = _factory.Create(_tokenFactorySourcePair, TokenConstants.EOF, null, TokenConstants.DefaultChannel, _input.Index, _input.Index - 1, line, cpos);
             Emit(eof);
             return eof;
         }
@@ -520,7 +520,7 @@ outer_continue: ;
         {
             IList<IToken> tokens = new List<IToken>();
             IToken t = NextToken();
-            while (t.Type != TokenConstants.Eof)
+            while (t.Type != TokenConstants.EOF)
             {
                 tokens.Add(t);
                 t = NextToken();
@@ -530,7 +530,7 @@ outer_continue: ;
 
         public virtual void Recover(LexerNoViableAltException e)
         {
-            if (_input.La(1) != IntStreamConstants.Eof)
+            if (_input.LA(1) != IntStreamConstants.EOF)
             {
                 // skip a char and try again
                 Interpreter.Consume(_input);
@@ -560,7 +560,7 @@ outer_continue: ;
             string s = ((char)c).ToString();
             switch (c)
             {
-                case TokenConstants.Eof:
+                case TokenConstants.EOF:
                 {
                     s = "<EOF>";
                     break;

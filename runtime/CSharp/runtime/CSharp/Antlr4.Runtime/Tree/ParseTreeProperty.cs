@@ -2,10 +2,7 @@
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
-using System.Collections.Concurrent;
-using System.Collections.Generic;
 using Antlr4.Runtime.Sharpen;
-using Antlr4.Runtime.Tree;
 
 namespace Antlr4.Runtime.Tree
 {

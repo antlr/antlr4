@@ -2,8 +2,6 @@
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
-using Antlr4.Runtime.Atn;
-using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
@@ -26,7 +24,7 @@ namespace Antlr4.Runtime.Atn
         /// .</p>
         /// </remarks>
         /// <seealso cref="Antlr4.Runtime.Dfa.DFA.IsPrecedenceDfa()"/>
-        public bool precedenceRuleDecision;
+        public bool isPrecedenceDecision;
 
         public override Antlr4.Runtime.Atn.StateType StateType
         {

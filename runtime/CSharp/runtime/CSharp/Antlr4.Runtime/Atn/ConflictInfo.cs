@@ -8,7 +8,6 @@ using Antlr4.Runtime.Sharpen;
 namespace Antlr4.Runtime.Atn
 {
     /// <summary>This class stores information about a configuration conflict.</summary>
-    /// <remarks>This class stores information about a configuration conflict.</remarks>
     /// <author>Sam Harwell</author>
     public class ConflictInfo
     {
@@ -43,7 +42,7 @@ namespace Antlr4.Runtime.Atn
         /// conflict indicates a true ambiguity in the input.
         /// <p>
         /// For the
-        /// <see cref="PredictionMode.LlExactAmbigDetection"/>
+        /// <see cref="PredictionMode.LL_EXACT_AMBIG_DETECTION"/>
         /// prediction mode,
         /// accept states are conflicting but not exact are treated as non-accept
         /// states.</p>

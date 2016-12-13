@@ -94,6 +94,7 @@
     <Compile Include="Atn\ILexerAction.cs" />
     <Compile Include="Atn\LexerActionExecutor.cs" />
     <Compile Include="Atn\LexerActionType.cs" />
+    <Compile Include="Atn\LexerATNConfig.cs" />
     <Compile Include="Atn\LexerATNSimulator.cs" />
     <Compile Include="Atn\LexerChannelAction.cs" />
     <Compile Include="Atn\LexerCustomAction.cs" />
@@ -107,8 +108,8 @@
     <Compile Include="Atn\LL1Analyzer.cs" />
     <Compile Include="Atn\LookaheadEventInfo.cs" />
     <Compile Include="Atn\LoopEndState.cs" />
+    <Compile Include="Atn\MergeCache.cs" />
     <Compile Include="Atn\NotSetTransition.cs" />
-    <Compile Include="Atn\OrderedATNConfigSet.cs" />
     <Compile Include="Atn\ParseInfo.cs" />
     <Compile Include="Atn\ParserATNSimulator.cs" />
     <Compile Include="Atn\PlusBlockStartState.cs" />
@@ -168,12 +169,14 @@
     <Compile Include="LexerNoViableAltException.cs" />
     <Compile Include="ListTokenSource.cs" />
     <Compile Include="Misc\Args.cs" />
+    <Compile Include="Misc\ArrayList.cs" />
     <Compile Include="Misc\MurmurHash.cs" />
     <Compile Include="Misc\NullableAttribute.cs" />
     <Compile Include="Misc\IIntSet.cs" />
     <Compile Include="Misc\Interval.cs" />
     <Compile Include="Misc\IntervalSet.cs" />
     <Compile Include="Misc\NotNullAttribute.cs" />
+    <Compile Include="Misc\Pair.cs" />
     <Compile Include="Misc\ParseCanceledException.cs" />
     <Compile Include="Misc\RuleDependencyChecker.cs" />
     <Compile Include="Misc\Utils.cs" />

@@ -25,7 +25,7 @@ namespace Antlr4.Runtime.Atn
         {
             get
             {
-                return Antlr4.Runtime.Atn.TransitionType.Atom;
+                return Antlr4.Runtime.Atn.TransitionType.ATOM;
             }
         }
 
