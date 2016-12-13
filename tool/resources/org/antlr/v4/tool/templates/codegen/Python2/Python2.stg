@@ -493,6 +493,7 @@ self.state = <m.stateNumber>
 <if(invert)>if <m.varName> \<= 0 or <expr><else>if not(<expr>)<endif>:
 <if(m.labels)><m.labels:{l |     <labelref(l)> = }><else>    <endif>self._errHandler.recoverInline(self)
 else:
+    self._errHandler.reportMatch(self)
     self.consume()
 >>
 

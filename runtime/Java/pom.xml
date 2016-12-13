@@ -41,6 +41,7 @@
 				<version>1.0</version>
 				<executions>
 					<execution>
+						<phase>deploy</phase>
 						<goals>
 							<goal>dot</goal>
 						</goals>
