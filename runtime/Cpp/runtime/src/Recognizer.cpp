@@ -41,7 +41,7 @@ std::map<std::string, size_t> Recognizer::getTokenTypeMap() {
   if (iterator != _tokenTypeMapCache.end()) {
     result = iterator->second;
   } else {
-    for (size_t i = 0; i < getATN().maxTokenType; ++i) {
+    for (size_t i = 0; i <= getATN().maxTokenType; ++i) {
       std::string literalName = vocabulary.getLiteralName(i);
       if (!literalName.empty()) {
         result[literalName] = i;
