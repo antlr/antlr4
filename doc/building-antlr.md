@@ -38,6 +38,7 @@ Receiving objects: 100% (59858/59858), 31.10 MiB | 819.00 KiB/s, done.
 Resolving deltas: 100% (31898/31898), done.
 Checking connectivity... done.
 $ cd antlr4
+$ export MAVEN_OPTS="-Xmx1G"   # don't forget this on linux
 $ mvn -DskipTests install
 ...
 [INFO] ------------------------------------------------------------------------
@@ -67,6 +68,7 @@ We do `install` not `compile` as tool tests and such refer to modules that must 
 To skip the tests (which require all the target languages be installed) and **install into local repository** `~/.m2/repository/org/antlr`, do this:
 
 ```bash
+$ export MAVEN_OPTS="-Xmx1G"     # don't forget this on linux
 $ mvn install -DskipTests=true   # make sure all artifacts are visible on this machine
 ```
 
@@ -85,6 +87,7 @@ In order to perform the tests on all target languages, you need to have the foll
 To run the tests and **install into local repository** `~/.m2/repository/org/antlr`, do this:
 
 ```bash
+$ export MAVEN_OPTS="-Xmx1G"     # don't forget this on linux
 $ mvn install -DskipTests=true   # make sure all artifacts are visible on this machine
 $ mvn install                    # now "do it with feeling"
 ...
@@ -123,8 +126,9 @@ antlr reports warnings from [-visitor, -Dlanguage=CSharp, -o, /var/folders/s1/h3
 
 Note: That is actually result of running the much faster:
 
-`mvn -Dparallel=methods -DthreadCount=4 install`
-
+```bash
+mvn -Dparallel=methods -DthreadCount=4 install
+```
 
 You should see these jars (when building 4.6-SNAPSHOT):
 
@@ -151,6 +155,7 @@ Note that ANTLR is written in itself, which is why maven downloads antlr4-4.5.ja
 
 ```bash
 $ cd runtime-testsuite
+$ export MAVEN_OPTS="-Xmx1G"     # don't forget this on linux
 $ mvn -Dtest=TestParserExec test
 -------------------------------------------------------
  T E S T S
@@ -165,6 +170,7 @@ Running org.antlr.v4.test.runtime.csharp.TestParserExec
 Or run all lexer related tests:
 
 ```
+$ cd runtime-testsuite
 $ mvn -Dtest=Test*Lexer* test
 -------------------------------------------------------
  T E S T S
@@ -176,6 +182,7 @@ Running org.antlr.v4.test.runtime.cpp.TestCompositeLexers
 ### Run all tests for a single target
 
 ```bash
+$ cd runtime-testsuite
 $ mvn -Dtest=java.* test
 ...
 ```
@@ -183,6 +190,7 @@ $ mvn -Dtest=java.* test
 Or run all lexer related tests in Java target only:
 
 ```bash
+$ cd runtime-testsuite
 $ mvn -Dtest=java.*Lexer* test
 ...
 -------------------------------------------------------
@@ -207,6 +215,7 @@ Tests run: 59, Failures: 0, Errors: 0, Skipped: 0
 Use this to run tests in parallel:
 
 ```bash
+$ export MAVEN_OPTS="-Xmx1G"
 $ mvn -Dparallel=methods -DthreadCount=4 test
 ...
 -------------------------------------------------------
@@ -223,7 +232,7 @@ This can be combined with other `-D` above.
 To build without running the tests (saves a lot of time), do this:
 
 ```bash
-mvn -DskipTests install
+$ mvn -DskipTests install
 ```
 
 ## Building ANTLR in Intellij IDE
