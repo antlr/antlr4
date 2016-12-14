@@ -550,7 +550,7 @@ public class BaseCppTest implements RuntimeTestSupport {
 
 		try {
 			String command[] = { "cmake", ".", /*"-DCMAKE_CXX_COMPILER=clang++",*/ "-DCMAKE_BUILD_TYPE=release" };
-			if (runCommand(command, runtimePath, "antlr runtime cmake", true) == null) {
+			if (runCommand(command, runtimePath, "antlr runtime cmake", false) == null) {
 				return false;
 			}
 		}
@@ -565,6 +565,14 @@ public class BaseCppTest implements RuntimeTestSupport {
 		}
 		catch (Exception e) {
 			System.err.println("can't compile antlr cpp runtime");
+			try {
+			    String command[] = { "ls", "-la" };
+					String output = runCommand(command, runtimePath + "/dist/", "printing library folder content", true);
+				System.out.println(output);
+			}
+			catch (Exception e2) {
+				System.err.println("can't even list folder content");
+			}
 		}
 
 /* for debugging
