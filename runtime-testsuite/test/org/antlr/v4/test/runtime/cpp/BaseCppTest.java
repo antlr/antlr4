@@ -587,12 +587,16 @@ public class BaseCppTest implements RuntimeTestSupport {
 		String includePath = runtimePath + "/runtime/src";
 		String binPath = new File(new File(tmpdir), "a.out").getAbsolutePath();
 		String inputPath = new File(new File(tmpdir), "input").getAbsolutePath();
+		String cxx = System.getenv("CXX");// clang++, g++-5, ...
+		if (cxx==null || cxx.length()==0) {
+			cxx = new String("clang++");// FIXME: with $> export CXX="clang++"
+		}
 
 		// Build runtime using cmake once.
 		synchronized (runtimeBuiltOnce) {
 			if ( !runtimeBuiltOnce ) {
 				try {
-					String command[] = {"clang++", "--version"};
+					String command[] = {cxx, "--version"};
 					String output = runCommand(command, tmpdir, "printing compiler version");
 					System.out.println("Compiler version is: "+output);
 				}
@@ -623,8 +627,9 @@ public class BaseCppTest implements RuntimeTestSupport {
 		}
 
 		try {
-			List<String> command2 = new ArrayList<String>(Arrays.asList("clang++", "-std=c++11", "-I", includePath, "-L.", "-lantlr4-runtime", "-o", "a.out"));
+			List<String> command2 = new ArrayList<String>(Arrays.asList(cxx, "-std=c++11"));
 			command2.addAll(allCppFiles(tmpdir));
+			command2.addAll(Arrays.asList("-o", "a.out", "-I", includePath, "-L.", "-lantlr4-runtime"));
 			if (runCommand(command2.toArray(new String[0]), tmpdir, "building test binary") == null) {
 				return null;
 			}
