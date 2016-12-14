@@ -4,12 +4,22 @@
 
 Create a pre-release or full release at github; [Example 4.5-rc-1](https://github.com/antlr/antlr4/releases/tag/4.5-rc-1).
 
+### Delete existing release tag
+
 Wack any existing tag as mvn will create one and it fails if already there.
 
 ```
 $ git tag -d 4.6
 $ git push origin :refs/tags/4.6
 $ git push upstream :refs/tags/4.6
+```
+
+### Create release candidate tag
+
+```bash
+$ git tag -a 4.6-rc1 -m 'heading towards 4.6'
+$ git push origin 4.6-rc1
+$ git push upstream 4.6-rc1
 ```
 
 ## Bump version
