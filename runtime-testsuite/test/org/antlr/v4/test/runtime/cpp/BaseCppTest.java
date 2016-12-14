@@ -55,7 +55,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -675,11 +677,21 @@ public class BaseCppTest implements RuntimeTestSupport {
 
 	protected String locateRuntime() {
 		final ClassLoader loader = Thread.currentThread().getContextClassLoader();
-		final URL runtimeSrc = loader.getResource("Cpp");
-		if (runtimeSrc == null) {
+		final URL runtimeURL = loader.getResource("Cpp");
+		if (runtimeURL == null) {
 			throw new RuntimeException("Cannot find runtime");
 		}
-		return runtimeSrc.getPath();
+		// Windows not getting runtime right. See:
+		// http://stackoverflow.com/questions/6164448/convert-url-to-normal-windows-filename-java
+		// it was coming back "/C:/projects/antlr4-l7imv/runtime-testsuite/target/classes/Cpp"
+		String p;
+		try {
+			p = Paths.get(runtimeURL.toURI()).toFile().toString();
+		}
+		catch (URISyntaxException use) {
+			p = "Can't find runtime";
+		}
+		return p;
 	}
 
 	List<ANTLRMessage> getMessagesOfType(List<ANTLRMessage> msgs, Class<? extends ANTLRMessage> c) {
