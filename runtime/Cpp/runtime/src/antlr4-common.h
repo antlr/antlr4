@@ -78,7 +78,6 @@
   #else
     #define ANTLR4CPP_PUBLIC
   #endif
-  #define EXPIMP_TEMPLATE
 #else
   #define GUID_LIBUUID
   #if __GNUC__ >= 6
@@ -86,7 +85,6 @@
   #else
     #define ANTLR4CPP_PUBLIC
   #endif
-  #define EXPIMP_TEMPLATE
 #endif
 
 #include "support/guid.h"
