@@ -255,9 +255,13 @@ public class CommonToken: WritableToken {
     }
 
     public var description: String {
+        return toString(nil)
+    }
+
+    public func toString(_ r: Recognizer<ATNSimulator>?) -> String {
         var channelStr: String = ""
         if channel > 0 {
-            channelStr = "channel=\(channel)"
+            channelStr = ",channel=\(channel)"
         }
         var txt: String
         if let tokenText = getText() {
@@ -267,15 +271,19 @@ public class CommonToken: WritableToken {
         } else {
             txt = "<no text>"
         }
-        let desc: StringBuilder = StringBuilder()
-        desc.append("[@\(getTokenIndex()),")
-        desc.append("\(start):\(stop)='\(txt)',")
-        desc.append("<\(type)>\(channelStr),")
-        desc.append("\(line):\(getCharPositionInLine())]")
-
-        return desc.toString()
+        var typeString = "\(type)"
+        if let r = r {
+            typeString = r.getVocabulary().getDisplayName(type);
+        }
+       return "[@"+getTokenIndex()+","+start+":"+stop+"='"+txt+"',<"+typeString+">"+channelStr+","+line+":"+getCharPositionInLine()+"]"
+//        let desc: StringBuilder = StringBuilder()
+//        desc.append("[@\(getTokenIndex()),")
+//        desc.append("\(start):\(stop)='\(txt)',")
+//        desc.append("<\(typeString)>\(channelStr),")
+//        desc.append("\(line):\(getCharPositionInLine())]")
+//        
+//        return desc.toString()
     }
-
     public var visited: Bool {
         get {
             return _visited
