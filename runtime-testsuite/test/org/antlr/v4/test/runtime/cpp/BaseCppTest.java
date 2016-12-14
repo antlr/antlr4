@@ -565,6 +565,7 @@ public class BaseCppTest implements RuntimeTestSupport {
 		}
 		catch (Exception e) {
 			System.err.println("can't compile antlr cpp runtime");
+			e.printStackTrace(System.err);
 			try {
 			    String command[] = { "ls", "-la" };
 					String output = runCommand(command, runtimePath + "/dist/", "printing library folder content", true);
@@ -572,6 +573,7 @@ public class BaseCppTest implements RuntimeTestSupport {
 			}
 			catch (Exception e2) {
 				System.err.println("can't even list folder content");
+				e2.printStackTrace(System.err);
 			}
 		}
 
