@@ -79,6 +79,18 @@ open class ParserRuleContext: RuleContext {
 
         self.start = ctx.start
         self.stop = ctx.stop
+        
+        // copy any error nodes to alt label node
+        if  ctx.children != nil{
+            self.children = Array<ParseTree>()
+            // reset parent pointer for any error nodes
+            for  child: ParseTree in ctx.children!  {
+                if  child is ErrorNode{
+                    self.children?.append(child)
+                    ( (child as! ErrorNode)).parent = self
+                }
+            }
+        }
     }
 
     public init(_ parent: ParserRuleContext?, _ invokingStateNumber: Int) {
