@@ -11,6 +11,7 @@ import org.antlr.v4.automata.ATNPrinter;
 import org.antlr.v4.automata.LexerATNFactory;
 import org.antlr.v4.automata.ParserATNFactory;
 import org.antlr.v4.codegen.CodeGenerator;
+import org.antlr.v4.misc.Utils;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonToken;
@@ -521,7 +522,7 @@ public class BaseCppTest implements RuntimeTestSupport {
 		String output = stdoutVacuum.toString();
 		if ( stderrVacuum.toString().length()>0 ) {
 			this.stderrDuringParse = stderrVacuum.toString();
-//			System.err.println(this.stderrDuringParse);
+			System.err.println(this.stderrDuringParse);
 		}
 		if (errcode != 0) {
 			String err = "execution failed with error code: "+errcode;
@@ -537,6 +538,7 @@ public class BaseCppTest implements RuntimeTestSupport {
 	}
 
 	private String runCommand(String command[], String workPath, String description) throws Exception {
+		System.err.println("runCommand: "+Utils.join(command, " "));
 		ProcessBuilder builder = new ProcessBuilder(command);
 		builder.directory(new File(workPath));
 
