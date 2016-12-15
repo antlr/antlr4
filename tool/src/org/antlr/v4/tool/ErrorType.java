@@ -1034,7 +1034,7 @@ public enum ErrorType {
 	/**
 	 * Compiler Warning 180.
 	 *
-	 * <p>chars "a-f" declared multiply times in set [a-fc-m]</p>
+	 * <p>chars "a-f" used multiple times in set [a-fc-m]</p>
 	 *
 	 * <pre>
 	 * A:    [aa-z];   // warning
@@ -1043,7 +1043,7 @@ public enum ErrorType {
 	 *
 	 * TODO: Does not work with fragment rules.
 	 */
-	CHARACTERS_COLLISION_IN_SET(180, "chars \"<arg>\" declared multiply times in set <arg2>", ErrorSeverity.WARNING),
+	CHARACTERS_COLLISION_IN_SET(180, "chars \"<arg>\" used multiple times in set <arg2>", ErrorSeverity.WARNING),
 
 	/*
 	 * Backward incompatibility errors

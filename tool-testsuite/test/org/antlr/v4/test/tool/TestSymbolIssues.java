@@ -329,10 +329,10 @@ public class TestSymbolIssues extends BaseJavaToolTest {
 				"TOKEN_RANGE_3:    'Z' | 'K'..'R' | 'O'..'V';\n" +
 				"TOKEN_RANGE_4:    'g'..'l' | [g-l];\n",             // Handling in ATNOptimizer.
 
-				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4:2:18: chars \"a-f\" declared multiply times in set [aa-f]\n" +
-				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4:3:18: chars \"D-J\" declared multiply times in set [A-FD-J]\n" +
-				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4:4:13: chars \"O-V\" declared multiply times in set 'Z' | 'K'..'R' | 'O'..'V'\n" +
-				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4::: chars \"g-l\" declared multiply times in set [g-l]\n"
+				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4:2:18: chars \"a-f\" used multiple times in set [aa-f]\n" +
+				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4:3:18: chars \"D-J\" used multiple times in set [A-FD-J]\n" +
+				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4:4:13: chars \"O-V\" used multiple times in set 'Z' | 'K'..'R' | 'O'..'V'\n" +
+				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4::: chars \"g-l\" used multiple times in set [g-l]\n"
 		};
 
 		testErrors(test, false);
