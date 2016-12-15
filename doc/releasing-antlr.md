@@ -229,6 +229,70 @@ popd
 
 ### CSharp
 
+*Publishing to Nuget from Linux/MacOSX*
+
+**Getting ready to run Nuget**
+
+Of course you need Mono and `nuget` to be installed. On mac:
+
+```bash
+brew install mono
+brew install nuget
+```
+
+Or, you can [download nuget.exe](https://dist.nuget.org/win-x86-commandline/latest/nuget.exe).
+
+From the shell on mac, you can check all is ok by typing
+
+```bash
+nuget
+```
+
+This should display the nuget help. 
+
+**Creating the assembly**
+
+```bash
+$ cd runtime/CSharp/runtime/CSharp/Antlr4.Runtime
+$ xbuild /p:Configuration=Release Antlr4.Runtime.mono.csproj
+...
+		Copying file from '/Users/parrt/antlr/code/antlr4/runtime/CSharp/runtime/CSharp/Antlr4.Runtime/obj/net20/Release/Antlr4.Runtime.Standard.dll' to '/Users/parrt/antlr/code/antlr4/runtime/CSharp/runtime/CSharp/Antlr4.Runtime/lib/Release/Antlr4.Runtime.Standard.dll'
+Done building project "/Users/parrt/antlr/code/antlr4/runtime/CSharp/runtime/CSharp/Antlr4.Runtime/Antlr4.Runtime.mono.csproj".
+```
+
+Alternately, you may want to build ANTLR using Xamarin Studio Community (free).
+
+**Packaging for NuGet**
+
+```bash
+cd runtime/CSharp/runtime/CSharp
+```
+
+which is where the `Package.nuspec` file resides.
+
+Type the following command:
+
+```bash
+$ nuget pack Package.nuspec
+Attempting to build package from 'Package.nuspec'.
+Successfully created package '/Users/parrt/antlr/code/antlr4/runtime/CSharp/runtime/CSharp/Antlr4.Runtime.Standard.4.6.0.nupkg'.
+```
+
+This should display: Successfully created package *&lt;package-path>*
+
+**Publishing to NuGet**
+
+You need to be a NuGet owner for "ANTLR 4 Standard Runtime"
+As a registered NuGet user, you can then manually upload the package spec here (`runtime/CSharp/runtime/CSharp/Package.nuspec`): [https://www.nuget.org/packages/manage/upload](https://www.nuget.org/packages/manage/upload)
+
+Alternately, you can publish from the cmd line. You need to get your NuGet key from [https://www.nuget.org/account#](https://www.nuget.org/account#) and then from the cmd line, you can then type:
+
+```bash
+nuget push Antlr4.Runtime.Standard.<version>.nupkg <your-key> -Source https://www.nuget.org/api/v2/package
+```
+
+**Creating DLLs**
+
 ```bash
 cd ~/antlr/code/antlr4/runtime/CSharp/runtime/CSharp
 # kill previous ones manually as "xbuild /t:Clean" didn't seem to do it
