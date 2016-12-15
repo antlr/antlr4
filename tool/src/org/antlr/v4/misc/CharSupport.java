@@ -112,26 +112,27 @@ public class CharSupport {
 	 *  Unnecessary escapes like '\{' yield -1.
 	 */
 	public static int getCharValueFromCharInGrammarLiteral(String cstr) {
-		switch (cstr.length()) {
+		switch ( cstr.length() ) {
 			case 1:
 				// 'x'
 				return cstr.charAt(0); // no escape char
 			case 2:
-				if (cstr.charAt(0) != '\\') return -1;
+				if ( cstr.charAt(0)!='\\' ) return -1;
 				// '\x'  (antlr lexer will catch invalid char)
-				if (Character.isDigit(cstr.charAt(1))) return -1;
+				if ( Character.isDigit(cstr.charAt(1)) ) return -1;
 				int escChar = cstr.charAt(1);
 				int charVal = ANTLRLiteralEscapedCharValue[escChar];
-				if (charVal == 0) return -1;
+				if ( charVal==0 ) return -1;
 				return charVal;
 			case 6:
 				// '\u1234'
-				if (!cstr.startsWith("\\u")) return -1;
+				if ( !cstr.startsWith("\\u") ) return -1;
 				String unicodeChars = cstr.substring(2, cstr.length());
 				int result = -1;
 				try {
 					result = Integer.parseInt(unicodeChars, 16);
-				} catch (NumberFormatException e) {
+				}
+				catch (NumberFormatException e) {
 				}
 				return result;
 			default:

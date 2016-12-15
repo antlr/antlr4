@@ -345,7 +345,6 @@ public class LexerATNFactory extends ParserATNFactory {
 		ATNState right;
 		chars = CharSupport.getStringFromGrammarStringLiteral(chars);
 		if (chars == null) {
-			right = left;
 			g.tool.errMgr.grammarError(ErrorType.INVALID_ESCAPE_SEQUENCE,
 					g.fileName, stringLiteralAST.getToken());
 			return new Handle(left, left);
