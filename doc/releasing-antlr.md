@@ -233,9 +233,10 @@ popd
 
 **Getting ready to run Nuget**
 
-Of course you need Mono to be installed and also `nuget`. On mac:
+Of course you need Mono and `nuget` to be installed. On mac:
 
 ```bash
+brew install mono
 brew install nuget
 ```
 
@@ -245,12 +246,6 @@ From the shell on mac, you can check all is ok by typing
 
 ```bash
 nuget
-```
-
-On linux it's likely:
-
-```bash
-mono <path-to-nuget.exe>
 ```
 
 This should display the nuget help. 
@@ -264,8 +259,6 @@ $ xbuild /p:Configuration=Release Antlr4.Runtime.mono.csproj
 		Copying file from '/Users/parrt/antlr/code/antlr4/runtime/CSharp/runtime/CSharp/Antlr4.Runtime/obj/net20/Release/Antlr4.Runtime.Standard.dll' to '/Users/parrt/antlr/code/antlr4/runtime/CSharp/runtime/CSharp/Antlr4.Runtime/lib/Release/Antlr4.Runtime.Standard.dll'
 Done building project "/Users/parrt/antlr/code/antlr4/runtime/CSharp/runtime/CSharp/Antlr4.Runtime/Antlr4.Runtime.mono.csproj".
 ```
-
-(Or `mono xbuild ...`)
 
 Alternately, you may want to build ANTLR using Xamarin Studio Community (free).
 
@@ -285,12 +278,6 @@ Attempting to build package from 'Package.nuspec'.
 Successfully created package '/Users/parrt/antlr/code/antlr4/runtime/CSharp/runtime/CSharp/Antlr4.Runtime.Standard.4.6.0.nupkg'.
 ```
 
-or 
-
-```bash
-mono <path-to-nuget.exe> pack Package.nuspec
-```
-
 This should display: Successfully created package *&lt;package-path>*
 
 **Publishing to NuGet**
@@ -301,7 +288,7 @@ As a registered NuGet user, you can then manually upload the package spec here (
 Alternately, you can publish from the cmd line. You need to get your NuGet key from [https://www.nuget.org/account#](https://www.nuget.org/account#) and then from the cmd line, you can then type:
 
 ```bash
-mono <path-to-nuget.exe> push Antlr4.Runtime.Standard.<version>.nupkg <your-key> -Source https://www.nuget.org/api/v2/package
+nuget push Antlr4.Runtime.Standard.<version>.nupkg <your-key> -Source https://www.nuget.org/api/v2/package
 ```
 
 **Creating DLLs**
