@@ -39,7 +39,7 @@ The grammars are strings representing StringTemplates (`ST` objects) so `<writel
 
 In order to perform the tests on all target languages, you need to have the following languages installed:
 
-* `mono` (e.g., `brew install mono`) Also must [`xbuild` the runtime](https://github.com/antlr/antlr4/blob/master/doc/releasing-antlr.md) before tests will run; see below
+* `mono` (e.g., `brew install mono`) on non-Windows boxes (on Windows it uses the Microsoft .net stack). Also must [`xbuild` the runtime](https://github.com/antlr/antlr4/blob/master/doc/releasing-antlr.md) before tests will run; see below
 * `nodejs`
 * Python 2.7
 * Python 3.5
