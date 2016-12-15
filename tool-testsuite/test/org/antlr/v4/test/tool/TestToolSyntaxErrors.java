@@ -487,11 +487,11 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 			"Error3: '';\n" +
 			"NotError: ' ';";
 		String expected =
-			"error(" + ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED.code + "): T.g4:2:8: string literals and sets cannot be empty: \n" +
-			"error(" + ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED.code + "): T.g4:2:16: string literals and sets cannot be empty: \n" +
-			"error(" + ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED.code + "): T.g4:3:8: string literals and sets cannot be empty: \n" +
-			"error(" + ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED.code + "): T.g4:4:15: string literals and sets cannot be empty: \n" +
-			"error(" + ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED.code + "): T.g4:5:8: string literals and sets cannot be empty: \n";
+			"error(" + ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED.code + "): T.g4:2:8: string literals and sets cannot be empty: ''\n" +
+			"error(" + ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED.code + "): T.g4:2:16: string literals and sets cannot be empty: ''\n" +
+			"error(" + ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED.code + "): T.g4:3:8: string literals and sets cannot be empty: ''\n" +
+			"error(" + ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED.code + "): T.g4:4:15: string literals and sets cannot be empty: ''\n" +
+			"error(" + ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED.code + "): T.g4:5:8: string literals and sets cannot be empty: ''\n";
 
 		String[] pair = new String[] {
 				grammar,
