@@ -95,33 +95,34 @@ public class ATNOptimizer {
 					Transition matchTransition = decision.transition(j).target.transition(0);
 					if (matchTransition instanceof NotSetTransition) {
 						throw new UnsupportedOperationException("Not yet implemented.");
-					} else {
-						IntervalSet set = matchTransition.label();
-						int minElem = set.getMinElement();
-						int maxElem = set.getMaxElement();
-						for (int k = minElem; k <= maxElem; k++) {
-							if (matchSet.contains(k)) {
-								char setMin = (char) set.getMinElement();
-								char setMax = (char) set.getMaxElement();
-								// TODO: Token is missing (i.e. position in source will not be displayed).
-								g.tool.errMgr.grammarError(ErrorType.CHARACTERS_COLLISION_IN_SET, g.fileName,
-										null, (char) minElem + "-" + (char) maxElem, "[" + setMin + "-" + setMax + "]");
-								break;
-							}
-						}
-						matchSet.addAll(set);
 					}
+					IntervalSet set = matchTransition.label();
+					int minElem = set.getMinElement();
+					int maxElem = set.getMaxElement();
+					for (int k = minElem; k <= maxElem; k++) {
+						if (matchSet.contains(k)) {
+							char setMin = (char) set.getMinElement();
+							char setMax = (char) set.getMaxElement();
+							// TODO: Token is missing (i.e. position in source will not be displayed).
+							g.tool.errMgr.grammarError(ErrorType.CHARACTERS_COLLISION_IN_SET, g.fileName,
+							                           null, (char) minElem + "-" + (char) maxElem, "[" + setMin + "-" + setMax + "]");
+							break;
+						}
+					}
+					matchSet.addAll(set);
 				}
 
 				Transition newTransition;
 				if (matchSet.getIntervals().size() == 1) {
 					if (matchSet.size() == 1) {
 						newTransition = new AtomTransition(blockEndState, matchSet.getMinElement());
-					} else {
+					}
+					else {
 						Interval matchInterval = matchSet.getIntervals().get(0);
 						newTransition = new RangeTransition(blockEndState, matchInterval.a, matchInterval.b);
 					}
-				} else {
+				}
+				else {
 					newTransition = new SetTransition(blockEndState, matchSet);
 				}
 
