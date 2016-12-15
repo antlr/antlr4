@@ -487,11 +487,39 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 			"Error3: '';\n" +
 			"NotError: ' ';";
 		String expected =
-			"error(" + ErrorType.EMPTY_STRINGS_NOT_ALLOWED.code + "): T.g4:2:8: string literals cannot be empty\n" +
-			"error(" + ErrorType.EMPTY_STRINGS_NOT_ALLOWED.code + "): T.g4:2:16: string literals cannot be empty\n" +
-			"error(" + ErrorType.EMPTY_STRINGS_NOT_ALLOWED.code + "): T.g4:3:8: string literals cannot be empty\n" +
-			"error(" + ErrorType.EMPTY_STRINGS_NOT_ALLOWED.code + "): T.g4:4:15: string literals cannot be empty\n" +
-			"error(" + ErrorType.EMPTY_STRINGS_NOT_ALLOWED.code + "): T.g4:5:8: string literals cannot be empty\n";
+			"error(" + ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED.code + "): T.g4:2:8: string literals and sets cannot be empty: \n" +
+			"error(" + ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED.code + "): T.g4:2:16: string literals and sets cannot be empty: \n" +
+			"error(" + ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED.code + "): T.g4:3:8: string literals and sets cannot be empty: \n" +
+			"error(" + ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED.code + "): T.g4:4:15: string literals and sets cannot be empty: \n" +
+			"error(" + ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED.code + "): T.g4:5:8: string literals and sets cannot be empty: \n";
+
+		String[] pair = new String[] {
+				grammar,
+				expected
+		};
+
+		super.testErrors(pair, true);
+	}
+
+	@Test public void testInvalidCharSetAndRange() {
+		String grammar =
+				"lexer grammar Test;\n" +
+				"INVALID_RANGE:         'GH'..'LM';\n" +
+				"INVALID_RANGE_2:       'F'..'A' | 'Z';\n" +
+				"VALID_STRING_LITERALS: '\\u1234' | '\\t' | [\\-\\]];\n" +
+				"INVALID_CHAR_SET:      [f-az][];\n" +
+				"INVALID_CHAR_SET_2:    [\\u24\\uA2][\\u24];\n" +  //https://github.com/antlr/antlr4/issues/1077
+				"INVALID_CHAR_SET_3:    [\\t\\{];";
+
+		String expected =
+				"error(" + ErrorType.INVALID_LITERAL_IN_LEXER_SET.code + "): Test.g4:2:23: multi-character literals are not allowed in lexer sets: 'GH'\n" +
+				"error(" + ErrorType.INVALID_LITERAL_IN_LEXER_SET.code + "): Test.g4:2:29: multi-character literals are not allowed in lexer sets: 'LM'\n" +
+				"error(" + ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED.code + "): Test.g4:3:26: string literals and sets cannot be empty: 'F'..'A'\n" +
+				"error(" + ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED.code + "): Test.g4:5:23: string literals and sets cannot be empty: [f-a]\n" +
+				"error(" + ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED.code + "): Test.g4:5:29: string literals and sets cannot be empty: []\n" +
+				"error(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:6:23: invalid escape sequence\n" +
+				"error(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:6:33: invalid escape sequence\n" +
+				"error(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:7:23: invalid escape sequence\n";
 
 		String[] pair = new String[] {
 				grammar,
