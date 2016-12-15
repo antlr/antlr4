@@ -23,7 +23,7 @@ import java.util.Set;
  */
 public class ListenerFile extends OutputFile {
 	public String genPackage; // from -package cmd-line
-	public String exportMacro; // from -export-macro cmd-line
+	public String exportMacro; // from -DexportMacro cmd-line
 	public String grammarName;
 	public String parserName;
 	/**
@@ -62,6 +62,6 @@ public class ListenerFile extends OutputFile {
 		ActionAST ast = g.namedActions.get("header");
 		if ( ast!=null ) header = new Action(factory, ast);
 		genPackage = factory.getGrammar().tool.genPackage;
-		exportMacro = factory.getGrammar().tool.exportMacro;
+		exportMacro = factory.getGrammar().getOptionString("exportMacro");
 	}
 }

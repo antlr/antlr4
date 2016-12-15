@@ -16,7 +16,7 @@ import java.util.Map;
 /** */
 public class ParserFile extends OutputFile {
 	public String genPackage; // from -package cmd-line
-	public String exportMacro ; // from -export-macro cmd-line
+	public String exportMacro; // from -DexportMacro cmd-line
 	public boolean genListener; // from -listener cmd-line
 	public boolean genVisitor; // from -visitor cmd-line
 	@ModelElement public Parser parser;
@@ -29,7 +29,7 @@ public class ParserFile extends OutputFile {
 		Grammar g = factory.getGrammar();
 		namedActions = buildNamedActions(factory.getGrammar());
 		genPackage = g.tool.genPackage;
-		exportMacro = g.tool.exportMacro;
+		exportMacro = factory.getGrammar().getOptionString("exportMacro");
 		// need the below members in the ST for Python, C++
 		genListener = g.tool.gen_listener;
 		genVisitor = g.tool.gen_visitor;
