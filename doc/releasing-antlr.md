@@ -251,13 +251,13 @@ This shoud display: Successfully created package <package-path>
 
 **Publishing to NuGet**
 
-You need to be a NuGet owner for "ANTLR 4 Official Runtime"
+You need to be a NuGet owner for "ANTLR 4 Standard Runtime"
 As a registered NuGet user, you can then manually upload the package spec here (`runtime/CSharp/runtime/CSharp/Package.nuspec`): [https://www.nuget.org/packages/manage/upload](https://www.nuget.org/packages/manage/upload)
 
 Alternately, you can publish from the cmd line. You need to get your NuGet key from [https://www.nuget.org/account#](https://www.nuget.org/account#) and then from the cmd line, you can then type:
 
 ```bash
-mono <path-to-nuget.exe> push Antlr4.Runtime.Official.<version>.nupkg <your-key> -Source https://www.nuget.org/api/v2/package
+mono <path-to-nuget.exe> push Antlr4.Runtime.Standard.<version>.nupkg <your-key> -Source https://www.nuget.org/api/v2/package
 ```
 
 **Creating DLLs**

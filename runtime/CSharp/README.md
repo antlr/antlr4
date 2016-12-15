@@ -2,11 +2,15 @@
 
 ### Note to historical users
 
-Versions of ANTLR 4.4.x and before managed the C# target as a [separate tool provided by Sam Harwell](https://github.com/tunnelvisionlabs/antlr4cs/releases/tag/v4.3.0).
-As of 4.5, we our releasing a (mono-compatible) C# target together with the main tool.
+Versions of ANTLR 4.4.x and before managed the C# 
+target as part of a [separate tool provided by Sam Harwell](https://github.com/tunnelvisionlabs/antlr4cs/releases/tag/v4.3.0).
+As of 4.5, we our releasing a (mono-compatible) C# target together
+with the main tool.
 
-Mono compatibility makes it possible to use ANTLR 4 in any C# development environment, including of course Microsoft Visual Studio, but also Xamarin Studio, which runs on MacOS X.
-Given Microsoft's recent commitment to *cross-platform developer experiences*, we believe this is a great opportunity for C# developers.
+Mono compatibility makes it possible to use ANTLR 4 in any C# development
+environment, including of course Microsoft Visual Studio, but also Xamarin Studio, which runs on MacOS X.
+Given Microsoft's recent commitment to *cross-platform developer experiences*,
+we believe this is a great opportunity for C# developers.
 
 Releasing the runtime with the tool ensures that you can get the exact same behavior across many languages: Java, C#, Python, JavaScript, Go, Swift and C++.
 
@@ -61,10 +65,10 @@ While the latter works, it is no longer the recommended approach, because it is 
 
 See the web site for examples of using the generated code.
  
-To learn more about ANTLR 4, read the book.
+To learn more about ANTLR 4, read [the book](http://a.co/2n4rJlb).
  
 ### Visual Studio integration
 
-If you require tighter Visual Studio integration, you can use the tools from Tunnel Vision Labs. 
+If you require tighter Visual Studio integration, you can use the tools from [Tunnel Vision Labs](http://tunnelvisionlabs.com/). 
 (please note however that they use a different tool and runtime)
 

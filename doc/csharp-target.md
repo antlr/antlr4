@@ -1,6 +1,6 @@
 # C&sharp;
 
-### Which frameworks are supported?
+## Which frameworks are supported?
 
 The C# runtime is CLS compliant, and only requires a corresponding 3.5 .Net framework.
 
@@ -11,19 +11,15 @@ In practice, the runtime has been extensively tested against:
 
 No issue was found, so you should find that the runtime works pretty much against any recent .Net framework.
 
-### How do I get started?
+## How do I get started?
 
-You will find full instructions on the [Git web page for ANTLR C# runtime](https://github.com/antlr/antlr4/tree/master/runtime/CSharp).
+You will find full instructions on the [Git repo page for ANTLR C# runtime](https://github.com/antlr/antlr4/tree/master/runtime/CSharp).
  
-### How do I use the runtime from my project?
+## How do I use the runtime from my project?
 
 (i.e., How do I run the generated lexer and/or parser?)
 
-Let's suppose that your grammar is named, as above, "MyGrammar".
-
-Let's suppose this parser comprises a rule named "StartRule"
-
-The tool will have generated for you the following files:
+Let's suppose that your grammar is named `MyGrammar`. The tool will generate for you the following files:
 
 *  MyGrammarLexer.cs
 *   MyGrammarParser.cs
@@ -32,7 +28,7 @@ The tool will have generated for you the following files:
 *   MyGrammarVisitor.js (if you have activated the -visitor option)
 *   MyGrammarBaseVisitor.js (if you have activated the -visitor option)
 
-Now a fully functioning code might look like the following:
+Now a fully functioning code might look like the following for start rule `StartRule`:
 
 ```
 using Antlr4.Runtime;
@@ -56,7 +52,7 @@ This program will work. But it won't be useful unless you do one of the followin
 
 (please note that production code is target specific, so you can't have multi target grammars that include production code)
  
-### How do I create and run a custom listener?
+## How do I create and run a custom listener?
 
 Let's suppose your MyGrammar grammar comprises 2 rules: "key" and "value".
 
@@ -94,7 +90,5 @@ ParseTreeWalker.DEFAULT.walk(printer, tree);
         
 Further information can be found from The Definitive ANTLR Reference book.
 
-The C# implementation of ANTLR is as close as possible to the Java one, so you shouldn't find it difficult to adapt the examples for C#.
-
-See also [Sam Harwell's alternative C# target](https://github.com/tunnelvisionlabs/antlr4cs)
+The C# implementation of ANTLR is as close as possible to the Java one, so you shouldn't find it difficult to adapt the examples for C#. See also [Sam Harwell's alternative C# target](https://github.com/tunnelvisionlabs/antlr4cs)
 
