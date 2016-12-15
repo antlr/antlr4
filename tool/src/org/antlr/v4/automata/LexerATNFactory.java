@@ -271,7 +271,8 @@ public class LexerATNFactory extends ParserATNFactory {
 				int a = CharSupport.getCharValueFromGrammarCharLiteral(t.getChild(0).getText());
 				int b = CharSupport.getCharValueFromGrammarCharLiteral(t.getChild(1).getText());
 				if (checkRange((GrammarAST) t.getChild(0), (GrammarAST) t.getChild(1), a, b)) {
-					checkAndAddToSet(associatedAST, set, a, b);
+					checkSetCollision(associatedAST, set, a, b);
+					set.add(a,b);
 				}
 			}
 			else if ( t.getType()==ANTLRParser.LEXER_CHAR_SET ) {
@@ -280,7 +281,8 @@ public class LexerATNFactory extends ParserATNFactory {
 			else if ( t.getType()==ANTLRParser.STRING_LITERAL ) {
 				int c = CharSupport.getCharValueFromGrammarCharLiteral(t.getText());
 				if ( c != -1 ) {
-					checkAndAddToSet(associatedAST, set, c);
+					checkSetCollision(associatedAST, set, c);
+					set.add(c);
 				}
 				else {
 					g.tool.errMgr.grammarError(ErrorType.INVALID_LITERAL_IN_LEXER_SET,
@@ -346,17 +348,18 @@ public class LexerATNFactory extends ParserATNFactory {
 			right = left;
 			g.tool.errMgr.grammarError(ErrorType.INVALID_ESCAPE_SEQUENCE,
 					g.fileName, stringLiteralAST.getToken());
-		} else {
-			int n = chars.length();
-			ATNState prev = left;
-			right = null;
-			for (int i = 0; i < n; i++) {
-				right = newState(stringLiteralAST);
-				prev.addTransition(new AtomTransition(right, chars.charAt(i)));
-				prev = right;
-			}
-			stringLiteralAST.atnState = left;
+			return new Handle(left, left);
 		}
+
+		int n = chars.length();
+		ATNState prev = left;
+		right = null;
+		for (int i = 0; i < n; i++) {
+			right = newState(stringLiteralAST);
+			prev.addTransition(new AtomTransition(right, chars.charAt(i)));
+			prev = right;
+		}
+		stringLiteralAST.atnState = left;
 		return new Handle(left, right);
 	}
 
@@ -380,55 +383,61 @@ public class LexerATNFactory extends ParserATNFactory {
 		if (chars.length() == 0) {
 			g.tool.errMgr.grammarError(ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED,
 					g.fileName, charSetAST.getToken(), "[]");
-		} else {
-			// unescape all valid escape char like \n, leaving escaped dashes as '\-'
-			// so we can avoid seeing them as '-' range ops.
-			chars = CharSupport.getStringFromGrammarStringLiteral(cset);
-			if (chars == null) {
-				g.tool.errMgr.grammarError(ErrorType.INVALID_ESCAPE_SEQUENCE,
-						g.fileName, charSetAST.getToken());
-			} else {
-				int n = chars.length();
-				// now make x-y become set of char
-				for (int i = 0; i < n; i++) {
-					int c = chars.charAt(i);
-					if (c == '\\' && (i + 1) < n && chars.charAt(i + 1) == '-') { // \-
-						checkAndAddToSet(charSetAST, set, '-');
-						i++;
-					} else if ((i + 2) < n && chars.charAt(i + 1) == '-') { // range x-y
-						int x = c;
-						int y = chars.charAt(i + 2);
-						if (x <= y) {
-							checkAndAddToSet(charSetAST, set, x, y);
-						} else {
-							g.tool.errMgr.grammarError(ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED,
-									g.fileName, charSetAST.getToken(), "[" + (char) x + "-" + (char) y + "]");
-						}
-						i += 2;
-					} else {
-						checkAndAddToSet(charSetAST, set, c);
-					}
+			return set;
+		}
+		// unescape all valid escape char like \n, leaving escaped dashes as '\-'
+		// so we can avoid seeing them as '-' range ops.
+		chars = CharSupport.getStringFromGrammarStringLiteral(cset);
+		if (chars == null) {
+			g.tool.errMgr.grammarError(ErrorType.INVALID_ESCAPE_SEQUENCE,
+			                           g.fileName, charSetAST.getToken());
+			return set;
+		}
+		int n = chars.length();
+		// now make x-y become set of char
+		for (int i = 0; i < n; i++) {
+			int c = chars.charAt(i);
+			if (c == '\\' && i+1 < n && chars.charAt(i+1) == '-') { // \-
+				checkSetCollision(charSetAST, set, '-');
+				set.add('-');
+				i++;
+			}
+			else if (i+2 < n && chars.charAt(i+1) == '-') { // range x-y
+				int x = c;
+				int y = chars.charAt(i+2);
+				if (x <= y) {
+					checkSetCollision(charSetAST, set, x, y);
+					set.add(x,y);
 				}
+				else {
+					g.tool.errMgr.grammarError(ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED,
+					                           g.fileName, charSetAST.getToken(), "[" + (char) x + "-" + (char) y + "]");
+				}
+				i += 2;
+			}
+			else {
+				checkSetCollision(charSetAST, set, c);
+				set.add(c);
 			}
 		}
 		return set;
 	}
 
-	private void checkAndAddToSet(GrammarAST ast, IntervalSet set, int el) {
+	protected void checkSetCollision(GrammarAST ast, IntervalSet set, int el) {
 		if (set.contains(el)) {
 			g.tool.errMgr.grammarError(ErrorType.CHARACTERS_COLLISION_IN_SET, g.fileName, ast.getToken(),
 					(char)el, ast.getText());
 		}
-		set.add(el);
 	}
 
-	private void checkAndAddToSet(GrammarAST ast, IntervalSet set, int a, int b) {
+	protected void checkSetCollision(GrammarAST ast, IntervalSet set, int a, int b) {
 		for (int i = a; i <= b; i++) {
 			if (set.contains(i)) {
 				String setText;
 				if (ast.getChildren() == null) {
 					setText = ast.getText();
-				} else {
+				}
+				else {
 					StringBuilder sb = new StringBuilder();
 					for (Object child : ast.getChildren()) {
 						if (child instanceof RangeAST) {
@@ -449,7 +458,6 @@ public class LexerATNFactory extends ParserATNFactory {
 				break;
 			}
 		}
-		set.add(a, b);
 	}
 
 	@Override
