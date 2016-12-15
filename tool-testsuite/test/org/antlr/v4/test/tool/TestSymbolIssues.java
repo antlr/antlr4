@@ -320,4 +320,21 @@ public class TestSymbolIssues extends BaseJavaToolTest {
 
 		testErrors(test, false);
 	}
+
+	@Test public void testCharsCollision() throws  Exception {
+		String[] test = {
+				"lexer grammar L;\n" +
+				"TOKEN_RANGE:      [aa-f];\n" +
+				"TOKEN_RANGE_2:    [A-FD-J];\n" +
+				"TOKEN_RANGE_3:    'Z' | 'K'..'R' | 'O'..'V';\n" +
+				"TOKEN_RANGE_4:    'g'..'l' | [g-l];\n",             // Handling in ATNOptimizer.
+
+				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4:2:18: chars \"a-f\" declared multiply times in set [aa-f]\n" +
+				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4:3:18: chars \"D-J\" declared multiply times in set [A-FD-J]\n" +
+				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4:4:13: chars \"O-V\" declared multiply times in set 'Z' | 'K'..'R' | 'O'..'V'\n" +
+				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4::: chars \"g-l\" declared multiply times in set [g-l]\n"
+		};
+
+		testErrors(test, false);
+	}
 }

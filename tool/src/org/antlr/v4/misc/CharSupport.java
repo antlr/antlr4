@@ -28,6 +28,8 @@ public class CharSupport {
 		ANTLRLiteralEscapedCharValue['\\'] = '\\';
 		ANTLRLiteralEscapedCharValue['\''] = '\'';
 		ANTLRLiteralEscapedCharValue['"'] = '"';
+		ANTLRLiteralEscapedCharValue['-'] = '-';
+		ANTLRLiteralEscapedCharValue[']'] = ']';
 		ANTLRLiteralCharValueEscape['\n'] = "\\n";
 		ANTLRLiteralCharValueEscape['\r'] = "\\r";
 		ANTLRLiteralCharValueEscape['\t'] = "\\t";
@@ -76,32 +78,6 @@ public class CharSupport {
 		return getCharValueFromCharInGrammarLiteral(literal.substring(1,literal.length()-1));
 	}
 
-	/** Given char x or \t or \u1234 return the char value;
-	 *  Unnecessary escapes like '\{' yield -1.
-	 */
-	public static int getCharValueFromCharInGrammarLiteral(String cstr) {
-		switch ( cstr.length() ) {
-			case 1 :
-				// 'x'
-				return cstr.charAt(0); // no escape char
-			case 2 :
-				if ( cstr.charAt(0)!='\\' ) return -1;
-				// '\x'  (antlr lexer will catch invalid char)
-				if ( Character.isDigit(cstr.charAt(1)) ) return -1;
-				int escChar = cstr.charAt(1);
-				int charVal = ANTLRLiteralEscapedCharValue[escChar];
-				if ( charVal==0 ) return -1;
-				return charVal;
-			case 6 :
-				// '\u1234'
-				if ( !cstr.startsWith("\\u") ) return -1;
-				String unicodeChars = cstr.substring(2, cstr.length());
-				return Integer.parseInt(unicodeChars, 16);
-			default :
-				return -1;
-		}
-	}
-
 	public static String getStringFromGrammarStringLiteral(String literal) {
 		StringBuilder buf = new StringBuilder();
 		int i = 1; // skip first quote
@@ -110,17 +86,57 @@ public class CharSupport {
 			int end = i+1;
 			if ( literal.charAt(i) == '\\' ) {
 				end = i+2;
-				if ( (i+1)>=n ) break; // ignore spurious \ on end
-				if ( literal.charAt(i+1) == 'u' ) end = i+6;
+				if ( i+1 < n && literal.charAt(i+1) == 'u' ) {
+					for (end = i + 2; end < i + 6; end++) {
+						if ( end>n ) return null; // invalid escape sequence.
+						char charAt = literal.charAt(end);
+						if (!Character.isDigit(charAt) && !(charAt >= 'a' && charAt <= 'f') && !(charAt >= 'A' && charAt <= 'F')) {
+							return null; // invalid escape sequence.
+						}
+					}
+				}
 			}
-			if ( end>n ) break;
+			if ( end>n ) return null; // invalid escape sequence.
 			String esc = literal.substring(i, end);
 			int c = getCharValueFromCharInGrammarLiteral(esc);
-			if ( c==-1 ) { buf.append(esc); }
+			if ( c==-1 ) {
+				return null; // invalid escape sequence.
+			}
 			else buf.append((char)c);
 			i = end;
 		}
 		return buf.toString();
+	}
+
+	/** Given char x or \t or \u1234 return the char value;
+	 *  Unnecessary escapes like '\{' yield -1.
+	 */
+	public static int getCharValueFromCharInGrammarLiteral(String cstr) {
+		switch (cstr.length()) {
+			case 1:
+				// 'x'
+				return cstr.charAt(0); // no escape char
+			case 2:
+				if (cstr.charAt(0) != '\\') return -1;
+				// '\x'  (antlr lexer will catch invalid char)
+				if (Character.isDigit(cstr.charAt(1))) return -1;
+				int escChar = cstr.charAt(1);
+				int charVal = ANTLRLiteralEscapedCharValue[escChar];
+				if (charVal == 0) return -1;
+				return charVal;
+			case 6:
+				// '\u1234'
+				if (!cstr.startsWith("\\u")) return -1;
+				String unicodeChars = cstr.substring(2, cstr.length());
+				int result = -1;
+				try {
+					result = Integer.parseInt(unicodeChars, 16);
+				} catch (NumberFormatException e) {
+				}
+				return result;
+			default:
+				return -1;
+		}
 	}
 
 	public static String capitalize(String s) {

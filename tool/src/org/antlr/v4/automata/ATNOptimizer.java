@@ -18,6 +18,7 @@ import org.antlr.v4.runtime.atn.SetTransition;
 import org.antlr.v4.runtime.atn.Transition;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.IntervalSet;
+import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.Rule;
 
@@ -95,7 +96,20 @@ public class ATNOptimizer {
 					if (matchTransition instanceof NotSetTransition) {
 						throw new UnsupportedOperationException("Not yet implemented.");
 					} else {
-						matchSet.addAll(matchTransition.label());
+						IntervalSet set = matchTransition.label();
+						int minElem = set.getMinElement();
+						int maxElem = set.getMaxElement();
+						for (int k = minElem; k <= maxElem; k++) {
+							if (matchSet.contains(k)) {
+								char setMin = (char) set.getMinElement();
+								char setMax = (char) set.getMaxElement();
+								// TODO: Token is missing (i.e. position in source will not be displayed).
+								g.tool.errMgr.grammarError(ErrorType.CHARACTERS_COLLISION_IN_SET, g.fileName,
+										null, (char) minElem + "-" + (char) maxElem, "[" + setMin + "-" + setMax + "]");
+								break;
+							}
+						}
+						matchSet.addAll(set);
 					}
 				}
 
