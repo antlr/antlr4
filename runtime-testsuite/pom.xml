@@ -96,14 +96,13 @@
 				<version>2.19.1</version>
 				<configuration>
 					<includes>
-						<include>${antlr.tests.swift}</include>
 						<include>**/csharp/Test*.java</include>
 						<include>**/java/Test*.java</include>
 						<include>**/go/Test*.java</include>
 						<include>**/javascript/node/Test*.java</include>
 						<include>**/python2/Test*.java</include>
 						<include>**/python3/Test*.java</include>
-						<include>**/cpp/Test*.java</include>
+						<include>${antlr.tests.swift}</include>
 					</includes>
 				</configuration>
 			</plugin>
