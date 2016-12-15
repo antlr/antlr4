@@ -302,30 +302,6 @@ public class LexerExecDescriptors {
 
 	}
 
-	public static class CharSetWithReversedRange extends BaseLexerTestDescriptor {
-		public String input = "9";
-		/**
-		A
-		[@0,0:0='9',<1>,1:0]
-		[@1,1:0='<EOF>',<-1>,1:1]
-		 */
-		@CommentHasStringValue
-		public String output;
-
-		public String errors = null;
-		public String startRule = "";
-		public String grammarName = "L";
-
-		/**
-		 lexer grammar L;
-		 A : [z-a9]+ {<writeln("\"A\"")>} ;
-		 WS : [ \n]+ -> skip ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
-
-	}
-
 	public static class EOFByItself extends BaseLexerTestDescriptor {
 		public String input = "";
 		/**
