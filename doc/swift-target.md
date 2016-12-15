@@ -31,7 +31,7 @@ see Xcode complaining the module "Antlr4" could not be found at the
 import statement. This is expected, since we still need the ANTLR
 Swift runtime for those missing symbols.
 
-<img src=images/dragfile.png style="width: 200px;">
+<img src=images/dragfile.png width="500">
 
 * __Download ANTLR runtime__. Due to unstable ABI of Swift language,
 there will not be a single "library" for the Swift ANTLR runtime for
@@ -48,7 +48,7 @@ Antlr4.xcodeproj shown as a contained project. The error message will
 still be there, that's because we still need to tell Xcode how to find
 the runtime.
 
-<img src=images/xcodenav.png style="width: 200px;">
+<img src=images/xcodenav.png width="300">
 
 * __Build ANTLR runtime__. By expanding the "Products" folder in the
 inner project (Antlr4.xcodeproj), you will see two Antlr4.framework
@@ -61,7 +61,7 @@ files are for iOS and OSX, as shown below. After target selection,
 press "CMD+B", and Xcode will build the framework for you. Then you
 will see one of the frameworks become black.
 
-<img src=images/targetselection.png style="width: 200px;">
+<img src=images/targetselection.png width="500">
 
 * __Add dependencies__. Simply adding ANTLR Swift runtime and build
 the artifact is not enough. You still need to specify
@@ -72,7 +72,7 @@ Dependencies__" and "__Link Binary With Libraries__" sections, as
 shown below. After correctly added dependencies, the error message for
 importing library will be gone.
 
-<img src=images/xcodedep.png>
+<img src=images/xcodedep.png width="800">
 
 ## Example playground
 
