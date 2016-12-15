@@ -301,7 +301,7 @@ rm Antlr4.Runtime/obj/net20/Release/Antlr4.Runtime.dll
 # build
 xbuild /p:Configuration=Release Antlr4.Runtime/Antlr4.Runtime.mono.csproj
 # zip it up to get a version number on zip filename
-zip --junk-paths /tmp/antlr-csharp-runtime-4.6.zip Antlr4.Runtime/bin/net35/Release/Antlr4.Runtime.dll
+zip --junk-paths /tmp/antlr-csharp-runtime-4.6.zip Antlr4.Runtime/obj/net20/Release/Antlr4.Runtime.Standard.dll
 cp /tmp/antlr-csharp-runtime-4.6.zip ~/antlr/sites/website-antlr4/download
 ```
 
