@@ -43,7 +43,7 @@ cppTypeInitMap ::= [
 LexerHeader(lexer, atn, actionFuncs, sempredFuncs, superClass = {antlr4::Lexer}) ::= <<
 <namedActions.context>
 
-class <lexer.name> : public <superClass> {
+class <file.exportMacro> <lexer.name> : public <superClass> {
 public:
 <if (lexer.tokens)>
   enum {
@@ -266,7 +266,7 @@ bool <if (r.factory.g.lexer)><lexer.name><else><parser.name><endif>::<r.name>Sem
 ParserHeader(parser, funcs, atn, sempredFuncs, superClass = {antlr4::Parser}) ::= <<
 <namedActions.context>
 
-class <parser.name> : public <superClass> {
+class <file.exportMacro> <parser.name> : public <superClass> {
 public:
 <if (parser.tokens)>
   enum {
@@ -526,7 +526,7 @@ LeftRecursiveRuleFunction(currentRule, args, code, locals, ruleCtx, altLabelCtxs
 >>
 
 StructDeclHeader(struct, ctorAttrs, attrs, getters, dispatchMethods, interfaces, extensionMembers) ::= <<
-class <struct.name> : public <if (contextSuperClass)><contextSuperClass><else>antlr4::ParserRuleContext<endif><if(interfaces)>, <interfaces; separator=", "><endif> {
+class <file.exportMacro> <struct.name> : public <if (contextSuperClass)><contextSuperClass><else>antlr4::ParserRuleContext<endif><if(interfaces)>, <interfaces; separator=", "><endif> {
 public:
   <attrs: {a | <a>;}; separator="\n">
   <if (ctorAttrs)><struct.name>(antlr4::ParserRuleContext *parent, size_t invokingState);<endif>
@@ -578,7 +578,7 @@ void <parser.name>::<struct.name>::copyFrom(<struct.name> *ctx) {
 >>
 
 AltLabelStructDeclHeader(struct, attrs, getters, dispatchMethods) ::= <<
-class <struct.name> : public <currentRule.name; format = "cap">Context {
+class <file.exportMacro> <struct.name> : public <currentRule.name; format = "cap">Context {
 public:
   <struct.name>(<currentRule.name; format = "cap">Context *ctx);
 
