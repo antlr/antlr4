@@ -473,8 +473,6 @@ public class BufferedTokenStream: TokenStream {
 
 
     public func getText() throws -> String {
-        try lazyInit()
-        try fill()
         return try getText(Interval.of(0, size() - 1))
     }
 
@@ -485,7 +483,7 @@ public class BufferedTokenStream: TokenStream {
         if start < 0 || stop < 0 {
             return ""
         }
-        try lazyInit()
+        try fill()
         if stop >= tokens.count {
             stop = tokens.count - 1
         }
