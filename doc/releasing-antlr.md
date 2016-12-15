@@ -233,21 +233,65 @@ popd
 
 **Getting ready to run Nuget**
 
-Of course you need Mono to be installed. 
-You then need to download nuget.exe from here: https://dist.nuget.org/win-x86-commandline/latest/nuget.exe
-From the Terminal, you can check all is ok by typing: mono <path-to-nuget.exe>. This should display the nuget help.
+Of course you need Mono to be installed and also `nuget`. On mac:
+
+```bash
+brew install nuget
+```
+
+Or, you can [download nuget.exe](https://dist.nuget.org/win-x86-commandline/latest/nuget.exe).
+
+From the shell on mac, you can check all is ok by typing
+
+```bash
+nuget
+```
+
+On linux it's likely:
+
+```bash
+mono <path-to-nuget.exe>
+```
+
+This should display the nuget help. 
 
 **Creating the assembly**
 
-Navigate to the runtime/CSharp/Antlr4.Runtime directory.
-Type: mono xbuild /p:Configuration=Release Antlr4.Runtime.mono.csproj
+```bash
+$ cd runtime/CSharp/runtime/CSharp/Antlr4.Runtime
+$ xbuild /p:Configuration=Release Antlr4.Runtime.mono.csproj
+...
+		Copying file from '/Users/parrt/antlr/code/antlr4/runtime/CSharp/runtime/CSharp/Antlr4.Runtime/obj/net20/Release/Antlr4.Runtime.Standard.dll' to '/Users/parrt/antlr/code/antlr4/runtime/CSharp/runtime/CSharp/Antlr4.Runtime/lib/Release/Antlr4.Runtime.Standard.dll'
+Done building project "/Users/parrt/antlr/code/antlr4/runtime/CSharp/runtime/CSharp/Antlr4.Runtime/Antlr4.Runtime.mono.csproj".
+```
+
+(Or `mono xbuild ...`)
+
 Alternately, you may want to build ANTLR using Xamarin Studio Community (free).
 
 **Packaging for NuGet**
 
-Navigate to the runtime/CSharp solution root, where the Package.nuspec file resides.
-Type the following command: mono <path-to-nuget.exe> pack Package.nuspec.
-This shoud display: Successfully created package <package-path>
+```bash
+cd runtime/CSharp/runtime/CSharp
+```
+
+which is where the `Package.nuspec` file resides.
+
+Type the following command:
+
+```bash
+$ nuget pack Package.nuspec
+Attempting to build package from 'Package.nuspec'.
+Successfully created package '/Users/parrt/antlr/code/antlr4/runtime/CSharp/runtime/CSharp/Antlr4.Runtime.Standard.4.6.0.nupkg'.
+```
+
+or 
+
+```bash
+mono <path-to-nuget.exe> pack Package.nuspec
+```
+
+This should display: Successfully created package *&lt;package-path>*
 
 **Publishing to NuGet**
 
