@@ -1,22 +1,22 @@
 # ANTLR4 Language Target, Runtime for Swift
 
-### Usage
-
-#### 1. Install ANTLR4
+## Install ANTLR4
 
 Make sure you have the ANTLR
 installed.[The getting started guide](getting-started.md) should get
 you started.
 
-#### 2. create a Swift lexer or parser This is pretty much the same as
-creating a Java lexer or parser, except you need to specify the
-language target, for example:
+## Create a Swift lexer or parser 
+This is pretty much the same as creating a Java lexer or parser, 
+except you need to specify the language target, for example:
 
-``` $ antlr4 -Dlanguage=Swift MyGrammar.g4 ``` For a full list of
-antlr4 tool options, please visit the
+``` 
+$ antlr4 -Dlanguage=Swift MyGrammar.g4 
+``` 
+For a full list of antlr4 tool options, please visit the
 [tool documentation page](tool-options.md).
 
-#### 3. Build your Swift project with ANTLR runtime
+## Build your Swift project with ANTLR runtime
 
 The following instructions are assuming Xcode as the IDE:
 
@@ -74,7 +74,7 @@ importing library will be gone.
 
 <img src=images/xcodedep.png>
 
-#### 4. Example playground
+## Example playground
 
 The Swift runtime includes an Xcode playground to get started with.
 
