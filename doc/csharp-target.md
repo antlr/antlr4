@@ -1,7 +1,5 @@
 # C&sharp;
 
-See also [Sam Harwell's Alternative C# target](https://github.com/tunnelvisionlabs/antlr4cs)
-
 ### Which frameworks are supported?
 
 The C# runtime is CLS compliant, and only requires a corresponding 3.5 .Net framework.
@@ -15,7 +13,7 @@ No issue was found, so you should find that the runtime works pretty much agains
 
 ### How do I get started?
 
-You will find full instructions on the Git web page for ANTLR C# runtime.
+You will find full instructions on the [Git web page for ANTLR C# runtime](https://github.com/antlr/antlr4/tree/master/runtime/CSharp).
  
 ### How do I use the runtime from my project?
 
@@ -97,3 +95,6 @@ ParseTreeWalker.DEFAULT.walk(printer, tree);
 Further information can be found from The Definitive ANTLR Reference book.
 
 The C# implementation of ANTLR is as close as possible to the Java one, so you shouldn't find it difficult to adapt the examples for C#.
+
+See also [Sam Harwell's alternative C# target](https://github.com/tunnelvisionlabs/antlr4cs)
+
