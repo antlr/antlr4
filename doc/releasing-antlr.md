@@ -358,7 +358,7 @@ python setup.py register -r pypi
 python setup.py sdist bdist_wininst upload -r pypi
 ```
 
-Add links to the artifacts from download.html
+There are links to the artifacts in [download.html](http://www.antlr.org/download.html) already.
 
 ### C++
 
@@ -378,6 +378,7 @@ On a Mac (with XCode 7+ installed):
 ```bash
 cd runtime/Cpp
 ./deploy-macos.sh
+cp antlr4-cpp-runtime-macos.zip ~/antlr/sites/website-antlr4/download/antlr4-cpp-runtime-4.6-macos.zip
 ```
 
 On any Mac or Linux machine:
@@ -385,6 +386,7 @@ On any Mac or Linux machine:
 ```bash
 cd runtime/Cpp
 ./deploy-source.sh
+cp antlr4-cpp-runtime-source.zip ~/antlr/sites/website-antlr4/download/antlr4-cpp-runtime-4.6-source.zip
 ```
 
 On a Windows machine the build scripts checks if VS 2013 and/or VS 2015 are installed and builds binaries for each, if found. This script requires 7z to be installed (http://7-zip.org).
@@ -392,15 +394,17 @@ On a Windows machine the build scripts checks if VS 2013 and/or VS 2015 are inst
 ```bash
 cd runtime/Cpp
 deploy-windows.cmd
+cp antlr4-cpp-runtime-vs2015.zip ~/antlr/sites/website-antlr4/download/antlr4-cpp-runtime-4.6-vs2015.zip
 ```
 
 Move target to website (**_rename to a specific ANTLR version first if needed_**):
 
 ```bash
 pushd ~/antlr/sites/website-antlr4/download
-git add antlr4cpp-runtime-macos.zip
-git add antlr4cpp-runtime-windows.zip
-git add antlr4cpp-runtime-source.zip
+# vi index.html
+git add antlr4cpp-runtime-4.6-macos.zip
+git add antlr4cpp-runtime-4.6-windows.zip
+git add antlr4cpp-runtime-4.6-source.zip
 git commit -a -m 'update C++ runtime'
 git push origin gh-pages
 popd
@@ -408,7 +412,7 @@ popd
 
 ## Update javadoc for runtime and tool
 
-First gen javadoc:
+First, gen javadoc:
 
 ```bash
 $ cd antlr4
