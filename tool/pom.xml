@@ -9,40 +9,40 @@
   <parent>
     <groupId>org.antlr</groupId>
     <artifactId>antlr4-master</artifactId>
-    <version>4.6-SNAPSHOT</version>
+    <version>4.6.1-SNAPSHOT</version>
   </parent>
   <artifactId>antlr4</artifactId>
   <name>ANTLR 4 Tool</name>
   <url>http://www.antlr.org</url>
   <description>The ANTLR 4 grammar compiler.</description>
 
-  <dependencies>
-    <dependency>
-      <groupId>org.antlr</groupId>
-      <artifactId>antlr4-runtime</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.antlr</groupId>
-      <artifactId>antlr-runtime</artifactId>
-      <version>3.5.2</version>
-    </dependency>
-    <dependency>
-      <groupId>org.antlr</groupId>
-      <artifactId>ST4</artifactId>
-      <version>4.0.8</version>
-    </dependency>
-    <dependency>
-      <groupId>org.abego.treelayout</groupId>
-      <artifactId>org.abego.treelayout.core</artifactId>
-      <version>1.0.3</version>
-    </dependency>
-    <dependency>
-      <groupId>javax.json</groupId>
-      <artifactId>javax.json-api</artifactId>
-      <version>1.0</version>
-    </dependency>
-  </dependencies>
+	<dependencies>
+		<dependency>
+			<groupId>org.antlr</groupId>
+			<artifactId>antlr4-runtime</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.antlr</groupId>
+			<artifactId>antlr-runtime</artifactId>
+			<version>3.5.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.antlr</groupId>
+			<artifactId>ST4</artifactId>
+			<version>4.0.8</version>
+		</dependency>
+		<dependency>
+			<groupId>org.abego.treelayout</groupId>
+			<artifactId>org.abego.treelayout.core</artifactId>
+			<version>1.0.3</version>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish</groupId>
+			<artifactId>javax.json</artifactId>
+			<version>1.0.4</version>
+		</dependency>
+	</dependencies>
 
   <build>
 		<sourceDirectory>src</sourceDirectory>
@@ -73,6 +73,7 @@
 				</configuration>
 				<executions>
 					<execution>
+						<phase>deploy</phase>
 						<goals>
 							<goal>javadoc</goal>
 						</goals>

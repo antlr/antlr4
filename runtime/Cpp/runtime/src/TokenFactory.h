@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "antlr4-common.h"
+
 namespace antlr4 {
 
   /// The default mechanism for creating tokens. It's used by default in Lexer and

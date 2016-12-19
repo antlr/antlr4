@@ -63,6 +63,6 @@ This documentation is a reference and summarizes grammar syntax and the key sema
 
 * [Cutting an ANTLR Release](releasing-antlr.md)
 
-* [Adding ANTLR unit tests](adding-tests.md)
+* [ANTLR project unit tests](antlr-project-testing.md)
 
 * [Creating an ANTLR Language Target](creating-a-language-target.md)
