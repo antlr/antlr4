@@ -982,11 +982,15 @@ public enum ErrorType {
 	 *
 	 * <p>empty strings not allowed</p>
 	 *
-	 * <pre>A: '''test''';</pre>
-	 * <pre>B: '';</pre>
-	 * <pre>C: 'test' '';</pre>
+	 * <pre>
+	 * A: '''test''';
+	 * B: '';
+	 * C: 'test' '';
+	 * D: [];
+	 * E: [f-a];
+	 * </pre>
 	 */
-	EMPTY_STRINGS_NOT_ALLOWED(174, "string literals cannot be empty", ErrorSeverity.ERROR),
+	EMPTY_STRINGS_AND_SETS_NOT_ALLOWED(174, "string literals and sets cannot be empty: <arg>", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 175.
 	 *
@@ -1027,6 +1031,19 @@ public enum ErrorType {
 	* <p>T00: 'a00' -> skip, more;</p>
 	 */
 	INCOMPATIBLE_COMMANDS(179, "incompatible commands <arg> and <arg2>", ErrorSeverity.WARNING),
+	/**
+	 * Compiler Warning 180.
+	 *
+	 * <p>chars "a-f" used multiple times in set [a-fc-m]</p>
+	 *
+	 * <pre>
+	 * A:    [aa-z];   // warning
+	 * B:    [a-fc-m]; // warning
+	 * </pre>
+	 *
+	 * TODO: Does not work with fragment rules.
+	 */
+	CHARACTERS_COLLISION_IN_SET(180, "chars \"<arg>\" used multiple times in set <arg2>", ErrorSeverity.WARNING),
 
 	/*
 	 * Backward incompatibility errors

@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class LexerFile extends OutputFile {
 	public String genPackage; // from -package cmd-line
-	public String exportMacro; // from -export-macro cmd-line
+	public String exportMacro; // from -DexportMacro cmd-line
 	public boolean genListener; // from -listener cmd-line
 	public boolean genVisitor; // from -visitor cmd-line
 	@ModelElement public Lexer lexer;
@@ -22,7 +22,7 @@ public class LexerFile extends OutputFile {
 		super(factory, fileName);
 		namedActions = buildNamedActions(factory.getGrammar());
 		genPackage = factory.getGrammar().tool.genPackage;
-		exportMacro = factory.getGrammar().tool.exportMacro;
+		exportMacro = factory.getGrammar().getOptionString("exportMacro");
 		genListener = factory.getGrammar().tool.gen_listener;
 		genVisitor = factory.getGrammar().tool.gen_visitor;
 	}

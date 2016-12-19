@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Antlr4.Runtime</RootNamespace>
-    <AssemblyName>Antlr4.Runtime</AssemblyName>
+    <AssemblyName>Antlr4.Runtime.Standard</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <BaseIntermediateOutputPath>obj\net35\</BaseIntermediateOutputPath>
