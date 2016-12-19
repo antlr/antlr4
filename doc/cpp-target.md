@@ -95,7 +95,8 @@ The code generation (by running the ANTLR4 jar) allows to specify 2 values you m
     #endif
   #endif
 ```
-Just like the `ANTLR4CPP_PUBLIC` macro here you can specify your own one for the generated classes using the **`-export-macro`** parameter.
+Just like the `ANTLR4CPP_PUBLIC` macro here you can specify your own one for the generated classes using the **`-DexportMacro=...`** command-line parameter or
+grammar option `options {exportMacro='...';}` in your grammar file.
 
 In order to create a static lib in Visual Studio define the `ANTLR4CPP_STATIC` macro in addition to the project settings that must be set for a static library (if you compile the runtime yourself).
 
