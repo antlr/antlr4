@@ -10,7 +10,8 @@ from antlr4.atn.ATNDeserializer import ATNDeserializer
 from antlr4.atn.ATNDeserializationOptions import ATNDeserializationOptions
 from antlr4.error.Errors import UnsupportedOperationException
 from antlr4.tree.ParseTreePatternMatcher import ParseTreePatternMatcher
-from antlr4.tree.Tree import ParseTreeListener
+from antlr4.tree.Tree import ParseTreeListener, ErrorNode, TerminalNode
+
 
 class TraceListener(ParseTreeListener):
 
