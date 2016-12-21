@@ -112,7 +112,6 @@ public class Tool {
 	public boolean gen_visitor = false;
 	public boolean gen_dependencies = false;
 	public String genPackage = null;
-	public String exportMacro = null; // C++ specific, need to allow setting a macro to set declspec for generated classes for VC++.
 	public Map<String, String> grammarOptions = null;
 	public boolean warnings_are_errors = false;
 	public boolean longMessages = false;
@@ -129,7 +128,6 @@ public class Tool {
 		new Option("gen_visitor",		"-visitor", "generate parse tree visitor"),
 		new Option("gen_visitor",		"-no-visitor", "don't generate parse tree visitor (default)"),
 		new Option("genPackage",		"-package", OptionArgType.STRING, "specify a package/namespace for the generated code"),
-		new Option("exportMacro",		"-export-macro", OptionArgType.STRING, "C++ only, specify a macro for import/export of generated classes"),
 		new Option("gen_dependencies",	"-depend", "generate file dependencies"),
 		new Option("",					"-D<option>=value", "set/override a grammar-level option"),
 		new Option("warnings_are_errors", "-Werror", "treat warnings as errors"),
