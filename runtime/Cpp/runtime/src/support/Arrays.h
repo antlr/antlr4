@@ -20,7 +20,7 @@ namespace antlrcpp {
         return false;
 
       for (size_t i = 0; i < a.size(); ++i)
-        if (a[i] != b[i]) // Requires that the != operator is supported by the template type.
+        if (!(a[i] == b[i]))
           return false;
 
       return true;
@@ -31,21 +31,12 @@ namespace antlrcpp {
       if (a.size() != b.size())
         return false;
 
-      for (size_t i = 0; i < a.size(); ++i)
-        if (*a[i] != *b[i])
+      for (size_t i = 0; i < a.size(); ++i) {
+        if (a[i] == b[i])
+          continue;
+        if (!(*a[i] == *b[i]))
           return false;
-
-      return true;
-    }
-
-    template <typename T>
-    static bool equals(const std::vector<std::weak_ptr<T>> &a, const std::vector<std::weak_ptr<T>> &b) {
-      if (a.size() != b.size())
-        return false;
-
-      for (size_t i = 0; i < a.size(); ++i)
-        if (*a[i].lock() != *b[i].lock())
-          return false;
+      }
 
       return true;
     }
@@ -55,9 +46,17 @@ namespace antlrcpp {
       if (a.size() != b.size())
         return false;
 
-      for (size_t i = 0; i < a.size(); ++i)
-        if (*a[i] != *b[i])
+      for (size_t i = 0; i < a.size(); ++i) {
+        if (!a[i] && !b[i])
+          continue;
+        if (!a[i] || !b[i])
           return false;
+        if (a[i] == b[i])
+          continue;
+
+        if (!(*a[i] == *b[i]))
+          return false;
+      }
 
       return true;
     }

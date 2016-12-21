@@ -20,13 +20,13 @@ namespace atn {
     const Ref<PredictionContext> parent;
     const size_t returnState;
 
-    SingletonPredictionContext(std::weak_ptr<PredictionContext> parent, size_t returnState);
+    SingletonPredictionContext(Ref<PredictionContext> const& parent, size_t returnState);
     virtual ~SingletonPredictionContext() {};
 
-    static Ref<SingletonPredictionContext> create(std::weak_ptr<PredictionContext> parent, size_t returnState);
+    static Ref<SingletonPredictionContext> create(Ref<PredictionContext> const& parent, size_t returnState);
 
     virtual size_t size() const override;
-    virtual std::weak_ptr<PredictionContext> getParent(size_t index) const override;
+    virtual Ref<PredictionContext> getParent(size_t index) const override;
     virtual size_t getReturnState(size_t index) const override;
     virtual bool operator == (const PredictionContext &o) const override;
     virtual std::string toString() const override;
