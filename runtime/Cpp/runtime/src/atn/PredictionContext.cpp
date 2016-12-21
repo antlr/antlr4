@@ -350,8 +350,10 @@ Ref<PredictionContext> PredictionContext::mergeArrays(const Ref<ArrayPredictionC
   }
 
   // ml: this part differs from Java code. We have to recreate the context as the parents array is copied on creation.
-  if (combineCommonParents(mergedParents))
+  if (combineCommonParents(mergedParents)) {
+    mergedReturnStates.resize(mergedParents.size());
     M = std::make_shared<ArrayPredictionContext>(mergedParents, mergedReturnStates);
+  }
 
   if (mergeCache != nullptr) {
     mergeCache->put(a, b, M);
