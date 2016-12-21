@@ -16,7 +16,7 @@ namespace atn {
 
     virtual bool isEmpty() const override;
     virtual size_t size() const override;
-    virtual std::weak_ptr<PredictionContext> getParent(size_t index) const override;
+    virtual Ref<PredictionContext> getParent(size_t index) const override;
     virtual size_t getReturnState(size_t index) const override;
     virtual std::string toString() const override;
 

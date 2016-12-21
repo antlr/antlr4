@@ -199,7 +199,7 @@ public class PerformanceDescriptors {
 		@Override
 		public boolean ignore(String targetName) {
 			// passes, but still too slow in Python and JavaScript
-			return !Arrays.asList("Java", "CSharp").contains(targetName);
+			return !Arrays.asList("Java", "CSharp", "Cpp").contains(targetName);
 		}
 	}
 

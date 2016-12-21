@@ -98,8 +98,7 @@ size_t ParserATNSimulator::adaptivePredict(TokenStream *input, size_t decision, 
     // the start state for a precedence DFA depends on the current
     // parser precedence, and is provided by a DFA method.
     s0 = dfa.getPrecedenceStartState(parser->getPrecedence());
-  }
-  else {
+  } else {
     // the start state for a "regular" DFA is just s0
     s0 = dfa.s0;
   }
