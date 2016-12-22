@@ -429,6 +429,7 @@
     <ClCompile Include="src\TokenStream.cpp" />
     <ClCompile Include="src\TokenStreamRewriter.cpp" />
     <ClCompile Include="src\tree\ErrorNodeImpl.cpp" />
+    <ClCompile Include="src\tree\IterativeParseTreeWalker.cpp" />
     <ClCompile Include="src\tree\ParseTree.cpp" />
     <ClCompile Include="src\tree\ParseTreeWalker.cpp" />
     <ClCompile Include="src\tree\pattern\ParseTreeMatch.cpp" />
@@ -582,6 +583,7 @@
     <ClInclude Include="src\tree\AbstractParseTreeVisitor.h" />
     <ClInclude Include="src\tree\ErrorNode.h" />
     <ClInclude Include="src\tree\ErrorNodeImpl.h" />
+    <ClInclude Include="src\tree\IterativeParseTreeWalker.h" />
     <ClInclude Include="src\tree\ParseTree.h" />
     <ClInclude Include="src\tree\ParseTreeListener.h" />
     <ClInclude Include="src\tree\ParseTreeProperty.h" />
