@@ -400,7 +400,7 @@ public class OutputModelController {
 	public List<SrcOp> wildcard(GrammarAST ast, GrammarAST labelAST) {
 		List<SrcOp> ops = delegate.wildcard(ast, labelAST);
 		for (CodeGeneratorExtension ext : extensions) {
-			ops = ext.set(ops);
+			ops = ext.wildcard(ops);
 		}
 		return ops;
 	}

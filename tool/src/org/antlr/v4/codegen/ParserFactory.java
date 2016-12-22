@@ -33,6 +33,7 @@ import org.antlr.v4.codegen.model.SemPred;
 import org.antlr.v4.codegen.model.SrcOp;
 import org.antlr.v4.codegen.model.StarBlock;
 import org.antlr.v4.codegen.model.TestSetInline;
+import org.antlr.v4.codegen.model.Wildcard;
 import org.antlr.v4.codegen.model.decl.Decl;
 import org.antlr.v4.codegen.model.decl.RuleContextDecl;
 import org.antlr.v4.codegen.model.decl.TokenDecl;
