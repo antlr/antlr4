@@ -372,7 +372,7 @@ public class BufferedTokenStream implements TokenStream {
 
 	/** Collect all hidden tokens (any off-default channel) to the right of
 	 *  the current token up until we see a token on DEFAULT_TOKEN_CHANNEL
-	 *  of EOF.
+	 *  or EOF.
 	 */
 	public List<Token> getHiddenTokensToRight(int tokenIndex) {
 		return getHiddenTokensToRight(tokenIndex, -1);
