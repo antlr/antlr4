@@ -405,7 +405,7 @@ func (p *<parser.name>) <currentRule.name; format="cap">(<currentRule.args:{a | 
 			<endif>
 		}
 	}()
-	
+
 	<if(currentRule.hasLookaheadBlock)>
 	var _alt int
 	<endif>
@@ -808,6 +808,7 @@ var _lt = p.GetTokenStream().LT(1)<! TODO: Should LT be called always like Invok
 	p.GetErrorHandler().RecoverInline(p)
 	<endif>
 } else {
+    p.GetErrorHandler().ReportMatch(p)
 	p.Consume()
 }
 >>

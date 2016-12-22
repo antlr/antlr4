@@ -13,7 +13,6 @@ import org.antlr.v4.runtime.WritableToken;
 import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.test.runtime.ErrorQueue;
 import org.antlr.v4.test.runtime.RuntimeTestSupport;
-import org.antlr.v4.test.runtime.SpecialRuntimeTestAssert;
 import org.antlr.v4.tool.ANTLRMessage;
 import org.antlr.v4.tool.GrammarSemanticsMessage;
 import org.junit.rules.TestRule;
@@ -54,7 +53,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class BaseCSharpTest implements RuntimeTestSupport, SpecialRuntimeTestAssert {
+public class BaseCSharpTest implements RuntimeTestSupport /*, SpecialRuntimeTestAssert*/ {
 	public static final String newline = System.getProperty("line.separator");
 	public static final String pathSep = System.getProperty("path.separator");
 
@@ -691,7 +690,7 @@ public class BaseCSharpTest implements RuntimeTestSupport, SpecialRuntimeTestAss
 				"        tokens.Fill();\n" +
 				"        foreach (object t in tokens.GetTokens())\n" +
 				"			Console.WriteLine(t);\n" +
-				(showDFA?"Console.Write(lex.Interpreter.GetDFA(Lexer.DefaultMode).ToLexerString());\n":"")+
+				(showDFA?"        Console.Write(lex.Interpreter.GetDFA(Lexer.DEFAULT_MODE).ToLexerString());\n":"")+
 				"    }\n" +
 				"}"
 		);
@@ -788,64 +787,8 @@ public class BaseCSharpTest implements RuntimeTestSupport, SpecialRuntimeTestAss
 		org.junit.Assert.assertEquals(msg, a, b);
 	}
 
-	@Override
-	public void assertEqualStrings(String a, String b) {
-		assertEquals(a, b);
-	}
-
 	protected static void assertEquals(String a, String b) {
-		a = absorbExpectedDifferences(a);
-		b = absorbActualDifferences(b);
 		org.junit.Assert.assertEquals(a, b);
-	}
-
-	protected static void assertNull(String a) {
-		a = absorbActualDifferences(a);
-		org.junit.Assert.assertNull(a);
-	}
-
-	private static String absorbExpectedDifferences(String a) {
-		if(a==null)
-			return a;
-		// work around the lack of requiresFullContext field in DFAState
-		if(a.startsWith("Decision"))
-			a = a.replaceAll("\\^", "");
-		// work around the algo difference for full context
-		a = stripOutUnwantedLinesWith(a, "reportAttemptingFullContext","reportContextSensitivity", "reportAmbiguity");
-		if(a.isEmpty()) {
-			a = null;
-		}
-		return a;
-	}
-
-	private static String absorbActualDifferences(String a) {
-		if(a==null)	return a;
-		// work around the algo difference for full context
-		// work around the algo difference for semantic predicates
-		a = stripOutUnwantedLinesWith(a, "reportContextSensitivity","eval=false");
-		if(a.isEmpty()) {
-			a = null;
-		}
-		return a;
-	}
-
-	private static String stripOutUnwantedLinesWith(String a, String ... unwanteds) {
-		String[] lines = a.split("\n");
-		StringBuilder sb = new StringBuilder();
-		for(String line : lines) {
-			boolean wanted = true;
-			for(String unwanted : unwanteds) {
-				if(line.contains(unwanted) ) {
-					wanted = false;
-					break;
-				}
-			}
-			if(!wanted)
-				continue;
-			sb.append(line);
-			sb.append("\n");
-		}
-		return sb.toString();
 	}
 
 }

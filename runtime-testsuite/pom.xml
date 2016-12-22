@@ -10,7 +10,7 @@
 	<parent>
 		<groupId>org.antlr</groupId>
 		<artifactId>antlr4-master</artifactId>
-		<version>4.6-SNAPSHOT</version>
+		<version>4.6.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>antlr4-runtime-testsuite</artifactId>
 	<name>ANTLR 4 Runtime Tests (2nd generation)</name>
@@ -27,16 +27,31 @@
 			<groupId>org.antlr</groupId>
 			<artifactId>ST4</artifactId>
 			<version>4.0.8</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.antlr</groupId>
 			<artifactId>antlr4</artifactId>
 			<version>${project.version}</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.antlr</groupId>
 			<artifactId>antlr4-runtime</artifactId>
 			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.antlr</groupId>
+			<artifactId>antlr4-runtime-test-annotations</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.antlr</groupId>
+			<artifactId>antlr4-runtime-test-annotation-processors</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -62,122 +77,61 @@
 			<version>1.0.4</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.antlr</groupId>
-			<artifactId>antlr4-runtime-test-annotations</artifactId>
-			<version>4.6-SNAPSHOT</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.antlr</groupId>
-			<artifactId>antlr4-runtime-test-annotation-processors</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
 	</dependencies>
 
-  <build>
-    <sourceDirectory>src</sourceDirectory>
-    <testSourceDirectory>test</testSourceDirectory>
-    <resources>
-      <resource>
-        <directory>resources</directory>
-      </resource>
-      <resource>
-        <directory>../runtime</directory>
-      </resource>
-    </resources>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.19.1</version>
-        <configuration>
-          <includes>
-            <include>**/csharp/Test*.java</include>
-            <include>**/java/Test*.java</include>
-            <include>**/go/Test*.java</include>
-            <include>**/javascript/node/Test*.java</include>
-            <include>**/python2/Test*.java</include>
-            <include>**/python3/Test*.java</include>
-            <include>${antlr.tests.swift}</include>
-          </includes>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <version>2.4</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>test-jar</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
+	<build>
+		<testSourceDirectory>test</testSourceDirectory>
+		<resources>
+			<resource>
+				<directory>resources</directory>
+			</resource>
+			<resource>
+				<directory>../runtime</directory>
+			</resource>
+		</resources>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.19.1</version>
+				<configuration>
+					<includes>
+						<include>**/csharp/Test*.java</include>
+						<include>**/java/Test*.java</include>
+						<include>**/go/Test*.java</include>
+						<include>**/javascript/node/Test*.java</include>
+						<include>**/python2/Test*.java</include>
+						<include>**/python3/Test*.java</include>
+						<include>${antlr.tests.swift}</include>
+					</includes>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.4</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>test-jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 
-  <profiles>
-    <profile>
-      <id>includeSwiftTests</id>
-      <activation>
-        <os>
-          <family>mac</family>
-        </os>
-      </activation>
-      <properties>
-        <antlr.tests.swift>**/swift/Test*.java</antlr.tests.swift>
-      </properties>
-    </profile>
-
-    <profile>
-      <id>gen</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>exec-maven-plugin</artifactId>
-            <version>1.4.0</version>
-            <executions>
-              <execution>
-                <phase>generate-test-sources</phase>
-                <goals>
-                  <goal>java</goal>
-                </goals>
-                <configuration>
-                  <mainClass>org.antlr.v4.testgen.TestGenerator</mainClass>
-                  <arguments>
-                    <argument>-root</argument>
-                    <argument>${basedir}</argument>
-                    <argument>-outdir</argument>
-                    <argument>${basedir}/test</argument>
-                    <argument>-templates</argument>
-                    <argument>${basedir}/resources/org/antlr/v4/test/runtime/templates</argument>
-                  </arguments>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
-      <id>tests</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <includes>
-                <include>**/Test*.java</include>
-              </includes>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
+	<profiles>
+		<profile>
+			<id>includeSwiftTests</id>
+			<activation>
+				<os>
+					<family>mac</family>
+				</os>
+			</activation>
+			<properties>
+				<antlr.tests.swift>**/swift/Test*.java</antlr.tests.swift>
+			</properties>
+		</profile>
+	</profiles>
 </project>

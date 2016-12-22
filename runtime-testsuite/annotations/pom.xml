@@ -9,7 +9,7 @@
   <parent>
     <groupId>org.antlr</groupId>
     <artifactId>antlr4-master</artifactId>
-    <version>4.6-SNAPSHOT</version>
+    <version>4.6.1-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <artifactId>antlr4-runtime-test-annotations</artifactId>
@@ -19,22 +19,6 @@
   <build>
     <sourceDirectory>src</sourceDirectory>
     <plugins>
-      <plugin>
-        <groupId>org.antlr</groupId>
-        <artifactId>antlr4-maven-plugin</artifactId>
-        <version>4.5</version>
-        <executions>
-          <execution>
-            <id>antlr</id>
-            <configuration>
-              <sourceDirectory>src</sourceDirectory>
-            </configuration>
-            <goals>
-              <goal>antlr4</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>

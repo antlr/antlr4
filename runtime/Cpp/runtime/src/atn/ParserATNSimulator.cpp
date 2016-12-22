@@ -111,7 +111,7 @@ size_t ParserATNSimulator::adaptivePredict(TokenStream *input, size_t decision, 
       dfa.s0->configs = std::move(s0_closure); // not used for prediction but useful to know start configs anyway
       dfa::DFAState *newState = new dfa::DFAState(applyPrecedenceFilter(dfa.s0->configs.get())); /* mem-check: managed by the DFA or deleted below */
       s0 = addDFAState(dfa, newState);
-      dfa.setPrecedenceStartState(parser->getPrecedence(), s0, _mutex);
+      dfa.setPrecedenceStartState(parser->getPrecedence(), s0, _edgeLock);
       if (s0 != newState) {
         delete newState; // If there was already a state with this config set we don't need the new one.
       }
@@ -246,7 +246,9 @@ size_t ParserATNSimulator::execATN(dfa::DFA &dfa, dfa::DFAState *s0, TokenStream
 }
 
 dfa::DFAState *ParserATNSimulator::getExistingTargetState(dfa::DFAState *previousD, size_t t) {
+  _edgeLock.readLock();
   auto iterator = previousD->edges.find(t);
+  _edgeLock.readUnlock();
   if (iterator == previousD->edges.end()) {
     return nullptr;
   }
@@ -1156,8 +1158,9 @@ dfa::DFAState *ParserATNSimulator::addDFAEdge(dfa::DFA &dfa, dfa::DFAState *from
   }
 
   {
-    std::lock_guard<std::recursive_mutex> lck(_mutex);
+    _edgeLock.writeLock();
     from->edges[t] = to; // connect
+    _edgeLock.writeUnlock();
   }
 
 #if DEBUG_DFA == 1
@@ -1178,26 +1181,28 @@ dfa::DFAState *ParserATNSimulator::addDFAState(dfa::DFA &dfa, dfa::DFAState *D) 
     return D;
   }
 
-  {
-    std::lock_guard<std::recursive_mutex> lck(_mutex);
+  _stateLock.writeLock();
 
-    auto existing = dfa.states.find(D);
-    if (existing != dfa.states.end()) {
-      return *existing;
-    }
+  auto existing = dfa.states.find(D);
+  if (existing != dfa.states.end()) {
+    _stateLock.writeUnlock();
+    return *existing;
+  }
 
-    D->stateNumber = (int)dfa.states.size();
-    if (!D->configs->isReadonly()) {
-      D->configs->optimizeConfigs(this);
-      D->configs->setReadonly(true);
-    }
-    dfa.states.insert(D);
+  D->stateNumber = (int)dfa.states.size();
+  if (!D->configs->isReadonly()) {
+    D->configs->optimizeConfigs(this);
+    D->configs->setReadonly(true);
+  }
+  
+  dfa.states.insert(D);
+  _stateLock.writeUnlock();
+
 #if DEBUG_DFA == 1
-      std::cout << "adding new DFA state: " << D << std::endl;
+  std::cout << "adding new DFA state: " << D << std::endl;
 #endif
 
-    return D;
-  }
+  return D;
 }
 
 void ParserATNSimulator::reportAttemptingFullContext(dfa::DFA &dfa, const antlrcpp::BitSet &conflictingAlts,

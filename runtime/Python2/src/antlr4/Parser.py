@@ -10,7 +10,8 @@ from antlr4.atn.ATNDeserializer import ATNDeserializer
 from antlr4.atn.ATNDeserializationOptions import ATNDeserializationOptions
 from antlr4.error.Errors import UnsupportedOperationException
 from antlr4.tree.ParseTreePatternMatcher import ParseTreePatternMatcher
-from antlr4.tree.Tree import ParseTreeListener
+from antlr4.tree.Tree import ParseTreeListener, ErrorNode, TerminalNode
+
 
 class TraceListener(ParseTreeListener):
 
@@ -328,7 +329,10 @@ class Parser (Recognizer):
                 node = self._ctx.addTokenNode(o)
             if hasListener:
                 for listener in self._parseListeners:
-                    listener.visitTerminal(node)
+                    if isinstance(node, ErrorNode):
+                        listener.visitErrorNode(node)
+                    elif isinstance(node, TerminalNode):
+                        listener.visitTerminal(node)
         return o
 
     def addContextToParseTree(self):

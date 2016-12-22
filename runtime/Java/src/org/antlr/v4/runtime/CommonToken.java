@@ -258,6 +258,11 @@ public class CommonToken implements WritableToken, Serializable {
 
 	@Override
 	public String toString() {
+		return toString(null);
+	}
+
+	public String toString(Recognizer r) {
+
 		String channelStr = "";
 		if ( channel>0 ) {
 			channelStr=",channel="+channel;
@@ -271,6 +276,10 @@ public class CommonToken implements WritableToken, Serializable {
 		else {
 			txt = "<no text>";
 		}
-		return "[@"+getTokenIndex()+","+start+":"+stop+"='"+txt+"',<"+type+">"+channelStr+","+line+":"+getCharPositionInLine()+"]";
+		String typeString = String.valueOf(type);
+		if ( r!=null ) {
+			typeString = r.getVocabulary().getDisplayName(type);
+		}
+		return "[@"+getTokenIndex()+","+start+":"+stop+"='"+txt+"',<"+typeString+">"+channelStr+","+line+":"+getCharPositionInLine()+"]";
 	}
 }

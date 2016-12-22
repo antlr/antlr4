@@ -9,81 +9,37 @@ using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
-#pragma warning disable 0659 // 'class' overrides Object.Equals(object o) but does not override Object.GetHashCode()
-    public sealed class EmptyPredictionContext : PredictionContext
+	#pragma warning disable 0659 // 'class' overrides Object.Equals(object o) but does not override Object.GetHashCode()
+    public sealed class EmptyPredictionContext : SingletonPredictionContext
     {
-        public static readonly Antlr4.Runtime.Atn.EmptyPredictionContext LocalContext = new Antlr4.Runtime.Atn.EmptyPredictionContext(false);
-
-        public static readonly Antlr4.Runtime.Atn.EmptyPredictionContext FullContext = new Antlr4.Runtime.Atn.EmptyPredictionContext(true);
-
-        private readonly bool fullContext;
-
-        private EmptyPredictionContext(bool fullContext)
-            : base(CalculateEmptyHashCode())
+        
+        internal EmptyPredictionContext()
+            : base(null, EMPTY_RETURN_STATE) 
         {
-            this.fullContext = fullContext;
         }
 
-        public bool IsFullContext
-        {
-            get
-            {
-                return fullContext;
-            }
-        }
-
-        protected internal override PredictionContext AddEmptyContext()
-        {
-            return this;
-        }
-
-        protected internal override PredictionContext RemoveEmptyContext()
-        {
-            throw new NotSupportedException("Cannot remove the empty context from itself.");
-        }
+   
 
         public override PredictionContext GetParent(int index)
         {
-            throw new ArgumentOutOfRangeException();
+            return null;
         }
 
         public override int GetReturnState(int index)
         {
-            throw new ArgumentOutOfRangeException();
+            return returnState;
         }
 
-        public override int FindReturnState(int returnState)
-        {
-            return -1;
-        }
-
+  
         public override int Size
         {
             get
             {
-                return 0;
+                return 1;
             }
-        }
-
-        public override PredictionContext AppendContext(int returnContext, PredictionContextCache contextCache)
-        {
-            return contextCache.GetChild(this, returnContext);
-        }
-
-        public override PredictionContext AppendContext(PredictionContext suffix, PredictionContextCache contextCache)
-        {
-            return suffix;
         }
 
         public override bool IsEmpty
-        {
-            get
-            {
-                return true;
-            }
-        }
-
-        public override bool HasEmpty
         {
             get
             {
@@ -96,7 +52,12 @@ namespace Antlr4.Runtime.Atn
             return this == o;
         }
 
-        public override string[] ToStrings(IRecognizer recognizer, int currentState)
+		public override string ToString()
+		{
+			return "$";
+		}
+    
+		public override string[] ToStrings(IRecognizer recognizer, int currentState)
         {
             return new string[] { "[]" };
         }

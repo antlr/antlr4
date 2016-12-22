@@ -1,9 +1,0 @@
-import "LabelsOnOpSubrule.stg"
-
-Input() ::= "(1/2)*3"
-
-Output() ::= <<
-(s (e (e ( (e (e 1) / (e 2)) )) * (e 3)))<\n>
->>
-
-Errors() ::= ""

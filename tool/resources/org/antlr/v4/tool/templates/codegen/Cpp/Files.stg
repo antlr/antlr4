@@ -47,8 +47,6 @@ LexerFileHeader(file, lexer, namedActions) ::= <<
 
 <namedActions.postinclude>
 
-using namespace antlr4;
-
 <if(file.genPackage)>namespace <file.genPackage> {<endif>
 
 <lexer>
@@ -85,8 +83,6 @@ ParserFileHeader(file, parser, namedActions, contextSuperClass) ::= <<
 #include "antlr4-runtime.h"
 
 <namedActions.postinclude>
-
-using namespace antlr4;
 
 <if (file.genPackage)>namespace <file.genPackage> {<endif>
 
@@ -136,7 +132,7 @@ namespace <file.genPackage> {
  * which can be extended to create a listener which only needs to handle a subset
  * of the available methods.
  */
-class <file.grammarName>BaseListener : public <file.grammarName>Listener {
+class <file.exportMacro> <file.grammarName>BaseListener : public <file.grammarName>Listener {
 public:
 <namedActions.baselistenerdeclarations>
 
@@ -145,10 +141,10 @@ public:
   virtual void exit<lname; format="cap">(<file.parserName>::<lname; format = "cap">Context * /*ctx*/) override { \}
 }; separator="\n">
 
-  virtual void enterEveryRule(ParserRuleContext * /*ctx*/) override { }
-  virtual void exitEveryRule(ParserRuleContext * /*ctx*/) override { }
-  virtual void visitTerminal(tree::TerminalNode * /*node*/) override { }
-  virtual void visitErrorNode(tree::ErrorNode * /*node*/) override { }
+  virtual void enterEveryRule(antlr4::ParserRuleContext * /*ctx*/) override { }
+  virtual void exitEveryRule(antlr4::ParserRuleContext * /*ctx*/) override { }
+  virtual void visitTerminal(antlr4::tree::TerminalNode * /*node*/) override { }
+  virtual void visitErrorNode(antlr4::tree::ErrorNode * /*node*/) override { }
   
 <if (namedActions.baselistenermembers)>
 private:  
@@ -196,7 +192,7 @@ namespace <file.genPackage> {
 /**
  * This interface defines an abstract listener for a parse tree produced by <file.parserName>.
  */
-class <file.grammarName>Listener : public antlr4::tree::ParseTreeListener {
+class <file.exportMacro> <file.grammarName>Listener : public antlr4::tree::ParseTreeListener {
 public:
 <namedActions.listenerdeclarations>
 
@@ -252,7 +248,7 @@ namespace <file.genPackage> {
  * This class provides an empty implementation of <file.grammarName>Visitor, which can be
  * extended to create a visitor which only needs to handle a subset of the available methods.
  */
-class <file.grammarName>BaseVisitor : public <file.grammarName>Visitor {
+class <file.exportMacro> <file.grammarName>BaseVisitor : public <file.grammarName>Visitor {
 public:
 <namedActions.basevisitordeclarations>
 
@@ -308,7 +304,7 @@ VisitorFileHeader(file, header, namedActions) ::= <<
  * This class defines an abstract visitor for a parse tree
  * produced by <file.parserName>.
  */
-class <file.grammarName>Visitor : public antlr4::tree::AbstractParseTreeVisitor {
+class <file.exportMacro> <file.grammarName>Visitor : public antlr4::tree::AbstractParseTreeVisitor {
 public:
   <namedActions.visitordeclarations>
   

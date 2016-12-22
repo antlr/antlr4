@@ -1,9 +1,0 @@
-import "JavaExpressions.stg"
-
-Input() ::= "(a|b)&c"
-
-Output() ::= <<
-(s (e (e ( (e (e a) | (e b)) )) & (e c)) \<EOF>)<\n>
->>
-
-Errors() ::= ""

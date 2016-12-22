@@ -4,10 +4,8 @@
  */
 using System;
 using System.Collections.Generic;
-using Antlr4.Runtime;
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Misc;
-using Antlr4.Runtime.Sharpen;
 
 #if NET40PLUS
 using System.Runtime.CompilerServices;
@@ -87,7 +85,7 @@ namespace Antlr4.Runtime
         protected virtual IDictionary<string, int> CreateTokenTypeMap(IVocabulary vocabulary)
         {
             var result = new Dictionary<string, int>();
-            for (int i = 0; i < Atn.maxTokenType; i++)
+            for (int i = 0; i <= Atn.maxTokenType; i++)
             {
                 string literalName = vocabulary.GetLiteralName(i);
                 if (literalName != null)
@@ -100,7 +98,7 @@ namespace Antlr4.Runtime
                     result[symbolicName] = i;
                 }
             }
-            result["EOF"] = TokenConstants.Eof;
+            result["EOF"] = TokenConstants.EOF;
             return result;
         }
 
@@ -255,7 +253,7 @@ namespace Antlr4.Runtime
             string s = t.Text;
             if (s == null)
             {
-                if (t.Type == TokenConstants.Eof)
+                if (t.Type == TokenConstants.EOF)
                 {
                     s = "<EOF>";
                 }

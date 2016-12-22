@@ -4,9 +4,10 @@
  */
 namespace Antlr4.Runtime.Sharpen
 {
-    using System.Collections.Generic;
+	using System.Collections.Generic;
+	using Antlr4.Runtime.Misc;
 
-    internal static class ListExtensions
+	internal static class ListExtensions
     {
         public static T Set<T>(this IList<T> list, int index, T value)
             where T : class
@@ -15,5 +16,8 @@ namespace Antlr4.Runtime.Sharpen
             list[index] = value;
             return previous;
         }
-    }
+
+
+
+	}
 }

@@ -55,7 +55,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -508,7 +510,7 @@ public class BaseCppTest implements RuntimeTestSupport {
 		return files;
 	}
 
-	private String runProcess(ProcessBuilder builder, String description) throws Exception {
+	private String runProcess(ProcessBuilder builder, String description, boolean showStderr) throws Exception {
 //		System.out.println("BUILDER: "+builder.command());
 		Process process = builder.start();
 		StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
@@ -521,10 +523,10 @@ public class BaseCppTest implements RuntimeTestSupport {
 		String output = stdoutVacuum.toString();
 		if ( stderrVacuum.toString().length()>0 ) {
 			this.stderrDuringParse = stderrVacuum.toString();
-//			System.err.println(this.stderrDuringParse);
+			if ( showStderr ) System.err.println(this.stderrDuringParse);
 		}
 		if (errcode != 0) {
-			String err = "execution failed with error code: "+errcode;
+			String err = "execution of '"+description+"' failed with error code: "+errcode;
 			if ( this.stderrDuringParse!=null ) {
 				this.stderrDuringParse += err;
 			}
@@ -536,11 +538,11 @@ public class BaseCppTest implements RuntimeTestSupport {
 		return output;
 	}
 
-	private String runCommand(String command[], String workPath, String description) throws Exception {
+	private String runCommand(String command[], String workPath, String description, boolean showStderr) throws Exception {
 		ProcessBuilder builder = new ProcessBuilder(command);
 		builder.directory(new File(workPath));
 
-		return runProcess(builder, description);
+		return runProcess(builder, description, showStderr);
 	}
 
 	// TODO: add a buildRuntimeOnWindows variant.
@@ -550,8 +552,9 @@ public class BaseCppTest implements RuntimeTestSupport {
 
 		try {
 			String command[] = { "cmake", ".", /*"-DCMAKE_CXX_COMPILER=clang++",*/ "-DCMAKE_BUILD_TYPE=release" };
-			if (runCommand(command, runtimePath, "antlr runtime cmake") == null)
+			if (runCommand(command, runtimePath, "antlr runtime cmake", false) == null) {
 				return false;
+			}
 		}
 		catch (Exception e) {
 			System.err.println("can't configure antlr cpp runtime cmake file");
@@ -559,11 +562,21 @@ public class BaseCppTest implements RuntimeTestSupport {
 
 		try {
 			String command[] = { "make", "-j", "8" }; // Assuming a reasonable amount of available CPU cores.
-			if (runCommand(command, runtimePath, "building antlr runtime") == null)
+			if (runCommand(command, runtimePath, "building antlr runtime", true) == null)
 				return false;
 		}
 		catch (Exception e) {
 			System.err.println("can't compile antlr cpp runtime");
+			e.printStackTrace(System.err);
+			try {
+			    String command[] = { "ls", "-la" };
+					String output = runCommand(command, runtimePath + "/dist/", "printing library folder content", true);
+				System.out.println(output);
+			}
+			catch (Exception e2) {
+				System.err.println("can't even list folder content");
+				e2.printStackTrace(System.err);
+			}
 		}
 
 /* for debugging
@@ -593,7 +606,7 @@ public class BaseCppTest implements RuntimeTestSupport {
 			if ( !runtimeBuiltOnce ) {
 				try {
 					String command[] = {"clang++", "--version"};
-					String output = runCommand(command, tmpdir, "printing compiler version");
+					String output = runCommand(command, tmpdir, "printing compiler version", false);
 					System.out.println("Compiler version is: "+output);
 				}
 				catch (Exception e) {
@@ -613,7 +626,7 @@ public class BaseCppTest implements RuntimeTestSupport {
 		String libExtension = (getOS().equals("mac")) ? "dylib" : "so";
 		try {
 			String command[] = { "ln", "-s", runtimePath + "/dist/libantlr4-runtime." + libExtension };
-			if (runCommand(command, tmpdir, "sym linking C++ runtime") == null)
+			if (runCommand(command, tmpdir, "sym linking C++ runtime", true) == null)
 				return null;
 		}
 		catch (Exception e) {
@@ -625,7 +638,7 @@ public class BaseCppTest implements RuntimeTestSupport {
 		try {
 			List<String> command2 = new ArrayList<String>(Arrays.asList("clang++", "-std=c++11", "-I", includePath, "-L.", "-lantlr4-runtime", "-o", "a.out"));
 			command2.addAll(allCppFiles(tmpdir));
-			if (runCommand(command2.toArray(new String[0]), tmpdir, "building test binary") == null) {
+			if (runCommand(command2.toArray(new String[0]), tmpdir, "building test binary", true) == null) {
 				return null;
 			}
 		}
@@ -642,7 +655,7 @@ public class BaseCppTest implements RuntimeTestSupport {
 			builder.directory(new File(tmpdir));
 			Map<String, String> env = builder.environment();
 			env.put("LD_PRELOAD", runtimePath + "/dist/libantlr4-runtime." + libExtension);
-			String output = runProcess(builder, "running test binary");
+			String output = runProcess(builder, "running test binary", false);
 			if ( output.length()==0 ) {
 				output = null;
 			}
@@ -664,11 +677,21 @@ public class BaseCppTest implements RuntimeTestSupport {
 
 	protected String locateRuntime() {
 		final ClassLoader loader = Thread.currentThread().getContextClassLoader();
-		final URL runtimeSrc = loader.getResource("Cpp");
-		if (runtimeSrc == null) {
+		final URL runtimeURL = loader.getResource("Cpp");
+		if (runtimeURL == null) {
 			throw new RuntimeException("Cannot find runtime");
 		}
-		return runtimeSrc.getPath();
+		// Windows not getting runtime right. See:
+		// http://stackoverflow.com/questions/6164448/convert-url-to-normal-windows-filename-java
+		// it was coming back "/C:/projects/antlr4-l7imv/runtime-testsuite/target/classes/Cpp"
+		String p;
+		try {
+			p = Paths.get(runtimeURL.toURI()).toFile().toString();
+		}
+		catch (URISyntaxException use) {
+			p = "Can't find runtime";
+		}
+		return p;
 	}
 
 	List<ANTLRMessage> getMessagesOfType(List<ANTLRMessage> msgs, Class<? extends ANTLRMessage> c) {

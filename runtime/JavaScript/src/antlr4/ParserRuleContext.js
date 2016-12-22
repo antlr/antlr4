@@ -64,6 +64,17 @@ ParserRuleContext.prototype.copyFrom = function(ctx) {
     this.children = null;
     this.start = ctx.start;
     this.stop = ctx.stop;
+    // copy any error nodes to alt label node
+    if(ctx.children) {
+        this.children = [];
+        // reset parent pointer for any error nodes
+    	ctx.children.map(function(child) {
+    		if (child instanceof ErrorNodeImpl) {
+                this.children.push(child);
+                child.parentCtx = this;
+            }
+		}, this);
+	}
 };
 
 // Double dispatch methods for listeners

@@ -11,7 +11,7 @@ namespace antlr4 {
 namespace misc {
 
   // Helpers to convert certain unsigned symbols (e.g. Token::EOF) to their original numeric value (e.g. -1)
-  // and vice version. This is needed mostly for intervals to keep their original order and for toString()
+  // and vice versa. This is needed mostly for intervals to keep their original order and for toString()
   // methods to print the original numeric value (e.g. for tests).
   size_t numericToSymbol(ssize_t v);
   ssize_t symbolToNumeric(size_t v);

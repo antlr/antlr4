@@ -12,581 +12,235 @@ using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
-    /// <summary>A tuple: (ATN state, predicted alt, syntactic, semantic context).</summary>
-    /// <remarks>
-    /// A tuple: (ATN state, predicted alt, syntactic, semantic context).
-    /// The syntactic context is a graph-structured stack node whose
-    /// path(s) to the root is the rule invocation(s)
-    /// chain used to arrive at the state.  The semantic context is
-    /// the tree of semantic predicates encountered before reaching
-    /// an ATN state.
-    /// </remarks>
-    public class ATNConfig
-    {
-        /// <summary>
-        /// This field stores the bit mask for implementing the
-        /// <see cref="PrecedenceFilterSuppressed()"/>
-        /// property as a bit within the
-        /// existing
-        /// <see cref="altAndOuterContextDepth"/>
-        /// field.
-        /// </summary>
-        private const int SuppressPrecedenceFilter = unchecked((int)(0x80000000));
+  
+	/** A tuple: (ATN state, predicted alt, syntactic, semantic context).
+	 *  The syntactic context is a graph-structured stack node whose
+	 *  path(s) to the root is the rule invocation(s)
+	 *  chain used to arrive at the state.  The semantic context is
+	 *  the tree of semantic predicates encountered before reaching
+	 *  an ATN state.
+	 */
+	public class ATNConfig
+	{
+		/**
+		 * This field stores the bit mask for implementing the
+		 * {@link #isPrecedenceFilterSuppressed} property as a bit within the
+		 * existing {@link #reachesIntoOuterContext} field.
+		 */
+		private static readonly int SUPPRESS_PRECEDENCE_FILTER = 0x40000000;
 
-        /// <summary>The ATN state associated with this configuration</summary>
-        [NotNull]
-        private readonly ATNState state;
+		/** The ATN state associated with this configuration */
+		public readonly ATNState state;
 
-        /// <summary>This is a bit-field currently containing the following values.</summary>
-        /// <remarks>
-        /// This is a bit-field currently containing the following values.
-        /// <ul>
-        /// <li>0x00FFFFFF: Alternative</li>
-        /// <li>0x7F000000: Outer context depth</li>
-        /// <li>0x80000000: Suppress precedence filter</li>
-        /// </ul>
-        /// </remarks>
-        private int altAndOuterContextDepth;
+		/** What alt (or lexer rule) is predicted by this configuration */
+		public readonly int alt;
 
-        /// <summary>
-        /// The stack of invoking states leading to the rule/states associated
-        /// with this config.
-        /// </summary>
-        /// <remarks>
-        /// The stack of invoking states leading to the rule/states associated
-        /// with this config.  We track only those contexts pushed during
-        /// execution of the ATN simulator.
-        /// </remarks>
-        [NotNull]
-        private PredictionContext context;
+		/** The stack of invoking states leading to the rule/states associated
+		 *  with this config.  We track only those contexts pushed during
+		 *  execution of the ATN simulator.
+		 */
+		public PredictionContext context;
 
-        protected internal ATNConfig(ATNState state, int alt, PredictionContext context)
-        {
-            System.Diagnostics.Debug.Assert((alt & unchecked((int)(0xFFFFFF))) == alt);
-            this.state = state;
-            this.altAndOuterContextDepth = alt;
-            this.context = context;
-        }
+		/**
+		 * We cannot execute predicates dependent upon local context unless
+		 * we know for sure we are in the correct context. Because there is
+		 * no way to do this efficiently, we simply cannot evaluate
+		 * dependent predicates unless we are in the rule that initially
+		 * invokes the ATN simulator.
+		 *
+		 * <p>
+		 * closure() tracks the depth of how far we dip into the outer context:
+		 * depth &gt; 0.  Note that it may not be totally accurate depth since I
+		 * don't ever decrement. TODO: make it a boolean then</p>
+		 *
+		 * <p>
+		 * For memory efficiency, the {@link #isPrecedenceFilterSuppressed} method
+		 * is also backed by this field. Since the field is publicly accessible, the
+		 * highest bit which would not cause the value to become negative is used to
+		 * store this field. This choice minimizes the risk that code which only
+		 * compares this value to 0 would be affected by the new purpose of the
+		 * flag. It also ensures the performance of the existing {@link ATNConfig}
+		 * constructors as well as certain operations like
+		 * {@link ATNConfigSet#add(ATNConfig, DoubleKeyMap)} method are
+		 * <em>completely</em> unaffected by the change.</p>
+		 */
+		public int reachesIntoOuterContext;
 
-        protected internal ATNConfig(Antlr4.Runtime.Atn.ATNConfig c, ATNState state, PredictionContext context)
-        {
-            this.state = state;
-            this.altAndOuterContextDepth = c.altAndOuterContextDepth;
-            this.context = context;
-        }
 
-        public static Antlr4.Runtime.Atn.ATNConfig Create(ATNState state, int alt, PredictionContext context)
-        {
-            return Create(state, alt, context, Antlr4.Runtime.Atn.SemanticContext.None, null);
-        }
+		public readonly SemanticContext semanticContext;
 
-        public static Antlr4.Runtime.Atn.ATNConfig Create(ATNState state, int alt, PredictionContext context, Antlr4.Runtime.Atn.SemanticContext semanticContext)
-        {
-            return Create(state, alt, context, semanticContext, null);
-        }
+		public ATNConfig(ATNConfig old)
+		{ // dup
+			this.state = old.state;
+			this.alt = old.alt;
+			this.context = old.context;
+			this.semanticContext = old.semanticContext;
+			this.reachesIntoOuterContext = old.reachesIntoOuterContext;
+		}
 
-        public static Antlr4.Runtime.Atn.ATNConfig Create(ATNState state, int alt, PredictionContext context, Antlr4.Runtime.Atn.SemanticContext semanticContext, LexerActionExecutor lexerActionExecutor)
-        {
-            if (semanticContext != Antlr4.Runtime.Atn.SemanticContext.None)
-            {
-                if (lexerActionExecutor != null)
-                {
-                    return new ATNConfig.ActionSemanticContextATNConfig(lexerActionExecutor, semanticContext, state, alt, context, false);
-                }
-                else
-                {
-                    return new ATNConfig.SemanticContextATNConfig(semanticContext, state, alt, context);
-                }
-            }
-            else
-            {
-                if (lexerActionExecutor != null)
-                {
-                    return new ATNConfig.ActionATNConfig(lexerActionExecutor, state, alt, context, false);
-                }
-                else
-                {
-                    return new Antlr4.Runtime.Atn.ATNConfig(state, alt, context);
-                }
-            }
-        }
+		public ATNConfig(ATNState state,
+						 int alt,
+						 PredictionContext context)
+			: this(state, alt, context, SemanticContext.NONE)
+		{
+		}
 
-        /// <summary>Gets the ATN state associated with this configuration.</summary>
-        /// <remarks>Gets the ATN state associated with this configuration.</remarks>
-        public ATNState State
-        {
-            get
-            {
-                return state;
-            }
-        }
+		public ATNConfig(ATNState state,
+						 int alt,
+						 PredictionContext context,
+						 SemanticContext semanticContext)
+		{
+			this.state = state;
+			this.alt = alt;
+			this.context = context;
+			this.semanticContext = semanticContext;
+		}
 
-        /// <summary>What alt (or lexer rule) is predicted by this configuration.</summary>
-        /// <remarks>What alt (or lexer rule) is predicted by this configuration.</remarks>
-        public int Alt
-        {
-            get
-            {
-                return altAndOuterContextDepth & unchecked((int)(0x00FFFFFF));
-            }
-        }
+		public ATNConfig(ATNConfig c, ATNState state)
+			: this(c, state, c.context, c.semanticContext)
+		{
+		}
 
-        public virtual PredictionContext Context
-        {
-            get
-            {
-                return context;
-            }
-            set
-            {
-                PredictionContext context = value;
-                this.context = context;
-            }
-        }
+		public ATNConfig(ATNConfig c, ATNState state,
+			 SemanticContext semanticContext)
+			: this(c, state, c.context, semanticContext)
+		{
+		}
 
-        public bool ReachesIntoOuterContext
-        {
-            get
-            {
-                return OuterContextDepth != 0;
-            }
-        }
+		public ATNConfig(ATNConfig c,
+						 SemanticContext semanticContext)
+			: this(c, c.state, c.context, semanticContext)
+		{
+		}
 
-        /// <summary>
-        /// We cannot execute predicates dependent upon local context unless
-        /// we know for sure we are in the correct context.
-        /// </summary>
-        /// <remarks>
-        /// We cannot execute predicates dependent upon local context unless
-        /// we know for sure we are in the correct context. Because there is
-        /// no way to do this efficiently, we simply cannot evaluate
-        /// dependent predicates unless we are in the rule that initially
-        /// invokes the ATN simulator.
-        /// <p>
-        /// closure() tracks the depth of how far we dip into the outer context:
-        /// depth &gt; 0.  Note that it may not be totally accurate depth since I
-        /// don't ever decrement. TODO: make it a boolean then</p>
-        /// </remarks>
-        public virtual int OuterContextDepth
-        {
-            get
-            {
-                return ((int)(((uint)altAndOuterContextDepth) >> 24)) & unchecked((int)(0x7F));
-            }
-            set
-            {
-                int outerContextDepth = value;
-                System.Diagnostics.Debug.Assert(outerContextDepth >= 0);
-                // saturate at 0x7F - everything but zero/positive is only used for debug information anyway
-                outerContextDepth = Math.Min(outerContextDepth, unchecked((int)(0x7F)));
-                this.altAndOuterContextDepth = (outerContextDepth << 24) | (altAndOuterContextDepth & ~unchecked((int)(0x7F000000)));
-            }
-        }
+		public ATNConfig(ATNConfig c, ATNState state,
+						 PredictionContext context)
+			: this(c, state, context, c.semanticContext)
+		{
+		}
 
-        public virtual LexerActionExecutor ActionExecutor
-        {
-            get
-            {
-                return null;
-            }
-        }
+		public ATNConfig(ATNConfig c, ATNState state,
+						 PredictionContext context,
+						 SemanticContext semanticContext)
+		{
+			this.state = state;
+			this.alt = c.alt;
+			this.context = context;
+			this.semanticContext = semanticContext;
+			this.reachesIntoOuterContext = c.reachesIntoOuterContext;
+		}
 
-        public virtual Antlr4.Runtime.Atn.SemanticContext SemanticContext
-        {
-            get
-            {
-                return Antlr4.Runtime.Atn.SemanticContext.None;
-            }
-        }
+		/**
+		 * This method gets the value of the {@link #reachesIntoOuterContext} field
+		 * as it existed prior to the introduction of the
+		 * {@link #isPrecedenceFilterSuppressed} method.
+		 */
+		public int OuterContextDepth
+		{
+			get
+			{
+				return reachesIntoOuterContext & ~SUPPRESS_PRECEDENCE_FILTER;
+			}
+		}
 
-        public virtual bool PassedThroughNonGreedyDecision
-        {
-            get
-            {
-                return false;
-            }
-        }
+		public bool IsPrecedenceFilterSuppressed
+		{
+			get
+			{
+				return (reachesIntoOuterContext & SUPPRESS_PRECEDENCE_FILTER) != 0;
+			}
+		}
 
-        public Antlr4.Runtime.Atn.ATNConfig Clone()
-        {
-            return Transform(this.State, false);
-        }
+		public void SetPrecedenceFilterSuppressed(bool value)
+		{
+			if (value)
+			{
+				this.reachesIntoOuterContext |= SUPPRESS_PRECEDENCE_FILTER;
+			}
+			else {
+				this.reachesIntoOuterContext &= ~SUPPRESS_PRECEDENCE_FILTER;
+			}
+		}
 
-        public Antlr4.Runtime.Atn.ATNConfig Transform(ATNState state, bool checkNonGreedy)
-        {
-            return Transform(state, this.context, this.SemanticContext, checkNonGreedy, this.ActionExecutor);
-        }
+		/** An ATN configuration is equal to another if both have
+		 *  the same state, they predict the same alternative, and
+		 *  syntactic/semantic contexts are the same.
+		 */
+		public override bool Equals(Object o)
+		{
+			if (!(o is ATNConfig)) {
+				return false;
+			}
 
-        public Antlr4.Runtime.Atn.ATNConfig Transform(ATNState state, Antlr4.Runtime.Atn.SemanticContext semanticContext, bool checkNonGreedy)
-        {
-            return Transform(state, this.context, semanticContext, checkNonGreedy, this.ActionExecutor);
-        }
+			return this.Equals((ATNConfig)o);
+		}
 
-        public Antlr4.Runtime.Atn.ATNConfig Transform(ATNState state, PredictionContext context, bool checkNonGreedy)
-        {
-            return Transform(state, context, this.SemanticContext, checkNonGreedy, this.ActionExecutor);
-        }
+		public virtual bool Equals(ATNConfig other)
+		{
+			if (this == other)
+			{
+				return true;
+			}
+			else if (other == null)
+			{
+				return false;
+			}
 
-        public Antlr4.Runtime.Atn.ATNConfig Transform(ATNState state, LexerActionExecutor lexerActionExecutor, bool checkNonGreedy)
-        {
-            return Transform(state, context, this.SemanticContext, checkNonGreedy, lexerActionExecutor);
-        }
+			return this.state.stateNumber == other.state.stateNumber
+				&& this.alt == other.alt
+				&& (this.context == other.context || (this.context != null && this.context.Equals(other.context)))
+				&& this.semanticContext.Equals(other.semanticContext)
+				&& this.IsPrecedenceFilterSuppressed == other.IsPrecedenceFilterSuppressed;
+		}
 
-        private Antlr4.Runtime.Atn.ATNConfig Transform(ATNState state, PredictionContext context, Antlr4.Runtime.Atn.SemanticContext semanticContext, bool checkNonGreedy, LexerActionExecutor lexerActionExecutor)
-        {
-            bool passedThroughNonGreedy = checkNonGreedy && CheckNonGreedyDecision(this, state);
-            if (semanticContext != Antlr4.Runtime.Atn.SemanticContext.None)
-            {
-                if (lexerActionExecutor != null || passedThroughNonGreedy)
-                {
-                    return new ATNConfig.ActionSemanticContextATNConfig(lexerActionExecutor, semanticContext, this, state, context, passedThroughNonGreedy);
-                }
-                else
-                {
-                    return new ATNConfig.SemanticContextATNConfig(semanticContext, this, state, context);
-                }
-            }
-            else
-            {
-                if (lexerActionExecutor != null || passedThroughNonGreedy)
-                {
-                    return new ATNConfig.ActionATNConfig(lexerActionExecutor, this, state, context, passedThroughNonGreedy);
-                }
-                else
-                {
-                    return new Antlr4.Runtime.Atn.ATNConfig(this, state, context);
-                }
-            }
-        }
+		public override int GetHashCode()
+		{
+			int hashCode = MurmurHash.Initialize(7);
+			hashCode = MurmurHash.Update(hashCode, state.stateNumber);
+			hashCode = MurmurHash.Update(hashCode, alt);
+			hashCode = MurmurHash.Update(hashCode, context);
+			hashCode = MurmurHash.Update(hashCode, semanticContext);
+			hashCode = MurmurHash.Finish(hashCode, 4);
+			return hashCode;
+		}
 
-        private static bool CheckNonGreedyDecision(Antlr4.Runtime.Atn.ATNConfig source, ATNState target)
-        {
-            return source.PassedThroughNonGreedyDecision || target is DecisionState && ((DecisionState)target).nonGreedy;
-        }
+		public override String ToString()
+		{
+			return ToString(null, true);
+		}
 
-        public virtual Antlr4.Runtime.Atn.ATNConfig AppendContext(int context, PredictionContextCache contextCache)
-        {
-            PredictionContext appendedContext = Context.AppendContext(context, contextCache);
-            Antlr4.Runtime.Atn.ATNConfig result = Transform(State, appendedContext, false);
-            return result;
-        }
+		public String ToString(IRecognizer recog, bool showAlt)
+		{
+			StringBuilder buf = new StringBuilder();
+			//		if ( state.ruleIndex>=0 ) {
+			//			if ( recog!=null ) buf.append(recog.getRuleNames()[state.ruleIndex]+":");
+			//			else buf.append(state.ruleIndex+":");
+			//		}
+			buf.Append('(');
+			buf.Append(state);
+			if (showAlt)
+			{
+				buf.Append(",");
+				buf.Append(alt);
+			}
+			if (context != null)
+			{
+				buf.Append(",[");
+				buf.Append(context.ToString());
+				buf.Append("]");
+			}
+			if (semanticContext != null && semanticContext != SemanticContext.NONE)
+			{
+				buf.Append(",");
+				buf.Append(semanticContext);
+			}
+			if (OuterContextDepth > 0)
+			{
+				buf.Append(",up=").Append(OuterContextDepth);
+			}
+			buf.Append(')');
+			return buf.ToString();
+		}
+	}
 
-        public virtual Antlr4.Runtime.Atn.ATNConfig AppendContext(PredictionContext context, PredictionContextCache contextCache)
-        {
-            PredictionContext appendedContext = Context.AppendContext(context, contextCache);
-            Antlr4.Runtime.Atn.ATNConfig result = Transform(State, appendedContext, false);
-            return result;
-        }
-
-        public virtual bool Contains(Antlr4.Runtime.Atn.ATNConfig subconfig)
-        {
-            if (this.state.stateNumber != subconfig.State.stateNumber || this.Alt != subconfig.Alt || !this.SemanticContext.Equals(subconfig.SemanticContext))
-            {
-                return false;
-            }
-            Stack<PredictionContext> leftWorkList = new Stack<PredictionContext>();
-            Stack<PredictionContext> rightWorkList = new Stack<PredictionContext>();
-            leftWorkList.Push(Context);
-            rightWorkList.Push(subconfig.Context);
-            while (leftWorkList.Count > 0)
-            {
-                PredictionContext left = leftWorkList.Pop();
-                PredictionContext right = rightWorkList.Pop();
-                if (left == right)
-                {
-                    return true;
-                }
-                if (left.Size < right.Size)
-                {
-                    return false;
-                }
-                if (right.IsEmpty)
-                {
-                    return left.HasEmpty;
-                }
-                else
-                {
-                    for (int i = 0; i < right.Size; i++)
-                    {
-                        int index = left.FindReturnState(right.GetReturnState(i));
-                        if (index < 0)
-                        {
-                            // assumes invokingStates has no duplicate entries
-                            return false;
-                        }
-                        leftWorkList.Push(left.GetParent(index));
-                        rightWorkList.Push(right.GetParent(i));
-                    }
-                }
-            }
-            return false;
-        }
-
-        public bool PrecedenceFilterSuppressed
-        {
-            get
-            {
-                return (altAndOuterContextDepth & SuppressPrecedenceFilter) != 0;
-            }
-            set
-            {
-                if (value)
-                {
-                    this.altAndOuterContextDepth |= SuppressPrecedenceFilter;
-                }
-                else
-                {
-                    this.altAndOuterContextDepth &= ~SuppressPrecedenceFilter;
-                }
-            }
-        }
-
-        /// <summary>
-        /// An ATN configuration is equal to another if both have
-        /// the same state, they predict the same alternative, and
-        /// syntactic/semantic contexts are the same.
-        /// </summary>
-        /// <remarks>
-        /// An ATN configuration is equal to another if both have
-        /// the same state, they predict the same alternative, and
-        /// syntactic/semantic contexts are the same.
-        /// </remarks>
-        public override bool Equals(object o)
-        {
-            if (!(o is Antlr4.Runtime.Atn.ATNConfig))
-            {
-                return false;
-            }
-            return this.Equals((Antlr4.Runtime.Atn.ATNConfig)o);
-        }
-
-        public virtual bool Equals(Antlr4.Runtime.Atn.ATNConfig other)
-        {
-            if (this == other)
-            {
-                return true;
-            }
-            else
-            {
-                if (other == null)
-                {
-                    return false;
-                }
-            }
-            return this.State.stateNumber == other.State.stateNumber && this.Alt == other.Alt && this.ReachesIntoOuterContext == other.ReachesIntoOuterContext && this.Context.Equals(other.Context) && this.SemanticContext.Equals(other.SemanticContext) && this.PrecedenceFilterSuppressed == other.PrecedenceFilterSuppressed && this.PassedThroughNonGreedyDecision == other.PassedThroughNonGreedyDecision && EqualityComparer<LexerActionExecutor>.Default.Equals(this.ActionExecutor, other.ActionExecutor);
-        }
-
-        public override int GetHashCode()
-        {
-            int hashCode = MurmurHash.Initialize(7);
-            hashCode = MurmurHash.Update(hashCode, State.stateNumber);
-            hashCode = MurmurHash.Update(hashCode, Alt);
-            hashCode = MurmurHash.Update(hashCode, ReachesIntoOuterContext ? 1 : 0);
-            hashCode = MurmurHash.Update(hashCode, Context);
-            hashCode = MurmurHash.Update(hashCode, SemanticContext);
-            hashCode = MurmurHash.Update(hashCode, PassedThroughNonGreedyDecision ? 1 : 0);
-            hashCode = MurmurHash.Update(hashCode, ActionExecutor);
-            hashCode = MurmurHash.Finish(hashCode, 7);
-            return hashCode;
-        }
-
-        public virtual string ToDotString()
-        {
-#if COMPACT
-            throw new NotImplementedException("The current platform does not provide RuntimeHelpers.GetHashCode(object).");
-#else
-            StringBuilder builder = new StringBuilder();
-            builder.Append("digraph G {\n");
-            builder.Append("rankdir=LR;\n");
-            HashSet<PredictionContext> visited = new HashSet<PredictionContext>();
-            Stack<PredictionContext> workList = new Stack<PredictionContext>();
-            workList.Push(Context);
-            visited.Add(Context);
-            while (workList.Count > 0)
-            {
-                PredictionContext current = workList.Pop();
-                for (int i = 0; i < current.Size; i++)
-                {
-                    builder.Append("  s").Append(System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(current));
-                    builder.Append("->");
-                    builder.Append("s").Append(System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(current.GetParent(i)));
-                    builder.Append("[label=\"").Append(current.GetReturnState(i)).Append("\"];\n");
-                    if (visited.Add(current.GetParent(i)))
-                    {
-                        workList.Push(current.GetParent(i));
-                    }
-                }
-            }
-            builder.Append("}\n");
-            return builder.ToString();
-#endif
-        }
-
-        public override string ToString()
-        {
-            return ToString(null, true, false);
-        }
-
-        public virtual string ToString(IRecognizer recog, bool showAlt)
-        {
-            return ToString(recog, showAlt, true);
-        }
-
-        public virtual string ToString(IRecognizer recog, bool showAlt, bool showContext)
-        {
-            StringBuilder buf = new StringBuilder();
-            //		if ( state.ruleIndex>=0 ) {
-            //			if ( recog!=null ) buf.append(recog.getRuleNames()[state.ruleIndex]+":");
-            //			else buf.append(state.ruleIndex+":");
-            //		}
-            string[] contexts;
-            if (showContext)
-            {
-                contexts = Context.ToStrings(recog, this.State.stateNumber);
-            }
-            else
-            {
-                contexts = new string[] { "?" };
-            }
-            bool first = true;
-            foreach (string contextDesc in contexts)
-            {
-                if (first)
-                {
-                    first = false;
-                }
-                else
-                {
-                    buf.Append(", ");
-                }
-                buf.Append('(');
-                buf.Append(State);
-                if (showAlt)
-                {
-                    buf.Append(",");
-                    buf.Append(Alt);
-                }
-                if (Context != null)
-                {
-                    buf.Append(",");
-                    buf.Append(contextDesc);
-                }
-                if (SemanticContext != null && SemanticContext != Antlr4.Runtime.Atn.SemanticContext.None)
-                {
-                    buf.Append(",");
-                    buf.Append(SemanticContext);
-                }
-                if (ReachesIntoOuterContext)
-                {
-                    buf.Append(",up=").Append(OuterContextDepth);
-                }
-                buf.Append(')');
-            }
-            return buf.ToString();
-        }
-
-        private class SemanticContextATNConfig : ATNConfig
-        {
-            [NotNull]
-            private readonly Antlr4.Runtime.Atn.SemanticContext semanticContext;
-
-            public SemanticContextATNConfig(Antlr4.Runtime.Atn.SemanticContext semanticContext, ATNState state, int alt, PredictionContext context)
-                : base(state, alt, context)
-            {
-                this.semanticContext = semanticContext;
-            }
-
-            public SemanticContextATNConfig(Antlr4.Runtime.Atn.SemanticContext semanticContext, ATNConfig c, ATNState state, PredictionContext context)
-                : base(c, state, context)
-            {
-                this.semanticContext = semanticContext;
-            }
-
-            public override Antlr4.Runtime.Atn.SemanticContext SemanticContext
-            {
-                get
-                {
-                    return semanticContext;
-                }
-            }
-        }
-
-        private class ActionATNConfig : ATNConfig
-        {
-            private readonly LexerActionExecutor lexerActionExecutor;
-
-            private readonly bool passedThroughNonGreedyDecision;
-
-            public ActionATNConfig(LexerActionExecutor lexerActionExecutor, ATNState state, int alt, PredictionContext context, bool passedThroughNonGreedyDecision)
-                : base(state, alt, context)
-            {
-                this.lexerActionExecutor = lexerActionExecutor;
-                this.passedThroughNonGreedyDecision = passedThroughNonGreedyDecision;
-            }
-
-            protected internal ActionATNConfig(LexerActionExecutor lexerActionExecutor, ATNConfig c, ATNState state, PredictionContext context, bool passedThroughNonGreedyDecision)
-                : base(c, state, context)
-            {
-                if (c.SemanticContext != SemanticContext.None)
-                {
-                    throw new NotSupportedException();
-                }
-                this.lexerActionExecutor = lexerActionExecutor;
-                this.passedThroughNonGreedyDecision = passedThroughNonGreedyDecision;
-            }
-
-            public override LexerActionExecutor ActionExecutor
-            {
-                get
-                {
-                    return lexerActionExecutor;
-                }
-            }
-
-            public override bool PassedThroughNonGreedyDecision
-            {
-                get
-                {
-                    return passedThroughNonGreedyDecision;
-                }
-            }
-        }
-
-        private class ActionSemanticContextATNConfig : ATNConfig.SemanticContextATNConfig
-        {
-            private readonly LexerActionExecutor lexerActionExecutor;
-
-            private readonly bool passedThroughNonGreedyDecision;
-
-            public ActionSemanticContextATNConfig(LexerActionExecutor lexerActionExecutor, SemanticContext semanticContext, ATNState state, int alt, PredictionContext context, bool passedThroughNonGreedyDecision)
-                : base(semanticContext, state, alt, context)
-            {
-                this.lexerActionExecutor = lexerActionExecutor;
-                this.passedThroughNonGreedyDecision = passedThroughNonGreedyDecision;
-            }
-
-            public ActionSemanticContextATNConfig(LexerActionExecutor lexerActionExecutor, SemanticContext semanticContext, ATNConfig c, ATNState state, PredictionContext context, bool passedThroughNonGreedyDecision)
-                : base(semanticContext, c, state, context)
-            {
-                this.lexerActionExecutor = lexerActionExecutor;
-                this.passedThroughNonGreedyDecision = passedThroughNonGreedyDecision;
-            }
-
-            public override LexerActionExecutor ActionExecutor
-            {
-                get
-                {
-                    return lexerActionExecutor;
-                }
-            }
-
-            public override bool PassedThroughNonGreedyDecision
-            {
-                get
-                {
-                    return passedThroughNonGreedyDecision;
-                }
-            }
-        }
-    }
 }

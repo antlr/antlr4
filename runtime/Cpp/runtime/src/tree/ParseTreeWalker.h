@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "antlr4-common.h"
+
 namespace antlr4 {
 namespace tree {
 

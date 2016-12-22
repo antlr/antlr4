@@ -3,9 +3,7 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Sharpen;
 

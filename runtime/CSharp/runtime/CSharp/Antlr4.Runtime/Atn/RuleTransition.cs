@@ -3,9 +3,7 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 using System;
-using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Misc;
-using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime.Atn
 {
@@ -43,7 +41,7 @@ namespace Antlr4.Runtime.Atn
         {
             get
             {
-                return Antlr4.Runtime.Atn.TransitionType.Rule;
+                return Antlr4.Runtime.Atn.TransitionType.RULE;
             }
         }
 

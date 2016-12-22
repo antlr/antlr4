@@ -74,7 +74,7 @@ install(TARGETS antlr4_static
         ARCHIVE DESTINATION lib)
 
 install(DIRECTORY "${PROJECT_SOURCE_DIR}/runtime/src/" 
-        DESTINATION "include" 
+        DESTINATION "include/antlr4-runtime"
         COMPONENT dev 
         FILES_MATCHING PATTERN "*.h"
         )
