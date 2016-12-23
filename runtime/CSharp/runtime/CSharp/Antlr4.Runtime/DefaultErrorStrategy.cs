@@ -265,7 +265,8 @@ namespace Antlr4.Runtime
             ITokenStream tokens = ((ITokenStream)recognizer.InputStream);
             int la = tokens.LA(1);
             // try cheaper subset first; might get lucky. seems to shave a wee bit off
-            if (recognizer.Atn.NextTokens(s).Contains(la) || la == TokenConstants.EOF)
+            var nextTokens = recognizer.Atn.NextTokens(s);
+            if (nextTokens.Contains(TokenConstants.EPSILON) || nextTokens.Contains(la))
             {
                 return;
             }

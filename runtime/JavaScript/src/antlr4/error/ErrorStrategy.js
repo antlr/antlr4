@@ -223,7 +223,8 @@ DefaultErrorStrategy.prototype.sync = function(recognizer) {
     var s = recognizer._interp.atn.states[recognizer.state];
     var la = recognizer.getTokenStream().LA(1);
     // try cheaper subset first; might get lucky. seems to shave a wee bit off
-    if (la===Token.EOF || recognizer.atn.nextTokens(s).contains(la)) {
+    var nextTokens = recognizer.atn.nextTokens(s);
+    if (nextTokens.contains(Token.EPSILON) || nextTokens.contains(la)) {
         return;
     }
     // Return but don't end recovery. only do that upon valid token match

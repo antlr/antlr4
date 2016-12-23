@@ -224,7 +224,10 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
         int la = tokens.LA(1);
 
         // try cheaper subset first; might get lucky. seems to shave a wee bit off
-        if ( recognizer.getATN().nextTokens(s).contains(la) || la==Token.EOF ) return;
+		IntervalSet nextTokens = recognizer.getATN().nextTokens(s);
+		if (nextTokens.contains(Token.EPSILON) || nextTokens.contains(la)) {
+			return;
+		}
 
 		// Return but don't end recovery. only do that upon valid token match
 		if (recognizer.isExpectedToken(la)) {
