@@ -360,7 +360,7 @@ switch (this._input.LA(1)) {
 	<alt>
 	break;}; separator="\n">
 default:
-	<error>
+	break;
 }
 >>
 
