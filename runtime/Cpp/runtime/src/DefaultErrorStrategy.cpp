@@ -105,11 +105,6 @@ void DefaultErrorStrategy::sync(Parser *recognizer) {
     return;
   }
 
-  // Return but don't end recovery. only do that upon valid token match
-  if (recognizer->isExpectedToken((int)la)) {
-    return;
-  }
-
   switch (s->getStateType()) {
     case atn::ATNState::BLOCK_START:
     case atn::ATNState::STAR_BLOCK_START:

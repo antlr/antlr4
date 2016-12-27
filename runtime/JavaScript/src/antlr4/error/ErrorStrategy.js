@@ -227,10 +227,6 @@ DefaultErrorStrategy.prototype.sync = function(recognizer) {
     if (nextTokens.contains(Token.EPSILON) || nextTokens.contains(la)) {
         return;
     }
-    // Return but don't end recovery. only do that upon valid token match
-    if(recognizer.isExpectedToken(la)) {
-        return;
-    }
     switch (s.stateType) {
     case ATNState.BLOCK_START:
     case ATNState.STAR_BLOCK_START:

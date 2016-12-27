@@ -229,11 +229,6 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 			return;
 		}
 
-		// Return but don't end recovery. only do that upon valid token match
-		if (recognizer.isExpectedToken(la)) {
-			return;
-		}
-
 		switch (s.getStateType()) {
 		case ATNState.BLOCK_START:
 		case ATNState.STAR_BLOCK_START:

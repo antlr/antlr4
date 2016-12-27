@@ -222,10 +222,6 @@ func (d *DefaultErrorStrategy) Sync(recognizer Parser) {
 	if nextTokens.contains(TokenEpsilon) || nextTokens.contains(la) {
 		return
 	}
-	// Return but don't end recovery. only do that upon valid token Match
-	if recognizer.IsExpectedToken(la) {
-		return
-	}
 
 	switch s.GetStateType() {
 	case ATNStateBlockStart, ATNStateStarBlockStart, ATNStatePlusBlockStart, ATNStateStarLoopEntry:

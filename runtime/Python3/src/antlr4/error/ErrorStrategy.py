@@ -211,10 +211,6 @@ class DefaultErrorStrategy(ErrorStrategy):
         if Token.EPSILON in nextTokens or la in nextTokens:
             return
 
-        # Return but don't end recovery. only do that upon valid token match
-        if recognizer.isExpectedToken(la):
-            return
-
         if s.stateType in [ATNState.BLOCK_START, ATNState.STAR_BLOCK_START,
                                 ATNState.PLUS_BLOCK_START, ATNState.STAR_LOOP_ENTRY]:
            # report error and recover if possible

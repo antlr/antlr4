@@ -270,11 +270,6 @@ namespace Antlr4.Runtime
             {
                 return;
             }
-            // Return but don't end recovery. only do that upon valid token match
-            if (recognizer.IsExpectedToken(la))
-            {
-                return;
-            }
             switch (s.StateType)
             {
                 case StateType.BlockStart:
