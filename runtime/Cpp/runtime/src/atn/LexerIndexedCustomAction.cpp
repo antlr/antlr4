@@ -55,7 +55,7 @@ bool LexerIndexedCustomAction::operator == (const LexerAction &obj) const {
     return false;
   }
 
-  return _offset == action->_offset && _action == action->_action;
+  return _offset == action->_offset && *_action == *action->_action;
 }
 
 std::string LexerIndexedCustomAction::toString() const {
