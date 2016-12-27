@@ -4,9 +4,9 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
-package org.antlr.v4.codegen;
+package org.antlr.v4.codegen.model;
 
-import org.antlr.v4.codegen.model.MatchToken;
+import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.tool.ast.GrammarAST;
 
 public class Wildcard extends MatchToken {
