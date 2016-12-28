@@ -362,7 +362,7 @@ open override func getVocabulary() -> Vocabulary {
 }
 
 public override init(_ input:TokenStream)throws {
-    RuntimeMetaData.checkVersion("4.6", RuntimeMetaData.VERSION)
+    RuntimeMetaData.checkVersion("4.6.1", RuntimeMetaData.VERSION)
 	try super.init(input)
 	_interp = ParserATNSimulator(self,<p.name>._ATN,<p.name>._decisionToDFA, <parser.name>._sharedContextCache)
 }
