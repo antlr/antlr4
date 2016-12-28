@@ -342,7 +342,7 @@ token = self._input.LA(1)
     <alt>
     pass}; separator="\nel">
 else:
-    <error>
+    pass
 >>
 
 LL1OptionalBlockSingleAlt(choice, expr, alts, preamble, error, followExpr) ::= <<

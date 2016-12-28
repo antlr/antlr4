@@ -753,6 +753,83 @@ public class ParserExecDescriptors {
 		 */
 		@CommentHasStringValue
 		public String grammar;
+	}
 
+	/**
+	 * This is a regression test for antlr/antlr4#1545, case 1.
+	 */
+	public static class OpenDeviceStatement_Case1 extends BaseParserTestDescriptor {
+		public String input = "OPEN DEVICE DEVICE";
+		public String output = "OPEN DEVICE DEVICE\n";
+		public String errors = null;
+		public String startRule = "statement";
+		public String grammarName = "OpenDeviceStatement";
+
+		/**
+		 grammar OpenDeviceStatement;
+		 program : statement+ '.' ;
+
+		 statement : 'OPEN' ( 'DEVICE' (  OPT1  |  OPT2  |  OPT3  )? )+ {<writeln("$text")>} ;
+
+		 OPT1 : 'OPT-1';
+		 OPT2 : 'OPT-2';
+		 OPT3 : 'OPT-3';
+
+		 WS : (' '|'\n')+ -> channel(HIDDEN);
+		 */
+		@CommentHasStringValue
+		public String grammar;
+	}
+
+	/**
+	 * This is a regression test for antlr/antlr4#1545, case 2.
+	 */
+	public static class OpenDeviceStatement_Case2 extends BaseParserTestDescriptor {
+		public String input = "OPEN DEVICE DEVICE";
+		public String output = "OPEN DEVICE DEVICE\n";
+		public String errors = null;
+		public String startRule = "statement";
+		public String grammarName = "OpenDeviceStatement";
+
+		/**
+		 grammar OpenDeviceStatement;
+		 program : statement+ '.' ;
+
+		 statement : 'OPEN' ( 'DEVICE' (  (OPT1)  |  OPT2  |  OPT3  )? )+ {<writeln("$text")>} ;
+
+		 OPT1 : 'OPT-1';
+		 OPT2 : 'OPT-2';
+		 OPT3 : 'OPT-3';
+
+		 WS : (' '|'\n')+ -> channel(HIDDEN);
+		 */
+		@CommentHasStringValue
+		public String grammar;
+	}
+
+	/**
+	 * This is a regression test for antlr/antlr4#1545, case 3.
+	 */
+	public static class OpenDeviceStatement_Case3 extends BaseParserTestDescriptor {
+		public String input = "OPEN DEVICE DEVICE.";
+		public String output = "OPEN DEVICE DEVICE\n";
+		public String errors = null;
+		public String startRule = "statement";
+		public String grammarName = "OpenDeviceStatement";
+
+		/**
+		 grammar OpenDeviceStatement;
+		 program : statement+ '.' ;
+
+		 statement : 'OPEN' ( 'DEVICE' (  (OPT1)  |  OPT2  |  OPT3  )? )+ {<writeln("$text")>} ;
+
+		 OPT1 : 'OPT-1';
+		 OPT2 : 'OPT-2';
+		 OPT3 : 'OPT-3';
+
+		 WS : (' '|'\n')+ -> channel(HIDDEN);
+		 */
+		@CommentHasStringValue
+		public String grammar;
 	}
 }

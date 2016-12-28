@@ -644,7 +644,7 @@ switch (_input->LA(1)) {
 \}
 }; separator="\n">
 default:
-  <error>
+  break;
 }
 >>
 

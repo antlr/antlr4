@@ -226,12 +226,11 @@ public class DefaultErrorStrategy: ANTLRErrorStrategy {
         // try cheaper subset first; might get lucky. seems to shave a wee bit off
         //let set : IntervalSet = recognizer.getATN().nextTokens(s)
 
-        if try recognizer.getATN().nextTokens(s).contains(la) || la == CommonToken.EOF {
+        if try recognizer.getATN().nextTokens(s).contains(CommonToken.EPSILON) {
             return
         }
 
-        // Return but don't end recovery. only do that upon valid token match
-        if try recognizer.isExpectedToken(la) {
+        if try recognizer.getATN().nextTokens(s).contains(la) {
             return
         }
 
