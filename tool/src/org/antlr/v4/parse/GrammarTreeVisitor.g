@@ -844,7 +844,7 @@ element
 	|   SEMPRED						{sempredInAlt((PredAST)$SEMPRED);}
 	|   ^(ACTION elementOptions)	{actionInAlt((ActionAST)$ACTION);}
 	|   ^(SEMPRED elementOptions)	{sempredInAlt((PredAST)$SEMPRED);}
-
+	|	range
 	|	^(NOT blockSet)
 	|	^(NOT block)
 	;
