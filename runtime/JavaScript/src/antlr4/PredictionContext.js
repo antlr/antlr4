@@ -1,38 +1,15 @@
 //
-// [The "BSD license"]
-//  Copyright (c) 2012 Terence Parr
-//  Copyright (c) 2012 Sam Harwell
-//  Copyright (c) 2014 Eric Vergnaud
-//  All rights reserved.
-//
-//  Redistribution and use in source and binary forms, with or without
-//  modification, are permitted provided that the following conditions
-//  are met:
-//
-//  1. Redistributions of source code must retain the above copyright
-//     notice, this list of conditions and the following disclaimer.
-//  2. Redistributions in binary form must reproduce the above copyright
-//     notice, this list of conditions and the following disclaimer in the
-//     documentation and/or other materials provided with the distribution.
-//  3. The name of the author may not be used to endorse or promote products
-//     derived from this software without specific prior written permission.
-//
-//  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-//  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-//  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-//  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-//  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-//  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-//  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-//  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-//  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
 ///
 
 var RuleContext = require('./RuleContext').RuleContext;
+var Hash = require('./Utils').Hash;
 
-function PredictionContext(cachedHashString) {
-	this.cachedHashString = cachedHashString;
+function PredictionContext(cachedHashCode) {
+	this.cachedHashCode = cachedHashCode;
 }
 
 // Represents {@code $} in local context prediction, which means wildcard.
@@ -83,17 +60,19 @@ PredictionContext.prototype.hasEmptyPath = function() {
 	return this.getReturnState(this.length - 1) === PredictionContext.EMPTY_RETURN_STATE;
 };
 
-PredictionContext.prototype.hashString = function() {
-	return this.cachedHashString;
+PredictionContext.prototype.hashCode = function() {
+	return this.cachedHashCode;
 };
 
+
+PredictionContext.prototype.updateHashCode = function(hash) {
+    hash.update(this.cachedHashCode);
+};
+/*
 function calculateHashString(parent, returnState) {
 	return "" + parent + returnState;
 }
-
-function calculateEmptyHashString() {
-	return "";
-}
+*/
 
 // Used to cache {@link PredictionContext} objects. Its used for the shared
 // context cash associated with contexts in DFA states. This cache
@@ -131,9 +110,13 @@ Object.defineProperty(PredictionContextCache.prototype, "length", {
 });
 
 function SingletonPredictionContext(parent, returnState) {
-	var hashString = parent !== null ? calculateHashString(parent, returnState)
-			: calculateEmptyHashString();
-	PredictionContext.call(this, hashString);
+	var hashCode = 0;
+	if(parent !== null) {
+		var hash = new Hash();
+		hash.update(parent, returnState);
+        hashCode = hash.finish();
+	}
+	PredictionContext.call(this, hashCode);
 	this.parentCtx = parent;
 	this.returnState = returnState;
 }
@@ -169,7 +152,7 @@ SingletonPredictionContext.prototype.equals = function(other) {
 		return true;
 	} else if (!(other instanceof SingletonPredictionContext)) {
 		return false;
-	} else if (this.hashString() !== other.hashString()) {
+	} else if (this.hashCode() !== other.hashCode()) {
 		return false; // can't be same if hash is different
 	} else {
 		if(this.returnState !== other.returnState)
@@ -181,14 +164,10 @@ SingletonPredictionContext.prototype.equals = function(other) {
 	}
 };
 
-SingletonPredictionContext.prototype.hashString = function() {
-	return this.cachedHashString;
-};
-
 SingletonPredictionContext.prototype.toString = function() {
 	var up = this.parentCtx === null ? "" : this.parentCtx.toString();
 	if (up.length === 0) {
-		if (this.returnState === this.EMPTY_RETURN_STATE) {
+		if (this.returnState === PredictionContext.EMPTY_RETURN_STATE) {
 			return "$";
 		} else {
 			return "" + this.returnState;
@@ -233,8 +212,10 @@ function ArrayPredictionContext(parents, returnStates) {
 	// from {@link //EMPTY} and non-empty. We merge {@link //EMPTY} by using
 	// null parent and
 	// returnState == {@link //EMPTY_RETURN_STATE}.
-	var hash = calculateHashString(parents, returnStates);
-	PredictionContext.call(this, hash);
+	var h = new Hash();
+	h.update(parents, returnStates);
+	var hashCode = h.finish();
+	PredictionContext.call(this, hashCode);
 	this.parents = parents;
 	this.returnStates = returnStates;
 	return this;
@@ -268,7 +249,7 @@ ArrayPredictionContext.prototype.equals = function(other) {
 		return true;
 	} else if (!(other instanceof ArrayPredictionContext)) {
 		return false;
-	} else if (this.hashString !== other.hashString()) {
+	} else if (this.hashCode() !== other.hashCode()) {
 		return false; // can't be same if hash is different
 	} else {
 		return this.returnStates === other.returnStates &&
@@ -318,7 +299,7 @@ function predictionContextFromRuleContext(atn, outerContext) {
 	var transition = state.transitions[0];
 	return SingletonPredictionContext.create(parent, transition.followState.stateNumber);
 }
-
+/*
 function calculateListsHashString(parents, returnStates) {
 	var s = "";
 	parents.map(function(p) {
@@ -329,7 +310,7 @@ function calculateListsHashString(parents, returnStates) {
 	});
 	return s;
 }
-
+*/
 function merge(a, b, rootIsWildcard, mergeCache) {
 	// share same graph if both same
 	if (a === b) {

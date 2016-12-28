@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
+
 package org.antlr.v4.test.tool;
 
 import org.antlr.v4.runtime.Lexer;
@@ -7,7 +13,7 @@ import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.antlr.v4.runtime.tree.xpath.XPath;
-import org.antlr.v4.test.runtime.java.BaseTest;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -17,7 +23,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class TestXPath extends BaseTest {
+public class TestXPath extends BaseJavaToolTest {
 	public static final String grammar =
 		"grammar Expr;\n" +
 		"prog:   func+ ;\n" +
@@ -51,6 +57,12 @@ public class TestXPath extends BaseTest {
 	public static final String SAMPLE_PROGRAM =
 			"def f(x,y) { x = 3+4; y; ; }\n" +
 			"def g(x) { return 1+2*x; }\n";
+
+	@Before
+	@Override
+	public void testSetUp() throws Exception {
+		super.testSetUp();
+	}
 
 	@Test public void testValidPaths() throws Exception {
 		boolean ok =

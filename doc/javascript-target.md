@@ -15,7 +15,7 @@ The tests were conducted using Selenium. No issue was found, so you should find 
 
 ## Is NodeJS supported?
 
-The runtime has also been extensively tested against Node.js 0.10.33. No issue was found.
+The runtime has also been extensively tested against Node.js 0.12.7. No issue was found.
 
 ## How to create a JavaScript lexer or parser?
 
@@ -31,7 +31,9 @@ For a full list of antlr4 tool options, please visit the [tool documentation pag
 
 Once you've generated the lexer and/or parser code, you need to download the runtime.
 
-The JavaScript runtime is available from the ANTLR web site [download section](http://www.antlr.org/download/index.html). The runtime is provided in the form of source code, so no additional installation is required.
+The JavaScript runtime is [available from npm](https://www.npmjs.com/package/antlr4).
+
+If you can't use npm, the JavaScript runtime is also available from the ANTLR web site [download section](http://www.antlr.org/download/index.html). The runtime is provided in the form of source code, so no additional installation is required.
 
 We will not document here how to refer to the runtime from your project, since this would differ a lot depending on your project type and IDE. 
 
@@ -47,11 +49,28 @@ However, it would be a bit of a problem when it comes to get it into a browser. 
 <script src='lib/myscript.js'>
 ```
 
-In order to avoid having to do this, and also to have the exact same code for browsers and Node.js, we rely on a script which provides the equivalent of the Node.js 'require' function.
+To avoid having doing this, the preferred approach is to bundle antlr4 with your parser code, using webpack.
 
-This script is provided by Torben Haase, and is NOT part of ANTLR JavaScript runtime, although the runtime heavily relies on it. Please note that syntax for 'require' in NodeJS is different from the one implemented by RequireJS and similar frameworks.  
+You can get [information on webpack here](https://webpack.github.io).
 
-So in short, assuming you have at the root of your web site, both the 'antlr4' directory and a 'lib' directory with 'require.js' inside it, all you need to put in your HTML header is the following:
+The steps to create your parsing code are the following:
+ - generate your lexer, parser, listener and visitor using the antlr tool
+ - write your parse tree handling code by providig your custom listener or visitor, and associated code, using 'require' to load antlr.
+ - create an index.js file with the entry point to your parsing code (or several if required).
+ - test your parsing logic thoroughly using node.js
+ 
+You are now ready to bundle your parsing code as follows:
+ - following webpack specs, create a webpack.config file
+ - in the webpack.config file, exclude node.js only modules using: node: { module: "empty", net: "empty", fs: "empty" }
+ - from the cmd line, nag-vigate to the directory containing webpack.config and type: webpack
+ 
+This will produce a single js file containing all your parsing code. Easy to include in your web pages!
+
+If you can't use webpack, you can use the lib/require.js script which implements the Node.js 'require' function in brwsers.
+
+This script is provided by Torben Haase, and is NOT part of ANTLR JavaScript runtime.   
+
+Assuming you have, at the root of your web site, both the 'antlr4' directory and a 'lib' directory with 'require.js' inside it, all you need to put in your HTML header is the following:
 
 ```xml
 <script src='lib/require.js'>
@@ -62,16 +81,6 @@ So in short, assuming you have at the root of your web site, both the 'antlr4' d
 
 This will load the runtime asynchronously.
 
-## How do I get the runtime in Node.js?
-
-Right now, there is no npm package available, so you need to register a link instead. This can be done by running the following command from the antlr4 directory:
-
-```bash
-$ npm link antlr4
-```
-
-This will install antlr4 using the package.son descriptor that comes with the script.
- 
 ## How do I run the generated lexer and/or parser?
 
 Let's suppose that your grammar is named, as above, "MyGrammar". Let's suppose this parser comprises a rule named "StartRule". The tool will have generated for you the following files:

@@ -1,31 +1,6 @@
-/*
- * [The "BSD license"]
- *  Copyright (c) 2013 Terence Parr
- *  Copyright (c) 2013 Sam Harwell
- *  All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions
- *  are met:
- *
- *  1. Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  2. Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  3. The name of the author may not be used to endorse or promote products
- *     derived from this software without specific prior written permission.
- *
- *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- *  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- *  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
  */
 using System;
 using System.Collections.Generic;
@@ -89,7 +64,7 @@ namespace Antlr4.Runtime
         /// <see cref="p"/>
         /// <c>]</c>
         /// should be
-        /// <see cref="Lt(int)">LT(1)</see>
+        /// <see cref="LT(int)">LT(1)</see>
         /// .
         /// <p>This field is set to -1 when the stream is first constructed or when
         /// <see cref="SetTokenSource(ITokenSource)"/>
@@ -104,7 +79,7 @@ namespace Antlr4.Runtime
 
         /// <summary>
         /// Indicates whether the
-        /// <see cref="TokenConstants.Eof"/>
+        /// <see cref="TokenConstants.EOF"/>
         /// token has been fetched from
         /// <see cref="_tokenSource"/>
         /// and added to
@@ -122,7 +97,7 @@ namespace Antlr4.Runtime
         /// and
         /// <see cref="p"/>
         /// instead of calling
-        /// <see cref="La(int)"/>
+        /// <see cref="LA(int)"/>
         /// .</li>
         /// <li>
         /// <see cref="Fetch(int)"/>
@@ -209,7 +184,7 @@ namespace Antlr4.Runtime
                 // not yet initialized
                 skipEofCheck = false;
             }
-            if (!skipEofCheck && La(1) == IntStreamConstants.Eof)
+            if (!skipEofCheck && LA(1) == IntStreamConstants.EOF)
             {
                 throw new InvalidOperationException("cannot consume EOF");
             }
@@ -225,7 +200,7 @@ namespace Antlr4.Runtime
         /// in tokens has a token.
         /// </summary>
         /// <returns>
-        /// 
+        ///
         /// <see langword="true"/>
         /// if a token is located at index
         /// <paramref name="i"/>
@@ -268,7 +243,7 @@ namespace Antlr4.Runtime
                     ((IWritableToken)t).TokenIndex = tokens.Count;
                 }
                 tokens.Add(t);
-                if (t.Type == TokenConstants.Eof)
+                if (t.Type == TokenConstants.EOF)
                 {
                     fetchedEOF = true;
                     return i + 1;
@@ -303,7 +278,7 @@ namespace Antlr4.Runtime
             for (int i = start; i <= stop; i++)
             {
                 IToken t = tokens[i];
-                if (t.Type == TokenConstants.Eof)
+                if (t.Type == TokenConstants.EOF)
                 {
                     break;
                 }
@@ -312,9 +287,9 @@ namespace Antlr4.Runtime
             return subset;
         }
 
-        public virtual int La(int i)
+        public virtual int LA(int i)
         {
-            return Lt(i).Type;
+            return LT(i).Type;
         }
 
         protected internal virtual IToken Lb(int k)
@@ -327,7 +302,7 @@ namespace Antlr4.Runtime
         }
 
         [return: NotNull]
-        public virtual IToken Lt(int k)
+        public virtual IToken LT(int k)
         {
             LazyInit();
             if (k == 0)
@@ -477,7 +452,7 @@ namespace Antlr4.Runtime
             IToken token = tokens[i];
             while (token.Channel != channel)
             {
-                if (token.Type == TokenConstants.Eof)
+                if (token.Type == TokenConstants.EOF)
                 {
                     return i;
                 }
@@ -520,7 +495,7 @@ namespace Antlr4.Runtime
             while (i >= 0)
             {
                 IToken token = tokens[i];
-                if (token.Type == TokenConstants.Eof || token.Channel == channel)
+                if (token.Type == TokenConstants.EOF || token.Channel == channel)
                 {
                     return i;
                 }
@@ -681,7 +656,7 @@ namespace Antlr4.Runtime
             for (int i = start; i <= stop; i++)
             {
                 IToken t = tokens[i];
-                if (t.Type == TokenConstants.Eof)
+                if (t.Type == TokenConstants.EOF)
                 {
                     break;
                 }

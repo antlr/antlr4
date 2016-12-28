@@ -8,6 +8,6 @@ This runtime has been tested in Node.js, Safari, Firefox, Chrome and IE.
 
 See www.antlr.org for more information on ANTLR
 
-See https://theantlrguy.atlassian.net/wiki/display/ANTLR4/JavaScript+Target for more information on using ANTLR in JavaScript
+See https://github.com/antlr/antlr4/blob/master/doc/javascript-target.md for more information on using ANTLR in JavaScript
 
 

@@ -1,3 +1,9 @@
+<!--
+  ~ Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+  ~ Use of this file is governed by the BSD 3-clause license that
+  ~ can be found in the LICENSE.txt file in the project root.
+  -->
+
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
@@ -7,7 +13,7 @@
   </parent>
   <groupId>org.antlr</groupId>
   <artifactId>antlr4-master</artifactId>
-  <version>4.5.4-SNAPSHOT</version>
+  <version>4.6.1-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>ANTLR 4</name>
@@ -30,7 +36,7 @@
   <developers>
     <developer>
       <name>Terence Parr</name>
-      <url>http://antlr.org/wiki/display/~admin/Home</url>
+      <url>http://parrt.cs.usfca.edu</url>
       <roles>
         <role>Project lead - ANTLR</role>
       </roles>
@@ -49,11 +55,23 @@
       </roles>
     </developer>
     <developer>
+      <name>Peter Boyer</name>
+      <roles>
+        <role>Developer - Go</role>
+      </roles>
+    </developer>
+    <developer>
       <name>Jim Idle</name>
       <email>jimi@idle.ws</email>
       <url>http://www.linkedin.com/in/jimidle</url>
       <roles>
         <role>Developer - Maven Plugin</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Mike Lischke</name>
+      <roles>
+        <role>Developer - C++ Target</role>
       </roles>
     </developer>
   </developers>
@@ -63,6 +81,8 @@
     <module>tool</module>
     <module>antlr4-maven-plugin</module>
     <module>tool-testsuite</module>
+    <module>runtime-testsuite/annotations</module>
+    <module>runtime-testsuite/processors</module>
     <module>runtime-testsuite</module>
   </modules>
 
@@ -70,8 +90,8 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <antlr.testinprocess>true</antlr.testinprocess>
-    <maven.compiler.source>1.6</maven.compiler.source>
-    <maven.compiler.target>1.6</maven.compiler.target>
+    <maven.compiler.source>1.7</maven.compiler.source>
+    <maven.compiler.target>1.7</maven.compiler.target>
   </properties>
 
   <mailingLists>
@@ -99,7 +119,6 @@
         <directory>resources</directory>
       </resource>
     </resources>
-    <testSourceDirectory>test</testSourceDirectory>
     <testResources>
       <testResource>
         <directory>test</directory>
@@ -110,6 +129,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
+          <version>3.6.0</version>
           <configuration>
             <source>${maven.compiler.source}</source>
             <target>${maven.compiler.target}</target>

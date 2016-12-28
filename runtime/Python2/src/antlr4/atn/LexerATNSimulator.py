@@ -1,32 +1,7 @@
 #
-# [The "BSD license"]
-#  Copyright (c) 2012 Terence Parr
-#  Copyright (c) 2012 Sam Harwell
-#  Copyright (c) 2014 Eric Vergnaud
-#  All rights reserved.
-#
-#  Redistribution and use in source and binary forms, with or without
-#  modification, are permitted provided that the following conditions
-#  are met:
-#
-#  1. Redistributions of source code must retain the above copyright
-#     notice, this list of conditions and the following disclaimer.
-#  2. Redistributions in binary form must reproduce the above copyright
-#     notice, this list of conditions and the following disclaimer in the
-#     documentation and/or other materials provided with the distribution.
-#  3. The name of the author may not be used to endorse or promote products
-#     derived from this software without specific prior written permission.
-#
-#  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-#  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-#  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-#  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-#  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-#  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-#  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-#  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-#  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-#  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+# Use of this file is governed by the BSD 3-clause license that
+# can be found in the LICENSE.txt file in the project root.
 #/
 
 # When we hit an accept state in either the DFA or the ATN, we
@@ -69,7 +44,7 @@ class SimState(object):
         self.dfaState = None
 
 class LexerATNSimulator(ATNSimulator):
-    
+
     debug = False
     dfa_debug = False
 
@@ -130,7 +105,7 @@ class LexerATNSimulator(ATNSimulator):
     def matchATN(self, input):
         startState = self.atn.modeToStartState[self.mode]
 
-        if self.debug:
+        if LexerATNSimulator.debug:
             print("matchATN mode " + str(self.mode) + " start: " + str(startState))
 
         old_mode = self.mode
@@ -144,13 +119,13 @@ class LexerATNSimulator(ATNSimulator):
 
         predict = self.execATN(input, next)
 
-        if self.debug:
+        if LexerATNSimulator.debug:
             print("DFA after matchATN: " + str(self.decisionToDFA[old_mode].toLexerString()))
 
         return predict
 
     def execATN(self, input, ds0):
-        if self.debug:
+        if LexerATNSimulator.debug:
             print("start state closure=" + str(ds0.configs))
 
         if ds0.isAcceptState:
@@ -161,8 +136,8 @@ class LexerATNSimulator(ATNSimulator):
         s = ds0 # s is current/from DFA state
 
         while True: # while more work
-            if self.debug:
-                print("execATN loop starting closure: %s\n", s.configs)
+            if LexerATNSimulator.debug:
+                print("execATN loop starting closure:", str(s.configs))
 
             # As we move src->trg, src->trg, we keep track of the previous trg to
             # avoid looking up the DFA state again, which is expensive.
@@ -223,8 +198,8 @@ class LexerATNSimulator(ATNSimulator):
             return None
 
         target = s.edges[t - self.MIN_DFA_EDGE]
-        if self.debug and target is not None:
-            print("reuse state "+s.stateNumber+ " edge to "+target.stateNumber)
+        if LexerATNSimulator.debug and target is not None:
+            print("reuse state", str(s.stateNumber), "edge to", str(target.stateNumber))
 
         return target
 
@@ -280,8 +255,8 @@ class LexerATNSimulator(ATNSimulator):
             if currentAltReachedAcceptState and cfg.passedThroughNonGreedyDecision:
                 continue
 
-            if self.debug:
-                print("testing %s at %s\n", self.getTokenName(t), cfg.toString(self.recog, True))
+            if LexerATNSimulator.debug:
+                print("testing", self.getTokenName(t), "at",  str(cfg))
 
             for trans in cfg.state.transitions:          # for each transition
                 target = self.getReachableTarget(trans, t)
@@ -298,8 +273,8 @@ class LexerATNSimulator(ATNSimulator):
                         skipAlt = cfg.alt
 
     def accept(self, input, lexerActionExecutor, startIndex, index, line, charPos):
-        if self.debug:
-            print("ACTION %s\n", lexerActionExecutor)
+        if LexerATNSimulator.debug:
+            print("ACTION", lexerActionExecutor)
 
         # seek to after last char in token
         input.seek(index)
@@ -334,15 +309,15 @@ class LexerATNSimulator(ATNSimulator):
     # {@code false}.
     def closure(self, input, config, configs, currentAltReachedAcceptState,
                 speculative, treatEofAsEpsilon):
-        if self.debug:
-            print("closure("+config.toString(self.recog, True)+")")
+        if LexerATNSimulator.debug:
+            print("closure(" + str(config) + ")")
 
         if isinstance( config.state, RuleStopState ):
-            if self.debug:
+            if LexerATNSimulator.debug:
                 if self.recog is not None:
-                    print("closure at %s rule stop %s\n", self.recog.getRuleNames()[config.state.ruleIndex], config)
+                    print("closure at", self.recog.symbolicNames[config.state.ruleIndex],  "rule stop", str(config))
                 else:
-                    print("closure at rule stop %s\n", config)
+                    print("closure at rule stop", str(config))
 
             if config.context is None or config.context.hasEmptyPath():
                 if config.context is None or config.context.isEmpty():
@@ -404,7 +379,7 @@ class LexerATNSimulator(ATNSimulator):
                 # states reached by traversing predicates. Since this is when we
                 # test them, we cannot cash the DFA state target of ID.
 
-                if self.debug:
+                if LexerATNSimulator.debug:
                     print("EVAL rule "+ str(t.ruleIndex) + ":" + str(t.predIndex))
                 configs.hasSemanticContext = True
                 if self.evaluatePredicate(input, t.ruleIndex, t.predIndex, speculative):
@@ -516,7 +491,7 @@ class LexerATNSimulator(ATNSimulator):
             # Only track edges within the DFA bounds
             return to
 
-        if self.debug:
+        if LexerATNSimulator.debug:
             print("EDGE " + str(from_) + " -> " + str(to) + " upon "+ chr(tk))
 
         if from_.edges is None:
@@ -535,11 +510,7 @@ class LexerATNSimulator(ATNSimulator):
     def addDFAState(self, configs):
 
         proposed = DFAState(configs=configs)
-        firstConfigWithRuleStopState = None
-        for c in configs:
-            if isinstance(c.state, RuleStopState):
-                firstConfigWithRuleStopState = c
-                break
+        firstConfigWithRuleStopState = next((cfg for cfg in configs if isinstance(cfg.state, RuleStopState)), None)
 
         if firstConfigWithRuleStopState is not None:
             proposed.isAcceptState = True

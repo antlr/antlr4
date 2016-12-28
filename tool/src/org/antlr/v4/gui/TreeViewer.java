@@ -1,31 +1,7 @@
 /*
- * [The "BSD license"]
- *  Copyright (c) 2012 Terence Parr
- *  Copyright (c) 2012 Sam Harwell
- *  All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions
- *  are met:
- *
- *  1. Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  2. Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  3. The name of the author may not be used to endorse or promote products
- *     derived from this software without specific prior written permission.
- *
- *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- *  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- *  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
  */
 
 package org.antlr.v4.gui;
@@ -285,8 +261,8 @@ public class TreeViewer extends JComponent {
     private static final String DIALOG_DIVIDER_LOC_PREFS_KEY    = "dialog_divider_location";
     private static final String DIALOG_VIEWER_SCALE_PREFS_KEY   = "dialog_viewer_scale";
 
-	protected static JDialog showInDialog(final TreeViewer viewer) {
-		final JDialog dialog = new JDialog();
+	protected static JFrame showInDialog(final TreeViewer viewer) {
+		final JFrame dialog = new JFrame();
 		dialog.setTitle("Parse Tree Inspector");
 
         final Preferences prefs = Preferences.userNodeForPackage(TreeViewer.class);
@@ -393,6 +369,7 @@ public class TreeViewer extends JComponent {
 
 		// make viz
         WindowListener exitListener = new WindowAdapter() {
+	        @Override
             public void windowClosing(WindowEvent e) {
                 prefs.putInt(DIALOG_WIDTH_PREFS_KEY, (int) dialog.getSize().getWidth());
                 prefs.putInt(DIALOG_HEIGHT_PREFS_KEY, (int) dialog.getSize().getHeight());
@@ -431,7 +408,7 @@ public class TreeViewer extends JComponent {
 		return dialog;
 	}
 
-	private static void generatePNGFile(TreeViewer viewer, JDialog dialog) {
+	private static void generatePNGFile(TreeViewer viewer, JFrame dialog) {
 		BufferedImage bi = new BufferedImage(viewer.getSize().width,
 											 viewer.getSize().height,
 											 BufferedImage.TYPE_INT_ARGB);
@@ -536,14 +513,14 @@ public class TreeViewer extends JComponent {
 	}
 
 
-	public Future<JDialog> open() {
+	public Future<JFrame> open() {
 		final TreeViewer viewer = this;
 		viewer.setScale(1.5);
-		Callable<JDialog> callable = new Callable<JDialog>() {
-			JDialog result;
+		Callable<JFrame> callable = new Callable<JFrame>() {
+			JFrame result;
 
 			@Override
-			public JDialog call() throws Exception {
+			public JFrame call() throws Exception {
 				SwingUtilities.invokeAndWait(new Runnable() {
 					@Override
 					public void run() {
@@ -566,7 +543,7 @@ public class TreeViewer extends JComponent {
 	}
 
 	public void save(String fileName) throws IOException, PrintException {
-		JDialog dialog = new JDialog();
+		JFrame dialog = new JFrame();
 		Container contentPane = dialog.getContentPane();
 		((JComponent) contentPane).setBorder(BorderFactory.createEmptyBorder(
 				10, 10, 10, 10));

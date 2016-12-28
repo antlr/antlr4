@@ -68,9 +68,9 @@ expr : expr '*' expr
      ;
 ```
 
-ANTLR 4 automatically constructs parse trees for you and abstract syntax tree (AST) construction is no longer an option. See also What if I need ASTs not parse trees for a compiler, for example?
+ANTLR 4 automatically constructs parse trees for you and abstract syntax tree (AST) construction is no longer an option. See also [What if I need ASTs not parse trees for a compiler, for example?](https://github.com/antlr/antlr4/blob/master/doc/faq/parse-trees.md#what-if-i-need-asts-not-parse-trees-for-a-compiler-for-example).
 
-Another big difference is that we discourage the use of actions directly within the grammar because ANTLR 4 automatically generates [listeners and visitors](https://raw.githubusercontent.com/antlr/antlr4/master/doc/listeners.md) for you to use that trigger method calls when some phrases of interest are recognized during a tree walk after parsing. See also [Parse Tree Matching and XPath](https://raw.githubusercontent.com/antlr/antlr4/master/doc/tree-matching.md).
+Another big difference is that we discourage the use of actions directly within the grammar because ANTLR 4 automatically generates [listeners and visitors](https://github.com/antlr/antlr4/blob/master/doc/listeners.md) for you to use that trigger method calls when some phrases of interest are recognized during a tree walk after parsing. See also [Parse Tree Matching and XPath](https://github.com/antlr/antlr4/blob/master/doc/tree-matching.md).
 
 Semantic predicates are still allowed in both the parser and lexer rules as our actions.  For efficiency sake keep semantic predicates to the right edge of lexical rules.
 

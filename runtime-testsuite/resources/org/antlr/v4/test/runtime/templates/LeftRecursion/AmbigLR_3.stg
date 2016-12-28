@@ -1,7 +1,0 @@
-import "AmbigLR.stg"
-
-Input() ::= "b = 6<\n>"
-
-Output() ::= ""
-
-Errors() ::= ""

@@ -1,9 +1,0 @@
-import "PrefixOpWithActionAndLabel.stg"
-
-Input() ::= "a"
-
-Output() ::= <<
-a<\n>
->>
-
-Errors() ::= ""

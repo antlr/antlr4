@@ -1,31 +1,7 @@
 /*
- * [The "BSD license"]
- *  Copyright (c) 2012 Terence Parr
- *  Copyright (c) 2012 Sam Harwell
- *  All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions
- *  are met:
- *
- *  1. Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  2. Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  3. The name of the author may not be used to endorse or promote products
- *     derived from this software without specific prior written permission.
- *
- *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- *  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- *  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
  */
 
 package org.antlr.v4.codegen;
@@ -64,7 +40,7 @@ public abstract class Target {
 	 */
 	protected String[] targetCharValueEscape = new String[255];
 
-	private final CodeGenerator gen;
+	protected final CodeGenerator gen;
 	private final String language;
 	private STGroup templates;
 
@@ -99,7 +75,6 @@ public abstract class Target {
 	 */
 	public abstract String getVersion();
 
-
 	public STGroup getTemplates() {
 		if (templates == null) {
 			String version = getVersion();
@@ -114,25 +89,9 @@ public abstract class Target {
 		return templates;
 	}
 
-	protected void genFile(Grammar g,
-						   ST outputFileST,
-						   String fileName)
+	protected void genFile(Grammar g, ST outputFileST, String fileName)
 	{
 		getCodeGenerator().write(outputFileST, fileName);
-	}
-
-	protected void genListenerFile(Grammar g,
-								   ST outputFileST)
-	{
-		String fileName = getCodeGenerator().getListenerFileName();
-		getCodeGenerator().write(outputFileST, fileName);
-	}
-
-	protected void genRecognizerHeaderFile(Grammar g,
-										   ST headerFileST,
-										   String extName) // e.g., ".h"
-	{
-		// no header file by default
 	}
 
 	/** Get a meaningful name for a token type useful during code generation.
@@ -392,6 +351,55 @@ public abstract class Target {
 		return getTokenTypeAsTargetLabel(getCodeGenerator().g, ttype);
 	}
 
+	/** Generate TParser.java and TLexer.java from T.g4 if combined, else
+	 *  just use T.java as output regardless of type.
+	 */
+	public String getRecognizerFileName(boolean header) {
+		ST extST = getTemplates().getInstanceOf("codeFileExtension");
+		String recognizerName = gen.g.getRecognizerName();
+		return recognizerName+extST.render();
+	}
+
+	/** A given grammar T, return the listener name such as
+	 *  TListener.java, if we're using the Java target.
+ 	 */
+	public String getListenerFileName(boolean header) {
+		assert gen.g.name != null;
+		ST extST = getTemplates().getInstanceOf("codeFileExtension");
+		String listenerName = gen.g.name + "Listener";
+		return listenerName+extST.render();
+	}
+
+	/** A given grammar T, return the visitor name such as
+	 *  TVisitor.java, if we're using the Java target.
+ 	 */
+	public String getVisitorFileName(boolean header) {
+		assert gen.g.name != null;
+		ST extST = getTemplates().getInstanceOf("codeFileExtension");
+		String listenerName = gen.g.name + "Visitor";
+		return listenerName+extST.render();
+	}
+
+	/** A given grammar T, return a blank listener implementation
+	 *  such as TBaseListener.java, if we're using the Java target.
+ 	 */
+	public String getBaseListenerFileName(boolean header) {
+		assert gen.g.name != null;
+		ST extST = getTemplates().getInstanceOf("codeFileExtension");
+		String listenerName = gen.g.name + "BaseListener";
+		return listenerName+extST.render();
+	}
+
+	/** A given grammar T, return a blank listener implementation
+	 *  such as TBaseListener.java, if we're using the Java target.
+ 	 */
+	public String getBaseVisitorFileName(boolean header) {
+		assert gen.g.name != null;
+		ST extST = getTemplates().getInstanceOf("codeFileExtension");
+		String listenerName = gen.g.name + "BaseVisitor";
+		return listenerName+extST.render();
+	}
+
 	/**
 	 * Gets the maximum number of 16-bit unsigned integers that can be encoded
 	 * in a single segment of the serialized ATN.
@@ -524,4 +532,7 @@ public abstract class Target {
 	public boolean supportsOverloadedMethods() {
 		return true;
 	}
+
+	/** @since 4.6 */
+	public boolean needsHeader() { return false; }; // Override in targets that need header files.
 }

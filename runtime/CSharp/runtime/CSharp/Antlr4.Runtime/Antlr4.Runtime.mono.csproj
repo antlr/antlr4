@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Antlr4.Runtime</RootNamespace>
-    <AssemblyName>Antlr4.Runtime</AssemblyName>
+    <AssemblyName>Antlr4.Runtime.Standard</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <BaseIntermediateOutputPath>obj\net20\</BaseIntermediateOutputPath>
@@ -21,15 +21,15 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\net35\Debug\</OutputPath>
+    <OutputPath>lib\Debug</OutputPath>
     <DefineConstants>DEBUG;TRACE;NET35PLUS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <NoWarn>1591</NoWarn>
+    <NoWarn>1591 0659</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Optimize>true</Optimize>
-    <OutputPath>bin\net35\Release\</OutputPath>
+    <OutputPath>lib\Release</OutputPath>
     <DefineConstants>TRACE;NET35PLUS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -87,7 +87,6 @@
     <Compile Include="Atn\LookaheadEventInfo.cs" />
     <Compile Include="Atn\LoopEndState.cs" />
     <Compile Include="Atn\NotSetTransition.cs" />
-    <Compile Include="Atn\OrderedATNConfigSet.cs" />
     <Compile Include="Atn\ParseInfo.cs" />
     <Compile Include="Atn\ParserATNSimulator.cs" />
     <Compile Include="Atn\PlusBlockStartState.cs" />
@@ -232,6 +231,10 @@
     <Compile Include="Dfa\IEdgeMap.cs" />
     <Compile Include="Dfa\SingletonEdgeMap.cs" />
     <Compile Include="Dfa\SparseEdgeMap.cs" />
+    <Compile Include="Misc\Pair.cs" />
+    <Compile Include="Atn\LexerATNConfig.cs" />
+    <Compile Include="Atn\MergeCache.cs" />
+    <Compile Include="Misc\ArrayList.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

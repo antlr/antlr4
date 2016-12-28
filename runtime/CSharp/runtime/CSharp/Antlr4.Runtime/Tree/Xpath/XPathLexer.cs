@@ -42,7 +42,7 @@ public partial class XPathLexer : Lexer {
 	public XPathLexer(ICharStream input)
 		: base(input)
 	{
-		Interpreter = new LexerATNSimulator(this,_ATN);
+		Interpreter = new LexerATNSimulator(this, _ATN, null, null);
 	}
 
 	private static readonly string[] _LiteralNames = {

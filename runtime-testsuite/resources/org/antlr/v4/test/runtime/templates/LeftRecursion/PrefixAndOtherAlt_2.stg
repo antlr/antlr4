@@ -1,9 +1,0 @@
-import "PrefixAndOtherAlt.stg"
-
-Input() ::= "-1 + -1"
-
-Output() ::= <<
-(s (expr (expr (literal - 1)) (op +) (expr (literal - 1))) \<EOF>)<\n>
->>
-
-Errors() ::= ""

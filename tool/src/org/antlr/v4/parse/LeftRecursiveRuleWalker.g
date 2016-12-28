@@ -1,7 +1,7 @@
 /*
  * [The "BSD license"]
- *  Copyright (c) 2012 Terence Parr
- *  Copyright (c) 2012 Sam Harwell
+ *  Copyright (c) 2012-2016 Terence Parr
+ *  Copyright (c) 2012-2016 Sam Harwell
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -127,7 +127,7 @@ binary
 
 prefix
 	:	^(	ALT elementOptions?
-			({!((CommonTree)input.LT(1)).getText().equals(ruleName)}? element)+
+			element+
 			recurse epsilonElement*
 		 )
          {setAltAssoc((AltAST)$ALT,currentOuterAltNumber);}

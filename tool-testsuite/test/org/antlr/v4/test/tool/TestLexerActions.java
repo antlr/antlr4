@@ -1,11 +1,24 @@
+/*
+ * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
+
 package org.antlr.v4.test.tool;
 
-import org.antlr.v4.test.runtime.java.BaseTest;
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class TestLexerActions extends BaseTest {
+public class TestLexerActions extends BaseJavaToolTest {
+
+	@Before
+	@Override
+	public void testSetUp() throws Exception {
+		super.testSetUp();
+	}
+
 	// ----- ACTIONS --------------------------------------------------------
 
 	@Test public void testActionExecutedInDFA() throws Exception {

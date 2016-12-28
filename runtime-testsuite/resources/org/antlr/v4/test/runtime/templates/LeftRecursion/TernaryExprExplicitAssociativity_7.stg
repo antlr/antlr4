@@ -1,9 +1,0 @@
-import "TernaryExprExplicitAssociativity.stg"
-
-Input() ::= "a?b=c:d"
-
-Output() ::= <<
-(s (e (e a) ? (e (e b) = (e c)) : (e d)) \<EOF>)<\n>
->>
-
-Errors() ::= ""

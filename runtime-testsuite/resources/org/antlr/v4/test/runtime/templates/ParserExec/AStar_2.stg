@@ -1,9 +1,0 @@
-import "AStar.stg"
-
-Input() ::= "a b c"
-
-Output() ::= <<
-abc<\n>
->>
-
-Errors() ::= ""

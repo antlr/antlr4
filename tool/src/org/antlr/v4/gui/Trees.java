@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
+
 package org.antlr.v4.gui;
 
 import org.antlr.v4.runtime.Parser;
@@ -15,13 +21,13 @@ import java.util.concurrent.Future;
 
 public class Trees {
 	/** Call this method to view a parse tree in a dialog box visually. */
-	public static Future<JDialog> inspect(Tree t, List<String> ruleNames) {
+	public static Future<JFrame> inspect(Tree t, List<String> ruleNames) {
 		TreeViewer viewer = new TreeViewer(ruleNames, t);
 		return viewer.open();
 	}
 
 	/** Call this method to view a parse tree in a dialog box visually. */
-	public static Future<JDialog> inspect(Tree t, Parser parser) {
+	public static Future<JFrame> inspect(Tree t, Parser parser) {
 		List<String> ruleNames = parser != null ? Arrays.asList(parser.getRuleNames()) : null;
 		return inspect(t, ruleNames);
 	}
