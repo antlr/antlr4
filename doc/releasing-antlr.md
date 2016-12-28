@@ -47,7 +47,7 @@ Edit the repository looking for 4.5 or whatever and update it. Bump version in t
 Here is a simple script to display any line from the critical files with, say, `4.5` in it:
 
 ```bash
-find /tmp/antlr4 -type f -exec grep -l '4\.5' {} \;
+find tool runtime -type f -exec grep -l '4\.6' {} \;
 ```
 
 Commit to repository.
