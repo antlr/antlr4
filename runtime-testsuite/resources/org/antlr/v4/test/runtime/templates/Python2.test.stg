@@ -72,6 +72,8 @@ TokenStartColumnEquals(i) ::= <%self._tokenStartColumn==<i>%>
 
 ImportListener(X) ::= ""
 
+ImportVisitor(grammarName) ::= ""
+
 GetExpectedTokenNames() ::= "self.getExpectedTokens().toString(self.literalNames, self.symbolicNames)"
 
 RuleInvocationStack() ::= "str_list(self.getRuleInvocationStack())"
@@ -239,13 +241,12 @@ class LeafListener(TListener):
 }
 >>
 
-ImportVisitor(X) ::= ""
-BasicVisitor(X) ::= ""
 WalkVisitor(s) ::= ""
-LRWithLabelsVisitor(X) ::= ""
-RuleGetterVisitor(X) ::= ""
-LRVisitor(x) ::= ""
-TokenGetterVisitor(x) ::= ""
+TerminalVisitor(grammarName) ::= ""
+ErrorVisitor(grammarName) ::= ""
+ShouldNotVisitEOFVisitor(grammarName) ::= ""
+ShouldNotVisitTerminalVisitor(grammarName) ::= ""
+CalculatorVisitor(grammarName) ::= ""
 
 DeclareContextListGettersFunction() ::= <<
 def foo():

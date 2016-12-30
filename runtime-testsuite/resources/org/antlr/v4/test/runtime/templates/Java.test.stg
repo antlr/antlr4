@@ -72,6 +72,8 @@ TokenStartColumnEquals(i) ::= <%this._tokenStartCharPositionInLine==<i>%>
 
 ImportListener(X) ::= ""
 
+ImportVisitor(grammarName) ::= ""
+
 GetExpectedTokenNames() ::= "this.getExpectedTokens().toString(this.tokenNames)"
 
 RuleInvocationStack() ::= "getRuleInvocationStack()"
@@ -234,7 +236,6 @@ public static class LeafListener extends TBaseListener {
 }
 >>
 
-
 LRListener(X) ::= <<
 @parser::members {
 public static class LeafListener extends TBaseListener {
@@ -262,13 +263,138 @@ public static class LeafListener extends TBaseListener {
 }
 >>
 
-ImportVisitor(X) ::= ""
-BasicVisitor(X) ::= ""
-WalkVisitor(s) ::= ""
-LRWithLabelsVisitor(X) ::= ""
-RuleGetterVisitor(X) ::= ""
-LRVisitor(x) ::= ""
-TokenGetterVisitor(x) ::= ""
+WalkVisitor(s) ::= <<
+System.out.println(new LeafVisitor().visit(<s>));
+>>
+
+TerminalVisitor(grammarName) ::= <<
+@parser::members {
+	public static class LeafVisitor extends <grammarName>BaseVisitor\<String> {
+		@Override
+		public String visitTerminal(TerminalNode node) {
+			return node.getSymbol().toString() + "\n";
+		}
+
+		@Override
+		protected String defaultResult() {
+			return "";
+		}
+
+		@Override
+		protected String aggregateResult(String aggregate, String nextResult) {
+			return aggregate + nextResult;
+		}
+	}
+}
+>>
+
+ErrorVisitor(grammarName) ::= <<
+@parser::members {
+	public static class LeafVisitor extends <grammarName>BaseVisitor\<String> {
+		@Override
+		public String visitErrorNode(ErrorNode node) {
+			return "Error encountered: " + node.getSymbol();
+		}
+
+		@Override
+		protected String defaultResult() {
+			return "";
+		}
+
+		@Override
+		protected String aggregateResult(String aggregate, String nextResult) {
+			return aggregate + nextResult;
+		}
+	}
+}
+>>
+
+ShouldNotVisitEOFVisitor(grammarName) ::= <<
+@parser::members {
+	public static class LeafVisitor extends <grammarName>BaseVisitor\<String> {
+		@Override
+		public String visitTerminal(TerminalNode node) {
+			return node.getSymbol().toString() + "\n";
+		}
+
+		@Override
+		protected boolean shouldVisitNextChild(RuleNode node, String currentResult) {
+			return currentResult == null || currentResult.isEmpty();
+		}
+	}
+}
+>>
+
+ShouldNotVisitTerminalVisitor(grammarName) ::= <<
+@parser::members {
+	public static class LeafVisitor extends <grammarName>BaseVisitor\<String> {
+		@Override
+		public String visitTerminal(TerminalNode node) {
+			throw new RuntimeException("Should not be reachable");
+		}
+
+		@Override
+		protected String defaultResult() {
+			return "default result";
+		}
+
+		@Override
+		protected boolean shouldVisitNextChild(RuleNode node, String currentResult) {
+			return false;
+		}
+	}
+}
+>>
+
+CalculatorVisitor(grammarName) ::= <<
+@parser::members {
+	public static class LeafVisitor extends <grammarName>BaseVisitor\<Integer> {
+		@Override
+		public Integer visitS(SContext ctx) {
+			return visit(ctx.expr());
+		}
+
+		@Override
+		public Integer visitNumber(NumberContext ctx) {
+			return Integer.valueOf(ctx.INT().getText());
+		}
+
+		@Override
+		public Integer visitMultiply(MultiplyContext ctx) {
+			Integer left = visit(ctx.expr(0));
+			Integer right = visit(ctx.expr(1));
+			if (ctx.MUL() != null) {
+				return left * right;
+			}
+			else {
+				return left / right;
+			}
+		}
+
+		@Override
+		public Integer visitAdd(AddContext ctx) {
+			Integer left = visit(ctx.expr(0));
+			Integer right = visit(ctx.expr(1));
+			if (ctx.ADD() != null) {
+				return left + right;
+			}
+			else {
+				return left - right;
+			}
+		}
+
+		@Override
+		protected Integer defaultResult() {
+			throw new RuntimeException("Should not be reachable");
+		}
+
+		@Override
+		protected Integer aggregateResult(Integer aggregate, Integer nextResult) {
+			throw new RuntimeException("Should not be reachable");
+		}
+	}
+}
+>>
 
 DeclareContextListGettersFunction() ::= <<
 void foo() {
