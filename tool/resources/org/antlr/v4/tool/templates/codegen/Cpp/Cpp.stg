@@ -1014,7 +1014,7 @@ ContextRuleListIndexedGetterDecl(r) ::= <<
 
 >>
 
-LexerRuleContext() ::= "antlr4::RuleContext"
+LexerRuleContext() ::= "RuleContext"
 
 // The rule context name is the rule followed by a suffix; e.g. r becomes rContext.
 RuleContextNameSuffix() ::= "Context"

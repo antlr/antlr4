@@ -20,10 +20,10 @@ namespace dfa {
     /// Set only allows you to see if it's there.
 
     /// From which ATN state did we create this DFA?
-    atn::DecisionState *const atnStartState;
+    atn::DecisionState *atnStartState;
     std::unordered_set<DFAState *, DFAState::Hasher, DFAState::Comparer> states; // States are owned by this class.
     DFAState *s0;
-    const size_t decision;
+    size_t decision;
 
     DFA(atn::DecisionState *atnStartState);
     DFA(atn::DecisionState *atnStartState, size_t decision);
@@ -85,7 +85,6 @@ namespace dfa {
      * {@code false}. This is the backing field for {@link #isPrecedenceDfa}.
      */
     bool _precedenceDfa;
-    DFAState *_s0Shadow = nullptr; // ml: assigned when we created s0 ourselves.
   };
 
 } // namespace atn
