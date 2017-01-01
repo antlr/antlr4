@@ -2,6 +2,7 @@
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
+
 package antlr
 
 import (
@@ -217,11 +218,8 @@ func (d *DefaultErrorStrategy) Sync(recognizer Parser) {
 	la := recognizer.GetTokenStream().LA(1)
 
 	// try cheaper subset first might get lucky. seems to shave a wee bit off
-	if la == TokenEOF || recognizer.GetATN().NextTokens(s, nil).contains(la) {
-		return
-	}
-	// Return but don't end recovery. only do that upon valid token Match
-	if recognizer.IsExpectedToken(la) {
+	nextTokens := recognizer.GetATN().NextTokens(s, nil)
+	if nextTokens.contains(TokenEpsilon) || nextTokens.contains(la) {
 		return
 	}
 

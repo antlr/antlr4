@@ -729,4 +729,20 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 		String[] pair = { grammar, expected };
 		super.testErrors(pair, true);
 	}
+
+	// Test for https://github.com/antlr/antlr4/issues/1556
+	@Test public void testRangeInParserGrammar() {
+		String grammar =
+			"grammar T;\n"+
+			"a:  'A'..'Z' ;\n";
+		String expected =
+			"error(" + ErrorType.TOKEN_RANGE_IN_PARSER.code + "): T.g4:2:4: token ranges not allowed in parser: 'A'..'Z'\n";
+
+		String[] pair = new String[] {
+			grammar,
+			expected
+		};
+
+		super.testErrors(pair, true);
+	}
 }

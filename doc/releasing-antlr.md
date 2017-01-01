@@ -33,21 +33,29 @@ Edit the repository looking for 4.5 or whatever and update it. Bump version in t
  * runtime/Python3/src/antlr4/Recognizer.py
  * runtime/CSharp/runtime/CSharp/Antlr4.Runtime/Properties/AssemblyInfo.cs
  * runtime/CSharp/build/version.ps1
+ * runtime/CSharp/runtime/CSharp/Package.nuspec
  * runtime/JavaScript/src/antlr4/package.json
  * runtime/JavaScript/src/antlr4/Recognizer.js
  * runtime/Cpp/VERSION
  * runtime/Cpp/runtime/src/RuntimeMetaData.cpp
  * runtime/Cpp/cmake/ExternalAntlr4Cpp.cmake
+ * runtime/Cpp/demo/generate.cmd
+ * runtime/Go/antlr/recognizer.go
+ * runtime/Swift/Antlr4/org/antlr/v4/runtime/RuntimeMetaData.swift
+ * tool/src/org/antlr/v4/codegen/target/GoTarget.java
  * tool/src/org/antlr/v4/codegen/target/CppTarget.java
  * tool/src/org/antlr/v4/codegen/target/CSharpTarget.java
  * tool/src/org/antlr/v4/codegen/target/JavaScriptTarget.java
  * tool/src/org/antlr/v4/codegen/target/Python2Target.java
  * tool/src/org/antlr/v4/codegen/target/Python3Target.java
+ * tool/src/org/antlr/v4/codegen/target/SwiftTarget.java
+ * tool/src/org/antlr/v4/codegen/Target.java
+ * tool/resources/org/antlr/v4/tool/templates/codegen/Swift/Swift.stg
  
 Here is a simple script to display any line from the critical files with, say, `4.5` in it:
 
 ```bash
-find /tmp/antlr4 -type f -exec grep -l '4\.5' {} \;
+find tool runtime -type f -exec grep -l '4\.6' {} \;
 ```
 
 Commit to repository.

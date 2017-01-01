@@ -1045,6 +1045,21 @@ public enum ErrorType {
 	 */
 	CHARACTERS_COLLISION_IN_SET(180, "chars \"<arg>\" used multiple times in set <arg2>", ErrorSeverity.WARNING),
 
+	/**
+	 * Compiler Warning 181
+	 *
+	 * <p>The token range operator makes no sense in the parser as token types
+	 * are not ordered (except in implementation).
+	 * </p>
+	 *
+	 * <pre>
+	 * grammar T;
+	 * a : 'A'..'Z' ;
+	 * </pre>
+	 *
+	 */
+	TOKEN_RANGE_IN_PARSER(181, "token ranges not allowed in parser: <arg>..<arg2>", ErrorSeverity.ERROR),
+
 	/*
 	 * Backward incompatibility errors
 	 */

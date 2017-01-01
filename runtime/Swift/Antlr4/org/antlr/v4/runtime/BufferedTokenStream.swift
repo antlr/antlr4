@@ -402,7 +402,7 @@ public class BufferedTokenStream: TokenStream {
 
     /** Collect all hidden tokens (any off-default channel) to the right of
      *  the current token up until we see a token on DEFAULT_TOKEN_CHANNEL
-     *  of EOF.
+     *  or EOF.
      */
     public func getHiddenTokensToRight(_ tokenIndex: Int) throws -> Array<Token>? {
         return try getHiddenTokensToRight(tokenIndex, -1)
