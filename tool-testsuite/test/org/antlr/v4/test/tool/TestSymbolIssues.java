@@ -9,6 +9,7 @@ package org.antlr.v4.test.tool;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.LexerGrammar;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -316,6 +317,49 @@ public class TestSymbolIssues extends BaseJavaToolTest {
 
 				"error(" + ErrorType.LABEL_TYPE_CONFLICT.code + "): L.g4:8:15: label t2=b type mismatch with previous definition: t2=a\n" +
 				"error(" + ErrorType.LABEL_TYPE_CONFLICT.code + "): L.g4:11:17: label t3+=c type mismatch with previous definition: t3+=a\n"
+		};
+
+		testErrors(test, false);
+	}
+
+	// https://github.com/antlr/antlr4/issues/1543
+	@Test public void testLabelsForTokensWithMixedTypesLRWithLabels() {
+		String[] test = {
+				"grammar L;\n" +
+				"\n" +
+				"expr\n" +
+				"    : left=A '+' right=A        #primary\n" +
+				"    | left=expr '-' right=expr  #sub\n" +
+				"    ;\n" +
+				"\n" +
+				"A: 'a';\n" +
+				"B: 'b';\n" +
+				"C: 'c';\n",
+
+				""
+		};
+
+		testErrors(test, false);
+	}
+
+	// https://github.com/antlr/antlr4/issues/1543
+	@Test
+	@Ignore
+	public void testLabelsForTokensWithMixedTypesLRWithoutLabels() {
+		String[] test = {
+				"grammar L;\n" +
+				"\n" +
+				"expr\n" +
+				"    : left=A '+' right=A\n" +
+				"    | left=expr '-' right=expr\n" +
+				"    ;\n" +
+				"\n" +
+				"A: 'a';\n" +
+				"B: 'b';\n" +
+				"C: 'c';\n",
+
+				"error(" + ErrorType.LABEL_TYPE_CONFLICT.code + "): L.g4:5:7: label left=expr type mismatch with previous definition: left=A\n" +
+				"error(" + ErrorType.LABEL_TYPE_CONFLICT.code + "): L.g4:5:19: label right=expr type mismatch with previous definition: right=A\n"
 		};
 
 		testErrors(test, false);

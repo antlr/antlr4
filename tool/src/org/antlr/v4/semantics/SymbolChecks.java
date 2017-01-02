@@ -20,6 +20,7 @@ import org.antlr.v4.tool.LexerGrammar;
 import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.antlr.v4.tool.LabelType;
+import org.antlr.v4.tool.LeftRecursiveRule;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -127,6 +128,12 @@ public class SymbolChecks {
     public void checkForLabelConflicts(Collection<Rule> rules) {
 		for (Rule r : rules) {
 			checkForAttributeConflicts(r);
+			if (r instanceof LeftRecursiveRule) {
+				// Label conflicts for left recursive rules need to be checked
+				// prior to the left recursion elimination step.
+				continue;
+			}
+
 			Map<String, LabelElementPair> labelNameSpace =
 					new HashMap<String, LabelElementPair>();
 			for (int i = 1; i <= r.numberOfAlts; i++) {
