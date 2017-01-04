@@ -65,7 +65,7 @@ function ParseTreeVisitor() {
 ParseTreeVisitor.prototype.visit = function(ctx) {
  	if (Array.isArray(ctx)) {
 		return ctx.map(function(child) {
-            return ctx.accept(this);
+            return child.accept(this);
         }, this);
 	} else {
 		return ctx.accept(this);
