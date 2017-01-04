@@ -183,11 +183,12 @@ public class ElementFrequenciesVisitor extends GrammarTreeVisitor {
 			for (Map.Entry<String, MutableInt> entry : frequencies.peek().entrySet()) {
 				entry.getValue().v = 2;
 			}
+		}
 
-			int multiplier = tree.getType() == POSITIVE_CLOSURE ? 1 : 0;
-			for (Map.Entry<String, MutableInt> entry : minFrequencies.peek().entrySet()) {
-				entry.getValue().v *= multiplier;
-			}
+		if (tree.getType() == CLOSURE) {
+			// Everything inside a closure is optional, so the minimum
+			// number of occurrences for all elements is 0.
+			minFrequencies.peek().clear();
 		}
 	}
 
@@ -225,11 +226,12 @@ public class ElementFrequenciesVisitor extends GrammarTreeVisitor {
 			for (Map.Entry<String, MutableInt> entry : frequencies.peek().entrySet()) {
 				entry.getValue().v = 2;
 			}
+		}
 
-			int multiplier = tree.getType() == POSITIVE_CLOSURE ? 1 : 0;
-			for (Map.Entry<String, MutableInt> entry : minFrequencies.peek().entrySet()) {
-				entry.getValue().v *= multiplier;
-			}
+		if (tree.getType() == CLOSURE) {
+			// Everything inside a closure is optional, so the minimum
+			// number of occurrences for all elements is 0.
+			minFrequencies.peek().clear();
 		}
 	}
 }
