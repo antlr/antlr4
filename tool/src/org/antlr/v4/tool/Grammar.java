@@ -1,37 +1,14 @@
 /*
- * [The "BSD license"]
- *  Copyright (c) 2012 Terence Parr
- *  Copyright (c) 2012 Sam Harwell
- *  All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions
- *  are met:
- *
- *  1. Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  2. Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  3. The name of the author may not be used to endorse or promote products
- *     derived from this software without specific prior written permission.
- *
- *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- *  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- *  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
  */
 
 package org.antlr.v4.tool;
 
 import org.antlr.v4.Tool;
 import org.antlr.v4.analysis.LeftRecursiveRuleTransformer;
+import org.antlr.v4.automata.ParserATNFactory;
 import org.antlr.v4.misc.CharSupport;
 import org.antlr.v4.misc.OrderedHashMap;
 import org.antlr.v4.misc.Utils;
@@ -45,6 +22,8 @@ import org.antlr.v4.runtime.LexerInterpreter;
 import org.antlr.v4.runtime.ParserInterpreter;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStream;
+import org.antlr.v4.runtime.Vocabulary;
+import org.antlr.v4.runtime.VocabularyImpl;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNDeserializer;
 import org.antlr.v4.runtime.atn.ATNSerializer;
@@ -53,8 +32,6 @@ import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntSet;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.IntervalSet;
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.tool.ast.ActionAST;
 import org.antlr.v4.tool.ast.AltAST;
@@ -71,6 +48,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -100,9 +78,11 @@ public class Grammar implements AttributeResolver {
 	public static final Set<String> parserOptions = new HashSet<String>();
 	static {
 		parserOptions.add("superClass");
+		parserOptions.add("contextSuperClass");
 		parserOptions.add("TokenLabelType");
 		parserOptions.add("tokenVocab");
 		parserOptions.add("language");
+		parserOptions.add("exportMacro");
 	}
 
 	public static final Set<String> lexerOptions = parserOptions;
@@ -116,14 +96,14 @@ public class Grammar implements AttributeResolver {
 
 	public static final Set<String> LexerBlockOptions = new HashSet<String>();
 
-	/** Legal options for rule refs like id<key=value> */
+	/** Legal options for rule refs like id&lt;key=value&gt; */
 	public static final Set<String> ruleRefOptions = new HashSet<String>();
 	static {
 		ruleRefOptions.add(LeftRecursiveRuleTransformer.PRECEDENCE_OPTION_NAME);
 		ruleRefOptions.add(LeftRecursiveRuleTransformer.TOKENINDEX_OPTION_NAME);
 	}
 
-	/** Legal options for terminal refs like ID<assoc=right> */
+	/** Legal options for terminal refs like ID&lt;assoc=right&gt; */
 	public static final Set<String> tokenOptions = new HashSet<String>();
 	static {
 		tokenOptions.add("assoc");
@@ -156,10 +136,19 @@ public class Grammar implements AttributeResolver {
 
 	public String name;
     public GrammarRootAST ast;
-	/** Track stream used to create this grammar */
-	@NotNull
+
+	/** Track token stream used to create this grammar */
+
 	public final org.antlr.runtime.TokenStream tokenStream;
-	/** If we transform grammar, track original unaltered token stream */
+
+	/** If we transform grammar, track original unaltered token stream.
+	 *  This is set to the same value as tokenStream when tokenStream is
+	 *  initially set.
+	 *
+	 *  If this field differs from tokenStream, then we have transformed
+	 *  the grammar.
+	 */
+
 	public org.antlr.runtime.TokenStream originalTokenStream;
 
     public String text; // testing only
@@ -214,7 +203,6 @@ public class Grammar implements AttributeResolver {
 
 	public List<IntervalSet[]> decisionLOOK;
 
-	@NotNull
 	public final Tool tool;
 
 	/** Token names and literal tokens like "void" are uniquely indexed.
@@ -293,7 +281,7 @@ public class Grammar implements AttributeResolver {
 
 	public static final String AUTO_GENERATED_TOKEN_NAME_PREFIX = "T__";
 
-	public Grammar(Tool tool, @NotNull GrammarRootAST ast) {
+	public Grammar(Tool tool, GrammarRootAST ast) {
 		if ( ast==null ) {
 			throw new NullPointerException("ast");
 		}
@@ -306,6 +294,7 @@ public class Grammar implements AttributeResolver {
         this.ast = ast;
         this.name = (ast.getChild(0)).getText();
 		this.tokenStream = ast.tokenStream;
+		this.originalTokenStream = this.tokenStream;
 
 		initTokenSymbolTables();
     }
@@ -334,19 +323,28 @@ public class Grammar implements AttributeResolver {
 	}
 
 	/** For testing; builds trees, does sem anal */
-	public Grammar(String fileName, String grammarText, @Nullable ANTLRToolListener listener)
+	public Grammar(String fileName, String grammarText, ANTLRToolListener listener)
 		throws org.antlr.runtime.RecognitionException
 	{
 		this(fileName, grammarText, null, listener);
 	}
 
 	/** For testing; builds trees, does sem anal */
-	public Grammar(String fileName, String grammarText, Grammar tokenVocabSource, @Nullable ANTLRToolListener listener)
+	public Grammar(String fileName, String grammarText, Grammar tokenVocabSource, ANTLRToolListener listener)
 		throws org.antlr.runtime.RecognitionException
 	{
         this.text = grammarText;
 		this.fileName = fileName;
 		this.tool = new Tool();
+		ANTLRToolListener hush = new ANTLRToolListener() {
+			@Override
+			public void info(String msg) { }
+			@Override
+			public void error(ANTLRMessage msg) { }
+			@Override
+			public void warning(ANTLRMessage msg) { }
+		};
+		tool.addListener(hush); // we want to hush errors/warnings
 		this.tool.addListener(listener);
 		org.antlr.runtime.ANTLRStringStream in = new org.antlr.runtime.ANTLRStringStream(grammarText);
 		in.name = fileName;
@@ -361,6 +359,7 @@ public class Grammar implements AttributeResolver {
 		}
 
 		this.tokenStream = ast.tokenStream;
+		this.originalTokenStream = this.tokenStream;
 
 		// ensure each node has pointer to surrounding grammar
 		final Grammar thiz = this;
@@ -391,6 +390,8 @@ public class Grammar implements AttributeResolver {
 		if ( ast==null ) return;
         GrammarAST i = (GrammarAST)ast.getFirstChildWithType(ANTLRParser.IMPORT);
         if ( i==null ) return;
+	    Set<String> visited = new HashSet<>();
+	    visited.add(this.name);
         importedGrammars = new ArrayList<Grammar>();
         for (Object c : i.getChildren()) {
             GrammarAST t = (GrammarAST)c;
@@ -398,11 +399,12 @@ public class Grammar implements AttributeResolver {
             if ( t.getType()==ANTLRParser.ASSIGN ) {
 				t = (GrammarAST)t.getChild(1);
 				importedGrammarName = t.getText();
-                tool.log("grammar", "import "+ importedGrammarName);
             }
             else if ( t.getType()==ANTLRParser.ID ) {
                 importedGrammarName = t.getText();
-                tool.log("grammar", "import " + t.getText());
+			}
+			if ( visited.contains(importedGrammarName) ) { // ignore circular refs
+				continue;
 			}
 			Grammar g;
 			try {
@@ -449,7 +451,7 @@ public class Grammar implements AttributeResolver {
 	 * instance; otherwise, {@code false} if a rule with this name already
 	 * existed in the grammar instance.
 	 */
-	public boolean defineRule(@NotNull Rule r) {
+	public boolean defineRule(Rule r) {
 		if ( rules.get(r.name)!=null ) {
 			return false;
 		}
@@ -476,7 +478,7 @@ public class Grammar implements AttributeResolver {
 	 * instance; otherwise, {@code false} if the specified rule was not defined
 	 * in the grammar.
 	 */
-	public boolean undefineRule(@NotNull Rule r) {
+	public boolean undefineRule(Rule r) {
 		if (r.index < 0 || r.index >= indexToRule.size() || indexToRule.get(r.index) != r) {
 			return false;
 		}
@@ -518,6 +520,14 @@ public class Grammar implements AttributeResolver {
 		*/
 	}
 
+	public ATN getATN() {
+		if ( atn==null ) {
+			ParserATNFactory factory = new ParserATNFactory(this);
+			atn = factory.createATN();
+		}
+		return atn;
+	}
+
 	public Rule getRule(int index) { return indexToRule.get(index); }
 
 	public Rule getRule(String grammarName, String ruleName) {
@@ -556,27 +566,26 @@ public class Grammar implements AttributeResolver {
      *  The grammars are in import tree preorder.  Don't include ourselves
      *  in list as we're not a delegate of ourselves.
      */
-    public List<Grammar> getAllImportedGrammars() {
-        if ( importedGrammars==null ) return null;
-        List<Grammar> delegates = new ArrayList<Grammar>();
-		for (Grammar d : importedGrammars) {
-			delegates.add(d);
-			List<Grammar> ds = d.getAllImportedGrammars();
-			if (ds != null) delegates.addAll(ds);
+	public List<Grammar> getAllImportedGrammars() {
+		if (importedGrammars == null) {
+			return null;
 		}
-        return delegates;
-    }
+
+		LinkedHashMap<String, Grammar> delegates = new LinkedHashMap<String, Grammar>();
+		for (Grammar d : importedGrammars) {
+			delegates.put(d.fileName, d);
+			List<Grammar> ds = d.getAllImportedGrammars();
+			if (ds != null) {
+				for (Grammar imported : ds) {
+					delegates.put(imported.fileName, imported);
+				}
+			}
+		}
+
+		return new ArrayList<Grammar>(delegates.values());
+	}
 
     public List<Grammar> getImportedGrammars() { return importedGrammars; }
-
-    /** Get delegates below direct delegates of g
-    public List<Grammar> getIndirectDelegates(Grammar g) {
-        List<Grammar> direct = getDirectDelegates(g);
-        List<Grammar> delegates = getDelegates(g);
-        delegates.removeAll(direct);
-        return delegates;
-    }
-*/
 
 	public LexerGrammar getImplicitLexer() {
 		return implicitLexer;
@@ -707,7 +716,7 @@ public class Grammar implements AttributeResolver {
 	 * @param ttype The token type.
 	 * @return The name of the token with the specified type.
 	 */
-	@NotNull
+
 	public String getTokenName(int ttype) {
 		// inside any target's char range and is lexer grammar?
 		if ( isLexer() &&
@@ -801,6 +810,53 @@ public class Grammar implements AttributeResolver {
 		}
 
 		return tokenNames;
+	}
+
+	/**
+	 * Gets the literal names assigned to tokens in the grammar.
+	 */
+
+	public String[] getTokenLiteralNames() {
+		int numTokens = getMaxTokenType();
+		String[] literalNames = new String[numTokens+1];
+		for (int i = 0; i < Math.min(literalNames.length, typeToStringLiteralList.size()); i++) {
+			literalNames[i] = typeToStringLiteralList.get(i);
+		}
+
+		for (Map.Entry<String, Integer> entry : stringLiteralToTypeMap.entrySet()) {
+			if (entry.getValue() >= 0 && entry.getValue() < literalNames.length && literalNames[entry.getValue()] == null) {
+				literalNames[entry.getValue()] = entry.getKey();
+			}
+		}
+
+		return literalNames;
+	}
+
+	/**
+	 * Gets the symbolic names assigned to tokens in the grammar.
+	 */
+
+	public String[] getTokenSymbolicNames() {
+		int numTokens = getMaxTokenType();
+		String[] symbolicNames = new String[numTokens+1];
+		for (int i = 0; i < Math.min(symbolicNames.length, typeToTokenList.size()); i++) {
+			if (typeToTokenList.get(i) == null || typeToTokenList.get(i).startsWith(AUTO_GENERATED_TOKEN_NAME_PREFIX)) {
+				continue;
+			}
+
+			symbolicNames[i] = typeToTokenList.get(i);
+		}
+
+		return symbolicNames;
+	}
+
+	/**
+	 * Gets a {@link Vocabulary} instance describing the vocabulary used by the
+	 * grammar.
+	 */
+
+	public Vocabulary getVocabulary() {
+		return new VocabularyImpl(getTokenLiteralNames(), getTokenSymbolicNames());
 	}
 
 	/** Given an arbitrarily complex SemanticContext, walk the "tree" and get display string.
@@ -1216,7 +1272,7 @@ public class Grammar implements AttributeResolver {
 	}
 
 	public Set<String> getStringLiterals() {
-		final Set<String> strings = new HashSet<String>();
+		final Set<String> strings = new LinkedHashSet<String>();
 		GrammarTreeVisitor collector = new GrammarTreeVisitor() {
 			@Override
 			public void stringRef(TerminalAST ref) {
@@ -1287,7 +1343,17 @@ public class Grammar implements AttributeResolver {
 
 		char[] serializedAtn = ATNSerializer.getSerializedAsChars(atn);
 		ATN deserialized = new ATNDeserializer().deserialize(serializedAtn);
-		return new LexerInterpreter(fileName, Arrays.asList(getTokenDisplayNames()), Arrays.asList(getRuleNames()), ((LexerGrammar)this).modes.keySet(), deserialized, input);
+		return new LexerInterpreter(fileName, getVocabulary(), Arrays.asList(getRuleNames()), ((LexerGrammar)this).modes.keySet(), deserialized, input);
+	}
+
+	/** @since 4.5.1 */
+	public GrammarParserInterpreter createGrammarParserInterpreter(TokenStream tokenStream) {
+		if (this.isLexer()) {
+			throw new IllegalStateException("A parser interpreter can only be created for a parser or combined grammar.");
+		}
+		char[] serializedAtn = ATNSerializer.getSerializedAsChars(atn);
+		ATN deserialized = new ATNDeserializer().deserialize(serializedAtn);
+		return new GrammarParserInterpreter(this, deserialized, tokenStream);
 	}
 
 	public ParserInterpreter createParserInterpreter(TokenStream tokenStream) {
@@ -1297,7 +1363,7 @@ public class Grammar implements AttributeResolver {
 
 		char[] serializedAtn = ATNSerializer.getSerializedAsChars(atn);
 		ATN deserialized = new ATNDeserializer().deserialize(serializedAtn);
-		return new ParserInterpreter(fileName, Arrays.asList(getTokenDisplayNames()), Arrays.asList(getRuleNames()), deserialized, tokenStream);
+		return new ParserInterpreter(fileName, getVocabulary(), Arrays.asList(getRuleNames()), deserialized, tokenStream);
 	}
 
 	protected static class AltLabelVisitor extends GrammarTreeVisitor {

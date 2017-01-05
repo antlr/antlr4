@@ -1,38 +1,11 @@
 /*
- * [The "BSD license"]
- *  Copyright (c) 2012 Terence Parr
- *  Copyright (c) 2012 Sam Harwell
- *  All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions
- *  are met:
- *
- *  1. Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  2. Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  3. The name of the author may not be used to endorse or promote products
- *     derived from this software without specific prior written permission.
- *
- *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- *  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- *  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
  */
 
 package org.antlr.v4.runtime.misc;
 
-import java.awt.Window;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -40,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -119,14 +93,13 @@ public class Utils {
 		}
 	}
 
+
 	public static char[] readFile(String fileName) throws IOException {
 		return readFile(fileName, null);
 	}
 
+
 	public static char[] readFile(String fileName, String encoding) throws IOException {
-		if ( fileName==null ) {
-			return null;
-		}
 		File f = new File(fileName);
 		int size = (int)f.length();
 		InputStreamReader isr;
@@ -151,38 +124,6 @@ public class Utils {
 		return data;
 	}
 
-	public static void waitForClose(final Window window) throws InterruptedException {
-		final Object lock = new Object();
-
-		Thread t = new Thread() {
-			@Override
-			public void run() {
-				synchronized (lock) {
-					while (window.isVisible()) {
-						try {
-							lock.wait(500);
-						} catch (InterruptedException e) {
-						}
-					}
-				}
-			}
-		};
-
-		t.start();
-
-		window.addWindowListener(new WindowAdapter() {
-			@Override
-			public void windowClosing(WindowEvent arg0) {
-				synchronized (lock) {
-					window.setVisible(false);
-					lock.notify();
-				}
-			}
-		});
-
-		t.join();
-	}
-
 	/** Convert array of strings to string&rarr;index map. Useful for
 	 *  converting rulenames to name&rarr;ruleindex map.
 	 */
@@ -201,5 +142,69 @@ public class Utils {
 			cdata[i] = (char)data.get(i);
 		}
 		return cdata;
+	}
+
+	public static IntervalSet toSet(BitSet bits) {
+		IntervalSet s = new IntervalSet();
+		int i = bits.nextSetBit(0);
+		while ( i >= 0 ) {
+			s.add(i);
+			i = bits.nextSetBit(i+1);
+		}
+		return s;
+	}
+
+	/** @since 4.6 */
+	public static String expandTabs(String s, int tabSize) {
+		if ( s==null ) return null;
+		StringBuilder buf = new StringBuilder();
+		int col = 0;
+		for (int i = 0; i<s.length(); i++) {
+			char c = s.charAt(i);
+			switch ( c ) {
+				case '\n' :
+					col = 0;
+					buf.append(c);
+					break;
+				case '\t' :
+					int n = tabSize-col%tabSize;
+					col+=n;
+					buf.append(spaces(n));
+					break;
+				default :
+					col++;
+					buf.append(c);
+					break;
+			}
+		}
+		return buf.toString();
+	}
+
+	/** @since 4.6 */
+	public static String spaces(int n) {
+		return sequence(n, " ");
+	}
+
+	/** @since 4.6 */
+	public static String newlines(int n) {
+		return sequence(n, "\n");
+	}
+
+	/** @since 4.6 */
+	public static String sequence(int n, String s) {
+		StringBuilder buf = new StringBuilder();
+		for (int sp=1; sp<=n; sp++) buf.append(s);
+		return buf.toString();
+	}
+
+	/** @since 4.6 */
+	public static int count(String s, char x) {
+		int n = 0;
+		for (int i = 0; i<s.length(); i++) {
+			if ( s.charAt(i)==x ) {
+				n++;
+			}
+		}
+		return n;
 	}
 }

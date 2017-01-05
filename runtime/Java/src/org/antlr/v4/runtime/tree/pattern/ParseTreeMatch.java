@@ -1,38 +1,12 @@
 /*
- * [The "BSD license"]
- * Copyright (c) 2013 Terence Parr
- * Copyright (c) 2013 Sam Harwell
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
  */
 
 package org.antlr.v4.runtime.tree.pattern;
 
 import org.antlr.v4.runtime.misc.MultiMap;
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 import java.util.Collections;
@@ -77,7 +51,7 @@ public class ParseTreeMatch {
 	 * @exception IllegalArgumentException if {@code pattern} is {@code null}
 	 * @exception IllegalArgumentException if {@code labels} is {@code null}
 	 */
-	public ParseTreeMatch(@NotNull ParseTree tree, @NotNull ParseTreePattern pattern, @NotNull MultiMap<String, ParseTree> labels, @Nullable ParseTree mismatchedNode) {
+	public ParseTreeMatch(ParseTree tree, ParseTreePattern pattern, MultiMap<String, ParseTree> labels, ParseTree mismatchedNode) {
 		if (tree == null) {
 			throw new IllegalArgumentException("tree cannot be null");
 		}
@@ -112,7 +86,7 @@ public class ParseTreeMatch {
 	 * @return The last {@link ParseTree} to match a tag with the specified
 	 * label, or {@code null} if no parse tree matched a tag with the label.
 	 */
-	@Nullable
+
 	public ParseTree get(String label) {
 		List<ParseTree> parseTrees = labels.get(label);
 		if ( parseTrees==null || parseTrees.size()==0 ) {
@@ -145,8 +119,8 @@ public class ParseTreeMatch {
 	 * the specified {@code label}. If no nodes matched the label, an empty list
 	 * is returned.
 	 */
-	@NotNull
-	public List<ParseTree> getAll(@NotNull String label) {
+
+	public List<ParseTree> getAll(String label) {
 		List<ParseTree> nodes = labels.get(label);
 		if ( nodes==null ) {
 			return Collections.emptyList();
@@ -165,7 +139,7 @@ public class ParseTreeMatch {
 	 * @return A mapping from labels to parse tree nodes. If the parse tree
 	 * pattern did not contain any rule or token tags, this map will be empty.
 	 */
-	@NotNull
+
 	public MultiMap<String, ParseTree> getLabels() {
 		return labels;
 	}
@@ -176,7 +150,7 @@ public class ParseTreeMatch {
 	 * @return the node at which we first detected a mismatch, or {@code null}
 	 * if the match was successful.
 	 */
-	@Nullable
+
 	public ParseTree getMismatchedNode() {
 		return mismatchedNode;
 	}
@@ -196,7 +170,7 @@ public class ParseTreeMatch {
 	 *
 	 * @return The tree pattern we are matching against.
 	 */
-	@NotNull
+
 	public ParseTreePattern getPattern() {
 		return pattern;
 	}
@@ -206,7 +180,7 @@ public class ParseTreeMatch {
 	 *
 	 * @return The {@link ParseTree} we are trying to match to a pattern.
 	 */
-	@NotNull
+
 	public ParseTree getTree() {
 		return tree;
 	}

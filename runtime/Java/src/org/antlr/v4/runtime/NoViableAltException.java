@@ -1,37 +1,11 @@
 /*
- * [The "BSD license"]
- *  Copyright (c) 2012 Terence Parr
- *  Copyright (c) 2012 Sam Harwell
- *  All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions
- *  are met:
- *
- *  1. Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  2. Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  3. The name of the author may not be used to endorse or promote products
- *     derived from this software without specific prior written permission.
- *
- *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- *  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- *  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
  */
 package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.atn.ATNConfigSet;
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
 
 /** Indicates that the parser could not decide which of two or more paths
  *  to take based upon the remaining input. It tracks the starting token
@@ -40,7 +14,7 @@ import org.antlr.v4.runtime.misc.Nullable;
  */
 public class NoViableAltException extends RecognitionException {
 	/** Which configurations did we try at input.index() that couldn't match input.LT(1)? */
-	@Nullable
+
 	private final ATNConfigSet deadEndConfigs;
 
 	/** The token object at the start index; the input stream might
@@ -48,10 +22,10 @@ public class NoViableAltException extends RecognitionException {
 	 *  time the error occurred, of course the stream needs to keep a
 	 *  buffer all of the tokens but later we might not have access to those.)
 	 */
-	@NotNull
+
 	private final Token startToken;
 
-	public NoViableAltException(@NotNull Parser recognizer) { // LL(1) error
+	public NoViableAltException(Parser recognizer) { // LL(1) error
 		this(recognizer,
 			 recognizer.getInputStream(),
 			 recognizer.getCurrentToken(),
@@ -60,12 +34,12 @@ public class NoViableAltException extends RecognitionException {
 			 recognizer._ctx);
 	}
 
-	public NoViableAltException(@NotNull Parser recognizer,
-								@NotNull TokenStream input,
-								@NotNull Token startToken,
-								@NotNull Token offendingToken,
-								@Nullable ATNConfigSet deadEndConfigs,
-								@NotNull ParserRuleContext ctx)
+	public NoViableAltException(Parser recognizer,
+								TokenStream input,
+								Token startToken,
+								Token offendingToken,
+								ATNConfigSet deadEndConfigs,
+								ParserRuleContext ctx)
 	{
 		super(recognizer, input, ctx);
 		this.deadEndConfigs = deadEndConfigs;
@@ -73,12 +47,12 @@ public class NoViableAltException extends RecognitionException {
 		this.setOffendingToken(offendingToken);
 	}
 
-	@NotNull
+
 	public Token getStartToken() {
 		return startToken;
 	}
 
-	@Nullable
+
 	public ATNConfigSet getDeadEndConfigs() {
 		return deadEndConfigs;
 	}

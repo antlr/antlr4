@@ -1,31 +1,7 @@
 /*
- * [The "BSD license"]
- *  Copyright (c) 2012 Terence Parr
- *  Copyright (c) 2012 Sam Harwell
- *  All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions
- *  are met:
- *
- *  1. Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  2. Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  3. The name of the author may not be used to endorse or promote products
- *     derived from this software without specific prior written permission.
- *
- *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- *  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- *  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
  */
 
 package org.antlr.v4.runtime.atn;
@@ -33,8 +9,6 @@ package org.antlr.v4.runtime.atn;
 import org.antlr.v4.runtime.misc.AbstractEqualityComparator;
 import org.antlr.v4.runtime.misc.Array2DHashSet;
 import org.antlr.v4.runtime.misc.DoubleKeyMap;
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
 
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -108,6 +82,11 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	// TODO: these fields make me pretty uncomfortable but nice to pack up info together, saves recomputation
 	// TODO: can we track conflicts as they are added to save scanning configs later?
 	public int uniqueAlt;
+	/** Currently this is only used when we detect SLL conflict; this does
+	 *  not necessarily represent the ambiguous alternatives. In fact,
+	 *  I should also point out that this seems to include predicated alternatives
+	 *  that have predicates that evaluate to false. Computed in computeTargetState().
+ 	 */
 	protected BitSet conflictingAlts;
 
 	// Used in parser and lexer. In lexer, it indicates we hit a pred
@@ -154,8 +133,8 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	 * {@link #hasSemanticContext} when necessary.</p>
 	 */
 	public boolean add(
-		@NotNull ATNConfig config,
-		@Nullable DoubleKeyMap<PredictionContext,PredictionContext,PredictionContext> mergeCache)
+		ATNConfig config,
+		DoubleKeyMap<PredictionContext,PredictionContext,PredictionContext> mergeCache)
 	{
 		if ( readonly ) throw new IllegalStateException("This set is readonly");
 		if ( config.semanticContext!=SemanticContext.NONE ) {
@@ -208,7 +187,7 @@ public class ATNConfigSet implements Set<ATNConfig> {
 	 *
 	 * @since 4.3
 	 */
-	@NotNull
+
 	public BitSet getAlts() {
 		BitSet alts = new BitSet();
 		for (ATNConfig config : configs) {

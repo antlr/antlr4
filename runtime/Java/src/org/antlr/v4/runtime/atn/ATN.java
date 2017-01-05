@@ -1,31 +1,7 @@
 /*
- * [The "BSD license"]
- *  Copyright (c) 2012 Terence Parr
- *  Copyright (c) 2012 Sam Harwell
- *  All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions
- *  are met:
- *
- *  1. Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  2. Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  3. The name of the author may not be used to endorse or promote products
- *     derived from this software without specific prior written permission.
- *
- *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- *  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- *  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
  */
 
 package org.antlr.v4.runtime.atn;
@@ -34,8 +10,6 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.IntervalSet;
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -46,14 +20,13 @@ import java.util.Map;
 public class ATN {
 	public static final int INVALID_ALT_NUMBER = 0;
 
-	@NotNull
+
 	public final List<ATNState> states = new ArrayList<ATNState>();
 
 	/** Each subrule/rule is a decision point and we must track them so we
 	 *  can go back later and build DFA predictors for them.  This includes
 	 *  all the rules, subrules, optional blocks, ()+, ()* etc...
 	 */
-	@NotNull
 	public final List<DecisionState> decisionToState = new ArrayList<DecisionState>();
 
 	/**
@@ -66,7 +39,7 @@ public class ATN {
 	 */
 	public RuleStopState[] ruleToStopState;
 
-	@NotNull
+
 	public final Map<String, TokensStartState> modeNameToStartState =
 		new LinkedHashMap<String, TokensStartState>();
 
@@ -95,11 +68,10 @@ public class ATN {
 	 */
 	public LexerAction[] lexerActions;
 
-	@NotNull
 	public final List<TokensStartState> modeToStartState = new ArrayList<TokensStartState>();
 
 	/** Used for runtime deserialization of ATNs from strings */
-	public ATN(@NotNull ATNType grammarType, int maxTokenType) {
+	public ATN(ATNType grammarType, int maxTokenType) {
 		this.grammarType = grammarType;
 		this.maxTokenType = maxTokenType;
 	}
@@ -109,7 +81,6 @@ public class ATN {
 	 *  the rule surrounding {@code s}. In other words, the set will be
 	 *  restricted to tokens reachable staying within {@code s}'s rule.
 	 */
-	@NotNull
 	public IntervalSet nextTokens(ATNState s, RuleContext ctx) {
 		LL1Analyzer anal = new LL1Analyzer(this);
 		IntervalSet next = anal.LOOK(s, ctx);
@@ -121,15 +92,14 @@ public class ATN {
 	 * staying in same rule. {@link Token#EPSILON} is in set if we reach end of
 	 * rule.
      */
-	@NotNull
-    public IntervalSet nextTokens(@NotNull ATNState s) {
+    public IntervalSet nextTokens(ATNState s) {
         if ( s.nextTokenWithinRule != null ) return s.nextTokenWithinRule;
         s.nextTokenWithinRule = nextTokens(s, null);
         s.nextTokenWithinRule.setReadonly(true);
         return s.nextTokenWithinRule;
     }
 
-	public void addState(@Nullable ATNState state) {
+	public void addState(ATNState state) {
 		if (state != null) {
 			state.atn = this;
 			state.stateNumber = states.size();
@@ -138,11 +108,11 @@ public class ATN {
 		states.add(state);
 	}
 
-	public void removeState(@NotNull ATNState state) {
+	public void removeState(ATNState state) {
 		states.set(state.stateNumber, null); // just free mem, don't shift states in list
 	}
 
-	public int defineDecisionState(@NotNull DecisionState s) {
+	public int defineDecisionState(DecisionState s) {
 		decisionToState.add(s);
 		s.decision = decisionToState.size()-1;
 		return s.decision;
@@ -168,8 +138,23 @@ public class ATN {
 	 * {@link RuleStopState} of the outermost context without matching any
 	 * symbols, {@link Token#EOF} is added to the returned set.
 	 *
-	 * <p>If {@code context} is {@code null}, it is treated as
-	 * {@link ParserRuleContext#EMPTY}.</p>
+	 * <p>If {@code context} is {@code null}, it is treated as {@link ParserRuleContext#EMPTY}.</p>
+	 *
+	 * Note that this does NOT give you the set of all tokens that could
+	 * appear at a given token position in the input phrase.  In other words,
+	 * it does not answer:
+	 *
+	 *   "Given a specific partial input phrase, return the set of all tokens
+	 *    that can follow the last token in the input phrase."
+	 *
+	 * The big difference is that with just the input, the parser could
+	 * land right in the middle of a lookahead decision. Getting
+     * all *possible* tokens given a partial input stream is a separate
+     * computation. See https://github.com/antlr/antlr4/issues/1428
+	 *
+	 * For this function, we are specifying an ATN state and call stack to compute
+	 * what token(s) can come next and specifically: outside of a lookahead decision.
+	 * That is what you want for error reporting and recovery upon parse error.
 	 *
 	 * @param stateNumber the ATN state number
 	 * @param context the full parse context
@@ -178,8 +163,7 @@ public class ATN {
 	 * @throws IllegalArgumentException if the ATN does not contain a state with
 	 * number {@code stateNumber}
 	 */
-	@NotNull
-	public IntervalSet getExpectedTokens(int stateNumber, @Nullable RuleContext context) {
+	public IntervalSet getExpectedTokens(int stateNumber, RuleContext context) {
 		if (stateNumber < 0 || stateNumber >= states.size()) {
 			throw new IllegalArgumentException("Invalid state number.");
 		}

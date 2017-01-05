@@ -1,39 +1,13 @@
 /*
- * [The "BSD license"]
- *  Copyright (c) 2013 Terence Parr
- *  Copyright (c) 2013 Sam Harwell
- *  All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions
- *  are met:
- *
- *  1. Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  2. Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  3. The name of the author may not be used to endorse or promote products
- *     derived from this software without specific prior written permission.
- *
- *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- *  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- *  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
  */
 
 package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.IntervalSet;
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.misc.Pair;
 
 import java.io.InvalidClassException;
@@ -96,14 +70,14 @@ public class ATNDeserializer {
 		SERIALIZED_UUID = ADDED_LEXER_ACTIONS;
 	}
 
-	@NotNull
+
 	private final ATNDeserializationOptions deserializationOptions;
 
 	public ATNDeserializer() {
 		this(ATNDeserializationOptions.getDefaultOptions());
 	}
 
-	public ATNDeserializer(@Nullable ATNDeserializationOptions deserializationOptions) {
+	public ATNDeserializer(ATNDeserializationOptions deserializationOptions) {
 		if (deserializationOptions == null) {
 			deserializationOptions = ATNDeserializationOptions.getDefaultOptions();
 		}
@@ -134,7 +108,7 @@ public class ATNDeserializer {
 	}
 
 	@SuppressWarnings("deprecation")
-	public ATN deserialize(@NotNull char[] data) {
+	public ATN deserialize(char[] data) {
 		data = data.clone();
 		// don't adjust the first value since that's the version number
 		for (int i = 1; i < data.length; i++) {
@@ -212,7 +186,7 @@ public class ATNDeserializer {
 			int numPrecedenceStates = toInt(data[p++]);
 			for (int i = 0; i < numPrecedenceStates; i++) {
 				int stateNumber = toInt(data[p++]);
-				((RuleStartState)atn.states.get(stateNumber)).isPrecedenceRule = true;
+				((RuleStartState)atn.states.get(stateNumber)).isLeftRecursiveRule = true;
 			}
 		}
 
@@ -241,9 +215,6 @@ public class ATNDeserializer {
 					// this piece of unused metadata was serialized prior to the
 					// addition of LexerAction
 					int actionIndexIgnored = toInt(data[p++]);
-					if (actionIndexIgnored == 0xFFFF) {
-						actionIndexIgnored = -1;
-					}
 				}
 			}
 		}
@@ -321,7 +292,7 @@ public class ATNDeserializer {
 
 				RuleTransition ruleTransition = (RuleTransition)t;
 				int outermostPrecedenceReturn = -1;
-				if (atn.ruleToStartState[ruleTransition.target.ruleIndex].isPrecedenceRule) {
+				if (atn.ruleToStartState[ruleTransition.target.ruleIndex].isLeftRecursiveRule) {
 					if (ruleTransition.precedence == 0) {
 						outermostPrecedenceReturn = ruleTransition.target.ruleIndex;
 					}
@@ -453,7 +424,7 @@ public class ATNDeserializer {
 
 				ATNState endState;
 				Transition excludeTransition = null;
-				if (atn.ruleToStartState[i].isPrecedenceRule) {
+				if (atn.ruleToStartState[i].isLeftRecursiveRule) {
 					// wrap from the beginning of the rule to the StarLoopEntryState
 					endState = null;
 					for (ATNState state : atn.states) {
@@ -526,12 +497,12 @@ public class ATNDeserializer {
 
 	/**
 	 * Analyze the {@link StarLoopEntryState} states in the specified ATN to set
-	 * the {@link StarLoopEntryState#precedenceRuleDecision} field to the
+	 * the {@link StarLoopEntryState#isPrecedenceDecision} field to the
 	 * correct value.
 	 *
 	 * @param atn The ATN.
 	 */
-	protected void markPrecedenceDecisions(@NotNull ATN atn) {
+	protected void markPrecedenceDecisions(ATN atn) {
 		for (ATNState state : atn.states) {
 			if (!(state instanceof StarLoopEntryState)) {
 				continue;
@@ -541,11 +512,11 @@ public class ATNDeserializer {
 			 * decision for the closure block that determines whether a
 			 * precedence rule should continue or complete.
 			 */
-			if (atn.ruleToStartState[state.ruleIndex].isPrecedenceRule) {
+			if (atn.ruleToStartState[state.ruleIndex].isLeftRecursiveRule) {
 				ATNState maybeLoopEndState = state.transition(state.getNumberOfTransitions() - 1).target;
 				if (maybeLoopEndState instanceof LoopEndState) {
 					if (maybeLoopEndState.epsilonOnlyTransitions && maybeLoopEndState.transition(0).target instanceof RuleStopState) {
-						((StarLoopEntryState)state).precedenceRuleDecision = true;
+						((StarLoopEntryState)state).isPrecedenceDecision = true;
 					}
 				}
 			}
@@ -643,8 +614,8 @@ public class ATNDeserializer {
 		return new UUID(mostSigBits, leastSigBits);
 	}
 
-	@NotNull
-	protected Transition edgeFactory(@NotNull ATN atn,
+
+	protected Transition edgeFactory(ATN atn,
 										 int type, int src, int trg,
 										 int arg1, int arg2, int arg3,
 										 List<IntervalSet> sets)

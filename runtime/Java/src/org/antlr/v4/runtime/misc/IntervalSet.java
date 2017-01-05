@@ -1,36 +1,14 @@
 /*
- * [The "BSD license"]
- *  Copyright (c) 2012 Terence Parr
- *  Copyright (c) 2012 Sam Harwell
- *  All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions
- *  are met:
- *
- *  1. Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  2. Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  3. The name of the author may not be used to endorse or promote products
- *     derived from this software without specific prior written permission.
- *
- *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- *  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- *  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
  */
 package org.antlr.v4.runtime.misc;
 
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.Vocabulary;
+import org.antlr.v4.runtime.VocabularyImpl;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -87,7 +65,7 @@ public class IntervalSet implements IntSet {
 	}
 
 	/** Create a set with a single element, el. */
-    @NotNull
+
     public static IntervalSet of(int a) {
 		IntervalSet s = new IntervalSet();
         s.add(a);
@@ -247,8 +225,8 @@ public class IntervalSet implements IntSet {
 	 * operation is {@code left - right}. If either of the input sets is
 	 * {@code null}, it is treated as though it was an empty set.
 	 */
-	@NotNull
-	public static IntervalSet subtract(@Nullable IntervalSet left, @Nullable IntervalSet right) {
+
+	public static IntervalSet subtract(IntervalSet left, IntervalSet right) {
 		if (left == null || left.isNil()) {
 			return new IntervalSet();
 		}
@@ -544,7 +522,15 @@ public class IntervalSet implements IntSet {
 		return buf.toString();
 	}
 
+	/**
+	 * @deprecated Use {@link #toString(Vocabulary)} instead.
+	 */
+	@Deprecated
 	public String toString(String[] tokenNames) {
+		return toString(VocabularyImpl.fromTokenNames(tokenNames));
+	}
+
+	public String toString(Vocabulary vocabulary) {
 		StringBuilder buf = new StringBuilder();
 		if ( this.intervals==null || this.intervals.isEmpty() ) {
 			return "{}";
@@ -558,12 +544,12 @@ public class IntervalSet implements IntSet {
 			int a = I.a;
 			int b = I.b;
 			if ( a==b ) {
-				buf.append(elementName(tokenNames, a));
+				buf.append(elementName(vocabulary, a));
 			}
 			else {
 				for (int i=a; i<=b; i++) {
 					if ( i>a ) buf.append(", ");
-                    buf.append(elementName(tokenNames, i));
+                    buf.append(elementName(vocabulary, i));
 				}
 			}
 			if ( iter.hasNext() ) {
@@ -576,12 +562,26 @@ public class IntervalSet implements IntSet {
         return buf.toString();
     }
 
-    protected String elementName(String[] tokenNames, int a) {
-        if ( a==Token.EOF ) return "<EOF>";
-        else if ( a==Token.EPSILON ) return "<EPSILON>";
-        else return tokenNames[a];
+	/**
+	 * @deprecated Use {@link #elementName(Vocabulary, int)} instead.
+	 */
+	@Deprecated
+	protected String elementName(String[] tokenNames, int a) {
+		return elementName(VocabularyImpl.fromTokenNames(tokenNames), a);
+	}
 
-    }
+
+	protected String elementName(Vocabulary vocabulary, int a) {
+		if (a == Token.EOF) {
+			return "<EOF>";
+		}
+		else if (a == Token.EPSILON) {
+			return "<EPSILON>";
+		}
+		else {
+			return vocabulary.getDisplayName(a);
+		}
+	}
 
     @Override
     public int size() {

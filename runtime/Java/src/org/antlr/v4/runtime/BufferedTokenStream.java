@@ -1,37 +1,12 @@
 /*
- * [The "BSD license"]
- *  Copyright (c) 2012 Terence Parr
- *  Copyright (c) 2012 Sam Harwell
- *  All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions
- *  are met:
- *
- *  1. Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  2. Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  3. The name of the author may not be used to endorse or promote products
- *     derived from this software without specific prior written permission.
- *
- *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- *  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- *  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
  */
 
 package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.misc.Interval;
-import org.antlr.v4.runtime.misc.NotNull;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -54,7 +29,6 @@ public class BufferedTokenStream implements TokenStream {
 	/**
 	 * The {@link TokenSource} from which tokens for this stream are fetched.
 	 */
-	@NotNull
     protected TokenSource tokenSource;
 
 	/**
@@ -92,7 +66,7 @@ public class BufferedTokenStream implements TokenStream {
 	 */
 	protected boolean fetchedEOF;
 
-    public BufferedTokenStream(@NotNull TokenSource tokenSource) {
+    public BufferedTokenStream(TokenSource tokenSource) {
 		if (tokenSource == null) {
 			throw new NullPointerException("tokenSource cannot be null");
 		}
@@ -228,7 +202,7 @@ public class BufferedTokenStream implements TokenStream {
         return tokens.get(p-k);
     }
 
-	@NotNull
+
     @Override
     public Token LT(int k) {
         lazyInit();
@@ -398,7 +372,7 @@ public class BufferedTokenStream implements TokenStream {
 
 	/** Collect all hidden tokens (any off-default channel) to the right of
 	 *  the current token up until we see a token on DEFAULT_TOKEN_CHANNEL
-	 *  of EOF.
+	 *  or EOF.
 	 */
 	public List<Token> getHiddenTokensToRight(int tokenIndex) {
 		return getHiddenTokensToRight(tokenIndex, -1);
@@ -455,21 +429,18 @@ public class BufferedTokenStream implements TokenStream {
     public String getSourceName() {	return tokenSource.getSourceName();	}
 
 	/** Get the text of all tokens in this buffer. */
-	@NotNull
+
 	@Override
 	public String getText() {
-        lazyInit();
-		fill();
 		return getText(Interval.of(0,size()-1));
 	}
 
-	@NotNull
-    @Override
-    public String getText(Interval interval) {
+	@Override
+	public String getText(Interval interval) {
 		int start = interval.a;
 		int stop = interval.b;
-        if ( start<0 || stop<0 ) return "";
-        lazyInit();
+		if ( start<0 || stop<0 ) return "";
+		fill();
         if ( stop>=tokens.size() ) stop = tokens.size()-1;
 
 		StringBuilder buf = new StringBuilder();
@@ -481,13 +452,13 @@ public class BufferedTokenStream implements TokenStream {
 		return buf.toString();
     }
 
-	@NotNull
+
 	@Override
 	public String getText(RuleContext ctx) {
 		return getText(ctx.getSourceInterval());
 	}
 
-	@NotNull
+
     @Override
     public String getText(Token start, Token stop) {
         if ( start!=null && stop!=null ) {

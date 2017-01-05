@@ -1,7 +1,7 @@
 /*
  * [The "BSD license"]
- *  Copyright (c) 2012 Terence Parr
- *  Copyright (c) 2012 Sam Harwell
+ *  Copyright (c) 2012-2016 Terence Parr
+ *  Copyright (c) 2012-2016 Sam Harwell
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -42,7 +42,7 @@ javaTypeInitMap ::= [
 
 // args must be <object-model-object>, <fields-resulting-in-STs>
 
-ParserFile(file, parser, namedActions) ::= <<
+ParserFile(file, parser, namedActions, contextSuperClass) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 <if(file.genPackage)>
 package <file.genPackage>;
@@ -60,13 +60,12 @@ import java.util.ArrayList;
 <parser>
 >>
 
-ListenerFile(file, header) ::= <<
+ListenerFile(file, header, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 <if(file.genPackage)>
 package <file.genPackage>;
 <endif>
 <header>
-import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 /**
@@ -84,7 +83,7 @@ public interface <file.grammarName>Listener extends ParseTreeListener {
 <endif>
  * @param ctx the parse tree
  */
-void enter<lname; format="cap">(@NotNull <file.parserName>.<lname; format="cap">Context ctx);
+void enter<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx);
 /**
 <if(file.listenerLabelRuleNames.(lname))>
  * Exit a parse tree produced by the {@code <lname>\}
@@ -94,11 +93,11 @@ void enter<lname; format="cap">(@NotNull <file.parserName>.<lname; format="cap">
 <endif>
  * @param ctx the parse tree
  */
-void exit<lname; format="cap">(@NotNull <file.parserName>.<lname; format="cap">Context ctx);}; separator="\n">
+void exit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx);}; separator="\n">
 }
 >>
 
-BaseListenerFile(file, header) ::= <<
+BaseListenerFile(file, header, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 <if(file.genPackage)>
 package <file.genPackage>;
@@ -106,7 +105,6 @@ package <file.genPackage>;
 <header>
 
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
@@ -122,48 +120,47 @@ public class <file.grammarName>BaseListener implements <file.grammarName>Listene
  *
  * \<p>The default implementation does nothing.\</p>
  */
-@Override public void enter<lname; format="cap">(@NotNull <file.parserName>.<lname; format="cap">Context ctx) { \}
+@Override public void enter<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { \}
 /**
  * {@inheritDoc\}
  *
  * \<p>The default implementation does nothing.\</p>
  */
-@Override public void exit<lname; format="cap">(@NotNull <file.parserName>.<lname; format="cap">Context ctx) { \}}; separator="\n">
+@Override public void exit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { \}}; separator="\n">
 
 	/**
 	 * {@inheritDoc\}
 	 *
 	 * \<p>The default implementation does nothing.\</p>
 	 */
-	@Override public void enterEveryRule(@NotNull ParserRuleContext ctx) { }
+	@Override public void enterEveryRule(ParserRuleContext ctx) { }
 	/**
 	 * {@inheritDoc\}
 	 *
 	 * \<p>The default implementation does nothing.\</p>
 	 */
-	@Override public void exitEveryRule(@NotNull ParserRuleContext ctx) { }
+	@Override public void exitEveryRule(ParserRuleContext ctx) { }
 	/**
 	 * {@inheritDoc\}
 	 *
 	 * \<p>The default implementation does nothing.\</p>
 	 */
-	@Override public void visitTerminal(@NotNull TerminalNode node) { }
+	@Override public void visitTerminal(TerminalNode node) { }
 	/**
 	 * {@inheritDoc\}
 	 *
 	 * \<p>The default implementation does nothing.\</p>
 	 */
-	@Override public void visitErrorNode(@NotNull ErrorNode node) { }
+	@Override public void visitErrorNode(ErrorNode node) { }
 }
 >>
 
-VisitorFile(file, header) ::= <<
+VisitorFile(file, header, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 <if(file.genPackage)>
 package <file.genPackage>;
 <endif>
 <header>
-import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
 /**
@@ -185,17 +182,16 @@ public interface <file.grammarName>Visitor\<T> extends ParseTreeVisitor\<T> {
  * @param ctx the parse tree
  * @return the visitor result
  */
-T visit<lname; format="cap">(@NotNull <file.parserName>.<lname; format="cap">Context ctx);}; separator="\n">
+T visit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx);}; separator="\n">
 }
 >>
 
-BaseVisitorFile(file, header) ::= <<
+BaseVisitorFile(file, header, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 <if(file.genPackage)>
 package <file.genPackage>;
 <endif>
 <header>
-import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 
 /**
@@ -214,7 +210,7 @@ public class <file.grammarName>BaseVisitor\<T> extends AbstractParseTreeVisitor\
  * \<p>The default implementation returns the result of calling
  * {@link #visitChildren\} on {@code ctx\}.\</p>
  */
-@Override public T visit<lname; format="cap">(@NotNull <file.parserName>.<lname; format="cap">Context ctx) { return visitChildren(ctx); \}}; separator="\n">
+@Override public T visit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx) { return visitChildren(ctx); \}}; separator="\n">
 }
 >>
 
@@ -238,20 +234,16 @@ public class <parser.name> extends <superClass; null="Parser"> {
 	public static final int
 		<parser.tokens:{k | <k>=<parser.tokens.(k)>}; separator=", ", wrap, anchor>;
 	<endif>
-	public static final String[] tokenNames = {
-		<parser.tokenNames:{t | <t>}; null="\"\<INVALID>\"", separator=", ", wrap, anchor>
-	};
 	public static final int
 		<parser.rules:{r | RULE_<r.name> = <r.index>}; separator=", ", wrap, anchor>;
 	public static final String[] ruleNames = {
 		<parser.ruleNames:{r | "<r>"}; separator=", ", wrap, anchor>
 	};
 
-	@Override
-	public String getGrammarFileName() { return "<parser.grammarFileName; format="java-escape">"; }
+	<vocabulary(parser.literalNames, parser.symbolicNames)>
 
 	@Override
-	public String[] getTokenNames() { return tokenNames; }
+	public String getGrammarFileName() { return "<parser.grammarFileName; format="java-escape">"; }
 
 	@Override
 	public String[] getRuleNames() { return ruleNames; }
@@ -270,7 +262,8 @@ public class <parser.name> extends <superClass; null="Parser"> {
 	public boolean sempred(RuleContext _localctx, int ruleIndex, int predIndex) {
 		switch (ruleIndex) {
 		<parser.sempredFuncs.values:{f|
-case <f.ruleIndex>: return <f.name>_sempred((<f.ctxType>)_localctx, predIndex);}; separator="\n">
+case <f.ruleIndex>:
+	return <f.name>_sempred((<f.ctxType>)_localctx, predIndex);}; separator="\n">
 		}
 		return true;
 	}
@@ -281,13 +274,56 @@ case <f.ruleIndex>: return <f.name>_sempred((<f.ctxType>)_localctx, predIndex);}
 }
 >>
 
+vocabulary(literalNames, symbolicNames) ::= <<
+private static final String[] _LITERAL_NAMES = {
+	<literalNames:{t | <t>}; null="null", separator=", ", wrap, anchor>
+};
+private static final String[] _SYMBOLIC_NAMES = {
+	<symbolicNames:{t | <t>}; null="null", separator=", ", wrap, anchor>
+};
+public static final Vocabulary VOCABULARY = new VocabularyImpl(_LITERAL_NAMES, _SYMBOLIC_NAMES);
+
+/**
+ * @deprecated Use {@link #VOCABULARY} instead.
+ */
+@Deprecated
+public static final String[] tokenNames;
+static {
+	tokenNames = new String[_SYMBOLIC_NAMES.length];
+	for (int i = 0; i \< tokenNames.length; i++) {
+		tokenNames[i] = VOCABULARY.getLiteralName(i);
+		if (tokenNames[i] == null) {
+			tokenNames[i] = VOCABULARY.getSymbolicName(i);
+		}
+
+		if (tokenNames[i] == null) {
+			tokenNames[i] = "\<INVALID>";
+		}
+	}
+}
+
+@Override
+@Deprecated
+public String[] getTokenNames() {
+	return tokenNames;
+}
+
+@Override
+
+public Vocabulary getVocabulary() {
+	return VOCABULARY;
+}
+>>
+
 dumpActions(recog, argFuncs, actionFuncs, sempredFuncs) ::= <<
 <if(actionFuncs)>
 @Override
 public void action(RuleContext _localctx, int ruleIndex, int actionIndex) {
 	switch (ruleIndex) {
 	<recog.actionFuncs.values:{f|
-case <f.ruleIndex>: <f.name>_action((<f.ctxType>)_localctx, actionIndex); break;}; separator="\n">
+case <f.ruleIndex>:
+	<f.name>_action((<f.ctxType>)_localctx, actionIndex);
+	break;}; separator="\n">
 	}
 }
 <actionFuncs.values; separator="\n">
@@ -297,7 +333,8 @@ case <f.ruleIndex>: <f.name>_action((<f.ctxType>)_localctx, actionIndex); break;
 public boolean sempred(RuleContext _localctx, int ruleIndex, int predIndex) {
 	switch (ruleIndex) {
 	<recog.sempredFuncs.values:{f|
-case <f.ruleIndex>: return <f.name>_sempred((<f.ctxType>)_localctx, predIndex);}; separator="\n">
+case <f.ruleIndex>:
+	return <f.name>_sempred((<f.ctxType>)_localctx, predIndex);}; separator="\n">
 	}
 	return true;
 }
@@ -319,7 +356,9 @@ RuleActionFunction(r, actions) ::= <<
 private void <r.name>_action(<r.ctxType> _localctx, int actionIndex) {
 	switch (actionIndex) {
 	<actions:{index|
-case <index>: <actions.(index)> break;}; separator="\n">
+case <index>:
+	<actions.(index)>
+	break;}; separator="\n">
 	}
 }
 >>
@@ -331,7 +370,8 @@ RuleSempredFunction(r, actions) ::= <<
 private boolean <r.name>_sempred(<r.ctxType> _localctx, int predIndex) {
 	switch (predIndex) {
 	<actions:{index|
-case <index>: return <actions.(index)>;}; separator="\n">
+case <index>:
+	return <actions.(index)>;}; separator="\n">
 	}
 	return true;
 }
@@ -431,7 +471,7 @@ CodeBlockForAlt(currentAltCodeBlock, locals, preamble, ops) ::= <<
 
 LL1AltBlock(choice, preamble, alts, error) ::= <<
 setState(<choice.stateNumber>);
-<!_errHandler.sync(this);!>
+_errHandler.sync(this);
 <if(choice.label)><labelref(choice.label)> = _input.LT(1);<endif>
 <preamble; separator="\n">
 switch (_input.LA(1)) {
@@ -445,19 +485,19 @@ default:
 
 LL1OptionalBlock(choice, alts, error) ::= <<
 setState(<choice.stateNumber>);
-<!_errHandler.sync(this);!>
+_errHandler.sync(this);
 switch (_input.LA(1)) {
 <choice.altLook,alts:{look,alt| <cases(ttypes=look)>
 	<alt>
 	break;}; separator="\n">
 default:
-	<error>
+	break;
 }
 >>
 
 LL1OptionalBlockSingleAlt(choice, expr, alts, preamble, error, followExpr) ::= <<
 setState(<choice.stateNumber>);
-<!_errHandler.sync(this);!>
+_errHandler.sync(this);
 <preamble; separator="\n">
 if (<expr>) {
 	<alts; separator="\n">
@@ -493,7 +533,7 @@ do {
 
 AltBlock(choice, preamble, alts, error) ::= <<
 setState(<choice.stateNumber>);
-<!_errHandler.sync(this);!>
+_errHandler.sync(this);
 <if(choice.label)><labelref(choice.label)> = _input.LT(1);<endif>
 <preamble; separator="\n">
 switch ( getInterpreter().adaptivePredict(_input,<choice.decision>,_ctx) ) {
@@ -506,7 +546,7 @@ case <i>:
 
 OptionalBlock(choice, alts, error) ::= <<
 setState(<choice.stateNumber>);
-<!_errHandler.sync(this);!>
+_errHandler.sync(this);
 switch ( getInterpreter().adaptivePredict(_input,<choice.decision>,_ctx) ) {
 <alts:{alt |
 case <i><if(!choice.ast.greedy)>+1<endif>:
@@ -586,11 +626,13 @@ cases(ttypes) ::= <<
 >>
 
 InvokeRule(r, argExprsChunks) ::= <<
-setState(<r.stateNumber>); <if(r.labels)><r.labels:{l | <labelref(l)> = }><endif><r.name>(<if(r.ast.options.p)><r.ast.options.p><if(argExprsChunks)>,<endif><endif><argExprsChunks>);
+setState(<r.stateNumber>);
+<if(r.labels)><r.labels:{l | <labelref(l)> = }><endif><r.name>(<if(r.ast.options.p)><r.ast.options.p><if(argExprsChunks)>,<endif><endif><argExprsChunks>);
 >>
 
 MatchToken(m) ::= <<
-setState(<m.stateNumber>); <if(m.labels)><m.labels:{l | <labelref(l)> = }><endif>match(<m.name>);
+setState(<m.stateNumber>);
+<if(m.labels)><m.labels:{l | <labelref(l)> = }><endif>match(<m.name>);
 >>
 
 MatchSet(m, expr, capture) ::= "<CommonSetStuff(m, expr, capture, false)>"
@@ -604,7 +646,11 @@ setState(<m.stateNumber>);
 if ( <if(invert)><m.varName> \<= 0 || <else>!<endif>(<expr>) ) {
 	<if(m.labels)><m.labels:{l | <labelref(l)> = (Token)}><endif>_errHandler.recoverInline(this);
 }
-consume();
+else {
+	if ( _input.LA(1)==Token.EOF ) matchedEOF = true;
+	_errHandler.reportMatch(this);
+	consume();
+}
 >>
 
 Wildcard(w) ::= <<
@@ -635,10 +681,10 @@ LexerSkipCommand()  ::= "skip();"
 LexerMoreCommand()  ::= "more();"
 LexerPopModeCommand() ::= "popMode();"
 
-LexerTypeCommand(arg)      ::= "_type = <arg>;"
-LexerChannelCommand(arg)   ::= "_channel = <arg>;"
-LexerModeCommand(arg)      ::= "_mode = <arg>;"
-LexerPushModeCommand(arg)  ::= "pushMode(<arg>);"
+LexerTypeCommand(arg, grammar)      ::= "_type = <arg>;"
+LexerChannelCommand(arg, grammar)   ::= "_channel = <arg>;"
+LexerModeCommand(arg, grammar)      ::= "_mode = <arg>;"
+LexerPushModeCommand(arg, grammar)  ::= "pushMode(<arg>);"
 
 ActionText(t) ::= "<t.text>"
 ActionTemplate(t) ::= "<t.st>"
@@ -667,11 +713,13 @@ RulePropertyRef_start(r) ::= "(<ctx(r)>.<r.label>!=null?(<ctx(r)>.<r.label>.star
 RulePropertyRef_stop(r)	 ::= "(<ctx(r)>.<r.label>!=null?(<ctx(r)>.<r.label>.stop):null)"
 RulePropertyRef_text(r)	 ::= "(<ctx(r)>.<r.label>!=null?_input.getText(<ctx(r)>.<r.label>.start,<ctx(r)>.<r.label>.stop):null)"
 RulePropertyRef_ctx(r)	 ::= "<ctx(r)>.<r.label>"
+RulePropertyRef_parser(r)	 ::= "this"
 
 ThisRulePropertyRef_start(r) ::= "_localctx.start"
 ThisRulePropertyRef_stop(r)	 ::= "_localctx.stop"
 ThisRulePropertyRef_text(r)	 ::= "_input.getText(_localctx.start, _input.LT(-1))"
 ThisRulePropertyRef_ctx(r)	 ::= "_localctx"
+ThisRulePropertyRef_parser(r)	 ::= "this"
 
 NonLocalAttrRef(s)		 ::= "((<s.ruleName; format=\"cap\">Context)getInvokingContext(<s.ruleIndex>)).<s.name>"
 SetNonLocalAttr(s, rhsChunks)	  ::=
@@ -725,9 +773,9 @@ ListLabelName(label)		  ::= "<label>"
 CaptureNextToken(d) ::= "<d.varName> = _input.LT(1);"
 CaptureNextTokenType(d) ::= "<d.varName> = _input.LA(1);"
 
-StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers,
-           superClass={ParserRuleContext}) ::= <<
-public static class <struct.name> extends <superClass><if(interfaces)> implements <interfaces; separator=", "><endif> {
+StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers)
+	::= <<
+public static class <struct.name> extends <if(contextSuperClass)><contextSuperClass><else>ParserRuleContext<endif><if(interfaces)> implements <interfaces; separator=", "><endif> {
 	<attrs:{a | public <a>;}; separator="\n">
 	<getters:{g | <g>}; separator="\n">
 	<if(ctorAttrs)>public <struct.name>(ParserRuleContext parent, int invokingState) { super(parent, invokingState); }<endif>
@@ -772,7 +820,7 @@ public \<T> T accept(ParseTreeVisitor\<? extends T> visitor) {
 }
 >>
 
-AttributeDecl(d) ::= "<d.type> <d.name>"
+AttributeDecl(d) ::= "<d.type> <d.name><if(d.initValue)> = <d.initValue><endif>"
 
 /** If we don't know location of label def x, use this template */
 labelref(x) ::= "<if(!x.isLocal)>((<x.ctx.name>)_localctx).<endif><x.name>"
@@ -859,12 +907,11 @@ public class <lexer.name> extends <superClass; null="Lexer"> {
 		<lexer.modes:{m| "<m>"}; separator=", ", wrap, anchor>
 	};
 
-	public static final String[] tokenNames = {
-		<lexer.tokenNames:{t | <t>}; null="\"\<INVALID>\"", separator=", ", wrap, anchor>
-	};
 	public static final String[] ruleNames = {
 		<lexer.ruleNames:{r | "<r>"}; separator=", ", wrap, anchor>
 	};
+
+	<vocabulary(lexer.literalNames, lexer.symbolicNames)>
 
 	<namedActions.members>
 
@@ -875,9 +922,6 @@ public class <lexer.name> extends <superClass; null="Lexer"> {
 
 	@Override
 	public String getGrammarFileName() { return "<lexer.grammarFileName>"; }
-
-	@Override
-	public String[] getTokenNames() { return tokenNames; }
 
 	@Override
 	public String[] getRuleNames() { return ruleNames; }

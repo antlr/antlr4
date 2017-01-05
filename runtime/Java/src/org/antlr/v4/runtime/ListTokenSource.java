@@ -1,6 +1,11 @@
+/*
+ * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
+
 package org.antlr.v4.runtime;
 
-import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Pair;
 
 import java.util.List;
@@ -53,7 +58,7 @@ public class ListTokenSource implements TokenSource {
 	 * {@link TokenSource}.
 	 * @exception NullPointerException if {@code tokens} is {@code null}
 	 */
-	public ListTokenSource(@NotNull List<? extends Token> tokens) {
+	public ListTokenSource(List<? extends Token> tokens) {
 		this(tokens, null);
 	}
 
@@ -70,7 +75,7 @@ public class ListTokenSource implements TokenSource {
 	 *
 	 * @exception NullPointerException if {@code tokens} is {@code null}
 	 */
-	public ListTokenSource(@NotNull List<? extends Token> tokens, String sourceName) {
+	public ListTokenSource(List<? extends Token> tokens, String sourceName) {
 		if (tokens == null) {
 			throw new NullPointerException("tokens cannot be null");
 		}
@@ -216,7 +221,7 @@ public class ListTokenSource implements TokenSource {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void setTokenFactory(@NotNull TokenFactory<?> factory) {
+	public void setTokenFactory(TokenFactory<?> factory) {
 		this._factory = factory;
 	}
 
@@ -224,7 +229,6 @@ public class ListTokenSource implements TokenSource {
 	 * {@inheritDoc}
 	 */
 	@Override
-	@NotNull
 	public TokenFactory<?> getTokenFactory() {
 		return _factory;
 	}

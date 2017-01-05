@@ -1,31 +1,7 @@
 /*
- * [The "BSD license"]
- *  Copyright (c) 2014 Terence Parr
- *  Copyright (c) 2014 Sam Harwell
- *  All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions
- *  are met:
- *
- *  1. Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  2. Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  3. The name of the author may not be used to endorse or promote products
- *     derived from this software without specific prior written permission.
- *
- *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- *  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- *  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
  */
 
 package org.antlr.v4.runtime.atn;
@@ -51,11 +27,13 @@ public class DecisionInfo {
 	 * The decision number, which is an index into {@link ATN#decisionToState}.
 	 */
 	public final int decision;
+
 	/**
 	 * The total number of times {@link ParserATNSimulator#adaptivePredict} was
 	 * invoked for this decision.
 	 */
 	public long invocations;
+
 	/**
 	 * The total time spent in {@link ParserATNSimulator#adaptivePredict} for
 	 * this decision, in nanoseconds.
@@ -79,18 +57,21 @@ public class DecisionInfo {
 	 * {@link PredictionMode#LL_EXACT_AMBIG_DETECTION} is used.
 	 */
 	public long SLL_TotalLook;
+
 	/**
 	 * Gets the minimum lookahead required for any single SLL prediction to
 	 * complete for this decision, by reaching a unique prediction, reaching an
 	 * SLL conflict state, or encountering a syntax error.
 	 */
 	public long SLL_MinLook;
+
 	/**
 	 * Gets the maximum lookahead required for any single SLL prediction to
 	 * complete for this decision, by reaching a unique prediction, reaching an
 	 * SLL conflict state, or encountering a syntax error.
 	 */
 	public long SLL_MaxLook;
+
 	/**
 	 * Gets the {@link LookaheadEventInfo} associated with the event where the
 	 * {@link #SLL_MaxLook} value was set.
@@ -103,6 +84,7 @@ public class DecisionInfo {
 	 * conflict state.
 	 */
 	public long LL_TotalLook;
+
 	/**
 	 * Gets the minimum lookahead required for any single LL prediction to
 	 * complete for this decision. An LL prediction completes when the algorithm
@@ -111,6 +93,7 @@ public class DecisionInfo {
 	 * {@link PredictionMode#LL_EXACT_AMBIG_DETECTION}, or a syntax error.
 	 */
 	public long LL_MinLook;
+
 	/**
 	 * Gets the maximum lookahead required for any single LL prediction to
 	 * complete for this decision. An LL prediction completes when the algorithm
@@ -119,6 +102,7 @@ public class DecisionInfo {
 	 * {@link PredictionMode#LL_EXACT_AMBIG_DETECTION}, or a syntax error.
 	 */
 	public long LL_MaxLook;
+
 	/**
 	 * Gets the {@link LookaheadEventInfo} associated with the event where the
 	 * {@link #LL_MaxLook} value was set.
@@ -132,6 +116,7 @@ public class DecisionInfo {
 	 * @see ContextSensitivityInfo
 	 */
 	public final List<ContextSensitivityInfo> contextSensitivities = new ArrayList<ContextSensitivityInfo>();
+
 	/**
 	 * A collection of {@link ErrorInfo} instances describing the parse errors
 	 * identified during calls to {@link ParserATNSimulator#adaptivePredict} for
@@ -140,6 +125,7 @@ public class DecisionInfo {
 	 * @see ErrorInfo
 	 */
 	public final List<ErrorInfo> errors = new ArrayList<ErrorInfo>();
+
 	/**
 	 * A collection of {@link AmbiguityInfo} instances describing the
 	 * ambiguities encountered during LL prediction for this decision.
@@ -174,6 +160,7 @@ public class DecisionInfo {
 	 * @see LexerATNSimulator#computeTargetState
 	 */
 	public long SLL_ATNTransitions;
+
 	/**
 	 * The total number of DFA transitions required during SLL prediction for
 	 * this decision.
@@ -216,6 +203,7 @@ public class DecisionInfo {
 	 * @see LexerATNSimulator#computeTargetState
 	 */
 	public long LL_ATNTransitions;
+
 	/**
 	 * The total number of DFA transitions required during LL prediction for
 	 * this decision.

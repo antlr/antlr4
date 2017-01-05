@@ -1,31 +1,7 @@
 /*
- * [The "BSD license"]
- *  Copyright (c) 2012 Terence Parr
- *  Copyright (c) 2012 Sam Harwell
- *  All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions
- *  are met:
- *
- *  1. Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  2. Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  3. The name of the author may not be used to endorse or promote products
- *     derived from this software without specific prior written permission.
- *
- *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- *  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- *  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
  */
 
 package org.antlr.v4;
@@ -51,7 +27,6 @@ import org.antlr.v4.parse.ToolANTLRParser;
 import org.antlr.v4.parse.v3TreeGrammarException;
 import org.antlr.v4.runtime.RuntimeMetaData;
 import org.antlr.v4.runtime.misc.LogManager;
-import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.tool.ANTLRMessage;
 import org.antlr.v4.tool.ANTLRToolListener;
@@ -481,18 +456,18 @@ public class Tool {
 			@Override
 			public void ruleRef(GrammarAST ref, ActionAST arg) {
 				RuleAST ruleAST = ruleToAST.get(ref.getText());
+				String fileName = ref.getToken().getInputStream().getSourceName();
 				if (Character.isUpperCase(currentRuleName.charAt(0)) &&
 					Character.isLowerCase(ref.getText().charAt(0)))
 				{
 					badref = true;
-					String fileName = ref.getToken().getInputStream().getSourceName();
 					errMgr.grammarError(ErrorType.PARSER_RULE_REF_IN_LEXER_RULE,
 										fileName, ref.getToken(), ref.getText(), currentRuleName);
 				}
 				else if ( ruleAST==null ) {
 					badref = true;
 					errMgr.grammarError(ErrorType.UNDEFINED_RULE_REF,
-										g.fileName, ref.token, ref.getText());
+										fileName, ref.token, ref.getText());
 				}
 			}
 			@Override
@@ -522,6 +497,19 @@ public class Tool {
 			// Make grammars depend on any tokenVocab options
 			if ( tokenVocabNode!=null ) {
 				String vocabName = tokenVocabNode.getText();
+				// Strip quote characters if any
+				int len = vocabName.length();
+				int firstChar = vocabName.charAt(0);
+				int lastChar = vocabName.charAt(len - 1);
+				if (len >= 2 && firstChar == '\'' && lastChar == '\'') {
+					vocabName = vocabName.substring(1, len-1);
+				}
+				// If the name contains a path delimited by forward slashes,
+				// use only the part after the last slash as the name
+				int lastSlash = vocabName.lastIndexOf('/');
+				if (lastSlash >= 0) {
+					vocabName = vocabName.substring(lastSlash + 1);
+				}
 				g.addEdge(grammarName, vocabName);
 			}
 			// add cycle to graph so we always process a grammar if no error
@@ -608,6 +596,8 @@ public class Tool {
 		return g;
 	}
 
+	private final Map<String, Grammar> importedGrammars = new HashMap<String, Grammar>();
+
 	/**
 	 * Try current dir then dir of g then lib dir
 	 * @param g
@@ -615,27 +605,34 @@ public class Tool {
 	 */
 	public Grammar loadImportedGrammar(Grammar g, GrammarAST nameNode) throws IOException {
 		String name = nameNode.getText();
-		g.tool.log("grammar", "load " + name + " from " + g.fileName);
-		File importedFile = null;
-		for (String extension : ALL_GRAMMAR_EXTENSIONS) {
-			importedFile = getImportedGrammarFile(g, name + extension);
-			if (importedFile != null) {
-				break;
+		Grammar imported = importedGrammars.get(name);
+		if (imported == null) {
+			g.tool.log("grammar", "load " + name + " from " + g.fileName);
+			File importedFile = null;
+			for (String extension : ALL_GRAMMAR_EXTENSIONS) {
+				importedFile = getImportedGrammarFile(g, name + extension);
+				if (importedFile != null) {
+					break;
+				}
 			}
+
+			if ( importedFile==null ) {
+				errMgr.grammarError(ErrorType.CANNOT_FIND_IMPORTED_GRAMMAR, g.fileName, nameNode.getToken(), name);
+				return null;
+			}
+
+			String absolutePath = importedFile.getAbsolutePath();
+			ANTLRFileStream in = new ANTLRFileStream(absolutePath, grammarEncoding);
+			GrammarRootAST root = parse(g.fileName, in);
+			if (root == null) {
+				return null;
+			}
+
+			imported = createGrammar(root);
+			imported.fileName = absolutePath;
+			importedGrammars.put(root.getGrammarName(), imported);
 		}
 
-		if ( importedFile==null ) {
-			errMgr.grammarError(ErrorType.CANNOT_FIND_IMPORTED_GRAMMAR, g.fileName, nameNode.getToken(), name);
-			return null;
-		}
-
-		ANTLRFileStream in = new ANTLRFileStream(importedFile.getAbsolutePath(), grammarEncoding);
-		GrammarRootAST root = parse(g.fileName, in);
-		if ( root==null ) {
-			return null;
-		}
-		Grammar imported = createGrammar(root);
-		imported.fileName = importedFile.getAbsolutePath();
 		return imported;
 	}
 
@@ -705,7 +702,7 @@ public class Tool {
 	 *
 	 *  The output dir -o spec takes precedence if it's absolute.
 	 *  E.g., if the grammar file dir is absolute the output dir is given
-	 *  precendence. "-o /tmp /usr/lib/t.g4" results in "/tmp/T.java" as
+	 *  precedence. "-o /tmp /usr/lib/t.g4" results in "/tmp/T.java" as
 	 *  output (assuming t.g4 holds T.java).
 	 *
 	 *  If no -o is specified, then just write to the directory where the
@@ -833,7 +830,7 @@ public class Tool {
 		}
 	}
 
-    public void log(@Nullable String component, String msg) { logMgr.log(component, msg); }
+    public void log(String component, String msg) { logMgr.log(component, msg); }
     public void log(String msg) { log(null, msg); }
 
 	public int getNumErrors() { return errMgr.getNumErrors(); }

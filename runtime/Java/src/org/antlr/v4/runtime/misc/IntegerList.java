@@ -1,31 +1,7 @@
 /*
- * [The "BSD license"]
- *  Copyright (c) 2012 Terence Parr
- *  Copyright (c) 2012 Sam Harwell
- *  All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions
- *  are met:
- *
- *  1. Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  2. Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  3. The name of the author may not be used to endorse or promote products
- *     derived from this software without specific prior written permission.
- *
- *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- *  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- *  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
  */
 package org.antlr.v4.runtime.misc;
 
@@ -44,7 +20,7 @@ public class IntegerList {
 	private static final int INITIAL_SIZE = 4;
 	private static final int MAX_ARRAY_SIZE = Integer.MAX_VALUE - 8;
 
-	@NotNull
+
 	private int[] _data;
 
 	private int _size;
@@ -65,12 +41,12 @@ public class IntegerList {
 		}
 	}
 
-	public IntegerList(@NotNull IntegerList list) {
+	public IntegerList(IntegerList list) {
 		_data = list._data.clone();
 		_size = list._size;
 	}
 
-	public IntegerList(@NotNull Collection<Integer> list) {
+	public IntegerList(Collection<Integer> list) {
 		this(list.size());
 		for (Integer value : list) {
 			add(value);
@@ -101,12 +77,11 @@ public class IntegerList {
 	public final void addAll(Collection<Integer> list) {
 		ensureCapacity(_size + list.size());
 		int current = 0;
-		for (int x : list) {
-			_data[_size + current] = x;
-			current++;
-		}
-
-		_size += list.size();
+    		for (int x : list) {
+      			_data[_size + current] = x;
+      			current++;
+    		}
+    		_size += list.size();
 	}
 
 	public final int get(int index) {
@@ -267,6 +242,9 @@ public class IntegerList {
 	public final int binarySearch(int fromIndex, int toIndex, int key) {
 		if (fromIndex < 0 || toIndex < 0 || fromIndex > _size || toIndex > _size) {
 			throw new IndexOutOfBoundsException();
+		}
+		if (fromIndex > toIndex) {
+        		throw new IllegalArgumentException();
 		}
 
 		return Arrays.binarySearch(_data, fromIndex, toIndex, key);

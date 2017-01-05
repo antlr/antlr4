@@ -1,37 +1,12 @@
 /*
- * [The "BSD license"]
- *  Copyright (c) 2012 Terence Parr
- *  Copyright (c) 2012 Sam Harwell
- *  All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions
- *  are met:
- *
- *  1. Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  2. Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  3. The name of the author may not be used to endorse or promote products
- *     derived from this software without specific prior written permission.
- *
- *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- *  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- *  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
  */
 
 package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.BailErrorStrategy;
-import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.FailedPredicateException;
 import org.antlr.v4.runtime.IntStream;
 import org.antlr.v4.runtime.NoViableAltException;
@@ -40,13 +15,13 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStream;
+import org.antlr.v4.runtime.Vocabulary;
+import org.antlr.v4.runtime.VocabularyImpl;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.dfa.DFAState;
 import org.antlr.v4.runtime.misc.DoubleKeyMap;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.IntervalSet;
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
 import org.antlr.v4.runtime.misc.Pair;
 
 import java.util.ArrayList;
@@ -58,6 +33,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static org.antlr.v4.runtime.atn.ATNState.BLOCK_END;
 
 /**
  * The embodiment of the adaptive LL(*), ALL(*), parsing strategy.
@@ -292,14 +269,15 @@ public class ParserATNSimulator extends ATNSimulator {
 	public static final boolean dfa_debug = false;
 	public static final boolean retry_debug = false;
 
-	@Nullable
+	/** Just in case this optimization is bad, add an ENV variable to turn it off */
+	public static final boolean TURN_OFF_LR_LOOP_ENTRY_BRANCH_OPT = Boolean.parseBoolean(System.getenv("TURN_OFF_LR_LOOP_ENTRY_BRANCH_OPT"));
+
 	protected final Parser parser;
 
-	@NotNull
 	public final DFA[] decisionToDFA;
 
 	/** SLL, LL, or LL + exact ambig detection? */
-	@NotNull
+
 	private PredictionMode mode = PredictionMode.LL;
 
 	/** Each prediction operation uses a cache for merge of prediction contexts.
@@ -319,15 +297,15 @@ public class ParserATNSimulator extends ATNSimulator {
 	protected DFA _dfa;
 
 	/** Testing only! */
-	public ParserATNSimulator(@NotNull ATN atn, @NotNull DFA[] decisionToDFA,
-							  @NotNull PredictionContextCache sharedContextCache)
+	public ParserATNSimulator(ATN atn, DFA[] decisionToDFA,
+							  PredictionContextCache sharedContextCache)
 	{
 		this(null, atn, decisionToDFA, sharedContextCache);
 	}
 
-	public ParserATNSimulator(@Nullable Parser parser, @NotNull ATN atn,
-							  @NotNull DFA[] decisionToDFA,
-							  @NotNull PredictionContextCache sharedContextCache)
+	public ParserATNSimulator(Parser parser, ATN atn,
+							  DFA[] decisionToDFA,
+							  PredictionContextCache sharedContextCache)
 	{
 		super(atn, sharedContextCache);
 		this.parser = parser;
@@ -348,8 +326,8 @@ public class ParserATNSimulator extends ATNSimulator {
 		}
 	}
 
-	public int adaptivePredict(@NotNull TokenStream input, int decision,
-							   @Nullable ParserRuleContext outerContext)
+	public int adaptivePredict(TokenStream input, int decision,
+							   ParserRuleContext outerContext)
 	{
 		if ( debug || debug_list_atn_decisions )  {
 			System.out.println("adaptivePredict decision "+decision+
@@ -388,17 +366,6 @@ public class ParserATNSimulator extends ATNSimulator {
 									   ", outerContext="+ outerContext.toString(parser));
 				}
 
-				/* If this is not a precedence DFA, we check the ATN start state
-				 * to determine if this ATN start state is the decision for the
-				 * closure block that determines whether a precedence rule
-				 * should continue or complete.
-				 */
-				if (!dfa.isPrecedenceDfa() && dfa.atnStartState instanceof StarLoopEntryState) {
-					if (((StarLoopEntryState)dfa.atnStartState).precedenceRuleDecision) {
-						dfa.setPrecedenceDfa(true);
-					}
-				}
-
 				boolean fullCtx = false;
 				ATNConfigSet s0_closure =
 					computeStartState(dfa.atnStartState,
@@ -412,6 +379,7 @@ public class ParserATNSimulator extends ATNSimulator {
 					 * appropriate start state for the precedence level rather
 					 * than simply setting DFA.s0.
 					 */
+					dfa.s0.configs = s0_closure; // not used for prediction but useful to know start configs anyway
 					s0_closure = applyPrecedenceFilter(s0_closure);
 					s0 = addDFAState(dfa, new DFAState(s0_closure));
 					dfa.setPrecedenceStartState(parser.getPrecedence(), s0);
@@ -423,7 +391,7 @@ public class ParserATNSimulator extends ATNSimulator {
 			}
 
 			int alt = execATN(dfa, s0, input, index, outerContext);
-			if ( debug ) System.out.println("DFA after predictATN: "+ dfa.toString(parser.getTokenNames()));
+			if ( debug ) System.out.println("DFA after predictATN: "+ dfa.toString(parser.getVocabulary()));
 			return alt;
 		}
 		finally {
@@ -464,8 +432,8 @@ public class ParserATNSimulator extends ATNSimulator {
 	    conflict
 	    conflict + preds
 	 */
-	protected int execATN(@NotNull DFA dfa, @NotNull DFAState s0,
-					   @NotNull TokenStream input, int startIndex,
+	protected int execATN(DFA dfa, DFAState s0,
+					   TokenStream input, int startIndex,
 					   ParserRuleContext outerContext)
 	{
 		if ( debug || debug_list_atn_decisions) {
@@ -583,8 +551,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	 * {@code t}, or {@code null} if the target state for this edge is not
 	 * already cached
 	 */
-	@Nullable
-	protected DFAState getExistingTargetState(@NotNull DFAState previousD, int t) {
+	protected DFAState getExistingTargetState(DFAState previousD, int t) {
 		DFAState[] edges = previousD.edges;
 		if (edges == null || t + 1 < 0 || t + 1 >= edges.length) {
 			return null;
@@ -605,8 +572,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	 * {@code t}. If {@code t} does not lead to a valid DFA state, this method
 	 * returns {@link #ERROR}.
 	 */
-	@NotNull
-	protected DFAState computeTargetState(@NotNull DFA dfa, @NotNull DFAState previousD, int t) {
+	protected DFAState computeTargetState(DFA dfa, DFAState previousD, int t) {
 		ATNConfigSet reach = computeReachSet(previousD.configs, t, false);
 		if ( reach==null ) {
 			addDFAEdge(dfa, previousD, t, ERROR);
@@ -676,9 +642,9 @@ public class ParserATNSimulator extends ATNSimulator {
 
 	// comes back with reach.uniqueAlt set to a valid alt
 	protected int execATNWithFullContext(DFA dfa,
-										 DFAState D, // how far we got before failing over
-										 @NotNull ATNConfigSet s0,
-										 @NotNull TokenStream input, int startIndex,
+										 DFAState D, // how far we got in SLL DFA before failing over
+										 ATNConfigSet s0,
+										 TokenStream input, int startIndex,
 										 ParserRuleContext outerContext)
 	{
 		if ( debug || debug_list_atn_decisions ) {
@@ -724,6 +690,7 @@ public class ParserATNSimulator extends ATNSimulator {
 			}
 
 //			System.out.println("altSubSets: "+altSubSets);
+//			System.err.println("reach="+reach+", "+reach.conflictingAlts);
 			reach.uniqueAlt = getUniqueAlt(reach);
 			// unique prediction?
 			if ( reach.uniqueAlt!=ATN.INVALID_ALT_NUMBER ) {
@@ -793,7 +760,8 @@ public class ParserATNSimulator extends ATNSimulator {
 		the fact that we should predict alternative 1.  We just can't say for
 		sure that there is an ambiguity without looking further.
 		*/
-		reportAmbiguity(dfa, D, startIndex, input.index(), foundExactAmbig, null, reach);
+		reportAmbiguity(dfa, D, startIndex, input.index(), foundExactAmbig,
+						reach.getAlts(), reach);
 
 		return predictedAlt;
 	}
@@ -801,7 +769,8 @@ public class ParserATNSimulator extends ATNSimulator {
 	protected ATNConfigSet computeReachSet(ATNConfigSet closure, int t,
 										   boolean fullCtx)
 	{
-		if ( debug ) System.out.println("in computeReachSet, starting closure: " + closure);
+		if ( debug )
+			System.out.println("in computeReachSet, starting closure: " + closure);
 
 		if (mergeCache == null) {
 			mergeCache = new DoubleKeyMap<PredictionContext, PredictionContext, PredictionContext>();
@@ -948,8 +917,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	 * rule stop state, otherwise return a new configuration set containing only
 	 * the configurations from {@code configs} which are in a rule stop state
 	 */
-	@NotNull
-	protected ATNConfigSet removeAllConfigsNotInRuleStopState(@NotNull ATNConfigSet configs, boolean lookToEndOfRule) {
+	protected ATNConfigSet removeAllConfigsNotInRuleStopState(ATNConfigSet configs, boolean lookToEndOfRule) {
 		if (PredictionMode.allConfigsInRuleStopStates(configs)) {
 			return configs;
 		}
@@ -973,9 +941,9 @@ public class ParserATNSimulator extends ATNSimulator {
 		return result;
 	}
 
-	@NotNull
-	protected ATNConfigSet computeStartState(@NotNull ATNState p,
-										  @Nullable RuleContext ctx,
+
+	protected ATNConfigSet computeStartState(ATNState p,
+										  RuleContext ctx,
 										  boolean fullCtx)
 	{
 		// always at least the implicit call to start rule
@@ -994,10 +962,6 @@ public class ParserATNSimulator extends ATNSimulator {
 
 	/* parrt internal source braindump that doesn't mess up
 	 * external API spec.
-
-		applyPrecedenceFilter is an optimization to avoid highly
-		nonlinear prediction of expressions and other left recursive
-		rules. The precedence predicates such as {3>=prec}? Are highly
 		context-sensitive in that they can only be properly evaluated
 		in the context of the proper prec argument. Without pruning,
 		these predicates are normal predicates evaluated when we reach
@@ -1098,7 +1062,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		state p, corresponding to a rule invocation with precedence
 		level 0"
 	 */
-	
+
 	/**
 	 * This method transforms the start state computed by
 	 * {@link #computeStartState} to the special start state used by a
@@ -1159,8 +1123,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	 * for a precedence DFA at a particular precedence level (determined by
 	 * calling {@link Parser#getPrecedence}).
 	 */
-	@NotNull
-	protected ATNConfigSet applyPrecedenceFilter(@NotNull ATNConfigSet configs) {
+	protected ATNConfigSet applyPrecedenceFilter(ATNConfigSet configs) {
 		Map<Integer, PredictionContext> statesFromAlt1 = new HashMap<Integer, PredictionContext>();
 		ATNConfigSet configSet = new ATNConfigSet(configs.fullCtx);
 		for (ATNConfig config : configs) {
@@ -1208,8 +1171,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		return configSet;
 	}
 
-	@Nullable
-	protected ATNState getReachableTarget(@NotNull Transition trans, int ttype) {
+	protected ATNState getReachableTarget(Transition trans, int ttype) {
 		if (trans.matches(ttype, 0, atn.maxTokenType)) {
 			return trans.target;
 		}
@@ -1217,8 +1179,8 @@ public class ParserATNSimulator extends ATNSimulator {
 		return null;
 	}
 
-	protected SemanticContext[] getPredsForAmbigAlts(@NotNull BitSet ambigAlts,
-												  @NotNull ATNConfigSet configs,
+	protected SemanticContext[] getPredsForAmbigAlts(BitSet ambigAlts,
+												  ATNConfigSet configs,
 												  int nalts)
 	{
 		// REACH=[1|1|[]|0:0, 1|2|[]|0:1]
@@ -1402,7 +1364,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	 *  then we stop at the first predicate that evaluates to true. This
 	 *  includes pairs with null predicates.
 	 */
-	protected BitSet evalSemanticContext(@NotNull DFAState.PredPrediction[] predPredictions,
+	protected BitSet evalSemanticContext(DFAState.PredPrediction[] predPredictions,
 									  ParserRuleContext outerContext,
 									  boolean complete)
 	{
@@ -1464,7 +1426,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	 *
 	 * @since 4.3
 	 */
-	protected boolean evalSemanticContext(@NotNull SemanticContext pred, ParserRuleContext parserCallStack, int alt, boolean fullCtx) {
+	protected boolean evalSemanticContext(SemanticContext pred, ParserRuleContext parserCallStack, int alt, boolean fullCtx) {
 		return pred.eval(parser, parserCallStack);
 	}
 
@@ -1475,9 +1437,9 @@ public class ParserATNSimulator extends ATNSimulator {
 		 ambig detection thought :(
 		  */
 
-	protected void closure(@NotNull ATNConfig config,
-						   @NotNull ATNConfigSet configs,
-						   @NotNull Set<ATNConfig> closureBusy,
+	protected void closure(ATNConfig config,
+						   ATNConfigSet configs,
+						   Set<ATNConfig> closureBusy,
 						   boolean collectPredicates,
 						   boolean fullCtx,
 						   boolean treatEofAsEpsilon)
@@ -1489,9 +1451,9 @@ public class ParserATNSimulator extends ATNSimulator {
 		assert !fullCtx || !configs.dipsIntoOuterContext;
 	}
 
-	protected void closureCheckingStopState(@NotNull ATNConfig config,
-											@NotNull ATNConfigSet configs,
-											@NotNull Set<ATNConfig> closureBusy,
+	protected void closureCheckingStopState(ATNConfig config,
+											ATNConfigSet configs,
+											Set<ATNConfig> closureBusy,
 											boolean collectPredicates,
 											boolean fullCtx,
 											int depth,
@@ -1553,9 +1515,9 @@ public class ParserATNSimulator extends ATNSimulator {
 	}
 
 	/** Do the actual work of walking epsilon edges */
-	protected void closure_(@NotNull ATNConfig config,
-							@NotNull ATNConfigSet configs,
-							@NotNull Set<ATNConfig> closureBusy,
+	protected void closure_(ATNConfig config,
+							ATNConfigSet configs,
+							Set<ATNConfig> closureBusy,
 							boolean collectPredicates,
 							boolean fullCtx,
 							int depth,
@@ -1571,6 +1533,8 @@ public class ParserATNSimulator extends ATNSimulator {
         }
 
 		for (int i=0; i<p.getNumberOfTransitions(); i++) {
+			if ( i==0 && canDropLoopEntryEdgeInLeftRecursiveRule(config) ) continue;
+
 			Transition t = p.transition(i);
 			boolean continueCollecting =
 				!(t instanceof ActionTransition) && collectPredicates;
@@ -1622,15 +1586,174 @@ public class ParserATNSimulator extends ATNSimulator {
 		}
 	}
 
-	@NotNull
+	/** Implements first-edge (loop entry) elimination as an optimization
+	 *  during closure operations.  See antlr/antlr4#1398.
+	 *
+	 * The optimization is to avoid adding the loop entry config when
+	 * the exit path can only lead back to the same
+	 * StarLoopEntryState after popping context at the rule end state
+	 * (traversing only epsilon edges, so we're still in closure, in
+	 * this same rule).
+	 *
+	 * We need to detect any state that can reach loop entry on
+	 * epsilon w/o exiting rule. We don't have to look at FOLLOW
+	 * links, just ensure that all stack tops for config refer to key
+	 * states in LR rule.
+	 *
+	 * To verify we are in the right situation we must first check
+	 * closure is at a StarLoopEntryState generated during LR removal.
+	 * Then we check that each stack top of context is a return state
+	 * from one of these cases:
+	 *
+	 *   1. 'not' expr, '(' type ')' expr. The return state points at loop entry state
+	 *   2. expr op expr. The return state is the block end of internal block of (...)*
+	 *   3. 'between' expr 'and' expr. The return state of 2nd expr reference.
+	 *      That state points at block end of internal block of (...)*.
+	 *   4. expr '?' expr ':' expr. The return state points at block end,
+	 *      which points at loop entry state.
+	 *
+	 * If any is true for each stack top, then closure does not add a
+	 * config to the current config set for edge[0], the loop entry branch.
+	 *
+	 *  Conditions fail if any context for the current config is:
+	 *
+	 *   a. empty (we'd fall out of expr to do a global FOLLOW which could
+	 *      even be to some weird spot in expr) or,
+	 *   b. lies outside of expr or,
+	 *   c. lies within expr but at a state not the BlockEndState
+	 *   generated during LR removal
+	 *
+	 * Do we need to evaluate predicates ever in closure for this case?
+	 *
+	 * No. Predicates, including precedence predicates, are only
+	 * evaluated when computing a DFA start state. I.e., only before
+	 * the lookahead (but not parser) consumes a token.
+	 *
+	 * There are no epsilon edges allowed in LR rule alt blocks or in
+	 * the "primary" part (ID here). If closure is in
+	 * StarLoopEntryState any lookahead operation will have consumed a
+	 * token as there are no epsilon-paths that lead to
+	 * StarLoopEntryState. We do not have to evaluate predicates
+	 * therefore if we are in the generated StarLoopEntryState of a LR
+	 * rule. Note that when making a prediction starting at that
+	 * decision point, decision d=2, compute-start-state performs
+	 * closure starting at edges[0], edges[1] emanating from
+	 * StarLoopEntryState. That means it is not performing closure on
+	 * StarLoopEntryState during compute-start-state.
+	 *
+	 * How do we know this always gives same prediction answer?
+	 *
+	 * Without predicates, loop entry and exit paths are ambiguous
+	 * upon remaining input +b (in, say, a+b). Either paths lead to
+	 * valid parses. Closure can lead to consuming + immediately or by
+	 * falling out of this call to expr back into expr and loop back
+	 * again to StarLoopEntryState to match +b. In this special case,
+	 * we choose the more efficient path, which is to take the bypass
+	 * path.
+	 *
+	 * The lookahead language has not changed because closure chooses
+	 * one path over the other. Both paths lead to consuming the same
+	 * remaining input during a lookahead operation. If the next token
+	 * is an operator, lookahead will enter the choice block with
+	 * operators. If it is not, lookahead will exit expr. Same as if
+	 * closure had chosen to enter the choice block immediately.
+	 *
+	 * Closure is examining one config (some loopentrystate, some alt,
+	 * context) which means it is considering exactly one alt. Closure
+	 * always copies the same alt to any derived configs.
+	 *
+	 * How do we know this optimization doesn't mess up precedence in
+	 * our parse trees?
+	 *
+	 * Looking through expr from left edge of stat only has to confirm
+	 * that an input, say, a+b+c; begins with any valid interpretation
+	 * of an expression. The precedence actually doesn't matter when
+	 * making a decision in stat seeing through expr. It is only when
+	 * parsing rule expr that we must use the precedence to get the
+	 * right interpretation and, hence, parse tree.
+	 *
+	 * @since 4.6
+	 */
+	protected boolean canDropLoopEntryEdgeInLeftRecursiveRule(ATNConfig config) {
+		if ( TURN_OFF_LR_LOOP_ENTRY_BRANCH_OPT ) return false;
+		ATNState p = config.state;
+		// First check to see if we are in StarLoopEntryState generated during
+		// left-recursion elimination. For efficiency, also check if
+		// the context has an empty stack case. If so, it would mean
+		// global FOLLOW so we can't perform optimization
+		if ( p.getStateType() != ATNState.STAR_LOOP_ENTRY ||
+			 !((StarLoopEntryState)p).isPrecedenceDecision || // Are we the special loop entry/exit state?
+			 config.context.isEmpty() ||                      // If SLL wildcard
+			 config.context.hasEmptyPath())
+		{
+			return false;
+		}
+
+		// Require all return states to return back to the same rule
+		// that p is in.
+		int numCtxs = config.context.size();
+		for (int i = 0; i < numCtxs; i++) { // for each stack context
+			ATNState returnState = atn.states.get(config.context.getReturnState(i));
+			if ( returnState.ruleIndex != p.ruleIndex ) return false;
+		}
+
+		BlockStartState decisionStartState = (BlockStartState)p.transition(0).target;
+		int blockEndStateNum = decisionStartState.endState.stateNumber;
+		BlockEndState blockEndState = (BlockEndState)atn.states.get(blockEndStateNum);
+
+		// Verify that the top of each stack context leads to loop entry/exit
+		// state through epsilon edges and w/o leaving rule.
+		for (int i = 0; i < numCtxs; i++) {                           // for each stack context
+			int returnStateNumber = config.context.getReturnState(i);
+			ATNState returnState = atn.states.get(returnStateNumber);
+			// all states must have single outgoing epsilon edge
+			if ( returnState.getNumberOfTransitions()!=1 ||
+				 !returnState.transition(0).isEpsilon() )
+			{
+				return false;
+			}
+			// Look for prefix op case like 'not expr', (' type ')' expr
+			ATNState returnStateTarget = returnState.transition(0).target;
+			if ( returnState.getStateType()==BLOCK_END && returnStateTarget==p ) {
+				continue;
+			}
+			// Look for 'expr op expr' or case where expr's return state is block end
+			// of (...)* internal block; the block end points to loop back
+			// which points to p but we don't need to check that
+			if ( returnState==blockEndState ) {
+				continue;
+			}
+			// Look for ternary expr ? expr : expr. The return state points at block end,
+			// which points at loop entry state
+			if ( returnStateTarget==blockEndState ) {
+				continue;
+			}
+			// Look for complex prefix 'between expr and expr' case where 2nd expr's
+			// return state points at block end state of (...)* internal block
+			if ( returnStateTarget.getStateType() == BLOCK_END &&
+				 returnStateTarget.getNumberOfTransitions()==1 &&
+				 returnStateTarget.transition(0).isEpsilon() &&
+				 returnStateTarget.transition(0).target == p )
+			{
+				continue;
+			}
+
+			// anything else ain't conforming
+			return false;
+		}
+
+		return true;
+	}
+
+
 	public String getRuleName(int index) {
 		if ( parser!=null && index>=0 ) return parser.getRuleNames()[index];
 		return "<rule "+index+">";
 	}
 
-	@Nullable
-	protected ATNConfig getEpsilonTarget(@NotNull ATNConfig config,
-									  @NotNull Transition t,
+
+	protected ATNConfig getEpsilonTarget(ATNConfig config,
+									  Transition t,
 									  boolean collectPredicates,
 									  boolean inContext,
 									  boolean fullCtx,
@@ -1673,15 +1796,15 @@ public class ParserATNSimulator extends ATNSimulator {
 		}
 	}
 
-	@NotNull
-	protected ATNConfig actionTransition(@NotNull ATNConfig config, @NotNull ActionTransition t) {
+
+	protected ATNConfig actionTransition(ATNConfig config, ActionTransition t) {
 		if ( debug ) System.out.println("ACTION edge "+t.ruleIndex+":"+t.actionIndex);
 		return new ATNConfig(config, t.target);
 	}
 
-	@Nullable
-	public ATNConfig precedenceTransition(@NotNull ATNConfig config,
-									@NotNull PrecedencePredicateTransition pt,
+
+	public ATNConfig precedenceTransition(ATNConfig config,
+									PrecedencePredicateTransition pt,
 									boolean collectPredicates,
 									boolean inContext,
 									boolean fullCtx)
@@ -1725,9 +1848,9 @@ public class ParserATNSimulator extends ATNSimulator {
         return c;
 	}
 
-	@Nullable
-	protected ATNConfig predTransition(@NotNull ATNConfig config,
-									@NotNull PredicateTransition pt,
+
+	protected ATNConfig predTransition(ATNConfig config,
+									PredicateTransition pt,
 									boolean collectPredicates,
 									boolean inContext,
 									boolean fullCtx)
@@ -1773,8 +1896,8 @@ public class ParserATNSimulator extends ATNSimulator {
         return c;
 	}
 
-	@NotNull
-	protected ATNConfig ruleTransition(@NotNull ATNConfig config, @NotNull RuleTransition t) {
+
+	protected ATNConfig ruleTransition(ATNConfig config, RuleTransition t) {
 		if ( debug ) {
 			System.out.println("CALL rule "+getRuleName(t.target.ruleIndex)+
 							   ", ctx="+config.context);
@@ -1795,8 +1918,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	 * conflicting alternative subsets. If {@code configs} does not contain any
 	 * conflicting subsets, this method returns an empty {@link BitSet}.
 	 */
-	@NotNull
-	protected BitSet getConflictingAlts(@NotNull ATNConfigSet configs) {
+	protected BitSet getConflictingAlts(ATNConfigSet configs) {
 		Collection<BitSet> altsets = PredictionMode.getConflictingAltSubsets(configs);
 		return PredictionMode.getAlts(altsets);
 	}
@@ -1837,7 +1959,6 @@ public class ParserATNSimulator extends ATNSimulator {
 	 ignore a set of conflicting alts when we have an alternative
 	 that we still need to pursue.
 	 */
-
 	protected BitSet getConflictingAltsOrUniqueAlt(ATNConfigSet configs) {
 		BitSet conflictingAlts;
 		if ( configs.uniqueAlt!= ATN.INVALID_ALT_NUMBER ) {
@@ -1850,20 +1971,19 @@ public class ParserATNSimulator extends ATNSimulator {
 		return conflictingAlts;
 	}
 
-	@NotNull
+
 	public String getTokenName(int t) {
-		if ( t==Token.EOF ) return "EOF";
-		if ( parser!=null && parser.getTokenNames()!=null ) {
-			String[] tokensNames = parser.getTokenNames();
-			if ( t>=tokensNames.length ) {
-				System.err.println(t+" ttype out of range: "+ Arrays.toString(tokensNames));
-				System.err.println(((CommonTokenStream)parser.getInputStream()).getTokens());
-			}
-			else {
-				return tokensNames[t]+"<"+t+">";
-			}
+		if (t == Token.EOF) {
+			return "EOF";
 		}
-		return String.valueOf(t);
+
+		Vocabulary vocabulary = parser != null ? parser.getVocabulary() : VocabularyImpl.EMPTY_VOCABULARY;
+		String displayName = vocabulary.getDisplayName(t);
+		if (displayName.equals(Integer.toString(t))) {
+			return displayName;
+		}
+
+		return displayName + "<" + t + ">";
 	}
 
 	public String getLookaheadName(TokenStream input) {
@@ -1874,7 +1994,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	 *  it out for clarity now that alg. works well. We can leave this
 	 *  "dead" code for a bit.
 	 */
-	public void dumpDeadEndConfigs(@NotNull NoViableAltException nvae) {
+	public void dumpDeadEndConfigs(NoViableAltException nvae) {
 		System.err.println("dead end configs: ");
 		for (ATNConfig c : nvae.getDeadEndConfigs()) {
 			String trans = "no edges";
@@ -1894,10 +2014,10 @@ public class ParserATNSimulator extends ATNSimulator {
 		}
 	}
 
-	@NotNull
-	protected NoViableAltException noViableAlt(@NotNull TokenStream input,
-											@NotNull ParserRuleContext outerContext,
-											@NotNull ATNConfigSet configs,
+
+	protected NoViableAltException noViableAlt(TokenStream input,
+											ParserRuleContext outerContext,
+											ATNConfigSet configs,
 											int startIndex)
 	{
 		return new NoViableAltException(parser, input,
@@ -1906,7 +2026,7 @@ public class ParserATNSimulator extends ATNSimulator {
 											configs, outerContext);
 	}
 
-	protected static int getUniqueAlt(@NotNull ATNConfigSet configs) {
+	protected static int getUniqueAlt(ATNConfigSet configs) {
 		int alt = ATN.INVALID_ALT_NUMBER;
 		for (ATNConfig c : configs) {
 			if ( alt == ATN.INVALID_ALT_NUMBER ) {
@@ -1939,10 +2059,10 @@ public class ParserATNSimulator extends ATNSimulator {
 	 * otherwise this method returns the result of calling {@link #addDFAState}
 	 * on {@code to}
 	 */
-	protected DFAState addDFAEdge(@NotNull DFA dfa,
-								  @Nullable DFAState from,
+	protected DFAState addDFAEdge(DFA dfa,
+								  DFAState from,
 								  int t,
-								  @Nullable DFAState to)
+								  DFAState to)
 	{
 		if ( debug ) {
 			System.out.println("EDGE "+from+" -> "+to+" upon "+getTokenName(t));
@@ -1966,7 +2086,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		}
 
 		if ( debug ) {
-			System.out.println("DFA=\n"+dfa.toString(parser!=null?parser.getTokenNames():null));
+			System.out.println("DFA=\n"+dfa.toString(parser!=null?parser.getVocabulary():VocabularyImpl.EMPTY_VOCABULARY));
 		}
 
 		return to;
@@ -1987,8 +2107,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	 * state if {@code D} is already in the DFA, or {@code D} itself if the
 	 * state was not already present.
 	 */
-	@NotNull
-	protected DFAState addDFAState(@NotNull DFA dfa, @NotNull DFAState D) {
+	protected DFAState addDFAState(DFA dfa, DFAState D) {
 		if (D == ERROR) {
 			return D;
 		}
@@ -2008,7 +2127,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		}
 	}
 
-	protected void reportAttemptingFullContext(@NotNull DFA dfa, @Nullable BitSet conflictingAlts, @NotNull ATNConfigSet configs, int startIndex, int stopIndex) {
+	protected void reportAttemptingFullContext(DFA dfa, BitSet conflictingAlts, ATNConfigSet configs, int startIndex, int stopIndex) {
         if ( debug || retry_debug ) {
 			Interval interval = Interval.of(startIndex, stopIndex);
 			System.out.println("reportAttemptingFullContext decision="+dfa.decision+":"+configs+
@@ -2017,7 +2136,7 @@ public class ParserATNSimulator extends ATNSimulator {
         if ( parser!=null ) parser.getErrorListenerDispatch().reportAttemptingFullContext(parser, dfa, startIndex, stopIndex, conflictingAlts, configs);
     }
 
-	protected void reportContextSensitivity(@NotNull DFA dfa, int prediction, @NotNull ATNConfigSet configs, int startIndex, int stopIndex) {
+	protected void reportContextSensitivity(DFA dfa, int prediction, ATNConfigSet configs, int startIndex, int stopIndex) {
         if ( debug || retry_debug ) {
 			Interval interval = Interval.of(startIndex, stopIndex);
             System.out.println("reportContextSensitivity decision="+dfa.decision+":"+configs+
@@ -2027,10 +2146,12 @@ public class ParserATNSimulator extends ATNSimulator {
     }
 
     /** If context sensitive parsing, we know it's ambiguity not conflict */
-    protected void reportAmbiguity(@NotNull DFA dfa, DFAState D, int startIndex, int stopIndex,
+    protected void reportAmbiguity(DFA dfa,
+								   DFAState D, // the DFA state from execATN() that had SLL conflicts
+								   int startIndex, int stopIndex,
 								   boolean exact,
-								   @Nullable BitSet ambigAlts,
-								   @NotNull ATNConfigSet configs)
+								   BitSet ambigAlts,
+								   ATNConfigSet configs) // configs that LL not SLL considered conflicting
 	{
 		if ( debug || retry_debug ) {
 			Interval interval = Interval.of(startIndex, stopIndex);
@@ -2042,11 +2163,11 @@ public class ParserATNSimulator extends ATNSimulator {
 																			  exact, ambigAlts, configs);
     }
 
-	public final void setPredictionMode(@NotNull PredictionMode mode) {
+	public final void setPredictionMode(PredictionMode mode) {
 		this.mode = mode;
 	}
 
-	@NotNull
+
 	public final PredictionMode getPredictionMode() {
 		return mode;
 	}

@@ -1,39 +1,16 @@
 /*
- * [The "BSD license"]
- *  Copyright (c) 2012 Terence Parr
- *  Copyright (c) 2012 Sam Harwell
- *  All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions
- *  are met:
- *
- *  1. Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  2. Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  3. The name of the author may not be used to endorse or promote products
- *     derived from this software without specific prior written permission.
- *
- *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- *  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- *  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
  */
 package org.antlr.v4.runtime.dfa;
 
+import org.antlr.v4.runtime.Parser;
+import org.antlr.v4.runtime.Vocabulary;
+import org.antlr.v4.runtime.VocabularyImpl;
 import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.atn.DecisionState;
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
-import org.antlr.v4.runtime.Parser;
+import org.antlr.v4.runtime.atn.StarLoopEntryState;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,31 +25,44 @@ public class DFA {
 	/** A set of all DFA states. Use {@link Map} so we can get old state back
 	 *  ({@link Set} only allows you to see if it's there).
      */
-    @NotNull
+
 	public final Map<DFAState, DFAState> states = new HashMap<DFAState, DFAState>();
-	@Nullable
+
 	public volatile DFAState s0;
 
 	public final int decision;
 
 	/** From which ATN state did we create this DFA? */
-	@NotNull
+
 	public final DecisionState atnStartState;
 
 	/**
 	 * {@code true} if this DFA is for a precedence decision; otherwise,
-	 * {@code false}. This is the backing field for {@link #isPrecedenceDfa},
-	 * {@link #setPrecedenceDfa}.
+	 * {@code false}. This is the backing field for {@link #isPrecedenceDfa}.
 	 */
-	private volatile boolean precedenceDfa;
+	private final boolean precedenceDfa;
 
-	public DFA(@NotNull DecisionState atnStartState) {
+	public DFA(DecisionState atnStartState) {
 		this(atnStartState, 0);
 	}
 
-	public DFA(@NotNull DecisionState atnStartState, int decision) {
+	public DFA(DecisionState atnStartState, int decision) {
 		this.atnStartState = atnStartState;
 		this.decision = decision;
+
+		boolean precedenceDfa = false;
+		if (atnStartState instanceof StarLoopEntryState) {
+			if (((StarLoopEntryState)atnStartState).isPrecedenceDecision) {
+				precedenceDfa = true;
+				DFAState precedenceState = new DFAState(new ATNConfigSet());
+				precedenceState.edges = new DFAState[0];
+				precedenceState.isAcceptState = false;
+				precedenceState.requiresFullContext = false;
+				this.s0 = precedenceState;
+			}
+		}
+
+		this.precedenceDfa = precedenceDfa;
 	}
 
 	/**
@@ -147,44 +137,27 @@ public class DFA {
 	}
 
 	/**
-	 * Sets whether this is a precedence DFA. If the specified value differs
-	 * from the current DFA configuration, the following actions are taken;
-	 * otherwise no changes are made to the current DFA.
-	 *
-	 * <ul>
-	 * <li>The {@link #states} map is cleared</li>
-	 * <li>If {@code precedenceDfa} is {@code false}, the initial state
-	 * {@link #s0} is set to {@code null}; otherwise, it is initialized to a new
-	 * {@link DFAState} with an empty outgoing {@link DFAState#edges} array to
-	 * store the start states for individual precedence values.</li>
-	 * <li>The {@link #precedenceDfa} field is updated</li>
-	 * </ul>
+	 * Sets whether this is a precedence DFA.
 	 *
 	 * @param precedenceDfa {@code true} if this is a precedence DFA; otherwise,
 	 * {@code false}
+	 *
+	 * @throws UnsupportedOperationException if {@code precedenceDfa} does not
+	 * match the value of {@link #isPrecedenceDfa} for the current DFA.
+	 *
+	 * @deprecated This method no longer performs any action.
 	 */
-	public final synchronized void setPrecedenceDfa(boolean precedenceDfa) {
-		if (this.precedenceDfa != precedenceDfa) {
-			this.states.clear();
-			if (precedenceDfa) {
-				DFAState precedenceState = new DFAState(new ATNConfigSet());
-				precedenceState.edges = new DFAState[0];
-				precedenceState.isAcceptState = false;
-				precedenceState.requiresFullContext = false;
-				this.s0 = precedenceState;
-			}
-			else {
-				this.s0 = null;
-			}
-
-			this.precedenceDfa = precedenceDfa;
+	@Deprecated
+	public final void setPrecedenceDfa(boolean precedenceDfa) {
+		if (precedenceDfa != isPrecedenceDfa()) {
+			throw new UnsupportedOperationException("The precedenceDfa field cannot change after a DFA is constructed.");
 		}
 	}
 
 	/**
 	 * Return a list of all states in this DFA, ordered by state number.
 	 */
-	@NotNull
+
 	public List<DFAState> getStates() {
 		List<DFAState> result = new ArrayList<DFAState>(states.keySet());
 		Collections.sort(result, new Comparator<DFAState>() {
@@ -198,11 +171,24 @@ public class DFA {
 	}
 
 	@Override
-	public String toString() { return toString(null); }
+	public String toString() { return toString(VocabularyImpl.EMPTY_VOCABULARY); }
 
-	public String toString(@Nullable String[] tokenNames) {
+	/**
+	 * @deprecated Use {@link #toString(Vocabulary)} instead.
+	 */
+	@Deprecated
+	public String toString(String[] tokenNames) {
 		if ( s0==null ) return "";
 		DFASerializer serializer = new DFASerializer(this,tokenNames);
+		return serializer.toString();
+	}
+
+	public String toString(Vocabulary vocabulary) {
+		if (s0 == null) {
+			return "";
+		}
+
+		DFASerializer serializer = new DFASerializer(this, vocabulary);
 		return serializer.toString();
 	}
 

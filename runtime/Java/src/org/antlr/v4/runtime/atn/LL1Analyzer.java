@@ -1,31 +1,7 @@
 /*
- * [The "BSD license"]
- *  Copyright (c) 2012 Terence Parr
- *  Copyright (c) 2012 Sam Harwell
- *  All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions
- *  are met:
- *
- *  1. Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  2. Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  3. The name of the author may not be used to endorse or promote products
- *     derived from this software without specific prior written permission.
- *
- *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- *  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- *  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
  */
 
 package org.antlr.v4.runtime.atn;
@@ -33,8 +9,6 @@ package org.antlr.v4.runtime.atn;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.IntervalSet;
-import org.antlr.v4.runtime.misc.NotNull;
-import org.antlr.v4.runtime.misc.Nullable;
 
 import java.util.BitSet;
 import java.util.HashSet;
@@ -46,10 +20,9 @@ public class LL1Analyzer {
 	 */
 	public static final int HIT_PRED = Token.INVALID_TYPE;
 
-	@NotNull
 	public final ATN atn;
 
-	public LL1Analyzer(@NotNull ATN atn) { this.atn = atn; }
+	public LL1Analyzer(ATN atn) { this.atn = atn; }
 
 	/**
 	 * Calculates the SLL(1) expected lookahead set for each outgoing transition
@@ -61,8 +34,7 @@ public class LL1Analyzer {
 	 * @param s the ATN state
 	 * @return the expected symbols for each outgoing transition of {@code s}.
 	 */
-	@Nullable
-	public IntervalSet[] getDecisionLookahead(@Nullable ATNState s) {
+	public IntervalSet[] getDecisionLookahead(ATNState s) {
 //		System.out.println("LOOK("+s.stateNumber+")");
 		if ( s==null ) {
 			return null;
@@ -100,8 +72,7 @@ public class LL1Analyzer {
 	 * @return The set of tokens that can follow {@code s} in the ATN in the
 	 * specified {@code ctx}.
 	 */
-    @NotNull
-   	public IntervalSet LOOK(@NotNull ATNState s, @Nullable RuleContext ctx) {
+   	public IntervalSet LOOK(ATNState s, RuleContext ctx) {
 		return LOOK(s, null, ctx);
    	}
 
@@ -123,8 +94,8 @@ public class LL1Analyzer {
 	 * @return The set of tokens that can follow {@code s} in the ATN in the
 	 * specified {@code ctx}.
 	 */
-    @NotNull
-   	public IntervalSet LOOK(@NotNull ATNState s, @Nullable ATNState stopState, @Nullable RuleContext ctx) {
+
+   	public IntervalSet LOOK(ATNState s, ATNState stopState, RuleContext ctx) {
    		IntervalSet r = new IntervalSet();
 		boolean seeThruPreds = true; // ignore preds; get all lookahead
 		PredictionContext lookContext = ctx != null ? PredictionContext.fromRuleContext(s.atn, ctx) : null;
@@ -163,12 +134,12 @@ public class LL1Analyzer {
 	 * outermost context is reached. This parameter has no effect if {@code ctx}
 	 * is {@code null}.
 	 */
-    protected void _LOOK(@NotNull ATNState s,
-						 @Nullable ATNState stopState,
-						 @Nullable PredictionContext ctx,
-						 @NotNull IntervalSet look,
-                         @NotNull Set<ATNConfig> lookBusy,
-						 @NotNull BitSet calledRuleStack,
+    protected void _LOOK(ATNState s,
+						 ATNState stopState,
+						 PredictionContext ctx,
+						 IntervalSet look,
+                         Set<ATNConfig> lookBusy,
+						 BitSet calledRuleStack,
 						 boolean seeThruPreds, boolean addEOF)
 	{
 //		System.out.println("_LOOK("+s.stateNumber+", ctx="+ctx);
@@ -179,7 +150,8 @@ public class LL1Analyzer {
 			if (ctx == null) {
 				look.add(Token.EPSILON);
 				return;
-			} else if (ctx.isEmpty() && addEOF) {
+			}
+			else if (ctx.isEmpty() && addEOF) {
 				look.add(Token.EOF);
 				return;
 			}
@@ -189,26 +161,26 @@ public class LL1Analyzer {
             if ( ctx==null ) {
                 look.add(Token.EPSILON);
                 return;
-            } else if (ctx.isEmpty() && addEOF) {
+            }
+            else if (ctx.isEmpty() && addEOF) {
 				look.add(Token.EOF);
 				return;
 			}
 
 			if ( ctx != PredictionContext.EMPTY ) {
 				// run thru all possible stack tops in ctx
-				for (int i = 0; i < ctx.size(); i++) {
-					ATNState returnState = atn.states.get(ctx.getReturnState(i));
-//					System.out.println("popping back to "+retState);
-
-					boolean removed = calledRuleStack.get(returnState.ruleIndex);
-					try {
-						calledRuleStack.clear(returnState.ruleIndex);
+				boolean removed = calledRuleStack.get(s.ruleIndex);
+				try {
+					calledRuleStack.clear(s.ruleIndex);
+					for (int i = 0; i < ctx.size(); i++) {
+						ATNState returnState = atn.states.get(ctx.getReturnState(i));
+//					    System.out.println("popping back to "+retState);
 						_LOOK(returnState, stopState, ctx.getParent(i), look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
 					}
-					finally {
-						if (removed) {
-							calledRuleStack.set(returnState.ruleIndex);
-						}
+				}
+				finally {
+					if (removed) {
+						calledRuleStack.set(s.ruleIndex);
 					}
 				}
 				return;

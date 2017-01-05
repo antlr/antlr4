@@ -1,31 +1,7 @@
 /*
- * [The "BSD license"]
- *  Copyright (c) 2012 Terence Parr
- *  Copyright (c) 2012 Sam Harwell
- *  All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions
- *  are met:
- *
- *  1. Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  2. Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  3. The name of the author may not be used to endorse or promote products
- *     derived from this software without specific prior written permission.
- *
- *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- *  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- *  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
  */
 
 package org.antlr.v4.runtime.atn;
@@ -108,7 +84,7 @@ public class ATNSerializer {
 				nonGreedyStates.add(s.stateNumber);
 			}
 
-			if (s instanceof RuleStartState && ((RuleStartState)s).isPrecedenceRule) {
+			if (s instanceof RuleStartState && ((RuleStartState)s).isLeftRecursiveRule) {
 				precedenceStates.add(s.stateNumber);
 			}
 
@@ -367,7 +343,12 @@ public class ATNSerializer {
 		// don't adjust the first value since that's the version number
 		for (int i = 1; i < data.size(); i++) {
 			if (data.get(i) < Character.MIN_VALUE || data.get(i) > Character.MAX_VALUE) {
-				throw new UnsupportedOperationException("Serialized ATN data element out of range.");
+				throw new UnsupportedOperationException("Serialized ATN data element "+
+					                                        data.get(i)+
+					                                        " element "+i+" out of range "+
+					                                        (int)Character.MIN_VALUE+
+					                                        ".."+
+					                                        (int)Character.MAX_VALUE);
 			}
 
 			int value = (data.get(i) + 2) & 0xFFFF;
@@ -424,6 +405,12 @@ public class ATNSerializer {
 				.append(ATNState.serializationNames.get(stype)).append(" ")
 				.append(ruleIndex).append(arg).append("\n");
 		}
+		// this code is meant to model the form of ATNDeserializer.deserialize,
+		// since both need to be updated together whenever a change is made to
+		// the serialization format. The "dead" code is only used in debugging
+		// and testing scenarios, so the form you see here was kept for
+		// improved maintainability.
+		// start
 		int numNonGreedyStates = ATNDeserializer.toInt(data[p++]);
 		for (int i = 0; i < numNonGreedyStates; i++) {
 			int stateNumber = ATNDeserializer.toInt(data[p++]);
@@ -432,6 +419,7 @@ public class ATNSerializer {
 		for (int i = 0; i < numPrecedenceStates; i++) {
 			int stateNumber = ATNDeserializer.toInt(data[p++]);
 		}
+		// finish
 		int nrules = ATNDeserializer.toInt(data[p++]);
 		for (int i=0; i<nrules; i++) {
 			int s = ATNDeserializer.toInt(data[p++]);
@@ -487,12 +475,17 @@ public class ATNSerializer {
 			buf.append(i).append(":").append(s).append("\n");
 		}
 		if (atn.grammarType == ATNType.LEXER) {
-				int lexerActionCount = ATNDeserializer.toInt(data[p++]);
-				for (int i = 0; i < lexerActionCount; i++) {
-					LexerActionType actionType = LexerActionType.values()[ATNDeserializer.toInt(data[p++])];
-					int data1 = ATNDeserializer.toInt(data[p++]);
-					int data2 = ATNDeserializer.toInt(data[p++]);
-				}
+			// this code is meant to model the form of ATNDeserializer.deserialize,
+			// since both need to be updated together whenever a change is made to
+			// the serialization format. The "dead" code is only used in debugging
+			// and testing scenarios, so the form you see here was kept for
+			// improved maintainability.
+			int lexerActionCount = ATNDeserializer.toInt(data[p++]);
+			for (int i = 0; i < lexerActionCount; i++) {
+				LexerActionType actionType = LexerActionType.values()[ATNDeserializer.toInt(data[p++])];
+				int data1 = ATNDeserializer.toInt(data[p++]);
+				int data2 = ATNDeserializer.toInt(data[p++]);
+			}
 		}
 		return buf.toString();
 	}

@@ -1,7 +1,7 @@
 /*
  * [The "BSD license"]
- *  Copyright (c) 2012 Terence Parr
- *  Copyright (c) 2012 Sam Harwell
+ *  Copyright (c) 2012-2016 Terence Parr
+ *  Copyright (c) 2012-2016 Sam Harwell
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -79,6 +79,7 @@ package org.antlr.v4.parse;
 import org.antlr.v4.Tool;
 import org.antlr.v4.tool.*;
 import org.antlr.v4.tool.ast.*;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 }
 
@@ -105,8 +106,12 @@ public void visit(GrammarAST t, String ruleName) {
 		Method m = getClass().getMethod(ruleName);
 		m.invoke(this);
 	}
-	catch (Exception e) {
+	catch (Throwable e) {
 		ErrorManager errMgr = getErrorManager();
+		if ( e instanceof InvocationTargetException ) {
+			e = e.getCause();
+		}
+		//e.printStackTrace(System.err);
 		if ( errMgr==null ) {
 			System.err.println("can't find rule "+ruleName+
 							   " or tree structure error: "+t.toStringTree()
@@ -343,7 +348,7 @@ grammarSpec
 @after {
 	exitGrammarSpec($start);
 }
-    :   ^(	GRAMMAR ID {grammarName=$ID.text;} DOC_COMMENT?
+    :   ^(	GRAMMAR ID {grammarName=$ID.text;}
     		{discoverGrammar((GrammarRootAST)$GRAMMAR, $ID);}
  		   	prequelConstructs
     		{finishPrequels($prequelConstructs.firstOne);}
@@ -519,7 +524,7 @@ lexerRule
 }
 	:	^(	RULE TOKEN_REF
 			{currentRuleName=$TOKEN_REF.text; currentRuleAST=$RULE;}
-			DOC_COMMENT? (^(RULEMODIFIERS m=FRAGMENT {mods.add($m);}))?
+			(^(RULEMODIFIERS m=FRAGMENT {mods.add($m);}))?
       		{discoverLexerRule((RuleAST)$RULE, $TOKEN_REF, mods, (GrammarAST)input.LT(1));}
       		lexerRuleBlock
       		{
@@ -540,7 +545,7 @@ rule
 	exitRule($start);
 }
 	:   ^(	RULE RULE_REF {currentRuleName=$RULE_REF.text; currentRuleAST=$RULE;}
-			DOC_COMMENT? (^(RULEMODIFIERS (m=ruleModifier{mods.add($m.start);})+))?
+			(^(RULEMODIFIERS (m=ruleModifier{mods.add($m.start);})+))?
 			ARG_ACTION?
       		ret=ruleReturns?
       		thr=throwsSpec?
@@ -839,7 +844,7 @@ element
 	|   SEMPRED						{sempredInAlt((PredAST)$SEMPRED);}
 	|   ^(ACTION elementOptions)	{actionInAlt((ActionAST)$ACTION);}
 	|   ^(SEMPRED elementOptions)	{sempredInAlt((PredAST)$SEMPRED);}
-
+	|	range
 	|	^(NOT blockSet)
 	|	^(NOT block)
 	;
