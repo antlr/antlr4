@@ -72,6 +72,8 @@ TokenStartColumnEquals(i) ::= <%this.TokenStartColumn==<i>%>
 
 ImportListener(X) ::= ""
 
+ImportVisitor(grammarName) ::= ""
+
 GetExpectedTokenNames() ::= "this.GetExpectedTokens().ToString(this.Vocabulary)"
 
 RuleInvocationStack() ::= "GetRuleInvocationStackAsString()"
@@ -266,13 +268,12 @@ public class LeafListener : TBaseListener {
 }
 >>
 
-ImportVisitor(X) ::= ""
-BasicVisitor(X) ::= ""
 WalkVisitor(s) ::= ""
-LRWithLabelsVisitor(X) ::= ""
-RuleGetterVisitor(X) ::= ""
-LRVisitor(x) ::= ""
-TokenGetterVisitor(x) ::= ""
+TerminalVisitor(grammarName) ::= ""
+ErrorVisitor(grammarName) ::= ""
+ShouldNotVisitEOFVisitor(grammarName) ::= ""
+ShouldNotVisitTerminalVisitor(grammarName) ::= ""
+CalculatorVisitor(grammarName) ::= ""
 
 DeclareContextListGettersFunction() ::= <<
 void foo() {

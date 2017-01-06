@@ -72,6 +72,8 @@ TokenStartColumnEquals(i) ::= <%p.TokenStartColumn == <i>%>
 
 ImportListener(X) ::= ""
 
+ImportVisitor(grammarName) ::= ""
+
 GetExpectedTokenNames() ::= "p.GetExpectedTokens().StringVerbose(p.GetTokenNames(), nil, false)"
 
 RuleInvocationStack() ::= "antlr.PrintArrayJavaStyle(p.GetRuleInvocationStack(nil))"
@@ -298,13 +300,12 @@ func (*LeafListener) ExitInt(ctx *IntContext) {
 }
 >>
 
-ImportVisitor(X) ::= ""
-BasicVisitor(X) ::= ""
 WalkVisitor(s) ::= ""
-LRWithLabelsVisitor(X) ::= ""
-RuleGetterVisitor(X) ::= ""
-LRVisitor(x) ::= ""
-TokenGetterVisitor(x) ::= ""
+TerminalVisitor(grammarName) ::= ""
+ErrorVisitor(grammarName) ::= ""
+ShouldNotVisitEOFVisitor(grammarName) ::= ""
+ShouldNotVisitTerminalVisitor(grammarName) ::= ""
+CalculatorVisitor(grammarName) ::= ""
 
 DeclareContextListGettersFunction() ::= <<
 func foo() {

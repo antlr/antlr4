@@ -6,24 +6,23 @@
 
 package org.antlr.v4.test.runtime.descriptors;
 
+import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
+import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 import org.antlr.v4.test.runtime.BaseParserTestDescriptor;
 import org.antlr.v4.test.runtime.CommentHasStringValue;
 
-import java.util.Arrays;
-
-import static org.antlr.v4.test.runtime.BaseRuntimeTest.JavaScriptTargets;
-
 public class VisitorsDescriptors {
-	public static boolean isJavaScriptTarget(String targetName) {
-		boolean isJavaScriptTarget = Arrays.binarySearch(JavaScriptTargets, targetName)>=0;
-		return isJavaScriptTarget;
-	}
-
-	public static class Basic extends BaseParserTestDescriptor {
-		public String input = "1 2";
+	/**
+	 * This test verifies the basic behavior of visitors, with an emphasis on
+	 * {@link AbstractParseTreeVisitor#visitTerminal}.
+	 */
+	public static class TestVisitTerminalNode extends BaseParserTestDescriptor {
+		public String input = "A";
 		/**
-		(a 1 2)
-		[ '1', '2' ]
+		(s A <EOF>)
+		[@0,0:0='A',<1>,1:0]
+		[@1,1:0='<EOF>',<-1>,1:1]
+
 		 */
 		@CommentHasStringValue
 		public String output;
@@ -33,42 +32,79 @@ public class VisitorsDescriptors {
 		public String grammarName = "T";
 
 		/**
-		 grammar T;
-		 @parser::header {
-		 <ImportVisitor(grammarName)>
-		 }
+		grammar T;
 
-		 @parser::members {
-		 <BasicVisitor(grammarName)>
-		 }
+		<ImportVisitor("T")>
+		<TerminalVisitor("T")>
 
-		 s
-		 @after {
-		 <ToStringTree("$ctx.r"):writeln()>
-		 <WalkVisitor("$ctx.r")>
-		 }
-		   : r=a ;
-		 a : INT INT
-		   | ID
-		   ;
-		 MULT: '*' ;
-		 ADD : '+' ;
-		 INT : [0-9]+ ;
-		 ID  : [a-z]+ ;
-		 WS : [ \t\n]+ -> skip ;
-		 */
+		s
+		@after {
+		<ToStringTree("$ctx"):writeln()>
+		<WalkVisitor("$ctx")>
+		}
+			: 'A' EOF
+			;
+		*/
 		@CommentHasStringValue
 		public String grammar;
 
 		@Override
-		public boolean ignore(String targetName) { return !isJavaScriptTarget(targetName); }
+		public boolean ignore(String targetName) {
+			return !"Java".equals(targetName);
+		}
 	}
 
-	public static class LR extends BaseParserTestDescriptor {
-		public String input = "1+2*3";
+	/**
+	 * This test verifies the basic behavior of visitors, with an emphasis on
+	 * {@link AbstractParseTreeVisitor#visitTerminal}.
+	 */
+	public static class TestVisitErrorNode extends BaseParserTestDescriptor {
+		public String input = "";
 		/**
-		(e (e 1) + (e (e 2) * (e 3)))
-		1,,2,,32 3 21 2 1
+		(s <missing 'A'> <EOF>)
+		Error encountered: [@-1,-1:-1='<missing 'A'>',<1>,1:0]
+		 */
+		@CommentHasStringValue
+		public String output;
+
+		public String errors = "line 1:0 missing 'A' at '<EOF>'\n";
+		public String startRule = "s";
+		public String grammarName = "T";
+
+		/**
+		grammar T;
+
+		<ImportVisitor("T")>
+		<ErrorVisitor("T")>
+
+		s
+		@after {
+		<ToStringTree("$ctx"):writeln()>
+		<WalkVisitor("$ctx")>
+		}
+			: 'A' EOF
+			;
+		*/
+		@CommentHasStringValue
+		public String grammar;
+
+		@Override
+		public boolean ignore(String targetName) {
+			return !"Java".equals(targetName);
+		}
+	}
+
+	/**
+	 * This test verifies that {@link AbstractParseTreeVisitor#visitChildren} does not call
+	 * {@link ParseTreeVisitor#visit} after {@link AbstractParseTreeVisitor#shouldVisitNextChild} returns
+	 * {@code false}.
+	 */
+	public static class TestShouldNotVisitEOF extends BaseParserTestDescriptor {
+		public String input = "A";
+		/**
+		(s A <EOF>)
+		[@0,0:0='A',<1>,1:0]
+
 		 */
 		@CommentHasStringValue
 		public String output;
@@ -78,43 +114,38 @@ public class VisitorsDescriptors {
 		public String grammarName = "T";
 
 		/**
-		 grammar T;
-		 @parser::header {
-		 <ImportVisitor(grammarName)>
-		 }
+		grammar T;
 
-		 @parser::members {
-		 <LRVisitor(grammarName)>
-		 }
+		<ImportVisitor("T")>
+		<ShouldNotVisitEOFVisitor("T")>
 
-		 s
-		 @after {
-		 <ToStringTree("$ctx.r"):writeln()>
-		 <WalkVisitor("$ctx.r")>
-		 }
-		 	: r=e ;
-		 e : e op='*' e
-		 	| e op='+' e
-		 	| INT
-		 	;
-		 MULT: '*' ;
-		 ADD : '+' ;
-		 INT : [0-9]+ ;
-		 ID  : [a-z]+ ;
-		 WS : [ \t\n]+ -> skip ;
-		 */
+		s
+		@after {
+		<ToStringTree("$ctx"):writeln()>
+		<WalkVisitor("$ctx")>
+		}
+			: 'A' EOF
+			;
+		*/
 		@CommentHasStringValue
 		public String grammar;
 
 		@Override
-		public boolean ignore(String targetName) { return !isJavaScriptTarget(targetName); }
+		public boolean ignore(String targetName) {
+			return !"Java".equals(targetName);
+		}
 	}
 
-	public static class LRWithLabels extends BaseParserTestDescriptor {
-		public String input = "1(2,3)";
+	/**
+	 * This test verifies that {@link AbstractParseTreeVisitor#shouldVisitNextChild} is called before visiting the first
+	 * child. It also verifies that {@link AbstractParseTreeVisitor#defaultResult} provides the default return value for
+	 * visiting a tree.
+	 */
+	public static class TestShouldNotVisitTerminal extends BaseParserTestDescriptor {
+		public String input = "A";
 		/**
-		(e (e 1) ( (eList (e 2) , (e 3)) ))
-		1,,2,,3,1 [13 6]
+		(s A <EOF>)
+		default result
 		 */
 		@CommentHasStringValue
 		public String output;
@@ -124,150 +155,76 @@ public class VisitorsDescriptors {
 		public String grammarName = "T";
 
 		/**
-		 grammar T;
-		 @parser::header {
-		 <ImportVisitor(grammarName)>
-		 }
+		grammar T;
 
-		 @parser::members {
-		 <LRWithLabelsVisitor(grammarName)>
-		 }
+		<ImportVisitor("T")>
+		<ShouldNotVisitTerminalVisitor("T")>
 
-		 s
-		 @after {
-		 <ToStringTree("$ctx.r"):writeln()>
-		 <WalkVisitor("$ctx.r")>
-		 }
-		   : r=e ;
-		 e : e '(' eList ')' # Call
-		   | INT             # Int
-		   ;
-		 eList : e (',' e)* ;
-		 MULT: '*' ;
-		 ADD : '+' ;
-		 INT : [0-9]+ ;
-		 ID  : [a-z]+ ;
-		 WS : [ \t\n]+ -> skip ;
-		 */
+		s
+		@after {
+		<ToStringTree("$ctx"):writeln()>
+		<WalkVisitor("$ctx")>
+		}
+			: 'A' EOF
+			;
+		*/
 		@CommentHasStringValue
 		public String grammar;
 
 		@Override
-		public boolean ignore(String targetName) { return !isJavaScriptTarget(targetName); }
+		public boolean ignore(String targetName) {
+			return !"Java".equals(targetName);
+		}
 	}
 
-	public static abstract class RuleGetters extends BaseParserTestDescriptor {
+	/**
+	 * This test verifies that the visitor correctly dispatches calls for labeled outer alternatives.
+	 */
+	public static class TestCalculatorVisitor extends BaseParserTestDescriptor {
+		public String input = "2 + 8 / 2";
+		/**
+		(s (expr (expr 2) + (expr (expr 8) / (expr 2))) <EOF>)
+		6
+		 */
+		@CommentHasStringValue
+		public String output;
+
 		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "T";
 
 		/**
-		 grammar T;
-		 @parser::header {
-		 <ImportVisitor(grammarName)>
-		 }
+		grammar T;
 
-		 @parser::members {
-		 <RuleGetterVisitor(grammarName)>
-		 }
+		<ImportVisitor("T")>
+		<CalculatorVisitor("T")>
 
-		 s
-		 @after {
-		 <ToStringTree("$ctx.r"):writeln()>
-		 <WalkVisitor("$ctx.r")>
-		 }
-		   : r=a ;
-		 a : b b		// forces list
-		   | b		// a list still
-		   ;
-		 b : ID | INT;
-		 MULT: '*' ;
-		 ADD : '+' ;
-		 INT : [0-9]+ ;
-		 ID  : [a-z]+ ;
-		 WS : [ \t\n]+ -> skip ;
-		 */
+		s
+		@after {
+		<ToStringTree("$ctx"):writeln()>
+		<WalkVisitor("$ctx")>
+		}
+			: expr EOF
+			;
+		expr
+			:	INT						# number
+			|	expr (MUL | DIV) expr	# multiply
+			|	expr (ADD | SUB) expr	# add
+			;
+
+		INT	: [0-9]+;
+		MUL : '*';
+		DIV : '/';
+		ADD : '+';
+		SUB : '-';
+		WS : [ \t]+ -> channel(HIDDEN);
+		*/
 		@CommentHasStringValue
 		public String grammar;
 
 		@Override
-		public boolean ignore(String targetName) { return !isJavaScriptTarget(targetName); }
-	}
-
-	public static class RuleGetters_1 extends RuleGetters {
-		public String input = "1 2";
-		/**
-		(a (b 1) (b 2))
-		,1 2 1
-		 */
-		@CommentHasStringValue
-		public String output;
-	}
-
-	public static class RuleGetters_2 extends RuleGetters {
-		public String input = "abc";
-		/**
-		(a (b abc))
-		abc
-		 */
-		@CommentHasStringValue
-		public String output;
-	}
-
-	public static abstract class TokenGetters extends BaseParserTestDescriptor {
-		public String errors = null;
-		public String startRule = "s";
-		public String grammarName = "T";
-
-		/**
-		 grammar T;
-		 @parser::header {
-		 <ImportVisitor(grammarName)>
-		 }
-
-		 @parser::members {
-		 <TokenGetterVisitor(grammarName)>
-		 }
-
-		 s
-		 @after {
-		 <ToStringTree("$ctx.r"):writeln()>
-		 <WalkVisitor("$ctx.r")>
-		 }
-		   : r=a ;
-		 a : INT INT
-		   | ID
-		   ;
-		 MULT: '*' ;
-		 ADD : '+' ;
-		 INT : [0-9]+ ;
-		 ID  : [a-z]+ ;
-		 WS : [ \t\n]+ -> skip ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
-
-		@Override
-		public boolean ignore(String targetName) { return !isJavaScriptTarget(targetName); }
-	}
-
-	public static class TokenGetters_1 extends TokenGetters {
-		public String input = "1 2";
-		/**
-		(a 1 2)
-		,1 2 [1, 2]
-		 */
-		@CommentHasStringValue
-		public String output;
-	}
-
-	public static class TokenGetters_2 extends TokenGetters {
-		public String input = "abc";
-		/**
-		(a abc)
-		[@0,0:2='abc',<4>,1:0]
-		 */
-		@CommentHasStringValue
-		public String output;
+		public boolean ignore(String targetName) {
+			return !"Java".equals(targetName);
+		}
 	}
 }

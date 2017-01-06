@@ -78,6 +78,8 @@ var <X>Listener = require('./<X>Listener').<X>Listener;
 }
 >>
 
+ImportVisitor(grammarName) ::= ""
+
 GetExpectedTokenNames() ::= "this.getExpectedTokens().toString(this.literalNames)"
 
 RuleInvocationStack() ::= "antlr4.Utils.arrayToString(this.getRuleInvocationStack())"
@@ -270,6 +272,13 @@ this.LeafListener.prototype = Object.create(<X>Listener.prototype);
 this.LeafListener.prototype.constructor = this.LeafListener;
 }
 >>
+
+WalkVisitor(s) ::= ""
+TerminalVisitor(grammarName) ::= ""
+ErrorVisitor(grammarName) ::= ""
+ShouldNotVisitEOFVisitor(grammarName) ::= ""
+ShouldNotVisitTerminalVisitor(grammarName) ::= ""
+CalculatorVisitor(grammarName) ::= ""
 
 DeclareContextListGettersFunction() ::= <<
 	function foo() {
