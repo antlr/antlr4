@@ -185,6 +185,14 @@ public class ElementFrequenciesVisitor extends GrammarTreeVisitor {
 
 	@Override
 	protected void exitBlockSet(GrammarAST tree) {
+		for (Map.Entry<String, MutableInt> entry : frequencies.peek().entrySet()) {
+			// This visitor counts a block set as a sequence of elements, not a
+			// sequence of alternatives of elements. Reset the count back to 1
+			// for all items when leaving the set to ensure duplicate entries in
+			// the set are treated as a maximum of one item.
+			entry.getValue().v = 1;
+		}
+
 		if (minFrequencies.peek().size() > 1) {
 			// Everything is optional
 			minFrequencies.peek().clear();
