@@ -53,6 +53,7 @@ public class Rule implements AttributeResolver {
 	}
 
 	public String name;
+	private String baseContext;
 	public List<GrammarAST> modifiers;
 
 	public RuleAST ast;
@@ -109,6 +110,23 @@ public class Rule implements AttributeResolver {
 		this.numberOfAlts = numberOfAlts;
 		alt = new Alternative[numberOfAlts+1]; // 1..n
 		for (int i=1; i<=numberOfAlts; i++) alt[i] = new Alternative(this, i);
+	}
+
+	public String getBaseContext() {
+		if (baseContext != null && !baseContext.isEmpty()) {
+			return baseContext;
+		}
+
+		String optionBaseContext = ast.getOptionString("baseContext");
+		if (optionBaseContext != null && !optionBaseContext.isEmpty()) {
+			return optionBaseContext;
+		}
+
+		return name;
+	}
+
+	public void setBaseContext(String baseContext) {
+		this.baseContext = baseContext;
 	}
 
 	public void defineActionInAlt(int currentAlt, ActionAST actionAST) {

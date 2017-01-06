@@ -11,6 +11,7 @@ import org.antlr.v4.misc.FrequencySet;
 import org.antlr.v4.misc.MutableInt;
 import org.antlr.v4.parse.GrammarTreeVisitor;
 import org.antlr.v4.tool.ErrorManager;
+import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.ast.ActionAST;
 import org.antlr.v4.tool.ast.AltAST;
 import org.antlr.v4.tool.ast.GrammarAST;
@@ -28,11 +29,13 @@ public class ElementFrequenciesVisitor extends GrammarTreeVisitor {
 	 */
 	private static final FrequencySet<String> SENTINEL = new FrequencySet<String>();
 
+	final Grammar grammar;
 	final Deque<FrequencySet<String>> frequencies;
 	private final Deque<FrequencySet<String>> minFrequencies;
 
-	public ElementFrequenciesVisitor(TreeNodeStream input) {
+	public ElementFrequenciesVisitor(Grammar grammar, TreeNodeStream input) {
 		super(input);
+		this.grammar = grammar;
 		frequencies = new ArrayDeque<FrequencySet<String>>();
 		frequencies.push(new FrequencySet<String>());
 		minFrequencies = new ArrayDeque<FrequencySet<String>>();
@@ -145,8 +148,8 @@ public class ElementFrequenciesVisitor extends GrammarTreeVisitor {
 
 	@Override
 	public void ruleRef(GrammarAST ref, ActionAST arg) {
-		frequencies.peek().add(ref.getText());
-		minFrequencies.peek().add(ref.getText());
+		frequencies.peek().add(RuleFunction.getLabelName(grammar, ref));
+		minFrequencies.peek().add(RuleFunction.getLabelName(grammar, ref));
 	}
 
 	/*
