@@ -96,7 +96,7 @@ public class ElementFrequenciesVisitor extends GrammarTreeVisitor {
 		}
 
 		assert a != SENTINEL;
-		FrequencySet<String> result = combineAndClip(a, b, 1);
+		FrequencySet<String> result = combineAndClip(a, b, Integer.MAX_VALUE);
 		for (Map.Entry<String, MutableInt> entry : result.entrySet()) {
 			entry.getValue().v = Math.min(a.count(entry.getKey()), b.count(entry.getKey()));
 		}
@@ -178,6 +178,31 @@ public class ElementFrequenciesVisitor extends GrammarTreeVisitor {
 	}
 
 	@Override
+	protected void enterBlockSet(GrammarAST tree) {
+		frequencies.push(new FrequencySet<String>());
+		minFrequencies.push(new FrequencySet<String>());
+	}
+
+	@Override
+	protected void exitBlockSet(GrammarAST tree) {
+		for (Map.Entry<String, MutableInt> entry : frequencies.peek().entrySet()) {
+			// This visitor counts a block set as a sequence of elements, not a
+			// sequence of alternatives of elements. Reset the count back to 1
+			// for all items when leaving the set to ensure duplicate entries in
+			// the set are treated as a maximum of one item.
+			entry.getValue().v = 1;
+		}
+
+		if (minFrequencies.peek().size() > 1) {
+			// Everything is optional
+			minFrequencies.peek().clear();
+		}
+
+		frequencies.push(combineAndClip(frequencies.pop(), frequencies.pop(), 2));
+		minFrequencies.push(combineAndClip(minFrequencies.pop(), minFrequencies.pop(), 2));
+	}
+
+	@Override
 	protected void exitSubrule(GrammarAST tree) {
 		if (tree.getType() == CLOSURE || tree.getType() == POSITIVE_CLOSURE) {
 			for (Map.Entry<String, MutableInt> entry : frequencies.peek().entrySet()) {
@@ -185,7 +210,7 @@ public class ElementFrequenciesVisitor extends GrammarTreeVisitor {
 			}
 		}
 
-		if (tree.getType() == CLOSURE) {
+		if (tree.getType() == CLOSURE || tree.getType() == OPTIONAL) {
 			// Everything inside a closure is optional, so the minimum
 			// number of occurrences for all elements is 0.
 			minFrequencies.peek().clear();
