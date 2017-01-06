@@ -243,14 +243,6 @@ public:
 }
 >>
 
-ImportVisitor(X) ::= ""
-BasicVisitor(X) ::= ""
-WalkVisitor(s) ::= ""
-LRWithLabelsVisitor(X) ::= ""
-RuleGetterVisitor(X) ::= ""
-LRVisitor(x) ::= ""
-TokenGetterVisitor(x) ::= ""
-
 DeclareContextListGettersFunction() ::= <<
 void foo() {
   SContext *s;
