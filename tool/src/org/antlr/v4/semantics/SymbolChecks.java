@@ -6,6 +6,7 @@
 
 package org.antlr.v4.semantics;
 
+import org.antlr.runtime.tree.CommonTree;
 import org.antlr.v4.automata.LexerATNFactory;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.Token;
@@ -18,6 +19,7 @@ import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LabelElementPair;
 import org.antlr.v4.tool.LexerGrammar;
 import org.antlr.v4.tool.Rule;
+import org.antlr.v4.tool.ast.AltAST;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.antlr.v4.tool.LabelType;
 import org.antlr.v4.tool.LeftRecursiveRule;
@@ -28,6 +30,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.ArrayList;
 
 /** Check for symbol problems; no side-effects.  Inefficient to walk rules
  *  and such multiple times, but I like isolating all error checking outside
@@ -128,43 +131,96 @@ public class SymbolChecks {
     public void checkForLabelConflicts(Collection<Rule> rules) {
 		for (Rule r : rules) {
 			checkForAttributeConflicts(r);
+
+			boolean leftRecursiveRule = false;
 			if (r instanceof LeftRecursiveRule) {
 				// Label conflicts for left recursive rules need to be checked
 				// prior to the left recursion elimination step.
-				continue;
+				leftRecursiveRule = true;
 			}
 
-			Map<String, LabelElementPair> labelNameSpace =
-					new HashMap<String, LabelElementPair>();
+			Map<String, LabelElementPair> labelNameSpace = new HashMap<String, LabelElementPair>();
 			for (int i = 1; i <= r.numberOfAlts; i++) {
+				boolean altLabels = false;
 				if (r.hasAltSpecificContexts()) {
 					labelNameSpace.clear();
+					altLabels = true;
 				}
 
 				Alternative a = r.alt[i];
 				for (List<LabelElementPair> pairs : a.labelDefs.values()) {
-					for (LabelElementPair p : pairs) {
-						checkForLabelConflict(r, p.label);
-						String name = p.label.getText();
-						LabelElementPair prev = labelNameSpace.get(name);
-						if (prev == null) labelNameSpace.put(name, p);
-						else checkForTypeMismatch(prev, p);
+					if (leftRecursiveRule && altLabels) {
+						Map<String, List<LabelElementPair>> labelPairs = new HashMap<String, List<LabelElementPair>>();
+						for (LabelElementPair p : pairs) {
+							String labelName = findAltLabel(p.label);
+							List<LabelElementPair> list;
+							if (labelPairs.containsKey(labelName)) {
+								list = labelPairs.get(labelName);
+							} else {
+								list = new ArrayList<LabelElementPair>();
+								labelPairs.put(labelName, list);
+							}
+							list.add(p);
+						}
+
+						for (List<LabelElementPair> internalPairs : labelPairs.values()) {
+							labelNameSpace.clear();
+							checkLabelPairs(r, labelNameSpace, internalPairs);
+						}
+					}
+					else {
+						checkLabelPairs(r, labelNameSpace, pairs);
 					}
 				}
 			}
 		}
 	}
 
-    void checkForTypeMismatch(LabelElementPair prevLabelPair, LabelElementPair labelPair) {
+	void checkLabelPairs(Rule r, Map<String, LabelElementPair> labelNameSpace, List<LabelElementPair> pairs) {
+		for (LabelElementPair p : pairs) {
+			checkForLabelConflict(r, p.label);
+			String name = p.label.getText();
+			LabelElementPair prev = labelNameSpace.get(name);
+			if (prev == null) {
+				labelNameSpace.put(name, p);
+			} else {
+				checkForTypeMismatch(r, prev, p);
+			}
+		}
+	}
+
+	String findAltLabel(CommonTree label) {
+		if (label == null) {
+			return null;
+		} else if (label instanceof AltAST) {
+			AltAST altAST = (AltAST) label;
+			if (altAST.altLabel != null) {
+				return altAST.altLabel.toString();
+			} else if (altAST.leftRecursiveAltInfo != null) {
+				return altAST.leftRecursiveAltInfo.altLabel.toString();
+			} else {
+				return findAltLabel(label.parent);
+			}
+		} else {
+			return findAltLabel(label.parent);
+		}
+	}
+
+    void checkForTypeMismatch(Rule r, LabelElementPair prevLabelPair, LabelElementPair labelPair) {
 		// label already defined; if same type, no problem
 		if (prevLabelPair.type != labelPair.type) {
-			String typeMismatchExpr = labelPair.type + "!=" + prevLabelPair.type;
+			org.antlr.runtime.Token token;
+			if (r instanceof LeftRecursiveRule) {
+				token = ((GrammarAST) r.ast.getChild(0)).getToken();
+			} else {
+				token = labelPair.label.token;
+			}
 			errMgr.grammarError(
 					ErrorType.LABEL_TYPE_CONFLICT,
 					g.fileName,
-					labelPair.label.token,
+					token,
 					labelPair.label.getText(),
-					typeMismatchExpr);
+					labelPair.type + "!=" + prevLabelPair.type);
 		}
 		if (!prevLabelPair.element.getText().equals(labelPair.element.getText()) &&
 			(prevLabelPair.type.equals(LabelType.RULE_LABEL) || prevLabelPair.type.equals(LabelType.RULE_LIST_LABEL)) &&
