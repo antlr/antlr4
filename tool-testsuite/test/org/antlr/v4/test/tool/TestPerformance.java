@@ -1288,7 +1288,7 @@ public class TestPerformance extends BaseJavaToolTest {
 								throw ex;
 							}
 
-							tokens.reset();
+							tokens.seek(0);
 							if (REUSE_PARSER && parser != null) {
 								parser.setInputStream(tokens);
 							} else {
