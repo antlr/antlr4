@@ -132,32 +132,20 @@ public class SymbolChecks {
 		for (Rule r : rules) {
 			checkForAttributeConflicts(r);
 
-			boolean leftRecursiveRule = false;
-			if (r instanceof LeftRecursiveRule) {
-				// Label conflicts for left recursive rules need to be checked
-				// prior to the left recursion elimination step.
-				leftRecursiveRule = true;
-			}
-
-			Map<String, LabelElementPair> labelNameSpace = new HashMap<String, LabelElementPair>();
+			Map<String, LabelElementPair> labelNameSpace = new HashMap<>();
 			for (int i = 1; i <= r.numberOfAlts; i++) {
-				boolean altLabels = false;
-				if (r.hasAltSpecificContexts()) {
-					labelNameSpace.clear();
-					altLabels = true;
-				}
-
 				Alternative a = r.alt[i];
 				for (List<LabelElementPair> pairs : a.labelDefs.values()) {
-					if (leftRecursiveRule && altLabels) {
-						Map<String, List<LabelElementPair>> labelPairs = new HashMap<String, List<LabelElementPair>>();
+					if (r.hasAltSpecificContexts()) {
+						// Collect labelName-labeledRules map for rule with alternative labels.
+						Map<String, List<LabelElementPair>> labelPairs = new HashMap<>();
 						for (LabelElementPair p : pairs) {
-							String labelName = findAltLabel(p.label);
+							String labelName = findAltLabelName(p.label);
 							List<LabelElementPair> list;
 							if (labelPairs.containsKey(labelName)) {
 								list = labelPairs.get(labelName);
 							} else {
-								list = new ArrayList<LabelElementPair>();
+								list = new ArrayList<>();
 								labelPairs.put(labelName, list);
 							}
 							list.add(p);
@@ -189,7 +177,7 @@ public class SymbolChecks {
 		}
 	}
 
-	String findAltLabel(CommonTree label) {
+	String findAltLabelName(CommonTree label) {
 		if (label == null) {
 			return null;
 		} else if (label instanceof AltAST) {
@@ -199,10 +187,10 @@ public class SymbolChecks {
 			} else if (altAST.leftRecursiveAltInfo != null) {
 				return altAST.leftRecursiveAltInfo.altLabel.toString();
 			} else {
-				return findAltLabel(label.parent);
+				return findAltLabelName(label.parent);
 			}
 		} else {
-			return findAltLabel(label.parent);
+			return findAltLabelName(label.parent);
 		}
 	}
 
@@ -211,6 +199,7 @@ public class SymbolChecks {
 		if (prevLabelPair.type != labelPair.type) {
 			org.antlr.runtime.Token token;
 			if (r instanceof LeftRecursiveRule) {
+				// TODO: replace rule token for left-recursive rule with correct token.
 				token = ((GrammarAST) r.ast.getChild(0)).getToken();
 			} else {
 				token = labelPair.label.token;
