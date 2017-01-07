@@ -144,7 +144,8 @@ public class SymbolChecks {
 							List<LabelElementPair> list;
 							if (labelPairs.containsKey(labelName)) {
 								list = labelPairs.get(labelName);
-							} else {
+							}
+							else {
 								list = new ArrayList<>();
 								labelPairs.put(labelName, list);
 							}
@@ -164,46 +165,48 @@ public class SymbolChecks {
 		}
 	}
 
-	void checkLabelPairs(Rule r, Map<String, LabelElementPair> labelNameSpace, List<LabelElementPair> pairs) {
+	private void checkLabelPairs(Rule r, Map<String, LabelElementPair> labelNameSpace, List<LabelElementPair> pairs) {
 		for (LabelElementPair p : pairs) {
 			checkForLabelConflict(r, p.label);
 			String name = p.label.getText();
 			LabelElementPair prev = labelNameSpace.get(name);
 			if (prev == null) {
 				labelNameSpace.put(name, p);
-			} else {
+			}
+			else {
 				checkForTypeMismatch(r, prev, p);
 			}
 		}
 	}
 
-	String findAltLabelName(CommonTree label) {
+	private String findAltLabelName(CommonTree label) {
 		if (label == null) {
 			return null;
-		} else if (label instanceof AltAST) {
+		}
+		else if (label instanceof AltAST) {
 			AltAST altAST = (AltAST) label;
 			if (altAST.altLabel != null) {
 				return altAST.altLabel.toString();
-			} else if (altAST.leftRecursiveAltInfo != null) {
+			}
+			else if (altAST.leftRecursiveAltInfo != null) {
 				return altAST.leftRecursiveAltInfo.altLabel.toString();
-			} else {
+			}
+			else {
 				return findAltLabelName(label.parent);
 			}
-		} else {
+		}
+		else {
 			return findAltLabelName(label.parent);
 		}
 	}
 
-    void checkForTypeMismatch(Rule r, LabelElementPair prevLabelPair, LabelElementPair labelPair) {
+	private void checkForTypeMismatch(Rule r, LabelElementPair prevLabelPair, LabelElementPair labelPair) {
 		// label already defined; if same type, no problem
 		if (prevLabelPair.type != labelPair.type) {
-			org.antlr.runtime.Token token;
-			if (r instanceof LeftRecursiveRule) {
-				// TODO: replace rule token for left-recursive rule with correct token.
-				token = ((GrammarAST) r.ast.getChild(0)).getToken();
-			} else {
-				token = labelPair.label.token;
-			}
+			// TODO: replace rule token for left-recursive rule with correct token.
+			org.antlr.runtime.Token token = r instanceof LeftRecursiveRule
+					?  ((GrammarAST) r.ast.getChild(0)).getToken()
+					: labelPair.label.token;
 			errMgr.grammarError(
 					ErrorType.LABEL_TYPE_CONFLICT,
 					g.fileName,
@@ -215,12 +218,15 @@ public class SymbolChecks {
 			(prevLabelPair.type.equals(LabelType.RULE_LABEL) || prevLabelPair.type.equals(LabelType.RULE_LIST_LABEL)) &&
 			(labelPair.type.equals(LabelType.RULE_LABEL) || labelPair.type.equals(LabelType.RULE_LIST_LABEL))) {
 
+			org.antlr.runtime.Token token = r instanceof LeftRecursiveRule
+					?  ((GrammarAST) r.ast.getChild(0)).getToken()
+					: labelPair.label.token;
 			String prevLabelOp = prevLabelPair.type.equals(LabelType.RULE_LIST_LABEL) ? "+=" : "=";
 			String labelOp = labelPair.type.equals(LabelType.RULE_LIST_LABEL) ? "+=" : "=";
 			errMgr.grammarError(
 					ErrorType.LABEL_TYPE_CONFLICT,
 					g.fileName,
-					labelPair.label.token,
+					token,
 					labelPair.label.getText() + labelOp + labelPair.element.getText(),
 					prevLabelPair.label.getText() + prevLabelOp + prevLabelPair.element.getText());
 		}
