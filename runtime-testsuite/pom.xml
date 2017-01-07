@@ -39,7 +39,7 @@
 			<groupId>org.antlr</groupId>
 			<artifactId>antlr4-runtime</artifactId>
 			<version>${project.version}</version>
-			<scope>compile</scope>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.antlr</groupId>
@@ -129,7 +129,9 @@
 						</goals>
 						<configuration>
 							<sourceDirectory>${basedir}/test</sourceDirectory>
+							<outputDirectory>${project.build.directory}/generated-test-sources/antlr4</outputDirectory>
 							<visitor>true</visitor>
+							<generateTestSources>true</generateTestSources>
 						</configuration>
 					</execution>
 				</executions>
