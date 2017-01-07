@@ -341,6 +341,48 @@ public class TestSymbolIssues extends BaseJavaToolTest {
 		testErrors(test, false);
 	}
 
+	// https://github.com/antlr/antlr4/issues/1543
+	@Test public void testLabelsForTokensWithMixedTypesLRWithLabels() {
+		String[] test = {
+				"grammar L;\n" +
+				"\n" +
+				"expr\n" +
+				"    : left=A '+' right=A        #primary\n" +
+				"    | left=expr '-' right=expr  #sub\n" +
+				"    ;\n" +
+				"\n" +
+				"A: 'a';\n" +
+				"B: 'b';\n" +
+				"C: 'c';\n",
+
+				""
+		};
+
+		testErrors(test, false);
+	}
+
+	// https://github.com/antlr/antlr4/issues/1543
+	@Test
+	public void testLabelsForTokensWithMixedTypesLRWithoutLabels() {
+		String[] test = {
+				"grammar L;\n" +
+				"\n" +
+				"expr\n" +
+				"    : left=A '+' right=A\n" +
+				"    | left=expr '-' right=expr\n" +
+				"    ;\n" +
+				"\n" +
+				"A: 'a';\n" +
+				"B: 'b';\n" +
+				"C: 'c';\n",
+
+				"error(" + ErrorType.LABEL_TYPE_CONFLICT.code + "): L.g4:3:0: label left type mismatch with previous definition: TOKEN_LABEL!=RULE_LABEL\n" +
+				"error(" + ErrorType.LABEL_TYPE_CONFLICT.code + "): L.g4:3:0: label right type mismatch with previous definition: RULE_LABEL!=TOKEN_LABEL\n"
+		};
+
+		testErrors(test, false);
+	}
+
 	@Test public void testCharsCollision() throws  Exception {
 		String[] test = {
 				"lexer grammar L;\n" +
