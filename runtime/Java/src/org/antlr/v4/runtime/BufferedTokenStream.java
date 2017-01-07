@@ -89,6 +89,14 @@ public class BufferedTokenStream implements TokenStream {
 		// no resources to release
 	}
 
+	/**
+	 * This method resets the token stream back to the first token in the
+	 * buffer. It is equivalent to calling {@link #seek}{@code (0)}.
+	 *
+	 * @see #setTokenSource(TokenSource)
+	 * @deprecated Use {@code seek(0)} instead.
+	 */
+	@Deprecated
     public void reset() {
         seek(0);
     }
