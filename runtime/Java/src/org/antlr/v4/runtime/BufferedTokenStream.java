@@ -252,6 +252,7 @@ public class BufferedTokenStream implements TokenStream {
         this.tokenSource = tokenSource;
         tokens.clear();
         p = -1;
+        fetchedEOF = false;
     }
 
     public List<Token> getTokens() { return tokens; }
