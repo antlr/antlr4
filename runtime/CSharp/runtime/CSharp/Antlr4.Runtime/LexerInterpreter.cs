@@ -21,6 +21,8 @@ namespace Antlr4.Runtime
 
 		private readonly string[] ruleNames;
 
+		private readonly string[] channelNames;
+
 		private readonly string[] modeNames;
 
         [NotNull]
@@ -29,7 +31,7 @@ namespace Antlr4.Runtime
 		protected DFA[] decisionToDFA;
 		protected PredictionContextCache sharedContextCache = new PredictionContextCache();
 
-        public LexerInterpreter(string grammarFileName, IVocabulary vocabulary, IEnumerable<string> ruleNames, IEnumerable<string> modeNames, ATN atn, ICharStream input)
+        public LexerInterpreter(string grammarFileName, IVocabulary vocabulary, IEnumerable<string> ruleNames, IEnumerable<string> channelNames, IEnumerable<string> modeNames, ATN atn, ICharStream input)
             : base(input)
         {
             if (atn.grammarType != ATNType.Lexer)
@@ -39,6 +41,7 @@ namespace Antlr4.Runtime
             this.grammarFileName = grammarFileName;
             this.atn = atn;
             this.ruleNames = ruleNames.ToArray();
+			this.channelNames = channelNames.ToArray();
             this.modeNames = modeNames.ToArray();
             this.vocabulary = vocabulary;
 			this.decisionToDFA = new DFA[atn.NumberOfDecisions];
@@ -70,6 +73,14 @@ namespace Antlr4.Runtime
             get
             {
                 return ruleNames;
+            }
+        }
+
+        public override string[] ChannelNames
+        {
+            get
+            {
+                return channelNames;
             }
         }
 

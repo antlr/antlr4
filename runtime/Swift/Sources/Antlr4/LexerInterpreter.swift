@@ -10,6 +10,7 @@ public class LexerInterpreter: Lexer {
     ////@Deprecated
     internal final var tokenNames: [String?]?
     internal final var ruleNames: [String]
+    internal final var channelNames: [String]
     internal final var modeNames: [String]
 
 
@@ -27,11 +28,11 @@ public class LexerInterpreter: Lexer {
 //        self._tokenFactorySourcePair = (self, input);
 //    }
     //@Deprecated
-    public convenience init(_ grammarFileName: String, _ tokenNames: Array<String?>?, _ ruleNames: Array<String>, _ modeNames: Array<String>, _ atn: ATN, _ input: CharStream) throws {
-        try self.init(grammarFileName, Vocabulary.fromTokenNames(tokenNames), ruleNames, modeNames, atn, input)
+    public convenience init(_ grammarFileName: String, _ tokenNames: Array<String?>?, _ ruleNames: Array<String>, _ channelNames: Array<String>, _ modeNames: Array<String>, _ atn: ATN, _ input: CharStream) throws {
+        try self.init(grammarFileName, Vocabulary.fromTokenNames(tokenNames), ruleNames, channelNames, modeNames, atn, input)
     }
 
-    public init(_ grammarFileName: String, _ vocabulary: Vocabulary, _ ruleNames: Array<String>, _ modeNames: Array<String>, _ atn: ATN, _ input: CharStream) throws {
+    public init(_ grammarFileName: String, _ vocabulary: Vocabulary, _ ruleNames: Array<String>, _ channelNames: Array<String>, _ modeNames: Array<String>, _ atn: ATN, _ input: CharStream) throws {
 
         self.grammarFileName = grammarFileName
         self.atn = atn
@@ -43,6 +44,7 @@ public class LexerInterpreter: Lexer {
         }
 
         self.ruleNames = ruleNames
+        self.channelNames = channelNames
         self.modeNames = modeNames
         self.vocabulary = vocabulary
 
@@ -81,6 +83,11 @@ public class LexerInterpreter: Lexer {
     override
     public func getRuleNames() -> [String] {
         return ruleNames
+    }
+
+    override
+    public func getChannelNames() -> [String] {
+        return channelNames
     }
 
     override
