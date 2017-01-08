@@ -766,7 +766,7 @@ class <lexer.name>(<if(superClass)><superClass><else>Lexer<endif>):
 <endif>
     <lexer.tokens:{k | <k> = <lexer.tokens.(k)>}; separator="\n", wrap, anchor>
 
-    channelNames = [ u"DEFAULT_TOKEN_CHANNEL", u"HIDDEN", <lexer.channels:{c| u"<c>"}; separator=", ", wrap, anchor> ]
+    channelNames = [ u"DEFAULT_TOKEN_CHANNEL", u"HIDDEN"<if (lexer.channels)>, <lexer.channels:{c| u"<c>"}; separator=", ", wrap, anchor><endif> ]
 
     modeNames = [ <lexer.modes:{m| u"<m>"}; separator=", ", wrap, anchor> ]
 
