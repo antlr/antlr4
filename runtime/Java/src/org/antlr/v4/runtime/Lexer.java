@@ -320,6 +320,8 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 		return _channel;
 	}
 
+	public String[] getChannelNames() { return null; }
+
 	public String[] getModeNames() {
 		return null;
 	}

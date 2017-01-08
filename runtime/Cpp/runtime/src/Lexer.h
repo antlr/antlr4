@@ -156,6 +156,8 @@ namespace antlr4 {
 
     virtual size_t getChannel();
 
+    virtual const std::vector<std::string>& getChannelNames() const = 0;
+
     virtual const std::vector<std::string>& getModeNames() const = 0;
 
     /// Return a list of all Token objects in input char stream.

@@ -502,7 +502,7 @@ outer_continue: ;
             }
         }
 
-        public virtual string[] ModeNames
+        public virtual string[] ChannelNames
         {
             get
             {
@@ -510,6 +510,13 @@ outer_continue: ;
             }
         }
 
+        public virtual string[] ModeNames
+        {
+            get
+            {
+                return null;
+            }
+        }
 
         /// <summary>Return a list of all Token objects in input char stream.</summary>
         /// <remarks>
