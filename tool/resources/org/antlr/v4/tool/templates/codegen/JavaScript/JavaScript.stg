@@ -821,8 +821,14 @@ function <lexer.name>(input) {
 <lexer.name>.EOF = antlr4.Token.EOF;
 <lexer.tokens:{k | <lexer.name>.<k> = <lexer.tokens.(k)>;}; separator="\n", wrap, anchor>
 
+<if(lexer.channels)>
+<lexer.channels:{c| <lexer.name>.<c> = <lexer.channels.(c)>;}; separator="\n">
+
+<endif>
+<if(rest(lexer.modes))>
 <rest(lexer.modes):{m| <lexer.name>.<m> = <i>;}; separator="\n">
 
+<endif>
 <lexer.name>.prototype.channelNames = [ "DEFAULT_TOKEN_CHANNEL", "HIDDEN", <lexer.channels:{c| "<c>"}; separator=", ", wrap, anchor> ];
 
 <lexer.name>.prototype.modeNames = [ <lexer.modes:{m| "<m>"}; separator=", ", wrap, anchor> ];
