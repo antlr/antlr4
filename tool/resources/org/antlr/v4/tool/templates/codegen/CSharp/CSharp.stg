@@ -982,8 +982,10 @@ public partial class <csIdentifier.(lexer.name)> : <superClass; null="Lexer"> {
 	public const int
 		<lexer.channels:{k | <csIdentifier.(k)>=<lexer.channels.(k)>}; separator=", ", wrap, anchor>;
 	<endif>
-	<rest(lexer.modes):{m| public const int <modeName.(m)> = <i>;}; separator="\n">
-
+	<if(rest(lexer.modes))>
+	public const int
+		<rest(lexer.modes):{m | <m>=<i>}; separator=", ", wrap, anchor>;
+	<endif>
 	public static string[] channelNames = {
 		"DEFAULT_TOKEN_CHANNEL", "HIDDEN", <lexer.channels:{c| "<c>"}; separator=", ", wrap, anchor>
 	};
