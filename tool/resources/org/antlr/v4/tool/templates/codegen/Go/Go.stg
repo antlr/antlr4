@@ -1463,9 +1463,21 @@ const (
 const <lexer.name><first(lexer.tokens)> = <lexer.tokens.(first(lexer.tokens))>
 <endif>
 
+<if(rest(lexer.channels))>
+
+// <lexer.name> channels.
+const (
+	<lexer.channels:{c | <lexer.name><c> = <lexer.channels.(c)>}; separator="\n">
+)
+<elseif(lexer.channels)>
+
+// <lexer.name><first(lexer.channels)> is the <lexer.name> channel.
+const <lexer.name><first(lexer.channels)> = <lexer.channels.(first(lexer.channels))>
+<endif>
+
 <if(rest(rest(lexer.modes)))>
 
-// <lexer.name> modes
+// <lexer.name> modes.
 const (
 	<first(rest(lexer.modes)):{m | <lexer.name><m> = iota + 1}>
 	<rest(rest(lexer.modes)):{m | <lexer.name><m>}; separator="\n">
