@@ -141,15 +141,16 @@ public class SymbolChecks {
 						Map<String, List<LabelElementPair>> labelPairs = new HashMap<>();
 						for (LabelElementPair p : pairs) {
 							String labelName = findAltLabelName(p.label);
-							List<LabelElementPair> list;
-							if (labelPairs.containsKey(labelName)) {
-								list = labelPairs.get(labelName);
+							if (labelName != null) {
+								List<LabelElementPair> list;
+								if (labelPairs.containsKey(labelName)) {
+									list = labelPairs.get(labelName);
+								} else {
+									list = new ArrayList<>();
+									labelPairs.put(labelName, list);
+								}
+								list.add(p);
 							}
-							else {
-								list = new ArrayList<>();
-								labelPairs.put(labelName, list);
-							}
-							list.add(p);
 						}
 
 						for (List<LabelElementPair> internalPairs : labelPairs.values()) {
@@ -203,7 +204,11 @@ public class SymbolChecks {
 	private void checkForTypeMismatch(Rule r, LabelElementPair prevLabelPair, LabelElementPair labelPair) {
 		// label already defined; if same type, no problem
 		if (prevLabelPair.type != labelPair.type) {
-			// TODO: replace rule token for left-recursive rule with correct token.
+			// Current behavior: take a token of rule declaration in case of left-recursive rule
+			// Desired behavior: take a token of proper label declaration in case of left-recursive rule
+			// See https://github.com/antlr/antlr4/pull/1585
+			// Such behavior is referring to the fact that the warning is typically reported on the actual label redefinition,
+			//   but for left-recursive rules the warning is reported on the enclosing rule.
 			org.antlr.runtime.Token token = r instanceof LeftRecursiveRule
 					?  ((GrammarAST) r.ast.getChild(0)).getToken()
 					: labelPair.label.token;
