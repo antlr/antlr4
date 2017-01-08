@@ -898,10 +898,12 @@ public class <lexer.name> extends <superClass; null="Lexer"> {
 		<lexer.tokens:{k | <k>=<lexer.tokens.(k)>}; separator=", ", wrap, anchor>;
 	<if(lexer.channels)>
 	public static final int
-		<lexer.channels:{k | <k>=<lexer.channels.(k)>}; separator=", ", wrap, anchor>;
+		<lexer.channels:{c | <c>=<lexer.channels.(c)>}; separator=", ", wrap, anchor>;
 	<endif>
-	<rest(lexer.modes):{m| public static final int <m> = <i>;}; separator="\n">
-
+	<if(rest(lexer.modes))>
+	public static final int
+		<rest(lexer.modes):{m | <m>=<i>}; separator=", ", wrap, anchor>;
+	<endif>
 	public static String[] channelNames = {
 	"DEFAULT_TOKEN_CHANNEL", "HIDDEN", <lexer.channels:{c| "<c>"}; separator=", ", wrap, anchor>
 	};
