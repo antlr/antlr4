@@ -196,7 +196,7 @@ std::vector\<std::string> <lexer.name>::_ruleNames = {
 };
 
 std::vector\<std::string> <lexer.name>::_channelNames = {
-  "DEFAULT_TOKEN_CHANNEL", "HIDDEN", <lexer.channels: {c | "<c>"}; separator = ", ", wrap, anchor>
+  "DEFAULT_TOKEN_CHANNEL", "HIDDEN"<if (lexer.channels)>, <lexer.channels: {c | "<c>"}; separator = ", ", wrap, anchor><endif>
 };
 
 std::vector\<std::string> <lexer.name>::_modeNames = {
