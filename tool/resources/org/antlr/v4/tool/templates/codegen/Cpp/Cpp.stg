@@ -59,7 +59,7 @@ public:
 
 <if (rest(lexer.modes))>
   enum {
-    <rest(lexer.modes): {m | <m> = <i>,}; separator="\n", anchor>
+    <rest(lexer.modes): {m | <m> = <i>}; separator=", ", wrap, anchor>
   };
 <endif>
 
