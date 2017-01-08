@@ -964,8 +964,9 @@ open class <lexer.name>: <superClass; null="Lexer"> {
 	<if(lexer.channels)>
 	public static let <lexer.channels:{k | <k>=<lexer.channels.(k)>}; separator=", ", wrap, anchor>
 	<endif>
-	<rest(lexer.modes):{m| public static let <m>: Int = <i>;}; separator="\n">
-
+	<if(rest(lexer.modes))>
+	public static let <rest(lexer.modes):{m| <m>=<i>}; separator=", ", wrap, anchor>
+	<endif>
 	public static let channelNames: [String] = [
 		"DEFAULT_TOKEN_CHANNEL", "HIDDEN", <lexer.channels:{c| "<c>"}; separator=", ", wrap, anchor>
 	]
