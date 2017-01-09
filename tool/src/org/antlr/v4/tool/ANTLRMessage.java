@@ -6,60 +6,72 @@
 
 package org.antlr.v4.tool;
 
-import org.antlr.runtime.Token;
-import org.stringtemplate.v4.ST;
-
 import java.util.Arrays;
+
+import org.antlr.runtime.CommonToken;
+import org.antlr.runtime.Token;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.TokenSource;
+import org.antlr.v4.runtime.misc.Pair;
+import org.stringtemplate.v4.ST;
 
 public class ANTLRMessage {
 	private static final Object[] EMPTY_ARGS = new Object[0];
 
+	private final ErrorType errorType;
 
-    private final ErrorType errorType;
+	private final Object[] args;
 
-    private final Object[] args;
+	private final Throwable e;
 
-    private final Throwable e;
-
-    // used for location template
-    public String fileName;
-    public int line = -1;
-    public int charPosition = -1;
+	// used for location template
+	public String fileName;
+	public int line = -1;
+	public int charPosition = -1;
 
 	public Grammar g;
 	/** Most of the time, we'll have a token such as an undefined rule ref
      *  and so this will be set.
-     */
-    public Token offendingToken;
+	 */
+	public Token offendingToken;
 
 	public ANTLRMessage(ErrorType errorType) {
-        this(errorType, (Throwable)null, Token.INVALID_TOKEN);
-    }
-
-    public ANTLRMessage(ErrorType errorType, Token offendingToken, Object... args) {
-        this(errorType, null, offendingToken, args);
+		this(errorType, (Throwable) null, Token.INVALID_TOKEN);
 	}
 
-    public ANTLRMessage(ErrorType errorType, Throwable e, Token offendingToken, Object... args) {
-        this.errorType = errorType;
-        this.e = e;
-        this.args = args;
+	public ANTLRMessage(ErrorType errorType, Token offendingToken, Object... args) {
+		this(errorType, null, offendingToken, args);
+	}
+
+	public ANTLRMessage(ErrorType errorType, Throwable e, Token offendingToken, Object... args) {
+		this.errorType = errorType;
+		this.e = e;
+		this.args = args;
 		this.offendingToken = offendingToken;
-    }
+	}
 
+	public ErrorType getErrorType() {
+		return errorType;
+	}
 
-    public ErrorType getErrorType() {
-        return errorType;
-    }
+	/** Returns the offending token converted to the v4 token type */
+	public org.antlr.v4.runtime.Token getOffendingToken() {
+		CommonToken token = (CommonToken) offendingToken;
+		org.antlr.v4.runtime.CommonToken tokenV4 = new org.antlr.v4.runtime.CommonToken(
+				new Pair<TokenSource, CharStream>(null, null), token.getType(), token.getChannel(),
+				token.getStartIndex(), token.getStopIndex());
+		tokenV4.setLine(line);
+		tokenV4.setCharPositionInLine(charPosition);
+		return tokenV4;
+	}
 
-
-    public Object[] getArgs() {
+	public Object[] getArgs() {
 		if (args == null) {
 			return EMPTY_ARGS;
 		}
 
 		return args;
-    }
+	}
 
 	public ST getMessageTemplate(boolean verbose) {
 		ST messageST = new ST(getErrorType().msg);
@@ -67,15 +79,15 @@ public class ANTLRMessage {
 
 		messageST.add("verbose", verbose);
 		Object[] args = getArgs();
-		for (int i=0; i<args.length; i++) {
+		for (int i = 0; i < args.length; i++) {
 			String attr = "arg";
-			if ( i>0 ) attr += i + 1;
+			if (i > 0) attr += i + 1;
 			messageST.add(attr, args[i]);
 		}
-		if ( args.length<2 ) messageST.add("arg2", null); // some messages ref arg2
+		if (args.length < 2) messageST.add("arg2", null); // some messages ref arg2
 
 		Throwable cause = getCause();
-		if ( cause!=null ) {
+		if (cause != null) {
 			messageST.add("exception", cause);
 			messageST.add("stackTrace", cause.getStackTrace());
 		}
@@ -87,10 +99,9 @@ public class ANTLRMessage {
 		return messageST;
 	}
 
-
-    public Throwable getCause() {
-        return e;
-    }
+	public Throwable getCause() {
+		return e;
+	}
 
 	@Override
 	public String toString() {
