@@ -145,10 +145,6 @@ func (v *Base<file.grammarName>Visitor) Visit<lname; format="cap">(ctx *<lname; 
 >>
 
 Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
-<if(superClass)>
-import "./<superClass>"
-
-<endif>
 <if(atn)>
 var parserATN = <atn>
 <else>
