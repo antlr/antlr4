@@ -23,7 +23,7 @@ const (
 
 var (
 	BasePredictionContextglobalNodeCount = 1
-	BasePredictionContextid = BasePredictionContextglobalNodeCount
+	BasePredictionContextid              = BasePredictionContextglobalNodeCount
 )
 
 type PredictionContext interface {
@@ -620,8 +620,8 @@ func mergeArrays(a, b *ArrayPredictionContext, rootIsWildcard bool, mergeCache *
 	j := 0 // walks b
 	k := 0 // walks target M array
 
-	mergedReturnStates := make([]int, len(a.returnStates) + len(b.returnStates))
-	mergedParents := make([]PredictionContext, len(a.returnStates) + len(b.returnStates))
+	mergedReturnStates := make([]int, len(a.returnStates)+len(b.returnStates))
+	mergedParents := make([]PredictionContext, len(a.returnStates)+len(b.returnStates))
 	// walk and merge to yield mergedParents, mergedReturnStates
 	for i < len(a.returnStates) && j < len(b.returnStates) {
 		aParent := a.parents[i]
