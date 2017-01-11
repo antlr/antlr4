@@ -1444,7 +1444,7 @@ ParserATNSimulator.prototype.precedenceTransition = function(config, pt,  collec
                 c = new ATNConfig({state:pt.target}, config); // no pred context
             }
         } else {
-            newSemCtx = SemanticContext.andContext(config.semanticContext, pt.getPredicate());
+            var newSemCtx = SemanticContext.andContext(config.semanticContext, pt.getPredicate());
             c = new ATNConfig({state:pt.target, semanticContext:newSemCtx}, config);
         }
     } else {
