@@ -253,6 +253,7 @@ public class BufferedTokenStream: TokenStream {
         self.tokenSource = tokenSource
         tokens.removeAll()
         p = -1
+        fetchedEOF = false
     }
 
     public func getTokens() -> Array<Token> {

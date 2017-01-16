@@ -7,8 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		DB09919D1E22DE9B00FE71AA /* Antlr4Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB0991951E22DE6000FE71AA /* Antlr4Tests.swift */; };
+		DB09919D1E22DE9B00FE71AA /* TokenStreamTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB0991951E22DE6000FE71AA /* TokenStreamTests.swift */; };
 		DB0991A11E22DF3B00FE71AA /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = DB0991A01E22DF3B00FE71AA /* Info.plist */; };
+		DB4EB8A51E2CB1B60095F402 /* SwiftTest.g4 in Resources */ = {isa = PBXBuildFile; fileRef = DB4EB8A41E2CB1B60095F402 /* SwiftTest.g4 */; };
+		DB4EB8AC1E2CB49D0095F402 /* SwiftTestBaseListener.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB4EB8A61E2CB49D0095F402 /* SwiftTestBaseListener.swift */; };
+		DB4EB8AD1E2CB49D0095F402 /* SwiftTestLexer.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB4EB8A71E2CB49D0095F402 /* SwiftTestLexer.swift */; };
+		DB4EB8AE1E2CB49D0095F402 /* SwiftTestLexerATN.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB4EB8A81E2CB49D0095F402 /* SwiftTestLexerATN.swift */; };
+		DB4EB8AF1E2CB49D0095F402 /* SwiftTestListener.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB4EB8A91E2CB49D0095F402 /* SwiftTestListener.swift */; };
+		DB4EB8B01E2CB49D0095F402 /* SwiftTestParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB4EB8AA1E2CB49D0095F402 /* SwiftTestParser.swift */; };
+		DB4EB8B11E2CB49D0095F402 /* SwiftTestParserATN.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB4EB8AB1E2CB49D0095F402 /* SwiftTestParserATN.swift */; };
 		DBBAE6351E22DCAC00C2FEA6 /* ANTLRErrorListener.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBBAE58E1E22DCAC00C2FEA6 /* ANTLRErrorListener.swift */; };
 		DBBAE6361E22DCAC00C2FEA6 /* ANTLRErrorListener.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBBAE58E1E22DCAC00C2FEA6 /* ANTLRErrorListener.swift */; };
 		DBBAE6371E22DCAC00C2FEA6 /* ANTLRErrorStrategy.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBBAE58F1E22DCAC00C2FEA6 /* ANTLRErrorStrategy.swift */; };
@@ -339,8 +346,15 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		DB0991951E22DE6000FE71AA /* Antlr4Tests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Antlr4Tests.swift; sourceTree = "<group>"; };
+		DB0991951E22DE6000FE71AA /* TokenStreamTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TokenStreamTests.swift; sourceTree = "<group>"; };
 		DB0991A01E22DF3B00FE71AA /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		DB4EB8A41E2CB1B60095F402 /* SwiftTest.g4 */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SwiftTest.g4; sourceTree = "<group>"; };
+		DB4EB8A61E2CB49D0095F402 /* SwiftTestBaseListener.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftTestBaseListener.swift; sourceTree = "<group>"; };
+		DB4EB8A71E2CB49D0095F402 /* SwiftTestLexer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftTestLexer.swift; sourceTree = "<group>"; };
+		DB4EB8A81E2CB49D0095F402 /* SwiftTestLexerATN.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftTestLexerATN.swift; sourceTree = "<group>"; };
+		DB4EB8A91E2CB49D0095F402 /* SwiftTestListener.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftTestListener.swift; sourceTree = "<group>"; };
+		DB4EB8AA1E2CB49D0095F402 /* SwiftTestParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftTestParser.swift; sourceTree = "<group>"; };
+		DB4EB8AB1E2CB49D0095F402 /* SwiftTestParserATN.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftTestParserATN.swift; sourceTree = "<group>"; };
 		DBBAE58E1E22DCAC00C2FEA6 /* ANTLRErrorListener.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ANTLRErrorListener.swift; sourceTree = "<group>"; };
 		DBBAE58F1E22DCAC00C2FEA6 /* ANTLRErrorStrategy.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ANTLRErrorStrategy.swift; sourceTree = "<group>"; };
 		DBBAE5901E22DCAC00C2FEA6 /* ANTLRFileStream.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ANTLRFileStream.swift; sourceTree = "<group>"; };
@@ -543,9 +557,24 @@
 		DB0991941E22DE6000FE71AA /* Antlr4Tests */ = {
 			isa = PBXGroup;
 			children = (
-				DB0991951E22DE6000FE71AA /* Antlr4Tests.swift */,
+				DB4EB8B21E2CBA240095F402 /* gen */,
+				DB0991951E22DE6000FE71AA /* TokenStreamTests.swift */,
+				DB4EB8A41E2CB1B60095F402 /* SwiftTest.g4 */,
 			);
 			path = Antlr4Tests;
+			sourceTree = "<group>";
+		};
+		DB4EB8B21E2CBA240095F402 /* gen */ = {
+			isa = PBXGroup;
+			children = (
+				DB4EB8A61E2CB49D0095F402 /* SwiftTestBaseListener.swift */,
+				DB4EB8A71E2CB49D0095F402 /* SwiftTestLexer.swift */,
+				DB4EB8A81E2CB49D0095F402 /* SwiftTestLexerATN.swift */,
+				DB4EB8A91E2CB49D0095F402 /* SwiftTestListener.swift */,
+				DB4EB8AA1E2CB49D0095F402 /* SwiftTestParser.swift */,
+				DB4EB8AB1E2CB49D0095F402 /* SwiftTestParserATN.swift */,
+			);
+			name = gen;
 			sourceTree = "<group>";
 		};
 		DBBAE58C1E22DCAC00C2FEA6 /* Sources */ = {
@@ -928,6 +957,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DB4EB8A51E2CB1B60095F402 /* SwiftTest.g4 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1283,7 +1313,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DB09919D1E22DE9B00FE71AA /* Antlr4Tests.swift in Sources */,
+				DB09919D1E22DE9B00FE71AA /* TokenStreamTests.swift in Sources */,
+				DB4EB8AC1E2CB49D0095F402 /* SwiftTestBaseListener.swift in Sources */,
+				DB4EB8AD1E2CB49D0095F402 /* SwiftTestLexer.swift in Sources */,
+				DB4EB8AE1E2CB49D0095F402 /* SwiftTestLexerATN.swift in Sources */,
+				DB4EB8AF1E2CB49D0095F402 /* SwiftTestListener.swift in Sources */,
+				DB4EB8B01E2CB49D0095F402 /* SwiftTestParser.swift in Sources */,
+				DB4EB8B11E2CB49D0095F402 /* SwiftTestParserATN.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
