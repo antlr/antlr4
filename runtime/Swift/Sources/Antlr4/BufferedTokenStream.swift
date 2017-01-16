@@ -1,63 +1,52 @@
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
- * Use of this file is governed by the BSD 3-clause license that
- * can be found in the LICENSE.txt file in the project root.
- */
+/// Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/// Use of this file is governed by the BSD 3-clause license that
+/// can be found in the LICENSE.txt file in the project root.
 
 
 
-/**
- * This implementation of {@link org.antlr.v4.runtime.TokenStream} loads tokens from a
- * {@link org.antlr.v4.runtime.TokenSource} on-demand, and places the tokens in a buffer to provide
- * access to any previous token by index.
- *
- * <p>
- * This token stream ignores the value of {@link org.antlr.v4.runtime.Token#getChannel}. If your
- * parser requires the token stream filter tokens to only those on a particular
- * channel, such as {@link org.antlr.v4.runtime.Token#DEFAULT_CHANNEL} or
- * {@link org.antlr.v4.runtime.Token#HIDDEN_CHANNEL}, use a filtering token stream such a
- * {@link org.antlr.v4.runtime.CommonTokenStream}.</p>
- */
+/// This implementation of {@link org.antlr.v4.runtime.TokenStream} loads tokens from a
+/// {@link org.antlr.v4.runtime.TokenSource} on-demand, and places the tokens in a buffer to provide
+/// access to any previous token by index.
+/// 
+/// <p>
+/// This token stream ignores the value of {@link org.antlr.v4.runtime.Token#getChannel}. If your
+/// parser requires the token stream filter tokens to only those on a particular
+/// channel, such as {@link org.antlr.v4.runtime.Token#DEFAULT_CHANNEL} or
+/// {@link org.antlr.v4.runtime.Token#HIDDEN_CHANNEL}, use a filtering token stream such a
+/// {@link org.antlr.v4.runtime.CommonTokenStream}.</p>
 
 public class BufferedTokenStream: TokenStream {
-    /**
-     * The {@link org.antlr.v4.runtime.TokenSource} from which tokens for this stream are fetched.
-     */
+    /// The {@link org.antlr.v4.runtime.TokenSource} from which tokens for this stream are fetched.
     internal var tokenSource: TokenSource
 
-    /**
-     * A collection of all tokens fetched from the token source. The list is
-     * considered a complete view of the input once {@link #fetchedEOF} is set
-     * to {@code true}.
-     */
+    /// A collection of all tokens fetched from the token source. The list is
+    /// considered a complete view of the input once {@link #fetchedEOF} is set
+    /// to {@code true}.
     internal var tokens: Array<Token> = Array<Token>()
     // Array<Token>(100
 
-    /**
-     * The index into {@link #tokens} of the current token (next token to
-     * {@link #consume}). {@link #tokens}{@code [}{@link #p}{@code ]} should be
-     * {@link #LT LT(1)}.
-     *
-     * <p>This field is set to -1 when the stream is first constructed or when
-     * {@link #setTokenSource} is called, indicating that the first token has
-     * not yet been fetched from the token source. For additional information,
-     * see the documentation of {@link org.antlr.v4.runtime.IntStream} for a description of
-     * Initializing Methods.</p>
-     */
+    /// The index into {@link #tokens} of the current token (next token to
+    /// {@link #consume}). {@link #tokens}{@code [}{@link #p}{@code ]} should be
+    /// {@link #LT LT(1)}.
+    /// 
+    /// <p>This field is set to -1 when the stream is first constructed or when
+    /// {@link #setTokenSource} is called, indicating that the first token has
+    /// not yet been fetched from the token source. For additional information,
+    /// see the documentation of {@link org.antlr.v4.runtime.IntStream} for a description of
+    /// Initializing Methods.</p>
     internal var p: Int = -1
 
-    /**
-     * Indicates whether the {@link org.antlr.v4.runtime.Token#EOF} token has been fetched from
-     * {@link #tokenSource} and added to {@link #tokens}. This field improves
-     * performance for the following cases:
-     *
-     * <ul>
-     * <li>{@link #consume}: The lookahead check in {@link #consume} to prevent
-     * consuming the EOF symbol is optimized by checking the values of
-     * {@link #fetchedEOF} and {@link #p} instead of calling {@link #LA}.</li>
-     * <li>{@link #fetch}: The check to prevent adding multiple EOF symbols into
-     * {@link #tokens} is trivial with this field.</li>
-     * <ul>
-     */
+    /// Indicates whether the {@link org.antlr.v4.runtime.Token#EOF} token has been fetched from
+    /// {@link #tokenSource} and added to {@link #tokens}. This field improves
+    /// performance for the following cases:
+    /// 
+    /// <ul>
+    /// <li>{@link #consume}: The lookahead check in {@link #consume} to prevent
+    /// consuming the EOF symbol is optimized by checking the values of
+    /// {@link #fetchedEOF} and {@link #p} instead of calling {@link #LA}.</li>
+    /// <li>{@link #fetch}: The check to prevent adding multiple EOF symbols into
+    /// {@link #tokens} is trivial with this field.</li>
+    /// <ul>
     internal var fetchedEOF: Bool = false
 
     public init(_ tokenSource: TokenSource) {
@@ -128,12 +117,11 @@ public class BufferedTokenStream: TokenStream {
         }
     }
 
-    /** Make sure index {@code i} in tokens has a token.
-	 *
-	 * @return {@code true} if a token is located at index {@code i}, otherwise
-	 *    {@code false}.
-	 * @see #get(int i)
-	 */
+    /// Make sure index {@code i} in tokens has a token.
+    /// 
+    /// - returns: {@code true} if a token is located at index {@code i}, otherwise
+    /// {@code false}.
+    /// - seealso: #get(int i)
     @discardableResult
     internal func sync(_ i: Int) throws -> Bool {
         assert(i >= 0, "Expected: i>=0")
@@ -147,10 +135,9 @@ public class BufferedTokenStream: TokenStream {
         return true
     }
 
-    /** Add {@code n} elements to buffer.
-	 *
-	 * @return The actual number of elements added to the buffer.
-	 */
+    /// Add {@code n} elements to buffer.
+    /// 
+    /// - returns: The actual number of elements added to the buffer.
     internal func fetch(_ n: Int) throws -> Int {
         if fetchedEOF {
             return 0
@@ -181,7 +168,7 @@ public class BufferedTokenStream: TokenStream {
         return tokens[i] //tokens[i]
     }
 
-    /** Get all tokens from start..stop inclusively */
+    /// Get all tokens from start..stop inclusively
     public func get(_ start: Int,_ stop: Int) throws -> Array<Token>? {
         var stop = stop
         if start < 0 || stop < 0 {
@@ -235,19 +222,17 @@ public class BufferedTokenStream: TokenStream {
         return tokens[i]
     }
 
-    /**
-     * Allowed derived classes to modify the behavior of operations which change
-     * the current stream position by adjusting the target token index of a seek
-     * operation. The default implementation simply returns {@code i}. If an
-     * exception is thrown in this method, the current stream index should not be
-     * changed.
-     *
-     * <p>For example, {@link org.antlr.v4.runtime.CommonTokenStream} overrides this method to ensure that
-     * the seek target is always an on-channel token.</p>
-     *
-     * @param i The target token index.
-     * @return The adjusted target token index.
-     */
+    /// Allowed derived classes to modify the behavior of operations which change
+    /// the current stream position by adjusting the target token index of a seek
+    /// operation. The default implementation simply returns {@code i}. If an
+    /// exception is thrown in this method, the current stream index should not be
+    /// changed.
+    /// 
+    /// <p>For example, {@link org.antlr.v4.runtime.CommonTokenStream} overrides this method to ensure that
+    /// the seek target is always an on-channel token.</p>
+    /// 
+    /// - parameter i: The target token index.
+    /// - returns: The adjusted target token index.
     internal func adjustSeekIndex(_ i: Int) throws -> Int {
         return i
     }
@@ -263,7 +248,7 @@ public class BufferedTokenStream: TokenStream {
         p = try adjustSeekIndex(0)
     }
 
-    /** Reset this token stream by setting its token source. */
+    /// Reset this token stream by setting its token source.
     public func setTokenSource(_ tokenSource: TokenSource) {
         self.tokenSource = tokenSource
         tokens.removeAll()
@@ -278,10 +263,9 @@ public class BufferedTokenStream: TokenStream {
         return try getTokens(start, stop, nil)
     }
 
-    /** Given a start and stop index, return a List of all tokens in
-     *  the token type BitSet.  Return null if no tokens were found.  This
-     *  method looks at both on and off channel tokens.
-     */
+    /// Given a start and stop index, return a List of all tokens in
+    /// the token type BitSet.  Return null if no tokens were found.  This
+    /// method looks at both on and off channel tokens.
     public func getTokens(_ start: Int, _ stop: Int, _ types: Set<Int>?) throws -> Array<Token>? {
         try lazyInit()
         if start < 0 || stop >= tokens.count ||
@@ -318,12 +302,10 @@ public class BufferedTokenStream: TokenStream {
         return try  getTokens(start, stop, s)
     }
 
-    /**
-     * Given a starting index, return the index of the next token on channel.
-     * Return {@code i} if {@code tokens[i]} is on channel. Return the index of
-     * the EOF token if there are no tokens on channel between {@code i} and
-     * EOF.
-     */
+    /// Given a starting index, return the index of the next token on channel.
+    /// Return {@code i} if {@code tokens[i]} is on channel. Return the index of
+    /// the EOF token if there are no tokens on channel between {@code i} and
+    /// EOF.
     internal func nextTokenOnChannel(_ i: Int, _ channel: Int) throws -> Int {
         var i = i
         try sync(i)
@@ -345,16 +327,14 @@ public class BufferedTokenStream: TokenStream {
         return i
     }
 
-    /**
-     * Given a starting index, return the index of the previous token on
-     * channel. Return {@code i} if {@code tokens[i]} is on channel. Return -1
-     * if there are no tokens on channel between {@code i} and 0.
-     *
-     * <p>
-     * If {@code i} specifies an index at or after the EOF token, the EOF token
-     * index is returned. This is due to the fact that the EOF token is treated
-     * as though it were on every channel.</p>
-     */
+    /// Given a starting index, return the index of the previous token on
+    /// channel. Return {@code i} if {@code tokens[i]} is on channel. Return -1
+    /// if there are no tokens on channel between {@code i} and 0.
+    /// 
+    /// <p>
+    /// If {@code i} specifies an index at or after the EOF token, the EOF token
+    /// index is returned. This is due to the fact that the EOF token is treated
+    /// as though it were on every channel.</p>
     internal func previousTokenOnChannel(_ i: Int, _ channel: Int) throws -> Int {
         var i = i
         try sync(i)
@@ -375,10 +355,9 @@ public class BufferedTokenStream: TokenStream {
         return i
     }
 
-    /** Collect all tokens on specified channel to the right of
-     *  the current token up until we see a token on DEFAULT_TOKEN_CHANNEL or
-     *  EOF. If channel is -1, find any non default channel token.
-     */
+    /// Collect all tokens on specified channel to the right of
+    /// the current token up until we see a token on DEFAULT_TOKEN_CHANNEL or
+    /// EOF. If channel is -1, find any non default channel token.
     public func getHiddenTokensToRight(_ tokenIndex: Int, _ channel: Int) throws -> Array<Token>? {
         try lazyInit()
         if tokenIndex < 0 || tokenIndex >= tokens.count {
@@ -400,18 +379,16 @@ public class BufferedTokenStream: TokenStream {
         return filterForChannel(from, to, channel)
     }
 
-    /** Collect all hidden tokens (any off-default channel) to the right of
-     *  the current token up until we see a token on DEFAULT_TOKEN_CHANNEL
-     *  or EOF.
-     */
+    /// Collect all hidden tokens (any off-default channel) to the right of
+    /// the current token up until we see a token on DEFAULT_TOKEN_CHANNEL
+    /// or EOF.
     public func getHiddenTokensToRight(_ tokenIndex: Int) throws -> Array<Token>? {
         return try getHiddenTokensToRight(tokenIndex, -1)
     }
 
-    /** Collect all tokens on specified channel to the left of
-     *  the current token up until we see a token on DEFAULT_TOKEN_CHANNEL.
-     *  If channel is -1, find any non default channel token.
-     */
+    /// Collect all tokens on specified channel to the left of
+    /// the current token up until we see a token on DEFAULT_TOKEN_CHANNEL.
+    /// If channel is -1, find any non default channel token.
     public func getHiddenTokensToLeft(_ tokenIndex: Int, _ channel: Int) throws -> Array<Token>? {
         try lazyInit()
         if tokenIndex < 0 || tokenIndex >= tokens.count {
@@ -437,9 +414,8 @@ public class BufferedTokenStream: TokenStream {
         return filterForChannel(from, to, channel)
     }
 
-    /** Collect all hidden tokens (any off-default channel) to the left of
-     *  the current token up until we see a token on DEFAULT_TOKEN_CHANNEL.
-     */
+    /// Collect all hidden tokens (any off-default channel) to the left of
+    /// the current token up until we see a token on DEFAULT_TOKEN_CHANNEL.
     public func getHiddenTokensToLeft(_ tokenIndex: Int) throws -> Array<Token>? {
         return try  getHiddenTokensToLeft(tokenIndex, -1)
     }
@@ -469,7 +445,7 @@ public class BufferedTokenStream: TokenStream {
         return tokenSource.getSourceName()
     }
 
-    /** Get the text of all tokens in this buffer. */
+    /// Get the text of all tokens in this buffer.
 
 
     public func getText() throws -> String {
@@ -513,7 +489,7 @@ public class BufferedTokenStream: TokenStream {
         return ""
     }
 
-    /** Get all tokens from lexer until EOF */
+    /// Get all tokens from lexer until EOF
     public func fill() throws {
         try lazyInit()
         let blockSize: Int = 1000

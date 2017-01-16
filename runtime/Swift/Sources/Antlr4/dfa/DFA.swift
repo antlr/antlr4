@@ -1,13 +1,11 @@
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
- * Use of this file is governed by the BSD 3-clause license that
- * can be found in the LICENSE.txt file in the project root.
- */
+/// Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/// Use of this file is governed by the BSD 3-clause license that
+/// can be found in the LICENSE.txt file in the project root.
 
 
 public class DFA: CustomStringConvertible {
-    /** A set of all DFA states. Use {@link java.util.Map} so we can get old state back
-     *  ({@link java.util.Set} only allows you to see if it's there).
-     */
+    /// A set of all DFA states. Use {@link java.util.Map} so we can get old state back
+    /// ({@link java.util.Set} only allows you to see if it's there).
 
     public final var states: HashMap<DFAState, DFAState?> = HashMap<DFAState, DFAState?>()
 
@@ -15,14 +13,12 @@ public class DFA: CustomStringConvertible {
 
     public final var decision: Int
 
-    /** From which ATN state did we create this DFA? */
+    /// From which ATN state did we create this DFA?
 
     public let atnStartState: DecisionState
 
-    /**
-     * {@code true} if this DFA is for a precedence decision; otherwise,
-     * {@code false}. This is the backing field for {@link #isPrecedenceDfa}.
-     */
+    /// {@code true} if this DFA is for a precedence decision; otherwise,
+    /// {@code false}. This is the backing field for {@link #isPrecedenceDfa}.
     private final var precedenceDfa: Bool
 
     public convenience init(_ atnStartState: DecisionState) {
@@ -48,31 +44,27 @@ public class DFA: CustomStringConvertible {
         self.precedenceDfa = precedenceDfa
     }
 
-    /**
-     * Gets whether this DFA is a precedence DFA. Precedence DFAs use a special
-     * start state {@link #s0} which is not stored in {@link #states}. The
-     * {@link org.antlr.v4.runtime.dfa.DFAState#edges} array for this start state contains outgoing edges
-     * supplying individual start states corresponding to specific precedence
-     * values.
-     *
-     * @return {@code true} if this is a precedence DFA; otherwise,
-     * {@code false}.
-     * @see org.antlr.v4.runtime.Parser#getPrecedence()
-     */
+    /// Gets whether this DFA is a precedence DFA. Precedence DFAs use a special
+    /// start state {@link #s0} which is not stored in {@link #states}. The
+    /// {@link org.antlr.v4.runtime.dfa.DFAState#edges} array for this start state contains outgoing edges
+    /// supplying individual start states corresponding to specific precedence
+    /// values.
+    /// 
+    /// - returns: {@code true} if this is a precedence DFA; otherwise,
+    /// {@code false}.
+    /// - seealso: org.antlr.v4.runtime.Parser#getPrecedence()
     public final func isPrecedenceDfa() -> Bool {
         return precedenceDfa
     }
 
-    /**
-     * Get the start state for a specific precedence value.
-     *
-     * @param precedence The current precedence.
-     * @return The start state corresponding to the specified precedence, or
-     * {@code null} if no start state exists for the specified precedence.
-     *
-     * @throws IllegalStateException if this is not a precedence DFA.
-     * @see #isPrecedenceDfa()
-     */
+    /// Get the start state for a specific precedence value.
+    /// 
+    /// - parameter precedence: The current precedence.
+    /// - returns: The start state corresponding to the specified precedence, or
+    /// {@code null} if no start state exists for the specified precedence.
+    /// 
+    /// -  IllegalStateException if this is not a precedence DFA.
+    /// - seealso: #isPrecedenceDfa()
     ////@SuppressWarnings("null")
     public final func getPrecedenceStartState(_ precedence: Int) throws -> DFAState? {
         if !isPrecedenceDfa() {
@@ -90,16 +82,14 @@ public class DFA: CustomStringConvertible {
         return s0!.edges![precedence]
     }
 
-    /**
-     * Set the start state for a specific precedence value.
-     *
-     * @param precedence The current precedence.
-     * @param startState The start state corresponding to the specified
-     * precedence.
-     *
-     * @throws IllegalStateException if this is not a precedence DFA.
-     * @see #isPrecedenceDfa()
-     */
+    /// Set the start state for a specific precedence value.
+    /// 
+    /// - parameter precedence: The current precedence.
+    /// - parameter startState: The start state corresponding to the specified
+    /// precedence.
+    /// 
+    /// -  IllegalStateException if this is not a precedence DFA.
+    /// - seealso: #isPrecedenceDfa()
     ////@SuppressWarnings({"SynchronizeOnNonFinalField", "null"})
     public final func setPrecedenceStartState(_ precedence: Int, _ startState: DFAState) throws {
         if !isPrecedenceDfa() {
@@ -125,17 +115,15 @@ public class DFA: CustomStringConvertible {
         }
     }
 
-    /**
-     * Sets whether this is a precedence DFA.
-     *
-     * @param precedenceDfa {@code true} if this is a precedence DFA; otherwise,
-     * {@code false}
-     *
-     * @throws UnsupportedOperationException if {@code precedenceDfa} does not
-     * match the value of {@link #isPrecedenceDfa} for the current DFA.
-     *
-     * @deprecated This method no longer performs any action.
-     */
+    /// Sets whether this is a precedence DFA.
+    /// 
+    /// - parameter precedenceDfa: {@code true} if this is a precedence DFA; otherwise,
+    /// {@code false}
+    /// 
+    /// -  UnsupportedOperationException if {@code precedenceDfa} does not
+    /// match the value of {@link #isPrecedenceDfa} for the current DFA.
+    /// 
+    /// -  This method no longer performs any action.
     ////@Deprecated
     public final func setPrecedenceDfa(_ precedenceDfa: Bool) throws {
         if precedenceDfa != isPrecedenceDfa() {
@@ -144,9 +132,7 @@ public class DFA: CustomStringConvertible {
         }
     }
 
-    /**
-     * Return a list of all states in this DFA, ordered by state number.
-     */
+    /// Return a list of all states in this DFA, ordered by state number.
 
     public func getStates() -> Array<DFAState> {
         var result: Array<DFAState> = Array<DFAState>(states.keys)
@@ -167,9 +153,7 @@ public class DFA: CustomStringConvertible {
         return description
     }
 
-    /**
-     * @deprecated Use {@link #toString(org.antlr.v4.runtime.Vocabulary)} instead.
-     */
+    /// -  Use {@link #toString(org.antlr.v4.runtime.Vocabulary)} instead.
     ////@Deprecated
     public func toString(_ tokenNames: [String?]?) -> String {
         if s0 == nil {

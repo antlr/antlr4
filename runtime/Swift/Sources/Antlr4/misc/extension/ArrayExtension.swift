@@ -1,7 +1,6 @@
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
- * Use of this file is governed by the BSD 3-clause license that
- * can be found in the LICENSE.txt file in the project root.
- */
+/// Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/// Use of this file is governed by the BSD 3-clause license that
+/// can be found in the LICENSE.txt file in the project root.
 
 import Foundation
 
@@ -30,19 +29,15 @@ extension Array {
 
     }
 
-    /**
-    Removes the last element from self and returns it.
-
-    :returns: The removed element
-    */
+    /// Removes the last element from self and returns it.
+    /// 
+    /// :returns: The removed element
     mutating func pop() -> Element {
         return removeLast()
     }
-    /**
-    Same as append.
-
-    :param: newElement Element to append
-    */
+    /// Same as append.
+    /// 
+    /// :param: newElement Element to append
     mutating func push(_ newElement: Element) {
         return append(newElement)
     }
@@ -58,12 +53,10 @@ extension Array {
     }
 
 
-    /**
-    Checks if test returns true for all the elements in self
-
-    :param: test Function to call for each element
-    :returns: True if test returns true for all the elements in self
-    */
+    /// Checks if test returns true for all the elements in self
+    /// 
+    /// :param: test Function to call for each element
+    /// :returns: True if test returns true for all the elements in self
     func every(_ test: (Element) -> Bool) -> Bool {
         for item in self {
             if !test(item) {
@@ -74,12 +67,10 @@ extension Array {
         return true
     }
 
-    /**
-    Checks if test returns true for any element of self.
-
-    :param: test Function to call for each element
-    :returns: true if test returns true for any element of self
-    */
+    /// Checks if test returns true for any element of self.
+    /// 
+    /// :param: test Function to call for each element
+    /// :returns: true if test returns true for any element of self
     func any(_ test: (Element) -> Bool) -> Bool {
         for item in self {
             if test(item) {
@@ -92,12 +83,11 @@ extension Array {
 
 
 
-    /* slice array
-    :param: index slice index
-    :param: isClose is close array
-    :param: first First array
-    :param: second Second array
-    */
+    /// slice array
+    /// :param: index slice index
+    /// :param: isClose is close array
+    /// :param: first First array
+    /// :param: second Second array
     //func slice(startIndex startIndex:Int, endIndex:Int) -> Slice<Element> {
     func slice(startIndex: Int, endIndex: Int) -> ArraySlice<Element> {
 

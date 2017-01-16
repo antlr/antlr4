@@ -1,84 +1,61 @@
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
- * Use of this file is governed by the BSD 3-clause license that
- * can be found in the LICENSE.txt file in the project root.
- */
+/// Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/// Use of this file is governed by the BSD 3-clause license that
+/// can be found in the LICENSE.txt file in the project root.
 
 
 
 public class CommonToken: WritableToken {
-    /**
-     * An empty {@link org.antlr.v4.runtime.misc.Pair} which is used as the default value of
-     * {@link #source} for tokens that do not have a source.
-     */
+    /// An empty {@link org.antlr.v4.runtime.misc.Pair} which is used as the default value of
+    /// {@link #source} for tokens that do not have a source.
     internal static let EMPTY_SOURCE: (TokenSource?, CharStream?) = (nil, nil)
 
-    /**
-     * This is the backing field for {@link #getType} and {@link #setType}.
-     */
+    /// This is the backing field for {@link #getType} and {@link #setType}.
     internal var type: Int
 
-    /**
-     * This is the backing field for {@link #getLine} and {@link #setLine}.
-     */
+    /// This is the backing field for {@link #getLine} and {@link #setLine}.
     internal var line: Int = 0
 
-    /**
-     * This is the backing field for {@link #getCharPositionInLine} and
-     * {@link #setCharPositionInLine}.
-     */
+    /// This is the backing field for {@link #getCharPositionInLine} and
+    /// {@link #setCharPositionInLine}.
     internal var charPositionInLine: Int = -1
     // set to invalid position
 
-    /**
-     * This is the backing field for {@link #getChannel} and
-     * {@link #setChannel}.
-     */
+    /// This is the backing field for {@link #getChannel} and
+    /// {@link #setChannel}.
     internal var channel: Int = DEFAULT_CHANNEL
 
-    /**
-     * This is the backing field for {@link #getTokenSource} and
-     * {@link #getInputStream}.
-     *
-     * <p>
-     * These properties share a field to reduce the memory footprint of
-     * {@link org.antlr.v4.runtime.CommonToken}. Tokens created by a {@link org.antlr.v4.runtime.CommonTokenFactory} from
-     * the same source and input stream share a reference to the same
-     * {@link org.antlr.v4.runtime.misc.Pair} containing these values.</p>
-     */
+    /// This is the backing field for {@link #getTokenSource} and
+    /// {@link #getInputStream}.
+    /// 
+    /// <p>
+    /// These properties share a field to reduce the memory footprint of
+    /// {@link org.antlr.v4.runtime.CommonToken}. Tokens created by a {@link org.antlr.v4.runtime.CommonTokenFactory} from
+    /// the same source and input stream share a reference to the same
+    /// {@link org.antlr.v4.runtime.misc.Pair} containing these values.</p>
 
     internal var source: (TokenSource?, CharStream?)
 
-    /**
-     * This is the backing field for {@link #getText} when the token text is
-     * explicitly set in the constructor or via {@link #setText}.
-     *
-     * @see #getText()
-     */
+    /// This is the backing field for {@link #getText} when the token text is
+    /// explicitly set in the constructor or via {@link #setText}.
+    /// 
+    /// - seealso: #getText()
     internal var text: String?
 
-    /**
-     * This is the backing field for {@link #getTokenIndex} and
-     * {@link #setTokenIndex}.
-     */
+    /// This is the backing field for {@link #getTokenIndex} and
+    /// {@link #setTokenIndex}.
     internal var index: Int = -1
 
-    /**
-     * This is the backing field for {@link #getStartIndex} and
-     * {@link #setStartIndex}.
-     */
+    /// This is the backing field for {@link #getStartIndex} and
+    /// {@link #setStartIndex}.
     internal var start: Int = 0
 
-    /**
-     * This is the backing field for {@link #getStopIndex} and
-     * {@link #setStopIndex}.
-     */
+    /// This is the backing field for {@link #getStopIndex} and
+    /// {@link #setStopIndex}.
     internal var stop: Int = 0
 
-    /**
-     * Constructs a new {@link org.antlr.v4.runtime.CommonToken} with the specified token type.
-     *
-     * @param type The token type.
-     */
+    /// Constructs a new {@link org.antlr.v4.runtime.CommonToken} with the specified token type.
+    /// 
+    /// - parameter type: The token type.
 
     private var _visited: Bool = false
 
@@ -99,13 +76,11 @@ public class CommonToken: WritableToken {
         }
     }
 
-    /**
-     * Constructs a new {@link org.antlr.v4.runtime.CommonToken} with the specified token type and
-     * text.
-     *
-     * @param type The token type.
-     * @param text The text of the token.
-     */
+    /// Constructs a new {@link org.antlr.v4.runtime.CommonToken} with the specified token type and
+    /// text.
+    /// 
+    /// - parameter type: The token type.
+    /// - parameter text: The text of the token.
     public init(_ type: Int, _ text: String?) {
         self.type = type
         self.channel = CommonToken.DEFAULT_CHANNEL
@@ -113,19 +88,17 @@ public class CommonToken: WritableToken {
         self.source = CommonToken.EMPTY_SOURCE
     }
 
-    /**
-     * Constructs a new {@link org.antlr.v4.runtime.CommonToken} as a copy of another {@link org.antlr.v4.runtime.Token}.
-     *
-     * <p>
-     * If {@code oldToken} is also a {@link org.antlr.v4.runtime.CommonToken} instance, the newly
-     * constructed token will share a reference to the {@link #text} field and
-     * the {@link org.antlr.v4.runtime.misc.Pair} stored in {@link #source}. Otherwise, {@link #text} will
-     * be assigned the result of calling {@link #getText}, and {@link #source}
-     * will be constructed from the result of {@link org.antlr.v4.runtime.Token#getTokenSource} and
-     * {@link org.antlr.v4.runtime.Token#getInputStream}.</p>
-     *
-     * @param oldToken The token to copy.
-     */
+    /// Constructs a new {@link org.antlr.v4.runtime.CommonToken} as a copy of another {@link org.antlr.v4.runtime.Token}.
+    /// 
+    /// <p>
+    /// If {@code oldToken} is also a {@link org.antlr.v4.runtime.CommonToken} instance, the newly
+    /// constructed token will share a reference to the {@link #text} field and
+    /// the {@link org.antlr.v4.runtime.misc.Pair} stored in {@link #source}. Otherwise, {@link #text} will
+    /// be assigned the result of calling {@link #getText}, and {@link #source}
+    /// will be constructed from the result of {@link org.antlr.v4.runtime.Token#getTokenSource} and
+    /// {@link org.antlr.v4.runtime.Token#getInputStream}.</p>
+    /// 
+    /// - parameter oldToken: The token to copy.
     public init(_ oldToken: Token) {
         type = oldToken.getType()
         line = oldToken.getLine()
@@ -173,15 +146,13 @@ public class CommonToken: WritableToken {
 
     }
 
-    /**
-     * Explicitly set the text for this token. If {code text} is not
-     * {@code null}, then {@link #getText} will return this value rather than
-     * extracting the text from the input.
-     *
-     * @param text The explicit text of the token, or {@code null} if the text
-     * should be obtained from the input along with the start and stop indexes
-     * of the token.
-     */
+    /// Explicitly set the text for this token. If {code text} is not
+    /// {@code null}, then {@link #getText} will return this value rather than
+    /// extracting the text from the input.
+    /// 
+    /// - parameter text: The explicit text of the token, or {@code null} if the text
+    /// should be obtained from the input along with the start and stop indexes
+    /// of the token.
 
     public func setText(_ text: String) {
         self.text = text

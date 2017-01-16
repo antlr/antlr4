@@ -1,62 +1,49 @@
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
- * Use of this file is governed by the BSD 3-clause license that
- * can be found in the LICENSE.txt file in the project root.
- */
+/// Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/// Use of this file is governed by the BSD 3-clause license that
+/// can be found in the LICENSE.txt file in the project root.
 
 
 
-/**
- * Implements the {@code mode} lexer action by calling {@link org.antlr.v4.runtime.Lexer#mode} with
- * the assigned mode.
- *
- * @author Sam Harwell
- * @since 4.2
- */
+/// Implements the {@code mode} lexer action by calling {@link org.antlr.v4.runtime.Lexer#mode} with
+/// the assigned mode.
+/// 
+/// -  Sam Harwell
+/// -  4.2
 
 public final class LexerModeAction: LexerAction, CustomStringConvertible {
     fileprivate final var mode: Int
 
-    /**
-     * Constructs a new {@code mode} action with the specified mode value.
-     * @param mode The mode value to pass to {@link org.antlr.v4.runtime.Lexer#mode}.
-     */
+    /// Constructs a new {@code mode} action with the specified mode value.
+    /// - parameter mode: The mode value to pass to {@link org.antlr.v4.runtime.Lexer#mode}.
     public init(_ mode: Int) {
         self.mode = mode
     }
 
-    /**
-     * Get the lexer mode this action should transition the lexer to.
-     *
-     * @return The lexer mode for this {@code mode} command.
-     */
+    /// Get the lexer mode this action should transition the lexer to.
+    /// 
+    /// - returns: The lexer mode for this {@code mode} command.
     public func getMode() -> Int {
         return mode
     }
 
-    /**
-     * {@inheritDoc}
-     * @return This method returns {@link org.antlr.v4.runtime.atn.LexerActionType#MODE}.
-     */
+    /// {@inheritDoc}
+    /// - returns: This method returns {@link org.antlr.v4.runtime.atn.LexerActionType#MODE}.
 
     public override func getActionType() -> LexerActionType {
         return LexerActionType.mode
     }
 
-    /**
-     * {@inheritDoc}
-     * @return This method returns {@code false}.
-     */
+    /// {@inheritDoc}
+    /// - returns: This method returns {@code false}.
 
     public override func isPositionDependent() -> Bool {
         return false
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * <p>This action is implemented by calling {@link org.antlr.v4.runtime.Lexer#mode} with the
-     * value provided by {@link #getMode}.</p>
-     */
+    /// {@inheritDoc}
+    /// 
+    /// <p>This action is implemented by calling {@link org.antlr.v4.runtime.Lexer#mode} with the
+    /// value provided by {@link #getMode}.</p>
     override
     public func execute(_ lexer: Lexer) {
         lexer.mode(mode)

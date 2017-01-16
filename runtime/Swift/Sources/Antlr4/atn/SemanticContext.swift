@@ -1,63 +1,55 @@
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
- * Use of this file is governed by the BSD 3-clause license that
- * can be found in the LICENSE.txt file in the project root.
- */
+/// Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/// Use of this file is governed by the BSD 3-clause license that
+/// can be found in the LICENSE.txt file in the project root.
 
 
 
-/** A tree structure used to record the semantic context in which
-*  an ATN configuration is valid.  It's either a single predicate,
-*  a conjunction {@code p1&&p2}, or a sum of products {@code p1||p2}.
-*
-*  <p>I have scoped the {@link org.antlr.v4.runtime.atn.SemanticContext.AND}, {@link org.antlr.v4.runtime.atn.SemanticContext.OR}, and {@link org.antlr.v4.runtime.atn.SemanticContext.Predicate} subclasses of
-*  {@link org.antlr.v4.runtime.atn.SemanticContext} within the scope of this outer class.</p>
-*/
+/// A tree structure used to record the semantic context in which
+/// an ATN configuration is valid.  It's either a single predicate,
+/// a conjunction {@code p1&&p2}, or a sum of products {@code p1||p2}.
+/// 
+/// <p>I have scoped the {@link org.antlr.v4.runtime.atn.SemanticContext.AND}, {@link org.antlr.v4.runtime.atn.SemanticContext.OR}, and {@link org.antlr.v4.runtime.atn.SemanticContext.Predicate} subclasses of
+/// {@link org.antlr.v4.runtime.atn.SemanticContext} within the scope of this outer class.</p>
 
 import Foundation
 
 public class SemanticContext: Hashable, CustomStringConvertible {
-    /**
-    * The default {@link org.antlr.v4.runtime.atn.SemanticContext}, which is semantically equivalent to
-    * a predicate of the form {@code {true}?}.
-    */
+    /// The default {@link org.antlr.v4.runtime.atn.SemanticContext}, which is semantically equivalent to
+    /// a predicate of the form {@code {true}?}.
     public static let NONE: SemanticContext = Predicate()
 
-    /**
-    * For context independent predicates, we evaluate them without a local
-    * context (i.e., null context). That way, we can evaluate them without
-    * having to create proper rule-specific context during prediction (as
-    * opposed to the parser, which creates them naturally). In a practical
-    * sense, this avoids a cast exception from RuleContext to myruleContext.
-    *
-    * <p>For context dependent predicates, we must pass in a local context so that
-    * references such as $arg evaluate properly as _localctx.arg. We only
-    * capture context dependent predicates in the context in which we begin
-    * prediction, so we passed in the outer context here in case of context
-    * dependent predicate evaluation.</p>
-    */
+    /// For context independent predicates, we evaluate them without a local
+    /// context (i.e., null context). That way, we can evaluate them without
+    /// having to create proper rule-specific context during prediction (as
+    /// opposed to the parser, which creates them naturally). In a practical
+    /// sense, this avoids a cast exception from RuleContext to myruleContext.
+    /// 
+    /// <p>For context dependent predicates, we must pass in a local context so that
+    /// references such as $arg evaluate properly as _localctx.arg. We only
+    /// capture context dependent predicates in the context in which we begin
+    /// prediction, so we passed in the outer context here in case of context
+    /// dependent predicate evaluation.</p>
     public func eval<T:ATNSimulator>(_ parser: Recognizer<T>, _ parserCallStack: RuleContext) throws -> Bool {
         RuntimeException(#function + " must be overridden")
         return false
     }
 
-    /**
-    * Evaluate the precedence predicates for the context and reduce the result.
-    *
-    * @param parser The parser instance.
-    * @param parserCallStack
-    * @return The simplified semantic context after precedence predicates are
-    * evaluated, which will be one of the following values.
-    * <ul>
-    * <li>{@link #NONE}: if the predicate simplifies to {@code true} after
-    * precedence predicates are evaluated.</li>
-    * <li>{@code null}: if the predicate simplifies to {@code false} after
-    * precedence predicates are evaluated.</li>
-    * <li>{@code this}: if the semantic context is not changed as a result of
-    * precedence predicate evaluation.</li>
-    * <li>A non-{@code null} {@link org.antlr.v4.runtime.atn.SemanticContext}: the new simplified
-    * semantic context after precedence predicates are evaluated.</li>
-    * </ul>
-    */
+    /// Evaluate the precedence predicates for the context and reduce the result.
+    /// 
+    /// - parameter parser: The parser instance.
+    /// - parameter parserCallStack:
+    /// - returns: The simplified semantic context after precedence predicates are
+    /// evaluated, which will be one of the following values.
+    /// <ul>
+    /// <li>{@link #NONE}: if the predicate simplifies to {@code true} after
+    /// precedence predicates are evaluated.</li>
+    /// <li>{@code null}: if the predicate simplifies to {@code false} after
+    /// precedence predicates are evaluated.</li>
+    /// <li>{@code this}: if the semantic context is not changed as a result of
+    /// precedence predicate evaluation.</li>
+    /// <li>A non-{@code null} {@link org.antlr.v4.runtime.atn.SemanticContext}: the new simplified
+    /// semantic context after precedence predicates are evaluated.</li>
+    /// </ul>
     public func evalPrecedence<T:ATNSimulator>(_ parser: Recognizer<T>, _ parserCallStack: RuleContext) throws -> SemanticContext? {
         return self
     }
@@ -154,22 +146,18 @@ public class SemanticContext: Hashable, CustomStringConvertible {
         }
     }
 
-    /**
-    * This is the base class for semantic context "operators", which operate on
-    * a collection of semantic context "operands".
-    *
-    * @since 4.3
-    */
+    /// This is the base class for semantic context "operators", which operate on
+    /// a collection of semantic context "operands".
+    /// 
+    /// -  4.3
 
     public class Operator: SemanticContext {
-        /**
-        * Gets the operands for the semantic context operator.
-        *
-        * @return a collection of {@link org.antlr.v4.runtime.atn.SemanticContext} operands for the
-        * operator.
-        *
-        * @since 4.3
-        */
+        /// Gets the operands for the semantic context operator.
+        /// 
+        /// - returns: a collection of {@link org.antlr.v4.runtime.atn.SemanticContext} operands for the
+        /// operator.
+        /// 
+        /// -  4.3
 
         public func getOperands() -> Array<SemanticContext> {
             RuntimeException(" must overriden ")
@@ -177,10 +165,8 @@ public class SemanticContext: Hashable, CustomStringConvertible {
         }
     }
 
-    /**
-    * A semantic context which is true whenever none of the contained contexts
-    * is false.
-    */
+    /// A semantic context which is true whenever none of the contained contexts
+    /// is false.
 
     public class AND: Operator {
         public let opnds: [SemanticContext]
@@ -228,13 +214,11 @@ public class SemanticContext: Hashable, CustomStringConvertible {
             return MurmurHash.hashCode(opnds, seed)
         }
 
-        /**
-        * {@inheritDoc}
-        *
-        * <p>
-        * The evaluation of predicates by this context is short-circuiting, but
-        * unordered.</p>
-        */
+        /// {@inheritDoc}
+        /// 
+        /// <p>
+        /// The evaluation of predicates by this context is short-circuiting, but
+        /// unordered.</p>
         override
         public func eval<T:ATNSimulator>(_ parser: Recognizer<T>, _ parserCallStack: RuleContext) throws -> Bool {
             for opnd: SemanticContext in opnds {
@@ -295,10 +279,8 @@ public class SemanticContext: Hashable, CustomStringConvertible {
         }
     }
 
-    /**
-    * A semantic context which is true whenever at least one of the contained
-    * contexts is true.
-    */
+    /// A semantic context which is true whenever at least one of the contained
+    /// contexts is true.
 
     public class OR: Operator {
         public final var opnds: [SemanticContext]
@@ -343,13 +325,11 @@ public class SemanticContext: Hashable, CustomStringConvertible {
             return MurmurHash.hashCode(opnds, NSStringFromClass(OR.self).hashValue)
         }
 
-        /**
-        * {@inheritDoc}
-        *
-        * <p>
-        * The evaluation of predicates by this context is short-circuiting, but
-        * unordered.</p>
-        */
+        /// {@inheritDoc}
+        /// 
+        /// <p>
+        /// The evaluation of predicates by this context is short-circuiting, but
+        /// unordered.</p>
         override
         public func eval<T:ATNSimulator>(_ parser: Recognizer<T>, _ parserCallStack: RuleContext) throws -> Bool {
             for opnd: SemanticContext in opnds {
@@ -425,10 +405,8 @@ public class SemanticContext: Hashable, CustomStringConvertible {
         return result
     }
 
-    /**
-    *
-    *  @see org.antlr.v4.runtime.atn.ParserATNSimulator#getPredsForAmbigAlts
-    */
+    /// 
+    /// - seealso: org.antlr.v4.runtime.atn.ParserATNSimulator#getPredsForAmbigAlts
     public static func or(_ a: SemanticContext?, _ b: SemanticContext?) -> SemanticContext {
         if a == nil {
             return b!

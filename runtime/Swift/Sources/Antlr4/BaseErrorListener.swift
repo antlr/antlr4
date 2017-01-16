@@ -1,16 +1,13 @@
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
- * Use of this file is governed by the BSD 3-clause license that
- * can be found in the LICENSE.txt file in the project root.
- */
+/// Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/// Use of this file is governed by the BSD 3-clause license that
+/// can be found in the LICENSE.txt file in the project root.
 
 
-/**
- * Provides an empty default implementation of {@link org.antlr.v4.runtime.ANTLRErrorListener}. The
- * default implementation of each method does nothing, but can be overridden as
- * necessary.
- *
- * @author Sam Harwell
- */
+/// Provides an empty default implementation of {@link org.antlr.v4.runtime.ANTLRErrorListener}. The
+/// default implementation of each method does nothing, but can be overridden as
+/// necessary.
+/// 
+/// -  Sam Harwell
 
 public class BaseErrorListener: ANTLRErrorListener {
 

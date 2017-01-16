@@ -1,16 +1,13 @@
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
- * Use of this file is governed by the BSD 3-clause license that
- * can be found in the LICENSE.txt file in the project root.
- */
+/// Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/// Use of this file is governed by the BSD 3-clause license that
+/// can be found in the LICENSE.txt file in the project root.
 
 
 
-/**
- * Represents the serialization type of a {@link org.antlr.v4.runtime.atn.LexerAction}.
- *
- * @author Sam Harwell
- * @since 4.2
- */
+/// Represents the serialization type of a {@link org.antlr.v4.runtime.atn.LexerAction}.
+/// 
+/// -  Sam Harwell
+/// -  4.2
 
 public enum LexerActionType: Int {
     /**

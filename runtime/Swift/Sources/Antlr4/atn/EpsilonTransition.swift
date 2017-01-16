@@ -1,7 +1,6 @@
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
- * Use of this file is governed by the BSD 3-clause license that
- * can be found in the LICENSE.txt file in the project root.
- */
+/// Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/// Use of this file is governed by the BSD 3-clause license that
+/// can be found in the LICENSE.txt file in the project root.
 
 
 public final class EpsilonTransition: Transition, CustomStringConvertible {
@@ -18,14 +17,12 @@ public final class EpsilonTransition: Transition, CustomStringConvertible {
         super.init(target)
     }
 
-    /**
-     * @return the rule index of a precedence rule for which this transition is
-     * returning from, where the precedence value is 0; otherwise, -1.
-     *
-     * @see org.antlr.v4.runtime.atn.ATNConfig#isPrecedenceFilterSuppressed()
-     * @see org.antlr.v4.runtime.atn.ParserATNSimulator#applyPrecedenceFilter(org.antlr.v4.runtime.atn.ATNConfigSet)
-     * @since 4.4.1
-     */
+    /// - returns: the rule index of a precedence rule for which this transition is
+    /// returning from, where the precedence value is 0; otherwise, -1.
+    /// 
+    /// - seealso: org.antlr.v4.runtime.atn.ATNConfig#isPrecedenceFilterSuppressed()
+    /// - seealso: org.antlr.v4.runtime.atn.ParserATNSimulator#applyPrecedenceFilter(org.antlr.v4.runtime.atn.ATNConfigSet)
+    /// -  4.4.1
     public func outermostPrecedenceReturn() -> Int {
         return outermostPrecedenceReturnInside
     }

@@ -1,19 +1,16 @@
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
- * Use of this file is governed by the BSD 3-clause license that
- * can be found in the LICENSE.txt file in the project root.
- */
+/// Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/// Use of this file is governed by the BSD 3-clause license that
+/// can be found in the LICENSE.txt file in the project root.
 
 
 public class ArrayPredictionContext: PredictionContext {
-    /** Parent can be null only if full ctx mode and we make an array
-     *  from {@link #EMPTY} and non-empty. We merge {@link #EMPTY} by using null parent and
-     *  returnState == {@link #EMPTY_RETURN_STATE}.
-     */
+    /// Parent can be null only if full ctx mode and we make an array
+    /// from {@link #EMPTY} and non-empty. We merge {@link #EMPTY} by using null parent and
+    /// returnState == {@link #EMPTY_RETURN_STATE}.
     public final var parents: [PredictionContext?]
 
-    /** Sorted for merge, no duplicates; if present,
-     *  {@link #EMPTY_RETURN_STATE} is always last.
-     */
+    /// Sorted for merge, no duplicates; if present,
+    /// {@link #EMPTY_RETURN_STATE} is always last.
     public final let returnStates: [Int]
 
     public convenience init(_ a: SingletonPredictionContext) {
