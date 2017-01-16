@@ -8,8 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		DB09919D1E22DE9B00FE71AA /* Antlr4Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB0991951E22DE6000FE71AA /* Antlr4Tests.swift */; };
-		DB09919E1E22DE9E00FE71AA /* BaseTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB0991961E22DE6000FE71AA /* BaseTest.swift */; };
-		DB09919F1E22DEA000FE71AA /* HashMapTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB0991971E22DE6000FE71AA /* HashMapTest.swift */; };
 		DB0991A11E22DF3B00FE71AA /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = DB0991A01E22DF3B00FE71AA /* Info.plist */; };
 		DBBAE6351E22DCAC00C2FEA6 /* ANTLRErrorListener.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBBAE58E1E22DCAC00C2FEA6 /* ANTLRErrorListener.swift */; };
 		DBBAE6361E22DCAC00C2FEA6 /* ANTLRErrorListener.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBBAE58E1E22DCAC00C2FEA6 /* ANTLRErrorListener.swift */; };
@@ -342,8 +340,6 @@
 
 /* Begin PBXFileReference section */
 		DB0991951E22DE6000FE71AA /* Antlr4Tests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Antlr4Tests.swift; sourceTree = "<group>"; };
-		DB0991961E22DE6000FE71AA /* BaseTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BaseTest.swift; sourceTree = "<group>"; };
-		DB0991971E22DE6000FE71AA /* HashMapTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HashMapTest.swift; sourceTree = "<group>"; };
 		DB0991A01E22DF3B00FE71AA /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		DBBAE58E1E22DCAC00C2FEA6 /* ANTLRErrorListener.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ANTLRErrorListener.swift; sourceTree = "<group>"; };
 		DBBAE58F1E22DCAC00C2FEA6 /* ANTLRErrorStrategy.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ANTLRErrorStrategy.swift; sourceTree = "<group>"; };
@@ -548,8 +544,6 @@
 			isa = PBXGroup;
 			children = (
 				DB0991951E22DE6000FE71AA /* Antlr4Tests.swift */,
-				DB0991961E22DE6000FE71AA /* BaseTest.swift */,
-				DB0991971E22DE6000FE71AA /* HashMapTest.swift */,
 			);
 			path = Antlr4Tests;
 			sourceTree = "<group>";
@@ -1290,8 +1284,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				DB09919D1E22DE9B00FE71AA /* Antlr4Tests.swift in Sources */,
-				DB09919E1E22DE9E00FE71AA /* BaseTest.swift in Sources */,
-				DB09919F1E22DEA000FE71AA /* HashMapTest.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
