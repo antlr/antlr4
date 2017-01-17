@@ -478,6 +478,8 @@ public class BufferedTokenStream: TokenStream {
 
 
     public func getText(_ interval: Interval) throws -> String {
+        try lazyInit()
+        try fill()
         let start: Int = interval.a
         var stop: Int = interval.b
         if start < 0 || stop < 0 {
