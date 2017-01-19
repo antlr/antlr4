@@ -27,7 +27,7 @@ namespace atn {
 
     struct Comparer {
       bool operator()(ATNConfig const& lhs, ATNConfig const& rhs) const {
-        return lhs == rhs;
+        return (&lhs == &rhs) || (lhs == rhs);
       }
     };
 

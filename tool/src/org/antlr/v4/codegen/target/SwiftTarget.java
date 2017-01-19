@@ -86,7 +86,7 @@ public class SwiftTarget extends Target {
 
     @Override
     public String getVersion() {
-        return "4.6"; // Java and tool versions move in lock step
+        return "4.6.1"; // Java and tool versions move in lock step
     }
 
     public Set<String> getBadWords() {

@@ -340,6 +340,7 @@ public class ATNSerializer {
 			}
 		}
 
+		// Note: This value shifting loop is documented in ATNDeserializer.
 		// don't adjust the first value since that's the version number
 		for (int i = 1; i < data.size(); i++) {
 			if (data.get(i) < Character.MIN_VALUE || data.get(i) > Character.MAX_VALUE) {

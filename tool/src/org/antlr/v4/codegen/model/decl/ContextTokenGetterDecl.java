@@ -10,7 +10,10 @@ import org.antlr.v4.codegen.OutputModelFactory;
 
 /** {@code public Token X() { }} */
 public class ContextTokenGetterDecl extends ContextGetterDecl {
-	public ContextTokenGetterDecl(OutputModelFactory factory, String name) {
+	public boolean optional;
+
+	public ContextTokenGetterDecl(OutputModelFactory factory, String name, boolean optional) {
 		super(factory, name);
+		this.optional = optional;
 	}
 }

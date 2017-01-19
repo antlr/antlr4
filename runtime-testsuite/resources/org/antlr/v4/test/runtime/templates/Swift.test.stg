@@ -271,14 +271,6 @@ open class LeafListener: TBaseListener {
 }
 >>
 
-ImportVisitor(X) ::= ""
-BasicVisitor(X) ::= ""
-WalkVisitor(s) ::= ""
-LRWithLabelsVisitor(X) ::= ""
-RuleGetterVisitor(X) ::= ""
-LRVisitor(x) ::= ""
-TokenGetterVisitor(x) ::= ""
-
 DeclareContextListGettersFunction() ::= <<
 func foo() {
 	//let s: SContext? = nil

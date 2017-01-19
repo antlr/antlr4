@@ -14,9 +14,9 @@ ArrayPredictionContext::ArrayPredictionContext(Ref<SingletonPredictionContext> c
   : ArrayPredictionContext({ a->parent }, { a->returnState }) {
 }
 
-ArrayPredictionContext::ArrayPredictionContext(std::vector<std::weak_ptr<PredictionContext>> parents_,
+ArrayPredictionContext::ArrayPredictionContext(std::vector<Ref<PredictionContext>> const& parents_,
                                                std::vector<size_t> const& returnStates)
-  : PredictionContext(calculateHashCode(parents_, returnStates)), parents(makeRef(parents_)), returnStates(returnStates) {
+  : PredictionContext(calculateHashCode(parents_, returnStates)), parents(parents_), returnStates(returnStates) {
     assert(parents.size() > 0);
     assert(returnStates.size() > 0);
 }
@@ -30,7 +30,7 @@ size_t ArrayPredictionContext::size() const {
   return returnStates.size();
 }
 
-std::weak_ptr<PredictionContext> ArrayPredictionContext::getParent(size_t index) const {
+Ref<PredictionContext> ArrayPredictionContext::getParent(size_t index) const {
   return parents[index];
 }
 
@@ -76,12 +76,4 @@ std::string ArrayPredictionContext::toString() const {
   }
   ss << "]";
   return ss.str();
-}
-
-std::vector<Ref<PredictionContext>> ArrayPredictionContext::makeRef(const std::vector<std::weak_ptr<PredictionContext> > &input) {
-  std::vector<Ref<PredictionContext>> result;
-  for (auto element : input) {
-    result.push_back(element.lock());
-  }
-  return result;
 }

@@ -563,9 +563,6 @@ switch p.GetTokenStream().LA(1) {
 
 <endif>
 default:
-	<if(error)>
-	<error>
-	<endif>
 }
 >>
 
