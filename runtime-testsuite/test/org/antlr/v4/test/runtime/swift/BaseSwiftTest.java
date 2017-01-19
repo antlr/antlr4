@@ -57,7 +57,7 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 		//add antlr.swift
 		final ClassLoader loader = Thread.currentThread().getContextClassLoader();
 
-		final URL swiftRuntime = loader.getResource("Swift/Antlr4");
+		final URL swiftRuntime = loader.getResource("Swift/Sources/Antlr4");
 		if (swiftRuntime == null) {
 			throw new RuntimeException("Swift runtime file not found at:" + swiftRuntime.getPath());
 		}
