@@ -409,7 +409,7 @@ public class BaseCSharpTest implements RuntimeTestSupport /*, SpecialRuntimeTest
 	}
 
 	private String locateTool(String tool) {
-		String[] roots = { "/opt/local/bin/", "/usr/bin/", "/usr/local/bin/" };
+		String[] roots = { "/opt/local/bin/", "/usr/local/bin/", "/usr/bin/" };
 		for(String root : roots) {
 			if(new File(root + tool).exists())
 				return root + tool;
