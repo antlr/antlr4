@@ -354,7 +354,7 @@ namespace Antlr4.Runtime.Misc
                 }
                 foreach (Transition transition in state.transitions)
                 {
-                    if (transition.TransitionType != TransitionType.Rule)
+                    if (transition.TransitionType != TransitionType.RULE)
                     {
                         continue;
                     }
@@ -459,7 +459,7 @@ namespace Antlr4.Runtime.Misc
         {
         }
 
-#if PORTABLE
+#if PORTABLE || DOTNETCORE
         public interface ICustomAttributeProvider
         {
             object[] GetCustomAttributes(Type attributeType, bool inherit);
