@@ -11,10 +11,10 @@ import (
 )
 
 var (
-	ParserATNSimulatorDebug = false
+	ParserATNSimulatorDebug            = false
 	ParserATNSimulatorListATNDecisions = false
-	ParserATNSimulatorDFADebug = false
-	ParserATNSimulatorRetryDebug = false
+	ParserATNSimulatorDFADebug         = false
+	ParserATNSimulatorRetryDebug       = false
 )
 
 type ParserATNSimulator struct {
@@ -118,7 +118,7 @@ func (p *ParserATNSimulator) AdaptivePredict(input TokenStream, decision int, ou
 		// closure block that determines whether a precedence rule
 		// should continue or complete.
 
-	t2 := dfa.atnStartState
+		t2 := dfa.atnStartState
 		t, ok := t2.(*StarLoopEntryState)
 		if !dfa.precedenceDfa && ok {
 			if t.precedenceRuleDecision {

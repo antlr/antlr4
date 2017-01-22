@@ -5,13 +5,13 @@
 package antlr
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"hash/fnv"
 	"sort"
-	"strings"
-	"bytes"
 	"strconv"
+	"strings"
 )
 
 func intMin(a, b int) int {
