@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	LexerATNSimulatorDebug = false
+	LexerATNSimulatorDebug    = false
 	LexerATNSimulatorDFADebug = false
 
 	LexerATNSimulatorMinDFAEdge = 0
