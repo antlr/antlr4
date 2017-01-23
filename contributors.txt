@@ -130,3 +130,4 @@ YYYY/MM/DD, github id, Full name, email
 2016/12/22, akosthekiss, Akos Kiss, akiss@inf.u-szeged.hu
 2016/12/24, adrpo, Adrian Pop, adrian.pop@liu.se
 2017/01/13, marcelo-rocha, Marcelo Rocha, mcrocha@gmail.com
+2017/01/23, bhamiltoncx, Ben Hamilton, bhamiltoncx+antlr@gmail.com
