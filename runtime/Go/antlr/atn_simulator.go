@@ -15,7 +15,7 @@ type IATNSimulator interface {
 type BaseATNSimulator struct {
 	atn                *ATN
 	sharedContextCache *PredictionContextCache
-	decisionToDFA  []*DFA
+	decisionToDFA      []*DFA
 }
 
 func NewBaseATNSimulator(atn *ATN, sharedContextCache *PredictionContextCache) *BaseATNSimulator {
