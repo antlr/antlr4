@@ -61,6 +61,8 @@ This documentation is a reference and summarizes grammar syntax and the key sema
 
 * [Building ANTLR itself](building-antlr.md)
 
+* [Contributing to ANTLR](contributing.md)
+
 * [Cutting an ANTLR Release](releasing-antlr.md)
 
 * [ANTLR project unit tests](antlr-project-testing.md)
