@@ -155,9 +155,9 @@ ExternalProject_ADD(
 
 ExternalProject_Get_Property(antlr4cpp INSTALL_DIR)
 
-list(APPEND ANTLR4CPP_INCLUDE_DIRS ${INSTALL_DIR}/include)
+list(APPEND ANTLR4CPP_INCLUDE_DIRS ${INSTALL_DIR}/include/antlr4-runtime)
 foreach(src_path misc atn dfa tree support)
-  list(APPEND ANTLR4CPP_INCLUDE_DIRS ${INSTALL_DIR}/include/${src_path})
+  list(APPEND ANTLR4CPP_INCLUDE_DIRS ${INSTALL_DIR}/include/antlr4-runtime/${src_path})
 endforeach(src_path)
 
 set(ANTLR4CPP_LIBS "${INSTALL_DIR}/lib")

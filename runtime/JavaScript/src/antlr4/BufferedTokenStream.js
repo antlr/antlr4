@@ -234,6 +234,7 @@ BufferedTokenStream.prototype.setTokenSource = function(tokenSource) {
 	this.tokenSource = tokenSource;
 	this.tokens = [];
 	this.index = -1;
+	this.fetchedEOF = false;
 };
 
 
@@ -280,8 +281,7 @@ BufferedTokenStream.prototype.getHiddenTokensToRight = function(tokenIndex,
 	if (tokenIndex < 0 || tokenIndex >= this.tokens.length) {
 		throw "" + tokenIndex + " not in 0.." + this.tokens.length - 1;
 	}
-	var nextOnChannel = this.nextTokenOnChannel(tokenIndex + 1,
-			Lexer.DEFAULT_TOKEN_CHANNEL);
+	var nextOnChannel = this.nextTokenOnChannel(tokenIndex + 1, Lexer.DEFAULT_TOKEN_CHANNEL);
 	var from_ = tokenIndex + 1;
 	// if none onchannel to right, nextOnChannel=-1 so set to = last token
 	var to = nextOnChannel === -1 ? this.tokens.length - 1 : nextOnChannel;
@@ -300,8 +300,7 @@ BufferedTokenStream.prototype.getHiddenTokensToLeft = function(tokenIndex,
 	if (tokenIndex < 0 || tokenIndex >= this.tokens.length) {
 		throw "" + tokenIndex + " not in 0.." + this.tokens.length - 1;
 	}
-	var prevOnChannel = this.previousTokenOnChannel(tokenIndex - 1,
-			Lexer.DEFAULT_TOKEN_CHANNEL);
+	var prevOnChannel = this.previousTokenOnChannel(tokenIndex - 1, Lexer.DEFAULT_TOKEN_CHANNEL);
 	if (prevOnChannel === tokenIndex - 1) {
 		return null;
 	}
