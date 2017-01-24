@@ -136,6 +136,7 @@ public class Utils {
 	}
 
 	public static char[] toCharArray(IntegerList data) {
+		if ( data==null ) return null;
 		return data.toCharArray();
 	}
 
