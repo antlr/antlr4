@@ -49,6 +49,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.antlr.v4.test.runtime.BaseRuntimeTest.antlrOnString;
+import static org.antlr.v4.test.runtime.BaseRuntimeTest.writeFile;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -608,16 +609,6 @@ public class BaseCSharpTest implements RuntimeTestSupport /*, SpecialRuntimeTest
 		}
 		public void setTokenTypeChannel(int ttype, int channel) {
 			hide.add(ttype);
-		}
-	}
-
-	public static void writeFile(String dir, String fileName, String content) {
-		try {
-			Utils.writeFile(dir+"/"+fileName, content, "UTF-8");
-		}
-		catch (IOException ioe) {
-			System.err.println("can't write file");
-			ioe.printStackTrace(System.err);
 		}
 	}
 

@@ -47,9 +47,7 @@ import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupString;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -70,6 +68,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import static org.antlr.v4.test.runtime.BaseRuntimeTest.antlrOnString;
+import static org.antlr.v4.test.runtime.BaseRuntimeTest.writeFile;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -866,21 +865,6 @@ public class BaseCppTest implements RuntimeTestSupport {
 		}
 		public void setTokenTypeChannel(int ttype, int channel) {
 			hide.add(ttype);
-		}
-	}
-
-	public static void writeFile(String dir, String fileName, String content) {
-		try {
-			File f = new File(dir, fileName);
-			FileWriter w = new FileWriter(f);
-			BufferedWriter bw = new BufferedWriter(w);
-			bw.write(content);
-			bw.close();
-			w.close();
-		}
-		catch (IOException ioe) {
-			System.err.println("can't write file");
-			ioe.printStackTrace(System.err);
 		}
 	}
 

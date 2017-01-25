@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Set;
 
 import static org.antlr.v4.test.runtime.BaseRuntimeTest.antlrOnString;
+import static org.antlr.v4.test.runtime.BaseRuntimeTest.writeFile;
 import static org.junit.Assert.assertTrue;
 
 public class BaseSwiftTest implements RuntimeTestSupport {
@@ -362,20 +363,6 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 	public String execRecognizer() {
 		compile();
 		return execTest();
-	}
-
-	public static void writeFile(String dir, String fileName, String content) {
-		try {
-			File f = new File(dir, fileName);
-			FileWriter w = new FileWriter(f);
-			BufferedWriter bw = new BufferedWriter(w);
-			bw.write(content);
-			bw.close();
-			w.close();
-		} catch (IOException ioe) {
-			System.err.println("can't write file");
-			ioe.printStackTrace(System.err);
-		}
 	}
 
 	protected void writeParserTestFile(String parserName,

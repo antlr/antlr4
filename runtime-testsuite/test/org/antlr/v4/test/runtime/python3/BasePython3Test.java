@@ -8,6 +8,8 @@ package org.antlr.v4.test.runtime.python3;
 import org.antlr.v4.test.runtime.python.BasePythonTest;
 import org.stringtemplate.v4.ST;
 
+import static org.antlr.v4.test.runtime.BaseRuntimeTest.writeFile;
+
 public class BasePython3Test extends BasePythonTest {
 
 	@Override

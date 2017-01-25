@@ -81,6 +81,7 @@ import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.assertTrue;
+import static org.antlr.v4.test.runtime.BaseRuntimeTest.writeFile;
 import static org.junit.Assert.assertArrayEquals;
 
 public class BaseJavaTest implements RuntimeTestSupport {
@@ -940,16 +941,6 @@ public class BaseJavaTest implements RuntimeTestSupport {
             hide.add(ttype);
         }
     }
-
-	public static void writeFile(String dir, String fileName, String content) {
-		try {
-			Utils.writeFile(dir+"/"+fileName, content, "UTF-8");
-		}
-		catch (IOException ioe) {
-			System.err.println("can't write file");
-			ioe.printStackTrace(System.err);
-		}
-	}
 
 	protected void writeTestFile(String parserName,
 								 String lexerName,

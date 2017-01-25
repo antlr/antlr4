@@ -224,7 +224,7 @@ public abstract class BaseRuntimeTest {
 	                                       String... extraOptions)
 	{
 		mkdir(workdir);
-		BaseJavaTest.writeFile(workdir, grammarFileName, grammarStr);
+		writeFile(workdir, grammarFileName, grammarStr);
 		return antlrOnString(workdir, targetName, grammarFileName, defaultListener, extraOptions);
 	}
 
