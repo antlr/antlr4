@@ -3,6 +3,7 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 exports.atn = require('./atn/index');
+exports.codepointat = require('./polyfills/codepointat');
 exports.dfa = require('./dfa/index');
 exports.tree = require('./tree/index');
 exports.error = require('./error/index');
