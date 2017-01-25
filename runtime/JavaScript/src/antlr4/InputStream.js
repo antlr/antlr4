@@ -6,21 +6,43 @@
 //
 
 var Token = require('./Token').Token;
+require('./polyfills/codepointat');
 
 // Vacuum all input from a string and then treat it like a buffer.
 
 function _loadString(stream) {
 	stream._index = 0;
 	stream.data = [];
-	for (var i = 0; i < stream.strdata.length; i++) {
-		stream.data.push(stream.strdata.charCodeAt(i));
+	var decodeDataAt;
+	if (stream.decodeToUnicodeCodePoints) {
+		decodeDataAt = function(i) {
+			var codePoint = stream.strdata.codePointAt(i);
+			stream.data.push(codePoint);
+			return codePoint <= 0xFFFF ? 1 : 2;
+		};
+	} else {
+		decodeDataAt = function(i) {
+			var codeUnit = stream.strdata.charCodeAt(i);
+			stream.data.push(codeUnit);
+			return 1;
+		};
+        }
+	for (var i = 0; i < stream.strdata.length; ) {
+		i += decodeDataAt(i);
 	}
 	stream._size = stream.data.length;
 }
 
-function InputStream(data) {
+// If decodeToUnicodeCodePoints is true, the input is treated
+// as a series of Unicode code points.
+//
+// Otherwise, the input is treated as a series of 16-bit UTF-16 code
+// units.
+function InputStream(data, decodeToUnicodeCodePoints) {
 	this.name = "<empty>";
 	this.strdata = data;
+	this.decodeToUnicodeCodePoints =
+		decodeToUnicodeCodePoints===undefined ? false : decodeToUnicodeCodePoints;
 	_loadString(this);
 	return this;
 }
