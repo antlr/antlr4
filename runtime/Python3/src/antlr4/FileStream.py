@@ -16,15 +16,15 @@ from antlr4.InputStream import InputStream
 
 class FileStream(InputStream):
 
-    def __init__(self, fileName:str, encoding:str='ascii'):
-        super().__init__(self.readDataFrom(fileName, encoding))
+    def __init__(self, fileName:str, encoding:str='utf-8', errors:str='replace'):
+        super().__init__(self.readDataFrom(fileName, encoding, errors))
         self.fileName = fileName
 
-    def readDataFrom(self, fileName:str, encoding:str):
+    def readDataFrom(self, fileName:str, encoding:str, errors:str='replace'):
         # read binary to avoid line ending conversion
         with open(fileName, 'rb') as file:
             bytes = file.read()
-            return codecs.decode(bytes, encoding)
+            return codecs.decode(bytes, encoding, errors)
 
 
 class TestFileStream(unittest.TestCase):

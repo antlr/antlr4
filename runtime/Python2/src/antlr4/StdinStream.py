@@ -15,7 +15,7 @@ from antlr4.InputStream import InputStream
 
 class StdinStream(InputStream):
 
-	def __init__(self, encoding='ascii'):
+	def __init__(self, encoding='utf-8', errors='replace'):
 		bytes = sys.stdin.read()
-		data = codecs.decode(bytes, encoding)
+		data = codecs.decode(bytes, encoding, errors)
 		super(type(self), self).__init__(data)
