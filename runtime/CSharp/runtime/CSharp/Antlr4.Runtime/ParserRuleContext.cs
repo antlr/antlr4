@@ -252,7 +252,7 @@ namespace Antlr4.Runtime
             return null;
         }
 
-#if NET45PLUS
+#if (NET45PLUS && !DOTNETCORE)
         public virtual IReadOnlyList<ITerminalNode> GetTokens(int ttype)
 #else
         public virtual ITerminalNode[] GetTokens(int ttype)
@@ -283,7 +283,7 @@ namespace Antlr4.Runtime
             {
                 return Collections.EmptyList<ITerminalNode>();
             }
-#if NET45PLUS
+#if (NET45PLUS && !DOTNETCORE)
             return tokens;
 #else
             return tokens.ToArray();
@@ -296,7 +296,7 @@ namespace Antlr4.Runtime
             return GetChild<T>(i);
         }
 
-#if NET45PLUS
+#if (NET45PLUS && !DOTNETCORE)
         public virtual IReadOnlyList<T> GetRuleContexts<T>()
             where T : Antlr4.Runtime.ParserRuleContext
 #else
@@ -324,7 +324,7 @@ namespace Antlr4.Runtime
             {
                 return Collections.EmptyList<T>();
             }
-#if NET45PLUS
+#if (NET45PLUS && !DOTNETCORE)
             return contexts;
 #else
             return contexts.ToArray();

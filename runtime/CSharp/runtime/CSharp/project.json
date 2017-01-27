@@ -1,18 +1,5 @@
 {
-  "buildOptions": {
-    "nowarn": [
-      "CS1591"
-    ],
-    "define": [
-      "DOTNETCORE",
-      "NET40PLUS",
-      "NET45PLUS"
-    ],
-    "keyFile": "../Antlr4.snk",
-    "xmlDoc": true,
-    "outputName": "Antlr4.Runtime.Standard"
-  },
-  "dependencies": {},
+  "version": "4.6.1-*",
   "frameworks": {
     "netstandard1.3": {
       "dependencies": {
@@ -20,6 +7,20 @@
       }
     }
   },
-  "version": "4.6.1-*",
-  "name": "Antlr4.Runtime.Standard"
+  "dependencies": {},
+  "buildOptions": {
+    "outputName": "Antlr4.Runtime.Standard",
+    "xmlDoc": true,
+    "keyFile": "../Antlr4.snk",
+    "define": [
+      "DOTNETCORE",
+      "NET40PLUS",
+      "NET45PLUS"
+    ],
+    "nowarn": [
+      "CS1591",
+      "CS1574",
+      "CS1580"
+    ]
+  }
 }

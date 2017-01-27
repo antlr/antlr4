@@ -12,10 +12,16 @@
       "type": "platform",
       "version": "1.1.0"
     },
-    "Antlr4.Runtime.Standard": "4.6.1-*"
+    "CSharp": {
+      "target": "Project",
+      "version": "*"
+    }
   },
   "buildOptions": {
     "emitEntryPoint": true,
-    "outputName": "Test"
+    "outputName": "Test",
+    "nowarn": [
+      "CS3021"
+    ]
   }
 }
