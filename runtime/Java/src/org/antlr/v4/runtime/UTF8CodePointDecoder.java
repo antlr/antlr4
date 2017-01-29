@@ -20,13 +20,13 @@ import java.nio.charset.CodingErrorAction;
  * intermediate representation, so this optimizes the common case of
  * decoding a UTF-8 file for parsing as Unicode code points.
  */
-public final class UTF8CodePointDecoder {
+public class UTF8CodePointDecoder {
 	private static final int SUBSTITUTION_CHARACTER = 0xFFFD;
 	private static final byte NVAL = (byte) 0xFF;
 
 	// Table mapping UTF-8 leading byte to the length of the trailing
 	// sequence.
-	private static final byte[] UTF8_LEADING_BYTE_LENGTHS = new byte[] {
+	protected static final byte[] UTF8_LEADING_BYTE_LENGTHS = new byte[] {
 		// [0x00, 0x7F] -> 0 trailing bytes
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -74,17 +74,17 @@ public final class UTF8CodePointDecoder {
 
 	// Table mapping UTF-8 sequence length to valid Unicode code point
 	// ranges for that sequence length.
-	private static final Interval[] UTF8_VALID_INTERVALS = new Interval[] {
+	protected static final Interval[] UTF8_VALID_INTERVALS = new Interval[] {
 		Interval.of(0x00, 0x7F),
 		Interval.of(0x80, 0x7FF),
 		Interval.of(0x800, 0xFFFF),
 		Interval.of(0x10000, 0x10FFFF)
 	};
 
-	private final CodingErrorAction decodingErrorAction;
-	private int decodingTrailBytesNeeded;
-	private int decodingCurrentCodePoint;
-	private Interval validDecodedCodePointRange;
+	protected final CodingErrorAction decodingErrorAction;
+	protected int decodingTrailBytesNeeded;
+	protected int decodingCurrentCodePoint;
+	protected Interval validDecodedCodePointRange;
 
 	/**
 	 * Constructs a new {@link UTF8CodePointDecoder} with a specified
