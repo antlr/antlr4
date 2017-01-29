@@ -132,6 +132,7 @@ public final class CodePointCharStream implements CharStream {
 		codePointBuffer.position(initialPosition + index);
 	}
 
+	/** Return the UTF-16 encoded string for the given interval */
 	@Override
 	public String getText(Interval interval) {
 		final int startIdx = initialPosition + Math.min(interval.a, size - 1);
