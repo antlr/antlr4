@@ -78,6 +78,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.antlr.v4.runtime.misc.MurmurHash;
 
+import static org.antlr.v4.test.runtime.BaseRuntimeTest.writeFile;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;

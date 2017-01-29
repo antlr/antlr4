@@ -9,6 +9,8 @@ package org.antlr.v4.test.runtime.python2;
 import org.antlr.v4.test.runtime.python.BasePythonTest;
 import org.stringtemplate.v4.ST;
 
+import static org.antlr.v4.test.runtime.BaseRuntimeTest.writeFile;
+
 public class BasePython2Test extends BasePythonTest {
 
 	@Override

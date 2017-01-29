@@ -70,6 +70,7 @@ import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.assertTrue;
 import static org.antlr.v4.test.runtime.BaseRuntimeTest.antlrOnString;
+import static org.antlr.v4.test.runtime.BaseRuntimeTest.writeFile;
 import static org.junit.Assert.assertArrayEquals;
 
 public class BaseGoTest implements RuntimeTestSupport {
@@ -309,7 +310,7 @@ public class BaseGoTest implements RuntimeTestSupport {
 		boolean success = rawGenerateAndBuildRecognizer(grammarFileName,
 		                                                grammarStr, null, lexerName, "-no-listener");
 		assertTrue(success);
-		writeFile(overall_tmpdir, "input", input);
+		writeFile(overall_tmpdir.toString(), "input", input);
 		writeLexerTestFile(lexerName, showDFA);
 		String output = execModule("Test.go");
 		return output;
@@ -338,7 +339,7 @@ public class BaseGoTest implements RuntimeTestSupport {
 		boolean success = rawGenerateAndBuildRecognizer(grammarFileName,
 		                                                grammarStr, parserName, lexerName, "-visitor");
 		assertTrue(success);
-		writeFile(overall_tmpdir, "input", input);
+		writeFile(overall_tmpdir.toString(), "input", input);
 		rawBuildRecognizerTestFile(parserName, lexerName, listenerName,
 		                           visitorName, startRuleName, showDiagnosticErrors);
 		return execRecognizer();
@@ -700,35 +701,6 @@ public class BaseGoTest implements RuntimeTestSupport {
 		}
 	}
 
-	public static void writeFile(File dir, String fileName, String content) {
-		try {
-			File f = new File(dir, fileName);
-			FileWriter w = new FileWriter(f);
-			BufferedWriter bw = new BufferedWriter(w);
-			bw.write(content);
-			bw.close();
-			w.close();
-		} catch (IOException ioe) {
-			System.err.println("can't write file");
-			ioe.printStackTrace(System.err);
-		}
-	}
-
-	public static void writeFile(String dir, String fileName, InputStream content) {
-		try {
-			File f = new File(dir, fileName);
-			OutputStream output = new FileOutputStream(f);
-			while(content.available()>0) {
-				int b = content.read();
-				output.write(b);
-			}
-			output.close();
-		} catch (IOException ioe) {
-			System.err.println("can't write file");
-			ioe.printStackTrace(System.err);
-		}
-	}
-
 	protected void mkdir(File dir) {
 		dir.mkdirs();
 	}
@@ -785,7 +757,7 @@ public class BaseGoTest implements RuntimeTestSupport {
 		outputFileST.add("listenerName", listenerName);
 		outputFileST.add("visitorName", visitorName);
 		outputFileST.add("parserStartRuleName", parserStartRuleName.substring(0, 1).toUpperCase() + parserStartRuleName.substring(1) );
-		writeFile(overall_tmpdir, "Test.go", outputFileST.render());
+		writeFile(overall_tmpdir.toString(), "Test.go", outputFileST.render());
 	}
 
 
@@ -813,7 +785,7 @@ public class BaseGoTest implements RuntimeTestSupport {
 				+ "}\n"
 				+ "\n");
 		outputFileST.add("lexerName", lexerName);
-		writeFile(overall_tmpdir, "Test.go", outputFileST.render());
+		writeFile(overall_tmpdir.toString(), "Test.go", outputFileST.render());
 	}
 
 	public void writeRecognizer(String parserName, String lexerName,
