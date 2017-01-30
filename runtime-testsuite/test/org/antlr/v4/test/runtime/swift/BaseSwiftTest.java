@@ -9,15 +9,11 @@ package org.antlr.v4.test.runtime.swift;
 import org.antlr.v4.Tool;
 import org.antlr.v4.test.runtime.ErrorQueue;
 import org.antlr.v4.test.runtime.RuntimeTestSupport;
+import org.antlr.v4.test.runtime.StreamVacuum;
 import org.stringtemplate.v4.ST;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -117,49 +113,6 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 	private static boolean buildAntlr4Framework() throws Exception {
 		String argsString = "xcrun -sdk macosx swiftc -emit-library -emit-module Antlr4.swift -module-name Antlr4 -module-link-name Antlr4 -Xlinker -install_name -Xlinker " + ANTLR_FRAMEWORK_DIR + "/libAntlr4.dylib ";
 		return runProcess(argsString, ANTLR_FRAMEWORK_DIR);
-	}
-
-	public static class StreamVacuum implements Runnable {
-		StringBuilder buf = new StringBuilder();
-		BufferedReader in;
-		Thread sucker;
-
-		public StreamVacuum(InputStream in) {
-			this.in = new BufferedReader(new InputStreamReader(in));
-		}
-
-		public void start() {
-			sucker = new Thread(this);
-			sucker.start();
-		}
-
-		@Override
-		public void run() {
-			try {
-				String line = in.readLine();
-				while (line != null) {
-					buf.append(line);
-					buf.append('\n');
-					line = in.readLine();
-				}
-			}
-			catch (IOException ioe) {
-				System.err.println("can't read output from process");
-				ioe.printStackTrace(System.err);
-			}
-		}
-
-		/**
-		 * wait for the thread to finish
-		 */
-		public void join() throws InterruptedException {
-			sucker.join();
-		}
-
-		@Override
-		public String toString() {
-			return buf.toString();
-		}
 	}
 
 	public String tmpdir = null;
