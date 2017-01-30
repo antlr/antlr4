@@ -116,7 +116,18 @@ namespace Antlr4.Runtime
             }
         }
 
-        /// <summary>COPY a ctx (I'm deliberately not using copy constructor)</summary>
+        /// <summary>
+        /// COPY a ctx (I'm deliberately not using copy constructor) to avoid
+        /// confusion with creating node with parent. Does not copy children.
+        /// 
+        /// This is used in the generated parser code to flip a generic XContext
+        /// node for rule X to a YContext for alt label Y. In that sense, it is
+        /// not really a generic copy function.
+        /// 
+        /// If we do an error sync() at start of a rule, we might add error nodes
+        /// to the generic XContext so this function must copy those nodes to
+        /// the YContext as well else they are lost!
+        /// </summary>
         public virtual void CopyFrom(Antlr4.Runtime.ParserRuleContext ctx)
         {
             // from RuleContext
@@ -124,6 +135,22 @@ namespace Antlr4.Runtime
             this.invokingState = ctx.invokingState;
             this._start = ctx._start;
             this._stop = ctx._stop;
+
+            // copy any error nodes to alt label node
+            if (ctx.children != null)
+            {
+                children = new List<IParseTree>();
+                // reset parent pointer for any error nodes
+                foreach (var child in ctx.children)
+                {
+                    var errorChildNode = child as ErrorNodeImpl;
+                    if (errorChildNode != null)
+                    {
+                        children.Add(errorChildNode);
+                        errorChildNode.Parent = this;
+                    }
+                }
+            }
         }
 
         public ParserRuleContext(Antlr4.Runtime.ParserRuleContext parent, int invokingStateNumber)
