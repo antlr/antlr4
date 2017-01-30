@@ -166,3 +166,4 @@ exports.NoViableAltException = NoViableAltException;
 exports.LexerNoViableAltException = LexerNoViableAltException;
 exports.InputMismatchException = InputMismatchException;
 exports.FailedPredicateException = FailedPredicateException;
+exports.ParseCancellationException = ParseCancellationException;
