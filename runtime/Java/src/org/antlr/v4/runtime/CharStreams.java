@@ -49,7 +49,7 @@ public final class CharStreams {
 			stringIdx += Character.charCount(codePoint);
 		}
 		codePointBuffer.flip();
-		return new CodePointCharStream(codePointBuffer);
+		return new CodePointCharStream(codePointBuffer, IntStream.UNKNOWN_SOURCE_NAME);
 	}
 
 	public static CodePointCharStream createWithUTF8(Path path) throws IOException {
@@ -57,7 +57,8 @@ public final class CharStreams {
 			return createWithUTF8Channel(
 					channel,
 					DEFAULT_BUFFER_SIZE,
-					CodingErrorAction.REPLACE);
+					CodingErrorAction.REPLACE,
+					path.toString());
 		}
 	}
 
@@ -66,14 +67,16 @@ public final class CharStreams {
 			return createWithUTF8Channel(
 					channel,
 					DEFAULT_BUFFER_SIZE,
-					CodingErrorAction.REPLACE);
+					CodingErrorAction.REPLACE,
+					IntStream.UNKNOWN_SOURCE_NAME);
 		}
 	}
 
 	public static CodePointCharStream createWithUTF8Channel(
 			ReadableByteChannel channel,
 			int bufferSize,
-			CodingErrorAction decodingErrorAction
+			CodingErrorAction decodingErrorAction,
+			String sourceName
 	) throws IOException {
 		ByteBuffer utf8BytesIn = ByteBuffer.allocateDirect(bufferSize);
 		IntBuffer codePointsOut = IntBuffer.allocate(bufferSize);
@@ -91,6 +94,6 @@ public final class CharStreams {
 		}
 		codePointsOut.limit(codePointsOut.position());
 		codePointsOut.flip();
-		return new CodePointCharStream(codePointsOut);
+		return new CodePointCharStream(codePointsOut, sourceName);
 	}
 }

@@ -60,6 +60,7 @@ public class TestCharStreams {
 		assertEquals(5, s.size());
 		assertEquals(0, s.index());
 		assertEquals("hello", s.toString());
+		assertEquals(p.toString(), s.getSourceName());
 	}
 
 	@Test
@@ -70,6 +71,7 @@ public class TestCharStreams {
 		assertEquals(7, s.size());
 		assertEquals(0, s.index());
 		assertEquals("hello \uD83C\uDF0E", s.toString());
+		assertEquals(p.toString(), s.getSourceName());
 	}
 
 	@Test
@@ -102,10 +104,11 @@ public class TestCharStreams {
 		Files.write(p, "hello".getBytes(StandardCharsets.UTF_8));
 		try (SeekableByteChannel c = Files.newByteChannel(p)) {
 			CodePointCharStream s = CharStreams.createWithUTF8Channel(
-					c, 4096, CodingErrorAction.REPLACE);
+					c, 4096, CodingErrorAction.REPLACE, "foo");
 			assertEquals(5, s.size());
 			assertEquals(0, s.index());
 			assertEquals("hello", s.toString());
+			assertEquals("foo", s.getSourceName());
 		}
 	}
 
@@ -115,10 +118,11 @@ public class TestCharStreams {
 		Files.write(p, "hello \uD83C\uDF0E".getBytes(StandardCharsets.UTF_8));
 		try (SeekableByteChannel c = Files.newByteChannel(p)) {
 			CodePointCharStream s = CharStreams.createWithUTF8Channel(
-					c, 4096, CodingErrorAction.REPLACE);
+					c, 4096, CodingErrorAction.REPLACE, "foo");
 			assertEquals(7, s.size());
 			assertEquals(0, s.index());
 			assertEquals("hello \uD83C\uDF0E", s.toString());
+			assertEquals("foo", s.getSourceName());
 		}
 	}
 
@@ -130,7 +134,7 @@ public class TestCharStreams {
 		Files.write(p, toWrite);
 		try (SeekableByteChannel c = Files.newByteChannel(p)) {
 			CodePointCharStream s = CharStreams.createWithUTF8Channel(
-					c, 4096, CodingErrorAction.REPLACE);
+					c, 4096, CodingErrorAction.REPLACE, "foo");
 			assertEquals(3, s.size());
 			assertEquals(0, s.index());
 			assertEquals("\uFFFD\uFFFD\uFFFD", s.toString());
@@ -144,7 +148,7 @@ public class TestCharStreams {
 		Files.write(p, toWrite);
 		try (SeekableByteChannel c = Files.newByteChannel(p)) {
 			thrown.expect(CharacterCodingException.class);
-			CharStreams.createWithUTF8Channel(c, 4096, CodingErrorAction.REPORT);
+			CharStreams.createWithUTF8Channel(c, 4096, CodingErrorAction.REPORT, "foo");
 		}
 	}
 
@@ -158,7 +162,8 @@ public class TestCharStreams {
 					// Note this buffer size ensures the SMP code point
 					// straddles the boundary of two buffers
 					8,
-					CodingErrorAction.REPLACE);
+					CodingErrorAction.REPLACE,
+					"foo");
 			assertEquals(7, s.size());
 			assertEquals(0, s.index());
 			assertEquals("hello \uD83C\uDF0E", s.toString());
