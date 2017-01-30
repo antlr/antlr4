@@ -16,7 +16,7 @@ from antlr4.InputStream import InputStream
 
 class FileStream(InputStream):
 
-    def __init__(self, fileName, encoding='utf-8', errors='replace'):
+    def __init__(self, fileName, encoding='ascii', errors='strict'):
         self.fileName = fileName
         # read binary to avoid line ending conversion
         with open(fileName, 'rb') as file:
