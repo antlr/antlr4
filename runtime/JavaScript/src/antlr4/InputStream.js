@@ -10,25 +10,20 @@ require('./polyfills/codepointat');
 
 // Vacuum all input from a string and then treat it like a buffer.
 
-function _loadString(stream) {
+function _loadString(stream, decodeToUnicodeCodePoints) {
 	stream._index = 0;
 	stream.data = [];
-	var decodeDataAt;
-	if (stream.decodeToUnicodeCodePoints) {
-		decodeDataAt = function(i) {
+	if (decodeToUnicodeCodePoints) {
+		for (var i = 0; i < stream.strdata.length; ) {
 			var codePoint = stream.strdata.codePointAt(i);
 			stream.data.push(codePoint);
-			return codePoint <= 0xFFFF ? 1 : 2;
-		};
+			i += codePoint <= 0xFFFF ? 1 : 2;
+		}
 	} else {
-		decodeDataAt = function(i) {
+		for (var i = 0; i < stream.strdata.length; i++) {
 			var codeUnit = stream.strdata.charCodeAt(i);
 			stream.data.push(codeUnit);
-			return 1;
-		};
-        }
-	for (var i = 0; i < stream.strdata.length; ) {
-		i += decodeDataAt(i);
+		}
 	}
 	stream._size = stream.data.length;
 }
@@ -41,9 +36,7 @@ function _loadString(stream) {
 function InputStream(data, decodeToUnicodeCodePoints) {
 	this.name = "<empty>";
 	this.strdata = data;
-	this.decodeToUnicodeCodePoints =
-		decodeToUnicodeCodePoints===undefined ? false : decodeToUnicodeCodePoints;
-	_loadString(this);
+	_loadString(this, decodeToUnicodeCodePoints || false);
 	return this;
 }
 
