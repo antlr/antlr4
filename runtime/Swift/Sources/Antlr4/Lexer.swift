@@ -331,6 +331,10 @@ open class Lexer: Recognizer<LexerATNSimulator>
         return _channel
     }
 
+    open func getChannelNames() -> [String]? {
+        return nil
+    }
+
     open func getModeNames() -> [String]? {
         return nil
     }

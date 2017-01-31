@@ -761,9 +761,17 @@ class <lexer.name>(<if(superClass)><superClass><else>Lexer<endif>):
 
     decisionsToDFA = [ DFA(ds, i) for i, ds in enumerate(atn.decisionToState) ]
 
+<if(lexer.channels)>
+    <lexer.channels:{c| <c> = <lexer.channels.(c)>}; separator="\n">
+
+<endif>
+<if(rest(lexer.modes))>
     <rest(lexer.modes):{m| <m> = <i>}; separator="\n">
 
+<endif>
     <lexer.tokens:{k | <k> = <lexer.tokens.(k)>}; separator="\n", wrap, anchor>
+
+    channelNames = [ u"DEFAULT_TOKEN_CHANNEL", u"HIDDEN"<if (lexer.channels)>, <lexer.channels:{c| u"<c>"}; separator=", ", wrap, anchor><endif> ]
 
     modeNames = [ <lexer.modes:{m| "<m>"}; separator=", ", wrap, anchor> ]
 

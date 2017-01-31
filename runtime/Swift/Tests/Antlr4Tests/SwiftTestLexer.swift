@@ -13,6 +13,10 @@ open class SwiftTestLexer: Lexer {
 
 	internal static let _sharedContextCache:PredictionContextCache = PredictionContextCache()
 	public static let T__0=1
+	public static let channelNames: [String] = [
+		"DEFAULT_TOKEN_CHANNEL", "HIDDEN"
+	]
+
 	public static let modeNames: [String] = [
 		"DEFAULT_MODE"
 	]
@@ -58,7 +62,7 @@ open class SwiftTestLexer: Lexer {
     }
 
 	public override init(_ input: CharStream) {
-	    RuntimeMetaData.checkVersion("4.6", RuntimeMetaData.VERSION)
+	    RuntimeMetaData.checkVersion("4.6.1", RuntimeMetaData.VERSION)
 		super.init(input)
 		_interp = LexerATNSimulator(self, SwiftTestLexer._ATN, SwiftTestLexer._decisionToDFA, SwiftTestLexer._sharedContextCache)
 	}
@@ -71,6 +75,9 @@ open class SwiftTestLexer: Lexer {
 
 	override
 	open func getSerializedATN() -> String { return SwiftTestLexer._serializedATN }
+
+	override
+	open func getChannelNames() -> [String] { return HelloLexer.channelNames }
 
 	override
 	open func getModeNames() -> [String] { return SwiftTestLexer.modeNames }
