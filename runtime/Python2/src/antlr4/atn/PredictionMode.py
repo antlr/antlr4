@@ -1,32 +1,7 @@
 #
-# [The "BSD license"]
-#  Copyright (c) 2012 Terence Parr
-#  Copyright (c) 2012 Sam Harwell
-#  Copyright (c) 2014 Eric Vergnaud
-#  All rights reserved.
-#
-#  Redistribution and use in source and binary forms, with or without
-#  modification, are permitted provided that the following conditions
-#  are met:
-#
-#  1. Redistributions of source code must retain the above copyright
-#     notice, this list of conditions and the following disclaimer.
-#  2. Redistributions in binary form must reproduce the above copyright
-#     notice, this list of conditions and the following disclaimer in the
-#     documentation and/or other materials provided with the distribution.
-#  3. The name of the author may not be used to endorse or promote products
-#     derived from this software without specific prior written permission.
-#
-#  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-#  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-#  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-#  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-#  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-#  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-#  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-#  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-#  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-#  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+# Use of this file is governed by the BSD 3-clause license that
+# can be found in the LICENSE.txt file in the project root.
 #
 #
 # This enumeration defines the prediction modes available in ANTLR 4 along with
@@ -213,7 +188,7 @@ class PredictionMode(object):
                 # dup configs, tossing out semantic predicates
                 dup = ATNConfigSet()
                 for c in configs:
-                    c = ATNConfig(c,SemanticContext.NONE)
+                    c = ATNConfig(config=c, semantic=SemanticContext.NONE)
                     dup.add(c)
                 configs = dup
             # now we have combined contexts for configs with dissimilar preds
@@ -232,10 +207,7 @@ class PredictionMode(object):
     # {@link RuleStopState}, otherwise {@code false}
     @classmethod
     def hasConfigInRuleStopState(cls, configs):
-        for c in configs:
-            if isinstance(c.state, RuleStopState):
-                return True
-        return False
+        return any(isinstance(cfg.state, RuleStopState) for cfg in configs)
 
     # Checks if all configurations in {@code configs} are in a
     # {@link RuleStopState}. Configurations meeting this condition have reached
@@ -247,10 +219,7 @@ class PredictionMode(object):
     # {@link RuleStopState}, otherwise {@code false}
     @classmethod
     def allConfigsInRuleStopStates(cls, configs):
-        for config in configs:
-            if not isinstance(config.state, RuleStopState):
-                return False
-        return True
+        return all(isinstance(cfg.state, RuleStopState) for cfg in configs)
 
     #
     # Full LL prediction termination.
@@ -419,10 +388,7 @@ class PredictionMode(object):
     #
     @classmethod
     def hasNonConflictingAltSet(cls, altsets):
-        for alts in altsets:
-            if len(alts)==1:
-                return True
-        return False
+        return any(len(alts) == 1 for alts in altsets)
 
     #
     # Determines if any single alternative subset in {@code altsets} contains
@@ -434,10 +400,7 @@ class PredictionMode(object):
     #
     @classmethod
     def hasConflictingAltSet(cls, altsets):
-        for alts in altsets:
-            if len(alts)>1:
-                return True
-        return False
+        return any(len(alts) > 1 for alts in altsets)
 
     #
     # Determines if every alternative subset in {@code altsets} is equivalent.
@@ -448,13 +411,9 @@ class PredictionMode(object):
     #
     @classmethod
     def allSubsetsEqual(cls, altsets):
-        first = None
-        for alts in altsets:
-            if first is None:
-                first = alts
-            elif not alts==first:
-                return False
-        return True
+        if not altsets:
+            return True
+        return all(alts == altsets[0] for alts in altsets[1:])
 
     #
     # Returns the unique alternative predicted by all alternative subsets in
@@ -467,10 +426,8 @@ class PredictionMode(object):
     def getUniqueAlt(cls, altsets):
         all = cls.getAlts(altsets)
         if len(all)==1:
-            for one in all:
-                return one
-        else:
-            return ATN.INVALID_ALT_NUMBER
+            return all.pop()
+        return ATN.INVALID_ALT_NUMBER
 
     # Gets the complete set of represented alternatives for a collection of
     # alternative subsets. This method returns the union of each {@link BitSet}
@@ -481,10 +438,7 @@ class PredictionMode(object):
     #
     @classmethod
     def getAlts(cls, altsets):
-        all = set()
-        for alts in altsets:
-            all = all | alts
-        return all
+        return set.union(*altsets)
 
     #
     # This function gets the conflicting alt subsets from a configuration set.
@@ -528,11 +482,7 @@ class PredictionMode(object):
 
     @classmethod
     def hasStateAssociatedWithOneAlt(cls, configs):
-        x = cls.getStateToAltMap(configs)
-        for alts in x.values():
-            if len(alts)==1:
-                return True
-        return False
+        return any(len(alts) == 1 for alts in cls.getStateToAltMap(configs).values())
 
     @classmethod
     def getSingleViableAlt(cls, altsets):

@@ -1,7 +1,0 @@
-import "AmbigLR.stg"
-
-Input() ::= "(1+2)*3<\n>"
-
-Output() ::= ""
-
-Errors() ::= ""

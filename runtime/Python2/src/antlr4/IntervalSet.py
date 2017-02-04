@@ -1,3 +1,9 @@
+#
+# Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+# Use of this file is governed by the BSD 3-clause license that
+# can be found in the LICENSE.txt file in the project root.
+#
+
 from io import StringIO
 import unittest
 from antlr4.Token import Token
@@ -11,12 +17,19 @@ class Interval(object):
 
     def __contains__(self, item):
         return item in self.range
-    
+
     def __len__(self):
         return self.stop - self.start
 
     def __iter__(self):
         return iter(self.range)
+
+    def __getitem__(self, idx):
+        if idx == 0:
+            return self.start
+        elif idx == 1:
+            return self.stop
+        raise IndexError('Interval index out or range [{}]'.format(idx))
 
 class IntervalSet(object):
 
@@ -97,16 +110,10 @@ class IntervalSet(object):
         if self.intervals is None:
             return False
         else:
-            for i in self.intervals:
-                if item in i:
-                    return True
-            return False
+            return any(item in i for i in self.intervals)
 
     def __len__(self):
-        xlen = 0
-        for i in self.intervals:
-            xlen += len(i)
-        return xlen
+        return sum(len(i) for i in self.intervals)
 
     def removeRange(self, v):
         if v.start==v.stop-1:
@@ -126,7 +133,7 @@ class IntervalSet(object):
                 # check for included range, remove it
                 elif v.start<=i.start and v.stop>=i.stop:
                     self.intervals.pop(k)
-                    k = k - 1 # need another pass
+                    k -= 1 # need another pass
                 # check for lower boundary
                 elif v.start<i.stop:
                     self.intervals[k] = Interval(i.start, v.start)
@@ -157,7 +164,7 @@ class IntervalSet(object):
                 # split existing range
                 elif v<i.stop-1:
                     x = Interval(i.start, v)
-                    i.start = v + 1
+                    self.intervals[k] = Interval(v + 1, i.stop)
                     self.intervals.insert(k, x)
                     return
                 k += 1

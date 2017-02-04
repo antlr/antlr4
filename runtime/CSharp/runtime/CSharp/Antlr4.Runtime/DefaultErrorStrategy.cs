@@ -1,31 +1,6 @@
-/*
- * [The "BSD license"]
- *  Copyright (c) 2013 Terence Parr
- *  Copyright (c) 2013 Sam Harwell
- *  All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions
- *  are met:
- *
- *  1. Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  2. Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  3. The name of the author may not be used to endorse or promote products
- *     derived from this software without specific prior written permission.
- *
- *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- *  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- *  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
  */
 using System;
 using Antlr4.Runtime;
@@ -288,14 +263,10 @@ namespace Antlr4.Runtime
                 return;
             }
             ITokenStream tokens = ((ITokenStream)recognizer.InputStream);
-            int la = tokens.La(1);
+            int la = tokens.LA(1);
             // try cheaper subset first; might get lucky. seems to shave a wee bit off
-            if (recognizer.Atn.NextTokens(s).Contains(la) || la == TokenConstants.Eof)
-            {
-                return;
-            }
-            // Return but don't end recovery. only do that upon valid token match
-            if (recognizer.IsExpectedToken(la))
+            var nextTokens = recognizer.Atn.NextTokens(s);
+            if (nextTokens.Contains(TokenConstants.EPSILON) || nextTokens.Contains(la))
             {
                 return;
             }
@@ -349,7 +320,7 @@ namespace Antlr4.Runtime
             string input;
             if (tokens != null)
             {
-                if (e.StartToken.Type == TokenConstants.Eof)
+                if (e.StartToken.Type == TokenConstants.EOF)
                 {
                     input = "<EOF>";
                 }
@@ -605,7 +576,7 @@ namespace Antlr4.Runtime
         /// </remarks>
         /// <param name="recognizer">the parser instance</param>
         /// <returns>
-        /// 
+        ///
         /// <see langword="true"/>
         /// if single-token insertion is a viable recovery
         /// strategy for the current mismatched input, otherwise
@@ -613,15 +584,14 @@ namespace Antlr4.Runtime
         /// </returns>
         protected internal virtual bool SingleTokenInsertion(Parser recognizer)
         {
-            int currentSymbolType = ((ITokenStream)recognizer.InputStream).La(1);
+            int currentSymbolType = ((ITokenStream)recognizer.InputStream).LA(1);
             // if current token is consistent with what could come after current
             // ATN state, then we know we're missing a token; error recovery
             // is free to conjure up and insert the missing token
             ATNState currentState = recognizer.Interpreter.atn.states[recognizer.State];
             ATNState next = currentState.Transition(0).target;
             ATN atn = recognizer.Interpreter.atn;
-			IntervalSet expectingAtLL2 = atn.NextTokens(next, PredictionContext.FromRuleContext(atn, recognizer.RuleContext));
-            //		System.out.println("LT(2) set="+expectingAtLL2.toString(recognizer.getTokenNames()));
+			IntervalSet expectingAtLL2 = atn.NextTokens(next, recognizer.RuleContext);
             if (expectingAtLL2.Contains(currentSymbolType))
             {
                 ReportMissingToken(recognizer);
@@ -665,7 +635,7 @@ namespace Antlr4.Runtime
         [return: Nullable]
         protected internal virtual IToken SingleTokenDeletion(Parser recognizer)
         {
-            int nextTokenType = ((ITokenStream)recognizer.InputStream).La(2);
+            int nextTokenType = ((ITokenStream)recognizer.InputStream).LA(2);
             IntervalSet expecting = GetExpectedTokens(recognizer);
             if (expecting.Contains(nextTokenType))
             {
@@ -709,7 +679,7 @@ namespace Antlr4.Runtime
             int expectedTokenType = expecting.MinElement;
             // get any element
             string tokenText;
-            if (expectedTokenType == TokenConstants.Eof)
+            if (expectedTokenType == TokenConstants.EOF)
             {
                 tokenText = "<missing EOF>";
             }
@@ -718,8 +688,8 @@ namespace Antlr4.Runtime
                 tokenText = "<missing " + recognizer.Vocabulary.GetDisplayName(expectedTokenType) + ">";
             }
             IToken current = currentSymbol;
-            IToken lookback = ((ITokenStream)recognizer.InputStream).Lt(-1);
-            if (current.Type == TokenConstants.Eof && lookback != null)
+            IToken lookback = ((ITokenStream)recognizer.InputStream).LT(-1);
+            if (current.Type == TokenConstants.EOF && lookback != null)
             {
                 current = lookback;
             }
@@ -761,7 +731,7 @@ namespace Antlr4.Runtime
             string s = GetSymbolText(t);
             if (s == null)
             {
-                if (GetSymbolType(t) == TokenConstants.Eof)
+                if (GetSymbolType(t) == TokenConstants.EOF)
                 {
                     s = "<EOF>";
                 }
@@ -808,7 +778,7 @@ namespace Antlr4.Runtime
                 recoverSet.AddAll(follow);
                 ctx = ctx.Parent;
             }
-            recoverSet.Remove(TokenConstants.Epsilon);
+            recoverSet.Remove(TokenConstants.EPSILON);
             //		System.out.println("recover set "+recoverSet.toString(recognizer.getTokenNames()));
             return recoverSet;
         }
@@ -818,13 +788,13 @@ namespace Antlr4.Runtime
         protected internal virtual void ConsumeUntil(Parser recognizer, IntervalSet set)
         {
             //		System.err.println("consumeUntil("+set.toString(recognizer.getTokenNames())+")");
-            int ttype = ((ITokenStream)recognizer.InputStream).La(1);
-            while (ttype != TokenConstants.Eof && !set.Contains(ttype))
+            int ttype = ((ITokenStream)recognizer.InputStream).LA(1);
+            while (ttype != TokenConstants.EOF && !set.Contains(ttype))
             {
                 //System.out.println("consume during recover LA(1)="+getTokenNames()[input.LA(1)]);
                 //			recognizer.getInputStream().consume();
                 recognizer.Consume();
-                ttype = ((ITokenStream)recognizer.InputStream).La(1);
+                ttype = ((ITokenStream)recognizer.InputStream).LA(1);
             }
         }
     }

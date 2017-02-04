@@ -1,32 +1,8 @@
 //
-// [The "BSD license"]
-//  Copyright (c) 2012 Terence Parr
-//  Copyright (c) 2012 Sam Harwell
-//  Copyright (c) 2014 Eric Vergnaud
-//  All rights reserved.
-//
-//  Redistribution and use in source and binary forms, with or without
-//  modification, are permitted provided that the following conditions
-//  are met:
-//
-//  1. Redistributions of source code must retain the above copyright
-//     notice, this list of conditions and the following disclaimer.
-//  2. Redistributions in binary form must reproduce the above copyright
-//     notice, this list of conditions and the following disclaimer in the
-//     documentation and/or other materials provided with the distribution.
-//  3. The name of the author may not be used to endorse or promote products
-//     derived from this software without specific prior written permission.
-//
-//  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-//  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-//  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-//  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-//  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-//  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-//  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-//  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-//  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
 //
 //
 // This enumeration defines the prediction modes available in ANTLR 4 along with
@@ -34,6 +10,7 @@
 // ambiguities.
 
 var Set = require('./../Utils').Set;
+var Map = require('./../Utils').Map;
 var BitSet = require('./../Utils').BitSet;
 var AltDict = require('./../Utils').AltDict;
 var ATN = require('./ATN').ATN;
@@ -41,6 +18,9 @@ var RuleStopState = require('./ATNState').RuleStopState;
 var ATNConfigSet = require('./ATNConfigSet').ATNConfigSet;
 var ATNConfig = require('./ATNConfig').ATNConfig;
 var SemanticContext = require('./SemanticContext').SemanticContext;
+var Hash = require("../Utils").Hash;
+var hashStuff = require('./../Utils').hashStuff;
+var equalArrays = require('./../Utils').equalArrays;
 
 function PredictionMode() {
 	return this;
@@ -515,27 +495,20 @@ PredictionMode.getAlts = function(altsets) {
 // map[c] U= c.{@link ATNConfig//alt alt} // map hash/equals uses s and x, not
 // alt and not pred
 // </pre>
-//
+
 PredictionMode.getConflictingAltSubsets = function(configs) {
-    var configToAlts = {};
-	for(var i=0;i<configs.items.length;i++) {
-		var c = configs.items[i];
-        var key = "key_" + c.state.stateNumber + "/" + c.context;
-        var alts = configToAlts[key] || null;
+    var configToAlts = new Map();
+    configToAlts.hashFunction = function(cfg) { hashStuff(cfg.state.stateNumber, cfg.context); };
+    configToAlts.equalsFunction = function(c1, c2) { return c1.state.stateNumber==c2.state.stateNumber && c1.context.equals(c2.context);}
+    configs.items.map(function(cfg) {
+        var alts = configToAlts.get(cfg);
         if (alts === null) {
             alts = new BitSet();
-            configToAlts[key] = alts;
+            configToAlts.put(cfg, alts);
         }
-        alts.add(c.alt);
-	}
-	var values = [];
-	for(var k in configToAlts) {
-		if(k.indexOf("key_")!==0) {
-			continue;
-		}
-		values.push(configToAlts[k]);
-	}
-    return values;
+        alts.add(cfg.alt);
+	});
+    return configToAlts.getValues();
 };
 
 //

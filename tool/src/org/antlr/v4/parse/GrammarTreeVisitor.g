@@ -1,7 +1,7 @@
 /*
  * [The "BSD license"]
- *  Copyright (c) 2012 Terence Parr
- *  Copyright (c) 2012 Sam Harwell
+ *  Copyright (c) 2012-2016 Terence Parr
+ *  Copyright (c) 2012-2016 Sam Harwell
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -844,7 +844,7 @@ element
 	|   SEMPRED						{sempredInAlt((PredAST)$SEMPRED);}
 	|   ^(ACTION elementOptions)	{actionInAlt((ActionAST)$ACTION);}
 	|   ^(SEMPRED elementOptions)	{sempredInAlt((PredAST)$SEMPRED);}
-
+	|	range
 	|	^(NOT blockSet)
 	|	^(NOT block)
 	;

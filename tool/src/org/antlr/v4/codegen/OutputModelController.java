@@ -1,31 +1,7 @@
 /*
- * [The "BSD license"]
- *  Copyright (c) 2012 Terence Parr
- *  Copyright (c) 2012 Sam Harwell
- *  All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions
- *  are met:
- *
- *  1. Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  2. Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  3. The name of the author may not be used to endorse or promote products
- *     derived from this software without specific prior written permission.
- *
- *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- *  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- *  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
  */
 
 package org.antlr.v4.codegen;
@@ -107,24 +83,23 @@ public class OutputModelController {
 	 *  controller as factory in SourceGenTriggers so it triggers codegen
 	 *  extensions too, not just the factory functions in this factory.
 	 */
-	public OutputModelObject buildParserOutputModel() {
-		Grammar g = delegate.getGrammar();
+	public OutputModelObject buildParserOutputModel(boolean header) {
 		CodeGenerator gen = delegate.getGenerator();
-		ParserFile file = parserFile(gen.getRecognizerFileName());
+		ParserFile file = parserFile(gen.getRecognizerFileName(header));
 		setRoot(file);
-		Parser parser = parser(file);
-		file.parser = parser;
+		file.parser = parser(file);
 
+		Grammar g = delegate.getGrammar();
 		for (Rule r : g.rules.values()) {
-			buildRuleFunction(parser, r);
+			buildRuleFunction(file.parser, r);
 		}
 
 		return file;
 	}
 
-	public OutputModelObject buildLexerOutputModel() {
+	public OutputModelObject buildLexerOutputModel(boolean header) {
 		CodeGenerator gen = delegate.getGenerator();
-		LexerFile file = lexerFile(gen.getRecognizerFileName());
+		LexerFile file = lexerFile(gen.getRecognizerFileName(header));
 		setRoot(file);
 		file.lexer = lexer(file);
 
@@ -136,24 +111,24 @@ public class OutputModelController {
 		return file;
 	}
 
-	public OutputModelObject buildListenerOutputModel() {
+	public OutputModelObject buildListenerOutputModel(boolean header) {
 		CodeGenerator gen = delegate.getGenerator();
-		return new ListenerFile(delegate, gen.getListenerFileName());
+		return new ListenerFile(delegate, gen.getListenerFileName(header));
 	}
 
-	public OutputModelObject buildBaseListenerOutputModel() {
+	public OutputModelObject buildBaseListenerOutputModel(boolean header) {
 		CodeGenerator gen = delegate.getGenerator();
-		return new BaseListenerFile(delegate, gen.getBaseListenerFileName());
+		return new BaseListenerFile(delegate, gen.getBaseListenerFileName(header));
 	}
 
-	public OutputModelObject buildVisitorOutputModel() {
+	public OutputModelObject buildVisitorOutputModel(boolean header) {
 		CodeGenerator gen = delegate.getGenerator();
-		return new VisitorFile(delegate, gen.getVisitorFileName());
+		return new VisitorFile(delegate, gen.getVisitorFileName(header));
 	}
 
-	public OutputModelObject buildBaseVisitorOutputModel() {
+	public OutputModelObject buildBaseVisitorOutputModel(boolean header) {
 		CodeGenerator gen = delegate.getGenerator();
-		return new BaseVisitorFile(delegate, gen.getBaseVisitorFileName());
+		return new BaseVisitorFile(delegate, gen.getBaseVisitorFileName(header));
 	}
 
 	public ParserFile parserFile(String fileName) {
@@ -425,7 +400,7 @@ public class OutputModelController {
 	public List<SrcOp> wildcard(GrammarAST ast, GrammarAST labelAST) {
 		List<SrcOp> ops = delegate.wildcard(ast, labelAST);
 		for (CodeGeneratorExtension ext : extensions) {
-			ops = ext.set(ops);
+			ops = ext.wildcard(ops);
 		}
 		return ops;
 	}

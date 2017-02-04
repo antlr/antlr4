@@ -1,32 +1,9 @@
 /*
- * [The "BSD license"]
- *  Copyright (c) 2012 Terence Parr
- *  Copyright (c) 2012 Sam Harwell
- *  All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions
- *  are met:
- *
- *  1. Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  2. Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  3. The name of the author may not be used to endorse or promote products
- *     derived from this software without specific prior written permission.
- *
- *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- *  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- *  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
  */
+
 package org.antlr.v4.tool;
 
 import org.antlr.v4.Tool;
@@ -102,7 +79,10 @@ public class BuildDependencyGenerator {
         List<File> files = new ArrayList<File>();
 
         // add generated recognizer; e.g., TParser.java
-        files.add(getOutputFile(generator.getRecognizerFileName()));
+        if (generator.getTarget().needsHeader()) {
+          files.add(getOutputFile(generator.getRecognizerFileName(true)));
+        }
+        files.add(getOutputFile(generator.getRecognizerFileName(false)));
         // add output vocab file; e.g., T.tokens. This is always generated to
         // the base output directory, which will be just . if there is no -o option
         //
@@ -134,16 +114,30 @@ public class BuildDependencyGenerator {
 
         if ( g.tool.gen_listener ) {
           // add generated listener; e.g., TListener.java
-          files.add(getOutputFile(generator.getListenerFileName()));
+          if (generator.getTarget().needsHeader()) {
+            files.add(getOutputFile(generator.getListenerFileName(true)));
+          }
+          files.add(getOutputFile(generator.getListenerFileName(false)));
+
           // add generated base listener; e.g., TBaseListener.java
-          files.add(getOutputFile(generator.getBaseListenerFileName()));
+          if (generator.getTarget().needsHeader()) {
+            files.add(getOutputFile(generator.getBaseListenerFileName(true)));
+          }
+          files.add(getOutputFile(generator.getBaseListenerFileName(false)));
         }
 
         if ( g.tool.gen_visitor ) {
           // add generated visitor; e.g., TVisitor.java
-          files.add(getOutputFile(generator.getVisitorFileName()));
+          if (generator.getTarget().needsHeader()) {
+            files.add(getOutputFile(generator.getVisitorFileName(true)));
+          }
+          files.add(getOutputFile(generator.getVisitorFileName(false)));
+
           // add generated base visitor; e.g., TBaseVisitor.java
-          files.add(getOutputFile(generator.getBaseVisitorFileName()));
+          if (generator.getTarget().needsHeader()) {
+            files.add(getOutputFile(generator.getBaseVisitorFileName(true)));
+          }
+          files.add(getOutputFile(generator.getBaseVisitorFileName(false)));
         }
 
 

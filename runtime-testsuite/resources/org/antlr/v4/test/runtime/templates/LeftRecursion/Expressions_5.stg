@@ -1,9 +1,0 @@
-import "Expressions.stg"
-
-Input() ::= "a.this"
-
-Output() ::= <<
-(s (e (e a) . this) \<EOF>)<\n>
->>
-
-Errors() ::= ""

@@ -1,31 +1,7 @@
 /*
- * [The "BSD license"]
- *  Copyright (c) 2012 Terence Parr
- *  Copyright (c) 2012 Sam Harwell
- *  All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions
- *  are met:
- *
- *  1. Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  2. Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  3. The name of the author may not be used to endorse or promote products
- *     derived from this software without specific prior written permission.
- *
- *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- *  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- *  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
  */
 
 package org.antlr.v4.runtime;
@@ -113,6 +89,14 @@ public class BufferedTokenStream implements TokenStream {
 		// no resources to release
 	}
 
+	/**
+	 * This method resets the token stream back to the first token in the
+	 * buffer. It is equivalent to calling {@link #seek}{@code (0)}.
+	 *
+	 * @see #setTokenSource(TokenSource)
+	 * @deprecated Use {@code seek(0)} instead.
+	 */
+	@Deprecated
     public void reset() {
         seek(0);
     }
@@ -276,6 +260,7 @@ public class BufferedTokenStream implements TokenStream {
         this.tokenSource = tokenSource;
         tokens.clear();
         p = -1;
+        fetchedEOF = false;
     }
 
     public List<Token> getTokens() { return tokens; }
@@ -396,7 +381,7 @@ public class BufferedTokenStream implements TokenStream {
 
 	/** Collect all hidden tokens (any off-default channel) to the right of
 	 *  the current token up until we see a token on DEFAULT_TOKEN_CHANNEL
-	 *  of EOF.
+	 *  or EOF.
 	 */
 	public List<Token> getHiddenTokensToRight(int tokenIndex) {
 		return getHiddenTokensToRight(tokenIndex, -1);
@@ -456,18 +441,15 @@ public class BufferedTokenStream implements TokenStream {
 
 	@Override
 	public String getText() {
-        lazyInit();
-		fill();
 		return getText(Interval.of(0,size()-1));
 	}
 
-
-    @Override
-    public String getText(Interval interval) {
+	@Override
+	public String getText(Interval interval) {
 		int start = interval.a;
 		int stop = interval.b;
-        if ( start<0 || stop<0 ) return "";
-        lazyInit();
+		if ( start<0 || stop<0 ) return "";
+		fill();
         if ( stop>=tokens.size() ) stop = tokens.size()-1;
 
 		StringBuilder buf = new StringBuilder();

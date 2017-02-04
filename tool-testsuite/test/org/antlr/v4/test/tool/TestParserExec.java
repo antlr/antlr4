@@ -1,36 +1,12 @@
 /*
- * [The "BSD license"]
- *  Copyright (c) 2012 Terence Parr
- *  Copyright (c) 2012 Sam Harwell
- *  All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions
- *  are met:
- *
- *  1. Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  2. Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  3. The name of the author may not be used to endorse or promote products
- *     derived from this software without specific prior written permission.
- *
- *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- *  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- *  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
  */
 
 package org.antlr.v4.test.tool;
 
-import org.antlr.v4.test.runtime.java.BaseTest;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -69,8 +45,12 @@ import static org.junit.Assert.assertTrue;
  *  Nongreedy loops match as much input as possible while still allowing
  *  the remaining input to match.
  */
-public class TestParserExec extends BaseTest {
-
+public class TestParserExec extends BaseJavaToolTest {
+	@Before
+	@Override
+	public void testSetUp() throws Exception {
+		super.testSetUp();
+	}
 
 	/**
 	 * This is a regression test for antlr/antlr4#118.
@@ -86,7 +66,8 @@ public class TestParserExec extends BaseTest {
 			"ID : 'a'..'z'+ ;\n"+
 			"INT : '0'..'9'+ ;\n"+
 			"WS : (' '|'\\t'|'\\n')+ -> skip ;\n";
-		String result = execParser("T.g4", grammar, "TParser", "TLexer", "s",
+		String result = execParser("T.g4", grammar, "TParser", "TLexer",
+		                           null, null, "s",
 								   "abc 34", true);
 		String expecting =
 			"Decision 0:\n" +
@@ -105,8 +86,8 @@ public class TestParserExec extends BaseTest {
 	// TODO: port to test framework (can we simplify the Psl grammar?)
 	@Test public void testFailedPredicateExceptionState() throws Exception {
 		String grammar = load("Psl.g4", "UTF-8");
-		String found = execParser("Psl.g4", grammar, "PslParser", "PslLexer", "floating_constant", " . 234", false);
-		assertEquals("", found);
+		String found = execParser("Psl.g4", grammar, "PslParser", "PslLexer", null, null, "floating_constant", " . 234", false);
+		assertEquals(null, found);
 		assertEquals("line 1:6 rule floating_constant DEC:A floating-point constant cannot have internal white space\n", stderrDuringParse);
 	}
 
@@ -145,8 +126,9 @@ public class TestParserExec extends BaseTest {
 														"ModeTagsLexer");
 		assertTrue(success);
 
-		String found = execParser("ModeTagsParser.g4", parserGrammar, "ModeTagsParser", "ModeTagsLexer", "file", "", false);
-		assertEquals("", found);
+		String found = execParser("ModeTagsParser.g4", parserGrammar, "ModeTagsParser", "ModeTagsLexer",
+		                          null, null, "file", "", false);
+		assertEquals(null, found);
 		assertNull(stderrDuringParse);
 	}
 
@@ -173,7 +155,8 @@ public class TestParserExec extends BaseTest {
 			"WS : [ \\t\\n\\r]+ -> skip ; // toss out all whitespace\n";
 
 		String input = "2 9 10 3 1 2 3";
-		String found = execParser("Data.g4", grammar, "DataParser", "DataLexer", "file", input, false);
+		String found = execParser("Data.g4", grammar, "DataParser", "DataLexer",
+		                          null, null, "file", input, false);
 		assertEquals("6\n", found);
 		assertNull(stderrDuringParse);
 	}

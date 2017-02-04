@@ -1,0 +1,250 @@
+writeln(s) ::= <<print(<s>)>>
+write(s) ::= <<print(<s>,end='')>>
+writeList(s) ::= <<print(<s: {v | str(<v>)}; separator="+">)>>
+
+False() ::= "False"
+
+True() ::= "True"
+
+Not(v) ::= "not <v>"
+
+Assert(s) ::= ""
+
+Cast(t,v) ::= "<v>"
+
+Append(a,b) ::= "<a> + str(<b>)"
+
+Concat(a,b) ::= "<a><b>"
+
+DeclareLocal(s,v) ::= "<s> = <v>"
+
+AssertIsList(v) ::= "assert isinstance(v, (list, tuple))"
+
+AssignLocal(s,v) ::= "<s> = <v>"
+
+InitIntMember(n,v) ::= <%<n> = <v>%>
+
+InitBooleanMember(n,v) ::= <%<n> = <v>%>
+
+GetMember(n) ::= <%self.<n>%>
+
+SetMember(n,v) ::= <%self.<n> = <v>%>
+
+AddMember(n,v) ::= <%self.<n> += <v>%>
+
+PlusMember(v,n) ::= <%<v> + str(self.<n>)%>
+
+MemberEquals(n,v) ::= <%self.<n> == <v>%>
+
+ModMemberEquals(n,m,v) ::= <%self.<n> % <m> == <v>%>
+
+ModMemberNotEquals(n,m,v) ::= <%self.<n> % <m> != <v>%>
+
+DumpDFA() ::= "self.dumpDFA()"
+
+Pass() ::= "pass"
+
+StringList() ::= ""
+
+BuildParseTrees() ::= "self._buildParseTrees = True"
+
+BailErrorStrategy() ::= <%self._errHandler = BailErrorStrategy()%>
+
+ToStringTree(s) ::= <%<s>.toStringTree(recog=self)%>
+
+Column() ::= "self.column"
+
+Text() ::= "self.text"
+
+ValEquals(a,b) ::= <%<a>==<b>%>
+
+TextEquals(a) ::= <%self.text=="<a>"%>
+
+PlusText(a) ::= <%"<a>" + self.text%>
+
+InputText() ::= "self._input.getText()"
+
+LTEquals(i, v) ::= <%self._input.LT(<i>).text==<v>%>
+
+LANotEquals(i, v) ::= <%self._input.LA(<i>)!=<v>%>
+
+TokenStartColumnEquals(i) ::= <%self._tokenStartColumn==<i>%>
+
+ImportListener(X) ::= <<
+@parser::header {
+class MockListener:
+    pass
+}
+>>
+
+GetExpectedTokenNames() ::= "self.getExpectedTokens().toString(self.literalNames, self.symbolicNames)"
+
+RuleInvocationStack() ::= "str_list(self.getRuleInvocationStack())"
+
+LL_EXACT_AMBIG_DETECTION() ::= <<self._interp.predictionMode =  PredictionMode.LL_EXACT_AMBIG_DETECTION>>
+
+ParserToken(parser, token) ::= <%<parser>.<token>%>
+
+Production(p) ::= <%<p>%>
+
+Result(r) ::= <%<r>%>
+
+ParserPropertyMember() ::= <<
+@members {
+def Property(self):
+    return True
+
+}
+>>
+
+ParserPropertyCall(p, call) ::= "<p>.<call>"
+
+PositionAdjustingLexer() ::= <<
+
+def resetAcceptPosition(self, index, line, column):
+	self._input.seek(index)
+	self.line = line
+	self.column = column
+	self._interp.consume(self._input)
+
+def nextToken(self):
+	if self._interp.__dict__.get("resetAcceptPosition", None) is None:
+		self._interp.__dict__["resetAcceptPosition"] = self.resetAcceptPosition
+	return super(type(self),self).nextToken()
+
+def emit(self):
+	if self._type==PositionAdjustingLexer.TOKENS:
+		self.handleAcceptPositionForKeyword("tokens")
+	elif self._type==PositionAdjustingLexer.LABEL:
+		self.handleAcceptPositionForIdentifier()
+	return super(type(self),self).emit()
+
+def handleAcceptPositionForIdentifier(self):
+	tokenText = self.text
+	identifierLength = 0
+	while identifierLength \< len(tokenText) and self.isIdentifierChar(tokenText[identifierLength]):
+		identifierLength += 1
+
+	if self._input.index > self._tokenStartCharIndex + identifierLength:
+		offset = identifierLength - 1
+		self._interp.resetAcceptPosition(self._tokenStartCharIndex + offset,
+				self._tokenStartLine, self._tokenStartColumn + offset)
+		return True
+	else:
+		return False
+
+
+def handleAcceptPositionForKeyword(self, keyword):
+	if self._input.index > self._tokenStartCharIndex + len(keyword):
+		offset = len(keyword) - 1
+		self._interp.resetAcceptPosition(self._tokenStartCharIndex + offset,
+			self._tokenStartLine, self._tokenStartColumn + offset)
+		return True
+	else:
+		return False
+
+@staticmethod
+def isIdentifierChar(c):
+	return c.isalnum() or c == '_'
+
+>>
+
+BasicListener(X) ::= <<
+@parser::members {
+class LeafListener(MockListener):
+    def visitTerminal(self, node):
+        print(node.symbol.text)
+}
+>>
+
+WalkListener(s) ::= <<
+if __name__ is not None and "." in __name__:
+    from .TListener import TListener
+else:
+    from TListener import TListener
+TParser.LeafListener.__bases__ = (TListener,)
+walker = ParseTreeWalker()
+walker.walk(TParser.LeafListener(), <s>)
+>>
+
+TreeNodeWithAltNumField(X) ::= <<
+@parser::members {
+class MyRuleNode(ParserRuleContext):
+    def __init__(self, parent:ParserRuleContext = None, invokingStateNumber:int = None ):
+        super(<X>Parser.MyRuleNode, self).__init__(parent, invokingStateNumber)
+        self.altNum = 0;
+    def getAltNumber(self):
+        return self.altNum
+    def setAltNumber(self, altNum):
+        self.altNum = altNum
+}
+>>
+
+TokenGetterListener(X) ::= <<
+@parser::members {
+class LeafListener(MockListener):
+    def exitA(self, ctx):
+        if ctx.getChildCount()==2:
+            print(ctx.INT(0).symbol.text + ' ' + ctx.INT(1).symbol.text + ' ' + str_list(ctx.INT()))
+        else:
+            print(str(ctx.ID().symbol))
+}
+>>
+
+RuleGetterListener(X) ::= <<
+@parser::members {
+class LeafListener(MockListener):
+    def exitA(self, ctx):
+        if ctx.getChildCount()==2:
+            print(ctx.b(0).start.text + ' ' + ctx.b(1).start.text + ' ' + ctx.b()[0].start.text)
+        else:
+            print(ctx.b(0).start.text)
+}
+>>
+
+
+LRListener(X) ::= <<
+@parser::members {
+class LeafListener(MockListener):
+    def exitE(self, ctx):
+        if ctx.getChildCount()==3:
+            print(ctx.e(0).start.text + ' ' + ctx.e(1).start.text + ' ' + ctx.e()[0].start.text)
+        else:
+            print(ctx.INT().symbol.text)
+}
+>>
+
+LRWithLabelsListener(X) ::= <<
+@parser::members {
+class LeafListener(MockListener):
+    def exitCall(self, ctx):
+        print(ctx.e().start.text + ' ' + str(ctx.eList()))
+    def exitInt(self, ctx):
+        print(ctx.INT().symbol.text)
+}
+>>
+
+DeclareContextListGettersFunction() ::= <<
+def foo():
+    s = SContext()
+    a = s.a()
+    b = s.b()
+>>
+
+Declare_foo() ::= <<def foo(self):
+	print('foo')
+>>
+
+Invoke_foo() ::= "self.foo()"
+
+Declare_pred() ::= <<def pred(self, v):
+	print('eval=' + str(v).lower())
+	return v
+
+>>
+
+Invoke_pred(v) ::= <<self.pred(<v>)>>
+ParserTokenType(t) ::= "Parser.<t>"
+ContextRuleFunction(ctx, rule) ::= "<ctx>.<rule>"
+StringType() ::= "String"
+ContextMember(ctx, subctx, member) ::= "<ctx>.<subctx>.<member>"

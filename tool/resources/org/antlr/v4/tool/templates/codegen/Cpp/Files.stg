@@ -1,0 +1,344 @@
+/*
+ * [The "BSD license"]
+ *  Copyright (c) 2016, Mike Lischke
+ *  All rights reserved.
+ *
+ *  Redistribution and use in source and binary forms, with or without
+ *  modification, are permitted provided that the following conditions
+ *  are met:
+ *
+ *  1. Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *  2. Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer in the
+ *     documentation and/or other materials provided with the distribution.
+ *  3. The name of the author may not be used to endorse or promote products
+ *     derived from this software without specific prior written permission.
+ *
+ *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ *  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ *  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+codeFileExtension() ::= ".cpp"
+headerFileExtension() ::= ".h"
+
+fileHeader(grammarFileName, ANTLRVersion, header) ::= <<
+<header>
+
+// Generated from <grammarFileName> by ANTLR <ANTLRVersion>
+>>
+
+LexerFileHeader(file, lexer, namedActions) ::= <<
+<fileHeader(file.grammarFileName, file.ANTLRVersion, namedActions.header)>
+
+#pragma once
+
+<namedActions.preinclude>
+
+#include "antlr4-runtime.h"
+
+<namedActions.postinclude>
+
+<if(file.genPackage)>namespace <file.genPackage> {<endif>
+
+<lexer>
+
+<if (file.genPackage)>
+}  // namespace <file.genPackage>
+<endif>
+>>
+
+LexerFile(file, lexer, namedActions) ::= <<
+<fileHeader(file.grammarFileName, file.ANTLRVersion, namedActions.header)>
+
+<namedActions.preinclude>
+
+#include "<file.lexer.name>.h"
+
+<namedActions.postinclude>
+
+using namespace antlr4;
+
+<if (file.genPackage)>using namespace <file.genPackage>;<endif>
+
+<lexer>
+
+>>
+
+ParserFileHeader(file, parser, namedActions, contextSuperClass) ::= <<
+<fileHeader(file.grammarFileName, file.ANTLRVersion, namedActions.header)>
+
+#pragma once
+
+<namedActions.preinclude>
+
+#include "antlr4-runtime.h"
+
+<namedActions.postinclude>
+
+<if (file.genPackage)>namespace <file.genPackage> {<endif>
+
+<parser>
+
+<if (file.genPackage)>
+}  // namespace <file.genPackage>
+<endif>
+>>
+
+ParserFile(file, parser, namedActions, contextSuperClass) ::= <<
+<fileHeader(file.grammarFileName, file.ANTLRVersion, namedActions.header)>
+
+<namedActions.preinclude>
+
+<if (file.genListener)>#include "<file.grammarName>Listener.h"<endif>
+<if (file.genVisitor)>#include "<file.grammarName>Visitor.h"<endif>
+
+#include "<file.parser.name>.h"
+
+<namedActions.postinclude>
+
+using namespace antlrcpp;
+<if (file.genPackage)>using namespace <file.genPackage>;<endif>
+<parser>
+
+>>
+
+BaseListenerFileHeader(file, header, namedActions) ::= <<
+<fileHeader(file.grammarFileName, file.ANTLRVersion, header)>
+
+#pragma once
+
+<namedActions.baselistenerpreinclude>
+
+#include "antlr4-runtime.h"
+#include "<file.grammarName>Listener.h"
+
+<namedActions.baselistenerpostinclude>
+
+<if(file.genPackage)>
+namespace <file.genPackage> {
+<endif>
+
+/**
+ * This class provides an empty implementation of <file.grammarName>Listener,
+ * which can be extended to create a listener which only needs to handle a subset
+ * of the available methods.
+ */
+class <file.exportMacro> <file.grammarName>BaseListener : public <file.grammarName>Listener {
+public:
+<namedActions.baselistenerdeclarations>
+
+<file.listenerNames: {lname |
+  virtual void enter<lname; format="cap">(<file.parserName>::<lname; format = "cap">Context * /*ctx*/) override { \}
+  virtual void exit<lname; format="cap">(<file.parserName>::<lname; format = "cap">Context * /*ctx*/) override { \}
+}; separator="\n">
+
+  virtual void enterEveryRule(antlr4::ParserRuleContext * /*ctx*/) override { }
+  virtual void exitEveryRule(antlr4::ParserRuleContext * /*ctx*/) override { }
+  virtual void visitTerminal(antlr4::tree::TerminalNode * /*node*/) override { }
+  virtual void visitErrorNode(antlr4::tree::ErrorNode * /*node*/) override { }
+  
+<if (namedActions.baselistenermembers)>
+private:  
+<namedActions.baselistenermembers>
+<endif>
+};
+
+<if (file.genPackage)>
+}  // namespace <file.genPackage>
+<endif>
+>>
+
+BaseListenerFile(file, header, namedActions) ::= <<
+<fileHeader(file.grammarFileName, file.ANTLRVersion, header)>
+
+<namedActions.baselistenerpreinclude>
+
+#include "<file.grammarName>BaseListener.h"
+
+<namedActions.baselistenerpostinclude>
+
+<if(file.genPackage)>
+using namespace <file.genPackage>;
+<endif>
+
+<namedActions.baselistenerdefinitions>
+>>
+
+ListenerFileHeader(file, header, namedActions) ::= <<
+<fileHeader(file.grammarFileName, file.ANTLRVersion, header)>
+
+#pragma once
+
+<namedActions.listenerpreinclude>
+
+#include "antlr4-runtime.h"
+#include "<file.parserName>.h"
+
+<namedActions.listenerpostinclude>
+
+<if(file.genPackage)>
+namespace <file.genPackage> {
+<endif>
+
+/**
+ * This interface defines an abstract listener for a parse tree produced by <file.parserName>.
+ */
+class <file.exportMacro> <file.grammarName>Listener : public antlr4::tree::ParseTreeListener {
+public:
+<namedActions.listenerdeclarations>
+
+<file.listenerNames: {lname |
+  virtual void enter<lname; format = "cap">(<file.parserName>::<lname; format ="cap">Context *ctx) = 0;
+  virtual void exit<lname; format = "cap">(<file.parserName>::<lname; format="cap">Context *ctx) = 0;
+}; separator = "\n">
+
+<if (namedActions.listenermembers)>
+private:  
+<namedActions.listenermembers>
+<endif>
+};
+
+<if(file.genPackage)>
+}  // namespace <file.genPackage>
+<endif>
+>>
+
+ListenerFile(file, header, namedActions) ::= <<
+<fileHeader(file.grammarFileName, file.ANTLRVersion, header)>
+
+<namedActions.listenerpreinclude>
+
+#include "<file.grammarName>Listener.h"
+
+<namedActions.listenerpostinclude>
+
+<if(file.genPackage)>
+using namespace <file.genPackage>;
+<endif>
+
+<namedActions.listenerdefinitions>
+>>
+
+BaseVisitorFileHeader(file, header, namedActions) ::= <<
+<fileHeader(file.grammarFileName, file.ANTLRVersion, header)>
+
+#pragma once
+
+<namedActions.basevisitorpreinclude>
+
+#include "antlr4-runtime.h"
+#include "<file.grammarName>Visitor.h"
+
+<namedActions.basevisitorpostinclude>
+
+<if(file.genPackage)>
+namespace <file.genPackage> {
+<endif>
+
+/**
+ * This class provides an empty implementation of <file.grammarName>Visitor, which can be
+ * extended to create a visitor which only needs to handle a subset of the available methods.
+ */
+class <file.exportMacro> <file.grammarName>BaseVisitor : public <file.grammarName>Visitor {
+public:
+<namedActions.basevisitordeclarations>
+
+<file.visitorNames: { lname |
+  virtual antlrcpp::Any visit<lname; format = "cap">(<file.parserName>::<lname; format = "cap">Context *ctx) override {
+    return visitChildren(ctx);
+  \}
+}; separator="\n">
+
+<if (namedActions.basevisitormembers)>
+private:  
+<namedActions.basevisitormembers>
+<endif>
+};
+
+<if(file.genPackage)>
+}  // namespace <file.genPackage>
+<endif>
+>>
+
+BaseVisitorFile(file, header, namedActions) ::= <<
+<fileHeader(file.grammarFileName, file.ANTLRVersion, header)>
+
+<namedActions.basevisitorpreinclude>
+
+#include "<file.grammarName>BaseVisitor.h"
+
+<namedActions.basevisitorpostinclude>
+
+<if(file.genPackage)>
+using namespace <file.genPackage>;
+<endif>
+
+<namedActions.basevisitordefinitions>
+
+>>
+
+VisitorFileHeader(file, header, namedActions) ::= <<
+<fileHeader(file.grammarFileName, file.ANTLRVersion, header)>
+
+#pragma once
+
+<namedActions.visitorpreinclude>
+
+#include "antlr4-runtime.h"
+#include "<file.parserName>.h"
+
+<namedActions.visitorpostinclude>
+
+<if(file.genPackage)>namespace <file.genPackage> {<endif>
+
+/**
+ * This class defines an abstract visitor for a parse tree
+ * produced by <file.parserName>.
+ */
+class <file.exportMacro> <file.grammarName>Visitor : public antlr4::tree::AbstractParseTreeVisitor {
+public:
+  <namedActions.visitordeclarations>
+  
+  /**
+   * Visit parse trees produced by <file.parserName>.
+   */
+  <file.visitorNames: {lname |
+  virtual antlrcpp::Any visit<lname; format = "cap">(<file.parserName>::<lname; format = "cap">Context *context) = 0;
+  }; separator="\n">
+
+<if (namedActions.visitormembers)>
+private:  
+<namedActions.visitormembers>
+<endif>
+};
+
+<if(file.genPackage)>
+}  // namespace <file.genPackage>
+<endif>
+>>
+
+VisitorFile(file, header, namedActions) ::= <<
+<fileHeader(file.grammarFileName, file.ANTLRVersion, header)>
+
+<namedActions.visitorpreinclude>
+
+#include "<file.grammarName>Visitor.h"
+
+<namedActions.visitorpostinclude>
+
+<if(file.genPackage)>
+using namespace <file.genPackage>;
+<endif>
+
+<namedActions.visitordefinitions>
+
+>>

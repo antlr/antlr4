@@ -1,0 +1,272 @@
+writeln(s) ::= "std::cout \<\< <s> \<\< std::endl;"
+write(s) ::= "std::cout \<\< <s>;"
+writeList(s) ::= << std::cout \<\< <s; separator=" \<\< "> \<\< std::endl;>>
+
+False() ::= "false"
+True() ::= "true"
+Not(v) ::= "!<v>"
+Assert(s) ::= ""
+Cast(t,v) ::= "dynamic_cast\<<t> *>(<v>)" // Should actually use a more specific name. We may have to use other casts as well.
+Append(a,b) ::= "<a> + <b>->toString()"
+Concat(a,b) ::= "<a><b>"
+
+DeclareLocal(s,v) ::= "<s> = <v>"
+
+AssertIsList(v) ::= "assert(<v>.size() >= 0);" // Use a method that exists only on a list (vector actually).
+AssignLocal(s,v) ::= "<s> = <v>;"
+
+InitIntMember(n,v) ::= "int <n> = <v>;"
+InitBooleanMember(n,v) ::= "bool <n> = <v>;"
+
+GetMember(n) ::= "<n>"
+SetMember(n,v) ::= "<n> = <v>;"
+AddMember(n,v) ::= "<n> += <v>;"
+PlusMember(v,n) ::= "<v> + <n>"
+MemberEquals(n,v) ::= "<n> == <v>"
+ModMemberEquals(n,m,v) ::= "<n> % <m> == <v>"
+ModMemberNotEquals(n,m,v) ::= "<n> % <m> != <v>"
+
+DumpDFA() ::= "dumpDFA();"
+Pass() ::= "/* do nothing */"
+
+StringList() ::= "std::vector\<std::string>"
+BuildParseTrees() ::= "setBuildParseTree(true);"
+BailErrorStrategy() ::= "_errHandler = std::make_shared\<BailErrorStrategy>();"
+
+ToStringTree(s) ::= "<s>->toStringTree(this)"
+Column() ::= "getCharPositionInLine()"
+Text() ::= "getText()"
+ValEquals(a,b) ::= "<a> == <b>"
+TextEquals(a) ::= "getText() == \"<a>\""
+PlusText(a) ::="\"<a>\" + getText()"
+InputText() ::= "_input->getText()"
+LTEquals(i, v) ::= "_input->LT(<i>)->getText() == <v>"
+LANotEquals(i, v) ::= "_input->LA(<i>) != <v>"
+TokenStartColumnEquals(i) ::= "tokenStartCharPositionInLine == <i>"
+
+ImportListener(X) ::= ""
+
+GetExpectedTokenNames() ::= "getExpectedTokens().toString(_tokenNames)"
+
+RuleInvocationStack() ::= "Arrays::listToString(getRuleInvocationStack(), \", \")"
+
+LL_EXACT_AMBIG_DETECTION() ::= <<getInterpreter\<atn::ParserATNSimulator>()->setPredictionMode(atn::PredictionMode::LL_EXACT_AMBIG_DETECTION);>>
+
+ParserToken(parser, token) ::= <%<parser>::<token>%>
+
+Production(p) ::= <%<p>%>
+
+Result(r) ::= <%<r>%>
+
+ParserPropertyMember() ::= <<
+@members {
+bool Property() {
+	return true;
+}
+}
+>>
+
+ParserPropertyCall(p, call) ::= "<call>"
+
+PositionAdjustingLexer() ::= <<
+protected:
+  class PositionAdjustingLexerATNSimulator : public antlr4::atn::LexerATNSimulator {
+  public:
+    PositionAdjustingLexerATNSimulator(antlr4::Lexer *recog, const antlr4::atn::ATN &atn, std::vector\<antlr4::dfa::DFA> &decisionToDFA,
+                                       antlr4::atn::PredictionContextCache &sharedContextCache)
+      : antlr4::atn::LexerATNSimulator(recog, atn, decisionToDFA, sharedContextCache) {
+    }
+
+    void resetAcceptPosition(antlr4::CharStream *input, int index, int line, int charPositionInLine) {
+      input->seek(index);
+      _line = line;
+      _charPositionInLine = charPositionInLine;
+      consume(input);
+    }
+
+  };
+
+public:
+  virtual std::unique_ptr\<antlr4::Token> nextToken() override {
+    if (dynamic_cast\<PositionAdjustingLexerATNSimulator *>(_interpreter) == nullptr) {
+      delete _interpreter;
+      _interpreter = new PositionAdjustingLexerATNSimulator(this, _atn, _decisionToDFA, _sharedContextCache);
+    }
+
+    return antlr4::Lexer::nextToken();
+  }
+
+  virtual antlr4::Token* emit() override {
+    switch (type) {
+      case TOKENS:
+        handleAcceptPositionForKeyword("tokens");
+        break;
+
+      case LABEL:
+        handleAcceptPositionForIdentifier();
+        break;
+
+      default:
+        break;
+    }
+    return antlr4::Lexer::emit();
+  }
+
+private:
+  bool handleAcceptPositionForIdentifier() {
+    std::string tokenText = getText();
+    int identifierLength = 0;
+    while (identifierLength \< tokenText.length() && isIdentifierChar(tokenText[identifierLength])) {
+      identifierLength++;
+    }
+
+    if (getInputStream()->index() > tokenStartCharIndex + identifierLength) {
+      int offset = identifierLength - 1;
+      getInterpreter\<PositionAdjustingLexerATNSimulator>()->resetAcceptPosition(getInputStream(),
+        tokenStartCharIndex + offset, tokenStartLine, tokenStartCharPositionInLine + offset);
+      return true;
+    }
+
+    return false;
+  }
+
+  bool handleAcceptPositionForKeyword(const std::string &keyword) {
+    if (getInputStream()->index() > tokenStartCharIndex + keyword.length()) {
+      long offset = keyword.size() - 1;
+      getInterpreter\<PositionAdjustingLexerATNSimulator>()->resetAcceptPosition(getInputStream(),
+        tokenStartCharIndex + offset, tokenStartLine, tokenStartCharPositionInLine + offset);
+      return true;
+    }
+
+    return false;
+  }
+
+  static bool isIdentifierChar(char c) {
+    return std::isalnum(c) || c == '_';
+  }
+
+public:
+>>
+
+BasicListener(X) ::= <<
+@parser::definitions {
+#include "TBaseListener.h"
+class LeafListener : public TBaseListener {
+public:
+  virtual void visitTerminal(tree::TerminalNode *node) override {
+  std::cout \<\< node->getSymbol()->getText() \<\< std::endl;
+  }
+};
+}
+>>
+
+WalkListener(s) ::= <<
+LeafListener listener;
+tree::ParseTreeWalker::DEFAULT.walk(&listener, <s>);
+>>
+
+TreeNodeWithAltNumField(X) ::= <<
+@parser::members {
+class MyRuleNode : public antlr4::ParserRuleContext {
+public:
+  size_t altNum;
+	MyRuleNode(antlr4::ParserRuleContext *parent, int invokingStateNumber)
+		: antlr4::ParserRuleContext(parent, invokingStateNumber) {
+	}
+	virtual size_t getAltNumber() const override { return altNum; }
+	virtual void setAltNumber(size_t altNum) override { this->altNum = altNum; }
+};
+}
+>>
+
+TokenGetterListener(X) ::= <<
+@parser::definitions {
+#include "TBaseListener.h"
+class LeafListener : public TBaseListener {
+public:
+  virtual void exitA(TParser::AContext *ctx) override {
+		if (ctx->children.size() == 2)
+			std::cout \<\< ctx->INT(0)->getSymbol()->getText() \<\< " " \<\< ctx->INT(1)->getSymbol()->getText()
+        \<\< " " \<\< Arrays::toString(ctx->INT()) \<\< std::endl;
+		else
+			std::cout \<\< ctx->ID()->getSymbol()->toString() \<\< std::endl;
+	}
+};
+}
+>>
+
+RuleGetterListener(X) ::= <<
+@parser::definitions {
+#include "TBaseListener.h"
+class LeafListener : public TBaseListener {
+public:
+  virtual void exitA(TParser::AContext *ctx) override {
+    if (ctx->children.size() == 2) {
+      std::cout \<\< ctx->b(0)->start->getText() \<\< " " \<\< ctx->b(1)->start->getText() \<\< " " \<\< ctx->b()[0]->start->getText() \<\< std::endl;
+    } else {
+      std::cout \<\< ctx->b(0)->start->getText() \<\< std::endl;
+    }
+  }
+};
+}
+>>
+
+
+LRListener(X) ::= <<
+@parser::definitions {
+#include "TBaseListener.h"
+class LeafListener : public TBaseListener {
+public:
+  virtual void exitE(TParser::EContext *ctx) override {
+    if (ctx->children.size() == 3) {
+      std::cout \<\< ctx->e(0)->start->getText() \<\< " " \<\< ctx->e(1)->start->getText() \<\< " " \<\< ctx->e()[0]->start->getText() \<\< std::endl;
+    } else {
+      std::cout \<\< ctx->INT()->getSymbol()->getText() \<\< std::endl;
+    }
+  }
+};
+}
+>>
+
+LRWithLabelsListener(X) ::= <<
+@parser::definitions {
+#include "TBaseListener.h"
+class LeafListener : public TBaseListener {
+public:
+  virtual void exitCall(TParser::CallContext *ctx) override {
+    std::cout \<\< ctx->e()->start->getText() \<\< " " \<\< ctx->eList()->toString() \<\< std::endl;
+	}
+	virtual void exitInt(TParser::IntContext *ctx) override {
+		std::cout \<\<  ctx->INT()->getSymbol()->getText() \<\< std::endl;
+	}
+};
+}
+>>
+
+DeclareContextListGettersFunction() ::= <<
+void foo() {
+  SContext *s;
+  std::vector\<AContext *> a = s->a();
+  std::vector\<BContext *> b = s->b();
+}
+>>
+
+Declare_foo() ::= <<void foo() {
+	std::cout \<\< "foo";
+}
+>>
+
+Invoke_foo() ::= "foo();"
+
+Declare_pred() ::= <<
+bool pred(bool v) {
+	std::cout \<\< "eval=" \<\< std::boolalpha \<\< v \<\< std::endl;
+	return v;
+}
+>>
+
+Invoke_pred(v) ::= <<pred(<v>)>>
+
+ContextRuleFunction(ctx, rule) ::= "<ctx>-><rule>"
+StringType() ::= "std::string"
+ContextMember(ctx, subctx, member) ::= "<ctx>-><subctx>-><member>"

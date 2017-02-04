@@ -1,19 +1,71 @@
+dist: trusty
 sudo: true
+
 language: java
-script:
-  - mvn install
-jdk:
-  - openjdk6
-  - oraclejdk7
-  - oraclejdk8
+
+matrix:
+  include:
+    - os: linux
+      compiler: clang
+      jdk: oraclejdk7
+      env:
+        - TARGET=cpp
+        - CXX=g++-5
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-precise-3.7
+          packages:
+            - g++-5
+            - uuid-dev
+            - clang-3.7
+    - os: osx
+      compiler: clang
+      osx_image: xcode8.1
+      env: TARGET=cpp
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-precise-3.7
+          packages:
+            - g++-5
+            - uuid-dev
+            - clang-3.7
+    - os: osx
+      compiler: clang
+      osx_image: xcode8.1
+      env: TARGET=swift
+    - os: linux
+      jdk: oraclejdk7
+      env: TARGET=java
+    - os: linux
+      jdk: oraclejdk8
+      env: TARGET=java
+    - os: linux
+      jdk: oraclejdk7
+      env: TARGET=csharp
+    - os: linux
+      jdk: oraclejdk7
+      env: TARGET=dotnet
+    - os: linux
+      jdk: oraclejdk7
+      env: TARGET=python2
+    - os: linux
+      jdk: oraclejdk7
+      env: TARGET=python3
+    - os: linux
+      jdk: oraclejdk7
+      env: TARGET=javascript
+    - os: linux
+      jdk: oraclejdk7
+      env: TARGET=go
+
 before_install:
-  - sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
-  - sudo add-apt-repository ppa:fkrull/deadsnakes -y
-  - sudo add-apt-repository ppa:rwky/nodejs -y
-  - sudo apt-get update -qq
-  - sudo apt-get install -qq python3.5
-  - sudo apt-get install -qq nodejs
-  - echo "deb http://download.mono-project.com/repo/debian wheezy/snapshots/3.12.1 main" | sudo tee /etc/apt/sources.list.d/mono-xamarin.list
-  - sudo apt-get install -qq mono-complete
-  - python --version
-  - python3 --version
+  - ./.travis/before-install-mvn3.3.9-trusty.sh
+  - ./.travis/before-install-$TRAVIS_OS_NAME-$TARGET.sh
+
+script:
+  - cd runtime-testsuite; ../.travis/run-tests-$TARGET.sh
+

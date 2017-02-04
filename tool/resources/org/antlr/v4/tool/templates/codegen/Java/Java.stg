@@ -1,7 +1,7 @@
 /*
  * [The "BSD license"]
- *  Copyright (c) 2012 Terence Parr
- *  Copyright (c) 2012 Sam Harwell
+ *  Copyright (c) 2012-2016 Terence Parr
+ *  Copyright (c) 2012-2016 Sam Harwell
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -60,7 +60,7 @@ import java.util.ArrayList;
 <parser>
 >>
 
-ListenerFile(file, header) ::= <<
+ListenerFile(file, header, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 <if(file.genPackage)>
 package <file.genPackage>;
@@ -97,7 +97,7 @@ void exit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ct
 }
 >>
 
-BaseListenerFile(file, header) ::= <<
+BaseListenerFile(file, header, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 <if(file.genPackage)>
 package <file.genPackage>;
@@ -155,7 +155,7 @@ public class <file.grammarName>BaseListener implements <file.grammarName>Listene
 }
 >>
 
-VisitorFile(file, header) ::= <<
+VisitorFile(file, header, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 <if(file.genPackage)>
 package <file.genPackage>;
@@ -186,7 +186,7 @@ T visit<lname; format="cap">(<file.parserName>.<lname; format="cap">Context ctx)
 }
 >>
 
-BaseVisitorFile(file, header) ::= <<
+BaseVisitorFile(file, header, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 <if(file.genPackage)>
 package <file.genPackage>;
@@ -469,6 +469,7 @@ CodeBlockForAlt(currentAltCodeBlock, locals, preamble, ops) ::= <<
 
 LL1AltBlock(choice, preamble, alts, error) ::= <<
 setState(<choice.stateNumber>);
+_errHandler.sync(this);
 <if(choice.label)><labelref(choice.label)> = _input.LT(1);<endif>
 <preamble; separator="\n">
 switch (_input.LA(1)) {
@@ -482,17 +483,19 @@ default:
 
 LL1OptionalBlock(choice, alts, error) ::= <<
 setState(<choice.stateNumber>);
+_errHandler.sync(this);
 switch (_input.LA(1)) {
 <choice.altLook,alts:{look,alt| <cases(ttypes=look)>
 	<alt>
 	break;}; separator="\n">
 default:
-	<error>
+	break;
 }
 >>
 
 LL1OptionalBlockSingleAlt(choice, expr, alts, preamble, error, followExpr) ::= <<
 setState(<choice.stateNumber>);
+_errHandler.sync(this);
 <preamble; separator="\n">
 if (<expr>) {
 	<alts; separator="\n">
@@ -640,7 +643,10 @@ setState(<m.stateNumber>);
 <capture>
 if ( <if(invert)><m.varName> \<= 0 || <else>!<endif>(<expr>) ) {
 	<if(m.labels)><m.labels:{l | <labelref(l)> = (Token)}><endif>_errHandler.recoverInline(this);
-} else {
+}
+else {
+	if ( _input.LA(1)==Token.EOF ) matchedEOF = true;
+	_errHandler.reportMatch(this);
 	consume();
 }
 >>
@@ -673,10 +679,10 @@ LexerSkipCommand()  ::= "skip();"
 LexerMoreCommand()  ::= "more();"
 LexerPopModeCommand() ::= "popMode();"
 
-LexerTypeCommand(arg)      ::= "_type = <arg>;"
-LexerChannelCommand(arg)   ::= "_channel = <arg>;"
-LexerModeCommand(arg)      ::= "_mode = <arg>;"
-LexerPushModeCommand(arg)  ::= "pushMode(<arg>);"
+LexerTypeCommand(arg, grammar)      ::= "_type = <arg>;"
+LexerChannelCommand(arg, grammar)   ::= "_channel = <arg>;"
+LexerModeCommand(arg, grammar)      ::= "_mode = <arg>;"
+LexerPushModeCommand(arg, grammar)  ::= "pushMode(<arg>);"
 
 ActionText(t) ::= "<t.text>"
 ActionTemplate(t) ::= "<t.st>"

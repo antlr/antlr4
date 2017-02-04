@@ -1,16 +1,26 @@
 {
-  "buildOptions": {
-    "define": [ "DEBUG", "TRACE", "DOTNETCORE", "NET40PLUS", "NET45PLUS" ],
-    "keyFile": "../Antlr4.snk",
-    "xmlDoc": true
-  },
-  "dependencies": {
-    "NETStandard.Library": "1.6.0"
-  },
+  "version": "4.6.1-*",
   "frameworks": {
-    "netstandard1.5": {
-      "imports": "dnxcore50"
+    "netstandard1.3": {
+      "dependencies": {
+        "NETStandard.Library": "1.6.1"
+      }
     }
   },
-  "version": "4.5.3-*"
+  "dependencies": {},
+  "buildOptions": {
+    "outputName": "Antlr4.Runtime.Standard",
+    "xmlDoc": true,
+    "keyFile": "../Antlr4.snk",
+    "define": [
+      "DOTNETCORE",
+      "NET40PLUS",
+      "NET45PLUS"
+    ],
+    "nowarn": [
+      "CS1591",
+      "CS1574",
+      "CS1580"
+    ]
+  }
 }

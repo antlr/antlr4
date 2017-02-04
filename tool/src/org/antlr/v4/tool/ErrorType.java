@@ -1,31 +1,7 @@
 /*
- * [The "BSD license"]
- *  Copyright (c) 2012 Terence Parr
- *  Copyright (c) 2012 Sam Harwell
- *  All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions
- *  are met:
- *
- *  1. Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  2. Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  3. The name of the author may not be used to endorse or promote products
- *     derived from this software without specific prior written permission.
- *
- *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- *  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- *  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
  */
 package org.antlr.v4.tool;
 
@@ -328,9 +304,9 @@ public enum ErrorType {
 	/**
 	 * Compiler Error 79.
 	 *
-	 * <p>missing arguments(s) on rule reference: <em>rule</em></p>
+	 * <p>missing argument(s) on rule reference: <em>rule</em></p>
 	 */
-	MISSING_RULE_ARGS(79, "missing arguments(s) on rule reference: <arg>", ErrorSeverity.ERROR),
+	MISSING_RULE_ARGS(79, "missing argument(s) on rule reference: <arg>", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 80.
 	 *
@@ -1006,11 +982,83 @@ public enum ErrorType {
 	 *
 	 * <p>empty strings not allowed</p>
 	 *
-	 * <pre>A: '''test''';</pre>
-	 * <pre>B: '';</pre>
-	 * <pre>C: 'test' '';</pre>
+	 * <pre>
+	 * A: '''test''';
+	 * B: '';
+	 * C: 'test' '';
+	 * D: [];
+	 * E: [f-a];
+	 * </pre>
 	 */
-	EMPTY_STRINGS_NOT_ALLOWED(174, "string literals cannot be empty", ErrorSeverity.ERROR),
+	EMPTY_STRINGS_AND_SETS_NOT_ALLOWED(174, "string literals and sets cannot be empty: <arg>", ErrorSeverity.ERROR),
+	/**
+	 * Compiler Error 175.
+	 *
+	 * <p><em>name</em> is not a recognized token name</p>
+	 *
+	 * <pre>TOKEN: 'a' -> type(CHANNEL1); // error 175</pre>
+	 */
+	CONSTANT_VALUE_IS_NOT_A_RECOGNIZED_TOKEN_NAME(175, "<arg> is not a recognized token name", ErrorSeverity.ERROR),
+	/**
+	 * Compiler Error 176.
+	 *
+	 * <p><em>name</em>is not a recognized mode name</p>
+	 *
+	 * <pre>TOKEN: 'a' -> mode(MODE1); // error 176</pre>
+	 */
+	CONSTANT_VALUE_IS_NOT_A_RECOGNIZED_MODE_NAME(176, "<arg> is not a recognized mode name", ErrorSeverity.ERROR),
+	/**
+	 * Compiler Error 177.
+	 *
+	 * <p><em>name</em> is not a recognized channel name</p>
+	 *
+	 * <pre>TOKEN: 'a' -> channel(TOKEN1); // error 177</pre>
+	 */
+	CONSTANT_VALUE_IS_NOT_A_RECOGNIZED_CHANNEL_NAME(177, "<arg> is not a recognized channel name", ErrorSeverity.ERROR),
+	/*
+	* Compiler Warning 178.
+	*
+	* <p>lexer rule has a duplicated commands</p>
+	*
+	* <p>TOKEN: 'asdf' -> mode(MODE1), mode(MODE2);</p>
+	* */
+	DUPLICATED_COMMAND(178, "duplicated command <arg>", ErrorSeverity.WARNING),
+	/*
+	* Compiler Waring 179.
+	*
+	* <p>incompatible commands <em>command1</em> and <em>command2</em></p>
+	*
+	* <p>T00: 'a00' -> skip, more;</p>
+	 */
+	INCOMPATIBLE_COMMANDS(179, "incompatible commands <arg> and <arg2>", ErrorSeverity.WARNING),
+	/**
+	 * Compiler Warning 180.
+	 *
+	 * <p>chars "a-f" used multiple times in set [a-fc-m]</p>
+	 *
+	 * <pre>
+	 * A:    [aa-z];   // warning
+	 * B:    [a-fc-m]; // warning
+	 * </pre>
+	 *
+	 * TODO: Does not work with fragment rules.
+	 */
+	CHARACTERS_COLLISION_IN_SET(180, "chars \"<arg>\" used multiple times in set <arg2>", ErrorSeverity.WARNING),
+
+	/**
+	 * Compiler Warning 181
+	 *
+	 * <p>The token range operator makes no sense in the parser as token types
+	 * are not ordered (except in implementation).
+	 * </p>
+	 *
+	 * <pre>
+	 * grammar T;
+	 * a : 'A'..'Z' ;
+	 * </pre>
+	 *
+	 */
+	TOKEN_RANGE_IN_PARSER(181, "token ranges not allowed in parser: <arg>..<arg2>", ErrorSeverity.ERROR),
 
 	/*
 	 * Backward incompatibility errors

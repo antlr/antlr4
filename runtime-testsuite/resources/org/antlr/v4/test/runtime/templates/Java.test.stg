@@ -1,0 +1,290 @@
+writeln(s) ::= <<System.out.println(<s>);>>
+write(s) ::= <<System.out.print(<s>);>>
+writeList(s) ::= <<System.out.println(<s; separator="+">);>>
+
+False() ::= "false"
+
+True() ::= "true"
+
+Not(v) ::= "!<v>"
+
+Assert(s) ::= <<assert(<s>);>>
+
+Cast(t,v) ::= "((<t>)<v>)"
+
+Append(a,b) ::= "<a> + <b>"
+
+Concat(a,b) ::= "<a><b>"
+
+DeclareLocal(s,v) ::= "Object <s> = <v>;"
+
+AssertIsList(v) ::= "List\<?> __ttt__ = <v>;" // just use static type system
+
+AssignLocal(s,v) ::= "<s> = <v>;"
+
+InitIntMember(n,v) ::= <%int <n> = <v>;%>
+
+InitBooleanMember(n,v) ::= <%boolean <n> = <v>;%>
+
+GetMember(n) ::= <%this.<n>%>
+
+SetMember(n,v) ::= <%this.<n> = <v>;%>
+
+AddMember(n,v) ::= <%this.<n> += <v>;%>
+
+PlusMember(v,n) ::= <%<v> + this.<n>%>
+
+MemberEquals(n,v) ::= <%this.<n> == <v>%>
+
+ModMemberEquals(n,m,v) ::= <%this.<n> % <m> == <v>%>
+
+ModMemberNotEquals(n,m,v) ::= <%this.<n> % <m> != <v>%>
+
+DumpDFA() ::= "this.dumpDFA();"
+
+Pass() ::= ""
+
+StringList() ::= "List\<String>"
+
+BuildParseTrees() ::= "setBuildParseTree(true);"
+
+BailErrorStrategy() ::= <%setErrorHandler(new BailErrorStrategy());%>
+
+ToStringTree(s) ::= <%<s>.toStringTree(this)%>
+
+Column() ::= "this.getCharPositionInLine()"
+
+Text() ::= "this.getText()"
+
+ValEquals(a,b) ::= <%<a>==<b>%>
+
+TextEquals(a) ::= <%this.getText().equals("<a>")%>
+
+PlusText(a) ::= <%"<a>" + this.getText()%>
+
+InputText() ::= "this._input.getText()"
+
+LTEquals(i, v) ::= <%this._input.LT(<i>).getText().equals(<v>)%>
+
+LANotEquals(i, v) ::= <%this._input.LA(<i>)!=<v>%>
+
+TokenStartColumnEquals(i) ::= <%this._tokenStartCharPositionInLine==<i>%>
+
+ImportListener(X) ::= ""
+
+GetExpectedTokenNames() ::= "this.getExpectedTokens().toString(this.tokenNames)"
+
+RuleInvocationStack() ::= "getRuleInvocationStack()"
+
+LL_EXACT_AMBIG_DETECTION() ::= <<_interp.setPredictionMode(PredictionMode.LL_EXACT_AMBIG_DETECTION);>>
+
+ParserToken(parser, token) ::= <%<parser>.<token>%>
+
+Production(p) ::= <%<p>%>
+
+Result(r) ::= <%<r>%>
+
+ParserPropertyMember() ::= <<
+@members {
+boolean Property() {
+  return true;
+}
+}
+>>
+
+ParserPropertyCall(p, call) ::= "<p>.<call>"
+
+PositionAdjustingLexer() ::= <<
+
+@Override
+public Token nextToken() {
+	if (!(_interp instanceof PositionAdjustingLexerATNSimulator)) {
+		_interp = new PositionAdjustingLexerATNSimulator(this, _ATN, _decisionToDFA, _sharedContextCache);
+	}
+
+	return super.nextToken();
+}
+
+@Override
+public Token emit() {
+	switch (_type) {
+	case TOKENS:
+		handleAcceptPositionForKeyword("tokens");
+		break;
+
+	case LABEL:
+		handleAcceptPositionForIdentifier();
+		break;
+
+	default:
+		break;
+	}
+
+	return super.emit();
+}
+
+private boolean handleAcceptPositionForIdentifier() {
+	String tokenText = getText();
+	int identifierLength = 0;
+	while (identifierLength \< tokenText.length() && isIdentifierChar(tokenText.charAt(identifierLength))) {
+		identifierLength++;
+	}
+
+	if (getInputStream().index() > _tokenStartCharIndex + identifierLength) {
+		int offset = identifierLength - 1;
+		getInterpreter().resetAcceptPosition(getInputStream(), _tokenStartCharIndex + offset, _tokenStartLine, _tokenStartCharPositionInLine + offset);
+		return true;
+	}
+
+	return false;
+}
+
+private boolean handleAcceptPositionForKeyword(String keyword) {
+	if (getInputStream().index() > _tokenStartCharIndex + keyword.length()) {
+		int offset = keyword.length() - 1;
+		getInterpreter().resetAcceptPosition(getInputStream(), _tokenStartCharIndex + offset, _tokenStartLine, _tokenStartCharPositionInLine + offset);
+		return true;
+	}
+
+	return false;
+}
+
+@Override
+public PositionAdjustingLexerATNSimulator getInterpreter() {
+	return (PositionAdjustingLexerATNSimulator)super.getInterpreter();
+}
+
+private static boolean isIdentifierChar(char c) {
+	return Character.isLetterOrDigit(c) || c == '_';
+}
+
+protected static class PositionAdjustingLexerATNSimulator extends LexerATNSimulator {
+
+	public PositionAdjustingLexerATNSimulator(Lexer recog, ATN atn,
+											  DFA[] decisionToDFA,
+											  PredictionContextCache sharedContextCache)
+	{
+		super(recog, atn, decisionToDFA, sharedContextCache);
+	}
+
+	protected void resetAcceptPosition(CharStream input, int index, int line, int charPositionInLine) {
+		input.seek(index);
+		this.line = line;
+		this.charPositionInLine = charPositionInLine;
+		consume(input);
+	}
+
+}
+
+>>
+
+BasicListener(X) ::= <<
+@parser::members {
+public static class LeafListener extends TBaseListener {
+	public void visitTerminal(TerminalNode node) {
+		System.out.println(node.getSymbol().getText());
+	}
+}
+}
+>>
+
+WalkListener(s) ::= <<
+ParseTreeWalker walker = new ParseTreeWalker();
+walker.walk(new LeafListener(), <s>);
+>>
+
+TreeNodeWithAltNumField(X) ::= <<
+@parser::members {
+public static class MyRuleNode extends ParserRuleContext {
+	public int altNum;
+	public MyRuleNode(ParserRuleContext parent, int invokingStateNumber) {
+		super(parent, invokingStateNumber);
+	}
+	@Override public int getAltNumber() { return altNum; }
+	@Override public void setAltNumber(int altNum) { this.altNum = altNum; }
+}
+}
+>>
+
+TokenGetterListener(X) ::= <<
+@parser::members {
+public static class LeafListener extends TBaseListener {
+	public void exitA(TParser.AContext ctx) {
+		if (ctx.getChildCount()==2)
+			System.out.printf("%s %s %s",ctx.INT(0).getSymbol().getText(),
+				ctx.INT(1).getSymbol().getText(),ctx.INT());
+		else
+			System.out.println(ctx.ID().getSymbol());
+	}
+}
+}
+>>
+
+RuleGetterListener(X) ::= <<
+@parser::members {
+public static class LeafListener extends TBaseListener {
+	public void exitA(TParser.AContext ctx) {
+		if (ctx.getChildCount()==2) {
+			System.out.printf("%s %s %s",ctx.b(0).start.getText(),
+				ctx.b(1).start.getText(),ctx.b().get(0).start.getText());
+		} else
+			System.out.println(ctx.b(0).start.getText());
+	}
+}
+}
+>>
+
+
+LRListener(X) ::= <<
+@parser::members {
+public static class LeafListener extends TBaseListener {
+	public void exitE(TParser.EContext ctx) {
+		if (ctx.getChildCount()==3) {
+			System.out.printf("%s %s %s\n",ctx.e(0).start.getText(),
+				ctx.e(1).start.getText(), ctx.e().get(0).start.getText());
+		} else
+			System.out.println(ctx.INT().getSymbol().getText());
+	}
+}
+}
+>>
+
+LRWithLabelsListener(X) ::= <<
+@parser::members {
+public static class LeafListener extends TBaseListener {
+	public void exitCall(TParser.CallContext ctx) {
+		System.out.printf("%s %s",ctx.e().start.getText(),ctx.eList());
+	}
+	public void exitInt(TParser.IntContext ctx) {
+		System.out.println(ctx.INT().getSymbol().getText());
+	}
+}
+}
+>>
+
+DeclareContextListGettersFunction() ::= <<
+void foo() {
+	SContext s = null;
+	List\<? extends AContext> a = s.a();
+	List\<? extends BContext> b = s.b();
+}
+>>
+
+Declare_foo() ::= <<
+	public void foo() {System.out.println("foo");}
+>>
+
+Invoke_foo() ::= "foo();"
+
+Declare_pred() ::= <<boolean pred(boolean v) {
+	System.out.println("eval="+v);
+	return v;
+}
+>>
+
+Invoke_pred(v) ::= <<this.pred(<v>)>>
+
+ParserTokenType(t) ::= "Parser.<t>"
+ContextRuleFunction(ctx, rule) ::= "<ctx>.<rule>"
+StringType() ::= "String"
+ContextMember(ctx, subctx, member) ::= "<ctx>.<subctx>.<member>"

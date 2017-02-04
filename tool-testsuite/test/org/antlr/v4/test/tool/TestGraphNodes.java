@@ -1,31 +1,7 @@
 /*
- * [The "BSD license"]
- *  Copyright (c) 2012 Terence Parr
- *  Copyright (c) 2012 Sam Harwell
- *  All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions
- *  are met:
- *
- *  1. Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  2. Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  3. The name of the author may not be used to endorse or promote products
- *     derived from this software without specific prior written permission.
- *
- *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- *  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- *  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
  */
 
 package org.antlr.v4.test.tool;
@@ -61,7 +37,7 @@ public class TestGraphNodes {
 		PredictionContext r = PredictionContext.merge(PredictionContext.EMPTY,
 													  PredictionContext.EMPTY,
 													  rootIsWildcard(), null);
-		System.out.println(toDOTString(r, rootIsWildcard()));
+//		System.out.println(toDOTString(r, rootIsWildcard()));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
@@ -74,7 +50,7 @@ public class TestGraphNodes {
 		PredictionContext r = PredictionContext.merge(PredictionContext.EMPTY,
 													  PredictionContext.EMPTY,
 													  fullCtx(), null);
-		System.out.println(toDOTString(r, fullCtx()));
+//		System.out.println(toDOTString(r, fullCtx()));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
@@ -85,7 +61,7 @@ public class TestGraphNodes {
 
 	@Test public void test_x_$() {
 		PredictionContext r = PredictionContext.merge(x(), PredictionContext.EMPTY, rootIsWildcard(), null);
-		System.out.println(toDOTString(r, rootIsWildcard()));
+//		System.out.println(toDOTString(r, rootIsWildcard()));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
@@ -96,7 +72,7 @@ public class TestGraphNodes {
 
 	@Test public void test_x_$_fullctx() {
 		PredictionContext r = PredictionContext.merge(x(), PredictionContext.EMPTY, fullCtx(), null);
-		System.out.println(toDOTString(r, fullCtx()));
+//		System.out.println(toDOTString(r, fullCtx()));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
@@ -109,7 +85,7 @@ public class TestGraphNodes {
 
 	@Test public void test_$_x() {
 		PredictionContext r = PredictionContext.merge(PredictionContext.EMPTY, x(), rootIsWildcard(), null);
-		System.out.println(toDOTString(r, rootIsWildcard()));
+//		System.out.println(toDOTString(r, rootIsWildcard()));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
@@ -120,7 +96,7 @@ public class TestGraphNodes {
 
 	@Test public void test_$_x_fullctx() {
 		PredictionContext r = PredictionContext.merge(PredictionContext.EMPTY, x(), fullCtx(), null);
-		System.out.println(toDOTString(r, fullCtx()));
+//		System.out.println(toDOTString(r, fullCtx()));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
@@ -133,7 +109,7 @@ public class TestGraphNodes {
 
 	@Test public void test_a_a() {
 		PredictionContext r = PredictionContext.merge(a(), a(), rootIsWildcard(), null);
-		System.out.println(toDOTString(r, rootIsWildcard()));
+//		System.out.println(toDOTString(r, rootIsWildcard()));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
@@ -149,7 +125,7 @@ public class TestGraphNodes {
 		PredictionContext x = x();
 		PredictionContext a2 = createSingleton(x, 1);
 		PredictionContext r = PredictionContext.merge(a1, a2, rootIsWildcard(), null);
-		System.out.println(toDOTString(r, rootIsWildcard()));
+//		System.out.println(toDOTString(r, rootIsWildcard()));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
@@ -165,7 +141,7 @@ public class TestGraphNodes {
 		PredictionContext x = x();
 		PredictionContext a2 = createSingleton(x, 1);
 		PredictionContext r = PredictionContext.merge(a1, a2, fullCtx(), null);
-		System.out.println(toDOTString(r, fullCtx()));
+//		System.out.println(toDOTString(r, fullCtx()));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
@@ -183,7 +159,7 @@ public class TestGraphNodes {
 		PredictionContext a1 = createSingleton(x, 1);
 		PredictionContext a2 = a();
 		PredictionContext r = PredictionContext.merge(a1, a2, rootIsWildcard(), null);
-		System.out.println(toDOTString(r, rootIsWildcard()));
+//		System.out.println(toDOTString(r, rootIsWildcard()));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
@@ -201,7 +177,7 @@ public class TestGraphNodes {
 		PredictionContext left = createSingleton(right, 8);
 		PredictionContext merged = PredictionContext.merge(left, right, false, null);
 		String actual = toDOTString(merged, false);
-		System.out.println(actual);
+//		System.out.println(actual);
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
@@ -219,7 +195,7 @@ public class TestGraphNodes {
 		PredictionContext a1 = createSingleton(x, 1);
 		PredictionContext a2 = a();
 		PredictionContext r = PredictionContext.merge(a1, a2, fullCtx(), null);
-		System.out.println(toDOTString(r, fullCtx()));
+//		System.out.println(toDOTString(r, fullCtx()));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
@@ -234,7 +210,7 @@ public class TestGraphNodes {
 
 	@Test public void test_a_b() {
 		PredictionContext r = PredictionContext.merge(a(), b(), rootIsWildcard(), null);
-		System.out.println(toDOTString(r, rootIsWildcard()));
+//		System.out.println(toDOTString(r, rootIsWildcard()));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
@@ -251,7 +227,7 @@ public class TestGraphNodes {
 		PredictionContext a1 = createSingleton(x, 1);
 		PredictionContext a2 = createSingleton(x, 1);
 		PredictionContext r = PredictionContext.merge(a1, a2, rootIsWildcard(), null);
-		System.out.println(toDOTString(r, rootIsWildcard()));
+//		System.out.println(toDOTString(r, rootIsWildcard()));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
@@ -270,7 +246,7 @@ public class TestGraphNodes {
 		PredictionContext a1 = createSingleton(x1, 1);
 		PredictionContext a2 = createSingleton(x2, 1);
 		PredictionContext r = PredictionContext.merge(a1, a2, rootIsWildcard(), null);
-		System.out.println(toDOTString(r, rootIsWildcard()));
+//		System.out.println(toDOTString(r, rootIsWildcard()));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
@@ -291,7 +267,7 @@ public class TestGraphNodes {
 		PredictionContext a1 = createSingleton(b1, 1);
 		PredictionContext a2 = createSingleton(b2, 1);
 		PredictionContext r = PredictionContext.merge(a1, a2, rootIsWildcard(), null);
-		System.out.println(toDOTString(r, rootIsWildcard()));
+//		System.out.println(toDOTString(r, rootIsWildcard()));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
@@ -314,7 +290,7 @@ public class TestGraphNodes {
 		PredictionContext a1 = createSingleton(b, 1);
 		PredictionContext a2 = createSingleton(c, 1);
 		PredictionContext r = PredictionContext.merge(a1, a2, rootIsWildcard(), null);
-		System.out.println(toDOTString(r, rootIsWildcard()));
+//		System.out.println(toDOTString(r, rootIsWildcard()));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
@@ -335,7 +311,7 @@ public class TestGraphNodes {
 		PredictionContext a = createSingleton(x, 1);
 		PredictionContext b = createSingleton(x, 2);
 		PredictionContext r = PredictionContext.merge(a, b, rootIsWildcard(), null);
-		System.out.println(toDOTString(r, rootIsWildcard()));
+//		System.out.println(toDOTString(r, rootIsWildcard()));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
@@ -355,7 +331,7 @@ public class TestGraphNodes {
 		PredictionContext a = createSingleton(x1, 1);
 		PredictionContext b = createSingleton(x2, 2);
 		PredictionContext r = PredictionContext.merge(a, b, rootIsWildcard(), null);
-		System.out.println(toDOTString(r, rootIsWildcard()));
+//		System.out.println(toDOTString(r, rootIsWildcard()));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
@@ -373,7 +349,7 @@ public class TestGraphNodes {
 		PredictionContext a = createSingleton(x(), 1);
 		PredictionContext b = createSingleton(y(), 2);
 		PredictionContext r = PredictionContext.merge(a, b, rootIsWildcard(), null);
-		System.out.println(toDOTString(r, rootIsWildcard()));
+//		System.out.println(toDOTString(r, rootIsWildcard()));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
@@ -394,7 +370,7 @@ public class TestGraphNodes {
 		PredictionContext a = a();
 		PredictionContext b = createSingleton(x2, 2);
 		PredictionContext r = PredictionContext.merge(a, b, rootIsWildcard(), null);
-		System.out.println(toDOTString(r, rootIsWildcard()));
+//		System.out.println(toDOTString(r, rootIsWildcard()));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
@@ -413,7 +389,7 @@ public class TestGraphNodes {
 		PredictionContext a = a();
 		PredictionContext b = createSingleton(x2, 2);
 		PredictionContext r = PredictionContext.merge(a, b, fullCtx(), null);
-		System.out.println(toDOTString(r, fullCtx()));
+//		System.out.println(toDOTString(r, fullCtx()));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
@@ -437,7 +413,7 @@ public class TestGraphNodes {
 		PredictionContext a = createSingleton(e, 1);
 		PredictionContext b = createSingleton(f, 2);
 		PredictionContext r = PredictionContext.merge(a, b, rootIsWildcard(), null);
-		System.out.println(toDOTString(r, rootIsWildcard()));
+//		System.out.println(toDOTString(r, rootIsWildcard()));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
@@ -461,7 +437,7 @@ public class TestGraphNodes {
 		ArrayPredictionContext A1 = array(PredictionContext.EMPTY);
 		ArrayPredictionContext A2 = array(PredictionContext.EMPTY);
 		PredictionContext r = PredictionContext.merge(A1, A2, fullCtx(), null);
-		System.out.println(toDOTString(r, fullCtx()));
+//		System.out.println(toDOTString(r, fullCtx()));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
@@ -477,7 +453,7 @@ public class TestGraphNodes {
 		ArrayPredictionContext A1 = array(a, b);
 		ArrayPredictionContext A2 = array(c);
 		PredictionContext r = PredictionContext.merge(A1, A2, rootIsWildcard(), null);
-		System.out.println(toDOTString(r, rootIsWildcard()));
+//		System.out.println(toDOTString(r, rootIsWildcard()));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
@@ -496,7 +472,7 @@ public class TestGraphNodes {
 		ArrayPredictionContext A1 = array(a1);
 		ArrayPredictionContext A2 = array(a2);
 		PredictionContext r = PredictionContext.merge(A1, A2, rootIsWildcard(), null);
-		System.out.println(toDOTString(r, rootIsWildcard()));
+//		System.out.println(toDOTString(r, rootIsWildcard()));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
@@ -514,7 +490,7 @@ public class TestGraphNodes {
 		ArrayPredictionContext A1 = array(a);
 		ArrayPredictionContext A2 = array(b, c);
 		PredictionContext r = PredictionContext.merge(A1, A2, rootIsWildcard(), null);
-		System.out.println(toDOTString(r, rootIsWildcard()));
+//		System.out.println(toDOTString(r, rootIsWildcard()));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
@@ -534,7 +510,7 @@ public class TestGraphNodes {
 		ArrayPredictionContext A1 = array(a, c);
 		ArrayPredictionContext A2 = array(b);
 		PredictionContext r = PredictionContext.merge(A1, A2, rootIsWildcard(), null);
-		System.out.println(toDOTString(r, rootIsWildcard()));
+//		System.out.println(toDOTString(r, rootIsWildcard()));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
@@ -551,7 +527,7 @@ public class TestGraphNodes {
 		ArrayPredictionContext A1 = array(a(), b());
 		ArrayPredictionContext A2 = array(a());
 		PredictionContext r = PredictionContext.merge(A1, A2, rootIsWildcard(), null);
-		System.out.println(toDOTString(r, rootIsWildcard()));
+//		System.out.println(toDOTString(r, rootIsWildcard()));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
@@ -567,7 +543,7 @@ public class TestGraphNodes {
 		ArrayPredictionContext A1 = array(a(), b());
 		ArrayPredictionContext A2 = array(b());
 		PredictionContext r = PredictionContext.merge(A1, A2, rootIsWildcard(), null);
-		System.out.println(toDOTString(r, rootIsWildcard()));
+//		System.out.println(toDOTString(r, rootIsWildcard()));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
@@ -585,7 +561,7 @@ public class TestGraphNodes {
 		ArrayPredictionContext A1 = array(a);
 		ArrayPredictionContext A2 = array(b);
 		PredictionContext r = PredictionContext.merge(A1, A2, rootIsWildcard(), null);
-		System.out.println(toDOTString(r, rootIsWildcard()));
+//		System.out.println(toDOTString(r, rootIsWildcard()));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
@@ -607,7 +583,7 @@ public class TestGraphNodes {
 		ArrayPredictionContext A1 = array(a1);
 		ArrayPredictionContext A2 = array(a2);
 		PredictionContext r = PredictionContext.merge(A1, A2, rootIsWildcard(), null);
-		System.out.println(toDOTString(r, rootIsWildcard()));
+//		System.out.println(toDOTString(r, rootIsWildcard()));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
@@ -627,7 +603,7 @@ public class TestGraphNodes {
 		ArrayPredictionContext A1 = array(a1, c());
 		ArrayPredictionContext A2 = array(a2, d());
 		PredictionContext r = PredictionContext.merge(A1, A2, rootIsWildcard(), null);
-		System.out.println(toDOTString(r, rootIsWildcard()));
+//		System.out.println(toDOTString(r, rootIsWildcard()));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
@@ -651,7 +627,7 @@ public class TestGraphNodes {
 		ArrayPredictionContext A1 = array(a, b);
 		ArrayPredictionContext A2 = array(c, d);
 		PredictionContext r = PredictionContext.merge(A1, A2, rootIsWildcard(), null);
-		System.out.println(toDOTString(r, rootIsWildcard()));
+//		System.out.println(toDOTString(r, rootIsWildcard()));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
@@ -681,7 +657,7 @@ public class TestGraphNodes {
 		ArrayPredictionContext A1 = array(a, b1);
 		ArrayPredictionContext A2 = array(b2, d);
 		PredictionContext r = PredictionContext.merge(A1, A2, rootIsWildcard(), null);
-		System.out.println(toDOTString(r, rootIsWildcard()));
+//		System.out.println(toDOTString(r, rootIsWildcard()));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
@@ -708,7 +684,7 @@ public class TestGraphNodes {
 		ArrayPredictionContext A1 = array(a, b1);
 		ArrayPredictionContext A2 = array(b2, d);
 		PredictionContext r = PredictionContext.merge(A1, A2, rootIsWildcard(), null);
-		System.out.println(toDOTString(r, rootIsWildcard()));
+//		System.out.println(toDOTString(r, rootIsWildcard()));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
@@ -736,7 +712,7 @@ public class TestGraphNodes {
 		ArrayPredictionContext A1 = array(a, b1);
 		ArrayPredictionContext A2 = array(b2, d);
 		PredictionContext r = PredictionContext.merge(A1, A2, rootIsWildcard(), null);
-		System.out.println(toDOTString(r, rootIsWildcard()));
+//		System.out.println(toDOTString(r, rootIsWildcard()));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +
@@ -761,7 +737,7 @@ public class TestGraphNodes {
 		ArrayPredictionContext A1 = array(a, b);
 		ArrayPredictionContext A2 = array(c, d);
 		PredictionContext r = PredictionContext.merge(A1, A2, rootIsWildcard(), null);
-		System.out.println(toDOTString(r, rootIsWildcard()));
+//		System.out.println(toDOTString(r, rootIsWildcard()));
 		String expecting =
 			"digraph G {\n" +
 			"rankdir=LR;\n" +

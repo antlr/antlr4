@@ -1,31 +1,7 @@
 /*
- * [The "BSD license"]
- *  Copyright (c) 2012 Terence Parr
- *  Copyright (c) 2012 Sam Harwell
- *  All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions
- *  are met:
- *
- *  1. Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  2. Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  3. The name of the author may not be used to endorse or promote products
- *     derived from this software without specific prior written permission.
- *
- *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- *  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- *  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
  */
 
 package org.antlr.v4.automata;
@@ -63,6 +39,7 @@ import org.antlr.v4.tool.LexerGrammar;
 import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.ActionAST;
 import org.antlr.v4.tool.ast.GrammarAST;
+import org.antlr.v4.tool.ast.RangeAST;
 import org.antlr.v4.tool.ast.TerminalAST;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
@@ -94,6 +71,8 @@ public class LexerATNFactory extends ParserATNFactory {
 		COMMON_CONSTANTS.put("MAX_CHAR_VALUE", Lexer.MAX_CHAR_VALUE);
 		COMMON_CONSTANTS.put("MIN_CHAR_VALUE", Lexer.MIN_CHAR_VALUE);
 	}
+
+	private List<String> ruleCommands = new ArrayList<String>();
 
 	/**
 	 * Maps from an action index to a {@link LexerAction} object.
@@ -157,6 +136,12 @@ public class LexerATNFactory extends ParserATNFactory {
 
 		ATNOptimizer.optimize(g, atn);
 		return atn;
+	}
+
+	@Override
+	public Handle rule(GrammarAST ruleAST, String name, Handle blk) {
+		ruleCommands.clear();
+		return super.rule(ruleAST, name, blk);
 	}
 
 	@Override
@@ -235,6 +220,7 @@ public class LexerATNFactory extends ParserATNFactory {
 		}
 
 		cmdST.add("arg", arg.getText());
+		cmdST.add("grammar", arg.g);
 		return action(cmdST.render());
 	}
 
@@ -268,6 +254,7 @@ public class LexerATNFactory extends ParserATNFactory {
 		ATNState right = newState(b);
 		int t1 = CharSupport.getCharValueFromGrammarCharLiteral(a.getText());
 		int t2 = CharSupport.getCharValueFromGrammarCharLiteral(b.getText());
+		checkRange(a, b, t1, t2);
 		left.addTransition(new  RangeTransition(right, t1, t2));
 		a.atnState = left;
 		b.atnState = left;
@@ -283,7 +270,10 @@ public class LexerATNFactory extends ParserATNFactory {
 			if ( t.getType()==ANTLRParser.RANGE ) {
 				int a = CharSupport.getCharValueFromGrammarCharLiteral(t.getChild(0).getText());
 				int b = CharSupport.getCharValueFromGrammarCharLiteral(t.getChild(1).getText());
-				set.add(a, b);
+				if (checkRange((GrammarAST) t.getChild(0), (GrammarAST) t.getChild(1), a, b)) {
+					checkSetCollision(associatedAST, set, a, b);
+					set.add(a,b);
+				}
 			}
 			else if ( t.getType()==ANTLRParser.LEXER_CHAR_SET ) {
 				set.addAll(getSetFromCharSetLiteral(t));
@@ -291,12 +281,12 @@ public class LexerATNFactory extends ParserATNFactory {
 			else if ( t.getType()==ANTLRParser.STRING_LITERAL ) {
 				int c = CharSupport.getCharValueFromGrammarCharLiteral(t.getText());
 				if ( c != -1 ) {
+					checkSetCollision(associatedAST, set, c);
 					set.add(c);
 				}
 				else {
 					g.tool.errMgr.grammarError(ErrorType.INVALID_LITERAL_IN_LEXER_SET,
 											   g.fileName, t.getToken(), t.getText());
-
 				}
 			}
 			else if ( t.getType()==ANTLRParser.TOKEN_REF ) {
@@ -322,6 +312,27 @@ public class LexerATNFactory extends ParserATNFactory {
 		return new Handle(left, right);
 	}
 
+	protected boolean checkRange(GrammarAST leftNode, GrammarAST rightNode, int leftValue, int rightValue) {
+		boolean result = true;
+		if (leftValue == -1) {
+			result = false;
+			g.tool.errMgr.grammarError(ErrorType.INVALID_LITERAL_IN_LEXER_SET,
+					g.fileName, leftNode.getToken(), leftNode.getText());
+		}
+		if (rightValue == -1) {
+			result = false;
+			g.tool.errMgr.grammarError(ErrorType.INVALID_LITERAL_IN_LEXER_SET,
+					g.fileName, rightNode.getToken(), rightNode.getText());
+		}
+		if (!result) return result;
+
+		if (rightValue < leftValue) {
+			g.tool.errMgr.grammarError(ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED,
+					g.fileName, leftNode.parent.getToken(), leftNode.getText() + ".." + rightNode.getText());
+		}
+		return result;
+	}
+
 	/** For a lexer, a string is a sequence of char to match.  That is,
 	 *  "fog" is treated as 'f' 'o' 'g' not as a single transition in
 	 *  the DFA.  Machine== o-'f'-&gt;o-'o'-&gt;o-'g'-&gt;o and has n+1 states
@@ -330,12 +341,19 @@ public class LexerATNFactory extends ParserATNFactory {
 	@Override
 	public Handle stringLiteral(TerminalAST stringLiteralAST) {
 		String chars = stringLiteralAST.getText();
-		chars = CharSupport.getStringFromGrammarStringLiteral(chars);
-		int n = chars.length();
 		ATNState left = newState(stringLiteralAST);
+		ATNState right;
+		chars = CharSupport.getStringFromGrammarStringLiteral(chars);
+		if (chars == null) {
+			g.tool.errMgr.grammarError(ErrorType.INVALID_ESCAPE_SEQUENCE,
+					g.fileName, stringLiteralAST.getToken());
+			return new Handle(left, left);
+		}
+
+		int n = chars.length();
 		ATNState prev = left;
-		ATNState right = null;
-		for (int i=0; i<n; i++) {
+		right = null;
+		for (int i = 0; i < n; i++) {
 			right = newState(stringLiteralAST);
 			prev.addTransition(new AtomTransition(right, chars.charAt(i)));
 			prev = right;
@@ -357,38 +375,94 @@ public class LexerATNFactory extends ParserATNFactory {
 
 	public IntervalSet getSetFromCharSetLiteral(GrammarAST charSetAST) {
 		String chars = charSetAST.getText();
-		chars = chars.substring(1, chars.length()-1);
-		String cset = '"'+ chars +'"';
+		chars = chars.substring(1, chars.length() - 1);
+		String cset = '"' + chars + '"';
 		IntervalSet set = new IntervalSet();
 
+		if (chars.length() == 0) {
+			g.tool.errMgr.grammarError(ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED,
+					g.fileName, charSetAST.getToken(), "[]");
+			return set;
+		}
 		// unescape all valid escape char like \n, leaving escaped dashes as '\-'
 		// so we can avoid seeing them as '-' range ops.
 		chars = CharSupport.getStringFromGrammarStringLiteral(cset);
-		// now make x-y become set of char
+		if (chars == null) {
+			g.tool.errMgr.grammarError(ErrorType.INVALID_ESCAPE_SEQUENCE,
+			                           g.fileName, charSetAST.getToken());
+			return set;
+		}
 		int n = chars.length();
-		for (int i=0; i< n; i++) {
+		// now make x-y become set of char
+		for (int i = 0; i < n; i++) {
 			int c = chars.charAt(i);
-			if ( c=='\\' && (i+1)<n && chars.charAt(i+1)=='-' ) { // \-
+			if (c == '\\' && i+1 < n && chars.charAt(i+1) == '-') { // \-
+				checkSetCollision(charSetAST, set, '-');
 				set.add('-');
 				i++;
 			}
-			else if ( (i+2)<n && chars.charAt(i+1)=='-' ) { // range x-y
+			else if (i+2 < n && chars.charAt(i+1) == '-') { // range x-y
 				int x = c;
 				int y = chars.charAt(i+2);
-				if ( x<=y ) set.add(x,y);
-				i+=2;
+				if (x <= y) {
+					checkSetCollision(charSetAST, set, x, y);
+					set.add(x,y);
+				}
+				else {
+					g.tool.errMgr.grammarError(ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED,
+					                           g.fileName, charSetAST.getToken(), "[" + (char) x + "-" + (char) y + "]");
+				}
+				i += 2;
 			}
 			else {
+				checkSetCollision(charSetAST, set, c);
 				set.add(c);
 			}
 		}
 		return set;
 	}
 
+	protected void checkSetCollision(GrammarAST ast, IntervalSet set, int el) {
+		if (set.contains(el)) {
+			g.tool.errMgr.grammarError(ErrorType.CHARACTERS_COLLISION_IN_SET, g.fileName, ast.getToken(),
+					(char)el, ast.getText());
+		}
+	}
+
+	protected void checkSetCollision(GrammarAST ast, IntervalSet set, int a, int b) {
+		for (int i = a; i <= b; i++) {
+			if (set.contains(i)) {
+				String setText;
+				if (ast.getChildren() == null) {
+					setText = ast.getText();
+				}
+				else {
+					StringBuilder sb = new StringBuilder();
+					for (Object child : ast.getChildren()) {
+						if (child instanceof RangeAST) {
+							sb.append(((RangeAST) child).getChild(0).getText());
+							sb.append("..");
+							sb.append(((RangeAST) child).getChild(1).getText());
+						}
+						else {
+							sb.append(((GrammarAST)child).getText());
+						}
+						sb.append(" | ");
+					}
+					sb.replace(sb.length() - 3, sb.length(), "");
+					setText = sb.toString();
+				}
+				g.tool.errMgr.grammarError(ErrorType.CHARACTERS_COLLISION_IN_SET, g.fileName, ast.getToken(),
+						(char)a + "-" + (char)b, setText);
+				break;
+			}
+		}
+	}
+
 	@Override
 	public Handle tokenRef(TerminalAST node) {
 		// Ref to EOF in lexer yields char transition on -1
-		if ( node.getText().equals("EOF") ) {
+		if (node.getText().equals("EOF") ) {
 			ATNState left = newState(node);
 			ATNState right = newState(node);
 			left.addTransition(new AtomTransition(right, IntStream.EOF));
@@ -397,9 +471,10 @@ public class LexerATNFactory extends ParserATNFactory {
 		return _ruleRef(node);
 	}
 
-
-	protected LexerAction createLexerAction(GrammarAST ID, GrammarAST arg) {
+	private LexerAction createLexerAction(GrammarAST ID, GrammarAST arg) {
 		String command = ID.getText();
+		checkCommands(command, ID.getToken());
+
 		if ("skip".equals(command) && arg == null) {
 			return LexerSkipAction.INSTANCE;
 		}
@@ -411,8 +486,7 @@ public class LexerATNFactory extends ParserATNFactory {
 		}
 		else if ("mode".equals(command) && arg != null) {
 			String modeName = arg.getText();
-			checkMode(modeName, arg.token);
-			Integer mode = getConstantValue(modeName, arg.getToken());
+			Integer mode = getModeConstantValue(modeName, arg.getToken());
 			if (mode == null) {
 				return null;
 			}
@@ -421,8 +495,7 @@ public class LexerATNFactory extends ParserATNFactory {
 		}
 		else if ("pushMode".equals(command) && arg != null) {
 			String modeName = arg.getText();
-			checkMode(modeName, arg.token);
-			Integer mode = getConstantValue(modeName, arg.getToken());
+			Integer mode = getModeConstantValue(modeName, arg.getToken());
 			if (mode == null) {
 				return null;
 			}
@@ -431,8 +504,7 @@ public class LexerATNFactory extends ParserATNFactory {
 		}
 		else if ("type".equals(command) && arg != null) {
 			String typeName = arg.getText();
-			checkToken(typeName, arg.token);
-			Integer type = getConstantValue(typeName, arg.getToken());
+			Integer type = getTokenConstantValue(typeName, arg.getToken());
 			if (type == null) {
 				return null;
 			}
@@ -441,8 +513,7 @@ public class LexerATNFactory extends ParserATNFactory {
 		}
 		else if ("channel".equals(command) && arg != null) {
 			String channelName = arg.getText();
-			checkChannel(channelName, arg.token);
-			Integer channel = getConstantValue(channelName, arg.getToken());
+			Integer channel = getChannelConstantValue(channelName, arg.getToken());
 			if (channel == null) {
 				return null;
 			}
@@ -454,54 +525,127 @@ public class LexerATNFactory extends ParserATNFactory {
 		}
 	}
 
-	protected void checkMode(String modeName, Token token) {
-		if (!modeName.equals("DEFAULT_MODE") && COMMON_CONSTANTS.containsKey(modeName)) {
-			g.tool.errMgr.grammarError(ErrorType.MODE_CONFLICTS_WITH_COMMON_CONSTANTS, g.fileName, token, token.getText());
+	private void checkCommands(String command, Token commandToken) {
+		// Command combinations list: https://github.com/antlr/antlr4/issues/1388#issuecomment-263344701
+		if (!command.equals("pushMode") && !command.equals("popMode")) {
+			if (ruleCommands.contains(command)) {
+				g.tool.errMgr.grammarError(ErrorType.DUPLICATED_COMMAND, g.fileName, commandToken, command);
+			}
+
+			if (!ruleCommands.equals("mode")) {
+				String firstCommand = null;
+
+				if (command.equals("skip")) {
+					if (ruleCommands.contains("more")) {
+						firstCommand = "more";
+					} else if (ruleCommands.contains("type")) {
+						firstCommand = "type";
+					} else if (ruleCommands.contains("channel")) {
+						firstCommand = "channel";
+					}
+				} else if (command.equals("more")) {
+					if (ruleCommands.contains("skip")) {
+						firstCommand = "skip";
+					} else if (ruleCommands.contains("type")) {
+						firstCommand = "type";
+					} else if (ruleCommands.contains("channel")) {
+						firstCommand = "channel";
+					}
+				} else if (command.equals("type") || command.equals("channel")) {
+					if (ruleCommands.contains("more")) {
+						firstCommand = "more";
+					} else if (ruleCommands.contains("skip")) {
+						firstCommand = "skip";
+					}
+				}
+
+				if (firstCommand != null) {
+					g.tool.errMgr.grammarError(ErrorType.INCOMPATIBLE_COMMANDS, g.fileName, commandToken, firstCommand, command);
+				}
+			}
 		}
+
+		ruleCommands.add(command);
 	}
 
-	protected void checkToken(String tokenName, Token token) {
-		if (!tokenName.equals("EOF") && COMMON_CONSTANTS.containsKey(tokenName)) {
-			g.tool.errMgr.grammarError(ErrorType.TOKEN_CONFLICTS_WITH_COMMON_CONSTANTS, g.fileName, token, token.getText());
-		}
-	}
-
-	protected void checkChannel(String channelName, Token token) {
-		if (!channelName.equals("HIDDEN") && !channelName.equals("DEFAULT_TOKEN_CHANNEL") && COMMON_CONSTANTS.containsKey(channelName)) {
-			g.tool.errMgr.grammarError(ErrorType.CHANNEL_CONFLICTS_WITH_COMMON_CONSTANTS, g.fileName, token, token.getText());
-		}
-	}
-
-	protected Integer getConstantValue(String name, Token token) {
-		if (name == null) {
+	private Integer getModeConstantValue(String modeName, Token token) {
+		if (modeName == null) {
 			return null;
 		}
 
-		Integer commonConstant = COMMON_CONSTANTS.get(name);
-		if (commonConstant != null) {
-			return commonConstant;
+		if (modeName.equals("DEFAULT_MODE")) {
+			return Lexer.DEFAULT_MODE;
 		}
-
-		int tokenType = g.getTokenType(name);
-		if (tokenType != org.antlr.v4.runtime.Token.INVALID_TYPE) {
-			return tokenType;
-		}
-
-		int channelValue = g.getChannelValue(name);
-		if (channelValue >= org.antlr.v4.runtime.Token.MIN_USER_CHANNEL_VALUE) {
-			return channelValue;
+		if (COMMON_CONSTANTS.containsKey(modeName)) {
+			g.tool.errMgr.grammarError(ErrorType.MODE_CONFLICTS_WITH_COMMON_CONSTANTS, g.fileName, token, token.getText());
+			return null;
 		}
 
 		List<String> modeNames = new ArrayList<String>(((LexerGrammar)g).modes.keySet());
-		int mode = modeNames.indexOf(name);
+		int mode = modeNames.indexOf(modeName);
 		if (mode >= 0) {
 			return mode;
 		}
 
 		try {
-			return Integer.parseInt(name);
+			return Integer.parseInt(modeName);
 		} catch (NumberFormatException ex) {
-			g.tool.errMgr.grammarError(ErrorType.UNKNOWN_LEXER_CONSTANT, g.fileName, token, currentRule.name, token != null ? token.getText() : null);
+			g.tool.errMgr.grammarError(ErrorType.CONSTANT_VALUE_IS_NOT_A_RECOGNIZED_MODE_NAME, g.fileName, token, token.getText());
+			return null;
+		}
+	}
+
+	private Integer getTokenConstantValue(String tokenName, Token token) {
+		if (tokenName == null) {
+			return null;
+		}
+
+		if (tokenName.equals("EOF")) {
+			return Lexer.EOF;
+		}
+		if (COMMON_CONSTANTS.containsKey(tokenName)) {
+			g.tool.errMgr.grammarError(ErrorType.TOKEN_CONFLICTS_WITH_COMMON_CONSTANTS, g.fileName, token, token.getText());
+			return null;
+		}
+
+		int tokenType = g.getTokenType(tokenName);
+		if (tokenType != org.antlr.v4.runtime.Token.INVALID_TYPE) {
+			return tokenType;
+		}
+
+		try {
+			return Integer.parseInt(tokenName);
+		} catch (NumberFormatException ex) {
+			g.tool.errMgr.grammarError(ErrorType.CONSTANT_VALUE_IS_NOT_A_RECOGNIZED_TOKEN_NAME, g.fileName, token, token.getText());
+			return null;
+		}
+	}
+
+	private Integer getChannelConstantValue(String channelName, Token token) {
+		if (channelName == null) {
+			return null;
+		}
+
+		if (channelName.equals("HIDDEN")) {
+			return Lexer.HIDDEN;
+		}
+		if (channelName.equals("DEFAULT_TOKEN_CHANNEL")) {
+			return Lexer.DEFAULT_TOKEN_CHANNEL;
+		}
+		if (COMMON_CONSTANTS.containsKey(channelName)) {
+			g.tool.errMgr.grammarError(ErrorType.CHANNEL_CONFLICTS_WITH_COMMON_CONSTANTS, g.fileName, token, token.getText());
+			return null;
+		}
+
+		int channelValue = g.getChannelValue(channelName);
+		if (channelValue >= org.antlr.v4.runtime.Token.MIN_USER_CHANNEL_VALUE) {
+			return channelValue;
+		}
+
+		try {
+			return Integer.parseInt(channelName);
+		} catch (NumberFormatException ex) {
+			g.tool.errMgr.grammarError(ErrorType.CONSTANT_VALUE_IS_NOT_A_RECOGNIZED_CHANNEL_NAME, g.fileName, token, token.getText());
 			return null;
 		}
 	}

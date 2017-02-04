@@ -1,31 +1,7 @@
 /*
- * [The "BSD license"]
- *  Copyright (c) 2012 Terence Parr
- *  Copyright (c) 2012 Sam Harwell
- *  All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions
- *  are met:
- *
- *  1. Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  2. Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  3. The name of the author may not be used to endorse or promote products
- *     derived from this software without specific prior written permission.
- *
- *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- *  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- *  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
  */
 
 package org.antlr.v4.runtime.atn;
@@ -57,6 +33,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static org.antlr.v4.runtime.atn.ATNState.BLOCK_END;
 
 /**
  * The embodiment of the adaptive LL(*), ALL(*), parsing strategy.
@@ -290,6 +268,9 @@ public class ParserATNSimulator extends ATNSimulator {
 	public static final boolean debug_list_atn_decisions = false;
 	public static final boolean dfa_debug = false;
 	public static final boolean retry_debug = false;
+
+	/** Just in case this optimization is bad, add an ENV variable to turn it off */
+	public static final boolean TURN_OFF_LR_LOOP_ENTRY_BRANCH_OPT = Boolean.parseBoolean(System.getenv("TURN_OFF_LR_LOOP_ENTRY_BRANCH_OPT"));
 
 	protected final Parser parser;
 
@@ -788,7 +769,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	protected ATNConfigSet computeReachSet(ATNConfigSet closure, int t,
 										   boolean fullCtx)
 	{
-		if ( debug ) 
+		if ( debug )
 			System.out.println("in computeReachSet, starting closure: " + closure);
 
 		if (mergeCache == null) {
@@ -981,10 +962,6 @@ public class ParserATNSimulator extends ATNSimulator {
 
 	/* parrt internal source braindump that doesn't mess up
 	 * external API spec.
-
-		applyPrecedenceFilter is an optimization to avoid highly
-		nonlinear prediction of expressions and other left recursive
-		rules. The precedence predicates such as {3>=prec}? Are highly
 		context-sensitive in that they can only be properly evaluated
 		in the context of the proper prec argument. Without pruning,
 		these predicates are normal predicates evaluated when we reach
@@ -1556,6 +1533,8 @@ public class ParserATNSimulator extends ATNSimulator {
         }
 
 		for (int i=0; i<p.getNumberOfTransitions(); i++) {
+			if ( i==0 && canDropLoopEntryEdgeInLeftRecursiveRule(config) ) continue;
+
 			Transition t = p.transition(i);
 			boolean continueCollecting =
 				!(t instanceof ActionTransition) && collectPredicates;
@@ -1605,6 +1584,165 @@ public class ParserATNSimulator extends ATNSimulator {
 										 fullCtx, newDepth, treatEofAsEpsilon);
 			}
 		}
+	}
+
+	/** Implements first-edge (loop entry) elimination as an optimization
+	 *  during closure operations.  See antlr/antlr4#1398.
+	 *
+	 * The optimization is to avoid adding the loop entry config when
+	 * the exit path can only lead back to the same
+	 * StarLoopEntryState after popping context at the rule end state
+	 * (traversing only epsilon edges, so we're still in closure, in
+	 * this same rule).
+	 *
+	 * We need to detect any state that can reach loop entry on
+	 * epsilon w/o exiting rule. We don't have to look at FOLLOW
+	 * links, just ensure that all stack tops for config refer to key
+	 * states in LR rule.
+	 *
+	 * To verify we are in the right situation we must first check
+	 * closure is at a StarLoopEntryState generated during LR removal.
+	 * Then we check that each stack top of context is a return state
+	 * from one of these cases:
+	 *
+	 *   1. 'not' expr, '(' type ')' expr. The return state points at loop entry state
+	 *   2. expr op expr. The return state is the block end of internal block of (...)*
+	 *   3. 'between' expr 'and' expr. The return state of 2nd expr reference.
+	 *      That state points at block end of internal block of (...)*.
+	 *   4. expr '?' expr ':' expr. The return state points at block end,
+	 *      which points at loop entry state.
+	 *
+	 * If any is true for each stack top, then closure does not add a
+	 * config to the current config set for edge[0], the loop entry branch.
+	 *
+	 *  Conditions fail if any context for the current config is:
+	 *
+	 *   a. empty (we'd fall out of expr to do a global FOLLOW which could
+	 *      even be to some weird spot in expr) or,
+	 *   b. lies outside of expr or,
+	 *   c. lies within expr but at a state not the BlockEndState
+	 *   generated during LR removal
+	 *
+	 * Do we need to evaluate predicates ever in closure for this case?
+	 *
+	 * No. Predicates, including precedence predicates, are only
+	 * evaluated when computing a DFA start state. I.e., only before
+	 * the lookahead (but not parser) consumes a token.
+	 *
+	 * There are no epsilon edges allowed in LR rule alt blocks or in
+	 * the "primary" part (ID here). If closure is in
+	 * StarLoopEntryState any lookahead operation will have consumed a
+	 * token as there are no epsilon-paths that lead to
+	 * StarLoopEntryState. We do not have to evaluate predicates
+	 * therefore if we are in the generated StarLoopEntryState of a LR
+	 * rule. Note that when making a prediction starting at that
+	 * decision point, decision d=2, compute-start-state performs
+	 * closure starting at edges[0], edges[1] emanating from
+	 * StarLoopEntryState. That means it is not performing closure on
+	 * StarLoopEntryState during compute-start-state.
+	 *
+	 * How do we know this always gives same prediction answer?
+	 *
+	 * Without predicates, loop entry and exit paths are ambiguous
+	 * upon remaining input +b (in, say, a+b). Either paths lead to
+	 * valid parses. Closure can lead to consuming + immediately or by
+	 * falling out of this call to expr back into expr and loop back
+	 * again to StarLoopEntryState to match +b. In this special case,
+	 * we choose the more efficient path, which is to take the bypass
+	 * path.
+	 *
+	 * The lookahead language has not changed because closure chooses
+	 * one path over the other. Both paths lead to consuming the same
+	 * remaining input during a lookahead operation. If the next token
+	 * is an operator, lookahead will enter the choice block with
+	 * operators. If it is not, lookahead will exit expr. Same as if
+	 * closure had chosen to enter the choice block immediately.
+	 *
+	 * Closure is examining one config (some loopentrystate, some alt,
+	 * context) which means it is considering exactly one alt. Closure
+	 * always copies the same alt to any derived configs.
+	 *
+	 * How do we know this optimization doesn't mess up precedence in
+	 * our parse trees?
+	 *
+	 * Looking through expr from left edge of stat only has to confirm
+	 * that an input, say, a+b+c; begins with any valid interpretation
+	 * of an expression. The precedence actually doesn't matter when
+	 * making a decision in stat seeing through expr. It is only when
+	 * parsing rule expr that we must use the precedence to get the
+	 * right interpretation and, hence, parse tree.
+	 *
+	 * @since 4.6
+	 */
+	protected boolean canDropLoopEntryEdgeInLeftRecursiveRule(ATNConfig config) {
+		if ( TURN_OFF_LR_LOOP_ENTRY_BRANCH_OPT ) return false;
+		ATNState p = config.state;
+		// First check to see if we are in StarLoopEntryState generated during
+		// left-recursion elimination. For efficiency, also check if
+		// the context has an empty stack case. If so, it would mean
+		// global FOLLOW so we can't perform optimization
+		if ( p.getStateType() != ATNState.STAR_LOOP_ENTRY ||
+			 !((StarLoopEntryState)p).isPrecedenceDecision || // Are we the special loop entry/exit state?
+			 config.context.isEmpty() ||                      // If SLL wildcard
+			 config.context.hasEmptyPath())
+		{
+			return false;
+		}
+
+		// Require all return states to return back to the same rule
+		// that p is in.
+		int numCtxs = config.context.size();
+		for (int i = 0; i < numCtxs; i++) { // for each stack context
+			ATNState returnState = atn.states.get(config.context.getReturnState(i));
+			if ( returnState.ruleIndex != p.ruleIndex ) return false;
+		}
+
+		BlockStartState decisionStartState = (BlockStartState)p.transition(0).target;
+		int blockEndStateNum = decisionStartState.endState.stateNumber;
+		BlockEndState blockEndState = (BlockEndState)atn.states.get(blockEndStateNum);
+
+		// Verify that the top of each stack context leads to loop entry/exit
+		// state through epsilon edges and w/o leaving rule.
+		for (int i = 0; i < numCtxs; i++) {                           // for each stack context
+			int returnStateNumber = config.context.getReturnState(i);
+			ATNState returnState = atn.states.get(returnStateNumber);
+			// all states must have single outgoing epsilon edge
+			if ( returnState.getNumberOfTransitions()!=1 ||
+				 !returnState.transition(0).isEpsilon() )
+			{
+				return false;
+			}
+			// Look for prefix op case like 'not expr', (' type ')' expr
+			ATNState returnStateTarget = returnState.transition(0).target;
+			if ( returnState.getStateType()==BLOCK_END && returnStateTarget==p ) {
+				continue;
+			}
+			// Look for 'expr op expr' or case where expr's return state is block end
+			// of (...)* internal block; the block end points to loop back
+			// which points to p but we don't need to check that
+			if ( returnState==blockEndState ) {
+				continue;
+			}
+			// Look for ternary expr ? expr : expr. The return state points at block end,
+			// which points at loop entry state
+			if ( returnStateTarget==blockEndState ) {
+				continue;
+			}
+			// Look for complex prefix 'between expr and expr' case where 2nd expr's
+			// return state points at block end state of (...)* internal block
+			if ( returnStateTarget.getStateType() == BLOCK_END &&
+				 returnStateTarget.getNumberOfTransitions()==1 &&
+				 returnStateTarget.transition(0).isEpsilon() &&
+				 returnStateTarget.transition(0).target == p )
+			{
+				continue;
+			}
+
+			// anything else ain't conforming
+			return false;
+		}
+
+		return true;
 	}
 
 

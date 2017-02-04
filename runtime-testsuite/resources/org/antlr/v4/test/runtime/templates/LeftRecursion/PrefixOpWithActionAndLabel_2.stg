@@ -1,9 +1,0 @@
-import "PrefixOpWithActionAndLabel.stg"
-
-Input() ::= "a+b"
-
-Output() ::= <<
-(a+b)<\n>
->>
-
-Errors() ::= ""

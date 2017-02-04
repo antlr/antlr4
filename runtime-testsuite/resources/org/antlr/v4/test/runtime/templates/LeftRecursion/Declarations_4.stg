@@ -1,9 +1,0 @@
-import "Declarations.stg"
-
-Input() ::= "a[3]"
-
-Output() ::= <<
-(s (declarator (declarator a) [ (e 3) ]) \<EOF>)<\n>
->>
-
-Errors() ::= ""
