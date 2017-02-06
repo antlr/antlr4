@@ -24,8 +24,8 @@ I see three real pieces of machinery related to this:
 
 /** A generic mechanism for constructing parse tree nodes and
  *  assembling them into trees.
-  */
-public interface ParseTreeFactory<T extends ParseTree> {
+ */
+public interface ParseTreeFactory {
 	ParseTree createRuleNode(ParserRuleContext parent, int invokingStateNumber);
 	ErrorNode createErrorNode(Token badToken);
 	TerminalNode createLeaf(Token matchedToken);
