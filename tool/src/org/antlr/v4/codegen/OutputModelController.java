@@ -222,6 +222,7 @@ public class OutputModelController {
 			if ( altInfo.altLabel==null ) continue;
 			ST altActionST = codegenTemplates.getInstanceOf("recRuleReplaceContext");
 			altActionST.add("ctxName", Utils.capitalize(altInfo.altLabel));
+			altActionST.add("altIndex", altInfo.altNum);
 			Action altAction =
 				new Action(delegate, function.altLabelCtxs.get(altInfo.altLabel), altActionST);
 			CodeBlockForAlt alt = primaryAltsCode.get(i);
@@ -247,6 +248,7 @@ public class OutputModelController {
 				templateName = "recRuleLabeledAltStartAction";
 				altActionST = codegenTemplates.getInstanceOf(templateName);
 				altActionST.add("currentAltLabel", altInfo.altLabel);
+				altActionST.add("altIndex", altInfo.altNum);
 			}
 			else {
 				templateName = "recRuleAltStartAction";

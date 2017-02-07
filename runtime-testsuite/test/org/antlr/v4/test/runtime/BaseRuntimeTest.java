@@ -103,13 +103,13 @@ public abstract class BaseRuntimeTest {
 		@Override
 		protected void succeeded(Description description) {
 			// remove tmpdir if no error.
-			delegate.eraseTempDir();
+//			delegate.eraseTempDir();
 		}
 	};
 
 	@Test
 	public void testOne() throws Exception {
-//		 System.out.println(delegate.getTmpDir());
+		System.out.println(delegate.getTmpDir());
 		if ( descriptor.ignore(descriptor.getTarget()) ) {
 			System.out.printf("Ignore "+descriptor);
 			return;
