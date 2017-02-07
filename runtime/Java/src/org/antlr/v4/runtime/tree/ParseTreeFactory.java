@@ -24,16 +24,11 @@ I see three real pieces of machinery related to this:
  *  assembling them into trees.
  */
 public interface ParseTreeFactory {
-	ParseTree createRuleNode(ParserRuleContext parent, int invokingStateNumber);
-	ErrorNode createErrorNode(Token badToken);
-	TerminalNode createLeaf(Token matchedToken);
+	/** Create a rule node for ruleIndex as child of parent; invoked from invokingStateNumber */
+	ParseTree createRuleNode(int ruleIndex, ParserRuleContext parent, int invokingStateNumber);
 
-	void addChild(RuleNode parent, TerminalNode matchedTokenNode);
-	void addChild(RuleNode parent, ParserRuleContext ruleInvocationNode);
-
-	/** COPY a ctx (I'm deliberately not using copy constructor) to avoid
-	 *  confusion with creating node with parent. Does not copy children
-	 *  except for case mentioned at end of this comment.
+	/** Create a node for ruleIndex, copy ctx fields from src.
+	 *  Does not copy children except for case mentioned at end of this comment.
 	 *
 	 *  This is used in the generated parser code to flip a generic XContext
 	 *  node for rule X to a YContext for alt label Y. In that sense, it is
@@ -43,13 +38,21 @@ public interface ParseTreeFactory {
 	 *  to the generic XContext so this function must copy those nodes to
 	 *  the YContext as well else they are lost!
 	 */
-	void copy(ParserRuleContext src, ParserRuleContext dest);
+	ParseTree createRuleNode(int ruleIndex, ParserRuleContext src);
+
+	ErrorNode createErrorNode(Token badToken);
+
+	TerminalNode createLeaf(Token matchedToken);
+
+	void addChild(RuleNode parent, TerminalNode matchedTokenNode);
+
+	void addChild(RuleNode parent, ParserRuleContext ruleInvocationNode);
 
 	/** Used by enterOuterAlt to toss out a RuleContext previously added as
 	 *  we entered a rule. If we have # label, we will need to remove
 	 *  generic ruleContext object.
  	 */
-	ParseTree replaceLastChild(ParserRuleContext parent, ParserRuleContext newChild);
+	void replaceLastChild(ParserRuleContext parent, ParserRuleContext newChild);
 
 	// -------------------
 
