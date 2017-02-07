@@ -10,7 +10,7 @@ public class DefaultParseTreeFactory implements ParseTreeFactory {
 	}
 
 	@Override
-	public ParseTree createRuleNode(int ruleIndex, ParserRuleContext src) {
+	public ParseTree createAltLabelRuleNode(int ruleIndex, int altIndex, ParserRuleContext src) {
 		return null;
 	}
 

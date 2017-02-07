@@ -258,6 +258,15 @@ public class <parser.name> extends <superClass; null="Parser"> {
 	<parser:(ctor)()>
 	<funcs; separator="\n">
 
+<if(funcs)>
+	public static ParserRuleContext createRuleNode(int ruleIndex, ParserRuleContext parent, int stateNumber) {
+		switch ( ruleIndex ) {
+			<funcs:{f | case RULE_<f.currentRule.name> : return new <f.currentRule.ctxType>(parent, stateNumber);}; separator="\n">
+			default : return null;
+		}
+	}
+<endif>
+
 <if(sempredFuncs)>
 	public boolean sempred(RuleContext _localctx, int ruleIndex, int predIndex) {
 		switch (ruleIndex) {
@@ -381,6 +390,15 @@ RuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,namedActions,fina
 
 <ruleCtx>
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
+
+<if(altLabelCtxs)>
+public static ParserRuleContext <currentRule.name>_createAltLabelNode(int altIndex, <currentRule.name; format="cap">Context parent) {
+	switch ( altIndex ) {
+		<altLabelCtxs:{l | case <altLabelCtxs.(l).struct.altNum> : return new <altLabelCtxs.(l).struct.name>(parent);}; separator="\n">
+		default : return null;
+	}
+}
+<endif>
 
 <if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public final <endif><currentRule.ctxType> <currentRule.name>(<args; separator=",">) throws RecognitionException {
 	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, getState()<currentRule.args:{a | , <a.name>}>);

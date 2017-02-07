@@ -38,7 +38,7 @@ public interface ParseTreeFactory {
 	 *  to the generic XContext so this function must copy those nodes to
 	 *  the YContext as well else they are lost!
 	 */
-	ParseTree createRuleNode(int ruleIndex, ParserRuleContext src);
+	ParseTree createAltLabelRuleNode(int ruleIndex, int altIndex, ParserRuleContext src);
 
 	ErrorNode createErrorNode(Token badToken);
 
