@@ -16,22 +16,22 @@ public class DefaultParseTreeFactory implements ParseTreeFactory {
 
 	@Override
 	public ErrorNode createErrorNode(Token badToken) {
-		return null;
+		return new ErrorNodeImpl(badToken);
 	}
 
 	@Override
 	public TerminalNode createLeaf(Token matchedToken) {
-		return null;
+		return new TerminalNodeImpl(matchedToken);
 	}
 
 	@Override
-	public void addChild(RuleNode parent, TerminalNode matchedTokenNode) {
-
+	public void addChild(ParserRuleContext parent, TerminalNode matchedTokenNode) {
+		parent.addChild(matchedTokenNode);
 	}
 
 	@Override
-	public void addChild(RuleNode parent, ParserRuleContext ruleInvocationNode) {
-
+	public void addChild(ParserRuleContext parent, ParserRuleContext ruleInvocationNode) {
+		parent.addChild(ruleInvocationNode);
 	}
 
 	@Override

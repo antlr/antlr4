@@ -44,9 +44,9 @@ public interface ParseTreeFactory {
 
 	TerminalNode createLeaf(Token matchedToken);
 
-	void addChild(RuleNode parent, TerminalNode matchedTokenNode);
+	void addChild(ParserRuleContext parent, TerminalNode matchedTokenNode);
 
-	void addChild(RuleNode parent, ParserRuleContext ruleInvocationNode);
+	void addChild(ParserRuleContext parent, ParserRuleContext ruleInvocationNode);
 
 	/** Used by enterOuterAlt to toss out a RuleContext previously added as
 	 *  we entered a rule. If we have # label, we will need to remove
