@@ -259,14 +259,16 @@ public class <parser.name> extends <superClass; null="Parser"> {
 	<funcs; separator="\n">
 
 <if(funcs)>
-	public static ParserRuleContext createRuleNode(int ruleIndex, ParserRuleContext parent, int stateNumber) {
+	@Override
+	public ParserRuleContext createRuleNode(int ruleIndex, ParserRuleContext parent, int stateNumber) {
 		switch ( ruleIndex ) {
 			<funcs:{f | case RULE_<f.currentRule.name> : return new <f.currentRule.ctxType>(parent, stateNumber);}; separator="\n">
 			default : return null;
 		}
 	}
 
-	public static ParserRuleContext createAltLabelRuleNode(int ruleIndex, int altIndex, ParserRuleContext parent) {
+	@Override
+	public ParserRuleContext createAltLabelRuleNode(int ruleIndex, int altIndex, ParserRuleContext parent) {
 		switch ( ruleIndex ) {
 			<funcs:{f | <if(f.altLabelCtxs)>case RULE_<f.currentRule.name> : return <f.currentRule.name>_createAltLabelNode(altIndex, (<f.currentRule.name; format="cap">Context)parent);<endif>}; separator="\n">
 			default : return null;
@@ -399,7 +401,7 @@ RuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,namedActions,fina
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
 
 <if(altLabelCtxs)>
-public static ParserRuleContext <currentRule.name>_createAltLabelNode(int altIndex, <currentRule.name; format="cap">Context parent) {
+public ParserRuleContext <currentRule.name>_createAltLabelNode(int altIndex, <currentRule.name; format="cap">Context parent) {
 	switch ( altIndex ) {
 		<currentRule.altToContext:{alt | case <alt.altNum> : return new <alt.name>(parent);}; separator="\n">
 		default : return null;
@@ -446,7 +448,7 @@ LeftRecursiveRuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
 
 <if(altLabelCtxs)>
-public static ParserRuleContext <currentRule.name>_createAltLabelNode(int altIndex, <currentRule.name; format="cap">Context parent) {
+public ParserRuleContext <currentRule.name>_createAltLabelNode(int altIndex, <currentRule.name; format="cap">Context parent) {
 	switch ( altIndex ) {
 		<currentRule.altToContext:{alt | case <alt.altNum> : return new <alt.name>(parent);}; separator="\n">
 		default : return null;

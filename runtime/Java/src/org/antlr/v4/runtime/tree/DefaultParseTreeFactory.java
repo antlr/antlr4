@@ -1,17 +1,24 @@
 package org.antlr.v4.runtime.tree;
 
+import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 
 public class DefaultParseTreeFactory implements ParseTreeFactory {
+	protected Parser parser;
+
+	public DefaultParseTreeFactory(Parser parser) {
+		this.parser = parser;
+	}
+
 	@Override
 	public ParseTree createRuleNode(int ruleIndex, ParserRuleContext parent, int invokingStateNumber) {
-		return null;
+		return parser.createRuleNode(ruleIndex, parent, invokingStateNumber);
 	}
 
 	@Override
 	public ParseTree createAltLabelRuleNode(int ruleIndex, int altIndex, ParserRuleContext src) {
-		return null;
+		return parser.createAltLabelRuleNode(ruleIndex, altIndex, src);
 	}
 
 	@Override
