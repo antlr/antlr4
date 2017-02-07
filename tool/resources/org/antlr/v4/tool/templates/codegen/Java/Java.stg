@@ -265,6 +265,13 @@ public class <parser.name> extends <superClass; null="Parser"> {
 			default : return null;
 		}
 	}
+
+	public static ParserRuleContext createAltLabelNode(int ruleIndex, int altIndex, ParserRuleContext parent) {
+		switch ( ruleIndex ) {
+			<funcs:{f | <if(f.altLabelCtxs)>case RULE_<f.currentRule.name> : return <f.currentRule.name>_createAltLabelNode(altIndex, (<f.currentRule.name; format="cap">Context)parent);<endif>}; separator="\n">
+			default : return null;
+		}
+	}
 <endif>
 
 <if(sempredFuncs)>
