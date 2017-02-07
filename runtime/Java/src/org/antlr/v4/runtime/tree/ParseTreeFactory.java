@@ -3,8 +3,6 @@ package org.antlr.v4.runtime.tree;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 
-import java.util.Collection;
-
 /* Sam comments:
 
 I see three real pieces of machinery related to this:
@@ -51,7 +49,7 @@ public interface ParseTreeFactory {
 	 *  we entered a rule. If we have # label, we will need to remove
 	 *  generic ruleContext object.
  	 */
-	ParseTree removeLastChild(ParserRuleContext t);
+	ParseTree replaceLastChild(ParserRuleContext parent, ParserRuleContext newChild);
 
 	// -------------------
 
@@ -70,6 +68,6 @@ public interface ParseTreeFactory {
 	  associated with the terminal that are after it. Names pulled
 	   from Roslyn; can be adjusted.
 	 */
-	Collection<TerminalNode> getLeadingHiddenTokens(ParseTree t);
-	Collection<TerminalNode> getTrailingHiddenTokens(ParseTree t);
+//	Collection<TerminalNode> getLeadingHiddenTokens(ParseTree t);
+//	Collection<TerminalNode> getTrailingHiddenTokens(ParseTree t);
 }
