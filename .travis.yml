@@ -1,4 +1,3 @@
-dist: trusty
 sudo: true
 
 language: java
@@ -48,6 +47,7 @@ matrix:
       env: TARGET=csharp
     - os: linux
       jdk: oraclejdk7
+      dist: trusty
       env: TARGET=dotnet
     - os: linux
       jdk: oraclejdk7
@@ -63,7 +63,6 @@ matrix:
       env: TARGET=go
 
 before_install:
-  - ./.travis/before-install-mvn3.3.9-trusty.sh
   - ./.travis/before-install-$TRAVIS_OS_NAME-$TARGET.sh
 
 script:
