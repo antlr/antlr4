@@ -25,7 +25,7 @@ I see three real pieces of machinery related to this:
  */
 public interface ParseTreeFactory {
 	/** Create a rule node for ruleIndex as child of parent; invoked from invokingStateNumber */
-	ParseTree createRuleNode(int ruleIndex, ParserRuleContext parent, int invokingStateNumber);
+	ParserRuleContext createRuleNode(int ruleIndex, ParserRuleContext parent, int invokingStateNumber);
 
 	/** Create a node for ruleIndex, copy ctx fields from src.
 	 *  Does not copy children except for case mentioned at end of this comment.
@@ -38,7 +38,7 @@ public interface ParseTreeFactory {
 	 *  to the generic XContext so this function must copy those nodes to
 	 *  the YContext as well else they are lost!
 	 */
-	ParseTree createAltLabelRuleNode(int ruleIndex, int altIndex, ParserRuleContext src);
+	ParserRuleContext createAltLabelRuleNode(int ruleIndex, int altIndex, ParserRuleContext src);
 
 	ErrorNode createErrorNode(Token badToken);
 

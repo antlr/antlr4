@@ -4,21 +4,14 @@ import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 
-public class DefaultParseTreeFactory implements ParseTreeFactory {
+public abstract class AbstractParseTreeFactory implements ParseTreeFactory {
+	/** Which parser are we creating nodes for? This might be useful so I'm
+	 *  including.
+	 */
 	protected Parser parser;
 
-	public DefaultParseTreeFactory(Parser parser) {
+	public AbstractParseTreeFactory(Parser parser) {
 		this.parser = parser;
-	}
-
-	@Override
-	public ParseTree createRuleNode(int ruleIndex, ParserRuleContext parent, int invokingStateNumber) {
-		return parser.createRuleNode(ruleIndex, parent, invokingStateNumber);
-	}
-
-	@Override
-	public ParseTree createAltLabelRuleNode(int ruleIndex, int altIndex, ParserRuleContext src) {
-		return parser.createAltLabelRuleNode(ruleIndex, altIndex, src);
 	}
 
 	@Override

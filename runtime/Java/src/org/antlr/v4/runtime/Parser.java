@@ -18,7 +18,6 @@ import org.antlr.v4.runtime.atn.RuleTransition;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntegerStack;
 import org.antlr.v4.runtime.misc.IntervalSet;
-import org.antlr.v4.runtime.tree.DefaultParseTreeFactory;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTreeFactory;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
@@ -145,7 +144,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 	protected List<ParseTreeListener> _parseListeners;
 
 	/** How to build nodes and assemble trees */
-	protected ParseTreeFactory _treeFactory = new DefaultParseTreeFactory(this);
+	protected ParseTreeFactory _treeFactory;
 
 	/**
 	 * The number of syntax errors reported during parsing. This value is
@@ -599,12 +598,6 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 			parent.addChild(_ctx);
 		}
 	}
-
-	/** How to create a parse tree rule node; generated parsers override to implement */
-	public ParserRuleContext createRuleNode(int ruleIndex, ParserRuleContext parent, int stateNumber) { return null; }
-
-	/** How to create a parse tree rule node associated with an alternative label; generated parsers override to implement */
-	public ParserRuleContext createAltLabelRuleNode(int ruleIndex, int altIndex, ParserRuleContext parent) { return null; }
 
 	/**
 	 * Always called by generated parsers upon entry to a rule. Access field
