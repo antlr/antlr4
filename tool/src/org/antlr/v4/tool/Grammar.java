@@ -86,7 +86,12 @@ public class Grammar implements AttributeResolver {
 
 	public static final Set<String> lexerOptions = parserOptions;
 
+
+	//TODO(garym) add extends rule options
 	public static final Set<String> ruleOptions = new HashSet<String>();
+	static {
+		ruleOptions.add("extends");
+	}
 
 	public static final Set<String> ParserBlockOptions = new HashSet<String>();
 

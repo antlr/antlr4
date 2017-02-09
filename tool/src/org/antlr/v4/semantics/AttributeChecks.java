@@ -49,6 +49,12 @@ public class AttributeChecks implements ActionSplitterListener {
         }
 
         for (Rule r : g.rules.values()) {
+			String importedG = g.tool.importRules_Alts.get(r.name);
+			if ( importedG != null ) {
+				String prefix = g.tool.importParamsMap.get(importedG).prefix;
+				r.prefix = prefix;
+				r.imported = true;
+			}
             for (ActionAST a : r.namedActions.values()) {
                 AttributeChecks checker = new AttributeChecks(g, r, null, a, a.token);
                 checker.examineAction();

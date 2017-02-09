@@ -319,7 +319,16 @@ public class ParserFactory extends DefaultOutputModelFactory {
 			String implLabel = gen.getTarget().getImplicitRuleLabel(ast.getText());
 			String ctxName =
 				gen.getTarget().getRuleFunctionContextStructName(r);
-			d = new RuleContextDecl(this, implLabel, ctxName);
+			
+			String orgGrammar = ast.g.tool.importRules_Alts.get(r.name);
+			if ( orgGrammar != null ) {
+				System.out.println("defineImplicitLabel Modify alt label:" + implLabel + " ctxName:" + ctxName);
+				String prefix = ast.g.tool.importParamsMap.get(orgGrammar).prefix;
+				d = new RuleContextDecl(this, implLabel, ctxName, prefix, true);
+			} else {
+				d = new RuleContextDecl(this, implLabel, ctxName, "", false);
+			}
+			
 			((RuleContextDecl)d).isImplicit = true;
 		}
 		else {

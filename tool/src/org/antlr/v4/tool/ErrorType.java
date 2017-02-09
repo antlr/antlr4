@@ -445,6 +445,14 @@ public enum ErrorType {
 	 */
 	ALT_LABEL_REDEF(123, "rule alt label <arg> redefined in rule <arg2>, originally in rule <arg3>", ErrorSeverity.ERROR),
 	/**
+	 * Compiler Error 123.
+	 *
+	 * <p>
+	 * rule alt label <em>label</em> redefined in rule <em>rule1</em>,
+	 * originally in rule <em>rule2</em></p>
+	 */
+	ALT_LABEL_REDEF_BY_IMPORT(1230, "rule alt label <arg> redefined by extension rule via import", ErrorSeverity.ERROR),
+	/**
 	 * Compiler Error 124.
 	 *
 	 * <p>

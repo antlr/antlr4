@@ -13,6 +13,9 @@ import org.antlr.v4.tool.Alternative;
 /** Any ALT (which can be child of ALT_REWRITE node) */
 public class AltAST extends GrammarASTWithOptions {
 	public Alternative alt;
+	
+	/** true if this Alt is in the root grammar (ie not an import) and inside an extension rule */
+	public boolean isExtention;
 
 	/** If we transformed this alt from a left-recursive one, need info on it */
 	public LeftRecursiveRuleAltInfo leftRecursiveAltInfo;
@@ -25,6 +28,7 @@ public class AltAST extends GrammarASTWithOptions {
 	public AltAST(AltAST node) {
 		super(node);
 		this.alt = node.alt;
+		this.isExtention = node.isExtention;
 		this.altLabel = node.altLabel;
 		this.leftRecursiveAltInfo = node.leftRecursiveAltInfo;
 	}

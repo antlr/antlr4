@@ -44,6 +44,14 @@ public class VisitorFile extends OutputFile {
 		parserName = g.getRecognizerName();
 		grammarName = g.name;
 		for (Rule r : g.rules.values()) {
+			// TODO(garym) needed?
+			String importedG = g.tool.importRules_Alts.get(r.name);
+			if ( importedG != null ) {
+				String prefix = g.tool.importParamsMap.get(importedG).prefix;
+				r.prefix = prefix;
+				r.imported = true;
+			}
+
 			Map<String, List<Pair<Integer, AltAST>>> labels = r.getAltLabels();
 			if ( labels!=null ) {
 				for (Map.Entry<String, List<Pair<Integer, AltAST>>> pair : labels.entrySet()) {

@@ -15,15 +15,20 @@ public class Decl extends SrcOp {
 	public String decl; 	// whole thing if copied from action
 	public boolean isLocal; // if local var (not in RuleContext struct)
 	public StructDecl ctx;  // which context contains us? set by addDecl
+	final public boolean isImported;
+	final public String prefix;
 
-	public Decl(OutputModelFactory factory, String name, String decl) {
-		this(factory, name);
+
+	public Decl(OutputModelFactory factory, String name, String decl, String prefix, boolean imported) {
+		this(factory, name, prefix, imported);
 		this.decl = decl;
 	}
 
-	public Decl(OutputModelFactory factory, String name) {
+	public Decl(OutputModelFactory factory, String name, String prefix, boolean imported) {
 		super(factory);
 		this.name = name;
+		this.isImported = imported;
+		this.prefix = prefix;
 	}
 
 	@Override

@@ -21,10 +21,12 @@ public class MatchToken extends RuleElement implements LabeledOp {
 	public String name;
 	public int ttype;
 	public List<Decl> labels = new ArrayList<Decl>();
+//	public boolean imported;
 
 	public MatchToken(OutputModelFactory factory, TerminalAST ast) {
 		super(factory, ast);
 		Grammar g = factory.getGrammar();
+//		imported = g.name == ()
 		CodeGenerator gen = factory.getGenerator();
 		ttype = g.getTokenType(ast.getText());
 		name = gen.getTarget().getTokenTypeAsTargetLabel(g, ttype);

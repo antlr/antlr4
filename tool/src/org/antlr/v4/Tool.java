@@ -59,8 +59,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Tool {
@@ -112,6 +114,8 @@ public class Tool {
 	public boolean gen_visitor = false;
 	public boolean gen_dependencies = false;
 	public String genPackage = null;
+	public String antlrRuntimeImport = null;
+	public String importParams = null;
 	public Map<String, String> grammarOptions = null;
 	public boolean warnings_are_errors = false;
 	public boolean longMessages = false;
@@ -128,8 +132,12 @@ public class Tool {
 		new Option("gen_visitor",		"-visitor", "generate parse tree visitor"),
 		new Option("gen_visitor",		"-no-visitor", "don't generate parse tree visitor (default)"),
 		new Option("genPackage",		"-package", OptionArgType.STRING, "specify a package/namespace for the generated code"),
+		new Option("antlrRuntimeImport","-runtimeImport", OptionArgType.STRING, "specify the runtime package to import"),
+		new Option("importParams",      "-importParams", OptionArgType.STRING, "when importing grammars these parameters modify the generated code\n" +
+		                                                                        " language dependant \n" + 
+				                                                                "  for Go  importedGrammar:packagename:import_path"),
 		new Option("gen_dependencies",	"-depend", "generate file dependencies"),
-		new Option("",					"-D<option>=value", "set/override a grammar-level option"),
+		new Option("",					"-D<option>=value", "set/override a grammar-level option" ),
 		new Option("warnings_are_errors", "-Werror", "treat warnings as errors"),
         new Option("launch_ST_inspector", "-XdbgST", "launch StringTemplate visualizer on generated code"),
 		new Option("ST_inspector_wait_for_close", "-XdbgSTWait", "wait for STViz to close before continuing"),
@@ -270,8 +278,48 @@ public class Tool {
 			STGroup.trackCreationEvents = true;
 			return_dont_exit = true;
 		}
+		if ( importParams != null ) {
+			if ( !grammarOptions.get("language").equals("Go") ) {
+				errMgr.toolError(ErrorType.INVALID_CMDLINE_ARG, "-Dlanguage=Go required. ImportParams currently only support for Go target");				
+			}
+			String[] params = importParams.split(":");
+			if ( params.length != 3 ) {
+				errMgr.toolError(ErrorType.INVALID_CMDLINE_ARG, "ImportParams must be in the form of parsername:package:importpath");								
+			}
+			importParamsMap.put(params[0], new importParam(params[1]+".", params[2]) );
+//			addImports.add(params[2]);
+		}
 	}
 
+	public static class importParam {
+		public String prefix;
+		public String packageName;
+		public importParam(String prefix, String packageName) {
+			super();
+			this.prefix = prefix;
+			this.packageName = packageName;
+		}		
+	}
+		
+	// rule and alt names to org grammar.
+	public Map<String,String> importRules_Alts = new HashMap<String, String>();
+	public Map<String,String> importMaybeAlts = new HashMap<String, String>();
+	public Map<String, RuleExtends>  importRulesExtended = new HashMap<String, RuleExtends>();
+
+	public static class RuleExtends {
+		public RuleAST rule;
+		public String importedRuleName;
+		public RuleExtends( RuleAST rule, String iName ) {
+			this.rule = rule;
+			this.importedRuleName = iName;
+		}
+	}
+	
+	
+	// org grammar to import modifiers. 
+	public Map<String,importParam> importParamsMap = new HashMap<String, importParam>();
+//	public Set<String> addImports = new HashSet<String>();
+		
 	protected void handleOptionSetArg(String arg) {
 		int eq = arg.indexOf('=');
 		if ( eq>0 && arg.length()>3 ) {
@@ -335,6 +383,11 @@ public class Tool {
 		GrammarTransformPipeline transform = new GrammarTransformPipeline(g, this);
 		transform.process();
 
+//		for( Rule a : g.rules.values() ) {
+//			System.out.println("**rules " +  a.name + " '" + a.prefix + "'");			
+//		}
+//		System.out.println("---------------" );
+
 		LexerGrammar lexerg;
 		GrammarRootAST lexerAST;
 		if ( g.ast!=null && g.ast.grammarType== ANTLRParser.COMBINED &&
@@ -359,7 +412,25 @@ public class Tool {
 		if ( g.implicitLexer!=null ) g.importVocab(g.implicitLexer);
 //		System.out.println("tokens="+g.tokenNameToTypeMap);
 //		System.out.println("strings="+g.stringLiteralToTypeMap);
+
+		System.out.println("---------------" );
+		for(  String a : g.tool.importRules_Alts.values() ) {
+			System.out.println("external " + a );
+		}
+		System.out.println("---------------" );
+		for(  String a : g.tool.importMaybeAlts.keySet() ) {
+			System.out.println("maybe " + a  + " -> " + g.tool.importMaybeAlts.get(a));
+		}
+		System.out.println("---------------" );
+		
+		
 		processNonCombinedGrammar(g, gencode);
+//		System.out.println("---------------" );
+//		for( Rule a : g.rules.values() ) {
+//			System.out.println("**rules " +  a.name + " '" + a.prefix + "'");			
+//		}
+//		System.out.println("---------------" );
+		
 	}
 
 	public void processNonCombinedGrammar(Grammar g, boolean gencode) {

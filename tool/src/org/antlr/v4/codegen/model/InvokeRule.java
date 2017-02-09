@@ -49,12 +49,29 @@ public class InvokeRule extends RuleElement implements LabeledOp {
 			String label = labelAST.getText();
 			if ( labelAST.parent.getType() == ANTLRParser.PLUS_ASSIGN  ) {
 				factory.defineImplicitLabel(ast, this);
-				String listLabel = gen.getTarget().getListLabel(label);
-				RuleContextListDecl l = new RuleContextListDecl(factory, listLabel, ctxName);
+				String listLabel = gen.getTarget().getListLabel(label);		
+				RuleContextListDecl l;
+//				System.out.println("LeftRecursiveRuleFunction Modify alt label:" + label + " listLabel:" + listLabel + " ctxName:" + ctxName);
+				String orgGrammar = factory.getGrammar().tool.importRules_Alts.get(r.name);
+				if ( orgGrammar != null ) {
+					String prefix = factory.getGrammar().tool.importParamsMap.get(orgGrammar).prefix;
+					l = new RuleContextListDecl(factory, listLabel, ctxName, prefix, true);
+				} else {
+					l = new RuleContextListDecl(factory, listLabel, ctxName, "", false);
+				}
+
 				rf.addContextDecl(ast.getAltLabel(), l);
 			}
 			else {
-				RuleContextDecl d = new RuleContextDecl(factory,label,ctxName);
+//				System.out.println("InvokeRule Modify alt label:" + label + " ctxName:" + ctxName);
+				String orgGrammar = factory.getGrammar().tool.importRules_Alts.get(r.name);
+				RuleContextDecl d;
+				if ( orgGrammar != null ) {
+					String prefix = factory.getGrammar().tool.importParamsMap.get(orgGrammar).prefix;
+					d = new RuleContextDecl(factory, label, ctxName, prefix, true);
+				} else {
+					d = new RuleContextDecl(factory, label, ctxName, "", false);					
+				}
 				labels.add(d);
 				rf.addContextDecl(ast.getAltLabel(), d);
 			}
@@ -68,7 +85,15 @@ public class InvokeRule extends RuleElement implements LabeledOp {
 		// If action refs rule as rulename not label, we need to define implicit label
 		if ( factory.getCurrentOuterMostAlt().ruleRefsInActions.containsKey(ast.getText()) ) {
 			String label = gen.getTarget().getImplicitRuleLabel(ast.getText());
-			RuleContextDecl d = new RuleContextDecl(factory,label,ctxName);
+			String orgGrammar = factory.getGrammar().tool.importRules_Alts.get(r.name);
+			System.out.println("InvokeRule Modify alt label:" + label + " ctxName:" + ctxName);
+			RuleContextDecl d;
+			if ( orgGrammar != null ) {
+				String prefix = factory.getGrammar().tool.importParamsMap.get(orgGrammar).prefix;
+				d = new RuleContextDecl(factory, label, ctxName, prefix, true);
+			} else {
+				d = new RuleContextDecl(factory, label, ctxName, "", false);					
+			}
 			labels.add(d);
 			rf.addContextDecl(ast.getAltLabel(), d);
 		}

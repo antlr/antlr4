@@ -12,6 +12,9 @@ import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.tool.Grammar;
 
 public class RuleAST extends GrammarASTWithOptions {
+	
+	public boolean isExtention;
+
 	public RuleAST(RuleAST node) {
 		super(node);
 	}
@@ -31,7 +34,11 @@ public class RuleAST extends GrammarASTWithOptions {
 	}
 
 	@Override
-	public RuleAST dupNode() { return new RuleAST(this); }
+	public RuleAST dupNode() {
+		RuleAST dup = new RuleAST(this);
+		dup.isExtention = this.isExtention;
+		return dup; 
+	}
 
 	public ActionAST getLexerAction() {
 		Tree blk = getFirstChildWithType(ANTLRParser.BLOCK);

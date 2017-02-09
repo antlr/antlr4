@@ -26,6 +26,9 @@ import java.util.List;
 public class StructDecl extends Decl {
 	public String derivedFromName; // rule name or label name
 	public boolean provideCopyFrom;
+//	public String grammarName;
+//	public String importedGrammarName;
+
 	@ModelElement public OrderedHashSet<Decl> attrs = new OrderedHashSet<Decl>();
 	@ModelElement public OrderedHashSet<Decl> getters = new OrderedHashSet<Decl>();
 	@ModelElement public Collection<AttributeDecl> ctorAttrs;
@@ -43,11 +46,14 @@ public class StructDecl extends Decl {
 	public OrderedHashSet<Decl> ruleContextListDecls = new OrderedHashSet<Decl>();
 	public OrderedHashSet<Decl> attributeDecls = new OrderedHashSet<Decl>();
 
-	public StructDecl(OutputModelFactory factory, Rule r) {
-		super(factory, factory.getGenerator().getTarget().getRuleFunctionContextStructName(r));
+	public StructDecl(OutputModelFactory factory, Rule r, String prefix, boolean imported) {
+		super(factory, factory.getGenerator().getTarget().getRuleFunctionContextStructName(r), prefix, imported);
 		addDispatchMethods(r);
 		derivedFromName = r.name;
 		provideCopyFrom = r.hasAltSpecificContexts();
+//		grammarName = factory.getGrammar().name;
+//		importedGrammarName = r.importedG.name;
+//		isImported = grammarName != importedGrammarName;
 	}
 
 	public void addDispatchMethods(Rule r) {
@@ -67,8 +73,11 @@ public class StructDecl extends Decl {
 	public void addDecl(Decl d) {
 		d.ctx = this;
 
-		if ( d instanceof ContextGetterDecl ) getters.add(d);
-		else attrs.add(d);
+		if ( d instanceof ContextGetterDecl ) {
+			getters.add(d);
+		} else {
+			attrs.add(d);
+		}
 
 		// add to specific "lists"
 		if ( d instanceof TokenTypeDecl ) {
@@ -92,7 +101,7 @@ public class StructDecl extends Decl {
 	}
 
 	public void addDecl(Attribute a) {
-		addDecl(new AttributeDecl(factory, a));
+		addDecl(new AttributeDecl(factory, a, prefix, isImported));
 	}
 
 	public void addDecls(Collection<Attribute> attrList) {
