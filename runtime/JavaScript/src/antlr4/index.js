@@ -5,6 +5,7 @@
 exports.atn = require('./atn/index');
 exports.codepointat = require('./polyfills/codepointat');
 exports.dfa = require('./dfa/index');
+exports.fromcodepoint = require('./polyfills/fromcodepoint');
 exports.tree = require('./tree/index');
 exports.error = require('./error/index');
 exports.Token = require('./Token').Token;

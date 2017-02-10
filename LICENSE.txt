@@ -28,6 +28,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =====
 
 MIT License for codepointat.js from https://git.io/codepointat
+MIT License for fromcodepoint.js from https://git.io/vDW1m
 
 Copyright Mathias Bynens <https://mathiasbynens.be/>
 
