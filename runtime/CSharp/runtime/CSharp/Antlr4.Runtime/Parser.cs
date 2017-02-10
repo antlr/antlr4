@@ -3,6 +3,7 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 using System;
+using System.IO;
 using System.Text;
 using System.Collections.Generic;
 using Antlr4.Runtime.Atn;
@@ -21,14 +22,20 @@ namespace Antlr4.Runtime
 #if !PORTABLE
         public class TraceListener : IParseTreeListener
         {
+            private readonly TextWriter Output;
+
+            public TraceListener(TextWriter output) {
+                Output = output;
+            }
+
             public virtual void EnterEveryRule(ParserRuleContext ctx)
             {
-                System.Console.Out.WriteLine("enter   " + this._enclosing.RuleNames[ctx.RuleIndex] + ", LT(1)=" + this._enclosing._input.LT(1).Text);
+                Output.WriteLine("enter   " + this._enclosing.RuleNames[ctx.RuleIndex] + ", LT(1)=" + this._enclosing._input.LT(1).Text);
             }
 
             public virtual void ExitEveryRule(ParserRuleContext ctx)
             {
-                System.Console.Out.WriteLine("exit    " + this._enclosing.RuleNames[ctx.RuleIndex] + ", LT(1)=" + this._enclosing._input.LT(1).Text);
+                Output.WriteLine("exit    " + this._enclosing.RuleNames[ctx.RuleIndex] + ", LT(1)=" + this._enclosing._input.LT(1).Text);
             }
 
             public virtual void VisitErrorNode(IErrorNode node)
@@ -39,7 +46,7 @@ namespace Antlr4.Runtime
             {
                 ParserRuleContext parent = (ParserRuleContext)((IRuleNode)node.Parent).RuleContext;
                 IToken token = node.Symbol;
-                System.Console.Out.WriteLine("consume " + token + " rule " + this._enclosing.RuleNames[parent.RuleIndex]);
+                Output.WriteLine("consume " + token + " rule " + this._enclosing.RuleNames[parent.RuleIndex]);
             }
 
             internal TraceListener(Parser _enclosing)
@@ -161,9 +168,14 @@ namespace Antlr4.Runtime
         /// </remarks>
         private int _syntaxErrors;
 
-        public Parser(ITokenStream input)
+        protected readonly TextWriter Output;
+
+        public Parser(ITokenStream input) : this(input, Console.Out) { }
+
+        public Parser(ITokenStream input, TextWriter output)
         {
             TokenStream = input;
+            Output = output;
         }
 
         /// <summary>reset the parser's state</summary>
@@ -1143,10 +1155,10 @@ namespace Antlr4.Runtime
                 {
                     if (seenOne)
                     {
-                        System.Console.Out.WriteLine();
+                        Output.WriteLine();
                     }
-                    System.Console.Out.WriteLine("Decision " + dfa.decision + ":");
-                    System.Console.Out.Write(dfa.ToString(Vocabulary));
+                    Output.WriteLine("Decision " + dfa.decision + ":");
+                    Output.Write(dfa.ToString(Vocabulary));
                     seenOne = true;
                 }
             }

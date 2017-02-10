@@ -3,6 +3,7 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Text;
 using Antlr4.Runtime;
@@ -32,6 +33,8 @@ namespace Antlr4.Runtime
         public const int MaxCharValue = '\uFFFE';
 
         private ICharStream _input;
+
+        protected readonly TextWriter Output;
 
 		private Tuple<ITokenSource, ICharStream> _tokenFactorySourcePair;
 
@@ -94,9 +97,12 @@ namespace Antlr4.Runtime
         /// </remarks>
 		private string _text;
 
-        public Lexer(ICharStream input)
+        public Lexer(ICharStream input) : this(input, Console.Out) { }
+
+        public Lexer(ICharStream input, TextWriter output)
         {
             this._input = input;
+            this.Output = output;
             this._tokenFactorySourcePair = Tuple.Create((ITokenSource)this, input);
         }
 
