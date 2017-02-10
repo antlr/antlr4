@@ -24,31 +24,6 @@ public final class CodePointCharStream implements CharStream {
 	private final String name;
 
 	/**
-	 * Convenience method to create a {@link CodePointCharStream}
-	 * for the Unicode code points in a Java {@link String}.
-	 */
-	public static CodePointCharStream createWithString(String s) {
-		// Initial guess assumes no code points > U+FFFF: one code
-		// point for each code unit in the string
-		IntBuffer codePointBuffer = IntBuffer.allocate(s.length());
-		int stringIdx = 0;
-		while (stringIdx < s.length()) {
-			if (!codePointBuffer.hasRemaining()) {
-				// Grow the code point buffer size by 2.
-				IntBuffer newBuffer = IntBuffer.allocate(codePointBuffer.capacity() * 2);
-				codePointBuffer.flip();
-				newBuffer.put(codePointBuffer);
-				codePointBuffer = newBuffer;
-			}
-			int codePoint = Character.codePointAt(s, stringIdx);
-			codePointBuffer.put(codePoint);
-			stringIdx += Character.charCount(codePoint);
-		}
-		codePointBuffer.flip();
-		return new CodePointCharStream(codePointBuffer);
-	}
-
-	/**
 	 * Constructs a {@link CodePointCharStream} which provides access
 	 * to the Unicode code points stored in {@code codePointBuffer}.
 	 *
