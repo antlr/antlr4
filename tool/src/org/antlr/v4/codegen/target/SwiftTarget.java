@@ -8,6 +8,7 @@ package org.antlr.v4.codegen.target;
 
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.codegen.Target;
+import org.antlr.v4.codegen.UnicodeEscapes;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNDeserializer;
@@ -550,4 +551,9 @@ public class SwiftTarget extends Target {
         }
 
     }
+
+	@Override
+	protected void appendUnicodeEscapedCodePoint(int codePoint, StringBuilder sb) {
+		UnicodeEscapes.appendSwiftStyleEscapedCodePoint(codePoint, sb);
+	}
 }
