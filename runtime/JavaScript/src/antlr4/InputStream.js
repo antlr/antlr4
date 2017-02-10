@@ -7,13 +7,14 @@
 
 var Token = require('./Token').Token;
 require('./polyfills/codepointat');
+require('./polyfills/fromcodepoint');
 
 // Vacuum all input from a string and then treat it like a buffer.
 
 function _loadString(stream, decodeToUnicodeCodePoints) {
 	stream._index = 0;
 	stream.data = [];
-	if (decodeToUnicodeCodePoints) {
+	if (stream.decodeToUnicodeCodePoints) {
 		for (var i = 0; i < stream.strdata.length; ) {
 			var codePoint = stream.strdata.codePointAt(i);
 			stream.data.push(codePoint);
@@ -36,7 +37,8 @@ function _loadString(stream, decodeToUnicodeCodePoints) {
 function InputStream(data, decodeToUnicodeCodePoints) {
 	this.name = "<empty>";
 	this.strdata = data;
-	_loadString(this, decodeToUnicodeCodePoints || false);
+	this.decodeToUnicodeCodePoints = decodeToUnicodeCodePoints || false;
+	_loadString(this);
 	return this;
 }
 
@@ -114,7 +116,15 @@ InputStream.prototype.getText = function(start, stop) {
 	if (start >= this._size) {
 		return "";
 	} else {
-		return this.strdata.slice(start, stop + 1);
+		if (this.decodeToUnicodeCodePoints) {
+			var result = "";
+			for (var i = start; i <= stop; i++) {
+				result += String.fromCodePoint(this.data[i]);
+			}
+			return result;
+		} else {
+			return this.strdata.slice(start, stop + 1);
+		}
 	}
 };
 
