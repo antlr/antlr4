@@ -37,6 +37,7 @@ import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.test.runtime.ErrorQueue;
 import org.antlr.v4.test.runtime.RuntimeTestSupport;
 import org.antlr.v4.test.runtime.StreamVacuum;
+import org.antlr.v4.test.runtime.TestOutputReading;
 import org.antlr.v4.tool.ANTLRMessage;
 import org.antlr.v4.tool.DOTGenerator;
 import org.antlr.v4.tool.Grammar;
@@ -51,6 +52,7 @@ import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupString;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
@@ -484,25 +486,21 @@ public abstract class BasePythonTest implements RuntimeTestSupport {
 	public String execModule(String fileName) {
 		String pythonPath = locatePython();
 		String runtimePath = locateRuntime();
-		String modulePath = new File(new File(tmpdir), fileName).getAbsolutePath();
-		String inputPath = new File(new File(tmpdir), "input").getAbsolutePath();
+		File tmpdirFile = new File(tmpdir);
+		String modulePath = new File(tmpdirFile, fileName).getAbsolutePath();
+		String inputPath = new File(tmpdirFile, "input").getAbsolutePath();
+		Path outputPath = tmpdirFile.toPath().resolve("output").toAbsolutePath();
 		try {
-			ProcessBuilder builder = new ProcessBuilder( pythonPath, modulePath, inputPath );
+			ProcessBuilder builder = new ProcessBuilder( pythonPath, modulePath, inputPath, outputPath.toString() );
 			builder.environment().put("PYTHONPATH",runtimePath);
 			builder.environment().put("PYTHONIOENCODING", "utf-8");
-			builder.directory(new File(tmpdir));
+			builder.directory(tmpdirFile);
 			Process process = builder.start();
-			StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
 			StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
-			stdoutVacuum.start();
 			stderrVacuum.start();
 			process.waitFor();
-			stdoutVacuum.join();
 			stderrVacuum.join();
-			String output = stdoutVacuum.toString();
-			if ( output.length()==0 ) {
-				output = null;
-			}
+			String output = TestOutputReading.read(outputPath);
 			if ( stderrVacuum.toString().length()>0 ) {
 				this.stderrDuringParse = stderrVacuum.toString();
 			}
