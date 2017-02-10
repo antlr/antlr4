@@ -95,6 +95,8 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>2.19.1</version>
 				<configuration>
+					<!-- SUREFIRE-951: file.encoding cannot be set via systemPropertyVariables -->
+					<argLine>-Dfile.encoding=UTF-8</argLine>
 					<includes>
 						<include>**/csharp/Test*.java</include>
 						<include>**/java/Test*.java</include>
