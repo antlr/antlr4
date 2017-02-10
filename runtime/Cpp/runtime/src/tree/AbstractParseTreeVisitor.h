@@ -71,8 +71,8 @@ namespace tree {
     /// <returns> The default value returned by visitor methods. </returns>
     virtual antlrcpp::Any defaultResult() {
       //return 0;
-			//CH2017-2-2 we must return nullptr not (int)0 otherwise isNotNull from class Any does not work.
-			return nullptr;
+      //CH2017-2-2 we must return nullptr not (int)0 otherwise isNotNull from class Any does not work.
+      return nullptr;
     }
 
     /// <summary>
