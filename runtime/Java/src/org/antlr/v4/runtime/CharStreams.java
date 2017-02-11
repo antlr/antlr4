@@ -32,6 +32,10 @@ public final class CharStreams {
 	 * for the Unicode code points in a Java {@link String}.
 	 */
 	public static CodePointCharStream createWithString(String s) {
+		return createWithString(s, IntStream.UNKNOWN_SOURCE_NAME);
+	}
+
+	public static CodePointCharStream createWithString(String s, String sourceName) {
 		// Initial guess assumes no code points > U+FFFF: one code
 		// point for each code unit in the string
 		IntBuffer codePointBuffer = IntBuffer.allocate(s.length());
@@ -49,7 +53,7 @@ public final class CharStreams {
 			stringIdx += Character.charCount(codePoint);
 		}
 		codePointBuffer.flip();
-		return new CodePointCharStream(codePointBuffer, IntStream.UNKNOWN_SOURCE_NAME);
+		return new CodePointCharStream(codePointBuffer, sourceName);
 	}
 
 	public static CodePointCharStream createWithUTF8(Path path) throws IOException {
