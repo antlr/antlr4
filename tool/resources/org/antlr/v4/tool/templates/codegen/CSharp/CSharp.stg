@@ -37,6 +37,7 @@ namespace <file.genPackage> {
 <endif>
 <namedActions.header>
 using System;
+using System.IO;
 using System.Text;
 using System.Diagnostics;
 using System.Collections.Generic;
@@ -357,8 +358,10 @@ case <f.ruleIndex> : return <f.name>_sempred(<if(!recog.modes)>(<f.ctxType>)<end
 >>
 
 parser_ctor(parser) ::= <<
-public <csIdentifier.(parser.name)>(ITokenStream input)
-	: base(input)
+	public <csIdentifier.(parser.name)>(ITokenStream input) : this(input, Console.Out) { }
+
+	public <csIdentifier.(parser.name)>(ITokenStream input, TextWriter output)
+	: base(input, output)
 {
 	Interpreter = new ParserATNSimulator(this, _ATN, decisionToDFA, sharedContextCache);
 }
@@ -958,6 +961,7 @@ namespace <file.genPackage> {
 <endif>
 <namedActions.header>
 using System;
+using System.IO;
 using System.Text;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Atn;
@@ -1001,7 +1005,10 @@ public partial class <csIdentifier.(lexer.name)> : <superClass; null="Lexer"> {
 	<namedActions.members>
 
 	public <csIdentifier.(lexer.name)>(ICharStream input)
-		: base(input)
+	: this(input, Console.Out) { }
+
+	public <csIdentifier.(lexer.name)>(ICharStream input, TextWriter output)
+	: base(input, output)
 	{
 		Interpreter = new LexerATNSimulator(this, _ATN, decisionToDFA, sharedContextCache);
 	}
