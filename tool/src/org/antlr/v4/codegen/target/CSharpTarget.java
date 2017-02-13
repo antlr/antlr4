@@ -46,7 +46,7 @@ public class CSharpTarget extends Target {
 			formatted = String.format("\\x%X", v & 0xFFFF);
 		}
 
-		return "'" + formatted + "'";
+		return formatted;
 	}
 
 	@Override
