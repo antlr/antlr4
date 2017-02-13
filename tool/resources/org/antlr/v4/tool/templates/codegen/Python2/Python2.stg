@@ -52,6 +52,7 @@ ParserFile(file, parser, namedActions, contextSuperClass) ::= <<
 from __future__ import print_function
 from antlr4 import *
 from io import StringIO
+import sys
 
 <namedActions.header>
 <parser>
@@ -198,8 +199,8 @@ def sempred(self, localctx, ruleIndex, predIndex):
 >>
 
 parser_ctor(p) ::= <<
-def __init__(self, input):
-    super(<parser.name>, self).__init__(input)
+def __init__(self, input, output=sys.stdout):
+    super(<parser.name>, self).__init__(input, output=output)
     self.checkVersion("<file.ANTLRVersion>")
     self._interp = ParserATNSimulator(self, self.atn, self.decisionsToDFA, self.sharedContextCache)
     self._predicates = None
@@ -740,6 +741,7 @@ LexerFile(lexerFile, lexer, namedActions) ::= <<
 from __future__ import print_function
 from antlr4 import *
 from io import StringIO
+import sys
 
 <namedActions.header>
 
@@ -780,8 +782,8 @@ class <lexer.name>(<if(superClass)><superClass><else>Lexer<endif>):
 
     grammarFileName = u"<lexer.grammarFileName>"
 
-    def __init__(self, input=None):
-        super(<lexer.name>, self).__init__(input)
+    def __init__(self, input=None, output=sys.stdout):
+        super(<lexer.name>, self).__init__(input, output=output)
         self.checkVersion("<lexerFile.ANTLRVersion>")
         self._interp = LexerATNSimulator(self, self.atn, self.decisionsToDFA, PredictionContextCache())
         self._actions = None
