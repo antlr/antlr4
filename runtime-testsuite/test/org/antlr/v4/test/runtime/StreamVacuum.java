@@ -25,12 +25,7 @@ public final class StreamVacuum implements Runnable {
 	@Override
 	public void run() {
 		try {
-			String line = in.readLine();
-			while (line!=null) {
-				buf.append(line);
-				buf.append('\n');
-				line = in.readLine();
-			}
+			TestOutputReading.append(in, buf);
 		}
 		catch (IOException ioe) {
 			System.err.println("can't read output from process");
