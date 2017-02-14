@@ -869,7 +869,6 @@ bitsetInlineComparison(s, bits) ::= <%
 <bits.ttypes:{ttype | <s.varName> == <parser.name><ttype>}; separator=" || ">
 %>
 
-
 InvokeRule(r, argExprsChunks) ::= <<
 {
 	p.SetState(<r.stateNumber>)
@@ -899,7 +898,6 @@ MatchToken(m) ::= <<
 	p.SetState(<m.stateNumber>)
 	<if(m.labels)>
     	var _m = p.Match(<parser.name><m.name>)
-    	//here
         <m.labels:{l | <labelRefStuff(l,"_m")> }; separator="\n">
 	<else>
     	p.Match(<parser.name><m.name>)
@@ -911,10 +909,7 @@ MatchSet(m, expr, capture) ::= "<CommonSetStuff(m, expr, capture, false)>"
 
 MatchNotSet(m, expr, capture) ::= "<CommonSetStuff(m, expr, capture, true)>"
 
-
 CommonSetStuff(m, expr, capture, invert) ::= <<
-
-
 p.SetState(<m.stateNumber>)
 <if(m.labels)>
 
@@ -1028,32 +1023,30 @@ AddToLabelList(a) ::= "<ctx(a.label)>.<a.listName> = append(<ctx(a.label)>.<a.li
 
 
 TokenDecl(t) ::= <<
-//here1
+//TokenDecl
 <t.name> <TokenLabelType()>
 >>
 TokenTypeDecl(t) ::= <<
-//here2
+//TokenTypeDecl
 <t.name> int
 >>
 TokenListDecl(t) ::= <<
-//here3
+//TokenListDecl
 <t.name> []antlr.Token
 >>
 
 RuleContextDecl(r) ::= <<
 //RuleContextDecl
 <r.name> I<r.ctxName>
-//<r.name> *<r.prefix><r.ctxName>
 >>
 
 RuleContextListDecl(rdecl) ::= <<
 //RuleContextListDecl
 <rdecl.name> []<rdecl.prefix>I<rdecl.ctxName>
-//<rdecl.name> []*<rdecl.ctxName>
 >>
 
 AttributeDecl(d) ::= <<
-//here5
+//AttributeDecl
 <d.name> <d.type><if(d.initValue)>// TODO = <d.initValue><endif>
 >>
 
@@ -1133,7 +1126,6 @@ CaptureNextTokenType(d) ::= "<d.varName> = p.GetTokenStream().LA(1)"
 StructDecl(struct, ctorAttrs, attrs, getters, dispatchMethods, interfaces, extensionMembers) ::= <<
 // StructDecl interface
 <if(struct.isImported)>
-// /* Get from imported grammar 
 type I<struct.name> interface {
     <struct.prefix>I<struct.name>
 }
@@ -1282,14 +1274,9 @@ func (s *<struct.name>) ToStringTree(ruleNames []string, recog antlr.Recognizer)
 
 <extensionMembers; separator="\n\n">
 <endif>
-<if(struct.isImported)>
-// */
-<endif>
-
 >>
 
 AltLabelStructDeclInterface(struct, currentRule) ::= <<
-//TODO(garym) complete
 type I<struct.name> interface {
     I<currentRule.name; format="cap">Context
     <struct.tokenDecls:{a           | Get<a.name; format="cap">() <TokenLabelType()> }; separator="\n">
@@ -1298,19 +1285,14 @@ type I<struct.name> interface {
     <struct.ruleContextDecls:{a     | Get<a.name; format="cap">() <a.prefix>I<a.ctxName> }; separator="\n">
     <struct.ruleContextListDecls:{a | Get<a.name; format="cap">() []<a.prefix>I<a.ctxName> }; separator="\n">
     <struct.attributeDecls:{a       | Get<a.name; format="cap">() <a.type> }; separator="\n">
-// TODO getters
-// TODO dispatchMethods   
+// TODO getters (needed?)
+// TODO dispatchMethods (needed?)   
 }
 >>
 
 AltLabelStructDecl(struct, attrs, getters, dispatchMethods, tokenDecls, tokenTypeDecls, tokenListDecls, ruleContextDecls, ruleContextListDecls, attributeDecls) ::= <<
 
-<if(struct.isImported)>
-// /* get from imported grammar
-<endif>
-
-
-//VV AltLabelStructDecl
+//Begin AltLabelStructDecl
 
 
 type <struct.name> struct {
@@ -1330,15 +1312,10 @@ func New<struct.name>(parser antlr.Parser, ctx antlr.ParserRuleContext) *<struct
 	return p
 }
 
-//TODO(garym) remove? maybe alts can't/should be expected to extend
 <if(struct.isImported)>
     <if(struct.isExtention)>
-    //here11
     <AltLabelStructDeclInterface(struct,currentRule)>
     <else>
-    //here111
-//TODO(garym) complete
-//here
 type I<struct.name> interface {
     <struct.prefix>I<struct.name>
 }
@@ -1399,52 +1376,9 @@ func (s *<struct.name>) GetRuleContext() antlr.RuleContext {
 <dispatchMethods; separator="\n\n">
 <endif>
 
-//^^AltLabelStructDecl
+//END AltLabelStructDecl
 
 
->>
-
-
-ruleContextDeclsMake(struct) ::= <<
-    <struct.ruleContextListDecls:{a |
-        // Get<a.name; format="cap"> returns the <a.name> rule contexts.
-        Get<a.name; format="cap">() I<a.ctxName>
-        // Set<a.name; format="cap"> sets the <a.name> rule contexts.
-        Set<a.name; format="cap">( I<a.ctxName>) 
-    }; separator="\n\n">
->>
-
-//TODO(garym) needed?
-ruleContextListDeclsMake(struct) ::= <<
-    <struct.ruleContextListDecls:{a | 
-    <if(a.enclosingRuleRunction.isImported)>
-        // Get<a.name; format="cap"> returns the <a.name> rule context list.
-        Get<a.name; format="cap">() []*<a.ctxName>
-        // Set<a.name; format="cap"> sets the <a.name> rule context list.
-        Set<a.name; format="cap">([]*<a.ctxName>) 
-    <else>
-        // Get<a.name; format="cap"> returns the <a.name> rule context list.
-        Get<a.name; format="cap">() []<a.prefix>I<a.ctxName>
-        // Set<a.name; format="cap"> sets the <a.name> rule context list.
-        Set<a.name; format="cap">([]I<a.ctxName>) 
-    <endif>
-    }; separator="\n\n">
->>
-
-//TODO(garym) needed?
-ruleContextDeclsImpl(struct) ::= <<
-    <struct.ruleContextDecls:{a | 
-        func (s *<struct.name>) Get<a.name; format="cap">()  *<a.prefix><a.ctxName> { return s.<a.name> \}
-        func (s *<struct.name>) Set<a.name; format="cap">( v *<a.prefix><a.ctxName>) { s.<a.name> = v \}
-    }; separator="\n\n">
->>
-
-//TODO(garym) needed?
-ruleContextListDeclsImpl (struct) ::= <<
-    <struct.ruleContextListDecls:{a | 
-        func (s *<struct.name>) Get<a.name; format="cap">() []<a.prefix>I<a.ctxName> { return s.<a.name> \}
-        func (s *<struct.name>) Set<a.name; format="cap">( v []<a.prefix>I<a.ctxName>) { s.<a.name> = v \}
-    }; separator="\n\n">
 >>
 
 ListenerDispatchMethod(method) ::= <<
@@ -1484,14 +1418,10 @@ labelref(x) ::= <<
 labelRefStuff(decl,varName) ::= <<
 <if(!decl.isLocal)>
     localctx.(*<decl.ctx.name; format="cap">).<decl.name> = <varName>
-//    localctx.(<decl.prefix>I<decl.ctx.name; format="cap">).Set<decl.name; format="cap">( <varName> )
-//    localctx.(*<decl.prefix><decl.ctx.name; format="cap">).Set<decl.name; format="cap">( <varName> )
 <else>
     <decl.name>
 <endif>
 >>   
-
-//localctx.(<decl.prefix>I<decl.ctx.name>).Get<decl.name; format="cap">()
 
 labelRefGet(decl) ::= <%
 <if(!decl.isLocal)>
@@ -1505,8 +1435,6 @@ localctx.(*<decl.ctx.name>).Get<decl.name; format="cap">()
 
 /** For any action chunk, what is correctly-typed context struct ptr? */
 ctx(actionChunk) ::= "localctx.(*<actionChunk.ctx.name>)"
-//ctxImported(actionChunk) ::= "localctx.(*<actionChunk.enclosingRuleRunction.rule.prefix><actionChunk.ctx.name>)"
-ctxImported(actionChunk) ::= "localctx.(*<actionChunk.ctx.name>)"
 
 // used for left-recursive rules
 recRuleAltPredicate(ruleName, opPrec) ::= "p.Precpred(p.GetParserRuleContext(), <opPrec>)"
@@ -1515,29 +1443,16 @@ recRuleSetStopToken() ::= "p.GetParserRuleContext().SetStop(p.GetTokenStream().L
 
 recRuleAltStartAction(ruleName, ctxName, label) ::= <<
 localctx = New<ctxName>Context(p, _parentctx, _parentState)
-//here 1
 <if(label)>localctx.(*<ctxName>Context).<label> = _prevctx<endif>
 p.PushNewRecursionContext(localctx, _startState, <parser.name>RULE_<ruleName>)
 >>
-
-//TODO(garym) needed?
-recRuleAltStartActionWithImport(ruleName, ctxName, label, prefix) ::= <<
-localctx = <prefix>New<ctxName>Context(p, _parentctx, _parentState)
-//here 1
-<if(label)>localctx.(*<a.b.c>.<ctxName>Context).<label> = _prevctx<endif>
-p.PushNewRecursionContext(localctx, _startState, <parser.name>RULE_<ruleName>)
->>
-
 
 recRuleLabeledAltStartAction(ruleName, currentAltLabel, label, isListLabel) ::= <<
 localctx = New<currentAltLabel; format="cap">Context(p, New<ruleName; format="cap">Context(p, _parentctx, _parentState))
 <if(label)>
 <if(isListLabel)>
-//here 2xx
 localctx.(*<currentAltLabel; format="cap">Context).<label> = append(localctx.(*<currentAltLabel; format="cap">Context).<label>, _prevctx)
 <else>
-//here 3xx
-//localctx.(*<currentAltLabel; format="cap">Context).Set<label>( _prevctx )
 localctx.(*<currentAltLabel; format="cap">Context).<label> = _prevctx
 <endif>
 
@@ -1545,40 +1460,12 @@ localctx.(*<currentAltLabel; format="cap">Context).<label> = _prevctx
 
 p.PushNewRecursionContext(localctx, _startState, <parser.name>RULE_<ruleName>)
 >>
-
-recRuleLabeledAltStartActionWithImport(ruleName, currentAltLabel, label, isListLabel) ::= <<
-localctx = New<currentAltLabel; format="cap">Context(p, New<ruleName; format="cap">Context(p, _parentctx, _parentState))
-//localctx = \<a.b.c>New<currentAltLabel; format="cap">Context(p, \<a.b.c>New<ruleName; format="cap">Context(p, _parentctx, _parentState))
-<if(label)>
-<if(isListLabel)>
-//here 2
-localctx.(*<currentAltLabel; format="cap">Context).<label> = append(localctx.(*<currentAltLabel; format="cap">Context).<label>, _prevctx)
-//localctx.(*\<a.b.c><currentAltLabel; format="cap">Context).<label> = append(localctx.(*\<a.b.c><currentAltLabel; format="cap">Context).<label>, _prevctx)
-<else>
-//here 3
-localctx.(*<currentAltLabel; format="cap">Context).<label> = _prevctx
-//localctx.(*\<a.b.c><currentAltLabel; format="cap">Context).<label> = _prevctx
-<endif>
-
-<endif>
-
-p.PushNewRecursionContext(localctx, _startState, <parser.name>RULE_<ruleName>)
->>
-
 
 recRuleReplaceContext(ctxName) ::= <<
 localctx = New<ctxName>Context(p, localctx)
 p.SetParserRuleContext(localctx)
 _prevctx = localctx
 >>
-
-recRuleReplaceContextWithImport(ctxName) ::= <<
-localctx = New<ctxName>Context(p, localctx)
-//localctx = \<a.b.c>New<ctxName>Context(p, localctx)
-p.SetParserRuleContext(localctx)
-_prevctx = localctx
->>
-
 
 recRuleSetPrevCtx() ::= <<
 if p.GetParseListeners() != nil {

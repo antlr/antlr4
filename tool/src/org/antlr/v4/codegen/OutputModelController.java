@@ -91,12 +91,6 @@ public class OutputModelController {
 
 		Grammar g = delegate.getGrammar();
 		for (Rule r : g.rules.values()) {
-//			String importedG = g.tool.importRules_Alts.get(r.name);
-//			if ( importedG != null ) {
-//				String prefix = g.tool.importParamsMap.get(importedG).prefix;
-//				r.prefix = prefix;
-//				r.imported = true;
-//			}
 			if( r.isExtention ) {
 				System.out.println("SKIPPING rule as it is an extention " + r.name);
 				continue;
@@ -115,12 +109,6 @@ public class OutputModelController {
 
 		Grammar g = delegate.getGrammar();
 		for (Rule r : g.rules.values()) {
-			String importedG = g.tool.importRules_Alts.get(r.name);
-//			if ( importedG != null ) {
-//				String prefix = g.tool.importParamsMap.get(importedG).prefix;
-//				r.prefix = prefix;
-//				r.imported = true;
-//			}
 			buildLexerRuleActions(file.lexer, r);
 		}
 
@@ -232,23 +220,11 @@ public class OutputModelController {
 			opAltsCode.add((CodeBlockForAlt)opStuff);
 		}
 
-		// hide feature from languages that don't implement this
-		boolean hiddenImportFeature = false;
-		String lang = delegate.getGrammar().tool.grammarOptions.get("language");
-		if ( lang.equals("Go") ) {
-			hiddenImportFeature = true;
-		}
-		
 		// Insert code in front of each primary alt to create specialized ctx if there was a label
 		for (int i = 0; i < primaryAltsCode.size(); i++) {
 			LeftRecursiveRuleAltInfo altInfo = r.recPrimaryAlts.get(i);
-			
-			String template = "recRuleReplaceContext";
-			if ( hiddenImportFeature && r.imported) {
-				template = "recRuleReplaceContextWithImport";
-			}
 			if ( altInfo.altLabel==null ) continue;
-			ST altActionST = codegenTemplates.getInstanceOf(template);
+			ST altActionST = codegenTemplates.getInstanceOf("recRuleReplaceContext");
 			altActionST.add("ctxName", Utils.capitalize(altInfo.altLabel));
 			Action altAction =
 				new Action(delegate, function.altLabelCtxs.get(altInfo.altLabel), altActionST);
@@ -270,22 +246,15 @@ public class OutputModelController {
 		for (int i = 0; i < opAltsCode.size(); i++) {
 			ST altActionST;
 			LeftRecursiveRuleAltInfo altInfo = r.recOpAlts.getElement(i);
-			String templateName = "not defined";
+			String templateName;
 			if ( altInfo.altLabel!=null ) {
 				templateName = "recRuleLabeledAltStartAction";
-				if ( hiddenImportFeature && r.imported) {
-					templateName = "recRuleLabeledAltStartActionWithImport";
-				}
 				altActionST = codegenTemplates.getInstanceOf(templateName);
 				altActionST.add("currentAltLabel", altInfo.altLabel);
 			}
 			else {
-				altActionST = codegenTemplates.getInstanceOf("recRuleAltStartAction");
-				//TODO(garym) needed?
-				if ( hiddenImportFeature && !r.imported ) {
-					templateName = "recRuleAltStartActionWithImport";
-				
-				}
+				templateName = "recRuleAltStartAction";
+				altActionST = codegenTemplates.getInstanceOf(templateName);
 				altActionST.add("ctxName", Utils.capitalize(r.name));
 			}
 			altActionST.add("ruleName", r.name);
