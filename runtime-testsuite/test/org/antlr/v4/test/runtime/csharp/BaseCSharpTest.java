@@ -13,6 +13,7 @@ import org.antlr.v4.runtime.WritableToken;
 import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.test.runtime.ErrorQueue;
 import org.antlr.v4.test.runtime.RuntimeTestSupport;
+import org.antlr.v4.test.runtime.StreamVacuum;
 import org.antlr.v4.tool.ANTLRMessage;
 import org.antlr.v4.tool.GrammarSemanticsMessage;
 import org.junit.rules.TestRule;
@@ -31,7 +32,6 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -49,6 +49,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.antlr.v4.test.runtime.BaseRuntimeTest.antlrOnString;
+import static org.antlr.v4.test.runtime.BaseRuntimeTest.writeFile;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -428,7 +429,7 @@ public class BaseCSharpTest implements RuntimeTestSupport /*, SpecialRuntimeTest
 	}
 
 	private String locateTool(String tool) {
-		String[] roots = { "/opt/local/bin/", "/usr/bin/", "/usr/local/bin/" };
+		String[] roots = { "/opt/local/bin/", "/usr/local/bin/", "/usr/bin/" };
 		for(String root : roots) {
 			if(new File(root + tool).exists())
 				return root + tool;
@@ -657,41 +658,6 @@ public class BaseCSharpTest implements RuntimeTestSupport /*, SpecialRuntimeTest
 	}
 
 
-	public static class StreamVacuum implements Runnable {
-		StringBuilder buf = new StringBuilder();
-		BufferedReader in;
-		Thread sucker;
-		public StreamVacuum(InputStream in) {
-			this.in = new BufferedReader( new InputStreamReader(in) );
-		}
-		public void start() {
-			sucker = new Thread(this);
-			sucker.start();
-		}
-		@Override
-		public void run() {
-			try {
-				String line = in.readLine();
-				while (line!=null) {
-					buf.append(line);
-					buf.append('\n');
-					line = in.readLine();
-				}
-			}
-			catch (IOException ioe) {
-				System.err.println("can't read output from process");
-			}
-		}
-		/** wait for the thread to finish */
-		public void join() throws InterruptedException {
-			sucker.join();
-		}
-		@Override
-		public String toString() {
-			return buf.toString();
-		}
-	}
-
 	protected void checkGrammarSemanticsError(ErrorQueue equeue,
 	                                          GrammarSemanticsMessage expectedMessage)
 		throws Exception
@@ -731,16 +697,6 @@ public class BaseCSharpTest implements RuntimeTestSupport /*, SpecialRuntimeTest
 		}
 		public void setTokenTypeChannel(int ttype, int channel) {
 			hide.add(ttype);
-		}
-	}
-
-	public static void writeFile(String dir, String fileName, String content) {
-		try {
-			Utils.writeFile(dir+"/"+fileName, content, "UTF-8");
-		}
-		catch (IOException ioe) {
-			System.err.println("can't write file");
-			ioe.printStackTrace(System.err);
 		}
 	}
 

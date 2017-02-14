@@ -36,6 +36,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.test.runtime.ErrorQueue;
 import org.antlr.v4.test.runtime.RuntimeTestSupport;
+import org.antlr.v4.test.runtime.StreamVacuum;
 import org.antlr.v4.tool.ANTLRMessage;
 import org.antlr.v4.tool.DOTGenerator;
 import org.antlr.v4.tool.Grammar;
@@ -49,13 +50,7 @@ import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupString;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
@@ -70,6 +65,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import static org.antlr.v4.test.runtime.BaseRuntimeTest.antlrOnString;
+import static org.antlr.v4.test.runtime.BaseRuntimeTest.writeFile;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -493,6 +489,7 @@ public abstract class BasePythonTest implements RuntimeTestSupport {
 		try {
 			ProcessBuilder builder = new ProcessBuilder( pythonPath, modulePath, inputPath );
 			builder.environment().put("PYTHONPATH",runtimePath);
+			builder.environment().put("PYTHONIOENCODING", "utf-8");
 			builder.directory(new File(tmpdir));
 			Process process = builder.start();
 			StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
@@ -651,41 +648,6 @@ public abstract class BasePythonTest implements RuntimeTestSupport {
 		}
 	}
 
-	public static class StreamVacuum implements Runnable {
-		StringBuilder buf = new StringBuilder();
-		BufferedReader in;
-		Thread sucker;
-		public StreamVacuum(InputStream in) {
-			this.in = new BufferedReader( new InputStreamReader(in) );
-		}
-		public void start() {
-			sucker = new Thread(this);
-			sucker.start();
-		}
-		@Override
-		public void run() {
-			try {
-				String line = in.readLine();
-				while (line!=null) {
-					buf.append(line);
-					buf.append('\n');
-					line = in.readLine();
-				}
-			}
-			catch (IOException ioe) {
-				System.err.println("can't read output from process");
-			}
-		}
-		/** wait for the thread to finish */
-		public void join() throws InterruptedException {
-			sucker.join();
-		}
-		@Override
-		public String toString() {
-			return buf.toString();
-		}
-	}
-
 	protected void checkGrammarSemanticsError(ErrorQueue equeue,
 	                                          GrammarSemanticsMessage expectedMessage)
 		throws Exception
@@ -766,21 +728,6 @@ public abstract class BasePythonTest implements RuntimeTestSupport {
 		}
 		public void setTokenTypeChannel(int ttype, int channel) {
 			hide.add(ttype);
-		}
-	}
-
-	public static void writeFile(String dir, String fileName, String content) {
-		try {
-			File f = new File(dir, fileName);
-			FileWriter w = new FileWriter(f);
-			BufferedWriter bw = new BufferedWriter(w);
-			bw.write(content);
-			bw.close();
-			w.close();
-		}
-		catch (IOException ioe) {
-			System.err.println("can't write file");
-			ioe.printStackTrace(System.err);
 		}
 	}
 

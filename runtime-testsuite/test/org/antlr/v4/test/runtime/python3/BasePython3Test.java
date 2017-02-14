@@ -8,6 +8,8 @@ package org.antlr.v4.test.runtime.python3;
 import org.antlr.v4.test.runtime.python.BasePythonTest;
 import org.stringtemplate.v4.ST;
 
+import static org.antlr.v4.test.runtime.BaseRuntimeTest.writeFile;
+
 public class BasePython3Test extends BasePythonTest {
 
 	@Override
@@ -28,7 +30,7 @@ public class BasePython3Test extends BasePythonTest {
 						+ "from <lexerName> import <lexerName>\n"
 						+ "\n"
 						+ "def main(argv):\n"
-						+ "    input = FileStream(argv[1])\n"
+						+ "    input = FileStream(argv[1], encoding='utf-8', errors='replace')\n"
 						+ "    lexer = <lexerName>(input)\n"
 						+ "    stream = CommonTokenStream(lexer)\n"
 						+ "    stream.fill()\n"
@@ -72,7 +74,7 @@ public class BasePython3Test extends BasePythonTest {
 						+ "                raise IllegalStateException(\"Invalid parse tree shape detected.\")\n"
 						+ "\n"
 						+ "def main(argv):\n"
-						+ "    input = FileStream(argv[1])\n"
+						+ "    input = FileStream(argv[1], encoding='utf-8', errors='replace')\n"
 						+ "    lexer = <lexerName>(input)\n"
 						+ "    stream = CommonTokenStream(lexer)\n"
 						+ "<createParser>"
