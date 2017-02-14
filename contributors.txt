@@ -132,4 +132,3 @@ YYYY/MM/DD, github id, Full name, email
 2017/01/13, marcelo-rocha, Marcelo Rocha, mcrocha@gmail.com
 2017/02/14, lecode-official, David Neumann, david.neumann@lecode.de
 2017/02/14, xied75, Dong Xie, xied75@gmail.com
-
