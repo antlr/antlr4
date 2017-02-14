@@ -74,17 +74,7 @@ public class SemanticPipeline {
 		if ( g.tool.errMgr.getNumErrors()>prevErrors ) return;
 
 		// STORE RULES IN GRAMMAR
-		for (Rule r : ruleCollector.rules.values()) {
-			
-			// TODO needed?
-			String importedG = g.tool.importRules_Alts.get(r.name);
-			if ( importedG != null ) {
-//				System.out.println("**rules " +  r.name + " '" + r.prefix + "'");						
-				
-				String prefix = g.tool.importParamsMap.get(importedG).prefix;
-				r.prefix = prefix;
-				r.imported = true;
-			}
+		for (Rule r : ruleCollector.rules.values()) {			
 			g.defineRule(r);
 		}
 

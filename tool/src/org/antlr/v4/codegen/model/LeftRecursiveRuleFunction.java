@@ -8,7 +8,6 @@ package org.antlr.v4.codegen.model;
 
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.codegen.model.decl.AltLabelStructDecl;
 import org.antlr.v4.codegen.model.decl.RuleContextDecl;
 import org.antlr.v4.codegen.model.decl.RuleContextListDecl;
 import org.antlr.v4.codegen.model.decl.StructDecl;
@@ -35,7 +34,6 @@ public class LeftRecursiveRuleFunction extends RuleFunction {
 				String ctxName = gen.getTarget().getRuleFunctionContextStructName(targetRule);
 				RuleContextDecl d;
 				if (idAST.getParent().getType() == ANTLRParser.ASSIGN) {
-//					System.out.println("LeftRecursiveRuleFunction Modify alt label:" + label + " ctxName:" + ctxName);
 					String orgGrammar = factory.getGrammar().tool.importRules_Alts.get(r.name);
 					if ( orgGrammar != null ) {
 						String prefix = factory.getGrammar().tool.importParamsMap.get(orgGrammar).prefix;
@@ -45,7 +43,6 @@ public class LeftRecursiveRuleFunction extends RuleFunction {
 					}
 				}
 				else {
-//					System.out.println("LeftRecursiveRuleFunction Modify alt label:" + label + " ctxName:" + ctxName);
 					String orgGrammar = factory.getGrammar().tool.importRules_Alts.get(r.name);
 					if ( orgGrammar != null ) {
 						String prefix = factory.getGrammar().tool.importParamsMap.get(orgGrammar).prefix;

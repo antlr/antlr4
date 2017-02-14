@@ -287,7 +287,6 @@ public class Tool {
 				errMgr.toolError(ErrorType.INVALID_CMDLINE_ARG, "ImportParams must be in the form of parsername:package:importpath");								
 			}
 			importParamsMap.put(params[0], new importParam(params[1]+".", params[2]) );
-//			addImports.add(params[2]);
 		}
 	}
 
@@ -316,9 +315,7 @@ public class Tool {
 	}
 	
 	
-	// org grammar to import modifiers. 
 	public Map<String,importParam> importParamsMap = new HashMap<String, importParam>();
-//	public Set<String> addImports = new HashSet<String>();
 		
 	protected void handleOptionSetArg(String arg) {
 		int eq = arg.indexOf('=');
@@ -383,11 +380,6 @@ public class Tool {
 		GrammarTransformPipeline transform = new GrammarTransformPipeline(g, this);
 		transform.process();
 
-//		for( Rule a : g.rules.values() ) {
-//			System.out.println("**rules " +  a.name + " '" + a.prefix + "'");			
-//		}
-//		System.out.println("---------------" );
-
 		LexerGrammar lexerg;
 		GrammarRootAST lexerAST;
 		if ( g.ast!=null && g.ast.grammarType== ANTLRParser.COMBINED &&
@@ -413,24 +405,15 @@ public class Tool {
 //		System.out.println("tokens="+g.tokenNameToTypeMap);
 //		System.out.println("strings="+g.stringLiteralToTypeMap);
 
-		System.out.println("---------------" );
 		for(  String a : g.tool.importRules_Alts.values() ) {
-			System.out.println("external " + a );
+			logMgr.log("grammar-inheritance","imported rule or alternative not overridden '" + a + "'");
 		}
-		System.out.println("---------------" );
 		for(  String a : g.tool.importMaybeAlts.keySet() ) {
-			System.out.println("maybe " + a  + " -> " + g.tool.importMaybeAlts.get(a));
+			logMgr.log("grammar-inheritance","alternative replace by root grammar '" + a + "'");
 		}
-		System.out.println("---------------" );
 		
 		
 		processNonCombinedGrammar(g, gencode);
-//		System.out.println("---------------" );
-//		for( Rule a : g.rules.values() ) {
-//			System.out.println("**rules " +  a.name + " '" + a.prefix + "'");			
-//		}
-//		System.out.println("---------------" );
-		
 	}
 
 	public void processNonCombinedGrammar(Grammar g, boolean gencode) {

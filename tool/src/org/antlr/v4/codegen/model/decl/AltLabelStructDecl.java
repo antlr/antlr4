@@ -29,10 +29,6 @@ public class AltLabelStructDecl extends StructDecl {
 		this.name = // override name set in super to the label ctx
 			factory.getGenerator().getTarget().getAltLabelContextStructName(label);
 		derivedFromName = label;
-//		String importedG = r.g.tool.importMaybeAlts.get(label);
-//		if( importedG ) {
-//			
-//		}
 	}
 
 	@Override

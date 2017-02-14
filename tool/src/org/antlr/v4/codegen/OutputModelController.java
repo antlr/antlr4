@@ -92,7 +92,7 @@ public class OutputModelController {
 		Grammar g = delegate.getGrammar();
 		for (Rule r : g.rules.values()) {
 			if( r.isExtention ) {
-				System.out.println("SKIPPING rule as it is an extention " + r.name);
+				delegate.getGenerator().tool.logMgr.log("grammar-inheritance","skipping rule in root grammar as it extends another rule '" + r.name + "'");
 				continue;
 			}
 			buildRuleFunction(file.parser, r);

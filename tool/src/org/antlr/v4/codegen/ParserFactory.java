@@ -322,7 +322,6 @@ public class ParserFactory extends DefaultOutputModelFactory {
 			
 			String orgGrammar = ast.g.tool.importRules_Alts.get(r.name);
 			if ( orgGrammar != null ) {
-				System.out.println("defineImplicitLabel Modify alt label:" + implLabel + " ctxName:" + ctxName);
 				String prefix = ast.g.tool.importParamsMap.get(orgGrammar).prefix;
 				d = new RuleContextDecl(this, implLabel, ctxName, prefix, true);
 			} else {

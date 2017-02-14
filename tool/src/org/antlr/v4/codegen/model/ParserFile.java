@@ -11,10 +11,8 @@ import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.codegen.model.ListenerFile.ImportedGrammar;
 import org.antlr.v4.codegen.model.chunk.ActionChunk;
 import org.antlr.v4.codegen.model.chunk.ActionText;
-import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
 
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
@@ -53,14 +51,5 @@ public class ParserFile extends OutputFile {
 			ImportedGrammar importedGrammar = new ImportedGrammar(igName, importParam.prefix, importParam.packageName);
 			importedGrammars.add( importedGrammar );			
 		}
-		
-//		if ( factory.getGrammar().tool.addImports.size() > 0 ) {
-//			Iterator<String> iter = factory.getGrammar().tool.addImports.iterator();
-//			addImport = iter.next(); 
-//			if ( iter.hasNext() ) {
-//				factory.getGrammar().tool.errMgr.toolError(ErrorType.INTERNAL_ERROR, "multiple addImport not implemented");
-//			}
-//		}
-		
 	}
 }

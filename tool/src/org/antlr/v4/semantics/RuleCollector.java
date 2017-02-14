@@ -50,16 +50,15 @@ public class RuleCollector extends GrammarTreeVisitor {
 	@Override
 	protected void exitGrammarSpec(GrammarAST tree) { 
 //		System.out.println("exitGrammarSpec---------------" );
-
-		for (Rule r : g.rules.values()) {
-//			System.out.println("**rules " +  r.name + " '" + r.prefix + "'");						
-			String importedG = g.tool.importRules_Alts.get(r.name);
-			if ( importedG != null ) {
-				String prefix = g.tool.importParamsMap.get(importedG).prefix;
-				r.prefix = prefix;
-				r.imported = true;
-			}
-		}		
+//
+//		for (Rule r : g.rules.values()) {
+//			String importedG = g.tool.importRules_Alts.get(r.name);
+//			if ( importedG != null ) {
+//				String prefix = g.tool.importParamsMap.get(importedG).prefix;
+//				r.prefix = prefix;
+//				r.imported = true;
+//			}
+//		}		
 	}
 	
 	@Override
@@ -128,7 +127,6 @@ public class RuleCollector extends GrammarTreeVisitor {
 			String altLabel = alt.altLabel.getText();
 			altLabelToRuleName.put(Utils.capitalize(altLabel), currentRuleName);
 			altLabelToRuleName.put(Utils.decapitalize(altLabel), currentRuleName);
-//			System.out.printf("RuleCollector.discoverOuterAlt imported %b %s %s\n", !alt.g.name.equals(g.name), altLabel, alt.g.name);
 			if ( !g.name.equals(alt.g.name) ) {
 				g.tool.importRules_Alts.put(altLabel,alt.g.name);
 			}

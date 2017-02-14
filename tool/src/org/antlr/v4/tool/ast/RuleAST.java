@@ -17,6 +17,7 @@ public class RuleAST extends GrammarASTWithOptions {
 
 	public RuleAST(RuleAST node) {
 		super(node);
+		this.isExtention = node.isExtention;
 	}
 
 	public RuleAST(Token t) { super(t); }
@@ -36,7 +37,6 @@ public class RuleAST extends GrammarASTWithOptions {
 	@Override
 	public RuleAST dupNode() {
 		RuleAST dup = new RuleAST(this);
-		dup.isExtention = this.isExtention;
 		return dup; 
 	}
 

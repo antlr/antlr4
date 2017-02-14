@@ -14,7 +14,6 @@ import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.ActionAST;
 import org.antlr.v4.tool.ast.AltAST;
 
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -167,16 +166,10 @@ public class ListenerFile extends OutputFile {
 				importedGrammars.add( importedGrammar );
 				r.imported = true;
 			}
-
-//			System.out.println("ListenerFile " +  r.g.name.equals( r.importedG.name) + " \t" + r.name + " " + r.g.name + " " + r.importedG.name);
-			
 			
 			Map<String, List<Pair<Integer,AltAST>>> labels = r.getAltLabels();
 			if ( labels!=null ) {
-				for (Map.Entry<String, List<Pair<Integer, AltAST>>> pair : labels.entrySet()) {
-					
-					
-					String k = pair.getKey();
+				for (Map.Entry<String, List<Pair<Integer, AltAST>>> pair : labels.entrySet()) {					
 					List<Pair<Integer, AltAST>> v = pair.getValue();
 					listenerNames.add(pair.getKey());
 					listenerLabelRuleNames.put(pair.getKey(), r.name);

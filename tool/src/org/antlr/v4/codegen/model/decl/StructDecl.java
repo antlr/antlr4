@@ -26,8 +26,6 @@ import java.util.List;
 public class StructDecl extends Decl {
 	public String derivedFromName; // rule name or label name
 	public boolean provideCopyFrom;
-//	public String grammarName;
-//	public String importedGrammarName;
 
 	@ModelElement public OrderedHashSet<Decl> attrs = new OrderedHashSet<Decl>();
 	@ModelElement public OrderedHashSet<Decl> getters = new OrderedHashSet<Decl>();
@@ -51,9 +49,6 @@ public class StructDecl extends Decl {
 		addDispatchMethods(r);
 		derivedFromName = r.name;
 		provideCopyFrom = r.hasAltSpecificContexts();
-//		grammarName = factory.getGrammar().name;
-//		importedGrammarName = r.importedG.name;
-//		isImported = grammarName != importedGrammarName;
 	}
 
 	public void addDispatchMethods(Rule r) {

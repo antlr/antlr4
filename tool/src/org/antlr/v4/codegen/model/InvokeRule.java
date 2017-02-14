@@ -51,7 +51,6 @@ public class InvokeRule extends RuleElement implements LabeledOp {
 				factory.defineImplicitLabel(ast, this);
 				String listLabel = gen.getTarget().getListLabel(label);		
 				RuleContextListDecl l;
-//				System.out.println("LeftRecursiveRuleFunction Modify alt label:" + label + " listLabel:" + listLabel + " ctxName:" + ctxName);
 				String orgGrammar = factory.getGrammar().tool.importRules_Alts.get(r.name);
 				if ( orgGrammar != null ) {
 					String prefix = factory.getGrammar().tool.importParamsMap.get(orgGrammar).prefix;
@@ -63,7 +62,6 @@ public class InvokeRule extends RuleElement implements LabeledOp {
 				rf.addContextDecl(ast.getAltLabel(), l);
 			}
 			else {
-//				System.out.println("InvokeRule Modify alt label:" + label + " ctxName:" + ctxName);
 				String orgGrammar = factory.getGrammar().tool.importRules_Alts.get(r.name);
 				RuleContextDecl d;
 				if ( orgGrammar != null ) {

@@ -29,7 +29,6 @@ public class LeftRecursiveRule extends Rule {
 
 	public LeftRecursiveRule(Grammar g, String name, RuleAST ast, String prefix, boolean imported) {
 		super(g, name, ast, 1, prefix, imported, ast.isExtention);
-//		System.out.println("LeftRecursiveRule " + g.name.equals(ast.g.name) + " \t" + ast.getRuleName() + " " + g.name + " " + ast.g.name);
 		originalAST = ast;
 		alt = new Alternative[numberOfAlts+1]; // always just one
 		for (int i=1; i<=numberOfAlts; i++) alt[i] = new Alternative(this, i);

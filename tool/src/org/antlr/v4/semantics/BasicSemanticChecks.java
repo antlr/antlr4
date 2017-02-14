@@ -9,7 +9,6 @@ package org.antlr.v4.semantics;
 import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.CommonTree;
 import org.antlr.runtime.tree.Tree;
-import org.antlr.v4.Tool;
 import org.antlr.v4.Tool.RuleExtends;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.parse.ANTLRParser;
@@ -265,7 +264,9 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	@Override
 	public void finishRule(RuleAST rule, GrammarAST ID, GrammarAST block) {
 		if ( rule.isLexerRule() ) return;
-		if ( rule.isExtention ) return;
+		if ( rule.isExtention ) {
+			return;
+		}
 		
 		BlockAST blk = (BlockAST)rule.getFirstChildWithType(BLOCK);
 		int nalts = blk.getChildCount();
