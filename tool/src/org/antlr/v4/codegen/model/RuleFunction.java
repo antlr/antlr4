@@ -86,7 +86,7 @@ public class RuleFunction extends OutputModelObject {
 		index = r.index;
 
 		String orgGrammar = factory.getGrammar().tool.importRules_Alts.get(r.name);
-		if ( orgGrammar != null ) {
+		if ( factory.getGrammar().tool.importParams != null && orgGrammar != null ) {
 			String prefix = factory.getGrammar().tool.importParamsMap.get(orgGrammar).prefix;
 			ruleCtx = new StructDecl(factory, r, prefix, true);
 		} else {
@@ -154,7 +154,7 @@ public class RuleFunction extends OutputModelObject {
 				for (Pair<Integer, AltAST> pair : entry.getValue()) {
 					Integer altNum = pair.a;
 					String orgGrammar = factory.getGrammar().tool.importRules_Alts.get(label);
-					if ( orgGrammar != null ) {
+					if ( factory.getGrammar().tool.importParams != null && orgGrammar != null ) {
 						String prefix = factory.getGrammar().tool.importParamsMap.get(orgGrammar).prefix;
 						altToContext[altNum] = new AltLabelStructDecl(factory, r, altNum, label, prefix, true, pair.b.isExtention);					
 					} else {

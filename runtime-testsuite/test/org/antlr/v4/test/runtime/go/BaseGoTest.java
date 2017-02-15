@@ -165,6 +165,9 @@ public class BaseGoTest implements RuntimeTestSupport {
 	}
 
 	private static void copyFile(File source, File dest) throws IOException {
+		if( source.isDirectory() ) {
+			return;
+		}
 		InputStream is = new FileInputStream(source);
 		OutputStream os = new FileOutputStream(dest);
 		byte[] buf = new byte[4 << 10];

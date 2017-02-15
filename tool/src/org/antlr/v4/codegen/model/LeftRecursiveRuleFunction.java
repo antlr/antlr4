@@ -35,7 +35,7 @@ public class LeftRecursiveRuleFunction extends RuleFunction {
 				RuleContextDecl d;
 				if (idAST.getParent().getType() == ANTLRParser.ASSIGN) {
 					String orgGrammar = factory.getGrammar().tool.importRules_Alts.get(r.name);
-					if ( orgGrammar != null ) {
+					if ( factory.getGrammar().tool.importParams != null && orgGrammar != null ) {
 						String prefix = factory.getGrammar().tool.importParamsMap.get(orgGrammar).prefix;
 						d = new RuleContextDecl(factory, label, ctxName, prefix, true);
 					} else {
@@ -44,7 +44,7 @@ public class LeftRecursiveRuleFunction extends RuleFunction {
 				}
 				else {
 					String orgGrammar = factory.getGrammar().tool.importRules_Alts.get(r.name);
-					if ( orgGrammar != null ) {
+					if ( factory.getGrammar().tool.importParams != null && orgGrammar != null ) {
 						String prefix = factory.getGrammar().tool.importParamsMap.get(orgGrammar).prefix;
 						d = new RuleContextListDecl(factory, label, ctxName, prefix, true);
 					} else {

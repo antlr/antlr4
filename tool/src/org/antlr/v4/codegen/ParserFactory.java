@@ -321,7 +321,7 @@ public class ParserFactory extends DefaultOutputModelFactory {
 				gen.getTarget().getRuleFunctionContextStructName(r);
 			
 			String orgGrammar = ast.g.tool.importRules_Alts.get(r.name);
-			if ( orgGrammar != null ) {
+			if ( ast.g.tool.importParams != null && orgGrammar != null ) {
 				String prefix = ast.g.tool.importParamsMap.get(orgGrammar).prefix;
 				d = new RuleContextDecl(this, implLabel, ctxName, prefix, true);
 			} else {

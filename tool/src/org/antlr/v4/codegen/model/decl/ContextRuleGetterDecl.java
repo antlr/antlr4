@@ -14,7 +14,7 @@ public class ContextRuleGetterDecl extends ContextGetterDecl {
 	public boolean optional;
 
 	public ContextRuleGetterDecl(OutputModelFactory factory, String name, String ctxName, boolean optional, String prefix, boolean imported) {
-		super(factory, name, prefix, imported);
+		super(factory, name, prefix, imported, false);
 		this.ctxName = ctxName;
 		this.optional = optional;
 	}

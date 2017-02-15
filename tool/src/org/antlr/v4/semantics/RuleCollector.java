@@ -51,14 +51,16 @@ public class RuleCollector extends GrammarTreeVisitor {
 	protected void exitGrammarSpec(GrammarAST tree) { 
 //		System.out.println("exitGrammarSpec---------------" );
 //
-//		for (Rule r : g.rules.values()) {
-//			String importedG = g.tool.importRules_Alts.get(r.name);
-//			if ( importedG != null ) {
-//				String prefix = g.tool.importParamsMap.get(importedG).prefix;
-//				r.prefix = prefix;
-//				r.imported = true;
-//			}
-//		}		
+//		if( g.tool.importParams != null ) {
+//			for (Rule r : g.rules.values()) {
+//				String importedG = g.tool.importRules_Alts.get(r.name);
+//				if ( importedG != null ) {
+//					String prefix = g.tool.importParamsMap.get(importedG).prefix;
+//					r.prefix = prefix;
+//					r.imported = true;
+//				}
+//			}		
+//		}
 	}
 	
 	@Override
@@ -73,7 +75,7 @@ public class RuleCollector extends GrammarTreeVisitor {
 		Rule r;
 		if ( LeftRecursiveRuleAnalyzer.hasImmediateRecursiveRuleRefs(rule, ID.getText()) ) {
 //			System.out.println("RuleCollector " + g.name.equals(rule.g.name) + " \t" + rule.getRuleName() + " " + g.name + " " + rule.g.name);
-			if ( !g.name.equals(rule.g.name) ) {
+			if ( g.tool.importParams != null && !g.name.equals(rule.g.name) ) {
 				String prefix = g.tool.importParamsMap.get(rule.g.name).prefix;
 				g.tool.importRules_Alts.put(ID.getText(),rule.g.name);
 				r = new LeftRecursiveRule(g, ID.getText(), rule, prefix, true);
@@ -83,7 +85,7 @@ public class RuleCollector extends GrammarTreeVisitor {
 		}
 		else {
 //			System.out.println("RuleCollector " + g.name.equals(rule.g.name) + " \t" + rule.getRuleName() + " " + g.name + " " + rule.g.name);
-			if ( !g.name.equals(rule.g.name) ) {
+			if ( g.tool.importParams != null && !g.name.equals(rule.g.name) ) {
 				String prefix = g.tool.importParamsMap.get(rule.g.name).prefix;
 				g.tool.importRules_Alts.put(ID.getText(),rule.g.name);
 				r = new Rule(g, ID.getText(), rule, numAlts, prefix, true, rule.isExtention);
@@ -140,7 +142,7 @@ public class RuleCollector extends GrammarTreeVisitor {
 	{
 		int numAlts = block.getChildCount();
 		Rule r ;
-		if ( !g.name.equals(rule.g.name) ) {
+		if ( g.tool.importParams != null && !g.name.equals(rule.g.name) ) {
 			String prefix = g.tool.importParamsMap.get(rule.g.name).prefix;
 			g.tool.importRules_Alts.put(ID.getText(),rule.g.name);
 			r = new Rule(g, ID.getText(), rule, numAlts, prefix, true, rule.isExtention);

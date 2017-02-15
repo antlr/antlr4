@@ -8,7 +8,7 @@ package org.antlr.v4.codegen.model;
 
 import org.antlr.v4.Tool.importParam;
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.codegen.model.ListenerFile.ImportedGrammar;
+import org.antlr.v4.codegen.model.BaseListenerFile.ImportedGrammar;
 import org.antlr.v4.codegen.model.chunk.ActionChunk;
 import org.antlr.v4.codegen.model.chunk.ActionText;
 import org.antlr.v4.tool.Grammar;
@@ -46,10 +46,12 @@ public class ParserFile extends OutputFile {
 			contextSuperClass = new ActionText(null, g.getOptionString("contextSuperClass"));
 		}
 		
-		for( String igName : factory.getGrammar().tool.importParamsMap.keySet() ) {
-			importParam importParam = g.tool.importParamsMap.get(igName);
-			ImportedGrammar importedGrammar = new ImportedGrammar(igName, importParam.prefix, importParam.packageName);
-			importedGrammars.add( importedGrammar );			
+		if( g.tool.importParams != null ) {
+			for( String igName : factory.getGrammar().tool.importParamsMap.keySet() ) {
+				importParam importParam = g.tool.importParamsMap.get(igName);
+				ImportedGrammar importedGrammar = new ImportedGrammar(igName, importParam.prefix, importParam.packageName);
+				importedGrammars.add( importedGrammar );			
+			}
 		}
 	}
 }

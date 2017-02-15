@@ -289,6 +289,8 @@ public class GrammarTransformPipeline {
 						GrammarAST importBlock = r.getAllChildrenWithType(ANTLRParser.BLOCK).get(0);
 						for( GrammarAST extendA : extendFromBlock.getAllChildrenWithType(ANTLRParser.ALT)) {
 							extendA.g = importBlock.g;
+							AltAST oldEA = (AltAST)extendA;
+							oldEA.isExtention = true;
 							AltAST newEA = ((AltAST)extendA.dupTree());
 							// differentiate fork
 							newEA.isExtention = true;
@@ -307,8 +309,11 @@ public class GrammarTransformPipeline {
 						GrammarAST block = r.getAllChildrenWithType(ANTLRParser.BLOCK).get(0);
 						List<GrammarAST> alts = block.getAllChildrenWithType(ANTLRParser.ALT);
 						for(GrammarAST a : alts ) {
-							rootGrammar.tool.logMgr.log("grammar-inheritance", "Super has alts " + ((AltAST)a).altLabel + " in rule " + name );
-							tool.importMaybeAlts.put(((AltAST)a).altLabel.getText(), r.g.name);
+							GrammarAST label = ((AltAST)a).altLabel;
+							if( label != null ) {
+								rootGrammar.tool.logMgr.log("grammar-inheritance", "Super has alts " + ((AltAST)a).altLabel + " in rule " + name );
+								tool.importMaybeAlts.put(label.getText(), r.g.name);
+							}
 						}
 					}
 				}

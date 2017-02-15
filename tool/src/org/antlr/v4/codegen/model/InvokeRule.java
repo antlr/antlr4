@@ -52,7 +52,7 @@ public class InvokeRule extends RuleElement implements LabeledOp {
 				String listLabel = gen.getTarget().getListLabel(label);		
 				RuleContextListDecl l;
 				String orgGrammar = factory.getGrammar().tool.importRules_Alts.get(r.name);
-				if ( orgGrammar != null ) {
+				if ( factory.getGrammar().tool.importParams != null && orgGrammar != null ) {
 					String prefix = factory.getGrammar().tool.importParamsMap.get(orgGrammar).prefix;
 					l = new RuleContextListDecl(factory, listLabel, ctxName, prefix, true);
 				} else {
@@ -64,7 +64,7 @@ public class InvokeRule extends RuleElement implements LabeledOp {
 			else {
 				String orgGrammar = factory.getGrammar().tool.importRules_Alts.get(r.name);
 				RuleContextDecl d;
-				if ( orgGrammar != null ) {
+				if ( factory.getGrammar().tool.importParams != null && orgGrammar != null ) {
 					String prefix = factory.getGrammar().tool.importParamsMap.get(orgGrammar).prefix;
 					d = new RuleContextDecl(factory, label, ctxName, prefix, true);
 				} else {
@@ -84,9 +84,9 @@ public class InvokeRule extends RuleElement implements LabeledOp {
 		if ( factory.getCurrentOuterMostAlt().ruleRefsInActions.containsKey(ast.getText()) ) {
 			String label = gen.getTarget().getImplicitRuleLabel(ast.getText());
 			String orgGrammar = factory.getGrammar().tool.importRules_Alts.get(r.name);
-			System.out.println("InvokeRule Modify alt label:" + label + " ctxName:" + ctxName);
+//			System.out.println("InvokeRule Modify alt label:" + label + " ctxName:" + ctxName);
 			RuleContextDecl d;
-			if ( orgGrammar != null ) {
+			if ( factory.getGrammar().tool.importParams != null && orgGrammar != null ) {
 				String prefix = factory.getGrammar().tool.importParamsMap.get(orgGrammar).prefix;
 				d = new RuleContextDecl(factory, label, ctxName, prefix, true);
 			} else {
