@@ -30,10 +30,15 @@ public class ListenerFile extends OutputFile {
 	public boolean hasImport;
 	
 	/**
-	 * The names of all listener contexts.
+	 * The names of all listener separated by rule & named alternative.
 	 */
 	public Set<String> listenerRuleNames = new LinkedHashSet<String>();
 	public Set<String> listenerAltNames = new LinkedHashSet<String>();
+
+	/**
+	 * The names of all listener contexts.
+	 */
+	public Set<String> listenerNames = new LinkedHashSet<String>();
 
 	/**
 	 * For listener contexts created for a labeled outer alternative, maps from
@@ -58,12 +63,14 @@ public class ListenerFile extends OutputFile {
 			Map<String, List<Pair<Integer,AltAST>>> labels = r.getAltLabels();
 			if ( labels!=null ) {
 				for (Map.Entry<String, List<Pair<Integer, AltAST>>> pair : labels.entrySet()) {
+					listenerNames.add(pair.getKey());
 					listenerAltNames.add(pair.getKey());
 					listenerLabelRuleNames.put(pair.getKey(), r.name);
 				}
 			}
 			else {
 				// only add rule context if no labels
+				listenerNames.add(r.name);
 				listenerRuleNames.add(r.name);
 			}
 		}
