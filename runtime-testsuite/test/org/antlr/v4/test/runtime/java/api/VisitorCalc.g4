@@ -1,8 +1,10 @@
 grammar VisitorCalc;
 
-s
-	:	expr EOF
+s	:	expr EOF
+	|	EOF
 	;
+
+s2	:	;
 
 expr
 	:	INT						# number
@@ -15,4 +17,7 @@ MUL : '*';
 DIV : '/';
 ADD : '+';
 SUB : '-';
-WS : [ \t]+ -> channel(HIDDEN);
+NL  : [\r\n] -> channel(HIDDEN); // separate these out so TerminalNodeWithHidden can check associating tokens with the current line
+WS  : [ \t]+ -> channel(HIDDEN);
+LINE_COMMENT : '//' ~'\n'* '\n' -> channel(HIDDEN) ;
+COMMENT : '/*' .*? '*/' -> channel(HIDDEN) ;
