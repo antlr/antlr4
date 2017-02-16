@@ -59,10 +59,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Tool {
@@ -114,8 +112,6 @@ public class Tool {
 	public boolean gen_visitor = false;
 	public boolean gen_dependencies = false;
 	public String genPackage = null;
-	public String antlrRuntimeImport = null;
-	public String importParams = null;
 	public Map<String, String> grammarOptions = null;
 	public boolean warnings_are_errors = false;
 	public boolean longMessages = false;
@@ -132,12 +128,8 @@ public class Tool {
 		new Option("gen_visitor",		"-visitor", "generate parse tree visitor"),
 		new Option("gen_visitor",		"-no-visitor", "don't generate parse tree visitor (default)"),
 		new Option("genPackage",		"-package", OptionArgType.STRING, "specify a package/namespace for the generated code"),
-		new Option("antlrRuntimeImport","-runtimeImport", OptionArgType.STRING, "specify the runtime package to import"),
-		new Option("importParams",      "-importParams", OptionArgType.STRING, "when importing grammars these parameters modify the generated code\n" +
-		                                                                        " language dependant \n" + 
-				                                                                "  for Go  importedGrammar:packagename:import_path"),
 		new Option("gen_dependencies",	"-depend", "generate file dependencies"),
-		new Option("",					"-D<option>=value", "set/override a grammar-level option" ),
+		new Option("",					"-D<option>=value", "set/override a grammar-level option"),
 		new Option("warnings_are_errors", "-Werror", "treat warnings as errors"),
         new Option("launch_ST_inspector", "-XdbgST", "launch StringTemplate visualizer on generated code"),
 		new Option("ST_inspector_wait_for_close", "-XdbgSTWait", "wait for STViz to close before continuing"),
@@ -278,32 +270,15 @@ public class Tool {
 			STGroup.trackCreationEvents = true;
 			return_dont_exit = true;
 		}
-		if ( importParams != null ) {
-			if ( !grammarOptions.get("language").equals("Go") ) {
-				errMgr.toolError(ErrorType.INVALID_CMDLINE_ARG, "-Dlanguage=Go required. ImportParams currently only support for Go target");				
-			}
-			String[] params = importParams.split(":");
-			if ( params.length != 3 ) {
-				errMgr.toolError(ErrorType.INVALID_CMDLINE_ARG, "ImportParams must be in the form of parsername:package:importpath");								
-			}
-			importParamsMap.put(params[0], new importParam(params[1]+".", params[2]) );
-		}
 	}
 
-	public static class importParam {
-		public String prefix;
-		public String packageName;
-		public importParam(String prefix, String packageName) {
-			super();
-			this.prefix = prefix;
-			this.packageName = packageName;
-		}		
-	}
-		
-	// rule and alt names to org grammar.
-	public Map<String,String> importRules_Alts = new HashMap<String, String>();
-	public Map<String,String> importMaybeAlts = new HashMap<String, String>();
-	public Map<String, RuleExtends>  importRulesExtended = new HashMap<String, RuleExtends>();
+	
+	/** Rules and Alts name to imported Grammar Name */
+	public Map<String,String> RorA2IGN = new HashMap<String, String>();
+	/** Alt name overriding alt in super 2 imported grammar name */
+	public Map<String,String> AltOver2IGN = new HashMap<String, String>();
+	/** Extended Rule name 2 Rule in imported */
+	public Map<String, RuleExtends>  RuleExtend2Rule = new HashMap<String, RuleExtends>();
 
 	public static class RuleExtends {
 		public RuleAST rule;
@@ -313,10 +288,7 @@ public class Tool {
 			this.importedRuleName = iName;
 		}
 	}
-	
-	
-	public Map<String,importParam> importParamsMap = new HashMap<String, importParam>();
-		
+			
 	protected void handleOptionSetArg(String arg) {
 		int eq = arg.indexOf('=');
 		if ( eq>0 && arg.length()>3 ) {
@@ -405,10 +377,10 @@ public class Tool {
 //		System.out.println("tokens="+g.tokenNameToTypeMap);
 //		System.out.println("strings="+g.stringLiteralToTypeMap);
 
-		for(  String a : g.tool.importRules_Alts.values() ) {
+		for(  String a : g.tool.RorA2IGN.values() ) {
 			logMgr.log("grammar-inheritance","imported rule or alternative not overridden '" + a + "'");
 		}
-		for(  String a : g.tool.importMaybeAlts.keySet() ) {
+		for(  String a : g.tool.AltOver2IGN.keySet() ) {
 			logMgr.log("grammar-inheritance","alternative replace by root grammar '" + a + "'");
 		}
 		

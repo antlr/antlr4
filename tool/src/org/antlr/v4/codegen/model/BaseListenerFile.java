@@ -5,11 +5,11 @@
  */
 package org.antlr.v4.codegen.model;
 
-import org.antlr.v4.Tool.importParam;
 import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.Grammar.ImportParam;
 import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.ActionAST;
 import org.antlr.v4.tool.ast.AltAST;
@@ -25,7 +25,7 @@ import java.util.Set;
  */
 public class BaseListenerFile extends OutputFile {
 	public String genPackage; // from -package cmd-line
-	public String antlrRuntimeImport; // from -runtimeImport cmd-line
+	public String antlrRuntimeImport; // from -DruntimeImport		
 	public String exportMacro; // from -DexportMacro cmd-line
 	public String grammarName;
 	public String parserName;
@@ -61,7 +61,7 @@ public class BaseListenerFile extends OutputFile {
 		ActionAST ast = g.namedActions.get("header");
 		if ( ast!=null ) header = new Action(factory, ast);
 		genPackage = factory.getGrammar().tool.genPackage;
-		antlrRuntimeImport = factory.getGrammar().tool.antlrRuntimeImport;		
+		antlrRuntimeImport = factory.getGrammar().getOptionString("runtimeImport");		
 		exportMacro = factory.getGrammar().getOptionString("exportMacro");
 
 		
@@ -73,7 +73,7 @@ public class BaseListenerFile extends OutputFile {
 				g.tool.logMgr.log("grammar-inheritance", String.format(_06SkipMSG, r.name) );
 				continue;
 			}
-			if ( g.tool.importParams == null ) {
+			if ( g.getImportParams() == null ) {
 				Map<String, List<Pair<Integer,AltAST>>> labels = r.getAltLabels();
 				if ( labels!=null ) {
 					for (Map.Entry<String, List<Pair<Integer, AltAST>>> pair : labels.entrySet()) {
@@ -105,8 +105,8 @@ public class BaseListenerFile extends OutputFile {
 			// 02
 			if ( labels == null ) {
 				// only add rule context if no labels
-				String importedG = g.tool.importRules_Alts.get(r.name);
-				importParam importParam = g.tool.importParamsMap.get(importedG);
+				String importedG = g.tool.RorA2IGN.get(r.name);
+				ImportParam importParam = g.getImportParams().get(importedG);
 				ImportedGrammar importedGrammar = new ImportedGrammar(importedG, importParam.prefix, importParam.packageName);; 
 				importedGrammars.add( importedGrammar );
 				//TODO(garym) needed?
@@ -135,9 +135,9 @@ public class BaseListenerFile extends OutputFile {
 				}
 
 				// 05
-				String importedGrammarByAltName = g.tool.importMaybeAlts.get(pair.getKey());
+				String importedGrammarByAltName = g.tool.AltOver2IGN.get(pair.getKey());
 				if( importedGrammarByAltName != null ) {
-					importParam importParam = g.tool.importParamsMap.get(importedGrammarByAltName);
+					ImportParam importParam = g.getImportParams().get(importedGrammarByAltName);
 					ImportedGrammar importedAltGrammar = new ImportedGrammar(importedGrammarByAltName, importParam.prefix, importParam.packageName);
 					importedGrammars.add( importedAltGrammar );
 					g.tool.logMgr.log("grammar-inheritance", String.format(_05MSG, pair.getKey(), r.name) );
@@ -147,8 +147,8 @@ public class BaseListenerFile extends OutputFile {
 				
 				// 07
 				if( r.imported ) {
-					String importedG = g.tool.importRules_Alts.get(r.name);
-					importParam importParam = g.tool.importParamsMap.get(importedG);
+					String importedG = g.tool.RorA2IGN.get(r.name);
+					ImportParam importParam = g.getImportParams().get(importedG);
 					ImportedGrammar importedGrammar = new ImportedGrammar(importedG, importParam.prefix, importParam.packageName);; 
 					importedGrammars.add( importedGrammar );
 					//TODO(garym) needed?

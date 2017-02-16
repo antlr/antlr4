@@ -274,7 +274,7 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 		
 		// Change rulename is options{ extends=<importRule> } is used
 		String ruleName = rule.getRuleName();
-		RuleExtends rulesExtended = g.tool.importRulesExtended.get(ruleName);
+		RuleExtends rulesExtended = g.tool.RuleExtend2Rule.get(ruleName);
 		if( rulesExtended != null  ) {
 			ruleName = rulesExtended.importedRuleName;
 		}

@@ -6,6 +6,8 @@
 
 package org.antlr.v4.codegen;
 
+import java.util.List;
+
 import org.antlr.v4.analysis.AnalysisPipeline;
 import org.antlr.v4.codegen.model.Action;
 import org.antlr.v4.codegen.model.AddToLabelList;
@@ -50,8 +52,6 @@ import org.antlr.v4.tool.ast.ActionAST;
 import org.antlr.v4.tool.ast.BlockAST;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.antlr.v4.tool.ast.TerminalAST;
-
-import java.util.List;
 
 /** */
 public class ParserFactory extends DefaultOutputModelFactory {
@@ -320,9 +320,9 @@ public class ParserFactory extends DefaultOutputModelFactory {
 			String ctxName =
 				gen.getTarget().getRuleFunctionContextStructName(r);
 			
-			String orgGrammar = ast.g.tool.importRules_Alts.get(r.name);
-			if ( ast.g.tool.importParams != null && orgGrammar != null ) {
-				String prefix = ast.g.tool.importParamsMap.get(orgGrammar).prefix;
+			String orgGrammar = g.tool.RorA2IGN.get(r.name);
+			if ( ast.g.getOutermostGrammar().getImportParams() != null && orgGrammar != null ) {
+				String prefix = ast.g.getOutermostGrammar().getImportParams().get(orgGrammar).prefix;
 				d = new RuleContextDecl(this, implLabel, ctxName, prefix, true);
 			} else {
 				d = new RuleContextDecl(this, implLabel, ctxName, "", false);

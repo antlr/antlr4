@@ -6,21 +6,21 @@
 
 package org.antlr.v4.codegen.model;
 
-import org.antlr.v4.Tool.importParam;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
+
 import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.codegen.model.BaseListenerFile.ImportedGrammar;
 import org.antlr.v4.codegen.model.chunk.ActionChunk;
 import org.antlr.v4.codegen.model.chunk.ActionText;
 import org.antlr.v4.tool.Grammar;
-
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
+import org.antlr.v4.tool.Grammar.ImportParam;
 
 /** */
 public class ParserFile extends OutputFile {
 	public String genPackage; // from -package cmd-line
-	public String antlrRuntimeImport; // from -runtimeImport cmd-line
+	public String antlrRuntimeImport; // from -DruntimeImport		
 	public String exportMacro; // from -DexportMacro cmd-line
 	public boolean genListener; // from -listener cmd-line
 	public boolean genVisitor; // from -visitor cmd-line
@@ -35,7 +35,7 @@ public class ParserFile extends OutputFile {
 		Grammar g = factory.getGrammar();
 		namedActions = buildNamedActions(factory.getGrammar());
 		genPackage = g.tool.genPackage;
-		antlrRuntimeImport = factory.getGrammar().tool.antlrRuntimeImport;		
+		antlrRuntimeImport = factory.getGrammar().getOptionString("runtimeImport");
 		exportMacro = factory.getGrammar().getOptionString("exportMacro");
 		// need the below members in the ST for Python, C++
 		genListener = g.tool.gen_listener;
@@ -46,9 +46,9 @@ public class ParserFile extends OutputFile {
 			contextSuperClass = new ActionText(null, g.getOptionString("contextSuperClass"));
 		}
 		
-		if( g.tool.importParams != null ) {
-			for( String igName : factory.getGrammar().tool.importParamsMap.keySet() ) {
-				importParam importParam = g.tool.importParamsMap.get(igName);
+		if( g.getImportParams() != null ) {
+			for( String igName : factory.getGrammar().getImportParams().keySet() ) {
+				ImportParam importParam = g.getImportParams().get(igName);
 				ImportedGrammar importedGrammar = new ImportedGrammar(igName, importParam.prefix, importParam.packageName);
 				importedGrammars.add( importedGrammar );			
 			}

@@ -23,7 +23,7 @@ import java.util.Set;
  */
 public class ListenerFile extends OutputFile {
 	public String genPackage; // from -package cmd-line
-	public String antlrRuntimeImport; // from -runtimeImport cmd-line
+	public String antlrRuntimeImport; // from -DruntimeImport		
 	public String exportMacro; // from -DexportMacro cmd-line
 	public String grammarName;
 	public String parserName;
@@ -72,7 +72,7 @@ public class ListenerFile extends OutputFile {
 			header = new Action(factory, ast);
 		}
 		genPackage = factory.getGrammar().tool.genPackage;
-		antlrRuntimeImport = factory.getGrammar().tool.antlrRuntimeImport;
+		antlrRuntimeImport = factory.getGrammar().getOptionString("runtimeImport");
 		exportMacro = factory.getGrammar().getOptionString("exportMacro");
 	}
 }

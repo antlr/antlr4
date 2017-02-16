@@ -296,7 +296,7 @@ public class GrammarTransformPipeline {
 							newEA.isExtention = true;
 							String eName = extendFrom.getChild(0).getText();
 							RuleExtends ruleExtend = new RuleExtends((RuleAST)extendFrom, name);
-							tool.importRulesExtended.put(eName, ruleExtend);
+							tool.RuleExtend2Rule.put(eName, ruleExtend);
 							importBlock.addChild(newEA);
 						}
 					}
@@ -312,7 +312,7 @@ public class GrammarTransformPipeline {
 							GrammarAST label = ((AltAST)a).altLabel;
 							if( label != null ) {
 								rootGrammar.tool.logMgr.log("grammar-inheritance", "Super has alts " + ((AltAST)a).altLabel + " in rule " + name );
-								tool.importMaybeAlts.put(label.getText(), r.g.name);
+								tool.AltOver2IGN.put(label.getText(), r.g.name);
 							}
 						}
 					}
