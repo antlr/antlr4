@@ -36,6 +36,8 @@ namespace Antlr4.Runtime
 
         protected readonly TextWriter Output;
 
+        protected readonly TextWriter ErrorOutput;
+
 		private Tuple<ITokenSource, ICharStream> _tokenFactorySourcePair;
 
         /// <summary>How to create token objects</summary>
@@ -97,12 +99,13 @@ namespace Antlr4.Runtime
         /// </remarks>
 		private string _text;
 
-        public Lexer(ICharStream input) : this(input, Console.Out) { }
+        public Lexer(ICharStream input) : this(input, Console.Out, Console.Error) { }
 
-        public Lexer(ICharStream input, TextWriter output)
+        public Lexer(ICharStream input, TextWriter output, TextWriter errorOutput)
         {
             this._input = input;
             this.Output = output;
+            this.ErrorOutput = errorOutput;
             this._tokenFactorySourcePair = Tuple.Create((ITokenSource)this, input);
         }
 
@@ -555,7 +558,7 @@ outer_continue: ;
             string text = _input.GetText(Interval.Of(_tokenStartCharIndex, _input.Index));
             string msg = "token recognition error at: '" + GetErrorDisplay(text) + "'";
             IAntlrErrorListener<int> listener = ErrorListenerDispatch;
-            listener.SyntaxError(this, 0, _tokenStartLine, _tokenStartColumn, msg, e);
+            listener.SyntaxError(ErrorOutput, this, 0, _tokenStartLine, _tokenStartColumn, msg, e);
         }
 
         public virtual string GetErrorDisplay(string s)
