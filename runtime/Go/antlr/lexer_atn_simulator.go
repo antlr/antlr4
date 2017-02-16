@@ -311,7 +311,7 @@ func (l *LexerATNSimulator) accept(input CharStream, lexerActionExecutor *LexerA
 }
 
 func (l *LexerATNSimulator) getReachableTarget(trans Transition, t int) ATNState {
-	if trans.Matches(t, 0, 0xFFFE) {
+	if trans.Matches(t, 0, LexerMaxCharValue) {
 		return trans.getTarget()
 	}
 
@@ -461,7 +461,7 @@ func (l *LexerATNSimulator) getEpsilonTarget(input CharStream, config *LexerATNC
 		trans.getSerializationType() == TransitionRANGE ||
 		trans.getSerializationType() == TransitionSET {
 		if treatEOFAsEpsilon {
-			if trans.Matches(TokenEOF, 0, 0xFFFF) {
+			if trans.Matches(TokenEOF, 0, LexerMaxCharValue) {
 				cfg = NewLexerATNConfig4(config, trans.getTarget())
 			}
 		}

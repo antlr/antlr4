@@ -28,9 +28,9 @@ namespace Antlr4.Runtime
 
         public const int Hidden = TokenConstants.HiddenChannel;
 
-        public const int MinCharValue = '\u0000';
+        public const int MinCharValue = 0x0000;
 
-        public const int MaxCharValue = '\uFFFE';
+        public const int MaxCharValue = 0x10FFFF;
 
         private ICharStream _input;
 

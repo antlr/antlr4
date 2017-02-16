@@ -21,8 +21,8 @@ open class Lexer: Recognizer<LexerATNSimulator>
 
     public static let DEFAULT_TOKEN_CHANNEL: Int = CommonToken.DEFAULT_CHANNEL
     public static let HIDDEN: Int = CommonToken.HIDDEN_CHANNEL
-    public static let MIN_CHAR_VALUE: Int = Character("\u{0000}").unicodeValue
-    public static let MAX_CHAR_VALUE: Int = Character("\u{FFFE}").unicodeValue
+    public static let MIN_CHAR_VALUE: Int = Character.MIN_VALUE;
+    public static let MAX_CHAR_VALUE: Int = Character.MAX_VALUE;
 
     public var _input: CharStream?
     internal var _tokenFactorySourcePair: (TokenSource?, CharStream?)
