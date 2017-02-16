@@ -109,8 +109,6 @@ public class BaseListenerFile extends OutputFile {
 				ImportParam importParam = g.getImportParams().get(importedG);
 				ImportedGrammar importedGrammar = new ImportedGrammar(importedG, importParam.prefix, importParam.packageName);; 
 				importedGrammars.add( importedGrammar );
-				//TODO(garym) needed?
-				r.prefix = importParam.prefix;
 				g.tool.logMgr.log("grammar-inheritance", String.format(_02listenerRuleNamesImportedMSG, r.name) ); 
 				listenerRuleNamesImported.add(new ImportedRule(r.name, r.prefix, importedGrammar ));
 				continue;
@@ -128,7 +126,6 @@ public class BaseListenerFile extends OutputFile {
 				}
 				if( isExtention ) {
 					// 04
-					//TODO(garym) would be nice to know of this alt was overridden
 					g.tool.logMgr.log("grammar-inheritance", String.format(_04listenerAltNamesLocalMSG01, pair.getKey(), r.name) );
 					listenerAltNamesIsExtensionLocal.add(pair.getKey());						
 					continue;
@@ -150,10 +147,7 @@ public class BaseListenerFile extends OutputFile {
 					String importedG = g.tool.RorA2IGN.get(r.name);
 					ImportParam importParam = g.getImportParams().get(importedG);
 					ImportedGrammar importedGrammar = new ImportedGrammar(importedG, importParam.prefix, importParam.packageName);; 
-					importedGrammars.add( importedGrammar );
-					//TODO(garym) needed?
-					r.prefix = importParam.prefix;
-					
+					importedGrammars.add( importedGrammar );					
 					g.tool.logMgr.log("grammar-inheritance", String.format(_07MSG, pair.getKey(), r.name) ); 
 					listenerAltAndRuleImported.add(new ImportedRule(pair.getKey(), r.prefix, importedGrammar ));
 					continue;

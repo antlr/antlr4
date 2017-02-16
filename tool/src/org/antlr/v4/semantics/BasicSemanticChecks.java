@@ -529,7 +529,6 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 			}
 		}
 		else if ( parent.getType()==ANTLRParser.RULE ) {
-			//TODO(garym) ruleOptions check
 			if ( !Grammar.ruleOptions.contains(optionID.getText()) ) { // rule
 				g.tool.errMgr.grammarError(ErrorType.ILLEGAL_OPTION,
 										   g.fileName,

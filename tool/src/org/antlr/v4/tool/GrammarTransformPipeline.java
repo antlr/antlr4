@@ -178,7 +178,6 @@ public class GrammarTransformPipeline {
 		RULELOOP:
 		for (GrammarAST r : rootRules) {
 			GrammarAST rOps = (GrammarAST)r.getFirstChildWithType(ANTLRParser.OPTIONS);
-//			GrammarAST optionsRule = (GrammarAST)imp.ast.getFirstChildWithType(ANTLRParser.OPTIONS);
 			if ( rOps!=null ) {
 				GrammarAST[] ops = rOps.getChildrenAsArray();
 				for( GrammarAST op : ops ) {
