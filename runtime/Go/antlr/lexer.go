@@ -114,8 +114,8 @@ const (
 const (
 	LexerDefaultTokenChannel = TokenDefaultChannel
 	LexerHidden              = TokenHiddenChannel
-	LexerMinCharValue        = '\u0000'
-	LexerMaxCharValue        = '\uFFFE'
+	LexerMinCharValue        = 0x0000
+	LexerMaxCharValue        = 0x10FFFF
 )
 
 func (b *BaseLexer) reset() {
