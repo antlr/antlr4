@@ -6,6 +6,8 @@
 
 package org.antlr.v4.runtime;
 
+import org.antlr.v4.runtime.tree.ErrorNode;
+
 /**
  * The interface for defining strategies to deal with syntax errors encountered
  * during a parse by ANTLR-generated parsers. We distinguish between three
@@ -89,8 +91,9 @@ public interface ANTLRErrorStrategy {
 	 * Tests whether or not {@code recognizer} is in the process of recovering
 	 * from an error. In error recovery mode, {@link Parser#consume} adds
 	 * symbols to the parse tree by calling
-	 * {@link ParserRuleContext#addErrorNode(Token)} instead of
-	 * {@link ParserRuleContext#addChild(Token)}.
+	 * {@link Parser#createErrorNode(ParserRuleContext, Token)} then
+	 * {@link ParserRuleContext#addErrorNode(ErrorNode)} instead of
+	 * {@link Parser#createTerminalNode(ParserRuleContext, Token)}.
 	 *
 	 * @param recognizer the parser instance
 	 * @return {@code true} if the parser is currently recovering from a parse
