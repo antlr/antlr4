@@ -14,6 +14,7 @@ import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.test.runtime.ErrorQueue;
 import org.antlr.v4.test.runtime.RuntimeTestSupport;
 import org.antlr.v4.test.runtime.StreamVacuum;
+import org.antlr.v4.test.runtime.TestOutputReading;
 import org.antlr.v4.tool.ANTLRMessage;
 import org.antlr.v4.tool.GrammarSemanticsMessage;
 import org.junit.rules.TestRule;
@@ -39,6 +40,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -241,7 +243,7 @@ public class BaseCSharpTest implements RuntimeTestSupport /*, SpecialRuntimeTest
 			return stderrDuringParse;
 		}
 		String output = execTest();
-		if ( output.length()==0 ) {
+		if ( output!=null && output.length()==0 ) {
 			output = null;
 		}
 		return output;
@@ -489,26 +491,18 @@ public class BaseCSharpTest implements RuntimeTestSupport /*, SpecialRuntimeTest
 
 	public String execTest() {
 		String exec = locateExec();
-		String[] args = getExecTestArgs(exec);
 		try {
+			File tmpdirFile = new File(tmpdir);
+			Path output = tmpdirFile.toPath().resolve("output");
+			Path errorOutput = tmpdirFile.toPath().resolve("error-output");
+			String[] args = getExecTestArgs(exec, output, errorOutput);
 			ProcessBuilder pb = new ProcessBuilder(args);
-			pb.directory(new File(tmpdir));
+			pb.directory(tmpdirFile);
 			Process process = pb.start();
-			StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
-			StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
-			stdoutVacuum.start();
-			stderrVacuum.start();
 			process.waitFor();
-			stdoutVacuum.join();
-			stderrVacuum.join();
-			String output = stdoutVacuum.toString();
-			if ( output.length()==0 ) {
-				output = null;
-			}
-			if ( stderrVacuum.toString().length()>0 ) {
-				this.stderrDuringParse = stderrVacuum.toString();
-			}
-			return output;
+			String writtenOutput = TestOutputReading.read(output);
+			this.stderrDuringParse = TestOutputReading.read(errorOutput);
+			return writtenOutput;
 		}
 		catch (Exception e) {
 			System.err.println("can't exec recognizer");
@@ -517,12 +511,12 @@ public class BaseCSharpTest implements RuntimeTestSupport /*, SpecialRuntimeTest
 		return null;
 	}
 
-	private String[] getExecTestArgs(String exec) {
+	private String[] getExecTestArgs(String exec, Path output, Path errorOutput) {
 		if(isWindows())
-			return new String[] { exec, new File(tmpdir, "input").getAbsolutePath() } ;
+			return new String[] { exec, new File(tmpdir, "input").getAbsolutePath(), output.toAbsolutePath().toString(), errorOutput.toAbsolutePath().toString() } ;
 		else {
 			String mono = locateTool("mono");
-			return new String[] { mono, exec, new File(tmpdir, "input").getAbsolutePath() };
+			return new String[] { mono, exec, new File(tmpdir, "input").getAbsolutePath(), output.toAbsolutePath().toString(), errorOutput.toAbsolutePath().toString() };
 		}
 	}
 
@@ -591,16 +585,23 @@ public class BaseCSharpTest implements RuntimeTestSupport /*, SpecialRuntimeTest
 			"using System;\n" +
 				"using Antlr4.Runtime;\n" +
 				"using Antlr4.Runtime.Tree;\n" +
+				"using System.IO;\n" +
+				"using System.Text;\n" +
 				"\n" +
 				"public class Test {\n" +
 				"    public static void Main(string[] args) {\n" +
-				"        ICharStream input = new AntlrFileStream(args[0]);\n" +
-				"        <lexerName> lex = new <lexerName>(input);\n" +
-				"        CommonTokenStream tokens = new CommonTokenStream(lex);\n" +
-				"        <createParser>\n"+
-				"		 parser.BuildParseTree = true;\n" +
-				"        ParserRuleContext tree = parser.<parserStartRuleName>();\n" +
-				"        ParseTreeWalker.Default.Walk(new TreeShapeListener(), tree);\n" +
+				"        string inputData = File.ReadAllText(args[0], Encoding.UTF8);\n" +
+				"        using (TextWriter output = new StreamWriter(args[1]),\n" +
+				"                          errorOutput = new StreamWriter(args[2])) {\n" +
+				"                CodePointCharStream input = new CodePointCharStream(inputData);\n" +
+				"                input.name = args[0];\n" +
+				"                <lexerName> lex = new <lexerName>(input, output, errorOutput);\n" +
+				"                CommonTokenStream tokens = new CommonTokenStream(lex);\n" +
+				"                <createParser>\n"+
+				"			 parser.BuildParseTree = true;\n" +
+				"                ParserRuleContext tree = parser.<parserStartRuleName>();\n" +
+				"                ParseTreeWalker.Default.Walk(new TreeShapeListener(), tree);\n" +
+				"        }\n" +
 				"    }\n" +
 				"}\n" +
 				"\n" +
@@ -619,11 +620,11 @@ public class BaseCSharpTest implements RuntimeTestSupport /*, SpecialRuntimeTest
 				"	}\n" +
 				"}"
 		);
-		ST createParserST = new ST("        <parserName> parser = new <parserName>(tokens);\n");
+		ST createParserST = new ST("        <parserName> parser = new <parserName>(tokens, output, errorOutput);\n");
 		if ( debug ) {
 			createParserST =
 				new ST(
-					"        <parserName> parser = new <parserName>(tokens);\n" +
+					"        <parserName> parser = new <parserName>(tokens, output, errorOutput);\n" +
 						"        parser.AddErrorListener(new DiagnosticErrorListener());\n");
 		}
 		outputFileST.add("createParser", createParserST);
@@ -637,17 +638,23 @@ public class BaseCSharpTest implements RuntimeTestSupport /*, SpecialRuntimeTest
 		ST outputFileST = new ST(
 			"using System;\n" +
 				"using Antlr4.Runtime;\n" +
+				"using System.IO;\n" +
+				"using System.Text;\n" +
 				"\n" +
 				"public class Test {\n" +
 				"    public static void Main(string[] args) {\n" +
-				"        ICharStream input = new AntlrFileStream(args[0]);\n" +
-				"        <lexerName> lex = new <lexerName>(input);\n" +
-				"        CommonTokenStream tokens = new CommonTokenStream(lex);\n" +
-				"        tokens.Fill();\n" +
-				"        foreach (object t in tokens.GetTokens())\n" +
-				"			Console.WriteLine(t);\n" +
-				(showDFA?"        Console.Write(lex.Interpreter.GetDFA(Lexer.DEFAULT_MODE).ToLexerString());\n":"")+
-				"    }\n" +
+				"        string inputData = File.ReadAllText(args[0], Encoding.UTF8);\n" +
+				"        ICharStream input = new CodePointCharStream(inputData);\n" +
+				"        using (TextWriter output = new StreamWriter(args[1]),\n" +
+				"                          errorOutput = new StreamWriter(args[2])) {\n" +
+					"        <lexerName> lex = new <lexerName>(input, output, errorOutput);\n" +
+					"        CommonTokenStream tokens = new CommonTokenStream(lex);\n" +
+					"        tokens.Fill();\n" +
+					"        foreach (object t in tokens.GetTokens())\n" +
+					"			output.WriteLine(t);\n" +
+					(showDFA?"        output.Write(lex.Interpreter.GetDFA(Lexer.DEFAULT_MODE).ToLexerString());\n":"")+
+					"    }\n" +
+					"}\n" +
 				"}"
 		);
 

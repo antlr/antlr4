@@ -358,10 +358,10 @@ case <f.ruleIndex> : return <f.name>_sempred(<if(!recog.modes)>(<f.ctxType>)<end
 >>
 
 parser_ctor(parser) ::= <<
-	public <csIdentifier.(parser.name)>(ITokenStream input) : this(input, Console.Out) { }
+	public <csIdentifier.(parser.name)>(ITokenStream input) : this(input, Console.Out, Console.Error) { }
 
-	public <csIdentifier.(parser.name)>(ITokenStream input, TextWriter output)
-	: base(input, output)
+	public <csIdentifier.(parser.name)>(ITokenStream input, TextWriter output, TextWriter errorOutput)
+	: base(input, output, errorOutput)
 {
 	Interpreter = new ParserATNSimulator(this, _ATN, decisionToDFA, sharedContextCache);
 }
@@ -1005,10 +1005,10 @@ public partial class <csIdentifier.(lexer.name)> : <superClass; null="Lexer"> {
 	<namedActions.members>
 
 	public <csIdentifier.(lexer.name)>(ICharStream input)
-	: this(input, Console.Out) { }
+	: this(input, Console.Out, Console.Error) { }
 
-	public <csIdentifier.(lexer.name)>(ICharStream input, TextWriter output)
-	: base(input, output)
+	public <csIdentifier.(lexer.name)>(ICharStream input, TextWriter output, TextWriter errorOutput)
+	: base(input, output, errorOutput)
 	{
 		Interpreter = new LexerATNSimulator(this, _ATN, decisionToDFA, sharedContextCache);
 	}

@@ -4,6 +4,7 @@
  */
 using Antlr4.Runtime;
 using Antlr4.Runtime.Sharpen;
+using System.IO;
 
 namespace Antlr4.Runtime
 {
@@ -30,6 +31,9 @@ namespace Antlr4.Runtime
         /// in-line, without returning from the surrounding rule (via the single
         /// token insertion and deletion mechanism).</p>
         /// </remarks>
+        /// <param name="output">
+        /// Where the error should be written.
+        /// </param>
         /// <param name="recognizer">
         /// What parser got the error. From this
         /// object, you can access the context as well
@@ -52,6 +56,6 @@ namespace Antlr4.Runtime
         /// the parser was able to recover in line without exiting the
         /// surrounding rule.
         /// </param>
-        void SyntaxError(IRecognizer recognizer, TSymbol offendingSymbol, int line, int charPositionInLine, string msg, RecognitionException e);
+        void SyntaxError(TextWriter output, IRecognizer recognizer, TSymbol offendingSymbol, int line, int charPositionInLine, string msg, RecognitionException e);
     }
 }

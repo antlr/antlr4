@@ -7,6 +7,7 @@
 
 using Antlr4.Runtime;
 using Antlr4.Runtime.Sharpen;
+using System.IO;
 
 namespace Antlr4.Runtime
 {
@@ -38,9 +39,9 @@ namespace Antlr4.Runtime
         /// line <em>line</em>:<em>charPositionInLine</em> <em>msg</em>
         /// </pre>
         /// </summary>
-        public virtual void SyntaxError(IRecognizer recognizer, Symbol offendingSymbol, int line, int charPositionInLine, string msg, RecognitionException e)
+        public virtual void SyntaxError(TextWriter output, IRecognizer recognizer, Symbol offendingSymbol, int line, int charPositionInLine, string msg, RecognitionException e)
         {
-            System.Console.Error.WriteLine("line " + line + ":" + charPositionInLine + " " + msg);
+            output.WriteLine("line " + line + ":" + charPositionInLine + " " + msg);
         }
     }
 }
