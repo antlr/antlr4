@@ -6,7 +6,10 @@
 
 package org.antlr.v4.semantics;
 
-import org.antlr.v4.Tool;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.antlr.v4.analysis.LeftRecursiveRuleAnalyzer;
 import org.antlr.v4.misc.OrderedHashMap;
 import org.antlr.v4.misc.Utils;
@@ -22,10 +25,6 @@ import org.antlr.v4.tool.ast.AltAST;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.antlr.v4.tool.ast.RuleAST;
 import org.stringtemplate.v4.misc.MultiMap;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class RuleCollector extends GrammarTreeVisitor {
 	/** which grammar are we checking */
@@ -46,22 +45,6 @@ public class RuleCollector extends GrammarTreeVisitor {
 	public ErrorManager getErrorManager() { return errMgr; }
 
 	public void process(GrammarAST ast) { visitGrammar(ast); }
-
-	@Override
-	protected void exitGrammarSpec(GrammarAST tree) { 
-//		System.out.println("exitGrammarSpec---------------" );
-//
-//		if( g.tool.importParams != null ) {
-//			for (Rule r : g.rules.values()) {
-//				String importedG = g.tool.importRules_Alts.get(r.name);
-//				if ( importedG != null ) {
-//					String prefix = g.tool.importParamsMap.get(importedG).prefix;
-//					r.prefix = prefix;
-//					r.imported = true;
-//				}
-//			}		
-//		}
-	}
 	
 	@Override
 	public void discoverRule(RuleAST rule, GrammarAST ID,

@@ -15,7 +15,7 @@ public class RuleActionFunction extends OutputModelObject {
 	public String name;
 	public String ctxType;
 	public int ruleIndex;
-	
+
 	/** Map actionIndex to Action */
 	@ModelElement public LinkedHashMap<Integer, Action> actions =
 		new LinkedHashMap<Integer, Action>();
