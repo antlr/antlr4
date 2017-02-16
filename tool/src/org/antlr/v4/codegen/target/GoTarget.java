@@ -8,6 +8,7 @@ package org.antlr.v4.codegen.target;
 
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.codegen.Target;
+import org.antlr.v4.codegen.UnicodeEscapes;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.ast.GrammarAST;
@@ -214,5 +215,10 @@ public class GoTarget extends Target {
 		}
 
 	}
-}
 
+	@Override
+	protected void appendUnicodeEscapedCodePoint(int codePoint, StringBuilder sb) {
+		// Go and Python share the same escaping style.
+		UnicodeEscapes.appendPythonStyleEscapedCodePoint(codePoint, sb);
+	}
+}
