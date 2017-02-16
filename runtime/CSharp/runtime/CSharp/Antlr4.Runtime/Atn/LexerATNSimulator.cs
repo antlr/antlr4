@@ -380,7 +380,7 @@ namespace Antlr4.Runtime.Atn
 
 		protected ATNState GetReachableTarget(Transition trans, int t)
 		{
-			if (trans.Matches(t, char.MinValue, char.MaxValue))
+			if (trans.Matches(t, Lexer.MinCharValue, Lexer.MaxCharValue))
 			{
 				return trans.target;
 			}
@@ -572,7 +572,7 @@ namespace Antlr4.Runtime.Atn
 				case TransitionType.SET:
 					if (treatEofAsEpsilon)
 					{
-						if (t.Matches(IntStreamConstants.EOF, char.MinValue, char.MaxValue))
+						if (t.Matches(IntStreamConstants.EOF, Lexer.MinCharValue, Lexer.MaxCharValue))
 						{
 							c = new LexerATNConfig(config, t.target);
 							break;

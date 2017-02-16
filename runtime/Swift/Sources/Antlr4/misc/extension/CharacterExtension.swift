@@ -40,7 +40,7 @@ extension Character {
     }
 
     public static var MAX_VALUE: Int {
-        let c: Character = "\u{FFFF}"
+        let c: Character = "\u{10FFFF}"
         return c.unicodeValue
     }
     public static var MIN_VALUE: Int {

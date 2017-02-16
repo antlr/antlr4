@@ -326,7 +326,7 @@ LexerATNSimulator.prototype.accept = function(input, lexerActionExecutor,
 };
 
 LexerATNSimulator.prototype.getReachableTarget = function(trans, t) {
-	if (trans.matches(t, 0, 0xFFFE)) {
+	if (trans.matches(t, 0, Lexer.MAX_CHAR_VALUE)) {
 		return trans.target;
 	} else {
 		return null;
@@ -468,7 +468,7 @@ LexerATNSimulator.prototype.getEpsilonTarget = function(input, config, trans,
 				trans.serializationType === Transition.RANGE ||
 				trans.serializationType === Transition.SET) {
 		if (treatEofAsEpsilon) {
-			if (trans.matches(Token.EOF, 0, 0xFFFF)) {
+			if (trans.matches(Token.EOF, 0, Lexer.MAX_CHAR_VALUE)) {
 				cfg = new LexerATNConfig( { state:trans.target }, config);
 			}
 		}

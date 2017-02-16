@@ -31,8 +31,8 @@ class Lexer(Recognizer, TokenSource):
 
     DEFAULT_TOKEN_CHANNEL = Token.DEFAULT_CHANNEL
     HIDDEN = Token.HIDDEN_CHANNEL
-    MIN_CHAR_VALUE = '\u0000'
-    MAX_CHAR_VALUE = '\uFFFE'
+    MIN_CHAR_VALUE = 0x0000
+    MAX_CHAR_VALUE = 0x10FFFF
 
     def __init__(self, input:InputStream, output:TextIO = sys.stdout):
         super().__init__()
