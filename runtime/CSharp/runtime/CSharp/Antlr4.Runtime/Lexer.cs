@@ -564,16 +564,17 @@ outer_continue: ;
         public virtual string GetErrorDisplay(string s)
         {
             StringBuilder buf = new StringBuilder();
-            foreach (char c in s.ToCharArray())
-            {
-                buf.Append(GetErrorDisplay(c));
+            for (var i = 0; i < s.Length; ) {
+                var codePoint = Char.ConvertToUtf32(s, i);
+                buf.Append(GetErrorDisplay(codePoint));
+                i += (codePoint > 0xFFFF) ? 2 : 1;
             }
             return buf.ToString();
         }
 
         public virtual string GetErrorDisplay(int c)
         {
-            string s = ((char)c).ToString();
+            string s;
             switch (c)
             {
                 case TokenConstants.EOF:
@@ -597,6 +598,12 @@ outer_continue: ;
                 case '\r':
                 {
                     s = "\\r";
+                    break;
+                }
+
+                default:
+                {
+                    s = Char.ConvertFromUtf32(c);
                     break;
                 }
             }
