@@ -73,15 +73,14 @@ public class TerminalNodeWithHidden extends TerminalNodeImpl {
 		collectHiddenTokens(tokens, channel, symbol);
 	}
 
-	// TODO: how to collect hidden on error nodes (deleted, inserted, during recovery)
 	protected void collectHiddenTokens(BufferedTokenStream tokens, int channel, Token symbol) {
 		List<Token> left  = tokens.getHiddenTokensToLeft(symbol.getTokenIndex(), channel);
 
 		// check the EOF special case separately
 		if ( symbol.getType()==Token.EOF ) {
-			int prevRealIndex = tokens.previousTokenOnChannel(symbol.getTokenIndex()-1, symbol.getChannel());
-			if ( prevRealIndex<0 ) { // EOF only gets hidden stuff if it's only token
-				if ( left!=null ) {
+			if ( left!=null ) {
+				Token firstHiddenLeft = left.get(0);
+				if ( firstHiddenLeft.getTokenIndex()==0 ) { // EOF only gets hidden stuff if it's only token
 					List<Token> allBefore = tokens.get(0, symbol.getTokenIndex()-1);
 					leading = allBefore.toArray(new Token[allBefore.size()]);
 				}
