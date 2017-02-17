@@ -34,6 +34,18 @@ import java.util.List;
  *  {@link org.antlr.v4.runtime.Parser#createErrorNode(ParserRuleContext, Token)} and
  *  {@link org.antlr.v4.runtime.Parser#createTerminalNode(ParserRuleContext, Token)}.
  *
+ *  Example:
+ *
+	 class MyCalcParser extends CalcParser(tokens) {
+	     public CalcParser(TokenStream tokens) { super(tokens); }
+	     @Override
+	     public TerminalNode createTerminalNode(ParserRuleContext parent, Token t) {
+	         TerminalNodeWithHidden node = new TerminalNodeWithHidden(tokens, -1, t);
+	         node.parent = parent;
+	         return node;
+	     }
+	 };
+ *
  * @since 4.6.1
  */
 public class TerminalNodeWithHidden extends TerminalNodeImpl {
@@ -47,6 +59,9 @@ public class TerminalNodeWithHidden extends TerminalNodeImpl {
 	 */
 	protected Token[] hiddenRight;
 
+	/** Construct a node with left/right hidden tokens on a channel,
+	 *  or all hidden tokens if channel==-1.
+	 */
 	public TerminalNodeWithHidden(BufferedTokenStream tokens, int channel, Token symbol) {
 		super(symbol);
 		collectHiddenTokens(tokens, channel, symbol);
