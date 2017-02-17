@@ -44,6 +44,12 @@ import java.util.List;
 	         node.parent = parent;
 	         return node;
 	     }
+		 @Override
+		 public ErrorNode createErrorNode(ParserRuleContext parent, Token t) {
+			 ErrorNodeWithHidden node = new ErrorNodeWithHidden(tokens, -1, t);
+			 node.parent = parent;
+		 	 return node;
+		 }
 	 };
  *
  * @since 4.6.1

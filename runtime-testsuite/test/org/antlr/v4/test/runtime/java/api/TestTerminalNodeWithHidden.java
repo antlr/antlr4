@@ -6,6 +6,8 @@ import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.Pair;
+import org.antlr.v4.runtime.tree.ErrorNode;
+import org.antlr.v4.runtime.tree.ErrorNodeWithHidden;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.antlr.v4.runtime.tree.TerminalNodeWithHidden;
@@ -15,6 +17,7 @@ import org.junit.Test;
 import java.util.Collection;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class TestTerminalNodeWithHidden {
 	@Test public void testEmptyInputWithCommentNoEOFRefInGrammar() {
@@ -96,6 +99,33 @@ public class TestTerminalNodeWithHidden {
 		assertEquals("+ ", op[0].getText());
 	}
 
+	// ERROR NODE CASES
+
+	@Test
+	public void testSingleInvalidToken() {
+		Pair<Parser, ParseTree> results = parse_calc("\t\n+\n");
+		VisitorCalcParser parser = (VisitorCalcParser)results.a;
+		ParseTree tree = results.b;
+		assertEquals("(s + <EOF>)", tree.toStringTree(parser));
+		ParseTree leaf = tree.getChild(0);
+		assertTrue(leaf instanceof ErrorNodeWithHidden);
+		assertEquals("\t\n+\n", leaf.getText());
+	}
+
+	@Test
+	public void testExtraToken() {
+		Pair<Parser, ParseTree> results = parse_calc("1 + * 2");
+		VisitorCalcParser parser = (VisitorCalcParser)results.a;
+		ParseTree tree = results.b;
+		assertEquals("(s (expr (expr 1) + (expr * 2)) <EOF>)", tree.toStringTree(parser));
+		TerminalNodeWithHidden[] op = XPath.findAll(tree, "//'*'", parser).toArray(new TerminalNodeWithHidden[0]);
+		assertTrue(op[0] instanceof ErrorNodeWithHidden);
+		assertEquals("* ", op[0].getText());
+
+		op = XPath.findAll(tree, "//'+'", parser).toArray(new TerminalNodeWithHidden[0]);
+		assertEquals("+ ", op[0].getText());
+	}
+
 	// SUPPORT
 
 	public Pair<Parser, ParseTree> parse_calc(String input) {
@@ -105,6 +135,12 @@ public class TestTerminalNodeWithHidden {
 			@Override
 			public TerminalNode createTerminalNode(ParserRuleContext parent, Token t) {
 				TerminalNodeWithHidden node = new TerminalNodeWithHidden(tokens, -1, t);
+				node.parent = parent;
+				return node;
+			}
+			@Override
+			public ErrorNode createErrorNode(ParserRuleContext parent, Token t) {
+				ErrorNodeWithHidden node = new ErrorNodeWithHidden(tokens, -1, t);
 				node.parent = parent;
 				return node;
 			}
@@ -121,6 +157,12 @@ public class TestTerminalNodeWithHidden {
 			@Override
 			public TerminalNode createTerminalNode(ParserRuleContext parent, Token t) {
 				TerminalNodeWithHidden node = new TerminalNodeWithHidden(tokens, -1, t);
+				node.parent = parent;
+				return node;
+			}
+			@Override
+			public ErrorNode createErrorNode(ParserRuleContext parent, Token t) {
+				ErrorNodeWithHidden node = new ErrorNodeWithHidden(tokens, -1, t);
 				node.parent = parent;
 				return node;
 			}
