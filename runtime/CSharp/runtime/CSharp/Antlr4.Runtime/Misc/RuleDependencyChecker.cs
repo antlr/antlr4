@@ -354,7 +354,7 @@ namespace Antlr4.Runtime.Misc
                 }
                 foreach (Transition transition in state.transitions)
                 {
-                    if (transition.TransitionType != TransitionType.Rule)
+                    if (transition.TransitionType != TransitionType.RULE)
                     {
                         continue;
                     }
@@ -459,7 +459,7 @@ namespace Antlr4.Runtime.Misc
         {
         }
 
-#if PORTABLE
+#if PORTABLE || DOTNETCORE
         public interface ICustomAttributeProvider
         {
             object[] GetCustomAttributes(Type attributeType, bool inherit);
@@ -646,7 +646,11 @@ namespace Antlr4.Runtime.Misc
             StringBuilder errors = new StringBuilder();
             foreach (Tuple<RuleDependencyAttribute, ICustomAttributeProvider> dependency in dependencies)
             {
-                if (!dependency.Item1.Recognizer.IsAssignableFrom(recognizerType))
+#if DOTNETCORE
+                if (!dependency.Item1.Recognizer.GetTypeInfo().IsAssignableFrom(recognizerType))
+#else
+                    if (!dependency.Item1.Recognizer.IsAssignableFrom(recognizerType))
+#endif
                 {
                     continue;
                 }
@@ -773,7 +777,11 @@ namespace Antlr4.Runtime.Misc
         private static int[] GetRuleVersions(Type recognizerClass, string[] ruleNames)
         {
             int[] versions = new int[ruleNames.Length];
+#if DOTNETCORE
+            FieldInfo[] fields = recognizerClass.GetTypeInfo().GetFields();
+#else
             FieldInfo[] fields = recognizerClass.GetFields();
+#endif
             foreach (FieldInfo field in fields)
             {
                 bool isStatic = field.IsStatic;
@@ -805,7 +813,11 @@ namespace Antlr4.Runtime.Misc
 #endif
                             continue;
                         }
+#if DOTNETCORE
+                        RuleVersionAttribute ruleVersion = ruleMethod.GetCustomAttribute<RuleVersionAttribute>();
+#else
                         RuleVersionAttribute ruleVersion = (RuleVersionAttribute)Attribute.GetCustomAttribute(ruleMethod, typeof(RuleVersionAttribute));
+#endif
                         int version = ruleVersion != null ? ruleVersion.Version : 0;
                         versions[index] = version;
                     }
@@ -832,10 +844,18 @@ namespace Antlr4.Runtime.Misc
 
         private static MethodInfo GetRuleMethod(Type recognizerClass, string name)
         {
+#if DOTNETCORE
+            MethodInfo[] declaredMethods = recognizerClass.GetTypeInfo().GetMethods();
+#else
             MethodInfo[] declaredMethods = recognizerClass.GetMethods();
+#endif
             foreach (MethodInfo method in declaredMethods)
             {
-                if (method.Name.Equals(name) && Attribute.IsDefined(method, typeof(RuleVersionAttribute)))
+#if DOTNETCORE
+                if (method.Name.Equals(name) && method.IsDefined(typeof(RuleVersionAttribute)))
+#else
+                    if (method.Name.Equals(name) && Attribute.IsDefined(method, typeof(RuleVersionAttribute)))
+#endif
                 {
                     return method;
                 }
@@ -845,7 +865,11 @@ namespace Antlr4.Runtime.Misc
 
         private static string[] GetRuleNames(Type recognizerClass)
         {
+#if DOTNETCORE
+            FieldInfo ruleNames = recognizerClass.GetTypeInfo().GetField("ruleNames");
+#else
             FieldInfo ruleNames = recognizerClass.GetField("ruleNames");
+#endif
             return (string[])ruleNames.GetValue(null);
         }
 
@@ -853,20 +877,36 @@ namespace Antlr4.Runtime.Misc
         {
             IList<Tuple<RuleDependencyAttribute, ICustomAttributeProvider>> result = new ArrayList<Tuple<RuleDependencyAttribute, ICustomAttributeProvider>>();
 
+#if DOTNETCORE
+            GetElementDependencies(AsCustomAttributeProvider(clazz.GetTypeInfo()), result);
+#else
             GetElementDependencies(AsCustomAttributeProvider(clazz), result);
+#endif
+#if DOTNETCORE
+            foreach (ConstructorInfo ctor in clazz.GetTypeInfo().GetConstructors(AllDeclaredMembers))
+#else
             foreach (ConstructorInfo ctor in clazz.GetConstructors(AllDeclaredMembers))
+#endif
             {
                 GetElementDependencies(AsCustomAttributeProvider(ctor), result);
                 foreach (ParameterInfo parameter in ctor.GetParameters())
                     GetElementDependencies(AsCustomAttributeProvider(parameter), result);
             }
 
+#if DOTNETCORE
+            foreach (FieldInfo field in clazz.GetTypeInfo().GetFields(AllDeclaredMembers))
+#else
             foreach (FieldInfo field in clazz.GetFields(AllDeclaredMembers))
+#endif
             {
                 GetElementDependencies(AsCustomAttributeProvider(field), result);
             }
 
+#if DOTNETCORE
+            foreach (MethodInfo method in clazz.GetTypeInfo().GetMethods(AllDeclaredMembers))
+#else
             foreach (MethodInfo method in clazz.GetMethods(AllDeclaredMembers))
+#endif
             {
                 GetElementDependencies(AsCustomAttributeProvider(method), result);
 #if COMPACT
@@ -922,12 +962,21 @@ namespace Antlr4.Runtime.Misc
 
         private static string GetSerializedATN(Type recognizerClass)
         {
+#if DOTNETCORE
+            FieldInfo serializedAtnField = recognizerClass.GetTypeInfo().GetField("_serializedATN", AllDeclaredStaticMembers);
+#else
             FieldInfo serializedAtnField = recognizerClass.GetField("_serializedATN", AllDeclaredStaticMembers);
+#endif
             if (serializedAtnField != null)
                 return (string)serializedAtnField.GetValue(null);
 
+#if DOTNETCORE
+            if (recognizerClass.GetTypeInfo().BaseType != null)
+                return GetSerializedATN(recognizerClass.GetTypeInfo().BaseType);
+#else
             if (recognizerClass.BaseType != null)
                 return GetSerializedATN(recognizerClass.BaseType);
+#endif
 
             return null;
         }

@@ -47,6 +47,10 @@ matrix:
       env: TARGET=csharp
     - os: linux
       jdk: oraclejdk7
+      dist: trusty
+      env: TARGET=dotnet
+    - os: linux
+      jdk: oraclejdk7
       env: TARGET=python2
     - os: linux
       jdk: oraclejdk7

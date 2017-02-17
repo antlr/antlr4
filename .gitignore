@@ -31,6 +31,9 @@ __pycache__/
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
+*.user
+.vs/
+project.lock.json
 
 # Build results
 [Dd]ebug/
