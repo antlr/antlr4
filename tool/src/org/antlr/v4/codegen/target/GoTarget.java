@@ -50,7 +50,7 @@ public class GoTarget extends Target {
 	};
 
 	/** Avoid grammar symbols in this set to prevent conflicts in gen'd code. */
-	private final Set<String> badWords = new HashSet<String>(goKeywords.length + goPredeclaredIdentifiers.length + 2);
+	private final Set<String> badWords = new HashSet<String>(goKeywords.length + goPredeclaredIdentifiers.length + 3);
 
 	private static final boolean DO_GOFMT = !Boolean.parseBoolean(System.getenv("ANTLR_GO_DISABLE_GOFMT"))
 			&& !Boolean.parseBoolean(System.getProperty("antlr.go.disable-gofmt"));
@@ -59,12 +59,12 @@ public class GoTarget extends Target {
 		super(gen, "Go");
 	}
 
-    @Override
-    public String getVersion() {
+	@Override
+	public String getVersion() {
 		return "4.6.1";
 	}
 
-    public Set<String> getBadWords() {
+	public Set<String> getBadWords() {
 		if (badWords.isEmpty()) {
 			addBadWords();
 		}
@@ -77,6 +77,7 @@ public class GoTarget extends Target {
 		badWords.addAll(Arrays.asList(goPredeclaredIdentifiers));
 		badWords.add("rule");
 		badWords.add("parserRule");
+		badWords.add("action");
 	}
 
 	@Override
