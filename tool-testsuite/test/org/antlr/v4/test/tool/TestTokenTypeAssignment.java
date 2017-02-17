@@ -141,6 +141,24 @@ public class TestTokenTypeAssignment extends BaseJavaToolTest {
 		assertEquals("'\\n'", literals.toArray()[0]);
 	}
 
+	@Test public void testParserCharLiteralWithBasicUnicodeEscape() throws Exception {
+		Grammar g = new Grammar(
+				"grammar t;\n"+
+				"a : '\\uABCD';\n");
+		Set<?> literals = g.stringLiteralToTypeMap.keySet();
+		// must store literals how they appear in the antlr grammar
+		assertEquals("'\\uABCD'", literals.toArray()[0]);
+	}
+
+	@Test public void testParserCharLiteralWithExtendedUnicodeEscape() throws Exception {
+		Grammar g = new Grammar(
+				"grammar t;\n"+
+				"a : '\\u{1ABCD}';\n");
+		Set<?> literals = g.stringLiteralToTypeMap.keySet();
+		// must store literals how they appear in the antlr grammar
+		assertEquals("'\\u{1ABCD}'", literals.toArray()[0]);
+	}
+
 	protected void checkSymbols(Grammar g,
 								String rulesStr,
 								String allValidTokensStr)
