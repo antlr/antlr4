@@ -17,6 +17,7 @@ import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.atn.ActionTransition;
 import org.antlr.v4.runtime.atn.AtomTransition;
+import org.antlr.v4.runtime.atn.CodePointTransitions;
 import org.antlr.v4.runtime.atn.LexerAction;
 import org.antlr.v4.runtime.atn.LexerChannelAction;
 import org.antlr.v4.runtime.atn.LexerCustomAction;
@@ -255,7 +256,7 @@ public class LexerATNFactory extends ParserATNFactory {
 		int t1 = CharSupport.getCharValueFromGrammarCharLiteral(a.getText());
 		int t2 = CharSupport.getCharValueFromGrammarCharLiteral(b.getText());
 		checkRange(a, b, t1, t2);
-		left.addTransition(new  RangeTransition(right, t1, t2));
+		left.addTransition(CodePointTransitions.createWithCodePointRange(right, t1, t2));
 		a.atnState = left;
 		b.atnState = left;
 		return new Handle(left, right);
@@ -301,7 +302,7 @@ public class LexerATNFactory extends ParserATNFactory {
 			Transition transition;
 			if (set.getIntervals().size() == 1) {
 				Interval interval = set.getIntervals().get(0);
-				transition = new RangeTransition(right, interval.a, interval.b);
+				transition = CodePointTransitions.createWithCodePointRange(right, interval.a, interval.b);
 			} else {
 				transition = new SetTransition(right, set);
 			}
@@ -356,7 +357,7 @@ public class LexerATNFactory extends ParserATNFactory {
 		for (int i = 0; i < n; ) {
 			right = newState(stringLiteralAST);
 			int codePoint = chars.codePointAt(i);
-			prev.addTransition(new AtomTransition(right, codePoint));
+			prev.addTransition(CodePointTransitions.createWithCodePoint(right, codePoint));
 			prev = right;
 			i += Character.charCount(codePoint);
 		}
