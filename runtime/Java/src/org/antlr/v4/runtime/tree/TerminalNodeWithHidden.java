@@ -55,15 +55,15 @@ import java.util.List;
  * @since 4.6.1
  */
 public class TerminalNodeWithHidden extends TerminalNodeImpl {
-	/** Hidden tokens left of this node's token.  hiddenLeft[0]
+	/** Hidden tokens before this node's token.  leading[0]
 	 *  is the furthest token from this node's token.
 	 */
-	protected Token[] hiddenLeft;
+	protected Token[] leading;
 
-	/** Hidden tokens right of this node's token.  hiddenRight[0]
+	/** Hidden tokens after this node's token.  trailing[0]
 	 *  is the first token after this node's token.
 	 */
-	protected Token[] hiddenRight;
+	protected Token[] trailing;
 
 	/** Construct a node with left/right hidden tokens on a channel,
 	 *  or all hidden tokens if channel==-1.
@@ -84,7 +84,7 @@ public class TerminalNodeWithHidden extends TerminalNodeImpl {
 			}
 			if ( prevReal==null ) { // this symbol is first real token (or EOF token) of file
 				List<Token> allBefore = tokens.get(0, symbol.getTokenIndex()-1);
-				hiddenLeft = allBefore.toArray(new Token[allBefore.size()]);
+				leading = allBefore.toArray(new Token[allBefore.size()]);
 			}
 			else {
 				// collect all tokens on next line after prev real
@@ -94,7 +94,7 @@ public class TerminalNodeWithHidden extends TerminalNodeImpl {
 						nextTokens.add(t);
 					}
 				}
-				hiddenLeft = nextTokens.toArray(new Token[nextTokens.size()]);
+				leading = nextTokens.toArray(new Token[nextTokens.size()]);
 			}
 		}
 
@@ -106,10 +106,9 @@ public class TerminalNodeWithHidden extends TerminalNodeImpl {
 				nextReal = tokens.get(lastHiddenRight.getTokenIndex()+1);
 			}
 			// If this is last real token, collect all hidden to right
-			StringBuilder buf = new StringBuilder();
 			if ( nextReal.getType()==Token.EOF ) {
 				List<Token> allAfter = tokens.get(right.get(0).getTokenIndex(), nextReal.getTokenIndex());
-				hiddenRight = allAfter.toArray(new Token[allAfter.size()]);
+				trailing = allAfter.toArray(new Token[allAfter.size()]);
 			}
 			else {
 				// collect all token text on same line to right
@@ -120,38 +119,38 @@ public class TerminalNodeWithHidden extends TerminalNodeImpl {
 						nextTokens.add(t);
 					}
 				}
-				hiddenRight = nextTokens.toArray(new Token[nextTokens.size()]);
+				trailing = nextTokens.toArray(new Token[nextTokens.size()]);
 			}
 		}
 	}
 
-	public Token[] getHiddenLeft() {
-		return hiddenLeft;
+	public Token[] getLeadingHidden() {
+		return leading;
 	}
 
-	public Token[] getHiddenRight() {
-		return hiddenRight;
+	public Token[] getTrailingHidden() {
+		return trailing;
 	}
 
-	public void setHiddenLeft(Token[] hiddenLeft) {
-		this.hiddenLeft = hiddenLeft;
+	public void setLeadingHidden(Token[] hiddenLeft) {
+		this.leading = hiddenLeft;
 	}
 
-	public void setHiddenRight(Token[] hiddenRight) {
-		this.hiddenRight = hiddenRight;
+	public void setTrailingHidden(Token[] hiddenRight) {
+		this.trailing = hiddenRight;
 	}
 
 	@Override
 	public String getText() {
 		StringBuilder buf = new StringBuilder();
-		if ( hiddenLeft!=null ) {
-			for (Token t : hiddenLeft) {
+		if ( leading!=null ) {
+			for (Token t : leading) {
 				buf.append(t.getText());
 			}
 		}
 		buf.append(super.getText());
-		if ( hiddenRight!=null ) {
-			for (Token t : hiddenRight) {
+		if ( trailing!=null ) {
+			for (Token t : trailing) {
 				buf.append(t.getText());
 			}
 		}
