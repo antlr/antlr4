@@ -106,6 +106,26 @@ public class Trees {
 		return kids;
 	}
 
+	/** Return ordered list of all leaves under this subtree @since 4.6.1 */
+	public static List<TerminalNode> getLeaves(ParseTree t) {
+		List<TerminalNode> leaves = new ArrayList<>();
+		getLeaves(t, leaves);
+		return leaves;
+	}
+
+	/** Fill an ordered list of all leaves under this subtree @since 4.6.1 */
+	public static void getLeaves(ParseTree t, List<TerminalNode> leaves) {
+		// If leaf, add and return
+		if ( t instanceof TerminalNode ) {
+			leaves.add((TerminalNode)t);
+			return;
+		}
+		// check children
+		for (int i = 0; i < t.getChildCount(); i++){
+			getLeaves(t.getChild(i), leaves);
+		}
+	}
+
 	/** Return a list of all ancestors of this node.  The first node of
 	 *  list is the root and the last is the parent of this node.
 	 *
