@@ -308,8 +308,10 @@ public class BufferedTokenStream implements TokenStream {
 	 * Return {@code i} if {@code tokens[i]} is on channel. Return the index of
 	 * the EOF token if there are no tokens on channel between {@code i} and
 	 * EOF.
+	 *
+	 * Making public in 4.6.1
 	 */
-	protected int nextTokenOnChannel(int i, int channel) {
+	public int nextTokenOnChannel(int i, int channel) {
 		sync(i);
 		if (i >= size()) {
 			return size() - 1;
@@ -338,8 +340,10 @@ public class BufferedTokenStream implements TokenStream {
 	 * If {@code i} specifies an index at or after the EOF token, the EOF token
 	 * index is returned. This is due to the fact that the EOF token is treated
 	 * as though it were on every channel.</p>
+	 *
+	 * Making public in 4.6.1
 	 */
-	protected int previousTokenOnChannel(int i, int channel) {
+	public int previousTokenOnChannel(int i, int channel) {
 		sync(i);
 		if (i >= size()) {
 			// the EOF token is on every channel
