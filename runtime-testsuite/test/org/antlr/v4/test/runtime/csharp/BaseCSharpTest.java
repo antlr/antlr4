@@ -10,7 +10,6 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenSource;
 import org.antlr.v4.runtime.WritableToken;
-import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.test.runtime.ErrorQueue;
 import org.antlr.v4.test.runtime.RuntimeTestSupport;
 import org.antlr.v4.test.runtime.StreamVacuum;
@@ -630,11 +629,29 @@ public class BaseCSharpTest implements RuntimeTestSupport /*, SpecialRuntimeTest
 	}
 
 	private String[] getExecTestArgs(String exec, Path output, Path errorOutput) {
-		if(isWindows())
-			return new String[] { exec, new File(tmpdir, "input").getAbsolutePath(), output.toAbsolutePath().toString(), errorOutput.toAbsolutePath().toString() } ;
+		if ( isWindows() ) {
+			return new String[]{
+				exec, new File(tmpdir, "input").getAbsolutePath(),
+				output.toAbsolutePath().toString(),
+				errorOutput.toAbsolutePath().toString()
+			};
+		}
 		else {
-			String mono = locateTool("mono");
-			return new String[] { mono, exec, new File(tmpdir, "input").getAbsolutePath(), output.toAbsolutePath().toString(), errorOutput.toAbsolutePath().toString() };
+			if (!NETSTANDARD) {
+				String mono = locateTool("mono");
+				return new String[] {
+					mono, exec, new File(tmpdir, "input").getAbsolutePath(),
+					output.toAbsolutePath().toString(),
+					errorOutput.toAbsolutePath().toString()
+				};
+			}
+
+			String dotnet = locateTool("dotnet");
+			return new String[] {
+				dotnet, exec, new File(tmpdir, "src/input").getAbsolutePath(),
+				output.toAbsolutePath().toString(),
+				errorOutput.toAbsolutePath().toString()
+			};
 		}
 	}
 
