@@ -11,10 +11,12 @@ import org.antlr.v4.runtime.tree.ErrorNodeWithHidden;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.antlr.v4.runtime.tree.TerminalNodeWithHidden;
+import org.antlr.v4.runtime.tree.Trees;
 import org.antlr.v4.runtime.tree.xpath.XPath;
 import org.junit.Test;
 
 import java.util.Collection;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -28,52 +30,68 @@ public class TestTerminalNodeWithHidden {
 	}
 
 	@Test public void testEmptyInputWithCommentEOFRefInGrammar() {
-		Pair<Parser, ParseTree> results = parse_calc("\t\n/* foo */\n");
+		String input = "\t\n/* foo */\n";
+		Pair<Parser, ParseTree> results = parse_calc(input);
 		VisitorCalcParser parser = (VisitorCalcParser)results.a;
 		ParseTree tree = results.b;
 		assertEquals("(s <EOF>)", tree.toStringTree(parser));
 		ParseTree leaf = tree.getChild(0);
 		assertEquals("\t\n/* foo */\n<EOF>", leaf.getText());
+
+		verifyLeavesCoverCompleteInput(tree, input);
 	}
 
 	@Test public void testWSBeforeFirstToken() {
-		Pair<Parser, ParseTree> results = parse_calc("\t\n 1");
+		String input = "\t\n 1";
+		Pair<Parser, ParseTree> results = parse_calc(input);
 		VisitorCalcParser parser = (VisitorCalcParser)results.a;
 		ParseTree tree = results.b;
 		assertEquals("(s (expr 1) <EOF>)", tree.toStringTree(parser));
 		ParseTree leaf = tree.getChild(0).getChild(0);
 		assertEquals("\t\n 1", leaf.getText());
+
+		verifyLeavesCoverCompleteInput(tree, input);
 	}
 
 	@Test public void testWSAfterLastToken() {
-		Pair<Parser, ParseTree> results = parse_calc("1 \t");
+		String input = "1 \t";
+		Pair<Parser, ParseTree> results = parse_calc(input);
 		VisitorCalcParser parser = (VisitorCalcParser)results.a;
 		ParseTree tree = results.b;
 		assertEquals("(s (expr 1) <EOF>)", tree.toStringTree(parser));
 		ParseTree leaf = tree.getChild(0).getChild(0);
 		assertEquals("1 \t", leaf.getText());
+
+		verifyLeavesCoverCompleteInput(tree, input);
 	}
 
 	@Test public void testWSBeforeAfterSingleToken() {
-		Pair<Parser, ParseTree> results = parse_calc(" \t1 \t");
+		String input = " \t1 \t";
+		Pair<Parser, ParseTree> results = parse_calc(input);
 		VisitorCalcParser parser = (VisitorCalcParser)results.a;
 		ParseTree tree = results.b;
 		assertEquals("(s (expr 1) <EOF>)", tree.toStringTree(parser));
 		ParseTree leaf = tree.getChild(0).getChild(0);
 		assertEquals(" \t1 \t", leaf.getText());
+
+		verifyLeavesCoverCompleteInput(tree, input);
 	}
 
 	@Test public void testMultilineWSAfterLastTokenGetsAll() {
-		Pair<Parser, ParseTree> results = parse_calc("1 \t\n \n");
+		String input = "1 \t\n \n";
+		Pair<Parser, ParseTree> results = parse_calc(input);
 		VisitorCalcParser parser = (VisitorCalcParser)results.a;
 		ParseTree tree = results.b;
 		assertEquals("(s (expr 1) <EOF>)", tree.toStringTree(parser));
 		ParseTree leaf = tree.getChild(0).getChild(0);
 		assertEquals("1 \t\n \n", leaf.getText());
+
+		verifyLeavesCoverCompleteInput(tree, input);
 	}
 
 	@Test public void testMultilineWSAfterTokenGetsOnLineOnly() {
-		Pair<Parser, ParseTree> results = parse_calc("1 \t\n \n+ 2");
+		String input = "1 \t\n \n+ 2";
+		Pair<Parser, ParseTree> results = parse_calc(input);
 		VisitorCalcParser parser = (VisitorCalcParser)results.a;
 		ParseTree tree = results.b;
 		assertEquals("(s (expr (expr 1) + (expr 2)) <EOF>)", tree.toStringTree(parser));
@@ -83,10 +101,13 @@ public class TestTerminalNodeWithHidden {
 		assertEquals("2", ints[1].getText());
 		TerminalNodeWithHidden[] op = XPath.findAll(tree, "//'+'", parser).toArray(new TerminalNodeWithHidden[0]);
 		assertEquals(" \n+ ", op[0].getText());
+
+		verifyLeavesCoverCompleteInput(tree, input);
 	}
 
 	@Test public void testWSAroundSingleOp() {
-		Pair<Parser, ParseTree> results = parse_calc("1 + 2\n");
+		String input = "1 + 2\n";
+		Pair<Parser, ParseTree> results = parse_calc(input);
 		VisitorCalcParser parser = (VisitorCalcParser)results.a;
 		ParseTree tree = results.b;
 		assertEquals("(s (expr (expr 1) + (expr 2)) <EOF>)", tree.toStringTree(parser));
@@ -97,24 +118,30 @@ public class TestTerminalNodeWithHidden {
 
 		TerminalNodeWithHidden[] op = XPath.findAll(tree, "//'+'", parser).toArray(new TerminalNodeWithHidden[0]);
 		assertEquals("+ ", op[0].getText());
+
+		verifyLeavesCoverCompleteInput(tree, input);
 	}
 
 	// ERROR NODE CASES
 
 	@Test
 	public void testSingleInvalidToken() {
-		Pair<Parser, ParseTree> results = parse_calc("\t\n+\n");
+		String input = "\t\n+\n";
+		Pair<Parser, ParseTree> results = parse_calc(input);
 		VisitorCalcParser parser = (VisitorCalcParser)results.a;
 		ParseTree tree = results.b;
 		assertEquals("(s + <EOF>)", tree.toStringTree(parser));
 		ParseTree leaf = tree.getChild(0);
 		assertTrue(leaf instanceof ErrorNodeWithHidden);
 		assertEquals("\t\n+\n", leaf.getText());
+
+		verifyLeavesCoverCompleteInput(tree, input);
 	}
 
 	@Test
 	public void testExtraToken() {
-		Pair<Parser, ParseTree> results = parse_calc("1 + * 2");
+		String input = "1 + * 2";
+		Pair<Parser, ParseTree> results = parse_calc(input);
 		VisitorCalcParser parser = (VisitorCalcParser)results.a;
 		ParseTree tree = results.b;
 		assertEquals("(s (expr (expr 1) + (expr * 2)) <EOF>)", tree.toStringTree(parser));
@@ -124,9 +151,43 @@ public class TestTerminalNodeWithHidden {
 
 		op = XPath.findAll(tree, "//'+'", parser).toArray(new TerminalNodeWithHidden[0]);
 		assertEquals("+ ", op[0].getText());
+
+		verifyLeavesCoverCompleteInput(tree, input);
 	}
 
 	// SUPPORT
+
+	protected void verifyLeavesCoverCompleteInput(ParseTree tree, String input) {
+		List<TerminalNode> leaves = Trees.getLeaves(tree);
+		StringBuilder buf = new StringBuilder();
+		for (TerminalNode t : leaves) {
+			TerminalNodeWithHidden t2 = (TerminalNodeWithHidden)t;
+			if ( t2.getSymbol().getType()==Token.EOF ) {
+				buf.append(getText(t2.getLeadingHidden()));
+			}
+			else {
+				buf.append(t.getText());
+			}
+		}
+		assertEquals(input, buf.toString());
+	}
+
+	public static String getText(List<TerminalNode> leaves) {
+		StringBuilder buf = new StringBuilder();
+		for (TerminalNode t : leaves) {
+			buf.append(t.getText());
+		}
+		return buf.toString();
+	}
+
+	public static String getText(Token[] tokens) {
+		if ( tokens==null || tokens.length==0 ) return "";
+		StringBuilder buf = new StringBuilder();
+		for (Token t : tokens) {
+			buf.append(t.getText());
+		}
+		return buf.toString();
+	}
 
 	public Pair<Parser, ParseTree> parse_calc(String input) {
 		final VisitorCalcLexer lexer = new VisitorCalcLexer(new ANTLRInputStream(input));
