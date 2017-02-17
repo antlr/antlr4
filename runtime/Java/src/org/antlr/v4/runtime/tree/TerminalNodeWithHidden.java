@@ -3,8 +3,8 @@ package org.antlr.v4.runtime.tree;
 import org.antlr.v4.runtime.BufferedTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.misc.Interval;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /** Track text of hidden channel tokens to left and right of terminal node
@@ -37,8 +37,15 @@ import java.util.List;
  * @since 4.6.1
  */
 public class TerminalNodeWithHidden extends TerminalNodeImpl {
-	protected String hiddenLeft;
-	protected String hiddenRight;
+	/** Hidden tokens left of this node's token.  hiddenLeft[0]
+	 *  is the furthest token from this node's token.
+	 */
+	protected Token[] hiddenLeft;
+
+	/** Hidden tokens right of this node's token.  hiddenRight[0]
+	 *  is the first token after this node's token.
+	 */
+	protected Token[] hiddenRight;
 
 	public TerminalNodeWithHidden(BufferedTokenStream tokens, int channel, Token symbol) {
 		super(symbol);
@@ -55,17 +62,18 @@ public class TerminalNodeWithHidden extends TerminalNodeImpl {
 				prevReal = tokens.get(firstHiddenLeft.getTokenIndex()-1);
 			}
 			if ( prevReal==null ) { // this symbol is first real token (or EOF token) of file
-				hiddenLeft = tokens.getText(Interval.of(0, symbol.getTokenIndex()-1));
+				List<Token> allBefore = tokens.get(0, symbol.getTokenIndex()-1);
+				hiddenLeft = allBefore.toArray(new Token[allBefore.size()]);
 			}
 			else {
-				// collect all token text on next line after prev real
-				StringBuilder buf = new StringBuilder();
+				// collect all tokens on next line after prev real
+				List<Token> nextTokens = new ArrayList<>();
 				for (Token t : left) {
 					if ( t.getLine()>prevReal.getLine() ) {
-						buf.append(t.getText());
+						nextTokens.add(t);
 					}
 				}
-				hiddenLeft = buf.toString();
+				hiddenLeft = nextTokens.toArray(new Token[nextTokens.size()]);
 			}
 		}
 
@@ -79,43 +87,53 @@ public class TerminalNodeWithHidden extends TerminalNodeImpl {
 			// If this is last real token, collect all hidden to right
 			StringBuilder buf = new StringBuilder();
 			if ( nextReal.getType()==Token.EOF ) {
-				hiddenRight = tokens.getText(right.get(0), nextReal);
+				List<Token> allAfter = tokens.get(right.get(0).getTokenIndex(), nextReal.getTokenIndex());
+				hiddenRight = allAfter.toArray(new Token[allAfter.size()]);
 			}
 			else {
 				// collect all token text on same line to right
 				int tokenLine = symbol.getLine();
+				List<Token> nextTokens = new ArrayList<>();
 				for (Token t : right) {
 					if ( t.getLine()==tokenLine ) {
-						buf.append(t.getText());
+						nextTokens.add(t);
 					}
 				}
-				hiddenRight = buf.toString();
+				hiddenRight = nextTokens.toArray(new Token[nextTokens.size()]);
 			}
 		}
 	}
 
-	public String getHiddenLeft() {
+	public Token[] getHiddenLeft() {
 		return hiddenLeft;
 	}
 
-	public String getHiddenRight() {
+	public Token[] getHiddenRight() {
 		return hiddenRight;
 	}
 
-	public void setHiddenLeft(String hiddenLeft) {
+	public void setHiddenLeft(Token[] hiddenLeft) {
 		this.hiddenLeft = hiddenLeft;
 	}
 
-	public void setHiddenRight(String hiddenRight) {
+	public void setHiddenRight(Token[] hiddenRight) {
 		this.hiddenRight = hiddenRight;
 	}
 
 	@Override
 	public String getText() {
 		StringBuilder buf = new StringBuilder();
-		if ( hiddenLeft!=null ) buf.append(hiddenLeft);
+		if ( hiddenLeft!=null ) {
+			for (Token t : hiddenLeft) {
+				buf.append(t.getText());
+			}
+		}
 		buf.append(super.getText());
-		if ( hiddenRight!=null ) buf.append(hiddenRight);
+		if ( hiddenRight!=null ) {
+			for (Token t : hiddenRight) {
+				buf.append(t.getText());
+			}
+		}
 		return buf.toString();
 	}
 }
