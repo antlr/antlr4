@@ -18,9 +18,7 @@ import java.util.List;
  *  associated with each node, which this definition accomplishes.
  *  Given that there is only one mvn pom.xml file for all of these API tests,
  *  all API tests that use grammars in this section will derived from
- *  TreeRootForTesting not the usual ParserRuleContext.  Nothing is different
- *  from the outside unless you set ALTERNATE_TOSTRINGTREE, in which case
- *  toStringTree() prints "@id" on the various nodes.
+ *  TreeRootForTesting not the usual ParserRuleContext.
  *
  *  Also {@see TerminalNodeForTesting} in this class.
  */
@@ -40,7 +38,7 @@ public class TreeRootForTesting extends ParserRuleContext {
 		}
 	}
 
-	public int id = TREE_NUMBER.getAndIncrement();
+	protected int id = TREE_NUMBER.getAndIncrement();
 
 	public TreeRootForTesting() {
 		super();

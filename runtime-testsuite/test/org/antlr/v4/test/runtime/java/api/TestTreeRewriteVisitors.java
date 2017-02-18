@@ -28,9 +28,7 @@ public class TestTreeRewriteVisitors extends BaseJavaTest {
 
 		@Override
 		public TerminalNode createTerminalNode(ParserRuleContext parent, Token t) {
-			TreeRootForTesting.TerminalNodeForTesting node = new TreeRootForTesting.TerminalNodeForTesting(t);
-			node.parent = parent;
-			return node;
+			return new TreeRootForTesting.TerminalNodeForTesting(t);
 		}
 	}
 
@@ -41,9 +39,7 @@ public class TestTreeRewriteVisitors extends BaseJavaTest {
 
 		@Override
 		public TerminalNode createTerminalNode(ParserRuleContext parent, Token t) {
-			TreeRootForTesting.TerminalNodeForTesting node = new TreeRootForTesting.TerminalNodeForTesting(t);
-			node.parent = parent;
-			return node;
+			return new TreeRootForTesting.TerminalNodeForTesting(t);
 		}
 	}
 
