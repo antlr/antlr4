@@ -7,6 +7,7 @@
 package org.antlr.v4.runtime.tree;
 
 import org.antlr.v4.runtime.Parser;
+import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.Interval;
 
@@ -24,6 +25,11 @@ public class TerminalNodeImpl implements TerminalNode {
 
 	@Override
 	public ParseTree getParent() { return parent; }
+
+	@Override
+	public void setParent(RuleContext parent) {
+		this.parent = parent;
+	}
 
 	@Override
 	public Token getPayload() { return symbol; }
