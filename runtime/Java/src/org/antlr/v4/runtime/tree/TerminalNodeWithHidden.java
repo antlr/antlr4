@@ -46,15 +46,11 @@ import java.util.List;
 	     public CalcParser(TokenStream tokens) { super(tokens); }
 	     @Override
 	     public TerminalNode createTerminalNode(ParserRuleContext parent, Token t) {
-	         TerminalNodeWithHidden node = new TerminalNodeWithHidden(tokens, -1, t);
-	         node.parent = parent;
-	         return node;
+	         return new TerminalNodeWithHidden(tokens, -1, t);
 	     }
 		 @Override
 		 public ErrorNode createErrorNode(ParserRuleContext parent, Token t) {
-			 ErrorNodeWithHidden node = new ErrorNodeWithHidden(tokens, -1, t);
-			 node.parent = parent;
-		 	 return node;
+			 return new ErrorNodeWithHidden(tokens, -1, t);
 		 }
 	 };
  *
