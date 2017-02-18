@@ -28,7 +28,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /** A set of utility routines useful for all kinds of ANTLR trees. */
 public class Trees {
 	/** A reflection cache tracking constructor methods for various tree nodes
-	 *  so we can clone notes. If this starts to get too big,
+	 *  so we can clone nodes. If this starts to get too big,
 	 *  call {@see resetCtorCache}.
 	 */
 	protected static Map<Class<? extends ParserRuleContext>, Constructor<? extends ParserRuleContext>> ctorCache;
@@ -209,7 +209,7 @@ public class Trees {
 
 	/** Create a shallow copy of node t; the copy has same type as t. Copy
 	 *  all relevant fields to make a proper clone of t except
-	 *  the children list. The only caveat is that there are nodes from t
+	 *  the children list. The only caveat is that the error nodes from t
 	 *  are in fact copied into the clone.
 	 *
 	 *  t is not altered.
