@@ -112,7 +112,7 @@ public class RuleCollector extends GrammarTreeVisitor {
 			String altLabel = alt.altLabel.getText();
 			altLabelToRuleName.put(Utils.capitalize(altLabel), currentRuleName);
 			altLabelToRuleName.put(Utils.decapitalize(altLabel), currentRuleName);
-			if ( !g.name.equals(alt.g.name) ) {
+			if ( g.name != null && !g.name.equals(alt.g.name) ) {
 				g.tool.RorA2IGN.put(altLabel,alt.g.name);
 			}
 
