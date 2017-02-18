@@ -20,6 +20,12 @@ import java.util.List;
  *  deviates from Roslyn rules in that final whitespace is added to
  *  last real token not the EOF token.
  *
+ *  ErrorNodes act just like regular token leaves except that tokens
+ *  conjured up during error recovery for missing tokens never have
+ *  leading/trailing hidden tokens. Hidden tokens are associated
+ *  with real tokens on either side of imaginary token injected
+ *  for the missing token.
+ *
  *  An empty input is a special case. If the start rule has a reference to EOF,
  *  then the tree will also have a terminal node for that. If the input
  *  is empty except for whitespace or comments, then the EOF terminal node
@@ -74,6 +80,10 @@ public class TerminalNodeWithHidden extends TerminalNodeImpl {
 	}
 
 	protected void collectHiddenTokens(BufferedTokenStream tokens, int channel, Token symbol) {
+		if ( symbol.getTokenIndex()<0 ) { // must be a token conjured up during error recovery for missing token
+			return; // tokens not in tokens buffer never have hidden tokens associated with them
+		}
+
 		List<Token> left  = tokens.getHiddenTokensToLeft(symbol.getTokenIndex(), channel);
 
 		// check the EOF special case separately

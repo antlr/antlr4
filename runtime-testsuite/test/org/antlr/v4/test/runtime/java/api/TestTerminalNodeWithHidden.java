@@ -22,6 +22,29 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class TestTerminalNodeWithHidden {
+	public static class MyVisitorCalcParser extends VisitorCalcParser {
+		private final CommonTokenStream tokens;
+
+		public MyVisitorCalcParser(CommonTokenStream tokens) {
+			super(tokens);
+			this.tokens = tokens;
+		}
+
+		@Override
+		public TerminalNode createTerminalNode(ParserRuleContext parent, Token t) {
+			TerminalNodeWithHidden node = new TerminalNodeWithHidden(tokens, -1, t);
+			node.parent = parent;
+			return node;
+		}
+
+		@Override
+		public ErrorNode createErrorNode(ParserRuleContext parent, Token t) {
+			ErrorNodeWithHidden node = new ErrorNodeWithHidden(tokens, -1, t);
+			node.parent = parent;
+			return node;
+		}
+	}
+
 	@Test public void testEmptyInputWithCommentNoEOFRefInGrammar() {
 		Pair<Parser, ParseTree> results = parse_calc2("\t\n/* foo */\n");
 		VisitorCalcParser parser = (VisitorCalcParser)results.a;
@@ -155,6 +178,54 @@ public class TestTerminalNodeWithHidden {
 		verifyLeavesCoverCompleteInput(tree, input);
 	}
 
+	@Test
+	public void testMissingToken() {
+		String input = "1 2 ";
+		Pair<Parser, ParseTree> results = parse_calc(input);
+		VisitorCalcParser parser = (VisitorCalcParser)results.a;
+		ParseTree tree = results.b;
+		assertEquals("(s (expr 1) 2 <EOF>)", tree.toStringTree(parser));
+		TerminalNodeWithHidden[] ints = XPath.findAll(tree, "//INT", parser).toArray(new TerminalNodeWithHidden[0]);
+		assertTrue(ints[1] instanceof ErrorNodeWithHidden);
+		assertEquals("1 ", ints[0].getText());
+		assertEquals("2 ", ints[1].getText());
+
+		verifyLeavesCoverCompleteInput(tree, input);
+	}
+
+	@Test
+	public void testConjuredUpImaginaryMissingTokenAtEnd() {
+		String input = "a [ i //oops\n";
+		Pair<Parser, ParseTree> results = parse_calc(input);
+		VisitorCalcParser parser = (VisitorCalcParser) results.a;
+		ParseTree tree = results.b;
+		assertEquals("(s (expr (expr a) [ (expr i) <missing ']'>) <EOF>)", tree.toStringTree(parser));
+		TerminalNode[] leaves = Trees.getLeaves(tree).toArray(new TerminalNode[0]);
+		assertEquals("a ", leaves[0].getText());
+		assertEquals("[ ", leaves[1].getText());
+		assertEquals("i //oops\n", leaves[2].getText());
+		assertEquals("<missing ']'>", leaves[3].getText());
+		assertEquals("<EOF>", leaves[4].getText());
+
+		// can't check leaves text against input since we conjure up a ']'
+	}
+
+	@Test
+	public void testConjuredUpImaginaryMissingToken() {
+		String input = "a 3 ;\n";
+		Pair<Parser, ParseTree> results = parse_calc3(input);
+		VisitorCalcParser parser = (VisitorCalcParser) results.a;
+		ParseTree tree = results.b;
+		assertEquals("(s3 a <missing '='> (expr 3) ;)", tree.toStringTree(parser));
+		TerminalNode[] leaves = Trees.getLeaves(tree).toArray(new TerminalNode[0]);
+		assertEquals("a ", leaves[0].getText());
+		assertEquals("<missing '='>", leaves[1].getText());
+		assertEquals("3 ", leaves[2].getText());
+		assertEquals(";\n", leaves[3].getText());
+
+		// can't check leaves text against input since we conjure up a '='
+	}
+
 	// SUPPORT
 
 	protected void verifyLeavesCoverCompleteInput(ParseTree tree, String input) {
@@ -192,44 +263,24 @@ public class TestTerminalNodeWithHidden {
 	public Pair<Parser, ParseTree> parse_calc(String input) {
 		final VisitorCalcLexer lexer = new VisitorCalcLexer(new ANTLRInputStream(input));
 		final CommonTokenStream tokens = new CommonTokenStream(lexer);
-		final VisitorCalcParser parser = new VisitorCalcParser(tokens) {
-			@Override
-			public TerminalNode createTerminalNode(ParserRuleContext parent, Token t) {
-				TerminalNodeWithHidden node = new TerminalNodeWithHidden(tokens, -1, t);
-				node.parent = parent;
-				return node;
-			}
-			@Override
-			public ErrorNode createErrorNode(ParserRuleContext parent, Token t) {
-				ErrorNodeWithHidden node = new ErrorNodeWithHidden(tokens, -1, t);
-				node.parent = parent;
-				return node;
-			}
-		};
+		final VisitorCalcParser parser = new MyVisitorCalcParser(tokens);
 		ParseTree tree = parser.s();
-//		System.out.println(tree.toStringTree(parser));
 		return new Pair<>((Parser)parser, tree);
 	}
 
 	public Pair<Parser, ParseTree> parse_calc2(String input) {
 		final VisitorCalcLexer lexer = new VisitorCalcLexer(new ANTLRInputStream(input));
 		final CommonTokenStream tokens = new CommonTokenStream(lexer);
-		final VisitorCalcParser parser = new VisitorCalcParser(tokens) {
-			@Override
-			public TerminalNode createTerminalNode(ParserRuleContext parent, Token t) {
-				TerminalNodeWithHidden node = new TerminalNodeWithHidden(tokens, -1, t);
-				node.parent = parent;
-				return node;
-			}
-			@Override
-			public ErrorNode createErrorNode(ParserRuleContext parent, Token t) {
-				ErrorNodeWithHidden node = new ErrorNodeWithHidden(tokens, -1, t);
-				node.parent = parent;
-				return node;
-			}
-		};
+		final VisitorCalcParser parser = new MyVisitorCalcParser(tokens);
 		ParseTree tree = parser.s2();
-//		System.out.println(tree.toStringTree(parser));
+		return new Pair<>((Parser)parser, tree);
+	}
+
+	public Pair<Parser, ParseTree> parse_calc3(String input) {
+		final VisitorCalcLexer lexer = new VisitorCalcLexer(new ANTLRInputStream(input));
+		final CommonTokenStream tokens = new CommonTokenStream(lexer);
+		final VisitorCalcParser parser = new MyVisitorCalcParser(tokens);
+		ParseTree tree = parser.s3();
 		return new Pair<>((Parser)parser, tree);
 	}
 }
