@@ -79,7 +79,8 @@ public class ParserRuleContext extends RuleContext {
 	public ParserRuleContext() { }
 
 	/** COPY a ctx (I'm deliberately not using copy constructor) to avoid
-	 *  confusion with creating node with parent. Does not copy children.
+	 *  confusion with creating node with parent. Does not copy children
+	 *  (except error leaves).
 	 *
 	 *  This is used in the generated parser code to flip a generic XContext
 	 *  node for rule X to a YContext for alt label Y. In that sense, it is
@@ -102,14 +103,7 @@ public class ParserRuleContext extends RuleContext {
 			// reset parent pointer for any error nodes
 			for (ParseTree child : ctx.children) {
 				if ( child instanceof ErrorNode ) {
-					this.children.add(child);
-					// there is no setParent() in ErrorNode so we have to guess
-					if ( child instanceof ErrorNodeImpl ) {
-						((ErrorNodeImpl) child).parent = this;
-					}
-					else if ( child instanceof TerminalNodeImpl ) { // might extend this for errors too
-						((TerminalNodeImpl)child).parent = this;
-					}
+					addChild((ErrorNode)child);
 				}
 			}
 		}
@@ -145,12 +139,18 @@ public class ParserRuleContext extends RuleContext {
 		return addAnyChild(ruleInvocation);
 	}
 
+	/** Add a token leaf node child and force its parent to be this node. */
 	public TerminalNode addChild(TerminalNode t) {
+		t.setParent(this);
 		return addAnyChild(t);
 	}
 
-	/** Add an error node child. @since 4.6.1 */
+	/** Add an error node child and force its parent to be this node.
+	 *
+	 * @since 4.6.1
+	 */
 	public ErrorNode addErrorNode(ErrorNode errorNode) {
+		errorNode.setParent(this);
 		return addAnyChild(errorNode);
 	}
 
@@ -163,7 +163,7 @@ public class ParserRuleContext extends RuleContext {
 	public TerminalNode addChild(Token matchedToken) {
 		TerminalNodeImpl t = new TerminalNodeImpl(matchedToken);
 		addAnyChild(t);
-		t.parent = this;
+		t.setParent(this);
 		return t;
 	}
 
@@ -176,7 +176,7 @@ public class ParserRuleContext extends RuleContext {
 	public ErrorNode addErrorNode(Token badToken) {
 		ErrorNodeImpl t = new ErrorNodeImpl(badToken);
 		addAnyChild(t);
-		t.parent = this;
+		t.setParent(this);
 		return t;
 	}
 

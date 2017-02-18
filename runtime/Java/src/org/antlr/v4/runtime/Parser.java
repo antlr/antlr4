@@ -20,7 +20,6 @@ import org.antlr.v4.runtime.misc.IntegerStack;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ErrorNodeImpl;
-import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -594,35 +593,21 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 	}
 
 	/** How to create a token leaf node associated with a parent.
-	 *  Typically, the terminal node to create is not a function of the parent
-	 *  but this method must still set the parent pointer of the terminal node
-	 *  returned. I would prefer having {@link ParserRuleContext#addAnyChild(ParseTree)}
-	 *  set the parent pointer, but the parent pointer is implementation dependent
-	 *  and currently there is no setParent() in {@link TerminalNode} (and can't
-	 *  add method in Java 1.7 without breaking backward compatibility).
+	 *  Typically, the terminal node to create is not a function of the parent.
 	 *
 	 * @since 4.6.1
 	 */
 	public TerminalNode createTerminalNode(ParserRuleContext parent, Token t) {
-		TerminalNodeImpl node = new TerminalNodeImpl(t);
-		node.parent = parent;
-		return node;
+		return new TerminalNodeImpl(t);
 	}
 
 	/** How to create an error node, given a token, associated with a parent.
-	 *  Typically, the error node to create is not a function of the parent
-	 *  but this method must still set the parent pointer of the terminal node
-	 *  returned. I would prefer having {@link ParserRuleContext#addAnyChild(ParseTree)}
-	 *  set the parent pointer, but the parent pointer is implementation dependent
-	 *  and currently there is no setParent() in {@link ErrorNode} (and can't
-	 *  add method in Java 1.7 without breaking backward compatibility).
+	 *  Typically, the error node to create is not a function of the parent.
 	 *
 	 * @since 4.6.1
 	 */
 	public ErrorNode createErrorNode(ParserRuleContext parent, Token t) {
-		ErrorNodeImpl node = new ErrorNodeImpl(t);
-		node.parent = parent;
-		return node;
+		return new ErrorNodeImpl(t);
 	}
 
 	protected void addContextToParseTree() {
