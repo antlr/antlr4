@@ -17,7 +17,7 @@ def decode_surrogate_pair(leading, trailing):
     return ((leading - 0xD800) << 10) + (trailing - 0xDC00) + 0x10000
 
 def _from_unicode(unistr):
-    return [ord(c) for c in unistr]
+    return (ord(c) for c in unistr)
 
 def _from_utf16(unistr):
     assert sys.maxunicode == 0xFFFF
@@ -59,7 +59,7 @@ def _to_utf16(code_points):
             yield unichr(low_surrogate)
 
 def _to_chars(code_points):
-    return [unichr(cp) for cp in code_points]
+    return (unichr(cp) for cp in code_points)
 
 if sys.maxunicode == 0xFFFF:
     from_unicode = _from_utf16
