@@ -55,9 +55,12 @@ public class RuleFunction extends OutputModelObject {
 	public ATNState startState;
 	public int index;
 	public Rule rule;
-	public AltLabelStructDecl[] altToContext;
+	public AltLabelStructDecl[] altToContext; 
 	public boolean hasLookaheadBlock;
+	public String grammarName;
+	public boolean isImported;
 
+	
 	@ModelElement public List<SrcOp> code;
 	@ModelElement public OrderedHashSet<Decl> locals; // TODO: move into ctx?
 	@ModelElement public Collection<AttributeDecl> args = null;
@@ -71,6 +74,8 @@ public class RuleFunction extends OutputModelObject {
 	public RuleFunction(OutputModelFactory factory, Rule r) {
 		super(factory);
 		this.name = r.name;
+		grammarName = factory.getGrammar().name;
+		isImported = r.imported;
 		this.rule = r;
 		if ( r.modifiers!=null && !r.modifiers.isEmpty() ) {
 			this.modifiers = new ArrayList<String>();
@@ -80,7 +85,13 @@ public class RuleFunction extends OutputModelObject {
 
 		index = r.index;
 
-		ruleCtx = new StructDecl(factory, r);
+		String orgGrammar = factory.getGrammar().tool.RorA2IGN.get(r.name);
+		if ( factory.getGrammar().getImportParams() != null && orgGrammar != null ) {
+			String prefix = factory.getGrammar().getImportParams().get(orgGrammar).prefix;
+			ruleCtx = new StructDecl(factory, r, prefix, true);
+		} else {
+			ruleCtx = new StructDecl(factory, r, "", false);
+		}
 		altToContext = new AltLabelStructDecl[r.getOriginalNumberOfAlts()+1];
 		addContextGetters(factory, r);
 
@@ -90,7 +101,7 @@ public class RuleFunction extends OutputModelObject {
 				args = new ArrayList<AttributeDecl>();
 				ruleCtx.addDecls(decls);
 				for (Attribute a : decls) {
-					args.add(new AttributeDecl(factory, a));
+					args.add(new AttributeDecl(factory, a,r.prefix,r.imported));
 				}
 				ruleCtx.ctorAttrs = args;
 			}
@@ -117,6 +128,9 @@ public class RuleFunction extends OutputModelObject {
 	}
 
 	public void addContextGetters(OutputModelFactory factory, Rule r) {
+		if( r.isExtention ) {
+			return;
+		}
 		// Add ctx labels for elements in alts with no -> label
 		List<AltAST> altsNoLabels = r.getUnlabeledAltASTs();
 		if ( altsNoLabels!=null ) {
@@ -139,7 +153,13 @@ public class RuleFunction extends OutputModelObject {
 				Set<Decl> decls = getDeclsForAllElements(alts);
 				for (Pair<Integer, AltAST> pair : entry.getValue()) {
 					Integer altNum = pair.a;
-					altToContext[altNum] = new AltLabelStructDecl(factory, r, altNum, label);
+					String orgGrammar = factory.getGrammar().tool.RorA2IGN.get(label);
+					if ( factory.getGrammar().getImportParams() != null && orgGrammar != null ) {
+						String prefix = factory.getGrammar().getImportParams().get(orgGrammar).prefix;
+						altToContext[altNum] = new AltLabelStructDecl(factory, r, altNum, label, prefix, true, pair.b.isExtention);					
+					} else {
+						altToContext[altNum] = new AltLabelStructDecl(factory, r, altNum, label, "", false, pair.b.isExtention);
+					}
 					if (!altLabelCtxs.containsKey(label)) {
 						altLabelCtxs.put(label, altToContext[altNum]);
 					}
@@ -238,11 +258,11 @@ public class RuleFunction extends OutputModelObject {
 							 .getRuleFunctionContextStructName(rref);
 			if ( needList) {
 				if(factory.getGenerator().getTarget().supportsOverloadedMethods())
-					decls.add( new ContextRuleListGetterDecl(factory, refLabelName, ctxName) );
-				decls.add( new ContextRuleListIndexedGetterDecl(factory, refLabelName, ctxName) );
+					decls.add( new ContextRuleListGetterDecl(factory, refLabelName, ctxName, rref.prefix, rref.imported) );
+				decls.add( new ContextRuleListIndexedGetterDecl(factory, refLabelName, ctxName, rref.prefix, rref.imported) ); // TODO should there be an else???
 			}
 			else {
-				decls.add( new ContextRuleGetterDecl(factory, refLabelName, ctxName, optional) );
+				decls.add( new ContextRuleGetterDecl(factory, refLabelName, ctxName, optional, rref.prefix, rref.imported) );
 			}
 		}
 		else {

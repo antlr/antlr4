@@ -26,6 +26,7 @@ import java.util.List;
 public class StructDecl extends Decl {
 	public String derivedFromName; // rule name or label name
 	public boolean provideCopyFrom;
+
 	@ModelElement public OrderedHashSet<Decl> attrs = new OrderedHashSet<Decl>();
 	@ModelElement public OrderedHashSet<Decl> getters = new OrderedHashSet<Decl>();
 	@ModelElement public Collection<AttributeDecl> ctorAttrs;
@@ -38,13 +39,25 @@ public class StructDecl extends Decl {
 	// built from it. Avoids adding args to StructDecl template
 	public OrderedHashSet<Decl> tokenDecls = new OrderedHashSet<Decl>();
 	public OrderedHashSet<Decl> tokenTypeDecls = new OrderedHashSet<Decl>();
+//	public OrderedHashSet<Decl> gettersDecls = new OrderedHashSet<Decl>();
+//	public OrderedHashSet<Decl> rulesDecls = new OrderedHashSet<Decl>();
+	
+	public OrderedHashSet<Decl> ruleListIndexedGetterDecl = new OrderedHashSet<Decl>();
+	public OrderedHashSet<Decl> ruleListGetterDecl = new OrderedHashSet<Decl>();
+	public OrderedHashSet<Decl> ruleGetterDecl = new OrderedHashSet<Decl>();
+	public OrderedHashSet<Decl> tokenListIndexedGetterDecl = new OrderedHashSet<Decl>();
+	public OrderedHashSet<Decl> tokenListGetterDecl = new OrderedHashSet<Decl>();
+	public OrderedHashSet<Decl> tokenGetterDecl = new OrderedHashSet<Decl>();
+	
+	
+	
 	public OrderedHashSet<Decl> tokenListDecls = new OrderedHashSet<Decl>();
 	public OrderedHashSet<Decl> ruleContextDecls = new OrderedHashSet<Decl>();
 	public OrderedHashSet<Decl> ruleContextListDecls = new OrderedHashSet<Decl>();
 	public OrderedHashSet<Decl> attributeDecls = new OrderedHashSet<Decl>();
 
-	public StructDecl(OutputModelFactory factory, Rule r) {
-		super(factory, factory.getGenerator().getTarget().getRuleFunctionContextStructName(r));
+	public StructDecl(OutputModelFactory factory, Rule r, String prefix, boolean imported) {
+		super(factory, factory.getGenerator().getTarget().getRuleFunctionContextStructName(r), prefix, imported);
 		addDispatchMethods(r);
 		derivedFromName = r.name;
 		provideCopyFrom = r.hasAltSpecificContexts();
@@ -67,9 +80,28 @@ public class StructDecl extends Decl {
 	public void addDecl(Decl d) {
 		d.ctx = this;
 
-		if ( d instanceof ContextGetterDecl ) getters.add(d);
-		else attrs.add(d);
+		if ( d instanceof ContextGetterDecl ) {
+			getters.add(d);
+		} else {
+			attrs.add(d);
+		}
 
+		if (d instanceof ContextRuleListIndexedGetterDecl) {
+			ruleListIndexedGetterDecl.add(d);
+		} else if (d instanceof ContextRuleListGetterDecl) {
+			ruleListGetterDecl.add(d);
+		} else if (d instanceof ContextRuleGetterDecl) {
+			ruleGetterDecl.add(d);
+		}
+
+		if (d instanceof ContextTokenListIndexedGetterDecl) {
+			tokenListIndexedGetterDecl.add(d);
+		} else if (d instanceof ContextTokenListGetterDecl) {
+			tokenListGetterDecl.add(d);
+		} else if (d instanceof ContextTokenGetterDecl) {
+			tokenGetterDecl.add(d);
+		}
+		
 		// add to specific "lists"
 		if ( d instanceof TokenTypeDecl ) {
 			tokenTypeDecls.add(d);
@@ -92,7 +124,7 @@ public class StructDecl extends Decl {
 	}
 
 	public void addDecl(Attribute a) {
-		addDecl(new AttributeDecl(factory, a));
+		addDecl(new AttributeDecl(factory, a, prefix, isImported));
 	}
 
 	public void addDecls(Collection<Attribute> attrList) {

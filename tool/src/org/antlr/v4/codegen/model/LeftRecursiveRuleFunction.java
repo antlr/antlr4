@@ -34,10 +34,22 @@ public class LeftRecursiveRuleFunction extends RuleFunction {
 				String ctxName = gen.getTarget().getRuleFunctionContextStructName(targetRule);
 				RuleContextDecl d;
 				if (idAST.getParent().getType() == ANTLRParser.ASSIGN) {
-					d = new RuleContextDecl(factory, label, ctxName);
+					String orgGrammar = factory.getGrammar().tool.RorA2IGN.get(r.name);
+					if ( factory.getGrammar().getImportParams() != null && orgGrammar != null ) {
+						String prefix = factory.getGrammar().getImportParams().get(orgGrammar).prefix;
+						d = new RuleContextDecl(factory, label, ctxName, prefix, true);
+					} else {
+						d = new RuleContextDecl(factory, label, ctxName, "", false);
+					}
 				}
 				else {
-					d = new RuleContextListDecl(factory, label, ctxName);
+					String orgGrammar = factory.getGrammar().tool.RorA2IGN.get(r.name);
+					if ( factory.getGrammar().getImportParams() != null && orgGrammar != null ) {
+						String prefix = factory.getGrammar().getImportParams().get(orgGrammar).prefix;
+						d = new RuleContextListDecl(factory, label, ctxName, prefix, true);
+					} else {
+						d = new RuleContextListDecl(factory, label, ctxName, "", false);
+					}
 				}
 
 				StructDecl struct = ruleCtx;

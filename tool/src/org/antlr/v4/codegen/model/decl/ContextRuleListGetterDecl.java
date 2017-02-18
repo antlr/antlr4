@@ -13,8 +13,8 @@ import org.antlr.v4.codegen.OutputModelFactory;
  */
 public class ContextRuleListGetterDecl extends ContextGetterDecl {
 	public String ctxName;
-	public ContextRuleListGetterDecl(OutputModelFactory factory, String name, String ctxName) {
-		super(factory, name);
+	public ContextRuleListGetterDecl(OutputModelFactory factory, String name, String ctxName, String prefix, boolean imported) {
+		super(factory, name, prefix, imported, true);
 		this.ctxName = ctxName;
 	}
 }

@@ -9,8 +9,8 @@ package org.antlr.v4.codegen.model.decl;
 import org.antlr.v4.codegen.OutputModelFactory;
 
 public class RuleContextListDecl extends RuleContextDecl {
-	public RuleContextListDecl(OutputModelFactory factory, String name, String ctxName) {
-		super(factory, name, ctxName);
+	public RuleContextListDecl(OutputModelFactory factory, String name, String ctxName, String prefix, boolean imported) {
+		super(factory, name, ctxName, prefix, imported);
 		isImplicit = false;
 	}
 }

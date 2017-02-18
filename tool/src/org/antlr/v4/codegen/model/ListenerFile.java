@@ -23,13 +23,23 @@ import java.util.Set;
  */
 public class ListenerFile extends OutputFile {
 	public String genPackage; // from -package cmd-line
+	public String antlrRuntimeImport; // from -DruntimeImport		
 	public String exportMacro; // from -DexportMacro cmd-line
 	public String grammarName;
 	public String parserName;
+	public boolean hasImport;
+	
+	/**
+	 * The names of all listener separated by rule & named alternative.
+	 */
+	public Set<String> listenerRuleNames = new LinkedHashSet<String>();
+	public Set<String> listenerAltNames = new LinkedHashSet<String>();
+
 	/**
 	 * The names of all listener contexts.
 	 */
 	public Set<String> listenerNames = new LinkedHashSet<String>();
+
 	/**
 	 * For listener contexts created for a labeled outer alternative, maps from
 	 * a listener context name to the name of the rule which defines the
@@ -47,21 +57,29 @@ public class ListenerFile extends OutputFile {
 		grammarName = g.name;
 		namedActions = buildNamedActions(factory.getGrammar());
 		for (Rule r : g.rules.values()) {
+			if( r.isExtention ) {
+				continue;
+			}
 			Map<String, List<Pair<Integer,AltAST>>> labels = r.getAltLabels();
 			if ( labels!=null ) {
 				for (Map.Entry<String, List<Pair<Integer, AltAST>>> pair : labels.entrySet()) {
 					listenerNames.add(pair.getKey());
+					listenerAltNames.add(pair.getKey());
 					listenerLabelRuleNames.put(pair.getKey(), r.name);
 				}
 			}
 			else {
 				// only add rule context if no labels
 				listenerNames.add(r.name);
+				listenerRuleNames.add(r.name);
 			}
 		}
 		ActionAST ast = g.namedActions.get("header");
-		if ( ast!=null ) header = new Action(factory, ast);
+		if ( ast!=null ) {
+			header = new Action(factory, ast);
+		}
 		genPackage = factory.getGrammar().tool.genPackage;
+		antlrRuntimeImport = factory.getGrammar().getOptionString("runtimeImport");
 		exportMacro = factory.getGrammar().getOptionString("exportMacro");
 	}
 }

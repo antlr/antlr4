@@ -13,7 +13,7 @@ public class ContextTokenGetterDecl extends ContextGetterDecl {
 	public boolean optional;
 
 	public ContextTokenGetterDecl(OutputModelFactory factory, String name, boolean optional) {
-		super(factory, name);
+		super(factory, name, "", false, false);
 		this.optional = optional;
 	}
 }

@@ -13,6 +13,7 @@ import org.antlr.runtime.tree.Tree;
 import org.antlr.runtime.tree.TreeVisitor;
 import org.antlr.runtime.tree.TreeVisitorAction;
 import org.antlr.v4.Tool;
+import org.antlr.v4.Tool.RuleExtends;
 import org.antlr.v4.analysis.LeftRecursiveRuleTransformer;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.BlockSetTransformer;
@@ -30,6 +31,7 @@ import org.antlr.v4.tool.ast.TerminalAST;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -168,9 +170,33 @@ public class GrammarTransformPipeline {
 		// Compute list of rules in root grammar and ensure we have a RULES node
 		GrammarAST RULES = (GrammarAST)root.getFirstChildWithType(ANTLRParser.RULES);
 		Set<String> rootRuleNames = new HashSet<String>();
+		
+		Map<String,GrammarAST> extendRules = new HashMap<String, GrammarAST>();
+		
 		// make list of rules we have in root grammar
 		List<GrammarAST> rootRules = RULES.getNodesWithType(ANTLRParser.RULE);
-		for (GrammarAST r : rootRules) rootRuleNames.add(r.getChild(0).getText());
+		RULELOOP:
+		for (GrammarAST r : rootRules) {
+			GrammarAST rOps = (GrammarAST)r.getFirstChildWithType(ANTLRParser.OPTIONS);
+			if ( rOps!=null ) {
+				GrammarAST[] ops = rOps.getChildrenAsArray();
+				for( GrammarAST op : ops ) {
+					if( "extends".equals(op.getChild(0).getText()) ) {
+						rootGrammar.tool.logMgr.log("grammar-inheritance", "Rule options in root grammar '" + r.getChild(0).getText() + "' extends '" + op.getChild(1).getText() + "'");
+						extendRules.put(op.getChild(1).getText(), r);
+						((RuleAST)r).isExtention = true;
+						//TODO(garym) check the rule exists in imported grammar.
+						//TODO(garym) Check (somewhere) that rule does not extend a rule in the same grammar - only extend rules in imported grammar. 
+						//TODO(garym) Check (somewhere) that extended and extending rules both have named alts or unnamed alts, can't have a mixture 						
+						// Don't add rule
+						continue RULELOOP; // Current rules can only have one option "extends", if any more are added can't continue here.
+					} else {
+						rootGrammar.tool.errMgr.grammarError(ErrorType.ILLEGAL_OPTION, r.g.fileName, r.getToken(), "option not support in rule " + op.getChild(0).getText() );						
+					}
+				}
+			}
+			rootRuleNames.add(r.getChild(0).getText());
+		}
 
 		for (Grammar imp : imports) {
 			// COPY TOKENS
@@ -245,13 +271,49 @@ public class GrammarTransformPipeline {
 			// COPY RULES
 			List<GrammarAST> rules = imp.ast.getNodesWithType(ANTLRParser.RULE);
 			if ( rules!=null ) {
-				for (GrammarAST r : rules) {
+				for (GrammarAST r : rules) {					
+					
 					rootGrammar.tool.log("grammar", "imported rule: "+r.toStringTree());
 					String name = r.getChild(0).getText();
+										
+					GrammarAST extendFrom = extendRules.get(name);
+					// Inject alternatives into imported rule 
+					
+					//TODO(garym) check to see that no other children of extendRule are defined - need to warn or error
+					// -> ^( RULE<RuleAST> RULE_REF ARG_ACTION<ActionAST>?
+					//		      		ruleReturns? throwsSpec? localsSpec? rulePrequels? ruleBlock exceptionGroup*
+					//		            	  )
+					if( extendFrom != null ) {
+						GrammarAST extendFromBlock = extendFrom.getAllChildrenWithType(ANTLRParser.BLOCK).get(0);
+						GrammarAST importBlock = r.getAllChildrenWithType(ANTLRParser.BLOCK).get(0);
+						for( GrammarAST extendA : extendFromBlock.getAllChildrenWithType(ANTLRParser.ALT)) {
+							extendA.g = importBlock.g;
+							AltAST oldEA = (AltAST)extendA;
+							oldEA.isExtention = true;
+							AltAST newEA = ((AltAST)extendA.dupTree());
+							// differentiate fork
+							newEA.isExtention = true;
+							String eName = extendFrom.getChild(0).getText();
+							RuleExtends ruleExtend = new RuleExtends((RuleAST)extendFrom, name);
+							tool.RuleExtend2Rule.put(eName, ruleExtend);
+							importBlock.addChild(newEA);
+						}
+					}
+					
 					boolean rootAlreadyHasRule = rootRuleNames.contains(name);
 					if ( !rootAlreadyHasRule ) {
 						RULES.addChild(r); // merge in if not overridden
 						rootRuleNames.add(name);
+					} else {
+						GrammarAST block = r.getAllChildrenWithType(ANTLRParser.BLOCK).get(0);
+						List<GrammarAST> alts = block.getAllChildrenWithType(ANTLRParser.ALT);
+						for(GrammarAST a : alts ) {
+							GrammarAST label = ((AltAST)a).altLabel;
+							if( label != null ) {
+								rootGrammar.tool.logMgr.log("grammar-inheritance", "Super has alts " + ((AltAST)a).altLabel + " in rule " + name );
+								tool.AltOver2IGN.put(label.getText(), r.g.name);
+							}
+						}
 					}
 				}
 			}
@@ -271,11 +333,14 @@ public class GrammarTransformPipeline {
 
 					String rootOption = rootGrammar.ast.getOptionString(option.getKey());
 					if (!importOption.equals(rootOption)) {
+//						System.out.println("importOption " + importOption);
+//						System.out.println("rootOption " + option.getKey() + " " + rootOption);
 						hasNewOption = true;
 						break;
 					}
 				}
 
+				//TODO(garym) deal-with/suppress imported grammar options
 				if (hasNewOption) {
 					rootGrammar.tool.errMgr.grammarError(ErrorType.OPTIONS_IN_DELEGATE,
 										optionsRoot.g.fileName, optionsRoot.token, imp.name);

@@ -25,7 +25,7 @@ import java.util.List;
 
 public class GrammarAST extends CommonTree {
 	/** For error msgs, nice to know which grammar this AST lives in */
-	// TODO: try to remove
+	// TODO: try to remove -- please don't removed - using it for distinguishing imported for root grammars 
 	public Grammar g;
 
 	/** If we build an ATN, we make AST node point at left edge of ATN construct */

@@ -17,11 +17,15 @@ import java.util.ArrayList;
 /** A StructDecl to handle a -&gt; label on alt */
 public class AltLabelStructDecl extends StructDecl {
 	public int altNum;
+	public boolean isExtention;
 	public AltLabelStructDecl(OutputModelFactory factory, Rule r,
-							  int altNum, String label)
+							  int altNum, String label,
+							  String prefix, boolean imported, boolean isExtention)
 	{
-		super(factory, r);
+		super(factory, r, prefix, imported);
+		
 		this.altNum = altNum;
+		this.isExtention = isExtention;
 		this.name = // override name set in super to the label ctx
 			factory.getGenerator().getTarget().getAltLabelContextStructName(label);
 		derivedFromName = label;

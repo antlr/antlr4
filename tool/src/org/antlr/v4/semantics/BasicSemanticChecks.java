@@ -9,6 +9,7 @@ package org.antlr.v4.semantics;
 import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.CommonTree;
 import org.antlr.runtime.tree.Tree;
+import org.antlr.v4.Tool.RuleExtends;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.GrammarTreeVisitor;
@@ -17,7 +18,7 @@ import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.ActionAST;
-import org.antlr.v4.tool.ast.AltAST;
+import org.antlr.v4.tool.ast.AltAST; 
 import org.antlr.v4.tool.ast.BlockAST;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.antlr.v4.tool.ast.GrammarASTWithOptions;
@@ -263,9 +264,45 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	@Override
 	public void finishRule(RuleAST rule, GrammarAST ID, GrammarAST block) {
 		if ( rule.isLexerRule() ) return;
+		if ( rule.isExtention ) {
+			return;
+		}
+		
 		BlockAST blk = (BlockAST)rule.getFirstChildWithType(BLOCK);
 		int nalts = blk.getChildCount();
 		GrammarAST idAST = (GrammarAST)rule.getChild(0);
+		
+		// Change rulename is options{ extends=<importRule> } is used
+		String ruleName = rule.getRuleName();
+		RuleExtends rulesExtended = g.tool.RuleExtend2Rule.get(ruleName);
+		if( rulesExtended != null  ) {
+			ruleName = rulesExtended.importedRuleName;
+		}
+ 
+		int naltsExt = 0;
+		checkRule(rule, blk, nalts, ruleName);
+		if( rulesExtended != null  ) {
+			BlockAST blkExt = (BlockAST)rule.getFirstChildWithType(BLOCK);	
+			naltsExt = blkExt.getChildCount();
+			checkRule(rulesExtended.rule, blkExt, blkExt.getChildCount(), ruleName);
+			for (int i=0; i< naltsExt; i++) {
+				AltAST altAST = (AltAST)blk.getChild(i);
+				if ( altAST.altLabel!=null ) {
+					ruleCollector.ruleToAltLabels.map(ruleName, altAST.altLabel);
+				}
+			}
+		}
+		
+		List<GrammarAST> altLabels = ruleCollector.ruleToAltLabels.get(ruleName);
+		int numAltLabels = 0;
+		if ( altLabels!=null ) numAltLabels = altLabels.size();
+		if ( numAltLabels>0 && (nalts + naltsExt)!= numAltLabels ) {
+			g.tool.errMgr.grammarError(ErrorType.RULE_WITH_TOO_FEW_ALT_LABELS,
+									   g.fileName, idAST.token, "(" + rule.getRuleName() + " extends " + ruleName + ")" );
+		}
+	}
+
+	private void checkRule(RuleAST rule, BlockAST blk, int nalts, String ruleName) {
 		for (int i=0; i< nalts; i++) {
 			AltAST altAST = (AltAST)blk.getChild(i);
 			if ( altAST.altLabel!=null ) {
@@ -281,22 +318,16 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 				}
 				// Now verify that label X or x doesn't conflict with label
 				// in another rule. altLabelToRuleName has both X and x mapped.
-				String prevRuleForLabel = ruleCollector.altLabelToRuleName.get(altLabel);
-				if ( prevRuleForLabel!=null && !prevRuleForLabel.equals(rule.getRuleName()) ) {
+				String prevRuleForLabel = ruleCollector.altLabelToRuleName.get(altLabel);				
+				
+				if ( prevRuleForLabel!=null && !prevRuleForLabel.equals(ruleName) ) {
 					g.tool.errMgr.grammarError(ErrorType.ALT_LABEL_REDEF,
 											   g.fileName, altAST.altLabel.token,
 											   altLabel,
-											   rule.getRuleName(),
+											   "(" + rule.getRuleName() + " extends " + ruleName +")",
 											   prevRuleForLabel);
 				}
 			}
-		}
-		List<GrammarAST> altLabels = ruleCollector.ruleToAltLabels.get(rule.getRuleName());
-		int numAltLabels = 0;
-		if ( altLabels!=null ) numAltLabels = altLabels.size();
-		if ( numAltLabels>0 && nalts != numAltLabels ) {
-			g.tool.errMgr.grammarError(ErrorType.RULE_WITH_TOO_FEW_ALT_LABELS,
-									   g.fileName, idAST.token, rule.getRuleName());
 		}
 	}
 

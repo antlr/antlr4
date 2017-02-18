@@ -74,7 +74,7 @@ public class SemanticPipeline {
 		if ( g.tool.errMgr.getNumErrors()>prevErrors ) return;
 
 		// STORE RULES IN GRAMMAR
-		for (Rule r : ruleCollector.rules.values()) {
+		for (Rule r : ruleCollector.rules.values()) {			
 			g.defineRule(r);
 		}
 
@@ -214,6 +214,7 @@ public class SemanticPipeline {
 
 		// create token types for tokens { A, B, C } ALIASES
 		for (GrammarAST alias : tokensDefs) {
+			//TODO(garym) get ride of warning(108) see ErrorType for redefined tokens in imported grammars
 			if (g.getTokenType(alias.getText()) != Token.INVALID_TYPE) {
 				g.tool.errMgr.grammarError(ErrorType.TOKEN_NAME_REASSIGNMENT, g.fileName, alias.token, alias.getText());
 			}

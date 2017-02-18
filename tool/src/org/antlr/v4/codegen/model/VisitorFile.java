@@ -44,6 +44,9 @@ public class VisitorFile extends OutputFile {
 		parserName = g.getRecognizerName();
 		grammarName = g.name;
 		for (Rule r : g.rules.values()) {
+			if ( r.isExtention ) {
+				continue;
+			}
 			Map<String, List<Pair<Integer, AltAST>>> labels = r.getAltLabels();
 			if ( labels!=null ) {
 				for (Map.Entry<String, List<Pair<Integer, AltAST>>> pair : labels.entrySet()) {

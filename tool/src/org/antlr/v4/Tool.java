@@ -272,6 +272,23 @@ public class Tool {
 		}
 	}
 
+	
+	/** Rules and Alts name to imported Grammar Name */
+	public Map<String,String> RorA2IGN = new HashMap<String, String>();
+	/** Alt name overriding alt in super 2 imported grammar name */
+	public Map<String,String> AltOver2IGN = new HashMap<String, String>();
+	/** Extended Rule name 2 Rule in imported */
+	public Map<String, RuleExtends>  RuleExtend2Rule = new HashMap<String, RuleExtends>();
+
+	public static class RuleExtends {
+		public RuleAST rule;
+		public String importedRuleName;
+		public RuleExtends( RuleAST rule, String iName ) {
+			this.rule = rule;
+			this.importedRuleName = iName;
+		}
+	}
+			
 	protected void handleOptionSetArg(String arg) {
 		int eq = arg.indexOf('=');
 		if ( eq>0 && arg.length()>3 ) {
@@ -359,6 +376,15 @@ public class Tool {
 		if ( g.implicitLexer!=null ) g.importVocab(g.implicitLexer);
 //		System.out.println("tokens="+g.tokenNameToTypeMap);
 //		System.out.println("strings="+g.stringLiteralToTypeMap);
+
+		for(  String a : g.tool.RorA2IGN.values() ) {
+			logMgr.log("grammar-inheritance","imported rule or alternative not overridden '" + a + "'");
+		}
+		for(  String a : g.tool.AltOver2IGN.keySet() ) {
+			logMgr.log("grammar-inheritance","alternative replace by root grammar '" + a + "'");
+		}
+		
+		
 		processNonCombinedGrammar(g, gencode);
 	}
 

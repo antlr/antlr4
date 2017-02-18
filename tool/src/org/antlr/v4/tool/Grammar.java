@@ -82,11 +82,17 @@ public class Grammar implements AttributeResolver {
 		parserOptions.add("tokenVocab");
 		parserOptions.add("language");
 		parserOptions.add("exportMacro");
+		parserOptions.add("runtimeImport");
+		parserOptions.add("importParams");
 	}
 
 	public static final Set<String> lexerOptions = parserOptions;
 
+
 	public static final Set<String> ruleOptions = new HashSet<String>();
+	static {
+		ruleOptions.add("extends");
+	}
 
 	public static final Set<String> ParserBlockOptions = new HashSet<String>();
 
@@ -258,6 +264,8 @@ public class Grammar implements AttributeResolver {
 	/** Map the other direction upon demand */
 	public LinkedHashMap<Integer, PredAST> indexToPredMap;
 
+	private Map<String,ImportParam> importParamsMap;
+	
 	public static final String AUTO_GENERATED_TOKEN_NAME_PREFIX = "T__";
 
 	public Grammar(Tool tool, GrammarRootAST ast) {
@@ -1327,4 +1335,35 @@ public class Grammar implements AttributeResolver {
 		ATN deserialized = new ATNDeserializer().deserialize(serializedAtn);
 		return new ParserInterpreter(fileName, getVocabulary(), Arrays.asList(getRuleNames()), deserialized, tokenStream);
 	}
+
+	public Map<String,ImportParam> getImportParams() {
+		if( importParamsMap != null ) {
+			return importParamsMap;
+		}
+		
+		String str = this.getOptionString("importParams");
+		if ( str == null) {
+			return null;
+		}
+		if ( !this.getOptionString("language").equals("Go") ) {
+			tool.errMgr.toolError(ErrorType.INVALID_CMDLINE_ARG, "-Dlanguage=Go required. ImportParams currently only support for Go target");				
+		}
+		String[] params = str.split(":");
+		if ( params.length != 3 ) {
+			tool.errMgr.toolError(ErrorType.INVALID_CMDLINE_ARG, "ImportParams must be in the form of parsername:package:importpath");								
+		}
+		importParamsMap = new HashMap<String, ImportParam>();
+		importParamsMap.put(params[0], new ImportParam(params[1]+".", params[2]) );
+		return importParamsMap;
+	}
+	
+	public static class ImportParam {
+		public String prefix;
+		public String packageName;
+		public ImportParam(String prefix, String packageName) {
+			this.prefix = prefix;
+			this.packageName = packageName;
+		}		
+	}	
+	
 }

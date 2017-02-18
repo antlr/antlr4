@@ -12,6 +12,7 @@ import java.util.Map;
 
 public class LexerFile extends OutputFile {
 	public String genPackage; // from -package cmd-line
+	public String antlrRuntimeImport; // from -DruntimeImport		
 	public String exportMacro; // from -DexportMacro cmd-line
 	public boolean genListener; // from -listener cmd-line
 	public boolean genVisitor; // from -visitor cmd-line
@@ -25,5 +26,6 @@ public class LexerFile extends OutputFile {
 		exportMacro = factory.getGrammar().getOptionString("exportMacro");
 		genListener = factory.getGrammar().tool.gen_listener;
 		genVisitor = factory.getGrammar().tool.gen_visitor;
+		antlrRuntimeImport = factory.getGrammar().getOptionString("runtimeImport");
 	}
 }

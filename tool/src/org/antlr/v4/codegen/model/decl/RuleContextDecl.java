@@ -13,8 +13,8 @@ public class RuleContextDecl extends Decl {
 	public String ctxName;
 	public boolean isImplicit;
 
-	public RuleContextDecl(OutputModelFactory factory, String name, String ctxName) {
-		super(factory, name);
+	public RuleContextDecl(OutputModelFactory factory, String name, String ctxName, String prefix, boolean imported) {
+		super(factory, name, prefix, imported);
 		this.ctxName = ctxName;
 	}
 }

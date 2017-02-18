@@ -13,6 +13,6 @@ public class TokenDecl extends Decl {
 	public boolean isImplicit;
 
 	public TokenDecl(OutputModelFactory factory, String varName) {
-		super(factory, varName);
+		super(factory, varName, "", false);
 	}
 }

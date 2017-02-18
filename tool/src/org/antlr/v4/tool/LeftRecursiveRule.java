@@ -27,8 +27,8 @@ public class LeftRecursiveRule extends Rule {
 	public List<Pair<GrammarAST,String>> leftRecursiveRuleRefLabels =
 		new ArrayList<Pair<GrammarAST,String>>();
 
-	public LeftRecursiveRule(Grammar g, String name, RuleAST ast) {
-		super(g, name, ast, 1);
+	public LeftRecursiveRule(Grammar g, String name, RuleAST ast, String prefix, boolean imported) {
+		super(g, name, ast, 1, prefix, imported, ast.isExtention);
 		originalAST = ast;
 		alt = new Alternative[numberOfAlts+1]; // always just one
 		for (int i=1; i<=numberOfAlts; i++) alt[i] = new Alternative(this, i);

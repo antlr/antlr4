@@ -10,8 +10,11 @@ import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.runtime.misc.MurmurHash;
 
 public abstract class ContextGetterDecl extends Decl {
-	public ContextGetterDecl(OutputModelFactory factory, String name) {
-		super(factory, name);
+	public boolean isList;
+	
+	public ContextGetterDecl(OutputModelFactory factory, String name, String prefix, boolean imported, boolean isList) {
+		super(factory, name, prefix, imported);
+		this.isList = isList;
 	}
 
 	/** Not used for output; just used to distinguish between decl types

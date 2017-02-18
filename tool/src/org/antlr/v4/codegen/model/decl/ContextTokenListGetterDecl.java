@@ -13,6 +13,6 @@ import org.antlr.v4.codegen.OutputModelFactory;
  */
 public class ContextTokenListGetterDecl extends ContextGetterDecl {
 	public ContextTokenListGetterDecl(OutputModelFactory factory, String name) {
-		super(factory, name);
+		super(factory, name, "", false, true);
 	}
 }
