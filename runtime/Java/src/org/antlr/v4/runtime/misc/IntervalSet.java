@@ -505,11 +505,11 @@ public class IntervalSet implements IntSet {
 			int b = I.b;
 			if ( a==b ) {
 				if ( a==Token.EOF ) buf.append("<EOF>");
-				else if ( elemAreChar ) buf.append("'").append((char)a).append("'");
+				else if ( elemAreChar ) buf.append("'").appendCodePoint(a).append("'");
 				else buf.append(a);
 			}
 			else {
-				if ( elemAreChar ) buf.append("'").append((char)a).append("'..'").append((char)b).append("'");
+				if ( elemAreChar ) buf.append("'").appendCodePoint(a).append("'..'").appendCodePoint(b).append("'");
 				else buf.append(a).append("..").append(b);
 			}
 			if ( iter.hasNext() ) {

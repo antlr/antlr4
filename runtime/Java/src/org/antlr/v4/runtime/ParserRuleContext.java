@@ -79,7 +79,8 @@ public class ParserRuleContext extends RuleContext {
 	public ParserRuleContext() { }
 
 	/** COPY a ctx (I'm deliberately not using copy constructor) to avoid
-	 *  confusion with creating node with parent. Does not copy children.
+	 *  confusion with creating node with parent. Does not copy children
+	 *  (except error leaves).
 	 *
 	 *  This is used in the generated parser code to flip a generic XContext
 	 *  node for rule X to a YContext for alt label Y. In that sense, it is
@@ -101,9 +102,8 @@ public class ParserRuleContext extends RuleContext {
 			this.children = new ArrayList<>();
 			// reset parent pointer for any error nodes
 			for (ParseTree child : ctx.children) {
-				if ( child instanceof ErrorNodeImpl ) {
-					this.children.add(child);
-					((ErrorNodeImpl) child).parent = this;
+				if ( child instanceof ErrorNode ) {
+					addChild((ErrorNode)child);
 				}
 			}
 		}
@@ -139,12 +139,18 @@ public class ParserRuleContext extends RuleContext {
 		return addAnyChild(ruleInvocation);
 	}
 
+	/** Add a token leaf node child and force its parent to be this node. */
 	public TerminalNode addChild(TerminalNode t) {
+		t.setParent(this);
 		return addAnyChild(t);
 	}
 
-	/** Add an error node child. @since 4.6.1 */
+	/** Add an error node child and force its parent to be this node.
+	 *
+	 * @since 4.6.1
+	 */
 	public ErrorNode addErrorNode(ErrorNode errorNode) {
+		errorNode.setParent(this);
 		return addAnyChild(errorNode);
 	}
 
@@ -157,7 +163,7 @@ public class ParserRuleContext extends RuleContext {
 	public TerminalNode addChild(Token matchedToken) {
 		TerminalNodeImpl t = new TerminalNodeImpl(matchedToken);
 		addAnyChild(t);
-		t.parent = this;
+		t.setParent(this);
 		return t;
 	}
 
@@ -170,7 +176,7 @@ public class ParserRuleContext extends RuleContext {
 	public ErrorNode addErrorNode(Token badToken) {
 		ErrorNodeImpl t = new ErrorNodeImpl(badToken);
 		addAnyChild(t);
-		t.parent = this;
+		t.setParent(this);
 		return t;
 	}
 
