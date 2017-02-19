@@ -10,7 +10,6 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenSource;
 import org.antlr.v4.runtime.WritableToken;
-import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.test.runtime.ErrorQueue;
 import org.antlr.v4.test.runtime.RuntimeTestSupport;
 import org.antlr.v4.test.runtime.StreamVacuum;
@@ -59,6 +58,12 @@ import static org.junit.Assert.assertTrue;
 public class BaseCSharpTest implements RuntimeTestSupport /*, SpecialRuntimeTestAssert*/ {
 	public static final String newline = System.getProperty("line.separator");
 	public static final String pathSep = System.getProperty("path.separator");
+
+    /**
+     * When {@code true}, on Linux will call dotnet cli toolchain, otherwise
+     * will continue to use mono
+     */
+    public static final boolean NETSTANDARD = Boolean.parseBoolean(System.getProperty("antlr-csharp-netstandard"));
 
 	/**
 	 * When the {@code antlr.preserve-test-dir} runtime property is set to
@@ -354,15 +359,25 @@ public class BaseCSharpTest implements RuntimeTestSupport /*, SpecialRuntimeTest
 	}
 
 	public boolean compile() {
-		try {
-			if(!createProject())
-				return false;
-			if(!buildProject())
-				return false;
-			return true;
-		} catch(Exception e) {
-			return false;
-		}
+        if(!NETSTANDARD) {
+            try {
+                if(!createProject())
+                    return false;
+                if(!buildProject())
+                    return false;
+                return true;
+            } catch(Exception e) {
+                return false;
+            }
+        }
+        else
+        {
+            try {
+                return createDotnetProject() && buildDotnetProject();
+            } catch(Exception e) {
+                return false;
+            }
+        }
 	}
 
 	private File getTestProjectFile() {
@@ -408,7 +423,10 @@ public class BaseCSharpTest implements RuntimeTestSupport /*, SpecialRuntimeTest
 	}
 
 	private String locateExec() {
-		return new File(tmpdir, "bin/Release/Test.exe").getAbsolutePath();
+        if (!NETSTANDARD)
+            return new File(tmpdir, "bin/Release/Test.exe").getAbsolutePath();
+
+        return new File(tmpdir, "src/bin/Debug/netcoreapp1.0/Test.dll").getAbsolutePath();
 	}
 
 	private String locateTool(String tool) {
@@ -475,6 +493,105 @@ public class BaseCSharpTest implements RuntimeTestSupport /*, SpecialRuntimeTest
 		}
 	}
 
+    public boolean createDotnetProject() {
+        try {
+            mkdir(tmpdir + "/src");
+
+            // move files to /src, since global.json need to be one level higher
+            File source = new File(tmpdir);
+            File[] files = source.listFiles();
+            for (File thisSource : files) {
+                if (!thisSource.isDirectory()) {
+                    File thisDest = new File(tmpdir + "/src/" + thisSource.getName());
+                    boolean success = thisSource.renameTo(thisDest);
+
+                    if (!success) {
+                        throw new RuntimeException("Moving file " + thisSource + " to " + thisDest + " failed.");
+                    }
+                }
+            }
+
+            // save auxiliary files
+            String pack = BaseCSharpTest.class.getPackage().getName().replace(".", "/") + "/";
+            saveResourceAsFile(pack + "global.json", new File(tmpdir, "global.json"));
+            saveResourceAsFile(pack + "project.json", new File(tmpdir, "src/project.json"));
+            return true;
+        }
+        catch(Exception e) {
+            e.printStackTrace(System.err);
+            return false;
+        }
+    }
+
+    public boolean buildDotnetProject() {
+        // find runtime package
+        final ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        final URL runtimeProj = loader.getResource("CSharp/runtime/CSharp/Antlr4.Runtime/Antlr4.Runtime.dotnet.xproj");
+        if ( runtimeProj==null ) {
+            throw new RuntimeException("C# runtime project file not found!");
+        }
+        File runtimeProjFile = new File(runtimeProj.getFile());
+        String runtimeProjPath = runtimeProjFile.getParentFile().getParentFile().getPath();
+        String projectRefPath = runtimeProjPath.substring(0, runtimeProjPath.lastIndexOf("/"));
+
+        // update global.json to reference runtime path
+        try {
+            String content = new java.util.Scanner(new File(tmpdir + "/global.json")).useDelimiter("\\Z").next();
+            content = content.replaceAll("replace_this", projectRefPath);
+            java.io.PrintWriter out = new java.io.PrintWriter(tmpdir + "/global.json");
+            out.write(content);
+            out.close();
+        }
+        catch(Exception e) {
+            return false;
+        }
+
+        // build test
+        String dotnetcli = locateTool("dotnet");
+        String[] args = new String[] {
+            dotnetcli,
+            "restore",
+            ".",
+            projectRefPath
+        };
+
+        try {
+            boolean success = runProcess(args, tmpdir);
+
+            args = new String[] {
+                dotnetcli,
+                "build",
+                "src"
+            };
+            success = runProcess(args, tmpdir);
+        }
+        catch(Exception e) {
+            return false;
+        }
+
+
+        return true;
+    }
+
+    private boolean runProcess(String[] args, String path) throws Exception {
+        ProcessBuilder pb = new ProcessBuilder(args);
+        pb.directory(new File(path));
+        Process process = pb.start();
+        StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
+        StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
+        stdoutVacuum.start();
+        stderrVacuum.start();
+        process.waitFor();
+        stdoutVacuum.join();
+        stderrVacuum.join();
+        boolean success = process.exitValue()==0;
+        if ( !success ) {
+            this.stderrDuringParse = stderrVacuum.toString();
+            System.err.println("runProcess stderrVacuum: "+ this.stderrDuringParse);
+        }
+        return success;
+    }
+
 	private void saveResourceAsFile(String resourceName, File file) throws IOException {
 		InputStream input = Thread.currentThread().getContextClassLoader().getResourceAsStream(resourceName);
 		if ( input==null ) {
@@ -512,11 +629,29 @@ public class BaseCSharpTest implements RuntimeTestSupport /*, SpecialRuntimeTest
 	}
 
 	private String[] getExecTestArgs(String exec, Path output, Path errorOutput) {
-		if(isWindows())
-			return new String[] { exec, new File(tmpdir, "input").getAbsolutePath(), output.toAbsolutePath().toString(), errorOutput.toAbsolutePath().toString() } ;
+		if ( isWindows() ) {
+			return new String[]{
+				exec, new File(tmpdir, "input").getAbsolutePath(),
+				output.toAbsolutePath().toString(),
+				errorOutput.toAbsolutePath().toString()
+			};
+		}
 		else {
-			String mono = locateTool("mono");
-			return new String[] { mono, exec, new File(tmpdir, "input").getAbsolutePath(), output.toAbsolutePath().toString(), errorOutput.toAbsolutePath().toString() };
+			if (!NETSTANDARD) {
+				String mono = locateTool("mono");
+				return new String[] {
+					mono, exec, new File(tmpdir, "input").getAbsolutePath(),
+					output.toAbsolutePath().toString(),
+					errorOutput.toAbsolutePath().toString()
+				};
+			}
+
+			String dotnet = locateTool("dotnet");
+			return new String[] {
+				dotnet, exec, new File(tmpdir, "src/input").getAbsolutePath(),
+				output.toAbsolutePath().toString(),
+				errorOutput.toAbsolutePath().toString()
+			};
 		}
 	}
 
