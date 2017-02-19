@@ -31,7 +31,9 @@ public class Trees {
 	 *  so we can clone nodes. If this starts to get too big,
 	 *  call {@see resetCtorCache}.
 	 */
-	protected static Map<Class<? extends ParserRuleContext>, Constructor<? extends ParserRuleContext>> ctorCache;
+	protected static final Map<Class<? extends ParserRuleContext>,
+		                       Constructor<? extends ParserRuleContext>> ctorCache
+		                   = new ConcurrentHashMap<>();
 
 	/** Print out a whole tree in LISP form. {@link #getNodeText} is used on the
 	 *  node payloads to get the text for the nodes.  Detect
@@ -224,9 +226,6 @@ public class Trees {
 			Class<? extends ParserRuleContext> cl = t.getClass();
 			Class<?> sup = cl.getSuperclass();
 			Class<?> supSup = sup.getSuperclass();
-			if ( ctorCache==null ) { // in a multithreaded environment, some thread will win to set ctorCache
-				ctorCache =	new ConcurrentHashMap<>();
-			}
 			boolean
 				isAltLabelNode = sup!=ParserRuleContext.class && // usual case
 				supSup!=ParserRuleContext.class;                 // if we use contextSuperClass option we are 2 below ParserRuleContext
@@ -262,34 +261,6 @@ public class Trees {
 	public static ParseTree shallowCopy(ParseTree t) {
 		if ( t instanceof TerminalNode ) return shallowCopy((TerminalNode)t);
 		return shallowCopy((ParserRuleContext)t);
-	}
-
-	/** Make a complete copy of a parse tree rooted at t.
-	 *  The original tree, t, is not altered.
-	 *
-	 *  @since 4.6.1
-	 */
-	public static ParseTree deepCopy(ParseTree t) {
-		if ( t instanceof TerminalNodeImpl ) { // must assume an implementation to alter
-			return shallowCopy(t);
-		}
-		ParserRuleContext ctx = (ParserRuleContext)t;
-		ParserRuleContext copy = shallowCopy(ctx);
-		int n = ctx.getChildCount();
-		for (int i = 0; i<n; i++) {
-			ParseTree child = ctx.getChild(i);
-			if ( child instanceof TerminalNodeImpl ) { // must assume an implementation to alter
-				TerminalNodeImpl cc = shallowCopy((TerminalNode)child);
-				cc.parent = copy;
-				copy.children.set(i, cc);
-			}
-			else {
-				ParserRuleContext cc = shallowCopy((ParserRuleContext)child);
-				cc.parent = copy;
-				copy.children.set(i, cc);
-			}
-		}
-		return copy;
 	}
 
 	/** Just in case the constructor cache gets too big, you can clear

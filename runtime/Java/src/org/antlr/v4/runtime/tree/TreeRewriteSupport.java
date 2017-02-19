@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
+
 package org.antlr.v4.runtime.tree;
 
 
@@ -20,6 +26,11 @@ import java.util.List;
 	    public ParseTree visitTerminal(TerminalNode node) {
 	        return node;
 	    }
+
+		@Override
+		public ParseTree visitErrorNode(ErrorNode node) {
+		    return node;
+		}
 		... any/all of your visitX() methods for rules in MyParserName ...
 	 }
  </pre>
@@ -45,7 +56,7 @@ import java.util.List;
  *  @since 4.6.1
  */
 public class TreeRewriteSupport {
-	public static ParseTree rewriteChildren(AbstractParseTreeVisitor<ParseTree> visitor, RuleNode tree) {
+	public static ParseTree rewriteChildren(ParseTreeVisitor<ParseTree> visitor, RuleNode tree) {
 		ParserRuleContext resultTree = (ParserRuleContext)tree;
 		int n = tree.getChildCount();
 		int nextChildToAlter = 0; // because of deletions, next child might not be i
