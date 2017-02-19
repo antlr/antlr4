@@ -302,12 +302,13 @@ namespace Antlr4.Runtime
         {
             this.data = new int[input.Length];
             int dataIdx = 0;
-            for (int i = 0; i < input.Length; i++) {
+            for (int i = 0; i < input.Length; ) {
                 var codePoint = Char.ConvertToUtf32(input, i);
                 data[dataIdx++] = codePoint;
                 if (dataIdx > data.Length) {
                     Array.Resize(ref data, data.Length * 2);
                 }
+                i += codePoint <= 0xFFFF ? 1 : 2;
             }
             this.n = dataIdx;
         }

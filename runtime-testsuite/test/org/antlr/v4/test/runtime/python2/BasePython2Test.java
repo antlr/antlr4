@@ -28,16 +28,18 @@ public class BasePython2Test extends BasePythonTest {
 		ST outputFileST = new ST(
 				"from __future__ import print_function\n"
 						+ "import sys\n"
+						+ "import codecs\n"
 						+ "from antlr4 import *\n"
 						+ "from <lexerName> import <lexerName>\n"
 						+ "\n"
 						+ "def main(argv):\n"
 						+ "    input = FileStream(argv[1], encoding='utf-8', errors='replace')\n"
-						+ "    lexer = <lexerName>(input)\n"
-						+ "    stream = CommonTokenStream(lexer)\n"
-						+ "    stream.fill()\n"
-						+ "    [ print(str(t)) for t in stream.tokens ]\n"
-						+ (showDFA ? "    print(lexer._interp.decisionToDFA[Lexer.DEFAULT_MODE].toLexerString(), end='')\n"
+						+ "    with codecs.open(argv[2], 'w', 'utf-8', 'replace') as output:\n"
+						+ "        lexer = <lexerName>(input, output)\n"
+						+ "        stream = CommonTokenStream(lexer)\n"
+						+ "        stream.fill()\n"
+						+ "        [ print(t, file=output) for t in stream.tokens ]\n"
+						+ (showDFA ? "        print(lexer._interp.decisionToDFA[Lexer.DEFAULT_MODE].toLexerString(), end='', file=output)\n"
 								: "") + "\n" + "if __name__ == '__main__':\n"
 						+ "    main(sys.argv)\n" + "\n");
 		outputFileST.add("lexerName", lexerName);
@@ -52,6 +54,7 @@ public class BasePython2Test extends BasePythonTest {
 			parserStartRuleName += "()";
 		ST outputFileST = new ST(
 				"import sys\n"
+						+ "import codecs\n"
 						+ "from antlr4 import *\n"
 						+ "from <lexerName> import <lexerName>\n"
 						+ "from <parserName> import <parserName>\n"
@@ -77,19 +80,20 @@ public class BasePython2Test extends BasePythonTest {
 						+ "\n"
 						+ "def main(argv):\n"
 						+ "    input = FileStream(argv[1], encoding='utf-8', errors='replace')\n"
-						+ "    lexer = <lexerName>(input)\n"
-						+ "    stream = CommonTokenStream(lexer)\n"
+						+ "    with codecs.open(argv[2], 'w', 'utf-8', 'replace') as output:\n"
+						+ "        lexer = <lexerName>(input, output)\n"
+						+ "        stream = CommonTokenStream(lexer)\n"
 						+ "<createParser>"
-						+ "    parser.buildParseTrees = True\n"
-						+ "    tree = parser.<parserStartRuleName>\n"
-						+ "    ParseTreeWalker.DEFAULT.walk(TreeShapeListener(), tree)\n"
+						+ "        parser.buildParseTrees = True\n"
+						+ "        tree = parser.<parserStartRuleName>\n"
+						+ "        ParseTreeWalker.DEFAULT.walk(TreeShapeListener(), tree)\n"
 						+ "\n" + "if __name__ == '__main__':\n"
 						+ "    main(sys.argv)\n" + "\n");
-		String stSource = "    parser = <parserName>(stream)\n";
+		String stSource = "        parser = <parserName>(stream, output)\n";
 		if(debug)
-			stSource += "    parser.addErrorListener(DiagnosticErrorListener())\n";
+			stSource += "        parser.addErrorListener(DiagnosticErrorListener())\n";
 		if(trace)
-			stSource += "    parser.setTrace(True)\n";
+			stSource += "        parser.setTrace(True)\n";
 		ST createParserST = new ST(stSource);
 		outputFileST.add("createParser", createParserST);
 		outputFileST.add("parserName", parserName);

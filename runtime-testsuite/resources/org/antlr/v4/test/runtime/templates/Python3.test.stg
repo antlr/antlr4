@@ -1,6 +1,6 @@
-writeln(s) ::= <<print(<s>)>>
-write(s) ::= <<print(<s>,end='')>>
-writeList(s) ::= <<print(<s: {v | str(<v>)}; separator="+">)>>
+writeln(s) ::= <<print(<s>, file=self._output)>>
+write(s) ::= <<print(<s>,end='',file=self._output)>>
+writeList(s) ::= <<print(<s: {v | str(<v>)}; separator="+">, file=self._output)>>
 
 False() ::= "False"
 
@@ -152,8 +152,10 @@ def isIdentifierChar(c):
 BasicListener(X) ::= <<
 @parser::members {
 class LeafListener(MockListener):
+    def __init__(self, output):
+        self._output = output
     def visitTerminal(self, node):
-        print(node.symbol.text)
+        print(node.symbol.text, file=self._output)
 }
 >>
 
@@ -164,7 +166,7 @@ else:
     from TListener import TListener
 TParser.LeafListener.__bases__ = (TListener,)
 walker = ParseTreeWalker()
-walker.walk(TParser.LeafListener(), <s>)
+walker.walk(TParser.LeafListener(self._output), <s>)
 >>
 
 TreeNodeWithAltNumField(X) ::= <<
@@ -183,22 +185,26 @@ class MyRuleNode(ParserRuleContext):
 TokenGetterListener(X) ::= <<
 @parser::members {
 class LeafListener(MockListener):
+    def __init__(self, output):
+        self._output = output
     def exitA(self, ctx):
         if ctx.getChildCount()==2:
-            print(ctx.INT(0).symbol.text + ' ' + ctx.INT(1).symbol.text + ' ' + str_list(ctx.INT()))
+            print(ctx.INT(0).symbol.text + ' ' + ctx.INT(1).symbol.text + ' ' + str_list(ctx.INT()), file=self._output)
         else:
-            print(str(ctx.ID().symbol))
+            print(str(ctx.ID().symbol), file=self._output)
 }
 >>
 
 RuleGetterListener(X) ::= <<
 @parser::members {
 class LeafListener(MockListener):
+    def __init__(self, output):
+        self._output = output
     def exitA(self, ctx):
         if ctx.getChildCount()==2:
-            print(ctx.b(0).start.text + ' ' + ctx.b(1).start.text + ' ' + ctx.b()[0].start.text)
+            print(ctx.b(0).start.text + ' ' + ctx.b(1).start.text + ' ' + ctx.b()[0].start.text, file=self._output)
         else:
-            print(ctx.b(0).start.text)
+            print(ctx.b(0).start.text, file=self._output)
 }
 >>
 
@@ -206,21 +212,25 @@ class LeafListener(MockListener):
 LRListener(X) ::= <<
 @parser::members {
 class LeafListener(MockListener):
+    def __init__(self, output):
+        self._output = output
     def exitE(self, ctx):
         if ctx.getChildCount()==3:
-            print(ctx.e(0).start.text + ' ' + ctx.e(1).start.text + ' ' + ctx.e()[0].start.text)
+            print(ctx.e(0).start.text + ' ' + ctx.e(1).start.text + ' ' + ctx.e()[0].start.text, file=self._output)
         else:
-            print(ctx.INT().symbol.text)
+            print(ctx.INT().symbol.text, file=self._output)
 }
 >>
 
 LRWithLabelsListener(X) ::= <<
 @parser::members {
 class LeafListener(MockListener):
+    def __init__(self, output):
+        self._output = output
     def exitCall(self, ctx):
-        print(ctx.e().start.text + ' ' + str(ctx.eList()))
+        print(ctx.e().start.text + ' ' + str(ctx.eList()), file=self._output)
     def exitInt(self, ctx):
-        print(ctx.INT().symbol.text)
+        print(ctx.INT().symbol.text, file=self._output)
 }
 >>
 
@@ -232,13 +242,13 @@ def foo():
 >>
 
 Declare_foo() ::= <<def foo(self):
-	print('foo')
+	print('foo', file=self._output)
 >>
 
 Invoke_foo() ::= "self.foo()"
 
 Declare_pred() ::= <<def pred(self, v):
-	print('eval=' + str(v).lower())
+	print('eval=' + str(v).lower(), file=self._output)
 	return v
 
 >>

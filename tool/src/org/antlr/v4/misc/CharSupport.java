@@ -19,6 +19,11 @@ public class CharSupport {
 	 */
 	public static String ANTLRLiteralCharValueEscape[] = new String[255];
 
+	public enum ToRangeMode {
+		BRACKETED,
+		NOT_BRACKETED,
+	};
+
 	static {
 		ANTLRLiteralEscapedCharValue['n'] = '\n';
 		ANTLRLiteralEscapedCharValue['r'] = '\r';
@@ -142,5 +147,19 @@ public class CharSupport {
 
 	public static String capitalize(String s) {
 		return Character.toUpperCase(s.charAt(0)) + s.substring(1);
+	}
+
+	public static String toRange(int codePointStart, int codePointEnd, ToRangeMode mode) {
+		StringBuilder sb = new StringBuilder();
+		if (mode == ToRangeMode.BRACKETED) {
+			sb.append("[");
+		}
+		sb.appendCodePoint(codePointStart)
+			.append("-")
+			.appendCodePoint(codePointEnd);
+		if (mode == ToRangeMode.BRACKETED) {
+			sb.append("]");
+		}
+		return sb.toString();
 	}
 }

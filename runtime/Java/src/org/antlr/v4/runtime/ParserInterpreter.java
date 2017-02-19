@@ -414,7 +414,7 @@ public class ParserInterpreter extends Parser {
 				                             Token.DEFAULT_CHANNEL,
 				                            -1, -1, // invalid start/stop
 				                             tok.getLine(), tok.getCharPositionInLine());
-				_ctx.addErrorNode(errToken);
+				_ctx.addErrorNode(createErrorNode(_ctx,errToken));
 			}
 			else { // NoViableAlt
 				Token tok = e.getOffendingToken();
@@ -424,7 +424,7 @@ public class ParserInterpreter extends Parser {
 				                             Token.DEFAULT_CHANNEL,
 				                            -1, -1, // invalid start/stop
 				                             tok.getLine(), tok.getCharPositionInLine());
-				_ctx.addErrorNode(errToken);
+				_ctx.addErrorNode(createErrorNode(_ctx,errToken));
 			}
 		}
 	}
@@ -445,3 +445,4 @@ public class ParserInterpreter extends Parser {
 		return rootContext;
 	}
 }
+

@@ -291,7 +291,8 @@ class LexerATNSimulator(ATNSimulator):
             lexerActionExecutor.execute(self.recog, input, startIndex)
 
     def getReachableTarget(self, trans:Transition, t:int):
-        if trans.matches(t, 0, 0xFFFE):
+        from antlr4.Lexer import Lexer
+        if trans.matches(t, 0, Lexer.MAX_CHAR_VALUE):
             return trans.target
         else:
             return None
@@ -419,7 +420,8 @@ class LexerATNSimulator(ATNSimulator):
 
         elif t.serializationType in [ Transition.ATOM, Transition.RANGE, Transition.SET ]:
             if treatEofAsEpsilon:
-                if t.matches(Token.EOF, 0, 0xFFFF):
+                from antlr4.Lexer import Lexer
+                if t.matches(Token.EOF, 0, Lexer.MAX_CHAR_VALUE):
                     c = LexerATNConfig(state=t.target, config=config)
 
         return c

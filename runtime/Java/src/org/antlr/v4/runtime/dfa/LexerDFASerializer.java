@@ -16,6 +16,9 @@ public class LexerDFASerializer extends DFASerializer {
 	@Override
 
 	protected String getEdgeLabel(int i) {
-		return "'"+(char)i+"'";
+		return new StringBuilder("'")
+				.appendCodePoint(i)
+				.append("'")
+				.toString();
 	}
 }
