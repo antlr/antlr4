@@ -7,13 +7,11 @@ package org.antlr.v4.runtime;
 
 import java.io.IOException;
 import java.io.InputStream;
-
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
-import java.nio.charset.CodingErrorAction;
 import java.nio.channels.Channels;
-import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
+import java.nio.charset.CodingErrorAction;
 import java.nio.file.Files;
 import java.nio.file.Path;
 

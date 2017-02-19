@@ -52,10 +52,10 @@ import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupString;
 
 import java.io.File;
-import java.nio.file.Path;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;

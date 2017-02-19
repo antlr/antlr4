@@ -5,20 +5,15 @@
  */
 package org.antlr.v4.test.runtime.java;
 
-import static org.junit.Assert.assertEquals;
-
-import java.io.IOException;
-import java.nio.IntBuffer;
-
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CodePointCharStream;
 import org.antlr.v4.runtime.IntStream;
-
 import org.antlr.v4.runtime.misc.Interval;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import static org.junit.Assert.assertEquals;
 
 public class TestCodePointCharStream {
 	@Rule
