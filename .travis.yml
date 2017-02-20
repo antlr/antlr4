@@ -55,6 +55,12 @@ matrix:
     - os: linux
       jdk: oraclejdk7
       env: TARGET=python3
+      addons:
+	apt:
+	  sources:
+	    - deadsnakes # source required so it finds the package definition below
+	  packages:
+	    - python3.5
     - os: linux
       jdk: oraclejdk7
       env: TARGET=javascript
