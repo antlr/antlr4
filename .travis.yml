@@ -7,7 +7,9 @@ matrix:
     - os: linux
       compiler: clang
       jdk: oraclejdk7
-      env: TARGET=cpp
+      env:
+        - TARGET=cpp
+        - CXX=g++-5
       addons:
         apt:
           sources:
@@ -19,6 +21,7 @@ matrix:
             - clang-3.7
     - os: osx
       compiler: clang
+      osx_image: xcode8.1
       env: TARGET=cpp
       addons:
         apt:
@@ -44,6 +47,7 @@ matrix:
       env: TARGET=csharp
     - os: linux
       jdk: oraclejdk7
+      dist: trusty
       env: TARGET=dotnet
     - os: linux
       jdk: oraclejdk7
