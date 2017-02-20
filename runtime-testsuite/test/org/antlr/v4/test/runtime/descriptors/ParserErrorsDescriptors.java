@@ -135,7 +135,7 @@ public class ParserErrorsDescriptors {
 	public static class InvalidEmptyInput extends BaseParserTestDescriptor {
 		public String input = "";
 		public String output = null;
-		public String errors = "line 1:0 missing ID at '<EOF>'\n";
+		public String errors = "line 1:0 mismatched input '<EOF>' expecting ID\n";
 		public String startRule = "start";
 		public String grammarName = "T";
 
@@ -414,7 +414,7 @@ public class ParserErrorsDescriptors {
 
 		/**
 		 grammar T;
-		 a : 'a' 'b'* ;
+		 a : 'a' 'b'* EOF ;
 		 */
 		@CommentHasStringValue
 		public String grammar;
@@ -436,7 +436,7 @@ public class ParserErrorsDescriptors {
 
 		/**
 		 grammar T;
-		 a : 'a' ('b'|'z'{<Pass()>})*;
+		 a : 'a' ('b'|'z'{<Pass()>})* EOF ;
 		 */
 		@CommentHasStringValue
 		public String grammar;

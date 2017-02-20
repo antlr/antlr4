@@ -9,6 +9,8 @@
 #  of speed.
 #/
 from io import StringIO
+from typing.io import TextIO
+import sys
 from antlr4.CommonTokenFactory import CommonTokenFactory
 from antlr4.atn.LexerATNSimulator import LexerATNSimulator
 from antlr4.InputStream import InputStream
@@ -29,12 +31,13 @@ class Lexer(Recognizer, TokenSource):
 
     DEFAULT_TOKEN_CHANNEL = Token.DEFAULT_CHANNEL
     HIDDEN = Token.HIDDEN_CHANNEL
-    MIN_CHAR_VALUE = '\u0000'
-    MAX_CHAR_VALUE = '\uFFFE'
+    MIN_CHAR_VALUE = 0x0000
+    MAX_CHAR_VALUE = 0x10FFFF
 
-    def __init__(self, input:InputStream):
+    def __init__(self, input:InputStream, output:TextIO = sys.stdout):
         super().__init__()
         self._input = input
+        self._output = output
         self._factory = CommonTokenFactory.DEFAULT
         self._tokenFactorySourcePair = (self, input)
 
@@ -162,7 +165,7 @@ class Lexer(Recognizer, TokenSource):
 
     def pushMode(self, m:int):
         if self._interp.debug:
-            print("pushMode " + str(m))
+            print("pushMode " + str(m), file=self._output)
         self._modeStack.append(self._mode)
         self.mode(m)
 
@@ -170,7 +173,7 @@ class Lexer(Recognizer, TokenSource):
         if len(self._modeStack)==0:
             raise Exception("Empty Stack")
         if self._interp.debug:
-            print("popMode back to "+ self._modeStack[:-1])
+            print("popMode back to "+ self._modeStack[:-1], file=self._output)
         self.mode( self._modeStack.pop() )
         return self._mode
 

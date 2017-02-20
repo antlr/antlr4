@@ -192,7 +192,7 @@ class BufferedTokenStream(TokenStream):
         self.tokenSource = tokenSource
         self.tokens = []
         self.index = -1
-
+        self.fetchedEOF = False
 
 
     # Given a starting index, return the index of the next token on channel.

@@ -353,10 +353,12 @@ public class LexerATNFactory extends ParserATNFactory {
 		int n = chars.length();
 		ATNState prev = left;
 		right = null;
-		for (int i = 0; i < n; i++) {
+		for (int i = 0; i < n; ) {
 			right = newState(stringLiteralAST);
-			prev.addTransition(new AtomTransition(right, chars.charAt(i)));
+			int codePoint = chars.codePointAt(i);
+			prev.addTransition(new AtomTransition(right, codePoint));
 			prev = right;
+			i += Character.charCount(codePoint);
 		}
 		stringLiteralAST.atnState = left;
 		return new Handle(left, right);
@@ -394,30 +396,32 @@ public class LexerATNFactory extends ParserATNFactory {
 		}
 		int n = chars.length();
 		// now make x-y become set of char
-		for (int i = 0; i < n; i++) {
-			int c = chars.charAt(i);
-			if (c == '\\' && i+1 < n && chars.charAt(i+1) == '-') { // \-
+		for (int i = 0; i < n; ) {
+			int c = chars.codePointAt(i);
+			int offset = Character.charCount(c);
+			if (c == '\\' && i+offset < n && chars.codePointAt(i+offset) == '-') { // \-
 				checkSetCollision(charSetAST, set, '-');
 				set.add('-');
-				i++;
+				offset++;
 			}
-			else if (i+2 < n && chars.charAt(i+1) == '-') { // range x-y
+			else if (i+offset+1 < n && chars.codePointAt(i+offset) == '-') { // range x-y
 				int x = c;
-				int y = chars.charAt(i+2);
+				int y = chars.codePointAt(i+offset+1);
 				if (x <= y) {
 					checkSetCollision(charSetAST, set, x, y);
 					set.add(x,y);
 				}
 				else {
 					g.tool.errMgr.grammarError(ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED,
-					                           g.fileName, charSetAST.getToken(), "[" + (char) x + "-" + (char) y + "]");
+								   g.fileName, charSetAST.getToken(), CharSupport.toRange(x, y, CharSupport.ToRangeMode.BRACKETED));
 				}
-				i += 2;
+				offset += Character.charCount(y) + 1;
 			}
 			else {
 				checkSetCollision(charSetAST, set, c);
 				set.add(c);
 			}
+			i += offset;
 		}
 		return set;
 	}
@@ -425,7 +429,7 @@ public class LexerATNFactory extends ParserATNFactory {
 	protected void checkSetCollision(GrammarAST ast, IntervalSet set, int el) {
 		if (set.contains(el)) {
 			g.tool.errMgr.grammarError(ErrorType.CHARACTERS_COLLISION_IN_SET, g.fileName, ast.getToken(),
-					(char)el, ast.getText());
+					el, ast.getText());
 		}
 	}
 
@@ -453,7 +457,7 @@ public class LexerATNFactory extends ParserATNFactory {
 					setText = sb.toString();
 				}
 				g.tool.errMgr.grammarError(ErrorType.CHARACTERS_COLLISION_IN_SET, g.fileName, ast.getToken(),
-						(char)a + "-" + (char)b, setText);
+							   CharSupport.toRange(a, b, CharSupport.ToRangeMode.NOT_BRACKETED), setText);
 				break;
 			}
 		}

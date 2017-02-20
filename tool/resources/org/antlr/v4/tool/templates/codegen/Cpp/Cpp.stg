@@ -59,7 +59,7 @@ public:
 
 <if (rest(lexer.modes))>
   enum {
-    <rest(lexer.modes): {m | <m> = <i>,}; separator="\n", anchor>
+    <rest(lexer.modes): {m | <m> = <i>}; separator=", ", wrap, anchor>
   };
 <endif>
 
@@ -70,6 +70,7 @@ public:
   virtual std::string getGrammarFileName() const override;
   virtual const std::vector\<std::string>& getRuleNames() const override;
 
+  virtual const std::vector\<std::string>& getChannelNames() const override;
   virtual const std::vector\<std::string>& getModeNames() const override;
   virtual const std::vector\<std::string>& getTokenNames() const override; // deprecated, use vocabulary instead
   virtual antlr4::dfa::Vocabulary& getVocabulary() const override;
@@ -89,6 +90,7 @@ private:
   static antlr4::atn::PredictionContextCache _sharedContextCache;
   static std::vector\<std::string> _ruleNames;
   static std::vector\<std::string> _tokenNames;
+  static std::vector\<std::string> _channelNames;
   static std::vector\<std::string> _modeNames;
 
   static std::vector\<std::string> _literalNames;
@@ -126,6 +128,10 @@ std::string <lexer.name>::getGrammarFileName() const {
 
 const std::vector\<std::string>& <lexer.name>::getRuleNames() const {
   return _ruleNames;
+}
+
+const std::vector\<std::string>& <lexer.name>::getChannelNames() const {
+  return _channelNames;
 }
 
 const std::vector\<std::string>& <lexer.name>::getModeNames() const {
@@ -187,6 +193,10 @@ std::vector\<uint16_t> <lexer.name>::_serializedATN;
 
 std::vector\<std::string> <lexer.name>::_ruleNames = {
   <lexer.ruleNames: {r | "<r>"}; separator = ", ", wrap, anchor>
+};
+
+std::vector\<std::string> <lexer.name>::_channelNames = {
+  "DEFAULT_TOKEN_CHANNEL", "HIDDEN"<if (lexer.channels)>, <lexer.channels: {c | "<c>"}; separator = ", ", wrap, anchor><endif>
 };
 
 std::vector\<std::string> <lexer.name>::_modeNames = {
@@ -644,7 +654,7 @@ switch (_input->LA(1)) {
 \}
 }; separator="\n">
 default:
-  <error>
+  break;
 }
 >>
 

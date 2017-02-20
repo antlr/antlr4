@@ -28,8 +28,8 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 
 	public static final int DEFAULT_TOKEN_CHANNEL = Token.DEFAULT_CHANNEL;
 	public static final int HIDDEN = Token.HIDDEN_CHANNEL;
-	public static final int MIN_CHAR_VALUE = '\u0000';
-	public static final int MAX_CHAR_VALUE = '\uFFFE';
+	public static final int MIN_CHAR_VALUE = 0x0000;
+	public static final int MAX_CHAR_VALUE = 0x10FFFF;
 
 	public CharStream _input;
 	protected Pair<TokenSource, CharStream> _tokenFactorySourcePair;
@@ -319,6 +319,8 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	public int getChannel() {
 		return _channel;
 	}
+
+	public String[] getChannelNames() { return null; }
 
 	public String[] getModeNames() {
 		return null;

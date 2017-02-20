@@ -33,21 +33,29 @@ Edit the repository looking for 4.5 or whatever and update it. Bump version in t
  * runtime/Python3/src/antlr4/Recognizer.py
  * runtime/CSharp/runtime/CSharp/Antlr4.Runtime/Properties/AssemblyInfo.cs
  * runtime/CSharp/build/version.ps1
+ * runtime/CSharp/runtime/CSharp/Package.nuspec
  * runtime/JavaScript/src/antlr4/package.json
  * runtime/JavaScript/src/antlr4/Recognizer.js
  * runtime/Cpp/VERSION
  * runtime/Cpp/runtime/src/RuntimeMetaData.cpp
  * runtime/Cpp/cmake/ExternalAntlr4Cpp.cmake
+ * runtime/Cpp/demo/generate.cmd
+ * runtime/Go/antlr/recognizer.go
+ * runtime/Swift/Antlr4/org/antlr/v4/runtime/RuntimeMetaData.swift
+ * tool/src/org/antlr/v4/codegen/target/GoTarget.java
  * tool/src/org/antlr/v4/codegen/target/CppTarget.java
  * tool/src/org/antlr/v4/codegen/target/CSharpTarget.java
  * tool/src/org/antlr/v4/codegen/target/JavaScriptTarget.java
  * tool/src/org/antlr/v4/codegen/target/Python2Target.java
  * tool/src/org/antlr/v4/codegen/target/Python3Target.java
+ * tool/src/org/antlr/v4/codegen/target/SwiftTarget.java
+ * tool/src/org/antlr/v4/codegen/Target.java
+ * tool/resources/org/antlr/v4/tool/templates/codegen/Swift/Swift.stg
  
 Here is a simple script to display any line from the critical files with, say, `4.5` in it:
 
 ```bash
-find /tmp/antlr4 -type f -exec grep -l '4\.5' {} \;
+find tool runtime -type f -exec grep -l '4\.6' {} \;
 ```
 
 Commit to repository.
@@ -301,7 +309,7 @@ rm Antlr4.Runtime/obj/net20/Release/Antlr4.Runtime.dll
 # build
 xbuild /p:Configuration=Release Antlr4.Runtime/Antlr4.Runtime.mono.csproj
 # zip it up to get a version number on zip filename
-zip --junk-paths /tmp/antlr-csharp-runtime-4.6.zip Antlr4.Runtime/bin/net35/Release/Antlr4.Runtime.dll
+zip --junk-paths /tmp/antlr-csharp-runtime-4.6.zip Antlr4.Runtime/obj/net20/Release/Antlr4.Runtime.Standard.dll
 cp /tmp/antlr-csharp-runtime-4.6.zip ~/antlr/sites/website-antlr4/download
 ```
 
@@ -358,7 +366,7 @@ python setup.py register -r pypi
 python setup.py sdist bdist_wininst upload -r pypi
 ```
 
-Add links to the artifacts from download.html
+There are links to the artifacts in [download.html](http://www.antlr.org/download.html) already.
 
 ### C++
 
@@ -378,6 +386,7 @@ On a Mac (with XCode 7+ installed):
 ```bash
 cd runtime/Cpp
 ./deploy-macos.sh
+cp antlr4-cpp-runtime-macos.zip ~/antlr/sites/website-antlr4/download/antlr4-cpp-runtime-4.6-macos.zip
 ```
 
 On any Mac or Linux machine:
@@ -385,6 +394,7 @@ On any Mac or Linux machine:
 ```bash
 cd runtime/Cpp
 ./deploy-source.sh
+cp antlr4-cpp-runtime-source.zip ~/antlr/sites/website-antlr4/download/antlr4-cpp-runtime-4.6-source.zip
 ```
 
 On a Windows machine the build scripts checks if VS 2013 and/or VS 2015 are installed and builds binaries for each, if found. This script requires 7z to be installed (http://7-zip.org).
@@ -392,15 +402,17 @@ On a Windows machine the build scripts checks if VS 2013 and/or VS 2015 are inst
 ```bash
 cd runtime/Cpp
 deploy-windows.cmd
+cp antlr4-cpp-runtime-vs2015.zip ~/antlr/sites/website-antlr4/download/antlr4-cpp-runtime-4.6-vs2015.zip
 ```
 
 Move target to website (**_rename to a specific ANTLR version first if needed_**):
 
 ```bash
 pushd ~/antlr/sites/website-antlr4/download
-git add antlr4cpp-runtime-macos.zip
-git add antlr4cpp-runtime-windows.zip
-git add antlr4cpp-runtime-source.zip
+# vi index.html
+git add antlr4cpp-runtime-4.6-macos.zip
+git add antlr4cpp-runtime-4.6-windows.zip
+git add antlr4cpp-runtime-4.6-source.zip
 git commit -a -m 'update C++ runtime'
 git push origin gh-pages
 popd
@@ -408,7 +420,7 @@ popd
 
 ## Update javadoc for runtime and tool
 
-First gen javadoc:
+First, gen javadoc:
 
 ```bash
 $ cd antlr4

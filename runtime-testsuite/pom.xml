@@ -10,7 +10,7 @@
 	<parent>
 		<groupId>org.antlr</groupId>
 		<artifactId>antlr4-master</artifactId>
-		<version>4.6</version>
+		<version>4.6.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>antlr4-runtime-testsuite</artifactId>
 	<name>ANTLR 4 Runtime Tests (2nd generation)</name>
@@ -95,6 +95,8 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>2.19.1</version>
 				<configuration>
+					<!-- SUREFIRE-951: file.encoding cannot be set via systemPropertyVariables -->
+					<argLine>-Dfile.encoding=UTF-8</argLine>
 					<includes>
 						<include>**/csharp/Test*.java</include>
 						<include>**/java/Test*.java</include>
@@ -115,6 +117,24 @@
 						<goals>
 							<goal>test-jar</goal>
 						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.antlr</groupId>
+				<artifactId>antlr4-maven-plugin</artifactId>
+				<version>${project.version}</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>antlr4</goal>
+						</goals>
+						<configuration>
+							<sourceDirectory>${basedir}/test</sourceDirectory>
+							<outputDirectory>${project.build.directory}/generated-test-sources/antlr4</outputDirectory>
+							<visitor>true</visitor>
+							<generateTestSources>true</generateTestSources>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>

@@ -8,6 +8,7 @@ package org.antlr.v4.codegen.target;
 
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.codegen.Target;
+import org.antlr.v4.codegen.UnicodeEscapes;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.ast.GrammarAST;
@@ -49,7 +50,7 @@ public class GoTarget extends Target {
 	};
 
 	/** Avoid grammar symbols in this set to prevent conflicts in gen'd code. */
-	private final Set<String> badWords = new HashSet<String>(goKeywords.length + goPredeclaredIdentifiers.length + 2);
+	private final Set<String> badWords = new HashSet<String>(goKeywords.length + goPredeclaredIdentifiers.length + 3);
 
 	private static final boolean DO_GOFMT = !Boolean.parseBoolean(System.getenv("ANTLR_GO_DISABLE_GOFMT"))
 			&& !Boolean.parseBoolean(System.getProperty("antlr.go.disable-gofmt"));
@@ -58,12 +59,12 @@ public class GoTarget extends Target {
 		super(gen, "Go");
 	}
 
-    @Override
-    public String getVersion() {
-		return "4.6";
+	@Override
+	public String getVersion() {
+		return "4.6.1";
 	}
 
-    public Set<String> getBadWords() {
+	public Set<String> getBadWords() {
 		if (badWords.isEmpty()) {
 			addBadWords();
 		}
@@ -76,6 +77,7 @@ public class GoTarget extends Target {
 		badWords.addAll(Arrays.asList(goPredeclaredIdentifiers));
 		badWords.add("rule");
 		badWords.add("parserRule");
+		badWords.add("action");
 	}
 
 	@Override
@@ -214,5 +216,10 @@ public class GoTarget extends Target {
 		}
 
 	}
-}
 
+	@Override
+	protected void appendUnicodeEscapedCodePoint(int codePoint, StringBuilder sb) {
+		// Go and Python share the same escaping style.
+		UnicodeEscapes.appendPythonStyleEscapedCodePoint(codePoint, sb);
+	}
+}

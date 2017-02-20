@@ -202,11 +202,8 @@ class DefaultErrorStrategy(ErrorStrategy):
         s = recognizer._interp.atn.states[recognizer.state]
         la = recognizer.getTokenStream().LA(1)
         # try cheaper subset first; might get lucky. seems to shave a wee bit off
-        if la==Token.EOF or la in recognizer.atn.nextTokens(s):
-            return
-
-        # Return but don't end recovery. only do that upon valid token match
-        if recognizer.isExpectedToken(la):
+        nextTokens = recognizer.atn.nextTokens(s)
+        if Token.EPSILON in nextTokens or la in nextTokens:
             return
 
         if s.stateType in [ATNState.BLOCK_START, ATNState.STAR_BLOCK_START,

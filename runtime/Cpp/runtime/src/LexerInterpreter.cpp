@@ -15,15 +15,16 @@
 using namespace antlr4;
 
 LexerInterpreter::LexerInterpreter(const std::string &grammarFileName, const std::vector<std::string> &tokenNames,
-  const std::vector<std::string> &ruleNames, const std::vector<std::string> &modeNames, const atn::ATN &atn,
-  CharStream *input)
-  : LexerInterpreter(grammarFileName, dfa::Vocabulary::fromTokenNames(tokenNames), ruleNames, modeNames, atn, input) {
+  const std::vector<std::string> &ruleNames, const std::vector<std::string> &channelNames, const std::vector<std::string> &modeNames,
+  const atn::ATN &atn, CharStream *input)
+  : LexerInterpreter(grammarFileName, dfa::Vocabulary::fromTokenNames(tokenNames), ruleNames, channelNames, modeNames, atn, input) {
 }
 
 LexerInterpreter::LexerInterpreter(const std::string &grammarFileName, const dfa::Vocabulary &vocabulary,
-  const std::vector<std::string> &ruleNames, const std::vector<std::string> &modeNames, const atn::ATN &atn,
-  CharStream *input)
-  : Lexer(input), _grammarFileName(grammarFileName), _atn(atn), _ruleNames(ruleNames), _modeNames(modeNames),
+  const std::vector<std::string> &ruleNames, const std::vector<std::string> &channelNames, const std::vector<std::string> &modeNames,
+  const atn::ATN &atn, CharStream *input)
+  : Lexer(input), _grammarFileName(grammarFileName), _atn(atn), _ruleNames(ruleNames),
+                  _channelNames(channelNames), _modeNames(modeNames),
                   _vocabulary(vocabulary) {
 
   if (_atn.grammarType != atn::ATNType::LEXER) {
@@ -59,6 +60,10 @@ const std::vector<std::string>& LexerInterpreter::getTokenNames() const {
 
 const std::vector<std::string>& LexerInterpreter::getRuleNames() const {
   return _ruleNames;
+}
+
+const std::vector<std::string>& LexerInterpreter::getChannelNames() const {
+  return _channelNames;
 }
 
 const std::vector<std::string>& LexerInterpreter::getModeNames() const {

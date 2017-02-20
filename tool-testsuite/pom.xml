@@ -10,7 +10,7 @@
   <parent>
     <groupId>org.antlr</groupId>
     <artifactId>antlr4-master</artifactId>
-    <version>4.6</version>
+    <version>4.6.1-SNAPSHOT</version>
   </parent>
   <artifactId>antlr4-tool-testsuite</artifactId>
   <name>ANTLR 4 Tool Tests</name>
@@ -59,6 +59,8 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <version>2.12.4</version>
         <configuration>
+          <!-- SUREFIRE-951: file.encoding cannot be set via systemPropertyVariables -->
+          <argLine>-Dfile.encoding=UTF-8</argLine>
           <includes>
             <include>**/Test*.java</include>
           </includes>

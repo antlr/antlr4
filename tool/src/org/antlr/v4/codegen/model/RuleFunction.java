@@ -171,49 +171,66 @@ public class RuleFunction extends OutputModelObject {
 	 */
 	public Set<Decl> getDeclsForAllElements(List<AltAST> altASTs) {
 		Set<String> needsList = new HashSet<String>();
+		Set<String> nonOptional = new HashSet<String>();
 		List<GrammarAST> allRefs = new ArrayList<GrammarAST>();
+		boolean firstAlt = true;
 		for (AltAST ast : altASTs) {
 			IntervalSet reftypes = new IntervalSet(RULE_REF, TOKEN_REF);
 			List<GrammarAST> refs = ast.getNodesWithType(reftypes);
 			allRefs.addAll(refs);
-			FrequencySet<String> altFreq = getElementFrequenciesForAlt(ast);
+			Pair<FrequencySet<String>, FrequencySet<String>> minAndAltFreq = getElementFrequenciesForAlt(ast);
+			FrequencySet<String> minFreq = minAndAltFreq.a;
+			FrequencySet<String> altFreq = minAndAltFreq.b;
 			for (GrammarAST t : refs) {
 				String refLabelName = t.getText();
 				if ( altFreq.count(refLabelName)>1 ) {
 					needsList.add(refLabelName);
 				}
+
+				if (firstAlt && minFreq.count(refLabelName) != 0) {
+					nonOptional.add(refLabelName);
+				}
 			}
+
+			for (String ref : nonOptional.toArray(new String[nonOptional.size()])) {
+				if (minFreq.count(ref) == 0) {
+					nonOptional.remove(ref);
+				}
+			}
+
+			firstAlt = false;
 		}
 		Set<Decl> decls = new LinkedHashSet<Decl>();
 		for (GrammarAST t : allRefs) {
 			String refLabelName = t.getText();
 			List<Decl> d = getDeclForAltElement(t,
 												refLabelName,
-												needsList.contains(refLabelName));
+												needsList.contains(refLabelName),
+												!nonOptional.contains(refLabelName));
 			decls.addAll(d);
 		}
 		return decls;
 	}
 
 	/** Given list of X and r refs in alt, compute how many of each there are */
-	protected FrequencySet<String> getElementFrequenciesForAlt(AltAST ast) {
+	protected Pair<FrequencySet<String>, FrequencySet<String>> getElementFrequenciesForAlt(AltAST ast) {
 		try {
 			ElementFrequenciesVisitor visitor = new ElementFrequenciesVisitor(new CommonTreeNodeStream(new GrammarASTAdaptor(), ast));
 			visitor.outerAlternative();
 			if (visitor.frequencies.size() != 1) {
 				factory.getGrammar().tool.errMgr.toolError(ErrorType.INTERNAL_ERROR);
-				return new FrequencySet<String>();
+				return new Pair<>(new FrequencySet<String>(), new FrequencySet<String>());
 			}
 
-			return visitor.frequencies.peek();
+			return new Pair<>(visitor.getMinFrequencies(), visitor.frequencies.peek());
 		}
 		catch (RecognitionException ex) {
 			factory.getGrammar().tool.errMgr.toolError(ErrorType.INTERNAL_ERROR, ex);
-			return new FrequencySet<String>();
+			return new Pair<>(new FrequencySet<String>(), new FrequencySet<String>());
 		}
 	}
 
-	public List<Decl> getDeclForAltElement(GrammarAST t, String refLabelName, boolean needList) {
+	public List<Decl> getDeclForAltElement(GrammarAST t, String refLabelName, boolean needList, boolean optional) {
 		List<Decl> decls = new ArrayList<Decl>();
 		if ( t.getType()==RULE_REF ) {
 			Rule rref = factory.getGrammar().getRule(t.getText());
@@ -225,7 +242,7 @@ public class RuleFunction extends OutputModelObject {
 				decls.add( new ContextRuleListIndexedGetterDecl(factory, refLabelName, ctxName) );
 			}
 			else {
-				decls.add( new ContextRuleGetterDecl(factory, refLabelName, ctxName) );
+				decls.add( new ContextRuleGetterDecl(factory, refLabelName, ctxName, optional) );
 			}
 		}
 		else {
@@ -235,7 +252,7 @@ public class RuleFunction extends OutputModelObject {
 				decls.add( new ContextTokenListIndexedGetterDecl(factory, refLabelName) );
 			}
 			else {
-				decls.add( new ContextTokenGetterDecl(factory, refLabelName) );
+				decls.add( new ContextTokenGetterDecl(factory, refLabelName, optional) );
 			}
 		}
 		return decls;

@@ -6,6 +6,7 @@
 
 package org.antlr.v4.semantics;
 
+import org.antlr.runtime.tree.CommonTree;
 import org.antlr.v4.automata.LexerATNFactory;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.Token;
@@ -18,8 +19,10 @@ import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LabelElementPair;
 import org.antlr.v4.tool.LexerGrammar;
 import org.antlr.v4.tool.Rule;
+import org.antlr.v4.tool.ast.AltAST;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.antlr.v4.tool.LabelType;
+import org.antlr.v4.tool.LeftRecursiveRule;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -27,6 +30,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.ArrayList;
 
 /** Check for symbol problems; no side-effects.  Inefficient to walk rules
  *  and such multiple times, but I like isolating all error checking outside
@@ -127,48 +131,107 @@ public class SymbolChecks {
     public void checkForLabelConflicts(Collection<Rule> rules) {
 		for (Rule r : rules) {
 			checkForAttributeConflicts(r);
-			Map<String, LabelElementPair> labelNameSpace =
-					new HashMap<String, LabelElementPair>();
-			for (int i = 1; i <= r.numberOfAlts; i++) {
-				if (r.hasAltSpecificContexts()) {
-					labelNameSpace.clear();
-				}
 
+			Map<String, LabelElementPair> labelNameSpace = new HashMap<>();
+			for (int i = 1; i <= r.numberOfAlts; i++) {
 				Alternative a = r.alt[i];
 				for (List<LabelElementPair> pairs : a.labelDefs.values()) {
-					for (LabelElementPair p : pairs) {
-						checkForLabelConflict(r, p.label);
-						String name = p.label.getText();
-						LabelElementPair prev = labelNameSpace.get(name);
-						if (prev == null) labelNameSpace.put(name, p);
-						else checkForTypeMismatch(prev, p);
+					if (r.hasAltSpecificContexts()) {
+						// Collect labelName-labeledRules map for rule with alternative labels.
+						Map<String, List<LabelElementPair>> labelPairs = new HashMap<>();
+						for (LabelElementPair p : pairs) {
+							String labelName = findAltLabelName(p.label);
+							if (labelName != null) {
+								List<LabelElementPair> list;
+								if (labelPairs.containsKey(labelName)) {
+									list = labelPairs.get(labelName);
+								} else {
+									list = new ArrayList<>();
+									labelPairs.put(labelName, list);
+								}
+								list.add(p);
+							}
+						}
+
+						for (List<LabelElementPair> internalPairs : labelPairs.values()) {
+							labelNameSpace.clear();
+							checkLabelPairs(r, labelNameSpace, internalPairs);
+						}
+					}
+					else {
+						checkLabelPairs(r, labelNameSpace, pairs);
 					}
 				}
 			}
 		}
 	}
 
-    void checkForTypeMismatch(LabelElementPair prevLabelPair, LabelElementPair labelPair) {
+	private void checkLabelPairs(Rule r, Map<String, LabelElementPair> labelNameSpace, List<LabelElementPair> pairs) {
+		for (LabelElementPair p : pairs) {
+			checkForLabelConflict(r, p.label);
+			String name = p.label.getText();
+			LabelElementPair prev = labelNameSpace.get(name);
+			if (prev == null) {
+				labelNameSpace.put(name, p);
+			}
+			else {
+				checkForTypeMismatch(r, prev, p);
+			}
+		}
+	}
+
+	private String findAltLabelName(CommonTree label) {
+		if (label == null) {
+			return null;
+		}
+		else if (label instanceof AltAST) {
+			AltAST altAST = (AltAST) label;
+			if (altAST.altLabel != null) {
+				return altAST.altLabel.toString();
+			}
+			else if (altAST.leftRecursiveAltInfo != null) {
+				return altAST.leftRecursiveAltInfo.altLabel.toString();
+			}
+			else {
+				return findAltLabelName(label.parent);
+			}
+		}
+		else {
+			return findAltLabelName(label.parent);
+		}
+	}
+
+	private void checkForTypeMismatch(Rule r, LabelElementPair prevLabelPair, LabelElementPair labelPair) {
 		// label already defined; if same type, no problem
 		if (prevLabelPair.type != labelPair.type) {
-			String typeMismatchExpr = labelPair.type + "!=" + prevLabelPair.type;
+			// Current behavior: take a token of rule declaration in case of left-recursive rule
+			// Desired behavior: take a token of proper label declaration in case of left-recursive rule
+			// See https://github.com/antlr/antlr4/pull/1585
+			// Such behavior is referring to the fact that the warning is typically reported on the actual label redefinition,
+			//   but for left-recursive rules the warning is reported on the enclosing rule.
+			org.antlr.runtime.Token token = r instanceof LeftRecursiveRule
+					?  ((GrammarAST) r.ast.getChild(0)).getToken()
+					: labelPair.label.token;
 			errMgr.grammarError(
 					ErrorType.LABEL_TYPE_CONFLICT,
 					g.fileName,
-					labelPair.label.token,
+					token,
 					labelPair.label.getText(),
-					typeMismatchExpr);
+					labelPair.type + "!=" + prevLabelPair.type);
 		}
 		if (!prevLabelPair.element.getText().equals(labelPair.element.getText()) &&
 			(prevLabelPair.type.equals(LabelType.RULE_LABEL) || prevLabelPair.type.equals(LabelType.RULE_LIST_LABEL)) &&
 			(labelPair.type.equals(LabelType.RULE_LABEL) || labelPair.type.equals(LabelType.RULE_LIST_LABEL))) {
 
+			org.antlr.runtime.Token token = r instanceof LeftRecursiveRule
+					?  ((GrammarAST) r.ast.getChild(0)).getToken()
+					: labelPair.label.token;
 			String prevLabelOp = prevLabelPair.type.equals(LabelType.RULE_LIST_LABEL) ? "+=" : "=";
 			String labelOp = labelPair.type.equals(LabelType.RULE_LIST_LABEL) ? "+=" : "=";
 			errMgr.grammarError(
 					ErrorType.LABEL_TYPE_CONFLICT,
 					g.fileName,
-					labelPair.label.token,
+					token,
 					labelPair.label.getText() + labelOp + labelPair.element.getText(),
 					prevLabelPair.label.getText() + prevLabelOp + prevLabelPair.element.getText());
 		}

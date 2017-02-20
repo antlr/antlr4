@@ -4,7 +4,4 @@
    <FileRef
       location = "container:Antlr4.xcodeproj">
    </FileRef>
-   <FileRef
-      location = "container:Antlr4 playground.playground">
-   </FileRef>
 </Workspace>

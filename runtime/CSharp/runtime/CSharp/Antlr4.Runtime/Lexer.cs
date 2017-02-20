@@ -3,6 +3,7 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Text;
 using Antlr4.Runtime;
@@ -27,11 +28,15 @@ namespace Antlr4.Runtime
 
         public const int Hidden = TokenConstants.HiddenChannel;
 
-        public const int MinCharValue = '\u0000';
+        public const int MinCharValue = 0x0000;
 
-        public const int MaxCharValue = '\uFFFE';
+        public const int MaxCharValue = 0x10FFFF;
 
         private ICharStream _input;
+
+        protected readonly TextWriter Output;
+
+        protected readonly TextWriter ErrorOutput;
 
 		private Tuple<ITokenSource, ICharStream> _tokenFactorySourcePair;
 
@@ -94,9 +99,13 @@ namespace Antlr4.Runtime
         /// </remarks>
 		private string _text;
 
-        public Lexer(ICharStream input)
+        public Lexer(ICharStream input) : this(input, Console.Out, Console.Error) { }
+
+        public Lexer(ICharStream input, TextWriter output, TextWriter errorOutput)
         {
             this._input = input;
+            this.Output = output;
+            this.ErrorOutput = errorOutput;
             this._tokenFactorySourcePair = Tuple.Create((ITokenSource)this, input);
         }
 
@@ -502,7 +511,7 @@ outer_continue: ;
             }
         }
 
-        public virtual string[] ModeNames
+        public virtual string[] ChannelNames
         {
             get
             {
@@ -510,6 +519,13 @@ outer_continue: ;
             }
         }
 
+        public virtual string[] ModeNames
+        {
+            get
+            {
+                return null;
+            }
+        }
 
         /// <summary>Return a list of all Token objects in input char stream.</summary>
         /// <remarks>
@@ -542,22 +558,23 @@ outer_continue: ;
             string text = _input.GetText(Interval.Of(_tokenStartCharIndex, _input.Index));
             string msg = "token recognition error at: '" + GetErrorDisplay(text) + "'";
             IAntlrErrorListener<int> listener = ErrorListenerDispatch;
-            listener.SyntaxError(this, 0, _tokenStartLine, _tokenStartColumn, msg, e);
+            listener.SyntaxError(ErrorOutput, this, 0, _tokenStartLine, _tokenStartColumn, msg, e);
         }
 
         public virtual string GetErrorDisplay(string s)
         {
             StringBuilder buf = new StringBuilder();
-            foreach (char c in s.ToCharArray())
-            {
-                buf.Append(GetErrorDisplay(c));
+            for (var i = 0; i < s.Length; ) {
+                var codePoint = Char.ConvertToUtf32(s, i);
+                buf.Append(GetErrorDisplay(codePoint));
+                i += (codePoint > 0xFFFF) ? 2 : 1;
             }
             return buf.ToString();
         }
 
         public virtual string GetErrorDisplay(int c)
         {
-            string s = ((char)c).ToString();
+            string s;
             switch (c)
             {
                 case TokenConstants.EOF:
@@ -581,6 +598,12 @@ outer_continue: ;
                 case '\r':
                 {
                     s = "\\r";
+                    break;
+                }
+
+                default:
+                {
+                    s = Char.ConvertFromUtf32(c);
                     break;
                 }
             }
