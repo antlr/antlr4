@@ -127,3 +127,4 @@ YYYY/MM/DD, github id, Full name, email
 2016/12/01, samtatasurya, Samuel Tatasurya, xemradiant@gmail.com
 2016/12/03, redxdev, Samuel Bloomberg, sam@redxdev.com
 2016/12/11, Gaulouis, Gaulouis, gaulouis.com@gmail.com
+2017/02/20, Thomasb81, Thomas Burg, thomasb81@gmail.com
