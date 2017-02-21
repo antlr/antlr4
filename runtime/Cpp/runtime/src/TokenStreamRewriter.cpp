@@ -251,7 +251,7 @@ std::string TokenStreamRewriter::getText(const Interval &interval) {
 }
 
 std::string TokenStreamRewriter::getText(const std::string &programName, const Interval &interval) {
-  std::vector<TokenStreamRewriter::RewriteOperation*> *rewrites = &_programs[programName];
+  std::vector<TokenStreamRewriter::RewriteOperation*> &rewrites = _programs[programName];
   size_t start = interval.a;
   size_t stop = interval.b;
 
@@ -263,13 +263,13 @@ std::string TokenStreamRewriter::getText(const std::string &programName, const I
     start = 0;
   }
 
-  if (rewrites->empty() || rewrites->empty()) {
+  if (rewrites.empty() || rewrites.empty()) {
     return tokens->getText(interval); // no instructions to execute
   }
   std::string buf;
 
   // First, optimize instruction stream
-  std::unordered_map<size_t, TokenStreamRewriter::RewriteOperation*> indexToOp = reduceToSingleOperationPerIndex(rewrites);
+  std::unordered_map<size_t, TokenStreamRewriter::RewriteOperation*> indexToOp = reduceToSingleOperationPerIndex(&rewrites);
 
   // Walk buffer, executing instructions and emitting tokens
   size_t i = start;
@@ -305,9 +305,9 @@ std::string TokenStreamRewriter::getText(const std::string &programName, const I
 }
 
 std::unordered_map<size_t, TokenStreamRewriter::RewriteOperation*> TokenStreamRewriter::reduceToSingleOperationPerIndex(
-  std::vector<TokenStreamRewriter::RewriteOperation*> *rewrites2) {
+  std::vector<TokenStreamRewriter::RewriteOperation*> *rewrites_ptr) {
 
-  std::vector<TokenStreamRewriter::RewriteOperation*> rewrites = *rewrites2;
+  std::vector<TokenStreamRewriter::RewriteOperation*> &rewrites = *rewrites_ptr;
 
   // WALK REPLACES
   for (size_t i = 0; i < rewrites.size(); ++i) {
@@ -404,16 +404,7 @@ std::unordered_map<size_t, TokenStreamRewriter::RewriteOperation*> TokenStreamRe
     }
     m[op->index] = op;
   }
-
-  std::vector<TokenStreamRewriter::RewriteOperation*>::iterator iter1 = rewrites.begin();
-  std::vector<TokenStreamRewriter::RewriteOperation*>::iterator iter2 = rewrites2->begin();
   
-  for(;iter1 != rewrites.end();iter1++,iter2++) {
-  	if ((*iter1) == nullptr) {
-		rewrites2->erase(iter2);
-	}
-  } 
-
   return m;
 }
 
