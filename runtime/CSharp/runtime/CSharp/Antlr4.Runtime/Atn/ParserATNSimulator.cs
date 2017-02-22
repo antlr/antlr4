@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+﻿/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -257,8 +257,8 @@ namespace Antlr4.Runtime.Atn
 		 *  Don't keep around as it wastes huge amounts of memory. DoubleKeyMap
 		 *  isn't synchronized but we're ok since two threads shouldn't reuse same
 		 *  parser/atnsim object because it can only handle one input at a time.
-		 *  This maps graphs a and b to merged result c. (a,b)&rarr;c. We can avoid
-		 *  the merge if we ever see a and b again.  Note that (b,a)&rarr;c should
+		 *  This maps graphs a and b to merged result c. (a,b)→c. We can avoid
+		 *  the merge if we ever see a and b again.  Note that (b,a)→c should
 		 *  also be examined during cache lookup.
 		 */
 		protected MergeCache mergeCache;
@@ -2047,7 +2047,7 @@ namespace Antlr4.Runtime.Atn
 		 we don't consider any conflicts that include alternative 2. So, we
 		 ignore the conflict between alts 1 and 2. We ignore a set of
 		 conflicting alts when there is an intersection with an alternative
-		 associated with a single alt state in the state&rarr;config-list map.
+		 associated with a single alt state in the state→config-list map.
 
 		 It's also the case that we might have two conflicting configurations but
 		 also a 3rd nonconflicting configuration for a different alternative:
