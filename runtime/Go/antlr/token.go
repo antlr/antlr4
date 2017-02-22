@@ -208,7 +208,7 @@ func (c *CommonToken) String() string {
 		ch = ""
 	}
 
-	return "[" + "channel:" + strconv.Itoa(c.channel) + " @" + strconv.Itoa(c.tokenIndex) + "," + strconv.Itoa(c.start) + ":" + strconv.Itoa(c.stop) + "='" +
+	return "[@" + strconv.Itoa(c.tokenIndex) + "," + strconv.Itoa(c.start) + ":" + strconv.Itoa(c.stop) + "='" +
 		txt + "',<" + strconv.Itoa(c.tokenType) + ">" +
 		ch + "," + strconv.Itoa(c.line) + ":" + strconv.Itoa(c.column) + "]"
 }
