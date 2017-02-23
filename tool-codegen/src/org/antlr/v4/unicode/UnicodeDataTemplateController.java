@@ -75,11 +75,13 @@ public abstract class UnicodeDataTemplateController {
 		addUnicodeCategoryCodesToCodePointRanges(propertyCodePointRanges);
 		addUnicodeBinaryPropertyCodesToCodePointRanges(propertyCodePointRanges);
 		addUnicodeScriptCodesToCodePointRanges(propertyCodePointRanges);
+		addUnicodeBlocksToCodePointRanges(propertyCodePointRanges);
 
 		Map<String, String> propertyAliases = new LinkedHashMap<>();
 		addUnicodeCategoryCodesToNames(propertyAliases);
 		addUnicodeBinaryPropertyCodesToNames(propertyAliases);
 		addUnicodeScriptCodesToNames(propertyAliases);
+		addUnicodeBlocksToNames(propertyAliases);
 
 		Map<String, Object> properties = new LinkedHashMap<>();
 		properties.put("propertyCodePointRanges", propertyCodePointRanges);
@@ -171,17 +173,17 @@ public abstract class UnicodeDataTemplateController {
 		}
 	}
 
-	private static void addUnicodeScriptCodesToCodePointRanges(Map<String, IntervalSet> propertyCodePointRanges) {
-		for (int script = UCharacter.getIntPropertyMinValue(UProperty.SCRIPT);
-		     script <= UCharacter.getIntPropertyMaxValue(UProperty.SCRIPT);
-		     script++) {
+	private static void addIntPropertyRanges(int property, String namePrefix, Map<String, IntervalSet> propertyCodePointRanges) {
+		for (int propertyValue = UCharacter.getIntPropertyMinValue(property);
+		     propertyValue <= UCharacter.getIntPropertyMaxValue(property);
+		     propertyValue++) {
 			UnicodeSet set = new UnicodeSet();
-			set.applyIntPropertyValue(UProperty.SCRIPT, script);
-			String scriptName = UCharacter.getPropertyValueName(UProperty.SCRIPT, script, UProperty.NameChoice.SHORT);
-			IntervalSet intervalSet = propertyCodePointRanges.get(scriptName);
+			set.applyIntPropertyValue(property, propertyValue);
+			String propertyName = namePrefix + UCharacter.getPropertyValueName(property, propertyValue, UProperty.NameChoice.SHORT);
+			IntervalSet intervalSet = propertyCodePointRanges.get(propertyName);
 			if (intervalSet == null) {
 				intervalSet = new IntervalSet();
-				propertyCodePointRanges.put(scriptName, intervalSet);
+				propertyCodePointRanges.put(propertyName, intervalSet);
 			}
 			for (UnicodeSet.EntryRange range : set.ranges()) {
 				intervalSet.add(range.codepoint, range.codepointEnd);
@@ -189,16 +191,24 @@ public abstract class UnicodeDataTemplateController {
 		}
 	}
 
-	private static void addUnicodeScriptCodesToNames(Map<String, String> propertyAliases) {
-		for (int script = UCharacter.getIntPropertyMinValue(UProperty.SCRIPT);
-		     script <= UCharacter.getIntPropertyMaxValue(UProperty.SCRIPT);
-		     script++) {
-			String propertyName = UCharacter.getPropertyValueName(UProperty.SCRIPT, script, UProperty.NameChoice.SHORT);
+	private static void addUnicodeScriptCodesToCodePointRanges(Map<String, IntervalSet> propertyCodePointRanges) {
+		addIntPropertyRanges(UProperty.SCRIPT, "", propertyCodePointRanges);
+	}
+
+	private static void addUnicodeBlocksToCodePointRanges(Map<String, IntervalSet> propertyCodePointRanges) {
+		addIntPropertyRanges(UProperty.BLOCK, "In", propertyCodePointRanges);
+	}
+
+	private static void addIntPropertyAliases(int property, String namePrefix, Map<String, String> propertyAliases) {
+		for (int propertyValue = UCharacter.getIntPropertyMinValue(property);
+		     propertyValue <= UCharacter.getIntPropertyMaxValue(property);
+		     propertyValue++) {
+			String propertyName = namePrefix + UCharacter.getPropertyValueName(property, propertyValue, UProperty.NameChoice.SHORT);
 			int nameChoice = UProperty.NameChoice.LONG;
 			String alias;
 			while (true) {
 				try {
-					alias = UCharacter.getPropertyValueName(UProperty.SCRIPT, script, nameChoice);
+					alias = namePrefix + UCharacter.getPropertyValueName(property, propertyValue, nameChoice);
 				} catch (IllegalArgumentException e) {
 					// No more aliases.
 					break;
@@ -208,5 +218,13 @@ public abstract class UnicodeDataTemplateController {
 				nameChoice++;
 			}
 		}
+	}
+
+	private static void addUnicodeScriptCodesToNames(Map<String, String> propertyAliases) {
+		addIntPropertyAliases(UProperty.SCRIPT, "", propertyAliases);
+	}
+
+	private static void addUnicodeBlocksToNames(Map<String, String> propertyAliases) {
+		addIntPropertyAliases(UProperty.BLOCK, "In", propertyAliases);
 	}
 }

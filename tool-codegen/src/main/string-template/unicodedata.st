@@ -41,12 +41,16 @@ static private void addProperty<k>() {
               addPropertyAliases();
        }
 
+       private static String normalize(String propertyCodeOrAlias) {
+               return propertyCodeOrAlias.toLowerCase(Locale.US).replace('-', '_');
+       }
+
        /**
         * Given a Unicode property (general category code, binary property name, or script name),
         * returns the {@link IntervalSet} of Unicode code point ranges which have that property.
         */
        public static IntervalSet getPropertyCodePoints(String propertyCodeOrAlias) {
-              String normalizedPropertyCodeOrAlias = propertyCodeOrAlias.toLowerCase(Locale.US);
+              String normalizedPropertyCodeOrAlias = normalize(propertyCodeOrAlias);
               IntervalSet result = propertyCodePointRanges.get(normalizedPropertyCodeOrAlias);
               if (result == null) {
                  String propertyCode = propertyAliases.get(normalizedPropertyCodeOrAlias);
