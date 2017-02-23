@@ -57,6 +57,51 @@ using namespace antlrcpp;
 
 const size_t ATNDeserializer::SERIALIZED_VERSION = 3;
 
+namespace {
+
+uint32_t deserializeInt32(const std::vector<uint16_t>& data, size_t offset) {
+  return (uint32_t)data[offset] | ((uint32_t)data[offset + 1] << 16);
+}
+
+ssize_t readUnicodeInt(const std::vector<uint16_t>& data, int& p) {
+  return static_cast<ssize_t>(data[p++]);
+}
+
+ssize_t readUnicodeInt32(const std::vector<uint16_t>& data, int& p) {
+  auto result = deserializeInt32(data, p);
+  p += 2;
+  return static_cast<ssize_t>(result);
+}
+
+// We templatize this on the function type so the optimizer can inline
+// the 16- or 32-bit readUnicodeInt/readUnicodeInt32 as needed.
+template <typename F>
+void deserializeSets(
+  const std::vector<uint16_t>& data,
+  int& p,
+  std::vector<misc::IntervalSet>& sets,
+  F readUnicode) {
+  int nsets = data[p++];
+  for (int i = 0; i < nsets; i++) {
+    int nintervals = data[p++];
+    misc::IntervalSet set;
+
+    bool containsEof = data[p++] != 0;
+    if (containsEof) {
+      set.add(-1);
+    }
+
+    for (int j = 0; j < nintervals; j++) {
+      auto a = readUnicode(data, p);
+      auto b = readUnicode(data, p);
+      set.add(a, b);
+    }
+    sets.push_back(set);
+  }
+}
+
+}
+
 ATNDeserializer::ATNDeserializer(): ATNDeserializer(ATNDeserializationOptions::getDefaultOptions()) {
 }
 
@@ -75,8 +120,12 @@ Guid ATNDeserializer::ADDED_LEXER_ACTIONS() {
   return Guid("AADB8D7E-AEEF-4415-AD2B-8204D6CF042E");
 }
 
+Guid ATNDeserializer::ADDED_UNICODE_SMP() {
+  return Guid("59627784-3BE5-417A-B9EB-8131A7286089");
+}
+
 Guid ATNDeserializer::SERIALIZED_UUID() {
-  return ADDED_LEXER_ACTIONS();
+  return ADDED_UNICODE_SMP();
 }
 
 Guid ATNDeserializer::BASE_SERIALIZED_UUID() {
@@ -84,7 +133,7 @@ Guid ATNDeserializer::BASE_SERIALIZED_UUID() {
 }
 
 std::vector<Guid>& ATNDeserializer::SUPPORTED_UUIDS() {
-  static std::vector<Guid> singleton = { BASE_SERIALIZED_UUID(), ADDED_PRECEDENCE_TRANSITIONS(), ADDED_LEXER_ACTIONS() };
+  static std::vector<Guid> singleton = { BASE_SERIALIZED_UUID(), ADDED_PRECEDENCE_TRANSITIONS(), ADDED_LEXER_ACTIONS(), ADDED_UNICODE_SMP() };
   return singleton;
 }
 
@@ -239,21 +288,14 @@ ATN ATNDeserializer::deserialize(const std::vector<uint16_t>& input) {
   // SETS
   //
   std::vector<misc::IntervalSet> sets;
-  int nsets = data[p++];
-  for (int i = 0; i < nsets; i++) {
-    int nintervals = data[p++];
-    misc::IntervalSet set;
 
-    bool containsEof = data[p++] != 0;
-    if (containsEof) {
-      set.add(-1);
-    }
+  // First, deserialize sets with 16-bit arguments <= U+FFFF.
+  deserializeSets(data, p, sets, readUnicodeInt);
 
-    for (int j = 0; j < nintervals; j++) {
-      set.add(data[p], data[p + 1], true);
-      p += 2;
-    }
-    sets.push_back(set);
+  // Next, if the ATN was serialized with the Unicode SMP feature,
+  // deserialize sets with 32-bit arguments <= U+10FFFF.
+  if (isFeatureSupported(ADDED_UNICODE_SMP(), uuid)) {
+    deserializeSets(data, p, sets, readUnicodeInt32);
   }
 
   //

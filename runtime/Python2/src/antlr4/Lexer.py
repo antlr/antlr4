@@ -278,7 +278,7 @@ class Lexer(Recognizer, TokenSource):
         start = self._tokenStartCharIndex
         stop = self._input.index
         text = self._input.getText(start, stop)
-        msg = "token recognition error at: '" + self.getErrorDisplay(text) + "'"
+        msg = u"token recognition error at: '" + self.getErrorDisplay(text) + u"'"
         listener = self.getErrorListenerDispatch()
         listener.syntaxError(self, None, self._tokenStartLine, self._tokenStartColumn, msg, e)
 
@@ -291,17 +291,17 @@ class Lexer(Recognizer, TokenSource):
     def getErrorDisplayForChar(self, c):
         if ord(c[0])==Token.EOF:
             return "<EOF>"
-        elif c=='\n':
-            return "\\n"
-        elif c=='\t':
-            return "\\t"
-        elif c=='\r':
-            return "\\r"
+        elif c==u'\n':
+            return u"\\n"
+        elif c==u'\t':
+            return u"\\t"
+        elif c==u'\r':
+            return u"\\r"
         else:
-            return unicode(c)
+            return c
 
     def getCharErrorDisplay(self, c):
-        return "'" + self.getErrorDisplayForChar(c) + "'"
+        return u"'" + self.getErrorDisplayForChar(c) + u"'"
 
     # Lexers can normally match any char in it's vocabulary after matching
     #  a token, so do the easy thing and just kill a character and hope
