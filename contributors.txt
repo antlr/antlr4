@@ -136,3 +136,5 @@ YYYY/MM/DD, github id, Full name, email
 2017/02/10, lionelplessis, Lionel Plessis, lionelplessis@users.noreply.github.com
 2017/02/14, lecode-official, David Neumann, david.neumann@lecode.de
 2017/02/14, xied75, Dong Xie, xied75@gmail.com
+2017/02/20, Thomasb81, Thomas Burg, thomasb81@gmail.com
+
