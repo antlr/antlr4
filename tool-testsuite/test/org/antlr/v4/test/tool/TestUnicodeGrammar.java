@@ -6,7 +6,13 @@
 
 package org.antlr.v4.test.tool;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+
 import org.antlr.v4.gui.Trees;
+import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.LexerInterpreter;
@@ -112,6 +118,41 @@ public class TestUnicodeGrammar extends BaseJavaToolTest {
 						grammarText,
 						"r",
 						inputText));
+	}
+
+	@Test
+	public void binaryGrammar() throws Exception {
+		String grammarText =
+			"grammar Binary;\n" +
+			"r : HEADER PACKET+ FOOTER;\n" +
+			"HEADER : '\\u0002\\u0000\\u0001\\u0007';\n" +
+			"PACKET : '\\u00D0' ('\\u00D1' | '\\u00D2' | '\\u00D3') +;\n" +
+			"FOOTER : '\\u00FF';\n";
+		byte[] toParse = new byte[] {
+				(byte)0x02, (byte)0x00, (byte)0x01, (byte)0x07,
+				(byte)0xD0, (byte)0xD2, (byte)0xD2, (byte)0xD3, (byte)0xD3, (byte)0xD3,
+				(byte)0xD0, (byte)0xD3, (byte)0xD3, (byte)0xD1,
+				(byte)0xFF
+		};
+		CharStream charStream;
+		try (ByteArrayInputStream is = new ByteArrayInputStream(toParse);
+		     // Note we use ISO_8859_1 to treat all byte values as Unicode "characters" from
+		     // U+0000 to U+00FF.
+		     InputStreamReader isr = new InputStreamReader(is, StandardCharsets.ISO_8859_1)) {
+			charStream = new ANTLRInputStream(isr);
+		}
+		Grammar grammar = new Grammar(grammarText);
+		LexerInterpreter lexEngine = grammar.createLexerInterpreter(charStream);
+		CommonTokenStream tokens = new CommonTokenStream(lexEngine);
+		GrammarParserInterpreter parser = grammar.createGrammarParserInterpreter(tokens);
+		ParseTree parseTree = parser.parse(grammar.rules.get("r").index);
+		InterpreterTreeTextProvider nodeTextProvider =
+				new InterpreterTreeTextProvider(grammar.getRuleNames());
+		String result = Trees.toStringTree(parseTree, nodeTextProvider);
+
+		assertEquals(
+				"(r:1 \u0002\u0000\u0001\u0007 \u00D0\u00D2\u00D2\u00D3\u00D3\u00D3 \u00D0\u00D3\u00D3\u00D1 \u00FF)",
+				result);
 	}
 
 	private static String parseTreeForGrammarWithInput(
