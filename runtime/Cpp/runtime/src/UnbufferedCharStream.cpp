@@ -44,15 +44,15 @@ void UnbufferedCharStream::consume() {
 }
 
 void UnbufferedCharStream::sync(size_t want) {
-  size_t need = (_p + want - 1) - _data.size() + 1; // how many more elements we need?
-  if (need > 0) {
-    fill(need);
-  }
+  if (_p + want <= _data.size()) // Already enough data loaded?
+    return;
+
+  fill(_p + want - _data.size());
 }
 
 size_t UnbufferedCharStream::fill(size_t n) {
   for (size_t i = 0; i < n; i++) {
-    if (_data.size() > 0 && (size_t)_data.back() == EOF) {
+    if (_data.size() > 0 && _data.back() == (uint32_t)EOF) {
       return i;
     }
 
@@ -87,13 +87,21 @@ size_t UnbufferedCharStream::LA(ssize_t i) {
   if (i == -1) { // special case
     return _lastChar;
   }
-  sync((size_t)i);
+
+  // We can look back only as many chars as we have buffered.
   ssize_t index = (ssize_t)_p + i - 1;
   if (index < 0) {
     throw IndexOutOfBoundsException();
   }
 
+  if (i > 0) {
+    sync((size_t)i); // No need to sync if we look back.
+  }
   if ((size_t)index >= _data.size()) {
+    return EOF;
+  }
+
+  if (_data[(size_t)index] == (uint32_t)EOF) {
     return EOF;
   }
 
