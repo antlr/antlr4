@@ -163,7 +163,7 @@ public class CharSupport {
 		}
 	}
 
-	private static int parseHexValue(String cstr, int startOff, int endOff) {
+	public static int parseHexValue(String cstr, int startOff, int endOff) {
 		if (startOff < 0 || endOff < 0) {
 			return -1;
 		}
