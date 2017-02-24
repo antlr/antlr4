@@ -21,7 +21,7 @@ namespace tree {
      *  TerminalNodes anyway so I'm adding as it improves internal
      *  code quality.
      *
-     *  @since 4.6.1
+     *  @since 4.7
      */
     virtual void setParent(RuleContext *parent) = 0;
   };
