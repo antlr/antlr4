@@ -114,7 +114,7 @@ import Antlr4
  * of the available methods.
  */
 open class <file.grammarName>BaseListener: <file.grammarName>Listener {
-    public init() { \}
+	public init() { \}
 	<file.listenerNames:{lname |
 
 /**
@@ -186,7 +186,7 @@ open class <file.grammarName>Visitor\<T>: ParseTreeVisitor\<T> {
 - returns: the visitor result
  */
 open func visit<lname; format="cap">(_ ctx: <file.parserName>.<lname; format="cap">Context) -> T{
- 	fatalError(#function + " must be overridden")
+	fatalError(#function + " must be overridden")
 \}
 }; separator="\n">
 }
@@ -233,20 +233,20 @@ Parser_(parser, funcs, atn, sempredFuncs, ctor, superClass) ::= <<
 open class <parser.name>: <superClass; null="Parser"> {
 
 	internal static var _decisionToDFA: [DFA] = {
-          var decisionToDFA = [DFA]()
-          let length = <parser.name>._ATN.getNumberOfDecisions()
-          for i in 0..\<length {
-           <!// decisionToDFA[i] = DFA(<parser.name>._ATN.getDecisionState(i)!, i);!>
-            decisionToDFA.append(DFA(<parser.name>._ATN.getDecisionState(i)!, i))
-           }
-           return decisionToDFA
-     }()
+		var decisionToDFA = [DFA]()
+		let length = <parser.name>._ATN.getNumberOfDecisions()
+		for i in 0..\<length {
+			<!// decisionToDFA[i] = DFA(<parser.name>._ATN.getDecisionState(i)!, i);!>
+			decisionToDFA.append(DFA(<parser.name>._ATN.getDecisionState(i)!, i))
+		}
+		return decisionToDFA
+	}()
 	internal static let _sharedContextCache: PredictionContextCache = PredictionContextCache()
 	<if(parser.tokens)>
 	public enum Tokens: Int {
 		case EOF = -1, <parser.tokens:{k | <k> = <parser.tokens.(k)>}; separator=", ", wrap, anchor>
 	}
-        <endif>
+		<endif>
 	public static let <parser.rules:{r | RULE_<r.name> = <r.index>}; separator=", ", wrap, anchor>
 	public static let ruleNames: [String] = [
 		<parser.ruleNames:{r | "<r>"}; separator=", ", wrap, anchor>
@@ -271,13 +271,13 @@ open class <parser.name>: <superClass; null="Parser"> {
 	<funcs; separator="\n">
 
 <if(sempredFuncs)>
-    override
+	override
 	open func sempred(_ _localctx: RuleContext?, _ ruleIndex: Int,  _ predIndex: Int)throws -> Bool {
 		switch (ruleIndex) {
 		<parser.sempredFuncs.values:{f|
-case  <f.ruleIndex>:
+case <f.ruleIndex>:
 	return try <f.name>_sempred(_localctx?.castdown(<f.ctxType>.self), predIndex)}; separator="\n">
-	    default: return true
+		default: return true
 		}
 		<!return true;!>
 	}
@@ -304,8 +304,8 @@ public static let VOCABULARY: Vocabulary = Vocabulary(_LITERAL_NAMES, _SYMBOLIC_
  */
 //@Deprecated
 public let tokenNames: [String?]? = {
-    let length = _SYMBOLIC_NAMES.count
-    var tokenNames = [String?](repeating: nil, count: length)
+	let length = _SYMBOLIC_NAMES.count
+	var tokenNames = [String?](repeating: nil, count: length)
 	for i in 0..\<length {
 		var name = VOCABULARY.getLiteralName(i)
 		if name == nil {
@@ -358,11 +358,11 @@ case <f.ruleIndex>:
 parser_ctor(p) ::= <<
 
 open override func getVocabulary() -> Vocabulary {
-    return <p.name>.VOCABULARY
+	return <p.name>.VOCABULARY
 }
 
 public override init(_ input:TokenStream)throws {
-    RuntimeMetaData.checkVersion("4.7", RuntimeMetaData.VERSION)
+	RuntimeMetaData.checkVersion("4.7", RuntimeMetaData.VERSION)
 	try super.init(input)
 	_interp = ParserATNSimulator(self,<p.name>._ATN,<p.name>._decisionToDFA, <parser.name>._sharedContextCache)
 }
@@ -390,8 +390,8 @@ RuleSempredFunction(r, actions) ::= <<
 private func <r.name>_sempred(_ _localctx: <r.ctxType>!,  _ predIndex: Int) throws -> Bool {
 	switch (predIndex) {
 	<actions:{index|
-    case <index>:return <actions.(index)>}; separator="\n">
-	    default: return true
+	case <index>:return <actions.(index)>}; separator="\n">
+		default: return true
 	}
 	<!return true;!>
 }
@@ -407,16 +407,16 @@ RuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,namedActions,fina
 	<namedActions.init>
 	<locals; separator="\n">
 	defer {
-    		<finallyAction>
-    		try! exitRule()
-    }
+			<finallyAction>
+			try! exitRule()
+	}
 	do {
 <if(currentRule.hasLookaheadBlock)>
 		var _alt:Int
 <endif>
-	 	<code>
+		<code>
 		<postamble; separator="\n">
-	 	<namedActions.after>
+		<namedActions.after>
 	}
 	<if(exceptions)>
 	<exceptions; separator="\n">
@@ -453,9 +453,9 @@ private func <currentRule.name>(_ _p<args:{a | , <a>}>: Int) throws -> <currentR
 	<namedActions.init>
 	<locals; separator="\n">
 	defer {
-    		<finallyAction>
-    		try! unrollRecursionContexts(_parentctx)
-    }
+			<finallyAction>
+			try! unrollRecursionContexts(_parentctx)
+	}
 	do {
 <if(currentRule.hasLookaheadBlock)>
 		var _alt: Int
@@ -507,7 +507,7 @@ setState(<choice.stateNumber>)
 try _errHandler.sync(self)
 switch (<parser.name>.Tokens(rawValue: try _input.LA(1))!) {
 <choice.altLook,alts:{look,alt| <cases(ttypes=look)>
- 	<alt>
+	<alt>
 	break}; separator="\n">
 default:
 	break
@@ -618,9 +618,9 @@ TestSetInline(s) ::= <<
 <!<s.bitsets:{bits | <if(rest(rest(bits.ttypes)))><bitsetBitfieldComparison(s, bits)><else><bitsetInlineComparison(s, bits)><endif>}; separator=" || ">!>
  //closure
  { () -> Bool in
-      <if(rest(s.bitsets))>var<else>let<endif> testSet: Bool = <first(s.bitsets):{bits | <if(rest(rest(bits.ttypes)))><bitsetBitfieldComparison(s, bits)><else><bitsetInlineComparison(s, bits)><endif>}>
-          <rest(s.bitsets):{bits | testSet = testSet || <if(rest(rest(bits.ttypes)))><bitsetBitfieldComparison(s, bits)><else><bitsetInlineComparison(s, bits)><endif>}; separator="\n">
-      return testSet
+	  <if(rest(s.bitsets))>var<else>let<endif> testSet: Bool = <first(s.bitsets):{bits | <if(rest(rest(bits.ttypes)))><bitsetBitfieldComparison(s, bits)><else><bitsetInlineComparison(s, bits)><endif>}>
+	      <rest(s.bitsets):{bits | testSet = testSet || <if(rest(rest(bits.ttypes)))><bitsetBitfieldComparison(s, bits)><else><bitsetInlineComparison(s, bits)><endif>}; separator="\n">
+	  return testSet
  }()
 >>
 
@@ -633,15 +633,15 @@ testShiftInRange(shiftAmount) ::= <<
 bitsetBitfieldComparison(s, bits) ::= <<
 <!(<testShiftInRange({<offsetShift(s.varName, bits.shift)>})> && ((1 \<\< <offsetShift(s.varName, bits.shift)>) & (<bits.ttypes:{ttype | (1 \<\< <offsetShift(ttype, bits.shift)>)}; separator=" | ">)) != 0)!>
 {  () -> Bool in
-    <! let test: Bool = (<testShiftInRange({<offsetShift(s.varName, bits.shift)>})>)!>
-   <!var temp: Int64 =  Int64(<offsetShift(s.varName, bits.shift)>)!>
-   <!temp = (temp \< 0) ? (64 + (temp % 64 )) : (temp % 64)!>
-   <!let test1: Int64 = (Int64(1) \<\< temp)!>
-   <!var test2: Int64 = (<first(bits.ttypes):{ttype | Utils.bitLeftShift(<offsetShift(parserName(ttype), bits.shift)>)}>)!>
-   <!<rest(bits.ttypes):{ttype | test2 = test2 | Utils.bitLeftShift(<offsetShift(parserName(ttype), bits.shift)>)}; separator="\n">!>
-   let testArray: [Int] = [<s.varName>, <bits.ttypes:{ttype |<parserName(ttype)>}; separator=",">]
-   <!var test2: Int64 = Utils.testBitLeftShiftArray(testArray)!>
-    return  Utils.testBitLeftShiftArray(testArray, <bits.shift>)
+	<! let test: Bool = (<testShiftInRange({<offsetShift(s.varName, bits.shift)>})>)!>
+	<!var temp: Int64 =  Int64(<offsetShift(s.varName, bits.shift)>)!>
+	<!temp = (temp \< 0) ? (64 + (temp % 64 )) : (temp % 64)!>
+	<!let test1: Int64 = (Int64(1) \<\< temp)!>
+	<!var test2: Int64 = (<first(bits.ttypes):{ttype | Utils.bitLeftShift(<offsetShift(parserName(ttype), bits.shift)>)}>)!>
+	<!<rest(bits.ttypes):{ttype | test2 = test2 | Utils.bitLeftShift(<offsetShift(parserName(ttype), bits.shift)>)}; separator="\n">!>
+	let testArray: [Int] = [<s.varName>, <bits.ttypes:{ttype |<parserName(ttype)>}; separator=",">]
+	<!var test2: Int64 = Utils.testBitLeftShiftArray(testArray)!>
+	return  Utils.testBitLeftShiftArray(testArray, <bits.shift>)
 }()
 >>
 
@@ -672,7 +672,7 @@ setState(<r.stateNumber>)
 try {
 		let assignmentValue = try <r.name>(<if(r.ast.options.p)><r.ast.options.p><if(argExprsChunks)>,<endif><endif><argExprsChunks>)
 		<r.labels:{l | <labelref(l)> = assignmentValue} ; separator="\n">
-     }()
+	}()
 <else>try <r.name>(<if(r.ast.options.p)><r.ast.options.p><if(argExprsChunks)>,<endif><endif><argExprsChunks>)<endif>
 >>
 
@@ -682,7 +682,7 @@ setState(<m.stateNumber>)
 try {
 		let assignmentValue = try match(<parser.name>.Tokens.<m.name>.rawValue)
 		<m.labels:{l | <labelref(l)> = assignmentValue}  ; separator="\n">
-     }()
+	 }()
 <else>try match(<parser.name>.Tokens.<m.name>.rawValue)<endif>
 >>
 
@@ -717,7 +717,7 @@ ArgAction(a, chunks) ::= "<chunks>"
 SemPred(p, chunks, failChunks) ::= <<
 setState(<p.stateNumber>)
 if (!(<chunks>)) {
-    throw try ANTLRException.recognition(e:FailedPredicateException(self, <p.predicate><if(failChunks)>, <failChunks><elseif(p.msg)>, <p.msg><endif>))
+	throw try ANTLRException.recognition(e:FailedPredicateException(self, <p.predicate><if(failChunks)>, <failChunks><elseif(p.msg)>, <p.msg><endif>))
 }
 >>
 
@@ -786,9 +786,9 @@ RuleContextDecl(r) ::= "<r.name>: <r.ctxName>!"
 RuleContextListDecl(rdecl) ::= "<rdecl.name>:Array\<<rdecl.ctxName>> = Array\<<rdecl.ctxName>>()"
 
 ContextTokenGetterDecl(t)      ::=
-    "open func <t.name>() -> TerminalNode? { return getToken(<parser.name>.Tokens.<t.name>.rawValue, 0) }"
+	"open func <t.name>() -> TerminalNode? { return getToken(<parser.name>.Tokens.<t.name>.rawValue, 0) }"
 ContextTokenListGetterDecl(t)  ::=
-    "open func <t.name>() -> Array\<TerminalNode> { return getTokens(<parser.name>.Tokens.<t.name>.rawValue) }"
+	"open func <t.name>() -> Array\<TerminalNode> { return getTokens(<parser.name>.Tokens.<t.name>.rawValue) }"
 ContextTokenListIndexedGetterDecl(t)  ::= <<
 open func <t.name>(_ i:Int) -> TerminalNode?{
 	return getToken(<parser.name>.Tokens.<t.name>.rawValue, i)
@@ -826,7 +826,7 @@ CaptureNextToken(d) ::= "<d.varName> = try _input.LT(1)"
 CaptureNextTokenType(d) ::= "<d.varName> = try _input.LA(1)"
 
 StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers,
-           superClass={ParserRuleContext}) ::= <<
+		superClass={ParserRuleContext}) ::= <<
 open class <struct.name>:<if(contextSuperClass)><contextSuperClass><else>ParserRuleContext<endif><if(interfaces)>, <interfaces; separator=", "><endif> {
 	<attrs:{a | public var <a>}; separator="\n">
 	<getters:{g | <g>}; separator="\n">
@@ -866,7 +866,7 @@ ListenerDispatchMethod(method) ::= <<
 override
 open func <if(method.isEnter)>enter<else>exit<endif>Rule(_ listener: ParseTreeListener) {
 	if listener is <parser.grammarName>Listener {
-	 	(listener as! <parser.grammarName>Listener).<if(method.isEnter)>enter<else>exit<endif><struct.derivedFromName; format="cap">(self)
+		(listener as! <parser.grammarName>Listener).<if(method.isEnter)>enter<else>exit<endif><struct.derivedFromName; format="cap">(self)
 	}
 }
 >>
@@ -875,12 +875,12 @@ VisitorDispatchMethod(method) ::= <<
 override
 open func accept\<T>(_ visitor: ParseTreeVisitor\<T>) -> T? {
 	if visitor is <parser.grammarName>Visitor {
-	     return (visitor as! <parser.grammarName>Visitor\<T>).visit<struct.derivedFromName; format="cap">(self)
+		return (visitor as! <parser.grammarName>Visitor\<T>).visit<struct.derivedFromName; format="cap">(self)
 	}else if visitor is <parser.grammarName>BaseVisitor {
-    	 return (visitor as! <parser.grammarName>BaseVisitor\<T>).visit<struct.derivedFromName; format="cap">(self)
-    }
+		return (visitor as! <parser.grammarName>BaseVisitor\<T>).visit<struct.derivedFromName; format="cap">(self)
+	}
 	else {
-	     return visitor.visitChildren(self)
+		return visitor.visitChildren(self)
 	}
 }
 >>
@@ -931,7 +931,7 @@ _prevctx = _localctx
 
 recRuleSetPrevCtx() ::= <<
 if _parseListeners != nil {
-   try triggerExitRuleEvent()
+	try triggerExitRuleEvent()
 }
 _prevctx = _localctx
 >>
@@ -950,14 +950,14 @@ import Antlr4
 Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
 open class <lexer.name>: <superClass; null="Lexer"> {
 	internal static var _decisionToDFA: [DFA] = {
-          var decisionToDFA = [DFA]()
-          let length = <lexer.name>._ATN.getNumberOfDecisions()
-          for i in 0..\<length {
-            <! decisionToDFA[i] = DFA(<lexer.name>._ATN.getDecisionState(i)!, i);!>
-          	    decisionToDFA.append(DFA(<lexer.name>._ATN.getDecisionState(i)!, i))
-          }
-           return decisionToDFA
-     }()
+		var decisionToDFA = [DFA]()
+		let length = <lexer.name>._ATN.getNumberOfDecisions()
+		for i in 0..\<length {
+			<! decisionToDFA[i] = DFA(<lexer.name>._ATN.getDecisionState(i)!, i);!>
+			decisionToDFA.append(DFA(<lexer.name>._ATN.getDecisionState(i)!, i))
+		}
+		 return decisionToDFA
+	 }()
 
 	internal static let _sharedContextCache:PredictionContextCache = PredictionContextCache()
 	public static let <lexer.tokens:{k | <k>=<lexer.tokens.(k)>}; separator=", ", wrap, anchor>
@@ -982,12 +982,12 @@ open class <lexer.name>: <superClass; null="Lexer"> {
 	<vocabulary(lexer.literalNames, lexer.symbolicNames)>
 
 	<namedActions.members>
-    open override func getVocabulary() -> Vocabulary {
-        return <lexer.name>.VOCABULARY
-    }
+	open override func getVocabulary() -> Vocabulary {
+		return <lexer.name>.VOCABULARY
+	}
 
 	public override init(_ input: CharStream) {
-	    RuntimeMetaData.checkVersion("<lexerFile.ANTLRVersion>", RuntimeMetaData.VERSION)
+		RuntimeMetaData.checkVersion("<lexerFile.ANTLRVersion>", RuntimeMetaData.VERSION)
 		super.init(input)
 		_interp = LexerATNSimulator(self, <lexer.name>._ATN, <lexer.name>._decisionToDFA, <lexer.name>._sharedContextCache)
 	}
@@ -995,7 +995,7 @@ open class <lexer.name>: <superClass; null="Lexer"> {
 	override
 	open func getGrammarFileName() -> String { return "<lexer.grammarFileName>" }
 
-    override
+	override
 	open func getRuleNames() -> [String] { return <lexer.name>.ruleNames }
 
 	override
@@ -1012,7 +1012,7 @@ open class <lexer.name>: <superClass; null="Lexer"> {
 
 	<dumpActions(lexer, "", actionFuncs, sempredFuncs)>
 	<atn>
-    public static let _serializedATN: String = <lexer.name>ATN().jsonString
+	public static let _serializedATN: String = <lexer.name>ATN().jsonString
 	public static let _ATN: ATN = ATNDeserializer().deserializeFromJson(_serializedATN)
 }
 >>
