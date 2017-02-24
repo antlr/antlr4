@@ -137,17 +137,17 @@ public:
 <namedActions.baselistenerdeclarations>
 
 <file.listenerNames: {lname |
-  virtual void enter<lname; format="cap">(<file.parserName>::<lname; format = "cap">Context * /*ctx*/) override { \}
-  virtual void exit<lname; format="cap">(<file.parserName>::<lname; format = "cap">Context * /*ctx*/) override { \}
+	virtual void enter<lname; format="cap">(<file.parserName>::<lname; format = "cap">Context * /*ctx*/) override { \}
+	virtual void exit<lname; format="cap">(<file.parserName>::<lname; format = "cap">Context * /*ctx*/) override { \}
 }; separator="\n">
 
-  virtual void enterEveryRule(antlr4::ParserRuleContext * /*ctx*/) override { }
-  virtual void exitEveryRule(antlr4::ParserRuleContext * /*ctx*/) override { }
-  virtual void visitTerminal(antlr4::tree::TerminalNode * /*node*/) override { }
-  virtual void visitErrorNode(antlr4::tree::ErrorNode * /*node*/) override { }
-  
+	virtual void enterEveryRule(antlr4::ParserRuleContext * /*ctx*/) override { }
+	virtual void exitEveryRule(antlr4::ParserRuleContext * /*ctx*/) override { }
+	virtual void visitTerminal(antlr4::tree::TerminalNode * /*node*/) override { }
+	virtual void visitErrorNode(antlr4::tree::ErrorNode * /*node*/) override { }
+
 <if (namedActions.baselistenermembers)>
-private:  
+private:
 <namedActions.baselistenermembers>
 <endif>
 };
@@ -197,12 +197,12 @@ public:
 <namedActions.listenerdeclarations>
 
 <file.listenerNames: {lname |
-  virtual void enter<lname; format = "cap">(<file.parserName>::<lname; format ="cap">Context *ctx) = 0;
-  virtual void exit<lname; format = "cap">(<file.parserName>::<lname; format="cap">Context *ctx) = 0;
+	virtual void enter<lname; format = "cap">(<file.parserName>::<lname; format ="cap">Context *ctx) = 0;
+	virtual void exit<lname; format = "cap">(<file.parserName>::<lname; format="cap">Context *ctx) = 0;
 }; separator = "\n">
 
 <if (namedActions.listenermembers)>
-private:  
+private:
 <namedActions.listenermembers>
 <endif>
 };
@@ -253,13 +253,13 @@ public:
 <namedActions.basevisitordeclarations>
 
 <file.visitorNames: { lname |
-  virtual antlrcpp::Any visit<lname; format = "cap">(<file.parserName>::<lname; format = "cap">Context *ctx) override {
-    return visitChildren(ctx);
-  \}
+	virtual antlrcpp::Any visit<lname; format = "cap">(<file.parserName>::<lname; format = "cap">Context *ctx) override {
+		return visitChildren(ctx);
+	\}
 }; separator="\n">
 
 <if (namedActions.basevisitormembers)>
-private:  
+private:
 <namedActions.basevisitormembers>
 <endif>
 };
@@ -306,17 +306,16 @@ VisitorFileHeader(file, header, namedActions) ::= <<
  */
 class <file.exportMacro> <file.grammarName>Visitor : public antlr4::tree::AbstractParseTreeVisitor {
 public:
-  <namedActions.visitordeclarations>
-  
-  /**
-   * Visit parse trees produced by <file.parserName>.
-   */
-  <file.visitorNames: {lname |
-  virtual antlrcpp::Any visit<lname; format = "cap">(<file.parserName>::<lname; format = "cap">Context *context) = 0;
-  }; separator="\n">
+	<namedActions.visitordeclarations>
+	/**
+	 * Visit parse trees produced by <file.parserName>.
+	 */
+
+	<file.visitorNames: {lname |
+virtual antlrcpp::Any visit<lname; format = "cap">(<file.parserName>::<lname; format = "cap">Context *context) = 0; }; separator="\n">
 
 <if (namedActions.visitormembers)>
-private:  
+private:
 <namedActions.visitormembers>
 <endif>
 };
