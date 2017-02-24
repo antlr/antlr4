@@ -54,13 +54,14 @@ namespace antlr4 {
     /// Match current input symbol against {@code ttype}. If the symbol type
     /// matches, <seealso cref="ANTLRErrorStrategy#reportMatch"/> and <seealso cref="#consume"/> are
     /// called to complete the match process.
-    /// <p/>
+    ///
     /// If the symbol type does not match,
     /// <seealso cref="ANTLRErrorStrategy#recoverInline"/> is called on the current error
     /// strategy to attempt recovery. If <seealso cref="#getBuildParseTree"/> is
     /// {@code true} and the token index of the symbol returned by
     /// <seealso cref="ANTLRErrorStrategy#recoverInline"/> is -1, the symbol is added to
-    /// the parse tree by calling <seealso cref="ParserRuleContext#addErrorNode"/>.
+    /// the parse tree by calling {@link #createErrorNode(ParserRuleContext, Token)} then
+    /// {@link ParserRuleContext#addErrorNode(ErrorNode)}.
     /// </summary>
     /// <param name="ttype"> the token type to match </param>
     /// <returns> the matched symbol </returns>
@@ -258,11 +259,11 @@ namespace antlr4 {
     /// </pre>
     ///
     /// If the parser is not in error recovery mode, the consumed symbol is added
-    /// to the parse tree using <seealso cref="ParserRuleContext#addChild(Token)"/>, and
+    /// to the parse tree using <seealso cref="ParserRuleContext#addChild(TerminalNode)"/>, and
     /// <seealso cref="ParseTreeListener#visitTerminal"/> is called on any parse listeners.
     /// If the parser <em>is</em> in error recovery mode, the consumed symbol is
-    /// added to the parse tree using
-    /// <seealso cref="ParserRuleContext#addErrorNode(Token)"/>, and
+    /// added to the parse tree using {@link #createErrorNode(ParserRuleContext, Token)} then
+    /// {@link ParserRuleContext#addErrorNode(ErrorNode)} and
     /// <seealso cref="ParseTreeListener#visitErrorNode"/> is called on any parse
     /// listeners.
     virtual Token* consume();
@@ -375,6 +376,30 @@ namespace antlr4 {
     bool isTrace() const;
 
     tree::ParseTreeTracker& getTreeTracker() { return _tracker; };
+
+    /** How to create a token leaf node associated with a parent.
+     *  Typically, the terminal node to create is not a function of the parent
+     *  but this method must still set the parent pointer of the terminal node
+     *  returned. I would prefer having {@link ParserRuleContext#addAnyChild(ParseTree)}
+     *  set the parent pointer, but the parent pointer is implementation dependent
+     *  and currently there is no setParent() in {@link TerminalNode} (and can't
+     *  add method in Java 1.7 without breaking backward compatibility).
+     *
+     * @since 4.6.1
+     */
+    tree::TerminalNode *createTerminalNode(Token *t);
+
+    /** How to create an error node, given a token, associated with a parent.
+       *  Typically, the error node to create is not a function of the parent
+       *  but this method must still set the parent pointer of the terminal node
+       *  returned. I would prefer having {@link ParserRuleContext#addAnyChild(ParseTree)}
+       *  set the parent pointer, but the parent pointer is implementation dependent
+       *  and currently there is no setParent() in {@link ErrorNode} (and can't
+       *  add method in Java 1.7 without breaking backward compatibility).
+       *
+       * @since 4.6.1
+       */
+    tree::ErrorNode *createErrorNode(Token *t);
 
   protected:
     /// The ParserRuleContext object for the currently executing rule.

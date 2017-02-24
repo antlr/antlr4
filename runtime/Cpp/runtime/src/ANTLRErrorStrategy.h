@@ -93,8 +93,9 @@ namespace antlr4 {
     /// Tests whether or not {@code recognizer} is in the process of recovering
     /// from an error. In error recovery mode, <seealso cref="Parser#consume"/> adds
     /// symbols to the parse tree by calling
-    /// <seealso cref="ParserRuleContext#addErrorNode(Token)"/> instead of
-    /// <seealso cref="ParserRuleContext#addChild(Token)"/>.
+    /// {@link Parser#createErrorNode(ParserRuleContext, Token)} then
+    /// {@link ParserRuleContext#addErrorNode(ErrorNode)} instead of
+    /// {@link Parser#createTerminalNode(ParserRuleContext, Token)}.
     /// </summary>
     /// <param name="recognizer"> the parser instance </param>
     /// <returns> {@code true} if the parser is currently recovering from a parse
