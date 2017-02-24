@@ -217,18 +217,18 @@ std::vector\<std::string> <lexer.name>::_tokenNames;
 
 <lexer.name>::Initializer::Initializer() {
   // This code could be in a static initializer lambda, but VS doesn't allow access to private class members from there.
-	for (size_t i = 0; i \< _symbolicNames.size(); ++i) {
-		std::string name = _vocabulary.getLiteralName(i);
-		if (name.empty()) {
-			name = _vocabulary.getSymbolicName(i);
-		}
+  for (size_t i = 0; i \< _symbolicNames.size(); ++i) {
+    std::string name = _vocabulary.getLiteralName(i);
+    if (name.empty()) {
+      name = _vocabulary.getSymbolicName(i);
+    }
 
-		if (name.empty()) {
-			_tokenNames.push_back("\<INVALID>");
-		} else {
+    if (name.empty()) {
+      _tokenNames.push_back("\<INVALID>");
+    } else {
       _tokenNames.push_back(name);
     }
-	}
+  }
 
   <atn>
 }
@@ -396,18 +396,18 @@ dfa::Vocabulary <parser.name>::_vocabulary(_literalNames, _symbolicNames);
 std::vector\<std::string> <parser.name>::_tokenNames;
 
 <parser.name>::Initializer::Initializer() {
-	for (size_t i = 0; i \< _symbolicNames.size(); ++i) {
-		std::string name = _vocabulary.getLiteralName(i);
-		if (name.empty()) {
-			name = _vocabulary.getSymbolicName(i);
-		}
+  for (size_t i = 0; i \< _symbolicNames.size(); ++i) {
+    std::string name = _vocabulary.getLiteralName(i);
+    if (name.empty()) {
+      name = _vocabulary.getSymbolicName(i);
+    }
 
-		if (name.empty()) {
-			_tokenNames.push_back("\<INVALID>");
-		} else {
+    if (name.empty()) {
+      _tokenNames.push_back("\<INVALID>");
+    } else {
       _tokenNames.push_back(name);
     }
-	}
+  }
 
   <atn>
 }
@@ -946,8 +946,8 @@ ThisRulePropertyRef_text(r)  ::= "_input->getText(_localctx->start, _input->LT(-
 ThisRulePropertyRef_ctxHeader(r)   ::= "<! Required but unused. !>"
 ThisRulePropertyRef_ctx(r)   ::= "_localctx"
 
-ThisRulePropertyRef_parserHeader(r)	 ::= "<! Required but unused. !>"
-ThisRulePropertyRef_parser(r)	 ::= "this"
+ThisRulePropertyRef_parserHeader(r)   ::= "<! Required but unused. !>"
+ThisRulePropertyRef_parser(r)   ::= "this"
 
 NonLocalAttrRef(s) ::= "NonLocalAttrRef(s) ((<s.ruleName; format=\"cap\">Context)getInvokingContext(<s.ruleIndex>)).<s.name>"
 SetNonLocalAttr(s, rhsChunks) ::=
