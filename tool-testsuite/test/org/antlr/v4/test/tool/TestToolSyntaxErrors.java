@@ -501,7 +501,7 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 		super.testErrors(pair, true);
 	}
 
-	@Test public void testInvalidCharSetAndRange() {
+	@Test public void testInvalidAndUselessEscapeInCharSetAndRange() {
 		String grammar =
 				"lexer grammar Test;\n" +
 				"INVALID_RANGE:         'GH'..'LM';\n" +
@@ -509,7 +509,7 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 				"VALID_STRING_LITERALS: '\\u1234' | '\\t' | [\\-\\]];\n" +
 				"INVALID_CHAR_SET:      [f-az][];\n" +
 				"INVALID_CHAR_SET_2:    [\\u24\\uA2][\\u24];\n" +  //https://github.com/antlr/antlr4/issues/1077
-				"INVALID_CHAR_SET_3:    [\\t\\{];";
+				"USELESS_ESCAPE_IN_CHAR_SET:    [\\[\\t];";        //https://github.com/antlr/antlr4/issues/1537
 
 		String expected =
 				"error(" + ErrorType.INVALID_LITERAL_IN_LEXER_SET.code + "): Test.g4:2:23: multi-character literals are not allowed in lexer sets: 'GH'\n" +
@@ -519,7 +519,7 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 				"error(" + ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED.code + "): Test.g4:5:29: string literals and sets cannot be empty: []\n" +
 				"error(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:6:23: invalid escape sequence\n" +
 				"error(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:6:33: invalid escape sequence\n" +
-				"error(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:7:23: invalid escape sequence\n";
+				"warning(" + ErrorType.USELESS_ESCAPE.code + "): Test.g4:7:31: useless escape in string \"\\[\\t\"\n";
 
 		String[] pair = new String[] {
 				grammar,
