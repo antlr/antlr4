@@ -28,7 +28,7 @@ public class CSharpTarget extends Target {
 
     @Override
     public String getVersion() {
-        return "4.6.1";
+        return "4.7";
     }
 
 	@Override
@@ -46,7 +46,7 @@ public class CSharpTarget extends Target {
 			formatted = String.format("\\x%X", v & 0xFFFF);
 		}
 
-		return formatted;
+		return "'" + formatted + "'";
 	}
 
 	@Override

@@ -19,7 +19,7 @@ public interface TerminalNode extends ParseTree {
 	 *  TerminalNodes anyway so I'm adding as it improves internal
 	 *  code quality.
 	 *
-	 *  @since 4.6.1
+	 *  @since 4.7
 	 */
 	void setParent(RuleContext parent);
 }

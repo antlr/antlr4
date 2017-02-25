@@ -50,8 +50,8 @@ IntervalSet IntervalSet::of(ssize_t a) {
   return IntervalSet({ Interval(a, a) });
 }
 
-IntervalSet IntervalSet::of(ssize_t a, ssize_t b, bool autoExtend) {
-  return IntervalSet({ Interval(a, b, autoExtend) });
+IntervalSet IntervalSet::of(ssize_t a, ssize_t b) {
+  return IntervalSet({ Interval(a, b) });
 }
 
 void IntervalSet::clear() {
@@ -68,8 +68,8 @@ void IntervalSet::add(ssize_t el) {
   add(el, el);
 }
 
-void IntervalSet::add(ssize_t a, ssize_t b, bool autoExtend) {
-  add(Interval(a, b, autoExtend));
+void IntervalSet::add(ssize_t a, ssize_t b) {
+  add(Interval(a, b));
 }
 
 void IntervalSet::add(const Interval &addition) {

@@ -288,7 +288,7 @@ public partial class <csIdentifier.(parser.name)> : <superClass; null="Parser"> 
 
 	public override string[] RuleNames { get { return ruleNames; } }
 
-	public override string SerializedAtn { get { return _serializedATN; } }
+	public override string SerializedAtn { get { return new string(_serializedATN); } }
 
 	static <csIdentifier.(parser.name)>() {
 		decisionToDFA = new DFA[_ATN.NumberOfDecisions];
@@ -1023,7 +1023,7 @@ public partial class <csIdentifier.(lexer.name)> : <superClass; null="Lexer"> {
 
 	public override string[] ModeNames { get { return modeNames; } }
 
-	public override string SerializedAtn { get { return _serializedATN; } }
+	public override string SerializedAtn { get { return new string(_serializedATN); } }
 
 	static <csIdentifier.(lexer.name)>() {
 		decisionToDFA = new DFA[_ATN.NumberOfDecisions];
@@ -1038,16 +1038,12 @@ public partial class <csIdentifier.(lexer.name)> : <superClass; null="Lexer"> {
 
 
 SerializedATN(model) ::= <<
-private static string _serializedATN = _serializeATN();
-private static string _serializeATN()
-{
-    StringBuilder sb = new StringBuilder();
-    sb.Append("<model.serialized; wrap={");<\n><\t>sb.Append("}>");
-    return sb.ToString();
-}
+private static char[] _serializedATN = {
+	<model.serialized; separator=", ", wrap>,
+};
 
 public static readonly ATN _ATN =
-	new ATNDeserializer().Deserialize(_serializedATN.ToCharArray());
+	new ATNDeserializer().Deserialize(_serializedATN);
 
 
 >>

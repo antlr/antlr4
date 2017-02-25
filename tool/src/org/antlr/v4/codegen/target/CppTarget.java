@@ -6,9 +6,9 @@
 
 package org.antlr.v4.codegen.target;
 
-import org.antlr.v4.codegen.UnicodeEscapes;
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.codegen.Target;
+import org.antlr.v4.codegen.UnicodeEscapes;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.stringtemplate.v4.NumberRenderer;
@@ -50,7 +50,7 @@ public class CppTarget extends Target {
 	}
 
 	public String getVersion() {
-		return "4.6.1";
+		return "4.7";
 	}
 
     public boolean needsHeader() { return true; }
