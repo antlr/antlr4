@@ -439,7 +439,7 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 	@Test public void testValidEscapeSequences() {
 		String grammar =
 			"lexer grammar A;\n" +
-			"NORMAL_ESCAPE : '\\b \\t \\n \\f \\r \\\" \\' \\\\';\n" +
+			"NORMAL_ESCAPE : '\\b \\t \\n \\f \\r \\' \\\\';\n" +
 			"UNICODE_ESCAPE : '\\u0001 \\u00A1 \\u00a1 \\uaaaa \\uAAAA';\n";
 		String expected =
 			"";
@@ -509,7 +509,8 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 				"VALID_STRING_LITERALS: '\\u1234' | '\\t' | [\\-\\]];\n" +
 				"INVALID_CHAR_SET:      [f-az][];\n" +
 				"INVALID_CHAR_SET_2:    [\\u24\\uA2][\\u24];\n" +  //https://github.com/antlr/antlr4/issues/1077
-				"USELESS_ESCAPE_IN_CHAR_SET:    [\\[\\t];";        //https://github.com/antlr/antlr4/issues/1537
+				"USELESS_ESCAPE_IN_CHAR_SET:    [\\[\\t];\n" +     //https://github.com/antlr/antlr4/issues/1537
+				"ESCAPE_IN_CHAR_SET:            [\\]`\\-=];";
 
 		String expected =
 				"error(" + ErrorType.INVALID_LITERAL_IN_LEXER_SET.code + "): Test.g4:2:23: multi-character literals are not allowed in lexer sets: 'GH'\n" +
