@@ -72,11 +72,12 @@ public protocol ANTLRErrorStrategy {
     /// the parsing process
     func sync(_ recognizer: Parser) throws // RecognitionException;
 
-    /// Tests whether or not {@code recognizer} is in the process of recovering
+    /// Tests whether or not recognizer} is in the process of recovering
     /// from an error. In error recovery mode, {@link org.antlr.v4.runtime.Parser#consume} adds
     /// symbols to the parse tree by calling
-    /// {@link org.antlr.v4.runtime.ParserRuleContext#addErrorNode(org.antlr.v4.runtime.Token)} instead of
-    /// {@link org.antlr.v4.runtime.ParserRuleContext#addChild(org.antlr.v4.runtime.Token)}.
+    /// {@link Parser#createErrorNode(ParserRuleContext, Token)} then
+    /// {@link ParserRuleContext#addErrorNode(ErrorNode)} instead of
+    /// {@link Parser#createTerminalNode(ParserRuleContext, Token)}.
     ///
     /// - parameter recognizer: the parser instance
     /// - returns: {@code true} if the parser is currently recovering from a parse

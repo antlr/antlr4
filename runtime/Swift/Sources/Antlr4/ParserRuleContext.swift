@@ -105,51 +105,84 @@ open class ParserRuleContext: RuleContext {
     open func exitRule(_ listener: ParseTreeListener) {
     }
 
-    /** Does not set parent link; other add methods do that */
+    /** Add a parse tree node to this as a child.  Works for
+     *  internal and leaf nodes. Does not set parent link;
+     *  other add methods must do that. Other addChild methods
+     *  call this.
+     *
+     *  We cannot set the parent pointer of the incoming node
+     *  because the existing interfaces do not have a setParent()
+     *  method and I don't want to break backward compatibility for this.
+     *
+     *  @since 4.6.1
+     */
     @discardableResult
-    open func addChild(_ t: TerminalNode) -> TerminalNode {
+    open func addAnyChild<T: ParseTree>(_ t: T) -> T {
         if children == nil {
-            children = Array<ParseTree>()
+            children = [T]()
         }
         children!.append(t)
         return t
     }
+    
     @discardableResult
     open func addChild(_ ruleInvocation: RuleContext) -> RuleContext {
-        if children == nil {
-            children = Array<ParseTree>()
-        }
-        children!.append(ruleInvocation)
-        return ruleInvocation
+        return addAnyChild(ruleInvocation)
+    }
+    
+    @discardableResult
+    open func addChild(_ t: TerminalNode) -> TerminalNode {
+        return addAnyChild(t)
+    }
+    
+    /** Add an error node child. @since 4.6.1 */
+    @discardableResult
+    open func addErrorNode(_ errorNode: ErrorNode) -> ErrorNode {
+        return addAnyChild(errorNode)
     }
 
+    /** Add a child to this node based upon matchedToken. It
+     *  creates a TerminalNodeImpl rather than using
+     *  {@link Parser#createTerminalNode(ParserRuleContext, Token)}. I'm leaving this
+     *  in for compatibility but the parser doesn't use this anymore.
+     */
+    @available(*, deprecated)
+    open func addChild(_ matchedToken: Token) -> TerminalNode {
+        let t: TerminalNodeImpl = TerminalNodeImpl(matchedToken)
+        addAnyChild(t)
+        t.parent = self
+        return t
+    }
+    
+    /** Add a child to this node based upon badToken.  It
+     *  creates a ErrorNodeImpl rather than using
+     *  {@link Parser#createErrorNode(ParserRuleContext, Token)}. I'm leaving this
+     *  in for compatibility but the parser doesn't use this anymore.
+     */
+    @discardableResult
+    @available(*, deprecated)
+    open func addErrorNode(_ badToken: Token) -> ErrorNode {
+        let t: ErrorNode = ErrorNode(badToken)
+        addAnyChild(t)
+        t.parent = self
+        return t
+    }
+    
+    //	public void trace(int s) {
+    //		if ( states==null ) states = new ArrayList<Integer>();
+    //		states.add(s);
+    //	}
+    
     /** Used by enterOuterAlt to toss out a RuleContext previously added as
      *  we entered a rule. If we have # label, we will need to remove
      *  generic ruleContext object.
-      */
+     */
     open func removeLastChild() {
-            children?.removeLast()
-            //children.remove(children.size()-1);
+    	if children != nil {
+            children!.remove(at: children!.count-1)
+    	}
     }
-
-//	public void trace(int s) {
-//		if ( states==null ) states = new ArrayList<Integer>();
-//		states.add(s);
-//	}
-
-    open func addChild(_ matchedToken: Token) -> TerminalNode {
-        let t: TerminalNodeImpl = TerminalNodeImpl(matchedToken)
-        addChild(t)
-        t.parent = self
-        return t
-    }
-    @discardableResult
-    open func addErrorNode(_ badToken: Token) -> ErrorNode {
-        let t: ErrorNode = ErrorNode(badToken)
-        addChild(t)
-        t.parent = self
-        return t
-    }
+    
 
     override
     /** Override to make type more specific */
