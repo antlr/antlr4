@@ -112,7 +112,7 @@ std::vector<tree::TerminalNode *> ParserRuleContext::getTokens(size_t ttype) {
   return tokens;
 }
 
-misc::Interval ParserRuleContext::getSourceInterval() {
+misc::Interval ParserRuleContext::getSourceInterval() const {
   if (start == nullptr) {
     return misc::Interval::INVALID;
   }
@@ -123,15 +123,15 @@ misc::Interval ParserRuleContext::getSourceInterval() {
   return misc::Interval(start->getTokenIndex(), stop->getTokenIndex());
 }
 
-Token* ParserRuleContext::getStart() {
+Token* ParserRuleContext::getStart() const {
   return start;
 }
 
-Token* ParserRuleContext::getStop() {
+Token* ParserRuleContext::getStop() const {
   return stop;
 }
 
-std::string ParserRuleContext::toInfoString(Parser *recognizer) {
+std::string ParserRuleContext::toInfoString(Parser *recognizer) const {
   std::vector<std::string> rules = recognizer->getRuleInvocationStack(this);
   std::reverse(rules.begin(), rules.end());
   std::string rulesStr = antlrcpp::arrayToString(rules);

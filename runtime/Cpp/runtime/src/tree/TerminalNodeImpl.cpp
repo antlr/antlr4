@@ -16,7 +16,7 @@ using namespace antlr4::tree;
 TerminalNodeImpl::TerminalNodeImpl(Token *symbol_) : symbol(symbol_) {
 }
 
-Token* TerminalNodeImpl::getSymbol() {
+Token* TerminalNodeImpl::getSymbol() const {
   return symbol;
 }
 
@@ -24,7 +24,7 @@ void TerminalNodeImpl::setParent(RuleContext *parent) {
   this->parent = parent;
 }
 
-misc::Interval TerminalNodeImpl::getSourceInterval() {
+misc::Interval TerminalNodeImpl::getSourceInterval() const {
   if (symbol == nullptr) {
     return misc::Interval::INVALID;
   }
@@ -37,21 +37,21 @@ antlrcpp::Any TerminalNodeImpl::accept(ParseTreeVisitor *visitor) {
   return visitor->visitTerminal(this);
 }
 
-std::string TerminalNodeImpl::getText() {
+std::string TerminalNodeImpl::getText() const {
   return symbol->getText();
 }
 
-std::string TerminalNodeImpl::toStringTree(Parser * /*parser*/) {
+std::string TerminalNodeImpl::toStringTree(Parser * /*parser*/) const {
   return toString();
 }
 
-std::string TerminalNodeImpl::toString() {
+std::string TerminalNodeImpl::toString() const {
   if (symbol->getType() == Token::EOF) {
     return "<EOF>";
   }
   return symbol->getText();
 }
 
-std::string TerminalNodeImpl::toStringTree() {
+std::string TerminalNodeImpl::toStringTree() const {
   return toString();
 }

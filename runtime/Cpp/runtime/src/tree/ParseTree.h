@@ -36,12 +36,12 @@ namespace tree {
 
     /// Print out a whole tree, not just a node, in LISP format
     /// {@code (root child1 .. childN)}. Print just a node if this is a leaf.
-    virtual std::string toStringTree() = 0;
-    virtual std::string toString() = 0;
+    virtual std::string toStringTree() const = 0;
+    virtual std::string toString() const = 0;
 
     /// Specialize toStringTree so that it can print out more information
     /// based upon the parser.
-    virtual std::string toStringTree(Parser *parser) = 0;
+    virtual std::string toStringTree(Parser *parser) const = 0;
 
     virtual bool operator == (const ParseTree &other) const;
 
@@ -52,7 +52,7 @@ namespace tree {
     /// Return the combined text of all leaf nodes. Does not get any
     /// off-channel tokens (if any) so won't return whitespace and
     /// comments if they are sent to parser on hidden channel.
-    virtual std::string getText() = 0;
+    virtual std::string getText() const = 0;
 
     /**
      * Return an {@link Interval} indicating the index in the
@@ -70,7 +70,7 @@ namespace tree {
      * <p>As a weird special case, the source interval for rules matched after
      * EOF is unspecified.</p>
      */
-    virtual misc::Interval getSourceInterval() = 0;
+    virtual misc::Interval getSourceInterval() const = 0;
   };
 
   // A class to help managing ParseTree instances without the need of a shared_ptr.

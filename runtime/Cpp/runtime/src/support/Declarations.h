@@ -131,6 +131,7 @@ namespace antlr4 {
     class AbstractParseTreeVisitor;
     class ErrorNode;
     class ErrorNodeImpl;
+    class ErrorNodeWithHidden;
     class ParseTree;
     class ParseTreeListener;
     template<typename T> class ParseTreeProperty;
@@ -139,6 +140,7 @@ namespace antlr4 {
     class SyntaxTree;
     class TerminalNode;
     class TerminalNodeImpl;
+    class TerminalNodeWithHidden;
     class Tree;
     class Trees;
 

@@ -69,16 +69,16 @@ namespace antlr4 {
     RuleContext();
     RuleContext(RuleContext *parent, size_t invokingState);
 
-    virtual int depth();
+    virtual int depth() const;
 
     /// A context is empty if there is no invoking state; meaning nobody called current context.
-    virtual bool isEmpty();
+    virtual bool isEmpty() const;
 
     // satisfy the ParseTree / SyntaxTree interface
 
-    virtual misc::Interval getSourceInterval() override;
+    virtual misc::Interval getSourceInterval() const override;
 
-    virtual std::string getText() override;
+    virtual std::string getText() const override;
 
     virtual size_t getRuleIndex() const;
 
@@ -110,25 +110,25 @@ namespace antlr4 {
     ///  (root child1 .. childN). Print just a node if this is a leaf.
     ///  We have to know the recognizer so we can get rule names.
     /// </summary>
-    virtual std::string toStringTree(Parser *recog) override;
+    virtual std::string toStringTree(Parser *recog) const override;
 
     /// <summary>
     /// Print out a whole tree, not just a node, in LISP format
     ///  (root child1 .. childN). Print just a node if this is a leaf.
     /// </summary>
-    virtual std::string toStringTree(std::vector<std::string> &ruleNames);
+    virtual std::string toStringTree(std::vector<std::string> &ruleNames) const;
 
-    virtual std::string toStringTree() override;
-    virtual std::string toString() override;
-    std::string toString(Recognizer *recog);
-    std::string toString(const std::vector<std::string> &ruleNames);
+    virtual std::string toStringTree() const override;
+    virtual std::string toString() const override;
+    std::string toString(Recognizer *recog) const;
+    std::string toString(const std::vector<std::string> &ruleNames) const;
 
     // recog null unless ParserRuleContext, in which case we use subclass toString(...)
-    std::string toString(Recognizer *recog, RuleContext *stop);
+    std::string toString(Recognizer *recog, RuleContext *stop) const;
 
-    virtual std::string toString(const std::vector<std::string> &ruleNames, RuleContext *stop);
+    virtual std::string toString(const std::vector<std::string> &ruleNames, RuleContext *stop) const;
 
-    bool operator == (const RuleContext &other) { return this == &other; } // Simple address comparison.
+    bool operator == (const RuleContext &other) const { return this == &other; } // Simple address comparison.
 
   private:
     void InitializeInstanceFields();

@@ -18,22 +18,28 @@ namespace tree {
     /// Print out a whole tree in LISP form. getNodeText is used on the
     /// node payloads to get the text for the nodes.  Detect
     /// parse trees and extract data appropriately.
-    static std::string toStringTree(ParseTree *t);
-
-    /// Print out a whole tree in LISP form. getNodeText is used on the
-    ///  node payloads to get the text for the nodes.  Detect
-    ///  parse trees and extract data appropriately.
-    static std::string toStringTree(ParseTree *t, Parser *recog);
+    static std::string toStringTree(ParseTree const *t);
 
     /// Print out a whole tree in LISP form. getNodeText is used on the
     /// node payloads to get the text for the nodes.  Detect
     /// parse trees and extract data appropriately.
-    static std::string toStringTree(ParseTree *t, const std::vector<std::string> &ruleNames);
-    static std::string getNodeText(ParseTree *t, Parser *recog);
-    static std::string getNodeText(ParseTree *t, const std::vector<std::string> &ruleNames);
+    static std::string toStringTree(ParseTree const *t, Parser const *recog);
+
+    /// Print out a whole tree in LISP form. getNodeText is used on the
+    /// node payloads to get the text for the nodes.  Detect
+    /// parse trees and extract data appropriately.
+    static std::string toStringTree(ParseTree const *t, const std::vector<std::string> &ruleNames);
+    static std::string getNodeText(ParseTree const *t, Parser const *recog);
+    static std::string getNodeText(ParseTree const *t, const std::vector<std::string> &ruleNames);
+
+    /** Return ordered list of all leaves under this subtree @since 4.7 */
+    static std::vector<TerminalNode *> getLeaves(ParseTree *t);
+
+    /** Fill an ordered list of all leaves under this subtree @since 4.7 */
+    static void getLeaves(ParseTree *t, std::vector<TerminalNode *> &leaves);
 
     /// Return a list of all ancestors of this node.  The first node of
-    ///  list is the root and the last is the parent of this node.
+    /// list is the root and the last is the parent of this node.
     static std::vector<ParseTree *> getAncestors(ParseTree *t);
 
     /** Return true if t is u's parent or a node on path to root from u.

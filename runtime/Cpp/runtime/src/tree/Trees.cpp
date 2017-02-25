@@ -25,17 +25,17 @@ using namespace antlrcpp;
 Trees::Trees() {
 }
 
-std::string Trees::toStringTree(ParseTree *t) {
+std::string Trees::toStringTree(ParseTree const *t) {
   return toStringTree(t, nullptr);
 }
 
-std::string Trees::toStringTree(ParseTree *t, Parser *recog) {
+std::string Trees::toStringTree(ParseTree const *t, Parser const *recog) {
   if (recog == nullptr)
     return toStringTree(t, std::vector<std::string>());
   return toStringTree(t, recog->getRuleNames());
 }
 
-std::string Trees::toStringTree(ParseTree *t, const std::vector<std::string> &ruleNames) {
+std::string Trees::toStringTree(ParseTree const *t, const std::vector<std::string> &ruleNames) {
   std::string temp = antlrcpp::escapeWhitespace(Trees::getNodeText(t, ruleNames), false);
   if (t->children.empty()) {
     return temp;
@@ -47,7 +47,7 @@ std::string Trees::toStringTree(ParseTree *t, const std::vector<std::string> &ru
   // Implement the recursive walk as iteration to avoid trouble with deep nesting.
   std::stack<size_t> stack;
   size_t childIndex = 0;
-  ParseTree *run = t;
+  const ParseTree *run = t;
   while (childIndex < run->children.size()) {
     if (childIndex > 0) {
       ss << ' ';
@@ -80,24 +80,24 @@ std::string Trees::toStringTree(ParseTree *t, const std::vector<std::string> &ru
   return ss.str();
 }
 
-std::string Trees::getNodeText(ParseTree *t, Parser *recog) {
+std::string Trees::getNodeText(ParseTree const *t, Parser const *recog) {
   return getNodeText(t, recog->getRuleNames());
 }
 
-std::string Trees::getNodeText(ParseTree *t, const std::vector<std::string> &ruleNames) {
+std::string Trees::getNodeText(ParseTree const *t, const std::vector<std::string> &ruleNames) {
   if (ruleNames.size() > 0) {
-    if (is<RuleContext *>(t)) {
-      size_t ruleIndex = dynamic_cast<RuleContext *>(t)->getRuleIndex();
+    if (is<RuleContext const *>(t)) {
+      size_t ruleIndex = dynamic_cast<RuleContext const *>(t)->getRuleIndex();
       std::string ruleName = ruleNames[ruleIndex];
-      size_t altNumber = dynamic_cast<RuleContext *>(t)->getAltNumber();
+      size_t altNumber = dynamic_cast<RuleContext const *>(t)->getAltNumber();
       if (altNumber != atn::ATN::INVALID_ALT_NUMBER) {
         return ruleName + ":" + std::to_string(altNumber);
       }
       return ruleName;
-    } else if (is<ErrorNode *>(t)) {
+    } else if (is<ErrorNode const *>(t)) {
       return t->toString();
-    } else if (is<TerminalNode *>(t)) {
-      Token *symbol = dynamic_cast<TerminalNode *>(t)->getSymbol();
+    } else if (is<TerminalNode const *>(t)) {
+      Token *symbol = dynamic_cast<TerminalNode const *>(t)->getSymbol();
       if (symbol != nullptr) {
         std::string s = symbol->getText();
         return s;
@@ -105,15 +105,35 @@ std::string Trees::getNodeText(ParseTree *t, const std::vector<std::string> &rul
     }
   }
   // no recog for rule names
-  if (is<RuleContext *>(t)) {
-    return dynamic_cast<RuleContext *>(t)->getText();
+  if (is<RuleContext const *>(t)) {
+    return dynamic_cast<RuleContext const *>(t)->getText();
   }
 
-  if (is<TerminalNodeImpl *>(t)) {
-    return dynamic_cast<TerminalNodeImpl *>(t)->getSymbol()->getText();
+  if (is<TerminalNodeImpl const *>(t)) {
+    return dynamic_cast<TerminalNodeImpl const *>(t)->getSymbol()->getText();
   }
 
   return "";
+}
+
+std::vector<TerminalNode *> Trees::getLeaves(ParseTree *t) {
+  std::vector<TerminalNode *> leaves;
+  getLeaves(t, leaves);
+  return leaves;
+}
+
+/** Fill an ordered list of all leaves under this subtree @since 4.7 */
+void Trees::getLeaves(ParseTree *t, std::vector<TerminalNode *> &leaves) {
+  // If leaf, add and return.
+  if (is<TerminalNode *>(t)) {
+    leaves.push_back((TerminalNode *)t);
+    return;
+  }
+
+  // Check children.
+  for (ParseTree *child : t->children){
+    getLeaves(child, leaves);
+  }
 }
 
 std::vector<ParseTree *> Trees::getAncestors(ParseTree *t) {

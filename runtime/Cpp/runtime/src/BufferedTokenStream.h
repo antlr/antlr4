@@ -94,6 +94,26 @@ namespace antlr4 {
     /// Get all tokens from lexer until EOF.
     virtual void fill();
 
+    /**
+     * Given a starting index, return the index of the next token on channel.
+     * Return {@code i} if {@code tokens[i]} is on channel. Return the index of
+     * the EOF token if there are no tokens on channel between {@code i} and
+     * EOF.
+     */
+    virtual ssize_t nextTokenOnChannel(size_t i, size_t channel);
+
+    /**
+     * Given a starting index, return the index of the previous token on
+     * channel. Return {@code i} if {@code tokens[i]} is on channel. Return -1
+     * if there are no tokens on channel between {@code i} and 0.
+     *
+     * <p>
+     * If {@code i} specifies an index at or after the EOF token, the EOF token
+     * index is returned. This is due to the fact that the EOF token is treated
+     * as though it were on every channel.</p>
+     */
+    virtual ssize_t previousTokenOnChannel(size_t i, size_t channel);
+    
   protected:
     /**
      * The {@link TokenSource} from which tokens for this stream are fetched.
@@ -167,26 +187,6 @@ namespace antlr4 {
     virtual ssize_t adjustSeekIndex(size_t i);
     void lazyInit();
     virtual void setup();
-
-    /**
-     * Given a starting index, return the index of the next token on channel.
-     * Return {@code i} if {@code tokens[i]} is on channel. Return the index of
-     * the EOF token if there are no tokens on channel between {@code i} and
-     * EOF.
-     */
-    virtual ssize_t nextTokenOnChannel(size_t i, size_t channel);
-
-    /**
-     * Given a starting index, return the index of the previous token on
-     * channel. Return {@code i} if {@code tokens[i]} is on channel. Return -1
-     * if there are no tokens on channel between {@code i} and 0.
-     *
-     * <p>
-     * If {@code i} specifies an index at or after the EOF token, the EOF token
-     * index is returned. This is due to the fact that the EOF token is treated
-     * as though it were on every channel.</p>
-     */
-    virtual ssize_t previousTokenOnChannel(size_t i, size_t channel);
 
     virtual std::vector<Token *> filterForChannel(size_t from, size_t to, ssize_t channel);
 
