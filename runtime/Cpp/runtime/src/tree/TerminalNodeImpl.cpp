@@ -20,8 +20,8 @@ Token* TerminalNodeImpl::getSymbol() const {
   return symbol;
 }
 
-void TerminalNodeImpl::setParent(RuleContext *parent) {
-  this->parent = parent;
+void TerminalNodeImpl::setParent(RuleContext *aParent) {
+  parent = aParent;
 }
 
 misc::Interval TerminalNodeImpl::getSourceInterval() const {

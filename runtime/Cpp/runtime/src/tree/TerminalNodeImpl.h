@@ -17,7 +17,7 @@ namespace tree {
     TerminalNodeImpl(Token *symbol);
 
     virtual Token* getSymbol() const override;
-    virtual void setParent(RuleContext *parent) override;
+    virtual void setParent(RuleContext *aParent) override;
     virtual misc::Interval getSourceInterval() const override;
 
     virtual antlrcpp::Any accept(ParseTreeVisitor *visitor) override;

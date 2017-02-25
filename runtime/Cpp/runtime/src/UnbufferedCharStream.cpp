@@ -51,8 +51,14 @@ void UnbufferedCharStream::sync(size_t want) {
 }
 
 size_t UnbufferedCharStream::fill(size_t n) {
+#ifdef _WIN32
+  auto eof = EOF & 0xFFFF; // Either that or we have to disable warning C4310.
+#else
+  uint32_t eof = (uint32_t)EOF;
+#endif
+
   for (size_t i = 0; i < n; i++) {
-    if (_data.size() > 0 && _data.back() == (uint32_t)EOF) {
+    if (_data.size() > 0 && _data.back() == eof) {
       return i;
     }
 
@@ -101,7 +107,12 @@ size_t UnbufferedCharStream::LA(ssize_t i) {
     return EOF;
   }
 
-  if (_data[(size_t)index] == (uint32_t)EOF) {
+#ifdef _WIN32
+  auto eof = EOF & 0xFFFF; // Either that or we have to disable warning C4310.
+#else
+  uint32_t eof = (uint32_t)EOF;
+#endif
+  if (_data[(size_t)index] == eof) {
     return EOF;
   }
 

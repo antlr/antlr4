@@ -1340,6 +1340,9 @@ Parser* ParserATNSimulator::getParser() {
   return parser;
 }
 
+#ifdef _WIN32
+#pragma warning(disable: 4996) // 'getenv': This function or variable may be unsafe.
+#endif
 bool ParserATNSimulator::getLrLoopSetting() {
   char *var = std::getenv("TURN_OFF_LR_LOOP_ENTRY_BRANCH_OPT");
   if (var == nullptr)

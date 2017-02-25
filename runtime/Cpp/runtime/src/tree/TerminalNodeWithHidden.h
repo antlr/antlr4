@@ -78,7 +78,7 @@ namespace tree {
      */
     std::vector<Token *> _trailing;
 
-    void collectHiddenTokens(BufferedTokenStream *tokens, int channel, Token *symbol);
+    void collectHiddenTokens(BufferedTokenStream *tokens, int channel, Token *aSymbol);
 
     std::vector<Token *> getLeadingHidden() const;
     std::vector<Token *> getTrailingHidden() const;

@@ -17,21 +17,21 @@ TerminalNodeWithHidden::TerminalNodeWithHidden(BufferedTokenStream *tokens, int 
   collectHiddenTokens(tokens, channel, symbol);
 }
 
-void TerminalNodeWithHidden::collectHiddenTokens(BufferedTokenStream *tokens, int channel, Token *symbol) {
-  if (symbol->getTokenIndex() == INVALID_INDEX) {
+void TerminalNodeWithHidden::collectHiddenTokens(BufferedTokenStream *tokens, int channel, Token *aSymbol) {
+  if (aSymbol->getTokenIndex() == INVALID_INDEX) {
     // Must be a token conjured up during error recovery for missing token.
     // Tokens not in tokens buffer never have hidden tokens associated with them.
     return;
   }
 
-  std::vector<Token *> left = tokens->getHiddenTokensToLeft(symbol->getTokenIndex(), channel);
+  std::vector<Token *> left = tokens->getHiddenTokensToLeft(aSymbol->getTokenIndex(), channel);
 
   // Check the EOF special case separately.
-  if (symbol->getType() == Token::EOF) {
+  if (aSymbol->getType() == Token::EOF) {
     if (!left.empty()) {
       Token *firstHiddenLeft = left[0];
       if (firstHiddenLeft->getTokenIndex() == 0) { // EOF only gets hidden stuff if it's the only token.
-        _leading = tokens->get(0, symbol->getTokenIndex() - 1);
+        _leading = tokens->get(0, aSymbol->getTokenIndex() - 1);
       }
     }
     return;
@@ -45,7 +45,7 @@ void TerminalNodeWithHidden::collectHiddenTokens(BufferedTokenStream *tokens, in
     }
 
     if (prevReal == nullptr) { // This symbol is the first real token (or EOF token) of the file.
-      _leading = tokens->get(0, symbol->getTokenIndex() - 1);
+      _leading = tokens->get(0, aSymbol->getTokenIndex() - 1);
     } else {
       // Collect all tokens on next line after prev real.
       for (Token *t : left) {
@@ -56,7 +56,7 @@ void TerminalNodeWithHidden::collectHiddenTokens(BufferedTokenStream *tokens, in
     }
   }
 
-  std::vector<Token *> right = tokens->getHiddenTokensToRight(symbol->getTokenIndex(), channel);
+  std::vector<Token *> right = tokens->getHiddenTokensToRight(aSymbol->getTokenIndex(), channel);
   if (!right.empty()) {
     Token *lastHiddenRight = right.back();
     Token *nextReal = tokens->get(lastHiddenRight->getTokenIndex() + 1);
@@ -66,7 +66,7 @@ void TerminalNodeWithHidden::collectHiddenTokens(BufferedTokenStream *tokens, in
       _trailing = tokens->get(right[0]->getTokenIndex(), nextReal->getTokenIndex());
     } else {
       // Collect all token text on same line to right.
-      size_t tokenLine = symbol->getLine();
+      size_t tokenLine = aSymbol->getLine();
       for (Token *t : right) {
         if (t->getLine() == tokenLine) {
           _trailing.push_back(t);
