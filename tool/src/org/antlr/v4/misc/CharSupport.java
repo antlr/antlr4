@@ -7,6 +7,7 @@
 package org.antlr.v4.misc;
 
 import org.antlr.v4.runtime.Lexer;
+import org.antlr.v4.tool.ErrorSeverity;
 
 /** */
 public class CharSupport {
@@ -77,12 +78,13 @@ public class CharSupport {
 	 *  return the int value of 'a'. Convert escape sequences here also.
 	 *  Return -1 if not single char.
 	 */
-	public static int getCharValueFromGrammarCharLiteral(String literal) {
-		if ( literal==null || literal.length()<3 ) return -1;
+	public static CharParseResult getCharValueFromGrammarCharLiteral(String literal) {
+		if ( literal==null || literal.length()<3 ) return CharParseResult.ErrorResult;
 		return getCharValueFromCharInGrammarLiteral(literal.substring(1,literal.length()-1));
 	}
 
-	public static String getStringFromGrammarStringLiteral(String literal) {
+	public static CharParseResult getStringFromGrammarStringLiteral(String literal) {
+		ErrorSeverity resultSeverity = ErrorSeverity.INFO;
 		StringBuilder buf = new StringBuilder();
 		int i = 1; // skip first quote
 		int n = literal.length()-1; // skip last quote
@@ -100,7 +102,7 @@ public class CharSupport {
 								break;
 							}
 							if (!Character.isDigit(charAt) && !(charAt >= 'a' && charAt <= 'f') && !(charAt >= 'A' && charAt <= 'F')) {
-								return null; // invalid escape sequence.
+								return CharParseResult.ErrorResult; // invalid escape sequence.
 							}
 						}
 					} else {
@@ -108,7 +110,7 @@ public class CharSupport {
 							if ( end>n ) return null; // invalid escape sequence.
 							char charAt = literal.charAt(end);
 							if (!Character.isDigit(charAt) && !(charAt >= 'a' && charAt <= 'f') && !(charAt >= 'A' && charAt <= 'F')) {
-								return null; // invalid escape sequence.
+								return CharParseResult.ErrorResult; // invalid escape sequence.
 							}
 						}
 					}
@@ -116,35 +118,40 @@ public class CharSupport {
 			}
 			if ( end>n ) return null; // invalid escape sequence.
 			String esc = literal.substring(i, end);
-			int c = getCharValueFromCharInGrammarLiteral(esc);
-			if ( c==-1 ) {
-				return null; // invalid escape sequence.
+			CharParseResult parseResult = getCharValueFromCharInGrammarLiteral(esc);
+			if (parseResult.errorSeverity == ErrorSeverity.ERROR) {
+				return parseResult; // invalid escape sequence.
 			}
-			else buf.appendCodePoint(c);
+			else if (parseResult.errorSeverity == ErrorSeverity.WARNING) {
+				resultSeverity = ErrorSeverity.WARNING;
+			}
+			else {
+				buf.appendCodePoint(parseResult.intChar);
+			}
 			i = end;
 		}
-		return buf.toString();
+		return new CharParseResult(resultSeverity, buf.toString());
 	}
 
 	/** Given char x or \\t or \\u1234 return the char value;
 	 *  Unnecessary escapes like '\{' yield -1.
 	 */
-	public static int getCharValueFromCharInGrammarLiteral(String cstr) {
+	public static CharParseResult getCharValueFromCharInGrammarLiteral(String cstr) {
+		int value;
 		switch ( cstr.length() ) {
 			case 1:
 				// 'x'
-				return cstr.charAt(0); // no escape char
+				return new CharParseResult(cstr.charAt(0)); // no escape char
 			case 2:
-				if ( cstr.charAt(0)!='\\' ) return -1;
+				if ( cstr.charAt(0)!='\\' ) return CharParseResult.ErrorResult;
 				// '\x'  (antlr lexer will catch invalid char)
-				if ( Character.isDigit(cstr.charAt(1)) ) return -1;
-				int escChar = cstr.charAt(1);
-				int charVal = ANTLRLiteralEscapedCharValue[escChar];
-				if ( charVal==0 ) return -1;
-				return charVal;
+				int charVal = ANTLRLiteralEscapedCharValue[cstr.charAt(1)];
+				if (charVal==0)
+					return new CharParseResult(ErrorSeverity.WARNING, cstr.charAt(1));
+				return new CharParseResult(ErrorSeverity.INFO, charVal);
 			case 6:
 				// '\\u1234' or '\\u{12}'
-				if ( !cstr.startsWith("\\u") ) return -1;
+				if ( !cstr.startsWith("\\u") ) return CharParseResult.ErrorResult;
 				int startOff;
 				int endOff;
 				if ( cstr.charAt(2) == '{' ) {
@@ -154,12 +161,18 @@ public class CharSupport {
 					startOff = 2;
 					endOff = cstr.length();
 				}
-				return parseHexValue(cstr, startOff, endOff);
+				value = parseHexValue(cstr, startOff, endOff);
+				if (value == -1)
+					return CharParseResult.ErrorResult;
+				return new CharParseResult(ErrorSeverity.INFO, value);
 			default:
 				if ( cstr.startsWith("\\u{") ) {
-					return parseHexValue(cstr, 3, cstr.indexOf('}'));
+					value = parseHexValue(cstr, 3, cstr.indexOf('}'));
+					if (value == -1)
+						return CharParseResult.ErrorResult;
+					return new CharParseResult(ErrorSeverity.INFO, value);
 				}
-				return -1;
+				return CharParseResult.ErrorResult;
 		}
 	}
 

@@ -12,6 +12,7 @@ import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.antlr.runtime.tree.Tree;
 import org.antlr.v4.analysis.LeftRecursiveRuleTransformer;
+import org.antlr.v4.misc.CharParseResult;
 import org.antlr.v4.misc.CharSupport;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.ATNBuilder;
@@ -60,6 +61,7 @@ import org.antlr.v4.tool.ast.GrammarASTWithOptions;
 import org.antlr.v4.tool.ast.PredAST;
 import org.antlr.v4.tool.ast.QuantifierAST;
 import org.antlr.v4.tool.ast.TerminalAST;
+import org.antlr.v4.tool.ErrorSeverity;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -244,7 +246,15 @@ public class ParserATNFactory implements ATNFactory {
 	protected int getTokenType(GrammarAST atom) {
 		int ttype;
 		if ( g.isLexer() ) {
-			ttype = CharSupport.getCharValueFromGrammarCharLiteral(atom.getText());
+			String atomText = atom.getText();
+			CharParseResult parseResult = CharSupport.getCharValueFromGrammarCharLiteral(atomText);
+			if (parseResult.errorSeverity == ErrorSeverity.ERROR) {
+				g.tool.errMgr.grammarError(ErrorType.INVALID_ESCAPE_SEQUENCE, g.fileName, atom.getToken());
+			}
+			else if (parseResult.errorSeverity == ErrorSeverity.WARNING) {
+				g.tool.errMgr.grammarError(ErrorType.USELESS_ESCAPE, g.fileName, atom.getToken(), atomText);
+			}
+			ttype = parseResult.intChar;
 		}
 		else {
 			ttype = g.getTokenType(atom.getText());

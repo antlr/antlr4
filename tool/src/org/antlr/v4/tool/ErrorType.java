@@ -1044,7 +1044,6 @@ public enum ErrorType {
 	 * TODO: Does not work with fragment rules.
 	 */
 	CHARACTERS_COLLISION_IN_SET(180, "chars \"<arg>\" used multiple times in set <arg2>", ErrorSeverity.WARNING),
-
 	/**
 	 * Compiler Warning 181
 	 *
@@ -1059,6 +1058,19 @@ public enum ErrorType {
 	 *
 	 */
 	TOKEN_RANGE_IN_PARSER(181, "token ranges not allowed in parser: <arg>..<arg2>", ErrorSeverity.ERROR),
+	/**
+	 * Compiler Warning 182
+	 *
+	 * <p>Use backslash for not escaping chars.
+	 * </p>
+	 *
+	 * <pre>
+	 * lexer grammar L;
+	 * A : [\[];
+	 * </pre>
+	 *
+	 */
+	USELESS_ESCAPE(182, "useless escape in string <arg>", ErrorSeverity.WARNING),
 
 	/*
 	 * Backward incompatibility errors

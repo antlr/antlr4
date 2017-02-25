@@ -244,7 +244,7 @@ public abstract class Target {
 						}
 						String fullEscape = is.substring(i, i + toAdvance);
 						appendUnicodeEscapedCodePoint(
-								CharSupport.getCharValueFromCharInGrammarLiteral(fullEscape),
+								CharSupport.getCharValueFromCharInGrammarLiteral(fullEscape).intChar,
 								sb);
 						break;
 					default:

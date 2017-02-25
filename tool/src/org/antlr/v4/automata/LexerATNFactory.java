@@ -9,6 +9,7 @@ package org.antlr.v4.automata;
 import org.antlr.runtime.CommonToken;
 import org.antlr.runtime.Token;
 import org.antlr.v4.codegen.CodeGenerator;
+import org.antlr.v4.misc.CharParseResult;
 import org.antlr.v4.misc.CharSupport;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.IntStream;
@@ -35,6 +36,7 @@ import org.antlr.v4.runtime.atn.TokensStartState;
 import org.antlr.v4.runtime.atn.Transition;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.IntervalSet;
+import org.antlr.v4.tool.ErrorSeverity;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.LexerGrammar;
 import org.antlr.v4.tool.Rule;
@@ -253,8 +255,8 @@ public class LexerATNFactory extends ParserATNFactory {
 	public Handle range(GrammarAST a, GrammarAST b) {
 		ATNState left = newState(a);
 		ATNState right = newState(b);
-		int t1 = CharSupport.getCharValueFromGrammarCharLiteral(a.getText());
-		int t2 = CharSupport.getCharValueFromGrammarCharLiteral(b.getText());
+		int t1 = CharSupport.getCharValueFromGrammarCharLiteral(a.getText()).intChar;
+		int t2 = CharSupport.getCharValueFromGrammarCharLiteral(b.getText()).intChar;
 		checkRange(a, b, t1, t2);
 		left.addTransition(CodePointTransitions.createWithCodePointRange(right, t1, t2));
 		a.atnState = left;
@@ -269,8 +271,8 @@ public class LexerATNFactory extends ParserATNFactory {
 		IntervalSet set = new IntervalSet();
 		for (GrammarAST t : alts) {
 			if ( t.getType()==ANTLRParser.RANGE ) {
-				int a = CharSupport.getCharValueFromGrammarCharLiteral(t.getChild(0).getText());
-				int b = CharSupport.getCharValueFromGrammarCharLiteral(t.getChild(1).getText());
+				int a = CharSupport.getCharValueFromGrammarCharLiteral(t.getChild(0).getText()).intChar;
+				int b = CharSupport.getCharValueFromGrammarCharLiteral(t.getChild(1).getText()).intChar;
 				if (checkRange((GrammarAST) t.getChild(0), (GrammarAST) t.getChild(1), a, b)) {
 					checkSetCollision(associatedAST, set, a, b);
 					set.add(a,b);
@@ -280,10 +282,15 @@ public class LexerATNFactory extends ParserATNFactory {
 				set.addAll(getSetFromCharSetLiteral(t));
 			}
 			else if ( t.getType()==ANTLRParser.STRING_LITERAL ) {
-				int c = CharSupport.getCharValueFromGrammarCharLiteral(t.getText());
-				if ( c != -1 ) {
+				CharParseResult parseResult = CharSupport.getCharValueFromGrammarCharLiteral(t.getText());
+				if ( parseResult.errorSeverity != ErrorSeverity.ERROR ) {
+					int c = parseResult.intChar;
 					checkSetCollision(associatedAST, set, c);
 					set.add(c);
+					if ( parseResult.errorSeverity == ErrorSeverity.WARNING ) {
+						g.tool.errMgr.grammarError(ErrorType.USELESS_ESCAPE,
+								g.fileName, t.getToken(), t.getText());
+					}
 				}
 				else {
 					g.tool.errMgr.grammarError(ErrorType.INVALID_LITERAL_IN_LEXER_SET,
@@ -344,13 +351,18 @@ public class LexerATNFactory extends ParserATNFactory {
 		String chars = stringLiteralAST.getText();
 		ATNState left = newState(stringLiteralAST);
 		ATNState right;
-		chars = CharSupport.getStringFromGrammarStringLiteral(chars);
-		if (chars == null) {
+		CharParseResult parseResult = CharSupport.getStringFromGrammarStringLiteral(chars);
+		if (parseResult.errorSeverity == ErrorSeverity.ERROR) {
 			g.tool.errMgr.grammarError(ErrorType.INVALID_ESCAPE_SEQUENCE,
 					g.fileName, stringLiteralAST.getToken());
 			return new Handle(left, left);
 		}
+		else if (parseResult.errorSeverity == ErrorSeverity.WARNING) {
+			g.tool.errMgr.grammarError(ErrorType.USELESS_ESCAPE,
+					g.fileName, stringLiteralAST.getToken(), chars);
+		}
 
+		chars = parseResult.stringChar;
 		int n = chars.length();
 		ATNState prev = left;
 		right = null;
@@ -389,12 +401,18 @@ public class LexerATNFactory extends ParserATNFactory {
 		}
 		// unescape all valid escape char like \n, leaving escaped dashes as '\-'
 		// so we can avoid seeing them as '-' range ops.
-		chars = CharSupport.getStringFromGrammarStringLiteral(cset);
-		if (chars == null) {
+		CharParseResult parseResult = CharSupport.getStringFromGrammarStringLiteral(cset);
+		if (parseResult.errorSeverity == ErrorSeverity.ERROR) {
 			g.tool.errMgr.grammarError(ErrorType.INVALID_ESCAPE_SEQUENCE,
-			                           g.fileName, charSetAST.getToken());
+					g.fileName, charSetAST.getToken());
 			return set;
 		}
+		else if (parseResult.errorSeverity == ErrorSeverity.WARNING) {
+			g.tool.errMgr.grammarError(ErrorType.USELESS_ESCAPE,
+					g.fileName, charSetAST.getToken(), cset);
+		}
+
+		chars = parseResult.stringChar;
 		int n = chars.length();
 		// now make x-y become set of char
 		for (int i = 0; i < n; ) {
