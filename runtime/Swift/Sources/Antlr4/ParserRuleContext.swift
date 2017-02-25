@@ -72,6 +72,14 @@ open class ParserRuleContext: RuleContext {
 
     /** COPY a ctx (I'm deliberately not using copy constructor) to avoid
      *  confusion with creating node with parent. Does not copy children.
+     *
+     *  This is used in the generated parser code to flip a generic XContext
+     *  node for rule X to a YContext for alt label Y. In that sense, it is
+     *  not really a generic copy function.
+     *
+     *  If we do an error sync() at start of a rule, we might add error nodes
+     *  to the generic XContext so this function must copy those nodes to
+     *  the YContext as well else they are lost!
      */
     open func copyFrom(_ ctx: ParserRuleContext) {
         self.parent = ctx.parent
@@ -81,13 +89,12 @@ open class ParserRuleContext: RuleContext {
         self.stop = ctx.stop
         
         // copy any error nodes to alt label node
-        if  ctx.children != nil{
+        if  ctx.children != nil {
             self.children = Array<ParseTree>()
             // reset parent pointer for any error nodes
-            for  child: ParseTree in ctx.children!  {
-                if  child is ErrorNode{
-                    self.children?.append(child)
-                    ( (child as! ErrorNode)).parent = self
+            for  child: ParseTree in ctx.children! {
+                if  child is ErrorNode {
+                    addChild(child as! ErrorNode)
                 }
             }
         }
@@ -130,14 +137,20 @@ open class ParserRuleContext: RuleContext {
         return addAnyChild(ruleInvocation)
     }
     
+    /** Add a token leaf node child and force its parent to be this node. */
     @discardableResult
     open func addChild(_ t: TerminalNode) -> TerminalNode {
+        t.setParent(self)
         return addAnyChild(t)
     }
     
-    /** Add an error node child. @since 4.6.1 */
+    /** Add an error node child and force its parent to be this node.
+     *
+     *  @since 4.6.1 
+     */
     @discardableResult
     open func addErrorNode(_ errorNode: ErrorNode) -> ErrorNode {
+        errorNode.setParent(self)
         return addAnyChild(errorNode)
     }
 
@@ -150,7 +163,7 @@ open class ParserRuleContext: RuleContext {
     open func addChild(_ matchedToken: Token) -> TerminalNode {
         let t: TerminalNodeImpl = TerminalNodeImpl(matchedToken)
         addAnyChild(t)
-        t.parent = self
+        t.setParent(self)
         return t
     }
     
@@ -164,7 +177,7 @@ open class ParserRuleContext: RuleContext {
     open func addErrorNode(_ badToken: Token) -> ErrorNode {
         let t: ErrorNode = ErrorNode(badToken)
         addAnyChild(t)
-        t.parent = self
+        t.setParent(self)
         return t
     }
     

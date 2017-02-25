@@ -595,35 +595,21 @@ open class Parser: Recognizer<ParserATNSimulator> {
     }
     
     /** How to create a token leaf node associated with a parent.
-     *  Typically, the terminal node to create is not a function of the parent
-     *  but this method must still set the parent pointer of the terminal node
-     *  returned. I would prefer having {@link ParserRuleContext#addAnyChild(ParseTree)}
-     *  set the parent pointer, but the parent pointer is implementation dependent
-     *  and currently there is no setParent() in {@link TerminalNode} (and can't
-     *  add method in Java 1.7 without breaking backward compatibility).
+     *  Typically, the terminal node to create is not a function of the parent.
      *
      *  @since 4.6.1
      */
     public func createTerminalNode(parent: ParserRuleContext, t: Token) -> TerminalNode {
-     	let node = TerminalNodeImpl(t);
-     	node.parent = parent;
-     	return node;
+     	return TerminalNodeImpl(t);
     }
     
     /** How to create an error node, given a token, associated with a parent.
-     *  Typically, the error node to create is not a function of the parent
-     *  but this method must still set the parent pointer of the terminal node
-     *  returned. I would prefer having {@link ParserRuleContext#addAnyChild(ParseTree)}
-     *  set the parent pointer, but the parent pointer is implementation dependent
-     *  and currently there is no setParent() in {@link ErrorNode} (and can't
-     *  add method in Java 1.7 without breaking backward compatibility).
+     *  Typically, the error node to create is not a function of the parent.
      *
      *  @since 4.6.1
      */
     public func createErrorNode(parent: ParserRuleContext, t: Token) -> ErrorNode {
-    	let node = ErrorNode(t);
-    	node.parent = parent;
-    	return node;
+    	return ErrorNode(t);
     }
 
     internal func addContextToParseTree() {
