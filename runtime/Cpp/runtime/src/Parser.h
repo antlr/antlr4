@@ -385,7 +385,7 @@ namespace antlr4 {
      *  and currently there is no setParent() in {@link TerminalNode} (and can't
      *  add method in Java 1.7 without breaking backward compatibility).
      *
-     * @since 4.6.1
+     * @since 4.7
      */
     tree::TerminalNode *createTerminalNode(Token *t);
 
@@ -397,7 +397,7 @@ namespace antlr4 {
        *  and currently there is no setParent() in {@link ErrorNode} (and can't
        *  add method in Java 1.7 without breaking backward compatibility).
        *
-       * @since 4.6.1
+       * @since 4.7
        */
     tree::ErrorNode *createErrorNode(Token *t);
 
