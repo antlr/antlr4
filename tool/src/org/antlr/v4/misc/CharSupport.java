@@ -14,11 +14,11 @@ public class CharSupport {
 	/** When converting ANTLR char and string literals, here is the
 	 *  value set of escape chars.
 	 */
-	public static int ANTLRLiteralEscapedCharValue[] = new int[255];
+	public static int ANTLRCommonLiteralEscapedCharValue[] = new int[255];
 
 	/** Given a char, we need to be able to show as an ANTLR literal.
 	 */
-	public static String ANTLRLiteralCharValueEscape[] = new String[255];
+	public static String ANTLRCommonLiteralCharValueEscape[] = new String[255];
 
 	public enum ToRangeMode {
 		BRACKETED,
@@ -26,23 +26,18 @@ public class CharSupport {
 	};
 
 	static {
-		ANTLRLiteralEscapedCharValue['n'] = '\n';
-		ANTLRLiteralEscapedCharValue['r'] = '\r';
-		ANTLRLiteralEscapedCharValue['t'] = '\t';
-		ANTLRLiteralEscapedCharValue['b'] = '\b';
-		ANTLRLiteralEscapedCharValue['f'] = '\f';
-		ANTLRLiteralEscapedCharValue['\\'] = '\\';
-		ANTLRLiteralEscapedCharValue['\''] = '\'';
-		ANTLRLiteralEscapedCharValue['"'] = '"';
-		ANTLRLiteralEscapedCharValue['-'] = '-';
-		ANTLRLiteralEscapedCharValue[']'] = ']';
-		ANTLRLiteralCharValueEscape['\n'] = "\\n";
-		ANTLRLiteralCharValueEscape['\r'] = "\\r";
-		ANTLRLiteralCharValueEscape['\t'] = "\\t";
-		ANTLRLiteralCharValueEscape['\b'] = "\\b";
-		ANTLRLiteralCharValueEscape['\f'] = "\\f";
-		ANTLRLiteralCharValueEscape['\\'] = "\\\\";
-		ANTLRLiteralCharValueEscape['\''] = "\\'";
+		ANTLRCommonLiteralEscapedCharValue['n'] = '\n';
+		ANTLRCommonLiteralEscapedCharValue['r'] = '\r';
+		ANTLRCommonLiteralEscapedCharValue['t'] = '\t';
+		ANTLRCommonLiteralEscapedCharValue['b'] = '\b';
+		ANTLRCommonLiteralEscapedCharValue['f'] = '\f';
+		ANTLRCommonLiteralEscapedCharValue['\\'] = '\\';
+		ANTLRCommonLiteralCharValueEscape['\n'] = "\\n";
+		ANTLRCommonLiteralCharValueEscape['\r'] = "\\r";
+		ANTLRCommonLiteralCharValueEscape['\t'] = "\\t";
+		ANTLRCommonLiteralCharValueEscape['\b'] = "\\b";
+		ANTLRCommonLiteralCharValueEscape['\f'] = "\\f";
+		ANTLRCommonLiteralCharValueEscape['\\'] = "\\\\";
 	}
 
 	/** Return a string representing the escaped char for code c.  E.g., If c
@@ -54,8 +49,8 @@ public class CharSupport {
 		if ( c< Lexer.MIN_CHAR_VALUE ) {
 			return "'<INVALID>'";
 		}
-		if ( c<ANTLRLiteralCharValueEscape.length && ANTLRLiteralCharValueEscape[c]!=null ) {
-			return '\''+ANTLRLiteralCharValueEscape[c]+'\'';
+		if ( c< ANTLRCommonLiteralCharValueEscape.length && ANTLRCommonLiteralCharValueEscape[c]!=null ) {
+			return '\''+ ANTLRCommonLiteralCharValueEscape[c]+'\'';
 		}
 		if ( Character.UnicodeBlock.of((char)c)==Character.UnicodeBlock.BASIC_LATIN &&
 			 !Character.isISOControl((char)c) ) {
@@ -80,10 +75,10 @@ public class CharSupport {
 	 */
 	public static CharParseResult getCharValueFromGrammarCharLiteral(String literal) {
 		if ( literal==null || literal.length()<3 ) return CharParseResult.ErrorResult;
-		return getCharValueFromCharInGrammarLiteral(literal.substring(1,literal.length()-1));
+		return getCharValueFromCharInGrammarLiteral(literal.substring(1,literal.length()-1), false);
 	}
 
-	public static CharParseResult getStringFromGrammarStringLiteral(String literal) {
+	public static CharParseResult getStringFromGrammarStringLiteral(String literal, boolean charset) {
 		ErrorSeverity resultSeverity = ErrorSeverity.INFO;
 		StringBuilder buf = new StringBuilder();
 		int i = 1; // skip first quote
@@ -118,15 +113,43 @@ public class CharSupport {
 			}
 			if ( end>n ) return null; // invalid escape sequence.
 			String esc = literal.substring(i, end);
-			CharParseResult parseResult = getCharValueFromCharInGrammarLiteral(esc);
-			if (parseResult.errorSeverity == ErrorSeverity.ERROR) {
-				return parseResult; // invalid escape sequence.
-			}
-			else if (parseResult.errorSeverity == ErrorSeverity.WARNING) {
-				resultSeverity = ErrorSeverity.WARNING;
+			CharParseResult parseResult;
+			if (esc.charAt(0) == '\\' && esc.length() == 2) {
+				if (charset) {
+					if (esc.charAt(1) == '-') {
+						parseResult = new CharParseResult(ErrorSeverity.INFO, "\\-");
+					}
+					else if (esc.charAt(1) == ']') {
+						parseResult = new CharParseResult(ErrorSeverity.INFO, ']');
+					}
+					else {
+						parseResult = getCharValueFromCharInGrammarLiteral(esc, charset);
+					}
+				}
+				else {
+					if (esc.charAt(1) == '\'') {
+						parseResult = new CharParseResult(ErrorSeverity.INFO, '\'');
+					}
+					else {
+						parseResult = getCharValueFromCharInGrammarLiteral(esc, charset);
+					}
+				}
 			}
 			else {
-				buf.appendCodePoint(parseResult.intChar);
+				parseResult = getCharValueFromCharInGrammarLiteral(esc, charset);
+			}
+			if (parseResult.errorSeverity == ErrorSeverity.ERROR) {
+				return parseResult; // invalid escape sequence.
+			} else {
+				if (parseResult.errorSeverity == ErrorSeverity.WARNING) {
+					resultSeverity = ErrorSeverity.WARNING;
+				}
+				if (parseResult.intChar != -1) {
+					buf.appendCodePoint(parseResult.intChar);
+				}
+				else {
+					buf.append(parseResult.stringChar);
+				}
 			}
 			i = end;
 		}
@@ -136,7 +159,7 @@ public class CharSupport {
 	/** Given char x or \\t or \\u1234 return the char value;
 	 *  Unnecessary escapes like '\{' yield -1.
 	 */
-	public static CharParseResult getCharValueFromCharInGrammarLiteral(String cstr) {
+	public static CharParseResult getCharValueFromCharInGrammarLiteral(String cstr, boolean charset) {
 		int value;
 		switch ( cstr.length() ) {
 			case 1:
@@ -145,9 +168,11 @@ public class CharSupport {
 			case 2:
 				if ( cstr.charAt(0)!='\\' ) return CharParseResult.ErrorResult;
 				// '\x'  (antlr lexer will catch invalid char)
-				int charVal = ANTLRLiteralEscapedCharValue[cstr.charAt(1)];
-				if (charVal==0)
-					return new CharParseResult(ErrorSeverity.WARNING, cstr.charAt(1));
+				char firstChar = cstr.charAt(1);
+				int charVal = ANTLRCommonLiteralEscapedCharValue[firstChar];
+				if (charVal==0) {
+					return new CharParseResult(ErrorSeverity.WARNING, firstChar);
+				}
 				return new CharParseResult(ErrorSeverity.INFO, charVal);
 			case 6:
 				// '\\u1234' or '\\u{12}'

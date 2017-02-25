@@ -43,7 +43,7 @@ public abstract class GrammarASTWithOptions extends GrammarAST {
 		else {
 			String v = value.getText();
 			if ( v.startsWith("'") || v.startsWith("\"") ) {
-				CharParseResult parseResult = CharSupport.getStringFromGrammarStringLiteral(v);
+				CharParseResult parseResult = CharSupport.getStringFromGrammarStringLiteral(v, false);
 				if (parseResult.errorSeverity == ErrorSeverity.ERROR) {
 					g.tool.errMgr.grammarError(ErrorType.INVALID_ESCAPE_SEQUENCE, g.fileName, value.getToken());
 					v = "";

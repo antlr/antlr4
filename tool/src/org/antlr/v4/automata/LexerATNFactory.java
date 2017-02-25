@@ -351,7 +351,7 @@ public class LexerATNFactory extends ParserATNFactory {
 		String chars = stringLiteralAST.getText();
 		ATNState left = newState(stringLiteralAST);
 		ATNState right;
-		CharParseResult parseResult = CharSupport.getStringFromGrammarStringLiteral(chars);
+		CharParseResult parseResult = CharSupport.getStringFromGrammarStringLiteral(chars, false);
 		if (parseResult.errorSeverity == ErrorSeverity.ERROR) {
 			g.tool.errMgr.grammarError(ErrorType.INVALID_ESCAPE_SEQUENCE,
 					g.fileName, stringLiteralAST.getToken());
@@ -401,7 +401,7 @@ public class LexerATNFactory extends ParserATNFactory {
 		}
 		// unescape all valid escape char like \n, leaving escaped dashes as '\-'
 		// so we can avoid seeing them as '-' range ops.
-		CharParseResult parseResult = CharSupport.getStringFromGrammarStringLiteral(cset);
+		CharParseResult parseResult = CharSupport.getStringFromGrammarStringLiteral(cset, true);
 		if (parseResult.errorSeverity == ErrorSeverity.ERROR) {
 			g.tool.errMgr.grammarError(ErrorType.INVALID_ESCAPE_SEQUENCE,
 					g.fileName, charSetAST.getToken());
