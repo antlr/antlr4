@@ -85,6 +85,7 @@
     <module>runtime-testsuite/annotations</module>
     <module>runtime-testsuite/processors</module>
     <module>runtime-testsuite</module>
+    <module>antlr4test-maven-plugin</module>
   </modules>
 
   <properties>
