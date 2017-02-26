@@ -448,7 +448,7 @@ public class LexerATNFactory extends ParserATNFactory {
 	protected void checkSetCollision(GrammarAST ast, IntervalSet set, int el) {
 		if (set.contains(el)) {
 			g.tool.errMgr.grammarError(ErrorType.CHARACTERS_COLLISION_IN_SET, g.fileName, ast.getToken(),
-					el, ast.getText());
+					String.valueOf(Character.toChars(el)), ast.getText());
 		}
 	}
 
