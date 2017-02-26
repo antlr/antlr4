@@ -203,12 +203,12 @@ void TokenStreamRewriter::Delete(Token *from, Token *to) {
 }
 
 void TokenStreamRewriter::Delete(const std::string &programName, size_t from, size_t to) {
-  std::String nullString;
+  std::string nullString;
   replace(programName, from, to, nullString);
 }
 
 void TokenStreamRewriter::Delete(const std::string &programName, Token *from, Token *to) {
-  std::String nullString;
+  std::string nullString;
   replace(programName, from, to, nullString);
 }
 
