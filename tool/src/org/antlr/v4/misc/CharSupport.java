@@ -113,29 +113,15 @@ public class CharSupport {
 			}
 			if ( end>n ) return null; // invalid escape sequence.
 			String esc = literal.substring(i, end);
-			CharParseResult parseResult;
-			if (esc.charAt(0) == '\\' && esc.length() == 2) {
-				if (charset) {
-					if (esc.charAt(1) == '-') {
-						parseResult = new CharParseResult(ErrorSeverity.INFO, "\\-");
-					}
-					else if (esc.charAt(1) == ']') {
-						parseResult = new CharParseResult(ErrorSeverity.INFO, ']');
-					}
-					else {
-						parseResult = getCharValueFromCharInGrammarLiteral(esc, charset);
-					}
-				}
-				else {
-					if (esc.charAt(1) == '\'') {
-						parseResult = new CharParseResult(ErrorSeverity.INFO, '\'');
-					}
-					else {
-						parseResult = getCharValueFromCharInGrammarLiteral(esc, charset);
-					}
+			CharParseResult parseResult = null;
+			if (charset && esc.charAt(0) == '\\' && esc.length() == 2) {
+				if (esc.charAt(1) == '-') {
+					parseResult = new CharParseResult(ErrorSeverity.INFO, "\\-");
+				} else if (esc.charAt(1) == ']') {
+					parseResult = new CharParseResult(ErrorSeverity.INFO, ']');
 				}
 			}
-			else {
+			if (parseResult == null) {
 				parseResult = getCharValueFromCharInGrammarLiteral(esc, charset);
 			}
 			if (parseResult.errorSeverity == ErrorSeverity.ERROR) {
@@ -170,7 +156,7 @@ public class CharSupport {
 				// '\x'  (antlr lexer will catch invalid char)
 				char firstChar = cstr.charAt(1);
 				int charVal = ANTLRCommonLiteralEscapedCharValue[firstChar];
-				if (charVal==0) {
+				if (charVal==0 && (charset || firstChar != '\'')) {
 					return new CharParseResult(ErrorSeverity.WARNING, firstChar);
 				}
 				return new CharParseResult(ErrorSeverity.INFO, charVal);

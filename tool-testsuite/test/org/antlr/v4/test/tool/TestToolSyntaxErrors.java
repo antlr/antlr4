@@ -510,7 +510,8 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 				"INVALID_CHAR_SET:      [f-az][];\n" +
 				"INVALID_CHAR_SET_2:    [\\u24\\uA2][\\u24];\n" +  //https://github.com/antlr/antlr4/issues/1077
 				"USELESS_ESCAPE_IN_CHAR_SET:    [\\[\\t];\n" +     //https://github.com/antlr/antlr4/issues/1537
-				"ESCAPE_IN_CHAR_SET:            [\\]`\\-=];";
+				"ESCAPE_IN_CHAR_SET:            [\\]`\\-=];\n" +
+				"ESCAPE_IN_STRING_LITERAL:      '\\'' ~'\\'' '\\'';";
 
 		String expected =
 				"error(" + ErrorType.INVALID_LITERAL_IN_LEXER_SET.code + "): Test.g4:2:23: multi-character literals are not allowed in lexer sets: 'GH'\n" +
