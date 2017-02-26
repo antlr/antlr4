@@ -100,7 +100,8 @@ public class CharSupport {
 								return CharParseResult.ErrorResult; // invalid escape sequence.
 							}
 						}
-					} else {
+					}
+					else {
 						for (end = i + 2; end < i + 6; end++) {
 							if ( end>n ) return null; // invalid escape sequence.
 							char charAt = literal.charAt(end);
@@ -113,20 +114,11 @@ public class CharSupport {
 			}
 			if ( end>n ) return null; // invalid escape sequence.
 			String esc = literal.substring(i, end);
-			CharParseResult parseResult = null;
-			if (charset && esc.charAt(0) == '\\' && esc.length() == 2) {
-				if (esc.charAt(1) == '-') {
-					parseResult = new CharParseResult(ErrorSeverity.INFO, "\\-");
-				} else if (esc.charAt(1) == ']') {
-					parseResult = new CharParseResult(ErrorSeverity.INFO, ']');
-				}
-			}
-			if (parseResult == null) {
-				parseResult = getCharValueFromCharInGrammarLiteral(esc, charset);
-			}
+			CharParseResult parseResult = getCharValueFromCharInGrammarLiteral(esc, charset);
 			if (parseResult.errorSeverity == ErrorSeverity.ERROR) {
 				return parseResult; // invalid escape sequence.
-			} else {
+			}
+			else {
 				if (parseResult.errorSeverity == ErrorSeverity.WARNING) {
 					resultSeverity = ErrorSeverity.WARNING;
 				}
@@ -147,25 +139,37 @@ public class CharSupport {
 	 */
 	public static CharParseResult getCharValueFromCharInGrammarLiteral(String cstr, boolean charset) {
 		int value;
-		switch ( cstr.length() ) {
+		switch (cstr.length()) {
 			case 1:
 				// 'x'
 				return new CharParseResult(cstr.charAt(0)); // no escape char
 			case 2:
-				if ( cstr.charAt(0)!='\\' ) return CharParseResult.ErrorResult;
+				if (cstr.charAt(0) != '\\') return CharParseResult.ErrorResult;
 				// '\x'  (antlr lexer will catch invalid char)
 				char firstChar = cstr.charAt(1);
 				int charVal = ANTLRCommonLiteralEscapedCharValue[firstChar];
-				if (charVal==0 && (charset || firstChar != '\'')) {
-					return new CharParseResult(ErrorSeverity.WARNING, firstChar);
+				if (charVal != 0) {
+					return new CharParseResult(ErrorSeverity.INFO, charVal);
 				}
-				return new CharParseResult(ErrorSeverity.INFO, charVal);
+				// Check for different escape chars for string literals ('\'') and char sets ('-', ']')
+				if (charset) {
+					if (firstChar == '-') {
+						return new CharParseResult(ErrorSeverity.INFO, "\\-");
+					}
+					else if (firstChar == ']') {
+						return new CharParseResult(ErrorSeverity.INFO, ']');
+					}
+				}
+				else if (firstChar == '\'') {
+					return new CharParseResult(ErrorSeverity.INFO, '\'');
+				}
+				return new CharParseResult(ErrorSeverity.WARNING, firstChar);
 			case 6:
 				// '\\u1234' or '\\u{12}'
-				if ( !cstr.startsWith("\\u") ) return CharParseResult.ErrorResult;
+				if (!cstr.startsWith("\\u")) return CharParseResult.ErrorResult;
 				int startOff;
 				int endOff;
-				if ( cstr.charAt(2) == '{' ) {
+				if (cstr.charAt(2) == '{') {
 					startOff = 3;
 					endOff = cstr.indexOf('}');
 				} else {
@@ -177,7 +181,7 @@ public class CharSupport {
 					return CharParseResult.ErrorResult;
 				return new CharParseResult(ErrorSeverity.INFO, value);
 			default:
-				if ( cstr.startsWith("\\u{") ) {
+				if (cstr.startsWith("\\u{")) {
 					value = parseHexValue(cstr, 3, cstr.indexOf('}'));
 					if (value == -1)
 						return CharParseResult.ErrorResult;
@@ -192,13 +196,13 @@ public class CharSupport {
 			return -1;
 		}
 		String unicodeChars = cstr.substring(startOff, endOff);
-				int result = -1;
-				try {
-					result = Integer.parseInt(unicodeChars, 16);
-				}
-				catch (NumberFormatException e) {
-				}
-				return result;
+		int result = -1;
+		try {
+			result = Integer.parseInt(unicodeChars, 16);
+		}
+		catch (NumberFormatException e) {
+		}
+		return result;
 	}
 
 	public static String capitalize(String s) {
