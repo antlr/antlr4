@@ -28,7 +28,7 @@ namespace antlr4 {
      * line <em>line</em>:<em>charPositionInLine</em> <em>msg</em>
      * </pre>
      */
-    virtual void syntaxError(IRecognizer *recognizer, Token * offendingSymbol, size_t line, size_t charPositionInLine,
+    virtual void syntaxError(Recognizer *recognizer, Token * offendingSymbol, size_t line, size_t charPositionInLine,
                              const std::string &msg, std::exception_ptr e) override;
   };
 
