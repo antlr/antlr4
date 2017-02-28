@@ -192,23 +192,23 @@ atn::ATN <lexer.name>::_atn;
 std::vector\<uint16_t> <lexer.name>::_serializedATN;
 
 std::vector\<std::string> <lexer.name>::_ruleNames = {
-  <lexer.ruleNames: {r | "<r>"}; separator = ", ", wrap, anchor>
+  <lexer.ruleNames: {r | u8"<r>"}; separator = ", ", wrap, anchor>
 };
 
 std::vector\<std::string> <lexer.name>::_channelNames = {
-  "DEFAULT_TOKEN_CHANNEL", "HIDDEN"<if (lexer.channels)>, <lexer.channels: {c | "<c>"}; separator = ", ", wrap, anchor><endif>
+  "DEFAULT_TOKEN_CHANNEL", "HIDDEN"<if (lexer.channels)>, <lexer.channels: {c | u8"<c>"}; separator = ", ", wrap, anchor><endif>
 };
 
 std::vector\<std::string> <lexer.name>::_modeNames = {
-  <lexer.modes: {m | "<m>"}; separator = ", ", wrap, anchor>
+  <lexer.modes: {m | u8"<m>"}; separator = ", ", wrap, anchor>
 };
 
 std::vector\<std::string> <lexer.name>::_literalNames = {
-  <lexer.literalNames: {t | <t>}; null = "\"\"", separator = ", ", wrap, anchor>
+  <lexer.literalNames: {t | u8<t>}; null = "\"\"", separator = ", ", wrap, anchor>
 };
 
 std::vector\<std::string> <lexer.name>::_symbolicNames = {
-  <lexer.symbolicNames: {t | <t>}; null = "\"\"", separator = ", ", wrap, anchor>
+  <lexer.symbolicNames: {t | u8<t>}; null = "\"\"", separator = ", ", wrap, anchor>
 };
 
 dfa::Vocabulary <lexer.name>::_vocabulary(_literalNames, _symbolicNames);

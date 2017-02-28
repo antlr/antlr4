@@ -62,7 +62,7 @@ open class SwiftTestLexer: Lexer {
     }
 
 	public override init(_ input: CharStream) {
-	    RuntimeMetaData.checkVersion("4.6.1", RuntimeMetaData.VERSION)
+	    RuntimeMetaData.checkVersion("4.7", RuntimeMetaData.VERSION)
 		super.init(input)
 		_interp = LexerATNSimulator(self, SwiftTestLexer._ATN, SwiftTestLexer._decisionToDFA, SwiftTestLexer._sharedContextCache)
 	}

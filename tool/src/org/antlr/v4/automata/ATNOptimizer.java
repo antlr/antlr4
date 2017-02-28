@@ -10,6 +10,7 @@ import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.atn.AtomTransition;
 import org.antlr.v4.runtime.atn.BlockEndState;
+import org.antlr.v4.runtime.atn.CodePointTransitions;
 import org.antlr.v4.runtime.atn.DecisionState;
 import org.antlr.v4.runtime.atn.EpsilonTransition;
 import org.antlr.v4.runtime.atn.NotSetTransition;
@@ -116,11 +117,11 @@ public class ATNOptimizer {
 				Transition newTransition;
 				if (matchSet.getIntervals().size() == 1) {
 					if (matchSet.size() == 1) {
-						newTransition = new AtomTransition(blockEndState, matchSet.getMinElement());
+						newTransition = CodePointTransitions.createWithCodePoint(blockEndState, matchSet.getMinElement());
 					}
 					else {
 						Interval matchInterval = matchSet.getIntervals().get(0);
-						newTransition = new RangeTransition(blockEndState, matchInterval.a, matchInterval.b);
+						newTransition = CodePointTransitions.createWithCodePointRange(blockEndState, matchInterval.a, matchInterval.b);
 					}
 				}
 				else {

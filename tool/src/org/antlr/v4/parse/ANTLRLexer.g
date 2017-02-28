@@ -615,8 +615,8 @@ SRC : 'src' WSCHARS+ file=ACTION_STRING_LITERAL WSCHARS+ line=INT
 //
 // ANTLR makes no disticintion between a single character literal and a
 // multi-character string. All literals are single quote delimited and
-// may contain unicode escape sequences of the form \uxxxx, where x
-// is a valid hexadecimal number (as per Java basically).
+// may contain unicode escape sequences of the form \uxxxx or \u{xxxxxx},
+// where x is a valid hexadecimal number.
 STRING_LITERAL
     :  '\'' ( ( ESC_SEQ | ~('\\'|'\''|'\r'|'\n') ) )*
        (    '\''
@@ -651,6 +651,10 @@ ESC_SEQ
     	    | // A Java style Unicode escape sequence
     	      //
     	      UNICODE_ESC
+
+            | // A Swift/Hack style Unicode escape sequence
+              //
+              UNICODE_EXTENDED_ESC
 
     	    | // An illegal escape seqeunce
     	      //
@@ -718,6 +722,27 @@ UNICODE_ESC
                 grammarError(ErrorType.INVALID_ESCAPE_SEQUENCE, t);
     		}
     	}
+    ;
+
+fragment
+UNICODE_EXTENDED_ESC
+    :   'u{' // Leadin for unicode extended escape sequence
+
+        HEX_DIGIT+ // One or more hexadecimal digits
+
+        '}' // Leadout for unicode extended escape sequence
+
+        // Now check the digit count and issue an error if we need to
+        {
+            int numDigits = getCharIndex()-state.tokenStartCharIndex-6;
+            if (numDigits > 6) {
+                Token t = new CommonToken(input, state.type, state.channel, state.tokenStartCharIndex, getCharIndex()-1);
+                t.setText(t.getText());
+                t.setLine(input.getLine());
+                t.setCharPositionInLine(input.getCharPositionInLine()-numDigits);
+                grammarError(ErrorType.INVALID_ESCAPE_SEQUENCE, t);
+            }
+        }
     ;
 
 // ----------
