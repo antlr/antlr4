@@ -121,7 +121,7 @@ open class ParserRuleContext: RuleContext {
      *  because the existing interfaces do not have a setParent()
      *  method and I don't want to break backward compatibility for this.
      *
-     *  @since 4.6.1
+     *  @since 4.7
      */
     @discardableResult
     open func addAnyChild<T: ParseTree>(_ t: T) -> T {
@@ -146,7 +146,7 @@ open class ParserRuleContext: RuleContext {
     
     /** Add an error node child and force its parent to be this node.
      *
-     *  @since 4.6.1 
+     *  @since 4.7 
      */
     @discardableResult
     open func addErrorNode(_ errorNode: ErrorNode) -> ErrorNode {

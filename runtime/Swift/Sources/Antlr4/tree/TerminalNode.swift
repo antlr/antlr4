@@ -17,7 +17,7 @@ public class TerminalNode: ParseTree {
      *  TerminalNodes anyway so I'm adding as it improves internal
      *  code quality.
      *
-     *  @since 4.6.1
+     *  @since 4.7
      */
     public func setParent(_ parent: RuleContext) {
         RuntimeException(" must overriden !")
