@@ -517,9 +517,9 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 				"error(" + ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED.code + "): Test.g4:3:26: string literals and sets cannot be empty: 'F'..'A'\n" +
 				"error(" + ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED.code + "): Test.g4:5:23: string literals and sets cannot be empty: [f-a]\n" +
 				"error(" + ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED.code + "): Test.g4:5:29: string literals and sets cannot be empty: []\n" +
-				"error(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:6:23: invalid escape sequence\n" +
-				"error(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:6:33: invalid escape sequence\n" +
-				"error(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:7:23: invalid escape sequence\n";
+				"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:6:23: invalid escape sequence\n" +
+				"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:6:33: invalid escape sequence\n" +
+				"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:7:23: invalid escape sequence\n";
 
 		String[] pair = new String[] {
 				grammar,
