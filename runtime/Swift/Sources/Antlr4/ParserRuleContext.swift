@@ -72,6 +72,14 @@ open class ParserRuleContext: RuleContext {
 
     /** COPY a ctx (I'm deliberately not using copy constructor) to avoid
      *  confusion with creating node with parent. Does not copy children.
+     *
+     *  This is used in the generated parser code to flip a generic XContext
+     *  node for rule X to a YContext for alt label Y. In that sense, it is
+     *  not really a generic copy function.
+     *
+     *  If we do an error sync() at start of a rule, we might add error nodes
+     *  to the generic XContext so this function must copy those nodes to
+     *  the YContext as well else they are lost!
      */
     open func copyFrom(_ ctx: ParserRuleContext) {
         self.parent = ctx.parent
@@ -81,13 +89,12 @@ open class ParserRuleContext: RuleContext {
         self.stop = ctx.stop
         
         // copy any error nodes to alt label node
-        if  ctx.children != nil{
+        if  ctx.children != nil {
             self.children = Array<ParseTree>()
             // reset parent pointer for any error nodes
-            for  child: ParseTree in ctx.children!  {
-                if  child is ErrorNode{
-                    self.children?.append(child)
-                    ( (child as! ErrorNode)).parent = self
+            for  child: ParseTree in ctx.children! {
+                if  child is ErrorNode {
+                    addChild(child as! ErrorNode)
                 }
             }
         }
@@ -105,51 +112,90 @@ open class ParserRuleContext: RuleContext {
     open func exitRule(_ listener: ParseTreeListener) {
     }
 
-    /** Does not set parent link; other add methods do that */
+    /** Add a parse tree node to this as a child.  Works for
+     *  internal and leaf nodes. Does not set parent link;
+     *  other add methods must do that. Other addChild methods
+     *  call this.
+     *
+     *  We cannot set the parent pointer of the incoming node
+     *  because the existing interfaces do not have a setParent()
+     *  method and I don't want to break backward compatibility for this.
+     *
+     *  @since 4.6.1
+     */
     @discardableResult
-    open func addChild(_ t: TerminalNode) -> TerminalNode {
+    open func addAnyChild<T: ParseTree>(_ t: T) -> T {
         if children == nil {
-            children = Array<ParseTree>()
+            children = [T]()
         }
         children!.append(t)
         return t
     }
+    
     @discardableResult
     open func addChild(_ ruleInvocation: RuleContext) -> RuleContext {
-        if children == nil {
-            children = Array<ParseTree>()
-        }
-        children!.append(ruleInvocation)
-        return ruleInvocation
+        return addAnyChild(ruleInvocation)
+    }
+    
+    /** Add a token leaf node child and force its parent to be this node. */
+    @discardableResult
+    open func addChild(_ t: TerminalNode) -> TerminalNode {
+        t.setParent(self)
+        return addAnyChild(t)
+    }
+    
+    /** Add an error node child and force its parent to be this node.
+     *
+     *  @since 4.6.1 
+     */
+    @discardableResult
+    open func addErrorNode(_ errorNode: ErrorNode) -> ErrorNode {
+        errorNode.setParent(self)
+        return addAnyChild(errorNode)
     }
 
+    /** Add a child to this node based upon matchedToken. It
+     *  creates a TerminalNodeImpl rather than using
+     *  {@link Parser#createTerminalNode(ParserRuleContext, Token)}. I'm leaving this
+     *  in for compatibility but the parser doesn't use this anymore.
+     */
+    @available(*, deprecated)
+    open func addChild(_ matchedToken: Token) -> TerminalNode {
+        let t: TerminalNodeImpl = TerminalNodeImpl(matchedToken)
+        addAnyChild(t)
+        t.setParent(self)
+        return t
+    }
+    
+    /** Add a child to this node based upon badToken.  It
+     *  creates a ErrorNodeImpl rather than using
+     *  {@link Parser#createErrorNode(ParserRuleContext, Token)}. I'm leaving this
+     *  in for compatibility but the parser doesn't use this anymore.
+     */
+    @discardableResult
+    @available(*, deprecated)
+    open func addErrorNode(_ badToken: Token) -> ErrorNode {
+        let t: ErrorNode = ErrorNode(badToken)
+        addAnyChild(t)
+        t.setParent(self)
+        return t
+    }
+    
+    //	public void trace(int s) {
+    //		if ( states==null ) states = new ArrayList<Integer>();
+    //		states.add(s);
+    //	}
+    
     /** Used by enterOuterAlt to toss out a RuleContext previously added as
      *  we entered a rule. If we have # label, we will need to remove
      *  generic ruleContext object.
-      */
+     */
     open func removeLastChild() {
-            children?.removeLast()
-            //children.remove(children.size()-1);
+    	if children != nil {
+            children!.remove(at: children!.count-1)
+    	}
     }
-
-//	public void trace(int s) {
-//		if ( states==null ) states = new ArrayList<Integer>();
-//		states.add(s);
-//	}
-
-    open func addChild(_ matchedToken: Token) -> TerminalNode {
-        let t: TerminalNodeImpl = TerminalNodeImpl(matchedToken)
-        addChild(t)
-        t.parent = self
-        return t
-    }
-    @discardableResult
-    open func addErrorNode(_ badToken: Token) -> ErrorNode {
-        let t: ErrorNode = ErrorNode(badToken)
-        addChild(t)
-        t.parent = self
-        return t
-    }
+    
 
     override
     /** Override to make type more specific */

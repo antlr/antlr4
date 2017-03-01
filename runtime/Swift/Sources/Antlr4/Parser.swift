@@ -1,18 +1,15 @@
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
- * Use of this file is governed by the BSD 3-clause license that
- * can be found in the LICENSE.txt file in the project root.
- */
-
-
-/** This is all the parsing support code essentially; most of it is error recovery stuff. */
-//public abstract class Parser  :  Recognizer<Token, ParserATNSimulator> {
+///
+/// Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/// Use of this file is governed by the BSD 3-clause license that
+/// can be found in the LICENSE.txt file in the project root.
+///
 
 import Foundation
 
+/// This is all the parsing support code essentially; most of it is error recovery stuff.
 open class Parser: Recognizer<ParserATNSimulator> {
     public static let EOF: Int = -1
     public static var ConsoleError = true
-    //false
 
     public class TraceListener: ParseTreeListener {
         var host: Parser
@@ -62,10 +59,7 @@ open class Parser: Recognizer<ParserATNSimulator> {
 
 
         public func exitEveryRule(_ ctx: ParserRuleContext) {
-            //TODO: check necessary
-//			if (ctx.children is ArrayList) {
-//				(ctx.children as ArrayList<?>).trimToSize();
-//			}
+            // TODO: Print exit info.
         }
     }
 
@@ -75,10 +69,8 @@ open class Parser: Recognizer<ParserATNSimulator> {
      *
      * @see org.antlr.v4.runtime.atn.ATNDeserializationOptions#isGenerateRuleBypassTransitions()
      */
-    //private let bypassAltsAtnCache : Dictionary<String, ATN> =
-    //	WeakHashMap<String, ATN>();  MapTable<NSString, ATN>
-
     private let bypassAltsAtnCache: HashMap<String, ATN> = HashMap<String, ATN>()
+    
     /**
      * The error handling strategy for the parser. The default value is a new
      * instance of {@link org.antlr.v4.runtime.DefaultErrorStrategy}.
@@ -86,7 +78,6 @@ open class Parser: Recognizer<ParserATNSimulator> {
      * @see #getErrorHandler
      * @see #setErrorHandler
      */
-
     public var _errHandler: ANTLRErrorStrategy = DefaultErrorStrategy()
 
     /**
@@ -177,14 +168,15 @@ open class Parser: Recognizer<ParserATNSimulator> {
      * strategy to attempt recovery. If {@link #getBuildParseTree} is
      * {@code true} and the token index of the symbol returned by
      * {@link org.antlr.v4.runtime.ANTLRErrorStrategy#recoverInline} is -1, the symbol is added to
-     * the parse tree by calling {@link org.antlr.v4.runtime.ParserRuleContext#addErrorNode}.</p>
+     * the parse tree by calling {@link #createErrorNode(ParserRuleContext, Token)} then
+     * {@link ParserRuleContext#addErrorNode(ErrorNode)}.</p>
      *
      * @param ttype the token type to match
      * @return the matched symbol
      * @throws org.antlr.v4.runtime.RecognitionException if the current input symbol did not match
      * {@code ttype} and the error strategy could not recover from the
      * mismatched symbol
-     *///; RecognitionException
+     */
     @discardableResult
     public func match(_ ttype: Int) throws -> Token {
         var t: Token = try getCurrentToken()
@@ -196,7 +188,7 @@ open class Parser: Recognizer<ParserATNSimulator> {
             if _buildParseTrees && t.getTokenIndex() == -1 {
                 // we must have conjured up a new token during single token insertion
                 // if it's not the current symbol
-                _ctx!.addErrorNode(t)
+                _ctx!.addErrorNode(createErrorNode(parent: _ctx!, t: t))
             }
         }
         return t
@@ -212,7 +204,8 @@ open class Parser: Recognizer<ParserATNSimulator> {
      * strategy to attempt recovery. If {@link #getBuildParseTree} is
      * {@code true} and the token index of the symbol returned by
      * {@link org.antlr.v4.runtime.ANTLRErrorStrategy#recoverInline} is -1, the symbol is added to
-     * the parse tree by calling {@link org.antlr.v4.runtime.ParserRuleContext#addErrorNode}.</p>
+     * the parse tree by calling {@link #createErrorNode(ParserRuleContext, Token)} then
+     * {@link ParserRuleContext#addErrorNode(ErrorNode)}.</p>
      *
      * @return the matched symbol
      * @throws org.antlr.v4.runtime.RecognitionException if the current input symbol did not match
@@ -230,7 +223,7 @@ open class Parser: Recognizer<ParserATNSimulator> {
             if _buildParseTrees && t.getTokenIndex() == -1 {
                 // we must have conjured up a new token during single token insertion
                 // if it's not the current symbol
-                _ctx!.addErrorNode(t)
+                _ctx!.addErrorNode(createErrorNode(parent: _ctx!, t: t))
             }
         }
 
@@ -562,11 +555,11 @@ open class Parser: Recognizer<ParserATNSimulator> {
      * </pre>
      *
      * If the parser is not in error recovery mode, the consumed symbol is added
-     * to the parse tree using {@link org.antlr.v4.runtime.ParserRuleContext#addChild(org.antlr.v4.runtime.Token)}, and
+     * to the parse tree using {@link ParserRuleContext#addChild(TerminalNode)}, and
      * {@link org.antlr.v4.runtime.tree.ParseTreeListener#visitTerminal} is called on any parse listeners.
      * If the parser <em>is</em> in error recovery mode, the consumed symbol is
-     * added to the parse tree using
-     * {@link org.antlr.v4.runtime.ParserRuleContext#addErrorNode(org.antlr.v4.runtime.Token)}, and
+     * added to the parse tree using {@link #createErrorNode(ParserRuleContext, Token)} then
+     * {@link ParserRuleContext#addErrorNode(ErrorNode)} and
      * {@link org.antlr.v4.runtime.tree.ParseTreeListener#visitErrorNode} is called on any parse
      * listeners.
      */
@@ -583,14 +576,14 @@ open class Parser: Recognizer<ParserATNSimulator> {
 
         if _buildParseTrees || hasListener {
             if _errHandler.inErrorRecoveryMode(self) {
-                let node: ErrorNode = _ctx.addErrorNode(o)
+                let node: ErrorNode = _ctx.addErrorNode(createErrorNode(parent: _ctx, t: o))
                 if let _parseListeners = _parseListeners {
                     for listener: ParseTreeListener in _parseListeners {
                         listener.visitErrorNode(node)
                     }
                 }
             } else {
-                let node: TerminalNode = _ctx.addChild(o)
+                let node: TerminalNode = _ctx.addChild(createTerminalNode(parent: _ctx, t: o))
                 if let _parseListeners = _parseListeners {
                     for listener: ParseTreeListener in _parseListeners {
                         listener.visitTerminal(node)
@@ -599,6 +592,24 @@ open class Parser: Recognizer<ParserATNSimulator> {
             }
         }
         return o
+    }
+    
+    /** How to create a token leaf node associated with a parent.
+     *  Typically, the terminal node to create is not a function of the parent.
+     *
+     *  @since 4.6.1
+     */
+    public func createTerminalNode(parent: ParserRuleContext, t: Token) -> TerminalNode {
+     	return TerminalNodeImpl(t);
+    }
+    
+    /** How to create an error node, given a token, associated with a parent.
+     *  Typically, the error node to create is not a function of the parent.
+     *
+     *  @since 4.6.1
+     */
+    public func createErrorNode(parent: ParserRuleContext, t: Token) -> ErrorNode {
+    	return ErrorNode(t);
     }
 
     internal func addContextToParseTree() {

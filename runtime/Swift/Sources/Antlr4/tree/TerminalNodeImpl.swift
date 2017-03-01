@@ -28,6 +28,11 @@ public class TerminalNodeImpl: TerminalNode {
     }
 
     override
+    public func setParent(_ parent: RuleContext) {
+        self.parent = parent
+    }
+
+    override
     public func getPayload() -> AnyObject {
         return symbol
     }
