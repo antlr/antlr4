@@ -115,6 +115,129 @@ public class TestATNConstruction extends BaseJavaToolTest {
 				"s4->RuleStop_A_2\n";
 		checkTokensRule(g, null, expecting);
 	}
+	@Test public void testCharSet() throws Exception {
+		LexerGrammar g = new LexerGrammar(
+			"lexer grammar P;\n"+
+			"A : [abc] ;"
+		);
+		String expecting =
+			"s0->RuleStart_A_1\n" +
+				"RuleStart_A_1->s3\n" +
+				"s3-{97..99}->s4\n" +
+				"s4->RuleStop_A_2\n";
+		checkTokensRule(g, null, expecting);
+	}
+	@Test public void testCharSetRange() throws Exception {
+		LexerGrammar g = new LexerGrammar(
+			"lexer grammar P;\n"+
+			"A : [a-c] ;"
+		);
+		String expecting =
+			"s0->RuleStart_A_1\n" +
+				"RuleStart_A_1->s3\n" +
+				"s3-{97..99}->s4\n" +
+				"s4->RuleStop_A_2\n";
+		checkTokensRule(g, null, expecting);
+	}
+	@Test public void testCharSetUnicodeBMPEscape() throws Exception {
+		LexerGrammar g = new LexerGrammar(
+			"lexer grammar P;\n"+
+			"A : [\\uABCD] ;"
+		);
+		String expecting =
+			"s0->RuleStart_A_1\n" +
+				"RuleStart_A_1->s3\n" +
+				"s3-43981->s4\n" +
+				"s4->RuleStop_A_2\n";
+		checkTokensRule(g, null, expecting);
+	}
+	@Test public void testCharSetUnicodeBMPEscapeRange() throws Exception {
+		LexerGrammar g = new LexerGrammar(
+			"lexer grammar P;\n"+
+			"A : [a-c\\uABCD-\\uABFF] ;"
+		);
+		String expecting =
+			"s0->RuleStart_A_1\n" +
+				"RuleStart_A_1->s3\n" +
+				"s3-{97..99, 43981..44031}->s4\n" +
+				"s4->RuleStop_A_2\n";
+		checkTokensRule(g, null, expecting);
+	}
+	@Test public void testCharSetUnicodeSMPEscape() throws Exception {
+		LexerGrammar g = new LexerGrammar(
+			"lexer grammar P;\n"+
+			"A : [\\u{10ABCD}] ;"
+		);
+		String expecting =
+			"s0->RuleStart_A_1\n" +
+				"RuleStart_A_1->s3\n" +
+				"s3-1092557->s4\n" +
+				"s4->RuleStop_A_2\n";
+		checkTokensRule(g, null, expecting);
+	}
+	@Test public void testCharSetUnicodeSMPEscapeRange() throws Exception {
+		LexerGrammar g = new LexerGrammar(
+			"lexer grammar P;\n"+
+			"A : [a-c\\u{10ABCD}-\\u{10ABFF}] ;"
+		);
+		String expecting =
+			"s0->RuleStart_A_1\n" +
+				"RuleStart_A_1->s3\n" +
+				"s3-{97..99, 1092557..1092607}->s4\n" +
+				"s4->RuleStop_A_2\n";
+		checkTokensRule(g, null, expecting);
+	}
+	@Test public void testCharSetUnicodePropertyEscape() throws Exception {
+		// The Gothic script is long dead and unlikely to change (which would
+		// cause this test to fail)
+		LexerGrammar g = new LexerGrammar(
+			"lexer grammar P;\n"+
+			"A : [\\p{Gothic}] ;"
+		);
+		String expecting =
+			"s0->RuleStart_A_1\n" +
+				"RuleStart_A_1->s3\n" +
+				"s3-{66352..66378}->s4\n" +
+				"s4->RuleStop_A_2\n";
+		checkTokensRule(g, null, expecting);
+	}
+	@Test public void testCharSetUnicodePropertyInvertEscape() throws Exception {
+		LexerGrammar g = new LexerGrammar(
+			"lexer grammar P;\n"+
+			"A : [\\P{Gothic}] ;"
+		);
+		String expecting =
+			"s0->RuleStart_A_1\n" +
+				"RuleStart_A_1->s3\n" +
+				"s3-{0..66351, 66379..1114111}->s4\n" +
+				"s4->RuleStop_A_2\n";
+		checkTokensRule(g, null, expecting);
+	}
+	@Test public void testCharSetUnicodeMultiplePropertyEscape() throws Exception {
+		// Ditto the Mahajani script. Not going to change soon. I hope.
+		LexerGrammar g = new LexerGrammar(
+			"lexer grammar P;\n"+
+			"A : [\\p{Gothic}\\p{Mahajani}] ;"
+		);
+		String expecting =
+			"s0->RuleStart_A_1\n" +
+				"RuleStart_A_1->s3\n" +
+				"s3-{66352..66378, 69968..70006}->s4\n" +
+				"s4->RuleStop_A_2\n";
+		checkTokensRule(g, null, expecting);
+	}
+	@Test public void testCharSetUnicodePropertyOverlap() throws Exception {
+		LexerGrammar g = new LexerGrammar(
+			"lexer grammar P;\n"+
+			"A : [\\p{ASCII_Hex_Digit}\\p{Hex_Digit}] ;"
+		);
+		String expecting =
+			"s0->RuleStart_A_1\n" +
+				"RuleStart_A_1->s3\n" +
+				"s3-{48..57, 65..70, 97..102, 65296..65305, 65313..65318, 65345..65350}->s4\n" +
+				"s4->RuleStop_A_2\n";
+		checkTokensRule(g, null, expecting);
+	}
 	@Test public void testRangeOrRange() throws Exception {
 		LexerGrammar g = new LexerGrammar(
 			"lexer grammar P;\n"+

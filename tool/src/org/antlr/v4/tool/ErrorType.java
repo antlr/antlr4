@@ -1060,6 +1060,20 @@ public enum ErrorType {
 	 */
 	TOKEN_RANGE_IN_PARSER(181, "token ranges not allowed in parser: <arg>..<arg2>", ErrorSeverity.ERROR),
 
+	/**
+	 * Compiler Error 182.
+	 *
+	 * <p>Unicode properties cannot be part of a lexer charset range</p>
+	 *
+	 * <pre>
+	 * A: [\\p{Letter}-\\p{Number}];
+	 * </pre>
+	 */
+	UNICODE_PROPERTY_NOT_ALLOWED_IN_RANGE(
+			182,
+			"unicode property escapes not allowed in lexer charset range: <arg>",
+			ErrorSeverity.ERROR),
+
 	/*
 	 * Backward incompatibility errors
 	 */
