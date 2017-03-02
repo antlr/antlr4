@@ -429,10 +429,11 @@ public class IntervalSet implements IntSet {
     }
 
 	/**
-	 * Returns the maximum value contained in the set.
+	 * Returns the maximum value contained in the set if not isNil().
+	 * Otherwise, result is undefined.
 	 *
-	 * @return the maximum value contained in the set. If the set is empty, this
-	 * method returns {@link Token#INVALID_TYPE}.
+	 * @return the maximum value contained in the set. If the set is empty,
+	 * result is undefined.
 	 */
 	public int getMaxElement() {
 		if ( isNil() ) {
@@ -443,10 +444,11 @@ public class IntervalSet implements IntSet {
 	}
 
 	/**
-	 * Returns the minimum value contained in the set.
+	 * Returns the minimum value contained in the set if not isNil().
+	 * Otherwise, result is undefined.
 	 *
-	 * @return the minimum value contained in the set. If the set is empty, this
-	 * method returns {@link Token#INVALID_TYPE}.
+	 * @return the minimum value contained in the set. If the set is empty,
+	 * result is undefined.
 	 */
 	public int getMinElement() {
 		if ( isNil() ) {
