@@ -147,7 +147,12 @@ public abstract class EscapeSequenceParsing {
 		} else if (escaped < CharSupport.ANTLRLiteralEscapedCharValue.length) {
 			int codePoint = CharSupport.ANTLRLiteralEscapedCharValue[escaped];
 			if (codePoint == 0) {
-				return Result.INVALID;
+				if (escaped != ']' && escaped != '-') { // escape ']' and '-' only in char sets.
+					return Result.INVALID;
+				}
+				else {
+					codePoint = escaped;
+				}
 			}
 			return new Result(
 				Result.Type.CODE_POINT,

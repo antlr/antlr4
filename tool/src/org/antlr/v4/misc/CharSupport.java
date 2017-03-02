@@ -31,17 +31,12 @@ public class CharSupport {
 		ANTLRLiteralEscapedCharValue['b'] = '\b';
 		ANTLRLiteralEscapedCharValue['f'] = '\f';
 		ANTLRLiteralEscapedCharValue['\\'] = '\\';
-		ANTLRLiteralEscapedCharValue['\''] = '\'';
-		ANTLRLiteralEscapedCharValue['"'] = '"';
-		ANTLRLiteralEscapedCharValue['-'] = '-';
-		ANTLRLiteralEscapedCharValue[']'] = ']';
 		ANTLRLiteralCharValueEscape['\n'] = "\\n";
 		ANTLRLiteralCharValueEscape['\r'] = "\\r";
 		ANTLRLiteralCharValueEscape['\t'] = "\\t";
 		ANTLRLiteralCharValueEscape['\b'] = "\\b";
 		ANTLRLiteralCharValueEscape['\f'] = "\\f";
 		ANTLRLiteralCharValueEscape['\\'] = "\\\\";
-		ANTLRLiteralCharValueEscape['\''] = "\\'";
 	}
 
 	/** Return a string representing the escaped char for code c.  E.g., If c
@@ -137,10 +132,10 @@ public class CharSupport {
 			case 2:
 				if ( cstr.charAt(0)!='\\' ) return -1;
 				// '\x'  (antlr lexer will catch invalid char)
-				if ( Character.isDigit(cstr.charAt(1)) ) return -1;
-				int escChar = cstr.charAt(1);
+				char escChar = cstr.charAt(1);
+				if (escChar == '\'') return escChar; // escape quote only in string literals.
 				int charVal = ANTLRLiteralEscapedCharValue[escChar];
-				if ( charVal==0 ) return -1;
+				if (charVal == 0) return -1;
 				return charVal;
 			case 6:
 				// '\\u1234' or '\\u{12}'
@@ -168,13 +163,13 @@ public class CharSupport {
 			return -1;
 		}
 		String unicodeChars = cstr.substring(startOff, endOff);
-				int result = -1;
-				try {
-					result = Integer.parseInt(unicodeChars, 16);
-				}
-				catch (NumberFormatException e) {
-				}
-				return result;
+		int result = -1;
+		try {
+			result = Integer.parseInt(unicodeChars, 16);
+		}
+		catch (NumberFormatException e) {
+		}
+		return result;
 	}
 
 	public static String capitalize(String s) {
