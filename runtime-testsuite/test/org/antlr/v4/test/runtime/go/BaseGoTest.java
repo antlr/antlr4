@@ -48,7 +48,6 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -215,7 +214,8 @@ public class BaseGoTest implements RuntimeTestSupport {
 			ParserATNFactory f;
 			if (g.isLexer()) {
 				f = new LexerATNFactory((LexerGrammar) g);
-			} else {
+			}
+			else {
 				f = new ParserATNFactory(g);
 			}
 
@@ -286,7 +286,8 @@ public class BaseGoTest implements RuntimeTestSupport {
 			ttype = interp.match(input, Lexer.DEFAULT_MODE);
 			if (ttype == Token.EOF) {
 				tokenTypes.add("EOF");
-			} else {
+			}
+			else {
 				tokenTypes.add(lg.typeToTokenList.get(ttype));
 			}
 
@@ -369,7 +370,8 @@ public class BaseGoTest implements RuntimeTestSupport {
 		this.stderrDuringParse = null;
 		if (parserName == null) {
 			writeLexerTestFile(lexerName, false);
-		} else {
+		}
+		else {
 			writeParserTestFile(parserName, lexerName, listenerName,
 			                    visitorName, parserStartRuleName, debug);
 		}
@@ -752,7 +754,8 @@ public class BaseGoTest implements RuntimeTestSupport {
 	                            String parserStartRuleName, boolean debug) {
 		if (parserName == null) {
 			writeLexerTestFile(lexerName, debug);
-		} else {
+		}
+		else {
 			writeParserTestFile(parserName, lexerName, listenerName,
 			                    visitorName, parserStartRuleName, debug);
 		}
@@ -776,7 +779,8 @@ public class BaseGoTest implements RuntimeTestSupport {
 			for (File file : files) {
 				if (file.isDirectory()) {
 					eraseDirectory(file);
-				} else {
+				}
+				else {
 					file.delete();
 				}
 			}

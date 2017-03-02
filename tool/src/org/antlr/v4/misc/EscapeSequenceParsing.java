@@ -6,11 +6,10 @@
 
 package org.antlr.v4.misc;
 
-import java.util.Objects;
-
-import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.unicode.UnicodeData;
+
+import java.util.Objects;
 
 /**
  * Utility class to parse escapes like:
@@ -77,7 +76,7 @@ public abstract class EscapeSequenceParsing {
 	/**
 	 * Parses a single escape sequence starting at {@code startOff}.
 	 *
-	 * Returns {@link Result.INVALID} if no valid escape sequence was found, a Result otherwise.
+	 * Returns {@link Result#INVALID} if no valid escape sequence was found, a Result otherwise.
 	 */
 	public static Result parseEscape(String s, int startOff) {
 		int offset = startOff;
@@ -103,7 +102,8 @@ public abstract class EscapeSequenceParsing {
 					return Result.INVALID;
 				}
 				offset = hexEndOffset + 1;
-			} else {
+			}
+			else {
 				if (offset + 4 > s.length()) {
 					return Result.INVALID;
 				}
@@ -120,7 +120,8 @@ public abstract class EscapeSequenceParsing {
 				codePointValue,
 				IntervalSet.EMPTY_SET,
 				offset - startOff);
-		} else if (escaped == 'p' || escaped == 'P') {
+		}
+		else if (escaped == 'p' || escaped == 'P') {
 			// \p{L} is the shortest we support
 			if (offset + 3 > s.length() || s.codePointAt(offset) != '{') {
 				return Result.INVALID;
@@ -144,7 +145,8 @@ public abstract class EscapeSequenceParsing {
 				-1,
 				propertyIntervalSet,
 				offset - startOff);
-		} else if (escaped < CharSupport.ANTLRLiteralEscapedCharValue.length) {
+		}
+		else if (escaped < CharSupport.ANTLRLiteralEscapedCharValue.length) {
 			int codePoint = CharSupport.ANTLRLiteralEscapedCharValue[escaped];
 			if (codePoint == 0) {
 				if (escaped != ']' && escaped != '-') { // escape ']' and '-' only in char sets.
@@ -159,7 +161,8 @@ public abstract class EscapeSequenceParsing {
 				codePoint,
 				IntervalSet.EMPTY_SET,
 				offset - startOff);
-		} else {
+		}
+		else {
 			return Result.INVALID;
 		}
 	}

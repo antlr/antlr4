@@ -238,7 +238,8 @@ public abstract class Target {
 								toAdvance++;
 							}
 							toAdvance++;
-						} else {
+						}
+						else {
 							toAdvance += 4;
 						}
 						String fullEscape = is.substring(i, i + toAdvance);
@@ -249,19 +250,23 @@ public abstract class Target {
 					default:
 						if (shouldUseUnicodeEscapeForCodePointInDoubleQuotedString(escapedCodePoint)) {
 							appendUnicodeEscapedCodePoint(escapedCodePoint, sb);
-						} else {
+						}
+						else {
 							sb.appendCodePoint(escapedCodePoint);
 						}
 						break;
 				}
-			} else {
+			}
+			else {
 				if (codePoint == 0x22) {
 					// ANTLR doesn't escape " in literal strings,
 					// but every other language needs to do so.
 					sb.append("\\\"");
-				} else if (shouldUseUnicodeEscapeForCodePointInDoubleQuotedString(codePoint)) {
+				}
+				else if (shouldUseUnicodeEscapeForCodePointInDoubleQuotedString(codePoint)) {
 					appendUnicodeEscapedCodePoint(codePoint, sb);
-				} else {
+				}
+				else {
 					sb.appendCodePoint(codePoint);
 				}
 			}

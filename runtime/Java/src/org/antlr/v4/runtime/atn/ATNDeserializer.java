@@ -105,7 +105,8 @@ public class ATNDeserializer {
 					return 1;
 				}
 			};
-		} else {
+		}
+		else {
 			return new UnicodeDeserializer() {
 				@Override
 				public int readUnicode(char[] data, int p) {

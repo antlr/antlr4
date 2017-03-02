@@ -63,7 +63,8 @@ public class CharSupport {
 		}
 		if (c <= 0xFFFF) {
 			return String.format("\\u%04X", c);
-		} else {
+		}
+		else {
 			return String.format("\\u{%06X}", c);
 		}
 	}
@@ -98,7 +99,8 @@ public class CharSupport {
 								return null; // invalid escape sequence.
 							}
 						}
-					} else {
+					}
+					else {
 						for (end = i + 2; end < i + 6; end++) {
 							if ( end>n ) return null; // invalid escape sequence.
 							char charAt = literal.charAt(end);
@@ -145,7 +147,8 @@ public class CharSupport {
 				if ( cstr.charAt(2) == '{' ) {
 					startOff = 3;
 					endOff = cstr.indexOf('}');
-				} else {
+				}
+				else {
 					startOff = 2;
 					endOff = cstr.length();
 				}

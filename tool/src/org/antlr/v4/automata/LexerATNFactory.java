@@ -29,7 +29,6 @@ import org.antlr.v4.runtime.atn.LexerPushModeAction;
 import org.antlr.v4.runtime.atn.LexerSkipAction;
 import org.antlr.v4.runtime.atn.LexerTypeAction;
 import org.antlr.v4.runtime.atn.NotSetTransition;
-import org.antlr.v4.runtime.atn.RangeTransition;
 import org.antlr.v4.runtime.atn.RuleStartState;
 import org.antlr.v4.runtime.atn.SetTransition;
 import org.antlr.v4.runtime.atn.TokensStartState;
@@ -305,7 +304,8 @@ public class LexerATNFactory extends ParserATNFactory {
 			if (set.getIntervals().size() == 1) {
 				Interval interval = set.getIntervals().get(0);
 				transition = CodePointTransitions.createWithCodePointRange(right, interval.a, interval.b);
-			} else {
+			}
+			else {
 				transition = new SetTransition(right, set);
 			}
 
@@ -474,15 +474,18 @@ public class LexerATNFactory extends ParserATNFactory {
 						break;
 				}
 				offset = escapeParseResult.parseLength;
-			} else if (c == '-' && !state.inRange) {
+			}
+			else if (c == '-' && !state.inRange) {
 				if (state.mode == CharSetParseState.Mode.PREV_PROPERTY) {
 					g.tool.errMgr.grammarError(ErrorType.UNICODE_PROPERTY_NOT_ALLOWED_IN_RANGE,
 								   g.fileName, charSetAST.getToken(), charSetAST.getText());
 					state = CharSetParseState.ERROR;
-				} else {
+				}
+				else {
 					state = new CharSetParseState(state.mode, true, state.prevCodePoint, state.prevProperty);
 				}
-			} else {
+			}
+			else {
 				state = applyPrevStateAndMoveToCodePoint(charSetAST, set, state, c);
 			}
 			i += offset;
@@ -517,7 +520,8 @@ public class LexerATNFactory extends ParserATNFactory {
 			checkSetCollision(charSetAST, set, state.prevCodePoint, codePoint);
 			set.add(state.prevCodePoint, codePoint);
 			state = CharSetParseState.NONE;
-		} else {
+		}
+		else {
 			applyPrevState(charSetAST, set, state);
 			state = new CharSetParseState(
 					CharSetParseState.Mode.PREV_CODE_POINT,
@@ -537,7 +541,8 @@ public class LexerATNFactory extends ParserATNFactory {
 			g.tool.errMgr.grammarError(ErrorType.UNICODE_PROPERTY_NOT_ALLOWED_IN_RANGE,
 						   g.fileName, charSetAST.getToken(), charSetAST.getText());
 			return CharSetParseState.ERROR;
-		} else {
+		}
+		else {
 			applyPrevState(charSetAST, set, state);
 			state = new CharSetParseState(
 					CharSetParseState.Mode.PREV_PROPERTY,
@@ -679,23 +684,30 @@ public class LexerATNFactory extends ParserATNFactory {
 				if (command.equals("skip")) {
 					if (ruleCommands.contains("more")) {
 						firstCommand = "more";
-					} else if (ruleCommands.contains("type")) {
+					}
+					else if (ruleCommands.contains("type")) {
 						firstCommand = "type";
-					} else if (ruleCommands.contains("channel")) {
+					}
+					else if (ruleCommands.contains("channel")) {
 						firstCommand = "channel";
 					}
-				} else if (command.equals("more")) {
+				}
+				else if (command.equals("more")) {
 					if (ruleCommands.contains("skip")) {
 						firstCommand = "skip";
-					} else if (ruleCommands.contains("type")) {
+					}
+					else if (ruleCommands.contains("type")) {
 						firstCommand = "type";
-					} else if (ruleCommands.contains("channel")) {
+					}
+					else if (ruleCommands.contains("channel")) {
 						firstCommand = "channel";
 					}
-				} else if (command.equals("type") || command.equals("channel")) {
+				}
+				else if (command.equals("type") || command.equals("channel")) {
 					if (ruleCommands.contains("more")) {
 						firstCommand = "more";
-					} else if (ruleCommands.contains("skip")) {
+					}
+					else if (ruleCommands.contains("skip")) {
 						firstCommand = "skip";
 					}
 				}

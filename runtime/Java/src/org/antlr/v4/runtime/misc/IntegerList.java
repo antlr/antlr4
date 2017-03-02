@@ -36,7 +36,8 @@ public class IntegerList {
 
 		if (capacity == 0) {
 			_data = EMPTY_DATA;
-		} else {
+		}
+		else {
 			_data = new int[capacity];
 		}
 	}
@@ -258,7 +259,8 @@ public class IntegerList {
 		int newLength;
 		if (_data.length == 0) {
 			newLength = INITIAL_SIZE;
-		} else {
+		}
+		else {
 			newLength = _data.length;
 		}
 
