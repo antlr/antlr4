@@ -45,7 +45,6 @@ import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupString;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -147,7 +146,8 @@ public class BaseNodeTest implements RuntimeTestSupport {
 			ParserATNFactory f;
 			if (g.isLexer()) {
 				f = new LexerATNFactory((LexerGrammar) g);
-			} else {
+			}
+			else {
 				f = new ParserATNFactory(g);
 			}
 
@@ -218,7 +218,8 @@ public class BaseNodeTest implements RuntimeTestSupport {
 			ttype = interp.match(input, Lexer.DEFAULT_MODE);
 			if (ttype == Token.EOF) {
 				tokenTypes.add("EOF");
-			} else {
+			}
+			else {
 				tokenTypes.add(lg.typeToTokenList.get(ttype));
 			}
 
@@ -310,7 +311,8 @@ public class BaseNodeTest implements RuntimeTestSupport {
 		this.stderrDuringParse = null;
 		if (parserName == null) {
 			writeLexerTestFile(lexerName, false);
-		} else {
+		}
+		else {
 			writeParserTestFile(parserName, lexerName, listenerName,
 					visitorName, parserStartRuleName, debug);
 		}
@@ -698,7 +700,8 @@ public class BaseNodeTest implements RuntimeTestSupport {
 			String parserStartRuleName, boolean debug) {
 		if (parserName == null) {
 			writeLexerTestFile(lexerName, debug);
-		} else {
+		}
+		else {
 			writeParserTestFile(parserName, lexerName, listenerName,
 					visitorName, parserStartRuleName, debug);
 		}

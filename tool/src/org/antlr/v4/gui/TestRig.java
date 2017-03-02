@@ -20,11 +20,8 @@ import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.atn.PredictionMode;
 
 import javax.print.PrintException;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Reader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -163,10 +160,11 @@ public class TestRig {
 			CharStream charStream;
 			if ( charset.equals(StandardCharsets.UTF_8)) {
 				charStream = CharStreams.createWithUTF8Stream(System.in);
-			} else {
+			}
+			else {
 				try ( InputStreamReader r = new InputStreamReader(System.in, charset) ) {
 					charStream = new ANTLRInputStream(r);
-			}
+				}
 			}
 			process(lexer, parserClass, parser, charStream);
 			return;
@@ -175,10 +173,11 @@ public class TestRig {
 			CharStream charStream;
 			if ( charset.equals(StandardCharsets.UTF_8) ) {
 				charStream = CharStreams.createWithUTF8(Paths.get(inputFile));
-			} else {
+			}
+			else {
 				try ( InputStreamReader r = new InputStreamReader(System.in, charset) ) {
 					charStream = new ANTLRInputStream(r);
-			}
+				}
 			}
 			if ( inputFiles.size()>1 ) {
 				System.err.println(inputFile);

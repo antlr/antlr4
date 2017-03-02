@@ -122,7 +122,8 @@ public class Utils {
 	public static void setSize(List<?> list, int size) {
 		if (size < list.size()) {
 			list.subList(size, list.size()).clear();
-		} else {
+		}
+		else {
 			while (size > list.size()) {
 				list.add(null);
 			}

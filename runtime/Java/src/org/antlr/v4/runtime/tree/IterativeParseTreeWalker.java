@@ -32,9 +32,11 @@ public class IterativeParseTreeWalker extends ParseTreeWalker {
 			// pre-order visit
 			if (currentNode instanceof ErrorNode) {
 				listener.visitErrorNode((ErrorNode) currentNode);
-			} else if (currentNode instanceof TerminalNode) {
+			}
+			else if (currentNode instanceof TerminalNode) {
 				listener.visitTerminal((TerminalNode) currentNode);
-			} else {
+			}
+			else {
 				final RuleNode r = (RuleNode) currentNode;
 				enterRule(listener, r);
 			}

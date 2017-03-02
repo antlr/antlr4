@@ -70,14 +70,17 @@ public final class CodePointCharStream implements CharStream {
 		if (i == 0) {
 			// Undefined
 			return 0;
-		} else if (i < 0) {
+		}
+		else if (i < 0) {
 			if (codePointBuffer.position() + i < initialPosition) {
 				return IntStream.EOF;
 			}
 			return codePointBuffer.get(relativeBufferPosition(i));
-		} else if (i > codePointBuffer.remaining()) {
+		}
+		else if (i > codePointBuffer.remaining()) {
 			return IntStream.EOF;
-		} else {
+		}
+		else {
 			return codePointBuffer.get(relativeBufferPosition(i - 1));
 		}
 	}

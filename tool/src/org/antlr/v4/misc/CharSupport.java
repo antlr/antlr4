@@ -31,17 +31,12 @@ public class CharSupport {
 		ANTLRLiteralEscapedCharValue['b'] = '\b';
 		ANTLRLiteralEscapedCharValue['f'] = '\f';
 		ANTLRLiteralEscapedCharValue['\\'] = '\\';
-		ANTLRLiteralEscapedCharValue['\''] = '\'';
-		ANTLRLiteralEscapedCharValue['"'] = '"';
-		ANTLRLiteralEscapedCharValue['-'] = '-';
-		ANTLRLiteralEscapedCharValue[']'] = ']';
 		ANTLRLiteralCharValueEscape['\n'] = "\\n";
 		ANTLRLiteralCharValueEscape['\r'] = "\\r";
 		ANTLRLiteralCharValueEscape['\t'] = "\\t";
 		ANTLRLiteralCharValueEscape['\b'] = "\\b";
 		ANTLRLiteralCharValueEscape['\f'] = "\\f";
 		ANTLRLiteralCharValueEscape['\\'] = "\\\\";
-		ANTLRLiteralCharValueEscape['\''] = "\\'";
 	}
 
 	/** Return a string representing the escaped char for code c.  E.g., If c
@@ -68,7 +63,8 @@ public class CharSupport {
 		}
 		if (c <= 0xFFFF) {
 			return String.format("\\u%04X", c);
-		} else {
+		}
+		else {
 			return String.format("\\u{%06X}", c);
 		}
 	}
@@ -103,7 +99,8 @@ public class CharSupport {
 								return null; // invalid escape sequence.
 							}
 						}
-					} else {
+					}
+					else {
 						for (end = i + 2; end < i + 6; end++) {
 							if ( end>n ) return null; // invalid escape sequence.
 							char charAt = literal.charAt(end);
@@ -137,10 +134,10 @@ public class CharSupport {
 			case 2:
 				if ( cstr.charAt(0)!='\\' ) return -1;
 				// '\x'  (antlr lexer will catch invalid char)
-				if ( Character.isDigit(cstr.charAt(1)) ) return -1;
-				int escChar = cstr.charAt(1);
+				char escChar = cstr.charAt(1);
+				if (escChar == '\'') return escChar; // escape quote only in string literals.
 				int charVal = ANTLRLiteralEscapedCharValue[escChar];
-				if ( charVal==0 ) return -1;
+				if (charVal == 0) return -1;
 				return charVal;
 			case 6:
 				// '\\u1234' or '\\u{12}'
@@ -150,7 +147,8 @@ public class CharSupport {
 				if ( cstr.charAt(2) == '{' ) {
 					startOff = 3;
 					endOff = cstr.indexOf('}');
-				} else {
+				}
+				else {
 					startOff = 2;
 					endOff = cstr.length();
 				}
@@ -163,18 +161,18 @@ public class CharSupport {
 		}
 	}
 
-	private static int parseHexValue(String cstr, int startOff, int endOff) {
+	public static int parseHexValue(String cstr, int startOff, int endOff) {
 		if (startOff < 0 || endOff < 0) {
 			return -1;
 		}
 		String unicodeChars = cstr.substring(startOff, endOff);
-				int result = -1;
-				try {
-					result = Integer.parseInt(unicodeChars, 16);
-				}
-				catch (NumberFormatException e) {
-				}
-				return result;
+		int result = -1;
+		try {
+			result = Integer.parseInt(unicodeChars, 16);
+		}
+		catch (NumberFormatException e) {
+		}
+		return result;
 	}
 
 	public static String capitalize(String s) {

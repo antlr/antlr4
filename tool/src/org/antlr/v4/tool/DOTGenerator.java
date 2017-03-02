@@ -289,7 +289,8 @@ public class DOTGenerator {
 				edgeST.add("arrowhead", arrowhead);
 				if (s.getNumberOfTransitions() > 1) {
 					edgeST.add("transitionIndex", i);
-				} else {
+				}
+				else {
 					edgeST.add("transitionIndex", false);
 				}
 				dot.add("edges", edgeST);

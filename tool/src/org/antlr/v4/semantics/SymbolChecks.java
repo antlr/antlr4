@@ -17,20 +17,20 @@ import org.antlr.v4.tool.ErrorManager;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LabelElementPair;
+import org.antlr.v4.tool.LabelType;
+import org.antlr.v4.tool.LeftRecursiveRule;
 import org.antlr.v4.tool.LexerGrammar;
 import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.AltAST;
 import org.antlr.v4.tool.ast.GrammarAST;
-import org.antlr.v4.tool.LabelType;
-import org.antlr.v4.tool.LeftRecursiveRule;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.ArrayList;
 
 /** Check for symbol problems; no side-effects.  Inefficient to walk rules
  *  and such multiple times, but I like isolating all error checking outside
@@ -96,7 +96,8 @@ public class SymbolChecks {
 			nameNode = (GrammarAST) ampersandAST.getChild(0);
 			if (ampersandAST.getChildCount() == 2) {
 				name = nameNode.getText();
-			} else {
+			}
+			else {
 				scope = nameNode.getText();
 				name = ampersandAST.getChild(1).getText();
 			}
@@ -107,7 +108,8 @@ public class SymbolChecks {
 			}
 			if (!scopeActions.contains(name)) {
 				scopeActions.add(name);
-			} else {
+			}
+			else {
 				errMgr.grammarError(ErrorType.ACTION_REDEFINITION,
 						g.fileName, nameNode.token, name);
 			}
@@ -145,7 +147,8 @@ public class SymbolChecks {
 								List<LabelElementPair> list;
 								if (labelPairs.containsKey(labelName)) {
 									list = labelPairs.get(labelName);
-								} else {
+								}
+								else {
 									list = new ArrayList<>();
 									labelPairs.put(labelName, list);
 								}
