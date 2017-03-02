@@ -6,8 +6,6 @@
 package org.antlr.v4.runtime.misc;
 
 
-import org.antlr.v4.runtime.Token;
-
 import java.util.List;
 
 /**
@@ -132,10 +130,11 @@ public interface IntSet {
 
 	/**
 	 * Returns the single value contained in the set, if {@link #size} is 1;
-	 * otherwise, returns {@link Token#INVALID_TYPE}.
+	 * otherwise, result is undefined.  Check {@link #isNil()} before using
+	 * this function.
 	 *
 	 * @return the single value contained in the set, if {@link #size} is 1;
-	 * otherwise, returns {@link Token#INVALID_TYPE}.
+	 * otherwise, result is undefined.
 	 */
 	int getSingleElement();
 

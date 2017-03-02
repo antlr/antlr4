@@ -8,6 +8,7 @@
 #include "dfa/DFA.h"
 #include "ParserRuleContext.h"
 #include "tree/TerminalNode.h"
+#include "tree/ErrorNodeImpl.h"
 #include "Lexer.h"
 #include "atn/ParserATNSimulator.h"
 #include "misc/IntervalSet.h"
@@ -111,7 +112,7 @@ Token* Parser::match(size_t ttype) {
     if (_buildParseTrees && t->getTokenIndex() == INVALID_INDEX) {
       // we must have conjured up a new token during single token insertion
       // if it's not the current symbol
-      _ctx->addErrorNode(_tracker, t);
+      _ctx->addChild(createErrorNode(t));
     }
   }
   return t;
@@ -127,7 +128,7 @@ Token* Parser::matchWildcard() {
     if (_buildParseTrees && t->getTokenIndex() == INVALID_INDEX) {
       // we must have conjured up a new token during single token insertion
       // if it's not the current symbol
-      _ctx->addErrorNode(_tracker, t);
+      _ctx->addChild(createErrorNode(t));
     }
   }
 
@@ -293,17 +294,19 @@ Token* Parser::consume() {
   if (o->getType() != EOF) {
     getInputStream()->consume();
   }
+  
   bool hasListener = _parseListeners.size() > 0 && !_parseListeners.empty();
   if (_buildParseTrees || hasListener) {
     if (_errHandler->inErrorRecoveryMode(this)) {
-      tree::ErrorNode* node = _ctx->addErrorNode(_tracker, o);
+      tree::ErrorNode *node = createErrorNode(o);
+      _ctx->addChild(node);
       if (_parseListeners.size() > 0) {
         for (auto listener : _parseListeners) {
           listener->visitErrorNode(node);
         }
       }
     } else {
-      tree::TerminalNode *node = _ctx->addChild(_tracker, o);
+      tree::TerminalNode *node = _ctx->addChild(createTerminalNode(o));
       if (_parseListeners.size() > 0) {
         for (auto listener : _parseListeners) {
           listener->visitTerminal(node);
@@ -615,6 +618,14 @@ void Parser::setTrace(bool trace) {
 
 bool Parser::isTrace() const {
   return _tracer != nullptr;
+}
+
+tree::TerminalNode *Parser::createTerminalNode(Token *t) {
+  return _tracker.createInstance<tree::TerminalNodeImpl>(t);
+}
+
+tree::ErrorNode *Parser::createErrorNode(Token *t) {
+  return _tracker.createInstance<tree::ErrorNodeImpl>(t);
 }
 
 void Parser::InitializeInstanceFields() {

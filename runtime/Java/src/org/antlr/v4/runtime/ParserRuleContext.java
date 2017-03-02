@@ -127,7 +127,7 @@ public class ParserRuleContext extends RuleContext {
 	 *  because the existing interfaces do not have a setParent()
 	 *  method and I don't want to break backward compatibility for this.
 	 *
-	 *  @since 4.6.1
+	 *  @since 4.7
 	 */
 	public <T extends ParseTree> T addAnyChild(T t) {
 		if ( children==null ) children = new ArrayList<>();
@@ -147,7 +147,7 @@ public class ParserRuleContext extends RuleContext {
 
 	/** Add an error node child and force its parent to be this node.
 	 *
-	 * @since 4.6.1
+	 * @since 4.7
 	 */
 	public ErrorNode addErrorNode(ErrorNode errorNode) {
 		errorNode.setParent(this);

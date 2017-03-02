@@ -135,7 +135,8 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 		String prop = System.getProperty(propName);
 		if (prop != null && prop.length() > 0) {
 			tmpdir = prop;
-		} else {
+		}
+		else {
 			tmpdir = new File(System.getProperty("java.io.tmpdir"), getClass().getSimpleName() +
 					"-" + Thread.currentThread().getName() + "-" + System.currentTimeMillis()).getAbsolutePath();
 		}
@@ -372,7 +373,8 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 			outputFileST.add("profile",
 					"let profiler = ProfilingATNSimulator(parser)\n" +
 							"parser.setInterpreter(profiler)");
-		} else {
+		}
+		else {
 			outputFileST.add("profile", new ArrayList<Object>());
 		}
 		outputFileST.add("createParser", createParserST);

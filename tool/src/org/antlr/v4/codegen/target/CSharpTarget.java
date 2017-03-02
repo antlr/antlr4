@@ -28,7 +28,7 @@ public class CSharpTarget extends Target {
 
     @Override
     public String getVersion() {
-        return "4.6.1";
+        return "4.7";
     }
 
 	@Override
@@ -40,13 +40,15 @@ public class CSharpTarget extends Target {
 		String formatted;
 		if (v >= 0 && v < targetCharValueEscape.length && targetCharValueEscape[v] != null) {
 			formatted = targetCharValueEscape[v];
-		} else if (v >= 0x20 && v < 127 && (v < '0' || v > '9') && (v < 'a' || v > 'f') && (v < 'A' || v > 'F')) {
+		}
+		else if (v >= 0x20 && v < 127 && (v < '0' || v > '9') && (v < 'a' || v > 'f') && (v < 'A' || v > 'F')) {
 			formatted = Character.toString((char)v);
-		} else {
+		}
+		else {
 			formatted = String.format("\\x%X", v & 0xFFFF);
 		}
 
-		return formatted;
+		return "'" + formatted + "'";
 	}
 
 	@Override

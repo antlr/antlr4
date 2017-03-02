@@ -87,7 +87,7 @@ public class SwiftTarget extends Target {
 
     @Override
     public String getVersion() {
-        return "4.6.1"; // Java and tool versions move in lock step
+        return "4.7"; // Java and tool versions move in lock step
     }
 
     public Set<String> getBadWords() {
@@ -124,7 +124,8 @@ public class SwiftTarget extends Target {
 
         if (g.isLexer()  && lexerAtnJSON == null) {
             lexerAtnJSON = getLexerOrParserATNJson(g, fileName);
-        } else if (!g.isLexer()  && parserAtnJSON == null && g.atn != null) {
+        }
+        else if (!g.isLexer()  && parserAtnJSON == null && g.atn != null) {
             parserAtnJSON = getLexerOrParserATNJson(g, fileName);
         }
 

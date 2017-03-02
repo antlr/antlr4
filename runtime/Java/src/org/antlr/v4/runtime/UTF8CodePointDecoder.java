@@ -134,8 +134,9 @@ public class UTF8CodePointDecoder {
 	public IntBuffer decodeCodePointsFromBuffer(
 			ByteBuffer utf8BytesIn,
 			IntBuffer codePointsOut,
-			boolean endOfInput
-	) throws CharacterCodingException {
+			boolean endOfInput)
+		throws CharacterCodingException
+	{
 		while (utf8BytesIn.hasRemaining()) {
 			if (decodingTrailBytesNeeded == -1) {
 				// Start a new UTF-8 sequence by checking the leading byte.
@@ -216,7 +217,8 @@ public class UTF8CodePointDecoder {
 		int trailingValue = (trailingByte & 0xFF) - 0x80;
 		if (trailingValue < 0x00 || trailingValue > 0x3F) {
 			return false;
-		} else {
+		}
+		else {
 			decodingCurrentCodePoint = (decodingCurrentCodePoint << 6) | trailingValue;
 			return true;
 		}
@@ -225,8 +227,9 @@ public class UTF8CodePointDecoder {
 	private IntBuffer appendCodePointFromInterval(
 			int codePoint,
 			Interval validCodePointRange,
-			IntBuffer codePointsOut
-	) throws CharacterCodingException {
+			IntBuffer codePointsOut)
+		throws CharacterCodingException
+	{
 		assert validCodePointRange != Interval.INVALID;
 
 		// Security check: UTF-8 must represent code points using their
@@ -239,7 +242,8 @@ public class UTF8CodePointDecoder {
 							codePoint,
 							validCodePointRange),
 					codePointsOut);
-		} else {
+		}
+		else {
 			return appendCodePoint(codePoint, codePointsOut);
 		}
 	}
@@ -258,11 +262,13 @@ public class UTF8CodePointDecoder {
 
 	private IntBuffer handleDecodeError(
 			final String error,
-			IntBuffer codePointsOut
-	) throws CharacterCodingException {
+			IntBuffer codePointsOut)
+		throws CharacterCodingException
+	{
 		if (decodingErrorAction == CodingErrorAction.REPLACE) {
 			codePointsOut = appendCodePoint(SUBSTITUTION_CHARACTER, codePointsOut);
-		} else if (decodingErrorAction == CodingErrorAction.REPORT) {
+		}
+		else if (decodingErrorAction == CodingErrorAction.REPORT) {
 			throw new CharacterCodingException() {
 				@Override
 				public String getMessage() {

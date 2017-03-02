@@ -9,7 +9,7 @@
   <parent>
     <groupId>org.antlr</groupId>
     <artifactId>antlr4-master</artifactId>
-    <version>4.6.1-SNAPSHOT</version>
+    <version>4.7-SNAPSHOT</version>
   </parent>
   <artifactId>antlr4</artifactId>
   <name>ANTLR 4 Tool</name>
@@ -80,6 +80,23 @@
 					</execution>
 				</executions>
 			</plugin>
+                        <plugin> <!-- include code-generated sources -->
+                          <groupId>org.codehaus.mojo</groupId>
+                          <artifactId>build-helper-maven-plugin</artifactId>
+                          <executions>
+                            <execution>
+                              <phase>generate-sources</phase>
+                              <goals>
+                                <goal>add-source</goal>
+                              </goals>
+                              <configuration>
+                                <sources>
+                                  <source>${project.build.directory}/generated-sources/antlr4-tool-codegen</source>
+                                </sources>
+                              </configuration>
+                            </execution>
+                          </executions>
+                        </plugin>
 			<plugin> <!-- this makes a fat jar with all dependencies -->
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
