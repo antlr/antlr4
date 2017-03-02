@@ -129,16 +129,6 @@ public interface IntSet {
 	boolean equals(Object obj);
 
 	/**
-	 * Returns the single value contained in the set, if {@link #size} is 1;
-	 * otherwise, result is undefined.  Check {@link #isNil()} before using
-	 * this function.
-	 *
-	 * @return the single value contained in the set, if {@link #size} is 1;
-	 * otherwise, result is undefined.
-	 */
-	int getSingleElement();
-
-	/**
 	 * Returns {@code true} if the set contains the specified element.
 	 *
 	 * @param el The element to check for.
