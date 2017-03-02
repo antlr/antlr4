@@ -664,6 +664,9 @@ ESC_SEQ
                 t.setLine(input.getLine());
                 t.setCharPositionInLine(input.getCharPositionInLine()-1);
                 grammarError(ErrorType.INVALID_ESCAPE_SEQUENCE, t);
+				if ( state.text==null ) {
+					setText(input.substring(state.tokenStartCharIndex, getCharIndex()-2));
+				}
     	      }
         )
     ;
@@ -720,6 +723,9 @@ UNICODE_ESC
                 t.setLine(input.getLine());
                 t.setCharPositionInLine(input.getCharPositionInLine()-hCount-2);
                 grammarError(ErrorType.INVALID_ESCAPE_SEQUENCE, t);
+				if ( state.text==null ) {
+					setText(input.substring(state.tokenStartCharIndex, getCharIndex()-hCount-3));
+				}
     		}
     	}
     ;
@@ -741,7 +747,10 @@ UNICODE_EXTENDED_ESC
                 t.setLine(input.getLine());
                 t.setCharPositionInLine(input.getCharPositionInLine()-numDigits);
                 grammarError(ErrorType.INVALID_ESCAPE_SEQUENCE, t);
-            }
+				if ( state.text==null ) {
+					setText(input.substring(state.tokenStartCharIndex, getCharIndex()-numDigits-3));
+				}
+			}
         }
     ;
 
