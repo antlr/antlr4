@@ -221,7 +221,6 @@ public abstract class Target {
 				switch (escapedCodePoint) {
 					// Pass through any escapes that Java also needs
 					//
-					case    '"':
 					case    'n':
 					case    'r':
 					case    't':
