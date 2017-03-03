@@ -19,5 +19,6 @@ sudo rm -rf /usr/local/maven/ && sudo mkdir -p /usr/local/maven && \
     sudo tar xzvf apache-maven-3.3.9-bin.tar.gz -C /usr/local/maven --strip-components=1
 
 mvn -v
-mono --version
+whereis mono
 which mono
+mono --version
