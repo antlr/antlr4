@@ -475,12 +475,10 @@ public class LexerATNFactory extends ParserATNFactory {
 				}
 				offset = escapeParseResult.parseLength;
 			}
-			else if (c == '-' && !state.inRange) {
-				if (state.mode == CharSetParseState.Mode.PREV_PROPERTY || i == 0 || i == n - 1) {
-					ErrorType errorType = state.mode == CharSetParseState.Mode.PREV_PROPERTY
-							? ErrorType.UNICODE_PROPERTY_NOT_ALLOWED_IN_RANGE
-							: ErrorType.INVALID_CHAR_SET;
-					g.tool.errMgr.grammarError(errorType, g.fileName, charSetAST.getToken(), charSetAST.getText());
+			else if (c == '-' && !state.inRange && i != 0 && i != n - 1) {
+				if (state.mode == CharSetParseState.Mode.PREV_PROPERTY) {
+					g.tool.errMgr.grammarError(ErrorType.UNICODE_PROPERTY_NOT_ALLOWED_IN_RANGE,
+							g.fileName, charSetAST.getToken(), charSetAST.getText());
 					state = CharSetParseState.ERROR;
 				}
 				else {
@@ -496,13 +494,7 @@ public class LexerATNFactory extends ParserATNFactory {
 			return new IntervalSet();
 		}
 		// Whether or not we were in a range, we'll add the last code point found to the set.
-		// If the range wasn't terminated, we'll treat it as a standalone codepoint.
 		applyPrevState(charSetAST, set, state);
-		if (state.inRange) {
-			// Unterminated range; add a literal hyphen to the set.
-			checkSetCollision(charSetAST, set, '-');
-			set.add('-');
-		}
 		return set;
 	}
 
