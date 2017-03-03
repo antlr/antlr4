@@ -115,7 +115,7 @@ public class ATNOptimizer {
 									g.tool.errMgr.grammarError(ErrorType.CHARACTERS_COLLISION_IN_SET, g.fileName,
 											null,
 											CharSupport.getANTLRCharLiteralForChar(v),
-											getIntervalSetEscapedString(matchSet));
+											CharSupport.getIntervalSetEscapedString(matchSet));
 									break;
 								}
 							}
@@ -148,29 +148,6 @@ public class ATNOptimizer {
 		}
 
 //		System.out.println("ATN optimizer removed " + removedStates + " states by collapsing sets.");
-	}
-
-	private static String getIntervalSetEscapedString(IntervalSet intervalSet) {
-		StringBuilder buf = new StringBuilder();
-		Iterator<Interval> iter = intervalSet.getIntervals().iterator();
-		while (iter.hasNext()) {
-			Interval I = iter.next();
-			int a = I.a;
-			int b = I.b;
-			if ( a==b ) {
-				if ( a== Token.EOF ) buf.append("<EOF>");
-				else buf.append(CharSupport.getANTLRCharLiteralForChar(a));
-			}
-			else {
-				buf.append(CharSupport.getANTLRCharLiteralForChar(a))
-					.append("..")
-					.append(CharSupport.getANTLRCharLiteralForChar(b));
-			}
-			if (iter.hasNext()) {
-				buf.append(" | ");
-			}
-		}
-		return buf.toString();
 	}
 
 	private static void optimizeStates(ATN atn) {

@@ -7,6 +7,11 @@
 package org.antlr.v4.misc;
 
 import org.antlr.v4.runtime.Lexer;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.misc.Interval;
+import org.antlr.v4.runtime.misc.IntervalSet;
+
+import java.util.Iterator;
 
 /** */
 public class CharSupport {
@@ -180,7 +185,20 @@ public class CharSupport {
 		return Character.toUpperCase(s.charAt(0)) + s.substring(1);
 	}
 
-	public static String toRange(int codePointStart, int codePointEnd) {
+	public static String getIntervalSetEscapedString(IntervalSet intervalSet) {
+		StringBuilder buf = new StringBuilder();
+		Iterator<Interval> iter = intervalSet.getIntervals().iterator();
+		while (iter.hasNext()) {
+			Interval interval = iter.next();
+			buf.append(getRangeEscapedString(interval.a, interval.b));
+			if (iter.hasNext()) {
+				buf.append(" | ");
+			}
+		}
+		return buf.toString();
+	}
+
+	public static String getRangeEscapedString(int codePointStart, int codePointEnd) {
 		return codePointStart != codePointEnd
 				? getANTLRCharLiteralForChar(codePointStart) + ".." + getANTLRCharLiteralForChar(codePointEnd)
 				: getANTLRCharLiteralForChar(codePointStart);

@@ -517,7 +517,7 @@ public class LexerATNFactory extends ParserATNFactory {
 						ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED,
 						g.fileName,
 						charSetAST.getToken(),
-						CharSupport.toRange(state.prevCodePoint, codePoint));
+						CharSupport.getRangeEscapedString(state.prevCodePoint, codePoint));
 			}
 			checkSetCollision(charSetAST, set, state.prevCodePoint, codePoint);
 			set.add(state.prevCodePoint, codePoint);
@@ -598,7 +598,7 @@ public class LexerATNFactory extends ParserATNFactory {
 					setText = sb.toString();
 				}
 				g.tool.errMgr.grammarError(ErrorType.CHARACTERS_COLLISION_IN_SET, g.fileName, ast.getToken(),
-						CharSupport.toRange(a, b), setText);
+						CharSupport.getRangeEscapedString(a, b), setText);
 				break;
 			}
 		}
