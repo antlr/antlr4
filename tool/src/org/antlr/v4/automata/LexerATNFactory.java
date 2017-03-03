@@ -476,9 +476,11 @@ public class LexerATNFactory extends ParserATNFactory {
 				offset = escapeParseResult.parseLength;
 			}
 			else if (c == '-' && !state.inRange) {
-				if (state.mode == CharSetParseState.Mode.PREV_PROPERTY) {
-					g.tool.errMgr.grammarError(ErrorType.UNICODE_PROPERTY_NOT_ALLOWED_IN_RANGE,
-								   g.fileName, charSetAST.getToken(), charSetAST.getText());
+				if (state.mode == CharSetParseState.Mode.PREV_PROPERTY || i == 0 || i == n - 1) {
+					ErrorType errorType = state.mode == CharSetParseState.Mode.PREV_PROPERTY
+							? ErrorType.UNICODE_PROPERTY_NOT_ALLOWED_IN_RANGE
+							: ErrorType.INVALID_CHAR_SET;
+					g.tool.errMgr.grammarError(errorType, g.fileName, charSetAST.getToken(), charSetAST.getText());
 					state = CharSetParseState.ERROR;
 				}
 				else {
