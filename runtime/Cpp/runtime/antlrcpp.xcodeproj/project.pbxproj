@@ -534,9 +534,6 @@
 		276E5F411CDB57AA003FF4B4 /* IntStream.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5CBF1CDB57AA003FF4B4 /* IntStream.h */; };
 		276E5F421CDB57AA003FF4B4 /* IntStream.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5CBF1CDB57AA003FF4B4 /* IntStream.h */; };
 		276E5F431CDB57AA003FF4B4 /* IntStream.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5CBF1CDB57AA003FF4B4 /* IntStream.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		276E5F441CDB57AA003FF4B4 /* IRecognizer.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5CC01CDB57AA003FF4B4 /* IRecognizer.h */; };
-		276E5F451CDB57AA003FF4B4 /* IRecognizer.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5CC01CDB57AA003FF4B4 /* IRecognizer.h */; };
-		276E5F461CDB57AA003FF4B4 /* IRecognizer.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5CC01CDB57AA003FF4B4 /* IRecognizer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		276E5F471CDB57AA003FF4B4 /* Lexer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5CC11CDB57AA003FF4B4 /* Lexer.cpp */; };
 		276E5F481CDB57AA003FF4B4 /* Lexer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5CC11CDB57AA003FF4B4 /* Lexer.cpp */; };
 		276E5F491CDB57AA003FF4B4 /* Lexer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5CC11CDB57AA003FF4B4 /* Lexer.cpp */; };
@@ -1061,7 +1058,6 @@
 		276E5CBD1CDB57AA003FF4B4 /* InterpreterRuleContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InterpreterRuleContext.h; sourceTree = "<group>"; wrapsLines = 0; };
 		276E5CBE1CDB57AA003FF4B4 /* IntStream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = IntStream.cpp; sourceTree = "<group>"; };
 		276E5CBF1CDB57AA003FF4B4 /* IntStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IntStream.h; sourceTree = "<group>"; };
-		276E5CC01CDB57AA003FF4B4 /* IRecognizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IRecognizer.h; sourceTree = "<group>"; };
 		276E5CC11CDB57AA003FF4B4 /* Lexer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Lexer.cpp; sourceTree = "<group>"; wrapsLines = 0; };
 		276E5CC21CDB57AA003FF4B4 /* Lexer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Lexer.h; sourceTree = "<group>"; };
 		276E5CC31CDB57AA003FF4B4 /* LexerInterpreter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LexerInterpreter.cpp; sourceTree = "<group>"; wrapsLines = 0; };
@@ -1266,7 +1262,6 @@
 				276E5CBD1CDB57AA003FF4B4 /* InterpreterRuleContext.h */,
 				276E5CBE1CDB57AA003FF4B4 /* IntStream.cpp */,
 				276E5CBF1CDB57AA003FF4B4 /* IntStream.h */,
-				276E5CC01CDB57AA003FF4B4 /* IRecognizer.h */,
 				276E5CC11CDB57AA003FF4B4 /* Lexer.cpp */,
 				276E5CC21CDB57AA003FF4B4 /* Lexer.h */,
 				276E5CC31CDB57AA003FF4B4 /* LexerInterpreter.cpp */,
@@ -1707,7 +1702,6 @@
 				27DB44CC1D0463DB007E790B /* XPathElement.h in Headers */,
 				276E5F581CDB57AA003FF4B4 /* LexerNoViableAltException.h in Headers */,
 				276E5D811CDB57AA003FF4B4 /* ATNSimulator.h in Headers */,
-				276E5F461CDB57AA003FF4B4 /* IRecognizer.h in Headers */,
 				27DB44B61D0463CC007E790B /* XPathLexer.h in Headers */,
 				276E5FC41CDB57AA003FF4B4 /* guid.h in Headers */,
 				276E602D1CDB57AA003FF4B4 /* TagChunk.h in Headers */,
@@ -1875,7 +1869,6 @@
 				276E60141CDB57AA003FF4B4 /* ParseTreeMatch.h in Headers */,
 				276E5F571CDB57AA003FF4B4 /* LexerNoViableAltException.h in Headers */,
 				276E5D801CDB57AA003FF4B4 /* ATNSimulator.h in Headers */,
-				276E5F451CDB57AA003FF4B4 /* IRecognizer.h in Headers */,
 				276E5FC31CDB57AA003FF4B4 /* guid.h in Headers */,
 				276E602C1CDB57AA003FF4B4 /* TagChunk.h in Headers */,
 				276E5E941CDB57AA003FF4B4 /* RuleStopState.h in Headers */,
@@ -2033,7 +2026,6 @@
 				276E60131CDB57AA003FF4B4 /* ParseTreeMatch.h in Headers */,
 				276E5F561CDB57AA003FF4B4 /* LexerNoViableAltException.h in Headers */,
 				276E5D7F1CDB57AA003FF4B4 /* ATNSimulator.h in Headers */,
-				276E5F441CDB57AA003FF4B4 /* IRecognizer.h in Headers */,
 				276E5FC21CDB57AA003FF4B4 /* guid.h in Headers */,
 				276E602B1CDB57AA003FF4B4 /* TagChunk.h in Headers */,
 				276E5E931CDB57AA003FF4B4 /* RuleStopState.h in Headers */,
