@@ -5,13 +5,13 @@
  */
 package org.antlr.v4.test.runtime;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 
 public abstract class TestOutputReading {
 	public static void append(BufferedReader in, StringBuilder buf) throws IOException {

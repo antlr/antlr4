@@ -242,6 +242,19 @@ public class <parser.name> extends <superClass; null="Parser"> {
 
 	<vocabulary(parser.literalNames, parser.symbolicNames)>
 
+	public static class <parser.grammarName>ParseTreeFactory extends AbstractParseTreeFactory {
+		public <parser.grammarName>ParseTreeFactory(Parser parser) { super(parser); }
+		@Override
+    	public ParserRuleContext createRuleNode(int ruleIndex, ParserRuleContext parent, int invokingStateNumber) {
+    		return <parser.name>.createRuleNode(ruleIndex, parent, invokingStateNumber);
+    	}
+
+    	@Override
+    	public ParserRuleContext createAltLabelRuleNode(int ruleIndex, int altIndex, ParserRuleContext src) {
+    		return <parser.name>.createAltLabelRuleNode(ruleIndex, altIndex, src);
+    	}
+	}
+
 	@Override
 	public String getGrammarFileName() { return "<parser.grammarFileName; format="java-escape">"; }
 
@@ -257,6 +270,20 @@ public class <parser.name> extends <superClass; null="Parser"> {
 	<namedActions.members>
 	<parser:(ctor)()>
 	<funcs; separator="\n">
+
+	public static ParserRuleContext createRuleNode(int ruleIndex, ParserRuleContext parent, int stateNumber) {
+		switch ( ruleIndex ) {
+			<funcs:{f | case RULE_<f.currentRule.name> : return new <f.currentRule.ctxType>(parent, stateNumber);}; separator="\n">
+			default : return null;
+		}
+	}
+
+	public static ParserRuleContext createAltLabelRuleNode(int ruleIndex, int altIndex, ParserRuleContext parent) {
+		switch ( ruleIndex ) {
+			<funcs:{f | <if(f.altLabelCtxs)>case RULE_<f.currentRule.name> : return <f.currentRule.name>_createAltLabelNode(altIndex, (<f.currentRule.name; format="cap">Context)parent);<endif>}; separator="\n">
+			default : return null;
+		}
+	}
 
 <if(sempredFuncs)>
 	public boolean sempred(RuleContext _localctx, int ruleIndex, int predIndex) {
@@ -346,6 +373,7 @@ parser_ctor(p) ::= <<
 public <p.name>(TokenStream input) {
 	super(input);
 	_interp = new ParserATNSimulator(this,_ATN,_decisionToDFA,_sharedContextCache);
+	_treeFactory = new <parser.grammarName>ParseTreeFactory(this);
 }
 >>
 
@@ -382,8 +410,18 @@ RuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,namedActions,fina
 <ruleCtx>
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
 
+<if(altLabelCtxs)>
+public static ParserRuleContext <currentRule.name>_createAltLabelNode(int altIndex, <currentRule.name; format="cap">Context parent) {
+	switch ( altIndex ) {
+		<currentRule.altToContext:{alt | case <alt.altNum> : return new <alt.name>(parent);}; separator="\n">
+		default : return null;
+	}
+}
+<endif>
+
 <if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public final <endif><currentRule.ctxType> <currentRule.name>(<args; separator=",">) throws RecognitionException {
-	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, getState()<currentRule.args:{a | , <a.name>}>);
+	<currentRule.ctxType> _localctx = (<currentRule.ctxType>)_treeFactory.createRuleNode(RULE_<currentRule.name>, _ctx, getState());
+	<currentRule.args:{a | _localctx.<a.name> = <a.name>;}; separator="\n">
 	enterRule(_localctx, <currentRule.startState>, RULE_<currentRule.name>);
 	<namedActions.init>
 	<locals; separator="\n">
@@ -419,6 +457,15 @@ LeftRecursiveRuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,
 <ruleCtx>
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
 
+<if(altLabelCtxs)>
+public static ParserRuleContext <currentRule.name>_createAltLabelNode(int altIndex, <currentRule.name; format="cap">Context parent) {
+	switch ( altIndex ) {
+		<currentRule.altToContext:{alt | case <alt.altNum> : return new <alt.name>(parent);}; separator="\n">
+		default : return null;
+	}
+}
+<endif>
+
 <if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public final <endif><currentRule.ctxType> <currentRule.name>(<args; separator=", ">) throws RecognitionException {
 	return <currentRule.name>(0<currentRule.args:{a | , <a.name>}>);
 }
@@ -426,7 +473,8 @@ LeftRecursiveRuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,
 private <currentRule.ctxType> <currentRule.name>(int _p<args:{a | , <a>}>) throws RecognitionException {
 	ParserRuleContext _parentctx = _ctx;
 	int _parentState = getState();
-	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(_ctx, _parentState<currentRule.args:{a | , <a.name>}>);
+	<currentRule.ctxType> _localctx = (<currentRule.ctxType>)_treeFactory.createRuleNode(RULE_<currentRule.name>, _ctx, _parentState);
+	<currentRule.args:{a | _localctx.<a.name> = <a.name>;}; separator="\n">
 	<currentRule.ctxType> _prevctx = _localctx;
 	int _startState = <currentRule.startState>;
 	enterRecursionRule(_localctx, <currentRule.startState>, RULE_<currentRule.name>, _p);
@@ -454,7 +502,9 @@ private <currentRule.ctxType> <currentRule.name>(int _p<args:{a | , <a>}>) throw
 >>
 
 CodeBlockForOuterMostAlt(currentOuterMostAltCodeBlock, locals, preamble, ops) ::= <<
-<if(currentOuterMostAltCodeBlock.altLabel)>_localctx = new <currentOuterMostAltCodeBlock.altLabel; format="cap">Context(_localctx);<endif>
+<if(currentOuterMostAltCodeBlock.altLabel)>
+_localctx = (<currentRule.ctxType>)_treeFactory.createAltLabelRuleNode(RULE_<currentRule.name>, <currentOuterMostAltCodeBlock.alt.altNum>, _localctx);
+<endif>
 enterOuterAlt(_localctx, <currentOuterMostAltCodeBlock.alt.altNum>);
 <CodeBlockForAlt(currentAltCodeBlock=currentOuterMostAltCodeBlock, ...)>
 >>
@@ -832,7 +882,7 @@ recRuleSetReturnAction(src,name)	  ::= "$<name>=$<src>.<name>;"
 recRuleSetStopToken()                 ::= "_ctx.stop = _input.LT(-1);"
 
 recRuleAltStartAction(ruleName, ctxName, label, isListLabel) ::= <<
-_localctx = new <ctxName>Context(_parentctx, _parentState);
+_localctx = (<currentRule.ctxType>)_treeFactory.createRuleNode(RULE_<ruleName>, _parentctx, _parentState);
 <if(label)>
 <if(isListLabel)>
 _localctx.<label>.add(_prevctx);
@@ -844,8 +894,8 @@ _localctx.<label> = _prevctx;
 pushNewRecursionContext(_localctx, _startState, RULE_<ruleName>);
 >>
 
-recRuleLabeledAltStartAction(ruleName, currentAltLabel, label, isListLabel) ::= <<
-_localctx = new <currentAltLabel; format="cap">Context(new <ruleName; format="cap">Context(_parentctx, _parentState));
+recRuleLabeledAltStartAction(ruleName, currentAltLabel, label, isListLabel, altIndex) ::= <<
+_localctx = (<currentAltLabel; format="cap">Context)_treeFactory.createAltLabelRuleNode(RULE_<currentRule.name>, <altIndex>, _treeFactory.createRuleNode(RULE_<ruleName>, _parentctx, _parentState));
 <if(label)>
 <if(isListLabel)>
 ((<currentAltLabel; format="cap">Context)_localctx).<label>.add(_prevctx);
@@ -856,8 +906,8 @@ _localctx = new <currentAltLabel; format="cap">Context(new <ruleName; format="ca
 pushNewRecursionContext(_localctx, _startState, RULE_<ruleName>);
 >>
 
-recRuleReplaceContext(ctxName) ::= <<
-_localctx = new <ctxName>Context(_localctx);
+recRuleReplaceContext(ctxName, altIndex) ::= <<
+_localctx = (<currentRule.ctxType>)_treeFactory.createAltLabelRuleNode(RULE_<currentRule.name>, <altIndex>, _localctx);
 _ctx = _localctx;
 _prevctx = _localctx;
 >>

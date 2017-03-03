@@ -20,6 +20,7 @@ import org.antlr.v4.runtime.misc.IntegerStack;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ErrorNodeImpl;
+import org.antlr.v4.runtime.tree.ParseTreeFactory;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -127,7 +128,6 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 	 */
 	protected boolean _buildParseTrees = true;
 
-
 	/**
 	 * When {@link #setTrace}{@code (true)} is called, a reference to the
 	 * {@link TraceListener} is stored here so it can be easily removed in a
@@ -144,6 +144,9 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 	 * @see #addParseListener
 	 */
 	protected List<ParseTreeListener> _parseListeners;
+
+	/** How to build nodes and assemble trees */
+	protected ParseTreeFactory _treeFactory;
 
 	/**
 	 * The number of syntax errors reported during parsing. This value is

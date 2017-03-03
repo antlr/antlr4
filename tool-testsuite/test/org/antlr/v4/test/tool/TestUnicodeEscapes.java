@@ -7,7 +7,6 @@
 package org.antlr.v4.test.tool;
 
 import org.antlr.v4.codegen.UnicodeEscapes;
-
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

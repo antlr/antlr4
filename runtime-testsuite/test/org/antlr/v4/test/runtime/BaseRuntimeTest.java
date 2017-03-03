@@ -9,7 +9,6 @@ package org.antlr.v4.test.runtime;
 import org.antlr.v4.Tool;
 import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.runtime.misc.Utils;
-import org.antlr.v4.test.runtime.java.BaseJavaTest;
 import org.antlr.v4.tool.ANTLRMessage;
 import org.antlr.v4.tool.DefaultToolListener;
 import org.junit.Before;
@@ -110,7 +109,7 @@ public abstract class BaseRuntimeTest {
 
 	@Test
 	public void testOne() throws Exception {
-		// System.out.println(delegate.getTmpDir());
+//		System.out.println(delegate.getTmpDir());
 		if ( descriptor.ignore(descriptor.getTarget()) ) {
 			System.out.printf("Ignore "+descriptor);
 			return;
