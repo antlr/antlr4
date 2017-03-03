@@ -6,6 +6,8 @@
 
 package org.antlr.v4.automata;
 
+import org.antlr.v4.codegen.model.MatchSet;
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.atn.AtomTransition;
@@ -25,6 +27,7 @@ import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.Rule;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -111,8 +114,8 @@ public class ATNOptimizer {
 									// TODO: Token is missing (i.e. position in source will not be displayed).
 									g.tool.errMgr.grammarError(ErrorType.CHARACTERS_COLLISION_IN_SET, g.fileName,
 											null,
-											String.valueOf(Character.toChars(v)),
-											matchSet.toString(true));
+											CharSupport.getANTLRCharLiteralForChar(v),
+											CharSupport.getIntervalSetEscapedString(matchSet));
 									break;
 								}
 							}

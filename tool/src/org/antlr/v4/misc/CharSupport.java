@@ -7,6 +7,11 @@
 package org.antlr.v4.misc;
 
 import org.antlr.v4.runtime.Lexer;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.misc.Interval;
+import org.antlr.v4.runtime.misc.IntervalSet;
+
+import java.util.Iterator;
 
 /** */
 public class CharSupport {
@@ -18,11 +23,6 @@ public class CharSupport {
 	/** Given a char, we need to be able to show as an ANTLR literal.
 	 */
 	public static String ANTLRLiteralCharValueEscape[] = new String[255];
-
-	public enum ToRangeMode {
-		BRACKETED,
-		NOT_BRACKETED,
-	};
 
 	static {
 		ANTLRLiteralEscapedCharValue['n'] = '\n';
@@ -45,28 +45,34 @@ public class CharSupport {
 	 *  as \\uXXXX or \\u{XXXXXX} escapes.
 	 */
 	public static String getANTLRCharLiteralForChar(int c) {
-		if ( c< Lexer.MIN_CHAR_VALUE ) {
-			return "'<INVALID>'";
-		}
-		if ( c<ANTLRLiteralCharValueEscape.length && ANTLRLiteralCharValueEscape[c]!=null ) {
-			return '\''+ANTLRLiteralCharValueEscape[c]+'\'';
-		}
-		if ( Character.UnicodeBlock.of((char)c)==Character.UnicodeBlock.BASIC_LATIN &&
-			 !Character.isISOControl((char)c) ) {
-			if ( c=='\\' ) {
-				return "'\\\\'";
-			}
-			if ( c=='\'') {
-				return "'\\''";
-			}
-			return '\''+Character.toString((char)c)+'\'';
-		}
-		if (c <= 0xFFFF) {
-			return String.format("\\u%04X", c);
+		String result;
+		if ( c < Lexer.MIN_CHAR_VALUE ) {
+			result = "<INVALID>";
 		}
 		else {
-			return String.format("\\u{%06X}", c);
+			String charValueEscape = c < ANTLRLiteralCharValueEscape.length ? ANTLRLiteralCharValueEscape[c] : null;
+			if (charValueEscape != null) {
+				result = charValueEscape;
+			}
+			else if (Character.UnicodeBlock.of((char) c) == Character.UnicodeBlock.BASIC_LATIN &&
+					!Character.isISOControl((char) c)) {
+				if (c == '\\') {
+					result = "\\\\";
+				}
+				else if (c == '\'') {
+					result = "\\'";
+				}
+				else {
+					result = Character.toString((char) c);
+				}
+			}
+			else if (c <= 0xFFFF) {
+				result = String.format("\\u%04X", c);
+			} else {
+				result = String.format("\\u{%06X}", c);
+			}
 		}
+		return '\'' + result + '\'';
 	}
 
 	/** Given a literal like (the 3 char sequence with single quotes) 'a',
@@ -179,17 +185,22 @@ public class CharSupport {
 		return Character.toUpperCase(s.charAt(0)) + s.substring(1);
 	}
 
-	public static String toRange(int codePointStart, int codePointEnd, ToRangeMode mode) {
-		StringBuilder sb = new StringBuilder();
-		if (mode == ToRangeMode.BRACKETED) {
-			sb.append("[");
+	public static String getIntervalSetEscapedString(IntervalSet intervalSet) {
+		StringBuilder buf = new StringBuilder();
+		Iterator<Interval> iter = intervalSet.getIntervals().iterator();
+		while (iter.hasNext()) {
+			Interval interval = iter.next();
+			buf.append(getRangeEscapedString(interval.a, interval.b));
+			if (iter.hasNext()) {
+				buf.append(" | ");
+			}
 		}
-		sb.appendCodePoint(codePointStart)
-			.append("-")
-			.appendCodePoint(codePointEnd);
-		if (mode == ToRangeMode.BRACKETED) {
-			sb.append("]");
-		}
-		return sb.toString();
+		return buf.toString();
+	}
+
+	public static String getRangeEscapedString(int codePointStart, int codePointEnd) {
+		return codePointStart != codePointEnd
+				? getANTLRCharLiteralForChar(codePointStart) + ".." + getANTLRCharLiteralForChar(codePointEnd)
+				: getANTLRCharLiteralForChar(codePointStart);
 	}
 }
