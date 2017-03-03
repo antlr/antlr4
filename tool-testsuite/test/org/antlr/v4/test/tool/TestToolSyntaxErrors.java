@@ -509,8 +509,9 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 				"INVALID_CHAR_SET:             [\\u24\\uA2][\\{];\n" +  //https://github.com/antlr/antlr4/issues/1077
 				"EMPTY_STRING_LITERAL_RANGE:   'F'..'A' | 'Z';\n" +
 				"EMPTY_CHAR_SET:               [f-az][];\n" +
+				"INVALID_RANGE_IN_CHAR_SET:    [-z] | [a-] | [-];" +
 				"VALID_STRING_LITERALS:        '\\u1234' | '\\t' | '\\'';\n" +
-				"VALID_CHAR_SET:               [`\\-=\\]];";
+				"VALID_CHAR_SET:               [`\\-=\\]];\n";
 
 		String expected =
 				"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:2:31: invalid escape sequence\n" +
@@ -522,7 +523,10 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 				"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:4:40: invalid escape sequence\n" +
 				"error(" + ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED.code + "): Test.g4:5:33: string literals and sets cannot be empty: 'F'..'A'\n" +
 				"error(" + ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED.code + "): Test.g4:6:30: string literals and sets cannot be empty: [f-a]\n" +
-				"error(" + ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED.code + "): Test.g4:6:36: string literals and sets cannot be empty: []\n";
+				"error(" + ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED.code + "): Test.g4:6:36: string literals and sets cannot be empty: []\n" +
+				"error(" + ErrorType.INVALID_CHAR_SET.code + "): Test.g4:7:30: invalid charset (range without start or end): [-z]\n" +
+				"error(" + ErrorType.INVALID_CHAR_SET.code + "): Test.g4:7:37: invalid charset (range without start or end): [a-]\n" +
+				"error(" + ErrorType.INVALID_CHAR_SET.code + "): Test.g4:7:44: invalid charset (range without start or end): [-]\n";
 
 		String[] pair = new String[] {
 				grammar,
