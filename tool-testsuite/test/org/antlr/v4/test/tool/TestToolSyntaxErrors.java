@@ -509,9 +509,9 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 				"INVALID_CHAR_SET:             [\\u24\\uA2][\\{];\n" +  //https://github.com/antlr/antlr4/issues/1077
 				"EMPTY_STRING_LITERAL_RANGE:   'F'..'A' | 'Z';\n" +
 				"EMPTY_CHAR_SET:               [f-az][];\n" +
-				"INVALID_RANGE_IN_CHAR_SET:    [-z] | [a-] | [-];" +
+				"INVALID_RANGE_IN_CHAR_SET:    [-z] | [a-] | [-];\n" +
 				"VALID_STRING_LITERALS:        '\\u1234' | '\\t' | '\\'';\n" +
-				"VALID_CHAR_SET:               [`\\-=\\]];\n";
+				"VALID_CHAR_SET:               [`\\-=\\]];";
 
 		String expected =
 				"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:2:31: invalid escape sequence\n" +
