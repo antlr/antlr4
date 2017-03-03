@@ -1054,7 +1054,7 @@ public enum ErrorType {
 	 *
 	 * TODO: Does not work with fragment rules.
 	 */
-	CHARACTERS_COLLISION_IN_SET(180, "chars \"<arg>\" used multiple times in set <arg2>", ErrorSeverity.WARNING),
+	CHARACTERS_COLLISION_IN_SET(180, "chars <arg> used multiple times in set <arg2>", ErrorSeverity.WARNING),
 
 	/**
 	 * Compiler Warning 181

@@ -111,7 +111,7 @@ public class ATNOptimizer {
 									// TODO: Token is missing (i.e. position in source will not be displayed).
 									g.tool.errMgr.grammarError(ErrorType.CHARACTERS_COLLISION_IN_SET, g.fileName,
 											null,
-											String.valueOf(Character.toChars(v)),
+											CharSupport.getANTLRCharLiteralForChar(v),
 											matchSet.toString(true));
 									break;
 								}

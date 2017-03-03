@@ -19,11 +19,6 @@ public class CharSupport {
 	 */
 	public static String ANTLRLiteralCharValueEscape[] = new String[255];
 
-	public enum ToRangeMode {
-		BRACKETED,
-		NOT_BRACKETED,
-	};
-
 	static {
 		ANTLRLiteralEscapedCharValue['n'] = '\n';
 		ANTLRLiteralEscapedCharValue['r'] = '\r';
@@ -45,28 +40,34 @@ public class CharSupport {
 	 *  as \\uXXXX or \\u{XXXXXX} escapes.
 	 */
 	public static String getANTLRCharLiteralForChar(int c) {
-		if ( c< Lexer.MIN_CHAR_VALUE ) {
-			return "'<INVALID>'";
-		}
-		if ( c<ANTLRLiteralCharValueEscape.length && ANTLRLiteralCharValueEscape[c]!=null ) {
-			return '\''+ANTLRLiteralCharValueEscape[c]+'\'';
-		}
-		if ( Character.UnicodeBlock.of((char)c)==Character.UnicodeBlock.BASIC_LATIN &&
-			 !Character.isISOControl((char)c) ) {
-			if ( c=='\\' ) {
-				return "'\\\\'";
-			}
-			if ( c=='\'') {
-				return "'\\''";
-			}
-			return '\''+Character.toString((char)c)+'\'';
-		}
-		if (c <= 0xFFFF) {
-			return String.format("\\u%04X", c);
+		String result;
+		if ( c < Lexer.MIN_CHAR_VALUE ) {
+			result = "<INVALID>";
 		}
 		else {
-			return String.format("\\u{%06X}", c);
+			String charValueEscape = c < ANTLRLiteralCharValueEscape.length ? ANTLRLiteralCharValueEscape[c] : null;
+			if (charValueEscape != null) {
+				result = charValueEscape;
+			}
+			else if (Character.UnicodeBlock.of((char) c) == Character.UnicodeBlock.BASIC_LATIN &&
+					!Character.isISOControl((char) c)) {
+				if (c == '\\') {
+					result = "\\\\";
+				}
+				else if (c == '\'') {
+					result = "\\'";
+				}
+				else {
+					result = Character.toString((char) c);
+				}
+			}
+			else if (c <= 0xFFFF) {
+				result = String.format("\\u%04X", c);
+			} else {
+				result = String.format("\\u{%06X}", c);
+			}
 		}
+		return '\'' + result + '\'';
 	}
 
 	/** Given a literal like (the 3 char sequence with single quotes) 'a',
@@ -179,17 +180,9 @@ public class CharSupport {
 		return Character.toUpperCase(s.charAt(0)) + s.substring(1);
 	}
 
-	public static String toRange(int codePointStart, int codePointEnd, ToRangeMode mode) {
-		StringBuilder sb = new StringBuilder();
-		if (mode == ToRangeMode.BRACKETED) {
-			sb.append("[");
-		}
-		sb.appendCodePoint(codePointStart)
-			.append("-")
-			.appendCodePoint(codePointEnd);
-		if (mode == ToRangeMode.BRACKETED) {
-			sb.append("]");
-		}
-		return sb.toString();
+	public static String toRange(int codePointStart, int codePointEnd) {
+		return codePointStart != codePointEnd
+				? getANTLRCharLiteralForChar(codePointStart) + ".." + getANTLRCharLiteralForChar(codePointEnd)
+				: getANTLRCharLiteralForChar(codePointStart);
 	}
 }
