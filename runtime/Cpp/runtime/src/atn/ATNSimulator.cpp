@@ -32,8 +32,7 @@ PredictionContextCache& ATNSimulator::getSharedContextCache() {
 }
 
 Ref<PredictionContext> ATNSimulator::getCachedContext(Ref<PredictionContext> const& context) {
-  // This function requires a lock as it might modify the cache, however the only path so far where it is called from
-  // (addDFAState -> optimizeConfigs) already has _stateLock aquired. Adding another lock here would then deadlock.
+  // This function must only be called with an active state lock, as we are going to change a shared structure.
   std::map<Ref<PredictionContext>, Ref<PredictionContext>> visited;
   return PredictionContext::getCachedContext(context, _sharedContextCache, visited);
 }
