@@ -6,11 +6,10 @@
 #pragma once
 
 #include "ProxyErrorListener.h"
-#include "IRecognizer.h"
 
 namespace antlr4 {
 
-  class ANTLR4CPP_PUBLIC Recognizer : public IRecognizer {
+  class ANTLR4CPP_PUBLIC Recognizer {
   public:
     static const size_t EOF = (size_t)-1;
 
@@ -117,7 +116,10 @@ namespace antlr4 {
 
     virtual void action(RuleContext *localctx, size_t ruleIndex, size_t actionIndex);
 
-    virtual size_t getState() const override;
+    virtual size_t getState() const ;
+
+    // Get the ATN used by the recognizer for prediction.
+    virtual const atn::ATN& getATN() const = 0;
 
     /// <summary>
     /// Indicate that the recognizer has changed internal state that is

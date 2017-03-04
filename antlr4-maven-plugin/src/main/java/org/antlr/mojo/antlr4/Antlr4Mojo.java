@@ -150,6 +150,13 @@ public class Antlr4Mojo extends AbstractMojo {
     @Parameter(property = "project", required = true, readonly = true)
     protected MavenProject project;
 
+	/**
+	 * Specifies whether sources are added to the {@code compile} or
+	 * {@code test} scope.
+	 */
+	@Parameter(property = "antlr4.generateTestSources", defaultValue = "false")
+	private boolean generateTestSources;
+
     /**
      * The directory where the ANTLR grammar files ({@code *.g4}) are located.
      */
@@ -190,7 +197,12 @@ public class Antlr4Mojo extends AbstractMojo {
     }
 
     void addSourceRoot(File outputDir) {
-        project.addCompileSourceRoot(outputDir.getPath());
+		if (generateTestSources) {
+			project.addTestCompileSourceRoot(outputDir.getPath());
+		}
+		else {
+			project.addCompileSourceRoot(outputDir.getPath());
+		}
     }
 
     /**

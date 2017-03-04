@@ -131,19 +131,5 @@ namespace Antlr4.Runtime.Misc
             }
             return m;
         }
-
-        public static char[] ToCharArray(ArrayList<int> data)
-        {
-            if (data == null)
-            {
-                return null;
-            }
-            char[] cdata = new char[data.Count];
-            for (int i = 0; i < data.Count; i++)
-            {
-                cdata[i] = (char)data[i];
-            }
-            return cdata;
-        }
     }
 }

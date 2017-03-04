@@ -53,13 +53,8 @@ import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupString;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.BindException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -72,6 +67,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import static org.antlr.v4.test.runtime.BaseRuntimeTest.antlrOnString;
+import static org.antlr.v4.test.runtime.BaseRuntimeTest.writeFile;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -528,41 +524,6 @@ public abstract class BaseBrowserTest implements RuntimeTestSupport {
 		}
 	}
 
-	public static class StreamVacuum implements Runnable {
-		StringBuilder buf = new StringBuilder();
-		BufferedReader in;
-		Thread sucker;
-		public StreamVacuum(InputStream in) {
-			this.in = new BufferedReader( new InputStreamReader(in) );
-		}
-		public void start() {
-			sucker = new Thread(this);
-			sucker.start();
-		}
-		@Override
-		public void run() {
-			try {
-				String line = in.readLine();
-				while (line!=null) {
-					buf.append(line);
-					buf.append('\n');
-					line = in.readLine();
-				}
-			}
-			catch (IOException ioe) {
-				System.err.println("can't read output from process");
-			}
-		}
-		/** wait for the thread to finish */
-		public void join() throws InterruptedException {
-			sucker.join();
-		}
-		@Override
-		public String toString() {
-			return buf.toString();
-		}
-	}
-
 	protected void checkGrammarSemanticsError(ErrorQueue equeue,
 	                                          GrammarSemanticsMessage expectedMessage)
 		throws Exception
@@ -646,21 +607,6 @@ public abstract class BaseBrowserTest implements RuntimeTestSupport {
 		}
 	}
 
-	public static void writeFile(String dir, String fileName, String content) {
-		try {
-			File f = new File(dir, fileName);
-			FileWriter w = new FileWriter(f);
-			BufferedWriter bw = new BufferedWriter(w);
-			bw.write(content);
-			bw.close();
-			w.close();
-		}
-		catch (IOException ioe) {
-			System.err.println("can't write file");
-			ioe.printStackTrace(System.err);
-		}
-	}
-
 	protected void mkdir(String dir) {
 		File f = new File(dir);
 		f.mkdirs();
@@ -732,7 +678,7 @@ public abstract class BaseBrowserTest implements RuntimeTestSupport {
 			"			test = function() {\r\n" +
 			"				document.getElementById('output').value = ''\r\n" +
 			"				var input = document.getElementById('input').value;\r\n" +
-			"    			var stream = new antlr4.InputStream(input);\n" +
+			"			var stream = new antlr4.InputStream(input, true);\n" +
 			"    			var lexer = new " + lexerName + "." + lexerName + "(stream);\n" +
 			"				lexer._listeners = [new listener()];\r\n" +
 			"    			var tokens = new antlr4.CommonTokenStream(lexer);\n" +
@@ -791,7 +737,7 @@ public abstract class BaseBrowserTest implements RuntimeTestSupport {
 			"			test = function() {\r\n" +
 			"				document.getElementById('output').value = ''\r\n" +
 			"				var input = document.getElementById('input').value;\r\n" +
-			"    			var chars = new antlr4.InputStream(input);\r\n" +
+			"			var chars = new antlr4.InputStream(input, true);\r\n" +
 			"    			var lexer = new " + lexerName + "." + lexerName + "(chars);\r\n" +
 			"				lexer._listeners = [new listener()];\r\n" +
 			"    			var stream = new antlr4.CommonTokenStream(lexer);\r\n" +

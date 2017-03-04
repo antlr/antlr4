@@ -9,6 +9,7 @@ package org.antlr.v4.test.tool;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.LexerGrammar;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -291,21 +292,36 @@ public class TestSymbolIssues extends BaseJavaToolTest {
 		String[] test = {
 				"grammar L;\n" +
 				"\n" +
-				"rule1                                    // Correct (Alternatives)\n" +
-				"    : t1 = a  #aLabel\n" +
-				"    | t1 = b  #bLabel\n" +
+				"rule1                                      // Correct (Alternatives)\n" +
+				"    : t1=a  #aLabel\n" +
+				"    | t1=b  #bLabel\n" +
 				"    ;\n" +
 				"rule2                         //Incorrect type casting in generated code (RULE_LABEL)\n" +
-				"    : t2 = a | t2 = b\n" +
+				"    : t2=a | t2=b\n" +
 				"    ;\n" +
 				"rule3\n" +
-				"    : t3 += a+ b t3 += c+     //Incorrect type casting in generated code (RULE_LIST_LABEL)\n" +
+				"    : t3+=a+ b t3+=c+     //Incorrect type casting in generated code (RULE_LIST_LABEL)\n" +
 				"    ;\n" +
 				"rule4\n" +
-				"    : a t4 = A b t4 = B c                // Correct (TOKEN_LABEL)\n" +
+				"    : a t4=A b t4=B c                  // Correct (TOKEN_LABEL)\n" +
 				"    ;\n" +
 				"rule5\n" +
-				"    : a t5 += A b t5 += B c              // Correct (TOKEN_LIST_LABEL)\n" +
+				"    : a t5+=A b t5+=B c                // Correct (TOKEN_LIST_LABEL)\n" +
+				"    ;\n" +
+				"rule6                     // Correct (https://github.com/antlr/antlr4/issues/1543)\n" +
+				"    : t6=a                          #t6_1_Label\n" +
+				"    | t6=rule6 b (t61=c)? t62=rule6 #t6_2_Label\n" +
+				"    | t6=A     a (t61=B)? t62=A     #t6_3_Label\n" +
+				"    ;\n" +
+				"rule7                     // Incorrect (https://github.com/antlr/antlr4/issues/1543)\n" +
+				"    : a\n" +
+				"    | t7=rule7 b (t71=c)? t72=rule7 \n" +
+				"    | t7=A     a (t71=B)? t72=A     \n" +
+				"    ;\n" +
+				"rule8                     // Correct (https://github.com/antlr/antlr4/issues/1543)\n" +
+				"    : a\n" +
+				"    | t8=rule8 a t8=rule8\n" +
+				"    | t8=rule8 b t8=rule8\n" +
 				"    ;\n" +
 				"a: A;\n" +
 				"b: B;\n" +
@@ -314,8 +330,54 @@ public class TestSymbolIssues extends BaseJavaToolTest {
 				"B: 'b';\n" +
 				"C: 'c';\n",
 
-				"error(" + ErrorType.LABEL_TYPE_CONFLICT.code + "): L.g4:8:15: label t2=b type mismatch with previous definition: t2=a\n" +
-				"error(" + ErrorType.LABEL_TYPE_CONFLICT.code + "): L.g4:11:17: label t3+=c type mismatch with previous definition: t3+=a\n"
+				"error(" + ErrorType.LABEL_TYPE_CONFLICT.code + "): L.g4:8:13: label t2=b type mismatch with previous definition: t2=a\n" +
+				"error(" + ErrorType.LABEL_TYPE_CONFLICT.code + "): L.g4:11:15: label t3+=c type mismatch with previous definition: t3+=a\n" +
+
+				"error(" + ErrorType.LABEL_TYPE_CONFLICT.code + "): L.g4:24:0: label t7 type mismatch with previous definition: TOKEN_LABEL!=RULE_LABEL\n" +
+				"error(" + ErrorType.LABEL_TYPE_CONFLICT.code + "): L.g4:24:0: label t71 type mismatch with previous definition: RULE_LABEL!=TOKEN_LABEL\n" +
+				"error(" + ErrorType.LABEL_TYPE_CONFLICT.code + "): L.g4:24:0: label t72 type mismatch with previous definition: RULE_LABEL!=TOKEN_LABEL\n"
+		};
+
+		testErrors(test, false);
+	}
+
+	// https://github.com/antlr/antlr4/issues/1543
+	@Test public void testLabelsForTokensWithMixedTypesLRWithLabels() {
+		String[] test = {
+				"grammar L;\n" +
+				"\n" +
+				"expr\n" +
+				"    : left=A '+' right=A        #primary\n" +
+				"    | left=expr '-' right=expr  #sub\n" +
+				"    ;\n" +
+				"\n" +
+				"A: 'a';\n" +
+				"B: 'b';\n" +
+				"C: 'c';\n",
+
+				""
+		};
+
+		testErrors(test, false);
+	}
+
+	// https://github.com/antlr/antlr4/issues/1543
+	@Test
+	public void testLabelsForTokensWithMixedTypesLRWithoutLabels() {
+		String[] test = {
+				"grammar L;\n" +
+				"\n" +
+				"expr\n" +
+				"    : left=A '+' right=A\n" +
+				"    | left=expr '-' right=expr\n" +
+				"    ;\n" +
+				"\n" +
+				"A: 'a';\n" +
+				"B: 'b';\n" +
+				"C: 'c';\n",
+
+				"error(" + ErrorType.LABEL_TYPE_CONFLICT.code + "): L.g4:3:0: label left type mismatch with previous definition: TOKEN_LABEL!=RULE_LABEL\n" +
+				"error(" + ErrorType.LABEL_TYPE_CONFLICT.code + "): L.g4:3:0: label right type mismatch with previous definition: RULE_LABEL!=TOKEN_LABEL\n"
 		};
 
 		testErrors(test, false);
@@ -327,12 +389,15 @@ public class TestSymbolIssues extends BaseJavaToolTest {
 				"TOKEN_RANGE:      [aa-f];\n" +
 				"TOKEN_RANGE_2:    [A-FD-J];\n" +
 				"TOKEN_RANGE_3:    'Z' | 'K'..'R' | 'O'..'V';\n" +
-				"TOKEN_RANGE_4:    'g'..'l' | [g-l];\n",             // Handling in ATNOptimizer.
+				"TOKEN_RANGE_4:    'g'..'l' | [g-l];\n" +
+				"TOKEN_RANGE_WITHOUT_COLLISION: '_' | [a-zA-Z];\n" +
+				"TOKEN_RANGE_WITH_ESCAPED_CHARS: [\\n-\\r] | '\\n'..'\\r';",
 
-				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4:2:18: chars \"a-f\" used multiple times in set [aa-f]\n" +
-				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4:3:18: chars \"D-J\" used multiple times in set [A-FD-J]\n" +
-				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4:4:13: chars \"O-V\" used multiple times in set 'Z' | 'K'..'R' | 'O'..'V'\n" +
-				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4::: chars \"g-l\" used multiple times in set [g-l]\n"
+				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4:2:18: chars 'a'..'f' used multiple times in set [aa-f]\n" +
+				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4:3:18: chars 'D'..'J' used multiple times in set [A-FD-J]\n" +
+				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4:4:13: chars 'O'..'V' used multiple times in set 'Z' | 'K'..'R' | 'O'..'V'\n" +
+				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4::: chars 'g' used multiple times in set 'g'..'l'\n" +
+				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4::: chars '\\n' used multiple times in set '\\n'..'\\r'\n"
 		};
 
 		testErrors(test, false);

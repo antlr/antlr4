@@ -22,7 +22,7 @@ namespace antlr4 {
     void removeErrorListener(ANTLRErrorListener *listener);
     void removeErrorListeners();
 
-    void syntaxError(IRecognizer *recognizer, Token *offendingSymbol, size_t line, size_t charPositionInLine,
+    void syntaxError(Recognizer *recognizer, Token *offendingSymbol, size_t line, size_t charPositionInLine,
                      const std::string &msg, std::exception_ptr e) override;
 
     virtual void reportAmbiguity(Parser *recognizer, const dfa::DFA &dfa, size_t startIndex, size_t stopIndex, bool exact,

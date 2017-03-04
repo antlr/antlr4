@@ -1,7 +1,6 @@
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
- * Use of this file is governed by the BSD 3-clause license that
- * can be found in the LICENSE.txt file in the project root.
- */
+// Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+// Use of this file is governed by the BSD 3-clause license that
+// can be found in the LICENSE.txt file in the project root.
 
 package antlr
 
@@ -94,11 +93,11 @@ func NewBaseATNConfig(c ATNConfig, state ATNState, context PredictionContext, se
 	}
 
 	return &BaseATNConfig{
-		state:                   state,
-		alt:                     c.GetAlt(),
-		context:                 context,
-		semanticContext:         semanticContext,
-		reachesIntoOuterContext: c.GetReachesIntoOuterContext(),
+		state:                      state,
+		alt:                        c.GetAlt(),
+		context:                    context,
+		semanticContext:            semanticContext,
+		reachesIntoOuterContext:    c.GetReachesIntoOuterContext(),
 		precedenceFilterSuppressed: c.getPrecedenceFilterSuppressed(),
 	}
 }
@@ -202,8 +201,6 @@ func (b *BaseATNConfig) String() string {
 
 	return fmt.Sprintf("(%v,%v%v%v%v)", b.state, b.alt, s1, s2, s3)
 }
-
-
 
 type LexerATNConfig struct {
 	*BaseATNConfig

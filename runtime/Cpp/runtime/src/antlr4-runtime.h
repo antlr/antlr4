@@ -25,7 +25,6 @@
 #include "DiagnosticErrorListener.h"
 #include "Exceptions.h"
 #include "FailedPredicateException.h"
-#include "IRecognizer.h"
 #include "InputMismatchException.h"
 #include "IntStream.h"
 #include "InterpreterRuleContext.h"

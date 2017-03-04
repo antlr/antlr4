@@ -1,6 +1,6 @@
-writeln(s) ::= <<Console.WriteLine(<s>);>>
-write(s) ::= <<Console.Write(<s>);>>
-writeList(s) ::= <<Console.WriteLine(<s; separator="+">);>>
+writeln(s) ::= <<Output.WriteLine(<s>);>>
+write(s) ::= <<Output.Write(<s>);>>
+writeList(s) ::= <<Output.WriteLine(<s; separator="+">);>>
 
 False() ::= "false"
 
@@ -176,8 +176,14 @@ public class PositionAdjustingLexerATNSimulator : LexerATNSimulator {
 BasicListener(X) ::= <<
 @parser::members {
 public class LeafListener : TBaseListener {
+	private readonly TextWriter Output;
+
+	public LeafListener(TextWriter output) {
+		Output = output;
+	}
+
 	public override void VisitTerminal(ITerminalNode node) {
-		Console.WriteLine(node.Symbol.Text);
+		Output.WriteLine(node.Symbol.Text);
 	}
 }
 }
@@ -185,7 +191,7 @@ public class LeafListener : TBaseListener {
 
 WalkListener(s) ::= <<
 ParseTreeWalker walker = new ParseTreeWalker();
-walker.Walk(new LeafListener(), <s>);
+walker.Walk(new LeafListener(Output), <s>);
 >>
 
 TreeNodeWithAltNumField(X) ::= <<
@@ -204,6 +210,12 @@ public class MyRuleNode : ParserRuleContext {
 TokenGetterListener(X) ::= <<
 @parser::members {
 public class LeafListener : TBaseListener {
+	private readonly TextWriter Output;
+
+	public LeafListener(TextWriter output) {
+		Output = output;
+	}
+
 	public override void ExitA(TParser.AContext ctx) {
 		if (ctx.ChildCount==2)
 		{
@@ -214,11 +226,11 @@ public class LeafListener : TBaseListener {
 			}
 			sb.Length = sb.Length - 2;
 			sb.Append ("]");
-			Console.Write ("{0} {1} {2}", ctx.INT (0).Symbol.Text,
+			Output.Write ("{0} {1} {2}", ctx.INT (0).Symbol.Text,
 				ctx.INT (1).Symbol.Text, sb.ToString());
 		}
 		else
-			Console.WriteLine(ctx.ID().Symbol);
+			Output.WriteLine(ctx.ID().Symbol);
 	}
 }
 }
@@ -227,12 +239,18 @@ public class LeafListener : TBaseListener {
 RuleGetterListener(X) ::= <<
 @parser::members {
 public class LeafListener : TBaseListener {
+	private readonly TextWriter Output;
+
+	public LeafListener(TextWriter output) {
+		Output = output;
+	}
+
 	public override void ExitA(TParser.AContext ctx) {
 		if (ctx.ChildCount==2) {
-			Console.Write("{0} {1} {2}",ctx.b(0).Start.Text,
+			Output.Write("{0} {1} {2}",ctx.b(0).Start.Text,
 				ctx.b(1).Start.Text,ctx.b()[0].Start.Text);
 		} else
-			Console.WriteLine(ctx.b(0).Start.Text);
+			Output.WriteLine(ctx.b(0).Start.Text);
 	}
 }
 }
@@ -242,12 +260,18 @@ public class LeafListener : TBaseListener {
 LRListener(X) ::= <<
 @parser::members {
 public class LeafListener : TBaseListener {
+	private readonly TextWriter Output;
+
+	public LeafListener(TextWriter output) {
+		Output = output;
+	}
+
 	public override void ExitE(TParser.EContext ctx) {
 		if (ctx.ChildCount==3) {
-			Console.Write("{0} {1} {2}\n",ctx.e(0).Start.Text,
+			Output.Write("{0} {1} {2}\n",ctx.e(0).Start.Text,
 				ctx.e(1).Start.Text, ctx.e()[0].Start.Text);
 		} else
-			Console.WriteLine(ctx.INT().Symbol.Text);
+			Output.WriteLine(ctx.INT().Symbol.Text);
 	}
 }
 }
@@ -256,23 +280,21 @@ public class LeafListener : TBaseListener {
 LRWithLabelsListener(X) ::= <<
 @parser::members {
 public class LeafListener : TBaseListener {
+	private readonly TextWriter Output;
+
+	public LeafListener(TextWriter output) {
+		Output = output;
+	}
+
 	public override void ExitCall(TParser.CallContext ctx) {
-		Console.Write("{0} {1}",ctx.e().Start.Text,ctx.eList());
+		Output.Write("{0} {1}",ctx.e().Start.Text,ctx.eList());
 	}
 	public override void ExitInt(TParser.IntContext ctx) {
-		Console.WriteLine(ctx.INT().Symbol.Text);
+		Output.WriteLine(ctx.INT().Symbol.Text);
 	}
 }
 }
 >>
-
-ImportVisitor(X) ::= ""
-BasicVisitor(X) ::= ""
-WalkVisitor(s) ::= ""
-LRWithLabelsVisitor(X) ::= ""
-RuleGetterVisitor(X) ::= ""
-LRVisitor(x) ::= ""
-TokenGetterVisitor(x) ::= ""
 
 DeclareContextListGettersFunction() ::= <<
 void foo() {
@@ -282,12 +304,12 @@ void foo() {
 }
 >>
 
-Declare_foo() ::= <<public void foo() {Console.WriteLine("foo");}>>
+Declare_foo() ::= <<public void foo() {Output.WriteLine("foo");}>>
 
 Invoke_foo() ::= "this.foo();"
 
 Declare_pred() ::= <<bool pred(bool v) {
-	Console.WriteLine("eval="+v.ToString().ToLower());
+	Output.WriteLine("eval="+v.ToString().ToLower());
 	return v;
 }
 >>

@@ -33,6 +33,7 @@ import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.test.runtime.ErrorQueue;
 import org.antlr.v4.test.runtime.RuntimeTestSupport;
+import org.antlr.v4.test.runtime.StreamVacuum;
 import org.antlr.v4.tool.ANTLRMessage;
 import org.antlr.v4.tool.DOTGenerator;
 import org.antlr.v4.tool.Grammar;
@@ -43,15 +44,7 @@ import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupString;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -64,6 +57,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import static org.antlr.v4.test.runtime.BaseRuntimeTest.antlrOnString;
+import static org.antlr.v4.test.runtime.BaseRuntimeTest.writeFile;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -152,7 +146,8 @@ public class BaseNodeTest implements RuntimeTestSupport {
 			ParserATNFactory f;
 			if (g.isLexer()) {
 				f = new LexerATNFactory((LexerGrammar) g);
-			} else {
+			}
+			else {
 				f = new ParserATNFactory(g);
 			}
 
@@ -223,7 +218,8 @@ public class BaseNodeTest implements RuntimeTestSupport {
 			ttype = interp.match(input, Lexer.DEFAULT_MODE);
 			if (ttype == Token.EOF) {
 				tokenTypes.add("EOF");
-			} else {
+			}
+			else {
 				tokenTypes.add(lg.typeToTokenList.get(ttype));
 			}
 
@@ -315,7 +311,8 @@ public class BaseNodeTest implements RuntimeTestSupport {
 		this.stderrDuringParse = null;
 		if (parserName == null) {
 			writeLexerTestFile(lexerName, false);
-		} else {
+		}
+		else {
 			writeParserTestFile(parserName, lexerName, listenerName,
 					visitorName, parserStartRuleName, debug);
 		}
@@ -524,45 +521,6 @@ public class BaseNodeTest implements RuntimeTestSupport {
 		}
 	}
 
-	public static class StreamVacuum implements Runnable {
-		StringBuilder buf = new StringBuilder();
-		BufferedReader in;
-		Thread sucker;
-
-		public StreamVacuum(InputStream in) {
-			this.in = new BufferedReader(new InputStreamReader(in));
-		}
-
-		public void start() {
-			sucker = new Thread(this);
-			sucker.start();
-		}
-
-		@Override
-		public void run() {
-			try {
-				String line = in.readLine();
-				while (line != null) {
-					buf.append(line);
-					buf.append('\n');
-					line = in.readLine();
-				}
-			} catch (IOException ioe) {
-				System.err.println("can't read output from process");
-			}
-		}
-
-		/** wait for the thread to finish */
-		public void join() throws InterruptedException {
-			sucker.join();
-		}
-
-		@Override
-		public String toString() {
-			return buf.toString();
-		}
-	}
-
 	protected void checkGrammarSemanticsError(ErrorQueue equeue,
 			GrammarSemanticsMessage expectedMessage) throws Exception {
 		ANTLRMessage foundMsg = null;
@@ -653,35 +611,6 @@ public class BaseNodeTest implements RuntimeTestSupport {
 		}
 	}
 
-	public static void writeFile(String dir, String fileName, String content) {
-		try {
-			File f = new File(dir, fileName);
-			FileWriter w = new FileWriter(f);
-			BufferedWriter bw = new BufferedWriter(w);
-			bw.write(content);
-			bw.close();
-			w.close();
-		} catch (IOException ioe) {
-			System.err.println("can't write file");
-			ioe.printStackTrace(System.err);
-		}
-	}
-
-	public static void writeFile(String dir, String fileName, InputStream content) {
-		try {
-			File f = new File(dir, fileName);
-			OutputStream output = new FileOutputStream(f);
-			while(content.available()>0) {
-				int b = content.read();
-				output.write(b);
-			}
-			output.close();
-		} catch (IOException ioe) {
-			System.err.println("can't write file");
-			ioe.printStackTrace(System.err);
-		}
-	}
-
 	protected void mkdir(String dir) {
 		File f = new File(dir);
 		f.mkdirs();
@@ -716,7 +645,7 @@ public class BaseNodeTest implements RuntimeTestSupport {
 						+ "};\n"
 						+ "\n"
 						+ "function main(argv) {\n"
-						+ "    var input = new antlr4.FileStream(argv[2]);\n"
+						+ "    var input = new antlr4.FileStream(argv[2], true);\n"
 						+ "    var lexer = new <lexerName>.<lexerName>(input);\n"
 						+ "    var stream = new antlr4.CommonTokenStream(lexer);\n"
 						+ "<createParser>"
@@ -752,7 +681,7 @@ public class BaseNodeTest implements RuntimeTestSupport {
 						+ "var <lexerName> = require('./<lexerName>');\n"
 						+ "\n"
 						+ "function main(argv) {\n"
-						+ "    var input = new antlr4.FileStream(argv[2]);\n"
+						+ "    var input = new antlr4.FileStream(argv[2], true);\n"
 						+ "    var lexer = new <lexerName>.<lexerName>(input);\n"
 						+ "    var stream = new antlr4.CommonTokenStream(lexer);\n"
 						+ "    stream.fill();\n"
@@ -771,7 +700,8 @@ public class BaseNodeTest implements RuntimeTestSupport {
 			String parserStartRuleName, boolean debug) {
 		if (parserName == null) {
 			writeLexerTestFile(lexerName, debug);
-		} else {
+		}
+		else {
 			writeParserTestFile(parserName, lexerName, listenerName,
 					visitorName, parserStartRuleName, debug);
 		}

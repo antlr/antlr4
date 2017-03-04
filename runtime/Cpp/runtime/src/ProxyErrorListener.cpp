@@ -23,7 +23,7 @@ void ProxyErrorListener::removeErrorListeners() {
   _delegates.clear();
 }
 
-void ProxyErrorListener::syntaxError(IRecognizer *recognizer, Token *offendingSymbol, size_t line,
+void ProxyErrorListener::syntaxError(Recognizer *recognizer, Token *offendingSymbol, size_t line,
   size_t charPositionInLine, const std::string &msg, std::exception_ptr e) {
 
   for (auto listener : _delegates) {

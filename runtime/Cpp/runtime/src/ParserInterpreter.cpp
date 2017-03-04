@@ -18,10 +18,12 @@
 #include "atn/ActionTransition.h"
 #include "atn/ATN.h"
 #include "atn/RuleStopState.h"
+#include "Lexer.h"
 #include "Token.h"
 #include "Vocabulary.h"
 #include "InputMismatchException.h"
 #include "CommonToken.h"
+#include "tree/ErrorNode.h"
 
 #include "support/CPPUtils.h"
 
@@ -184,7 +186,7 @@ void ParserInterpreter::visitState(atn::ATNState *p) {
     case atn::Transition::RANGE:
     case atn::Transition::SET:
     case atn::Transition::NOT_SET:
-      if (!transition->matches((int)_input->LA(1), Token::MIN_USER_TOKEN_TYPE, 65535)) {
+      if (!transition->matches((int)_input->LA(1), Token::MIN_USER_TOKEN_TYPE, Lexer::MAX_CHAR_VALUE)) {
         recoverInline();
       }
       matchWildcard();
@@ -287,14 +289,14 @@ void ParserInterpreter::recover(RecognitionException &e) {
       _errorToken = getTokenFactory()->create({ tok->getTokenSource(), tok->getTokenSource()->getInputStream() },
         expectedTokenType, tok->getText(), Token::DEFAULT_CHANNEL, INVALID_INDEX, INVALID_INDEX, // invalid start/stop
         tok->getLine(), tok->getCharPositionInLine());
-      _ctx->addErrorNode(_tracker, _errorToken.get());
+      _ctx->addChild(createErrorNode(_errorToken.get()));
     }
     else { // NoViableAlt
       Token *tok = e.getOffendingToken();
       _errorToken = getTokenFactory()->create({ tok->getTokenSource(), tok->getTokenSource()->getInputStream() },
         Token::INVALID_TYPE, tok->getText(), Token::DEFAULT_CHANNEL, INVALID_INDEX, INVALID_INDEX, // invalid start/stop
         tok->getLine(), tok->getCharPositionInLine());
-      _ctx->addErrorNode(_tracker, _errorToken.get());
+      _ctx->addChild(createErrorNode(_errorToken.get()));
     }
   }
 }

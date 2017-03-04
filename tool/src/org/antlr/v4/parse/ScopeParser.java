@@ -312,7 +312,8 @@ public class ScopeParser {
 						// do we see a matching '>' ahead?  if so, hope it's a generic
 						// and not less followed by expr with greater than
 						p = _splitArgumentList(actionText, p + 1, '>', separatorChar, args);
-					} else {
+					}
+					else {
 						p++; // treat as normal char
 					}
 					break;

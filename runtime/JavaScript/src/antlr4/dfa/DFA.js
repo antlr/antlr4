@@ -32,7 +32,7 @@ function DFA(atnStartState, decision) {
     {
         if (atnStartState.isPrecedenceDecision) {
             this.precedenceDfa = true;
-            precedenceState = new DFAState(null, new ATNConfigSet());
+            var precedenceState = new DFAState(null, new ATNConfigSet());
             precedenceState.edges = [];
             precedenceState.isAcceptState = false;
             precedenceState.requiresFullContext = false;

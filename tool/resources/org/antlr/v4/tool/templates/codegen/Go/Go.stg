@@ -145,10 +145,6 @@ func (v *Base<file.grammarName>Visitor) Visit<lname; format="cap">(ctx *<lname; 
 >>
 
 Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
-<if(superClass)>
-import "./<superClass>"
-
-<endif>
 <if(atn)>
 var parserATN = <atn>
 <else>
@@ -902,7 +898,7 @@ TokenListDecl(t) ::= "<t.name> []antlr.Token"
 RuleContextDecl(r) ::= "<r.name> I<r.ctxName> "
 RuleContextListDecl(rdecl) ::= "<rdecl.name> []I<rdecl.ctxName>"
 
-AttributeDecl(d) ::= "<d.name> <d.type;format={lower}><if(d.initValue)>// TODO = <d.initValue><endif>"
+AttributeDecl(d) ::= "<d.name> <d.type><if(d.initValue)>// TODO = <d.initValue><endif>"
 
 ContextTokenGetterDecl(t) ::= <<
 <t.name; format="cap">() antlr.TerminalNode {
@@ -1046,13 +1042,13 @@ Set<a.name; format="cap">([]I<a.ctxName>) }; separator="\n\n">
 	<if(struct.attributeDecls)>
 
 	<struct.attributeDecls:{a | // Get<a.name; format="cap"> returns the <a.name> attribute.
-Get<a.name; format="cap">() <a.type;format="lower">}; separator="\n\n">
+Get<a.name; format="cap">() <a.type>}; separator="\n\n">
 	<endif>
 
 	<if(struct.attributeDecls)>
 
 	<struct.attributeDecls:{a | // Set<a.name; format="cap"> sets the <a.name> attribute.
-Set<a.name; format="cap">(<a.type;format="lower">)}; separator="\n\n">
+Set<a.name; format="cap">(<a.type>)}; separator="\n\n">
 	<endif>
 
 
@@ -1077,7 +1073,7 @@ func NewEmpty<struct.name>() *<struct.name> {
 
 func (*<struct.name>) Is<struct.name>() {}
 
-func New<struct.name>(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int<struct.ctorAttrs:{a | , <a.name> <a.type;format="lower">}>) *<struct.name> {
+func New<struct.name>(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int<struct.ctorAttrs:{a | , <a.name> <a.type>}>) *<struct.name> {
 	var p = new(<struct.name>)
 
 	p.<if(contextSuperClass)><contextSuperClass><else>BaseParserRuleContext<endif> = <if(contextSuperClass)>New<contextSuperClass><else>antlr.NewBaseParserRuleContext<endif>(parent, invokingState)
@@ -1145,12 +1141,12 @@ func (s *<struct.name>) GetParser() antlr.Parser { return s.parser }
 
 <if(struct.attributeDecls)>
 
-<struct.attributeDecls:{a | func (s *<struct.name>) Get<a.name; format="cap">() <a.type;format="lower"> { return s.<a.name> \}}; separator="\n\n">
+<struct.attributeDecls:{a | func (s *<struct.name>) Get<a.name; format="cap">() <a.type> { return s.<a.name> \}}; separator="\n\n">
 <endif>
 
 <if(struct.attributeDecls)>
 
-<struct.attributeDecls:{a | func (s *<struct.name>) Set<a.name; format="cap">(v <a.type;format="lower">) { s.<a.name> = v \}}; separator="\n\n">
+<struct.attributeDecls:{a | func (s *<struct.name>) Set<a.name; format="cap">(v <a.type>) { s.<a.name> = v \}}; separator="\n\n">
 <endif>
 
 <if(getters)>
@@ -1255,12 +1251,12 @@ func New<struct.name>(parser antlr.Parser, ctx antlr.ParserRuleContext) *<struct
 
 <if(struct.attributeDecls)>
 
-<struct.attributeDecls:{a | func (s *<struct.name>) Get<a.name; format="cap">() <a.type;format="lower"> { return s.<a.name> \}}; separator="\n\n">
+<struct.attributeDecls:{a | func (s *<struct.name>) Get<a.name; format="cap">() <a.type> { return s.<a.name> \}}; separator="\n\n">
 <endif>
 
 <if(struct.attributeDecls)>
 
-<struct.attributeDecls:{a | func (s *<struct.name>) Set<a.name; format="cap">(v <a.type;format="lower">) { s.<a.name> = v \}}; separator="\n\n">
+<struct.attributeDecls:{a | func (s *<struct.name>) Set<a.name; format="cap">(v <a.type>) { s.<a.name> = v \}}; separator="\n\n">
 <endif>
 
 func (s *<struct.name>) GetRuleContext() antlr.RuleContext {
@@ -1383,14 +1379,13 @@ var serializedLexerAtn []uint16
 var lexerDeserializer = antlr.NewATNDeserializer(nil)
 var lexerAtn = lexerDeserializer.DeserializeFromUInt16(serializedLexerAtn)
 
-<if(lexer.modes)>
+var lexerChannelNames = []string{
+	"DEFAULT_TOKEN_CHANNEL", "HIDDEN"<if (lexer.channels)>, <lexer.channels:{c | "<c>"}; separator=", ", wrap><endif>,
+}
+
 var lexerModeNames = []string{
 	<lexer.modes:{m | "<m>"}; separator=", ", wrap>,
 }
-<else>
-var lexerModeNames []string
-<endif>
-
 
 <if(lexer.literalNames)>
 var lexerLiteralNames = []string{
@@ -1421,6 +1416,7 @@ var lexerRuleNames []string
 
 type <lexer.name> struct {
 	*<if(superClass)><superClass><else>antlr.BaseLexer<endif>
+	channelNames []string
 	modeNames []string
 	// TODO: EOF string
 }
@@ -1437,6 +1433,7 @@ func New<lexer.name>(input antlr.CharStream) *<lexer.name> {
 	l.BaseLexer = antlr.NewBaseLexer(input)
 	l.Interpreter = antlr.NewLexerATNSimulator(l, lexerAtn, lexerDecisionToDFA, antlr.NewPredictionContextCache())
 
+	l.channelNames = lexerChannelNames
 	l.modeNames = lexerModeNames
 	l.RuleNames = lexerRuleNames
 	l.LiteralNames = lexerLiteralNames
@@ -1458,9 +1455,21 @@ const (
 const <lexer.name><first(lexer.tokens)> = <lexer.tokens.(first(lexer.tokens))>
 <endif>
 
+<if(rest(lexer.channels))>
+
+// <lexer.name> channels.
+const (
+	<lexer.channels:{c | <lexer.name><c> = <lexer.channels.(c)>}; separator="\n">
+)
+<elseif(lexer.channels)>
+
+// <lexer.name><first(lexer.channels)> is the <lexer.name> channel.
+const <lexer.name><first(lexer.channels)> = <lexer.channels.(first(lexer.channels))>
+<endif>
+
 <if(rest(rest(lexer.modes)))>
 
-// <lexer.name> modes
+// <lexer.name> modes.
 const (
 	<first(rest(lexer.modes)):{m | <lexer.name><m> = iota + 1}>
 	<rest(rest(lexer.modes)):{m | <lexer.name><m>}; separator="\n">

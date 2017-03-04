@@ -4,35 +4,18 @@
  */
 using System;
 using System.IO;
+using System.Text;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime
 {
-    /// <summary>
-    /// Vacuum all input from a
-    /// <see cref="System.IO.TextReader"/>
-    /// /
-    /// <see cref="System.IO.Stream"/>
-    /// and then treat it
-    /// like a
-    /// <c>char[]</c>
-    /// buffer. Can also pass in a
-    /// <see cref="string"/>
-    /// or
-    /// <c>char[]</c>
-    /// to use.
-    /// <p>If you need encoding, pass in stream/reader with correct encoding.</p>
-    /// </summary>
-    public class AntlrInputStream : ICharStream
+    public abstract class BaseInputCharStream : ICharStream
     {
         public const int ReadBufferSize = 1024;
 
         public const int InitialBufferSize = 1024;
-
-        /// <summary>The data being scanned</summary>
-        protected internal char[] data;
 
         /// <summary>How many characters are actually in the buffer</summary>
         protected internal int n;
@@ -42,72 +25,6 @@ namespace Antlr4.Runtime
 
         /// <summary>What is name or source of this char stream?</summary>
         public string name;
-
-        public AntlrInputStream()
-        {
-        }
-
-        /// <summary>Copy data in string to a local char array</summary>
-        public AntlrInputStream(string input)
-        {
-            this.data = input.ToCharArray();
-            this.n = input.Length;
-        }
-
-        /// <summary>This is the preferred constructor for strings as no data is copied</summary>
-        public AntlrInputStream(char[] data, int numberOfActualCharsInArray)
-        {
-            this.data = data;
-            this.n = numberOfActualCharsInArray;
-        }
-
-        /// <exception cref="System.IO.IOException"/>
-        public AntlrInputStream(TextReader r)
-            : this(r, InitialBufferSize, ReadBufferSize)
-        {
-        }
-
-        /// <exception cref="System.IO.IOException"/>
-        public AntlrInputStream(TextReader r, int initialSize)
-            : this(r, initialSize, ReadBufferSize)
-        {
-        }
-
-        /// <exception cref="System.IO.IOException"/>
-        public AntlrInputStream(TextReader r, int initialSize, int readChunkSize)
-        {
-            Load(r, initialSize, readChunkSize);
-        }
-
-        /// <exception cref="System.IO.IOException"/>
-        public AntlrInputStream(Stream input)
-            : this(new StreamReader(input), InitialBufferSize)
-        {
-        }
-
-        /// <exception cref="System.IO.IOException"/>
-        public AntlrInputStream(Stream input, int initialSize)
-            : this(new StreamReader(input), initialSize)
-        {
-        }
-
-        /// <exception cref="System.IO.IOException"/>
-        public AntlrInputStream(Stream input, int initialSize, int readChunkSize)
-            : this(new StreamReader(input), initialSize, readChunkSize)
-        {
-        }
-
-        /// <exception cref="System.IO.IOException"/>
-        public virtual void Load(TextReader r, int size, int readChunkSize)
-        {
-            if (r == null)
-            {
-                return;
-            }
-
-            data = r.ReadToEnd().ToCharArray();
-            n = data.Length;
-        }
 
         /// <summary>
         /// Reset the stream so that it's in the same state it was
@@ -163,7 +80,7 @@ namespace Antlr4.Runtime
             }
             //System.out.println("char LA("+i+")="+(char)data[p+i-1]+"; p="+p);
             //System.out.println("LA("+i+"); p="+p+" n="+n+" data.length="+data.length);
-            return data[p + i - 1];
+            return ValueAt(p + i - 1);
         }
 
         public virtual int Lt(int i)
@@ -243,10 +160,16 @@ namespace Antlr4.Runtime
             {
                 return string.Empty;
             }
-            //		System.err.println("data: "+Arrays.toString(data)+", n="+n+
-            //						   ", start="+start+
-            //						   ", stop="+stop);
-            return new string(data, start, count);
+            return ConvertDataToString(start, count);
+        }
+
+        protected abstract int ValueAt(int i);
+
+        protected abstract string ConvertDataToString(int start, int count);
+
+        public override sealed string ToString()
+        {
+            return ConvertDataToString(0, n);
         }
 
         public virtual string SourceName
@@ -260,10 +183,148 @@ namespace Antlr4.Runtime
                 return name;
             }
         }
+    }
 
-        public override string ToString()
+    /// <summary>
+    /// Vacuum all input from a
+    /// <see cref="System.IO.TextReader"/>
+    /// /
+    /// <see cref="System.IO.Stream"/>
+    /// and then treat it
+    /// like a
+    /// <c>char[]</c>
+    /// buffer. Can also pass in a
+    /// <see cref="string"/>
+    /// or
+    /// <c>char[]</c>
+    /// to use.
+    /// <p>If you need encoding, pass in stream/reader with correct encoding.</p>
+    /// </summary>
+    public class AntlrInputStream : BaseInputCharStream
+    {
+        /// <summary>The data being scanned</summary>
+        protected internal char[] data;
+
+        public AntlrInputStream()
         {
-            return new string(data);
+        }
+
+        /// <summary>Copy data in string to a local char array</summary>
+        public AntlrInputStream(string input)
+        {
+            this.data = input.ToCharArray();
+            this.n = input.Length;
+        }
+
+        /// <summary>This is the preferred constructor for strings as no data is copied</summary>
+        public AntlrInputStream(char[] data, int numberOfActualCharsInArray)
+        {
+            this.data = data;
+            this.n = numberOfActualCharsInArray;
+        }
+
+        /// <exception cref="System.IO.IOException"/>
+        public AntlrInputStream(TextReader r)
+            : this(r, InitialBufferSize, ReadBufferSize)
+        {
+        }
+
+        /// <exception cref="System.IO.IOException"/>
+        public AntlrInputStream(TextReader r, int initialSize)
+            : this(r, initialSize, ReadBufferSize)
+        {
+        }
+
+        /// <exception cref="System.IO.IOException"/>
+        public AntlrInputStream(TextReader r, int initialSize, int readChunkSize)
+        {
+            Load(r, initialSize, readChunkSize);
+        }
+
+        /// <exception cref="System.IO.IOException"/>
+        public AntlrInputStream(Stream input)
+            : this(new StreamReader(input), InitialBufferSize)
+        {
+        }
+
+        /// <exception cref="System.IO.IOException"/>
+        public AntlrInputStream(Stream input, int initialSize)
+            : this(new StreamReader(input), initialSize)
+        {
+        }
+
+        /// <exception cref="System.IO.IOException"/>
+        public AntlrInputStream(Stream input, int initialSize, int readChunkSize)
+            : this(new StreamReader(input), initialSize, readChunkSize)
+        {
+        }
+
+        /// <exception cref="System.IO.IOException"/>
+        public virtual void Load(TextReader r, int size, int readChunkSize)
+        {
+            if (r == null)
+            {
+                return;
+            }
+
+            data = r.ReadToEnd().ToCharArray();
+            n = data.Length;
+        }
+
+        protected override int ValueAt(int i)
+        {
+            return data[i];
+        }
+
+        protected override string ConvertDataToString(int start, int count)
+        {
+            //		System.err.println("data: "+Arrays.toString(data)+", n="+n+
+            //                                             ", start="+start+
+            //                                             ", stop="+stop);
+            return new string(data, start, count);
+        }
+    }
+
+    /// <summary>
+    /// Alternative to
+    /// <see cref="ANTLRInputStream"/>
+    /// which treats the input as a series of Unicode code points,
+    /// instead of a series of UTF-16 code units.
+    ///
+    /// Use this if you need to parse input which potentially contains
+    /// Unicode values > U+FFFF.
+    /// </summary>
+    public class CodePointCharStream : BaseInputCharStream
+    {
+        private int[] data;
+
+        public CodePointCharStream(string input)
+        {
+            this.data = new int[input.Length];
+            int dataIdx = 0;
+            for (int i = 0; i < input.Length; ) {
+                var codePoint = Char.ConvertToUtf32(input, i);
+                data[dataIdx++] = codePoint;
+                if (dataIdx > data.Length) {
+                    Array.Resize(ref data, data.Length * 2);
+                }
+                i += codePoint <= 0xFFFF ? 1 : 2;
+            }
+            this.n = dataIdx;
+        }
+
+        protected override int ValueAt(int i)
+        {
+            return data[i];
+        }
+
+        protected override string ConvertDataToString(int start, int count)
+        {
+            var sb = new StringBuilder(count);
+            for (int i = start; i < start + count; i++) {
+                sb.Append(Char.ConvertFromUtf32(data[i]));
+            }
+            return sb.ToString();
         }
     }
 }

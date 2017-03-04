@@ -34,7 +34,6 @@ namespace antlr4 {
   class InputMismatchException;
   class IntStream;
   class InterpreterRuleContext;
-  class IRecognizer;
   class Lexer;
   class LexerInterpreter;
   class LexerNoViableAltException;

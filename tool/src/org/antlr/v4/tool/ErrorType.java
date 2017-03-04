@@ -824,7 +824,7 @@ public enum ErrorType {
 	 *
 	 * @since 4.2.1
 	 */
-	INVALID_ESCAPE_SEQUENCE(156, "invalid escape sequence", ErrorSeverity.ERROR),
+	INVALID_ESCAPE_SEQUENCE(156, "invalid escape sequence", ErrorSeverity.WARNING),
 	/**
 	 * Compiler Warning 157.
 	 *
@@ -931,6 +931,17 @@ public enum ErrorType {
 	 * <p>custom channels are not supported in combined grammars</p>
 	 */
 	CHANNELS_BLOCK_IN_COMBINED_GRAMMAR(164, "custom channels are not supported in combined grammars", ErrorSeverity.ERROR),
+	/**
+	 * Compiler Error 165.
+	 *
+	 * <p>charset range should have start and end</p>
+	 *
+	 * <pre>
+	 * INVALID_RANGE_IN_CHAR_SET:    [-z] | [a-] | [-]; // error 165
+	 * </pre>
+	 *
+	 * */
+	INVALID_CHAR_SET(165, "invalid charset (range without start or end): <arg>", ErrorSeverity.ERROR),
 
 	NONCONFORMING_LR_RULE(169, "rule <arg> is left recursive but doesn't conform to a pattern ANTLR can handle", ErrorSeverity.ERROR),
 	/**
@@ -1043,7 +1054,7 @@ public enum ErrorType {
 	 *
 	 * TODO: Does not work with fragment rules.
 	 */
-	CHARACTERS_COLLISION_IN_SET(180, "chars \"<arg>\" used multiple times in set <arg2>", ErrorSeverity.WARNING),
+	CHARACTERS_COLLISION_IN_SET(180, "chars <arg> used multiple times in set <arg2>", ErrorSeverity.WARNING),
 
 	/**
 	 * Compiler Warning 181
@@ -1059,6 +1070,20 @@ public enum ErrorType {
 	 *
 	 */
 	TOKEN_RANGE_IN_PARSER(181, "token ranges not allowed in parser: <arg>..<arg2>", ErrorSeverity.ERROR),
+
+	/**
+	 * Compiler Error 182.
+	 *
+	 * <p>Unicode properties cannot be part of a lexer charset range</p>
+	 *
+	 * <pre>
+	 * A: [\\p{Letter}-\\p{Number}];
+	 * </pre>
+	 */
+	UNICODE_PROPERTY_NOT_ALLOWED_IN_RANGE(
+			182,
+			"unicode property escapes not allowed in lexer charset range: <arg>",
+			ErrorSeverity.ERROR),
 
 	/*
 	 * Backward incompatibility errors

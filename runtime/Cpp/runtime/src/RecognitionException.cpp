@@ -13,12 +13,12 @@
 
 using namespace antlr4;
 
-RecognitionException::RecognitionException(IRecognizer *recognizer, IntStream *input, ParserRuleContext *ctx,
+RecognitionException::RecognitionException(Recognizer *recognizer, IntStream *input, ParserRuleContext *ctx,
                                            Token *offendingToken)
   : RecognitionException("", recognizer, input, ctx, offendingToken) {
 }
 
-RecognitionException::RecognitionException(const std::string &message, IRecognizer *recognizer, IntStream *input,
+RecognitionException::RecognitionException(const std::string &message, Recognizer *recognizer, IntStream *input,
                                            ParserRuleContext *ctx, Token *offendingToken)
   : RuntimeException(message), _recognizer(recognizer), _input(input), _ctx(ctx), _offendingToken(offendingToken) {
   InitializeInstanceFields();
@@ -54,7 +54,7 @@ Token* RecognitionException::getOffendingToken() const {
   return _offendingToken;
 }
 
-IRecognizer* RecognitionException::getRecognizer() const {
+Recognizer* RecognitionException::getRecognizer() const {
   return _recognizer;
 }
 

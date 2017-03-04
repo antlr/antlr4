@@ -36,7 +36,8 @@ public class IntegerList {
 
 		if (capacity == 0) {
 			_data = EMPTY_DATA;
-		} else {
+		}
+		else {
 			_data = new int[capacity];
 		}
 	}
@@ -258,7 +259,8 @@ public class IntegerList {
 		int newLength;
 		if (_data.length == 0) {
 			newLength = INITIAL_SIZE;
-		} else {
+		}
+		else {
 			newLength = _data.length;
 		}
 
@@ -272,4 +274,39 @@ public class IntegerList {
 		_data = Arrays.copyOf(_data, newLength);
 	}
 
+	/** Convert the list to a UTF-16 encoded char array. If all values are less
+	 *  than the 0xFFFF 16-bit code point limit then this is just a char array
+	 *  of 16-bit char as usual. For values in the supplementary range, encode
+	 * them as two UTF-16 code units.
+	 */
+	public final char[] toCharArray() {
+		// Optimize for the common case (all data values are
+		// < 0xFFFF) to avoid an extra scan
+		char[] resultArray = new char[_size];
+		int resultIdx = 0;
+		boolean calculatedPreciseResultSize = false;
+		for (int i = 0; i < _size; i++) {
+			int codePoint = _data[i];
+			// Calculate the precise result size if we encounter
+			// a code point > 0xFFFF
+			if (!calculatedPreciseResultSize &&
+			    Character.isSupplementaryCodePoint(codePoint)) {
+				resultArray = Arrays.copyOf(resultArray, charArraySize());
+				calculatedPreciseResultSize = true;
+			}
+			// This will throw IllegalArgumentException if
+			// the code point is not a valid Unicode code point
+			int charsWritten = Character.toChars(codePoint, resultArray, resultIdx);
+			resultIdx += charsWritten;
+		}
+		return resultArray;
+	}
+
+	private int charArraySize() {
+		int result = 0;
+		for (int i = 0; i < _size; i++) {
+			result += Character.charCount(_data[i]);
+		}
+		return result;
+	}
 }

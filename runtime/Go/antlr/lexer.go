@@ -1,7 +1,6 @@
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
- * Use of this file is governed by the BSD 3-clause license that
- * can be found in the LICENSE.txt file in the project root.
- */
+// Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+// Use of this file is governed by the BSD 3-clause license that
+// can be found in the LICENSE.txt file in the project root.
 
 package antlr
 
@@ -115,8 +114,8 @@ const (
 const (
 	LexerDefaultTokenChannel = TokenDefaultChannel
 	LexerHidden              = TokenHiddenChannel
-	LexerMinCharValue        = '\u0000'
-	LexerMaxCharValue        = '\uFFFE'
+	LexerMinCharValue        = 0x0000
+	LexerMaxCharValue        = 0x10FFFF
 )
 
 func (b *BaseLexer) reset() {

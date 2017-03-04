@@ -159,7 +159,8 @@ public class TreeViewer extends JComponent {
 					double ctrly2 = y1;
 					c.setCurve(x1, y1, ctrlx1, ctrly1, ctrlx2, ctrly2, x2, y2);
 					((Graphics2D) g).draw(c);
-				} else {
+				}
+				else {
 					g.drawLine((int) x1, (int) y1,
 							   (int) x2, (int) y2);
 				}

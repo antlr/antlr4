@@ -63,8 +63,8 @@ public class ParserRuleContext extends RuleContext {
 	 *
 	 *  The parser setState() method updates field s and adds it to this list
 	 *  if we are debugging/tracing.
-     *
-     *  This does not trace states visited during prediction.
+	 *
+	 *  This does not trace states visited during prediction.
 	 */
 //	public List<Integer> states;
 
@@ -79,7 +79,8 @@ public class ParserRuleContext extends RuleContext {
 	public ParserRuleContext() { }
 
 	/** COPY a ctx (I'm deliberately not using copy constructor) to avoid
-	 *  confusion with creating node with parent. Does not copy children.
+	 *  confusion with creating node with parent. Does not copy children
+	 *  (except error leaves).
 	 *
 	 *  This is used in the generated parser code to flip a generic XContext
 	 *  node for rule X to a YContext for alt label Y. In that sense, it is
@@ -101,9 +102,8 @@ public class ParserRuleContext extends RuleContext {
 			this.children = new ArrayList<>();
 			// reset parent pointer for any error nodes
 			for (ParseTree child : ctx.children) {
-				if ( child instanceof ErrorNodeImpl ) {
-					this.children.add(child);
-					((ErrorNodeImpl) child).parent = this;
+				if ( child instanceof ErrorNode ) {
+					addChild((ErrorNode)child);
 				}
 			}
 		}
@@ -118,27 +118,66 @@ public class ParserRuleContext extends RuleContext {
 	public void enterRule(ParseTreeListener listener) { }
 	public void exitRule(ParseTreeListener listener) { }
 
-	/** Does not set parent link; other add methods do that */
-	public TerminalNode addChild(TerminalNode t) {
-		if ( children==null ) children = new ArrayList<ParseTree>();
+	/** Add a parse tree node to this as a child.  Works for
+	 *  internal and leaf nodes. Does not set parent link;
+	 *  other add methods must do that. Other addChild methods
+	 *  call this.
+	 *
+	 *  We cannot set the parent pointer of the incoming node
+	 *  because the existing interfaces do not have a setParent()
+	 *  method and I don't want to break backward compatibility for this.
+	 *
+	 *  @since 4.7
+	 */
+	public <T extends ParseTree> T addAnyChild(T t) {
+		if ( children==null ) children = new ArrayList<>();
 		children.add(t);
 		return t;
 	}
 
 	public RuleContext addChild(RuleContext ruleInvocation) {
-		if ( children==null ) children = new ArrayList<ParseTree>();
-		children.add(ruleInvocation);
-		return ruleInvocation;
+		return addAnyChild(ruleInvocation);
 	}
 
-	/** Used by enterOuterAlt to toss out a RuleContext previously added as
-	 *  we entered a rule. If we have # label, we will need to remove
-	 *  generic ruleContext object.
- 	 */
-	public void removeLastChild() {
-		if ( children!=null ) {
-			children.remove(children.size()-1);
-		}
+	/** Add a token leaf node child and force its parent to be this node. */
+	public TerminalNode addChild(TerminalNode t) {
+		t.setParent(this);
+		return addAnyChild(t);
+	}
+
+	/** Add an error node child and force its parent to be this node.
+	 *
+	 * @since 4.7
+	 */
+	public ErrorNode addErrorNode(ErrorNode errorNode) {
+		errorNode.setParent(this);
+		return addAnyChild(errorNode);
+	}
+
+	/** Add a child to this node based upon matchedToken. It
+	 *  creates a TerminalNodeImpl rather than using
+	 *  {@link Parser#createTerminalNode(ParserRuleContext, Token)}. I'm leaving this
+     *  in for compatibility but the parser doesn't use this anymore.
+	 */
+	@Deprecated
+	public TerminalNode addChild(Token matchedToken) {
+		TerminalNodeImpl t = new TerminalNodeImpl(matchedToken);
+		addAnyChild(t);
+		t.setParent(this);
+		return t;
+	}
+
+	/** Add a child to this node based upon badToken.  It
+	 *  creates a ErrorNodeImpl rather than using
+	 *  {@link Parser#createErrorNode(ParserRuleContext, Token)}. I'm leaving this
+	 *  in for compatibility but the parser doesn't use this anymore.
+	 */
+	@Deprecated
+	public ErrorNode addErrorNode(Token badToken) {
+		ErrorNodeImpl t = new ErrorNodeImpl(badToken);
+		addAnyChild(t);
+		t.setParent(this);
+		return t;
 	}
 
 //	public void trace(int s) {
@@ -146,18 +185,14 @@ public class ParserRuleContext extends RuleContext {
 //		states.add(s);
 //	}
 
-	public TerminalNode addChild(Token matchedToken) {
-		TerminalNodeImpl t = new TerminalNodeImpl(matchedToken);
-		addChild(t);
-		t.parent = this;
-		return t;
-	}
-
-	public ErrorNode addErrorNode(Token badToken) {
-		ErrorNodeImpl t = new ErrorNodeImpl(badToken);
-		addChild(t);
-		t.parent = this;
-		return t;
+	/** Used by enterOuterAlt to toss out a RuleContext previously added as
+	 *  we entered a rule. If we have # label, we will need to remove
+	 *  generic ruleContext object.
+	 */
+	public void removeLastChild() {
+		if ( children!=null ) {
+			children.remove(children.size()-1);
+		}
 	}
 
 	@Override
@@ -290,13 +325,14 @@ public class ParserRuleContext extends RuleContext {
 	 */
 	public Token getStop() { return stop; }
 
-    /** Used for rule context info debugging during parse-time, not so much for ATN debugging */
-    public String toInfoString(Parser recognizer) {
-        List<String> rules = recognizer.getRuleInvocationStack(this);
-        Collections.reverse(rules);
-        return "ParserRuleContext"+rules+"{" +
-                "start=" + start +
-                ", stop=" + stop +
-                '}';
-    }
+	/** Used for rule context info debugging during parse-time, not so much for ATN debugging */
+	public String toInfoString(Parser recognizer) {
+		List<String> rules = recognizer.getRuleInvocationStack(this);
+		Collections.reverse(rules);
+		return "ParserRuleContext"+rules+"{" +
+			"start=" + start +
+			", stop=" + stop +
+			'}';
+	}
 }
+

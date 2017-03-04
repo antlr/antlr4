@@ -37,6 +37,7 @@ namespace <file.genPackage> {
 <endif>
 <namedActions.header>
 using System;
+using System.IO;
 using System.Text;
 using System.Diagnostics;
 using System.Collections.Generic;
@@ -287,7 +288,7 @@ public partial class <csIdentifier.(parser.name)> : <superClass; null="Parser"> 
 
 	public override string[] RuleNames { get { return ruleNames; } }
 
-	public override string SerializedAtn { get { return _serializedATN; } }
+	public override string SerializedAtn { get { return new string(_serializedATN); } }
 
 	static <csIdentifier.(parser.name)>() {
 		decisionToDFA = new DFA[_ATN.NumberOfDecisions];
@@ -357,8 +358,10 @@ case <f.ruleIndex> : return <f.name>_sempred(<if(!recog.modes)>(<f.ctxType>)<end
 >>
 
 parser_ctor(parser) ::= <<
-public <csIdentifier.(parser.name)>(ITokenStream input)
-	: base(input)
+	public <csIdentifier.(parser.name)>(ITokenStream input) : this(input, Console.Out, Console.Error) { }
+
+	public <csIdentifier.(parser.name)>(ITokenStream input, TextWriter output, TextWriter errorOutput)
+	: base(input, output, errorOutput)
 {
 	Interpreter = new ParserATNSimulator(this, _ATN, decisionToDFA, sharedContextCache);
 }
@@ -958,6 +961,7 @@ namespace <file.genPackage> {
 <endif>
 <namedActions.header>
 using System;
+using System.IO;
 using System.Text;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Atn;
@@ -982,7 +986,14 @@ public partial class <csIdentifier.(lexer.name)> : <superClass; null="Lexer"> {
 	public const int
 		<lexer.channels:{k | <csIdentifier.(k)>=<lexer.channels.(k)>}; separator=", ", wrap, anchor>;
 	<endif>
-	<rest(lexer.modes):{m| public const int <modeName.(m)> = <i>;}; separator="\n">
+	<if(rest(lexer.modes))>
+	public const int
+		<rest(lexer.modes):{m | <m>=<i>}; separator=", ", wrap, anchor>;
+	<endif>
+	public static string[] channelNames = {
+		"DEFAULT_TOKEN_CHANNEL", "HIDDEN"<if (lexer.channels)>, <lexer.channels:{c| "<c>"}; separator=", ", wrap, anchor><endif>
+	};
+
 	public static string[] modeNames = {
 		<lexer.modes:{m| "<m>"}; separator=", ", wrap, anchor>
 	};
@@ -994,7 +1005,10 @@ public partial class <csIdentifier.(lexer.name)> : <superClass; null="Lexer"> {
 	<namedActions.members>
 
 	public <csIdentifier.(lexer.name)>(ICharStream input)
-		: base(input)
+	: this(input, Console.Out, Console.Error) { }
+
+	public <csIdentifier.(lexer.name)>(ICharStream input, TextWriter output, TextWriter errorOutput)
+	: base(input, output, errorOutput)
 	{
 		Interpreter = new LexerATNSimulator(this, _ATN, decisionToDFA, sharedContextCache);
 	}
@@ -1005,9 +1019,11 @@ public partial class <csIdentifier.(lexer.name)> : <superClass; null="Lexer"> {
 
 	public override string[] RuleNames { get { return ruleNames; } }
 
+	public override string[] ChannelNames { get { return channelNames; } }
+
 	public override string[] ModeNames { get { return modeNames; } }
 
-	public override string SerializedAtn { get { return _serializedATN; } }
+	public override string SerializedAtn { get { return new string(_serializedATN); } }
 
 	static <csIdentifier.(lexer.name)>() {
 		decisionToDFA = new DFA[_ATN.NumberOfDecisions];
@@ -1022,16 +1038,12 @@ public partial class <csIdentifier.(lexer.name)> : <superClass; null="Lexer"> {
 
 
 SerializedATN(model) ::= <<
-private static string _serializedATN = _serializeATN();
-private static string _serializeATN()
-{
-    StringBuilder sb = new StringBuilder();
-    sb.Append("<model.serialized; wrap={");<\n><\t>sb.Append("}>");
-    return sb.ToString();
-}
+private static char[] _serializedATN = {
+	<model.serialized; separator=", ", wrap>,
+};
 
 public static readonly ATN _ATN =
-	new ATNDeserializer().Deserialize(_serializedATN.ToCharArray());
+	new ATNDeserializer().Deserialize(_serializedATN);
 
 
 >>

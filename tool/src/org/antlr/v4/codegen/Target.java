@@ -9,6 +9,7 @@ package org.antlr.v4.codegen;
 import org.antlr.v4.Tool;
 import org.antlr.v4.codegen.model.RuleFunction;
 import org.antlr.v4.codegen.model.SerializedATN;
+import org.antlr.v4.misc.CharSupport;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.RuntimeMetaData;
@@ -146,23 +147,34 @@ public abstract class Target {
 		if ( quoted ) {
 			buf.append('"');
 		}
-		for (int i=0; i<s.length(); i++) {
-			int c = s.charAt(i);
+		for (int i=0; i<s.length(); ) {
+			int c = s.codePointAt(i);
 			if ( c!='\'' && // don't escape single quotes in strings for java
 				 c<targetCharValueEscape.length &&
 				 targetCharValueEscape[c]!=null )
 			{
 				buf.append(targetCharValueEscape[c]);
 			}
-			else {
-				buf.append((char)c);
+			else if (shouldUseUnicodeEscapeForCodePointInDoubleQuotedString(c)) {
+				appendUnicodeEscapedCodePoint(i, buf);
 			}
+			else
+			{
+				buf.appendCodePoint(c);
+			}
+			i += Character.charCount(c);
 		}
 		if ( quoted ) {
 			buf.append('"');
 		}
 		return buf.toString();
 	}
+
+	/**
+	 * Escape the Unicode code point appropriately for this language
+	 * and append the escaped value to {@code sb}.
+	 */
+	abstract protected void appendUnicodeEscapedCodePoint(int codePoint, StringBuilder sb);
 
 	public String getTargetStringLiteralFromString(String s) {
 		return getTargetStringLiteralFromString(s, true);
@@ -194,18 +206,21 @@ public abstract class Target {
 
 		if ( addQuotes ) sb.append('"');
 
-		for (int i = 1; i < is.length() -1; i++) {
-			if  (is.charAt(i) == '\\') {
+		for (int i = 1; i < is.length() -1; ) {
+			int codePoint = is.codePointAt(i);
+			int toAdvance = Character.charCount(codePoint);
+			if  (codePoint == '\\') {
 				// Anything escaped is what it is! We assume that
 				// people know how to escape characters correctly. However
 				// we catch anything that does not need an escape in Java (which
 				// is what the default implementation is dealing with and remove
 				// the escape. The C target does this for instance.
 				//
-				switch (is.charAt(i+1)) {
+				int escapedCodePoint = is.codePointAt(i+toAdvance);
+				toAdvance++;
+				switch (escapedCodePoint) {
 					// Pass through any escapes that Java also needs
 					//
-					case    '"':
 					case    'n':
 					case    'r':
 					case    't':
@@ -214,37 +229,66 @@ public abstract class Target {
 					case    '\\':
 						// Pass the escape through
 						sb.append('\\');
+						sb.appendCodePoint(escapedCodePoint);
 						break;
 
-					case    'u':    // Assume unnnn
-						// Pass the escape through as double \\
-						// so that Java leaves as \u0000 string not char
-						sb.append('\\');
-						sb.append('\\');
+					case    'u':    // Either unnnn or u{nnnnnn}
+						if (is.charAt(i+toAdvance) == '{') {
+							while (is.charAt(i+toAdvance) != '}') {
+								toAdvance++;
+							}
+							toAdvance++;
+						}
+						else {
+							toAdvance += 4;
+						}
+						String fullEscape = is.substring(i, i + toAdvance);
+						appendUnicodeEscapedCodePoint(
+								CharSupport.getCharValueFromCharInGrammarLiteral(fullEscape),
+								sb);
 						break;
-
 					default:
-						// Remove the escape by virtue of not adding it here
-						// Thus \' becomes ' and so on
+						if (shouldUseUnicodeEscapeForCodePointInDoubleQuotedString(escapedCodePoint)) {
+							appendUnicodeEscapedCodePoint(escapedCodePoint, sb);
+						}
+						else {
+							sb.appendCodePoint(escapedCodePoint);
+						}
 						break;
-				}
-
-				// Go past the \ character
-				i++;
-			} else {
-				// Characters that don't need \ in ANTLR 'strings' but do in Java
-				if (is.charAt(i) == '"') {
-					// We need to escape " in Java
-					sb.append('\\');
 				}
 			}
-			// Add in the next character, which may have been escaped
-			sb.append(is.charAt(i));
+			else {
+				if (codePoint == 0x22) {
+					// ANTLR doesn't escape " in literal strings,
+					// but every other language needs to do so.
+					sb.append("\\\"");
+				}
+				else if (shouldUseUnicodeEscapeForCodePointInDoubleQuotedString(codePoint)) {
+					appendUnicodeEscapedCodePoint(codePoint, sb);
+				}
+				else {
+					sb.appendCodePoint(codePoint);
+				}
+			}
+			i += toAdvance;
 		}
 
 		if ( addQuotes ) sb.append('"');
 
 		return sb.toString();
+	}
+
+	private static boolean shouldUseUnicodeEscapeForCodePointInDoubleQuotedString(int codePoint) {
+		// We don't want anyone passing 0x0A (newline) or 0x22
+		// (double-quote) here because Java treats \\u000A as
+		// a literal newline and \\u0022 as a literal
+		// double-quote, so Unicode escaping doesn't help.
+		assert codePoint != 0x0A && codePoint != 0x22;
+
+		return
+			codePoint < 0x20  || // control characters up to but not including space
+			codePoint == 0x5C || // backslash
+			codePoint >= 0x7F;   // DEL and beyond (keeps source code 7-bit US-ASCII)
 	}
 
 	/** Assume 16-bit char */

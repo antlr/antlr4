@@ -51,14 +51,21 @@ var LexerModeAction = LexerActions.LexerModeAction;
 // stick to serialized version for now, we don't need a UUID instance
 var BASE_SERIALIZED_UUID = "AADB8D7E-AEEF-4415-AD2B-8204D6CF042E";
 
+//
+// This UUID indicates the serialized ATN contains two sets of
+// IntervalSets, where the second set's values are encoded as
+// 32-bit integers to support the full Unicode SMP range up to U+10FFFF.
+//
+var ADDED_UNICODE_SMP = "59627784-3BE5-417A-B9EB-8131A7286089";
+
 // This list contains all of the currently supported UUIDs, ordered by when
 // the feature first appeared in this branch.
-var SUPPORTED_UUIDS = [ BASE_SERIALIZED_UUID ];
+var SUPPORTED_UUIDS = [ BASE_SERIALIZED_UUID, ADDED_UNICODE_SMP ];
 
 var SERIALIZED_VERSION = 3;
 
 // This is the current serialized UUID.
-var SERIALIZED_UUID = BASE_SERIALIZED_UUID;
+var SERIALIZED_UUID = ADDED_UNICODE_SMP;
 
 function initArray( length, value) {
 	var tmp = [];
@@ -91,11 +98,11 @@ function ATNDeserializer (options) {
 // introduced; otherwise, {@code false}.
 
 ATNDeserializer.prototype.isFeatureSupported = function(feature, actualUuid) {
-    var idx1 = SUPPORTED_UUIDS.index(feature);
+    var idx1 = SUPPORTED_UUIDS.indexOf(feature);
     if (idx1<0) {
         return false;
     }
-    var idx2 = SUPPORTED_UUIDS.index(actualUuid);
+    var idx2 = SUPPORTED_UUIDS.indexOf(actualUuid);
     return idx2 >= idx1;
 };
 
@@ -107,7 +114,14 @@ ATNDeserializer.prototype.deserialize = function(data) {
     this.readStates(atn);
     this.readRules(atn);
     this.readModes(atn);
-    var sets = this.readSets(atn);
+    var sets = [];
+    // First, deserialize sets with 16-bit arguments <= U+FFFF.
+    this.readSets(atn, sets, this.readInt.bind(this));
+    // Next, if the ATN was serialized with the Unicode SMP feature,
+    // deserialize sets with 32-bit arguments <= U+10FFFF.
+    if (this.isFeatureSupported(ADDED_UNICODE_SMP, this.uuid)) {
+        this.readSets(atn, sets, this.readInt32.bind(this));
+    }
     this.readEdges(atn, sets);
     this.readDecisions(atn);
     this.readLexerActions(atn);
@@ -244,8 +258,7 @@ ATNDeserializer.prototype.readModes = function(atn) {
     }
 };
 
-ATNDeserializer.prototype.readSets = function(atn) {
-    var sets = [];
+ATNDeserializer.prototype.readSets = function(atn, sets, readUnicode) {
     var m = this.readInt();
     for (var i=0; i<m; i++) {
         var iset = new IntervalSet();
@@ -256,12 +269,11 @@ ATNDeserializer.prototype.readSets = function(atn) {
             iset.addOne(-1);
         }
         for (var j=0; j<n; j++) {
-            var i1 = this.readInt();
-            var i2 = this.readInt();
+            var i1 = readUnicode();
+            var i2 = readUnicode();
             iset.addRange(i1, i2);
         }
     }
-    return sets;
 };
 
 ATNDeserializer.prototype.readEdges = function(atn, sets) {
