@@ -931,17 +931,6 @@ public enum ErrorType {
 	 * <p>custom channels are not supported in combined grammars</p>
 	 */
 	CHANNELS_BLOCK_IN_COMBINED_GRAMMAR(164, "custom channels are not supported in combined grammars", ErrorSeverity.ERROR),
-	/**
-	 * Compiler Error 165.
-	 *
-	 * <p>charset range should have start and end</p>
-	 *
-	 * <pre>
-	 * INVALID_RANGE_IN_CHAR_SET:    [-z] | [a-] | [-]; // error 165
-	 * </pre>
-	 *
-	 * */
-	INVALID_CHAR_SET(165, "invalid charset (range without start or end): <arg>", ErrorSeverity.ERROR),
 
 	NONCONFORMING_LR_RULE(169, "rule <arg> is left recursive but doesn't conform to a pattern ANTLR can handle", ErrorSeverity.ERROR),
 	/**
