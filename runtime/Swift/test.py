@@ -48,13 +48,15 @@ def gen_parser(grammar):
     """
     Generate parser for the input g4 file.
     """
+    grammar_folder = grammar[0:grammar.rindex('/')+1]
     java_home = os.environ['JAVA_HOME']
     java = java_home + '/bin/java'
     if not os.path.exists(java):
         print 'Cannot find java. Check your JAVA_HOME setting.'
         return
 
-    call([java, '-jar', ANTLR4_JAR, '-Dlanguage=Swift', grammar])
+    call([java, '-jar', ANTLR4_JAR,\
+          '-Dlanguage=Swift', grammar, '-o', grammar_folder + '/gen'])
 
 
 def swift_test():
