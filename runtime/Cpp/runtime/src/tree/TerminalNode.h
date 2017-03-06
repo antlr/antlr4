@@ -13,6 +13,17 @@ namespace tree {
   class ANTLR4CPP_PUBLIC TerminalNode : public ParseTree {
   public:
     virtual Token* getSymbol() = 0;
+
+    /** Set the parent for this leaf node.
+     *
+     *  Technically, this is not backward compatible as it changes
+     *  the interface but no one was able to create custom
+     *  TerminalNodes anyway so I'm adding as it improves internal
+     *  code quality.
+     *
+     *  @since 4.7
+     */
+    virtual void setParent(RuleContext *parent) = 0;
   };
 
 } // namespace tree

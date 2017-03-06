@@ -107,6 +107,8 @@ size_t ParserATNSimulator::adaptivePredict(TokenStream *input, size_t decision, 
     bool fullCtx = false;
     std::unique_ptr<ATNConfigSet> s0_closure = computeStartState(dynamic_cast<ATNState *>(dfa.atnStartState),
                                                                  &ParserRuleContext::EMPTY, fullCtx);
+
+    _stateLock.writeLock();
     if (dfa.isPrecedenceDfa()) {
       /* If this is a precedence DFA, we use applyPrecedenceFilter
        * to convert the computed start state to a precedence start
@@ -129,6 +131,7 @@ size_t ParserATNSimulator::adaptivePredict(TokenStream *input, size_t decision, 
         delete newState; // If there was already a state with this config set we don't need the new one.
       }
     }
+    _stateLock.writeUnlock();
   }
 
   // We can start with an existing DFA.
@@ -1239,7 +1242,9 @@ dfa::DFAState *ParserATNSimulator::addDFAEdge(dfa::DFA &dfa, dfa::DFAState *from
     return nullptr;
   }
 
+  _stateLock.writeLock();
   to = addDFAState(dfa, to); // used existing if possible not incoming
+  _stateLock.writeUnlock();
   if (from == nullptr || t > (int)atn.maxTokenType) {
     return to;
   }
@@ -1268,11 +1273,8 @@ dfa::DFAState *ParserATNSimulator::addDFAState(dfa::DFA &dfa, dfa::DFAState *D) 
     return D;
   }
 
-  _stateLock.writeLock();
-
   auto existing = dfa.states.find(D);
   if (existing != dfa.states.end()) {
-    _stateLock.writeUnlock();
     return *existing;
   }
 
@@ -1283,7 +1285,6 @@ dfa::DFAState *ParserATNSimulator::addDFAState(dfa::DFA &dfa, dfa::DFAState *D) 
   }
   
   dfa.states.insert(D);
-  _stateLock.writeUnlock();
 
 #if DEBUG_DFA == 1
   std::cout << "adding new DFA state: " << D << std::endl;

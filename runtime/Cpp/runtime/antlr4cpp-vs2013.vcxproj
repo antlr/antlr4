@@ -549,7 +549,6 @@
     <ClInclude Include="src\InputMismatchException.h" />
     <ClInclude Include="src\InterpreterRuleContext.h" />
     <ClInclude Include="src\IntStream.h" />
-    <ClInclude Include="src\IRecognizer.h" />
     <ClInclude Include="src\Lexer.h" />
     <ClInclude Include="src\LexerInterpreter.h" />
     <ClInclude Include="src\LexerNoViableAltException.h" />

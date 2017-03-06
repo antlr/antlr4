@@ -14,6 +14,7 @@
     "keyFile": "../Antlr4.snk",
     "define": [
       "DOTNETCORE",
+      "NET35PLUS",
       "NET40PLUS",
       "NET45PLUS"
     ],

@@ -17,7 +17,8 @@ public abstract class UnicodeEscapes {
 			// to int before passing to the %X formatter or else it throws.
 			sb.append(String.format("\\u%04X", (int)Character.highSurrogate(codePoint)));
 			sb.append(String.format("\\u%04X", (int)Character.lowSurrogate(codePoint)));
-		} else {
+		}
+		else {
 			sb.append(String.format("\\u%04X", codePoint));
 		}
 	}
@@ -25,7 +26,8 @@ public abstract class UnicodeEscapes {
 	static public void appendPythonStyleEscapedCodePoint(int codePoint, StringBuilder sb) {
 		if (Character.isSupplementaryCodePoint(codePoint)) {
 			sb.append(String.format("\\U%08X", codePoint));
-		} else {
+		}
+		else {
 			sb.append(String.format("\\u%04X", codePoint));
 		}
 	}

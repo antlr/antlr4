@@ -109,11 +109,30 @@ public class TestUnicodeData {
 	}
 
 	@Test
+	public void testUnicodeBlocks() {
+		assertTrue(UnicodeData.getPropertyCodePoints("InASCII").contains('0'));
+		assertTrue(UnicodeData.getPropertyCodePoints("InCJK").contains(0x4E04));
+		assertTrue(UnicodeData.getPropertyCodePoints("InCyrillic").contains(0x0404));
+		assertTrue(UnicodeData.getPropertyCodePoints("InMisc_Pictographs").contains(0x1F4A9));
+	}
+
+	@Test
+	public void testUnicodeBlockAliases() {
+		assertTrue(UnicodeData.getPropertyCodePoints("InBasic_Latin").contains('0'));
+		assertTrue(UnicodeData.getPropertyCodePoints("InMiscellaneous_Mathematical_Symbols_B").contains(0x29BE));
+	}
+
+	@Test
 	public void testPropertyCaseInsensitivity() {
 		assertTrue(UnicodeData.getPropertyCodePoints("l").contains('x'));
 		assertFalse(UnicodeData.getPropertyCodePoints("l").contains('0'));
 		assertTrue(UnicodeData.getPropertyCodePoints("common").contains('0'));
 		assertTrue(UnicodeData.getPropertyCodePoints("Alnum").contains('0'));
+	}
+
+	@Test
+	public void testPropertyDashSameAsUnderscore() {
+		assertTrue(UnicodeData.getPropertyCodePoints("InLatin-1").contains('\u00F0'));
 	}
 
 	@Test

@@ -206,30 +206,6 @@ public class LexerExecDescriptors {
 
 	}
 
-	public static class CharSetWithMissingEndRange extends BaseLexerTestDescriptor {
-		public String input = "00\n";
-		/**
-		I
-		[@0,0:1='00',<1>,1:0]
-		[@1,3:2='<EOF>',<-1>,2:0]
-		 */
-		@CommentHasStringValue
-		public String output;
-
-		public String errors = null;
-		public String startRule = "";
-		public String grammarName = "L";
-
-		/**
-		 lexer grammar L;
-		 I : [0-]+ {<writeln("\"I\"")>} ;
-		 WS : [ \n\\u000D]+ -> skip ;
-		 */ // needs escape on u000D otherwise java converts even in comment
-		@CommentHasStringValue
-		public String grammar;
-
-	}
-
 	public static class CharSetWithMissingEscapeChar extends BaseLexerTestDescriptor {
 		public String input = "34 ";
 		/**

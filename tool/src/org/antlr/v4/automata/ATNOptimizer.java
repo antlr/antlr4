@@ -6,6 +6,8 @@
 
 package org.antlr.v4.automata;
 
+import org.antlr.v4.codegen.model.MatchSet;
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.atn.AtomTransition;
@@ -25,6 +27,7 @@ import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.Rule;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -98,17 +101,24 @@ public class ATNOptimizer {
 					if (matchTransition instanceof NotSetTransition) {
 						throw new UnsupportedOperationException("Not yet implemented.");
 					}
-					IntervalSet set = matchTransition.label();
-					int minElem = set.getMinElement();
-					int maxElem = set.getMaxElement();
-					for (int k = minElem; k <= maxElem; k++) {
-						if (matchSet.contains(k)) {
-							// TODO: Token is missing (i.e. position in source will not be displayed).
-							g.tool.errMgr.grammarError(ErrorType.CHARACTERS_COLLISION_IN_SET, g.fileName,
-										   null,
-										   CharSupport.toRange(minElem, maxElem, CharSupport.ToRangeMode.NOT_BRACKETED),
-										   CharSupport.toRange(set.getMinElement(), set.getMaxElement(), CharSupport.ToRangeMode.BRACKETED));
-							break;
+					IntervalSet set =  matchTransition.label();
+					List<Interval> intervals = set.getIntervals();
+					int n = intervals.size();
+					for (int k = 0; k < n; k++) {
+						Interval setInterval = intervals.get(k);
+						int a = setInterval.a;
+						int b = setInterval.b;
+						if (a != -1 && b != -1) {
+							for (int v = a; v <= b; v++) {
+								if (matchSet.contains(v)) {
+									// TODO: Token is missing (i.e. position in source will not be displayed).
+									g.tool.errMgr.grammarError(ErrorType.CHARACTERS_COLLISION_IN_SET, g.fileName,
+											null,
+											CharSupport.getANTLRCharLiteralForChar(v),
+											CharSupport.getIntervalSetEscapedString(matchSet));
+									break;
+								}
+							}
 						}
 					}
 					matchSet.addAll(set);

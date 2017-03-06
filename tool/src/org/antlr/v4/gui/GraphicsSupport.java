@@ -93,7 +93,8 @@ public class GraphicsSupport {
 				job.print(doc, attributes);
 				out.close();
 			}
-		} else {
+		}
+		else {
 			// parrt: works with [image/jpeg, image/png, image/x-png, image/vnd.wap.wbmp, image/bmp, image/gif]
 			Rectangle rect = comp.getBounds();
 			BufferedImage image = new BufferedImage(rect.width, rect.height,

@@ -5,6 +5,7 @@
 
 #include "misc/Interval.h"
 #include "Token.h"
+#include "RuleContext.h"
 #include "tree/ParseTreeVisitor.h"
 
 #include "tree/TerminalNodeImpl.h"
@@ -17,6 +18,10 @@ TerminalNodeImpl::TerminalNodeImpl(Token *symbol_) : symbol(symbol_) {
 
 Token* TerminalNodeImpl::getSymbol() {
   return symbol;
+}
+
+void TerminalNodeImpl::setParent(RuleContext *parent) {
+  this->parent = parent;
 }
 
 misc::Interval TerminalNodeImpl::getSourceInterval() {

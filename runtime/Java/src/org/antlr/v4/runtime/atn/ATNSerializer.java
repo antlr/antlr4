@@ -16,8 +16,8 @@ import java.io.InvalidClassException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
@@ -168,7 +168,8 @@ public class ATNSerializer {
 		for (IntervalSet set : sets.keySet()) {
 			if (set.getMaxElement() <= Character.MAX_VALUE) {
 				bmpSets.add(set);
-			} else {
+			}
+			else {
 				smpSets.add(set);
 			}
 		}

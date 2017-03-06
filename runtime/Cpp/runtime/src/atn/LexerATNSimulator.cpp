@@ -12,6 +12,7 @@
 #include "atn/SingletonPredictionContext.h"
 #include "atn/PredicateTransition.h"
 #include "atn/ActionTransition.h"
+#include "atn/TokensStartState.h"
 #include "misc/Interval.h"
 #include "dfa/DFA.h"
 #include "Lexer.h"
@@ -102,7 +103,7 @@ void LexerATNSimulator::clearDFA() {
 }
 
 size_t LexerATNSimulator::matchATN(CharStream *input) {
-  ATNState *startState = (ATNState *)atn.modeToStartState[_mode];
+  ATNState *startState = atn.modeToStartState[_mode];
 
   std::unique_ptr<ATNConfigSet> s0_closure = computeStartState(input, startState);
 

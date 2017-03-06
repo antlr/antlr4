@@ -124,7 +124,8 @@ public class SwiftTarget extends Target {
 
         if (g.isLexer()  && lexerAtnJSON == null) {
             lexerAtnJSON = getLexerOrParserATNJson(g, fileName);
-        } else if (!g.isLexer()  && parserAtnJSON == null && g.atn != null) {
+        }
+        else if (!g.isLexer()  && parserAtnJSON == null && g.atn != null) {
             parserAtnJSON = getLexerOrParserATNJson(g, fileName);
         }
 

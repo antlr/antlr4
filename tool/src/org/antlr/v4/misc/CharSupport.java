@@ -7,6 +7,11 @@
 package org.antlr.v4.misc;
 
 import org.antlr.v4.runtime.Lexer;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.misc.Interval;
+import org.antlr.v4.runtime.misc.IntervalSet;
+
+import java.util.Iterator;
 
 /** */
 public class CharSupport {
@@ -19,11 +24,6 @@ public class CharSupport {
 	 */
 	public static String ANTLRLiteralCharValueEscape[] = new String[255];
 
-	public enum ToRangeMode {
-		BRACKETED,
-		NOT_BRACKETED,
-	};
-
 	static {
 		ANTLRLiteralEscapedCharValue['n'] = '\n';
 		ANTLRLiteralEscapedCharValue['r'] = '\r';
@@ -31,17 +31,12 @@ public class CharSupport {
 		ANTLRLiteralEscapedCharValue['b'] = '\b';
 		ANTLRLiteralEscapedCharValue['f'] = '\f';
 		ANTLRLiteralEscapedCharValue['\\'] = '\\';
-		ANTLRLiteralEscapedCharValue['\''] = '\'';
-		ANTLRLiteralEscapedCharValue['"'] = '"';
-		ANTLRLiteralEscapedCharValue['-'] = '-';
-		ANTLRLiteralEscapedCharValue[']'] = ']';
 		ANTLRLiteralCharValueEscape['\n'] = "\\n";
 		ANTLRLiteralCharValueEscape['\r'] = "\\r";
 		ANTLRLiteralCharValueEscape['\t'] = "\\t";
 		ANTLRLiteralCharValueEscape['\b'] = "\\b";
 		ANTLRLiteralCharValueEscape['\f'] = "\\f";
 		ANTLRLiteralCharValueEscape['\\'] = "\\\\";
-		ANTLRLiteralCharValueEscape['\''] = "\\'";
 	}
 
 	/** Return a string representing the escaped char for code c.  E.g., If c
@@ -50,27 +45,34 @@ public class CharSupport {
 	 *  as \\uXXXX or \\u{XXXXXX} escapes.
 	 */
 	public static String getANTLRCharLiteralForChar(int c) {
-		if ( c< Lexer.MIN_CHAR_VALUE ) {
-			return "'<INVALID>'";
+		String result;
+		if ( c < Lexer.MIN_CHAR_VALUE ) {
+			result = "<INVALID>";
 		}
-		if ( c<ANTLRLiteralCharValueEscape.length && ANTLRLiteralCharValueEscape[c]!=null ) {
-			return '\''+ANTLRLiteralCharValueEscape[c]+'\'';
-		}
-		if ( Character.UnicodeBlock.of((char)c)==Character.UnicodeBlock.BASIC_LATIN &&
-			 !Character.isISOControl((char)c) ) {
-			if ( c=='\\' ) {
-				return "'\\\\'";
+		else {
+			String charValueEscape = c < ANTLRLiteralCharValueEscape.length ? ANTLRLiteralCharValueEscape[c] : null;
+			if (charValueEscape != null) {
+				result = charValueEscape;
 			}
-			if ( c=='\'') {
-				return "'\\''";
+			else if (Character.UnicodeBlock.of((char) c) == Character.UnicodeBlock.BASIC_LATIN &&
+					!Character.isISOControl((char) c)) {
+				if (c == '\\') {
+					result = "\\\\";
+				}
+				else if (c == '\'') {
+					result = "\\'";
+				}
+				else {
+					result = Character.toString((char) c);
+				}
 			}
-			return '\''+Character.toString((char)c)+'\'';
+			else if (c <= 0xFFFF) {
+				result = String.format("\\u%04X", c);
+			} else {
+				result = String.format("\\u{%06X}", c);
+			}
 		}
-		if (c <= 0xFFFF) {
-			return String.format("\\u%04X", c);
-		} else {
-			return String.format("\\u{%06X}", c);
-		}
+		return '\'' + result + '\'';
 	}
 
 	/** Given a literal like (the 3 char sequence with single quotes) 'a',
@@ -103,7 +105,8 @@ public class CharSupport {
 								return null; // invalid escape sequence.
 							}
 						}
-					} else {
+					}
+					else {
 						for (end = i + 2; end < i + 6; end++) {
 							if ( end>n ) return null; // invalid escape sequence.
 							char charAt = literal.charAt(end);
@@ -137,10 +140,10 @@ public class CharSupport {
 			case 2:
 				if ( cstr.charAt(0)!='\\' ) return -1;
 				// '\x'  (antlr lexer will catch invalid char)
-				if ( Character.isDigit(cstr.charAt(1)) ) return -1;
-				int escChar = cstr.charAt(1);
+				char escChar = cstr.charAt(1);
+				if (escChar == '\'') return escChar; // escape quote only in string literals.
 				int charVal = ANTLRLiteralEscapedCharValue[escChar];
-				if ( charVal==0 ) return -1;
+				if (charVal == 0) return -1;
 				return charVal;
 			case 6:
 				// '\\u1234' or '\\u{12}'
@@ -150,7 +153,8 @@ public class CharSupport {
 				if ( cstr.charAt(2) == '{' ) {
 					startOff = 3;
 					endOff = cstr.indexOf('}');
-				} else {
+				}
+				else {
 					startOff = 2;
 					endOff = cstr.length();
 				}
@@ -163,35 +167,40 @@ public class CharSupport {
 		}
 	}
 
-	private static int parseHexValue(String cstr, int startOff, int endOff) {
+	public static int parseHexValue(String cstr, int startOff, int endOff) {
 		if (startOff < 0 || endOff < 0) {
 			return -1;
 		}
 		String unicodeChars = cstr.substring(startOff, endOff);
-				int result = -1;
-				try {
-					result = Integer.parseInt(unicodeChars, 16);
-				}
-				catch (NumberFormatException e) {
-				}
-				return result;
+		int result = -1;
+		try {
+			result = Integer.parseInt(unicodeChars, 16);
+		}
+		catch (NumberFormatException e) {
+		}
+		return result;
 	}
 
 	public static String capitalize(String s) {
 		return Character.toUpperCase(s.charAt(0)) + s.substring(1);
 	}
 
-	public static String toRange(int codePointStart, int codePointEnd, ToRangeMode mode) {
-		StringBuilder sb = new StringBuilder();
-		if (mode == ToRangeMode.BRACKETED) {
-			sb.append("[");
+	public static String getIntervalSetEscapedString(IntervalSet intervalSet) {
+		StringBuilder buf = new StringBuilder();
+		Iterator<Interval> iter = intervalSet.getIntervals().iterator();
+		while (iter.hasNext()) {
+			Interval interval = iter.next();
+			buf.append(getRangeEscapedString(interval.a, interval.b));
+			if (iter.hasNext()) {
+				buf.append(" | ");
+			}
 		}
-		sb.appendCodePoint(codePointStart)
-			.append("-")
-			.appendCodePoint(codePointEnd);
-		if (mode == ToRangeMode.BRACKETED) {
-			sb.append("]");
-		}
-		return sb.toString();
+		return buf.toString();
+	}
+
+	public static String getRangeEscapedString(int codePointStart, int codePointEnd) {
+		return codePointStart != codePointEnd
+				? getANTLRCharLiteralForChar(codePointStart) + ".." + getANTLRCharLiteralForChar(codePointEnd)
+				: getANTLRCharLiteralForChar(codePointStart);
 	}
 }

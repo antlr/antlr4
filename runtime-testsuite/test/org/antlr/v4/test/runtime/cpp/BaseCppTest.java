@@ -482,11 +482,14 @@ public class BaseCppTest implements RuntimeTestSupport {
 			String os = System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH);
 			if ((os.indexOf("mac") >= 0) || (os.indexOf("darwin") >= 0)) {
 				detectedOS = "mac";
-			} else if (os.indexOf("win") >= 0) {
+			}
+			else if (os.indexOf("win") >= 0) {
 				detectedOS = "windows";
-			} else if (os.indexOf("nux") >= 0) {
+			}
+			else if (os.indexOf("nux") >= 0) {
 				detectedOS = "linux";
-			} else {
+			}
+			else {
 				detectedOS = "unknown";
 			}
 		}
