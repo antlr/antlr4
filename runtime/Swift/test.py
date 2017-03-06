@@ -57,6 +57,13 @@ def gen_parser(grammar):
     call([java, '-jar', ANTLR4_JAR, '-Dlanguage=Swift', grammar])
 
 
+def swift_test():
+    """
+    Run unit tests.
+    """
+    call(['swift', 'test'])
+
+
 if __name__ == '__main__':
     if not jar_exists():
         print 'Run "mvn install" in antlr4 project root' + \
@@ -64,3 +71,4 @@ if __name__ == '__main__':
         exit()
 
     _ = [gen_parser(f) for f in find_g4()]
+    swift_test()
