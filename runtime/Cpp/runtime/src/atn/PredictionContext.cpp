@@ -362,27 +362,19 @@ Ref<PredictionContext> PredictionContext::mergeArrays(const Ref<ArrayPredictionC
 }
 
 bool PredictionContext::combineCommonParents(std::vector<Ref<PredictionContext>> &parents) {
-  std::unordered_set<Ref<PredictionContext>, PredictionContextHasher, PredictionContextComparer> uniqueParents;
 
+  std::set<Ref<PredictionContext>> uniqueParents;
   for (size_t p = 0; p < parents.size(); ++p) {
-    if (!parents[p])
-      continue;
     Ref<PredictionContext> parent = parents[p];
     if (uniqueParents.find(parent) == uniqueParents.end()) { // don't replace
       uniqueParents.insert(parent);
     }
   }
 
-  if (uniqueParents.size() == parents.size())
-    return false;
-
-  for (size_t p = 0; p < uniqueParents.size(); ++p) {
-    if (!parents[p])
-      continue;
+  for (size_t p = 0; p < parents.size(); ++p) {
     parents[p] = *uniqueParents.find(parents[p]);
   }
-  parents.resize(uniqueParents.size());
-  
+
   return true;
 }
 
