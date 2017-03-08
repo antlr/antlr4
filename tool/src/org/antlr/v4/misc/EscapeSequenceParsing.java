@@ -18,6 +18,8 @@ import java.util.Objects;
  *   \\u{10ABCD}
  *   \\p{Foo}
  *   \\P{Bar}
+ *   \\p{Baz=Blech}
+ *   \\P{Baz=Blech}
  */
 public abstract class EscapeSequenceParsing {
 	public static class Result {

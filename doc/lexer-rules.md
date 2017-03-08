@@ -60,11 +60,11 @@ Match that character or sequence of characters. E.g., ’while’ or ’=’.</t
 <td>[char set]</td><td>
 <p>Match one of the characters specified in the character set. Interpret <tt>x-y</tt> as the set of characters between range <tt>x</tt> and <tt>y</tt>, inclusively. The following escaped characters are interpreted as single special characters: <tt>\n</tt>, <tt>\r</tt>, <tt>\b</tt>, <tt>\t</tt>, <tt>\f</tt>, <tt>\uXXXX</tt>, and <tt>\u{XXXXXX}</tt>. To get <tt>]</tt>, <tt>\</tt>, or <tt>-</tt> you must escape them with <tt>\</tt>.</p>
 
-<p>You can also include all characters matching Unicode properties (general category, boolean, script, or block) with <tt>\p{PropertyName}</tt>. (You can invert the test with <tt>\P{PropertyName}</tt>).</p>
+<p>You can also include all characters matching Unicode properties (general category, boolean, or enumerated including scripts and blocks) with <tt>\p{PropertyName}</tt> or <tt>\p{EnumProperty=Value}</tt>. (You can invert the test with <tt>\P{PropertyName}</tt> or <tt>\P{EnumProperty=Value}</tt>).</p>
 
-<p>For a list of valid Unicode property names, see <a href="http://unicode.org/reports/tr44/#Properties">Unicode Standard Annex #44</a>. (ANTLR also supports <a href="http://unicode.org/reports/tr44/#General_Category_Values">short and long Unicode general category names</a> like <tt>\p{Lu}</tt>, <tt>\p{Z}</tt>, and <tt>\p{Symbol}</tt>.)</p>
+<p>For a list of valid Unicode property names, see <a href="http://unicode.org/reports/tr44/#Properties">Unicode Standard Annex #44</a>. (ANTLR also supports <a href="http://unicode.org/reports/tr44/#General_Category_Values">short and long Unicode general category names and values</a> like <tt>\p{Lu}</tt>, <tt>\p{Z}</tt>, <tt>\p{Symbol}</tt>, <tt>\p{Blk=Latin_1_Sup}</tt>, and <tt>\p{Block=Latin_1_Supplement}</tt>.)</p>
 
-<p>Property names include <a href="http://www.unicode.org/Public/UCD/latest/ucd/Blocks.txt">Unicode block names</a> prefixed with <tt>In</tt> (they overlap with script names) and with spaces changed to <tt>_</tt>. For example: <tt>\p{InLatin_1_Supplement}</tt>, <tt>\p{InYijing_Hexagram_Symbols}</tt>, and <tt>\p{InAncient_Greek_Numbers}</tt>.</p>
+<p>As a shortcut for <tt>\p{Block=Latin_1_Supplement}</tt>, you can refer to blocks using <a href="http://www.unicode.org/Public/UCD/latest/ucd/Blocks.txt">Unicode block names</a> prefixed with <tt>In</tt> and with spaces changed to <tt>_</tt>. For example: <tt>\p{InLatin_1_Supplement}</tt>, <tt>\p{InYijing_Hexagram_Symbols}</tt>, and <tt>\p{InAncient_Greek_Numbers}</tt>.</p>
 
 <p>Property names are <b>case-insensitive</b>, and <tt>_</tt> and <tt>-</tt> are treated identically</p>
 
@@ -77,7 +77,7 @@ UNICODE_WS : [\p{White_Space}] -> skip; // match all Unicode whitespace
 
 ID : [a-zA-Z] [a-zA-Z0-9]* ; // match usual identifier spec
 
-UNICODE_ID : [\p{Alpha}] [\p{Alnum}]* ; // match full Unicode alphabetic ids
+UNICODE_ID : [\p{Alpha}\p{General_Category=Other_Letter}] [\p{Alnum}\p{General_Category=Other_Letter}]* ; // match full Unicode alphabetic ids
 
 EMOJI : [\u{1F4A9}\u{1F926}] ; // note Unicode code points > U+FFFF
 
