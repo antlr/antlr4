@@ -101,6 +101,14 @@ public class TestUnicodeData {
 	}
 
 	@Test
+	public void testUnicodeScriptEquals() {
+		assertTrue(UnicodeData.getPropertyCodePoints("Script=Zyyy").contains('0'));
+		assertTrue(UnicodeData.getPropertyCodePoints("Script=Latn").contains('X'));
+		assertTrue(UnicodeData.getPropertyCodePoints("Script=Hani").contains(0x4E04));
+		assertTrue(UnicodeData.getPropertyCodePoints("Script=Cyrl").contains(0x0404));
+	}
+
+	@Test
 	public void testUnicodeScriptAliases() {
 		assertTrue(UnicodeData.getPropertyCodePoints("Common").contains('0'));
 		assertTrue(UnicodeData.getPropertyCodePoints("Latin").contains('X'));
@@ -117,9 +125,45 @@ public class TestUnicodeData {
 	}
 
 	@Test
+	public void testUnicodeBlockEquals() {
+		assertTrue(UnicodeData.getPropertyCodePoints("Block=ASCII").contains('0'));
+		assertTrue(UnicodeData.getPropertyCodePoints("Block=CJK").contains(0x4E04));
+		assertTrue(UnicodeData.getPropertyCodePoints("Block=Cyrillic").contains(0x0404));
+		assertTrue(UnicodeData.getPropertyCodePoints("Block=Misc_Pictographs").contains(0x1F4A9));
+	}
+
+	@Test
 	public void testUnicodeBlockAliases() {
 		assertTrue(UnicodeData.getPropertyCodePoints("InBasic_Latin").contains('0'));
 		assertTrue(UnicodeData.getPropertyCodePoints("InMiscellaneous_Mathematical_Symbols_B").contains(0x29BE));
+	}
+
+	@Test
+	public void testEnumeratedPropertyEquals() {
+		assertTrue(
+				"U+1F481 INFORMATION DESK PERSON is an emoji modifier base",
+				UnicodeData.getPropertyCodePoints("Grapheme_Cluster_Break=E_Base").contains(0x1F481));
+
+		assertFalse(
+				"U+1F47E ALIEN MONSTER is not an emoji modifier",
+				UnicodeData.getPropertyCodePoints("Grapheme_Cluster_Break=E_Base").contains(0x1F47E));
+
+		assertTrue(
+				"U+0E33 THAI CHARACTER SARA AM is a spacing mark",
+				UnicodeData.getPropertyCodePoints("Grapheme_Cluster_Break=E_Base").contains(0x1F481));
+
+		assertFalse(
+				"U+1038 MYANMAR SIGN VISARGA is not a spacing mark",
+				UnicodeData.getPropertyCodePoints("Grapheme_Cluster_Break=E_Base").contains(0x1038));
+
+		assertTrue(
+				"U+00A1 INVERTED EXCLAMATION MARK has ambiguous East Asian Width",
+				UnicodeData.getPropertyCodePoints("East_Asian_Width=Ambiguous").contains(0x00A1));
+
+		assertFalse(
+				"U+00A2 CENT SIGN does not have ambiguous East Asian Width",
+				UnicodeData.getPropertyCodePoints("East_Asian_Width=Ambiguous").contains(0x00A2));
+
 	}
 
 	@Test

@@ -74,14 +74,14 @@ public abstract class UnicodeDataTemplateController {
 		Map<String, IntervalSet> propertyCodePointRanges = new LinkedHashMap<>();
 		addUnicodeCategoryCodesToCodePointRanges(propertyCodePointRanges);
 		addUnicodeBinaryPropertyCodesToCodePointRanges(propertyCodePointRanges);
-		addUnicodeScriptCodesToCodePointRanges(propertyCodePointRanges);
-		addUnicodeBlocksToCodePointRanges(propertyCodePointRanges);
+		addUnicodeIntPropertyCodesToCodePointRanges(propertyCodePointRanges);
 
 		Map<String, String> propertyAliases = new LinkedHashMap<>();
 		addUnicodeCategoryCodesToNames(propertyAliases);
 		addUnicodeBinaryPropertyCodesToNames(propertyAliases);
 		addUnicodeScriptCodesToNames(propertyAliases);
 		addUnicodeBlocksToNames(propertyAliases);
+		addUnicodeIntPropertyCodesToNames(propertyAliases);
 
 		Map<String, Object> properties = new LinkedHashMap<>();
 		properties.put("propertyCodePointRanges", propertyCodePointRanges);
@@ -191,20 +191,22 @@ public abstract class UnicodeDataTemplateController {
 		}
 	}
 
-	private static void addUnicodeScriptCodesToCodePointRanges(Map<String, IntervalSet> propertyCodePointRanges) {
-		addIntPropertyRanges(UProperty.SCRIPT, "", propertyCodePointRanges);
-	}
-
-	private static void addUnicodeBlocksToCodePointRanges(Map<String, IntervalSet> propertyCodePointRanges) {
-		addIntPropertyRanges(UProperty.BLOCK, "In", propertyCodePointRanges);
+	private static void addUnicodeIntPropertyCodesToCodePointRanges(Map<String, IntervalSet> propertyCodePointRanges) {
+		for (int property = UProperty.INT_START;
+		     property < UProperty.INT_LIMIT;
+		     property++) {
+			String propertyName = getShortPropertyName(property);
+			addIntPropertyRanges(property, propertyName + "=", propertyCodePointRanges);
+		}
 	}
 
 	private static void addIntPropertyAliases(int property, String namePrefix, Map<String, String> propertyAliases) {
+		String propertyName = getShortPropertyName(property);
 		for (int propertyValue = UCharacter.getIntPropertyMinValue(property);
 		     propertyValue <= UCharacter.getIntPropertyMaxValue(property);
 		     propertyValue++) {
-			String propertyName = namePrefix + UCharacter.getPropertyValueName(property, propertyValue, UProperty.NameChoice.SHORT);
-			int nameChoice = UProperty.NameChoice.LONG;
+			String aliasTarget = propertyName + "=" + UCharacter.getPropertyValueName(property, propertyValue, UProperty.NameChoice.SHORT);
+			int nameChoice = UProperty.NameChoice.SHORT;
 			String alias;
 			while (true) {
 				try {
@@ -214,7 +216,7 @@ public abstract class UnicodeDataTemplateController {
 					break;
 				}
 				assert alias != null;
-				addPropertyAlias(propertyAliases, alias, propertyName);
+				addPropertyAlias(propertyAliases, alias, aliasTarget);
 				nameChoice++;
 			}
 		}
@@ -226,5 +228,24 @@ public abstract class UnicodeDataTemplateController {
 
 	private static void addUnicodeBlocksToNames(Map<String, String> propertyAliases) {
 		addIntPropertyAliases(UProperty.BLOCK, "In", propertyAliases);
+	}
+
+	private static void addUnicodeIntPropertyCodesToNames(Map<String, String> propertyAliases) {
+		for (int property = UProperty.INT_START;
+		     property < UProperty.INT_LIMIT;
+		     property++) {
+			int nameChoice = UProperty.NameChoice.SHORT + 1;
+			while (true) {
+				String propertyNameAlias;
+				try {
+					propertyNameAlias = UCharacter.getPropertyName(property, nameChoice);
+				} catch (IllegalArgumentException e) {
+					// No more aliases.
+					break;
+				}
+				addIntPropertyAliases(property, propertyNameAlias + "=", propertyAliases);
+				nameChoice++;
+			}
+		}
 	}
 }
