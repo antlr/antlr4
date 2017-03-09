@@ -166,6 +166,16 @@ public class TestUnicodeData {
 
 	}
 
+        @Test
+        public void extendedPictographic() {
+		assertTrue(
+				"U+1F588 BLACK PUSHPIN is in Extended Pictographic",
+				UnicodeData.getPropertyCodePoints("Extended_Pictographic").contains(0x1F588));
+		assertFalse(
+				"0 is not in Extended Pictographic",
+				UnicodeData.getPropertyCodePoints("Extended_Pictographic").contains('0'));
+        }
+
 	@Test
 	public void testPropertyCaseInsensitivity() {
 		assertTrue(UnicodeData.getPropertyCodePoints("l").contains('x'));
