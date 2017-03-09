@@ -176,6 +176,28 @@ public class TestUnicodeData {
 				UnicodeData.getPropertyCodePoints("Extended_Pictographic").contains('0'));
         }
 
+        @Test
+        public void emojiPresentation() {
+		assertTrue(
+				"U+1F4A9 PILE OF POO is in EmojiPresentation=EmojiDefault",
+				UnicodeData.getPropertyCodePoints("EmojiPresentation=EmojiDefault").contains(0x1F4A9));
+		assertFalse(
+				"0 is not in EmojiPresentation=EmojiDefault",
+				UnicodeData.getPropertyCodePoints("EmojiPresentation=EmojiDefault").contains('0'));
+		assertFalse(
+				"A is not in EmojiPresentation=EmojiDefault",
+				UnicodeData.getPropertyCodePoints("EmojiPresentation=EmojiDefault").contains('A'));
+		assertFalse(
+				"U+1F4A9 PILE OF POO is not in EmojiPresentation=TextDefault",
+				UnicodeData.getPropertyCodePoints("EmojiPresentation=TextDefault").contains(0x1F4A9));
+		assertTrue(
+				"0 is in EmojiPresentation=TextDefault",
+				UnicodeData.getPropertyCodePoints("EmojiPresentation=TextDefault").contains('0'));
+		assertFalse(
+				"A is not in EmojiPresentation=TextDefault",
+				UnicodeData.getPropertyCodePoints("EmojiPresentation=TextDefault").contains('A'));
+        }
+
 	@Test
 	public void testPropertyCaseInsensitivity() {
 		assertTrue(UnicodeData.getPropertyCodePoints("l").contains('x'));

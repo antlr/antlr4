@@ -66,6 +66,14 @@ Match that character or sequence of characters. E.g., ’while’ or ’=’.</t
 
 <p>As a shortcut for <tt>\p{Block=Latin_1_Supplement}</tt>, you can refer to blocks using <a href="http://www.unicode.org/Public/UCD/latest/ucd/Blocks.txt">Unicode block names</a> prefixed with <tt>In</tt> and with spaces changed to <tt>_</tt>. For example: <tt>\p{InLatin_1_Supplement}</tt>, <tt>\p{InYijing_Hexagram_Symbols}</tt>, and <tt>\p{InAncient_Greek_Numbers}</tt>.</p>
 
+<p>A few extra properties are supported:</p>
+<ul>
+<li><tt>\p{Extended_Pictographic}</tt> (see <a href="http://unicode.org/reports/tr35/">UTS #35</a>)</li>
+<li><tt>\p{EmojiPresentation=EmojiDefault}</tt> (code points which have colorful emoji-style presentation by default but which can also be displayed text-style)</li>
+<li><tt>\p{EmojiPresentation=TextDefault}</tt> (code points which have black-and-white text-style presentation by default but which can also be displayed emoji-style)</li>
+<li><tt>\p{EmojiPresentation=Text}</tt> (code points which have only black-and-white text-style and lack a colorful emoji-style presentation)</li>
+</ul>
+
 <p>Property names are <b>case-insensitive</b>, and <tt>_</tt> and <tt>-</tt> are treated identically</p>
 
 <p>Here are a few examples:</p>
