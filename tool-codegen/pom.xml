@@ -48,7 +48,7 @@
             <template>
               <directory>${basedir}/src/main/string-template</directory>
               <name>unicodedata</name>
-              <target>../tool/target/generated-sources/antlr4-tool-codegen/org/antlr/v4/unicode/UnicodeData.java</target>
+              <target>../tool/src/org/antlr/v4/unicode/UnicodeData.java</target>
               <controller>
                 <className>org.antlr.v4.unicode.UnicodeDataTemplateController</className>
                 <sourceVersion>1.7</sourceVersion>
