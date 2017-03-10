@@ -21,7 +21,7 @@ public abstract class UnicodeData {
        // initialization into one method per Unicode property
 
        <propertyCodePointRanges.keys:{ k | // Unicode code points with property "<k>"
-static private void addProperty<k>() {
+static private void addProperty<i>() {
        List\<Interval\> intervals = Arrays.asList(
                <propertyCodePointRanges.(k).intervals:{ interval | Interval.of(<interval.a>, <interval.b>)}; separator=",\n">
        );
@@ -37,7 +37,7 @@ static private void addProperty<k>() {
 
        // Put it all together
        static {
-              <propertyCodePointRanges.keys:{ k | addProperty<k>(); }; separator="\n">
+              <propertyCodePointRanges.keys:{ k | addProperty<i>(); }; separator="\n">
               addPropertyAliases();
        }
 
