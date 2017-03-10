@@ -1,21 +1,16 @@
-<!--
-  ~ Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
-  ~ Use of this file is governed by the BSD 3-clause license that
-  ~ can be found in the LICENSE.txt file in the project root.
-  -->
+<!-- ~ Copyright (c) 2012-2016 The ANTLR Project. All rights reserved. ~ Use of this file is governed by the BSD 3-clause license that ~ can be found in the LICENSE.txt file in the project root. -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.antlr</groupId>
-    <artifactId>antlr4-master</artifactId>
-    <version>4.7-SNAPSHOT</version>
-  </parent>
-  <artifactId>antlr4</artifactId>
-  <name>ANTLR 4 Tool</name>
-  <url>http://www.antlr.org</url>
-  <description>The ANTLR 4 grammar compiler.</description>
-
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.antlr</groupId>
+		<artifactId>antlr4-master</artifactId>
+		<version>4.7-SNAPSHOT</version>
+	</parent>
+	<artifactId>antlr4</artifactId>
+	<name>ANTLR 4 Tool</name>
+	<url>http://www.antlr.org</url>
+	<description>The ANTLR 4 grammar compiler.</description>
 	<dependencies>
 		<dependency>
 			<groupId>org.antlr</groupId>
@@ -42,9 +37,13 @@
 			<artifactId>javax.json</artifactId>
 			<version>1.0.4</version>
 		</dependency>
+		<dependency>
+			<groupId>com.ibm.icu</groupId>
+			<artifactId>icu4j</artifactId>
+			<version>58.2</version>
+		</dependency>
 	</dependencies>
-
-  <build>
+	<build>
 		<sourceDirectory>src</sourceDirectory>
 		<testResources>
 			<testResource>
@@ -80,91 +79,112 @@
 					</execution>
 				</executions>
 			</plugin>
-                        <plugin> <!-- include code-generated sources -->
-                          <groupId>org.codehaus.mojo</groupId>
-                          <artifactId>build-helper-maven-plugin</artifactId>
-                          <executions>
-                            <execution>
-                              <phase>generate-sources</phase>
-                              <goals>
-                                <goal>add-source</goal>
-                              </goals>
-                              <configuration>
-                                <sources>
-                                  <source>${project.build.directory}/generated-sources/antlr4-tool-codegen</source>
-                                </sources>
-                              </configuration>
-                            </execution>
-                          </executions>
-                        </plugin>
+			<plugin> <!-- include code-generated sources -->
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>add-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+								<source>${project.build.directory}/generated-sources/antlr4-tool-codegen</source>
+							</sources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin> <!-- this makes a fat jar with all dependencies -->
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
 				<version>2.3</version>
 				<executions>
 					<execution>
-            <phase>package</phase>
-            <configuration>
+						<phase>package</phase>
+						<configuration>
 							<minimizeJar>false</minimizeJar>
 							<createDependencyReducedPom>false</createDependencyReducedPom>
 							<shadedArtifactAttached>true</shadedArtifactAttached>
-              <shadedClassifierName>complete</shadedClassifierName>
-            </configuration>
-            <goals>
-              <goal>shade</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <!-- can't get this to add bundle items
-      <plugin>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>maven-bundle-plugin</artifactId>
-        <version>2.5.4</version>
-        <executions>
-          <execution>
-            <id>bundle-manifest</id>
-            <phase>process-classes</phase>
-            <configuration>
-              <instructions>
-                <Bundle-SymbolicName>org.antlr.antlr4-tool</Bundle-SymbolicName>
-              </instructions>
-            </configuration>
-            <goals>
-              <goal>manifest</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      -->
-      <plugin> <!-- this just jars up tool stuff and sets main class -->
-        <artifactId>maven-jar-plugin</artifactId>
-        <version>3.0.0</version>
-        <configuration>
-          <archive>
-            <manifest>
-              <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-              <mainClass>org.antlr.v4.Tool</mainClass>
-            </manifest>
-          </archive>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.antlr</groupId>
-        <artifactId>antlr3-maven-plugin</artifactId>
-        <version>3.5.2</version>
-        <configuration>
-          <sourceDirectory>src</sourceDirectory>
-          <verbose>true</verbose>
-        </configuration>
-        <executions>
-          <execution>
-            <goals>
-              <goal>antlr</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
+							<shadedClassifierName>complete</shadedClassifierName>
+							<artifactSet>
+								<excludes>
+									<exclude>com.ibm.icu:*</exclude>
+								</excludes>
+							</artifactSet>
+						</configuration>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- can't get this to add bundle items <plugin> <groupId>org.apache.felix</groupId> <artifactId>maven-bundle-plugin</artifactId> <version>2.5.4</version> <executions> <execution> <id>bundle-manifest</id> <phase>process-classes</phase> <configuration> <instructions> <Bundle-SymbolicName>org.antlr.antlr4-tool</Bundle-SymbolicName> </instructions> </configuration> <goals> <goal>manifest</goal> </goals> </execution> </executions> </plugin> -->
+			<plugin> <!-- this just jars up tool stuff and sets main class -->
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>3.0.0</version>
+				<configuration>
+					<archive>
+						<manifest>
+							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+							<mainClass>org.antlr.v4.Tool</mainClass>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.antlr</groupId>
+				<artifactId>antlr3-maven-plugin</artifactId>
+				<version>3.5.2</version>
+				<configuration>
+					<sourceDirectory>src</sourceDirectory>
+					<verbose>true</verbose>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>antlr</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>com.webguys</groupId>
+				<artifactId>string-template-maven-plugin</artifactId>
+				<version>1.1</version>
+				<!-- this nonsense is for some reason needed to make this plugin work with maven 3 -->
+				<dependencies>
+					<dependency>
+						<groupId>org.twdata.maven</groupId>
+						<artifactId>mojo-executor</artifactId>
+						<version>2.1.0</version>
+					</dependency>
+				</dependencies>
+				<configuration>
+					<templates>
+						<template>
+							<directory>${basedir}/resources/org/antlr/v4/tool/templates</directory>
+							<name>unicodedata</name>
+							<target>${basedir}/target/generated-sources/tool/src/org/antlr/v4/unicode/UnicodeData.java</target>
+							<controller>
+								<className>org.antlr.v4.unicode.UnicodeDataTemplateController</className>
+								<sourceVersion>1.7</sourceVersion>
+								<targetVersion>1.7</targetVersion>
+								<method>getProperties</method>
+							</controller>
+						</template>
+					</templates>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>render</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 </project>

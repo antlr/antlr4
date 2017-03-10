@@ -1,4 +1,4 @@
-﻿ANTLR Project Contributors Certification of Origin and Rights
+ANTLR Project Contributors Certification of Origin and Rights
 
 All contributors to ANTLR v4 must formally agree to abide by this
 certificate of origin by signing on the bottom with their github
@@ -138,5 +138,6 @@ YYYY/MM/DD, github id, Full name, email
 2017/02/14, xied75, Dong Xie, xied75@gmail.com
 2017/02/20, Thomasb81, Thomas Burg, thomasb81@gmail.com
 2017/02/26, jvasileff, John Vasileff, john@vasileff.com
-2017/03/03, chund, Christian Hund, christian.hund@gmail.com
 2017/03/08, harry-tallbelt, Igor Vysokopoyasny, harry.tallbelt@gmail.com
+2017/03/09, teverett, Tom Everett, tom@khubla.com
+2017/03/03, chund, Christian Hund, christian.hund@gmail.com
