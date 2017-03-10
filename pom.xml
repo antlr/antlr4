@@ -78,7 +78,6 @@
 
   <modules>
     <module>runtime/Java</module>
-    <module>tool-codegen</module>
     <module>tool</module>
     <module>antlr4-maven-plugin</module>
     <module>tool-testsuite</module>

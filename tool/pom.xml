@@ -42,6 +42,11 @@
 			<artifactId>javax.json</artifactId>
 			<version>1.0.4</version>
 		</dependency>
+    <dependency>
+      <groupId>com.ibm.icu</groupId>
+      <artifactId>icu4j</artifactId>
+      <version>58.2</version>
+    </dependency>
 	</dependencies>
 
   <build>
@@ -161,6 +166,43 @@
           <execution>
             <goals>
               <goal>antlr</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+   <plugin>
+        <groupId>com.webguys</groupId>
+        <artifactId>string-template-maven-plugin</artifactId>
+        <version>1.1</version>
+        <!-- this nonsense is for some reason needed to make this plugin
+             work with maven 3 -->
+        <dependencies>
+          <dependency>
+            <groupId>org.twdata.maven</groupId>
+            <artifactId>mojo-executor</artifactId>
+            <version>2.1.0</version>
+          </dependency>
+        </dependencies>
+        <configuration>
+          <templates>
+            <template>
+              <directory>${basedir}/resources/org/antlr/v4/tool/templates</directory>
+              <name>unicodedata</name>
+              <target>${basedir}/target/generated-sources/tool/src/org/antlr/v4/unicode/UnicodeData.java</target>
+              <controller>
+                <className>org.antlr.v4.unicode.UnicodeDataTemplateController</className>
+                <sourceVersion>1.7</sourceVersion>
+                <targetVersion>1.7</targetVersion>
+                <method>getProperties</method>
+              </controller>
+            </template>
+          </templates>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>render</goal>
             </goals>
           </execution>
         </executions>
