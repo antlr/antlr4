@@ -70,6 +70,12 @@
 				<role>Developer - C++ Target</role>
 			</roles>
 		</developer>
+		<developer>
+			<name>Tom Everett</name>
+			<roles>
+				<role>Developer</role>
+			</roles>
+		</developer>
 	</developers>
 
 	<modules>
