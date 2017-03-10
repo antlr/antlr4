@@ -84,22 +84,6 @@ public class XPathLexer extends Lexer {
 		super(input);
 	}
 
-	/*
-	ANYWHERE : '//' ;
-	ROOT	 : '/' ;
-	WILDCARD : '*' ;
-	BANG	 : '!' ;
-
-	ID			:	NameStartChar NameChar*
-					{
-					String text = getText();
-					if ( Character.isUpperCase(text.charAt(0)) ) setType(TOKEN_REF);
-					else setType(RULE_REF);
-					}
-				;
-*/
-	/**	STRING : '\'' .*? '\'' ; */
-
 	@Override
 	public Token nextToken() {
 		_tokenStartCharIndex = _input.index();
