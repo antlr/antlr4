@@ -14,7 +14,7 @@ Most often, actions access the attributes of tokens and rule references:
 ```
 decl: type ID ';'
       {System.out.println("var "+$ID.text+":"+$type.text+";");}
-    | t=ID id=ID ';'
+    | t=type id=ID ';'
       {System.out.println("var "+$id.text+":"+$t.text+";");}
     ;
 ```
