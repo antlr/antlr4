@@ -6,7 +6,6 @@ package antlr
 
 import (
 	"fmt"
-	"strconv"
 )
 
 type Comparable interface {
@@ -171,11 +170,11 @@ func (b *BaseATNConfig) equals(o interface{}) bool {
 
 // TODO(pboyer) not altogether clear why this is needed
 func (b *BaseATNConfig) shortHash() int {
-	h := initMurmurHash(7)
-	h = updateMurmurHash(h, b.state.GetStateNumber())
-	h = updateMurmurHash(h, b.alt)
-	h = updateMurmurHash(h, b.semanticContext.Hash())
-	return finishMurmurHash(h, 3)
+	h := murmurInit(7)
+	h = murmurUpdate(h, b.state.GetStateNumber())
+	h = murmurUpdate(h, b.alt)
+	h = murmurUpdate(h, b.semanticContext.Hash())
+	return murmurFinish(h, 3)
 }
 
 func (b *BaseATNConfig) Hash() int {
@@ -186,12 +185,12 @@ func (b *BaseATNConfig) Hash() int {
 		c = b.context.Hash()
 	}
 
-	h := initMurmurHash(7)
-	h = updateMurmurHash(h, b.state.GetStateNumber())
-	h = updateMurmurHash(h, b.alt)
-	h = updateMurmurHash(h, c)
-	h = updateMurmurHash(h, b.semanticContext.Hash())
-	return finishMurmurHash(h, 4)
+	h := murmurInit(7)
+	h = murmurUpdate(h, b.state.GetStateNumber())
+	h = murmurUpdate(h, b.alt)
+	h = murmurUpdate(h, c)
+	h = murmurUpdate(h, b.semanticContext.Hash())
+	return murmurFinish(h, 4)
 }
 
 func (b *BaseATNConfig) String() string {
@@ -265,14 +264,14 @@ func (l *LexerATNConfig) Hash() int {
 		f = 0
 	}
 
-	h := initMurmurHash(7)
-	h = updateMurmurHash(h, l.state.Hash())
-	h = updateMurmurHash(h, l.alt)
-	h = updateMurmurHash(h, l.context.Hash())
-	h = updateMurmurHash(h, l.semanticContext.Hash())
-	h = updateMurmurHash(h, f)
-	h = updateMurmurHash(h, l.lexerActionExecutor.Hash())
-	return finishMurmurHash(h, 6)
+	h := murmurInit(7)
+	h = murmurUpdate(h, l.state.Hash())
+	h = murmurUpdate(h, l.alt)
+	h = murmurUpdate(h, l.context.Hash())
+	h = murmurUpdate(h, l.semanticContext.Hash())
+	h = murmurUpdate(h, f)
+	h = murmurUpdate(h, l.lexerActionExecutor.Hash())
+	return murmurFinish(h, 6)
 }
 
 func (l *LexerATNConfig) equals(other interface{}) bool {

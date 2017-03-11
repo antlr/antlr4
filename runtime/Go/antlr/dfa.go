@@ -76,7 +76,7 @@ func (d *DFA) setPrecedenceStartState(precedence int, startState *DFAState) {
 // true or nil otherwise, and d.precedenceDfa is updated.
 func (d *DFA) setPrecedenceDfa(precedenceDfa bool) {
 	if d.precedenceDfa != precedenceDfa {
-		d.states = make(map[string]*DFAState)
+		d.states = make(map[int]*DFAState)
 
 		if precedenceDfa {
 			precedenceState := NewDFAState(-1, NewBaseATNConfigSet(false))

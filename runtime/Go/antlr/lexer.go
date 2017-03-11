@@ -31,12 +31,12 @@ type Lexer interface {
 type BaseLexer struct {
 	*BaseRecognizer
 
-	Interpreter         ILexerATNSimulator
-	TokenStartCharIndex int
-	TokenStartLine      int
-	TokenStartColumn    int
-	ActionType          int
-	Virt                Lexer // The most derived lexer implementation. Allows virtual method calls.
+	Interpreter            ILexerATNSimulator
+	TokenStartCharIndex    int
+	TokenStartLine         int
+	TokenStartColumn       int
+	ActionType             int
+	Virt                   Lexer // The most derived lexer implementation. Allows virtual method calls.
 
 	input                  CharStream
 	factory                TokenFactory
@@ -45,7 +45,7 @@ type BaseLexer struct {
 	hitEOF                 bool
 	channel                int
 	thetype                int
-	modeStack              IntStack
+	modeStack              intStack
 	mode                   int
 	text                   string
 }
@@ -258,7 +258,7 @@ func (b *BaseLexer) pushMode(m int) {
 	if LexerATNSimulatorDebug {
 		fmt.Println("pushMode " + strconv.Itoa(m))
 	}
-	b.modeStack.Push(b.mode)
+	b.modeStack.push(b.mode)
 	b.mode = m
 }
 
@@ -269,7 +269,7 @@ func (b *BaseLexer) popMode() int {
 	if LexerATNSimulatorDebug {
 		fmt.Println("popMode back to " + fmt.Sprint(b.modeStack[0:len(b.modeStack)-1]))
 	}
-	i, _ := b.modeStack.Pop()
+	i, _ := b.modeStack.pop()
 	b.mode = i
 	return b.mode
 }

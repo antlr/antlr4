@@ -101,11 +101,11 @@ func (p *Predicate) Hash() int {
 		c = 1
 	}
 
-	h := initMurmurHash(0)
-	h = updateMurmurHash(h, p.ruleIndex)
-	h = updateMurmurHash(h, p.predIndex)
-	h = updateMurmurHash(h, c)
-	return finishMurmurHash(h, 3)
+	h := murmurInit(0)
+	h = murmurUpdate(h, p.ruleIndex)
+	h = murmurUpdate(h, p.predIndex)
+	h = murmurUpdate(h, c)
+	return murmurFinish(h, 3)
 }
 
 func (p *Predicate) equals(other interface{}) bool {
@@ -170,7 +170,7 @@ func (p *PrecedencePredicate) String() string {
 	return "{" + strconv.Itoa(p.precedence) + ">=prec}?"
 }
 
-func PrecedencePredicatefilterPrecedencePredicates(set *Set) []*PrecedencePredicate {
+func PrecedencePredicatefilterPrecedencePredicates(set *set) []*PrecedencePredicate {
 	result := make([]*PrecedencePredicate, 0)
 
 	for _, v := range set.values() {
@@ -190,7 +190,7 @@ type AND struct {
 }
 
 func NewAND(a, b SemanticContext) *AND {
-	operands := NewSet(nil, nil)
+	operands := newSet(nil, nil)
 	if aa, ok := a.(*AND); ok {
 		for _, o := range aa.opnds {
 			operands.add(o)
@@ -248,11 +248,11 @@ func (a *AND) equals(other interface{}) bool {
 }
 
 func (a *AND) Hash() int {
-	h := initMurmurHash(0) // Init with a value different from OR
+	h := murmurInit(0) // Init with a value different from OR
 	for _, op := range a.opnds {
-		h = updateMurmurHash(h, op.Hash())
+		h = murmurUpdate(h, op.Hash())
 	}
-	return finishMurmurHash(h, len(a.opnds))
+	return murmurFinish(h, len(a.opnds))
 }
 
 //
@@ -334,7 +334,7 @@ type OR struct {
 
 func NewOR(a, b SemanticContext) *OR {
 
-	operands := NewSet(nil, nil)
+	operands := newSet(nil, nil)
 	if aa, ok := a.(*OR); ok {
 		for _, o := range aa.opnds {
 			operands.add(o)
@@ -393,11 +393,11 @@ func (o *OR) equals(other interface{}) bool {
 }
 
 func (o *OR) Hash() int {
-	h := initMurmurHash(1) // Init with a value different from AND
+	h := murmurInit(1) // Init with a value different from AND
 	for _, op := range o.opnds {
-		h = updateMurmurHash(h, op.Hash())
+		h = murmurUpdate(h, op.Hash())
 	}
-	return finishMurmurHash(h, len(o.opnds))
+	return murmurFinish(h, len(o.opnds))
 }
 
 // <p>

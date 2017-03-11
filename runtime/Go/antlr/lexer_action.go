@@ -109,10 +109,10 @@ func (l *LexerTypeAction) execute(lexer Lexer) {
 }
 
 func (l *LexerTypeAction) Hash() int {
-	h := initMurmurHash(0)
-	h = updateMurmurHash(h, l.actionType)
-	h = updateMurmurHash(h, l.thetype)
-	return finishMurmurHash(h, 2)
+	h := murmurInit(0)
+	h = murmurUpdate(h, l.actionType)
+	h = murmurUpdate(h, l.thetype)
+	return murmurFinish(h, 2)
 }
 
 func (l *LexerTypeAction) equals(other LexerAction) bool {
@@ -153,10 +153,10 @@ func (l *LexerPushModeAction) execute(lexer Lexer) {
 }
 
 func (l *LexerPushModeAction) Hash() int {
-	h := initMurmurHash(0)
-	h = updateMurmurHash(h, l.actionType)
-	h = updateMurmurHash(h, l.mode)
-	return finishMurmurHash(h, 2)
+	h := murmurInit(0)
+	h = murmurUpdate(h, l.actionType)
+	h = murmurUpdate(h, l.mode)
+	return murmurFinish(h, 2)
 }
 
 func (l *LexerPushModeAction) equals(other LexerAction) bool {
@@ -250,10 +250,10 @@ func (l *LexerModeAction) execute(lexer Lexer) {
 }
 
 func (l *LexerModeAction) Hash() int {
-	h := initMurmurHash(0)
-	h = updateMurmurHash(h, l.actionType)
-	h = updateMurmurHash(h, l.mode)
-	return finishMurmurHash(h, 2)
+	h := murmurInit(0)
+	h = murmurUpdate(h, l.actionType)
+	h = murmurUpdate(h, l.mode)
+	return murmurFinish(h, 2)
 }
 
 func (l *LexerModeAction) equals(other LexerAction) bool {
@@ -308,11 +308,11 @@ func (l *LexerCustomAction) execute(lexer Lexer) {
 }
 
 func (l *LexerCustomAction) Hash() int {
-	h := initMurmurHash(0)
-	h = updateMurmurHash(h, l.actionType)
-	h = updateMurmurHash(h, l.ruleIndex)
-	h = updateMurmurHash(h, l.actionIndex)
-	return finishMurmurHash(h, 3)
+	h := murmurInit(0)
+	h = murmurUpdate(h, l.actionType)
+	h = murmurUpdate(h, l.ruleIndex)
+	h = murmurUpdate(h, l.actionIndex)
+	return murmurFinish(h, 3)
 }
 
 func (l *LexerCustomAction) equals(other LexerAction) bool {
@@ -349,10 +349,10 @@ func (l *LexerChannelAction) execute(lexer Lexer) {
 }
 
 func (l *LexerChannelAction) Hash() int {
-	h := initMurmurHash(0)
-	h = updateMurmurHash(h, l.actionType)
-	h = updateMurmurHash(h, l.channel)
-	return finishMurmurHash(h, 2)
+	h := murmurInit(0)
+	h = murmurUpdate(h, l.actionType)
+	h = murmurUpdate(h, l.channel)
+	return murmurFinish(h, 2)
 }
 
 func (l *LexerChannelAction) equals(other LexerAction) bool {
@@ -417,11 +417,11 @@ func (l *LexerIndexedCustomAction) execute(lexer Lexer) {
 }
 
 func (l *LexerIndexedCustomAction) Hash() int {
-	h := initMurmurHash(0)
-	h = updateMurmurHash(h, l.actionType)
-	h = updateMurmurHash(h, l.offset)
-	h = updateMurmurHash(h, l.lexerAction.Hash())
-	return finishMurmurHash(h, 3)
+	h := murmurInit(0)
+	h = murmurUpdate(h, l.actionType)
+	h = murmurUpdate(h, l.offset)
+	h = murmurUpdate(h, l.lexerAction.Hash())
+	return murmurFinish(h, 3)
 }
 
 func (l *LexerIndexedCustomAction) equals(other LexerAction) bool {

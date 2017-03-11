@@ -28,11 +28,11 @@ func NewLexerActionExecutor(lexerActions []LexerAction) *LexerActionExecutor {
 
 	// Caches the result of {@link //hashCode} since the hash code is an element
 	// of the performance-critical {@link LexerATNConfig//hashCode} operation.
-	h := initMurmurHash(0)
+	h := murmurInit(0)
 	for _, a := range lexerActions {
-		h = updateMurmurHash(h, a.Hash())
+		h = murmurUpdate(h, a.Hash())
 	}
-	l.cachedHash = finishMurmurHash(h, len(lexerActions))
+	l.cachedHash = murmurFinish(h, len(lexerActions))
 
 	return l
 }
