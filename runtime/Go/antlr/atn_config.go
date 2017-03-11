@@ -168,7 +168,6 @@ func (b *BaseATNConfig) equals(o interface{}) bool {
 	return nums && alts && cons && sups && equal
 }
 
-// TODO(pboyer) not altogether clear why this is needed
 func (b *BaseATNConfig) shortHash() int {
 	h := murmurInit(7)
 	h = murmurUpdate(h, b.state.GetStateNumber())
