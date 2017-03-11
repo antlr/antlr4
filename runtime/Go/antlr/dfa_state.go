@@ -137,7 +137,7 @@ func (d *DFAState) String() string {
 }
 
 func (d *DFAState) Hash() int {
-	h := initMurmurHash(7);
-	h = updateMurmurHash(h, d.configs.Hash());
-	return finishMurmurHash(h, 1);
+	h := initMurmurHash(7)
+	h = updateMurmurHash(h, d.configs.Hash())
+	return finishMurmurHash(h, 1)
 }

@@ -98,7 +98,7 @@ func (a *ATNDeserializer) DeserializeFromUInt16(data []uint16) *ATN {
 	sets = a.readSets(atn, sets, a.readInt)
 	// Next, if the ATN was serialized with the Unicode SMP feature,
 	// deserialize sets with 32-bit arguments <= U+10FFFF.
-	if (a.isFeatureSupported(AddedUnicodeSMP, a.uuid)) {
+	if a.isFeatureSupported(AddedUnicodeSMP, a.uuid) {
 		sets = a.readSets(atn, sets, a.readInt32)
 	}
 

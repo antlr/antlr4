@@ -7,7 +7,6 @@ package antlr
 import (
 	"fmt"
 	"strconv"
-	"golang.autodesk.com/ts/go/test/fixedbugs/issue4932.dir"
 )
 
 type Comparable interface {

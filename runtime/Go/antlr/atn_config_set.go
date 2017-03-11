@@ -49,7 +49,7 @@ type ATNConfigSet interface {
 // about its elements and can combine similar configurations using a
 // graph-structured stack.
 type BaseATNConfigSet struct {
-	cachedHash   int
+	cachedHash int
 
 	// configLookup is used to determine whether two BaseATNConfigSets are equal. We
 	// need all configurations with the same (s, i, _, semctx) to be equal. A key
@@ -59,7 +59,7 @@ type BaseATNConfigSet struct {
 	configLookup *Set
 
 	// configs is the added elements.
-	configs      []ATNConfig
+	configs []ATNConfig
 
 	// TODO: These fields make me pretty uncomfortable, but it is nice to pack up
 	// info together because it saves recomputation. Can we track conflicts as they
@@ -84,19 +84,19 @@ type BaseATNConfigSet struct {
 	// allow any code to manipulate the set if true because DFA states will point at
 	// sets and those must not change. It not protect other fields; conflictingAlts
 	// in particular, which is assigned after readOnly.
-	readOnly     bool
+	readOnly bool
 
 	// TODO: These fields make me pretty uncomfortable, but it is nice to pack up
 	// info together because it saves recomputation. Can we track conflicts as they
 	// are added to save scanning configs later?
-	uniqueAlt    int
+	uniqueAlt int
 }
 
 func NewBaseATNConfigSet(fullCtx bool) *BaseATNConfigSet {
 	return &BaseATNConfigSet{
-		cachedHash: -1,
-		configLookup:     NewSet(hashATNConfig, equalATNConfigs),
-		fullCtx:          fullCtx,
+		cachedHash:   -1,
+		configLookup: NewSet(hashATNConfig, equalATNConfigs),
+		fullCtx:      fullCtx,
 	}
 }
 

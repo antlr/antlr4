@@ -153,7 +153,7 @@ func (p *PrecedencePredicate) compareTo(other *PrecedencePredicate) int {
 }
 
 func (p *PrecedencePredicate) Hash() int {
-	return 31 + p.precedence;
+	return 31 + p.precedence
 }
 
 func (p *PrecedencePredicate) equals(other interface{}) bool {

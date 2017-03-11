@@ -12,8 +12,8 @@ package antlr
 // not cause bloating of the {@link DFA} created for the lexer.</p>
 
 type LexerActionExecutor struct {
-	lexerActions     []LexerAction
-	cachedHash int
+	lexerActions []LexerAction
+	cachedHash   int
 }
 
 func NewLexerActionExecutor(lexerActions []LexerAction) *LexerActionExecutor {
@@ -32,7 +32,7 @@ func NewLexerActionExecutor(lexerActions []LexerAction) *LexerActionExecutor {
 	for _, a := range lexerActions {
 		h = updateMurmurHash(h, a.Hash())
 	}
-	l.cachedHash = finishMurmurHash(h, len(lexerActions));
+	l.cachedHash = finishMurmurHash(h, len(lexerActions))
 
 	return l
 }
