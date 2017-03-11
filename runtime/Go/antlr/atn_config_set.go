@@ -9,10 +9,10 @@ import "fmt"
 type ATNConfigSet interface {
 	Hasher
 
-	Add(ATNConfig, *DoubleDict) bool
+	Add(ATNConfig, *doubleDict) bool
 	AddAll([]ATNConfig) bool
 
-	GetStates() *Set
+	GetStates() *set
 	GetPredicates() []SemanticContext
 	GetItems() []ATNConfig
 
@@ -33,8 +33,8 @@ type ATNConfigSet interface {
 	ReadOnly() bool
 	SetReadOnly(bool)
 
-	GetConflictingAlts() *BitSet
-	SetConflictingAlts(*BitSet)
+	GetConflictingAlts() *bitSet
+	SetConflictingAlts(*bitSet)
 
 	FullContext() bool
 
@@ -49,14 +49,14 @@ type ATNConfigSet interface {
 // about its elements and can combine similar configurations using a
 // graph-structured stack.
 type BaseATNConfigSet struct {
-	cachedHashString string
+	cachedHash int
 
 	// configLookup is used to determine whether two BaseATNConfigSets are equal. We
 	// need all configurations with the same (s, i, _, semctx) to be equal. A key
 	// effectively doubles the number of objects associated with ATNConfigs. All
 	// keys are hashed by (s, i, _, pi), not including the context. Wiped out when
 	// read-only because a set becomes a DFA state.
-	configLookup *Set
+	configLookup *set
 
 	// configs is the added elements.
 	configs []ATNConfig
@@ -64,7 +64,7 @@ type BaseATNConfigSet struct {
 	// TODO: These fields make me pretty uncomfortable, but it is nice to pack up
 	// info together because it saves recomputation. Can we track conflicts as they
 	// are added to save scanning configs later?
-	conflictingAlts *BitSet
+	conflictingAlts *bitSet
 
 	// dipsIntoOuterContext is used by parsers and lexers. In a lexer, it indicates
 	// we hit a pred while computing a closure operation. Do not make a DFA state
@@ -94,9 +94,9 @@ type BaseATNConfigSet struct {
 
 func NewBaseATNConfigSet(fullCtx bool) *BaseATNConfigSet {
 	return &BaseATNConfigSet{
-		cachedHashString: "-1",
-		configLookup:     NewSet(hashATNConfig, equalATNConfigs),
-		fullCtx:          fullCtx,
+		cachedHash:   -1,
+		configLookup: newSet(hashATNConfig, equalATNConfigs),
+		fullCtx:      fullCtx,
 	}
 }
 
@@ -104,7 +104,7 @@ func NewBaseATNConfigSet(fullCtx bool) *BaseATNConfigSet {
 // ATNConfig.state, i is the ATNConfig.alt, and pi is the
 // ATNConfig.semanticContext. We use (s,i,pi) as the key. Updates
 // dipsIntoOuterContext and hasSemanticContext when necessary.
-func (b *BaseATNConfigSet) Add(config ATNConfig, mergeCache *DoubleDict) bool {
+func (b *BaseATNConfigSet) Add(config ATNConfig, mergeCache *doubleDict) bool {
 	if b.readOnly {
 		panic("set is read-only")
 	}
@@ -120,7 +120,7 @@ func (b *BaseATNConfigSet) Add(config ATNConfig, mergeCache *DoubleDict) bool {
 	existing := b.configLookup.add(config).(ATNConfig)
 
 	if existing == config {
-		b.cachedHashString = "-1"
+		b.cachedHash = -1
 		b.configs = append(b.configs, config) // Track order here
 
 		return true
@@ -146,8 +146,8 @@ func (b *BaseATNConfigSet) Add(config ATNConfig, mergeCache *DoubleDict) bool {
 	return true
 }
 
-func (b *BaseATNConfigSet) GetStates() *Set {
-	states := NewSet(nil, nil)
+func (b *BaseATNConfigSet) GetStates() *set {
+	states := newSet(nil, nil)
 
 	for i := 0; i < len(b.configs); i++ {
 		states.add(b.configs[i].GetState())
@@ -224,26 +224,30 @@ func (b *BaseATNConfigSet) Equals(other interface{}) bool {
 		b.dipsIntoOuterContext == other2.dipsIntoOuterContext
 }
 
-func (b *BaseATNConfigSet) Hash() string {
+func (b *BaseATNConfigSet) Hash() int {
 	if b.readOnly {
-		if b.cachedHashString == "-1" {
-			b.cachedHashString = b.hashConfigs()
+		if b.cachedHash == -1 {
+			b.cachedHash = b.hashConfigs()
 		}
 
-		return b.cachedHashString
+		return b.cachedHash
 	}
 
 	return b.hashConfigs()
 }
 
-func (b *BaseATNConfigSet) hashConfigs() string {
-	s := ""
+func (b *BaseATNConfigSet) hashConfigs() int {
+	h := 1
 
 	for _, c := range b.configs {
-		s += fmt.Sprint(c)
+		h += 31 * h
+
+		if c != nil {
+			h += c.Hash()
+		}
 	}
 
-	return s
+	return h
 }
 
 func (b *BaseATNConfigSet) Length() int {
@@ -276,8 +280,8 @@ func (b *BaseATNConfigSet) Clear() {
 	}
 
 	b.configs = make([]ATNConfig, 0)
-	b.cachedHashString = "-1"
-	b.configLookup = NewSet(hashATNConfig, equalATNConfigs)
+	b.cachedHash = -1
+	b.configLookup = newSet(hashATNConfig, equalATNConfigs)
 }
 
 func (b *BaseATNConfigSet) FullContext() bool {
@@ -300,11 +304,11 @@ func (b *BaseATNConfigSet) SetUniqueAlt(v int) {
 	b.uniqueAlt = v
 }
 
-func (b *BaseATNConfigSet) GetConflictingAlts() *BitSet {
+func (b *BaseATNConfigSet) GetConflictingAlts() *bitSet {
 	return b.conflictingAlts
 }
 
-func (b *BaseATNConfigSet) SetConflictingAlts(v *BitSet) {
+func (b *BaseATNConfigSet) SetConflictingAlts(v *bitSet) {
 	b.conflictingAlts = v
 }
 
@@ -359,12 +363,12 @@ type OrderedATNConfigSet struct {
 func NewOrderedATNConfigSet() *OrderedATNConfigSet {
 	b := NewBaseATNConfigSet(false)
 
-	b.configLookup = NewSet(nil, nil)
+	b.configLookup = newSet(nil, nil)
 
 	return &OrderedATNConfigSet{BaseATNConfigSet: b}
 }
 
-func hashATNConfig(c interface{}) string {
+func hashATNConfig(c interface{}) int {
 	return c.(ATNConfig).shortHash()
 }
 

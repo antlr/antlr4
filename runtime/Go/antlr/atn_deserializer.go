@@ -98,7 +98,7 @@ func (a *ATNDeserializer) DeserializeFromUInt16(data []uint16) *ATN {
 	sets = a.readSets(atn, sets, a.readInt)
 	// Next, if the ATN was serialized with the Unicode SMP feature,
 	// deserialize sets with 32-bit arguments <= U+10FFFF.
-	if (a.isFeatureSupported(AddedUnicodeSMP, a.uuid)) {
+	if a.isFeatureSupported(AddedUnicodeSMP, a.uuid) {
 		sets = a.readSets(atn, sets, a.readInt32)
 	}
 
@@ -656,14 +656,6 @@ func (a *ATNDeserializer) readInt32() int {
 	return low | (high << 16)
 }
 
-//TODO
-//func (a *ATNDeserializer) readLong() int64 {
-//    panic("Not implemented")
-//    var low = a.readInt32()
-//    var high = a.readInt32()
-//    return (low & 0x00000000FFFFFFFF) | (high << int32)
-//}
-
 func createByteToHex() []string {
 	bth := make([]string, 256)
 
@@ -806,16 +798,16 @@ func (a *ATNDeserializer) lexerActionFactory(typeIndex, data1, data2 int) LexerA
 		return NewLexerModeAction(data1)
 
 	case LexerActionTypeMore:
-		return LexerMoreActionINSTANCE
+		return LexerMoreActionInstance
 
 	case LexerActionTypePopMode:
-		return LexerPopModeActionINSTANCE
+		return LexerPopModeActionInstance
 
 	case LexerActionTypePushMode:
 		return NewLexerPushModeAction(data1)
 
 	case LexerActionTypeSkip:
-		return LexerSkipActionINSTANCE
+		return LexerSkipActionInstance
 
 	case LexerActionTypeType:
 		return NewLexerTypeAction(data1)

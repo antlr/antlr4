@@ -4,7 +4,10 @@
 
 package antlr
 
-import "strconv"
+import (
+	"fmt"
+	"strconv"
+)
 
 const (
 	LexerActionTypeChannel  = 0 //The type of a {@link LexerChannelAction} action.
@@ -18,10 +21,11 @@ const (
 )
 
 type LexerAction interface {
+	Hasher
+
 	getActionType() int
 	getIsPositionDependent() bool
 	execute(lexer Lexer)
-	Hash() string
 	equals(other LexerAction) bool
 }
 
@@ -51,8 +55,8 @@ func (b *BaseLexerAction) getIsPositionDependent() bool {
 	return b.isPositionDependent
 }
 
-func (b *BaseLexerAction) Hash() string {
-	return strconv.Itoa(b.actionType)
+func (b *BaseLexerAction) Hash() int {
+	return b.actionType
 }
 
 func (b *BaseLexerAction) equals(other LexerAction) bool {
@@ -75,7 +79,7 @@ func NewLexerSkipAction() *LexerSkipAction {
 }
 
 // Provides a singleton instance of l parameterless lexer action.
-var LexerSkipActionINSTANCE = NewLexerSkipAction()
+var LexerSkipActionInstance = NewLexerSkipAction()
 
 func (l *LexerSkipAction) execute(lexer Lexer) {
 	lexer.Skip()
@@ -104,8 +108,11 @@ func (l *LexerTypeAction) execute(lexer Lexer) {
 	lexer.setType(l.thetype)
 }
 
-func (l *LexerTypeAction) Hash() string {
-	return strconv.Itoa(l.actionType) + strconv.Itoa(l.thetype)
+func (l *LexerTypeAction) Hash() int {
+	h := murmurInit(0)
+	h = murmurUpdate(h, l.actionType)
+	h = murmurUpdate(h, l.thetype)
+	return murmurFinish(h, 2)
 }
 
 func (l *LexerTypeAction) equals(other LexerAction) bool {
@@ -119,7 +126,7 @@ func (l *LexerTypeAction) equals(other LexerAction) bool {
 }
 
 func (l *LexerTypeAction) String() string {
-	return "actionType(" + strconv.Itoa(l.thetype) + ")"
+	return fmt.Sprintf("actionType(%d)", l.thetype)
 }
 
 // Implements the {@code pushMode} lexer action by calling
@@ -145,8 +152,11 @@ func (l *LexerPushModeAction) execute(lexer Lexer) {
 	lexer.pushMode(l.mode)
 }
 
-func (l *LexerPushModeAction) Hash() string {
-	return strconv.Itoa(l.actionType) + strconv.Itoa(l.mode)
+func (l *LexerPushModeAction) Hash() int {
+	h := murmurInit(0)
+	h = murmurUpdate(h, l.actionType)
+	h = murmurUpdate(h, l.mode)
+	return murmurFinish(h, 2)
 }
 
 func (l *LexerPushModeAction) equals(other LexerAction) bool {
@@ -160,7 +170,7 @@ func (l *LexerPushModeAction) equals(other LexerAction) bool {
 }
 
 func (l *LexerPushModeAction) String() string {
-	return "pushMode(" + strconv.Itoa(l.mode) + ")"
+	return fmt.Sprintf("pushMode(%d)", l.mode)
 }
 
 // Implements the {@code popMode} lexer action by calling {@link Lexer//popMode}.
@@ -180,7 +190,7 @@ func NewLexerPopModeAction() *LexerPopModeAction {
 	return l
 }
 
-var LexerPopModeActionINSTANCE = NewLexerPopModeAction()
+var LexerPopModeActionInstance = NewLexerPopModeAction()
 
 // <p>This action is implemented by calling {@link Lexer//popMode}.</p>
 func (l *LexerPopModeAction) execute(lexer Lexer) {
@@ -207,7 +217,7 @@ func NewLexerMoreAction() *LexerMoreAction {
 	return l
 }
 
-var LexerMoreActionINSTANCE = NewLexerMoreAction()
+var LexerMoreActionInstance = NewLexerMoreAction()
 
 // <p>This action is implemented by calling {@link Lexer//popMode}.</p>
 func (l *LexerMoreAction) execute(lexer Lexer) {
@@ -239,8 +249,11 @@ func (l *LexerModeAction) execute(lexer Lexer) {
 	lexer.setMode(l.mode)
 }
 
-func (l *LexerModeAction) Hash() string {
-	return strconv.Itoa(l.actionType) + strconv.Itoa(l.mode)
+func (l *LexerModeAction) Hash() int {
+	h := murmurInit(0)
+	h = murmurUpdate(h, l.actionType)
+	h = murmurUpdate(h, l.mode)
+	return murmurFinish(h, 2)
 }
 
 func (l *LexerModeAction) equals(other LexerAction) bool {
@@ -254,7 +267,7 @@ func (l *LexerModeAction) equals(other LexerAction) bool {
 }
 
 func (l *LexerModeAction) String() string {
-	return "mode(" + strconv.Itoa(l.mode) + ")"
+	return fmt.Sprintf("mode(%d)", l.mode)
 }
 
 // Executes a custom lexer action by calling {@link Recognizer//action} with the
@@ -294,8 +307,12 @@ func (l *LexerCustomAction) execute(lexer Lexer) {
 	lexer.Action(nil, l.ruleIndex, l.actionIndex)
 }
 
-func (l *LexerCustomAction) Hash() string {
-	return strconv.Itoa(l.actionType) + strconv.Itoa(l.ruleIndex) + strconv.Itoa(l.actionIndex)
+func (l *LexerCustomAction) Hash() int {
+	h := murmurInit(0)
+	h = murmurUpdate(h, l.actionType)
+	h = murmurUpdate(h, l.ruleIndex)
+	h = murmurUpdate(h, l.actionIndex)
+	return murmurFinish(h, 3)
 }
 
 func (l *LexerCustomAction) equals(other LexerAction) bool {
@@ -331,8 +348,11 @@ func (l *LexerChannelAction) execute(lexer Lexer) {
 	lexer.setChannel(l.channel)
 }
 
-func (l *LexerChannelAction) Hash() string {
-	return strconv.Itoa(l.actionType) + strconv.Itoa(l.channel)
+func (l *LexerChannelAction) Hash() int {
+	h := murmurInit(0)
+	h = murmurUpdate(h, l.actionType)
+	h = murmurUpdate(h, l.channel)
+	return murmurFinish(h, 2)
 }
 
 func (l *LexerChannelAction) equals(other LexerAction) bool {
@@ -396,8 +416,12 @@ func (l *LexerIndexedCustomAction) execute(lexer Lexer) {
 	l.lexerAction.execute(lexer)
 }
 
-func (l *LexerIndexedCustomAction) Hash() string {
-	return strconv.Itoa(l.actionType) + strconv.Itoa(l.offset) + l.lexerAction.Hash()
+func (l *LexerIndexedCustomAction) Hash() int {
+	h := murmurInit(0)
+	h = murmurUpdate(h, l.actionType)
+	h = murmurUpdate(h, l.offset)
+	h = murmurUpdate(h, l.lexerAction.Hash())
+	return murmurFinish(h, 3)
 }
 
 func (l *LexerIndexedCustomAction) equals(other LexerAction) bool {

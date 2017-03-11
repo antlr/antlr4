@@ -16,8 +16,8 @@ import (
 
 type ErrorListener interface {
 	SyntaxError(recognizer Recognizer, offendingSymbol interface{}, line, column int, msg string, e RecognitionException)
-	ReportAmbiguity(recognizer Parser, dfa *DFA, startIndex, stopIndex int, exact bool, ambigAlts *BitSet, configs ATNConfigSet)
-	ReportAttemptingFullContext(recognizer Parser, dfa *DFA, startIndex, stopIndex int, conflictingAlts *BitSet, configs ATNConfigSet)
+	ReportAmbiguity(recognizer Parser, dfa *DFA, startIndex, stopIndex int, exact bool, ambigAlts *bitSet, configs ATNConfigSet)
+	ReportAttemptingFullContext(recognizer Parser, dfa *DFA, startIndex, stopIndex int, conflictingAlts *bitSet, configs ATNConfigSet)
 	ReportContextSensitivity(recognizer Parser, dfa *DFA, startIndex, stopIndex, prediction int, configs ATNConfigSet)
 }
 
@@ -31,10 +31,10 @@ func NewDefaultErrorListener() *DefaultErrorListener {
 func (d *DefaultErrorListener) SyntaxError(recognizer Recognizer, offendingSymbol interface{}, line, column int, msg string, e RecognitionException) {
 }
 
-func (d *DefaultErrorListener) ReportAmbiguity(recognizer Parser, dfa *DFA, startIndex, stopIndex int, exact bool, ambigAlts *BitSet, configs ATNConfigSet) {
+func (d *DefaultErrorListener) ReportAmbiguity(recognizer Parser, dfa *DFA, startIndex, stopIndex int, exact bool, ambigAlts *bitSet, configs ATNConfigSet) {
 }
 
-func (d *DefaultErrorListener) ReportAttemptingFullContext(recognizer Parser, dfa *DFA, startIndex, stopIndex int, conflictingAlts *BitSet, configs ATNConfigSet) {
+func (d *DefaultErrorListener) ReportAttemptingFullContext(recognizer Parser, dfa *DFA, startIndex, stopIndex int, conflictingAlts *bitSet, configs ATNConfigSet) {
 }
 
 func (d *DefaultErrorListener) ReportContextSensitivity(recognizer Parser, dfa *DFA, startIndex, stopIndex, prediction int, configs ATNConfigSet) {
@@ -51,7 +51,7 @@ func NewConsoleErrorListener() *ConsoleErrorListener {
 //
 // Provides a default instance of {@link ConsoleErrorListener}.
 //
-var ConsoleErrorListenerINSTANCE = NewConsoleErrorListener()
+var ConsoleErrorListenerInstance = NewConsoleErrorListener()
 
 //
 // {@inheritDoc}
@@ -89,13 +89,13 @@ func (p *ProxyErrorListener) SyntaxError(recognizer Recognizer, offendingSymbol 
 	}
 }
 
-func (p *ProxyErrorListener) ReportAmbiguity(recognizer Parser, dfa *DFA, startIndex, stopIndex int, exact bool, ambigAlts *BitSet, configs ATNConfigSet) {
+func (p *ProxyErrorListener) ReportAmbiguity(recognizer Parser, dfa *DFA, startIndex, stopIndex int, exact bool, ambigAlts *bitSet, configs ATNConfigSet) {
 	for _, d := range p.delegates {
 		d.ReportAmbiguity(recognizer, dfa, startIndex, stopIndex, exact, ambigAlts, configs)
 	}
 }
 
-func (p *ProxyErrorListener) ReportAttemptingFullContext(recognizer Parser, dfa *DFA, startIndex, stopIndex int, conflictingAlts *BitSet, configs ATNConfigSet) {
+func (p *ProxyErrorListener) ReportAttemptingFullContext(recognizer Parser, dfa *DFA, startIndex, stopIndex int, conflictingAlts *bitSet, configs ATNConfigSet) {
 	for _, d := range p.delegates {
 		d.ReportAttemptingFullContext(recognizer, dfa, startIndex, stopIndex, conflictingAlts, configs)
 	}

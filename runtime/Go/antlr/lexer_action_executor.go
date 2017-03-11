@@ -12,8 +12,8 @@ package antlr
 // not cause bloating of the {@link DFA} created for the lexer.</p>
 
 type LexerActionExecutor struct {
-	lexerActions     []LexerAction
-	cachedHashString string
+	lexerActions []LexerAction
+	cachedHash   int
 }
 
 func NewLexerActionExecutor(lexerActions []LexerAction) *LexerActionExecutor {
@@ -28,13 +28,11 @@ func NewLexerActionExecutor(lexerActions []LexerAction) *LexerActionExecutor {
 
 	// Caches the result of {@link //hashCode} since the hash code is an element
 	// of the performance-critical {@link LexerATNConfig//hashCode} operation.
-
-	var s string
+	h := murmurInit(0)
 	for _, a := range lexerActions {
-		s += a.Hash()
+		h = murmurUpdate(h, a.Hash())
 	}
-
-	l.cachedHashString = s // "".join([str(la) for la in
+	l.cachedHash = murmurFinish(h, len(lexerActions))
 
 	return l
 }
@@ -157,8 +155,8 @@ func (l *LexerActionExecutor) execute(lexer Lexer, input CharStream, startIndex 
 	}
 }
 
-func (l *LexerActionExecutor) Hash() string {
-	return l.cachedHashString
+func (l *LexerActionExecutor) Hash() int {
+	return l.cachedHash
 }
 
 func (l *LexerActionExecutor) equals(other interface{}) bool {
@@ -167,7 +165,7 @@ func (l *LexerActionExecutor) equals(other interface{}) bool {
 	} else if _, ok := other.(*LexerActionExecutor); !ok {
 		return false
 	} else {
-		return l.cachedHashString == other.(*LexerActionExecutor).cachedHashString &&
+		return l.cachedHash == other.(*LexerActionExecutor).cachedHash &&
 			&l.lexerActions == &other.(*LexerActionExecutor).lexerActions
 	}
 }

@@ -6,7 +6,6 @@ package antlr
 
 import (
 	"fmt"
-	"strconv"
 )
 
 // PredPrediction maps a predicate to a predicted alternative.
@@ -91,8 +90,8 @@ func NewDFAState(stateNumber int, configs ATNConfigSet) *DFAState {
 }
 
 // GetAltSet gets the set of all alts mentioned by all ATN configurations in d.
-func (d *DFAState) GetAltSet() *Set {
-	alts := NewSet(nil, nil)
+func (d *DFAState) GetAltSet() *set {
+	alts := newSet(nil, nil)
 
 	if d.configs != nil {
 		for _, c := range d.configs.GetItems() {
@@ -133,19 +132,11 @@ func (d *DFAState) equals(other interface{}) bool {
 }
 
 func (d *DFAState) String() string {
-	return strconv.Itoa(d.stateNumber) + ":" + d.Hash()
+	return fmt.Sprintf("%d:%d", d.stateNumber, d.Hash())
 }
 
-func (d *DFAState) Hash() string {
-	var s string
-
-	if d.isAcceptState {
-		if d.predicates != nil {
-			s = "=>" + fmt.Sprint(d.predicates)
-		} else {
-			s = "=>" + fmt.Sprint(d.prediction)
-		}
-	}
-
-	return fmt.Sprint(d.configs) + s
+func (d *DFAState) Hash() int {
+	h := murmurInit(7)
+	h = murmurUpdate(h, d.configs.Hash())
+	return murmurFinish(h, 1)
 }

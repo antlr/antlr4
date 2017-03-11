@@ -30,44 +30,43 @@ func intMax(a, b int) int {
 
 // A simple integer stack
 
-type IntStack []int
+type intStack []int
 
-var ErrEmptyStack = errors.New("Stack is empty")
+var errEmptyStack = errors.New("Stack is empty")
 
-func (s *IntStack) Pop() (int, error) {
+func (s *intStack) pop() (int, error) {
 	l := len(*s) - 1
 	if l < 0 {
-		return 0, ErrEmptyStack
+		return 0, errEmptyStack
 	}
 	v := (*s)[l]
 	*s = (*s)[0:l]
 	return v, nil
 }
 
-func (s *IntStack) Push(e int) {
+func (s *intStack) push(e int) {
 	*s = append(*s, e)
 }
 
-type Set struct {
-	data           map[string][]interface{}
-	hashFunction   func(interface{}) string
+type set struct {
+	data           map[int][]interface{}
+	hashFunction   func(interface{}) int
 	equalsFunction func(interface{}, interface{}) bool
 }
 
-func NewSet(hashFunction func(interface{}) string, equalsFunction func(interface{}, interface{}) bool) *Set {
+func newSet(hashFunction func(interface{}) int, equalsFunction func(interface{}, interface{}) bool) *set {
+	s := new(set)
 
-	s := new(Set)
-
-	s.data = make(map[string][]interface{})
+	s.data = make(map[int][]interface{})
 
 	if hashFunction == nil {
-		s.hashFunction = standardHashFunction
+		s.hashFunction = hasherHash
 	} else {
 		s.hashFunction = hashFunction
 	}
 
 	if equalsFunction == nil {
-		s.equalsFunction = standardEqualsFunction
+		s.equalsFunction = comparableHash
 	} else {
 		s.equalsFunction = equalsFunction
 	}
@@ -75,7 +74,7 @@ func NewSet(hashFunction func(interface{}) string, equalsFunction func(interface
 	return s
 }
 
-func standardEqualsFunction(a interface{}, b interface{}) bool {
+func comparableHash(a interface{}, b interface{}) bool {
 
 	ac, oka := a.(Comparable)
 	bc, okb := b.(Comparable)
@@ -87,7 +86,7 @@ func standardEqualsFunction(a interface{}, b interface{}) bool {
 	return ac.equals(bc)
 }
 
-func standardHashFunction(a interface{}) string {
+func hasherHash(a interface{}) int {
 	h, ok := a.(Hasher)
 
 	if ok {
@@ -97,35 +96,23 @@ func standardHashFunction(a interface{}) string {
 	panic("Not Hasher")
 }
 
-//func getBytes(key interface{}) ([]byte, error) {
-//	var buf bytes.Buffer
-//	enc := gob.NewEncoder(&buf)
-//	err := enc.Encode(key)
-//	if err != nil {
-//		return nil, err
-//	}
-//	return buf.Bytes(), nil
-//}
-
 type Hasher interface {
-	Hash() string
+	Hash() int
 }
 
-func hashCode(s string) string {
+func hashCode(s string) int {
 	h := fnv.New32a()
 	h.Write([]byte((s)))
-	return fmt.Sprint(h.Sum32())
+	return int(h.Sum32())
 }
 
-func (s *Set) length() int {
+func (s *set) length() int {
 	return len(s.data)
 }
 
-func (s *Set) add(value interface{}) interface{} {
+func (s *set) add(value interface{}) interface{} {
 
-	hash := s.hashFunction(value)
-	key := "hash_" + hashCode(hash)
-
+	key := s.hashFunction(value)
 	values := s.data[key]
 
 	if s.data[key] != nil {
@@ -144,10 +131,8 @@ func (s *Set) add(value interface{}) interface{} {
 	return value
 }
 
-func (s *Set) contains(value interface{}) bool {
-
-	hash := s.hashFunction(value)
-	key := "hash_" + hashCode(hash)
+func (s *set) contains(value interface{}) bool {
+	key := s.hashFunction(value)
 
 	values := s.data[key]
 
@@ -161,19 +146,16 @@ func (s *Set) contains(value interface{}) bool {
 	return false
 }
 
-func (s *Set) values() []interface{} {
-	l := make([]interface{}, 0)
+func (s *set) values() []interface{} {
+	l := make([]interface{}, 10)
 
 	for key := range s.data {
-		if strings.Index(key, "hash_") == 0 {
-			l = append(l, s.data[key]...)
-		}
+		l = append(l, s.data[key]...)
 	}
 	return l
 }
 
-func (s *Set) String() string {
-
+func (s *set) String() string {
 	r := ""
 
 	for _, av := range s.data {
@@ -185,39 +167,39 @@ func (s *Set) String() string {
 	return r
 }
 
-type BitSet struct {
+type bitSet struct {
 	data map[int]bool
 }
 
-func NewBitSet() *BitSet {
-	b := new(BitSet)
+func newBitSet() *bitSet {
+	b := new(bitSet)
 	b.data = make(map[int]bool)
 	return b
 }
 
-func (b *BitSet) add(value int) {
+func (b *bitSet) add(value int) {
 	b.data[value] = true
 }
 
-func (b *BitSet) clear(index int) {
+func (b *bitSet) clear(index int) {
 	delete(b.data, index)
 }
 
-func (b *BitSet) or(set *BitSet) {
+func (b *bitSet) or(set *bitSet) {
 	for k := range set.data {
 		b.add(k)
 	}
 }
 
-func (b *BitSet) remove(value int) {
+func (b *bitSet) remove(value int) {
 	delete(b.data, value)
 }
 
-func (b *BitSet) contains(value int) bool {
+func (b *bitSet) contains(value int) bool {
 	return b.data[value] == true
 }
 
-func (b *BitSet) values() []int {
+func (b *bitSet) values() []int {
 	ks := make([]int, len(b.data))
 	i := 0
 	for k := range b.data {
@@ -228,7 +210,7 @@ func (b *BitSet) values() []int {
 	return ks
 }
 
-func (b *BitSet) minValue() int {
+func (b *bitSet) minValue() int {
 	min := 2147483647
 
 	for k := range b.data {
@@ -240,8 +222,8 @@ func (b *BitSet) minValue() int {
 	return min
 }
 
-func (b *BitSet) equals(other interface{}) bool {
-	otherBitSet, ok := other.(*BitSet)
+func (b *bitSet) equals(other interface{}) bool {
+	otherBitSet, ok := other.(*bitSet)
 	if !ok {
 		return false
 	}
@@ -259,11 +241,11 @@ func (b *BitSet) equals(other interface{}) bool {
 	return true
 }
 
-func (b *BitSet) length() int {
+func (b *bitSet) length() int {
 	return len(b.data)
 }
 
-func (b *BitSet) String() string {
+func (b *bitSet) String() string {
 	vals := b.values()
 	valsS := make([]string, len(vals))
 
@@ -273,27 +255,27 @@ func (b *BitSet) String() string {
 	return "{" + strings.Join(valsS, ", ") + "}"
 }
 
-type AltDict struct {
+type altDict struct {
 	data map[string]interface{}
 }
 
-func NewAltDict() *AltDict {
-	d := new(AltDict)
+func newAltDict() *altDict {
+	d := new(altDict)
 	d.data = make(map[string]interface{})
 	return d
 }
 
-func (a *AltDict) Get(key string) interface{} {
+func (a *altDict) Get(key string) interface{} {
 	key = "k-" + key
 	return a.data[key]
 }
 
-func (a *AltDict) put(key string, value interface{}) {
+func (a *altDict) put(key string, value interface{}) {
 	key = "k-" + key
 	a.data[key] = value
 }
 
-func (a *AltDict) values() []interface{} {
+func (a *altDict) values() []interface{} {
 	vs := make([]interface{}, len(a.data))
 	i := 0
 	for _, v := range a.data {
@@ -303,17 +285,17 @@ func (a *AltDict) values() []interface{} {
 	return vs
 }
 
-type DoubleDict struct {
-	data map[string]map[string]interface{}
+type doubleDict struct {
+	data map[int]map[int]interface{}
 }
 
-func NewDoubleDict() *DoubleDict {
-	dd := new(DoubleDict)
-	dd.data = make(map[string]map[string]interface{})
+func newDoubleDict() *doubleDict {
+	dd := new(doubleDict)
+	dd.data = make(map[int]map[int]interface{})
 	return dd
 }
 
-func (d *DoubleDict) Get(a string, b string) interface{} {
+func (d *doubleDict) get(a, b int) interface{} {
 	data := d.data[a]
 
 	if data == nil {
@@ -323,11 +305,11 @@ func (d *DoubleDict) Get(a string, b string) interface{} {
 	return data[b]
 }
 
-func (d *DoubleDict) set(a, b string, o interface{}) {
+func (d *doubleDict) set(a, b int, o interface{}) {
 	data := d.data[a]
 
 	if data == nil {
-		data = make(map[string]interface{})
+		data = make(map[int]interface{})
 		d.data[a] = data
 	}
 
@@ -372,16 +354,35 @@ func PrintArrayJavaStyle(sa []string) string {
 	return buffer.String()
 }
 
-func TitleCase(str string) string {
+// murmur hash
+const (
+	c1_32 = 0xCC9E2D51
+	c2_32 = 0x1B873593
+	n1_32 = 0xE6546B64
+)
 
-	//	func (re *Regexp) ReplaceAllStringFunc(src string, repl func(string) string) string
-	//	return str.replace(//g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1)})
+func murmurInit(seed int) int {
+	return seed
+}
 
-	panic("Not implemented")
+func murmurUpdate(h1 int, k1 int) int {
+	k1 *= c1_32
+	k1 = (k1 << 15) | (k1 >> 17) // rotl32(k1, 15)
+	k1 *= c2_32
 
-	//	re := regexp.MustCompile("\w\S*")
-	//	return re.ReplaceAllStringFunc(str, func(s string) {
-	//		return strings.ToUpper(s[0:1]) + s[1:2]
-	//	})
+	h1 ^= k1
+	h1 = (h1 << 13) | (h1 >> 19) // rotl32(h1, 13)
+	h1 = h1*5 + 0xe6546b64
+	return h1
+}
 
+func murmurFinish(h1 int, numberOfWords int) int {
+	h1 ^= (numberOfWords * 4)
+	h1 ^= h1 >> 16
+	h1 *= 0x85ebca6b
+	h1 ^= h1 >> 13
+	h1 *= 0xc2b2ae35
+	h1 ^= h1 >> 16
+
+	return h1
 }

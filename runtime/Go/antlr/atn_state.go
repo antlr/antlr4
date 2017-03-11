@@ -28,6 +28,8 @@ const (
 var ATNStateInitialNumTransitions = 4
 
 type ATNState interface {
+	Hasher
+
 	GetEpsilonOnlyTransitions() bool
 
 	GetRuleIndex() int
@@ -151,6 +153,10 @@ func (as *BaseATNState) AddTransition(trans Transition, index int) {
 		as.transitions = append(as.transitions[:index], append([]Transition{trans}, as.transitions[index:]...)...)
 		// TODO: as.transitions.splice(index, 1, trans)
 	}
+}
+
+func (as *BaseATNState) Hash() int {
+	return as.stateNumber
 }
 
 type BasicState struct {
