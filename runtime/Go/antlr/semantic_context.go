@@ -18,14 +18,16 @@ import (
 //
 
 type SemanticContext interface {
+	Hasher
 	Comparable
 
 	evaluate(parser Recognizer, outerContext RuleContext) bool
 	evalPrecedence(parser Recognizer, outerContext RuleContext) SemanticContext
+
 	String() string
 }
 
-func SemanticContextandContext(a, b SemanticContext) SemanticContext {
+func SemanticContextAnd(a, b SemanticContext) SemanticContext {
 	if a == nil || a == SemanticContextNone {
 		return b
 	}
@@ -40,7 +42,7 @@ func SemanticContextandContext(a, b SemanticContext) SemanticContext {
 	return result
 }
 
-func SemanticContextorContext(a, b SemanticContext) SemanticContext {
+func SemanticContextOr(a, b SemanticContext) SemanticContext {
 	if a == nil {
 		return b
 	}
@@ -93,8 +95,17 @@ func (p *Predicate) evaluate(parser Recognizer, outerContext RuleContext) bool {
 	return parser.Sempred(localctx, p.ruleIndex, p.predIndex)
 }
 
-func (p *Predicate) Hash() string {
-	return strconv.Itoa(p.ruleIndex) + "/" + strconv.Itoa(p.predIndex) + "/" + fmt.Sprint(p.isCtxDependent)
+func (p *Predicate) Hash() int {
+	var c int
+	if p.isCtxDependent {
+		c = 1
+	}
+
+	h := initMurmurHash(0)
+	h = updateMurmurHash(h, p.ruleIndex)
+	h = updateMurmurHash(h, p.predIndex)
+	h = updateMurmurHash(h, c)
+	return finishMurmurHash(h, 3)
 }
 
 func (p *Predicate) equals(other interface{}) bool {
@@ -141,8 +152,8 @@ func (p *PrecedencePredicate) compareTo(other *PrecedencePredicate) int {
 	return p.precedence - other.precedence
 }
 
-func (p *PrecedencePredicate) Hash() string {
-	return "31"
+func (p *PrecedencePredicate) Hash() int {
+	return 31 + p.precedence;
 }
 
 func (p *PrecedencePredicate) equals(other interface{}) bool {
@@ -179,7 +190,6 @@ type AND struct {
 }
 
 func NewAND(a, b SemanticContext) *AND {
-
 	operands := NewSet(nil, nil)
 	if aa, ok := a.(*AND); ok {
 		for _, o := range aa.opnds {
@@ -237,8 +247,12 @@ func (a *AND) equals(other interface{}) bool {
 	}
 }
 
-func (a *AND) Hash() string {
-	return fmt.Sprint(a.opnds) + "/AND"
+func (a *AND) Hash() int {
+	h := initMurmurHash(0) // Init with a value different from OR
+	for _, op := range a.opnds {
+		h = updateMurmurHash(h, op.Hash())
+	}
+	return finishMurmurHash(h, len(a.opnds))
 }
 
 //
@@ -288,7 +302,7 @@ func (a *AND) evalPrecedence(parser Recognizer, outerContext RuleContext) Semant
 		if result == nil {
 			result = o
 		} else {
-			result = SemanticContextandContext(result, o)
+			result = SemanticContextAnd(result, o)
 		}
 	}
 
@@ -378,8 +392,12 @@ func (o *OR) equals(other interface{}) bool {
 	}
 }
 
-func (o *OR) Hash() string {
-	return fmt.Sprint(o.opnds) + "/OR"
+func (o *OR) Hash() int {
+	h := initMurmurHash(1) // Init with a value different from AND
+	for _, op := range o.opnds {
+		h = updateMurmurHash(h, op.Hash())
+	}
+	return finishMurmurHash(h, len(o.opnds))
 }
 
 // <p>
@@ -423,7 +441,7 @@ func (o *OR) evalPrecedence(parser Recognizer, outerContext RuleContext) Semanti
 		if result == nil {
 			result = o
 		} else {
-			result = SemanticContextorContext(result, o)
+			result = SemanticContextOr(result, o)
 		}
 	}
 

@@ -40,7 +40,7 @@ type BaseRecognizer struct {
 
 func NewBaseRecognizer() *BaseRecognizer {
 	rec := new(BaseRecognizer)
-	rec.listeners = []ErrorListener{ConsoleErrorListenerINSTANCE}
+	rec.listeners = []ErrorListener{ConsoleErrorListenerInstance}
 	rec.state = -1
 	return rec
 }
@@ -110,7 +110,6 @@ func (b *BaseRecognizer) SetState(v int) {
 // <p>Used for XPath and tree pattern compilation.</p>
 //
 func (b *BaseRecognizer) GetRuleIndexMap() map[string]int {
-
 	panic("Method not defined!")
 	//    var ruleNames = b.GetRuleNames()
 	//    if (ruleNames==nil) {

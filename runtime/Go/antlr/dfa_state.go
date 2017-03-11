@@ -133,19 +133,11 @@ func (d *DFAState) equals(other interface{}) bool {
 }
 
 func (d *DFAState) String() string {
-	return strconv.Itoa(d.stateNumber) + ":" + d.Hash()
+	return fmt.Sprintf("%d:%d", d.stateNumber, d.Hash())
 }
 
-func (d *DFAState) Hash() string {
-	var s string
-
-	if d.isAcceptState {
-		if d.predicates != nil {
-			s = "=>" + fmt.Sprint(d.predicates)
-		} else {
-			s = "=>" + fmt.Sprint(d.prediction)
-		}
-	}
-
-	return fmt.Sprint(d.configs) + s
+func (d *DFAState) Hash() int {
+	h := initMurmurHash(7);
+	h = updateMurmurHash(h, d.configs.Hash());
+	return finishMurmurHash(h, 1);
 }

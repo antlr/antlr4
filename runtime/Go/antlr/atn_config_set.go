@@ -49,7 +49,7 @@ type ATNConfigSet interface {
 // about its elements and can combine similar configurations using a
 // graph-structured stack.
 type BaseATNConfigSet struct {
-	cachedHashString string
+	cachedHash   int
 
 	// configLookup is used to determine whether two BaseATNConfigSets are equal. We
 	// need all configurations with the same (s, i, _, semctx) to be equal. A key
@@ -59,7 +59,7 @@ type BaseATNConfigSet struct {
 	configLookup *Set
 
 	// configs is the added elements.
-	configs []ATNConfig
+	configs      []ATNConfig
 
 	// TODO: These fields make me pretty uncomfortable, but it is nice to pack up
 	// info together because it saves recomputation. Can we track conflicts as they
@@ -84,17 +84,17 @@ type BaseATNConfigSet struct {
 	// allow any code to manipulate the set if true because DFA states will point at
 	// sets and those must not change. It not protect other fields; conflictingAlts
 	// in particular, which is assigned after readOnly.
-	readOnly bool
+	readOnly     bool
 
 	// TODO: These fields make me pretty uncomfortable, but it is nice to pack up
 	// info together because it saves recomputation. Can we track conflicts as they
 	// are added to save scanning configs later?
-	uniqueAlt int
+	uniqueAlt    int
 }
 
 func NewBaseATNConfigSet(fullCtx bool) *BaseATNConfigSet {
 	return &BaseATNConfigSet{
-		cachedHashString: "-1",
+		cachedHash: -1,
 		configLookup:     NewSet(hashATNConfig, equalATNConfigs),
 		fullCtx:          fullCtx,
 	}
@@ -120,7 +120,7 @@ func (b *BaseATNConfigSet) Add(config ATNConfig, mergeCache *DoubleDict) bool {
 	existing := b.configLookup.add(config).(ATNConfig)
 
 	if existing == config {
-		b.cachedHashString = "-1"
+		b.cachedHash = -1
 		b.configs = append(b.configs, config) // Track order here
 
 		return true
@@ -224,26 +224,30 @@ func (b *BaseATNConfigSet) Equals(other interface{}) bool {
 		b.dipsIntoOuterContext == other2.dipsIntoOuterContext
 }
 
-func (b *BaseATNConfigSet) Hash() string {
+func (b *BaseATNConfigSet) Hash() int {
 	if b.readOnly {
-		if b.cachedHashString == "-1" {
-			b.cachedHashString = b.hashConfigs()
+		if b.cachedHash == -1 {
+			b.cachedHash = b.hashConfigs()
 		}
 
-		return b.cachedHashString
+		return b.cachedHash
 	}
 
 	return b.hashConfigs()
 }
 
-func (b *BaseATNConfigSet) hashConfigs() string {
-	s := ""
+func (b *BaseATNConfigSet) hashConfigs() int {
+	h := 1
 
 	for _, c := range b.configs {
-		s += fmt.Sprint(c)
+		h += 31 * h
+
+		if c != nil {
+			h += c.Hash()
+		}
 	}
 
-	return s
+	return h
 }
 
 func (b *BaseATNConfigSet) Length() int {
@@ -276,7 +280,7 @@ func (b *BaseATNConfigSet) Clear() {
 	}
 
 	b.configs = make([]ATNConfig, 0)
-	b.cachedHashString = "-1"
+	b.cachedHash = -1
 	b.configLookup = NewSet(hashATNConfig, equalATNConfigs)
 }
 

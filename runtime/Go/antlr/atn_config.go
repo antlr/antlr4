@@ -7,6 +7,7 @@ package antlr
 import (
 	"fmt"
 	"strconv"
+	"golang.autodesk.com/ts/go/test/fixedbugs/issue4932.dir"
 )
 
 type Comparable interface {
@@ -37,7 +38,7 @@ type ATNConfig interface {
 	getPrecedenceFilterSuppressed() bool
 	setPrecedenceFilterSuppressed(bool)
 
-	shortHash() string
+	shortHash() int
 }
 
 type BaseATNConfig struct {
@@ -121,6 +122,7 @@ func (b *BaseATNConfig) GetAlt() int {
 func (b *BaseATNConfig) SetContext(v PredictionContext) {
 	b.context = v
 }
+
 func (b *BaseATNConfig) GetContext() PredictionContext {
 	return b.context
 }
@@ -168,20 +170,29 @@ func (b *BaseATNConfig) equals(o interface{}) bool {
 	return nums && alts && cons && sups && equal
 }
 
-func (b *BaseATNConfig) shortHash() string {
-	return strconv.Itoa(b.state.GetStateNumber()) + "/" + strconv.Itoa(b.alt) + "/" + b.semanticContext.String()
+// TODO(pboyer) not altogether clear why this is needed
+func (b *BaseATNConfig) shortHash() int {
+	h := initMurmurHash(7)
+	h = updateMurmurHash(h, b.state.GetStateNumber())
+	h = updateMurmurHash(h, b.alt)
+	h = updateMurmurHash(h, b.semanticContext.Hash())
+	return finishMurmurHash(h, 3)
 }
 
-func (b *BaseATNConfig) Hash() string {
-	var c string
-
+func (b *BaseATNConfig) Hash() int {
+	var c int
 	if b.context == nil {
-		c = ""
+		c = 0
 	} else {
 		c = b.context.Hash()
 	}
 
-	return strconv.Itoa(b.state.GetStateNumber()) + "/" + strconv.Itoa(b.alt) + "/" + c + "/" + b.semanticContext.String()
+	h := initMurmurHash(7)
+	h = updateMurmurHash(h, b.state.GetStateNumber())
+	h = updateMurmurHash(h, b.alt)
+	h = updateMurmurHash(h, c)
+	h = updateMurmurHash(h, b.semanticContext.Hash())
+	return finishMurmurHash(h, 4)
 }
 
 func (b *BaseATNConfig) String() string {
@@ -247,16 +258,22 @@ func NewLexerATNConfig1(state ATNState, alt int, context PredictionContext) *Lex
 	return &LexerATNConfig{BaseATNConfig: NewBaseATNConfig5(state, alt, context, SemanticContextNone)}
 }
 
-func (l *LexerATNConfig) Hash() string {
-	var f string
-
+func (l *LexerATNConfig) Hash() int {
+	var f int
 	if l.passedThroughNonGreedyDecision {
-		f = "1"
+		f = 1
 	} else {
-		f = "0"
+		f = 0
 	}
 
-	return fmt.Sprintf("%v%v%v%v%v%v", l.state.GetStateNumber(), l.alt, l.context, l.semanticContext, f, l.lexerActionExecutor)
+	h := initMurmurHash(7)
+	h = updateMurmurHash(h, l.state.Hash())
+	h = updateMurmurHash(h, l.alt)
+	h = updateMurmurHash(h, l.context.Hash())
+	h = updateMurmurHash(h, l.semanticContext.Hash())
+	h = updateMurmurHash(h, f)
+	h = updateMurmurHash(h, l.lexerActionExecutor.Hash())
+	return finishMurmurHash(h, 6)
 }
 
 func (l *LexerATNConfig) equals(other interface{}) bool {

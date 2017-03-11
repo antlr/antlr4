@@ -49,19 +49,18 @@ func (s *IntStack) Push(e int) {
 }
 
 type Set struct {
-	data           map[string][]interface{}
-	hashFunction   func(interface{}) string
+	data           map[int][]interface{}
+	hashFunction   func(interface{}) int
 	equalsFunction func(interface{}, interface{}) bool
 }
 
 func NewSet(hashFunction func(interface{}) string, equalsFunction func(interface{}, interface{}) bool) *Set {
-
 	s := new(Set)
 
 	s.data = make(map[string][]interface{})
 
 	if hashFunction == nil {
-		s.hashFunction = standardHashFunction
+		s.hashFunction = hasherHash
 	} else {
 		s.hashFunction = hashFunction
 	}
@@ -87,7 +86,7 @@ func standardEqualsFunction(a interface{}, b interface{}) bool {
 	return ac.equals(bc)
 }
 
-func standardHashFunction(a interface{}) string {
+func hasherHash(a interface{}) string {
 	h, ok := a.(Hasher)
 
 	if ok {
@@ -97,24 +96,14 @@ func standardHashFunction(a interface{}) string {
 	panic("Not Hasher")
 }
 
-//func getBytes(key interface{}) ([]byte, error) {
-//	var buf bytes.Buffer
-//	enc := gob.NewEncoder(&buf)
-//	err := enc.Encode(key)
-//	if err != nil {
-//		return nil, err
-//	}
-//	return buf.Bytes(), nil
-//}
-
 type Hasher interface {
-	Hash() string
+	Hash() int
 }
 
-func hashCode(s string) string {
+func hashCode(s string) int {
 	h := fnv.New32a()
 	h.Write([]byte((s)))
-	return fmt.Sprint(h.Sum32())
+	return int(h.Sum32())
 }
 
 func (s *Set) length() int {
@@ -124,7 +113,7 @@ func (s *Set) length() int {
 func (s *Set) add(value interface{}) interface{} {
 
 	hash := s.hashFunction(value)
-	key := "hash_" + hashCode(hash)
+	key := hashCode(hash)
 
 	values := s.data[key]
 
@@ -147,7 +136,7 @@ func (s *Set) add(value interface{}) interface{} {
 func (s *Set) contains(value interface{}) bool {
 
 	hash := s.hashFunction(value)
-	key := "hash_" + hashCode(hash)
+	key := hashCode(hash)
 
 	values := s.data[key]
 
@@ -173,7 +162,6 @@ func (s *Set) values() []interface{} {
 }
 
 func (s *Set) String() string {
-
 	r := ""
 
 	for _, av := range s.data {
@@ -309,11 +297,11 @@ type DoubleDict struct {
 
 func NewDoubleDict() *DoubleDict {
 	dd := new(DoubleDict)
-	dd.data = make(map[string]map[string]interface{})
+	dd.data = make(map[int]map[int]interface{})
 	return dd
 }
 
-func (d *DoubleDict) Get(a string, b string) interface{} {
+func (d *DoubleDict) Get(a, b int) interface{} {
 	data := d.data[a]
 
 	if data == nil {
@@ -323,7 +311,7 @@ func (d *DoubleDict) Get(a string, b string) interface{} {
 	return data[b]
 }
 
-func (d *DoubleDict) set(a, b string, o interface{}) {
+func (d *DoubleDict) set(a, b int, o interface{}) {
 	data := d.data[a]
 
 	if data == nil {
@@ -372,16 +360,36 @@ func PrintArrayJavaStyle(sa []string) string {
 	return buffer.String()
 }
 
-func TitleCase(str string) string {
 
-	//	func (re *Regexp) ReplaceAllStringFunc(src string, repl func(string) string) string
-	//	return str.replace(//g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1)})
+// murmur hash
+const (
+	c1_32 = 0xCC9E2D51
+	c2_32 = 0x1B873593
+	n1_32 = 0xE6546B64
+)
 
-	panic("Not implemented")
+func initMurmurHash(seed int) int {
+	return seed
+}
 
-	//	re := regexp.MustCompile("\w\S*")
-	//	return re.ReplaceAllStringFunc(str, func(s string) {
-	//		return strings.ToUpper(s[0:1]) + s[1:2]
-	//	})
+func updateMurmurHash(h1 int, k1 int) int {
+	k1 *= c1_32
+	k1 = (k1 << 15) | (k1 >> 17) // rotl32(k1, 15)
+	k1 *= c2_32
 
+	h1 ^= k1
+	h1 = (h1 << 13) | (h1 >> 19) // rotl32(h1, 13)
+	h1 = h1*5 + 0xe6546b64
+	return h1
+}
+
+func finishMurmurHash(h1 int, numberOfWords int) int {
+	h1 ^= (numberOfWords * 4)
+	h1 ^= h1 >> 16
+	h1 *= 0x85ebca6b
+	h1 ^= h1 >> 13
+	h1 *= 0xc2b2ae35
+	h1 ^= h1 >> 16
+
+	return h1
 }

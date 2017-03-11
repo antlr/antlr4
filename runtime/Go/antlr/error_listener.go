@@ -51,7 +51,7 @@ func NewConsoleErrorListener() *ConsoleErrorListener {
 //
 // Provides a default instance of {@link ConsoleErrorListener}.
 //
-var ConsoleErrorListenerINSTANCE = NewConsoleErrorListener()
+var ConsoleErrorListenerInstance = NewConsoleErrorListener()
 
 //
 // {@inheritDoc}
