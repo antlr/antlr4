@@ -365,6 +365,7 @@ func PrintArrayJavaStyle(sa []string) string {
 	return buffer.String()
 }
 
+
 // murmur hash
 const (
 	c1_32 = 0xCC9E2D51
