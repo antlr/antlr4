@@ -49,7 +49,7 @@ func (s *IntStack) Push(e int) {
 }
 
 type Set struct {
-	setData map[int][]interface{}
+	data             map[int][]interface{}
 	hashcodeFunction func(interface{}) int
 	equalsFunction   func(interface{}, interface{}) bool
 }
@@ -60,7 +60,7 @@ func NewSet(
 
 	s := new(Set)
 
-	s.setData = make(map[int][]interface{})
+	s.data = make(map[int][]interface{})
 
 	if hashcodeFunction != nil {
 		s.hashcodeFunction = hashcodeFunction
@@ -113,29 +113,29 @@ type HashCoder interface {
 }
 
 func (s *Set) length() int {
-	return len(s.setData)
+	return len(s.data)
 }
 
 func (s *Set) add(value interface{}) interface{} {
 
 	key := s.hashcodeFunction(value)
 
-	values := s.setData[key]
+	values := s.data[key]
 
-	if s.setData[key] != nil {
+	if s.data[key] != nil {
 		for i := 0; i < len(values); i++ {
 			if s.equalsFunction(value, values[i]) {
 				return values[i]
 			}
 		}
 
-		s.setData[key] = append(s.setData[key], value)
+		s.data[key] = append(s.data[key], value)
 		return value
 	}
 
 	v := make([]interface{}, 1, 10)
 	v[0] = value
-	s.setData[key] = v
+	s.data[key] = v
 
 	return value
 }
@@ -144,9 +144,9 @@ func (s *Set) contains(value interface{}) bool {
 
 	key := s.hashcodeFunction(value)
 
-	values := s.setData[key]
+	values := s.data[key]
 
-	if s.setData[key] != nil {
+	if s.data[key] != nil {
 		for i := 0; i < len(values); i++ {
 			if s.equalsFunction(value, values[i]) {
 				return true
@@ -159,7 +159,7 @@ func (s *Set) contains(value interface{}) bool {
 func (s *Set) values() []interface{} {
 	var l []interface{}
 
-	for _, v := range s.setData {
+	for _, v := range s.data {
 		l = append(l, v...)
 	}
 
@@ -169,7 +169,7 @@ func (s *Set) values() []interface{} {
 func (s *Set) String() string {
 	r := ""
 
-	for _, av := range s.setData {
+	for _, av := range s.data {
 		for _, v := range av {
 			r += fmt.Sprint(v)
 		}
