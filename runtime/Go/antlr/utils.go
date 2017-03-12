@@ -50,7 +50,6 @@ func (s *IntStack) Push(e int) {
 
 type Set struct {
 	setData map[int][]interface{}
-	// stringhashFunction func(interface{}) string
 	hashcodeFunction func(interface{}) int
 	equalsFunction   func(interface{}, interface{}) bool
 }
@@ -64,18 +63,11 @@ func NewSet(
 
 	s.setData = make(map[int][]interface{})
 
-	// could be nil
 	if hashcodeFunction != nil {
 		s.hashcodeFunction = hashcodeFunction
 	} else {
 		s.hashcodeFunction = standardHashFunction
 	}
-
-	// if hashFunction == nil {
-	// 	s.hashFunction = standardHashFunction
-	// } else {
-	// 	s.stringhashFunction = hashFunction
-	// }
 
 	if equalsFunction == nil {
 		s.equalsFunction = standardEqualsFunction
@@ -113,16 +105,6 @@ func standardHashFunction(a interface{}) int {
 	panic("Not Hasher")
 }
 
-//func getBytes(key interface{}) ([]byte, error) {
-//	var buf bytes.Buffer
-//	enc := gob.NewEncoder(&buf)
-//	err := enc.Encode(key)
-//	if err != nil {
-//		return nil, err
-//	}
-//	return buf.Bytes(), nil
-//}
-
 type Hasher interface {
 	Hash() string
 }
@@ -141,7 +123,6 @@ func (s *Set) add(value interface{}) interface{} {
 	values := s.setData[key]
 
 	if s.setData[key] != nil {
-
 		for i := 0; i < len(values); i++ {
 			if s.equalsFunction(value, values[i]) {
 				return values[i]
@@ -156,7 +137,6 @@ func (s *Set) add(value interface{}) interface{} {
 	v[0] = value
 	s.setData[key] = v
 
-	// s.setData[key] = []interface{}{value}
 	return value
 }
 
@@ -177,18 +157,16 @@ func (s *Set) contains(value interface{}) bool {
 }
 
 func (s *Set) values() []interface{} {
-	l := make([]interface{}, 0)
+	var l []interface{}
 
-	for key := range s.setData {
-		// if strings.Index(key, "hash_") == 0 {
-		l = append(l, s.setData[key]...)
-		// }
+	for _, v := range s.setData {
+		l = append(l, v...)
 	}
+
 	return l
 }
 
 func (s *Set) String() string {
-
 	r := ""
 
 	for _, av := range s.setData {
@@ -385,20 +363,6 @@ func PrintArrayJavaStyle(sa []string) string {
 	buffer.WriteString("]")
 
 	return buffer.String()
-}
-
-func TitleCase(str string) string {
-
-	//	func (re *Regexp) ReplaceAllStringFunc(src string, repl func(string) string) string
-	//	return str.replace(//g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1)})
-
-	panic("Not implemented")
-
-	//	re := regexp.MustCompile("\w\S*")
-	//	return re.ReplaceAllStringFunc(str, func(s string) {
-	//		return strings.ToUpper(s[0:1]) + s[1:2]
-	//	})
-
 }
 
 // murmur hash
