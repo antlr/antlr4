@@ -22,6 +22,8 @@ type ATNConfig interface {
 	Hasher
 	Comparable
 
+	HashCode() int
+
 	GetState() ATNState
 	GetAlt() int
 	GetSemanticContext() SemanticContext
@@ -182,6 +184,20 @@ func (b *BaseATNConfig) Hash() string {
 	}
 
 	return strconv.Itoa(b.state.GetStateNumber()) + "/" + strconv.Itoa(b.alt) + "/" + c + "/" + b.semanticContext.String()
+}
+
+func (b *BaseATNConfig) HashCode() int {
+	var c int
+	if b.context != nil {
+		c = b.context.HashCode()
+	}
+
+	h := initHash(7)
+	h = update(h, b.state.GetStateNumber())
+	h = update(h, b.alt)
+	h = update(h, c)
+	h = update(h, b.semanticContext.HashCode())
+	return finish(h, 4)
 }
 
 func (b *BaseATNConfig) String() string {

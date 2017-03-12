@@ -149,3 +149,24 @@ func (d *DFAState) Hash() string {
 
 	return fmt.Sprint(d.configs) + s
 }
+
+func (d *DFAState) HashCode() int {
+	h := initHash(11)
+
+	c := 1
+	if d.isAcceptState {
+		if d.predicates != nil {
+			for _, p := range d.predicates {
+				h = update(h, p.alt)
+				h = update(h, p.pred.HashCode())
+				c += 2
+			}
+		} else {
+			h = update(h, d.prediction)
+			c += 1
+		}
+	}
+
+	h = update(h, d.configs.HashCode())
+	return finish(h, c)
+}

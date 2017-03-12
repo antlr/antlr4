@@ -9,6 +9,7 @@ import "fmt"
 type ATNConfigSet interface {
 	Hasher
 
+	HashCode() int
 	Add(ATNConfig, *DoubleDict) bool
 	AddAll([]ATNConfig) bool
 
@@ -50,6 +51,7 @@ type ATNConfigSet interface {
 // graph-structured stack.
 type BaseATNConfigSet struct {
 	cachedHashString string
+	cachedHash int
 
 	// configLookup is used to determine whether two BaseATNConfigSets are equal. We
 	// need all configurations with the same (s, i, _, semctx) to be equal. A key
@@ -244,6 +246,32 @@ func (b *BaseATNConfigSet) hashConfigs() string {
 	}
 
 	return s
+}
+
+func (b *BaseATNConfigSet) HashCode() int {
+	if b.readOnly {
+		if b.cachedHash == -1 {
+			b.cachedHash = b.hashCodeConfigs()
+		}
+
+		return b.cachedHash
+	}
+
+	return b.hashCodeConfigs()
+}
+
+func (b *BaseATNConfigSet) hashCodeConfigs() int {
+	h := 1
+
+	for _, c := range b.configs {
+		h += 31 * h
+
+		if c != nil {
+			h += c.HashCode()
+		}
+	}
+
+	return h
 }
 
 func (b *BaseATNConfigSet) Length() int {
