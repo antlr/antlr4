@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	LexerATNSimulatorDebug    = false
+	LexerATNSimulatorDebug = false
 	LexerATNSimulatorDFADebug = false
 
 	LexerATNSimulatorMinDFAEdge = 0
@@ -311,7 +311,7 @@ func (l *LexerATNSimulator) accept(input CharStream, lexerActionExecutor *LexerA
 }
 
 func (l *LexerATNSimulator) getReachableTarget(trans Transition, t int) ATNState {
-	if trans.Matches(t, 0, LexerMaxCharValue) {
+	if trans.Matches(t, 0, 0xFFFE) {
 		return trans.getTarget()
 	}
 
@@ -461,7 +461,7 @@ func (l *LexerATNSimulator) getEpsilonTarget(input CharStream, config *LexerATNC
 		trans.getSerializationType() == TransitionRANGE ||
 		trans.getSerializationType() == TransitionSET {
 		if treatEOFAsEpsilon {
-			if trans.Matches(TokenEOF, 0, LexerMaxCharValue) {
+			if trans.Matches(TokenEOF, 0, 0xFFFF) {
 				cfg = NewLexerATNConfig4(config, trans.getTarget())
 			}
 		}

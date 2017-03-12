@@ -28,6 +28,7 @@ var (
 
 type PredictionContext interface {
 	Hash() string
+	HashCode() int
 	GetParent(int) PredictionContext
 	getReturnState(int) int
 	equals(PredictionContext) bool
@@ -204,6 +205,23 @@ func (b *BaseSingletonPredictionContext) Hash() string {
 	return b.cachedHashString
 }
 
+func (b *BaseSingletonPredictionContext) HashCode() int {
+	up := 0
+	if b.parentCtx != nil {
+		up = b.parentCtx.HashCode()
+	}
+
+	if up == 0 {
+		if b.returnState == BasePredictionContextEmptyReturnState {
+			up += 1 //TODO what should this be
+		}
+		up += b.returnState
+		return up
+	}
+	up += b.returnState
+	return up
+}
+
 func (b *BaseSingletonPredictionContext) String() string {
 	var up string
 
@@ -320,6 +338,26 @@ func (a *ArrayPredictionContext) equals(other PredictionContext) bool {
 		otherP := other.(*ArrayPredictionContext)
 		return &a.returnStates == &otherP.returnStates && &a.parents == &otherP.parents
 	}
+}
+
+func (a *ArrayPredictionContext) HashCode() int {
+	if a.isEmpty() {
+		return 19 //TODO what to return here, some prime is probably ol
+	}
+	v := 0
+	for i := 0; i < len(a.returnStates); i++ {
+		if a.returnStates[i] == BasePredictionContextEmptyReturnState {
+			v += (i * 23) //TODO what #
+			continue
+		}
+		v += a.returnStates[i]
+		if a.parents[i] != nil {
+			v += (27 * a.parents[i].HashCode())
+		} else {
+			v += 31
+		}
+	}
+	return v
 }
 
 func (a *ArrayPredictionContext) String() string {

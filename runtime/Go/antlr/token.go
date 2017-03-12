@@ -14,6 +14,10 @@ type TokenSourceCharStreamPair struct {
 	charStream  CharStream
 }
 
+func NewTokenSourceCharStreamPair(source TokenSource, stream CharStream) *TokenSourceCharStreamPair {
+	return &TokenSourceCharStreamPair{source, stream}
+}
+
 // A token has properties: text, type, line, character position in the line
 // (so we can ignore tabs), token channel, index, and source from which
 // we obtained this token.
