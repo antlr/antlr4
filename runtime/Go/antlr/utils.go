@@ -8,7 +8,6 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"hash/fnv"
 	"sort"
 	"strconv"
 	"strings"
@@ -90,15 +89,15 @@ func standardEqualsFunction(a interface{}, b interface{}) bool {
 }
 
 func standardHashFunction(a interface{}) int {
-	if h, ok := a.(HashCoder); ok {
-		return h.HashCode()
+	if h, ok := a.(Hasher); ok {
+		return h.Hash()
 	}
 
 	panic("Not Hasher")
 }
 
-type HashCoder interface {
-	HashCode() int
+type Hasher interface {
+	Hash() int
 }
 
 func (s *Set) length() int {
@@ -362,11 +361,11 @@ const (
 	n1_32 = 0xE6546B64
 )
 
-func initHash(seed int) int {
+func murmurInit(seed int) int {
 	return seed
 }
 
-func update(h1 int, k1 int) int {
+func murmurUpdate(h1 int, k1 int) int {
 	k1 *= c1_32
 	k1 = (k1 << 15) | (k1 >> 17) // rotl32(k1, 15)
 	k1 *= c2_32
@@ -377,7 +376,7 @@ func update(h1 int, k1 int) int {
 	return h1
 }
 
-func finish(h1 int, numberOfWords int) int {
+func murmurFinish(h1 int, numberOfWords int) int {
 	h1 ^= (numberOfWords * 4)
 	h1 ^= h1 >> 16
 	h1 *= 0x85ebca6b

@@ -28,9 +28,9 @@ func NewLexerActionExecutor(lexerActions []LexerAction) *LexerActionExecutor {
 
 	// Caches the result of {@link //hashCode} since the hash code is an element
 	// of the performance-critical {@link LexerATNConfig//hashCode} operation.
-	l.cachedHash = initHash(57)
+	l.cachedHash = murmurInit(57)
 	for _, a := range lexerActions {
-		l.cachedHash = update(l.cachedHash, a.HashCode())
+		l.cachedHash = murmurUpdate(l.cachedHash, a.Hash())
 	}
 
 	return l
@@ -151,7 +151,7 @@ func (l *LexerActionExecutor) execute(lexer Lexer, input CharStream, startIndex 
 	}
 }
 
-func (l *LexerActionExecutor) HashCode() int {
+func (l *LexerActionExecutor) Hash() int {
 	if l == nil {
 		return 61
 	}

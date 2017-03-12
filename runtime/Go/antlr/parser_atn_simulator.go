@@ -1420,7 +1420,7 @@ func (p *ParserATNSimulator) addDFAState(dfa *DFA, D *DFAState) *DFAState {
 	if D == ATNSimulatorError {
 		return D
 	}
-	hash := D.HashCode()
+	hash := D.Hash()
 	var existing, ok = dfa.GetStates()[hash]
 	if ok {
 		return existing
