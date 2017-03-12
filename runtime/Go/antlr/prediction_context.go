@@ -5,7 +5,6 @@
 package antlr
 
 import (
-	"fmt"
 	"strconv"
 )
 
@@ -215,37 +214,6 @@ func (b *BaseSingletonPredictionContext) HashCode() int {
 	h = update(h, b.parentCtx.HashCode())
 	h = update(h, b.returnState)
 	return finish(h, 2)
-
-	//
-	//protected static int calculateEmptyHashCode() {
-	//	int hash = MurmurHash.initialize(INITIAL_HASH);
-	//	hash = MurmurHash.finish(hash, 0);
-	//	return hash;
-	//}
-	//
-	//protected static int calculateHashCode(PredictionContext parent, int returnState) {
-	//int hash = MurmurHash.initialize(INITIAL_HASH);
-	//hash = MurmurHash.update(hash, parent);
-	//hash = MurmurHash.update(hash, returnState);
-	//hash = MurmurHash.finish(hash, 2);
-	//return hash;
-	//}
-	//
-	//
-	//up := 0
-	//if b.parentCtx != nil {
-	//	up = b.parentCtx.HashCode()
-	//}
-	//
-	//if up == 0 {
-	//	if b.returnState == BasePredictionContextEmptyReturnState {
-	//		up += 1 //TODO what should this be
-	//	}
-	//	up += b.returnState
-	//	return up
-	//}
-	//up += b.returnState
-	//return up
 }
 
 func (b *BaseSingletonPredictionContext) String() string {
