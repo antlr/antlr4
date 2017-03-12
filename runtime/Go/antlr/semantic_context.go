@@ -247,10 +247,6 @@ func (a *AND) equals(other interface{}) bool {
 	}
 }
 
-func (a *AND) Hash() string {
-	return fmt.Sprint(a.opnds) + "/AND"
-}
-
 //
 // {@inheritDoc}
 //
@@ -402,10 +398,6 @@ func (o *OR) equals(other interface{}) bool {
 		}
 		return true
 	}
-}
-
-func (o *OR) Hash() string {
-	return fmt.Sprint(o.opnds) + "/OR"
 }
 
 // <p>
