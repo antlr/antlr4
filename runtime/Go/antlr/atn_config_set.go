@@ -7,8 +7,6 @@ package antlr
 import "fmt"
 
 type ATNConfigSet interface {
-	Hasher
-
 	HashCode() int
 	Add(ATNConfig, *DoubleDict) bool
 	AddAll([]ATNConfig) bool
@@ -224,28 +222,6 @@ func (b *BaseATNConfigSet) Equals(other interface{}) bool {
 		b.conflictingAlts == other2.conflictingAlts &&
 		b.hasSemanticContext == other2.hasSemanticContext &&
 		b.dipsIntoOuterContext == other2.dipsIntoOuterContext
-}
-
-func (b *BaseATNConfigSet) Hash() string {
-	if b.readOnly {
-		if b.cachedHashString == "-1" {
-			b.cachedHashString = b.hashConfigs()
-		}
-
-		return b.cachedHashString
-	}
-
-	return b.hashConfigs()
-}
-
-func (b *BaseATNConfigSet) hashConfigs() string {
-	s := ""
-
-	for _, c := range b.configs {
-		s += fmt.Sprint(c)
-	}
-
-	return s
 }
 
 func (b *BaseATNConfigSet) HashCode() int {
