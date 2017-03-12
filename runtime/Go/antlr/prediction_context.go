@@ -341,23 +341,17 @@ func (a *ArrayPredictionContext) equals(other PredictionContext) bool {
 }
 
 func (a *ArrayPredictionContext) HashCode() int {
-	if a.isEmpty() {
-		return 19 //TODO what to return here, some prime is probably ol
+	h := initHash(1)
+
+	for _, p := range a.parents {
+		h = update(h, p.HashCode())
 	}
-	v := 0
-	for i := 0; i < len(a.returnStates); i++ {
-		if a.returnStates[i] == BasePredictionContextEmptyReturnState {
-			v += (i * 23) //TODO what #
-			continue
-		}
-		v += a.returnStates[i]
-		if a.parents[i] != nil {
-			v += (27 * a.parents[i].HashCode())
-		} else {
-			v += 31
-		}
+
+	for _, r := range a.returnStates {
+		h = update(h, r)
 	}
-	return v
+
+	return finish(h, 2 * len(a.parents))
 }
 
 func (a *ArrayPredictionContext) String() string {
