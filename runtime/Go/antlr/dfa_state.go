@@ -6,7 +6,6 @@ package antlr
 
 import (
 	"fmt"
-	"strconv"
 )
 
 // PredPrediction maps a predicate to a predicted alternative.
@@ -133,12 +132,7 @@ func (d *DFAState) equals(other interface{}) bool {
 }
 
 func (d *DFAState) String() string {
-	return strconv.Itoa(d.stateNumber) + ":" + d.Hash()
-}
-
-func (d *DFAState) Hash() string {
 	var s string
-
 	if d.isAcceptState {
 		if d.predicates != nil {
 			s = "=>" + fmt.Sprint(d.predicates)
@@ -147,7 +141,7 @@ func (d *DFAState) Hash() string {
 		}
 	}
 
-	return fmt.Sprint(d.configs) + s
+	return fmt.Sprintf("%d:%s%s", fmt.Sprint(d.configs), s)
 }
 
 func (d *DFAState) HashCode() int {
