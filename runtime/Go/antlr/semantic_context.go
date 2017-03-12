@@ -306,19 +306,19 @@ func (a *AND) evalPrecedence(parser Recognizer, outerContext RuleContext) Semant
 }
 
 func (a *AND) HashCode() int {
-	v := 37
-	for _, o := range a.opnds {
-		v += o.HashCode()
+	h := initHash(37) // Init with a value different from OR
+	for _, op := range a.opnds {
+		h = update(h, op.HashCode())
 	}
-	return v
+	return finish(h, len(a.opnds))
 }
 
 func (a *OR) HashCode() int {
-	v := 41
-	for _, o := range a.opnds {
-		v += o.HashCode()
+	h := initHash(41) // Init with a value different from AND
+	for _, op := range a.opnds {
+		h = update(h, op.HashCode())
 	}
-	return v
+	return finish(h, len(a.opnds))
 }
 
 func (a *AND) String() string {
