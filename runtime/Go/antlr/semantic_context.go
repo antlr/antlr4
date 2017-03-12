@@ -95,10 +95,6 @@ func (p *Predicate) evaluate(parser Recognizer, outerContext RuleContext) bool {
 	return parser.Sempred(localctx, p.ruleIndex, p.predIndex)
 }
 
-func (p *Predicate) Hash() string {
-	return strconv.Itoa(p.ruleIndex) + "/" + strconv.Itoa(p.predIndex) + "/" + fmt.Sprint(p.isCtxDependent)
-}
-
 func (p *Predicate) equals(other interface{}) bool {
 	if p == other {
 		return true
@@ -145,10 +141,6 @@ func (p *PrecedencePredicate) evalPrecedence(parser Recognizer, outerContext Rul
 
 func (p *PrecedencePredicate) compareTo(other *PrecedencePredicate) int {
 	return p.precedence - other.precedence
-}
-
-func (p *PrecedencePredicate) Hash() string {
-	return "31"
 }
 
 func (p *PrecedencePredicate) equals(other interface{}) bool {
