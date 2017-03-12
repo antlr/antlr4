@@ -19,7 +19,6 @@ type Comparable interface {
 // state. The semantic context is the tree of semantic predicates encountered
 // before reaching an ATN state.
 type ATNConfig interface {
-	Hasher
 	Comparable
 
 	HashCode() int
@@ -172,18 +171,6 @@ func (b *BaseATNConfig) equals(o interface{}) bool {
 
 func (b *BaseATNConfig) shortHash() string {
 	return strconv.Itoa(b.state.GetStateNumber()) + "/" + strconv.Itoa(b.alt) + "/" + b.semanticContext.String()
-}
-
-func (b *BaseATNConfig) Hash() string {
-	var c string
-
-	if b.context == nil {
-		c = ""
-	} else {
-		c = b.context.Hash()
-	}
-
-	return strconv.Itoa(b.state.GetStateNumber()) + "/" + strconv.Itoa(b.alt) + "/" + c + "/" + b.semanticContext.String()
 }
 
 func (b *BaseATNConfig) HashCode() int {
