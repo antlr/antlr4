@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-type Comparable interface {
+type comparable interface {
 	equals(other interface{}) bool
 }
 
@@ -18,7 +18,7 @@ type Comparable interface {
 // state. The semantic context is the tree of semantic predicates encountered
 // before reaching an ATN state.
 type ATNConfig interface {
-	Comparable
+	comparable
 
 	hash() int
 

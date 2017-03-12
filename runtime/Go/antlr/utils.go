@@ -78,8 +78,8 @@ func NewSet(
 
 func standardEqualsFunction(a interface{}, b interface{}) bool {
 
-	ac, oka := a.(Comparable)
-	bc, okb := b.(Comparable)
+	ac, oka := a.(comparable)
+	bc, okb := b.(comparable)
 
 	if !oka || !okb {
 		panic("Not Comparable")

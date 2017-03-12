@@ -18,7 +18,7 @@ import (
 //
 
 type SemanticContext interface {
-	Comparable
+	comparable
 
 	evaluate(parser Recognizer, outerContext RuleContext) bool
 	evalPrecedence(parser Recognizer, outerContext RuleContext) SemanticContext
