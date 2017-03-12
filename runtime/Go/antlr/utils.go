@@ -89,15 +89,15 @@ func standardEqualsFunction(a interface{}, b interface{}) bool {
 }
 
 func standardHashFunction(a interface{}) int {
-	if h, ok := a.(Hasher); ok {
-		return h.Hash()
+	if h, ok := a.(hasher); ok {
+		return h.hash()
 	}
 
 	panic("Not Hasher")
 }
 
-type Hasher interface {
-	Hash() int
+type hasher interface {
+	hash() int
 }
 
 func (s *Set) length() int {

@@ -30,7 +30,7 @@ func NewLexerActionExecutor(lexerActions []LexerAction) *LexerActionExecutor {
 	// of the performance-critical {@link LexerATNConfig//hashCode} operation.
 	l.cachedHash = murmurInit(57)
 	for _, a := range lexerActions {
-		l.cachedHash = murmurUpdate(l.cachedHash, a.Hash())
+		l.cachedHash = murmurUpdate(l.cachedHash, a.hash())
 	}
 
 	return l
@@ -151,7 +151,7 @@ func (l *LexerActionExecutor) execute(lexer Lexer, input CharStream, startIndex 
 	}
 }
 
-func (l *LexerActionExecutor) Hash() int {
+func (l *LexerActionExecutor) hash() int {
 	if l == nil {
 		return 61
 	}

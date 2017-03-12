@@ -21,7 +21,7 @@ type LexerAction interface {
 	getActionType() int
 	getIsPositionDependent() bool
 	execute(lexer Lexer)
-	Hash() int
+	hash() int
 	equals(other LexerAction) bool
 }
 
@@ -51,7 +51,7 @@ func (b *BaseLexerAction) getIsPositionDependent() bool {
 	return b.isPositionDependent
 }
 
-func (b *BaseLexerAction) Hash() int {
+func (b *BaseLexerAction) hash() int {
 	return b.actionType
 }
 
@@ -104,7 +104,7 @@ func (l *LexerTypeAction) execute(lexer Lexer) {
 	lexer.setType(l.thetype)
 }
 
-func (l *LexerTypeAction) Hash() int {
+func (l *LexerTypeAction) hash() int {
 	h := murmurInit(0)
 	h = murmurUpdate(h, l.actionType)
 	h = murmurUpdate(h, l.thetype)
@@ -148,7 +148,7 @@ func (l *LexerPushModeAction) execute(lexer Lexer) {
 	lexer.pushMode(l.mode)
 }
 
-func (l *LexerPushModeAction) Hash() int {
+func (l *LexerPushModeAction) hash() int {
 	h := murmurInit(0)
 	h = murmurUpdate(h, l.actionType)
 	h = murmurUpdate(h, l.mode)
@@ -245,7 +245,7 @@ func (l *LexerModeAction) execute(lexer Lexer) {
 	lexer.setMode(l.mode)
 }
 
-func (l *LexerModeAction) Hash() int {
+func (l *LexerModeAction) hash() int {
 	h := murmurInit(0)
 	h = murmurUpdate(h, l.actionType)
 	h = murmurUpdate(h, l.mode)
@@ -303,7 +303,7 @@ func (l *LexerCustomAction) execute(lexer Lexer) {
 	lexer.Action(nil, l.ruleIndex, l.actionIndex)
 }
 
-func (l *LexerCustomAction) Hash() int {
+func (l *LexerCustomAction) hash() int {
 	h := murmurInit(0)
 	h = murmurUpdate(h, l.actionType)
 	h = murmurUpdate(h, l.ruleIndex)
@@ -344,7 +344,7 @@ func (l *LexerChannelAction) execute(lexer Lexer) {
 	lexer.setChannel(l.channel)
 }
 
-func (l *LexerChannelAction) Hash() int {
+func (l *LexerChannelAction) hash() int {
 	h := murmurInit(0)
 	h = murmurUpdate(h, l.actionType)
 	h = murmurUpdate(h, l.channel)
@@ -412,11 +412,11 @@ func (l *LexerIndexedCustomAction) execute(lexer Lexer) {
 	l.lexerAction.execute(lexer)
 }
 
-func (l *LexerIndexedCustomAction) Hash() int {
+func (l *LexerIndexedCustomAction) hash() int {
 	h := murmurInit(0)
 	h = murmurUpdate(h, l.actionType)
 	h = murmurUpdate(h, l.offset)
-	h = murmurUpdate(h, l.lexerAction.Hash())
+	h = murmurUpdate(h, l.lexerAction.hash())
 	return murmurFinish(h, 3)
 }
 

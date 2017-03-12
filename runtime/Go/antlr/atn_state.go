@@ -49,7 +49,7 @@ type ATNState interface {
 	AddTransition(Transition, int)
 
 	String() string
-	Hash() int
+	hash() int
 }
 
 type BaseATNState struct {
@@ -123,7 +123,7 @@ func (as *BaseATNState) SetNextTokenWithinRule(v *IntervalSet) {
 	as.NextTokenWithinRule = v
 }
 
-func (as *BaseATNState) Hash() int {
+func (as *BaseATNState) hash() int {
 	return as.stateNumber
 }
 

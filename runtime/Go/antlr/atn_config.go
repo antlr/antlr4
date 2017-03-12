@@ -20,7 +20,7 @@ type Comparable interface {
 type ATNConfig interface {
 	Comparable
 
-	Hash() int
+	hash() int
 
 	GetState() ATNState
 	GetAlt() int
@@ -166,17 +166,17 @@ func (b *BaseATNConfig) equals(o interface{}) bool {
 	return nums && alts && cons && sups && equal
 }
 
-func (b *BaseATNConfig) Hash() int {
+func (b *BaseATNConfig) hash() int {
 	var c int
 	if b.context != nil {
-		c = b.context.Hash()
+		c = b.context.hash()
 	}
 
 	h := murmurInit(7)
 	h = murmurUpdate(h, b.state.GetStateNumber())
 	h = murmurUpdate(h, b.alt)
 	h = murmurUpdate(h, c)
-	h = murmurUpdate(h, b.semanticContext.Hash())
+	h = murmurUpdate(h, b.semanticContext.hash())
 	return murmurFinish(h, 4)
 }
 
@@ -243,7 +243,7 @@ func NewLexerATNConfig1(state ATNState, alt int, context PredictionContext) *Lex
 	return &LexerATNConfig{BaseATNConfig: NewBaseATNConfig5(state, alt, context, SemanticContextNone)}
 }
 
-func (l *LexerATNConfig) Hash() int {
+func (l *LexerATNConfig) hash() int {
 	var f int
 	if l.passedThroughNonGreedyDecision {
 		f = 1
@@ -251,12 +251,12 @@ func (l *LexerATNConfig) Hash() int {
 		f = 0
 	}
 	h := murmurInit(7)
-	h = murmurUpdate(h, l.state.Hash())
+	h = murmurUpdate(h, l.state.hash())
 	h = murmurUpdate(h, l.alt)
-	h = murmurUpdate(h, l.context.Hash())
-	h = murmurUpdate(h, l.semanticContext.Hash())
+	h = murmurUpdate(h, l.context.hash())
+	h = murmurUpdate(h, l.semanticContext.hash())
 	h = murmurUpdate(h, f)
-	h = murmurUpdate(h, l.lexerActionExecutor.Hash())
+	h = murmurUpdate(h, l.lexerActionExecutor.hash())
 	h = murmurFinish(h, 6)
 	return h
 }

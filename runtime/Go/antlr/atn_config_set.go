@@ -7,7 +7,7 @@ package antlr
 import "fmt"
 
 type ATNConfigSet interface {
-	Hash() int
+	hash() int
 	Add(ATNConfig, *DoubleDict) bool
 	AddAll([]ATNConfig) bool
 
@@ -223,7 +223,7 @@ func (b *BaseATNConfigSet) Equals(other interface{}) bool {
 		b.dipsIntoOuterContext == other2.dipsIntoOuterContext
 }
 
-func (b *BaseATNConfigSet) Hash() int {
+func (b *BaseATNConfigSet) hash() int {
 	if b.readOnly {
 		if b.cachedHash == -1 {
 			b.cachedHash = b.hashCodeConfigs()
@@ -239,7 +239,7 @@ func (b *BaseATNConfigSet) hashCodeConfigs() int {
 	h := murmurInit(1)
 	for _, c := range b.configs {
 		if c != nil {
-			h = murmurUpdate(h, c.Hash())
+			h = murmurUpdate(h, c.hash())
 		}
 	}
 	return murmurFinish(h, len(b.configs))

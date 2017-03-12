@@ -23,7 +23,7 @@ type SemanticContext interface {
 	evaluate(parser Recognizer, outerContext RuleContext) bool
 	evalPrecedence(parser Recognizer, outerContext RuleContext) SemanticContext
 
-	Hash() int
+	hash() int
 	String() string
 }
 
@@ -107,7 +107,7 @@ func (p *Predicate) equals(other interface{}) bool {
 	}
 }
 
-func (p *Predicate) Hash() int {
+func (p *Predicate) hash() int {
 	return p.ruleIndex*43 + p.predIndex*47
 }
 
@@ -153,7 +153,7 @@ func (p *PrecedencePredicate) equals(other interface{}) bool {
 	}
 }
 
-func (p *PrecedencePredicate) Hash() int {
+func (p *PrecedencePredicate) hash() int {
 	return p.precedence * 51
 }
 
@@ -293,18 +293,18 @@ func (a *AND) evalPrecedence(parser Recognizer, outerContext RuleContext) Semant
 	return result
 }
 
-func (a *AND) Hash() int {
+func (a *AND) hash() int {
 	h := murmurInit(37) // Init with a value different from OR
 	for _, op := range a.opnds {
-		h = murmurUpdate(h, op.Hash())
+		h = murmurUpdate(h, op.hash())
 	}
 	return murmurFinish(h, len(a.opnds))
 }
 
-func (a *OR) Hash() int {
+func (a *OR) hash() int {
 	h := murmurInit(41) // Init with a value different from AND
 	for _, op := range a.opnds {
-		h = murmurUpdate(h, op.Hash())
+		h = murmurUpdate(h, op.hash())
 	}
 	return murmurFinish(h, len(a.opnds))
 }

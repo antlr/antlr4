@@ -144,7 +144,7 @@ func (d *DFAState) String() string {
 	return fmt.Sprintf("%d:%s%s", fmt.Sprint(d.configs), s)
 }
 
-func (d *DFAState) Hash() int {
+func (d *DFAState) hash() int {
 	h := murmurInit(11)
 
 	c := 1
@@ -152,7 +152,7 @@ func (d *DFAState) Hash() int {
 		if d.predicates != nil {
 			for _, p := range d.predicates {
 				h = murmurUpdate(h, p.alt)
-				h = murmurUpdate(h, p.pred.Hash())
+				h = murmurUpdate(h, p.pred.hash())
 				c += 2
 			}
 		} else {
@@ -161,6 +161,6 @@ func (d *DFAState) Hash() int {
 		}
 	}
 
-	h = murmurUpdate(h, d.configs.Hash())
+	h = murmurUpdate(h, d.configs.hash())
 	return murmurFinish(h, c)
 }
