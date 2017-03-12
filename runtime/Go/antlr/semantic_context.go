@@ -22,6 +22,8 @@ type SemanticContext interface {
 
 	evaluate(parser Recognizer, outerContext RuleContext) bool
 	evalPrecedence(parser Recognizer, outerContext RuleContext) SemanticContext
+
+	HashCode() int
 	String() string
 }
 
@@ -109,6 +111,10 @@ func (p *Predicate) equals(other interface{}) bool {
 	}
 }
 
+func (p *Predicate) HashCode() int {
+	return p.ruleIndex*43 + p.predIndex*47
+}
+
 func (p *Predicate) String() string {
 	return "{" + strconv.Itoa(p.ruleIndex) + ":" + strconv.Itoa(p.predIndex) + "}?"
 }
@@ -155,6 +161,10 @@ func (p *PrecedencePredicate) equals(other interface{}) bool {
 	}
 }
 
+func (p *PrecedencePredicate) HashCode() int {
+	return p.precedence * 51
+}
+
 func (p *PrecedencePredicate) String() string {
 	return "{" + strconv.Itoa(p.precedence) + ">=prec}?"
 }
@@ -180,7 +190,7 @@ type AND struct {
 
 func NewAND(a, b SemanticContext) *AND {
 
-	operands := NewSet(nil, nil)
+	operands := NewSet(nil, nil, nil)
 	if aa, ok := a.(*AND); ok {
 		for _, o := range aa.opnds {
 			operands.add(o)
@@ -295,6 +305,21 @@ func (a *AND) evalPrecedence(parser Recognizer, outerContext RuleContext) Semant
 	return result
 }
 
+func (a *AND) HashCode() int {
+	v := 37
+	for _, o := range a.opnds {
+		v += o.HashCode()
+	}
+	return v
+}
+func (a *OR) HashCode() int {
+	v := 41
+	for _, o := range a.opnds {
+		v += o.HashCode()
+	}
+	return v
+}
+
 func (a *AND) String() string {
 	s := ""
 
@@ -320,7 +345,7 @@ type OR struct {
 
 func NewOR(a, b SemanticContext) *OR {
 
-	operands := NewSet(nil, nil)
+	operands := NewSet(nil, nil, nil)
 	if aa, ok := a.(*OR); ok {
 		for _, o := range aa.opnds {
 			operands.add(o)

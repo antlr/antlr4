@@ -14,6 +14,10 @@ type TokenSourceCharStreamPair struct {
 	charStream  CharStream
 }
 
+func NewTokenSourceCharStreamPair(source TokenSource, stream CharStream) *TokenSourceCharStreamPair {
+	return &TokenSourceCharStreamPair{source, stream}
+}
+
 // A token has properties: text, type, line, character position in the line
 // (so we can ignore tabs), token channel, index, and source from which
 // we obtained this token.
@@ -204,7 +208,7 @@ func (c *CommonToken) String() string {
 		ch = ""
 	}
 
-	return "[@" + strconv.Itoa(c.tokenIndex) + "," + strconv.Itoa(c.start) + ":" + strconv.Itoa(c.stop) + "='" +
+	return "[" + "channel:" + strconv.Itoa(c.channel) + " @" + strconv.Itoa(c.tokenIndex) + "," + strconv.Itoa(c.start) + ":" + strconv.Itoa(c.stop) + "='" +
 		txt + "',<" + strconv.Itoa(c.tokenType) + ">" +
 		ch + "," + strconv.Itoa(c.line) + ":" + strconv.Itoa(c.column) + "]"
 }

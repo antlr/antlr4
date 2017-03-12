@@ -22,6 +22,7 @@ type LexerAction interface {
 	getIsPositionDependent() bool
 	execute(lexer Lexer)
 	Hash() string
+	HashCode() int
 	equals(other LexerAction) bool
 }
 
@@ -49,6 +50,10 @@ func (b *BaseLexerAction) getActionType() int {
 
 func (b *BaseLexerAction) getIsPositionDependent() bool {
 	return b.isPositionDependent
+}
+
+func (b *BaseLexerAction) HashCode() int {
+	return b.actionType
 }
 
 func (b *BaseLexerAction) Hash() string {

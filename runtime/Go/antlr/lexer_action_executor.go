@@ -14,6 +14,7 @@ package antlr
 type LexerActionExecutor struct {
 	lexerActions     []LexerAction
 	cachedHashString string
+	cachedHash       int
 }
 
 func NewLexerActionExecutor(lexerActions []LexerAction) *LexerActionExecutor {
@@ -30,8 +31,10 @@ func NewLexerActionExecutor(lexerActions []LexerAction) *LexerActionExecutor {
 	// of the performance-critical {@link LexerATNConfig//hashCode} operation.
 
 	var s string
+	l.cachedHash = initHash(57)
 	for _, a := range lexerActions {
 		s += a.Hash()
+		l.cachedHash = update(l.cachedHash, a.HashCode())
 	}
 
 	l.cachedHashString = s // "".join([str(la) for la in
@@ -159,6 +162,13 @@ func (l *LexerActionExecutor) execute(lexer Lexer, input CharStream, startIndex 
 
 func (l *LexerActionExecutor) Hash() string {
 	return l.cachedHashString
+}
+
+func (l *LexerActionExecutor) HashCode() int {
+	if l == nil {
+		return 61
+	}
+	return l.cachedHash
 }
 
 func (l *LexerActionExecutor) equals(other interface{}) bool {

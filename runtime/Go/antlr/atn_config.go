@@ -247,17 +247,17 @@ func NewLexerATNConfig1(state ATNState, alt int, context PredictionContext) *Lex
 	return &LexerATNConfig{BaseATNConfig: NewBaseATNConfig5(state, alt, context, SemanticContextNone)}
 }
 
-func (l *LexerATNConfig) Hash() string {
-	var f string
-
-	if l.passedThroughNonGreedyDecision {
-		f = "1"
-	} else {
-		f = "0"
-	}
-
-	return fmt.Sprintf("%v%v%v%v%v%v", l.state.GetStateNumber(), l.alt, l.context, l.semanticContext, f, l.lexerActionExecutor)
-}
+// func (l *LexerATNConfig) Hash() string {
+// 	var f string
+//
+// 	if l.passedThroughNonGreedyDecision {
+// 		f = "1"
+// 	} else {
+// 		f = "0"
+// 	}
+//
+// 	return fmt.Sprintf("%v%v%v%v%v%v", l.state.GetStateNumber(), l.alt, l.context, l.semanticContext, f, l.lexerActionExecutor)
+// }
 
 func (l *LexerATNConfig) equals(other interface{}) bool {
 	var othert, ok = other.(*LexerATNConfig)
@@ -283,6 +283,24 @@ func (l *LexerATNConfig) equals(other interface{}) bool {
 	}
 
 	return l.BaseATNConfig.equals(othert.BaseATNConfig)
+}
+
+func (l *LexerATNConfig) HashCode() int {
+	var f int
+	if l.passedThroughNonGreedyDecision {
+		f = 1
+	} else {
+		f = 0
+	}
+	h := initHash(7)
+	h = update(h, l.state.HashCode())
+	h = update(h, l.alt)
+	h = update(h, l.context.HashCode())
+	h = update(h, l.semanticContext.HashCode())
+	h = update(h, f)
+	h = update(h, l.lexerActionExecutor.HashCode())
+	h = finish(h, 6)
+	return h
 }
 
 func checkNonGreedyDecision(source *LexerATNConfig, target ATNState) bool {

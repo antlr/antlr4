@@ -49,22 +49,33 @@ func (s *IntStack) Push(e int) {
 }
 
 type Set struct {
-	data           map[string][]interface{}
-	hashFunction   func(interface{}) string
-	equalsFunction func(interface{}, interface{}) bool
+	setData map[int][]interface{}
+	// stringhashFunction func(interface{}) string
+	hashcodeFunction func(interface{}) int
+	equalsFunction   func(interface{}, interface{}) bool
 }
 
-func NewSet(hashFunction func(interface{}) string, equalsFunction func(interface{}, interface{}) bool) *Set {
+func NewSet(
+	hashFunction func(interface{}) string,
+	hashcodeFunction func(interface{}) int,
+	equalsFunction func(interface{}, interface{}) bool) *Set {
 
 	s := new(Set)
 
-	s.data = make(map[string][]interface{})
+	s.setData = make(map[int][]interface{})
 
-	if hashFunction == nil {
-		s.hashFunction = standardHashFunction
+	// could be nil
+	if hashcodeFunction != nil {
+		s.hashcodeFunction = hashcodeFunction
 	} else {
-		s.hashFunction = hashFunction
+		s.hashcodeFunction = standardHashFunction
 	}
+
+	// if hashFunction == nil {
+	// 	s.hashFunction = standardHashFunction
+	// } else {
+	// 	s.stringhashFunction = hashFunction
+	// }
 
 	if equalsFunction == nil {
 		s.equalsFunction = standardEqualsFunction
@@ -87,11 +98,16 @@ func standardEqualsFunction(a interface{}, b interface{}) bool {
 	return ac.equals(bc)
 }
 
-func standardHashFunction(a interface{}) string {
-	h, ok := a.(Hasher)
+func standardHashFunction(a interface{}) int {
+	if h, ok := a.(HashCodeer); ok {
+		return h.HashCode()
+	}
 
-	if ok {
-		return h.Hash()
+	if h, ok := a.(Hasher); ok {
+		s := h.Hash()
+		ha := fnv.New32a()
+		ha.Write([]byte((s)))
+		return int(ha.Sum32())
 	}
 
 	panic("Not Hasher")
@@ -110,25 +126,21 @@ func standardHashFunction(a interface{}) string {
 type Hasher interface {
 	Hash() string
 }
-
-func hashCode(s string) string {
-	h := fnv.New32a()
-	h.Write([]byte((s)))
-	return fmt.Sprint(h.Sum32())
+type HashCodeer interface {
+	HashCode() int
 }
 
 func (s *Set) length() int {
-	return len(s.data)
+	return len(s.setData)
 }
 
 func (s *Set) add(value interface{}) interface{} {
 
-	hash := s.hashFunction(value)
-	key := "hash_" + hashCode(hash)
+	key := s.hashcodeFunction(value)
 
-	values := s.data[key]
+	values := s.setData[key]
 
-	if s.data[key] != nil {
+	if s.setData[key] != nil {
 
 		for i := 0; i < len(values); i++ {
 			if s.equalsFunction(value, values[i]) {
@@ -136,22 +148,25 @@ func (s *Set) add(value interface{}) interface{} {
 			}
 		}
 
-		s.data[key] = append(s.data[key], value)
+		s.setData[key] = append(s.setData[key], value)
 		return value
 	}
 
-	s.data[key] = []interface{}{value}
+	v := make([]interface{}, 1, 10)
+	v[0] = value
+	s.setData[key] = v
+
+	// s.setData[key] = []interface{}{value}
 	return value
 }
 
 func (s *Set) contains(value interface{}) bool {
 
-	hash := s.hashFunction(value)
-	key := "hash_" + hashCode(hash)
+	key := s.hashcodeFunction(value)
 
-	values := s.data[key]
+	values := s.setData[key]
 
-	if s.data[key] != nil {
+	if s.setData[key] != nil {
 		for i := 0; i < len(values); i++ {
 			if s.equalsFunction(value, values[i]) {
 				return true
@@ -164,10 +179,10 @@ func (s *Set) contains(value interface{}) bool {
 func (s *Set) values() []interface{} {
 	l := make([]interface{}, 0)
 
-	for key := range s.data {
-		if strings.Index(key, "hash_") == 0 {
-			l = append(l, s.data[key]...)
-		}
+	for key := range s.setData {
+		// if strings.Index(key, "hash_") == 0 {
+		l = append(l, s.setData[key]...)
+		// }
 	}
 	return l
 }
@@ -176,7 +191,7 @@ func (s *Set) String() string {
 
 	r := ""
 
-	for _, av := range s.data {
+	for _, av := range s.setData {
 		for _, v := range av {
 			r += fmt.Sprint(v)
 		}
@@ -214,7 +229,7 @@ func (b *BitSet) remove(value int) {
 }
 
 func (b *BitSet) contains(value int) bool {
-	return b.data[value] == true
+	return b.data[value]
 }
 
 func (b *BitSet) values() []int {
@@ -384,4 +399,37 @@ func TitleCase(str string) string {
 	//		return strings.ToUpper(s[0:1]) + s[1:2]
 	//	})
 
+}
+
+// murmur hash
+const (
+	c1_32 = 0xCC9E2D51
+	c2_32 = 0x1B873593
+	n1_32 = 0xE6546B64
+)
+
+func initHash(seed int) int {
+	return seed
+}
+
+func update(h1 int, k1 int) int {
+	k1 *= c1_32
+	k1 = (k1 << 15) | (k1 >> 17) // rotl32(k1, 15)
+	k1 *= c2_32
+
+	h1 ^= k1
+	h1 = (h1 << 13) | (h1 >> 19) // rotl32(h1, 13)
+	h1 = h1*5 + 0xe6546b64
+	return h1
+}
+
+func finish(h1 int, numberOfWords int) int {
+	h1 ^= (numberOfWords * 4)
+	h1 ^= h1 >> 16
+	h1 *= 0x85ebca6b
+	h1 ^= h1 >> 13
+	h1 *= 0xc2b2ae35
+	h1 ^= h1 >> 16
+
+	return h1
 }

@@ -49,6 +49,7 @@ type ATNState interface {
 	AddTransition(Transition, int)
 
 	String() string
+	HashCode() int
 }
 
 type BaseATNState struct {
@@ -120,6 +121,10 @@ func (as *BaseATNState) GetNextTokenWithinRule() *IntervalSet {
 
 func (as *BaseATNState) SetNextTokenWithinRule(v *IntervalSet) {
 	as.NextTokenWithinRule = v
+}
+
+func (as *BaseATNState) HashCode() int {
+	return as.stateNumber
 }
 
 func (as *BaseATNState) String() string {
