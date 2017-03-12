@@ -55,7 +55,6 @@ type Set struct {
 }
 
 func NewSet(
-	hashFunction func(interface{}) string,
 	hashcodeFunction func(interface{}) int,
 	equalsFunction func(interface{}, interface{}) bool) *Set {
 
@@ -91,7 +90,7 @@ func standardEqualsFunction(a interface{}, b interface{}) bool {
 }
 
 func standardHashFunction(a interface{}) int {
-	if h, ok := a.(HashCodeer); ok {
+	if h, ok := a.(HashCoder); ok {
 		return h.HashCode()
 	}
 
@@ -108,7 +107,8 @@ func standardHashFunction(a interface{}) int {
 type Hasher interface {
 	Hash() string
 }
-type HashCodeer interface {
+
+type HashCoder interface {
 	HashCode() int
 }
 

@@ -568,7 +568,7 @@ func (p *ParserATNSimulator) computeReachSet(closure ATNConfigSet, t int, fullCt
 	//
 	if reach == nil {
 		reach = NewBaseATNConfigSet(fullCtx)
-		closureBusy := NewSet(nil, nil, nil)
+		closureBusy := NewSet(nil, nil)
 		treatEOFAsEpsilon := t == TokenEOF
 		for k := 0; k < len(intermediate.configs); k++ {
 			p.closure(intermediate.configs[k], reach, closureBusy, false, fullCtx, treatEOFAsEpsilon)
@@ -665,7 +665,7 @@ func (p *ParserATNSimulator) computeStartState(a ATNState, ctx RuleContext, full
 	for i := 0; i < len(a.GetTransitions()); i++ {
 		target := a.GetTransitions()[i].getTarget()
 		c := NewBaseATNConfig6(target, i+1, initialContext)
-		closureBusy := NewSet(nil, nil, nil)
+		closureBusy := NewSet(nil, nil)
 		p.closure(c, configs, closureBusy, true, fullCtx, false)
 	}
 	return configs

@@ -190,7 +190,7 @@ type AND struct {
 
 func NewAND(a, b SemanticContext) *AND {
 
-	operands := NewSet(nil, nil, nil)
+	operands := NewSet(nil, nil)
 	if aa, ok := a.(*AND); ok {
 		for _, o := range aa.opnds {
 			operands.add(o)
@@ -312,6 +312,7 @@ func (a *AND) HashCode() int {
 	}
 	return v
 }
+
 func (a *OR) HashCode() int {
 	v := 41
 	for _, o := range a.opnds {
@@ -345,7 +346,7 @@ type OR struct {
 
 func NewOR(a, b SemanticContext) *OR {
 
-	operands := NewSet(nil, nil, nil)
+	operands := NewSet(nil, nil)
 	if aa, ok := a.(*OR); ok {
 		for _, o := range aa.opnds {
 			operands.add(o)

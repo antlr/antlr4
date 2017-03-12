@@ -38,7 +38,7 @@ func (la *LL1Analyzer) getDecisionLookahead(s ATNState) []*IntervalSet {
 	look := make([]*IntervalSet, count)
 	for alt := 0; alt < count; alt++ {
 		look[alt] = NewIntervalSet()
-		lookBusy := NewSet(nil, nil, nil)
+		lookBusy := NewSet(nil, nil)
 		seeThruPreds := false // fail to get lookahead upon pred
 		la.look1(s.GetTransitions()[alt].getTarget(), nil, BasePredictionContextEMPTY, look[alt], lookBusy, NewBitSet(), seeThruPreds, false)
 		// Wipe out lookahead for la alternative if we found nothing
@@ -75,7 +75,7 @@ func (la *LL1Analyzer) Look(s, stopState ATNState, ctx RuleContext) *IntervalSet
 	if ctx != nil {
 		lookContext = predictionContextFromRuleContext(s.GetATN(), ctx)
 	}
-	la.look1(s, stopState, lookContext, r, NewSet(nil, nil, nil), NewBitSet(), seeThruPreds, true)
+	la.look1(s, stopState, lookContext, r, NewSet(nil, nil), NewBitSet(), seeThruPreds, true)
 	return r
 }
 
