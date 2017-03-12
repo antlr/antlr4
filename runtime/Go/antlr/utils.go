@@ -94,18 +94,7 @@ func standardHashFunction(a interface{}) int {
 		return h.HashCode()
 	}
 
-	if h, ok := a.(Hasher); ok {
-		s := h.Hash()
-		ha := fnv.New32a()
-		ha.Write([]byte((s)))
-		return int(ha.Sum32())
-	}
-
 	panic("Not Hasher")
-}
-
-type Hasher interface {
-	Hash() string
 }
 
 type HashCoder interface {

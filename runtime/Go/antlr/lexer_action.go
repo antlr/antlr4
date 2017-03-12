@@ -21,7 +21,6 @@ type LexerAction interface {
 	getActionType() int
 	getIsPositionDependent() bool
 	execute(lexer Lexer)
-	Hash() string
 	HashCode() int
 	equals(other LexerAction) bool
 }
@@ -54,10 +53,6 @@ func (b *BaseLexerAction) getIsPositionDependent() bool {
 
 func (b *BaseLexerAction) HashCode() int {
 	return b.actionType
-}
-
-func (b *BaseLexerAction) Hash() string {
-	return strconv.Itoa(b.actionType)
 }
 
 func (b *BaseLexerAction) equals(other LexerAction) bool {
@@ -109,8 +104,11 @@ func (l *LexerTypeAction) execute(lexer Lexer) {
 	lexer.setType(l.thetype)
 }
 
-func (l *LexerTypeAction) Hash() string {
-	return strconv.Itoa(l.actionType) + strconv.Itoa(l.thetype)
+func (l *LexerTypeAction) HashCode() int {
+	h := initHash(0)
+	h = update(h, l.actionType)
+	h = update(h, l.thetype)
+	return finish(h, 2)
 }
 
 func (l *LexerTypeAction) equals(other LexerAction) bool {
@@ -150,8 +148,11 @@ func (l *LexerPushModeAction) execute(lexer Lexer) {
 	lexer.pushMode(l.mode)
 }
 
-func (l *LexerPushModeAction) Hash() string {
-	return strconv.Itoa(l.actionType) + strconv.Itoa(l.mode)
+func (l *LexerPushModeAction) HashCode() int {
+	h := initHash(0)
+	h = update(h, l.actionType)
+	h = update(h, l.mode)
+	return finish(h, 2)
 }
 
 func (l *LexerPushModeAction) equals(other LexerAction) bool {
@@ -244,8 +245,11 @@ func (l *LexerModeAction) execute(lexer Lexer) {
 	lexer.setMode(l.mode)
 }
 
-func (l *LexerModeAction) Hash() string {
-	return strconv.Itoa(l.actionType) + strconv.Itoa(l.mode)
+func (l *LexerModeAction) HashCode() int {
+	h := initHash(0)
+	h = update(h, l.actionType)
+	h = update(h, l.mode)
+	return finish(h, 2)
 }
 
 func (l *LexerModeAction) equals(other LexerAction) bool {
@@ -299,8 +303,12 @@ func (l *LexerCustomAction) execute(lexer Lexer) {
 	lexer.Action(nil, l.ruleIndex, l.actionIndex)
 }
 
-func (l *LexerCustomAction) Hash() string {
-	return strconv.Itoa(l.actionType) + strconv.Itoa(l.ruleIndex) + strconv.Itoa(l.actionIndex)
+func (l *LexerCustomAction) HashCode() int {
+	h := initHash(0)
+	h = update(h, l.actionType)
+	h = update(h, l.ruleIndex)
+	h = update(h, l.actionIndex)
+	return finish(h, 3)
 }
 
 func (l *LexerCustomAction) equals(other LexerAction) bool {
@@ -336,8 +344,11 @@ func (l *LexerChannelAction) execute(lexer Lexer) {
 	lexer.setChannel(l.channel)
 }
 
-func (l *LexerChannelAction) Hash() string {
-	return strconv.Itoa(l.actionType) + strconv.Itoa(l.channel)
+func (l *LexerChannelAction) HashCode() int {
+	h := initHash(0)
+	h = update(h, l.actionType)
+	h = update(h, l.channel)
+	return finish(h, 2)
 }
 
 func (l *LexerChannelAction) equals(other LexerAction) bool {
@@ -401,8 +412,12 @@ func (l *LexerIndexedCustomAction) execute(lexer Lexer) {
 	l.lexerAction.execute(lexer)
 }
 
-func (l *LexerIndexedCustomAction) Hash() string {
-	return strconv.Itoa(l.actionType) + strconv.Itoa(l.offset) + l.lexerAction.Hash()
+func (l *LexerIndexedCustomAction) HashCode() int {
+	h := initHash(0)
+	h = update(h, l.actionType)
+	h = update(h, l.offset)
+	h = update(h, l.lexerAction.HashCode())
+	return finish(h, 3)
 }
 
 func (l *LexerIndexedCustomAction) equals(other LexerAction) bool {
