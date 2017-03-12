@@ -48,7 +48,6 @@ type ATNConfigSet interface {
 // about its elements and can combine similar configurations using a
 // graph-structured stack.
 type BaseATNConfigSet struct {
-	cachedHashString string
 	cachedHash int
 
 	// configLookup is used to determine whether two BaseATNConfigSets are equal. We
@@ -94,7 +93,7 @@ type BaseATNConfigSet struct {
 
 func NewBaseATNConfigSet(fullCtx bool) *BaseATNConfigSet {
 	return &BaseATNConfigSet{
-		cachedHashString: "-1",
+		cachedHash: -1,
 		configLookup:     NewSet(nil, equalATNConfigs),
 		fullCtx:          fullCtx,
 	}
@@ -120,7 +119,7 @@ func (b *BaseATNConfigSet) Add(config ATNConfig, mergeCache *DoubleDict) bool {
 	existing := b.configLookup.add(config).(ATNConfig)
 
 	if existing == config {
-		b.cachedHashString = "-1"
+		b.cachedHash = -1
 		b.configs = append(b.configs, config) // Track order here
 
 		return true
@@ -237,17 +236,13 @@ func (b *BaseATNConfigSet) HashCode() int {
 }
 
 func (b *BaseATNConfigSet) hashCodeConfigs() int {
-	h := 1
-
+	h := initHash(1)
 	for _, c := range b.configs {
-		h += 31 * h
-
 		if c != nil {
-			h += c.HashCode()
+			h = update(h, c.HashCode())
 		}
 	}
-
-	return h
+	return finish(h, len(b.configs))
 }
 
 func (b *BaseATNConfigSet) Length() int {
@@ -280,7 +275,7 @@ func (b *BaseATNConfigSet) Clear() {
 	}
 
 	b.configs = make([]ATNConfig, 0)
-	b.cachedHashString = "-1"
+	b.cachedHash = -1
 	b.configLookup = NewSet(nil, equalATNConfigs)
 }
 

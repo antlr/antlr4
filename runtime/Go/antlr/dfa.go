@@ -14,7 +14,7 @@ type DFA struct {
 
 	// states is all the DFA states. Use Map to get the old state back; Set can only
 	// indicate whether it is there.
-	states map[string]*DFAState
+	states map[int]*DFAState
 
 	s0 *DFAState
 
@@ -27,7 +27,7 @@ func NewDFA(atnStartState DecisionState, decision int) *DFA {
 	return &DFA{
 		atnStartState: atnStartState,
 		decision:      decision,
-		states:        make(map[string]*DFAState),
+		states:        make(map[int]*DFAState),
 	}
 }
 
@@ -76,7 +76,7 @@ func (d *DFA) setPrecedenceStartState(precedence int, startState *DFAState) {
 // true or nil otherwise, and d.precedenceDfa is updated.
 func (d *DFA) setPrecedenceDfa(precedenceDfa bool) {
 	if d.precedenceDfa != precedenceDfa {
-		d.states = make(map[string]*DFAState)
+		d.states = make(map[int]*DFAState)
 
 		if precedenceDfa {
 			precedenceState := NewDFAState(-1, NewBaseATNConfigSet(false))
@@ -93,7 +93,7 @@ func (d *DFA) setPrecedenceDfa(precedenceDfa bool) {
 	}
 }
 
-func (d *DFA) GetStates() map[string]*DFAState {
+func (d *DFA) GetStates() map[int]*DFAState {
 	return d.states
 }
 
