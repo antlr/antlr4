@@ -18,7 +18,7 @@ function TraceListener(parser) {
 	return this;
 }
 
-TraceListener.prototype = Object.create(ParseTreeListener);
+TraceListener.prototype = Object.create(ParseTreeListener.prototype);
 TraceListener.prototype.constructor = TraceListener;
 
 TraceListener.prototype.enterEveryRule = function(ctx) {
