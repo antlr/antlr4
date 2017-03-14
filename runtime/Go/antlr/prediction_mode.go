@@ -4,12 +4,6 @@
 
 package antlr
 
-import (
-	"strconv"
-	"strings"
-)
-
-//
 // This enumeration defines the prediction modes available in ANTLR 4 along with
 // utility methods for analyzing configuration sets for conflicts and/or
 // ambiguities.
@@ -491,25 +485,22 @@ func PredictionModeGetAlts(altsets []*BitSet) *BitSet {
 // </pre>
 //
 func PredictionModegetConflictingAltSubsets(configs ATNConfigSet) []*BitSet {
-	configToAlts := make(map[string]*BitSet)
+	configToAlts := make(map[int]*BitSet)
 
 	for _, c := range configs.GetItems() {
-		key := "key_" + strconv.Itoa(c.GetState().GetStateNumber()) + "/" + c.GetContext().String()
-		alts := configToAlts[key]
-		if alts == nil {
+		key := 31 * c.GetState().GetStateNumber() + c.GetContext().hash()
+
+		alts, ok := configToAlts[key]
+		if !ok {
 			alts = NewBitSet()
 			configToAlts[key] = alts
 		}
 		alts.add(c.GetAlt())
 	}
 
-	values := make([]*BitSet, 0)
-
-	for k := range configToAlts {
-		if strings.Index(k, "key_") != 0 {
-			continue
-		}
-		values = append(values, configToAlts[k])
+	values := make([]*BitSet, 0, 10)
+	for _, v := range configToAlts {
+		values = append(values, v)
 	}
 	return values
 }
