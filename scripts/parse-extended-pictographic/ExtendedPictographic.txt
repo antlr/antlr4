@@ -1,0 +1,309 @@
+# ExtendedPictographic.txt
+# Date: 2016-10-12
+# © 2016 Unicode®, Inc.
+# For terms of use, see http://www.unicode.org/terms_of_use.html
+#
+# Extended_Pictographic (EP) is a binary code point property for characters that are pictographic 
+# (or otherwise similar in kind to characters with the Emoji property)
+# and used to customize segmentation (UAX #29 and UAX #14) so that possible future emoji zwj sequences
+# will not break grapheme clusters, words, or lines. It also includes unassigned codepoints that
+# are in blocks intended for use for emoji characters, added to the Unicode 9.0 Linebreak property.
+#
+# For usage information, see http://unicode.org/reports/tr35/#Property_Data
+# 
+# Format
+#
+# This file follows the format used for UCD files. 
+# Field 1 indicates that the character(s) listed in Field 0 have the value ExtendedPictographic=Yes
+# All other characters have the value ExtendedPictographic=No
+#
+# The files contain additional comments to aid in understanding the context of the property values.
+#
+# 1. Blocks are included if they contain any emoji characters, even if there are no EP characters.
+#
+# 2. EP code points may include unassigned values. Those are based on the Line_Break assignments that
+#    were added in Unicode 9.0 to future-proof ZWJ linebreak behavior. 
+#
+# 3. Comment lines are included to describe the content of the blocks for comparison. For example:
+#    emoji=33	: [✂✅✈-✍✏✒✔✖✝✡✨✳✴❄❇❌❎❓-❕❗❣❤➕-➗➡➰➿]
+#    EP=10	: [✀✁✃✄✎✐✑❥-❧]
+#    other=149	: [✆✇✓✕✗-✜✞-✠✢-✧✩-✲✵-❃❅❆❈-❋❍❏-❒❖❘-❢❨-➔➘-➠➢-➯➱-➾]
+#    otherCn=2
+#
+#    Meaning
+#    • emoji:   the number of Emoji=Yes characters in that block,
+#    • EP:     the number of ExtendedPictographic in the block (with details below), and
+#    • other:   the number of other characters in the block (non-Emoji, non-EP),
+#    • otherCn: the number of other code points in the block (non-Emoji, non-EP, not characters).
+#
+#    The characters can be listed out in detail by using any implementation that supports UnicodeSet,
+#    such as ​http://unicode.org/cldr/utility/list-unicodeset.jsp.
+#    The lines are omitted if empty: for example, Transport_And_Map_Symbols have no "other" characters.
+#    
+# =====
+
+# Alchemical_Symbols
+# EP=12	: [🝴-🝿]
+# other=116	: [🜀-🝳]
+
+U+1F774..U+1F77F	; ExtendedPictographic #	GC=Cn
+# count=12
+
+# Arrows
+# emoji=8	: [↔-↙↩↪]
+# other=104	: [←-↓↚-↨↫-⇿]
+
+# CJK_Symbols_And_Punctuation
+# emoji=2	: [〰〽]
+# other=62	: [　-〯〱-〼〾〿]
+
+# Dingbats
+# emoji=33	: [✂✅✈-✍✏✒✔✖✝✡✨✳✴❄❇❌❎❓-❕❗❣❤➕-➗➡➰➿]
+# EP=10	: [✀✁✃✄✎✐✑❥-❧]
+# other=149	: [✆✇✓✕✗-✜✞-✠✢-✧✩-✲✵-❃❅❆❈-❋❍❏-❒❖❘-❢❨-➔➘-➠➢-➯➱-➾]
+
+U+2700..U+2701	; ExtendedPictographic #	[✀✁]	BLACK SAFETY SCISSORS .. UPPER BLADE SCISSORS
+U+2703..U+2704	; ExtendedPictographic #	[✃✄]	LOWER BLADE SCISSORS .. WHITE SCISSORS
+U+270E	; ExtendedPictographic #	[✎]	LOWER RIGHT PENCIL
+U+2710..U+2711	; ExtendedPictographic #	[✐✑]	UPPER RIGHT PENCIL .. WHITE NIB
+U+2765..U+2767	; ExtendedPictographic #	[❥-❧]	ROTATED HEAVY BLACK HEART BULLET .. ROTATED FLORAL HEART BULLET
+# count=10
+
+# Domino_Tiles
+# EP=112	: [🀰-🂟]
+
+U+1F030..U+1F093	; ExtendedPictographic #	[🀰-🂓]	DOMINO TILE HORIZONTAL BACK .. DOMINO TILE VERTICAL-06-06
+U+1F094..U+1F09F	; ExtendedPictographic #	GC=Cn
+# count=112
+
+# Emoticons
+# emoji=80	: [😀-🙏]
+
+# Enclosed_Alphanumerics
+# emoji=1	: [Ⓜ]
+# other=159	: [①-ⓁⓃ-⓿]
+
+# Enclosed_Alphanumeric_Supplement
+# emoji=15	: [🅰🅱🅾🅿🆎🆑-🆚]
+# EP=65	: [🄍-🄏🄯🅬-🅯🆭-🇥]
+# other=176	: [🄀-🄌🄐-🄮🄰-🅫🅲-🅽🆀-🆍🆏🆐🆛-🆬🇦-🇿]
+
+U+1F10D..U+1F10F	; ExtendedPictographic #	GC=Cn
+U+1F12F	; ExtendedPictographic #	GC=Cn
+U+1F16C..U+1F16F	; ExtendedPictographic #	GC=Cn
+U+1F1AD..U+1F1E5	; ExtendedPictographic #	GC=Cn
+# count=65
+
+# Enclosed_CJK_Letters_And_Months
+# emoji=2	: [㊗㊙]
+# other=252	: [㈀-㈞㈠-㊖㊘㊚-㋾]
+
+# Enclosed_Ideographic_Supplement
+# emoji=15	: [🈁🈂🈚🈯🈲-🈺🉐🉑]
+# EP=198	: [🈃-🈏🈼-🈿🉉-🉏🉒-🋿]
+# other=43	: [🈀🈐-🈙🈛-🈮🈰🈱🈻🉀-🉈]
+
+U+1F260..U+1F265	; ExtendedPictographic #	[🉠-🉥]	ROUNDED SYMBOL FOR FU .. ROUNDED SYMBOL FOR CAI
+U+1F203..U+1F20F	; ExtendedPictographic #	GC=Cn
+U+1F23C..U+1F23F	; ExtendedPictographic #	GC=Cn
+U+1F249..U+1F24F	; ExtendedPictographic #	GC=Cn
+U+1F252..U+1F25F	; ExtendedPictographic #	GC=Cn
+U+1F266..U+1F2FF	; ExtendedPictographic #	GC=Cn
+# count=198
+
+# Geometric_Shapes
+# emoji=8	: [▪▫▶◀◻-◾]
+# other=88	: [■-▩▬-▵▷-▿◁-◺◿]
+
+# Geometric_Shapes_Extended
+# EP=43	: [🟕-🟿]
+# other=85	: [🞀-🟔]
+
+U+1F7D5..U+1F7FF	; ExtendedPictographic #	GC=Cn
+# count=43
+
+# Latin_1_Supplement
+# emoji=2	: [©®]
+# other=126	: [-¨ª-­¯-ÿ]
+
+# Letterlike_Symbols
+# emoji=2	: [™ℹ]
+# other=78	: [℀-℡℣-ℸ℺-⅏]
+
+# Mahjong_Tiles
+# emoji=1	: [🀄]
+# EP=47	: [🀀-🀃🀅-🀯]
+
+U+1F000..U+1F003	; ExtendedPictographic #	[🀀-🀃]	MAHJONG TILE EAST WIND .. MAHJONG TILE NORTH WIND
+U+1F005..U+1F02B	; ExtendedPictographic #	[🀅-🀫]	MAHJONG TILE GREEN DRAGON .. MAHJONG TILE BACK
+U+1F02C..U+1F02F	; ExtendedPictographic #	GC=Cn
+# count=47
+
+# Miscellaneous_Symbols_And_Arrows
+# emoji=7	: [⬅-⬇⬛⬜⭐⭕]
+# other=200	: [⬀-⬄⬈-⬚⬝-⭏⭑-⭔⭖-⭳⭶-⮕⮘-⮹⮽-⯈⯊-⯒⯬-⯯]
+
+# Miscellaneous_Symbols_And_Pictographs
+# emoji=637	: [🌀-🌡🌤-🎓🎖🎗🎙-🎛🎞-🏰🏳-🏵🏷-📽📿-🔽🕉-🕎🕐-🕧🕯🕰🕳-🕺🖇🖊-🖍🖐🖕🖖🖤🖥🖨🖱🖲🖼🗂-🗄🗑-🗓🗜-🗞🗡🗣🗨🗯🗳🗺-🗿]
+# EP=131	: [🌢🌣🎔🎕🎘🎜🎝🏱🏲🏶📾🔾-🕈🕏🕨-🕮🕱🕲🕻-🖆🖈🖉🖎🖏🖑-🖔🖗-🖣🖦🖧🖩-🖰🖳-🖻🖽-🗁🗅-🗐🗔-🗛🗟🗠🗢🗤-🗧🗩-🗮🗰-🗲🗴-🗹]
+
+U+1F322..U+1F323	; ExtendedPictographic #	[🌢🌣]	BLACK DROPLET .. WHITE SUN
+U+1F394..U+1F395	; ExtendedPictographic #	[🎔🎕]	HEART WITH TIP ON THE LEFT .. BOUQUET OF FLOWERS
+U+1F398	; ExtendedPictographic #	[🎘]	MUSICAL KEYBOARD WITH JACKS
+U+1F39C..U+1F39D	; ExtendedPictographic #	[🎜🎝]	BEAMED ASCENDING MUSICAL NOTES .. BEAMED DESCENDING MUSICAL NOTES
+U+1F3F1..U+1F3F2	; ExtendedPictographic #	[🏱🏲]	WHITE PENNANT .. BLACK PENNANT
+U+1F3F6	; ExtendedPictographic #	[🏶]	BLACK ROSETTE
+U+1F4FE	; ExtendedPictographic #	[📾]	PORTABLE STEREO
+U+1F53E..U+1F548	; ExtendedPictographic #	[🔾-🕈]	LOWER RIGHT SHADOWED WHITE CIRCLE .. CELTIC CROSS
+U+1F54F	; ExtendedPictographic #	[🕏]	BOWL OF HYGIEIA
+U+1F568..U+1F56E	; ExtendedPictographic #	[🕨-🕮]	RIGHT SPEAKER .. BOOK
+U+1F571..U+1F572	; ExtendedPictographic #	[🕱🕲]	BLACK SKULL AND CROSSBONES .. NO PIRACY
+U+1F57B..U+1F586	; ExtendedPictographic #	[🕻-🖆]	LEFT HAND TELEPHONE RECEIVER .. PEN OVER STAMPED ENVELOPE
+U+1F588..U+1F589	; ExtendedPictographic #	[🖈🖉]	BLACK PUSHPIN .. LOWER LEFT PENCIL
+U+1F58E..U+1F58F	; ExtendedPictographic #	[🖎🖏]	LEFT WRITING HAND .. TURNED OK HAND SIGN
+U+1F591..U+1F594	; ExtendedPictographic #	[🖑-🖔]	REVERSED RAISED HAND WITH FINGERS SPLAYED .. REVERSED VICTORY HAND
+U+1F597..U+1F5A3	; ExtendedPictographic #	[🖗-🖣]	WHITE DOWN POINTING LEFT HAND INDEX .. BLACK DOWN POINTING BACKHAND INDEX
+U+1F5A6..U+1F5A7	; ExtendedPictographic #	[🖦🖧]	KEYBOARD AND MOUSE .. THREE NETWORKED COMPUTERS
+U+1F5A9..U+1F5B0	; ExtendedPictographic #	[🖩-🖰]	POCKET CALCULATOR .. TWO BUTTON MOUSE
+U+1F5B3..U+1F5BB	; ExtendedPictographic #	[🖳-🖻]	OLD PERSONAL COMPUTER .. DOCUMENT WITH PICTURE
+U+1F5BD..U+1F5C1	; ExtendedPictographic #	[🖽-🗁]	FRAME WITH TILES .. OPEN FOLDER
+U+1F5C5..U+1F5D0	; ExtendedPictographic #	[🗅-🗐]	EMPTY NOTE .. PAGES
+U+1F5D4..U+1F5DB	; ExtendedPictographic #	[🗔-🗛]	DESKTOP WINDOW .. DECREASE FONT SIZE SYMBOL
+U+1F5DF..U+1F5E0	; ExtendedPictographic #	[🗟🗠]	PAGE WITH CIRCLED TEXT .. STOCK CHART
+U+1F5E2	; ExtendedPictographic #	[🗢]	LIPS
+U+1F5E4..U+1F5E7	; ExtendedPictographic #	[🗤-🗧]	THREE RAYS ABOVE .. THREE RAYS RIGHT
+U+1F5E9..U+1F5EE	; ExtendedPictographic #	[🗩-🗮]	RIGHT SPEECH BUBBLE .. LEFT ANGER BUBBLE
+U+1F5F0..U+1F5F2	; ExtendedPictographic #	[🗰-🗲]	MOOD BUBBLE .. LIGHTNING MOOD
+U+1F5F4..U+1F5F9	; ExtendedPictographic #	[🗴-🗹]	BALLOT SCRIPT X .. BALLOT BOX WITH BOLD CHECK
+# count=131
+
+# Miscellaneous_Symbols
+# emoji=80	: [☀-☄☎☑☔☕☘☝☠☢☣☦☪☮☯☸-☺♀♂♈-♓♠♣♥♦♨♻♿⚒-⚗⚙⚛⚜⚠⚡⚪⚫⚰⚱⚽⚾⛄⛅⛈⛎⛏⛑⛓⛔⛩⛪⛰-⛵⛷-⛺⛽]
+# EP=177	: [★☇-☍☏☐☒☖☗☙-☜☞☟☡☤☥☧-☩☫-☭☰-☷☻-♇♔-♟♡♢♤♧♩-♺♼-♾⚀-⚑⚕⚘⚚⚝-⚟⚢-⚩⚬-⚯⚲-⚼⚿-⛃⛆⛇⛉-⛍⛐⛒⛕-⛨⛫-⛯⛶⛻⛼⛾⛿]
+# other=2	: [☆☓]
+
+U+2605	; ExtendedPictographic #	[★]	BLACK STAR
+U+2607..U+260D	; ExtendedPictographic #	[☇-☍]	LIGHTNING .. OPPOSITION
+U+260F..U+2610	; ExtendedPictographic #	[☏☐]	WHITE TELEPHONE .. BALLOT BOX
+U+2612	; ExtendedPictographic #	[☒]	BALLOT BOX WITH X
+U+2616..U+2617	; ExtendedPictographic #	[☖☗]	WHITE SHOGI PIECE .. BLACK SHOGI PIECE
+U+2619..U+261C	; ExtendedPictographic #	[☙-☜]	REVERSED ROTATED FLORAL HEART BULLET .. WHITE LEFT POINTING INDEX
+U+261E..U+261F	; ExtendedPictographic #	[☞☟]	WHITE RIGHT POINTING INDEX .. WHITE DOWN POINTING INDEX
+U+2621	; ExtendedPictographic #	[☡]	CAUTION SIGN
+U+2624..U+2625	; ExtendedPictographic #	[☤☥]	CADUCEUS .. ANKH
+U+2627..U+2629	; ExtendedPictographic #	[☧-☩]	CHI RHO .. CROSS OF JERUSALEM
+U+262B..U+262D	; ExtendedPictographic #	[☫-☭]	FARSI SYMBOL .. HAMMER AND SICKLE
+U+2630..U+2637	; ExtendedPictographic #	[☰-☷]	TRIGRAM FOR HEAVEN .. TRIGRAM FOR EARTH
+U+263B..U+2647	; ExtendedPictographic #	[☻-♇]	BLACK SMILING FACE .. PLUTO
+U+2654..U+265F	; ExtendedPictographic #	[♔-♟]	WHITE CHESS KING .. BLACK CHESS PAWN
+U+2661..U+2662	; ExtendedPictographic #	[♡♢]	WHITE HEART SUIT .. WHITE DIAMOND SUIT
+U+2664	; ExtendedPictographic #	[♤]	WHITE SPADE SUIT
+U+2667	; ExtendedPictographic #	[♧]	WHITE CLUB SUIT
+U+2669..U+267A	; ExtendedPictographic #	[♩-♺]	QUARTER NOTE .. RECYCLING SYMBOL FOR GENERIC MATERIALS
+U+267C..U+267E	; ExtendedPictographic #	[♼-♾]	RECYCLED PAPER SYMBOL .. PERMANENT PAPER SIGN
+U+2680..U+2691	; ExtendedPictographic #	[⚀-⚑]	DIE FACE-1 .. BLACK FLAG
+U+2695	; ExtendedPictographic #	[⚕]	STAFF OF AESCULAPIUS
+U+2698	; ExtendedPictographic #	[⚘]	FLOWER
+U+269A	; ExtendedPictographic #	[⚚]	STAFF OF HERMES
+U+269D..U+269F	; ExtendedPictographic #	[⚝-⚟]	OUTLINED WHITE STAR .. THREE LINES CONVERGING LEFT
+U+26A2..U+26A9	; ExtendedPictographic #	[⚢-⚩]	DOUBLED FEMALE SIGN .. HORIZONTAL MALE WITH STROKE SIGN
+U+26AC..U+26AF	; ExtendedPictographic #	[⚬-⚯]	MEDIUM SMALL WHITE CIRCLE .. UNMARRIED PARTNERSHIP SYMBOL
+U+26B2..U+26BC	; ExtendedPictographic #	[⚲-⚼]	NEUTER .. SESQUIQUADRATE
+U+26BF..U+26C3	; ExtendedPictographic #	[⚿-⛃]	SQUARED KEY .. BLACK DRAUGHTS KING
+U+26C6..U+26C7	; ExtendedPictographic #	[⛆⛇]	RAIN .. BLACK SNOWMAN
+U+26C9..U+26CD	; ExtendedPictographic #	[⛉-⛍]	TURNED WHITE SHOGI PIECE .. DISABLED CAR
+U+26D0	; ExtendedPictographic #	[⛐]	CAR SLIDING
+U+26D2	; ExtendedPictographic #	[⛒]	CIRCLED CROSSING LANES
+U+26D5..U+26E8	; ExtendedPictographic #	[⛕-⛨]	ALTERNATE ONE-WAY LEFT WAY TRAFFIC .. BLACK CROSS ON SHIELD
+U+26EB..U+26EF	; ExtendedPictographic #	[⛫-⛯]	CASTLE .. MAP SYMBOL FOR LIGHTHOUSE
+U+26F6	; ExtendedPictographic #	[⛶]	SQUARE FOUR CORNERS
+U+26FB..U+26FC	; ExtendedPictographic #	[⛻⛼]	JAPANESE BANK SYMBOL .. HEADSTONE GRAVEYARD SYMBOL
+U+26FE..U+26FF	; ExtendedPictographic #	[⛾⛿]	CUP ON BLACK SQUARE .. WHITE FLAG WITH HORIZONTAL MIDDLE BLACK STRIPE
+# count=177
+
+# Miscellaneous_Technical
+# emoji=18	: [⌚⌛⌨⏏⏩-⏳⏸-⏺]
+# EP=1	: [⎈]
+# other=237	: [⌀-⌙⌜-⌧〈-⎇⎉-⏎⏐-⏨⏴-⏷⏻-⏿]
+
+U+2388	; ExtendedPictographic #	[⎈]	HELM SYMBOL
+# count=1
+
+# No_Block
+# EP=1534	: [🨀-🿽]
+
+U+1FA00..U+1FFFD	; ExtendedPictographic #	GC=Cn
+# count=1534
+
+# Playing_Cards
+# emoji=1	: [🃏]
+# EP=96	: [🂠-🃿]
+
+U+1F0A0..U+1F0AE	; ExtendedPictographic #	[🂠-🂮]	PLAYING CARD BACK .. PLAYING CARD KING OF SPADES
+U+1F0B1..U+1F0BF	; ExtendedPictographic #	[🂱-🂿]	PLAYING CARD ACE OF HEARTS .. PLAYING CARD RED JOKER
+U+1F0C1..U+1F0CF	; ExtendedPictographic #	[🃁-🃏]	PLAYING CARD ACE OF DIAMONDS .. PLAYING CARD BLACK JOKER
+U+1F0D1..U+1F0F5	; ExtendedPictographic #	[🃑-🃵]	PLAYING CARD ACE OF CLUBS .. PLAYING CARD TRUMP-21
+U+1F0AF..U+1F0B0	; ExtendedPictographic #	GC=Cn
+U+1F0C0	; ExtendedPictographic #	GC=Cn
+U+1F0D0	; ExtendedPictographic #	GC=Cn
+U+1F0F6..U+1F0FF	; ExtendedPictographic #	GC=Cn
+# count=96
+
+# General_Punctuation
+# emoji=2	: [‼⁉]
+# other=109	: [ -※‽-⁈⁊-⁤⁦-⁯]
+
+# Supplemental_Arrows_B
+# emoji=2	: [⤴⤵]
+# other=126	: [⤀-⤳⤶-⥿]
+
+# Supplemental_Arrows_C
+# EP=108	: [🠌-🠏🡈-🡏🡚-🡟🢈-🢏🢮-🣿]
+# other=148	: [🠀-🠋🠐-🡇🡐-🡙🡠-🢇🢐-🢭]
+
+U+1F80C..U+1F80F	; ExtendedPictographic #	GC=Cn
+U+1F848..U+1F84F	; ExtendedPictographic #	GC=Cn
+U+1F85A..U+1F85F	; ExtendedPictographic #	GC=Cn
+U+1F888..U+1F88F	; ExtendedPictographic #	GC=Cn
+U+1F8AE..U+1F8FF	; ExtendedPictographic #	GC=Cn
+# count=108
+
+# Supplemental_Symbols_And_Pictographs
+# emoji=134	: [🤐-🤺🤼-🤾🥀-🥅🥇-🥌🥐-🥫🦀-🦗🧀🧐-🧦]
+# EP=174	: [🤀-🤏🤟🤨-🤯🤱🤲🤿🥌-🥏🥟-🥿🦒-🦿🧁-🧿]
+# other=2	: [🤻🥆]
+
+U+1F900..U+1F90B	; ExtendedPictographic #	[🤀-🤋]	CIRCLED CROSS FORMEE WITH FOUR DOTS .. DOWNWARD FACING NOTCHED HOOK WITH DOT
+U+1F91F	; ExtendedPictographic #	[🤟]	I LOVE YOU HAND SIGN
+U+1F928..U+1F92F	; ExtendedPictographic #	[🤨-🤯]	FACE WITH ONE EYEBROW RAISED .. SHOCKED FACE WITH EXPLODING HEAD
+U+1F931..U+1F932	; ExtendedPictographic #	[🤱🤲]	BREAST-FEEDING .. PALMS UP TOGETHER
+U+1F94C	; ExtendedPictographic #	[🥌]	CURLING STONE
+U+1F95F..U+1F96B	; ExtendedPictographic #	[🥟-🥫]	DUMPLING .. CANNED FOOD
+U+1F992..U+1F997	; ExtendedPictographic #	[🦒-🦗]	GIRAFFE FACE .. CRICKET
+U+1F9D0..U+1F9E6	; ExtendedPictographic #	[🧐-🧦]	FACE WITH MONOCLE .. SOCKS
+U+1F90C..U+1F90F	; ExtendedPictographic #	GC=Cn
+U+1F93F	; ExtendedPictographic #	GC=Cn
+U+1F94D..U+1F94F	; ExtendedPictographic #	GC=Cn
+U+1F96C..U+1F97F	; ExtendedPictographic #	GC=Cn
+U+1F998..U+1F9BF	; ExtendedPictographic #	GC=Cn
+U+1F9C1..U+1F9CF	; ExtendedPictographic #	GC=Cn
+U+1F9E7..U+1F9FF	; ExtendedPictographic #	GC=Cn
+# count=174
+
+# Transport_And_Map_Symbols
+# emoji=94	: [🚀-🛅🛋-🛒🛠-🛥🛩🛫🛬🛰🛳-🛸]
+# EP=36	: [🛆-🛊🛓-🛟🛦-🛨🛪🛭-🛯🛱🛲🛷-🛿]
+
+U+1F6C6..U+1F6CA	; ExtendedPictographic #	[🛆-🛊]	TRIANGLE WITH ROUNDED CORNERS .. GIRLS SYMBOL
+U+1F6D3..U+1F6D4	; ExtendedPictographic #	[🛓🛔]	STUPA .. PAGODA
+U+1F6E6..U+1F6E8	; ExtendedPictographic #	[🛦-🛨]	UP-POINTING MILITARY AIRPLANE .. UP-POINTING SMALL AIRPLANE
+U+1F6EA	; ExtendedPictographic #	[🛪]	NORTHEAST-POINTING AIRPLANE
+U+1F6F1..U+1F6F2	; ExtendedPictographic #	[🛱🛲]	ONCOMING FIRE ENGINE .. DIESEL LOCOMOTIVE
+U+1F6F7..U+1F6F8	; ExtendedPictographic #	[🛷🛸]	SLED .. FLYING SAUCER
+U+1F6D5..U+1F6DF	; ExtendedPictographic #	GC=Cn
+U+1F6ED..U+1F6EF	; ExtendedPictographic #	GC=Cn
+U+1F6F9..U+1F6FF	; ExtendedPictographic #	GC=Cn
+# count=36
+
+# total_count=2744
+# EOF
