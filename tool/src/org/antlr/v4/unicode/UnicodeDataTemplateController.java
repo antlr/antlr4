@@ -76,6 +76,7 @@ public abstract class UnicodeDataTemplateController {
 		addUnicodeBinaryPropertyCodesToCodePointRanges(propertyCodePointRanges);
 		addUnicodeIntPropertyCodesToCodePointRanges(propertyCodePointRanges);
 		addTR35ExtendedPictographicPropertyCodesToCodePointRanges(propertyCodePointRanges);
+		addEmojiPresentationPropertyCodesToCodePointRanges(propertyCodePointRanges);
 
 		Map<String, String> propertyAliases = new LinkedHashMap<>();
 		addUnicodeCategoryCodesToNames(propertyAliases);
@@ -348,6 +349,23 @@ public abstract class UnicodeDataTemplateController {
 		addUnicodeSetToIntervalSet(emojiNRKUnicodeSet, emojiNRKIntervalSet);
 		propertyCodePointRanges.put("EmojiNRK", emojiNRKIntervalSet);
 	}
+
+	private static void addEmojiPresentationPropertyCodesToCodePointRanges(Map<String, IntervalSet> propertyCodePointRanges) {
+		UnicodeSet emojiDefaultUnicodeSet = new UnicodeSet("[[\\p{Emoji=Yes}]&[\\p{Emoji_Presentation=Yes}]]");
+		IntervalSet emojiDefaultIntervalSet = new IntervalSet();
+		addUnicodeSetToIntervalSet(emojiDefaultUnicodeSet, emojiDefaultIntervalSet);
+		propertyCodePointRanges.put("EmojiPresentation=EmojiDefault", emojiDefaultIntervalSet);
+
+		UnicodeSet textDefaultUnicodeSet = new UnicodeSet("[[\\p{Emoji=Yes}]&[\\p{Emoji_Presentation=No}]]");
+		IntervalSet textDefaultIntervalSet = new IntervalSet();
+		addUnicodeSetToIntervalSet(textDefaultUnicodeSet, textDefaultIntervalSet);
+		propertyCodePointRanges.put("EmojiPresentation=TextDefault", textDefaultIntervalSet);
+
+		UnicodeSet textUnicodeSet = new UnicodeSet("[\\p{Emoji=No}]");
+		IntervalSet textIntervalSet = new IntervalSet();
+		addUnicodeSetToIntervalSet(textUnicodeSet, textIntervalSet);
+		propertyCodePointRanges.put("EmojiPresentation=Text", textIntervalSet);
+        }
 
 	private static void addIntPropertyAliases(int property, String namePrefix, Map<String, String> propertyAliases) {
 		String propertyName = getShortPropertyName(property);
