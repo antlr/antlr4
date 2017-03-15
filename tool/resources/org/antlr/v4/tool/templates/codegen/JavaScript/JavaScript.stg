@@ -530,7 +530,7 @@ else {
 
 Wildcard(w) ::= <<
 this.state = <w.stateNumber>;
-<if(w.labels)><w.labels:{l | <labelref(l)> = }><endif>matchWildcard();
+<if(w.labels)><w.labels:{l | <labelref(l)> = }><endif>this.matchWildcard();
 >>
 
 // ACTION STUFF
