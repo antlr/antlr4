@@ -17,7 +17,12 @@ import org.stringtemplate.v4.STGroupFile;
 import org.stringtemplate.v4.StringRenderer;
 import org.stringtemplate.v4.misc.STMessage;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 public class CSharpTarget extends Target {
+	private final Set<String> badWords = new HashSet<String>(2);
 
 	public CSharpTarget(CodeGenerator gen) {
 		super(gen, "CSharp");
@@ -26,10 +31,23 @@ public class CSharpTarget extends Target {
 		targetCharValueEscape[0x000B] = "\\v";
 	}
 
-    @Override
-    public String getVersion() {
+	@Override
+	public String getVersion() {
         return "4.7";
     }
+
+	public Set<String> getBadWords() {
+		if (badWords.isEmpty()) {
+			addBadWords();
+		}
+
+		return badWords;
+	}
+
+	protected void addBadWords() {
+		badWords.add("default");
+		badWords.add("values");
+	}
 
 	@Override
 	public String encodeIntAsCharEscape(int v) {
@@ -53,7 +71,7 @@ public class CSharpTarget extends Target {
 
 	@Override
 	protected boolean visibleGrammarSymbolCausesIssueInGeneratedCode(GrammarAST idNode) {
-		return false;
+		return getBadWords().contains(idNode.getText());
 	}
 
 	@Override
