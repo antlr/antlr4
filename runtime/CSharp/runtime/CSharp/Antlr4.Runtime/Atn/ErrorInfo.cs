@@ -33,7 +33,7 @@ namespace Antlr4.Runtime.Atn
         /// <param name="state">
         /// The final simulator state reached during prediction
         /// prior to reaching the
-        /// <see cref="ATNSimulator.Error"/>
+        /// <see cref="ATNSimulator.ERROR"/>
         /// state
         /// </param>
         /// <param name="input">The input token stream</param>

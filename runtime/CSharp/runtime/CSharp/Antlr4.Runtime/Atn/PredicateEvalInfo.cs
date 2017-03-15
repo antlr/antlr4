@@ -16,7 +16,7 @@ namespace Antlr4.Runtime.Atn
     /// This class represents profiling event information for semantic predicate
     /// evaluations which occur during prediction.
     /// </remarks>
-    /// <seealso cref="ParserATNSimulator.EvalSemanticContext(Antlr4.Runtime.Dfa.DFAState.PredPrediction[], Antlr4.Runtime.ParserRuleContext, bool)"/>
+    /// <seealso cref="ParserATNSimulator.EvalSemanticContext(Dfa.PredPrediction[], ParserRuleContext, bool)"/>
     /// <since>4.3</since>
     public class PredicateEvalInfo : DecisionEventInfo
     {
@@ -68,7 +68,7 @@ namespace Antlr4.Runtime.Atn
         /// <see cref="predictedAlt"/>
         /// for more information.
         /// </param>
-        /// <seealso cref="ParserATNSimulator.EvalSemanticContext(SemanticContext, ParserRuleContext, int)"/>
+        /// <seealso cref="ParserATNSimulator.EvalSemanticContext(SemanticContext, ParserRuleContext, int, bool)"/>
         /// <seealso cref="SemanticContext.Eval"/>
         public PredicateEvalInfo(SimulatorState state, int decision, ITokenStream input, int startIndex, int stopIndex, SemanticContext semctx, bool evalResult, int predictedAlt)
             : base(decision, state, input, startIndex, stopIndex, state.useContext)

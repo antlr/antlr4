@@ -27,8 +27,8 @@ namespace Antlr4.Runtime.Atn
         /// the rule index of a precedence rule for which this transition is
         /// returning from, where the precedence value is 0; otherwise, -1.
         /// </returns>
-        /// <seealso cref="ATNConfig.PrecedenceFilterSuppressed()"/>
-        /// <seealso cref="ParserATNSimulator.ApplyPrecedenceFilter(ATNConfigSet, Antlr4.Runtime.ParserRuleContext, PredictionContextCache)"/>
+        /// <seealso cref="ATNConfig.IsPrecedenceFilterSuppressed"/>
+        /// <seealso cref="ParserATNSimulator.ApplyPrecedenceFilter(ATNConfigSet)"/>
         /// <since>4.4.1</since>
         public int OutermostPrecedenceReturn
         {
