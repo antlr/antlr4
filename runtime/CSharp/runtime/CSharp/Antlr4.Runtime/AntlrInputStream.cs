@@ -287,7 +287,7 @@ namespace Antlr4.Runtime
 
     /// <summary>
     /// Alternative to
-    /// <see cref="ANTLRInputStream"/>
+    /// <see cref="AntlrInputStream"/>
     /// which treats the input as a series of Unicode code points,
     /// instead of a series of UTF-16 code units.
     ///

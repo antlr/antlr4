@@ -583,7 +583,7 @@ namespace Antlr4.Runtime.Atn
         /// <see cref="StarLoopEntryState"/>
         /// states in the specified ATN to set
         /// the
-        /// <see cref="StarLoopEntryState.precedenceRuleDecision"/>
+        /// <see cref="StarLoopEntryState.isPrecedenceDecision"/>
         /// field to the
         /// correct value.
         /// </summary>

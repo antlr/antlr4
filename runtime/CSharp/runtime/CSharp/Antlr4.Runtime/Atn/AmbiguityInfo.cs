@@ -20,7 +20,7 @@ namespace Antlr4.Runtime.Atn
     /// determine that the SLL conflict is truly an ambiguity. For example, if none
     /// of the ATN configurations in the conflicting SLL configuration set have
     /// traversed a global follow transition (i.e.
-    /// <see cref="ATNConfig.ReachesIntoOuterContext()"/>
+    /// <see cref="ATNConfig.reachesIntoOuterContext"/>
     /// is
     /// <see langword="false"/>
     /// for all
