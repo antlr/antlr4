@@ -10,6 +10,6 @@
 using namespace antlr4;
 
 InputMismatchException::InputMismatchException(Parser *recognizer)
-  : RecognitionException("Input mismatch", recognizer, recognizer->getInputStream(), recognizer->getContext(),
+  : RecognitionException(recognizer, recognizer->getInputStream(), recognizer->getContext(),
                          recognizer->getCurrentToken()) {
 }
