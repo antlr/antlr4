@@ -82,7 +82,7 @@ Make sure to use two-stage parsing. See example in [bug report](https://github.c
 
 ```Java
 
-CharStream input = new ANTLRFileStream(args[0]);
+CharStream input = CharStreams.fromPath(Paths.get(args[0]));
 ExprLexer lexer = new ExprLexer(input);
 CommonTokenStream tokens = new CommonTokenStream(lexer);
 ExprParser parser = new ExprParser(tokens);

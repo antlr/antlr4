@@ -30,7 +30,7 @@ public static ParseTree parse(String fileName,
     throws IOException
 {
     final Grammar g = Grammar.load(combinedGrammarFileName);
-    LexerInterpreter lexEngine = g.createLexerInterpreter(new ANTLRFileStream(fileName));
+    LexerInterpreter lexEngine = g.createLexerInterpreter(CharStreams.fromPath(Paths.get(fileName)));
     CommonTokenStream tokens = new CommonTokenStream(lexEngine);
     ParserInterpreter parser = g.createParserInterpreter(tokens);
     ParseTree t = parser.parse(g.getRule(startRule).index);
@@ -58,7 +58,7 @@ public static ParseTree parse(String fileNameToParse,
 {
     final LexerGrammar lg = (LexerGrammar) Grammar.load(lexerGrammarFileName);
     final Grammar pg = Grammar.load(parserGrammarFileName, lg);
-    ANTLRFileStream input = new ANTLRFileStream(fileNameToParse);
+    CharStream input = CharStreams.fromPath(Paths.get(fileNameToParse));
     LexerInterpreter lexEngine = lg.createLexerInterpreter(input);
     CommonTokenStream tokens = new CommonTokenStream(lexEngine);
     ParserInterpreter parser = pg.createParserInterpreter(tokens);
