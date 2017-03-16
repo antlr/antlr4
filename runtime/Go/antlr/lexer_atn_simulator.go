@@ -119,7 +119,7 @@ func (l *LexerATNSimulator) MatchATN(input CharStream) int {
 	next := l.addDFAState(s0Closure)
 
 	if !suppressEdge {
-		l.decisionToDFA[l.mode].s0 = next
+		l.decisionToDFA[l.mode].setS0(next)
 	}
 
 	predict := l.execATN(input, next)
@@ -584,15 +584,15 @@ func (l *LexerATNSimulator) addDFAState(configs ATNConfigSet) *DFAState {
 	}
 	hash := proposed.hash()
 	dfa := l.decisionToDFA[l.mode]
-	existing := dfa.GetStates()[hash]
-	if existing != nil {
+	existing, ok := dfa.getState(hash)
+	if ok {
 		return existing
 	}
 	newState := proposed
-	newState.stateNumber = len(dfa.GetStates())
+	newState.stateNumber = dfa.numStates()
 	configs.SetReadOnly(true)
 	newState.configs = configs
-	dfa.GetStates()[hash] = newState
+	dfa.setState(hash, newState)
 	return newState
 }
 

@@ -686,7 +686,7 @@ func (p *BaseParser) GetDFAStrings() string {
 func (p *BaseParser) DumpDFA() {
 	seenOne := false
 	for _, dfa := range p.Interpreter.decisionToDFA {
-		if len(dfa.GetStates()) > 0 {
+		if dfa.numStates() > 0 {
 			if seenOne {
 				fmt.Println()
 			}
