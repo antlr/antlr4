@@ -7,10 +7,8 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.test.runtime.java.api.JavaLexer;
 
-import java.io.File;
 import java.net.URL;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -144,29 +142,6 @@ public class TimeLexerSpeed { // don't call it Test else it'll run during "mvn t
 		Arrays.sort(times);
 		times = Arrays.copyOfRange(times, 0, times.length-(int)(n*.2)); // drop highest 20% of times
 		return avg(times);
-	}
-
-	public static List<String> getFilenames(File f, String inputFilePattern) throws Exception {
-		List<String> files = new ArrayList<String>();
-		getFilenames_(f, files, inputFilePattern);
-		return files;
-	}
-
-	public static void getFilenames_(File f, List<String> files, String inputFilePattern) throws Exception {
-		// If this is a directory, walk each file/dir in that directory
-		if (f.isDirectory()) {
-			String flist[] = f.list();
-			for(int i=0; i < flist.length; i++) {
-				getFilenames_(new File(f, flist[i]), files, inputFilePattern);
-			}
-		}
-
-		// otherwise, if this is an input file, parse it!
-		else if ( inputFilePattern==null || f.getName().matches(inputFilePattern) &&
-			f.getName().indexOf('-')<0 ) // don't allow preprocessor files like ByteBufferAs-X-Buffer.java
-		{
-			files.add(f.getAbsolutePath());
-		}
 	}
 
 	public double avg(long[] values) {
