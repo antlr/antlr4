@@ -17,20 +17,22 @@ import java.util.List;
  *
  *  Sample output on OS X with 4 GHz Intel Core i7 (us == microseconds, 1/1000 of a millisecond)
  *
-	 legacy_java_ascii average time   387us over 1500 runs of 29038 symbols
-	 legacy_java_ascii average time   827us over 1500 runs of 29038 symbols DFA cleared
-	     new_java_utf8 average time   512us over 1500 runs of 29038 symbols
-	     new_java_utf8 average time  1066us over 1500 runs of 29038 symbols DFA cleared
-  legacy_grapheme_utf8 average time  6879us over  500 runs of  6614 symbols from udhr_kor.txt
-  legacy_grapheme_utf8 average time  7031us over  500 runs of  6614 symbols from udhr_kor.txt DFA cleared
-  legacy_grapheme_utf8 average time  6071us over  500 runs of 13379 symbols from udhr_hin.txt
-  legacy_grapheme_utf8 average time  6072us over  500 runs of 13379 symbols from udhr_hin.txt DFA cleared
-	 new_grapheme_utf8 average time  6998us over  500 runs of  6614 symbols from udhr_kor.txt
-	 new_grapheme_utf8 average time  7155us over  500 runs of  6614 symbols from udhr_kor.txt DFA cleared
-	 new_grapheme_utf8 average time  6200us over  500 runs of 13379 symbols from udhr_hin.txt
-	 new_grapheme_utf8 average time  6228us over  500 runs of 13379 symbols from udhr_hin.txt DFA cleared
-	 new_grapheme_utf8 average time    99us over  500 runs of    85 symbols from emoji.txt
-	 new_grapheme_utf8 average time   111us over  500 runs of    85 symbols from emoji.txt DFA cleared
+	 legacy_java_ascii average time   336us over 1500 runs of 29038 symbols
+	 legacy_java_ascii average time   828us over 1500 runs of 29038 symbols DFA cleared
+	  legacy_java_utf8 average time   281us over 1500 runs of 29038 symbols
+	  legacy_java_utf8 average time   815us over 1500 runs of 29038 symbols DFA cleared
+	     new_java_utf8 average time   538us over 1500 runs of 29038 symbols
+	     new_java_utf8 average time  1074us over 1500 runs of 29038 symbols DFA cleared
+  legacy_grapheme_utf8 average time  6812us over  500 runs of  6614 symbols from udhr_kor.txt
+  legacy_grapheme_utf8 average time  7046us over  500 runs of  6614 symbols from udhr_kor.txt DFA cleared
+  legacy_grapheme_utf8 average time  6190us over  500 runs of 13379 symbols from udhr_hin.txt
+  legacy_grapheme_utf8 average time  6379us over  500 runs of 13379 symbols from udhr_hin.txt DFA cleared
+	 new_grapheme_utf8 average time  6898us over  500 runs of  6614 symbols from udhr_kor.txt
+	 new_grapheme_utf8 average time  7033us over  500 runs of  6614 symbols from udhr_kor.txt DFA cleared
+	 new_grapheme_utf8 average time  6606us over  500 runs of 13379 symbols from udhr_hin.txt
+	 new_grapheme_utf8 average time  6651us over  500 runs of 13379 symbols from udhr_hin.txt DFA cleared
+	 new_grapheme_utf8 average time   101us over  500 runs of    85 symbols from emoji.txt
+	 new_grapheme_utf8 average time   113us over  500 runs of    85 symbols from emoji.txt DFA cleared
  *
  *  The "DFA cleared" indicates that the lexer was returned to initial conditions
  *  before the tokenizing of each file.  As the ALL(*) lexer encounters new input,
@@ -48,6 +50,8 @@ public class TimeLexerSpeed { // don't call it Test else it'll run during "mvn t
 		int n = 1500;
 		tests.legacy_java_ascii(n, false);
 		tests.legacy_java_ascii(n, true);
+		tests.legacy_java_utf8(n, false);
+		tests.legacy_java_utf8(n, true);
 		tests.new_java_utf8(n, false);
 		tests.new_java_utf8(n, true);
 
@@ -80,6 +84,20 @@ public class TimeLexerSpeed { // don't call it Test else it'll run during "mvn t
 		                  clearLexerDFACache ? " DFA cleared" : "");
 	}
 
+	public void legacy_java_utf8(int n, boolean clearLexerDFACache) throws Exception {
+		URL sampleJavaFile = TimeLexerSpeed.class.getClassLoader().getResource(Parser_java_file);
+		CharStream input = new ANTLRFileStream(sampleJavaFile.getFile(), "UTF-8");
+		JavaLexer lexer = new JavaLexer(input);
+		double avg = tokenize(lexer, n, clearLexerDFACache);
+		String currentMethodName = new Exception().getStackTrace()[0].getMethodName();
+		System.out.printf("%25s average time %5dus over %4d runs of %5d symbols%s\n",
+		                  currentMethodName,
+		                  (int)avg,
+		                  n,
+		                  input.size(),
+		                  clearLexerDFACache ? " DFA cleared" : "");
+	}
+
 	public void new_java_utf8(int n, boolean clearLexerDFACache) throws Exception {
 		URL sampleJavaFile = TimeLexerSpeed.class.getClassLoader().getResource(Parser_java_file);
 		CharStream input = CharStreams.fromPath(Paths.get(sampleJavaFile.getFile()));
@@ -96,7 +114,7 @@ public class TimeLexerSpeed { // don't call it Test else it'll run during "mvn t
 
 	public void legacy_grapheme_utf8(String fileName, int n, boolean clearLexerDFACache) throws Exception {
 		URL sampleJavaFile = TimeLexerSpeed.class.getClassLoader().getResource(PerfDir+"/"+fileName);
-		CharStream input = new ANTLRFileStream(sampleJavaFile.getFile());
+		CharStream input = new ANTLRFileStream(sampleJavaFile.getFile(), "UTF-8");
 		graphemesLexer lexer = new graphemesLexer(input);
 		double avg = tokenize(lexer, n, clearLexerDFACache);
 		String currentMethodName = new Exception().getStackTrace()[0].getMethodName();
