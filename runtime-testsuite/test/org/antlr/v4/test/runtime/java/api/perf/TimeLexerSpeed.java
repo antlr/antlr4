@@ -8,6 +8,7 @@ import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.test.runtime.java.api.JavaLexer;
 
 import java.net.URL;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
@@ -18,28 +19,30 @@ import java.util.List;
  *
  *  Sample output on OS X with 4 GHz Intel Core i7 (us == microseconds, 1/1000 of a millisecond):
  *
- Warming up Java compiler...
-    load_legacy_java_ascii average time    52us over 3500 loads of 29038 symbols
-     load_legacy_java_utf8 average time    40us over 3500 loads of 29038 symbols
-        load_new_java_utf8 average time   192us over 3500 loads of 29038 symbols
+ Warming up Java compiler....
+    load_legacy_java_ascii average time    53us over 3500 loads of 29038 symbols from Parser.java
+     load_legacy_java_utf8 average time    42us over 3500 loads of 29038 symbols from Parser.java
+     load_legacy_java_utf8 average time   121us over 3500 loads of 13379 symbols from udhr_hin.txt
+             load_new_utf8 average time   193us over 3500 loads of 29038 symbols from Parser.java
+             load_new_utf8 average time   199us over 3500 loads of 13379 symbols from udhr_hin.txt
 
-     lex_legacy_java_ascii average time   348us over 2000 runs of 29038 symbols
-     lex_legacy_java_ascii average time   880us over 2000 runs of 29038 symbols DFA cleared
-      lex_legacy_java_utf8 average time   348us over 2000 runs of 29038 symbols
-      lex_legacy_java_utf8 average time   890us over 2000 runs of 29038 symbols DFA cleared
-         lex_new_java_utf8 average time   386us over 2000 runs of 29038 symbols
-         lex_new_java_utf8 average time   910us over 2000 runs of 29038 symbols DFA cleared
+     lex_legacy_java_ascii average time   399us over 2000 runs of 29038 symbols
+     lex_legacy_java_ascii average time   918us over 2000 runs of 29038 symbols DFA cleared
+      lex_legacy_java_utf8 average time   377us over 2000 runs of 29038 symbols
+      lex_legacy_java_utf8 average time   925us over 2000 runs of 29038 symbols DFA cleared
+         lex_new_java_utf8 average time   460us over 2000 runs of 29038 symbols
+         lex_new_java_utf8 average time   989us over 2000 runs of 29038 symbols DFA cleared
 
-  lex_legacy_grapheme_utf8 average time  6903us over  400 runs of  6614 symbols from udhr_kor.txt
-  lex_legacy_grapheme_utf8 average time  7108us over  400 runs of  6614 symbols from udhr_kor.txt DFA cleared
-  lex_legacy_grapheme_utf8 average time  5980us over  400 runs of 13379 symbols from udhr_hin.txt
-  lex_legacy_grapheme_utf8 average time  6056us over  400 runs of 13379 symbols from udhr_hin.txt DFA cleared
-     lex_new_grapheme_utf8 average time  6966us over  400 runs of  6614 symbols from udhr_kor.txt
-     lex_new_grapheme_utf8 average time  7077us over  400 runs of  6614 symbols from udhr_kor.txt DFA cleared
-     lex_new_grapheme_utf8 average time  6072us over  400 runs of 13379 symbols from udhr_hin.txt
-     lex_new_grapheme_utf8 average time  6103us over  400 runs of 13379 symbols from udhr_hin.txt DFA cleared
-     lex_new_grapheme_utf8 average time   100us over  400 runs of    85 symbols from emoji.txt
-     lex_new_grapheme_utf8 average time   110us over  400 runs of    85 symbols from emoji.txt DFA cleared
+  lex_legacy_grapheme_utf8 average time  6862us over  400 runs of  6614 symbols from udhr_kor.txt
+  lex_legacy_grapheme_utf8 average time  7023us over  400 runs of  6614 symbols from udhr_kor.txt DFA cleared
+  lex_legacy_grapheme_utf8 average time  6290us over  400 runs of 13379 symbols from udhr_hin.txt
+  lex_legacy_grapheme_utf8 average time  6238us over  400 runs of 13379 symbols from udhr_hin.txt DFA cleared
+     lex_new_grapheme_utf8 average time  6863us over  400 runs of  6614 symbols from udhr_kor.txt
+     lex_new_grapheme_utf8 average time  7014us over  400 runs of  6614 symbols from udhr_kor.txt DFA cleared
+     lex_new_grapheme_utf8 average time  6187us over  400 runs of 13379 symbols from udhr_hin.txt
+     lex_new_grapheme_utf8 average time  6284us over  400 runs of 13379 symbols from udhr_hin.txt DFA cleared
+     lex_new_grapheme_utf8 average time    99us over  400 runs of    85 symbols from emoji.txt
+     lex_new_grapheme_utf8 average time   111us over  400 runs of    85 symbols from emoji.txt DFA cleared
  *
  *  The "DFA cleared" indicates that the lexer was returned to initial conditions
  *  before the tokenizing of each file.  As the ALL(*) lexer encounters new input,
@@ -68,9 +71,13 @@ public class TimeLexerSpeed { // don't call it Test else it'll run during "mvn t
 		tests.compilerWarmUp(100);
 
 		int n = 3500;
+		URL sampleJavaFile = TimeLexerSpeed.class.getClassLoader().getResource(Parser_java_file);
+		URL sampleFile = TimeLexerSpeed.class.getClassLoader().getResource(PerfDir+"/udhr_hin.txt");
 		tests.load_legacy_java_ascii(n);
-		tests.load_legacy_java_utf8(n);
-		tests.load_new_java_utf8(n);
+		tests.load_legacy_java_utf8(sampleJavaFile.getFile(), n);
+		tests.load_legacy_java_utf8(sampleFile.getFile(), n);
+		tests.load_new_utf8(sampleJavaFile.getFile(), n);
+		tests.load_new_utf8(sampleFile.getFile(), n);
 		System.out.println();
 
 		n = 2000;
@@ -104,6 +111,8 @@ public class TimeLexerSpeed { // don't call it Test else it'll run during "mvn t
 		System.out.print('.');
 		lex_legacy_java_utf8(n, false);
 		System.out.print('.');
+		lex_legacy_java_ascii(n, false);
+		System.out.print('.');
 		lex_legacy_grapheme_utf8("udhr_hin.txt", n, false);
 		System.out.print('.');
 		lex_new_grapheme_utf8("udhr_hin.txt", n, false);
@@ -122,47 +131,48 @@ public class TimeLexerSpeed { // don't call it Test else it'll run during "mvn t
 		long tus = (stop-start)/1000;
 		int size = input.size();
 		String currentMethodName = new Exception().getStackTrace()[0].getMethodName();
-		if ( output ) System.out.printf("%25s average time %5dus over %4d loads of %5d symbols\n",
+		if ( output ) System.out.printf("%25s average time %5dus over %4d loads of %5d symbols from %s\n",
 		                                currentMethodName,
 		                                tus/n,
 		                                n,
-		                                size);
+		                                size,
+		                                basename(sampleJavaFile.getFile()));
 	}
 
-	public void load_legacy_java_utf8(int n) throws Exception {
-		URL sampleJavaFile = TimeLexerSpeed.class.getClassLoader().getResource(Parser_java_file);
+	public void load_legacy_java_utf8(String fileName, int n) throws Exception {
 		long start = System.nanoTime();
 		CharStream input = null;
 		for (int i = 0; i<n; i++) {
-			input = new ANTLRFileStream(sampleJavaFile.getFile(), "UTF-8");
+			input = new ANTLRFileStream(fileName, "UTF-8");
 		}
 		long stop = System.nanoTime();
 		long tus = (stop-start)/1000;
 		int size = input.size();
 		String currentMethodName = new Exception().getStackTrace()[0].getMethodName();
-		if ( output ) System.out.printf("%25s average time %5dus over %4d loads of %5d symbols\n",
+		if ( output ) System.out.printf("%25s average time %5dus over %4d loads of %5d symbols from %s\n",
 		                                currentMethodName,
 		                                tus/n,
 		                                n,
-		                                size);
+		                                size,
+		                                basename(fileName));
 	}
 
-	public void load_new_java_utf8(int n) throws Exception {
-		URL sampleJavaFile = TimeLexerSpeed.class.getClassLoader().getResource(Parser_java_file);
+	public void load_new_utf8(String fileName, int n) throws Exception {
 		long start = System.nanoTime();
 		CharStream input = null;
 		for (int i = 0; i<n; i++) {
-			input = CharStreams.fromPath(Paths.get(sampleJavaFile.getFile()));
+			input = CharStreams.fromFileName(fileName);
 		}
 		long stop = System.nanoTime();
 		long tus = (stop-start)/1000;
 		int size = input.size();
 		String currentMethodName = new Exception().getStackTrace()[0].getMethodName();
-		if ( output ) System.out.printf("%25s average time %5dus over %4d loads of %5d symbols\n",
+		if ( output ) System.out.printf("%25s average time %5dus over %4d loads of %5d symbols from %s\n",
 		                                currentMethodName,
 		                                tus/n,
 		                                n,
-		                                size);
+		                                size,
+		                                basename(fileName));
 	}
 
 	public void lex_legacy_java_ascii(int n, boolean clearLexerDFACache) throws Exception {
@@ -208,8 +218,8 @@ public class TimeLexerSpeed { // don't call it Test else it'll run during "mvn t
 	}
 
 	public void lex_legacy_grapheme_utf8(String fileName, int n, boolean clearLexerDFACache) throws Exception {
-		URL sampleJavaFile = TimeLexerSpeed.class.getClassLoader().getResource(PerfDir+"/"+fileName);
-		CharStream input = new ANTLRFileStream(sampleJavaFile.getFile(), "UTF-8");
+		URL sampleFile = TimeLexerSpeed.class.getClassLoader().getResource(PerfDir+"/"+fileName);
+		CharStream input = new ANTLRFileStream(sampleFile.getFile(), "UTF-8");
 		graphemesLexer lexer = new graphemesLexer(input);
 		double avg = tokenize(lexer, n, clearLexerDFACache);
 		String currentMethodName = new Exception().getStackTrace()[0].getMethodName();
@@ -238,6 +248,9 @@ public class TimeLexerSpeed { // don't call it Test else it'll run during "mvn t
 	}
 
 	public double tokenize(Lexer lexer, int n, boolean clearLexerDFACache) {
+		// always wipe the DFA before we begin tests so previous tests
+		// don't affect this run!
+		lexer.getInterpreter().clearDFA();
 		long[] times = new long[n];
 		for (int i = 0; i<n; i++) {
 			lexer.reset();
@@ -271,5 +284,23 @@ public class TimeLexerSpeed { // don't call it Test else it'll run during "mvn t
 			sum += (v-mean)*(v-mean);
 		}
 		return Math.sqrt(sum / (values.size() - 1));
+	}
+
+	public static String basename(String fullyQualifiedFileName) {
+		Path path = Paths.get(fullyQualifiedFileName);
+		return basename(path);
+	}
+
+	public static String dirname(String fullyQualifiedFileName) {
+		Path path = Paths.get(fullyQualifiedFileName);
+		return dirname(path);
+	}
+
+	public static String basename(Path path) {
+		return path.getName(path.getNameCount()-1).toString();
+	}
+
+	public static String dirname(Path path) {
+		return path.getName(0).toString();
 	}
 }
