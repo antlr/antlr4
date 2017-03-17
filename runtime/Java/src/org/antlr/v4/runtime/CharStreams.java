@@ -9,15 +9,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
-import java.nio.channels.Channels;
-import java.nio.channels.FileChannel;
-import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -65,7 +63,8 @@ public final class CharStreams {
 					CodingErrorAction.REPLACE,
 					path.toString());
 			}
-		} else {
+		}
+		else {
 			return new ANTLRFileStream(path.toString(), charset.toString());
 		}
 	}
@@ -99,16 +98,16 @@ public final class CharStreams {
 
 	/**
 	 * Creates a {@link CharStream} given an opened {@link InputStream}
-         * containing UTF-8 bytes.
+	 * containing UTF-8 bytes.
 	 *
 	 * Reads the entire contents of the {@code InputStream} into
 	 * the result before returning, then closes the {@code InputStream}.
 	 */
-        public static CharStream fromStream(InputStream is) throws IOException {
-                return fromStream(is, StandardCharsets.UTF_8);
-        }
+	public static CharStream fromStream(InputStream is) throws IOException {
+		return fromStream(is, StandardCharsets.UTF_8);
+	}
 
-/**
+	/**
 	 * Creates a {@link CharStream} given an opened {@link InputStream} and the
 	 * charset of the bytes contained in the stream.
 	 *
@@ -124,12 +123,13 @@ public final class CharStreams {
 		if (charset.equals(StandardCharsets.UTF_8)) {
 			try (ReadableByteChannel channel = Channels.newChannel(is)) {
 				return fromChannel(
-						channel,
-						DEFAULT_BUFFER_SIZE,
-						CodingErrorAction.REPLACE,
-						IntStream.UNKNOWN_SOURCE_NAME);
+					channel,
+					DEFAULT_BUFFER_SIZE,
+					CodingErrorAction.REPLACE,
+					IntStream.UNKNOWN_SOURCE_NAME);
 			}
-		} else {
+		}
+		else {
 			try (InputStreamReader isr = new InputStreamReader(is, charset)) {
 				return new ANTLRInputStream(isr);
 			}
@@ -162,13 +162,13 @@ public final class CharStreams {
 	public static CharStream fromChannel(ReadableByteChannel channel, Charset charset) throws IOException {
 		if (charset.equals(StandardCharsets.UTF_8)) {
 			return fromChannel(
-					channel,
-					DEFAULT_BUFFER_SIZE,
-					CodingErrorAction.REPLACE,
-					IntStream.UNKNOWN_SOURCE_NAME);
-		} else {
-			try (InputStream is = Channels.newInputStream(channel);
-			     InputStreamReader isr = new InputStreamReader(Channels.newInputStream(channel), charset)) {
+				channel,
+				DEFAULT_BUFFER_SIZE,
+				CodingErrorAction.REPLACE,
+				IntStream.UNKNOWN_SOURCE_NAME);
+		}
+		else {
+			try (InputStreamReader isr = new InputStreamReader(Channels.newInputStream(channel), charset)) {
 				return new ANTLRInputStream(isr);
 			}
 		}
@@ -205,15 +205,18 @@ public final class CharStreams {
 						codePointBuffer.put(highSurrogate);
 					}
 					highSurrogate = curCodeUnit;
-				} else if (Character.isLowSurrogate((char) curCodeUnit)) {
+				}
+				else if (Character.isLowSurrogate((char) curCodeUnit)) {
 					if (highSurrogate == -1) {
 						// Low surrogate not preceded by high surrogate.
 						codePointBuffer.put(curCodeUnit);
-					} else {
+					}
+					else {
 						codePointBuffer.put(Character.toCodePoint((char) highSurrogate, (char) curCodeUnit));
 						highSurrogate = -1;
 					}
-				} else {
+				}
+				else {
 					if (highSurrogate != -1) {
 						// Dangling high surrogate followed by a non-surrogate.
 						codePointBuffer.put(highSurrogate);
@@ -228,7 +231,8 @@ public final class CharStreams {
 			}
 			codePointBuffer.flip();
 			return new CodePointCharStream(codePointBuffer, sourceName);
-		} finally {
+		}
+		finally {
 			r.close();
 		}
 	}
@@ -273,11 +277,12 @@ public final class CharStreams {
 	 * the result before returning, then closes the {@code channel}.
 	 */
 	public static CodePointCharStream fromChannel(
-			ReadableByteChannel channel,
-			int bufferSize,
-			CodingErrorAction decodingErrorAction,
-			String sourceName
-	) throws IOException {
+		ReadableByteChannel channel,
+		int bufferSize,
+		CodingErrorAction decodingErrorAction,
+		String sourceName)
+		throws IOException
+	{
 		try {
 			ByteBuffer utf8BytesIn = ByteBuffer.allocateDirect(bufferSize);
 			IntBuffer codePointsOut = IntBuffer.allocate(bufferSize);
@@ -288,15 +293,16 @@ public final class CharStreams {
 				endOfInput = (bytesRead == -1);
 				utf8BytesIn.flip();
 				codePointsOut = decoder.decodeCodePointsFromBuffer(
-						utf8BytesIn,
-						codePointsOut,
-						endOfInput);
+					utf8BytesIn,
+					codePointsOut,
+					endOfInput);
 				utf8BytesIn.compact();
 			}
 			codePointsOut.limit(codePointsOut.position());
 			codePointsOut.flip();
 			return new CodePointCharStream(codePointsOut, sourceName);
-		} finally {
+		}
+		finally {
 			channel.close();
 		}
 	}
