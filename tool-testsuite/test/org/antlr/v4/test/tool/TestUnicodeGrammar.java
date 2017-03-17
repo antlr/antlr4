@@ -161,7 +161,7 @@ public class TestUnicodeGrammar extends BaseJavaToolTest {
 			String inputText) throws Exception {
 		Grammar grammar = new Grammar(grammarText);
 		LexerInterpreter lexEngine = grammar.createLexerInterpreter(
-				CharStreams.createWithString(inputText));
+				CharStreams.fromString(inputText));
 		CommonTokenStream tokens = new CommonTokenStream(lexEngine);
 		GrammarParserInterpreter parser = grammar.createGrammarParserInterpreter(tokens);
 		ParseTree parseTree = parser.parse(grammar.rules.get(rootRule).index);

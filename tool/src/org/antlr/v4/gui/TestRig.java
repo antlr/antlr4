@@ -26,7 +26,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -157,28 +156,12 @@ public class TestRig {
 
 		Charset charset = ( encoding == null ? Charset.defaultCharset () : Charset.forName(encoding) );
 		if ( inputFiles.size()==0 ) {
-			CharStream charStream;
-			if ( charset.equals(StandardCharsets.UTF_8)) {
-				charStream = CharStreams.createWithUTF8Stream(System.in);
-			}
-			else {
-				try ( InputStreamReader r = new InputStreamReader(System.in, charset) ) {
-					charStream = new ANTLRInputStream(r);
-				}
-			}
+			CharStream charStream = CharStreams.fromStream(System.in, charset);
 			process(lexer, parserClass, parser, charStream);
 			return;
 		}
 		for (String inputFile : inputFiles) {
-			CharStream charStream;
-			if ( charset.equals(StandardCharsets.UTF_8) ) {
-				charStream = CharStreams.createWithUTF8(Paths.get(inputFile));
-			}
-			else {
-				try ( InputStreamReader r = new InputStreamReader(System.in, charset) ) {
-					charStream = new ANTLRInputStream(r);
-				}
-			}
+	                CharStream charStream = CharStreams.fromPath(Paths.get(inputFile), charset);
 			if ( inputFiles.size()>1 ) {
 				System.err.println(inputFile);
 			}
