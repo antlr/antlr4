@@ -923,7 +923,7 @@ public class BaseJavaTest implements RuntimeTestSupport {
 			"\n" +
 			"public class Test {\n" +
 			"    public static void main(String[] args) throws Exception {\n" +
-			"        CharStream input = CharStreams.createWithUTF8(Paths.get(args[0]));\n" +
+			"        CharStream input = CharStreams.fromPath(Paths.get(args[0]));\n" +
 			"        <lexerName> lex = new <lexerName>(input);\n" +
 			"        CommonTokenStream tokens = new CommonTokenStream(lex);\n" +
 			"        <createParser>\n"+
@@ -980,7 +980,7 @@ public class BaseJavaTest implements RuntimeTestSupport {
 			"\n" +
 			"public class Test {\n" +
 			"    public static void main(String[] args) throws Exception {\n" +
-			"        CharStream input = CharStreams.createWithUTF8(Paths.get(args[0]));\n" +
+			"        CharStream input = CharStreams.fromPath(Paths.get(args[0]));\n" +
 			"        <lexerName> lex = new <lexerName>(input);\n" +
 			"        CommonTokenStream tokens = new CommonTokenStream(lex);\n" +
 			"        tokens.fill();\n" +

@@ -381,7 +381,7 @@ public class TestATNLexerInterpreter extends BaseJavaToolTest {
 
 	protected void checkLexerMatches(LexerGrammar lg, String inputString, String expecting) {
 		ATN atn = createATN(lg, true);
-		CharStream input = CharStreams.createWithString(inputString);
+		CharStream input = CharStreams.fromString(inputString);
 		ATNState startState = atn.modeNameToStartState.get("DEFAULT_MODE");
 		DOTGenerator dot = new DOTGenerator(lg);
 //		System.out.println(dot.getDOT(startState, true));
