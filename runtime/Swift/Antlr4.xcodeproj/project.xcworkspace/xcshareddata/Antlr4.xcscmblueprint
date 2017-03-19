@@ -1,0 +1,30 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "F87DC9FBC9E282B88EC1892E49DCE765631D3152",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "481D6A1A63AAA84E22CA41443AC34F2761E57E20" : 9223372036854775807,
+    "F87DC9FBC9E282B88EC1892E49DCE765631D3152" : 9223372036854775807
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "194AE0A2-18FF-4519-BB3D-2C7F6F175940",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "481D6A1A63AAA84E22CA41443AC34F2761E57E20" : "..",
+    "F87DC9FBC9E282B88EC1892E49DCE765631D3152" : "Swift\/"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "Antlr4",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "Antlr4.xcodeproj",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/hanjoes\/antlr4.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "481D6A1A63AAA84E22CA41443AC34F2761E57E20"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/hanjoes\/antlr4-swift-runtime.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "F87DC9FBC9E282B88EC1892E49DCE765631D3152"
+    }
+  ]
+}
