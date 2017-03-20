@@ -16,23 +16,22 @@ a lexer rule for a single Cyrillic character by creating a range from
 `U+0400` to `U+04FF`:
 
 ```ANTLR
-CYRILLIC = ('\u0400'..'\u04FF'); // or [\u0400-\u04FF] without quotes
+CYRILLIC : '\u0400'..'\u04FF' ; // or [\u0400-\u04FF] without quotes
 ```
 
-Unicode literals larger than U+FFFF must use the extended `\u{12345}` syntax.
-For example, to create a lexer rule for a selection of smiley faces
+Unicode literals larger than U+FFFF must use the extended `\u{12345}` syntax. For example, to create a lexer rule for a selection of smiley faces
 from the [Emoticons Unicode block](http://www.unicode.org/charts/PDF/U1F600.pdf):
 
 ```ANTLR
-EMOTICONS = ('\u{1F600}' | '\u{1F602}' | '\u{1F615}'); // or [\u{1F600}\u{1F602}\u{1F615}]
+EMOTICONS : ('\u{1F600}' | '\u{1F602}' | '\u{1F615}') ; // or [\u{1F600}\u{1F602}\u{1F615}]
 ```
 
 Finally, lexer char sets can include Unicode properties. Each Unicode code point has at least one property that describes the type group to which it belongs (e.g. alpha, number, punctuation). Other properties can be the language script or special binary properties and Unicode code blocks. That means however, that a property specifies a group of code points, hence they are only allowed in lexer char sets.
 
 ```ANTLR
-EMOJI = [\p{Emoji}];
-JAPANESE = [\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Han}];
-NOT_CYRILLIC = [\P{Script=Cyrillic}];
+EMOJI : [\p{Emoji}] ;
+JAPANESE : [\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Han}] ;
+NOT_CYRILLIC : [\P{Script=Cyrillic}] ;
 ```
 
 See [lexer-rules.md](lexer-rules.md#lexer-rule-elements) for more detail on Unicode
