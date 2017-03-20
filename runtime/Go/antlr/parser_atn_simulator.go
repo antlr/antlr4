@@ -1416,25 +1416,25 @@ func (p *ParserATNSimulator) addDFAEdge(dfa *DFA, from *DFAState, t int, to *DFA
 // state if {@code D} is already in the DFA, or {@code D} itself if the
 // state was not already present.
 //
-func (p *ParserATNSimulator) addDFAState(dfa *DFA, D *DFAState) *DFAState {
-	if D == ATNSimulatorError {
-		return D
+func (p *ParserATNSimulator) addDFAState(dfa *DFA, d *DFAState) *DFAState {
+	if d == ATNSimulatorError {
+		return d
 	}
-	hash := D.hash()
-	var existing, ok = dfa.GetStates()[hash]
+	hash := d.hash()
+	existing, ok := dfa.getState(hash)
 	if ok {
 		return existing
 	}
-	D.stateNumber = len(dfa.GetStates())
-	if !D.configs.ReadOnly() {
-		D.configs.OptimizeConfigs(p.BaseATNSimulator)
-		D.configs.SetReadOnly(true)
+	d.stateNumber = dfa.numStates()
+	if !d.configs.ReadOnly() {
+		d.configs.OptimizeConfigs(p.BaseATNSimulator)
+		d.configs.SetReadOnly(true)
 	}
-	dfa.GetStates()[hash] = D
+	dfa.setState(hash, d)
 	if ParserATNSimulatorDebug {
-		fmt.Println("adding NewDFA state: " + D.String())
+		fmt.Println("adding NewDFA state: " + d.String())
 	}
-	return D
+	return d
 }
 
 func (p *ParserATNSimulator) ReportAttemptingFullContext(dfa *DFA, conflictingAlts *BitSet, configs ATNConfigSet, startIndex, stopIndex int) {
