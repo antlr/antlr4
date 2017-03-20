@@ -11,12 +11,12 @@ or the equivalent method for your runtime's language.
 # Unicode Code Points in Lexer Grammars
 
 To refer to Unicode [code points](https://en.wikipedia.org/wiki/Code_point)
-in lexer grammars, use the `\u` string escape. For example, to create
+in lexer grammars, use the `\u` string escape plus up to 4 hex digits. For example, to create
 a lexer rule for a single Cyrillic character by creating a range from
 `U+0400` to `U+04FF`:
 
 ```ANTLR
-CYRILLIC = ('\u0400'..'\u04FF');
+CYRILLIC = ('\u0400'..'\u04FF'); // or [\u0400-\u04FF] without quotes
 ```
 
 Unicode literals larger than U+FFFF must use the extended `\u{12345}` syntax.
@@ -24,10 +24,10 @@ For example, to create a lexer rule for a selection of smiley faces
 from the [Emoticons Unicode block](http://www.unicode.org/charts/PDF/U1F600.pdf):
 
 ```ANTLR
-EMOTICONS = ('\u{1F600}' | '\u{1F602}' | '\u{1F615}');
+EMOTICONS = ('\u{1F600}' | '\u{1F602}' | '\u{1F615}'); // or [\u{1F600}\u{1F602}\u{1F615}]
 ```
 
-Finally, lexer char sets can include Unicode properties:
+Finally, lexer char sets can include Unicode properties. Each Unicode code point has at least one property that describes the type group to which it belongs (e.g. alpha, number, punctuation). Other properties can be the language script or special binary properties and Unicode code blocks. That means however, that a property specifies a group of code points, hence they are only allowed in lexer char sets.
 
 ```ANTLR
 EMOJI = [\p{Emoji}];
@@ -40,6 +40,7 @@ escapes in lexer rules.
 
 # CharStreams and UTF-8
 
+## Java Target
 If your lexer grammar contains code points larger than `U+FFFF`, your
 lexer client code must open the file using `CharStreams.fromPath()` or
 equivalent in your runtime's language, or input values larger than
@@ -51,7 +52,10 @@ For backwards compatibility, the existing `ANTLRInputStream` and
 The existing `TestRig` command-line interface supports all Unicode
 code points.
 
-# Example
+## Other Targets
+Other language targets usually have their `ANTLRInputStream` extended to support the full Unicode range. See the target documentation for supported input encodings (e.g. UTF-8) and other related details.
+
+# Java Example
 
 If you have generated a lexer named `UnicodeLexer`:
 
