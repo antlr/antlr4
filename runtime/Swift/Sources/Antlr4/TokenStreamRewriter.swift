@@ -95,18 +95,20 @@ public class TokenStreamRewriter {
         /** Token buffer index. */
         internal var index: Int
         internal var text: String?
-        weak var  tokens: TokenStream!
         internal var lastIndex: Int = 0
+        internal weak var  tokens: TokenStream!
+        
         init(_ index: Int, _ tokens: TokenStream) {
             self.index = index
             self.tokens = tokens
         }
-        //_ tokens : TokenStream  ,_ tokens : TokenStream
+        
         init(_ index: Int, _ text: String?, _ tokens: TokenStream) {
             self.index = index
             self.text = text
             self.tokens = tokens
         }
+        
         /** Execute the rewrite operation by possibly adding to the buffer.
          *  Return the index of the next token to operate on.
          */
@@ -115,10 +117,8 @@ public class TokenStreamRewriter {
         }
 
         public var description: String {
-            let opName: String = NSStringFromClass(RewriteOperation.self)
-            //  var index : Int = opName.indexOf("$");
-            //  opName =    opName.substring(   index+1);
-            return "<\(opName) @ \(try? tokens.get(index)):\\\(text)\">"
+            let opName = String(describing: type(of: self))
+            return "<\(opName)@\(try! tokens.get(index)):\"\(text!)\">"
         }
     }
 
@@ -165,11 +165,10 @@ public class TokenStreamRewriter {
         override
         public var description: String {
             if text == nil {
-                return "<DeleteOp@\(try? tokens.get(index))..\(try? tokens.get(lastIndex))>"
+                return "<DeleteOp@\(try! tokens.get(index))..\(try! tokens.get(lastIndex))>"
             }
-            return "<ReplaceOp@\(try? tokens.get(index))..\(try? tokens.get(lastIndex)):\\\(text)>"
+            return "<ReplaceOp@\(try! tokens.get(index))..\(try! tokens.get(lastIndex)):\"\(text!)\">"
         }
-
     }
 
     public class RewriteOperationArray{
@@ -288,7 +287,8 @@ public class TokenStreamRewriter {
                             rop.lastIndex = max(prevRop.lastIndex, rop.lastIndex)
                             print("new rop \(rop)")
                         } else if !disjoint {
-                            throw ANTLRError.illegalArgument(msg: "replace op boundaries of \(rop.description) overlap with previous \(prevRop.description)")
+                            throw ANTLRError.illegalArgument(msg: "replace op boundaries of \(rop.description) " +
+                                "overlap with previous \(prevRop.description)")
                         }
                     }
                 }
@@ -333,7 +333,8 @@ public class TokenStreamRewriter {
                             continue
                         }
                         if iop.index >= rop.index && iop.index <= rop.lastIndex {
-                            throw ANTLRError.illegalArgument(msg: "insert op \(iop.description) within boundaries of previous \(rop.description)")
+                            throw ANTLRError.illegalArgument(msg: "insert op \(iop.description) within" +
+                                " boundaries of previous \(rop.description)")
 
                         }
                     }

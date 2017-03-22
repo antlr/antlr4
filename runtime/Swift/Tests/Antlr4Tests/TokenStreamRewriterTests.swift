@@ -199,7 +199,6 @@ class TokenStreamRewriterTests: XCTestCase {
         XCTAssertEqual(expecting, result)
     }
 
-    // TODO: tweak printing
     func testInsertInPriorReplace() throws {
         let input = ANTLRInputStream("abc")
         let lexer = LexerA(input)
@@ -209,9 +208,9 @@ class TokenStreamRewriterTests: XCTestCase {
         try tokens.replace(0, 2, "x")
         tokens.insertBefore(1, "0")
 
-        var err: Error?
         do {
             _ = try tokens.getText()
+            XCTFail("Expected exception not thrown.")
         } catch ANTLRError.illegalArgument(let msg) {
             let expecting = "insert op <InsertBeforeOp@[@1,1:1='b',<2>,1:1]:\"0\"> within boundaries of previous <ReplaceOp@[@0,0:0='a',<1>,1:0]..[@2,2:2='c',<3>,1:2]:\"x\">"
 
@@ -311,7 +310,6 @@ class TokenStreamRewriterTests: XCTestCase {
         XCTAssertEqual(expecting, result)
     }
 
-    // TODO: tweak printing
     func testReplaceRangeThenInsertAtRightEdge() throws {
         let input = ANTLRInputStream("abcccba")
         let lexer = LexerA(input)
@@ -321,9 +319,9 @@ class TokenStreamRewriterTests: XCTestCase {
         try tokens.replace(2, 4, "x")
         tokens.insertBefore(4, "y")
 
-        var err: Error?
         do {
             _ = try tokens.getText()
+            XCTFail("Expected exception not thrown.")
         } catch ANTLRError.illegalArgument(let msg) {
             let expecting = "insert op <InsertBeforeOp@[@4,4:4='c',<3>,1:4]:\"y\"> within boundaries of previous <ReplaceOp@[@2,2:2='c',<3>,1:2]..[@4,4:4='c',<3>,1:4]:\"x\">"
 
@@ -368,43 +366,41 @@ class TokenStreamRewriterTests: XCTestCase {
         XCTAssertEqual(expecting, result)
     }
 
-    // TODO: tweak printing
-   func testReplaceThenReplaceSuperset() throws {
-       let input = ANTLRInputStream("abcccba")
-       let lexer = LexerA(input)
-       let stream = CommonTokenStream(lexer)
-       try stream.fill()
-       let tokens = TokenStreamRewriter(stream)
-       try tokens.replace(2, 4, "xyz")
-       try tokens.replace(3, 5, "foo")
+    func testReplaceThenReplaceSuperset() throws {
+        let input = ANTLRInputStream("abcccba")
+        let lexer = LexerA(input)
+        let stream = CommonTokenStream(lexer)
+        try stream.fill()
+        let tokens = TokenStreamRewriter(stream)
+        try tokens.replace(2, 4, "xyz")
+        try tokens.replace(3, 5, "foo")
 
-       var err: Error?
-       do {
-           _ = try tokens.getText()
-       } catch ANTLRError.illegalArgument(let msg) {
-           let expecting = "replace op boundaries of <ReplaceOp@[@3,3:3='c',<3>,1:3]..[@5,5:5='b',<2>,1:5]:\"foo\"> overlap with previous <ReplaceOp@[@2,2:2='c',<3>,1:2]..[@4,4:4='c',<3>,1:4]:\"xyz\">"
-           XCTAssertEqual(expecting, msg)
-       }
-   }
+        do {
+            _ = try tokens.getText()
+            XCTFail("Expected exception not thrown.")
+        } catch ANTLRError.illegalArgument(let msg) {
+            let expecting = "replace op boundaries of <ReplaceOp@[@3,3:3='c',<3>,1:3]..[@5,5:5='b',<2>,1:5]:\"foo\"> overlap with previous <ReplaceOp@[@2,2:2='c',<3>,1:2]..[@4,4:4='c',<3>,1:4]:\"xyz\">"
+            XCTAssertEqual(expecting, msg)
+        }
+    }
 
-    // TODO: tweak printing
-   func testReplaceThenReplaceLowerIndexedSuperset() throws {
-       let input = ANTLRInputStream("abcccba")
-       let lexer = LexerA(input)
-       let stream = CommonTokenStream(lexer)
-       try stream.fill()
-       let tokens = TokenStreamRewriter(stream)
-       try tokens.replace(2, 4, "xyz")
-       try tokens.replace(1, 3, "foo")
+    func testReplaceThenReplaceLowerIndexedSuperset() throws {
+        let input = ANTLRInputStream("abcccba")
+        let lexer = LexerA(input)
+        let stream = CommonTokenStream(lexer)
+        try stream.fill()
+        let tokens = TokenStreamRewriter(stream)
+        try tokens.replace(2, 4, "xyz")
+        try tokens.replace(1, 3, "foo")
 
-       var err: Error?
-       do {
-           _ = try tokens.getText()
-       } catch ANTLRError.illegalArgument(let msg) {
-           let expecting = "replace op boundaries of <ReplaceOp@[@1,1:1='b',<2>,1:1]..[@3,3:3='c',<3>,1:3]:\"foo\"> overlap with previous <ReplaceOp@[@2,2:2='c',<3>,1:2]..[@4,4:4='c',<3>,1:4]:\"xyz\">"
-           XCTAssertEqual(expecting, msg)
-       }
-   }
+        do {
+            _ = try tokens.getText()
+            XCTFail("Expected exception not thrown.")
+        } catch ANTLRError.illegalArgument(let msg) {
+            let expecting = "replace op boundaries of <ReplaceOp@[@1,1:1='b',<2>,1:1]..[@3,3:3='c',<3>,1:3]:\"foo\"> overlap with previous <ReplaceOp@[@2,2:2='c',<3>,1:2]..[@4,4:4='c',<3>,1:4]:\"xyz\">"
+            XCTAssertEqual(expecting, msg)
+        }
+    }
 
     func testReplaceSingleMiddleThenOverlappingSuperset() throws {
         let input = ANTLRInputStream("abcba")
@@ -519,9 +515,9 @@ class TokenStreamRewriterTests: XCTestCase {
         try stream.fill()
         // cannot split earlier replace
 
-        var err: Error?
         do {
             _ = try tokens.getText()
+            XCTFail("Expected exception not thrown.")
         } catch ANTLRError.illegalArgument(let msg) {
             let expecting = "replace op boundaries of <ReplaceOp@[@1,1:1='b',<2>,1:1]..[@2,2:2='c',<3>,1:2]:\"foo\"> overlap with previous <ReplaceOp@[@0,0:0='a',<1>,1:0]..[@3,3:3='c',<3>,1:3]:\"bar\">"
             XCTAssertEqual(expecting, msg)
@@ -627,7 +623,6 @@ class TokenStreamRewriterTests: XCTestCase {
         XCTAssertEqual(expecting, result)
     }
 
-    // TODO: Test Fix for https://github.com/antlr/antlr4/issues/550
     func testDistinguishBetweenInsertAfterAndInsertBeforeToPreserverOrder() throws {
         let input = ANTLRInputStream("aa")
         let lexer = LexerA(input)
