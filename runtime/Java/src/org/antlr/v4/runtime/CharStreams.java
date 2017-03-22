@@ -10,10 +10,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
+import java.nio.CharBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CoderResult;
 import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -55,17 +57,15 @@ public final class CharStreams {
 	 * For other sources, only supports Unicode code points up to U+FFFF.
 	 */
 	public static CharStream fromPath(Path path, Charset charset) throws IOException {
-		if (charset.equals(StandardCharsets.UTF_8)) {
-			try (ReadableByteChannel channel = Files.newByteChannel(path)) {
-				return fromChannel(
-					channel,
-					DEFAULT_BUFFER_SIZE,
-					CodingErrorAction.REPLACE,
-					path.toString());
-			}
-		}
-		else {
-			return new ANTLRFileStream(path.toString(), charset.toString());
+		long size = Files.size(path);
+		try (ReadableByteChannel channel = Files.newByteChannel(path)) {
+			return fromChannel(
+				channel,
+				charset,
+				DEFAULT_BUFFER_SIZE,
+				CodingErrorAction.REPLACE,
+				path.toString(),
+				size);
 		}
 	}
 
@@ -120,19 +120,18 @@ public final class CharStreams {
 	 * For other sources, only supports Unicode code points up to U+FFFF.
 	 */
 	public static CharStream fromStream(InputStream is, Charset charset) throws IOException {
-		if (charset.equals(StandardCharsets.UTF_8)) {
-			try (ReadableByteChannel channel = Channels.newChannel(is)) {
-				return fromChannel(
-					channel,
-					DEFAULT_BUFFER_SIZE,
-					CodingErrorAction.REPLACE,
-					IntStream.UNKNOWN_SOURCE_NAME);
-			}
-		}
-		else {
-			try (InputStreamReader isr = new InputStreamReader(is, charset)) {
-				return new ANTLRInputStream(isr);
-			}
+		return fromStream(is, charset, -1);
+	}
+
+	public static CharStream fromStream(InputStream is, Charset charset, long inputSize) throws IOException {
+		try (ReadableByteChannel channel = Channels.newChannel(is)) {
+			return fromChannel(
+				channel,
+				charset,
+				DEFAULT_BUFFER_SIZE,
+				CodingErrorAction.REPLACE,
+				IntStream.UNKNOWN_SOURCE_NAME,
+				inputSize);
 		}
 	}
 
@@ -160,18 +159,11 @@ public final class CharStreams {
 	 * For other sources, only supports Unicode code points up to U+FFFF.
 	 */
 	public static CharStream fromChannel(ReadableByteChannel channel, Charset charset) throws IOException {
-		if (charset.equals(StandardCharsets.UTF_8)) {
-			return fromChannel(
-				channel,
-				DEFAULT_BUFFER_SIZE,
-				CodingErrorAction.REPLACE,
-				IntStream.UNKNOWN_SOURCE_NAME);
-		}
-		else {
-			try (InputStreamReader isr = new InputStreamReader(Channels.newInputStream(channel), charset)) {
-				return new ANTLRInputStream(isr);
-			}
-		}
+		return fromChannel(
+			channel,
+			DEFAULT_BUFFER_SIZE,
+			CodingErrorAction.REPLACE,
+			IntStream.UNKNOWN_SOURCE_NAME);
 	}
 
 	/**
@@ -187,50 +179,15 @@ public final class CharStreams {
 	 * source name. Closes the reader before returning.
 	 */
 	public static CodePointCharStream fromReader(Reader r, String sourceName) throws IOException {
-		IntBuffer codePointBuffer = IntBuffer.allocate(DEFAULT_BUFFER_SIZE);
-		int highSurrogate = -1;
-		int curCodeUnit;
 		try {
-			while ((curCodeUnit = r.read()) != -1) {
-				if (!codePointBuffer.hasRemaining()) {
-					// Grow the code point buffer size by 2.
-					IntBuffer newBuffer = IntBuffer.allocate(codePointBuffer.capacity() * 2);
-					codePointBuffer.flip();
-					newBuffer.put(codePointBuffer);
-					codePointBuffer = newBuffer;
-				}
-				if (Character.isHighSurrogate((char) curCodeUnit)) {
-					if (highSurrogate != -1) {
-						// Dangling high surrogate followed by another high surrogate.
-						codePointBuffer.put(highSurrogate);
-					}
-					highSurrogate = curCodeUnit;
-				}
-				else if (Character.isLowSurrogate((char) curCodeUnit)) {
-					if (highSurrogate == -1) {
-						// Low surrogate not preceded by high surrogate.
-						codePointBuffer.put(curCodeUnit);
-					}
-					else {
-						codePointBuffer.put(Character.toCodePoint((char) highSurrogate, (char) curCodeUnit));
-						highSurrogate = -1;
-					}
-				}
-				else {
-					if (highSurrogate != -1) {
-						// Dangling high surrogate followed by a non-surrogate.
-						codePointBuffer.put(highSurrogate);
-						highSurrogate = -1;
-					}
-					codePointBuffer.put(curCodeUnit);
-				}
+			CodePointBuffer.Builder codePointBufferBuilder = CodePointBuffer.builder(DEFAULT_BUFFER_SIZE);
+			CharBuffer charBuffer = CharBuffer.allocate(DEFAULT_BUFFER_SIZE);
+			while ((r.read(charBuffer)) != -1) {
+				charBuffer.flip();
+				codePointBufferBuilder.append(charBuffer);
+				charBuffer.compact();
 			}
-			if (highSurrogate != -1) {
-				// Dangling high surrogate at end of file.
-				codePointBuffer.put(highSurrogate);
-			}
-			codePointBuffer.flip();
-			return new CodePointCharStream(codePointBuffer, sourceName);
+			return CodePointCharStream.fromBuffer(codePointBufferBuilder.build(), sourceName);
 		}
 		finally {
 			r.close();
@@ -251,22 +208,14 @@ public final class CharStreams {
 	public static CodePointCharStream fromString(String s, String sourceName) {
 		// Initial guess assumes no code points > U+FFFF: one code
 		// point for each code unit in the string
-		IntBuffer codePointBuffer = IntBuffer.allocate(s.length());
-		int stringIdx = 0;
-		while (stringIdx < s.length()) {
-			if (!codePointBuffer.hasRemaining()) {
-				// Grow the code point buffer size by 2.
-				IntBuffer newBuffer = IntBuffer.allocate(codePointBuffer.capacity() * 2);
-				codePointBuffer.flip();
-				newBuffer.put(codePointBuffer);
-				codePointBuffer = newBuffer;
-			}
-			int codePoint = Character.codePointAt(s, stringIdx);
-			codePointBuffer.put(codePoint);
-			stringIdx += Character.charCount(codePoint);
-		}
-		codePointBuffer.flip();
-		return new CodePointCharStream(codePointBuffer, sourceName);
+		CodePointBuffer.Builder codePointBufferBuilder = CodePointBuffer.builder(s.length());
+		// TODO: CharBuffer.wrap(String) rightfully returns a read-only buffer
+		// which doesn't expose its array, so we make a copy.
+		CharBuffer cb = CharBuffer.allocate(s.length());
+		cb.put(s);
+		cb.flip();
+		codePointBufferBuilder.append(cb);
+		return CodePointCharStream.fromBuffer(codePointBufferBuilder.build(), sourceName);
 	}
 
 	/**
@@ -283,24 +232,61 @@ public final class CharStreams {
 		String sourceName)
 		throws IOException
 	{
+		return fromChannel(channel, StandardCharsets.UTF_8, bufferSize, decodingErrorAction, sourceName, -1);
+	}
+
+	public static CodePointCharStream fromChannel(
+		ReadableByteChannel channel,
+		Charset charset,
+		int bufferSize,
+		CodingErrorAction decodingErrorAction,
+		String sourceName,
+		long inputSize)
+		throws IOException
+	{
 		try {
-			ByteBuffer utf8BytesIn = ByteBuffer.allocateDirect(bufferSize);
-			IntBuffer codePointsOut = IntBuffer.allocate(bufferSize);
+			ByteBuffer utf8BytesIn = ByteBuffer.allocate(bufferSize);
+			CharBuffer utf16CodeUnitsOut = CharBuffer.allocate(bufferSize);
+			if (inputSize == -1) {
+				inputSize = bufferSize;
+			} else if (inputSize > Integer.MAX_VALUE) {
+				// ByteBuffer et al don't support long sizes
+				throw new IOException(String.format("inputSize %d larger than max %d", inputSize, Integer.MAX_VALUE));
+			}
+			CodePointBuffer.Builder codePointBufferBuilder = CodePointBuffer.builder((int) inputSize);
+			CharsetDecoder decoder = charset
+					.newDecoder()
+					.onMalformedInput(decodingErrorAction)
+					.onUnmappableCharacter(decodingErrorAction);
+
 			boolean endOfInput = false;
-			UTF8CodePointDecoder decoder = new UTF8CodePointDecoder(decodingErrorAction);
 			while (!endOfInput) {
 				int bytesRead = channel.read(utf8BytesIn);
 				endOfInput = (bytesRead == -1);
 				utf8BytesIn.flip();
-				codePointsOut = decoder.decodeCodePointsFromBuffer(
+				CoderResult result = decoder.decode(
 					utf8BytesIn,
-					codePointsOut,
+					utf16CodeUnitsOut,
 					endOfInput);
+				if (result.isError() && decodingErrorAction.equals(CodingErrorAction.REPORT)) {
+					result.throwException();
+				}
+				utf16CodeUnitsOut.flip();
+				codePointBufferBuilder.append(utf16CodeUnitsOut);
 				utf8BytesIn.compact();
+				utf16CodeUnitsOut.compact();
 			}
-			codePointsOut.limit(codePointsOut.position());
-			codePointsOut.flip();
-			return new CodePointCharStream(codePointsOut, sourceName);
+			// Handle any bytes at the end of the file which need to
+			// be represented as errors or substitution characters.
+			CoderResult flushResult = decoder.flush(utf16CodeUnitsOut);
+			if (flushResult.isError() && decodingErrorAction.equals(CodingErrorAction.REPORT)) {
+				flushResult.throwException();
+			}
+			utf16CodeUnitsOut.flip();
+			codePointBufferBuilder.append(utf16CodeUnitsOut);
+
+			CodePointBuffer codePointBuffer = codePointBufferBuilder.build();
+			return CodePointCharStream.fromBuffer(codePointBuffer, sourceName);
 		}
 		finally {
 			channel.close();
