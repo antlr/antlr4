@@ -1003,17 +1003,11 @@
 			files = (
 			);
 			inputPaths = (
+				"$(SRCROOT)/VisitorBasic.g4",
+				"$(SRCROOT)/LexerA.g4",
+				"$(SRCROOT)/LexerB.g4",
 			);
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/SwiftTestBaseListener.swift",
-				"$(DERIVED_FILE_DIR)/SwiftTestLexer.swift",
-				"$(DERIVED_FILE_DIR)/SwiftTestLexerATN.swift",
-				"$(DERIVED_FILE_DIR)/SwiftTestListener.swift",
-				"$(DERIVED_FILE_DIR)/SwiftTestParser.swift",
-				"$(DERIVED_FILE_DIR)/SwiftTestParserATN.swift",
-				"$(DERIVED_FILE_DIR)/LexerA.swift",
-				"$(DERIVED_FILE_DIR)/LexerA.tokens",
-				"$(DERIVED_FILE_DIR)/LexerAATN.swift",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
