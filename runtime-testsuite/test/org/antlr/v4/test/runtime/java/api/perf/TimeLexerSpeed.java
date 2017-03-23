@@ -7,6 +7,8 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.test.runtime.java.api.JavaLexer;
 
+import java.lang.management.ManagementFactory;
+import java.lang.management.RuntimeMXBean;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -19,30 +21,31 @@ import java.util.List;
  *
  *  Sample output on OS X with 4 GHz Intel Core i7 (us == microseconds, 1/1000 of a millisecond):
  *
+ Java VM args: -Xms2G -Xmx2G
  Warming up Java compiler....
-    load_legacy_java_ascii average time    53us over 3500 loads of 29038 symbols from Parser.java
-     load_legacy_java_utf8 average time    42us over 3500 loads of 29038 symbols from Parser.java
-     load_legacy_java_utf8 average time   121us over 3500 loads of 13379 symbols from udhr_hin.txt
-             load_new_utf8 average time   193us over 3500 loads of 29038 symbols from Parser.java
-             load_new_utf8 average time   199us over 3500 loads of 13379 symbols from udhr_hin.txt
+    load_legacy_java_ascii average time    55us size  64788b over 3500 loads of 29038 symbols from Parser.java
+     load_legacy_java_utf8 average time    61us size  64788b over 3500 loads of 29038 symbols from Parser.java
+     load_legacy_java_utf8 average time   122us size 102088b over 3500 loads of 13379 symbols from udhr_hin.txt
+             load_new_utf8 average time   212us size 176187b over 3500 loads of 29038 symbols from Parser.java
+             load_new_utf8 average time   206us size  49439b over 3500 loads of 13379 symbols from udhr_hin.txt
 
-     lex_legacy_java_ascii average time   399us over 2000 runs of 29038 symbols
-     lex_legacy_java_ascii average time   918us over 2000 runs of 29038 symbols DFA cleared
-      lex_legacy_java_utf8 average time   377us over 2000 runs of 29038 symbols
-      lex_legacy_java_utf8 average time   925us over 2000 runs of 29038 symbols DFA cleared
-         lex_new_java_utf8 average time   460us over 2000 runs of 29038 symbols
-         lex_new_java_utf8 average time   989us over 2000 runs of 29038 symbols DFA cleared
+     lex_legacy_java_ascii average time   362us over 2000 runs of 29038 symbols
+     lex_legacy_java_ascii average time   903us over 2000 runs of 29038 symbols DFA cleared
+      lex_legacy_java_utf8 average time   359us over 2000 runs of 29038 symbols
+      lex_legacy_java_utf8 average time   890us over 2000 runs of 29038 symbols DFA cleared
+         lex_new_java_utf8 average time   413us over 2000 runs of 29038 symbols
+         lex_new_java_utf8 average time   912us over 2000 runs of 29038 symbols DFA cleared
 
-  lex_legacy_grapheme_utf8 average time  6862us over  400 runs of  6614 symbols from udhr_kor.txt
-  lex_legacy_grapheme_utf8 average time  7023us over  400 runs of  6614 symbols from udhr_kor.txt DFA cleared
-  lex_legacy_grapheme_utf8 average time  6290us over  400 runs of 13379 symbols from udhr_hin.txt
-  lex_legacy_grapheme_utf8 average time  6238us over  400 runs of 13379 symbols from udhr_hin.txt DFA cleared
-     lex_new_grapheme_utf8 average time  6863us over  400 runs of  6614 symbols from udhr_kor.txt
-     lex_new_grapheme_utf8 average time  7014us over  400 runs of  6614 symbols from udhr_kor.txt DFA cleared
-     lex_new_grapheme_utf8 average time  6187us over  400 runs of 13379 symbols from udhr_hin.txt
-     lex_new_grapheme_utf8 average time  6284us over  400 runs of 13379 symbols from udhr_hin.txt DFA cleared
-     lex_new_grapheme_utf8 average time    99us over  400 runs of    85 symbols from emoji.txt
-     lex_new_grapheme_utf8 average time   111us over  400 runs of    85 symbols from emoji.txt DFA cleared
+  lex_legacy_grapheme_utf8 average time  6746us over  400 runs of  6614 symbols from udhr_kor.txt
+  lex_legacy_grapheme_utf8 average time  6868us over  400 runs of  6614 symbols from udhr_kor.txt DFA cleared
+  lex_legacy_grapheme_utf8 average time  5894us over  400 runs of 13379 symbols from udhr_hin.txt
+  lex_legacy_grapheme_utf8 average time  5972us over  400 runs of 13379 symbols from udhr_hin.txt DFA cleared
+     lex_new_grapheme_utf8 average time  6796us over  400 runs of  6614 symbols from udhr_kor.txt
+     lex_new_grapheme_utf8 average time  6951us over  400 runs of  6614 symbols from udhr_kor.txt DFA cleared
+     lex_new_grapheme_utf8 average time  5909us over  400 runs of 13379 symbols from udhr_hin.txt
+     lex_new_grapheme_utf8 average time  6003us over  400 runs of 13379 symbols from udhr_hin.txt DFA cleared
+     lex_new_grapheme_utf8 average time    96us over  400 runs of    85 symbols from emoji.txt
+     lex_new_grapheme_utf8 average time   107us over  400 runs of    85 symbols from emoji.txt DFA cleared
  *
  *  The "DFA cleared" indicates that the lexer was returned to initial conditions
  *  before the tokenizing of each file.  As the ALL(*) lexer encounters new input,
@@ -66,6 +69,16 @@ public class TimeLexerSpeed { // don't call it Test else it'll run during "mvn t
 	public boolean output = true;
 
 	public static void main(String[] args) throws Exception {
+		RuntimeMXBean runtimeMxBean = ManagementFactory.getRuntimeMXBean();
+		List<String> vmArgs = runtimeMxBean.getInputArguments();
+		System.out.print("Java VM args: ");
+		for (String vmArg : vmArgs) {
+			if ( !vmArg.startsWith("-D") ) {
+				System.out.print(vmArg+" ");
+			}
+		}
+		System.out.println();
+
 		TimeLexerSpeed tests = new TimeLexerSpeed();
 
 		tests.compilerWarmUp(100);
@@ -123,17 +136,22 @@ public class TimeLexerSpeed { // don't call it Test else it'll run during "mvn t
 	public void load_legacy_java_ascii(int n) throws Exception {
 		URL sampleJavaFile = TimeLexerSpeed.class.getClassLoader().getResource(Parser_java_file);
 		long start = System.nanoTime();
-		CharStream input = null;
+		CharStream[] input = new CharStream[n]; // keep refs around so we can average memory
+		System.gc();
+		long beforeFreeMem = Runtime.getRuntime().freeMemory();
 		for (int i = 0; i<n; i++) {
-			input = new ANTLRFileStream(sampleJavaFile.getFile());
+			input[i] = new ANTLRFileStream(sampleJavaFile.getFile());
 		}
 		long stop = System.nanoTime();
 		long tus = (stop-start)/1000;
-		int size = input.size();
+		int size = input[0].size();
+		long afterFreeMem = Runtime.getRuntime().freeMemory();
+		int avgStreamSize = (int)((beforeFreeMem-afterFreeMem) / (float)n);
 		String currentMethodName = new Exception().getStackTrace()[0].getMethodName();
-		if ( output ) System.out.printf("%25s average time %5dus over %4d loads of %5d symbols from %s\n",
+		if ( output ) System.out.printf("%25s average time %5dus size %6db over %4d loads of %5d symbols from %s\n",
 		                                currentMethodName,
 		                                tus/n,
+		                                avgStreamSize,
 		                                n,
 		                                size,
 		                                basename(sampleJavaFile.getFile()));
@@ -141,17 +159,22 @@ public class TimeLexerSpeed { // don't call it Test else it'll run during "mvn t
 
 	public void load_legacy_java_utf8(String fileName, int n) throws Exception {
 		long start = System.nanoTime();
-		CharStream input = null;
+		System.gc();
+		CharStream[] input = new CharStream[n];
+		long beforeFreeMem = Runtime.getRuntime().freeMemory();
 		for (int i = 0; i<n; i++) {
-			input = new ANTLRFileStream(fileName, "UTF-8");
+			input[i] = new ANTLRFileStream(fileName, "UTF-8");
 		}
 		long stop = System.nanoTime();
 		long tus = (stop-start)/1000;
-		int size = input.size();
+		int size = input[0].size();
+		long afterFreeMem = Runtime.getRuntime().freeMemory();
+		int avgStreamSize = (int)((beforeFreeMem-afterFreeMem) / (float)n);
 		String currentMethodName = new Exception().getStackTrace()[0].getMethodName();
-		if ( output ) System.out.printf("%25s average time %5dus over %4d loads of %5d symbols from %s\n",
+		if ( output ) System.out.printf("%25s average time %5dus size %6db over %4d loads of %5d symbols from %s\n",
 		                                currentMethodName,
 		                                tus/n,
+		                                avgStreamSize,
 		                                n,
 		                                size,
 		                                basename(fileName));
@@ -159,17 +182,22 @@ public class TimeLexerSpeed { // don't call it Test else it'll run during "mvn t
 
 	public void load_new_utf8(String fileName, int n) throws Exception {
 		long start = System.nanoTime();
-		CharStream input = null;
+		System.gc();
+		CharStream[] input = new CharStream[n];
+		long beforeFreeMem = Runtime.getRuntime().freeMemory();
 		for (int i = 0; i<n; i++) {
-			input = CharStreams.fromFileName(fileName);
+			input[i] = CharStreams.fromFileName(fileName);
 		}
 		long stop = System.nanoTime();
 		long tus = (stop-start)/1000;
-		int size = input.size();
+		int size = input[0].size();
+		long afterFreeMem = Runtime.getRuntime().freeMemory();
+		int avgStreamSize = (int)((beforeFreeMem-afterFreeMem) / (float)n);
 		String currentMethodName = new Exception().getStackTrace()[0].getMethodName();
-		if ( output ) System.out.printf("%25s average time %5dus over %4d loads of %5d symbols from %s\n",
+		if ( output ) System.out.printf("%25s average time %5dus size %6db over %4d loads of %5d symbols from %s\n",
 		                                currentMethodName,
 		                                tus/n,
+		                                avgStreamSize,
 		                                n,
 		                                size,
 		                                basename(fileName));
