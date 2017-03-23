@@ -8,7 +8,13 @@
 
 /* Begin PBXBuildFile section */
 		DB09919D1E22DE9B00FE71AA /* TokenStreamTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB0991951E22DE6000FE71AA /* TokenStreamTests.swift */; };
-		DB4EB8A51E2CB1B60095F402 /* SwiftTest.g4 in Resources */ = {isa = PBXBuildFile; fileRef = DB4EB8A41E2CB1B60095F402 /* SwiftTest.g4 */; };
+		DB4EB8A51E2CB1B60095F402 /* VisitorBasic.g4 in Resources */ = {isa = PBXBuildFile; fileRef = DB4EB8A41E2CB1B60095F402 /* VisitorBasic.g4 */; };
+		DBA2FEF21E837D1F00BB60D9 /* VisitorBasicBaseListener.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBA2FEEB1E837D1F00BB60D9 /* VisitorBasicBaseListener.swift */; };
+		DBA2FEF31E837D1F00BB60D9 /* VisitorBasicLexer.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBA2FEEC1E837D1F00BB60D9 /* VisitorBasicLexer.swift */; };
+		DBA2FEF41E837D1F00BB60D9 /* VisitorBasicLexerATN.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBA2FEEE1E837D1F00BB60D9 /* VisitorBasicLexerATN.swift */; };
+		DBA2FEF51E837D1F00BB60D9 /* VisitorBasicListener.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBA2FEEF1E837D1F00BB60D9 /* VisitorBasicListener.swift */; };
+		DBA2FEF61E837D1F00BB60D9 /* VisitorBasicParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBA2FEF01E837D1F00BB60D9 /* VisitorBasicParser.swift */; };
+		DBA2FEF71E837D1F00BB60D9 /* VisitorBasicParserATN.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBA2FEF11E837D1F00BB60D9 /* VisitorBasicParserATN.swift */; };
 		DBBAE6351E22DCAC00C2FEA6 /* ANTLRErrorListener.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBBAE58E1E22DCAC00C2FEA6 /* ANTLRErrorListener.swift */; };
 		DBBAE6361E22DCAC00C2FEA6 /* ANTLRErrorListener.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBBAE58E1E22DCAC00C2FEA6 /* ANTLRErrorListener.swift */; };
 		DBBAE6371E22DCAC00C2FEA6 /* ANTLRErrorStrategy.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBBAE58F1E22DCAC00C2FEA6 /* ANTLRErrorStrategy.swift */; };
@@ -324,12 +330,6 @@
 		DBBAE76D1E22DCAC00C2FEA6 /* WritableToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBBAE6321E22DCAC00C2FEA6 /* WritableToken.swift */; };
 		DBBAE76E1E22DCAC00C2FEA6 /* WritableToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBBAE6321E22DCAC00C2FEA6 /* WritableToken.swift */; };
 		DBBAE7721E22DCAC00C2FEA6 /* Info-OSX.plist in Resources */ = {isa = PBXBuildFile; fileRef = DBBAE6341E22DCAC00C2FEA6 /* Info-OSX.plist */; };
-		DBF000AB1E7F521E006DB586 /* SwiftTestBaseListener.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBF000A31E7F521E006DB586 /* SwiftTestBaseListener.swift */; };
-		DBF000AC1E7F521E006DB586 /* SwiftTestLexer.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBF000A41E7F521E006DB586 /* SwiftTestLexer.swift */; };
-		DBF000AE1E7F521E006DB586 /* SwiftTestLexerATN.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBF000A61E7F521E006DB586 /* SwiftTestLexerATN.swift */; };
-		DBF000AF1E7F521E006DB586 /* SwiftTestListener.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBF000A71E7F521E006DB586 /* SwiftTestListener.swift */; };
-		DBF000B01E7F521E006DB586 /* SwiftTestParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBF000A81E7F521E006DB586 /* SwiftTestParser.swift */; };
-		DBF000B11E7F521E006DB586 /* SwiftTestParserATN.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBF000A91E7F521E006DB586 /* SwiftTestParserATN.swift */; };
 		DBF000B31E7F59B3006DB586 /* TokenStreamRewriterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBF000B21E7F59B3006DB586 /* TokenStreamRewriterTests.swift */; };
 		DBF000B91E7F627D006DB586 /* LexerA.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBF000B61E7F627D006DB586 /* LexerA.swift */; };
 		DBF000BB1E7F627D006DB586 /* LexerAATN.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBF000B81E7F627D006DB586 /* LexerAATN.swift */; };
@@ -351,7 +351,15 @@
 /* Begin PBXFileReference section */
 		DB0991951E22DE6000FE71AA /* TokenStreamTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TokenStreamTests.swift; sourceTree = "<group>"; };
 		DB0991A01E22DF3B00FE71AA /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		DB4EB8A41E2CB1B60095F402 /* SwiftTest.g4 */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SwiftTest.g4; sourceTree = "<group>"; };
+		DB4EB8A41E2CB1B60095F402 /* VisitorBasic.g4 */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = VisitorBasic.g4; sourceTree = "<group>"; };
+		DBA2FEEA1E837D1F00BB60D9 /* VisitorBasic.tokens */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = VisitorBasic.tokens; path = "../../../../../../../../Library/Developer/Xcode/DerivedData/Antlr4-dgqyozbmfhoivufxxoucdcelhjkw/Build/Intermediates/Antlr4.build/Debug/Antlr4Tests.build/DerivedSources/Tests/Antlr4Tests/VisitorBasic.tokens"; sourceTree = "<group>"; };
+		DBA2FEEB1E837D1F00BB60D9 /* VisitorBasicBaseListener.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = VisitorBasicBaseListener.swift; path = "../../../../../../../../Library/Developer/Xcode/DerivedData/Antlr4-dgqyozbmfhoivufxxoucdcelhjkw/Build/Intermediates/Antlr4.build/Debug/Antlr4Tests.build/DerivedSources/Tests/Antlr4Tests/VisitorBasicBaseListener.swift"; sourceTree = "<group>"; };
+		DBA2FEEC1E837D1F00BB60D9 /* VisitorBasicLexer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = VisitorBasicLexer.swift; path = "../../../../../../../../Library/Developer/Xcode/DerivedData/Antlr4-dgqyozbmfhoivufxxoucdcelhjkw/Build/Intermediates/Antlr4.build/Debug/Antlr4Tests.build/DerivedSources/Tests/Antlr4Tests/VisitorBasicLexer.swift"; sourceTree = "<group>"; };
+		DBA2FEED1E837D1F00BB60D9 /* VisitorBasicLexer.tokens */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = VisitorBasicLexer.tokens; path = "../../../../../../../../Library/Developer/Xcode/DerivedData/Antlr4-dgqyozbmfhoivufxxoucdcelhjkw/Build/Intermediates/Antlr4.build/Debug/Antlr4Tests.build/DerivedSources/Tests/Antlr4Tests/VisitorBasicLexer.tokens"; sourceTree = "<group>"; };
+		DBA2FEEE1E837D1F00BB60D9 /* VisitorBasicLexerATN.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = VisitorBasicLexerATN.swift; path = "../../../../../../../../Library/Developer/Xcode/DerivedData/Antlr4-dgqyozbmfhoivufxxoucdcelhjkw/Build/Intermediates/Antlr4.build/Debug/Antlr4Tests.build/DerivedSources/Tests/Antlr4Tests/VisitorBasicLexerATN.swift"; sourceTree = "<group>"; };
+		DBA2FEEF1E837D1F00BB60D9 /* VisitorBasicListener.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = VisitorBasicListener.swift; path = "../../../../../../../../Library/Developer/Xcode/DerivedData/Antlr4-dgqyozbmfhoivufxxoucdcelhjkw/Build/Intermediates/Antlr4.build/Debug/Antlr4Tests.build/DerivedSources/Tests/Antlr4Tests/VisitorBasicListener.swift"; sourceTree = "<group>"; };
+		DBA2FEF01E837D1F00BB60D9 /* VisitorBasicParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = VisitorBasicParser.swift; path = "../../../../../../../../Library/Developer/Xcode/DerivedData/Antlr4-dgqyozbmfhoivufxxoucdcelhjkw/Build/Intermediates/Antlr4.build/Debug/Antlr4Tests.build/DerivedSources/Tests/Antlr4Tests/VisitorBasicParser.swift"; sourceTree = "<group>"; };
+		DBA2FEF11E837D1F00BB60D9 /* VisitorBasicParserATN.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = VisitorBasicParserATN.swift; path = "../../../../../../../../Library/Developer/Xcode/DerivedData/Antlr4-dgqyozbmfhoivufxxoucdcelhjkw/Build/Intermediates/Antlr4.build/Debug/Antlr4Tests.build/DerivedSources/Tests/Antlr4Tests/VisitorBasicParserATN.swift"; sourceTree = "<group>"; };
 		DBBAE58E1E22DCAC00C2FEA6 /* ANTLRErrorListener.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ANTLRErrorListener.swift; sourceTree = "<group>"; };
 		DBBAE58F1E22DCAC00C2FEA6 /* ANTLRErrorStrategy.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ANTLRErrorStrategy.swift; sourceTree = "<group>"; };
 		DBBAE5901E22DCAC00C2FEA6 /* ANTLRFileStream.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ANTLRFileStream.swift; sourceTree = "<group>"; };
@@ -511,14 +519,6 @@
 		DBBAE6321E22DCAC00C2FEA6 /* WritableToken.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WritableToken.swift; sourceTree = "<group>"; };
 		DBBAE6331E22DCAC00C2FEA6 /* Info-IOS.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Info-IOS.plist"; sourceTree = "<group>"; };
 		DBBAE6341E22DCAC00C2FEA6 /* Info-OSX.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Info-OSX.plist"; sourceTree = "<group>"; };
-		DBF000A21E7F521E006DB586 /* SwiftTest.tokens */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file; name = SwiftTest.tokens; path = ../../Intermediates/Antlr4.build/Debug/Antlr4Tests.build/DerivedSources/Tests/Antlr4Tests/SwiftTest.tokens; sourceTree = BUILT_PRODUCTS_DIR; };
-		DBF000A31E7F521E006DB586 /* SwiftTestBaseListener.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SwiftTestBaseListener.swift; path = ../../Intermediates/Antlr4.build/Debug/Antlr4Tests.build/DerivedSources/Tests/Antlr4Tests/SwiftTestBaseListener.swift; sourceTree = BUILT_PRODUCTS_DIR; };
-		DBF000A41E7F521E006DB586 /* SwiftTestLexer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SwiftTestLexer.swift; path = ../../Intermediates/Antlr4.build/Debug/Antlr4Tests.build/DerivedSources/Tests/Antlr4Tests/SwiftTestLexer.swift; sourceTree = BUILT_PRODUCTS_DIR; };
-		DBF000A51E7F521E006DB586 /* SwiftTestLexer.tokens */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file; name = SwiftTestLexer.tokens; path = ../../Intermediates/Antlr4.build/Debug/Antlr4Tests.build/DerivedSources/Tests/Antlr4Tests/SwiftTestLexer.tokens; sourceTree = BUILT_PRODUCTS_DIR; };
-		DBF000A61E7F521E006DB586 /* SwiftTestLexerATN.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SwiftTestLexerATN.swift; path = ../../Intermediates/Antlr4.build/Debug/Antlr4Tests.build/DerivedSources/Tests/Antlr4Tests/SwiftTestLexerATN.swift; sourceTree = BUILT_PRODUCTS_DIR; };
-		DBF000A71E7F521E006DB586 /* SwiftTestListener.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SwiftTestListener.swift; path = ../../Intermediates/Antlr4.build/Debug/Antlr4Tests.build/DerivedSources/Tests/Antlr4Tests/SwiftTestListener.swift; sourceTree = BUILT_PRODUCTS_DIR; };
-		DBF000A81E7F521E006DB586 /* SwiftTestParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SwiftTestParser.swift; path = ../../Intermediates/Antlr4.build/Debug/Antlr4Tests.build/DerivedSources/Tests/Antlr4Tests/SwiftTestParser.swift; sourceTree = BUILT_PRODUCTS_DIR; };
-		DBF000A91E7F521E006DB586 /* SwiftTestParserATN.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SwiftTestParserATN.swift; path = ../../Intermediates/Antlr4.build/Debug/Antlr4Tests.build/DerivedSources/Tests/Antlr4Tests/SwiftTestParserATN.swift; sourceTree = BUILT_PRODUCTS_DIR; };
 		DBF000B21E7F59B3006DB586 /* TokenStreamRewriterTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TokenStreamRewriterTests.swift; sourceTree = "<group>"; };
 		DBF000B51E7F614D006DB586 /* LexerA.g4 */ = {isa = PBXFileReference; lastKnownFileType = text; path = LexerA.g4; sourceTree = "<group>"; };
 		DBF000B61E7F627D006DB586 /* LexerA.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = LexerA.swift; path = ../../Intermediates/Antlr4.build/Debug/Antlr4Tests.build/DerivedSources/Tests/Antlr4Tests/LexerA.swift; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -574,7 +574,7 @@
 				DB4EB8B21E2CBA240095F402 /* gen */,
 				DB0991951E22DE6000FE71AA /* TokenStreamTests.swift */,
 				DBF000B21E7F59B3006DB586 /* TokenStreamRewriterTests.swift */,
-				DB4EB8A41E2CB1B60095F402 /* SwiftTest.g4 */,
+				DB4EB8A41E2CB1B60095F402 /* VisitorBasic.g4 */,
 				DBF000B51E7F614D006DB586 /* LexerA.g4 */,
 				DBF000BD1E7F64DE006DB586 /* LexerB.g4 */,
 			);
@@ -590,14 +590,14 @@
 				DBF000BE1E7F6546006DB586 /* LexerB.swift */,
 				DBF000BF1E7F6546006DB586 /* LexerB.tokens */,
 				DBF000C01E7F6546006DB586 /* LexerBATN.swift */,
-				DBF000A21E7F521E006DB586 /* SwiftTest.tokens */,
-				DBF000A31E7F521E006DB586 /* SwiftTestBaseListener.swift */,
-				DBF000A41E7F521E006DB586 /* SwiftTestLexer.swift */,
-				DBF000A51E7F521E006DB586 /* SwiftTestLexer.tokens */,
-				DBF000A61E7F521E006DB586 /* SwiftTestLexerATN.swift */,
-				DBF000A71E7F521E006DB586 /* SwiftTestListener.swift */,
-				DBF000A81E7F521E006DB586 /* SwiftTestParser.swift */,
-				DBF000A91E7F521E006DB586 /* SwiftTestParserATN.swift */,
+				DBA2FEEA1E837D1F00BB60D9 /* VisitorBasic.tokens */,
+				DBA2FEEB1E837D1F00BB60D9 /* VisitorBasicBaseListener.swift */,
+				DBA2FEEC1E837D1F00BB60D9 /* VisitorBasicLexer.swift */,
+				DBA2FEED1E837D1F00BB60D9 /* VisitorBasicLexer.tokens */,
+				DBA2FEEE1E837D1F00BB60D9 /* VisitorBasicLexerATN.swift */,
+				DBA2FEEF1E837D1F00BB60D9 /* VisitorBasicListener.swift */,
+				DBA2FEF01E837D1F00BB60D9 /* VisitorBasicParser.swift */,
+				DBA2FEF11E837D1F00BB60D9 /* VisitorBasicParserATN.swift */,
 			);
 			name = gen;
 			sourceTree = "<group>";
@@ -982,7 +982,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DB4EB8A51E2CB1B60095F402 /* SwiftTest.g4 in Resources */,
+				DB4EB8A51E2CB1B60095F402 /* VisitorBasic.g4 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1017,7 +1017,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "echo \"Generating parser in $DERIVED_FILE_DIR\"\njava -jar ~/.m2/repository/org/antlr/antlr4/4.7-SNAPSHOT/antlr4-4.7-SNAPSHOT-complete.jar -Dlanguage=Swift Tests/Antlr4Tests/SwiftTest.g4 -o $DERIVED_FILE_DIR\njava -jar ~/.m2/repository/org/antlr/antlr4/4.7-SNAPSHOT/antlr4-4.7-SNAPSHOT-complete.jar -Dlanguage=Swift Tests/Antlr4Tests/LexerA.g4 -o $DERIVED_FILE_DIR\njava -jar ~/.m2/repository/org/antlr/antlr4/4.7-SNAPSHOT/antlr4-4.7-SNAPSHOT-complete.jar -Dlanguage=Swift Tests/Antlr4Tests/LexerB.g4 -o $DERIVED_FILE_DIR";
+			shellScript = "echo \"Generating parser in $DERIVED_FILE_DIR\"\njava -jar ~/.m2/repository/org/antlr/antlr4/4.7-SNAPSHOT/antlr4-4.7-SNAPSHOT-complete.jar -Dlanguage=Swift Tests/Antlr4Tests/VisitorBasic.g4 -o $DERIVED_FILE_DIR\njava -jar ~/.m2/repository/org/antlr/antlr4/4.7-SNAPSHOT/antlr4-4.7-SNAPSHOT-complete.jar -Dlanguage=Swift Tests/Antlr4Tests/LexerA.g4 -o $DERIVED_FILE_DIR\njava -jar ~/.m2/repository/org/antlr/antlr4/4.7-SNAPSHOT/antlr4-4.7-SNAPSHOT-complete.jar -Dlanguage=Swift Tests/Antlr4Tests/LexerB.g4 -o $DERIVED_FILE_DIR";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1354,18 +1354,18 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DBA2FEF71E837D1F00BB60D9 /* VisitorBasicParserATN.swift in Sources */,
+				DBA2FEF21E837D1F00BB60D9 /* VisitorBasicBaseListener.swift in Sources */,
+				DBA2FEF51E837D1F00BB60D9 /* VisitorBasicListener.swift in Sources */,
 				DBF000B91E7F627D006DB586 /* LexerA.swift in Sources */,
 				DB09919D1E22DE9B00FE71AA /* TokenStreamTests.swift in Sources */,
+				DBA2FEF41E837D1F00BB60D9 /* VisitorBasicLexerATN.swift in Sources */,
+				DBA2FEF61E837D1F00BB60D9 /* VisitorBasicParser.swift in Sources */,
 				DBF000BB1E7F627D006DB586 /* LexerAATN.swift in Sources */,
+				DBA2FEF31E837D1F00BB60D9 /* VisitorBasicLexer.swift in Sources */,
 				DBF000C31E7F6546006DB586 /* LexerBATN.swift in Sources */,
-				DBF000AC1E7F521E006DB586 /* SwiftTestLexer.swift in Sources */,
 				DBF000C11E7F6546006DB586 /* LexerB.swift in Sources */,
-				DBF000B11E7F521E006DB586 /* SwiftTestParserATN.swift in Sources */,
-				DBF000B01E7F521E006DB586 /* SwiftTestParser.swift in Sources */,
-				DBF000AE1E7F521E006DB586 /* SwiftTestLexerATN.swift in Sources */,
 				DBF000B31E7F59B3006DB586 /* TokenStreamRewriterTests.swift in Sources */,
-				DBF000AF1E7F521E006DB586 /* SwiftTestListener.swift in Sources */,
-				DBF000AB1E7F521E006DB586 /* SwiftTestBaseListener.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
