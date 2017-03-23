@@ -9,9 +9,11 @@
 /// 
 /// -  Sam Harwell
 
-public class BaseErrorListener: ANTLRErrorListener {
+open class BaseErrorListener: ANTLRErrorListener {
+    public init() {
+    }
 
-    public func syntaxError<T:ATNSimulator>(_ recognizer: Recognizer<T>,
+    open func syntaxError<T:ATNSimulator>(_ recognizer: Recognizer<T>,
                                             _ offendingSymbol: AnyObject?,
                                             _ line: Int,
                                             _ charPositionInLine: Int,
@@ -21,7 +23,7 @@ public class BaseErrorListener: ANTLRErrorListener {
     }
 
 
-    public func reportAmbiguity(_ recognizer: Parser,
+    open func reportAmbiguity(_ recognizer: Parser,
                                 _ dfa: DFA,
                                 _ startIndex: Int,
                                 _ stopIndex: Int,
@@ -31,7 +33,7 @@ public class BaseErrorListener: ANTLRErrorListener {
     }
 
 
-    public func reportAttemptingFullContext(_ recognizer: Parser,
+    open func reportAttemptingFullContext(_ recognizer: Parser,
                                             _ dfa: DFA,
                                             _ startIndex: Int,
                                             _ stopIndex: Int,
@@ -40,7 +42,7 @@ public class BaseErrorListener: ANTLRErrorListener {
     }
 
 
-    public func reportContextSensitivity(_ recognizer: Parser,
+    open func reportContextSensitivity(_ recognizer: Parser,
                                          _ dfa: DFA,
                                          _ startIndex: Int,
                                          _ stopIndex: Int,
