@@ -16,7 +16,6 @@ open class AbstractParseTreeVisitor<T>: ParseTreeVisitor<T> {
      * <p>The default implementation calls {@link org.antlr.v4.runtime.tree.ParseTree#accept} on the
      * specified tree.</p>
      */
-
     open override func visit(_ tree: ParseTree) -> T? {
         return tree.accept(self)
     }
@@ -36,7 +35,6 @@ open class AbstractParseTreeVisitor<T>: ParseTreeVisitor<T> {
      * the tree structure. Visitors that modify the tree should override this
      * method to behave properly in respect to the specific algorithm in use.</p>
      */
-
     open override func visitChildren(_ node: RuleNode) -> T? {
         var result: T? = defaultResult()
         let n: Int = node.getChildCount()
@@ -60,7 +58,6 @@ open class AbstractParseTreeVisitor<T>: ParseTreeVisitor<T> {
      * <p>The default implementation returns the result of
      * {@link #defaultResult defaultResult}.</p>
      */
-
     open override func visitTerminal(_ node: TerminalNode) -> T? {
         return defaultResult()
     }
@@ -87,7 +84,7 @@ open class AbstractParseTreeVisitor<T>: ParseTreeVisitor<T> {
      *
      * @return The default value returned by visitor methods.
      */
-    internal func defaultResult() -> T? {
+    open func defaultResult() -> T? {
         return nil
     }
 
@@ -110,7 +107,7 @@ open class AbstractParseTreeVisitor<T>: ParseTreeVisitor<T> {
      *
      * @return The updated aggregate result.
      */
-    internal func aggregateResult(_ aggregate: T?, _ nextResult: T?) -> T? {
+    open func aggregateResult(_ aggregate: T?, _ nextResult: T?) -> T? {
         return nextResult
     }
 
@@ -138,7 +135,7 @@ open class AbstractParseTreeVisitor<T>: ParseTreeVisitor<T> {
      * {@code false} to stop visiting children and immediately return the
      * current aggregate result from {@link #visitChildren}.
      */
-    internal func shouldVisitNextChild(_ node: RuleNode, _ currentResult: T?) -> Bool {
+    open func shouldVisitNextChild(_ node: RuleNode, _ currentResult: T?) -> Bool {
         return true
     }
 

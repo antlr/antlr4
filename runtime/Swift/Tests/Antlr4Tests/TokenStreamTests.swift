@@ -10,20 +10,20 @@ class TokenStreamTests: XCTestCase {
     /// Test fetchEOF reset after setTokenSource
     func testBufferedTokenStreamClearFetchEOFWithNewSource() throws {
         let inputStream1 = ANTLRInputStream("A")
-        let tokenStream = CommonTokenStream(SwiftTestLexer(inputStream1))
-        
+        let tokenStream = CommonTokenStream(VisitorBasicLexer(inputStream1))
+
         try tokenStream.fill();
         XCTAssertEqual(2, tokenStream.size())
-        XCTAssertEqual(SwiftTestLexer.T__0, try tokenStream.get(0).getType())
+        XCTAssertEqual(VisitorBasicLexer.A, try tokenStream.get(0).getType())
         XCTAssertEqual(Lexer.EOF, try tokenStream.get(1).getType())
-        
+
         let inputStream2 = ANTLRInputStream("AA");
-        tokenStream.setTokenSource(SwiftTestLexer(inputStream2));
+        tokenStream.setTokenSource(VisitorBasicLexer(inputStream2));
         try tokenStream.fill();
         XCTAssertEqual(3, tokenStream.size())
-        XCTAssertEqual(SwiftTestLexer.T__0, try tokenStream.get(0).getType())
-        XCTAssertEqual(SwiftTestLexer.T__0, try tokenStream.get(1).getType())
+        XCTAssertEqual(VisitorBasicLexer.A, try tokenStream.get(0).getType())
+        XCTAssertEqual(VisitorBasicLexer.A, try tokenStream.get(1).getType())
         XCTAssertEqual(Lexer.EOF, try tokenStream.get(2).getType())
     }
-    
+
 }

@@ -5,81 +5,81 @@
 
 
 /**
-* Useful for rewriting out a buffered input token stream after doing some
-* augmentation or other manipulations on it.
-*
-* <p>
-* You can insert stuff, replace, and delete chunks. Note that the operations
-* are done lazily--only if you convert the buffer to a {@link String} with
-* {@link org.antlr.v4.runtime.TokenStream#getText()}. This is very efficient because you are not
-* moving data around all the time. As the buffer of tokens is converted to
-* strings, the {@link #getText()} method(s) scan the input token stream and
-* check to see if there is an operation at the current index. If so, the
-* operation is done and then normal {@link String} rendering continues on the
-* buffer. This is like having multiple Turing machine instruction streams
-* (programs) operating on a single input tape. :)</p>
-*
-* <p>
-* This rewriter makes no modifications to the token stream. It does not ask the
-* stream to fill itself up nor does it advance the input cursor. The token
-* stream {@link org.antlr.v4.runtime.TokenStream#index()} will return the same value before and
-* after any {@link #getText()} call.</p>
-*
-* <p>
-* The rewriter only works on tokens that you have in the buffer and ignores the
-* current input cursor. If you are buffering tokens on-demand, calling
-* {@link #getText()} halfway through the input will only do rewrites for those
-* tokens in the first half of the file.</p>
-*
-* <p>
-* Since the operations are done lazily at {@link #getText}-time, operations do
-* not screw up the token index values. That is, an insert operation at token
-* index {@code i} does not change the index values for tokens
-* {@code i}+1..n-1.</p>
-*
-* <p>
-* Because operations never actually alter the buffer, you may always get the
-* original token stream back without undoing anything. Since the instructions
-* are queued up, you can easily simulate transactions and roll back any changes
-* if there is an error just by removing instructions. For example,</p>
-*
-* <pre>
-* CharStream input = new ANTLRFileStream("input");
-* TLexer lex = new TLexer(input);
-* CommonTokenStream tokens = new CommonTokenStream(lex);
-* T parser = new T(tokens);
-* TokenStreamRewriter rewriter = new TokenStreamRewriter(tokens);
-* parser.startRule();
-* </pre>
-*
-* <p>
-* Then in the rules, you can execute (assuming rewriter is visible):</p>
-*
-* <pre>
-* Token t,u;
-* ...
-* rewriter.insertAfter(t, "text to put after t");}
-* rewriter.insertAfter(u, "text after u");}
-* System.out.println(rewriter.getText());
-* </pre>
-*
-* <p>
-* You can also have multiple "instruction streams" and get multiple rewrites
-* from a single pass over the input. Just name the instruction streams and use
-* that name again when printing the buffer. This could be useful for generating
-* a C file and also its header file--all from the same buffer:</p>
-*
-* <pre>
-* rewriter.insertAfter("pass1", t, "text to put after t");}
-* rewriter.insertAfter("pass2", u, "text after u");}
-* System.out.println(rewriter.getText("pass1"));
-* System.out.println(rewriter.getText("pass2"));
-* </pre>
-*
-* <p>
-* If you don't use named rewrite streams, a "default" stream is used as the
-* first example shows.</p>
-*/
+ * Useful for rewriting out a buffered input token stream after doing some
+ * augmentation or other manipulations on it.
+ *
+ * <p>
+ * You can insert stuff, replace, and delete chunks. Note that the operations
+ * are done lazily--only if you convert the buffer to a {@link String} with
+ * {@link org.antlr.v4.runtime.TokenStream#getText()}. This is very efficient because you are not
+ * moving data around all the time. As the buffer of tokens is converted to
+ * strings, the {@link #getText()} method(s) scan the input token stream and
+ * check to see if there is an operation at the current index. If so, the
+ * operation is done and then normal {@link String} rendering continues on the
+ * buffer. This is like having multiple Turing machine instruction streams
+ * (programs) operating on a single input tape. :)</p>
+ *
+ * <p>
+ * This rewriter makes no modifications to the token stream. It does not ask the
+ * stream to fill itself up nor does it advance the input cursor. The token
+ * stream {@link org.antlr.v4.runtime.TokenStream#index()} will return the same value before and
+ * after any {@link #getText()} call.</p>
+ *
+ * <p>
+ * The rewriter only works on tokens that you have in the buffer and ignores the
+ * current input cursor. If you are buffering tokens on-demand, calling
+ * {@link #getText()} halfway through the input will only do rewrites for those
+ * tokens in the first half of the file.</p>
+ *
+ * <p>
+ * Since the operations are done lazily at {@link #getText}-time, operations do
+ * not screw up the token index values. That is, an insert operation at token
+ * index {@code i} does not change the index values for tokens
+ * {@code i}+1..n-1.</p>
+ *
+ * <p>
+ * Because operations never actually alter the buffer, you may always get the
+ * original token stream back without undoing anything. Since the instructions
+ * are queued up, you can easily simulate transactions and roll back any changes
+ * if there is an error just by removing instructions. For example,</p>
+ *
+ * <pre>
+ * CharStream input = new ANTLRFileStream("input");
+ * TLexer lex = new TLexer(input);
+ * CommonTokenStream tokens = new CommonTokenStream(lex);
+ * T parser = new T(tokens);
+ * TokenStreamRewriter rewriter = new TokenStreamRewriter(tokens);
+ * parser.startRule();
+ * </pre>
+ *
+ * <p>
+ * Then in the rules, you can execute (assuming rewriter is visible):</p>
+ *
+ * <pre>
+ * Token t,u;
+ * ...
+ * rewriter.insertAfter(t, "text to put after t");}
+ * rewriter.insertAfter(u, "text after u");}
+ * System.out.println(rewriter.getText());
+ * </pre>
+ *
+ * <p>
+ * You can also have multiple "instruction streams" and get multiple rewrites
+ * from a single pass over the input. Just name the instruction streams and use
+ * that name again when printing the buffer. This could be useful for generating
+ * a C file and also its header file--all from the same buffer:</p>
+ *
+ * <pre>
+ * rewriter.insertAfter("pass1", t, "text to put after t");}
+ * rewriter.insertAfter("pass2", u, "text after u");}
+ * System.out.println(rewriter.getText("pass1"));
+ * System.out.println(rewriter.getText("pass2"));
+ * </pre>
+ *
+ * <p>
+ * If you don't use named rewrite streams, a "default" stream is used as the
+ * first example shows.</p>
+ */
 
 import Foundation
 
@@ -95,18 +95,20 @@ public class TokenStreamRewriter {
         /** Token buffer index. */
         internal var index: Int
         internal var text: String?
-        weak var  tokens: TokenStream!
         internal var lastIndex: Int = 0
+        internal weak var  tokens: TokenStream!
+        
         init(_ index: Int, _ tokens: TokenStream) {
             self.index = index
             self.tokens = tokens
         }
-        //_ tokens : TokenStream  ,_ tokens : TokenStream
+        
         init(_ index: Int, _ text: String?, _ tokens: TokenStream) {
             self.index = index
             self.text = text
             self.tokens = tokens
         }
+        
         /** Execute the rewrite operation by possibly adding to the buffer.
          *  Return the index of the next token to operate on.
          */
@@ -115,21 +117,17 @@ public class TokenStreamRewriter {
         }
 
         public var description: String {
-            let opName: String = NSStringFromClass(RewriteOperation.self)
-            //  var index : Int = opName.indexOf("$");
-            //  opName =    opName.substring(   index+1);
-            return "<\(opName) @ \(try? tokens.get(index)):\\\(text)\">"
+            let opName = String(describing: type(of: self))
+            return "<\(opName)@\(try! tokens.get(index)):\"\(text!)\">"
         }
-
     }
 
-    public final class InsertBeforeOp: RewriteOperation {
+    public class InsertBeforeOp: RewriteOperation {
         public override init(_ index: Int, _ text: String?, _ tokens: TokenStream) {
             super.init(index, text, tokens)
         }
 
-        override
-        public func execute(_ buf: StringBuilder) throws -> Int {
+        override public func execute(_ buf: StringBuilder) throws -> Int {
             if text != nil {
                 buf.append(text!)
             }
@@ -139,12 +137,18 @@ public class TokenStreamRewriter {
             return index + 1
         }
     }
+    
+    public class InsertAfterOp: InsertBeforeOp {
+        public override init(_ index: Int, _ text: String?, _ tokens: TokenStream) {
+            super.init(index + 1, text, tokens)
+        }
+    }
 
     /** I'm going to try replacing range from x..y with (y-x)+1 ReplaceOp
      *  instructions.
      */
 
-    public final class ReplaceOp: RewriteOperation {
+    public class ReplaceOp: RewriteOperation {
 
         public init(_ from: Int, _ to: Int, _ text: String?, _ tokens: TokenStream) {
             super.init(from, text, tokens)
@@ -161,11 +165,10 @@ public class TokenStreamRewriter {
         override
         public var description: String {
             if text == nil {
-                return "<DeleteOp@\(try? tokens.get(index))..\(try? tokens.get(lastIndex))>"
+                return "<DeleteOp@\(try! tokens.get(index))..\(try! tokens.get(lastIndex))>"
             }
-            return "<ReplaceOp@\(try? tokens.get(index))..\(try? tokens.get(lastIndex)):\\\(text)>"
+            return "<ReplaceOp@\(try! tokens.get(index))..\(try! tokens.get(lastIndex)):\"\(text!)\">"
         }
-
     }
 
     public class RewriteOperationArray{
@@ -241,58 +244,51 @@ public class TokenStreamRewriter {
             let rewritesCount = rewrites.count
             // WALK REPLACES
             for i in 0..<rewritesCount {
-                guard let rewritesI = rewrites[i]  else {
+                guard let rop = rewrites[i]  else {
                     continue
                 }
-                if !(rewritesI is ReplaceOp) {
+                if !(rop is ReplaceOp) {
                     continue
                 }
 
                 // Wipe prior inserts within range
-                let iopIndexList =  getKindOfOps(&rewrites, InsertBeforeOp.self, i)
-                for j in iopIndexList  {
-                    if let rewritesJ = rewrites[j] {
-                        if rewritesJ.index == rewritesI.index {
+                let inserts =  getKindOfOps(&rewrites, InsertBeforeOp.self, i)
+                for j in inserts  {
+                    if let iop = rewrites[j] {
+                        if iop.index == rop.index {
                             // E.g., insert before 2, delete 2..2; update replace
                             // text to include insert before, kill insert
-                            rewrites[rewritesJ.instructionIndex] = nil
+                            rewrites[iop.instructionIndex] = nil
+                            rop.text = catOpText(iop.text, rop.text)
 
-                            rewritesI.text = catOpText(rewritesJ.text, rewritesI.text)
-
-                        } else if rewritesJ.index > rewritesI.index &&
-                                 rewritesJ.index <= rewritesI.lastIndex {
+                        } else if iop.index > rop.index && iop.index <= rop.lastIndex {
                             // delete insert as it's a no-op.
-                            rewrites[rewritesJ.instructionIndex] = nil
-                            //print("set nil j:\(j)")
-
+                            rewrites[iop.instructionIndex] = nil
                         }
                     }
                 }
                 // Drop any prior replaces contained within
                 let prevRopIndexList =  getKindOfOps(&rewrites, ReplaceOp.self, i)
                 for j in prevRopIndexList  {
-                    if let rewritesJ = rewrites[j] {
-                        if rewritesJ.index >= rewritesI.index && rewritesJ.lastIndex <= rewritesI.lastIndex {
+                    if let prevRop = rewrites[j] {
+                        if prevRop.index >= rop.index && prevRop.lastIndex <= rop.lastIndex {
                             // delete replace as it's a no-op.
-                            rewrites[rewritesJ.instructionIndex] = nil
+                            rewrites[prevRop.instructionIndex] = nil
                             continue
                         }
                         // throw exception unless disjoint or identical
                         let disjoint: Bool =
-                            rewritesJ.lastIndex < rewritesI.index || rewritesJ.index > rewritesI.lastIndex
-                        let same: Bool =
-                            rewritesJ.index == rewritesI.index && rewritesJ.lastIndex == rewritesI.lastIndex
+                            prevRop.lastIndex < rop.index || prevRop.index > rop.lastIndex
                         // Delete special case of replace (text==null):
                         // D.i-j.u D.x-y.v  | boundaries overlap    combine to max(min)..max(right)
-                        if rewritesJ.text == nil && rewritesI.text == nil && !disjoint {
-                            //System.out.println("overlapping deletes: "+rewritesJ+", "+rop);
-                            rewrites[rewritesJ.instructionIndex] = nil // kill first delete
-                            rewritesI.index = min(rewritesJ.index, rewritesI.index)
-                            rewritesI.lastIndex = max(rewritesJ.lastIndex, rewritesI.lastIndex)
-                            //print("new rop " + rewritesI.description)
-                        } else if !disjoint && !same {
-                            throw ANTLRError.illegalArgument(msg: "replace op boundaries of \(rewritesI.description) overlap with previous \(rewritesJ.description)")
-
+                        if prevRop.text == nil && rop.text == nil && !disjoint {
+                            rewrites[prevRop.instructionIndex] = nil // kill first delete
+                            rop.index = min(prevRop.index, rop.index)
+                            rop.lastIndex = max(prevRop.lastIndex, rop.lastIndex)
+                            print("new rop \(rop)")
+                        } else if !disjoint {
+                            throw ANTLRError.illegalArgument(msg: "replace op boundaries of \(rop.description) " +
+                                "overlap with previous \(prevRop.description)")
                         }
                     }
                 }
@@ -300,25 +296,29 @@ public class TokenStreamRewriter {
 
             // WALK INSERTS
             for i in 0..<rewritesCount {
-                guard let rewritesI = rewrites[i]  else {
+                guard let iop = rewrites[i] else {
                     continue
                 }
-                if !(rewritesI is InsertBeforeOp) {
+                if !(iop is InsertBeforeOp) {
                     continue
                 }
-
 
                 // combine current insert with prior if any at same index
                 let prevIopIndexList = getKindOfOps(&rewrites, InsertBeforeOp.self, i)
                 for j in prevIopIndexList {
-                    if let rewritesJ = rewrites[j] {
-                        if rewritesJ.index == rewritesI.index {
-                            // combine objects
-                            // convert to strings...we're in process of toString'ing
-                            // whole token buffer so no lazy eval issue with any templates
-                            rewritesI.text = catOpText(rewritesI.text, rewrites[j]?.text)
-                            // delete redundant prior insert
-                            rewrites[rewritesJ.instructionIndex] = nil
+                    if let prevIop = rewrites[j] {
+                        if prevIop.index == iop.index {
+                            if prevIop is InsertAfterOp {
+                                iop.text = catOpText(prevIop.text, iop.text)
+                                rewrites[prevIop.instructionIndex] = nil
+                            }
+                            else if prevIop is InsertBeforeOp {
+                                // convert to strings...we're in process of toString'ing
+                                // whole token buffer so no lazy eval issue with any templates
+                                iop.text = catOpText(iop.text, prevIop.text)
+                                // delete redundant prior insert
+                                rewrites[prevIop.instructionIndex] = nil
+                            }
                         }
                     }
                 }
@@ -326,19 +326,19 @@ public class TokenStreamRewriter {
                 // look for replaces where iop.index is in range; error
                 let ropIndexList = getKindOfOps(&rewrites, ReplaceOp.self, i)
                 for j in ropIndexList  {
-                    if let rewritesJ = rewrites[j] {
-                        if rewritesI.index == rewritesJ.index {
-                            rewritesJ.text = catOpText(rewritesI.text, rewritesJ.text)
+                    if let rop = rewrites[j] {
+                        if iop.index == rop.index {
+                            rop.text = catOpText(iop.text, rop.text)
                             rewrites[i] = nil    // delete current insert
                             continue
                         }
-                        if rewritesI.index >= rewritesJ.index && rewritesI.index <= rewritesJ.lastIndex {
-                            throw ANTLRError.illegalArgument(msg: "insert op \(rewritesI.description) within boundaries of previous \(rewritesJ.description)")
+                        if iop.index >= rop.index && iop.index <= rop.lastIndex {
+                            throw ANTLRError.illegalArgument(msg: "insert op \(iop.description) within" +
+                                " boundaries of previous \(rop.description)")
 
                         }
                     }
                 }
-
             }
 
             var m: Dictionary<Int, RewriteOperation> = Dictionary<Int, RewriteOperation>()
@@ -363,10 +363,10 @@ public class TokenStreamRewriter {
 
         /** Get all operations before an index of a particular kind */
 
-        final func getKindOfOps<T: RewriteOperation>(_ rewrites: inout Array<RewriteOperation?>, _ kind: T.Type, _ before: Int ) ->  Array<Int>  {
+        final func getKindOfOps<T: RewriteOperation>(_ rewrites: inout [RewriteOperation?], _ kind: T.Type, _ before: Int ) ->  [Int]  {
 
             let length = min(before,rewrites.count)
-            var op = Array<Int>()
+            var op = [Int]()
             op.reserveCapacity(length)
             for i in 0..<length {
                 if rewrites[i] is T {
@@ -438,7 +438,9 @@ public class TokenStreamRewriter {
 
     public func insertAfter(_ programName: String, _ index: Int, _ text: String) {
         // to insert after, just insert before next index (even if past end)
-        insertBefore(programName, index + 1, text)
+        let op = InsertAfterOp(index, text, tokens)
+        let rewrites =  getProgram(programName)
+        rewrites.append(op)
     }
 
     public func insertBefore(_ t: Token, _ text: String) {
@@ -455,8 +457,8 @@ public class TokenStreamRewriter {
 
     public func insertBefore(_ programName: String, _ index: Int, _ text: String) {
         let op: RewriteOperation = InsertBeforeOp(index, text, tokens)
-        let rewritesArray: RewriteOperationArray = getProgram(programName)
-        rewritesArray.append(op)
+        let rewrites: RewriteOperationArray = getProgram(programName)
+        rewrites.append(op)
     }
 
     public func replace(_ index: Int, _ text: String) throws {

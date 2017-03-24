@@ -56,7 +56,8 @@ def gen_parser(grammar):
         return
 
     call([java, '-jar', ANTLR4_JAR,\
-          '-Dlanguage=Swift', grammar, '-o', grammar_folder + '/gen'])
+          '-Dlanguage=Swift', grammar, '-visitor',\
+          '-o', grammar_folder + '/gen'])
 
 
 def swift_test():
