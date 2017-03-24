@@ -44,27 +44,27 @@ Warming up Java compiler....
  *
  Java VM args: -Xms2G -Xmx2G
  Warming up Java compiler....
-    load_legacy_java_ascii average time    45us size  54301b over 3500 loads of 29038 symbols from Parser.java
-     load_legacy_java_utf8 average time    44us size  60072b over 3500 loads of 29038 symbols from Parser.java
-     load_legacy_java_utf8 average time   129us size  23110b over 3500 loads of 13379 symbols from udhr_hin.txt
-             load_new_utf8 average time   184us size 190579b over 3500 loads of 29038 symbols from Parser.java
-             load_new_utf8 average time   196us size  57482b over 3500 loads of 13379 symbols from udhr_hin.txt
+    load_legacy_java_ascii average time    44us size  54301b over 3500 loads of 29038 symbols from Parser.java
+     load_legacy_java_utf8 average time    46us size  94675b over 3500 loads of 29038 symbols from Parser.java
+     load_legacy_java_utf8 average time   125us size  37490b over 3500 loads of 13379 symbols from udhr_hin.txt
+             load_new_utf8 average time   201us size 145893b over 3500 loads of 29038 symbols from Parser.java
+             load_new_utf8 average time   202us size  57482b over 3500 loads of 13379 symbols from udhr_hin.txt
 
-      lex_legacy_java_utf8 average time   388us over 2000 runs of 29038 symbols
-      lex_legacy_java_utf8 average time   922us over 2000 runs of 29038 symbols DFA cleared
-         lex_new_java_utf8 average time   452us over 2000 runs of 29038 symbols
-         lex_new_java_utf8 average time   977us over 2000 runs of 29038 symbols DFA cleared
+      lex_legacy_java_utf8 average time   367us over 2000 runs of 29038 symbols
+      lex_legacy_java_utf8 average time   907us over 2000 runs of 29038 symbols DFA cleared
+         lex_new_java_utf8 average time   434us over 2000 runs of 29038 symbols
+         lex_new_java_utf8 average time   963us over 2000 runs of 29038 symbols DFA cleared
 
-  lex_legacy_grapheme_utf8 average time  6802us over  400 runs of  6614 symbols from udhr_kor.txt
-  lex_legacy_grapheme_utf8 average time  6950us over  400 runs of  6614 symbols from udhr_kor.txt DFA cleared
-  lex_legacy_grapheme_utf8 average time  6233us over  400 runs of 13379 symbols from udhr_hin.txt
-  lex_legacy_grapheme_utf8 average time  6172us over  400 runs of 13379 symbols from udhr_hin.txt DFA cleared
-     lex_new_grapheme_utf8 average time  6962us over  400 runs of  6614 symbols from udhr_kor.txt
-     lex_new_grapheme_utf8 average time  7045us over  400 runs of  6614 symbols from udhr_kor.txt DFA cleared
-     lex_new_grapheme_utf8 average time  6161us over  400 runs of 13379 symbols from udhr_hin.txt
-     lex_new_grapheme_utf8 average time  6217us over  400 runs of 13379 symbols from udhr_hin.txt DFA cleared
-     lex_new_grapheme_utf8 average time   108us over  400 runs of    85 symbols from emoji.txt
-     lex_new_grapheme_utf8 average time   109us over  400 runs of    85 symbols from emoji.txt DFA cleared
+  lex_legacy_grapheme_utf8 average time  4028us over  400 runs of  6614 symbols from udhr_kor.txt
+  lex_legacy_grapheme_utf8 average time  4128us over  400 runs of  6614 symbols from udhr_kor.txt DFA cleared
+  lex_legacy_grapheme_utf8 average time  7661us over  400 runs of 13379 symbols from udhr_hin.txt
+  lex_legacy_grapheme_utf8 average time  7581us over  400 runs of 13379 symbols from udhr_hin.txt DFA cleared
+     lex_new_grapheme_utf8 average time  4026us over  400 runs of  6614 symbols from udhr_kor.txt
+     lex_new_grapheme_utf8 average time  4115us over  400 runs of  6614 symbols from udhr_kor.txt DFA cleared
+     lex_new_grapheme_utf8 average time  7547us over  400 runs of 13379 symbols from udhr_hin.txt
+     lex_new_grapheme_utf8 average time  7613us over  400 runs of 13379 symbols from udhr_hin.txt DFA cleared
+     lex_new_grapheme_utf8 average time    80us over  400 runs of    85 symbols from emoji.txt
+     lex_new_grapheme_utf8 average time    88us over  400 runs of    85 symbols from emoji.txt DFA cleared
  *
  *  The "DFA cleared" indicates that the lexer was returned to initial conditions
  *  before the tokenizing of each file.	 As the ALL(*) lexer encounters new input,
