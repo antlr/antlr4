@@ -7,12 +7,12 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.test.runtime.java.api.JavaLexer;
 
-import java.lang.management.ManagementFactory;
-import java.lang.management.RuntimeMXBean;
-import java.nio.charset.StandardCharsets;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.management.ManagementFactory;
+import java.lang.management.RuntimeMXBean;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -77,6 +77,7 @@ public class TimeLexerSpeed { // don't call it Test else it'll run during "mvn t
 		tests.compilerWarmUp(100);
 
 		int n = 3500;
+		tests.load_legacy_java_ascii(Parser_java_file, n);
 		tests.load_legacy_java_utf8(Parser_java_file, n);
 		tests.load_legacy_java_utf8(PerfDir+"/udhr_hin.txt", n);
 		tests.load_new_utf8(Parser_java_file, n);
@@ -120,13 +121,47 @@ public class TimeLexerSpeed { // don't call it Test else it'll run during "mvn t
 		output = true;
 	}
 
-	public void load_legacy_java_utf8(String resourceName, int n) throws Exception {
-		long start = System.nanoTime();
+	public void load_legacy_java_ascii(String resourceName, int n) throws Exception {
 		CharStream[] input = new CharStream[n]; // keep refs around so we can average memory
+		ClassLoader loader = TimeLexerSpeed.class.getClassLoader();
+		InputStream[] streams = new InputStream[n];
+		for (int i = 0; i<n; i++) {
+			streams[i] = loader.getResourceAsStream(resourceName);
+		}
 		System.gc();
 		long beforeFreeMem = Runtime.getRuntime().freeMemory();
+		long start = System.nanoTime(); // track only time to suck data out of stream
 		for (int i = 0; i<n; i++) {
-			try (InputStream is = TimeLexerSpeed.class.getClassLoader().getResourceAsStream(resourceName);
+			input[i] = new ANTLRInputStream(streams[i]);
+		}
+		long stop = System.nanoTime();
+		long tus = (stop-start)/1000;
+		int size = input[0].size();
+		System.gc();
+		long afterFreeMem = Runtime.getRuntime().freeMemory();
+		int avgStreamSize = (int)((beforeFreeMem-afterFreeMem) / (float)n);
+		String currentMethodName = new Exception().getStackTrace()[0].getMethodName();
+		if ( output ) System.out.printf("%25s average time %5dus size %6db over %4d loads of %5d symbols from %s\n",
+		                                currentMethodName,
+		                                tus/n,
+		                                avgStreamSize,
+		                                n,
+		                                size,
+		                                basename(resourceName));
+	}
+
+	public void load_legacy_java_utf8(String resourceName, int n) throws Exception {
+		CharStream[] input = new CharStream[n]; // keep refs around so we can average memory
+		ClassLoader loader = TimeLexerSpeed.class.getClassLoader();
+		InputStream[] streams = new InputStream[n];
+		for (int i = 0; i<n; i++) {
+			streams[i] = loader.getResourceAsStream(resourceName);
+		}
+		System.gc();
+		long beforeFreeMem = Runtime.getRuntime().freeMemory();
+		long start = System.nanoTime(); // track only time to suck data out of stream
+		for (int i = 0; i<n; i++) {
+			try (InputStream is = streams[i];
 			     InputStreamReader isr = new InputStreamReader(is, StandardCharsets.UTF_8);
 			     BufferedReader br = new BufferedReader(isr)) {
 				input[i] = new ANTLRInputStream(br);
@@ -135,6 +170,7 @@ public class TimeLexerSpeed { // don't call it Test else it'll run during "mvn t
 		long stop = System.nanoTime();
 		long tus = (stop-start)/1000;
 		int size = input[0].size();
+		System.gc();
 		long afterFreeMem = Runtime.getRuntime().freeMemory();
 		int avgStreamSize = (int)((beforeFreeMem-afterFreeMem) / (float)n);
 		String currentMethodName = new Exception().getStackTrace()[0].getMethodName();
@@ -147,19 +183,25 @@ public class TimeLexerSpeed { // don't call it Test else it'll run during "mvn t
 						basename(resourceName));
 	}
 
-	public void load_new_utf8(String fileName, int n) throws Exception {
-		long start = System.nanoTime();
-		System.gc();
-		CharStream[] input = new CharStream[n];
-		long beforeFreeMem = Runtime.getRuntime().freeMemory();
+	public void load_new_utf8(String resourceName, int n) throws Exception {
+		CharStream[] input = new CharStream[n]; // keep refs around so we can average memory
+		ClassLoader loader = TimeLexerSpeed.class.getClassLoader();
+		InputStream[] streams = new InputStream[n];
 		for (int i = 0; i<n; i++) {
-			try (InputStream is = TimeLexerSpeed.class.getClassLoader().getResourceAsStream(fileName)) {
+			streams[i] = loader.getResourceAsStream(resourceName);
+		}
+		System.gc();
+		long beforeFreeMem = Runtime.getRuntime().freeMemory();
+		long start = System.nanoTime(); // track only time to suck data out of stream
+		for (int i = 0; i<n; i++) {
+			try (InputStream is = streams[i]) {
 				input[i] = CharStreams.fromStream(is);
 			}
 		}
 		long stop = System.nanoTime();
 		long tus = (stop-start)/1000;
 		int size = input[0].size();
+		System.gc();
 		long afterFreeMem = Runtime.getRuntime().freeMemory();
 		int avgStreamSize = (int)((beforeFreeMem-afterFreeMem) / (float)n);
 		String currentMethodName = new Exception().getStackTrace()[0].getMethodName();
@@ -169,7 +211,7 @@ public class TimeLexerSpeed { // don't call it Test else it'll run during "mvn t
 						avgStreamSize,
 						n,
 						size,
-						basename(fileName));
+						basename(resourceName));
 	}
 
 	public void lex_legacy_java_utf8(int n, boolean clearLexerDFACache) throws Exception {
