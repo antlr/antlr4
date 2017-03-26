@@ -6,6 +6,7 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.test.runtime.java.api.JavaLexer;
+import org.openjdk.jol.info.GraphLayout;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -15,6 +16,7 @@ import java.lang.management.RuntimeMXBean;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -66,6 +68,44 @@ Warming up Java compiler....
      lex_new_grapheme_utf8 average time    80us over  400 runs of    85 symbols from emoji.txt
      lex_new_grapheme_utf8 average time    88us over  400 runs of    85 symbols from emoji.txt DFA cleared
  *
+ *  I dump footprint now too (this is 64-bit HotSpot VM):
+ *
+ Parser.java (29038 char): org.antlr.v4.runtime.ANTLRInputStream@7d3d101bd footprint:
+      COUNT       AVG       SUM   DESCRIPTION
+          1     65552     65552   [C
+          1        32        32   org.antlr.v4.runtime.ANTLRInputStream
+          2               65584   (total)
+
+ Parser.java (29038 char): org.antlr.v4.runtime.ANTLRInputStream@deb3b60d footprint:
+      COUNT       AVG       SUM   DESCRIPTION
+          1     65552     65552   [C
+          1        32        32   org.antlr.v4.runtime.ANTLRInputStream
+          2               65584   (total)
+
+ udhr_hin.txt (13379 char): org.antlr.v4.runtime.ANTLRInputStream@69fe0ed4d footprint:
+      COUNT       AVG       SUM   DESCRIPTION
+          1     32784     32784   [C
+          1        32        32   org.antlr.v4.runtime.ANTLRInputStream
+          2               32816   (total)
+
+ Parser.java (29038 char): org.antlr.v4.runtime.CodePointCharStream@733fb462d footprint:
+      COUNT       AVG       SUM   DESCRIPTION
+          1        40        40   [C
+          1    131088    131088   [I
+          1        24        24   java.lang.String
+          1        48        48   java.nio.HeapIntBuffer
+          1        32        32   org.antlr.v4.runtime.CodePointCharStream
+          5              131232   (total)
+
+ udhr_hin.txt (13379 char): org.antlr.v4.runtime.CodePointCharStream@2d74cbbdd footprint:
+      COUNT       AVG       SUM   DESCRIPTION
+          1        40        40   [C
+          1     65552     65552   [I
+          1        24        24   java.lang.String
+          1        48        48   java.nio.HeapIntBuffer
+          1        32        32   org.antlr.v4.runtime.CodePointCharStream
+          5               65696   (total)
+ *
  *  The "DFA cleared" indicates that the lexer was returned to initial conditions
  *  before the tokenizing of each file.	 As the ALL(*) lexer encounters new input,
  *  it records how it tokenized the chars. The next time it sees that input,
@@ -87,6 +127,8 @@ public class TimeLexerSpeed { // don't call it Test else it'll run during "mvn t
 
 	public boolean output = true;
 
+	public List<String> streamFootprints = new ArrayList<>();
+
 	public static void main(String[] args) throws Exception {
 		RuntimeMXBean runtimeMxBean = ManagementFactory.getRuntimeMXBean();
 		List<String> vmArgs = runtimeMxBean.getInputArguments();
@@ -97,6 +139,7 @@ public class TimeLexerSpeed { // don't call it Test else it'll run during "mvn t
 			}
 		}
 		System.out.println();
+//		System.out.println(VM.current().details());
 
 		TimeLexerSpeed tests = new TimeLexerSpeed();
 
@@ -130,6 +173,10 @@ public class TimeLexerSpeed { // don't call it Test else it'll run during "mvn t
 		tests.lex_new_grapheme_utf8("udhr_hin.txt", n, true);
 		tests.lex_new_grapheme_utf8("emoji.txt", n, false);
 		tests.lex_new_grapheme_utf8("emoji.txt", n, true);
+
+		for (String streamFootprint : tests.streamFootprints) {
+			System.out.print(streamFootprint);
+		}
 	}
 
 	public void compilerWarmUp(int n) throws Exception {
@@ -154,8 +201,6 @@ public class TimeLexerSpeed { // don't call it Test else it'll run during "mvn t
 		for (int i = 0; i<n; i++) {
 			streams[i] = loader.getResourceAsStream(resourceName);
 		}
-		System.gc();
-		long beforeFreeMem = Runtime.getRuntime().freeMemory();
 		long start = System.nanoTime(); // track only time to suck data out of stream
 		for (int i = 0; i<n; i++) {
 			try (InputStream is = streams[i]) {
@@ -165,14 +210,13 @@ public class TimeLexerSpeed { // don't call it Test else it'll run during "mvn t
 		long stop = System.nanoTime();
 		long tus = (stop-start)/1000;
 		int size = input[0].size();
-		System.gc();
-		long afterFreeMem = Runtime.getRuntime().freeMemory();
-		int avgStreamSize = (int)((beforeFreeMem-afterFreeMem) / (float)n);
+		long streamSize = GraphLayout.parseInstance((Object)input[0]).totalSize();
+		streamFootprints.add(basename(resourceName)+" ("+size+" char): "+GraphLayout.parseInstance((Object)input[0]).toFootprint());
 		String currentMethodName = new Exception().getStackTrace()[0].getMethodName();
 		if ( output ) System.out.printf("%25s average time %5dus size %6db over %4d loads of %5d symbols from %s\n",
 		                                currentMethodName,
 		                                tus/n,
-		                                avgStreamSize,
+		                                streamSize,
 		                                n,
 		                                size,
 		                                basename(resourceName));
@@ -185,8 +229,6 @@ public class TimeLexerSpeed { // don't call it Test else it'll run during "mvn t
 		for (int i = 0; i<n; i++) {
 			streams[i] = loader.getResourceAsStream(resourceName);
 		}
-		System.gc();
-		long beforeFreeMem = Runtime.getRuntime().freeMemory();
 		long start = System.nanoTime(); // track only time to suck data out of stream
 		for (int i = 0; i<n; i++) {
 			try (InputStream is = streams[i];
@@ -198,17 +240,16 @@ public class TimeLexerSpeed { // don't call it Test else it'll run during "mvn t
 		long stop = System.nanoTime();
 		long tus = (stop-start)/1000;
 		int size = input[0].size();
-		System.gc();
-		long afterFreeMem = Runtime.getRuntime().freeMemory();
-		int avgStreamSize = (int)((beforeFreeMem-afterFreeMem) / (float)n);
+		long streamSize = GraphLayout.parseInstance((Object)input[0]).totalSize();
+		streamFootprints.add(basename(resourceName)+" ("+size+" char): "+GraphLayout.parseInstance((Object)input[0]).toFootprint());
 		String currentMethodName = new Exception().getStackTrace()[0].getMethodName();
 		if ( output ) System.out.printf("%25s average time %5dus size %6db over %4d loads of %5d symbols from %s\n",
-						currentMethodName,
-						tus/n,
-						avgStreamSize,
-						n,
-						size,
-						basename(resourceName));
+		                                currentMethodName,
+		                                tus/n,
+		                                streamSize,
+		                                n,
+		                                size,
+		                                basename(resourceName));
 	}
 
 	public void load_new_utf8(String resourceName, int n) throws Exception {
@@ -218,8 +259,6 @@ public class TimeLexerSpeed { // don't call it Test else it'll run during "mvn t
 		for (int i = 0; i<n; i++) {
 			streams[i] = loader.getResourceAsStream(resourceName);
 		}
-		System.gc();
-		long beforeFreeMem = Runtime.getRuntime().freeMemory();
 		long start = System.nanoTime(); // track only time to suck data out of stream
 		for (int i = 0; i<n; i++) {
 			try (InputStream is = streams[i]) {
@@ -229,14 +268,13 @@ public class TimeLexerSpeed { // don't call it Test else it'll run during "mvn t
 		long stop = System.nanoTime();
 		long tus = (stop-start)/1000;
 		int size = input[0].size();
-		System.gc();
-		long afterFreeMem = Runtime.getRuntime().freeMemory();
-		int avgStreamSize = (int)((beforeFreeMem-afterFreeMem) / (float)n);
+		long streamSize = GraphLayout.parseInstance((Object)input[0]).totalSize();
+		streamFootprints.add(basename(resourceName)+" ("+size+" char): "+GraphLayout.parseInstance((Object)input[0]).toFootprint());
 		String currentMethodName = new Exception().getStackTrace()[0].getMethodName();
 		if ( output ) System.out.printf("%25s average time %5dus size %6db over %4d loads of %5d symbols from %s\n",
 						currentMethodName,
 						tus/n,
-						avgStreamSize,
+						streamSize,
 						n,
 						size,
 						basename(resourceName));
