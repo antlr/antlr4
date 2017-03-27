@@ -77,6 +77,11 @@
 			<version>1.0.4</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+		    <groupId>org.openjdk.jol</groupId>
+		    <artifactId>jol-core</artifactId>
+		    <version>0.8</version>
+		</dependency>
 	</dependencies>
 
 	<build>
