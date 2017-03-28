@@ -32,6 +32,10 @@ public extension String {
         return self.replacingOccurrences(of: from, with: replacement, options: NSString.CompareOptions.literal, range: nil)
     }
 
+    @available(iOS, obsoleted: 10.0)
+    @available(macOS, obsoleted: 10.12)
+    @available(tvOS, obsoleted: 10.0)
+    @available(watchOS, obsoleted: 3.0)
     func contains(_ find: String) -> Bool {
         return self.range(of: find) != nil
     }
