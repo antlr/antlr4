@@ -4,6 +4,7 @@
  */
 using System;
 using System.IO;
+using System.Text;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Sharpen;
@@ -27,7 +28,7 @@ namespace Antlr4.Runtime
         /// resets so
         /// we start filling at index 0 again.
         /// </remarks>
-        protected internal char[] data;
+        protected internal int[] data;
 
         /// <summary>
         /// The number of characters currently in
@@ -119,7 +120,7 @@ namespace Antlr4.Runtime
         public UnbufferedCharStream(int bufferSize)
         {
             n = 0;
-            data = new char[bufferSize];
+            data = new int[bufferSize];
         }
 
         public UnbufferedCharStream(Stream input)
@@ -211,13 +212,52 @@ namespace Antlr4.Runtime
         {
             for (int i = 0; i < n; i++)
             {
-                if (this.n > 0 && data[this.n - 1] == unchecked((char)IntStreamConstants.EOF))
+                if (this.n > 0 && data[this.n - 1] == IntStreamConstants.EOF)
                 {
                     return i;
                 }
 
                 int c = NextChar();
-                Add(c);
+                if (c > char.MaxValue || c == IntStreamConstants.EOF)
+                {
+                    Add(c);
+                }
+                else
+                {
+                    char ch = unchecked((char)c);
+                    if (Char.IsLowSurrogate(ch))
+                    {
+                        throw new ArgumentException("Invalid UTF-16 (low surrogate with no preceding high surrogate)");
+                    }
+                    else if (Char.IsHighSurrogate(ch))
+                    {
+                        int lowSurrogate = NextChar();
+                        if (lowSurrogate > char.MaxValue)
+                        {
+                            throw new ArgumentException("Invalid UTF-16 (high surrogate followed by code point > U+FFFF");
+                        }
+                        else if (lowSurrogate == IntStreamConstants.EOF)
+                        {
+                            throw new ArgumentException("Invalid UTF-16 (low surrogate with no preceding high surrogate)");
+                        }
+                        else
+                        {
+                            char lowSurrogateChar = unchecked((char)lowSurrogate);
+                            if (Char.IsLowSurrogate(lowSurrogateChar))
+                            {
+                                Add(Char.ConvertToUtf32(ch, lowSurrogateChar));
+                            }
+                            else
+                            {
+                                throw new ArgumentException("Invalid UTF-16 (low surrogate with no preceding high surrogate)");
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Add(c);
+                    }
+                }
             }
             return n;
         }
@@ -239,7 +279,7 @@ namespace Antlr4.Runtime
             {
                 data = Arrays.CopyOf(data, data.Length * 2);
             }
-            data[n++] = (char)c;
+            data[n++] = c;
         }
 
         public virtual int LA(int i)
@@ -259,12 +299,7 @@ namespace Antlr4.Runtime
             {
                 return IntStreamConstants.EOF;
             }
-            char c = data[index];
-            if (c == unchecked((char)IntStreamConstants.EOF))
-            {
-                return IntStreamConstants.EOF;
-            }
-            return c;
+            return data[index];
         }
 
         /// <summary>Return a marker that we can release later.</summary>
@@ -395,7 +430,7 @@ namespace Antlr4.Runtime
                 throw new ArgumentException("invalid interval");
             }
             int bufferStartIndex = BufferStartIndex;
-            if (n > 0 && data[n - 1] == char.MaxValue)
+            if (n > 0 && data[n - 1] == IntStreamConstants.EOF)
             {
                 if (interval.a + interval.Length > bufferStartIndex + n)
                 {
@@ -408,7 +443,12 @@ namespace Antlr4.Runtime
             }
             // convert from absolute to local index
             int i = interval.a - bufferStartIndex;
-            return new string(data, i, interval.Length);
+            // build a UTF-16 string from the Unicode code points in data
+            var sb = new StringBuilder(interval.Length);
+            for (int offset = 0; offset < interval.Length; offset++) {
+                sb.Append(Char.ConvertFromUtf32(data[i + offset]));
+            }
+            return sb.ToString();
         }
 
         protected internal int BufferStartIndex
