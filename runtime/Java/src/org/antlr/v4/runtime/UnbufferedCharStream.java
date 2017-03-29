@@ -25,7 +25,7 @@ public class UnbufferedCharStream implements CharStream {
 	 * we keep adding to buffer. Otherwise, {@link #consume consume()} resets so
 	 * we start filling at index 0 again.
 	 */
-   	protected char[] data;
+	protected int[] data;
 
 	/**
 	 * The number of characters currently in {@link #data data}.
@@ -82,7 +82,7 @@ public class UnbufferedCharStream implements CharStream {
 	/** Useful for subclasses that pull char from other than this.input. */
 	public UnbufferedCharStream(int bufferSize) {
 		n = 0;
-		data = new char[bufferSize];
+		data = new int[bufferSize];
 	}
 
 	public UnbufferedCharStream(InputStream input) {
@@ -145,13 +145,36 @@ public class UnbufferedCharStream implements CharStream {
 	 */
 	protected int fill(int n) {
 		for (int i=0; i<n; i++) {
-			if (this.n > 0 && data[this.n - 1] == (char)IntStream.EOF) {
+			if (this.n > 0 && data[this.n - 1] == IntStream.EOF) {
 				return i;
 			}
 
 			try {
 				int c = nextChar();
-				add(c);
+				if (c > Character.MAX_VALUE || c == IntStream.EOF) {
+					add(c);
+				} else {
+					char ch = (char) c;
+					if (Character.isLowSurrogate(ch)) {
+						throw new RuntimeException("Invalid UTF-16 (low surrogate with no preceding high surrogate)");
+					} else if (Character.isHighSurrogate(ch)) {
+						int lowSurrogate = nextChar();
+						if (lowSurrogate > Character.MAX_VALUE) {
+							throw new RuntimeException("Invalid UTF-16 (high surrogate followed by code point > U+FFFF");
+						} else if (lowSurrogate == IntStream.EOF) {
+							throw new RuntimeException("Invalid UTF-16 (dangling high surrogate at end of file)");
+						} else {
+							char lowSurrogateChar = (char) lowSurrogate;
+							if (Character.isLowSurrogate(lowSurrogateChar)) {
+								add(Character.toCodePoint(ch, lowSurrogateChar));
+							} else {
+								throw new RuntimeException("Invalid UTF-16 (dangling high surrogate");
+							}
+						}
+					} else {
+						add(c);
+					}
+				}
 			}
 			catch (IOException ioe) {
 				throw new RuntimeException(ioe);
@@ -173,7 +196,7 @@ public class UnbufferedCharStream implements CharStream {
 		if ( n>=data.length ) {
 			data = Arrays.copyOf(data, data.length * 2);
         }
-        data[n++] = (char)c;
+        data[n++] = c;
     }
 
     @Override
@@ -183,8 +206,8 @@ public class UnbufferedCharStream implements CharStream {
         int index = p + i - 1;
         if ( index < 0 ) throw new IndexOutOfBoundsException();
 		if ( index >= n ) return IntStream.EOF;
-        char c = data[index];
-        if ( c==(char)IntStream.EOF ) return IntStream.EOF;
+        int c = data[index];
+        if ( c==IntStream.EOF ) return IntStream.EOF;
         return c;
     }
 
