@@ -50,11 +50,6 @@ public final class CharStreams {
 	 * charset of the bytes contained in the file.
 	 *
 	 * Reads the entire contents of the file into the result before returning.
-	 *
-	 * For sources encoded in UTF-8, supports the full Unicode code point
-	 * range.
-	 *
-	 * For other sources, only supports Unicode code points up to U+FFFF.
 	 */
 	public static CharStream fromPath(Path path, Charset charset) throws IOException {
 		long size = Files.size(path);
@@ -85,11 +80,6 @@ public final class CharStreams {
 	 * contained in the file.
 	 *
 	 * Reads the entire contents of the file into the result before returning.
-	 *
-	 * For sources encoded in UTF-8, supports the full Unicode code point
-	 * range.
-	 *
-	 * For other sources, only supports Unicode code points up to U+FFFF.
 	 */
 	public static CharStream fromFileName(String fileName, Charset charset) throws IOException {
 		return fromPath(Paths.get(fileName), charset);
@@ -113,11 +103,6 @@ public final class CharStreams {
 	 *
 	 * Reads the entire contents of the {@code InputStream} into
 	 * the result before returning, then closes the {@code InputStream}.
-	 *
-	 * For sources encoded in UTF-8, supports the full Unicode code point
-	 * range.
-	 *
-	 * For other sources, only supports Unicode code points up to U+FFFF.
 	 */
 	public static CharStream fromStream(InputStream is, Charset charset) throws IOException {
 		return fromStream(is, charset, -1);
@@ -152,11 +137,6 @@ public final class CharStreams {
 	 *
 	 * Reads the entire contents of the {@code channel} into
 	 * the result before returning, then closes the {@code channel}.
-	 *
-	 * For sources encoded in UTF-8, supports the full Unicode code point
-	 * range.
-	 *
-	 * For other sources, only supports Unicode code points up to U+FFFF.
 	 */
 	public static CharStream fromChannel(ReadableByteChannel channel, Charset charset) throws IOException {
 		return fromChannel(
