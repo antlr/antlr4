@@ -4,10 +4,10 @@ Prior to ANTLR 4.7, generated lexers only supported part of the Unicode standard
 long as the input `CharStream` is opened using `CharStreams.fromPath()`, `CharStreams.fromFileName()`, etc...
 or the equivalent method for your runtime's language. 
 
-The deprecated `ANTLRInputStream` and `ANTLRFileStream` APIs only support Unicode code points up to `U+FFFF`.
+The deprecated `ANTLRInputStream` and `ANTLRFileStream` *Java-target* APIs only support Unicode code points up to `U+FFFF`.
 
 A big shout out to Ben Hamilton (github bhamiltoncx) for his superhuman
-efforts across all targets to get true Unicode 3.1 support for U+10FFFF.
+efforts across all targets to get true support for U+10FFFF code points.
 
 ## Example
 
@@ -61,7 +61,7 @@ Code for **4.6** looked like this:
 
 
 ```java
-CharStream input = new ANTLRFileStream("myinputfile")
+CharStream input = new ANTLRFileStream("myinputfile");
 JavaLexer lexer = new JavaLexer(input);
 CommonTokenStream tokens = new CommonTokenStream(lexer);
 ```
@@ -77,7 +77,7 @@ CommonTokenStream tokens = new CommonTokenStream(lexer);
 Or, if you'd like to specify the file encoding:
 
 ```java
-CharStream input = CharStreams.fromFileName("inputfile", StandardCharsets.UTF_16);
+CharStream input = CharStreams.fromFileName("inputfile", Charset.forName("windows-1252"));
 ```
 
 ### Motivation
@@ -112,7 +112,13 @@ of unbuffered input. See the [ANTLR 4 book](https://www.amazon.com/Definitive-AN
 useful for processing infinite streams *during the parse* and require that you manually buffer characters. Use `UnbufferedCharStream` and `UnbufferedTokenStream`.
 
 ```java
-CharStream input = new UnbufferedCharStream(is);CSVLexer lex = new CSVLexer(input);// copy text out of sliding buffer and store in tokens lex.setTokenFactory(new CommonTokenFactory(true));TokenStream tokens = new UnbufferedTokenStream<CommonToken>(lex); CSVParser parser = new CSVParser(tokens); parser.setBuildParseTree(false);parser.file();
+CharStream input = new UnbufferedCharStream(is);
+CSVLexer lex = new CSVLexer(input); // copy text out of sliding buffer and store in tokens
+lex.setTokenFactory(new CommonTokenFactory(true));
+TokenStream tokens = new UnbufferedTokenStream<CommonToken>(lex);
+CSVParser parser = new CSVParser(tokens);
+parser.setBuildParseTree(false);
+parser.file();
 ```
 
 Your grammar that needs to have embedded actions that access the tokens as they are created, but before they disappear and are garbage collected. For example,
@@ -133,4 +139,4 @@ implementation of `CharStream.getText` in
 allows `Token.getText` to be called at any time regardless of the
 input stream implementation.
 
-*Currently, only Java and C# have these unbuffered streams implemented*.
+*Currently, only Java, C++, and C# have these unbuffered streams implemented*.

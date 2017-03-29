@@ -42,7 +42,7 @@ public class WriteBinaryFile {
 	};
 
 	public static void main(String[] args) throws IOException {
-		Files.write(new File("resources/ips").toPath(), bytes);
+		Files.write(new File("/tmp/ips").toPath(), bytes);
 	}
 }
 ```
@@ -50,14 +50,14 @@ public class WriteBinaryFile {
 Now we need to create a stream of bytes satisfactory to ANTLR, which is as simple as:
 
 ```java
-ANTLRFileStream bytesAsChar = new ANTLRFileStream("resources/ips", "ISO-8859-1");
+CharStream bytesAsChar = CharStreams.fromFileName("/tmp/ips", StandardCharsets.ISO_8859_1);
 ```
 
 The `ISO-8859-1` encoding is just the 8-bit char encoding for LATIN-1, which effectively tells the stream to treat each byte as a character. That's what we want. Then we have the usual test rig:
 
 
 ```java
-//ANTLRFileStream bytesAsChar = new ANTLRFileStream("resources/ips", "ISO-8859-1"); DEPRECATED in 4.7
+//ANTLRFileStream bytesAsChar = new ANTLRFileStream("/tmp/ips", "ISO-8859-1"); DEPRECATED in 4.7
 CharStream bytesAsChar = CharStreams.fromFileName("/tmp/ips", StandardCharsets.ISO_8859_1);
 IPLexer lexer = new IPLexer(bytesAsChar);
 CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -127,7 +127,7 @@ class BinaryANTLRFileStream extends ANTLRFileStream {
 The new test code starts out like this:
 
 ```java
-ANTLRFileStream bytesAsChar = new BinaryANTLRFileStream("resources/ips");
+ANTLRFileStream bytesAsChar = new BinaryANTLRFileStream("/tmp/ips");
 IPLexer lexer = new IPLexer(bytesAsChar);
 ...
 ```
