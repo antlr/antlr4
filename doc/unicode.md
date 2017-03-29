@@ -66,7 +66,9 @@ JavaLexer lexer = new JavaLexer(input);
 CommonTokenStream tokens = new CommonTokenStream(lexer);
 ```
 
-Code for **4.7** looks like this:
+(It didn't use UTF-8 by default, despite the documentation saying so previously; it actually depended on the calling environments default.)
+
+Code for **4.7** assumes UTF-8 by default and looks like this:
 
 ```java
 CharStream input = CharStreams.fromFileName("inputfile");
