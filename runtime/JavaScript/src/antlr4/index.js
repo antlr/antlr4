@@ -9,6 +9,7 @@ exports.fromcodepoint = require('./polyfills/fromcodepoint');
 exports.tree = require('./tree/index');
 exports.error = require('./error/index');
 exports.Token = require('./Token').Token;
+exports.CharStreams = require('./CharStreams').CharStreams;
 exports.CommonToken = require('./Token').CommonToken;
 exports.InputStream = require('./InputStream').InputStream;
 exports.FileStream = require('./FileStream').FileStream;
