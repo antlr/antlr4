@@ -1,10 +1,8 @@
 # Lexers and Unicode text
 
-Prior to ANTLR 4.7, generated lexers only supported part of the Unicode standard (code points up to `U+FFFF`). As of ANTLR 4.7, the lexers in all language runtimes support the full range of Unicode code points up to `U+10FFFF`, as
+Prior to ANTLR 4.7, generated lexers in most targets only supported part of the Unicode standard (code points up to `U+FFFF`). As of ANTLR 4.7, the lexers in all language runtimes support the full range of Unicode code points up to `U+10FFFF`, as
 long as the input `CharStream` is opened using `CharStreams.fromPath()`, `CharStreams.fromFileName()`, etc...
-or the equivalent method for your runtime's language. 
-
-The deprecated `ANTLRInputStream` and `ANTLRFileStream` *Java-target* APIs only support Unicode code points up to `U+FFFF`.
+or the equivalent method for your runtime's language. Java, C#, and JavaScript runtimes required changes and, rather than break the previous interface, we deprecated them. (The *Java-target* deprecated `ANTLRInputStream` and `ANTLRFileStream` APIs only support Unicode code points up to `U+FFFF`.) C++, Python, Go, and Swift APIs didn't need any changes to support Unicode code points, so we decided to leave those alone. They do not use the new factory-style stream construction. 
 
 A big shout out to Ben Hamilton (github bhamiltoncx) for his superhuman
 efforts across all targets to get true support for U+10FFFF code points.
