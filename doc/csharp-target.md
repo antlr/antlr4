@@ -35,7 +35,7 @@ using Antlr4.Runtime;
      
 public void MyParseMethod() {
       String input = "your text to parse here";
-      AntlrInputStream stream = new InputStream(input);
+      ICharStream stream = new CharStreams.fromString(input);
       ITokenSource lexer = new MyGrammarLexer(stream);
       ITokenStream tokens = new CommonTokenStream(lexer);
       MyGrammarParser parser = new MyGrammarParser(tokens);
