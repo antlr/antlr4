@@ -12,6 +12,8 @@ import java.io.IOException;
 /**
  * This is an {@link ANTLRInputStream} that is loaded from a file all at once
  * when you construct the object.
+ *
+ * @deprecated as of 4.7 Please use {@link CharStreams} interface.
  */
 public class ANTLRFileStream extends ANTLRInputStream {
 	protected String fileName;
