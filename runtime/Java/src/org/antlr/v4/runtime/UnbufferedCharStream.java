@@ -206,9 +206,7 @@ public class UnbufferedCharStream implements CharStream {
         int index = p + i - 1;
         if ( index < 0 ) throw new IndexOutOfBoundsException();
 		if ( index >= n ) return IntStream.EOF;
-        int c = data[index];
-        if ( c==IntStream.EOF ) return IntStream.EOF;
-        return c;
+        return data[index];
     }
 
 	/**
