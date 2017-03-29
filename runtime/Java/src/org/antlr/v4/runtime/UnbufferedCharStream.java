@@ -18,6 +18,9 @@ import java.util.Arrays;
  *  for efficiency and also buffers while a mark exists (set by the
  *  lookahead prediction in parser). "Unbuffered" here refers to fact
  *  that it doesn't buffer all data, not that's it's on demand loading of char.
+ *
+ *  As of 4.7, the buffer elements are ints not 16-bit chars to support
+ *  U+10FFFF code points.
  */
 public class UnbufferedCharStream implements CharStream {
 	/**
@@ -153,25 +156,31 @@ public class UnbufferedCharStream implements CharStream {
 				int c = nextChar();
 				if (c > Character.MAX_VALUE || c == IntStream.EOF) {
 					add(c);
-				} else {
+				}
+				else {
 					char ch = (char) c;
 					if (Character.isLowSurrogate(ch)) {
 						throw new RuntimeException("Invalid UTF-16 (low surrogate with no preceding high surrogate)");
-					} else if (Character.isHighSurrogate(ch)) {
+					}
+					else if (Character.isHighSurrogate(ch)) {
 						int lowSurrogate = nextChar();
 						if (lowSurrogate > Character.MAX_VALUE) {
 							throw new RuntimeException("Invalid UTF-16 (high surrogate followed by code point > U+FFFF");
-						} else if (lowSurrogate == IntStream.EOF) {
+						}
+						else if (lowSurrogate == IntStream.EOF) {
 							throw new RuntimeException("Invalid UTF-16 (dangling high surrogate at end of file)");
-						} else {
+						}
+						else {
 							char lowSurrogateChar = (char) lowSurrogate;
 							if (Character.isLowSurrogate(lowSurrogateChar)) {
 								add(Character.toCodePoint(ch, lowSurrogateChar));
-							} else {
+							}
+							else {
 								throw new RuntimeException("Invalid UTF-16 (dangling high surrogate");
 							}
 						}
-					} else {
+					}
+					else {
 						add(c);
 					}
 				}

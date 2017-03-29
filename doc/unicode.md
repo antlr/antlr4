@@ -98,13 +98,39 @@ on-the-fly compiler (JIT) is unable to perform the same optimizations
 so stick with either the old or the new streams, if performance is
 a primary concern. See the [extreme debugging and spelunking](https://github.com/antlr/antlr4/pull/1781) needed to identify this issue in our timing rig.
 
-### Character Buffering
+### Character Buffering, Unbuffered streams
 
 The ANTLR character streams still buffer all the input when you create
-the stream, as they have done for ~20 years. If you need unbuffered
+the stream, as they have done for ~20 years. 
+
+If you need unbuffered
 access, please note that it becomes challenging to create
 parse trees. The parse tree has to point to tokens which will either
 point into a stale location in an unbuffered stream or you have to copy
 the characters out of the buffer into the token. That defeats the purpose
 of unbuffered input. See the [ANTLR 4 book](https://www.amazon.com/Definitive-ANTLR-4-Reference/dp/1934356999) "13.8 Unbuffered Character and Token Streams". Unbuffered streams are primarily
-useful for processing infinite streams *during the parse* and require that you manually buffer characters.
+useful for processing infinite streams *during the parse* and require that you manually buffer characters. Use `UnbufferedCharStream` and `UnbufferedTokenStream`.
+
+```java
+CharStream input = new UnbufferedCharStream(is);CSVLexer lex = new CSVLexer(input);// copy text out of sliding buffer and store in tokens lex.setTokenFactory(new CommonTokenFactory(true));TokenStream tokens = new UnbufferedTokenStream<CommonToken>(lex); CSVParser parser = new CSVParser(tokens); parser.setBuildParseTree(false);parser.file();
+```
+
+Your grammar that needs to have embedded actions that access the tokens as they are created, but before they disappear and are garbage collected. For example,
+
+```
+data : a=INT {int x = Integer.parseInt($a.text);} ;
+```
+
+From the code comments of `CommonTokenFactory`:
+
+> That `true` in `new CommonTokenFactory(true)` indicates whether `CommonToken.setText` should be called after 
+constructing tokens to explicitly set the text. This is useful for cases
+where the input stream might not be able to provide arbitrary substrings
+of text from the input after the lexer creates a token (e.g. the
+implementation of `CharStream.getText` in
+`UnbufferedCharStream` throws an
+`UnsupportedOperationException`). Explicitly setting the token text
+allows `Token.getText` to be called at any time regardless of the
+input stream implementation.
+
+*Currently, only Java and C# have these unbuffered streams implemented*.
