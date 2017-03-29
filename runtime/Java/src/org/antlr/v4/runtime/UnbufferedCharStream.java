@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 /** Do not buffer up the entire char stream. It does keep a small buffer
@@ -19,8 +21,11 @@ import java.util.Arrays;
  *  lookahead prediction in parser). "Unbuffered" here refers to fact
  *  that it doesn't buffer all data, not that's it's on demand loading of char.
  *
- *  As of 4.7, the buffer elements are ints not 16-bit chars to support
- *  U+10FFFF code points.
+ *  Before 4.7, this class used the default environment encoding to convert
+ *  bytes to UTF-16, and held the UTF-16 bytes in the buffer as chars.
+ *
+ *  As of 4.7, the class uses UTF-8 by default, and the buffer holds Unicode
+ *  code points in the buffer as ints.
  */
 public class UnbufferedCharStream implements CharStream {
 	/**
@@ -97,8 +102,12 @@ public class UnbufferedCharStream implements CharStream {
 	}
 
 	public UnbufferedCharStream(InputStream input, int bufferSize) {
+		this(input, bufferSize, StandardCharsets.UTF_8);
+	}
+
+	public UnbufferedCharStream(InputStream input, int bufferSize, Charset charset) {
 		this(bufferSize);
-		this.input = new InputStreamReader(input);
+		this.input = new InputStreamReader(input, charset);
 		fill(1); // prime
 	}
 
