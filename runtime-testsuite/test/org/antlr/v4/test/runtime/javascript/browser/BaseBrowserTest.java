@@ -678,7 +678,7 @@ public abstract class BaseBrowserTest implements RuntimeTestSupport {
 			"			test = function() {\r\n" +
 			"				document.getElementById('output').value = ''\r\n" +
 			"				var input = document.getElementById('input').value;\r\n" +
-			"			var stream = new antlr4.InputStream(input, true);\n" +
+			"			var stream = antlr4.CharStreams.fromString(input);\n" +
 			"    			var lexer = new " + lexerName + "." + lexerName + "(stream);\n" +
 			"				lexer._listeners = [new listener()];\r\n" +
 			"    			var tokens = new antlr4.CommonTokenStream(lexer);\n" +
@@ -737,7 +737,7 @@ public abstract class BaseBrowserTest implements RuntimeTestSupport {
 			"			test = function() {\r\n" +
 			"				document.getElementById('output').value = ''\r\n" +
 			"				var input = document.getElementById('input').value;\r\n" +
-			"			var chars = new antlr4.InputStream(input, true);\r\n" +
+			"			var chars = antlr4.CharStreams.fromString(input);\r\n" +
 			"    			var lexer = new " + lexerName + "." + lexerName + "(chars);\r\n" +
 			"				lexer._listeners = [new listener()];\r\n" +
 			"    			var stream = new antlr4.CommonTokenStream(lexer);\r\n" +
