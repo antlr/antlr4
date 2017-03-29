@@ -3,16 +3,13 @@
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
-package org.antlr.v4.test.runtime.java;
+package org.antlr.v4.runtime;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.nio.IntBuffer;
-
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CodePointCharStream;
-import org.antlr.v4.runtime.IntStream;
 
 import org.antlr.v4.runtime.misc.Interval;
 
@@ -290,5 +287,26 @@ public class TestCodePointCharStream {
 					.toString());
 		s.seek(6);
 		assertEquals(0x1F522, s.LA(-1));
+	}
+
+	@Test
+	public void asciiContentsShouldUse8BitBuffer() {
+		CodePointCharStream s = CharStreams.fromString("hello");
+		assertTrue(s.getInternalStorage() instanceof byte[]);
+		assertEquals(5, s.size());
+	}
+
+	@Test
+	public void bmpContentsShouldUse16BitBuffer() {
+		CodePointCharStream s = CharStreams.fromString("hello \u4E16\u754C");
+		assertTrue(s.getInternalStorage() instanceof char[]);
+		assertEquals(8, s.size());
+	}
+
+	@Test
+	public void smpContentsShouldUse32BitBuffer() {
+		CodePointCharStream s = CharStreams.fromString("hello \uD83C\uDF0D");
+		assertTrue(s.getInternalStorage() instanceof int[]);
+		assertEquals(7, s.size());
 	}
 }

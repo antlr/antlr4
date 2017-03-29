@@ -137,9 +137,9 @@ public class TestCharStreams {
 		try (SeekableByteChannel c = Files.newByteChannel(p)) {
 			CharStream s = CharStreams.fromChannel(
 					c, 4096, CodingErrorAction.REPLACE, "foo");
-			assertEquals(3, s.size());
+			assertEquals(4, s.size());
 			assertEquals(0, s.index());
-			assertEquals("\uFFFD\uFFFD\uFFFD", s.toString());
+			assertEquals("\uFFFD\uFFFD\uFFFD\uFFFD", s.toString());
 		}
 	}
 
