@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -119,11 +119,11 @@ namespace Antlr4.Runtime
         /// <summary>
         /// COPY a ctx (I'm deliberately not using copy constructor) to avoid
         /// confusion with creating node with parent. Does not copy children.
-        /// 
+        ///
         /// This is used in the generated parser code to flip a generic XContext
         /// node for rule X to a YContext for alt label Y. In that sense, it is
         /// not really a generic copy function.
-        /// 
+        ///
         /// If we do an error sync() at start of a rule, we might add error nodes
         /// to the generic XContext so this function must copy those nodes to
         /// the YContext as well else they are lost!

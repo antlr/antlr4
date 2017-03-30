@@ -1,11 +1,11 @@
-/// Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
 
 
 /// Implements the {@code channel} lexer action by calling
 /// {@link org.antlr.v4.runtime.Lexer#setChannel} with the assigned channel.
-/// 
+///
 /// -  Sam Harwell
 /// -  4.2
 
@@ -19,7 +19,7 @@ public final class LexerChannelAction: LexerAction, CustomStringConvertible {
     }
 
     /// Gets the channel to use for the {@link org.antlr.v4.runtime.Token} created by the lexer.
-    /// 
+    ///
     /// - returns: The channel to use for the {@link org.antlr.v4.runtime.Token} created by the lexer.
     public func getChannel() -> Int {
         return channel
@@ -40,7 +40,7 @@ public final class LexerChannelAction: LexerAction, CustomStringConvertible {
     }
 
     /// {@inheritDoc}
-    /// 
+    ///
     /// <p>This action is implemented by calling {@link org.antlr.v4.runtime.Lexer#setChannel} with the
     /// value provided by {@link #getChannel}.</p>
 

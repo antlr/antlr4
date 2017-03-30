@@ -1,4 +1,4 @@
-/// Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
 
@@ -7,7 +7,7 @@
 /// certain potential correctness and performance problems in grammars. "Reports"
 /// are made by calling {@link org.antlr.v4.runtime.Parser#notifyErrorListeners} with the appropriate
 /// message.
-/// 
+///
 /// <ul>
 /// <li><b>Ambiguities</b>: These are cases where more than one path through the
 /// grammar can match the input.</li>
@@ -20,7 +20,7 @@
 /// a truly viable alternative. Two-stage parsing cannot be used for inputs where
 /// this situation occurs.</li>
 /// </ul>
-/// 
+///
 /// -  Sam Harwell
 
 import Foundation
@@ -37,7 +37,7 @@ public class DiagnosticErrorListener: BaseErrorListener {
 
     /// Initializes a new instance of {@link org.antlr.v4.runtime.DiagnosticErrorListener}, specifying
     /// whether all ambiguities or only exact ambiguities are reported.
-    /// 
+    ///
     /// - parameter exactOnly: {@code true} to report only exact ambiguities, otherwise
     /// {@code false} to report all ambiguities.
     public init(_ exactOnly: Bool) {
@@ -114,7 +114,7 @@ public class DiagnosticErrorListener: BaseErrorListener {
     /// Computes the set of conflicting or ambiguous alternatives from a
     /// configuration set, if that information was not already provided by the
     /// parser.
-    /// 
+    ///
     /// - parameter reportedAlts: The set of conflicting or ambiguous alternatives, as
     /// reported by the parser.
     /// - parameter configs: The conflicting or ambiguous configuration set.

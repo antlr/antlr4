@@ -1,11 +1,11 @@
-/// Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
 
 
 /// This class extends {@link org.antlr.v4.runtime.ParserRuleContext} by allowing the value of
 /// {@link #getRuleIndex} to be explicitly set for the context.
-/// 
+///
 /// <p>
 /// {@link org.antlr.v4.runtime.ParserRuleContext} does not include field storage for the rule index
 /// since the context classes created by the code generator override the
@@ -24,7 +24,7 @@ public class InterpreterRuleContext: ParserRuleContext {
 
     /// Constructs a new {@link org.antlr.v4.runtime.InterpreterRuleContext} with the specified
     /// parent, invoking state, and rule index.
-    /// 
+    ///
     /// - parameter parent: The parent context.
     /// - parameter invokingStateNumber: The invoking state number.
     /// - parameter ruleIndex: The rule index for the current context.

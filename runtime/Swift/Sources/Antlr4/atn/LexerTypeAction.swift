@@ -1,11 +1,11 @@
-/// Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
 
 
 /// Implements the {@code type} lexer action by calling {@link org.antlr.v4.runtime.Lexer#setType}
 /// with the assigned type.
-/// 
+///
 /// -  Sam Harwell
 /// -  4.2
 
@@ -39,7 +39,7 @@ public class LexerTypeAction: LexerAction, CustomStringConvertible {
     }
 
     /// {@inheritDoc}
-    /// 
+    ///
     /// <p>This action is implemented by calling {@link org.antlr.v4.runtime.Lexer#setType} with the
     /// value provided by {@link #getType}.</p>
 

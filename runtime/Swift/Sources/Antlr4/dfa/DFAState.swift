@@ -1,4 +1,4 @@
-/// Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
 
@@ -18,11 +18,11 @@
 /// jump from rule to rule, emulating rule invocations (method calls).
 /// I have to add a stack to simulate the proper lookahead sequences for
 /// the underlying LL grammar from which the ATN was derived.
-/// 
+///
 /// <p>I use a set of ATNConfig objects not simple states.  An ATNConfig
 /// is both a state (ala normal conversion) and a RuleContext describing
 /// the chain of rules (if any) followed to arrive at that state.</p>
-/// 
+///
 /// <p>A DFA state may have multiple references to a particular state,
 /// but with different ATN contexts (with same or different alts)
 /// meaning that state was reached via a different set of rule invocations.</p>
@@ -58,11 +58,11 @@ public class DFAState: Hashable, CustomStringConvertible {
     /// {@link #requiresFullContext} is {@code false} since full context prediction evaluates predicates
     /// on-the-fly. If this is not null, then {@link #prediction} is
     /// {@link org.antlr.v4.runtime.atn.ATN#INVALID_ALT_NUMBER}.
-    /// 
+    ///
     /// <p>We only use these for non-{@link #requiresFullContext} but conflicting states. That
     /// means we know from the context (it's $ or we don't dip into outer
     /// context) that it's an ambiguity not a conflict.</p>
-    /// 
+    ///
     /// <p>This list is computed by {@link org.antlr.v4.runtime.atn.ParserATNSimulator#predicateDFAState}.</p>
 
     public var predicates: [PredPrediction]?
@@ -117,11 +117,11 @@ public class DFAState: Hashable, CustomStringConvertible {
 
     /// Two {@link org.antlr.v4.runtime.dfa.DFAState} instances are equal if their ATN configuration sets
     /// are the same. This method is used to see if a state already exists.
-    /// 
+    ///
     /// <p>Because the number of alternatives and number of ATN configurations are
     /// finite, there is a finite number of DFA states that can be processed.
     /// This is necessary to show that the algorithm terminates.</p>
-    /// 
+    ///
     /// <p>Cannot test the DFA state numbers here because in
     /// {@link org.antlr.v4.runtime.atn.ParserATNSimulator#addDFAState} we need to know if any other state
     /// exists that has this exact set of ATN configurations. The

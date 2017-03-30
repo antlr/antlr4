@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -21,14 +21,14 @@ void replaceAll(std::string& str, const std::string& from, const std::string& to
 
 std::string ws2s(const std::wstring &wstr) {
   std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-  
+
   std::string narrow = converter.to_bytes(wstr);
   return narrow;
 }
 
 std::wstring s2ws(const std::string &str) {
   std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-  
+
   std::wstring wide = converter.from_bytes(str);
   return wide;
 }

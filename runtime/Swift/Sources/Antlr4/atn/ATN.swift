@@ -1,4 +1,4 @@
-/// Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
 
@@ -111,10 +111,10 @@ public class ATN {
     /// assumed true). If a path in the ATN exists from the starting state to the
     /// {@link org.antlr.v4.runtime.atn.RuleStopState} of the outermost context without matching any
     /// symbols, {@link org.antlr.v4.runtime.Token#EOF} is added to the returned set.
-    /// 
+    ///
     /// <p>If {@code context} is {@code null}, it is treated as
     /// {@link org.antlr.v4.runtime.ParserRuleContext#EMPTY}.</p>
-    /// 
+    ///
     /// - parameter stateNumber: the ATN state number
     /// - parameter context: the full parse context
     /// - returns: The set of potentially valid input symbols which could follow the

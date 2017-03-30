@@ -1,4 +1,4 @@
-/// Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
 
@@ -26,7 +26,7 @@ public class CommonToken: WritableToken {
 
     /// This is the backing field for {@link #getTokenSource} and
     /// {@link #getInputStream}.
-    /// 
+    ///
     /// <p>
     /// These properties share a field to reduce the memory footprint of
     /// {@link org.antlr.v4.runtime.CommonToken}. Tokens created by a {@link org.antlr.v4.runtime.CommonTokenFactory} from
@@ -37,7 +37,7 @@ public class CommonToken: WritableToken {
 
     /// This is the backing field for {@link #getText} when the token text is
     /// explicitly set in the constructor or via {@link #setText}.
-    /// 
+    ///
     /// - seealso: #getText()
     internal var text: String?
 
@@ -54,7 +54,7 @@ public class CommonToken: WritableToken {
     internal var stop: Int = 0
 
     /// Constructs a new {@link org.antlr.v4.runtime.CommonToken} with the specified token type.
-    /// 
+    ///
     /// - parameter type: The token type.
 
     private var _visited: Bool = false
@@ -78,7 +78,7 @@ public class CommonToken: WritableToken {
 
     /// Constructs a new {@link org.antlr.v4.runtime.CommonToken} with the specified token type and
     /// text.
-    /// 
+    ///
     /// - parameter type: The token type.
     /// - parameter text: The text of the token.
     public init(_ type: Int, _ text: String?) {
@@ -89,7 +89,7 @@ public class CommonToken: WritableToken {
     }
 
     /// Constructs a new {@link org.antlr.v4.runtime.CommonToken} as a copy of another {@link org.antlr.v4.runtime.Token}.
-    /// 
+    ///
     /// <p>
     /// If {@code oldToken} is also a {@link org.antlr.v4.runtime.CommonToken} instance, the newly
     /// constructed token will share a reference to the {@link #text} field and
@@ -97,7 +97,7 @@ public class CommonToken: WritableToken {
     /// be assigned the result of calling {@link #getText}, and {@link #source}
     /// will be constructed from the result of {@link org.antlr.v4.runtime.Token#getTokenSource} and
     /// {@link org.antlr.v4.runtime.Token#getInputStream}.</p>
-    /// 
+    ///
     /// - parameter oldToken: The token to copy.
     public init(_ oldToken: Token) {
         type = oldToken.getType()
@@ -149,7 +149,7 @@ public class CommonToken: WritableToken {
     /// Explicitly set the text for this token. If {code text} is not
     /// {@code null}, then {@link #getText} will return this value rather than
     /// extracting the text from the input.
-    /// 
+    ///
     /// - parameter text: The explicit text of the token, or {@code null} if the text
     /// should be obtained from the input along with the start and stop indexes
     /// of the token.
@@ -252,7 +252,7 @@ public class CommonToken: WritableToken {
 //        desc.append("\(start):\(stop)='\(txt)',")
 //        desc.append("<\(typeString)>\(channelStr),")
 //        desc.append("\(line):\(getCharPositionInLine())]")
-//        
+//
 //        return desc.toString()
     }
     public var visited: Bool {

@@ -1,4 +1,4 @@
-/// Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
 
@@ -9,10 +9,10 @@
 /// {@link org.antlr.v4.runtime.misc.ParseCancellationException}. The implementation ensures that the
 /// {@link org.antlr.v4.runtime.ParserRuleContext#exception} field is set for all parse tree nodes
 /// that were not completed prior to encountering the error.
-/// 
+///
 /// <p>
 /// This error strategy is useful in the following scenarios.</p>
-/// 
+///
 /// <ul>
 /// <li><strong>Two-stage parsing:</strong> This error strategy allows the first
 /// stage of two-stage parsing to immediately terminate if an error is
@@ -25,10 +25,10 @@
 /// the {@link org.antlr.v4.runtime.BailErrorStrategy} avoids wasting work on recovering from errors
 /// when the result will be ignored either way.</li>
 /// </ul>
-/// 
+///
 /// <p>
 /// {@code myparser.setErrorHandler(new BailErrorStrategy());}</p>
-/// 
+///
 /// - seealso: org.antlr.v4.runtime.Parser#setErrorHandler(org.antlr.v4.runtime.ANTLRErrorStrategy)
 
 public class BailErrorStrategy: DefaultErrorStrategy {

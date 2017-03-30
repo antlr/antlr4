@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -54,7 +54,6 @@ import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupString;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.net.BindException;
 import java.util.ArrayList;
 import java.util.Arrays;

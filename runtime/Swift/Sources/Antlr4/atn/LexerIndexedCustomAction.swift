@@ -1,4 +1,4 @@
-/// Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
 
@@ -6,13 +6,13 @@
 
 /// This implementation of {@link org.antlr.v4.runtime.atn.LexerAction} is used for tracking input offsets
 /// for position-dependent actions within a {@link org.antlr.v4.runtime.atn.LexerActionExecutor}.
-/// 
+///
 /// <p>This action is not serialized as part of the ATN, and is only required for
 /// position-dependent lexer actions which appear at a location other than the
 /// end of a rule. For more information about DFA optimizations employed for
 /// lexer actions, see {@link org.antlr.v4.runtime.atn.LexerActionExecutor#append} and
 /// {@link org.antlr.v4.runtime.atn.LexerActionExecutor#fixOffsetBeforeMatch}.</p>
-/// 
+///
 /// -  Sam Harwell
 /// -  4.2
 
@@ -22,10 +22,10 @@ public final class LexerIndexedCustomAction: LexerAction {
 
     /// Constructs a new indexed custom action by associating a character offset
     /// with a {@link org.antlr.v4.runtime.atn.LexerAction}.
-    /// 
+    ///
     /// <p>Note: This class is only required for lexer actions for which
     /// {@link org.antlr.v4.runtime.atn.LexerAction#isPositionDependent} returns {@code true}.</p>
-    /// 
+    ///
     /// - parameter offset: The offset into the input {@link org.antlr.v4.runtime.CharStream}, relative to
     /// the token start index, at which the specified lexer action should be
     /// executed.
@@ -39,7 +39,7 @@ public final class LexerIndexedCustomAction: LexerAction {
     /// Gets the location in the input {@link org.antlr.v4.runtime.CharStream} at which the lexer
     /// action should be executed. The value is interpreted as an offset relative
     /// to the token start index.
-    /// 
+    ///
     /// - returns: The location in the input {@link org.antlr.v4.runtime.CharStream} at which the lexer
     /// action should be executed.
     public func getOffset() -> Int {
@@ -47,14 +47,14 @@ public final class LexerIndexedCustomAction: LexerAction {
     }
 
     /// Gets the lexer action to execute.
-    /// 
+    ///
     /// - returns: A {@link org.antlr.v4.runtime.atn.LexerAction} object which executes the lexer action.
     public func getAction() -> LexerAction {
         return action
     }
 
     /// {@inheritDoc}
-    /// 
+    ///
     /// - returns: This method returns the result of calling {@link #getActionType}
     /// on the {@link org.antlr.v4.runtime.atn.LexerAction} returned by {@link #getAction}.
 
@@ -70,7 +70,7 @@ public final class LexerIndexedCustomAction: LexerAction {
     }
 
     /// {@inheritDoc}
-    /// 
+    ///
     /// <p>This method calls {@link #execute} on the result of {@link #getAction}
     /// using the provided {@code lexer}.</p>
 

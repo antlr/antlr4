@@ -1,4 +1,4 @@
-/// Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
 /// How to emit recognition errors.
@@ -9,12 +9,12 @@ public protocol ANTLRErrorListener: class {
     /// specifies how to recover from syntax errors and how to compute error
     /// messages. This listener's job is simply to emit a computed message,
     /// though it has enough information to create its own message in many cases.
-    /// 
+    ///
     /// <p>The {@link org.antlr.v4.runtime.RecognitionException} is non-null for all syntax errors except
     /// when we discover mismatched token errors that we can recover from
     /// in-line, without returning from the surrounding rule (via the single
     /// token insertion and deletion mechanism).</p>
-    /// 
+    ///
     /// - parameter recognizer:
     /// What parser got the error. From this
     /// object, you can access the context as well
@@ -45,16 +45,16 @@ public protocol ANTLRErrorListener: class {
 
     /// This method is called by the parser when a full-context prediction
     /// results in an ambiguity.
-    /// 
+    ///
     /// <p>Each full-context prediction which does not result in a syntax error
     /// will call either {@link #reportContextSensitivity} or
     /// {@link #reportAmbiguity}.</p>
-    /// 
+    ///
     /// <p>When {@code ambigAlts} is not null, it contains the set of potentially
     /// viable alternatives identified by the prediction algorithm. When
     /// {@code ambigAlts} is null, use {@link org.antlr.v4.runtime.atn.ATNConfigSet#getAlts} to obtain the
     /// represented alternatives from the {@code configs} argument.</p>
-    /// 
+    ///
     /// <p>When {@code exact} is {@code true}, <em>all</em> of the potentially
     /// viable alternatives are truly viable, i.e. this is reporting an exact
     /// ambiguity. When {@code exact} is {@code false}, <em>at least two</em> of
@@ -62,13 +62,13 @@ public protocol ANTLRErrorListener: class {
     /// the prediction algorithm terminated as soon as it determined that at
     /// least the <em>minimum</em> potentially viable alternative is truly
     /// viable.</p>
-    /// 
+    ///
     /// <p>When the {@link org.antlr.v4.runtime.atn.PredictionMode#LL_EXACT_AMBIG_DETECTION} prediction
     /// mode is used, the parser is required to identify exact ambiguities so
     /// {@code exact} will always be {@code true}.</p>
-    /// 
+    ///
     /// <p>This method is not used by lexers.</p>
-    /// 
+    ///
     /// - parameter recognizer: the parser instance
     /// - parameter dfa: the DFA for the current decision
     /// - parameter startIndex: the input index where the decision started
@@ -91,14 +91,14 @@ public protocol ANTLRErrorListener: class {
 
     /// This method is called when an SLL conflict occurs and the parser is about
     /// to use the full context information to make an LL decision.
-    /// 
+    ///
     /// <p>If one or more configurations in {@code configs} contains a semantic
     /// predicate, the predicates are evaluated before this method is called. The
     /// subset of alternatives which are still viable after predicates are
     /// evaluated is reported in {@code conflictingAlts}.</p>
-    /// 
+    ///
     /// <p>This method is not used by lexers.</p>
-    /// 
+    ///
     /// - parameter recognizer: the parser instance
     /// - parameter dfa: the DFA for the current decision
     /// - parameter startIndex: the input index where the decision started
@@ -119,11 +119,11 @@ public protocol ANTLRErrorListener: class {
 
     /// This method is called by the parser when a full-context prediction has a
     /// unique result.
-    /// 
+    ///
     /// <p>Each full-context prediction which does not result in a syntax error
     /// will call either {@link #reportContextSensitivity} or
     /// {@link #reportAmbiguity}.</p>
-    /// 
+    ///
     /// <p>For prediction implementations that only evaluate full-context
     /// predictions when an SLL conflict is found (including the default
     /// {@link org.antlr.v4.runtime.atn.ParserATNSimulator} implementation), this method reports cases
@@ -131,20 +131,20 @@ public protocol ANTLRErrorListener: class {
     /// i.e. the decision was context-sensitive. This report does not necessarily
     /// indicate a problem, and it may appear even in completely unambiguous
     /// grammars.</p>
-    /// 
+    ///
     /// <p>{@code configs} may have more than one represented alternative if the
     /// full-context prediction algorithm does not evaluate predicates before
     /// beginning the full-context prediction. In all cases, the final prediction
     /// is passed as the {@code prediction} argument.</p>
-    /// 
+    ///
     /// <p>Note that the definition of "context sensitivity" in this method
     /// differs from the concept in {@link org.antlr.v4.runtime.atn.DecisionInfo#contextSensitivities}.
     /// This method reports all instances where an SLL conflict occurred but LL
     /// parsing produced a unique result, whether or not that unique result
     /// matches the minimum alternative in the SLL conflicting set.</p>
-    /// 
+    ///
     /// <p>This method is not used by lexers.</p>
-    /// 
+    ///
     /// - parameter recognizer: the parser instance
     /// - parameter dfa: the DFA for the current decision
     /// - parameter startIndex: the input index where the decision started

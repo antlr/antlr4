@@ -1,4 +1,4 @@
-/// Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
 
@@ -7,7 +7,7 @@
 /// This implementation of {@link org.antlr.v4.runtime.TokenStream} loads tokens from a
 /// {@link org.antlr.v4.runtime.TokenSource} on-demand, and places the tokens in a buffer to provide
 /// access to any previous token by index.
-/// 
+///
 /// <p>
 /// This token stream ignores the value of {@link org.antlr.v4.runtime.Token#getChannel}. If your
 /// parser requires the token stream filter tokens to only those on a particular
@@ -28,7 +28,7 @@ public class BufferedTokenStream: TokenStream {
     /// The index into {@link #tokens} of the current token (next token to
     /// {@link #consume}). {@link #tokens}{@code [}{@link #p}{@code ]} should be
     /// {@link #LT LT(1)}.
-    /// 
+    ///
     /// <p>This field is set to -1 when the stream is first constructed or when
     /// {@link #setTokenSource} is called, indicating that the first token has
     /// not yet been fetched from the token source. For additional information,
@@ -39,7 +39,7 @@ public class BufferedTokenStream: TokenStream {
     /// Indicates whether the {@link org.antlr.v4.runtime.Token#EOF} token has been fetched from
     /// {@link #tokenSource} and added to {@link #tokens}. This field improves
     /// performance for the following cases:
-    /// 
+    ///
     /// <ul>
     /// <li>{@link #consume}: The lookahead check in {@link #consume} to prevent
     /// consuming the EOF symbol is optimized by checking the values of
@@ -118,7 +118,7 @@ public class BufferedTokenStream: TokenStream {
     }
 
     /// Make sure index {@code i} in tokens has a token.
-    /// 
+    ///
     /// - returns: {@code true} if a token is located at index {@code i}, otherwise
     /// {@code false}.
     /// - seealso: #get(int i)
@@ -136,7 +136,7 @@ public class BufferedTokenStream: TokenStream {
     }
 
     /// Add {@code n} elements to buffer.
-    /// 
+    ///
     /// - returns: The actual number of elements added to the buffer.
     internal func fetch(_ n: Int) throws -> Int {
         if fetchedEOF {
@@ -227,10 +227,10 @@ public class BufferedTokenStream: TokenStream {
     /// operation. The default implementation simply returns {@code i}. If an
     /// exception is thrown in this method, the current stream index should not be
     /// changed.
-    /// 
+    ///
     /// <p>For example, {@link org.antlr.v4.runtime.CommonTokenStream} overrides this method to ensure that
     /// the seek target is always an on-channel token.</p>
-    /// 
+    ///
     /// - parameter i: The target token index.
     /// - returns: The adjusted target token index.
     internal func adjustSeekIndex(_ i: Int) throws -> Int {
@@ -331,7 +331,7 @@ public class BufferedTokenStream: TokenStream {
     /// Given a starting index, return the index of the previous token on
     /// channel. Return {@code i} if {@code tokens[i]} is on channel. Return -1
     /// if there are no tokens on channel between {@code i} and 0.
-    /// 
+    ///
     /// <p>
     /// If {@code i} specifies an index at or after the EOF token, the EOF token
     /// index is returned. This is due to the fact that the EOF token is treated

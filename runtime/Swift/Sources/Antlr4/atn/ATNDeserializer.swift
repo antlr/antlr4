@@ -1,10 +1,10 @@
-/// Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
 
 
 
-/// 
+///
 /// -  Sam Harwell
 
 import Foundation
@@ -73,7 +73,7 @@ public class ATNDeserializer {
     /// Determines if a particular serialized representation of an ATN supports
     /// a particular feature, identified by the {@link java.util.UUID} used for serializing
     /// the ATN at the time the feature was first introduced.
-    /// 
+    ///
     /// - parameter feature: The {@link java.util.UUID} marking the first time the feature was
     /// supported in the serialized ATN.
     /// - parameter actualUuid: The {@link java.util.UUID} of the actual serialized ATN which is
@@ -996,7 +996,7 @@ public class ATNDeserializer {
     /// Analyze the {@link org.antlr.v4.runtime.atn.StarLoopEntryState} states in the specified ATN to set
     /// the {@link org.antlr.v4.runtime.atn.StarLoopEntryState#precedenceRuleDecision} field to the
     /// correct value.
-    /// 
+    ///
     /// - parameter atn: The ATN.
     internal func markPrecedenceDecisions(_ atn: ATN) {
         for state: ATNState? in atn.states {

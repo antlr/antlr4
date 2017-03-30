@@ -1,4 +1,4 @@
-/// Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
 
@@ -21,7 +21,7 @@ open class LexerATNSimulator: ATNSimulator {
     /// and current character position in that line. Note that the Lexer is
     /// tracking the starting line and characterization of the token. These
     /// variables track the "state" of the simulator when it hits an accept state.
-    /// 
+    ///
     /// <p>We track these variables separately for the DFA and ATN simulation
     /// because the DFA simulation often has to fail over to the ATN
     /// simulation. If the ATN simulation fails, we need the DFA to fall
@@ -229,7 +229,7 @@ open class LexerATNSimulator: ATNSimulator {
     /// Get an existing target state for an edge in the DFA. If the target state
     /// for the edge has not yet been computed or is otherwise not available,
     /// this method returns {@code null}.
-    /// 
+    ///
     /// - parameter s: The current DFA state
     /// - parameter t: The next input symbol
     /// - returns: The existing target DFA state for the given input symbol
@@ -251,11 +251,11 @@ open class LexerATNSimulator: ATNSimulator {
 
     /// Compute a target state for an edge in the DFA, and attempt to add the
     /// computed state and corresponding edge to the DFA.
-    /// 
+    ///
     /// - parameter input: The input stream
     /// - parameter s: The current DFA state
     /// - parameter t: The next input symbol
-    /// 
+    ///
     /// - returns: The computed target DFA state for the given input symbol
     /// {@code t}. If {@code t} does not lead to a valid DFA state, this method
     /// returns {@link #ERROR}.
@@ -394,7 +394,7 @@ open class LexerATNSimulator: ATNSimulator {
     /// state is reached. After the first accept state is reached by depth-first
     /// search from {@code config}, all other (potentially reachable) states for
     /// this rule would have a lower priority.
-    /// 
+    ///
     /// - returns: {@code true} if an accept state is reached, otherwise
     /// {@code false}.
     @discardableResult
@@ -491,9 +491,9 @@ open class LexerATNSimulator: ATNSimulator {
                 /// semantically it's not used that often. One of the key elements to
                 /// this predicate mechanism is not adding DFA states that see
                 /// predicates immediately afterwards in the ATN. For example,
-                /// 
+                ///
                 /// a : ID {p1}? | ID {p2}? ;
-                /// 
+                ///
                 /// should create the start state for rule 'a' (to save start state
                 /// competition), but should not create target of ID state. The
                 /// collection of ATN states the following ID references includes
@@ -555,7 +555,7 @@ open class LexerATNSimulator: ATNSimulator {
     }
 
     /// Evaluate a predicate specified in the lexer.
-    /// 
+    ///
     /// <p>If {@code speculative} is {@code true}, this method was called before
     /// {@link #consume} for the matched character. This method should call
     /// {@link #consume} before evaluating the predicate to ensure position
@@ -564,13 +564,13 @@ open class LexerATNSimulator: ATNSimulator {
     /// lexer state. This method should restore {@code input} and the simulator
     /// to the original state before returning (i.e. undo the actions made by the
     /// call to {@link #consume}.</p>
-    /// 
+    ///
     /// - parameter input: The input stream.
     /// - parameter ruleIndex: The rule containing the predicate.
     /// - parameter predIndex: The index of the predicate within the rule.
     /// - parameter speculative: {@code true} if the current index in {@code input} is
     /// one character before the predicate's location.
-    /// 
+    ///
     /// - returns: {@code true} if the specified predicate evaluates to
     /// {@code true}.
     final func evaluatePredicate(_ input: CharStream, _ ruleIndex: Int, _ predIndex: Int, _ speculative: Bool) throws -> Bool {
@@ -620,7 +620,7 @@ open class LexerATNSimulator: ATNSimulator {
             /// DFA should be omitted. The target DFAState is still created since
             /// execATN has the ability to resynchronize with the DFA state cache
             /// following the predicate evaluation step.
-            /// 
+            ///
             /// TJP notes: next time through the DFA, we see a pred again and eval.
             /// If that gets us to a previously created (but dangling) DFA
             /// state, we can continue in pure DFA mode from there.
