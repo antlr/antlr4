@@ -1,4 +1,4 @@
-/// Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
 
@@ -19,23 +19,23 @@ import Foundation
 /// {@code BitSet} may be used to modify the contents of another
 /// {@code BitSet} through logical AND, logical inclusive OR, and
 /// logical exclusive OR operations.
-/// 
+///
 /// <p>By default, all bits in the set initially have the value
 /// {@code false}.
-/// 
+///
 /// <p>Every bit set has a current size, which is the number of bits
 /// of space currently in use by the bit set. Note that the size is
 /// related to the implementation of a bit set, so it may change with
 /// implementation. The length of a bit set relates to logical length
 /// of a bit set and is defined independently of implementation.
-/// 
+///
 /// <p>Unless otherwise noted, passing a null parameter to any of the
 /// methods in a {@code BitSet} will result in a
 /// {@code NullPointerException}.
-/// 
+///
 /// <p>A {@code BitSet} is not safe for multithreaded use without
 /// external synchronization.
-/// 
+///
 /// -   Arthur van Hoff
 /// -   Michael McCloskey
 /// -   Martin Buchholz
@@ -55,7 +55,7 @@ public class BitSet: Hashable, CustomStringConvertible {
     // 0xffffffffffffffffL;
 
     /// -  bits long[]
-    /// 
+    ///
     /// The bits in this BitSet.  The ith bit is stored in bits[i/64] at
     /// bit position i % 64 (where bit position 0 refers to the least
     /// significant bit and 63 refers to the most significant bit).
@@ -117,7 +117,7 @@ public class BitSet: Hashable, CustomStringConvertible {
     /// Creates a bit set whose initial size is large enough to explicitly
     /// represent bits with indices in the range {@code 0} through
     /// {@code nbits-1}. All bits are initially {@code false}.
-    /// 
+    ///
     /// - parameter  nbits: the initial size of the bit set
     /// -  NegativeArraySizeException if the specified initial size
     /// is negative
@@ -149,13 +149,13 @@ public class BitSet: Hashable, CustomStringConvertible {
 
 
     /// Returns a new long array containing all the bits in this bit set.
-    /// 
+    ///
     /// <p>More precisely, if
     /// <br>{@code long[] longs = s.toLongArray();}
     /// <br>then {@code longs.length == (s.length()+63)/64} and
     /// <br>{@code s.get(n) == ((longs[n/64] & (1L<<(n%64))) != 0)}
     /// <br>for all {@code n < 64 * longs.length}.
-    /// 
+    ///
     /// - returns: a long array containing a little-endian representation
     /// of all the bits in this bit set
     /// -  1.7
@@ -212,7 +212,7 @@ public class BitSet: Hashable, CustomStringConvertible {
 
     /// Sets the bit at the specified index to the complement of its
     /// current value.
-    /// 
+    ///
     /// - parameter  bitIndex: the index of the bit to flip
     /// -  IndexOutOfBoundsException if the specified index is negative
     /// -   1.4
@@ -234,7 +234,7 @@ public class BitSet: Hashable, CustomStringConvertible {
     /// Sets each bit from the specified {@code fromIndex} (inclusive) to the
     /// specified {@code toIndex} (exclusive) to the complement of its current
     /// value.
-    /// 
+    ///
     /// - parameter  fromIndex: index of the first bit to flip
     /// - parameter  toIndex: index after the last bit to flip
     /// -  IndexOutOfBoundsException if {@code fromIndex} is negative,
@@ -278,7 +278,7 @@ public class BitSet: Hashable, CustomStringConvertible {
     }
 
     /// Sets the bit at the specified index to {@code true}.
-    /// 
+    ///
     /// - parameter  bitIndex: a bit index
     /// -  IndexOutOfBoundsException if the specified index is negative
     /// -   JDK1.0
@@ -297,7 +297,7 @@ public class BitSet: Hashable, CustomStringConvertible {
     }
 
     /// Sets the bit at the specified index to the specified value.
-    /// 
+    ///
     /// - parameter  bitIndex: a bit index
     /// - parameter  value: a boolean value to set
     /// -  IndexOutOfBoundsException if the specified index is negative
@@ -312,7 +312,7 @@ public class BitSet: Hashable, CustomStringConvertible {
 
     /// Sets the bits from the specified {@code fromIndex} (inclusive) to the
     /// specified {@code toIndex} (exclusive) to {@code true}.
-    /// 
+    ///
     /// - parameter  fromIndex: index of the first bit to be set
     /// - parameter  toIndex: index after the last bit to be set
     /// -  IndexOutOfBoundsException if {@code fromIndex} is negative,
@@ -357,7 +357,7 @@ public class BitSet: Hashable, CustomStringConvertible {
 
     /// Sets the bits from the specified {@code fromIndex} (inclusive) to the
     /// specified {@code toIndex} (exclusive) to the specified value.
-    /// 
+    ///
     /// - parameter  fromIndex: index of the first bit to be set
     /// - parameter  toIndex: index after the last bit to be set
     /// - parameter  value: value to set the selected bits to
@@ -374,7 +374,7 @@ public class BitSet: Hashable, CustomStringConvertible {
     }
 
     /// Sets the bit specified by the index to {@code false}.
-    /// 
+    ///
     /// - parameter  bitIndex: the index of the bit to be cleared
     /// -  IndexOutOfBoundsException if the specified index is negative
     /// -   JDK1.0
@@ -395,7 +395,7 @@ public class BitSet: Hashable, CustomStringConvertible {
 
     /// Sets the bits from the specified {@code fromIndex} (inclusive) to the
     /// specified {@code toIndex} (exclusive) to {@code false}.
-    /// 
+    ///
     /// - parameter  fromIndex: index of the first bit to be cleared
     /// - parameter  toIndex: index after the last bit to be cleared
     /// -  IndexOutOfBoundsException if {@code fromIndex} is negative,
@@ -447,7 +447,7 @@ public class BitSet: Hashable, CustomStringConvertible {
     }
 
     /// Sets all of the bits in this BitSet to {@code false}.
-    /// 
+    ///
     /// -  1.4
     public func clear() {
         while wordsInUse > 0 {
@@ -460,7 +460,7 @@ public class BitSet: Hashable, CustomStringConvertible {
     /// is {@code true} if the bit with the index {@code bitIndex}
     /// is currently set in this {@code BitSet}; otherwise, the result
     /// is {@code false}.
-    /// 
+    ///
     /// - parameter  bitIndex:   the bit index
     /// - returns: the value of the bit with the specified index
     /// -  IndexOutOfBoundsException if the specified index is negative
@@ -479,7 +479,7 @@ public class BitSet: Hashable, CustomStringConvertible {
 
     /// Returns a new {@code BitSet} composed of bits from this {@code BitSet}
     /// from {@code fromIndex} (inclusive) to {@code toIndex} (exclusive).
-    /// 
+    ///
     /// - parameter  fromIndex: index of the first bit to include
     /// - parameter  toIndex: index after the last bit to include
     /// - returns: a new {@code BitSet} from a range of this {@code BitSet}
@@ -550,15 +550,15 @@ public class BitSet: Hashable, CustomStringConvertible {
     /// Returns the index of the first bit that is set to {@code true}
     /// that occurs on or after the specified starting index. If no such
     /// bit exists then {@code -1} is returned.
-    /// 
+    ///
     /// <p>To iterate over the {@code true} bits in a {@code BitSet},
     /// use the following loop:
-    /// 
+    ///
     /// <pre> {@code
     /// for (int i = bs.nextSetBit(0); i >= 0; i = bs.nextSetBit(i+1)) {
     /// // operate on index i here
     /// }}</pre>
-    /// 
+    ///
     /// - parameter  fromIndex: the index to start checking from (inclusive)
     /// - returns: the index of the next set bit, or {@code -1} if there
     /// is no such bit
@@ -631,7 +631,7 @@ public class BitSet: Hashable, CustomStringConvertible {
 
     /// Returns the index of the first bit that is set to {@code false}
     /// that occurs on or after the specified starting index.
-    /// 
+    ///
     /// - parameter  fromIndex: the index to start checking from (inclusive)
     /// - returns: the index of the next clear bit
     /// -  IndexOutOfBoundsException if the specified index is negative
@@ -669,15 +669,15 @@ public class BitSet: Hashable, CustomStringConvertible {
     /// that occurs on or before the specified starting index.
     /// If no such bit exists, or if {@code -1} is given as the
     /// starting index, then {@code -1} is returned.
-    /// 
+    ///
     /// <p>To iterate over the {@code true} bits in a {@code BitSet},
     /// use the following loop:
-    /// 
+    ///
     /// <pre> {@code
     /// for (int i = bs.length(); (i = bs.previousSetBit(i-1)) >= 0; ) {
     /// // operate on index i here
     /// }}</pre>
-    /// 
+    ///
     /// - parameter  fromIndex: the index to start checking from (inclusive)
     /// - returns: the index of the previous set bit, or {@code -1} if there
     /// is no such bit
@@ -717,7 +717,7 @@ public class BitSet: Hashable, CustomStringConvertible {
     /// that occurs on or before the specified starting index.
     /// If no such bit exists, or if {@code -1} is given as the
     /// starting index, then {@code -1} is returned.
-    /// 
+    ///
     /// - parameter  fromIndex: the index to start checking from (inclusive)
     /// - returns: the index of the previous clear bit, or {@code -1} if there
     /// is no such bit
@@ -789,7 +789,7 @@ public class BitSet: Hashable, CustomStringConvertible {
     /// Returns the "logical size" of this {@code BitSet}: the index of
     /// the highest set bit in the {@code BitSet} plus one. Returns zero
     /// if the {@code BitSet} contains no set bits.
-    /// 
+    ///
     /// - returns: the logical size of this {@code BitSet}
     /// -   1.2
     public func length() -> Int {
@@ -803,7 +803,7 @@ public class BitSet: Hashable, CustomStringConvertible {
 
     /// Returns true if this {@code BitSet} contains no bits that are set
     /// to {@code true}.
-    /// 
+    ///
     /// - returns: boolean indicating whether this {@code BitSet} is empty
     /// -   1.4
     public func isEmpty() -> Bool {
@@ -812,7 +812,7 @@ public class BitSet: Hashable, CustomStringConvertible {
 
     /// Returns true if the specified {@code BitSet} has any bits set to
     /// {@code true} that are also set to {@code true} in this {@code BitSet}.
-    /// 
+    ///
     /// - parameter  set: {@code BitSet} to intersect with
     /// - returns: boolean indicating whether this {@code BitSet} intersects
     /// the specified {@code BitSet}
@@ -829,7 +829,7 @@ public class BitSet: Hashable, CustomStringConvertible {
     }
 
     /// Returns the number of bits set to {@code true} in this {@code BitSet}.
-    /// 
+    ///
     /// - returns: the number of bits set to {@code true} in this {@code BitSet}
     /// -   1.4
     public func cardinality() -> Int {
@@ -858,7 +858,7 @@ public class BitSet: Hashable, CustomStringConvertible {
     /// has the value {@code true} if and only if it both initially
     /// had the value {@code true} and the corresponding bit in the
     /// bit set argument also had the value {@code true}.
-    /// 
+    ///
     /// - parameter set: a bit set
     public func and(_ set: BitSet) {
         if self == set {
@@ -884,7 +884,7 @@ public class BitSet: Hashable, CustomStringConvertible {
     /// value {@code true} if and only if it either already had the
     /// value {@code true} or the corresponding bit in the bit set
     /// argument has the value {@code true}.
-    /// 
+    ///
     /// - parameter set: a bit set
     public func or(_ set: BitSet) {
         if self == set {
@@ -923,7 +923,7 @@ public class BitSet: Hashable, CustomStringConvertible {
     /// <li>The bit initially has the value {@code false}, and the
     /// corresponding bit in the argument has the value {@code true}.
     /// </ul>
-    /// 
+    ///
     /// - parameter  set: a bit set
     public func xor(_ set: BitSet) {
         let wordsInCommon: Int = min(wordsInUse, set.wordsInUse)
@@ -951,7 +951,7 @@ public class BitSet: Hashable, CustomStringConvertible {
 
     /// Clears all of the bits in this {@code BitSet} whose corresponding
     /// bit is set in the specified {@code BitSet}.
-    /// 
+    ///
     /// - parameter  set: the {@code BitSet} with which to mask this
     /// {@code BitSet}
     /// -   1.2
@@ -969,7 +969,7 @@ public class BitSet: Hashable, CustomStringConvertible {
 
     /// Returns the hash code value for this bit set. The hash code depends
     /// only on which bits are set within this {@code BitSet}.
-    /// 
+    ///
     /// <p>The hash code is defined to be the result of the following
     /// calculation:
     /// <pre> {@code
@@ -981,7 +981,7 @@ public class BitSet: Hashable, CustomStringConvertible {
     /// return (int)((h >> 32) ^ h);
     /// }}</pre>
     /// Note that the hash code changes if the set of bits is altered.
-    /// 
+    ///
     /// - returns: the hash code value for this bit set
     public var hashValue: Int {
         var h: Int64 = 1234
@@ -998,7 +998,7 @@ public class BitSet: Hashable, CustomStringConvertible {
     /// Returns the number of bits of space actually in use by this
     /// {@code BitSet} to represent bit values.
     /// The maximum element in the set is the size - 1st element.
-    /// 
+    ///
     /// - returns: the number of bits currently in this bit set
     public func size() -> Int {
         return words.count * BitSet.BITS_PER_WORD
@@ -1026,7 +1026,7 @@ public class BitSet: Hashable, CustomStringConvertible {
     /// highest, separated by ",&nbsp;" (a comma and a space) and
     /// surrounded by braces, resulting in the usual mathematical
     /// notation for a set of integers.
-    /// 
+    ///
     /// <p>Example:
     /// <pre>
     /// BitSet drPepper = new BitSet();</pre>
@@ -1038,7 +1038,7 @@ public class BitSet: Hashable, CustomStringConvertible {
     /// drPepper.set(4);
     /// drPepper.set(10);</pre>
     /// Now {@code drPepper.toString()} returns "{@code {2, 4, 10}}".
-    /// 
+    ///
     /// - returns: a string representation of this bit set
     public var description: String {
         checkInvariants()

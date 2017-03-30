@@ -1,4 +1,4 @@
-/// Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
 
@@ -48,12 +48,12 @@ extension Token {
     }
     /// This is the minimum constant value which can be assigned to a
     /// user-defined token channel.
-    /// 
+    ///
     /// <p>
     /// The non-negative numbers less than {@link #MIN_USER_CHANNEL_VALUE} are
     /// assigned to the predefined channels {@link #DEFAULT_CHANNEL} and
     /// {@link #HIDDEN_CHANNEL}.</p>
-    /// 
+    ///
     /// - seealso: org.antlr.v4.runtime.Token#getChannel()
 
     static public var MIN_USER_CHANNEL_VALUE: Int {

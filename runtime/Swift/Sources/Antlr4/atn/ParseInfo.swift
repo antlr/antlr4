@@ -1,4 +1,4 @@
-/// Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
 
@@ -6,7 +6,7 @@
 
 /// This class provides access to specific and aggregate statistics gathered
 /// during profiling of a parser.
-/// 
+///
 /// -  4.3
 
 public class ParseInfo {
@@ -18,7 +18,7 @@ public class ParseInfo {
 
     /// Gets an array of {@link org.antlr.v4.runtime.atn.DecisionInfo} instances containing the profiling
     /// information gathered for each decision in the ATN.
-    /// 
+    ///
     /// - returns: An array of {@link org.antlr.v4.runtime.atn.DecisionInfo} instances, indexed by decision
     /// number.
     public func getDecisionInfo() -> [DecisionInfo] {
@@ -28,7 +28,7 @@ public class ParseInfo {
     /// Gets the decision numbers for decisions that required one or more
     /// full-context predictions during parsing. These are decisions for which
     /// {@link org.antlr.v4.runtime.atn.DecisionInfo#LL_Fallback} is non-zero.
-    /// 
+    ///
     /// - returns: A list of decision numbers which required one or more
     /// full-context predictions during parsing.
     public func getLLDecisions() -> Array<Int> {
@@ -110,7 +110,7 @@ public class ParseInfo {
 
     /// Gets the total number of ATN lookahead operations for SLL and LL
     /// prediction across all decisions made during parsing.
-    /// 
+    ///
     /// <p>
     /// This value is the sum of {@link #getTotalSLLATNLookaheadOps} and
     /// {@link #getTotalLLATNLookaheadOps}.</p>

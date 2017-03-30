@@ -1,4 +1,4 @@
-/// Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
 
@@ -7,20 +7,20 @@
 /// This class extends {@link org.antlr.v4.runtime.BufferedTokenStream} with functionality to filter
 /// token streams to tokens on a particular channel (tokens where
 /// {@link org.antlr.v4.runtime.Token#getChannel} returns a particular value).
-/// 
+///
 /// <p>
 /// This token stream provides access to all tokens by index or when calling
 /// methods like {@link #getText}. The channel filtering is only used for code
 /// accessing tokens via the lookahead methods {@link #LA}, {@link #LT}, and
 /// {@link #LB}.</p>
-/// 
+///
 /// <p>
 /// By default, tokens are placed on the default channel
 /// ({@link org.antlr.v4.runtime.Token#DEFAULT_CHANNEL}), but may be reassigned by using the
 /// {@code ->channel(HIDDEN)} lexer command, or by using an embedded action to
 /// call {@link org.antlr.v4.runtime.Lexer#setChannel}.
 /// </p>
-/// 
+///
 /// <p>
 /// Note: lexer rules which use the {@code ->skip} lexer command or call
 /// {@link org.antlr.v4.runtime.Lexer#skip} do not produce tokens at all, so input text matched by
@@ -29,7 +29,7 @@
 
 public class CommonTokenStream: BufferedTokenStream {
     /// Specifies the channel to use for filtering tokens.
-    /// 
+    ///
     /// <p>
     /// The default value is {@link org.antlr.v4.runtime.Token#DEFAULT_CHANNEL}, which matches the
     /// default channel assigned to tokens created by the lexer.</p>
@@ -37,7 +37,7 @@ public class CommonTokenStream: BufferedTokenStream {
 
     /// Constructs a new {@link org.antlr.v4.runtime.CommonTokenStream} using the specified token
     /// source and the default token channel ({@link org.antlr.v4.runtime.Token#DEFAULT_CHANNEL}).
-    /// 
+    ///
     /// - parameter tokenSource: The token source.
     public override init(_ tokenSource: TokenSource) {
         super.init(tokenSource)
@@ -48,7 +48,7 @@ public class CommonTokenStream: BufferedTokenStream {
     /// {@link org.antlr.v4.runtime.Token#getChannel} matches {@code channel} or have the
     /// {@link org.antlr.v4.runtime.Token#getType} equal to {@link org.antlr.v4.runtime.Token#EOF} will be returned by the
     /// token stream lookahead methods.
-    /// 
+    ///
     /// - parameter tokenSource: The token source.
     /// - parameter channel: The channel to use for filtering tokens.
     public convenience init(_ tokenSource: TokenSource, _ channel: Int) {

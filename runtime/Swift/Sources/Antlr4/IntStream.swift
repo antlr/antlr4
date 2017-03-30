@@ -1,4 +1,4 @@
-/// Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
 
@@ -8,11 +8,11 @@
 /// interface provides <em>marked ranges</em> with support for a minimum level
 /// of buffering necessary to implement arbitrary lookahead during prediction.
 /// For more information on marked ranges, see {@link #mark}.
-/// 
+///
 /// <p><strong>Initializing Methods:</strong> Some methods in this interface have
 /// unspecified behavior if no call to an initializing method has occurred after
 /// the stream was constructed. The following is a list of initializing methods:</p>
-/// 
+///
 /// <ul>
 /// <li>{@link #LA}</li>
 /// <li>{@link #consume}</li>
@@ -30,7 +30,7 @@ public protocol IntStream: class {
 
     /// Consumes the current symbol in the stream. This method has the following
     /// effects:
-    /// 
+    ///
     /// <ul>
     /// <li><strong>Forward movement:</strong> The value of {@link #index index()}
     /// before calling this method is less than the value of {@code index()}
@@ -39,12 +39,12 @@ public protocol IntStream: class {
     /// calling this method becomes the value of {@code LA(-1)} after calling
     /// this method.</li>
     /// </ul>
-    /// 
+    ///
     /// Note that calling this method does not guarantee that {@code index()} is
     /// incremented by exactly 1, as that would preclude the ability to implement
     /// filtering streams (e.g. {@link org.antlr.v4.runtime.CommonTokenStream} which distinguishes
     /// between "on-channel" and "off-channel" tokens).
-    /// 
+    ///
     /// -  IllegalStateException if an attempt is made to consume the the
     /// end of the stream (i.e. if {@code LA(1)==}{@link #EOF EOF} before calling
     /// {@code consume}).
@@ -57,9 +57,9 @@ public protocol IntStream: class {
     /// symbol in the stream. It is not valid to call this method with
     /// {@code i==0}, but the specific behavior is unspecified because this
     /// method is frequently called from performance-critical code.
-    /// 
+    ///
     /// <p>This method is guaranteed to succeed if any of the following are true:</p>
-    /// 
+    ///
     /// <ul>
     /// <li>{@code i>0}</li>
     /// <li>{@code i==-1} and {@link #index index()} returns a value greater
@@ -72,14 +72,14 @@ public protocol IntStream: class {
     /// <li>{@code LA(i)} refers to a symbol consumed within a marked region
     /// that has not yet been released.</li>
     /// </ul>
-    /// 
+    ///
     /// <p>If {@code i} represents a position at or beyond the end of the stream,
     /// this method returns {@link #EOF}.</p>
-    /// 
+    ///
     /// <p>The return value is unspecified if {@code i<0} and fewer than {@code -i}
     /// calls to {@link #consume consume()} have occurred from the beginning of
     /// the stream before calling this method.</p>
-    /// 
+    ///
     /// -  UnsupportedOperationException if the stream does not support
     /// retrieving the value of the specified symbol
     func LA(_ i: Int) throws -> Int
@@ -89,7 +89,7 @@ public protocol IntStream: class {
     /// was called to the current {@link #index index()}. This allows the use of
     /// streaming input sources by specifying the minimum buffering requirements
     /// to support arbitrary lookahead during prediction.
-    /// 
+    ///
     /// <p>The returned mark is an opaque handle (type {@code int}) which is passed
     /// to {@link #release release()} when the guarantees provided by the marked
     /// range are no longer necessary. When calls to
@@ -99,13 +99,13 @@ public protocol IntStream: class {
     /// behavior of invalid usage is unspecified (i.e. a mark is not released, or
     /// a mark is released twice, or marks are not released in reverse order from
     /// which they were created).</p>
-    /// 
+    ///
     /// <p>The behavior of this method is unspecified if no call to an
     /// {@link org.antlr.v4.runtime.IntStream initializing method} has occurred after this stream was
     /// constructed.</p>
-    /// 
+    ///
     /// <p>This method does not change the current position in the input stream.</p>
-    /// 
+    ///
     /// <p>The following example shows the use of {@link #mark mark()},
     /// {@link #release release(mark)}, {@link #index index()}, and
     /// {@link #seek seek(index)} as part of an operation to safely work within a
@@ -125,7 +125,7 @@ public protocol IntStream: class {
     /// stream.release(mark);
     /// }
     /// </pre>
-    /// 
+    ///
     /// - returns: An opaque marker which should be passed to
     /// {@link #release release()} when the marked range is no longer required.
     func mark() -> Int
@@ -135,16 +135,16 @@ public protocol IntStream: class {
     /// reverse order of the corresponding calls to {@code mark()}. If a mark is
     /// released twice, or if marks are not released in reverse order of the
     /// corresponding calls to {@code mark()}, the behavior is unspecified.
-    /// 
+    ///
     /// <p>For more information and an example, see {@link #mark}.</p>
-    /// 
+    ///
     /// - parameter marker: A marker returned by a call to {@code mark()}.
     /// - seealso: #mark
     func release(_ marker: Int) throws
 
     /// Return the index into the stream of the input symbol referred to by
     /// {@code LA(1)}.
-    /// 
+    ///
     /// <p>The behavior of this method is unspecified if no call to an
     /// {@link org.antlr.v4.runtime.IntStream initializing method} has occurred after this stream was
     /// constructed.</p>
@@ -155,7 +155,7 @@ public protocol IntStream: class {
     /// though {@code index} was the index of the EOF symbol. After this method
     /// returns without throwing an exception, then at least one of the following
     /// will be true.
-    /// 
+    ///
     /// <ul>
     /// <li>{@link #index index()} will return the index of the first symbol
     /// appearing at or after the specified {@code index}. Specifically,
@@ -164,15 +164,15 @@ public protocol IntStream: class {
     /// operation to target a non-ignored symbol.</li>
     /// <li>{@code LA(1)} returns {@link #EOF}</li>
     /// </ul>
-    /// 
+    ///
     /// This operation is guaranteed to not throw an exception if {@code index}
     /// lies within a marked region. For more information on marked regions, see
     /// {@link #mark}. The behavior of this method is unspecified if no call to
     /// an {@link org.antlr.v4.runtime.IntStream initializing method} has occurred after this stream
     /// was constructed.
-    /// 
+    ///
     /// - parameter index: The absolute index to seek to.
-    /// 
+    ///
     /// -  IllegalArgumentException if {@code index} is less than 0
     /// -  UnsupportedOperationException if the stream does not support
     /// seeking to the specified index
@@ -180,7 +180,7 @@ public protocol IntStream: class {
 
     /// Returns the total number of symbols in the stream, including a single EOF
     /// symbol.
-    /// 
+    ///
     /// -  UnsupportedOperationException if the size of the stream is
     /// unknown.
     func size() -> Int

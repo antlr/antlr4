@@ -1,4 +1,4 @@
-/// Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
 
@@ -35,7 +35,7 @@ open class ATNSimulator {
     /// to use only cached nodes/graphs in addDFAState(). We don't want to
     /// fill this during closure() since there are lots of contexts that
     /// pop up but are not used ever again. It also greatly slows down closure().
-    /// 
+    ///
     /// <p>This cache makes a huge difference in memory and a little bit in speed.
     /// For the Java grammar on java.*, it dropped the memory requirements
     /// at the end from 25M to 16M. We don't store any of the full context
@@ -43,7 +43,7 @@ open class ATNSimulator {
     /// but apparently there's a lot of repetition there as well. We optimize
     /// the config contexts before storing the config set in the DFA states
     /// by literally rebuilding them with cached subgraphs only.</p>
-    /// 
+    ///
     /// <p>I tried a cache for use during closure operations, that was
     /// whacked after each adaptivePredict(). It cost a little bit
     /// more time I think and doesn't save on the overall footprint
@@ -70,10 +70,10 @@ open class ATNSimulator {
     /// be shared by multiple ATN simulators, this method may affect the
     /// performance (but not accuracy) of other parsers which are being used
     /// concurrently.
-    /// 
+    ///
     /// -  UnsupportedOperationException if the current instance does not
     /// support clearing the DFA.
-    /// 
+    ///
     /// -  4.3
     open func clearDFA() throws {
         throw ANTLRError.unsupportedOperation(msg: "This ATN simulator does not support clearing the DFA. ")

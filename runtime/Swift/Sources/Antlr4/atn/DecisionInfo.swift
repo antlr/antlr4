@@ -1,10 +1,10 @@
-/// Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
 
 
 /// This class contains profiling gathered for a particular decision.
-/// 
+///
 /// <p>
 /// Parsing performance in ANTLR 4 is heavily influenced by both static factors
 /// (e.g. the form of the rules in the grammar) and dynamic factors (e.g. the
@@ -12,7 +12,7 @@
 /// operations are started). For best results, gather and use aggregate
 /// statistics from a large sample of inputs representing the inputs expected in
 /// production before using the results to make changes in the grammar.</p>
-/// 
+///
 /// -  4.3
 
 public class DecisionInfo: CustomStringConvertible {
@@ -25,7 +25,7 @@ public class DecisionInfo: CustomStringConvertible {
 
     /// The total time spent in {@link org.antlr.v4.runtime.atn.ParserATNSimulator#adaptivePredict} for
     /// this decision, in nanoseconds.
-    /// 
+    ///
     /// <p>
     /// The value of this field contains the sum of differential results obtained
     /// by {@link System#nanoTime()}, and is not adjusted to compensate for JIT
@@ -82,27 +82,27 @@ public class DecisionInfo: CustomStringConvertible {
 
     /// A collection of {@link org.antlr.v4.runtime.atn.ContextSensitivityInfo} instances describing the
     /// context sensitivities encountered during LL prediction for this decision.
-    /// 
+    ///
     /// - seealso: org.antlr.v4.runtime.atn.ContextSensitivityInfo
     public final var contextSensitivities: Array<ContextSensitivityInfo> = Array<ContextSensitivityInfo>()
 
     /// A collection of {@link org.antlr.v4.runtime.atn.ErrorInfo} instances describing the parse errors
     /// identified during calls to {@link org.antlr.v4.runtime.atn.ParserATNSimulator#adaptivePredict} for
     /// this decision.
-    /// 
+    ///
     /// - seealso: org.antlr.v4.runtime.atn.ErrorInfo
     public final var errors: Array<ErrorInfo> = Array<ErrorInfo>()
 
     /// A collection of {@link org.antlr.v4.runtime.atn.AmbiguityInfo} instances describing the
     /// ambiguities encountered during LL prediction for this decision.
-    /// 
+    ///
     /// - seealso: org.antlr.v4.runtime.atn.AmbiguityInfo
     public final var ambiguities: Array<AmbiguityInfo> = Array<AmbiguityInfo>()
 
     /// A collection of {@link org.antlr.v4.runtime.atn.PredicateEvalInfo} instances describing the
     /// results of evaluating individual predicates during prediction for this
     /// decision.
-    /// 
+    ///
     /// - seealso: org.antlr.v4.runtime.atn.PredicateEvalInfo
     public final var predicateEvals: Array<PredicateEvalInfo> = Array<PredicateEvalInfo>()
 
@@ -110,13 +110,13 @@ public class DecisionInfo: CustomStringConvertible {
     /// this decision. An ATN transition is determined by the number of times the
     /// DFA does not contain an edge that is required for prediction, resulting
     /// in on-the-fly computation of that edge.
-    /// 
+    ///
     /// <p>
     /// If DFA caching of SLL transitions is employed by the implementation, ATN
     /// computation may cache the computed edge for efficient lookup during
     /// future parsing of this decision. Otherwise, the SLL parsing algorithm
     /// will use ATN transitions exclusively.</p>
-    /// 
+    ///
     /// - seealso: #SLL_ATNTransitions
     /// - seealso: org.antlr.v4.runtime.atn.ParserATNSimulator#computeTargetState
     /// - seealso: org.antlr.v4.runtime.atn.LexerATNSimulator#computeTargetState
@@ -124,17 +124,17 @@ public class DecisionInfo: CustomStringConvertible {
 
     /// The total number of DFA transitions required during SLL prediction for
     /// this decision.
-    /// 
+    ///
     /// <p>If the ATN simulator implementation does not use DFA caching for SLL
     /// transitions, this value will be 0.</p>
-    /// 
+    ///
     /// - seealso: org.antlr.v4.runtime.atn.ParserATNSimulator#getExistingTargetState
     /// - seealso: org.antlr.v4.runtime.atn.LexerATNSimulator#getExistingTargetState
     public var SLL_DFATransitions: Int64 = 0
 
     /// Gets the total number of times SLL prediction completed in a conflict
     /// state, resulting in fallback to LL prediction.
-    /// 
+    ///
     /// <p>Note that this value is not related to whether or not
     /// {@link org.antlr.v4.runtime.atn.PredictionMode#SLL} may be used successfully with a particular
     /// grammar. If the ambiguity resolution algorithm applied to the SLL
@@ -147,13 +147,13 @@ public class DecisionInfo: CustomStringConvertible {
     /// this decision. An ATN transition is determined by the number of times the
     /// DFA does not contain an edge that is required for prediction, resulting
     /// in on-the-fly computation of that edge.
-    /// 
+    ///
     /// <p>
     /// If DFA caching of LL transitions is employed by the implementation, ATN
     /// computation may cache the computed edge for efficient lookup during
     /// future parsing of this decision. Otherwise, the LL parsing algorithm will
     /// use ATN transitions exclusively.</p>
-    /// 
+    ///
     /// - seealso: #LL_DFATransitions
     /// - seealso: org.antlr.v4.runtime.atn.ParserATNSimulator#computeTargetState
     /// - seealso: org.antlr.v4.runtime.atn.LexerATNSimulator#computeTargetState
@@ -161,17 +161,17 @@ public class DecisionInfo: CustomStringConvertible {
 
     /// The total number of DFA transitions required during LL prediction for
     /// this decision.
-    /// 
+    ///
     /// <p>If the ATN simulator implementation does not use DFA caching for LL
     /// transitions, this value will be 0.</p>
-    /// 
+    ///
     /// - seealso: org.antlr.v4.runtime.atn.ParserATNSimulator#getExistingTargetState
     /// - seealso: org.antlr.v4.runtime.atn.LexerATNSimulator#getExistingTargetState
     public var LL_DFATransitions: Int64 = 0
 
     /// Constructs a new instance of the {@link org.antlr.v4.runtime.atn.DecisionInfo} class to contain
     /// statistics for a particular decision.
-    /// 
+    ///
     /// - parameter decision: The decision number
     public init(_ decision: Int) {
         self.decision = decision

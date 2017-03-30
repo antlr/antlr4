@@ -1,4 +1,4 @@
-/// Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
 
@@ -7,7 +7,7 @@
 /// A tree structure used to record the semantic context in which
 /// an ATN configuration is valid.  It's either a single predicate,
 /// a conjunction {@code p1&&p2}, or a sum of products {@code p1||p2}.
-/// 
+///
 /// <p>I have scoped the {@link org.antlr.v4.runtime.atn.SemanticContext.AND}, {@link org.antlr.v4.runtime.atn.SemanticContext.OR}, and {@link org.antlr.v4.runtime.atn.SemanticContext.Predicate} subclasses of
 /// {@link org.antlr.v4.runtime.atn.SemanticContext} within the scope of this outer class.</p>
 
@@ -23,7 +23,7 @@ public class SemanticContext: Hashable, CustomStringConvertible {
     /// having to create proper rule-specific context during prediction (as
     /// opposed to the parser, which creates them naturally). In a practical
     /// sense, this avoids a cast exception from RuleContext to myruleContext.
-    /// 
+    ///
     /// <p>For context dependent predicates, we must pass in a local context so that
     /// references such as $arg evaluate properly as _localctx.arg. We only
     /// capture context dependent predicates in the context in which we begin
@@ -35,7 +35,7 @@ public class SemanticContext: Hashable, CustomStringConvertible {
     }
 
     /// Evaluate the precedence predicates for the context and reduce the result.
-    /// 
+    ///
     /// - parameter parser: The parser instance.
     /// - parameter parserCallStack:
     /// - returns: The simplified semantic context after precedence predicates are
@@ -148,15 +148,15 @@ public class SemanticContext: Hashable, CustomStringConvertible {
 
     /// This is the base class for semantic context "operators", which operate on
     /// a collection of semantic context "operands".
-    /// 
+    ///
     /// -  4.3
 
     public class Operator: SemanticContext {
         /// Gets the operands for the semantic context operator.
-        /// 
+        ///
         /// - returns: a collection of {@link org.antlr.v4.runtime.atn.SemanticContext} operands for the
         /// operator.
-        /// 
+        ///
         /// -  4.3
 
         public func getOperands() -> Array<SemanticContext> {
@@ -215,7 +215,7 @@ public class SemanticContext: Hashable, CustomStringConvertible {
         }
 
         /// {@inheritDoc}
-        /// 
+        ///
         /// <p>
         /// The evaluation of predicates by this context is short-circuiting, but
         /// unordered.</p>
@@ -326,7 +326,7 @@ public class SemanticContext: Hashable, CustomStringConvertible {
         }
 
         /// {@inheritDoc}
-        /// 
+        ///
         /// <p>
         /// The evaluation of predicates by this context is short-circuiting, but
         /// unordered.</p>
@@ -405,7 +405,7 @@ public class SemanticContext: Hashable, CustomStringConvertible {
         return result
     }
 
-    /// 
+    ///
     /// - seealso: org.antlr.v4.runtime.atn.ParserATNSimulator#getPredsForAmbigAlts
     public static func or(_ a: SemanticContext?, _ b: SemanticContext?) -> SemanticContext {
         if a == nil {

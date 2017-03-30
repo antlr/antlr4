@@ -1,10 +1,10 @@
-/// Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
 /// Vacuum all input from a {@link java.io.Reader}/{@link java.io.InputStream} and then treat it
 /// like a {@code char[]} buffer. Can also pass in a {@link String} or
 /// {@code char[]} to use.
-/// 
+///
 /// <p>If you need encoding, pass in stream/reader with correct encoding.</p>
 
 public class ANTLRInputStream: CharStream {
@@ -42,27 +42,27 @@ public class ANTLRInputStream: CharStream {
     /// public convenience init(_ r : Reader) throws; IOException {
     /// self.init(r, INITIAL_BUFFER_SIZE, READ_BUFFER_SIZE);
     /// }
-    /// 
+    ///
     /// public convenience init(_ r : Reader, _ initialSize : Int) throws; IOException {
     /// self.init(r, initialSize, READ_BUFFER_SIZE);
     /// }
-    /// 
+    ///
     /// public init(_ r : Reader, _ initialSize : Int, _ readChunkSize : Int) throws; IOException {
     /// load(r, initialSize, readChunkSize);
     /// }
-    /// 
+    ///
     /// public convenience init(_ input : InputStream) throws; IOException {
     /// self.init(InputStreamReader(input), INITIAL_BUFFER_SIZE);
     /// }
-    /// 
+    ///
     /// public convenience init(_ input : InputStream, _ initialSize : Int) throws; IOException {
     /// self.init(InputStreamReader(input), initialSize);
     /// }
-    /// 
+    ///
     /// public convenience init(_ input : InputStream, _ initialSize : Int, _ readChunkSize : Int) throws; IOException {
     /// self.init(InputStreamReader(input), initialSize, readChunkSize);
     /// }
-    /// 
+    ///
     /// public func load(r : Reader, _ size : Int, _ readChunkSize : Int)
     /// throws; IOException
     /// {

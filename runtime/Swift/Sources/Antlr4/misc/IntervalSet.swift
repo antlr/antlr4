@@ -1,4 +1,4 @@
-/// Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
 
@@ -8,7 +8,7 @@
 /// large collections of numbers, where the majority of elements appear as part
 /// of a sequential range of numbers that are all part of the set. For example,
 /// the set { 1, 2, 3, 4, 7, 8 } may be represented as { [1, 4], [7, 8] }.
-/// 
+///
 /// <p>
 /// This class is able to represent sets containing any combination of values in
 /// the range {@link Integer#MIN_VALUE} to {@link Integer#MAX_VALUE}
@@ -440,7 +440,7 @@ public class IntervalSet: IntSet, Hashable, CustomStringConvertible {
     }
 
     /// Returns the maximum value contained in the set.
-    /// 
+    ///
     /// - returns: the maximum value contained in the set. If the set is empty, this
     /// method returns {@link org.antlr.v4.runtime.Token#INVALID_TYPE}.
     public func getMaxElement() -> Int {
@@ -452,7 +452,7 @@ public class IntervalSet: IntSet, Hashable, CustomStringConvertible {
     }
 
     /// Returns the minimum value contained in the set.
-    /// 
+    ///
     /// - returns: the minimum value contained in the set. If the set is empty, this
     /// method returns {@link org.antlr.v4.runtime.Token#INVALID_TYPE}.
     public func getMinElement() -> Int {

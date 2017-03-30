@@ -14,7 +14,7 @@
     <licenseUrl>https://github.com/antlr/antlr4/blob/master/LICENSE.txt</licenseUrl>
     <projectUrl>https://github.com/antlr/antlr4</projectUrl>
     <iconUrl>https://raw.github.com/antlr/website-antlr4/master/images/icons/antlr.png</iconUrl>
-    <copyright>Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.</copyright>
+    <copyright>Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.</copyright>
     <tags>antlr parsing grammar</tags>
     <dependencies />
   </metadata>

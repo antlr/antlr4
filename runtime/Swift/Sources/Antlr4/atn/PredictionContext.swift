@@ -1,4 +1,4 @@
-/// Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
 
@@ -26,19 +26,19 @@ public class PredictionContext: Hashable, CustomStringConvertible {
 
     /// Stores the computed hash code of this {@link org.antlr.v4.runtime.atn.PredictionContext}. The hash
     /// code is computed in parts to match the following reference algorithm.
-    /// 
+    ///
     /// <pre>
     /// private int referenceHashCode() {
     /// int hash = {@link org.antlr.v4.runtime.misc.MurmurHash#initialize MurmurHash.initialize}({@link #INITIAL_HASH});
-    /// 
+    ///
     /// for (int i = 0; i &lt; {@link #size()}; i++) {
     /// hash = {@link org.antlr.v4.runtime.misc.MurmurHash#update MurmurHash.update}(hash, {@link #getParent getParent}(i));
     /// }
-    /// 
+    ///
     /// for (int i = 0; i &lt; {@link #size()}; i++) {
     /// hash = {@link org.antlr.v4.runtime.misc.MurmurHash#update MurmurHash.update}(hash, {@link #getReturnState getReturnState}(i));
     /// }
-    /// 
+    ///
     /// hash = {@link org.antlr.v4.runtime.misc.MurmurHash#finish MurmurHash.finish}(hash, 2 * {@link #size()});
     /// return hash;
     /// }
@@ -180,25 +180,25 @@ public class PredictionContext: Hashable, CustomStringConvertible {
     }
 
     /// Merge two {@link org.antlr.v4.runtime.atn.SingletonPredictionContext} instances.
-    /// 
+    ///
     /// <p>Stack tops equal, parents merge is same; return left graph.<br>
     /// <embed src="images/SingletonMerge_SameRootSamePar.svg" type="image/svg+xml"/></p>
-    /// 
+    ///
     /// <p>Same stack top, parents differ; merge parents giving array node, then
     /// remainders of those graphs. A new root node is created to point to the
     /// merged parents.<br>
     /// <embed src="images/SingletonMerge_SameRootDiffPar.svg" type="image/svg+xml"/></p>
-    /// 
+    ///
     /// <p>Different stack tops pointing to same parent. Make array node for the
     /// root where both element in the root point to the same (original)
     /// parent.<br>
     /// <embed src="images/SingletonMerge_DiffRootSamePar.svg" type="image/svg+xml"/></p>
-    /// 
+    ///
     /// <p>Different stack tops pointing to different parents. Make array node for
     /// the root where each element points to the corresponding original
     /// parent.<br>
     /// <embed src="images/SingletonMerge_DiffRootDiffPar.svg" type="image/svg+xml"/></p>
-    /// 
+    ///
     /// - parameter a: the first {@link org.antlr.v4.runtime.atn.SingletonPredictionContext}
     /// - parameter b: the second {@link org.antlr.v4.runtime.atn.SingletonPredictionContext}
     /// - parameter rootIsWildcard: {@code true} if this is a local-context merge,
@@ -297,35 +297,35 @@ public class PredictionContext: Hashable, CustomStringConvertible {
     /// Handle case where at least one of {@code a} or {@code b} is
     /// {@link #EMPTY}. In the following diagrams, the symbol {@code $} is used
     /// to represent {@link #EMPTY}.
-    /// 
+    ///
     /// <h2>Local-Context Merges</h2>
-    /// 
+    ///
     /// <p>These local-context merge operations are used when {@code rootIsWildcard}
     /// is true.</p>
-    /// 
+    ///
     /// <p>{@link #EMPTY} is superset of any graph; return {@link #EMPTY}.<br>
     /// <embed src="images/LocalMerge_EmptyRoot.svg" type="image/svg+xml"/></p>
-    /// 
+    ///
     /// <p>{@link #EMPTY} and anything is {@code #EMPTY}, so merged parent is
     /// {@code #EMPTY}; return left graph.<br>
     /// <embed src="images/LocalMerge_EmptyParent.svg" type="image/svg+xml"/></p>
-    /// 
+    ///
     /// <p>Special case of last merge if local context.<br>
     /// <embed src="images/LocalMerge_DiffRoots.svg" type="image/svg+xml"/></p>
-    /// 
+    ///
     /// <h2>Full-Context Merges</h2>
-    /// 
+    ///
     /// <p>These full-context merge operations are used when {@code rootIsWildcard}
     /// is false.</p>
-    /// 
+    ///
     /// <p><embed src="images/FullMerge_EmptyRoots.svg" type="image/svg+xml"/></p>
-    /// 
+    ///
     /// <p>Must keep all contexts; {@link #EMPTY} in array is a special value (and
     /// null parent).<br>
     /// <embed src="images/FullMerge_EmptyRoot.svg" type="image/svg+xml"/></p>
-    /// 
+    ///
     /// <p><embed src="images/FullMerge_SameRoot.svg" type="image/svg+xml"/></p>
-    /// 
+    ///
     /// - parameter a: the first {@link org.antlr.v4.runtime.atn.SingletonPredictionContext}
     /// - parameter b: the second {@link org.antlr.v4.runtime.atn.SingletonPredictionContext}
     /// - parameter rootIsWildcard: {@code true} if this is a local-context merge,
@@ -365,19 +365,19 @@ public class PredictionContext: Hashable, CustomStringConvertible {
     }
 
     /// Merge two {@link org.antlr.v4.runtime.atn.ArrayPredictionContext} instances.
-    /// 
+    ///
     /// <p>Different tops, different parents.<br>
     /// <embed src="images/ArrayMerge_DiffTopDiffPar.svg" type="image/svg+xml"/></p>
-    /// 
+    ///
     /// <p>Shared top, same parents.<br>
     /// <embed src="images/ArrayMerge_ShareTopSamePar.svg" type="image/svg+xml"/></p>
-    /// 
+    ///
     /// <p>Shared top, different parents.<br>
     /// <embed src="images/ArrayMerge_ShareTopDiffPar.svg" type="image/svg+xml"/></p>
-    /// 
+    ///
     /// <p>Shared top, all shared parents.<br>
     /// <embed src="images/ArrayMerge_ShareTopSharePar.svg" type="image/svg+xml"/></p>
-    /// 
+    ///
     /// <p>Equal tops, merge parents and reduce top to
     /// {@link org.antlr.v4.runtime.atn.SingletonPredictionContext}.<br>
     /// <embed src="images/ArrayMerge_EqualTop.svg" type="image/svg+xml"/></p>
