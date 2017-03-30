@@ -1,4 +1,4 @@
-/// Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
 
@@ -7,13 +7,13 @@
 /// Represents a single action which can be executed following the successful
 /// match of a lexer rule. Lexer actions are used for both embedded action syntax
 /// and ANTLR 4's new lexer command syntax.
-/// 
+///
 /// -  Sam Harwell
 /// -  4.2
 
 public class LexerAction: Hashable {
     /// Gets the serialization type of the lexer action.
-    /// 
+    ///
     /// - returns: The serialization type of the lexer action.
     public func getActionType() -> LexerActionType {
         RuntimeException(" must overriden ")
@@ -24,12 +24,12 @@ public class LexerAction: Hashable {
     /// Gets whether the lexer action is position-dependent. Position-dependent
     /// actions may have different semantics depending on the {@link org.antlr.v4.runtime.CharStream}
     /// index at the time the action is executed.
-    /// 
+    ///
     /// <p>Many lexer commands, including {@code type}, {@code skip}, and
     /// {@code more}, do not check the input index during their execution.
     /// Actions like this are position-independent, and may be stored more
     /// efficiently as part of the {@link org.antlr.v4.runtime.atn.LexerATNConfig#lexerActionExecutor}.</p>
-    /// 
+    ///
     /// - returns: {@code true} if the lexer action semantics can be affected by the
     /// position of the input {@link org.antlr.v4.runtime.CharStream} at the time it is executed;
     /// otherwise, {@code false}.
@@ -39,10 +39,10 @@ public class LexerAction: Hashable {
     }
 
     /// Execute the lexer action in the context of the specified {@link org.antlr.v4.runtime.Lexer}.
-    /// 
+    ///
     /// <p>For position-dependent actions, the input stream must already be
     /// positioned correctly prior to calling this method.</p>
-    /// 
+    ///
     /// - parameter lexer: The lexer instance.
     public func execute(_ lexer: Lexer) throws {
         RuntimeException(" must overriden ")

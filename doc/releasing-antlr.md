@@ -225,6 +225,14 @@ cp /tmp/antlr-javascript-runtime-4.6.zip ~/antlr/sites/website-antlr4/download
 # git add, commit, push
 ```
 
+**Push to npm**
+
+```bash
+cd runtime/JavaScript/src
+npm login
+npm publish antlr4
+```
+
 Move target to website
 
 ```bash

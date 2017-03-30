@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -97,18 +97,18 @@ public class TokenStreamRewriter {
         internal var text: String?
         internal var lastIndex: Int = 0
         internal weak var  tokens: TokenStream!
-        
+
         init(_ index: Int, _ tokens: TokenStream) {
             self.index = index
             self.tokens = tokens
         }
-        
+
         init(_ index: Int, _ text: String?, _ tokens: TokenStream) {
             self.index = index
             self.text = text
             self.tokens = tokens
         }
-        
+
         /** Execute the rewrite operation by possibly adding to the buffer.
          *  Return the index of the next token to operate on.
          */
@@ -137,7 +137,7 @@ public class TokenStreamRewriter {
             return index + 1
         }
     }
-    
+
     public class InsertAfterOp: InsertBeforeOp {
         public override init(_ index: Int, _ text: String?, _ tokens: TokenStream) {
             super.init(index + 1, text, tokens)

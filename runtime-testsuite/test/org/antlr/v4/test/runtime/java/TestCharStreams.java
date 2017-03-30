@@ -3,32 +3,27 @@
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
+
 package org.antlr.v4.test.runtime.java;
 
-import static org.junit.Assert.assertEquals;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.rules.TemporaryFolder;
 
-import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
-
 import java.nio.channels.SeekableByteChannel;
 import java.nio.charset.CharacterCodingException;
+import java.nio.charset.Charset;
 import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import java.util.Arrays;
-
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CodePointCharStream;
-
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.rules.TemporaryFolder;
+import static org.junit.Assert.assertEquals;
 
 public class TestCharStreams {
 	@Rule
@@ -137,9 +132,9 @@ public class TestCharStreams {
 		try (SeekableByteChannel c = Files.newByteChannel(p)) {
 			CharStream s = CharStreams.fromChannel(
 					c, 4096, CodingErrorAction.REPLACE, "foo");
-			assertEquals(3, s.size());
+			assertEquals(4, s.size());
 			assertEquals(0, s.index());
-			assertEquals("\uFFFD\uFFFD\uFFFD", s.toString());
+			assertEquals("\uFFFD\uFFFD\uFFFD\uFFFD", s.toString());
 		}
 	}
 
@@ -206,5 +201,29 @@ public class TestCharStreams {
 			assertEquals(0, s.index());
 			assertEquals("hello \uD83C\uDF0E", s.toString());
 		}
+	}
+
+	@Test
+	public void fromSMPUTF16LEPathSMPHasExpectedSize() throws Exception {
+		Path p = folder.newFile().toPath();
+		Files.write(p, "hello \uD83C\uDF0E".getBytes(StandardCharsets.UTF_16LE));
+		CharStream s = CharStreams.fromPath(p, StandardCharsets.UTF_16LE);
+		assertEquals(7, s.size());
+		assertEquals(0, s.index());
+		assertEquals("hello \uD83C\uDF0E", s.toString());
+		assertEquals(p.toString(), s.getSourceName());
+	}
+
+	@Test
+	public void fromSMPUTF32LEPathSMPHasExpectedSize() throws Exception {
+		Path p = folder.newFile().toPath();
+		// UTF-32 isn't popular enough to have an entry in StandardCharsets.
+		Charset c = Charset.forName("UTF-32LE");
+		Files.write(p, "hello \uD83C\uDF0E".getBytes(c));
+		CharStream s = CharStreams.fromPath(p, c);
+		assertEquals(7, s.size());
+		assertEquals(0, s.index());
+		assertEquals("hello \uD83C\uDF0E", s.toString());
+		assertEquals(p.toString(), s.getSourceName());
 	}
 }

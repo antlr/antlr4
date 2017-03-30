@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+  ~ Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
   ~ Use of this file is governed by the BSD 3-clause license that
   ~ can be found in the LICENSE.txt file in the project root.
   -->
@@ -9,7 +9,7 @@
 	<parent>
 		<groupId>org.antlr</groupId>
 		<artifactId>antlr4-master</artifactId>
-		<version>4.7-SNAPSHOT</version>
+		<version>4.7.1-SNAPSHOT</version>
 		<relativePath>../../pom.xml</relativePath>
 	</parent>
 	<artifactId>antlr4-runtime-test-annotation-processors</artifactId>

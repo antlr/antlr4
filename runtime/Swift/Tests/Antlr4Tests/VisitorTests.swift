@@ -1,4 +1,4 @@
-/// Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
 
@@ -171,11 +171,11 @@ class VisitorTests: XCTestCase {
             override func visitS(_ ctx: VisitorCalcParser.SContext) -> Int? {
                 return visit(ctx.expr()!)
             }
-            
+
             override func visitNumber(_ ctx: VisitorCalcParser.NumberContext) -> Int? {
                 return Int((ctx.INT()?.getText())!)
             }
-            
+
             override func visitMultiply(_ ctx: VisitorCalcParser.MultiplyContext) -> Int? {
                 let left = visit(ctx.expr(0)!)!
                 let right = visit(ctx.expr(1)!)!
@@ -186,7 +186,7 @@ class VisitorTests: XCTestCase {
                     return left / right
                 }
             }
-            
+
             override func visitAdd(_ ctx: VisitorCalcParser.AddContext) -> Int? {
                 let left = visit(ctx.expr(0)!)!
                 let right = visit(ctx.expr(1)!)!

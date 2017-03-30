@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+﻿/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -37,7 +37,7 @@ namespace Antlr4.Runtime.Atn
 		}
 
 		public LexerATNConfig(LexerATNConfig c, ATNState state)
-			: base(c, state, c.context, c.semanticContext) 
+			: base(c, state, c.context, c.semanticContext)
 		{
 			this.lexerActionExecutor = c.lexerActionExecutor;
 			this.passedThroughNonGreedyDecision = checkNonGreedyDecision(c, state);
@@ -45,7 +45,7 @@ namespace Antlr4.Runtime.Atn
 
 		public LexerATNConfig(LexerATNConfig c, ATNState state,
 							  LexerActionExecutor lexerActionExecutor)
-			: base(c, state, c.context, c.semanticContext) 
+			: base(c, state, c.context, c.semanticContext)
 		{
 			this.lexerActionExecutor = lexerActionExecutor;
 			this.passedThroughNonGreedyDecision = checkNonGreedyDecision(c, state);
@@ -53,7 +53,7 @@ namespace Antlr4.Runtime.Atn
 
 		public LexerATNConfig(LexerATNConfig c, ATNState state,
 							  PredictionContext context)
-			: base(c, state, context, c.semanticContext) 
+			: base(c, state, context, c.semanticContext)
 		{
 			this.lexerActionExecutor = c.lexerActionExecutor;
 			this.passedThroughNonGreedyDecision = checkNonGreedyDecision(c, state);

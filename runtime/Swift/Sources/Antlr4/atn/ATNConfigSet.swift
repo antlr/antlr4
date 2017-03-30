@@ -1,4 +1,4 @@
-/// Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
 
@@ -83,7 +83,7 @@ public class ATNConfigSet: Hashable, CustomStringConvertible {
     /// {@link org.antlr.v4.runtime.atn.ATNConfig#state}, {@code i} is the {@link org.antlr.v4.runtime.atn.ATNConfig#alt}, and
     /// {@code pi} is the {@link org.antlr.v4.runtime.atn.ATNConfig#semanticContext}. We use
     /// {@code (s,i,pi)} as key.
-    /// 
+    ///
     /// <p>This method updates {@link #dipsIntoOuterContext} and
     /// {@link #hasSemanticContext} when necessary.</p>
     @discardableResult
@@ -152,9 +152,9 @@ public class ATNConfigSet: Hashable, CustomStringConvertible {
 
     /// Gets the complete set of represented alternatives for the configuration
     /// set.
-    /// 
+    ///
     /// - returns: the set of represented alternatives in this configuration set
-    /// 
+    ///
     /// -  4.3
 
     public final func getAlts() throws -> BitSet {
@@ -524,9 +524,9 @@ public class ATNConfigSet: Hashable, CustomStringConvertible {
     /// Walk the list of configurations and split them according to
     /// those that have preds evaluating to true/false.  If no pred, assume
     /// true pred and include in succeeded set.  Returns Pair of sets.
-    /// 
+    ///
     /// Create a new set so as not to alter the incoming parameter.
-    /// 
+    ///
     /// Assumption: the input stream has been restored to the starting point
     /// prediction, which is where predicates need to evaluate.
     public final func splitAccordingToSemanticValidity(

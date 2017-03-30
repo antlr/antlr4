@@ -1,4 +1,4 @@
-/// Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
 
@@ -49,7 +49,7 @@ public class DFA: CustomStringConvertible {
     /// {@link org.antlr.v4.runtime.dfa.DFAState#edges} array for this start state contains outgoing edges
     /// supplying individual start states corresponding to specific precedence
     /// values.
-    /// 
+    ///
     /// - returns: {@code true} if this is a precedence DFA; otherwise,
     /// {@code false}.
     /// - seealso: org.antlr.v4.runtime.Parser#getPrecedence()
@@ -58,11 +58,11 @@ public class DFA: CustomStringConvertible {
     }
 
     /// Get the start state for a specific precedence value.
-    /// 
+    ///
     /// - parameter precedence: The current precedence.
     /// - returns: The start state corresponding to the specified precedence, or
     /// {@code null} if no start state exists for the specified precedence.
-    /// 
+    ///
     /// -  IllegalStateException if this is not a precedence DFA.
     /// - seealso: #isPrecedenceDfa()
     ////@SuppressWarnings("null")
@@ -83,11 +83,11 @@ public class DFA: CustomStringConvertible {
     }
 
     /// Set the start state for a specific precedence value.
-    /// 
+    ///
     /// - parameter precedence: The current precedence.
     /// - parameter startState: The start state corresponding to the specified
     /// precedence.
-    /// 
+    ///
     /// -  IllegalStateException if this is not a precedence DFA.
     /// - seealso: #isPrecedenceDfa()
     ////@SuppressWarnings({"SynchronizeOnNonFinalField", "null"})
@@ -116,13 +116,13 @@ public class DFA: CustomStringConvertible {
     }
 
     /// Sets whether this is a precedence DFA.
-    /// 
+    ///
     /// - parameter precedenceDfa: {@code true} if this is a precedence DFA; otherwise,
     /// {@code false}
-    /// 
+    ///
     /// -  UnsupportedOperationException if {@code precedenceDfa} does not
     /// match the value of {@link #isPrecedenceDfa} for the current DFA.
-    /// 
+    ///
     /// -  This method no longer performs any action.
     ////@Deprecated
     public final func setPrecedenceDfa(_ precedenceDfa: Bool) throws {

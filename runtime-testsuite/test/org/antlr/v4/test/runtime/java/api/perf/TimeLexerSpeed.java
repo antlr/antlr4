@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
+
 package org.antlr.v4.test.runtime.java.api.perf;
 
 import org.antlr.v4.runtime.ANTLRFileStream;
@@ -11,11 +17,13 @@ import org.openjdk.jol.info.GraphLayout;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.net.URL;
+import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -331,10 +339,12 @@ public class TimeLexerSpeed { // don't call it Test else it'll run during "mvn t
 		for (int i = 0; i<n; i++) {
 			streams[i] = loader.getResourceAsStream(resourceName);
 		}
+		URLConnection uc = null;
+		long streamLength = getResourceSize(loader, resourceName);
 		long start = System.nanoTime(); // track only time to suck data out of stream
 		for (int i = 0; i<n; i++) {
 			try (InputStream is = streams[i]) {
-				input[i] = CharStreams.fromStream(is);
+				input[i] = CharStreams.fromStream(is, StandardCharsets.UTF_8, streamLength);
 			}
 		}
 		long stop = System.nanoTime();
@@ -370,8 +380,10 @@ public class TimeLexerSpeed { // don't call it Test else it'll run during "mvn t
 	}
 
 	public void lex_new_java_utf8(int n, boolean clearLexerDFACache) throws Exception {
-		try (InputStream is = TimeLexerSpeed.class.getClassLoader().getResourceAsStream(Parser_java_file);) {
-			CharStream input = CharStreams.fromStream(is);
+		ClassLoader loader = TimeLexerSpeed.class.getClassLoader();
+		try (InputStream is = loader.getResourceAsStream(Parser_java_file);) {
+			long size = getResourceSize(loader, Parser_java_file);
+			CharStream input = CharStreams.fromStream(is, StandardCharsets.UTF_8, size);
 			JavaLexer lexer = new JavaLexer(input);
 			double avg = tokenize(lexer, n, clearLexerDFACache);
 			String currentMethodName = new Exception().getStackTrace()[0].getMethodName();
@@ -403,8 +415,11 @@ public class TimeLexerSpeed { // don't call it Test else it'll run during "mvn t
 	}
 
 	public void lex_new_grapheme_utf8(String fileName, int n, boolean clearLexerDFACache) throws Exception {
-		try (InputStream is = TimeLexerSpeed.class.getClassLoader().getResourceAsStream(PerfDir+"/"+fileName)) {
-			CharStream input = CharStreams.fromStream(is);
+		String resourceName = PerfDir+"/"+fileName;
+		ClassLoader loader = TimeLexerSpeed.class.getClassLoader();
+		try (InputStream is = loader.getResourceAsStream(resourceName)) {
+			long size = getResourceSize(loader, resourceName);
+			CharStream input = CharStreams.fromStream(is, StandardCharsets.UTF_8, size);
 			graphemesLexer lexer = new graphemesLexer(input);
 			double avg = tokenize(lexer, n, clearLexerDFACache);
 			String currentMethodName = new Exception().getStackTrace()[0].getMethodName();
@@ -473,5 +488,19 @@ public class TimeLexerSpeed { // don't call it Test else it'll run during "mvn t
 
 	public static String dirname(Path path) {
 		return path.getName(0).toString();
+	}
+
+	public static final long getResourceSize(ClassLoader loader, String resourceName) throws IOException {
+		URLConnection uc = null;
+		try {
+			// Sadly, URLConnection is not AutoCloseable, but it leaks resources if
+			// we don't close its stream.
+			uc = loader.getResource(resourceName).openConnection();
+			return uc.getContentLengthLong();
+		} finally {
+			if (uc != null) {
+				uc.getInputStream().close();
+			}
+		}
 	}
 }

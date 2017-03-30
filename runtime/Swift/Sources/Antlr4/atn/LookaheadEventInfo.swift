@@ -1,17 +1,17 @@
-/// Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
 
 
 /// This class represents profiling event information for tracking the lookahead
 /// depth required in order to make a prediction.
-/// 
+///
 /// -  4.3
 
 public class LookaheadEventInfo: DecisionEventInfo {
     /// Constructs a new instance of the {@link org.antlr.v4.runtime.atn.LookaheadEventInfo} class with
     /// the specified detailed lookahead information.
-    /// 
+    ///
     /// - parameter decision: The decision number
     /// - parameter configs: The final configuration set containing the necessary
     /// information to determine the result of a prediction, or {@code null} if

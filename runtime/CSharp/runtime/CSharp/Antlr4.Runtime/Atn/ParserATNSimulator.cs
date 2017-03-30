@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+﻿/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -372,7 +372,7 @@ namespace Antlr4.Runtime.Atn
 				}
 
 				int alt = ExecATN(dfa, s0, input, index, outerContext);
-				if (debug) 
+				if (debug)
 					ConsoleWriteLine("DFA after predictATN: " + dfa.ToString(parser.Vocabulary));
 				return alt;
 			}
@@ -1532,7 +1532,7 @@ namespace Antlr4.Runtime.Atn
 												int depth,
 												bool treatEofAsEpsilon)
 		{
-			if (debug) 
+			if (debug)
 				ConsoleWriteLine("closure(" + config.ToString(parser, true) + ")");
 
 			if (config.state is RuleStopState)

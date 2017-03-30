@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -725,13 +725,11 @@ public class BaseCSharpTest implements RuntimeTestSupport /*, SpecialRuntimeTest
 				"\n" +
 				"public class Test {\n" +
 				"    public static void Main(string[] args) {\n" +
-				"        string inputData = File.ReadAllText(args[0], Encoding.UTF8);\n" +
+				"        var input = CharStreams.fromPath(args[0]);\n" +
                 "        using (FileStream fsOut = new FileStream(args[1], FileMode.Create, FileAccess.Write))\n" +
                 "        using (FileStream fsErr = new FileStream(args[2], FileMode.Create, FileAccess.Write))\n" +
 				"        using (TextWriter output = new StreamWriter(fsOut),\n" +
 				"                          errorOutput = new StreamWriter(fsErr)) {\n" +
-				"                CodePointCharStream input = new CodePointCharStream(inputData);\n" +
-				"                input.name = args[0];\n" +
 				"                <lexerName> lex = new <lexerName>(input, output, errorOutput);\n" +
 				"                CommonTokenStream tokens = new CommonTokenStream(lex);\n" +
 				"                <createParser>\n"+
@@ -780,8 +778,7 @@ public class BaseCSharpTest implements RuntimeTestSupport /*, SpecialRuntimeTest
 				"\n" +
 				"public class Test {\n" +
 				"    public static void Main(string[] args) {\n" +
-				"        string inputData = File.ReadAllText(args[0], Encoding.UTF8);\n" +
-				"        ICharStream input = new CodePointCharStream(inputData);\n" +
+				"        var input = CharStreams.fromPath(args[0]);\n" +
                 "        using (FileStream fsOut = new FileStream(args[1], FileMode.Create, FileAccess.Write))\n" +
                 "        using (FileStream fsErr = new FileStream(args[2], FileMode.Create, FileAccess.Write))\n" +
 				"        using (TextWriter output = new StreamWriter(fsOut),\n" +

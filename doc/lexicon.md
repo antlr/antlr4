@@ -92,7 +92,7 @@ grammar Foreign;
 a : '外' ;
 ```
 
-The recognizers that ANTLR generates assume a character vocabulary containing all Unicode characters. The input file encoding assumed by the runtime library depends on the target language. For the Java target, the runtime library assumes files are in UTF-8. Using the constructors, you can specify a different encoding. See, for example, ANTLR’s `ANTLRFileStream`.
+The recognizers that ANTLR generates assume a character vocabulary containing all Unicode characters. The input file encoding assumed by the runtime library depends on the target language. For the Java target, the runtime library assumes files are in UTF-8. Using the  factory methods in `CharStreams`, you can specify a different encoding.
 
 ## Actions
 
