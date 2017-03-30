@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -217,7 +217,7 @@ namespace Antlr4.Runtime.Atn
 					parents[1] = b.parent;
 				}
 				pc = new ArrayPredictionContext(parents, payloads);
-				if (mergeCache != null) 
+				if (mergeCache != null)
 					mergeCache.Put(a, b, pc);
 				return pc;
 			}
@@ -232,10 +232,10 @@ namespace Antlr4.Runtime.Atn
 			if (mergeCache != null)
 			{
 				PredictionContext previous = mergeCache.Get(a, b);
-				if (previous != null) 
+				if (previous != null)
 					return previous;
 				previous = mergeCache.Get(b, a);
-				if (previous != null) 
+				if (previous != null)
 					return previous;
 			}
 
@@ -327,20 +327,20 @@ namespace Antlr4.Runtime.Atn
 			// TODO: track whether this is possible above during merge sort for speed
 			if (M.Equals(a))
 			{
-				if (mergeCache != null) 
+				if (mergeCache != null)
 					mergeCache.Put(a, b, a);
 				return a;
 			}
 			if (M.Equals(b))
 			{
-				if (mergeCache != null) 
+				if (mergeCache != null)
 					mergeCache.Put(a, b, b);
 				return b;
 			}
 
 			CombineCommonParents(mergedParents);
 
-			if (mergeCache != null) 
+			if (mergeCache != null)
 				mergeCache.Put(a, b, M);
 			return M;
 		}
@@ -370,9 +370,9 @@ namespace Antlr4.Runtime.Atn
 		{
 			if (rootIsWildcard)
 			{
-				if (a == PredictionContext.EMPTY) 
+				if (a == PredictionContext.EMPTY)
 					return PredictionContext.EMPTY;  // * + b = *
-				if (b == PredictionContext.EMPTY) 
+				if (b == PredictionContext.EMPTY)
 					return PredictionContext.EMPTY;  // a + * = *
 			}
 			else {

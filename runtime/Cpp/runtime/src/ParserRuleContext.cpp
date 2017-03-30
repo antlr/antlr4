@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+﻿/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -45,7 +45,7 @@ void ParserRuleContext::copyFrom(ParserRuleContext *ctx) {
         children.push_back(errorNode);
       }
     }
-    
+
     // Remove the just reparented error nodes from the source context.
     ctx->children.erase(std::remove_if(ctx->children.begin(), ctx->children.end(), [this](tree::ParseTree *e) -> bool {
       return std::find(children.begin(), children.end(), e) != children.end();

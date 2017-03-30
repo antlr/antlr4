@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
+
 package org.antlr.v4.test.runtime.java.api.perf;
 
 import org.antlr.v4.runtime.ANTLRFileStream;
@@ -11,9 +17,9 @@ import org.openjdk.jol.info.GraphLayout;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.net.URL;

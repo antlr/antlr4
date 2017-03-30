@@ -1,4 +1,4 @@
-/// Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
 
@@ -85,12 +85,12 @@ public final class HashMap<K: Hashable,V>: Sequence
      var size: Int = 0
 
     /// The next size value at which to resize (capacity * load factor).
-    /// - 
+    /// -
     var threshold: Int = 0
 
     /// The load factor for the hash table.
-    /// 
-    /// - 
+    ///
+    /// -
      var loadFactor: Float = 0
 
     /// The number of times this HashMap has been structurally modified
@@ -143,7 +143,7 @@ public final class HashMap<K: Hashable,V>: Sequence
     }
 
     /// Returns <tt>true</tt> if this map contains no key-value mappings.
-    /// 
+    ///
     /// - returns: <tt>true</tt> if this map contains no key-value mappings
     public final var isEmpty: Bool {
         return size == 0
@@ -166,18 +166,18 @@ public final class HashMap<K: Hashable,V>: Sequence
     }
     /// Returns the value to which the specified key is mapped,
     /// or {@code null} if this map contains no mapping for the key.
-    /// 
+    ///
     /// <p>More formally, if this map contains a mapping from a key
     /// {@code k} to a value {@code v} such that {@code (key==null ? k==null :
     /// key.equals(k))}, then this method returns {@code v}; otherwise
     /// it returns {@code null}.  (There can be at most one such mapping.)
-    /// 
+    ///
     /// <p>A return value of {@code null} does not <i>necessarily</i>
     /// indicate that the map contains no mapping for the key; it's also
     /// possible that the map explicitly maps the key to {@code null}.
     /// The {@link #containsKey containsKey} operation may be used to
     /// distinguish these two cases.
-    /// 
+    ///
     /// - seealso: #put(Object, Object)
     public final func get(_ key: K) -> V? {
         let hash: Int = HashMap.hash(key.hashValue)
@@ -194,7 +194,7 @@ public final class HashMap<K: Hashable,V>: Sequence
     }
     /// Returns <tt>true</tt> if this map contains a mapping for the
     /// specified key.
-    /// 
+    ///
     /// - parameter   key:   The key whose presence in this map is to be tested
     /// - returns: <tt>true</tt> if this map contains a mapping for the specified
     /// key.
@@ -223,7 +223,7 @@ public final class HashMap<K: Hashable,V>: Sequence
     /// Associates the specified value with the specified key in this map.
     /// If the map previously contained a mapping for the key, the old
     /// value is replaced.
-    /// 
+    ///
     /// - parameter key: key with which the specified value is to be associated
     /// - parameter value: value to be associated with the specified key
     /// - returns: the previous value associated with <tt>key</tt>, or
@@ -254,7 +254,7 @@ public final class HashMap<K: Hashable,V>: Sequence
     /// Adds a new entry with the specified key, value and hash code to
     /// the specified bucket.  It is the responsibility of this
     /// method to resize the table if appropriate.
-    /// 
+    ///
     /// Subclass overrides this to alter the behavior of put method.
     final func addEntry(_ hash: Int, _ key: K, _ value: V, _ bucketIndex: Int) {
         let e = table[bucketIndex]
@@ -268,11 +268,11 @@ public final class HashMap<K: Hashable,V>: Sequence
     /// Rehashes the contents of this map into a new array with a
     /// larger capacity.  This method is called automatically when the
     /// number of keys in this map reaches its threshold.
-    /// 
+    ///
     /// If current capacity is MAXIMUM_CAPACITY, this method does not
     /// resize the map, but sets threshold to Integer.MAX_VALUE.
     /// This has the effect of preventing future calls.
-    /// 
+    ///
     /// - parameter newCapacity: the new capacity, MUST be a power of two;
     /// must be greater than current capacity unless current
     /// capacity is MAXIMUM_CAPACITY (in which case value

@@ -1,4 +1,4 @@
-/// Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
 
@@ -6,7 +6,7 @@
 
 /// This is the base class for gathering detailed information about prediction
 /// events which occur during parsing.
-/// 
+///
 /// Note that we could record the parser call stack at the time this event
 /// occurred but in the presence of left recursive rules, the stack is kind of
 /// meaningless. It's better to look at the individual configurations for their
@@ -15,12 +15,12 @@
 /// (start...stop) of the various subtrees. Examining the stack tops of all
 /// configurations provide the return states for the rule invocations.
 /// From there you can get the enclosing rule.
-/// 
+///
 /// -  4.3
 
 public class DecisionEventInfo {
     /// The invoked decision number which this event is related to.
-    /// 
+    ///
     /// - seealso: org.antlr.v4.runtime.atn.ATN#decisionToState
     public let decision: Int
 

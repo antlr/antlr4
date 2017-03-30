@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -87,7 +87,7 @@ open class ParserRuleContext: RuleContext {
 
         self.start = ctx.start
         self.stop = ctx.stop
-        
+
         // copy any error nodes to alt label node
         if  ctx.children != nil {
             self.children = Array<ParseTree>()
@@ -131,22 +131,22 @@ open class ParserRuleContext: RuleContext {
         children!.append(t)
         return t
     }
-    
+
     @discardableResult
     open func addChild(_ ruleInvocation: RuleContext) -> RuleContext {
         return addAnyChild(ruleInvocation)
     }
-    
+
     /** Add a token leaf node child and force its parent to be this node. */
     @discardableResult
     open func addChild(_ t: TerminalNode) -> TerminalNode {
         t.setParent(self)
         return addAnyChild(t)
     }
-    
+
     /** Add an error node child and force its parent to be this node.
      *
-     *  @since 4.7 
+     *  @since 4.7
      */
     @discardableResult
     open func addErrorNode(_ errorNode: ErrorNode) -> ErrorNode {
@@ -166,7 +166,7 @@ open class ParserRuleContext: RuleContext {
         t.setParent(self)
         return t
     }
-    
+
     /** Add a child to this node based upon badToken.  It
      *  creates a ErrorNodeImpl rather than using
      *  {@link Parser#createErrorNode(ParserRuleContext, Token)}. I'm leaving this
@@ -180,12 +180,12 @@ open class ParserRuleContext: RuleContext {
         t.setParent(self)
         return t
     }
-    
+
     //	public void trace(int s) {
     //		if ( states==null ) states = new ArrayList<Integer>();
     //		states.add(s);
     //	}
-    
+
     /** Used by enterOuterAlt to toss out a RuleContext previously added as
      *  we entered a rule. If we have # label, we will need to remove
      *  generic ruleContext object.
@@ -195,7 +195,7 @@ open class ParserRuleContext: RuleContext {
             children!.remove(at: children!.count-1)
     	}
     }
-    
+
 
     override
     /** Override to make type more specific */

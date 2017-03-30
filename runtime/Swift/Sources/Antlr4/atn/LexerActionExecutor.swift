@@ -1,4 +1,4 @@
-/// Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
 
@@ -8,11 +8,11 @@
 
 /// Represents an executor for a sequence of lexer actions which traversed during
 /// the matching operation of a lexer rule (token).
-/// 
+///
 /// <p>The executor tracks position information for position-dependent lexer actions
 /// efficiently, ensuring that actions appearing only at the end of the rule do
 /// not cause bloating of the {@link org.antlr.v4.runtime.dfa.DFA} created for the lexer.</p>
-/// 
+///
 /// -  Sam Harwell
 /// -  4.2
 
@@ -39,14 +39,14 @@ public class LexerActionExecutor: Hashable {
     /// Creates a {@link org.antlr.v4.runtime.atn.LexerActionExecutor} which executes the actions for
     /// the input {@code lexerActionExecutor} followed by a specified
     /// {@code lexerAction}.
-    /// 
+    ///
     /// - parameter lexerActionExecutor: The executor for actions already traversed by
     /// the lexer while matching a token within a particular
     /// {@link org.antlr.v4.runtime.atn.LexerATNConfig}. If this is {@code null}, the method behaves as
     /// though it were an empty executor.
     /// - parameter lexerAction: The lexer action to execute after the actions
     /// specified in {@code lexerActionExecutor}.
-    /// 
+    ///
     /// - returns: A {@link org.antlr.v4.runtime.atn.LexerActionExecutor} for executing the combine actions
     /// of {@code lexerActionExecutor} and {@code lexerAction}.
     public static func append(_ lexerActionExecutor: LexerActionExecutor?, _ lexerAction: LexerAction) -> LexerActionExecutor {
@@ -63,7 +63,7 @@ public class LexerActionExecutor: Hashable {
 
     /// Creates a {@link org.antlr.v4.runtime.atn.LexerActionExecutor} which encodes the current offset
     /// for position-dependent lexer actions.
-    /// 
+    ///
     /// <p>Normally, when the executor encounters lexer actions where
     /// {@link org.antlr.v4.runtime.atn.LexerAction#isPositionDependent} returns {@code true}, it calls
     /// {@link org.antlr.v4.runtime.IntStream#seek} on the input {@link org.antlr.v4.runtime.CharStream} to set the input
@@ -71,7 +71,7 @@ public class LexerActionExecutor: Hashable {
     /// for efficient DFA representation of lexer actions which appear at the end
     /// of a lexer rule, even when the lexer rule matches a variable number of
     /// characters.</p>
-    /// 
+    ///
     /// <p>Prior to traversing a match transition in the ATN, the current offset
     /// from the token start index is assigned to all position-dependent lexer
     /// actions which have not already been assigned a fixed offset. By storing
@@ -79,13 +79,13 @@ public class LexerActionExecutor: Hashable {
     /// lexer actions which appear in the middle of tokens remains efficient due
     /// to sharing among tokens of the same length, regardless of their absolute
     /// position in the input stream.</p>
-    /// 
+    ///
     /// <p>If the current executor already has offsets assigned to all
     /// position-dependent lexer actions, the method returns {@code this}.</p>
-    /// 
+    ///
     /// - parameter offset: The current offset to assign to all position-dependent
     /// lexer actions which do not already have offsets assigned.
-    /// 
+    ///
     /// - returns: A {@link org.antlr.v4.runtime.atn.LexerActionExecutor} which stores input stream offsets
     /// for all position-dependent lexer actions.
     public func fixOffsetBeforeMatch(_ offset: Int) -> LexerActionExecutor {
@@ -116,13 +116,13 @@ public class LexerActionExecutor: Hashable {
 
     /// Execute the actions encapsulated by this executor within the context of a
     /// particular {@link org.antlr.v4.runtime.Lexer}.
-    /// 
+    ///
     /// <p>This method calls {@link org.antlr.v4.runtime.IntStream#seek} to set the position of the
     /// {@code input} {@link org.antlr.v4.runtime.CharStream} prior to calling
     /// {@link org.antlr.v4.runtime.atn.LexerAction#execute} on a position-dependent action. Before the
     /// method returns, the input position will be restored to the same position
     /// it was in when the method was invoked.</p>
-    /// 
+    ///
     /// - parameter lexer: The lexer instance.
     /// - parameter input: The input stream which is the source for the current token.
     /// When this method is called, the current {@link org.antlr.v4.runtime.IntStream#index} for

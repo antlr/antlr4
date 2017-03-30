@@ -1,4 +1,4 @@
-/// Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
 
@@ -32,12 +32,12 @@ public class ATNConfig: Hashable, CustomStringConvertible {
     /// no way to do this efficiently, we simply cannot evaluate
     /// dependent predicates unless we are in the rule that initially
     /// invokes the ATN simulator.
-    /// 
+    ///
     /// <p>
     /// closure() tracks the depth of how far we dip into the outer context:
     /// depth &gt; 0.  Note that it may not be totally accurate depth since I
     /// don't ever decrement. TODO: make it a boolean then</p>
-    /// 
+    ///
     /// <p>
     /// For memory efficiency, the {@link #isPrecedenceFilterSuppressed} method
     /// is also backed by this field. Since the field is publicly accessible, the

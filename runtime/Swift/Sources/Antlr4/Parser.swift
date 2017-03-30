@@ -1,5 +1,5 @@
 ///
-/// Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
 ///
@@ -70,7 +70,7 @@ open class Parser: Recognizer<ParserATNSimulator> {
      * @see org.antlr.v4.runtime.atn.ATNDeserializationOptions#isGenerateRuleBypassTransitions()
      */
     private let bypassAltsAtnCache: HashMap<String, ATN> = HashMap<String, ATN>()
-    
+
     /**
      * The error handling strategy for the parser. The default value is a new
      * instance of {@link org.antlr.v4.runtime.DefaultErrorStrategy}.
@@ -593,7 +593,7 @@ open class Parser: Recognizer<ParserATNSimulator> {
         }
         return o
     }
-    
+
     /** How to create a token leaf node associated with a parent.
      *  Typically, the terminal node to create is not a function of the parent.
      *
@@ -602,7 +602,7 @@ open class Parser: Recognizer<ParserATNSimulator> {
     public func createTerminalNode(parent: ParserRuleContext, t: Token) -> TerminalNode {
      	return TerminalNodeImpl(t);
     }
-    
+
     /** How to create an error node, given a token, associated with a parent.
      *  Typically, the error node to create is not a function of the parent.
      *
