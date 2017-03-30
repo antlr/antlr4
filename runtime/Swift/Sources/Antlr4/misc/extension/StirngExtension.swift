@@ -17,7 +17,7 @@ import UIKit
 //http://stackoverflow.com/questions/28182441/swift-how-to-get-substring-from-start-to-last-index-of-character
 //https://github.com/williamFalcon/Bolt_Swift/blob/master/Bolt/BoltLibrary/String/String.swift
 
-public extension String {
+extension String {
 
     func trim() -> String {
         return self.trimmingCharacters(in: CharacterSet.whitespaces)
