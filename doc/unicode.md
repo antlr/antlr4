@@ -100,6 +100,30 @@ on-the-fly compiler (JIT) is unable to perform the same optimizations
 so stick with either the old or the new streams, if performance is
 a primary concern. See the [extreme debugging and spelunking](https://github.com/antlr/antlr4/pull/1781) needed to identify this issue in our timing rig.
 
+### Legacy grammar using surrogate code units
+
+Legacy grammars that did their own UTF-16 surrogate code unit matching will need to continue to use `ANTLRInputStream` (Java target) until the parser-application code can upgrade to `CharStreams` interface. Then the surrogate code unit matching should be removed from the grammar in favor of letting the new streams do the decoding.  
+
+Prior to 4.7, application code could directly pass `Token.getStartIndex()` and `Token.getStopIndex()` to Java and C# String APIs (because both used UTF-16 code units as the fundamental unit of length).  With the new streams, clients will have to convert from code point indices to UTF-16 code unit indices. Here is some (Java) code to show you the necessary logic:
+
+```java
+public final class CodePointCounter {
+  private final String input;
+  public int inputIndex = 0;
+  public int codePointIndex = 0;
+  
+  public int advanceToIndex(int newCodePointIndex) {
+    assert newCodePointIndex >= codePointIndex;
+    while (codePointIndex < newCodePointOffset) {
+        int codePoint = Character.codePointAt(input, inputIndex);
+        inputIndex += Character.charCount(codePoint);
+        codePointIndex++;
+    }
+    return inputIndex;
+  }
+}
+```
+
 ### Character Buffering, Unbuffered streams
 
 The ANTLR character streams still buffer all the input when you create
