@@ -1,15 +1,17 @@
 # Lexers and Unicode text
 
-Prior to ANTLR 4.7, generated lexers in most targets only supported part of the Unicode standard (code points up to `U+FFFF`). As of ANTLR 4.7, the lexers in all language runtimes support the full range of Unicode code points up to `U+10FFFF`, as
-long as the input `CharStream` is opened using `CharStreams.fromPath()`, `CharStreams.fromFileName()`, etc...
-or the equivalent method for your runtime's language. Java, C#, and JavaScript runtimes required changes and, rather than break the previous interface, we deprecated them. (The *Java-target* deprecated `ANTLRInputStream` and `ANTLRFileStream` APIs only support Unicode code points up to `U+FFFF`.) C++, Python, Go, and Swift APIs didn't need any changes to support Unicode code points, so we decided to leave those alone. They do not use the new factory-style stream construction. 
+Prior to ANTLR 4.7, generated lexers in most targets only supported part of the Unicode standard (code points up to `U+FFFF`). As of ANTLR 4.7, the lexers in all language runtimes support the full range of Unicode code points up to `U+10FFFF`. 
+
+C++, Python, Go, and Swift APIs didn't need any API changes to support Unicode code points, so we decided to leave those class interfaces as-is. 
+
+Java, C#, and JavaScript runtimes required changes and, rather than break the previous interface, we deprecated them. (The *Java-target* deprecated `ANTLRInputStream` and `ANTLRFileStream` APIs only support Unicode code points up to `U+FFFF`.) Now, those targets must create `CharStream`s from input using `CharStreams.fromPath()`, `CharStreams.fromFileName()`, etc... 
 
 A big shout out to Ben Hamilton (github bhamiltoncx) for his superhuman
 efforts across all targets to get true support for U+10FFFF code points.
 
 ## Example
 
-### Java
+The Java, C#, and JavaScript runtimes use the new factory style stream creation interface. For example, here is some sample Java code that uses `CharStreams.fromPath()`:
 
 ```java
 public static void main(String[] args) {

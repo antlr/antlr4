@@ -21,7 +21,7 @@ ANTLR project lead and supreme dictator for life
 * David Sisson (C++ initial target and test)
 * [Janyou](https://github.com/janyou) (Swift target)
 * [Ewan Mellor](https://github.com/ewanmellor), [Hanzhou Shi](https://github.com/hanjoes) (Swift target merging)
-* [Ben Hamilton](https://github.com/bhamiltoncx) (Integration of > U+FFFF unicode, all targets)
+* [Ben Hamilton](https://github.com/bhamiltoncx) (Full Unicode support in serialized ATN and all languages' runtimes for code points > U+FFFF)
 
 ## Useful information
 
