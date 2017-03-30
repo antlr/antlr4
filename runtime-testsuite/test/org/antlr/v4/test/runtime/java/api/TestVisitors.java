@@ -5,8 +5,6 @@
  */
 package org.antlr.v4.test.runtime.java.api;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -19,8 +17,10 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class TestVisitors {
+import java.util.ArrayList;
+import java.util.List;
 
+public class TestVisitors {
 	/**
 	 * This test verifies the basic behavior of visitors, with an emphasis on
 	 * {@link AbstractParseTreeVisitor#visitTerminal}.

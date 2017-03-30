@@ -15,4 +15,6 @@ MUL : '*';
 DIV : '/';
 ADD : '+';
 SUB : '-';
-WS : [ \t]+ -> channel(HIDDEN);
+WS : [ \t\r\n]+ -> channel(HIDDEN);
+LINE_COMMENT : '//' ~'\n'* '\n' -> channel(HIDDEN) ;
+COMMENT : '/*' .*? '*/' -> channel(HIDDEN) ;
