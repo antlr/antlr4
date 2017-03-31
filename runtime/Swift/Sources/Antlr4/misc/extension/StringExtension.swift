@@ -17,7 +17,7 @@ import UIKit
 //http://stackoverflow.com/questions/28182441/swift-how-to-get-substring-from-start-to-last-index-of-character
 //https://github.com/williamFalcon/Bolt_Swift/blob/master/Bolt/BoltLibrary/String/String.swift
 
-public extension String {
+extension String {
 
     func trim() -> String {
         return self.trimmingCharacters(in: CharacterSet.whitespaces)
@@ -30,10 +30,6 @@ public extension String {
     func replaceAll(_ from: String, replacement: String) -> String {
 
         return self.replacingOccurrences(of: from, with: replacement, options: NSString.CompareOptions.literal, range: nil)
-    }
-
-    func contains(_ find: String) -> Bool {
-        return self.range(of: find) != nil
     }
 
     func containsIgnoreCase(_ find: String) -> Bool {

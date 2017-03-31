@@ -240,8 +240,8 @@
 		DBBAE7081E22DCAC00C2FEA6 /* IntStreamExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBBAE5FC1E22DCAC00C2FEA6 /* IntStreamExtension.swift */; };
 		DBBAE7091E22DCAC00C2FEA6 /* NSUUIDExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBBAE5FD1E22DCAC00C2FEA6 /* NSUUIDExtension.swift */; };
 		DBBAE70A1E22DCAC00C2FEA6 /* NSUUIDExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBBAE5FD1E22DCAC00C2FEA6 /* NSUUIDExtension.swift */; };
-		DBBAE70B1E22DCAC00C2FEA6 /* StirngExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBBAE5FE1E22DCAC00C2FEA6 /* StirngExtension.swift */; };
-		DBBAE70C1E22DCAC00C2FEA6 /* StirngExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBBAE5FE1E22DCAC00C2FEA6 /* StirngExtension.swift */; };
+		DBBAE70B1E22DCAC00C2FEA6 /* StringExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBBAE5FE1E22DCAC00C2FEA6 /* StringExtension.swift */; };
+		DBBAE70C1E22DCAC00C2FEA6 /* StringExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBBAE5FE1E22DCAC00C2FEA6 /* StringExtension.swift */; };
 		DBBAE70D1E22DCAC00C2FEA6 /* TokenExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBBAE5FF1E22DCAC00C2FEA6 /* TokenExtension.swift */; };
 		DBBAE70E1E22DCAC00C2FEA6 /* TokenExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBBAE5FF1E22DCAC00C2FEA6 /* TokenExtension.swift */; };
 		DBBAE70F1E22DCAC00C2FEA6 /* HashMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBBAE6001E22DCAC00C2FEA6 /* HashMap.swift */; };
@@ -492,7 +492,7 @@
 		DBBAE5FB1E22DCAC00C2FEA6 /* CharacterExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CharacterExtension.swift; sourceTree = "<group>"; };
 		DBBAE5FC1E22DCAC00C2FEA6 /* IntStreamExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IntStreamExtension.swift; sourceTree = "<group>"; };
 		DBBAE5FD1E22DCAC00C2FEA6 /* NSUUIDExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSUUIDExtension.swift; sourceTree = "<group>"; };
-		DBBAE5FE1E22DCAC00C2FEA6 /* StirngExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StirngExtension.swift; sourceTree = "<group>"; };
+		DBBAE5FE1E22DCAC00C2FEA6 /* StringExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StringExtension.swift; sourceTree = "<group>"; };
 		DBBAE5FF1E22DCAC00C2FEA6 /* TokenExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TokenExtension.swift; sourceTree = "<group>"; };
 		DBBAE6001E22DCAC00C2FEA6 /* HashMap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HashMap.swift; sourceTree = "<group>"; };
 		DBBAE6011E22DCAC00C2FEA6 /* Interval.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Interval.swift; sourceTree = "<group>"; };
@@ -828,7 +828,7 @@
 				DBBAE5FB1E22DCAC00C2FEA6 /* CharacterExtension.swift */,
 				DBBAE5FC1E22DCAC00C2FEA6 /* IntStreamExtension.swift */,
 				DBBAE5FD1E22DCAC00C2FEA6 /* NSUUIDExtension.swift */,
-				DBBAE5FE1E22DCAC00C2FEA6 /* StirngExtension.swift */,
+				DBBAE5FE1E22DCAC00C2FEA6 /* StringExtension.swift */,
 				DBBAE5FF1E22DCAC00C2FEA6 /* TokenExtension.swift */,
 			);
 			path = extension;
@@ -1186,7 +1186,7 @@
 				DBBAE68F1E22DCAC00C2FEA6 /* LookupATNConfig.swift in Sources */,
 				DBBAE6BB1E22DCAC00C2FEA6 /* SetTransition.swift in Sources */,
 				DBBAE6551E22DCAC00C2FEA6 /* AtomTransition.swift in Sources */,
-				DBBAE70B1E22DCAC00C2FEA6 /* StirngExtension.swift in Sources */,
+				DBBAE70B1E22DCAC00C2FEA6 /* StringExtension.swift in Sources */,
 				DBBAE64B1E22DCAC00C2FEA6 /* ATNDeserializationOptions.swift in Sources */,
 				DBBAE6851E22DCAC00C2FEA6 /* LexerPushModeAction.swift in Sources */,
 				DBBAE6E11E22DCAC00C2FEA6 /* DFAState.swift in Sources */,
@@ -1350,7 +1350,7 @@
 				DBBAE6901E22DCAC00C2FEA6 /* LookupATNConfig.swift in Sources */,
 				DBBAE6BC1E22DCAC00C2FEA6 /* SetTransition.swift in Sources */,
 				DBBAE6561E22DCAC00C2FEA6 /* AtomTransition.swift in Sources */,
-				DBBAE70C1E22DCAC00C2FEA6 /* StirngExtension.swift in Sources */,
+				DBBAE70C1E22DCAC00C2FEA6 /* StringExtension.swift in Sources */,
 				DBBAE64C1E22DCAC00C2FEA6 /* ATNDeserializationOptions.swift in Sources */,
 				DBBAE6861E22DCAC00C2FEA6 /* LexerPushModeAction.swift in Sources */,
 				DBBAE6E21E22DCAC00C2FEA6 /* DFAState.swift in Sources */,
