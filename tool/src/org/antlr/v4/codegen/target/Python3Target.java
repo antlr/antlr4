@@ -56,7 +56,7 @@ public class Python3Target extends Target {
 	@Override
 	public int getSerializedATNSegmentLimit() {
 		// set to something stupid to avoid segmentation
-		return 2 ^ 31;
+		return Integer.MAX_VALUE;
 	}
 
 	@Override
