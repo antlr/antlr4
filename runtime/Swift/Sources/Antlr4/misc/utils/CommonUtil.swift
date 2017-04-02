@@ -16,9 +16,24 @@ func errPrint(_ msg: String) {
     fputs(msg + "\n", __stderrp)
 }
 
+public func +(lhs: String, rhs: Int) -> String {
+    return lhs + String(rhs)
+}
+
+public func +(lhs: Int, rhs: String) -> String {
+    return String(lhs) + rhs
+}
+
+public func +(lhs: String, rhs: Token) -> String {
+    return lhs + rhs.description
+}
+
+public func +(lhs: Token, rhs: String) -> String {
+    return lhs.description + rhs
+}
+
 infix operator >>> : BitwiseShiftPrecedence
 
-//infix operator >>> { associativity right precedence 160 }
 func >>>(lhs: Int32, rhs: Int32) -> Int32 {
     let left = UInt32(bitPattern: lhs)
     let right = UInt32(bitPattern: rhs) % 32
