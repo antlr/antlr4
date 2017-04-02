@@ -246,14 +246,7 @@ public class CommonToken: WritableToken {
         if let r = r {
             typeString = r.getVocabulary().getDisplayName(type);
         }
-       return "[@"+getTokenIndex()+","+start+":"+stop+"='"+txt+"',<"+typeString+">"+channelStr+","+line+":"+getCharPositionInLine()+"]"
-//        let desc: StringBuilder = StringBuilder()
-//        desc.append("[@\(getTokenIndex()),")
-//        desc.append("\(start):\(stop)='\(txt)',")
-//        desc.append("<\(typeString)>\(channelStr),")
-//        desc.append("\(line):\(getCharPositionInLine())]")
-//
-//        return desc.toString()
+       return "[@\(getTokenIndex()),\(start):\(stop)='\(txt)',<\(typeString)>\(channelStr),\(line):\(getCharPositionInLine())]"
     }
     public var visited: Bool {
         get {

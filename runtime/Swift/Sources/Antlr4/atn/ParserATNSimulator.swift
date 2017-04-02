@@ -1124,7 +1124,7 @@ open class ParserATNSimulator: ATNSimulator {
             let altToPred: [SemanticContext?]? = try configs.getPredsForAmbigAlts(ambigAlts,nalts)
 
             if debug {
-                print("getPredsForAmbigAlts result \(altToPred)")
+                print("getPredsForAmbigAlts result \(String(describing: altToPred))")
             }
             return altToPred
     }
@@ -1747,7 +1747,7 @@ open class ParserATNSimulator: ATNSimulator {
             }
 
             if debug {
-                print("config from pred transition=\(c)")
+                print("config from pred transition=\(String(describing: c))")
             }
             return c!
     }
@@ -1790,7 +1790,7 @@ open class ParserATNSimulator: ATNSimulator {
             }
 
             if debug {
-                print("config from pred transition=\(c)")
+                print("config from pred transition=\(String(describing: c))")
             }
             return c
     }
@@ -1798,7 +1798,7 @@ open class ParserATNSimulator: ATNSimulator {
 
     final func ruleTransition(_ config: ATNConfig, _ t: RuleTransition) -> ATNConfig {
         if debug {
-            print("CALL rule \(getRuleName(t.target.ruleIndex!)), ctx=\(config.context)")
+            print("CALL rule \(getRuleName(t.target.ruleIndex!)), ctx=\(String(describing: config.context))")
         }
 
         let returnState: ATNState = t.followState
@@ -1958,7 +1958,7 @@ open class ParserATNSimulator: ATNSimulator {
                           _ to: DFAState?) throws -> DFAState? {
         var to = to
         if debug {
-            print("EDGE \(from) -> \(to) upon \(getTokenName(t))")
+            print("EDGE \(String(describing: from)) -> \(String(describing: to)) upon \(getTokenName(t))")
         }
 
         if to == nil {

@@ -626,7 +626,7 @@ public class BitSet: Hashable, CustomStringConvertible {
             n = n - 2
             x = y
         }
-        return n - ((x << 1) >>> 31)
+        return Int(n - ((x << 1) >>> 31))
     }
 
     /// Returns the index of the first bit that is set to {@code false}
@@ -988,7 +988,7 @@ public class BitSet: Hashable, CustomStringConvertible {
         var i: Int = wordsInUse
         i -= 1
         while i >= 0 {
-             h ^= words[i] * (i + 1)
+             h ^= words[i] * Int64(i + 1)
              i -= 1
         }
 

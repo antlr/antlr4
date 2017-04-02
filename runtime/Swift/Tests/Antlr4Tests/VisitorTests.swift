@@ -6,7 +6,6 @@ import XCTest
 import Antlr4
 
 class VisitorTests: XCTestCase {
-
     ///
     /// This test verifies the basic behavior of visitors, with an emphasis on
     /// {@link AbstractParseTreeVisitor#visitTerminal}.

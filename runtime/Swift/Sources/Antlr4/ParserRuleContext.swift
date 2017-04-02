@@ -329,7 +329,7 @@ open class ParserRuleContext: RuleContext {
         var rules: Array<String> = recognizer.getRuleInvocationStack(self)
         // Collections.reverse(rules);
         rules = rules.reversed()
-        return "ParserRuleContext\(rules){start= + \(start), stop=\(stop)}"
+        return "ParserRuleContext\(rules){start= + \(String(describing: start)), stop=\(String(describing: stop))}"
 
     }
 }

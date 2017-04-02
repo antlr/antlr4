@@ -118,8 +118,6 @@ public func ==(lhs: ArrayPredictionContext, rhs: ArrayPredictionContext) -> Bool
         return false
     }
 
-    // return lhs.returnStates == rhs.returnStates && lhs.parents == rhs.parents
-
-    return ArrayEquals(lhs.returnStates, rhs.returnStates) && ArrayEquals(lhs.parents, rhs.parents)
+    return lhs.returnStates == rhs.returnStates && lhs.parents == rhs.parents
 }
 
