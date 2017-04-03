@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
+
 package org.antlr.v4.test.runtime.descriptors;
 
 import org.antlr.v4.runtime.misc.Pair;
@@ -290,30 +296,6 @@ public class LexerExecDescriptors {
 		 lexer grammar L;
 		 A : ["\\\\ab]+ {<writeln("\"A\"")>} ;
 		 WS : [ \n\t]+ -> skip ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
-
-	}
-
-	public static class CharSetWithReversedRange extends BaseLexerTestDescriptor {
-		public String input = "9";
-		/**
-		A
-		[@0,0:0='9',<1>,1:0]
-		[@1,1:0='<EOF>',<-1>,1:1]
-		 */
-		@CommentHasStringValue
-		public String output;
-
-		public String errors = null;
-		public String startRule = "";
-		public String grammarName = "L";
-
-		/**
-		 lexer grammar L;
-		 A : [z-a9]+ {<writeln("\"A\"")>} ;
-		 WS : [ \n]+ -> skip ;
 		 */
 		@CommentHasStringValue
 		public String grammar;

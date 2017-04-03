@@ -70,14 +70,14 @@ ParserPropertyCall(p, call) ::= "<call>"
 
 PositionAdjustingLexer() ::= <<
 protected:
-  class PositionAdjustingLexerATNSimulator : public atn::LexerATNSimulator {
+  class PositionAdjustingLexerATNSimulator : public antlr4::atn::LexerATNSimulator {
   public:
-    PositionAdjustingLexerATNSimulator(Lexer *recog, const atn::ATN &atn, std::vector\<dfa::DFA> &decisionToDFA,
-                                       atn::PredictionContextCache &sharedContextCache)
-      : atn::LexerATNSimulator(recog, atn, decisionToDFA, sharedContextCache) {
+    PositionAdjustingLexerATNSimulator(antlr4::Lexer *recog, const antlr4::atn::ATN &atn, std::vector\<antlr4::dfa::DFA> &decisionToDFA,
+                                       antlr4::atn::PredictionContextCache &sharedContextCache)
+      : antlr4::atn::LexerATNSimulator(recog, atn, decisionToDFA, sharedContextCache) {
     }
 
-    void resetAcceptPosition(CharStream *input, int index, int line, int charPositionInLine) {
+    void resetAcceptPosition(antlr4::CharStream *input, int index, int line, int charPositionInLine) {
       input->seek(index);
       _line = line;
       _charPositionInLine = charPositionInLine;
@@ -87,16 +87,16 @@ protected:
   };
 
 public:
-  virtual std::unique_ptr\<Token> nextToken() override {
+  virtual std::unique_ptr\<antlr4::Token> nextToken() override {
     if (dynamic_cast\<PositionAdjustingLexerATNSimulator *>(_interpreter) == nullptr) {
       delete _interpreter;
       _interpreter = new PositionAdjustingLexerATNSimulator(this, _atn, _decisionToDFA, _sharedContextCache);
     }
 
-    return Lexer::nextToken();
+    return antlr4::Lexer::nextToken();
   }
 
-  virtual Token* emit() override {
+  virtual antlr4::Token* emit() override {
     switch (type) {
       case TOKENS:
         handleAcceptPositionForKeyword("tokens");
@@ -109,7 +109,7 @@ public:
       default:
         break;
     }
-    return Lexer::emit();
+    return antlr4::Lexer::emit();
   }
 
 private:
@@ -167,11 +167,11 @@ tree::ParseTreeWalker::DEFAULT.walk(&listener, <s>);
 
 TreeNodeWithAltNumField(X) ::= <<
 @parser::members {
-class MyRuleNode : public ParserRuleContext {
+class MyRuleNode : public antlr4::ParserRuleContext {
 public:
   size_t altNum;
-	MyRuleNode(ParserRuleContext *parent, int invokingStateNumber)
-		: ParserRuleContext(parent, invokingStateNumber) {
+	MyRuleNode(antlr4::ParserRuleContext *parent, int invokingStateNumber)
+		: antlr4::ParserRuleContext(parent, invokingStateNumber) {
 	}
 	virtual size_t getAltNumber() const override { return altNum; }
 	virtual void setAltNumber(size_t altNum) override { this->altNum = altNum; }
@@ -242,14 +242,6 @@ public:
 };
 }
 >>
-
-ImportVisitor(X) ::= ""
-BasicVisitor(X) ::= ""
-WalkVisitor(s) ::= ""
-LRWithLabelsVisitor(X) ::= ""
-RuleGetterVisitor(X) ::= ""
-LRVisitor(x) ::= ""
-TokenGetterVisitor(x) ::= ""
 
 DeclareContextListGettersFunction() ::= <<
 void foo() {

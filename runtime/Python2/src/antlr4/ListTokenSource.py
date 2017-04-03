@@ -1,4 +1,10 @@
 #
+# Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+# Use of this file is governed by the BSD 3-clause license that
+# can be found in the LICENSE.txt file in the project root.
+#
+
+#
 # Provides an implementation of {@link TokenSource} as a wrapper around a list
 # of {@link Token} objects.
 #
@@ -53,12 +59,12 @@ class ListTokenSource(TokenSource):
             # have to calculate the result from the line/column of the previous
             # token, along with the text of the token.
             lastToken = self.tokens[len(self.tokens) - 1]
-            tokenText = lastToken.getText()
+            tokenText = lastToken.text
             if tokenText is not None:
                 lastNewLine = tokenText.rfind('\n')
                 if lastNewLine >= 0:
                     return len(tokenText) - lastNewLine - 1
-            return lastToken.column + lastToken.stopIndex - lastToken.startIndex + 1
+            return lastToken.column + lastToken.stop - lastToken.start + 1
 
         # only reach this if tokens is empty, meaning EOF occurs at the first
         # position in the input
@@ -72,7 +78,7 @@ class ListTokenSource(TokenSource):
             if self.eofToken is None:
                 start = -1
                 if len(self.tokens) > 0:
-                    previousStop = self.tokens[len(self.tokens) - 1].stopIndex
+                    previousStop = self.tokens[len(self.tokens) - 1].stop
                     if previousStop != -1:
                         start = previousStop + 1
                 stop = max(-1, start - 1)

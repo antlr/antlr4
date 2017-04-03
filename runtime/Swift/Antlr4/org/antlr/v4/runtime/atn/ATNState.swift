@@ -1,33 +1,7 @@
-/*
-* [The "BSD license"]
-*  Copyright (c) 2012 Terence Parr
-*  Copyright (c) 2012 Sam Harwell
-*  Copyright (c) 2015 Janyou
-*  All rights reserved.
-*
-*  Redistribution and use in source and binary forms, with or without
-*  modification, are permitted provided that the following conditions
-*  are met:
-*
-*  1. Redistributions of source code must retain the above copyright
-*     notice, this list of conditions and the following disclaimer.
-*  2. Redistributions in binary form must reproduce the above copyright
-*     notice, this list of conditions and the following disclaimer in the
-*     documentation and/or other materials provided with the distribution.
-*  3. The name of the author may not be used to endorse or promote products
-*     derived from this software without specific prior written permission.
-*
-*  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-*  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-*  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-*  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-*  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-*  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-*  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-*  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-*  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-*  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
+/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
 
 
 
@@ -94,7 +68,7 @@
 
 public class ATNState: Hashable, CustomStringConvertible {
     public static let INITIAL_NUM_TRANSITIONS: Int = 4
-    
+
     // constants for serialization
     public static let INVALID_TYPE: Int = 0
     public static let BASIC: Int = 1
@@ -109,9 +83,9 @@ public class ATNState: Hashable, CustomStringConvertible {
     public static let STAR_LOOP_ENTRY: Int = 10
     public static let PLUS_LOOP_BACK: Int = 11
     public static let LOOP_END: Int = 12
-    
+
     public static let serializationNames: Array<String> =
-    
+
     ["INVALID",
         "BASIC",
         "RULE_START",
@@ -125,38 +99,38 @@ public class ATNState: Hashable, CustomStringConvertible {
         "STAR_LOOP_ENTRY",
         "PLUS_LOOP_BACK",
         "LOOP_END"]
-    
-    
+
+
     public static let INVALID_STATE_NUMBER: Int = -1
-    
+
     /** Which ATN are we in? */
     public final var atn: ATN? = nil
-    
+
     public final var stateNumber: Int = INVALID_STATE_NUMBER
-    
+
     public final var ruleIndex: Int?
     // at runtime, we don't have Rule objects
-    
+
     public final var epsilonOnlyTransitions: Bool = false
-    
+
     /** Track the transitions emanating from this ATN state. */
     internal final var transitions: Array<Transition> = Array<Transition>()
     //Array<Transition>(INITIAL_NUM_TRANSITIONS);
-    
+
     /** Used to cache lookahead during parsing, not used during construction */
     public final var nextTokenWithinRule: IntervalSet?
-    
-    
+
+
     public var hashValue: Int {
         return stateNumber
     }
-    
-    
+
+
     public func isNonGreedyExitState() -> Bool {
         return false
     }
-    
-    
+
+
     public func toString() -> String {
         return description
     }
@@ -167,51 +141,51 @@ public class ATNState: Hashable, CustomStringConvertible {
     public final func getTransitions() -> [Transition] {
         return transitions
     }
-    
+
     public final func getNumberOfTransitions() -> Int {
         return transitions.count
     }
-    
+
     public final func addTransition(_ e: Transition) {
         addTransition(transitions.count, e)
     }
-    
+
     public final func addTransition(_ index: Int, _ e: Transition) {
         if transitions.isEmpty {
             epsilonOnlyTransitions = e.isEpsilon()
         } else {
             if epsilonOnlyTransitions != e.isEpsilon() {
-                
+
                 print("ATN state %d has both epsilon and non-epsilon transitions.\n", String(stateNumber))
                 epsilonOnlyTransitions = false
             }
         }
         transitions.insert(e, at: index)
-        
+
     }
-    
+
     public final func transition(_ i: Int) -> Transition {
         return transitions[i]
     }
-    
+
     public final func setTransition(_ i: Int, _ e: Transition) {
         transitions[i] = e
     }
-    
+
     public final func removeTransition(_ index: Int) -> Transition {
-        
+
         return transitions.remove(at: index)
     }
-    
+
     public func getStateType() -> Int {
         RuntimeException(#function + " must be overridden")
         return 0
     }
-    
+
     public final func onlyHasEpsilonTransitions() -> Bool {
         return epsilonOnlyTransitions
     }
-    
+
     public final func setRuleIndex(_ ruleIndex: Int) {
         self.ruleIndex = ruleIndex
     }
@@ -223,6 +197,6 @@ public func ==(lhs: ATNState, rhs: ATNState) -> Bool {
     }
     // are these states same object?
     return lhs.stateNumber == rhs.stateNumber
-    
+
 }
- 
+

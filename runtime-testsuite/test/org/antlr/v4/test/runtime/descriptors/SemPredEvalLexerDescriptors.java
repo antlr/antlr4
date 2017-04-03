@@ -1,9 +1,39 @@
+/*
+ * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
+
 package org.antlr.v4.test.runtime.descriptors;
 
 import org.antlr.v4.test.runtime.BaseLexerTestDescriptor;
 import org.antlr.v4.test.runtime.CommentHasStringValue;
 
 public class SemPredEvalLexerDescriptors {
+	// Test for https://github.com/antlr/antlr4/issues/958
+	public static class RuleSempredFunction extends BaseLexerTestDescriptor {
+		public String input = "aaa";
+		/**
+		 [@0,0:0='a',<1>,1:0]
+		 [@1,1:1='a',<1>,1:1]
+		 [@2,2:2='a',<1>,1:2]
+		 [@3,3:2='<EOF>',<-1>,1:3]
+		 */
+		@CommentHasStringValue
+		public String output;
+
+		public String errors = null;
+		public String startRule = "";
+		public String grammarName = "L";
+
+		/**
+		 lexer grammar L;
+		 T : 'a' {<True()>}? ;
+		 */
+		@CommentHasStringValue
+		public String grammar;
+	}
+
 	public static class DisableRule extends BaseLexerTestDescriptor {
 		public String input = "enum abc";
 		/**

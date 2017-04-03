@@ -1,36 +1,10 @@
-/*
- * [The "BSD license"]
- *  Copyright (c) 2013 Terence Parr
- *  Copyright (c) 2013 Sam Harwell
- *  All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions
- *  are met:
- *
- *  1. Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  2. Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  3. The name of the author may not be used to endorse or promote products
- *     derived from this software without specific prior written permission.
- *
- *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- *  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- *  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
  */
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Antlr4.Runtime;
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Sharpen;
@@ -82,13 +56,13 @@ namespace Antlr4.Runtime
                 {
                     continue;
                 }
-                if (((StarLoopEntryState)state).precedenceRuleDecision)
+				if (((StarLoopEntryState)state).isPrecedenceDecision)
                 {
                     this.pushRecursionContextStates.Set(state.stateNumber);
                 }
             }
             // get atn simulator that knows how to do predictions
-            Interpreter = new ParserATNSimulator(this, atn);
+            Interpreter = new ParserATNSimulator(this, atn, null, null);
         }
 
         public override ATN Atn
@@ -211,7 +185,7 @@ namespace Antlr4.Runtime
             Transition transition = p.Transition(edge - 1);
             switch (transition.TransitionType)
             {
-                case TransitionType.Epsilon:
+                case TransitionType.EPSILON:
                 {
                     if (pushRecursionContextStates.Get(p.stateNumber) && !(transition.target is LoopEndState))
                     {
@@ -221,17 +195,17 @@ namespace Antlr4.Runtime
                     break;
                 }
 
-                case TransitionType.Atom:
+                case TransitionType.ATOM:
                 {
 					Match(((AtomTransition)transition).token);
                     break;
                 }
 
-                case TransitionType.Range:
-                case TransitionType.Set:
-                case TransitionType.NotSet:
+                case TransitionType.RANGE:
+                case TransitionType.SET:
+                case TransitionType.NOT_SET:
                 {
-                    if (!transition.Matches(TokenStream.La(1), TokenConstants.MinUserTokenType, 65535))
+                    if (!transition.Matches(TokenStream.LA(1), TokenConstants.MinUserTokenType, 65535))
                     {
 						ErrorHandler.RecoverInline(this);
                     }
@@ -239,13 +213,13 @@ namespace Antlr4.Runtime
                     break;
                 }
 
-                case TransitionType.Wildcard:
+                case TransitionType.WILDCARD:
                 {
                     MatchWildcard();
                     break;
                 }
 
-                case TransitionType.Rule:
+                case TransitionType.RULE:
                 {
                     RuleStartState ruleStartState = (RuleStartState)transition.target;
                     int ruleIndex = ruleStartState.ruleIndex;
@@ -261,7 +235,7 @@ namespace Antlr4.Runtime
                     break;
                 }
 
-                case TransitionType.Predicate:
+                case TransitionType.PREDICATE:
                 {
                     PredicateTransition predicateTransition = (PredicateTransition)transition;
 					if (!Sempred(RuleContext, predicateTransition.ruleIndex, predicateTransition.predIndex))
@@ -271,14 +245,14 @@ namespace Antlr4.Runtime
                     break;
                 }
 
-                case TransitionType.Action:
+                case TransitionType.ACTION:
                 {
                     ActionTransition actionTransition = (ActionTransition)transition;
 					Action(RuleContext, actionTransition.ruleIndex, actionTransition.actionIndex);
                     break;
                 }
 
-                case TransitionType.Precedence:
+                case TransitionType.PRECEDENCE:
                 {
 					if (!Precpred(RuleContext, ((PrecedencePredicateTransition)transition).precedence))
                     {

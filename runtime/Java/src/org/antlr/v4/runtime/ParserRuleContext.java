@@ -1,31 +1,7 @@
 /*
- * [The "BSD license"]
- *  Copyright (c) 2012 Terence Parr
- *  Copyright (c) 2012 Sam Harwell
- *  All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions
- *  are met:
- *
- *  1. Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  2. Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  3. The name of the author may not be used to endorse or promote products
- *     derived from this software without specific prior written permission.
- *
- *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- *  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- *  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
  */
 package org.antlr.v4.runtime;
 
@@ -104,6 +80,14 @@ public class ParserRuleContext extends RuleContext {
 
 	/** COPY a ctx (I'm deliberately not using copy constructor) to avoid
 	 *  confusion with creating node with parent. Does not copy children.
+	 *
+	 *  This is used in the generated parser code to flip a generic XContext
+	 *  node for rule X to a YContext for alt label Y. In that sense, it is
+	 *  not really a generic copy function.
+	 *
+	 *  If we do an error sync() at start of a rule, we might add error nodes
+	 *  to the generic XContext so this function must copy those nodes to
+	 *  the YContext as well else they are lost!
 	 */
 	public void copyFrom(ParserRuleContext ctx) {
 		this.parent = ctx.parent;
@@ -111,6 +95,18 @@ public class ParserRuleContext extends RuleContext {
 
 		this.start = ctx.start;
 		this.stop = ctx.stop;
+
+		// copy any error nodes to alt label node
+		if ( ctx.children!=null ) {
+			this.children = new ArrayList<>();
+			// reset parent pointer for any error nodes
+			for (ParseTree child : ctx.children) {
+				if ( child instanceof ErrorNodeImpl ) {
+					this.children.add(child);
+					((ErrorNodeImpl) child).parent = this;
+				}
+			}
+		}
 	}
 
 	public ParserRuleContext(ParserRuleContext parent, int invokingStateNumber) {

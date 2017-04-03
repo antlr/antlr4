@@ -1,4 +1,9 @@
-﻿//
+﻿/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
+
+//
 //  main.cpp
 //  antlr4-cpp-demo
 //
@@ -25,16 +30,12 @@ int main(int argc, const char * argv[]) {
   CommonTokenStream tokens(&lexer);
 
   TParser parser(&tokens);
-  tree::ParseTree* tree = parser.main();
+  tree::ParseTree *tree = parser.main();
 
   std::wstring s = antlrcpp::s2ws(tree->toStringTree(&parser)) + L"\n";
 
-  // Unfortunately, there is no way of showing the Unicode output properly in either the Intermediate Window in VS
-  // (when using OutputDebugString), nor in a terminal (when using wcout). Instead set a breakpoint and view the
-  // content of s in the debugger, which works fine.
-
-  OutputDebugString(s.data());
-  std::wcout << "Parse Tree: " << s << std::endl;
+  OutputDebugString(s.data()); // Only works properly since VS 2015.
+  //std::wcout << "Parse Tree: " << s << std::endl; Unicode output in the console is very limited.
 
   return 0;
 }

@@ -1,3 +1,8 @@
+/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
+
 //
 //  main.cpp
 //  antlr4-cpp-demo
@@ -25,7 +30,7 @@ int main(int , const char **) {
   }
 
   TParser parser(&tokens);
-  Ref<tree::ParseTree> tree = parser.main();
+  tree::ParseTree* tree = parser.main();
 
   std::cout << tree->toStringTree(&parser) << std::endl << std::endl;
 

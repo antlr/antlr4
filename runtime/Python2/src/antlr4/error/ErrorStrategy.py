@@ -1,32 +1,7 @@
 #
-# [The "BSD license"]
-#  Copyright (c) 2012 Terence Parr
-#  Copyright (c) 2012 Sam Harwell
-#  Copyright (c) 2014 Eric Vergnaud
-#  All rights reserved.
-#
-#  Redistribution and use in source and binary forms, with or without
-#  modification, are permitted provided that the following conditions
-#  are met:
-#
-#  1. Redistributions of source code must retain the above copyright
-#     notice, this list of conditions and the following disclaimer.
-#  2. Redistributions in binary form must reproduce the above copyright
-#     notice, this list of conditions and the following disclaimer in the
-#     documentation and/or other materials provided with the distribution.
-#  3. The name of the author may not be used to endorse or promote products
-#     derived from this software without specific prior written permission.
-#
-#  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-#  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-#  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-#  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-#  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-#  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-#  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-#  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-#  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-#  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+# Use of this file is governed by the BSD 3-clause license that
+# can be found in the LICENSE.txt file in the project root.
 #
 from antlr4.IntervalSet import IntervalSet
 
@@ -227,11 +202,8 @@ class DefaultErrorStrategy(ErrorStrategy):
         s = recognizer._interp.atn.states[recognizer.state]
         la = recognizer.getTokenStream().LA(1)
         # try cheaper subset first; might get lucky. seems to shave a wee bit off
-        if la==Token.EOF or la in recognizer.atn.nextTokens(s):
-            return
-
-        # Return but don't end recovery. only do that upon valid token match
-        if recognizer.isExpectedToken(la):
+        nextTokens = recognizer.atn.nextTokens(s)
+        if Token.EPSILON in nextTokens or la in nextTokens:
             return
 
         if s.stateType in [ATNState.BLOCK_START, ATNState.STAR_BLOCK_START,
@@ -509,14 +481,14 @@ class DefaultErrorStrategy(ErrorStrategy):
         expecting = self.getExpectedTokens(recognizer)
         expectedTokenType = expecting[0] # get any element
         if expectedTokenType==Token.EOF:
-            tokenText = "<missing EOF>"
+            tokenText = u"<missing EOF>"
         else:
             name = None
             if expectedTokenType < len(recognizer.literalNames):
                 name = recognizer.literalNames[expectedTokenType]
             if name is None and expectedTokenType < len(recognizer.symbolicNames):
                 name = recognizer.symbolicNames[expectedTokenType]
-            tokenText = "<missing " + str(name) + ">"
+            tokenText = u"<missing " + unicode(name) + u">"
         current = currentSymbol
         lookback = recognizer.getTokenStream().LT(-1)
         if current.type==Token.EOF and lookback is not None:

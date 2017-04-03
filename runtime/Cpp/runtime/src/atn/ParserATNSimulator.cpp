@@ -1,32 +1,6 @@
-﻿/*
- * [The "BSD license"]
- *  Copyright (c) 2016 Mike Lischke
- *  Copyright (c) 2013 Terence Parr
- *  Copyright (c) 2013 Dan McLaughlin
- *  All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions
- *  are met:
- *
- *  1. Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  2. Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  3. The name of the author may not be used to endorse or promote products
- *     derived from this software without specific prior written permission.
- *
- *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- *  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- *  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+﻿/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
  */
 
 #include "dfa/DFA.h"
@@ -47,6 +21,11 @@
 #include "atn/RuleStopState.h"
 #include "atn/ATNConfigSet.h"
 #include "atn/ATNConfig.h"
+
+#include "atn/StarLoopEntryState.h"
+#include "atn/BlockStartState.h"
+#include "atn/BlockEndState.h"
+
 #include "misc/Interval.h"
 #include "ANTLRErrorListener.h"
 
@@ -64,6 +43,8 @@ using namespace antlr4;
 using namespace antlr4::atn;
 
 using namespace antlrcpp;
+
+const bool ParserATNSimulator::TURN_OFF_LR_LOOP_ENTRY_BRANCH_OPT = ParserATNSimulator::getLrLoopSetting();
 
 ParserATNSimulator::ParserATNSimulator(const ATN &atn, std::vector<dfa::DFA> &decisionToDFA,
                                        PredictionContextCache &sharedContextCache)
@@ -88,7 +69,7 @@ void ParserATNSimulator::clearDFA() {
 }
 
 size_t ParserATNSimulator::adaptivePredict(TokenStream *input, size_t decision, ParserRuleContext *outerContext) {
-  
+
 #if DEBUG_ATN == 1 || DEBUG_LIST_ATN_DECISIONS == 1
     std::cout << "adaptivePredict decision " << decision << " exec LA(1)==" << getLookaheadName(input) << " line "
       << input->LT(1)->getLine() << ":" << input->LT(1)->getCharPositionInLine() << std::endl;
@@ -117,8 +98,7 @@ size_t ParserATNSimulator::adaptivePredict(TokenStream *input, size_t decision, 
     // the start state for a precedence DFA depends on the current
     // parser precedence, and is provided by a DFA method.
     s0 = dfa.getPrecedenceStartState(parser->getPrecedence());
-  }
-  else {
+  } else {
     // the start state for a "regular" DFA is just s0
     s0 = dfa.s0;
   }
@@ -137,7 +117,7 @@ size_t ParserATNSimulator::adaptivePredict(TokenStream *input, size_t decision, 
       dfa.s0->configs = std::move(s0_closure); // not used for prediction but useful to know start configs anyway
       dfa::DFAState *newState = new dfa::DFAState(applyPrecedenceFilter(dfa.s0->configs.get())); /* mem-check: managed by the DFA or deleted below */
       s0 = addDFAState(dfa, newState);
-      dfa.setPrecedenceStartState(parser->getPrecedence(), s0, _mutex);
+      dfa.setPrecedenceStartState(parser->getPrecedence(), s0, _edgeLock);
       if (s0 != newState) {
         delete newState; // If there was already a state with this config set we don't need the new one.
       }
@@ -159,7 +139,7 @@ size_t ParserATNSimulator::adaptivePredict(TokenStream *input, size_t decision, 
 
 size_t ParserATNSimulator::execATN(dfa::DFA &dfa, dfa::DFAState *s0, TokenStream *input, size_t startIndex,
                                    ParserRuleContext *outerContext) {
-  
+
 #if DEBUG_ATN == 1 || DEBUG_LIST_ATN_DECISIONS == 1
     std::cout << "execATN decision " << dfa.decision << " exec LA(1)==" << getLookaheadName(input) <<
       " line " << input->LT(1)->getLine() << ":" << input->LT(1)->getCharPositionInLine() << std::endl;
@@ -272,7 +252,9 @@ size_t ParserATNSimulator::execATN(dfa::DFA &dfa, dfa::DFAState *s0, TokenStream
 }
 
 dfa::DFAState *ParserATNSimulator::getExistingTargetState(dfa::DFAState *previousD, size_t t) {
+  _edgeLock.readLock();
   auto iterator = previousD->edges.find(t);
+  _edgeLock.readUnlock();
   if (iterator == previousD->edges.end()) {
     return nullptr;
   }
@@ -449,7 +431,7 @@ size_t ParserATNSimulator::execATNWithFullContext(dfa::DFA &dfa, dfa::DFAState *
 }
 
 std::unique_ptr<ATNConfigSet> ParserATNSimulator::computeReachSet(ATNConfigSet *closure_, size_t t, bool fullCtx) {
-  
+
   std::unique_ptr<ATNConfigSet> intermediate(new ATNConfigSet(fullCtx));
 
   /* Configurations already in a rule stop state indicate reaching the end
@@ -899,6 +881,9 @@ void ParserATNSimulator::closure_(Ref<ATNConfig> const& config, ATNConfigSet *co
   }
 
   for (size_t i = 0; i < p->transitions.size(); i++) {
+    if (i == 0 && canDropLoopEntryEdgeInLeftRecursiveRule(config.get()))
+      continue;
+
     Transition *t = p->transitions[i];
     bool continueCollecting = !is<ActionTransition*>(t) && collectPredicates;
     Ref<ATNConfig> c = getEpsilonTarget(config, t, continueCollecting, depth == 0, fullCtx, treatEofAsEpsilon);
@@ -934,11 +919,11 @@ void ParserATNSimulator::closure_(Ref<ATNConfig> const& config, ATNConfigSet *co
             c->setPrecedenceFilterSuppressed(true);
           }
         }
-        
+
         c->reachesIntoOuterContext++;
         configs->dipsIntoOuterContext = true; // TO_DO: can remove? only care when we add to set per middle of this method
         assert(newDepth > INT_MIN);
-        
+
         newDepth--;
 #if DEBUG_DFA == 1
           std::cout << "dips into outer ctx: " << c << std::endl;
@@ -954,6 +939,84 @@ void ParserATNSimulator::closure_(Ref<ATNConfig> const& config, ATNConfigSet *co
       closureCheckingStopState(c, configs, closureBusy, continueCollecting, fullCtx, newDepth, treatEofAsEpsilon);
     }
   }
+}
+
+bool ParserATNSimulator::canDropLoopEntryEdgeInLeftRecursiveRule(ATNConfig *config) const {
+  if (TURN_OFF_LR_LOOP_ENTRY_BRANCH_OPT)
+    return false;
+
+  ATNState *p = config->state;
+
+  // First check to see if we are in StarLoopEntryState generated during
+  // left-recursion elimination. For efficiency, also check if
+  // the context has an empty stack case. If so, it would mean
+  // global FOLLOW so we can't perform optimization
+  if ( p->getStateType() != ATNState::STAR_LOOP_ENTRY ||
+      !((StarLoopEntryState *)p)->isPrecedenceDecision || // Are we the special loop entry/exit state?
+      config->context->isEmpty() ||                      // If SLL wildcard
+      config->context->hasEmptyPath())
+  {
+    return false;
+  }
+
+  // Require all return states to return back to the same rule
+  // that p is in.
+  size_t numCtxs = config->context->size();
+  for (size_t i = 0; i < numCtxs; i++) { // for each stack context
+    ATNState *returnState = atn.states[config->context->getReturnState(i)];
+    if (returnState->ruleIndex != p->ruleIndex)
+      return false;
+  }
+
+  BlockStartState *decisionStartState = (BlockStartState *)p->transitions[0]->target;
+  size_t blockEndStateNum = decisionStartState->endState->stateNumber;
+  BlockEndState *blockEndState = (BlockEndState *)atn.states[blockEndStateNum];
+
+  // Verify that the top of each stack context leads to loop entry/exit
+  // state through epsilon edges and w/o leaving rule.
+  for (size_t i = 0; i < numCtxs; i++) {                           // for each stack context
+    size_t returnStateNumber = config->context->getReturnState(i);
+    ATNState *returnState = atn.states[returnStateNumber];
+    // All states must have single outgoing epsilon edge.
+    if (returnState->transitions.size() != 1 || !returnState->transitions[0]->isEpsilon())
+    {
+      return false;
+    }
+
+    // Look for prefix op case like 'not expr', (' type ')' expr
+    ATNState *returnStateTarget = returnState->transitions[0]->target;
+    if (returnState->getStateType() == ATNState::BLOCK_END && returnStateTarget == p) {
+      continue;
+    }
+
+    // Look for 'expr op expr' or case where expr's return state is block end
+    // of (...)* internal block; the block end points to loop back
+    // which points to p but we don't need to check that
+    if (returnState == blockEndState) {
+      continue;
+    }
+
+    // Look for ternary expr ? expr : expr. The return state points at block end,
+    // which points at loop entry state
+    if (returnStateTarget == blockEndState) {
+      continue;
+    }
+
+    // Look for complex prefix 'between expr and expr' case where 2nd expr's
+    // return state points at block end state of (...)* internal block
+    if (returnStateTarget->getStateType() == ATNState::BLOCK_END &&
+        returnStateTarget->transitions.size() == 1 &&
+        returnStateTarget->transitions[0]->isEpsilon() &&
+        returnStateTarget->transitions[0]->target == p)
+    {
+      continue;
+    }
+
+    // Anything else ain't conforming.
+    return false;
+  }
+
+  return true;
 }
 
 std::string ParserATNSimulator::getRuleName(size_t index) {
@@ -991,9 +1054,9 @@ Ref<ATNConfig> ParserATNSimulator::getEpsilonTarget(Ref<ATNConfig> const& config
           return std::make_shared<ATNConfig>(config, t->target);
         }
       }
-      
+
       return nullptr;
-      
+
     default:
       return nullptr;
   }
@@ -1182,8 +1245,9 @@ dfa::DFAState *ParserATNSimulator::addDFAEdge(dfa::DFA &dfa, dfa::DFAState *from
   }
 
   {
-    std::lock_guard<std::recursive_mutex> lck(_mutex);
+    _edgeLock.writeLock();
     from->edges[t] = to; // connect
+    _edgeLock.writeUnlock();
   }
 
 #if DEBUG_DFA == 1
@@ -1204,26 +1268,28 @@ dfa::DFAState *ParserATNSimulator::addDFAState(dfa::DFA &dfa, dfa::DFAState *D) 
     return D;
   }
 
-  {
-    std::lock_guard<std::recursive_mutex> lck(_mutex);
+  _stateLock.writeLock();
 
-    auto existing = dfa.states.find(D);
-    if (existing != dfa.states.end()) {
-      return *existing;
-    }
+  auto existing = dfa.states.find(D);
+  if (existing != dfa.states.end()) {
+    _stateLock.writeUnlock();
+    return *existing;
+  }
 
-    D->stateNumber = (int)dfa.states.size();
-    if (!D->configs->isReadonly()) {
-      D->configs->optimizeConfigs(this);
-      D->configs->setReadonly(true);
-    }
-    dfa.states.insert(D);
+  D->stateNumber = (int)dfa.states.size();
+  if (!D->configs->isReadonly()) {
+    D->configs->optimizeConfigs(this);
+    D->configs->setReadonly(true);
+  }
+  
+  dfa.states.insert(D);
+  _stateLock.writeUnlock();
+
 #if DEBUG_DFA == 1
-      std::cout << "adding new DFA state: " << D << std::endl;
+  std::cout << "adding new DFA state: " << D << std::endl;
 #endif
 
-    return D;
-  }
+  return D;
 }
 
 void ParserATNSimulator::reportAttemptingFullContext(dfa::DFA &dfa, const antlrcpp::BitSet &conflictingAlts,
@@ -1272,6 +1338,14 @@ atn::PredictionMode ParserATNSimulator::getPredictionMode() {
 
 Parser* ParserATNSimulator::getParser() {
   return parser;
+}
+
+bool ParserATNSimulator::getLrLoopSetting() {
+  char *var = std::getenv("TURN_OFF_LR_LOOP_ENTRY_BRANCH_OPT");
+  if (var == nullptr)
+    return false;
+  std::string value(var);
+  return value == "true" || value == "1";
 }
 
 void ParserATNSimulator::InitializeInstanceFields() {

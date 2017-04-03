@@ -1,10 +1,16 @@
+<!--
+  ~ Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+  ~ Use of this file is governed by the BSD 3-clause license that
+  ~ can be found in the LICENSE.txt file in the project root.
+  -->
+
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.antlr</groupId>
     <artifactId>antlr4-master</artifactId>
-    <version>4.6-SNAPSHOT</version>
+    <version>4.6.1-SNAPSHOT</version>
   </parent>
   <artifactId>antlr4-tool-testsuite</artifactId>
   <name>ANTLR 4 Tool Tests</name>
@@ -21,34 +27,26 @@
       <groupId>org.antlr</groupId>
       <artifactId>ST4</artifactId>
       <version>4.0.8</version>
-    </dependency>
-    <dependency>
-      <groupId>org.antlr</groupId>
-      <artifactId>antlr4-runtime</artifactId>
-      <version>${project.version}</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.antlr</groupId>
       <artifactId>antlr4-runtime-testsuite</artifactId>
       <version>${project.version}</version>
-      <type>test-jar</type>
+			<scope>test</scope>
+			<type>test-jar</type>
     </dependency>
     <dependency>
       <groupId>org.antlr</groupId>
       <artifactId>antlr4</artifactId>
       <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.antlr</groupId>
-      <artifactId>antlr4</artifactId>
-      <version>${project.version}</version>
-      <type>test-jar</type>
-    </dependency>
+			<scope>test</scope>
+		</dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.11</version>
-      <scope>test</scope>
+      <version>4.12</version>
+			<scope>test</scope>
     </dependency>
   </dependencies>
 
@@ -56,19 +54,6 @@
     <sourceDirectory>src</sourceDirectory>
     <testSourceDirectory>test</testSourceDirectory>
     <plugins>
-      <plugin>
-        <groupId>com.googlecode.maven-download-plugin</groupId>
-        <artifactId>download-maven-plugin</artifactId>
-        <version>1.2.1</version>
-        <configuration>
-          <skipCache>true</skipCache>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>build-helper-maven-plugin</artifactId>
-        <version>1.8</version>
-      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>

@@ -1,30 +1,6 @@
-/*
- * [The "BSD license"]
- *  Copyright (c) 2016 Mike Lischke
- *  All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions
- *  are met:
- *
- *  1. Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  2. Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  3. The name of the author may not be used to endorse or promote products
- *     derived from this software without specific prior written permission.
- *
- *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- *  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- *  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
  */
 
 #pragma once
@@ -56,15 +32,18 @@
 #include <mutex>
 #include <exception>
 #include <bitset>
+#include <condition_variable>
 
 // Defines for the Guid class and other platform dependent stuff.
 #ifdef _WIN32
-  #pragma warning (disable: 4250) // Class inherits by dominance.
-  #pragma warning (disable: 4512) // assignment operator could not be generated
+  #ifdef _MSC_VER
+    #pragma warning (disable: 4250) // Class inherits by dominance.
+    #pragma warning (disable: 4512) // assignment operator could not be generated
 
-  #if _MSC_VER < 1900
-    // Before VS 2015 code like "while (true)" will create a (useless) warning in level 4.
-    #pragma warning (disable: 4127) // conditional expression is constant
+    #if _MSC_VER < 1900
+      // Before VS 2015 code like "while (true)" will create a (useless) warning in level 4.
+      #pragma warning (disable: 4127) // conditional expression is constant
+    #endif
   #endif
 
   #define GUID_WINDOWS
@@ -82,21 +61,19 @@
     typedef std::basic_string<__int32> i32string;
   #endif
 
-#ifdef ANTLR4CPP_DLL
-    #define SHARED_LIB 1
-    #ifdef ANTLR4CPP_EXPORTS
-      #define ANTLR4CPP_PUBLIC __declspec(dllexport)
-      #define EXPIMP_TEMPLATE
+  #ifdef ANTLR4CPP_EXPORTS
+    #define ANTLR4CPP_PUBLIC __declspec(dllexport)
+  #else
+    #ifdef ANTLR4CPP_STATIC
+      #define ANTLR4CPP_PUBLIC
     #else
       #define ANTLR4CPP_PUBLIC __declspec(dllimport)
-      #define EXPIMP_TEMPLATE extern
     #endif
-  #else
-    #define ANTLR4CPP_PUBLIC
-    #define EXPIMP_TEMPLATE
   #endif
 
-  EXPIMP_TEMPLATE class ANTLR4CPP_PUBLIC std::exception; // Needed for VS 2015.
+#ifdef _MSC_VER
+  class ANTLR4CPP_PUBLIC std::exception; // Needed for VS 2015.
+#endif
 
 #elif __APPLE__
   #define GUID_CFUUID
@@ -105,7 +82,6 @@
   #else
     #define ANTLR4CPP_PUBLIC
   #endif
-  #define EXPIMP_TEMPLATE
 #else
   #define GUID_LIBUUID
   #if __GNUC__ >= 6
@@ -113,7 +89,6 @@
   #else
     #define ANTLR4CPP_PUBLIC
   #endif
-  #define EXPIMP_TEMPLATE
 #endif
 
 #include "support/guid.h"

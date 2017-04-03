@@ -269,6 +269,8 @@ Parser_(parser, funcs, atn, sempredFuncs, ctor, superClass) ::= <<
 [System.CodeDom.Compiler.GeneratedCode("ANTLR", "<file.ANTLRVersion>")]
 [System.CLSCompliant(false)]
 public partial class <csIdentifier.(parser.name)> : <superClass; null="Parser"> {
+	protected static DFA[] decisionToDFA;
+	protected static PredictionContextCache sharedContextCache = new PredictionContextCache();
 	<if(parser.tokens)>
 	public const int
 		<parser.tokens:{k | <k>=<parser.tokens.(k)>}; separator=", ", wrap, anchor>;
@@ -286,6 +288,13 @@ public partial class <csIdentifier.(parser.name)> : <superClass; null="Parser"> 
 	public override string[] RuleNames { get { return ruleNames; } }
 
 	public override string SerializedAtn { get { return _serializedATN; } }
+
+	static <csIdentifier.(parser.name)>() {
+		decisionToDFA = new DFA[_ATN.NumberOfDecisions];
+		for (int i = 0; i \< _ATN.NumberOfDecisions; i++) {
+			decisionToDFA[i] = new DFA(_ATN.GetDecisionState(i), i);
+		}
+	}
 
 	<namedActions.members>
 	<parser:(ctor)()>
@@ -351,7 +360,7 @@ parser_ctor(parser) ::= <<
 public <csIdentifier.(parser.name)>(ITokenStream input)
 	: base(input)
 {
-	Interpreter = new ParserATNSimulator(this,_ATN);
+	Interpreter = new ParserATNSimulator(this, _ATN, decisionToDFA, sharedContextCache);
 }
 >>
 
@@ -538,9 +547,9 @@ CodeBlockForAlt(currentAltCodeBlock, locals, preamble, ops) ::= <<
 LL1AltBlock(choice, preamble, alts, error) ::= <<
 State = <choice.stateNumber>;
 ErrorHandler.Sync(this);
-<if(choice.label)><labelref(choice.label)> = TokenStream.Lt(1);<endif>
+<if(choice.label)><labelref(choice.label)> = TokenStream.LT(1);<endif>
 <preamble; separator="\n">
-switch (TokenStream.La(1)) {
+switch (TokenStream.LA(1)) {
 <choice.altLook,alts:{look,alt| <cases(ttypes=look)>
 	<alt>
 	break;}; separator="\n">
@@ -552,12 +561,12 @@ default:
 LL1OptionalBlock(choice, alts, error) ::= <<
 State = <choice.stateNumber>;
 ErrorHandler.Sync(this);
-switch (TokenStream.La(1)) {
+switch (TokenStream.LA(1)) {
 <choice.altLook,alts:{look,alt| <cases(ttypes=look)>
 	<alt>
 	break;}; separator="\n">
 default:
-	<error>
+	break;
 }
 >>
 
@@ -600,7 +609,7 @@ do {
 AltBlock(choice, preamble, alts, error) ::= <<
 State = <choice.stateNumber>;
 ErrorHandler.Sync(this);
-<if(choice.label)><labelref(choice.label)> = TokenStream.Lt(1);<endif>
+<if(choice.label)><labelref(choice.label)> = TokenStream.LT(1);<endif>
 <preamble; separator="\n">
 switch ( Interpreter.AdaptivePredict(TokenStream,<choice.decision>,Context) ) {
 <alts:{alt |
@@ -625,7 +634,7 @@ StarBlock(choice, alts, sync, iteration) ::= <<
 State = <choice.stateNumber>;
 ErrorHandler.Sync(this);
 _alt = Interpreter.AdaptivePredict(TokenStream,<choice.decision>,Context);
-while ( _alt!=<choice.exitAlt> && _alt!=global::Antlr4.Runtime.Atn.ATN.InvalidAltNumber ) {
+while ( _alt!=<choice.exitAlt> && _alt!=global::Antlr4.Runtime.Atn.ATN.INVALID_ALT_NUMBER ) {
 	if ( _alt==1<if(!choice.ast.greedy)>+1<endif> ) {
 		<iteration>
 		<alts> <! should only be one !>
@@ -652,7 +661,7 @@ case <i><if(!choice.ast.greedy)>+1<endif>:
 	State = <choice.loopBackStateNumber>;<! loopback/exit decision !>
 	ErrorHandler.Sync(this);
 	_alt = Interpreter.AdaptivePredict(TokenStream,<choice.decision>,Context);
-} while ( _alt!=<choice.exitAlt> && _alt!=global::Antlr4.Runtime.Atn.ATN.InvalidAltNumber );
+} while ( _alt!=<choice.exitAlt> && _alt!=global::Antlr4.Runtime.Atn.ATN.INVALID_ALT_NUMBER );
 >>
 
 Sync(s) ::= "Sync(<s.expecting.name>);"
@@ -705,12 +714,13 @@ MatchNotSet(m, expr, capture) ::= "<CommonSetStuff(m, expr, capture, true)>"
 
 CommonSetStuff(m, expr, capture, invert) ::= <<
 State = <m.stateNumber>;
-<if(m.labels)><m.labels:{l | <labelref(l)> = }>TokenStream.Lt(1);<endif>
+<if(m.labels)><m.labels:{l | <labelref(l)> = }>TokenStream.LT(1);<endif>
 <capture>
 if ( <if(invert)><m.varName> \<= 0 || <else>!<endif>(<expr>) ) {
 	<if(m.labels)><m.labels:{l | <labelref(l)> = }><endif>ErrorHandler.RecoverInline(this);
 }
 else {
+	ErrorHandler.ReportMatch(this);
     Consume();
 }
 >>
@@ -779,7 +789,7 @@ RulePropertyRef_parser(r)	 ::= "this"
 
 ThisRulePropertyRef_start(r) ::= "_localctx.Start"
 ThisRulePropertyRef_stop(r)	 ::= "_localctx.Stop"
-ThisRulePropertyRef_text(r)	 ::= "TokenStream.GetText(_localctx.Start, TokenStream.Lt(-1))"
+ThisRulePropertyRef_text(r)	 ::= "TokenStream.GetText(_localctx.Start, TokenStream.LT(-1))"
 ThisRulePropertyRef_ctx(r)	 ::= "_localctx"
 ThisRulePropertyRef_parser(r)	 ::= "this"
 
@@ -837,8 +847,8 @@ ImplicitRuleLabel(ruleName)	  ::= "_<ruleName>"
 ImplicitSetLabel(id)		  ::= "_tset<id>"
 ListLabelName(label)		  ::= "_<label>"
 
-CaptureNextToken(d) ::= "<d.varName> = TokenStream.Lt(1);"
-CaptureNextTokenType(d) ::= "<d.varName> = TokenStream.La(1);"
+CaptureNextToken(d) ::= "<d.varName> = TokenStream.LT(1);"
+CaptureNextTokenType(d) ::= "<d.varName> = TokenStream.LA(1);"
 
 StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers,
            superClass={ParserRuleContext}) ::= <<
@@ -902,7 +912,7 @@ typedContext(ctx) ::= "<if(ctx.provideCopyFrom)>((<ctx.name>)_localctx)<else>_lo
 // used for left-recursive rules
 recRuleAltPredicate(ruleName,opPrec)  ::= "Precpred(Context, <opPrec>)"
 recRuleSetReturnAction(src,name)	  ::= "$<name>=$<src>.<name>;"
-recRuleSetStopToken()                 ::= "Context.Stop = TokenStream.Lt(-1);"
+recRuleSetStopToken()                 ::= "Context.Stop = TokenStream.LT(-1);"
 
 recRuleAltStartAction(ruleName, ctxName, label, isListLabel) ::= <<
 _localctx = new <ctxName>Context(_parentctx, _parentState);
@@ -964,6 +974,8 @@ Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
 [System.CodeDom.Compiler.GeneratedCode("ANTLR", "<file.ANTLRVersion>")]
 [System.CLSCompliant(false)]
 public partial class <csIdentifier.(lexer.name)> : <superClass; null="Lexer"> {
+	protected static DFA[] decisionToDFA;
+	protected static PredictionContextCache sharedContextCache = new PredictionContextCache();
 	public const int
 		<lexer.tokens:{k | <tokenType.(k)>=<lexer.tokens.(k)>}; separator=", ", wrap, anchor>;
 	<if(lexer.channels)>
@@ -984,7 +996,7 @@ public partial class <csIdentifier.(lexer.name)> : <superClass; null="Lexer"> {
 	public <csIdentifier.(lexer.name)>(ICharStream input)
 		: base(input)
 	{
-		Interpreter = new LexerATNSimulator(this,_ATN);
+		Interpreter = new LexerATNSimulator(this, _ATN, decisionToDFA, sharedContextCache);
 	}
 
 	<vocabulary(lexer.literalNames, lexer.symbolicNames)>
@@ -997,6 +1009,12 @@ public partial class <csIdentifier.(lexer.name)> : <superClass; null="Lexer"> {
 
 	public override string SerializedAtn { get { return _serializedATN; } }
 
+	static <csIdentifier.(lexer.name)>() {
+		decisionToDFA = new DFA[_ATN.NumberOfDecisions];
+		for (int i = 0; i \< _ATN.NumberOfDecisions; i++) {
+			decisionToDFA[i] = new DFA(_ATN.GetDecisionState(i), i);
+		}
+	}
 	<dumpActions(lexer, "", actionFuncs, sempredFuncs)>
 	<atn>
 }
@@ -1014,6 +1032,8 @@ private static string _serializeATN()
 
 public static readonly ATN _ATN =
 	new ATNDeserializer().Deserialize(_serializedATN.ToCharArray());
+
+
 >>
 
 initValue(typeName) ::= <<

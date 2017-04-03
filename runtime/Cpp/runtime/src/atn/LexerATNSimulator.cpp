@@ -1,32 +1,6 @@
-﻿/*
- * [The "BSD license"]
- *  Copyright (c) 2016 Mike Lischke
- *  Copyright (c) 2013 Terence Parr
- *  Copyright (c) 2013 Dan McLaughlin
- *  All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions
- *  are met:
- *
- *  1. Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  2. Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  3. The name of the author may not be used to endorse or promote products
- *     derived from this software without specific prior written permission.
- *
- *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- *  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- *  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+﻿/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
  */
 
 #include "IntStream.h"
@@ -189,7 +163,7 @@ size_t LexerATNSimulator::execATN(CharStream *input, dfa::DFAState *ds0) {
     if (t != Token::EOF) {
       consume(input);
     }
-    
+
     if (target->isAcceptState) {
       captureSimState(input, target);
       if (t == Token::EOF) {
@@ -209,14 +183,19 @@ dfa::DFAState *LexerATNSimulator::getExistingTargetState(dfa::DFAState *s, size_
     return nullptr;
   }
 
-  dfa::DFAState *target = s->edges[t - MIN_DFA_EDGE];
+  _edgeLock.readLock();
+  auto iterator = s->edges.find(t - MIN_DFA_EDGE);
 #if DEBUG_ATN == 1
-  if (target != nullptr) {
-    std::cout << std::string("reuse state ") << s->stateNumber << std::string(" edge to ") << target->stateNumber << std::endl;
+  if (iterator != s->edges.end()) {
+    std::cout << std::string("reuse state ") << s->stateNumber << std::string(" edge to ") << iterator->second->stateNumber << std::endl;
   }
 #endif
+  _edgeLock.readUnlock();
 
-  return target;
+  if (iterator == s->edges.end())
+    return nullptr;
+
+  return iterator->second;
 }
 
 dfa::DFAState *LexerATNSimulator::computeTargetState(CharStream *input, dfa::DFAState *s, size_t t) {
@@ -394,7 +373,7 @@ bool LexerATNSimulator::closure(CharStream *input, const Ref<LexerATNConfig> &co
 
 Ref<LexerATNConfig> LexerATNSimulator::getEpsilonTarget(CharStream *input, const Ref<LexerATNConfig> &config, Transition *t,
   ATNConfigSet *configs, bool speculative, bool treatEofAsEpsilon) {
-  
+
   Ref<LexerATNConfig> c = nullptr;
   switch (t->getSerializationType()) {
     case Transition::RULE: {
@@ -477,7 +456,7 @@ Ref<LexerATNConfig> LexerATNSimulator::getEpsilonTarget(CharStream *input, const
           break;
         }
       }
-      
+
       break;
 
     default: // To silence the compiler. Other transition types are not used here.
@@ -551,8 +530,9 @@ void LexerATNSimulator::addDFAEdge(dfa::DFAState *p, size_t t, dfa::DFAState *q)
     return;
   }
 
-  std::lock_guard<std::recursive_mutex> lck(_mutex);
+  _edgeLock.writeLock();
   p->edges[t - MIN_DFA_EDGE] = q; // connect
+  _edgeLock.writeUnlock();
 }
 
 dfa::DFAState *LexerATNSimulator::addDFAState(ATNConfigSet *configs) {
@@ -578,22 +558,23 @@ dfa::DFAState *LexerATNSimulator::addDFAState(ATNConfigSet *configs) {
 
   dfa::DFA &dfa = _decisionToDFA[_mode];
 
-  {
-    std::lock_guard<std::recursive_mutex> lck(_mutex);
-
-    if (!dfa.states.empty()) {
-      auto iterator = dfa.states.find(proposed);
-      if (iterator != dfa.states.end()) {
-        delete proposed;
-        return *iterator;
-      }
+  _stateLock.writeLock();
+  if (!dfa.states.empty()) {
+    auto iterator = dfa.states.find(proposed);
+    if (iterator != dfa.states.end()) {
+      delete proposed;
+      _stateLock.writeUnlock();
+      return *iterator;
     }
-
-    proposed->stateNumber = (int)dfa.states.size();
-    proposed->configs->setReadonly(true);
-    dfa.states.insert(proposed);
-    return proposed;
   }
+
+  proposed->stateNumber = (int)dfa.states.size();
+  proposed->configs->setReadonly(true);
+
+  dfa.states.insert(proposed);
+  _stateLock.writeUnlock();
+
+  return proposed;
 }
 
 dfa::DFA& LexerATNSimulator::getDFA(size_t mode) {

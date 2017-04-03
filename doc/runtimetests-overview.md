@@ -29,7 +29,7 @@ The underlying process of running the tests is quite a complicated setup to cate
 
 ## Generating JUnit Tests
 
-The test specification part makes heavy use of the StringTemplate engine to allow defining target language agnostic tests. For that all tests are described in template (`stg`) files. You can find them in the [templates](../runtime-testsuite/resources/org/antlr/v4/test/runtime/templates) subfolder of the runtime tests folder. Read more about the folder structure in the [adding-tests.md](adding-tests.md) file. As lined out there you have to run
+The test specification part makes heavy use of the StringTemplate engine to allow defining target language agnostic tests. For that all tests are described in template (`stg`) files. You can find them in the [templates](../runtime-testsuite/resources/org/antlr/v4/test/runtime/templates) subfolder of the runtime tests folder. Read more about the folder structure in the [antlr-project-testing.md](antlr-project-testing.md) file. As lined out there you have to run
 
 ```bash
 $ mvn -Pgen generate-test-sources

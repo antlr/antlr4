@@ -1,31 +1,7 @@
 /*
- * [The "BSD license"]
- *  Copyright (c) 2012 Terence Parr
- *  Copyright (c) 2012 Sam Harwell
- *  All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions
- *  are met:
- *
- *  1. Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  2. Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  3. The name of the author may not be used to endorse or promote products
- *     derived from this software without specific prior written permission.
- *
- *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- *  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- *  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
  */
 package org.antlr.v4.test.runtime.csharp;
 
@@ -37,7 +13,6 @@ import org.antlr.v4.runtime.WritableToken;
 import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.test.runtime.ErrorQueue;
 import org.antlr.v4.test.runtime.RuntimeTestSupport;
-import org.antlr.v4.test.runtime.SpecialRuntimeTestAssert;
 import org.antlr.v4.tool.ANTLRMessage;
 import org.antlr.v4.tool.GrammarSemanticsMessage;
 import org.junit.rules.TestRule;
@@ -78,7 +53,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class BaseCSharpTest implements RuntimeTestSupport, SpecialRuntimeTestAssert {
+public class BaseCSharpTest implements RuntimeTestSupport /*, SpecialRuntimeTestAssert*/ {
 	public static final String newline = System.getProperty("line.separator");
 	public static final String pathSep = System.getProperty("path.separator");
 
@@ -715,7 +690,7 @@ public class BaseCSharpTest implements RuntimeTestSupport, SpecialRuntimeTestAss
 				"        tokens.Fill();\n" +
 				"        foreach (object t in tokens.GetTokens())\n" +
 				"			Console.WriteLine(t);\n" +
-				(showDFA?"Console.Write(lex.Interpreter.GetDFA(Lexer.DefaultMode).ToLexerString());\n":"")+
+				(showDFA?"        Console.Write(lex.Interpreter.GetDFA(Lexer.DEFAULT_MODE).ToLexerString());\n":"")+
 				"    }\n" +
 				"}"
 		);
@@ -812,64 +787,8 @@ public class BaseCSharpTest implements RuntimeTestSupport, SpecialRuntimeTestAss
 		org.junit.Assert.assertEquals(msg, a, b);
 	}
 
-	@Override
-	public void assertEqualStrings(String a, String b) {
-		assertEquals(a, b);
-	}
-
 	protected static void assertEquals(String a, String b) {
-		a = absorbExpectedDifferences(a);
-		b = absorbActualDifferences(b);
 		org.junit.Assert.assertEquals(a, b);
-	}
-
-	protected static void assertNull(String a) {
-		a = absorbActualDifferences(a);
-		org.junit.Assert.assertNull(a);
-	}
-
-	private static String absorbExpectedDifferences(String a) {
-		if(a==null)
-			return a;
-		// work around the lack of requiresFullContext field in DFAState
-		if(a.startsWith("Decision"))
-			a = a.replaceAll("\\^", "");
-		// work around the algo difference for full context
-		a = stripOutUnwantedLinesWith(a, "reportAttemptingFullContext","reportContextSensitivity", "reportAmbiguity");
-		if(a.isEmpty()) {
-			a = null;
-		}
-		return a;
-	}
-
-	private static String absorbActualDifferences(String a) {
-		if(a==null)	return a;
-		// work around the algo difference for full context
-		// work around the algo difference for semantic predicates
-		a = stripOutUnwantedLinesWith(a, "reportContextSensitivity","eval=false");
-		if(a.isEmpty()) {
-			a = null;
-		}
-		return a;
-	}
-
-	private static String stripOutUnwantedLinesWith(String a, String ... unwanteds) {
-		String[] lines = a.split("\n");
-		StringBuilder sb = new StringBuilder();
-		for(String line : lines) {
-			boolean wanted = true;
-			for(String unwanted : unwanteds) {
-				if(line.contains(unwanted) ) {
-					wanted = false;
-					break;
-				}
-			}
-			if(!wanted)
-				continue;
-			sb.append(line);
-			sb.append("\n");
-		}
-		return sb.toString();
 	}
 
 }

@@ -1,9 +1,13 @@
+/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
+
 //
 //  BaseTest.swift
 //  Antlr4
 //
 //  Created by janyou on 15/10/13.
-//  Copyright © 2015  jlabs. All rights reserved.
 //
 
 import XCTest
@@ -15,7 +19,7 @@ class BaseTest: XCTestCase {
         super.setUp()
         // Put setup code here. This method is called before the invocation of each test method in the class.
     }
-    
+
     override func tearDown() {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
         super.tearDown()

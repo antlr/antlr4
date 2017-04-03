@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
+
 package org.antlr.v4.test.runtime.descriptors;
 
 import org.antlr.v4.test.runtime.BaseParserTestDescriptor;
@@ -107,8 +113,7 @@ public class PerformanceDescriptors {
 
 		@Override
 		public boolean ignore(String targetName) {
-//			return !Arrays.asList("Java", "Python2", "Python3", "Node").contains(targetName);
-			return !Arrays.asList("Java").contains(targetName);
+			return !Arrays.asList("Java", "CSharp", "Python2", "Python3", "Node", "Cpp").contains(targetName);
 		}
 	}
 
@@ -190,6 +195,12 @@ public class PerformanceDescriptors {
 		 */
 		@CommentHasStringValue
 		public String input;
+
+		@Override
+		public boolean ignore(String targetName) {
+			// passes, but still too slow in Python and JavaScript
+			return !Arrays.asList("Java", "CSharp", "Cpp").contains(targetName);
+		}
 	}
 
 	public static class DropLoopEntryBranchInLRRule_5 extends DropLoopEntryBranchInLRRule {

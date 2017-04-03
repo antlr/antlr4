@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
+
 package org.antlr.v4.test.runtime;
 
 import org.antlr.v4.Tool;
@@ -104,6 +110,7 @@ public abstract class BaseRuntimeTest {
 
 	@Test
 	public void testOne() throws Exception {
+		// System.out.println(delegate.getTmpDir());
 		if ( descriptor.ignore(descriptor.getTarget()) ) {
 			System.out.printf("Ignore "+descriptor);
 			return;

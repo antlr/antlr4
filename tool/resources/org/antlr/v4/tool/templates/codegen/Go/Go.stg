@@ -405,7 +405,7 @@ func (p *<parser.name>) <currentRule.name; format="cap">(<currentRule.args:{a | 
 			<endif>
 		}
 	}()
-	
+
 	<if(currentRule.hasLookaheadBlock)>
 	var _alt int
 	<endif>
@@ -563,9 +563,6 @@ switch p.GetTokenStream().LA(1) {
 
 <endif>
 default:
-	<if(error)>
-	<error>
-	<endif>
 }
 >>
 
@@ -644,10 +641,7 @@ p.GetErrorHandler().Sync(p)
 
 <endif>
 
-
-la_ := p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), <choice.decision>, p.GetParserRuleContext())
-
-switch la_ {
+switch p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), <choice.decision>, p.GetParserRuleContext()) {
 <if(alts)>
 <alts:{alt | case <i>:
 	<alt>}; separator="\n\n">
@@ -658,10 +652,10 @@ switch la_ {
 OptionalBlock(choice, alts, error) ::= <<
 p.SetState(<choice.stateNumber>)
 p.GetErrorHandler().Sync(p)
-la_ := p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), <choice.decision>, p.GetParserRuleContext())
+
 <if(alts)>
 
-<alts:{alt | if la_ == <i><if(!choice.ast.greedy)>+1<endif> {
+<alts:{alt | if p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), <choice.decision>, p.GetParserRuleContext()) == <i><if(!choice.ast.greedy)>+1<endif> {
 	<alt>
 }; separator="} else ">
 <endif>
@@ -811,6 +805,7 @@ var _lt = p.GetTokenStream().LT(1)<! TODO: Should LT be called always like Invok
 	p.GetErrorHandler().RecoverInline(p)
 	<endif>
 } else {
+    p.GetErrorHandler().ReportMatch(p)
 	p.Consume()
 }
 >>

@@ -64,9 +64,9 @@ PlusText(a) ::= <%"<a>" + this.Text%>
 
 InputText() ::= "this.TokenStream.GetText()"
 
-LTEquals(i, v) ::= <%this.TokenStream.Lt(<i>).Text.Equals(<v>)%>
+LTEquals(i, v) ::= <%this.TokenStream.LT(<i>).Text.Equals(<v>)%>
 
-LANotEquals(i, v) ::= <%this.InputStream.La(<i>)!=<v>%>
+LANotEquals(i, v) ::= <%this.InputStream.LA(<i>)!=<v>%>
 
 TokenStartColumnEquals(i) ::= <%this.TokenStartColumn==<i>%>
 
@@ -76,7 +76,7 @@ GetExpectedTokenNames() ::= "this.GetExpectedTokens().ToString(this.Vocabulary)"
 
 RuleInvocationStack() ::= "GetRuleInvocationStackAsString()"
 
-LL_EXACT_AMBIG_DETECTION() ::= <<Interpreter.PredictionMode = PredictionMode.LlExactAmbigDetection;>>
+LL_EXACT_AMBIG_DETECTION() ::= <<Interpreter.PredictionMode = PredictionMode.LL_EXACT_AMBIG_DETECTION;>>
 
 ParserToken(parser, token) ::= <%<parser>.<token>%>
 
@@ -98,7 +98,7 @@ PositionAdjustingLexer() ::= <<
 
 public override IToken NextToken() {
 	if (!(Interpreter is PositionAdjustingLexerATNSimulator)) {
-		Interpreter = new PositionAdjustingLexerATNSimulator(this, _ATN);
+		Interpreter = new PositionAdjustingLexerATNSimulator(this, _ATN, decisionToDFA, sharedContextCache);
 	}
 
 	return base.NextToken();
@@ -157,8 +157,8 @@ private static bool IsIdentifierChar(char c) {
 
 public class PositionAdjustingLexerATNSimulator : LexerATNSimulator {
 
-	public PositionAdjustingLexerATNSimulator(Lexer recog, ATN atn)
-	: base(recog, atn)
+	public PositionAdjustingLexerATNSimulator(Lexer recog, ATN atn, DFA[] decisionToDFA, PredictionContextCache sharedContextCache)
+	: base(recog, atn, decisionToDFA, sharedContextCache)
 	{
 	}
 
@@ -265,14 +265,6 @@ public class LeafListener : TBaseListener {
 }
 }
 >>
-
-ImportVisitor(X) ::= ""
-BasicVisitor(X) ::= ""
-WalkVisitor(s) ::= ""
-LRWithLabelsVisitor(X) ::= ""
-RuleGetterVisitor(X) ::= ""
-LRVisitor(x) ::= ""
-TokenGetterVisitor(x) ::= ""
 
 DeclareContextListGettersFunction() ::= <<
 void foo() {
