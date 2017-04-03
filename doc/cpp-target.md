@@ -1,6 +1,6 @@
 # C++
 
-The C++ target supports all platforms that can either run MS Visual Studio 2013 (or newer), XCode 7 (or newer) or CMake (C++11 required). All build tools can either create static or dynamic libraries, both as 64bit or 32bit arch. Additionally, XCode can create an iOS library.
+The C++ target supports all platforms that can either run MS Visual Studio 2013 (or newer), XCode 7 (or newer) or CMake (C++11 required). All build tools can either create static or dynamic libraries, both as 64bit or 32bit arch. Additionally, XCode can create an iOS library. Also see [Antlr4 for C++ with CMake: A practical example](http://blorente.me//Antlr-,-C++-and-CMake-Wait-what.html).
 
 ## How to create a C++ lexer or parser?
 This is pretty much the same as creating a Java lexer or parser, except you need to specify the language target, for example:
