@@ -36,6 +36,9 @@ matrix:
       compiler: clang
       osx_image: xcode8.1
       env: TARGET=swift
+    - os: osx
+      osx_image: xcode8.2
+      env: TARGET=dotnet
     - os: linux
       jdk: oraclejdk7
       env: TARGET=java
