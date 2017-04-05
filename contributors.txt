@@ -1,4 +1,4 @@
-﻿ANTLR Project Contributors Certification of Origin and Rights
+ANTLR Project Contributors Certification of Origin and Rights
 
 All contributors to ANTLR v4 must formally agree to abide by this
 certificate of origin by signing on the bottom with their github
@@ -129,3 +129,17 @@ YYYY/MM/DD, github id, Full name, email
 2016/12/11, Gaulouis, Gaulouis, gaulouis.com@gmail.com
 2016/12/22, akosthekiss, Akos Kiss, akiss@inf.u-szeged.hu
 2016/12/24, adrpo, Adrian Pop, adrian.pop@liu.se
+2017/01/11, robertbrignull, Robert Brignull, robertbrignull@gmail.com
+2017/01/13, marcelo-rocha, Marcelo Rocha, mcrocha@gmail.com
+2017/01/23, bhamiltoncx, Ben Hamilton, bhamiltoncx+antlr@gmail.com
+2017/01/18, mshockwave, Bekket McClane, yihshyng223@gmail.com
+2017/02/10, lionelplessis, Lionel Plessis, lionelplessis@users.noreply.github.com
+2017/02/14, lecode-official, David Neumann, david.neumann@lecode.de
+2017/02/14, xied75, Dong Xie, xied75@gmail.com
+2017/02/20, Thomasb81, Thomas Burg, thomasb81@gmail.com
+2017/02/26, jvasileff, John Vasileff, john@vasileff.com
+2017/03/08, harry-tallbelt, Igor Vysokopoyasny, harry.tallbelt@gmail.com
+2017/03/09, teverett, Tom Everett, tom@khubla.com
+2017/03/03, chund, Christian Hund, christian.hund@gmail.com
+2017/03/15, robertvanderhulst, Robert van der Hulst, robert@xsharp.eu
+2017/03/28, cmd-johnson, Jonas Auer, jonas.auer.94@gmail.com

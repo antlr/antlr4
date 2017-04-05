@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -10,6 +10,7 @@ import org.antlr.runtime.CommonToken;
 import org.antlr.runtime.Token;
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.misc.CharSupport;
+import org.antlr.v4.misc.EscapeSequenceParsing;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.IntStream;
 import org.antlr.v4.runtime.Lexer;
@@ -17,6 +18,7 @@ import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.atn.ActionTransition;
 import org.antlr.v4.runtime.atn.AtomTransition;
+import org.antlr.v4.runtime.atn.CodePointTransitions;
 import org.antlr.v4.runtime.atn.LexerAction;
 import org.antlr.v4.runtime.atn.LexerChannelAction;
 import org.antlr.v4.runtime.atn.LexerCustomAction;
@@ -27,7 +29,6 @@ import org.antlr.v4.runtime.atn.LexerPushModeAction;
 import org.antlr.v4.runtime.atn.LexerSkipAction;
 import org.antlr.v4.runtime.atn.LexerTypeAction;
 import org.antlr.v4.runtime.atn.NotSetTransition;
-import org.antlr.v4.runtime.atn.RangeTransition;
 import org.antlr.v4.runtime.atn.RuleStartState;
 import org.antlr.v4.runtime.atn.SetTransition;
 import org.antlr.v4.runtime.atn.TokensStartState;
@@ -48,6 +49,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 public class LexerATNFactory extends ParserATNFactory {
@@ -255,7 +257,7 @@ public class LexerATNFactory extends ParserATNFactory {
 		int t1 = CharSupport.getCharValueFromGrammarCharLiteral(a.getText());
 		int t2 = CharSupport.getCharValueFromGrammarCharLiteral(b.getText());
 		checkRange(a, b, t1, t2);
-		left.addTransition(new  RangeTransition(right, t1, t2));
+		left.addTransition(CodePointTransitions.createWithCodePointRange(right, t1, t2));
 		a.atnState = left;
 		b.atnState = left;
 		return new Handle(left, right);
@@ -301,8 +303,9 @@ public class LexerATNFactory extends ParserATNFactory {
 			Transition transition;
 			if (set.getIntervals().size() == 1) {
 				Interval interval = set.getIntervals().get(0);
-				transition = new RangeTransition(right, interval.a, interval.b);
-			} else {
+				transition = CodePointTransitions.createWithCodePointRange(right, interval.a, interval.b);
+			}
+			else {
 				transition = new SetTransition(right, set);
 			}
 
@@ -353,16 +356,18 @@ public class LexerATNFactory extends ParserATNFactory {
 		int n = chars.length();
 		ATNState prev = left;
 		right = null;
-		for (int i = 0; i < n; i++) {
+		for (int i = 0; i < n; ) {
 			right = newState(stringLiteralAST);
-			prev.addTransition(new AtomTransition(right, chars.charAt(i)));
+			int codePoint = chars.codePointAt(i);
+			prev.addTransition(CodePointTransitions.createWithCodePoint(right, codePoint));
 			prev = right;
+			i += Character.charCount(codePoint);
 		}
 		stringLiteralAST.atnState = left;
 		return new Handle(left, right);
 	}
 
-	/** [Aa\t \u1234a-z\]\-] char sets */
+	/** [Aa\t \u1234a-z\]\p{Letter}\-] char sets */
 	@Override
 	public Handle charSetLiteral(GrammarAST charSetAST) {
 		ATNState left = newState(charSetAST);
@@ -373,10 +378,68 @@ public class LexerATNFactory extends ParserATNFactory {
 		return new Handle(left, right);
 	}
 
+	private static class CharSetParseState {
+		enum Mode {
+			NONE,
+			ERROR,
+			PREV_CODE_POINT,
+			PREV_PROPERTY
+		}
+
+		public static final CharSetParseState NONE = new CharSetParseState(Mode.NONE, false, -1, IntervalSet.EMPTY_SET);
+		public static final CharSetParseState ERROR = new CharSetParseState(Mode.ERROR, false, -1, IntervalSet.EMPTY_SET);
+
+		public final Mode mode;
+		public final boolean inRange;
+		public final int prevCodePoint;
+		public final IntervalSet prevProperty;
+
+		public CharSetParseState(
+				Mode mode,
+				boolean inRange,
+				int prevCodePoint,
+				IntervalSet prevProperty) {
+			this.mode = mode;
+			this.inRange = inRange;
+			this.prevCodePoint = prevCodePoint;
+			this.prevProperty = prevProperty;
+		}
+
+		@Override
+		public String toString() {
+			return String.format(
+					"%s mode=%s inRange=%s prevCodePoint=%d prevProperty=%s",
+					super.toString(),
+					mode,
+					inRange,
+					prevCodePoint,
+					prevProperty);
+		}
+
+		@Override
+		public boolean equals(Object other) {
+			if (!(other instanceof CharSetParseState)) {
+				return false;
+			}
+			CharSetParseState that = (CharSetParseState) other;
+			if (this == that) {
+				return true;
+			}
+			return Objects.equals(this.mode, that.mode) &&
+				Objects.equals(this.inRange, that.inRange) &&
+				Objects.equals(this.prevCodePoint, that.prevCodePoint) &&
+				Objects.equals(this.prevProperty, that.prevProperty);
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash(mode, inRange, prevCodePoint, prevProperty);
+		}
+	}
+
 	public IntervalSet getSetFromCharSetLiteral(GrammarAST charSetAST) {
 		String chars = charSetAST.getText();
 		chars = chars.substring(1, chars.length() - 1);
-		String cset = '"' + chars + '"';
 		IntervalSet set = new IntervalSet();
 
 		if (chars.length() == 0) {
@@ -384,49 +447,123 @@ public class LexerATNFactory extends ParserATNFactory {
 					g.fileName, charSetAST.getToken(), "[]");
 			return set;
 		}
-		// unescape all valid escape char like \n, leaving escaped dashes as '\-'
-		// so we can avoid seeing them as '-' range ops.
-		chars = CharSupport.getStringFromGrammarStringLiteral(cset);
-		if (chars == null) {
-			g.tool.errMgr.grammarError(ErrorType.INVALID_ESCAPE_SEQUENCE,
-			                           g.fileName, charSetAST.getToken());
-			return set;
-		}
+
+		CharSetParseState state = CharSetParseState.NONE;
+
 		int n = chars.length();
-		// now make x-y become set of char
-		for (int i = 0; i < n; i++) {
-			int c = chars.charAt(i);
-			if (c == '\\' && i+1 < n && chars.charAt(i+1) == '-') { // \-
-				checkSetCollision(charSetAST, set, '-');
-				set.add('-');
-				i++;
+		for (int i = 0; i < n; ) {
+			if (state.mode == CharSetParseState.Mode.ERROR) {
+				return new IntervalSet();
 			}
-			else if (i+2 < n && chars.charAt(i+1) == '-') { // range x-y
-				int x = c;
-				int y = chars.charAt(i+2);
-				if (x <= y) {
-					checkSetCollision(charSetAST, set, x, y);
-					set.add(x,y);
+			int c = chars.codePointAt(i);
+			int offset = Character.charCount(c);
+			if (c == '\\') {
+				EscapeSequenceParsing.Result escapeParseResult =
+					EscapeSequenceParsing.parseEscape(chars, i);
+				switch (escapeParseResult.type) {
+					case INVALID:
+						g.tool.errMgr.grammarError(ErrorType.INVALID_ESCAPE_SEQUENCE,
+									   g.fileName, charSetAST.getToken(), charSetAST.getText());
+						state = CharSetParseState.ERROR;
+						break;
+					case CODE_POINT:
+						state = applyPrevStateAndMoveToCodePoint(charSetAST, set, state, escapeParseResult.codePoint);
+						break;
+					case PROPERTY:
+						state = applyPrevStateAndMoveToProperty(charSetAST, set, state, escapeParseResult.propertyIntervalSet);
+						break;
+				}
+				offset = escapeParseResult.parseLength;
+			}
+			else if (c == '-' && !state.inRange && i != 0 && i != n - 1) {
+				if (state.mode == CharSetParseState.Mode.PREV_PROPERTY) {
+					g.tool.errMgr.grammarError(ErrorType.UNICODE_PROPERTY_NOT_ALLOWED_IN_RANGE,
+							g.fileName, charSetAST.getToken(), charSetAST.getText());
+					state = CharSetParseState.ERROR;
 				}
 				else {
-					g.tool.errMgr.grammarError(ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED,
-					                           g.fileName, charSetAST.getToken(), "[" + (char) x + "-" + (char) y + "]");
+					state = new CharSetParseState(state.mode, true, state.prevCodePoint, state.prevProperty);
 				}
-				i += 2;
 			}
 			else {
-				checkSetCollision(charSetAST, set, c);
-				set.add(c);
+				state = applyPrevStateAndMoveToCodePoint(charSetAST, set, state, c);
 			}
+			i += offset;
 		}
+		if (state.mode == CharSetParseState.Mode.ERROR) {
+			return new IntervalSet();
+		}
+		// Whether or not we were in a range, we'll add the last code point found to the set.
+		applyPrevState(charSetAST, set, state);
 		return set;
 	}
 
-	protected void checkSetCollision(GrammarAST ast, IntervalSet set, int el) {
-		if (set.contains(el)) {
-			g.tool.errMgr.grammarError(ErrorType.CHARACTERS_COLLISION_IN_SET, g.fileName, ast.getToken(),
-					(char)el, ast.getText());
+	private CharSetParseState applyPrevStateAndMoveToCodePoint(
+			GrammarAST charSetAST,
+			IntervalSet set,
+			CharSetParseState state,
+			int codePoint) {
+		if (state.inRange) {
+			if (state.prevCodePoint > codePoint) {
+				g.tool.errMgr.grammarError(
+						ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED,
+						g.fileName,
+						charSetAST.getToken(),
+						CharSupport.getRangeEscapedString(state.prevCodePoint, codePoint));
+			}
+			checkSetCollision(charSetAST, set, state.prevCodePoint, codePoint);
+			set.add(state.prevCodePoint, codePoint);
+			state = CharSetParseState.NONE;
 		}
+		else {
+			applyPrevState(charSetAST, set, state);
+			state = new CharSetParseState(
+					CharSetParseState.Mode.PREV_CODE_POINT,
+					false,
+					codePoint,
+					IntervalSet.EMPTY_SET);
+		}
+		return state;
+	}
+
+	private CharSetParseState applyPrevStateAndMoveToProperty(
+			GrammarAST charSetAST,
+			IntervalSet set,
+			CharSetParseState state,
+			IntervalSet property) {
+		if (state.inRange) {
+			g.tool.errMgr.grammarError(ErrorType.UNICODE_PROPERTY_NOT_ALLOWED_IN_RANGE,
+						   g.fileName, charSetAST.getToken(), charSetAST.getText());
+			return CharSetParseState.ERROR;
+		}
+		else {
+			applyPrevState(charSetAST, set, state);
+			state = new CharSetParseState(
+					CharSetParseState.Mode.PREV_PROPERTY,
+					false,
+					-1,
+					property);
+		}
+		return state;
+	}
+
+	private void applyPrevState(GrammarAST charSetAST, IntervalSet set, CharSetParseState state) {
+		switch (state.mode) {
+			case NONE:
+			case ERROR:
+				break;
+			case PREV_CODE_POINT:
+				checkSetCollision(charSetAST, set, state.prevCodePoint);
+				set.add(state.prevCodePoint);
+				break;
+			case PREV_PROPERTY:
+				set.addAll(state.prevProperty);
+				break;
+		}
+	}
+
+	protected void checkSetCollision(GrammarAST ast, IntervalSet set, int el) {
+		checkSetCollision(ast, set, el, el);
 	}
 
 	protected void checkSetCollision(GrammarAST ast, IntervalSet set, int a, int b) {
@@ -453,7 +590,7 @@ public class LexerATNFactory extends ParserATNFactory {
 					setText = sb.toString();
 				}
 				g.tool.errMgr.grammarError(ErrorType.CHARACTERS_COLLISION_IN_SET, g.fileName, ast.getToken(),
-						(char)a + "-" + (char)b, setText);
+						CharSupport.getRangeEscapedString(a, b), setText);
 				break;
 			}
 		}
@@ -538,23 +675,30 @@ public class LexerATNFactory extends ParserATNFactory {
 				if (command.equals("skip")) {
 					if (ruleCommands.contains("more")) {
 						firstCommand = "more";
-					} else if (ruleCommands.contains("type")) {
+					}
+					else if (ruleCommands.contains("type")) {
 						firstCommand = "type";
-					} else if (ruleCommands.contains("channel")) {
+					}
+					else if (ruleCommands.contains("channel")) {
 						firstCommand = "channel";
 					}
-				} else if (command.equals("more")) {
+				}
+				else if (command.equals("more")) {
 					if (ruleCommands.contains("skip")) {
 						firstCommand = "skip";
-					} else if (ruleCommands.contains("type")) {
+					}
+					else if (ruleCommands.contains("type")) {
 						firstCommand = "type";
-					} else if (ruleCommands.contains("channel")) {
+					}
+					else if (ruleCommands.contains("channel")) {
 						firstCommand = "channel";
 					}
-				} else if (command.equals("type") || command.equals("channel")) {
+				}
+				else if (command.equals("type") || command.equals("channel")) {
 					if (ruleCommands.contains("more")) {
 						firstCommand = "more";
-					} else if (ruleCommands.contains("skip")) {
+					}
+					else if (ruleCommands.contains("skip")) {
 						firstCommand = "skip";
 					}
 				}

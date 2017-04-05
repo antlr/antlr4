@@ -1,5 +1,5 @@
 //
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -1444,7 +1444,7 @@ ParserATNSimulator.prototype.precedenceTransition = function(config, pt,  collec
                 c = new ATNConfig({state:pt.target}, config); // no pred context
             }
         } else {
-            newSemCtx = SemanticContext.andContext(config.semanticContext, pt.getPredicate());
+            var newSemCtx = SemanticContext.andContext(config.semanticContext, pt.getPredicate());
             c = new ATNConfig({state:pt.target, semanticContext:newSemCtx}, config);
         }
     } else {

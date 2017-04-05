@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+﻿/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -29,27 +29,20 @@ namespace tree {
   template<typename V>
   class ANTLR4CPP_PUBLIC ParseTreeProperty {
   public:
-    ParseTreeProperty() {
-      InitializeInstanceFields();
-    }
-
     virtual V get(ParseTree *node) {
-      return _annotations.get(node);
+      return _annotations[node];
     }
     virtual void put(ParseTree *node, V value) {
-      _annotations.put(node, value);
+      _annotations[node] = value;
     }
     virtual V removeFrom(ParseTree *node) {
-      return _annotations->remove(node);
+      auto value = _annotations[node];
+      _annotations.erase(node);
+      return value;
     }
 
   protected:
     std::map<ParseTree*, V> _annotations;
-
-  private:
-    void InitializeInstanceFields() {
-    }
-
   };
 
 } // namespace tree

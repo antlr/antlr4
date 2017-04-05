@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+﻿/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -66,6 +66,13 @@ namespace atn {
      * LexerAction instances.
      */
     static Guid ADDED_LEXER_ACTIONS();
+
+    /**
+     * This UUID indicates the serialized ATN contains two sets of
+     * IntervalSets, where the second set's values are encoded as
+     * 32-bit integers to support the full Unicode SMP range up to U+10FFFF.
+     */
+    static Guid ADDED_UNICODE_SMP();
 
     /// This list contains all of the currently supported UUIDs, ordered by when
     /// the feature first appeared in this branch.

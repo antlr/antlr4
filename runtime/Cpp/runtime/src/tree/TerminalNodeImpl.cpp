@@ -1,10 +1,11 @@
-﻿/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+﻿/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
 #include "misc/Interval.h"
 #include "Token.h"
+#include "RuleContext.h"
 #include "tree/ParseTreeVisitor.h"
 
 #include "tree/TerminalNodeImpl.h"
@@ -17,6 +18,10 @@ TerminalNodeImpl::TerminalNodeImpl(Token *symbol_) : symbol(symbol_) {
 
 Token* TerminalNodeImpl::getSymbol() {
   return symbol;
+}
+
+void TerminalNodeImpl::setParent(RuleContext *parent) {
+  this->parent = parent;
 }
 
 misc::Interval TerminalNodeImpl::getSourceInterval() {

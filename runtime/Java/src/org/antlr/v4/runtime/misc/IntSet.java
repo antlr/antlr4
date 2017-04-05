@@ -1,12 +1,10 @@
 /*
- * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 package org.antlr.v4.runtime.misc;
 
-
-import org.antlr.v4.runtime.Token;
 
 import java.util.List;
 
@@ -129,15 +127,6 @@ public interface IntSet {
 	 */
 	@Override
 	boolean equals(Object obj);
-
-	/**
-	 * Returns the single value contained in the set, if {@link #size} is 1;
-	 * otherwise, returns {@link Token#INVALID_TYPE}.
-	 *
-	 * @return the single value contained in the set, if {@link #size} is 1;
-	 * otherwise, returns {@link Token#INVALID_TYPE}.
-	 */
-	int getSingleElement();
 
 	/**
 	 * Returns {@code true} if the set contains the specified element.

@@ -1,4 +1,4 @@
-// Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 // Use of this file is governed by the BSD 3-clause license that
 // can be found in the LICENSE.txt file in the project root.
 
@@ -6,10 +6,9 @@ package antlr
 
 import (
 	"fmt"
-	"strconv"
 )
 
-type Comparable interface {
+type comparable interface {
 	equals(other interface{}) bool
 }
 
@@ -19,8 +18,9 @@ type Comparable interface {
 // state. The semantic context is the tree of semantic predicates encountered
 // before reaching an ATN state.
 type ATNConfig interface {
-	Hasher
-	Comparable
+	comparable
+
+	hash() int
 
 	GetState() ATNState
 	GetAlt() int
@@ -36,8 +36,6 @@ type ATNConfig interface {
 
 	getPrecedenceFilterSuppressed() bool
 	setPrecedenceFilterSuppressed(bool)
-
-	shortHash() string
 }
 
 type BaseATNConfig struct {
@@ -93,11 +91,11 @@ func NewBaseATNConfig(c ATNConfig, state ATNState, context PredictionContext, se
 	}
 
 	return &BaseATNConfig{
-		state:                   state,
-		alt:                     c.GetAlt(),
-		context:                 context,
-		semanticContext:         semanticContext,
-		reachesIntoOuterContext: c.GetReachesIntoOuterContext(),
+		state:                      state,
+		alt:                        c.GetAlt(),
+		context:                    context,
+		semanticContext:            semanticContext,
+		reachesIntoOuterContext:    c.GetReachesIntoOuterContext(),
 		precedenceFilterSuppressed: c.getPrecedenceFilterSuppressed(),
 	}
 }
@@ -168,20 +166,18 @@ func (b *BaseATNConfig) equals(o interface{}) bool {
 	return nums && alts && cons && sups && equal
 }
 
-func (b *BaseATNConfig) shortHash() string {
-	return strconv.Itoa(b.state.GetStateNumber()) + "/" + strconv.Itoa(b.alt) + "/" + b.semanticContext.String()
-}
-
-func (b *BaseATNConfig) Hash() string {
-	var c string
-
-	if b.context == nil {
-		c = ""
-	} else {
-		c = b.context.Hash()
+func (b *BaseATNConfig) hash() int {
+	var c int
+	if b.context != nil {
+		c = b.context.hash()
 	}
 
-	return strconv.Itoa(b.state.GetStateNumber()) + "/" + strconv.Itoa(b.alt) + "/" + c + "/" + b.semanticContext.String()
+	h := murmurInit(7)
+	h = murmurUpdate(h, b.state.GetStateNumber())
+	h = murmurUpdate(h, b.alt)
+	h = murmurUpdate(h, c)
+	h = murmurUpdate(h, b.semanticContext.hash())
+	return murmurFinish(h, 4)
 }
 
 func (b *BaseATNConfig) String() string {
@@ -201,8 +197,6 @@ func (b *BaseATNConfig) String() string {
 
 	return fmt.Sprintf("(%v,%v%v%v%v)", b.state, b.alt, s1, s2, s3)
 }
-
-
 
 type LexerATNConfig struct {
 	*BaseATNConfig
@@ -249,16 +243,22 @@ func NewLexerATNConfig1(state ATNState, alt int, context PredictionContext) *Lex
 	return &LexerATNConfig{BaseATNConfig: NewBaseATNConfig5(state, alt, context, SemanticContextNone)}
 }
 
-func (l *LexerATNConfig) Hash() string {
-	var f string
-
+func (l *LexerATNConfig) hash() int {
+	var f int
 	if l.passedThroughNonGreedyDecision {
-		f = "1"
+		f = 1
 	} else {
-		f = "0"
+		f = 0
 	}
-
-	return fmt.Sprintf("%v%v%v%v%v%v", l.state.GetStateNumber(), l.alt, l.context, l.semanticContext, f, l.lexerActionExecutor)
+	h := murmurInit(7)
+	h = murmurUpdate(h, l.state.hash())
+	h = murmurUpdate(h, l.alt)
+	h = murmurUpdate(h, l.context.hash())
+	h = murmurUpdate(h, l.semanticContext.hash())
+	h = murmurUpdate(h, f)
+	h = murmurUpdate(h, l.lexerActionExecutor.hash())
+	h = murmurFinish(h, 6)
+	return h
 }
 
 func (l *LexerATNConfig) equals(other interface{}) bool {
@@ -286,6 +286,7 @@ func (l *LexerATNConfig) equals(other interface{}) bool {
 
 	return l.BaseATNConfig.equals(othert.BaseATNConfig)
 }
+
 
 func checkNonGreedyDecision(source *LexerATNConfig, target ATNState) bool {
 	var ds, ok = target.(DecisionState)

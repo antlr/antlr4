@@ -1,5 +1,5 @@
 /*
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -12,11 +12,9 @@ namespace Antlr4.Runtime.Atn
 	/// <summary>"dup" of ParserInterpreter</summary>
 	public class LexerATNSimulator : ATNSimulator
 	{
-#if !PORTABLE
 		public readonly bool debug = false;
 
 		public readonly bool dfa_debug = false;
-#endif
 
 
 		public static readonly int MIN_DFA_EDGE = 0;
@@ -64,7 +62,9 @@ namespace Antlr4.Runtime.Atn
 			this.recog = recog;
 		}
 
-		public void CopyState(LexerATNSimulator simulator)
+
+
+        public void CopyState(LexerATNSimulator simulator)
 		{
 			this.charPositionInLine = simulator.charPositionInLine;
 			this.thisLine = simulator.thisLine;
@@ -86,7 +86,7 @@ namespace Antlr4.Runtime.Atn
 				{
 					return MatchATN(input);
 				}
-				else 
+				else
 				{
 					return ExecATN(input, dfa.s0);
 				}
@@ -117,13 +117,11 @@ namespace Antlr4.Runtime.Atn
 		protected int MatchATN(ICharStream input)
 		{
 			ATNState startState = atn.modeToStartState[mode];
-
-			if (debug)
+            if (debug)
 			{
-				Console.WriteLine("matchATN mode " + mode + " start: " + startState);
+				ConsoleWriteLine("matchATN mode " + mode + " start: " + startState);
 			}
-
-			int old_mode = mode;
+            int old_mode = mode;
 
 			ATNConfigSet s0_closure = ComputeStartState(input, startState);
 			bool suppressEdge = s0_closure.hasSemanticContext;
@@ -136,24 +134,21 @@ namespace Antlr4.Runtime.Atn
 			}
 
 			int predict = ExecATN(input, next);
-
-			if (debug)
+            if (debug)
 			{
-				Console.WriteLine("DFA after matchATN: " + decisionToDFA[old_mode].ToString());
+				ConsoleWriteLine("DFA after matchATN: " + decisionToDFA[old_mode].ToString());
 			}
-
-			return predict;
+            return predict;
 		}
 
 		protected int ExecATN(ICharStream input, DFAState ds0)
 		{
-			//System.out.println("enter exec index "+input.index()+" from "+ds0.configs);
-			if (debug)
-			{
-				Console.WriteLine("start state closure=" + ds0.configSet);
+            //System.out.println("enter exec index "+input.index()+" from "+ds0.configs);
+            if (debug)
+            {
+                ConsoleWriteLine("start state closure=" + ds0.configSet);
 			}
-
-			if (ds0.isAcceptState)
+            if (ds0.isAcceptState)
 			{
 				// allow zero-length tokens
 				CaptureSimState(prevAccept, input, ds0);
@@ -165,29 +160,28 @@ namespace Antlr4.Runtime.Atn
 
 			while (true)
 			{ // while more work
-				if (debug)
-				{
-					Console.WriteLine("execATN loop starting closure: " + s.configSet);
+                if (debug)
+                {
+                    ConsoleWriteLine("execATN loop starting closure: " + s.configSet);
 				}
-
-				// As we move src->trg, src->trg, we keep track of the previous trg to
-				// avoid looking up the DFA state again, which is expensive.
-				// If the previous target was already part of the DFA, we might
-				// be able to avoid doing a reach operation upon t. If s!=null,
-				// it means that semantic predicates didn't prevent us from
-				// creating a DFA state. Once we know s!=null, we check to see if
-				// the DFA state has an edge already for t. If so, we can just reuse
-				// it's configuration set; there's no point in re-computing it.
-				// This is kind of like doing DFA simulation within the ATN
-				// simulation because DFA simulation is really just a way to avoid
-				// computing reach/closure sets. Technically, once we know that
-				// we have a previously added DFA state, we could jump over to
-				// the DFA simulator. But, that would mean popping back and forth
-				// a lot and making things more complicated algorithmically.
-				// This optimization makes a lot of sense for loops within DFA.
-				// A character will take us back to an existing DFA state
-				// that already has lots of edges out of it. e.g., .* in comments.
-				DFAState target = GetExistingTargetState(s, t);
+                // As we move src->trg, src->trg, we keep track of the previous trg to
+                // avoid looking up the DFA state again, which is expensive.
+                // If the previous target was already part of the DFA, we might
+                // be able to avoid doing a reach operation upon t. If s!=null,
+                // it means that semantic predicates didn't prevent us from
+                // creating a DFA state. Once we know s!=null, we check to see if
+                // the DFA state has an edge already for t. If so, we can just reuse
+                // it's configuration set; there's no point in re-computing it.
+                // This is kind of like doing DFA simulation within the ATN
+                // simulation because DFA simulation is really just a way to avoid
+                // computing reach/closure sets. Technically, once we know that
+                // we have a previously added DFA state, we could jump over to
+                // the DFA simulator. But, that would mean popping back and forth
+                // a lot and making things more complicated algorithmically.
+                // This optimization makes a lot of sense for loops within DFA.
+                // A character will take us back to an existing DFA state
+                // that already has lots of edges out of it. e.g., .* in comments.
+                DFAState target = GetExistingTargetState(s, t);
 				if (target == null)
 				{
 					target = ComputeTargetState(input, s, t);
@@ -245,7 +239,7 @@ namespace Antlr4.Runtime.Atn
 			DFAState target = s.edges[t - MIN_DFA_EDGE];
 			if (debug && target != null)
 			{
-				Console.WriteLine("reuse state " + s.stateNumber + " edge to " + target.stateNumber);
+				ConsoleWriteLine("reuse state " + s.stateNumber + " edge to " + target.stateNumber);
 			}
 
 			return target;
@@ -329,7 +323,7 @@ namespace Antlr4.Runtime.Atn
 
 				if (debug)
 				{
-					Console.WriteLine("testing " + GetTokenName(t) + " at " + c.ToString(recog, true));
+					ConsoleWriteLine("testing " + GetTokenName(t) + " at " + c.ToString(recog, true));
 				}
 
 				int n = c.state.NumberOfTransitions;
@@ -363,7 +357,7 @@ namespace Antlr4.Runtime.Atn
 		{
 			if (debug)
 			{
-				Console.WriteLine("ACTION " + lexerActionExecutor);
+				ConsoleWriteLine("ACTION " + lexerActionExecutor);
 			}
 
 			// seek to after last char in token
@@ -380,7 +374,7 @@ namespace Antlr4.Runtime.Atn
 
 		protected ATNState GetReachableTarget(Transition trans, int t)
 		{
-			if (trans.Matches(t, char.MinValue, char.MaxValue))
+			if (trans.Matches(t, Lexer.MinCharValue, Lexer.MaxCharValue))
 			{
 				return trans.target;
 			}
@@ -417,7 +411,7 @@ namespace Antlr4.Runtime.Atn
 		{
 			if (debug)
 			{
-				Console.WriteLine("closure(" + config.ToString(recog, true) + ")");
+				ConsoleWriteLine("closure(" + config.ToString(recog, true) + ")");
 			}
 
 			if (config.state is RuleStopState)
@@ -426,10 +420,10 @@ namespace Antlr4.Runtime.Atn
 				{
 					if (recog != null)
 					{
-						Console.WriteLine("closure at " + recog.RuleNames[config.state.ruleIndex] + " rule stop " + config);
+						ConsoleWriteLine("closure at " + recog.RuleNames[config.state.ruleIndex] + " rule stop " + config);
 					}
 					else {
-						Console.WriteLine("closure at rule stop " + config);
+						ConsoleWriteLine("closure at rule stop " + config);
 					}
 				}
 
@@ -529,7 +523,7 @@ namespace Antlr4.Runtime.Atn
 					PredicateTransition pt = (PredicateTransition)t;
 					if (debug)
 					{
-						Console.WriteLine("EVAL rule " + pt.ruleIndex + ":" + pt.predIndex);
+						ConsoleWriteLine("EVAL rule " + pt.ruleIndex + ":" + pt.predIndex);
 					}
 					configs.hasSemanticContext = true;
 					if (EvaluatePredicate(input, pt.ruleIndex, pt.predIndex, speculative))
@@ -572,7 +566,7 @@ namespace Antlr4.Runtime.Atn
 				case TransitionType.SET:
 					if (treatEofAsEpsilon)
 					{
-						if (t.Matches(IntStreamConstants.EOF, char.MinValue, char.MaxValue))
+						if (t.Matches(IntStreamConstants.EOF, Lexer.MinCharValue, Lexer.MaxCharValue))
 						{
 							c = new LexerATNConfig(config, t.target);
 							break;
@@ -688,7 +682,7 @@ namespace Antlr4.Runtime.Atn
 
 			if (debug)
 			{
-				Console.WriteLine("EDGE " + p + " -> " + q + " upon " + ((char)t));
+				ConsoleWriteLine("EDGE " + p + " -> " + q + " upon " + ((char)t));
 			}
 
 			lock (p)

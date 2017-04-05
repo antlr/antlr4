@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -201,30 +201,6 @@ public class LexerExecDescriptors {
 		 DASHBRACK : [\\-\]]+ {<writeln("\"DASHBRACK\"")>} ;
 		 WS : [ \n]+ -> skip ;
 		 */
-		@CommentHasStringValue
-		public String grammar;
-
-	}
-
-	public static class CharSetWithMissingEndRange extends BaseLexerTestDescriptor {
-		public String input = "00\n";
-		/**
-		I
-		[@0,0:1='00',<1>,1:0]
-		[@1,3:2='<EOF>',<-1>,2:0]
-		 */
-		@CommentHasStringValue
-		public String output;
-
-		public String errors = null;
-		public String startRule = "";
-		public String grammarName = "L";
-
-		/**
-		 lexer grammar L;
-		 I : [0-]+ {<writeln("\"I\"")>} ;
-		 WS : [ \n\\u000D]+ -> skip ;
-		 */ // needs escape on u000D otherwise java converts even in comment
 		@CommentHasStringValue
 		public String grammar;
 

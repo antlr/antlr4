@@ -81,14 +81,18 @@ These more or less correspond to `isJavaIdentifierPart` and `isJavaIdentifierSta
 
 ANTLR does not distinguish between character and string literals as most languages do. All literal strings one or more characters in length are enclosed in single quotes such as `’;’`, `’if’`, `’>=’`, and `’\’'` (refers to the one-character string containing the single quote character). Literals never contain regular expressions.
 
-Literals can contain Unicode escape sequences of the form `\uXXXX`, where XXXX is the hexadecimal Unicode character value. For example, `’\u00E8’` is the French letter with a grave accent: `’è’`. ANTLR also understands the usual special escape sequences: `’\n’` (newline), `’\r’` (carriage return), `’\t’` (tab), `’\b’` (backspace), and `’\f’` (form feed). You can use Unicode characters directly within literals or use the Unicode escape sequences:
+Literals can contain Unicode escape sequences of the form `’\uXXXX’` (for Unicode code points up to `’U+FFFF’`) or `’\u{XXXXXX}’` (for all Unicode code points), where `’XXXX’` is the hexadecimal Unicode code point value.
+
+For example, `’\u00E8’` is the French letter with a grave accent: `’è’`, and `’\u{1F4A9}’` is the famous emoji: `’💩’`.
+
+ANTLR also understands the usual special escape sequences: `’\n’` (newline), `’\r’` (carriage return), `’\t’` (tab), `’\b’` (backspace), and `’\f’` (form feed). You can use Unicode code points directly within literals or use the Unicode escape sequences:
 
 ```
 grammar Foreign;
 a : '外' ;
 ```
 
-The recognizers that ANTLR generates assume a character vocabulary containing all Unicode characters. The input file encoding assumed by the runtime library depends on the target language. For the Java target, the runtime library assumes files are in UTF-8. Using the constructors, you can specify a different encoding. See, for example, ANTLR’s `ANTLRFileStream`.
+The recognizers that ANTLR generates assume a character vocabulary containing all Unicode characters. The input file encoding assumed by the runtime library depends on the target language. For the Java target, the runtime library assumes files are in UTF-8. Using the  factory methods in `CharStreams`, you can specify a different encoding.
 
 ## Actions
 

@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+﻿/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -42,8 +42,8 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("4.6.1")]
+[assembly: AssemblyVersion("4.7")]
 #if !COMPACT
-[assembly: AssemblyFileVersion("4.6.1")]
-[assembly: AssemblyInformationalVersion("4.6.1")]
+[assembly: AssemblyFileVersion("4.7")]
+[assembly: AssemblyInformationalVersion("4.7")]
 #endif

@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+﻿/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -15,11 +15,11 @@ namespace antlr4 {
   public:
     // @deprecated
     LexerInterpreter(const std::string &grammarFileName, const std::vector<std::string> &tokenNames,
-                     const std::vector<std::string> &ruleNames, const std::vector<std::string> &modeNames,
-                     const atn::ATN &atn, CharStream *input);
+                     const std::vector<std::string> &ruleNames, const std::vector<std::string> &channelNames,
+                     const std::vector<std::string> &modeNames, const atn::ATN &atn, CharStream *input);
     LexerInterpreter(const std::string &grammarFileName, const dfa::Vocabulary &vocabulary,
-                     const std::vector<std::string> &ruleNames, const std::vector<std::string> &modeNames,
-                     const atn::ATN &atn, CharStream *input);
+                     const std::vector<std::string> &ruleNames, const std::vector<std::string> &channelNames,
+                     const std::vector<std::string> &modeNames, const atn::ATN &atn, CharStream *input);
 
     ~LexerInterpreter();
 
@@ -27,6 +27,7 @@ namespace antlr4 {
     virtual std::string getGrammarFileName() const override;
     virtual const std::vector<std::string>& getTokenNames() const override;
     virtual const std::vector<std::string>& getRuleNames() const override;
+    virtual const std::vector<std::string>& getChannelNames() const override;
     virtual const std::vector<std::string>& getModeNames() const override;
 
     virtual const dfa::Vocabulary& getVocabulary() const override;
@@ -38,6 +39,7 @@ namespace antlr4 {
     // @deprecated
     std::vector<std::string> _tokenNames;
     const std::vector<std::string> &_ruleNames;
+	const std::vector<std::string> &_channelNames;
     const std::vector<std::string> &_modeNames;
     std::vector<dfa::DFA> _decisionToDFA;
 

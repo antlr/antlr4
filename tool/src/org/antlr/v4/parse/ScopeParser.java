@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -312,7 +312,8 @@ public class ScopeParser {
 						// do we see a matching '>' ahead?  if so, hope it's a generic
 						// and not less followed by expr with greater than
 						p = _splitArgumentList(actionText, p + 1, '>', separatorChar, args);
-					} else {
+					}
+					else {
 						p++; // treat as normal char
 					}
 					break;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -372,7 +372,7 @@ public class LexerATNSimulator extends ATNSimulator {
 
 
 	protected ATNState getReachableTarget(Transition trans, int t) {
-		if (trans.matches(t, Character.MIN_VALUE, Character.MAX_VALUE)) {
+		if (trans.matches(t, Lexer.MIN_CHAR_VALUE, Lexer.MAX_CHAR_VALUE)) {
 			return trans.target;
 		}
 
@@ -544,7 +544,7 @@ public class LexerATNSimulator extends ATNSimulator {
 			case Transition.RANGE:
 			case Transition.SET:
 				if (treatEofAsEpsilon) {
-					if (t.matches(CharStream.EOF, Character.MIN_VALUE, Character.MAX_VALUE)) {
+					if (t.matches(CharStream.EOF, Lexer.MIN_CHAR_VALUE, Lexer.MAX_CHAR_VALUE)) {
 						c = new LexerATNConfig(config, t.target);
 						break;
 					}
@@ -738,7 +738,8 @@ public class LexerATNSimulator extends ATNSimulator {
 		if ( curChar=='\n' ) {
 			line++;
 			charPositionInLine=0;
-		} else {
+		}
+		else {
 			charPositionInLine++;
 		}
 		input.consume();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -17,6 +17,7 @@ import org.junit.Test;
 
 import java.io.File;
 
+import static org.antlr.v4.test.runtime.BaseRuntimeTest.writeFile;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
@@ -460,7 +461,7 @@ public class TestCompositeGrammars extends BaseJavaToolTest {
 		BaseRuntimeTest.mkdir(tmpdir);
 		writeFile(tmpdir, "Java.g4", slave);
 		String found = execParser("NewJava.g4", master, "NewJavaParser", "NewJavaLexer",
-		                          null, null, "compilationUnit", "package Foo;", debug);
+					  null, null, "compilationUnit", "package Foo;", debug);
 		assertEquals(null, found);
 		assertNull(stderrDuringParse);
 	}
@@ -488,7 +489,7 @@ public class TestCompositeGrammars extends BaseJavaToolTest {
 		BaseRuntimeTest.mkdir(tmpdir);
 		writeFile(tmpdir, "Java.g4", slave);
 		String found = execParser("T.g4", master, "TParser", "TLexer",
-		                          null, null, "s", "a=b", debug);
+					  null, null, "s", "a=b", debug);
 		assertEquals(null, found);
 		assertNull(stderrDuringParse);
 	}

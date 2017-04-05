@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
     <id>Antlr4.Runtime.Standard</id>
-    <version>4.6.1</version>
+    <version>4.7</version>
      <language>en-us</language>
     <title>ANTLR 4 Standard Runtime</title>
     <description>The standard C# ANTLR 4 runtime from the ANTLR Organization</description>
@@ -14,7 +14,7 @@
     <licenseUrl>https://github.com/antlr/antlr4/blob/master/LICENSE.txt</licenseUrl>
     <projectUrl>https://github.com/antlr/antlr4</projectUrl>
     <iconUrl>https://raw.github.com/antlr/website-antlr4/master/images/icons/antlr.png</iconUrl>
-    <copyright>Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.</copyright>
+    <copyright>Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.</copyright>
     <tags>antlr parsing grammar</tags>
     <dependencies />
   </metadata>

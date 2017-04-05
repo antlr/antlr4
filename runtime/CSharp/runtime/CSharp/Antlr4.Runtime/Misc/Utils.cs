@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -130,20 +130,6 @@ namespace Antlr4.Runtime.Misc
                 m[keys[i]] = i;
             }
             return m;
-        }
-
-        public static char[] ToCharArray(ArrayList<int> data)
-        {
-            if (data == null)
-            {
-                return null;
-            }
-            char[] cdata = new char[data.Count];
-            for (int i = 0; i < data.Count; i++)
-            {
-                cdata[i] = (char)data[i];
-            }
-            return cdata;
         }
     }
 }

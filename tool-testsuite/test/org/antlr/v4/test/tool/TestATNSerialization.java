@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -291,6 +291,113 @@ public class TestATNSerialization extends BaseJavaToolTest {
 		assertEquals(expecting, result);
 	}
 
+	@Test public void testLexerUnicodeSMPLiteralSerializedToSet() throws Exception {
+		LexerGrammar lg = new LexerGrammar(
+			"lexer grammar L;\n"+
+			"INT : '\\u{1F4A9}' ;");
+		String expecting =
+			"max type 1\n" +
+			"0:TOKEN_START -1\n" +
+			"1:RULE_START 0\n" +
+			"2:RULE_STOP 0\n" +
+			"3:BASIC 0\n" +
+			"4:BASIC 0\n" +
+			"rule 0:1 1\n" +
+			"mode 0:0\n" +
+			"0:128169..128169\n" +
+			"0->1 EPSILON 0,0,0\n" +
+			"1->3 EPSILON 0,0,0\n" +
+			"3->4 SET 0,0,0\n" +
+			"4->2 EPSILON 0,0,0\n" +
+			"0:0\n";
+		ATN atn = createATN(lg, true);
+		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
+		assertEquals(expecting, result);
+	}
+
+	@Test public void testLexerUnicodeSMPRangeSerializedToSet() throws Exception {
+		LexerGrammar lg = new LexerGrammar(
+			"lexer grammar L;\n"+
+			"INT : ('a'..'\\u{1F4A9}') ;");
+		String expecting =
+			"max type 1\n" +
+			"0:TOKEN_START -1\n" +
+			"1:RULE_START 0\n" +
+			"2:RULE_STOP 0\n" +
+			"3:BASIC 0\n" +
+			"4:BASIC 0\n" +
+			"rule 0:1 1\n" +
+			"mode 0:0\n" +
+			"0:'a'..128169\n" +
+			"0->1 EPSILON 0,0,0\n" +
+			"1->3 EPSILON 0,0,0\n" +
+			"3->4 SET 0,0,0\n" +
+			"4->2 EPSILON 0,0,0\n" +
+			"0:0\n";
+		ATN atn = createATN(lg, true);
+		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
+		assertEquals(expecting, result);
+	}
+
+	@Test public void testLexerUnicodeSMPSetSerializedAfterBMPSet() throws Exception {
+		LexerGrammar lg = new LexerGrammar(
+			"lexer grammar L;\n"+
+			"SMP : ('\\u{1F4A9}' | '\\u{1F4AF}') ;\n"+
+			"BMP : ('a' | 'x') ;");
+		String expecting =
+			"max type 2\n" +
+			"0:TOKEN_START -1\n" +
+			"1:RULE_START 0\n" +
+			"2:RULE_STOP 0\n" +
+			"3:RULE_START 1\n" +
+			"4:RULE_STOP 1\n" +
+			"5:BASIC 0\n" +
+			"6:BASIC 0\n" +
+			"7:BASIC 1\n" +
+			"8:BASIC 1\n" +
+			"rule 0:1 1\n" +
+			"rule 1:3 2\n" +
+			"mode 0:0\n" +
+			"0:'a'..'a', 'x'..'x'\n" +
+			"1:128169..128169, 128175..128175\n" +
+			"0->1 EPSILON 0,0,0\n" +
+			"0->3 EPSILON 0,0,0\n" +
+			"1->5 EPSILON 0,0,0\n" +
+			"3->7 EPSILON 0,0,0\n" +
+			"5->6 SET 1,0,0\n" +
+			"6->2 EPSILON 0,0,0\n" +
+			"7->8 SET 0,0,0\n" +
+			"8->4 EPSILON 0,0,0\n" +
+			"0:0\n";
+		ATN atn = createATN(lg, true);
+		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
+		assertEquals(expecting, result);
+	}
+
+	@Test public void testLexerNotLiteral() throws Exception {
+		LexerGrammar lg = new LexerGrammar(
+			"lexer grammar L;\n"+
+			"INT : ~'a' ;");
+		String expecting =
+			"max type 1\n" +
+			"0:TOKEN_START -1\n" +
+			"1:RULE_START 0\n" +
+			"2:RULE_STOP 0\n" +
+			"3:BASIC 0\n" +
+			"4:BASIC 0\n" +
+			"rule 0:1 1\n" +
+			"mode 0:0\n" +
+			"0:'a'..'a'\n" +
+			"0->1 EPSILON 0,0,0\n" +
+			"1->3 EPSILON 0,0,0\n" +
+			"3->4 NOT_SET 0,0,0\n" +
+			"4->2 EPSILON 0,0,0\n" +
+			"0:0\n";
+		ATN atn = createATN(lg, true);
+		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
+		assertEquals(expecting, result);
+	}
+
 	@Test public void testLexerRange() throws Exception {
 		LexerGrammar lg = new LexerGrammar(
 			"lexer grammar L;\n"+
@@ -508,6 +615,222 @@ public class TestATNSerialization extends BaseJavaToolTest {
 			"rule 0:1 1\n" +
 			"mode 0:0\n" +
 			"0:'a'..'b', 'e'..'e', 'p'..'t'\n" +
+			"0->1 EPSILON 0,0,0\n" +
+			"1->3 EPSILON 0,0,0\n" +
+			"3->4 NOT_SET 0,0,0\n" +
+			"4->2 EPSILON 0,0,0\n" +
+			"0:0\n";
+		ATN atn = createATN(lg, true);
+		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
+		assertEquals(expecting, result);
+	}
+
+	@Test public void testLexerUnicodeUnescapedBMPNotSet() throws Exception {
+		LexerGrammar lg = new LexerGrammar(
+			"lexer grammar L;\n"+
+			"ID : ~('\u4E9C'|'\u4E9D')\n ;");
+		String expecting =
+			"max type 1\n" +
+			"0:TOKEN_START -1\n" +
+			"1:RULE_START 0\n" +
+			"2:RULE_STOP 0\n" +
+			"3:BASIC 0\n" +
+			"4:BASIC 0\n" +
+			"rule 0:1 1\n" +
+			"mode 0:0\n" +
+			"0:'\\u4E9C'..'\\u4E9D'\n" +
+			"0->1 EPSILON 0,0,0\n" +
+			"1->3 EPSILON 0,0,0\n" +
+			"3->4 NOT_SET 0,0,0\n" +
+			"4->2 EPSILON 0,0,0\n" +
+			"0:0\n";
+		ATN atn = createATN(lg, true);
+		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
+		assertEquals(expecting, result);
+	}
+
+	@Test public void testLexerUnicodeUnescapedBMPSetWithRange() throws Exception {
+		LexerGrammar lg = new LexerGrammar(
+			"lexer grammar L;\n"+
+			"ID : ('\u4E9C'|'\u4E9D'|'\u6C5F'|'\u305F'..'\u307B')\n ;");
+		String expecting =
+			"max type 1\n" +
+			"0:TOKEN_START -1\n" +
+			"1:RULE_START 0\n" +
+			"2:RULE_STOP 0\n" +
+			"3:BASIC 0\n" +
+			"4:BASIC 0\n" +
+			"rule 0:1 1\n" +
+			"mode 0:0\n" +
+			"0:'\\u305F'..'\\u307B', '\\u4E9C'..'\\u4E9D', '\\u6C5F'..'\\u6C5F'\n" +
+			"0->1 EPSILON 0,0,0\n" +
+			"1->3 EPSILON 0,0,0\n" +
+			"3->4 SET 0,0,0\n" +
+			"4->2 EPSILON 0,0,0\n" +
+			"0:0\n";
+		ATN atn = createATN(lg, true);
+		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
+		assertEquals(expecting, result);
+	}
+
+	@Test public void testLexerUnicodeUnescapedBMPNotSetWithRange() throws Exception {
+		LexerGrammar lg = new LexerGrammar(
+			"lexer grammar L;\n"+
+			"ID : ~('\u4E9C'|'\u4E9D'|'\u6C5F'|'\u305F'..'\u307B')\n ;");
+		String expecting =
+			"max type 1\n" +
+			"0:TOKEN_START -1\n" +
+			"1:RULE_START 0\n" +
+			"2:RULE_STOP 0\n" +
+			"3:BASIC 0\n" +
+			"4:BASIC 0\n" +
+			"rule 0:1 1\n" +
+			"mode 0:0\n" +
+			"0:'\\u305F'..'\\u307B', '\\u4E9C'..'\\u4E9D', '\\u6C5F'..'\\u6C5F'\n" +
+			"0->1 EPSILON 0,0,0\n" +
+			"1->3 EPSILON 0,0,0\n" +
+			"3->4 NOT_SET 0,0,0\n" +
+			"4->2 EPSILON 0,0,0\n" +
+			"0:0\n";
+		ATN atn = createATN(lg, true);
+		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
+		assertEquals(expecting, result);
+	}
+
+	@Test public void testLexerUnicodeEscapedBMPNotSet() throws Exception {
+		LexerGrammar lg = new LexerGrammar(
+			"lexer grammar L;\n"+
+			"ID : ~('\\u4E9C'|'\\u4E9D')\n ;");
+		String expecting =
+			"max type 1\n" +
+			"0:TOKEN_START -1\n" +
+			"1:RULE_START 0\n" +
+			"2:RULE_STOP 0\n" +
+			"3:BASIC 0\n" +
+			"4:BASIC 0\n" +
+			"rule 0:1 1\n" +
+			"mode 0:0\n" +
+			"0:'\\u4E9C'..'\\u4E9D'\n" +
+			"0->1 EPSILON 0,0,0\n" +
+			"1->3 EPSILON 0,0,0\n" +
+			"3->4 NOT_SET 0,0,0\n" +
+			"4->2 EPSILON 0,0,0\n" +
+			"0:0\n";
+		ATN atn = createATN(lg, true);
+		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
+		assertEquals(expecting, result);
+	}
+
+	@Test public void testLexerUnicodeEscapedBMPSetWithRange() throws Exception {
+		LexerGrammar lg = new LexerGrammar(
+			"lexer grammar L;\n"+
+			"ID : ('\\u4E9C'|'\\u4E9D'|'\\u6C5F'|'\\u305F'..'\\u307B')\n ;");
+		String expecting =
+			"max type 1\n" +
+			"0:TOKEN_START -1\n" +
+			"1:RULE_START 0\n" +
+			"2:RULE_STOP 0\n" +
+			"3:BASIC 0\n" +
+			"4:BASIC 0\n" +
+			"rule 0:1 1\n" +
+			"mode 0:0\n" +
+			"0:'\\u305F'..'\\u307B', '\\u4E9C'..'\\u4E9D', '\\u6C5F'..'\\u6C5F'\n" +
+			"0->1 EPSILON 0,0,0\n" +
+			"1->3 EPSILON 0,0,0\n" +
+			"3->4 SET 0,0,0\n" +
+			"4->2 EPSILON 0,0,0\n" +
+			"0:0\n";
+		ATN atn = createATN(lg, true);
+		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
+		assertEquals(expecting, result);
+	}
+
+	@Test public void testLexerUnicodeEscapedBMPNotSetWithRange() throws Exception {
+		LexerGrammar lg = new LexerGrammar(
+			"lexer grammar L;\n"+
+			"ID : ~('\\u4E9C'|'\\u4E9D'|'\\u6C5F'|'\\u305F'..'\\u307B')\n ;");
+		String expecting =
+			"max type 1\n" +
+			"0:TOKEN_START -1\n" +
+			"1:RULE_START 0\n" +
+			"2:RULE_STOP 0\n" +
+			"3:BASIC 0\n" +
+			"4:BASIC 0\n" +
+			"rule 0:1 1\n" +
+			"mode 0:0\n" +
+			"0:'\\u305F'..'\\u307B', '\\u4E9C'..'\\u4E9D', '\\u6C5F'..'\\u6C5F'\n" +
+			"0->1 EPSILON 0,0,0\n" +
+			"1->3 EPSILON 0,0,0\n" +
+			"3->4 NOT_SET 0,0,0\n" +
+			"4->2 EPSILON 0,0,0\n" +
+			"0:0\n";
+		ATN atn = createATN(lg, true);
+		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
+		assertEquals(expecting, result);
+	}
+
+	@Test public void testLexerUnicodeEscapedSMPNotSet() throws Exception {
+		LexerGrammar lg = new LexerGrammar(
+			"lexer grammar L;\n"+
+			"ID : ~('\\u{1F4A9}'|'\\u{1F4AA}')\n ;");
+		String expecting =
+			"max type 1\n" +
+			"0:TOKEN_START -1\n" +
+			"1:RULE_START 0\n" +
+			"2:RULE_STOP 0\n" +
+			"3:BASIC 0\n" +
+			"4:BASIC 0\n" +
+			"rule 0:1 1\n" +
+			"mode 0:0\n" +
+			"0:128169..128170\n" +
+			"0->1 EPSILON 0,0,0\n" +
+			"1->3 EPSILON 0,0,0\n" +
+			"3->4 NOT_SET 0,0,0\n" +
+			"4->2 EPSILON 0,0,0\n" +
+			"0:0\n";
+		ATN atn = createATN(lg, true);
+		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
+		assertEquals(expecting, result);
+	}
+
+	@Test public void testLexerUnicodeEscapedSMPSetWithRange() throws Exception {
+		LexerGrammar lg = new LexerGrammar(
+			"lexer grammar L;\n"+
+			"ID : ('\\u{1F4A9}'|'\\u{1F4AA}'|'\\u{1F441}'|'\\u{1D40F}'..'\\u{1D413}')\n ;");
+		String expecting =
+			"max type 1\n" +
+			"0:TOKEN_START -1\n" +
+			"1:RULE_START 0\n" +
+			"2:RULE_STOP 0\n" +
+			"3:BASIC 0\n" +
+			"4:BASIC 0\n" +
+			"rule 0:1 1\n" +
+			"mode 0:0\n" +
+			"0:119823..119827, 128065..128065, 128169..128170\n" +
+			"0->1 EPSILON 0,0,0\n" +
+			"1->3 EPSILON 0,0,0\n" +
+			"3->4 SET 0,0,0\n" +
+			"4->2 EPSILON 0,0,0\n" +
+			"0:0\n";
+		ATN atn = createATN(lg, true);
+		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
+		assertEquals(expecting, result);
+	}
+
+	@Test public void testLexerUnicodeEscapedSMPNotSetWithRange() throws Exception {
+		LexerGrammar lg = new LexerGrammar(
+			"lexer grammar L;\n"+
+			"ID : ~('\\u{1F4A9}'|'\\u{1F4AA}'|'\\u{1F441}'|'\\u{1D40F}'..'\\u{1D413}')\n ;");
+		String expecting =
+			"max type 1\n" +
+			"0:TOKEN_START -1\n" +
+			"1:RULE_START 0\n" +
+			"2:RULE_STOP 0\n" +
+			"3:BASIC 0\n" +
+			"4:BASIC 0\n" +
+			"rule 0:1 1\n" +
+			"mode 0:0\n" +
+			"0:119823..119827, 128065..128065, 128169..128170\n" +
 			"0->1 EPSILON 0,0,0\n" +
 			"1->3 EPSILON 0,0,0\n" +
 			"3->4 NOT_SET 0,0,0\n" +

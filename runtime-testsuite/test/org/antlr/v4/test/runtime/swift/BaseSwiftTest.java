@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -9,15 +9,11 @@ package org.antlr.v4.test.runtime.swift;
 import org.antlr.v4.Tool;
 import org.antlr.v4.test.runtime.ErrorQueue;
 import org.antlr.v4.test.runtime.RuntimeTestSupport;
+import org.antlr.v4.test.runtime.StreamVacuum;
 import org.stringtemplate.v4.ST;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,6 +23,7 @@ import java.util.List;
 import java.util.Set;
 
 import static org.antlr.v4.test.runtime.BaseRuntimeTest.antlrOnString;
+import static org.antlr.v4.test.runtime.BaseRuntimeTest.writeFile;
 import static org.junit.Assert.assertTrue;
 
 public class BaseSwiftTest implements RuntimeTestSupport {
@@ -57,7 +54,7 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 		//add antlr.swift
 		final ClassLoader loader = Thread.currentThread().getContextClassLoader();
 
-		final URL swiftRuntime = loader.getResource("Swift/Antlr4");
+		final URL swiftRuntime = loader.getResource("Swift/Sources/Antlr4");
 		if (swiftRuntime == null) {
 			throw new RuntimeException("Swift runtime file not found at:" + swiftRuntime.getPath());
 		}
@@ -118,49 +115,6 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 		return runProcess(argsString, ANTLR_FRAMEWORK_DIR);
 	}
 
-	public static class StreamVacuum implements Runnable {
-		StringBuilder buf = new StringBuilder();
-		BufferedReader in;
-		Thread sucker;
-
-		public StreamVacuum(InputStream in) {
-			this.in = new BufferedReader(new InputStreamReader(in));
-		}
-
-		public void start() {
-			sucker = new Thread(this);
-			sucker.start();
-		}
-
-		@Override
-		public void run() {
-			try {
-				String line = in.readLine();
-				while (line != null) {
-					buf.append(line);
-					buf.append('\n');
-					line = in.readLine();
-				}
-			}
-			catch (IOException ioe) {
-				System.err.println("can't read output from process");
-				ioe.printStackTrace(System.err);
-			}
-		}
-
-		/**
-		 * wait for the thread to finish
-		 */
-		public void join() throws InterruptedException {
-			sucker.join();
-		}
-
-		@Override
-		public String toString() {
-			return buf.toString();
-		}
-	}
-
 	public String tmpdir = null;
 
 	/**
@@ -181,7 +135,8 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 		String prop = System.getProperty(propName);
 		if (prop != null && prop.length() > 0) {
 			tmpdir = prop;
-		} else {
+		}
+		else {
 			tmpdir = new File(System.getProperty("java.io.tmpdir"), getClass().getSimpleName() +
 					"-" + Thread.currentThread().getName() + "-" + System.currentTimeMillis()).getAbsolutePath();
 		}
@@ -364,20 +319,6 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 		return execTest();
 	}
 
-	public static void writeFile(String dir, String fileName, String content) {
-		try {
-			File f = new File(dir, fileName);
-			FileWriter w = new FileWriter(f);
-			BufferedWriter bw = new BufferedWriter(w);
-			bw.write(content);
-			bw.close();
-			w.close();
-		} catch (IOException ioe) {
-			System.err.println("can't write file");
-			ioe.printStackTrace(System.err);
-		}
-	}
-
 	protected void writeParserTestFile(String parserName,
 									   String lexerName,
 									   String parserStartRuleName,
@@ -432,7 +373,8 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 			outputFileST.add("profile",
 					"let profiler = ProfilingATNSimulator(parser)\n" +
 							"parser.setInterpreter(profiler)");
-		} else {
+		}
+		else {
 			outputFileST.add("profile", new ArrayList<Object>());
 		}
 		outputFileST.add("createParser", createParserST);

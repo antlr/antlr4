@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+# Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 # Use of this file is governed by the BSD 3-clause license that
 # can be found in the LICENSE.txt file in the project root.
 #
@@ -10,7 +10,8 @@ import unittest
 #  Vacuum all input from a string and then treat it like a buffer.
 #
 from antlr4.Token import Token
-
+from antlr4.CodePoints import from_unicode, to_unicode
+import sys
 
 class InputStream (object):
 
@@ -21,7 +22,7 @@ class InputStream (object):
 
     def _loadString(self):
         self._index = 0
-        self.data = [ord(c) for c in self.strdata]
+        self.data = list(from_unicode(self.strdata))
         self._size = len(self.data)
 
     @property
@@ -79,9 +80,9 @@ class InputStream (object):
         if stop >= self._size:
             stop = self._size-1
         if start >= self._size:
-            return ""
+            return u""
         else:
-            return self.strdata[start:stop+1]
+            return to_unicode(self.data[start:stop+1])
 
     def __str__(self):
         return unicode(self)

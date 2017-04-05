@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -313,6 +313,30 @@ public class TestUnbufferedCharStream extends BaseJavaToolTest {
 		assertEquals(expecting, tokens.getTokens().toString());
     }
 
+	@Test public void testUnicodeSMP() throws Exception {
+		TestingUnbufferedCharStream input = createStream("\uD83C\uDF0E");
+		assertEquals(0x1F30E, input.LA(1));
+		assertEquals("\uD83C\uDF0E", input.getBuffer());
+		input.consume();
+		assertEquals(IntStream.EOF, input.LA(1));
+		assertEquals("\uFFFF", input.getBuffer());
+	}
+
+	@Test(expected = RuntimeException.class)
+	public void testDanglingHighSurrogateAtEOFThrows() throws Exception {
+		createStream("\uD83C");
+	}
+
+	@Test(expected = RuntimeException.class)
+	public void testDanglingHighSurrogateThrows() throws Exception {
+		createStream("\uD83C\u0123");
+	}
+
+	@Test(expected = RuntimeException.class)
+	public void testDanglingLowSurrogateThrows() throws Exception {
+		createStream("\uDF0E");
+	}
+
 	protected static TestingUnbufferedCharStream createStream(String text) {
 		return new TestingUnbufferedCharStream(new StringReader(text));
 	}
@@ -336,7 +360,13 @@ public class TestUnbufferedCharStream extends BaseJavaToolTest {
 		 */
 		public String getRemainingBuffer() {
 			if ( n==0 ) return "";
-			return new String(data,p,n-p);
+			int len = n;
+			if (data[len-1] == IntStream.EOF) {
+				// Don't pass -1 to new String().
+				return new String(data,p,len-p-1) + "\uFFFF";
+			} else {
+				return new String(data,p,len-p);
+			}
 		}
 
 		/** For testing.  What's in moving window buffer into data stream.
@@ -344,7 +374,14 @@ public class TestUnbufferedCharStream extends BaseJavaToolTest {
 		 */
 		public String getBuffer() {
 			if ( n==0 ) return "";
-			return new String(data,0,n);
+			int len = n;
+			// Don't pass -1 to new String().
+			if (data[len-1] == IntStream.EOF) {
+				// Don't pass -1 to new String().
+				return new String(data,0,len-1) + "\uFFFF";
+			} else {
+				return new String(data,0,len);
+			}
 		}
 
 	}

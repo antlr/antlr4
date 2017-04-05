@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -162,6 +162,12 @@ public class RuleContext implements RuleNode {
 	 *  @since 4.5.3
 	 */
 	public void setAltNumber(int altNumber) { }
+
+	/** @since 4.7. {@see ParseTree#setParent} comment */
+	@Override
+	public void setParent(RuleContext parent) {
+		this.parent = parent;
+	}
 
 	@Override
 	public ParseTree getChild(int i) {

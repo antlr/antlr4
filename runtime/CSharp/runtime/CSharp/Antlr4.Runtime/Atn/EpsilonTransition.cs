@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -27,8 +27,8 @@ namespace Antlr4.Runtime.Atn
         /// the rule index of a precedence rule for which this transition is
         /// returning from, where the precedence value is 0; otherwise, -1.
         /// </returns>
-        /// <seealso cref="ATNConfig.PrecedenceFilterSuppressed()"/>
-        /// <seealso cref="ParserATNSimulator.ApplyPrecedenceFilter(ATNConfigSet, Antlr4.Runtime.ParserRuleContext, PredictionContextCache)"/>
+        /// <seealso cref="ATNConfig.IsPrecedenceFilterSuppressed"/>
+        /// <seealso cref="ParserATNSimulator.ApplyPrecedenceFilter(ATNConfigSet)"/>
         /// <since>4.4.1</since>
         public int OutermostPrecedenceReturn
         {

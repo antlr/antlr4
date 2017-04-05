@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+# Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 # Use of this file is governed by the BSD 3-clause license that
 # can be found in the LICENSE.txt file in the project root.
 #
@@ -19,6 +19,7 @@
 #
 from antlr4 import PredictionContextCache
 from antlr4.dfa.DFA import DFA
+from antlr4.Lexer import Lexer
 from antlr4.Parser import Parser
 from antlr4.ParserRuleContext import InterpreterRuleContext
 from antlr4.Token import Token
@@ -111,7 +112,7 @@ class ParserInterpreter(Parser):
 
         elif tt in [ Transition.RANGE, Transition.SET, Transition.NOT_SET]:
 
-            if not transition.matches(self._input.LA(1), Token.MIN_USER_TOKEN_TYPE, 0xFFFF):
+            if not transition.matches(self._input.LA(1), Token.MIN_USER_TOKEN_TYPE, Lexer.MAX_CHAR_VALUE):
                 self._errHandler.recoverInline(self)
             self.matchWildcard()
 

@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+﻿/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -251,21 +251,21 @@ namespace atn {
 
     std::vector<dfa::DFA> &decisionToDFA;
 
+  private:
     /// <summary>
     /// SLL, LL, or LL + exact ambig detection? </summary>
-  private:
     PredictionMode mode;
 
+  protected:
     /// <summary>
     /// Each prediction operation uses a cache for merge of prediction contexts.
-    ///  Don't keep around as it wastes huge amounts of memory. The merge cache
-    ///  isn't synchronized but we're ok since two threads shouldn't reuse same
-    ///  parser/atnsim object because it can only handle one input at a time.
-    ///  This maps graphs a and b to merged result c. (a,b)->c. We can avoid
-    ///  the merge if we ever see a and b again.  Note that (b,a)->c should
-    ///  also be examined during cache lookup.
+    /// Don't keep around as it wastes huge amounts of memory. The merge cache
+    /// isn't synchronized but we're ok since two threads shouldn't reuse same
+    /// parser/atnsim object because it can only handle one input at a time.
+    /// This maps graphs a and b to merged result c. (a,b)->c. We can avoid
+    /// the merge if we ever see a and b again.  Note that (b,a)->c should
+    /// also be examined during cache lookup.
     /// </summary>
-  protected:
     PredictionContextMergeCache mergeCache;
 
     // LAME globals to avoid parameters!!!!! I need these down deep in predTransition
@@ -286,6 +286,7 @@ namespace atn {
     virtual void clearDFA() override;
     virtual size_t adaptivePredict(TokenStream *input, size_t decision, ParserRuleContext *outerContext);
 
+  protected:
     /// <summary>
     /// Performs ATN simulation to compute a predicted alternative based
     ///  upon the remaining input, but also updates the DFA cache to avoid
@@ -317,7 +318,6 @@ namespace atn {
     ///    conflict
     ///    conflict + preds
     /// </summary>
-  protected:
     virtual size_t execATN(dfa::DFA &dfa, dfa::DFAState *s0, TokenStream *input, size_t startIndex,
                            ParserRuleContext *outerContext);
 

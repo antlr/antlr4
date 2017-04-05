@@ -107,5 +107,13 @@ if (WITH_DEMO)
  add_subdirectory(demo)
 endif(WITH_DEMO)
 
-install(FILES License.txt README.md VERSION 
+if( EXISTS LICENSE.txt)
+install(FILES LICENSE.txt
         DESTINATION "share/doc/libantlr4")
+elseif(EXISTS ../../LICENSE.txt) 
+install(FILES ../../LICENSE.txt
+    DESTINATION "share/doc/libantlr4")
+endif()
+
+install(FILES README.md VERSION 
+    DESTINATION "share/doc/libantlr4")

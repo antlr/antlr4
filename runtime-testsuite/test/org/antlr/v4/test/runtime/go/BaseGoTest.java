@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -33,6 +33,7 @@ import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.test.runtime.ErrorQueue;
 import org.antlr.v4.test.runtime.RuntimeTestSupport;
+import org.antlr.v4.test.runtime.StreamVacuum;
 import org.antlr.v4.tool.ANTLRMessage;
 import org.antlr.v4.tool.DOTGenerator;
 import org.antlr.v4.tool.Grammar;
@@ -43,16 +44,12 @@ import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupString;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.URL;
 import java.util.ArrayList;
@@ -70,6 +67,7 @@ import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.assertTrue;
 import static org.antlr.v4.test.runtime.BaseRuntimeTest.antlrOnString;
+import static org.antlr.v4.test.runtime.BaseRuntimeTest.writeFile;
 import static org.junit.Assert.assertArrayEquals;
 
 public class BaseGoTest implements RuntimeTestSupport {
@@ -216,7 +214,8 @@ public class BaseGoTest implements RuntimeTestSupport {
 			ParserATNFactory f;
 			if (g.isLexer()) {
 				f = new LexerATNFactory((LexerGrammar) g);
-			} else {
+			}
+			else {
 				f = new ParserATNFactory(g);
 			}
 
@@ -287,7 +286,8 @@ public class BaseGoTest implements RuntimeTestSupport {
 			ttype = interp.match(input, Lexer.DEFAULT_MODE);
 			if (ttype == Token.EOF) {
 				tokenTypes.add("EOF");
-			} else {
+			}
+			else {
 				tokenTypes.add(lg.typeToTokenList.get(ttype));
 			}
 
@@ -309,7 +309,7 @@ public class BaseGoTest implements RuntimeTestSupport {
 		boolean success = rawGenerateAndBuildRecognizer(grammarFileName,
 		                                                grammarStr, null, lexerName, "-no-listener");
 		assertTrue(success);
-		writeFile(overall_tmpdir, "input", input);
+		writeFile(overall_tmpdir.toString(), "input", input);
 		writeLexerTestFile(lexerName, showDFA);
 		String output = execModule("Test.go");
 		return output;
@@ -338,7 +338,7 @@ public class BaseGoTest implements RuntimeTestSupport {
 		boolean success = rawGenerateAndBuildRecognizer(grammarFileName,
 		                                                grammarStr, parserName, lexerName, "-visitor");
 		assertTrue(success);
-		writeFile(overall_tmpdir, "input", input);
+		writeFile(overall_tmpdir.toString(), "input", input);
 		rawBuildRecognizerTestFile(parserName, lexerName, listenerName,
 		                           visitorName, startRuleName, showDiagnosticErrors);
 		return execRecognizer();
@@ -370,7 +370,8 @@ public class BaseGoTest implements RuntimeTestSupport {
 		this.stderrDuringParse = null;
 		if (parserName == null) {
 			writeLexerTestFile(lexerName, false);
-		} else {
+		}
+		else {
 			writeParserTestFile(parserName, lexerName, listenerName,
 			                    visitorName, parserStartRuleName, debug);
 		}
@@ -571,45 +572,6 @@ public class BaseGoTest implements RuntimeTestSupport {
 		}
 	}
 
-	public static class StreamVacuum implements Runnable {
-		StringBuilder buf = new StringBuilder();
-		BufferedReader in;
-		Thread sucker;
-
-		public StreamVacuum(InputStream in) {
-			this.in = new BufferedReader(new InputStreamReader(in));
-		}
-
-		public void start() {
-			sucker = new Thread(this);
-			sucker.start();
-		}
-
-		@Override
-		public void run() {
-			try {
-				String line = in.readLine();
-				while (line != null) {
-					buf.append(line);
-					buf.append('\n');
-					line = in.readLine();
-				}
-			} catch (IOException ioe) {
-				System.err.println("can't read output from process");
-			}
-		}
-
-		/** wait for the thread to finish */
-		public void join() throws InterruptedException {
-			sucker.join();
-		}
-
-		@Override
-		public String toString() {
-			return buf.toString();
-		}
-	}
-
 	protected void checkGrammarSemanticsError(ErrorQueue equeue,
 	                                          GrammarSemanticsMessage expectedMessage) throws Exception {
 		ANTLRMessage foundMsg = null;
@@ -700,35 +662,6 @@ public class BaseGoTest implements RuntimeTestSupport {
 		}
 	}
 
-	public static void writeFile(File dir, String fileName, String content) {
-		try {
-			File f = new File(dir, fileName);
-			FileWriter w = new FileWriter(f);
-			BufferedWriter bw = new BufferedWriter(w);
-			bw.write(content);
-			bw.close();
-			w.close();
-		} catch (IOException ioe) {
-			System.err.println("can't write file");
-			ioe.printStackTrace(System.err);
-		}
-	}
-
-	public static void writeFile(String dir, String fileName, InputStream content) {
-		try {
-			File f = new File(dir, fileName);
-			OutputStream output = new FileOutputStream(f);
-			while(content.available()>0) {
-				int b = content.read();
-				output.write(b);
-			}
-			output.close();
-		} catch (IOException ioe) {
-			System.err.println("can't write file");
-			ioe.printStackTrace(System.err);
-		}
-	}
-
 	protected void mkdir(File dir) {
 		dir.mkdirs();
 	}
@@ -785,7 +718,7 @@ public class BaseGoTest implements RuntimeTestSupport {
 		outputFileST.add("listenerName", listenerName);
 		outputFileST.add("visitorName", visitorName);
 		outputFileST.add("parserStartRuleName", parserStartRuleName.substring(0, 1).toUpperCase() + parserStartRuleName.substring(1) );
-		writeFile(overall_tmpdir, "Test.go", outputFileST.render());
+		writeFile(overall_tmpdir.toString(), "Test.go", outputFileST.render());
 	}
 
 
@@ -813,7 +746,7 @@ public class BaseGoTest implements RuntimeTestSupport {
 				+ "}\n"
 				+ "\n");
 		outputFileST.add("lexerName", lexerName);
-		writeFile(overall_tmpdir, "Test.go", outputFileST.render());
+		writeFile(overall_tmpdir.toString(), "Test.go", outputFileST.render());
 	}
 
 	public void writeRecognizer(String parserName, String lexerName,
@@ -821,7 +754,8 @@ public class BaseGoTest implements RuntimeTestSupport {
 	                            String parserStartRuleName, boolean debug) {
 		if (parserName == null) {
 			writeLexerTestFile(lexerName, debug);
-		} else {
+		}
+		else {
 			writeParserTestFile(parserName, lexerName, listenerName,
 			                    visitorName, parserStartRuleName, debug);
 		}
@@ -845,7 +779,8 @@ public class BaseGoTest implements RuntimeTestSupport {
 			for (File file : files) {
 				if (file.isDirectory()) {
 					eraseDirectory(file);
-				} else {
+				}
+				else {
 					file.delete();
 				}
 			}

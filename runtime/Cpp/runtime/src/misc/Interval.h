@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+﻿/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -27,7 +27,7 @@ namespace misc {
 
     Interval();
     explicit Interval(size_t a_, size_t b_); // For unsigned -> signed mappings.
-    Interval(ssize_t a_, ssize_t b_, bool autoExtend = false); // Automatically extend a value of 0xFFFF to 0x10FFFF.
+    Interval(ssize_t a_, ssize_t b_);
     virtual ~Interval() {};
 
     /// return number of elements between a and b inclusively. x..x is length 1.

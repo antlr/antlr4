@@ -1,4 +1,4 @@
-// Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 // Use of this file is governed by the BSD 3-clause license that
 // can be found in the LICENSE.txt file in the project root.
 
@@ -15,15 +15,16 @@ import (
 // This is the earliest supported serialized UUID.
 // stick to serialized version for now, we don't need a UUID instance
 var BaseSerializedUUID = "AADB8D7E-AEEF-4415-AD2B-8204D6CF042E"
+var AddedUnicodeSMP = "59627784-3BE5-417A-B9EB-8131A7286089"
 
 // This list contains all of the currently supported UUIDs, ordered by when
 // the feature first appeared in this branch.
-var SupportedUUIDs = []string{BaseSerializedUUID}
+var SupportedUUIDs = []string{BaseSerializedUUID, AddedUnicodeSMP}
 
 var SerializedVersion = 3
 
 // This is the current serialized UUID.
-var SerializedUUID = BaseSerializedUUID
+var SerializedUUID = AddedUnicodeSMP
 
 type LoopEndStateIntPair struct {
 	item0 *LoopEndState
@@ -91,7 +92,15 @@ func (a *ATNDeserializer) DeserializeFromUInt16(data []uint16) *ATN {
 	a.readRules(atn)
 	a.readModes(atn)
 
-	sets := a.readSets(atn)
+	sets := make([]*IntervalSet, 0)
+
+	// First, deserialize sets with 16-bit arguments <= U+FFFF.
+	sets = a.readSets(atn, sets, a.readInt)
+	// Next, if the ATN was serialized with the Unicode SMP feature,
+	// deserialize sets with 32-bit arguments <= U+10FFFF.
+	if (a.isFeatureSupported(AddedUnicodeSMP, a.uuid)) {
+		sets = a.readSets(atn, sets, a.readInt32)
+	}
 
 	a.readEdges(atn, sets)
 	a.readDecisions(atn)
@@ -266,8 +275,7 @@ func (a *ATNDeserializer) readModes(atn *ATN) {
 	}
 }
 
-func (a *ATNDeserializer) readSets(atn *ATN) []*IntervalSet {
-	sets := make([]*IntervalSet, 0)
+func (a *ATNDeserializer) readSets(atn *ATN, sets []*IntervalSet, readUnicode func() int) []*IntervalSet {
 	m := a.readInt()
 
 	for i := 0; i < m; i++ {
@@ -283,8 +291,8 @@ func (a *ATNDeserializer) readSets(atn *ATN) []*IntervalSet {
 		}
 
 		for j := 0; j < n; j++ {
-			i1 := a.readInt()
-			i2 := a.readInt()
+			i1 := readUnicode()
+			i2 := readUnicode()
 
 			iset.addRange(i1, i2)
 		}
@@ -640,6 +648,12 @@ func (a *ATNDeserializer) readInt() int {
 	a.pos++
 
 	return int(v)
+}
+
+func (a *ATNDeserializer) readInt32() int {
+	var low = a.readInt()
+	var high = a.readInt()
+	return low | (high << 16)
 }
 
 //TODO

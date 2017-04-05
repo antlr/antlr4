@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -23,7 +23,7 @@ namespace Antlr4.Runtime.Atn
     /// the two-stage parsing strategy to improve parsing performance for that
     /// input.</p>
     /// </remarks>
-    /// <seealso cref="ParserATNSimulator.ReportContextSensitivity(Antlr4.Runtime.Dfa.DFA, int, SimulatorState, int, int)"/>
+    /// <seealso cref="ParserATNSimulator.ReportContextSensitivity(Dfa.DFA, int, ATNConfigSet, int, int)"/>
     /// <seealso cref="Antlr4.Runtime.IParserErrorListener.ReportContextSensitivity(Antlr4.Runtime.Parser, Antlr4.Runtime.Dfa.DFA, int, int, int, SimulatorState)"/>
     /// <since>4.3</since>
     public class ContextSensitivityInfo : DecisionEventInfo

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -34,6 +34,11 @@ public final class RangeTransition extends Transition {
 
 	@Override
 	public String toString() {
-		return "'"+(char)from+"'..'"+(char)to+"'";
+		return new StringBuilder("'")
+				.appendCodePoint(from)
+				.append("'..'")
+				.appendCodePoint(to)
+				.append("'")
+				.toString();
 	}
 }

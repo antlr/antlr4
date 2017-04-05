@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -23,6 +23,24 @@ public interface ParseTree extends SyntaxTree {
 	ParseTree getParent();
 	@Override
 	ParseTree getChild(int i);
+
+
+	/** Set the parent for this node.
+	 *
+	 *  This is not backward compatible as it changes
+	 *  the interface but no one was able to create custom
+	 *  nodes anyway so I'm adding as it improves internal
+	 *  code quality.
+	 *
+	 *  One could argue for a restructuring of
+	 *  the class/interface hierarchy so that
+	 *  setParent, addChild are moved up to Tree
+	 *  but that's a major change. So I'll do the
+	 *  minimal change, which is to add this method.
+	 *
+	 *  @since 4.7
+	 */
+	void setParent(RuleContext parent);
 
 	/** The {@link ParseTreeVisitor} needs a double dispatch method. */
 	<T> T accept(ParseTreeVisitor<? extends T> visitor);

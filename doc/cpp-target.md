@@ -1,6 +1,6 @@
 # C++
 
-The C++ target supports all platforms that can either run MS Visual Studio 2013 (or newer), XCode 7 (or newer) or CMake (C++11 required). All build tools can either create static or dynamic libraries, both as 64bit or 32bit arch. Additionally, XCode can create an iOS library.
+The C++ target supports all platforms that can either run MS Visual Studio 2013 (or newer), XCode 7 (or newer) or CMake (C++11 required). All build tools can either create static or dynamic libraries, both as 64bit or 32bit arch. Additionally, XCode can create an iOS library. Also see [Antlr4 for C++ with CMake: A practical example](http://blorente.me//Antlr-,-C++-and-CMake-Wait-what.html).
 
 ## How to create a C++ lexer or parser?
 This is pretty much the same as creating a Java lexer or parser, except you need to specify the language target, for example:
@@ -106,16 +106,12 @@ For gcc and clang it is possible to use the `-fvisibility=hidden` setting to hid
 Since C++ has no built-in memory management we need to take extra care. For that we rely mostly on smart pointers, which however might cause time penalties or memory side effects (like cyclic references) if not used with care. Currently however the memory household looks very stable. Generally, when you see a raw pointer in code consider this as being managed elsewehere. You should never try to manage such a pointer (delete, assign to smart pointer etc.).
 
 ### Unicode Support
-Encoding is mostly an input issue, i.e. when the lexer converts text input into lexer tokens. The parser is completely encoding unaware. However, lexer input in the grammar is defined by character ranges with either a single member (e.g. 'a' or [a] or [abc]), an explicit range (e.g. 'a'..'z' or [a-z]), the full Unicode range (for a wildcard) and the full Unicode range minus a sub range (for negated ranges, e.g. ~[a]). The explicit ranges (including single member ranges) are encoded in the serialized ATN by 16bit numbers, hence cannot reach beyond 0xFFFF (the Unicode BMP), while the implicit ranges can include any value (and hence support the full Unicode set, up to 0x10FFFF).
+Encoding is mostly an input issue, i.e. when the lexer converts text input into lexer tokens. The parser is completely encoding unaware.
 
-> An interesting side note here is that the Java target fully supports Unicode as well, despite the inherent limitations from the serialized ATN. That's possible because the Java String class represents characters beyond the BMP as surrogate pairs (two 16bit values) and even reads them as 2 separate input characters. To make this work a character range for an identifier in a grammar must include the surrogate pairs area (for a Java parser).
-
-The C++ target however always expects UTF-8 input (either in a string or via a wide stream) which is then converted to UTF-32 (a char32_t array) and fed to the lexer. ANTLR, when parsing your grammar, limits character ranges explicitly to the BMP currently. So, in order to allow specifying the full Unicode set the C++ target uses a little trick: whenever an explicit character range includes the (unused) codepoint 0xFFFF in a grammar it is silently extended to the full Unicode range. It's clear that this is an all-or-nothing solution. You cannot define a subset of Unicode codepoints > 0xFFFF that way. This can only be solved if ANTLR supports larger character intervals.
-
-The differences in handling characters beyond the BMP leads to a difference between Java and C++ lexers: the character offsets may not concur. This is because Java reads two 16bit values per Unicode char (if that falls into the surrogate area) while a C++ parser only reads one 32bit value. That usually doesn't have practical consequences, but might confuse people when comparing token positions.
+The C++ target always expects UTF-8 input (either in a string or stream) which is then converted to UTF-32 (a char32_t array) and fed to the lexer.
 
 ### Named Actions
-In order to help customizing the generated files there are a number of additional socalled **named actions**. These actions are tight to specific areas in the generated code and allow to add custom (target specific) code. All targets support these actions 
+In order to help customizing the generated files there are a number of additional socalled **named actions**. These actions are tight to specific areas in the generated code and allow to add custom (target specific) code. All targets support these actions
 
 * @parser::header
 * @parser::members

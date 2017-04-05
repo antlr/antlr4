@@ -1,7 +1,9 @@
 #
-# Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+# Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 # Use of this file is governed by the BSD 3-clause license that
 # can be found in the LICENSE.txt file in the project root.
+import sys
+from typing.io import TextIO
 from antlr4.BufferedTokenStream import TokenStream
 from antlr4.CommonTokenFactory import TokenFactory
 from antlr4.error.ErrorStrategy import DefaultErrorStrategy
@@ -23,18 +25,18 @@ class TraceListener(ParseTreeListener):
         self._parser = parser
 
     def enterEveryRule(self, ctx):
-        print("enter   " + self._parser.ruleNames[ctx.getRuleIndex()] + ", LT(1)=" + self._parser._input.LT(1).text)
+        print("enter   " + self._parser.ruleNames[ctx.getRuleIndex()] + ", LT(1)=" + self._parser._input.LT(1).text, file=self._parser._output)
 
     def visitTerminal(self, node):
 
-        print("consume " + str(node.symbol) + " rule " + self._parser.ruleNames[self._parser._ctx.getRuleIndex()])
+        print("consume " + str(node.symbol) + " rule " + self._parser.ruleNames[self._parser._ctx.getRuleIndex()], file=self._parser._output)
 
     def visitErrorNode(self, node):
         pass
 
 
     def exitEveryRule(self, ctx):
-        print("exit    " + self._parser.ruleNames[ctx.getRuleIndex()] + ", LT(1)=" + self._parser._input.LT(1).text)
+        print("exit    " + self._parser.ruleNames[ctx.getRuleIndex()] + ", LT(1)=" + self._parser._input.LT(1).text, file=self._parser._output)
 
 
 # self is all the parsing support code essentially; most of it is error recovery stuff.#
@@ -47,10 +49,11 @@ class Parser (Recognizer):
     #
     bypassAltsAtnCache = dict()
 
-    def __init__(self, input:TokenStream):
+    def __init__(self, input:TokenStream, output:TextIO = sys.stdout):
         super().__init__()
         # The input stream.
         self._input = None
+        self._output = output
         # The error handling strategy for the parser. The default value is a new
         # instance of {@link DefaultErrorStrategy}.
         self._errHandler = DefaultErrorStrategy()
@@ -538,9 +541,9 @@ class Parser (Recognizer):
             dfa = self._interp.decisionToDFA[i]
             if len(dfa.states)>0:
                 if seenOne:
-                    print()
-                print("Decision " + str(dfa.decision) + ":")
-                print(dfa.toString(self.literalNames, self.symbolicNames), end='')
+                    print(file=self._output)
+                print("Decision " + str(dfa.decision) + ":", file=self._output)
+                print(dfa.toString(self.literalNames, self.symbolicNames), end='', file=self._output)
                 seenOne = True
 
 

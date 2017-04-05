@@ -16,7 +16,7 @@ Links in the documentation refer to various sections of the book but have been r
 <a href=""><img src=images/tpantlr2.png width=120></a>
 <a href=""><img src=images/tpdsl.png width=120></a>
 <a href="https://www.youtube.com/watch?v=OAoA3E-cyug"><img src=images/teronbook.png width=250></a>
-                 
+
 This documentation is a reference and summarizes grammar syntax and the key semantics of ANTLR grammars. The source code for all examples in the book, not just this chapter, are free at the publisher's website. The following video is a general tour of ANTLR 4 and includes a description of how to use parse tree listeners to process Java files easily:
 
 <a href="https://vimeo.com/59285751"><img src=images/tertalk.png width=200></a>
@@ -51,8 +51,10 @@ This documentation is a reference and summarizes grammar syntax and the key sema
 
 * [Runtime Libraries and Code Generation Targets](targets.md)
 
+* [Unicode U+FFFF, U+10FFFF character streams](unicode.md)
+
 * [Parsing binary streams](parsing-binary-files.md)
- 
+
 * [Parser and lexer interpreters](interpreters.md)
 
 * [Resources](resources.md)
@@ -60,6 +62,8 @@ This documentation is a reference and summarizes grammar syntax and the key sema
 # Building / releasing ANTLR itself
 
 * [Building ANTLR itself](building-antlr.md)
+
+* [Contributing to ANTLR](/CONTRIBUTING.md)
 
 * [Cutting an ANTLR Release](releasing-antlr.md)
 

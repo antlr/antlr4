@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -8,6 +8,7 @@ package org.antlr.v4.codegen.target;
 
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.codegen.Target;
+import org.antlr.v4.codegen.UnicodeEscapes;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNDeserializer;
@@ -86,7 +87,7 @@ public class SwiftTarget extends Target {
 
     @Override
     public String getVersion() {
-        return "4.6.1"; // Java and tool versions move in lock step
+        return "4.7"; // Java and tool versions move in lock step
     }
 
     public Set<String> getBadWords() {
@@ -123,7 +124,8 @@ public class SwiftTarget extends Target {
 
         if (g.isLexer()  && lexerAtnJSON == null) {
             lexerAtnJSON = getLexerOrParserATNJson(g, fileName);
-        } else if (!g.isLexer()  && parserAtnJSON == null && g.atn != null) {
+        }
+        else if (!g.isLexer()  && parserAtnJSON == null && g.atn != null) {
             parserAtnJSON = getLexerOrParserATNJson(g, fileName);
         }
 
@@ -550,4 +552,9 @@ public class SwiftTarget extends Target {
         }
 
     }
+
+	@Override
+	protected void appendUnicodeEscapedCodePoint(int codePoint, StringBuilder sb) {
+		UnicodeEscapes.appendSwiftStyleEscapedCodePoint(codePoint, sb);
+	}
 }

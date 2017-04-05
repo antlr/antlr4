@@ -1,10 +1,12 @@
 /*
- * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
 package org.antlr.v4.runtime;
+
+import org.antlr.v4.runtime.tree.ErrorNode;
 
 /**
  * The interface for defining strategies to deal with syntax errors encountered
@@ -89,8 +91,9 @@ public interface ANTLRErrorStrategy {
 	 * Tests whether or not {@code recognizer} is in the process of recovering
 	 * from an error. In error recovery mode, {@link Parser#consume} adds
 	 * symbols to the parse tree by calling
-	 * {@link ParserRuleContext#addErrorNode(Token)} instead of
-	 * {@link ParserRuleContext#addChild(Token)}.
+	 * {@link Parser#createErrorNode(ParserRuleContext, Token)} then
+	 * {@link ParserRuleContext#addErrorNode(ErrorNode)} instead of
+	 * {@link Parser#createTerminalNode(ParserRuleContext, Token)}.
 	 *
 	 * @param recognizer the parser instance
 	 * @return {@code true} if the parser is currently recovering from a parse

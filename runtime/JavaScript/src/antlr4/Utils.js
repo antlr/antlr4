@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -361,7 +361,7 @@ Hash.prototype.update = function () {
             k = (k << 15) | (k >>> (32 - 15));
             k = k * 0x1B873593;
             this.count = this.count + 1;
-            hash = this.hash ^ k;
+            var hash = this.hash ^ k;
             hash = (hash << 13) | (hash >>> (32 - 13));
             hash = hash * 5 + 0xE6546B64;
             this.hash = hash;

@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+﻿/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -12,6 +12,7 @@
 #include "atn/SingletonPredictionContext.h"
 #include "atn/PredicateTransition.h"
 #include "atn/ActionTransition.h"
+#include "atn/TokensStartState.h"
 #include "misc/Interval.h"
 #include "dfa/DFA.h"
 #include "Lexer.h"
@@ -102,7 +103,7 @@ void LexerATNSimulator::clearDFA() {
 }
 
 size_t LexerATNSimulator::matchATN(CharStream *input) {
-  ATNState *startState = (ATNState *)atn.modeToStartState[_mode];
+  ATNState *startState = atn.modeToStartState[_mode];
 
   std::unique_ptr<ATNConfigSet> s0_closure = computeStartState(input, startState);
 

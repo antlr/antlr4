@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+# Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 # Use of this file is governed by the BSD 3-clause license that
 # can be found in the LICENSE.txt file in the project root.
 #/
@@ -291,7 +291,8 @@ class LexerATNSimulator(ATNSimulator):
             lexerActionExecutor.execute(self.recog, input, startIndex)
 
     def getReachableTarget(self, trans:Transition, t:int):
-        if trans.matches(t, 0, 0xFFFE):
+        from antlr4.Lexer import Lexer
+        if trans.matches(t, 0, Lexer.MAX_CHAR_VALUE):
             return trans.target
         else:
             return None
@@ -419,7 +420,8 @@ class LexerATNSimulator(ATNSimulator):
 
         elif t.serializationType in [ Transition.ATOM, Transition.RANGE, Transition.SET ]:
             if treatEofAsEpsilon:
-                if t.matches(Token.EOF, 0, 0xFFFF):
+                from antlr4.Lexer import Lexer
+                if t.matches(Token.EOF, 0, Lexer.MAX_CHAR_VALUE):
                     c = LexerATNConfig(state=t.target, config=config)
 
         return c

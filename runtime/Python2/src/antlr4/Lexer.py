@@ -1,4 +1,4 @@
-# Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+# Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 # Use of this file is governed by the BSD 3-clause license that
 # can be found in the LICENSE.txt file in the project root.
 #/
@@ -8,7 +8,9 @@
 #  uses simplified match() and error recovery mechanisms in the interest
 #  of speed.
 #/
+from __future__ import print_function
 from io import StringIO
+import sys
 from antlr4.CommonTokenFactory import CommonTokenFactory
 from antlr4.Recognizer import Recognizer
 from antlr4.Token import Token
@@ -27,12 +29,13 @@ class Lexer(Recognizer, TokenSource):
 
     DEFAULT_TOKEN_CHANNEL = Token.DEFAULT_CHANNEL
     HIDDEN = Token.HIDDEN_CHANNEL
-    MIN_CHAR_VALUE = '\u0000'
-    MAX_CHAR_VALUE = '\uFFFE'
+    MIN_CHAR_VALUE = 0x0000
+    MAX_CHAR_VALUE = 0x10FFFF
 
-    def __init__(self, input):
+    def __init__(self, input, output=sys.stdout):
         super(Lexer, self).__init__()
         self._input = input
+        self._output = output
         self._factory = CommonTokenFactory.DEFAULT
         self._tokenFactorySourcePair = (self, input)
 
@@ -160,7 +163,7 @@ class Lexer(Recognizer, TokenSource):
 
     def pushMode(self, m):
         if self._interp.debug:
-            print("pushMode " + str(m))
+            print("pushMode " + str(m), file=self._output)
         self._modeStack.append(self._mode)
         self.mode(m)
 
@@ -168,7 +171,7 @@ class Lexer(Recognizer, TokenSource):
         if len(self._modeStack)==0:
             raise Exception("Empty Stack")
         if self._interp.debug:
-            print("popMode back to "+ self._modeStack[:-1])
+            print("popMode back to "+ self._modeStack[:-1], file=self._output)
         self.mode( self._modeStack.pop() )
         return self._mode
 
@@ -275,7 +278,7 @@ class Lexer(Recognizer, TokenSource):
         start = self._tokenStartCharIndex
         stop = self._input.index
         text = self._input.getText(start, stop)
-        msg = "token recognition error at: '" + self.getErrorDisplay(text) + "'"
+        msg = u"token recognition error at: '" + self.getErrorDisplay(text) + u"'"
         listener = self.getErrorListenerDispatch()
         listener.syntaxError(self, None, self._tokenStartLine, self._tokenStartColumn, msg, e)
 
@@ -288,17 +291,17 @@ class Lexer(Recognizer, TokenSource):
     def getErrorDisplayForChar(self, c):
         if ord(c[0])==Token.EOF:
             return "<EOF>"
-        elif c=='\n':
-            return "\\n"
-        elif c=='\t':
-            return "\\t"
-        elif c=='\r':
-            return "\\r"
+        elif c==u'\n':
+            return u"\\n"
+        elif c==u'\t':
+            return u"\\t"
+        elif c==u'\r':
+            return u"\\r"
         else:
-            return unicode(c)
+            return c
 
     def getCharErrorDisplay(self, c):
-        return "'" + self.getErrorDisplayForChar(c) + "'"
+        return u"'" + self.getErrorDisplayForChar(c) + u"'"
 
     # Lexers can normally match any char in it's vocabulary after matching
     #  a token, so do the easy thing and just kill a character and hope

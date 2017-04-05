@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -8,6 +8,7 @@ package org.antlr.v4.codegen.target;
 
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.codegen.Target;
+import org.antlr.v4.codegen.UnicodeEscapes;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.stringtemplate.v4.NumberRenderer;
@@ -49,7 +50,7 @@ public class CppTarget extends Target {
 	}
 
 	public String getVersion() {
-		return "4.6.1";
+		return "4.7";
 	}
 
     public boolean needsHeader() { return true; }
@@ -66,81 +67,6 @@ public class CppTarget extends Target {
 		badWords.addAll(Arrays.asList(cppKeywords));
 		badWords.add("rule");
 		badWords.add("parserRule");
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * <p/>
-	 * For C++, this is the translation {@code 'a\n"'} &rarr; {@code "a\n\""}.
-	 * Expect single quotes around the incoming literal. Just flip the quotes
-	 * and replace double quotes with {@code \"}.
-	 * <p/>
-	 * Note that we have decided to allow people to use '\"' without penalty, so
-	 * we must build the target string in a loop as {@link String#replace}
-	 * cannot handle both {@code \"} and {@code "} without a lot of messing
-	 * around.
-	 */
-	@Override
-	public String getTargetStringLiteralFromANTLRStringLiteral(
-		CodeGenerator generator,
-		String literal, boolean addQuotes)
-	{
-		StringBuilder sb = new StringBuilder();
-		String is = literal;
-
-		if ( addQuotes ) sb.append('"');
-
-		for (int i = 1; i < is.length() -1; i++) {
-			if  (is.charAt(i) == '\\') {
-				// Anything escaped is what it is! We assume that
-				// people know how to escape characters correctly. However
-				// we catch anything that does not need an escape in Java (which
-				// is what the default implementation is dealing with and remove
-				// the escape. The C target does this for instance.
-				//
-				switch (is.charAt(i+1)) {
-					// Pass through any escapes that Java also needs
-					//
-					case    '"':
-					case    'n':
-					case    'r':
-					case    't':
-					case    'b':
-					case    'f':
-					case    '\\':
-						// Pass the escape through
-						sb.append('\\');
-						break;
-
-					case    'u':    // Assume unnnn
-						// Pass the escape through as double \\
-						// so that Java leaves as \u0000 string not char
-						sb.append('\\');
-						sb.append('\\');
-						break;
-
-					default:
-						// Remove the escape by virtue of not adding it here
-						// Thus \' becomes ' and so on
-						break;
-				}
-
-				// Go past the \ character
-				i++;
-			} else {
-				// Characters that don't need \ in ANTLR 'strings' but do in Java
-				if (is.charAt(i) == '"') {
-					// We need to escape " in Java
-					sb.append('\\');
-				}
-			}
-			// Add in the next character, which may have been escaped
-			sb.append(is.charAt(i));
-		}
-
-		if ( addQuotes ) sb.append('"');
-
-		return sb.toString();
 	}
 
 	@Override
@@ -231,5 +157,11 @@ public class CppTarget extends Target {
 		});
 
 		return result;
+	}
+
+	@Override
+	protected void appendUnicodeEscapedCodePoint(int codePoint, StringBuilder sb) {
+		// C99 and Python share the same escaping style.
+		UnicodeEscapes.appendPythonStyleEscapedCodePoint(codePoint, sb);
 	}
 }

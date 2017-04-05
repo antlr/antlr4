@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -1301,7 +1301,11 @@ public class Grammar implements AttributeResolver {
 
 		char[] serializedAtn = ATNSerializer.getSerializedAsChars(atn);
 		ATN deserialized = new ATNDeserializer().deserialize(serializedAtn);
-		return new LexerInterpreter(fileName, getVocabulary(), Arrays.asList(getRuleNames()), ((LexerGrammar)this).modes.keySet(), deserialized, input);
+		List<String> allChannels = new ArrayList<String>();
+		allChannels.add("DEFAULT_TOKEN_CHANNEL");
+		allChannels.add("HIDDEN");
+		allChannels.addAll(channelValueToNameList);
+		return new LexerInterpreter(fileName, getVocabulary(), Arrays.asList(getRuleNames()), allChannels, ((LexerGrammar)this).modes.keySet(), deserialized, input);
 	}
 
 	/** @since 4.5.1 */

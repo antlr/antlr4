@@ -1,9 +1,10 @@
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 using System;
 using System.Collections.Generic;
+using System.IO;
 namespace Antlr4.Runtime
 {
     /// <summary>
@@ -35,11 +36,11 @@ namespace Antlr4.Runtime
             }
         }
 
-        public virtual void SyntaxError(IRecognizer recognizer, Symbol offendingSymbol, int line, int charPositionInLine, string msg, RecognitionException e)
+        public virtual void SyntaxError(TextWriter output, IRecognizer recognizer, Symbol offendingSymbol, int line, int charPositionInLine, string msg, RecognitionException e)
         {
             foreach (IAntlrErrorListener<Symbol> listener in delegates)
             {
-                listener.SyntaxError(recognizer, offendingSymbol, line, charPositionInLine, msg, e);
+                listener.SyntaxError(output, recognizer, offendingSymbol, line, charPositionInLine, msg, e);
             }
         }
     }

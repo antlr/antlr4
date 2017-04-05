@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -12,6 +12,7 @@ import org.antlr.v4.runtime.atn.LexerATNSimulator;
 import org.antlr.v4.runtime.atn.PredictionContextCache;
 import org.antlr.v4.runtime.dfa.DFA;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 public class LexerInterpreter extends Lexer {
@@ -21,6 +22,7 @@ public class LexerInterpreter extends Lexer {
 	@Deprecated
 	protected final String[] tokenNames;
 	protected final String[] ruleNames;
+	protected final String[] channelNames;
 	protected final String[] modeNames;
 
 
@@ -32,10 +34,15 @@ public class LexerInterpreter extends Lexer {
 
 	@Deprecated
 	public LexerInterpreter(String grammarFileName, Collection<String> tokenNames, Collection<String> ruleNames, Collection<String> modeNames, ATN atn, CharStream input) {
-		this(grammarFileName, VocabularyImpl.fromTokenNames(tokenNames.toArray(new String[tokenNames.size()])), ruleNames, modeNames, atn, input);
+		this(grammarFileName, VocabularyImpl.fromTokenNames(tokenNames.toArray(new String[tokenNames.size()])), ruleNames, new ArrayList<String>(), modeNames, atn, input);
 	}
 
+	@Deprecated
 	public LexerInterpreter(String grammarFileName, Vocabulary vocabulary, Collection<String> ruleNames, Collection<String> modeNames, ATN atn, CharStream input) {
+		this(grammarFileName, vocabulary, ruleNames, new ArrayList<String>(), modeNames, atn, input);
+	}
+
+	public LexerInterpreter(String grammarFileName, Vocabulary vocabulary, Collection<String> ruleNames, Collection<String> channelNames, Collection<String> modeNames, ATN atn, CharStream input) {
 		super(input);
 
 		if (atn.grammarType != ATNType.LEXER) {
@@ -50,6 +57,7 @@ public class LexerInterpreter extends Lexer {
 		}
 
 		this.ruleNames = ruleNames.toArray(new String[ruleNames.size()]);
+		this.channelNames = channelNames.toArray(new String[channelNames.size()]);
 		this.modeNames = modeNames.toArray(new String[modeNames.size()]);
 		this.vocabulary = vocabulary;
 
@@ -79,6 +87,11 @@ public class LexerInterpreter extends Lexer {
 	@Override
 	public String[] getRuleNames() {
 		return ruleNames;
+	}
+
+	@Override
+	public String[] getChannelNames() {
+		return channelNames;
 	}
 
 	@Override

@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+﻿/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -100,7 +100,7 @@ ParseTreePattern ParseTreePatternMatcher::compile(const std::string &pattern, in
     throw e;
 #else
   } catch (std::exception & /*e*/) {
-    std::throw_with_nested("Cannot invoke start rule"); // Wrap any other exception. We should however probably use one of the ANTLR exceptions here.
+    std::throw_with_nested((const char*)"Cannot invoke start rule"); // Wrap any other exception. We should however probably use one of the ANTLR exceptions here.
 #endif
   }
 

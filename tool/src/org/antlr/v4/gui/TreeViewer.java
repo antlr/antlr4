@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -159,7 +159,8 @@ public class TreeViewer extends JComponent {
 					double ctrly2 = y1;
 					c.setCurve(x1, y1, ctrlx1, ctrly1, ctrlx2, ctrly2, x2, y2);
 					((Graphics2D) g).draw(c);
-				} else {
+				}
+				else {
 					g.drawLine((int) x1, (int) y1,
 							   (int) x2, (int) y2);
 				}

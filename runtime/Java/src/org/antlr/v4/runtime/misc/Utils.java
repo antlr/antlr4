@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -137,11 +137,7 @@ public class Utils {
 
 	public static char[] toCharArray(IntegerList data) {
 		if ( data==null ) return null;
-		char[] cdata = new char[data.size()];
-		for (int i=0; i<data.size(); i++) {
-			cdata[i] = (char)data.get(i);
-		}
-		return cdata;
+		return data.toCharArray();
 	}
 
 	public static IntervalSet toSet(BitSet bits) {

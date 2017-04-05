@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+# Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 # Use of this file is governed by the BSD 3-clause license that
 # can be found in the LICENSE.txt file in the project root.
 #
@@ -16,12 +16,12 @@ from antlr4.InputStream import InputStream
 
 class FileStream(InputStream):
 
-    def __init__(self, fileName, encoding='ascii'):
+    def __init__(self, fileName, encoding='ascii', errors='strict'):
         self.fileName = fileName
         # read binary to avoid line ending conversion
         with open(fileName, 'rb') as file:
             bytes = file.read()
-            data = codecs.decode(bytes, encoding)
+            data = codecs.decode(bytes, encoding, errors)
             super(type(self), self).__init__(data)
 
 

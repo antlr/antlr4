@@ -1,9 +1,10 @@
-﻿/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+﻿/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
-#include "tree/ErrorNodeImpl.h"
+#include "tree/TerminalNode.h"
+#include "tree/ErrorNode.h"
 #include "misc/Interval.h"
 #include "Parser.h"
 #include "Token.h"
@@ -34,6 +35,22 @@ void ParserRuleContext::copyFrom(ParserRuleContext *ctx) {
 
   this->start = ctx->start;
   this->stop = ctx->stop;
+
+  // copy any error nodes to alt label node
+  if (!ctx->children.empty()) {
+    for (auto child : ctx->children) {
+      auto errorNode = dynamic_cast<ErrorNode *>(child);
+      if (errorNode != nullptr) {
+        errorNode->setParent(this);
+        children.push_back(errorNode);
+      }
+    }
+
+    // Remove the just reparented error nodes from the source context.
+    ctx->children.erase(std::remove_if(ctx->children.begin(), ctx->children.end(), [this](tree::ParseTree *e) -> bool {
+      return std::find(children.begin(), children.end(), e) != children.end();
+    }), ctx->children.end());
+  }
 }
 
 void ParserRuleContext::enterRule(tree::ParseTreeListener * /*listener*/) {
@@ -43,6 +60,7 @@ void ParserRuleContext::exitRule(tree::ParseTreeListener * /*listener*/) {
 }
 
 tree::TerminalNode* ParserRuleContext::addChild(tree::TerminalNode *t) {
+  t->setParent(this);
   children.push_back(t);
   return t;
 }
@@ -56,20 +74,6 @@ void ParserRuleContext::removeLastChild() {
   if (!children.empty()) {
     children.pop_back();
   }
-}
-
-tree::TerminalNode* ParserRuleContext::addChild(ParseTreeTracker &tracker, Token *matchedToken) {
-  auto t = tracker.createInstance<tree::TerminalNodeImpl>(matchedToken);
-  addChild(t);
-  t->parent = this;
-  return t;
-}
-
-tree::ErrorNode* ParserRuleContext::addErrorNode(ParseTreeTracker &tracker, Token *badToken) {
-  auto t = tracker.createInstance<tree::ErrorNodeImpl>(badToken);
-  addChild(t);
-  t->parent = this;
-  return t;
 }
 
 tree::TerminalNode* ParserRuleContext::getToken(size_t ttype, size_t i) {

@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+﻿/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -17,7 +17,7 @@ namespace antlr4 {
   class ANTLR4CPP_PUBLIC RecognitionException : public RuntimeException {
   private:
     /// The Recognizer where this exception originated.
-    IRecognizer *_recognizer;
+    Recognizer *_recognizer;
     IntStream *_input;
     ParserRuleContext *_ctx;
 
@@ -29,9 +29,9 @@ namespace antlr4 {
     size_t _offendingState;
 
   public:
-    RecognitionException(IRecognizer *recognizer, IntStream *input, ParserRuleContext *ctx,
+    RecognitionException(Recognizer *recognizer, IntStream *input, ParserRuleContext *ctx,
                          Token *offendingToken = nullptr);
-    RecognitionException(const std::string &message, IRecognizer *recognizer, IntStream *input,
+    RecognitionException(const std::string &message, Recognizer *recognizer, IntStream *input,
                          ParserRuleContext *ctx, Token *offendingToken = nullptr);
     ~RecognitionException() {}
 
@@ -87,7 +87,7 @@ namespace antlr4 {
     /// </summary>
     /// <returns> The recognizer where this exception occurred, or {@code null} if
     /// the recognizer is not available. </returns>
-    virtual IRecognizer* getRecognizer() const;
+    virtual Recognizer* getRecognizer() const;
 
   private:
     void InitializeInstanceFields();

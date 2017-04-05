@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+﻿/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -70,7 +70,8 @@ namespace antlr4 {
     virtual ~ParserRuleContext() {}
 
     /** COPY a ctx (I'm deliberately not using copy constructor) to avoid
-     *  confusion with creating node with parent. Does not copy children.
+     *  confusion with creating node with parent. Does not copy children
+     *  (except error leaves).
      */
     virtual void copyFrom(ParserRuleContext *ctx);
 
@@ -80,7 +81,7 @@ namespace antlr4 {
     virtual void enterRule(tree::ParseTreeListener *listener);
     virtual void exitRule(tree::ParseTreeListener *listener);
 
-    /// Does not set parent link; other add methods do that.
+    /** Add a token leaf node child and force its parent to be this node. */
     tree::TerminalNode* addChild(tree::TerminalNode *t);
     RuleContext* addChild(RuleContext *ruleInvocation);
 
@@ -88,9 +89,6 @@ namespace antlr4 {
     /// we entered a rule. If we have # label, we will need to remove
     /// generic ruleContext object.
     virtual void removeLastChild();
-
-    virtual tree::TerminalNode* addChild(tree::ParseTreeTracker &tracker, Token *matchedToken);
-    virtual tree::ErrorNode* addErrorNode(tree::ParseTreeTracker &tracker, Token *badToken);
 
     virtual tree::TerminalNode* getToken(size_t ttype, std::size_t i);
 
@@ -132,14 +130,14 @@ namespace antlr4 {
      * Note that the range from start to stop is inclusive, so for rules that do not consume anything
      * (for example, zero length or error productions) this token may exceed stop.
      */
-    virtual Token*getStart();
+    virtual Token *getStart();
 
     /**
      * Get the final token in this context.
      * Note that the range from start to stop is inclusive, so for rules that do not consume anything
      * (for example, zero length or error productions) this token may precede start.
      */
-    virtual Token* getStop();
+    virtual Token *getStop();
 
     /// <summary>
     /// Used for rule context info debugging during parse-time, not so much for ATN debugging </summary>

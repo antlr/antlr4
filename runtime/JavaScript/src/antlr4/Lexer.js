@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -76,8 +76,8 @@ Lexer.SKIP = -3;
 
 Lexer.DEFAULT_TOKEN_CHANNEL = Token.DEFAULT_CHANNEL;
 Lexer.HIDDEN = Token.HIDDEN_CHANNEL;
-Lexer.MIN_CHAR_VALUE = '\u0000';
-Lexer.MAX_CHAR_VALUE = '\uFFFE';
+Lexer.MIN_CHAR_VALUE = 0x0000;
+Lexer.MAX_CHAR_VALUE = 0x10FFFF;
 
 Lexer.prototype.reset = function() {
 	// wack Lexer state variables

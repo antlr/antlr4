@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+﻿/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -44,7 +44,7 @@ namespace misc {
     static IntervalSet of(ssize_t a);
 
     /// Create a set with all ints within range [a..b] (inclusive)
-    static IntervalSet of(ssize_t a, ssize_t b, bool autoExtend = false);
+    static IntervalSet of(ssize_t a, ssize_t b);
 
     virtual void clear();
 
@@ -58,7 +58,7 @@ namespace misc {
     /// If overlap, combine ranges.  For example,
     /// If this is {1..5, 10..20}, adding 6..7 yields
     /// {1..5, 6..7, 10..20}.  Adding 4..8 yields {1..8, 10..20}.
-    virtual void add(ssize_t a, ssize_t b, bool autoExtend = false);
+    virtual void add(ssize_t a, ssize_t b);
 
   public:
     /// combine all sets in the array returned the or'd value

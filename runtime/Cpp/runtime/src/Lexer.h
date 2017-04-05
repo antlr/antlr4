@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+﻿/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -155,6 +155,8 @@ namespace antlr4 {
     virtual void setChannel(size_t newChannel);
 
     virtual size_t getChannel();
+
+    virtual const std::vector<std::string>& getChannelNames() const = 0;
 
     virtual const std::vector<std::string>& getModeNames() const = 0;
 

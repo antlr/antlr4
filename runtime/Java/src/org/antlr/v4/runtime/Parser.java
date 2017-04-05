@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -19,9 +19,11 @@ import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntegerStack;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.tree.ErrorNode;
+import org.antlr.v4.runtime.tree.ErrorNodeImpl;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.antlr.v4.runtime.tree.TerminalNodeImpl;
 import org.antlr.v4.runtime.tree.pattern.ParseTreePattern;
 import org.antlr.v4.runtime.tree.pattern.ParseTreePatternMatcher;
 
@@ -182,7 +184,8 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 	 * strategy to attempt recovery. If {@link #getBuildParseTree} is
 	 * {@code true} and the token index of the symbol returned by
 	 * {@link ANTLRErrorStrategy#recoverInline} is -1, the symbol is added to
-	 * the parse tree by calling {@link ParserRuleContext#addErrorNode}.</p>
+	 * the parse tree by calling {@link #createErrorNode(ParserRuleContext, Token)} then
+	 * {@link ParserRuleContext#addErrorNode(ErrorNode)}.</p>
 	 *
 	 * @param ttype the token type to match
 	 * @return the matched symbol
@@ -204,7 +207,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 			if ( _buildParseTrees && t.getTokenIndex()==-1 ) {
 				// we must have conjured up a new token during single token insertion
 				// if it's not the current symbol
-				_ctx.addErrorNode(t);
+				_ctx.addErrorNode(createErrorNode(_ctx,t));
 			}
 		}
 		return t;
@@ -220,7 +223,8 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 	 * strategy to attempt recovery. If {@link #getBuildParseTree} is
 	 * {@code true} and the token index of the symbol returned by
 	 * {@link ANTLRErrorStrategy#recoverInline} is -1, the symbol is added to
-	 * the parse tree by calling {@link ParserRuleContext#addErrorNode}.</p>
+	 * the parse tree by calling {@link Parser#createErrorNode(ParserRuleContext, Token)}. then
+     * {@link ParserRuleContext#addErrorNode(ErrorNode)}</p>
 	 *
 	 * @return the matched symbol
 	 * @throws RecognitionException if the current input symbol did not match
@@ -238,7 +242,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 			if (_buildParseTrees && t.getTokenIndex() == -1) {
 				// we must have conjured up a new token during single token insertion
 				// if it's not the current symbol
-				_ctx.addErrorNode(t);
+				_ctx.addErrorNode(createErrorNode(_ctx,t));
 			}
 		}
 
@@ -553,11 +557,11 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 	 * </pre>
 	 *
 	 * If the parser is not in error recovery mode, the consumed symbol is added
-	 * to the parse tree using {@link ParserRuleContext#addChild(Token)}, and
+	 * to the parse tree using {@link ParserRuleContext#addChild(TerminalNode)}, and
 	 * {@link ParseTreeListener#visitTerminal} is called on any parse listeners.
 	 * If the parser <em>is</em> in error recovery mode, the consumed symbol is
-	 * added to the parse tree using
-	 * {@link ParserRuleContext#addErrorNode(Token)}, and
+	 * added to the parse tree using {@link #createErrorNode(ParserRuleContext, Token)} then
+     * {@link ParserRuleContext#addErrorNode(ErrorNode)} and
 	 * {@link ParseTreeListener#visitErrorNode} is called on any parse
 	 * listeners.
 	 */
@@ -569,7 +573,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 		boolean hasListener = _parseListeners != null && !_parseListeners.isEmpty();
 		if (_buildParseTrees || hasListener) {
 			if ( _errHandler.inErrorRecoveryMode(this) ) {
-				ErrorNode node = _ctx.addErrorNode(o);
+				ErrorNode node = _ctx.addErrorNode(createErrorNode(_ctx,o));
 				if (_parseListeners != null) {
 					for (ParseTreeListener listener : _parseListeners) {
 						listener.visitErrorNode(node);
@@ -577,7 +581,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 				}
 			}
 			else {
-				TerminalNode node = _ctx.addChild(o);
+				TerminalNode node = _ctx.addChild(createTerminalNode(_ctx,o));
 				if (_parseListeners != null) {
 					for (ParseTreeListener listener : _parseListeners) {
 						listener.visitTerminal(node);
@@ -586,6 +590,24 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 			}
 		}
 		return o;
+	}
+
+	/** How to create a token leaf node associated with a parent.
+	 *  Typically, the terminal node to create is not a function of the parent.
+	 *
+	 * @since 4.7
+	 */
+	public TerminalNode createTerminalNode(ParserRuleContext parent, Token t) {
+		return new TerminalNodeImpl(t);
+	}
+
+	/** How to create an error node, given a token, associated with a parent.
+	 *  Typically, the error node to create is not a function of the parent.
+	 *
+	 * @since 4.7
+	 */
+	public ErrorNode createErrorNode(ParserRuleContext parent, Token t) {
+		return new ErrorNodeImpl(t);
 	}
 
 	protected void addContextToParseTree() {
@@ -925,3 +947,4 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 		return _tracer != null;
 	}
 }
+

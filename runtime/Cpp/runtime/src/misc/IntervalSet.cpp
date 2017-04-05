@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+﻿/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -50,8 +50,8 @@ IntervalSet IntervalSet::of(ssize_t a) {
   return IntervalSet({ Interval(a, a) });
 }
 
-IntervalSet IntervalSet::of(ssize_t a, ssize_t b, bool autoExtend) {
-  return IntervalSet({ Interval(a, b, autoExtend) });
+IntervalSet IntervalSet::of(ssize_t a, ssize_t b) {
+  return IntervalSet({ Interval(a, b) });
 }
 
 void IntervalSet::clear() {
@@ -68,8 +68,8 @@ void IntervalSet::add(ssize_t el) {
   add(el, el);
 }
 
-void IntervalSet::add(ssize_t a, ssize_t b, bool autoExtend) {
-  add(Interval(a, b, autoExtend));
+void IntervalSet::add(ssize_t a, ssize_t b) {
+  add(Interval(a, b));
 }
 
 void IntervalSet::add(const Interval &addition) {
