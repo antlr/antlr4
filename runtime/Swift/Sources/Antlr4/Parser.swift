@@ -25,7 +25,7 @@ open class Parser: Recognizer<ParserATNSimulator> {
 
 
         public func visitTerminal(_ node: TerminalNode) {
-            print("consume \(node.getSymbol()) rule \(host.getRuleNames()[host._ctx!.getRuleIndex()])")
+            print("consume \(String(describing: node.getSymbol())) rule \(host.getRuleNames()[host._ctx!.getRuleIndex()])")
         }
 
 

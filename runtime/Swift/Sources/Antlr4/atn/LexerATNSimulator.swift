@@ -352,7 +352,7 @@ open class LexerATNSimulator: ATNSimulator {
     internal func accept(_ input: CharStream, _ lexerActionExecutor: LexerActionExecutor?,
         _ startIndex: Int, _ index: Int, _ line: Int, _ charPos: Int) throws {
             if LexerATNSimulator.debug {
-                print("ACTION \(lexerActionExecutor)\n")
+                print("ACTION \(String(describing: lexerActionExecutor))\n")
 
             }
 

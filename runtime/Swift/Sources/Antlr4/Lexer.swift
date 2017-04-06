@@ -129,9 +129,6 @@ open class Lexer: Recognizer<LexerATNSimulator>
                 _text = nil
                 repeat {
                     _type = CommonToken.INVALID_TYPE
-                    // print("nextToken line \(_tokenStartLine)" + " at \(try _input!.LA(1))" +
-                    //   " in mode \(mode)"  +
-                    //   " at index \(_input!.index())" );
                     var ttype: Int
                     do {
                         ttype = try getInterpreter().match(_input, _mode)
@@ -189,12 +186,10 @@ open class Lexer: Recognizer<LexerATNSimulator>
     open func popMode() throws -> Int {
         if _modeStack.isEmpty {
             throw ANTLRError.unsupportedOperation(msg: " EmptyStackException")
-            //RuntimeException(" EmptyStackException")
-            //throwException() /* throw EmptyStackException(); } */
         }
 
         if LexerATNSimulator.debug {
-            print("popMode back to \(_modeStack.peek())")
+            print("popMode back to \(String(describing: _modeStack.peek()))")
         }
         mode(_modeStack.pop())
         return _mode
