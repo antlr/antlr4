@@ -824,7 +824,7 @@ public enum ErrorType {
 	 *
 	 * @since 4.2.1
 	 */
-	INVALID_ESCAPE_SEQUENCE(156, "invalid escape sequence", ErrorSeverity.WARNING),
+	INVALID_ESCAPE_SEQUENCE(156, "invalid escape sequence <arg>", ErrorSeverity.WARNING),
 	/**
 	 * Compiler Warning 157.
 	 *

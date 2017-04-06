@@ -29,17 +29,17 @@ public abstract class EscapeSequenceParsing {
 			PROPERTY
 		};
 
-		public static Result INVALID = new Result(Type.INVALID, -1, IntervalSet.EMPTY_SET, -1);
-
 		public final Type type;
 		public final int codePoint;
 		public final IntervalSet propertyIntervalSet;
+		public final int startOffset;
 		public final int parseLength;
 
-		public Result(Type type, int codePoint, IntervalSet propertyIntervalSet, int parseLength) {
+		public Result(Type type, int codePoint, IntervalSet propertyIntervalSet, int startOffset, int parseLength) {
 			this.type = type;
 			this.codePoint = codePoint;
 			this.propertyIntervalSet = propertyIntervalSet;
+			this.startOffset = startOffset;
 			this.parseLength = parseLength;
 		}
 
@@ -78,12 +78,12 @@ public abstract class EscapeSequenceParsing {
 	/**
 	 * Parses a single escape sequence starting at {@code startOff}.
 	 *
-	 * Returns {@link Result#INVALID} if no valid escape sequence was found, a Result otherwise.
+	 * Returns a type of INVALID if no valid escape sequence was found, a Result otherwise.
 	 */
 	public static Result parseEscape(String s, int startOff) {
 		int offset = startOff;
 		if (offset + 2 > s.length() || s.codePointAt(offset) != '\\') {
-			return Result.INVALID;
+			return invalid(startOff, s.length()-1);
 		}
 		// Move past backslash
 		offset++;
@@ -93,21 +93,21 @@ public abstract class EscapeSequenceParsing {
 		if (escaped == 'u') {
 			// \\u{1} is the shortest we support
 			if (offset + 3 > s.length()) {
-				return Result.INVALID;
+				return invalid(startOff, s.length()-1);
 			}
 			int hexStartOffset;
-			int hexEndOffset;
+			int hexEndOffset; // appears to be exclusive
 			if (s.codePointAt(offset) == '{') {
 				hexStartOffset = offset + 1;
 				hexEndOffset = s.indexOf('}', hexStartOffset);
 				if (hexEndOffset == -1) {
-					return Result.INVALID;
+					return invalid(startOff, s.length()-1);
 				}
 				offset = hexEndOffset + 1;
 			}
 			else {
 				if (offset + 4 > s.length()) {
-					return Result.INVALID;
+					return invalid(startOff, s.length()-1);
 				}
 				hexStartOffset = offset;
 				hexEndOffset = offset + 4;
@@ -115,28 +115,32 @@ public abstract class EscapeSequenceParsing {
 			}
 			int codePointValue = CharSupport.parseHexValue(s, hexStartOffset, hexEndOffset);
 			if (codePointValue == -1 || codePointValue > Character.MAX_CODE_POINT) {
-				return Result.INVALID;
+				return invalid(startOff, startOff+6-1);
 			}
 			return new Result(
 				Result.Type.CODE_POINT,
 				codePointValue,
 				IntervalSet.EMPTY_SET,
+				startOff,
 				offset - startOff);
 		}
 		else if (escaped == 'p' || escaped == 'P') {
 			// \p{L} is the shortest we support
-			if (offset + 3 > s.length() || s.codePointAt(offset) != '{') {
-				return Result.INVALID;
+			if (offset + 3 > s.length()) {
+				return invalid(startOff, s.length()-1);
+			}
+			if (s.codePointAt(offset) != '{') {
+				return invalid(startOff, offset);
 			}
 			int openBraceOffset = offset;
 			int closeBraceOffset = s.indexOf('}', openBraceOffset);
 			if (closeBraceOffset == -1) {
-				return Result.INVALID;
+				return invalid(startOff, s.length()-1);
 			}
 			String propertyName = s.substring(openBraceOffset + 1, closeBraceOffset);
 			IntervalSet propertyIntervalSet = UnicodeData.getPropertyCodePoints(propertyName);
 			if (propertyIntervalSet == null) {
-				return Result.INVALID;
+				return invalid(startOff, closeBraceOffset);
 			}
 			offset = closeBraceOffset + 1;
 			if (escaped == 'P') {
@@ -146,13 +150,14 @@ public abstract class EscapeSequenceParsing {
 				Result.Type.PROPERTY,
 				-1,
 				propertyIntervalSet,
+				startOff,
 				offset - startOff);
 		}
 		else if (escaped < CharSupport.ANTLRLiteralEscapedCharValue.length) {
 			int codePoint = CharSupport.ANTLRLiteralEscapedCharValue[escaped];
 			if (codePoint == 0) {
 				if (escaped != ']' && escaped != '-') { // escape ']' and '-' only in char sets.
-					return Result.INVALID;
+					return invalid(startOff, startOff+1);
 				}
 				else {
 					codePoint = escaped;
@@ -162,10 +167,20 @@ public abstract class EscapeSequenceParsing {
 				Result.Type.CODE_POINT,
 				codePoint,
 				IntervalSet.EMPTY_SET,
+				startOff,
 				offset - startOff);
 		}
 		else {
-			return Result.INVALID;
+			return invalid(startOff,s.length()-1);
 		}
+	}
+
+	private static Result invalid(int start, int stop) { // start..stop is inclusive
+		return new Result(
+			Result.Type.INVALID,
+			0,
+			IntervalSet.EMPTY_SET,
+			start,
+			stop - start + 1);
 	}
 }

@@ -349,7 +349,7 @@ public class LexerATNFactory extends ParserATNFactory {
 		chars = CharSupport.getStringFromGrammarStringLiteral(chars);
 		if (chars == null) {
 			g.tool.errMgr.grammarError(ErrorType.INVALID_ESCAPE_SEQUENCE,
-					g.fileName, stringLiteralAST.getToken());
+					g.fileName, stringLiteralAST.getToken(), chars);
 			return new Handle(left, left);
 		}
 
@@ -462,8 +462,10 @@ public class LexerATNFactory extends ParserATNFactory {
 					EscapeSequenceParsing.parseEscape(chars, i);
 				switch (escapeParseResult.type) {
 					case INVALID:
+						String invalid = chars.substring(escapeParseResult.startOffset,
+						                                 escapeParseResult.startOffset+escapeParseResult.parseLength);
 						g.tool.errMgr.grammarError(ErrorType.INVALID_ESCAPE_SEQUENCE,
-									   g.fileName, charSetAST.getToken(), charSetAST.getText());
+						                           g.fileName, charSetAST.getToken(), invalid);
 						state = CharSetParseState.ERROR;
 						break;
 					case CODE_POINT:
