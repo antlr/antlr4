@@ -433,6 +433,26 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 	}
 
 	/**
+	 * This is a regression test for https://github.com/antlr/antlr4/issues/1815
+	 * "Null ptr exception in SqlBase.g4"
+	 */
+	@Test public void testDoubleQuoteInTwoStringLiterals() {
+		String grammar =
+			"lexer grammar A;\n" +
+			"STRING : '\\\"' '\\\"' 'x' ;";
+		String expected =
+			"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): A.g4:2:10: invalid escape sequence \\\"\n"+
+			"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): A.g4:2:15: invalid escape sequence \\\"\n";
+
+		String[] pair = new String[] {
+			grammar,
+			expected
+		};
+
+		super.testErrors(pair, true);
+	}
+
+	/**
 	 * This test ensures that the {@link ErrorType#INVALID_ESCAPE_SEQUENCE}
 	 * error is not reported for escape sequences that are known to be valid.
 	 */
@@ -464,7 +484,8 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 		String expected =
 			"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): A.g4:2:12: invalid escape sequence \\uAABG\n" +
 			"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): A.g4:2:19: invalid escape sequence \\x\n" +
-			"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): A.g4:2:22: invalid escape sequence \\u\n";
+			"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): A.g4:2:22: invalid escape sequence \\u\n" +
+			"warning("+ErrorType.EPSILON_TOKEN.code+"): A.g4:2:0: non-fragment lexer rule RULE can match the empty string\n";
 
 		String[] pair = new String[] {
 			grammar,
@@ -525,7 +546,8 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 				"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:4:40: invalid escape sequence \\{\n" +
 				"error(" + ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED.code + "): Test.g4:5:33: string literals and sets cannot be empty: 'F'..'A'\n" +
 				"error(" + ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED.code + "): Test.g4:6:30: string literals and sets cannot be empty: 'f'..'a'\n" +
-				"error(" + ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED.code + "): Test.g4:6:36: string literals and sets cannot be empty: []\n";
+				"error(" + ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED.code + "): Test.g4:6:36: string literals and sets cannot be empty: []\n" +
+				"warning("+ ErrorType.EPSILON_TOKEN.code + "): Test.g4:2:0: non-fragment lexer rule INVALID_STRING_LITERAL can match the empty string\n";
 
 		String[] pair = new String[] {
 				grammar,

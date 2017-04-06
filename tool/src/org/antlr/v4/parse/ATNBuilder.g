@@ -137,7 +137,7 @@ element returns [ATNFactory.Handle p]
 	|   ^(ACTION .)					{$p = factory.action((ActionAST)$ACTION);}
 	|   ^(SEMPRED .)				{$p = factory.sempred((PredAST)$SEMPRED);}
     |	^(NOT b=blockSet[true])		{$p = $b.p;}
-    |	LEXER_CHAR_SET					{$p = factory.charSetLiteral($start);}
+    |	LEXER_CHAR_SET				{$p = factory.charSetLiteral($start);}
 	;
 
 astOperand returns [ATNFactory.Handle p]

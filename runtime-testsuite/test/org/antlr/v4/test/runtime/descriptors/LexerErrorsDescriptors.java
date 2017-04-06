@@ -222,10 +222,11 @@ public class LexerErrorsDescriptors {
 		public String startRule = "";
 		public String grammarName = "L";
 
+		// ST interprets \\ as \ so we need \\\\ to get \\
 		/**
 		 lexer grammar L;
 		 ACTION2 : '[' (STRING | ~'"')*? ']';
-		 STRING : '"' ('\\"' | .)*? '"';
+		 STRING : '"' ('\\\\' '"' | .)*? '"';
 		 WS : [ \t\r\n]+ -> skip;
 		 */
 		@CommentHasStringValue

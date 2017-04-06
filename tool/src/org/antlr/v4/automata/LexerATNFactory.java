@@ -346,19 +346,18 @@ public class LexerATNFactory extends ParserATNFactory {
 		String chars = stringLiteralAST.getText();
 		ATNState left = newState(stringLiteralAST);
 		ATNState right;
-		chars = CharSupport.getStringFromGrammarStringLiteral(chars);
-		if (chars == null) {
-			g.tool.errMgr.grammarError(ErrorType.INVALID_ESCAPE_SEQUENCE,
-					g.fileName, stringLiteralAST.getToken(), chars);
+		String s = CharSupport.getStringFromGrammarStringLiteral(chars);
+		if (s == null) {
+			// the lexer will already have given an error
 			return new Handle(left, left);
 		}
 
-		int n = chars.length();
+		int n = s.length();
 		ATNState prev = left;
 		right = null;
 		for (int i = 0; i < n; ) {
 			right = newState(stringLiteralAST);
-			int codePoint = chars.codePointAt(i);
+			int codePoint = s.codePointAt(i);
 			prev.addTransition(CodePointTransitions.createWithCodePoint(right, codePoint));
 			prev = right;
 			i += Character.charCount(codePoint);
