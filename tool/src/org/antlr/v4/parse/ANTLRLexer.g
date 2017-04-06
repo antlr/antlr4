@@ -146,6 +146,7 @@ tokens { SEMPRED; TOKEN_REF; RULE_REF; LEXER_CHAR_SET; ARG_ACTION; }
 */
 package org.antlr.v4.parse;
 import org.antlr.v4.tool.*;
+import org.antlr.v4.runtime.misc.Interval;
 }
 
 
@@ -643,27 +644,23 @@ fragment
 ESC_SEQ
     : '\\'
         (
-              // The standard escaped character set such as tab, newline,
-              // etc.
-              //
+              // The standard escaped character set such as tab, newline, etc...
     		  'b'|'t'|'n'|'f'|'r'|'\''|'\\'
 
     	    | // A Java style Unicode escape sequence
-    	      //
     	      UNICODE_ESC
 
             | // A Swift/Hack style Unicode escape sequence
-              //
               UNICODE_EXTENDED_ESC
 
     	    | // An illegal escape seqeunce
-    	      //
+    	      ~('b'|'t'|'n'|'f'|'r'|'\''|'\\'|'u') // \x for any invalid x (make sure to match char here)
     	      {
-                Token t = new CommonToken(input, state.type, state.channel, getCharIndex()-1, getCharIndex());
+                Token t = new CommonToken(input, state.type, state.channel, getCharIndex()-2, getCharIndex()-1);
                 t.setText(t.getText());
                 t.setLine(input.getLine());
-                t.setCharPositionInLine(input.getCharPositionInLine()-1);
-                grammarError(ErrorType.INVALID_ESCAPE_SEQUENCE, t);
+                t.setCharPositionInLine(input.getCharPositionInLine()-2);
+                grammarError(ErrorType.INVALID_ESCAPE_SEQUENCE, t, input.substring(getCharIndex()-2,getCharIndex()-1));
 				if ( state.text==null ) {
 					setText(input.substring(state.tokenStartCharIndex, getCharIndex()-2));
 				}
@@ -673,7 +670,6 @@ ESC_SEQ
 
 fragment
 UNICODE_ESC
-
 @init {
 
 	// Flag to tell us whether we have a valid number of
@@ -717,14 +713,19 @@ UNICODE_ESC
     	// Now check the digit count and issue an error if we need to
     	//
     	{
-    		if (hCount != 4) {
-                Token t = new CommonToken(input, state.type, state.channel, getCharIndex()-3-hCount, getCharIndex()-1);
-                t.setText(t.getText());
-                t.setLine(input.getLine());
-                t.setCharPositionInLine(input.getCharPositionInLine()-hCount-2);
-                grammarError(ErrorType.INVALID_ESCAPE_SEQUENCE, t);
+    		if (hCount < 4) {
+				Interval badRange = Interval.of(getCharIndex()-2-hCount, getCharIndex());
+				String lastChar = input.substring(badRange.b, badRange.b);
+				if ( lastChar.codePointAt(0)=='\'' ) {
+					badRange.b--;
+				}
+				String bad = input.substring(badRange.a, badRange.b);
+				Token t = new CommonToken(input, state.type, state.channel, badRange.a, badRange.b);
+				t.setLine(input.getLine());
+				t.setCharPositionInLine(input.getCharPositionInLine()-hCount-2);
+				grammarError(ErrorType.INVALID_ESCAPE_SEQUENCE, t, bad);
 				if ( state.text==null ) {
-					setText(input.substring(state.tokenStartCharIndex, getCharIndex()-hCount-3));
+					setText(bad);
 				}
     		}
     	}
@@ -746,7 +747,7 @@ UNICODE_EXTENDED_ESC
                 t.setText(t.getText());
                 t.setLine(input.getLine());
                 t.setCharPositionInLine(input.getCharPositionInLine()-numDigits);
-                grammarError(ErrorType.INVALID_ESCAPE_SEQUENCE, t);
+                grammarError(ErrorType.INVALID_ESCAPE_SEQUENCE, t, input.substring(state.tokenStartCharIndex,getCharIndex()-1));
 				if ( state.text==null ) {
 					setText(input.substring(state.tokenStartCharIndex, getCharIndex()-numDigits-3));
 				}
