@@ -357,6 +357,9 @@ size_t ParserATNSimulator::execATNWithFullContext(dfa::DFA &dfa, dfa::DFAState *
       }
       throw e;
     }
+    if (previous != s0) // Don't delete the start set.
+        delete previous;
+    previous = nullptr;
 
     std::vector<BitSet> altSubSets = PredictionModeClass::getConflictingAltSubsets(reach.get());
     reach->uniqueAlt = getUniqueAlt(reach.get());
@@ -382,9 +385,6 @@ size_t ParserATNSimulator::execATNWithFullContext(dfa::DFA &dfa, dfa::DFAState *
       // we're not sure what the ambiguity is yet.
       // So, keep going.
     }
-
-    if (previous != s0) // Don't delete the start set.
-      delete previous;
     previous = reach.release();
 
     if (t != Token::EOF) {
