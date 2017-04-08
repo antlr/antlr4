@@ -115,6 +115,15 @@ import "github.com/antlr/antlr4/runtime/Go/antlr"
 type <file.grammarName>Visitor interface {
 	antlr.ParseTreeVisitor
 
+	// Provide the default result that will be returned from GetChildren (default: nil)
+	DefaultResult() interface{}
+
+	// Decide if we should continue visiting the rule nodes, based on the result so far.
+	ShouldVisitNextChild(node antlr.RuleNode, resultSoFar interface{}) bool
+
+	// Given the results found in the children so far, and the new result, determine the new result value.
+	AggregateResult(resultSoFar interface{}, childResult interface{}) interface{}
+
 <file.visitorNames:{lname |
 	// Visit a parse tree produced by <file.parserName>#<lname>.
 	Visit<lname; format="cap">(ctx *<lname; format="cap">Context) interface{\}
@@ -142,30 +151,42 @@ func (v *Base<file.grammarName>Visitor) SetSuper(newSuper <file.grammarName>Visi
 	v.super = newSuper
 }
 
-func (v *Base<file.grammarName>Visitor) visitByName(name string, child antlr.RuleNode) {
-	var reified <file.grammarName>Visitor
-	if v.super == nil {
-		reified = v
-	} else {
-		reified = v.super
-	}
+func (v *Base<file.grammarName>Visitor) DefaultResult() interface{} {
+	return nil
+}
 
-	switch name {
-<file.visitorNames:{lname |
-	case "<lname>":
-		reified.Visit<lname; format="cap">(child.(*<lname; format="cap">Context))
-}; separator="\n">
-	}
+func (v *Base<file.grammarName>Visitor) ShouldVisitNextChild(node antlr.RuleNode, resultSoFar interface{}) bool {
+	return true
+}
+
+func (v *Base<file.grammarName>Visitor) AggregateResult(resultSoFar, childResult interface{}) interface{} {
+	return childResult
 }
 
 func (v *Base<file.grammarName>Visitor) VisitChildren(node antlr.RuleNode) interface{} {
+	var result interface{} = nil
+
+	if v.super != nil {
+		result = v.super.DefaultResult()
+	}
+
 	for i := 0; i \< node.GetChildCount(); i++ {
+		if v.super != nil {
+			doNextChild := v.super.ShouldVisitNextChild(node, result)
+			if(!doNextChild) { break }
+		}
+
 		child := node.GetChild(i)
 		ruleChild, ok := child.(antlr.RuleNode)
 		if !ok {
 			terminalChild, ok := child.(antlr.TerminalNode)
 			if ok {
-				v.VisitTerminal(terminalChild)
+				childResult := v.VisitTerminal(terminalChild)
+				if v.super != nil {
+					result = v.super.AggregateResult(result, childResult)
+				} else {
+					result = childResult
+				}
 			} else {
 				errChild, ok := child.(antlr.ErrorNode)
 				if ok {
@@ -173,11 +194,15 @@ func (v *Base<file.grammarName>Visitor) VisitChildren(node antlr.RuleNode) inter
 				}
 			}
 		} else {
-			ruleType := ruleNames[ruleChild.GetRuleContext().GetRuleIndex()]
-			v.visitByName(ruleType, ruleChild)
+			if v.super != nil {
+			        childResult := ruleChild.Accept(v.super)
+			        result = v.super.AggregateResult(result, childResult)
+			} else {
+			        result = ruleChild.Accept(v)
+			}
 		}
 	}
-	return nil
+	return result
 }
 
 <file.visitorNames:{lname |
