@@ -143,3 +143,4 @@ YYYY/MM/DD, github id, Full name, email
 2017/03/03, chund, Christian Hund, christian.hund@gmail.com
 2017/03/15, robertvanderhulst, Robert van der Hulst, robert@xsharp.eu
 2017/03/28, cmd-johnson, Jonas Auer, jonas.auer.94@gmail.com
+2017/04/12, lys0716, Yishuang Lu, luyscmu@gmail.com
