@@ -27,6 +27,8 @@ import org.antlr.v4.parse.ToolANTLRParser;
 import org.antlr.v4.parse.v3TreeGrammarException;
 import org.antlr.v4.runtime.RuntimeMetaData;
 import org.antlr.v4.runtime.misc.LogManager;
+import org.antlr.v4.runtime.misc.IntegerList;
+import org.antlr.v4.runtime.atn.ATNSerializer;
 import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.tool.ANTLRMessage;
 import org.antlr.v4.tool.ANTLRToolListener;
@@ -102,6 +104,7 @@ public class Tool {
 	public String outputDirectory;
 	public String libDirectory;
 	public boolean generate_ATN_dot = false;
+	public boolean genInterpreterData = false;
 	public String grammarEncoding = null; // use default locale's encoding
 	public String msgFormat = "antlr";
 	public boolean launch_ST_inspector = false;
@@ -117,24 +120,25 @@ public class Tool {
 	public boolean longMessages = false;
 
     public static Option[] optionDefs = {
-        new Option("outputDirectory",	"-o", OptionArgType.STRING, "specify output directory where all output is generated"),
-        new Option("libDirectory",		"-lib", OptionArgType.STRING, "specify location of grammars, tokens files"),
-        new Option("generate_ATN_dot",	"-atn", "generate rule augmented transition network diagrams"),
-		new Option("grammarEncoding",	"-encoding", OptionArgType.STRING, "specify grammar file encoding; e.g., euc-jp"),
-		new Option("msgFormat",			"-message-format", OptionArgType.STRING, "specify output style for messages in antlr, gnu, vs2005"),
-		new Option("longMessages",		"-long-messages", "show exception details when available for errors and warnings"),
-		new Option("gen_listener",		"-listener", "generate parse tree listener (default)"),
-		new Option("gen_listener",		"-no-listener", "don't generate parse tree listener"),
-		new Option("gen_visitor",		"-visitor", "generate parse tree visitor"),
-		new Option("gen_visitor",		"-no-visitor", "don't generate parse tree visitor (default)"),
-		new Option("genPackage",		"-package", OptionArgType.STRING, "specify a package/namespace for the generated code"),
-		new Option("gen_dependencies",	"-depend", "generate file dependencies"),
-		new Option("",					"-D<option>=value", "set/override a grammar-level option"),
-		new Option("warnings_are_errors", "-Werror", "treat warnings as errors"),
-        new Option("launch_ST_inspector", "-XdbgST", "launch StringTemplate visualizer on generated code"),
+        new Option("outputDirectory",             "-o", OptionArgType.STRING, "specify output directory where all output is generated"),
+        new Option("libDirectory",                "-lib", OptionArgType.STRING, "specify location of grammars, tokens files"),
+        new Option("generate_ATN_dot",            "-atn", "generate rule augmented transition network diagrams"),
+        new Option("genInterpreterData",          "-interpreter", "generate only data required for interpreters"),
+		new Option("grammarEncoding",             "-encoding", OptionArgType.STRING, "specify grammar file encoding; e.g., euc-jp"),
+		new Option("msgFormat",                   "-message-format", OptionArgType.STRING, "specify output style for messages in antlr, gnu, vs2005"),
+		new Option("longMessages",                "-long-messages", "show exception details when available for errors and warnings"),
+		new Option("gen_listener",                "-listener", "generate parse tree listener (default)"),
+		new Option("gen_listener",                "-no-listener", "don't generate parse tree listener"),
+		new Option("gen_visitor",                 "-visitor", "generate parse tree visitor"),
+		new Option("gen_visitor",                 "-no-visitor", "don't generate parse tree visitor (default)"),
+		new Option("genPackage",                  "-package", OptionArgType.STRING, "specify a package/namespace for the generated code"),
+		new Option("gen_dependencies",            "-depend", "generate file dependencies"),
+		new Option("",                            "-D<option>=value", "set/override a grammar-level option"),
+		new Option("warnings_are_errors",         "-Werror", "treat warnings as errors"),
+        new Option("launch_ST_inspector",         "-XdbgST", "launch StringTemplate visualizer on generated code"),
 		new Option("ST_inspector_wait_for_close", "-XdbgSTWait", "wait for STViz to close before continuing"),
-        new Option("force_atn",			"-Xforce-atn", "use the ATN simulator for all predictions"),
-		new Option("log",   			"-Xlog", "dump lots of logging info to antlr-timestamp.log"),
+        new Option("force_atn",                   "-Xforce-atn", "use the ATN simulator for all predictions"),
+		new Option("log",                         "-Xlog", "dump lots of logging info to antlr-timestamp.log"),
 	};
 
 	// helper vars for option management
@@ -389,6 +393,11 @@ public class Tool {
 		g.atn = factory.createATN();
 
 		if ( generate_ATN_dot ) generateATNs(g);
+		
+		if ( genInterpreterData ) {
+			generateInterpreterData(g);
+			return;
+		}
 
 		// PERFORM GRAMMAR ANALYSIS ON ATN: BUILD DECISION DFAs
 		AnalysisPipeline anal = new AnalysisPipeline(g);
@@ -693,6 +702,70 @@ public class Tool {
 		}
 	}
 
+	private void generateInterpreterData(Grammar g) {
+		List<Grammar> grammars = new ArrayList<Grammar>();
+		grammars.add(g);
+		List<Grammar> imported = g.getAllImportedGrammars();
+		if ( imported!=null ) grammars.addAll(imported);
+		for (Grammar ig : grammars) {
+			StringBuilder content = new StringBuilder();
+			
+			content.append("token literal names:\n");
+			String[] names = ig.getTokenLiteralNames();
+			for (String name : names) {
+				content.append(name + "\n");
+			}
+			content.append("\n");
+			
+			content.append("token symbolic names:\n");
+			names = ig.getTokenSymbolicNames();
+			for (String name : names) {
+				content.append(name + "\n");
+			}
+			content.append("\n");
+			
+			if ( ig.isLexer() ) {
+				content.append("channel names:\n");
+				content.append("DEFAULT_TOKEN_CHANNEL\n");
+				content.append("HIDDEN\n");
+				for (String channel : ig.channelValueToNameList) {
+					content.append(channel + "\n");
+				}
+				content.append("\n");
+				
+				content.append("mode names:\n");
+				for (String mode : ((LexerGrammar)ig).modes.keySet()) {
+					content.append(mode + "\n");
+				}
+			}
+			else {
+				content.append("rule names:\n");
+				names = ig.getRuleNames();
+				for (String name : names) {
+					content.append(name + "\n");
+				}
+			}
+			content.append("\n");
+			
+			IntegerList serializedATN = ATNSerializer.getSerialized(ig.atn);
+			content.append("atn:\n");
+			content.append(serializedATN.toString());
+			
+			try {
+				Writer fw = getOutputFileWriter(ig, ig.name + ".interpreter.txt");
+				try {
+					fw.write(content.toString());
+				}
+				finally {
+					fw.close();
+				}	
+			}
+			catch (IOException ioe) {
+				errMgr.toolError(ErrorType.CANNOT_WRITE_FILE, ioe);
+			}
+		}
+	}
+	
 	/** This method is used by all code generators to create new output
 	 *  files. If the outputDir set by -o is not present it will be created.
 	 *  The final filename is sensitive to the output directory and

@@ -123,6 +123,7 @@
 #include "dfa/DFASerializer.h"
 #include "dfa/DFAState.h"
 #include "dfa/LexerDFASerializer.h"
+#include "misc/InterpreterDataReader.h"
 #include "misc/Interval.h"
 #include "misc/IntervalSet.h"
 #include "misc/MurmurHash.h"

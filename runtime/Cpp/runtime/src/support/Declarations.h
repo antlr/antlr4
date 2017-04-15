@@ -56,6 +56,7 @@ namespace antlr4 {
   class WritableToken;
 
   namespace misc {
+    class InterpreterDataReader;
     class Interval;
     class IntervalSet;
     class MurmurHash;
