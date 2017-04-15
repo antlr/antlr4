@@ -52,7 +52,7 @@ void UnbufferedCharStream::sync(size_t want) {
 
 size_t UnbufferedCharStream::fill(size_t n) {
   for (size_t i = 0; i < n; i++) {
-    if (_data.size() > 0 && _data.back() == (uint32_t)EOF) {
+    if (_data.size() > 0 && _data.back() == 0xFFFF) {
       return i;
     }
 
@@ -101,7 +101,7 @@ size_t UnbufferedCharStream::LA(ssize_t i) {
     return EOF;
   }
 
-  if (_data[(size_t)index] == (uint32_t)EOF) {
+  if (_data[(size_t)index] == 0xFFFF) {
     return EOF;
   }
 

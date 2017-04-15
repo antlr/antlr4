@@ -422,6 +422,7 @@
     <ClCompile Include="src\LexerInterpreter.cpp" />
     <ClCompile Include="src\LexerNoViableAltException.cpp" />
     <ClCompile Include="src\ListTokenSource.cpp" />
+    <ClCompile Include="src\misc\InterpreterDataReader.cpp" />
     <ClCompile Include="src\misc\Interval.cpp" />
     <ClCompile Include="src\misc\IntervalSet.cpp" />
     <ClCompile Include="src\misc\MurmurHash.cpp" />
@@ -566,6 +567,7 @@
     <ClInclude Include="src\LexerInterpreter.h" />
     <ClInclude Include="src\LexerNoViableAltException.h" />
     <ClInclude Include="src\ListTokenSource.h" />
+    <ClInclude Include="src\misc\InterpreterDataReader.h" />
     <ClInclude Include="src\misc\Interval.h" />
     <ClInclude Include="src\misc\IntervalSet.h" />
     <ClInclude Include="src\misc\MurmurHash.h" />
