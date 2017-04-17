@@ -373,7 +373,7 @@ public class BaseCSharpTest implements RuntimeTestSupport /*, SpecialRuntimeTest
         else
         {
             try {
-                return createDotnetProject() && buildDotnetProject();
+                return buildDotnetProject();
             } catch(Exception e) {
                 return false;
             }
@@ -426,7 +426,7 @@ public class BaseCSharpTest implements RuntimeTestSupport /*, SpecialRuntimeTest
         if (!NETSTANDARD)
             return new File(tmpdir, "bin/Release/Test.exe").getAbsolutePath();
 
-        return new File(tmpdir, "src/bin/Debug/netcoreapp1.0/Test.dll").getAbsolutePath();
+        return new File(tmpdir, "bin/Release/netcoreapp1.0/Test.dll").getAbsolutePath();
 	}
 
 	private String locateTool(String tool) {
@@ -493,82 +493,54 @@ public class BaseCSharpTest implements RuntimeTestSupport /*, SpecialRuntimeTest
 		}
 	}
 
-    public boolean createDotnetProject() {
+    public boolean buildDotnetProject() {
         try {
-            mkdir(tmpdir + "/src");
-
-            // move files to /src, since global.json need to be one level higher
-            File source = new File(tmpdir);
-            File[] files = source.listFiles();
-            for (File thisSource : files) {
-                if (!thisSource.isDirectory()) {
-                    File thisDest = new File(tmpdir + "/src/" + thisSource.getName());
-                    boolean success = thisSource.renameTo(thisDest);
-
-                    if (!success) {
-                        throw new RuntimeException("Moving file " + thisSource + " to " + thisDest + " failed.");
-                    }
-                }
-            }
-
             // save auxiliary files
             String pack = BaseCSharpTest.class.getPackage().getName().replace(".", "/") + "/";
-            saveResourceAsFile(pack + "global.json", new File(tmpdir, "global.json"));
-            saveResourceAsFile(pack + "project.json", new File(tmpdir, "src/project.json"));
-            return true;
+            saveResourceAsFile(pack + "Antlr4.Test.dotnet.csproj", new File(tmpdir, "Antlr4.Test.dotnet.csproj"));
+
+            // find runtime package
+            final ClassLoader loader = Thread.currentThread().getContextClassLoader();
+            final URL runtimeProj = loader.getResource("CSharp/runtime/CSharp/Antlr4.Runtime/Antlr4.Runtime.dotnet.csproj");
+            if ( runtimeProj==null ) {
+                throw new RuntimeException("C# runtime project file not found!");
+            }
+            File runtimeProjFile = new File(runtimeProj.getFile());
+            String runtimeProjPath = runtimeProjFile.getPath();
+
+            // add Runtime project reference
+            String dotnetcli = locateTool("dotnet");
+            String[] args = new String[] {
+                dotnetcli,
+                "add",
+                "Antlr4.Test.dotnet.csproj",
+                "reference",
+                runtimeProjPath
+            };
+            boolean success = runProcess(args, tmpdir);
+
+            // restore project
+            args = new String[] {
+                dotnetcli,
+                "restore",
+                "Antlr4.Test.dotnet.csproj"
+            };
+            success = runProcess(args, tmpdir);
+
+            // build test
+            args = new String[] {
+                dotnetcli,
+                "build",
+                "Antlr4.Test.dotnet.csproj",
+                "-c",
+                "Release"
+            };
+            success = runProcess(args, tmpdir);
         }
         catch(Exception e) {
             e.printStackTrace(System.err);
             return false;
         }
-    }
-
-    public boolean buildDotnetProject() {
-        // find runtime package
-        final ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        final URL runtimeProj = loader.getResource("CSharp/runtime/CSharp/Antlr4.Runtime/Antlr4.Runtime.dotnet.xproj");
-        if ( runtimeProj==null ) {
-            throw new RuntimeException("C# runtime project file not found!");
-        }
-        File runtimeProjFile = new File(runtimeProj.getFile());
-        String runtimeProjPath = runtimeProjFile.getParentFile().getParentFile().getPath();
-        String projectRefPath = runtimeProjPath.substring(0, runtimeProjPath.lastIndexOf("/"));
-
-        // update global.json to reference runtime path
-        try {
-            String content = new java.util.Scanner(new File(tmpdir + "/global.json")).useDelimiter("\\Z").next();
-            content = content.replaceAll("replace_this", projectRefPath);
-            java.io.PrintWriter out = new java.io.PrintWriter(tmpdir + "/global.json");
-            out.write(content);
-            out.close();
-        }
-        catch(Exception e) {
-            return false;
-        }
-
-        // build test
-        String dotnetcli = locateTool("dotnet");
-        String[] args = new String[] {
-            dotnetcli,
-            "restore",
-            ".",
-            projectRefPath
-        };
-
-        try {
-            boolean success = runProcess(args, tmpdir);
-
-            args = new String[] {
-                dotnetcli,
-                "build",
-                "src"
-            };
-            success = runProcess(args, tmpdir);
-        }
-        catch(Exception e) {
-            return false;
-        }
-
 
         return true;
     }
@@ -648,7 +620,7 @@ public class BaseCSharpTest implements RuntimeTestSupport /*, SpecialRuntimeTest
 
 			String dotnet = locateTool("dotnet");
 			return new String[] {
-				dotnet, exec, new File(tmpdir, "src/input").getAbsolutePath(),
+				dotnet, exec, new File(tmpdir, "input").getAbsolutePath(),
 				output.toAbsolutePath().toString(),
 				errorOutput.toAbsolutePath().toString()
 			};
