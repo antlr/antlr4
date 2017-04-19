@@ -34,16 +34,6 @@ namespace antlr4 {
    * channel.</p>
    */
   class ANTLR4CPP_PUBLIC CommonTokenStream : public BufferedTokenStream {
-  protected:
-    /**
-     * Specifies the channel to use for filtering tokens.
-     *
-     * <p>
-     * The default value is {@link Token#DEFAULT_CHANNEL}, which matches the
-     * default channel assigned to tokens created by the lexer.</p>
-     */
-    size_t channel;
-
   public:
     /**
      * Constructs a new {@link CommonTokenStream} using the specified token
@@ -63,21 +53,27 @@ namespace antlr4 {
      * @param tokenSource The token source.
      * @param channel The channel to use for filtering tokens.
      */
-    CommonTokenStream(TokenSource *tokenSource, int channel);
+    CommonTokenStream(TokenSource *tokenSource, size_t channel);
 
-  protected:
-    virtual ssize_t adjustSeekIndex(size_t i) override;
-
-    virtual Token* LB(size_t k) override;
-
-  public:
     virtual Token* LT(ssize_t k) override;
 
     /// Count EOF just once.
     virtual int getNumberOfOnChannelTokens();
+    
+  protected:
+    /**
+     * Specifies the channel to use for filtering tokens.
+     *
+     * <p>
+     * The default value is {@link Token#DEFAULT_CHANNEL}, which matches the
+     * default channel assigned to tokens created by the lexer.</p>
+     */
+    size_t channel;
 
-  private:
-    void InitializeInstanceFields();
+    virtual ssize_t adjustSeekIndex(size_t i) override;
+
+    virtual Token* LB(size_t k) override;
+
   };
 
 } // namespace antlr4
