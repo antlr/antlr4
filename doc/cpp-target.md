@@ -63,9 +63,9 @@ int main(int argc, const char* argv[]) {
   CommonTokenStream tokens(&lexer);
   MyGrammarParser parser(&tokens);
 
-  Ref<tree::ParseTree> tree = parser.key();
-  Ref<TreeShapeListener> listener(new TreeShapeListener());
-  tree::ParseTreeWalker::DEFAULT->walk(listener, tree);
+  tree::ParseTree *tree = parser.key();
+  TreeShapeListener listener;
+  tree::ParseTreeWalker::DEFAULT->walk(&listener, tree);
 
   return 0;
 }
