@@ -158,7 +158,7 @@ func (b *BaseLexer) GetTokenFactory() TokenFactory {
 	return b.factory
 }
 
-func (b *BaseLexer) setTokenFactory(f TokenFactory) {
+func (b *BaseLexer) SetTokenFactory(f TokenFactory) {
 	b.factory = f
 }
 
