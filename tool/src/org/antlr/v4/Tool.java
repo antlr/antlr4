@@ -119,9 +119,9 @@ public class Tool {
 	public boolean longMessages = false;
 
     public static Option[] optionDefs = {
-        new Option("outputDirectory",             "-o", OptionArgType.STRING, "specify output directory where all output is generated"),
-        new Option("libDirectory",                "-lib", OptionArgType.STRING, "specify location of grammars, tokens files"),
-        new Option("generate_ATN_dot",            "-atn", "generate rule augmented transition network diagrams"),
+		new Option("outputDirectory",             "-o", OptionArgType.STRING, "specify output directory where all output is generated"),
+		new Option("libDirectory",                "-lib", OptionArgType.STRING, "specify location of grammars, tokens files"),
+		new Option("generate_ATN_dot",            "-atn", "generate rule augmented transition network diagrams"),
 		new Option("grammarEncoding",             "-encoding", OptionArgType.STRING, "specify grammar file encoding; e.g., euc-jp"),
 		new Option("msgFormat",                   "-message-format", OptionArgType.STRING, "specify output style for messages in antlr, gnu, vs2005"),
 		new Option("longMessages",                "-long-messages", "show exception details when available for errors and warnings"),
@@ -133,9 +133,9 @@ public class Tool {
 		new Option("gen_dependencies",            "-depend", "generate file dependencies"),
 		new Option("",                            "-D<option>=value", "set/override a grammar-level option"),
 		new Option("warnings_are_errors",         "-Werror", "treat warnings as errors"),
-        new Option("launch_ST_inspector",         "-XdbgST", "launch StringTemplate visualizer on generated code"),
+		new Option("launch_ST_inspector",         "-XdbgST", "launch StringTemplate visualizer on generated code"),
 		new Option("ST_inspector_wait_for_close", "-XdbgSTWait", "wait for STViz to close before continuing"),
-        new Option("force_atn",                   "-Xforce-atn", "use the ATN simulator for all predictions"),
+		new Option("force_atn",                   "-Xforce-atn", "use the ATN simulator for all predictions"),
 		new Option("log",                         "-Xlog", "dump lots of logging info to antlr-timestamp.log"),
 	};
 

@@ -18,8 +18,7 @@ import java.util.ArrayList;
 import java.io.BufferedReader;
 import java.io.FileReader;
 
-// A class to read plain text interpreter data produced by ANTLR when run with
-// the -interpreter option.
+// A class to read plain text interpreter data produced by ANTLR.
 public class InterpreterDataReader {
 	
 	public static class InterpreterData {
@@ -59,7 +58,7 @@ public class InterpreterDataReader {
 		  	List<String> symbolicNames = new ArrayList<String>();
 		
 			line = br.readLine();
-			if (!line.equals("token literal names:"))
+			if ( !line.equals("token literal names:") )
 				throw new RuntimeException("Unexpected data entry");
 		    while ((line = br.readLine()) != null) {
 		       if ( line.isEmpty() )
@@ -68,7 +67,7 @@ public class InterpreterDataReader {
 		    }
 		
 			line = br.readLine();
-			if (!line.equals("token symbolic names:"))
+			if ( !line.equals("token symbolic names:") )
 				throw new RuntimeException("Unexpected data entry");
 		    while ((line = br.readLine()) != null) {
 		       if ( line.isEmpty() )
@@ -88,7 +87,7 @@ public class InterpreterDataReader {
 			    }
 		  	}
 			else {
-				if (!line.equals("channel names:"))
+				if ( !line.equals("channel names:") )
 					throw new RuntimeException("Unexpected data entry");
 
 				result.channels = new ArrayList<String>();
@@ -99,7 +98,7 @@ public class InterpreterDataReader {
 			    }
 
 				line = br.readLine();
-				if (!line.equals("mode names:"))
+				if ( !line.equals("mode names:") )
 					throw new RuntimeException("Unexpected data entry");
 				result.modes = new ArrayList<String>();
 			    while ((line = br.readLine()) != null) {
@@ -111,7 +110,7 @@ public class InterpreterDataReader {
 		  	}
 
 		  	line = br.readLine();
-		  	if (!line.equals("atn:"))
+		  	if ( !line.equals("atn:") )
 		  		throw new RuntimeException("Unexpected data entry");
 			line = br.readLine();
 			String[] elements = line.split(",");
