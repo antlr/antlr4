@@ -104,7 +104,6 @@ public class Tool {
 	public String outputDirectory;
 	public String libDirectory;
 	public boolean generate_ATN_dot = false;
-	public boolean genInterpreterData = false;
 	public String grammarEncoding = null; // use default locale's encoding
 	public String msgFormat = "antlr";
 	public boolean launch_ST_inspector = false;
@@ -123,7 +122,6 @@ public class Tool {
         new Option("outputDirectory",             "-o", OptionArgType.STRING, "specify output directory where all output is generated"),
         new Option("libDirectory",                "-lib", OptionArgType.STRING, "specify location of grammars, tokens files"),
         new Option("generate_ATN_dot",            "-atn", "generate rule augmented transition network diagrams"),
-        new Option("genInterpreterData",          "-interpreter", "generate only data required for interpreters"),
 		new Option("grammarEncoding",             "-encoding", OptionArgType.STRING, "specify grammar file encoding; e.g., euc-jp"),
 		new Option("msgFormat",                   "-message-format", OptionArgType.STRING, "specify output style for messages in antlr, gnu, vs2005"),
 		new Option("longMessages",                "-long-messages", "show exception details when available for errors and warnings"),
@@ -394,10 +392,7 @@ public class Tool {
 
 		if ( generate_ATN_dot ) generateATNs(g);
 		
-		if ( genInterpreterData ) {
-			generateInterpreterData(g);
-			return;
-		}
+		generateInterpreterData(g);
 
 		// PERFORM GRAMMAR ANALYSIS ON ATN: BUILD DECISION DFAs
 		AnalysisPipeline anal = new AnalysisPipeline(g);
@@ -752,7 +747,7 @@ public class Tool {
 			content.append(serializedATN.toString());
 			
 			try {
-				Writer fw = getOutputFileWriter(ig, ig.name + ".interpreter.txt");
+				Writer fw = getOutputFileWriter(ig, ig.name + ".interp");
 				try {
 					fw.write(content.toString());
 				}
