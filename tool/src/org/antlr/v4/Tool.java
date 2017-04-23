@@ -698,66 +698,60 @@ public class Tool {
 	}
 
 	private void generateInterpreterData(Grammar g) {
-		List<Grammar> grammars = new ArrayList<Grammar>();
-		grammars.add(g);
-		List<Grammar> imported = g.getAllImportedGrammars();
-		if ( imported!=null ) grammars.addAll(imported);
-		for (Grammar ig : grammars) {
-			StringBuilder content = new StringBuilder();
+		StringBuilder content = new StringBuilder();
+		
+		content.append("token literal names:\n");
+		String[] names = g.getTokenLiteralNames();
+		for (String name : names) {
+			content.append(name + "\n");
+		}
+		content.append("\n");
+		
+		content.append("token symbolic names:\n");
+		names = g.getTokenSymbolicNames();
+		for (String name : names) {
+			content.append(name + "\n");
+		}
+		content.append("\n");
+		
+		if ( g.isLexer() ) {
+			content.append("channel names:\n");
+			content.append("DEFAULT_TOKEN_CHANNEL\n");
+			content.append("HIDDEN\n");
+			for (String channel : g.channelValueToNameList) {
+				content.append(channel + "\n");
+			}
+			content.append("\n");
 			
-			content.append("token literal names:\n");
-			String[] names = ig.getTokenLiteralNames();
+			content.append("mode names:\n");
+			for (String mode : ((LexerGrammar)g).modes.keySet()) {
+				content.append(mode + "\n");
+			}
+		}
+		else {
+			content.append("rule names:\n");
+			names = g.getRuleNames();
 			for (String name : names) {
 				content.append(name + "\n");
 			}
-			content.append("\n");
-			
-			content.append("token symbolic names:\n");
-			names = ig.getTokenSymbolicNames();
-			for (String name : names) {
-				content.append(name + "\n");
-			}
-			content.append("\n");
-			
-			if ( ig.isLexer() ) {
-				content.append("channel names:\n");
-				content.append("DEFAULT_TOKEN_CHANNEL\n");
-				content.append("HIDDEN\n");
-				for (String channel : ig.channelValueToNameList) {
-					content.append(channel + "\n");
-				}
-				content.append("\n");
-				
-				content.append("mode names:\n");
-				for (String mode : ((LexerGrammar)ig).modes.keySet()) {
-					content.append(mode + "\n");
-				}
-			}
-			else {
-				content.append("rule names:\n");
-				names = ig.getRuleNames();
-				for (String name : names) {
-					content.append(name + "\n");
-				}
-			}
-			content.append("\n");
-			
-			IntegerList serializedATN = ATNSerializer.getSerialized(ig.atn);
-			content.append("atn:\n");
-			content.append(serializedATN.toString());
-			
+		}
+		content.append("\n");
+		
+		IntegerList serializedATN = ATNSerializer.getSerialized(g.atn);
+		content.append("atn:\n");
+		content.append(serializedATN.toString());
+		
+		try {
+			Writer fw = getOutputFileWriter(g, g.name + ".interp");
 			try {
-				Writer fw = getOutputFileWriter(ig, ig.name + ".interp");
-				try {
-					fw.write(content.toString());
-				}
-				finally {
-					fw.close();
-				}	
+				fw.write(content.toString());
 			}
-			catch (IOException ioe) {
-				errMgr.toolError(ErrorType.CANNOT_WRITE_FILE, ioe);
-			}
+			finally {
+				fw.close();
+			}	
+		}
+		catch (IOException ioe) {
+			errMgr.toolError(ErrorType.CANNOT_WRITE_FILE, ioe);
 		}
 	}
 	
