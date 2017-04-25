@@ -12,12 +12,17 @@ package parser // <file.grammarName>
 <endif>
 
 import (
-	"fmt"
-	"reflect"
-	"strconv"
-
-	"github.com/antlr/antlr4/runtime/Go/antlr"
+    "fmt"
+    "reflect"
+    "strconv"
 )
+<if(file.antlrRuntimeImport)>
+import "<file.antlrRuntimeImport>"
+<else>
+import "github.com/antlr/antlr4/runtime/Go/antlr"
+<endif>
+
+
 
 <if(namedActions.header)>
 
@@ -45,7 +50,11 @@ package <file.genPackage> // <file.grammarName>
 package parser // <file.grammarName>
 <endif>
 
+<if(file.antlrRuntimeImport)>
+import "<file.antlrRuntimeImport>"
+<else>
 import "github.com/antlr/antlr4/runtime/Go/antlr"
+<endif>
 
 // <file.grammarName>Listener is a complete listener for a parse tree produced by <file.parserName>.
 type <file.grammarName>Listener interface {
@@ -69,7 +78,11 @@ package <file.genPackage> // <file.grammarName>
 package parser // <file.grammarName>
 <endif>
 
+<if(file.antlrRuntimeImport)>
+import "<file.antlrRuntimeImport>"
+<else>
 import "github.com/antlr/antlr4/runtime/Go/antlr"
+<endif>
 
 // Base<file.grammarName>Listener is a complete listener for a parse tree produced by <file.parserName>.
 type Base<file.grammarName>Listener struct{}
@@ -105,7 +118,11 @@ package <file.genPackage> // <file.grammarName>
 package parser // <file.grammarName>
 <endif>
 
+<if(file.antlrRuntimeImport)>
+import "<file.antlrRuntimeImport>"
+<else>
 import "github.com/antlr/antlr4/runtime/Go/antlr"
+<endif>
 <if(header)>
 
 <header>
@@ -131,7 +148,11 @@ package <file.genPackage> // <file.grammarName>
 package parser // <file.grammarName>
 <endif>
 
+<if(file.antlrRuntimeImport)>
+import "<file.antlrRuntimeImport>"
+<else>
 import "github.com/antlr/antlr4/runtime/Go/antlr"
+<endif>
 
 type Base<file.grammarName>Visitor struct {
 	*antlr.BaseParseTreeVisitor
@@ -1344,11 +1365,16 @@ package parser
 <endif>
 
 import (
-	"fmt"
-	"unicode"
-
-	"github.com/antlr/antlr4/runtime/Go/antlr"
+    "fmt"
+    "unicode"
 )
+
+<if(lexerFile.antlrRuntimeImport)>
+import "<lexerFile.antlrRuntimeImport>"
+<else>
+import "github.com/antlr/antlr4/runtime/Go/antlr"
+<endif>
+
 <if(namedActions.header)>
 
 <namedActions.header>

@@ -20,6 +20,7 @@ public abstract class OutputFile extends OutputModelObject {
 	public final String ANTLRVersion;
     public final String TokenLabelType;
     public final String InputSymbolType;
+	public final String antlrRuntimeImport; // from -DruntimeImport or options in grammars
 
     public OutputFile(OutputModelFactory factory, String fileName) {
         super(factory);
@@ -29,6 +30,7 @@ public abstract class OutputFile extends OutputModelObject {
 		ANTLRVersion = Tool.VERSION;
         TokenLabelType = g.getOptionString("TokenLabelType");
         InputSymbolType = TokenLabelType;
+		antlrRuntimeImport = factory.getGrammar().getOptionString("runtimeImport");
     }
 
 	public Map<String, Action> buildNamedActions(Grammar g) {
