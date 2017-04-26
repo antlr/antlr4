@@ -181,8 +181,8 @@ func (prc *BaseParserRuleContext) GetRuleContext() RuleContext {
 	return prc
 }
 
-func (prc *BaseParserRuleContext) Accept(delegate ParseTreeVisitor) interface{} {
-	return delegate.VisitChildren(prc, delegate)
+func (prc *BaseParserRuleContext) Accept(delegate ParseTreeVisitor) {
+	delegate.VisitChildren(prc, delegate)
 }
 
 func (prc *BaseParserRuleContext) SetStart(t Token) {
