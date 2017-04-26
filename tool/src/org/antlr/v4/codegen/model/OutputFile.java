@@ -8,10 +8,12 @@ package org.antlr.v4.codegen.model;
 
 import org.antlr.v4.Tool;
 import org.antlr.v4.codegen.OutputModelFactory;
+import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.ast.ActionAST;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 public abstract class OutputFile extends OutputModelObject {
@@ -21,7 +23,10 @@ public abstract class OutputFile extends OutputModelObject {
     public final String TokenLabelType;
     public final String InputSymbolType;
 	public final String antlrRuntimeImport; // from -DruntimeImport or options in grammars
+	public final boolean newcb; 
+	private static HashSet<String> optionMessage = new HashSet<String>();
 
+	
     public OutputFile(OutputModelFactory factory, String fileName) {
         super(factory);
         this.fileName = fileName;
@@ -31,6 +36,16 @@ public abstract class OutputFile extends OutputModelObject {
         TokenLabelType = g.getOptionString("TokenLabelType");
         InputSymbolType = TokenLabelType;
 		antlrRuntimeImport = factory.getGrammar().getOptionString("runtimeImport");
+		String cbVersion = factory.getGrammar().getOptionString("newCallback");
+		if( cbVersion != null && !optionMessage.contains(g.fileName) && !cbVersion.equals("true") ) {
+			optionMessage.add(g.fileName);
+			g.tool.errMgr.grammarError(ErrorType.ILLEGAL_OPTION_VALUE_EXPECTED, g.fileName, null, "callbackVersion", cbVersion, "true");			
+		}
+		if( cbVersion != null && cbVersion.equals("true") ) {
+			newcb = true;
+		} else {
+			newcb = false;
+		}
     }
 
 	public Map<String, Action> buildNamedActions(Grammar g) {

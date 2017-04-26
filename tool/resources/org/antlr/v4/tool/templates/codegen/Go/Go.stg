@@ -59,27 +59,30 @@ import "github.com/antlr/antlr4/runtime/Go/antlr"
 // <file.grammarName>Listener is a complete listener for a parse tree produced by <file.parserName>.
 type <file.grammarName>Listener interface {
 	antlr.ParseTreeListener
+	
+    <file.listenerRuleNames:{lname | <lname; format="cap">ContextListener }; separator="\n"> 
+    <file.listenerAltNames:{lname | <lname; format="cap">ContextListener }; separator="\n">
+}
 
 //
 // Rules with unnamed alternatives
 //
-	<file.listenerRuleNames:{lname | 
-Enter<lname; format="cap">(c I<lname; format="cap">Context)
-Exit<lname; format="cap">(c I<lname; format="cap">Context)
-}; separator="\n">
+<file.listenerRuleNames:{lname |
+type <lname; format="cap">ContextListener interface {
+    Enter<lname; format="cap">(c <if(file.newcb)>I<else>*<endif><lname; format="cap">Context)
+    Exit<lname; format="cap">(c <if(file.newcb)>I<else>*<endif><lname; format="cap">Context)
+\}}; separator="\n">
 
 //
 // Named alternatives
 // <! TODO Would be nice to have the rule name here !>
 // 
-    <file.listenerAltNames:{lname | 
+<file.listenerAltNames:{lname | 
+type <lname; format="cap">ContextListener interface {
 // From Rule '<file.listenerLabelRuleNames.(lname)>'
-Enter<lname; format="cap">(c I<lname; format="cap">Context)
-Exit<lname; format="cap">(c I<lname; format="cap">Context)    
-}; separator="\n">
-
-
-}
+    Enter<lname; format="cap">(c <if(file.newcb)>I<else>*<endif><lname; format="cap">Context)
+    Exit<lname; format="cap">(c <if(file.newcb)>I<else>*<endif><lname; format="cap">Context)    
+\}}; separator="\n">
 
 >>
 
@@ -116,10 +119,10 @@ func (s *Base<file.grammarName>Listener) EnterEveryRule(ctx antlr.ParserRuleCont
 func (s *Base<file.grammarName>Listener) ExitEveryRule(ctx antlr.ParserRuleContext) {}
 
 <file.listenerNames:{lname | // Enter<lname; format="cap"> is called when production <lname> is entered.
-func (s *Base<file.grammarName>Listener) Enter<lname; format="cap">(ctx I<lname; format="cap">Context) {\}
+func (s *Base<file.grammarName>Listener) Enter<lname; format="cap">(ctx <if(file.newcb)>I<else>*<endif><lname; format="cap">Context) {\}
 
 // Exit<lname; format="cap"> is called when production <lname> is exited.
-func (s *Base<file.grammarName>Listener) Exit<lname; format="cap">(ctx I<lname; format="cap">Context) {\}}; separator="\n\n">
+func (s *Base<file.grammarName>Listener) Exit<lname; format="cap">(ctx <if(file.newcb)>I<else>*<endif><lname; format="cap">Context) {\}}; separator="\n\n">
 
 >>
 
@@ -145,11 +148,11 @@ import "github.com/antlr/antlr4/runtime/Go/antlr"
 // A complete Visitor for a parse tree produced by <file.parserName>.
 type <file.grammarName>Visitor interface {
     antlr.ParseTreeVisitor
-    <file.visitorNames:{lname | <lname; format="cap">Visitor}; separator="\n">
+    <file.visitorNames:{lname | <lname; format="cap">ContextVisitor}; separator="\n">
 }
 
 <file.visitorNames:{lname |
-type <lname; format="cap">Visitor interface {
+type <lname; format="cap">ContextVisitor interface {
     Visit<lname; format="cap">(ctx I<lname; format="cap">Context, delegate antlr.ParseTreeVisitor)
 \}}; separator="\n">
 >>
@@ -1355,13 +1358,13 @@ func (s *<struct.name>) GetRuleContext() antlr.RuleContext {
 ListenerDispatchMethod(method) ::= <<
 <if(method.isEnter)>
 func (s *<struct.name>) EnterRule(listener antlr.ParseTreeListener) {
-    if listenerT, ok := listener.(<parser.grammarName>Listener); ok {
+    if listenerT, ok := listener.(<struct.derivedFromName; format="cap">ContextListener); ok {
         listenerT.Enter<struct.derivedFromName; format="cap">(s)
     }
 }
 <else>
 func (s *<struct.name>) ExitRule(listener antlr.ParseTreeListener) {
-    if listenerT, ok := listener.(<parser.grammarName>Listener); ok {
+    if listenerT, ok := listener.(<struct.derivedFromName; format="cap">ContextListener); ok {
         listenerT.Exit<struct.derivedFromName; format="cap">(s)
     }
 }
@@ -1371,7 +1374,7 @@ func (s *<struct.name>) ExitRule(listener antlr.ParseTreeListener) {
 VisitorDispatchMethod(method) ::= <<
 func (s *<struct.name>) Accept(delegate antlr.ParseTreeVisitor) {
 	switch t := delegate.(type) {
-	case <struct.derivedFromName; format="cap">Visitor:
+	case <struct.derivedFromName; format="cap">ContextVisitor:
 		t.Visit<struct.derivedFromName; format="cap">(s, delegate)
 	default:
 		delegate.VisitChildren(s, delegate)

@@ -326,6 +326,12 @@ public enum ErrorType {
 	 */
 	ILLEGAL_OPTION_VALUE(84, "unsupported option value <arg>=<arg2>", ErrorSeverity.WARNING),
 	/**
+	 * Compiler Warning 85.
+	 *
+	 * <p>unsupported option value <em>name</em>=<em>value</em>. Expected one of [value,..]</p>
+	 */
+	ILLEGAL_OPTION_VALUE_EXPECTED(85, "unsupported option value <arg>=<arg2>. Expected one of <arg3> ", ErrorSeverity.WARNING),
+	/**
 	 * Compiler Error 94.
 	 *
 	 * <p>redefinition of <em>action</em> action</p>
