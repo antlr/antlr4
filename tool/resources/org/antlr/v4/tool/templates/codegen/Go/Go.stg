@@ -130,13 +130,13 @@ import "github.com/antlr/antlr4/runtime/Go/antlr"
 
 // A complete Visitor for a parse tree produced by <file.parserName>.
 type <file.grammarName>Visitor interface {
-	antlr.ParseTreeVisitor
+    antlr.ParseTreeVisitor
+}
 
 <file.visitorNames:{lname |
-	// Visit a parse tree produced by <file.parserName>#<lname>.
-	Visit<lname; format="cap">(ctx *<lname; format="cap">Context) interface{\}
-}; separator="\n">
-}
+type <lname; format="cap">Visitor interface {
+    Visit<lname; format="cap">(ctx *<lname; format="cap">Context, delegate antlr.ParseTreeVisitor) interface{\}
+\}}; separator="\n">
 >>
 
 BaseVisitorFile(file, header, namedActions) ::= <<
@@ -149,19 +149,54 @@ package parser // <file.grammarName>
 <endif>
 
 <if(file.antlrRuntimeImport)>
-import "<file.antlrRuntimeImport>"
+//import "<file.antlrRuntimeImport>"
 <else>
-import "github.com/antlr/antlr4/runtime/Go/antlr"
+//import "github.com/antlr/antlr4/runtime/Go/antlr"
 <endif>
 
-type Base<file.grammarName>Visitor struct {
-	*antlr.BaseParseTreeVisitor
-}
+//type <file.grammarName>Visitor struct {
+//    *antlr.BaseParseTreeVisitor
+//}
 
+//func (v *<file.grammarName>Visitor) Init() interface{} {
+//    return nil
+//}
+
+//func (v *<file.grammarName>Visitor) VisitNext(node antlr.Tree, resultSoFar interface{}) bool {
+//    return true
+//}
+
+//func (v *<file.grammarName>Visitor) Aggregate(resultSoFar, childResult interface{}) interface{} {
+//    return childResult
+//}
+
+//func (v *<file.grammarName>Visitor) VisitTerminal(node antlr.TerminalNode) interface{} {
+//    return nil
+//}
+
+//func (v *<file.grammarName>Visitor) VisitErrorNode(node antlr.ErrorNode) interface{} {
+//    return nil
+//}
+
+<if(file.genPackage)>
 <file.visitorNames:{lname |
-func (v *Base<file.grammarName>Visitor) Visit<lname; format="cap">(ctx *<lname; format="cap">Context) interface{\} {
-	return v.VisitChildren(ctx)
-\}}; separator="\n\n">
+//func (v *<file.grammarName>Visitor) Visit<lname; format="cap">(ctx *<file.genPackage>.<lname; format="cap">Context, delegate antlr.ParseTreeVisitor) interface{\} {
+//  // before children
+//  r := v.VisitChildren(ctx, delegate)
+//  // afer children
+//  return r 
+//\}}; separator="\n\n">
+<else>
+<file.visitorNames:{lname |
+//func (v *<file.grammarName>Visitor) Visit<lname; format="cap">(ctx *parser.<lname; format="cap">Context, delegate antlr.ParseTreeVisitor) interface{\} {
+//  // before children
+//  r := v.VisitChildren(ctx, delegate)
+//  // afer children
+//  return r 
+//\}}; separator="\n\n">
+<endif>
+
+
 
 >>
 
@@ -1300,14 +1335,13 @@ func (s *<struct.name>) <if(method.isEnter)>Enter<else>Exit<endif>Rule(listener 
 >>
 
 VisitorDispatchMethod(method) ::= <<
-func (s *<struct.name>) Accept(visitor antlr.ParseTreeVisitor) interface{} {
-	switch t := visitor.(type) {
-	case <parser.grammarName>Visitor:
-		return t.Visit<struct.derivedFromName; format="cap">(s)
-
-	default:
-		return t.VisitChildren(s)
-	}
+func (s *<struct.name>) Accept(delegate antlr.ParseTreeVisitor) interface{} {
+    switch t := delegate.(type) {
+    case <struct.derivedFromName; format="cap">Visitor:
+        return t.Visit<struct.derivedFromName; format="cap">(s, delegate)
+    default:
+        return delegate.VisitChildren(s, delegate)
+    }
 }
 >>
 

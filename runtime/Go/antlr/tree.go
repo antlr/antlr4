@@ -28,7 +28,7 @@ type SyntaxTree interface {
 type ParseTree interface {
 	SyntaxTree
 
-	Accept(Visitor ParseTreeVisitor) interface{}
+	Accept(visitor ParseTreeVisitor) interface{}
 	GetText() string
 
 	ToStringTree([]string, Recognizer) string
@@ -54,41 +54,44 @@ type ErrorNode interface {
 }
 
 type ParseTreeVisitor interface {
-	Visit(tree ParseTree) interface{}
-	VisitChildren(node RuleNode) interface{}
+	Init() interface{}
+	VisitNext(node Tree, resultSoFar interface{}) bool
+	Aggregate(resultSoFar, childResult interface{}) interface{}
 	VisitTerminal(node TerminalNode) interface{}
 	VisitErrorNode(node ErrorNode) interface{}
+	VisitChildren(node RuleNode, delegate ParseTreeVisitor) interface{}
 }
 
 type BaseParseTreeVisitor struct{}
 
-var _ ParseTreeVisitor = &BaseParseTreeVisitor{}
-
-func (v *BaseParseTreeVisitor) Visit(tree ParseTree) interface{}            { return nil }
-func (v *BaseParseTreeVisitor) VisitChildren(node RuleNode) interface{}     { return nil }
-func (v *BaseParseTreeVisitor) VisitTerminal(node TerminalNode) interface{} { return nil }
-func (v *BaseParseTreeVisitor) VisitErrorNode(node ErrorNode) interface{}   { return nil }
-
-// TODO
-//func (this ParseTreeVisitor) Visit(ctx) {
-//	if (Utils.isArray(ctx)) {
-//		self := this
-//		return ctx.map(function(child) { return VisitAtom(self, child)})
-//	} else {
-//		return VisitAtom(this, ctx)
-//	}
-//}
-//
-//func VisitAtom(Visitor, ctx) {
-//	if (ctx.parser == nil) { //is terminal
-//		return
-//	}
-//
-//	name := ctx.parser.ruleNames[ctx.ruleIndex]
-//	funcName := "Visit" + Utils.titleCase(name)
-//
-//	return Visitor[funcName](ctx)
-//}
+func (*BaseParseTreeVisitor) Init() interface{}                                 { return nil }
+func (*BaseParseTreeVisitor) VisitNext(node Tree, resultSoFar interface{}) bool { return true }
+func (*BaseParseTreeVisitor) Aggregate(resultSoFar, childResult interface{}) interface{} {
+	return childResult
+}
+func (*BaseParseTreeVisitor) VisitTerminal(node TerminalNode) interface{} { return nil }
+func (*BaseParseTreeVisitor) VisitErrorNode(node ErrorNode) interface{}   { return nil }
+func (*BaseParseTreeVisitor) VisitChildren(node RuleNode, delegate ParseTreeVisitor) interface{} {
+	result := delegate.Init()
+	for _, child := range node.GetChildren() {
+		if !delegate.VisitNext(child, result) {
+			continue
+		}
+		switch child := child.(type) {
+		case TerminalNode:
+			childResult := delegate.VisitTerminal(child)
+			result = delegate.Aggregate(result, childResult)
+		case ErrorNode:
+			delegate.VisitErrorNode(child)
+		case RuleNode:
+			childResult := child.Accept(delegate)
+			result = delegate.Aggregate(result, childResult)
+		default:
+			// can this happen??
+		}
+	}
+	return result
+}
 
 type ParseTreeListener interface {
 	VisitTerminal(node TerminalNode)
