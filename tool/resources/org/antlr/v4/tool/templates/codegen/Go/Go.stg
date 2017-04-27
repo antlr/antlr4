@@ -995,7 +995,7 @@ QRetValueRef(a) ::= "<ctx(a)>.Get<a.dict;format={cap}>().Get<a.name;format={cap}
 /** How to translate $tokenLabel */
 TokenRef(t) ::= "<ctx(t)>.Get<t.name;format={cap}>()"
 LabelRef(t) ::= "<ctx(t)>.Get<t.name;format={cap}>()"
-ListLabelRef(t) ::= "<ctx(t)>.Get<ListLabelName(t.name)>()"
+ListLabelRef(t) ::= "<ctx(t)>.Get<t.name;format={cap}>()"
 
 SetAttr(s, rhsChunks) ::= "<ctx(s)>.Set<s.name; format={cap}>(<rhsChunks>)"
 
@@ -1136,7 +1136,7 @@ RuleContextNameSuffix() ::= "Context"
 ImplicitTokenLabel(tokenName) ::= "_<tokenName>"
 ImplicitRuleLabel(ruleName) ::= "_<ruleName>"
 ImplicitSetLabel(id) ::= "_tset<id>"
-ListLabelName(label) ::= "<label; format=\"cap\">"
+ListLabelName(label) ::= "<label>"
 
 CaptureNextToken(d) ::= "<d.varName> = p.GetTokenStream().LT(1)"
 CaptureNextTokenType(d) ::= "<d.varName> = p.GetTokenStream().LA(1)"
@@ -1163,30 +1163,28 @@ type I<struct.name>Internal interface {
 
 // This can to be the 'Exported' interface (put in non export if it turn out to be an issue)
 type I<struct.name> interface {
-    antlr.ParserRuleContext
-    // GetParser returns the parser.
-    GetParser() antlr.Parser
-
+	antlr.ParserRuleContext
+	// GetParser returns the parser.
+	GetParser() antlr.Parser
+	
     //Gets for labeled elements
-    //  tokenDecls
+    //tokenDecls	
     <struct.tokenDecls:{a           | <if(!a.isImplicit)> Get<a.name; format="cap">() <TokenLabelType()>
     <endif> }>
-    //  tokenTypeDecls
+    //tokenTypeDecls
     <struct.tokenTypeDecls:{a       | Get<a.name; format="cap">() int }; separator="\n\n">
-    //  tokenListDecls
+    //tokenListDecls
     <struct.tokenListDecls:{a       | Get<a.name; format="cap">() []<TokenLabelType()> }; separator="\n">
-    //  attributeDecls
+    //attributeDecls
     <struct.attributeDecls:{a       | Get<a.name; format="cap">() <a.type> }; separator="\n">
-    //  tokenGetterDecl
-    <struct.tokenGetterDecl:{t            | <t.name; format="cap">() antlr.TerminalNode}; separator="\n">
-    //  tokenListGetterDecl
-    <struct.tokenListGetterDecl:{t        | All<t.name; format="cap">() []antlr.TerminalNode}; separator="\n">
-    //  tokenListIndexedGetterDecl
-    <struct.tokenListIndexedGetterDecl:{t | <t.name; format="cap">(i int) antlr.TerminalNode}; separator="\n">
+    //tokenGetterDecl
+<struct.tokenGetterDecl:{t            |    <t.name; format="cap">() antlr.TerminalNode}; separator="\n">
+    //tokenListGetterDecl
+<struct.tokenListGetterDecl:{t        |    All<t.name; format="cap">() []antlr.TerminalNode}; separator="\n">
+    //tokenListIndexedGetterDecl
+<struct.tokenListIndexedGetterDecl:{t |    <t.name; format="cap">(i int) antlr.TerminalNode}; separator="\n">
 
     // Is<struct.name> differentiates from other interfaces.
-    Is<struct.name>()
-
 //copyStruct,GetRuleContext and ToStringTree  from embedded
 
 //\<if(dispatchMethods)>
@@ -1196,7 +1194,6 @@ type I<struct.name> interface {
 //\<if(extensionMembers)>
 //\<extensionMembers; separator="\n\n">
 //\<endif>
-// TODO dispatchMethods (needed?)   
 }
 
 type <struct.name> struct {
