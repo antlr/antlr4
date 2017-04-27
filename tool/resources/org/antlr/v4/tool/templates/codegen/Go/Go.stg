@@ -1142,61 +1142,47 @@ CaptureNextToken(d) ::= "<d.varName> = p.GetTokenStream().LT(1)"
 CaptureNextTokenType(d) ::= "<d.varName> = p.GetTokenStream().LA(1)"
 
 StructDecl(struct, ctorAttrs, attrs, getters, dispatchMethods, interfaces, extensionMembers) ::= <<
-// I<struct.name> is an interface to support dynamic dispatch.
+
+type I<struct.name>Internal interface {
+    // embed exported interface
+    I<struct.name>
+
+    //  ruleGetterDecl
+    <struct.ruleGetterDecl:{r            | <r.name; format="cap">() I<r.ctxName>  }; separator="\n">
+    //  ruleListGetterDecl
+    <struct.ruleListGetterDecl:{r        | All<r.name; format="cap">() []I<r.ctxName> }; separator="\n">
+    //  ruleListIndexedGetterDecl
+    <struct.ruleListIndexedGetterDecl:{r | <r.name; format="cap">(i int) I<r.ctxName> }; separator="\n">
+    //  ruleContextDecls
+    <struct.ruleContextDecls:{a     | Get<a.name; format="cap">() I<a.ctxName> }; separator="\n">
+    //  ruleContextListDecls
+    <struct.ruleContextListDecls:{a | Get<a.name; format="cap">() []I<a.ctxName> }; separator="\n">
+}
+
+// This can to be the 'Exported' interface (put in non export if it turn out to be an issue)
 type I<struct.name> interface {
-	antlr.ParserRuleContext
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-	
-    //tokenDecls	
-	<struct.tokenDecls:{a | 
-Get<a.name; format="cap">() <TokenLabelType()>
-Set<a.name; format="cap">(<TokenLabelType()>) 
-}; separator="\n">
+    antlr.ParserRuleContext
+    // GetParser returns the parser.
+    GetParser() antlr.Parser
 
-    //tokenTypeDecls
-	<struct.tokenTypeDecls:{a | 
-Get<a.name; format="cap">() int 
-Set<a.name; format="cap">(int) 
-}; separator="\n">
+    //Gets for labeled elements
+    //  tokenDecls
+    <struct.tokenDecls:{a           | Get<a.name; format="cap">() <TokenLabelType()> }; separator="\n">
+    //  tokenTypeDecls
+    <struct.tokenTypeDecls:{a       | Get<a.name; format="cap">() int }; separator="\n\n">
+    //  tokenListDecls
+    <struct.tokenListDecls:{a       | Get<a.name; format="cap">() []<TokenLabelType()> }; separator="\n">
+    //  attributeDecls
+    <struct.attributeDecls:{a       | Get<a.name; format="cap">() <a.type> }; separator="\n">
+    //  tokenGetterDecl
+    <struct.tokenGetterDecl:{t            | <t.name; format="cap">() antlr.TerminalNode}; separator="\n">
+    //  tokenListGetterDecl
+    <struct.tokenListGetterDecl:{t        | All<t.name; format="cap">() []antlr.TerminalNode}; separator="\n">
+    //  tokenListIndexedGetterDecl
+    <struct.tokenListIndexedGetterDecl:{t | <t.name; format="cap">(i int) antlr.TerminalNode}; separator="\n">
 
-    //tokenListDecls
-	<struct.tokenListDecls:{a | 
-Get<a.name; format="cap">() []<TokenLabelType()>
-Set<a.name; format="cap">([]<TokenLabelType()>)
-}; separator="\n">
-
-    //ruleContextDecls
-	<struct.ruleContextDecls:{a | 
-Get<a.name; format="cap">() I<a.ctxName>
-Set<a.name; format="cap">(I<a.ctxName>)
-}; separator="\n">
-
-    //ruleContextListDecls
-	<struct.ruleContextListDecls:{a | 
-Get<a.name; format="cap">() []I<a.ctxName>
-Set<a.name; format="cap">([]I<a.ctxName>) 
-}; separator="\n">
-
-    //attributeDecls
-	<struct.attributeDecls:{a | 
-Get<a.name; format="cap">() <a.type>
-Set<a.name; format="cap">(<a.type>)}
-; separator="\n">
-
-    //ruleGetterDecl
-<struct.ruleGetterDecl:{r            |    <r.name; format="cap">() I<r.ctxName>  }; separator="\n">
-    //ruleListGetterDecl
-<struct.ruleListGetterDecl:{r        |    All<r.name; format="cap">() []I<r.ctxName> }; separator="\n">
-    //ruleListIndexedGetterDecl
-<struct.ruleListIndexedGetterDecl:{r |    <r.name; format="cap">(i int) I<r.ctxName> }; separator="\n">
-
-    //tokenGetterDecl
-<struct.tokenGetterDecl:{t            |    <t.name; format="cap">() antlr.TerminalNode}; separator="\n">
-    //tokenListGetterDecl
-<struct.tokenListGetterDecl:{t        |    All<t.name; format="cap">() []antlr.TerminalNode}; separator="\n">
-    //tokenListIndexedGetterDecl
-<struct.tokenListIndexedGetterDecl:{t |    <t.name; format="cap">(i int) antlr.TerminalNode}; separator="\n">
+    // Is<struct.name> differentiates from other interfaces.
+    Is<struct.name>()
 
 //copyStruct,GetRuleContext and ToStringTree  from embedded
 
@@ -1207,10 +1193,7 @@ Set<a.name; format="cap">(<a.type>)}
 //\<if(extensionMembers)>
 //\<extensionMembers; separator="\n\n">
 //\<endif>
-
-
-	// Is<struct.name> differentiates from other interfaces.
-	Is<struct.name>()
+// TODO dispatchMethods (needed?)   
 }
 
 type <struct.name> struct {
