@@ -1154,9 +1154,11 @@ type I<struct.name>Internal interface {
     //  ruleListIndexedGetterDecl
     <struct.ruleListIndexedGetterDecl:{r | <r.name; format="cap">(i int) I<r.ctxName> }; separator="\n">
     //  ruleContextDecls
-    <struct.ruleContextDecls:{a     | Get<a.name; format="cap">() I<a.ctxName> }; separator="\n">
+    <struct.ruleContextDecls:{a     | <if(!a.isImplicit)> Get<a.name; format="cap">() I<a.ctxName> 
+    <endif> }>
     //  ruleContextListDecls
-    <struct.ruleContextListDecls:{a | Get<a.name; format="cap">() []I<a.ctxName> }; separator="\n">
+    <struct.ruleContextListDecls:{a | <if(!a.isImplicit)> Get<a.name; format="cap">() []I<a.ctxName>  <endif> 
+    }>
 }
 
 // This can to be the 'Exported' interface (put in non export if it turn out to be an issue)
@@ -1167,7 +1169,8 @@ type I<struct.name> interface {
 
     //Gets for labeled elements
     //  tokenDecls
-    <struct.tokenDecls:{a           | Get<a.name; format="cap">() <TokenLabelType()> }; separator="\n">
+    <struct.tokenDecls:{a           | <if(!a.isImplicit)> Get<a.name; format="cap">() <TokenLabelType()>
+    <endif> }>
     //  tokenTypeDecls
     <struct.tokenTypeDecls:{a       | Get<a.name; format="cap">() int }; separator="\n\n">
     //  tokenListDecls
@@ -1328,15 +1331,18 @@ type I<struct.name> interface {
 
     //Gets for labeled elements
     //  tokenDecls
-    <struct.tokenDecls:{a           | Get<a.name; format="cap">() <TokenLabelType()> }; separator="\n">
+    <struct.tokenDecls:{a           | <if(!a.isImplicit)>Get<a.name; format="cap">() <TokenLabelType()>
+    <endif> }>
     //  tokenTypeDecls
     <struct.tokenTypeDecls:{a       | Get<a.name; format="cap">() int }; separator="\n\n">
     //  tokenListDecls
     <struct.tokenListDecls:{a       | Get<a.name; format="cap">() []<TokenLabelType()> }; separator="\n">
     //  ruleContextDecls
-    <struct.ruleContextDecls:{a     | Get<a.name; format="cap">() I<a.ctxName> }; separator="\n">
+    <struct.ruleContextDecls:{a     | <if(!a.isImplicit)> Get<a.name; format="cap">() I<a.ctxName> 
+    <endif> }>
     //  ruleContextListDecls
-    <struct.ruleContextListDecls:{a | Get<a.name; format="cap">() []I<a.ctxName> }; separator="\n">
+    <struct.ruleContextListDecls:{a | <if(!a.isImplicit)> Get<a.name; format="cap">() []I<a.ctxName> <endif>
+    }>
     //  attributeDecls
     <struct.attributeDecls:{a       | Get<a.name; format="cap">() <a.type> }; separator="\n">
 
