@@ -995,7 +995,7 @@ QRetValueRef(a) ::= "<ctx(a)>.Get<a.dict;format={cap}>().Get<a.name;format={cap}
 /** How to translate $tokenLabel */
 TokenRef(t) ::= "<ctx(t)>.Get<t.name;format={cap}>()"
 LabelRef(t) ::= "<ctx(t)>.Get<t.name;format={cap}>()"
-ListLabelRef(t) ::= "<ctx(t)>.Get<ListLabelName(t.name);format={cap}>"
+ListLabelRef(t) ::= "<ctx(t)>.Get<ListLabelName(t.name)>()"
 
 SetAttr(s, rhsChunks) ::= "<ctx(s)>.Set<s.name; format={cap}>(<rhsChunks>)"
 
@@ -1136,7 +1136,7 @@ RuleContextNameSuffix() ::= "Context"
 ImplicitTokenLabel(tokenName) ::= "_<tokenName>"
 ImplicitRuleLabel(ruleName) ::= "_<ruleName>"
 ImplicitSetLabel(id) ::= "_tset<id>"
-ListLabelName(label) ::= "<label>"
+ListLabelName(label) ::= "<label; format=\"cap\">"
 
 CaptureNextToken(d) ::= "<d.varName> = p.GetTokenStream().LT(1)"
 CaptureNextTokenType(d) ::= "<d.varName> = p.GetTokenStream().LA(1)"
