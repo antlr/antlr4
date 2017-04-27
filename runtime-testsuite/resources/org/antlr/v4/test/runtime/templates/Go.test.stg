@@ -199,11 +199,11 @@ func (m *MyRuleNode) SetAltNumber(altNum int) {
 BasicListener(notused) ::= <<
 @parser::members {
 type LeafListener struct {
-	*BaseTListener
+	*antlr.BaseParseTreeListener
 }
 
 func NewLeafListener() *LeafListener {
-	return &LeafListener{BaseTListener: &BaseTListener{}}
+	return &LeafListener{}
 }
 
 func (*LeafListener) VisitTerminal(node antlr.TerminalNode) {
@@ -221,11 +221,11 @@ walker.Walk(NewLeafListener(), <s>)
 TokenGetterListener(notused) ::= <<
 @parser::members {
 type LeafListener struct {
-	*BaseTListener
+    *antlr.BaseParseTreeListener
 }
 
 func NewLeafListener() *LeafListener {
-	return &LeafListener{BaseTListener: &BaseTListener{}}
+	return &LeafListener{}
 }
 
 func (*LeafListener) ExitA(ctx *AContext) { // new callback IAContext
@@ -241,11 +241,11 @@ func (*LeafListener) ExitA(ctx *AContext) { // new callback IAContext
 RuleGetterListener(notused) ::= <<
 @parser::members {
 type LeafListener struct {
-	*BaseTListener
+    *antlr.BaseParseTreeListener
 }
 
 func NewLeafListener() *LeafListener {
-	return &LeafListener{BaseTListener: &BaseTListener{}}
+	return &LeafListener{}
 }
 
 func (*LeafListener) ExitA(ctx *AContext) { // new callback IAContext
@@ -261,11 +261,11 @@ func (*LeafListener) ExitA(ctx *AContext) { // new callback IAContext
 LRListener(notused) ::= <<
 @parser::members {
 type LeafListener struct {
-	*BaseTListener
+    *antlr.BaseParseTreeListener
 }
 
 func NewLeafListener() *LeafListener {
-	return &LeafListener{BaseTListener: &BaseTListener{}}
+	return &LeafListener{}
 }
 
 func (*LeafListener) ExitE(ctx *EContext) { // new callback IEContext
@@ -281,11 +281,11 @@ func (*LeafListener) ExitE(ctx *EContext) { // new callback IEContext
 LRWithLabelsListener(notused) ::= <<
 @parser::members {
 type LeafListener struct {
-	*BaseTListener
+    *antlr.BaseParseTreeListener
 }
 
 func NewLeafListener() *LeafListener {
-	return &LeafListener{BaseTListener: &BaseTListener{}}
+	return &LeafListener{}
 }
 
 func (*LeafListener) ExitCall(ctx *CallContext) { // new callback ICallContext

@@ -681,7 +681,7 @@ public class BaseGoTest implements RuntimeTestSupport {
 				+")\n"
 				+ "\n"
 				+ "type TreeShapeListener struct {\n"
-				+ "	*parser.Base<listenerName>\n"
+				+ "	*antlr.BaseParseTreeListener\n"
 				+ "}\n"
 				+ "\n"
 				+ "func NewTreeShapeListener() *TreeShapeListener {\n"

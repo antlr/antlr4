@@ -94,10 +94,10 @@ type BaseParseTreeListener struct{}
 
 var _ ParseTreeListener = &BaseParseTreeListener{}
 
-func (l *BaseParseTreeListener) VisitTerminal(node TerminalNode)      {}
-func (l *BaseParseTreeListener) VisitErrorNode(node ErrorNode)        {}
-func (l *BaseParseTreeListener) EnterEveryRule(ctx ParserRuleContext) {}
-func (l *BaseParseTreeListener) ExitEveryRule(ctx ParserRuleContext)  {}
+func (*BaseParseTreeListener) VisitTerminal(node TerminalNode)      {}
+func (*BaseParseTreeListener) VisitErrorNode(node ErrorNode)        {}
+func (*BaseParseTreeListener) EnterEveryRule(ctx ParserRuleContext) {}
+func (*BaseParseTreeListener) ExitEveryRule(ctx ParserRuleContext)  {}
 
 type TerminalNodeImpl struct {
 	parentCtx RuleContext

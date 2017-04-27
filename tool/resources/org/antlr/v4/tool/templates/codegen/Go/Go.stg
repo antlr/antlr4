@@ -256,6 +256,10 @@ package parser // <file.grammarName>
 //import "github.com/antlr/antlr4/runtime/Go/antlr"
 <endif>
 
+
+
+// import "generate package"
+
 //type <file.grammarName>Visitor struct {
 //    *antlr.BaseParseTreeVisitor
 //}
