@@ -723,6 +723,20 @@ function getAllContextNodes(context, nodes, visited) {
 	}
 }
 
+
+let memoize_toString = function(obj) {
+	let prev_toString = obj.toString;
+	obj.toString = function() {
+		if (typeof this._memo_toString !== 'string') {
+			this._memo_toString = prev_toString.call(this);
+		}
+		return this._memo_toString;
+	};
+};
+memoize_toString(SingletonPredictionContext.prototype);
+memoize_toString(ArrayPredictionContext.prototype);
+
+
 exports.merge = merge;
 exports.PredictionContext = PredictionContext;
 exports.PredictionContextCache = PredictionContextCache;
