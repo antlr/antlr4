@@ -495,10 +495,6 @@ public class BaseCSharpTest implements RuntimeTestSupport /*, SpecialRuntimeTest
             File runtimeProjFile = new File(runtimeProj.getFile());
             String runtimeProjPath = runtimeProjFile.getPath();
 
-            // check if runtime is built already
-            File dll = new File(runtimeProjFile.getParent() + "/bin/Release/netstandard1.3/Antlr4.Runtime.Core.dll");
-            String cliSwitch = (dll.exists() ? "--no-dependencies" : "");
-
             // add Runtime project reference
             String dotnetcli = locateTool("dotnet");
             String[] args = new String[] {
@@ -515,7 +511,7 @@ public class BaseCSharpTest implements RuntimeTestSupport /*, SpecialRuntimeTest
                 dotnetcli,
                 "restore",
                 "Antlr4.Test.dotnet.csproj",
-                cliSwitch
+                "--no-dependencies"
             };
             success = runProcess(args, tmpdir);
 
@@ -526,7 +522,7 @@ public class BaseCSharpTest implements RuntimeTestSupport /*, SpecialRuntimeTest
                 "Antlr4.Test.dotnet.csproj",
                 "-c",
                 "Release",
-                cliSwitch
+                "--no-dependencies"
             };
             success = runProcess(args, tmpdir);
         }
