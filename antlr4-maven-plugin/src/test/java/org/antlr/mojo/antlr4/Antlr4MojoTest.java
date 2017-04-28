@@ -100,7 +100,7 @@ public class Antlr4MojoTest {
         Path parserGrammar = antlrDir.resolve("TestParser.g4");
 
         Xpp3Dom outputDirectory = TestMavenRuntime.newParameter("outputDirectory",
-                "src/main/java/foo");
+                "src/main/java/");
         Xpp3Dom arguments = new Xpp3Dom("arguments");
         arguments.addChild(TestMavenRuntime.newParameter("argument", "-package"));
         arguments.addChild(TestMavenRuntime.newParameter("argument", "foo"));
