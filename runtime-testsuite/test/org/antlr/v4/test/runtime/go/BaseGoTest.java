@@ -698,7 +698,7 @@ public class BaseGoTest implements RuntimeTestSupport {
 				+ "func main() {\n"
 				+ "	input, err := antlr.NewFileStream(os.Args[1])\n"
 				+ "     if err != nil {\n"
-				+ "     	fmt.Printf("Failed to find file: %v", err)\n"
+				+ "     	fmt.Printf(\"Failed to find file: %v\", err)\n"
 				+ "     	return\n"
 				+ "     }\n"
 				+ "	lexer := parser.New<lexerName>(input)\n"
