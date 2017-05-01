@@ -277,11 +277,14 @@ package parser // <file.grammarName>
 //var _ <if(file.genPackage)><file.genPackage>.<endif><lname; format="cap">ContextVisitor = &<file.grammarName>Visitor{\}
 }>
 
-//func (v *<file.grammarName>Visitor) VisitNext(node antlr.Tree) bool {
+//func (v *<file.grammarName>Visitor) VisitNext(node antlr.Tree, current interface{}) bool {
 //    return true
 //}
-//func (v *<file.grammarName>Visitor) VisitRest(node antlr.RuleNode) bool {
+//func (v *<file.grammarName>Visitor) VisitRest(node antlr.RuleNode, current interface{}) bool {
 //    return true
+//}
+//func (v *<file.grammarName>Visitor) AggregateResult(aggregate, nextResult interface{}) (result interface{}) {
+//    return nextResult
 //}
 //func (v *<file.grammarName>Visitor) VisitTerminal(node antlr.TerminalNode) {
 //}
@@ -1197,10 +1200,6 @@ type I<struct.name> interface {
     //tokenDecls	
     <struct.tokenDecls:{a           | <if(!a.isImplicit)> Get<a.name; format="cap">() <TokenLabelType()>
     <endif> }>
-    <struct.tokenDecls:{a           | Get<a.name; format="cap">() <TokenLabelType()> // Implict <a.isImplicit> 
-    }>
-
-
     //tokenTypeDecls
     <struct.tokenTypeDecls:{a       | Get<a.name; format="cap">() int }; separator="\n\n">
     //tokenListDecls
@@ -1341,6 +1340,7 @@ type I<struct.name>Internal interface {
     <struct.ruleListGetterDecl:{r        | All<r.name; format="cap">() []I<r.ctxName> }; separator="\n">
     //  ruleListIndexedGetterDecl
     <struct.ruleListIndexedGetterDecl:{r | <r.name; format="cap">(i int) I<r.ctxName> }; separator="\n">
+
     //  tokenGetterDecl
     <struct.tokenGetterDecl:{t            | <t.name; format="cap">() antlr.TerminalNode}; separator="\n">
     //  tokenListGetterDecl
@@ -1481,8 +1481,7 @@ func (s *<struct.name>) Visit(delegate antlr.ParseTreeVisitor, args ...interface
 	case <struct.derivedFromName; format="cap">ContextVisitor:
 		return t.Visit<struct.derivedFromName; format="cap">(s, delegate, args)
 	default:
-		delegate.VisitChildren(s, delegate)
-		return
+		return delegate.VisitChildren(s, delegate, args)
 	}
 }
 >>

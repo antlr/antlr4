@@ -54,19 +54,20 @@ type ErrorNode interface {
 }
 
 type ParseTreeVisitor interface {
-	VisitNext(next Tree) bool
-	VisitRest(next RuleNode) bool
+	VisitNext(next Tree, currentResult interface{}) bool
+	VisitRest(next RuleNode, currentResult interface{}) bool
 	VisitTerminal(node TerminalNode, args ...interface{}) (result interface{})
 	VisitErrorNode(node ErrorNode, args ...interface{}) (result interface{})
-	VisitChildren(node RuleNode, delegate ParseTreeVisitor)
+	VisitChildren(node RuleNode, delegate ParseTreeVisitor, args ...interface{}) (result interface{})
+	AggregateResult(aggregate, nextResult interface{}) (result interface{})
 }
 
 type BaseParseTreeVisitor struct{}
 
-func (*BaseParseTreeVisitor) VisitNext(node Tree) bool {
+func (*BaseParseTreeVisitor) VisitNext(node Tree, currentResult interface{}) bool {
 	return true
 }
-func (*BaseParseTreeVisitor) VisitRest(node RuleNode) bool {
+func (*BaseParseTreeVisitor) VisitRest(node RuleNode, currentResult interface{}) bool {
 	return true
 }
 func (*BaseParseTreeVisitor) VisitTerminal(node TerminalNode, args ...interface{}) (result interface{}) {
@@ -75,25 +76,32 @@ func (*BaseParseTreeVisitor) VisitTerminal(node TerminalNode, args ...interface{
 func (*BaseParseTreeVisitor) VisitErrorNode(node ErrorNode, args ...interface{}) (result interface{}) {
 	return
 }
-func (*BaseParseTreeVisitor) VisitChildren(node RuleNode, delegate ParseTreeVisitor) {
+func (*BaseParseTreeVisitor) AggregateResult(aggregate, nextResult interface{}) (result interface{}) {
+	return nextResult
+}
+func (*BaseParseTreeVisitor) VisitChildren(node RuleNode, delegate ParseTreeVisitor, args ...interface{}) (result interface{}) {
 	for _, child := range node.GetChildren() {
-		if !delegate.VisitNext(child) {
+		if !delegate.VisitNext(child, result) {
 			continue
 		}
 		switch child := child.(type) {
 		case TerminalNode:
-			delegate.VisitTerminal(child)
+			r := delegate.VisitTerminal(child, args)
+			result = delegate.AggregateResult(result, r)
 		case ErrorNode:
-			delegate.VisitErrorNode(child)
+			r := delegate.VisitErrorNode(child, args)
+			result = delegate.AggregateResult(result, r)
 		case RuleNode:
-			if !delegate.VisitRest(child) {
+			if !delegate.VisitRest(child, result) {
 				break
 			}
-			child.Visit(delegate)
+			r := child.Visit(delegate, args)
+			result = delegate.AggregateResult(result, r)
 		default:
 			// can this happen??
 		}
 	}
+	return
 }
 
 type ParseTreeListener interface {
