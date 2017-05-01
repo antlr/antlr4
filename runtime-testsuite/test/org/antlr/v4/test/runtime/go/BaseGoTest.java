@@ -362,6 +362,7 @@ public class BaseGoTest implements RuntimeTestSupport {
 		ErrorQueue equeue = antlrOnString(getTmpDir(), "Go", grammarFileName, grammarStr,
 		                                  defaultListener, extraOptions);
 		if (!equeue.errors.isEmpty()) {
+			System.err.println(equeue.errors);
 			return false;
 		}
 		return true;

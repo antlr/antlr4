@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -286,7 +287,7 @@ public abstract class BaseRuntimeTest {
 
 	// ---- support ----
 
-	public static RuntimeTestDescriptor[] getRuntimeTestDescriptors(Class<?> clazz, String targetName) {
+	public static RuntimeTestDescriptor[] getRuntimeTestDescriptors(Class<?> clazz, String targetName, String ...ignore) {
 		Class<?>[] nestedClasses = clazz.getClasses();
 		List<RuntimeTestDescriptor> descriptors = new ArrayList<RuntimeTestDescriptor>();
 		for (Class<?> nestedClass : nestedClasses) {
@@ -294,6 +295,11 @@ public abstract class BaseRuntimeTest {
 			if ( RuntimeTestDescriptor.class.isAssignableFrom(nestedClass) && !Modifier.isAbstract(modifiers) ) {
 				try {
 					RuntimeTestDescriptor d = (RuntimeTestDescriptor) nestedClass.newInstance();
+					System.out.println(d.getTestName() + " " + targetName);
+					if( Arrays.asList(ignore).contains( d.getTestName() ) ) {
+						System.out.println("**");
+						d.addIgnore(targetName);
+					}
 					d.setTarget(targetName);
 					descriptors.add(d);
 				} catch (Exception e) {
