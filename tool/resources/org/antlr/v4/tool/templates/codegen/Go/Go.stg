@@ -273,6 +273,8 @@ package parser // <file.grammarName>
 //    *antlr.BaseParseTreeVisitor
 //}
 
+//var _ antlr.ParseTreeVisitor = &&<file.grammarName>Visitor{}
+
 <file.visitorNames:{lname | 
 //var _ <if(file.genPackage)><file.genPackage>.<endif><lname; format="cap">ContextVisitor = &<file.grammarName>Visitor{\}
 }>
@@ -286,13 +288,15 @@ package parser // <file.grammarName>
 //func (v *<file.grammarName>Visitor) AggregateResult(aggregate, nextResult interface{}) (result interface{}) {
 //    return nextResult
 //}
-//func (v *<file.grammarName>Visitor) VisitTerminal(node antlr.TerminalNode) {
+//func (v *<file.grammarName>Visitor) VisitTerminal(node antlr.TerminalNode, args ...interface{}) {
 //}
-//func (v *<file.grammarName>Visitor) VisitErrorNode(node antlr.ErrorNode) {
+//func (v *<file.grammarName>Visitor) VisitErrorNode(node antlr.ErrorNode, args ...interface{}) {
 //}
 
 <file.visitorNames:{lname |
 //func (v *<file.grammarName>Visitor) Visit<lname; format="cap">(ctx <if(file.genPackage)><file.genPackage><else>parser<endif>.I<lname; format="cap">Context, delegate antlr.ParseTreeVisitor, args ...interface{\}) (result interface{\}){
+}>
+
 //  TODO list rules here
 //  Visit rules manually
 //  eg a : b c* | d;
@@ -308,7 +312,6 @@ package parser // <file.grammarName>
 //  // afer children
 //
 //  return result
-//\}}; separator="\n\n">
 
 
 >>
