@@ -28,7 +28,7 @@ type SyntaxTree interface {
 type ParseTree interface {
 	SyntaxTree
 
-	Accept(visitor ParseTreeVisitor)
+	Visit(visitor ParseTreeVisitor, args ...interface{}) interface{}
 	GetText() string
 
 	ToStringTree([]string, Recognizer) string
@@ -55,16 +55,26 @@ type ErrorNode interface {
 
 type ParseTreeVisitor interface {
 	VisitNext(next Tree) bool
-	VisitTerminal(node TerminalNode)
-	VisitErrorNode(node ErrorNode)
+	VisitRest(next RuleNode) bool
+	VisitTerminal(node TerminalNode, args ...interface{}) (result interface{})
+	VisitErrorNode(node ErrorNode, args ...interface{}) (result interface{})
 	VisitChildren(node RuleNode, delegate ParseTreeVisitor)
 }
 
 type BaseParseTreeVisitor struct{}
 
-func (*BaseParseTreeVisitor) VisitNext(node Tree) bool        { return true }
-func (*BaseParseTreeVisitor) VisitTerminal(node TerminalNode) {}
-func (*BaseParseTreeVisitor) VisitErrorNode(node ErrorNode)   {}
+func (*BaseParseTreeVisitor) VisitNext(node Tree) bool {
+	return true
+}
+func (*BaseParseTreeVisitor) VisitRest(node RuleNode) bool {
+	return true
+}
+func (*BaseParseTreeVisitor) VisitTerminal(node TerminalNode, args ...interface{}) (result interface{}) {
+	return
+}
+func (*BaseParseTreeVisitor) VisitErrorNode(node ErrorNode, args ...interface{}) (result interface{}) {
+	return
+}
 func (*BaseParseTreeVisitor) VisitChildren(node RuleNode, delegate ParseTreeVisitor) {
 	for _, child := range node.GetChildren() {
 		if !delegate.VisitNext(child) {
@@ -76,7 +86,10 @@ func (*BaseParseTreeVisitor) VisitChildren(node RuleNode, delegate ParseTreeVisi
 		case ErrorNode:
 			delegate.VisitErrorNode(child)
 		case RuleNode:
-			child.Accept(delegate)
+			if !delegate.VisitRest(child) {
+				break
+			}
+			child.Visit(delegate)
 		default:
 			// can this happen??
 		}
@@ -156,8 +169,8 @@ func (t *TerminalNodeImpl) GetChildCount() int {
 	return 0
 }
 
-func (t *TerminalNodeImpl) Accept(v ParseTreeVisitor) {
-	v.VisitTerminal(t)
+func (t *TerminalNodeImpl) Visit(v ParseTreeVisitor, args ...interface{}) interface{} {
+	return v.VisitTerminal(t, args)
 }
 
 func (t *TerminalNodeImpl) GetText() string {
@@ -196,8 +209,8 @@ func NewErrorNodeImpl(token Token) *ErrorNodeImpl {
 
 func (e *ErrorNodeImpl) errorNode() {}
 
-func (e *ErrorNodeImpl) Accept(v ParseTreeVisitor) {
-	v.VisitErrorNode(e)
+func (e *ErrorNodeImpl) Visit(v ParseTreeVisitor, args ...interface{}) interface{} {
+	return v.VisitErrorNode(e, args)
 }
 
 type ParseTreeWalker struct {

@@ -144,7 +144,16 @@ package parser // <file.grammarName>
 //  tree.Accept(v)
 // }
 
+//// implemented all listeners methods
 //var _ <if(file.genPackage)><file.genPackage>.<endif><file.grammarName>Listener = &<file.grammarName>Listener{}
+//// implemented specific
+//<file.listenerNames:{lname | 
+//    }; separator="\n">
+//
+<file.listenerNames:{lname | 
+//var _ <if(file.genPackage)><file.genPackage>.<endif><lname; format="cap">EntryListener = &<file.grammarName>Listener{\}
+//var _ <if(file.genPackage)><file.genPackage>.<endif><lname; format="cap">ExitListener = &<file.grammarName>Listener{\}
+    }; separator="\n"> 
 
 //type <file.grammarName>Listener struct {
 //}
@@ -235,7 +244,7 @@ type <file.grammarName>Visitor interface {
 
 <file.visitorNames:{lname |
 type <lname; format="cap">ContextVisitor interface {
-    Visit<lname; format="cap">(ctx I<lname; format="cap">Context, delegate antlr.ParseTreeVisitor)
+    Visit<lname; format="cap">(ctx I<lname; format="cap">Context, delegate antlr.ParseTreeVisitor, args ...interface{\}) (result interface{\})
 \}}; separator="\n">
 >>
 
@@ -264,21 +273,38 @@ package parser // <file.grammarName>
 //    *antlr.BaseParseTreeVisitor
 //}
 
+<file.visitorNames:{lname | 
+//var _ <if(file.genPackage)><file.genPackage>.<endif><lname; format="cap">ContextVisitor = &<file.grammarName>Visitor{\}
+}>
+
 //func (v *<file.grammarName>Visitor) VisitNext(node antlr.Tree) bool {
 //    return true
 //}
-
+//func (v *<file.grammarName>Visitor) VisitRest(node antlr.RuleNode) bool {
+//    return true
+//}
 //func (v *<file.grammarName>Visitor) VisitTerminal(node antlr.TerminalNode) {
 //}
-
 //func (v *<file.grammarName>Visitor) VisitErrorNode(node antlr.ErrorNode) {
 //}
 
 <file.visitorNames:{lname |
-//func (v *<file.grammarName>Visitor) Visit<lname; format="cap">(ctx <if(file.genPackage)><file.genPackage><else>parser<endif>.I<lname; format="cap">Context, delegate antlr.ParseTreeVisitor) {
+//func (v *<file.grammarName>Visitor) Visit<lname; format="cap">(ctx <if(file.genPackage)><file.genPackage><else>parser<endif>.I<lname; format="cap">Context, delegate antlr.ParseTreeVisitor, args ...interface{\}) (result interface{\}){
+//  TODO list rules here
+//  Visit rules manually
+//  eg a : b c* | d;
+//  if ctx.GetB() != nil {
+//    result1 = ctx.GetB(ctx, delegate, args)
+//    for _, c := range ctx.GetC() {
+//      resultS = c.GetC(ctx, delegate, args)
+//    \}
+//  \} else { ... \}
+//  OR visit all children rules
 //  // before children
 //  v.VisitChildren(ctx, delegate)
 //  // afer children
+//
+//  return result
 //\}}; separator="\n\n">
 
 
@@ -1171,6 +1197,10 @@ type I<struct.name> interface {
     //tokenDecls	
     <struct.tokenDecls:{a           | <if(!a.isImplicit)> Get<a.name; format="cap">() <TokenLabelType()>
     <endif> }>
+    <struct.tokenDecls:{a           | Get<a.name; format="cap">() <TokenLabelType()> // Implict <a.isImplicit> 
+    }>
+
+
     //tokenTypeDecls
     <struct.tokenTypeDecls:{a       | Get<a.name; format="cap">() int }; separator="\n\n">
     //tokenListDecls
@@ -1446,12 +1476,13 @@ func (s *<struct.name>) ExitRule(listener antlr.ParseTreeListener) {
 >>
 
 VisitorDispatchMethod(method) ::= <<
-func (s *<struct.name>) Accept(delegate antlr.ParseTreeVisitor) {
+func (s *<struct.name>) Visit(delegate antlr.ParseTreeVisitor, args ...interface{}) (result interface{}) {
 	switch t := delegate.(type) {
 	case <struct.derivedFromName; format="cap">ContextVisitor:
-		t.Visit<struct.derivedFromName; format="cap">(s, delegate)
+		return t.Visit<struct.derivedFromName; format="cap">(s, delegate, args)
 	default:
 		delegate.VisitChildren(s, delegate)
+		return
 	}
 }
 >>
