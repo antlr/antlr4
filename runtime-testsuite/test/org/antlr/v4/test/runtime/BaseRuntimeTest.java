@@ -295,9 +295,7 @@ public abstract class BaseRuntimeTest {
 			if ( RuntimeTestDescriptor.class.isAssignableFrom(nestedClass) && !Modifier.isAbstract(modifiers) ) {
 				try {
 					RuntimeTestDescriptor d = (RuntimeTestDescriptor) nestedClass.newInstance();
-					System.out.println(d.getTestName() + " " + targetName);
 					if( Arrays.asList(ignore).contains( d.getTestName() ) ) {
-						System.out.println("**");
 						d.addIgnore(targetName);
 					}
 					d.setTarget(targetName);
