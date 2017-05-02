@@ -19,13 +19,19 @@ type FileStream struct {
 	filename string
 }
 
-func NewFileStream(fileName string) *FileStream {
+func NewFileStream(fileName string) (*FileStream, error) {
 
 	buf := bytes.NewBuffer(nil)
 
-	f, _ := os.Open(fileName) // Error handling elided for brevity.
-	io.Copy(buf, f)           // Error handling elided for brevity.
-	f.Close()
+	f, err := os.Open(fileName)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+	_, err = io.Copy(buf, f)
+	if err != nil {
+		return nil, err
+	}
 
 	fs := new(FileStream)
 
@@ -34,7 +40,7 @@ func NewFileStream(fileName string) *FileStream {
 
 	fs.InputStream = NewInputStream(s)
 
-	return fs
+	return fs, nil
 
 }
 

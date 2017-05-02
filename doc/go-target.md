@@ -88,7 +88,7 @@ func (this *TreeShapeListener) EnterEveryRule(ctx antlr.ParserRuleContext) {
 }
 
 func main() {
-	input := antlr.NewFileStream(os.Args[1])
+	input, _ := antlr.NewFileStream(os.Args[1])
 	lexer := parser.NewJSONLexer(input)
 	stream := antlr.NewCommonTokenStream(lexer,0)
 	p := parser.NewJSONParser(stream)
