@@ -147,9 +147,6 @@ package parser // <file.grammarName>
 //// implemented all listeners methods
 //var _ <if(file.genPackage)><file.genPackage>.<endif><file.grammarName>Listener = &<file.grammarName>Listener{}
 //// implemented specific
-//<file.listenerNames:{lname | 
-//    }; separator="\n">
-//
 <file.listenerNames:{lname | 
 //var _ <if(file.genPackage)><file.genPackage>.<endif><lname; format="cap">EntryListener = &<file.grammarName>Listener{\}
 //var _ <if(file.genPackage)><file.genPackage>.<endif><lname; format="cap">ExitListener = &<file.grammarName>Listener{\}
@@ -195,22 +192,16 @@ package parser // <file.grammarName>
 //// antlr.ParseTreeListener implementation.
 //// All required.
 
-//func (s *<file.grammarName>Listener ) VisitTerminal(node  antlr.TerminalNode) {   
-//}
-//func (s *<file.grammarName>Listener ) VisitErrorNode(node antlr.ErrorNode)    {   
-//}
-//func (s *<file.grammarName>Listener ) EnterEveryRule(ctx antlr.ParserRuleContext) {  
-//}
-//func (s *<file.grammarName>Listener ) ExitEveryRule(ctx antlr.ParserRuleContext) {  
-//}
+//func (s *<file.grammarName>Listener ) VisitTerminal(node  antlr.TerminalNode) {   }
+//func (s *<file.grammarName>Listener ) VisitErrorNode(node antlr.ErrorNode)    {   }
+//func (s *<file.grammarName>Listener ) EnterEveryRule(ctx antlr.ParserRuleContext) {  }
+//func (s *<file.grammarName>Listener ) ExitEveryRule(ctx antlr.ParserRuleContext) {  }
 
 //// Only implemented as needed.
 
 <file.listenerNames:{lname | 
-//func (s *<file.grammarName>Listener) Enter<lname; format="cap">(ctx <if(file.newcb)><if(file.genPackage)><file.genPackage>.<endif>I<else>*<if(file.genPackage)><file.genPackage>.<endif><endif><lname; format="cap">Context) {
-//\}
-//func (s *<file.grammarName>Listener) Exit<lname; format="cap">(ctx <if(file.newcb)><if(file.genPackage)><file.genPackage>.<endif>I<else>*<if(file.genPackage)><file.genPackage>.<endif><endif><lname; format="cap">Context) {
-//\}
+//func (s *<file.grammarName>Listener) Enter<lname; format="cap">(ctx <if(file.newcb)><if(file.genPackage)><file.genPackage>.<endif>I<else>*<if(file.genPackage)><file.genPackage>.<endif><endif><lname; format="cap">Context) {\}
+//func (s *<file.grammarName>Listener) Exit<lname; format="cap">(ctx <if(file.newcb)><if(file.genPackage)><file.genPackage>.<endif>I<else>*<if(file.genPackage)><file.genPackage>.<endif><endif><lname; format="cap">Context) {\}
 }; 
 separator="\n">
 
@@ -271,9 +262,15 @@ package parser // <file.grammarName>
 
 //type <file.grammarName>Visitor struct {
 //    *antlr.BaseParseTreeVisitor
+//    indent string
 //}
 
 //var _ antlr.ParseTreeVisitor = &&<file.grammarName>Visitor{}
+//var _ antlr.AggregateResultVisitor = &&<file.grammarName>Visitor{}
+//var _ antlr.VisitNextCheck = &&<file.grammarName>Visitor{}
+//var _ antlr.VisitRestCheck = &&<file.grammarName>Visitor{}
+//var _ antlr.EnterEveryRuleVisitor = &&<file.grammarName>Visitor{}
+//var _ antlr.ExitEveryRuleVisitor = &&<file.grammarName>Visitor{}
 
 <file.visitorNames:{lname | 
 //var _ <if(file.genPackage)><file.genPackage>.<endif><lname; format="cap">ContextVisitor = &<file.grammarName>Visitor{\}
@@ -288,13 +285,21 @@ package parser // <file.grammarName>
 //func (v *<file.grammarName>Visitor) AggregateResult(aggregate, nextResult interface{}) (result interface{}) {
 //    return nextResult
 //}
-//func (v *<file.grammarName>Visitor) VisitTerminal(node antlr.TerminalNode, args ...interface{}) {
+//func (v *<file.grammarName>Visitor) VisitTerminal(node antlr.TerminalNode) {
 //}
-//func (v *<file.grammarName>Visitor) VisitErrorNode(node antlr.ErrorNode, args ...interface{}) {
+//func (v *<file.grammarName>Visitor) VisitErrorNode(node antlr.ErrorNode) {
+//}
+//func (v *<file.grammarName>Visitor) EnterEveryRule(ctx antlr.RuleNode) {
+//    v.indent += " "
+//    fmt.Printf("%s %T\n", v.indent, ctx)
+//}
+//func (v *<file.grammarName>Visitor) ExitEveryRule(ctx antlr.RuleNode) {
+//    v.indent = v.indent[:len(v.indent)-1]
 //}
 
+
 <file.visitorNames:{lname |
-//func (v *<file.grammarName>Visitor) Visit<lname; format="cap">(ctx <if(file.genPackage)><file.genPackage><else>parser<endif>.I<lname; format="cap">Context, delegate antlr.ParseTreeVisitor, args ...interface{\}) (result interface{\}){
+//func (v *<file.grammarName>Visitor) Visit<lname; format="cap">(ctx <if(file.genPackage)><file.genPackage><else>parser<endif>.I<lname; format="cap">Context, delegate antlr.ParseTreeVisitor, args ...interface{\}) (result interface{\}){    v.VisitChildren(ctx, delegate);return \}
 }>
 
 //  TODO list rules here
