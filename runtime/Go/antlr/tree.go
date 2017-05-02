@@ -54,46 +54,86 @@ type ErrorNode interface {
 }
 
 type ParseTreeVisitor interface {
-	VisitNext(next Tree, currentResult interface{}) bool
-	VisitRest(next RuleNode, currentResult interface{}) bool
-	VisitTerminal(node TerminalNode, args ...interface{})
-	VisitErrorNode(node ErrorNode, args ...interface{})
+	VisitTerminal(node TerminalNode)
+	VisitErrorNode(node ErrorNode)
 	VisitChildren(node RuleNode, delegate ParseTreeVisitor, args ...interface{}) (result interface{})
+}
+type AggregateResultVisitor interface {
 	AggregateResult(aggregate, nextResult interface{}) (result interface{})
 }
+type VisitNextCheck interface {
+	VisitNext(next Tree, currentResult interface{}) bool
+}
+type VisitRestCheck interface {
+	VisitRest(next RuleNode, currentResult interface{}) bool
+}
+type EnterEveryRuleVisitor interface {
+	EnterEveryRule(ctx RuleNode)
+}
+type ExitEveryRuleVisitor interface {
+	ExitEveryRule(ctx RuleNode)
+}
+
+// grammar Example;
+// a : b ;
+// b : 'c' # Y;
+
+// in somefile.go
+//go:generate java -jar path/antlr.har -o parser -package parser -visitor Example.g4
+
+// -- generate example_visitor.go
+// type AContextVisitor interface {
+// 	VisitA(ctx IAContext, delegate antlr.ParseTreeVisitor, args ...interface{}) (result interface{})
+// }
+// type YContextVisitor interface {
+// 	VisitY(ctx IYContext, delegate antlr.ParseTreeVisitor, args ...interface{}) (result interface{})
+// }
+
+// -- implemented visitor
+// func (v *MyV) VisitA(ctx parser.IAContext, delegate antlr.ParseTreeVisitor, args ...interface{}) (result interface{}) {
+// 	return
+// }
+// func (v *MyV) VisitY(ctx parser.IYContext, delegate antlr.ParseTreeVisitor, args ...interface{}) (result interface{}) {
+// 	return
+// }
 
 type BaseParseTreeVisitor struct{}
 
-func (*BaseParseTreeVisitor) VisitNext(node Tree, currentResult interface{}) bool {
-	return true
-}
-func (*BaseParseTreeVisitor) VisitRest(node RuleNode, currentResult interface{}) bool {
-	return true
-}
-func (*BaseParseTreeVisitor) VisitTerminal(node TerminalNode, args ...interface{}) {
-}
-func (*BaseParseTreeVisitor) VisitErrorNode(node ErrorNode, args ...interface{}) {
-}
-func (*BaseParseTreeVisitor) AggregateResult(aggregate, nextResult interface{}) (result interface{}) {
-	return nextResult
-}
+func (*BaseParseTreeVisitor) VisitTerminal(node TerminalNode) {}
+func (*BaseParseTreeVisitor) VisitErrorNode(node ErrorNode)   {}
+
 func (*BaseParseTreeVisitor) VisitChildren(node RuleNode, delegate ParseTreeVisitor, args ...interface{}) interface{} {
+	next, isNextCk := delegate.(VisitNextCheck)
+	rest, isRestCk := delegate.(VisitRestCheck)
+	entryV, isEnterV := delegate.(EnterEveryRuleVisitor)
+	exitV, isExitEV := delegate.(ExitEveryRuleVisitor)
+	aggre, isAggre := delegate.(AggregateResultVisitor)
 	var result interface{}
 	for _, child := range node.GetChildren() {
-		if !delegate.VisitNext(child, result) {
+		if isNextCk && !next.VisitNext(child, result) {
 			continue
 		}
 		switch child := child.(type) {
 		case TerminalNode:
-			delegate.VisitTerminal(child, args)
+			delegate.VisitTerminal(child)
 		case ErrorNode:
-			delegate.VisitErrorNode(child, args)
+			delegate.VisitErrorNode(child)
 		case RuleNode:
-			if !delegate.VisitRest(child, result) {
+			if isRestCk && !rest.VisitRest(child, result) {
 				break
 			}
+			if isEnterV {
+				entryV.EnterEveryRule(child)
+			}
 			r := child.Visit(delegate, args)
-			result = delegate.AggregateResult(result, r)
+			if isExitEV {
+				exitV.ExitEveryRule(child)
+			}
+			if isAggre {
+				result = aggre.AggregateResult(result, r)
+			} else {
+				result = r
+			}
 		default:
 			// can this happen??
 		}
@@ -175,7 +215,7 @@ func (t *TerminalNodeImpl) GetChildCount() int {
 }
 
 func (t *TerminalNodeImpl) Visit(v ParseTreeVisitor, args ...interface{}) interface{} {
-	v.VisitTerminal(t, args)
+	v.VisitTerminal(t)
 	return nil
 }
 
@@ -216,7 +256,7 @@ func NewErrorNodeImpl(token Token) *ErrorNodeImpl {
 func (e *ErrorNodeImpl) errorNode() {}
 
 func (e *ErrorNodeImpl) Visit(v ParseTreeVisitor, args ...interface{}) interface{} {
-	v.VisitErrorNode(e, args)
+	v.VisitErrorNode(e)
 	return nil
 }
 
