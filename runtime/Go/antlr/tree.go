@@ -125,7 +125,7 @@ func (*BaseParseTreeVisitor) VisitChildren(node RuleNode, delegate ParseTreeVisi
 			if isEnterV {
 				entryV.EnterEveryRule(child)
 			}
-			r := child.Visit(delegate, args)
+			r := child.Visit(delegate, args...)
 			if isExitEV {
 				exitV.ExitEveryRule(child)
 			}

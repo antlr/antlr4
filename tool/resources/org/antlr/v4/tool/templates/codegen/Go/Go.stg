@@ -265,12 +265,12 @@ package parser // <file.grammarName>
 //    indent string
 //}
 
-//var _ antlr.ParseTreeVisitor = &&<file.grammarName>Visitor{}
-//var _ antlr.AggregateResultVisitor = &&<file.grammarName>Visitor{}
-//var _ antlr.VisitNextCheck = &&<file.grammarName>Visitor{}
-//var _ antlr.VisitRestCheck = &&<file.grammarName>Visitor{}
-//var _ antlr.EnterEveryRuleVisitor = &&<file.grammarName>Visitor{}
-//var _ antlr.ExitEveryRuleVisitor = &&<file.grammarName>Visitor{}
+//var _ antlr.ParseTreeVisitor = &<file.grammarName>Visitor{}
+//var _ antlr.AggregateResultVisitor = &<file.grammarName>Visitor{}
+//var _ antlr.VisitNextCheck = &<file.grammarName>Visitor{}
+//var _ antlr.VisitRestCheck = &<file.grammarName>Visitor{}
+//var _ antlr.EnterEveryRuleVisitor = &<file.grammarName>Visitor{}
+//var _ antlr.ExitEveryRuleVisitor = &<file.grammarName>Visitor{}
 
 <file.visitorNames:{lname | 
 //var _ <if(file.genPackage)><file.genPackage>.<endif><lname; format="cap">ContextVisitor = &<file.grammarName>Visitor{\}
@@ -299,7 +299,7 @@ package parser // <file.grammarName>
 
 
 <file.visitorNames:{lname |
-//func (v *<file.grammarName>Visitor) Visit<lname; format="cap">(ctx <if(file.genPackage)><file.genPackage><else>parser<endif>.I<lname; format="cap">Context, delegate antlr.ParseTreeVisitor, args ...interface{\}) (result interface{\}){    v.VisitChildren(ctx, delegate);return \}
+//func (v *<file.grammarName>Visitor) Visit<lname; format="cap">(ctx <if(file.genPackage)><file.genPackage><else>parser<endif>.I<lname; format="cap">Context, delegate antlr.ParseTreeVisitor, args ...interface{\}) (result interface{\}){    result = v.VisitChildren(ctx, delegate, args...);return\}
 }>
 
 //  TODO list rules here
@@ -1487,9 +1487,9 @@ VisitorDispatchMethod(method) ::= <<
 func (s *<struct.name>) Visit(delegate antlr.ParseTreeVisitor, args ...interface{}) (result interface{}) {
 	switch t := delegate.(type) {
 	case <struct.derivedFromName; format="cap">ContextVisitor:
-		return t.Visit<struct.derivedFromName; format="cap">(s, delegate, args)
+		return t.Visit<struct.derivedFromName; format="cap">(s, delegate, args...)
 	default:
-		return delegate.VisitChildren(s, delegate, args)
+		return delegate.VisitChildren(s, delegate, args...)
 	}
 }
 >>
