@@ -724,8 +724,8 @@ function getAllContextNodes(context, nodes, visited) {
 }
 
 
-let memoize_toString = function(obj) {
-	let prev_toString = obj.toString;
+var memoize_toString = function(obj) {
+	var prev_toString = obj.toString;
 	obj.toString = function() {
 		if (typeof this._memo_toString !== 'string') {
 			this._memo_toString = prev_toString.call(this);
