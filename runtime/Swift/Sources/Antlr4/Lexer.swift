@@ -414,6 +414,8 @@ open class Lexer: Recognizer<LexerATNSimulator>
         //System.out.println("consuming char "+(char)input.LA(1)+" during recovery");
         //re.printStackTrace();
         // TODO: Do we lose character or line position information?
-        try _input!.consume()
+        if try _input!.LA(1) != BufferedTokenStream.EOF {
+            try _input!.consume()
+        }
     }
 }

@@ -274,7 +274,9 @@ std::string Lexer::getErrorDisplay(const std::string &s) {
 
 void Lexer::recover(RecognitionException * /*re*/) {
   // TO_DO: Do we lose character or line position information?
-  _input->consume();
+  if (_input->LA(1) != EOF) {
+    _input->consume();
+  }
 }
 
 size_t Lexer::getNumberOfSyntaxErrors() {

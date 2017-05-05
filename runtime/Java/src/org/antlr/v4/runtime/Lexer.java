@@ -405,6 +405,8 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 		//System.out.println("consuming char "+(char)input.LA(1)+" during recovery");
 		//re.printStackTrace();
 		// TODO: Do we lose character or line position information?
-		_input.consume();
+		if (_input.LA(1) != IntStream.EOF) {
+			_input.consume();
+		}
 	}
 }
