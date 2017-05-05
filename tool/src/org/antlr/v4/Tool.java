@@ -714,6 +714,13 @@ public class Tool {
 		}
 		content.append("\n");
 		
+		content.append("rule names:\n");
+		names = g.getRuleNames();
+		for (String name : names) {
+			content.append(name + "\n");
+		}
+		content.append("\n");
+
 		if ( g.isLexer() ) {
 			content.append("channel names:\n");
 			content.append("DEFAULT_TOKEN_CHANNEL\n");
@@ -726,13 +733,6 @@ public class Tool {
 			content.append("mode names:\n");
 			for (String mode : ((LexerGrammar)g).modes.keySet()) {
 				content.append(mode + "\n");
-			}
-		}
-		else {
-			content.append("rule names:\n");
-			names = g.getRuleNames();
-			for (String name : names) {
-				content.append(name + "\n");
 			}
 		}
 		content.append("\n");

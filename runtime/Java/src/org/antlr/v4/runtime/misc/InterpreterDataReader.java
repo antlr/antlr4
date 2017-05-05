@@ -38,6 +38,9 @@ public class InterpreterDataReader {
 	 * token symbolic names:
 	 * ...
 	 * 
+	 * rule names:
+	 * ...
+	 * 
 	 * channel names:
 	 * ...
 	 * 
@@ -47,10 +50,11 @@ public class InterpreterDataReader {
 	 * atn:
 	 * <a single line with comma separated int values> enclosed in a pair of squared brackets.
 	 * 
-	 * Data for a parser does not contain channel and mode names, but a "rule names:" part instead.
+	 * Data for a parser does not contain channel and mode names.
 	 */
 	public static InterpreterData parseFile(String fileName) {
 		InterpreterData result = new InterpreterData();
+		result.ruleNames = new ArrayList<String>();
 		
 		try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
 		    String line;
@@ -78,18 +82,15 @@ public class InterpreterDataReader {
 		  	result.vocabulary = new VocabularyImpl(literalNames.toArray(new String[0]), symbolicNames.toArray(new String[0]));
 
 			line = br.readLine();
-		  	if ( line.equals("rule names:") ) {
-				result.ruleNames = new ArrayList<String>();
-			    while ((line = br.readLine()) != null) {
-			       if ( line.isEmpty() )
-						break;
-					result.ruleNames.add(line);
-			    }
-		  	}
-			else {
-				if ( !line.equals("channel names:") )
-					throw new RuntimeException("Unexpected data entry");
-
+			if ( !line.equals("rule names:") )
+				throw new RuntimeException("Unexpected data entry");
+		    while ((line = br.readLine()) != null) {
+		       if ( line.isEmpty() )
+					break;
+				result.ruleNames.add(line);
+		    }
+		    
+			if ( line.equals("channel names:") ) { // Additional lexer data.
 				result.channels = new ArrayList<String>();
 			    while ((line = br.readLine()) != null) {
 			       if ( line.isEmpty() )
@@ -106,8 +107,7 @@ public class InterpreterDataReader {
 						break;
 					result.modes.add(line);
 			    }
-
-		  	}
+			}
 
 		  	line = br.readLine();
 		  	if ( !line.equals("atn:") )

@@ -26,6 +26,9 @@ InterpreterData InterpreterDataReader::parseFile(std::string const& fileName) {
   // token symbolic names:
   // ...
   //
+  // rule names:
+  // ...
+  //
   // channel names:
   // ...
   //
@@ -35,7 +38,7 @@ InterpreterData InterpreterDataReader::parseFile(std::string const& fileName) {
   // atn:
   // <a single line with comma separated int values> enclosed in a pair of squared brackets.
   //
-  // Data for a parser does not contain channel and mode names, but a "rule names:" part instead.
+  // Data for a parser does not contain channel and mode names.
 
   std::ifstream input(fileName);
   if (!input.good())
@@ -68,17 +71,17 @@ InterpreterData InterpreterDataReader::parseFile(std::string const& fileName) {
   InterpreterData result(literalNames, symbolicNames);
 
   std::getline(input, line, '\n');
-  if (line == "rule names:") {
-    while (true) {
-      std::getline(input, line, '\n');
-      if (line.empty())
-        break;
+  assert(line == "rule names:");
+  while (true) {
+    std::getline(input, line, '\n');
+    if (line.empty())
+      break;
 
-      result.ruleNames.push_back(line);
-    };
+    result.ruleNames.push_back(line);
+  };
 
-  } else {
-    assert(line == "channel names:");
+  std::getline(input, line, '\n');
+  if (line == "channel names:") {
     while (true) {
       std::getline(input, line, '\n');
       if (line.empty())
