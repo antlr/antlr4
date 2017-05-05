@@ -39,6 +39,7 @@ Resolving deltas: 100% (31898/31898), done.
 Checking connectivity... done.
 $ cd antlr4
 $ export MAVEN_OPTS="-Xmx1G"   # don't forget this on linux
+$ mvn clean                    # must be separate, not part of install/compile
 $ mvn -DskipTests install
 ...
 [INFO] ------------------------------------------------------------------------
@@ -61,7 +62,7 @@ $ mvn -DskipTests install
 [INFO] ------------------------------------------------------------------------
 ```
 
-We do `install` not `compile` as tool tests and such refer to modules that must be pulled from the maven install local cache.
+**NOTE:** We do `install` not `compile` as tool tests and such refer to modules that must be pulled from the maven install local cache.
 
 # Installing libs to mvn cache locally
 

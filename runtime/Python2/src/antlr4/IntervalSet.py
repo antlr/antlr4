@@ -164,7 +164,7 @@ class IntervalSet(object):
                 # split existing range
                 elif v<i.stop-1:
                     x = Interval(i.start, v)
-                    self.intervals[k] = range(v + 1, i.stop)
+                    self.intervals[k] = Interval(v + 1, i.stop)
                     self.intervals.insert(k, x)
                     return
                 k += 1

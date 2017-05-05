@@ -33,15 +33,18 @@
 #include <exception>
 #include <bitset>
 #include <condition_variable>
+#include <functional>
 
 // Defines for the Guid class and other platform dependent stuff.
 #ifdef _WIN32
-  #pragma warning (disable: 4250) // Class inherits by dominance.
-  #pragma warning (disable: 4512) // assignment operator could not be generated
+  #ifdef _MSC_VER
+    #pragma warning (disable: 4250) // Class inherits by dominance.
+    #pragma warning (disable: 4512) // assignment operator could not be generated
 
-  #if _MSC_VER < 1900
-    // Before VS 2015 code like "while (true)" will create a (useless) warning in level 4.
-    #pragma warning (disable: 4127) // conditional expression is constant
+    #if _MSC_VER < 1900
+      // Before VS 2015 code like "while (true)" will create a (useless) warning in level 4.
+      #pragma warning (disable: 4127) // conditional expression is constant
+    #endif
   #endif
 
   #define GUID_WINDOWS
@@ -69,7 +72,9 @@
     #endif
   #endif
 
+#ifdef _MSC_VER
   class ANTLR4CPP_PUBLIC std::exception; // Needed for VS 2015.
+#endif
 
 #elif __APPLE__
   #define GUID_CFUUID

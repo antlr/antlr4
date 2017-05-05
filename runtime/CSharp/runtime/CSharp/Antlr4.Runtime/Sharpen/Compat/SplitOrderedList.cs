@@ -28,7 +28,6 @@ using System;
 using System.Threading;
 using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.Serialization;
 
 namespace Antlr4.Runtime.Sharpen
 {

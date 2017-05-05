@@ -20,7 +20,7 @@ void ANTLRFileStream::loadFromFile(const std::string &fileName) {
     return;
   }
 
-#ifdef _WIN32
+#ifdef _MSC_VER
   std::ifstream stream(antlrcpp::s2ws(fileName), std::ios::binary);
 #else
   std::ifstream stream(fileName, std::ios::binary);

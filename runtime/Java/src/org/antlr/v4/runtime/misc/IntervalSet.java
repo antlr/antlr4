@@ -416,41 +416,29 @@ public class IntervalSet implements IntSet {
         return intervals==null || intervals.isEmpty();
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public int getSingleElement() {
-        if ( intervals!=null && intervals.size()==1 ) {
-            Interval I = intervals.get(0);
-            if ( I.a == I.b ) {
-                return I.a;
-            }
-        }
-        return Token.INVALID_TYPE;
-    }
-
 	/**
-	 * Returns the maximum value contained in the set.
+	 * Returns the maximum value contained in the set if not isNil().
 	 *
-	 * @return the maximum value contained in the set. If the set is empty, this
-	 * method returns {@link Token#INVALID_TYPE}.
+	 * @return the maximum value contained in the set.
+	 * @throws RuntimeException if set is empty
 	 */
 	public int getMaxElement() {
 		if ( isNil() ) {
-			return Token.INVALID_TYPE;
+			throw new RuntimeException("set is empty");
 		}
 		Interval last = intervals.get(intervals.size()-1);
 		return last.b;
 	}
 
 	/**
-	 * Returns the minimum value contained in the set.
+	 * Returns the minimum value contained in the set if not isNil().
 	 *
-	 * @return the minimum value contained in the set. If the set is empty, this
-	 * method returns {@link Token#INVALID_TYPE}.
+	 * @return the minimum value contained in the set.
+	 * @throws RuntimeException if set is empty
 	 */
 	public int getMinElement() {
 		if ( isNil() ) {
-			return Token.INVALID_TYPE;
+			throw new RuntimeException("set is empty");
 		}
 
 		return intervals.get(0).a;
@@ -505,11 +493,11 @@ public class IntervalSet implements IntSet {
 			int b = I.b;
 			if ( a==b ) {
 				if ( a==Token.EOF ) buf.append("<EOF>");
-				else if ( elemAreChar ) buf.append("'").append((char)a).append("'");
+				else if ( elemAreChar ) buf.append("'").appendCodePoint(a).append("'");
 				else buf.append(a);
 			}
 			else {
-				if ( elemAreChar ) buf.append("'").append((char)a).append("'..'").append((char)b).append("'");
+				if ( elemAreChar ) buf.append("'").appendCodePoint(a).append("'..'").appendCodePoint(b).append("'");
 				else buf.append(a).append("..").append(b);
 			}
 			if ( iter.hasNext() ) {

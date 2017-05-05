@@ -114,9 +114,6 @@
     <ClInclude Include="src\IntStream.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\IRecognizer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Lexer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -537,6 +534,9 @@
     <ClInclude Include="src\antlr4-runtime.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\tree\IterativeParseTreeWalker.h">
+      <Filter>Header Files\tree</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\ANTLRFileStream.cpp">
@@ -933,6 +933,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\tree\ParseTree.cpp">
+      <Filter>Source Files\tree</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tree\IterativeParseTreeWalker.cpp">
       <Filter>Source Files\tree</Filter>
     </ClCompile>
   </ItemGroup>

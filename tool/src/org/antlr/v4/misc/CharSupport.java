@@ -7,6 +7,11 @@
 package org.antlr.v4.misc;
 
 import org.antlr.v4.runtime.Lexer;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.misc.Interval;
+import org.antlr.v4.runtime.misc.IntervalSet;
+
+import java.util.Iterator;
 
 /** */
 public class CharSupport {
@@ -26,47 +31,48 @@ public class CharSupport {
 		ANTLRLiteralEscapedCharValue['b'] = '\b';
 		ANTLRLiteralEscapedCharValue['f'] = '\f';
 		ANTLRLiteralEscapedCharValue['\\'] = '\\';
-		ANTLRLiteralEscapedCharValue['\''] = '\'';
-		ANTLRLiteralEscapedCharValue['"'] = '"';
-		ANTLRLiteralEscapedCharValue['-'] = '-';
-		ANTLRLiteralEscapedCharValue[']'] = ']';
 		ANTLRLiteralCharValueEscape['\n'] = "\\n";
 		ANTLRLiteralCharValueEscape['\r'] = "\\r";
 		ANTLRLiteralCharValueEscape['\t'] = "\\t";
 		ANTLRLiteralCharValueEscape['\b'] = "\\b";
 		ANTLRLiteralCharValueEscape['\f'] = "\\f";
 		ANTLRLiteralCharValueEscape['\\'] = "\\\\";
-		ANTLRLiteralCharValueEscape['\''] = "\\'";
 	}
 
 	/** Return a string representing the escaped char for code c.  E.g., If c
-	 *  has value 0x100, you will get "\u0100".  ASCII gets the usual
-	 *  char (non-hex) representation.  Control characters are spit out
-	 *  as unicode.  While this is specially set up for returning Java strings,
-	 *  it can be used by any language target that has the same syntax. :)
+	 *  has value 0x100, you will get "\\u0100".  ASCII gets the usual
+	 *  char (non-hex) representation.  Non-ASCII characters are spit out
+	 *  as \\uXXXX or \\u{XXXXXX} escapes.
 	 */
 	public static String getANTLRCharLiteralForChar(int c) {
-		if ( c< Lexer.MIN_CHAR_VALUE ) {
-			return "'<INVALID>'";
+		String result;
+		if ( c < Lexer.MIN_CHAR_VALUE ) {
+			result = "<INVALID>";
 		}
-		if ( c<ANTLRLiteralCharValueEscape.length && ANTLRLiteralCharValueEscape[c]!=null ) {
-			return '\''+ANTLRLiteralCharValueEscape[c]+'\'';
-		}
-		if ( Character.UnicodeBlock.of((char)c)==Character.UnicodeBlock.BASIC_LATIN &&
-			 !Character.isISOControl((char)c) ) {
-			if ( c=='\\' ) {
-				return "'\\\\'";
+		else {
+			String charValueEscape = c < ANTLRLiteralCharValueEscape.length ? ANTLRLiteralCharValueEscape[c] : null;
+			if (charValueEscape != null) {
+				result = charValueEscape;
 			}
-			if ( c=='\'') {
-				return "'\\''";
+			else if (Character.UnicodeBlock.of((char) c) == Character.UnicodeBlock.BASIC_LATIN &&
+					!Character.isISOControl((char) c)) {
+				if (c == '\\') {
+					result = "\\\\";
+				}
+				else if (c == '\'') {
+					result = "\\'";
+				}
+				else {
+					result = Character.toString((char) c);
+				}
 			}
-			return '\''+Character.toString((char)c)+'\'';
+			else if (c <= 0xFFFF) {
+				result = String.format("\\u%04X", c);
+			} else {
+				result = String.format("\\u{%06X}", c);
+			}
 		}
-		// turn on the bit above max "\uFFFF" value so that we pad with zeros
-		// then only take last 4 digits
-		String hex = Integer.toHexString(c|0x10000).toUpperCase().substring(1,5);
-		String unicodeStr = "'\\u"+hex+"'";
-		return unicodeStr;
+		return '\'' + result + '\'';
 	}
 
 	/** Given a literal like (the 3 char sequence with single quotes) 'a',
@@ -87,11 +93,26 @@ public class CharSupport {
 			if ( literal.charAt(i) == '\\' ) {
 				end = i+2;
 				if ( i+1 < n && literal.charAt(i+1) == 'u' ) {
-					for (end = i + 2; end < i + 6; end++) {
-						if ( end>n ) return null; // invalid escape sequence.
-						char charAt = literal.charAt(end);
-						if (!Character.isDigit(charAt) && !(charAt >= 'a' && charAt <= 'f') && !(charAt >= 'A' && charAt <= 'F')) {
-							return null; // invalid escape sequence.
+					if ( i+2 < n && literal.charAt(i+2) == '{' ) { // extended escape sequence
+						end = i + 3;
+						while (true) {
+							if ( end + 1 > n ) return null; // invalid escape sequence.
+							char charAt = literal.charAt(end++);
+							if (charAt == '}') {
+								break;
+							}
+							if (!Character.isDigit(charAt) && !(charAt >= 'a' && charAt <= 'f') && !(charAt >= 'A' && charAt <= 'F')) {
+								return null; // invalid escape sequence.
+							}
+						}
+					}
+					else {
+						for (end = i + 2; end < i + 6; end++) {
+							if ( end>n ) return null; // invalid escape sequence.
+							char charAt = literal.charAt(end);
+							if (!Character.isDigit(charAt) && !(charAt >= 'a' && charAt <= 'f') && !(charAt >= 'A' && charAt <= 'F')) {
+								return null; // invalid escape sequence.
+							}
 						}
 					}
 				}
@@ -102,13 +123,13 @@ public class CharSupport {
 			if ( c==-1 ) {
 				return null; // invalid escape sequence.
 			}
-			else buf.append((char)c);
+			else buf.appendCodePoint(c);
 			i = end;
 		}
 		return buf.toString();
 	}
 
-	/** Given char x or \t or \u1234 return the char value;
+	/** Given char x or \\t or \\u1234 return the char value;
 	 *  Unnecessary escapes like '\{' yield -1.
 	 */
 	public static int getCharValueFromCharInGrammarLiteral(String cstr) {
@@ -119,28 +140,67 @@ public class CharSupport {
 			case 2:
 				if ( cstr.charAt(0)!='\\' ) return -1;
 				// '\x'  (antlr lexer will catch invalid char)
-				if ( Character.isDigit(cstr.charAt(1)) ) return -1;
-				int escChar = cstr.charAt(1);
+				char escChar = cstr.charAt(1);
+				if (escChar == '\'') return escChar; // escape quote only in string literals.
 				int charVal = ANTLRLiteralEscapedCharValue[escChar];
-				if ( charVal==0 ) return -1;
+				if (charVal == 0) return -1;
 				return charVal;
 			case 6:
-				// '\u1234'
+				// '\\u1234' or '\\u{12}'
 				if ( !cstr.startsWith("\\u") ) return -1;
-				String unicodeChars = cstr.substring(2, cstr.length());
-				int result = -1;
-				try {
-					result = Integer.parseInt(unicodeChars, 16);
+				int startOff;
+				int endOff;
+				if ( cstr.charAt(2) == '{' ) {
+					startOff = 3;
+					endOff = cstr.indexOf('}');
 				}
-				catch (NumberFormatException e) {
+				else {
+					startOff = 2;
+					endOff = cstr.length();
 				}
-				return result;
+				return parseHexValue(cstr, startOff, endOff);
 			default:
+				if ( cstr.startsWith("\\u{") ) {
+					return parseHexValue(cstr, 3, cstr.indexOf('}'));
+				}
 				return -1;
 		}
 	}
 
+	public static int parseHexValue(String cstr, int startOff, int endOff) {
+		if (startOff < 0 || endOff < 0) {
+			return -1;
+		}
+		String unicodeChars = cstr.substring(startOff, endOff);
+		int result = -1;
+		try {
+			result = Integer.parseInt(unicodeChars, 16);
+		}
+		catch (NumberFormatException e) {
+		}
+		return result;
+	}
+
 	public static String capitalize(String s) {
 		return Character.toUpperCase(s.charAt(0)) + s.substring(1);
+	}
+
+	public static String getIntervalSetEscapedString(IntervalSet intervalSet) {
+		StringBuilder buf = new StringBuilder();
+		Iterator<Interval> iter = intervalSet.getIntervals().iterator();
+		while (iter.hasNext()) {
+			Interval interval = iter.next();
+			buf.append(getRangeEscapedString(interval.a, interval.b));
+			if (iter.hasNext()) {
+				buf.append(" | ");
+			}
+		}
+		return buf.toString();
+	}
+
+	public static String getRangeEscapedString(int codePointStart, int codePointEnd) {
+		return codePointStart != codePointEnd
+				? getANTLRCharLiteralForChar(codePointStart) + ".." + getANTLRCharLiteralForChar(codePointEnd)
+				: getANTLRCharLiteralForChar(codePointStart);
 	}
 }

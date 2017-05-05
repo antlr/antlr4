@@ -8,7 +8,7 @@
 
 using namespace antlr4;
 
-void BaseErrorListener::syntaxError(IRecognizer * /*recognizer*/, Token * /*offendingSymbol*/, size_t /*line*/,
+void BaseErrorListener::syntaxError(Recognizer * /*recognizer*/, Token * /*offendingSymbol*/, size_t /*line*/,
   size_t /*charPositionInLine*/, const std::string &/*msg*/, std::exception_ptr /*e*/) {
 }
 

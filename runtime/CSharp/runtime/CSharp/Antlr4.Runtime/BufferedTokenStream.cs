@@ -371,6 +371,7 @@ namespace Antlr4.Runtime
             this._tokenSource = tokenSource;
             tokens.Clear();
             p = -1;
+			this.fetchedEOF = false;
         }
 
         public virtual IList<IToken> GetTokens()

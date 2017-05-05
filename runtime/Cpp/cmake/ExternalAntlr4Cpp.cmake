@@ -66,7 +66,7 @@ set(ANTLR4CPP_EXTERNAL_ROOT ${CMAKE_BINARY_DIR}/externals/antlr4cpp)
 # external repository
 # GIT_REPOSITORY     https://github.com/antlr/antlr4.git
 set(ANTLR4CPP_EXTERNAL_REPO "https://github.com/antlr/antlr4.git")
-set(ANTLR4CPP_EXTERNAL_TAG  "4.6-rc1")
+set(ANTLR4CPP_EXTERNAL_TAG  "4.7")
 
 if(NOT EXISTS "${ANTLR4CPP_JAR_LOCATION}")
   message(FATAL_ERROR "Unable to find antlr tool. ANTLR4CPP_JAR_LOCATION:${ANTLR4CPP_JAR_LOCATION}")
@@ -155,9 +155,9 @@ ExternalProject_ADD(
 
 ExternalProject_Get_Property(antlr4cpp INSTALL_DIR)
 
-list(APPEND ANTLR4CPP_INCLUDE_DIRS ${INSTALL_DIR}/include)
+list(APPEND ANTLR4CPP_INCLUDE_DIRS ${INSTALL_DIR}/include/antlr4-runtime)
 foreach(src_path misc atn dfa tree support)
-  list(APPEND ANTLR4CPP_INCLUDE_DIRS ${INSTALL_DIR}/include/${src_path})
+  list(APPEND ANTLR4CPP_INCLUDE_DIRS ${INSTALL_DIR}/include/antlr4-runtime/${src_path})
 endforeach(src_path)
 
 set(ANTLR4CPP_LIBS "${INSTALL_DIR}/lib")

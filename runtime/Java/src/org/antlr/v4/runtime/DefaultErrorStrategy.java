@@ -224,10 +224,8 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
         int la = tokens.LA(1);
 
         // try cheaper subset first; might get lucky. seems to shave a wee bit off
-        if ( recognizer.getATN().nextTokens(s).contains(la) || la==Token.EOF ) return;
-
-		// Return but don't end recovery. only do that upon valid token match
-		if (recognizer.isExpectedToken(la)) {
+		IntervalSet nextTokens = recognizer.getATN().nextTokens(s);
+		if (nextTokens.contains(Token.EPSILON) || nextTokens.contains(la)) {
 			return;
 		}
 
@@ -550,7 +548,10 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 	protected Token getMissingSymbol(Parser recognizer) {
 		Token currentSymbol = recognizer.getCurrentToken();
 		IntervalSet expecting = getExpectedTokens(recognizer);
-		int expectedTokenType = expecting.getMinElement(); // get any element
+		int expectedTokenType = Token.INVALID_TYPE;
+		if ( !expecting.isNil() ) {
+			expectedTokenType = expecting.getMinElement(); // get any element
+		}
 		String tokenText;
 		if ( expectedTokenType== Token.EOF ) tokenText = "<missing EOF>";
 		else tokenText = "<missing "+recognizer.getVocabulary().getDisplayName(expectedTokenType)+">";

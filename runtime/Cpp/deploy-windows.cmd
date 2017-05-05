@@ -17,9 +17,7 @@ if exist "C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\Tools\VsDe
 
   pushd runtime
   msbuild antlr4cpp-vs2013.vcxproj /p:configuration="Release DLL" /p:platform=Win32
-  msbuild antlr4cpp-vs2013.vcxproj /p:configuration="Release Static" /p:platform=Win32
   msbuild antlr4cpp-vs2013.vcxproj /p:configuration="Release DLL" /p:platform=x64
-  msbuild antlr4cpp-vs2013.vcxproj /p:configuration="Release Static" /p:platform=x64
   popd
   
   7z a antlr4-cpp-runtime-vs2013.zip antlr4-runtime
@@ -39,9 +37,7 @@ if exist "C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\Tools\VsDe
 
   pushd runtime
   msbuild antlr4cpp-vs2015.vcxproj /p:configuration="Release DLL" /p:platform=Win32
-  msbuild antlr4cpp-vs2015.vcxproj /p:configuration="Release Static" /p:platform=Win32
   msbuild antlr4cpp-vs2015.vcxproj /p:configuration="Release DLL" /p:platform=x64
-  msbuild antlr4cpp-vs2015.vcxproj /p:configuration="Release Static" /p:platform=x64
   popd
   
   7z a antlr4-cpp-runtime-vs2015.zip antlr4-runtime

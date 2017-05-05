@@ -114,9 +114,6 @@
     <ClInclude Include="src\IntStream.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\IRecognizer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Lexer.h">
       <Filter>Header Files</Filter>
     </ClInclude>

@@ -76,8 +76,8 @@ Lexer.SKIP = -3;
 
 Lexer.DEFAULT_TOKEN_CHANNEL = Token.DEFAULT_CHANNEL;
 Lexer.HIDDEN = Token.HIDDEN_CHANNEL;
-Lexer.MIN_CHAR_VALUE = '\u0000';
-Lexer.MAX_CHAR_VALUE = '\uFFFE';
+Lexer.MIN_CHAR_VALUE = 0x0000;
+Lexer.MAX_CHAR_VALUE = 0x10FFFF;
 
 Lexer.prototype.reset = function() {
 	// wack Lexer state variables

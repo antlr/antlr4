@@ -38,7 +38,7 @@ void myBarLexerAction() { /* do something*/ };
 channels { CommentsChannel, DirectiveChannel }
 
 tokens {
-	DUMMY	
+	DUMMY
 }
 
 Return: 'return';
@@ -48,7 +48,7 @@ INT: Digit+;
 Digit: [0-9];
 
 ID: LETTER (LETTER | '0'..'9')*;
-fragment LETTER : [a-zA-Z\u0080-\uFFFF];
+fragment LETTER : [a-zA-Z\u0080-\u{10FFFF}];
 
 LessThan: '<';
 GreaterThan:  '>';
@@ -68,7 +68,7 @@ QuestionMark: '?';
 Comma: ',' -> skip;
 Dollar: '$' -> more, mode(Mode1);
 Ampersand: '&' -> type(DUMMY);
- 
+
 String: '"' .*? '"';
 Foo: {canTestFoo()}? 'foo' {isItFoo()}? { myFooLexerAction(); };
 Bar: 'bar' {isItBar()}? { myBarLexerAction(); };
