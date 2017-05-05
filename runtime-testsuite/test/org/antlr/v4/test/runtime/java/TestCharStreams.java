@@ -8,6 +8,7 @@ package org.antlr.v4.test.runtime.java;
 
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.PathCharStreams;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -53,7 +54,7 @@ public class TestCharStreams {
 	public void fromBMPUTF8PathHasExpectedSize() throws Exception {
 		Path p = folder.newFile().toPath();
 		Files.write(p, "hello".getBytes(StandardCharsets.UTF_8));
-		CharStream s = CharStreams.fromPath(p);
+		CharStream s = PathCharStreams.fromPath(p);
 		assertEquals(5, s.size());
 		assertEquals(0, s.index());
 		assertEquals("hello", s.toString());
@@ -64,7 +65,7 @@ public class TestCharStreams {
 	public void fromSMPUTF8PathHasExpectedSize() throws Exception {
 		Path p = folder.newFile().toPath();
 		Files.write(p, "hello \uD83C\uDF0E".getBytes(StandardCharsets.UTF_8));
-		CharStream s = CharStreams.fromPath(p);
+		CharStream s = PathCharStreams.fromPath(p);
 		assertEquals(7, s.size());
 		assertEquals(0, s.index());
 		assertEquals("hello \uD83C\uDF0E", s.toString());
@@ -207,7 +208,7 @@ public class TestCharStreams {
 	public void fromSMPUTF16LEPathSMPHasExpectedSize() throws Exception {
 		Path p = folder.newFile().toPath();
 		Files.write(p, "hello \uD83C\uDF0E".getBytes(StandardCharsets.UTF_16LE));
-		CharStream s = CharStreams.fromPath(p, StandardCharsets.UTF_16LE);
+		CharStream s = PathCharStreams.fromPath(p, StandardCharsets.UTF_16LE);
 		assertEquals(7, s.size());
 		assertEquals(0, s.index());
 		assertEquals("hello \uD83C\uDF0E", s.toString());
@@ -220,7 +221,7 @@ public class TestCharStreams {
 		// UTF-32 isn't popular enough to have an entry in StandardCharsets.
 		Charset c = Charset.forName("UTF-32LE");
 		Files.write(p, "hello \uD83C\uDF0E".getBytes(c));
-		CharStream s = CharStreams.fromPath(p, c);
+		CharStream s = PathCharStreams.fromPath(p, c);
 		assertEquals(7, s.size());
 		assertEquals(0, s.index());
 		assertEquals("hello \uD83C\uDF0E", s.toString());

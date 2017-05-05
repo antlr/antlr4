@@ -8,6 +8,7 @@ package org.antlr.v4.gui;
 
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.PathCharStreams;
 import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.DiagnosticErrorListener;
@@ -159,7 +160,7 @@ public class TestRig {
 			return;
 		}
 		for (String inputFile : inputFiles) {
-	                CharStream charStream = CharStreams.fromPath(Paths.get(inputFile), charset);
+			CharStream charStream = PathCharStreams.fromPath(Paths.get(inputFile), charset);
 			if ( inputFiles.size()>1 ) {
 				System.err.println(inputFile);
 			}
