@@ -21,6 +21,7 @@ ANTLR_VERSION = "4.7"
 USER_M2 = os.path.expanduser("~") + "/.m2/"
 ANTLR4_FOLDER = USER_M2 + "repository/org/antlr/antlr4/" + ANTLR_VERSION + "-SNAPSHOT/"
 ANTLR4_JAR = ANTLR4_FOLDER + "antlr4-" + ANTLR_VERSION + "-SNAPSHOT-complete.jar"
+TMP_FOLDER = "/tmp/"
 
 
 def jar_exists():
@@ -69,25 +70,48 @@ def swift_test():
 
 
 def get_argument_parser():
-    p = argparse.ArgumentParser(description="Helper script for ANTLR4 Swift target.")
+    """
+    Initialize argument parser.
+    :return: the argument parser
+    """
+    p = argparse.ArgumentParser(description="Helper script for ANTLR4 Swift target. "
+                                            "<DEVELOPER> flag means the command is mostly used by a developer. "
+                                            "<USER> flag means the command should be used by user. ")
     p.add_argument("--gen-spm-module",
                    action="store_true",
-                   help="Generates a Swift Package Manager flavored module."
+                   help="<USER> Generates a Swift Package Manager flavored module. "
                         "Use this command if you want to include ANTLR4 as SPM dependency.", )
     p.add_argument("--gen-xcodeproj",
                    action="store_true",
-                   help="Generates an Xcode project for ANTLR4 Swift runtime.")
+                   help="<DEVELOPER> Generates an Xcode project for ANTLR4 Swift runtime. "
+                        "This directive will generate all the required parsers for the project. "
+                        "Feel free to re-run whenever you updated the test grammar files.")
     p.add_argument("--test",
                    action="store_true",
-                   help="Run unit tests.")
+                   help="<DEVELOPER> Run unit tests.")
     return p
 
 
-def generate_spm_module():
+def generate_spm_module(in_folder=TMP_FOLDER):
+    """
+    Generate spm module in the specified folder, default
+    to the system's tmp folder.
+
+    After generation, user can simply use the prompt SPM
+    code to include the ANTLR4 Swift runtime package.
+    :return: None
+    """
     pass
 
 
 def generate_xcodeproj():
+    """
+    Generates the ANTLR4 Swift runtime Xcode project.
+
+    This method will also generate parsers required by
+    the runtime tests.
+    :return:
+    """
     pass
 
 
