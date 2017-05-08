@@ -648,7 +648,7 @@ open class LexerATNSimulator: ATNSimulator {
             print("EDGE \(p) -> \(q) upon \(t)")
         }
 
-        synced(p) {
+        synchronized {
             if p.edges == nil {
                 //  make room for tokens 1..n and -1 masquerading as index 0
                 //TODO ARRAY COUNT

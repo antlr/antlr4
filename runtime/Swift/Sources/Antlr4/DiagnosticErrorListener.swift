@@ -60,8 +60,7 @@ public class DiagnosticErrorListener: BaseErrorListener {
             let decision: String = getDecisionDescription(recognizer, dfa)
             let conflictingAlts: BitSet = try getConflictingAlts(ambigAlts, configs)
             let text: String = try recognizer.getTokenStream()!.getText(Interval.of(startIndex, stopIndex))
-
-            let message: String = NSString(format: format as NSString, decision, conflictingAlts.description, text) as String
+            let message = makeString(fromFormat: format, decision, conflictingAlts.description, text)
             try recognizer.notifyErrorListeners(message)
     }
 
@@ -75,7 +74,7 @@ public class DiagnosticErrorListener: BaseErrorListener {
             let format: String = "reportAttemptingFullContext d=%@, input='%@'"
             let decision: String = getDecisionDescription(recognizer, dfa)
             let text: String = try recognizer.getTokenStream()!.getText(Interval.of(startIndex, stopIndex))
-            let message: String = NSString(format: format as NSString, decision, text) as String
+            let message = makeString(fromFormat: format, decision, text)
             try recognizer.notifyErrorListeners(message)
     }
 
@@ -89,7 +88,7 @@ public class DiagnosticErrorListener: BaseErrorListener {
             let format: String = "reportContextSensitivity d=%@, input='%@'"
             let decision: String = getDecisionDescription(recognizer, dfa)
             let text: String = try recognizer.getTokenStream()!.getText(Interval.of(startIndex, stopIndex))
-            let message: String = NSString(format: format as NSString, decision, text) as String
+            let message = makeString(fromFormat: format, decision, text)
             try recognizer.notifyErrorListeners(message)
     }
 
@@ -107,8 +106,7 @@ public class DiagnosticErrorListener: BaseErrorListener {
         if ruleName.isEmpty {
             return String(decision)
         }
-
-        return NSString(format: "%d (%@)", decision, ruleName) as String
+        return makeString(fromFormat: "%@ (%@)", decision.description, ruleName)
     }
 
     /// Computes the set of conflicting or ambiguous alternatives from a
@@ -127,4 +125,5 @@ public class DiagnosticErrorListener: BaseErrorListener {
         let result = try configs.getAltBitSet()
         return result
     }
+    
 }

@@ -440,7 +440,7 @@ open class Parser: Recognizer<ParserATNSimulator> {
         let serializedAtn: String = getSerializedATN()
 
         var result: ATN? = bypassAltsAtnCache[serializedAtn]
-        synced(bypassAltsAtnCache) {
+        synchronized {
             [unowned self] in
             if result == nil {
                 let deserializationOptions: ATNDeserializationOptions = ATNDeserializationOptions()
@@ -988,7 +988,7 @@ open class Parser: Recognizer<ParserATNSimulator> {
         guard let _interp = _interp  else {
             return s
         }
-        synced(_interp.decisionToDFA as AnyObject) {
+        synchronized {
             [unowned self] in
 
             for d in 0..<_interp.decisionToDFA.count {
@@ -1005,7 +1005,7 @@ open class Parser: Recognizer<ParserATNSimulator> {
         guard let _interp = _interp  else {
             return
         }
-        synced(_interp.decisionToDFA as AnyObject) {
+        synchronized {
             [unowned self] in
             var seenOne: Bool = false
 

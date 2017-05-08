@@ -57,7 +57,7 @@ open class Recognizer<ATNInterpreter:ATNSimulator> {
     public func getTokenTypeMap() -> Dictionary<String, Int> {
         let vocabulary: Vocabulary = getVocabulary()
         var result: Dictionary<String, Int>? = self.tokenTypeMapCache[vocabulary]
-        synced(tokenTypeMapCache) {
+        synchronized {
             [unowned self] in
             if result == nil {
                 result = Dictionary<String, Int>()
@@ -96,7 +96,7 @@ open class Recognizer<ATNInterpreter:ATNSimulator> {
         let ruleNames: [String] = getRuleNames()
 
         let result: Dictionary<String, Int>? = self.ruleIndexMapCache[ArrayWrapper<String>(ruleNames)]
-        synced(ruleIndexMapCache) {
+        synchronized {
             [unowned self] in
             if result == nil {
                 self.ruleIndexMapCache[ArrayWrapper<String>(ruleNames)] = Utils.toMap(ruleNames)
@@ -212,9 +212,9 @@ open class Recognizer<ATNInterpreter:ATNSimulator> {
                 s = "<\(t.getType())>"
             }
         }
-        s = s.replaceAll("\n", replacement: "\\n")
-        s = s.replaceAll("\r", replacement: "\\r")
-        s = s.replaceAll("\t", replacement: "\\t")
+        s = s.replacingOccurrences(of: "\n", with: "\\n")
+        s = s.replacingOccurrences(of: "\r", with: "\\r")
+        s = s.replacingOccurrences(of: "\t", with: "\\t")
         return "\(s)"
     }
 

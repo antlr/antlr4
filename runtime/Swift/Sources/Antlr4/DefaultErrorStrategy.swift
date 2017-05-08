@@ -574,9 +574,9 @@ public class DefaultErrorStrategy: ANTLRErrorStrategy {
 
     internal func escapeWSAndQuote(_ s: String) -> String {
         var s = s
-        s = s.replaceAll("\n", replacement: "\\n")
-        s = s.replaceAll("\r", replacement: "\\r")
-        s = s.replaceAll("\t", replacement: "\\t")
+        s = s.replacingOccurrences(of: "\n", with: "\\n")
+        s = s.replacingOccurrences(of: "\r", with: "\\r")
+        s = s.replacingOccurrences(of: "\t", with: "\\t")
         return "'" + s + "'"
     }
 

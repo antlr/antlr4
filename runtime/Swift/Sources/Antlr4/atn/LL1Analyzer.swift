@@ -23,14 +23,12 @@ public class LL1Analyzer {
     /// - parameter s: the ATN state
     /// - returns: the expected symbols for each outgoing transition of {@code s}.
     public func getDecisionLookahead(_ s: ATNState?) throws -> [IntervalSet?]? {
-//		print("LOOK("+s.stateNumber+")");
-
+        
         guard let s = s else {
              return nil
         }
         let length = s.getNumberOfTransitions()
         var look: [IntervalSet?] = [IntervalSet?](repeating: nil, count: length)
-        //new IntervalSet[s.getNumberOfTransitions()];
         for alt in 0..<length {
             look[alt] = try IntervalSet()
             var lookBusy: Set<ATNConfig> = Set<ATNConfig>()
@@ -138,10 +136,6 @@ public class LL1Analyzer {
             lookBusy.insert(c)
         }
 
-//        if ( !lookBusy.insert (c) ) {
-//            return;
-//        }
-
         if s == stopState {
             guard let ctx = ctx else {
                 try look.add(CommonToken.EPSILON)
@@ -175,11 +169,8 @@ public class LL1Analyzer {
 
 
                     var removed: Bool = try calledRuleStack.get(returnState.ruleIndex!)
-                    //TODO  try
-                    //try {
                     try calledRuleStack.clear(returnState.ruleIndex!)
                     try self._LOOK(returnState, stopState, ctx.getParent(i), look, &lookBusy, calledRuleStack, seeThruPreds, addEOF)
-                    //}
                     defer {
                         if removed {
                             try! calledRuleStack.set(returnState.ruleIndex!)
@@ -193,18 +184,15 @@ public class LL1Analyzer {
         var n: Int = s.getNumberOfTransitions()
         for i in 0..<n {
             var t: Transition = s.transition(i)
-            if type(of: t) === RuleTransition.self {
+            if type(of: t) == RuleTransition.self {
                 if try calledRuleStack.get((t as! RuleTransition).target.ruleIndex!) {
                     continue
                 }
 
                 var newContext: PredictionContext =
                 SingletonPredictionContext.create(ctx, (t as! RuleTransition).followState.stateNumber)
-                //TODO try
-                //try {
                 try calledRuleStack.set((t as! RuleTransition).target.ruleIndex!)
                 try _LOOK(t.target, stopState, newContext, look, &lookBusy, calledRuleStack, seeThruPreds, addEOF)
-                //}
                 defer {
                     try! calledRuleStack.clear((t as! RuleTransition).target.ruleIndex!)
                 }
@@ -219,7 +207,7 @@ public class LL1Analyzer {
                     if t.isEpsilon() {
                         try _LOOK(t.target, stopState, ctx, look, &lookBusy, calledRuleStack, seeThruPreds, addEOF)
                     } else {
-                        if type(of: t) === WildcardTransition.self {
+                        if type(of: t) == WildcardTransition.self {
                             try look.addAll(IntervalSet.of(CommonToken.MIN_USER_TOKEN_TYPE, atn.maxTokenType))
                         } else {
 
