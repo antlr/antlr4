@@ -18,7 +18,7 @@ func makeString(fromFormat format: String, _ args: String...) -> String {
         let cStrings = args.map { $0.withCString { $0 } }
         return String(format: linuxFormat, arguments: cStrings)
     #else
-        return String(format: format, args)
+        return String(format: format, arguments: args)
     #endif
 }
 

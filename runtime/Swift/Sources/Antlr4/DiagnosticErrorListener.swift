@@ -56,10 +56,10 @@ public class DiagnosticErrorListener: BaseErrorListener {
                 return
             }
 
-            let format: String = "reportAmbiguity d=%@: ambigAlts=%@, input='%@'"
-            let decision: String = getDecisionDescription(recognizer, dfa)
-            let conflictingAlts: BitSet = try getConflictingAlts(ambigAlts, configs)
-            let text: String = try recognizer.getTokenStream()!.getText(Interval.of(startIndex, stopIndex))
+            let format = "reportAmbiguity d=%@: ambigAlts=%@, input='%@'"
+            let decision = getDecisionDescription(recognizer, dfa)
+            let conflictingAlts = try getConflictingAlts(ambigAlts, configs)
+            let text = try recognizer.getTokenStream()!.getText(Interval.of(startIndex, stopIndex))
             let message = makeString(fromFormat: format, decision, conflictingAlts.description, text)
             try recognizer.notifyErrorListeners(message)
     }
@@ -71,9 +71,9 @@ public class DiagnosticErrorListener: BaseErrorListener {
         _ stopIndex: Int,
         _ conflictingAlts: BitSet?,
         _ configs: ATNConfigSet) throws {
-            let format: String = "reportAttemptingFullContext d=%@, input='%@'"
-            let decision: String = getDecisionDescription(recognizer, dfa)
-            let text: String = try recognizer.getTokenStream()!.getText(Interval.of(startIndex, stopIndex))
+            let format = "reportAttemptingFullContext d=%@, input='%@'"
+            let decision = getDecisionDescription(recognizer, dfa)
+            let text = try recognizer.getTokenStream()!.getText(Interval.of(startIndex, stopIndex))
             let message = makeString(fromFormat: format, decision, text)
             try recognizer.notifyErrorListeners(message)
     }
@@ -85,9 +85,9 @@ public class DiagnosticErrorListener: BaseErrorListener {
         _ stopIndex: Int,
         _ prediction: Int,
         _ configs: ATNConfigSet) throws {
-            let format: String = "reportContextSensitivity d=%@, input='%@'"
-            let decision: String = getDecisionDescription(recognizer, dfa)
-            let text: String = try recognizer.getTokenStream()!.getText(Interval.of(startIndex, stopIndex))
+            let format = "reportContextSensitivity d=%@, input='%@'"
+            let decision = getDecisionDescription(recognizer, dfa)
+            let text = try recognizer.getTokenStream()!.getText(Interval.of(startIndex, stopIndex))
             let message = makeString(fromFormat: format, decision, text)
             try recognizer.notifyErrorListeners(message)
     }
