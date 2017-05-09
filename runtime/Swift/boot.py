@@ -19,7 +19,10 @@ import os.path
 import time
 from subprocess import call
 
-ANTLR_VERSION = "4.7.0"
+ANTLR_MAJOR_VERSION = "4"
+ANTLR_MINOR_VERSION = "7"
+ANTLR_RELEASE = "0" # Placeholder which required by SPM to work.
+ANTLR_VERSION = ANTLR_MAJOR_VERSION + "." + ANTLR_MINOR_VERSION
 USER_M2 = os.path.expanduser("~") + "/.m2/"
 ANTLR4_FOLDER = USER_M2 + "repository/org/antlr/antlr4/" + ANTLR_VERSION + "-SNAPSHOT/"
 ANTLR4_JAR = ANTLR4_FOLDER + "antlr4-" + ANTLR_VERSION + "-SNAPSHOT-complete.jar"
@@ -77,6 +80,7 @@ def swift_test():
     """
     Run unit tests.
     """
+    generate_parser()
     call(["swift", "test"])
 
 
@@ -128,10 +132,11 @@ def generate_spm_module(in_folder=TMP_FOLDER):
     call(["git", "init"])
     call(["git", "add", "*"])
     call(["git", "commit", "-m", "Initial commit."])
-    call(["git", "tag", ANTLR_VERSION])
+    call(["git", "tag", ANTLR_VERSION + "." + ANTLR_RELEASE])
 
     antlr_says("Created local repository.")
-    antlr_says("Put .Package(url: \"{}\", \"{}\") in your project dependencies.".format(os.getcwd(), ANTLR_VERSION))
+    antlr_says("Put .Package(url: \"{}\", majorVersion: {}) in your project dependencies.".format(os.getcwd(),
+                                                                                                  ANTLR_MAJOR_VERSION))
 
 
 def generate_xcodeproj():
@@ -142,7 +147,16 @@ def generate_xcodeproj():
     the runtime tests.
     :return:
     """
-    pass
+    generate_parser()
+    call(["swift", "package", "generate-xcodeproj"])
+
+
+def generate_parser():
+    if not jar_exists():
+        antlr_complains("Run \"mvn install\" in antlr4 project root first or check mvn settings")
+        exit()
+
+    _ = [gen_parser(f) for f in find_g4()]
 
 
 def antlr_says(msg):
@@ -161,11 +175,6 @@ if __name__ == "__main__":
     elif args.gen_xcodeproj:
         generate_xcodeproj()
     elif args.test:
-        if not jar_exists():
-            antlr_complains("Run \"mvn install\" in antlr4 project root first or check mvn settings")
-            exit()
-
-        _ = [gen_parser(f) for f in find_g4()]
         swift_test()
     else:
         parser.print_help()
