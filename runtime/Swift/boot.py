@@ -12,16 +12,27 @@ USER_M2 constant below.
 the java version is used according to environment variable $JAVA_HOME.
 """
 
+import shutil
+import argparse
 import fnmatch
 import os.path
-import argparse
+import time
 from subprocess import call
 
-ANTLR_VERSION = "4.7"
+ANTLR_VERSION = "4.7.0"
 USER_M2 = os.path.expanduser("~") + "/.m2/"
 ANTLR4_FOLDER = USER_M2 + "repository/org/antlr/antlr4/" + ANTLR_VERSION + "-SNAPSHOT/"
 ANTLR4_JAR = ANTLR4_FOLDER + "antlr4-" + ANTLR_VERSION + "-SNAPSHOT-complete.jar"
 TMP_FOLDER = "/tmp/"
+DIR = os.path.dirname(os.path.realpath(__file__))
+
+# Colors
+RED = "\033[91;1m"
+GREEN = "\033[32;1m"
+YELLOW = "\033[93;1m"
+CYAN = "\033[36;1m"
+GREY = "\033[38;2;127;127;127m"
+RESET = "\033[0m"
 
 
 def jar_exists():
@@ -54,7 +65,7 @@ def gen_parser(grammar):
     java_home = os.environ["JAVA_HOME"]
     java = java_home + "/bin/java"
     if not os.path.exists(java):
-        print "Cannot find java. Check your JAVA_HOME setting."
+        antlr_complains("Cannot find java. Check your JAVA_HOME setting.")
         return
 
     call([java, "-jar", ANTLR4_JAR,
@@ -99,9 +110,28 @@ def generate_spm_module(in_folder=TMP_FOLDER):
 
     After generation, user can simply use the prompt SPM
     code to include the ANTLR4 Swift runtime package.
+    :param in_folder: the folder where we generate the SPM module.
     :return: None
     """
-    pass
+
+    tmp_antlr_folder = in_folder + "Antlr4-tmp-" + str(int(time.time()))
+    os.mkdir(tmp_antlr_folder)
+
+    # Copy folders and SPM manifest file.
+    dirs_to_copy = ["Sources", "Tests"]
+    for dir_to_copy in dirs_to_copy:
+        shutil.copytree(DIR + "/" + dir_to_copy, tmp_antlr_folder + "/" + dir_to_copy)
+
+    shutil.copy("Package.swift", tmp_antlr_folder)
+
+    os.chdir(tmp_antlr_folder)
+    call(["git", "init"])
+    call(["git", "add", "*"])
+    call(["git", "commit", "-m", "Initial commit."])
+    call(["git", "tag", ANTLR_VERSION])
+
+    antlr_says("Created local repository.")
+    antlr_says("Put .Package(url: \"{}\", \"{}\") in your project dependencies.".format(os.getcwd(), ANTLR_VERSION))
 
 
 def generate_xcodeproj():
@@ -115,6 +145,14 @@ def generate_xcodeproj():
     pass
 
 
+def antlr_says(msg):
+    print GREEN + "[ANTLR] " + msg + RESET
+
+
+def antlr_complains(msg):
+    print RED + "[ANTLR] " + msg + RESET
+
+
 if __name__ == "__main__":
     parser = get_argument_parser()
     args = parser.parse_args()
@@ -124,7 +162,7 @@ if __name__ == "__main__":
         generate_xcodeproj()
     elif args.test:
         if not jar_exists():
-            print "Run \"mvn install\" in antlr4 project root first or check mvn settings"
+            antlr_complains("Run \"mvn install\" in antlr4 project root first or check mvn settings")
             exit()
 
         _ = [gen_parser(f) for f in find_g4()]
