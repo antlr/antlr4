@@ -11,7 +11,7 @@ USER_M2 constant below.
 
 the java version is used according to environment variable $JAVA_HOME.
 """
-
+import glob
 import shutil
 import argparse
 import fnmatch
@@ -19,15 +19,20 @@ import os.path
 import time
 from subprocess import call
 
-ANTLR_MAJOR_VERSION = "4"
-ANTLR_MINOR_VERSION = "7"
-ANTLR_RELEASE = "0" # Placeholder which required by SPM to work.
-ANTLR_VERSION = ANTLR_MAJOR_VERSION + "." + ANTLR_MINOR_VERSION
-USER_M2 = os.path.expanduser("~") + "/.m2/"
-ANTLR4_FOLDER = USER_M2 + "repository/org/antlr/antlr4/" + ANTLR_VERSION + "-SNAPSHOT/"
-ANTLR4_JAR = ANTLR4_FOLDER + "antlr4-" + ANTLR_VERSION + "-SNAPSHOT-complete.jar"
+
+# ANTLR Version, here we only care about major version.
+MAJOR_VERSION = "4"
+
+# Note: User defines their own M2_HOME should change this variable.
+USER_M2 = os.path.expanduser("~") + "/.m2"
 TMP_FOLDER = "/tmp/"
+
+# The directory contains this script.
 DIR = os.path.dirname(os.path.realpath(__file__))
+
+# The following two are using glob syntax.
+ANTLR4_FOLDER = USER_M2 + "/repository/org/antlr/antlr4/*-SNAPSHOT"
+ANTLR4 = ANTLR4_FOLDER + "/antlr4-*-SNAPSHOT-complete.jar"
 
 # Colors
 RED = "\033[91;1m"
@@ -38,11 +43,15 @@ GREY = "\033[38;2;127;127;127m"
 RESET = "\033[0m"
 
 
-def jar_exists():
+def find_a4_jar():
     """
     Finds the antlr4 jar.
     """
-    return os.path.exists(ANTLR4_JAR)
+    matches = glob.glob(ANTLR4)
+    if len(matches) == 0:
+        return None
+    sorted(matches, reverse=True)
+    return matches[0]
 
 
 def find_g4():
@@ -60,9 +69,12 @@ def find_g4():
     return res
 
 
-def gen_parser(grammar):
+def gen_parser(grammar, a4):
     """
     Generate parser for the input g4 file.
+    :param grammar: grammar file
+    :param a4: antlr4 runtime
+    :return: None
     """
     grammar_folder = grammar[0:grammar.rindex("/") + 1]
     java_home = os.environ["JAVA_HOME"]
@@ -71,7 +83,7 @@ def gen_parser(grammar):
         antlr_complains("Cannot find java. Check your JAVA_HOME setting.")
         return
 
-    call([java, "-jar", ANTLR4_JAR,
+    call([java, "-jar", a4,
           "-Dlanguage=Swift", grammar, "-visitor",
           "-o", grammar_folder + "/gen"])
 
@@ -132,11 +144,10 @@ def generate_spm_module(in_folder=TMP_FOLDER):
     call(["git", "init"])
     call(["git", "add", "*"])
     call(["git", "commit", "-m", "Initial commit."])
-    call(["git", "tag", ANTLR_VERSION + "." + ANTLR_RELEASE])
+    call(["git", "tag", "{}.0.0".format(MAJOR_VERSION)])
 
     antlr_says("Created local repository.")
-    antlr_says("Put .Package(url: \"{}\", majorVersion: {}) in your project dependencies.".format(os.getcwd(),
-                                                                                                  ANTLR_MAJOR_VERSION))
+    antlr_says("Put .Package(url: \"{}\", majorVersion: {}) in Package.swift.".format(os.getcwd(), MAJOR_VERSION))
 
 
 def generate_xcodeproj():
@@ -152,11 +163,12 @@ def generate_xcodeproj():
 
 
 def generate_parser():
-    if not jar_exists():
+    antlr = find_a4_jar()
+    if antlr is None:
         antlr_complains("Run \"mvn install\" in antlr4 project root first or check mvn settings")
         exit()
 
-    _ = [gen_parser(f) for f in find_g4()]
+    _ = [gen_parser(f, antlr) for f in find_g4()]
 
 
 def antlr_says(msg):
