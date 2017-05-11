@@ -30,7 +30,7 @@ var CharStreams = {
   fromBlob: function(blob, encoding, onLoad, onError) {
     var reader = FileReader();
     reader.onload = function(e) {
-      var is = InputStream(e.target.result, true);
+      var is = new InputStream(e.target.result, true);
       onLoad(is);
     };
     reader.onerror = onError;
@@ -53,7 +53,7 @@ var CharStreams = {
     fs.readFile(path, encoding, function(err, data) {
       var is = null;
       if (data !== null) {
-        is = InputStream(data, true);
+        is = new InputStream(data, true);
       }
       callback(err, is);
     });
