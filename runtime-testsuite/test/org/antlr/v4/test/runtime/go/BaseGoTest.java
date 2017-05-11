@@ -326,7 +326,7 @@ public class BaseGoTest implements RuntimeTestSupport {
 //		writeFile(overall_tmpdir, "input", input);
 //		rawBuildRecognizerTestFile(parserName, lexerName, listenerName,
 //		                           visitorName, startRuleName, debug);
-//		return execRecognizer();
+//		return execParser();
 //	}
 
 	@Override
