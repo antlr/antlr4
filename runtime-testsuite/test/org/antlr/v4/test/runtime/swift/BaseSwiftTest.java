@@ -6,6 +6,7 @@
 
 package org.antlr.v4.test.runtime.swift;
 
+import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.test.runtime.ErrorQueue;
 import org.antlr.v4.test.runtime.RuntimeTestSupport;
 import org.antlr.v4.test.runtime.StreamVacuum;
@@ -33,17 +34,6 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 	 */
 	private static String ANTLR_RUNTIME_PATH;
 
-	private static void exec(String workingDir, String... command) {
-		ProcessBuilder builder = new ProcessBuilder(command);
-		builder.directory(new File(workingDir));
-		try {
-			Process p = builder.start();
-			p.waitFor();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
 	static {
 		String baseTestDir = System.getProperty("antlr-swift-test-dir");
 		if (baseTestDir == null || baseTestDir.isEmpty()) {
@@ -62,12 +52,12 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 			throw new RuntimeException("Swift runtime file not found at:" + swiftRuntime.getPath());
 		}
 		ANTLR_RUNTIME_PATH = swiftRuntime.getPath();
-		exec(ANTLR_RUNTIME_PATH, "swift", "build");
+		fastFailRunProcess(ANTLR_RUNTIME_PATH, "swift", "build");
 
 		// shutdown logic
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			public void run() {
-				exec(ANTLR_RUNTIME_PATH, "swift", "package", "clean");
+				fastFailRunProcess(ANTLR_RUNTIME_PATH, "swift", "package", "clean");
 			}
 		});
 	}
@@ -148,68 +138,10 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 		writeLexerTestFile(lexerName, showDFA);
 		addSourceFiles("main.swift");
 
-//		compile();
-//		String output = execTest();
-//		return output;
-		return ""; // TODO:
-	}
-
-	private String execTest(String projectDir, String projectName) {
-		try {
-			return runProcess(projectDir, "./.build/debug/" + projectName, "input");
-		}
-		catch (Exception e) {
-			System.err.println("Execution of testcase failed.");
-			e.printStackTrace(System.err);
-		}
-		return null;
-	}
-
-	private void addSourceFiles(String... files) {
-		Collections.addAll(this.sourceFiles, files);
-	}
-
-	private void listSourceFiles() {
-		for (String sourceFile: this.sourceFiles) {
-			System.out.println(sourceFile);
-		}
-	}
-
-	private static final String EXEC_NAME = "Test";
-
-	private void buildProject(String projectDir) {
-		mkdir(projectDir);
-		exec(projectDir, "swift", "package", "init", "--type", "executable");
-		for (String sourceFile: sourceFiles) {
-			String absPath = getTmpDir() + "/" + sourceFile;
-			exec(getTmpDir(), "mv", "-f", absPath, projectDir + "/Sources/");
-		}
-		exec(getTmpDir(), "mv", "-f", "input", projectDir);
-
-		try {
-			String dylibPath = ANTLR_RUNTIME_PATH + "/.build/debug/";
-			runProcess(projectDir, "swift", "build",
-					"-Xswiftc", "-I"+dylibPath,
-					"-Xlinker", "-L"+dylibPath,
-					"-Xlinker", "-lAntlr4");
-		} catch (IOException | InterruptedException e) {
-			e.printStackTrace();
-		}
-	}
-
-	private static String runProcess(String execPath, String... args) throws IOException, InterruptedException {
-		Process process = Runtime.getRuntime().exec(args, null, new File(execPath));
-		StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
-		StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
-		stdoutVacuum.start();
-		stderrVacuum.start();
-		process.waitFor();
-		stdoutVacuum.join();
-		stderrVacuum.join();
-		if (stderrVacuum.toString().length() > 0) {
-			throw new RuntimeException(stderrVacuum.toString());
-		}
-		return stdoutVacuum.toString();
+		String projectName = "testcase-" + System.currentTimeMillis();
+		String projectDir = getTmpDir() + "/" + projectName;
+		buildProject(projectDir);
+		return execTest(projectDir, projectName);
 	}
 
 	@Override
@@ -226,13 +158,75 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 				showDiagnosticErrors,false);
 	}
 
+	private String execTest(String projectDir, String projectName) {
+		try {
+			Pair<String, String> output = runProcess(projectDir, "./.build/debug/" + projectName, "input");
+			if (output.b.length() > 0) {
+				stderrDuringParse = output.b;
+			}
+			String stdout = output.a;
+			return stdout.length() > 0 ? stdout : null;
+		}
+		catch (Exception e) {
+			System.err.println("Execution of testcase failed.");
+			e.printStackTrace(System.err);
+		}
+		return null;
+	}
+
+	private void addSourceFiles(String... files) {
+		Collections.addAll(this.sourceFiles, files);
+	}
+
+	private void buildProject(String projectDir) {
+		mkdir(projectDir);
+		fastFailRunProcess(projectDir, "swift", "package", "init", "--type", "executable");
+		for (String sourceFile: sourceFiles) {
+			String absPath = getTmpDir() + "/" + sourceFile;
+			fastFailRunProcess(getTmpDir(), "mv", "-f", absPath, projectDir + "/Sources/");
+		}
+		fastFailRunProcess(getTmpDir(), "mv", "-f", "input", projectDir);
+
+		try {
+			String dylibPath = ANTLR_RUNTIME_PATH + "/.build/debug/";
+			runProcess(projectDir, "swift", "build",
+					"-Xswiftc", "-I"+dylibPath,
+					"-Xlinker", "-L"+dylibPath,
+					"-Xlinker", "-lAntlr4");
+		} catch (IOException | InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private static Pair<String,String> runProcess(String execPath, String... args) throws IOException, InterruptedException {
+		Process process = Runtime.getRuntime().exec(args, null, new File(execPath));
+		StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
+		StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
+		stdoutVacuum.start();
+		stderrVacuum.start();
+		process.waitFor();
+		stdoutVacuum.join();
+		stderrVacuum.join();
+		return new Pair<>(stdoutVacuum.toString(), stderrVacuum.toString());
+	}
+
+	private static void fastFailRunProcess(String workingDir, String... command) {
+		ProcessBuilder builder = new ProcessBuilder(command);
+		builder.directory(new File(workingDir));
+		try {
+			Process p = builder.start();
+			p.waitFor();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 	private String execParser(String parserName,
 							  String lexerName,
 							  String parserStartRuleName,
 							  boolean debug,
 							  boolean profile)
 	{
-		this.stderrDuringParse = null;
 		if ( parserName==null ) {
 			writeLexerTestFile(lexerName, false);
 		}
@@ -356,7 +350,7 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 								String... extraOptions) {
 		ErrorQueue equeue = antlrOnString(getTmpDir(), "Swift", grammarFileName, grammarStr, false, extraOptions);
 		assertTrue(equeue.errors.isEmpty());
-		System.out.println(getTmpDir());
+//		System.out.println(getTmpDir());
 
 		List<String> files = new ArrayList<>();
 		if (lexerName != null) {
