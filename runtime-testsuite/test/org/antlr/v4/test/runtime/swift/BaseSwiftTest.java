@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Set;
 
 import static org.antlr.v4.test.runtime.BaseRuntimeTest.antlrOnString;
+import static org.antlr.v4.test.runtime.BaseRuntimeTest.mkdir;
 import static org.antlr.v4.test.runtime.BaseRuntimeTest.writeFile;
 import static org.junit.Assert.assertTrue;
 
@@ -87,7 +88,7 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 	/**
 	 * Source files used in each small swift project.
 	 */
-	private Set<String> sourceFiles = new HashSet<String>();
+	private Set<String> sourceFiles = new HashSet<>();
 
 	@Override
 	public void testSetUp() throws Exception {
@@ -139,11 +140,10 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 
 	@Override
 	public String execLexer(String grammarFileName, String grammarStr, String lexerName, String input, boolean showDFA) {
-		boolean success = generateParser(grammarFileName,
+		generateParser(grammarFileName,
 				grammarStr,
 				null,
 				lexerName);
-		assertTrue(success);
 		writeFile(tmpdir, "input", input);
 		writeLexerTestFile(lexerName, showDFA);
 		addSourceFiles("main.swift");
@@ -154,32 +154,12 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 		return ""; // TODO:
 	}
 
-	private String execTest() {
+	private String execTest(String projectDir, String projectName) {
 		try {
-			String exec = tmpdir + "/" + EXEC_NAME;
-			String[] args =
-					new String[]{exec, "input"};
-			ProcessBuilder pb = new ProcessBuilder(args);
-			pb.directory(new File(tmpdir));
-			Process p = pb.start();
-			StreamVacuum stdoutVacuum = new StreamVacuum(p.getInputStream());
-			StreamVacuum stderrVacuum = new StreamVacuum(p.getErrorStream());
-			stdoutVacuum.start();
-			stderrVacuum.start();
-			p.waitFor();
-			stdoutVacuum.join();
-			stderrVacuum.join();
-			String output = stdoutVacuum.toString();
-			if ( output.length()==0 ) {
-				output = null;
-			}
-			if (stderrVacuum.toString().length() > 0) {
-				this.stderrDuringParse = stderrVacuum.toString();
-			}
-			return output;
+			return runProcess(projectDir, "./.build/debug/" + projectName, "input");
 		}
 		catch (Exception e) {
-			System.err.println("can't exec recognizer");
+			System.err.println("Execution of testcase failed.");
 			e.printStackTrace(System.err);
 		}
 		return null;
@@ -189,27 +169,35 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 		Collections.addAll(this.sourceFiles, files);
 	}
 
-	private boolean compile() {
-		try {
-			return buildProject();
-		} catch (Exception e) {
-			return false;
+	private void listSourceFiles() {
+		for (String sourceFile: this.sourceFiles) {
+			System.out.println(sourceFile);
 		}
 	}
 
 	private static final String EXEC_NAME = "Test";
 
-	private boolean buildProject() throws Exception {
-		String fileList = sourceFiles.toString().replace("[", "").replace("]", "")
-				.replace(", ", " ");
+	private void buildProject(String projectDir) {
+		mkdir(projectDir);
+		exec(projectDir, "swift", "package", "init", "--type", "executable");
+		for (String sourceFile: sourceFiles) {
+			String absPath = getTmpDir() + "/" + sourceFile;
+			exec(getTmpDir(), "mv", "-f", absPath, projectDir + "/Sources/");
+		}
+		exec(getTmpDir(), "mv", "-f", "input", projectDir);
 
-//		String argsString = "xcrun -sdk macosx swiftc " + fileList + " -o " + EXEC_NAME + " -I " + ANTLR_FRAMEWORK_DIR + " -L " + ANTLR_FRAMEWORK_DIR + " -module-link-name Antlr4 -suppress-warnings";
-//		return runProcess(argsString, tmpdir);
-		return true;
+		try {
+			String dylibPath = ANTLR_RUNTIME_PATH + "/.build/debug/";
+			runProcess(projectDir, "swift", "build",
+					"-Xswiftc", "-I"+dylibPath,
+					"-Xlinker", "-L"+dylibPath,
+					"-Xlinker", "-lAntlr4");
+		} catch (IOException | InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 
-	private static boolean runProcess(String argsString, String execPath) throws IOException, InterruptedException {
-		String[] args = argsString.split(" ");
+	private static String runProcess(String execPath, String... args) throws IOException, InterruptedException {
 		Process process = Runtime.getRuntime().exec(args, null, new File(execPath));
 		StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
 		StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
@@ -219,43 +207,30 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 		stdoutVacuum.join();
 		stderrVacuum.join();
 		if (stderrVacuum.toString().length() > 0) {
-			//this.stderrDuringParse = stderrVacuum.toString();
-			System.err.println("buildProject stderrVacuum: " + stderrVacuum);
+			throw new RuntimeException(stderrVacuum.toString());
 		}
-		return process.exitValue() == 0;
+		return stdoutVacuum.toString();
 	}
 
 	@Override
 	public String execParser(String grammarFileName, String grammarStr, String parserName, String lexerName, String listenerName, String visitorName, String startRuleName, String input, boolean showDiagnosticErrors) {
-		return execParser(grammarFileName, grammarStr, parserName,
-				lexerName, startRuleName, input, showDiagnosticErrors, false);
-	}
-
-	private String execParser(String grammarFileName,
-								String grammarStr,
-								String parserName,
-								String lexerName,
-								String startRuleName,
-								String input, boolean debug,boolean profile)
-	{
-		boolean success = generateParser(grammarFileName,
+		generateParser(grammarFileName,
 				grammarStr,
 				parserName,
 				lexerName,
 				"-visitor");
-		assertTrue(success);
-		writeFile(tmpdir, "input", input);
+		writeFile(getTmpDir(), "input", input);
 		return execParser(parserName,
 				lexerName,
 				startRuleName,
-				debug,profile);
+				showDiagnosticErrors,false);
 	}
 
 	private String execParser(String parserName,
-								String lexerName,
-								String parserStartRuleName,
-								boolean debug,
-								boolean profile)
+							  String lexerName,
+							  String parserStartRuleName,
+							  boolean debug,
+							  boolean profile)
 	{
 		this.stderrDuringParse = null;
 		if ( parserName==null ) {
@@ -270,19 +245,17 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 		}
 
 		addSourceFiles("main.swift");
-		return execParser();
-	}
-
-	private String execParser() {
-		compile();
-		return execTest();
+		String projectName = "testcase-" + System.currentTimeMillis();
+		String projectDir = getTmpDir() + "/" + projectName;
+		buildProject(projectDir);
+		return execTest(projectDir, projectName);
 	}
 
 	private void writeParserTestFile(String parserName,
-									   String lexerName,
-									   String parserStartRuleName,
-									   boolean debug,
-									   boolean profile) {
+									 String lexerName,
+									 String parserStartRuleName,
+									 boolean debug,
+									 boolean profile) {
 
 		ST outputFileST = new ST(
 				"import Antlr4\n" +
@@ -345,7 +318,7 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 
 	private void writeLexerTestFile(String lexerName, boolean showDFA) {
 		ST outputFileST = new ST(
-						"import Antlr4\n" +
+				"import Antlr4\n" +
 						"import Foundation\n" +
 
 						"setbuf(__stdoutp, nil)\n" +
@@ -374,27 +347,27 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 	}
 
 	/**
-	 * Return true if all is well
+	 * Generates the parser for one test case.
 	 */
-	private boolean generateParser(String grammarFileName,
-								   String grammarStr,
-								   String parserName,
-								   String lexerName,
-								   String... extraOptions) {
+	private void generateParser(String grammarFileName,
+								String grammarStr,
+								String parserName,
+								String lexerName,
+								String... extraOptions) {
 		ErrorQueue equeue = antlrOnString(getTmpDir(), "Swift", grammarFileName, grammarStr, false, extraOptions);
-		if (!equeue.errors.isEmpty()) {
-			return false;
-		}
+		assertTrue(equeue.errors.isEmpty());
+		System.out.println(getTmpDir());
 
-		List<String> files = new ArrayList<String>();
+		List<String> files = new ArrayList<>();
 		if (lexerName != null) {
 			files.add(lexerName + ".swift");
 			files.add(lexerName + "ATN.swift");
 		}
+
 		if (parserName != null) {
 			files.add(parserName + ".swift");
 			files.add(parserName + "ATN.swift");
-			Set<String> optionsSet = new HashSet<String>(Arrays.asList(extraOptions));
+			Set<String> optionsSet = new HashSet<>(Arrays.asList(extraOptions));
 			String grammarName = grammarFileName.substring(0, grammarFileName.lastIndexOf('.'));
 			if (!optionsSet.contains("-no-listener")) {
 				files.add(grammarName + "Listener.swift");
@@ -406,6 +379,5 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 			}
 		}
 		addSourceFiles(files.toArray(new String[files.size()]));
-		return true;
 	}
 }
