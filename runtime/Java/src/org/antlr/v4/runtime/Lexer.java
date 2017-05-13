@@ -13,6 +13,7 @@ import org.antlr.v4.runtime.misc.Pair;
 import java.util.ArrayList;
 import java.util.EmptyStackException;
 import java.util.List;
+import java.util.Stack;
 
 /** A lexer is recognizer that draws input symbols from a character stream.
  *  lexer grammars result in a subclass of this object. A Lexer object
@@ -64,6 +65,30 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	 */
 	public boolean _hitEOF;
 
+	/** 
+	 * Once a request to process an include file, next token need to store 
+	 * current lexer state and read from the requested file.
+	 */
+	public boolean _hitInclude;
+	
+	/** Store fileName for content to be include. */
+	public String _includeFileName;
+
+	/** Store substitution string for content to be include. */
+	public String _includeSubstFrom;
+	
+	/** Store substitution string for content to be include. */
+	public String _includeSubstTo;
+	
+	/** 
+	 * Keep track of lexerScanner states.
+	 * Needed to handling grammars that allow to include 
+	 * new content into the current scanning stream. 
+	 */
+	public final Stack<LexerScannerStateStackItem> _lexerScannerStateStack = new Stack<LexerScannerStateStackItem>(); 
+
+	public LexerScannerIncludeSource _lexerScannerIncludeSource = new LexerScannerIncludeSourceImpl();
+	
 	/** The channel number for the current token */
 	public int _channel;
 
@@ -99,6 +124,7 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 		_text = null;
 
 		_hitEOF = false;
+		_hitInclude = false;
 		_mode = Lexer.DEFAULT_MODE;
 		_modeStack.clear();
 
@@ -121,10 +147,23 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 			outer:
 			while (true) {
 				if (_hitEOF) {
-					emitEOF();
-					return _token;
+					// check if any input has been stacked
+					if (!_lexerScannerStateStack.isEmpty()) {
+						popLexerScannerState( );
+						_hitEOF = false;
+					} else {
+						emitEOF();
+						return _token;
+					}
 				}
 
+				if (_hitInclude) {
+					// store current lexer state, and open _includeFileName for reading.
+					pushLexerScannerState( );
+					_hitInclude=false;					
+				}
+				
+				
 				_token = null;
 				_channel = Token.DEFAULT_CHANNEL;
 				_tokenStartCharIndex = _input.index();
@@ -407,4 +446,80 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 		// TODO: Do we lose character or line position information?
 		_input.consume();
 	}
+	
+	/**
+	 * Prepare Lexer to scan next set of tokens from fileName.
+	 * Stacks current scanner state stack. Once EOF of fileName is met 
+	 * previous scanner state is restored. 
+	 * This method is supposed to be called from a grammar action.
+	 * @param fileName
+	 */
+	public void performIncludeSourceFile(String fileName)
+	{ 
+		_hitInclude = true; // instruct scanner to prepare for switch of scan source
+		_includeFileName = fileName;
+		_includeSubstFrom = null;
+		_includeSubstTo = null;
+	}
+
+	/**
+	 * Prepare Lexer to scan next set of tokens from fileName.
+	 * Stacks current scanner state stack. Once EOF of fileName is met 
+	 * previous scanner state is restored. 
+	 * A simple string replacement is performed before the scanner reads 
+	 * from the fileName. 
+	 * This method is supposed to be called from a grammar action.
+	 * @param fileName
+	 * @param substFrom
+	 * @param substTo
+	 */
+	public void performIncludeSourceFile(String fileName, String substFrom, String substTo)
+	{ 
+		_hitInclude = true; // instruct scanner to prepare for switch of scan source
+		_includeFileName = fileName;
+		_includeSubstFrom = substFrom;
+		_includeSubstTo = substTo;
+	}
+
+
+	/**
+	 * Retrieve old lexer state and make it the current state.
+	 */
+	public void popLexerScannerState() {
+		if (_lexerScannerStateStack.isEmpty() == true) {
+			throw new IllegalStateException("popLexerScanner cannot operate on empty stack.");
+		}
+		LexerScannerStateStackItem stackItem ;
+		stackItem=_lexerScannerStateStack.pop();
+		// restore _input and _tokenFactorySourcePair
+		this._input=stackItem.getInput();
+		this._tokenFactorySourcePair=stackItem.getTokenFactorySourcePair();
+	}
+
+	/**
+	 * Store current lexer state, and open new file for input.
+	 */
+	public void pushLexerScannerState() {
+		if (_hitInclude == false) {
+			throw new IllegalStateException("pushLexerScanner requires performIncludeSourceFile action.");
+		}
+		
+		// store current lexer scanner state
+		LexerScannerStateStackItem stackItem = new LexerScannerStateStackItem(_input, _tokenFactorySourcePair);
+		_lexerScannerStateStack.push(stackItem);
+		
+		// open _includeFileName ...
+		CharStream newfile = _lexerScannerIncludeSource.embedSource(_includeFileName,_includeSubstFrom,_includeSubstTo);
+		this._input = newfile;
+        this._tokenFactorySourcePair = new Pair<TokenSource, CharStream>(this, _input);
+        this._input.seek(0); // ensure position is set
+        getInterpreter().reset();
+	}
+	
+	/**
+	 * Set how the lexer handle inclusion of source code.
+	 * @param LexerScannerIncludeSource
+	 */
+	public void setLexerScannerIncludeSource( LexerScannerIncludeSource lsis) {_lexerScannerIncludeSource=lsis;}
+	
 }
