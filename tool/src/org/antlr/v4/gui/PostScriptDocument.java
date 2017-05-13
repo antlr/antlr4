@@ -60,7 +60,7 @@ public class PostScriptDocument {
 	public void boundingBox(int w, int h) {
 		boundingBoxWidth = w;
 		boundingBoxHeight = h;
-		boundingBox = String.format(Locale.US, "%%%%BoundingBox: %d %d %d %d\n", 0,0,
+		boundingBox = String.format(Locale.US, "%%%%BoundingBox: %d %d %d %d %n", 0,0,
 									boundingBoxWidth,boundingBoxHeight);
 	}
 
@@ -111,7 +111,7 @@ public class PostScriptDocument {
 			psname = this.fontName;
 		}
 
-		ps.append(String.format(Locale.US, "/%s findfont %d scalefont setfont\n", psname, fontSize));
+		ps.append(String.format(Locale.US, "/%s findfont %d scalefont setfont%n", psname, fontSize));
 	}
 
 	public void lineWidth(double w) {
@@ -120,11 +120,11 @@ public class PostScriptDocument {
 	}
 
 	public void move(double x, double y) {
-		ps.append(String.format(Locale.US, "%1.3f %1.3f moveto\n", x, y));
+		ps.append(String.format(Locale.US, "%1.3f %1.3f moveto%n", x, y));
 	}
 
 	public void lineto(double x, double y) {
-		ps.append(String.format(Locale.US, "%1.3f %1.3f lineto\n", x, y));
+		ps.append(String.format(Locale.US, "%1.3f %1.3f lineto%n", x, y));
 	}
 
 	public void line(double x1, double y1, double x2, double y2) {
@@ -141,7 +141,7 @@ public class PostScriptDocument {
 
 	/** Make red box */
 	public void highlight(double x, double y, double width, double height) {
-		ps.append(String.format(Locale.US, "%1.3f %1.3f %1.3f %1.3f highlight\n", x, y, width, height));
+		ps.append(String.format(Locale.US, "%1.3f %1.3f %1.3f %1.3f highlight%n", x, y, width, height));
 	}
 
 	public void stroke() {
@@ -174,7 +174,7 @@ public class PostScriptDocument {
 		}
 		s = buf.toString();
 		move(x,y);
-		ps.append(String.format(Locale.US, "(%s) show\n", s));
+		ps.append(String.format(Locale.US, "(%s) show%n", s));
 		stroke();
 	}
 
