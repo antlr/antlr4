@@ -36,7 +36,7 @@ public abstract class LL1Loop extends Choice {
 		iteration.add(op);
 	}
 
-	public SrcOp addCodeForLoopLookaheadTempVar(IntervalSet look) {
+	public final SrcOp addCodeForLoopLookaheadTempVar(IntervalSet look) {
 		TestSetInline expr = addCodeForLookaheadTempVar(look);
 		if (expr != null) {
 			CaptureNextTokenType nextType = new CaptureNextTokenType(factory, expr.varName);

@@ -358,7 +358,7 @@ public class Grammar implements AttributeResolver {
 		tool.process(this, false);
     }
 
-	protected void initTokenSymbolTables() {
+	protected final void initTokenSymbolTables() {
 		tokenNameToTypeMap.put("EOF", Token.EOF);
 
 		// reserve a spot for the INVALID token
@@ -927,7 +927,7 @@ public class Grammar implements AttributeResolver {
 		}
 	}
 
-	public void importVocab(Grammar importG) {
+	public final void importVocab(Grammar importG) {
 		for (String tokenName: importG.tokenNameToTypeMap.keySet()) {
 			defineTokenName(tokenName, importG.tokenNameToTypeMap.get(tokenName));
 		}

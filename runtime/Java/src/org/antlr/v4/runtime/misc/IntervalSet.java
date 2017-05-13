@@ -88,7 +88,7 @@ public class IntervalSet implements IntSet {
      *  as a range el..el.
      */
     @Override
-    public void add(int el) {
+    public final void add(int el) {
         if ( readonly ) throw new IllegalStateException("can't alter readonly IntervalSet");
         add(el,el);
     }
@@ -159,7 +159,7 @@ public class IntervalSet implements IntSet {
 	}
 
 	@Override
-	public IntervalSet addAll(IntSet set) {
+	public final IntervalSet addAll(IntSet set) {
 		if ( set==null ) {
 			return this;
 		}

@@ -28,7 +28,7 @@ public class AltLabelStructDecl extends StructDecl {
 	}
 
 	@Override
-	public void addDispatchMethods(Rule r) {
+	public final void addDispatchMethods(Rule r) {
 		dispatchMethods = new ArrayList<DispatchMethod>();
 		if ( factory.getGrammar().tool.gen_listener ) {
 			dispatchMethods.add(new ListenerDispatchMethod(factory, true));

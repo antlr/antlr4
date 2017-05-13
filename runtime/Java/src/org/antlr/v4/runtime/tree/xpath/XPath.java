@@ -82,7 +82,7 @@ public class XPath {
 
 	// TODO: check for invalid token/rule names, bad syntax
 
-	public XPathElement[] split(String path) {
+	public final XPathElement[] split(String path) {
 		ANTLRInputStream in;
 		try {
 			in = new ANTLRInputStream(new StringReader(path));

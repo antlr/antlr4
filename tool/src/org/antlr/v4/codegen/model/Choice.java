@@ -45,7 +45,7 @@ public abstract class Choice extends RuleElement {
 		preamble.add(op);
 	}
 
-	public List<String[]> getAltLookaheadAsStringLists(IntervalSet[] altLookSets) {
+	public final List<String[]> getAltLookaheadAsStringLists(IntervalSet[] altLookSets) {
 		List<String[]> altLook = new ArrayList<String[]>();
 		for (IntervalSet s : altLookSets) {
 			altLook.add(factory.getGenerator().getTarget().getTokenTypesAsTargetLabels(factory.getGrammar(), s.toArray()));
@@ -53,7 +53,7 @@ public abstract class Choice extends RuleElement {
 		return altLook;
 	}
 
-	public TestSetInline addCodeForLookaheadTempVar(IntervalSet look) {
+	public final TestSetInline addCodeForLookaheadTempVar(IntervalSet look) {
 		List<SrcOp> testOps = factory.getLL1Test(look, ast);
 		TestSetInline expr = Utils.find(testOps, TestSetInline.class);
 		if (expr != null) {
@@ -65,7 +65,7 @@ public abstract class Choice extends RuleElement {
 		return expr;
 	}
 
-	public ThrowNoViableAlt getThrowNoViableAlt(OutputModelFactory factory,
+	public final ThrowNoViableAlt getThrowNoViableAlt(OutputModelFactory factory,
 												GrammarAST blkAST,
 												IntervalSet expecting) {
 		return new ThrowNoViableAlt(factory, blkAST, expecting);

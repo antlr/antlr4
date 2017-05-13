@@ -170,7 +170,7 @@ public class UnbufferedTokenStream<T extends Token> implements TokenStream {
 	 * actually added to the buffer. If the return value is less than {@code n},
 	 * then EOF was reached before {@code n} tokens could be added.
 	 */
-	protected int fill(int n) {
+	protected final int fill(int n) {
 		for (int i=0; i<n; i++) {
 			if (this.n > 0 && tokens[this.n-1].getType() == Token.EOF) {
 				return i;

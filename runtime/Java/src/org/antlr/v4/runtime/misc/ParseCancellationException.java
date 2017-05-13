@@ -37,4 +37,8 @@ public class ParseCancellationException extends CancellationException {
 		initCause(cause);
 	}
 
+	@Override
+	public final synchronized Throwable initCause(Throwable cause) {
+		return super.initCause(cause);
+	}
 }
