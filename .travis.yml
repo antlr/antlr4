@@ -36,6 +36,11 @@ matrix:
       compiler: clang
       osx_image: xcode8.1
       env: TARGET=swift
+    - os: linux
+      compiler: clang
+      env:
+        - TARGET=swift
+        - SWIFT_VERSION=swift-3.1.1
     - os: osx
       osx_image: xcode8.2
       env: TARGET=dotnet
