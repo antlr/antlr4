@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static org.antlr.v4.test.runtime.BaseRuntimeTest.antlrOnString;
@@ -34,30 +35,34 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 	 */
 	private static String ANTLR_RUNTIME_PATH;
 
+	/**
+	 * Absolute path to swift command.
+	 */
+	private static String SWIFT_CMD;
+
+	/**
+	 * Environment variable name for swift home.
+	 */
+	private static final String SWIFT_HOME_ENV_KEY = "SWIFT_HOME";
+
 	static {
-		String baseTestDir = System.getProperty("antlr-swift-test-dir");
-		if (baseTestDir == null || baseTestDir.isEmpty()) {
-			baseTestDir = System.getProperty("java.io.tmpdir");
-		}
+		Map<String, String> env = System.getenv();
+		String swiftHome = env.containsKey(SWIFT_HOME_ENV_KEY) ? env.get(SWIFT_HOME_ENV_KEY) : "";
+		SWIFT_CMD = swiftHome + "swift";
 
-		if (!new File(baseTestDir).isDirectory()) {
-			throw new UnsupportedOperationException("The specified base test directory does not exist: " + baseTestDir);
-		}
-
-		final ClassLoader loader = Thread.currentThread().getContextClassLoader();
-
+		ClassLoader loader = Thread.currentThread().getContextClassLoader();
 		// build swift runtime
-		final URL swiftRuntime = loader.getResource("Swift");
+		URL swiftRuntime = loader.getResource("Swift");
 		if (swiftRuntime == null) {
 			throw new RuntimeException("Swift runtime file not found at:" + swiftRuntime.getPath());
 		}
 		ANTLR_RUNTIME_PATH = swiftRuntime.getPath();
-		fastFailRunProcess(ANTLR_RUNTIME_PATH, "swift", "build");
+		fastFailRunProcess(ANTLR_RUNTIME_PATH, SWIFT_CMD, "build");
 
 		// shutdown logic
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			public void run() {
-				fastFailRunProcess(ANTLR_RUNTIME_PATH, "swift", "package", "clean");
+				fastFailRunProcess(ANTLR_RUNTIME_PATH, SWIFT_CMD, "package", "clean");
 			}
 		});
 	}
@@ -180,7 +185,7 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 
 	private void buildProject(String projectDir) {
 		mkdir(projectDir);
-		fastFailRunProcess(projectDir, "swift", "package", "init", "--type", "executable");
+		fastFailRunProcess(projectDir, SWIFT_CMD, "package", "init", "--type", "executable");
 		for (String sourceFile: sourceFiles) {
 			String absPath = getTmpDir() + "/" + sourceFile;
 			fastFailRunProcess(getTmpDir(), "mv", "-f", absPath, projectDir + "/Sources/");
@@ -189,7 +194,7 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 
 		try {
 			String dylibPath = ANTLR_RUNTIME_PATH + "/.build/debug/";
-			runProcess(projectDir, "swift", "build",
+			runProcess(projectDir, SWIFT_CMD, "build",
 					"-Xswiftc", "-I"+dylibPath,
 					"-Xlinker", "-L"+dylibPath,
 					"-Xlinker", "-lAntlr4");
