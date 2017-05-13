@@ -16,7 +16,9 @@ import java.io.IOException;
  * @deprecated as of 4.7 Please use {@link CharStreams} interface.
  */
 public class ANTLRFileStream extends ANTLRInputStream {
+	@Deprecated
 	protected String fileName;
+	private String encoding;
 
 	public ANTLRFileStream(String fileName) throws IOException {
 		this(fileName, null);
@@ -24,9 +26,12 @@ public class ANTLRFileStream extends ANTLRInputStream {
 
 	public ANTLRFileStream(String fileName, String encoding) throws IOException {
 		this.fileName = fileName;
-		load(fileName, encoding);
+		this.name=fileName;
+		this.encoding=encoding;
+		load();
 	}
 
+	@Deprecated
 	public void load(String fileName, String encoding)
 		throws IOException
 	{
@@ -34,8 +39,9 @@ public class ANTLRFileStream extends ANTLRInputStream {
 		this.n = data.length;
 	}
 
-	@Override
-	public String getSourceName() {
-		return fileName;
-	}
+	public void load() throws IOException
+		{
+			this.data = Utils.readFile(this.name, this.encoding);
+			this.n = data.length;
+		}
 }
