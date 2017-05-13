@@ -44,6 +44,10 @@ struct Any
   Any(U&& value) : _ptr(new Derived<StorageType<U>>(std::forward<U>(value))) {
   }
 
+  template<>
+  Any(std::nullptr_t&& ) : _ptr(nullptr) {
+  }
+
   template<class U>
   bool is() const {
     typedef StorageType<U> T;
