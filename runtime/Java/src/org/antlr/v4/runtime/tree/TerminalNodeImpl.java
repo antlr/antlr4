@@ -54,6 +54,9 @@ public class TerminalNodeImpl implements TerminalNode {
 	public String getText() { return symbol.getText(); }
 
 	@Override
+	public String getSourceText() { return symbol.getText(); }
+
+	@Override
 	public String toStringTree(Parser parser) {
 		return toString();
 	}

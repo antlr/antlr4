@@ -417,6 +417,29 @@ public class TestParseTreeMatcher extends BaseJavaToolTest {
 		checkPatternMatch(grammar, "expr", input, pattern, "X6");
 	}
 
+	@Test
+	public void testGetSourceText() throws Exception {
+		String grammar =
+			"grammar X7;\n" +
+			"s : ID '=' expr ';' ;\n" +
+			"expr : ID | INT ;\n" +
+			"ID : [a-z]+ ;\n" +
+			"INT : [0-9]+ ;\n" +
+			"WS : [ \\r\\n\\t]+ -> channel(HIDDEN) ;\n";
+
+		String grammarFileName = "X7.g4";
+		String parserName = "X7Parser";
+		String lexerName = "X7Lexer";
+		boolean ok =
+						rawGenerateAndBuildRecognizer(grammarFileName, grammar, parserName, lexerName, false);
+		assertTrue(ok);
+
+		ParseTree tree = execParser("s", "  foo = \n 42 ;   ", parserName, lexerName);
+
+		assertEquals("foo=42;", tree.getText());
+		assertEquals("foo = \n 42 ;", tree.getSourceText());
+	}
+
 	public ParseTreeMatch checkPatternMatch(String grammar, String startRule,
 											String input, String pattern,
 											String grammarName)
