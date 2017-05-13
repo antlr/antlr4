@@ -888,8 +888,8 @@ public class TestPerformance extends BaseJavaToolTest {
 						continue;
 					}
 
-					states += dfa.states.size();
-					for (DFAState state : dfa.states.values()) {
+					states += dfa.getStatesMap().size();
+					for (DFAState state : dfa.getStatesMap().values()) {
 						configs += state.configs.size();
 						uniqueConfigs.addAll(state.configs);
 					}
@@ -901,17 +901,17 @@ public class TestPerformance extends BaseJavaToolTest {
 					System.out.format("\tMode\tStates\tConfigs\tMode%n");
 					for (int i = 0; i < modeToDFA.length; i++) {
 						DFA dfa = modeToDFA[i];
-						if (dfa == null || dfa.states.isEmpty()) {
+						if (dfa == null || dfa.getStatesMap().isEmpty()) {
 							continue;
 						}
 
 						int modeConfigs = 0;
-						for (DFAState state : dfa.states.values()) {
+						for (DFAState state : dfa.getStatesMap().values()) {
 							modeConfigs += state.configs.size();
 						}
 
 						String modeName = lexer.getModeNames()[i];
-						System.out.format("\t%d\t%d\t%d\t%s%n", dfa.decision, dfa.states.size(), modeConfigs, modeName);
+						System.out.format("\t%d\t%d\t%d\t%s%n", dfa.getDecision(), dfa.getStatesMap().size(), modeConfigs, modeName);
 					}
 				}
 			}
@@ -935,8 +935,8 @@ public class TestPerformance extends BaseJavaToolTest {
                         continue;
                     }
 
-                    states += dfa.states.size();
-					for (DFAState state : dfa.states.values()) {
+                    states += dfa.getStatesMap().size();
+					for (DFAState state : dfa.getStatesMap().values()) {
 						configs += state.configs.size();
 						uniqueConfigs.addAll(state.configs);
 					}
@@ -954,16 +954,16 @@ public class TestPerformance extends BaseJavaToolTest {
 
 					for (int i = 0; i < decisionToDFA.length; i++) {
 						DFA dfa = decisionToDFA[i];
-						if (dfa == null || dfa.states.isEmpty()) {
+						if (dfa == null || dfa.getStatesMap().isEmpty()) {
 							continue;
 						}
 
 						int decisionConfigs = 0;
-						for (DFAState state : dfa.states.values()) {
+						for (DFAState state : dfa.getStatesMap().values()) {
 							decisionConfigs += state.configs.size();
 						}
 
-						String ruleName = parser.getRuleNames()[parser.getATN().decisionToState.get(dfa.decision).ruleIndex];
+						String ruleName = parser.getRuleNames()[parser.getATN().decisionToState.get(dfa.getDecision()).ruleIndex];
 
 						long calls = 0;
 						long fullContextCalls = 0;
@@ -1014,7 +1014,7 @@ public class TestPerformance extends BaseJavaToolTest {
 							formatString = "\t%1$d\t%2$d\t%3$d\t%12$s%n";
 						}
 
-						System.out.format(formatString, dfa.decision, dfa.states.size(), decisionConfigs, calls, fullContextCalls, nonSllCalls, transitions, computedTransitions, fullContextTransitions, lookahead, fullContextLookahead, ruleName);
+						System.out.format(formatString, dfa.getDecision(), dfa.getStatesMap().size(), decisionConfigs, calls, fullContextCalls, nonSllCalls, transitions, computedTransitions, fullContextTransitions, lookahead, fullContextLookahead, ruleName);
 					}
 				}
             }
@@ -1032,7 +1032,7 @@ public class TestPerformance extends BaseJavaToolTest {
                 }
 
                 if (SHOW_CONFIG_STATS) {
-                    for (DFAState state : dfa.states.keySet()) {
+                    for (DFAState state : dfa.getStatesMap().keySet()) {
                         if (state.configs.size() >= contextsInDFAState.length) {
                             contextsInDFAState = Arrays.copyOf(contextsInDFAState, state.configs.size() + 1);
                         }
@@ -1403,7 +1403,7 @@ public class TestPerformance extends BaseJavaToolTest {
 				int dfaSize = 0;
 				for (DFA dfa : interpreter.decisionToDFA) {
 					if (dfa != null) {
-						dfaSize += dfa.states.size();
+						dfaSize += dfa.getStatesMap().size();
 					}
 				}
 
@@ -1435,7 +1435,7 @@ public class TestPerformance extends BaseJavaToolTest {
 				int dfaSize = 0;
 				for (DFA dfa : interpreter.decisionToDFA) {
 					if (dfa != null) {
-						dfaSize += dfa.states.size();
+						dfaSize += dfa.getStatesMap().size();
 					}
 				}
 
@@ -1585,7 +1585,7 @@ public class TestPerformance extends BaseJavaToolTest {
 				BitSet llPredictions = getConflictingAlts(ambigAlts, configs);
 				int llPrediction = llPredictions.cardinality() == 0 ? ATN.INVALID_ALT_NUMBER : llPredictions.nextSetBit(0);
 				if (sllPrediction != llPrediction) {
-					((StatisticsParserATNSimulator)recognizer.getInterpreter()).nonSll[dfa.decision]++;
+					((StatisticsParserATNSimulator)recognizer.getInterpreter()).nonSll[dfa.getDecision()]++;
 				}
 			}
 
@@ -1595,8 +1595,8 @@ public class TestPerformance extends BaseJavaToolTest {
 
 			// show the rule name along with the decision
 			String format = "reportAmbiguity d=%d (%s): ambigAlts=%s, input='%s'";
-			int decision = dfa.decision;
-			String rule = recognizer.getRuleNames()[dfa.atnStartState.ruleIndex];
+			int decision = dfa.getDecision();
+			String rule = recognizer.getRuleNames()[dfa.getAtnStartState().ruleIndex];
 			String input = recognizer.getTokenStream().getText(Interval.of(startIndex, stopIndex));
 			recognizer.notifyErrorListeners(String.format(format, decision, rule, ambigAlts, input));
 		}
@@ -1611,8 +1611,8 @@ public class TestPerformance extends BaseJavaToolTest {
 
 			// show the rule name and viable configs along with the base info
 			String format = "reportAttemptingFullContext d=%d (%s), input='%s', viable=%s";
-			int decision = dfa.decision;
-			String rule = recognizer.getRuleNames()[dfa.atnStartState.ruleIndex];
+			int decision = dfa.getDecision();
+			String rule = recognizer.getRuleNames()[dfa.getAtnStartState().ruleIndex];
 			String input = recognizer.getTokenStream().getText(Interval.of(startIndex, stopIndex));
 			BitSet representedAlts = getConflictingAlts(conflictingAlts, configs);
 			recognizer.notifyErrorListeners(String.format(format, decision, rule, input, representedAlts));
@@ -1624,7 +1624,7 @@ public class TestPerformance extends BaseJavaToolTest {
 				BitSet sllPredictions = getConflictingAlts(_sllConflict, _sllConfigs);
 				int sllPrediction = sllPredictions.nextSetBit(0);
 				if (sllPrediction != prediction) {
-					((StatisticsParserATNSimulator)recognizer.getInterpreter()).nonSll[dfa.decision]++;
+					((StatisticsParserATNSimulator)recognizer.getInterpreter()).nonSll[dfa.getDecision()]++;
 				}
 			}
 
@@ -1634,8 +1634,8 @@ public class TestPerformance extends BaseJavaToolTest {
 
 			// show the rule name and viable configs along with the base info
 			String format = "reportContextSensitivity d=%d (%s), input='%s', viable={%d}";
-			int decision = dfa.decision;
-			String rule = recognizer.getRuleNames()[dfa.atnStartState.ruleIndex];
+			int decision = dfa.getDecision();
+			String rule = recognizer.getRuleNames()[dfa.getAtnStartState().ruleIndex];
 			String input = recognizer.getTokenStream().getText(Interval.of(startIndex, stopIndex));
 			recognizer.notifyErrorListeners(String.format(format, decision, rule, input, prediction));
 		}

@@ -111,8 +111,8 @@ public class DiagnosticErrorListener extends BaseErrorListener {
 	}
 
 	protected String getDecisionDescription(Parser recognizer, DFA dfa) {
-		int decision = dfa.decision;
-		int ruleIndex = dfa.atnStartState.ruleIndex;
+		int decision = dfa.getDecision();
+		int ruleIndex = dfa.getAtnStartState().ruleIndex;
 
 		String[] ruleNames = recognizer.getRuleNames();
 		if (ruleIndex < 0 || ruleIndex >= ruleNames.length) {

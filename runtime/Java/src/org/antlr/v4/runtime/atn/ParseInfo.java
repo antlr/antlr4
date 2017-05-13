@@ -158,6 +158,6 @@ public class ParseInfo {
 	 */
 	public int getDFASize(int decision) {
 		DFA decisionToDFA = atnSimulator.decisionToDFA[decision];
-		return decisionToDFA.states.size();
+		return decisionToDFA.getStatesMap().size();
 	}
 }
