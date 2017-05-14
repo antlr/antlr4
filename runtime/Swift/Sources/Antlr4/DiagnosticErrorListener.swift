@@ -56,11 +56,10 @@ public class DiagnosticErrorListener: BaseErrorListener {
                 return
             }
 
-            let format = "reportAmbiguity d=%@: ambigAlts=%@, input='%@'"
             let decision = getDecisionDescription(recognizer, dfa)
             let conflictingAlts = try getConflictingAlts(ambigAlts, configs)
             let text = try recognizer.getTokenStream()!.getText(Interval.of(startIndex, stopIndex))
-            let message = makeString(fromFormat: format, decision, conflictingAlts.description, text)
+            let message = "reportAmbiguity d=\(decision): ambigAlts=\(conflictingAlts), input='\(text)'"
             try recognizer.notifyErrorListeners(message)
     }
 
@@ -71,10 +70,9 @@ public class DiagnosticErrorListener: BaseErrorListener {
         _ stopIndex: Int,
         _ conflictingAlts: BitSet?,
         _ configs: ATNConfigSet) throws {
-            let format = "reportAttemptingFullContext d=%@, input='%@'"
             let decision = getDecisionDescription(recognizer, dfa)
             let text = try recognizer.getTokenStream()!.getText(Interval.of(startIndex, stopIndex))
-            let message = makeString(fromFormat: format, decision, text)
+            let message = "reportAttemptingFullContext d=\(decision), input='\(text)'"
             try recognizer.notifyErrorListeners(message)
     }
 
@@ -85,10 +83,9 @@ public class DiagnosticErrorListener: BaseErrorListener {
         _ stopIndex: Int,
         _ prediction: Int,
         _ configs: ATNConfigSet) throws {
-            let format = "reportContextSensitivity d=%@, input='%@'"
             let decision = getDecisionDescription(recognizer, dfa)
             let text = try recognizer.getTokenStream()!.getText(Interval.of(startIndex, stopIndex))
-            let message = makeString(fromFormat: format, decision, text)
+            let message = "reportContextSensitivity d=\(decision), input='\(text)'"
             try recognizer.notifyErrorListeners(message)
     }
 
@@ -106,7 +103,7 @@ public class DiagnosticErrorListener: BaseErrorListener {
         if ruleName.isEmpty {
             return String(decision)
         }
-        return makeString(fromFormat: "%@ (%@)", decision.description, ruleName)
+        return "\(decision) (\(ruleName))"
     }
 
     /// Computes the set of conflicting or ambiguous alternatives from a
