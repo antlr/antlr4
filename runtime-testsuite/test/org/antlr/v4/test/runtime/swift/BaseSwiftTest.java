@@ -194,10 +194,15 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 
 		try {
 			String dylibPath = ANTLR_RUNTIME_PATH + "/.build/debug/";
-			runProcess(projectDir, SWIFT_CMD, "build",
+			Pair<String, String> buildResult = runProcess(projectDir, SWIFT_CMD, "build",
 					"-Xswiftc", "-I"+dylibPath,
 					"-Xlinker", "-L"+dylibPath,
-					"-Xlinker", "-lAntlr4");
+					"-Xlinker", "-lAntlr4",
+					"-Xlinker", "-rpath",
+					"-Xlinker", dylibPath);
+			if (buildResult.b.length() > 0) {
+				throw new RuntimeException("unit test build failed: " + buildResult.b);
+			}
 		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -259,7 +264,7 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 		ST outputFileST = new ST(
 				"import Antlr4\n" +
 						"import Foundation\n" +
-						"setbuf(__stdoutp, nil)\n" +
+						"setbuf(stdout, nil)\n" +
 						"class TreeShapeListener: ParseTreeListener{\n" +
 						"    func visitTerminal(_ node: TerminalNode){ }\n" +
 						"    func visitErrorNode(_ node: ErrorNode){ }\n" +
@@ -320,7 +325,7 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 				"import Antlr4\n" +
 						"import Foundation\n" +
 
-						"setbuf(__stdoutp, nil)\n" +
+						"setbuf(stdout, nil)\n" +
 						"let args = CommandLine.arguments\n" +
 						"let input = ANTLRFileStream(args[1])\n" +
 						"let lex = <lexerName>(input)\n" +
