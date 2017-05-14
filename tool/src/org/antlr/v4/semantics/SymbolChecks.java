@@ -8,8 +8,10 @@ package org.antlr.v4.semantics;
 
 import org.antlr.runtime.tree.CommonTree;
 import org.antlr.v4.automata.LexerATNFactory;
+import org.antlr.v4.parse.ANTLRLexer;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.misc.MultiMap;
 import org.antlr.v4.tool.Alternative;
 import org.antlr.v4.tool.Attribute;
 import org.antlr.v4.tool.AttributeDict;
@@ -23,6 +25,7 @@ import org.antlr.v4.tool.LexerGrammar;
 import org.antlr.v4.tool.Rule;
 import org.antlr.v4.tool.ast.AltAST;
 import org.antlr.v4.tool.ast.GrammarAST;
+import org.antlr.v4.tool.ast.TerminalAST;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -39,42 +42,31 @@ import java.util.Set;
  *  Side-effect: strip away redef'd rules.
  */
 public class SymbolChecks {
-    Grammar g;
-    SymbolCollector collector;
-    Map<String, Rule> nameToRuleMap = new HashMap<String, Rule>();
+	Grammar g;
+	SymbolCollector collector;
+	Map<String, Rule> nameToRuleMap = new HashMap<String, Rule>();
 	Set<String> tokenIDs = new HashSet<String>();
-    Map<String, Set<String>> actionScopeToActionNames = new HashMap<String, Set<String>>();
-//	DoubleKeyMap<String, String, GrammarAST> namedActions =
-//		new DoubleKeyMap<String, String, GrammarAST>();
+	Map<String, Set<String>> actionScopeToActionNames = new HashMap<String, Set<String>>();
 
 	public ErrorManager errMgr;
 
 	protected final Set<String> reservedNames = new HashSet<String>();
+
 	{
 		reservedNames.addAll(LexerATNFactory.getCommonConstants());
 	}
 
-    public SymbolChecks(Grammar g, SymbolCollector collector) {
-        this.g = g;
-        this.collector = collector;
+	public SymbolChecks(Grammar g, SymbolCollector collector) {
+		this.g = g;
+		this.collector = collector;
 		this.errMgr = g.tool.errMgr;
 
-        for (GrammarAST tokenId : collector.tokenIDRefs) {
-            tokenIDs.add(tokenId.getText());
-        }
-        /*
-        System.out.println("rules="+collector.rules);
-        System.out.println("rulerefs="+collector.rulerefs);
-        System.out.println("tokenIDRefs="+collector.tokenIDRefs);
-        System.out.println("terminals="+collector.terminals);
-        System.out.println("strings="+collector.strings);
-        System.out.println("tokensDef="+collector.tokensDefs);
-        System.out.println("actions="+collector.actions);
-        System.out.println("scopes="+collector.scopes);
-         */
-    }
+		for (GrammarAST tokenId : collector.tokenIDRefs) {
+			tokenIDs.add(tokenId.getText());
+		}
+	}
 
-    public void process() {
+	public void process() {
 		// methods affect fields, but no side-effects outside this object
 		// So, call order sensitive
 		// First collect all rules for later use in checkForLabelConflict()
@@ -83,7 +75,6 @@ public class SymbolChecks {
 		}
 		checkReservedNames(g.rules.values());
 		checkActionRedefinitions(collector.namedActions);
-		checkForTokenConflicts(collector.tokenIDRefs);  // sets tokenIDs
 		checkForLabelConflicts(g.rules.values());
 	}
 
@@ -96,8 +87,7 @@ public class SymbolChecks {
 			nameNode = (GrammarAST) ampersandAST.getChild(0);
 			if (ampersandAST.getChildCount() == 2) {
 				name = nameNode.getText();
-			}
-			else {
+			} else {
 				scope = nameNode.getText();
 				name = ampersandAST.getChild(1).getText();
 			}
@@ -108,29 +98,21 @@ public class SymbolChecks {
 			}
 			if (!scopeActions.contains(name)) {
 				scopeActions.add(name);
-			}
-			else {
+			} else {
 				errMgr.grammarError(ErrorType.ACTION_REDEFINITION,
 						g.fileName, nameNode.token, name);
 			}
 		}
 	}
 
-	public void checkForTokenConflicts(List<GrammarAST> tokenIDRefs) {
-//        for (GrammarAST a : tokenIDRefs) {
-//            Token t = a.token;
-//            String ID = t.getText();
-//            tokenIDs.add(ID);
-//        }
-	}
-
-    /** Make sure a label doesn't conflict with another symbol.
-     *  Labels must not conflict with: rules, tokens, scope names,
-     *  return values, parameters, and rule-scope dynamic attributes
-     *  defined in surrounding rule.  Also they must have same type
-     *  for repeated defs.
-     */
-    public void checkForLabelConflicts(Collection<Rule> rules) {
+	/**
+	 * Make sure a label doesn't conflict with another symbol.
+	 * Labels must not conflict with: rules, tokens, scope names,
+	 * return values, parameters, and rule-scope dynamic attributes
+	 * defined in surrounding rule.  Also they must have same type
+	 * for repeated defs.
+	 */
+	public void checkForLabelConflicts(Collection<Rule> rules) {
 		for (Rule r : rules) {
 			checkForAttributeConflicts(r);
 
@@ -147,8 +129,7 @@ public class SymbolChecks {
 								List<LabelElementPair> list;
 								if (labelPairs.containsKey(labelName)) {
 									list = labelPairs.get(labelName);
-								}
-								else {
+								} else {
 									list = new ArrayList<>();
 									labelPairs.put(labelName, list);
 								}
@@ -160,8 +141,7 @@ public class SymbolChecks {
 							labelNameSpace.clear();
 							checkLabelPairs(r, labelNameSpace, internalPairs);
 						}
-					}
-					else {
+					} else {
 						checkLabelPairs(r, labelNameSpace, pairs);
 					}
 				}
@@ -176,8 +156,7 @@ public class SymbolChecks {
 			LabelElementPair prev = labelNameSpace.get(name);
 			if (prev == null) {
 				labelNameSpace.put(name, p);
-			}
-			else {
+			} else {
 				checkForTypeMismatch(r, prev, p);
 			}
 		}
@@ -186,20 +165,16 @@ public class SymbolChecks {
 	private String findAltLabelName(CommonTree label) {
 		if (label == null) {
 			return null;
-		}
-		else if (label instanceof AltAST) {
+		} else if (label instanceof AltAST) {
 			AltAST altAST = (AltAST) label;
 			if (altAST.altLabel != null) {
 				return altAST.altLabel.toString();
-			}
-			else if (altAST.leftRecursiveAltInfo != null) {
+			} else if (altAST.leftRecursiveAltInfo != null) {
 				return altAST.leftRecursiveAltInfo.altLabel.toString();
-			}
-			else {
+			} else {
 				return findAltLabelName(label.parent);
 			}
-		}
-		else {
+		} else {
 			return findAltLabelName(label.parent);
 		}
 	}
@@ -213,7 +188,7 @@ public class SymbolChecks {
 			// Such behavior is referring to the fact that the warning is typically reported on the actual label redefinition,
 			//   but for left-recursive rules the warning is reported on the enclosing rule.
 			org.antlr.runtime.Token token = r instanceof LeftRecursiveRule
-					?  ((GrammarAST) r.ast.getChild(0)).getToken()
+					? ((GrammarAST) r.ast.getChild(0)).getToken()
 					: labelPair.label.token;
 			errMgr.grammarError(
 					ErrorType.LABEL_TYPE_CONFLICT,
@@ -223,11 +198,11 @@ public class SymbolChecks {
 					labelPair.type + "!=" + prevLabelPair.type);
 		}
 		if (!prevLabelPair.element.getText().equals(labelPair.element.getText()) &&
-			(prevLabelPair.type.equals(LabelType.RULE_LABEL) || prevLabelPair.type.equals(LabelType.RULE_LIST_LABEL)) &&
-			(labelPair.type.equals(LabelType.RULE_LABEL) || labelPair.type.equals(LabelType.RULE_LIST_LABEL))) {
+				(prevLabelPair.type.equals(LabelType.RULE_LABEL) || prevLabelPair.type.equals(LabelType.RULE_LIST_LABEL)) &&
+				(labelPair.type.equals(LabelType.RULE_LABEL) || labelPair.type.equals(LabelType.RULE_LIST_LABEL))) {
 
 			org.antlr.runtime.Token token = r instanceof LeftRecursiveRule
-					?  ((GrammarAST) r.ast.getChild(0)).getToken()
+					? ((GrammarAST) r.ast.getChild(0)).getToken()
 					: labelPair.label.token;
 			String prevLabelOp = prevLabelPair.type.equals(LabelType.RULE_LIST_LABEL) ? "+=" : "=";
 			String labelOp = labelPair.type.equals(LabelType.RULE_LIST_LABEL) ? "+=" : "=";
@@ -291,11 +266,11 @@ public class SymbolChecks {
 		for (Attribute attribute : attributes.attributes.values()) {
 			if (ruleNames.contains(attribute.name)) {
 				errMgr.grammarError(
-					errorType,
-					g.fileName,
-					attribute.token != null ? attribute.token : ((GrammarAST)r.ast.getChild(0)).token,
-					attribute.name,
-					r.name);
+						errorType,
+						g.fileName,
+						attribute.token != null ? attribute.token : ((GrammarAST) r.ast.getChild(0)).token,
+						attribute.name,
+						r.name);
 			}
 		}
 	}
@@ -308,25 +283,25 @@ public class SymbolChecks {
 		Set<String> conflictingKeys = attributes.intersection(referenceAttributes);
 		for (String key : conflictingKeys) {
 			errMgr.grammarError(
-				errorType,
-				g.fileName,
-				attributes.get(key).token != null ? attributes.get(key).token : ((GrammarAST) r.ast.getChild(0)).token,
-				key,
-				r.name);
+					errorType,
+					g.fileName,
+					attributes.get(key).token != null ? attributes.get(key).token : ((GrammarAST) r.ast.getChild(0)).token,
+					key,
+					r.name);
 		}
 	}
 
 	protected void checkReservedNames(Collection<Rule> rules) {
 		for (Rule rule : rules) {
 			if (reservedNames.contains(rule.name)) {
-				errMgr.grammarError(ErrorType.RESERVED_RULE_NAME, g.fileName, ((GrammarAST)rule.ast.getChild(0)).getToken(), rule.name);
+				errMgr.grammarError(ErrorType.RESERVED_RULE_NAME, g.fileName, ((GrammarAST) rule.ast.getChild(0)).getToken(), rule.name);
 			}
 		}
 	}
 
 	public void checkForModeConflicts(Grammar g) {
 		if (g.isLexer()) {
-			LexerGrammar lexerGrammar = (LexerGrammar)g;
+			LexerGrammar lexerGrammar = (LexerGrammar) g;
 			for (String modeName : lexerGrammar.modes.keySet()) {
 				if (!modeName.equals("DEFAULT_MODE") && reservedNames.contains(modeName)) {
 					Rule rule = lexerGrammar.modes.get(modeName).iterator().next();
@@ -341,42 +316,101 @@ public class SymbolChecks {
 		}
 	}
 
+	public void checkForUnreachableTokens(Grammar g) {
+		if (g.isLexer()) {
+			LexerGrammar lexerGrammar = (LexerGrammar) g;
+			for (List<Rule> rules : lexerGrammar.modes.values()) {
+
+				// Collect string literal lexer rules
+				List<Rule> stringLiteralRules = new ArrayList<>();
+				List<List<String>> stringLiteralValues = new ArrayList<>();
+				for (int i = 0; i < rules.size(); i++) {
+					Rule rule = rules.get(i);
+					List<String> ruleStringAlts = getSingleTokenValues(rule);
+					if (ruleStringAlts != null && ruleStringAlts.size() > 0) {
+						stringLiteralRules.add(rule);
+						stringLiteralValues.add(ruleStringAlts);
+					}
+				}
+
+				// Check string sets intersection
+				for (int i = 0; i < stringLiteralRules.size(); i++) {
+					List<String> firstTokenStringValues = stringLiteralValues.get(i);
+					for (int j = i + 1; j < stringLiteralRules.size(); j++) {
+						List<String> secondTokenStringValues = stringLiteralValues.get(j);
+						for (String str1 : firstTokenStringValues) {
+							for (String str2 : secondTokenStringValues) {
+								if (str1.equals(str2)) {
+									errMgr.grammarError(ErrorType.TOKEN_UNREACHABLE, g.fileName,
+											((GrammarAST) stringLiteralRules.get(j).ast.getChild(0)).token,
+											stringLiteralRules.get(j).name, str2, stringLiteralRules.get(i).name);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	public List<String> getSingleTokenValues(Rule rule)
+	{
+		List<String> values = new ArrayList<>();
+		for (Alternative alt : rule.alt) {
+			if (alt != null) {
+				List<GrammarAST> stringLiterals = alt.ast.getNodesWithType(ANTLRLexer.STRING_LITERAL);
+
+				// TODO: Support all tokens but not only string literals.
+				if (stringLiterals.size() == 0 || alt.ast.getChildCount() != stringLiterals.size()) {
+					continue;
+				}
+
+				StringBuilder currentValue = new StringBuilder();
+				for (GrammarAST ast : stringLiterals) {
+					TerminalAST stringLiteral = (TerminalAST) ast;
+					String text = stringLiteral.token.getText();
+					currentValue.append(text.substring(1, text.length() - 1));
+				}
+				values.add(currentValue.toString());
+			}
+		}
+		return values;
+	}
+
 	// CAN ONLY CALL THE TWO NEXT METHODS AFTER GRAMMAR HAS RULE DEFS (see semanticpipeline)
 
 	public void checkRuleArgs(Grammar g, List<GrammarAST> rulerefs) {
-		if ( rulerefs==null ) return;
+		if (rulerefs == null) return;
 		for (GrammarAST ref : rulerefs) {
 			String ruleName = ref.getText();
 			Rule r = g.getRule(ruleName);
-			GrammarAST arg = (GrammarAST)ref.getFirstChildWithType(ANTLRParser.ARG_ACTION);
-			if ( arg!=null && (r==null || r.args==null) ) {
+			GrammarAST arg = (GrammarAST) ref.getFirstChildWithType(ANTLRParser.ARG_ACTION);
+			if (arg != null && (r == null || r.args == null)) {
 				errMgr.grammarError(ErrorType.RULE_HAS_NO_ARGS,
-										  g.fileName, ref.token, ruleName);
+						g.fileName, ref.token, ruleName);
 
-			}
-			else if ( arg==null && (r!=null&&r.args!=null) ) {
+			} else if (arg == null && (r != null && r.args != null)) {
 				errMgr.grammarError(ErrorType.MISSING_RULE_ARGS,
-										  g.fileName, ref.token, ruleName);
+						g.fileName, ref.token, ruleName);
 			}
 		}
 	}
 
 	public void checkForQualifiedRuleIssues(Grammar g, List<GrammarAST> qualifiedRuleRefs) {
 		for (GrammarAST dot : qualifiedRuleRefs) {
-			GrammarAST grammar = (GrammarAST)dot.getChild(0);
-			GrammarAST rule = (GrammarAST)dot.getChild(1);
-            g.tool.log("semantics", grammar.getText()+"."+rule.getText());
+			GrammarAST grammar = (GrammarAST) dot.getChild(0);
+			GrammarAST rule = (GrammarAST) dot.getChild(1);
+			g.tool.log("semantics", grammar.getText() + "." + rule.getText());
 			Grammar delegate = g.getImportedGrammar(grammar.getText());
-			if ( delegate==null ) {
+			if (delegate == null) {
 				errMgr.grammarError(ErrorType.NO_SUCH_GRAMMAR_SCOPE,
-										  g.fileName, grammar.token, grammar.getText(),
-										  rule.getText());
-			}
-			else {
-				if ( g.getRule(grammar.getText(), rule.getText())==null ) {
+						g.fileName, grammar.token, grammar.getText(),
+						rule.getText());
+			} else {
+				if (g.getRule(grammar.getText(), rule.getText()) == null) {
 					errMgr.grammarError(ErrorType.NO_SUCH_RULE_IN_SCOPE,
-											  g.fileName, rule.token, grammar.getText(),
-											  rule.getText());
+							g.fileName, rule.token, grammar.getText(),
+							rule.getText());
 				}
 			}
 		}
