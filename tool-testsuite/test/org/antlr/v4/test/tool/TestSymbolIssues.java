@@ -401,4 +401,25 @@ public class TestSymbolIssues extends BaseJavaToolTest {
 
 		testErrors(test, false);
 	}
+
+	@Test public void testUnreachableTokens() {
+		String[] test = {
+				"lexer grammar Test;\n" +
+				"TOKEN1: 'as' 'df' | 'qwer';\n" +
+				"TOKEN2: [0-9];\n" +
+				"TOKEN3: 'asdf';\n" +
+				"TOKEN4: 'q' 'w' 'e' 'r' | A;\n" +
+				"TOKEN5: 'aaaa';\n" +
+				"\n" +
+				"mode MODE1;\n" +
+				"TOKEN6: 'asdf';\n" +
+				"\n" +
+				"fragment A: 'A';",
+
+				"warning(" + ErrorType.TOKEN_UNREACHABLE.code + "): Test.g4:4:0: token TOKEN3 unreachable. Its value asdf is always overlapped by token TOKEN1\n" +
+				"warning(" + ErrorType.TOKEN_UNREACHABLE.code + "): Test.g4:5:0: token TOKEN4 unreachable. Its value qwer is always overlapped by token TOKEN1\n"
+		};
+
+		testErrors(test, false);
+	}
 }
