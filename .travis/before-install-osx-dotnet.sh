@@ -12,10 +12,10 @@ ln -s /usr/local/opt/openssl/lib/libcrypto.1.0.0.dylib /usr/local/lib/
 ln -s /usr/local/opt/openssl/lib/libssl.1.0.0.dylib /usr/local/lib/
 
 # download dotnet core
-curl https://download.microsoft.com/download/8/F/9/8F9659B9-E628-4D1A-B6BF-C3004C8C954B/dotnet-1.1.1-sdk-osx-x64.pkg -o /tmp/dotnet-1.1.1-sdk-osx-x64.pkg
+curl https://download.microsoft.com/download/1/1/4/114223DE-0AD6-4B8A-A8FB-164E5862AF6E/dotnet-dev-osx-x64.1.0.3.pkg -o /tmp/dotnet-dev-osx-x64.1.0.3.pkg
 
 # install dotnet core
-sudo installer -pkg /tmp/dotnet-1.1.1-sdk-osx-x64.pkg -target /
+sudo installer -pkg /tmp/dotnet-dev-osx-x64.1.0.3.pkg -target /
 
 # make the link
 ln -s /usr/local/share/dotnet/dotnet /usr/local/bin/

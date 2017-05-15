@@ -127,19 +127,6 @@ public class BaseCSharpTest implements RuntimeTestSupport /*, SpecialRuntimeTest
 	/** Errors found while running antlr */
 	protected StringBuilder antlrToolErrors;
 
-	@org.junit.Rule
-	public final TestRule testWatcher = new TestWatcher() {
-
-		@Override
-		protected void succeeded(Description description) {
-			// remove tmpdir if no error.
-			if (!PRESERVE_TEST_DIR) {
-				eraseTempDir();
-			}
-		}
-
-	};
-
 	@Override
 	public void testSetUp() throws Exception {
 		if (CREATE_PER_TEST_DIRECTORIES) {
@@ -150,7 +137,7 @@ public class BaseCSharpTest implements RuntimeTestSupport /*, SpecialRuntimeTest
 		else {
 			tmpdir = new File(BASE_TEST_DIR).getAbsolutePath();
 			if (!PRESERVE_TEST_DIR && new File(tmpdir).exists()) {
-				eraseFiles();
+				eraseDirectory(new File(tmpdir));
 			}
 		}
 		antlrToolErrors = new StringBuilder();
@@ -523,7 +510,8 @@ public class BaseCSharpTest implements RuntimeTestSupport /*, SpecialRuntimeTest
             args = new String[] {
                 dotnetcli,
                 "restore",
-                "Antlr4.Test.dotnet.csproj"
+                "Antlr4.Test.dotnet.csproj",
+                "--no-dependencies"
             };
             success = runProcess(args, tmpdir);
 
@@ -533,7 +521,8 @@ public class BaseCSharpTest implements RuntimeTestSupport /*, SpecialRuntimeTest
                 "build",
                 "Antlr4.Test.dotnet.csproj",
                 "-c",
-                "Release"
+                "Release",
+                "--no-dependencies"
             };
             success = runProcess(args, tmpdir);
         }
@@ -797,25 +786,30 @@ public class BaseCSharpTest implements RuntimeTestSupport /*, SpecialRuntimeTest
 		}
 	}
 
-	protected void eraseFiles() {
-		if (tmpdir == null) {
-			return;
-		}
-
-		File tmpdirF = new File(tmpdir);
-		String[] files = tmpdirF.list();
-		if(files!=null) for(String file : files) {
-			new File(tmpdir+"/"+file).delete();
-		}
+	protected void eraseDirectory(File dir) {
+		File[] files = dir.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                if (file.isDirectory()) {
+                    eraseDirectory(file);
+                }
+                else {
+                    file.delete();
+                }
+            }
+        }
+        dir.delete();
 	}
 
 	@Override
 	public void eraseTempDir() {
-		File tmpdirF = new File(tmpdir);
-		if ( tmpdirF.exists() ) {
-			eraseFiles();
-			tmpdirF.delete();
-		}
+        if (!PRESERVE_TEST_DIR) {
+            File tmpdirF = new File(tmpdir);
+            if ( tmpdirF.exists() ) {
+                eraseDirectory(tmpdirF);
+                tmpdirF.delete();
+            }
+        }
 	}
 
 	public String getFirstLineOfException() {
