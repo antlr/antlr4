@@ -655,7 +655,7 @@ open class LexerATNSimulator: ATNSimulator {
             print("EDGE \(p) -> \(q) upon \(t)")
         }
 
-        try! dfaStateMutex.synchronized {
+        dfaStateMutex.synchronized {
             if p.edges == nil {
                 //  make room for tokens 1..n and -1 masquerading as index 0
                 //TODO ARRAY COUNT
@@ -686,7 +686,7 @@ open class LexerATNSimulator: ATNSimulator {
 
         let dfa: DFA = decisionToDFA[mode]
 
-        return try! dfaStatesMutex.synchronized {
+        return dfaStatesMutex.synchronized {
             if let existing = dfa.states[proposed] {
                 return existing!
             }

@@ -19,7 +19,7 @@ class Mutex {
     /// - Returns: the value returned by the closure
     /// - Throws: the exception populated by the closure run
     @discardableResult
-    func synchronized<R>(closure: () throws -> R) throws -> R {
+    func synchronized<R>(closure: () throws -> R) rethrows -> R {
         pthread_mutex_lock(&mutex)
         defer {
             pthread_mutex_unlock(&mutex)

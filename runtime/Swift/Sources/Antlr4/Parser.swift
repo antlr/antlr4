@@ -440,12 +440,12 @@ open class Parser: Recognizer<ParserATNSimulator> {
         let serializedAtn: String = getSerializedATN()
 
         var result: ATN? = bypassAltsAtnCache[serializedAtn]
-        try! bypassAltsAtnCacheMutex.synchronized {
+        bypassAltsAtnCacheMutex.synchronized {
             [unowned self] in
             if result == nil {
                 let deserializationOptions: ATNDeserializationOptions = ATNDeserializationOptions()
                 try! deserializationOptions.setGenerateRuleBypassTransitions(true)
-                result = try!  ATNDeserializer(deserializationOptions).deserialize(Array(serializedAtn.characters))
+                result = try! ATNDeserializer(deserializationOptions).deserialize(Array(serializedAtn.characters))
                 self.bypassAltsAtnCache[serializedAtn] = result!
             }
         }
@@ -986,7 +986,7 @@ open class Parser: Recognizer<ParserATNSimulator> {
         guard let _interp = _interp  else {
             return s
         }
-        try! decisionToDFAMutex.synchronized {
+        decisionToDFAMutex.synchronized {
             [unowned self] in
 
             for d in 0..<_interp.decisionToDFA.count {
@@ -1003,7 +1003,7 @@ open class Parser: Recognizer<ParserATNSimulator> {
         guard let _interp = _interp  else {
             return
         }
-        try! decisionToDFAMutex.synchronized {
+        decisionToDFAMutex.synchronized {
             [unowned self] in
             var seenOne: Bool = false
 

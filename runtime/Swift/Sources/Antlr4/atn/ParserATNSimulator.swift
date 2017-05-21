@@ -1977,7 +1977,7 @@ open class ParserATNSimulator: ATNSimulator {
         guard let from = from else {
             return to
         }
-        try! dfaStateMutex.synchronized {
+        dfaStateMutex.synchronized {
             [unowned self] in
             if from.edges == nil {
                 from.edges = [DFAState?](repeating: nil, count: self.atn.maxTokenType + 1 + 1)       //new DFAState[atn.maxTokenType+1+1];

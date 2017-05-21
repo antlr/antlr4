@@ -63,7 +63,7 @@ open class Recognizer<ATNInterpreter:ATNSimulator> {
     public func getTokenTypeMap() -> Dictionary<String, Int> {
         let vocabulary: Vocabulary = getVocabulary()
         var result: Dictionary<String, Int>? = self.tokenTypeMapCache[vocabulary]
-        try! tokenTypeMapCacheMutex.synchronized {
+        tokenTypeMapCacheMutex.synchronized {
             [unowned self] in
             if result == nil {
                 result = Dictionary<String, Int>()
@@ -100,7 +100,7 @@ open class Recognizer<ATNInterpreter:ATNSimulator> {
         let ruleNames: [String] = getRuleNames()
 
         let result: Dictionary<String, Int>? = self.ruleIndexMapCache[ArrayWrapper<String>(ruleNames)]
-        try! ruleIndexMapCacheMutex.synchronized {
+        ruleIndexMapCacheMutex.synchronized {
             [unowned self] in
             if result == nil {
                 self.ruleIndexMapCache[ArrayWrapper<String>(ruleNames)] = Utils.toMap(ruleNames)
