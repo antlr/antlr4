@@ -227,6 +227,17 @@ import "github.com/antlr/antlr4/runtime/Go/antlr"
 <header>
 <endif>
 
+
+// Struct of Handlers
+type <file.grammarName>Handlers struct {
+    EnterEveryRule func(ctx antlr.RuleNode)
+    ExitEveryRule  func(ctx antlr.RuleNode)
+
+    <file.visitorNames:{lname |
+<lname; format="cap"> func(this *<file.grammarName>Handlers, ctx I<lname; format="cap">Context)
+}>
+}
+
 // A complete Visitor for a parse tree produced by <file.parserName>.
 type <file.grammarName>Visitor interface {
     antlr.ParseTreeVisitor
@@ -297,6 +308,15 @@ package parser // <file.grammarName>
 //    v.indent = v.indent[:len(v.indent)-1]
 //}
 
+
+//indent := ""
+//parsetree.VisitFunc(&<if(file.genPackage)><file.genPackage><else>parser<endif>.<file.grammarName>Handlers{
+    //EnterEveryRule: func(ctx antlr.RuleNode){indent += "\t"},
+    //ExitEveryRule:  func(ctx antlr.RuleNode){indent = indent[1:]},
+    <file.visitorNames:{lname |
+//<lname; format="cap">: func(this *<if(file.genPackage)><file.genPackage><else>parser<endif>.<file.grammarName>Handlers, ctx <if(file.genPackage)><file.genPackage><else>parser<endif>.I<lname; format="cap">Context) {fmt.Printf("%s%T\n", indent, ctx);ctx.VisitChildrenFunc(this)\},
+}>
+//}
 
 <file.visitorNames:{lname |
 //func (v *<file.grammarName>Visitor) Visit<lname; format="cap">(ctx <if(file.genPackage)><file.genPackage><else>parser<endif>.I<lname; format="cap">Context, delegate antlr.ParseTreeVisitor, args ...interface{\}) (result interface{\}){    result = v.VisitChildren(ctx, delegate, args...);return\}
@@ -1484,6 +1504,21 @@ func (s *<struct.name>) ExitRule(listener antlr.ParseTreeListener) {
 >>
 
 VisitorDispatchMethod(method) ::= <<
+func (s *<struct.name>) VisitFunc(hdls antlr.ParserTreeVisitorHandlers) {
+    h := hdls.(*<file.grammarName>Handlers)
+    if h.EnterEveryRule != nil {
+        h.EnterEveryRule(s)
+    }
+    if h.<struct.derivedFromName; format="cap"> != nil {
+        h.<struct.derivedFromName; format="cap">(h, s)
+    } else {
+        s.VisitChildrenFunc(h)
+    }
+    if h.ExitEveryRule != nil {
+        h.ExitEveryRule(s)
+    }    
+}
+
 func (s *<struct.name>) Visit(delegate antlr.ParseTreeVisitor, args ...interface{}) (result interface{}) {
 	switch t := delegate.(type) {
 	case <struct.derivedFromName; format="cap">ContextVisitor:

@@ -17,6 +17,8 @@ type Tree interface {
 	GetChild(i int) Tree
 	GetChildCount() int
 	GetChildren() []Tree
+
+	VisitFunc(ParserTreeVisitorHandlers)
 }
 
 type SyntaxTree interface {
@@ -51,6 +53,9 @@ type ErrorNode interface {
 	TerminalNode
 
 	errorNode()
+}
+
+type ParserTreeVisitorHandlers interface {
 }
 
 type ParseTreeVisitor interface {
@@ -172,6 +177,9 @@ func NewTerminalNodeImpl(symbol Token) *TerminalNodeImpl {
 	tn.symbol = symbol
 
 	return tn
+}
+
+func (t *TerminalNodeImpl) VisitFunc(x ParserTreeVisitorHandlers) {
 }
 
 func (t *TerminalNodeImpl) GetChild(i int) Tree {

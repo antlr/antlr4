@@ -28,6 +28,8 @@ type ParserRuleContext interface {
 
 	AddChild(child RuleContext) RuleContext
 	RemoveLastChild()
+
+	VisitChildrenFunc(h ParserTreeVisitorHandlers)
 }
 
 type BaseParserRuleContext struct {
@@ -62,6 +64,15 @@ func NewBaseParserRuleContext(parent ParserRuleContext, invokingStateNumber int)
 
 func (prc *BaseParserRuleContext) SetException(e RecognitionException) {
 	prc.exception = e
+}
+
+func (prc *BaseParserRuleContext) VisitFunc(ParserTreeVisitorHandlers) {
+}
+
+func (prc *BaseParserRuleContext) VisitChildrenFunc(h ParserTreeVisitorHandlers) {
+	for _, child := range prc.GetChildren() {
+		child.VisitFunc(h)
+	}
 }
 
 func (prc *BaseParserRuleContext) GetChildren() []Tree {
