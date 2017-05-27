@@ -145,3 +145,4 @@ YYYY/MM/DD, github id, Full name, email
 2017/03/28, cmd-johnson, Jonas Auer, jonas.auer.94@gmail.com
 2017/04/12, lys0716, Yishuang Lu, luyscmu@gmail.com
 2017/05/11, jimallman, Jim Allman, jim@ibang.com
+2017/05/26, waf, Will Fuqua, wafuqua@gmail.com

@@ -20,5 +20,6 @@
   </metadata>
   <files>
     <file src="Antlr4.Runtime/lib/Release/Antlr4.Runtime.Standard.dll" target="lib/net35/"/>
+    <file src="Antlr4.Runtime/lib/Release/netstandard1.3/Antlr4.Runtime.Core.dll" target="lib/netstandard/"/>
   </files>
 </package>
