@@ -234,7 +234,7 @@ type <file.grammarName>Handlers struct {
     ExitEveryRule  func(ctx antlr.RuleNode)
 
     <file.visitorNames:{lname |
-<lname; format="cap"> func(this *<file.grammarName>Handlers, ctx I<lname; format="cap">Context)
+<lname; format="cap"> func(ctx I<lname; format="cap">Context, this *<file.grammarName>Handlers, args ...interface{\}) (result interface{\})
 }>
 }
 
@@ -314,7 +314,7 @@ package parser // <file.grammarName>
     //EnterEveryRule: func(ctx antlr.RuleNode){indent += "\t"},
     //ExitEveryRule:  func(ctx antlr.RuleNode){indent = indent[1:]},
     <file.visitorNames:{lname |
-//<lname; format="cap">: func(this *<if(file.genPackage)><file.genPackage><else>parser<endif>.<file.grammarName>Handlers, ctx <if(file.genPackage)><file.genPackage><else>parser<endif>.I<lname; format="cap">Context) {fmt.Printf("%s%T\n", indent, ctx);ctx.VisitChildrenFunc(this)\},
+//<lname; format="cap">: func(ctx <if(file.genPackage)><file.genPackage><else>parser<endif>.I<lname; format="cap">Context, this *<if(file.genPackage)><file.genPackage><else>parser<endif>.<file.grammarName>Handlers, args ...interface{\}) (result interface{\}) {fmt.Printf("%s%T\n", indent, ctx);ctx.VisitChildrenFunc(this, args...);return\},
 }>
 //}
 
@@ -1504,19 +1504,20 @@ func (s *<struct.name>) ExitRule(listener antlr.ParseTreeListener) {
 >>
 
 VisitorDispatchMethod(method) ::= <<
-func (s *<struct.name>) VisitFunc(hdls antlr.ParserTreeVisitorHandlers) {
+func (s *<struct.name>) VisitFunc(hdls antlr.ParserTreeVisitorHandlers, args ...interface{}) (result interface{}) {
     h := hdls.(*<file.grammarName>Handlers)
     if h.EnterEveryRule != nil {
         h.EnterEveryRule(s)
     }
     if h.<struct.derivedFromName; format="cap"> != nil {
-        h.<struct.derivedFromName; format="cap">(h, s)
+        h.<struct.derivedFromName; format="cap">(s, h, args...)
     } else {
-        s.VisitChildrenFunc(h)
+        s.VisitChildrenFunc(h, args...)
     }
     if h.ExitEveryRule != nil {
         h.ExitEveryRule(s)
     }    
+    return
 }
 
 func (s *<struct.name>) Visit(delegate antlr.ParseTreeVisitor, args ...interface{}) (result interface{}) {

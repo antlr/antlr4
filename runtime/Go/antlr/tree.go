@@ -18,7 +18,7 @@ type Tree interface {
 	GetChildCount() int
 	GetChildren() []Tree
 
-	VisitFunc(ParserTreeVisitorHandlers)
+	VisitFunc(ParserTreeVisitorHandlers, ...interface{}) interface{}
 }
 
 type SyntaxTree interface {
@@ -179,7 +179,8 @@ func NewTerminalNodeImpl(symbol Token) *TerminalNodeImpl {
 	return tn
 }
 
-func (t *TerminalNodeImpl) VisitFunc(x ParserTreeVisitorHandlers) {
+func (t *TerminalNodeImpl) VisitFunc(x ParserTreeVisitorHandlers, args ...interface{}) interface{} {
+	return nil
 }
 
 func (t *TerminalNodeImpl) GetChild(i int) Tree {
