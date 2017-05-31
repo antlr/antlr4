@@ -63,7 +63,8 @@ int main(int argc, const char* argv[]) {
   CommonTokenStream tokens(&lexer);
   MyGrammarParser parser(&tokens);
 
-  Ref<tree::ParseTree> tree = parser.key();
+  // MyGrammarParser owns this pointer.
+  tree::ParseTree *tree = parser.key();
   Ref<TreeShapeListener> listener(new TreeShapeListener());
   tree::ParseTreeWalker::DEFAULT->walk(listener, tree);
 
