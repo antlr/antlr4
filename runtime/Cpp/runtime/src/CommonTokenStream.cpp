@@ -9,12 +9,11 @@
 
 using namespace antlr4;
 
-CommonTokenStream::CommonTokenStream(TokenSource *tokenSource) : BufferedTokenStream(tokenSource) {
-  InitializeInstanceFields();
+CommonTokenStream::CommonTokenStream(TokenSource *tokenSource) : CommonTokenStream(tokenSource, Token::DEFAULT_CHANNEL) {
 }
 
-CommonTokenStream::CommonTokenStream(TokenSource *tokenSource, int channel) : BufferedTokenStream(tokenSource) {
-  this->channel = channel;
+CommonTokenStream::CommonTokenStream(TokenSource *tokenSource, size_t channel)
+: BufferedTokenStream(tokenSource), channel(channel) {
 }
 
 ssize_t CommonTokenStream::adjustSeekIndex(size_t i) {
@@ -76,8 +75,4 @@ int CommonTokenStream::getNumberOfOnChannelTokens() {
     }
   }
   return n;
-}
-
-void CommonTokenStream::InitializeInstanceFields() {
-  channel = Token::DEFAULT_CHANNEL;
 }
