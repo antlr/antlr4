@@ -14,7 +14,8 @@
 using namespace antlr4::tree;
 using namespace antlrcpp;
 
-ParseTreeWalker ParseTreeWalker::DEFAULT = IterativeParseTreeWalker();
+static IterativeParseTreeWalker defaultWalker;
+ParseTreeWalker &ParseTreeWalker::DEFAULT = defaultWalker;
 
 void ParseTreeWalker::walk(ParseTreeListener *listener, ParseTree *t) const {
   if (is<ErrorNode *>(t)) {

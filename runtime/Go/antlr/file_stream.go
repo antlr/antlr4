@@ -28,9 +28,9 @@ func NewFileStream(fileName string) (*FileStream, error) {
 		return nil, err
 	}
 	defer f.Close()
-	err = io.Copy(buf, f)
+	_, err = io.Copy(buf, f)
 	if err != nil {
-		return nil, er
+		return nil, err
 	}
 
 	fs := new(FileStream)

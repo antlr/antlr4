@@ -35,9 +35,9 @@ void ANTLRInputStream::load(const std::string &input) {
   // Remove the UTF-8 BOM if present.
   const char bom[4] = "\xef\xbb\xbf";
   if (input.compare(0, 3, bom, 3) == 0)
-    _data = antlrcpp::utfConverter.from_bytes(input.data() + 3, input.data() + input.size());
+    _data = antlrcpp::utf8_to_utf32(input.data() + 3, input.data() + input.size());
   else
-    _data = antlrcpp::utfConverter.from_bytes(input);
+    _data = antlrcpp::utf8_to_utf32(input.data(), input.data() + input.size());
   p = 0;
 }
 
@@ -136,7 +136,7 @@ std::string ANTLRInputStream::getText(const Interval &interval) {
     return "";
   }
 
-  return antlrcpp::utfConverter.to_bytes(_data.substr(start, count));
+  return antlrcpp::utf32_to_utf8(_data.substr(start, count));
 }
 
 std::string ANTLRInputStream::getSourceName() const {
@@ -147,7 +147,7 @@ std::string ANTLRInputStream::getSourceName() const {
 }
 
 std::string ANTLRInputStream::toString() const {
-  return antlrcpp::utfConverter.to_bytes(_data);
+  return antlrcpp::utf32_to_utf8(_data);
 }
 
 void ANTLRInputStream::InitializeInstanceFields() {
