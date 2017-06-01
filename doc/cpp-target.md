@@ -49,7 +49,7 @@ using namespace org::antlr::v4::runtime;
 
 class TreeShapeListener : public MyGrammarBaseListener {
 public:
-  void enterKey(Ref<ParserRuleContext> ctx) {
+  void enterKey(ParserRuleContext *ctx) override {
 	// Do something when entering the key rule.
   }
 };
@@ -72,7 +72,7 @@ int main(int argc, const char* argv[]) {
 
 ```
  
-This example assumes your grammar contains a parser rule named `key` for which the enterKey function was generated. The `Ref<>` template is an alias for `std::shared_ptr<>` to simplify the runtime source code which often makes use of smart pointers.
+This example assumes your grammar contains a parser rule named `key` for which the enterKey function was generated.
 
 ## Specialities of this ANTLR target
 
