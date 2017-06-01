@@ -53,7 +53,7 @@ public interface IntStream {
 	 * filtering streams (e.g. {@link CommonTokenStream} which distinguishes
 	 * between "on-channel" and "off-channel" tokens).
 	 *
-	 * @throws IllegalStateException if an attempt is made to consume the the
+	 * @throws IllegalStateException if an attempt is made to consume the
 	 * end of the stream (i.e. if {@code LA(1)==}{@link #EOF EOF} before calling
 	 * {@code consume}).
 	 */
