@@ -798,7 +798,7 @@ var _lt = p.GetTokenStream().LT(1)<! TODO: Should LT be called always like Invok
 	p.GetErrorHandler().RecoverInline(p)
 	<endif>
 } else {
-    p.GetErrorHandler().ReportMatch(p)
+	p.GetErrorHandler().ReportMatch(p)
 	p.Consume()
 }
 >>

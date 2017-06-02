@@ -105,7 +105,7 @@ function <file.grammarName>Visitor() {
 <file.visitorNames:{lname |
 // Visit a parse tree produced by <file.parserName>#<lname>.
 <file.grammarName>Visitor.prototype.visit<lname; format="cap"> = function(ctx) {
-  return this.visitChildren(ctx);
+	return this.visitChildren(ctx);
 \};
 
 }; separator="\n">
@@ -142,12 +142,12 @@ var ruleNames =  [ <parser.ruleNames:{r | "<r>"}; separator=", ", wrap, anchor> 
 
 function <parser.name> (input) {
 	<superClass; null="antlr4.Parser">.call(this, input);
-    this._interp = new antlr4.atn.ParserATNSimulator(this, atn, decisionsToDFA, sharedContextCache);
-    this.ruleNames = ruleNames;
-    this.literalNames = literalNames;
-    this.symbolicNames = symbolicNames;
+	this._interp = new antlr4.atn.ParserATNSimulator(this, atn, decisionsToDFA, sharedContextCache);
+	this.ruleNames = ruleNames;
+	this.literalNames = literalNames;
+	this.symbolicNames = symbolicNames;
 	<namedActions.members>
-    return this;
+	return this;
 }
 
 <parser.name>.prototype = Object.create(<superClass; null="antlr4.Parser">.prototype);
@@ -173,9 +173,9 @@ Object.defineProperty(<parser.name>.prototype, "atn", {
 	switch(ruleIndex) {
 	<parser.sempredFuncs.values:{f | case <f.ruleIndex>:
 		return this.<f.name>_sempred(localctx, predIndex);}; separator="\n">
-    default:
-        throw "No predicate with index:" + ruleIndex;
-   }
+	default:
+		throw "No predicate with index:" + ruleIndex;
+	}
 };
 
 <sempredFuncs.values; separator="\n">
@@ -205,9 +205,9 @@ case <f.ruleIndex>:
 	switch (ruleIndex) {
 		<recog.sempredFuncs.values:{f| case <f.ruleIndex>:
 	return this.<f.name>_sempred(localctx, predIndex);}; separator="\n">
-    	default:
-    		throw "No registered predicate for:" + ruleIndex;
-    }
+		default:
+			throw "No registered predicate for:" + ruleIndex;
+	}
 };
 
 <sempredFuncs.values; separator="\n">
@@ -258,30 +258,30 @@ RuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,namedActions,fina
 
 <parser.name>.prototype.<currentRule.name> = function(<currentRule.args:{a | <a.name>}; separator=", ">) {
 
-    var localctx = new <currentRule.ctxType>(this, this._ctx, this.state<currentRule.args:{a | , <a.name>}>);
-    this.enterRule(localctx, <currentRule.startState>, <parser.name>.RULE_<currentRule.name>);
-    <namedActions.init>
-    <locals; separator="\n">
-    try {
-        <code>
-        <postamble; separator="\n">
-        <namedActions.after>
-    <if(exceptions)>
-    <exceptions; separator="\n">
-    <else>
-    } catch (re) {
-    	if(re instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = re;
-	        this._errHandler.reportError(this, re);
-	        this._errHandler.recover(this, re);
-	    } else {
-	    	throw re;
-	    }
-    }<endif> finally {
-        <finallyAction>
-        this.exitRule();
-    }
-    return localctx;
+	var localctx = new <currentRule.ctxType>(this, this._ctx, this.state<currentRule.args:{a | , <a.name>}>);
+	this.enterRule(localctx, <currentRule.startState>, <parser.name>.RULE_<currentRule.name>);
+	<namedActions.init>
+	<locals; separator="\n">
+	try {
+		<code>
+		<postamble; separator="\n">
+		<namedActions.after>
+	<if(exceptions)>
+	<exceptions; separator="\n">
+	<else>
+	} catch (re) {
+		if(re instanceof antlr4.error.RecognitionException) {
+			localctx.exception = re;
+			this._errHandler.reportError(this, re);
+			this._errHandler.recover(this, re);
+		} else {
+			throw re;
+		}
+	}<endif> finally {
+		<finallyAction>
+		this.exitRule();
+	}
+	return localctx;
 };
 
 >>
@@ -295,33 +295,33 @@ LeftRecursiveRuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,
 
 <parser.name>.prototype.<currentRule.name> = function(_p<if(currentRule.args)>, <args:{a | , <a>}><endif>) {
 	if(_p===undefined) {
-	    _p = 0;
+		_p = 0;
 	}
-    var _parentctx = this._ctx;
-    var _parentState = this.state;
-    var localctx = new <currentRule.ctxType>(this, this._ctx, _parentState<args:{a | , <a.name>}>);
-    var _prevctx = localctx;
-    var _startState = <currentRule.startState>;
-    this.enterRecursionRule(localctx, <currentRule.startState>, <parser.name>.RULE_<currentRule.name>, _p);
-    <namedActions.init>
-    <locals; separator="\n">
-    try {
-        <code>
-        <postamble; separator="\n">
-        <namedActions.after>
-    } catch( error) {
-        if(error instanceof antlr4.error.RecognitionException) {
-	        localctx.exception = error;
-	        this._errHandler.reportError(this, error);
-	        this._errHandler.recover(this, error);
-	    } else {
-	    	throw error;
-	    }
-    } finally {
-        <finallyAction>
-        this.unrollRecursionContexts(_parentctx)
-    }
-    return localctx;
+	var _parentctx = this._ctx;
+	var _parentState = this.state;
+	var localctx = new <currentRule.ctxType>(this, this._ctx, _parentState<args:{a | , <a.name>}>);
+	var _prevctx = localctx;
+	var _startState = <currentRule.startState>;
+	this.enterRecursionRule(localctx, <currentRule.startState>, <parser.name>.RULE_<currentRule.name>, _p);
+	<namedActions.init>
+	<locals; separator="\n">
+	try {
+		<code>
+		<postamble; separator="\n">
+		<namedActions.after>
+	} catch( error) {
+		if(error instanceof antlr4.error.RecognitionException) {
+			localctx.exception = error;
+			this._errHandler.reportError(this, error);
+			this._errHandler.recover(this, error);
+		} else {
+			throw error;
+		}
+	} finally {
+		<finallyAction>
+		this.unrollRecursionContexts(_parentctx)
+	}
+	return localctx;
 };
 
 >>
@@ -345,10 +345,10 @@ this._errHandler.sync(this);
 <preamble; separator="\n">
 switch(this._input.LA(1)) {
 <choice.altLook,alts:{look,alt| <cases(ttypes=look)>
-    <alt>
-    break;}; separator="\n">
+	<alt>
+	break;}; separator="\n">
 default:
-    <error>
+	<error>
 }
 >>
 
@@ -369,7 +369,7 @@ this.state = <choice.stateNumber>;
 this._errHandler.sync(this);
 <preamble; separator="\n">
 if(<expr>) {
-    <alts; separator="\n">
+	<alts; separator="\n">
 }
 <!else if ( !(<followExpr>) ) <error>!>
 >>
@@ -379,10 +379,10 @@ this.state = <choice.stateNumber>;
 this._errHandler.sync(this);
 <preamble; separator="\n">
 while(<loopExpr>) {
-    <alts; separator="\n">
-    this.state = <choice.loopBackStateNumber>;
-    this._errHandler.sync(this);
-    <iteration>
+	<alts; separator="\n">
+	this.state = <choice.loopBackStateNumber>;
+	this._errHandler.sync(this);
+	<iteration>
 }
 >>
 
@@ -391,10 +391,10 @@ this.state = <choice.blockStartStateNumber>; <! alt block decision !>
 this._errHandler.sync(this);
 <preamble; separator="\n">
 do {
-    <alts; separator="\n">
-    this.state = <choice.stateNumber>; <! loopback/exit decision !>
-    this._errHandler.sync(this);
-    <iteration>
+	<alts; separator="\n">
+	this.state = <choice.stateNumber>; <! loopback/exit decision !>
+	this._errHandler.sync(this);
+	<iteration>
 } while(<loopExpr>);
 >>
 
@@ -409,8 +409,8 @@ var la_ = this._interp.adaptivePredict(this._input,<choice.decision>,this._ctx);
 switch(la_) {
 <alts:{alt |
 case <i>:
-    <alt>
-    break;
+	<alt>
+	break;
 }; separator="\n">
 }
 >>
@@ -421,7 +421,7 @@ this._errHandler.sync(this);
 var la_ = this._interp.adaptivePredict(this._input,<choice.decision>,this._ctx);
 <alts:{alt |
 if(la_===<i><if(!choice.ast.greedy)>+1<endif>) {
-    <alt>
+	<alt>
 }; separator="\n} else ">
 }
 >>
@@ -431,13 +431,13 @@ this.state = <choice.stateNumber>;
 this._errHandler.sync(this);
 var _alt = this._interp.adaptivePredict(this._input,<choice.decision>,this._ctx)
 while(_alt!=<choice.exitAlt> && _alt!=antlr4.atn.ATN.INVALID_ALT_NUMBER) {
-    if(_alt===1<if(!choice.ast.greedy)>+1<endif>) {
-        <iteration>
-        <alts> <! should only be one !>
-    }
-    this.state = <choice.loopBackStateNumber>;
-    this._errHandler.sync(this);
-    _alt = this._interp.adaptivePredict(this._input,<choice.decision>,this._ctx);
+	if(_alt===1<if(!choice.ast.greedy)>+1<endif>) {
+		<iteration>
+		<alts> <! should only be one !>
+	}
+	this.state = <choice.loopBackStateNumber>;
+	this._errHandler.sync(this);
+	_alt = this._interp.adaptivePredict(this._input,<choice.decision>,this._ctx);
 }
 
 >>
@@ -520,11 +520,11 @@ this.state = <m.stateNumber>;
 <if(m.labels)><m.labels:{l | <labelref(l)> = }>this._input.LT(1);<endif>
 <capture>
 <if(invert)>if(<m.varName>\<=0 || <expr>)<else>if(!(<expr>))<endif> {
-    <if(m.labels)><m.labels:{l | <labelref(l)> = }><endif>this._errHandler.recoverInline(this);
+	<if(m.labels)><m.labels:{l | <labelref(l)> = }><endif>this._errHandler.recoverInline(this);
 }
 else {
 	this._errHandler.reportMatch(this);
-    this.consume();
+	this.consume();
 }
 >>
 
@@ -542,7 +542,7 @@ ArgAction(a, chunks) ::= "<chunks>"
 SemPred(p, chunks, failChunks) ::= <<
 this.state = <p.stateNumber>;
 if (!( <chunks>)) {
-    throw new antlr4.error.FailedPredicateException(this, <p.predicate><if(failChunks)>, <failChunks><elseif(p.msg)>, <p.msg><endif>);
+	throw new antlr4.error.FailedPredicateException(this, <p.predicate><if(failChunks)>, <failChunks><elseif(p.msg)>, <p.msg><endif>);
 }
 >>
 
@@ -610,14 +610,14 @@ RuleContextListDecl(rdecl) ::= "this.<rdecl.name> = []; // of <rdecl.ctxName>s"
 
 ContextTokenGetterDecl(t)      ::= <<
 <t.name> = function() {
-    return this.getToken(<parser.name>.<t.name>, 0);
+	return this.getToken(<parser.name>.<t.name>, 0);
 };
 >>
 
 // should never be called
 ContextTokenListGetterDecl(t)  ::= <<
 def <t.name>_list(self):
-    return self.getTokens(<parser.name>.<t.name>)
+	return self.getTokens(<parser.name>.<t.name>)
 >>
 
 ContextTokenListIndexedGetterDecl(t)  ::= <<
@@ -625,38 +625,38 @@ ContextTokenListIndexedGetterDecl(t)  ::= <<
 	if(i===undefined) {
 		i = null;
 	}
-    if(i===null) {
-        return this.getTokens(<parser.name>.<t.name>);
-    } else {
-        return this.getToken(<parser.name>.<t.name>, i);
-    }
+	if(i===null) {
+		return this.getTokens(<parser.name>.<t.name>);
+	} else {
+		return this.getToken(<parser.name>.<t.name>, i);
+	}
 };
 
 >>
 
 ContextRuleGetterDecl(r)       ::= <<
 <r.name> = function() {
-    return this.getTypedRuleContext(<r.ctxName>,0);
+	return this.getTypedRuleContext(<r.ctxName>,0);
 };
 >>
 
 // should never be called
 ContextRuleListGetterDecl(r)   ::= <<
 def <r.name>_list(self):
-    return self.getTypedRuleContexts(<parser.name>.<r.ctxName>)
+	return self.getTypedRuleContexts(<parser.name>.<r.ctxName>)
 
 >>
 
 ContextRuleListIndexedGetterDecl(r)   ::= <<
 <r.name> = function(i) {
-    if(i===undefined) {
-        i = null;
-    }
-    if(i===null) {
-        return this.getTypedRuleContexts(<r.ctxName>);
-    } else {
-        return this.getTypedRuleContext(<r.ctxName>,i);
-    }
+	if(i===undefined) {
+		i = null;
+	}
+	if(i===null) {
+		return this.getTypedRuleContexts(<r.ctxName>);
+	} else {
+		return this.getTypedRuleContext(<r.ctxName>,i);
+	}
 };
 >>
 
@@ -678,17 +678,17 @@ CaptureNextTokenType(d) ::= "<d.varName> = this._input.LA(1);"
 StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers) ::= <<
 function <struct.name>(parser, parent, invokingState<struct.ctorAttrs:{a | , <a.name>}>) {
 	if(parent===undefined) {
-	    parent = null;
+		parent = null;
 	}
 	if(invokingState===undefined || invokingState===null) {
 		invokingState = -1;
 	}
 	<if(contextSuperClass)><contextSuperClass><else>antlr4.ParserRuleContext<endif>.call(this, parent, invokingState);
-    this.parser = parser;
-    this.ruleIndex = <parser.name>.RULE_<struct.derivedFromName>;
-    <attrs:{a | <a>}; separator="\n">
-    <struct.ctorAttrs:{a | this.<a.name> = <a.name> || null;}; separator="\n">
-    return this;
+	this.parser = parser;
+	this.ruleIndex = <parser.name>.RULE_<struct.derivedFromName>;
+	<attrs:{a | <a>}; separator="\n">
+	<struct.ctorAttrs:{a | this.<a.name> = <a.name> || null;}; separator="\n">
+	return this;
 }
 
 <struct.name>.prototype = Object.create(<if(contextSuperClass)><contextSuperClass><else>antlr4.ParserRuleContext<endif>.prototype);
@@ -698,8 +698,8 @@ function <struct.name>(parser, parent, invokingState<struct.ctorAttrs:{a | , <a.
 
 <if(struct.provideCopyFrom)> <! don't need copy unless we have subclasses !>
 <struct.name>.prototype.copyFrom = function(ctx) {
-    <if(contextSuperClass)><contextSuperClass><else>antlr4.ParserRuleContext<endif>.prototype.copyFrom.call(this, ctx);
-    <struct.attrs:{a | this.<a.name> = ctx.<a.name>;}; separator="\n">
+	<if(contextSuperClass)><contextSuperClass><else>antlr4.ParserRuleContext<endif>.prototype.copyFrom.call(this, ctx);
+	<struct.attrs:{a | this.<a.name> = ctx.<a.name>;}; separator="\n">
 };
 <endif>
 <dispatchMethods; separator="\n">
@@ -710,9 +710,9 @@ function <struct.name>(parser, parent, invokingState<struct.ctorAttrs:{a | , <a.
 AltLabelStructDecl(struct,attrs,getters,dispatchMethods) ::= <<
 function <struct.name>(parser, ctx) {
 	<currentRule.name; format="cap">Context.call(this, parser);
-    <attrs:{a | <a>;}; separator="\n">
-    <currentRule.name; format="cap">Context.prototype.copyFrom.call(this, ctx);
-    return this;
+	<attrs:{a | <a>;}; separator="\n">
+	<currentRule.name; format="cap">Context.prototype.copyFrom.call(this, ctx);
+	return this;
 }
 
 <struct.name>.prototype = Object.create(<currentRule.name; format="cap">Context.prototype);
@@ -728,8 +728,8 @@ function <struct.name>(parser, ctx) {
 
 ListenerDispatchMethod(method) ::= <<
 <struct.name>.prototype.<if(method.isEnter)>enter<else>exit<endif>Rule = function(listener) {
-    if(listener instanceof <parser.grammarName>Listener ) {
-        listener.<if(method.isEnter)>enter<else>exit<endif><struct.derivedFromName; format="cap">(this);
+	if(listener instanceof <parser.grammarName>Listener ) {
+		listener.<if(method.isEnter)>enter<else>exit<endif><struct.derivedFromName; format="cap">(this);
 	}
 };
 
@@ -737,11 +737,11 @@ ListenerDispatchMethod(method) ::= <<
 
 VisitorDispatchMethod(method) ::= <<
 <struct.name>.prototype.accept = function(visitor) {
-    if ( visitor instanceof <parser.grammarName>Visitor ) {
-        return visitor.visit<struct.derivedFromName; format="cap">(this);
-    } else {
-        return visitor.visitChildren(this);
-    }
+	if ( visitor instanceof <parser.grammarName>Visitor ) {
+		return visitor.visit<struct.derivedFromName; format="cap">(this);
+	} else {
+		return visitor.visitChildren(this);
+	}
 };
 
 >>
@@ -785,7 +785,7 @@ _prevctx = localctx;
 
 recRuleSetPrevCtx() ::= <<
 if(this._parseListeners!==null) {
-    this.triggerExitRuleEvent();
+	this.triggerExitRuleEvent();
 }
 _prevctx = localctx;
 >>
@@ -811,8 +811,8 @@ var decisionsToDFA = atn.decisionToState.map( function(ds, index) { return new a
 
 function <lexer.name>(input) {
 	<if(superClass)><superClass><else>antlr4.Lexer<endif>.call(this, input);
-    this._interp = new antlr4.atn.LexerATNSimulator(this, atn, decisionsToDFA, new antlr4.PredictionContextCache());
-    return this;
+	this._interp = new antlr4.atn.LexerATNSimulator(this, atn, decisionsToDFA, new antlr4.PredictionContextCache());
+	return this;
 }
 
 <lexer.name>.prototype = Object.create(<if(superClass)><superClass><else>antlr4.Lexer<endif>.prototype);
@@ -852,7 +852,7 @@ exports.<lexer.name> = <lexer.name>;
 SerializedATN(model) ::= <<
 <! only one segment, can be inlined !>
 
-var serializedATN = ["<model.serialized; wrap={",<\n>    "}>"].join("");
+var serializedATN = ["<model.serialized; wrap={",<\n>	"}>"].join("");
 
 >>
 
