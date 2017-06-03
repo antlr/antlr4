@@ -34,7 +34,7 @@ public class TokenVocabParser {
 
 	/** Load a vocab file {@code <vocabName>.tokens} and return mapping. */
 	public Map<String,Integer> load() {
-		Map<String,Integer> tokens = new LinkedHashMap<String,Integer>();
+		Map<String,Integer> tokens = new LinkedHashMap<>();
 		int maxTokenType = -1;
 		File fullFile = getImportedVocabFile();
 		FileInputStream fis = null;

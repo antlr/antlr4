@@ -24,7 +24,7 @@ public class JavaTarget extends Target {
 	/**
 	 * The Java target can cache the code generation templates.
 	 */
-	private static final ThreadLocal<STGroup> targetTemplates = new ThreadLocal<STGroup>();
+	private static final ThreadLocal<STGroup> targetTemplates = new ThreadLocal<>();
 
 	protected static final String[] javaKeywords = {
 		"abstract", "assert", "boolean", "break", "byte", "case", "catch",
@@ -38,7 +38,7 @@ public class JavaTarget extends Target {
 	};
 
 	/** Avoid grammar symbols in this set to prevent conflicts in gen'd code. */
-	protected final Set<String> badWords = new HashSet<String>();
+	protected final Set<String> badWords = new HashSet<>();
 
 	public JavaTarget(CodeGenerator gen) {
 		super(gen, "Java");

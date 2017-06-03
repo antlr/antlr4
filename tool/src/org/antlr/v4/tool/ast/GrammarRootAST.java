@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class GrammarRootAST extends GrammarASTWithOptions {
-	public static final Map<String, String> defaultOptions = new HashMap<String, String>();
+	public static final Map<String, String> defaultOptions = new HashMap<>();
 	static {
 		defaultOptions.put("language","Java");
 	}

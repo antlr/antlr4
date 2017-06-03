@@ -16,7 +16,7 @@ import java.util.Map;
  */
 public class OrderedHashMap<K,V> extends LinkedHashMap<K,V> {
 	/** Track the elements as they are added to the set */
-	protected List<K> elements = new ArrayList<K>();
+	protected List<K> elements = new ArrayList<>();
 
 	public K getKey(int i) { return elements.get(i); }
 

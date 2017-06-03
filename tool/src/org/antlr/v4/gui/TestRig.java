@@ -44,7 +44,7 @@ public class TestRig {
 
 	protected String grammarName;
 	protected String startRuleName;
-	protected final List<String> inputFiles = new ArrayList<String>();
+	protected final List<String> inputFiles = new ArrayList<>();
 	protected boolean printTree = false;
 	protected boolean gui = false;
 	protected String psFile = null;

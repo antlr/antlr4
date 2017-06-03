@@ -26,12 +26,12 @@ public class LeftRecursionDetector {
 	public ATN atn;
 
 	/** Holds a list of cycles (sets of rule names). */
-	public List<Set<Rule>> listOfRecursiveCycles = new ArrayList<Set<Rule>>();
+	public List<Set<Rule>> listOfRecursiveCycles = new ArrayList<>();
 
 	/** Which rule start states have we visited while looking for a single
 	 * 	left-recursion check?
 	 */
-	Set<RuleStartState> rulesVisitedPerRuleCheck = new HashSet<RuleStartState>();
+	 Set<RuleStartState> rulesVisitedPerRuleCheck = new HashSet<>();
 
 	public LeftRecursionDetector(Grammar g, ATN atn) {
 		this.g = g;
@@ -121,7 +121,7 @@ public class LeftRecursionDetector {
 			}
 		}
 		if ( !foundCycle ) {
-			Set<Rule> cycle = new OrderedHashSet<Rule>();
+			Set<Rule> cycle = new OrderedHashSet<>();
 			cycle.add(targetRule);
 			cycle.add(enclosingRule);
 			listOfRecursiveCycles.add(cycle);

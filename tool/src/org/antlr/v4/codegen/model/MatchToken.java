@@ -20,7 +20,7 @@ import java.util.List;
 public class MatchToken extends RuleElement implements LabeledOp {
 	public String name;
 	public int ttype;
-	public List<Decl> labels = new ArrayList<Decl>();
+	public List<Decl> labels = new ArrayList<>();
 
 	public MatchToken(OutputModelFactory factory, TerminalAST ast) {
 		super(factory, ast);

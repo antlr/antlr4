@@ -149,7 +149,7 @@ public class ATNOptimizer {
 
 	private static void optimizeStates(ATN atn) {
 //		System.out.println(atn.states);
-		List<ATNState> compressed = new ArrayList<ATNState>();
+		List<ATNState> compressed = new ArrayList<>();
 		int i = 0; // new state number
 		for (ATNState s : atn.states) {
 			if ( s!=null ) {

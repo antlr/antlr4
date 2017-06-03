@@ -57,7 +57,7 @@ public class OutputModelController {
 	public OutputModelFactory delegate;
 
 	/** Post-processing CodeGeneratorExtension objects; done in order given. */
-	public List<CodeGeneratorExtension> extensions = new ArrayList<CodeGeneratorExtension>();
+	public List<CodeGeneratorExtension> extensions = new ArrayList<>();
 
 	/** While walking code in rules, this is set to the tree walker that
 	 *  triggers actions.
@@ -68,7 +68,7 @@ public class OutputModelController {
 	public int codeBlockLevel = -1;
 	public int treeLevel = -1;
 	public OutputModelObject root; // normally ParserFile, LexerFile, ...
-	public Stack<RuleFunction> currentRule = new Stack<RuleFunction>();
+	public Stack<RuleFunction> currentRule = new Stack<>();
 	public Alternative currentOuterMostAlt;
 	public CodeBlock currentBlock;
 	public CodeBlockForOuterMostAlt currentOuterMostAlternativeBlock;
@@ -193,7 +193,7 @@ public class OutputModelController {
 
 		// pick out alt(s) for primaries
 		CodeBlockForOuterMostAlt outerAlt = (CodeBlockForOuterMostAlt)function.code.get(0);
-		List<CodeBlockForAlt> primaryAltsCode = new ArrayList<CodeBlockForAlt>();
+		List<CodeBlockForAlt> primaryAltsCode = new ArrayList<>();
 		SrcOp primaryStuff = outerAlt.ops.get(0);
 		if ( primaryStuff instanceof Choice ) {
 			Choice primaryAltBlock = (Choice) primaryStuff;
@@ -206,7 +206,7 @@ public class OutputModelController {
 		// pick out alt(s) for op alts
 		StarBlock opAltStarBlock = (StarBlock)outerAlt.ops.get(1);
 		CodeBlockForAlt altForOpAltBlock = opAltStarBlock.alts.get(0);
-		List<CodeBlockForAlt> opAltsCode = new ArrayList<CodeBlockForAlt>();
+		List<CodeBlockForAlt> opAltsCode = new ArrayList<>();
 		SrcOp opStuff = altForOpAltBlock.ops.get(0);
 		if ( opStuff instanceof AltBlock ) {
 			AltBlock opAltBlock = (AltBlock)opStuff;
