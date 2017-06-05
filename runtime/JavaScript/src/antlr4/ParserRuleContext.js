@@ -35,8 +35,6 @@ var ErrorNodeImpl = Tree.ErrorNodeImpl;
 var Interval = require("./IntervalSet").Interval;
 
 function ParserRuleContext(parent, invokingStateNumber) {
-	parent = parent || null;
-	invokingStateNumber = invokingStateNumber || null;
 	RuleContext.call(this, parent, invokingStateNumber);
 	this.ruleIndex = -1;
     // * If we are debugging or building a parse tree for a visitor,
