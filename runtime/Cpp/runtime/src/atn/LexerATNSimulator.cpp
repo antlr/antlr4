@@ -605,11 +605,15 @@ void LexerATNSimulator::setCharPositionInLine(size_t charPositionInLine) {
 
 void LexerATNSimulator::consume(CharStream *input) {
   size_t curChar = input->LA(1);
-  if (curChar == '\n') {
-    _line++;
+  if ((curChar == '\n')
+      || (curChar == 0x2028 /*'\u2028'*/)
+      || (curChar == 0x2029 /*'\u2029'*/)
+      || (curChar == 0x0085 /*'\u0085'*/)
+      || (curChar == 0x000C /*'\u000C'*/)) {
+    ++_line;
     _charPositionInLine = 0;
   } else {
-    _charPositionInLine++;
+    ++_charPositionInLine;
   }
   input->consume();
 }
