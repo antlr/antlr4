@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <cstddef>
+#include <stddef.h>
 
 namespace antlr4 {
 namespace atn {
