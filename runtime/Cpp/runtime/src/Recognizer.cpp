@@ -27,6 +27,10 @@ Recognizer::Recognizer() {
   _proxListener.addErrorListener(&ConsoleErrorListener::INSTANCE);
 }
 
+Recognizer::~Recognizer()
+{
+}
+
 dfa::Vocabulary const& Recognizer::getVocabulary() const {
   static dfa::Vocabulary vocabulary = dfa::Vocabulary::fromTokenNames(getTokenNames());
   return vocabulary;

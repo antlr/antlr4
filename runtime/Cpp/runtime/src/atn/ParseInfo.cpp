@@ -13,6 +13,10 @@ using namespace antlr4::atn;
 ParseInfo::ParseInfo(ProfilingATNSimulator *atnSimulator) : _atnSimulator(atnSimulator) {
 }
 
+ParseInfo::~ParseInfo()
+{
+}
+
 std::vector<DecisionInfo> ParseInfo::getDecisionInfo() {
   return _atnSimulator->getDecisionInfo();
 }

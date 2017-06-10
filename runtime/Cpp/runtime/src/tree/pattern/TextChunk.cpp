@@ -16,6 +16,10 @@ TextChunk::TextChunk(const std::string &text) : text(text) {
 
 }
 
+TextChunk::~TextChunk()
+{
+}
+
 std::string TextChunk::getText() {
   return text;
 }

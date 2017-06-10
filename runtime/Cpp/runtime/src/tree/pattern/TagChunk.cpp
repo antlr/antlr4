@@ -19,6 +19,10 @@ TagChunk::TagChunk(const std::string &label, const std::string &tag) : _tag(tag)
 
 }
 
+TagChunk::~TagChunk()
+{
+}
+
 std::string TagChunk::getTag() {
   return _tag;
 }

@@ -12,6 +12,7 @@
 #include <fstream>
 #include <iostream>
 #include <iterator>
+#include <limits>
 #include <limits.h>
 #include <list>
 #include <map>
@@ -76,7 +77,7 @@
   class ANTLR4CPP_PUBLIC std::exception; // Needed for VS 2015.
 #endif
 
-#elif __APPLE__
+#elif defined(__APPLE__)
   #define GUID_CFUUID
   #if __GNUC__ >= 4
     #define ANTLR4CPP_PUBLIC __attribute__ ((visibility ("default")))
@@ -120,5 +121,5 @@
 #undef EOF
 #endif
 
-#define INVALID_INDEX (size_t)-1
+#define INVALID_INDEX std::numeric_limits<size_t>::max()
 template<class T> using Ref = std::shared_ptr<T>;

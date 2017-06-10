@@ -15,7 +15,7 @@ namespace antlr4 {
   template<typename Symbol>
   class ANTLR4CPP_PUBLIC TokenFactory {
   public:
-    virtual ~TokenFactory() {};
+    virtual ~TokenFactory() {}
 
     /// This is the method used to create tokens in the lexer and in the
     /// error handling strategy. If text!=null, than the start and stop positions

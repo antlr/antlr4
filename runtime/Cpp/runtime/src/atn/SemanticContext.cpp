@@ -13,6 +13,10 @@ using namespace antlr4;
 using namespace antlr4::atn;
 using namespace antlrcpp;
 
+SemanticContext::~SemanticContext()
+{
+}
+
 //------------------ Predicate -----------------------------------------------------------------------------------------
 
 SemanticContext::Predicate::Predicate() : Predicate(INVALID_INDEX, INVALID_INDEX, false) {
@@ -365,4 +369,8 @@ std::vector<Ref<SemanticContext::PrecedencePredicate>> SemanticContext::filterPr
   }
 
   return result;
+}
+
+SemanticContext::Operator::~Operator()
+{
 }

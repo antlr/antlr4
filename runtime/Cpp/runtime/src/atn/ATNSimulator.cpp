@@ -23,6 +23,10 @@ ATNSimulator::ATNSimulator(const ATN &atn, PredictionContextCache &sharedContext
 : atn(atn), _sharedContextCache(sharedContextCache) {
 }
 
+ATNSimulator::~ATNSimulator()
+{
+}
+
 void ATNSimulator::clearDFA() {
   throw UnsupportedOperationException("This ATN simulator does not support clearing the DFA.");
 }

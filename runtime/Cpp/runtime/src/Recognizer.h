@@ -11,10 +11,13 @@ namespace antlr4 {
 
   class ANTLR4CPP_PUBLIC Recognizer {
   public:
-    static const size_t EOF = (size_t)-1;
+    static const size_t EOF = std::numeric_limits<size_t>::max();
 
     Recognizer();
-    virtual ~Recognizer() {};
+    Recognizer(Recognizer const&) = delete;
+    virtual ~Recognizer();
+
+    Recognizer& operator=(Recognizer const&) = delete;
 
     /** Used to print out token names like ID during debugging and
      *  error reporting.  The generated parsers implement a method

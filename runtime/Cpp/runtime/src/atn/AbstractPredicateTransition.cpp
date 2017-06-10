@@ -9,3 +9,7 @@ using namespace antlr4::atn;
 
 AbstractPredicateTransition::AbstractPredicateTransition(ATNState *target) : Transition(target) {
 }
+
+AbstractPredicateTransition::~AbstractPredicateTransition()
+{
+}

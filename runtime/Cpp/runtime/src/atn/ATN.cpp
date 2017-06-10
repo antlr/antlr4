@@ -36,7 +36,7 @@ ATN::ATN(ATN &&other) {
   modeToStartState = std::move(other.modeToStartState);
 }
 
-ATN::ATN(ATNType grammarType, size_t maxTokenType) : grammarType(grammarType), maxTokenType(maxTokenType) {
+ATN::ATN(ATNType grammarType_in, size_t maxTokenType_in) : grammarType(grammarType_in), maxTokenType(maxTokenType_in) {
 }
 
 ATN::~ATN() {

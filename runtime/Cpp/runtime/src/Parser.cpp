@@ -33,7 +33,11 @@ using namespace antlrcpp;
 
 std::map<std::vector<uint16_t>, atn::ATN> Parser::bypassAltsAtnCache;
 
-Parser::TraceListener::TraceListener(Parser *outerInstance) : outerInstance(outerInstance) {
+Parser::TraceListener::TraceListener(Parser *outerInstance_in) : outerInstance(outerInstance_in) {
+}
+
+Parser::TraceListener::~TraceListener()
+{
 }
 
 void Parser::TraceListener::enterEveryRule(ParserRuleContext *ctx) {
@@ -55,6 +59,10 @@ void Parser::TraceListener::exitEveryRule(ParserRuleContext *ctx) {
 }
 
 Parser::TrimToSizeListener Parser::TrimToSizeListener::INSTANCE;
+
+Parser::TrimToSizeListener::~TrimToSizeListener()
+{
+}
 
 void Parser::TrimToSizeListener::enterEveryRule(ParserRuleContext * /*ctx*/) {
 }

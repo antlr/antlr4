@@ -47,7 +47,7 @@ const atn::ATN& XPathLexer::getATN() const {
 
 void XPathLexer::action(RuleContext *context, size_t ruleIndex, size_t actionIndex) {
   switch (ruleIndex) {
-    case 4: IDAction(dynamic_cast<antlr4::RuleContext *>(context), actionIndex); break;
+    case 4: IDAction(context, actionIndex); break;
 
   default:
     break;

@@ -92,9 +92,7 @@ struct Any
     return *this;
   }
 
-  virtual ~Any() {
-    delete _ptr;
-  }
+  virtual ~Any();
 
   virtual bool equals(Any other) const {
     return _ptr == other._ptr;
@@ -102,7 +100,7 @@ struct Any
 
 private:
   struct Base {
-    virtual ~Base() { }
+    virtual ~Base();
     virtual Base* clone() const = 0;
   };
 

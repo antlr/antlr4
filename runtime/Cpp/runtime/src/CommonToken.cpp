@@ -35,7 +35,7 @@ CommonToken::CommonToken(std::pair<TokenSource*, CharStream*> source, size_t typ
   _start = start;
   _stop = stop;
   if (_source.first != nullptr) {
-    _line = (int)source.first->getLine();
+    _line = static_cast<int>(source.first->getLine());
     _charPositionInLine = source.first->getCharPositionInLine();
   }
 }

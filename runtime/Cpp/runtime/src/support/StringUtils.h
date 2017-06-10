@@ -20,7 +20,7 @@ namespace antlrcpp {
   template<typename T>
   inline std::string utf32_to_utf8(T _data)
   {
-    #if _MSC_VER > 1900 && _MSC_VER < 2000
+    #if defined(_MSC_VER) && _MSC_VER > 1900 && _MSC_VER < 2000
       auto p = reinterpret_cast<const int32_t *>(_data.data());
       return antlrcpp::utfConverter.to_bytes(p, p + _data.size());
     #else
@@ -30,7 +30,7 @@ namespace antlrcpp {
 
   inline auto utf8_to_utf32(const char* first, const char* last)
   {
-    #if _MSC_VER > 1900 && _MSC_VER < 2000
+    #if defined(_MSC_VER) && _MSC_VER > 1900 && _MSC_VER < 2000
       auto r = antlrcpp::utfConverter.from_bytes(first, last);
       std::u32string s = reinterpret_cast<const char32_t *>(r.data());
       return s;

@@ -19,6 +19,10 @@ LexerActionExecutor::LexerActionExecutor(const std::vector<Ref<LexerAction>> &le
   : _lexerActions(lexerActions), _hashCode(generateHashCode()) {
 }
 
+LexerActionExecutor::~LexerActionExecutor()
+{
+}
+
 Ref<LexerActionExecutor> LexerActionExecutor::append(Ref<LexerActionExecutor> const& lexerActionExecutor,
                                                      Ref<LexerAction> const& lexerAction) {
   if (lexerActionExecutor == nullptr) {

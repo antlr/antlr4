@@ -31,6 +31,10 @@ using namespace antlr4;
 using namespace antlr4::atn;
 using namespace antlrcpp;
 
+LexerATNSimulator::SimState::~SimState()
+{
+}
+
 void LexerATNSimulator::SimState::reset() {
   index = INVALID_INDEX;
   line = 0;
@@ -82,8 +86,6 @@ size_t LexerATNSimulator::match(CharStream *input, size_t mode) {
   } else {
     return execATN(input, dfa.s0);
   }
-
-  return Token::EOF;
 }
 
 void LexerATNSimulator::reset() {

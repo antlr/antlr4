@@ -18,11 +18,11 @@ namespace antlr4 {
 
     /// During lookahead operations, this "token" signifies we hit rule end ATN state
     /// and did not follow it despite needing to.
-    static const size_t EPSILON = (size_t)-2;
+    static const size_t EPSILON = std::numeric_limits<size_t>::max() - 1;
     static const size_t MIN_USER_TOKEN_TYPE = 1;
     static const size_t EOF = IntStream::EOF;
 
-    virtual ~Token() {};
+    virtual ~Token();
 
     /// All tokens go to the parser (unless skip() is called in that rule)
     /// on a particular "channel".  The parser tunes to a particular channel

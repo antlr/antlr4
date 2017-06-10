@@ -43,7 +43,7 @@ namespace atn {
      */
     static const Ref<SemanticContext> NONE;
 
-    virtual ~SemanticContext() {};
+    virtual ~SemanticContext();
 
     virtual size_t hashCode() const = 0;
     virtual std::string toString() const = 0;
@@ -144,6 +144,8 @@ namespace atn {
    */
   class ANTLR4CPP_PUBLIC SemanticContext::Operator : public SemanticContext {
   public:
+    ~Operator();
+
     /**
      * Gets the operands for the semantic context operator.
      *

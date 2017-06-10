@@ -22,3 +22,12 @@ IOException::IOException(const std::string &msg) : std::exception(), _message(ms
 const char* IOException::what() const NOEXCEPT {
   return _message.c_str();
 }
+
+IllegalStateException::~IllegalStateException() = default;
+IllegalArgumentException::~IllegalArgumentException() = default;
+NullPointerException::~NullPointerException() = default;
+IndexOutOfBoundsException::~IndexOutOfBoundsException() = default;
+UnsupportedOperationException::~UnsupportedOperationException() = default;
+EmptyStackException::~EmptyStackException() = default;
+CancellationException::~CancellationException() = default;
+ParseCancellationException::~ParseCancellationException() = default;

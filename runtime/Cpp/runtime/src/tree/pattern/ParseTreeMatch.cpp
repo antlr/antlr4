@@ -19,6 +19,10 @@ ParseTreeMatch::ParseTreeMatch(ParseTree *tree, const ParseTreePattern &pattern,
   }
 }
 
+ParseTreeMatch::~ParseTreeMatch()
+{
+}
+
 ParseTree* ParseTreeMatch::get(const std::string &label) {
   auto iterator = _labels.find(label);
   if (iterator == _labels.end() || iterator->second.empty()) {

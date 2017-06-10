@@ -62,18 +62,18 @@ void DefaultErrorStrategy::reportError(Parser *recognizer, const RecognitionExce
 
   beginErrorCondition(recognizer);
   if (is<const NoViableAltException *>(&e)) {
-    reportNoViableAlternative(recognizer, (const NoViableAltException &)e);
+    reportNoViableAlternative(recognizer, static_cast<const NoViableAltException &>(e));
   } else if (is<const InputMismatchException *>(&e)) {
-    reportInputMismatch(recognizer, (const InputMismatchException &)e);
+    reportInputMismatch(recognizer, static_cast<const InputMismatchException &>(e));
   } else if (is<const FailedPredicateException *>(&e)) {
-    reportFailedPredicate(recognizer, (const FailedPredicateException &)e);
+    reportFailedPredicate(recognizer, static_cast<const FailedPredicateException &>(e));
   } else if (is<const RecognitionException *>(&e)) {
     recognizer->notifyErrorListeners(e.getOffendingToken(), e.what(), std::current_exception());
   }
 }
 
 void DefaultErrorStrategy::recover(Parser *recognizer, std::exception_ptr /*e*/) {
-  if (lastErrorIndex == (int)recognizer->getInputStream()->index() &&
+  if (lastErrorIndex == static_cast<int>(recognizer->getInputStream()->index()) &&
       lastErrorStates.contains(recognizer->getState())) {
 
     // uh oh, another error at same token index and previously-visited
@@ -82,7 +82,7 @@ void DefaultErrorStrategy::recover(Parser *recognizer, std::exception_ptr /*e*/)
     // at least to prevent an infinite loop; this is a failsafe.
     recognizer->consume();
   }
-  lastErrorIndex = (int)recognizer->getInputStream()->index();
+  lastErrorIndex = static_cast<int>(recognizer->getInputStream()->index());
   lastErrorStates.add(recognizer->getState());
   misc::IntervalSet followSet = getErrorRecoverySet(recognizer);
   consumeUntil(recognizer, followSet);
@@ -312,7 +312,7 @@ misc::IntervalSet DefaultErrorStrategy::getErrorRecoverySet(Parser *recognizer) 
 
     if (ctx->parent == nullptr)
       break;
-    ctx = (RuleContext *)ctx->parent;
+    ctx = static_cast<RuleContext *>(ctx->parent);
   }
   recoverSet.remove(Token::EPSILON);
 

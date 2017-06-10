@@ -34,8 +34,20 @@ using namespace antlrcpp;
 ParseTreePatternMatcher::CannotInvokeStartRule::CannotInvokeStartRule(const RuntimeException &e) : RuntimeException(e.what()) {
 }
 
+ParseTreePatternMatcher::CannotInvokeStartRule::~CannotInvokeStartRule()
+{
+}
+
+ParseTreePatternMatcher::StartRuleDoesNotConsumeFullPattern::~StartRuleDoesNotConsumeFullPattern()
+{
+}
+
 ParseTreePatternMatcher::ParseTreePatternMatcher(Lexer *lexer, Parser *parser) : _lexer(lexer), _parser(parser) {
   InitializeInstanceFields();
+}
+
+ParseTreePatternMatcher::~ParseTreePatternMatcher()
+{
 }
 
 void ParseTreePatternMatcher::setDelimiters(const std::string &start, const std::string &stop, const std::string &escapeLeft) {

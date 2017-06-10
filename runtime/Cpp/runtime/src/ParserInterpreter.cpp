@@ -174,19 +174,19 @@ void ParserInterpreter::visitState(atn::ATNState *p) {
         // We are at the start of a left recursive rule's (...)* loop
         // and we're not taking the exit branch of loop.
         InterpreterRuleContext *localctx = createInterpreterRuleContext(_parentContextStack.top().first,
-          _parentContextStack.top().second, (int)_ctx->getRuleIndex());
-        pushNewRecursionContext(localctx, _atn.ruleToStartState[p->ruleIndex]->stateNumber, (int)_ctx->getRuleIndex());
+          _parentContextStack.top().second, static_cast<int>(_ctx->getRuleIndex()));
+        pushNewRecursionContext(localctx, _atn.ruleToStartState[p->ruleIndex]->stateNumber, static_cast<int>(_ctx->getRuleIndex()));
       }
       break;
 
     case atn::Transition::ATOM:
-      match((int)((atn::AtomTransition*)(transition))->_label);
+      match(static_cast<int>(static_cast<atn::AtomTransition*>(transition)->_label));
       break;
 
     case atn::Transition::RANGE:
     case atn::Transition::SET:
     case atn::Transition::NOT_SET:
-      if (!transition->matches((int)_input->LA(1), Token::MIN_USER_TOKEN_TYPE, Lexer::MAX_CHAR_VALUE)) {
+      if (!transition->matches(static_cast<int>(_input->LA(1)), Token::MIN_USER_TOKEN_TYPE, Lexer::MAX_CHAR_VALUE)) {
         recoverInline();
       }
       matchWildcard();
@@ -198,11 +198,11 @@ void ParserInterpreter::visitState(atn::ATNState *p) {
 
     case atn::Transition::RULE:
     {
-      atn::RuleStartState *ruleStartState = (atn::RuleStartState*)(transition->target);
+      atn::RuleStartState *ruleStartState = static_cast<atn::RuleStartState*>(transition->target);
       size_t ruleIndex = ruleStartState->ruleIndex;
       InterpreterRuleContext *newctx = createInterpreterRuleContext(_ctx, p->stateNumber, ruleIndex);
       if (ruleStartState->isLeftRecursiveRule) {
-        enterRecursionRule(newctx, ruleStartState->stateNumber, ruleIndex, ((atn::RuleTransition*)(transition))->precedence);
+        enterRecursionRule(newctx, ruleStartState->stateNumber, ruleIndex, static_cast<atn::RuleTransition*>(transition)->precedence);
       } else {
         enterRule(newctx, transition->target->stateNumber, ruleIndex);
       }
@@ -211,7 +211,7 @@ void ParserInterpreter::visitState(atn::ATNState *p) {
 
     case atn::Transition::PREDICATE:
     {
-      atn::PredicateTransition *predicateTransition = (atn::PredicateTransition*)(transition);
+      atn::PredicateTransition *predicateTransition = static_cast<atn::PredicateTransition*>(transition);
       if (!sempred(_ctx, predicateTransition->ruleIndex, predicateTransition->predIndex)) {
         throw FailedPredicateException(this);
       }
@@ -220,15 +220,15 @@ void ParserInterpreter::visitState(atn::ATNState *p) {
 
     case atn::Transition::ACTION:
     {
-      atn::ActionTransition *actionTransition = (atn::ActionTransition*)(transition);
+      atn::ActionTransition *actionTransition = static_cast<atn::ActionTransition*>(transition);
       action(_ctx, actionTransition->ruleIndex, actionTransition->actionIndex);
     }
       break;
 
     case atn::Transition::PRECEDENCE:
     {
-      if (!precpred(_ctx, ((atn::PrecedencePredicateTransition*)(transition))->precedence)) {
-        throw FailedPredicateException(this, "precpred(_ctx, " + std::to_string(((atn::PrecedencePredicateTransition*)(transition))->precedence) +  ")");
+      if (!precpred(_ctx, static_cast<atn::PrecedencePredicateTransition*>(transition)->precedence)) {
+        throw FailedPredicateException(this, "precpred(_ctx, " + std::to_string(static_cast<atn::PrecedencePredicateTransition*>(transition)->precedence) +  ")");
       }
     }
       break;
@@ -283,7 +283,7 @@ void ParserInterpreter::recover(RecognitionException &e) {
   if (_input->index() == i) {
     // no input consumed, better add an error node
     if (is<InputMismatchException *>(&e)) {
-      InputMismatchException &ime = (InputMismatchException&)e;
+      InputMismatchException &ime = static_cast<InputMismatchException&>(e);
       Token *tok = e.getOffendingToken();
       size_t expectedTokenType = ime.getExpectedTokens().getMinElement(); // get any element
       _errorToken = getTokenFactory()->create({ tok->getTokenSource(), tok->getTokenSource()->getInputStream() },
