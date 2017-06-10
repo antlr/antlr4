@@ -89,8 +89,11 @@ misc::IntervalSet ATN::nextTokens(ATNState *s, RuleContext *ctx) const {
 
 misc::IntervalSet& ATN::nextTokens(ATNState *s) const {
   if (s->nextTokenWithinRule.isEmpty()) {
-    s->nextTokenWithinRule = nextTokens(s, nullptr);
-    s->nextTokenWithinRule.setReadOnly(true);
+    auto candidate = nextTokens(s, nullptr);
+    if (!candidate.isEmpty() || !s->nextTokenWithinRule.isReadOnly()) {
+      s->nextTokenWithinRule = candidate;
+      s->nextTokenWithinRule.setReadOnly(true);
+    }
   }
   return s->nextTokenWithinRule;
 }
