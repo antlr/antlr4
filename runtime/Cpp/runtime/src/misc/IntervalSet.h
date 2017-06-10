@@ -38,7 +38,9 @@ namespace misc {
     IntervalSet(const IntervalSet &set);
     IntervalSet(int numArgs, ...);
 
-    virtual ~IntervalSet() {}
+    virtual ~IntervalSet();
+
+    IntervalSet& operator=(const IntervalSet &set);
 
     /// Create a set with a single element, el.
     static IntervalSet of(ssize_t a);
