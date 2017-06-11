@@ -9,14 +9,14 @@
 
 namespace antlrcpp {
 
-// For all conversions utf8 <-> utf32.
-// VS 2015 and VS 2017 have different bugs in std::codecvt_utf8<char32_t> (VS 2013 works fine).
+  // For all conversions utf8 <-> utf32.
+  // VS 2015 and VS 2017 have different bugs in std::codecvt_utf8<char32_t> (VS 2013 works fine).
 #if defined(_MSC_VER) && _MSC_VER >= 1900 && _MSC_VER < 2000
   typedef std::wstring_convert<std::codecvt_utf8<__int32>, __int32> UTF32Converter;
 #else
   typedef std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> UTF32Converter;
 #endif
-
+  
   // The conversion functions fails in VS2017, so we explicitly use a workaround.
   template<typename T>
   inline std::string utf32_to_utf8(T const& data)
