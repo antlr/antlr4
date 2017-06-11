@@ -24,9 +24,9 @@ Let's suppose that your grammar is named `MyGrammar`. The tool will generate for
 *  MyGrammarLexer.cs
 *   MyGrammarParser.cs
 *   MyGrammarListener.cs (if you have not activated the -no-listener option)
-*   MyGrammarBaseListener.js (if you have not activated the -no-listener option)
-*   MyGrammarVisitor.js (if you have activated the -visitor option)
-*   MyGrammarBaseVisitor.js (if you have activated the -visitor option)
+*   MyGrammarBaseListener.cs (if you have not activated the -no-listener option)
+*   MyGrammarVisitor.cs (if you have activated the -visitor option)
+*   MyGrammarBaseVisitor.cs (if you have activated the -visitor option)
 
 Now a fully functioning code might look like the following for start rule `StartRule`:
 

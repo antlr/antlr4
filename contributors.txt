@@ -148,3 +148,4 @@ YYYY/MM/DD, github id, Full name, email
 2017/05/11, jimallman, Jim Allman, jim@ibang.com
 2017/05/26, waf, Will Fuqua, wafuqua@gmail.com
 2017/05/29, kosak, Corey Kosak, kosak@kosak.com
+2017/06/11, erikbra, Erik A. Brandstadmoen, erik@brandstadmoen.net
