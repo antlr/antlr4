@@ -6,6 +6,7 @@
 #pragma once
 
 #include "misc/Interval.h"
+#include <atomic>
 
 namespace antlr4 {
 namespace misc {
@@ -30,7 +31,7 @@ namespace misc {
   protected:
     /// The list of sorted, disjoint intervals.
     std::vector<Interval> _intervals;
-    bool _readonly;
+    std::atomic<bool> _readonly;
 
   public:
     IntervalSet();

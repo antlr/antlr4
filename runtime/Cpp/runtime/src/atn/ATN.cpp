@@ -88,10 +88,10 @@ misc::IntervalSet ATN::nextTokens(ATNState *s, RuleContext *ctx) const {
 }
 
 misc::IntervalSet& ATN::nextTokens(ATNState *s) const {
-  if (s->nextTokenWithinRule.isEmpty()) {
-    auto candidate = nextTokens(s, nullptr);
-    if (!candidate.isEmpty() || !s->nextTokenWithinRule.isReadOnly()) {
-      s->nextTokenWithinRule = candidate;
+  if (!s->nextTokenWithinRule.isReadOnly()) {
+    std::unique_lock<std::mutex> lock { _mutex };
+    if (!s->nextTokenWithinRule.isReadOnly()) {
+      s->nextTokenWithinRule = nextTokens(s, nullptr);
       s->nextTokenWithinRule.setReadOnly(true);
     }
   }
