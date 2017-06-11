@@ -25,9 +25,9 @@ RuleContext::RuleContext(RuleContext *parent, size_t invokingState) {
   this->invokingState = invokingState;
 }
 
-int RuleContext::depth() {
+int RuleContext::depth() const {
   int n = 1;
-  RuleContext *p = this;
+  const RuleContext *p = this;
   while (true) {
     if (p->parent == nullptr)
       break;
@@ -37,15 +37,15 @@ int RuleContext::depth() {
   return n;
 }
 
-bool RuleContext::isEmpty() {
+bool RuleContext::isEmpty() const {
   return invokingState == ATNState::INVALID_STATE_NUMBER;
 }
 
-misc::Interval RuleContext::getSourceInterval() {
+misc::Interval RuleContext::getSourceInterval() const {
   return misc::Interval::INVALID;
 }
 
-std::string RuleContext::getText() {
+std::string RuleContext::getText() const {
   if (children.empty()) {
     return "";
   }
@@ -75,28 +75,28 @@ antlrcpp::Any RuleContext::accept(tree::ParseTreeVisitor *visitor) {
   return visitor->visitChildren(this);
 }
 
-std::string RuleContext::toStringTree(Parser *recog) {
+std::string RuleContext::toStringTree(Parser *recog) const {
   return tree::Trees::toStringTree(this, recog);
 }
 
-std::string RuleContext::toStringTree(std::vector<std::string> &ruleNames) {
+std::string RuleContext::toStringTree(std::vector<std::string> &ruleNames) const {
   return tree::Trees::toStringTree(this, ruleNames);
 }
 
-std::string RuleContext::toStringTree() {
+std::string RuleContext::toStringTree() const {
   return toStringTree(nullptr);
 }
 
 
-std::string RuleContext::toString(const std::vector<std::string> &ruleNames) {
+std::string RuleContext::toString(const std::vector<std::string> &ruleNames) const {
   return toString(ruleNames, nullptr);
 }
 
 
-std::string RuleContext::toString(const std::vector<std::string> &ruleNames, RuleContext *stop) {
+std::string RuleContext::toString(const std::vector<std::string> &ruleNames, RuleContext *stop) const {
   std::stringstream ss;
 
-  RuleContext *currentParent = this;
+  RuleContext const *currentParent = this;
   ss << "[";
   while (currentParent != stop) {
     if (ruleNames.empty()) {
@@ -123,15 +123,15 @@ std::string RuleContext::toString(const std::vector<std::string> &ruleNames, Rul
   return ss.str();
 }
 
-std::string RuleContext::toString() {
+std::string RuleContext::toString() const {
   return toString(nullptr);
 }
 
-std::string RuleContext::toString(Recognizer *recog) {
+std::string RuleContext::toString(Recognizer *recog) const {
   return toString(recog, &ParserRuleContext::EMPTY);
 }
 
-std::string RuleContext::toString(Recognizer *recog, RuleContext *stop) {
+std::string RuleContext::toString(Recognizer *recog, RuleContext *stop) const {
   if (recog == nullptr)
     return toString(std::vector<std::string>(), stop); // Don't use an initializer {} here or we end up calling ourselve recursivly.
   return toString(recog->getRuleNames(), stop);

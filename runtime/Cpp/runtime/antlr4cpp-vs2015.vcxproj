@@ -442,6 +442,7 @@
     <ClCompile Include="src\TokenStream.cpp" />
     <ClCompile Include="src\TokenStreamRewriter.cpp" />
     <ClCompile Include="src\tree\ErrorNodeImpl.cpp" />
+    <ClCompile Include="src\tree\ErrorNodeWithHidden.cpp" />
     <ClCompile Include="src\tree\IterativeParseTreeWalker.cpp" />
     <ClCompile Include="src\tree\ParseTree.cpp" />
     <ClCompile Include="src\tree\ParseTreeWalker.cpp" />
@@ -453,6 +454,7 @@
     <ClCompile Include="src\tree\pattern\TextChunk.cpp" />
     <ClCompile Include="src\tree\pattern\TokenTagToken.cpp" />
     <ClCompile Include="src\tree\TerminalNodeImpl.cpp" />
+    <ClCompile Include="src\tree\TerminalNodeWithHidden.cpp" />
     <ClCompile Include="src\tree\Trees.cpp" />
     <ClCompile Include="src\tree\xpath\XPath.cpp" />
     <ClCompile Include="src\tree\xpath\XPathElement.cpp" />
@@ -596,6 +598,7 @@
     <ClInclude Include="src\tree\AbstractParseTreeVisitor.h" />
     <ClInclude Include="src\tree\ErrorNode.h" />
     <ClInclude Include="src\tree\ErrorNodeImpl.h" />
+    <ClInclude Include="src\tree\ErrorNodeWithHidden.h" />
     <ClInclude Include="src\tree\IterativeParseTreeWalker.h" />
     <ClInclude Include="src\tree\ParseTree.h" />
     <ClInclude Include="src\tree\ParseTreeListener.h" />
@@ -614,6 +617,7 @@
     <ClInclude Include="src\tree\SyntaxTree.h" />
     <ClInclude Include="src\tree\TerminalNode.h" />
     <ClInclude Include="src\tree\TerminalNodeImpl.h" />
+    <ClInclude Include="src\tree\TerminalNodeWithHidden.h" />
     <ClInclude Include="src\tree\Trees.h" />
     <ClInclude Include="src\tree\xpath\XPath.h" />
     <ClInclude Include="src\tree\xpath\XPathElement.h" />

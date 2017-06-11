@@ -521,14 +521,14 @@ ParserRuleContext* Parser::getRuleContext() {
   return _ctx;
 }
 
-std::vector<std::string> Parser::getRuleInvocationStack() {
+std::vector<std::string> Parser::getRuleInvocationStack() const {
   return getRuleInvocationStack(_ctx);
 }
 
-std::vector<std::string> Parser::getRuleInvocationStack(RuleContext *p) {
+std::vector<std::string> Parser::getRuleInvocationStack(RuleContext const *p) const {
   std::vector<std::string> const& ruleNames = getRuleNames();
   std::vector<std::string> stack;
-  RuleContext *run = p;
+  const RuleContext *run = p;
   while (run != nullptr) {
     // compute what follows who invoked us
     size_t ruleIndex = run->getRuleIndex();

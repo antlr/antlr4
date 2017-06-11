@@ -123,25 +123,25 @@ namespace antlr4 {
       return contexts;
     }
 
-    virtual misc::Interval getSourceInterval() override;
+    virtual misc::Interval getSourceInterval() const override;
 
     /**
      * Get the initial token in this context.
      * Note that the range from start to stop is inclusive, so for rules that do not consume anything
      * (for example, zero length or error productions) this token may exceed stop.
      */
-    virtual Token *getStart();
+    virtual Token *getStart() const;
 
     /**
      * Get the final token in this context.
      * Note that the range from start to stop is inclusive, so for rules that do not consume anything
      * (for example, zero length or error productions) this token may precede start.
      */
-    virtual Token *getStop();
+    virtual Token *getStop() const;
 
     /// <summary>
     /// Used for rule context info debugging during parse-time, not so much for ATN debugging </summary>
-    virtual std::string toInfoString(Parser *recognizer);
+    virtual std::string toInfoString(Parser *recognizer) const;
   };
 
 } // namespace antlr4

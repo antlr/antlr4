@@ -340,9 +340,9 @@ namespace antlr4 {
     ///
     ///  This is very useful for error messages.
     /// </summary>
-    virtual std::vector<std::string> getRuleInvocationStack();
+    virtual std::vector<std::string> getRuleInvocationStack() const;
 
-    virtual std::vector<std::string> getRuleInvocationStack(RuleContext *p);
+    virtual std::vector<std::string> getRuleInvocationStack(RuleContext const *p) const;
 
     /// <summary>
     /// For debugging and other purposes. </summary>

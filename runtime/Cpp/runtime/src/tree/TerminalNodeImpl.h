@@ -16,16 +16,16 @@ namespace tree {
 
     TerminalNodeImpl(Token *symbol);
 
-    virtual Token* getSymbol() override;
-    virtual void setParent(RuleContext *parent) override;
-    virtual misc::Interval getSourceInterval() override;
+    virtual Token* getSymbol() const override;
+    virtual void setParent(RuleContext *aParent) override;
+    virtual misc::Interval getSourceInterval() const override;
 
     virtual antlrcpp::Any accept(ParseTreeVisitor *visitor) override;
 
-    virtual std::string getText() override;
-    virtual std::string toStringTree(Parser *parser) override;
-    virtual std::string toString() override;
-    virtual std::string toStringTree() override;
+    virtual std::string getText() const override;
+    virtual std::string toStringTree(Parser *parser) const override;
+    virtual std::string toString() const override;
+    virtual std::string toStringTree() const override;
 
   };
 

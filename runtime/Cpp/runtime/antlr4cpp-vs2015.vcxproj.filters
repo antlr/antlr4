@@ -537,6 +537,12 @@
     <ClInclude Include="src\tree\IterativeParseTreeWalker.h">
       <Filter>Header Files\tree</Filter>
     </ClInclude>
+    <ClInclude Include="src\tree\ErrorNodeWithHidden.h">
+      <Filter>Header Files\tree</Filter>
+    </ClInclude>
+    <ClInclude Include="src\tree\TerminalNodeWithHidden.h">
+      <Filter>Header Files\tree</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\ANTLRFileStream.cpp">
@@ -936,6 +942,12 @@
       <Filter>Source Files\tree</Filter>
     </ClCompile>
     <ClCompile Include="src\tree\IterativeParseTreeWalker.cpp">
+      <Filter>Source Files\tree</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tree\ErrorNodeWithHidden.cpp">
+      <Filter>Source Files\tree</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tree\TerminalNodeWithHidden.cpp">
       <Filter>Source Files\tree</Filter>
     </ClCompile>
   </ItemGroup>
