@@ -19,6 +19,12 @@ open class Recognizer<ATNInterpreter:ATNSimulator> {
     public var _interp: ATNInterpreter!
 
     private var _stateNumber: Int = -1
+    
+    /// mutex for tokenTypeMapCache updates
+    private var tokenTypeMapCacheMutex = Mutex()
+    
+    /// mutex for ruleIndexMapCacheMutex updates
+    private var ruleIndexMapCacheMutex = Mutex()
 
     /** Used to print out token names like ID during debugging and
      *  error reporting.  The generated parsers implement a method
@@ -57,7 +63,7 @@ open class Recognizer<ATNInterpreter:ATNSimulator> {
     public func getTokenTypeMap() -> Dictionary<String, Int> {
         let vocabulary: Vocabulary = getVocabulary()
         var result: Dictionary<String, Int>? = self.tokenTypeMapCache[vocabulary]
-        synced(tokenTypeMapCache) {
+        tokenTypeMapCacheMutex.synchronized {
             [unowned self] in
             if result == nil {
                 result = Dictionary<String, Int>()
@@ -80,8 +86,6 @@ open class Recognizer<ATNInterpreter:ATNSimulator> {
 
                 self.tokenTypeMapCache[vocabulary] = result!
             }
-
-
         }
         return result!
 
@@ -96,12 +100,11 @@ open class Recognizer<ATNInterpreter:ATNSimulator> {
         let ruleNames: [String] = getRuleNames()
 
         let result: Dictionary<String, Int>? = self.ruleIndexMapCache[ArrayWrapper<String>(ruleNames)]
-        synced(ruleIndexMapCache) {
+        ruleIndexMapCacheMutex.synchronized {
             [unowned self] in
             if result == nil {
                 self.ruleIndexMapCache[ArrayWrapper<String>(ruleNames)] = Utils.toMap(ruleNames)
             }
-
         }
         return result!
 
@@ -212,9 +215,9 @@ open class Recognizer<ATNInterpreter:ATNSimulator> {
                 s = "<\(t.getType())>"
             }
         }
-        s = s.replaceAll("\n", replacement: "\\n")
-        s = s.replaceAll("\r", replacement: "\\r")
-        s = s.replaceAll("\t", replacement: "\\t")
+        s = s.replacingOccurrences(of: "\n", with: "\\n")
+        s = s.replacingOccurrences(of: "\r", with: "\\r")
+        s = s.replacingOccurrences(of: "\t", with: "\\t")
         return "\(s)"
     }
 

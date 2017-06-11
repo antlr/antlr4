@@ -236,9 +236,9 @@ public class CommonToken: WritableToken {
         }
         var txt: String
         if let tokenText = getText() {
-            txt = tokenText.replaceAll("\n", replacement: "\\n")
-            txt = txt.replaceAll("\r", replacement: "\\r")
-            txt = txt.replaceAll("\t", replacement: "\\t")
+            txt = tokenText.replacingOccurrences(of: "\n", with: "\\n")
+            txt = txt.replacingOccurrences(of: "\r", with: "\\r")
+            txt = txt.replacingOccurrences(of: "\t", with: "\\t")
         } else {
             txt = "<no text>"
         }

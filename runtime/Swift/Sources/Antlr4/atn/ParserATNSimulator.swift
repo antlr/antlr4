@@ -265,13 +265,18 @@ open class ParserATNSimulator: ATNSimulator {
     internal var _startIndex: Int = 0
     internal var _outerContext: ParserRuleContext!
     internal var _dfa: DFA?
+    
+    /// mutex for DFAState change
+    private var dfaStateMutex = Mutex()
+    
+    /// mutex for changes in a DFAStates map
+    private var dfaStatesMutex = Mutex()
 
-    /// Testing only!
-     //	public convenience init(_ atn : ATN, _ decisionToDFA : [DFA],
-     //							  _ sharedContextCache : PredictionContextCache)
-     //	{
-     //		self.init(nil, atn, decisionToDFA, sharedContextCache);
-     //	}
+//    /// Testing only!
+//    public convenience init(_ atn : ATN, _ decisionToDFA : [DFA],
+//                              _ sharedContextCache : PredictionContextCache) {
+//        self.init(nil, atn, decisionToDFA, sharedContextCache);
+//    }
 
     public init(_ parser: Parser, _ atn: ATN,
         _ decisionToDFA: [DFA],
@@ -1972,7 +1977,7 @@ open class ParserATNSimulator: ATNSimulator {
         guard let from = from else {
             return to
         }
-        synced(from) {
+        dfaStateMutex.synchronized {
             [unowned self] in
             if from.edges == nil {
                 from.edges = [DFAState?](repeating: nil, count: self.atn.maxTokenType + 1 + 1)       //new DFAState[atn.maxTokenType+1+1];
@@ -2006,25 +2011,26 @@ open class ParserATNSimulator: ATNSimulator {
         if D == ATNSimulator.ERROR {
             return D
         }
-        //TODO: synced (dfa.states) {
-        //synced (dfa.states) {
-        let existing = dfa.states[D]
-        if existing != nil {
-            return existing!!
-        }
+        
+        return try dfaStatesMutex.synchronized {
+            if let existing = dfa.states[D] {
+                return existing!
+            }
 
-        D.stateNumber = dfa.states.count
-        if !D.configs.isReadonly() {
-            try D.configs.optimizeConfigs(self)
-            D.configs.setReadonly(true)
-        }
-        dfa.states[D] = D
-        if debug {
-            print("adding new DFA state: \(D)")
-        }
+            D.stateNumber = dfa.states.count
+            
+            if !D.configs.isReadonly() {
+                try D.configs.optimizeConfigs(self)
+                D.configs.setReadonly(true)
+            }
+            
+            dfa.states[D] = D
+            if debug {
+                print("adding new DFA state: \(D)")
+            }
 
-        //}
-        return D
+            return D
+        }
     }
 
     func reportAttemptingFullContext(_ dfa: DFA, _ conflictingAlts: BitSet?, _ configs: ATNConfigSet, _ startIndex: Int, _ stopIndex: Int) throws {

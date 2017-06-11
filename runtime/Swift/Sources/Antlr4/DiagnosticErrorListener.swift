@@ -56,12 +56,10 @@ public class DiagnosticErrorListener: BaseErrorListener {
                 return
             }
 
-            let format: String = "reportAmbiguity d=%@: ambigAlts=%@, input='%@'"
-            let decision: String = getDecisionDescription(recognizer, dfa)
-            let conflictingAlts: BitSet = try getConflictingAlts(ambigAlts, configs)
-            let text: String = try recognizer.getTokenStream()!.getText(Interval.of(startIndex, stopIndex))
-
-            let message: String = NSString(format: format as NSString, decision, conflictingAlts.description, text) as String
+            let decision = getDecisionDescription(recognizer, dfa)
+            let conflictingAlts = try getConflictingAlts(ambigAlts, configs)
+            let text = try recognizer.getTokenStream()!.getText(Interval.of(startIndex, stopIndex))
+            let message = "reportAmbiguity d=\(decision): ambigAlts=\(conflictingAlts), input='\(text)'"
             try recognizer.notifyErrorListeners(message)
     }
 
@@ -72,10 +70,9 @@ public class DiagnosticErrorListener: BaseErrorListener {
         _ stopIndex: Int,
         _ conflictingAlts: BitSet?,
         _ configs: ATNConfigSet) throws {
-            let format: String = "reportAttemptingFullContext d=%@, input='%@'"
-            let decision: String = getDecisionDescription(recognizer, dfa)
-            let text: String = try recognizer.getTokenStream()!.getText(Interval.of(startIndex, stopIndex))
-            let message: String = NSString(format: format as NSString, decision, text) as String
+            let decision = getDecisionDescription(recognizer, dfa)
+            let text = try recognizer.getTokenStream()!.getText(Interval.of(startIndex, stopIndex))
+            let message = "reportAttemptingFullContext d=\(decision), input='\(text)'"
             try recognizer.notifyErrorListeners(message)
     }
 
@@ -86,10 +83,9 @@ public class DiagnosticErrorListener: BaseErrorListener {
         _ stopIndex: Int,
         _ prediction: Int,
         _ configs: ATNConfigSet) throws {
-            let format: String = "reportContextSensitivity d=%@, input='%@'"
-            let decision: String = getDecisionDescription(recognizer, dfa)
-            let text: String = try recognizer.getTokenStream()!.getText(Interval.of(startIndex, stopIndex))
-            let message: String = NSString(format: format as NSString, decision, text) as String
+            let decision = getDecisionDescription(recognizer, dfa)
+            let text = try recognizer.getTokenStream()!.getText(Interval.of(startIndex, stopIndex))
+            let message = "reportContextSensitivity d=\(decision), input='\(text)'"
             try recognizer.notifyErrorListeners(message)
     }
 
@@ -107,8 +103,7 @@ public class DiagnosticErrorListener: BaseErrorListener {
         if ruleName.isEmpty {
             return String(decision)
         }
-
-        return NSString(format: "%d (%@)", decision, ruleName) as String
+        return "\(decision) (\(ruleName))"
     }
 
     /// Computes the set of conflicting or ambiguous alternatives from a
@@ -127,4 +122,5 @@ public class DiagnosticErrorListener: BaseErrorListener {
         let result = try configs.getAltBitSet()
         return result
     }
+    
 }
