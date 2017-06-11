@@ -41,15 +41,15 @@ import java.util.Set;
 public class SymbolChecks {
     Grammar g;
     SymbolCollector collector;
-    Map<String, Rule> nameToRuleMap = new HashMap<String, Rule>();
-	Set<String> tokenIDs = new HashSet<String>();
-    Map<String, Set<String>> actionScopeToActionNames = new HashMap<String, Set<String>>();
+     Map<String, Rule> nameToRuleMap = new HashMap<>();
+	 Set<String> tokenIDs = new HashSet<>();
+     Map<String, Set<String>> actionScopeToActionNames = new HashMap<>();
 //	DoubleKeyMap<String, String, GrammarAST> namedActions =
 //		new DoubleKeyMap<String, String, GrammarAST>();
 
 	public ErrorManager errMgr;
 
-	protected final Set<String> reservedNames = new HashSet<String>();
+	protected final Set<String> reservedNames = new HashSet<>();
 	{
 		reservedNames.addAll(LexerATNFactory.getCommonConstants());
 	}

@@ -26,13 +26,13 @@ public class VisitorFile extends OutputFile {
 	/**
 	 * The names of all rule contexts which may need to be visited.
 	 */
-	public Set<String> visitorNames = new LinkedHashSet<String>();
+	public Set<String> visitorNames = new LinkedHashSet<>();
 	/**
 	 * For rule contexts created for a labeled outer alternative, maps from
 	 * a listener context name to the name of the rule which defines the
 	 * context.
 	 */
-	public Map<String, String> visitorLabelRuleNames = new LinkedHashMap<String, String>();
+	public Map<String, String> visitorLabelRuleNames = new LinkedHashMap<>();
 
 	@ModelElement public Action header;
 	@ModelElement public Map<String, Action> namedActions;

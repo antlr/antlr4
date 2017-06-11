@@ -25,7 +25,7 @@ public class LeftRecursiveRule extends Rule {
 
 	/** Did we delete any labels on direct left-recur refs? Points at ID of ^(= ID el) */
 	public List<Pair<GrammarAST,String>> leftRecursiveRuleRefLabels =
-		new ArrayList<Pair<GrammarAST,String>>();
+		new ArrayList<>();
 
 	public LeftRecursiveRule(Grammar g, String name, RuleAST ast) {
 		super(g, name, ast, 1);
@@ -53,7 +53,7 @@ public class LeftRecursiveRule extends Rule {
 
 	@Override
 	public List<AltAST> getUnlabeledAltASTs() {
-		List<AltAST> alts = new ArrayList<AltAST>();
+		List<AltAST> alts = new ArrayList<>();
 		for (LeftRecursiveRuleAltInfo altInfo : recPrimaryAlts) {
 			if (altInfo.altLabel == null) alts.add(altInfo.originalAltAST);
 		}
@@ -115,7 +115,7 @@ public class LeftRecursiveRule extends Rule {
 	/** Get -&gt; labels from those alts we deleted for left-recursive rules. */
 	@Override
 	public Map<String, List<Pair<Integer, AltAST>>> getAltLabels() {
-		Map<String, List<Pair<Integer, AltAST>>> labels = new HashMap<String, List<Pair<Integer, AltAST>>>();
+		Map<String, List<Pair<Integer, AltAST>>> labels = new HashMap<>();
 		Map<String, List<Pair<Integer, AltAST>>> normalAltLabels = super.getAltLabels();
 		if ( normalAltLabels!=null ) labels.putAll(normalAltLabels);
 		if ( recPrimaryAlts!=null ) {

@@ -35,16 +35,16 @@ public class SymbolCollector extends GrammarTreeVisitor {
 	public Grammar g;
 
 	// stuff to collect
-	public List<GrammarAST> rulerefs = new ArrayList<GrammarAST>();
-	public List<GrammarAST> qualifiedRulerefs = new ArrayList<GrammarAST>();
-	public List<GrammarAST> terminals = new ArrayList<GrammarAST>();
-	public List<GrammarAST> tokenIDRefs = new ArrayList<GrammarAST>();
-	public Set<String> strings = new HashSet<String>();
-	public List<GrammarAST> tokensDefs = new ArrayList<GrammarAST>();
-	public List<GrammarAST> channelDefs = new ArrayList<GrammarAST>();
+	public List<GrammarAST> rulerefs = new ArrayList<>();
+	public List<GrammarAST> qualifiedRulerefs = new ArrayList<>();
+	public List<GrammarAST> terminals = new ArrayList<>();
+	public List<GrammarAST> tokenIDRefs = new ArrayList<>();
+	public Set<String> strings = new HashSet<>();
+	public List<GrammarAST> tokensDefs = new ArrayList<>();
+	public List<GrammarAST> channelDefs = new ArrayList<>();
 
 	/** Track action name node in @parser::members {...} or @members {...} */
-	List<GrammarAST> namedActions = new ArrayList<GrammarAST>();
+	 List<GrammarAST> namedActions = new ArrayList<>();
 
 	public ErrorManager errMgr;
 

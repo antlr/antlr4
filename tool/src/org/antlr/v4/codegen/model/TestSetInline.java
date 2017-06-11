@@ -32,7 +32,7 @@ public class TestSetInline extends SrcOp {
 										  IntervalSet set,
 										  int wordSize,
 										  boolean useZeroOffset) {
-		List<Bitset> bitsetList = new ArrayList<Bitset>();
+		List<Bitset> bitsetList = new ArrayList<>();
 		for (int ttype : set.toArray()) {
 			Bitset current = !bitsetList.isEmpty() ? bitsetList.get(bitsetList.size() - 1) : null;
 			if (current == null || ttype > (current.shift + wordSize-1)) {
@@ -55,6 +55,6 @@ public class TestSetInline extends SrcOp {
 
 	public static final class Bitset {
 		public int shift;
-		public final List<String> ttypes = new ArrayList<String>();
+		public final List<String> ttypes = new ArrayList<>();
 	}
 }

@@ -62,7 +62,7 @@ public class SwiftTarget extends Target {
     /**
      * The Swift target can cache the code generation templates.
      */
-    private static final ThreadLocal<STGroup> targetTemplates = new ThreadLocal<STGroup>();
+    private static final ThreadLocal<STGroup> targetTemplates = new ThreadLocal<>();
 
     protected static final String[] swiftKeywords = {
             "associatedtype", "class", "deinit", "enum", "extension", "func", "import", "init", "inout", "internal",
@@ -77,7 +77,7 @@ public class SwiftTarget extends Target {
  };
 
     /** Avoid grammar symbols in this set to prevent conflicts in gen'd code. */
-    protected final Set<String> badWords = new HashSet<String>();
+    protected final Set<String> badWords = new HashSet<>();
 
     public String lexerAtnJSON = null;
     public String parserAtnJSON = null;
@@ -200,8 +200,8 @@ public class SwiftTarget extends Target {
         //states
         int nedges = 0;
 
-        Map<IntervalSet, Integer> setIndices = new HashMap<IntervalSet, Integer>();
-        List<IntervalSet> sets = new ArrayList<IntervalSet>();
+        Map<IntervalSet, Integer> setIndices = new HashMap<>();
+        List<IntervalSet> sets = new ArrayList<>();
         JsonArrayBuilder statesBuilder = Json.createArrayBuilder() ;
         IntegerList nonGreedyStates = new IntegerList();
         IntegerList precedenceStates = new IntegerList();

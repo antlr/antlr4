@@ -14,7 +14,7 @@ import java.util.List;
 public class Parser extends Recognizer {
 	public ParserFile file;
 
-	@ModelElement public List<RuleFunction> funcs = new ArrayList<RuleFunction>();
+	@ModelElement public List<RuleFunction> funcs = new ArrayList<>();
 
 	public Parser(OutputModelFactory factory, ParserFile file) {
 		super(factory);

@@ -75,7 +75,7 @@ public class UseDefAnalyzer {
 	}
 
 	public static Map<Rule, Set<Rule>> getRuleDependencies(Grammar g, Collection<Rule> rules) {
-		Map<Rule, Set<Rule>> dependencies = new HashMap<Rule, Set<Rule>>();
+		Map<Rule, Set<Rule>> dependencies = new HashMap<>();
 
 		for (Rule r : rules) {
 			List<GrammarAST> tokenRefs = r.ast.getNodesWithType(ANTLRParser.TOKEN_REF);

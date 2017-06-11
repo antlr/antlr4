@@ -32,7 +32,7 @@ public abstract class OutputFile extends OutputModelObject {
     }
 
 	public Map<String, Action> buildNamedActions(Grammar g) {
-		Map<String, Action> namedActions = new HashMap<String, Action>();
+		Map<String, Action> namedActions = new HashMap<>();
 		for (String name : g.namedActions.keySet()) {
 			ActionAST ast = g.namedActions.get(name);
 			namedActions.put(name, new Action(factory, ast));

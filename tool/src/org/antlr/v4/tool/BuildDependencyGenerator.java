@@ -76,7 +76,7 @@ public class BuildDependencyGenerator {
      *  name files ANTLR will emit from T.g.
      */
     public List<File> getGeneratedFileList() {
-        List<File> files = new ArrayList<File>();
+        List<File> files = new ArrayList<>();
 
         // add generated recognizer; e.g., TParser.java
         if (generator.getTarget().needsHeader()) {
@@ -213,7 +213,7 @@ public class BuildDependencyGenerator {
      * @return List of dependencies other than imported grammars
      */
     public List<File> getNonImportDependenciesFileList() {
-        List<File> files = new ArrayList<File>();
+        List<File> files = new ArrayList<>();
 
         // handle token vocabulary loads
         String tokenVocab = g.getOptionString("tokenVocab");

@@ -142,7 +142,7 @@ public class CodeGenerator {
 	 */
 	ST getTokenVocabOutput() {
 		ST vocabFileST = new ST(vocabFilePattern);
-		Map<String,Integer> tokens = new LinkedHashMap<String,Integer>();
+		Map<String,Integer> tokens = new LinkedHashMap<>();
 		// make constants for the token names
 		for (String t : g.tokenNameToTypeMap.keySet()) {
 			int tokenType = g.tokenNameToTypeMap.get(t);
@@ -153,7 +153,7 @@ public class CodeGenerator {
 		vocabFileST.add("tokens", tokens);
 
 		// now dump the strings
-		Map<String,Integer> literals = new LinkedHashMap<String,Integer>();
+		Map<String,Integer> literals = new LinkedHashMap<>();
 		for (String literal : g.stringLiteralToTypeMap.keySet()) {
 			int tokenType = g.stringLiteralToTypeMap.get(literal);
 			if ( tokenType>=Token.MIN_USER_TOKEN_TYPE) {

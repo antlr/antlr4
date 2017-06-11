@@ -277,7 +277,7 @@ public class GrammarParserInterpreter extends ParserInterpreter {
 	                                                               int stopIndex,
 	                                                               int startRuleIndex)
 		throws RecognitionException {
-		List<ParserRuleContext> trees = new ArrayList<ParserRuleContext>();
+		List<ParserRuleContext> trees = new ArrayList<>();
 		// Create a new parser interpreter to parse the ambiguous subphrase
 		ParserInterpreter parser = deriveTempParserInterpreter(g, originalParser, tokens);
 
@@ -341,7 +341,7 @@ public class GrammarParserInterpreter extends ParserInterpreter {
 	                                                             int decision,
 	                                                             int startIndex,
 	                                                             int stopIndex) {
-		List<ParserRuleContext> trees = new ArrayList<ParserRuleContext>();
+		List<ParserRuleContext> trees = new ArrayList<>();
 		// Create a new parser interpreter to parse the ambiguous subphrase
 		ParserInterpreter parser = deriveTempParserInterpreter(g, originalParser, tokens);
 

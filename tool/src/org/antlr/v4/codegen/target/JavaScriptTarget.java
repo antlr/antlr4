@@ -43,7 +43,7 @@ public class JavaScriptTarget extends Target {
 	};
 
 	/** Avoid grammar symbols in this set to prevent conflicts in gen'd code. */
-	protected final Set<String> badWords = new HashSet<String>();
+	protected final Set<String> badWords = new HashSet<>();
 
 	public JavaScriptTarget(CodeGenerator gen) {
 		super(gen, "JavaScript");
