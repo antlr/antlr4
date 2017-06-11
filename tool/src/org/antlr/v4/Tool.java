@@ -761,11 +761,18 @@ public class Tool {
 		File outputDir;
 		String fileDirectory;
 
+		// Some files are given to us without a PATH but should should
+		// still be written to the output directory in the relative path of
+		// the output directory. The file directory is either the set of sub directories
+		// or just or the relative path recorded for the parent grammar. This means
+		// that when we write the tokens files, or the .java files for imported grammars
+		// taht we will write them in the correct place.
 		if (fileNameWithPath.lastIndexOf(File.separatorChar) == -1) {
 			// No path is included in the file name, so make the file
-			// directory the same as the parent grammar (which might still be just ""
+			// directory the same as the parent grammar (which might sitll be just ""
 			// but when it is not, we will write the file in the correct place.
 			fileDirectory = ".";
+
 		}
 		else {
 			fileDirectory = fileNameWithPath.substring(0, fileNameWithPath.lastIndexOf(File.separatorChar));
@@ -774,8 +781,21 @@ public class Tool {
 			// -o /tmp /var/lib/t.g4 => /tmp/T.java
 			// -o subdir/output /usr/lib/t.g4 => subdir/output/T.java
 			// -o . /usr/lib/t.g4 => ./T.java
-			// -o /tmp subdir/t.g4 => /tmp/t.g4
-			outputDir = new File(outputDirectory);
+			if (fileDirectory != null &&
+				(new File(fileDirectory).isAbsolute() ||
+				 fileDirectory.startsWith("~"))) { // isAbsolute doesn't count this :(
+				// somebody set the dir, it takes precendence; write new file there
+				outputDir = new File(outputDirectory);
+			}
+			else {
+				// -o /tmp subdir/t.g4 => /tmp/subdir/t.g4
+				if (fileDirectory != null) {
+					outputDir = new File(outputDirectory, fileDirectory);
+				}
+				else {
+					outputDir = new File(outputDirectory);
+				}
+			}
 		}
 		else {
 			// they didn't specify a -o dir so just write to location
