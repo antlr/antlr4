@@ -22,8 +22,7 @@ ParseTreePattern::ParseTreePattern(ParseTreePatternMatcher *matcher, const std::
   : patternRuleIndex(patternRuleIndex_), _pattern(pattern), _patternTree(patternTree), _matcher(matcher) {
 }
 
-ParseTreePattern::~ParseTreePattern()
-{
+ParseTreePattern::~ParseTreePattern() {
 }
 
 ParseTreeMatch ParseTreePattern::match(ParseTree *tree) {
