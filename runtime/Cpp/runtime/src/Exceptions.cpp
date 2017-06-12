@@ -23,11 +23,42 @@ const char* IOException::what() const NOEXCEPT {
   return _message.c_str();
 }
 
-IllegalStateException::~IllegalStateException() = default;
-IllegalArgumentException::~IllegalArgumentException() = default;
-NullPointerException::~NullPointerException() = default;
-IndexOutOfBoundsException::~IndexOutOfBoundsException() = default;
-UnsupportedOperationException::~UnsupportedOperationException() = default;
-EmptyStackException::~EmptyStackException() = default;
-CancellationException::~CancellationException() = default;
-ParseCancellationException::~ParseCancellationException() = default;
+//------------------ IllegalStateException -----------------------------------------------------------------------------
+
+IllegalStateException::~IllegalStateException() {
+}
+
+//------------------ IllegalArgumentException --------------------------------------------------------------------------
+
+IllegalArgumentException::~IllegalArgumentException() {
+}
+
+//------------------ NullPointerException ------------------------------------------------------------------------------
+
+NullPointerException::~NullPointerException() {
+}
+
+//------------------ IndexOutOfBoundsException -------------------------------------------------------------------------
+
+IndexOutOfBoundsException::~IndexOutOfBoundsException() {
+}
+
+//------------------ UnsupportedOperationException ---------------------------------------------------------------------
+
+UnsupportedOperationException::~UnsupportedOperationException() {
+}
+
+//------------------ EmptyStackException -------------------------------------------------------------------------------
+
+EmptyStackException::~EmptyStackException() {
+}
+
+//------------------ CancellationException -----------------------------------------------------------------------------
+
+CancellationException::~CancellationException() {
+}
+
+//------------------ ParseCancellationException ------------------------------------------------------------------------
+
+ParseCancellationException::~ParseCancellationException() {
+}
