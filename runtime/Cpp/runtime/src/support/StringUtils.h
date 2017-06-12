@@ -24,7 +24,7 @@ namespace antlrcpp {
     // Don't make the converter static or we have to serialize access to it.
     UTF32Converter converter;
 
-    #if _MSC_VER >= 1900 && _MSC_VER < 2000
+    #if defined(_MSC_VER) && _MSC_VER >= 1900 && _MSC_VER < 2000
       auto p = reinterpret_cast<const int32_t *>(data.data());
       return converter.to_bytes(p, p + data.size());
     #else
@@ -36,7 +36,7 @@ namespace antlrcpp {
   {
     UTF32Converter converter;
 
-    #if _MSC_VER >= 1900 && _MSC_VER < 2000
+    #if defined(_MSC_VER) && _MSC_VER >= 1900 && _MSC_VER < 2000
       auto r = converter.from_bytes(first, last);
       i32string s = reinterpret_cast<const int32_t *>(r.data());
     #else

@@ -77,7 +77,7 @@
 
   class ANTLR4CPP_PUBLIC std::exception; // Needed for VS 2015.
 
-#elif __APPLE__
+#elif defined(__APPLE__)
   typedef std::u32string UTF32String;
 
   #define GUID_CFUUID
