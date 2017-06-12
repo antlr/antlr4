@@ -13,7 +13,7 @@
 import Foundation
 
 func errPrint(_ msg: String) {
-    fputs(msg + "\n", __stderrp)
+    fputs(msg + "\n", stderr)
 }
 
 public func +(lhs: String, rhs: Int) -> String {
@@ -55,12 +55,6 @@ func >>>(lhs: Int, rhs: Int) -> Int {
     let right = UInt(bitPattern: rhs) % numberOfBits
 
     return Int(bitPattern: left >> right)
-}
-
-func synced(_ lock: AnyObject, closure: () -> ()) {
-    objc_sync_enter(lock)
-    closure()
-    objc_sync_exit(lock)
 }
 
 func intChar2String(_ i: Int) -> String {

@@ -6,7 +6,53 @@ import XCTest
 import Antlr4
 
 class TokenStreamRewriterTests: XCTestCase {
-
+    
+    static let allTests = [
+        ("testPreservesOrderOfContiguousInserts", testPreservesOrderOfContiguousInserts),
+        ("testDistinguishBetweenInsertAfterAndInsertBeforeToPreserverOrder2", testDistinguishBetweenInsertAfterAndInsertBeforeToPreserverOrder2),
+        ("testDistinguishBetweenInsertAfterAndInsertBeforeToPreserverOrder", testDistinguishBetweenInsertAfterAndInsertBeforeToPreserverOrder),
+        ("testInsertBeforeTokenThenDeleteThatToken", testInsertBeforeTokenThenDeleteThatToken),
+        ("testLeaveAloneDisjointInsert2", testLeaveAloneDisjointInsert2),
+        ("testLeaveAloneDisjointInsert", testLeaveAloneDisjointInsert),
+        ("testDropPrevCoveredInsert", testDropPrevCoveredInsert),
+        ("testDropIdenticalReplace", testDropIdenticalReplace),
+        ("testOverlappingReplace4", testOverlappingReplace4),
+        ("testOverlappingReplace3", testOverlappingReplace3),
+        ("testOverlappingReplace2", testOverlappingReplace2),
+        ("testOverlappingReplace", testOverlappingReplace),
+        ("testDisjointInserts", testDisjointInserts),
+        ("testCombineInsertOnLeftWithDelete", testCombineInsertOnLeftWithDelete),
+        ("testCombineInsertOnLeftWithReplace", testCombineInsertOnLeftWithReplace),
+        ("testCombine3Inserts", testCombine3Inserts),
+        ("testCombineInserts", testCombineInserts),
+        ("testReplaceSingleMiddleThenOverlappingSuperset", testReplaceSingleMiddleThenOverlappingSuperset),
+        ("testReplaceThenReplaceLowerIndexedSuperset", testReplaceThenReplaceLowerIndexedSuperset),
+        ("testReplaceThenReplaceSuperset", testReplaceThenReplaceSuperset),
+        ("testReplaceSubsetThenFetch", testReplaceSubsetThenFetch),
+        ("testReplaceAll", testReplaceAll),
+        ("testReplaceRangeThenInsertAfterRightEdge", testReplaceRangeThenInsertAfterRightEdge),
+        ("testReplaceRangeThenInsertAtRightEdge", testReplaceRangeThenInsertAtRightEdge),
+        ("testReplaceThenInsertAtLeftEdge", testReplaceThenInsertAtLeftEdge),
+        ("testReplaceThenInsertAfterLastIndex", testReplaceThenInsertAfterLastIndex),
+        ("testInsertThenReplaceLastIndex", testInsertThenReplaceLastIndex),
+        ("testReplaceThenInsertBeforeLastIndex", testReplaceThenInsertBeforeLastIndex),
+        ("test2InsertThenReplaceIndex0", test2InsertThenReplaceIndex0),
+        ("test2InsertMiddleIndex", test2InsertMiddleIndex),
+        ("testInsertThenReplaceSameIndex", testInsertThenReplaceSameIndex),
+        ("testInsertInPriorReplace", testInsertInPriorReplace),
+        ("testReplaceThenDeleteMiddleIndex", testReplaceThenDeleteMiddleIndex),
+        ("test2ReplaceMiddleIndex1InsertBefore", test2ReplaceMiddleIndex1InsertBefore),
+        ("test2ReplaceMiddleIndex", test2ReplaceMiddleIndex),
+        ("testToStringStartStop2", testToStringStartStop2),
+        ("testToStringStartStop", testToStringStartStop),
+        ("testReplaceMiddleIndex", testReplaceMiddleIndex),
+        ("testReplaceLastIndex", testReplaceLastIndex),
+        ("testReplaceIndex0", testReplaceIndex0),
+        ("test2InsertBeforeAfterMiddleIndex", test2InsertBeforeAfterMiddleIndex),
+        ("testInsertAfterLastIndex", testInsertAfterLastIndex),
+        ("testInsertBeforeIndex0", testInsertBeforeIndex0)
+    ]
+    
     func testInsertBeforeIndex0() throws {
         let input = ANTLRInputStream("abc")
         let lexer = LexerA(input)
