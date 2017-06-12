@@ -144,7 +144,7 @@ namespace atn {
    */
   class ANTLR4CPP_PUBLIC SemanticContext::Operator : public SemanticContext {
   public:
-    ~Operator();
+    virtual ~Operator() override;
 
     /**
      * Gets the operands for the semantic context operator.
