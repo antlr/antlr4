@@ -110,8 +110,7 @@ ATNDeserializer::ATNDeserializer(): ATNDeserializer(ATNDeserializationOptions::g
 ATNDeserializer::ATNDeserializer(const ATNDeserializationOptions& dso): deserializationOptions(dso) {
 }
 
-ATNDeserializer::~ATNDeserializer()
-{
+ATNDeserializer::~ATNDeserializer() {
 }
 
 /**

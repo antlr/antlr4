@@ -31,8 +31,7 @@ using namespace antlr4;
 using namespace antlr4::atn;
 using namespace antlrcpp;
 
-LexerATNSimulator::SimState::~SimState()
-{
+LexerATNSimulator::SimState::~SimState() {
 }
 
 void LexerATNSimulator::SimState::reset() {

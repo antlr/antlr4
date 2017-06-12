@@ -13,10 +13,6 @@ using namespace antlr4;
 using namespace antlr4::atn;
 using namespace antlrcpp;
 
-SemanticContext::~SemanticContext()
-{
-}
-
 //------------------ Predicate -----------------------------------------------------------------------------------------
 
 SemanticContext::Predicate::Predicate() : Predicate(INVALID_INDEX, INVALID_INDEX, false) {
@@ -315,6 +311,9 @@ std::string SemanticContext::OR::toString() const {
 
 const Ref<SemanticContext> SemanticContext::NONE = std::make_shared<Predicate>(INVALID_INDEX, INVALID_INDEX, false);
 
+SemanticContext::~SemanticContext() {
+}
+
 bool SemanticContext::operator != (const SemanticContext &other) const {
   return !(*this == other);
 }
@@ -371,6 +370,8 @@ std::vector<Ref<SemanticContext::PrecedencePredicate>> SemanticContext::filterPr
   return result;
 }
 
-SemanticContext::Operator::~Operator()
-{
+
+//------------------ Operator -----------------------------------------------------------------------------------------
+
+SemanticContext::Operator::~Operator() {
 }

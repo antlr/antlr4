@@ -15,8 +15,7 @@ SingletonPredictionContext::SingletonPredictionContext(Ref<PredictionContext> co
   assert(returnState != ATNState::INVALID_STATE_NUMBER);
 }
 
-SingletonPredictionContext::~SingletonPredictionContext()
-{
+SingletonPredictionContext::~SingletonPredictionContext() {
 }
 
 Ref<SingletonPredictionContext> SingletonPredictionContext::create(Ref<PredictionContext> const& parent, size_t returnState) {

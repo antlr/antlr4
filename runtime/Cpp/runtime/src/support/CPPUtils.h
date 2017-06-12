@@ -22,8 +22,7 @@ namespace antlrcpp {
   struct FinalAction {
     FinalAction(std::function<void ()> f) : _cleanUp { f } {}
     FinalAction(FinalAction &&other) :
-	_cleanUp(std::move(other._cleanUp)), _enabled(other._enabled)
-    {
+	_cleanUp(std::move(other._cleanUp)), _enabled(other._enabled) {
       other._enabled = false; // Don't trigger the lambda after ownership has moved.
     }
     ~FinalAction() { if (_enabled) _cleanUp(); }

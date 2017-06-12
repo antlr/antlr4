@@ -23,8 +23,7 @@ ATNSimulator::ATNSimulator(const ATN &atn, PredictionContextCache &sharedContext
 : atn(atn), _sharedContextCache(sharedContextCache) {
 }
 
-ATNSimulator::~ATNSimulator()
-{
+ATNSimulator::~ATNSimulator() {
 }
 
 void ATNSimulator::clearDFA() {

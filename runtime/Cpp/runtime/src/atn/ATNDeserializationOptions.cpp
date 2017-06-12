@@ -18,8 +18,7 @@ ATNDeserializationOptions::ATNDeserializationOptions(ATNDeserializationOptions *
   this->generateRuleBypassTransitions = options->generateRuleBypassTransitions;
 }
 
-ATNDeserializationOptions::~ATNDeserializationOptions()
-{
+ATNDeserializationOptions::~ATNDeserializationOptions() {
 }
 
 const ATNDeserializationOptions& ATNDeserializationOptions::getDefaultOptions() {

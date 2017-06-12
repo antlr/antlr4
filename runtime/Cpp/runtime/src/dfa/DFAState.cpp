@@ -18,8 +18,7 @@ DFAState::PredPrediction::PredPrediction(const Ref<SemanticContext> &pred, int a
   this->alt = alt;
 }
 
-DFAState::PredPrediction::~PredPrediction()
-{
+DFAState::PredPrediction::~PredPrediction() {
 }
 
 std::string DFAState::PredPrediction::toString() {

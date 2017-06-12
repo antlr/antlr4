@@ -5,6 +5,5 @@ antlrcpp::Any::~Any()
     delete _ptr;
 }
 
-antlrcpp::Any::Base::~Base()
-{
+antlrcpp::Any::Base::~Base() {
 }

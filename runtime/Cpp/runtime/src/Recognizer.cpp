@@ -27,8 +27,7 @@ Recognizer::Recognizer() {
   _proxListener.addErrorListener(&ConsoleErrorListener::INSTANCE);
 }
 
-Recognizer::~Recognizer()
-{
+Recognizer::~Recognizer() {
 }
 
 dfa::Vocabulary const& Recognizer::getVocabulary() const {

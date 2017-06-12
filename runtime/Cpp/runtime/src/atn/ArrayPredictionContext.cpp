@@ -21,8 +21,7 @@ ArrayPredictionContext::ArrayPredictionContext(std::vector<Ref<PredictionContext
     assert(returnStates.size() > 0);
 }
 
-ArrayPredictionContext::~ArrayPredictionContext()
-{
+ArrayPredictionContext::~ArrayPredictionContext() {
 }
 
 bool ArrayPredictionContext::isEmpty() const {

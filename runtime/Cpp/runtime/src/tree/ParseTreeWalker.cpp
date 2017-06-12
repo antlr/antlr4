@@ -17,8 +17,7 @@ using namespace antlrcpp;
 static IterativeParseTreeWalker defaultWalker;
 ParseTreeWalker &ParseTreeWalker::DEFAULT = defaultWalker;
 
-ParseTreeWalker::~ParseTreeWalker()
-{
+ParseTreeWalker::~ParseTreeWalker() {
 }
 
 void ParseTreeWalker::walk(ParseTreeListener *listener, ParseTree *t) const {

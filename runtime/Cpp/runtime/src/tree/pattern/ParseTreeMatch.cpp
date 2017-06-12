@@ -19,8 +19,7 @@ ParseTreeMatch::ParseTreeMatch(ParseTree *tree, const ParseTreePattern &pattern,
   }
 }
 
-ParseTreeMatch::~ParseTreeMatch()
-{
+ParseTreeMatch::~ParseTreeMatch() {
 }
 
 ParseTree* ParseTreeMatch::get(const std::string &label) {

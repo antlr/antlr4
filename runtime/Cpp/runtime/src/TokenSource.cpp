@@ -1,5 +1,4 @@
 #include "TokenSource.h"
 
-antlr4::TokenSource::~TokenSource()
-{
+antlr4::TokenSource::~TokenSource() {
 }

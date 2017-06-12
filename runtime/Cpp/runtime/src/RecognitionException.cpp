@@ -27,8 +27,7 @@ RecognitionException::RecognitionException(const std::string &message, Recognize
   }
 }
 
-RecognitionException::~RecognitionException()
-{
+RecognitionException::~RecognitionException() {
 }
 
 size_t RecognitionException::getOffendingState() const {

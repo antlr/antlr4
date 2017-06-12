@@ -36,8 +36,7 @@ std::map<std::vector<uint16_t>, atn::ATN> Parser::bypassAltsAtnCache;
 Parser::TraceListener::TraceListener(Parser *outerInstance_) : outerInstance(outerInstance_) {
 }
 
-Parser::TraceListener::~TraceListener()
-{
+Parser::TraceListener::~TraceListener() {
 }
 
 void Parser::TraceListener::enterEveryRule(ParserRuleContext *ctx) {
@@ -60,8 +59,7 @@ void Parser::TraceListener::exitEveryRule(ParserRuleContext *ctx) {
 
 Parser::TrimToSizeListener Parser::TrimToSizeListener::INSTANCE;
 
-Parser::TrimToSizeListener::~TrimToSizeListener()
-{
+Parser::TrimToSizeListener::~TrimToSizeListener() {
 }
 
 void Parser::TrimToSizeListener::enterEveryRule(ParserRuleContext * /*ctx*/) {
