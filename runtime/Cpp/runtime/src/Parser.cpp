@@ -33,7 +33,7 @@ using namespace antlrcpp;
 
 std::map<std::vector<uint16_t>, atn::ATN> Parser::bypassAltsAtnCache;
 
-Parser::TraceListener::TraceListener(Parser *outerInstance_in) : outerInstance(outerInstance_in) {
+Parser::TraceListener::TraceListener(Parser *outerInstance_) : outerInstance(outerInstance_) {
 }
 
 Parser::TraceListener::~TraceListener()

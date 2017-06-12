@@ -14,19 +14,19 @@ using namespace antlr4;
 
 using antlr4::misc::Interval;
 
-TokenStreamRewriter::RewriteOperation::RewriteOperation(TokenStreamRewriter *outerInstance_in, size_t index_in)
-  : outerInstance(outerInstance_in) {
+TokenStreamRewriter::RewriteOperation::RewriteOperation(TokenStreamRewriter *outerInstance_, size_t index_)
+  : outerInstance(outerInstance_) {
 
   InitializeInstanceFields();
-  this->index = index_in;
+  this->index = index_;
 }
 
-TokenStreamRewriter::RewriteOperation::RewriteOperation(TokenStreamRewriter *outerInstance_in, size_t index_in,
-  const std::string& text_in) : outerInstance(outerInstance_in) {
+TokenStreamRewriter::RewriteOperation::RewriteOperation(TokenStreamRewriter *outerInstance_, size_t index_,
+  const std::string& text_) : outerInstance(outerInstance_) {
 
   InitializeInstanceFields();
-  this->index = index_in;
-  this->text = text_in;
+  this->index = index_;
+  this->text = text_;
 }
 
 TokenStreamRewriter::RewriteOperation::~RewriteOperation()
@@ -49,8 +49,8 @@ void TokenStreamRewriter::RewriteOperation::InitializeInstanceFields() {
   index = 0;
 }
 
-TokenStreamRewriter::InsertBeforeOp::InsertBeforeOp(TokenStreamRewriter *outerInstance_in, size_t index_in, const std::string& text_in)
-: RewriteOperation(outerInstance_in, index_in, text_in), outerInstance(outerInstance_in) {
+TokenStreamRewriter::InsertBeforeOp::InsertBeforeOp(TokenStreamRewriter *outerInstance_, size_t index_, const std::string& text_)
+: RewriteOperation(outerInstance_, index_, text_), outerInstance(outerInstance_) {
 }
 
 size_t TokenStreamRewriter::InsertBeforeOp::execute(std::string *buf) {
@@ -61,8 +61,8 @@ size_t TokenStreamRewriter::InsertBeforeOp::execute(std::string *buf) {
   return index + 1;
 }
 
-TokenStreamRewriter::ReplaceOp::ReplaceOp(TokenStreamRewriter *outerInstance_in, size_t from, size_t to, const std::string& text)
-: RewriteOperation(outerInstance_in, from, text), outerInstance(outerInstance_in) {
+TokenStreamRewriter::ReplaceOp::ReplaceOp(TokenStreamRewriter *outerInstance_, size_t from, size_t to, const std::string& text)
+: RewriteOperation(outerInstance_, from, text), outerInstance(outerInstance_) {
 
   InitializeInstanceFields();
   lastIndex = to;
@@ -88,7 +88,7 @@ void TokenStreamRewriter::ReplaceOp::InitializeInstanceFields() {
 
 const std::string TokenStreamRewriter::DEFAULT_PROGRAM_NAME = "default";
 
-TokenStreamRewriter::TokenStreamRewriter(TokenStream *tokens_in) : tokens(tokens_in) {
+TokenStreamRewriter::TokenStreamRewriter(TokenStream *tokens_) : tokens(tokens_) {
   _programs[DEFAULT_PROGRAM_NAME].reserve(PROGRAM_INIT_SIZE);
 }
 

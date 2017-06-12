@@ -11,7 +11,7 @@
 
 using namespace antlr4;
 
-ListTokenSource::ListTokenSource(std::vector<std::unique_ptr<Token>> tokens_in) : ListTokenSource(std::move(tokens_in), "") {
+ListTokenSource::ListTokenSource(std::vector<std::unique_ptr<Token>> tokens_) : ListTokenSource(std::move(tokens_), "") {
 }
 
 ListTokenSource::ListTokenSource(std::vector<std::unique_ptr<Token>> tokens_, const std::string &sourceName_)

@@ -17,7 +17,7 @@ using namespace antlr4;
 DiagnosticErrorListener::DiagnosticErrorListener() : DiagnosticErrorListener(true) {
 }
 
-DiagnosticErrorListener::DiagnosticErrorListener(bool exactOnly_in) : exactOnly(exactOnly_in) {
+DiagnosticErrorListener::DiagnosticErrorListener(bool exactOnly_) : exactOnly(exactOnly_) {
 }
 
 void DiagnosticErrorListener::reportAmbiguity(Parser *recognizer, const dfa::DFA &dfa, size_t startIndex, size_t stopIndex,

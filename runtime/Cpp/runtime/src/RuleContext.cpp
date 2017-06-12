@@ -19,10 +19,10 @@ RuleContext::RuleContext() {
   InitializeInstanceFields();
 }
 
-RuleContext::RuleContext(RuleContext *parent, size_t invokingState_in) {
+RuleContext::RuleContext(RuleContext *parent_, size_t invokingState_) {
   InitializeInstanceFields();
-  this->parent = parent;
-  this->invokingState = invokingState_in;
+  this->parent = parent_;
+  this->invokingState = invokingState_;
 }
 
 int RuleContext::depth() {

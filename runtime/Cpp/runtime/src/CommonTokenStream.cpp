@@ -12,8 +12,8 @@ using namespace antlr4;
 CommonTokenStream::CommonTokenStream(TokenSource *tokenSource) : CommonTokenStream(tokenSource, Token::DEFAULT_CHANNEL) {
 }
 
-CommonTokenStream::CommonTokenStream(TokenSource *tokenSource, size_t channel_in)
-: BufferedTokenStream(tokenSource), channel(channel_in) {
+CommonTokenStream::CommonTokenStream(TokenSource *tokenSource, size_t channel_)
+: BufferedTokenStream(tokenSource), channel(channel_) {
 }
 
 ssize_t CommonTokenStream::adjustSeekIndex(size_t i) {
