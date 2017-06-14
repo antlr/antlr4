@@ -96,7 +96,7 @@ Now a fully functioning script might look like the following:
 
 ```javascript
    var input = "your text to parse here"
-   var chars = CharStreams.fromString(input);
+   var chars = antlr4.CharStreams.fromString(input);
    var lexer = new MyGrammarLexer.MyGrammarLexer(chars);
    var tokens  = new antlr4.CommonTokenStream(lexer);
    var parser = new MyGrammarParser.MyGrammarParser(tokens);
