@@ -138,7 +138,7 @@ ATNDeserializer.prototype.deserialize = function(data) {
 ATNDeserializer.prototype.reset = function(data) {
 	var adjust = function(c) {
         var v = c.charCodeAt(0);
-        return v>1  ? v-2 : -1;
+        return v>1  ? v-2 : v + 65533;
 	};
     var temp = data.split("").map(adjust);
     // don't adjust the first value since that's the version number
