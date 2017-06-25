@@ -554,22 +554,19 @@ public class ATNDeserializer {
     }
 
     public func deserializeFromJson(_ jsonStr: String) -> ATN {
-        // let jsonStr = Utils.readFile2String(jsonFileName)
         guard !jsonStr.isEmpty else {
             fatalError("ATN Serialization is empty,Please include *LexerATN.json and  *ParserATN.json in TARGETS-Build Phases-Copy Bundle Resources")
         }
         if let JSONData = jsonStr.data(using: String.Encoding.utf8) {
             do {
                 let JSON = try JSONSerialization.jsonObject(with: JSONData, options: JSONSerialization.ReadingOptions(rawValue: 0))
-                guard let JSONDictionary: NSDictionary = JSON as? NSDictionary  else {
-                    print("Not a Dictionary")
-                    // put in function
+                guard let JSONDictionary = JSON as? Dictionary<String, Any>  else {
                     fatalError("deserializeFromJson Not a Dictionary")
                 }
 
                 return try dictToJson(JSONDictionary)
 
-            } catch let JSONError as NSError {
+            } catch let JSONError {
                 print("\(JSONError)")
             }
         }
@@ -577,10 +574,10 @@ public class ATNDeserializer {
         fatalError("Could not deserialize ATN ")
     }
 
-    public func dictToJson(_ dict: NSDictionary) throws -> ATN {
+    public func dictToJson(_ dict: Dictionary<String, Any>) throws -> ATN {
 
 
-        let version: Int = dict.object(forKey: "version") as! Int
+        let version: Int = dict["version"] as! Int
         if version != ATNDeserializer.SERIALIZED_VERSION {
 
             let reason: String = "Could not deserialize ATN with version \(version) (expected \(ATNDeserializer.SERIALIZED_VERSION))."
@@ -588,7 +585,7 @@ public class ATNDeserializer {
             throw ANTLRError.unsupportedOperation(msg: reason)
         }
 
-        let uuid: UUID = UUID(uuidString: dict.object(forKey: "uuid") as! String)!
+        let uuid: UUID = UUID(uuidString: dict["uuid"] as! String)!
 
         if !ATNDeserializer.SUPPORTED_UUIDS.contains(uuid) {
             let reason: String = "Could not deserialize ATN with UUID \(uuid) (expected \(ATNDeserializer.SERIALIZED_UUID) or a legacy UUID)."
@@ -599,8 +596,8 @@ public class ATNDeserializer {
         let supportsPrecedencePredicates: Bool = isFeatureSupported(ATNDeserializer.ADDED_PRECEDENCE_TRANSITIONS, uuid)
         let supportsLexerActions: Bool = isFeatureSupported(ATNDeserializer.ADDED_LEXER_ACTIONS, uuid)
 
-        let grammarType: ATNType = ATNType(rawValue: dict.object(forKey: "grammarType") as! Int)!
-        let maxTokenType: Int = dict.object(forKey: "maxTokenType") as! Int
+        let grammarType: ATNType = ATNType(rawValue: dict["grammarType"] as! Int)!
+        let maxTokenType: Int = dict["maxTokenType"] as! Int
         let atn: ATN = ATN(grammarType, maxTokenType)
 
         //
@@ -609,22 +606,22 @@ public class ATNDeserializer {
         var loopBackStateNumbers: Array<(LoopEndState, Int)> = Array<(LoopEndState, Int)>()
         var endStateNumbers: Array<(BlockStartState, Int)> = Array<(BlockStartState, Int)>()
 
-        let states = dict.object(forKey: "states") as! [NSDictionary]
-
+        let states = dict["states"] as! [Dictionary<String, Any>]
+        
         for state in states {
 
 
-            let ruleIndex: Int = state.object(forKey: "ruleIndex") as! Int
+            let ruleIndex: Int = state["ruleIndex"] as! Int
 
-            let stype: Int = state.object(forKey: "stateType") as! Int
+            let stype: Int = state["stateType"] as! Int
             let s: ATNState = try stateFactory(stype, ruleIndex)!
             if stype == ATNState.LOOP_END {
                 // special case
-                let loopBackStateNumber: Int = state.object(forKey: "detailStateNumber") as! Int
+                let loopBackStateNumber: Int = state["detailStateNumber"] as! Int
                 loopBackStateNumbers.append((s as! LoopEndState, loopBackStateNumber))
             } else {
                 if s is BlockStartState {
-                    let endStateNumber: Int = state.object(forKey: "detailStateNumber") as! Int
+                    let endStateNumber: Int = state["detailStateNumber"] as! Int
                     endStateNumbers.append((s as! BlockStartState, endStateNumber))
                 }
             }
@@ -642,13 +639,13 @@ public class ATNDeserializer {
             pair.0.endState = atn.states[pair.1] as? BlockEndState
         }
 
-        let numNonGreedyStates = dict.object(forKey: "nonGreedyStates") as! [Int]
+        let numNonGreedyStates = dict["nonGreedyStates"] as! [Int]
         for numNonGreedyState in numNonGreedyStates {
             (atn.states[numNonGreedyState] as! DecisionState).nonGreedy = true
         }
 
         if supportsPrecedencePredicates {
-            let numPrecedenceStates = dict.object(forKey: "precedenceStates") as! [Int]
+            let numPrecedenceStates = dict["precedenceStates"] as! [Int]
             for numPrecedenceState in numPrecedenceStates {
                 (atn.states[numPrecedenceState] as! RuleStartState).isPrecedenceRule = true
             }
@@ -658,7 +655,7 @@ public class ATNDeserializer {
         //
         // RULES
         //
-        let ruleToStartState = dict.object(forKey: "ruleToStartState") as! [NSDictionary]
+        let ruleToStartState = dict["ruleToStartState"] as! [Dictionary<String, Any>]
 
         let nrules: Int = ruleToStartState.count
         if atn.grammarType == ATNType.lexer {
@@ -668,11 +665,11 @@ public class ATNDeserializer {
         atn.ruleToStartState = [RuleStartState](repeating: RuleStartState(), count: nrules) // [nrules];
         for i in 0..<nrules {
             let currentRuleToStartState = ruleToStartState[i]
-            let s: Int = currentRuleToStartState.object(forKey: "stateNumber") as! Int
+            let s: Int = currentRuleToStartState["stateNumber"] as! Int
             let startState: RuleStartState = atn.states[s] as! RuleStartState
             atn.ruleToStartState[i] = startState
             if atn.grammarType == ATNType.lexer {
-                var tokenType: Int = currentRuleToStartState.object(forKey: "ruleToTokenType") as! Int
+                var tokenType: Int = currentRuleToStartState["ruleToTokenType"] as! Int
                 if tokenType == -1 {
                     tokenType = CommonToken.EOF
                 }
@@ -699,7 +696,7 @@ public class ATNDeserializer {
         //
         // MODES
         //
-        let modeToStartState = dict.object(forKey: "modeToStartState") as! [Int]
+        let modeToStartState = dict["modeToStartState"] as! [Int]
         //let nmodes : Int = toInt(data[p++]);
         //for  var i : Int=0; i<nmodes; i++ {
         for stateNumber in modeToStartState {
@@ -708,33 +705,30 @@ public class ATNDeserializer {
             //atn.modeToStartState.append(atn.states[s] as! TokensStartState)
         }
 
-
-
-
         //
         // SETS
         //
         var sets: Array<IntervalSet> = Array<IntervalSet>()
-        let nsets: Int = dict.object(forKey: "nsets") as! Int
-        let intervalSet = dict.object(forKey: "IntervalSet") as! [NSDictionary]
+        let nsets: Int = dict["nsets"] as! Int
+        let intervalSet = dict["IntervalSet"] as! [Dictionary<String, Any>]
 
         for i in 0..<nsets {
             let setBuilder = intervalSet[i]
-            let nintervals: Int = setBuilder.object(forKey: "size") as! Int
+            let nintervals: Int = setBuilder["size"] as! Int
 
             let set: IntervalSet = try IntervalSet()
             sets.append(set)
 
-            let containsEof: Bool = (setBuilder.object(forKey: "containsEof") as! Int) != 0
+            let containsEof: Bool = (setBuilder["containsEof"] as! Int) != 0
             if containsEof {
                 try set.add(-1)
             }
-            let intervalsBuilder = setBuilder.object(forKey: "Intervals") as! [NSDictionary]
+            let intervalsBuilder = setBuilder["Intervals"] as! [Dictionary<String, Any>]
 
 
             for j in 0..<nintervals {
                 let vals = intervalsBuilder[j]
-                try set.add((vals.object(forKey: "a") as! Int), (vals.object(forKey: "b") as! Int))
+                try set.add((vals["a"] as! Int), (vals["b"] as! Int))
 
             }
         }
@@ -744,17 +738,17 @@ public class ATNDeserializer {
         // EDGES
         //
         //   let nedges : Int = dict.objectForKey("nedges") as!  Int
-        let allTransitions = dict.object(forKey: "allTransitionsBuilder") as! [[NSDictionary]]
+        let allTransitions = dict["allTransitionsBuilder"] as! [[Dictionary<String, Any>]]
 
         for transitionsBuilder in allTransitions {
 
             for transition in transitionsBuilder {
-                let src: Int = transition.object(forKey: "src") as! Int
-                let trg: Int = transition.object(forKey: "trg") as! Int
-                let ttype: Int = transition.object(forKey: "edgeType") as! Int
-                let arg1: Int = transition.object(forKey: "arg1") as! Int
-                let arg2: Int = transition.object(forKey: "arg2") as! Int
-                let arg3: Int = transition.object(forKey: "arg3") as! Int
+                let src: Int = transition["src"] as! Int
+                let trg: Int = transition["trg"] as! Int
+                let ttype: Int = transition["edgeType"] as! Int
+                let arg1: Int = transition["arg1"] as! Int
+                let arg2: Int = transition["arg2"] as! Int
+                let arg3: Int = transition["arg3"] as! Int
                 let trans: Transition = try edgeFactory(atn, ttype, src, trg, arg1, arg2, arg3, sets)
 
                 let srcState: ATNState = atn.states[src]!
@@ -830,7 +824,7 @@ public class ATNDeserializer {
         //
         // DECISIONS
         //
-        let ndecisions: [Int] = dict.object(forKey: "decisionToState") as! [Int]
+        let ndecisions: [Int] = dict["decisionToState"] as! [Int]
         let length = ndecisions.count
         for i in 0..<length {
             let s: Int = ndecisions[i]
@@ -844,17 +838,17 @@ public class ATNDeserializer {
         // LEXER ACTIONS
         //
         if atn.grammarType == ATNType.lexer {
-            let lexerActionsBuilder = dict.object(forKey: "lexerActions") as! [NSDictionary]
+            let lexerActionsBuilder = dict["lexerActions"] as! [Dictionary<String, Any>]
             if supportsLexerActions {
                 atn.lexerActions = [LexerAction](repeating: LexerAction(), count: lexerActionsBuilder.count)   //[toInt(data[p++])];
                 let length = atn.lexerActions.count
                 for i in 0..<length {
-                    let actionTypeValue = lexerActionsBuilder[i].object(forKey: "actionType") as! Int
+                    let actionTypeValue = lexerActionsBuilder[i]["actionType"] as! Int
                     let actionType: LexerActionType = LexerActionType(rawValue: actionTypeValue)! //LexerActionType.values()[toInt(data[p++])];
-                    let data1: Int = lexerActionsBuilder[i].object(forKey: "a") as! Int
+                    let data1: Int = lexerActionsBuilder[i]["a"] as! Int
 
 
-                    let data2: Int = lexerActionsBuilder[i].object(forKey: "b") as! Int
+                    let data2: Int = lexerActionsBuilder[i]["b"] as! Int
 
 
                     let lexerAction: LexerAction = lexerActionFactory(actionType, data1, data2)

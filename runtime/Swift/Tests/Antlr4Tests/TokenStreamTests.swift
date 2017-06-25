@@ -6,6 +6,10 @@ import XCTest
 import Antlr4
 
 class TokenStreamTests: XCTestCase {
+    
+    static let allTests = [
+        ("testBufferedTokenStreamClearFetchEOFWithNewSource", testBufferedTokenStreamClearFetchEOFWithNewSource)
+    ]
 
     /// Test fetchEOF reset after setTokenSource
     func testBufferedTokenStreamClearFetchEOFWithNewSource() throws {

@@ -195,7 +195,7 @@ std::string UnbufferedCharStream::getText(const misc::Interval &interval) {
   }
   // convert from absolute to local index
   size_t i = interval.a - bufferStartIndex;
-  return utfConverter.to_bytes(_data.substr(i, interval.length()));
+  return utf32_to_utf8(_data.substr(i, interval.length()));
 }
 
 size_t UnbufferedCharStream::getBufferStartIndex() const {

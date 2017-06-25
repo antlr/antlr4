@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
     <id>Antlr4.Runtime.Standard</id>
-    <version>4.7</version>
+    <version>4.7.1</version>
      <language>en-us</language>
     <title>ANTLR 4 Standard Runtime</title>
     <description>The standard C# ANTLR 4 runtime from the ANTLR Organization</description>
