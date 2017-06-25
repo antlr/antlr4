@@ -125,8 +125,10 @@ func (a *ATNDeserializer) reset(data []rune) {
 		// Don't adjust the first value since that's the version number
 		if i == 0 {
 			temp[i] = c
-		} else {
+		} else if c > 1 {
 			temp[i] = c - 2
+		} else {
+		    temp[i] = c + 65533
 		}
 	}
 
