@@ -77,7 +77,6 @@ public class LexerExecDescriptors {
 	public static class UnicodeCharSet extends BaseLexerTestDescriptor {
 		public String input = "均";
 		/**
-		 ID
 		 [@0,0:0='均',<1>,1:0]
 		 [@1,1:0='<EOF>',<-1>,1:1]
 		 */
@@ -90,8 +89,7 @@ public class LexerExecDescriptors {
 
 		/**
 		 lexer grammar L;
-		 ID : ([A-Z_]|'\u0100'..'\uFFFE') ([A-Z_0-9]|'\u0100'..'\uFFFE')* {<writeln("\"ID\"")>};
-		 WS : [ \n\\u000D] -> skip ;
+		 ID : ([A-Z_]|'\u0100'..'\uFFFE') ([A-Z_0-9]|'\u0100'..'\uFFFE')*;
 		 */
 		@CommentHasStringValue
 		public String grammar;
