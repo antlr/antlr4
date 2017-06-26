@@ -11,7 +11,7 @@
 
 using namespace antlr4;
 
-ListTokenSource::ListTokenSource(std::vector<std::unique_ptr<Token>> tokens) : ListTokenSource(std::move(tokens), "") {
+ListTokenSource::ListTokenSource(std::vector<std::unique_ptr<Token>> tokens_) : ListTokenSource(std::move(tokens_), "") {
 }
 
 ListTokenSource::ListTokenSource(std::vector<std::unique_ptr<Token>> tokens_, const std::string &sourceName_)
@@ -32,7 +32,7 @@ ListTokenSource::ListTokenSource(std::vector<std::unique_ptr<Token>> tokens_, co
 
     size_t stop = std::max(INVALID_INDEX, start - 1);
     tokens.emplace_back((_factory->create({ this, getInputStream() }, Token::EOF, "EOF",
-      Token::DEFAULT_CHANNEL, start, stop, (int)lastToken->getLine(), lastToken->getCharPositionInLine())));
+      Token::DEFAULT_CHANNEL, start, stop, static_cast<int>(lastToken->getLine()), lastToken->getCharPositionInLine())));
   }
 }
 

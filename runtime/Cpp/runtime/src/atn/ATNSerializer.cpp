@@ -50,6 +50,8 @@ ATNSerializer::ATNSerializer(ATN *atn, const std::vector<std::string> &tokenName
   _tokenNames = tokenNames;
 }
 
+ATNSerializer::~ATNSerializer() { }
+
 std::vector<size_t> ATNSerializer::serialize() {
   std::vector<size_t> data;
   data.push_back(ATNDeserializer::SERIALIZED_VERSION);

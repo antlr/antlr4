@@ -36,7 +36,7 @@ ATN::ATN(ATN &&other) {
   modeToStartState = std::move(other.modeToStartState);
 }
 
-ATN::ATN(ATNType grammarType, size_t maxTokenType) : grammarType(grammarType), maxTokenType(maxTokenType) {
+ATN::ATN(ATNType grammarType_, size_t maxTokenType_) : grammarType(grammarType_), maxTokenType(maxTokenType_) {
 }
 
 ATN::~ATN() {
@@ -88,9 +88,12 @@ misc::IntervalSet ATN::nextTokens(ATNState *s, RuleContext *ctx) const {
 }
 
 misc::IntervalSet& ATN::nextTokens(ATNState *s) const {
-  if (s->nextTokenWithinRule.isEmpty()) {
-    s->nextTokenWithinRule = nextTokens(s, nullptr);
-    s->nextTokenWithinRule.setReadOnly(true);
+  if (!s->nextTokenWithinRule.isReadOnly()) {
+    std::unique_lock<std::mutex> lock { _mutex };
+    if (!s->nextTokenWithinRule.isReadOnly()) {
+      s->nextTokenWithinRule = nextTokens(s, nullptr);
+      s->nextTokenWithinRule.setReadOnly(true);
+    }
   }
   return s->nextTokenWithinRule;
 }

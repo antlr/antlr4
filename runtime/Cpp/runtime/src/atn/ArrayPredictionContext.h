@@ -27,7 +27,7 @@ namespace atn {
 
     ArrayPredictionContext(Ref<SingletonPredictionContext> const& a);
     ArrayPredictionContext(std::vector<Ref<PredictionContext>> const& parents_, std::vector<size_t> const& returnStates);
-    virtual ~ArrayPredictionContext() {};
+    virtual ~ArrayPredictionContext();
 
     virtual bool isEmpty() const override;
     virtual size_t size() const override;

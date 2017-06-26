@@ -25,6 +25,9 @@ using namespace antlrcpp;
 LL1Analyzer::LL1Analyzer(const ATN &atn) : _atn(atn) {
 }
 
+LL1Analyzer::~LL1Analyzer() {
+}
+
 std::vector<misc::IntervalSet> LL1Analyzer::getDecisionLookahead(ATNState *s) const {
   std::vector<misc::IntervalSet> look;
 

@@ -31,7 +31,7 @@ namespace atn {
     // ml: originally Integer.MAX_VALUE, which would be (size_t)-1 for us, but this is already used in places where
     //     -1 is converted to unsigned, so we use a different value here. Any value does the job provided it doesn't
     //     conflict with real return states.
-    static const size_t EMPTY_RETURN_STATE = (size_t)-10;
+    static const size_t EMPTY_RETURN_STATE = std::numeric_limits<size_t>::max() - 9;
 
   private:
     static const size_t INITIAL_HASH = 1;

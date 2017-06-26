@@ -51,6 +51,8 @@
 
 #include "atn/ATNDeserializer.h"
 
+#include <string>
+
 using namespace antlr4;
 using namespace antlr4::atn;
 using namespace antlrcpp;
@@ -106,6 +108,9 @@ ATNDeserializer::ATNDeserializer(): ATNDeserializer(ATNDeserializationOptions::g
 }
 
 ATNDeserializer::ATNDeserializer(const ATNDeserializationOptions& dso): deserializationOptions(dso) {
+}
+
+ATNDeserializer::~ATNDeserializer() {
 }
 
 /**

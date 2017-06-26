@@ -71,7 +71,7 @@ size_t ANTLRInputStream::LA(ssize_t i) {
     return 0; // undefined
   }
 
-  ssize_t position = (ssize_t)p;
+  ssize_t position = static_cast<ssize_t>(p);
   if (i < 0) {
     i++; // e.g., translate LA(-1) to use offset i=0; then _data[p+0-1]
     if ((position + i - 1) < 0) {
@@ -79,11 +79,11 @@ size_t ANTLRInputStream::LA(ssize_t i) {
     }
   }
 
-  if ((position + i - 1) >= (ssize_t)_data.size()) {
+  if ((position + i - 1) >= static_cast<ssize_t>(_data.size())) {
     return IntStream::EOF;
   }
 
-  return _data[(size_t)(position + i - 1)];
+  return _data[static_cast<size_t>((position + i - 1))];
 }
 
 size_t ANTLRInputStream::LT(ssize_t i) {
@@ -123,8 +123,8 @@ std::string ANTLRInputStream::getText(const Interval &interval) {
     return "";
   }
 
-  size_t start = interval.a;
-  size_t stop = interval.b;
+  size_t start = static_cast<size_t>(interval.a);
+  size_t stop = static_cast<size_t>(interval.b);
 
 
   if (stop >= _data.size()) {

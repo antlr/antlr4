@@ -23,7 +23,7 @@ namespace tree {
    */
   class ANTLR4CPP_PUBLIC ParseTreeListener {
   public:
-    virtual ~ParseTreeListener() {};
+    virtual ~ParseTreeListener();
 
     virtual void visitTerminal(TerminalNode *node) = 0;
     virtual void visitErrorNode(ErrorNode *node) = 0;
