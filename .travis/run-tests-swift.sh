@@ -17,10 +17,12 @@ fi
 swift --version
 swift build --version
 
-if [ $GROUP == "LEXER" ]; then GROUPS=-Dgroups="org.antlr.v4.test.runtime.category.LexerTests"
-elif [ $GROUP == "PARSER" ]; then GROUPS=-Dgroups="org.antlr.v4.test.runtime.category.ParserTests"
-elif [ $GROUP == "RECURSION" ]; then GROUPS=-Dgroups="org.antlr.v4.test.runtime.category.LeftRecursionTests"
-else GROUPS=
+if [ $GROUP == "LEXER" ]; then
+    mvn -q -Dgroups="org.antlr.v4.test.runtime.category.LexerTests" -Dtest=swift.* test
+elif [ $GROUP == "PARSER" ]; then
+    mvn -q -Dgroups="org.antlr.v4.test.runtime.category.ParserTests" -Dtest=swift.* test
+elif [ $GROUP == "RECURSION" ]; then
+    mvn -q -Dgroups="org.antlr.v4.test.runtime.category.LeftRecursionTests" -swift=cpp.* test
+else
+    mvn -q -swift=cpp.* test
 fi
-
-mvn -q $GROUPS -Dtest=swift.* test
