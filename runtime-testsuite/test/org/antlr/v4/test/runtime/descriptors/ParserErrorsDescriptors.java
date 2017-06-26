@@ -581,4 +581,41 @@ public class ParserErrorsDescriptors {
 		public String grammar;
 
 	}
+
+	public static class TokenMismatch3 extends BaseParserTestDescriptor {
+		public String input = "";
+		public String output = null;
+		public String errors = "line 1:0 mismatched input '<EOF>' expecting {'(', BOOLEAN_LITERAL, ID, '$'}\n";
+		public String startRule = "expression";
+		public String grammarName = "T";
+
+		/**
+		 grammar T;
+
+		 expression
+		 :   value
+		 |   expression op=AND expression
+		 |   expression op=OR expression
+		 ;
+		 value
+		 :   BOOLEAN_LITERAL
+		 |   ID
+		 |   ID1
+		 |   '(' expression ')'
+		 ;
+
+		 AND : '&&';
+		 OR  : '||';
+
+		 BOOLEAN_LITERAL : 'true' | 'false';
+
+		 ID  : [a-z]+;
+		 ID1 : '$';
+
+		 WS  : [ \t\r\n]+ -> skip ;
+		 */
+		@CommentHasStringValue
+		public String grammar;
+
+	}
 }
