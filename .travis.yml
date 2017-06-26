@@ -22,7 +22,9 @@ matrix:
     - os: osx
       compiler: clang
       osx_image: xcode8.1
-      env: TARGET=cpp
+      env:
+        - TARGET=cpp
+        - GROUP=LEXER
       addons:
         apt:
           sources:
@@ -35,7 +37,51 @@ matrix:
     - os: osx
       compiler: clang
       osx_image: xcode8.1
-      env: TARGET=swift
+      env:
+        - TARGET=cpp
+        - GROUP=PARSER
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-precise-3.7
+          packages:
+            - g++-5
+            - uuid-dev
+            - clang-3.7
+    - os: osx
+      compiler: clang
+      osx_image: xcode8.1
+      env:
+        - TARGET=cpp
+        - GROUP=RECURSION
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-precise-3.7
+          packages:
+            - g++-5
+            - uuid-dev
+            - clang-3.7
+    - os: osx
+      compiler: clang
+      osx_image: xcode8.1
+      env:
+        - TARGET=swift
+        - GROUP=LEXER
+    - os: osx
+      compiler: clang
+      osx_image: xcode8.1
+      env:
+        - TARGET=swift
+        - GROUP=PARSER
+    - os: osx
+      compiler: clang
+      osx_image: xcode8.1
+      env:
+        - TARGET=swift
+        - GROUP=RECURSION
     - os: linux
       compiler: clang
       env: TARGET=swift
