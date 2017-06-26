@@ -8,13 +8,13 @@ package org.antlr.v4.test.runtime.swift;
 
 import org.antlr.v4.test.runtime.BaseRuntimeTest;
 import org.antlr.v4.test.runtime.RuntimeTestDescriptor;
-import org.antlr.v4.test.runtime.category.ParserTests;
+import org.antlr.v4.test.runtime.category.LexerTests;
 import org.antlr.v4.test.runtime.descriptors.SetsDescriptors;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-@Category(ParserTests.class)
+@Category(LexerTests.class)
 @RunWith(Parameterized.class)
 public class TestSets extends BaseRuntimeTest {
 	public TestSets(RuntimeTestDescriptor descriptor) {
