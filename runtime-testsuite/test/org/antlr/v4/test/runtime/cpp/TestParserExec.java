@@ -8,10 +8,13 @@ package org.antlr.v4.test.runtime.cpp;
 
 import org.antlr.v4.test.runtime.BaseRuntimeTest;
 import org.antlr.v4.test.runtime.RuntimeTestDescriptor;
+import org.antlr.v4.test.runtime.category.ParserTests;
 import org.antlr.v4.test.runtime.descriptors.ParserExecDescriptors;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+@Category(ParserTests.class)
 @RunWith(Parameterized.class)
 public class TestParserExec extends BaseRuntimeTest {
 	public TestParserExec(RuntimeTestDescriptor descriptor) {
