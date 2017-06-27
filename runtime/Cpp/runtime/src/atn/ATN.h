@@ -70,7 +70,7 @@ namespace atn {
     /// staying in same rule. <seealso cref="Token#EPSILON"/> is in set if we reach end of
     /// rule.
     /// </summary>
-    virtual misc::IntervalSet& nextTokens(ATNState *s) const;
+    virtual misc::IntervalSet const& nextTokens(ATNState *s) const;
 
     virtual void addState(ATNState *state);
 
