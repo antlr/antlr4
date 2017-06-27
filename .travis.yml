@@ -84,7 +84,9 @@ matrix:
         - GROUP=RECURSION
     - os: linux
       compiler: clang
-      env: TARGET=swift
+      env:
+       - TARGET=swift
+       - GROUP=ALL
     - os: osx
       osx_image: xcode8.2
       env: TARGET=dotnet
