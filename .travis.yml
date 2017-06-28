@@ -10,6 +10,7 @@ matrix:
       env:
         - TARGET=cpp
         - CXX=g++-5
+        - GROUP=ALL
       addons:
         apt:
           sources:
