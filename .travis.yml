@@ -90,7 +90,19 @@ matrix:
        - GROUP=ALL
     - os: osx
       osx_image: xcode8.2
-      env: TARGET=dotnet
+      env:
+        - TARGET=dotnet
+        - GROUP=LEXER
+    - os: osx
+      osx_image: xcode8.2
+      env:
+        - TARGET=dotnet
+        - GROUP=PARSER
+    - os: osx
+      osx_image: xcode8.2
+      env:
+        - TARGET=dotnet
+        - GROUP=RECURSION
     - os: linux
       jdk: oraclejdk7
       env: TARGET=java
@@ -103,7 +115,21 @@ matrix:
     - os: linux
       jdk: oraclejdk8
       dist: trusty
-      env: TARGET=dotnet
+      env:
+        - TARGET=dotnet
+        - GROUP=LEXER
+    - os: linux
+      jdk: oraclejdk8
+      dist: trusty
+      env:
+        - TARGET=dotnet
+        - GROUP=PARSER
+    - os: linux
+      jdk: oraclejdk8
+      dist: trusty
+      env:
+        - TARGET=dotnet
+        - GROUP=RECURSION
     - os: linux
       jdk: oraclejdk7
       env: TARGET=python2
