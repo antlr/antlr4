@@ -24,5 +24,5 @@ elif [ $GROUP == "PARSER" ]; then
 elif [ $GROUP == "RECURSION" ]; then
     mvn -q -Dgroups="org.antlr.v4.test.runtime.category.LeftRecursionTests" -Dtest=swift.* test
 else
-    mvn -q -swift=cpp.* test
+    mvn -q -Dtest=swift.* test
 fi
