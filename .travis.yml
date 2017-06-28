@@ -100,7 +100,7 @@ matrix:
       jdk: oraclejdk7
       env: TARGET=csharp
     - os: linux
-      jdk: oraclejdk7
+      jdk: oraclejdk8
       dist: trusty
       env: TARGET=dotnet
     - os: linux
