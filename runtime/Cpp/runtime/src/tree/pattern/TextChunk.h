@@ -29,7 +29,7 @@ namespace pattern {
     /// <exception cref="IllegalArgumentException"> if {@code text} is {@code null}. </exception>
   public:
     TextChunk(const std::string &text);
-    virtual ~TextChunk() {};
+    virtual ~TextChunk();
 
     /// <summary>
     /// Gets the raw text of this chunk.

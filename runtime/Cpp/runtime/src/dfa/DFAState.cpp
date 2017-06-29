@@ -18,6 +18,9 @@ DFAState::PredPrediction::PredPrediction(const Ref<SemanticContext> &pred, int a
   this->alt = alt;
 }
 
+DFAState::PredPrediction::~PredPrediction() {
+}
+
 std::string DFAState::PredPrediction::toString() {
   return std::string("(") + pred->toString() + ", " + std::to_string(alt) + ")";
 }

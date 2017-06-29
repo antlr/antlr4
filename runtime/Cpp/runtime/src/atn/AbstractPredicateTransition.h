@@ -16,6 +16,7 @@ namespace atn {
 
   public:
     AbstractPredicateTransition(ATNState *target);
+    ~AbstractPredicateTransition();
 
   };
 
