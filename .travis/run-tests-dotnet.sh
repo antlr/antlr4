@@ -8,5 +8,12 @@ dotnet build -c Release ../runtime/CSharp/runtime/CSharp/Antlr4.Runtime/Antlr4.R
 
 # call test
 
-mvn -q -Dparallel=classes -DthreadCount=4 -Dtest=csharp.* -Dantlr-csharp-netstandard=true test
-
+if [ $GROUP == "LEXER" ]; then
+    mvn -q -Dgroups="org.antlr.v4.test.runtime.category.LexerTests" -Dparallel=classes -DthreadCount=4 -Dtest=csharp.* -Dantlr-csharp-netstandard=true test
+elif [ $GROUP == "PARSER" ]; then
+    mvn -q -Dgroups="org.antlr.v4.test.runtime.category.ParserTests" -Dparallel=classes -DthreadCount=4 -Dtest=csharp.* -Dantlr-csharp-netstandard=true test
+elif [ $GROUP == "RECURSION" ]; then
+    mvn -q -Dgroups="org.antlr.v4.test.runtime.category.LeftRecursionTests" -Dparallel=classes -DthreadCount=4 -Dtest=csharp.* -Dantlr-csharp-netstandard=true test
+else
+    mvn -q -Dparallel=classes -DthreadCount=4 -Dtest=csharp.* -Dantlr-csharp-netstandard=true test
+fi
