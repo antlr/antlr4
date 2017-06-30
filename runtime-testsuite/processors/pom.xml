@@ -14,6 +14,7 @@
 	</parent>
 	<artifactId>antlr4-runtime-test-annotation-processors</artifactId>
 	<name>ANTLR 4 Runtime Test Processors</name>
+	<packaging>bundle</packaging>
 	<description>The ANTLR 4 Runtime</description>
 
 	<dependencies>
@@ -50,6 +51,11 @@
 						-proc:none
 					</compilerArgument>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<extensions>true</extensions>
 			</plugin>
 		</plugins>
 	</build>
