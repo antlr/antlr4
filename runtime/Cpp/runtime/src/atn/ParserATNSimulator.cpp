@@ -257,14 +257,12 @@ size_t ParserATNSimulator::execATN(dfa::DFA &dfa, dfa::DFAState *s0, TokenStream
 }
 
 dfa::DFAState *ParserATNSimulator::getExistingTargetState(dfa::DFAState *previousD, size_t t) {
+  dfa::DFAState* retval;
   _edgeLock.readLock();
   auto iterator = previousD->edges.find(t);
+  retval = (iterator == previousD->edges.end()) ? nullptr : iterator->second;
   _edgeLock.readUnlock();
-  if (iterator == previousD->edges.end()) {
-    return nullptr;
-  }
-
-  return iterator->second;
+  return retval;
 }
 
 dfa::DFAState *ParserATNSimulator::computeTargetState(dfa::DFA &dfa, dfa::DFAState *previousD, size_t t) {
