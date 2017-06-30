@@ -103,6 +103,9 @@ namespace atn {
     virtual misc::IntervalSet getExpectedTokens(size_t stateNumber, RuleContext *context) const;
 
     std::string toString() const;
+
+  private:
+    mutable std::mutex _mutex;
   };
 
 } // namespace atn

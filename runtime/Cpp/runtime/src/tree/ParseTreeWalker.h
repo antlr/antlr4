@@ -12,9 +12,9 @@ namespace tree {
 
   class ANTLR4CPP_PUBLIC ParseTreeWalker {
   public:
-    static ParseTreeWalker DEFAULT;
+    static ParseTreeWalker &DEFAULT;
 
-    virtual ~ParseTreeWalker() {};
+    virtual ~ParseTreeWalker();
 
     virtual void walk(ParseTreeListener *listener, ParseTree *t) const;
 

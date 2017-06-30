@@ -73,6 +73,29 @@ public class LexerExecDescriptors {
 
 	}
 
+	/* regression test for antlr/antlr4#1925 */
+	public static class UnicodeCharSet extends BaseLexerTestDescriptor {
+		public String input = "均";
+		/**
+		 [@0,0:0='均',<1>,1:0]
+		 [@1,1:0='<EOF>',<-1>,1:1]
+		 */
+		@CommentHasStringValue
+		public String output;
+
+		public String errors = null;
+		public String startRule = "";
+		public String grammarName = "L";
+
+		/**
+		 lexer grammar L;
+		 ID : ([A-Z_]|'\u0100'..'\uFFFE') ([A-Z_0-9]|'\u0100'..'\uFFFE')*;
+		 */
+		@CommentHasStringValue
+		public String grammar;
+
+	}
+
 	public static class CharSetInSet extends BaseLexerTestDescriptor {
 		public String input = "a x";
 		/**

@@ -126,6 +126,8 @@ size_t ParserATNSimulator::adaptivePredict(TokenStream *input, size_t decision, 
     } else {
       dfa::DFAState *newState = new dfa::DFAState(std::move(s0_closure)); /* mem-check: managed by the DFA or deleted below */
       s0 = addDFAState(dfa, newState);
+
+      delete dfa.s0; // Delete existing s0 DFA state, if there's any. 
       dfa.s0 = s0;
       if (s0 != newState) {
         delete newState; // If there was already a state with this config set we don't need the new one.
@@ -510,7 +512,7 @@ std::unique_ptr<ATNConfigSet> ParserATNSimulator::computeReachSet(ATNConfigSet *
     }
   }
 
-  if (t == Token::EOF) {
+  if (t == IntStream::EOF) {
     /* After consuming EOF no additional input is possible, so we are
      * only interested in configurations which reached the end of the
      * decision rule (local context) or end of the start rule (full
@@ -528,7 +530,7 @@ std::unique_ptr<ATNConfigSet> ParserATNSimulator::computeReachSet(ATNConfigSet *
      * already guaranteed to meet this condition whether or not it's
      * required.
      */
-    ATNConfigSet * temp = removeAllConfigsNotInRuleStopState(reach.get(), reach == intermediate);
+    ATNConfigSet *temp = removeAllConfigsNotInRuleStopState(reach.get(), *reach == *intermediate);
     if (temp != reach.get())
       reach.reset(temp); // We got a new set, so use that.
   }
@@ -954,7 +956,7 @@ bool ParserATNSimulator::canDropLoopEntryEdgeInLeftRecursiveRule(ATNConfig *conf
   // left-recursion elimination. For efficiency, also check if
   // the context has an empty stack case. If so, it would mean
   // global FOLLOW so we can't perform optimization
-  if ( p->getStateType() != ATNState::STAR_LOOP_ENTRY ||
+  if (p->getStateType() != ATNState::STAR_LOOP_ENTRY ||
       !((StarLoopEntryState *)p)->isPrecedenceDecision || // Are we the special loop entry/exit state?
       config->context->isEmpty() ||                      // If SLL wildcard
       config->context->hasEmptyPath())

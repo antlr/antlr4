@@ -20,6 +20,9 @@ public class DFA: CustomStringConvertible {
     /// {@code true} if this DFA is for a precedence decision; otherwise,
     /// {@code false}. This is the backing field for {@link #isPrecedenceDfa}.
     private final var precedenceDfa: Bool
+    
+    /// mutex for DFAState changes.
+    private var dfaStateMutex = Mutex()
 
     public convenience init(_ atnStartState: DecisionState) {
         self.init(atnStartState, 0)
@@ -102,13 +105,11 @@ public class DFA: CustomStringConvertible {
         }
         // synchronization on s0 here is ok. when the DFA is turned into a
         // precedence DFA, s0 will be initialized once and not updated again
-        synced(s0) {
+        dfaStateMutex.synchronized {
             // s0.edges is never null for a precedence DFA
             if precedence >= edges.count {
                 let increase = [DFAState?](repeating: nil, count: (precedence + 1 - edges.count))
                 s0.edges = edges + increase
-                //Array( self.s0!.edges![0..<precedence + 1])
-                //s0.edges = Arrays.copyOf(s0.edges, precedence + 1);
             }
 
             s0.edges[precedence] = startState

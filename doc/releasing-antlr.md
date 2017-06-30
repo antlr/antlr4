@@ -247,16 +247,13 @@ popd
 
 *Publishing to Nuget from Linux/MacOSX*
 
-**Getting ready to run Nuget**
+**Install the pre-requisites**
 
 Of course you need Mono and `nuget` to be installed. On mac:
 
-```bash
-brew install mono
-brew install nuget
-```
-
-Or, you can [download nuget.exe](https://dist.nuget.org/win-x86-commandline/latest/nuget.exe).
+- mono - on mac, `brew install mono`
+- nuget - on mac, `brew install nuget` or you can [download nuget.exe](https://dist.nuget.org/win-x86-commandline/latest/nuget.exe)
+- dotnet - follow [the instructions here](https://www.microsoft.com/net/core)
 
 From the shell on mac, you can check all is ok by typing
 
@@ -266,35 +263,22 @@ nuget
 
 This should display the nuget help. 
 
-**Creating the assembly**
+**Creating and packaging the assembly**
 
 ```bash
-$ cd runtime/CSharp/runtime/CSharp/Antlr4.Runtime
-$ xbuild /p:Configuration=Release Antlr4.Runtime.mono.csproj
+$ cd runtime/CSharp/runtime/CSharp
+$ ./build-nuget-package.sh
 ...
-		Copying file from '/Users/parrt/antlr/code/antlr4/runtime/CSharp/runtime/CSharp/Antlr4.Runtime/obj/net20/Release/Antlr4.Runtime.Standard.dll' to '/Users/parrt/antlr/code/antlr4/runtime/CSharp/runtime/CSharp/Antlr4.Runtime/lib/Release/Antlr4.Runtime.Standard.dll'
-Done building project "/Users/parrt/antlr/code/antlr4/runtime/CSharp/runtime/CSharp/Antlr4.Runtime/Antlr4.Runtime.mono.csproj".
-```
-
-Alternately, you may want to build ANTLR using Xamarin Studio Community (free).
-
-**Packaging for NuGet**
-
-```bash
-cd runtime/CSharp/runtime/CSharp
-```
-
-which is where the `Package.nuspec` file resides.
-
-Type the following command:
-
-```bash
-$ nuget pack Package.nuspec
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
 Attempting to build package from 'Package.nuspec'.
-Successfully created package '/Users/parrt/antlr/code/antlr4/runtime/CSharp/runtime/CSharp/Antlr4.Runtime.Standard.4.7.0.nupkg'.
+Successfully created package '/path/to/antlr/.../Antlr4.Runtime.Standard.4.7.0.nupkg'.
 ```
 
 This should display: Successfully created package *&lt;package-path>*
+
+Alternately, you may want to build ANTLR using Xamarin Studio Community (free).
 
 **Publishing to NuGet**
 

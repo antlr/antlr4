@@ -21,7 +21,7 @@ namespace atn {
     const size_t returnState;
 
     SingletonPredictionContext(Ref<PredictionContext> const& parent, size_t returnState);
-    virtual ~SingletonPredictionContext() {};
+    virtual ~SingletonPredictionContext();
 
     static Ref<SingletonPredictionContext> create(Ref<PredictionContext> const& parent, size_t returnState);
 

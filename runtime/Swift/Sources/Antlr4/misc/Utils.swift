@@ -52,7 +52,7 @@ public class Utils {
 
         do {
             fileContents = try String(contentsOfFile: path, encoding: encoding)
-        } catch _ as NSError {
+        } catch {
             return [Character]()
         }
 
@@ -68,22 +68,20 @@ public class Utils {
         var fileContents: String? = nil
         do {
             fileContents = try String(contentsOfFile: path!, encoding: encoding)
-        } catch _ as NSError {
+        } catch {
             return ""
         }
-
-
 
         return fileContents ?? ""
     }
 
     public static func readFile2StringByPath(_ path: String, _ encoding: String.Encoding = String.Encoding.utf8) -> String {
 
-        //let path = fileName.stringByExpandingTildeInPath
         var fileContents: String? = nil
+        
         do {
-            fileContents = try NSString(contentsOfFile: path, encoding: String.Encoding.utf8.rawValue) as String          //try String(contentsOfFile: path!, encoding: encoding)
-        } catch _ as NSError {
+            fileContents = try String(contentsOfFile: path, encoding: String.Encoding.utf8)
+        } catch {
             return ""
         }
 

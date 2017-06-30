@@ -18,7 +18,7 @@ void BailErrorStrategy::recover(Parser *recognizer, std::exception_ptr e) {
     context->exception = e;
     if (context->parent == nullptr)
       break;
-    context = (ParserRuleContext *)context->parent;
+    context = static_cast<ParserRuleContext *>(context->parent);
   } while (true);
 
   try {
@@ -42,7 +42,7 @@ Token* BailErrorStrategy::recoverInline(Parser *recognizer)  {
     context->exception = exception;
     if (context->parent == nullptr)
       break;
-    context = (ParserRuleContext *)context->parent;
+    context = static_cast<ParserRuleContext *>(context->parent);
   } while (true);
 
   try {

@@ -32,7 +32,7 @@ namespace antlr4 {
     /// <summary>
     /// Reset the error handler state for the specified {@code recognizer}. </summary>
     /// <param name="recognizer"> the parser instance </param>
-    virtual ~ANTLRErrorStrategy() {};
+    virtual ~ANTLRErrorStrategy();
 
     virtual void reset(Parser *recognizer) = 0;
 

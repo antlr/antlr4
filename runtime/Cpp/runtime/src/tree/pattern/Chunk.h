@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "antlr4-common.h"
+
 namespace antlr4 {
 namespace tree {
 namespace pattern {
@@ -22,7 +24,11 @@ namespace pattern {
   /// </summary>
   class ANTLR4CPP_PUBLIC Chunk {
   public:
-    virtual ~Chunk() {};
+    Chunk() = default;
+    Chunk(Chunk const&) = default;
+    virtual ~Chunk();
+
+    Chunk& operator=(Chunk const&) = default;
 
     /// This method returns a text representation of the tag chunk. Labeled tags
     /// are returned in the form {@code label:tag}, and unlabeled tags are

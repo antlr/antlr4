@@ -96,7 +96,7 @@ Now a fully functioning script might look like the following:
 
 ```javascript
    var input = "your text to parse here"
-   var chars = CharStreams.fromString(input);
+   var chars = new antlr4.InputStream(input);
    var lexer = new MyGrammarLexer.MyGrammarLexer(chars);
    var tokens  = new antlr4.CommonTokenStream(lexer);
    var parser = new MyGrammarParser.MyGrammarParser(tokens);
@@ -153,6 +153,10 @@ In order to execute this listener, you would simply add the following lines to t
    var printer = new KeyPrinter();
  antlr4.tree.ParseTreeWalker.DEFAULT.walk(printer, tree);
 ```
+
+## What about TypeScript?
+
+We currently do not have a TypeScript target, but Sam Harwell is [working on a port](https://github.com/tunnelvisionlabs/antlr4ts). [Here](https://github.com/ChuckJonas/extract-interface-ts) is Section 4.3 of [ANTLR 4 book](http://a.co/5jUJYmh) converted to typescript.
 
 ## How do I integrate my parser with ACE editor?
 

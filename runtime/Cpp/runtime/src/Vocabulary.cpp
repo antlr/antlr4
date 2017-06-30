@@ -22,6 +22,9 @@ Vocabulary::Vocabulary(const std::vector<std::string> &literalNames,
   // See note here on -1 part: https://github.com/antlr/antlr4/pull/1146
 }
 
+Vocabulary::~Vocabulary() {
+}
+
 Vocabulary Vocabulary::fromTokenNames(const std::vector<std::string> &tokenNames) {
   if (tokenNames.empty()) {
     return EMPTY_VOCABULARY;

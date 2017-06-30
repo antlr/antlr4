@@ -164,7 +164,7 @@ namespace antlr4 {
 
       RewriteOperation(TokenStreamRewriter *outerInstance, size_t index);
       RewriteOperation(TokenStreamRewriter *outerInstance, size_t index, const std::string& text);
-      virtual ~RewriteOperation() {};
+      virtual ~RewriteOperation();
 
       /// Execute the rewrite operation by possibly adding to the buffer.
       /// Return the index of the next token to operate on.

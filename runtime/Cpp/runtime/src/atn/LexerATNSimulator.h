@@ -17,7 +17,7 @@ namespace atn {
   protected:
     class SimState {
     public:
-      virtual ~SimState() {};
+      virtual ~SimState();
 
     protected:
       size_t index;

@@ -482,7 +482,7 @@ public class ParseTreePatternMatcher {
             let c: Chunk = chunks[i]
             if c is TextChunk {
                 let tc: TextChunk = c as! TextChunk
-                let unescaped: String = tc.getText().replaceAll(escape, replacement: "")
+                let unescaped = tc.getText().replacingOccurrences(of: escape, with: "")
                 if unescaped.length < tc.getText().length {
                     chunks[i] = TextChunk(unescaped)
                 }

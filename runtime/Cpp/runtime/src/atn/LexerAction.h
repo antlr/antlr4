@@ -6,6 +6,7 @@
 #pragma once
 
 #include "atn/LexerActionType.h"
+#include "antlr4-common.h"
 
 namespace antlr4 {
 namespace atn {
@@ -20,7 +21,7 @@ namespace atn {
   /// </summary>
   class ANTLR4CPP_PUBLIC LexerAction {
   public:
-    virtual ~LexerAction() {};
+    virtual ~LexerAction();
 
     /// <summary>
     /// Gets the serialization type of the lexer action.
