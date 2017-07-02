@@ -5,10 +5,12 @@
 
 #include "Any.h"
 
-antlrcpp::Any::~Any()
+using namespace antlrcpp;
+
+Any::~Any()
 {
     delete _ptr;
 }
 
-antlrcpp::Any::Base::~Base() {
+Any::Base::~Base() {
 }
