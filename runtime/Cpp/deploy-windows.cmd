@@ -12,7 +12,8 @@ rem Headers
 xcopy runtime\src\*.h antlr4-runtime\ /s
 
 rem Binaries
-if exist "C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\Tools\VsDevCmd.bat" (
+rem VS 2013 disabled by default. Change the X to a C to enable it.
+if exist "X:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\Tools\VsDevCmd.bat" (
   call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\Tools\VsDevCmd.bat"
 
   pushd runtime
