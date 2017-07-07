@@ -23,6 +23,18 @@ func NewInterval(start, stop int) *Interval {
 	return i
 }
 
+func (i *Interval) GetStart() int {
+	return i.start
+}
+
+func (i *Interval) GetStop() int {
+	return i.stop
+}
+
+func (i *Interval) Contains(item int) bool {
+	return i.contains(item)
+}
+
 func (i *Interval) contains(item int) bool {
 	return item >= i.start && item < i.stop
 }
