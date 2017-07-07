@@ -32,10 +32,6 @@ func (i *Interval) GetStop() int {
 }
 
 func (i *Interval) Contains(item int) bool {
-	return i.contains(item)
-}
-
-func (i *Interval) contains(item int) bool {
 	return item >= i.start && item < i.stop
 }
 
@@ -143,7 +139,7 @@ func (i *IntervalSet) contains(item int) bool {
 		return false
 	}
 	for k := 0; k < len(i.intervals); k++ {
-		if i.intervals[k].contains(item) {
+		if i.intervals[k].Contains(item) {
 			return true
 		}
 	}
