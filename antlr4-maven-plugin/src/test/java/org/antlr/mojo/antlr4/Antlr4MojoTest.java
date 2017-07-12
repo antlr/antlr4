@@ -202,6 +202,7 @@ public class Antlr4MojoTest {
         Path genHello = generatedSources.resolve("test/HelloParser.java");
 
         Path baseGrammar = antlrDir.resolve("imports/TestBaseLexer.g4");
+        Path baseGrammar2 = antlrDir.resolve("imports/TestBaseLexer2.g4");
         Path lexerGrammar = antlrDir.resolve("test/TestLexer.g4");
         Path parserGrammar = antlrDir.resolve("test/TestParser.g4");
 
@@ -257,7 +258,25 @@ public class Antlr4MojoTest {
         assertTrue(Arrays.equals(origHelloSum, checksum(genHello)));
 
         ////////////////////////////////////////////////////////////////////////
-        // 4th - the lexer grammar changed, the parser grammar has to be processed as well
+        // 4th - the second imported grammar changed, every dependency has to be processed
+        ////////////////////////////////////////////////////////////////////////
+
+        // modify the grammar to make checksum comparison detect a change
+        try(Change change = Change.of(baseGrammar2, "BANG: '!' ;")) {
+            maven.executeMojo(session, project, exec);
+
+            assertFalse(Arrays.equals(origTestLexerSum, checksum(genTestLexer)));
+            assertFalse(Arrays.equals(origTestParserSum, checksum(genTestParser)));
+            assertTrue(Arrays.equals(origHelloSum, checksum(genHello)));
+        }
+        // Restore file and confirm it was restored.
+        maven.executeMojo(session, project, exec);
+        assertTrue(Arrays.equals(origTestLexerSum, checksum(genTestLexer)));
+        assertTrue(Arrays.equals(origTestParserSum, checksum(genTestParser)));
+        assertTrue(Arrays.equals(origHelloSum, checksum(genHello)));
+
+        ////////////////////////////////////////////////////////////////////////
+        // 5th - the lexer grammar changed, the parser grammar has to be processed as well
         ////////////////////////////////////////////////////////////////////////
 
         // modify the grammar to make checksum comparison detect a change
@@ -275,7 +294,7 @@ public class Antlr4MojoTest {
         assertTrue(Arrays.equals(origHelloSum, checksum(genHello)));
 
         ////////////////////////////////////////////////////////////////////////
-        // 5th - the parser grammar changed, no other grammars have to be processed
+        // 6th - the parser grammar changed, no other grammars have to be processed
         ////////////////////////////////////////////////////////////////////////
 
         // modify the grammar to make checksum comparison detect a change
