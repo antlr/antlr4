@@ -395,7 +395,7 @@ public class Antlr4Mojo extends AbstractMojo {
             String tokensFileName = grammarFile.getName().split("\\.")[0] + ".tokens";
             File outputFile = new File(outputDirectory, tokensFileName);
             if ( (! outputFile.exists()) ||
-                 outputFile.lastModified() < grammarFile.lastModified() ||
+                 outputFile.lastModified() <= grammarFile.lastModified() ||
                  dependencies.isDependencyChanged(grammarFile)) {
                 grammarFilesToProcess.add(grammarFile);
             }
