@@ -261,7 +261,7 @@ public class Antlr4MojoTest {
         ////////////////////////////////////////////////////////////////////////
 
         // modify the grammar to make checksum comparison detect a change
-        try(Change change = Change.of(lexerGrammar)) {
+        try(Change change = Change.of(lexerGrammar, "FOO: 'foo' ;")) {
             maven.executeMojo(session, project, exec);
 
             assertFalse(Arrays.equals(origTestLexerSum, checksum(genTestLexer)));
