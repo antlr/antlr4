@@ -7,7 +7,7 @@ ANTLR_DIR=`readlink -f "$DOCKER_DIR/.."`;
 
 IMAGE_NAME="antlr4/basic";
 
-pushd $DOCKER_DIR > /dev/null
+pushd $DOCKER_DIR > /dev/null;
 
 docker build --tag "${IMAGE_NAME}" . ;
 
@@ -25,4 +25,4 @@ docker run -i --tty \
     --hostname="antlr4" \
     "${IMAGE_NAME}";
 
-popd > /dev/null
+popd > /dev/null;
