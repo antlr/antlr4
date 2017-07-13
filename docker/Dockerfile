@@ -19,6 +19,11 @@ RUN bash /tmp/install-maven.sh "3.5.0"
 # Needed when running ANTLR as a plugin in Maven
 ENV MAVEN_OPTS="-Xmx1G"
 
+ADD antlr4.sh /usr/local/bin/
+ADD grun.sh /usr/local/bin/
+RUN chmod u+x /usr/local/bin/*.sh   
+
+
 RUN mkdir /opt/project;
 VOLUME /opt/project
 WORKDIR /opt/project
