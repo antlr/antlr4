@@ -21,6 +21,7 @@ docker run -i --tty \
     --name "antlr4-development" \
     --volume "${ANTLR_DIR}:/opt/project" \
     --volume "m2-repository:/root/.m2/repository" \
+    -p 127.0.0.1:5005:5005 \
     --hostname="antlr4" \
     "${IMAGE_NAME}";
 

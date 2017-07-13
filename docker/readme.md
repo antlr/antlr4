@@ -24,7 +24,37 @@ Using the Java runtime just as a stable example.
 4. Run the changed tool against your grammar file: `antlr4.sh Hello.g4 -package Example -Dlanguage=java`
 5. Inspect the generated `*.java` files and see what comes up as a syntax error.
 
-Known issues:
+## Debugging
+
+The approach taken in this section is to configure the running program in the 
+docker container to open a listening port and then wait for a debugger to
+connect. (The alternative would be to have the JVM connect outwards seeking a
+listening debugger.)
+
+
+### Debugging Maven
+
+This command will set up debugging for the `mvn` command on top of whatever the
+pre-existing `MAVEN_OPTS` are. Note that since it does not begin with `export`, 
+it only changes `MAVEN_OPTS` for the current run. 
+
+    MAVEN_OPTS="$MAVEN_OPTS -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005" mvn
+    
+Note that the command will pause, waiting for a connection from your IDE.    
+    
+### Debugging antlr4.sh
+
+    ANTLR_JVM_OPTS="-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005" antlr4.sh
+   
+Note that the command will pause, waiting for a connection from your IDE.
+  
+### Changing the debugging port
+
+If your IDE does not want to use 5005, you can easily change the port by 
+altering `docker/go.sh` so that it is mapped to something different on localhost.
+ 
+
+## Known issues
 
 1. Not using `docker-compose` because it doesn't seamlessly support interactive stuff on Windows quite yet.
 2. Files created by processes inside the Docker environment may set the wrong ownership. 

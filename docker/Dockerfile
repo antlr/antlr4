@@ -28,4 +28,7 @@ RUN mkdir /opt/project;
 VOLUME /opt/project
 WORKDIR /opt/project
 
+# Java debugging port for host to connect inwards on
+EXPOSE 5005
+
 CMD ["bash"]
