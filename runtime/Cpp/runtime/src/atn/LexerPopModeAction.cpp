@@ -34,7 +34,7 @@ void LexerPopModeAction::execute(Lexer *lexer) {
 
 size_t LexerPopModeAction::hashCode() const {
   size_t hash = MurmurHash::initialize();
-  hash = MurmurHash::update(hash, (size_t)getActionType());
+  hash = MurmurHash::update(hash, static_cast<size_t>(getActionType()));
   return MurmurHash::finish(hash, 1);
 }
 
