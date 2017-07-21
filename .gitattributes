@@ -1,2 +1,7 @@
 # This rule applies to all files which don't match another line below
 * text=auto
+
+# These files are packaged into a docker image and need unix-style line-endings
+docker/install-maven.sh text eol=lf
+docker/antlr4.sh text eol=lf
+docker/grun.sh text eol=lf
