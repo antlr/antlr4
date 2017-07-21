@@ -14,6 +14,7 @@
 	</parent>
 	<artifactId>antlr4-runtime</artifactId>
 	<name>ANTLR 4 Runtime</name>
+	<packaging>bundle</packaging>
 	<description>The ANTLR 4 Runtime</description>
 
 	<properties>
@@ -88,7 +89,8 @@
 			<plugin>
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-bundle-plugin</artifactId>
-				<version>2.5.4</version>
+				<version>3.3.0</version>
+				<extensions>true</extensions>
 				<executions>
 					<execution>
 						<id>bundle-manifest</id>

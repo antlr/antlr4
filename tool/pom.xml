@@ -12,6 +12,7 @@
 		<version>4.7.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>antlr4</artifactId>
+	<packaging>bundle</packaging>
 	<name>ANTLR 4 Tool</name>
 	<url>http://www.antlr.org</url>
 	<description>The ANTLR 4 grammar compiler.</description>
@@ -86,6 +87,7 @@
 			<plugin> <!-- include code-generated sources -->
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>build-helper-maven-plugin</artifactId>
+				<extensions>true</extensions>
 				<executions>
 					<execution>
 						<phase>generate-sources</phase>
@@ -188,6 +190,11 @@
 						</goals>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<extensions>true</extensions>
 			</plugin>
 		</plugins>
 	</build>
