@@ -160,6 +160,7 @@ Object.defineProperty(<parser.name>.prototype, "atn", {
 });
 
 <parser.name>.EOF = antlr4.Token.EOF;
+<parser.name>.prototype.EOF = antlr4.Token.EOF;
 <if(parser.tokens)>
 <parser.tokens:{k | <parser.name>.<k> = <parser.tokens.(k)>;}; separator="\n", wrap, anchor>
 <endif>
@@ -802,6 +803,9 @@ var antlr4 = require('antlr4/index');
 >>
 
 Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
+<if(superClass)>
+var <superClass> = require('./<superClass>').<superClass>;
+<endif>
 
 <atn>
 
@@ -819,14 +823,18 @@ function <lexer.name>(input) {
 <lexer.name>.prototype.constructor = <lexer.name>;
 
 <lexer.name>.EOF = antlr4.Token.EOF;
+<lexer.name>.prototype.EOF = antlr4.Token.EOF;
 <lexer.tokens:{k | <lexer.name>.<k> = <lexer.tokens.(k)>;}; separator="\n", wrap, anchor>
+<lexer.tokens:{k | <lexer.name>.prototype.<k> = <lexer.tokens.(k)>;}; separator="\n", wrap, anchor>
 
 <if(lexer.channels)>
 <lexer.channels:{c| <lexer.name>.<c> = <lexer.channels.(c)>;}; separator="\n">
+<lexer.channels:{c| <lexer.name>.prototype.<c> = <lexer.channels.(c)>;}; separator="\n">
 
 <endif>
 <if(rest(lexer.modes))>
 <rest(lexer.modes):{m| <lexer.name>.<m> = <i>;}; separator="\n">
+<rest(lexer.modes):{m| <lexer.name>.prototype.<m> = <i>;}; separator="\n">
 
 <endif>
 <lexer.name>.prototype.channelNames = [ "DEFAULT_TOKEN_CHANNEL", "HIDDEN"<if (lexer.channels)>, <lexer.channels:{c| "<c>"}; separator=", ", wrap, anchor><endif> ];
