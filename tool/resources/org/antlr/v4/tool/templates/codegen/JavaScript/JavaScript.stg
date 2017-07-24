@@ -822,7 +822,6 @@ function <lexer.name>(input) {
 <lexer.name>.prototype.constructor = <lexer.name>;
 
 <lexer.name>.EOF = antlr4.Token.EOF;
-<lexer.name>.prototype.EOF = antlr4.Token.EOF;
 <lexer.tokens:{k | <lexer.name>.<k> = <lexer.tokens.(k)>;}; separator="\n", wrap, anchor>
 
 <if(lexer.channels)>
