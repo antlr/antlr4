@@ -66,6 +66,11 @@ if (MSVC_VERSION)
   target_compile_options(antlr4_static PRIVATE "/MT$<$<CONFIG:Debug>:d>")
 endif()
 
+set(static_lib_suffix "")
+if (MSVC_VERSION)
+  set(static_lib_suffix "-static")
+endif()
+
 set_target_properties(antlr4_shared
                       PROPERTIES VERSION   ${ANTLR_VERSION}
                                  SOVERSION ${ANTLR_VERSION}
@@ -80,7 +85,7 @@ set_target_properties(antlr4_shared
 set_target_properties(antlr4_static
                       PROPERTIES VERSION   ${ANTLR_VERSION}
                                  SOVERSION ${ANTLR_VERSION}
-                                 OUTPUT_NAME antlr4-runtime
+                                 OUTPUT_NAME "antlr4-runtime${static_lib_suffix}"
                                  ARCHIVE_OUTPUT_DIRECTORY ${LIB_OUTPUT_DIR}
                                  COMPILE_FLAGS "${disabled_compile_warnings} ${extra_static_compile_flags}")
 
