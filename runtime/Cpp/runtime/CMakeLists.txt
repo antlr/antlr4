@@ -62,8 +62,8 @@ if (WIN32)
   set(extra_static_compile_flags "-DANTLR4CPP_STATIC")
 endif(WIN32)
 if (MSVC_VERSION)
-  set(extra_share_compile_flags "${extra_share_compile_flags} /MD")
-  set(extra_static_compile_flags "${extra_static_compile_flags} /MT")
+  target_compile_options(antlr4_shared PRIVATE "/MD$<$<CONFIG:Debug>:d>")
+  target_compile_options(antlr4_static PRIVATE "/MT$<$<CONFIG:Debug>:d>")
 endif()
 
 set_target_properties(antlr4_shared
