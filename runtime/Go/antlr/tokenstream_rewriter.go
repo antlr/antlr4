@@ -443,8 +443,8 @@ func (tsr *TokenStreamRewriter)GetTextDefault() string{
 //  instructions given to this rewriter.
 func (tsr *TokenStreamRewriter)GetText(program_name string, interval *Interval) string  {
 	rewrites := tsr.programs[program_name]
-	start := interval.start
-	stop  := interval.stop
+	start := interval.Start
+	stop  := interval.Stop
 	// ensure start/end are in range
 	stop = min(stop, tsr.tokens.Size()-1)
 	start = max(start,0)
