@@ -20,7 +20,6 @@ public class ProxyErrorListener: ANTLRErrorListener {
         self.delegates = delegates
     }
 
-    //_ e : RecognitionException
     public func syntaxError<T:ATNSimulator>(_ recognizer: Recognizer<T>,
                                             _ offendingSymbol: AnyObject?,
                                             _ line: Int,

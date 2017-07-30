@@ -35,8 +35,8 @@ public protocol TokenStream: IntStream {
      * of the stream. Unlike {@code seek()}, this method does not adjust
      * {@code index} to point to a non-ignored symbol.</p>
      *
-     * @throws IllegalArgumentException if {code index} is less than 0
-     * @throws UnsupportedOperationException if the stream does not support
+     * @throws ANTLRError.illegalArgument if {code index} is less than 0
+     * @throws ANTLRError.unsupportedOperation if the stream does not support
      * retrieving the token at the specified index
      */
     func get(_ index: Int) throws -> Token
@@ -66,7 +66,7 @@ public protocol TokenStream: IntStream {
      * @return The text of all tokens within the specified interval in this
      * stream.
      *
-     * @throws NullPointerException if {@code interval} is {@code null}
+     * @throws ANTLRError.nullPointer if {@code interval} is {@code null}
      */
     func getText(_ interval: Interval) throws -> String
 
@@ -131,7 +131,7 @@ public protocol TokenStream: IntStream {
      * @return The text of all tokens lying between the specified {@code start}
      * and {@code stop} tokens.
      *
-     * @throws UnsupportedOperationException if this stream does not support
+     * @throws ANTLRError.unsupportedOperation if this stream does not support
      * this method for the specified tokens
      */
     func getText(_ start: Token?, _ stop: Token?) throws -> String

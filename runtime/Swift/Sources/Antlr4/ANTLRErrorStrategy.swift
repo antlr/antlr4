@@ -36,10 +36,10 @@ public protocol ANTLRErrorStrategy {
     /// for calling {@link org.antlr.v4.runtime.Parser#notifyErrorListeners} as appropriate.</p>
     ///
     /// - parameter recognizer: the parser instance
-    /// -  org.antlr.v4.runtime.RecognitionException if the error strategy was not able to
+    /// - throws: _RecognitionException_ if the error strategy was not able to
     /// recover from the unexpected input symbol
     @discardableResult
-    func recoverInline(_ recognizer: Parser) throws -> Token // RecognitionException;
+    func recoverInline(_ recognizer: Parser) throws -> Token
 
     /// This method is called to recover from exception {@code e}. This method is
     /// called after {@link #reportError} by the default exception handler
@@ -49,9 +49,9 @@ public protocol ANTLRErrorStrategy {
     ///
     /// - parameter recognizer: the parser instance
     /// - parameter e: the recognition exception to recover from
-    /// -  org.antlr.v4.runtime.RecognitionException if the error strategy could not recover from
+    /// - throws: _RecognitionException_ if the error strategy could not recover from
     /// the recognition exception
-    func recover(_ recognizer: Parser, _ e: AnyObject) throws // RecognitionException;
+    func recover(_ recognizer: Parser, _ e: AnyObject) throws
 
     /// This method provides the error handler with an opportunity to handle
     /// syntactic or semantic errors in the input stream before they result in a
@@ -67,10 +67,10 @@ public protocol ANTLRErrorStrategy {
     /// - seealso: org.antlr.v4.runtime.DefaultErrorStrategy#sync
     ///
     /// - parameter recognizer: the parser instance
-    /// -  org.antlr.v4.runtime.RecognitionException if an error is detected by the error
+    /// - throws: _RecognitionException_ if an error is detected by the error
     /// strategy but cannot be automatically recovered at the current state in
     /// the parsing process
-    func sync(_ recognizer: Parser) throws // RecognitionException;
+    func sync(_ recognizer: Parser) throws
 
     /// Tests whether or not recognizer} is in the process of recovering
     /// from an error. In error recovery mode, {@link org.antlr.v4.runtime.Parser#consume} adds

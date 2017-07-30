@@ -2,8 +2,6 @@
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
 
-
-
 /// This is the default implementation of {@link org.antlr.v4.runtime.ANTLRErrorStrategy} used for
 /// error reporting and recovery in ANTLR parsers.
 
@@ -26,11 +24,8 @@ public class DefaultErrorStrategy: ANTLRErrorStrategy {
 
     internal var lastErrorStates: IntervalSet?
 
-    /// {@inheritDoc}
-    ///
     /// <p>The default implementation simply calls {@link #endErrorCondition} to
     /// ensure that the handler is not in error recovery mode.</p>
-
     public func reset(_ recognizer: Parser) {
         endErrorCondition(recognizer)
     }
@@ -42,8 +37,6 @@ public class DefaultErrorStrategy: ANTLRErrorStrategy {
     internal func beginErrorCondition(_ recognizer: Parser) {
         errorRecoveryMode = true
     }
-
-    /// {@inheritDoc}
 
     public func inErrorRecoveryMode(_ recognizer: Parser) -> Bool {
         return errorRecoveryMode
@@ -59,15 +52,11 @@ public class DefaultErrorStrategy: ANTLRErrorStrategy {
         lastErrorIndex = -1
     }
 
-    /// {@inheritDoc}
-    ///
     /// <p>The default implementation simply calls {@link #endErrorCondition}.</p>
-
     public func reportMatch(_ recognizer: Parser) {
         endErrorCondition(recognizer)
     }
 
-    /// {@inheritDoc}
     ///
     /// <p>The default implementation returns immediately if the handler is already
     /// in error recovery mode. Otherwise, it calls {@link #beginErrorCondition}
@@ -84,7 +73,6 @@ public class DefaultErrorStrategy: ANTLRErrorStrategy {
     /// <li>All other types: calls {@link org.antlr.v4.runtime.Parser#notifyErrorListeners} to report
     /// the exception</li>
     /// </ul>
-
     public func reportError(_ recognizer: Parser,
                             _ e: AnyObject) {
         // if we've already reported an error and have not matched a token
@@ -94,7 +82,6 @@ public class DefaultErrorStrategy: ANTLRErrorStrategy {
             return // don't report spurious errors
         }
         beginErrorCondition(recognizer)
-        //TODO:  exception handler
         if (e is NoViableAltException) {
             try! reportNoViableAlternative(recognizer, e as! NoViableAltException);
         } else {
@@ -112,12 +99,9 @@ public class DefaultErrorStrategy: ANTLRErrorStrategy {
         }
     }
 
-    /// {@inheritDoc}
-    ///
     /// <p>The default implementation resynchronizes the parser by consuming tokens
     /// until we find one in the resynchronization set--loosely the set of tokens
     /// that can follow the current rule.</p>
-
     public func recover(_ recognizer: Parser, _ e: AnyObject) throws {
 //		print("recover in "+recognizer.getRuleInvocationStack()+
 //						   " index="+getTokenStream(recognizer).index()+
@@ -507,7 +491,6 @@ public class DefaultErrorStrategy: ANTLRErrorStrategy {
     /// a CommonToken of the appropriate type. The text will be the token.
     /// If you change what tokens must be created by the lexer,
     /// override this method to create the appropriate tokens.
-
     internal func getTokenStream(_ recognizer: Parser) -> TokenStream {
         return recognizer.getInputStream() as! TokenStream
     }

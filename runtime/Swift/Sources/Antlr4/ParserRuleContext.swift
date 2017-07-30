@@ -26,7 +26,6 @@
  *  group values such as this aggregate.  The getters/setters are there to
  *  satisfy the superclass interface.
  */
-
 open class ParserRuleContext: RuleContext {
     public var visited = false
     /** If we are debugging or building a parse tree for a visitor,
@@ -55,8 +54,6 @@ open class ParserRuleContext: RuleContext {
      *
      *  This does not trace states visited during prediction.
      */
-//	public List<Integer> states;
-
     public var start: Token?, stop: Token?
 
     /**
@@ -64,7 +61,6 @@ open class ParserRuleContext: RuleContext {
      * completed, this is {@code null}.
      */
     public var exception: AnyObject!
-    //RecognitionException<ATNSimulator>!;
 
     public override init() {
         super.init()
@@ -198,7 +194,9 @@ open class ParserRuleContext: RuleContext {
 
 
     override
-    /** Override to make type more specific */
+    /**
+     * Override to make type more specific
+     */
     open func getParent() -> Tree? {
         return super.getParent()
     }

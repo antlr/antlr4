@@ -36,7 +36,6 @@ public class ListTokenSource: TokenSource {
     ///
     /// - parameter tokens: The collection of {@link org.antlr.v4.runtime.Token} objects to provide as a
     /// {@link org.antlr.v4.runtime.TokenSource}.
-    /// -  NullPointerException if {@code tokens} is {@code null}
     public convenience init(_ tokens: Array<Token>) {
         self.init(tokens, nil)
     }
@@ -50,15 +49,11 @@ public class ListTokenSource: TokenSource {
     /// {@code null}, {@link #getSourceName} will attempt to infer the name from
     /// the next {@link org.antlr.v4.runtime.Token} (or the previous token if the end of the input has
     /// been reached).
-    ///
-    /// -  NullPointerException if {@code tokens} is {@code null}
     public init(_ tokens: Array<Token>, _ sourceName: String?) {
 
         self.tokens = tokens
         self.sourceName = sourceName
     }
-
-    /// {@inheritDoc}
 
     public func getCharPositionInLine() -> Int {
         if i < tokens.count {
@@ -92,8 +87,6 @@ public class ListTokenSource: TokenSource {
         return 0
     }
 
-    /// {@inheritDoc}
-
     public func nextToken() -> Token {
         if i >= tokens.count {
             if eofToken == nil {
@@ -120,8 +113,6 @@ public class ListTokenSource: TokenSource {
         i += 1
         return t
     }
-
-    /// {@inheritDoc}
 
     public func getLine() -> Int {
         if i < tokens.count {
@@ -156,8 +147,6 @@ public class ListTokenSource: TokenSource {
         return 1
     }
 
-    /// {@inheritDoc}
-
     public func getInputStream() -> CharStream? {
         if i < tokens.count {
             return tokens[i].getInputStream()
@@ -175,8 +164,6 @@ public class ListTokenSource: TokenSource {
         return nil
     }
 
-    /// {@inheritDoc}
-
     public func getSourceName() -> String {
         if sourceName != nil {
             return sourceName!
@@ -189,13 +176,9 @@ public class ListTokenSource: TokenSource {
         return "List"
     }
 
-    /// {@inheritDoc}
-
     public func setTokenFactory(_ factory: TokenFactory) {
         self._factory = factory
     }
-
-    /// {@inheritDoc}
 
     public func getTokenFactory() -> TokenFactory {
         return _factory

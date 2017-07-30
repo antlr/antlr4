@@ -128,7 +128,6 @@ open class Recognizer<ATNInterpreter:ATNSimulator> {
     open func getSerializedATN() -> String {
         RuntimeException("there is no serialized ATN")
         fatalError()
-        ///throw  ANTLRError.UnsupportedOperation /* throw UnsupportedOperationException("there is no /serialized ATN"); */
     }
 
     /** For debugging and other purposes, might want the grammar name.
@@ -177,9 +176,9 @@ open class Recognizer<ATNInterpreter:ATNSimulator> {
         _interp = interpreter
     }
 
-    /** What is the error header, normally line/character position information? */
-    //public func getErrorHeader(e : RecognitionException
-
+    /**
+     * What is the error header, normally line/character position information?
+     */
     open func getErrorHeader(_ e: AnyObject) -> String {
         let line: Int = (e as! RecognitionException).getOffendingToken().getLine()
         let charPositionInLine: Int = (e as! RecognitionException).getOffendingToken().getCharPositionInLine()
@@ -222,7 +221,7 @@ open class Recognizer<ATNInterpreter:ATNSimulator> {
     }
 
     /**
-     * @exception NullPointerException if {@code listener} is {@code null}.
+     * @exception ANTLRError.nullPointer if {@code listener} is {@code null}.
      */
     open func addErrorListener(_ listener: ANTLRErrorListener) {
 
@@ -285,22 +284,18 @@ open class Recognizer<ATNInterpreter:ATNSimulator> {
         fatalError()
     }
 
-
     open func setInputStream(_ input: IntStream) throws {
         RuntimeException(#function + "Must be overridden")
 
     }
-
 
     open func getTokenFactory() -> TokenFactory {
         RuntimeException(#function + "Must be overridden")
         fatalError()
     }
 
-
     open func setTokenFactory(_ input: TokenFactory) {
         RuntimeException(#function + "Must be overridden")
 
     }
-
 }

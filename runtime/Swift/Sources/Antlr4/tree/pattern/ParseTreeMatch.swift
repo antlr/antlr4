@@ -40,9 +40,9 @@ public class ParseTreeMatch: CustomStringConvertible {
      * @param mismatchedNode The first node which failed to match the tree
      * pattern during the matching process.
      *
-     * @exception IllegalArgumentException if {@code tree} is {@code null}
-     * @exception IllegalArgumentException if {@code pattern} is {@code null}
-     * @exception IllegalArgumentException if {@code labels} is {@code null}
+     * @exception ANTLRError.ilegalArgument if {@code tree} is {@code null}
+     * @exception ANTLRError.ilegalArgument if {@code pattern} is {@code null}
+     * @exception ANTLRError.ilegalArgument if {@code labels} is {@code null}
      */
     public init(_ tree: ParseTree, _ pattern: ParseTreePattern, _ labels: MultiMap<String, ParseTree>, _ mismatchedNode: ParseTree?) {
 

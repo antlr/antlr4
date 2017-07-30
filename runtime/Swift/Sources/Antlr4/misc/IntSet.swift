@@ -12,7 +12,7 @@ public protocol IntSet {
     ///
     /// - parameter el: the value to add
     ///
-    /// -  IllegalStateException if the current set is read-only
+    /// - throws: _ANTLRError.illegalState_ if the current set is read-only
     func add(_ el: Int) throws
 
     /// Modify the current {@link org.antlr.v4.runtime.misc.IntSet} object to contain all elements that are
@@ -22,7 +22,7 @@ public protocol IntSet {
     /// treated as though it were an empty set.
     /// - returns: {@code this} (to support chained calls)
     ///
-    /// -  IllegalStateException if the current set is read-only
+    /// - throws: _ANTLRError.illegalState_ if the current set is read-only
 
     func addAll(_ set: IntSet?) throws -> IntSet
 
@@ -122,7 +122,7 @@ public protocol IntSet {
     ///
     /// - parameter el: the value to remove
     ///
-    /// -  IllegalStateException if the current set is read-only
+    /// - throws: _ANTLRError.illegalState_ if the current set is read-only
     func remove(_ el: Int) throws
 
     /// Return a list containing the elements represented by the current set. The

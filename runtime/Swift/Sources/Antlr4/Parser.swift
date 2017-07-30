@@ -217,7 +217,7 @@ open class Parser: Recognizer<ParserATNSimulator> {
      * @throws org.antlr.v4.runtime.RecognitionException if the current input symbol did not match
      * a wildcard and the error strategy could not recover from the mismatched
      * symbol
-     *///; RecognitionException
+     */
     @discardableResult
     public func matchWildcard() throws -> Token {
         var t: Token = try getCurrentToken()
@@ -330,7 +330,7 @@ open class Parser: Recognizer<ParserATNSimulator> {
      *
      * @param listener the listener to add
      *
-     * @throws NullPointerException if {@code} listener is {@code null}
+     * @throws _ANTLRError.nullPointer_ if listener is {@code null}
      */
     public func addParseListener(_ listener: ParseTreeListener) {
         if _parseListeners == nil {
@@ -432,7 +432,7 @@ open class Parser: Recognizer<ParserATNSimulator> {
      * The ATN with bypass alternatives is expensive to create so we create it
      * lazily.
      *
-     * @throws UnsupportedOperationException if the current parser does not
+     * @throws _ANTLRError.unsupportedOperation_ if the current parser does not
      * implement the {@link #getSerializedATN()} method.
      */
 

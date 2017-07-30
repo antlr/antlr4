@@ -10,7 +10,7 @@ public protocol ANTLRErrorListener: class {
     /// messages. This listener's job is simply to emit a computed message,
     /// though it has enough information to create its own message in many cases.
     ///
-    /// <p>The {@link org.antlr.v4.runtime.RecognitionException} is non-null for all syntax errors except
+    /// <p>The {@link RecognitionException} is non-null for all syntax errors except
     /// when we discover mismatched token errors that we can recover from
     /// in-line, without returning from the surrounding rule (via the single
     /// token insertion and deletion mechanism).</p>
@@ -40,7 +40,7 @@ public protocol ANTLRErrorListener: class {
                                      _ line: Int,
                                      _ charPositionInLine: Int,
                                      _ msg: String,
-                                     _ e: AnyObject?// RecognitionException?
+                                     _ e: AnyObject?
     )
 
     /// This method is called by the parser when a full-context prediction

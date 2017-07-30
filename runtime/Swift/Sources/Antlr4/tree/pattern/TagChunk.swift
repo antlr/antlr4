@@ -36,7 +36,7 @@ public class TagChunk: Chunk, CustomStringConvertible {
      * @param tag The tag, which should be the name of a parser rule or token
      * type.
      *
-     * @exception IllegalArgumentException if {@code tag} is {@code null} or
+     * @exception ANTLRError.illegalArgument if {@code tag} is {@code null} or
      * empty.
      */
     public convenience init(_ tag: String) throws {
@@ -52,7 +52,7 @@ public class TagChunk: Chunk, CustomStringConvertible {
      * @param tag The tag, which should be the name of a parser rule or token
      * type.
      *
-     * @exception IllegalArgumentException if {@code tag} is {@code null} or
+     * @exception ANTLRError.illegalArgument if {@code tag} is {@code null} or
      * empty.
      */
     public init(_ label: String?, _ tag: String) throws {
@@ -70,7 +70,6 @@ public class TagChunk: Chunk, CustomStringConvertible {
      *
      * @return The tag for the chunk.
      */
-
     public final func getTag() -> String {
         return tag
     }
@@ -81,7 +80,6 @@ public class TagChunk: Chunk, CustomStringConvertible {
      * @return The label assigned to this chunk, or {@code null} if no label is
      * assigned to the chunk.
      */
-
     public final func getLabel() -> String? {
         return label
     }
@@ -91,8 +89,6 @@ public class TagChunk: Chunk, CustomStringConvertible {
      * are returned in the form {@code label:tag}, and unlabeled tags are
      * returned as just the tag name.
      */
-
-
     public var description: String {
         if label != nil {
             return label! + ":" + tag

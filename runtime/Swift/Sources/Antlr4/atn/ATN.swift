@@ -119,16 +119,14 @@ public class ATN {
     /// - parameter context: the full parse context
     /// - returns: The set of potentially valid input symbols which could follow the
     /// specified state in the specified context.
-    /// -  IllegalArgumentException if the ATN does not contain a state with
+    /// - throws: _ANTLRError.illegalArgument_ if the ATN does not contain a state with
     /// number {@code stateNumber}
     public func getExpectedTokens(_ stateNumber: Int, _ context: RuleContext) throws -> IntervalSet {
         if stateNumber < 0 || stateNumber >= states.count {
             throw ANTLRError.illegalArgument(msg: "Invalid state number.")
-            /// throw IllegalArgumentException("Invalid state number.");
         }
 
         var ctx: RuleContext? = context
-        //TODO:  s may be nil
         let s: ATNState = states[stateNumber]!
         var following: IntervalSet = try nextTokens(s)
         if !following.contains(CommonToken.EPSILON) {

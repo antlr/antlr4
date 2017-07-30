@@ -12,7 +12,9 @@
  */
 
 public class RecognitionException<T:ATNSimulator>  {
-    /** The {@link org.antlr.v4.runtime.Recognizer} where this exception originated. */
+    /**
+     * The {@link org.antlr.v4.runtime.Recognizer} where this exception originated.
+     */
     private final var recognizer: Recognizer<T>?
     //Recognizer<AnyObject,ATNSimulator>? ;
 

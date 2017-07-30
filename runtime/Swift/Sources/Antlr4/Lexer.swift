@@ -384,9 +384,6 @@ open class Lexer: Recognizer<LexerATNSimulator>
             s = "<EOF>"
         }
         switch s {
-//			case CommonToken.EOF :
-//				s = "<EOF>";
-//				break;
         case "\n":
             s = "\\n"
         case "\t":
@@ -408,11 +405,7 @@ open class Lexer: Recognizer<LexerATNSimulator>
     /// a token, so do the easy thing and just kill a character and hope
     /// it all works out.  You can instead use the rule invocation stack
     /// to do sophisticated error recovery if you are in a fragment rule.
-    //public func recover(re : RecognitionException) {
-
     open func recover(_ re: AnyObject) throws {
-        //System.out.println("consuming char "+(char)input.LA(1)+" during recovery");
-        //re.printStackTrace();
         // TODO: Do we lose character or line position information?
         try _input!.consume()
     }

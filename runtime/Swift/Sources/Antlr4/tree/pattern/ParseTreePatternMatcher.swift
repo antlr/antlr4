@@ -64,16 +64,6 @@
  */
 
 public class ParseTreePatternMatcher {
-//	public class CannotInvokeStartRule  :  RuntimeException {
-//		public convenience init(_ e : Throwable) {
-//			super.init(e);
-//		}
-//	}
-//
-//	// Fixes https://github.com/antlr/antlr4/issues/413
-//	// "Tree pattern compilation doesn't check for a complete parse"
-//	public class StartRuleDoesNotConsumeFullPattern  :  RuntimeException {
-//	}
 
     /**
      * This is the backing field for {@link #getLexer()}.
@@ -88,7 +78,6 @@ public class ParseTreePatternMatcher {
     internal var start: String = "<"
     internal var stop: String = ">"
     internal var escape: String = "\\"
-    // e.g., \< and \> must escape BOTH!
 
     /**
      * Constructs a {@link org.antlr.v4.runtime.tree.pattern.ParseTreePatternMatcher} or from a {@link org.antlr.v4.runtime.Lexer} and
@@ -109,22 +98,15 @@ public class ParseTreePatternMatcher {
      * @param stop The stop delimiter.
      * @param escapeLeft The escape sequence to use for escaping a start or stop delimiter.
      *
-     * @exception IllegalArgumentException if {@code start} is {@code null} or empty.
-     * @exception IllegalArgumentException if {@code stop} is {@code null} or empty.
+     * @exception ANTLRError.ilegalArgument if {@code start} is {@code null} or empty.
+     * @exception ANTLRError.ilegalArgument if {@code stop} is {@code null} or empty.
      */
     public func setDelimiters(_ start: String, _ stop: String, _ escapeLeft: String) throws {
-        //start == nil ||
         if start.isEmpty {
             throw ANTLRError.illegalArgument(msg: "start cannot be null or empty")
-            // RuntimeException("start cannot be null or empty")
-            //throwException() /* throw IllegalArgumentException("start cannot be null or empty"); */
         }
-        //stop == nil ||
         if stop.isEmpty {
             throw ANTLRError.illegalArgument(msg: "stop cannot be null or empty")
-            //RuntimeException("stop cannot be null or empty")
-
-            //throwException() /* throw IllegalArgumentException("stop cannot be null or empty"); */
         }
 
         self.start = start
@@ -132,14 +114,17 @@ public class ParseTreePatternMatcher {
         self.escape = escapeLeft
     }
 
-    /** Does {@code pattern} matched as rule {@code patternRuleIndex} match {@code tree}? */
+    /**
+     * Does {@code pattern} matched as rule {@code patternRuleIndex} match {@code tree}?
+     */
     public func matches(_ tree: ParseTree, _ pattern: String, _ patternRuleIndex: Int) throws -> Bool {
         let p: ParseTreePattern = try compile(pattern, patternRuleIndex)
         return try matches(tree, p)
     }
 
-    /** Does {@code pattern} matched as rule patternRuleIndex match tree? Pass in a
-     *  compiled pattern instead of a string representation of a tree pattern.
+    /**
+     * Does {@code pattern} matched as rule patternRuleIndex match tree? Pass in a
+     * compiled pattern instead of a string representation of a tree pattern.
      */
     public func matches(_ tree: ParseTree, _ pattern: ParseTreePattern) throws -> Bool {
         let labels: MultiMap<String, ParseTree> = MultiMap<String, ParseTree>()
@@ -163,7 +148,6 @@ public class ParseTreePatternMatcher {
      * node at which the match failed. Pass in a compiled pattern instead of a
      * string representation of a tree pattern.
      */
-
     public func match(_ tree: ParseTree, _ pattern: ParseTreePattern) throws -> ParseTreeMatch {
         let labels: MultiMap<String, ParseTree> = MultiMap<String, ParseTree>()
         let mismatchedNode: ParseTree? = try matchImpl(tree, pattern.getPatternTree(), labels)
@@ -185,29 +169,13 @@ public class ParseTreePatternMatcher {
                 parser.getATNWithBypassAlts(),
                 tokens)
 
-        var tree: ParseTree //= nil;
-        //TODO:  exception handler
-        //try {
+        var tree: ParseTree
         parserInterp.setErrorHandler(BailErrorStrategy())
         tree = try parserInterp.parse(patternRuleIndex)
-//			print("pattern tree = "+tree.toStringTree(parserInterp));
-//		}
-//		catch (ParseCancellationException e) {
-//			throwException() /* throw e.getCause() as RecognitionException; */
-//		}
-//		catch (RecognitionException re) {
-//			throwException() /* throw re; */
-//		}
-//		catch (Exception e) {
-//			throwException() /* throw CannotInvokeStartRule(e); */
-//		}
 
         // Make sure tree pattern compilation checks for a complete parse
         if try tokens.LA(1) != CommonToken.EOF {
             throw ANTLRError.illegalState(msg: "Tree pattern compilation doesn't check for a complete parse")
-            // RuntimeException("Tree pattern compilation doesn't check for a complete parse")
-            //throw ANTLRException.StartRuleDoesNotConsumeFullPattern
-            //throwException() /* throw StartRuleDoesNotConsumeFullPattern(); */
         }
 
         return ParseTreePattern(self, pattern, patternRuleIndex, tree)
@@ -217,7 +185,6 @@ public class ParseTreePatternMatcher {
      * Used to convert the tree pattern string into a series of tokens. The
      * input stream is reset.
      */
-
     public func getLexer() -> Lexer {
         return lexer
     }
@@ -226,7 +193,6 @@ public class ParseTreePatternMatcher {
      * Used to collect to the grammar file name, token names, rule names for
      * used to parse the pattern into a parse tree.
      */
-
     public func getParser() -> Parser {
         return parser
     }
@@ -242,7 +208,6 @@ public class ParseTreePatternMatcher {
      * was successful. The specific node returned depends on the matching
      * algorithm used by the implementation, and may be overridden.
      */
-
     internal func matchImpl(_ tree: ParseTree,
                             _ patternTree: ParseTree,
                             _ labels: MultiMap<String, ParseTree>) throws -> ParseTree? {
@@ -391,12 +356,13 @@ public class ParseTreePatternMatcher {
         return tokens
     }
 
-    /** Split {@code <ID> = <e:expr> ;} into 4 chunks for tokenizing by {@link #tokenize}. */
+    /**
+     * Split {@code <ID> = <e:expr> ;} into 4 chunks for tokenizing by {@link #tokenize}.
+     */
     public func split(_ pattern: String) throws -> Array<Chunk> {
         var p: Int = 0
         let n: Int = pattern.length
         var chunks: Array<Chunk> = Array<Chunk>()
-        //var buf : StringBuilder = StringBuilder();
         // find all start and stop indexes first, then collect
         var starts: Array<Int> = Array<Int>()
         var stops: Array<Int> = Array<Int>()

@@ -1924,16 +1924,6 @@ open class ParserATNSimulator: ATNSimulator {
     }
 
     internal static func getUniqueAlt(_ configs: ATNConfigSet) -> Int {
-        //        var alt: Int = ATN.INVALID_ALT_NUMBER
-        //        for c: ATNConfig in configs.configs {
-        //            if alt == ATN.INVALID_ALT_NUMBER {
-        //                alt = c.alt // found first alt
-        //            } else {
-        //                if c.alt != alt {
-        //                    return ATN.INVALID_ALT_NUMBER
-        //                }
-        //            }
-        //        }
         let alt = configs.getUniqueAlt()
         return alt
     }

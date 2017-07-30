@@ -10,7 +10,6 @@ public class ANTLRFileStream: ANTLRInputStream {
     internal var fileName: String
 
     public convenience override init(_ fileName: String) {
-        // throws; IOException
         self.init(fileName, nil)
     }
 

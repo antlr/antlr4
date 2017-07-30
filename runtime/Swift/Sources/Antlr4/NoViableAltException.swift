@@ -20,7 +20,6 @@ public class NoViableAltException: RecognitionException<ParserATNSimulator> {
      *  time the error occurred, of course the stream needs to keep a
      *  buffer all of the tokens but later we might not have access to those.)
      */
-
     private final var startToken: Token
 
     public convenience init(_ recognizer: Parser?) throws {

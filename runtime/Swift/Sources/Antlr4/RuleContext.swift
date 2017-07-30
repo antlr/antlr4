@@ -159,50 +159,49 @@ open class RuleContext: RuleNode {
         return visitor.visitChildren(self)
     }
 
-    /*
-     /** Call this method to view a parse tree in a dialog box visually. */
-     public func inspect(parser : Parser) -> Future<JDialog> {
-         var ruleNames : Array<String> = parser != nil ? Arrays.asList(parser.getRuleNames()) : null;
-         return inspect(ruleNames);
-     }
-
-     public func inspect(ruleNames : Array<String>) -> Future<JDialog> {
-         var viewer : TreeViewer = TreeViewer(ruleNames, self);
-         return viewer.open();
-     }
-
-     /** Save this tree in a postscript file */
-     public func save(parser : Parser, _ fileName : String)
-         throws; IOException, PrintException
-     {
-         var ruleNames : Array<String> = parser != nil ? Arrays.asList(parser.getRuleNames()) : null;
-         save(ruleNames, fileName);
-     }
-
-     /** Save this tree in a postscript file using a particular font name and size */
-     public func save(parser : Parser, _ fileName : String,
-                      _ fontName : String, _ fontSize : Int)
-         throws; IOException
-     {
-         var ruleNames : Array<String> = parser != nil ? Arrays.asList(parser.getRuleNames()) : null;
-         save(ruleNames, fileName, fontName, fontSize);
-     }
-
-     /** Save this tree in a postscript file */
-     public func save(ruleNames : Array<String>, _ fileName : String)
-         throws; IOException, PrintException
-     {
-         Trees.writePS(self, ruleNames, fileName);
-     }
-
-     /** Save this tree in a postscript file using a particular font name and size */
-     public func save(ruleNames : Array<String>, _ fileName : String,
-                      _ fontName : String, _ fontSize : Int)
-         throws; IOException
-     {
-         Trees.writePS(self, ruleNames, fileName, fontName, fontSize);
-     }
- */
+//     /** Call this method to view a parse tree in a dialog box visually. */
+//     public func inspect(parser : Parser) -> Future<JDialog> {
+//         var ruleNames : Array<String> = parser != nil ? Arrays.asList(parser.getRuleNames()) : null;
+//         return inspect(ruleNames);
+//     }
+//
+//     public func inspect(ruleNames : Array<String>) -> Future<JDialog> {
+//         var viewer : TreeViewer = TreeViewer(ruleNames, self);
+//         return viewer.open();
+//     }
+//
+//     /** Save this tree in a postscript file */
+//     public func save(parser : Parser, _ fileName : String)
+//         throws; IOException, PrintException
+//     {
+//         var ruleNames : Array<String> = parser != nil ? Arrays.asList(parser.getRuleNames()) : null;
+//         save(ruleNames, fileName);
+//     }
+//
+//     /** Save this tree in a postscript file using a particular font name and size */
+//     public func save(parser : Parser, _ fileName : String,
+//                      _ fontName : String, _ fontSize : Int)
+//         throws; IOException
+//     {
+//         var ruleNames : Array<String> = parser != nil ? Arrays.asList(parser.getRuleNames()) : null;
+//         save(ruleNames, fileName, fontName, fontSize);
+//     }
+//
+//     /** Save this tree in a postscript file */
+//     public func save(ruleNames : Array<String>, _ fileName : String)
+//         throws; IOException, PrintException
+//     {
+//         Trees.writePS(self, ruleNames, fileName);
+//     }
+//
+//     /** Save this tree in a postscript file using a particular font name and size */
+//     public func save(ruleNames : Array<String>, _ fileName : String,
+//                      _ fontName : String, _ fontSize : Int)
+//         throws; IOException
+//     {
+//         Trees.writePS(self, ruleNames, fileName, fontName, fontSize);
+//     }
+ 
     /** Print out a whole tree, not just a node, in LISP format
      *  (root child1 .. childN). Print just a node if this is a leaf.
      *  We have to know the recognizer so we can get rule names.

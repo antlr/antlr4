@@ -35,7 +35,7 @@ public class RuleTagToken: Token, CustomStringConvertible {
      * @param ruleName The name of the parser rule this rule tag matches.
      * @param bypassTokenType The bypass token type assigned to the parser rule.
      *
-     * @exception IllegalArgumentException if {@code ruleName} is {@code null}
+     * @exception ANTLRError.illegalArgument if {@code ruleName} is {@code null}
      * or empty.
      */
     public convenience init(_ ruleName: String, _ bypassTokenType: Int) {
@@ -51,7 +51,7 @@ public class RuleTagToken: Token, CustomStringConvertible {
      * @param label The label associated with the rule tag, or {@code null} if
      * the rule tag is unlabeled.
      *
-     * @exception IllegalArgumentException if {@code ruleName} is {@code null}
+     * @exception ANTLRError.illegalArgument if {@code ruleName} is {@code null}
      * or empty.
      */
     public init(_ ruleName: String, _ bypassTokenType: Int, _ label: String?) {
@@ -67,7 +67,6 @@ public class RuleTagToken: Token, CustomStringConvertible {
      *
      * @return The name of the parser rule associated with this rule tag.
      */
-
     public final func getRuleName() -> String {
         return ruleName
     }
@@ -78,28 +77,21 @@ public class RuleTagToken: Token, CustomStringConvertible {
      * @return The name of the label associated with the rule tag, or
      * {@code null} if this is an unlabeled rule tag.
      */
-
     public final func getLabel() -> String? {
         return label
     }
 
     /**
-     * {@inheritDoc}
-     *
      * <p>Rule tag tokens are always placed on the {@link #DEFAULT_CHANNEL}.</p>
      */
-
     public func getChannel() -> Int {
         return RuleTagToken.DEFAULT_CHANNEL
     }
 
     /**
-     * {@inheritDoc}
-     *
      * <p>This method returns the rule tag formatted with {@code <} and {@code >}
      * delimiters.</p>
      */
-
     public func getText() -> String? {
         if label != nil {
             return "<" + label! + ":" + ruleName + ">"
@@ -109,32 +101,23 @@ public class RuleTagToken: Token, CustomStringConvertible {
     }
 
     /**
-     * {@inheritDoc}
-     *
      * <p>Rule tag tokens have types assigned according to the rule bypass
      * transitions created during ATN deserialization.</p>
      */
-
     public func getType() -> Int {
         return bypassTokenType
     }
 
     /**
-     * {@inheritDoc}
-     *
      * <p>The implementation for {@link org.antlr.v4.runtime.tree.pattern.RuleTagToken} always returns 0.</p>
      */
-
     public func getLine() -> Int {
         return 0
     }
 
     /**
-     * {@inheritDoc}
-     *
      * <p>The implementation for {@link org.antlr.v4.runtime.tree.pattern.RuleTagToken} always returns -1.</p>
      */
-
     public func getCharPositionInLine() -> Int {
         return -1
     }
@@ -144,59 +127,42 @@ public class RuleTagToken: Token, CustomStringConvertible {
      *
      * <p>The implementation for {@link org.antlr.v4.runtime.tree.pattern.RuleTagToken} always returns -1.</p>
      */
-
     public func getTokenIndex() -> Int {
         return -1
     }
 
     /**
-     * {@inheritDoc}
-     *
      * <p>The implementation for {@link org.antlr.v4.runtime.tree.pattern.RuleTagToken} always returns -1.</p>
      */
-
     public func getStartIndex() -> Int {
         return -1
     }
 
     /**
-     * {@inheritDoc}
-     *
      * <p>The implementation for {@link org.antlr.v4.runtime.tree.pattern.RuleTagToken} always returns -1.</p>
      */
-
     public func getStopIndex() -> Int {
         return -1
     }
 
     /**
-     * {@inheritDoc}
-     *
      * <p>The implementation for {@link org.antlr.v4.runtime.tree.pattern.RuleTagToken} always returns {@code null}.</p>
      */
-
     public func getTokenSource() -> TokenSource? {
         return nil
     }
 
     /**
-     * {@inheritDoc}
-     *
      * <p>The implementation for {@link org.antlr.v4.runtime.tree.pattern.RuleTagToken} always returns {@code null}.</p>
      */
-
     public func getInputStream() -> CharStream? {
         return nil
     }
 
     /**
-     * {@inheritDoc}
-     *
      * <p>The implementation for {@link org.antlr.v4.runtime.tree.pattern.RuleTagToken} returns a string of the form
      * {@code ruleName:bypassTokenType}.</p>
      */
-
-
     public var description: String {
         return ruleName + ":" + String(bypassTokenType)
     }

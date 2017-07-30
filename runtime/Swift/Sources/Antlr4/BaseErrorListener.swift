@@ -18,7 +18,7 @@ open class BaseErrorListener: ANTLRErrorListener {
                                             _ line: Int,
                                             _ charPositionInLine: Int,
                                             _ msg: String,
-                                            _ e: AnyObject?//RecognitionException
+                                            _ e: AnyObject?
     ) {
     }
 

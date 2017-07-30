@@ -10,8 +10,6 @@
  *  and deletion as well as during "consume until error recovery set"
  *  upon no viable alternative exceptions.
  */
-//public class ErrorNodeImpl  :  TerminalNodeImpl,ErrorNode{
-
 public class ErrorNode: TerminalNodeImpl {
     public override init(_ token: Token) {
         super.init(token)

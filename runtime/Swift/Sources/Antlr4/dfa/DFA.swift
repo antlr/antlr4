@@ -66,9 +66,8 @@ public class DFA: CustomStringConvertible {
     /// - returns: The start state corresponding to the specified precedence, or
     /// {@code null} if no start state exists for the specified precedence.
     ///
-    /// -  IllegalStateException if this is not a precedence DFA.
+    /// - throws: _ANTLRError.illegalState_ if this is not a precedence DFA.
     /// - seealso: #isPrecedenceDfa()
-    ////@SuppressWarnings("null")
     public final func getPrecedenceStartState(_ precedence: Int) throws -> DFAState? {
         if !isPrecedenceDfa() {
             throw ANTLRError.illegalState(msg: "Only precedence DFAs may contain a precedence start state.")
@@ -91,9 +90,8 @@ public class DFA: CustomStringConvertible {
     /// - parameter startState: The start state corresponding to the specified
     /// precedence.
     ///
-    /// -  IllegalStateException if this is not a precedence DFA.
+    /// - throws: _ANTLRError.illegalState_ if this is not a precedence DFA.
     /// - seealso: #isPrecedenceDfa()
-    ////@SuppressWarnings({"SynchronizeOnNonFinalField", "null"})
     public final func setPrecedenceStartState(_ precedence: Int, _ startState: DFAState) throws {
         if !isPrecedenceDfa() {
             throw ANTLRError.illegalState(msg: "Only precedence DFAs may contain a precedence start state.")
@@ -121,11 +119,10 @@ public class DFA: CustomStringConvertible {
     /// - parameter precedenceDfa: {@code true} if this is a precedence DFA; otherwise,
     /// {@code false}
     ///
-    /// -  UnsupportedOperationException if {@code precedenceDfa} does not
+    /// - throws: ANTLRError.unsupportedOperation if {@code precedenceDfa} does not
     /// match the value of {@link #isPrecedenceDfa} for the current DFA.
     ///
-    /// -  This method no longer performs any action.
-    ////@Deprecated
+    /// - note: This method no longer performs any action.
     public final func setPrecedenceDfa(_ precedenceDfa: Bool) throws {
         if precedenceDfa != isPrecedenceDfa() {
             throw ANTLRError.unsupportedOperation(msg: "The precedenceDfa field cannot change after a DFA is constructed.")
@@ -134,7 +131,6 @@ public class DFA: CustomStringConvertible {
     }
 
     /// Return a list of all states in this DFA, ordered by state number.
-
     public func getStates() -> Array<DFAState> {
         var result: Array<DFAState> = Array<DFAState>(states.keys)
 
@@ -155,7 +151,6 @@ public class DFA: CustomStringConvertible {
     }
 
     /// -  Use {@link #toString(org.antlr.v4.runtime.Vocabulary)} instead.
-    ////@Deprecated
     public func toString(_ tokenNames: [String?]?) -> String {
         if s0 == nil {
             return ""

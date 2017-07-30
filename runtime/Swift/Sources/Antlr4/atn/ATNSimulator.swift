@@ -20,7 +20,6 @@ open class ATNSimulator {
 
 
     /// Must distinguish between missing edge and edge we know leads nowhere
-
     public static let ERROR: DFAState = {
         let error = DFAState(ATNConfigSet())
         error.stateNumber = Int.max
@@ -50,11 +49,6 @@ open class ATNSimulator {
     /// so it's not worth the complexity.</p>
     internal final var sharedContextCache: PredictionContextCache?
 
-    //static; {
-    //ERROR = DFAState(ATNConfigSet());
-    // ERROR.stateNumber = Integer.MAX_VALUE;
-    //}
-
     public init(_ atn: ATN,
                 _ sharedContextCache: PredictionContextCache) {
 
@@ -71,7 +65,7 @@ open class ATNSimulator {
     /// performance (but not accuracy) of other parsers which are being used
     /// concurrently.
     ///
-    /// -  UnsupportedOperationException if the current instance does not
+    /// - throws: ANTLRError.unsupportedOperation if the current instance does not
     /// support clearing the DFA.
     ///
     /// -  4.3
@@ -100,49 +94,34 @@ open class ATNSimulator {
     }
 
     /// -  Use {@link org.antlr.v4.runtime.atn.ATNDeserializer#deserialize} instead.
-    ////@Deprecated
     public static func deserialize(_ data: [Character]) throws -> ATN {
         return try ATNDeserializer().deserialize(data)
     }
 
     /// -  Use {@link org.antlr.v4.runtime.atn.ATNDeserializer#checkCondition(boolean)} instead.
-    ////@Deprecated
     public static func checkCondition(_ condition: Bool) throws {
         try ATNDeserializer().checkCondition(condition)
     }
 
     /// -  Use {@link org.antlr.v4.runtime.atn.ATNDeserializer#checkCondition(boolean, String)} instead.
-    ////@Deprecated
     public static func checkCondition(_ condition: Bool, _ message: String) throws {
         try ATNDeserializer().checkCondition(condition, message)
     }
 
     /// -  Use {@link org.antlr.v4.runtime.atn.ATNDeserializer#toInt} instead.
-    ////@Deprecated
     public func toInt(_ c: Character) -> Int {
         return toInt(c)
     }
 
     /// -  Use {@link org.antlr.v4.runtime.atn.ATNDeserializer#toInt32} instead.
-    ////@Deprecated
     public func toInt32(_ data: [Character], _ offset: Int) -> Int {
         return toInt32(data, offset)
     }
 
     /// -  Use {@link org.antlr.v4.runtime.atn.ATNDeserializer#toLong} instead.
-    ////@Deprecated
     public func toLong(_ data: [Character], _ offset: Int) -> Int64 {
         return toLong(data, offset)
     }
-
-    /// -  Use {@link org.antlr.v4.runtime.atn.ATNDeserializer#toUUID} instead.
-    ////@Deprecated
-    //public class func toUUID(data : [Character], _ offset : Int) -> NSUUID {
-    //return ATNDeserializer.toUUID(data, offset);
-    //}
-
-    /// -  Use {@link org.antlr.v4.runtime.atn.ATNDeserializer#edgeFactory} instead.
-    ////@Deprecated
 
     public static func edgeFactory(_ atn: ATN,
                                   _ type: Int, _ src: Int, _ trg: Int,
@@ -152,7 +131,6 @@ open class ATNSimulator {
     }
 
     /// -  Use {@link org.antlr.v4.runtime.atn.ATNDeserializer#stateFactory} instead.
-    ////@Deprecated
     public static func stateFactory(_ type: Int, _ ruleIndex: Int) throws -> ATNState {
         return try ATNDeserializer().stateFactory(type, ruleIndex)!
     }

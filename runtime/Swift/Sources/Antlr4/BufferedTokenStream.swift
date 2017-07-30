@@ -69,7 +69,6 @@ public class BufferedTokenStream: TokenStream {
         return 0
     }
 
-
     public func release(_ marker: Int) {
         // no resources to release
     }
@@ -108,8 +107,6 @@ public class BufferedTokenStream: TokenStream {
 
         if try !skipEofCheck && LA(1) == BufferedTokenStream.EOF {
             throw ANTLRError.illegalState(msg: "cannot consume EOF")
-            //RuntimeException("cannot consume EOF")
-            //throw  ANTLRError.IllegalState /* throw IllegalStateException("cannot consume EOF"); */
         }
 
         if try sync(p + 1) {
@@ -158,7 +155,6 @@ public class BufferedTokenStream: TokenStream {
 
         return n
     }
-
 
     public func get(_ i: Int) throws -> Token {
         if i < 0 || i >= tokens.count {
@@ -394,8 +390,6 @@ public class BufferedTokenStream: TokenStream {
         try lazyInit()
         if tokenIndex < 0 || tokenIndex >= tokens.count {
             throw ANTLRError.indexOutOfBounds(msg: "\(tokenIndex) not in 0..\(tokens.count - 1)")
-            //RuntimeException("\(tokenIndex) not in 0..\(tokens.count-1)")
-            //throw ANTLRError.IndexOutOfBounds /* throw IndexOutOfBoundsException(tokenIndex+" not in 0.."+(tokens.count-1)); */
         }
 
         if tokenIndex == 0 {
@@ -447,12 +441,9 @@ public class BufferedTokenStream: TokenStream {
     }
 
     /// Get the text of all tokens in this buffer.
-
-
     public func getText() throws -> String {
         return try getText(Interval.of(0, size() - 1))
     }
-
 
     public func getText(_ interval: Interval) throws -> String {
         let start: Int = interval.a

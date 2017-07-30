@@ -45,7 +45,7 @@ public protocol IntStream: class {
     /// filtering streams (e.g. {@link org.antlr.v4.runtime.CommonTokenStream} which distinguishes
     /// between "on-channel" and "off-channel" tokens).
     ///
-    /// -  IllegalStateException if an attempt is made to consume the the
+    /// - throws: _ANTLRError.illegalState_ if an attempt is made to consume the the
     /// end of the stream (i.e. if {@code LA(1)==}{@link #EOF EOF} before calling
     /// {@code consume}).
     func consume() throws
@@ -80,7 +80,7 @@ public protocol IntStream: class {
     /// calls to {@link #consume consume()} have occurred from the beginning of
     /// the stream before calling this method.</p>
     ///
-    /// -  UnsupportedOperationException if the stream does not support
+    /// - throws: _ANTLRError.unsupportedOperation_ if the stream does not support
     /// retrieving the value of the specified symbol
     func LA(_ i: Int) throws -> Int
 
@@ -173,21 +173,20 @@ public protocol IntStream: class {
     ///
     /// - parameter index: The absolute index to seek to.
     ///
-    /// -  IllegalArgumentException if {@code index} is less than 0
-    /// -  UnsupportedOperationException if the stream does not support
+    /// - throws: _ANTLRError.illegalArgument_ if {@code index} is less than 0
+    /// - throws: _ANTLRError.unsupportedOperation_ if the stream does not support
     /// seeking to the specified index
     func seek(_ index: Int) throws
 
     /// Returns the total number of symbols in the stream, including a single EOF
     /// symbol.
     ///
-    /// -  UnsupportedOperationException if the size of the stream is
+    /// - throws: _ANTLRError.unsupportedOperation_ if the size of the stream is
     /// unknown.
     func size() -> Int
 
     /// Gets the name of the underlying symbol source. This method returns a
     /// non-null, non-empty string. If such a name is not known, this method
     /// returns {@link #UNKNOWN_SOURCE_NAME}.
-
     func getSourceName() -> String
 }

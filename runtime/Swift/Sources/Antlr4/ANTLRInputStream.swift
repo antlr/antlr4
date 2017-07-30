@@ -39,75 +39,10 @@ public class ANTLRInputStream: CharStream {
         self.data = data
         self.n = numberOfActualCharsInArray
     }
-    /// public convenience init(_ r : Reader) throws; IOException {
-    /// self.init(r, INITIAL_BUFFER_SIZE, READ_BUFFER_SIZE);
-    /// }
-    ///
-    /// public convenience init(_ r : Reader, _ initialSize : Int) throws; IOException {
-    /// self.init(r, initialSize, READ_BUFFER_SIZE);
-    /// }
-    ///
-    /// public init(_ r : Reader, _ initialSize : Int, _ readChunkSize : Int) throws; IOException {
-    /// load(r, initialSize, readChunkSize);
-    /// }
-    ///
-    /// public convenience init(_ input : InputStream) throws; IOException {
-    /// self.init(InputStreamReader(input), INITIAL_BUFFER_SIZE);
-    /// }
-    ///
-    /// public convenience init(_ input : InputStream, _ initialSize : Int) throws; IOException {
-    /// self.init(InputStreamReader(input), initialSize);
-    /// }
-    ///
-    /// public convenience init(_ input : InputStream, _ initialSize : Int, _ readChunkSize : Int) throws; IOException {
-    /// self.init(InputStreamReader(input), initialSize, readChunkSize);
-    /// }
-    ///
-    /// public func load(r : Reader, _ size : Int, _ readChunkSize : Int)
-    /// throws; IOException
-    /// {
-    /// if ( r==nil ) {
-    /// return;
-    /// }
-    /// if ( size<=0 ) {
-    /// size = INITIAL_BUFFER_SIZE;
-    /// }
-    /// if ( readChunkSize<=0 ) {
-    /// readChunkSize = READ_BUFFER_SIZE;
-    /// }
-    /// // print("load "+size+" in chunks of "+readChunkSize);
-    /// try {
-    /// // alloc initial buffer size.
-    /// data = new char[size];
-    /// // read all the data in chunks of readChunkSize
-    /// var numRead : Int=0;
-    /// var p : Int = 0;
-    /// do {
-    /// if ( p+readChunkSize > data.length ) { // overflow?
-    /// // print("### overflow p="+p+", data.length="+data.length);
-    /// data = Arrays.copyOf(data, data.length * 2);
-    /// }
-    /// numRead = r.read(data, p, readChunkSize);
-    /// // print("read "+numRead+" chars; p was "+p+" is now "+(p+numRead));
-    /// p += numRead;
-    /// } while (numRead!=-1); // while not EOF
-    /// // set the actual size of the data available;
-    /// // EOF subtracted one above in p+=numRead; add one back
-    /// n = p+1;
-    /// //print("n="+n);
-    /// }
-    /// finally {
-    /// r.close();
-    /// }
-    /// }
-    /// Reset the stream so that it's in the same state it was
-    /// when the object was created *except* the data array is not
-    /// touched.
 
     public func reset() {
         p = 0
     }
-
 
     public func consume() throws {
         if p >= n {
@@ -123,7 +58,6 @@ public class ANTLRInputStream: CharStream {
             //print("p moves to "+p+" (c='"+(char)data[p]+"')");
         }
     }
-
 
     public func LA(_ i: Int) -> Int {
         var i = i
@@ -186,7 +120,6 @@ public class ANTLRInputStream: CharStream {
         }
     }
 
-
     public func getText(_ interval: Interval) -> String {
         let start: Int = interval.a
         var stop: Int = interval.b
@@ -201,14 +134,12 @@ public class ANTLRInputStream: CharStream {
         return String(data[start ..< (start + count)])
     }
 
-
     public func getSourceName() -> String {
         guard let name = name , !name.isEmpty else {
              return ANTLRInputStream.UNKNOWN_SOURCE_NAME
         }
         return name
     }
-
 
     public func toString() -> String {
         return String(data)

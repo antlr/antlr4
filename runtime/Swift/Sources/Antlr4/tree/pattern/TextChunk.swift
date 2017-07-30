@@ -20,7 +20,7 @@ public class TextChunk: Chunk, CustomStringConvertible {
      * Constructs a new instance of {@link org.antlr.v4.runtime.tree.pattern.TextChunk} with the specified text.
      *
      * @param text The text of this chunk.
-     * @exception IllegalArgumentException if {@code text} is {@code null}.
+     * @exception ANTLRError.illegalArgument if {@code text} is {@code null}.
      */
     public init(_ text: String) {
         self.text = text

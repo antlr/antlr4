@@ -14,11 +14,11 @@ public protocol CharStream: IntStream {
     /// - parameter interval: an interval within the stream
     /// - returns: the text of the specified interval
     ///
-    /// -  NullPointerException if {@code interval} is {@code null}
-    /// -  IllegalArgumentException if {@code interval.a < 0}, or if
+    /// - throws: _ANTLRError.nullPointer_ if {@code interval} is {@code null}
+    /// - throws: _ANTLRError.illegalArgument_ if {@code interval.a < 0}, or if
     /// {@code interval.b < interval.a - 1}, or if {@code interval.b} lies at or
     /// past the end of the stream
-    /// -  UnsupportedOperationException if the stream does not support
+    /// - throws: _ANTLRError.unsupportedOperation_ if the stream does not support
     /// getting the text of the specified interval
     func getText(_ interval: Interval) -> String
 }
