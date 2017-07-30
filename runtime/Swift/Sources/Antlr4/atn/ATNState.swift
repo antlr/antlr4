@@ -3,66 +3,64 @@
 /// can be found in the LICENSE.txt file in the project root.
 
 
-
+///
 /// The following images show the relation of states and
 /// {@link org.antlr.v4.runtime.atn.ATNState#transitions} for various grammar constructs.
 ///
-/// <ul>
 ///
-/// <li>Solid edges marked with an &#0949; indicate a required
-/// {@link org.antlr.v4.runtime.atn.EpsilonTransition}.</li>
+/// * Solid edges marked with an &#0949; indicate a required
+/// {@link org.antlr.v4.runtime.atn.EpsilonTransition}.
 ///
-/// <li>Dashed edges indicate locations where any transition derived from
-/// {@link org.antlr.v4.runtime.atn.Transition} might appear.</li>
+/// * Dashed edges indicate locations where any transition derived from
+/// {@link org.antlr.v4.runtime.atn.Transition} might appear.
 ///
-/// <li>Dashed nodes are place holders for either a sequence of linked
+/// * Dashed nodes are place holders for either a sequence of linked
 /// {@link org.antlr.v4.runtime.atn.BasicState} states or the inclusion of a block representing a nested
-/// construct in one of the forms below.</li>
+/// construct in one of the forms below.
 ///
-/// <li>Nodes showing multiple outgoing alternatives with a {@code ...} support
+/// * Nodes showing multiple outgoing alternatives with a {@code ...} support
 /// any number of alternatives (one or more). Nodes without the {@code ...} only
-/// support the exact number of alternatives shown in the diagram.</li>
+/// support the exact number of alternatives shown in the diagram.
 ///
-/// </ul>
 ///
-/// <h2>Basic Blocks</h2>
+/// ## Basic Blocks
 ///
-/// <h3>Rule</h3>
+/// ### Rule
 ///
 /// <embed src="images/Rule.svg" type="image/svg+xml"/>
 ///
-/// <h3>Block of 1 or more alternatives</h3>
+/// ## Block of 1 or more alternatives
 ///
 /// <embed src="images/Block.svg" type="image/svg+xml"/>
 ///
-/// <h2>Greedy Loops</h2>
+/// ## Greedy Loops
 ///
-/// <h3>Greedy Closure: {@code (...)*}</h3>
+/// ### Greedy Closure: {@code (...)*}
 ///
 /// <embed src="images/ClosureGreedy.svg" type="image/svg+xml"/>
 ///
-/// <h3>Greedy Positive Closure: {@code (...)+}</h3>
+/// ### Greedy Positive Closure: {@code (...)+}
 ///
 /// <embed src="images/PositiveClosureGreedy.svg" type="image/svg+xml"/>
 ///
-/// <h3>Greedy Optional: {@code (...)?}</h3>
+/// ### Greedy Optional: {@code (...)?}
 ///
 /// <embed src="images/OptionalGreedy.svg" type="image/svg+xml"/>
 ///
-/// <h2>Non-Greedy Loops</h2>
+/// ## Non-Greedy Loops
 ///
-/// <h3>Non-Greedy Closure: {@code (...)*?}</h3>
+/// ### Non-Greedy Closure: {@code (...)*?}
 ///
 /// <embed src="images/ClosureNonGreedy.svg" type="image/svg+xml"/>
 ///
-/// <h3>Non-Greedy Positive Closure: {@code (...)+?}</h3>
+/// ### Non-Greedy Positive Closure: {@code (...)+?}
 ///
 /// <embed src="images/PositiveClosureNonGreedy.svg" type="image/svg+xml"/>
 ///
-/// <h3>Non-Greedy Optional: {@code (...)??}</h3>
+/// ### Non-Greedy Optional: {@code (...)??}
 ///
 /// <embed src="images/OptionalNonGreedy.svg" type="image/svg+xml"/>
-
+///
 public class ATNState: Hashable, CustomStringConvertible {
     public static let INITIAL_NUM_TRANSITIONS: Int = 4
 

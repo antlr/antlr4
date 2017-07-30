@@ -306,27 +306,25 @@ open class Parser: Recognizer<ParserATNSimulator> {
     /**
      * Registers {@code listener} to receive events during the parsing process.
      *
-     * <p>To support output-preserving grammar transformations (including but not
+     * To support output-preserving grammar transformations (including but not
      * limited to left-recursion removal, automated left-factoring, and
      * optimized code generation), calls to listener methods during the parse
      * may differ substantially from calls made by
      * {@link org.antlr.v4.runtime.tree.ParseTreeWalker#DEFAULT} used after the parse is complete. In
      * particular, rule entry and exit events may occur in a different order
      * during the parse than after the parser. In addition, calls to certain
-     * rule entry methods may be omitted.</p>
+     * rule entry methods may be omitted.
      *
-     * <p>With the following specific exceptions, calls to listener events are
-     * <em>deterministic</em>, i.e. for identical input the calls to listener
-     * methods will be the same.</p>
+     * With the following specific exceptions, calls to listener events are
+     * __deterministic__, i.e. for identical input the calls to listener
+     * methods will be the same.
      *
-     * <ul>
-     * <li>Alterations to the grammar used to generate code may change the
-     * behavior of the listener calls.</li>
-     * <li>Alterations to the command line options passed to ANTLR 4 when
-     * generating the parser may change the behavior of the listener calls.</li>
-     * <li>Changing the version of the ANTLR Tool used to generate the parser
-     * may change the behavior of the listener calls.</li>
-     * </ul>
+     * * Alterations to the grammar used to generate code may change the
+     * behavior of the listener calls.
+     * * Alterations to the command line options passed to ANTLR 4 when
+     * generating the parser may change the behavior of the listener calls.
+     * * Changing the version of the ANTLR Tool used to generate the parser
+     * may change the behavior of the listener calls.
      *
      * @param listener the listener to add
      *
@@ -555,7 +553,7 @@ open class Parser: Recognizer<ParserATNSimulator> {
      * If the parser is not in error recovery mode, the consumed symbol is added
      * to the parse tree using {@link ParserRuleContext#addChild(TerminalNode)}, and
      * {@link org.antlr.v4.runtime.tree.ParseTreeListener#visitTerminal} is called on any parse listeners.
-     * If the parser <em>is</em> in error recovery mode, the consumed symbol is
+     * If the parser __is__ in error recovery mode, the consumed symbol is
      * added to the parse tree using {@link #createErrorNode(ParserRuleContext, Token)} then
      * {@link ParserRuleContext#addErrorNode(ErrorNode)} and
      * {@link org.antlr.v4.runtime.tree.ParseTreeListener#visitErrorNode} is called on any parse

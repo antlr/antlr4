@@ -10,18 +10,14 @@ public class ConsoleErrorListener: BaseErrorListener {
     /// Provides a default instance of {@link org.antlr.v4.runtime.ConsoleErrorListener}.
     public static let INSTANCE: ConsoleErrorListener = ConsoleErrorListener()
 
-    /// {@inheritDoc}
     ///
-    /// <p>
     /// This implementation prints messages to {@link System#err} containing the
     /// values of {@code line}, {@code charPositionInLine}, and {@code msg} using
-    /// the following format.</p>
+    /// the following format.
     ///
-    /// <pre>
-    /// line <em>line</em>:<em>charPositionInLine</em> <em>msg</em>
-    /// </pre>
-    override
-    public func syntaxError<T:ATNSimulator>(_ recognizer: Recognizer<T>,
+    /// line __line__:__charPositionInLine__ __msg__
+    ///
+    override public func syntaxError<T:ATNSimulator>(_ recognizer: Recognizer<T>,
                                             _ offendingSymbol: AnyObject?,
                                             _ line: Int,
                                             _ charPositionInLine: Int,

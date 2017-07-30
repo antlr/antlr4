@@ -1,22 +1,24 @@
+///
 /// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
-/// The interface for defining strategies to deal with syntax errors encountered
-/// during a parse by ANTLR-generated parsers. We distinguish between three
+///
+
+
+///
+/// The interface for defining strategies to deal with syntax errors
+/// encountered during a parse by ANTLR-generated parsers. We distinguish between three
 /// different kinds of errors:
 ///
-/// <ul>
-/// <li>The parser could not figure out which path to take in the ATN (none of
-/// the available alternatives could possibly match)</li>
-/// <li>The current input does not match what we were looking for</li>
-/// <li>A predicate evaluated to false</li>
-/// </ul>
+/// * The parser could not figure out which path to take in the ATN (none of
+/// the available alternatives could possibly match)
+/// * The current input does not match what we were looking for
+/// * A predicate evaluated to false
 ///
 /// Implementations of this interface report syntax errors by calling
 /// {@link org.antlr.v4.runtime.Parser#notifyErrorListeners}.
 ///
 /// <p>TODO: what to do about lexers</p>
-
 public protocol ANTLRErrorStrategy {
     /// Reset the error handler state for the specified {@code recognizer}.
     /// - parameter recognizer: the parser instance
@@ -29,7 +31,7 @@ public protocol ANTLRErrorStrategy {
     /// successful result of the match.
     ///
     /// <p>This method handles the consumption of any tokens - the caller should
-    /// <b>not</b> call {@link org.antlr.v4.runtime.Parser#consume} after a successful recovery.</p>
+    /// __not__ call {@link org.antlr.v4.runtime.Parser#consume} after a successful recovery.</p>
     ///
     /// <p>Note that the calling code will not report an error if this method
     /// returns successfully. The error strategy implementation is responsible

@@ -17,8 +17,8 @@ public class LL1Analyzer {
     /// Calculates the SLL(1) expected lookahead set for each outgoing transition
     /// of an {@link org.antlr.v4.runtime.atn.ATNState}. The returned array has one element for each
     /// outgoing transition in {@code s}. If the closure from transition
-    /// <em>i</em> leads to a semantic predicate before matching a symbol, the
-    /// element at index <em>i</em> of the result will be {@code null}.
+    /// __i__ leads to a semantic predicate before matching a symbol, the
+    /// element at index __i__ of the result will be {@code null}.
     ///
     /// - parameter s: the ATN state
     /// - returns: the expected symbols for each outgoing transition of {@code s}.

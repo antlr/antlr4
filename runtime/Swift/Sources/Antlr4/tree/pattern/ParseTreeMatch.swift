@@ -86,14 +86,12 @@ public class ParseTreeMatch: CustomStringConvertible {
      * rule or tags explicitly labeled with the label and the complete set of
      * parse trees matching the labeled and unlabeled tags in the pattern for
      * the parser rule or token. For example, if {@code label} is {@code "foo"},
-     * the result will contain <em>all</em> of the following.</p>
+     * the result will contain __all__ of the following.</p>
      *
-     * <ul>
-     * <li>Parse tree nodes matching tags of the form {@code <foo:anyRuleName>} and
-     * {@code <foo:AnyTokenName>}.</li>
-     * <li>Parse tree nodes matching tags of the form {@code <anyLabel:foo>}.</li>
-     * <li>Parse tree nodes matching tags of the form {@code <foo>}.</li>
-     * </ul>
+     * * Parse tree nodes matching tags of the form {@code <foo:anyRuleName>} and
+     * {@code <foo:AnyTokenName>}.
+     * * Parse tree nodes matching tags of the form {@code <anyLabel:foo>}.
+     * * Parse tree nodes matching tags of the form {@code <foo>}.
      *
      * @param label The label.
      *
@@ -101,7 +99,6 @@ public class ParseTreeMatch: CustomStringConvertible {
      * the specified {@code label}. If no nodes matched the label, an empty list
      * is returned.
      */
-
     public func getAll(_ label: String) -> Array<ParseTree> {
         let nodes: Array<ParseTree>? = labels.get(label)
         if nodes == nil {
@@ -121,7 +118,6 @@ public class ParseTreeMatch: CustomStringConvertible {
      * @return A mapping from labels to parse tree nodes. If the parse tree
      * pattern did not contain any rule or token tags, this map will be empty.
      */
-
     public func getLabels() -> MultiMap<String, ParseTree> {
         return labels
     }
@@ -132,7 +128,6 @@ public class ParseTreeMatch: CustomStringConvertible {
      * @return the node at which we first detected a mismatch, or {@code null}
      * if the match was successful.
      */
-
     public func getMismatchedNode() -> ParseTree? {
         return mismatchedNode
     }
@@ -152,7 +147,6 @@ public class ParseTreeMatch: CustomStringConvertible {
      *
      * @return The tree pattern we are matching against.
      */
-
     public func getPattern() -> ParseTreePattern {
         return pattern
     }
@@ -162,14 +156,9 @@ public class ParseTreeMatch: CustomStringConvertible {
      *
      * @return The {@link org.antlr.v4.runtime.tree.ParseTree} we are trying to match to a pattern.
      */
-
     public func getTree() -> ParseTree {
         return tree
     }
-
-    /**
-     * {@inheritDoc}
-     */
 
     public func toString() -> String {
         return description

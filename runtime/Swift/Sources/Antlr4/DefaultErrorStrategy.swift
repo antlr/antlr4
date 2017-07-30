@@ -58,21 +58,19 @@ public class DefaultErrorStrategy: ANTLRErrorStrategy {
     }
 
     ///
-    /// <p>The default implementation returns immediately if the handler is already
+    /// The default implementation returns immediately if the handler is already
     /// in error recovery mode. Otherwise, it calls {@link #beginErrorCondition}
     /// and dispatches the reporting task based on the runtime type of {@code e}
-    /// according to the following table.</p>
+    /// according to the following table.
     ///
-    /// <ul>
-    /// <li>{@link org.antlr.v4.runtime.NoViableAltException}: Dispatches the call to
-    /// {@link #reportNoViableAlternative}</li>
-    /// <li>{@link org.antlr.v4.runtime.InputMismatchException}: Dispatches the call to
-    /// {@link #reportInputMismatch}</li>
-    /// <li>{@link org.antlr.v4.runtime.FailedPredicateException}: Dispatches the call to
-    /// {@link #reportFailedPredicate}</li>
-    /// <li>All other types: calls {@link org.antlr.v4.runtime.Parser#notifyErrorListeners} to report
-    /// the exception</li>
-    /// </ul>
+    /// * {@link org.antlr.v4.runtime.NoViableAltException}: Dispatches the call to
+    /// {@link #reportNoViableAlternative}
+    /// * {@link org.antlr.v4.runtime.InputMismatchException}: Dispatches the call to
+    /// {@link #reportInputMismatch}
+    /// * {@link org.antlr.v4.runtime.FailedPredicateException}: Dispatches the call to
+    /// {@link #reportFailedPredicate}
+    /// * All other types: calls {@link org.antlr.v4.runtime.Parser#notifyErrorListeners} to report
+    /// the exception
     public func reportError(_ recognizer: Parser,
                             _ e: AnyObject) {
         // if we've already reported an error and have not matched a token
@@ -155,7 +153,7 @@ public class DefaultErrorStrategy: ANTLRErrorStrategy {
     /// sub rule or what follows loop. Yes, that is pretty aggressive. We opt to
     /// stay in the loop as long as possible.</p>
     ///
-    /// <p><strong>ORIGINS</strong></p>
+    /// <p>__ORIGINS__</p>
     ///
     /// <p>Previous versions of ANTLR did a poor job of their recovery within loops.
     /// A single mismatch token or missing token would force the parser to bail
@@ -343,7 +341,7 @@ public class DefaultErrorStrategy: ANTLRErrorStrategy {
     /// recovery attempt fails, this method throws an
     /// {@link org.antlr.v4.runtime.InputMismatchException}.</p>
     ///
-    /// <p><strong>EXTRA TOKEN</strong> (single token deletion)</p>
+    /// <p>__EXTRA TOKEN__ (single token deletion)</p>
     ///
     /// <p>{@code LA(1)} is not what we are looking for. If {@code LA(2)} has the
     /// right token, however, then assume {@code LA(1)} is some extra spurious
@@ -352,7 +350,7 @@ public class DefaultErrorStrategy: ANTLRErrorStrategy {
     ///
     /// <p>This recovery strategy is implemented by {@link #singleTokenDeletion}.</p>
     ///
-    /// <p><strong>MISSING TOKEN</strong> (single token insertion)</p>
+    /// <p>__MISSING TOKEN__ (single token insertion)</p>
     ///
     /// <p>If current token (at {@code LA(1)}) is consistent with what could come
     /// after the expected {@code LA(1)} token, then assume the token is missing
@@ -362,7 +360,7 @@ public class DefaultErrorStrategy: ANTLRErrorStrategy {
     ///
     /// <p>This recovery strategy is implemented by {@link #singleTokenInsertion}.</p>
     ///
-    /// <p><strong>EXAMPLE</strong></p>
+    /// <p>__EXAMPLE__</p>
     ///
     /// <p>For example, Input {@code i=(3;} is clearly missing the {@code ')'}. When
     /// the parser returns from the nested call to {@code expr}, it will have
@@ -442,7 +440,7 @@ public class DefaultErrorStrategy: ANTLRErrorStrategy {
     /// strategy. It is called by {@link #recoverInline} to attempt to recover
     /// from mismatched input. If this method returns null, the parser and error
     /// handler state will not have changed. If this method returns non-null,
-    /// {@code recognizer} will <em>not</em> be in error recovery mode since the
+    /// {@code recognizer} will __not__ be in error recovery mode since the
     /// returned token was a successful match.
     ///
     /// <p>If the single-token deletion is successful, this method calls

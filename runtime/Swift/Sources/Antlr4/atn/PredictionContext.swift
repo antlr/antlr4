@@ -523,29 +523,6 @@ public class PredictionContext: Hashable, CustomStringConvertible {
             return M
     }
 
-    /// Make pass over all <em>M</em> {@code parents}; merge any {@code equals()}
-    /// ones.
-//    internal static func combineCommonParents(inout parents: [PredictionContext?]) {
-//        var uniqueParents: Dictionary<PredictionContext, PredictionContext> =
-//        Dictionary<PredictionContext, PredictionContext>()
-//        let length = parents.count
-//        for p in 0..<length {
-//            if let parent: PredictionContext = parents[p] {
-//                // if !uniqueParents.keys.contains(parent) {
-//                if uniqueParents[parent] == nil {
-//                    uniqueParents[parent] = parent  // don't replace
-//                }
-//            }
-//        }
-//
-//        for p in 0..<length {
-//            if let parent: PredictionContext = parents[p] {
-//                parents[p] = uniqueParents[parent]
-//            }
-//        }
-//
-//    }
-
     public static func toDOTString(_ context: PredictionContext?) -> String {
         if (context == nil) {
             return ""

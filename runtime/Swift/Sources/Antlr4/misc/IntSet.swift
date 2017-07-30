@@ -23,7 +23,6 @@ public protocol IntSet {
     /// - returns: {@code this} (to support chained calls)
     ///
     /// - throws: _ANTLRError.illegalState_ if the current set is read-only
-
     func addAll(_ set: IntSet?) throws -> IntSet
 
     /// Return a new {@link org.antlr.v4.runtime.misc.IntSet} object containing all elements that are
@@ -34,7 +33,6 @@ public protocol IntSet {
     /// - returns: A new {@link org.antlr.v4.runtime.misc.IntSet} instance containing the intersection of the
     /// current set and {@code a}. The value {@code null} may be returned in
     /// place of an empty result set.
-
     func and(_ a: IntSet?) throws -> IntSet?
 
     /// Return a new {@link org.antlr.v4.runtime.misc.IntSet} object containing all elements that are
@@ -42,17 +40,14 @@ public protocol IntSet {
     /// following expressions are equivalent for input non-null {@link org.antlr.v4.runtime.misc.IntSet}
     /// instances {@code x} and {@code y}.
     ///
-    /// <ul>
-    /// <li>{@code x.complement(y)}</li>
-    /// <li>{@code y.subtract(x)}</li>
-    /// </ul>
+    /// * {@code x.complement(y)}
+    /// *{@code y.subtract(x)}
     ///
     /// - parameter elements: The set to compare with the current set. A {@code null}
     /// argument is treated as though it were an empty set.
     /// - returns: A new {@link org.antlr.v4.runtime.misc.IntSet} instance containing the elements present in
     /// {@code elements} but not present in the current set. The value
     /// {@code null} may be returned in place of an empty result set.
-
     func complement(_ elements: IntSet?) throws -> IntSet?
 
     /// Return a new {@link org.antlr.v4.runtime.misc.IntSet} object containing all elements that are
@@ -67,7 +62,6 @@ public protocol IntSet {
     /// - returns: A new {@link org.antlr.v4.runtime.misc.IntSet} instance containing the union of the current
     /// set and {@code a}. The value {@code null} may be returned in place of an
     /// empty result set.
-
     func or(_ a: IntSet) throws -> IntSet
 
     /// Return a new {@link org.antlr.v4.runtime.misc.IntSet} object containing all elements that are
@@ -75,17 +69,14 @@ public protocol IntSet {
     /// The following expressions are equivalent for input non-null
     /// {@link org.antlr.v4.runtime.misc.IntSet} instances {@code x} and {@code y}.
     ///
-    /// <ul>
-    /// <li>{@code y.subtract(x)}</li>
-    /// <li>{@code x.complement(y)}</li>
-    /// </ul>
+    /// * {@code y.subtract(x)}
+    /// * {@code x.complement(y)}
     ///
     /// - parameter a: The set to compare with the current set. A {@code null}
     /// argument is treated as though it were an empty set.
     /// - returns: A new {@link org.antlr.v4.runtime.misc.IntSet} instance containing the elements present in
     /// {@code elements} but not present in the current set. The value
     /// {@code null} may be returned in place of an empty result set.
-
     func subtract(_ a: IntSet?) throws -> IntSet
 
     /// Return the total number of elements represented by the current set.
@@ -99,10 +90,6 @@ public protocol IntSet {
     /// - returns: {@code true} if the current set contains no elements; otherwise,
     /// {@code false}.
     func isNil() -> Bool
-
-    /// {@inheritDoc}
-
-    //func equals(obj : AnyObject) -> Bool;
 
     /// Returns the single value contained in the set, if {@link #size} is 1;
     /// otherwise, returns {@link org.antlr.v4.runtime.Token#INVALID_TYPE}.
@@ -130,10 +117,7 @@ public protocol IntSet {
     ///
     /// - returns: A list containing all element present in the current set, sorted
     /// in ascending numerical order.
-
     func toList() -> Array<Int>
-
-    /// {@inheritDoc}
 
     func toString() -> String
 }

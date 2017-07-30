@@ -40,16 +40,14 @@ public class SemanticContext: Hashable, CustomStringConvertible {
     /// - parameter parserCallStack:
     /// - returns: The simplified semantic context after precedence predicates are
     /// evaluated, which will be one of the following values.
-    /// <ul>
-    /// <li>{@link #NONE}: if the predicate simplifies to {@code true} after
-    /// precedence predicates are evaluated.</li>
-    /// <li>{@code null}: if the predicate simplifies to {@code false} after
-    /// precedence predicates are evaluated.</li>
-    /// <li>{@code this}: if the semantic context is not changed as a result of
-    /// precedence predicate evaluation.</li>
-    /// <li>A non-{@code null} {@link org.antlr.v4.runtime.atn.SemanticContext}: the new simplified
-    /// semantic context after precedence predicates are evaluated.</li>
-    /// </ul>
+    /// * {@link #NONE}: if the predicate simplifies to {@code true} after
+    /// precedence predicates are evaluated.
+    /// * {@code null}: if the predicate simplifies to {@code false} after
+    /// precedence predicates are evaluated.
+    /// * {@code this}: if the semantic context is not changed as a result of
+    /// precedence predicate evaluation.
+    /// * A non-{@code null} {@link org.antlr.v4.runtime.atn.SemanticContext}: the new simplified
+    /// semantic context after precedence predicates are evaluated.
     public func evalPrecedence<T:ATNSimulator>(_ parser: Recognizer<T>, _ parserCallStack: RuleContext) throws -> SemanticContext? {
         return self
     }

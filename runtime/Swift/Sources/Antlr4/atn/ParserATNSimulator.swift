@@ -43,7 +43,7 @@
 /// ATN each time we get that input.</p>
 ///
 /// <p>
-/// <strong>CACHING FULL CONTEXT PREDICTIONS</strong></p>
+/// __CACHING FULL CONTEXT PREDICTIONS__</p>
 ///
 /// <p>
 /// We could cache results from full context to predicted alternative easily and
@@ -75,7 +75,7 @@
 /// with full LL thing Sam does.</p>
 ///
 /// <p>
-/// <strong>AVOIDING FULL CONTEXT PREDICTION</strong></p>
+/// __AVOIDING FULL CONTEXT PREDICTION__</p>
 ///
 /// <p>
 /// We avoid doing full context retry when the outer context is empty, we did not
@@ -111,7 +111,7 @@
 /// entry rule and not dip into the outer context.</p>
 ///
 /// <p>
-/// <strong>PREDICATES</strong></p>
+/// __PREDICATES__</p>
 ///
 /// <p>
 /// Predicates are always evaluated if present in either SLL or LL both. SLL and
@@ -143,7 +143,7 @@
 /// without this on-the-fly evaluation.</p>
 ///
 /// <p>
-/// <strong>SHARING DFA</strong></p>
+/// __SHARING DFA__</p>
 ///
 /// <p>
 /// All instances of the same parser share the same decision DFAs through a
@@ -154,7 +154,7 @@
 /// a big size difference.</p>
 ///
 /// <p>
-/// <strong>THREAD SAFETY</strong></p>
+/// __THREAD SAFETY__</p>
 ///
 /// <p>
 /// The {@link org.antlr.v4.runtime.atn.ParserATNSimulator} locks on the {@link #decisionToDFA} field when
@@ -182,8 +182,8 @@
 /// way it will work because it's not doing a test and set operation.</p>
 ///
 /// <p>
-/// <strong>Starting with SLL then failing to combined SLL/LL (Two-Stage
-/// Parsing)</strong></p>
+/// __Starting with SLL then failing to combined SLL/LL (Two-Stage
+/// Parsing)__</p>
 ///
 /// <p>
 /// Sam pointed out that if SLL does not give a syntax error, then there is no
@@ -218,12 +218,12 @@
 ///
 /// <p>
 /// Let's say we have a set of SLL conflicting alternatives {@code {1, 2, 3}} and
-/// a smaller LL set called <em>s</em>. If <em>s</em> is {@code {2, 3}}, then SLL
+/// a smaller LL set called __s__. If __s__ is {@code {2, 3}}, then SLL
 /// parsing will get an error because SLL will pursue alternative 1. If
-/// <em>s</em> is {@code {1, 2}} or {@code {1, 3}} then both SLL and LL will
+/// __s__ is {@code {1, 2}} or {@code {1, 3}} then both SLL and LL will
 /// choose the same alternative because alternative one is the minimum of either
-/// set. If <em>s</em> is {@code {2}} or {@code {3}} then SLL will get a syntax
-/// error. If <em>s</em> is {@code {1}} then SLL will succeed.</p>
+/// set. If __s__ is {@code {2}} or {@code {3}} then SLL will get a syntax
+/// error. If __s__ is {@code {1}} then SLL will succeed.</p>
 ///
 /// <p>
 /// Of course, if the input is invalid, then we will get an error for sure in
@@ -1045,44 +1045,35 @@ open class ParserATNSimulator: ATNSimulator {
     /// process applies the following changes to the start state's configuration
     /// set.
     ///
-    /// <ol>
-    /// <li>Evaluate the precedence predicates for each configuration using
-    /// {@link org.antlr.v4.runtime.atn.SemanticContext#evalPrecedence}.</li>
-    /// <li>When {@link org.antlr.v4.runtime.atn.ATNConfig#isPrecedenceFilterSuppressed} is {@code false},
+    /// * Evaluate the precedence predicates for each configuration using
+    /// {@link org.antlr.v4.runtime.atn.SemanticContext#evalPrecedence}.
+    /// * When {@link org.antlr.v4.runtime.atn.ATNConfig#isPrecedenceFilterSuppressed} is {@code false},
     /// remove all configurations which predict an alternative greater than 1,
     /// for which another configuration that predicts alternative 1 is in the
     /// same ATN state with the same prediction context. This transformation is
     /// valid for the following reasons:
-    /// <ul>
-    /// <li>The closure block cannot contain any epsilon transitions which bypass
+    ///
+    /// * The closure block cannot contain any epsilon transitions which bypass
     /// the body of the closure, so all states reachable via alternative 1 are
     /// part of the precedence alternatives of the transformed left-recursive
-    /// rule.</li>
-    /// <li>The "primary" portion of a left recursive rule cannot contain an
+    /// rule.
+    /// * The "primary" portion of a left recursive rule cannot contain an
     /// epsilon transition, so the only way an alternative other than 1 can exist
     /// in a state that is also reachable via alternative 1 is by nesting calls
     /// to the left-recursive rule, with the outer calls not being at the
     /// preferred precedence level. The
     /// {@link org.antlr.v4.runtime.atn.ATNConfig#isPrecedenceFilterSuppressed} property marks ATN
     /// configurations which do not meet this condition, and therefore are not
-    /// eligible for elimination during the filtering process.</li>
-    /// </ul>
-    /// </li>
-    /// </ol>
+    /// eligible for elimination during the filtering process.
     ///
-    /// <p>
     /// The prediction context must be considered by this filter to address
     /// situations like the following.
-    /// </p>
-    /// <code>
-    /// <pre>
+    /// ```
     /// grammar TA;
     /// prog: statement* EOF;
     /// statement: letterA | statement letterA 'b' ;
     /// letterA: 'a';
-    /// </pre>
-    /// </code>
-    /// <p>
+    /// ```
     /// If the above grammar, the ATN state immediately before the token
     /// reference {@code 'a'} in {@code letterA} is reachable from the left edge
     /// of both the primary and closure blocks of the left-recursive rule
@@ -1090,7 +1081,6 @@ open class ParserATNSimulator: ATNSimulator {
     /// configurations distinguishes between them, and prevents the alternative
     /// which stepped out to {@code prog} (and then back in to {@code statement}
     /// from being eliminated by the filter.
-    /// </p>
     ///
     /// - parameter configs: The configuration set computed by
     /// {@link #computeStartState} as the start state for the DFA.
@@ -1165,27 +1155,22 @@ open class ParserATNSimulator: ATNSimulator {
     /// {@link org.antlr.v4.runtime.NoViableAltException} in particular prediction scenarios where the
     /// {@link #ERROR} state was reached during ATN simulation.
     ///
-    /// <p>
     /// The default implementation of this method uses the following
     /// algorithm to identify an ATN configuration which successfully parsed the
     /// decision entry rule. Choosing such an alternative ensures that the
     /// {@link org.antlr.v4.runtime.ParserRuleContext} returned by the calling rule will be complete
     /// and valid, and the syntax error will be reported later at a more
-    /// localized location.</p>
+    /// localized location.
     ///
-    /// <ul>
-    /// <li>If a syntactically valid path or paths reach the end of the decision rule and
-    /// they are semantically valid if predicated, return the min associated alt.</li>
-    /// <li>Else, if a semantically invalid but syntactically valid path exist
+    /// * If a syntactically valid path or paths reach the end of the decision rule and
+    /// they are semantically valid if predicated, return the min associated alt.
+    /// * Else, if a semantically invalid but syntactically valid path exist
     /// or paths exist, return the minimum associated alt.
-    /// </li>
-    /// <li>Otherwise, return {@link org.antlr.v4.runtime.atn.ATN#INVALID_ALT_NUMBER}.</li>
-    /// </ul>
+    /// * Otherwise, return {@link org.antlr.v4.runtime.atn.ATN#INVALID_ALT_NUMBER}.
     ///
-    /// <p>
     /// In some scenarios, the algorithm described above could predict an
     /// alternative which will result in a {@link org.antlr.v4.runtime.FailedPredicateException} in
-    /// the parser. Specifically, this could occur if the <em>only</em> configuration
+    /// the parser. Specifically, this could occur if the __only__ configuration
     /// capable of successfully parsing to the end of the decision rule is
     /// blocked by a semantic predicate. By choosing this alternative within
     /// {@link #adaptivePredict} instead of throwing a
@@ -1194,7 +1179,6 @@ open class ParserATNSimulator: ATNSimulator {
     /// predicate which is preventing the parser from successfully parsing the
     /// decision rule, which helps developers identify and correct logic errors
     /// in semantic predicates.
-    /// </p>
     ///
     /// - parameter configs: The ATN configurations which were valid immediately before
     /// the {@link #ERROR} state was reached
@@ -1286,22 +1270,19 @@ open class ParserATNSimulator: ATNSimulator {
 
     /// Evaluate a semantic context within a specific parser context.
     ///
-    /// <p>
     /// This method might not be called for every semantic context evaluated
     /// during the prediction process. In particular, we currently do not
-    /// evaluate the following but it may change in the future:</p>
+    /// evaluate the following but it may change in the future:
     ///
-    /// <ul>
-    /// <li>Precedence predicates (represented by
+    /// * Precedence predicates (represented by
     /// {@link org.antlr.v4.runtime.atn.SemanticContext.PrecedencePredicate}) are not currently evaluated
-    /// through this method.</li>
-    /// <li>Operator predicates (represented by {@link org.antlr.v4.runtime.atn.SemanticContext.AND} and
+    /// through this method.
+    /// * Operator predicates (represented by {@link org.antlr.v4.runtime.atn.SemanticContext.AND} and
     /// {@link org.antlr.v4.runtime.atn.SemanticContext.OR}) are evaluated as a single semantic
     /// context, rather than evaluating the operands individually.
     /// Implementations which require evaluation results from individual
     /// predicates should override this method to explicitly handle evaluation of
-    /// the operands within operator predicates.</li>
-    /// </ul>
+    /// the operands within operator predicates.
     ///
     /// - parameter pred: The semantic context to evaluate
     /// - parameter parserCallStack: The parser context in which to evaluate the
@@ -1311,7 +1292,7 @@ open class ParserATNSimulator: ATNSimulator {
     /// prediction; otherwise, {@code false} if the evaluation is occurring
     /// during SLL prediction
     ///
-    /// -  4.3
+    /// - since: 4.3
     internal func evalSemanticContext(_ pred: SemanticContext, _ parserCallStack: ParserRuleContext, _ alt: Int, _ fullCtx: Bool) throws -> Bool {
         return try pred.eval(parser, parserCallStack)
     }
@@ -1321,7 +1302,6 @@ open class ParserATNSimulator: ATNSimulator {
     /// alternative. We will not be caching that DFA state and it is a
     /// waste to pursue the closure. Might have to advance when we do
     /// ambig detection thought :(
-
     final internal func closure(_ config: ATNConfig,
         _ configs: ATNConfigSet,
         _ closureBusy: inout Set<ATNConfig>,

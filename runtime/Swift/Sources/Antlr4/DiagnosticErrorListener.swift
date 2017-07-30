@@ -8,18 +8,16 @@
 /// are made by calling {@link org.antlr.v4.runtime.Parser#notifyErrorListeners} with the appropriate
 /// message.
 ///
-/// <ul>
-/// <li><b>Ambiguities</b>: These are cases where more than one path through the
-/// grammar can match the input.</li>
-/// <li><b>Weak context sensitivity</b>: These are cases where full-context
+/// * __Ambiguities__: These are cases where more than one path through the
+/// grammar can match the input.
+/// * __Weak context sensitivity__: These are cases where full-context
 /// prediction resolved an SLL conflict to a unique alternative which equaled the
-/// minimum alternative of the SLL conflict.</li>
-/// <li><b>Strong (forced) context sensitivity</b>: These are cases where the
+/// minimum alternative of the SLL conflict.
+/// * __Strong (forced) context sensitivity__: These are cases where the
 /// full-context prediction resolved an SLL conflict to a unique alternative,
-/// <em>and</em> the minimum alternative of the SLL conflict was found to not be
+/// __and__ the minimum alternative of the SLL conflict was found to not be
 /// a truly viable alternative. Two-stage parsing cannot be used for inputs where
-/// this situation occurs.</li>
-/// </ul>
+/// this situation occurs.
 ///
 /// -  Sam Harwell
 

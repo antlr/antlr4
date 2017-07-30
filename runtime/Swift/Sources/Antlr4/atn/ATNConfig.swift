@@ -47,7 +47,7 @@ public class ATNConfig: Hashable, CustomStringConvertible {
     /// flag. It also ensures the performance of the existing {@link org.antlr.v4.runtime.atn.ATNConfig}
     /// constructors as well as certain operations like
     /// {@link org.antlr.v4.runtime.atn.ATNConfigSet#add(org.antlr.v4.runtime.atn.ATNConfig, DoubleKeyMap)} method are
-    /// <em>completely</em> unaffected by the change.</p>
+    /// __completely__ unaffected by the change.</p>
     public final var reachesIntoOuterContext: Int = 0
     //=0 intital by janyou
 

@@ -5,40 +5,28 @@
 
 
 /// A simple stream of symbols whose values are represented as integers. This
-/// interface provides <em>marked ranges</em> with support for a minimum level
+/// interface provides __marked ranges__ with support for a minimum level
 /// of buffering necessary to implement arbitrary lookahead during prediction.
 /// For more information on marked ranges, see {@link #mark}.
 ///
-/// <p><strong>Initializing Methods:</strong> Some methods in this interface have
+/// __Initializing Methods:__ Some methods in this interface have
 /// unspecified behavior if no call to an initializing method has occurred after
-/// the stream was constructed. The following is a list of initializing methods:</p>
+/// the stream was constructed. The following is a list of initializing methods:
 ///
-/// <ul>
-/// <li>{@link #LA}</li>
-/// <li>{@link #consume}</li>
-/// <li>{@link #size}</li>
-/// </ul>
-
+/// * {@link #LA}
+/// * {@link #consume}
+/// * {@link #size}
 public protocol IntStream: class {
-    /// The value returned by {@link #LA LA()} when the end of the stream is
-    /// reached.
-    //let EOF : Int = -1;
-
-    /// The value returned by {@link #getSourceName} when the actual name of the
-    /// underlying source is not known.
-    //let UNKNOWN_SOURCE_NAME : String = "<unknown>";
 
     /// Consumes the current symbol in the stream. This method has the following
     /// effects:
     ///
-    /// <ul>
-    /// <li><strong>Forward movement:</strong> The value of {@link #index index()}
+    /// * __Forward movement:__ The value of {@link #index index()}
     /// before calling this method is less than the value of {@code index()}
-    /// after calling this method.</li>
-    /// <li><strong>Ordered lookahead:</strong> The value of {@code LA(1)} before
+    /// after calling this method.
+    /// * __Ordered lookahead:__ The value of {@code LA(1)} before
     /// calling this method becomes the value of {@code LA(-1)} after calling
-    /// this method.</li>
-    /// </ul>
+    /// this method.
     ///
     /// Note that calling this method does not guarantee that {@code index()} is
     /// incremented by exactly 1, as that would preclude the ability to implement
@@ -58,27 +46,25 @@ public protocol IntStream: class {
     /// {@code i==0}, but the specific behavior is unspecified because this
     /// method is frequently called from performance-critical code.
     ///
-    /// <p>This method is guaranteed to succeed if any of the following are true:</p>
+    /// This method is guaranteed to succeed if any of the following are true:
     ///
-    /// <ul>
-    /// <li>{@code i>0}</li>
-    /// <li>{@code i==-1} and {@link #index index()} returns a value greater
+    /// * {@code i>0}
+    /// * {@code i==-1} and {@link #index index()} returns a value greater
     /// than the value of {@code index()} after the stream was constructed
     /// and {@code LA(1)} was called in that order. Specifying the current
     /// {@code index()} relative to the index after the stream was created
     /// allows for filtering implementations that do not return every symbol
     /// from the underlying source. Specifying the call to {@code LA(1)}
-    /// allows for lazily initialized streams.</li>
-    /// <li>{@code LA(i)} refers to a symbol consumed within a marked region
-    /// that has not yet been released.</li>
-    /// </ul>
+    /// allows for lazily initialized streams.
+    /// * {@code LA(i)} refers to a symbol consumed within a marked region
+    /// that has not yet been released.
     ///
-    /// <p>If {@code i} represents a position at or beyond the end of the stream,
-    /// this method returns {@link #EOF}.</p>
+    /// If {@code i} represents a position at or beyond the end of the stream,
+    /// this method returns {@link #EOF}.
     ///
-    /// <p>The return value is unspecified if {@code i<0} and fewer than {@code -i}
+    /// The return value is unspecified if {@code i<0} and fewer than {@code -i}
     /// calls to {@link #consume consume()} have occurred from the beginning of
-    /// the stream before calling this method.</p>
+    /// the stream before calling this method.
     ///
     /// - throws: _ANTLRError.unsupportedOperation_ if the stream does not support
     /// retrieving the value of the specified symbol
@@ -156,14 +142,12 @@ public protocol IntStream: class {
     /// returns without throwing an exception, then at least one of the following
     /// will be true.
     ///
-    /// <ul>
-    /// <li>{@link #index index()} will return the index of the first symbol
+    /// * {@link #index index()} will return the index of the first symbol
     /// appearing at or after the specified {@code index}. Specifically,
     /// implementations which filter their sources should automatically
     /// adjust {@code index} forward the minimum amount required for the
-    /// operation to target a non-ignored symbol.</li>
-    /// <li>{@code LA(1)} returns {@link #EOF}</li>
-    /// </ul>
+    /// operation to target a non-ignored symbol.
+    /// * {@code LA(1)} returns {@link #EOF}
     ///
     /// This operation is guaranteed to not throw an exception if {@code index}
     /// lies within a marked region. For more information on marked regions, see

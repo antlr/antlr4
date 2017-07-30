@@ -42,7 +42,7 @@ public enum PredictionMode {
      * When using this prediction mode, the parser will make correct decisions
      * for all syntactically-correct grammar and input combinations. However, in
      * cases where the grammar is truly ambiguous this prediction mode might not
-     * report a precise answer for <em>exactly which</em> alternatives are
+     * report a precise answer for __exactly which__ alternatives are
      * ambiguous.</p>
      *
      * <p>
@@ -76,12 +76,10 @@ public enum PredictionMode {
     /// This method computes the SLL prediction termination condition for both of
     /// the following cases.</p>
     ///
-    /// <ul>
-    /// <li>The usual SLL+LL fallback upon SLL conflict</li>
-    /// <li>Pure SLL without LL fallback</li>
-    /// </ul>
+    /// * The usual SLL+LL fallback upon SLL conflict
+    /// * Pure SLL without LL fallback
     ///
-    /// <p><strong>COMBINED SLL+LL PARSING</strong></p>
+    /// <p>__COMBINED SLL+LL PARSING__</p>
     ///
     /// <p>When LL-fallback is enabled upon SLL conflict, correct predictions are
     /// ensured regardless of how the termination condition is computed by this
@@ -100,7 +98,7 @@ public enum PredictionMode {
     /// stops when it sees only conflicting configuration subsets. In contrast,
     /// full LL keeps going when there is uncertainty.</p>
     ///
-    /// <p><strong>HEURISTIC</strong></p>
+    /// <p>__HEURISTIC__</p>
     ///
     /// <p>As a heuristic, we stop prediction when we see any conflicting subset
     /// unless we see a state that only has one alternative associated with it.
@@ -128,13 +126,13 @@ public enum PredictionMode {
     /// associated with the conflicting configs, but since we can continue
     /// looking for input reasonably, don't declare the state done.</p>
     ///
-    /// <p><strong>PURE SLL PARSING</strong></p>
+    /// <p>__PURE SLL PARSING__</p>
     ///
     /// <p>To handle pure SLL parsing, all we have to do is make sure that we
     /// combine stack contexts for configurations that differ only by semantic
     /// predicate. From there, we can do the usual SLL termination heuristic.</p>
     ///
-    /// <p><strong>PREDICATES IN SLL+LL PARSING</strong></p>
+    /// <p>__PREDICATES IN SLL+LL PARSING__</p>
     ///
     /// <p>SLL decisions don't evaluate predicates until after they reach DFA stop
     /// states because they need to create the DFA cache that works in all
@@ -272,7 +270,7 @@ public enum PredictionMode {
     /// no configuration contains a semantic context during the termination
     /// check.</p>
     ///
-    /// <p><strong>CONFLICTING CONFIGS</strong></p>
+    /// <p>__CONFLICTING CONFIGS__</p>
     ///
     /// <p>Two configurations {@code (s, i, x)} and {@code (s, j, x')}, conflict
     /// when {@code i!=j} but {@code x=x'}. Because we merge all
@@ -295,67 +293,63 @@ public enum PredictionMode {
     /// simplicity but also because that is the test you need to detect the
     /// alternatives that are actually in conflict.</p>
     ///
-    /// <p><strong>CONTINUE/STOP RULE</strong></p>
+    /// <p>__CONTINUE/STOP RULE__</p>
     ///
     /// <p>Continue if union of resolved alternative sets from non-conflicting and
     /// conflicting alternative subsets has more than one alternative. We are
     /// uncertain about which alternative to predict.</p>
     ///
-    /// <p>The complete set of alternatives, {@code [i for (_,i,_)]}, tells us which
+    /// The complete set of alternatives, {@code [i for (_,i,_)]}, tells us which
     /// alternatives are still in the running for the amount of input we've
     /// consumed at this point. The conflicting sets let us to strip away
     /// configurations that won't lead to more states because we resolve
     /// conflicts to the configuration with a minimum alternate for the
-    /// conflicting set.</p>
+    /// conflicting set.
     ///
-    /// <p><strong>CASES</strong></p>
+    /// __CASES__
     ///
-    /// <ul>
+    /// * no conflicts and more than 1 alternative in set =&gt; continue
     ///
-    /// <li>no conflicts and more than 1 alternative in set =&gt; continue</li>
-    ///
-    /// <li> {@code (s, 1, x)}, {@code (s, 2, x)}, {@code (s, 3, z)},
+    /// * {@code (s, 1, x)}, {@code (s, 2, x)}, {@code (s, 3, z)},
     /// {@code (s', 1, y)}, {@code (s', 2, y)} yields non-conflicting set
     /// {@code {3}} U conflicting sets {@code min({1,2})} U {@code min({1,2})} =
     /// {@code {1,3}} =&gt; continue
-    /// </li>
     ///
-    /// <li>{@code (s, 1, x)}, {@code (s, 2, x)}, {@code (s', 1, y)},
+    /// * {@code (s, 1, x)}, {@code (s, 2, x)}, {@code (s', 1, y)},
     /// {@code (s', 2, y)}, {@code (s'', 1, z)} yields non-conflicting set
     /// {@code {1}} U conflicting sets {@code min({1,2})} U {@code min({1,2})} =
-    /// {@code {1}} =&gt; stop and predict 1</li>
+    /// {@code {1}} =&gt; stop and predict 1
     ///
-    /// <li>{@code (s, 1, x)}, {@code (s, 2, x)}, {@code (s', 1, y)},
+    /// * {@code (s, 1, x)}, {@code (s, 2, x)}, {@code (s', 1, y)},
     /// {@code (s', 2, y)} yields conflicting, reduced sets {@code {1}} U
     /// {@code {1}} = {@code {1}} =&gt; stop and predict 1, can announce
-    /// ambiguity {@code {1,2}}</li>
+    /// ambiguity {@code {1,2}}
     ///
-    /// <li>{@code (s, 1, x)}, {@code (s, 2, x)}, {@code (s', 2, y)},
+    /// * {@code (s, 1, x)}, {@code (s, 2, x)}, {@code (s', 2, y)},
     /// {@code (s', 3, y)} yields conflicting, reduced sets {@code {1}} U
-    /// {@code {2}} = {@code {1,2}} =&gt; continue</li>
+    /// {@code {2}} = {@code {1,2}} =&gt; continue
     ///
-    /// <li>{@code (s, 1, x)}, {@code (s, 2, x)}, {@code (s', 3, y)},
+    /// * {@code (s, 1, x)}, {@code (s, 2, x)}, {@code (s', 3, y)},
     /// {@code (s', 4, y)} yields conflicting, reduced sets {@code {1}} U
-    /// {@code {3}} = {@code {1,3}} =&gt; continue</li>
+    /// {@code {3}} = {@code {1,3}} =&gt; continue
     ///
-    /// </ul>
     ///
-    /// <p><strong>EXACT AMBIGUITY DETECTION</strong></p>
+    /// __EXACT AMBIGUITY DETECTION__
     ///
-    /// <p>If all states report the same conflicting set of alternatives, then we
-    /// know we have the exact ambiguity set.</p>
+    /// If all states report the same conflicting set of alternatives, then we
+    /// know we have the exact ambiguity set.
     ///
-    /// <p><code>|A_<em>i</em>|&gt;1</code> and
-    /// <code>A_<em>i</em> = A_<em>j</em></code> for all <em>i</em>, <em>j</em>.</p>
+    /// `|A_i__|&gt;1` and
+    /// `A_i = A_j` for all i, j.
     ///
-    /// <p>In other words, we continue examining lookahead until all {@code A_i}
+    /// In other words, we continue examining lookahead until all {@code A_i}
     /// have more than one alternative and all {@code A_i} are the same. If
     /// {@code A={{1,2}, {1,3}}}, then regular LL prediction would terminate
     /// because the resolved set is {@code {1}}. To determine what the real
     /// ambiguity is, we have to know whether the ambiguity is between one and
     /// two or one and three so we keep going. We can only stop prediction when
     /// we need exact ambiguity detection when the sets look like
-    /// {@code A={{1,2}}} or {@code {{1,2},{1,2}}}, etc...</p>
+    /// {@code A={{1,2}}} or {@code {{1,2},{1,2}}}, etc...
     public static func resolvesToJustOneViableAlt(_ altsets: Array<BitSet>) throws -> Int {
         return try  getSingleViableAlt(altsets)
     }

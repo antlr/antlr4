@@ -67,7 +67,7 @@ public class LexerActionExecutor: Hashable {
     /// <p>Normally, when the executor encounters lexer actions where
     /// {@link org.antlr.v4.runtime.atn.LexerAction#isPositionDependent} returns {@code true}, it calls
     /// {@link org.antlr.v4.runtime.IntStream#seek} on the input {@link org.antlr.v4.runtime.CharStream} to set the input
-    /// position to the <em>end</em> of the current token. This behavior provides
+    /// position to the __end__ of the current token. This behavior provides
     /// for efficient DFA representation of lexer actions which appear at the end
     /// of a lexer rule, even when the lexer rule matches a variable number of
     /// characters.</p>

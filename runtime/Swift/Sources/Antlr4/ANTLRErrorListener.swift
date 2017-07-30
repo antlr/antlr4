@@ -46,28 +46,28 @@ public protocol ANTLRErrorListener: class {
     /// This method is called by the parser when a full-context prediction
     /// results in an ambiguity.
     ///
-    /// <p>Each full-context prediction which does not result in a syntax error
+    /// Each full-context prediction which does not result in a syntax error
     /// will call either {@link #reportContextSensitivity} or
-    /// {@link #reportAmbiguity}.</p>
+    /// {@link #reportAmbiguity}.
     ///
-    /// <p>When {@code ambigAlts} is not null, it contains the set of potentially
+    /// When {@code ambigAlts} is not null, it contains the set of potentially
     /// viable alternatives identified by the prediction algorithm. When
     /// {@code ambigAlts} is null, use {@link org.antlr.v4.runtime.atn.ATNConfigSet#getAlts} to obtain the
-    /// represented alternatives from the {@code configs} argument.</p>
+    /// represented alternatives from the {@code configs} argument.
     ///
-    /// <p>When {@code exact} is {@code true}, <em>all</em> of the potentially
+    /// When {@code exact} is {@code true}, __all__ of the potentially
     /// viable alternatives are truly viable, i.e. this is reporting an exact
-    /// ambiguity. When {@code exact} is {@code false}, <em>at least two</em> of
+    /// ambiguity. When {@code exact} is {@code false}, __at least two__ of
     /// the potentially viable alternatives are viable for the current input, but
     /// the prediction algorithm terminated as soon as it determined that at
-    /// least the <em>minimum</em> potentially viable alternative is truly
-    /// viable.</p>
+    /// least the __minimum__ potentially viable alternative is truly
+    /// viable.
     ///
-    /// <p>When the {@link org.antlr.v4.runtime.atn.PredictionMode#LL_EXACT_AMBIG_DETECTION} prediction
+    /// When the {@link org.antlr.v4.runtime.atn.PredictionMode#LL_EXACT_AMBIG_DETECTION} prediction
     /// mode is used, the parser is required to identify exact ambiguities so
-    /// {@code exact} will always be {@code true}.</p>
+    /// {@code exact} will always be {@code true}.
     ///
-    /// <p>This method is not used by lexers.</p>
+    /// This method is not used by lexers.
     ///
     /// - parameter recognizer: the parser instance
     /// - parameter dfa: the DFA for the current decision

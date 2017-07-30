@@ -55,7 +55,7 @@
  * {@code expr} but, from the parser passed in, we create a special version of
  * the underlying grammar representation (an {@link org.antlr.v4.runtime.atn.ATN}) that allows imaginary
  * tokens representing rules ({@code <expr>}) to match entire rules. We call
- * these <em>bypass alternatives</em>.</p>
+ * these __bypass alternatives__.</p>
  *
  * <p>Delimiters are {@code <} and {@code >}, with {@code \} as the escape string
  * by default, but you can set them to whatever you want using

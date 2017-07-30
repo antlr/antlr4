@@ -8,17 +8,14 @@
  * Represents a placeholder tag in a tree pattern. A tag can have any of the
  * following forms.
  *
- * <ul>
- * <li>{@code expr}: An unlabeled placeholder for a parser rule {@code expr}.</li>
- * <li>{@code ID}: An unlabeled placeholder for a token of type {@code ID}.</li>
- * <li>{@code e:expr}: A labeled placeholder for a parser rule {@code expr}.</li>
- * <li>{@code id:ID}: A labeled placeholder for a token of type {@code ID}.</li>
- * </ul>
+ * * {@code expr}: An unlabeled placeholder for a parser rule {@code expr}.
+ * * {@code ID}: An unlabeled placeholder for a token of type {@code ID}.
+ * * {@code e:expr}: A labeled placeholder for a parser rule {@code expr}.
+ * * {@code id:ID}: A labeled placeholder for a token of type {@code ID}.
  *
  * This class does not perform any validation on the tag or label names aside
  * from ensuring that the tag is a non-null, non-empty string.
  */
-
 public class TagChunk: Chunk, CustomStringConvertible {
     /**
      * This is the backing field for {@link #getTag}.

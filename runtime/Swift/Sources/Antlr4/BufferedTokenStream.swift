@@ -40,13 +40,12 @@ public class BufferedTokenStream: TokenStream {
     /// {@link #tokenSource} and added to {@link #tokens}. This field improves
     /// performance for the following cases:
     ///
-    /// <ul>
-    /// <li>{@link #consume}: The lookahead check in {@link #consume} to prevent
+    /// * {@link #consume}: The lookahead check in {@link #consume} to prevent
     /// consuming the EOF symbol is optimized by checking the values of
-    /// {@link #fetchedEOF} and {@link #p} instead of calling {@link #LA}.</li>
-    /// <li>{@link #fetch}: The check to prevent adding multiple EOF symbols into
-    /// {@link #tokens} is trivial with this field.</li>
-    /// <ul>
+    /// {@link #fetchedEOF} and {@link #p} instead of calling {@link #LA}.
+    ///
+    /// * {@link #fetch}: The check to prevent adding multiple EOF symbols into
+    /// {@link #tokens} is trivial with this field.
     internal var fetchedEOF: Bool = false
 
     public init(_ tokenSource: TokenSource) {

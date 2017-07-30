@@ -836,7 +836,7 @@ public class BitSet: Hashable, CustomStringConvertible {
         return Int(i) & 0x7f
     }
 
-    /// Performs a logical <b>AND</b> of this target bit set with the
+    /// Performs a logical __AND__ of this target bit set with the
     /// argument bit set. This bit set is modified so that each bit in it
     /// has the value {@code true} if and only if it both initially
     /// had the value {@code true} and the corresponding bit in the
@@ -862,7 +862,7 @@ public class BitSet: Hashable, CustomStringConvertible {
         checkInvariants()
     }
 
-    /// Performs a logical <b>OR</b> of this bit set with the bit set
+    /// Performs a logical __OR__ of this bit set with the bit set
     /// argument. This bit set is modified so that a bit in it has the
     /// value {@code true} if and only if it either already had the
     /// value {@code true} or the corresponding bit in the bit set
@@ -896,16 +896,15 @@ public class BitSet: Hashable, CustomStringConvertible {
         checkInvariants()
     }
 
-    /// Performs a logical <b>XOR</b> of this bit set with the bit set
+    /// Performs a logical __XOR__ of this bit set with the bit set
     /// argument. This bit set is modified so that a bit in it has the
     /// value {@code true} if and only if one of the following
     /// statements holds:
-    /// <ul>
-    /// <li>The bit initially has the value {@code true}, and the
+    ///
+    /// * The bit initially has the value {@code true}, and the
     /// corresponding bit in the argument has the value {@code false}.
-    /// <li>The bit initially has the value {@code false}, and the
+    /// * The bit initially has the value {@code false}, and the
     /// corresponding bit in the argument has the value {@code true}.
-    /// </ul>
     ///
     /// - parameter  set: a bit set
     public func xor(_ set: BitSet) {
