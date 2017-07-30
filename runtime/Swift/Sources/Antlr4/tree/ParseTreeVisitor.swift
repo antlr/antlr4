@@ -5,14 +5,14 @@
 
 
 
-/**
- * This interface defines the basic notion of a parse tree visitor. Generated
- * visitors implement this interface and the {@code XVisitor} interface for
- * grammar {@code X}.
- *
- * @param <T> The return type of the visit operation. Use {@link Void} for
- * operations with no return type.
- */
+/// 
+/// This interface defines the basic notion of a parse tree visitor. Generated
+/// visitors implement this interface and the `XVisitor` interface for
+/// grammar `X`.
+/// 
+/// - Parameter <T>: The return type of the visit operation. Use _Void_ for
+/// operations with no return type.
+/// 
 
 
 open class ParseTreeVisitor<T> {
@@ -20,49 +20,49 @@ open class ParseTreeVisitor<T> {
 
     }
     // typealias T
-    /**
-     * Visit a parse tree, and return a user-defined result of the operation.
-     *
-     * @param tree The {@link org.antlr.v4.runtime.tree.ParseTree} to visit.
-     * @return The result of visiting the parse tree.
-     */
+    /// 
+    /// Visit a parse tree, and return a user-defined result of the operation.
+    /// 
+    /// - Parameter tree: The _org.antlr.v4.runtime.tree.ParseTree_ to visit.
+    /// - Returns: The result of visiting the parse tree.
+    /// 
     open func visit(_ tree: ParseTree) -> T? {
         RuntimeException(" must overriden !")
         return nil
 
     }
 
-    /**
-     * Visit the children of a node, and return a user-defined result of the
-     * operation.
-     *
-     * @param node The {@link org.antlr.v4.runtime.tree.RuleNode} whose children should be visited.
-     * @return The result of visiting the children of the node.
-     */
+    /// 
+    /// Visit the children of a node, and return a user-defined result of the
+    /// operation.
+    /// 
+    /// - Parameter node: The _org.antlr.v4.runtime.tree.RuleNode_ whose children should be visited.
+    /// - Returns: The result of visiting the children of the node.
+    /// 
     open func visitChildren(_ node: RuleNode) -> T? {
         RuntimeException(" must overriden !")
         return nil
 
     }
 
-    /**
-     * Visit a terminal node, and return a user-defined result of the operation.
-     *
-     * @param node The {@link org.antlr.v4.runtime.tree.TerminalNode} to visit.
-     * @return The result of visiting the node.
-     */
+    /// 
+    /// Visit a terminal node, and return a user-defined result of the operation.
+    /// 
+    /// - Parameter node: The _org.antlr.v4.runtime.tree.TerminalNode_ to visit.
+    /// - Returns: The result of visiting the node.
+    /// 
     open func visitTerminal(_ node: TerminalNode) -> T? {
         RuntimeException(" must overriden !")
         return nil
 
     }
 
-    /**
-     * Visit an error node, and return a user-defined result of the operation.
-     *
-     * @param node The {@link org.antlr.v4.runtime.tree.ErrorNode} to visit.
-     * @return The result of visiting the node.
-     */
+    /// 
+    /// Visit an error node, and return a user-defined result of the operation.
+    /// 
+    /// - Parameter node: The _org.antlr.v4.runtime.tree.ErrorNode_ to visit.
+    /// - Returns: The result of visiting the node.
+    /// 
     open func visitErrorNode(_ node: ErrorNode) -> T? {
         RuntimeException(" must overriden !")
         return nil
