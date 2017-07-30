@@ -1,26 +1,36 @@
+/// 
 /// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
-/// Vacuum all input from a {@link java.io.Reader}/{@link java.io.InputStream} and then treat it
-/// like a {@code char[]} buffer. Can also pass in a {@link String} or
-/// {@code char[]} to use.
-///
-/// <p>If you need encoding, pass in stream/reader with correct encoding.</p>
+/// Vacuum all input from a _java.io.Reader_/_java.io.InputStream_ and then treat it
+/// like a `char[]` buffer. Can also pass in a _String_ or
+/// `char[]` to use.
+/// 
+/// If you need encoding, pass in stream/reader with correct encoding.
+/// 
 
 public class ANTLRInputStream: CharStream {
     public static let READ_BUFFER_SIZE: Int = 1024
     public static let INITIAL_BUFFER_SIZE: Int = 1024
 
+    /// 
     /// The data being scanned
+    /// 
     internal var data: [Character]
 
+    /// 
     /// How many characters are actually in the buffer
+    /// 
     internal var n: Int
 
+    /// 
     /// 0..n-1 index into string of next char
+    /// 
     internal var p: Int = 0
 
+    /// 
     /// What is name or source of this char stream?
+    /// 
     public var name: String?
 
     public init() {
@@ -28,13 +38,17 @@ public class ANTLRInputStream: CharStream {
         data = [Character]()
     }
 
+    /// 
     /// Copy data in string to a local char array
+    /// 
     public init(_ input: String) {
         self.data = Array(input.characters) // input.toCharArray();
         self.n = input.length
     }
 
+    /// 
     /// This is the preferred constructor for strings as no data is copied
+    /// 
     public init(_ data: [Character], _ numberOfActualCharsInArray: Int) {
         self.data = data
         self.n = numberOfActualCharsInArray
@@ -84,9 +98,11 @@ public class ANTLRInputStream: CharStream {
         return LA(i)
     }
 
+    /// 
     /// Return the current input symbol index 0..n where n indicates the
     /// last symbol has been read.  The index is the index of char to
     /// be returned from LA(1).
+    /// 
     public func index() -> Int {
         return p
     }
@@ -95,7 +111,9 @@ public class ANTLRInputStream: CharStream {
         return n
     }
 
+    /// 
     /// mark/release do nothing; we have entire buffer
+    /// 
 
     public func mark() -> Int {
         return -1
@@ -104,8 +122,10 @@ public class ANTLRInputStream: CharStream {
     public func release(_ marker: Int) {
     }
 
+    /// 
     /// consume() ahead until p==index; can't just set p=index as we must
     /// update line and charPositionInLine. If we seek backwards, just set p
+    /// 
 
     public func seek(_ index: Int) throws {
         var index = index

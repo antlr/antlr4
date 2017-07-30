@@ -1,66 +1,70 @@
+/// 
 /// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
+/// 
 
 
-///
+/// 
+/// 
 /// The following images show the relation of states and
-/// {@link org.antlr.v4.runtime.atn.ATNState#transitions} for various grammar constructs.
-///
-///
+/// _org.antlr.v4.runtime.atn.ATNState#transitions_ for various grammar constructs.
+/// 
+/// 
 /// * Solid edges marked with an &#0949; indicate a required
-/// {@link org.antlr.v4.runtime.atn.EpsilonTransition}.
-///
+/// _org.antlr.v4.runtime.atn.EpsilonTransition_.
+/// 
 /// * Dashed edges indicate locations where any transition derived from
-/// {@link org.antlr.v4.runtime.atn.Transition} might appear.
-///
+/// _org.antlr.v4.runtime.atn.Transition_ might appear.
+/// 
 /// * Dashed nodes are place holders for either a sequence of linked
-/// {@link org.antlr.v4.runtime.atn.BasicState} states or the inclusion of a block representing a nested
+/// _org.antlr.v4.runtime.atn.BasicState_ states or the inclusion of a block representing a nested
 /// construct in one of the forms below.
-///
-/// * Nodes showing multiple outgoing alternatives with a {@code ...} support
-/// any number of alternatives (one or more). Nodes without the {@code ...} only
+/// 
+/// * Nodes showing multiple outgoing alternatives with a `...` support
+/// any number of alternatives (one or more). Nodes without the `...` only
 /// support the exact number of alternatives shown in the diagram.
-///
-///
+/// 
+/// 
 /// ## Basic Blocks
-///
+/// 
 /// ### Rule
-///
-/// <embed src="images/Rule.svg" type="image/svg+xml"/>
-///
+/// 
+/// 
+/// 
 /// ## Block of 1 or more alternatives
-///
-/// <embed src="images/Block.svg" type="image/svg+xml"/>
-///
+/// 
+/// 
+/// 
 /// ## Greedy Loops
-///
-/// ### Greedy Closure: {@code (...)*}
-///
-/// <embed src="images/ClosureGreedy.svg" type="image/svg+xml"/>
-///
-/// ### Greedy Positive Closure: {@code (...)+}
-///
-/// <embed src="images/PositiveClosureGreedy.svg" type="image/svg+xml"/>
-///
-/// ### Greedy Optional: {@code (...)?}
-///
-/// <embed src="images/OptionalGreedy.svg" type="image/svg+xml"/>
-///
+/// 
+/// ### Greedy Closure: `(...)*`
+/// 
+/// 
+/// 
+/// ### Greedy Positive Closure: `(...)+`
+/// 
+/// 
+/// 
+/// ### Greedy Optional: `(...)?`
+/// 
+/// 
+/// 
 /// ## Non-Greedy Loops
-///
-/// ### Non-Greedy Closure: {@code (...)*?}
-///
-/// <embed src="images/ClosureNonGreedy.svg" type="image/svg+xml"/>
-///
-/// ### Non-Greedy Positive Closure: {@code (...)+?}
-///
-/// <embed src="images/PositiveClosureNonGreedy.svg" type="image/svg+xml"/>
-///
-/// ### Non-Greedy Optional: {@code (...)??}
-///
-/// <embed src="images/OptionalNonGreedy.svg" type="image/svg+xml"/>
-///
+/// 
+/// ### Non-Greedy Closure: `(...)*?`
+/// 
+/// 
+/// 
+/// ### Non-Greedy Positive Closure: `(...)+?`
+/// 
+/// 
+/// 
+/// ### Non-Greedy Optional: `(...)??`
+/// 
+/// 
+/// 
+/// 
 public class ATNState: Hashable, CustomStringConvertible {
     public static let INITIAL_NUM_TRANSITIONS: Int = 4
 
@@ -98,7 +102,9 @@ public class ATNState: Hashable, CustomStringConvertible {
 
     public static let INVALID_STATE_NUMBER: Int = -1
 
+    /// 
     /// Which ATN are we in?
+    /// 
     public final var atn: ATN? = nil
 
     public final var stateNumber: Int = INVALID_STATE_NUMBER
@@ -108,11 +114,15 @@ public class ATNState: Hashable, CustomStringConvertible {
 
     public final var epsilonOnlyTransitions: Bool = false
 
+    /// 
     /// Track the transitions emanating from this ATN state.
+    /// 
     internal final var transitions: Array<Transition> = Array<Transition>()
     //Array<Transition>(INITIAL_NUM_TRANSITIONS);
 
+    /// 
     /// Used to cache lookahead during parsing, not used during construction
+    /// 
     public final var nextTokenWithinRule: IntervalSet?
 
 
