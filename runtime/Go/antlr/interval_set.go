@@ -27,6 +27,68 @@ func (i *Interval) Contains(item int) bool {
 	return item >= i.Start && item < i.Stop
 }
 
+// Does this start completely before other? Disjoint
+func (i *Interval) StartsBeforeDisjoint(other *Interval) bool{
+	return i.Start<other.Start && i.Stop < other.Start
+}
+
+// Does this start at or before other? Nondisjoint
+func (i *Interval) StartsBeforeNonDisjoint(other *Interval) bool{
+	return i.Start <= other.Start && i.Stop >= other.Start
+}
+
+// Does this.a start after other.b? May or may not be disjoint
+func (i *Interval) StartsAfter(other *Interval) bool{
+	return i.Start > other.Start
+}
+
+// Does this start completely after other? Disjoint
+func (i *Interval) StartsAfterDisjoint(other *Interval) bool{
+	return i.Start > other.Stop
+}
+
+// Does this start after other? NonDisjoint
+func (i *Interval) StartsAfterNonDisjoint(other *Interval) bool{
+	return i.Start>other.Start && i.Start <= other.Stop // i.Stop>=other.Stop implied
+}
+
+// Are both ranges disjoint? I.e., no overlap?
+func (i *Interval) Disjoint(other *Interval) bool{
+	return i.StartsBeforeDisjoint(other) || i.StartsAfterDisjoint(other)
+}
+
+// Are two intervals adjacent such as 0..41 and 42..42?
+func (i *Interval) Adjacent(other *Interval) bool{
+	return i.Start == other.Stop+1 || i.Stop == other.Start-1;
+}
+
+func (i *Interval) ProperlyContains(other *Interval) bool{
+	return other.Start >= i.Start && other.Stop <= i.Stop
+}
+
+// Return the interval computed from combining this and other
+func (i *Interval) Union(other *Interval) *Interval{
+	return NewInterval(intMin(i.Start, other.Start), intMax(i.Stop, other.Stop))
+}
+
+// Return the interval in common between this and other
+func (i *Interval) Intersection(other *Interval) *Interval{
+	return NewInterval(intMax(i.Start, other.Start), intMin(i.Stop, other.Stop))
+}
+//  Return the interval with elements from this not in other;
+//  other must not be totally enclosed (properly contained)
+//  within this, which would result in two disjoint intervals
+//  instead of the single one returned by this method.
+func (i *Interval) DifferenceNotProperlyContained(other *Interval) *Interval{
+	var diff *Interval = nil
+	if other.StartsBeforeDisjoint(i){
+		diff = NewInterval(intMax(i.Start, other.Stop +1), i.Stop)
+	}else if other.StartsAfterNonDisjoint(i){
+		diff = NewInterval(i.Start, other.Start -1)
+	}
+	return diff
+}
+
 func (i *Interval) String() string {
 	if i.Start == i.Stop-1 {
 		return strconv.Itoa(i.Start)
