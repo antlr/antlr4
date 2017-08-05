@@ -151,3 +151,6 @@ YYYY/MM/DD, github id, Full name, email
 2017/06/11, erikbra, Erik A. Brandstadmoen, erik@brandstadmoen.net
 2017/06/10, jm-mikkelsen, Jan Martin Mikkelsen, janm@transactionware.com
 2017/06/25, alimg, Alim Gökkaya, alim.gokkaya@gmail.com
+2017/07/11, dhalperi, Daniel Halperin, daniel@halper.in
+2017/07/27, shirou, WAKAYAMA Shirou, shirou.faw@gmail.com
+2017/07/09, neatnerd, Mike Arshinskiy, neatnerd@users.noreply.github.com

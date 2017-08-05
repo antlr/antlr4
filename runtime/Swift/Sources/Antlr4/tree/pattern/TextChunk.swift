@@ -4,44 +4,44 @@
  */
 
 
-/**
- * Represents a span of raw text (concrete syntax) between tags in a tree
- * pattern string.
- */
+/// 
+/// Represents a span of raw text (concrete syntax) between tags in a tree
+/// pattern string.
+/// 
 
 public class TextChunk: Chunk, CustomStringConvertible {
-    /**
-     * This is the backing field for {@link #getText}.
-     */
+    /// 
+    /// This is the backing field for _#getText_.
+    /// 
 
     private let text: String
 
-    /**
-     * Constructs a new instance of {@link org.antlr.v4.runtime.tree.pattern.TextChunk} with the specified text.
-     *
-     * @param text The text of this chunk.
-     * @exception IllegalArgumentException if {@code text} is {@code null}.
-     */
+    /// 
+    /// Constructs a new instance of _org.antlr.v4.runtime.tree.pattern.TextChunk_ with the specified text.
+    /// 
+    /// - Parameter text: The text of this chunk.
+    /// - Throws: ANTLRError.illegalArgument if `text` is `null`.
+    /// 
     public init(_ text: String) {
         self.text = text
     }
 
-    /**
-     * Gets the raw text of this chunk.
-     *
-     * @return The text of the chunk.
-     */
+    /// 
+    /// Gets the raw text of this chunk.
+    /// 
+    /// - Returns: The text of the chunk.
+    /// 
 
     public final func getText() -> String {
         return text
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * <p>The implementation for {@link org.antlr.v4.runtime.tree.pattern.TextChunk} returns the result of
-     * {@link #getText()} in single quotes.</p>
-     */
+    /// 
+    /// 
+    /// 
+    /// The implementation for _org.antlr.v4.runtime.tree.pattern.TextChunk_ returns the result of
+    /// _#getText()_ in single quotes.
+    /// 
 
 
     public var description: String {

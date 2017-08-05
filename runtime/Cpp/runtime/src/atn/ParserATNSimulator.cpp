@@ -184,7 +184,7 @@ size_t ParserATNSimulator::execATN(dfa::DFA &dfa, dfa::DFAState *s0, TokenStream
       throw e;
     }
 
-    if (D->requiresFullContext && mode != PredictionMode::SLL) {
+    if (D->requiresFullContext && _mode != PredictionMode::SLL) {
       // IF PREDS, MIGHT RESOLVE TO SINGLE ALT => SLL (or syntax error)
       BitSet conflictingAlts;
       if (D->predicates.size() != 0) {
@@ -281,7 +281,7 @@ dfa::DFAState *ParserATNSimulator::computeTargetState(dfa::DFA &dfa, dfa::DFASta
     D->isAcceptState = true;
     D->configs->uniqueAlt = predictedAlt;
     D->prediction = predictedAlt;
-  } else if (PredictionModeClass::hasSLLConflictTerminatingPrediction(mode, D->configs.get())) {
+  } else if (PredictionModeClass::hasSLLConflictTerminatingPrediction(_mode, D->configs.get())) {
     // MORE THAN ONE VIABLE ALTERNATIVE
     D->configs->conflictingAlts = getConflictingAlts(D->configs.get());
     D->requiresFullContext = true;
@@ -368,7 +368,7 @@ size_t ParserATNSimulator::execATNWithFullContext(dfa::DFA &dfa, dfa::DFAState *
       predictedAlt = reach->uniqueAlt;
       break;
     }
-    if (mode != PredictionMode::LL_EXACT_AMBIG_DETECTION) {
+    if (_mode != PredictionMode::LL_EXACT_AMBIG_DETECTION) {
       predictedAlt = PredictionModeClass::resolvesToJustOneViableAlt(altSubSets);
       if (predictedAlt != ATN::INVALID_ALT_NUMBER) {
         break;
@@ -1330,11 +1330,11 @@ void ParserATNSimulator::reportAmbiguity(dfa::DFA &dfa, dfa::DFAState * /*D*/, s
 }
 
 void ParserATNSimulator::setPredictionMode(PredictionMode newMode) {
-  mode = newMode;
+  _mode = newMode;
 }
 
 atn::PredictionMode ParserATNSimulator::getPredictionMode() {
-  return mode;
+  return _mode;
 }
 
 Parser* ParserATNSimulator::getParser() {
@@ -1350,6 +1350,6 @@ bool ParserATNSimulator::getLrLoopSetting() {
 }
 
 void ParserATNSimulator::InitializeInstanceFields() {
-  mode = PredictionMode::LL;
+  _mode = PredictionMode::LL;
   _startIndex = 0;
 }

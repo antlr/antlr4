@@ -1,12 +1,16 @@
+/// 
 /// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
+/// 
 
 
+/// 
 /// A semantic predicate failed during validation.  Validation of predicates
 /// occurs when normally parsing the alternative just like matching a token.
 /// Disambiguating predicate evaluation occurs when we test a predicate during
 /// prediction.
+/// 
 public class FailedPredicateException: RecognitionException<ParserATNSimulator> {
 	private final var ruleIndex: Int
 	private final var predicateIndex: Int

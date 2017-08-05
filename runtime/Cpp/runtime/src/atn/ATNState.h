@@ -83,7 +83,7 @@ namespace atn {
     ATNState& operator=(ATNState const&) = delete;
 
     static const size_t INITIAL_NUM_TRANSITIONS = 4;
-    static const size_t INVALID_STATE_NUMBER = std::numeric_limits<size_t>::max();
+    static const size_t INVALID_STATE_NUMBER = static_cast<size_t>(-1); // std::numeric_limits<size_t>::max();
 
     enum {
       ATN_INVALID_TYPE = 0,
