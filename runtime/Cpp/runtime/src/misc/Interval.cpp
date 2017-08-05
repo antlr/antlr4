@@ -8,16 +8,16 @@
 using namespace antlr4::misc;
 
 size_t antlr4::misc::numericToSymbol(ssize_t v) {
-  return (size_t)v;
+  return static_cast<size_t>(v);
 }
 
 ssize_t antlr4::misc::symbolToNumeric(size_t v) {
-  return (ssize_t)v;
+  return static_cast<ssize_t>(v);
 }
 
 Interval const Interval::INVALID;
 
-Interval::Interval() : Interval((ssize_t)-1, -2) { // Need an explicit cast here for VS.
+Interval::Interval() : Interval(static_cast<ssize_t>(-1), -2) { // Need an explicit cast here for VS.
 }
 
 Interval::Interval(size_t a_, size_t b_) : Interval(symbolToNumeric(a_), symbolToNumeric(b_)) {
@@ -39,8 +39,8 @@ bool Interval::operator == (const Interval &other) const {
 
 size_t Interval::hashCode() const {
   size_t hash = 23;
-  hash = hash * 31 + (size_t)a;
-  hash = hash * 31 + (size_t)b;
+  hash = hash * 31 + static_cast<size_t>(a);
+  hash = hash * 31 + static_cast<size_t>(b);
   return hash;
 }
 

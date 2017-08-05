@@ -1,9 +1,13 @@
+/// 
 /// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
+/// 
 
 
+/// 
 /// A DFA walker that knows how to dump them to serialized strings.
+/// 
 
 public class DFASerializer: CustomStringConvertible {
 
@@ -11,7 +15,9 @@ public class DFASerializer: CustomStringConvertible {
 
     private let vocabulary: Vocabulary
 
-    /// -  Use {@link #DFASerializer(org.antlr.v4.runtime.dfa.DFA, org.antlr.v4.runtime.Vocabulary)} instead.
+    /// 
+    /// -  Use _#DFASerializer(org.antlr.v4.runtime.dfa.DFA, org.antlr.v4.runtime.Vocabulary)_ instead.
+    /// 
     //@Deprecated
     public convenience init(_ dfa: DFA, _ tokenNames: [String?]?) {
         self.init(dfa, Vocabulary.fromTokenNames(tokenNames))

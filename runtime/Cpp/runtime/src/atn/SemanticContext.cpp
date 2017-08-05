@@ -82,7 +82,7 @@ int SemanticContext::PrecedencePredicate::compareTo(PrecedencePredicate *o) {
 
 size_t SemanticContext::PrecedencePredicate::hashCode() const {
   size_t hashCode = 1;
-  hashCode = 31 * hashCode + (size_t)precedence;
+  hashCode = 31 * hashCode + static_cast<size_t>(precedence);
   return hashCode;
 }
 

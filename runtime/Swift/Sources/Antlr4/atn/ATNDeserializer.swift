@@ -1,11 +1,15 @@
+/// 
 /// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
+/// 
 
 
 
-///
+/// 
+/// 
 /// -  Sam Harwell
+/// 
 
 import Foundation
 
@@ -16,26 +20,34 @@ public class ATNDeserializer {
     }()
 
 
+    /// 
     /// This is the earliest supported serialized UUID.
+    /// 
     private static let BASE_SERIALIZED_UUID: UUID = UUID(uuidString: "33761B2D-78BB-4A43-8B0B-4F5BEE8AACF3")!
 
-    /// This UUID indicates an extension of {@link BASE_SERIALIZED_UUID} for the
+    /// 
+    /// This UUID indicates an extension of _BASE_SERIALIZED_UUID_ for the
     /// addition of precedence predicates.
+    /// 
     private static let ADDED_PRECEDENCE_TRANSITIONS: UUID = UUID(uuidString: "1DA0C57D-6C06-438A-9B27-10BCB3CE0F61")!
-    /// This UUID indicates an extension of {@link #ADDED_PRECEDENCE_TRANSITIONS}
+    /// 
+    /// This UUID indicates an extension of _#ADDED_PRECEDENCE_TRANSITIONS_
     /// for the addition of lexer actions encoded as a sequence of
-    /// {@link org.antlr.v4.runtime.atn.LexerAction} instances.
+    /// _org.antlr.v4.runtime.atn.LexerAction_ instances.
+    /// 
     private static let ADDED_LEXER_ACTIONS: UUID = UUID(uuidString: "AADB8D7E-AEEF-4415-AD2B-8204D6CF042E")!
 
+    /// 
     /// This UUID indicates the serialized ATN contains two sets of
     /// IntervalSets, where the second set's values are encoded as
     /// 32-bit integers to support the full Unicode SMP range up to U+10FFFF.
+    /// 
     private static let ADDED_UNICODE_SMP: UUID = UUID(uuidString: "59627784-3BE5-417A-B9EB-8131A7286089")!
 
-    /**
-    * This list contains all of the currently supported UUIDs, ordered by when
-    * the feature first appeared in this branch.
-    */
+    /// 
+    /// This list contains all of the currently supported UUIDs, ordered by when
+    /// the feature first appeared in this branch.
+    /// 
     private static let SUPPORTED_UUIDS: Array<UUID> = {
         var suuid = Array<UUID>()
         suuid.append(ATNDeserializer.BASE_SERIALIZED_UUID)
@@ -46,7 +58,9 @@ public class ATNDeserializer {
 
     }()
 
+    /// 
     /// This is the current serialized UUID.
+    /// 
     public static let SERIALIZED_UUID: UUID = {
         // SERIALIZED_UUID = ADDED_UNICODE_SMP;
         return UUID(uuidString: "59627784-3BE5-417A-B9EB-8131A7286089")!
@@ -70,17 +84,19 @@ public class ATNDeserializer {
 
     }
 
+    /// 
     /// Determines if a particular serialized representation of an ATN supports
-    /// a particular feature, identified by the {@link java.util.UUID} used for serializing
+    /// a particular feature, identified by the _java.util.UUID_ used for serializing
     /// the ATN at the time the feature was first introduced.
-    ///
-    /// - parameter feature: The {@link java.util.UUID} marking the first time the feature was
+    /// 
+    /// - parameter feature: The _java.util.UUID_ marking the first time the feature was
     /// supported in the serialized ATN.
-    /// - parameter actualUuid: The {@link java.util.UUID} of the actual serialized ATN which is
+    /// - parameter actualUuid: The _java.util.UUID_ of the actual serialized ATN which is
     /// currently being deserialized.
-    /// - returns: {@code true} if the {@code actualUuid} value represents a
-    /// serialized ATN at or after the feature identified by {@code feature} was
-    /// introduced; otherwise, {@code false}.
+    /// - returns: `true` if the `actualUuid` value represents a
+    /// serialized ATN at or after the feature identified by `feature` was
+    /// introduced; otherwise, `false`.
+    /// 
     internal func isFeatureSupported(_ feature: UUID, _ actualUuid: UUID) -> Bool {
         let featureIndex: Int = ATNDeserializer.SUPPORTED_UUIDS.index(of: feature)!
         if featureIndex < 0 {
@@ -987,18 +1003,22 @@ public class ATNDeserializer {
     }
 
 
-    /// Analyze the {@link org.antlr.v4.runtime.atn.StarLoopEntryState} states in the specified ATN to set
-    /// the {@link org.antlr.v4.runtime.atn.StarLoopEntryState#precedenceRuleDecision} field to the
+    /// 
+    /// Analyze the _org.antlr.v4.runtime.atn.StarLoopEntryState_ states in the specified ATN to set
+    /// the _org.antlr.v4.runtime.atn.StarLoopEntryState#precedenceRuleDecision_ field to the
     /// correct value.
-    ///
+    /// 
     /// - parameter atn: The ATN.
+    /// 
     internal func markPrecedenceDecisions(_ atn: ATN) {
         for state: ATNState? in atn.states {
             if let state = state as? StarLoopEntryState {
 
+                /// 
                 /// We analyze the ATN to determine if this ATN decision state is the
                 /// decision for the closure block that determines whether a
                 /// precedence rule should continue or complete.
+                /// 
                 if let stateRuleIndex = state.ruleIndex {
                     if  atn.ruleToStartState[stateRuleIndex].isPrecedenceRule {
                         let maybeLoopEndState: ATNState = state.transition(state.getNumberOfTransitions() - 1).target

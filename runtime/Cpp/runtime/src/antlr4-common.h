@@ -7,6 +7,7 @@
 
 #include <algorithm>
 #include <assert.h>
+#include <atomic>
 #include <codecvt>
 #include <chrono>
 #include <fstream>
@@ -63,6 +64,8 @@
     typedef std::basic_string<__int32> i32string;
 
     typedef i32string UTF32String;
+  #else
+    typedef std::u32string UTF32String;
   #endif
 
   #ifdef ANTLR4CPP_EXPORTS

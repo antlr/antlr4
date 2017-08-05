@@ -202,6 +202,7 @@ public class Antlr4MojoTest {
         Path genHello = generatedSources.resolve("test/HelloParser.java");
 
         Path baseGrammar = antlrDir.resolve("imports/TestBaseLexer.g4");
+        Path baseGrammar2 = antlrDir.resolve("imports/TestBaseLexer2.g4");
         Path lexerGrammar = antlrDir.resolve("test/TestLexer.g4");
         Path parserGrammar = antlrDir.resolve("test/TestParser.g4");
 
@@ -222,21 +223,20 @@ public class Antlr4MojoTest {
         assertTrue(Files.exists(genHello));
         assertTrue(Files.exists(genTestParser));
         assertTrue(Files.exists(genTestLexer));
+        byte[] origTestLexerSum = checksum(genTestLexer);
+        byte[] origTestParserSum = checksum(genTestParser);
+        byte[] origHelloSum = checksum(genHello);
 
         ////////////////////////////////////////////////////////////////////////
         // 2nd - nothing has been modified, no grammars have to be processed
         ////////////////////////////////////////////////////////////////////////
 
         {
-            byte[] testLexerSum = checksum(genTestLexer);
-            byte[] testParserSum = checksum(genTestParser);
-            byte[] helloSum = checksum(genHello);
-
             maven.executeMojo(session, project, exec);
 
-            assertTrue(Arrays.equals(testLexerSum, checksum(genTestLexer)));
-            assertTrue(Arrays.equals(testParserSum, checksum(genTestParser)));
-            assertTrue(Arrays.equals(helloSum, checksum(genHello)));
+            assertTrue(Arrays.equals(origTestLexerSum, checksum(genTestLexer)));
+            assertTrue(Arrays.equals(origTestParserSum, checksum(genTestParser)));
+            assertTrue(Arrays.equals(origHelloSum, checksum(genHello)));
         }
 
         ////////////////////////////////////////////////////////////////////////
@@ -245,50 +245,71 @@ public class Antlr4MojoTest {
 
         // modify the grammar to make checksum comparison detect a change
         try(Change change = Change.of(baseGrammar, "DOT: '.' ;")) {
-            byte[] testLexerSum = checksum(genTestLexer);
-            byte[] testParserSum = checksum(genTestParser);
-            byte[] helloSum = checksum(genHello);
-
             maven.executeMojo(session, project, exec);
 
-            assertFalse(Arrays.equals(testLexerSum, checksum(genTestLexer)));
-            assertFalse(Arrays.equals(testParserSum, checksum(genTestParser)));
-            assertTrue(Arrays.equals(helloSum, checksum(genHello)));
+            assertFalse(Arrays.equals(origTestLexerSum, checksum(genTestLexer)));
+            assertFalse(Arrays.equals(origTestParserSum, checksum(genTestParser)));
+            assertTrue(Arrays.equals(origHelloSum, checksum(genHello)));
         }
+        // Restore file and confirm it was restored.
+        maven.executeMojo(session, project, exec);
+        assertTrue(Arrays.equals(origTestLexerSum, checksum(genTestLexer)));
+        assertTrue(Arrays.equals(origTestParserSum, checksum(genTestParser)));
+        assertTrue(Arrays.equals(origHelloSum, checksum(genHello)));
 
         ////////////////////////////////////////////////////////////////////////
-        // 4th - the lexer grammar changed, the parser grammar has to be processed as well
+        // 4th - the second imported grammar changed, every dependency has to be processed
         ////////////////////////////////////////////////////////////////////////
 
         // modify the grammar to make checksum comparison detect a change
-        try(Change change = Change.of(lexerGrammar)) {
-            byte[] testLexerSum = checksum(genTestLexer);
-            byte[] testParserSum = checksum(genTestParser);
-            byte[] helloSum = checksum(genHello);
-
+        try(Change change = Change.of(baseGrammar2, "BANG: '!' ;")) {
             maven.executeMojo(session, project, exec);
 
-            assertFalse(Arrays.equals(testLexerSum, checksum(genTestLexer)));
-            assertFalse(Arrays.equals(testParserSum, checksum(genTestParser)));
-            assertTrue(Arrays.equals(helloSum, checksum(genHello)));
+            assertFalse(Arrays.equals(origTestLexerSum, checksum(genTestLexer)));
+            assertFalse(Arrays.equals(origTestParserSum, checksum(genTestParser)));
+            assertTrue(Arrays.equals(origHelloSum, checksum(genHello)));
         }
+        // Restore file and confirm it was restored.
+        maven.executeMojo(session, project, exec);
+        assertTrue(Arrays.equals(origTestLexerSum, checksum(genTestLexer)));
+        assertTrue(Arrays.equals(origTestParserSum, checksum(genTestParser)));
+        assertTrue(Arrays.equals(origHelloSum, checksum(genHello)));
 
         ////////////////////////////////////////////////////////////////////////
-        // 5th - the parser grammar changed, no other grammars have to be processed
+        // 5th - the lexer grammar changed, the parser grammar has to be processed as well
+        ////////////////////////////////////////////////////////////////////////
+
+        // modify the grammar to make checksum comparison detect a change
+        try(Change change = Change.of(lexerGrammar, "FOO: 'foo' ;")) {
+            maven.executeMojo(session, project, exec);
+
+            assertFalse(Arrays.equals(origTestLexerSum, checksum(genTestLexer)));
+            assertFalse(Arrays.equals(origTestParserSum, checksum(genTestParser)));
+            assertTrue(Arrays.equals(origHelloSum, checksum(genHello)));
+        }
+        // Restore file and confirm it was restored.
+        maven.executeMojo(session, project, exec);
+        assertTrue(Arrays.equals(origTestLexerSum, checksum(genTestLexer)));
+        assertTrue(Arrays.equals(origTestParserSum, checksum(genTestParser)));
+        assertTrue(Arrays.equals(origHelloSum, checksum(genHello)));
+
+        ////////////////////////////////////////////////////////////////////////
+        // 6th - the parser grammar changed, no other grammars have to be processed
         ////////////////////////////////////////////////////////////////////////
 
         // modify the grammar to make checksum comparison detect a change
         try(Change change = Change.of(parserGrammar, " t : WS* ;")) {
-            byte[] testLexerSum = checksum(genTestLexer);
-            byte[] testParserSum = checksum(genTestParser);
-            byte[] helloSum = checksum(genHello);
-
             maven.executeMojo(session, project, exec);
 
-            assertTrue(Arrays.equals(testLexerSum, checksum(genTestLexer)));
-            assertFalse(Arrays.equals(testParserSum, checksum(genTestParser)));
-            assertTrue(Arrays.equals(helloSum, checksum(genHello)));
+            assertTrue(Arrays.equals(origTestLexerSum, checksum(genTestLexer)));
+            assertFalse(Arrays.equals(origTestParserSum, checksum(genTestParser)));
+            assertTrue(Arrays.equals(origHelloSum, checksum(genHello)));
         }
+        // Restore file and confirm it was restored.
+        maven.executeMojo(session, project, exec);
+        assertTrue(Arrays.equals(origTestLexerSum, checksum(genTestLexer)));
+        assertTrue(Arrays.equals(origTestParserSum, checksum(genTestParser)));
+        assertTrue(Arrays.equals(origHelloSum, checksum(genHello)));
     }
 
     @Test

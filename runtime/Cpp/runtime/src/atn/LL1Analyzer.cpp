@@ -144,12 +144,12 @@ void LL1Analyzer::_LOOK(ATNState *s, ATNState *stopState, Ref<PredictionContext>
     } else if (t->isEpsilon()) {
       _LOOK(t->target, stopState, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
     } else if (t->getSerializationType() == Transition::WILDCARD) {
-      look.addAll(misc::IntervalSet::of(Token::MIN_USER_TOKEN_TYPE, (ssize_t)_atn.maxTokenType));
+      look.addAll(misc::IntervalSet::of(Token::MIN_USER_TOKEN_TYPE, static_cast<ssize_t>(_atn.maxTokenType)));
     } else {
       misc::IntervalSet set = t->label();
       if (!set.isEmpty()) {
         if (is<NotSetTransition*>(t)) {
-          set = set.complement(misc::IntervalSet::of(Token::MIN_USER_TOKEN_TYPE, (ssize_t)_atn.maxTokenType));
+          set = set.complement(misc::IntervalSet::of(Token::MIN_USER_TOKEN_TYPE, static_cast<ssize_t>(_atn.maxTokenType)));
         }
         look.addAll(set);
       }

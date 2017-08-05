@@ -6,7 +6,6 @@
 #pragma once
 
 #include "misc/IntervalSet.h"
-#include <atomic>
 
 namespace antlr4 {
 namespace atn {
@@ -83,7 +82,7 @@ namespace atn {
     ATNState& operator=(ATNState const&) = delete;
 
     static const size_t INITIAL_NUM_TRANSITIONS = 4;
-    static const size_t INVALID_STATE_NUMBER = std::numeric_limits<size_t>::max();
+    static const size_t INVALID_STATE_NUMBER = static_cast<size_t>(-1); // std::numeric_limits<size_t>::max();
 
     enum {
       ATN_INVALID_TYPE = 0,
@@ -124,8 +123,8 @@ namespace atn {
   private:
     /// Used to cache lookahead during parsing, not used during construction.
 
-    misc::IntervalSet nextTokenWithinRule;
-    std::atomic<bool> nextTokenUpdated { false };
+    misc::IntervalSet _nextTokenWithinRule;
+    std::atomic<bool> _nextTokenUpdated { false };
 
     friend class ATN;
   };
