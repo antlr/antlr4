@@ -88,14 +88,14 @@ misc::IntervalSet ATN::nextTokens(ATNState *s, RuleContext *ctx) const {
 }
 
 misc::IntervalSet const& ATN::nextTokens(ATNState *s) const {
-  if (!s->nextTokenUpdated) {
+  if (!s->_nextTokenUpdated) {
     std::unique_lock<std::mutex> lock { _mutex };
-    if (!s->nextTokenUpdated) {
-      s->nextTokenWithinRule = nextTokens(s, nullptr);
-      s->nextTokenUpdated = true;
+    if (!s->_nextTokenUpdated) {
+      s->_nextTokenWithinRule = nextTokens(s, nullptr);
+      s->_nextTokenUpdated = true;
     }
   }
-  return s->nextTokenWithinRule;
+  return s->_nextTokenWithinRule;
 }
 
 void ATN::addState(ATNState *state) {

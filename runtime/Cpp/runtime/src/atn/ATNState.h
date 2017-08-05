@@ -6,7 +6,6 @@
 #pragma once
 
 #include "misc/IntervalSet.h"
-#include <atomic>
 
 namespace antlr4 {
 namespace atn {
@@ -124,8 +123,8 @@ namespace atn {
   private:
     /// Used to cache lookahead during parsing, not used during construction.
 
-    misc::IntervalSet nextTokenWithinRule;
-    std::atomic<bool> nextTokenUpdated { false };
+    misc::IntervalSet _nextTokenWithinRule;
+    std::atomic<bool> _nextTokenUpdated { false };
 
     friend class ATN;
   };
