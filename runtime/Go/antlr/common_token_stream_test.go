@@ -6,8 +6,6 @@ package antlr
 
 import (
 	"testing"
-
-	"github.com/stretchr/testify/assert"
 )
 
 type commonTokenStreamTestLexer struct {
@@ -24,7 +22,7 @@ func (l *commonTokenStreamTestLexer) NextToken() Token {
 }
 
 func TestCommonTokenStreamOffChannel(t *testing.T) {
-	assert := assert.New(t)
+	assert := assertNew(t)
 	lexEngine := &commonTokenStreamTestLexer{
 		tokens: []Token{
 			newTestCommonToken(1, " ", LexerHidden),                    // 0
@@ -64,7 +62,7 @@ func TestCommonTokenStreamOffChannel(t *testing.T) {
 }
 
 func TestCommonTokenStreamFetchOffChannel(t *testing.T) {
-	assert := assert.New(t)
+	assert := assertNew(t)
 	lexEngine := &commonTokenStreamTestLexer{
 		tokens: []Token{
 			newTestCommonToken(1, " ", LexerHidden),                    // 0
@@ -134,7 +132,7 @@ func (l *commonTokenStreamTestLexerSingleEOF) NextToken() Token {
 }
 
 func TestCommonTokenStreamSingleEOF(t *testing.T) {
-	assert := assert.New(t)
+	assert := assertNew(t)
 	lexEngine := &commonTokenStreamTestLexerSingleEOF{}
 	tokens := NewCommonTokenStream(lexEngine, TokenDefaultChannel)
 	tokens.Fill()
@@ -145,7 +143,7 @@ func TestCommonTokenStreamSingleEOF(t *testing.T) {
 }
 
 func TestCommonTokenStreamCannotConsumeEOF(t *testing.T) {
-	assert := assert.New(t)
+	assert := assertNew(t)
 	lexEngine := &commonTokenStreamTestLexerSingleEOF{}
 	tokens := NewCommonTokenStream(lexEngine, TokenDefaultChannel)
 	tokens.Fill()
