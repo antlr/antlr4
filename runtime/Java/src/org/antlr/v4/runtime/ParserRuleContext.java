@@ -76,6 +76,8 @@ public class ParserRuleContext extends RuleContext {
 	 */
 	public RecognitionException exception;
 
+	TokenStream tokenStream;
+	
 	public ParserRuleContext() { }
 
 	/** COPY a ctx (I'm deliberately not using copy constructor) to avoid
@@ -341,6 +343,14 @@ public class ParserRuleContext extends RuleContext {
         String text = startToken.getInputStream().getText(interval);
 
         return text;
+    }
+
+    /**
+     * Get the token stream created by the parser.
+     * @return
+     */
+    public TokenStream getTokenStream() {
+    		return tokenStream;
     }
 	
 	/** Used for rule context info debugging during parse-time, not so much for ATN debugging */
