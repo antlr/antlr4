@@ -325,6 +325,24 @@ public class ParserRuleContext extends RuleContext {
 	 */
 	public Token getStop() { return stop; }
 
+	/**
+	 * Get the full text (with whitespace) from the input stream.
+	 * @param parseTree
+	 * @return
+	 */
+    public String getFullText() {
+        if (children == null)
+            return "";
+
+        Token startToken = start;
+        Token stopToken = stop;
+
+        Interval interval = new Interval(startToken.getStartIndex(), stopToken.getStopIndex());
+        String text = startToken.getInputStream().getText(interval);
+
+        return text;
+    }
+	
 	/** Used for rule context info debugging during parse-time, not so much for ATN debugging */
 	public String toInfoString(Parser recognizer) {
 		List<String> rules = recognizer.getRuleInvocationStack(this);
