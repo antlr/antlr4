@@ -395,7 +395,10 @@ public class ParserRuleContext extends RuleContext {
      * @return
      */
     public TokenStream getTokenStream() {
-    		return tokenStream;
+    		if (this.parent == null)
+    			return tokenStream;
+    		else
+    			return ((ParserRuleContext)this.parent).getTokenStream();
     }
 	
 	/** Used for rule context info debugging during parse-time, not so much for ATN debugging */
