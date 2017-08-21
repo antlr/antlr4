@@ -353,12 +353,11 @@ func PrintArrayJavaStyle(sa []string) string {
 	return buffer.String()
 }
 
-
 // murmur hash
 const (
-	c1_32 = 0xCC9E2D51
-	c2_32 = 0x1B873593
-	n1_32 = 0xE6546B64
+	c1_32 uint = 0xCC9E2D51
+	c2_32 uint = 0x1B873593
+	n1_32 uint = 0xE6546B64
 )
 
 func murmurInit(seed int) int {
@@ -366,23 +365,25 @@ func murmurInit(seed int) int {
 }
 
 func murmurUpdate(h1 int, k1 int) int {
-	k1 *= c1_32
-	k1 = (k1 << 15) | (k1 >> 17) // rotl32(k1, 15)
-	k1 *= c2_32
+	var k1u uint
+	k1u = uint(k1) * c1_32
+	k1u = (k1u << 15) | (k1u >> 17) // rotl32(k1u, 15)
+	k1u *= c2_32
 
-	h1 ^= k1
-	h1 = (h1 << 13) | (h1 >> 19) // rotl32(h1, 13)
-	h1 = h1*5 + 0xe6546b64
-	return h1
+	var h1u = uint(h1) ^ k1u
+	h1u = (h1u << 13) | (h1u >> 19) // rotl32(h1u, 13)
+	h1u = h1u*5 + 0xe6546b64
+	return int(h1u)
 }
 
 func murmurFinish(h1 int, numberOfWords int) int {
-	h1 ^= (numberOfWords * 4)
-	h1 ^= h1 >> 16
-	h1 *= 0x85ebca6b
-	h1 ^= h1 >> 13
-	h1 *= 0xc2b2ae35
-	h1 ^= h1 >> 16
+	var h1u uint = uint(h1)
+	h1u ^= uint(numberOfWords * 4)
+	h1u ^= h1u >> 16
+	h1u *= uint(0x85ebca6b)
+	h1u ^= h1u >> 13
+	h1u *= 0xc2b2ae35
+	h1u ^= h1u >> 16
 
-	return h1
+	return int(h1u)
 }
