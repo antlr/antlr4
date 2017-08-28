@@ -5,12 +5,14 @@
 
 #pragma once
 
+#include "antlr4-common.h"
+
 namespace antlr4 {
 namespace misc {
 
   class ANTLR4CPP_PUBLIC Predicate {
   public:
-    virtual ~Predicate() {};
+    virtual ~Predicate();
 
     virtual bool test(tree::ParseTree *t) = 0;
   };

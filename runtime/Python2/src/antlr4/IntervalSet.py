@@ -193,7 +193,7 @@ class IntervalSet(object):
         elif a==Token.EPSILON:
             return u"<EPSILON>"
         else:
-            if a<len(literalNames):
+            if a<len(literalNames) and literalNames[a] != u"<INVALID>":
                 return literalNames[a]
             if a<len(symbolicNames):
                 return symbolicNames[a]

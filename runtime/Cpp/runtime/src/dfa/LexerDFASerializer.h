@@ -13,7 +13,7 @@ namespace dfa {
   class ANTLR4CPP_PUBLIC LexerDFASerializer : public DFASerializer {
   public:
     LexerDFASerializer(DFA *dfa);
-    virtual ~LexerDFASerializer() {};
+    virtual ~LexerDFASerializer();
 
   protected:
     virtual std::string getEdgeLabel(size_t i) const override;

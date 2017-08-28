@@ -122,7 +122,7 @@ That pops up a dialog box showing that rule `r` matched keyword `hello` followed
 
 ## Book source code
 
-The book has lots and lots of examples that should be useful to. You can download them here for free:
+The book has lots and lots of examples that should be useful too. You can download them here for free:
 
 [http://pragprog.com/titles/tpantlr2/source_code](http://pragprog.com/titles/tpantlr2/source_code)
 

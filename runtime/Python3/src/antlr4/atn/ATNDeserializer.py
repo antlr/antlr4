@@ -86,7 +86,7 @@ class ATNDeserializer (object):
     def reset(self, data:str):
         def adjust(c):
             v = ord(c)
-            return v-2 if v>1 else -1
+            return v-2 if v>1 else v + 65533
         temp = [ adjust(c) for c in data ]
         # don't adjust the first value since that's the version number
         temp[0] = ord(data[0])

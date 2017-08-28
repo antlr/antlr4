@@ -46,6 +46,21 @@ IntervalSet::IntervalSet(int n, ...) : IntervalSet() {
   }
 }
 
+IntervalSet::~IntervalSet()
+{
+}
+
+IntervalSet& IntervalSet::operator=(const IntervalSet& other)
+{
+  if (_readonly) {
+    throw IllegalStateException("can't alter read only IntervalSet");
+  }
+
+  _intervals.clear();
+
+  return addAll(other);
+}
+
 IntervalSet IntervalSet::of(ssize_t a) {
   return IntervalSet({ Interval(a, a) });
 }

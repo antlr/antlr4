@@ -433,6 +433,26 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 	}
 
 	/**
+	 * This is a regression test for https://github.com/antlr/antlr4/issues/1815
+	 * "Null ptr exception in SqlBase.g4"
+	 */
+	@Test public void testDoubleQuoteInTwoStringLiterals() {
+		String grammar =
+			"lexer grammar A;\n" +
+			"STRING : '\\\"' '\\\"' 'x' ;";
+		String expected =
+			"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): A.g4:2:10: invalid escape sequence \\\"\n"+
+			"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): A.g4:2:15: invalid escape sequence \\\"\n";
+
+		String[] pair = new String[] {
+			grammar,
+			expected
+		};
+
+		super.testErrors(pair, true);
+	}
+
+	/**
 	 * This test ensures that the {@link ErrorType#INVALID_ESCAPE_SEQUENCE}
 	 * error is not reported for escape sequences that are known to be valid.
 	 */
@@ -462,9 +482,10 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 			"lexer grammar A;\n" +
 			"RULE : 'Foo \\uAABG \\x \\u';\n";
 		String expected =
-			"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): A.g4:2:12: invalid escape sequence\n" +
-			"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): A.g4:2:19: invalid escape sequence\n" +
-			"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): A.g4:2:22: invalid escape sequence\n";
+			"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): A.g4:2:12: invalid escape sequence \\uAABG\n" +
+			"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): A.g4:2:19: invalid escape sequence \\x\n" +
+			"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): A.g4:2:22: invalid escape sequence \\u\n" +
+			"warning("+ErrorType.EPSILON_TOKEN.code+"): A.g4:2:0: non-fragment lexer rule RULE can match the empty string\n";
 
 		String[] pair = new String[] {
 			grammar,
@@ -516,16 +537,17 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 				"VALID_CHAR_SET:               [`\\-=\\]];";
 
 		String expected =
-				"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:2:31: invalid escape sequence\n" +
-				"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:2:38: invalid escape sequence\n" +
-				"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:2:45: invalid escape sequence\n" +
+				"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:2:31: invalid escape sequence \\\"\n" +
+				"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:2:38: invalid escape sequence \\]\n" +
+				"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:2:45: invalid escape sequence \\u24\n" +
 				"error(" + ErrorType.INVALID_LITERAL_IN_LEXER_SET.code + "): Test.g4:3:30: multi-character literals are not allowed in lexer sets: 'GH'\n" +
 				"error(" + ErrorType.INVALID_LITERAL_IN_LEXER_SET.code + "): Test.g4:3:36: multi-character literals are not allowed in lexer sets: 'LM'\n" +
-				"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:4:30: invalid escape sequence\n" +
-				"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:4:40: invalid escape sequence\n" +
+				"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:4:30: invalid escape sequence \\u24\\u\n" +
+				"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:4:40: invalid escape sequence \\{\n" +
 				"error(" + ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED.code + "): Test.g4:5:33: string literals and sets cannot be empty: 'F'..'A'\n" +
 				"error(" + ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED.code + "): Test.g4:6:30: string literals and sets cannot be empty: 'f'..'a'\n" +
-				"error(" + ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED.code + "): Test.g4:6:36: string literals and sets cannot be empty: []\n";
+				"error(" + ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED.code + "): Test.g4:6:36: string literals and sets cannot be empty: []\n" +
+				"warning("+ ErrorType.EPSILON_TOKEN.code + "): Test.g4:2:0: non-fragment lexer rule INVALID_STRING_LITERAL can match the empty string\n";
 
 		String[] pair = new String[] {
 				grammar,
@@ -552,14 +574,14 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 				"INVERTED_UNICODE_PROPERTY_NOT_ALLOWED_IN_RANGE: [\\P{Uppercase_Letter}-\\P{Number}];\n";
 
 		String expected =
-				"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:2:32: invalid escape sequence\n" +
-				"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:3:41: invalid escape sequence\n" +
-				"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:4:35: invalid escape sequence\n" +
-				"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:5:32: invalid escape sequence\n" +
-				"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:6:41: invalid escape sequence\n" +
-				"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:7:41: invalid escape sequence\n" +
-				"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:8:34: invalid escape sequence\n" +
-				"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:9:43: invalid escape sequence\n" +
+				"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:2:32: invalid escape sequence \\u{}\n"+
+				"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:3:41: invalid escape sequence \\u{\n"+
+				"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:4:35: invalid escape sequence \\u{110\n"+
+				"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:5:32: invalid escape sequence \\p{}\n"+
+				"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:6:41: invalid escape sequence \\p{\n"+
+				"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:7:41: invalid escape sequence \\P{}\n"+
+				"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:8:34: invalid escape sequence \\p{NotAProperty}\n"+
+				"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:9:43: invalid escape sequence \\P{NotAProperty}\n"+
 				"error(" + ErrorType.UNICODE_PROPERTY_NOT_ALLOWED_IN_RANGE.code + "): Test.g4:10:39: unicode property escapes not allowed in lexer charset range: [\\p{Uppercase_Letter}-\\p{Lowercase_Letter}]\n" +
 				"error(" + ErrorType.UNICODE_PROPERTY_NOT_ALLOWED_IN_RANGE.code + "): Test.g4:11:41: unicode property escapes not allowed in lexer charset range: [\\p{Letter}-Z]\n" +
 				"error(" + ErrorType.UNICODE_PROPERTY_NOT_ALLOWED_IN_RANGE.code + "): Test.g4:12:41: unicode property escapes not allowed in lexer charset range: [A-\\p{Number}]\n" +

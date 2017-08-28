@@ -123,7 +123,7 @@ open func emit() -> Token  {
 private func handleAcceptPositionForIdentifier() -> Bool {
 	let tokenText = getText()
 	var identifierLength = 0
-	while ((identifierLength \< tokenText.length)  &&  isIdentifierChar(tokenText[tokenText.characters.index(tokenText.startIndex, offsetBy: identifierLength)])) {
+	while ((identifierLength \< tokenText.characters.count)  &&  isIdentifierChar(tokenText[tokenText.characters.index(tokenText.startIndex, offsetBy: identifierLength)])) {
 		identifierLength += 1
 	}
 
@@ -137,8 +137,8 @@ private func handleAcceptPositionForIdentifier() -> Bool {
 }
 
 private func handleAcceptPositionForKeyword(_ keyword:String) -> Bool  {
-	if  getInputStream()!.index() > _tokenStartCharIndex + keyword.length   {
-		let offset = keyword.length  - 1
+	if  getInputStream()!.index() > _tokenStartCharIndex + keyword.characters.count   {
+		let offset = keyword.characters.count  - 1
 		(getInterpreter() as! PositionAdjustingLexerATNSimulator).resetAcceptPosition(getInputStream()!, _tokenStartCharIndex + offset, _tokenStartLine, _tokenStartCharPositionInLine + offset)
 		return true
 	}

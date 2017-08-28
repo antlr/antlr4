@@ -1,35 +1,18 @@
+/// 
 /// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
+/// 
 
-//import Cocoa
-
-#if os(OSX)
-
-import Cocoa
-
-#elseif os(iOS)
-
-import UIKit
-
-#endif
+import Foundation
 
 //http://stackoverflow.com/questions/28182441/swift-how-to-get-substring-from-start-to-last-index-of-character
 //https://github.com/williamFalcon/Bolt_Swift/blob/master/Bolt/BoltLibrary/String/String.swift
 
 extension String {
 
-    func trim() -> String {
-        return self.trimmingCharacters(in: CharacterSet.whitespaces)
-    }
-
     func split(_ separator: String) -> [String] {
         return self.components(separatedBy: separator)
-    }
-
-    func replaceAll(_ from: String, replacement: String) -> String {
-
-        return self.replacingOccurrences(of: from, with: replacement, options: NSString.CompareOptions.literal, range: nil)
     }
 
     func containsIgnoreCase(_ find: String) -> Bool {
@@ -53,7 +36,7 @@ extension String {
     func indexOf(_ target: String, startIndex: Int) -> Int {
 
         let startRange = self.characters.index(self.startIndex, offsetBy: startIndex)
-        let range = self.range(of: target, options: NSString.CompareOptions.literal, range: startRange..<self.endIndex)
+        let range = self.range(of: target, options: .literal, range: startRange..<self.endIndex)
 
         if let range = range {
 
@@ -139,9 +122,11 @@ private let characterEntities: [String:Character] = [
 
 extension String {
 
+    /// 
     /// Returns a new string made by replacing in the `String`
     /// all HTML character entity references with the corresponding
     /// character.
+    /// 
     var stringByDecodingHTMLEntities: String {
 
 
@@ -170,7 +155,6 @@ extension String {
                 return characterEntities[entity]
             }
         }
-
 
         var result = ""
         var position = startIndex
@@ -204,8 +188,8 @@ extension String {
 }
 
 extension String {
+    
     static let htmlEscapedDictionary = [
-
             "&amp;": "&",
             "&quot;": "\"",
             "&#x27;": "'",
@@ -213,13 +197,14 @@ extension String {
             "&#x92;": "'",
             "&#x96;": "'",
             "&gt;": ">",
-            "&lt;": "<"]
+            "&lt;": "<"
+    ]
 
     public var escapedHtmlString: String {
         var newString = "\(self)"
 
         for (key, value) in String.htmlEscapedDictionary {
-            newString = newString.replaceAll(value, replacement: key)
+            newString = newString.replacingOccurrences(of: value, with: key)
         }
         return newString
     }

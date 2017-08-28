@@ -216,14 +216,14 @@ class GrammarDependencies {
             return;
 
         for (GrammarAST importDecl : grammar.getAllChildrenWithType(ANTLRParser.IMPORT)) {
-            Tree id = importDecl.getFirstChildWithType(ANTLRParser.ID);
+            for (Tree id: importDecl.getAllChildrenWithType(ANTLRParser.ID)) {
+                // missing id is not valid, but we don't want to prevent the root cause from
+                // being reported by the ANTLR tool
+                if (id != null) {
+                    String grammarPath = getRelativePath(grammarFile);
 
-            // missing id is not valid, but we don't want to prevent the root cause from
-            // being reported by the ANTLR tool
-            if (id != null) {
-                String grammarPath = getRelativePath(grammarFile);
-
-                graph.addEdge(id.getText() + ".g4", grammarPath);
+                    graph.addEdge(id.getText() + ".g4", grammarPath);
+                }
             }
         }
 

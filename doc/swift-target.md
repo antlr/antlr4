@@ -1,9 +1,16 @@
 # ANTLR4 Language Target, Runtime for Swift
 
+## Performance Note
+
+To use ANTLR4 Swift target in production environment, make sure to turn on compiler optimizations by following [these instructions](https://github.com/apple/swift-package-manager/blob/master/Documentation/Usage.md#build-configurations) if you use SwiftPM to build your project. If you are using Xcode to build your project, it's unlikely you will not use `release` build for production build.
+
+Conclusion is, you need to turn on `release` mode (which will have all the optimization pre configured for you) so the ANTLR4 Swift target can have reasonable parsing speed.
+
+
 ## Install ANTLR4
 
 Make sure you have the ANTLR
-installed.[The getting started guide](getting-started.md) should get
+installed. [The getting started guide](getting-started.md) should get
 you started.
 
 ## Create a Swift lexer or parser 
@@ -73,27 +80,3 @@ shown below. After correctly added dependencies, the error message for
 importing library will be gone.
 
 <img src=images/xcodedep.png width="800">
-
-## Example playground
-
-The Swift runtime includes an Xcode playground to get started with.
-
-First go to the ANTLR4 repository, and open
-`runtime/Swift/Antlr4.xcworkspace` in Xcode.  Select "Antlr4 OSX > My
-Mac" as the build target, and build the project as normal. The
-playground should then be active.
-
-The playground includes a simple grammar called "Hello", and an
-example for walking the parse tree.  You should see in the playground
-output that it is printing messages for each node in the parse tree as
-it walks.
-
-The grammar is defined in the playground's `Resources/Hello.g4`.  The
-parser was generated from the grammar using ANTLR like this:
-
-``` 
-antlr4 -Dlanguage=Swift -visitor -o ../Sources/Autogen Hello.g4
-```
-
-The example tree walker is in Sources/HelloWalker.swift.
- 

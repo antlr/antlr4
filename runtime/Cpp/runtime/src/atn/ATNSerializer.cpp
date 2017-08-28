@@ -50,13 +50,15 @@ ATNSerializer::ATNSerializer(ATN *atn, const std::vector<std::string> &tokenName
   _tokenNames = tokenNames;
 }
 
+ATNSerializer::~ATNSerializer() { }
+
 std::vector<size_t> ATNSerializer::serialize() {
   std::vector<size_t> data;
   data.push_back(ATNDeserializer::SERIALIZED_VERSION);
   serializeUUID(data, ATNDeserializer::SERIALIZED_UUID());
 
   // convert grammar type to ATN const to avoid dependence on ANTLRParser
-  data.push_back((size_t)atn->grammarType);
+  data.push_back(static_cast<size_t>(atn->grammarType));
   data.push_back(atn->maxTokenType);
   size_t nedges = 0;
 
@@ -286,7 +288,7 @@ std::vector<size_t> ATNSerializer::serialize() {
   if (atn->grammarType == ATNType::LEXER) {
     data.push_back(atn->lexerActions.size());
     for (Ref<LexerAction> &action : atn->lexerActions) {
-      data.push_back((size_t)action->getActionType());
+      data.push_back(static_cast<size_t>(action->getActionType()));
       switch (action->getActionType()) {
         case LexerActionType::CHANNEL:
         {
@@ -346,7 +348,8 @@ std::vector<size_t> ATNSerializer::serialize() {
 
         default:
           throw IllegalArgumentException("The specified lexer action type " +
-                                         std::to_string((size_t)action->getActionType()) + " is not valid.");
+                                         std::to_string(static_cast<size_t>(action->getActionType())) +
+                                         " is not valid.");
       }
     }
   }

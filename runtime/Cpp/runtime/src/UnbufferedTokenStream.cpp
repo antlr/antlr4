@@ -46,17 +46,17 @@ Token* UnbufferedTokenStream::LT(ssize_t i)
   }
 
   sync(i);
-  ssize_t index = (ssize_t)_p + i - 1;
+  ssize_t index = static_cast<ssize_t>(_p) + i - 1;
   if (index < 0) {
     throw IndexOutOfBoundsException(std::string("LT(") + std::to_string(i) + std::string(") gives negative index"));
   }
 
-  if (index >= (ssize_t)_tokens.size()) {
+  if (index >= static_cast<ssize_t>(_tokens.size())) {
     assert(_tokens.size() > 0 && _tokens.back()->getType() == EOF);
     return _tokens.back().get();
   }
 
-  return _tokens[(size_t)index].get();
+  return _tokens[static_cast<size_t>(index)].get();
 }
 
 size_t UnbufferedTokenStream::LA(ssize_t i)
@@ -113,9 +113,9 @@ void UnbufferedTokenStream::consume()
 /// </summary>
 void UnbufferedTokenStream::sync(ssize_t want)
 {
-  ssize_t need = ((ssize_t)_p + want - 1) - (ssize_t)_tokens.size() + 1; // how many more elements we need?
+  ssize_t need = (static_cast<ssize_t>(_p) + want - 1) - static_cast<ssize_t>(_tokens.size()) + 1; // how many more elements we need?
   if (need > 0) {
-    fill((size_t)need);
+    fill(static_cast<size_t>(need));
   }
 }
 
@@ -177,7 +177,7 @@ void UnbufferedTokenStream::release(ssize_t marker)
     if (_p > 0) {
       // Copy tokens[p]..tokens[n-1] to tokens[0]..tokens[(n-1)-p], reset ptrs
       // p is last valid token; move nothing if p==n as we have no valid char
-      _tokens.erase(_tokens.begin(), _tokens.begin() + (ssize_t)_p);
+      _tokens.erase(_tokens.begin(), _tokens.begin() + static_cast<ssize_t>(_p));
       _p = 0;
     }
 

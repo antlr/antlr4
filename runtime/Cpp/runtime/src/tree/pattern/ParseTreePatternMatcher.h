@@ -73,11 +73,18 @@ namespace pattern {
     class CannotInvokeStartRule : public RuntimeException {
     public:
       CannotInvokeStartRule(const RuntimeException &e);
+      ~CannotInvokeStartRule();
     };
 
     // Fixes https://github.com/antlr/antlr4/issues/413
     // "Tree pattern compilation doesn't check for a complete parse"
     class StartRuleDoesNotConsumeFullPattern : public RuntimeException {
+    public:
+      StartRuleDoesNotConsumeFullPattern() = default;
+      StartRuleDoesNotConsumeFullPattern(StartRuleDoesNotConsumeFullPattern const&) = default;
+      ~StartRuleDoesNotConsumeFullPattern();
+
+      StartRuleDoesNotConsumeFullPattern& operator=(StartRuleDoesNotConsumeFullPattern const&) = default;
     };
 
     /// Constructs a <seealso cref="ParseTreePatternMatcher"/> or from a <seealso cref="Lexer"/> and
@@ -85,7 +92,7 @@ namespace pattern {
     /// the tree patterns. The parser is used as a convenient mechanism to get
     /// the grammar name, plus token, rule names.
     ParseTreePatternMatcher(Lexer *lexer, Parser *parser);
-    virtual ~ParseTreePatternMatcher() {};
+    virtual ~ParseTreePatternMatcher();
 
     /// <summary>
     /// Set the delimiters used for marking rule and token tags within concrete

@@ -12,6 +12,7 @@
 #include <fstream>
 #include <iostream>
 #include <iterator>
+#include <limits>
 #include <limits.h>
 #include <list>
 #include <map>
@@ -55,11 +56,15 @@
     typedef __int32 ssize_t;
   #endif
 
-  #if _MSC_VER == 1900
+  #if _MSC_VER >= 1900 && _MSC_VER < 2000
     // VS 2015 has a known bug when using std::codecvt_utf8<char32_t>
     // so we have to temporarily use __int32 instead.
     // https://connect.microsoft.com/VisualStudio/feedback/details/1403302/unresolved-external-when-using-codecvt-utf8
     typedef std::basic_string<__int32> i32string;
+
+    typedef i32string UTF32String;
+  #else
+    typedef std::u32string UTF32String;
   #endif
 
   #ifdef ANTLR4CPP_EXPORTS
@@ -72,11 +77,11 @@
     #endif
   #endif
 
-#ifdef _MSC_VER
   class ANTLR4CPP_PUBLIC std::exception; // Needed for VS 2015.
-#endif
 
-#elif __APPLE__
+#elif defined(__APPLE__)
+  typedef std::u32string UTF32String;
+
   #define GUID_CFUUID
   #if __GNUC__ >= 4
     #define ANTLR4CPP_PUBLIC __attribute__ ((visibility ("default")))
@@ -84,6 +89,8 @@
     #define ANTLR4CPP_PUBLIC
   #endif
 #else
+  typedef std::u32string UTF32String;
+
   #define GUID_LIBUUID
   #if __GNUC__ >= 6
     #define ANTLR4CPP_PUBLIC __attribute__ ((visibility ("default")))
@@ -120,5 +127,5 @@
 #undef EOF
 #endif
 
-#define INVALID_INDEX (size_t)-1
+#define INVALID_INDEX std::numeric_limits<size_t>::max()
 template<class T> using Ref = std::shared_ptr<T>;

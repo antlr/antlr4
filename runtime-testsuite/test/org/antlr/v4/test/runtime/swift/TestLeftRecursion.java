@@ -8,10 +8,13 @@ package org.antlr.v4.test.runtime.swift;
 
 import org.antlr.v4.test.runtime.BaseRuntimeTest;
 import org.antlr.v4.test.runtime.RuntimeTestDescriptor;
+import org.antlr.v4.test.runtime.category.LeftRecursionTests;
 import org.antlr.v4.test.runtime.descriptors.LeftRecursionDescriptors;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+@Category(LeftRecursionTests.class)
 @RunWith(Parameterized.class)
 public class TestLeftRecursion extends BaseRuntimeTest {
 	public TestLeftRecursion(RuntimeTestDescriptor descriptor) {

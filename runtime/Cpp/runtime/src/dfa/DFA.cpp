@@ -26,35 +26,34 @@ DFA::DFA(atn::DecisionState *atnStartState, size_t decision)
     if (static_cast<atn::StarLoopEntryState *>(atnStartState)->isPrecedenceDecision) {
       _precedenceDfa = true;
       s0 = new DFAState(std::unique_ptr<atn::ATNConfigSet>(new atn::ATNConfigSet()));
-      _s0Shadow = s0;
       s0->isAcceptState = false;
       s0->requiresFullContext = false;
     }
   }
 }
 
-DFA::DFA(DFA &&other) : atnStartState(std::move(other.atnStartState)), decision(std::move(other.decision)) {
+DFA::DFA(DFA &&other) : atnStartState(other.atnStartState), decision(other.decision) {
   // Source states are implicitly cleared by the move.
   states = std::move(other.states);
 
-  // Manually move s0 pointers.
+  other.atnStartState = nullptr;
+  other.decision = 0;
   s0 = other.s0;
   other.s0 = nullptr;
-  _s0Shadow = other._s0Shadow;
-  other._s0Shadow = nullptr;
-
   _precedenceDfa = other._precedenceDfa;
+  other._precedenceDfa = false;
 }
 
 DFA::~DFA() {
-  // ml: s0 can be set either in our constructor or by external code, so we need a way to track our own creation.
-  // We could use a shared pointer again (and force that on all external assignments etc.) or just shadow it.
-  // I hesitate moving s0 to the normal states list as this might conflict with consumers of that list.
-  delete _s0Shadow;
-
+  bool s0InList = (s0 == nullptr);
   for (auto state : states) {
+    if (state == s0)
+      s0InList = true;
     delete state;
   }
+
+  if (!s0InList)
+    delete s0;
 }
 
 bool DFA::isPrecedenceDfa() const {

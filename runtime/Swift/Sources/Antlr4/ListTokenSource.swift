@@ -1,64 +1,77 @@
+/// 
 /// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
+/// 
 
-/// Provides an implementation of {@link org.antlr.v4.runtime.TokenSource} as a wrapper around a list
-/// of {@link org.antlr.v4.runtime.Token} objects.
-///
-/// <p>If the final token in the list is an {@link org.antlr.v4.runtime.Token#EOF} token, it will be used
-/// as the EOF token for every call to {@link #nextToken} after the end of the
-/// list is reached. Otherwise, an EOF token will be created.</p>
+/// 
+/// Provides an implementation of _org.antlr.v4.runtime.TokenSource_ as a wrapper around a list
+/// of _org.antlr.v4.runtime.Token_ objects.
+/// 
+/// If the final token in the list is an _org.antlr.v4.runtime.Token#EOF_ token, it will be used
+/// as the EOF token for every call to _#nextToken_ after the end of the
+/// list is reached. Otherwise, an EOF token will be created.
+/// 
 
 public class ListTokenSource: TokenSource {
-    /// The wrapped collection of {@link org.antlr.v4.runtime.Token} objects to return.
+    /// 
+    /// The wrapped collection of _org.antlr.v4.runtime.Token_ objects to return.
+    /// 
     internal final var tokens: Array<Token>
 
-    /// The name of the input source. If this value is {@code null}, a call to
-    /// {@link #getSourceName} should return the source name used to create the
-    /// the next token in {@link #tokens} (or the previous token if the end of
+    /// 
+    /// The name of the input source. If this value is `null`, a call to
+    /// _#getSourceName_ should return the source name used to create the
+    /// the next token in _#tokens_ (or the previous token if the end of
     /// the input has been reached).
+    /// 
     private final var sourceName: String?
 
-    /// The index into {@link #tokens} of token to return by the next call to
-    /// {@link #nextToken}. The end of the input is indicated by this value
-    /// being greater than or equal to the number of items in {@link #tokens}.
+    /// 
+    /// The index into _#tokens_ of token to return by the next call to
+    /// _#nextToken_. The end of the input is indicated by this value
+    /// being greater than or equal to the number of items in _#tokens_.
+    /// 
     internal var i: Int = 0
 
+    /// 
     /// This field caches the EOF token for the token source.
+    /// 
     internal var eofToken: Token?
 
-    /// This is the backing field for {@link #getTokenFactory} and
-    /// {@link setTokenFactory}.
+    /// 
+    /// This is the backing field for _#getTokenFactory_ and
+    /// _setTokenFactory_.
+    /// 
     private var _factory: TokenFactory = CommonTokenFactory.DEFAULT
 
-    /// Constructs a new {@link org.antlr.v4.runtime.ListTokenSource} instance from the specified
-    /// collection of {@link org.antlr.v4.runtime.Token} objects.
-    ///
-    /// - parameter tokens: The collection of {@link org.antlr.v4.runtime.Token} objects to provide as a
-    /// {@link org.antlr.v4.runtime.TokenSource}.
-    /// -  NullPointerException if {@code tokens} is {@code null}
+    /// 
+    /// Constructs a new _org.antlr.v4.runtime.ListTokenSource_ instance from the specified
+    /// collection of _org.antlr.v4.runtime.Token_ objects.
+    /// 
+    /// - parameter tokens: The collection of _org.antlr.v4.runtime.Token_ objects to provide as a
+    /// _org.antlr.v4.runtime.TokenSource_.
+    /// 
     public convenience init(_ tokens: Array<Token>) {
         self.init(tokens, nil)
     }
 
-    /// Constructs a new {@link org.antlr.v4.runtime.ListTokenSource} instance from the specified
-    /// collection of {@link org.antlr.v4.runtime.Token} objects and source name.
-    ///
-    /// - parameter tokens: The collection of {@link org.antlr.v4.runtime.Token} objects to provide as a
-    /// {@link org.antlr.v4.runtime.TokenSource}.
-    /// - parameter sourceName: The name of the {@link org.antlr.v4.runtime.TokenSource}. If this value is
-    /// {@code null}, {@link #getSourceName} will attempt to infer the name from
-    /// the next {@link org.antlr.v4.runtime.Token} (or the previous token if the end of the input has
+    /// 
+    /// Constructs a new _org.antlr.v4.runtime.ListTokenSource_ instance from the specified
+    /// collection of _org.antlr.v4.runtime.Token_ objects and source name.
+    /// 
+    /// - parameter tokens: The collection of _org.antlr.v4.runtime.Token_ objects to provide as a
+    /// _org.antlr.v4.runtime.TokenSource_.
+    /// - parameter sourceName: The name of the _org.antlr.v4.runtime.TokenSource_. If this value is
+    /// `null`, _#getSourceName_ will attempt to infer the name from
+    /// the next _org.antlr.v4.runtime.Token_ (or the previous token if the end of the input has
     /// been reached).
-    ///
-    /// -  NullPointerException if {@code tokens} is {@code null}
+    /// 
     public init(_ tokens: Array<Token>, _ sourceName: String?) {
 
         self.tokens = tokens
         self.sourceName = sourceName
     }
-
-    /// {@inheritDoc}
 
     public func getCharPositionInLine() -> Int {
         if i < tokens.count {
@@ -92,8 +105,6 @@ public class ListTokenSource: TokenSource {
         return 0
     }
 
-    /// {@inheritDoc}
-
     public func nextToken() -> Token {
         if i >= tokens.count {
             if eofToken == nil {
@@ -120,8 +131,6 @@ public class ListTokenSource: TokenSource {
         i += 1
         return t
     }
-
-    /// {@inheritDoc}
 
     public func getLine() -> Int {
         if i < tokens.count {
@@ -156,8 +165,6 @@ public class ListTokenSource: TokenSource {
         return 1
     }
 
-    /// {@inheritDoc}
-
     public func getInputStream() -> CharStream? {
         if i < tokens.count {
             return tokens[i].getInputStream()
@@ -175,8 +182,6 @@ public class ListTokenSource: TokenSource {
         return nil
     }
 
-    /// {@inheritDoc}
-
     public func getSourceName() -> String {
         if sourceName != nil {
             return sourceName!
@@ -189,13 +194,9 @@ public class ListTokenSource: TokenSource {
         return "List"
     }
 
-    /// {@inheritDoc}
-
     public func setTokenFactory(_ factory: TokenFactory) {
         self._factory = factory
     }
-
-    /// {@inheritDoc}
 
     public func getTokenFactory() -> TokenFactory {
         return _factory

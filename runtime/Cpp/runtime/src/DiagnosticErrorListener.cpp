@@ -17,7 +17,7 @@ using namespace antlr4;
 DiagnosticErrorListener::DiagnosticErrorListener() : DiagnosticErrorListener(true) {
 }
 
-DiagnosticErrorListener::DiagnosticErrorListener(bool exactOnly) : exactOnly(exactOnly) {
+DiagnosticErrorListener::DiagnosticErrorListener(bool exactOnly_) : exactOnly(exactOnly_) {
 }
 
 void DiagnosticErrorListener::reportAmbiguity(Parser *recognizer, const dfa::DFA &dfa, size_t startIndex, size_t stopIndex,
@@ -53,7 +53,7 @@ void DiagnosticErrorListener::reportContextSensitivity(Parser *recognizer, const
 
 std::string DiagnosticErrorListener::getDecisionDescription(Parser *recognizer, const dfa::DFA &dfa) {
   size_t decision = dfa.decision;
-  size_t ruleIndex = ((atn::ATNState*)dfa.atnStartState)->ruleIndex;
+  size_t ruleIndex = (reinterpret_cast<atn::ATNState*>(dfa.atnStartState))->ruleIndex;
 
   const std::vector<std::string>& ruleNames = recognizer->getRuleNames();
   if (ruleIndex == INVALID_INDEX || ruleIndex >= ruleNames.size()) {

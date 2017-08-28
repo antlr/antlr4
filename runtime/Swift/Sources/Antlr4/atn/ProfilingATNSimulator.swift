@@ -1,9 +1,13 @@
+/// 
 /// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
+/// 
 
 
+/// 
 /// -  4.3
+/// 
 
 import Foundation
 
@@ -17,6 +21,7 @@ public class ProfilingATNSimulator: ParserATNSimulator {
     internal var currentDecision: Int = 0
     internal var currentState: DFAState?
 
+    /// 
     /// At the point of LL failover, we record how SLL would resolve the conflict so that
     /// we can determine whether or not a decision / input pair is context-sensitive.
     /// If LL gives a different result than SLL's predicted alternative, we have a
@@ -27,6 +32,7 @@ public class ProfilingATNSimulator: ParserATNSimulator {
     /// was not required in order to produce a correct prediction for this decision and input sequence.
     /// It may in fact still be a context sensitivity but we don't know by looking at the
     /// minimum alternatives for the current input.
+    /// 
     internal var conflictingAltResolvedBySLL: Int = 0
 
     public init(_ parser: Parser) {
@@ -57,7 +63,7 @@ public class ProfilingATNSimulator: ParserATNSimulator {
         decisions[decision].timeInPrediction += (stop - start)
         decisions[decision].invocations += 1
 
-        var SLL_k: Int64 = _sllStopIndex - _startIndex + 1
+        var SLL_k: Int64 = Int64(_sllStopIndex - _startIndex + 1)
         decisions[decision].SLL_TotalLook += SLL_k
         decisions[decision].SLL_MinLook = decisions[decision].SLL_MinLook == 0 ? SLL_k : min(decisions[decision].SLL_MinLook, SLL_k)
         if SLL_k > decisions[decision].SLL_MaxLook {
@@ -67,7 +73,7 @@ public class ProfilingATNSimulator: ParserATNSimulator {
         }
 
         if _llStopIndex >= 0 {
-            var LL_k: Int64 = _llStopIndex - _startIndex + 1
+            var LL_k: Int64 = Int64(_llStopIndex - _startIndex + 1)
             decisions[decision].LL_TotalLook += LL_k
             decisions[decision].LL_MinLook = decisions[decision].LL_MinLook == 0 ? LL_k : min(decisions[decision].LL_MinLook, LL_k)
             if LL_k > decisions[decision].LL_MaxLook {
