@@ -361,7 +361,7 @@ func (b *BaseLexer) GetATN() *ATN {
 // Return a list of all Token objects in input char stream.
 // Forces load of all tokens. Does not include EOF token.
 // /
-func (b *BaseLexer) getAllTokens() []Token {
+func (b *BaseLexer) GetAllTokens() []Token {
 	vl := b.Virt
 	tokens := make([]Token, 0)
 	t := vl.NextToken()
