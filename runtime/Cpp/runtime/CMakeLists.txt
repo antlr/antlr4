@@ -44,7 +44,10 @@ elseif(APPLE)
   target_link_libraries(antlr4_static ${COREFOUNDATION_LIBRARY})
 endif()
 
-set(disabled_compile_warnings "-Wno-overloaded-virtual")
+if (NOT CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+  set(disabled_compile_warnings "-Wno-overloaded-virtual")
+endif ()
+
 if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
   set(disabled_compile_warnings "${disabled_compile_warnings} -Wno-dollar-in-identifier-extension -Wno-four-char-constants")
 elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
@@ -57,6 +60,11 @@ if (WIN32)
   set(extra_share_compile_flags "-DANTLR4CPP_EXPORTS")
   set(extra_static_compile_flags "-DANTLR4CPP_STATIC")
 endif(WIN32)
+
+if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+  set(extra_share_compile_flags "-DANTLR4CPP_EXPORTS -MP /wd4251")
+  set(extra_static_compile_flags "-DANTLR4CPP_STATIC -MP")
+endif()
 
 set_target_properties(antlr4_shared
                       PROPERTIES VERSION   ${ANTLR_VERSION}
