@@ -91,8 +91,8 @@ namespace tree {
     /// a child node.
     /// </param>
     /// <returns> The updated aggregate result. </returns>
-    virtual antlrcpp::Any aggregateResult(antlrcpp::Any /*aggregate*/, const antlrcpp::Any &nextResult) {
-      return nextResult;
+    virtual antlrcpp::Any aggregateResult(antlrcpp::Any &/*aggregate*/, antlrcpp::Any &nextResult) {
+      return std::move(nextResult);
     }
 
     /// <summary>
