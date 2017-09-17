@@ -5,41 +5,41 @@
 
 
 
-/**
- *
- * @author Sam Harwell
- */
+/// 
+/// 
+/// - Author: Sam Harwell
+/// 
 
 public final class MurmurHash {
 
     private static let DEFAULT_SEED: Int = 0
 
-    /**
-     * Initialize the hash using the default seed value.
-     *
-     * @return the intermediate hash value
-     */
+    /// 
+    /// Initialize the hash using the default seed value.
+    /// 
+    /// - Returns: the intermediate hash value
+    /// 
     public static func initialize() -> Int {
         return initialize(DEFAULT_SEED)
     }
 
-    /**
-     * Initialize the hash using the specified {@code seed}.
-     *
-     * @param seed the seed
-     * @return the intermediate hash value
-     */
+    /// 
+    /// Initialize the hash using the specified `seed`.
+    /// 
+    /// - Parameter seed: the seed
+    /// - Returns: the intermediate hash value
+    /// 
     public static func initialize(_ seed: Int) -> Int {
         return seed
     }
 
-    /**
-     * Update the intermediate hash value for the next input {@code value}.
-     *
-     * @param hash the intermediate hash value
-     * @param value the value to add to the current hash
-     * @return the updated intermediate hash value
-     */
+    /// 
+    /// Update the intermediate hash value for the next input `value`.
+    /// 
+    /// - Parameter hash: the intermediate hash value
+    /// - Parameter value: the value to add to the current hash
+    /// - Returns: the updated intermediate hash value
+    /// 
     public static func update2(_ hashIn: Int, _ value: Int) -> Int {
 
         let c1: Int32 = -862048943//0xCC9E2D51;
@@ -67,26 +67,26 @@ public final class MurmurHash {
         return Int(hash)
     }
 
-    /**
-     * Update the intermediate hash value for the next input {@code value}.
-     *
-     * @param hash the intermediate hash value
-     * @param value the value to add to the current hash
-     * @return the updated intermediate hash value
-     */
+    /// 
+    /// Update the intermediate hash value for the next input `value`.
+    /// 
+    /// - Parameter hash: the intermediate hash value
+    /// - Parameter value: the value to add to the current hash
+    /// - Returns: the updated intermediate hash value
+    /// 
     public static func update<T:Hashable>(_ hash: Int, _ value: T?) -> Int {
         return update2(hash, value != nil ? value!.hashValue : 0)
         // return update2(hash, value);
     }
 
-    /**
-     * Apply the final computation steps to the intermediate value {@code hash}
-     * to form the final result of the MurmurHash 3 hash function.
-     *
-     * @param hash the intermediate hash value
-     * @param numberOfWords the number of integer values added to the hash
-     * @return the final hash result
-     */
+    /// 
+    /// Apply the final computation steps to the intermediate value `hash`
+    /// to form the final result of the MurmurHash 3 hash function.
+    /// 
+    /// - Parameter hash: the intermediate hash value
+    /// - Parameter numberOfWords: the number of integer values added to the hash
+    /// - Returns: the final hash result
+    /// 
     public static func finish(_ hashin: Int, _ numberOfWordsIn: Int) -> Int {
         var hash = Int32(hashin)
         let numberOfWords = Int32(numberOfWordsIn)
@@ -101,15 +101,15 @@ public final class MurmurHash {
         return Int(hash)
     }
 
-    /**
-     * Utility function to compute the hash code of an array using the
-     * MurmurHash algorithm.
-     *
-     * @param <T> the array element type
-     * @param data the array data
-     * @param seed the seed for the MurmurHash algorithm
-     * @return the hash code of the data
-     */
+    /// 
+    /// Utility function to compute the hash code of an array using the
+    /// MurmurHash algorithm.
+    /// 
+    /// - Parameter <T>: the array element type
+    /// - Parameter data: the array data
+    /// - Parameter seed: the seed for the MurmurHash algorithm
+    /// - Returns: the hash code of the data
+    /// 
     public static func hashCode<T:Hashable>(_ data: [T], _ seed: Int) -> Int {
         var hash: Int = initialize(seed)
         for value: T in data {

@@ -5,126 +5,108 @@
 
 
 
-/**
- * A tree pattern matching mechanism for ANTLR {@link org.antlr.v4.runtime.tree.ParseTree}s.
- *
- * <p>Patterns are strings of source input text with special tags representing
- * token or rule references such as:</p>
- *
- * <p>{@code <ID> = <expr>;}</p>
- *
- * <p>Given a pattern start rule such as {@code statement}, this object constructs
- * a {@link org.antlr.v4.runtime.tree.ParseTree} with placeholders for the {@code ID} and {@code expr}
- * subtree. Then the {@link #match} routines can compare an actual
- * {@link org.antlr.v4.runtime.tree.ParseTree} from a parse with this pattern. Tag {@code <ID>} matches
- * any {@code ID} token and tag {@code <expr>} references the result of the
- * {@code expr} rule (generally an instance of {@code ExprContext}.</p>
- *
- * <p>Pattern {@code x = 0;} is a similar pattern that matches the same pattern
- * except that it requires the identifier to be {@code x} and the expression to
- * be {@code 0}.</p>
- *
- * <p>The {@link #matches} routines return {@code true} or {@code false} based
- * upon a match for the tree rooted at the parameter sent in. The
- * {@link #match} routines return a {@link org.antlr.v4.runtime.tree.pattern.ParseTreeMatch} object that
- * contains the parse tree, the parse tree pattern, and a map from tag name to
- * matched nodes (more below). A subtree that fails to match, returns with
- * {@link org.antlr.v4.runtime.tree.pattern.ParseTreeMatch#mismatchedNode} set to the first tree node that did not
- * match.</p>
- *
- * <p>For efficiency, you can compile a tree pattern in string form to a
- * {@link org.antlr.v4.runtime.tree.pattern.ParseTreePattern} object.</p>
- *
- * <p>See {@code TestParseTreeMatcher} for lots of examples.
- * {@link org.antlr.v4.runtime.tree.pattern.ParseTreePattern} has two static helper methods:
- * {@link org.antlr.v4.runtime.tree.pattern.ParseTreePattern#findAll} and {@link org.antlr.v4.runtime.tree.pattern.ParseTreePattern#match} that
- * are easy to use but not super efficient because they create new
- * {@link org.antlr.v4.runtime.tree.pattern.ParseTreePatternMatcher} objects each time and have to compile the
- * pattern in string form before using it.</p>
- *
- * <p>The lexer and parser that you pass into the {@link org.antlr.v4.runtime.tree.pattern.ParseTreePatternMatcher}
- * constructor are used to parse the pattern in string form. The lexer converts
- * the {@code <ID> = <expr>;} into a sequence of four tokens (assuming lexer
- * throws out whitespace or puts it on a hidden channel). Be aware that the
- * input stream is reset for the lexer (but not the parser; a
- * {@link org.antlr.v4.runtime.ParserInterpreter} is created to parse the input.). Any user-defined
- * fields you have put into the lexer might get changed when this mechanism asks
- * it to scan the pattern string.</p>
- *
- * <p>Normally a parser does not accept token {@code <expr>} as a valid
- * {@code expr} but, from the parser passed in, we create a special version of
- * the underlying grammar representation (an {@link org.antlr.v4.runtime.atn.ATN}) that allows imaginary
- * tokens representing rules ({@code <expr>}) to match entire rules. We call
- * these <em>bypass alternatives</em>.</p>
- *
- * <p>Delimiters are {@code <} and {@code >}, with {@code \} as the escape string
- * by default, but you can set them to whatever you want using
- * {@link #setDelimiters}. You must escape both start and stop strings
- * {@code \<} and {@code \>}.</p>
- */
+/// 
+/// A tree pattern matching mechanism for ANTLR _org.antlr.v4.runtime.tree.ParseTree_s.
+/// 
+/// Patterns are strings of source input text with special tags representing
+/// token or rule references such as:
+/// 
+/// `<ID> = <expr>;`
+/// 
+/// Given a pattern start rule such as `statement`, this object constructs
+/// a _org.antlr.v4.runtime.tree.ParseTree_ with placeholders for the `ID` and `expr`
+/// subtree. Then the _#match_ routines can compare an actual
+/// _org.antlr.v4.runtime.tree.ParseTree_ from a parse with this pattern. Tag `<ID>` matches
+/// any `ID` token and tag `<expr>` references the result of the
+/// `expr` rule (generally an instance of `ExprContext`.
+/// 
+/// Pattern `x = 0;` is a similar pattern that matches the same pattern
+/// except that it requires the identifier to be `x` and the expression to
+/// be `0`.
+/// 
+/// The _#matches_ routines return `true` or `false` based
+/// upon a match for the tree rooted at the parameter sent in. The
+/// _#match_ routines return a _org.antlr.v4.runtime.tree.pattern.ParseTreeMatch_ object that
+/// contains the parse tree, the parse tree pattern, and a map from tag name to
+/// matched nodes (more below). A subtree that fails to match, returns with
+/// _org.antlr.v4.runtime.tree.pattern.ParseTreeMatch#mismatchedNode_ set to the first tree node that did not
+/// match.
+/// 
+/// For efficiency, you can compile a tree pattern in string form to a
+/// _org.antlr.v4.runtime.tree.pattern.ParseTreePattern_ object.
+/// 
+/// See `TestParseTreeMatcher` for lots of examples.
+/// _org.antlr.v4.runtime.tree.pattern.ParseTreePattern_ has two static helper methods:
+/// _org.antlr.v4.runtime.tree.pattern.ParseTreePattern#findAll_ and _org.antlr.v4.runtime.tree.pattern.ParseTreePattern#match_ that
+/// are easy to use but not super efficient because they create new
+/// _org.antlr.v4.runtime.tree.pattern.ParseTreePatternMatcher_ objects each time and have to compile the
+/// pattern in string form before using it.
+/// 
+/// The lexer and parser that you pass into the _org.antlr.v4.runtime.tree.pattern.ParseTreePatternMatcher_
+/// constructor are used to parse the pattern in string form. The lexer converts
+/// the `<ID> = <expr>;` into a sequence of four tokens (assuming lexer
+/// throws out whitespace or puts it on a hidden channel). Be aware that the
+/// input stream is reset for the lexer (but not the parser; a
+/// _org.antlr.v4.runtime.ParserInterpreter_ is created to parse the input.). Any user-defined
+/// fields you have put into the lexer might get changed when this mechanism asks
+/// it to scan the pattern string.
+/// 
+/// Normally a parser does not accept token `<expr>` as a valid
+/// `expr` but, from the parser passed in, we create a special version of
+/// the underlying grammar representation (an _org.antlr.v4.runtime.atn.ATN_) that allows imaginary
+/// tokens representing rules (`<expr>`) to match entire rules. We call
+/// these __bypass alternatives__.
+/// 
+/// Delimiters are `<` and `>`, with `\` as the escape string
+/// by default, but you can set them to whatever you want using
+/// _#setDelimiters_. You must escape both start and stop strings
+/// `\<` and `\>`.
+/// 
 
 public class ParseTreePatternMatcher {
-//	public class CannotInvokeStartRule  :  RuntimeException {
-//		public convenience init(_ e : Throwable) {
-//			super.init(e);
-//		}
-//	}
-//
-//	// Fixes https://github.com/antlr/antlr4/issues/413
-//	// "Tree pattern compilation doesn't check for a complete parse"
-//	public class StartRuleDoesNotConsumeFullPattern  :  RuntimeException {
-//	}
 
-    /**
-     * This is the backing field for {@link #getLexer()}.
-     */
+    /// 
+    /// This is the backing field for _#getLexer()_.
+    /// 
     private final var lexer: Lexer
 
-    /**
-     * This is the backing field for {@link #getParser()}.
-     */
+    /// 
+    /// This is the backing field for _#getParser()_.
+    /// 
     private final var parser: Parser
 
     internal var start: String = "<"
     internal var stop: String = ">"
     internal var escape: String = "\\"
-    // e.g., \< and \> must escape BOTH!
 
-    /**
-     * Constructs a {@link org.antlr.v4.runtime.tree.pattern.ParseTreePatternMatcher} or from a {@link org.antlr.v4.runtime.Lexer} and
-     * {@link org.antlr.v4.runtime.Parser} object. The lexer input stream is altered for tokenizing
-     * the tree patterns. The parser is used as a convenient mechanism to get
-     * the grammar name, plus token, rule names.
-     */
+    /// 
+    /// Constructs a _org.antlr.v4.runtime.tree.pattern.ParseTreePatternMatcher_ or from a _org.antlr.v4.runtime.Lexer_ and
+    /// _org.antlr.v4.runtime.Parser_ object. The lexer input stream is altered for tokenizing
+    /// the tree patterns. The parser is used as a convenient mechanism to get
+    /// the grammar name, plus token, rule names.
+    /// 
     public init(_ lexer: Lexer, _ parser: Parser) {
         self.lexer = lexer
         self.parser = parser
     }
 
-    /**
-     * Set the delimiters used for marking rule and token tags within concrete
-     * syntax used by the tree pattern parser.
-     *
-     * @param start The start delimiter.
-     * @param stop The stop delimiter.
-     * @param escapeLeft The escape sequence to use for escaping a start or stop delimiter.
-     *
-     * @exception IllegalArgumentException if {@code start} is {@code null} or empty.
-     * @exception IllegalArgumentException if {@code stop} is {@code null} or empty.
-     */
+    /// 
+    /// Set the delimiters used for marking rule and token tags within concrete
+    /// syntax used by the tree pattern parser.
+    /// 
+    /// - Parameter start: The start delimiter.
+    /// - Parameter stop: The stop delimiter.
+    /// - Parameter escapeLeft: The escape sequence to use for escaping a start or stop delimiter.
+    /// 
+    /// - Throws: ANTLRError.ilegalArgument if `start` is `null` or empty.
+    /// - Throws: ANTLRError.ilegalArgument if `stop` is `null` or empty.
+    /// 
     public func setDelimiters(_ start: String, _ stop: String, _ escapeLeft: String) throws {
-        //start == nil ||
         if start.isEmpty {
             throw ANTLRError.illegalArgument(msg: "start cannot be null or empty")
-            // RuntimeException("start cannot be null or empty")
-            //throwException() /* throw IllegalArgumentException("start cannot be null or empty"); */
         }
-        //stop == nil ||
         if stop.isEmpty {
             throw ANTLRError.illegalArgument(msg: "stop cannot be null or empty")
-            //RuntimeException("stop cannot be null or empty")
-
-            //throwException() /* throw IllegalArgumentException("stop cannot be null or empty"); */
         }
 
         self.start = start
@@ -132,48 +114,50 @@ public class ParseTreePatternMatcher {
         self.escape = escapeLeft
     }
 
-    /** Does {@code pattern} matched as rule {@code patternRuleIndex} match {@code tree}? */
+    /// 
+    /// Does `pattern` matched as rule `patternRuleIndex` match `tree`?
+    /// 
     public func matches(_ tree: ParseTree, _ pattern: String, _ patternRuleIndex: Int) throws -> Bool {
         let p: ParseTreePattern = try compile(pattern, patternRuleIndex)
         return try matches(tree, p)
     }
 
-    /** Does {@code pattern} matched as rule patternRuleIndex match tree? Pass in a
-     *  compiled pattern instead of a string representation of a tree pattern.
-     */
+    /// 
+    /// Does `pattern` matched as rule patternRuleIndex match tree? Pass in a
+    /// compiled pattern instead of a string representation of a tree pattern.
+    /// 
     public func matches(_ tree: ParseTree, _ pattern: ParseTreePattern) throws -> Bool {
         let labels: MultiMap<String, ParseTree> = MultiMap<String, ParseTree>()
         let mismatchedNode: ParseTree? = try matchImpl(tree, pattern.getPatternTree(), labels)
         return mismatchedNode == nil
     }
 
-    /**
-     * Compare {@code pattern} matched as rule {@code patternRuleIndex} against
-     * {@code tree} and return a {@link org.antlr.v4.runtime.tree.pattern.ParseTreeMatch} object that contains the
-     * matched elements, or the node at which the match failed.
-     */
+    /// 
+    /// Compare `pattern` matched as rule `patternRuleIndex` against
+    /// `tree` and return a _org.antlr.v4.runtime.tree.pattern.ParseTreeMatch_ object that contains the
+    /// matched elements, or the node at which the match failed.
+    /// 
     public func match(_ tree: ParseTree, _ pattern: String, _ patternRuleIndex: Int) throws -> ParseTreeMatch {
         let p: ParseTreePattern = try compile(pattern, patternRuleIndex)
         return try match(tree, p)
     }
 
-    /**
-     * Compare {@code pattern} matched against {@code tree} and return a
-     * {@link org.antlr.v4.runtime.tree.pattern.ParseTreeMatch} object that contains the matched elements, or the
-     * node at which the match failed. Pass in a compiled pattern instead of a
-     * string representation of a tree pattern.
-     */
-
+    /// 
+    /// Compare `pattern` matched against `tree` and return a
+    /// _org.antlr.v4.runtime.tree.pattern.ParseTreeMatch_ object that contains the matched elements, or the
+    /// node at which the match failed. Pass in a compiled pattern instead of a
+    /// string representation of a tree pattern.
+    /// 
     public func match(_ tree: ParseTree, _ pattern: ParseTreePattern) throws -> ParseTreeMatch {
         let labels: MultiMap<String, ParseTree> = MultiMap<String, ParseTree>()
         let mismatchedNode: ParseTree? = try matchImpl(tree, pattern.getPatternTree(), labels)
         return ParseTreeMatch(tree, pattern, labels, mismatchedNode)
     }
 
-    /**
-     * For repeated use of a tree pattern, compile it to a
-     * {@link org.antlr.v4.runtime.tree.pattern.ParseTreePattern} using this method.
-     */
+    /// 
+    /// For repeated use of a tree pattern, compile it to a
+    /// _org.antlr.v4.runtime.tree.pattern.ParseTreePattern_ using this method.
+    /// 
     public func compile(_ pattern: String, _ patternRuleIndex: Int) throws -> ParseTreePattern {
         let tokenList: Array<Token> = try tokenize(pattern)
         let tokenSrc: ListTokenSource = ListTokenSource(tokenList)
@@ -185,64 +169,45 @@ public class ParseTreePatternMatcher {
                 parser.getATNWithBypassAlts(),
                 tokens)
 
-        var tree: ParseTree //= nil;
-        //TODO:  exception handler
-        //try {
+        var tree: ParseTree
         parserInterp.setErrorHandler(BailErrorStrategy())
         tree = try parserInterp.parse(patternRuleIndex)
-//			print("pattern tree = "+tree.toStringTree(parserInterp));
-//		}
-//		catch (ParseCancellationException e) {
-//			throwException() /* throw e.getCause() as RecognitionException; */
-//		}
-//		catch (RecognitionException re) {
-//			throwException() /* throw re; */
-//		}
-//		catch (Exception e) {
-//			throwException() /* throw CannotInvokeStartRule(e); */
-//		}
 
         // Make sure tree pattern compilation checks for a complete parse
         if try tokens.LA(1) != CommonToken.EOF {
             throw ANTLRError.illegalState(msg: "Tree pattern compilation doesn't check for a complete parse")
-            // RuntimeException("Tree pattern compilation doesn't check for a complete parse")
-            //throw ANTLRException.StartRuleDoesNotConsumeFullPattern
-            //throwException() /* throw StartRuleDoesNotConsumeFullPattern(); */
         }
 
         return ParseTreePattern(self, pattern, patternRuleIndex, tree)
     }
 
-    /**
-     * Used to convert the tree pattern string into a series of tokens. The
-     * input stream is reset.
-     */
-
+    /// 
+    /// Used to convert the tree pattern string into a series of tokens. The
+    /// input stream is reset.
+    /// 
     public func getLexer() -> Lexer {
         return lexer
     }
 
-    /**
-     * Used to collect to the grammar file name, token names, rule names for
-     * used to parse the pattern into a parse tree.
-     */
-
+    /// 
+    /// Used to collect to the grammar file name, token names, rule names for
+    /// used to parse the pattern into a parse tree.
+    /// 
     public func getParser() -> Parser {
         return parser
     }
 
     // ---- SUPPORT CODE ----
 
-    /**
-     * Recursively walk {@code tree} against {@code patternTree}, filling
-     * {@code match.}{@link org.antlr.v4.runtime.tree.pattern.ParseTreeMatch#labels labels}.
-     *
-     * @return the first node encountered in {@code tree} which does not match
-     * a corresponding node in {@code patternTree}, or {@code null} if the match
-     * was successful. The specific node returned depends on the matching
-     * algorithm used by the implementation, and may be overridden.
-     */
-
+    /// 
+    /// Recursively walk `tree` against `patternTree`, filling
+    /// `match.`_org.antlr.v4.runtime.tree.pattern.ParseTreeMatch#labels labels_.
+    /// 
+    /// - Returns: the first node encountered in `tree` which does not match
+    /// a corresponding node in `patternTree`, or `null` if the match
+    /// was successful. The specific node returned depends on the matching
+    /// algorithm used by the implementation, and may be overridden.
+    /// 
     internal func matchImpl(_ tree: ParseTree,
                             _ patternTree: ParseTree,
                             _ labels: MultiMap<String, ParseTree>) throws -> ParseTree? {
@@ -328,7 +293,7 @@ public class ParseTreePatternMatcher {
         return tree
     }
 
-    /** Is {@code t} {@code (expr <expr>)} subtree? */
+    /// Is `t` `(expr <expr>)` subtree?
     internal func getRuleTagToken(_ t: ParseTree) -> RuleTagToken? {
         if t is RuleNode {
             let r: RuleNode = t as! RuleNode
@@ -391,12 +356,13 @@ public class ParseTreePatternMatcher {
         return tokens
     }
 
-    /** Split {@code <ID> = <e:expr> ;} into 4 chunks for tokenizing by {@link #tokenize}. */
+    /// 
+    /// Split `<ID> = <e:expr> ;` into 4 chunks for tokenizing by _#tokenize_.
+    /// 
     public func split(_ pattern: String) throws -> Array<Chunk> {
         var p: Int = 0
         let n: Int = pattern.length
         var chunks: Array<Chunk> = Array<Chunk>()
-        //var buf : StringBuilder = StringBuilder();
         // find all start and stop indexes first, then collect
         var starts: Array<Int> = Array<Int>()
         var stops: Array<Int> = Array<Int>()

@@ -11,6 +11,3 @@ Whitespace  :  ' ' | '\n' | '\t' | '\r' ;
 
 fragment
 Hexdigit    :  [a-fA-F0-9] ;
-
-fragment
-Digit       :  [0-9] ;

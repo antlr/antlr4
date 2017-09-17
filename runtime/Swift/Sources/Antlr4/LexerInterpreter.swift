@@ -1,13 +1,17 @@
+/// 
 /// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
+/// 
 
 
 public class LexerInterpreter: Lexer {
     internal final var grammarFileName: String
     internal final var atn: ATN
 
-    ////@Deprecated
+    /// 
+    /// /@Deprecated
+    /// 
     internal final var tokenNames: [String?]?
     internal final var ruleNames: [String]
     internal final var channelNames: [String]
@@ -75,7 +79,9 @@ public class LexerInterpreter: Lexer {
     }
 
     override
-    ////@Deprecated
+    /// 
+    /// /@Deprecated
+    /// 
     public func getTokenNames() -> [String?]? {
         return tokenNames
     }
