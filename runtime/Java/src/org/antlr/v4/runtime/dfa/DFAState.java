@@ -6,7 +6,6 @@
 
 package org.antlr.v4.runtime.dfa;
 
-import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNConfig;
 import org.antlr.v4.runtime.atn.ATNConfigSet;
@@ -14,6 +13,7 @@ import org.antlr.v4.runtime.atn.LexerActionExecutor;
 import org.antlr.v4.runtime.atn.ParserATNSimulator;
 import org.antlr.v4.runtime.atn.SemanticContext;
 import org.antlr.v4.runtime.misc.MurmurHash;
+import org.antlr.v4.runtime.misc.SimpleIntMap;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -44,16 +44,17 @@ import java.util.Set;
  *  meaning that state was reached via a different set of rule invocations.</p>
  */
 public class DFAState {
+
 	public int stateNumber = -1;
 
 
 	public ATNConfigSet configs = new ATNConfigSet();
 
-	/** {@code edges[symbol]} points to target of symbol. Shift up by 1 so (-1)
-	 *  {@link Token#EOF} maps to {@code edges[0]}.
-	 */
-
-	public DFAState[] edges;
+	/**
+	 * Edges points to a target State for a symbol.
+	 * This map represents all edges from this state to all connected states.
+ 	 */
+	private final SimpleIntMap<DFAState> edges = new SimpleIntMap<>();
 
 	public boolean isAcceptState = false;
 
@@ -108,6 +109,24 @@ public class DFAState {
 	public DFAState(int stateNumber) { this.stateNumber = stateNumber; }
 
 	public DFAState(ATNConfigSet configs) { this.configs = configs; }
+
+	public void addEdge(int symbol, DFAState state) {
+		synchronized(this) {
+			edges.put(symbol, state);
+		}
+	}
+
+	public DFAState getTargetState(int symbol) {
+		return edges.get(symbol);
+	}
+
+	public int[] getEdgeKeys() {
+		return edges.getKeys();
+	}
+
+	public int getEdgeCount() {
+		return edges.size();
+	}
 
 	/** Get the set of all alts mentioned by all ATN configurations in this
 	 *  DFA state.
@@ -175,4 +194,5 @@ public class DFAState {
         }
 		return buf.toString();
 	}
+
 }

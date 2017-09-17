@@ -552,12 +552,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	 * already cached
 	 */
 	protected DFAState getExistingTargetState(DFAState previousD, int t) {
-		DFAState[] edges = previousD.edges;
-		if (edges == null || t + 1 < 0 || t + 1 >= edges.length) {
-			return null;
-		}
-
-		return edges[t + 1];
+		return previousD.getTargetState(t);
 	}
 
 	/**
@@ -2059,10 +2054,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	 * otherwise this method returns the result of calling {@link #addDFAState}
 	 * on {@code to}
 	 */
-	protected DFAState addDFAEdge(DFA dfa,
-								  DFAState from,
-								  int t,
-								  DFAState to)
+	protected DFAState addDFAEdge(DFA dfa, DFAState from, int t, DFAState to)
 	{
 		if ( debug ) {
 			System.out.println("EDGE "+from+" -> "+to+" upon "+getTokenName(t));
@@ -2072,18 +2064,12 @@ public class ParserATNSimulator extends ATNSimulator {
 			return null;
 		}
 
-		to = addDFAState(dfa, to); // used existing if possible not incoming
+		to = addDFAState(dfa, to); // Use existing if possible not incoming
 		if (from == null || t < -1 || t > atn.maxTokenType) {
 			return to;
 		}
 
-		synchronized (from) {
-			if ( from.edges==null ) {
-				from.edges = new DFAState[atn.maxTokenType+1+1];
-			}
-
-			from.edges[t+1] = to; // connect
-		}
+  	from.addEdge(t, to);
 
 		if ( debug ) {
 			System.out.println("DFA=\n"+dfa.toString(parser!=null?parser.getVocabulary():VocabularyImpl.EMPTY_VOCABULARY));
@@ -2091,6 +2077,7 @@ public class ParserATNSimulator extends ATNSimulator {
 
 		return to;
 	}
+
 
 	/**
 	 * Add state {@code D} to the DFA if it is not already present, and return
