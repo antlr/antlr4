@@ -61,7 +61,7 @@ json_lexer.go
 json_listener.go
 ```
 
-Another common option to the ANTLR tool is `-visitor`, which generates a parse tree visitor, but we won't be doing that here. For a full list of antlr4 tool options, please visit the [tool documentation page](tool-options.md).
+Another common option to the ANTLR tool is `-visitor`, which generates a parse tree visitor, but that is still work-in-progress. For a full list of antlr4 tool options, please visit the [tool documentation page](tool-options.md).
 
 We'll write a small main func to call the generated parser/lexer (assuming they are separate). This one writes out the encountered `ParseTreeContext`'s. Suppose the gen'ed parser code is in the `parser` directory relative to this code:
 
