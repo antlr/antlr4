@@ -1,6 +1,8 @@
+/// 
 /// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
+/// 
 
 //
 //  NSUUIDExtension.swift
@@ -33,7 +35,6 @@ extension UUID {
         let intLiteral = hi | (val & (hi - 1))
         let s: String = String(Character(UnicodeScalar(UInt32(intLiteral))!))
         return s[1 ..< s.length]
-        // return s.substringFromIndex(1)
     }
 
 

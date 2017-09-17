@@ -1,43 +1,55 @@
+/// 
 /// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
+/// 
 
 
-/// Specialized {@link java.util.Set}{@code <}{@link org.antlr.v4.runtime.atn.ATNConfig}{@code >} that can track
+/// 
+/// Specialized _java.util.Set_`<`_org.antlr.v4.runtime.atn.ATNConfig_`>` that can track
 /// info about the set, with support for combining similar configurations using a
 /// graph-structured stack.
-//:  Set<ATNConfig>
-
+///
 public class ATNConfigSet: Hashable, CustomStringConvertible {
+    /// 
     /// The reason that we need this is because we don't want the hash map to use
     /// the standard hash code and equals. We need all configurations with the same
-    /// {@code (s,i,_,semctx)} to be equal. Unfortunately, this key effectively doubles
+    /// `(s,i,_,semctx)` to be equal. Unfortunately, this key effectively doubles
     /// the number of objects associated with ATNConfigs. The other solution is to
     /// use a hash table that lets us specify the equals/hashcode operation.
+    /// 
 
 
-     /// Indicates that the set of configurations is read-only. Do not
+    ///
+    /// Indicates that the set of configurations is read-only. Do not
     /// allow any code to manipulate the set; DFA states will point at
     /// the sets and they must not change. This does not protect the other
     /// fields; in particular, conflictingAlts is set after
     /// we've made this readonly.
+    ///
     internal final var readonly: Bool = false
 
+    /// 
     /// All configs but hashed by (s, i, _, pi) not including context. Wiped out
     /// when we go readonly as this set becomes a DFA state.
+    /// 
     public final var configLookup: LookupDictionary
 
+    /// 
     /// Track the elements as they are added to the set; supports get(i)
+    /// 
     public final var configs: Array<ATNConfig> = Array<ATNConfig>()
 
     // TODO: these fields make me pretty uncomfortable but nice to pack up info together, saves recomputation
     // TODO: can we track conflicts as they are added to save scanning configs later?
     public final var uniqueAlt: Int = 0
     //TODO no default
+    /// 
     /// Currently this is only used when we detect SLL conflict; this does
     /// not necessarily represent the ambiguous alternatives. In fact,
     /// I should also point out that this seems to include predicated alternatives
     /// that have predicates that evaluate to false. Computed in computeTargetState().
+    /// 
     internal final var conflictingAlts: BitSet?
 
     // Used in parser and lexer. In lexer, it indicates we hit a pred
@@ -47,9 +59,11 @@ public class ATNConfigSet: Hashable, CustomStringConvertible {
     public final var dipsIntoOuterContext: Bool = false
     //TODO no default
 
+    /// 
     /// Indicates that this configuration set is part of a full context
     /// LL prediction. It will be used to determine how to merge $. With SLL
     /// it's a wildcard whereas it is not for LL context merge.
+    /// 
     public final var fullCtx: Bool
 
     private var cachedHashCode: Int = -1
@@ -78,14 +92,16 @@ public class ATNConfigSet: Hashable, CustomStringConvertible {
         return try add(config, &mergeCache)
     }
 
+    /// 
     /// Adding a new config means merging contexts with existing configs for
-    /// {@code (s, i, pi, _)}, where {@code s} is the
-    /// {@link org.antlr.v4.runtime.atn.ATNConfig#state}, {@code i} is the {@link org.antlr.v4.runtime.atn.ATNConfig#alt}, and
-    /// {@code pi} is the {@link org.antlr.v4.runtime.atn.ATNConfig#semanticContext}. We use
-    /// {@code (s,i,pi)} as key.
-    ///
-    /// <p>This method updates {@link #dipsIntoOuterContext} and
-    /// {@link #hasSemanticContext} when necessary.</p>
+    /// `(s, i, pi, _)`, where `s` is the
+    /// _org.antlr.v4.runtime.atn.ATNConfig#state_, `i` is the _org.antlr.v4.runtime.atn.ATNConfig#alt_, and
+    /// `pi` is the _org.antlr.v4.runtime.atn.ATNConfig#semanticContext_. We use
+    /// `(s,i,pi)` as key.
+    /// 
+    /// This method updates _#dipsIntoOuterContext_ and
+    /// _#hasSemanticContext_ when necessary.
+    /// 
     @discardableResult
     public final func add(
         _ config: ATNConfig,
@@ -135,7 +151,9 @@ public class ATNConfigSet: Hashable, CustomStringConvertible {
     }
 
 
+    /// 
     /// Return a List holding list of configs
+    /// 
     public final func elements() -> Array<ATNConfig> {
         return configs
     }
@@ -150,13 +168,14 @@ public class ATNConfigSet: Hashable, CustomStringConvertible {
         return states
     }
 
+    /// 
     /// Gets the complete set of represented alternatives for the configuration
     /// set.
-    ///
+    /// 
     /// - returns: the set of represented alternatives in this configuration set
-    ///
-    /// -  4.3
-
+    /// 
+    /// - since: 4.3
+    /// 
     public final func getAlts() throws -> BitSet {
         let alts: BitSet = BitSet()
         let length = configs.count
@@ -291,14 +310,11 @@ public class ATNConfigSet: Hashable, CustomStringConvertible {
         return description
     }
 
-    // satisfy interface
-    //	public func toArray() -> [ATNConfig] {
-    //        return  Array( configLookup.map{$0.config}) ;
-    //	}
-
+    /// 
     /// override
     /// public <T> func toArray(a : [T]) -> [T] {
     /// return configLookup.toArray(a);
+    /// 
     private final func configHash(_ stateNumber: Int,_ context: PredictionContext?) -> Int{
 
         var hashCode: Int = MurmurHash.initialize(7)
@@ -456,9 +472,11 @@ public class ATNConfigSet: Hashable, CustomStringConvertible {
             }
 
             if !configs[i].isPrecedenceFilterSuppressed() {
+                /// 
                 /// In the future, this elimination step could be updated to also
                 /// filter the prediction context for alternatives predicting alt>1
                 /// (basically a graph subtraction algorithm).
+                /// 
                 let context: PredictionContext? = statesFromAlt1[configs[i].state.stateNumber]
                 if context != nil && context == configs[i].context {
                     // eliminated
@@ -521,14 +539,16 @@ public class ATNConfigSet: Hashable, CustomStringConvertible {
         return alts.getMinElement()
     }
 
+    /// 
     /// Walk the list of configurations and split them according to
     /// those that have preds evaluating to true/false.  If no pred, assume
     /// true pred and include in succeeded set.  Returns Pair of sets.
-    ///
+    /// 
     /// Create a new set so as not to alter the incoming parameter.
-    ///
+    /// 
     /// Assumption: the input stream has been restored to the starting point
     /// prediction, which is where predicates need to evaluate.
+    /// 
     public final func splitAccordingToSemanticValidity(
         _ outerContext: ParserRuleContext,
         _ evalSemanticContext:( SemanticContext,ParserRuleContext,Int,Bool) throws -> Bool) throws -> (ATNConfigSet, ATNConfigSet) {

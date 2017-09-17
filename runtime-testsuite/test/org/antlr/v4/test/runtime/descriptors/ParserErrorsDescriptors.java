@@ -618,4 +618,28 @@ public class ParserErrorsDescriptors {
 		public String grammar;
 
 	}
+
+	public static class ExtraneousInput extends BaseParserTestDescriptor {
+		public String input = "baa";
+		public String output = null;
+		public String errors = "line 1:0 mismatched input 'b' expecting {<EOF>, 'a'}\n";
+		public String startRule = "file";
+		public String grammarName = "T";
+
+		/**
+		 grammar T;
+
+		 member : 'a';
+		 body : member*;
+		 file : body EOF;
+		 B : 'b';
+		 */
+		@CommentHasStringValue
+		public String grammar;
+
+		@Override
+		public boolean ignore(String targetName) {
+			return !"Java".equals(targetName);
+		}
+	}
 }
