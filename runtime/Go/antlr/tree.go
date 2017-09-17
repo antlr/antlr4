@@ -69,27 +69,6 @@ func (v *BaseParseTreeVisitor) VisitChildren(node RuleNode) interface{}     { re
 func (v *BaseParseTreeVisitor) VisitTerminal(node TerminalNode) interface{} { return nil }
 func (v *BaseParseTreeVisitor) VisitErrorNode(node ErrorNode) interface{}   { return nil }
 
-// TODO
-//func (this ParseTreeVisitor) Visit(ctx) {
-//	if (Utils.isArray(ctx)) {
-//		self := this
-//		return ctx.map(function(child) { return VisitAtom(self, child)})
-//	} else {
-//		return VisitAtom(this, ctx)
-//	}
-//}
-//
-//func VisitAtom(Visitor, ctx) {
-//	if (ctx.parser == nil) { //is terminal
-//		return
-//	}
-//
-//	name := ctx.parser.ruleNames[ctx.ruleIndex]
-//	funcName := "Visit" + Utils.titleCase(name)
-//
-//	return Visitor[funcName](ctx)
-//}
-
 type ParseTreeListener interface {
 	VisitTerminal(node TerminalNode)
 	VisitErrorNode(node ErrorNode)

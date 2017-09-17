@@ -16,7 +16,7 @@ import (
 	"reflect"
 	"strconv"
 
-	"github.com/antlr/antlr4/runtime/Go/antlr"
+	"github.com/cyberfox/antlr4/runtime/Go/antlr"
 )
 
 <if(namedActions.header)>
@@ -45,7 +45,7 @@ package <file.genPackage> // <file.grammarName>
 package parser // <file.grammarName>
 <endif>
 
-import "github.com/antlr/antlr4/runtime/Go/antlr"
+import "github.com/cyberfox/antlr4/runtime/Go/antlr"
 
 // <file.grammarName>Listener is a complete listener for a parse tree produced by <file.parserName>.
 type <file.grammarName>Listener interface {
@@ -69,7 +69,7 @@ package <file.genPackage> // <file.grammarName>
 package parser // <file.grammarName>
 <endif>
 
-import "github.com/antlr/antlr4/runtime/Go/antlr"
+import "github.com/cyberfox/antlr4/runtime/Go/antlr"
 
 // Base<file.grammarName>Listener is a complete listener for a parse tree produced by <file.parserName>.
 type Base<file.grammarName>Listener struct{}
@@ -105,7 +105,7 @@ package <file.genPackage> // <file.grammarName>
 package parser // <file.grammarName>
 <endif>
 
-import "github.com/antlr/antlr4/runtime/Go/antlr"
+import "github.com/cyberfox/antlr4/runtime/Go/antlr"
 <if(header)>
 
 <header>
@@ -114,6 +114,15 @@ import "github.com/antlr/antlr4/runtime/Go/antlr"
 // A complete Visitor for a parse tree produced by <file.parserName>.
 type <file.grammarName>Visitor interface {
 	antlr.ParseTreeVisitor
+
+	// Provide the default result that will be returned from GetChildren (default: nil)
+	DefaultResult() interface{}
+
+	// Decide if we should continue visiting the rule nodes, based on the result so far.
+	ShouldVisitNextChild(node antlr.RuleNode, resultSoFar interface{}) bool
+
+	// Given the results found in the children so far, and the new result, determine the new result value.
+	AggregateResult(resultSoFar interface{}, childResult interface{}) interface{}
 
 <file.visitorNames:{lname |
 	// Visit a parse tree produced by <file.parserName>#<lname>.
@@ -131,10 +140,69 @@ package <file.genPackage> // <file.grammarName>
 package parser // <file.grammarName>
 <endif>
 
-import "github.com/antlr/antlr4/runtime/Go/antlr"
+import "github.com/cyberfox/antlr4/runtime/Go/antlr"
 
 type Base<file.grammarName>Visitor struct {
 	*antlr.BaseParseTreeVisitor
+	super <file.grammarName>Visitor
+}
+
+func (v *Base<file.grammarName>Visitor) SetSuper(newSuper <file.grammarName>Visitor) {
+	v.super = newSuper
+}
+
+func (v *Base<file.grammarName>Visitor) DefaultResult() interface{} {
+	return nil
+}
+
+func (v *Base<file.grammarName>Visitor) ShouldVisitNextChild(node antlr.RuleNode, resultSoFar interface{}) bool {
+	return true
+}
+
+func (v *Base<file.grammarName>Visitor) AggregateResult(resultSoFar, childResult interface{}) interface{} {
+	return childResult
+}
+
+func (v *Base<file.grammarName>Visitor) VisitChildren(node antlr.RuleNode) interface{} {
+	var result interface{} = nil
+
+	if v.super != nil {
+		result = v.super.DefaultResult()
+	}
+
+	for i := 0; i \< node.GetChildCount(); i++ {
+		if v.super != nil {
+			doNextChild := v.super.ShouldVisitNextChild(node, result)
+			if(!doNextChild) { break }
+		}
+
+		child := node.GetChild(i)
+		ruleChild, ok := child.(antlr.RuleNode)
+		if !ok {
+			terminalChild, ok := child.(antlr.TerminalNode)
+			if ok {
+				childResult := v.VisitTerminal(terminalChild)
+				if v.super != nil {
+					result = v.super.AggregateResult(result, childResult)
+				} else {
+					result = childResult
+				}
+			} else {
+				errChild, ok := child.(antlr.ErrorNode)
+				if ok {
+					v.VisitErrorNode(errChild)
+				}
+			}
+		} else {
+			if v.super != nil {
+			        childResult := ruleChild.Accept(v.super)
+			        result = v.super.AggregateResult(result, childResult)
+			} else {
+			        result = ruleChild.Accept(v)
+			}
+		}
+	}
+	return result
 }
 
 <file.visitorNames:{lname |
@@ -1347,7 +1415,7 @@ import (
 	"fmt"
 	"unicode"
 
-	"github.com/antlr/antlr4/runtime/Go/antlr"
+	"github.com/cyberfox/antlr4/runtime/Go/antlr"
 )
 <if(namedActions.header)>
 
