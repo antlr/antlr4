@@ -12,17 +12,15 @@ import org.junit.Test;
 
 public class TestSimpleIntMap {
 
-  private List<int[]> fuzzLists = new ArrayList<>(10000);
-
   public TestSimpleIntMap() {
     createFuzzingLists();
   }
 
   @Test
   public void initializesCorrectly() {
-    // Check first 10K initial sizes.
-    for (int i=1; i < 10000; i++ ) {
-      SimpleIntMap<String> im = new SimpleIntMap<>(1);
+    // Check first 1K initial sizes.
+    for (int i=1; i < 1000; i++ ) {
+      SimpleIntMap<String> im = new SimpleIntMap<>(i);
       checkSize(im, 0);
     }
   }
@@ -36,7 +34,7 @@ public class TestSimpleIntMap {
       im = new SimpleIntMap<>(Integer.MAX_VALUE);
       im = new SimpleIntMap<>(Integer.MIN_VALUE);
       im = new SimpleIntMap<>(1 << 29 + 1);
-      Assert.fail("Illegal size could have thrown an exception.");
+      Assert.fail("Illegal size should have thrown an exception.");
     } catch (RuntimeException e) {
       // Nothing to do
     }
@@ -44,7 +42,7 @@ public class TestSimpleIntMap {
 
   @Test
   public void expandsCorrectly() {
-    // Create maps with differnt sizes and add size * 10 elements to each.
+    // Create maps with different sizes and add size * 10 elements to each.
     for (int i=1; i < 100; i++ ) {
       SimpleIntMap<String> im = new SimpleIntMap<>(i);
       // Insert i * 10 elements to each and confirm sizes
@@ -52,7 +50,10 @@ public class TestSimpleIntMap {
       for (int j=0; j< elements; j++) {
         im.put(j, "" + j);
       }
-      checkSize(im, elements);
+			for (int j=0; j< elements; j++) {
+				Assert.assertEquals(im.get(j), "" + j);
+			}
+			checkSize(im, elements);
     }
   }
 
@@ -74,6 +75,7 @@ public class TestSimpleIntMap {
 
   @Test
   public void survivesSimpleFuzzing() {
+		List<int[]> fuzzLists = createFuzzingLists();
     for (int[] arr : fuzzLists) {
       SimpleIntMap<String> im = new SimpleIntMap<>();
       for (int i=0; i<arr.length; i++) {
@@ -91,7 +93,8 @@ public class TestSimpleIntMap {
     }
   }
 
-  private void createFuzzingLists() {
+  private List<int[]> createFuzzingLists() {
+		List<int[]> fuzzLists = new ArrayList<>(5000);
     int maxListSize = 300;
     Random r = new Random(0xBEEFCAFE);
     // Random sized lists with values in [0..n] shuffled.
@@ -125,6 +128,7 @@ public class TestSimpleIntMap {
       shuffle(arr);
       fuzzLists.add(arr);
     }
+    return fuzzLists;
   }
 
   private void checkSpanInsertions(SimpleIntMap<String> im, int start, int end) {
@@ -165,11 +169,11 @@ public class TestSimpleIntMap {
 		assertTrue((m.capacity() & (m.capacity() - 1)) == 0);
 	}
 
-  // Fisher yates shuffle
+	// Fisher yates shuffle
   private static void shuffle(int[] array)
   {
     int index, temp;
-    Random random = new Random();
+    Random random = new Random(0xCAFEBABE);
     for (int i = array.length - 1; i > 0; i--)
     {
       index = random.nextInt(i + 1);

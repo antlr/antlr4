@@ -18,11 +18,10 @@ import java.util.List;
  */
 public final class SimpleIntMap<T> {
 
-	private static final int DEFAULT_INITIAL_CAPACITY = 8;
+	private static final int DEFAULT_INITIAL_CAPACITY = 4;
 	/**
 	 * Capacity of the map is expanded when size reaches to
-	 * capacity * LOAD_FACTOR. This value is selected to fit
-	 * max 5 elements to 8 and 10 elements to a 16 sized map.
+	 * capacity * LOAD_FACTOR.
 	 */
 	private static final float LOAD_FACTOR = 0.65f;
 
@@ -44,8 +43,7 @@ public final class SimpleIntMap<T> {
 	/**
 	 * Map capacity is always a power of 2. With this property,
 	 * integer modulo operation (key % capacity) can be replaced with
-	 * (key & (capacity - 1))
-	 * We keep (capacity - 1) value in this variable.
+	 * (key & (capacity - 1)). We keep (capacity - 1) value in this variable.
 	 */
 	private int modulo;
 
@@ -201,11 +199,10 @@ public final class SimpleIntMap<T> {
 		return (int) size;
 	}
 
-
 	/**
 	 * Expands backing arrays by doubling their capacity.
 	 */
-     private void expand() {
+  private void expand() {
 		int capacity = newCapacity();
 		SimpleIntMap<T> h = new SimpleIntMap<>(capacity);
 		for (int i = 0; i < keys.length; i++) {
