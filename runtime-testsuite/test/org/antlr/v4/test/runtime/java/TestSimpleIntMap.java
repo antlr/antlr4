@@ -12,10 +12,6 @@ import org.junit.Test;
 
 public class TestSimpleIntMap {
 
-  public TestSimpleIntMap() {
-    createFuzzingLists();
-  }
-
   @Test
   public void initializesCorrectly() {
     // Check first 1K initial sizes.
@@ -170,8 +166,7 @@ public class TestSimpleIntMap {
 	}
 
 	// Fisher yates shuffle
-  private static void shuffle(int[] array)
-  {
+  private static void shuffle(int[] array) {
     int index, temp;
     Random random = new Random(0xCAFEBABE);
     for (int i = array.length - 1; i > 0; i--)
