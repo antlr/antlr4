@@ -393,6 +393,31 @@ public class LeftRecursionDescriptors {
 		public String output = "(s (e new (typespec T) [ (e (e ( (e (e ( (e (e n) - (e 1)) )) * (e x)) )) + (e 1)) ]) <EOF>)\n";
 	}
 
+	public static class ListLabelsOnRuleRefStartOfAlt extends BaseParserTestDescriptor {
+		public String input = "a and b";
+		public String output = "";
+		public String errors = null;
+		public String startRule = "expression";
+		public String grammarName = "Test";
+
+		/**
+		 grammar Test;
+
+		 expression: op=NOT args+=expression
+		           | args+=expression (op=AND args+=expression)+
+		           | args+=expression (op=OR args+=expression)+
+		           | IDENTIFIER
+		           ;
+		 AND : 'and' ;
+		 OR : 'or' ;
+		 NOT : 'not' ;
+		 IDENTIFIER : [a-zA-Z_][a-zA-Z0-9_]* ;
+		 WS : [ \t\r\n]+ -> skip ;
+		 */
+		@CommentHasStringValue
+		public String grammar;
+	}
+
 	public static abstract class LabelsOnOpSubrule extends BaseParserTestDescriptor {
 		public String errors = null;
 		public String startRule = "s";
