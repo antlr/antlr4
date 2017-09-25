@@ -165,6 +165,7 @@ YYYY/MM/DD, github id, Full name, email
 2017/08/29, Eddy Reyes, eddy@mindsight.io
 2017/09/09, brauliobz, Bráulio Bezerra, brauliobezerra@gmail.com
 2017/09/11, sachinjain024, Sachin Jain, sachinjain024@gmail.com
+2017/09/25, kaedvann, Rostislav Listerenko, r.listerenko@gmail.com
 2017/10/06, bramp, Andrew Brampton, brampton@gmail.com
 2017/10/15, simkimsia, Sim Kim Sia, kimcity@gmail.com
 2017/10/27, Griffon26, Maurice van der Pot, griffon26@kfk4ever.com

@@ -8,7 +8,7 @@ xbuild /p:Configuration=Release Antlr4.mono.sln
 # Build a .NET core DLL using the `dotnet` cli from microsoft
 echo "Step 2: Building .NET Core DLL"
 dotnet restore Antlr4.dotnet.sln
-dotnet build -c Release Antlr4.dotnet.sln
+dotnet build -c Release -f netstandard1.3 Antlr4.dotnet.sln
 
 echo "Step 3: Packaging both DLLs into a single nuget package"
 nuget pack Package.nuspec
