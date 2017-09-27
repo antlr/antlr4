@@ -36,7 +36,7 @@ public class LexerActionExecutor: Hashable {
     public init(_ lexerActions: [LexerAction]) {
         self.lexerActions = lexerActions
 
-        var hash: Int = MurmurHash.initialize()
+        var hash = MurmurHash.initialize()
         for lexerAction: LexerAction in lexerActions {
             hash = MurmurHash.update(hash, lexerAction)
         }

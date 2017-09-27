@@ -97,12 +97,11 @@ public class SemanticContext: Hashable, CustomStringConvertible {
 
         override
         public var hashValue: Int {
-            var hashCode: Int = MurmurHash.initialize()
+            var hashCode = MurmurHash.initialize()
             hashCode = MurmurHash.update(hashCode, ruleIndex)
             hashCode = MurmurHash.update(hashCode, predIndex)
             hashCode = MurmurHash.update(hashCode, isCtxDependent ? 1 : 0)
-            hashCode = MurmurHash.finish(hashCode, 3)
-            return hashCode
+            return MurmurHash.finish(hashCode, 3)
         }
 
 

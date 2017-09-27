@@ -124,10 +124,9 @@ public class DFAState: Hashable, CustomStringConvertible {
 
 
     public var hashValue: Int {
-        var hash: Int = MurmurHash.initialize(7)
+        var hash = MurmurHash.initialize(7)
         hash = MurmurHash.update(hash, configs.hashValue)
-        hash = MurmurHash.finish(hash, 1)
-        return hash
+        return MurmurHash.finish(hash, 1)
     }
 
     /// 
