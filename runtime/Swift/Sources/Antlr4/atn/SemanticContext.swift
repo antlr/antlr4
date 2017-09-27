@@ -187,15 +187,13 @@ public class SemanticContext: Hashable, CustomStringConvertible {
 
         public init(_ a: SemanticContext, _ b: SemanticContext) {
             var operands: Set<SemanticContext> = Set<SemanticContext>()
-            if a is AND {
-                operands.formUnion((a as! AND).opnds)
-                //operands.addAll(Arrays.asList((a as AND).opnds));
+            if let aAnd = a as? AND {
+                operands.formUnion(aAnd.opnds)
             } else {
                 operands.insert(a)
             }
-            if b is AND {
-                operands.formUnion((b as! AND).opnds)
-                //operands.addAll(Arrays.asList((b as AND).opnds));
+            if let bAnd = b as? AND {
+                operands.formUnion(bAnd.opnds)
             } else {
                 operands.insert(b)
             }
@@ -305,15 +303,13 @@ public class SemanticContext: Hashable, CustomStringConvertible {
 
         public init(_ a: SemanticContext, _ b: SemanticContext) {
             var operands: Set<SemanticContext> = Set<SemanticContext>()
-            if a is OR {
-                operands.formUnion((a as! OR).opnds)
-                // operands.addAll(Arrays.asList((a as OR).opnds));
+            if let aOr = a as? OR {
+                operands.formUnion(aOr.opnds)
             } else {
                 operands.insert(a)
             }
-            if b is OR {
-                operands.formUnion((b as! OR).opnds)
-                //operands.addAll(Arrays.asList((b as OR).opnds));
+            if let bOr = b as? OR {
+                operands.formUnion(bOr.opnds)
             } else {
                 operands.insert(b)
             }
