@@ -238,12 +238,9 @@ public class ATNConfigSet: Hashable, CustomStringConvertible {
     private var configsHashValue: Int {
         var hashCode = 1
         for item in configs {
-            hashCode = Int.multiplyWithOverflow(3, hashCode).0
-            hashCode = Int.addWithOverflow(hashCode, item.hashValue).0
-
+            hashCode = hashCode &* 3 &+ item.hashValue
         }
         return hashCode
-
     }
 
     public final var count: Int {

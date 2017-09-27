@@ -61,7 +61,7 @@ extension String {
         let start = characters.index(startIndex, offsetBy: integerRange.lowerBound)
         let end = characters.index(startIndex, offsetBy: integerRange.upperBound)
         let range = start ..< end
-        return self[range]
+        return String(self[range])
     }
 }
 
