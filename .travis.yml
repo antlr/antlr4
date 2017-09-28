@@ -67,42 +67,42 @@ matrix:
             - clang-3.7
     - os: osx
       compiler: clang
-      osx_image: xcode8.1
+      osx_image: xcode9
       env:
         - TARGET=cpp
         - GROUP=LEXER
       stage: extended-test
     - os: osx
       compiler: clang
-      osx_image: xcode8.1
+      osx_image: xcode9
       env:
         - TARGET=cpp
         - GROUP=PARSER
       stage: extended-test
     - os: osx
       compiler: clang
-      osx_image: xcode8.1
+      osx_image: xcode9
       env:
         - TARGET=cpp
         - GROUP=RECURSION
       stage: extended-test
     - os: osx
       compiler: clang
-      osx_image: xcode8.1
+      osx_image: xcode9
       env:
         - TARGET=swift
         - GROUP=LEXER
       stage: main-test
     - os: osx
       compiler: clang
-      osx_image: xcode8.1
+      osx_image: xcode9
       env:
         - TARGET=swift
         - GROUP=PARSER
       stage: main-test
     - os: osx
       compiler: clang
-      osx_image: xcode8.1
+      osx_image: xcode9
       env:
         - TARGET=swift
         - GROUP=RECURSION
@@ -114,19 +114,19 @@ matrix:
        - GROUP=ALL
       stage: extended-test
     - os: osx
-      osx_image: xcode8.2
+      osx_image: xcode9
       env:
         - TARGET=dotnet
         - GROUP=LEXER
       stage: extended-test
     - os: osx
-      osx_image: xcode8.2
+      osx_image: xcode9
       env:
         - TARGET=dotnet
         - GROUP=PARSER
       stage: extended-test
     - os: osx
-      osx_image: xcode8.2
+      osx_image: xcode9
       env:
         - TARGET=dotnet
         - GROUP=RECURSION
@@ -194,7 +194,7 @@ matrix:
       stage: main-test
 
 before_install:
-  - ./.travis/before-install-$TRAVIS_OS_NAME-$TARGET.sh
+  - f="./.travis/before-install-$TRAVIS_OS_NAME-$TARGET.sh"; ! [ -x "$f" ] || "$f"
 
 script:
   - cd runtime-testsuite; travis_wait 40 ../.travis/run-tests-$TARGET.sh
