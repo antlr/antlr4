@@ -24,8 +24,8 @@ class TokenTagToken(CommonToken):
     #
     def __init__(self, tokenName, type, label=None):
         super(TokenTagToken, self).__init__(type=type)
-        self.tokenName = tokenName
-        self.label = label
+        self.tokenName = unicode(tokenName)
+        self.label = unicode(label)
         self._text = self.getText()
 
     #
@@ -36,9 +36,9 @@ class TokenTagToken(CommonToken):
     #
     def getText(self):
         if self.label is None:
-            return "<" + self.tokenName + ">"
+            return u"<" + self.tokenName + u">"
         else:
-            return "<" + self.label + ":" + self.tokenName + ">"
+            return u"<" + self.label + u":" + self.tokenName + u">"
 
     # <p>The implementation for {@link TokenTagToken} returns a string of the form
     # {@code tokenName:type}.</p>
