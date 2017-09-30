@@ -110,7 +110,7 @@ matrix:
       jdk: oraclejdk8
       env: TARGET=java
     - os: linux
-      jdk: oraclejdk7
+      jdk: oraclejdk8
       env: TARGET=csharp
     - os: linux
       jdk: oraclejdk8
@@ -131,10 +131,10 @@ matrix:
         - TARGET=dotnet
         - GROUP=RECURSION
     - os: linux
-      jdk: oraclejdk7
+      jdk: oraclejdk8
       env: TARGET=python2
     - os: linux
-      jdk: oraclejdk7
+      jdk: oraclejdk8
       env: TARGET=python3
       addons:
         apt:
@@ -143,7 +143,7 @@ matrix:
           packages:
             - python3.5
     - os: linux
-      jdk: oraclejdk7
+      jdk: oraclejdk8
       env: TARGET=javascript
     - os: linux
       jdk: oraclejdk7
