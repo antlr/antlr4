@@ -7,3 +7,13 @@ import PackageDescription
 let package = Package(
     name: "Antlr4"
 )
+
+products.append(
+    Product(
+        name: "Antlr4",
+        type: .Library(.Dynamic),
+        modules: [
+            "Antlr4"
+        ]
+    )
+)

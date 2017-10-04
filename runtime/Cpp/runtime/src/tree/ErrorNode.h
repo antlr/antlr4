@@ -11,6 +11,8 @@ namespace antlr4 {
 namespace tree {
 
   class ANTLR4CPP_PUBLIC ErrorNode : public virtual TerminalNode {
+  public:
+    ~ErrorNode() override;
   };
 
 } // namespace tree

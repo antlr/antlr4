@@ -17,6 +17,9 @@ DFASerializer::DFASerializer(const DFA *dfa, const std::vector<std::string>& tok
 DFASerializer::DFASerializer(const DFA *dfa, const Vocabulary &vocabulary) : _dfa(dfa), _vocabulary(vocabulary) {
 }
 
+DFASerializer::~DFASerializer() {
+}
+
 std::string DFASerializer::toString() const {
   if (_dfa->s0 == nullptr) {
     return "";

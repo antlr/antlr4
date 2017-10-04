@@ -144,3 +144,15 @@ YYYY/MM/DD, github id, Full name, email
 2017/03/15, robertvanderhulst, Robert van der Hulst, robert@xsharp.eu
 2017/03/28, cmd-johnson, Jonas Auer, jonas.auer.94@gmail.com
 2017/04/12, lys0716, Yishuang Lu, luyscmu@gmail.com
+2017/04/30, shravanrn, Shravan Narayan, shravanrn@gmail.com
+2017/05/11, jimallman, Jim Allman, jim@ibang.com
+2017/05/26, waf, Will Fuqua, wafuqua@gmail.com
+2017/05/29, kosak, Corey Kosak, kosak@kosak.com
+2017/06/11, erikbra, Erik A. Brandstadmoen, erik@brandstadmoen.net
+2017/06/10, jm-mikkelsen, Jan Martin Mikkelsen, janm@transactionware.com
+2017/06/25, alimg, Alim Gökkaya, alim.gokkaya@gmail.com
+2017/07/09, neatnerd, Mike Arshinskiy, neatnerd@users.noreply.github.com
+2017/07/11, dhalperi, Daniel Halperin, daniel@halper.in
+2017/07/17, vaibhavaingankar09, Vaibhav Vaingankar, vbhvvaingankar9@gmail.com
+2017/07/23, venkatperi, Venkat Peri, venkatperi@gmail.com
+2017/07/27, shirou, WAKAYAMA Shirou, shirou.faw@gmail.com

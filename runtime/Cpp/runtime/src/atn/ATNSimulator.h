@@ -20,7 +20,7 @@ namespace atn {
     const ATN &atn;
 
     ATNSimulator(const ATN &atn, PredictionContextCache &sharedContextCache);
-    virtual ~ATNSimulator() {};
+    virtual ~ATNSimulator();
 
     virtual void reset() = 0;
 

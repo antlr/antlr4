@@ -51,6 +51,8 @@
 
 #include "atn/ATNDeserializer.h"
 
+#include <string>
+
 using namespace antlr4;
 using namespace antlr4::atn;
 using namespace antlrcpp;
@@ -106,6 +108,9 @@ ATNDeserializer::ATNDeserializer(): ATNDeserializer(ATNDeserializationOptions::g
 }
 
 ATNDeserializer::ATNDeserializer(const ATNDeserializationOptions& dso): deserializationOptions(dso) {
+}
+
+ATNDeserializer::~ATNDeserializer() {
 }
 
 /**
@@ -747,6 +752,7 @@ Ref<LexerAction> ATNDeserializer::lexerActionFactory(LexerActionType type, int d
       return std::make_shared<LexerTypeAction>(data1);
 
     default:
-      throw IllegalArgumentException("The specified lexer action type " + std::to_string((size_t)type) + " is not valid.");
+      throw IllegalArgumentException("The specified lexer action type " + std::to_string(static_cast<size_t>(type)) +
+                                     " is not valid.");
   }
 }

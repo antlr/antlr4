@@ -1092,7 +1092,10 @@ nextTransition_continue: ;
         protected internal Guid ReadUUID()
         {
 			byte[] d = BitConverter.GetBytes (ReadLong ());
-			Array.Reverse(d);
+			if(BitConverter.IsLittleEndian)
+			{
+				Array.Reverse(d);
+			}
 			short c = (short)ReadInt();
 			short b = (short)ReadInt();
 			int a = ReadInt32();

@@ -28,8 +28,8 @@ FailedPredicateException::FailedPredicateException(Parser *recognizer, const std
   atn::ATNState *s = recognizer->getInterpreter<atn::ATNSimulator>()->atn.states[recognizer->getState()];
   atn::Transition *transition = s->transitions[0];
   if (is<atn::PredicateTransition*>(transition)) {
-    _ruleIndex = ((atn::PredicateTransition *)transition)->ruleIndex;
-    _predicateIndex = ((atn::PredicateTransition *)transition)->predIndex;
+    _ruleIndex = static_cast<atn::PredicateTransition *>(transition)->ruleIndex;
+    _predicateIndex = static_cast<atn::PredicateTransition *>(transition)->predIndex;
   } else {
     _ruleIndex = 0;
     _predicateIndex = 0;

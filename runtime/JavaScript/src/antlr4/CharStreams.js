@@ -18,7 +18,7 @@ var fs = isNodeJs ? require("fs") : null;
 var CharStreams = {
   // Creates an InputStream from a string.
   fromString: function(str) {
-    return InputStream(str, true);
+    return new InputStream(str, true);
   },
 
   // Asynchronously creates an InputStream from a blob given the
@@ -30,7 +30,7 @@ var CharStreams = {
   fromBlob: function(blob, encoding, onLoad, onError) {
     var reader = FileReader();
     reader.onload = function(e) {
-      var is = InputStream(e.target.result, true);
+      var is = new InputStream(e.target.result, true);
       onLoad(is);
     };
     reader.onerror = onError;
@@ -41,7 +41,7 @@ var CharStreams = {
   // encoding of the bytes in that buffer (defaults to 'utf8' if
   // encoding is null).
   fromBuffer: function(buffer, encoding) {
-    return InputStream(buffer.toString(encoding), true);
+    return new InputStream(buffer.toString(encoding), true);
   },
 
   // Asynchronously creates an InputStream from a file on disk given
@@ -53,7 +53,7 @@ var CharStreams = {
     fs.readFile(path, encoding, function(err, data) {
       var is = null;
       if (data !== null) {
-        is = InputStream(data, true);
+        is = new InputStream(data, true);
       }
       callback(err, is);
     });
@@ -64,7 +64,7 @@ var CharStreams = {
   // 'utf8' if encoding is null).
   fromPathSync: function(path, encoding) {
     var data = fs.readFileSync(path, encoding);
-    return InputStream(data, true);
+    return new InputStream(data, true);
   }
 };
 

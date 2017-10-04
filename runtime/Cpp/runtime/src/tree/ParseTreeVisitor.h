@@ -20,7 +20,7 @@ namespace tree {
   // ml: no template parameter here, to avoid the need for virtual template functions. Instead we have our Any class.
   class ANTLR4CPP_PUBLIC ParseTreeVisitor {
   public:
-    virtual ~ParseTreeVisitor() {}
+    virtual ~ParseTreeVisitor();
 
     /// <summary>
     /// Visit a parse tree, and return a user-defined result of the operation.

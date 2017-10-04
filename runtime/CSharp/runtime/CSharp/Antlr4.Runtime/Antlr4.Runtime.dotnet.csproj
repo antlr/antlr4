@@ -1,16 +1,27 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <VersionPrefix>4.7</VersionPrefix>
+    <Company>The ANTLR Organization</Company>
+    <Version>4.7.1</Version>
     <TargetFramework>netstandard1.3</TargetFramework>
     <DefineConstants>$(DefineConstants);DOTNETCORE;NET35PLUS;NET40PLUS;NET45PLUS</DefineConstants>
     <NoWarn>$(NoWarn);CS1591;CS1574;CS1580</NoWarn>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <AssemblyName>Antlr4.Runtime.Standard</AssemblyName>
+    <AssemblyName>Antlr4.Runtime.Core</AssemblyName>
     <AssemblyOriginatorKeyFile>../../Antlr4.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
-    <PackageId>Antlr4.Runtime.Standard</PackageId>
+    <PackageId>Antlr4.Runtime.Core</PackageId>
+    <Title>ANTLR 4 .NET Core Runtime</Title>
+    <Authors>Eric Vergnaud, Terence Parr, Sam Harwell</Authors>
+    <Description>The .NET Core C# ANTLR 4 runtime from the ANTLR Organization</Description>
+    <Copyright>Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.</Copyright>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageLicenseUrl>https://github.com/antlr/antlr4/blob/master/LICENSE.txt</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/antlr/antlr4</PackageProjectUrl>
+    <PackageIconUrl>https://raw.github.com/antlr/website-antlr4/master/images/icons/antlr.png</PackageIconUrl>
+    <PackageReleaseNotes>https://github.com/antlr/antlr4/releases</PackageReleaseNotes>
+    <PackageTags>antlr parsing grammar</PackageTags>
     <NetStandardImplicitPackageVersion>1.6.1</NetStandardImplicitPackageVersion>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
     <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
@@ -21,6 +32,16 @@
     <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
     <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
     <GenerateAssemblyInformationalVersionAttribute>false</GenerateAssemblyInformationalVersionAttribute>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>lib\Debug</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <Optimize>true</Optimize>
+    <OutputPath>lib\Release</OutputPath>
   </PropertyGroup>
 
 </Project>

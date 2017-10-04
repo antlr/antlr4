@@ -21,14 +21,13 @@ namespace antlrcpp {
   // Using RAII + a lambda to implement a "finally" replacement.
   struct FinalAction {
     FinalAction(std::function<void ()> f) : _cleanUp { f } {}
-    FinalAction(FinalAction &&other) {
-      _cleanUp = other._cleanUp;
-      _enabled = other._enabled;
+    FinalAction(FinalAction &&other) :
+	_cleanUp(std::move(other._cleanUp)), _enabled(other._enabled) {
       other._enabled = false; // Don't trigger the lambda after ownership has moved.
     }
     ~FinalAction() { if (_enabled) _cleanUp(); }
 
-    void disable() { _enabled = false; };
+    void disable() { _enabled = false; }
   private:
     std::function<void ()> _cleanUp;
     bool _enabled {true};
@@ -52,7 +51,7 @@ namespace antlrcpp {
     std::stringstream ss;
     // typeid gives the mangled class name, but that's all what's possible
     // in a portable way.
-    ss << typeid(o).name() << "@" << std::hex << (size_t)&o;
+    ss << typeid(o).name() << "@" << std::hex << reinterpret_cast<uintptr_t>(&o);
     return ss.str();
   }
 

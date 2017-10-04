@@ -27,7 +27,7 @@ namespace antlr4 {
   /// </summary>
   class ANTLR4CPP_PUBLIC IntStream {
   public:
-    static const size_t EOF = (size_t)-1;
+    static const size_t EOF = static_cast<size_t>(-1); // std::numeric_limits<size_t>::max(); doesn't work in VS 2013
 
     /// The value returned by <seealso cref="#LA LA()"/> when the end of the stream is
     /// reached.
@@ -40,7 +40,7 @@ namespace antlr4 {
     /// </summary>
     static const std::string UNKNOWN_SOURCE_NAME;
 
-    virtual ~IntStream() {};
+    virtual ~IntStream();
 
     /// <summary>
     /// Consumes the current symbol in the stream. This method has the following

@@ -51,7 +51,7 @@ This is just a quick start. The tool has many useful options to control generati
 
 The Antlr 4 standard runtime for C# is now available from NuGet.
 We trust that you know how to do add NuGet references to your project :-).
-The package id is Antlr.4.Runtime. We do not support other packages.
+The package id is Antlr4.Runtime.Standard. We do not support other packages.
 
 
 ### Step 6: You're done!

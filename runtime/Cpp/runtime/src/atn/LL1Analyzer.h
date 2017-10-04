@@ -22,7 +22,7 @@ namespace atn {
     const atn::ATN &_atn;
 
     LL1Analyzer(const atn::ATN &atn);
-    virtual ~LL1Analyzer() {};
+    virtual ~LL1Analyzer();
 
     /// <summary>
     /// Calculates the SLL(1) expected lookahead set for each outgoing transition

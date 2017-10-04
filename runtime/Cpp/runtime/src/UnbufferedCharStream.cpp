@@ -52,7 +52,7 @@ void UnbufferedCharStream::sync(size_t want) {
 
 size_t UnbufferedCharStream::fill(size_t n) {
   for (size_t i = 0; i < n; i++) {
-    if (_data.size() > 0 && _data.back() == (uint32_t)EOF) {
+    if (_data.size() > 0 && _data.back() == 0xFFFF) {
       return i;
     }
 
@@ -89,23 +89,23 @@ size_t UnbufferedCharStream::LA(ssize_t i) {
   }
 
   // We can look back only as many chars as we have buffered.
-  ssize_t index = (ssize_t)_p + i - 1;
+  ssize_t index = static_cast<ssize_t>(_p) + i - 1;
   if (index < 0) {
     throw IndexOutOfBoundsException();
   }
 
   if (i > 0) {
-    sync((size_t)i); // No need to sync if we look back.
+    sync(static_cast<size_t>(i)); // No need to sync if we look back.
   }
-  if ((size_t)index >= _data.size()) {
+  if (static_cast<size_t>(index) >= _data.size()) {
     return EOF;
   }
 
-  if (_data[(size_t)index] == (uint32_t)EOF) {
+  if (_data[static_cast<size_t>(index)] == 0xFFFF) {
     return EOF;
   }
 
-  return _data[(size_t)index];
+  return _data[static_cast<size_t>(index)];
 }
 
 ssize_t UnbufferedCharStream::mark() {
@@ -113,13 +113,13 @@ ssize_t UnbufferedCharStream::mark() {
     _lastCharBufferStart = _lastChar;
   }
 
-  ssize_t mark = -(ssize_t)_numMarkers - 1;
+  ssize_t mark = -static_cast<ssize_t>(_numMarkers) - 1;
   _numMarkers++;
   return mark;
 }
 
 void UnbufferedCharStream::release(ssize_t marker) {
-  ssize_t expectedMark = -(ssize_t)_numMarkers;
+  ssize_t expectedMark = -static_cast<ssize_t>(_numMarkers);
   if (marker != expectedMark) {
     throw IllegalStateException("release() called with an invalid marker.");
   }
@@ -147,16 +147,16 @@ void UnbufferedCharStream::seek(size_t index) {
   }
 
   // index == to bufferStartIndex should set p to 0
-  ssize_t i = (ssize_t)index - (ssize_t)getBufferStartIndex();
+  ssize_t i = static_cast<ssize_t>(index) - static_cast<ssize_t>(getBufferStartIndex());
   if (i < 0) {
     throw IllegalArgumentException(std::string("cannot seek to negative index ") + std::to_string(index));
-  } else if (i >= (ssize_t)_data.size()) {
+  } else if (i >= static_cast<ssize_t>(_data.size())) {
     throw UnsupportedOperationException("Seek to index outside buffer: " + std::to_string(index) +
                                         " not in " + std::to_string(getBufferStartIndex()) + ".." +
                                         std::to_string(getBufferStartIndex() + _data.size()));
   }
 
-  _p = (size_t)i;
+  _p = static_cast<size_t>(i);
   _currentCharIndex = index;
   if (_p == 0) {
     _lastChar = _lastCharBufferStart;
@@ -189,13 +189,13 @@ std::string UnbufferedCharStream::getText(const misc::Interval &interval) {
     }
   }
 
-  if (interval.a < (ssize_t)bufferStartIndex || interval.b >= ssize_t(bufferStartIndex + _data.size())) {
+  if (interval.a < static_cast<ssize_t>(bufferStartIndex) || interval.b >= ssize_t(bufferStartIndex + _data.size())) {
     throw UnsupportedOperationException("interval " + interval.toString() + " outside buffer: " +
       std::to_string(bufferStartIndex) + ".." + std::to_string(bufferStartIndex + _data.size() - 1));
   }
   // convert from absolute to local index
   size_t i = interval.a - bufferStartIndex;
-  return utfConverter.to_bytes(_data.substr(i, interval.length()));
+  return utf32_to_utf8(_data.substr(i, interval.length()));
 }
 
 size_t UnbufferedCharStream::getBufferStartIndex() const {

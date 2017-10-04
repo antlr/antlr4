@@ -25,6 +25,8 @@ namespace atn {
     RuleTransition(RuleStartState *ruleStart, size_t ruleIndex, ATNState *followState);
 
     RuleTransition(RuleStartState *ruleStart, size_t ruleIndex, int precedence, ATNState *followState);
+    RuleTransition(RuleTransition const&) = delete;
+    RuleTransition& operator=(RuleTransition const&) = delete;
 
     virtual SerializationType getSerializationType() const override;
 

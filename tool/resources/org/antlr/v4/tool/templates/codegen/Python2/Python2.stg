@@ -167,16 +167,16 @@ class <parser.name> ( <if(superClass)><superClass><else>Parser<endif> ):
 dumpActions(recog, argFuncs, actionFuncs, sempredFuncs) ::= <<
 <if(actionFuncs)>
 def action(self, localctx, ruleIndex, actionIndex):
-	if self._actions is None:
-		actions = dict()
+    if self._actions is None:
+        actions = dict()
 <recog.actionFuncs.values:{f|
-		actions[<f.ruleIndex>] = self.<f.name>_action }; separator="\n">
-		self._actions = actions
-	action = self._actions.get(ruleIndex, None)
-	if action is not None:
-		action(localctx, actionIndex)
-	else:
-		raise Exception("No registered action for:" + str(ruleIndex))
+        actions[<f.ruleIndex>] = self.<f.name>_action }; separator="\n">
+        self._actions = actions
+    action = self._actions.get(ruleIndex, None)
+    if action is not None:
+        action(localctx, actionIndex)
+    else:
+        raise Exception("No registered action for:" + str(ruleIndex))
 
 <actionFuncs.values; separator="\n">
 
@@ -518,7 +518,7 @@ if not <chunks>:
 
 ExceptionClause(e, catchArg, catchAction) ::= <<
 catch (<catchArg>) {
-	<catchAction>
+    <catchAction>
 }
 >>
 
@@ -623,7 +623,7 @@ def <r.name>(self, i=None):
 LexerRuleContext() ::= "RuleContext"
 
 /** The rule context name is the rule followed by a suffix; e.g.,
- *	r becomes rContext.
+ *  r becomes rContext.
  */
 RuleContextNameSuffix() ::= "Context"
 
@@ -806,10 +806,10 @@ def serializedATN():
 >>
 
 /** Using a type to init value map, try to init a type; if not in table
- *	must be an object, default value is "null".
+ *  must be an object, default value is "null".
  */
 initValue(typeName) ::= <<
-<javaTypeInitMap.(typeName)>
+<pythonTypeInitMap.(typeName)>
 >>
 
 codeFileExtension() ::= ".py"

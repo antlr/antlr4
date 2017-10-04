@@ -21,7 +21,9 @@ namespace atn {
   public:
     ATNDeserializationOptions();
     ATNDeserializationOptions(ATNDeserializationOptions *options);
-    virtual ~ATNDeserializationOptions() {};
+    ATNDeserializationOptions(ATNDeserializationOptions const&) = default;
+    virtual ~ATNDeserializationOptions();
+    ATNDeserializationOptions& operator=(ATNDeserializationOptions const&) = default;
 
     static const ATNDeserializationOptions& getDefaultOptions();
 

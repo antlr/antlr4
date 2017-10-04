@@ -13,3 +13,6 @@ InputMismatchException::InputMismatchException(Parser *recognizer)
   : RecognitionException(recognizer, recognizer->getInputStream(), recognizer->getContext(),
                          recognizer->getCurrentToken()) {
 }
+
+InputMismatchException::~InputMismatchException() {
+}

@@ -19,10 +19,10 @@ RuleContext::RuleContext() {
   InitializeInstanceFields();
 }
 
-RuleContext::RuleContext(RuleContext *parent, size_t invokingState) {
+RuleContext::RuleContext(RuleContext *parent_, size_t invokingState_) {
   InitializeInstanceFields();
-  this->parent = parent;
-  this->invokingState = invokingState;
+  this->parent = parent_;
+  this->invokingState = invokingState_;
 }
 
 int RuleContext::depth() {
@@ -31,7 +31,7 @@ int RuleContext::depth() {
   while (true) {
     if (p->parent == nullptr)
       break;
-    p = (RuleContext *)p->parent;
+    p = static_cast<RuleContext *>(p->parent);
     n++;
   }
   return n;
@@ -112,7 +112,7 @@ std::string RuleContext::toString(const std::vector<std::string> &ruleNames, Rul
 
     if (currentParent->parent == nullptr) // No parent anymore.
       break;
-    currentParent = (RuleContext *)currentParent->parent;
+    currentParent = static_cast<RuleContext *>(currentParent->parent);
     if (!ruleNames.empty() || !currentParent->isEmpty()) {
       ss << " ";
     }
