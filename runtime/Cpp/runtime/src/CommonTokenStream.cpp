@@ -9,12 +9,11 @@
 
 using namespace antlr4;
 
-CommonTokenStream::CommonTokenStream(TokenSource *tokenSource) : BufferedTokenStream(tokenSource) {
-  InitializeInstanceFields();
+CommonTokenStream::CommonTokenStream(TokenSource *tokenSource) : CommonTokenStream(tokenSource, Token::DEFAULT_CHANNEL) {
 }
 
-CommonTokenStream::CommonTokenStream(TokenSource *tokenSource, int channel) : BufferedTokenStream(tokenSource) {
-  this->channel = channel;
+CommonTokenStream::CommonTokenStream(TokenSource *tokenSource, size_t channel_)
+: BufferedTokenStream(tokenSource), channel(channel_) {
 }
 
 ssize_t CommonTokenStream::adjustSeekIndex(size_t i) {
@@ -26,7 +25,7 @@ Token* CommonTokenStream::LB(size_t k) {
     return nullptr;
   }
 
-  ssize_t i = (ssize_t)_p;
+  ssize_t i = static_cast<ssize_t>(_p);
   size_t n = 1;
   // find k good tokens looking backwards
   while (n <= k) {
@@ -47,7 +46,7 @@ Token* CommonTokenStream::LT(ssize_t k) {
     return nullptr;
   }
   if (k < 0) {
-    return LB((size_t)-k);
+    return LB(static_cast<size_t>(-k));
   }
   size_t i = _p;
   ssize_t n = 1; // we know tokens[p] is a good one
@@ -76,8 +75,4 @@ int CommonTokenStream::getNumberOfOnChannelTokens() {
     }
   }
   return n;
-}
-
-void CommonTokenStream::InitializeInstanceFields() {
-  channel = Token::DEFAULT_CHANNEL;
 }

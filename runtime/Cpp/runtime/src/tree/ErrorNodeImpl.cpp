@@ -15,6 +15,9 @@ using namespace antlr4::tree;
 ErrorNodeImpl::ErrorNodeImpl(Token *token) : TerminalNodeImpl(token) {
 }
 
+ErrorNodeImpl::~ErrorNodeImpl() {
+}
+
 antlrcpp::Any ErrorNodeImpl::accept(ParseTreeVisitor *visitor) {
   return visitor->visitErrorNode(this);
 }

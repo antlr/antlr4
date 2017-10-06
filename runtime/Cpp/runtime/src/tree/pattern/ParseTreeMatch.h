@@ -43,7 +43,9 @@ namespace pattern {
     /// <exception cref="IllegalArgumentException"> if {@code labels} is {@code null} </exception>
     ParseTreeMatch(ParseTree *tree, ParseTreePattern const& pattern,
                    const std::map<std::string, std::vector<ParseTree *>> &labels, ParseTree *mismatchedNode);
-    virtual ~ParseTreeMatch() {};
+    ParseTreeMatch(ParseTreeMatch const&) = default;
+    virtual ~ParseTreeMatch();
+    ParseTreeMatch& operator=(ParseTreeMatch const&) = default;
 
     /// <summary>
     /// Get the last node associated with a specific {@code label}.

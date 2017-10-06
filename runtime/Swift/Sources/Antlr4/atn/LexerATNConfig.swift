@@ -1,10 +1,14 @@
+/// 
 /// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
+/// 
 
 
 public class LexerATNConfig: ATNConfig {
-    /// This is the backing field for {@link #getLexerActionExecutor}.
+    /// 
+    /// This is the backing field for _#getLexerActionExecutor_.
+    /// 
     private let lexerActionExecutor: LexerActionExecutor?
 
     fileprivate let passedThroughNonGreedyDecision: Bool
@@ -56,8 +60,10 @@ public class LexerATNConfig: ATNConfig {
         return source.passedThroughNonGreedyDecision
                 || target is DecisionState && (target as! DecisionState).nonGreedy
     }
-    /// Gets the {@link org.antlr.v4.runtime.atn.LexerActionExecutor} capable of executing the embedded
+    /// 
+    /// Gets the _org.antlr.v4.runtime.atn.LexerActionExecutor_ capable of executing the embedded
     /// action(s) for the current configuration.
+    /// 
     public final func getLexerActionExecutor() -> LexerActionExecutor? {
         return lexerActionExecutor
     }

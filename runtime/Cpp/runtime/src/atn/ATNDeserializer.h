@@ -21,7 +21,7 @@ namespace atn {
 
     ATNDeserializer();
     ATNDeserializer(const ATNDeserializationOptions& dso);
-    virtual ~ATNDeserializer() {};
+    virtual ~ATNDeserializer();
 
     static Guid toUUID(const unsigned short *data, size_t offset);
 

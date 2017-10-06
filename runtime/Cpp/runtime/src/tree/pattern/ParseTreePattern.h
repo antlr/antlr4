@@ -28,7 +28,9 @@ namespace pattern {
     /// <param name="patternTree"> The tree pattern in <seealso cref="ParseTree"/> form. </param>
     ParseTreePattern(ParseTreePatternMatcher *matcher, const std::string &pattern, int patternRuleIndex,
                      ParseTree *patternTree);
-    virtual ~ParseTreePattern() {};
+    ParseTreePattern(ParseTreePattern const&) = default;
+    virtual ~ParseTreePattern();
+    ParseTreePattern& operator=(ParseTreePattern const&) = default;
 
     /// <summary>
     /// Match a specific parse tree against this tree pattern.

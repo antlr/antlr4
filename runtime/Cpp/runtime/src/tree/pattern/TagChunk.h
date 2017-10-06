@@ -37,7 +37,7 @@ namespace pattern {
     /// <exception cref="IllegalArgumentException"> if {@code tag} is {@code null} or
     /// empty. </exception>
     TagChunk(const std::string &tag);
-    virtual ~TagChunk() {};
+    virtual ~TagChunk();
 
     /// <summary>
     /// Construct a new instance of <seealso cref="TagChunk"/> using the specified label

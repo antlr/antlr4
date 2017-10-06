@@ -1,18 +1,22 @@
+/// 
 /// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
+/// 
 
 
-/// This class implements the {@link org.antlr.v4.runtime.misc.IntSet} backed by a sorted array of
+/// 
+/// This class implements the _org.antlr.v4.runtime.misc.IntSet_ backed by a sorted array of
 /// non-overlapping intervals. It is particularly efficient for representing
 /// large collections of numbers, where the majority of elements appear as part
 /// of a sequential range of numbers that are all part of the set. For example,
 /// the set { 1, 2, 3, 4, 7, 8 } may be represented as { [1, 4], [7, 8] }.
-///
-/// <p>
+/// 
+/// 
 /// This class is able to represent sets containing any combination of values in
-/// the range {@link Integer#MIN_VALUE} to {@link Integer#MAX_VALUE}
-/// (inclusive).</p>
+/// the range _Integer#MIN_VALUE_ to _Integer#MAX_VALUE_
+/// (inclusive).
+/// 
 
 public class IntervalSet: IntSet, Hashable, CustomStringConvertible {
     public static let COMPLETE_CHAR_SET: IntervalSet =
@@ -29,7 +33,9 @@ public class IntervalSet: IntSet, Hashable, CustomStringConvertible {
     }()
 
 
+    /// 
     /// The list of sorted, disjoint intervals.
+    /// 
     internal var intervals: Array<Interval>
 
     internal var readonly: Bool = false
@@ -55,7 +61,9 @@ public class IntervalSet: IntSet, Hashable, CustomStringConvertible {
         }
     }
 
+    /// 
     /// Create a set with a single element, el.
+    /// 
 
     public static func of(_ a: Int) throws -> IntervalSet {
         let s: IntervalSet = try IntervalSet()
@@ -63,7 +71,9 @@ public class IntervalSet: IntSet, Hashable, CustomStringConvertible {
         return s
     }
 
+    /// 
     /// Create a set with all ints within range [a..b] (inclusive)
+    /// 
     public static func of(_ a: Int, _ b: Int) throws -> IntervalSet {
         let s: IntervalSet = try IntervalSet()
         try s.add(a, b)
@@ -77,8 +87,10 @@ public class IntervalSet: IntSet, Hashable, CustomStringConvertible {
         intervals.removeAll()
     }
 
+    /// 
     /// Add a single element to the set.  An isolated element is stored
     /// as a range el..el.
+    /// 
 
     public func add(_ el: Int) throws {
         if readonly {
@@ -87,12 +99,14 @@ public class IntervalSet: IntSet, Hashable, CustomStringConvertible {
         try add(el, el)
     }
 
+    /// 
     /// Add interval; i.e., add all integers from a to b to set.
     /// If b&lt;a, do nothing.
     /// Keep list in sorted order (by left range value).
     /// If overlap, combine ranges.  For example,
     /// If this is {1..5, 10..20}, adding 6..7 yields
     /// {1..5, 6..7, 10..20}.  Adding 4..8 yields {1..8, 10..20}.
+    /// 
     public func add(_ a: Int, _ b: Int) throws {
         try add(Interval.of(a, b))
     }
@@ -132,10 +146,12 @@ public class IntervalSet: IntSet, Hashable, CustomStringConvertible {
                     }
 
                     // if we bump up against or overlap next, merge
+                    /// 
                     /// iter.remove();   // remove this one
                     /// iter.previous(); // move backwards to what we just set
                     /// iter.set(bigger.union(next)); // set to 3 merged ones
                     /// iter.next(); // first call to next after previous duplicates the resul
+                    /// 
                     intervals.remove(at: i)
                     i -= 1
                     intervals[i] = bigger.union(next)
@@ -159,7 +175,9 @@ public class IntervalSet: IntSet, Hashable, CustomStringConvertible {
         intervals.append(addition)
     }
 
+    /// 
     /// combine all sets in the array returned the or'd value
+    /// 
     public func or(_ sets: [IntervalSet]) throws -> IntSet {
         let r: IntervalSet = try IntervalSet()
         for s: IntervalSet in sets {
@@ -195,7 +213,9 @@ public class IntervalSet: IntSet, Hashable, CustomStringConvertible {
         return try self.complement(IntervalSet.of(minElement, maxElement))
     }
 
-    /// {@inheritDoc}
+    /// 
+    /// 
+    /// 
 
     public func complement(_ vocabulary: IntSet?) throws -> IntSet? {
         guard let vocabulary = vocabulary , !vocabulary.isNil()  else {
@@ -226,9 +246,11 @@ public class IntervalSet: IntSet, Hashable, CustomStringConvertible {
         return try subtract(self, other)
     }
 
+    /// 
     /// Compute the set difference between two interval sets. The specific
-    /// operation is {@code left - right}. If either of the input sets is
-    /// {@code null}, it is treated as though it was an empty set.
+    /// operation is `left - right`. If either of the input sets is
+    /// `null`, it is treated as though it was an empty set.
+    /// 
 
     public func subtract(_ left: IntervalSet?, _ right: IntervalSet?) throws -> IntervalSet {
 
@@ -315,7 +337,9 @@ public class IntervalSet: IntSet, Hashable, CustomStringConvertible {
         return o
     }
 
-    /// {@inheritDoc}
+    /// 
+    /// 
+    /// 
 
     public func and(_ other: IntSet?) throws -> IntSet? {
         if other == nil {
@@ -392,7 +416,9 @@ public class IntervalSet: IntSet, Hashable, CustomStringConvertible {
         return intersection
     }
 
-    /// {@inheritDoc}
+    /// 
+    /// 
+    /// 
 
     public func contains(_ el: Int) -> Bool {
         let n: Int = intervals.count
@@ -408,6 +434,7 @@ public class IntervalSet: IntSet, Hashable, CustomStringConvertible {
             }
         }
         return false
+/// 
 /// for (ListIterator iter = intervals.listIterator(); iter.hasNext();) {
 /// Interval I = (Interval) iter.next();
 /// if ( el<I.a ) {
@@ -418,15 +445,20 @@ public class IntervalSet: IntSet, Hashable, CustomStringConvertible {
 /// }
 /// }
 /// return false;
+/// 
     }
 
-    /// {@inheritDoc}
+    /// 
+    /// 
+    /// 
 
     public func isNil() -> Bool {
         return intervals.isEmpty
     }
 
-    /// {@inheritDoc}
+    /// 
+    /// 
+    /// 
 
     public func getSingleElement() -> Int {
         //intervals=nil && intervals.count==1 )
@@ -439,10 +471,12 @@ public class IntervalSet: IntSet, Hashable, CustomStringConvertible {
         return CommonToken.INVALID_TYPE
     }
 
+    /// 
     /// Returns the maximum value contained in the set.
-    ///
+    /// 
     /// - returns: the maximum value contained in the set. If the set is empty, this
-    /// method returns {@link org.antlr.v4.runtime.Token#INVALID_TYPE}.
+    /// method returns _org.antlr.v4.runtime.Token#INVALID_TYPE_.
+    /// 
     public func getMaxElement() -> Int {
         if isNil() {
             return CommonToken.INVALID_TYPE
@@ -451,10 +485,12 @@ public class IntervalSet: IntSet, Hashable, CustomStringConvertible {
         return last.b
     }
 
+    /// 
     /// Returns the minimum value contained in the set.
-    ///
+    /// 
     /// - returns: the minimum value contained in the set. If the set is empty, this
-    /// method returns {@link org.antlr.v4.runtime.Token#INVALID_TYPE}.
+    /// method returns _org.antlr.v4.runtime.Token#INVALID_TYPE_.
+    /// 
     public func getMinElement() -> Int {
         if isNil() {
             return CommonToken.INVALID_TYPE
@@ -463,7 +499,9 @@ public class IntervalSet: IntSet, Hashable, CustomStringConvertible {
         return intervals[0].a
     }
 
+    /// 
     /// Return a list of Interval objects.
+    /// 
     public func getIntervals() -> Array<Interval> {
         return intervals
     }
@@ -489,17 +527,21 @@ public class IntervalSet: IntSet, Hashable, CustomStringConvertible {
         hash = MurmurHash.finish(hash, intervals.count * 2)
         return hash
     }
+    /// 
     /// Are two IntervalSets equal?  Because all intervals are sorted
     /// and disjoint, equals is a simple linear walk over both lists
     /// to make sure they are the same.  Interval.equals() is used
     /// by the List.equals() method to check the ranges.
+    /// 
 
+    /// 
     /// public func equals(obj : AnyObject) -> Bool {
     /// if ( obj==nil || !(obj is IntervalSet) ) {
     /// return false;
     /// }
     /// var other : IntervalSet = obj as! IntervalSet;
     /// return self.intervals.equals(other.intervals);
+    /// 
 
     public var description: String {
         return toString(false)
@@ -555,8 +597,10 @@ public class IntervalSet: IntSet, Hashable, CustomStringConvertible {
         return buf.toString()
     }
 
-    /// -  Use {@link #toString(org.antlr.v4.runtime.Vocabulary)} instead.
-    ////@Deprecated
+    /// 
+    /// -  Use _#toString(org.antlr.v4.runtime.Vocabulary)_ instead.
+    /// /@Deprecated
+    /// 
     public func toString(_ tokenNames: [String?]?) -> String {
         return toString(Vocabulary.fromTokenNames(tokenNames))
     }
@@ -598,8 +642,10 @@ public class IntervalSet: IntSet, Hashable, CustomStringConvertible {
         return buf.toString()
     }
 
-    /// -  Use {@link #elementName(org.antlr.v4.runtime.Vocabulary, int)} instead.
-    ////@Deprecated
+    /// 
+    /// -  Use _#elementName(org.antlr.v4.runtime.Vocabulary, int)_ instead.
+    /// /@Deprecated
+    /// 
     internal func elementName(_ tokenNames: [String?]?, _ a: Int) -> String {
         return elementName(Vocabulary.fromTokenNames(tokenNames), a)
     }
@@ -677,9 +723,11 @@ public class IntervalSet: IntSet, Hashable, CustomStringConvertible {
         return s
     }
 
+    /// 
     /// Get the ith element of ordered set.  Used only by RandomPhrase so
     /// don't bother to implement if you're not doing that for a new
     /// ANTLR code gen target.
+    /// 
     public func get(_ i: Int) -> Int {
         let n: Int = intervals.count
         var index: Int = 0

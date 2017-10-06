@@ -33,7 +33,9 @@ namespace antlr4 {
                          Token *offendingToken = nullptr);
     RecognitionException(const std::string &message, Recognizer *recognizer, IntStream *input,
                          ParserRuleContext *ctx, Token *offendingToken = nullptr);
-    ~RecognitionException() {}
+    RecognitionException(RecognitionException const&) = default;
+    ~RecognitionException();
+    RecognitionException& operator=(RecognitionException const&) = default;
 
     /// Get the ATN state number the parser was in at the time the error
     /// occurred. For NoViableAltException and

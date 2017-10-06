@@ -18,7 +18,10 @@ namespace xpath {
     /// Construct element like {@code /ID} or {@code ID} or {@code /*} etc...
     ///  op is null if just node
     XPathElement(const std::string &nodeName);
-    virtual ~XPathElement() {}
+    XPathElement(XPathElement const&) = default;
+    virtual ~XPathElement();
+
+    XPathElement& operator=(XPathElement const&) = default;
 
     /// Given tree rooted at {@code t} return all nodes matched by this path
     /// element.

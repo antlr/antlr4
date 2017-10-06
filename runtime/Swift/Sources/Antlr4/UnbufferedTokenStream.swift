@@ -7,55 +7,55 @@
 public class UnbufferedTokenStream<T>: TokenStream {
     internal var tokenSource: TokenSource
 
-    /**
-     * A moving window buffer of the data being scanned. While there's a marker,
-     * we keep adding to buffer. Otherwise, {@link #consume consume()} resets so
-     * we start filling at index 0 again.
-     */
+    /// 
+    /// A moving window buffer of the data being scanned. While there's a marker,
+    /// we keep adding to buffer. Otherwise, _#consume consume()_ resets so
+    /// we start filling at index 0 again.
+    /// 
     internal var tokens: [Token]
 
-    /**
-     * The number of tokens currently in {@link #tokens tokens}.
-     *
-     * <p>This is not the buffer capacity, that's {@code tokens.length}.</p>
-     */
+    /// 
+    /// The number of tokens currently in _#tokens tokens_.
+    /// 
+    /// This is not the buffer capacity, that's `tokens.length`.
+    /// 
     internal var n: Int
 
-    /**
-     * 0..n-1 index into {@link #tokens tokens} of next token.
-     *
-     * <p>The {@code LT(1)} token is {@code tokens[p]}. If {@code p == n}, we are
-     * out of buffered tokens.</p>
-     */
+    /// 
+    /// 0..n-1 index into _#tokens tokens_ of next token.
+    /// 
+    /// The `LT(1)` token is `tokens[p]`. If `p == n`, we are
+    /// out of buffered tokens.
+    /// 
     internal var p: Int = 0
 
-    /**
-     * Count up with {@link #mark mark()} and down with
-     * {@link #release release()}. When we {@code release()} the last mark,
-     * {@code numMarkers} reaches 0 and we reset the buffer. Copy
-     * {@code tokens[p]..tokens[n-1]} to {@code tokens[0]..tokens[(n-1)-p]}.
-     */
+    /// 
+    /// Count up with _#mark mark()_ and down with
+    /// _#release release()_. When we `release()` the last mark,
+    /// `numMarkers` reaches 0 and we reset the buffer. Copy
+    /// `tokens[p]..tokens[n-1]` to `tokens[0]..tokens[(n-1)-p]`.
+    /// 
     internal var numMarkers: Int = 0
 
-    /**
-     * This is the {@code LT(-1)} token for the current position.
-     */
+    /// 
+    /// This is the `LT(-1)` token for the current position.
+    /// 
     internal var lastToken: Token!
 
-    /**
-     * When {@code numMarkers > 0}, this is the {@code LT(-1)} token for the
-     * first token in {@link #tokens}. Otherwise, this is {@code null}.
-     */
+    /// 
+    /// When `numMarkers > 0`, this is the `LT(-1)` token for the
+    /// first token in _#tokens_. Otherwise, this is `null`.
+    /// 
     internal var lastTokenBufferStart: Token!
 
-    /**
-     * Absolute token index. It's the index of the token about to be read via
-     * {@code LT(1)}. Goes from 0 to the number of tokens in the entire stream,
-     * although the stream size is unknown before the end is reached.
-     *
-     * <p>This value is used to set the token indexes if the stream provides tokens
-     * that implement {@link org.antlr.v4.runtime.WritableToken}.</p>
-     */
+    /// 
+    /// Absolute token index. It's the index of the token about to be read via
+    /// `LT(1)`. Goes from 0 to the number of tokens in the entire stream,
+    /// although the stream size is unknown before the end is reached.
+    /// 
+    /// This value is used to set the token indexes if the stream provides tokens
+    /// that implement _org.antlr.v4.runtime.WritableToken_.
+    /// 
     internal var currentTokenIndex: Int = 0
 
     public convenience init(_ tokenSource: TokenSource) throws {
@@ -148,10 +148,10 @@ public class UnbufferedTokenStream<T>: TokenStream {
         try sync(1)
     }
 
-    /** Make sure we have 'need' elements from current position {@link #p p}. Last valid
-     *  {@code p} index is {@code tokens.length-1}.  {@code p+need-1} is the tokens index 'need' elements
-     *  ahead.  If we need 1 element, {@code (p+1-1)==p} must be less than {@code tokens.length}.
-     */
+    /// Make sure we have 'need' elements from current position _#p p_. Last valid
+    /// `p` index is `tokens.length-1`.  `p+need-1` is the tokens index 'need' elements
+    /// ahead.  If we need 1 element, `(p+1-1)==p` must be less than `tokens.length`.
+    /// 
     internal func sync(_ want: Int) throws {
         let need: Int = (p + want - 1) - n + 1 // how many more elements we need?
         if need > 0 {
@@ -159,11 +159,11 @@ public class UnbufferedTokenStream<T>: TokenStream {
         }
     }
 
-    /**
-     * Add {@code n} elements to the buffer. Returns the number of tokens
-     * actually added to the buffer. If the return value is less than {@code n},
-     * then EOF was reached before {@code n} tokens could be added.
-     */
+    /// 
+    /// Add `n` elements to the buffer. Returns the number of tokens
+    /// actually added to the buffer. If the return value is less than `n`,
+    /// then EOF was reached before `n` tokens could be added.
+    /// 
     @discardableResult
     internal func fill(_ n: Int) throws -> Int {
         for i in 0..<n {
@@ -192,13 +192,13 @@ public class UnbufferedTokenStream<T>: TokenStream {
         n += 1
     }
 
-    /**
-     * Return a marker that we can release later.
-     *
-     * <p>The specific marker value used for this class allows for some level of
-     * protection against misuse where {@code seek()} is called on a mark or
-     * {@code release()} is called in the wrong order.</p>
-     */
+    /// 
+    /// Return a marker that we can release later.
+    /// 
+    /// The specific marker value used for this class allows for some level of
+    /// protection against misuse where `seek()` is called on a mark or
+    /// `release()` is called in the wrong order.
+    /// 
 
     public func mark() -> Int {
         if numMarkers == 0 {

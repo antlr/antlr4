@@ -28,7 +28,9 @@ namespace misc {
     Interval();
     explicit Interval(size_t a_, size_t b_); // For unsigned -> signed mappings.
     Interval(ssize_t a_, ssize_t b_);
-    virtual ~Interval() {};
+    Interval(Interval const&) = default;
+    virtual ~Interval();
+    Interval& operator=(Interval const&) = default;
 
     /// return number of elements between a and b inclusively. x..x is length 1.
     ///  if b < a, then length is 0.  9..10 has length 2.

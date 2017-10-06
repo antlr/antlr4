@@ -45,7 +45,7 @@ namespace atn {
     // ml: this is a reference into the ATN.
     ATNState *target;
 
-    virtual ~Transition() {};
+    virtual ~Transition();
 
   protected:
     Transition(ATNState *target);
@@ -67,6 +67,9 @@ namespace atn {
     virtual bool matches(size_t symbol, size_t minVocabSymbol, size_t maxVocabSymbol) const = 0;
 
     virtual std::string toString() const;
+
+    Transition(Transition const&) = delete;
+    Transition& operator=(Transition const&) = delete;
   };
 
 } // namespace atn

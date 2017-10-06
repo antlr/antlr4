@@ -11,6 +11,7 @@ namespace antlr4 {
 
   class ANTLR4CPP_PUBLIC WritableToken : public Token {
   public:
+    virtual ~WritableToken();
     virtual void setText(const std::string &text) = 0;
     virtual void setType(size_t ttype) = 0;
     virtual void setLine(size_t line) = 0;

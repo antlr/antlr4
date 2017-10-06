@@ -26,7 +26,7 @@ namespace antlr4 {
   /// </summary>
   class ANTLR4CPP_PUBLIC TokenSource {
   public:
-    virtual ~TokenSource() {};
+    virtual ~TokenSource();
 
     /// Return a <seealso cref="Token"/> object from your input stream (usually a
     /// <seealso cref="CharStream"/>). Do not fail/return upon lexing error; keep chewing

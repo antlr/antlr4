@@ -21,6 +21,9 @@ ArrayPredictionContext::ArrayPredictionContext(std::vector<Ref<PredictionContext
     assert(returnStates.size() > 0);
 }
 
+ArrayPredictionContext::~ArrayPredictionContext() {
+}
+
 bool ArrayPredictionContext::isEmpty() const {
   // Since EMPTY_RETURN_STATE can only appear in the last position, we don't need to verify that size == 1.
   return returnStates[0] == EMPTY_RETURN_STATE;

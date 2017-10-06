@@ -43,7 +43,7 @@ namespace dfa {
       int alt;
 
       PredPrediction(const Ref<atn::SemanticContext> &pred, int alt);
-      virtual ~PredPrediction() {};
+      virtual ~PredPrediction();
 
       virtual std::string toString();
 

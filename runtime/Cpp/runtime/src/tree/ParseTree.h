@@ -20,7 +20,10 @@ namespace tree {
   class ANTLR4CPP_PUBLIC ParseTree {
   public:
     ParseTree();
+    ParseTree(ParseTree const&) = delete;
     virtual ~ParseTree() {}
+
+    ParseTree& operator=(ParseTree const&) = delete;
 
     /// The parent of this node. If the return value is null, then this
     /// node is the root of the tree.

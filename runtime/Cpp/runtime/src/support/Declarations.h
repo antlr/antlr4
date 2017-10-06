@@ -6,16 +6,6 @@
 #pragma once
 
 namespace antlr4 {
-  class IllegalStateException;
-  class IllegalArgumentException;
-  class NoSuchElementException;
-  class NullPointerException;
-  class InputMismatchException;
-  class ParseCancellationException;
-  class InputMismatchException;
-  class EmptyStackException;
-  class LexerNoViableAltException;
-
   class ANTLRErrorListener;
   class ANTLRErrorStrategy;
   class ANTLRFileStream;
@@ -30,7 +20,10 @@ namespace antlr4 {
   class ConsoleErrorListener;
   class DefaultErrorStrategy;
   class DiagnosticErrorListener;
+  class EmptyStackException;
   class FailedPredicateException;
+  class IllegalArgumentException;
+  class IllegalStateException;
   class InputMismatchException;
   class IntStream;
   class InterpreterRuleContext;
@@ -38,7 +31,10 @@ namespace antlr4 {
   class LexerInterpreter;
   class LexerNoViableAltException;
   class ListTokenSource;
+  class NoSuchElementException;
   class NoViableAltException;
+  class NullPointerException;
+  class ParseCancellationException;
   class Parser;
   class ParserInterpreter;
   class ParserRuleContext;
@@ -59,7 +55,6 @@ namespace antlr4 {
     class Interval;
     class IntervalSet;
     class MurmurHash;
-    class ParseCancellationException;
     class Utils;
     class Predicate;
   }

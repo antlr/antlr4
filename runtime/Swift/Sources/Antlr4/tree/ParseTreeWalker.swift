@@ -29,12 +29,12 @@ public class ParseTreeWalker {
         try exitRule(listener, r)
     }
 
-    /**
-     * The discovery of a rule node, involves sending two events: the generic
-     * {@link org.antlr.v4.runtime.tree.ParseTreeListener#enterEveryRule} and a
-     * {@link org.antlr.v4.runtime.RuleContext}-specific event. First we trigger the generic and then
-     * the rule specific. We to them in reverse order upon finishing the node.
-     */
+    /// 
+    /// The discovery of a rule node, involves sending two events: the generic
+    /// _org.antlr.v4.runtime.tree.ParseTreeListener#enterEveryRule_ and a
+    /// _org.antlr.v4.runtime.RuleContext_-specific event. First we trigger the generic and then
+    /// the rule specific. We to them in reverse order upon finishing the node.
+    /// 
     internal func enterRule(_ listener: ParseTreeListener, _ r: RuleNode) throws {
         let ctx: ParserRuleContext = r.getRuleContext() as! ParserRuleContext
         try listener.enterEveryRule(ctx)

@@ -14,6 +14,9 @@ XPathElement::XPathElement(const std::string &nodeName) {
   _nodeName = nodeName;
 }
 
+XPathElement::~XPathElement() {
+}
+
 std::vector<ParseTree *> XPathElement::evaluate(ParseTree * /*t*/) {
   return {};
 }

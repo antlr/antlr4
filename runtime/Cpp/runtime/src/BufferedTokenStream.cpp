@@ -96,7 +96,7 @@ size_t BufferedTokenStream::fetch(size_t n) {
     std::unique_ptr<Token> t(_tokenSource->nextToken());
 
     if (is<WritableToken *>(t.get())) {
-      (static_cast<WritableToken *>(t.get()))->setTokenIndex((int)_tokens.size());
+      (static_cast<WritableToken *>(t.get()))->setTokenIndex(_tokens.size());
     }
 
     _tokens.push_back(std::move(t));
@@ -272,7 +272,7 @@ ssize_t BufferedTokenStream::previousTokenOnChannel(size_t i, size_t channel) {
     }
 
     if (i == 0)
-      return i;
+      break;
     i--;
   }
   return i;
@@ -289,7 +289,7 @@ std::vector<Token *> BufferedTokenStream::getHiddenTokensToRight(size_t tokenInd
   size_t from = tokenIndex + 1;
   // if none onchannel to right, nextOnChannel=-1 so set to = last token
   if (nextOnChannel == -1) {
-    to = (ssize_t)size() - 1;
+    to = static_cast<ssize_t>(size() - 1);
   } else {
     to = nextOnChannel;
   }
@@ -313,11 +313,11 @@ std::vector<Token *> BufferedTokenStream::getHiddenTokensToLeft(size_t tokenInde
   }
 
   ssize_t prevOnChannel = previousTokenOnChannel(tokenIndex - 1, Lexer::DEFAULT_TOKEN_CHANNEL);
-  if (prevOnChannel == (ssize_t)tokenIndex - 1) {
+  if (prevOnChannel == static_cast<ssize_t>(tokenIndex - 1)) {
     return { };
   }
   // if none onchannel to left, prevOnChannel=-1 then from=0
-  size_t from = (size_t)(prevOnChannel + 1);
+  size_t from = static_cast<size_t>(prevOnChannel + 1);
   size_t to = tokenIndex - 1;
 
   return filterForChannel(from, to, channel);
@@ -336,7 +336,7 @@ std::vector<Token *> BufferedTokenStream::filterForChannel(size_t from, size_t t
         hidden.push_back(t);
       }
     } else {
-      if (t->getChannel() == (size_t)channel) {
+      if (t->getChannel() == static_cast<size_t>(channel)) {
         hidden.push_back(t);
       }
     }
