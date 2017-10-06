@@ -156,3 +156,4 @@ YYYY/MM/DD, github id, Full name, email
 2017/07/17, vaibhavaingankar09, Vaibhav Vaingankar, vbhvvaingankar9@gmail.com
 2017/07/23, venkatperi, Venkat Peri, venkatperi@gmail.com
 2017/07/27, shirou, WAKAYAMA Shirou, shirou.faw@gmail.com
+2017/10/06, bramp, Andrew Brampton, brampton@gmail.com
