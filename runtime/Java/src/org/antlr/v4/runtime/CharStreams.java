@@ -303,4 +303,26 @@ public final class CharStreams {
 			channel.close();
 		}
 	}
+
+	/**
+	 * Takes the stream and forces all symbols to uppercase for lexing purposes
+	 * but leaves the original text as-is.
+	 *
+	 * @param in
+	 * @return
+	 */
+	public static CharStream toUpper(CharStream in) {
+		return new CaseChangingCharStream(in, true);
+	}
+
+	/**
+	 * Takes the stream and forces all symbols to lowercase for lexing purposes
+	 * but leaves the original text as-is.
+	 *
+	 * @param in
+	 * @return
+	 */
+	public static CharStream toLower(CharStream in) {
+		return new CaseChangingCharStream(in, false);
+	}
 }
