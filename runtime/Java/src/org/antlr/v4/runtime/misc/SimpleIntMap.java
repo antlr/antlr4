@@ -125,17 +125,14 @@ public final class SimpleIntMap<T> {
 	 * @throws IllegalArgumentException if key is {@code Integer.MIN_INT}
 	 */
 	public T get(int key) {
+		int slot;
 		// Avoid key validity check for the most common case of positive keys.
 		if (key > 0) {
-			final int slot = key & modulo;
-			return key == keys[slot] ? values[slot] : linearProbe(slot, key);
+			slot = key & modulo;
+		} else {
+			checkKey(key);
+			slot = -key & modulo;
 		}
-		return getNegativeKey(key);
-	}
-
-	private T getNegativeKey(int key) {
-		checkKey(key);
-		final int slot = -key & modulo;
 		return key == keys[slot] ? values[slot] : linearProbe(slot, key);
 	}
 
