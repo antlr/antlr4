@@ -54,7 +54,7 @@ public class DFAState {
 	 * Edges points to a target State for a symbol.
 	 * This map represents all edges from this state to all connected states.
  	 */
-	private final SimpleIntMap<DFAState> edges = new SimpleIntMap<>();
+	private final SimpleIntMap<DFAState> edges = new SimpleIntMap<>(2);
 
 	public boolean isAcceptState = false;
 

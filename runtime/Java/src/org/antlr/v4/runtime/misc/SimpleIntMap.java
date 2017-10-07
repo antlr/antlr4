@@ -68,7 +68,7 @@ public final class SimpleIntMap<T> {
 
 	private int adjustInitialSize(int capacity) {
 		if (capacity < 1) {
-			throw new IllegalArgumentException("Size must > 0: " + capacity);
+			throw new IllegalArgumentException("Capacity must be > 0: " + capacity);
 		}
 		long k = 1;
 		while (k < capacity) {
@@ -120,20 +120,28 @@ public final class SimpleIntMap<T> {
 
 	/**
 	 * @return The value {@code T} taht is mapped to given {@code key}.
-	 * or  {@code null} If key does not exist,
+	 * or  {@code null} If key does not exist.
 	 *
 	 * @throws IllegalArgumentException if key is {@code Integer.MIN_INT}
 	 */
 	public T get(int key) {
-		checkKey(key);
-		int slot = initialProbe(key);
-		// Test the lucky first shot.
-		if (key == keys[slot]) {
-			return values[slot];
+		// Avoid key validity check for the most common case of positive keys.
+		if (key > 0) {
+			final int slot = key & modulo;
+			return key == keys[slot] ? values[slot] : linearProbe(slot, key);
 		}
-		// Continue linear probing otherwise
+		return getNegativeKey(key);
+	}
+
+	private T getNegativeKey(int key) {
+		checkKey(key);
+		final int slot = -key & modulo;
+		return key == keys[slot] ? values[slot] : linearProbe(slot, key);
+	}
+
+	private T linearProbe(int slot, int key) {
 		while (true) {
-			slot = probeNext(slot + 1);
+			slot = (slot + 1) & modulo;
 			final int t = keys[slot];
 			if (t == key) {
 				return values[slot];
