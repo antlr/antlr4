@@ -162,3 +162,4 @@ YYYY/MM/DD, github id, Full name, email
 2017/07/27, shirou, WAKAYAMA Shirou, shirou.faw@gmail.com
 2017/08/20, tiagomazzutti, Tiago Mazzutti, tiagomzt@gmail.com
 2017/09/11, sachinjain024, Sachin Jain, sachinjain024@gmail.com
+2017/10/06, bramp, Andrew Brampton, brampton@gmail.com
