@@ -90,6 +90,7 @@
 		<module>runtime-testsuite/annotations</module>
 		<module>runtime-testsuite/processors</module>
 		<module>runtime-testsuite</module>
+		<module>benchmark</module>
 	</modules>
 
 	<properties>
