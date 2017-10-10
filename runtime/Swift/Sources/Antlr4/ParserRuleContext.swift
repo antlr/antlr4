@@ -4,83 +4,79 @@
  */
 
 
-/** A rule invocation record for parsing.
- *
- *  Contains all of the information about the current rule not stored in the
- *  RuleContext. It handles parse tree children list, Any ATN state
- *  tracing, and the default values available for rule invocations:
- *  start, stop, rule index, current alt number.
- *
- *  Subclasses made for each rule and grammar track the parameters,
- *  return values, locals, and labels specific to that rule. These
- *  are the objects that are returned from rules.
- *
- *  Note text is not an actual field of a rule return value; it is computed
- *  from start and stop using the input stream's toString() method.  I
- *  could add a ctor to this so that we can pass in and store the input
- *  stream, but I'm not sure we want to do that.  It would seem to be undefined
- *  to get the .text property anyway if the rule matches tokens from multiple
- *  input streams.
- *
- *  I do not use getters for fields of objects that are used simply to
- *  group values such as this aggregate.  The getters/setters are there to
- *  satisfy the superclass interface.
- */
-
+/// A rule invocation record for parsing.
+/// 
+/// Contains all of the information about the current rule not stored in the
+/// RuleContext. It handles parse tree children list, Any ATN state
+/// tracing, and the default values available for rule invocations:
+/// start, stop, rule index, current alt number.
+/// 
+/// Subclasses made for each rule and grammar track the parameters,
+/// return values, locals, and labels specific to that rule. These
+/// are the objects that are returned from rules.
+/// 
+/// Note text is not an actual field of a rule return value; it is computed
+/// from start and stop using the input stream's toString() method.  I
+/// could add a ctor to this so that we can pass in and store the input
+/// stream, but I'm not sure we want to do that.  It would seem to be undefined
+/// to get the .text property anyway if the rule matches tokens from multiple
+/// input streams.
+/// 
+/// I do not use getters for fields of objects that are used simply to
+/// group values such as this aggregate.  The getters/setters are there to
+/// satisfy the superclass interface.
+/// 
 open class ParserRuleContext: RuleContext {
     public var visited = false
-    /** If we are debugging or building a parse tree for a visitor,
-     *  we need to track all of the tokens and rule invocations associated
-     *  with this rule's context. This is empty for parsing w/o tree constr.
-     *  operation because we don't the need to track the details about
-     *  how we parse this rule.
-     */
+    /// If we are debugging or building a parse tree for a visitor,
+    /// we need to track all of the tokens and rule invocations associated
+    /// with this rule's context. This is empty for parsing w/o tree constr.
+    /// operation because we don't the need to track the details about
+    /// how we parse this rule.
+    /// 
     public var children: Array<ParseTree>?
 
-    /** For debugging/tracing purposes, we want to track all of the nodes in
-     *  the ATN traversed by the parser for a particular rule.
-     *  This list indicates the sequence of ATN nodes used to match
-     *  the elements of the children list. This list does not include
-     *  ATN nodes and other rules used to match rule invocations. It
-     *  traces the rule invocation node itself but nothing inside that
-     *  other rule's ATN submachine.
-     *
-     *  There is NOT a one-to-one correspondence between the children and
-     *  states list. There are typically many nodes in the ATN traversed
-     *  for each element in the children list. For example, for a rule
-     *  invocation there is the invoking state and the following state.
-     *
-     *  The parser setState() method updates field s and adds it to this list
-     *  if we are debugging/tracing.
-     *
-     *  This does not trace states visited during prediction.
-     */
-//	public List<Integer> states;
-
+    /// For debugging/tracing purposes, we want to track all of the nodes in
+    /// the ATN traversed by the parser for a particular rule.
+    /// This list indicates the sequence of ATN nodes used to match
+    /// the elements of the children list. This list does not include
+    /// ATN nodes and other rules used to match rule invocations. It
+    /// traces the rule invocation node itself but nothing inside that
+    /// other rule's ATN submachine.
+    /// 
+    /// There is NOT a one-to-one correspondence between the children and
+    /// states list. There are typically many nodes in the ATN traversed
+    /// for each element in the children list. For example, for a rule
+    /// invocation there is the invoking state and the following state.
+    /// 
+    /// The parser setState() method updates field s and adds it to this list
+    /// if we are debugging/tracing.
+    /// 
+    /// This does not trace states visited during prediction.
+    /// 
     public var start: Token?, stop: Token?
 
-    /**
-     * The exception that forced this rule to return. If the rule successfully
-     * completed, this is {@code null}.
-     */
+    /// 
+    /// The exception that forced this rule to return. If the rule successfully
+    /// completed, this is `null`.
+    /// 
     public var exception: AnyObject!
-    //RecognitionException<ATNSimulator>!;
 
     public override init() {
         super.init()
     }
 
-    /** COPY a ctx (I'm deliberately not using copy constructor) to avoid
-     *  confusion with creating node with parent. Does not copy children.
-     *
-     *  This is used in the generated parser code to flip a generic XContext
-     *  node for rule X to a YContext for alt label Y. In that sense, it is
-     *  not really a generic copy function.
-     *
-     *  If we do an error sync() at start of a rule, we might add error nodes
-     *  to the generic XContext so this function must copy those nodes to
-     *  the YContext as well else they are lost!
-     */
+    /// COPY a ctx (I'm deliberately not using copy constructor) to avoid
+    /// confusion with creating node with parent. Does not copy children.
+    /// 
+    /// This is used in the generated parser code to flip a generic XContext
+    /// node for rule X to a YContext for alt label Y. In that sense, it is
+    /// not really a generic copy function.
+    /// 
+    /// If we do an error sync() at start of a rule, we might add error nodes
+    /// to the generic XContext so this function must copy those nodes to
+    /// the YContext as well else they are lost!
+    /// 
     open func copyFrom(_ ctx: ParserRuleContext) {
         self.parent = ctx.parent
         self.invokingState = ctx.invokingState
@@ -112,17 +108,17 @@ open class ParserRuleContext: RuleContext {
     open func exitRule(_ listener: ParseTreeListener) {
     }
 
-    /** Add a parse tree node to this as a child.  Works for
-     *  internal and leaf nodes. Does not set parent link;
-     *  other add methods must do that. Other addChild methods
-     *  call this.
-     *
-     *  We cannot set the parent pointer of the incoming node
-     *  because the existing interfaces do not have a setParent()
-     *  method and I don't want to break backward compatibility for this.
-     *
-     *  @since 4.7
-     */
+    /// Add a parse tree node to this as a child.  Works for
+    /// internal and leaf nodes. Does not set parent link;
+    /// other add methods must do that. Other addChild methods
+    /// call this.
+    /// 
+    /// We cannot set the parent pointer of the incoming node
+    /// because the existing interfaces do not have a setParent()
+    /// method and I don't want to break backward compatibility for this.
+    /// 
+    /// - Since: 4.7
+    /// 
     @discardableResult
     open func addAnyChild<T: ParseTree>(_ t: T) -> T {
         if children == nil {
@@ -137,28 +133,28 @@ open class ParserRuleContext: RuleContext {
         return addAnyChild(ruleInvocation)
     }
 
-    /** Add a token leaf node child and force its parent to be this node. */
+    /// Add a token leaf node child and force its parent to be this node.
     @discardableResult
     open func addChild(_ t: TerminalNode) -> TerminalNode {
         t.setParent(self)
         return addAnyChild(t)
     }
 
-    /** Add an error node child and force its parent to be this node.
-     *
-     *  @since 4.7
-     */
+    /// Add an error node child and force its parent to be this node.
+    /// 
+    /// - Since: 4.7
+    /// 
     @discardableResult
     open func addErrorNode(_ errorNode: ErrorNode) -> ErrorNode {
         errorNode.setParent(self)
         return addAnyChild(errorNode)
     }
 
-    /** Add a child to this node based upon matchedToken. It
-     *  creates a TerminalNodeImpl rather than using
-     *  {@link Parser#createTerminalNode(ParserRuleContext, Token)}. I'm leaving this
-     *  in for compatibility but the parser doesn't use this anymore.
-     */
+    /// Add a child to this node based upon matchedToken. It
+    /// creates a TerminalNodeImpl rather than using
+    /// _Parser#createTerminalNode(ParserRuleContext, Token)_. I'm leaving this
+    /// in for compatibility but the parser doesn't use this anymore.
+    /// 
     @available(*, deprecated)
     open func addChild(_ matchedToken: Token) -> TerminalNode {
         let t: TerminalNodeImpl = TerminalNodeImpl(matchedToken)
@@ -167,11 +163,11 @@ open class ParserRuleContext: RuleContext {
         return t
     }
 
-    /** Add a child to this node based upon badToken.  It
-     *  creates a ErrorNodeImpl rather than using
-     *  {@link Parser#createErrorNode(ParserRuleContext, Token)}. I'm leaving this
-     *  in for compatibility but the parser doesn't use this anymore.
-     */
+    /// Add a child to this node based upon badToken.  It
+    /// creates a ErrorNodeImpl rather than using
+    /// _Parser#createErrorNode(ParserRuleContext, Token)_. I'm leaving this
+    /// in for compatibility but the parser doesn't use this anymore.
+    /// 
     @discardableResult
     @available(*, deprecated)
     open func addErrorNode(_ badToken: Token) -> ErrorNode {
@@ -186,10 +182,10 @@ open class ParserRuleContext: RuleContext {
     //		states.add(s);
     //	}
 
-    /** Used by enterOuterAlt to toss out a RuleContext previously added as
-     *  we entered a rule. If we have # label, we will need to remove
-     *  generic ruleContext object.
-     */
+    /// Used by enterOuterAlt to toss out a RuleContext previously added as
+    /// we entered a rule. If we have # label, we will need to remove
+    /// generic ruleContext object.
+    /// 
     open func removeLastChild() {
     	if children != nil {
             children!.remove(at: children!.count-1)
@@ -198,7 +194,9 @@ open class ParserRuleContext: RuleContext {
 
 
     override
-    /** Override to make type more specific */
+    /// 
+    /// Override to make type more specific
+    /// 
     open func getParent() -> Tree? {
         return super.getParent()
     }
@@ -307,24 +305,24 @@ open class ParserRuleContext: RuleContext {
         return Interval.of(start.getTokenIndex(), stop.getTokenIndex())
     }
 
-    /**
-     * Get the initial token in this context.
-     * Note that the range from start to stop is inclusive, so for rules that do not consume anything
-     * (for example, zero length or error productions) this token may exceed stop.
-     */
+    /// 
+    /// Get the initial token in this context.
+    /// Note that the range from start to stop is inclusive, so for rules that do not consume anything
+    /// (for example, zero length or error productions) this token may exceed stop.
+    /// 
     open func getStart() -> Token? {
         return start
     }
-    /**
-     * Get the final token in this context.
-     * Note that the range from start to stop is inclusive, so for rules that do not consume anything
-     * (for example, zero length or error productions) this token may precede start.
-     */
+    /// 
+    /// Get the final token in this context.
+    /// Note that the range from start to stop is inclusive, so for rules that do not consume anything
+    /// (for example, zero length or error productions) this token may precede start.
+    /// 
     open func getStop() -> Token? {
         return stop
     }
 
-    /** Used for rule context info debugging during parse-time, not so much for ATN debugging */
+    /// Used for rule context info debugging during parse-time, not so much for ATN debugging
     open func toInfoString(_ recognizer: Parser) -> String {
         var rules: Array<String> = recognizer.getRuleInvocationStack(self)
         // Collections.reverse(rules);

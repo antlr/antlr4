@@ -1,8 +1,10 @@
+/// 
 /// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
-/// This is an {@link org.antlr.v4.runtime.ANTLRInputStream} that is loaded from a file all at once
+/// This is an _org.antlr.v4.runtime.ANTLRInputStream_ that is loaded from a file all at once
 /// when you construct the object.
+/// 
 
 import Foundation
 
@@ -10,7 +12,6 @@ public class ANTLRFileStream: ANTLRInputStream {
     internal var fileName: String
 
     public convenience override init(_ fileName: String) {
-        // throws; IOException
         self.init(fileName, nil)
     }
 

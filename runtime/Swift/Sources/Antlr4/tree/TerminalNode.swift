@@ -10,15 +10,15 @@ public class TerminalNode: ParseTree {
 
     }
 
-    /** Set the parent for this leaf node.
-     *
-     *  Technically, this is not backward compatible as it changes
-     *  the interface but no one was able to create custom
-     *  TerminalNodes anyway so I'm adding as it improves internal
-     *  code quality.
-     *
-     *  @since 4.7
-     */
+    /// Set the parent for this leaf node.
+    /// 
+    /// Technically, this is not backward compatible as it changes
+    /// the interface but no one was able to create custom
+    /// TerminalNodes anyway so I'm adding as it improves internal
+    /// code quality.
+    /// 
+    /// - Since: 4.7
+    /// 
     public func setParent(_ parent: RuleContext) {
         RuntimeException(" must overriden !")
         fatalError()

@@ -1,12 +1,16 @@
+/// 
 /// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
+/// 
 
 
+/// 
 /// A lexer is recognizer that draws input symbols from a character stream.
 /// lexer grammars result in a subclass of this object. A Lexer object
 /// uses simplified match() and error recovery mechanisms in the interest
 /// of speed.
+/// 
 
 import Foundation
 
@@ -27,9 +31,12 @@ open class Lexer: Recognizer<LexerATNSimulator>
     public var _input: CharStream?
     internal var _tokenFactorySourcePair: (TokenSource?, CharStream?)
 
+    /// 
     /// How to create token objects
+    /// 
     internal var _factory: TokenFactory = CommonTokenFactory.DEFAULT
 
+    /// 
     /// The goal of all lexer rules/methods is to create a token object.
     /// This is an instance variable as multiple rules may collaborate to
     /// create a single token.  nextToken will return this object after
@@ -37,34 +44,49 @@ open class Lexer: Recognizer<LexerATNSimulator>
     /// emissions, then set this to the last token to be matched or
     /// something nonnull so that the auto token emit mechanism will not
     /// emit another token.
+    /// 
     public var _token: Token?
 
+    /// 
     /// What character index in the stream did the current token start at?
     /// Needed, for example, to get the text for current token.  Set at
     /// the start of nextToken.
+    /// 
     public var _tokenStartCharIndex: Int = -1
 
+    /// 
     /// The line on which the first character of the token resides
+    /// 
     public var _tokenStartLine: Int = 0
 
+    /// 
     /// The character position of first character within the line
+    /// 
     public var _tokenStartCharPositionInLine: Int = 0
 
+    /// 
     /// Once we see EOF on char stream, next token will be EOF.
     /// If you have DONE : EOF ; then you see DONE EOF.
+    /// 
     public var _hitEOF: Bool = false
 
+    /// 
     /// The channel number for the current token
+    /// 
     public var _channel: Int = 0
 
+    /// 
     /// The token type for the current token
+    /// 
     public var _type: Int = 0
 
     public final var _modeStack: Stack<Int> = Stack<Int>()
     public var _mode: Int = Lexer.DEFAULT_MODE
 
+    /// 
     /// You can set the text for the current token to override what is in
     /// the input char buffer.  Use setText() or can set this instance var.
+    /// 
     public var _text: String?
 
     public override init() {
@@ -97,8 +119,10 @@ open class Lexer: Recognizer<LexerATNSimulator>
         getInterpreter().reset()
     }
 
+    /// 
     /// Return a token from this source; i.e., match a token on the char
     /// stream.
+    /// 
 
     open func nextToken() throws -> Token {
         guard let _input = _input else {
@@ -158,11 +182,13 @@ open class Lexer: Recognizer<LexerATNSimulator>
 
     }
 
+    /// 
     /// Instruct the lexer to skip creating a token for current lexer rule
     /// and look for another token.  nextToken() knows to keep looking when
     /// a lexer rule finishes with token set to SKIP_TOKEN.  Recall that
     /// if token==null at end of any token rule, it creates one for you
     /// and emits it.
+    /// 
     open func skip() {
         _type = Lexer.SKIP
     }
@@ -205,7 +231,9 @@ open class Lexer: Recognizer<LexerATNSimulator>
         return _factory
     }
 
+    /// 
     /// Set the char stream and reset the lexer
+    /// 
 
     open override func setInputStream(_ input: IntStream) throws {
         self._input = nil
@@ -225,20 +253,24 @@ open class Lexer: Recognizer<LexerATNSimulator>
         return _input
     }
 
+    /// 
     /// By default does not support multiple emits per nextToken invocation
     /// for efficiency reasons.  Subclass and override this method, nextToken,
     /// and getToken (to push tokens into a list and pull from that list
     /// rather than a single variable as this implementation does).
+    /// 
     open func emit(_ token: Token) {
         //System.err.println("emit "+token);
         self._token = token
     }
 
+    /// 
     /// The standard method called to automatically emit a token at the
     /// outermost lexical rule.  The token object should point into the
     /// char buffer start..stop.  If there is a text override in 'text',
     /// use that to set the token's text.  Override this method to emit
     /// custom Token objects or provide a new factory.
+    /// 
     @discardableResult
     open func emit() -> Token {
         let t: Token = _factory.create(_tokenFactorySourcePair, _type, _text, _channel, _tokenStartCharIndex, getCharIndex() - 1,
@@ -281,13 +313,17 @@ open class Lexer: Recognizer<LexerATNSimulator>
         getInterpreter().setCharPositionInLine(charPositionInLine)
     }
 
+    /// 
     /// What is the index of the current character of lookahead?
+    /// 
     open func getCharIndex() -> Int {
         return _input!.index()
     }
 
+    /// 
     /// Return the text matched so far for the current token or any
     /// text override.
+    /// 
     open func getText() -> String {
         if _text != nil {
             return _text!
@@ -295,13 +331,17 @@ open class Lexer: Recognizer<LexerATNSimulator>
         return getInterpreter().getText(_input!)
     }
 
+    /// 
     /// Set the complete text of this token; it wipes any previous
     /// changes to the text.
+    /// 
     open func setText(_ text: String) {
         self._text = text
     }
 
+    /// 
     /// Override if emitting multiple tokens.
+    /// 
     open func getToken() -> Token {
         return _token!
     }
@@ -334,16 +374,20 @@ open class Lexer: Recognizer<LexerATNSimulator>
         return nil
     }
 
+    /// 
     /// Used to print out token names like ID during debugging and
     /// error reporting.  The generated parsers implement a method
     /// that overrides this to point to their String[] tokenNames.
+    /// 
     override
     open func getTokenNames() -> [String?]? {
         return nil
     }
 
+    /// 
     /// Return a list of all Token objects in input char stream.
     /// Forces load of all tokens. Does not include EOF token.
+    /// 
     open func getAllTokens() throws -> Array<Token> {
         var tokens: Array<Token> = Array<Token>()
         var t: Token = try nextToken()
@@ -384,9 +428,6 @@ open class Lexer: Recognizer<LexerATNSimulator>
             s = "<EOF>"
         }
         switch s {
-//			case CommonToken.EOF :
-//				s = "<EOF>";
-//				break;
         case "\n":
             s = "\\n"
         case "\t":
@@ -404,15 +445,13 @@ open class Lexer: Recognizer<LexerATNSimulator>
         return "'\(s)'"
     }
 
+    /// 
     /// Lexers can normally match any char in it's vocabulary after matching
     /// a token, so do the easy thing and just kill a character and hope
     /// it all works out.  You can instead use the rule invocation stack
     /// to do sophisticated error recovery if you are in a fragment rule.
-    //public func recover(re : RecognitionException) {
-
+    /// 
     open func recover(_ re: AnyObject) throws {
-        //System.out.println("consuming char "+(char)input.LA(1)+" during recovery");
-        //re.printStackTrace();
         // TODO: Do we lose character or line position information?
         try _input!.consume()
     }
