@@ -36,12 +36,12 @@
  *  REQUIRED.
  */
 
-pythonTypeInitMap ::= [
-	"bool":"False",
+javascriptTypeInitMap ::= [
+	"bool":"false",
 	"int":"0",
 	"float":"0.0",
 	"str":"",
-	default:"None" // anything other than a primitive type is an object
+	default:"{}" // anything other than a primitive type is an object
 ]
 
 // args must be <object-model-object>, <fields-resulting-in-STs>
@@ -802,6 +802,9 @@ var antlr4 = require('antlr4/index');
 >>
 
 Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
+<if(superClass)>
+var <superClass> = require('./<superClass>').<superClass>;
+<endif>
 
 <atn>
 
@@ -860,7 +863,7 @@ var serializedATN = ["<model.serialized; wrap={",<\n>    "}>"].join("");
  *	must be an object, default value is "null".
  */
 initValue(typeName) ::= <<
-<javaTypeInitMap.(typeName)>
+<javacriptTypeInitMap.(typeName)>
 >>
 
 codeFileExtension() ::= ".js"
