@@ -157,5 +157,7 @@ YYYY/MM/DD, github id, Full name, email
 2017/07/17, vaibhavaingankar09, Vaibhav Vaingankar, vbhvvaingankar9@gmail.com
 2017/07/23, venkatperi, Venkat Peri, venkatperi@gmail.com
 2017/07/27, shirou, WAKAYAMA Shirou, shirou.faw@gmail.com
+2017/07/09, neatnerd, Mike Arshinskiy, neatnerd@users.noreply.github.com
 2017/07/27, matthauck, Matt Hauck, matthauck@gmail.com
 2017/07/27, shirou, WAKAYAMA Shirou, shirou.faw@gmail.com
+2017/08/20, tiagomazzutti, Tiago Mazzutti, tiagomzt@gmail.com
