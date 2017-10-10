@@ -88,14 +88,6 @@ public final class SimpleIntMap<T> {
 		return keyCount;
 	}
 
-	private int initialProbe(final int hashCode) {
- 	  return hashCode >= 0 ? hashCode & modulo : -hashCode & modulo;
-	}
-
-	private int probeNext(int index) {
-		return index & modulo;
-	}
-
 	private void checkKey(int key) {
 		if (key == EMPTY) {
 			throw new IllegalArgumentException("Illegal key: " + key);
@@ -125,14 +117,8 @@ public final class SimpleIntMap<T> {
 	 * @throws IllegalArgumentException if key is {@code Integer.MIN_INT}
 	 */
 	public T get(int key) {
-		int slot;
-		// Avoid key validity check for the most common case of positive keys.
-		if (key > 0) {
-			slot = key & modulo;
-		} else {
-			checkKey(key);
-			slot = -key & modulo;
-		}
+		checkKey(key);
+		final int slot = key & modulo;
 		return key == keys[slot] ? values[slot] : linearProbe(slot, key);
 	}
 
@@ -182,7 +168,7 @@ public final class SimpleIntMap<T> {
 	}
 
 	private int locate(int key) {
-		int slot = initialProbe(key);
+		int slot = key & modulo;
 		while (true) {
 			final int k = keys[slot];
 			// If slot is empty, return its location
@@ -192,7 +178,7 @@ public final class SimpleIntMap<T> {
 			if (k == key) {
 				return slot;
 			}
-			slot = probeNext(slot + 1);
+			slot = (slot + 1) & modulo;
 		}
 	}
 
@@ -207,7 +193,7 @@ public final class SimpleIntMap<T> {
 	/**
 	 * Expands backing arrays by doubling their capacity.
 	 */
-  private void expand() {
+	private void expand() {
 		int capacity = newCapacity();
 		SimpleIntMap<T> h = new SimpleIntMap<>(capacity);
 		for (int i = 0; i < keys.length; i++) {
