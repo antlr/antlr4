@@ -8,6 +8,7 @@ package org.antlr.v4.test.tool;
 
 import org.antlr.v4.Tool;
 import org.antlr.v4.tool.ErrorType;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -58,6 +59,16 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 	@Override
 	public void testSetUp() throws Exception {
 		super.testSetUp();
+	}
+
+	@Test
+	public void AllErrorCodesDistinct() {
+		ErrorType[] errorTypes = ErrorType.class.getEnumConstants();
+		for (int i = 0; i < errorTypes.length; i++) {
+			for (int j = i + 1; j < errorTypes.length; j++) {
+				Assert.assertNotEquals(errorTypes[i].code, errorTypes[j].code);
+			}
+		}
 	}
 
 	@Test public void testA() { super.testErrors(A, true); }

@@ -1,5 +1,8 @@
 root = true
 
+[*]
+tab_width = 4
+
 [*.{java,stg}]
 charset = utf-8
 insert_final_newline = true
