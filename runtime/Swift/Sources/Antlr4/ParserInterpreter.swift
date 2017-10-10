@@ -5,26 +5,26 @@
 
 
 
-/** A parser simulator that mimics what ANTLR's generated
- *  parser code does. A ParserATNSimulator is used to make
- *  predictions via adaptivePredict but this class moves a pointer through the
- *  ATN to simulate parsing. ParserATNSimulator just
- *  makes us efficient rather than having to backtrack, for example.
- *
- *  This properly creates parse trees even for left recursive rules.
- *
- *  We rely on the left recursive rule invocation and special predicate
- *  transitions to make left recursive rules work.
- *
- *  See TestParserInterpreter for examples.
- */
+/// A parser simulator that mimics what ANTLR's generated
+/// parser code does. A ParserATNSimulator is used to make
+/// predictions via adaptivePredict but this class moves a pointer through the
+/// ATN to simulate parsing. ParserATNSimulator just
+/// makes us efficient rather than having to backtrack, for example.
+/// 
+/// This properly creates parse trees even for left recursive rules.
+/// 
+/// We rely on the left recursive rule invocation and special predicate
+/// transitions to make left recursive rules work.
+/// 
+/// See TestParserInterpreter for examples.
+/// 
 
 public class ParserInterpreter: Parser {
     internal final var grammarFileName: String
     internal final var atn: ATN
-    /** This identifies StarLoopEntryState's that begin the (...)*
-     *  precedence loops of left recursive rules.
-     */
+    /// This identifies StarLoopEntryState's that begin the (...)*
+    /// precedence loops of left recursive rules.
+    /// 
     internal final var statesNeedingLeftRecursionContext: BitSet
 
     internal final var decisionToDFA: [DFA]
@@ -32,30 +32,32 @@ public class ParserInterpreter: Parser {
     internal final var sharedContextCache: PredictionContextCache =
     PredictionContextCache()
 
-    ////@Deprecated
+    /// 
+    /// /@Deprecated
+    /// 
     internal final var tokenNames: [String]
     internal final var ruleNames: [String]
 
     private final var vocabulary: Vocabulary
 
-    /** Tracks LR rules for adjusting the contexts */
+    /// Tracks LR rules for adjusting the contexts
     internal final var _parentContextStack: Array<(ParserRuleContext?, Int)> =
     Array<(ParserRuleContext?, Int)>()
 
-    /** We need a map from (decision,inputIndex)->forced alt for computing ambiguous
-     *  parse trees. For now, we allow exactly one override.
-     */
+    /// We need a map from (decision,inputIndex)->forced alt for computing ambiguous
+    /// parse trees. For now, we allow exactly one override.
+    /// 
     internal var overrideDecision: Int = -1
     internal var overrideDecisionInputIndex: Int = -1
     internal var overrideDecisionAlt: Int = -1
 
-    /** A copy constructor that creates a new parser interpreter by reusing
-     *  the fields of a previous interpreter.
-     *
-     *  @since 4.5.1
-     *
-     *  @param old The interpreter to copy
-     */
+    /// A copy constructor that creates a new parser interpreter by reusing
+    /// the fields of a previous interpreter.
+    /// 
+    /// - Since: 4.5.1
+    /// 
+    /// - Parameter old: The interpreter to copy
+    /// 
     public init(_ old: ParserInterpreter) throws {
 
         self.atn = old.atn
@@ -71,9 +73,9 @@ public class ParserInterpreter: Parser {
                 sharedContextCache))
     }
 
-    /**
-     * @deprecated Use {@link #ParserInterpreter(String, org.antlr.v4.runtime.Vocabulary, java.util.Collection, org.antlr.v4.runtime.atn.ATN, org.antlr.v4.runtime.TokenStream)} instead.
-     */
+    /// 
+    /// Use _#ParserInterpreter(String, org.antlr.v4.runtime.Vocabulary, java.util.Collection, org.antlr.v4.runtime.atn.ATN, org.antlr.v4.runtime.TokenStream)_ instead.
+    /// 
     //@Deprecated
     public convenience init(_ grammarFileName: String, _ tokenNames: Array<String?>?,
                             _ ruleNames: Array<String>, _ atn: ATN, _ input: TokenStream) throws {
@@ -122,7 +124,9 @@ public class ParserInterpreter: Parser {
     }
 
 //	override
-    ////@Deprecated
+    /// 
+    /// /@Deprecated
+    /// 
     public func getTokenNames() -> [String] {
         return tokenNames
     }
@@ -142,7 +146,7 @@ public class ParserInterpreter: Parser {
         return grammarFileName
     }
 
-    /** Begin parsing at startRuleIndex */
+    /// Begin parsing at startRuleIndex
     public func parse(_ startRuleIndex: Int) throws -> ParserRuleContext {
         let startRuleStartState: RuleStartState = atn.ruleToStartState[startRuleIndex]
 
@@ -303,46 +307,46 @@ public class ParserInterpreter: Parser {
         setState(ruleTransition.followState.stateNumber)
     }
 
-    /** Override this parser interpreters normal decision-making process
-     *  at a particular decision and input token index. Instead of
-     *  allowing the adaptive prediction mechanism to choose the
-     *  first alternative within a block that leads to a successful parse,
-     *  force it to take the alternative, 1..n for n alternatives.
-     *
-     *  As an implementation limitation right now, you can only specify one
-     *  override. This is sufficient to allow construction of different
-     *  parse trees for ambiguous input. It means re-parsing the entire input
-     *  in general because you're never sure where an ambiguous sequence would
-     *  live in the various parse trees. For example, in one interpretation,
-     *  an ambiguous input sequence would be matched completely in expression
-     *  but in another it could match all the way back to the root.
-     *
-     *  s : e '!'? ;
-     *  e : ID
-     *    | ID '!'
-     *    ;
-     *
-     *  Here, x! can be matched as (s (e ID) !) or (s (e ID !)). In the first
-     *  case, the ambiguous sequence is fully contained only by the root.
-     *  In the second case, the ambiguous sequences fully contained within just
-     *  e, as in: (e ID !).
-     *
-     *  Rather than trying to optimize this and make
-     *  some intelligent decisions for optimization purposes, I settled on
-     *  just re-parsing the whole input and then using
-     *  {link Trees#getRootOfSubtreeEnclosingRegion} to find the minimal
-     *  subtree that contains the ambiguous sequence. I originally tried to
-     *  record the call stack at the point the parser detected and ambiguity but
-     *  left recursive rules create a parse tree stack that does not reflect
-     *  the actual call stack. That impedance mismatch was enough to make
-     *  it it challenging to restart the parser at a deeply nested rule
-     *  invocation.
-     *
-     *  Only parser interpreters can override decisions so as to avoid inserting
-     *  override checking code in the critical ALL(*) prediction execution path.
-     *
-     *  @since 4.5.1
-     */
+    /// Override this parser interpreters normal decision-making process
+    /// at a particular decision and input token index. Instead of
+    /// allowing the adaptive prediction mechanism to choose the
+    /// first alternative within a block that leads to a successful parse,
+    /// force it to take the alternative, 1..n for n alternatives.
+    /// 
+    /// As an implementation limitation right now, you can only specify one
+    /// override. This is sufficient to allow construction of different
+    /// parse trees for ambiguous input. It means re-parsing the entire input
+    /// in general because you're never sure where an ambiguous sequence would
+    /// live in the various parse trees. For example, in one interpretation,
+    /// an ambiguous input sequence would be matched completely in expression
+    /// but in another it could match all the way back to the root.
+    /// 
+    /// s : e '!'? ;
+    /// e : ID
+    /// | ID '!'
+    /// ;
+    /// 
+    /// Here, x! can be matched as (s (e ID) !) or (s (e ID !)). In the first
+    /// case, the ambiguous sequence is fully contained only by the root.
+    /// In the second case, the ambiguous sequences fully contained within just
+    /// e, as in: (e ID !).
+    /// 
+    /// Rather than trying to optimize this and make
+    /// some intelligent decisions for optimization purposes, I settled on
+    /// just re-parsing the whole input and then using
+    /// {link Trees#getRootOfSubtreeEnclosingRegion} to find the minimal
+    /// subtree that contains the ambiguous sequence. I originally tried to
+    /// record the call stack at the point the parser detected and ambiguity but
+    /// left recursive rules create a parse tree stack that does not reflect
+    /// the actual call stack. That impedance mismatch was enough to make
+    /// it it challenging to restart the parser at a deeply nested rule
+    /// invocation.
+    /// 
+    /// Only parser interpreters can override decisions so as to avoid inserting
+    /// override checking code in the critical ALL(*) prediction execution path.
+    /// 
+    /// - Since: 4.5.1
+    /// 
     public func addDecisionOverride(_ decision: Int, _ tokenIndex: Int, _ forcedAlt: Int) {
         overrideDecision = decision
         overrideDecisionInputIndex = tokenIndex

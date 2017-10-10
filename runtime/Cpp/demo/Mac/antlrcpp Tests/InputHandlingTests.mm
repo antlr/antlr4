@@ -91,7 +91,7 @@ using namespace antlr4::misc;
 
 - (void)testANTLRInputStreamUse {
   std::string text(u8"🚧Lorem ipsum dolor sit amet🕶");
-  std::u32string wtext = utfConverter.from_bytes(text); // Convert to UTF-32.
+  std::u32string wtext = utf8_to_utf32(text.c_str(), text.c_str() + text.size()); // Convert to UTF-32.
   ANTLRInputStream stream(text);
   XCTAssertEqual(stream.index(), 0U);
   XCTAssertEqual(stream.size(), wtext.size());
@@ -116,8 +116,8 @@ using namespace antlr4::misc;
 
   XCTAssertEqual(stream.LA(0), 0ULL);
   for (size_t i = 1; i < wtext.size(); ++i) {
-    XCTAssertEqual(stream.LA((ssize_t)i), wtext[i - 1]); // LA(1) means: current char.
-    XCTAssertEqual(stream.LT((ssize_t)i), wtext[i - 1]); // LT is mapped to LA.
+    XCTAssertEqual(stream.LA(static_cast<ssize_t>(i)), wtext[i - 1]); // LA(1) means: current char.
+    XCTAssertEqual(stream.LT(static_cast<ssize_t>(i)), wtext[i - 1]); // LT is mapped to LA.
     XCTAssertEqual(stream.index(), 0U); // No consumption when looking ahead.
   }
 
@@ -128,7 +128,7 @@ using namespace antlr4::misc;
   XCTAssertEqual(stream.index(), wtext.size() / 2);
 
   stream.seek(wtext.size() - 1);
-  for (ssize_t i = 1; i < (ssize_t)wtext.size() - 1; ++i) {
+  for (ssize_t i = 1; i < static_cast<ssize_t>(wtext.size()) - 1; ++i) {
     XCTAssertEqual(stream.LA(-i), wtext[wtext.size() - i - 1]); // LA(-1) means: previous char.
     XCTAssertEqual(stream.LT(-i), wtext[wtext.size() - i - 1]); // LT is mapped to LA.
     XCTAssertEqual(stream.index(), wtext.size() - 1); // No consumption when looking ahead.
@@ -150,7 +150,7 @@ using namespace antlr4::misc;
 
   misc::Interval interval1(2, 10UL); // From - to, inclusive.
   std::string output = stream.getText(interval1);
-  std::string sub = utfConverter.to_bytes(wtext.substr(2, 9));
+  std::string sub = utf32_to_utf8(wtext.substr(2, 9));
   XCTAssertEqual(output, sub);
 
   misc::Interval interval2(200, 10UL); // Start beyond bounds.
