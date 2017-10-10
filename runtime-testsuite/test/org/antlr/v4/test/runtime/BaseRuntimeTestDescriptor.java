@@ -9,7 +9,10 @@ package org.antlr.v4.test.runtime;
 import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.runtime.misc.Utils;
 
+import com.ibm.icu.impl.UResource.Array;
+
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -22,6 +25,7 @@ import java.util.regex.Pattern;
  */
 public abstract class BaseRuntimeTestDescriptor implements RuntimeTestDescriptor {
 	protected String targetName;
+	ArrayList<String> ignoreList;
 
 	@Override
 	public String getTestName() {
@@ -164,7 +168,18 @@ public abstract class BaseRuntimeTestDescriptor implements RuntimeTestDescriptor
 	}
 
 	@Override
+	public void addIgnore(String targetName) {
+		if( ignoreList == null ) {
+			ignoreList = new ArrayList<String>();
+		}
+		ignoreList.add(targetName);
+	}
+	
+	@Override
 	public boolean ignore(String targetName) {
+		if( ignoreList != null ) {
+			return ignoreList.contains(targetName);
+		}
 		return false;
 	}
 

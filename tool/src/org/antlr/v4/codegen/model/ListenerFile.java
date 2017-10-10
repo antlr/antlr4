@@ -26,10 +26,18 @@ public class ListenerFile extends OutputFile {
 	public String exportMacro; // from -DexportMacro cmd-line
 	public String grammarName;
 	public String parserName;
+	
+	/**
+	 * The names of all listener separated by rule & named alternative.
+	 */
+	public Set<String> listenerRuleNames = new LinkedHashSet<String>();
+	public Set<String> listenerAltNames = new LinkedHashSet<String>();
+
 	/**
 	 * The names of all listener contexts.
 	 */
 	public Set<String> listenerNames = new LinkedHashSet<String>();
+
 	/**
 	 * For listener contexts created for a labeled outer alternative, maps from
 	 * a listener context name to the name of the rule which defines the
@@ -51,16 +59,20 @@ public class ListenerFile extends OutputFile {
 			if ( labels!=null ) {
 				for (Map.Entry<String, List<Pair<Integer, AltAST>>> pair : labels.entrySet()) {
 					listenerNames.add(pair.getKey());
+					listenerAltNames.add(pair.getKey());
 					listenerLabelRuleNames.put(pair.getKey(), r.name);
 				}
 			}
 			else {
 				// only add rule context if no labels
 				listenerNames.add(r.name);
+				listenerRuleNames.add(r.name);
 			}
 		}
 		ActionAST ast = g.namedActions.get("header");
-		if ( ast!=null ) header = new Action(factory, ast);
+		if ( ast!=null ) {
+			header = new Action(factory, ast);
+		}
 		genPackage = factory.getGrammar().tool.genPackage;
 		exportMacro = factory.getGrammar().getOptionString("exportMacro");
 	}
