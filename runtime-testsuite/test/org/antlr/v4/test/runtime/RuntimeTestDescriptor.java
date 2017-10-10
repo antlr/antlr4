@@ -63,6 +63,9 @@ public interface RuntimeTestDescriptor {
 	/** Set the target we are testing */
 	void setTarget(String targetName);
 
+	/** added a target to the list of targets to be ignored */
+	void addIgnore(String targetName);
+	
 	/** Return true if this test should be ignored for the indicated target */
 	boolean ignore(String targetName);
 }

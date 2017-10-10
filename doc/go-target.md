@@ -113,3 +113,178 @@ The output is:
 "a":1
 1
 ```
+
+### Visitor Example
+
+The following example demostrates the use of a generated and implemented vistor.
+The main difference of visitors of listeners is that the iteration can be controlled.
+There are two points of control. First `VisitNext` is called before a rule, terminal or error node is visited. Second your `VisitX` methods can choice to call `VisitChildren` to continue, or exclude the call so no more children are visited.
+
+The following simple example demonstrates.
+It is assumed all the file are in
+```
+src/scratch
+```
+
+
+# The Grammar
+in Scratch.g4
+```
+grammar Scratch;
+
+start : a EOF ;
+a  
+  : t=('1'|'0') b? a?
+;
+
+b
+  : t='x'
+  | t='y'
+;
+```
+
+# Generating Go
+in gen.go
+```
+//go:generate java -jar <path-to-antlr-jar> Scratch.g4 -o parser -visitor -Dlanguage=Go Scratch.g4
+
+func main() { }
+```
+
+use the Go cmd to generate the Go code.
+
+```
+go generate
+```
+
+# Your Visitor Implementation
+in myVisitor.go
+```
+package main
+
+import (
+	"fmt"
+	"scratch/parser"
+	"bytes"
+	"github.com/antlr/antlr4/runtime/Go/antlr"
+)
+
+type ScratchVisitor struct {
+	*antlr.BaseParseTreeVisitor
+	// fields to control the interation
+	lastAis1 bool
+	seenY    bool
+
+	// result fields
+	SExpr bytes.Buffer
+}
+
+// Can be used to check that all Visit methods are "overriden"
+//var _ parser.ScratchVisitor = &ScratchVisitor{}
+
+// Filter
+func (v *ScratchVisitor) VisitNext(node antlr.Tree) bool {
+	// Don't visit terminal node
+	if _, ok := node.(antlr.TerminalNode); ok {
+		return false
+	}
+	// Don't visit rule B is the last rule A token was a 0
+	if _, ok := node.(*parser.BContext); !v.lastAis1 && ok {
+		return false
+	}
+	return true
+}
+
+// never called because VisitNext filters all TerminalNode types
+func (v *ScratchVisitor) VisitTerminal(node antlr.TerminalNode) {
+	fmt.Printf("terminal %v\n", node.GetText())
+}
+func (v *ScratchVisitor) VisitErrorNode(node antlr.ErrorNode) {
+}
+
+func (v *ScratchVisitor) VisitA(ctx parser.IAContext, delegate antlr.ParseTreeVisitor) {
+	// before children
+	// Don't visit any more children after a "y"
+	if v.seenY {
+		return
+	}
+	v.SExpr.WriteString(" (a ")
+	v.SExpr.WriteString(ctx.GetT().GetText())
+	fmt.Printf("%s\n", ctx.GetT().GetText())
+	v.lastAis1 = ctx.GetT().GetText() == "1"
+	v.VisitChildren(ctx, delegate)
+	// afer children
+	v.SExpr.WriteString(")")
+}
+
+func (v *ScratchVisitor) VisitB(ctx parser.IBContext, delegate antlr.ParseTreeVisitor) {
+	// before children
+	v.SExpr.WriteString(" (b ")
+	v.SExpr.WriteString(ctx.GetT().GetText())
+	fmt.Printf("%s\n", ctx.GetT().GetText())
+	v.seenY = ctx.GetT().GetText() == "y"
+	v.VisitChildren(ctx, delegate)
+	// afer children
+	v.SExpr.WriteString(")")
+}
+```
+
+# Main or Test code
+in my_test.go
+```
+package main
+
+import (
+	"testing"
+
+	"fmt"
+
+	"github.com/antlr/antlr4/runtime/Go/antlr"
+	"scratch/parser"
+)
+
+func TestScratch(t *testing.T) {
+	// input is "101x0x01y11111"
+	input := antlr.NewInputStream("101x0x01y11111")
+	lexer := parser.NewScratchLexer(input)
+	stream := antlr.NewCommonTokenStream(lexer, 0)
+	p := parser.NewScratchParser(stream)
+	p.AddErrorListener(antlr.NewDiagnosticErrorListener(true))
+	tree := p.Start()
+	sexpr := antlr.TreesStringTree(tree, nil, p)
+	fmt.Printf("%s\n", sexpr)
+	v := &ScratchVisitor{}
+	tree.Accept(v)
+	fmt.Printf("%s\n", v.SExpr.String())
+	fmt.Println()
+}
+```
+
+# Running the test
+
+```
+go test
+```
+
+Explaining the output
+- Only one of the "x"s is visited as only one of then is preceded by a 1
+- No children are visited after the "y" as VisitChildren isn't call after the first "y" is seen.
+- Note because "a" is defined recursively all "a"s are a child of an "a" or "start"
+- The result collected by the visitor (ie the last LISPy line) is collected inside your visitor.
+
+```
+=== RUN   TestScratch
+(start (a 1 (a 0 (a 1 (b x) (a 0 (b x) (a 0 (a 1 (b y) (a 1 (a 1 (a 1 (a 1 (a 1))))))))))) <EOF>)
+1
+0
+1
+x
+0
+0
+1
+y
+ (a 1 (a 0 (a 1 (b x) (a 0 (a 0 (a 1 (b y)))))))
+--- PASS: TestScratch (0.00s)
+PASS
+ok  	scratch	0.006s
+```

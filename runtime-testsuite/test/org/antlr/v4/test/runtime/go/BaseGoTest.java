@@ -164,6 +164,9 @@ public class BaseGoTest implements RuntimeTestSupport {
 	}
 
 	private static void copyFile(File source, File dest) throws IOException {
+		if( source.isDirectory() ) {
+			return;
+		}
 		InputStream is = new FileInputStream(source);
 		OutputStream os = new FileOutputStream(dest);
 		byte[] buf = new byte[4 << 10];
@@ -359,6 +362,7 @@ public class BaseGoTest implements RuntimeTestSupport {
 		ErrorQueue equeue = antlrOnString(getTmpDir(), "Go", grammarFileName, grammarStr,
 		                                  defaultListener, extraOptions);
 		if (!equeue.errors.isEmpty()) {
+			System.err.println(equeue.errors);
 			return false;
 		}
 		return true;
@@ -679,7 +683,7 @@ public class BaseGoTest implements RuntimeTestSupport {
 				+")\n"
 				+ "\n"
 				+ "type TreeShapeListener struct {\n"
-				+ "	*parser.Base<listenerName>\n"
+				+ "	*antlr.BaseParseTreeListener\n"
 				+ "}\n"
 				+ "\n"
 				+ "func NewTreeShapeListener() *TreeShapeListener {\n"
