@@ -227,6 +227,14 @@ class Parser (Recognizer):
                 listener.exitEveryRule(self._ctx)
 
 
+    # Gets the number of syntax errors reported during parsing. This value is
+    # incremented each time {@link #notifyErrorListeners} is called.
+    #
+    # @see #notifyErrorListeners
+    #
+    def getNumberOfSyntaxErrors(self):
+        return self._syntaxErrors
+
     def getTokenFactory(self):
         return self._input.tokenSource._factory
 
