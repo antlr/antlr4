@@ -336,8 +336,6 @@ open class Parser: Recognizer<ParserATNSimulator> {
     /// 
     /// - Parameter listener: the listener to add
     /// 
-    /// - Throws: _ANTLRError.nullPointer_ if listener is `null`
-    /// 
     public func addParseListener(_ listener: ParseTreeListener) {
         if _parseListeners == nil {
             _parseListeners = Array<ParseTreeListener>()

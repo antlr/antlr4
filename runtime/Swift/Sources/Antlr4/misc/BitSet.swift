@@ -32,10 +32,6 @@ import Foundation
 /// implementation. The length of a bit set relates to logical length
 /// of a bit set and is defined independently of implementation.
 /// 
-/// Unless otherwise noted, passing a null parameter to any of the
-/// methods in a `BitSet` will result in a
-/// `ANTLRError.nullPointer`.
-/// 
 /// A `BitSet` is not safe for multithreaded use without
 /// external synchronization.
 /// 
