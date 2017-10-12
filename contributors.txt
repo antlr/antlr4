@@ -151,8 +151,16 @@ YYYY/MM/DD, github id, Full name, email
 2017/06/11, erikbra, Erik A. Brandstadmoen, erik@brandstadmoen.net
 2017/06/10, jm-mikkelsen, Jan Martin Mikkelsen, janm@transactionware.com
 2017/06/25, alimg, Alim Gökkaya, alim.gokkaya@gmail.com
+2017/06/28, jBugman, Sergey Parshukov, codedby@bugman.me
 2017/07/09, neatnerd, Mike Arshinskiy, neatnerd@users.noreply.github.com
 2017/07/11, dhalperi, Daniel Halperin, daniel@halper.in
 2017/07/17, vaibhavaingankar09, Vaibhav Vaingankar, vbhvvaingankar9@gmail.com
 2017/07/23, venkatperi, Venkat Peri, venkatperi@gmail.com
 2017/07/27, shirou, WAKAYAMA Shirou, shirou.faw@gmail.com
+2017/07/09, neatnerd, Mike Arshinskiy, neatnerd@users.noreply.github.com
+2017/07/27, matthauck, Matt Hauck, matthauck@gmail.com
+2017/07/27, shirou, WAKAYAMA Shirou, shirou.faw@gmail.com
+2017/08/20, tiagomazzutti, Tiago Mazzutti, tiagomzt@gmail.com
+2017/09/09, brauliobz, Bráulio Bezerra, brauliobezerra@gmail.com
+2017/09/11, sachinjain024, Sachin Jain, sachinjain024@gmail.com
+2017/10/06, bramp, Andrew Brampton, brampton@gmail.com

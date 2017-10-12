@@ -894,8 +894,10 @@ public class <lexer.name> extends <superClass; null="Lexer"> {
 	protected static final DFA[] _decisionToDFA;
 	protected static final PredictionContextCache _sharedContextCache =
 		new PredictionContextCache();
+	<if(lexer.tokens)>
 	public static final int
 		<lexer.tokens:{k | <k>=<lexer.tokens.(k)>}; separator=", ", wrap, anchor>;
+	<endif>
 	<if(lexer.channels)>
 	public static final int
 		<lexer.channels:{c | <c>=<lexer.channels.(c)>}; separator=", ", wrap, anchor>;
