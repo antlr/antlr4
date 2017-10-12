@@ -145,7 +145,7 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 
 		String projectName = "testcase-" + System.currentTimeMillis();
 		String projectDir = getTmpDir() + "/" + projectName;
-		buildProject(projectDir);
+		buildProject(projectDir, projectName);
 		return execTest(projectDir, projectName);
 	}
 
@@ -183,12 +183,12 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 		Collections.addAll(this.sourceFiles, files);
 	}
 
-	private void buildProject(String projectDir) {
+	private void buildProject(String projectDir, String projectName) {
 		mkdir(projectDir);
 		fastFailRunProcess(projectDir, SWIFT_CMD, "package", "init", "--type", "executable");
 		for (String sourceFile: sourceFiles) {
 			String absPath = getTmpDir() + "/" + sourceFile;
-			fastFailRunProcess(getTmpDir(), "mv", "-f", absPath, projectDir + "/Sources/");
+			fastFailRunProcess(getTmpDir(), "mv", "-f", absPath, projectDir + "/Sources/" + projectName);
 		}
 		fastFailRunProcess(getTmpDir(), "mv", "-f", "input", projectDir);
 
@@ -201,7 +201,7 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 					"-Xlinker", "-rpath",
 					"-Xlinker", dylibPath);
 			if (buildResult.b.length() > 0) {
-				throw new RuntimeException("unit test build failed: " + buildResult.b);
+				throw new RuntimeException("unit test build failed: " + buildResult.a + "\n" + buildResult.b);
 			}
 		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
@@ -251,7 +251,7 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 		addSourceFiles("main.swift");
 		String projectName = "testcase-" + System.currentTimeMillis();
 		String projectDir = getTmpDir() + "/" + projectName;
-		buildProject(projectDir);
+		buildProject(projectDir, projectName);
 		return execTest(projectDir, projectName);
 	}
 
