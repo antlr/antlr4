@@ -154,4 +154,3 @@ before_install:
 
 script:
   - cd runtime-testsuite; ../.travis/run-tests-$TARGET.sh
-
