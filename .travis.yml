@@ -108,6 +108,7 @@ matrix:
         - GROUP=RECURSION
       stage: main-test
     - os: linux
+      dist: trusty
       compiler: clang
       env:
        - TARGET=swift
