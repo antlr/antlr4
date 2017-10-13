@@ -158,4 +158,4 @@ before_install:
   - ./.travis/before-install-$TRAVIS_OS_NAME-$TARGET.sh
 
 script:
-  - cd runtime-testsuite; ../.travis/run-tests-$TARGET.sh
+  - cd runtime-testsuite; travis_wait 40 ../.travis/run-tests-$TARGET.sh
