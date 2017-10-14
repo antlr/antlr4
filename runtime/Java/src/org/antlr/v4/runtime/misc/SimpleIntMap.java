@@ -94,6 +94,10 @@ public final class SimpleIntMap<T> {
 		}
 	}
 
+	public boolean needsExpansion() {
+		return keyCount == threshold;
+	}
+
 	public void put(int key, T value) {
 		checkKey(key);
 		if (keyCount == threshold) {
@@ -182,6 +186,17 @@ public final class SimpleIntMap<T> {
 		}
 	}
 
+	public SimpleIntMap<T> expandToNewMap() {
+		int capacity = newCapacity();
+		SimpleIntMap<T> newMap = new SimpleIntMap<>(capacity);
+		for (int i = 0; i < keys.length; i++) {
+			if (keys[i] != EMPTY) {
+				newMap.put(keys[i], values[i]);
+			}
+		}
+		return newMap;
+	}
+
 	private int newCapacity() {
 		long size = (long) (keys.length * 2);
 		if (keys.length > MAX_SIZE) {
@@ -194,13 +209,7 @@ public final class SimpleIntMap<T> {
 	 * Expands backing arrays by doubling their capacity.
 	 */
 	private void expand() {
-		int capacity = newCapacity();
-		SimpleIntMap<T> h = new SimpleIntMap<>(capacity);
-		for (int i = 0; i < keys.length; i++) {
-			if (keys[i] != EMPTY) {
-				h.put(keys[i], values[i]);
-			}
-		}
+		SimpleIntMap<T> h = expandToNewMap();
 		this.keys = h.keys;
 		this.values = h.values;
 		this.threshold = h.threshold;

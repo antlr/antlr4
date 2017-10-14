@@ -10,7 +10,6 @@ import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNConfig;
 import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.atn.LexerActionExecutor;
-import org.antlr.v4.runtime.atn.ParserATNSimulator;
 import org.antlr.v4.runtime.atn.SemanticContext;
 import org.antlr.v4.runtime.misc.MurmurHash;
 import org.antlr.v4.runtime.misc.SimpleIntMap;
@@ -18,6 +17,8 @@ import org.antlr.v4.runtime.misc.SimpleIntMap;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.ReentrantLock;
 
 /** A DFA state represents a set of possible ATN configurations.
  *  As Aho, Sethi, Ullman p. 117 says "The DFA uses its state
@@ -54,7 +55,8 @@ public class DFAState {
 	 * Edges points to a target State for a symbol.
 	 * This map represents all edges from this state to all connected states.
  	 */
-	private final SimpleIntMap<DFAState> edges = new SimpleIntMap<>(2);
+	private AtomicReference<SimpleIntMap<DFAState>> edgeMap;
+	private final ReentrantLock writeLock = new ReentrantLock();
 
 	public boolean isAcceptState = false;
 
@@ -108,24 +110,32 @@ public class DFAState {
 
 	public DFAState(int stateNumber) { this.stateNumber = stateNumber; }
 
-	public DFAState(ATNConfigSet configs) { this.configs = configs; }
+	public DFAState(ATNConfigSet configs) {
+		edgeMap = new AtomicReference<>(new SimpleIntMap<DFAState>(2));
+		this.configs = configs;
+	}
 
 	public void addEdge(int symbol, DFAState state) {
-		synchronized(this) {
-			edges.put(symbol, state);
+		writeLock.lock();
+		SimpleIntMap<DFAState> currentMap = edgeMap.get();
+		if(edgeMap.get().needsExpansion()) {
+			SimpleIntMap<DFAState> newMap = currentMap.expandToNewMap();
+			edgeMap.set(newMap);
 		}
+		edgeMap.get().put(symbol, state);
+		writeLock.unlock();
 	}
 
 	public DFAState getTargetState(int symbol) {
-		return edges.get(symbol);
+		return edgeMap.get().get(symbol);
 	}
 
 	public int[] getEdgeKeys() {
-		return edges.getKeys();
+		return edgeMap.get().getKeys();
 	}
 
 	public int getEdgeCount() {
-		return edges.size();
+		return edgeMap.get().size();
 	}
 
 	/** Get the set of all alts mentioned by all ATN configurations in this
