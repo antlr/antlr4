@@ -6,7 +6,7 @@ Hi and welcome to the version 4 release of ANTLR! It's named after the fearless 
 
 ANTLR is really two things: a tool that translates your grammar to a parser/lexer in Java (or other target language) and the runtime needed by the generated parsers/lexers. Even if you are using the ANTLR Intellij plug-in or ANTLRWorks to run the ANTLR tool, the generated code will still need the runtime library. 
 
-The first thing you should do is probably download and install a development tool plug-in. Even if you only use such tools for editing, they are great. Then, follow the instructions below to get the runtime environment available to your system to run generated parsers/lexers.  In what follows, I talk about antlr-4.5.3-complete.jar, which has the tool and the runtime and any other support libraries (e.g., ANTLR v4 is written in v3).
+The first thing you should do is probably download and install a development tool plug-in. Even if you only use such tools for editing, they are great. Then, follow the instructions below to get the runtime environment available to your system to run generated parsers/lexers.  In what follows, I talk about antlr-4.7-complete.jar, which has the tool and the runtime and any other support libraries (e.g., ANTLR v4 is written in v3).
 
 If you are going to integrate ANTLR into your existing build system using mvn, ant, or want to get ANTLR into your IDE such as eclipse or intellij, see Integrating ANTLR into Development Systems.
 
@@ -16,7 +16,7 @@ If you are going to integrate ANTLR into your existing build system using mvn, a
 1. Download
 ```
 $ cd /usr/local/lib
-$ curl -O http://www.antlr.org/download/antlr-4.5.3-complete.jar
+$ curl -O http://www.antlr.org/download/antlr-4.7-complete.jar
 ```
 Or just download in browser from website:
     [http://www.antlr.org/download.html](http://www.antlr.org/download.html)
@@ -45,7 +45,7 @@ Save to your directory for 3rd party Java libraries, say `C:\Javalib`
   * Permanently: Using System Properties dialog > Environment variables > Create or append to `CLASSPATH` variable
   * Temporarily, at command line:
 ```
-SET CLASSPATH=.;C:\Javalib\antlr-4.5.3-complete.jar;%CLASSPATH%
+SET CLASSPATH=.;C:\Javalib\antlr-4.7-complete.jar;%CLASSPATH%
 ```
 3. Create short convenient commands for the ANTLR Tool, and TestRig, using batch files or doskey commands:
   * Batch files (in directory in system PATH) antlr4.bat and grun.bat
@@ -67,7 +67,7 @@ Either launch org.antlr.v4.Tool directly:
 
 ```
 $ java org.antlr.v4.Tool
-ANTLR Parser Generator Version 4.5.3
+ANTLR Parser Generator Version 4.7
 -o ___ specify output directory where all output is generated
 -lib ___ specify location of .tokens files
 ...
@@ -76,8 +76,8 @@ ANTLR Parser Generator Version 4.5.3
 or use -jar option on java:
 
 ```
-$ java -jar /usr/local/lib/antlr-4.5.3-complete.jar
-ANTLR Parser Generator Version 4.5.3
+$ java -jar /usr/local/lib/antlr-4.7-complete.jar
+ANTLR Parser Generator Version 4.7
 -o ___ specify output directory where all output is generated
 -lib ___ specify location of .tokens files
 ...
