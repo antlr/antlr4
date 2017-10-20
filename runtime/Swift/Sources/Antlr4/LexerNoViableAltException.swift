@@ -39,7 +39,7 @@ public class LexerNoViableAltException: RecognitionException<LexerATNSimulator>,
         var symbol = ""
         if let charStream = getInputStream() as? CharStream, startIndex >= 0 && startIndex < charStream.size() {
             let interval = Interval.of(startIndex, startIndex)
-            symbol = charStream.getText(interval)
+            symbol = try! charStream.getText(interval)
             symbol = Utils.escapeWhitespace(symbol, false)
         }
 

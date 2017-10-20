@@ -164,7 +164,12 @@ public class CommonToken: WritableToken {
         if let input = getInputStream() {
             let n = input.size()
             if start < n && stop < n {
-                return input.getText(Interval.of(start, stop))
+                do {
+                    return try input.getText(Interval.of(start, stop))
+                }
+                catch {
+                    return nil
+                }
             } else {
                 return "<EOF>"
             }

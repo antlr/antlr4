@@ -25,5 +25,5 @@ public protocol CharStream: IntStream {
     /// - throws: _ANTLRError.unsupportedOperation_ if the stream does not support
     /// getting the text of the specified interval
     /// 
-    func getText(_ interval: Interval) -> String
+    func getText(_ interval: Interval) throws -> String
 }
