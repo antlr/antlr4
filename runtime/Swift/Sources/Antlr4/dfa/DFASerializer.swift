@@ -13,14 +13,6 @@ public class DFASerializer: CustomStringConvertible {
     private let dfa: DFA
     private let vocabulary: Vocabulary
 
-    /// 
-    /// -  Use _#DFASerializer(org.antlr.v4.runtime.dfa.DFA, org.antlr.v4.runtime.Vocabulary)_ instead.
-    /// 
-    //@Deprecated
-    public convenience init(_ dfa: DFA, _ tokenNames: [String?]?) {
-        self.init(dfa, Vocabulary.fromTokenNames(tokenNames))
-    }
-
     public init(_ dfa: DFA, _ vocabulary: Vocabulary) {
         self.dfa = dfa
         self.vocabulary = vocabulary

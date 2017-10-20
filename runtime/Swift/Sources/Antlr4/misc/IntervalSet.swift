@@ -595,14 +595,6 @@ public class IntervalSet: IntSet, Hashable, CustomStringConvertible {
         return buf.toString()
     }
 
-    /// 
-    /// -  Use _#toString(org.antlr.v4.runtime.Vocabulary)_ instead.
-    /// /@Deprecated
-    /// 
-    public func toString(_ tokenNames: [String?]?) -> String {
-        return toString(Vocabulary.fromTokenNames(tokenNames))
-    }
-
     public func toString(_ vocabulary: Vocabulary) -> String {
         let buf = StringBuilder()
 
@@ -639,15 +631,6 @@ public class IntervalSet: IntSet, Hashable, CustomStringConvertible {
         }
         return buf.toString()
     }
-
-    /// 
-    /// -  Use _#elementName(org.antlr.v4.runtime.Vocabulary, int)_ instead.
-    /// /@Deprecated
-    /// 
-    internal func elementName(_ tokenNames: [String?]?, _ a: Int) -> String {
-        return elementName(Vocabulary.fromTokenNames(tokenNames), a)
-    }
-
 
     internal func elementName(_ vocabulary: Vocabulary, _ a: Int) -> String {
         if a == CommonToken.EOF {

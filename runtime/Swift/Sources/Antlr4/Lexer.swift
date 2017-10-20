@@ -373,16 +373,6 @@ open class Lexer: Recognizer<LexerATNSimulator>, TokenSource {
     }
 
     /// 
-    /// Used to print out token names like ID during debugging and
-    /// error reporting.  The generated parsers implement a method
-    /// that overrides this to point to their String[] tokenNames.
-    /// 
-    override
-    open func getTokenNames() -> [String?]? {
-        return nil
-    }
-
-    /// 
     /// Return a list of all Token objects in input char stream.
     /// Forces load of all tokens. Does not include EOF token.
     /// 

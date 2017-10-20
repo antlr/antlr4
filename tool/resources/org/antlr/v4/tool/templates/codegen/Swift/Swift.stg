@@ -300,32 +300,6 @@ private static let _SYMBOLIC_NAMES: [String?] = [
 	<symbolicNames:{t | <t>}; null="nil", separator=", ", wrap, anchor>
 ]
 public static let VOCABULARY = Vocabulary(_LITERAL_NAMES, _SYMBOLIC_NAMES)
-
-/**
- * @deprecated Use {@link #VOCABULARY} instead.
- */
-//@Deprecated
-public let tokenNames: [String?]? = {
-    let length = _SYMBOLIC_NAMES.count
-    var tokenNames = [String?](repeating: nil, count: length)
-	for i in 0..\<length {
-		var name = VOCABULARY.getLiteralName(i)
-		if name == nil {
-			name = VOCABULARY.getSymbolicName(i)
-		}
-		if name == nil {
-			name = "\<INVALID>"
-		}
-		tokenNames[i] = name
-	}
-	return tokenNames
-}()
-
-override
-<!//@Deprecated!>
-open func getTokenNames() -> [String?]? {
-	return tokenNames
-}
 >>
 
 dumpActions(recog, argFuncs, actionFuncs, sempredFuncs) ::= <<

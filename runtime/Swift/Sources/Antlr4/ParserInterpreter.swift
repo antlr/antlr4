@@ -32,10 +32,6 @@ public class ParserInterpreter: Parser {
     internal final var sharedContextCache: PredictionContextCache =
     PredictionContextCache()
 
-    /// 
-    /// /@Deprecated
-    /// 
-    internal final var tokenNames: [String]
     internal final var ruleNames: [String]
 
     private final var vocabulary: Vocabulary
@@ -64,7 +60,6 @@ public class ParserInterpreter: Parser {
         self.grammarFileName = old.grammarFileName
         self.statesNeedingLeftRecursionContext = old.statesNeedingLeftRecursionContext
         self.decisionToDFA = old.decisionToDFA
-        self.tokenNames = old.tokenNames
         self.ruleNames = old.ruleNames
         self.vocabulary = old.vocabulary
         try  super.init(old.getTokenStream()!)
@@ -73,26 +68,11 @@ public class ParserInterpreter: Parser {
                 sharedContextCache))
     }
 
-    /// 
-    /// Use _#ParserInterpreter(String, org.antlr.v4.runtime.Vocabulary, java.util.Collection, org.antlr.v4.runtime.atn.ATN, org.antlr.v4.runtime.TokenStream)_ instead.
-    /// 
-    //@Deprecated
-    public convenience init(_ grammarFileName: String, _ tokenNames: Array<String?>?,
-                            _ ruleNames: Array<String>, _ atn: ATN, _ input: TokenStream) throws {
-        try self.init(grammarFileName, Vocabulary.fromTokenNames(tokenNames), ruleNames, atn, input)
-    }
-
     public init(_ grammarFileName: String, _ vocabulary: Vocabulary,
                 _ ruleNames: Array<String>, _ atn: ATN, _ input: TokenStream) throws {
 
         self.grammarFileName = grammarFileName
         self.atn = atn
-        self.tokenNames = [String]()//    new String[atn.maxTokenType];
-        let length = tokenNames.count
-        for i in 0..<length {
-            tokenNames[i] = vocabulary.getDisplayName(i)
-        }
-
         self.ruleNames = ruleNames
         self.vocabulary = vocabulary
         self.decisionToDFA = [DFA]() //new DFA[atn.getNumberOfDecisions()];
@@ -121,14 +101,6 @@ public class ParserInterpreter: Parser {
     override
     public func getATN() -> ATN {
         return atn
-    }
-
-//	override
-    /// 
-    /// /@Deprecated
-    /// 
-    public func getTokenNames() -> [String] {
-        return tokenNames
     }
 
     override

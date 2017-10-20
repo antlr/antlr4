@@ -28,20 +28,6 @@ open class Recognizer<ATNInterpreter:ATNSimulator> {
     /// 
     private let ruleIndexMapCacheMutex = Mutex()
 
-    /// Used to print out token names like ID during debugging and
-    /// error reporting.  The generated parsers implement a method
-    /// that overrides this to point to their String[] tokenNames.
-    /// 
-    /// Use _#getVocabulary()_ instead.
-    /// 
-    /// 
-    /// /@Deprecated
-    /// 
-    open func getTokenNames() -> [String?]? {
-        RuntimeException(#function + " must be overridden")
-        return []
-    }
-
     open func getRuleNames() -> [String] {
         RuntimeException(#function + " must be overridden")
         return []
@@ -54,7 +40,7 @@ open class Recognizer<ATNInterpreter:ATNSimulator> {
     /// vocabulary used by the grammar.
     /// 
     open func getVocabulary() -> Vocabulary {
-        return Vocabulary.fromTokenNames(getTokenNames())
+        fatalError(#function + " must be overridden")
     }
 
     /// 
@@ -174,43 +160,6 @@ open class Recognizer<ATNInterpreter:ATNSimulator> {
         let line = offending.getLine()
         let charPositionInLine = offending.getCharPositionInLine()
         return "line \(line):\(charPositionInLine)"
-    }
-
-    /// How should a token be displayed in an error message? The default
-    /// is to display just the text, but during development you might
-    /// want to have a lot of information spit out.  Override in that case
-    /// to use t.toString() (which, for CommonToken, dumps everything about
-    /// the token). This is better than forcing you to override a method in
-    /// your token objects because you don't have to go modify your lexer
-    /// so that it creates a new Java type.
-    /// 
-    /// This method is not called by the ANTLR 4 Runtime. Specific
-    /// implementations of _org.antlr.v4.runtime.ANTLRErrorStrategy_ may provide a similar
-    /// feature when necessary. For example, see
-    /// _org.antlr.v4.runtime.DefaultErrorStrategy#getTokenErrorDisplay_.
-    /// 
-    /// 
-    /// /@Deprecated
-    /// 
-    open func getTokenErrorDisplay(_ t: Token?) -> String {
-        guard let t = t else {
-            return "<no token>"
-        }
-        var s: String
-
-        if let text = t.getText() {
-            s = text
-        } else {
-            if t.getType() == CommonToken.EOF {
-                s = "<EOF>"
-            } else {
-                s = "<\(t.getType())>"
-            }
-        }
-        s = s.replacingOccurrences(of: "\n", with: "\\n")
-        s = s.replacingOccurrences(of: "\r", with: "\\r")
-        s = s.replacingOccurrences(of: "\t", with: "\\t")
-        return "\(s)"
     }
 
     open func addErrorListener(_ listener: ANTLRErrorListener) {
