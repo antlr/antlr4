@@ -38,8 +38,7 @@ public class SemanticContext: Hashable, CustomStringConvertible {
     /// dependent predicate evaluation.
     /// 
     public func eval<T>(_ parser: Recognizer<T>, _ parserCallStack: RuleContext) throws -> Bool {
-        RuntimeException(#function + " must be overridden")
-        return false
+        fatalError(#function + " must be overridden")
     }
 
     /// 
@@ -63,13 +62,11 @@ public class SemanticContext: Hashable, CustomStringConvertible {
     }
 
     public var hashValue: Int {
-        RuntimeException(#function + " must be overridden")
-        return 0
+        fatalError(#function + " must be overridden")
     }
 
     public var description: String {
-        RuntimeException(#function + " must be overridden")
-        return ""
+        fatalError(#function + " must be overridden")
     }
 
     public class Predicate: SemanticContext {
@@ -173,8 +170,7 @@ public class SemanticContext: Hashable, CustomStringConvertible {
         /// 
 
         public func getOperands() -> Array<SemanticContext> {
-            RuntimeException(" must overriden ")
-            return Array<SemanticContext>()
+            fatalError(#function + " must be overridden")
         }
     }
 

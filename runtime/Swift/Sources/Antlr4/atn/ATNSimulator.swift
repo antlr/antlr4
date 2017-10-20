@@ -50,7 +50,7 @@ open class ATNSimulator {
     }
 
     open func reset() {
-        RuntimeException(" must overriden ")
+        fatalError(#function + " must be overridden")
     }
 
     /// 

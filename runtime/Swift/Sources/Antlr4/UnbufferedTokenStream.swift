@@ -274,10 +274,7 @@ public class UnbufferedTokenStream: TokenStream {
 
 
     public func size() -> Int {
-
-        RuntimeException("Unbuffered stream cannot know its size")
-        fatalError()
-
+        fatalError("Unbuffered stream cannot know its size")
     }
 
 

@@ -80,20 +80,17 @@ public class PredictionContext: Hashable, CustomStringConvertible {
     }
 
     public func size() -> Int {
-        RuntimeException(#function + " must be overridden")
-        return 0
+        fatalError(#function + " must be overridden")
     }
 
 
     public func getParent(_ index: Int) -> PredictionContext? {
-        RuntimeException(#function + " must be overridden")
-        return nil
+        fatalError(#function + " must be overridden")
     }
 
 
     public func getReturnState(_ index: Int) -> Int {
-        RuntimeException(#function + " must be overridden")
-        return 0
+        fatalError(#function + " must be overridden")
     }
 
 

@@ -82,8 +82,7 @@ public class Transition {
     }
 
     public func getSerializationType() -> Int {
-        RuntimeException(#function + " must be overridden")
-        fatalError()
+        fatalError(#function + " must be overridden")
     }
 
     /// 
@@ -105,7 +104,6 @@ public class Transition {
     }
 
     public func matches(_ symbol: Int, _ minVocabSymbol: Int, _ maxVocabSymbol: Int) -> Bool {
-        RuntimeException(#function + " must be overridden")
-        fatalError()
+        fatalError(#function + " must be overridden")
     }
 }

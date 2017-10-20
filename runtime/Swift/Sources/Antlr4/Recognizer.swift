@@ -29,8 +29,7 @@ open class Recognizer<ATNInterpreter:ATNSimulator> {
     private let ruleIndexMapCacheMutex = Mutex()
 
     open func getRuleNames() -> [String] {
-        RuntimeException(#function + " must be overridden")
-        return []
+        fatalError(#function + " must be overridden")
     }
 
     ///
@@ -102,16 +101,14 @@ open class Recognizer<ATNInterpreter:ATNSimulator> {
     /// created the interpreter from it.
     /// 
     open func getSerializedATN() -> String {
-        RuntimeException("there is no serialized ATN")
-        fatalError()
+        fatalError("there is no serialized ATN")
     }
 
     /// For debugging and other purposes, might want the grammar name.
     /// Have ANTLR generate an implementation for this method.
     /// 
     open func getGrammarFileName() -> String {
-        RuntimeException(#function + " must be overridden")
-        return ""
+        fatalError(#function + " must be overridden")
     }
 
     /// 
@@ -120,8 +117,7 @@ open class Recognizer<ATNInterpreter:ATNSimulator> {
     /// - Returns: The _org.antlr.v4.runtime.atn.ATN_ used by the recognizer for prediction.
     /// 
     open func getATN() -> ATN {
-        RuntimeException(#function + " must be overridden")
-        fatalError()
+        fatalError(#function + " must be overridden")
     }
 
     /// 
@@ -215,22 +211,18 @@ open class Recognizer<ATNInterpreter:ATNSimulator> {
     }
 
     open func getInputStream() -> IntStream? {
-        RuntimeException(#function + "Must be overridden")
-        fatalError()
+        fatalError(#function + " must be overridden")
     }
 
     open func setInputStream(_ input: IntStream) throws {
-        RuntimeException(#function + "Must be overridden")
-
+        fatalError(#function + " must be overridden")
     }
 
     open func getTokenFactory() -> TokenFactory {
-        RuntimeException(#function + "Must be overridden")
-        fatalError()
+        fatalError(#function + " must be overridden")
     }
 
     open func setTokenFactory(_ input: TokenFactory) {
-        RuntimeException(#function + "Must be overridden")
-
+        fatalError(#function + " must be overridden")
     }
 }

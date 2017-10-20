@@ -70,17 +70,6 @@ func log(_ message: String = "", file: String = #file, function: String = #funct
     //   #endif
 }
 
-func RuntimeException(_ message: String = "", file: String = #file, function: String = #function, lineNum: Int = #line) {
-    // #if DEBUG
-    let info = "FILE: \(URL(fileURLWithPath: file).pathComponents.last!),FUNC: \(function), LINE: \(lineNum) MESSAGE: \(message)"
-    //   #else
-    // let info = "FILE: \(NSURL(fileURLWithPath: file).pathComponents!.last!),FUNC: \(function), LINE: \(lineNum) MESSAGE: \(message)"
-    //   #endif
-
-    fatalError(info)
-
-}
-
 func toInt(_ c: Character) -> Int {
     return c.unicodeValue
 }
