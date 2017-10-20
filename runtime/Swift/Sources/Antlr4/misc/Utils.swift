@@ -34,19 +34,6 @@ public class Utils {
     }
 
 
-    public static func writeFile(_ fileName: String, _ content: String, _ encoding: String.Encoding = String.Encoding.utf8) {
-
-        //writing
-        do {
-            try content.write(toFile: fileName, atomically: false, encoding: encoding)
-        } catch {
-            /* error handling here */
-            RuntimeException(" write file fail \(error)")
-        }
-
-    }
-
-
     public static func readFile(_ path: String, _ encoding: String.Encoding = String.Encoding.utf8) -> [Character] {
 
         var fileContents: String
@@ -58,35 +45,6 @@ public class Utils {
         }
 
         return Array(fileContents.characters)
-    }
-
-    public static func readFile2String(_ fileName: String, _ encoding: String.Encoding = String.Encoding.utf8) -> String {
-        let path = Bundle.main.path(forResource: fileName, ofType: nil)
-        if path == nil {
-            return ""
-        }
-
-        var fileContents: String? = nil
-        do {
-            fileContents = try String(contentsOfFile: path!, encoding: encoding)
-        } catch {
-            return ""
-        }
-
-        return fileContents ?? ""
-    }
-
-    public static func readFile2StringByPath(_ path: String, _ encoding: String.Encoding = String.Encoding.utf8) -> String {
-
-        var fileContents: String? = nil
-        
-        do {
-            fileContents = try String(contentsOfFile: path, encoding: String.Encoding.utf8)
-        } catch {
-            return ""
-        }
-
-        return fileContents ?? ""
     }
 
     public static func toMap(_ keys: [String]) -> Dictionary<String, Int> {
