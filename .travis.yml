@@ -20,7 +20,41 @@ matrix:
       env:
         - TARGET=cpp
         - CXX=g++-5
-        - GROUP=ALL
+        - GROUP=LEXER
+      stage: main-test
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-precise-3.7
+          packages:
+            - g++-5
+            - uuid-dev
+            - clang-3.7
+    - os: linux
+      compiler: clang
+      jdk: openjdk7
+      env:
+        - TARGET=cpp
+        - CXX=g++-5
+        - GROUP=PARSER
+      stage: main-test
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-precise-3.7
+          packages:
+            - g++-5
+            - uuid-dev
+            - clang-3.7
+    - os: linux
+      compiler: clang
+      jdk: openjdk7
+      env:
+        - TARGET=cpp
+        - CXX=g++-5
+        - GROUP=RECURSION
       stage: main-test
       addons:
         apt:
