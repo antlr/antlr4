@@ -4,7 +4,7 @@
  */
 
 
-public class UnbufferedTokenStream<T>: TokenStream {
+public class UnbufferedTokenStream: TokenStream {
     internal var tokenSource: TokenSource
 
     /// 
