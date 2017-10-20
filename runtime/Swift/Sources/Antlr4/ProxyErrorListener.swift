@@ -13,10 +13,9 @@
 /// 
 
 public class ProxyErrorListener: ANTLRErrorListener {
-    private final var delegates: Array<ANTLRErrorListener>
+    private final var delegates: [ANTLRErrorListener]
 
-    public init(_ delegates: Array<ANTLRErrorListener>) {
-
+    public init(_ delegates: [ANTLRErrorListener]) {
         self.delegates = delegates
     }
 
@@ -27,7 +26,7 @@ public class ProxyErrorListener: ANTLRErrorListener {
                                _ msg: String,
                                _ e: AnyObject?)
     {
-        for listener: ANTLRErrorListener in delegates {
+        for listener in delegates {
             listener.syntaxError(recognizer, offendingSymbol, line, charPositionInLine, msg, e)
         }
     }

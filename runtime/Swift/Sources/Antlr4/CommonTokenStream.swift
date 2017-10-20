@@ -39,7 +39,7 @@ public class CommonTokenStream: BufferedTokenStream {
     /// The default value is _org.antlr.v4.runtime.Token#DEFAULT_CHANNEL_, which matches the
     /// default channel assigned to tokens created by the lexer.
     /// 
-    internal var channel: Int = CommonToken.DEFAULT_CHANNEL
+    internal var channel = CommonToken.DEFAULT_CHANNEL
 
     /// 
     /// Constructs a new _org.antlr.v4.runtime.CommonTokenStream_ using the specified token
@@ -77,8 +77,8 @@ public class CommonTokenStream: BufferedTokenStream {
             return nil
         }
 
-        var i: Int = p
-        var n: Int = 1
+        var i = p
+        var n = 1
         // find k good tokens looking backwards
         while n <= k {
             // skip off-channel tokens
@@ -101,8 +101,8 @@ public class CommonTokenStream: BufferedTokenStream {
         if k < 0 {
             return try LB(-k)
         }
-        var i: Int = p
-        var n: Int = 1 // we know tokens[p] is a good one
+        var i = p
+        var n = 1 // we know tokens[p] is a good one
         // find k good tokens
         while n < k {
             // skip off-channel tokens, but make sure to not look past EOF
@@ -119,11 +119,11 @@ public class CommonTokenStream: BufferedTokenStream {
     /// Count EOF just once.
     /// 
     public func getNumberOfOnChannelTokens() throws -> Int {
-        var n: Int = 0
+        var n = 0
         try fill()
         let length = tokens.count
         for i in 0..<length {
-            let t: Token = tokens[i]
+            let t = tokens[i]
             if t.getChannel() == channel {
                 n += 1
             }

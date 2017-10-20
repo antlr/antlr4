@@ -21,8 +21,8 @@ public class LexerInterpreter: Lexer {
     private final var vocabulary: Vocabulary?
 
     internal final var _decisionToDFA: [DFA]
-    internal final var _sharedContextCache: PredictionContextCache =
-    PredictionContextCache()
+    internal final var _sharedContextCache = PredictionContextCache()
+
 //   public override init() {
 //    super.init()}
 

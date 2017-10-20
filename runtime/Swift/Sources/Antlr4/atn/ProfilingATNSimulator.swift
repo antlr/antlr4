@@ -113,7 +113,7 @@ public class ProfilingATNSimulator: ParserATNSimulator {
 
     override
     internal func computeTargetState(_ dfa: DFA, _ previousD: DFAState, _ t: Int) throws -> DFAState {
-        let state: DFAState = try  super.computeTargetState(dfa, previousD, t)
+        let state = try super.computeTargetState(dfa, previousD, t)
         currentState = state
         return state
     }
@@ -126,7 +126,7 @@ public class ProfilingATNSimulator: ParserATNSimulator {
             _llStopIndex = _input.index()
         }
 
-        let reachConfigs: ATNConfigSet? = try super.computeReachSet(closure, t, fullCtx)
+        let reachConfigs = try super.computeReachSet(closure, t, fullCtx)
         if fullCtx {
             decisions[currentDecision].LL_ATNTransitions += 1 // count computation even if error
             if reachConfigs != nil {
@@ -152,10 +152,10 @@ public class ProfilingATNSimulator: ParserATNSimulator {
 
     override
     internal func evalSemanticContext(_ pred: SemanticContext, _ parserCallStack: ParserRuleContext, _ alt: Int, _ fullCtx: Bool) throws -> Bool {
-        let result: Bool = try super.evalSemanticContext(pred, parserCallStack, alt, fullCtx)
+        let result = try super.evalSemanticContext(pred, parserCallStack, alt, fullCtx)
         if !(pred is SemanticContext.PrecedencePredicate) {
-            let fullContext: Bool = _llStopIndex >= 0
-            let stopIndex: Int = fullContext ? _llStopIndex : _sllStopIndex
+            let fullContext = _llStopIndex >= 0
+            let stopIndex = fullContext ? _llStopIndex : _sllStopIndex
             decisions[currentDecision].predicateEvals.append(
             PredicateEvalInfo(currentDecision, _input, _startIndex, stopIndex, pred, result, alt, fullCtx)
             )

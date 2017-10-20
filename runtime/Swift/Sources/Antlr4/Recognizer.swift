@@ -6,29 +6,27 @@
 import Foundation
 
 open class Recognizer<ATNInterpreter:ATNSimulator> {
-    //public  static let EOF: Int = -1
     //TODO: WeakKeyDictionary NSMapTable Dictionary MapTable<Vocabulary,HashMap<String, Int>>
-    private let tokenTypeMapCache = HashMap<Vocabulary,Dictionary<String, Int>>()
+    private let tokenTypeMapCache = HashMap<Vocabulary, [String : Int]>()
 
-    private let ruleIndexMapCache = HashMap<ArrayWrapper<String>,Dictionary<String, Int>>()
+    private let ruleIndexMapCache = HashMap<ArrayWrapper<String>, [String : Int]>()
 
 
-    private var _listeners: Array<ANTLRErrorListener> = [ConsoleErrorListener.INSTANCE]
-
+    private var _listeners: [ANTLRErrorListener] = [ConsoleErrorListener.INSTANCE]
 
     public var _interp: ATNInterpreter!
 
-    private var _stateNumber: Int = -1
+    private var _stateNumber = -1
     
     /// 
     /// mutex for tokenTypeMapCache updates
     /// 
-    private var tokenTypeMapCacheMutex = Mutex()
+    private let tokenTypeMapCacheMutex = Mutex()
     
     /// 
     /// mutex for ruleIndexMapCacheMutex updates
     /// 
-    private var ruleIndexMapCacheMutex = Mutex()
+    private let ruleIndexMapCacheMutex = Mutex()
 
     /// Used to print out token names like ID during debugging and
     /// error reporting.  The generated parsers implement a method
@@ -49,14 +47,12 @@ open class Recognizer<ATNInterpreter:ATNSimulator> {
         return []
     }
 
-
-    /// 
+    ///
     /// Get the vocabulary used by the recognizer.
     /// 
     /// - Returns: A _org.antlr.v4.runtime.Vocabulary_ instance providing information about the
     /// vocabulary used by the grammar.
     /// 
-
     open func getVocabulary() -> Vocabulary {
         return Vocabulary.fromTokenNames(getTokenNames())
     }
@@ -66,35 +62,29 @@ open class Recognizer<ATNInterpreter:ATNSimulator> {
     /// 
     /// Used for XPath and tree pattern compilation.
     /// 
-    public func getTokenTypeMap() -> Dictionary<String, Int> {
-        let vocabulary: Vocabulary = getVocabulary()
-        var result: Dictionary<String, Int>? = self.tokenTypeMapCache[vocabulary]
-        tokenTypeMapCacheMutex.synchronized {
-            [unowned self] in
+    public func getTokenTypeMap() -> [String : Int] {
+        let vocabulary = getVocabulary()
+        var result = tokenTypeMapCache[vocabulary]
+        tokenTypeMapCacheMutex.synchronized { [unowned self] in
             if result == nil {
-                result = Dictionary<String, Int>()
+                result = [String : Int]()
                 let length = self.getATN().maxTokenType
                 for i in 0...length {
-                    let literalName: String? = vocabulary.getLiteralName(i)
-                    if literalName != nil {
-                        result![literalName!] = i
+                    if let literalName = vocabulary.getLiteralName(i) {
+                        result![literalName] = i
                     }
 
-                    let symbolicName: String? = vocabulary.getSymbolicName(i)
-                    if symbolicName != nil {
-                        result![symbolicName!] = i
+                    if let symbolicName = vocabulary.getSymbolicName(i) {
+                        result![symbolicName] = i
                     }
                 }
 
                 result!["EOF"] = CommonToken.EOF
 
-                //TODO Result Collections.unmodifiableMap
-
                 self.tokenTypeMapCache[vocabulary] = result!
             }
         }
         return result!
-
     }
 
     /// 
@@ -102,26 +92,20 @@ open class Recognizer<ATNInterpreter:ATNSimulator> {
     /// 
     /// Used for XPath and tree pattern compilation.
     /// 
-    public func getRuleIndexMap() -> Dictionary<String, Int> {
-        let ruleNames: [String] = getRuleNames()
+    public func getRuleIndexMap() -> [String : Int] {
+        let ruleNames = getRuleNames()
 
-        let result: Dictionary<String, Int>? = self.ruleIndexMapCache[ArrayWrapper<String>(ruleNames)]
-        ruleIndexMapCacheMutex.synchronized {
-            [unowned self] in
+        let result = ruleIndexMapCache[ArrayWrapper<String>(ruleNames)]
+        ruleIndexMapCacheMutex.synchronized { [unowned self] in
             if result == nil {
                 self.ruleIndexMapCache[ArrayWrapper<String>(ruleNames)] = Utils.toMap(ruleNames)
             }
         }
         return result!
-
     }
 
     public func getTokenType(_ tokenName: String) -> Int {
-        let ttype: Int? = getTokenTypeMap()[tokenName]
-        if ttype != nil {
-            return ttype!
-        }
-        return CommonToken.INVALID_TYPE
+        return getTokenTypeMap()[tokenName] ?? CommonToken.INVALID_TYPE
     }
 
     /// 
@@ -186,9 +170,10 @@ open class Recognizer<ATNInterpreter:ATNSimulator> {
     /// What is the error header, normally line/character position information?
     /// 
     open func getErrorHeader(_ e: AnyObject) -> String {
-        let line: Int = (e as! RecognitionException).getOffendingToken().getLine()
-        let charPositionInLine: Int = (e as! RecognitionException).getOffendingToken().getCharPositionInLine()
-        return "line " + String(line) + ":" + String(charPositionInLine)
+        let offending = (e as! RecognitionException).getOffendingToken()
+        let line = offending.getLine()
+        let charPositionInLine = offending.getCharPositionInLine()
+        return "line \(line):\(charPositionInLine)"
     }
 
     /// How should a token be displayed in an error message? The default
@@ -229,7 +214,6 @@ open class Recognizer<ATNInterpreter:ATNSimulator> {
     }
 
     open func addErrorListener(_ listener: ANTLRErrorListener) {
-
         _listeners.append(listener)
     }
 
@@ -237,16 +221,13 @@ open class Recognizer<ATNInterpreter:ATNSimulator> {
         _listeners = _listeners.filter() {
             $0 !== listener
         }
-
-        // _listeners.removeObject(listener);
     }
 
     open func removeErrorListeners() {
         _listeners.removeAll()
     }
 
-
-    open func getErrorListeners() -> Array<ANTLRErrorListener> {
+    open func getErrorListeners() -> [ANTLRErrorListener] {
         return _listeners
     }
 

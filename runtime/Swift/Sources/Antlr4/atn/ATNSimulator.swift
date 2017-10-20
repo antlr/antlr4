@@ -17,7 +17,7 @@ open class ATNSimulator {
         return error
     }()
 
-    public var atn: ATN
+    public let atn: ATN
 
     /// 
     /// The context cache maps all PredictionContext objects that are equals()
@@ -79,8 +79,7 @@ open class ATNSimulator {
 
         //TODO: synced (sharedContextCache!)
         //synced (sharedContextCache!) {
-        let visited: HashMap<PredictionContext, PredictionContext> =
-        HashMap<PredictionContext, PredictionContext>()
+        let visited = HashMap<PredictionContext, PredictionContext>()
 
         return PredictionContext.getCachedContext(context,
                 sharedContextCache!,

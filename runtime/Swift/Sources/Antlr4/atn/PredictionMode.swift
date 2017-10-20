@@ -376,7 +376,7 @@ public enum PredictionMode {
     /// - returns: `true` if every _java.util.BitSet_ in `altsets` has
     /// _java.util.BitSet#cardinality cardinality_ &gt; 1, otherwise `false`
     /// 
-    public static func allSubsetsConflict(_ altsets: Array<BitSet>) -> Bool {
+    public static func allSubsetsConflict(_ altsets: [BitSet]) -> Bool {
         return !hasNonConflictingAltSet(altsets)
     }
 
@@ -388,7 +388,7 @@ public enum PredictionMode {
     /// - returns: `true` if `altsets` contains a _java.util.BitSet_ with
     /// _java.util.BitSet#cardinality cardinality_ 1, otherwise `false`
     /// 
-    public static func hasNonConflictingAltSet(_ altsets: Array<BitSet>) -> Bool {
+    public static func hasNonConflictingAltSet(_ altsets: [BitSet]) -> Bool {
         for alts: BitSet in altsets {
             if alts.cardinality() == 1 {
                 return true
@@ -405,7 +405,7 @@ public enum PredictionMode {
     /// - returns: `true` if `altsets` contains a _java.util.BitSet_ with
     /// _java.util.BitSet#cardinality cardinality_ &gt; 1, otherwise `false`
     /// 
-    public static func hasConflictingAltSet(_ altsets: Array<BitSet>) -> Bool {
+    public static func hasConflictingAltSet(_ altsets: [BitSet]) -> Bool {
         for alts: BitSet in altsets {
             if alts.cardinality() > 1 {
                 return true
@@ -421,7 +421,7 @@ public enum PredictionMode {
     /// - returns: `true` if every member of `altsets` is equal to the
     /// others, otherwise `false`
     /// 
-    public static func allSubsetsEqual(_ altsets: Array<BitSet>) -> Bool {
+    public static func allSubsetsEqual(_ altsets: [BitSet]) -> Bool {
 
         let first: BitSet = altsets[0]
         for it in altsets {

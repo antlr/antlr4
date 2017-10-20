@@ -148,17 +148,17 @@ public class ParserInterpreter: Parser {
 
     /// Begin parsing at startRuleIndex
     public func parse(_ startRuleIndex: Int) throws -> ParserRuleContext {
-        let startRuleStartState: RuleStartState = atn.ruleToStartState[startRuleIndex]
+        let startRuleStartState = atn.ruleToStartState[startRuleIndex]
 
-        let rootContext: InterpreterRuleContext = InterpreterRuleContext(nil, ATNState.INVALID_STATE_NUMBER, startRuleIndex)
+        let rootContext = InterpreterRuleContext(nil, ATNState.INVALID_STATE_NUMBER, startRuleIndex)
         if startRuleStartState.isPrecedenceRule {
-            try    enterRecursionRule(rootContext, startRuleStartState.stateNumber, startRuleIndex, 0)
+            try enterRecursionRule(rootContext, startRuleStartState.stateNumber, startRuleIndex, 0)
         } else {
             try enterRule(rootContext, startRuleStartState.stateNumber, startRuleIndex)
         }
 
         while true {
-            let p: ATNState = getATNState()!
+            let p = getATNState()!
             switch p.getStateType() {
             case ATNState.RULE_STOP:
                 // pop; return from rule
@@ -208,7 +208,7 @@ public class ParserInterpreter: Parser {
         var altNum: Int
         if p.getNumberOfTransitions() > 1 {
             try getErrorHandler().sync(self)
-            let decision: Int = (p as! DecisionState).decision
+            let decision = (p as! DecisionState).decision
             if decision == overrideDecision && _input.index() == overrideDecisionInputIndex {
                 altNum = overrideDecisionAlt
             } else {
@@ -218,7 +218,7 @@ public class ParserInterpreter: Parser {
             altNum = 1
         }
 
-        let transition: Transition = p.transition(altNum - 1)
+        let transition = p.transition(altNum - 1)
         switch transition.getSerializationType() {
         case Transition.EPSILON:
             if try statesNeedingLeftRecursionContext.get(p.stateNumber) &&
@@ -252,9 +252,9 @@ public class ParserInterpreter: Parser {
             break
 
         case Transition.RULE:
-            let ruleStartState: RuleStartState = transition.target as! RuleStartState
-            let ruleIndex: Int = ruleStartState.ruleIndex!
-            let ctx: InterpreterRuleContext = InterpreterRuleContext(_ctx, p.stateNumber, ruleIndex)
+            let ruleStartState = transition.target as! RuleStartState
+            let ruleIndex = ruleStartState.ruleIndex!
+            let ctx = InterpreterRuleContext(_ctx, p.stateNumber, ruleIndex)
             if ruleStartState.isPrecedenceRule {
                 try enterRecursionRule(ctx, ruleStartState.stateNumber, ruleIndex, (transition as! RuleTransition).precedence)
             } else {
@@ -263,7 +263,7 @@ public class ParserInterpreter: Parser {
             break
 
         case Transition.PREDICATE:
-            let predicateTransition: PredicateTransition = transition as! PredicateTransition
+            let predicateTransition = transition as! PredicateTransition
             if try !sempred(_ctx!, predicateTransition.ruleIndex, predicateTransition.predIndex) {
 
                 throw try ANTLRException.recognition(e: FailedPredicateException(self))
@@ -273,7 +273,7 @@ public class ParserInterpreter: Parser {
             break
 
         case Transition.ACTION:
-            let actionTransition: ActionTransition = transition as! ActionTransition
+            let actionTransition = transition as! ActionTransition
             try action(_ctx, actionTransition.ruleIndex, actionTransition.actionIndex)
             break
 
@@ -294,16 +294,16 @@ public class ParserInterpreter: Parser {
     }
 
     internal func visitRuleStopState(_ p: ATNState) throws {
-        let ruleStartState: RuleStartState = atn.ruleToStartState[p.ruleIndex!]
+        let ruleStartState = atn.ruleToStartState[p.ruleIndex!]
         if ruleStartState.isPrecedenceRule {
-            let parentContext: (ParserRuleContext?, Int) = _parentContextStack.pop()
-            try unrollRecursionContexts(parentContext.0!)
-            setState(parentContext.1)
+            let (parentContext, parentState) = _parentContextStack.pop()
+            try unrollRecursionContexts(parentContext!)
+            setState(parentState)
         } else {
             try exitRule()
         }
 
-        let ruleTransition: RuleTransition = atn.states[getState()]!.transition(0) as! RuleTransition
+        let ruleTransition = atn.states[getState()]!.transition(0) as! RuleTransition
         setState(ruleTransition.followState.stateNumber)
     }
 

@@ -8,7 +8,6 @@
 /// the error handling strategy (to create missing tokens).  Notifying the parser
 /// of a new factory means that it notifies it's token source and error strategy.
 /// 
-
 public protocol TokenFactory {
 
     //typealias Symbol

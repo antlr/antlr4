@@ -74,19 +74,19 @@ public final class HashMap<K: Hashable,V>: Sequence
     /// 
     /// The default initial capacity - MUST be a power of two.
     /// 
-    let DEFAULT_INITIAL_CAPACITY: Int = 16
+    private let DEFAULT_INITIAL_CAPACITY: Int = 16
 
     /// 
     /// The maximum capacity, used if a higher value is implicitly specified
     /// by either of the constructors with arguments.
     /// MUST be a power of two <= 1<<30.
     /// 
-    let MAXIMUM_CAPACITY: Int = 1 << 30
+    private let MAXIMUM_CAPACITY: Int = 1 << 30
 
     /// 
     /// The load factor used when none specified in constructor.
     /// 
-    let DEFAULT_LOAD_FACTOR: Float = 0.75
+    private let DEFAULT_LOAD_FACTOR: Float = 0.75
 
     /// 
     /// The table, resized as necessary. Length MUST Always be a power of two.
