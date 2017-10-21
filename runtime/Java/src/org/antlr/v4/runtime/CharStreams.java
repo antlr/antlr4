@@ -7,6 +7,7 @@
 package org.antlr.v4.runtime;
 
 import java.io.IOException;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.Reader;
 import java.nio.ByteBuffer;
@@ -18,9 +19,6 @@ import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CoderResult;
 import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 /** This class represents the primary interface for creating {@link CharStream}s
  *  from a variety of sources as of 4.7.  The motivation was to support
@@ -61,39 +59,10 @@ import java.nio.file.Paths;
  *  @since 4.7
  */
 public final class CharStreams {
-	private static final int DEFAULT_BUFFER_SIZE = 4096;
+	static final int DEFAULT_BUFFER_SIZE = 4096;
 
 	// Utility class; do not construct.
 	private CharStreams() { }
-
-	/**
-	 * Creates a {@link CharStream} given a path to a UTF-8
-	 * encoded file on disk.
-	 *
-	 * Reads the entire contents of the file into the result before returning.
-	 */
-	public static CharStream fromPath(Path path) throws IOException {
-		return fromPath(path, StandardCharsets.UTF_8);
-	}
-
-	/**
-	 * Creates a {@link CharStream} given a path to a file on disk and the
-	 * charset of the bytes contained in the file.
-	 *
-	 * Reads the entire contents of the file into the result before returning.
-	 */
-	public static CharStream fromPath(Path path, Charset charset) throws IOException {
-		long size = Files.size(path);
-		try (ReadableByteChannel channel = Files.newByteChannel(path)) {
-			return fromChannel(
-				channel,
-				charset,
-				DEFAULT_BUFFER_SIZE,
-				CodingErrorAction.REPLACE,
-				path.toString(),
-				size);
-		}
-	}
 
 	/**
 	 * Creates a {@link CharStream} given a string containing a
@@ -102,7 +71,7 @@ public final class CharStreams {
 	 * Reads the entire contents of the file into the result before returning.
 	 */
 	public static CharStream fromFileName(String fileName) throws IOException {
-		return fromPath(Paths.get(fileName), StandardCharsets.UTF_8);
+		return fromFileName(fileName, StandardCharsets.UTF_8);
 	}
 
 	/**
@@ -113,7 +82,15 @@ public final class CharStreams {
 	 * Reads the entire contents of the file into the result before returning.
 	 */
 	public static CharStream fromFileName(String fileName, Charset charset) throws IOException {
-		return fromPath(Paths.get(fileName), charset);
+		try (FileInputStream fis = new FileInputStream(fileName)) {
+			return fromChannel(
+					fis.getChannel(),
+					charset,
+					DEFAULT_BUFFER_SIZE,
+					CodingErrorAction.REPLACE,
+					fileName,
+					fis.getChannel().size());
+		}
 	}
 
 

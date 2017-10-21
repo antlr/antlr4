@@ -4,18 +4,18 @@ Prior to ANTLR 4.7, generated lexers in most targets only supported part of the 
 
 C++, Python, Go, and Swift APIs didn't need any API changes to support Unicode code points, so we decided to leave those class interfaces as-is. 
 
-Java, C#, and JavaScript runtimes required changes and, rather than break the previous interface, we deprecated them. (The *Java-target* deprecated `ANTLRInputStream` and `ANTLRFileStream` APIs only support Unicode code points up to `U+FFFF`.) Now, those targets must create `CharStream`s from input using `CharStreams.fromPath()`, `CharStreams.fromFileName()`, etc... 
+Java, C#, and JavaScript runtimes required changes and, rather than break the previous interface, we deprecated them. (The *Java-target* deprecated `ANTLRInputStream` and `ANTLRFileStream` APIs only support Unicode code points up to `U+FFFF`.) Now, those targets must create `CharStream`s from input using `PathCharStreams.fromPath()`, `CharStreams.fromFileName()`, etc...
 
 A big shout out to Ben Hamilton (github bhamiltoncx) for his superhuman
 efforts across all targets to get true support for U+10FFFF code points.
 
 ## Example
 
-The Java, C#, and JavaScript runtimes use the new factory style stream creation interface. For example, here is some sample Java code that uses `CharStreams.fromPath()`:
+The Java, C#, and JavaScript runtimes use the new factory style stream creation interface. For example, here is some sample Java code that uses `PathCharStreams.fromPath()`:
 
 ```java
 public static void main(String[] args) {
-  CharStream charStream = CharStreams.fromPath(Paths.get(args[0]));
+  CharStream charStream = PathCharStreams.fromPath(Paths.get(args[0]));
   Lexer lexer = new UnicodeLexer(charStream);
   CommonTokenStream tokens = new CommonTokenStream(lexer);
   tokens.fill();
