@@ -101,7 +101,7 @@ func NewLexerTypeAction(thetype int) *LexerTypeAction {
 }
 
 func (l *LexerTypeAction) execute(lexer Lexer) {
-	lexer.setType(l.thetype)
+	lexer.SetType(l.thetype)
 }
 
 func (l *LexerTypeAction) hash() int {
@@ -145,7 +145,7 @@ func NewLexerPushModeAction(mode int) *LexerPushModeAction {
 // <p>This action is implemented by calling {@link Lexer//pushMode} with the
 // value provided by {@link //getMode}.</p>
 func (l *LexerPushModeAction) execute(lexer Lexer) {
-	lexer.pushMode(l.mode)
+	lexer.PushMode(l.mode)
 }
 
 func (l *LexerPushModeAction) hash() int {
@@ -190,7 +190,7 @@ var LexerPopModeActionINSTANCE = NewLexerPopModeAction()
 
 // <p>This action is implemented by calling {@link Lexer//popMode}.</p>
 func (l *LexerPopModeAction) execute(lexer Lexer) {
-	lexer.popMode()
+	lexer.PopMode()
 }
 
 func (l *LexerPopModeAction) String() string {
@@ -242,7 +242,7 @@ func NewLexerModeAction(mode int) *LexerModeAction {
 // <p>This action is implemented by calling {@link Lexer//mode} with the
 // value provided by {@link //getMode}.</p>
 func (l *LexerModeAction) execute(lexer Lexer) {
-	lexer.setMode(l.mode)
+	lexer.SetMode(l.mode)
 }
 
 func (l *LexerModeAction) hash() int {
@@ -341,7 +341,7 @@ func NewLexerChannelAction(channel int) *LexerChannelAction {
 // <p>This action is implemented by calling {@link Lexer//setChannel} with the
 // value provided by {@link //getChannel}.</p>
 func (l *LexerChannelAction) execute(lexer Lexer) {
-	lexer.setChannel(l.channel)
+	lexer.SetChannel(l.channel)
 }
 
 func (l *LexerChannelAction) hash() int {
