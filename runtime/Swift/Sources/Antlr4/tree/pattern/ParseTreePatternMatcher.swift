@@ -320,7 +320,6 @@ public class ParseTreePatternMatcher {
                 // add special rule token or conjure up new token from name
                 let firstStr = String(tagChunk.getTag()[0])
                 if firstStr.lowercased() != firstStr {
-                    //if ( Character.isUpperCase(tagChunk.getTag().charAt(0)) ) {
                     let ttype: Int = parser.getTokenType(tagChunk.getTag())
                     if ttype == CommonToken.INVALID_TYPE {
                         throw ANTLRError.illegalArgument(msg: "Unknown token " + tagChunk.getTag() + " in pattern: " + pattern)
@@ -329,7 +328,6 @@ public class ParseTreePatternMatcher {
                     tokens.append(t)
                 } else {
                     if firstStr.uppercased() != firstStr {
-                        // if ( Character.isLowerCase(tagChunk.getTag().charAt(0)) ) {
                         let ruleIndex: Int = parser.getRuleIndex(tagChunk.getTag())
                         if ruleIndex == -1 {
                             throw ANTLRError.illegalArgument(msg: "Unknown rule " + tagChunk.getTag() + " in pattern: " + pattern)

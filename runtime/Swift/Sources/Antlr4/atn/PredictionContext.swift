@@ -712,17 +712,17 @@ public class PredictionContext: Hashable, CustomStringConvertible {
         }
     }
 
-    public func toString<T:ATNSimulator>(_ recog: Recognizer<T>) -> String {
+    public func toString<T>(_ recog: Recognizer<T>) -> String {
         return NSStringFromClass(PredictionContext.self)
         //		return toString(recog, ParserRuleContext.EMPTY);
     }
 
-    public func toStrings<T:ATNSimulator>(_ recognizer: Recognizer<T>, _ currentState: Int) -> [String] {
+    public func toStrings<T>(_ recognizer: Recognizer<T>, _ currentState: Int) -> [String] {
         return toStrings(recognizer, PredictionContext.EMPTY, currentState)
     }
 
     // FROM SAM
-    public func toStrings<T:ATNSimulator>(_ recognizer: Recognizer<T>?, _ stop: PredictionContext, _ currentState: Int) -> [String] {
+    public func toStrings<T>(_ recognizer: Recognizer<T>?, _ stop: PredictionContext, _ currentState: Int) -> [String] {
         var result: Array<String> = Array<String>()
         var perm: Int = 0
         outer: while true {

@@ -49,19 +49,19 @@ public final class MurmurHash {
         let m: Int32 = 5
         let n: Int32 = -430675100//0xE6546B64;
 
-        var k: Int32 = Int32(truncatingBitPattern: value)
-        k = Int32.multiplyWithOverflow(k, c1).0
+        var k: Int32 = Int32(truncatingIfNeeded: value)
+        k = k.multipliedReportingOverflow(by: c1).partialValue
         // (k,_) = UInt32.multiplyWithOverflow(k, c1)     ;//( k * c1);
         //TODO: CHECKE >>>
         k = (k << r1) | (k >>> (Int32(32) - r1))  //k = (k << r1) | (k >>> (32 - r1));
         //k =  UInt32 (truncatingBitPattern:Int64(Int64(k) * Int64(c2)));//( k * c2);
         //(k,_) = UInt32.multiplyWithOverflow(k, c2)
-        k = Int32.multiplyWithOverflow(k, c2).0
+        k = k.multipliedReportingOverflow(by: c2).partialValue
         var hash = Int32(hashIn)
         hash = hash ^ k
         hash = (hash << r2) | (hash >>> (Int32(32) - r2))//hash = (hash << r2) | (hash >>> (32 - r2));
-        (hash, _) = Int32.multiplyWithOverflow(hash, m)
-        (hash, _) = Int32.addWithOverflow(hash, n)
+        hash = hash.multipliedReportingOverflow(by: m).partialValue
+        hash = hash.addingReportingOverflow(n).partialValue
         //hash = hash * m + n;
         // print("murmur update2 : \(hash)")
         return Int(hash)
@@ -90,12 +90,12 @@ public final class MurmurHash {
     public static func finish(_ hashin: Int, _ numberOfWordsIn: Int) -> Int {
         var hash = Int32(hashin)
         let numberOfWords = Int32(numberOfWordsIn)
-        hash = hash ^ Int32.multiplyWithOverflow(numberOfWords, Int32(4)).0  //(numberOfWords * UInt32(4));
+        hash = hash ^ numberOfWords.multipliedReportingOverflow(by: 4).partialValue  //(numberOfWords * UInt32(4));
         hash = hash ^ (hash >>> Int32(16))   //hash = hash ^ (hash >>> 16);
-        (hash, _) = Int32.multiplyWithOverflow(hash, Int32(-2048144789))//hash * UInt32(0x85EBCA6B);
+        hash = hash.multipliedReportingOverflow(by: -2048144789).partialValue //hash * UInt32(0x85EBCA6B);
         hash = hash ^ (hash >>> Int32(13))//hash = hash ^ (hash >>> 13);
         //hash = UInt32(truncatingBitPattern: UInt64(hash) * UInt64(0xC2B2AE35)) ;
-        (hash, _) = Int32.multiplyWithOverflow(hash, Int32(-1028477387))
+        hash = hash.multipliedReportingOverflow(by: -1028477387).partialValue
         hash = hash ^ (hash >>> Int32(16))//	hash = hash ^ (hash >>> 16);
         //print("murmur finish : \(hash)")
         return Int(hash)

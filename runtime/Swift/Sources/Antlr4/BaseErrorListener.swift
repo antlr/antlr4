@@ -17,12 +17,12 @@ open class BaseErrorListener: ANTLRErrorListener {
     public init() {
     }
 
-    open func syntaxError<T:ATNSimulator>(_ recognizer: Recognizer<T>,
-                                            _ offendingSymbol: AnyObject?,
-                                            _ line: Int,
-                                            _ charPositionInLine: Int,
-                                            _ msg: String,
-                                            _ e: AnyObject?
+    open func syntaxError<T>(_ recognizer: Recognizer<T>,
+                             _ offendingSymbol: AnyObject?,
+                             _ line: Int,
+                             _ charPositionInLine: Int,
+                             _ msg: String,
+                             _ e: AnyObject?
     ) {
     }
 

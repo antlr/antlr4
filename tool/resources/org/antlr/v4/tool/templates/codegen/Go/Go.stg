@@ -1,5 +1,5 @@
 fileHeader(grammarFileName, ANTLRVersion) ::= <<
-// Generated from <grammarFileName; format="java-escape"> by ANTLR <ANTLRVersion>.
+// Code generated from <grammarFileName; format="java-escape"> by ANTLR <ANTLRVersion>. DO NOT EDIT.
 >>
 
 ParserFile(file, parser, namedActions, contextSuperClass) ::= <<
@@ -777,29 +777,31 @@ MatchSet(m, expr, capture) ::= "<CommonSetStuff(m, expr, capture, false)>"
 MatchNotSet(m, expr, capture) ::= "<CommonSetStuff(m, expr, capture, true)>"
 
 CommonSetStuff(m, expr, capture, invert) ::= <<
-p.SetState(<m.stateNumber>)
-<if(m.labels)>
-
-var _lt = p.GetTokenStream().LT(1)<! TODO: Should LT be called always like InvokeRule and MatchToken? !>
-
-<m.labels:{l | <labelref(l)> = _lt}; separator="\n">
-
-<endif>
-<if(capture)>
-<capture>
-
-<endif>
-<if(invert)>if <m.varName> \<= 0 || <expr> <else>if !(<expr>)<endif> {
+{
+	p.SetState(<m.stateNumber>)
 	<if(m.labels)>
-	var _ri = p.GetErrorHandler().RecoverInline(p)
 
-	<m.labels:{l | <labelref(l)> = _ri}; separator="\n">
-	<else>
-	p.GetErrorHandler().RecoverInline(p)
+	var _lt = p.GetTokenStream().LT(1)<! TODO: Should LT be called always like InvokeRule and MatchToken? !>
+
+	<m.labels:{l | <labelref(l)> = _lt}; separator="\n">
+
 	<endif>
-} else {
-    p.GetErrorHandler().ReportMatch(p)
-	p.Consume()
+	<if(capture)>
+	<capture>
+
+	<endif>
+	<if(invert)>if <m.varName> \<= 0 || <expr> <else>if !(<expr>)<endif> {
+		<if(m.labels)>
+		var _ri = p.GetErrorHandler().RecoverInline(p)
+
+		<m.labels:{l | <labelref(l)> = _ri}; separator="\n">
+		<else>
+		p.GetErrorHandler().RecoverInline(p)
+		<endif>
+	} else {
+		p.GetErrorHandler().ReportMatch(p)
+		p.Consume()
+	}
 }
 >>
 

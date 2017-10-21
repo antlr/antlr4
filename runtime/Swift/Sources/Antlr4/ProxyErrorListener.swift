@@ -20,13 +20,13 @@ public class ProxyErrorListener: ANTLRErrorListener {
         self.delegates = delegates
     }
 
-    public func syntaxError<T:ATNSimulator>(_ recognizer: Recognizer<T>,
-                                            _ offendingSymbol: AnyObject?,
-                                            _ line: Int,
-                                            _ charPositionInLine: Int,
-                                            _ msg: String,
-                                            _ e: AnyObject?)
-     {
+    public func syntaxError<T>(_ recognizer: Recognizer<T>,
+                               _ offendingSymbol: AnyObject?,
+                               _ line: Int,
+                               _ charPositionInLine: Int,
+                               _ msg: String,
+                               _ e: AnyObject?)
+    {
         for listener: ANTLRErrorListener in delegates {
             listener.syntaxError(recognizer, offendingSymbol, line, charPositionInLine, msg, e)
         }

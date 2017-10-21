@@ -233,7 +233,7 @@ open class RuleContext: RuleNode {
          return description
     }
 
-    public final func toString<T:ATNSimulator>(_ recog: Recognizer<T>) -> String {
+    public final func toString<T>(_ recog: Recognizer<T>) -> String {
         return toString(recog, ParserRuleContext.EMPTY)
     }
 
@@ -242,7 +242,7 @@ open class RuleContext: RuleNode {
     }
 
     // recog null unless ParserRuleContext, in which case we use subclass toString(...)
-    open func toString<T:ATNSimulator>(_ recog: Recognizer<T>?, _ stop: RuleContext) -> String {
+    open func toString<T>(_ recog: Recognizer<T>?, _ stop: RuleContext) -> String {
         let ruleNames: [String]? = recog != nil ? recog!.getRuleNames() : nil
         let ruleNamesList: Array<String>? = ruleNames ?? nil
         return toString(ruleNamesList, stop)
