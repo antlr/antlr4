@@ -45,17 +45,11 @@ set(antlr4-demo_SRC
   ${antlr4-demo-GENERATED_SRC}
   )
 
-if (NOT CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-  set (flags_1 "-Wno-overloaded-virtual")
-else()
-  set (flags_1 "-MP /wd4251")
-endif()
-
 foreach( src_file ${antlr4-demo_SRC} )
       set_source_files_properties(
           ${src_file}
           PROPERTIES
-          COMPILE_FLAGS "${COMPILE_FLAGS} ${flags_1}"
+          COMPILE_FLAGS -Wno-overloaded-virtual
           )
 endforeach( src_file ${antlr4-demo_SRC} )
 
