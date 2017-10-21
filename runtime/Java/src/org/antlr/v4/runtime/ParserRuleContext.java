@@ -16,6 +16,8 @@ import org.antlr.v4.runtime.tree.TerminalNodeImpl;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /** A rule invocation record for parsing.
  *
@@ -76,6 +78,8 @@ public class ParserRuleContext extends RuleContext {
 	 */
 	public RecognitionException exception;
 
+	TokenStream tokenStream;
+	
 	public ParserRuleContext() { }
 
 	/** COPY a ctx (I'm deliberately not using copy constructor) to avoid
@@ -223,6 +227,49 @@ public class ParserRuleContext extends RuleContext {
 		return null;
 	}
 
+	/**
+	 * Get the children of this node.
+	 * @return
+	 */
+	public <T extends ParseTree> List<ParseTree> getChildren() {
+		if (children == null)
+			return new ArrayList<>();
+
+		return children;
+	}
+
+	/**
+	 * Get the children of this node matching a list of types.
+	 * @param ctxTypes
+	 * @return
+	 */
+	public <T extends ParseTree> List<ParseTree> getChildren(List<Class<? extends T>> ctxTypes) {
+		if (children == null)
+			return new ArrayList<>();
+
+		List<ParseTree> result = children.stream()
+				.filter(o -> ctxTypes.contains(o.getClass()))
+				.collect(Collectors.toList());
+		
+		return result;
+	}
+
+	/**
+	 * Get the children of this node matching a predicate.
+	 * @param predicate
+	 * @return
+	 */
+	public <T extends ParseTree> List<ParseTree> getChildren(Predicate<ParseTree> predicate) {
+		if (children == null)
+			return new ArrayList<>();
+
+		List<ParseTree> result = children.stream()
+				.filter(o -> predicate.test(o))
+				.collect(Collectors.toList());
+		
+		return result;
+	}
+	
 	public TerminalNode getToken(int ttype, int i) {
 		if ( children==null || i < 0 || i >= children.size() ) {
 			return null;
@@ -325,6 +372,35 @@ public class ParserRuleContext extends RuleContext {
 	 */
 	public Token getStop() { return stop; }
 
+	/**
+	 * Get the full text (with whitespace) from the input stream.
+	 * @param parseTree
+	 * @return
+	 */
+    public String getFullText() {
+        if (children == null)
+            return "";
+
+        Token startToken = start;
+        Token stopToken = stop;
+
+        Interval interval = new Interval(startToken.getStartIndex(), stopToken.getStopIndex());
+        String text = startToken.getInputStream().getText(interval);
+
+        return text;
+    }
+
+    /**
+     * Get the token stream created by the parser.
+     * @return
+     */
+    public TokenStream getTokenStream() {
+    		if (this.parent == null)
+    			return tokenStream;
+    		else
+    			return ((ParserRuleContext)this.parent).getTokenStream();
+    }
+	
 	/** Used for rule context info debugging during parse-time, not so much for ATN debugging */
 	public String toInfoString(Parser recognizer) {
 		List<String> rules = recognizer.getRuleInvocationStack(this);

@@ -623,6 +623,9 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 	 * {@link #_ctx} get the current context.
 	 */
 	public void enterRule(ParserRuleContext localctx, int state, int ruleIndex) {
+		if (localctx.parent == null && localctx.tokenStream == null)
+			localctx.tokenStream = _input;
+		
 		setState(state);
 		_ctx = localctx;
 		_ctx.start = _input.LT(1);
@@ -682,6 +685,9 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 	}
 
 	public void enterRecursionRule(ParserRuleContext localctx, int state, int ruleIndex, int precedence) {
+		if (localctx.parent == null && localctx.tokenStream == null)
+			localctx.tokenStream = _input;
+		
 		setState(state);
 		_precedenceStack.push(precedence);
 		_ctx = localctx;
@@ -695,6 +701,9 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 	 *  Make the current context the child of the incoming localctx.
 	 */
 	public void pushNewRecursionContext(ParserRuleContext localctx, int state, int ruleIndex) {
+		if (localctx.parent == null && localctx.tokenStream == null)
+			localctx.tokenStream = _input;
+		
 		ParserRuleContext previous = _ctx;
 		previous.parent = localctx;
 		previous.invokingState = state;
