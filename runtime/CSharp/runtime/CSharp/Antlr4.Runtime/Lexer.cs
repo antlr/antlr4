@@ -632,7 +632,10 @@ outer_continue: ;
             //System.out.println("consuming char "+(char)input.LA(1)+" during recovery");
             //re.printStackTrace();
             // TODO: Do we lose character or line position information?
-            _input.Consume();
+            if (_input.LA(1) != IntStreamConstants.EOF)
+            {
+                _input.Consume();
+            }
         }
     }
 }
