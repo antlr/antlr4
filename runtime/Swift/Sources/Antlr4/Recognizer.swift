@@ -228,9 +228,6 @@ open class Recognizer<ATNInterpreter:ATNSimulator> {
         return "\(s)"
     }
 
-    /// 
-    /// - Throws: ANTLRError.nullPointer if `listener` is `null`.
-    /// 
     open func addErrorListener(_ listener: ANTLRErrorListener) {
 
         _listeners.append(listener)
