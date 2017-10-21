@@ -63,7 +63,6 @@ public protocol TokenStream: IntStream {
     /// 
     /// - Parameter interval: The interval of tokens within this stream to get text
     /// for.
-    /// - Throws: ANTLRError.nullPointer if `interval` is `null`
     /// - Returns: The text of all tokens within the specified interval in this
     /// stream.
     /// 

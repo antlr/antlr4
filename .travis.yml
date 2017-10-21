@@ -2,30 +2,26 @@ sudo: true
 
 language: java
 
+cache:
+  directories:
+  - $HOME/.m2
+  - $HOME/Library/Caches/Homebrew
+
+stages:
+  - smoke-test
+  - main-test
+  - extended-test
+
 matrix:
   include:
     - os: linux
       compiler: clang
-      jdk: oraclejdk7
+      jdk: openjdk7
       env:
         - TARGET=cpp
         - CXX=g++-5
-        - GROUP=ALL
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-precise-3.7
-          packages:
-            - g++-5
-            - uuid-dev
-            - clang-3.7
-    - os: osx
-      compiler: clang
-      osx_image: xcode8.1
-      env:
-        - TARGET=cpp
         - GROUP=LEXER
+      stage: main-test
       addons:
         apt:
           sources:
@@ -35,106 +31,150 @@ matrix:
             - g++-5
             - uuid-dev
             - clang-3.7
-    - os: osx
-      compiler: clang
-      osx_image: xcode8.1
-      env:
-        - TARGET=cpp
-        - GROUP=PARSER
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-precise-3.7
-          packages:
-            - g++-5
-            - uuid-dev
-            - clang-3.7
-    - os: osx
-      compiler: clang
-      osx_image: xcode8.1
-      env:
-        - TARGET=cpp
-        - GROUP=RECURSION
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-precise-3.7
-          packages:
-            - g++-5
-            - uuid-dev
-            - clang-3.7
-    - os: osx
-      compiler: clang
-      osx_image: xcode8.1
-      env:
-        - TARGET=swift
-        - GROUP=LEXER
-    - os: osx
-      compiler: clang
-      osx_image: xcode8.1
-      env:
-        - TARGET=swift
-        - GROUP=PARSER
-    - os: osx
-      compiler: clang
-      osx_image: xcode8.1
-      env:
-        - TARGET=swift
-        - GROUP=RECURSION
     - os: linux
+      compiler: clang
+      jdk: openjdk7
+      env:
+        - TARGET=cpp
+        - CXX=g++-5
+        - GROUP=PARSER
+      stage: main-test
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-precise-3.7
+          packages:
+            - g++-5
+            - uuid-dev
+            - clang-3.7
+    - os: linux
+      compiler: clang
+      jdk: openjdk7
+      env:
+        - TARGET=cpp
+        - CXX=g++-5
+        - GROUP=RECURSION
+      stage: main-test
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-precise-3.7
+          packages:
+            - g++-5
+            - uuid-dev
+            - clang-3.7
+    - os: osx
+      compiler: clang
+      osx_image: xcode9
+      env:
+        - TARGET=cpp
+        - GROUP=LEXER
+      stage: extended-test
+    - os: osx
+      compiler: clang
+      osx_image: xcode9
+      env:
+        - TARGET=cpp
+        - GROUP=PARSER
+      stage: extended-test
+    - os: osx
+      compiler: clang
+      osx_image: xcode9
+      env:
+        - TARGET=cpp
+        - GROUP=RECURSION
+      stage: extended-test
+    - os: osx
+      compiler: clang
+      osx_image: xcode9
+      env:
+        - TARGET=swift
+        - GROUP=LEXER
+      stage: main-test
+    - os: osx
+      compiler: clang
+      osx_image: xcode9
+      env:
+        - TARGET=swift
+        - GROUP=PARSER
+      stage: main-test
+    - os: osx
+      compiler: clang
+      osx_image: xcode9
+      env:
+        - TARGET=swift
+        - GROUP=RECURSION
+      stage: main-test
+    - os: linux
+      dist: trusty
       compiler: clang
       env:
        - TARGET=swift
        - GROUP=ALL
+      stage: extended-test
     - os: osx
-      osx_image: xcode8.2
+      osx_image: xcode9
       env:
         - TARGET=dotnet
         - GROUP=LEXER
+      stage: extended-test
     - os: osx
-      osx_image: xcode8.2
+      osx_image: xcode9
       env:
         - TARGET=dotnet
         - GROUP=PARSER
+      stage: extended-test
     - os: osx
-      osx_image: xcode8.2
+      osx_image: xcode9
       env:
         - TARGET=dotnet
         - GROUP=RECURSION
+      stage: extended-test
     - os: linux
-      jdk: oraclejdk7
+      jdk: openjdk7
       env: TARGET=java
+      stage: extended-test
+    - os: linux
+      jdk: openjdk8
+      env: TARGET=java
+      stage: extended-test
     - os: linux
       jdk: oraclejdk8
       env: TARGET=java
+      stage: smoke-test
     - os: linux
-      jdk: oraclejdk7
+      jdk: openjdk7
       env: TARGET=csharp
+      stage: extended-test
     - os: linux
       jdk: oraclejdk8
       dist: trusty
       env:
         - TARGET=dotnet
         - GROUP=LEXER
+      stage: main-test
     - os: linux
-      jdk: oraclejdk8
+      jdk: openjdk8
       dist: trusty
       env:
         - TARGET=dotnet
         - GROUP=PARSER
+      stage: main-test
     - os: linux
       jdk: oraclejdk8
       dist: trusty
       env:
         - TARGET=dotnet
         - GROUP=RECURSION
+      stage: main-test
     - os: linux
-      jdk: oraclejdk7
+      jdk: openjdk7
       env: TARGET=python2
+      stage: extended-test
     - os: linux
-      jdk: oraclejdk7
+      jdk: openjdk7
       env: TARGET=python3
       addons:
         apt:
@@ -142,16 +182,20 @@ matrix:
             - deadsnakes # source required so it finds the package definition below
           packages:
             - python3.5
+      stage: main-test
     - os: linux
-      jdk: oraclejdk7
+      dist: trusty
+      jdk: openjdk8
       env: TARGET=javascript
+      stage: main-test
     - os: linux
-      jdk: oraclejdk7
+      dist: trusty
+      jdk: openjdk8
       env: TARGET=go
+      stage: main-test
 
 before_install:
-  - ./.travis/before-install-$TRAVIS_OS_NAME-$TARGET.sh
+  - f="./.travis/before-install-$TRAVIS_OS_NAME-$TARGET.sh"; ! [ -x "$f" ] || "$f"
 
 script:
-  - cd runtime-testsuite; ../.travis/run-tests-$TARGET.sh
-
+  - cd runtime-testsuite; travis_wait 40 ../.travis/run-tests-$TARGET.sh

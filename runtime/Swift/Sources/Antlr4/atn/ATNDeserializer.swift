@@ -175,7 +175,7 @@ public class ATNDeserializer {
                 if let s = s as? BlockStartState {
                     let endStateNumber: Int = toInt(data[p])
                     p += 1
-                    endStateNumbers.append(s, endStateNumber)
+                    endStateNumbers.append((s, endStateNumber))
                 }
             }
             atn.addState(s)

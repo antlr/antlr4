@@ -69,7 +69,7 @@ public final class ArrayWrapper<T: Hashable>: ExpressibleByArrayLiteral, Hashabl
 
 }
 
-public func == <Element: Equatable>(lhs: ArrayWrapper<Element>, rhs: ArrayWrapper<Element>) -> Bool {
+public func == <Element>(lhs: ArrayWrapper<Element>, rhs: ArrayWrapper<Element>) -> Bool {
     if lhs === rhs {
         return true
     }
