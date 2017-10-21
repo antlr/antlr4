@@ -37,6 +37,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.net.URI;
 import java.nio.charset.Charset;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -247,10 +248,9 @@ public class Antlr4Mojo extends AbstractMojo {
         // Ensure that the output directory path is all in tact so that
         // ANTLR can just write into it.
         //
-        File outputDir = getOutputDirectory();
-
-        if (!outputDir.exists()) {
-            outputDir.mkdirs();
+        File toolOutputDir = getToolOutputDirectory();
+        if (!toolOutputDir.exists()) {
+			toolOutputDir.mkdirs();
         }
 
         GrammarDependencies dependencies = new GrammarDependencies(sourceDirectory, libDirectory, arguments, getDependenciesStatusFile(), getLog());
@@ -319,7 +319,7 @@ public class Antlr4Mojo extends AbstractMojo {
 
 		if (getOutputDirectory() != null) {
 			args.add("-o");
-			args.add(outputDirectory.getAbsolutePath());
+			args.add(getToolOutputDirectory().getAbsolutePath());
 		}
 
 		// Where do we want ANTLR to look for .tokens and import grammars?
@@ -393,7 +393,7 @@ public class Antlr4Mojo extends AbstractMojo {
 
         for (File grammarFile : grammarFiles) {
             String tokensFileName = grammarFile.getName().split("\\.")[0] + ".tokens";
-            File outputFile = new File(outputDirectory, tokensFileName);
+            File outputFile = new File(getToolOutputDirectory(), tokensFileName);
             if ( (! outputFile.exists()) ||
                  outputFile.lastModified() <= grammarFile.lastModified() ||
                  dependencies.isDependencyChanged(grammarFile)) {
@@ -503,6 +503,21 @@ public class Antlr4Mojo extends AbstractMojo {
         }
 
         return statusFile;
+    }
+
+	/**
+    * Translates the ANTLR output directory so that proper package directory structure can be created
+    */
+    private File getToolOutputDirectory() {
+        File outputDir = outputDirectory;
+        if (arguments != null) {
+            int packageNameIndex = arguments.indexOf("-package") + 1;
+            if (packageNameIndex > 0 && packageNameIndex < arguments.size()) {
+                String[] packagePath = arguments.get(packageNameIndex).split("[.]");
+                outputDir = Paths.get(outputDirectory.getAbsolutePath(), packagePath).toFile();
+            }
+        }
+        return outputDir;
     }
 
 	private final class CustomTool extends Tool {
