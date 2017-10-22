@@ -146,6 +146,22 @@ public class TokenVocabParser {
 		// files are generated (in the base, not relative to the input
 		// location.)
 		f = new File(g.tool.outputDirectory, vocabName + CodeGenerator.VOCAB_FILE_EXTENSION);
-		return f;
+		if ( f.exists() ) {
+			return f;
+		}
+		
+		// Still not found? Use the grammar's subfolder then.
+		String fileDirectory;
+
+		if (g.fileName.lastIndexOf(File.separatorChar) == -1) {
+			// No path is included in the file name, so make the file
+			// directory the same as the parent grammar (which might still be just ""
+			// but when it is not, we will write the file in the correct place.
+			fileDirectory = ".";
+		}
+		else {
+			fileDirectory = g.fileName.substring(0, g.fileName.lastIndexOf(File.separatorChar));
+		}
+		return new File(fileDirectory, vocabName + CodeGenerator.VOCAB_FILE_EXTENSION);
 	}
 }
