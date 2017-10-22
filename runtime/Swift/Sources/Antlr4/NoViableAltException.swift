@@ -35,7 +35,7 @@ public class NoViableAltException: RecognitionException<ParserATNSimulator> {
     public init(_ recognizer: Parser?,
                 _ input: IntStream,
                 _ startToken: Token,
-                _ offendingToken: Token,
+                _ offendingToken: Token?,
                 _ deadEndConfigs: ATNConfigSet?,
                 _ ctx: ParserRuleContext?) {
 
@@ -44,7 +44,9 @@ public class NoViableAltException: RecognitionException<ParserATNSimulator> {
 
         // as? Recognizer<AnyObject, ATNSimulator>
         super.init(recognizer, input, ctx)
-        self.setOffendingToken(offendingToken)
+        if let offendingToken = offendingToken {
+            setOffendingToken(offendingToken)
+        }
     }
 
 

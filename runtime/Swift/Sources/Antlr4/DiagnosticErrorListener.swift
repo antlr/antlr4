@@ -59,16 +59,16 @@ public class DiagnosticErrorListener: BaseErrorListener {
         _ stopIndex: Int,
         _ exact: Bool,
         _ ambigAlts: BitSet,
-        _ configs: ATNConfigSet) throws {
+        _ configs: ATNConfigSet) {
             if exactOnly && !exact {
                 return
             }
 
             let decision = getDecisionDescription(recognizer, dfa)
-            let conflictingAlts = try getConflictingAlts(ambigAlts, configs)
-            let text = try recognizer.getTokenStream()!.getText(Interval.of(startIndex, stopIndex))
+            let conflictingAlts = getConflictingAlts(ambigAlts, configs)
+            let text = getTextInInterval(recognizer, startIndex, stopIndex)
             let message = "reportAmbiguity d=\(decision): ambigAlts=\(conflictingAlts), input='\(text)'"
-            try recognizer.notifyErrorListeners(message)
+            recognizer.notifyErrorListeners(message)
     }
 
     override
@@ -77,11 +77,11 @@ public class DiagnosticErrorListener: BaseErrorListener {
         _ startIndex: Int,
         _ stopIndex: Int,
         _ conflictingAlts: BitSet?,
-        _ configs: ATNConfigSet) throws {
+        _ configs: ATNConfigSet) {
             let decision = getDecisionDescription(recognizer, dfa)
-            let text = try recognizer.getTokenStream()!.getText(Interval.of(startIndex, stopIndex))
+            let text = getTextInInterval(recognizer, startIndex, stopIndex)
             let message = "reportAttemptingFullContext d=\(decision), input='\(text)'"
-            try recognizer.notifyErrorListeners(message)
+            recognizer.notifyErrorListeners(message)
     }
 
     override
@@ -90,11 +90,11 @@ public class DiagnosticErrorListener: BaseErrorListener {
         _ startIndex: Int,
         _ stopIndex: Int,
         _ prediction: Int,
-        _ configs: ATNConfigSet) throws {
+        _ configs: ATNConfigSet) {
             let decision = getDecisionDescription(recognizer, dfa)
-            let text = try recognizer.getTokenStream()!.getText(Interval.of(startIndex, stopIndex))
+            let text = getTextInInterval(recognizer, startIndex, stopIndex)
             let message = "reportContextSensitivity d=\(decision), input='\(text)'"
-            try recognizer.notifyErrorListeners(message)
+            recognizer.notifyErrorListeners(message)
     }
 
     internal func getDecisionDescription(_ recognizer: Parser, _ dfa: DFA) -> String {
@@ -125,12 +125,17 @@ public class DiagnosticErrorListener: BaseErrorListener {
     /// - returns: Returns `reportedAlts` if it is not `null`, otherwise
     /// returns the set of alternatives represented in `configs`.
     /// 
-    internal func getConflictingAlts(_ reportedAlts: BitSet?, _ configs: ATNConfigSet) throws -> BitSet {
-        if reportedAlts != nil {
-            return reportedAlts!
-        }
-        let result = try configs.getAltBitSet()
-        return result
+    internal func getConflictingAlts(_ reportedAlts: BitSet?, _ configs: ATNConfigSet) -> BitSet {
+        return reportedAlts ?? configs.getAltBitSet()
     }
-    
+}
+
+
+fileprivate func getTextInInterval(_ recognizer: Parser, _ startIndex: Int, _ stopIndex: Int) -> String {
+    do {
+        return try recognizer.getTokenStream()?.getText(Interval.of(startIndex, stopIndex)) ?? "<unknown>"
+    }
+    catch {
+        return "<unknown>"
+    }
 }

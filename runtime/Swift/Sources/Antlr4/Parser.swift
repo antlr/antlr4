@@ -506,15 +506,20 @@ open class Parser: Recognizer<ParserATNSimulator> {
         return try _input.LT(1)!
     }
 
-    public final func notifyErrorListeners(_ msg: String) throws {
-        try notifyErrorListeners(getCurrentToken(), msg, nil)
+    public final func notifyErrorListeners(_ msg: String) {
+        let token = try? getCurrentToken()
+        notifyErrorListeners(token, msg, nil)
     }
 
-    public func notifyErrorListeners(_ offendingToken: Token, _ msg: String,
-                                     _ e: AnyObject?) {
+    public func notifyErrorListeners(_ offendingToken: Token?, _ msg: String, _ e: AnyObject?) {
         _syntaxErrors += 1
-        let line = offendingToken.getLine()
-        let charPositionInLine = offendingToken.getCharPositionInLine()
+        var line = -1
+        var charPositionInLine = -1
+        if let offendingToken = offendingToken {
+            line = offendingToken.getLine()
+            charPositionInLine = offendingToken.getCharPositionInLine()
+        }
+
         let listener = getErrorListenerDispatch()
         listener.syntaxError(self, offendingToken, line, charPositionInLine, msg, e)
     }
@@ -832,7 +837,7 @@ open class Parser: Recognizer<ParserATNSimulator> {
 //			parser.getInterpreter()!.setPredictionMode(PredictionMode.LL_EXACT_AMBIG_DETECTION);
 //
 //			// get ambig trees
-//			var alt : Int = ambiguityInfo.ambigAlts.nextSetBit(0);
+//			var alt : Int = ambiguityInfo.ambigAlts.firstSetBit();
 //			while  alt>=0  {
 //				// re-parse entire input for all ambiguous alternatives
 //				// (don't have to do first as it's been parsed, but do again for simplicity
@@ -870,11 +875,11 @@ open class Parser: Recognizer<ParserATNSimulator> {
     /// - Returns: `true` if `symbol` can follow the current state in
     /// the ATN, otherwise `false`.
     /// 
-    public func isExpectedToken(_ symbol: Int) throws -> Bool {
+    public func isExpectedToken(_ symbol: Int) -> Bool {
         let atn = getInterpreter().atn
-        var ctx = _ctx
+        var ctx: ParserRuleContext? = _ctx
         let s = atn.states[getState()]!
-        var following = try atn.nextTokens(s)
+        var following = atn.nextTokens(s)
         if following.contains(symbol) {
             return true
         }
@@ -886,7 +891,7 @@ open class Parser: Recognizer<ParserATNSimulator> {
         while let ctxWrap = ctx, ctxWrap.invokingState >= 0 && following.contains(CommonToken.EPSILON) {
             let invokingState = atn.states[ctxWrap.invokingState]!
             let rt = invokingState.transition(0) as! RuleTransition
-            following = try atn.nextTokens(rt.followState)
+            following = atn.nextTokens(rt.followState)
             if following.contains(symbol) {
                 return true
             }
@@ -913,10 +918,10 @@ open class Parser: Recognizer<ParserATNSimulator> {
     }
 
 
-    public func getExpectedTokensWithinCurrentRule() throws -> IntervalSet {
+    public func getExpectedTokensWithinCurrentRule() -> IntervalSet {
         let atn = getInterpreter().atn
         let s = atn.states[getState()]!
-        return try atn.nextTokens(s)
+        return atn.nextTokens(s)
     }
 
     /// Get a rule's index (i.e., `RULE_ruleName` field) or -1 if not found.

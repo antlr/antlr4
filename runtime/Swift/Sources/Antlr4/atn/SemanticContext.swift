@@ -125,12 +125,12 @@ public class SemanticContext: Hashable, CustomStringConvertible {
 
         override
         public func eval<T>(_ parser: Recognizer<T>, _ parserCallStack: RuleContext) throws -> Bool {
-            return try parser.precpred(parserCallStack, precedence)
+            return parser.precpred(parserCallStack, precedence)
         }
 
         override
         public func evalPrecedence<T>(_ parser: Recognizer<T>, _ parserCallStack: RuleContext) throws -> SemanticContext? {
-            if try parser.precpred(parserCallStack, precedence) {
+            if parser.precpred(parserCallStack, precedence) {
                 return SemanticContext.NONE
             } else {
                 return nil

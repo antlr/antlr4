@@ -99,7 +99,7 @@ public class Transition {
     }
 
 
-    public func labelIntervalSet() throws -> IntervalSet? {
+    public func labelIntervalSet() -> IntervalSet? {
         return nil
     }
 

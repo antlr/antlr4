@@ -73,9 +73,9 @@ public class ATN {
     /// the rule surrounding `s`. In other words, the set will be
     /// restricted to tokens reachable staying within `s`'s rule.
     /// 
-    public func nextTokens(_ s: ATNState, _ ctx: RuleContext?)throws -> IntervalSet {
-        let anal: LL1Analyzer = LL1Analyzer(self)
-        let next: IntervalSet = try anal.LOOK(s, ctx)
+    public func nextTokens(_ s: ATNState, _ ctx: RuleContext?) -> IntervalSet {
+        let anal = LL1Analyzer(self)
+        let next = anal.LOOK(s, ctx)
         return next
     }
 
@@ -84,14 +84,14 @@ public class ATN {
     /// staying in same rule. _org.antlr.v4.runtime.Token#EPSILON_ is in set if we reach end of
     /// rule.
     /// 
-    public func nextTokens(_ s: ATNState) throws -> IntervalSet {
+    public func nextTokens(_ s: ATNState) -> IntervalSet {
         if let nextTokenWithinRule = s.nextTokenWithinRule
         {
             return nextTokenWithinRule
         }
-        let intervalSet = try nextTokens(s, nil)
+        let intervalSet = nextTokens(s, nil)
         s.nextTokenWithinRule = intervalSet
-        try intervalSet.setReadonly(true)
+        try! intervalSet.setReadonly(true)
         return intervalSet
     }
 
@@ -151,27 +151,27 @@ public class ATN {
         }
 
         var ctx: RuleContext? = context
-        let s: ATNState = states[stateNumber]!
-        var following: IntervalSet = try nextTokens(s)
+        let s = states[stateNumber]!
+        var following = nextTokens(s)
         if !following.contains(CommonToken.EPSILON) {
             return following
         }
 
-        let expected: IntervalSet = try IntervalSet()
-        try expected.addAll(following)
-        try expected.remove(CommonToken.EPSILON)
+        let expected = IntervalSet()
+        try! expected.addAll(following)
+        try! expected.remove(CommonToken.EPSILON)
 
-        while let ctxWrap = ctx , ctxWrap.invokingState >= 0 && following.contains(CommonToken.EPSILON) {
-            let invokingState: ATNState = states[ctxWrap.invokingState]!
-            let rt: RuleTransition = invokingState.transition(0) as! RuleTransition
-            following = try nextTokens(rt.followState)
-            try expected.addAll(following)
-            try expected.remove(CommonToken.EPSILON)
+        while let ctxWrap = ctx, ctxWrap.invokingState >= 0 && following.contains(CommonToken.EPSILON) {
+            let invokingState = states[ctxWrap.invokingState]!
+            let rt = invokingState.transition(0) as! RuleTransition
+            following = nextTokens(rt.followState)
+            try! expected.addAll(following)
+            try! expected.remove(CommonToken.EPSILON)
             ctx = ctxWrap.parent
         }
 
         if following.contains(CommonToken.EPSILON) {
-            try expected.add(CommonToken.EOF)
+            try! expected.add(CommonToken.EOF)
         }
 
         return expected
