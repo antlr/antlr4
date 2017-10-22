@@ -589,7 +589,7 @@ case <i><if(!choice.ast.greedy)>+1<endif>:
 
 Sync(s) ::= "sync(<s.expecting.name>);"
 
-ThrowNoViableAlt(t) ::= "throw try ANTLRException.recognition(e: NoViableAltException(self))"
+ThrowNoViableAlt(t) ::= "throw ANTLRException.recognition(e: NoViableAltException(self))"
 
 TestSetInline(s) ::= <<
 <!<s.bitsets:{bits | <if(rest(rest(bits.ttypes)))><bitsetBitfieldComparison(s, bits)><else><bitsetInlineComparison(s, bits)><endif>}; separator=" || ">!>
@@ -694,7 +694,7 @@ ArgAction(a, chunks) ::= "<chunks>"
 SemPred(p, chunks, failChunks) ::= <<
 setState(<p.stateNumber>)
 if (!(<chunks>)) {
-    throw try ANTLRException.recognition(e:FailedPredicateException(self, <p.predicate><if(failChunks)>, <failChunks><elseif(p.msg)>, <p.msg><endif>))
+    throw ANTLRException.recognition(e:FailedPredicateException(self, <p.predicate><if(failChunks)>, <failChunks><elseif(p.msg)>, <p.msg><endif>))
 }
 >>
 

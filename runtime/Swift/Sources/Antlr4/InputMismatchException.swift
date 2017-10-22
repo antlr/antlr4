@@ -10,9 +10,11 @@
 /// when the current input does not match the expected token.
 /// 
 
-public class InputMismatchException: RecognitionException<ParserATNSimulator> {
-    public init(_ recognizer: Parser) throws {
+public class InputMismatchException: RecognitionException {
+    public init(_ recognizer: Parser) {
         super.init(recognizer, recognizer.getInputStream()!, recognizer._ctx)
-        self.setOffendingToken(try recognizer.getCurrentToken())
+        if let token = try? recognizer.getCurrentToken() {
+            setOffendingToken(token)
+        }
     }
 }

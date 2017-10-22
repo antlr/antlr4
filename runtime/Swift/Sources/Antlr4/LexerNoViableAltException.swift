@@ -5,7 +5,7 @@
 /// 
 
 
-public class LexerNoViableAltException: RecognitionException<LexerATNSimulator>, CustomStringConvertible {
+public class LexerNoViableAltException: RecognitionException, CustomStringConvertible {
     /// 
     /// Matching attempted at what input index?
     /// 

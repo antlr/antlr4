@@ -90,7 +90,7 @@ public class DefaultErrorStrategy: ANTLRErrorStrategy {
     /// the exception
     /// 
     public func reportError(_ recognizer: Parser,
-                            _ e: AnyObject) {
+                            _ e: RecognitionException) {
         // if we've already reported an error and have not matched a token
         // yet successfully, don't report any errors.
         if inErrorRecoveryMode(recognizer) {
@@ -109,8 +109,7 @@ public class DefaultErrorStrategy: ANTLRErrorStrategy {
         }
         else {
             errPrint("unknown recognition error type: " + String(describing: type(of: e)))
-            let re = (e as! RecognitionException<ParserATNSimulator>)
-            recognizer.notifyErrorListeners(re.getOffendingToken(), re.message ?? "", e)
+            recognizer.notifyErrorListeners(e.getOffendingToken(), e.message ?? "", e)
         }
     }
 
@@ -119,7 +118,7 @@ public class DefaultErrorStrategy: ANTLRErrorStrategy {
     /// until we find one in the resynchronization set--loosely the set of tokens
     /// that can follow the current rule.
     /// 
-    public func recover(_ recognizer: Parser, _ e: AnyObject) throws {
+    public func recover(_ recognizer: Parser, _ e: RecognitionException) throws {
 //		print("recover in "+recognizer.getRuleInvocationStack()+
 //						   " index="+getTokenStream(recognizer).index()+
 //						   ", lastErrorIndex="+
@@ -219,7 +218,7 @@ public class DefaultErrorStrategy: ANTLRErrorStrategy {
             if try singleTokenDeletion(recognizer) != nil {
                 return
             }
-            throw try ANTLRException.recognition(e: InputMismatchException(recognizer))
+            throw ANTLRException.recognition(e: InputMismatchException(recognizer))
 
         case ATNState.PLUS_LOOP_BACK: fallthrough
         case ATNState.STAR_LOOP_BACK:
@@ -418,11 +417,8 @@ public class DefaultErrorStrategy: ANTLRErrorStrategy {
         if try singleTokenInsertion(recognizer) {
             return try getMissingSymbol(recognizer)
         }
-        throw try ANTLRException.recognition(e: InputMismatchException(recognizer))
-        // throw try ANTLRException.InputMismatch(e: InputMismatchException(recognizer) )
-        //RuntimeException("InputMismatchException")
         // even that didn't work; must throw the exception
-        //throwException() /* throw InputMismatchException(recognizer); */
+        throw ANTLRException.recognition(e: InputMismatchException(recognizer))
     }
 
     /// 

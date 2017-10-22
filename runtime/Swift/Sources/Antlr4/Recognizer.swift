@@ -5,12 +5,24 @@
 
 import Foundation
 
-open class Recognizer<ATNInterpreter:ATNSimulator> {
+
+public protocol RecognizerProtocol {
+    func getATN() -> ATN
+    func getGrammarFileName() -> String
+    func getParseInfo() -> ParseInfo?
+    func getRuleNames() -> [String]
+    func getSerializedATN() -> String
+    func getState() -> Int
+    func getTokenType(_ tokenName: String) -> Int
+    func getVocabulary() -> Vocabulary
+}
+
+
+open class Recognizer<ATNInterpreter: ATNSimulator>: RecognizerProtocol {
     //TODO: WeakKeyDictionary NSMapTable Dictionary MapTable<Vocabulary,HashMap<String, Int>>
     private let tokenTypeMapCache = HashMap<Vocabulary, [String : Int]>()
 
     private let ruleIndexMapCache = HashMap<ArrayWrapper<String>, [String : Int]>()
-
 
     private var _listeners: [ANTLRErrorListener] = [ConsoleErrorListener.INSTANCE]
 
@@ -151,8 +163,8 @@ open class Recognizer<ATNInterpreter:ATNSimulator> {
     /// 
     /// What is the error header, normally line/character position information?
     /// 
-    open func getErrorHeader(_ e: AnyObject) -> String {
-        let offending = (e as! RecognitionException).getOffendingToken()
+    open func getErrorHeader(_ e: RecognitionException) -> String {
+        let offending = e.getOffendingToken()
         let line = offending.getLine()
         let charPositionInLine = offending.getCharPositionInLine()
         return "line \(line):\(charPositionInLine)"

@@ -11,12 +11,11 @@
 /// and what kind of problem occurred.
 /// 
 
-public class RecognitionException<T:ATNSimulator>  {
+public class RecognitionException {
     /// 
     /// The _org.antlr.v4.runtime.Recognizer_ where this exception originated.
     /// 
-    private final var recognizer: Recognizer<T>?
-    //Recognizer<AnyObject,ATNSimulator>? ;
+    private final var recognizer: RecognizerProtocol?
 
     private final let ctx: RuleContext?
 
@@ -32,25 +31,15 @@ public class RecognitionException<T:ATNSimulator>  {
     private var offendingState = -1
 
     public var message: String?
-    public init(_ recognizer: Recognizer<T>?,
-                _ input: IntStream,
-                _ ctx: ParserRuleContext?) {
-        self.recognizer = recognizer
-        self.input = input
-        self.ctx = ctx
-        if let recognizer = recognizer {
-            self.offendingState = recognizer.getState()
-        }
-    }
 
-    public init(_ message: String,
-                _ recognizer: Recognizer<T>?,
+    public init(_ recognizer: RecognizerProtocol?,
                 _ input: IntStream,
-                _ ctx: ParserRuleContext?) {
-        self.message = message
+                _ ctx: ParserRuleContext? = nil,
+                _ message: String? = nil) {
         self.recognizer = recognizer
         self.input = input
         self.ctx = ctx
+        self.message = message
         if let recognizer = recognizer {
             self.offendingState = recognizer.getState()
         }
@@ -87,7 +76,6 @@ public class RecognitionException<T:ATNSimulator>  {
         if let recognizer = recognizer {
             return try? recognizer.getATN().getExpectedTokens(offendingState, ctx!)
         }
-
         return nil
     }
 
@@ -134,7 +122,7 @@ public class RecognitionException<T:ATNSimulator>  {
     /// - Returns: The recognizer where this exception occurred, or `null` if
     /// the recognizer is not available.
     /// 
-    public func getRecognizer() -> Recognizer<T>? {
+    public func getRecognizer() -> RecognizerProtocol? {
         return recognizer
     }
 }

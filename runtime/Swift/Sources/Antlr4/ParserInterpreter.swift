@@ -237,11 +237,8 @@ public class ParserInterpreter: Parser {
         case Transition.PREDICATE:
             let predicateTransition = transition as! PredicateTransition
             if try !sempred(_ctx!, predicateTransition.ruleIndex, predicateTransition.predIndex) {
-
-                throw try ANTLRException.recognition(e: FailedPredicateException(self))
-
+                throw ANTLRException.recognition(e: FailedPredicateException(self))
             }
-
             break
 
         case Transition.ACTION:
@@ -251,9 +248,7 @@ public class ParserInterpreter: Parser {
 
         case Transition.PRECEDENCE:
             if !precpred(_ctx!, (transition as! PrecedencePredicateTransition).precedence) {
-
-                throw try ANTLRException.recognition(e: FailedPredicateException(self, "precpred(_ctx,\((transition as! PrecedencePredicateTransition).precedence))"))
-
+                throw ANTLRException.recognition(e: FailedPredicateException(self, "precpred(_ctx,\((transition as! PrecedencePredicateTransition).precedence))"))
             }
             break
 
