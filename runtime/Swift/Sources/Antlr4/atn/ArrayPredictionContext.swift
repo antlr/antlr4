@@ -1,23 +1,25 @@
+/// 
 /// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
+/// 
 
 
 public class ArrayPredictionContext: PredictionContext {
+    /// 
     /// Parent can be null only if full ctx mode and we make an array
-    /// from {@link #EMPTY} and non-empty. We merge {@link #EMPTY} by using null parent and
-    /// returnState == {@link #EMPTY_RETURN_STATE}.
+    /// from _#EMPTY_ and non-empty. We merge _#EMPTY_ by using null parent and
+    /// returnState == _#EMPTY_RETURN_STATE_.
+    /// 
     public final var parents: [PredictionContext?]
 
+    /// 
     /// Sorted for merge, no duplicates; if present,
-    /// {@link #EMPTY_RETURN_STATE} is always last.
+    /// _#EMPTY_RETURN_STATE_ is always last.
+    /// 
     public final let returnStates: [Int]
 
     public convenience init(_ a: SingletonPredictionContext) {
-//        if a.parent == nil {
-//            // print("parent is nil")
-//        }
-        //self.init(new, PredictionContext[] {a.parent}, new, int[] {a.returnState});
         let parents = [a.parent]
         self.init(parents, [a.returnState])
     }
@@ -50,12 +52,6 @@ public class ArrayPredictionContext: PredictionContext {
     final public func getReturnState(_ index: Int) -> Int {
         return returnStates[index]
     }
-
-    //	@Override
-    //	public int findReturnState(int returnState) {
-    //		return Arrays.binarySearch(returnStates, returnState);
-    //	}
-
 
     override
     public var description: String {

@@ -4,13 +4,13 @@
  */
 
 
-/**
- * This implementation of {@link org.antlr.v4.runtime.ANTLRErrorListener} dispatches all calls to a
- * collection of delegate listeners. This reduces the effort required to support multiple
- * listeners.
- *
- * @author Sam Harwell
- */
+/// 
+/// This implementation of _org.antlr.v4.runtime.ANTLRErrorListener_ dispatches all calls to a
+/// collection of delegate listeners. This reduces the effort required to support multiple
+/// listeners.
+/// 
+/// - Author: Sam Harwell
+/// 
 
 public class ProxyErrorListener: ANTLRErrorListener {
     private final var delegates: Array<ANTLRErrorListener>
@@ -20,14 +20,13 @@ public class ProxyErrorListener: ANTLRErrorListener {
         self.delegates = delegates
     }
 
-    //_ e : RecognitionException
-    public func syntaxError<T:ATNSimulator>(_ recognizer: Recognizer<T>,
-                                            _ offendingSymbol: AnyObject?,
-                                            _ line: Int,
-                                            _ charPositionInLine: Int,
-                                            _ msg: String,
-                                            _ e: AnyObject?)
-     {
+    public func syntaxError<T>(_ recognizer: Recognizer<T>,
+                               _ offendingSymbol: AnyObject?,
+                               _ line: Int,
+                               _ charPositionInLine: Int,
+                               _ msg: String,
+                               _ e: AnyObject?)
+    {
         for listener: ANTLRErrorListener in delegates {
             listener.syntaxError(recognizer, offendingSymbol, line, charPositionInLine, msg, e)
         }

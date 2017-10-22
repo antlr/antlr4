@@ -321,6 +321,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\ANTLRErrorListener.cpp" />
+    <ClCompile Include="src\ANTLRErrorStrategy.cpp" />
     <ClCompile Include="src\ANTLRFileStream.cpp" />
     <ClCompile Include="src\ANTLRInputStream.cpp" />
     <ClCompile Include="src\atn\AbstractPredicateTransition.cpp" />
@@ -339,6 +341,7 @@
     <ClCompile Include="src\atn\BasicBlockStartState.cpp" />
     <ClCompile Include="src\atn\BasicState.cpp" />
     <ClCompile Include="src\atn\BlockEndState.cpp" />
+    <ClCompile Include="src\atn\BlockStartState.cpp" />
     <ClCompile Include="src\atn\ContextSensitivityInfo.cpp" />
     <ClCompile Include="src\atn\DecisionEventInfo.cpp" />
     <ClCompile Include="src\atn\DecisionInfo.cpp" />
@@ -346,6 +349,7 @@
     <ClCompile Include="src\atn\EmptyPredictionContext.cpp" />
     <ClCompile Include="src\atn\EpsilonTransition.cpp" />
     <ClCompile Include="src\atn\ErrorInfo.cpp" />
+    <ClCompile Include="src\atn\LexerAction.cpp" />
     <ClCompile Include="src\atn\LexerActionExecutor.cpp" />
     <ClCompile Include="src\atn\LexerATNConfig.cpp" />
     <ClCompile Include="src\atn\LexerATNSimulator.cpp" />
@@ -412,6 +416,7 @@
     <ClCompile Include="src\misc\Interval.cpp" />
     <ClCompile Include="src\misc\IntervalSet.cpp" />
     <ClCompile Include="src\misc\MurmurHash.cpp" />
+    <ClCompile Include="src\misc\Predicate.cpp" />
     <ClCompile Include="src\NoViableAltException.cpp" />
     <ClCompile Include="src\Parser.cpp" />
     <ClCompile Include="src\ParserInterpreter.cpp" />
@@ -422,16 +427,23 @@
     <ClCompile Include="src\RuleContext.cpp" />
     <ClCompile Include="src\RuleContextWithAltNum.cpp" />
     <ClCompile Include="src\RuntimeMetaData.cpp" />
+    <ClCompile Include="src\support\Any.cpp" />
     <ClCompile Include="src\support\Arrays.cpp" />
     <ClCompile Include="src\support\CPPUtils.cpp" />
     <ClCompile Include="src\support\guid.cpp" />
     <ClCompile Include="src\support\StringUtils.cpp" />
+    <ClCompile Include="src\Token.cpp" />
+    <ClCompile Include="src\TokenSource.cpp" />
     <ClCompile Include="src\TokenStream.cpp" />
     <ClCompile Include="src\TokenStreamRewriter.cpp" />
+    <ClCompile Include="src\tree\ErrorNode.cpp" />
     <ClCompile Include="src\tree\ErrorNodeImpl.cpp" />
     <ClCompile Include="src\tree\IterativeParseTreeWalker.cpp" />
     <ClCompile Include="src\tree\ParseTree.cpp" />
+    <ClCompile Include="src\tree\ParseTreeListener.cpp" />
+    <ClCompile Include="src\tree\ParseTreeVisitor.cpp" />
     <ClCompile Include="src\tree\ParseTreeWalker.cpp" />
+    <ClCompile Include="src\tree\pattern\Chunk.cpp" />
     <ClCompile Include="src\tree\pattern\ParseTreeMatch.cpp" />
     <ClCompile Include="src\tree\pattern\ParseTreePattern.cpp" />
     <ClCompile Include="src\tree\pattern\ParseTreePatternMatcher.cpp" />
@@ -439,6 +451,7 @@
     <ClCompile Include="src\tree\pattern\TagChunk.cpp" />
     <ClCompile Include="src\tree\pattern\TextChunk.cpp" />
     <ClCompile Include="src\tree\pattern\TokenTagToken.cpp" />
+    <ClCompile Include="src\tree\TerminalNode.cpp" />
     <ClCompile Include="src\tree\TerminalNodeImpl.cpp" />
     <ClCompile Include="src\tree\Trees.cpp" />
     <ClCompile Include="src\tree\xpath\XPath.cpp" />
@@ -454,6 +467,7 @@
     <ClCompile Include="src\UnbufferedCharStream.cpp" />
     <ClCompile Include="src\UnbufferedTokenStream.cpp" />
     <ClCompile Include="src\Vocabulary.cpp" />
+    <ClCompile Include="src\WritableToken.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\antlr4-common.h" />

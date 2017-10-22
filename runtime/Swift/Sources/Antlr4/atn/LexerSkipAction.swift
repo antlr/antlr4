@@ -1,41 +1,55 @@
+/// 
 /// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
+/// 
 
 
-/// Implements the {@code skip} lexer action by calling {@link org.antlr.v4.runtime.Lexer#skip}.
-///
-/// <p>The {@code skip} command does not have any parameters, so this action is
-/// implemented as a singleton instance exposed by {@link #INSTANCE}.</p>
-///
+/// 
+/// Implements the `skip` lexer action by calling _org.antlr.v4.runtime.Lexer#skip_.
+/// 
+/// The `skip` command does not have any parameters, so this action is
+/// implemented as a singleton instance exposed by _#INSTANCE_.
+/// 
 /// -  Sam Harwell
 /// -  4.2
+/// 
 
 public final class LexerSkipAction: LexerAction, CustomStringConvertible {
+    /// 
     /// Provides a singleton instance of this parameterless lexer action.
+    /// 
     public static let INSTANCE: LexerSkipAction = LexerSkipAction()
 
-    /// Constructs the singleton instance of the lexer {@code skip} command.
+    /// 
+    /// Constructs the singleton instance of the lexer `skip` command.
+    /// 
     private override init() {
     }
 
-    /// {@inheritDoc}
-    /// - returns: This method returns {@link org.antlr.v4.runtime.atn.LexerActionType#SKIP}.
+    /// 
+    /// 
+    /// - returns: This method returns _org.antlr.v4.runtime.atn.LexerActionType#SKIP_.
+    /// 
     override
     public func getActionType() -> LexerActionType {
         return LexerActionType.skip
     }
 
-    /// {@inheritDoc}
-    /// - returns: This method returns {@code false}.
+    /// 
+    /// 
+    /// - returns: This method returns `false`.
+    /// 
     override
     public func isPositionDependent() -> Bool {
         return false
     }
 
-    /// {@inheritDoc}
-    ///
-    /// <p>This action is implemented by calling {@link org.antlr.v4.runtime.Lexer#skip}.</p>
+    /// 
+    /// 
+    /// 
+    /// This action is implemented by calling _org.antlr.v4.runtime.Lexer#skip_.
+    /// 
     override
     public func execute(_ lexer: Lexer) {
         lexer.skip()

@@ -1,8 +1,8 @@
+/// 
 /// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
-
-
+///
 public class MultiMap<K:Hashable, V> {
     private var mapping = [K: Array < V>]()
     public func map(_ key: K, _ value: V) {

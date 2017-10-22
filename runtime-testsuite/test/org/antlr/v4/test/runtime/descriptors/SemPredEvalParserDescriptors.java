@@ -283,11 +283,16 @@ public class SemPredEvalParserDescriptors {
 		public String input = "s\n\n\nx\n";
 		public String output = "(file_ (para (paraContent s) \\n \\n) (para (paraContent \\n x \\n)) <EOF>)\n";
 		/**
-		line 5:0 mismatched input '<EOF>' expecting '
-		'
+		line 5:0 mismatched input '<EOF>' expecting {'s', '
+		', 'x'}
 		 */
 		@CommentHasStringValue
 		public String errors;
+
+		@Override
+		public boolean ignore(String targetName) {
+			return !"Java".equals(targetName);
+		}
 	}
 
 	public static class PredFromAltTestedInLoopBack_2 extends PredFromAltTestedInLoopBack {

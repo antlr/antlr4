@@ -1,56 +1,64 @@
+/// 
 /// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
+/// 
 
 
 
+/// 
 /// A tree structure used to record the semantic context in which
 /// an ATN configuration is valid.  It's either a single predicate,
-/// a conjunction {@code p1&&p2}, or a sum of products {@code p1||p2}.
-///
-/// <p>I have scoped the {@link org.antlr.v4.runtime.atn.SemanticContext.AND}, {@link org.antlr.v4.runtime.atn.SemanticContext.OR}, and {@link org.antlr.v4.runtime.atn.SemanticContext.Predicate} subclasses of
-/// {@link org.antlr.v4.runtime.atn.SemanticContext} within the scope of this outer class.</p>
+/// a conjunction `p1&&p2`, or a sum of products `p1||p2`.
+/// 
+/// I have scoped the _org.antlr.v4.runtime.atn.SemanticContext.AND_, _org.antlr.v4.runtime.atn.SemanticContext.OR_, and _org.antlr.v4.runtime.atn.SemanticContext.Predicate_ subclasses of
+/// _org.antlr.v4.runtime.atn.SemanticContext_ within the scope of this outer class.
+/// 
 
 import Foundation
 
 public class SemanticContext: Hashable, CustomStringConvertible {
-    /// The default {@link org.antlr.v4.runtime.atn.SemanticContext}, which is semantically equivalent to
-    /// a predicate of the form {@code {true}?}.
+    /// 
+    /// The default _org.antlr.v4.runtime.atn.SemanticContext_, which is semantically equivalent to
+    /// a predicate of the form `{true`?}.
+    /// 
     public static let NONE: SemanticContext = Predicate()
 
+    /// 
     /// For context independent predicates, we evaluate them without a local
     /// context (i.e., null context). That way, we can evaluate them without
     /// having to create proper rule-specific context during prediction (as
     /// opposed to the parser, which creates them naturally). In a practical
     /// sense, this avoids a cast exception from RuleContext to myruleContext.
-    ///
-    /// <p>For context dependent predicates, we must pass in a local context so that
+    /// 
+    /// For context dependent predicates, we must pass in a local context so that
     /// references such as $arg evaluate properly as _localctx.arg. We only
     /// capture context dependent predicates in the context in which we begin
     /// prediction, so we passed in the outer context here in case of context
-    /// dependent predicate evaluation.</p>
-    public func eval<T:ATNSimulator>(_ parser: Recognizer<T>, _ parserCallStack: RuleContext) throws -> Bool {
+    /// dependent predicate evaluation.
+    /// 
+    public func eval<T>(_ parser: Recognizer<T>, _ parserCallStack: RuleContext) throws -> Bool {
         RuntimeException(#function + " must be overridden")
         return false
     }
 
+    /// 
     /// Evaluate the precedence predicates for the context and reduce the result.
-    ///
+    /// 
     /// - parameter parser: The parser instance.
     /// - parameter parserCallStack:
     /// - returns: The simplified semantic context after precedence predicates are
     /// evaluated, which will be one of the following values.
-    /// <ul>
-    /// <li>{@link #NONE}: if the predicate simplifies to {@code true} after
-    /// precedence predicates are evaluated.</li>
-    /// <li>{@code null}: if the predicate simplifies to {@code false} after
-    /// precedence predicates are evaluated.</li>
-    /// <li>{@code this}: if the semantic context is not changed as a result of
-    /// precedence predicate evaluation.</li>
-    /// <li>A non-{@code null} {@link org.antlr.v4.runtime.atn.SemanticContext}: the new simplified
-    /// semantic context after precedence predicates are evaluated.</li>
-    /// </ul>
-    public func evalPrecedence<T:ATNSimulator>(_ parser: Recognizer<T>, _ parserCallStack: RuleContext) throws -> SemanticContext? {
+    /// * _#NONE_: if the predicate simplifies to `true` after
+    /// precedence predicates are evaluated.
+    /// * `null`: if the predicate simplifies to `false` after
+    /// precedence predicates are evaluated.
+    /// * `this`: if the semantic context is not changed as a result of
+    /// precedence predicate evaluation.
+    /// * A non-`null` _org.antlr.v4.runtime.atn.SemanticContext_: the new simplified
+    /// semantic context after precedence predicates are evaluated.
+    /// 
+    public func evalPrecedence<T>(_ parser: Recognizer<T>, _ parserCallStack: RuleContext) throws -> SemanticContext? {
         return self
     }
     public var hashValue: Int {
@@ -82,7 +90,7 @@ public class SemanticContext: Hashable, CustomStringConvertible {
         }
 
         override
-        public func eval<T:ATNSimulator>(_ parser: Recognizer<T>, _ parserCallStack: RuleContext) throws -> Bool {
+        public func eval<T>(_ parser: Recognizer<T>, _ parserCallStack: RuleContext) throws -> Bool {
             let localctx: RuleContext? = isCtxDependent ? parserCallStack : nil
             return try parser.sempred(localctx, ruleIndex, predIndex)
         }
@@ -118,12 +126,12 @@ public class SemanticContext: Hashable, CustomStringConvertible {
         }
 
         override
-        public func eval<T:ATNSimulator>(_ parser: Recognizer<T>, _ parserCallStack: RuleContext) throws -> Bool {
+        public func eval<T>(_ parser: Recognizer<T>, _ parserCallStack: RuleContext) throws -> Bool {
             return try parser.precpred(parserCallStack, precedence)
         }
 
         override
-        public func evalPrecedence<T:ATNSimulator>(_ parser: Recognizer<T>, _ parserCallStack: RuleContext) throws -> SemanticContext? {
+        public func evalPrecedence<T>(_ parser: Recognizer<T>, _ parserCallStack: RuleContext) throws -> SemanticContext? {
             if try parser.precpred(parserCallStack, precedence) {
                 return SemanticContext.NONE
             } else {
@@ -146,18 +154,22 @@ public class SemanticContext: Hashable, CustomStringConvertible {
         }
     }
 
+    /// 
     /// This is the base class for semantic context "operators", which operate on
     /// a collection of semantic context "operands".
-    ///
+    /// 
     /// -  4.3
+    /// 
 
     public class Operator: SemanticContext {
+        /// 
         /// Gets the operands for the semantic context operator.
-        ///
-        /// - returns: a collection of {@link org.antlr.v4.runtime.atn.SemanticContext} operands for the
+        /// 
+        /// - returns: a collection of _org.antlr.v4.runtime.atn.SemanticContext_ operands for the
         /// operator.
-        ///
+        /// 
         /// -  4.3
+        /// 
 
         public func getOperands() -> Array<SemanticContext> {
             RuntimeException(" must overriden ")
@@ -165,39 +177,38 @@ public class SemanticContext: Hashable, CustomStringConvertible {
         }
     }
 
+    /// 
     /// A semantic context which is true whenever none of the contained contexts
     /// is false.
+    /// 
 
     public class AND: Operator {
         public let opnds: [SemanticContext]
 
         public init(_ a: SemanticContext, _ b: SemanticContext) {
             var operands: Set<SemanticContext> = Set<SemanticContext>()
-            if a is AND {
-                operands.formUnion((a as! AND).opnds)
-                //operands.addAll(Arrays.asList((a as AND).opnds));
+            if let aAnd = a as? AND {
+                operands.formUnion(aAnd.opnds)
             } else {
                 operands.insert(a)
             }
-            if b is AND {
-                operands.formUnion((b as! AND).opnds)
-                //operands.addAll(Arrays.asList((b as AND).opnds));
+            if let bAnd = b as? AND {
+                operands.formUnion(bAnd.opnds)
             } else {
                 operands.insert(b)
             }
 
-            let precedencePredicates: Array<PrecedencePredicate> =
-            SemanticContext.filterPrecedencePredicates(&operands)
+            let precedencePredicates = SemanticContext.filterPrecedencePredicates(&operands)
             if !precedencePredicates.isEmpty {
                 // interested in the transition with the lowest precedence
 
-                let reduced: PrecedencePredicate = precedencePredicates.sorted {
+                let reduced = precedencePredicates.sorted {
                     $0.precedence < $1.precedence
-                }.first! //Collections.min(precedencePredicates);
-                operands.insert(reduced)
+                }
+                operands.insert(reduced[0])
             }
 
-            opnds = Array(operands)   //.toArray(new, SemanticContext[operands.size()]);
+            opnds = Array(operands)
         }
 
         override
@@ -214,13 +225,15 @@ public class SemanticContext: Hashable, CustomStringConvertible {
             return MurmurHash.hashCode(opnds, seed)
         }
 
-        /// {@inheritDoc}
-        ///
-        /// <p>
+        /// 
+        /// 
+        /// 
+        /// 
         /// The evaluation of predicates by this context is short-circuiting, but
-        /// unordered.</p>
+        /// unordered.
+        /// 
         override
-        public func eval<T:ATNSimulator>(_ parser: Recognizer<T>, _ parserCallStack: RuleContext) throws -> Bool {
+        public func eval<T>(_ parser: Recognizer<T>, _ parserCallStack: RuleContext) throws -> Bool {
             for opnd: SemanticContext in opnds {
                 if try !opnd.eval(parser, parserCallStack) {
                     return false
@@ -230,7 +243,7 @@ public class SemanticContext: Hashable, CustomStringConvertible {
         }
 
         override
-        public func evalPrecedence<T:ATNSimulator>(_ parser: Recognizer<T>, _ parserCallStack: RuleContext) throws -> SemanticContext? {
+        public func evalPrecedence<T>(_ parser: Recognizer<T>, _ parserCallStack: RuleContext) throws -> SemanticContext? {
             var differs: Bool = false
             var operands: Array<SemanticContext> = Array<SemanticContext>()
             for context: SemanticContext in opnds {
@@ -279,38 +292,38 @@ public class SemanticContext: Hashable, CustomStringConvertible {
         }
     }
 
+    /// 
     /// A semantic context which is true whenever at least one of the contained
     /// contexts is true.
+    /// 
 
     public class OR: Operator {
         public final var opnds: [SemanticContext]
 
         public init(_ a: SemanticContext, _ b: SemanticContext) {
             var operands: Set<SemanticContext> = Set<SemanticContext>()
-            if a is OR {
-                operands.formUnion((a as! OR).opnds)
-                // operands.addAll(Arrays.asList((a as OR).opnds));
+            if let aOr = a as? OR {
+                operands.formUnion(aOr.opnds)
             } else {
                 operands.insert(a)
             }
-            if b is OR {
-                operands.formUnion((b as! OR).opnds)
-                //operands.addAll(Arrays.asList((b as OR).opnds));
+            if let bOr = b as? OR {
+                operands.formUnion(bOr.opnds)
             } else {
                 operands.insert(b)
             }
 
-            let precedencePredicates: Array<PrecedencePredicate> = SemanticContext.filterPrecedencePredicates(&operands)
+            let precedencePredicates = SemanticContext.filterPrecedencePredicates(&operands)
             if !precedencePredicates.isEmpty {
                 // interested in the transition with the highest precedence
-                let reduced: PrecedencePredicate = precedencePredicates.sorted {
+
+                let reduced = precedencePredicates.sorted {
                     $0.precedence > $1.precedence
-                }.first!
-                //var reduced : PrecedencePredicate = Collections.max(precedencePredicates);
-                operands.insert(reduced)
+                }
+                operands.insert(reduced[0])
             }
 
-            self.opnds = Array(operands)  //operands.toArray(new, SemanticContext[operands.size()]);
+            self.opnds = Array(operands)
         }
 
         override
@@ -325,13 +338,15 @@ public class SemanticContext: Hashable, CustomStringConvertible {
             return MurmurHash.hashCode(opnds, NSStringFromClass(OR.self).hashValue)
         }
 
-        /// {@inheritDoc}
-        ///
-        /// <p>
+        /// 
+        /// 
+        /// 
+        /// 
         /// The evaluation of predicates by this context is short-circuiting, but
-        /// unordered.</p>
+        /// unordered.
+        /// 
         override
-        public func eval<T:ATNSimulator>(_ parser: Recognizer<T>, _ parserCallStack: RuleContext) throws -> Bool {
+        public func eval<T>(_ parser: Recognizer<T>, _ parserCallStack: RuleContext) throws -> Bool {
             for opnd: SemanticContext in opnds {
                 if try opnd.eval(parser, parserCallStack) {
                     return true
@@ -341,7 +356,7 @@ public class SemanticContext: Hashable, CustomStringConvertible {
         }
 
         override
-        public func evalPrecedence<T:ATNSimulator>(_ parser: Recognizer<T>, _ parserCallStack: RuleContext) throws -> SemanticContext? {
+        public func evalPrecedence<T>(_ parser: Recognizer<T>, _ parserCallStack: RuleContext) throws -> SemanticContext? {
             var differs: Bool = false
             var operands: Array<SemanticContext> = Array<SemanticContext>()
             for context: SemanticContext in opnds {
@@ -405,8 +420,10 @@ public class SemanticContext: Hashable, CustomStringConvertible {
         return result
     }
 
-    ///
+    /// 
+    /// 
     /// - seealso: org.antlr.v4.runtime.atn.ParserATNSimulator#getPredsForAmbigAlts
+    /// 
     public static func or(_ a: SemanticContext?, _ b: SemanticContext?) -> SemanticContext {
         if a == nil {
             return b!
@@ -425,21 +442,14 @@ public class SemanticContext: Hashable, CustomStringConvertible {
         return result
     }
 
-    private static func filterPrecedencePredicates(
-            _ collection: inout Set<SemanticContext>) ->
-            Array<PrecedencePredicate> {
-
-        let result = collection.filter {
-            $0 is PrecedencePredicate
+    private static func filterPrecedencePredicates(_ collection: inout Set<SemanticContext>) -> [PrecedencePredicate] {
+        let result = collection.flatMap {
+            $0 as? PrecedencePredicate
         }
         collection = Set<SemanticContext>(collection.filter {
             !($0 is PrecedencePredicate)
         })
-        //if (result == nil) {
-        //return Array<PrecedencePredicate>();
-        //}
-
-        return (result as! Array<PrecedencePredicate>)
+        return result
     }
 }
 

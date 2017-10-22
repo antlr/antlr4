@@ -1,6 +1,8 @@
+/// 
 /// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
+/// 
 
 //
 //  ArrayWrapper.swift
@@ -67,7 +69,7 @@ public final class ArrayWrapper<T: Hashable>: ExpressibleByArrayLiteral, Hashabl
 
 }
 
-public func == <Element: Equatable>(lhs: ArrayWrapper<Element>, rhs: ArrayWrapper<Element>) -> Bool {
+public func == <Element>(lhs: ArrayWrapper<Element>, rhs: ArrayWrapper<Element>) -> Bool {
     if lhs === rhs {
         return true
     }
