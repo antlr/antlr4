@@ -7,10 +7,12 @@
 package org.antlr.v4.semantics;
 
 import org.antlr.runtime.tree.CommonTree;
+import org.antlr.runtime.tree.Tree;
 import org.antlr.v4.automata.LexerATNFactory;
 import org.antlr.v4.parse.ANTLRLexer;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.MultiMap;
 import org.antlr.v4.tool.Alternative;
 import org.antlr.v4.tool.Attribute;
@@ -320,34 +322,44 @@ public class SymbolChecks {
 		if (g.isLexer()) {
 			LexerGrammar lexerGrammar = (LexerGrammar) g;
 			for (List<Rule> rules : lexerGrammar.modes.values()) {
-
-				// Collect string literal lexer rules
+				// Collect string literal lexer rules for each mode
 				List<Rule> stringLiteralRules = new ArrayList<>();
 				List<List<String>> stringLiteralValues = new ArrayList<>();
 				for (int i = 0; i < rules.size(); i++) {
 					Rule rule = rules.get(i);
-					List<String> ruleStringAlts = getSingleTokenValues(rule);
-					if (ruleStringAlts != null && ruleStringAlts.size() > 0) {
-						stringLiteralRules.add(rule);
-						stringLiteralValues.add(ruleStringAlts);
+
+					if (!rule.isFragment()) {
+						List<String> ruleStringAlts = getSingleTokenValues(rule);
+						if (ruleStringAlts != null && ruleStringAlts.size() > 0) {
+							stringLiteralRules.add(rule);
+							stringLiteralValues.add(ruleStringAlts);
+						}
 					}
 				}
 
 				// Check string sets intersection
 				for (int i = 0; i < stringLiteralRules.size(); i++) {
 					List<String> firstTokenStringValues = stringLiteralValues.get(i);
+					Rule rule1 =  stringLiteralRules.get(i);
+					checkForOverlap(g, rule1, rule1, firstTokenStringValues, stringLiteralValues.get(i));
+
 					for (int j = i + 1; j < stringLiteralRules.size(); j++) {
-						List<String> secondTokenStringValues = stringLiteralValues.get(j);
-						for (String str1 : firstTokenStringValues) {
-							for (String str2 : secondTokenStringValues) {
-								if (str1.equals(str2)) {
-									errMgr.grammarError(ErrorType.TOKEN_UNREACHABLE, g.fileName,
-											((GrammarAST) stringLiteralRules.get(j).ast.getChild(0)).token,
-											stringLiteralRules.get(j).name, str2, stringLiteralRules.get(i).name);
-								}
-							}
-						}
+						checkForOverlap(g, rule1, stringLiteralRules.get(j), firstTokenStringValues, stringLiteralValues.get(j));
 					}
+				}
+			}
+		}
+	}
+
+	private void checkForOverlap(Grammar g, Rule rule1, Rule rule2, List<String> firstTokenStringValues, List<String> secondTokenStringValues) {
+		for (int i = 0; i < firstTokenStringValues.size(); i++) {
+			int secondTokenInd = rule1 == rule2 ? i + 1 : 0; // Compare with self or not
+			String str1 = firstTokenStringValues.get(i);
+			for (int j = secondTokenInd; j < secondTokenStringValues.size(); j++) {
+				String str2 = secondTokenStringValues.get(j);
+				if (str1.equals(str2)) {
+					errMgr.grammarError(ErrorType.TOKEN_UNREACHABLE, g.fileName,
+							((GrammarAST) rule2.ast.getChild(0)).token, rule2.name, str2, rule1.name);
 				}
 			}
 		}
@@ -358,25 +370,44 @@ public class SymbolChecks {
 		List<String> values = new ArrayList<>();
 		for (Alternative alt : rule.alt) {
 			if (alt != null) {
-				List<GrammarAST> stringLiterals = alt.ast.getNodesWithType(ANTLRLexer.STRING_LITERAL);
+				// select first alt if token has a command
+				Tree rootNode = alt.ast.getChildCount() == 2 &&
+							alt.ast.getChild(0) instanceof AltAST && alt.ast.getChild(1) instanceof GrammarAST
+							? alt.ast.getChild(0)
+							: alt.ast;
 
-				// TODO: Support all tokens but not only string literals.
-				if (stringLiterals.size() == 0 || alt.ast.getChildCount() != stringLiterals.size()) {
-					continue;
+				if (rootNode.getTokenStartIndex() == -1) {
+					continue; // ignore tokens from parser that start as T__
 				}
 
+				// Ignore alt if contains not only string literals (repetition, optional)
+				boolean ignore = false;
 				StringBuilder currentValue = new StringBuilder();
-				for (GrammarAST ast : stringLiterals) {
-					TerminalAST stringLiteral = (TerminalAST) ast;
-					String text = stringLiteral.token.getText();
-					currentValue.append(text.substring(1, text.length() - 1));
+				for (int i = 0; i < rootNode.getChildCount(); i++) {
+					Tree child = rootNode.getChild(i);
+					if (!(child instanceof TerminalAST)) {
+						ignore = true;
+						break;
+					}
+
+					TerminalAST terminalAST = (TerminalAST)child;
+					if (terminalAST.token.getType() != ANTLRLexer.STRING_LITERAL) {
+						ignore = true;
+						break;
+					}
+					else {
+						String text = terminalAST.token.getText();
+						currentValue.append(text.substring(1, text.length() - 1));
+					}
 				}
-				values.add(currentValue.toString());
+
+				if (!ignore) {
+					values.add(currentValue.toString());
+				}
 			}
 		}
 		return values;
 	}
-
 	// CAN ONLY CALL THE TWO NEXT METHODS AFTER GRAMMAR HAS RULE DEFS (see semanticpipeline)
 
 	public void checkRuleArgs(Grammar g, List<GrammarAST> rulerefs) {
