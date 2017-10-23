@@ -313,15 +313,12 @@ public class ATNConfigSet: Hashable, CustomStringConvertible {
     /// return configLookup.toArray(a);
     /// 
     private final func configHash(_ stateNumber: Int,_ context: PredictionContext?) -> Int{
-
-        var hashCode: Int = MurmurHash.initialize(7)
+        var hashCode = MurmurHash.initialize(7)
         hashCode = MurmurHash.update(hashCode, stateNumber)
         hashCode = MurmurHash.update(hashCode, context)
-        hashCode = MurmurHash.finish(hashCode, 2)
-
-        return hashCode
-
+        return MurmurHash.finish(hashCode, 2)
     }
+
     public final func getConflictingAltSubsets() throws -> Array<BitSet> {
         let length = configs.count
         let configToAlts: HashMap<Int, BitSet> = HashMap<Int, BitSet>(count: length)

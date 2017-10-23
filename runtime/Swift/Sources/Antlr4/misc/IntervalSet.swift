@@ -508,24 +508,22 @@ public class IntervalSet: IntSet, Hashable, CustomStringConvertible {
 
 
     public func hashCode() -> Int {
-        var hash: Int = MurmurHash.initialize()
+        var hash = MurmurHash.initialize()
         for I: Interval in intervals {
             hash = MurmurHash.update(hash, I.a)
             hash = MurmurHash.update(hash, I.b)
         }
 
-        hash = MurmurHash.finish(hash, intervals.count * 2)
-        return hash
+        return MurmurHash.finish(hash, intervals.count * 2)
     }
     public var hashValue: Int {
-        var hash: Int = MurmurHash.initialize()
+        var hash = MurmurHash.initialize()
         for I: Interval in intervals {
             hash = MurmurHash.update(hash, I.a)
             hash = MurmurHash.update(hash, I.b)
         }
 
-        hash = MurmurHash.finish(hash, intervals.count * 2)
-        return hash
+        return MurmurHash.finish(hash, intervals.count * 2)
     }
     /// 
     /// Are two IntervalSets equal?  Because all intervals are sorted
