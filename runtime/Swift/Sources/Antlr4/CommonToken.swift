@@ -8,12 +8,6 @@
 
 public class CommonToken: WritableToken {
     /// 
-    /// An empty _org.antlr.v4.runtime.misc.Pair_ which is used as the default value of
-    /// _#source_ for tokens that do not have a source.
-    /// 
-    internal static let EMPTY_SOURCE: (TokenSource?, CharStream?) = (nil, nil)
-
-    /// 
     /// This is the backing field for _#getType_ and _#setType_.
     /// 
     internal var type: Int
@@ -47,7 +41,7 @@ public class CommonToken: WritableToken {
     /// _org.antlr.v4.runtime.misc.Pair_ containing these values.
     /// 
 
-    internal var source: (TokenSource?, CharStream?)
+    internal let source: TokenSourceAndStream
 
     /// 
     /// This is the backing field for _#getText_ when the token text is
@@ -85,16 +79,16 @@ public class CommonToken: WritableToken {
 
     public init(_ type: Int) {
         self.type = type
-        self.source = CommonToken.EMPTY_SOURCE
+        self.source = TokenSourceAndStream.EMPTY
     }
 
-    public init(_ source: (TokenSource?, CharStream?), _ type: Int, _ channel: Int, _ start: Int, _ stop: Int) {
+    public init(_ source: TokenSourceAndStream, _ type: Int, _ channel: Int, _ start: Int, _ stop: Int) {
         self.source = source
         self.type = type
         self.channel = channel
         self.start = start
         self.stop = stop
-        if let tsource = source.0 {
+        if let tsource = source.tokenSource {
             self.line = tsource.getLine()
             self.charPositionInLine = tsource.getCharPositionInLine()
         }
@@ -111,20 +105,12 @@ public class CommonToken: WritableToken {
         self.type = type
         self.channel = CommonToken.DEFAULT_CHANNEL
         self.text = text
-        self.source = CommonToken.EMPTY_SOURCE
+        self.source = TokenSourceAndStream.EMPTY
     }
 
     /// 
     /// Constructs a new _org.antlr.v4.runtime.CommonToken_ as a copy of another _org.antlr.v4.runtime.Token_.
-    /// 
-    /// 
-    /// If `oldToken` is also a _org.antlr.v4.runtime.CommonToken_ instance, the newly
-    /// constructed token will share a reference to the _#text_ field and
-    /// the _org.antlr.v4.runtime.misc.Pair_ stored in _#source_. Otherwise, _#text_ will
-    /// be assigned the result of calling _#getText_, and _#source_
-    /// will be constructed from the result of _org.antlr.v4.runtime.Token#getTokenSource_ and
-    /// _org.antlr.v4.runtime.Token#getInputStream_.
-    /// 
+    ///
     /// - parameter oldToken: The token to copy.
     /// 
     public init(_ oldToken: Token) {
@@ -135,14 +121,8 @@ public class CommonToken: WritableToken {
         channel = oldToken.getChannel()
         start = oldToken.getStartIndex()
         stop = oldToken.getStopIndex()
-
-        if oldToken is CommonToken {
-            text = (oldToken as! CommonToken).text
-            source = (oldToken as! CommonToken).source
-        } else {
-            text = oldToken.getText()
-            source = (oldToken.getTokenSource(), oldToken.getInputStream())
-        }
+        text = oldToken.getText()
+        source = oldToken.getTokenSourceAndStream()
     }
 
 
@@ -252,12 +232,16 @@ public class CommonToken: WritableToken {
 
 
     public func getTokenSource() -> TokenSource? {
-        return source.0
+        return source.tokenSource
     }
 
 
     public func getInputStream() -> CharStream? {
-        return source.1
+        return source.stream
+    }
+
+    public func getTokenSourceAndStream() -> TokenSourceAndStream {
+        return source
     }
 
     public var description: String {

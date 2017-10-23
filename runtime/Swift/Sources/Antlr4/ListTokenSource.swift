@@ -112,7 +112,8 @@ public class ListTokenSource: TokenSource {
                 }
 
                 let stop = max(-1, start - 1)
-                eofToken = _factory.create((self, getInputStream()!), CommonToken.EOF, "EOF", CommonToken.DEFAULT_CHANNEL, start, stop, getLine(), getCharPositionInLine())
+                let source = TokenSourceAndStream(self, getInputStream())
+                eofToken = _factory.create(source, CommonToken.EOF, "EOF", CommonToken.DEFAULT_CHANNEL, start, stop, getLine(), getCharPositionInLine())
             }
 
             return eofToken!

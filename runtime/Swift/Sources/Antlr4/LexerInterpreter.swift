@@ -45,9 +45,7 @@ public class LexerInterpreter: Lexer {
         for i in 0..<_decisionToDFALength {
             _decisionToDFA[i] = DFA(atn.getDecisionState(i)!, i)
         }
-        super.init()
-        self._input = input
-        self._tokenFactorySourcePair = (self, input)
+        super.init(input)
         self._interp = LexerATNSimulator(self, atn, _decisionToDFA, _sharedContextCache)
 
         if atn.grammarType != ATNType.lexer {

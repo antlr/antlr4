@@ -149,14 +149,18 @@ public class RuleTagToken: Token, CustomStringConvertible {
         return nil
     }
 
-    /// 
+    ///
     /// The implementation for _org.antlr.v4.runtime.tree.pattern.RuleTagToken_ always returns `null`.
     /// 
     public func getInputStream() -> CharStream? {
         return nil
     }
 
-    /// 
+    public func getTokenSourceAndStream() -> TokenSourceAndStream {
+        return TokenSourceAndStream.EMPTY
+    }
+
+    ///
     /// The implementation for _org.antlr.v4.runtime.tree.pattern.RuleTagToken_ returns a string of the form
     /// `ruleName:bypassTokenType`.
     /// 
