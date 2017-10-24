@@ -18,9 +18,9 @@ public class RecognitionException<T:ATNSimulator>  {
     private final var recognizer: Recognizer<T>?
     //Recognizer<AnyObject,ATNSimulator>? ;
 
-    private final let ctx: RuleContext?
+    private final weak var ctx: RuleContext?
 
-    private final let input: IntStream
+    private final var input: IntStream?
 
     /// 
     /// The current _org.antlr.v4.runtime.Token_ when an error occurred. Since not all streams
@@ -113,10 +113,13 @@ public class RecognitionException<T:ATNSimulator>  {
     /// where this exception was thrown, or `null` if the stream is not
     /// available.
     /// 
-    public func getInputStream() -> IntStream {
+    public func getInputStream() -> IntStream? {
         return input
     }
 
+    public func clearInputStream() {
+        input = nil
+    }
 
     public func getOffendingToken() -> Token {
         return offendingToken
@@ -136,5 +139,9 @@ public class RecognitionException<T:ATNSimulator>  {
     /// 
     public func getRecognizer() -> Recognizer<T>? {
         return recognizer
+    }
+
+    public func clearRecognizer() {
+        self.recognizer = nil
     }
 }
