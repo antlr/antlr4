@@ -3,8 +3,10 @@ sudo: true
 language: java
 
 cache:
+  timeout: 600
   directories:
   - $HOME/.m2
+  - $HOME/Library/Caches/Antlr4
   - $HOME/Library/Caches/Homebrew
 
 stages:
