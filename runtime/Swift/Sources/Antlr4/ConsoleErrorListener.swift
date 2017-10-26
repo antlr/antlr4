@@ -25,12 +25,12 @@ public class ConsoleErrorListener: BaseErrorListener {
     /// line __line__:__charPositionInLine__ __msg__
     /// 
     /// 
-    override public func syntaxError<T:ATNSimulator>(_ recognizer: Recognizer<T>,
-                                            _ offendingSymbol: AnyObject?,
-                                            _ line: Int,
-                                            _ charPositionInLine: Int,
-                                            _ msg: String,
-                                            _ e: AnyObject?
+    override public func syntaxError<T>(_ recognizer: Recognizer<T>,
+                                        _ offendingSymbol: AnyObject?,
+                                        _ line: Int,
+                                        _ charPositionInLine: Int,
+                                        _ msg: String,
+                                        _ e: AnyObject?
     ) {
         if Parser.ConsoleError {
             errPrint("line \(line):\(charPositionInLine) \(msg)")

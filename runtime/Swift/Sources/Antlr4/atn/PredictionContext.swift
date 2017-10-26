@@ -21,7 +21,7 @@ public class PredictionContext: Hashable, CustomStringConvertible {
     /// 
     public static let EMPTY_RETURN_STATE: Int = Int(Int32.max)
 
-    private static let INITIAL_HASH: Int = 1
+    private static let INITIAL_HASH = UInt32(1)
 
     public static var globalNodeCount: Int = 0
     public final let id: Int = {
@@ -118,21 +118,19 @@ public class PredictionContext: Hashable, CustomStringConvertible {
     }
 
     static func calculateEmptyHashCode() -> Int {
-        var hash: Int = MurmurHash.initialize(INITIAL_HASH)
-        hash = MurmurHash.finish(hash, 0)
-        return hash
+        let hash = MurmurHash.initialize(INITIAL_HASH)
+        return MurmurHash.finish(hash, 0)
     }
 
     static func calculateHashCode(_ parent: PredictionContext?, _ returnState: Int) -> Int {
-        var hash: Int = MurmurHash.initialize(INITIAL_HASH)
+        var hash = MurmurHash.initialize(INITIAL_HASH)
         hash = MurmurHash.update(hash, parent)
         hash = MurmurHash.update(hash, returnState)
-        hash = MurmurHash.finish(hash, 2)
-        return hash
+        return MurmurHash.finish(hash, 2)
     }
 
     static func calculateHashCode(_ parents: [PredictionContext?], _ returnStates: [Int]) -> Int {
-        var hash: Int = MurmurHash.initialize(INITIAL_HASH)
+        var hash = MurmurHash.initialize(INITIAL_HASH)
         var length = parents.count
         for i in 0..<length {
             hash = MurmurHash.update(hash, parents[i])
@@ -142,8 +140,7 @@ public class PredictionContext: Hashable, CustomStringConvertible {
             hash = MurmurHash.update(hash, returnStates[i])
         }
 
-        hash = MurmurHash.finish(hash, 2 * parents.count)
-        return hash
+        return  MurmurHash.finish(hash, 2 * parents.count)
     }
 
     // dispatch
@@ -712,17 +709,17 @@ public class PredictionContext: Hashable, CustomStringConvertible {
         }
     }
 
-    public func toString<T:ATNSimulator>(_ recog: Recognizer<T>) -> String {
+    public func toString<T>(_ recog: Recognizer<T>) -> String {
         return NSStringFromClass(PredictionContext.self)
         //		return toString(recog, ParserRuleContext.EMPTY);
     }
 
-    public func toStrings<T:ATNSimulator>(_ recognizer: Recognizer<T>, _ currentState: Int) -> [String] {
+    public func toStrings<T>(_ recognizer: Recognizer<T>, _ currentState: Int) -> [String] {
         return toStrings(recognizer, PredictionContext.EMPTY, currentState)
     }
 
     // FROM SAM
-    public func toStrings<T:ATNSimulator>(_ recognizer: Recognizer<T>?, _ stop: PredictionContext, _ currentState: Int) -> [String] {
+    public func toStrings<T>(_ recognizer: Recognizer<T>?, _ stop: PredictionContext, _ currentState: Int) -> [String] {
         var result: Array<String> = Array<String>()
         var perm: Int = 0
         outer: while true {

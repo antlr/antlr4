@@ -94,7 +94,7 @@ public final class LexerCustomAction: LexerAction {
 
     override
     public var hashValue: Int {
-        var hash: Int = MurmurHash.initialize()
+        var hash = MurmurHash.initialize()
         hash = MurmurHash.update(hash, getActionType().rawValue)
         hash = MurmurHash.update(hash, ruleIndex)
         hash = MurmurHash.update(hash, actionIndex)

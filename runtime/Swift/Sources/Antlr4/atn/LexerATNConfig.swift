@@ -77,15 +77,14 @@ public class LexerATNConfig: ATNConfig {
 
     }*/
     public var hashValue: Int {
-        var hashCode: Int = MurmurHash.initialize(7)
+        var hashCode = MurmurHash.initialize(7)
         hashCode = MurmurHash.update(hashCode, state.stateNumber)
         hashCode = MurmurHash.update(hashCode, alt)
         hashCode = MurmurHash.update(hashCode, context)
         hashCode = MurmurHash.update(hashCode, semanticContext)
         hashCode = MurmurHash.update(hashCode, passedThroughNonGreedyDecision ? 1 : 0)
         hashCode = MurmurHash.update(hashCode, lexerActionExecutor)
-        hashCode = MurmurHash.finish(hashCode, 6)
-        return hashCode
+        return MurmurHash.finish(hashCode, 6)
 
     }
 

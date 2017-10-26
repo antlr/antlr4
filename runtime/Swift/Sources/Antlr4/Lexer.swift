@@ -405,7 +405,7 @@ open class Lexer: Recognizer<LexerATNSimulator>
         }
     }
 
-    open func notifyListeners<T:ATNSimulator>(_ e: LexerNoViableAltException, recognizer: Recognizer<T>) {
+    open func notifyListeners<T>(_ e: LexerNoViableAltException, recognizer: Recognizer<T>) {
 
         let text: String = _input!.getText(Interval.of(_tokenStartCharIndex, _input!.index()))
         let msg: String = "token recognition error at: '\(getErrorDisplay(text))'"

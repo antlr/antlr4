@@ -23,6 +23,7 @@ public class TestCodePointCharStream {
 		CodePointCharStream s = CharStreams.fromString("");
 		assertEquals(0, s.size());
 		assertEquals(0, s.index());
+		assertEquals("", s.toString());
 	}
 
 	@Test
