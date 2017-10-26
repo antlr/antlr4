@@ -12,7 +12,6 @@ import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.atn.LexerActionExecutor;
 import org.antlr.v4.runtime.atn.SemanticContext;
 import org.antlr.v4.runtime.misc.MurmurHash;
-import org.antlr.v4.runtime.misc.SimpleIntMap;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -48,15 +47,13 @@ public class DFAState {
 
 	public int stateNumber = -1;
 
-
 	public ATNConfigSet configs = new ATNConfigSet();
 
 	/**
 	 * Edges points to a target State for a symbol.
-	 * This map represents all edges from this state to all connected states.
+	 * Represents all edges from this state to all connected states.
  	 */
-	private AtomicReference<SimpleIntMap<DFAState>> edgeMap;
-	private final ReentrantLock writeLock = new ReentrantLock();
+	private DFAEdgeCache edges = new DFAEdgeCache(2);
 
 	public boolean isAcceptState = false;
 
@@ -111,32 +108,33 @@ public class DFAState {
 	public DFAState(int stateNumber) { this.stateNumber = stateNumber; }
 
 	public DFAState(ATNConfigSet configs) {
-		edgeMap = new AtomicReference<>(new SimpleIntMap<DFAState>(2));
 		this.configs = configs;
 	}
 
 	public void addEdge(int symbol, DFAState state) {
-		writeLock.lock();
-		SimpleIntMap<DFAState> currentMap = edgeMap.get();
-		if(edgeMap.get().needsExpansion()) {
-			SimpleIntMap<DFAState> newMap = currentMap.expandToNewMap();
-			edgeMap.set(newMap);
-		}
-		edgeMap.get().put(symbol, state);
-		writeLock.unlock();
+		edges.addEdge(symbol, state);
 	}
 
 	public DFAState getTargetState(int symbol) {
-		return edgeMap.get().get(symbol);
-	}
-
-	public int[] getEdgeKeys() {
-		return edgeMap.get().getKeys();
+		return edges.getTargetState(symbol);
 	}
 
 	public int getEdgeCount() {
-		return edgeMap.get().size();
+		return edges.size();
 	}
+
+	public int size() {
+		return edges.size();
+	}
+
+	public int capacity() {
+		return edges.capacity();
+	}
+
+	public int[] getEdgeKeys() {
+		return edges.getKeys();
+	}
+
 
 	/** Get the set of all alts mentioned by all ATN configurations in this
 	 *  DFA state.
