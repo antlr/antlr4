@@ -60,7 +60,7 @@ public class DFAEdgeCache {
 	 * If put operation fails (not enough space in the map for efficient gets), it just returns false
 	 * it is callers responsibility to create a new Map with expanded size and replace the old one.
 	 */
-	final class SymbolEdgeMap<T> {
+	private static final class SymbolEdgeMap<T> {
 
 		// Special value to mark empty cells.
 		private static final int EMPTY = Integer.MIN_VALUE;
