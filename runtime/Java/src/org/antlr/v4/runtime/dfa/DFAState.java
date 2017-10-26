@@ -53,7 +53,7 @@ public class DFAState {
 	 * Edges points to a target State for a symbol.
 	 * Represents all edges from this state to all connected states.
  	 */
-	private DFAEdgeCache edges = new DFAEdgeCache(2);
+	private DFAEdgeCache edges;
 
 	public boolean isAcceptState = false;
 
@@ -109,6 +109,7 @@ public class DFAState {
 
 	public DFAState(ATNConfigSet configs) {
 		this.configs = configs;
+		edges = new DFAEdgeCache(2);
 	}
 
 	public void addEdge(int symbol, DFAState state) {
@@ -123,10 +124,6 @@ public class DFAState {
 		return edges.size();
 	}
 
-	public int size() {
-		return edges.size();
-	}
-
 	public int capacity() {
 		return edges.capacity();
 	}
@@ -134,7 +131,6 @@ public class DFAState {
 	public int[] getEdgeKeys() {
 		return edges.getKeys();
 	}
-
 
 	/** Get the set of all alts mentioned by all ATN configurations in this
 	 *  DFA state.

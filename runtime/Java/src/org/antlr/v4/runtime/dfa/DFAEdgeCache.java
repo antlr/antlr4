@@ -16,7 +16,7 @@ import java.util.Arrays;
 public class DFAEdgeCache {
 	private static final int DEFAULT_INITIAL_CAPACITY = 2;
 
-	// In Java volatile guarantees atomic reference copy.
+	// volatile guarantees atomic reference copy.
 	private volatile SymbolEdgeMap<DFAState> edgeMap;
 
 	public DFAEdgeCache() {
@@ -231,22 +231,10 @@ public class DFAEdgeCache {
 					keyArray[c++] = key;
 				}
 			}
+			Arrays.sort(keyArray);
 			return keyArray;
 		}
 
-		/**
-		 * @return The array of values in the map (shares same order with getKeys).
-		 */
-		@SuppressWarnings("unchecked")
-		public T[] getValues() {
-			T[] valueArray = (T[]) new Object[keyCount];
-			for (int i = 0, j = 0; i < keys.length; i++) {
-				if (keys[i] != EMPTY) {
-					valueArray[j++] = values[i];
-				}
-			}
-			return valueArray;
-		}
 	}
 
 }
