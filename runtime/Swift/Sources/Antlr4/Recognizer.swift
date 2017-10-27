@@ -198,7 +198,7 @@ open class Recognizer<ATNInterpreter: ATNSimulator>: RecognizerProtocol {
         return true
     }
 
-    open func precpred(_ localctx: RuleContext?, _ precedence: Int) throws -> Bool {
+    open func precpred(_ localctx: RuleContext?, _ precedence: Int) -> Bool {
         return true
     }
 

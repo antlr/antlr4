@@ -268,12 +268,12 @@ public class ATNDeserializer {
         var sets: Array<IntervalSet> = Array<IntervalSet>()
 
         // First, deserialize sets with 16-bit arguments <= U+FFFF.
-        try readSets(data, &p, &sets, readUnicodeInt)
+        readSets(data, &p, &sets, readUnicodeInt)
 
         // Next, if the ATN was serialized with the Unicode SMP feature,
         // deserialize sets with 32-bit arguments <= U+10FFFF.
         if isFeatureSupported(ATNDeserializer.ADDED_UNICODE_SMP, uuid) {
-            try readSets(data, &p, &sets, readUnicodeInt32)
+            readSets(data, &p, &sets, readUnicodeInt32)
         }
 
         //
@@ -544,23 +544,23 @@ public class ATNDeserializer {
         return result
     }
 
-    private func readSets(_ data: [Character], _ p: inout Int, _ sets: inout Array<IntervalSet>, _ readUnicode: ([Character], inout Int) -> Int) throws {
+    private func readSets(_ data: [Character], _ p: inout Int, _ sets: inout Array<IntervalSet>, _ readUnicode: ([Character], inout Int) -> Int) {
         let nsets = toInt(data[p])
         p += 1
         for _ in 0..<nsets {
             let nintervals = toInt(data[p])
             p += 1
-            let set = try IntervalSet()
+            let set = IntervalSet()
             sets.append(set)
 
             let containsEof = (toInt(data[p]) != 0)
             p += 1
             if containsEof {
-                try set.add(-1)
+                try! set.add(-1)
             }
 
             for _ in 0..<nintervals {
-                try set.add(readUnicode(data, &p), readUnicode(data, &p))
+                try! set.add(readUnicode(data, &p), readUnicode(data, &p))
             }
         }
     }
@@ -728,19 +728,19 @@ public class ATNDeserializer {
             let setBuilder = intervalSet[i]
             let nintervals = setBuilder["size"] as! Int
 
-            let set = try IntervalSet()
+            let set = IntervalSet()
             sets.append(set)
 
             let containsEof = (setBuilder["containsEof"] as! Int) != 0
             if containsEof {
-                try set.add(-1)
+                try! set.add(-1)
             }
             let intervalsBuilder = setBuilder["Intervals"] as! [[String : Any]]
 
 
             for j in 0..<nintervals {
                 let vals = intervalsBuilder[j]
-                try set.add((vals["a"] as! Int), (vals["b"] as! Int))
+                try! set.add((vals["a"] as! Int), (vals["b"] as! Int))
 
             }
         }
