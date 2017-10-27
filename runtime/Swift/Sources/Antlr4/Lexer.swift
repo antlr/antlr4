@@ -26,7 +26,7 @@ open class Lexer: Recognizer<LexerATNSimulator>, TokenSource {
     public static let MAX_CHAR_VALUE = Character.MAX_VALUE;
 
     public var _input: CharStream?
-    internal var _tokenFactorySourcePair: (TokenSource?, CharStream?)
+    internal var _tokenFactorySourcePair: TokenSourceAndStream
 
     /// 
     /// How to create token objects
@@ -87,13 +87,17 @@ open class Lexer: Recognizer<LexerATNSimulator>, TokenSource {
     public var _text: String?
 
     public override init() {
+        self._tokenFactorySourcePair = TokenSourceAndStream()
+        super.init()
+        self._tokenFactorySourcePair.tokenSource = self
     }
 
     public init(_ input: CharStream) {
-
-        super.init()
         self._input = input
-        self._tokenFactorySourcePair = (self, input)
+        self._tokenFactorySourcePair = TokenSourceAndStream()
+        super.init()
+        self._tokenFactorySourcePair.tokenSource = self
+        self._tokenFactorySourcePair.stream = input
     }
 
     open func reset() throws {
@@ -234,10 +238,10 @@ open class Lexer: Recognizer<LexerATNSimulator>, TokenSource {
 
     open override func setInputStream(_ input: IntStream) throws {
         self._input = nil
-        self._tokenFactorySourcePair = (self, _input!)
+        self._tokenFactorySourcePair = makeTokenSourceAndStream()
         try reset()
         self._input = input as? CharStream
-        self._tokenFactorySourcePair = (self, _input!)
+        self._tokenFactorySourcePair = makeTokenSourceAndStream()
     }
 
 
@@ -448,5 +452,9 @@ open class Lexer: Recognizer<LexerATNSimulator>, TokenSource {
     open func recover(_ re: AnyObject) throws {
         // TODO: Do we lose character or line position information?
         try _input!.consume()
+    }
+
+    internal func makeTokenSourceAndStream() -> TokenSourceAndStream {
+        return TokenSourceAndStream(self, _input)
     }
 }

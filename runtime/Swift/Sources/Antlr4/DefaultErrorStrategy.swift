@@ -540,10 +540,12 @@ public class DefaultErrorStrategy: ANTLRErrorStrategy {
             current = lookback!
         }
 
-        let token = recognizer.getTokenFactory().create((current.getTokenSource(), current.getTokenSource()!.getInputStream()), expectedTokenType, tokenText,
-                CommonToken.DEFAULT_CHANNEL,
-                -1, -1,
-                current.getLine(), current.getCharPositionInLine())
+        let token = recognizer.getTokenFactory().create(
+            current.getTokenSourceAndStream(),
+            expectedTokenType, tokenText,
+            CommonToken.DEFAULT_CHANNEL,
+            -1, -1,
+            current.getLine(), current.getCharPositionInLine())
 
         return token
     }

@@ -50,7 +50,7 @@ open class LexerATNSimulator: ATNSimulator {
     }
 
 
-    internal let recog: Lexer?
+    internal weak var recog: Lexer?
 
     /// 
     /// The current token's starting index into the character stream.

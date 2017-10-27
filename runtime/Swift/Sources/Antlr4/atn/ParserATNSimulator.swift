@@ -250,7 +250,8 @@ open class ParserATNSimulator: ATNSimulator {
         }
         return false
     }()
-    internal final var parser: Parser
+
+    internal final unowned let parser: Parser
 
     public final var decisionToDFA: [DFA]
 

@@ -59,7 +59,7 @@ open class RuleContext: RuleNode {
     public static let EMPTY = ParserRuleContext()
 
     /// What context invoked this rule?
-    public var parent: RuleContext?
+    public weak var parent: RuleContext?
 
     /// What state invoked the rule associated with this context?
     /// The "return address" is the followState of invokingState
