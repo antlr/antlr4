@@ -1,13 +1,19 @@
+/// 
 /// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
+/// 
 
 
-public class LexerNoViableAltException: RecognitionException<LexerATNSimulator>, CustomStringConvertible {
+public class LexerNoViableAltException: RecognitionException, CustomStringConvertible {
+    /// 
     /// Matching attempted at what input index?
+    /// 
     private final var startIndex: Int
 
+    /// 
     /// Which configurations did we try at input.index() that couldn't match input.LA(1)?
+    /// 
     private final var deadEndConfigs: ATNConfigSet
 
     public init(_ lexer: Lexer?,
@@ -25,23 +31,15 @@ public class LexerNoViableAltException: RecognitionException<LexerATNSimulator>,
         return startIndex
     }
 
-
     public func getDeadEndConfigs() -> ATNConfigSet {
         return deadEndConfigs
     }
 
-    //override
-//	public func getInputStream() -> CharStream {
-//		return super.getInputStream() as! CharStream;
-//	}
-
-
     public var description: String {
-        var symbol: String = ""
-        if startIndex >= 0 && startIndex < getInputStream().size() {
-            let charStream: CharStream = getInputStream() as! CharStream
-            let interval: Interval = Interval.of(startIndex, startIndex)
-            symbol = charStream.getText(interval)
+        var symbol = ""
+        if let charStream = getInputStream() as? CharStream, startIndex >= 0 && startIndex < charStream.size() {
+            let interval = Interval.of(startIndex, startIndex)
+            symbol = try! charStream.getText(interval)
             symbol = Utils.escapeWhitespace(symbol, false)
         }
 

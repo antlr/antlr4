@@ -101,7 +101,7 @@ func (is *InputStream) GetTextFromTokens(start, stop Token) string {
 }
 
 func (is *InputStream) GetTextFromInterval(i *Interval) string {
-	return is.GetText(i.start, i.stop)
+	return is.GetText(i.Start, i.Stop)
 }
 
 func (*InputStream) GetSourceName() string {

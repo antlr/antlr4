@@ -1,7 +1,8 @@
-/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
- * Use of this file is governed by the BSD 3-clause license that
- * can be found in the LICENSE.txt file in the project root.
- */
+/// 
+/// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
+/// Use of this file is governed by the BSD 3-clause license that
+/// can be found in the LICENSE.txt file in the project root.
+///
 
 
 public class Triple<A:Hashable, B:Hashable, C:Hashable>: Hashable, CustomStringConvertible {
@@ -15,7 +16,7 @@ public class Triple<A:Hashable, B:Hashable, C:Hashable>: Hashable, CustomStringC
         self.c = c
     }
     public var hashValue: Int {
-        var hash: Int = MurmurHash.initialize()
+        var hash = MurmurHash.initialize()
         hash = MurmurHash.update(hash, a)
         hash = MurmurHash.update(hash, b)
         hash = MurmurHash.update(hash, c)

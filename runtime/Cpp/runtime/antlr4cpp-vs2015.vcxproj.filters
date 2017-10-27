@@ -938,5 +938,47 @@
     <ClCompile Include="src\tree\IterativeParseTreeWalker.cpp">
       <Filter>Source Files\tree</Filter>
     </ClCompile>
+    <ClCompile Include="src\ANTLRErrorListener.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ANTLRErrorStrategy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\atn\BlockStartState.cpp">
+      <Filter>Source Files\atn</Filter>
+    </ClCompile>
+    <ClCompile Include="src\atn\LexerAction.cpp">
+      <Filter>Source Files\atn</Filter>
+    </ClCompile>
+    <ClCompile Include="src\misc\Predicate.cpp">
+      <Filter>Source Files\misc</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Token.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TokenSource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WritableToken.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\support\Any.cpp">
+      <Filter>Source Files\support</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tree\ErrorNode.cpp">
+      <Filter>Source Files\tree</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tree\ParseTreeListener.cpp">
+      <Filter>Source Files\tree</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tree\ParseTreeVisitor.cpp">
+      <Filter>Source Files\tree</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tree\TerminalNode.cpp">
+      <Filter>Source Files\tree</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tree\pattern\Chunk.cpp">
+      <Filter>Source Files\tree\pattern</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

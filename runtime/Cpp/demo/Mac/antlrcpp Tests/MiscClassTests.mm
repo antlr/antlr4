@@ -92,7 +92,7 @@ using namespace antlrcpp;
   // in a deterministic and a random sequence of 100K values each.
   std::set<size_t> hashs;
   for (size_t i = 0; i < 100000; ++i) {
-    std::vector<size_t> data = { i, (size_t)(i * M_PI),  arc4random()};
+    std::vector<size_t> data = { i, static_cast<size_t>(i * M_PI), arc4random() };
     size_t hash = 0;
     for (auto value : data)
       hash = MurmurHash::update(hash, value);
@@ -103,7 +103,7 @@ using namespace antlrcpp;
 
   hashs.clear();
   for (size_t i = 0; i < 100000; ++i) {
-    std::vector<size_t> data = { i, (size_t)(i * M_PI)};
+    std::vector<size_t> data = { i, static_cast<size_t>(i * M_PI) };
     size_t hash = 0;
     for (auto value : data)
       hash = MurmurHash::update(hash, value);
@@ -232,19 +232,25 @@ using namespace antlrcpp;
     { 78, Interval(1000, 1000UL), Interval(20, 100UL), { false, false, true, true, false, true, false, false } },
 
     // It's possible to add more tests with borders that touch each other (e.g. first starts before/on/after second
-    // and first ends directly before/after second. However, such cases are not handled differently in the Interval class
+    // and first ends directly before/after second. However, such cases are not handled differently in the Interval
+    // class
     // (only adjacent intervals, where first ends directly before second starts and vice versa. So I ommitted them here.
   };
 
   for (auto &entry : testData) {
-    XCTAssert(entry.interval1.startsBeforeDisjoint(entry.interval2) == entry.results[0], @"entry: %zu", entry.runningNumber);
-    XCTAssert(entry.interval1.startsBeforeNonDisjoint(entry.interval2) == entry.results[1], @"entry: %zu", entry.runningNumber);
+    XCTAssert(entry.interval1.startsBeforeDisjoint(entry.interval2) == entry.results[0], @"entry: %zu",
+              entry.runningNumber);
+    XCTAssert(entry.interval1.startsBeforeNonDisjoint(entry.interval2) == entry.results[1], @"entry: %zu",
+              entry.runningNumber);
     XCTAssert(entry.interval1.startsAfter(entry.interval2) == entry.results[2], @"entry: %zu", entry.runningNumber);
-    XCTAssert(entry.interval1.startsAfterDisjoint(entry.interval2) == entry.results[3], @"entry: %zu", entry.runningNumber);
-    XCTAssert(entry.interval1.startsAfterNonDisjoint(entry.interval2) == entry.results[4], @"entry: %zu", entry.runningNumber);
+    XCTAssert(entry.interval1.startsAfterDisjoint(entry.interval2) == entry.results[3], @"entry: %zu",
+              entry.runningNumber);
+    XCTAssert(entry.interval1.startsAfterNonDisjoint(entry.interval2) == entry.results[4], @"entry: %zu",
+              entry.runningNumber);
     XCTAssert(entry.interval1.disjoint(entry.interval2) == entry.results[5], @"entry: %zu", entry.runningNumber);
     XCTAssert(entry.interval1.adjacent(entry.interval2) == entry.results[6], @"entry: %zu", entry.runningNumber);
-    XCTAssert(entry.interval1.properlyContains(entry.interval2) == entry.results[7], @"entry: %zu", entry.runningNumber);
+    XCTAssert(entry.interval1.properlyContains(entry.interval2) == entry.results[7], @"entry: %zu",
+              entry.runningNumber);
   }
 
   XCTAssert(Interval().Union(Interval(10, 100UL)) == Interval(-1L, 100));
@@ -327,30 +333,34 @@ using namespace antlrcpp;
   try {
     set4.clear();
     XCTFail(@"Expected exception");
-  }
-  catch (IllegalStateException &e) {
+  } catch (IllegalStateException &e) {
   }
 
   try {
     set4.setReadOnly(false);
     XCTFail(@"Expected exception");
+  } catch (IllegalStateException &e) {
   }
-  catch (IllegalStateException &e) {
-  }
-  
-  set4 = IntervalSet::of(12345);
-  XCTAssertEqual(set4.getSingleElement(), 12345);
-  XCTAssertEqual(set4.getMinElement(), 12345);
-  XCTAssertEqual(set4.getMaxElement(), 12345);
 
-  IntervalSet set5(10, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50);
-  XCTAssertEqual(set5.getMinElement(), 5);
-  XCTAssertEqual(set5.getMaxElement(), 50);
-  XCTAssertEqual(set5.size(), 10U);
-  set5.add(12, 18);
-  XCTAssertEqual(set5.size(), 16U); // (15, 15) replaced by (12, 18)
-  set5.add(9, 33);
-  XCTAssertEqual(set5.size(), 30U); // (10, 10), (12, 18), (20, 20), (25, 25) and (30, 30) replaced by (9, 33)
+  try {
+    set4 = IntervalSet::of(12345);
+    XCTFail(@"Expected exception");
+  } catch (IllegalStateException &e) {
+  }
+
+  IntervalSet set5 = IntervalSet::of(12345);
+  XCTAssertEqual(set5.getSingleElement(), 12345);
+  XCTAssertEqual(set5.getMinElement(), 12345);
+  XCTAssertEqual(set5.getMaxElement(), 12345);
+
+  IntervalSet set6(10, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50);
+  XCTAssertEqual(set6.getMinElement(), 5);
+  XCTAssertEqual(set6.getMaxElement(), 50);
+  XCTAssertEqual(set6.size(), 10U);
+  set6.add(12, 18);
+  XCTAssertEqual(set6.size(), 16U); // (15, 15) replaced by (12, 18)
+  set6.add(9, 33);
+  XCTAssertEqual(set6.size(), 30U); // (10, 10), (12, 18), (20, 20), (25, 25) and (30, 30) replaced by (9, 33)
 
   XCTAssert(IntervalSet(3, 1, 2, 10).Or(IntervalSet(3, 1, 2, 5)) == IntervalSet(4, 1, 2, 5, 10));
   XCTAssert(IntervalSet({ Interval(2, 10UL) }).Or(IntervalSet({ Interval(5, 8UL) })) == IntervalSet({ Interval(2, 10UL) }));
@@ -358,8 +368,10 @@ using namespace antlrcpp;
   XCTAssert(IntervalSet::of(1, 10).complement(IntervalSet::of(7, 55)) == IntervalSet::of(11, 55));
   XCTAssert(IntervalSet::of(1, 10).complement(IntervalSet::of(20, 55)) == IntervalSet::of(20, 55));
   XCTAssert(IntervalSet::of(1, 10).complement(IntervalSet::of(5, 6)) == IntervalSet::EMPTY_SET);
-  XCTAssert(IntervalSet::of(15, 20).complement(IntervalSet::of(7, 55)) == IntervalSet({ Interval(7, 14UL), Interval(21, 55UL) }));
-  XCTAssert(IntervalSet({ Interval(1, 10UL), Interval(30, 35UL) }).complement(IntervalSet::of(7, 55)) == IntervalSet({ Interval(11, 29UL), Interval(36, 55UL) }));
+  XCTAssert(IntervalSet::of(15, 20).complement(IntervalSet::of(7, 55)) ==
+            IntervalSet({ Interval(7, 14UL), Interval(21, 55UL) }));
+  XCTAssert(IntervalSet({ Interval(1, 10UL), Interval(30, 35UL) }).complement(IntervalSet::of(7, 55)) ==
+            IntervalSet({ Interval(11, 29UL), Interval(36, 55UL) }));
 
   XCTAssert(IntervalSet::of(1, 10).And(IntervalSet::of(7, 55)) == IntervalSet::of(7, 10));
   XCTAssert(IntervalSet::of(1, 10).And(IntervalSet::of(20, 55)) == IntervalSet::EMPTY_SET);
@@ -368,7 +380,8 @@ using namespace antlrcpp;
 
   XCTAssert(IntervalSet::of(1, 10).subtract(IntervalSet::of(7, 55)) == IntervalSet::of(1, 6));
   XCTAssert(IntervalSet::of(1, 10).subtract(IntervalSet::of(20, 55)) == IntervalSet::of(1, 10));
-  XCTAssert(IntervalSet::of(1, 10).subtract(IntervalSet::of(5, 6)) == IntervalSet({ Interval(1, 4UL), Interval(7, 10UL) }));
+  XCTAssert(IntervalSet::of(1, 10).subtract(IntervalSet::of(5, 6)) ==
+            IntervalSet({ Interval(1, 4UL), Interval(7, 10UL) }));
   XCTAssert(IntervalSet::of(15, 20).subtract(IntervalSet::of(7, 55)) == IntervalSet::EMPTY_SET);
 }
 

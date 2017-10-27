@@ -21,11 +21,11 @@ type Lexer interface {
 
 	Emit() Token
 
-	setChannel(int)
-	pushMode(int)
-	popMode() int
-	setType(int)
-	setMode(int)
+	SetChannel(int)
+	PushMode(int)
+	PopMode() int
+	SetType(int)
+	SetMode(int)
 }
 
 type BaseLexer struct {
@@ -150,7 +150,7 @@ func (b *BaseLexer) GetSourceName() string {
 	return b.GrammarFileName
 }
 
-func (b *BaseLexer) setChannel(v int) {
+func (b *BaseLexer) SetChannel(v int) {
 	b.channel = v
 }
 
@@ -250,11 +250,11 @@ func (b *BaseLexer) More() {
 	b.thetype = LexerMore
 }
 
-func (b *BaseLexer) setMode(m int) {
+func (b *BaseLexer) SetMode(m int) {
 	b.mode = m
 }
 
-func (b *BaseLexer) pushMode(m int) {
+func (b *BaseLexer) PushMode(m int) {
 	if LexerATNSimulatorDebug {
 		fmt.Println("pushMode " + strconv.Itoa(m))
 	}
@@ -262,7 +262,7 @@ func (b *BaseLexer) pushMode(m int) {
 	b.mode = m
 }
 
-func (b *BaseLexer) popMode() int {
+func (b *BaseLexer) PopMode() int {
 	if len(b.modeStack) == 0 {
 		panic("Empty Stack")
 	}
@@ -331,7 +331,7 @@ func (b *BaseLexer) GetType() int {
 	return b.thetype
 }
 
-func (b *BaseLexer) setType(t int) {
+func (b *BaseLexer) SetType(t int) {
 	b.thetype = t
 }
 
@@ -361,7 +361,7 @@ func (b *BaseLexer) GetATN() *ATN {
 // Return a list of all Token objects in input char stream.
 // Forces load of all tokens. Does not include EOF token.
 // /
-func (b *BaseLexer) getAllTokens() []Token {
+func (b *BaseLexer) GetAllTokens() []Token {
 	vl := b.Virt
 	tokens := make([]Token, 0)
 	t := vl.NextToken()

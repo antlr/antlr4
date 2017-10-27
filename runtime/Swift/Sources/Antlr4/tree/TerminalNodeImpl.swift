@@ -6,7 +6,7 @@
 
 public class TerminalNodeImpl: TerminalNode {
     public var symbol: Token
-    public var parent: ParseTree?
+    public weak var parent: ParseTree?
 
     public init(_ symbol: Token) {
         self.symbol = symbol

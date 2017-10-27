@@ -110,7 +110,7 @@ def get_argument_parser():
                         "Use this command if you want to include ANTLR4 as SPM dependency.", )
     p.add_argument("--gen-xcodeproj",
                    action="store_true",
-                   help="<DEVELOPER> Generates an Xcode project for ANTLR4 Swift runtime. "
+                   help="<DEVELOPER, USER> Generates an Xcode project for ANTLR4 Swift runtime. "
                         "This directive will generate all the required parsers for the project. "
                         "Feel free to re-run whenever you updated the test grammar files.")
     p.add_argument("--test",
@@ -147,7 +147,11 @@ def generate_spm_module(in_folder=TMP_FOLDER):
     call(["git", "tag", "{}.0.0".format(MAJOR_VERSION)])
 
     antlr_says("Created local repository.")
-    antlr_says("Put .Package(url: \"{}\", majorVersion: {}) in Package.swift.".format(os.getcwd(), MAJOR_VERSION))
+    antlr_says("(swift-tools-version:3.0) " 
+               "Put .Package(url: \"{}\", majorVersion: {}) in Package.swift.".format(os.getcwd(), MAJOR_VERSION))
+    antlr_says("(swift-tools-wersion:4.0) "
+               "Put .package(url: \"{}\", from: \"{}.0.0\") in Package.swift "
+               "and add \"Antlr4\" to target dependencies. ".format(os.getcwd(), MAJOR_VERSION))
 
 
 def generate_xcodeproj():
