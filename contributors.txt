@@ -151,3 +151,4 @@ YYYY/MM/DD, github id, Full name, email
 2017/06/11, erikbra, Erik A. Brandstadmoen, erik@brandstadmoen.net
 2017/06/10, jm-mikkelsen, Jan Martin Mikkelsen, janm@transactionware.com
 2017/06/25, alimg, Alim Gökkaya, alim.gokkaya@gmail.com
+2017/10/27, Griffon26, Maurice van der Pot, griffon26@kfk4ever.com
