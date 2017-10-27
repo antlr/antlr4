@@ -75,7 +75,7 @@ public class CommonTokenFactory: TokenFactory {
             t.setText(text)
         }
         else if let cStream = source.1, copyText {
-            t.setText(cStream.getText(Interval.of(start, stop)))
+            t.setText(try! cStream.getText(Interval.of(start, stop)))
         }
 
         return t

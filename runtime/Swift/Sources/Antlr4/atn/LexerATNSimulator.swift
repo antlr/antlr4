@@ -736,7 +736,7 @@ open class LexerATNSimulator: ATNSimulator {
 
     public func getText(_ input: CharStream) -> String {
         // index is first lookahead char, don't include.
-        return input.getText(Interval.of(startIndex, input.index() - 1))
+        return try! input.getText(Interval.of(startIndex, input.index() - 1))
     }
 
     public func getLine() -> Int {
