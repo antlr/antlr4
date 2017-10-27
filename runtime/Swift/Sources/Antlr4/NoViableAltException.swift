@@ -10,7 +10,7 @@
 /// in the various paths when the error. Reported by reportNoViableAlternative()
 /// 
 
-public class NoViableAltException: RecognitionException<ParserATNSimulator> {
+public class NoViableAltException: RecognitionException {
     /// Which configurations did we try at input.index() that couldn't match input.LT(1)?
 
     private final var deadEndConfigs: ATNConfigSet?
@@ -22,14 +22,15 @@ public class NoViableAltException: RecognitionException<ParserATNSimulator> {
     /// 
     private final var startToken: Token
 
-    public convenience init(_ recognizer: Parser?) throws {
+    public convenience init(_ recognizer: Parser) {
         // LL(1) error
+        let token = try! recognizer.getCurrentToken()
         self.init(recognizer,
-                recognizer!.getInputStream()!,
-                try recognizer!.getCurrentToken(),
-                try recognizer!.getCurrentToken(),
+                recognizer.getInputStream()!,
+                token,
+                token,
                 nil,
-                recognizer!._ctx)
+                recognizer._ctx)
     }
 
     public init(_ recognizer: Parser?,
@@ -42,7 +43,6 @@ public class NoViableAltException: RecognitionException<ParserATNSimulator> {
         self.deadEndConfigs = deadEndConfigs
         self.startToken = startToken
 
-        // as? Recognizer<AnyObject, ATNSimulator>
         super.init(recognizer, input, ctx)
         self.setOffendingToken(offendingToken)
     }

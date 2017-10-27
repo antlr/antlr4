@@ -40,7 +40,7 @@ public class BailErrorStrategy: DefaultErrorStrategy {
     /// rule function catches.  Use _Exception#getCause()_ to get the
     /// original _org.antlr.v4.runtime.RecognitionException_.
     /// 
-    override public func recover(_ recognizer: Parser, _ e: AnyObject) throws {
+    override public func recover(_ recognizer: Parser, _ e: RecognitionException) throws {
         var context = recognizer.getContext()
         while let contextWrap = context {
             contextWrap.exception = e
@@ -56,7 +56,7 @@ public class BailErrorStrategy: DefaultErrorStrategy {
     /// 
     override
     public func recoverInline(_ recognizer: Parser) throws -> Token {
-        let e = try InputMismatchException(recognizer)
+        let e = InputMismatchException(recognizer)
         var context = recognizer.getContext()
         while let contextWrap = context {
              contextWrap.exception = e
