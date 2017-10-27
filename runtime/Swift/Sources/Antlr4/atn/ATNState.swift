@@ -183,8 +183,7 @@ public class ATNState: Hashable, CustomStringConvertible {
     }
 
     public func getStateType() -> Int {
-        RuntimeException(#function + " must be overridden")
-        return 0
+        fatalError(#function + " must be overridden")
     }
 
     public final func onlyHasEpsilonTransitions() -> Bool {

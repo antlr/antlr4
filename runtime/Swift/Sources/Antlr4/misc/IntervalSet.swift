@@ -51,11 +51,11 @@ public class IntervalSet: IntSet, Hashable, CustomStringConvertible {
     }
 
     public init(_ els: Int...) throws {
-        if els.count == 0 {
-            intervals = Array<Interval>() // most sets are 1 or 2 elements
+        if els.isEmpty {
+            intervals = [Interval]() // most sets are 1 or 2 elements
         } else {
-            intervals = Array<Interval>()
-            for e: Int in els {
+            intervals = [Interval]()
+            for e in els {
                 try add(e)
             }
         }
@@ -595,16 +595,8 @@ public class IntervalSet: IntSet, Hashable, CustomStringConvertible {
         return buf.toString()
     }
 
-    /// 
-    /// -  Use _#toString(org.antlr.v4.runtime.Vocabulary)_ instead.
-    /// /@Deprecated
-    /// 
-    public func toString(_ tokenNames: [String?]?) -> String {
-        return toString(Vocabulary.fromTokenNames(tokenNames))
-    }
-
     public func toString(_ vocabulary: Vocabulary) -> String {
-        let buf: StringBuilder = StringBuilder()
+        let buf = StringBuilder()
 
         if self.intervals.isEmpty {
             return "{}"
@@ -614,14 +606,14 @@ public class IntervalSet: IntSet, Hashable, CustomStringConvertible {
         }
 
         var first = true
-        for I: Interval in intervals {
+        for interval in intervals {
             if !first {
                 buf.append(", ")
             }
             first = false
-            //var I : Interval = iter.next();
-            let a: Int = I.a
-            let b: Int = I.b
+
+            let a = interval.a
+            let b = interval.b
             if a == b {
                 buf.append(elementName(vocabulary, a))
             } else {
@@ -639,15 +631,6 @@ public class IntervalSet: IntSet, Hashable, CustomStringConvertible {
         }
         return buf.toString()
     }
-
-    /// 
-    /// -  Use _#elementName(org.antlr.v4.runtime.Vocabulary, int)_ instead.
-    /// /@Deprecated
-    /// 
-    internal func elementName(_ tokenNames: [String?]?, _ a: Int) -> String {
-        return elementName(Vocabulary.fromTokenNames(tokenNames), a)
-    }
-
 
     internal func elementName(_ vocabulary: Vocabulary, _ a: Int) -> String {
         if a == CommonToken.EOF {
@@ -752,35 +735,32 @@ public class IntervalSet: IntSet, Hashable, CustomStringConvertible {
         if readonly {
             throw ANTLRError.illegalState(msg: "can't alter readonly IntervalSet")
         }
-        let n: Int = intervals.count
-        for i in 0..<n {
-            let I: Interval = intervals[i]
-            let a: Int = I.a
-            let b: Int = I.b
+        for interval in intervals {
+            let a = interval.a
+            let b = interval.b
             if el < a {
                 break // list is sorted and el is before this interval; not here
             }
             // if whole interval x..x, rm
             if el == a && el == b {
-                intervals.remove(at: i)
-                //intervals.remove(i);
+                intervals.removeObject(interval)
                 break
             }
             // if on left edge x..b, adjust left
             if el == a {
-                I.a += 1
+                interval.a += 1
                 break
             }
             // if on right edge a..x, adjust right
             if el == b {
-                I.b -= 1
+                interval.b -= 1
                 break
             }
             // if in middle a..x..b, split interval
             if el > a && el < b {
                 // found in this interval
-                let oldb: Int = I.b
-                I.b = el - 1      // [a..x-1]
+                let oldb = interval.b
+                interval.b = el - 1      // [a..x-1]
                 try add(el + 1, oldb) // add [x+1..b]
             }
         }

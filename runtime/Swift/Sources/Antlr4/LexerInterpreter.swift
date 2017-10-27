@@ -9,20 +9,15 @@ public class LexerInterpreter: Lexer {
     internal final var grammarFileName: String
     internal final var atn: ATN
 
-    /// 
-    /// /@Deprecated
-    /// 
-    internal final var tokenNames: [String?]?
     internal final var ruleNames: [String]
     internal final var channelNames: [String]
     internal final var modeNames: [String]
 
-
     private final var vocabulary: Vocabulary?
 
     internal final var _decisionToDFA: [DFA]
-    internal final var _sharedContextCache: PredictionContextCache =
-    PredictionContextCache()
+    internal final var _sharedContextCache = PredictionContextCache()
+
 //   public override init() {
 //    super.init()}
 
@@ -40,13 +35,6 @@ public class LexerInterpreter: Lexer {
 
         self.grammarFileName = grammarFileName
         self.atn = atn
-        self.tokenNames = [String?]()
-        //new String[atn.maxTokenType];
-        let length = tokenNames!.count
-        for i in 0..<length {
-            tokenNames![i] = vocabulary.getDisplayName(i)
-        }
-
         self.ruleNames = ruleNames
         self.channelNames = channelNames
         self.modeNames = modeNames
@@ -76,14 +64,6 @@ public class LexerInterpreter: Lexer {
     override
     public func getGrammarFileName() -> String {
         return grammarFileName
-    }
-
-    override
-    /// 
-    /// /@Deprecated
-    /// 
-    public func getTokenNames() -> [String?]? {
-        return tokenNames
     }
 
     override

@@ -26,7 +26,7 @@ public class RuleTagToken: Token, CustomStringConvertible {
     /// 
     private final var label: String?
 
-    public var visited: Bool = false
+    public var visited = false
 
     /// 
     /// Constructs a new instance of _org.antlr.v4.runtime.tree.pattern.RuleTagToken_ with the specified rule
@@ -55,8 +55,6 @@ public class RuleTagToken: Token, CustomStringConvertible {
     /// or empty.
     /// 
     public init(_ ruleName: String, _ bypassTokenType: Int, _ label: String?) {
-
-
         self.ruleName = ruleName
         self.bypassTokenType = bypassTokenType
         self.label = label
@@ -93,11 +91,10 @@ public class RuleTagToken: Token, CustomStringConvertible {
     /// delimiters.
     /// 
     public func getText() -> String? {
-        if label != nil {
-            return "<" + label! + ":" + ruleName + ">"
+        if let label = label {
+            return "<\(label):\(ruleName)>"
         }
-
-        return "<" + ruleName + ">"
+        return "<\(ruleName)>"
     }
 
     /// 

@@ -236,10 +236,11 @@
 import Foundation
 
 open class ParserATNSimulator: ATNSimulator {
-    public let debug: Bool = false
-    public let debug_list_atn_decisions: Bool = false
-    public let dfa_debug: Bool = false
-    public let retry_debug: Bool = false
+    public let debug = false
+    public let debug_list_atn_decisions = false
+    public let dfa_debug = false
+    public let retry_debug = false
+
     /// 
     /// Just in case this optimization is bad, add an ENV variable to turn it off
     /// 
@@ -257,7 +258,7 @@ open class ParserATNSimulator: ATNSimulator {
     /// SLL, LL, or LL + exact ambig detection?
     /// 
 
-    private var mode: PredictionMode = PredictionMode.LL
+    private var mode = PredictionMode.LL
 
     /// 
     /// Each prediction operation uses a cache for merge of prediction contexts.
@@ -272,7 +273,7 @@ open class ParserATNSimulator: ATNSimulator {
 
     // LAME globals to avoid parameters!!!!! I need these down deep in predTransition
     internal var _input: TokenStream!
-    internal var _startIndex: Int = 0
+    internal var _startIndex = 0
     internal var _outerContext: ParserRuleContext!
     internal var _dfa: DFA?
     
@@ -310,7 +311,6 @@ open class ParserATNSimulator: ATNSimulator {
 
     override
     open func clearDFA() {
-        //for var d: Int = 0; d < decisionToDFA.count; d++ {
         for d in 0..<decisionToDFA.count {
             decisionToDFA[d] = DFA(atn.getDecisionState(d)!, d)
         }
@@ -319,86 +319,82 @@ open class ParserATNSimulator: ATNSimulator {
     open func adaptivePredict(_ input: TokenStream, _ decision: Int,
         _ outerContext: ParserRuleContext?) throws -> Int {
         var outerContext = outerContext
-            if debug || debug_list_atn_decisions {
-                var debugInfo = "adaptivePredict decision \(decision) "
-                debugInfo += "exec LA(1)==\(try getLookaheadName(input)) "
-                debugInfo += "line \(try input.LT(1)!.getLine()):"
-                debugInfo += "\(try input.LT(1)!.getCharPositionInLine())"
-                print(debugInfo)
+        if debug || debug_list_atn_decisions {
+            var debugInfo = "adaptivePredict decision \(decision) "
+            debugInfo += "exec LA(1)==\(try getLookaheadName(input)) "
+            debugInfo += "line \(try input.LT(1)!.getLine()):"
+            debugInfo += "\(try input.LT(1)!.getCharPositionInLine())"
+            print(debugInfo)
+        }
+
+
+        _input = input
+        _startIndex = input.index()
+        _outerContext = outerContext
+        let dfa = decisionToDFA[decision]
+        _dfa = dfa
+
+        let m = input.mark()
+        let index = _startIndex
+
+        // Now we are certain to have a specific decision's DFA
+        // But, do we still need an initial state?
+        //TODO: exception handler
+        do {
+            var s0: DFAState?
+            if dfa.isPrecedenceDfa() {
+                // the start state for a precedence DFA depends on the current
+                // parser precedence, and is provided by a DFA method.
+                s0 = try dfa.getPrecedenceStartState(parser.getPrecedence())
+            } else {
+                // the start state for a "regular" DFA is just s0
+                s0 = dfa.s0
             }
 
+            if s0 == nil {
+                //BIG BUG
+                if outerContext == nil {
+                    outerContext = ParserRuleContext.EMPTY
+                }
+                if debug || debug_list_atn_decisions {
+                    var debugInfo = "predictATN decision \(dfa.decision) "
+                    debugInfo += "exec LA(1)==\(try getLookaheadName(input)), "
+                    debugInfo += "outerContext=\(outerContext!.toString(parser))"
+                    print(debugInfo)
+                }
 
-            _input = input
-            _startIndex = input.index()
-            _outerContext = outerContext
-            var dfa: DFA = decisionToDFA[decision]
-            _dfa = dfa
+                let fullCtx = false
+                var s0_closure = try computeStartState(dfa.atnStartState, ParserRuleContext.EMPTY, fullCtx)
 
-            var m: Int = input.mark()
-            var index: Int = _startIndex
-
-            // Now we are certain to have a specific decision's DFA
-            // But, do we still need an initial state?
-            //TODO: exception handler
-            do {
-                var s0: DFAState?
                 if dfa.isPrecedenceDfa() {
-                    // the start state for a precedence DFA depends on the current
-                    // parser precedence, and is provided by a DFA method.
-                    s0 = try dfa.getPrecedenceStartState(parser.getPrecedence())
+                    ///
+                    /// If this is a precedence DFA, we use applyPrecedenceFilter
+                    /// to convert the computed start state to a precedence start
+                    /// state. We then use DFA.setPrecedenceStartState to set the
+                    /// appropriate start state for the precedence level rather
+                    /// than simply setting DFA.s0.
+                    ///
+                    //added by janyou 20160224
+                    // dfa.s0!.configs = s0_closure // not used for prediction but useful to know start configs anyway
+                    s0_closure = try applyPrecedenceFilter(s0_closure)
+                    s0 = try addDFAState(dfa, DFAState(s0_closure))
+                    try dfa.setPrecedenceStartState(parser.getPrecedence(), s0!)
                 } else {
-                    // the start state for a "regular" DFA is just s0
-                    s0 = dfa.s0
+                    s0 = try addDFAState(dfa, DFAState(s0_closure))
+                    dfa.s0 = s0
                 }
-
-                if s0 == nil {
-                    //BIG BUG
-                    if outerContext == nil {
-                        outerContext = ParserRuleContext.EMPTY
-                    }
-                    if debug || debug_list_atn_decisions {
-                        var debugInfo = "predictATN decision \(dfa.decision) "
-                        debugInfo += "exec LA(1)==\(try getLookaheadName(input)), "
-                        debugInfo += "outerContext=\(outerContext!.toString(parser))"
-                        print(debugInfo)
-                    }
-
-                    var fullCtx: Bool = false
-                    var s0_closure: ATNConfigSet = try computeStartState(dfa.atnStartState,
-                        ParserRuleContext.EMPTY,
-                        fullCtx)
-
-                    if dfa.isPrecedenceDfa() {
-                        /// 
-                        /// If this is a precedence DFA, we use applyPrecedenceFilter
-                        /// to convert the computed start state to a precedence start
-                        /// state. We then use DFA.setPrecedenceStartState to set the
-                        /// appropriate start state for the precedence level rather
-                        /// than simply setting DFA.s0.
-                        /// 
-                        //added by janyou 20160224
-                       // dfa.s0!.configs = s0_closure // not used for prediction but useful to know start configs anyway
-                        s0_closure = try applyPrecedenceFilter(s0_closure)
-                        s0 = try addDFAState(dfa, DFAState(s0_closure))
-                        try  dfa.setPrecedenceStartState(parser.getPrecedence(), s0!)
-                    } else {
-                        s0 = try addDFAState(dfa, DFAState(s0_closure))
-                        dfa.s0 = s0
-                    }
-                }
-
-                var alt: Int = try execATN(dfa, s0!, input, index, outerContext!)
-                if debug {
-                    print("DFA after predictATN: \(dfa.toString(parser.getVocabulary()))")
-                }
-                defer {
-                    mergeCache = nil // wack cache after each prediction
-                    _dfa = nil
-                    try! input.seek(index)
-                    try! input.release(m)
-                }
-                return alt
             }
+
+            let alt = try execATN(dfa, s0!, input, index, outerContext!)
+            if debug {
+                print("DFA after predictATN: \(dfa.toString(parser.getVocabulary()))")
+            }
+            mergeCache = nil // wack cache after each prediction
+            _dfa = nil
+            try! input.seek(index)
+            try! input.release(m)
+            return alt
+        }
 
     }
 
@@ -440,13 +436,13 @@ open class ParserATNSimulator: ATNSimulator {
                 try print("execATN decision \(dfa.decision) exec LA(1)==\(getLookaheadName(input)) line \(input.LT(1)!.getLine()):\(input.LT(1)!.getCharPositionInLine())")
             }
 
-            var previousD: DFAState = s0
+            var previousD = s0
 
             if debug {
                 print("s0 = \(s0)")
             }
 
-            var t: Int = try input.LA(1)
+            var t = try input.LA(1)
 
             while true {
                 // while more work
@@ -480,12 +476,12 @@ open class ParserATNSimulator: ATNSimulator {
 
                 if D.requiresFullContext && (mode != PredictionMode.SLL) {
                     // IF PREDS, MIGHT RESOLVE TO SINGLE ALT => SLL (or syntax error)
-                    var conflictingAlts: BitSet = D.configs.conflictingAlts!
+                    var conflictingAlts = D.configs.conflictingAlts!
                     if D.predicates != nil {
                         if debug {
                             print("DFA state has preds in DFA sim LL failover")
                         }
-                        let conflictIndex: Int = input.index()
+                        let conflictIndex = input.index()
                         if conflictIndex != startIndex {
                             try input.seek(startIndex)
                         }
@@ -508,12 +504,10 @@ open class ParserATNSimulator: ATNSimulator {
                     if dfa_debug {
                         print("ctx sensitive state \(outerContext) in \(D)")
                     }
-                    let fullCtx: Bool = true
-                    let s0_closure: ATNConfigSet =
-                    try computeStartState(dfa.atnStartState, outerContext,
-                        fullCtx)
+                    let fullCtx = true
+                    let s0_closure = try computeStartState(dfa.atnStartState, outerContext, fullCtx)
                     try reportAttemptingFullContext(dfa, conflictingAlts, D.configs, startIndex, input.index())
-                    let alt: Int = try execATNWithFullContext(dfa, D, s0_closure,
+                    let alt = try execATNWithFullContext(dfa, D, s0_closure,
                         input, startIndex,
                         outerContext)
                     return alt
@@ -564,7 +558,7 @@ open class ParserATNSimulator: ATNSimulator {
     /// already cached
     /// 
    func getExistingTargetState(_ previousD: DFAState, _ t: Int) -> DFAState? {
-        var edges: [DFAState?]? = previousD.edges
+        var edges = previousD.edges
         if edges == nil || (t + 1) < 0 || (t + 1) >= (edges!.count) {
             return nil
         }
@@ -586,7 +580,7 @@ open class ParserATNSimulator: ATNSimulator {
     /// 
    func computeTargetState(_ dfa: DFA, _ previousD: DFAState, _ t: Int) throws -> DFAState {
 
-        let reach: ATNConfigSet? = try computeReachSet(previousD.configs, t, false)
+        let reach = try computeReachSet(previousD.configs, t, false)
         if reach == nil {
             try addDFAEdge(dfa, previousD, t, ATNSimulator.ERROR)
             return ATNSimulator.ERROR
@@ -658,13 +652,13 @@ open class ParserATNSimulator: ATNSimulator {
         if debug || debug_list_atn_decisions {
             print("execATNWithFullContext \(s0)")
         }
-        let fullCtx: Bool = true
-        var foundExactAmbig: Bool = false
+        let fullCtx = true
+        var foundExactAmbig = false
         var reach: ATNConfigSet? = nil
-        var previous: ATNConfigSet = s0
+        var previous = s0
         try input.seek(startIndex)
-        var t: Int = try input.LA(1)
-        var predictedAlt: Int = 0
+        var t = try input.LA(1)
+        var predictedAlt = 0
         while true {
             // while more work
             if let computeReach = try computeReachSet(previous, t, fullCtx) {
@@ -780,7 +774,7 @@ open class ParserATNSimulator: ATNSimulator {
             mergeCache = DoubleKeyMap<PredictionContext, PredictionContext, PredictionContext>()
         }
 
-        let intermediate: ATNConfigSet = ATNConfigSet(fullCtx)
+        let intermediate = ATNConfigSet(fullCtx)
 
         /// 
         /// Configurations already in a rule stop state indicate reaching the end
@@ -793,39 +787,33 @@ open class ParserATNSimulator: ATNSimulator {
         /// ensure that the alternative matching the longest overall sequence is
         /// chosen when multiple such configurations can match the input.
         /// 
-        var skippedStopStates: Array<ATNConfig>? = nil
+        var skippedStopStates: [ATNConfig]? = nil
 
         // First figure out where we can reach on input t
-        let length =  closureConfigSet.configs.count
         let configs = closureConfigSet.configs
-        for i in 0..<length {
-            //for c: ATNConfig in closureConfigSet.configs {
+        for config in configs {
             if debug {
-                print("testing \(getTokenName(t)) at \(configs[i].description)")
+                print("testing \(getTokenName(t)) at \(config.description)")
             }
 
-            if configs[i].state is RuleStopState {
-                assert(configs[i].context!.isEmpty(), "Expected: c.context.isEmpty()")
+            if config.state is RuleStopState {
+                assert(config.context!.isEmpty(), "Expected: c.context.isEmpty()")
                 if fullCtx || t == BufferedTokenStream.EOF {
                     if skippedStopStates == nil {
-                        skippedStopStates = Array<ATNConfig>()
+                        skippedStopStates = [ATNConfig]()
                     }
-
-                    skippedStopStates?.append(configs[i])
+                    skippedStopStates!.append(config)
                 }
 
                 continue
             }
 
-            let n: Int = configs[i].state.getNumberOfTransitions()
+            let n = config.state.getNumberOfTransitions()
             for ti in 0..<n {
                 // for each transition
-                let trans: Transition = configs[i].state.transition(ti)
-                let target: ATNState? = getReachableTarget(trans, t)
-
-
-                if target != nil {
-                    try intermediate.add(ATNConfig(configs[i], target!), &mergeCache)
+                let trans = config.state.transition(ti)
+                if let target = getReachableTarget(trans, t) {
+                    try intermediate.add(ATNConfig(config, target), &mergeCache)
                 }
             }
         }
@@ -866,14 +854,10 @@ open class ParserATNSimulator: ATNSimulator {
         /// 
         if reach == nil {
             reach = ATNConfigSet(fullCtx)
-            var closureBusy: Set<ATNConfig> = Set<ATNConfig>()
-            let treatEofAsEpsilon: Bool = t == CommonToken.EOF
-            let configs = intermediate.configs
-            let length = configs.count
-            for i in 0..<length {
-                //for c: ATNConfig in intermediate.configs {
-                // print(__FUNCTION__)
-                try closure(configs[i], reach!, &closureBusy, false, fullCtx, treatEofAsEpsilon)
+            var closureBusy = Set<ATNConfig>()
+            let treatEofAsEpsilon = (t == CommonToken.EOF)
+            for config in intermediate.configs {
+                try closure(config, reach!, &closureBusy, false, fullCtx, treatEofAsEpsilon)
             }
         }
 
@@ -909,10 +893,10 @@ open class ParserATNSimulator: ATNSimulator {
         /// multiple alternatives are viable.
         /// 
         if let reach = reach {
-            if skippedStopStates != nil && (!fullCtx || !PredictionMode.hasConfigInRuleStopState(reach)) {
-                assert(!skippedStopStates!.isEmpty, "Expected: !skippedStopStates.isEmpty()")
-                for c: ATNConfig in skippedStopStates! {
-                    try reach.add(c, &mergeCache)
+            if let skippedStopStates = skippedStopStates, (!fullCtx || !PredictionMode.hasConfigInRuleStopState(reach)) {
+                assert(!skippedStopStates.isEmpty, "Expected: !skippedStopStates.isEmpty()")
+                for c in skippedStopStates {
+                    try! reach.add(c, &mergeCache)
                 }
             }
 
@@ -1127,10 +1111,8 @@ open class ParserATNSimulator: ATNSimulator {
     /// for a precedence DFA at a particular precedence level (determined by
     /// calling _org.antlr.v4.runtime.Parser#getPrecedence_).
     /// 
-    final  internal func applyPrecedenceFilter(_ configs: ATNConfigSet) throws -> ATNConfigSet {
-
-        let configSet = try configs.applyPrecedenceFilter(&mergeCache,parser,_outerContext)
-        return configSet
+    final internal func applyPrecedenceFilter(_ configs: ATNConfigSet) throws -> ATNConfigSet {
+        return try configs.applyPrecedenceFilter(&mergeCache,parser,_outerContext)
     }
 
     final internal func getReachableTarget(_ trans: Transition, _ ttype: Int) -> ATNState? {
@@ -1360,10 +1342,8 @@ open class ParserATNSimulator: ATNSimulator {
         _ collectPredicates: Bool,
         _ fullCtx: Bool,
         _ treatEofAsEpsilon: Bool) throws {
-            let initialDepth: Int = 0
-            try closureCheckingStopState(config, configs, &closureBusy, collectPredicates,
-                fullCtx,
-                initialDepth, treatEofAsEpsilon)
+            let initialDepth = 0
+            try closureCheckingStopState(config, configs, &closureBusy, collectPredicates, fullCtx, initialDepth, treatEofAsEpsilon)
             assert(!fullCtx || !configs.dipsIntoOuterContext, "Expected: !fullCtx||!configs.dipsIntoOuterContext")
     }
 
@@ -1431,8 +1411,7 @@ open class ParserATNSimulator: ATNSimulator {
 
                 }
             }
-            try closure_(config, configs, &closureBusy, collectPredicates,
-                fullCtx, depth, treatEofAsEpsilon)
+            try closure_(config, configs, &closureBusy, collectPredicates, fullCtx, depth, treatEofAsEpsilon)
     }
 
     /// 
@@ -1447,7 +1426,7 @@ open class ParserATNSimulator: ATNSimulator {
         _ treatEofAsEpsilon: Bool) throws {
             // print(__FUNCTION__)
             //long startTime = System.currentTimeMillis();
-            let p: ATNState = config.state
+            let p = config.state
             // optimization
             if !p.onlyHasEpsilonTransitions() {
                 try configs.add(config, &mergeCache)
@@ -1461,11 +1440,9 @@ open class ParserATNSimulator: ATNSimulator {
                     canDropLoopEntryEdgeInLeftRecursiveRule(config) {
                     continue
                 }
-                let t: Transition = p.transition(i)
-                let continueCollecting: Bool =
-                !(t is ActionTransition) && collectPredicates
-                let c: ATNConfig? = try getEpsilonTarget(config, t, continueCollecting,
-                    depth == 0, fullCtx, treatEofAsEpsilon)
+                let t = p.transition(i)
+                let continueCollecting = !(t is ActionTransition) && collectPredicates
+                let c = try getEpsilonTarget(config, t, continueCollecting, depth == 0, fullCtx, treatEofAsEpsilon)
                 if let c = c {
                     if !t.isEpsilon() {
                         // avoid infinite recursion for EOF* and EOF+
@@ -1476,7 +1453,7 @@ open class ParserATNSimulator: ATNSimulator {
                         }
                     }
 
-                    var newDepth: Int = depth
+                    var newDepth = depth
                     if config.state is RuleStopState {
                         assert(!fullCtx, "Expected: !fullCtx")
                         // target fell off end of rule; mark resulting c as having dipped into outer context
@@ -1619,7 +1596,7 @@ open class ParserATNSimulator: ATNSimulator {
         if ParserATNSimulator.TURN_OFF_LR_LOOP_ENTRY_BRANCH_OPT {
             return false
         }
-        let p: ATNState = config.state
+        let p = config.state
         guard let configContext = config.context else {
             return false
         }
@@ -1627,7 +1604,7 @@ open class ParserATNSimulator: ATNSimulator {
         // left-recursion elimination. For efficiency, also check if
         // the context has an empty stack case. If so, it would mean
         // global FOLLOW so we can't perform optimization
-        if  p.getStateType() != ATNState.STAR_LOOP_ENTRY ||
+        if p.getStateType() != ATNState.STAR_LOOP_ENTRY ||
             !( (p as! StarLoopEntryState)).precedenceRuleDecision || // Are we the special loop entry/exit state?
             configContext.isEmpty() || // If SLL wildcard
             configContext.hasEmptyPath(){
@@ -1636,41 +1613,41 @@ open class ParserATNSimulator: ATNSimulator {
 
         // Require all return states to return back to the same rule
         // that p is in.
-        let numCtxs: Int = configContext.size()
+        let numCtxs = configContext.size()
         for  i in 0 ..< numCtxs { // for each stack context
-            let returnState: ATNState = atn.states[configContext.getReturnState(i)]!
+            let returnState = atn.states[configContext.getReturnState(i)]!
             if  returnState.ruleIndex != p.ruleIndex
             {return false}
         }
 
-        let decisionStartState: BlockStartState =  (p.transition(0).target as! BlockStartState)
-        let blockEndStateNum: Int = decisionStartState.endState!.stateNumber
-        let blockEndState: BlockEndState =  (atn.states[blockEndStateNum] as! BlockEndState)
+        let decisionStartState = (p.transition(0).target as! BlockStartState)
+        let blockEndStateNum = decisionStartState.endState!.stateNumber
+        let blockEndState = (atn.states[blockEndStateNum] as! BlockEndState)
 
         // Verify that the top of each stack context leads to loop entry/exit
         // state through epsilon edges and w/o leaving rule.
         for  i in 0 ..< numCtxs { // for each stack context
-            let returnStateNumber: Int = configContext.getReturnState(i)
-            let returnState: ATNState = atn.states[returnStateNumber]!
+            let returnStateNumber = configContext.getReturnState(i)
+            let returnState = atn.states[returnStateNumber]!
             // all states must have single outgoing epsilon edge
             if  returnState.getNumberOfTransitions() != 1 || !returnState.transition(0).isEpsilon(){
                 return false
             }
             // Look for prefix op case like 'not expr', (' type ')' expr
-            let returnStateTarget: ATNState = returnState.transition(0).target
-            if  returnState.getStateType() == ATNState.BLOCK_END &&
+            let returnStateTarget = returnState.transition(0).target
+            if returnState.getStateType() == ATNState.BLOCK_END &&
                 returnStateTarget == p {
                 continue
             }
             // Look for 'expr op expr' or case where expr's return state is block end
             // of (...)* internal block; the block end points to loop back
             // which points to p but we don't need to check that
-            if  returnState == blockEndState{
+            if returnState == blockEndState {
                 continue
             }
             // Look for ternary expr ? expr : expr. The return state points at block end,
             // which points at loop entry state
-            if  returnStateTarget == blockEndState{
+            if returnStateTarget == blockEndState {
                 continue
             }
             // Look for complex prefix 'between expr and expr' case where 2nd expr's
@@ -1842,9 +1819,8 @@ open class ParserATNSimulator: ATNSimulator {
             print("CALL rule \(getRuleName(t.target.ruleIndex!)), ctx=\(String(describing: config.context))")
         }
 
-        let returnState: ATNState = t.followState
-        let newContext: PredictionContext =
-        SingletonPredictionContext.create(config.context, returnState.stateNumber)
+        let returnState = t.followState
+        let newContext = SingletonPredictionContext.create(config.context, returnState.stateNumber)
         return ATNConfig(config, t.target, newContext)
     }
 
@@ -1858,7 +1834,7 @@ open class ParserATNSimulator: ATNSimulator {
     /// conflicting subsets, this method returns an empty _java.util.BitSet_.
     /// 
     final func getConflictingAlts(_ configs: ATNConfigSet) throws -> BitSet {
-        let altsets: Array<BitSet> = try PredictionMode.getConflictingAltSubsets(configs)
+        let altsets = try PredictionMode.getConflictingAltSubsets(configs)
         return PredictionMode.getAlts(altsets)
     }
 
@@ -1914,9 +1890,8 @@ open class ParserATNSimulator: ATNSimulator {
         if t == CommonToken.EOF {
             return "EOF"
         }
-        //var vocabulary : Vocabulary = parser != nil ? parser.getVocabulary() : Vocabulary.EMPTY_VOCABULARY;
-        let vocabulary: Vocabulary = parser.getVocabulary()
-        let displayName: String = vocabulary.getDisplayName(t)
+        let vocabulary = parser.getVocabulary()
+        let displayName = vocabulary.getDisplayName(t)
         if displayName == String(t) {
             return displayName
         }
@@ -1935,19 +1910,16 @@ open class ParserATNSimulator: ATNSimulator {
     /// 
     public final func dumpDeadEndConfigs(_ nvae: NoViableAltException) {
         errPrint("dead end configs: ")
-        for c: ATNConfig in nvae.getDeadEndConfigs()!.configs {
-            var trans: String = "no edges"
+        for c in nvae.getDeadEndConfigs()!.configs {
+            var trans = "no edges"
             if c.state.getNumberOfTransitions() > 0 {
-                let t: Transition = c.state.transition(0)
-                if t is AtomTransition {
-                    let at: AtomTransition = t as! AtomTransition
+                let t = c.state.transition(0)
+                if let at = t as? AtomTransition {
                     trans = "Atom " + getTokenName(at.label)
-                } else {
-                    if t is SetTransition {
-                        let st: SetTransition = t as! SetTransition
-                        let not: Bool = st is NotSetTransition
-                        trans = (not ? "~" : "") + "Set " + st.set.toString()
-                    }
+                }
+                else if let st = t as? SetTransition {
+                    let not = st is NotSetTransition
+                    trans = (not ? "~" : "") + "Set " + st.set.toString()
                 }
             }
             errPrint("\(c.toString(parser, true)):\(trans)")
@@ -2021,7 +1993,6 @@ open class ParserATNSimulator: ATNSimulator {
         }
 
         if debug {
-            //  print ("DFA=\n"+dfa.toString(parser != nil ? parser.getVocabulary() : Vocabulary.EMPTY_VOCABULARY));
             print("DFA=\n" + dfa.toString(parser.getVocabulary()))
         }
 
@@ -2071,22 +2042,18 @@ open class ParserATNSimulator: ATNSimulator {
 
     func reportAttemptingFullContext(_ dfa: DFA, _ conflictingAlts: BitSet?, _ configs: ATNConfigSet, _ startIndex: Int, _ stopIndex: Int) throws {
         if debug || retry_debug {
-            let interval: Interval = Interval.of(startIndex, stopIndex)
-            try print("reportAttemptingFullContext decision=\(dfa.decision):\(configs), input=\(parser.getTokenStream()!.getText(interval))")
+            let input = getTextInInterval(startIndex, stopIndex)
+            print("reportAttemptingFullContext decision=\(dfa.decision):\(configs), input=\(input)")
         }
-        // if ( parser=nil ) {
         try parser.getErrorListenerDispatch().reportAttemptingFullContext(parser, dfa, startIndex, stopIndex, conflictingAlts, configs)
-        // }
     }
 
     func reportContextSensitivity(_ dfa: DFA, _ prediction: Int, _ configs: ATNConfigSet, _ startIndex: Int, _ stopIndex: Int) throws {
         if debug || retry_debug {
-            let interval: Interval = Interval.of(startIndex, stopIndex)
-            try print("reportContextSensitivity decision=\(dfa.decision):\(configs), input=\(parser.getTokenStream()!.getText(interval))")
+            let input = getTextInInterval(startIndex, stopIndex)
+            print("reportContextSensitivity decision=\(dfa.decision):\(configs), input=\(input)")
         }
-        //if ( parser=nil ) {
         try parser.getErrorListenerDispatch().reportContextSensitivity(parser, dfa, startIndex, stopIndex, prediction, configs)
-        // }
     }
 
     /// 
@@ -2101,14 +2068,21 @@ open class ParserATNSimulator: ATNSimulator {
         _ configs: ATNConfigSet) throws
     {
         if debug || retry_debug {
-            let interval: Interval = Interval.of(startIndex, stopIndex)
-            try print("reportAmbiguity \(ambigAlts):\(configs), input=\(parser.getTokenStream()!.getText(interval))")
+            let input = getTextInInterval(startIndex, stopIndex)
+            print("reportAmbiguity \(ambigAlts):\(configs), input=\(input)")
         }
-        //TODO  ( parser != nil ?
-        //if ( parser != nil ) {
-        try parser .getErrorListenerDispatch().reportAmbiguity(parser, dfa, startIndex, stopIndex,
+        try parser.getErrorListenerDispatch().reportAmbiguity(parser, dfa, startIndex, stopIndex,
             exact, ambigAlts, configs)
-        //}
+    }
+
+    private func getTextInInterval(_ startIndex: Int, _ stopIndex: Int) -> String {
+        let interval = Interval.of(startIndex, stopIndex)
+        do {
+            return try parser.getTokenStream()?.getText(interval) ?? "<unknown>"
+        }
+        catch {
+            return "<unknown>"
+        }
     }
 
     public final func setPredictionMode(_ mode: PredictionMode) {
@@ -2120,9 +2094,6 @@ open class ParserATNSimulator: ATNSimulator {
         return mode
     }
 
-    /// 
-    /// -  4.3
-    /// 
     public final func getParser() -> Parser {
         return parser
     }

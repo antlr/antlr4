@@ -28,13 +28,12 @@ public class FailedPredicateException: RecognitionException<ParserATNSimulator> 
 									_ predicate: String?,
 									_ message: String?) throws
 	{
+		let s = recognizer.getInterpreter().atn.states[recognizer.getState()]!
 
-		let s: ATNState  = recognizer.getInterpreter().atn.states[recognizer.getState()]!
-
-		let trans: AbstractPredicateTransition = s.transition(0) as! AbstractPredicateTransition
-		if trans is PredicateTransition {
-			self.ruleIndex = (trans as! PredicateTransition).ruleIndex
-			self.predicateIndex = (trans as! PredicateTransition).predIndex
+		let trans = s.transition(0) as! AbstractPredicateTransition
+		if let predex = trans as? PredicateTransition {
+			self.ruleIndex = predex.ruleIndex
+			self.predicateIndex = predex.predIndex
 		}
 		else {
 			self.ruleIndex = 0
@@ -55,7 +54,6 @@ public class FailedPredicateException: RecognitionException<ParserATNSimulator> 
 	public func getPredIndex() -> Int {
 		return predicateIndex
 	}
-
 
 	public func getPredicate() -> String? {
 		return predicate

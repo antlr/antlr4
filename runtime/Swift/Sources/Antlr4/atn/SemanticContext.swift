@@ -38,8 +38,7 @@ public class SemanticContext: Hashable, CustomStringConvertible {
     /// dependent predicate evaluation.
     /// 
     public func eval<T>(_ parser: Recognizer<T>, _ parserCallStack: RuleContext) throws -> Bool {
-        RuntimeException(#function + " must be overridden")
-        return false
+        fatalError(#function + " must be overridden")
     }
 
     /// 
@@ -61,13 +60,13 @@ public class SemanticContext: Hashable, CustomStringConvertible {
     public func evalPrecedence<T>(_ parser: Recognizer<T>, _ parserCallStack: RuleContext) throws -> SemanticContext? {
         return self
     }
+
     public var hashValue: Int {
-        RuntimeException(#function + " must be overridden")
-        return 0
+        fatalError(#function + " must be overridden")
     }
+
     public var description: String {
-        RuntimeException(#function + " must be overridden")
-        return ""
+        fatalError(#function + " must be overridden")
     }
 
     public class Predicate: SemanticContext {
@@ -91,7 +90,7 @@ public class SemanticContext: Hashable, CustomStringConvertible {
 
         override
         public func eval<T>(_ parser: Recognizer<T>, _ parserCallStack: RuleContext) throws -> Bool {
-            let localctx: RuleContext? = isCtxDependent ? parserCallStack : nil
+            let localctx = isCtxDependent ? parserCallStack : nil
             return try parser.sempred(localctx, ruleIndex, predIndex)
         }
 
@@ -171,8 +170,7 @@ public class SemanticContext: Hashable, CustomStringConvertible {
         /// 
 
         public func getOperands() -> Array<SemanticContext> {
-            RuntimeException(" must overriden ")
-            return Array<SemanticContext>()
+            fatalError(#function + " must be overridden")
         }
     }
 
@@ -185,7 +183,7 @@ public class SemanticContext: Hashable, CustomStringConvertible {
         public let opnds: [SemanticContext]
 
         public init(_ a: SemanticContext, _ b: SemanticContext) {
-            var operands: Set<SemanticContext> = Set<SemanticContext>()
+            var operands = Set<SemanticContext>()
             if let aAnd = a as? AND {
                 operands.formUnion(aAnd.opnds)
             } else {
@@ -211,7 +209,7 @@ public class SemanticContext: Hashable, CustomStringConvertible {
         }
 
         override
-        public func getOperands() -> Array<SemanticContext> {
+        public func getOperands() -> [SemanticContext] {
             return opnds
         }
 
@@ -233,7 +231,7 @@ public class SemanticContext: Hashable, CustomStringConvertible {
         /// 
         override
         public func eval<T>(_ parser: Recognizer<T>, _ parserCallStack: RuleContext) throws -> Bool {
-            for opnd: SemanticContext in opnds {
+            for opnd in opnds {
                 if try !opnd.eval(parser, parserCallStack) {
                     return false
                 }
@@ -243,10 +241,10 @@ public class SemanticContext: Hashable, CustomStringConvertible {
 
         override
         public func evalPrecedence<T>(_ parser: Recognizer<T>, _ parserCallStack: RuleContext) throws -> SemanticContext? {
-            var differs: Bool = false
-            var operands: Array<SemanticContext> = Array<SemanticContext>()
-            for context: SemanticContext in opnds {
-                let evaluated: SemanticContext? = try context.evalPrecedence(parser, parserCallStack)
+            var differs = false
+            var operands = [SemanticContext]()
+            for context in opnds {
+                let evaluated = try context.evalPrecedence(parser, parserCallStack)
                 //TODO differs |= (evaluated != context)
                 //differs |= (evaluated != context);
                 differs = differs || (evaluated != context)
@@ -254,11 +252,10 @@ public class SemanticContext: Hashable, CustomStringConvertible {
                 if evaluated == nil {
                     // The AND context is false if any element is false
                     return nil
-                } else {
-                    if evaluated != SemanticContext.NONE {
-                        // Reduce the result by skipping true elements
-                        operands.append(evaluated!)
-                    }
+                }
+                else if evaluated != SemanticContext.NONE {
+                    // Reduce the result by skipping true elements
+                    operands.append(evaluated!)
                 }
             }
 
@@ -271,7 +268,7 @@ public class SemanticContext: Hashable, CustomStringConvertible {
                 return SemanticContext.NONE
             }
 
-            var result: SemanticContext = operands[0]
+            var result = operands[0]
             let length = operands.count
             for i in 1..<length {
                 result = SemanticContext.and(result, operands[i])
@@ -326,8 +323,8 @@ public class SemanticContext: Hashable, CustomStringConvertible {
         }
 
         override
-        public func getOperands() -> Array<SemanticContext> {
-            return opnds //Arrays.asList(opnds);
+        public func getOperands() -> [SemanticContext] {
+            return opnds
         }
 
 
@@ -346,7 +343,7 @@ public class SemanticContext: Hashable, CustomStringConvertible {
         /// 
         override
         public func eval<T>(_ parser: Recognizer<T>, _ parserCallStack: RuleContext) throws -> Bool {
-            for opnd: SemanticContext in opnds {
+            for opnd in opnds {
                 if try opnd.eval(parser, parserCallStack) {
                     return true
                 }
@@ -356,21 +353,18 @@ public class SemanticContext: Hashable, CustomStringConvertible {
 
         override
         public func evalPrecedence<T>(_ parser: Recognizer<T>, _ parserCallStack: RuleContext) throws -> SemanticContext? {
-            var differs: Bool = false
-            var operands: Array<SemanticContext> = Array<SemanticContext>()
-            for context: SemanticContext in opnds {
-                let evaluated: SemanticContext? = try context.evalPrecedence(parser, parserCallStack)
-                //differs |= (evaluated != context);
+            var differs = false
+            var operands = [SemanticContext]()
+            for context in opnds {
+                let evaluated = try context.evalPrecedence(parser, parserCallStack)
                 differs = differs || (evaluated != context)
                 if evaluated == SemanticContext.NONE {
                     // The OR context is true if any element is true
                     return SemanticContext.NONE
-                } else {
-                    if evaluated != nil {
-                        // Reduce the result by skipping false elements
-                        operands.append(evaluated!)
-                        //operands.add(evaluated);
-                    }
+                }
+                else if let evaluated = evaluated {
+                    // Reduce the result by skipping false elements
+                    operands.append(evaluated)
                 }
             }
 
@@ -383,7 +377,7 @@ public class SemanticContext: Hashable, CustomStringConvertible {
                 return nil
             }
 
-            var result: SemanticContext = operands[0]
+            var result = operands[0]
             let length = operands.count
             for i in 1..<length {
                 result = SemanticContext.or(result, operands[i])

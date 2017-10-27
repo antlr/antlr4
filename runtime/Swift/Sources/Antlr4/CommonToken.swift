@@ -21,20 +21,20 @@ public class CommonToken: WritableToken {
     /// 
     /// This is the backing field for _#getLine_ and _#setLine_.
     /// 
-    internal var line: Int = 0
+    internal var line = 0
 
     /// 
     /// This is the backing field for _#getCharPositionInLine_ and
     /// _#setCharPositionInLine_.
     /// 
-    internal var charPositionInLine: Int = -1
+    internal var charPositionInLine = -1
     // set to invalid position
 
     /// 
     /// This is the backing field for _#getChannel_ and
     /// _#setChannel_.
     /// 
-    internal var channel: Int = DEFAULT_CHANNEL
+    internal var channel = DEFAULT_CHANNEL
 
     /// 
     /// This is the backing field for _#getTokenSource_ and
@@ -61,19 +61,19 @@ public class CommonToken: WritableToken {
     /// This is the backing field for _#getTokenIndex_ and
     /// _#setTokenIndex_.
     /// 
-    internal var index: Int = -1
+    internal var index = -1
 
     /// 
     /// This is the backing field for _#getStartIndex_ and
     /// _#setStartIndex_.
     /// 
-    internal var start: Int = 0
+    internal var start = 0
 
     /// 
     /// This is the backing field for _#getStopIndex_ and
     /// _#setStopIndex_.
     /// 
-    internal var stop: Int = 0
+    internal var stop = 0
 
     /// 
     /// Constructs a new _org.antlr.v4.runtime.CommonToken_ with the specified token type.
@@ -157,12 +157,12 @@ public class CommonToken: WritableToken {
 
 
     public func getText() -> String? {
-        if text != nil {
-            return text!
+        if let text = text {
+            return text
         }
 
         if let input = getInputStream() {
-            let n: Int = input.size()
+            let n = input.size()
             if start < n && stop < n {
                 return input.getText(Interval.of(start, stop))
             } else {
@@ -260,10 +260,8 @@ public class CommonToken: WritableToken {
     }
 
     public func toString(_ r: Recognizer<ATNSimulator>?) -> String {
-        var channelStr: String = ""
-        if channel > 0 {
-            channelStr = ",channel=\(channel)"
-        }
+        let channelStr = (channel > 0 ? ",channel=\(channel)" : "")
+
         var txt: String
         if let tokenText = getText() {
             txt = tokenText.replacingOccurrences(of: "\n", with: "\\n")
@@ -272,12 +270,16 @@ public class CommonToken: WritableToken {
         } else {
             txt = "<no text>"
         }
-        var typeString = "\(type)"
+        let typeString: String
         if let r = r {
-            typeString = r.getVocabulary().getDisplayName(type);
+            typeString = r.getVocabulary().getDisplayName(type)
+        }
+        else {
+            typeString = "\(type)"
         }
        return "[@\(getTokenIndex()),\(start):\(stop)='\(txt)',<\(typeString)>\(channelStr),\(line):\(getCharPositionInLine())]"
     }
+
     public var visited: Bool {
         get {
             return _visited

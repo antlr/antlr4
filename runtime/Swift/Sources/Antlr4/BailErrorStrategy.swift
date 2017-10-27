@@ -41,13 +41,13 @@ public class BailErrorStrategy: DefaultErrorStrategy {
     /// original _org.antlr.v4.runtime.RecognitionException_.
     /// 
     override public func recover(_ recognizer: Parser, _ e: AnyObject) throws {
-        var context: ParserRuleContext? = recognizer.getContext()
-        while let contextWrap = context{
+        var context = recognizer.getContext()
+        while let contextWrap = context {
             contextWrap.exception = e
             context = (contextWrap.getParent() as? ParserRuleContext)
         }
 
-        throw  ANTLRException.recognition(e: e)
+        throw ANTLRException.recognition(e: e)
     }
 
     /// 
@@ -56,15 +56,14 @@ public class BailErrorStrategy: DefaultErrorStrategy {
     /// 
     override
     public func recoverInline(_ recognizer: Parser) throws -> Token {
-        let e: InputMismatchException = try InputMismatchException(recognizer)
-        var context: ParserRuleContext? = recognizer.getContext()
+        let e = try InputMismatchException(recognizer)
+        var context = recognizer.getContext()
         while let contextWrap = context {
              contextWrap.exception = e
              context = (contextWrap.getParent() as? ParserRuleContext)
         }
 
-        throw  ANTLRException.recognition(e: e)
-
+        throw ANTLRException.recognition(e: e)
     }
 
     /// 

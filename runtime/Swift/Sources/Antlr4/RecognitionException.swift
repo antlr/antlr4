@@ -18,9 +18,9 @@ public class RecognitionException<T:ATNSimulator>  {
     private final var recognizer: Recognizer<T>?
     //Recognizer<AnyObject,ATNSimulator>? ;
 
-    private final var ctx: RuleContext?
+    private final let ctx: RuleContext?
 
-    private final var input: IntStream
+    private final let input: IntStream
 
     /// 
     /// The current _org.antlr.v4.runtime.Token_ when an error occurred. Since not all streams
@@ -29,7 +29,7 @@ public class RecognitionException<T:ATNSimulator>  {
     /// 
     private var offendingToken: Token!
 
-    private var offendingState: Int = -1
+    private var offendingState = -1
 
     public var message: String?
     public init(_ recognizer: Recognizer<T>?,

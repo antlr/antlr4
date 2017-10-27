@@ -170,23 +170,12 @@ public class DFA: CustomStringConvertible {
         return description
     }
 
-    /// 
-    /// -  Use _#toString(org.antlr.v4.runtime.Vocabulary)_ instead.
-    /// 
-    public func toString(_ tokenNames: [String?]?) -> String {
-        if s0 == nil {
-            return ""
-        }
-        let serializer: DFASerializer = DFASerializer(self, tokenNames)
-        return serializer.toString()
-    }
-
     public func toString(_ vocabulary: Vocabulary) -> String {
         if s0 == nil {
             return ""
         }
 
-        let serializer: DFASerializer = DFASerializer(self, vocabulary)
+        let serializer = DFASerializer(self, vocabulary)
         return serializer.toString()
     }
 
@@ -194,7 +183,7 @@ public class DFA: CustomStringConvertible {
         if s0 == nil {
             return ""
         }
-        let serializer: DFASerializer = LexerDFASerializer(self)
+        let serializer = LexerDFASerializer(self)
         return serializer.toString()
     }
 

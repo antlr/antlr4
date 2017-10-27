@@ -4,7 +4,7 @@
  */
 
 
-public class UnbufferedTokenStream<T>: TokenStream {
+public class UnbufferedTokenStream: TokenStream {
     internal var tokenSource: TokenSource
 
     /// 
@@ -274,10 +274,7 @@ public class UnbufferedTokenStream<T>: TokenStream {
 
 
     public func size() -> Int {
-
-        RuntimeException("Unbuffered stream cannot know its size")
-        fatalError()
-
+        fatalError("Unbuffered stream cannot know its size")
     }
 
 

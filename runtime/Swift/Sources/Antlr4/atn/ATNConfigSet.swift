@@ -27,7 +27,7 @@ public class ATNConfigSet: Hashable, CustomStringConvertible {
     /// fields; in particular, conflictingAlts is set after
     /// we've made this readonly.
     ///
-    internal final var readonly: Bool = false
+    internal final var readonly = false
 
     /// 
     /// All configs but hashed by (s, i, _, pi) not including context. Wiped out
@@ -38,11 +38,11 @@ public class ATNConfigSet: Hashable, CustomStringConvertible {
     /// 
     /// Track the elements as they are added to the set; supports get(i)
     /// 
-    public final var configs: Array<ATNConfig> = Array<ATNConfig>()
+    public final var configs = [ATNConfig]()
 
     // TODO: these fields make me pretty uncomfortable but nice to pack up info together, saves recomputation
     // TODO: can we track conflicts as they are added to save scanning configs later?
-    public final var uniqueAlt: Int = 0
+    public final var uniqueAlt = 0
     //TODO no default
     /// 
     /// Currently this is only used when we detect SLL conflict; this does
@@ -54,9 +54,9 @@ public class ATNConfigSet: Hashable, CustomStringConvertible {
 
     // Used in parser and lexer. In lexer, it indicates we hit a pred
     // while computing a closure operation.  Don't make a DFA state from this.
-    public final var hasSemanticContext: Bool = false
+    public final var hasSemanticContext = false
     //TODO no default
-    public final var dipsIntoOuterContext: Bool = false
+    public final var dipsIntoOuterContext = false
     //TODO no default
 
     /// 
@@ -66,7 +66,7 @@ public class ATNConfigSet: Hashable, CustomStringConvertible {
     /// 
     public final var fullCtx: Bool
 
-    private var cachedHashCode: Int = -1
+    private var cachedHashCode = -1
 
     public init(_ fullCtx: Bool) {
         configLookup = LookupDictionary()
@@ -125,10 +125,9 @@ public class ATNConfigSet: Hashable, CustomStringConvertible {
                 return true
             }
             // a previous (s,i,pi,_), merge with it and save result
-            let rootIsWildcard: Bool = !fullCtx
+            let rootIsWildcard = !fullCtx
 
-            let merged: PredictionContext =
-            PredictionContext.merge(existing.context!, config.context!, rootIsWildcard, &mergeCache)
+            let merged = PredictionContext.merge(existing.context!, config.context!, rootIsWildcard, &mergeCache)
 
             // no need to check for existing.context, config.context in cache
             // since only way to create new graphs is "call rule" and here. We
@@ -154,14 +153,14 @@ public class ATNConfigSet: Hashable, CustomStringConvertible {
     /// 
     /// Return a List holding list of configs
     /// 
-    public final func elements() -> Array<ATNConfig> {
+    public final func elements() -> [ATNConfig] {
         return configs
     }
 
     public final func getStates() -> Set<ATNState> {
 
         let length = configs.count
-        var states: Set<ATNState> = Set<ATNState>(minimumCapacity: length)
+        var states = Set<ATNState>(minimumCapacity: length)
         for i in 0..<length {
             states.insert(configs[i].state)
         }
@@ -177,7 +176,7 @@ public class ATNConfigSet: Hashable, CustomStringConvertible {
     /// - since: 4.3
     /// 
     public final func getAlts() throws -> BitSet {
-        let alts: BitSet = BitSet()
+        let alts = BitSet()
         let length = configs.count
         for i in 0..<length {
             try alts.set(configs[i].alt)
@@ -185,8 +184,8 @@ public class ATNConfigSet: Hashable, CustomStringConvertible {
         return alts
     }
 
-    public final func getPredicates() -> Array<SemanticContext> {
-        var preds: Array<SemanticContext> = Array<SemanticContext>()
+    public final func getPredicates() -> [SemanticContext] {
+        var preds = [SemanticContext]()
         let length = configs.count
         for i in 0..<length {
             if configs[i].semanticContext != SemanticContext.NONE {
@@ -217,8 +216,8 @@ public class ATNConfigSet: Hashable, CustomStringConvertible {
 
     @discardableResult
     public final func addAll(_ coll: ATNConfigSet) throws -> Bool {
-        for c: ATNConfig in coll.configs {
-            try  add(c)
+        for c in coll.configs {
+            try add(c)
         }
         return false
     }
@@ -284,7 +283,7 @@ public class ATNConfigSet: Hashable, CustomStringConvertible {
     }
 
     public var description: String {
-        let buf: StringBuilder = StringBuilder()
+        let buf = StringBuilder()
         buf.append(elements().map({ $0.description }))
         if hasSemanticContext {
             buf.append(",hasSemanticContext=")
@@ -321,7 +320,7 @@ public class ATNConfigSet: Hashable, CustomStringConvertible {
 
     public final func getConflictingAltSubsets() throws -> Array<BitSet> {
         let length = configs.count
-        let configToAlts: HashMap<Int, BitSet> = HashMap<Int, BitSet>(count: length)
+        let configToAlts = HashMap<Int, BitSet>(count: length)
 
         for i in 0..<length {
             let hash = configHash(configs[i].state.stateNumber, configs[i].context)
@@ -586,9 +585,8 @@ public class ATNConfigSet: Hashable, CustomStringConvertible {
     }
 
     public final var allConfigsInRuleStopStates: Bool {
-        let length = configs.count
-        for i in 0..<length {
-            if !(configs[i].state is RuleStopState) {
+        for config in configs {
+            if !(config.state is RuleStopState) {
                 return false
             }
         }
