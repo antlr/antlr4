@@ -44,6 +44,8 @@ IntervalSet::IntervalSet(int n, ...) : IntervalSet() {
   for (int i = 0; i < n; i++) {
     add(va_arg(vlist, int));
   }
+
+  va_end(vlist);
 }
 
 IntervalSet::~IntervalSet()
