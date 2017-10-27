@@ -20,12 +20,14 @@ type TokenSourceCharStreamPair struct {
 
 type Token interface {
 	GetSource() *TokenSourceCharStreamPair
-	GetTokenType() int
 	GetChannel() int
 	GetStart() int
 	GetStop() int
 	GetLine() int
 	GetColumn() int
+
+	GetTokenType() int
+	SetTokenType(t int)
 
 	GetText() string
 	SetText(s string)
@@ -95,6 +97,10 @@ func (b *BaseToken) GetColumn() int {
 
 func (b *BaseToken) GetTokenType() int {
 	return b.tokenType
+}
+
+func (b *BaseToken) SetTokenType(t int) {
+	b.tokenType = t
 }
 
 func (b *BaseToken) GetSource() *TokenSourceCharStreamPair {
