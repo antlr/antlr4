@@ -2,6 +2,8 @@ sudo: true
 
 language: java
 
+before_cache:
+  - rm -rf $HOME/.m2/repository/org/antlr
 cache:
   directories:
   - $HOME/.m2
