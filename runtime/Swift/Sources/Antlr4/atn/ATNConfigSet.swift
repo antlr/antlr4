@@ -27,7 +27,7 @@ public class ATNConfigSet: Hashable, CustomStringConvertible {
     /// fields; in particular, conflictingAlts is set after
     /// we've made this readonly.
     ///
-    internal final var readonly: Bool = false
+    internal final var readonly = false
 
     /// 
     /// All configs but hashed by (s, i, _, pi) not including context. Wiped out
@@ -38,11 +38,11 @@ public class ATNConfigSet: Hashable, CustomStringConvertible {
     /// 
     /// Track the elements as they are added to the set; supports get(i)
     /// 
-    public final var configs: Array<ATNConfig> = Array<ATNConfig>()
+    public final var configs = [ATNConfig]()
 
     // TODO: these fields make me pretty uncomfortable but nice to pack up info together, saves recomputation
     // TODO: can we track conflicts as they are added to save scanning configs later?
-    public final var uniqueAlt: Int = 0
+    public final var uniqueAlt = 0
     //TODO no default
     /// 
     /// Currently this is only used when we detect SLL conflict; this does
@@ -54,9 +54,9 @@ public class ATNConfigSet: Hashable, CustomStringConvertible {
 
     // Used in parser and lexer. In lexer, it indicates we hit a pred
     // while computing a closure operation.  Don't make a DFA state from this.
-    public final var hasSemanticContext: Bool = false
+    public final var hasSemanticContext = false
     //TODO no default
-    public final var dipsIntoOuterContext: Bool = false
+    public final var dipsIntoOuterContext = false
     //TODO no default
 
     /// 
@@ -66,7 +66,7 @@ public class ATNConfigSet: Hashable, CustomStringConvertible {
     /// 
     public final var fullCtx: Bool
 
-    private var cachedHashCode: Int = -1
+    private var cachedHashCode = -1
 
     public init(_ fullCtx: Bool) {
         configLookup = LookupDictionary()
@@ -76,9 +76,9 @@ public class ATNConfigSet: Hashable, CustomStringConvertible {
         self.init(true)
     }
 
-    public convenience init(_ old: ATNConfigSet) throws {
+    public convenience init(_ old: ATNConfigSet) {
         self.init(old.fullCtx)
-        try addAll(old)
+        try! addAll(old)
         self.uniqueAlt = old.uniqueAlt
         self.conflictingAlts = old.conflictingAlts
         self.hasSemanticContext = old.hasSemanticContext
@@ -108,7 +108,6 @@ public class ATNConfigSet: Hashable, CustomStringConvertible {
         _ mergeCache: inout DoubleKeyMap<PredictionContext, PredictionContext, PredictionContext>?) throws -> Bool {
             if readonly {
                 throw ANTLRError.illegalState(msg: "This set is readonly")
-
             }
 
             if config.semanticContext != SemanticContext.NONE {
@@ -125,10 +124,9 @@ public class ATNConfigSet: Hashable, CustomStringConvertible {
                 return true
             }
             // a previous (s,i,pi,_), merge with it and save result
-            let rootIsWildcard: Bool = !fullCtx
+            let rootIsWildcard = !fullCtx
 
-            let merged: PredictionContext =
-            PredictionContext.merge(existing.context!, config.context!, rootIsWildcard, &mergeCache)
+            let merged = PredictionContext.merge(existing.context!, config.context!, rootIsWildcard, &mergeCache)
 
             // no need to check for existing.context, config.context in cache
             // since only way to create new graphs is "call rule" and here. We
@@ -154,16 +152,14 @@ public class ATNConfigSet: Hashable, CustomStringConvertible {
     /// 
     /// Return a List holding list of configs
     /// 
-    public final func elements() -> Array<ATNConfig> {
+    public final func elements() -> [ATNConfig] {
         return configs
     }
 
     public final func getStates() -> Set<ATNState> {
-
-        let length = configs.count
-        var states: Set<ATNState> = Set<ATNState>(minimumCapacity: length)
-        for i in 0..<length {
-            states.insert(configs[i].state)
+        var states = Set<ATNState>(minimumCapacity: configs.count)
+        for config in configs {
+            states.insert(config.state)
         }
         return states
     }
@@ -176,21 +172,19 @@ public class ATNConfigSet: Hashable, CustomStringConvertible {
     /// 
     /// - since: 4.3
     /// 
-    public final func getAlts() throws -> BitSet {
-        let alts: BitSet = BitSet()
-        let length = configs.count
-        for i in 0..<length {
-            try alts.set(configs[i].alt)
+    public final func getAlts() -> BitSet {
+        let alts = BitSet()
+        for config in configs {
+            try! alts.set(config.alt)
         }
         return alts
     }
 
-    public final func getPredicates() -> Array<SemanticContext> {
-        var preds: Array<SemanticContext> = Array<SemanticContext>()
-        let length = configs.count
-        for i in 0..<length {
-            if configs[i].semanticContext != SemanticContext.NONE {
-                preds.append(configs[i].semanticContext)
+    public final func getPredicates() -> [SemanticContext] {
+        var preds = [SemanticContext]()
+        for config in configs {
+            if config.semanticContext != SemanticContext.NONE {
+                preds.append(config.semanticContext)
             }
         }
         return preds
@@ -203,22 +197,20 @@ public class ATNConfigSet: Hashable, CustomStringConvertible {
     public final func optimizeConfigs(_ interpreter: ATNSimulator) throws {
         if readonly {
             throw ANTLRError.illegalState(msg: "This set is readonly")
-
         }
         if configLookup.isEmpty {
             return
         }
-        let length = configs.count
-        for i in 0..<length {
-            configs[i].context = interpreter.getCachedContext(configs[i].context!)
+        for config in configs {
+            config.context = interpreter.getCachedContext(config.context!)
 
         }
     }
 
     @discardableResult
     public final func addAll(_ coll: ATNConfigSet) throws -> Bool {
-        for c: ATNConfig in coll.configs {
-            try  add(c)
+        for c in coll.configs {
+            try add(c)
         }
         return false
     }
@@ -238,12 +230,9 @@ public class ATNConfigSet: Hashable, CustomStringConvertible {
     private var configsHashValue: Int {
         var hashCode = 1
         for item in configs {
-            hashCode = Int.multiplyWithOverflow(3, hashCode).0
-            hashCode = Int.addWithOverflow(hashCode, item.hashValue).0
-
+            hashCode = hashCode &* 3 &+ item.hashValue
         }
         return hashCode
-
     }
 
     public final var count: Int {
@@ -269,7 +258,6 @@ public class ATNConfigSet: Hashable, CustomStringConvertible {
     public final func clear() throws {
         if readonly {
             throw ANTLRError.illegalState(msg: "This set is readonly")
-
         }
         configs.removeAll()
         cachedHashCode = -1
@@ -287,7 +275,7 @@ public class ATNConfigSet: Hashable, CustomStringConvertible {
     }
 
     public var description: String {
-        let buf: StringBuilder = StringBuilder()
+        let buf = StringBuilder()
         buf.append(elements().map({ $0.description }))
         if hasSemanticContext {
             buf.append(",hasSemanticContext=")
@@ -316,18 +304,15 @@ public class ATNConfigSet: Hashable, CustomStringConvertible {
     /// return configLookup.toArray(a);
     /// 
     private final func configHash(_ stateNumber: Int,_ context: PredictionContext?) -> Int{
-
-        var hashCode: Int = MurmurHash.initialize(7)
+        var hashCode = MurmurHash.initialize(7)
         hashCode = MurmurHash.update(hashCode, stateNumber)
         hashCode = MurmurHash.update(hashCode, context)
-        hashCode = MurmurHash.finish(hashCode, 2)
-
-        return hashCode
-
+        return MurmurHash.finish(hashCode, 2)
     }
-    public final func getConflictingAltSubsets() throws -> Array<BitSet> {
+
+    public final func getConflictingAltSubsets() -> [BitSet] {
         let length = configs.count
-        let configToAlts: HashMap<Int, BitSet> = HashMap<Int, BitSet>(count: length)
+        let configToAlts = HashMap<Int, BitSet>(count: length)
 
         for i in 0..<length {
             let hash = configHash(configs[i].state.stateNumber, configs[i].context)
@@ -339,15 +324,15 @@ public class ATNConfigSet: Hashable, CustomStringConvertible {
                 configToAlts[hash] = alts
             }
 
-            try alts.set(configs[i].alt)
+            try! alts.set(configs[i].alt)
         }
-
 
         return configToAlts.values
     }
-    public final func getStateToAltMap() throws -> HashMap<ATNState, BitSet> {
+
+    public final func getStateToAltMap() -> HashMap<ATNState, BitSet> {
         let length = configs.count
-        let m: HashMap<ATNState, BitSet> = HashMap<ATNState, BitSet>(count: length) //minimumCapacity: length)
+        let m = HashMap<ATNState, BitSet>(count: length)
 
         for i in 0..<length {
             var alts: BitSet
@@ -358,42 +343,37 @@ public class ATNConfigSet: Hashable, CustomStringConvertible {
                 m[configs[i].state] = alts
             }
 
-            try alts.set(configs[i].alt)
+            try! alts.set(configs[i].alt)
         }
         return m
     }
 
     //for DFAState
     public final func getAltSet() -> Set<Int>?  {
-        var alts: Set<Int> = Set<Int>()
-        let length = configs.count
-        for i in 0..<length {
-            alts.insert(configs[i].alt)
-        }
-
-        if alts.isEmpty {
+        if configs.isEmpty {
             return nil
+        }
+        var alts = Set<Int>()
+        for config in configs {
+            alts.insert(config.alt)
         }
         return alts
     }
 
     //for DiagnosticErrorListener
-    public final func getAltBitSet() throws -> BitSet  {
-        let result: BitSet = BitSet()
-        let length = configs.count
-        for i in 0..<length {
-            try result.set(configs[i].alt)
+    public final func getAltBitSet() -> BitSet  {
+        let result = BitSet()
+        for config in configs {
+            try! result.set(config.alt)
         }
-
         return result
     }
 
     //LexerATNSimulator
-    public final var firstConfigWithRuleStopState: ATNConfig?  {
-        let length = configs.count
-        for i in 0..<length {
-            if configs[i].state is RuleStopState {
-                return configs[i]
+    public final var firstConfigWithRuleStopState: ATNConfig? {
+        for config in configs {
+            if config.state is RuleStopState {
+                return config
             }
         }
 
@@ -402,135 +382,124 @@ public class ATNConfigSet: Hashable, CustomStringConvertible {
 
     //ParserATNSimulator
 
-    public final  func getUniqueAlt() -> Int {
-        var alt: Int = ATN.INVALID_ALT_NUMBER
-        let length = configs.count
-        for i in 0..<length {
+    public final func getUniqueAlt() -> Int {
+        var alt = ATN.INVALID_ALT_NUMBER
+        for config in configs {
             if alt == ATN.INVALID_ALT_NUMBER {
-                alt = configs[i].alt // found first alt
-            } else {
-                if configs[i].alt != alt {
-                    return ATN.INVALID_ALT_NUMBER
-                }
+                alt = config.alt // found first alt
+            } else if config.alt != alt {
+                return ATN.INVALID_ALT_NUMBER
             }
         }
         return alt
     }
-    public final func removeAllConfigsNotInRuleStopState(_ mergeCache: inout DoubleKeyMap<PredictionContext, PredictionContext, PredictionContext>?,_ lookToEndOfRule: Bool,_ atn: ATN) throws -> ATNConfigSet {
+
+    public final func removeAllConfigsNotInRuleStopState(_ mergeCache: inout DoubleKeyMap<PredictionContext, PredictionContext, PredictionContext>?,_ lookToEndOfRule: Bool,_ atn: ATN) -> ATNConfigSet {
         if PredictionMode.allConfigsInRuleStopStates(self) {
             return self
         }
 
-        let result: ATNConfigSet = ATNConfigSet(fullCtx)
-        let length = configs.count
-        for i in 0..<length {
-            if configs[i].state is RuleStopState {
-                try result.add(configs[i],&mergeCache)
+        let result = ATNConfigSet(fullCtx)
+        for config in configs {
+            if config.state is RuleStopState {
+                try! result.add(config, &mergeCache)
                 continue
             }
 
-            if lookToEndOfRule && configs[i].state.onlyHasEpsilonTransitions() {
-                let nextTokens: IntervalSet = try  atn.nextTokens(configs[i].state)
+            if lookToEndOfRule && config.state.onlyHasEpsilonTransitions() {
+                let nextTokens = atn.nextTokens(config.state)
                 if nextTokens.contains(CommonToken.EPSILON) {
-                    let endOfRuleState: ATNState = atn.ruleToStopState[configs[i].state.ruleIndex!]
-                    try result.add(ATNConfig(configs[i], endOfRuleState), &mergeCache)
+                    let endOfRuleState = atn.ruleToStopState[config.state.ruleIndex!]
+                    try! result.add(ATNConfig(config, endOfRuleState), &mergeCache)
                 }
             }
         }
 
         return result
     }
+
     public final func applyPrecedenceFilter(_ mergeCache: inout DoubleKeyMap<PredictionContext, PredictionContext, PredictionContext>?,_ parser: Parser,_ _outerContext: ParserRuleContext!) throws -> ATNConfigSet {
 
-        let configSet: ATNConfigSet = ATNConfigSet(fullCtx)
-        let length = configs.count
-        let statesFromAlt1: HashMap<Int, PredictionContext> = HashMap<Int, PredictionContext>(count: length)
-        for i in 0..<length {
+        let configSet = ATNConfigSet(fullCtx)
+        let statesFromAlt1 = HashMap<Int, PredictionContext>(count: configs.count)
+        for config in configs {
             // handle alt 1 first
-            if configs[i].alt != 1 {
+            if config.alt != 1 {
                 continue
             }
 
-            let updatedContext: SemanticContext? = try configs[i].semanticContext.evalPrecedence(parser, _outerContext)
+            let updatedContext = try config.semanticContext.evalPrecedence(parser, _outerContext)
             if updatedContext == nil {
                 // the configuration was eliminated
                 continue
             }
 
-            statesFromAlt1[configs[i].state.stateNumber] = configs[i].context
-            if updatedContext != configs[i].semanticContext {
-                try configSet.add(ATNConfig(configs[i], updatedContext!), &mergeCache)
+            statesFromAlt1[config.state.stateNumber] = config.context
+            if updatedContext != config.semanticContext {
+                try! configSet.add(ATNConfig(config, updatedContext!), &mergeCache)
             } else {
-                try configSet.add(configs[i],&mergeCache)
+                try! configSet.add(config, &mergeCache)
             }
         }
 
-        for i in 0..<length {
-            if configs[i].alt == 1 {
+        for config in configs {
+            if config.alt == 1 {
                 // already handled
                 continue
             }
 
-            if !configs[i].isPrecedenceFilterSuppressed() {
+            if !config.isPrecedenceFilterSuppressed() {
                 /// 
                 /// In the future, this elimination step could be updated to also
                 /// filter the prediction context for alternatives predicting alt>1
                 /// (basically a graph subtraction algorithm).
                 /// 
-                let context: PredictionContext? = statesFromAlt1[configs[i].state.stateNumber]
-                if context != nil && context == configs[i].context {
+                let context = statesFromAlt1[config.state.stateNumber]
+                if context != nil && context == config.context {
                     // eliminated
                     continue
                 }
             }
 
-            try configSet.add(configs[i], &mergeCache)
+            try! configSet.add(config, &mergeCache)
         }
 
         return configSet
     }
-    internal func getPredsForAmbigAlts(_ ambigAlts: BitSet,
-        _ nalts: Int) throws -> [SemanticContext?]? {
 
-            var altToPred: [SemanticContext?]? = [SemanticContext?](repeating: nil, count: nalts + 1) //new SemanticContext[nalts + 1];
-            let length = configs.count
-            for i in 0..<length {
-                if try ambigAlts.get(configs[i].alt) {
-                    altToPred![configs[i].alt] = SemanticContext.or(altToPred![configs[i].alt], configs[i].semanticContext)
-                }
+    internal func getPredsForAmbigAlts(_ ambigAlts: BitSet, _ nalts: Int) -> [SemanticContext?]? {
+        var altToPred = [SemanticContext?](repeating: nil, count: nalts + 1)
+        for config in configs {
+            if try! ambigAlts.get(config.alt) {
+                altToPred[config.alt] = SemanticContext.or(altToPred[config.alt], config.semanticContext)
             }
-            var nPredAlts: Int = 0
-            for i in 1...nalts {
-                if altToPred![i] == nil {
-                    altToPred![i] = SemanticContext.NONE
-                } else {
-                    if altToPred![i] != SemanticContext.NONE {
-                        nPredAlts += 1
-                    }
-                }
+        }
+        var nPredAlts = 0
+        for i in 1...nalts {
+            if altToPred[i] == nil {
+                altToPred[i] = SemanticContext.NONE
             }
-
-            //		// Optimize away p||p and p&&p TODO: optimize() was a no-op
-            //		for (int i = 0; i < altToPred.length; i++) {
-            //			altToPred[i] = altToPred[i].optimize();
-            //		}
-
-            // nonambig alts are null in altToPred
-            if nPredAlts == 0 {
-                altToPred = nil
+            else if altToPred[i] != SemanticContext.NONE {
+                nPredAlts += 1
             }
+        }
 
-            return altToPred
+        //		// Optimize away p||p and p&&p TODO: optimize() was a no-op
+        //		for (int i = 0; i < altToPred.length; i++) {
+        //			altToPred[i] = altToPred[i].optimize();
+        //		}
 
+        // nonambig alts are null in altToPred
+        return (nPredAlts == 0 ? nil : altToPred)
     }
-    public final func getAltThatFinishedDecisionEntryRule() throws -> Int {
-        let alts: IntervalSet = try IntervalSet()
-        let length = configs.count
-        for i in 0..<length {
-            if configs[i].getOuterContextDepth() > 0 ||
-                (configs[i].state is RuleStopState &&
-                    configs[i].context!.hasEmptyPath()) {
-                try alts.add(configs[i].alt)
+
+    public final func getAltThatFinishedDecisionEntryRule() -> Int {
+        let alts = IntervalSet()
+        for config in configs {
+            if config.getOuterContextDepth() > 0 ||
+                (config.state is RuleStopState &&
+                    config.context!.hasEmptyPath()) {
+                try! alts.add(config.alt)
             }
         }
         if alts.size() == 0 {
@@ -551,39 +520,36 @@ public class ATNConfigSet: Hashable, CustomStringConvertible {
     /// 
     public final func splitAccordingToSemanticValidity(
         _ outerContext: ParserRuleContext,
-        _ evalSemanticContext:( SemanticContext,ParserRuleContext,Int,Bool) throws -> Bool) throws -> (ATNConfigSet, ATNConfigSet) {
-            let succeeded: ATNConfigSet = ATNConfigSet(fullCtx)
-            let failed: ATNConfigSet = ATNConfigSet(fullCtx)
-            let length = configs.count
-            for i in 0..<length {
-                if configs[i].semanticContext != SemanticContext.NONE {
-                    let predicateEvaluationResult: Bool = try evalSemanticContext(configs[i].semanticContext, outerContext, configs[i].alt,fullCtx)
-                    if predicateEvaluationResult {
-                        try succeeded.add(configs[i])
-                    } else {
-                        try failed.add(configs[i])
-                    }
+        _ evalSemanticContext: (SemanticContext, ParserRuleContext, Int, Bool) throws -> Bool) rethrows -> (ATNConfigSet, ATNConfigSet) {
+        let succeeded = ATNConfigSet(fullCtx)
+        let failed = ATNConfigSet(fullCtx)
+        for config in configs {
+            if config.semanticContext != SemanticContext.NONE {
+                let predicateEvaluationResult = try evalSemanticContext(config.semanticContext, outerContext, config.alt,fullCtx)
+                if predicateEvaluationResult {
+                    try! succeeded.add(config)
                 } else {
-                    try succeeded.add(configs[i])
+                    try! failed.add(config)
                 }
+            } else {
+                try! succeeded.add(config)
             }
-            return (succeeded, failed)
+        }
+        return (succeeded, failed)
     }
 
-    //public enum PredictionMode
-    public final  func dupConfigsWithoutSemanticPredicates() throws -> ATNConfigSet {
-        let dup: ATNConfigSet = ATNConfigSet()
-        let length = configs.count
-        for i in 0..<length {
-            let c = ATNConfig(configs[i], SemanticContext.NONE)
-            try dup.add(c)
+    public final func dupConfigsWithoutSemanticPredicates() -> ATNConfigSet {
+        let dup = ATNConfigSet()
+        for config in configs {
+            let c = ATNConfig(config, SemanticContext.NONE)
+            try! dup.add(c)
         }
         return dup
     }
+
     public final var hasConfigInRuleStopState: Bool {
-        let length = configs.count
-        for i in 0..<length {
-            if configs[i].state is RuleStopState {
+        for config in configs {
+            if config.state is RuleStopState {
                 return true
             }
         }
@@ -592,9 +558,8 @@ public class ATNConfigSet: Hashable, CustomStringConvertible {
     }
 
     public final var allConfigsInRuleStopStates: Bool {
-        let length = configs.count
-        for i in 0..<length {
-            if !(configs[i].state is RuleStopState) {
+        for config in configs {
+            if !(config.state is RuleStopState) {
                 return false
             }
         }

@@ -72,7 +72,7 @@ TokenStartColumnEquals(i) ::= <%self._tokenStartCharPositionInLine == <i>%>
 
 ImportListener(X) ::= ""
 
-GetExpectedTokenNames() ::= "try self.getExpectedTokens().toString(self.tokenNames)"
+GetExpectedTokenNames() ::= "try self.getExpectedTokens().toString(self.getVocabulary())"
 
 RuleInvocationStack() ::= "getRuleInvocationStack().description.replacingOccurrences(of: \"\\\"\", with: \"\")"
 

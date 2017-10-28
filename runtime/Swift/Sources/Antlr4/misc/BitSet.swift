@@ -32,10 +32,6 @@ import Foundation
 /// implementation. The length of a bit set relates to logical length
 /// of a bit set and is defined independently of implementation.
 /// 
-/// Unless otherwise noted, passing a null parameter to any of the
-/// methods in a `BitSet` will result in a
-/// `ANTLRError.nullPointer`.
-/// 
 /// A `BitSet` is not safe for multithreaded use without
 /// external synchronization.
 /// 
@@ -596,7 +592,14 @@ public class BitSet: Hashable, CustomStringConvertible {
         return result
     }
 
-    /// 
+    ///
+    /// Equivalent to nextSetBit(0), but guaranteed not to throw an exception.
+    ///
+    public func firstSetBit() -> Int {
+        return try! nextSetBit(0)
+    }
+
+    ///
     /// Returns the index of the first bit that is set to `true`
     /// that occurs on or after the specified starting index. If no such
     /// bit exists then `-1` is returned.
@@ -605,7 +608,7 @@ public class BitSet: Hashable, CustomStringConvertible {
     /// use the following loop:
     /// 
     /// `
-    /// for (int i = bs.nextSetBit(0); i >= 0; i = bs.nextSetBit(i+1)) {
+    /// for (int i = bs.firstSetBit(); i >= 0; i = bs.nextSetBit(i+1)) {
     /// // operate on index i here
     /// `}
     /// 
@@ -648,12 +651,12 @@ public class BitSet: Hashable, CustomStringConvertible {
             return 64
         }
         var n: Int32 = 63
-        y = Int32(truncatingBitPattern: i)
+        y = Int32(truncatingIfNeeded: i)
         if y != 0 {
             n = n - 32
             x = y
         } else {
-            x = Int32(truncatingBitPattern: i >>> 32)
+            x = Int32(truncatingIfNeeded: i >>> 32)
         }
 
         y = x << 16
@@ -1118,24 +1121,20 @@ public class BitSet: Hashable, CustomStringConvertible {
 
         //let numBits: Int = (wordsInUse > 128) ?
         // cardinality() : wordsInUse * BitSet.BITS_PER_WORD
-        let b: StringBuilder = StringBuilder()
+        let b = StringBuilder()
         b.append("{")
-        do {
-            var i: Int = try  nextSetBit(0)
-            if i != -1 {
-                b.append(i)
-                i = try  nextSetBit(i + 1)
-                while i >= 0 {
-                    let endOfRun: Int = try  nextClearBit(i)
-                    repeat {
-                        b.append(", ").append(i)
-                         i += 1
-                    } while i < endOfRun
-                    i = try nextSetBit(i + 1)
-                }
+        var i = firstSetBit()
+        if i != -1 {
+            b.append(i)
+            i = try! nextSetBit(i + 1)
+            while i >= 0 {
+                let endOfRun = try! nextClearBit(i)
+                repeat {
+                    b.append(", ").append(i)
+                    i += 1
+                } while i < endOfRun
+                i = try! nextSetBit(i + 1)
             }
-        } catch {
-            print("BitSet description error")
         }
         b.append("}")
         return b.toString()

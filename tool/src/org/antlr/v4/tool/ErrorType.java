@@ -394,11 +394,11 @@ public enum ErrorType {
 	 */
 	IMPORT_NAME_CLASH(113, "<arg.typeString> grammar <arg.name> and imported <arg2.typeString> grammar <arg2.name> both generate <arg2.recognizerName>", ErrorSeverity.ERROR),
 	/**
-	 * Compiler Error 160.
+	 * Compiler Error 114.
 	 *
 	 * <p>cannot find tokens file <em>filename</em></p>
 	 */
-	CANNOT_FIND_TOKENS_FILE_REFD_IN_GRAMMAR(160, "cannot find tokens file <arg>", ErrorSeverity.ERROR),
+	CANNOT_FIND_TOKENS_FILE_REFD_IN_GRAMMAR(114, "cannot find tokens file <arg>", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Warning 118.
 	 *
@@ -522,7 +522,7 @@ public enum ErrorType {
 	 */
 	USE_OF_BAD_WORD(134, "symbol <arg> conflicts with generated code in target language or runtime", ErrorSeverity.ERROR),
 	/**
-	 * Compiler Error 134.
+	 * Compiler Error 183.
 	 *
 	 * <p>rule reference <em>rule</em> is not currently supported in a set</p>
 	 *
@@ -530,7 +530,7 @@ public enum ErrorType {
 	 * Note: This error has the same number as the unrelated error
 	 * {@link #USE_OF_BAD_WORD}.</p>
 	 */
-	UNSUPPORTED_REFERENCE_IN_LEXER_SET(134, "rule reference <arg> is not currently supported in a set", ErrorSeverity.ERROR),
+	UNSUPPORTED_REFERENCE_IN_LEXER_SET(183, "rule reference <arg> is not currently supported in a set", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 135.
 	 *

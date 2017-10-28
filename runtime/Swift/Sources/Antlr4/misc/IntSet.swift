@@ -43,7 +43,7 @@ public protocol IntSet {
     /// current set and `a`. The value `null` may be returned in
     /// place of an empty result set.
     /// 
-    func and(_ a: IntSet?) throws -> IntSet?
+    func and(_ a: IntSet?) -> IntSet?
 
     /// 
     /// Return a new _org.antlr.v4.runtime.misc.IntSet_ object containing all elements that are
@@ -60,7 +60,7 @@ public protocol IntSet {
     /// `elements` but not present in the current set. The value
     /// `null` may be returned in place of an empty result set.
     /// 
-    func complement(_ elements: IntSet?) throws -> IntSet?
+    func complement(_ elements: IntSet?) -> IntSet?
 
     /// 
     /// Return a new _org.antlr.v4.runtime.misc.IntSet_ object containing all elements that are
@@ -76,7 +76,7 @@ public protocol IntSet {
     /// set and `a`. The value `null` may be returned in place of an
     /// empty result set.
     /// 
-    func or(_ a: IntSet) throws -> IntSet
+    func or(_ a: IntSet) -> IntSet
 
     /// 
     /// Return a new _org.antlr.v4.runtime.misc.IntSet_ object containing all elements that are
@@ -93,7 +93,7 @@ public protocol IntSet {
     /// `elements` but not present in the current set. The value
     /// `null` may be returned in place of an empty result set.
     /// 
-    func subtract(_ a: IntSet?) throws -> IntSet
+    func subtract(_ a: IntSet?) -> IntSet
 
     /// 
     /// Return the total number of elements represented by the current set.
@@ -145,7 +145,7 @@ public protocol IntSet {
     /// - returns: A list containing all element present in the current set, sorted
     /// in ascending numerical order.
     /// 
-    func toList() -> Array<Int>
+    func toList() -> [Int]
 
     func toString() -> String
 }

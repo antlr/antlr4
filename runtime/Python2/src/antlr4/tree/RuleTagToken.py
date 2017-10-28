@@ -36,14 +36,13 @@ class RuleTagToken(Token):
         self.tokenIndex = -1 # from 0..n-1 of the token object in the input stream
         self.line = 0 # line=1..n of the 1st character
         self.column = -1 # beginning of the line at which it occurs, 0..n-1
-        self.label = label
+        self.label = unicode(label)
         self._text = self.getText() # text of the token.
-
-        self.ruleName = ruleName
+        self.ruleName = unicode(ruleName)
 
 
     def getText(self):
         if self.label is None:
-            return "<" + self.ruleName + ">"
+            return u"<" + self.ruleName + u">"
         else:
-            return "<" + self.label + ":" + self.ruleName + ">"
+            return u"<" + self.label + ":" + self.ruleName + u">"

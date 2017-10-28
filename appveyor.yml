@@ -1,8 +1,8 @@
-version: '4.6-SNAPSHOT+AppVeyor.{build}'
-os: Windows Server 2012
+version: '4.7.1-SNAPSHOT+AppVeyor.{build}'
+build: off
 build_script:
-  - mvn -DskipTests install -q --batch-mode 
+  - mvn -DskipTests install --batch-mode
+  - msbuild runtime/CSharp/runtime/CSharp/Antlr4.vs2013.sln /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /verbosity:detailed
+  - msbuild ./runtime-testsuite/target/classes/CSharp/runtime/CSharp/Antlr4.vs2013.sln /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /verbosity:detailed
 test_script:
-  - mvn install -q -Dantlr-python2-python="C:\Python27\python.exe" -Dantlr-python3-python="C:\Python35\python.exe" -Dantlr-javascript-nodejs="C:\Program Files (x86)\nodejs\node.exe" --batch-mode
-build:
-  verbosity: minimal
+  - mvn install -Dantlr-python2-python="C:\Python27\python.exe" -Dantlr-python3-python="C:\Python35\python.exe" -Dantlr-javascript-nodejs="C:\Program Files (x86)\nodejs\node.exe" --batch-mode

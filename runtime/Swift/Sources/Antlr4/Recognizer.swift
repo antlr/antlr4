@@ -5,60 +5,53 @@
 
 import Foundation
 
-open class Recognizer<ATNInterpreter:ATNSimulator> {
-    //public  static let EOF: Int = -1
+
+public protocol RecognizerProtocol {
+    func getATN() -> ATN
+    func getGrammarFileName() -> String
+    func getParseInfo() -> ParseInfo?
+    func getRuleNames() -> [String]
+    func getSerializedATN() -> String
+    func getState() -> Int
+    func getTokenType(_ tokenName: String) -> Int
+    func getVocabulary() -> Vocabulary
+}
+
+
+open class Recognizer<ATNInterpreter: ATNSimulator>: RecognizerProtocol {
     //TODO: WeakKeyDictionary NSMapTable Dictionary MapTable<Vocabulary,HashMap<String, Int>>
-    private let tokenTypeMapCache = HashMap<Vocabulary,Dictionary<String, Int>>()
+    private let tokenTypeMapCache = HashMap<Vocabulary, [String : Int]>()
 
-    private let ruleIndexMapCache = HashMap<ArrayWrapper<String>,Dictionary<String, Int>>()
+    private let ruleIndexMapCache = HashMap<ArrayWrapper<String>, [String : Int]>()
 
-
-    private var _listeners: Array<ANTLRErrorListener> = [ConsoleErrorListener.INSTANCE]
-
+    private var _listeners: [ANTLRErrorListener] = [ConsoleErrorListener.INSTANCE]
 
     public var _interp: ATNInterpreter!
 
-    private var _stateNumber: Int = -1
+    private var _stateNumber = -1
     
     /// 
     /// mutex for tokenTypeMapCache updates
     /// 
-    private var tokenTypeMapCacheMutex = Mutex()
+    private let tokenTypeMapCacheMutex = Mutex()
     
     /// 
     /// mutex for ruleIndexMapCacheMutex updates
     /// 
-    private var ruleIndexMapCacheMutex = Mutex()
-
-    /// Used to print out token names like ID during debugging and
-    /// error reporting.  The generated parsers implement a method
-    /// that overrides this to point to their String[] tokenNames.
-    /// 
-    /// Use _#getVocabulary()_ instead.
-    /// 
-    /// 
-    /// /@Deprecated
-    /// 
-    open func getTokenNames() -> [String?]? {
-        RuntimeException(#function + " must be overridden")
-        return []
-    }
+    private let ruleIndexMapCacheMutex = Mutex()
 
     open func getRuleNames() -> [String] {
-        RuntimeException(#function + " must be overridden")
-        return []
+        fatalError(#function + " must be overridden")
     }
 
-
-    /// 
+    ///
     /// Get the vocabulary used by the recognizer.
     /// 
     /// - Returns: A _org.antlr.v4.runtime.Vocabulary_ instance providing information about the
     /// vocabulary used by the grammar.
     /// 
-
     open func getVocabulary() -> Vocabulary {
-        return Vocabulary.fromTokenNames(getTokenNames())
+        fatalError(#function + " must be overridden")
     }
 
     /// 
@@ -66,35 +59,29 @@ open class Recognizer<ATNInterpreter:ATNSimulator> {
     /// 
     /// Used for XPath and tree pattern compilation.
     /// 
-    public func getTokenTypeMap() -> Dictionary<String, Int> {
-        let vocabulary: Vocabulary = getVocabulary()
-        var result: Dictionary<String, Int>? = self.tokenTypeMapCache[vocabulary]
-        tokenTypeMapCacheMutex.synchronized {
-            [unowned self] in
+    public func getTokenTypeMap() -> [String : Int] {
+        let vocabulary = getVocabulary()
+        var result = tokenTypeMapCache[vocabulary]
+        tokenTypeMapCacheMutex.synchronized { [unowned self] in
             if result == nil {
-                result = Dictionary<String, Int>()
+                result = [String : Int]()
                 let length = self.getATN().maxTokenType
                 for i in 0...length {
-                    let literalName: String? = vocabulary.getLiteralName(i)
-                    if literalName != nil {
-                        result![literalName!] = i
+                    if let literalName = vocabulary.getLiteralName(i) {
+                        result![literalName] = i
                     }
 
-                    let symbolicName: String? = vocabulary.getSymbolicName(i)
-                    if symbolicName != nil {
-                        result![symbolicName!] = i
+                    if let symbolicName = vocabulary.getSymbolicName(i) {
+                        result![symbolicName] = i
                     }
                 }
 
                 result!["EOF"] = CommonToken.EOF
 
-                //TODO Result Collections.unmodifiableMap
-
                 self.tokenTypeMapCache[vocabulary] = result!
             }
         }
         return result!
-
     }
 
     /// 
@@ -102,26 +89,20 @@ open class Recognizer<ATNInterpreter:ATNSimulator> {
     /// 
     /// Used for XPath and tree pattern compilation.
     /// 
-    public func getRuleIndexMap() -> Dictionary<String, Int> {
-        let ruleNames: [String] = getRuleNames()
+    public func getRuleIndexMap() -> [String : Int] {
+        let ruleNames = getRuleNames()
 
-        let result: Dictionary<String, Int>? = self.ruleIndexMapCache[ArrayWrapper<String>(ruleNames)]
-        ruleIndexMapCacheMutex.synchronized {
-            [unowned self] in
+        let result = ruleIndexMapCache[ArrayWrapper<String>(ruleNames)]
+        ruleIndexMapCacheMutex.synchronized { [unowned self] in
             if result == nil {
                 self.ruleIndexMapCache[ArrayWrapper<String>(ruleNames)] = Utils.toMap(ruleNames)
             }
         }
         return result!
-
     }
 
     public func getTokenType(_ tokenName: String) -> Int {
-        let ttype: Int? = getTokenTypeMap()[tokenName]
-        if ttype != nil {
-            return ttype!
-        }
-        return CommonToken.INVALID_TYPE
+        return getTokenTypeMap()[tokenName] ?? CommonToken.INVALID_TYPE
     }
 
     /// 
@@ -132,16 +113,14 @@ open class Recognizer<ATNInterpreter:ATNSimulator> {
     /// created the interpreter from it.
     /// 
     open func getSerializedATN() -> String {
-        RuntimeException("there is no serialized ATN")
-        fatalError()
+        fatalError("there is no serialized ATN")
     }
 
     /// For debugging and other purposes, might want the grammar name.
     /// Have ANTLR generate an implementation for this method.
     /// 
     open func getGrammarFileName() -> String {
-        RuntimeException(#function + " must be overridden")
-        return ""
+        fatalError(#function + " must be overridden")
     }
 
     /// 
@@ -150,8 +129,7 @@ open class Recognizer<ATNInterpreter:ATNSimulator> {
     /// - Returns: The _org.antlr.v4.runtime.atn.ATN_ used by the recognizer for prediction.
     /// 
     open func getATN() -> ATN {
-        RuntimeException(#function + " must be overridden")
-        fatalError()
+        fatalError(#function + " must be overridden")
     }
 
     /// 
@@ -185,54 +163,14 @@ open class Recognizer<ATNInterpreter:ATNSimulator> {
     /// 
     /// What is the error header, normally line/character position information?
     /// 
-    open func getErrorHeader(_ e: AnyObject) -> String {
-        let line: Int = (e as! RecognitionException).getOffendingToken().getLine()
-        let charPositionInLine: Int = (e as! RecognitionException).getOffendingToken().getCharPositionInLine()
-        return "line " + String(line) + ":" + String(charPositionInLine)
+    open func getErrorHeader(_ e: RecognitionException) -> String {
+        let offending = e.getOffendingToken()
+        let line = offending.getLine()
+        let charPositionInLine = offending.getCharPositionInLine()
+        return "line \(line):\(charPositionInLine)"
     }
 
-    /// How should a token be displayed in an error message? The default
-    /// is to display just the text, but during development you might
-    /// want to have a lot of information spit out.  Override in that case
-    /// to use t.toString() (which, for CommonToken, dumps everything about
-    /// the token). This is better than forcing you to override a method in
-    /// your token objects because you don't have to go modify your lexer
-    /// so that it creates a new Java type.
-    /// 
-    /// This method is not called by the ANTLR 4 Runtime. Specific
-    /// implementations of _org.antlr.v4.runtime.ANTLRErrorStrategy_ may provide a similar
-    /// feature when necessary. For example, see
-    /// _org.antlr.v4.runtime.DefaultErrorStrategy#getTokenErrorDisplay_.
-    /// 
-    /// 
-    /// /@Deprecated
-    /// 
-    open func getTokenErrorDisplay(_ t: Token?) -> String {
-        guard let t = t else {
-            return "<no token>"
-        }
-        var s: String
-
-        if let text = t.getText() {
-            s = text
-        } else {
-            if t.getType() == CommonToken.EOF {
-                s = "<EOF>"
-            } else {
-                s = "<\(t.getType())>"
-            }
-        }
-        s = s.replacingOccurrences(of: "\n", with: "\\n")
-        s = s.replacingOccurrences(of: "\r", with: "\\r")
-        s = s.replacingOccurrences(of: "\t", with: "\\t")
-        return "\(s)"
-    }
-
-    /// 
-    /// - Throws: ANTLRError.nullPointer if `listener` is `null`.
-    /// 
     open func addErrorListener(_ listener: ANTLRErrorListener) {
-
         _listeners.append(listener)
     }
 
@@ -240,16 +178,13 @@ open class Recognizer<ATNInterpreter:ATNSimulator> {
         _listeners = _listeners.filter() {
             $0 !== listener
         }
-
-        // _listeners.removeObject(listener);
     }
 
     open func removeErrorListeners() {
         _listeners.removeAll()
     }
 
-
-    open func getErrorListeners() -> Array<ANTLRErrorListener> {
+    open func getErrorListeners() -> [ANTLRErrorListener] {
         return _listeners
     }
 
@@ -263,7 +198,7 @@ open class Recognizer<ATNInterpreter:ATNSimulator> {
         return true
     }
 
-    open func precpred(_ localctx: RuleContext?, _ precedence: Int) throws -> Bool {
+    open func precpred(_ localctx: RuleContext?, _ precedence: Int) -> Bool {
         return true
     }
 
@@ -288,22 +223,18 @@ open class Recognizer<ATNInterpreter:ATNSimulator> {
     }
 
     open func getInputStream() -> IntStream? {
-        RuntimeException(#function + "Must be overridden")
-        fatalError()
+        fatalError(#function + " must be overridden")
     }
 
     open func setInputStream(_ input: IntStream) throws {
-        RuntimeException(#function + "Must be overridden")
-
+        fatalError(#function + " must be overridden")
     }
 
     open func getTokenFactory() -> TokenFactory {
-        RuntimeException(#function + "Must be overridden")
-        fatalError()
+        fatalError(#function + " must be overridden")
     }
 
     open func setTokenFactory(_ input: TokenFactory) {
-        RuntimeException(#function + "Must be overridden")
-
+        fatalError(#function + " must be overridden")
     }
 }

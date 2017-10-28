@@ -32,10 +32,6 @@ public class ParserInterpreter: Parser {
     internal final var sharedContextCache: PredictionContextCache =
     PredictionContextCache()
 
-    /// 
-    /// /@Deprecated
-    /// 
-    internal final var tokenNames: [String]
     internal final var ruleNames: [String]
 
     private final var vocabulary: Vocabulary
@@ -64,7 +60,6 @@ public class ParserInterpreter: Parser {
         self.grammarFileName = old.grammarFileName
         self.statesNeedingLeftRecursionContext = old.statesNeedingLeftRecursionContext
         self.decisionToDFA = old.decisionToDFA
-        self.tokenNames = old.tokenNames
         self.ruleNames = old.ruleNames
         self.vocabulary = old.vocabulary
         try  super.init(old.getTokenStream()!)
@@ -73,26 +68,11 @@ public class ParserInterpreter: Parser {
                 sharedContextCache))
     }
 
-    /// 
-    /// Use _#ParserInterpreter(String, org.antlr.v4.runtime.Vocabulary, java.util.Collection, org.antlr.v4.runtime.atn.ATN, org.antlr.v4.runtime.TokenStream)_ instead.
-    /// 
-    //@Deprecated
-    public convenience init(_ grammarFileName: String, _ tokenNames: Array<String?>?,
-                            _ ruleNames: Array<String>, _ atn: ATN, _ input: TokenStream) throws {
-        try self.init(grammarFileName, Vocabulary.fromTokenNames(tokenNames), ruleNames, atn, input)
-    }
-
     public init(_ grammarFileName: String, _ vocabulary: Vocabulary,
                 _ ruleNames: Array<String>, _ atn: ATN, _ input: TokenStream) throws {
 
         self.grammarFileName = grammarFileName
         self.atn = atn
-        self.tokenNames = [String]()//    new String[atn.maxTokenType];
-        let length = tokenNames.count
-        for i in 0..<length {
-            tokenNames[i] = vocabulary.getDisplayName(i)
-        }
-
         self.ruleNames = ruleNames
         self.vocabulary = vocabulary
         self.decisionToDFA = [DFA]() //new DFA[atn.getNumberOfDecisions()];
@@ -123,14 +103,6 @@ public class ParserInterpreter: Parser {
         return atn
     }
 
-//	override
-    /// 
-    /// /@Deprecated
-    /// 
-    public func getTokenNames() -> [String] {
-        return tokenNames
-    }
-
     override
     public func getVocabulary() -> Vocabulary {
         return vocabulary
@@ -148,17 +120,17 @@ public class ParserInterpreter: Parser {
 
     /// Begin parsing at startRuleIndex
     public func parse(_ startRuleIndex: Int) throws -> ParserRuleContext {
-        let startRuleStartState: RuleStartState = atn.ruleToStartState[startRuleIndex]
+        let startRuleStartState = atn.ruleToStartState[startRuleIndex]
 
-        let rootContext: InterpreterRuleContext = InterpreterRuleContext(nil, ATNState.INVALID_STATE_NUMBER, startRuleIndex)
+        let rootContext = InterpreterRuleContext(nil, ATNState.INVALID_STATE_NUMBER, startRuleIndex)
         if startRuleStartState.isPrecedenceRule {
-            try    enterRecursionRule(rootContext, startRuleStartState.stateNumber, startRuleIndex, 0)
+            try enterRecursionRule(rootContext, startRuleStartState.stateNumber, startRuleIndex, 0)
         } else {
             try enterRule(rootContext, startRuleStartState.stateNumber, startRuleIndex)
         }
 
         while true {
-            let p: ATNState = getATNState()!
+            let p = getATNState()!
             switch p.getStateType() {
             case ATNState.RULE_STOP:
                 // pop; return from rule
@@ -208,7 +180,7 @@ public class ParserInterpreter: Parser {
         var altNum: Int
         if p.getNumberOfTransitions() > 1 {
             try getErrorHandler().sync(self)
-            let decision: Int = (p as! DecisionState).decision
+            let decision = (p as! DecisionState).decision
             if decision == overrideDecision && _input.index() == overrideDecisionInputIndex {
                 altNum = overrideDecisionAlt
             } else {
@@ -218,7 +190,7 @@ public class ParserInterpreter: Parser {
             altNum = 1
         }
 
-        let transition: Transition = p.transition(altNum - 1)
+        let transition = p.transition(altNum - 1)
         switch transition.getSerializationType() {
         case Transition.EPSILON:
             if try statesNeedingLeftRecursionContext.get(p.stateNumber) &&
@@ -252,9 +224,9 @@ public class ParserInterpreter: Parser {
             break
 
         case Transition.RULE:
-            let ruleStartState: RuleStartState = transition.target as! RuleStartState
-            let ruleIndex: Int = ruleStartState.ruleIndex!
-            let ctx: InterpreterRuleContext = InterpreterRuleContext(_ctx, p.stateNumber, ruleIndex)
+            let ruleStartState = transition.target as! RuleStartState
+            let ruleIndex = ruleStartState.ruleIndex!
+            let ctx = InterpreterRuleContext(_ctx, p.stateNumber, ruleIndex)
             if ruleStartState.isPrecedenceRule {
                 try enterRecursionRule(ctx, ruleStartState.stateNumber, ruleIndex, (transition as! RuleTransition).precedence)
             } else {
@@ -263,25 +235,20 @@ public class ParserInterpreter: Parser {
             break
 
         case Transition.PREDICATE:
-            let predicateTransition: PredicateTransition = transition as! PredicateTransition
+            let predicateTransition = transition as! PredicateTransition
             if try !sempred(_ctx!, predicateTransition.ruleIndex, predicateTransition.predIndex) {
-
-                throw try ANTLRException.recognition(e: FailedPredicateException(self))
-
+                throw ANTLRException.recognition(e: FailedPredicateException(self))
             }
-
             break
 
         case Transition.ACTION:
-            let actionTransition: ActionTransition = transition as! ActionTransition
+            let actionTransition = transition as! ActionTransition
             try action(_ctx, actionTransition.ruleIndex, actionTransition.actionIndex)
             break
 
         case Transition.PRECEDENCE:
             if !precpred(_ctx!, (transition as! PrecedencePredicateTransition).precedence) {
-
-                throw try ANTLRException.recognition(e: FailedPredicateException(self, "precpred(_ctx,\((transition as! PrecedencePredicateTransition).precedence))"))
-
+                throw ANTLRException.recognition(e: FailedPredicateException(self, "precpred(_ctx,\((transition as! PrecedencePredicateTransition).precedence))"))
             }
             break
 
@@ -294,16 +261,16 @@ public class ParserInterpreter: Parser {
     }
 
     internal func visitRuleStopState(_ p: ATNState) throws {
-        let ruleStartState: RuleStartState = atn.ruleToStartState[p.ruleIndex!]
+        let ruleStartState = atn.ruleToStartState[p.ruleIndex!]
         if ruleStartState.isPrecedenceRule {
-            let parentContext: (ParserRuleContext?, Int) = _parentContextStack.pop()
-            try unrollRecursionContexts(parentContext.0!)
-            setState(parentContext.1)
+            let (parentContext, parentState) = _parentContextStack.pop()
+            try unrollRecursionContexts(parentContext!)
+            setState(parentState)
         } else {
             try exitRule()
         }
 
-        let ruleTransition: RuleTransition = atn.states[getState()]!.transition(0) as! RuleTransition
+        let ruleTransition = atn.states[getState()]!.transition(0) as! RuleTransition
         setState(ruleTransition.followState.stateNumber)
     }
 

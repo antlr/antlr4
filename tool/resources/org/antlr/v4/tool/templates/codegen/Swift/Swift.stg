@@ -241,12 +241,14 @@ open class <parser.name>: <superClass; null="Parser"> {
            }
            return decisionToDFA
      }()
-	internal static let _sharedContextCache: PredictionContextCache = PredictionContextCache()
+	internal static let _sharedContextCache = PredictionContextCache()
+
 	<if(parser.tokens)>
 	public enum Tokens: Int {
 		case EOF = -1, <parser.tokens:{k | <k> = <parser.tokens.(k)>}; separator=", ", wrap, anchor>
 	}
         <endif>
+
 	public static let <parser.rules:{r | RULE_<r.name> = <r.index>}; separator=", ", wrap, anchor>
 	public static let ruleNames: [String] = [
 		<parser.ruleNames:{r | "<r>"}; separator=", ", wrap, anchor>
@@ -285,8 +287,8 @@ case  <f.ruleIndex>:
 <endif>
 
 	<atn>
-   public static let _serializedATN : String = <parser.name>ATN().jsonString
-   public static let _ATN: ATN = ATNDeserializer().deserializeFromJson(_serializedATN)
+   public static let _serializedATN = <parser.name>ATN().jsonString
+   public static let _ATN = ATNDeserializer().deserializeFromJson(_serializedATN)
 }
 >>
 
@@ -297,33 +299,7 @@ private static let _LITERAL_NAMES: [String?] = [
 private static let _SYMBOLIC_NAMES: [String?] = [
 	<symbolicNames:{t | <t>}; null="nil", separator=", ", wrap, anchor>
 ]
-public static let VOCABULARY: Vocabulary = Vocabulary(_LITERAL_NAMES, _SYMBOLIC_NAMES)
-
-/**
- * @deprecated Use {@link #VOCABULARY} instead.
- */
-//@Deprecated
-public let tokenNames: [String?]? = {
-    let length = _SYMBOLIC_NAMES.count
-    var tokenNames = [String?](repeating: nil, count: length)
-	for i in 0..\<length {
-		var name = VOCABULARY.getLiteralName(i)
-		if name == nil {
-			name = VOCABULARY.getSymbolicName(i)
-		}
-		if name == nil {
-			name = "\<INVALID>"
-		}
-		tokenNames[i] = name
-	}
-	return tokenNames
-}()
-
-override
-<!//@Deprecated!>
-open func getTokenNames() -> [String?]? {
-	return tokenNames
-}
+public static let VOCABULARY = Vocabulary(_LITERAL_NAMES, _SYMBOLIC_NAMES)
 >>
 
 dumpActions(recog, argFuncs, actionFuncs, sempredFuncs) ::= <<
@@ -361,11 +337,12 @@ open override func getVocabulary() -> Vocabulary {
     return <p.name>.VOCABULARY
 }
 
-public override init(_ input:TokenStream)throws {
+public override init(_ input:TokenStream) throws {
     RuntimeMetaData.checkVersion("4.7", RuntimeMetaData.VERSION)
 	try super.init(input)
 	_interp = ParserATNSimulator(self,<p.name>._ATN,<p.name>._decisionToDFA, <parser.name>._sharedContextCache)
 }
+
 >>
 
 /* This generates a private method since the actionIndex is generated, making an
@@ -612,7 +589,7 @@ case <i><if(!choice.ast.greedy)>+1<endif>:
 
 Sync(s) ::= "sync(<s.expecting.name>);"
 
-ThrowNoViableAlt(t) ::= "throw try ANTLRException.recognition(e: NoViableAltException(self))"
+ThrowNoViableAlt(t) ::= "throw ANTLRException.recognition(e: NoViableAltException(self))"
 
 TestSetInline(s) ::= <<
 <!<s.bitsets:{bits | <if(rest(rest(bits.ttypes)))><bitsetBitfieldComparison(s, bits)><else><bitsetInlineComparison(s, bits)><endif>}; separator=" || ">!>
@@ -717,7 +694,7 @@ ArgAction(a, chunks) ::= "<chunks>"
 SemPred(p, chunks, failChunks) ::= <<
 setState(<p.stateNumber>)
 if (!(<chunks>)) {
-    throw try ANTLRException.recognition(e:FailedPredicateException(self, <p.predicate><if(failChunks)>, <failChunks><elseif(p.msg)>, <p.msg><endif>))
+    throw ANTLRException.recognition(e:FailedPredicateException(self, <p.predicate><if(failChunks)>, <failChunks><elseif(p.msg)>, <p.msg><endif>))
 }
 >>
 
@@ -796,7 +773,7 @@ open func <t.name>(_ i:Int) -> TerminalNode?{
 >>
 ContextRuleGetterDecl(r)       ::= <<
 open func <r.name>() -> <r.ctxName>? {
-	return getRuleContext(<r.ctxName>.self,0)
+	return getRuleContext(<r.ctxName>.self, 0)
 }
 >>
 ContextRuleListGetterDecl(r)   ::= <<
@@ -806,7 +783,7 @@ open func <r.name>() -> Array\<<r.ctxName>\> {
 >>
 ContextRuleListIndexedGetterDecl(r)   ::= <<
 open func <r.name>(_ i: Int) -> <r.ctxName>? {
-	return getRuleContext(<r.ctxName>.self,i)
+	return getRuleContext(<r.ctxName>.self, i)
 }
 >>
 
@@ -827,7 +804,7 @@ CaptureNextTokenType(d) ::= "<d.varName> = try _input.LA(1)"
 
 StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers,
            superClass={ParserRuleContext}) ::= <<
-open class <struct.name>:<if(contextSuperClass)><contextSuperClass><else>ParserRuleContext<endif><if(interfaces)>, <interfaces; separator=", "><endif> {
+open class <struct.name>: <if(contextSuperClass)><contextSuperClass><else>ParserRuleContext<endif><if(interfaces)>, <interfaces; separator=", "><endif> {
 	<attrs:{a | public var <a>}; separator="\n">
 	<getters:{g | <g>}; separator="\n">
 	<! <if(ctorAttrs)>public init(_ parent: ParserRuleContext,_ invokingState: Int) { super.init(parent, invokingState)  }<endif> !>
@@ -865,8 +842,8 @@ public  final class <struct.name>: <currentRule.name; format="cap">Context {
 ListenerDispatchMethod(method) ::= <<
 override
 open func <if(method.isEnter)>enter<else>exit<endif>Rule(_ listener: ParseTreeListener) {
-	if listener is <parser.grammarName>Listener {
-	 	(listener as! <parser.grammarName>Listener).<if(method.isEnter)>enter<else>exit<endif><struct.derivedFromName; format="cap">(self)
+	if let listener = listener as? <parser.grammarName>Listener {
+		listener.<if(method.isEnter)>enter<else>exit<endif><struct.derivedFromName; format="cap">(self)
 	}
 }
 >>
@@ -874,11 +851,12 @@ open func <if(method.isEnter)>enter<else>exit<endif>Rule(_ listener: ParseTreeLi
 VisitorDispatchMethod(method) ::= <<
 override
 open func accept\<T>(_ visitor: ParseTreeVisitor\<T>) -> T? {
-	if visitor is <parser.grammarName>Visitor {
-	     return (visitor as! <parser.grammarName>Visitor\<T>).visit<struct.derivedFromName; format="cap">(self)
-	}else if visitor is <parser.grammarName>BaseVisitor {
-    	 return (visitor as! <parser.grammarName>BaseVisitor\<T>).visit<struct.derivedFromName; format="cap">(self)
-    }
+	if let visitor = visitor as? <parser.grammarName>Visitor {
+	    return visitor.visit<struct.derivedFromName; format="cap">(self)
+	}
+	else if let visitor = visitor as? <parser.grammarName>BaseVisitor {
+	    return visitor.visit<struct.derivedFromName; format="cap">(self)
+	}
 	else {
 	     return visitor.visitChildren(self)
 	}
@@ -959,7 +937,7 @@ open class <lexer.name>: <superClass; null="Lexer"> {
            return decisionToDFA
      }()
 
-	internal static let _sharedContextCache:PredictionContextCache = PredictionContextCache()
+	internal static let _sharedContextCache = PredictionContextCache()
 	public static let <lexer.tokens:{k | <k>=<lexer.tokens.(k)>}; separator=", ", wrap, anchor>
 	<if(lexer.channels)>
 	public static let <lexer.channels:{k | <k>=<lexer.channels.(k)>}; separator=", ", wrap, anchor>

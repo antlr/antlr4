@@ -12,7 +12,7 @@ import Foundation
 /// This is all the parsing support code essentially; most of it is error recovery stuff.
 /// 
 open class Parser: Recognizer<ParserATNSimulator> {
-    public static let EOF: Int = -1
+    public static let EOF = -1
     public static var ConsoleError = true
 
     public class TraceListener: ParseTreeListener {
@@ -27,15 +27,12 @@ open class Parser: Recognizer<ParserATNSimulator> {
             print("enter   \(ruleName), LT(1)=\(lt1)")
         }
 
-
         public func visitTerminal(_ node: TerminalNode) {
             print("consume \(String(describing: node.getSymbol())) rule \(host.getRuleNames()[host._ctx!.getRuleIndex()])")
         }
 
-
         public func visitErrorNode(_ node: ErrorNode) {
         }
-
 
         public func exitEveryRule(_ ctx: ParserRuleContext) throws {
             let ruleName = host.getRuleNames()[ctx.getRuleIndex()]
@@ -45,22 +42,16 @@ open class Parser: Recognizer<ParserATNSimulator> {
     }
 
     public class TrimToSizeListener: ParseTreeListener {
-
-
-        public static let INSTANCE: TrimToSizeListener = TrimToSizeListener()
-
+        public static let INSTANCE = TrimToSizeListener()
 
         public func enterEveryRule(_ ctx: ParserRuleContext) {
         }
 
-
         public func visitTerminal(_ node: TerminalNode) {
         }
 
-
         public func visitErrorNode(_ node: ErrorNode) {
         }
-
 
         public func exitEveryRule(_ ctx: ParserRuleContext) {
             // TODO: Print exit info.
@@ -193,7 +184,7 @@ open class Parser: Recognizer<ParserATNSimulator> {
     /// 
     @discardableResult
     public func match(_ ttype: Int) throws -> Token {
-        var t: Token = try getCurrentToken()
+        var t = try getCurrentToken()
         if t.getType() == ttype {
             _errHandler.reportMatch(self)
             try consume()
@@ -228,7 +219,7 @@ open class Parser: Recognizer<ParserATNSimulator> {
     /// 
     @discardableResult
     public func matchWildcard() throws -> Token {
-        var t: Token = try getCurrentToken()
+        var t = try getCurrentToken()
         if t.getType() > 0 {
             _errHandler.reportMatch(self)
             try consume()
@@ -297,18 +288,11 @@ open class Parser: Recognizer<ParserATNSimulator> {
     /// using the default _org.antlr.v4.runtime.Parser.TrimToSizeListener_ during the parse process.
     /// 
     public func getTrimParseTree() -> Bool {
-
         return !getParseListeners().filter({ $0 === TrimToSizeListener.INSTANCE }).isEmpty
     }
 
-
-    public func getParseListeners() -> Array<ParseTreeListener> {
-        let listeners: Array<ParseTreeListener>? = _parseListeners
-        if listeners == nil {
-            return Array<ParseTreeListener>()
-        }
-
-        return listeners!
+    public func getParseListeners() -> [ParseTreeListener] {
+        return _parseListeners ?? [ParseTreeListener]()
     }
 
     /// 
@@ -336,14 +320,12 @@ open class Parser: Recognizer<ParserATNSimulator> {
     /// 
     /// - Parameter listener: the listener to add
     /// 
-    /// - Throws: _ANTLRError.nullPointer_ if listener is `null`
-    /// 
     public func addParseListener(_ listener: ParseTreeListener) {
         if _parseListeners == nil {
-            _parseListeners = Array<ParseTreeListener>()
+            _parseListeners = [ParseTreeListener]()
         }
 
-        self._parseListeners!.append(listener)
+        _parseListeners!.append(listener)
     }
 
     /// 
@@ -401,11 +383,11 @@ open class Parser: Recognizer<ParserATNSimulator> {
     public func triggerExitRuleEvent() throws {
         // reverse order walk of listeners
         if let _parseListeners = _parseListeners, let _ctx = _ctx {
-            var i: Int = _parseListeners.count - 1
+            var i = _parseListeners.count - 1
             while i >= 0 {
-                let listener: ParseTreeListener = _parseListeners[i]
+                let listener = _parseListeners[i]
                 _ctx.exitRule(listener)
-                try  listener.exitEveryRule(_ctx)
+                try listener.exitEveryRule(_ctx)
                 i -= 1
             }
         }
@@ -423,14 +405,12 @@ open class Parser: Recognizer<ParserATNSimulator> {
 
     override
     open func getTokenFactory() -> TokenFactory {
-        //<AnyObject>
         return _input.getTokenSource().getTokenFactory()
     }
 
     /// Tell our token source and error strategy about a new way to create tokens.
     override
     open func setTokenFactory(_ factory: TokenFactory) {
-        //<AnyObject>
         _input.getTokenSource().setTokenFactory(factory)
     }
 
@@ -441,15 +421,13 @@ open class Parser: Recognizer<ParserATNSimulator> {
     /// - Throws: _ANTLRError.unsupportedOperation_ if the current parser does not
     /// implement the _#getSerializedATN()_ method.
     /// 
-
     public func getATNWithBypassAlts() -> ATN {
-        let serializedAtn: String = getSerializedATN()
+        let serializedAtn = getSerializedATN()
 
-        var result: ATN? = bypassAltsAtnCache[serializedAtn]
-        bypassAltsAtnCacheMutex.synchronized {
-            [unowned self] in
+        var result = bypassAltsAtnCache[serializedAtn]
+        bypassAltsAtnCacheMutex.synchronized { [unowned self] in
             if result == nil {
-                let deserializationOptions: ATNDeserializationOptions = ATNDeserializationOptions()
+                let deserializationOptions = ATNDeserializationOptions()
                 try! deserializationOptions.setGenerateRuleBypassTransitions(true)
                 result = try! ATNDeserializer(deserializationOptions).deserialize(Array(serializedAtn.characters))
                 self.bypassAltsAtnCache[serializedAtn] = result!
@@ -471,14 +449,12 @@ open class Parser: Recognizer<ParserATNSimulator> {
     /// 
     public func compileParseTreePattern(_ pattern: String, _ patternRuleIndex: Int) throws -> ParseTreePattern {
         if let tokenStream = getTokenStream() {
-            let tokenSource: TokenSource = tokenStream.getTokenSource()
-            if tokenSource is Lexer {
-                let lexer: Lexer = tokenSource as! Lexer
+            let tokenSource = tokenStream.getTokenSource()
+            if let lexer = tokenSource as? Lexer {
                 return try compileParseTreePattern(pattern, patternRuleIndex, lexer)
             }
         }
         throw ANTLRError.unsupportedOperation(msg: "Parser can't discover a lexer to use")
-
     }
 
     /// 
@@ -487,7 +463,7 @@ open class Parser: Recognizer<ParserATNSimulator> {
     /// 
     public func compileParseTreePattern(_ pattern: String, _ patternRuleIndex: Int,
                                         _ lexer: Lexer) throws -> ParseTreePattern {
-        let m: ParseTreePatternMatcher = ParseTreePatternMatcher(lexer, self)
+        let m = ParseTreePatternMatcher(lexer, self)
         return try m.compile(pattern, patternRuleIndex)
     }
 
@@ -530,19 +506,21 @@ open class Parser: Recognizer<ParserATNSimulator> {
         return try _input.LT(1)!
     }
 
-    public final func notifyErrorListeners(_ msg: String) throws {
-        try notifyErrorListeners(getCurrentToken(), msg, nil)
+    public final func notifyErrorListeners(_ msg: String) {
+        let token = try? getCurrentToken()
+        notifyErrorListeners(token, msg, nil)
     }
 
-    public func notifyErrorListeners(_ offendingToken: Token, _ msg: String,
-                                     _ e: AnyObject?) {
+    public func notifyErrorListeners(_ offendingToken: Token?, _ msg: String, _ e: AnyObject?) {
         _syntaxErrors += 1
-        var line: Int = -1
-        var charPositionInLine: Int = -1
-        line = offendingToken.getLine()
-        charPositionInLine = offendingToken.getCharPositionInLine()
+        var line = -1
+        var charPositionInLine = -1
+        if let offendingToken = offendingToken {
+            line = offendingToken.getLine()
+            charPositionInLine = offendingToken.getCharPositionInLine()
+        }
 
-        let listener: ANTLRErrorListener = getErrorListenerDispatch()
+        let listener = getErrorListenerDispatch()
         listener.syntaxError(self, offendingToken, line, charPositionInLine, msg, e)
     }
 
@@ -569,27 +547,27 @@ open class Parser: Recognizer<ParserATNSimulator> {
     /// 
     @discardableResult
     public func consume() throws -> Token {
-        let o: Token = try getCurrentToken()
+        let o = try getCurrentToken()
         if o.getType() != Parser.EOF {
             try getInputStream()!.consume()
         }
         guard let _ctx = _ctx else {
             return o
         }
-        let hasListener: Bool = _parseListeners != nil && !_parseListeners!.isEmpty
+        let hasListener = _parseListeners != nil && !_parseListeners!.isEmpty
 
         if _buildParseTrees || hasListener {
             if _errHandler.inErrorRecoveryMode(self) {
-                let node: ErrorNode = _ctx.addErrorNode(createErrorNode(parent: _ctx, t: o))
+                let node = _ctx.addErrorNode(createErrorNode(parent: _ctx, t: o))
                 if let _parseListeners = _parseListeners {
-                    for listener: ParseTreeListener in _parseListeners {
+                    for listener in _parseListeners {
                         listener.visitErrorNode(node)
                     }
                 }
             } else {
-                let node: TerminalNode = _ctx.addChild(createTerminalNode(parent: _ctx, t: o))
+                let node = _ctx.addChild(createTerminalNode(parent: _ctx, t: o))
                 if let _parseListeners = _parseListeners {
-                    for listener: ParseTreeListener in _parseListeners {
+                    for listener in _parseListeners {
                         listener.visitTerminal(node)
                     }
                 }
@@ -705,7 +683,7 @@ open class Parser: Recognizer<ParserATNSimulator> {
     /// Make the current context the child of the incoming localctx.
     /// 
     public func pushNewRecursionContext(_ localctx: ParserRuleContext, _ state: Int, _ ruleIndex: Int) throws {
-        let previous: ParserRuleContext = _ctx!
+        let previous = _ctx!
         previous.parent = localctx
         previous.invokingState = state
         previous.stop = try _input.LT(-1)
@@ -724,12 +702,12 @@ open class Parser: Recognizer<ParserATNSimulator> {
     public func unrollRecursionContexts(_ _parentctx: ParserRuleContext?) throws {
         _precedenceStack.pop()
         _ctx!.stop = try _input.LT(-1)
-        let retctx: ParserRuleContext = _ctx! // save current ctx (return value)
+        let retctx = _ctx! // save current ctx (return value)
 
         // unroll so _ctx is as it was before call to recursive method
         if _parseListeners != nil {
-            while let ctxWrap = _ctx , ctxWrap !== _parentctx {
-                try  triggerExitRuleEvent()
+            while let ctxWrap = _ctx, ctxWrap !== _parentctx {
+                try triggerExitRuleEvent()
                 _ctx = ctxWrap.parent as? ParserRuleContext
             }
         } else {
@@ -746,7 +724,7 @@ open class Parser: Recognizer<ParserATNSimulator> {
     }
 
     public func getInvokingContext(_ ruleIndex: Int) -> ParserRuleContext? {
-        var p: ParserRuleContext? = _ctx
+        var p = _ctx
         while let pWrap = p {
             if pWrap.getRuleIndex() == ruleIndex {
                 return pWrap
@@ -859,7 +837,7 @@ open class Parser: Recognizer<ParserATNSimulator> {
 //			parser.getInterpreter()!.setPredictionMode(PredictionMode.LL_EXACT_AMBIG_DETECTION);
 //
 //			// get ambig trees
-//			var alt : Int = ambiguityInfo.ambigAlts.nextSetBit(0);
+//			var alt : Int = ambiguityInfo.ambigAlts.firstSetBit();
 //			while  alt>=0  {
 //				// re-parse entire input for all ambiguous alternatives
 //				// (don't have to do first as it's been parsed, but do again for simplicity
@@ -897,12 +875,11 @@ open class Parser: Recognizer<ParserATNSimulator> {
     /// - Returns: `true` if `symbol` can follow the current state in
     /// the ATN, otherwise `false`.
     /// 
-    public func isExpectedToken(_ symbol: Int) throws -> Bool {
-//   		return getInterpreter().atn.nextTokens(_ctx);
-        let atn: ATN = getInterpreter().atn
+    public func isExpectedToken(_ symbol: Int) -> Bool {
+        let atn = getInterpreter().atn
         var ctx: ParserRuleContext? = _ctx
-        let s: ATNState = atn.states[getState()]!
-        var following: IntervalSet = try  atn.nextTokens(s)
+        let s = atn.states[getState()]!
+        var following = atn.nextTokens(s)
         if following.contains(symbol) {
             return true
         }
@@ -911,10 +888,10 @@ open class Parser: Recognizer<ParserATNSimulator> {
             return false
         }
 
-        while let ctxWrap = ctx , ctxWrap.invokingState >= 0 && following.contains(CommonToken.EPSILON) {
-            let invokingState: ATNState = atn.states[ctxWrap.invokingState]!
-            let rt: RuleTransition = invokingState.transition(0) as! RuleTransition
-            following = try  atn.nextTokens(rt.followState)
+        while let ctxWrap = ctx, ctxWrap.invokingState >= 0 && following.contains(CommonToken.EPSILON) {
+            let invokingState = atn.states[ctxWrap.invokingState]!
+            let rt = invokingState.transition(0) as! RuleTransition
+            following = atn.nextTokens(rt.followState)
             if following.contains(symbol) {
                 return true
             }
@@ -941,19 +918,15 @@ open class Parser: Recognizer<ParserATNSimulator> {
     }
 
 
-    public func getExpectedTokensWithinCurrentRule() throws -> IntervalSet {
-        let atn: ATN = getInterpreter().atn
-        let s: ATNState = atn.states[getState()]!
-        return try  atn.nextTokens(s)
+    public func getExpectedTokensWithinCurrentRule() -> IntervalSet {
+        let atn = getInterpreter().atn
+        let s = atn.states[getState()]!
+        return atn.nextTokens(s)
     }
 
     /// Get a rule's index (i.e., `RULE_ruleName` field) or -1 if not found.
     public func getRuleIndex(_ ruleName: String) -> Int {
-        let ruleIndex: Int? = getRuleIndexMap()[ruleName]
-        if ruleIndex != nil {
-            return ruleIndex!
-        }
-        return -1
+        return getRuleIndexMap()[ruleName] ?? -1
     }
 
     public func getRuleContext() -> ParserRuleContext? {
@@ -967,17 +940,17 @@ open class Parser: Recognizer<ParserATNSimulator> {
     /// 
     /// This is very useful for error messages.
     /// 
-    public func getRuleInvocationStack() -> Array<String> {
+    public func getRuleInvocationStack() -> [String] {
         return getRuleInvocationStack(_ctx)
     }
 
-    public func getRuleInvocationStack(_ p: RuleContext?) -> Array<String> {
+    public func getRuleInvocationStack(_ p: RuleContext?) -> [String] {
         var p = p
-        var ruleNames: [String] = getRuleNames()
-        var stack: Array<String> = Array<String>()
+        var ruleNames = getRuleNames()
+        var stack = [String]()
         while let pWrap = p {
             // compute what follows who invoked us
-            let ruleIndex: Int = pWrap.getRuleIndex()
+            let ruleIndex = pWrap.getRuleIndex()
             if ruleIndex < 0 {
                 stack.append("n/a")
             } else {
@@ -989,16 +962,14 @@ open class Parser: Recognizer<ParserATNSimulator> {
     }
 
     /// For debugging and other purposes.
-    public func getDFAStrings() -> Array<String> {
-        var s: Array<String> = Array<String>()
+    public func getDFAStrings() -> [String] {
+        var s = [String]()
         guard let _interp = _interp  else {
             return s
         }
-        decisionToDFAMutex.synchronized {
-            [unowned self] in
-
+        decisionToDFAMutex.synchronized { [unowned self] in
             for d in 0..<_interp.decisionToDFA.count {
-                let dfa: DFA = _interp.decisionToDFA[d]
+                let dfa = _interp.decisionToDFA[d]
                 s.append(dfa.toString(self.getVocabulary()))
             }
 
@@ -1008,15 +979,13 @@ open class Parser: Recognizer<ParserATNSimulator> {
 
     /// For debugging and other purposes.
     public func dumpDFA() {
-        guard let _interp = _interp  else {
+        guard let _interp = _interp else {
             return
         }
-        decisionToDFAMutex.synchronized {
-            [unowned self] in
-            var seenOne: Bool = false
+        decisionToDFAMutex.synchronized { [unowned self] in
+            var seenOne = false
 
-            for d in 0..<_interp.decisionToDFA.count {
-                let dfa: DFA = _interp.decisionToDFA[d]
+            for dfa in _interp.decisionToDFA {
                 if !dfa.states.isEmpty {
                     if seenOne {
                         print("")
@@ -1036,9 +1005,9 @@ open class Parser: Recognizer<ParserATNSimulator> {
 
     override
     open func getParseInfo() -> ParseInfo? {
-        let interp: ParserATNSimulator? = getInterpreter()
-        if interp is ProfilingATNSimulator {
-            return ParseInfo(interp as! ProfilingATNSimulator)
+        let interp = getInterpreter()
+        if let interp = interp as? ProfilingATNSimulator {
+            return ParseInfo(interp)
         }
         return nil
     }
@@ -1047,16 +1016,15 @@ open class Parser: Recognizer<ParserATNSimulator> {
     /// - Since: 4.3
     /// 
     public func setProfile(_ profile: Bool) {
-        let interp: ParserATNSimulator = getInterpreter()
-        let saveMode: PredictionMode = interp.getPredictionMode()
+        let interp = getInterpreter()
+        let saveMode = interp.getPredictionMode()
         if profile {
             if !(interp is ProfilingATNSimulator) {
                 setInterpreter(ProfilingATNSimulator(self))
             }
         } else {
             if interp is ProfilingATNSimulator {
-                let sim: ParserATNSimulator =
-                ParserATNSimulator(self, getATN(), interp.decisionToDFA, interp.getSharedContextCache()!)
+                let sim = ParserATNSimulator(self, getATN(), interp.decisionToDFA, interp.getSharedContextCache()!)
                 setInterpreter(sim)
             }
         }

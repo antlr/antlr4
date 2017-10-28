@@ -11,16 +11,15 @@
 /// and what kind of problem occurred.
 /// 
 
-public class RecognitionException<T:ATNSimulator>  {
+public class RecognitionException {
     /// 
     /// The _org.antlr.v4.runtime.Recognizer_ where this exception originated.
     /// 
-    private final var recognizer: Recognizer<T>?
-    //Recognizer<AnyObject,ATNSimulator>? ;
+    private final var recognizer: RecognizerProtocol?
 
-    private final var ctx: RuleContext?
+    private final weak var ctx: RuleContext?
 
-    private final var input: IntStream
+    private final var input: IntStream?
 
     /// 
     /// The current _org.antlr.v4.runtime.Token_ when an error occurred. Since not all streams
@@ -29,28 +28,18 @@ public class RecognitionException<T:ATNSimulator>  {
     /// 
     private var offendingToken: Token!
 
-    private var offendingState: Int = -1
+    private var offendingState = -1
 
     public var message: String?
-    public init(_ recognizer: Recognizer<T>?,
-                _ input: IntStream,
-                _ ctx: ParserRuleContext?) {
-        self.recognizer = recognizer
-        self.input = input
-        self.ctx = ctx
-        if let recognizer = recognizer {
-            self.offendingState = recognizer.getState()
-        }
-    }
 
-    public init(_ message: String,
-                _ recognizer: Recognizer<T>?,
+    public init(_ recognizer: RecognizerProtocol?,
                 _ input: IntStream,
-                _ ctx: ParserRuleContext?) {
-        self.message = message
+                _ ctx: ParserRuleContext? = nil,
+                _ message: String? = nil) {
         self.recognizer = recognizer
         self.input = input
         self.ctx = ctx
+        self.message = message
         if let recognizer = recognizer {
             self.offendingState = recognizer.getState()
         }
@@ -87,7 +76,6 @@ public class RecognitionException<T:ATNSimulator>  {
         if let recognizer = recognizer {
             return try? recognizer.getATN().getExpectedTokens(offendingState, ctx!)
         }
-
         return nil
     }
 
@@ -113,10 +101,13 @@ public class RecognitionException<T:ATNSimulator>  {
     /// where this exception was thrown, or `null` if the stream is not
     /// available.
     /// 
-    public func getInputStream() -> IntStream {
+    public func getInputStream() -> IntStream? {
         return input
     }
 
+    public func clearInputStream() {
+        input = nil
+    }
 
     public func getOffendingToken() -> Token {
         return offendingToken
@@ -134,7 +125,11 @@ public class RecognitionException<T:ATNSimulator>  {
     /// - Returns: The recognizer where this exception occurred, or `null` if
     /// the recognizer is not available.
     /// 
-    public func getRecognizer() -> Recognizer<T>? {
+    public func getRecognizer() -> RecognizerProtocol? {
         return recognizer
+    }
+
+    public func clearRecognizer() {
+        self.recognizer = nil
     }
 }

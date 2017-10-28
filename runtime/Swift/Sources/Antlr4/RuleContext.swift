@@ -56,17 +56,18 @@
 /// 
 
 open class RuleContext: RuleNode {
-    public static let EMPTY: ParserRuleContext = ParserRuleContext()
+    public static let EMPTY = ParserRuleContext()
 
     /// What context invoked this rule?
-    public var parent: RuleContext?
+    public weak var parent: RuleContext?
 
     /// What state invoked the rule associated with this context?
     /// The "return address" is the followState of invokingState
     /// If parent is null, this should be -1 this context object represents
     /// the start rule.
     /// 
-    public var invokingState: Int = -1
+    public var invokingState = -1
+
     override
     public init() {
         super.init()
@@ -79,7 +80,7 @@ open class RuleContext: RuleNode {
     }
 
     open func depth() -> Int {
-        var n: Int = 0
+        var n = 0
         var p: RuleContext? = self
         while let pWrap = p {
             p = pWrap.parent
@@ -131,7 +132,7 @@ open class RuleContext: RuleNode {
             return ""
         }
 
-        let builder: StringBuilder = StringBuilder()
+        let builder = StringBuilder()
         for i in 0..<length {
             builder.append((getChild(i) as! ParseTree).getText())
         }
@@ -159,54 +160,10 @@ open class RuleContext: RuleNode {
         return visitor.visitChildren(self)
     }
 
-//     /// Call this method to view a parse tree in a dialog box visually.
-//     public func inspect(parser : Parser) -> Future<JDialog> {
-//         var ruleNames : Array<String> = parser != nil ? Arrays.asList(parser.getRuleNames()) : null;
-//         return inspect(ruleNames);
-//     }
-//
-//     public func inspect(ruleNames : Array<String>) -> Future<JDialog> {
-//         var viewer : TreeViewer = TreeViewer(ruleNames, self);
-//         return viewer.open();
-//     }
-//
-//     /// Save this tree in a postscript file
-//     public func save(parser : Parser, _ fileName : String)
-//         throws; IOException, PrintException
-//     {
-//         var ruleNames : Array<String> = parser != nil ? Arrays.asList(parser.getRuleNames()) : null;
-//         save(ruleNames, fileName);
-//     }
-//
-//     /// Save this tree in a postscript file using a particular font name and size
-//     public func save(parser : Parser, _ fileName : String,
-//                      _ fontName : String, _ fontSize : Int)
-//         throws; IOException
-//     {
-//         var ruleNames : Array<String> = parser != nil ? Arrays.asList(parser.getRuleNames()) : null;
-//         save(ruleNames, fileName, fontName, fontSize);
-//     }
-//
-//     /// Save this tree in a postscript file
-//     public func save(ruleNames : Array<String>, _ fileName : String)
-//         throws; IOException, PrintException
-//     {
-//         Trees.writePS(self, ruleNames, fileName);
-//     }
-//
-//     /// Save this tree in a postscript file using a particular font name and size
-//     public func save(ruleNames : Array<String>, _ fileName : String,
-//                      _ fontName : String, _ fontSize : Int)
-//         throws; IOException
-//     {
-//         Trees.writePS(self, ruleNames, fileName, fontName, fontSize);
-//     }
- 
     /// Print out a whole tree, not just a node, in LISP format
     /// (root child1 .. childN). Print just a node if this is a leaf.
     /// We have to know the recognizer so we can get rule names.
-    /// 
-
+    ///
     open override func toStringTree(_ recog: Parser) -> String {
         return Trees.toStringTree(self, recog)
     }
@@ -214,54 +171,51 @@ open class RuleContext: RuleNode {
     /// Print out a whole tree, not just a node, in LISP format
     /// (root child1 .. childN). Print just a node if this is a leaf.
     /// 
-    public func toStringTree(_ ruleNames: Array<String>?) -> String {
+    public func toStringTree(_ ruleNames: [String]?) -> String {
         return Trees.toStringTree(self, ruleNames)
     }
 
-
     open override func toStringTree() -> String {
-        let info: Array<String>? = nil
-        return toStringTree(info)
+        return toStringTree(nil)
     }
+
     open override var description: String {
-        let p1: Array<String>? = nil
-        let p2: RuleContext? = nil
-        return toString(p1, p2)
+        return toString(nil, nil)
     }
 
      open override var debugDescription: String {
          return description
     }
 
-    public final func toString<T:ATNSimulator>(_ recog: Recognizer<T>) -> String {
+    public final func toString<T>(_ recog: Recognizer<T>) -> String {
         return toString(recog, ParserRuleContext.EMPTY)
     }
 
-    public final func toString(_ ruleNames: Array<String>) -> String {
+    public final func toString(_ ruleNames: [String]) -> String {
         return toString(ruleNames, nil)
     }
 
     // recog null unless ParserRuleContext, in which case we use subclass toString(...)
-    open func toString<T:ATNSimulator>(_ recog: Recognizer<T>?, _ stop: RuleContext) -> String {
-        let ruleNames: [String]? = recog != nil ? recog!.getRuleNames() : nil
-        let ruleNamesList: Array<String>? = ruleNames ?? nil
-        return toString(ruleNamesList, stop)
+    open func toString<T>(_ recog: Recognizer<T>?, _ stop: RuleContext) -> String {
+        let ruleNames = recog?.getRuleNames()
+        return toString(ruleNames, stop)
     }
 
-    open func toString(_ ruleNames: Array<String>?, _ stop: RuleContext?) -> String {
-        let buf: StringBuilder = StringBuilder()
+    open func toString(_ ruleNames: [String]?, _ stop: RuleContext?) -> String {
+        let buf = StringBuilder()
         var p: RuleContext? = self
         buf.append("[")
-        while let pWrap = p , pWrap !== stop {
-            if ruleNames == nil {
+        while let pWrap = p, pWrap !== stop {
+            if let ruleNames = ruleNames {
+                let ruleIndex = pWrap.getRuleIndex()
+                let ruleIndexInRange = (ruleIndex >= 0 && ruleIndex < ruleNames.count)
+                let ruleName = (ruleIndexInRange ? ruleNames[ruleIndex] : String(ruleIndex))
+                buf.append(ruleName)
+            }
+            else {
                 if !pWrap.isEmpty() {
                     buf.append(pWrap.invokingState)
                 }
-            } else {
-                let ruleIndex: Int = pWrap.getRuleIndex()
-                let ruleIndexInRange: Bool =  ruleIndex >= 0 && ruleIndex < ruleNames!.count
-                let ruleName: String = ruleIndexInRange ? ruleNames![ruleIndex] : String(ruleIndex)
-                buf.append(ruleName)
             }
 
             if pWrap.parent != nil && (ruleNames != nil || !pWrap.parent!.isEmpty()) {
