@@ -89,7 +89,8 @@ public class SymbolChecks {
 			nameNode = (GrammarAST) ampersandAST.getChild(0);
 			if (ampersandAST.getChildCount() == 2) {
 				name = nameNode.getText();
-			} else {
+			}
+			else {
 				scope = nameNode.getText();
 				name = ampersandAST.getChild(1).getText();
 			}
@@ -100,7 +101,8 @@ public class SymbolChecks {
 			}
 			if (!scopeActions.contains(name)) {
 				scopeActions.add(name);
-			} else {
+			}
+			else {
 				errMgr.grammarError(ErrorType.ACTION_REDEFINITION,
 						g.fileName, nameNode.token, name);
 			}
@@ -131,7 +133,8 @@ public class SymbolChecks {
 								List<LabelElementPair> list;
 								if (labelPairs.containsKey(labelName)) {
 									list = labelPairs.get(labelName);
-								} else {
+								}
+								else {
 									list = new ArrayList<>();
 									labelPairs.put(labelName, list);
 								}
@@ -143,7 +146,8 @@ public class SymbolChecks {
 							labelNameSpace.clear();
 							checkLabelPairs(r, labelNameSpace, internalPairs);
 						}
-					} else {
+					}
+					else {
 						checkLabelPairs(r, labelNameSpace, pairs);
 					}
 				}
@@ -158,7 +162,8 @@ public class SymbolChecks {
 			LabelElementPair prev = labelNameSpace.get(name);
 			if (prev == null) {
 				labelNameSpace.put(name, p);
-			} else {
+			}
+			else {
 				checkForTypeMismatch(r, prev, p);
 			}
 		}
@@ -167,16 +172,20 @@ public class SymbolChecks {
 	private String findAltLabelName(CommonTree label) {
 		if (label == null) {
 			return null;
-		} else if (label instanceof AltAST) {
+		}
+		else if (label instanceof AltAST) {
 			AltAST altAST = (AltAST) label;
 			if (altAST.altLabel != null) {
 				return altAST.altLabel.toString();
-			} else if (altAST.leftRecursiveAltInfo != null) {
+			}
+			else if (altAST.leftRecursiveAltInfo != null) {
 				return altAST.leftRecursiveAltInfo.altLabel.toString();
-			} else {
+			}
+			else {
 				return findAltLabelName(label.parent);
 			}
-		} else {
+		}
+		else {
 			return findAltLabelName(label.parent);
 		}
 	}
@@ -420,7 +429,8 @@ public class SymbolChecks {
 				errMgr.grammarError(ErrorType.RULE_HAS_NO_ARGS,
 						g.fileName, ref.token, ruleName);
 
-			} else if (arg == null && (r != null && r.args != null)) {
+			}
+			else if (arg == null && (r != null && r.args != null)) {
 				errMgr.grammarError(ErrorType.MISSING_RULE_ARGS,
 						g.fileName, ref.token, ruleName);
 			}
@@ -437,7 +447,8 @@ public class SymbolChecks {
 				errMgr.grammarError(ErrorType.NO_SUCH_GRAMMAR_SCOPE,
 						g.fileName, grammar.token, grammar.getText(),
 						rule.getText());
-			} else {
+			}
+			else {
 				if (g.getRule(grammar.getText(), rule.getText()) == null) {
 					errMgr.grammarError(ErrorType.NO_SUCH_RULE_IN_SCOPE,
 							g.fileName, rule.token, grammar.getText(),
