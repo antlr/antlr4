@@ -413,9 +413,11 @@ public class TestSymbolIssues extends BaseJavaToolTest {
 				"TOKEN6: 'asdf';\n" +
 				"TOKEN7: 'qwer'+;\n" +
 				"TOKEN8: 'a' 'b' | 'b' | 'a' 'b';\n" +
+				"fragment\n" +
+				"TOKEN9: 'asdf' | 'qwer' | 'qwer';\n" +
 				"\n" +
 				"mode MODE1;\n" +
-				"TOKEN9: 'asdf';\n" +
+				"TOKEN10: 'asdf';\n" +
 				"\n" +
 				"fragment A: 'A';",
 
@@ -423,7 +425,8 @@ public class TestSymbolIssues extends BaseJavaToolTest {
 				"warning(" + ErrorType.TOKEN_UNREACHABLE.code + "): Test.g4:5:0: One of the token TOKEN4 values unreachable. qwer is always overlapped by token TOKEN1\n" +
 				"warning(" + ErrorType.TOKEN_UNREACHABLE.code + "): Test.g4:7:0: One of the token TOKEN6 values unreachable. asdf is always overlapped by token TOKEN1\n" +
 				"warning(" + ErrorType.TOKEN_UNREACHABLE.code + "): Test.g4:7:0: One of the token TOKEN6 values unreachable. asdf is always overlapped by token TOKEN3\n" +
-				"warning(" + ErrorType.TOKEN_UNREACHABLE.code + "): Test.g4:9:0: One of the token TOKEN8 values unreachable. ab is always overlapped by token TOKEN8\n"
+				"warning(" + ErrorType.TOKEN_UNREACHABLE.code + "): Test.g4:9:0: One of the token TOKEN8 values unreachable. ab is always overlapped by token TOKEN8\n" +
+				"warning(" + ErrorType.TOKEN_UNREACHABLE.code + "): Test.g4:11:0: One of the token TOKEN9 values unreachable. qwer is always overlapped by token TOKEN9\n"
 		};
 
 		testErrors(test, false);

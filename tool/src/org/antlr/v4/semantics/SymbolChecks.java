@@ -12,8 +12,6 @@ import org.antlr.v4.automata.LexerATNFactory;
 import org.antlr.v4.parse.ANTLRLexer;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.misc.IntervalSet;
-import org.antlr.v4.runtime.misc.MultiMap;
 import org.antlr.v4.tool.Alternative;
 import org.antlr.v4.tool.Attribute;
 import org.antlr.v4.tool.AttributeDict;
@@ -347,12 +345,10 @@ public class SymbolChecks {
 				for (int i = 0; i < rules.size(); i++) {
 					Rule rule = rules.get(i);
 
-					if (!rule.isFragment()) {
-						List<String> ruleStringAlts = getSingleTokenValues(rule);
-						if (ruleStringAlts != null && ruleStringAlts.size() > 0) {
-							stringLiteralRules.add(rule);
-							stringLiteralValues.add(ruleStringAlts);
-						}
+					List<String> ruleStringAlts = getSingleTokenValues(rule);
+					if (ruleStringAlts != null && ruleStringAlts.size() > 0) {
+						stringLiteralRules.add(rule);
+						stringLiteralValues.add(ruleStringAlts);
 					}
 				}
 
@@ -362,8 +358,14 @@ public class SymbolChecks {
 					Rule rule1 =  stringLiteralRules.get(i);
 					checkForOverlap(g, rule1, rule1, firstTokenStringValues, stringLiteralValues.get(i));
 
-					for (int j = i + 1; j < stringLiteralRules.size(); j++) {
-						checkForOverlap(g, rule1, stringLiteralRules.get(j), firstTokenStringValues, stringLiteralValues.get(j));
+					// Check fragment rules only with themselfs
+					if (!rule1.isFragment()) {
+						for (int j = i + 1; j < stringLiteralRules.size(); j++) {
+							Rule rule2 = stringLiteralRules.get(j);
+							if (!rule2.isFragment()) {
+								checkForOverlap(g, rule1, stringLiteralRules.get(j), firstTokenStringValues, stringLiteralValues.get(j));
+							}
+						}
 					}
 				}
 			}
