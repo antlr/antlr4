@@ -169,3 +169,4 @@ YYYY/MM/DD, github id, Full name, email
 2017/10/15, simkimsia, Sim Kim Sia, kimcity@gmail.com
 2017/10/27, Griffon26, Maurice van der Pot, griffon26@kfk4ever.com
 2017/05/29, rlfnb, Ralf Neeb, rlfnb@rlfnb.de
+2017/10/29, gendalph, Максим Прохоренко, Maxim\dotProhorenko@gm@il.com
