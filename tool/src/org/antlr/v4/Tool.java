@@ -191,8 +191,11 @@ public class Tool {
 	public Tool(String[] args) {
 		this.args = args;
 		errMgr = new ErrorManager(this);
-		errMgr.setFormat(msgFormat);
+		// We have to use the default message format until we have
+		// parsed the -message-format command line option.
+		errMgr.setFormat("antlr");
 		handleArgs();
+		errMgr.setFormat(msgFormat);
 	}
 
 	protected void handleArgs() {
