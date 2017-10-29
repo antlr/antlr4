@@ -17,14 +17,14 @@ public class DFAEdgeCache {
 	private static final int DEFAULT_INITIAL_CAPACITY = 2;
 
 	// volatile guarantees atomic reference copy.
-	private volatile SymbolEdgeMap<DFAState> edgeMap;
+	private volatile SymbolEdgeMap edgeMap;
 
 	public DFAEdgeCache() {
 		this(DEFAULT_INITIAL_CAPACITY);
 	}
 
 	public DFAEdgeCache(int initialCapacity) {
-		edgeMap = new SymbolEdgeMap<>(initialCapacity);
+		edgeMap = new SymbolEdgeMap(initialCapacity);
 	}
 
 	public synchronized void addEdge(int symbol, DFAState state) {
@@ -36,7 +36,7 @@ public class DFAEdgeCache {
 	public DFAState getTargetState(int symbol) {
 		// Obtain a reference to current edge map. Even if the edgeMap instance is changed
 		// by a writer thread, we can still read a consistent version of the map.
-		SymbolEdgeMap<DFAState> map = edgeMap;
+		SymbolEdgeMap map = edgeMap;
 		return map.get(symbol);
 	}
 
@@ -60,19 +60,17 @@ public class DFAEdgeCache {
 	 * If put operation fails (not enough space in the map for efficient gets), it just returns false
 	 * it is callers responsibility to create a new Map with expanded size and replace the old one.
 	 */
-	private static final class SymbolEdgeMap<T> {
+	private static final class SymbolEdgeMap {
 
 		// Special value to mark empty cells.
 		private static final int EMPTY = Integer.MIN_VALUE;
-
-		private static final int DEFAULT_INITIAL_CAPACITY = 2;
 
 		private static final int CAPACITY_LIMIT = 1 << 29;
 		/**
 		 * Capacity of the map is expanded when size reaches to
 		 * capacity * LOAD_FACTOR.
 		 */
-		private static final float LOAD_FACTOR = 0.65f;
+		private static final float LOAD_FACTOR = 0.60f;
 
 		/**
 		 * Map capacity is always a power of 2. With this property,
@@ -83,7 +81,7 @@ public class DFAEdgeCache {
 
 		// Backing arrays for keys and value references.
 		protected int[] keys;
-		protected T[] values;
+		protected DFAState[] values;
 
 		// Number of keys in the map = size of the map.
 		private int keyCount;
@@ -103,7 +101,7 @@ public class DFAEdgeCache {
 		SymbolEdgeMap(int capacity) {
 			capacity = adjustInitialCapacity(capacity);
 			keys = new int[capacity];
-			values = (T[]) new Object[keys.length];
+			values = new DFAState[keys.length];
 			Arrays.fill(keys, EMPTY);
 			modulo = keys.length - 1;
 			threshold = (int) (capacity * LOAD_FACTOR);
@@ -137,7 +135,7 @@ public class DFAEdgeCache {
 			}
 		}
 
-		public boolean put(int key, T value) {
+		public boolean put(int key, DFAState value) {
 			checkKey(key);
 			if (keyCount == threshold) {
 				// Caller should create a new version with expanded capacity.
@@ -160,11 +158,14 @@ public class DFAEdgeCache {
 		 * not exist.
 		 * @throws IllegalArgumentException if key is {@code Integer.MIN_INT}
 		 */
-		public T get(int key) {
+		public DFAState get(int key) {
 			checkKey(key);
 			int slot = key & modulo;
 			if (key == keys[slot]) {
 				return values[slot];
+			}
+			if (key == EMPTY) {
+				return null;
 			}
 			// Apply linear probing.
 			while (true) {
@@ -207,11 +208,11 @@ public class DFAEdgeCache {
 		}
 
 		/**
-		 * Expands backing arrays by doubling their capacity.
+		 * Returns an new expanded (double capcacity) map with content of this map.
 		 */
-		SymbolEdgeMap<T> expand() {
+		SymbolEdgeMap expand() {
 			int capacity = newCapacity();
-			SymbolEdgeMap<T> newMap = new SymbolEdgeMap<>(capacity);
+			SymbolEdgeMap newMap = new SymbolEdgeMap(capacity);
 			for (int i = 0; i < keys.length; i++) {
 				if (keys[i] != EMPTY) {
 					newMap.put(keys[i], values[i]);
@@ -221,7 +222,7 @@ public class DFAEdgeCache {
 		}
 
 		/**
-		 * @return The array of keys in the map.
+		 * @return The array of keys in the map. Sorted ascending.
 		 */
 		public int[] getKeys() {
 			int[] keyArray = new int[keyCount];
@@ -236,5 +237,4 @@ public class DFAEdgeCache {
 		}
 
 	}
-
 }

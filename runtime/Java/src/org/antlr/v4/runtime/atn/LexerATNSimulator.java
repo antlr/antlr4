@@ -22,9 +22,6 @@ public class LexerATNSimulator extends ATNSimulator {
 	public static final boolean debug = false;
 	public static final boolean dfa_debug = false;
 
-	public static final int MIN_DFA_EDGE = 0;
-	public static final int MAX_DFA_EDGE = 127; // forces unicode to stay in ATN
-
 	/** When we hit an accept state in either the DFA or the ATN, we
 	 *  have to notify the character stream to start buffering characters
 	 *  via {@link IntStream#mark} and record the current state. The current sim state
