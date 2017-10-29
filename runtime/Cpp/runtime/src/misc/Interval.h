@@ -26,7 +26,7 @@ namespace misc {
     ssize_t b;
 
     Interval();
-    Interval(size_t a_, size_t b_); // For unsigned -> signed mappings.
+    explicit Interval(size_t a_, size_t b_); // For unsigned -> signed mappings.
     Interval(ssize_t a_, ssize_t b_);
 
     /// return number of elements between a and b inclusively. x..x is length 1.

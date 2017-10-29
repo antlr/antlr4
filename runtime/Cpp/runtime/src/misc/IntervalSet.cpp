@@ -21,7 +21,8 @@ IntervalSet const IntervalSet::EMPTY_SET;
 IntervalSet::IntervalSet() : _intervals() {
 }
 
-IntervalSet::IntervalSet(const IntervalSet &set) : _intervals(set._intervals) {
+IntervalSet::IntervalSet(const IntervalSet &set) : IntervalSet() {
+  _intervals = set._intervals;
 }
 
 IntervalSet::IntervalSet(IntervalSet&& set) : IntervalSet(std::move(set._intervals)) {
