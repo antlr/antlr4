@@ -70,11 +70,16 @@ namespace atn {
   ///
   /// <embed src="images/OptionalNonGreedy.svg" type="image/svg+xml"/>
   /// </summary>
+  class ANTLR4CPP_PUBLIC ATN;
+
   class ANTLR4CPP_PUBLIC ATNState {
   public:
     ATNState();
+    ATNState(ATNState const&) = delete;
 
     virtual ~ATNState();
+
+    ATNState& operator=(ATNState const&) = delete;
 
     static const size_t INITIAL_NUM_TRANSITIONS = 4;
     static const size_t INVALID_STATE_NUMBER = static_cast<size_t>(-1); // std::numeric_limits<size_t>::max();
@@ -102,9 +107,6 @@ namespace atn {
     bool epsilonOnlyTransitions = false;
 
   public:
-    /// Used to cache lookahead during parsing, not used during construction.
-    misc::IntervalSet nextTokenWithinRule;
-
     virtual size_t hashCode();
     bool operator == (const ATNState &other);
 
@@ -117,6 +119,14 @@ namespace atn {
     virtual void addTransition(size_t index, Transition *e);
     virtual Transition* removeTransition(size_t index);
     virtual size_t getStateType() = 0;
+
+  private:
+    /// Used to cache lookahead during parsing, not used during construction.
+
+    misc::IntervalSet _nextTokenWithinRule;
+    std::atomic<bool> _nextTokenUpdated { false };
+
+    friend class ATN;
   };
 
 } // namespace atn
