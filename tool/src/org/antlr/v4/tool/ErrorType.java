@@ -28,56 +28,56 @@ public enum ErrorType {
 	 *
 	 * <p>cannot write file <em>filename</em>: <em>reason</em></p>
 	 */
-	CANNOT_WRITE_FILE(1, "cannot write file <arg>: <arg2>", ErrorSeverity.ERROR),
+	CANNOT_WRITE_FILE(1, "cannot write file '<arg>': '<arg2>'", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 2.
 	 *
 	 * <p>unknown command-line option <em>option</em></p>
 	 */
-	INVALID_CMDLINE_ARG(2, "unknown command-line option <arg>", ErrorSeverity.ERROR),
+	INVALID_CMDLINE_ARG(2, "unknown command-line option '<arg>'", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 3.
 	 *
 	 * <p>cannot find tokens file <em>filename</em></p>
 	 */
-	CANNOT_FIND_TOKENS_FILE_GIVEN_ON_CMDLINE(3, "cannot find tokens file <arg> given for <arg2>", ErrorSeverity.ERROR),
+	CANNOT_FIND_TOKENS_FILE_GIVEN_ON_CMDLINE(3, "cannot find tokens file '<arg>' given for '<arg2>'", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 4.
 	 *
 	 * <p>cannot find tokens file <em>filename</em>: <em>reason</em></p>
 	 */
-	ERROR_READING_TOKENS_FILE(4, "error reading tokens file <arg>: <arg2>", ErrorSeverity.ERROR),
+	ERROR_READING_TOKENS_FILE(4, "error reading tokens file '<arg>': '<arg2>'", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 5.
 	 *
 	 * <p>directory not found: <em>directory</em></p>
 	 */
-	DIR_NOT_FOUND(5, "directory not found: <arg>", ErrorSeverity.ERROR),
+	DIR_NOT_FOUND(5, "directory not found: '<arg>'", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 6.
 	 *
 	 * <p>output directory is a file: <em>filename</em></p>
 	 */
-	OUTPUT_DIR_IS_FILE(6, "output directory is a file: <arg>", ErrorSeverity.ERROR),
+	OUTPUT_DIR_IS_FILE(6, "output directory is a file: '<arg>'", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 7.
 	 *
 	 * <p>cannot find or open file: <em>filename</em></p>
 	 */
-	CANNOT_OPEN_FILE(7, "cannot find or open file: <arg><if(exception&&verbose)>; reason: <exception><endif>", ErrorSeverity.ERROR),
+	CANNOT_OPEN_FILE(7, "cannot find or open file: '<arg>'<if(exception&&verbose)>; reason: <exception><endif>", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 8.
 	 *
 	 * <p>
 	 * grammar name <em>name</em> and file name <em>filename</em> differ</p>
 	 */
-	FILE_AND_GRAMMAR_NAME_DIFFER(8, "grammar name <arg> and file name <arg2> differ", ErrorSeverity.ERROR),
+	FILE_AND_GRAMMAR_NAME_DIFFER(8, "grammar name '<arg>' and file name '<arg2>' differ", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 9.
 	 *
 	 * <p>invalid {@code -Dname=value} syntax: <em>syntax</em></p>
 	 */
-	BAD_OPTION_SET_SYNTAX(9, "invalid -Dname=value syntax: <arg>", ErrorSeverity.ERROR),
+	BAD_OPTION_SET_SYNTAX(9, "invalid -Dname=value syntax: '<arg>'", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 10.
 	 *
@@ -89,27 +89,27 @@ public enum ErrorType {
 	 *
 	 * <p>cannot find tokens file <em>filename</em>: <em>reason</em></p>
 	 */
-	ERROR_READING_IMPORTED_GRAMMAR(11, "error reading imported grammar <arg> referenced in <arg2>", ErrorSeverity.ERROR),
+	ERROR_READING_IMPORTED_GRAMMAR(11, "error reading imported grammar '<arg>' referenced in '<arg2>'", ErrorSeverity.ERROR),
 
 	/**
 	 * Compiler Error 20.
 	 *
 	 * <p>internal error: <em>message</em></p>
 	 */
-	INTERNAL_ERROR(20, "internal error: <arg> <arg2><if(exception&&verbose)>: <exception>" +
+	INTERNAL_ERROR(20, "internal error: '<arg>' '<arg2>'<if(exception&&verbose)>: <exception>" +
 				   "<stackTrace; separator=\"\\n\"><endif>", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 21.
 	 *
 	 * <p>.tokens file syntax error <em>filename</em>: <em>message</em></p>
 	 */
-	TOKENS_FILE_SYNTAX_ERROR(21, ".tokens file syntax error <arg>:<arg2>", ErrorSeverity.ERROR),
+	TOKENS_FILE_SYNTAX_ERROR(21, ".tokens file syntax error '<arg>':'<arg2>'", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Warning 22.
 	 *
 	 * <p>template error: <em>message</em></p>
 	 */
-	STRING_TEMPLATE_WARNING(22, "template error: <arg> <arg2><if(exception&&verbose)>: <exception>" +
+	STRING_TEMPLATE_WARNING(22, "template error: '<arg>' '<arg2>'<if(exception&&verbose)>: <exception>" +
 				   "<stackTrace; separator=\"\\n\"><endif>", ErrorSeverity.WARNING),
 
 	/*
@@ -121,7 +121,7 @@ public enum ErrorType {
 	 *
 	 * <p>can't find code generation templates: <em>group</em></p>
 	 */
-	MISSING_CODE_GEN_TEMPLATES(30, "can't find code generation templates: <arg>", ErrorSeverity.ERROR),
+	MISSING_CODE_GEN_TEMPLATES(30, "can't find code generation templates: '<arg>'", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 31.
 	 *
@@ -129,7 +129,7 @@ public enum ErrorType {
 	 * ANTLR cannot generate <em>language</em> code as of version
 	 * <em>version</em></p>
 	 */
-	CANNOT_CREATE_TARGET_GENERATOR(31, "ANTLR cannot generate <arg> code as of version "+ Tool.VERSION, ErrorSeverity.ERROR_ONE_OFF),
+	CANNOT_CREATE_TARGET_GENERATOR(31, "ANTLR cannot generate '<arg>' code as of version "+ Tool.VERSION, ErrorSeverity.ERROR_ONE_OFF),
 	/**
 	 * Compiler Error 32.
 	 *
@@ -137,26 +137,26 @@ public enum ErrorType {
 	 * code generation template <em>template</em> has missing, misnamed, or
 	 * incomplete arg list; missing <em>field</em></p>
 	 */
-	CODE_TEMPLATE_ARG_ISSUE(32, "code generation template <arg> has missing, misnamed, or incomplete arg list; missing <arg2>", ErrorSeverity.ERROR),
+	CODE_TEMPLATE_ARG_ISSUE(32, "code generation template '<arg>' has missing, misnamed, or incomplete arg list; missing '<arg2>'", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 33.
 	 *
 	 * <p>missing code generation template <em>template</em></p>
 	 */
-	CODE_GEN_TEMPLATES_INCOMPLETE(33, "missing code generation template <arg>", ErrorSeverity.ERROR),
+	CODE_GEN_TEMPLATES_INCOMPLETE(33, "missing code generation template '<arg>'", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 34.
 	 *
 	 * <p>
 	 * no mapping to template name for output model class <em>class</em></p>
 	 */
-	NO_MODEL_TO_TEMPLATE_MAPPING(34, "no mapping to template name for output model class <arg>", ErrorSeverity.ERROR),
+	NO_MODEL_TO_TEMPLATE_MAPPING(34, "no mapping to template name for output model class '<arg>'", ErrorSeverity.ERROR),
     /**
    	 * Compiler Error 35.
    	 *
    	 * <p>templates/target and tool aren't compatible</p>
    	 */
-   	INCOMPATIBLE_TOOL_AND_TEMPLATES(35, "<arg3> code generation target requires ANTLR <arg2>; it can't be loaded by the current ANTLR <arg>", ErrorSeverity.ERROR),
+	INCOMPATIBLE_TOOL_AND_TEMPLATES(35, "'<arg3>' code generation target requires ANTLR '<arg2>'; it can't be loaded by the current ANTLR '<arg>'", ErrorSeverity.ERROR),
 
 	/*
 	 * Grammar errors
@@ -167,25 +167,25 @@ public enum ErrorType {
 	 *
 	 * <p>syntax error: <em>message</em></p>
 	 */
-	SYNTAX_ERROR(50, "syntax error: <arg>", ErrorSeverity.ERROR),
+	SYNTAX_ERROR(50, "syntax error: '<arg>'", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 51.
 	 *
 	 * <p>rule <em>rule</em> redefinition; previous at line <em>line</em></p>
 	 */
-	RULE_REDEFINITION(51, "rule <arg> redefinition; previous at line <arg2>", ErrorSeverity.ERROR),
+	RULE_REDEFINITION(51, "rule '<arg>' redefinition; previous at line '<arg2>'", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 52.
 	 *
 	 * <p>lexer rule <em>rule</em> not allowed in parser</p>
 	 */
-	LEXER_RULES_NOT_ALLOWED(52, "lexer rule <arg> not allowed in parser", ErrorSeverity.ERROR),
+	LEXER_RULES_NOT_ALLOWED(52, "lexer rule '<arg>' not allowed in parser", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 53.
 	 *
 	 * <p>parser rule <em>rule</em> not allowed in lexer</p>
 	 */
-	PARSER_RULES_NOT_ALLOWED(53, "parser rule <arg> not allowed in lexer", ErrorSeverity.ERROR),
+	PARSER_RULES_NOT_ALLOWED(53, "parser rule '<arg>' not allowed in lexer", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 54.
 	 *
@@ -201,7 +201,7 @@ public enum ErrorType {
 	 *
 	 * @see #PARSER_RULE_REF_IN_LEXER_RULE
 	 */
-	UNDEFINED_RULE_REF(56, "reference to undefined rule: <arg>", ErrorSeverity.ERROR),
+	UNDEFINED_RULE_REF(56, "reference to undefined rule: '<arg>'", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 57.
 	 *
@@ -209,13 +209,13 @@ public enum ErrorType {
 	 * reference to undefined rule <em>rule</em> in non-local ref
 	 * <em>reference</em></p>
 	 */
-	UNDEFINED_RULE_IN_NONLOCAL_REF(57, "reference to undefined rule <arg> in non-local ref <arg3>", ErrorSeverity.ERROR),
+	UNDEFINED_RULE_IN_NONLOCAL_REF(57, "reference to undefined rule '<arg>' in non-local ref '<arg3>'", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 60.
 	 *
 	 * <p>token names must start with an uppercase letter: <em>name</em></p>
 	 */
-    TOKEN_NAMES_MUST_START_UPPER(60, "token names must start with an uppercase letter: <arg>", ErrorSeverity.ERROR),
+    TOKEN_NAMES_MUST_START_UPPER(60, "token names must start with an uppercase letter: '<arg>'", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 63.
 	 *
@@ -223,7 +223,7 @@ public enum ErrorType {
 	 * unknown attribute reference <em>attribute</em> in
 	 * <em>expression</em></p>
 	 */
-	UNKNOWN_SIMPLE_ATTRIBUTE(63, "unknown attribute reference <arg> in <arg2>", ErrorSeverity.ERROR),
+	UNKNOWN_SIMPLE_ATTRIBUTE(63, "unknown attribute reference '<arg>' in '<arg2>'", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 64.
 	 *
@@ -231,7 +231,7 @@ public enum ErrorType {
 	 * parameter <em>parameter</em> of rule <em>rule</em> is not accessible
 	 * in this scope: <em>expression</em></p>
 	 */
-	INVALID_RULE_PARAMETER_REF(64, "parameter <arg> of rule <arg2> is not accessible in this scope: <arg3>", ErrorSeverity.ERROR),
+	INVALID_RULE_PARAMETER_REF(64, "parameter '<arg>' of rule '<arg2>' is not accessible in this scope: '<arg3>'", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 65.
 	 *
@@ -239,7 +239,7 @@ public enum ErrorType {
 	 * unknown attribute <em>attribute</em> for rule <em>rule</em> in
 	 * <em>expression</em></p>
 	 */
-	UNKNOWN_RULE_ATTRIBUTE(65, "unknown attribute <arg> for rule <arg2> in <arg3>", ErrorSeverity.ERROR),
+	UNKNOWN_RULE_ATTRIBUTE(65, "unknown attribute '<arg>' for rule '<arg2>' in '<arg3>'", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 66.
 	 *
@@ -247,7 +247,7 @@ public enum ErrorType {
 	 * attribute <em>attribute</em> isn't a valid property in
 	 * <em>expression</em></p>
 	 */
-    UNKNOWN_ATTRIBUTE_IN_SCOPE(66, "attribute <arg> isn't a valid property in <arg2>", ErrorSeverity.ERROR),
+    UNKNOWN_ATTRIBUTE_IN_SCOPE(66, "attribute '<arg>' isn't a valid property in '<arg2>'", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 67.
 	 *
@@ -255,37 +255,37 @@ public enum ErrorType {
 	 * missing attribute access on rule reference <em>rule</em> in
 	 * <em>expression</em></p>
 	 */
-	ISOLATED_RULE_REF(67, "missing attribute access on rule reference <arg> in <arg2>", ErrorSeverity.ERROR),
+	ISOLATED_RULE_REF(67, "missing attribute access on rule reference '<arg>' in '<arg2>'", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 69.
 	 *
 	 * <p>label <em>label</em> conflicts with rule with same name</p>
 	 */
-	LABEL_CONFLICTS_WITH_RULE(69, "label <arg> conflicts with rule with same name", ErrorSeverity.ERROR),
+	LABEL_CONFLICTS_WITH_RULE(69, "label '<arg>' conflicts with rule with same name", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 70.
 	 *
 	 * <p>label <em>label</em> conflicts with token with same name</p>
 	 */
-	LABEL_CONFLICTS_WITH_TOKEN(70, "label <arg> conflicts with token with same name", ErrorSeverity.ERROR),
+	LABEL_CONFLICTS_WITH_TOKEN(70, "label '<arg>' conflicts with token with same name", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 72.
 	 *
 	 * <p>label <em>label</em> conflicts with parameter with same name</p>
 	 */
-	LABEL_CONFLICTS_WITH_ARG(72, "label <arg> conflicts with parameter with same name", ErrorSeverity.ERROR),
+	LABEL_CONFLICTS_WITH_ARG(72, "label '<arg>' conflicts with parameter with same name", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 73.
 	 *
 	 * <p>label <em>label</em> conflicts with return value with same name</p>
 	 */
-	LABEL_CONFLICTS_WITH_RETVAL(73, "label <arg> conflicts with return value with same name", ErrorSeverity.ERROR),
+	LABEL_CONFLICTS_WITH_RETVAL(73, "label '<arg>' conflicts with return value with same name", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 74.
 	 *
 	 * <p>label <em>label</em> conflicts with local with same name</p>
 	 */
-	LABEL_CONFLICTS_WITH_LOCAL(74, "label <arg> conflicts with local with same name", ErrorSeverity.ERROR),
+	LABEL_CONFLICTS_WITH_LOCAL(74, "label '<arg>' conflicts with local with same name", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 75.
 	 *
@@ -293,44 +293,44 @@ public enum ErrorType {
 	 * label <em>label</em> type mismatch with previous definition:
 	 * <em>message</em></p>
 	 */
-	LABEL_TYPE_CONFLICT(75, "label <arg> type mismatch with previous definition: <arg2>", ErrorSeverity.ERROR),
+	LABEL_TYPE_CONFLICT(75, "label '<arg>' type mismatch with previous definition: '<arg2>'", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 76.
 	 *
 	 * <p>
 	 * return value <em>name</em> conflicts with parameter with same name</p>
 	 */
-	RETVAL_CONFLICTS_WITH_ARG(76, "return value <arg> conflicts with parameter with same name", ErrorSeverity.ERROR),
+	RETVAL_CONFLICTS_WITH_ARG(76, "return value '<arg>' conflicts with parameter with same name", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 79.
 	 *
 	 * <p>missing argument(s) on rule reference: <em>rule</em></p>
 	 */
-	MISSING_RULE_ARGS(79, "missing argument(s) on rule reference: <arg>", ErrorSeverity.ERROR),
+	MISSING_RULE_ARGS(79, "missing argument(s) on rule reference: '<arg>'", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 80.
 	 *
 	 * <p>rule <em>rule</em> has no defined parameters</p>
 	 */
-	RULE_HAS_NO_ARGS(80, "rule <arg> has no defined parameters", ErrorSeverity.ERROR),
+	RULE_HAS_NO_ARGS(80, "rule '<arg>' has no defined parameters", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Warning 83.
 	 *
 	 * <p>unsupported option <em>option</em></p>
 	 */
-	ILLEGAL_OPTION(83, "unsupported option <arg>", ErrorSeverity.WARNING),
+	ILLEGAL_OPTION(83, "unsupported option '<arg>'", ErrorSeverity.WARNING),
 	/**
 	 * Compiler Warning 84.
 	 *
 	 * <p>unsupported option value <em>name</em>=<em>value</em></p>
 	 */
-	ILLEGAL_OPTION_VALUE(84, "unsupported option value <arg>=<arg2>", ErrorSeverity.WARNING),
+	ILLEGAL_OPTION_VALUE(84, "unsupported option value '<arg>'='<arg2>'", ErrorSeverity.WARNING),
 	/**
 	 * Compiler Error 94.
 	 *
 	 * <p>redefinition of <em>action</em> action</p>
 	 */
-    ACTION_REDEFINITION(94, "redefinition of <arg> action", ErrorSeverity.ERROR),
+    ACTION_REDEFINITION(94, "redefinition of '<arg>' action", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 99.
 	 *
@@ -341,7 +341,7 @@ public enum ErrorType {
 	 * <li>implicitly generated grammar <em>grammar</em> has no rules</li>
 	 * </ul>
 	 */
-	NO_RULES(99, "<if(arg2.implicitLexerOwner)>implicitly generated <endif>grammar <arg> has no rules", ErrorSeverity.ERROR),
+	NO_RULES(99, "<if(arg2.implicitLexerOwner)>implicitly generated <endif>grammar '<arg>' has no rules", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 105.
 	 *
@@ -349,25 +349,25 @@ public enum ErrorType {
 	 * reference to undefined grammar in rule reference:
 	 * <em>grammar</em>.<em>rule</em></p>
 	 */
-	NO_SUCH_GRAMMAR_SCOPE(105, "reference to undefined grammar in rule reference: <arg>.<arg2>", ErrorSeverity.ERROR),
+	NO_SUCH_GRAMMAR_SCOPE(105, "reference to undefined grammar in rule reference: '<arg>'.'<arg2>'", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 106.
 	 *
 	 * <p>rule <em>rule</em> is not defined in grammar <em>grammar</em></p>
 	 */
-	NO_SUCH_RULE_IN_SCOPE(106, "rule <arg2> is not defined in grammar <arg>", ErrorSeverity.ERROR),
+	NO_SUCH_RULE_IN_SCOPE(106, "rule '<arg2>' is not defined in grammar '<arg>'", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Warning 108.
 	 *
 	 * <p>token name <em>Token</em> is already defined</p>
 	 */
-	TOKEN_NAME_REASSIGNMENT(108, "token name <arg> is already defined", ErrorSeverity.WARNING),
+	TOKEN_NAME_REASSIGNMENT(108, "token name '<arg>' is already defined", ErrorSeverity.WARNING),
 	/**
 	 * Compiler Warning 109.
 	 *
 	 * <p>options ignored in imported grammar <em>grammar</em></p>
 	 */
-	OPTIONS_IN_DELEGATE(109, "options ignored in imported grammar <arg>", ErrorSeverity.WARNING),
+	OPTIONS_IN_DELEGATE(109, "options ignored in imported grammar '<arg>'", ErrorSeverity.WARNING),
 	/**
 	 * Compiler Error 110.
 	 *
@@ -375,7 +375,7 @@ public enum ErrorType {
 	 * can't find or load grammar <em>grammar</em> from
 	 * <em>filename</em></p>
 	 */
-	CANNOT_FIND_IMPORTED_GRAMMAR(110, "can't find or load grammar <arg>", ErrorSeverity.ERROR),
+	CANNOT_FIND_IMPORTED_GRAMMAR(110, "can't find or load grammar '<arg>'", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 111.
 	 *
@@ -398,7 +398,7 @@ public enum ErrorType {
 	 *
 	 * <p>cannot find tokens file <em>filename</em></p>
 	 */
-	CANNOT_FIND_TOKENS_FILE_REFD_IN_GRAMMAR(114, "cannot find tokens file <arg>", ErrorSeverity.ERROR),
+	CANNOT_FIND_TOKENS_FILE_REFD_IN_GRAMMAR(114, "cannot find tokens file '<arg>'", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Warning 118.
 	 *
@@ -409,7 +409,7 @@ public enum ErrorType {
 	 * @deprecated This warning is no longer applicable with the current syntax for specifying associativity.
 	 */
 	@Deprecated
-	ALL_OPS_NEED_SAME_ASSOC(118, "all operators of alt <arg> of left-recursive rule must have same associativity", ErrorSeverity.WARNING),
+	ALL_OPS_NEED_SAME_ASSOC(118, "all operators of alt '<arg>' of left-recursive rule must have same associativity", ErrorSeverity.WARNING),
 	/**
 	 * Compiler Error 119.
 	 *
@@ -435,7 +435,7 @@ public enum ErrorType {
 	 *
 	 * <p>rule <em>rule</em>: must label all alternatives or none</p>
 	 */
-	RULE_WITH_TOO_FEW_ALT_LABELS(122, "rule <arg>: must label all alternatives or none", ErrorSeverity.ERROR),
+	RULE_WITH_TOO_FEW_ALT_LABELS(122, "rule '<arg>': must label all alternatives or none", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 123.
 	 *
@@ -443,20 +443,20 @@ public enum ErrorType {
 	 * rule alt label <em>label</em> redefined in rule <em>rule1</em>,
 	 * originally in rule <em>rule2</em></p>
 	 */
-	ALT_LABEL_REDEF(123, "rule alt label <arg> redefined in rule <arg2>, originally in rule <arg3>", ErrorSeverity.ERROR),
+	ALT_LABEL_REDEF(123, "rule alt label '<arg>' redefined in rule '<arg2>', originally in rule '<arg3>'", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 124.
 	 *
 	 * <p>
 	 * rule alt label <em>label</em> conflicts with rule <em>rule</em></p>
 	 */
-	ALT_LABEL_CONFLICTS_WITH_RULE(124, "rule alt label <arg> conflicts with rule <arg2>", ErrorSeverity.ERROR),
+	ALT_LABEL_CONFLICTS_WITH_RULE(124, "rule alt label '<arg>' conflicts with rule '<arg2>'", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Warning 125.
 	 *
 	 * <p>implicit definition of token <em>Token</em> in parser</p>
 	 */
-	IMPLICIT_TOKEN_DEFINITION(125, "implicit definition of token <arg> in parser", ErrorSeverity.WARNING),
+	IMPLICIT_TOKEN_DEFINITION(125, "implicit definition of token '<arg>' in parser", ErrorSeverity.WARNING),
 	/**
 	 * Compiler Error 126.
 	 *
@@ -464,7 +464,7 @@ public enum ErrorType {
 	 * cannot create implicit token for string literal in non-combined grammar:
 	 * <em>literal</em></p>
 	 */
-	IMPLICIT_STRING_DEFINITION(126, "cannot create implicit token for string literal in non-combined grammar: <arg>", ErrorSeverity.ERROR),
+	IMPLICIT_STRING_DEFINITION(126, "cannot create implicit token for string literal in non-combined grammar: '<arg>'", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 128.
 	 *
@@ -472,13 +472,13 @@ public enum ErrorType {
 	 * attribute references not allowed in lexer actions:
 	 * <em>expression</em></p>
 	 */
-	ATTRIBUTE_IN_LEXER_ACTION(128, "attribute references not allowed in lexer actions: $<arg>", ErrorSeverity.ERROR),
+	ATTRIBUTE_IN_LEXER_ACTION(128, "attribute references not allowed in lexer actions: $'<arg>'", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 130.
 	 *
 	 * <p>label <em>label</em> assigned to a block which is not a set</p>
 	 */
-	LABEL_BLOCK_NOT_A_SET(130, "label <arg> assigned to a block which is not a set", ErrorSeverity.ERROR),
+	LABEL_BLOCK_NOT_A_SET(130, "label '<arg>' assigned to a block which is not a set", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Warning 131.
 	 *
@@ -489,7 +489,7 @@ public enum ErrorType {
 	 * <li>greedy block {@code ()+} contains wildcard; the non-greedy syntax {@code ()+?} may be preferred</li>
 	 * </ul>
 	 */
-	EXPECTED_NON_GREEDY_WILDCARD_BLOCK(131, "greedy block ()<arg> contains wildcard; the non-greedy syntax ()<arg>? may be preferred", ErrorSeverity.WARNING),
+	EXPECTED_NON_GREEDY_WILDCARD_BLOCK(131, "greedy block ()'<arg>' contains wildcard; the non-greedy syntax ()'<arg>'? may be preferred", ErrorSeverity.WARNING),
 	/**
 	 * Compiler Error 132.
 	 *
@@ -500,7 +500,7 @@ public enum ErrorType {
 	 * @deprecated This error is no longer issued by ANTLR 4.2.
 	 */
 	@Deprecated
-	LEXER_ACTION_PLACEMENT_ISSUE(132, "action in lexer rule <arg> must be last element of single outermost alt", ErrorSeverity.ERROR),
+	LEXER_ACTION_PLACEMENT_ISSUE(132, "action in lexer rule '<arg>' must be last element of single outermost alt", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 133.
 	 *
@@ -508,7 +508,7 @@ public enum ErrorType {
 	 * {@code ->command} in lexer rule <em>rule</em> must be last element of
 	 * single outermost alt</p>
 	 */
-	LEXER_COMMAND_PLACEMENT_ISSUE(133, "->command in lexer rule <arg> must be last element of single outermost alt", ErrorSeverity.ERROR),
+	LEXER_COMMAND_PLACEMENT_ISSUE(133, "->command in lexer rule '<arg>' must be last element of single outermost alt", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 134.
 	 *
@@ -520,7 +520,7 @@ public enum ErrorType {
 	 * Note: This error has the same number as the unrelated error
 	 * {@link #UNSUPPORTED_REFERENCE_IN_LEXER_SET}.</p>
 	 */
-	USE_OF_BAD_WORD(134, "symbol <arg> conflicts with generated code in target language or runtime", ErrorSeverity.ERROR),
+	USE_OF_BAD_WORD(134, "symbol '<arg>' conflicts with generated code in target language or runtime", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 183.
 	 *
@@ -530,61 +530,61 @@ public enum ErrorType {
 	 * Note: This error has the same number as the unrelated error
 	 * {@link #USE_OF_BAD_WORD}.</p>
 	 */
-	UNSUPPORTED_REFERENCE_IN_LEXER_SET(183, "rule reference <arg> is not currently supported in a set", ErrorSeverity.ERROR),
+	UNSUPPORTED_REFERENCE_IN_LEXER_SET(183, "rule reference '<arg>' is not currently supported in a set", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 135.
 	 *
 	 * <p>cannot assign a value to list label <em>label</em></p>
 	 */
-	ASSIGNMENT_TO_LIST_LABEL(135, "cannot assign a value to list label <arg>", ErrorSeverity.ERROR),
+	ASSIGNMENT_TO_LIST_LABEL(135, "cannot assign a value to list label '<arg>'", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 136.
 	 *
 	 * <p>return value <em>name</em> conflicts with rule with same name</p>
 	 */
-	RETVAL_CONFLICTS_WITH_RULE(136, "return value <arg> conflicts with rule with same name", ErrorSeverity.ERROR),
+	RETVAL_CONFLICTS_WITH_RULE(136, "return value '<arg>' conflicts with rule with same name", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 137.
 	 *
 	 * <p>return value <em>name</em> conflicts with token with same name</p>
 	 */
-	RETVAL_CONFLICTS_WITH_TOKEN(137, "return value <arg> conflicts with token with same name", ErrorSeverity.ERROR),
+	RETVAL_CONFLICTS_WITH_TOKEN(137, "return value '<arg>' conflicts with token with same name", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 138.
 	 *
 	 * <p>parameter <em>parameter</em> conflicts with rule with same name</p>
 	 */
-	ARG_CONFLICTS_WITH_RULE(138, "parameter <arg> conflicts with rule with same name", ErrorSeverity.ERROR),
+	ARG_CONFLICTS_WITH_RULE(138, "parameter '<arg>' conflicts with rule with same name", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 139.
 	 *
 	 * <p>parameter <em>parameter</em> conflicts with token with same name</p>
 	 */
-	ARG_CONFLICTS_WITH_TOKEN(139, "parameter <arg> conflicts with token with same name", ErrorSeverity.ERROR),
+	ARG_CONFLICTS_WITH_TOKEN(139, "parameter '<arg>' conflicts with token with same name", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 140.
 	 *
 	 * <p>local <em>local</em> conflicts with rule with same name</p>
 	 */
-	LOCAL_CONFLICTS_WITH_RULE(140, "local <arg> conflicts with rule with same name", ErrorSeverity.ERROR),
+	LOCAL_CONFLICTS_WITH_RULE(140, "local '<arg>' conflicts with rule with same name", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 141.
 	 *
 	 * <p>local <em>local</em> conflicts with rule token same name</p>
 	 */
-	LOCAL_CONFLICTS_WITH_TOKEN(141, "local <arg> conflicts with rule token same name", ErrorSeverity.ERROR),
+	LOCAL_CONFLICTS_WITH_TOKEN(141, "local '<arg>' conflicts with rule token same name", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 142.
 	 *
 	 * <p>local <em>local</em> conflicts with parameter with same name</p>
 	 */
-	LOCAL_CONFLICTS_WITH_ARG(142, "local <arg> conflicts with parameter with same name", ErrorSeverity.ERROR),
+	LOCAL_CONFLICTS_WITH_ARG(142, "local '<arg>' conflicts with parameter with same name", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 143.
 	 *
 	 * <p>local <em>local</em> conflicts with return value with same name</p>
 	 */
-	LOCAL_CONFLICTS_WITH_RETVAL(143, "local <arg> conflicts with return value with same name", ErrorSeverity.ERROR),
+	LOCAL_CONFLICTS_WITH_RETVAL(143, "local '<arg>' conflicts with return value with same name", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 144.
 	 *
@@ -592,7 +592,7 @@ public enum ErrorType {
 	 * multi-character literals are not allowed in lexer sets:
 	 * <em>literal</em></p>
 	 */
-	INVALID_LITERAL_IN_LEXER_SET(144, "multi-character literals are not allowed in lexer sets: <arg>", ErrorSeverity.ERROR),
+	INVALID_LITERAL_IN_LEXER_SET(144, "multi-character literals are not allowed in lexer sets: '<arg>'", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 145.
 	 *
@@ -604,7 +604,7 @@ public enum ErrorType {
 	 * Every lexer mode must contain at least one rule which is not declared
 	 * with the {@code fragment} modifier.</p>
 	 */
-	MODE_WITHOUT_RULES(145, "lexer mode <arg> must contain at least one non-fragment rule", ErrorSeverity.ERROR),
+	MODE_WITHOUT_RULES(145, "lexer mode '<arg>' must contain at least one non-fragment rule", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Warning 146.
 	 *
@@ -623,7 +623,7 @@ public enum ErrorType {
 	 * Whitespace : [ \t]*;  // error 146
 	 * </pre>
 	 */
-	EPSILON_TOKEN(146, "non-fragment lexer rule <arg> can match the empty string", ErrorSeverity.WARNING),
+	EPSILON_TOKEN(146, "non-fragment lexer rule '<arg>' can match the empty string", ErrorSeverity.WARNING),
 	/**
 	 * Compiler Error 147.
 	 *
@@ -643,7 +643,7 @@ public enum ErrorType {
 	 *   ;
 	 * </pre>
 	 */
-	NO_NON_LR_ALTS(147, "left recursive rule <arg> must contain an alternative which is not left recursive", ErrorSeverity.ERROR),
+	NO_NON_LR_ALTS(147, "left recursive rule '<arg>' must contain an alternative which is not left recursive", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 148.
 	 *
@@ -663,7 +663,7 @@ public enum ErrorType {
 	 *   ;
 	 * </pre>
 	 */
-	EPSILON_LR_FOLLOW(148, "left recursive rule <arg> contains a left recursive alternative which can be followed by the empty string", ErrorSeverity.ERROR),
+	EPSILON_LR_FOLLOW(148, "left recursive rule '<arg>' contains a left recursive alternative which can be followed by the empty string", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 149.
 	 *
@@ -684,7 +684,7 @@ public enum ErrorType {
 	 *
 	 * @since 4.1
 	 */
-	INVALID_LEXER_COMMAND(149, "lexer command <arg> does not exist or is not supported by the current target", ErrorSeverity.ERROR),
+	INVALID_LEXER_COMMAND(149, "lexer command '<arg>' does not exist or is not supported by the current target", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 150.
 	 *
@@ -701,7 +701,7 @@ public enum ErrorType {
 	 *
 	 * @since 4.1
 	 */
-	MISSING_LEXER_COMMAND_ARGUMENT(150, "missing argument for lexer command <arg>", ErrorSeverity.ERROR),
+	MISSING_LEXER_COMMAND_ARGUMENT(150, "missing argument for lexer command '<arg>'", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 151.
 	 *
@@ -719,7 +719,7 @@ public enum ErrorType {
 	 *
 	 * @since 4.1
 	 */
-	UNWANTED_LEXER_COMMAND_ARGUMENT(151, "lexer command <arg> does not take any arguments", ErrorSeverity.ERROR),
+	UNWANTED_LEXER_COMMAND_ARGUMENT(151, "lexer command '<arg>' does not take any arguments", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 152.
 	 *
@@ -758,7 +758,7 @@ public enum ErrorType {
 	 *
 	 * @since 4.1
 	 */
-	EPSILON_CLOSURE(153, "rule <arg> contains a closure with at least one alternative that can match an empty string", ErrorSeverity.ERROR),
+	EPSILON_CLOSURE(153, "rule '<arg>' contains a closure with at least one alternative that can match an empty string", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Warning 154.
 	 *
@@ -780,7 +780,7 @@ public enum ErrorType {
 	 *
 	 * @since 4.1
 	 */
-	EPSILON_OPTIONAL(154, "rule <arg> contains an optional block with at least one alternative that can match an empty string", ErrorSeverity.WARNING),
+	EPSILON_OPTIONAL(154, "rule '<arg>' contains an optional block with at least one alternative that can match an empty string", ErrorSeverity.WARNING),
 	/**
 	 * Compiler Warning 155.
 	 *
@@ -807,7 +807,7 @@ public enum ErrorType {
 	 *
 	 * @since 4.2
 	 */
-	UNKNOWN_LEXER_CONSTANT(155, "rule <arg> contains a lexer command with an unrecognized constant value; lexer interpreters may produce incorrect output", ErrorSeverity.WARNING),
+	UNKNOWN_LEXER_CONSTANT(155, "rule '<arg>' contains a lexer command with an unrecognized constant value; lexer interpreters may produce incorrect output", ErrorSeverity.WARNING),
 	/**
 	 * Compiler Error 156.
 	 *
@@ -824,7 +824,7 @@ public enum ErrorType {
 	 *
 	 * @since 4.2.1
 	 */
-	INVALID_ESCAPE_SEQUENCE(156, "invalid escape sequence <arg>", ErrorSeverity.WARNING),
+	INVALID_ESCAPE_SEQUENCE(156, "invalid escape sequence '<arg>'", ErrorSeverity.WARNING),
 	/**
 	 * Compiler Warning 157.
 	 *
@@ -850,7 +850,7 @@ public enum ErrorType {
 	 *
 	 * @since 4.2.1
 	 */
-	UNRECOGNIZED_ASSOC_OPTION(157, "rule <arg> contains an assoc terminal option in an unrecognized location", ErrorSeverity.WARNING),
+	UNRECOGNIZED_ASSOC_OPTION(157, "rule '<arg>' contains an assoc terminal option in an unrecognized location", ErrorSeverity.WARNING),
 	/**
 	 * Compiler Warning 158.
 	 *
@@ -881,7 +881,7 @@ public enum ErrorType {
 	 *
 	 * @since 4.2.1
 	 */
-	FRAGMENT_ACTION_IGNORED(158, "fragment rule <arg> contains an action or command which can never be executed", ErrorSeverity.WARNING),
+	FRAGMENT_ACTION_IGNORED(158, "fragment rule '<arg>' contains an action or command which can never be executed", ErrorSeverity.WARNING),
 	/**
 	 * Compiler Error 159.
 	 *
@@ -898,7 +898,7 @@ public enum ErrorType {
 	 *
 	 * @since 4.2.1
 	 */
-	RESERVED_RULE_NAME(159, "cannot declare a rule with reserved name <arg>", ErrorSeverity.ERROR),
+	RESERVED_RULE_NAME(159, "cannot declare a rule with reserved name '<arg>'", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 160.
 	 *
@@ -906,19 +906,19 @@ public enum ErrorType {
 	 *
 	 * @see #UNDEFINED_RULE_REF
 	 */
-	PARSER_RULE_REF_IN_LEXER_RULE(160, "reference to parser rule <arg> in lexer rule <arg2>", ErrorSeverity.ERROR),
+	PARSER_RULE_REF_IN_LEXER_RULE(160, "reference to parser rule '<arg>' in lexer rule '<arg2>'", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 161.
 	 *
 	 * <p>channel <em>name</em> conflicts with token with same name</p>
 	 */
-	CHANNEL_CONFLICTS_WITH_TOKEN(161, "channel <arg> conflicts with token with same name", ErrorSeverity.ERROR),
+	CHANNEL_CONFLICTS_WITH_TOKEN(161, "channel '<arg>' conflicts with token with same name", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 162.
 	 *
 	 * <p>channel <em>name</em> conflicts with mode with same name</p>
 	 */
-	CHANNEL_CONFLICTS_WITH_MODE(162, "channel <arg> conflicts with mode with same name", ErrorSeverity.ERROR),
+	CHANNEL_CONFLICTS_WITH_MODE(162, "channel '<arg>' conflicts with mode with same name", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 163.
 	 *
@@ -932,7 +932,7 @@ public enum ErrorType {
 	 */
 	CHANNELS_BLOCK_IN_COMBINED_GRAMMAR(164, "custom channels are not supported in combined grammars", ErrorSeverity.ERROR),
 
-	NONCONFORMING_LR_RULE(169, "rule <arg> is left recursive but doesn't conform to a pattern ANTLR can handle", ErrorSeverity.ERROR),
+	NONCONFORMING_LR_RULE(169, "rule '<arg>' is left recursive but doesn't conform to a pattern ANTLR can handle", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 170.
 	 *
@@ -946,7 +946,7 @@ public enum ErrorType {
 	 *
 	 * <p>mode <em>name</em> conflicts with token with same name</p>
 	 */
-	MODE_CONFLICTS_WITH_TOKEN(170, "mode <arg> conflicts with token with same name", ErrorSeverity.ERROR),
+	MODE_CONFLICTS_WITH_TOKEN(170, "mode '<arg>' conflicts with token with same name", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 171.
 	 *
@@ -956,7 +956,7 @@ public enum ErrorType {
 	 *
 	 * <p>Can be used but cannot be declared: EOF</p>
 	 */
-	TOKEN_CONFLICTS_WITH_COMMON_CONSTANTS(171, "cannot use or declare token with reserved name <arg>", ErrorSeverity.ERROR),
+	TOKEN_CONFLICTS_WITH_COMMON_CONSTANTS(171, "cannot use or declare token with reserved name '<arg>'", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 172.
 	 *
@@ -966,7 +966,7 @@ public enum ErrorType {
 	 *
 	 * <p>Can be used but cannot be declared: HIDDEN, DEFAULT_TOKEN_CHANNEL</p>
 	 */
-	CHANNEL_CONFLICTS_WITH_COMMON_CONSTANTS(172, "cannot use or declare channel with reserved name <arg>", ErrorSeverity.ERROR),
+	CHANNEL_CONFLICTS_WITH_COMMON_CONSTANTS(172, "cannot use or declare channel with reserved name '<arg>'", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 173.
 	 *
@@ -976,7 +976,7 @@ public enum ErrorType {
 	 *
 	 * <p>Can be used and cannot declared: DEFAULT_MODE</p>
 	 */
-	MODE_CONFLICTS_WITH_COMMON_CONSTANTS(173, "cannot use or declare mode with reserved name <arg>", ErrorSeverity.ERROR),
+	MODE_CONFLICTS_WITH_COMMON_CONSTANTS(173, "cannot use or declare mode with reserved name '<arg>'", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 174.
 	 *
@@ -990,7 +990,7 @@ public enum ErrorType {
 	 * E: [f-a];
 	 * </pre>
 	 */
-	EMPTY_STRINGS_AND_SETS_NOT_ALLOWED(174, "string literals and sets cannot be empty: <arg>", ErrorSeverity.ERROR),
+	EMPTY_STRINGS_AND_SETS_NOT_ALLOWED(174, "string literals and sets cannot be empty: '<arg>'", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 175.
 	 *
@@ -998,7 +998,7 @@ public enum ErrorType {
 	 *
 	 * <pre>TOKEN: 'a' -> type(CHANNEL1); // error 175</pre>
 	 */
-	CONSTANT_VALUE_IS_NOT_A_RECOGNIZED_TOKEN_NAME(175, "<arg> is not a recognized token name", ErrorSeverity.ERROR),
+	CONSTANT_VALUE_IS_NOT_A_RECOGNIZED_TOKEN_NAME(175, "'<arg>' is not a recognized token name", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 176.
 	 *
@@ -1006,7 +1006,7 @@ public enum ErrorType {
 	 *
 	 * <pre>TOKEN: 'a' -> mode(MODE1); // error 176</pre>
 	 */
-	CONSTANT_VALUE_IS_NOT_A_RECOGNIZED_MODE_NAME(176, "<arg> is not a recognized mode name", ErrorSeverity.ERROR),
+	CONSTANT_VALUE_IS_NOT_A_RECOGNIZED_MODE_NAME(176, "'<arg>' is not a recognized mode name", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 177.
 	 *
@@ -1014,7 +1014,7 @@ public enum ErrorType {
 	 *
 	 * <pre>TOKEN: 'a' -> channel(TOKEN1); // error 177</pre>
 	 */
-	CONSTANT_VALUE_IS_NOT_A_RECOGNIZED_CHANNEL_NAME(177, "<arg> is not a recognized channel name", ErrorSeverity.ERROR),
+	CONSTANT_VALUE_IS_NOT_A_RECOGNIZED_CHANNEL_NAME(177, "'<arg>' is not a recognized channel name", ErrorSeverity.ERROR),
 	/*
 	* Compiler Warning 178.
 	*
@@ -1022,7 +1022,7 @@ public enum ErrorType {
 	*
 	* <p>TOKEN: 'asdf' -> mode(MODE1), mode(MODE2);</p>
 	* */
-	DUPLICATED_COMMAND(178, "duplicated command <arg>", ErrorSeverity.WARNING),
+	DUPLICATED_COMMAND(178, "duplicated command '<arg>'", ErrorSeverity.WARNING),
 	/*
 	* Compiler Waring 179.
 	*
@@ -1030,7 +1030,7 @@ public enum ErrorType {
 	*
 	* <p>T00: 'a00' -> skip, more;</p>
 	 */
-	INCOMPATIBLE_COMMANDS(179, "incompatible commands <arg> and <arg2>", ErrorSeverity.WARNING),
+	INCOMPATIBLE_COMMANDS(179, "incompatible commands '<arg>' and '<arg2>'", ErrorSeverity.WARNING),
 	/**
 	 * Compiler Warning 180.
 	 *
@@ -1043,7 +1043,7 @@ public enum ErrorType {
 	 *
 	 * TODO: Does not work with fragment rules.
 	 */
-	CHARACTERS_COLLISION_IN_SET(180, "chars <arg> used multiple times in set <arg2>", ErrorSeverity.WARNING),
+	CHARACTERS_COLLISION_IN_SET(180, "chars '<arg>' used multiple times in set '<arg2>'", ErrorSeverity.WARNING),
 
 	/**
 	 * Compiler Warning 181
@@ -1058,7 +1058,7 @@ public enum ErrorType {
 	 * </pre>
 	 *
 	 */
-	TOKEN_RANGE_IN_PARSER(181, "token ranges not allowed in parser: <arg>..<arg2>", ErrorSeverity.ERROR),
+	TOKEN_RANGE_IN_PARSER(181, "token ranges not allowed in parser: '<arg>'..'<arg2>'", ErrorSeverity.ERROR),
 
 	/**
 	 * Compiler Error 182.
@@ -1071,7 +1071,7 @@ public enum ErrorType {
 	 */
 	UNICODE_PROPERTY_NOT_ALLOWED_IN_RANGE(
 			182,
-			"unicode property escapes not allowed in lexer charset range: <arg>",
+			"unicode property escapes not allowed in lexer charset range: '<arg>'",
 			ErrorSeverity.ERROR),
 
 	/*
@@ -1138,7 +1138,7 @@ public enum ErrorType {
 	 * value declared in the {@code tokens{}} block should be converted to
 	 * standard lexer rules.</p>
 	 */
-	V3_ASSIGN_IN_TOKENS(203, "assignments in tokens{} are not supported in ANTLR 4; use lexical rule <arg> : <arg2>; instead", ErrorSeverity.ERROR),
+	V3_ASSIGN_IN_TOKENS(203, "assignments in tokens{} are not supported in ANTLR 4; use lexical rule '<arg>' : '<arg2>'; instead", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Warning 204.
 	 *
