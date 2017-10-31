@@ -22,9 +22,6 @@ public class LexerATNSimulator extends ATNSimulator {
 	public static final boolean debug = false;
 	public static final boolean dfa_debug = false;
 
-	public static final int MIN_DFA_EDGE = 0;
-	public static final int MAX_DFA_EDGE = 127; // forces unicode to stay in ATN
-
 	/** When we hit an accept state in either the DFA or the ATN, we
 	 *  have to notify the character stream to start buffering characters
 	 *  via {@link IntStream#mark} and record the current state. The current sim state
@@ -244,19 +241,8 @@ public class LexerATNSimulator extends ATNSimulator {
 	 * {@code t}, or {@code null} if the target state for this edge is not
 	 * already cached
 	 */
-
 	protected DFAState getExistingTargetState(DFAState s, int t) {
-		if (s.edges == null || t < MIN_DFA_EDGE || t > MAX_DFA_EDGE) {
-			return null;
-		}
-
-		DFAState target = s.edges[t - MIN_DFA_EDGE];
-		if (debug && target != null) {
-			System.out.println("reuse state "+s.stateNumber+
-							   " edge to "+target.stateNumber);
-		}
-
-		return target;
+		return s.getTargetState(t);
 	}
 
 	/**
@@ -644,22 +630,10 @@ public class LexerATNSimulator extends ATNSimulator {
 	}
 
 	protected void addDFAEdge(DFAState p, int t, DFAState q) {
-		if (t < MIN_DFA_EDGE || t > MAX_DFA_EDGE) {
-			// Only track edges within the DFA bounds
-			return;
-		}
-
 		if ( debug ) {
 			System.out.println("EDGE "+p+" -> "+q+" upon "+((char)t));
 		}
-
-		synchronized (p) {
-			if ( p.edges==null ) {
-				//  make room for tokens 1..n and -1 masquerading as index 0
-				p.edges = new DFAState[MAX_DFA_EDGE-MIN_DFA_EDGE+1];
-			}
-			p.edges[t - MIN_DFA_EDGE] = q; // connect
-		}
+		p.addEdge(t, q);
 	}
 
 	/** Add a new DFA state if there isn't one with this set of
@@ -668,6 +642,7 @@ public class LexerATNSimulator extends ATNSimulator {
 		traversing the DFA, we will know which rule to accept.
 	 */
 
+
 	protected DFAState addDFAState(ATNConfigSet configs) {
 		/* the lexer evaluates predicates on-the-fly; by this point configs
 		 * should not contain any configurations with unevaluated predicates.
@@ -675,6 +650,7 @@ public class LexerATNSimulator extends ATNSimulator {
 		assert !configs.hasSemanticContext;
 
 		DFAState proposed = new DFAState(configs);
+
 		ATNConfig firstConfigWithRuleStopState = null;
 		for (ATNConfig c : configs) {
 			if ( c.state instanceof RuleStopState )	{
@@ -695,7 +671,6 @@ public class LexerATNSimulator extends ATNSimulator {
 			if ( existing!=null ) return existing;
 
 			DFAState newState = proposed;
-
 			newState.stateNumber = dfa.states.size();
 			configs.setReadonly(true);
 			newState.configs = configs;
@@ -703,7 +678,6 @@ public class LexerATNSimulator extends ATNSimulator {
 			return newState;
 		}
 	}
-
 
 	public final DFA getDFA(int mode) {
 		return decisionToDFA[mode];

@@ -85,9 +85,10 @@ public class DOTGenerator {
 		}
 
 		for (DFAState d : dfa.states.keySet()) {
-			if ( d.edges!=null ) {
-				for (int i = 0; i < d.edges.length; i++) {
-					DFAState target = d.edges[i];
+			if ( d.getEdgeCount() > 0 ) {
+				int[] keys = d.getEdgeKeys();
+				for (int i = 0; i < keys.length; i++) {
+					DFAState target = d.getTargetState(keys[i]);
 					if ( target==null) continue;
 					if ( target.stateNumber == Integer.MAX_VALUE ) continue;
 					int ttype = i-1; // we shift up for EOF as -1 for parser
