@@ -613,13 +613,7 @@ public class IntervalSet: IntSet, Hashable, CustomStringConvertible {
 
     public func size() -> Int {
         var n = 0
-        let numIntervals = intervals.count
-        if numIntervals == 1 {
-            let firstInterval = intervals[0]
-            return firstInterval.b - firstInterval.a + 1
-        }
-        for i in 0..<numIntervals {
-            let interval = intervals[i]
+        for interval in intervals {
             n += (interval.b - interval.a + 1)
         }
         return n

@@ -142,9 +142,8 @@ public class ListTokenSource: TokenSource {
                     var line = lastToken.getLine()
 
                     if let tokenText = lastToken.getText() {
-                        let length = tokenText.length
-                        for j in 0..<length {
-                            if String(tokenText[j]) == "\n" {
+                        for c in tokenText {
+                            if c == "\n" {
                                 line += 1
                             }
                         }
