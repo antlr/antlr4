@@ -41,16 +41,20 @@ include_directories(
   )
 
 #file(GLOB antlr4-demo_SRC "${PROJECT_SOURCE_DIR}/demo/generated/*")
-set(antlr4-demo_SRC 
-  ${PROJECT_SOURCE_DIR}/demo/Linux/main.cpp
-  ${antlr4-demo-GENERATED_SRC}
-  )
 
 if (NOT CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
   set (flags_1 "-Wno-overloaded-virtual")
+  set (main_src ${PROJECT_SOURCE_DIR}/demo/Linux/main.cpp)
 else()
   set (flags_1 "-MP /wd4251")
+  add_definitions (-DUNICODE -D_UNICODE)
+  set (main_src ${PROJECT_SOURCE_DIR}/demo/Windows/main.cpp)
 endif()
+
+set(antlr4-demo_SRC 
+  ${antlr4-demo-GENERATED_SRC}
+  ${main_src}
+  )
 
 foreach( src_file ${antlr4-demo_SRC} )
       set_source_files_properties(
