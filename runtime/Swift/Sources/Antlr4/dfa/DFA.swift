@@ -165,18 +165,13 @@ public class DFA: CustomStringConvertible {
         return toString(Vocabulary.EMPTY_VOCABULARY)
     }
 
-
-    public func toString() -> String {
-        return description
-    }
-
     public func toString(_ vocabulary: Vocabulary) -> String {
         if s0 == nil {
             return ""
         }
 
         let serializer = DFASerializer(self, vocabulary)
-        return serializer.toString()
+        return serializer.description
     }
 
     public func toLexerString() -> String {
@@ -184,7 +179,7 @@ public class DFA: CustomStringConvertible {
             return ""
         }
         let serializer = LexerDFASerializer(self)
-        return serializer.toString()
+        return serializer.description
     }
 
 }

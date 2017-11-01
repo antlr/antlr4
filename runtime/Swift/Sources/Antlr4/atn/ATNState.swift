@@ -136,9 +136,6 @@ public class ATNState: Hashable, CustomStringConvertible {
     }
 
 
-    public func toString() -> String {
-        return description
-    }
     public var description: String {
         //return "MyClass \(string)"
         return String(stateNumber)

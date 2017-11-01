@@ -292,10 +292,6 @@ public class ATNConfigSet: Hashable, CustomStringConvertible {
         return buf
     }
 
-    public func toString() -> String {
-        return description
-    }
-
     /// 
     /// override
     /// public <T> func toArray(a : [T]) -> [T] {

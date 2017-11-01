@@ -1907,7 +1907,7 @@ open class ParserATNSimulator: ATNSimulator {
                 }
                 else if let st = t as? SetTransition {
                     let not = st is NotSetTransition
-                    trans = (not ? "~" : "") + "Set " + st.set.toString()
+                    trans = (not ? "~" : "") + "Set " + st.set.description
                 }
             }
             errPrint("\(c.toString(parser, true)):\(trans)")

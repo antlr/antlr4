@@ -159,9 +159,6 @@ public class ATNConfig: Hashable, CustomStringConvertible {
 
     }
 
-    public func toString() -> String {
-        return description
-    }
     public var description: String {
         //return "MyClass \(string)"
         return toString(nil, true)

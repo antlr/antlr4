@@ -43,10 +43,6 @@ public class DFASerializer: CustomStringConvertible {
         return buf
     }
 
-    public func toString() -> String {
-        return description
-    }
-
     internal func getEdgeLabel(_ i: Int) -> String {
         return vocabulary.getDisplayName(i - 1)
     }

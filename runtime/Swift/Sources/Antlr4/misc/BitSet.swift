@@ -1104,15 +1104,15 @@ public class BitSet: Hashable, CustomStringConvertible {
     /// 
     /// Example:
     /// 
-    /// BitSet drPepper = new BitSet();
-    /// Now `drPepper.toString()` returns "`{`}".
+    /// `BitSet drPepper = new BitSet();`
+    /// Now `drPepper.description` returns `"{}"`.
     /// 
-    /// drPepper.set(2);
-    /// Now `drPepper.toString()` returns "`{2`}".
+    /// `drPepper.set(2);`
+    /// Now `drPepper.description` returns `"{2}"`.
     /// 
-    /// drPepper.set(4);
-    /// drPepper.set(10);
-    /// Now `drPepper.toString()` returns "`{2, 4, 10`}".
+    /// `drPepper.set(4);`
+    /// `drPepper.set(10);`
+    /// Now `drPepper.description` returns `"{2, 4, 10}"`.
     /// 
     /// - returns: a string representation of this bit set
     /// 
@@ -1139,10 +1139,6 @@ public class BitSet: Hashable, CustomStringConvertible {
         return b
 
     }
-    public func toString() -> String {
-        return description
-    }
-
 }
 
 public func ==(lhs: BitSet, rhs: BitSet) -> Bool {

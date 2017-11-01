@@ -105,7 +105,6 @@ public class IntervalSet: IntSet, Hashable, CustomStringConvertible {
         if readonly {
             throw ANTLRError.illegalState(msg: "can't alter readonly IntervalSet")
         }
-        //System.out.println("add "+addition+" to "+intervals.toString());
         if addition.b < addition.a {
             return
         }
@@ -508,9 +507,6 @@ public class IntervalSet: IntSet, Hashable, CustomStringConvertible {
 
     public var description: String {
         return toString(false)
-    }
-    public func toString() -> String {
-        return description
     }
 
     public func toString(_ elemAreChar: Bool) -> String {
