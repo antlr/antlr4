@@ -10,27 +10,25 @@ import Foundation
 public class Utils {
 
     public static func escapeWhitespace(_ s: String, _ escapeSpaces: Bool) -> String {
-        let buf: StringBuilder = StringBuilder()
-        for c: Character in s.characters {
+        var buf = ""
+        for c in s {
             if c == " " && escapeSpaces {
-                buf.append("\u{00B7}")
-            } else {
-                if c == "\t" {
-                    buf.append("\\t")
-                } else {
-                    if c == "\n" {
-                        buf.append("\\n")
-                    } else {
-                        if c == "\r" {
-                            buf.append("\\r")
-                        } else {
-                            buf.append(String(c))
-                        }
-                    }
-                }
+                buf += "\u{00B7}"
+            }
+            else if c == "\t" {
+                    buf += "\\t"
+            }
+            else if c == "\n" {
+                buf += "\\n"
+            }
+            else if c == "\r" {
+                buf += "\\r"
+            }
+            else {
+                buf.append(c)
             }
         }
-        return buf.toString()
+        return buf
     }
 
 

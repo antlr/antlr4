@@ -413,11 +413,11 @@ open class Lexer: Recognizer<LexerATNSimulator>, TokenSource {
     }
 
     open func getErrorDisplay(_ s: String) -> String {
-        let buf = StringBuilder()
-        for c in s.characters {
-            buf.append(getErrorDisplay(c))
+        var buf = ""
+        for c in s {
+            buf += getErrorDisplay(c)
         }
-        return buf.toString()
+        return buf
     }
 
     open func getErrorDisplay(_ c: Character) -> String {

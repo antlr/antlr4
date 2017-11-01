@@ -1121,23 +1121,22 @@ public class BitSet: Hashable, CustomStringConvertible {
 
         //let numBits: Int = (wordsInUse > 128) ?
         // cardinality() : wordsInUse * BitSet.BITS_PER_WORD
-        let b = StringBuilder()
-        b.append("{")
+        var b = "{"
         var i = firstSetBit()
         if i != -1 {
-            b.append(i)
+            b += String(i)
             i = try! nextSetBit(i + 1)
             while i >= 0 {
                 let endOfRun = try! nextClearBit(i)
                 repeat {
-                    b.append(", ").append(i)
+                    b += ", \(i)"
                     i += 1
                 } while i < endOfRun
                 i = try! nextSetBit(i + 1)
             }
         }
-        b.append("}")
-        return b.toString()
+        b += "}"
+        return b
 
     }
     public func toString() -> String {

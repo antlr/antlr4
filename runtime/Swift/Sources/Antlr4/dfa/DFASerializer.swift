@@ -22,33 +22,25 @@ public class DFASerializer: CustomStringConvertible {
         if dfa.s0 == nil {
             return ""
         }
-        let buf = StringBuilder()
+        var buf = ""
         let states = dfa.getStates()
         for s in states {
             guard let edges = s.edges else {
                 continue
             }
-            let n = edges.count
-            for i in 0..<n {
-                if let t = s.edges![i], t.stateNumber != Int.max {
-                    buf.append(getStateString(s))
-                    let label = getEdgeLabel(i)
-                    buf.append("-")
-                    buf.append(label)
-                    buf.append("->")
-                    buf.append(getStateString(t))
-                    buf.append("\n")
+            for (i, t) in edges.enumerated() {
+                guard let t = t, t.stateNumber != Int.max else {
+                    continue
                 }
+                let edgeLabel = getEdgeLabel(i)
+                buf += getStateString(s)
+                buf += "-\(edgeLabel)->"
+                buf += getStateString(t)
+                buf += "\n"
             }
         }
 
-        let output = buf.toString()
-        if output.length == 0 {
-            return ""
-        }
-        //return Utils.sortLinesInString(output);
-        return output
-
+        return buf
     }
 
     public func toString() -> String {
