@@ -130,6 +130,20 @@
 				<directory>test</directory>
 			</testResource>
 		</testResources>
+		<plugins>
+			<plugin>
+				<artifactId>maven-clean-plugin</artifactId>
+				<version>3.0.0</version>
+				<configuration>
+					<filesets>
+						<fileset>
+							<directory>runtime/Swift/.build</directory>
+							<directory>runtime/Swift/Tests/Antlr4Tests/gen</directory>
+						</fileset>
+					</filesets>
+				</configuration>
+			</plugin>
+		</plugins>
 		<pluginManagement>
 			<plugins>
 				<plugin>
