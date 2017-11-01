@@ -34,19 +34,6 @@ public class Utils {
     }
 
 
-    public static func readFile(_ path: String, _ encoding: String.Encoding = String.Encoding.utf8) -> [Character] {
-
-        var fileContents: String
-
-        do {
-            fileContents = try String(contentsOfFile: path, encoding: encoding)
-        } catch {
-            return [Character]()
-        }
-
-        return Array(fileContents.characters)
-    }
-
     public static func toMap(_ keys: [String]) -> Dictionary<String, Int> {
         var m = Dictionary<String, Int>()
         for (index,v) in keys.enumerated() {
