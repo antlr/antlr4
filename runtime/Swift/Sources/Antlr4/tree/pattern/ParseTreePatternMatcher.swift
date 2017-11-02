@@ -387,7 +387,7 @@ public class ParseTreePatternMatcher {
 
         let ntags = starts.count
         for i in 0..<ntags {
-            if starts[i] != stops[i] {
+            if starts[i] >= stops[i] {
                 throw ANTLRError.illegalArgument(msg: "tag delimiters out of order in pattern: " + pattern)
             }
         }
@@ -408,7 +408,7 @@ public class ParseTreePatternMatcher {
             // copy inside of <tag>
             let tag = pattern[starts[i] + start.length ..< stops[i]]
             var ruleOrToken = tag
-            var label = ""
+            var label: String?
             let colon = tag.indexOf(":")
             if colon >= 0 {
                 label = tag[0 ..< colon]
@@ -417,7 +417,7 @@ public class ParseTreePatternMatcher {
             chunks.append(try TagChunk(label, ruleOrToken))
             if i + 1 < ntags {
                 // copy from end of <tag> to start of next
-                let text = pattern[stops[i] + stop.length ..< starts[i] + 1]
+                let text = pattern[stops[i] + stop.length ..< starts[i + 1]]
                 chunks.append(TextChunk(text))
             }
         }
