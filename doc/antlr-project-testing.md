@@ -59,8 +59,7 @@ Now, make sure C# runtime is built and installed locally.
 ```bash
 cd ~/antlr/code/antlr4/runtime/CSharp/runtime/CSharp
 # kill previous ones manually as "xbuild /t:Clean" didn't seem to do it
-rm Antlr4.Runtime/bin/net20/Release/Antlr4.Runtime.dll
-rm Antlr4.Runtime/obj/net20/Release/Antlr4.Runtime.dll
+find . -name '*.dll' -exec rm {} \;
 # build
 xbuild /p:Configuration=Release Antlr4.Runtime/Antlr4.Runtime.mono.csproj
 ```
