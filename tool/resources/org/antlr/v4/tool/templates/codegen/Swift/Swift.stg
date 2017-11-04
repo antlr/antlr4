@@ -964,7 +964,7 @@ open class <lexer.name>: <superClass; null="Lexer"> {
         return <lexer.name>.VOCABULARY
     }
 
-	public override init(_ input: CharStream) {
+	public required init(_ input: CharStream) {
 	    RuntimeMetaData.checkVersion("<lexerFile.ANTLRVersion>", RuntimeMetaData.VERSION)
 		super.init(input)
 		_interp = LexerATNSimulator(self, <lexer.name>._ATN, <lexer.name>._decisionToDFA, <lexer.name>._sharedContextCache)
