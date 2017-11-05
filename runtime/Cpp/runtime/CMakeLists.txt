@@ -53,7 +53,7 @@ endif ()
 
 if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
   set(disabled_compile_warnings "${disabled_compile_warnings} -Wno-dollar-in-identifier-extension -Wno-four-char-constants")
-elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
+elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU" OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "Intel")
   set(disabled_compile_warnings "${disabled_compile_warnings} -Wno-multichar")
 endif()
 
