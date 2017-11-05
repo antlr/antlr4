@@ -49,8 +49,18 @@ public class GoTarget extends Target {
 			"make", "new", "panic", "print", "println", "real", "recover"
 	};
 
+	// interface definition of RuleContext from runtime/Go/antlr/rule_context.go
+	private static final String[] goRuleContextInterfaceMethods = {
+		"Accept", "GetAltNumber", "GetBaseRuleContext", "GetChild", "GetChildCount",
+		"GetChildren", "GetInvokingState", "GetParent", "GetPayload", "GetRuleContext",
+		"GetRuleIndex", "GetSourceInterval", "GetText", "IsEmpty", "SetAltNumber",
+		"SetInvokingState", "SetParent", "String"
+	};
+
 	/** Avoid grammar symbols in this set to prevent conflicts in gen'd code. */
-	private final Set<String> badWords = new HashSet<String>(goKeywords.length + goPredeclaredIdentifiers.length + 3);
+	private final Set<String> badWords = new HashSet<String>(
+		goKeywords.length + goPredeclaredIdentifiers.length + goRuleContextInterfaceMethods.length + 3
+	);
 
 	private static final boolean DO_GOFMT = !Boolean.parseBoolean(System.getenv("ANTLR_GO_DISABLE_GOFMT"))
 			&& !Boolean.parseBoolean(System.getProperty("antlr.go.disable-gofmt"));
@@ -75,6 +85,7 @@ public class GoTarget extends Target {
 	protected void addBadWords() {
 		badWords.addAll(Arrays.asList(goKeywords));
 		badWords.addAll(Arrays.asList(goPredeclaredIdentifiers));
+		badWords.addAll(Arrays.asList(goRuleContextInterfaceMethods));
 		badWords.add("rule");
 		badWords.add("parserRule");
 		badWords.add("action");

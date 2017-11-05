@@ -18,19 +18,6 @@ public class LexerInterpreter: Lexer {
     internal final var _decisionToDFA: [DFA]
     internal final var _sharedContextCache = PredictionContextCache()
 
-//   public override init() {
-//    super.init()}
-
-//    public  convenience   init(_ input : CharStream) {
-//        self.init()
-//        self._input = input;
-//        self._tokenFactorySourcePair = (self, input);
-//    }
-    //@Deprecated
-    public convenience init(_ grammarFileName: String, _ tokenNames: Array<String?>?, _ ruleNames: Array<String>, _ channelNames: Array<String>, _ modeNames: Array<String>, _ atn: ATN, _ input: CharStream) throws {
-        try self.init(grammarFileName, Vocabulary.fromTokenNames(tokenNames), ruleNames, channelNames, modeNames, atn, input)
-    }
-
     public init(_ grammarFileName: String, _ vocabulary: Vocabulary, _ ruleNames: Array<String>, _ channelNames: Array<String>, _ modeNames: Array<String>, _ atn: ATN, _ input: CharStream) throws {
 
         self.grammarFileName = grammarFileName
@@ -52,6 +39,10 @@ public class LexerInterpreter: Lexer {
             throw ANTLRError.illegalArgument(msg: "The ATN must be a lexer ATN.")
 
         }
+    }
+
+    public required init(_ input: CharStream) {
+        fatalError("Use the other initializer")
     }
 
     override
