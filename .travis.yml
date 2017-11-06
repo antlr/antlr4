@@ -2,9 +2,13 @@ sudo: true
 
 language: java
 
+before_cache:
+  - rm -rf $HOME/.m2/repository/org/antlr
 cache:
+  timeout: 600
   directories:
   - $HOME/.m2
+  - $HOME/Library/Caches/Antlr4
   - $HOME/Library/Caches/Homebrew
 
 stages:

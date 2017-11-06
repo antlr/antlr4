@@ -1,4 +1,7 @@
 version: '4.7.1-SNAPSHOT+AppVeyor.{build}'
+cache:
+  - '%USERPROFILE%\.m2'
+  - '%USERPROFILE%\.nuget\packages -> **\project.json'
 build: off
 build_script:
   - mvn -DskipTests install --batch-mode

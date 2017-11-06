@@ -19,6 +19,8 @@ import Foundation
  *  code points in the buffer as ints.
  */
 open class UnbufferedCharStream: CharStream {
+    private let bufferSize: Int
+
     /**
      * A moving window buffer of the data being scanned. While there's a marker,
      * we keep adding to buffer. Otherwise, {@link #consume consume()} resets so
@@ -77,6 +79,7 @@ open class UnbufferedCharStream: CharStream {
 
     public init(_ input: InputStream, _ bufferSize: Int = 256) {
         self.input = input
+        self.bufferSize = bufferSize
         self.data = [Int](repeating: 0, count: bufferSize)
         let si = UInt8StreamIterator(input)
         self.unicodeIterator = UnicodeScalarStreamIterator(si)
@@ -159,13 +162,6 @@ open class UnbufferedCharStream: CharStream {
     }
 
     public func LA(_ i: Int) throws -> Int {
-        let result = try LA_(i)
-        print("LA(\(i)) -> \(result)")
-        return result
-    }
-
-    private func LA_(_ i: Int) throws -> Int {
-
         if i == -1 {
             return lastChar // special case
         }
@@ -212,11 +208,16 @@ open class UnbufferedCharStream: CharStream {
 
             // Copy data[p]..data[n-1] to data[0]..data[(n-1)-p], reset ptrs
             // p is last valid char; move nothing if p==n as we have no valid char
-            let dataCapacity = data.capacity
-            data = Array(data[p ..< n])
-            data += [Int](repeating: 0, count: dataCapacity - (n - p))
-            precondition(data.capacity == dataCapacity)
-            n = n - p
+            if p == n {
+                if data.count != bufferSize {
+                    data = [Int](repeating: 0, count: bufferSize)
+                }
+                n = 0
+            }
+            else {
+                data = Array(data[p ..< n])
+                n -= p
+            }
             p = 0
             lastCharBufferStart = lastChar
         }
@@ -344,9 +345,12 @@ fileprivate struct UInt8StreamIterator: IteratorProtocol {
             break
         }
 
-        let count = stream.read(&buffer, maxLength: buffer.capacity)
-        if count <= 0 {
+        let count = stream.read(&buffer, maxLength: buffer.count)
+        if count < 0 {
             hasErrorOccurred = true
+            return nil
+        }
+        else if count == 0 {
             return nil
         }
 

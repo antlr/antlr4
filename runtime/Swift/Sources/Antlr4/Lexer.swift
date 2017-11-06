@@ -92,7 +92,7 @@ open class Lexer: Recognizer<LexerATNSimulator>, TokenSource {
         self._tokenFactorySourcePair.tokenSource = self
     }
 
-    public init(_ input: CharStream) {
+    public required init(_ input: CharStream) {
         self._input = input
         self._tokenFactorySourcePair = TokenSourceAndStream()
         super.init()
