@@ -7,11 +7,8 @@
 open class AbstractParseTreeVisitor<T>: ParseTreeVisitor<T> {
     public override init() {
         super.init()
-
     }
 
-    /// 
-    /// 
     /// 
     /// The default implementation calls _org.antlr.v4.runtime.tree.ParseTree#accept_ on the
     /// specified tree.
@@ -20,9 +17,7 @@ open class AbstractParseTreeVisitor<T>: ParseTreeVisitor<T> {
         return tree.accept(self)
     }
 
-    /// 
-    /// 
-    /// 
+    ///
     /// The default implementation initializes the aggregate result to
     /// _#defaultResult defaultResult()_. Before visiting each child, it
     /// calls _#shouldVisitNextChild shouldVisitNextChild_; if the result
@@ -37,24 +32,22 @@ open class AbstractParseTreeVisitor<T>: ParseTreeVisitor<T> {
     /// 
     open override func visitChildren(_ node: RuleNode) -> T? {
         var result: T? = defaultResult()
-        let n: Int = node.getChildCount()
+        let n = node.getChildCount()
 
         for i in 0..<n {
             if !shouldVisitNextChild(node, result) {
                 break
             }
 
-            let c: ParseTree? = node.getChild(i) as? ParseTree
-            let childResult: T? = c?.accept(self)
+            let c = node.getChild(i) as? ParseTree
+            let childResult = c?.accept(self)
             result = aggregateResult(result, childResult)
         }
 
         return result
     }
 
-    /// 
-    /// 
-    /// 
+    ///
     /// The default implementation returns the result of
     /// _#defaultResult defaultResult_.
     /// 
@@ -62,9 +55,7 @@ open class AbstractParseTreeVisitor<T>: ParseTreeVisitor<T> {
         return defaultResult()
     }
 
-    /// 
-    /// 
-    /// 
+    ///
     /// The default implementation returns the result of
     /// _#defaultResult defaultResult_.
     /// 

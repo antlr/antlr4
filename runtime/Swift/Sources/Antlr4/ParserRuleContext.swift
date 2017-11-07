@@ -28,13 +28,14 @@
 /// 
 open class ParserRuleContext: RuleContext {
     public var visited = false
+
     /// If we are debugging or building a parse tree for a visitor,
     /// we need to track all of the tokens and rule invocations associated
     /// with this rule's context. This is empty for parsing w/o tree constr.
     /// operation because we don't the need to track the details about
     /// how we parse this rule.
     /// 
-    public var children: Array<ParseTree>?
+    public var children: [ParseTree]?
 
     /// For debugging/tracing purposes, we want to track all of the nodes in
     /// the ATN traversed by the parser for a particular rule.
@@ -60,10 +61,14 @@ open class ParserRuleContext: RuleContext {
     /// The exception that forced this rule to return. If the rule successfully
     /// completed, this is `null`.
     /// 
-    public var exception: AnyObject!
+    public var exception: RecognitionException?
 
     public override init() {
         super.init()
+    }
+
+    public init(_ parent: ParserRuleContext?, _ invokingStateNumber: Int) {
+        super.init(parent, invokingStateNumber)
     }
 
     /// COPY a ctx (I'm deliberately not using copy constructor) to avoid
@@ -80,24 +85,19 @@ open class ParserRuleContext: RuleContext {
     open func copyFrom(_ ctx: ParserRuleContext) {
         self.parent = ctx.parent
         self.invokingState = ctx.invokingState
-
         self.start = ctx.start
         self.stop = ctx.stop
 
         // copy any error nodes to alt label node
-        if  ctx.children != nil {
-            self.children = Array<ParseTree>()
+        if let ctxChildren = ctx.children {
+            self.children = [ParseTree]()
             // reset parent pointer for any error nodes
-            for  child: ParseTree in ctx.children! {
-                if  child is ErrorNode {
-                    addChild(child as! ErrorNode)
+            for child in ctxChildren {
+                if let errNode = child as? ErrorNode {
+                    addChild(errNode)
                 }
             }
         }
-    }
-
-    public init(_ parent: ParserRuleContext?, _ invokingStateNumber: Int) {
-        super.init(parent, invokingStateNumber)
     }
 
     // Double dispatch methods for listeners
@@ -141,99 +141,55 @@ open class ParserRuleContext: RuleContext {
     }
 
     /// Add an error node child and force its parent to be this node.
-    /// 
-    /// - Since: 4.7
-    /// 
     @discardableResult
     open func addErrorNode(_ errorNode: ErrorNode) -> ErrorNode {
         errorNode.setParent(self)
         return addAnyChild(errorNode)
     }
 
-    /// Add a child to this node based upon matchedToken. It
-    /// creates a TerminalNodeImpl rather than using
-    /// _Parser#createTerminalNode(ParserRuleContext, Token)_. I'm leaving this
-    /// in for compatibility but the parser doesn't use this anymore.
-    /// 
-    @available(*, deprecated)
-    open func addChild(_ matchedToken: Token) -> TerminalNode {
-        let t: TerminalNodeImpl = TerminalNodeImpl(matchedToken)
-        addAnyChild(t)
-        t.setParent(self)
-        return t
-    }
-
-    /// Add a child to this node based upon badToken.  It
-    /// creates a ErrorNodeImpl rather than using
-    /// _Parser#createErrorNode(ParserRuleContext, Token)_. I'm leaving this
-    /// in for compatibility but the parser doesn't use this anymore.
-    /// 
-    @discardableResult
-    @available(*, deprecated)
-    open func addErrorNode(_ badToken: Token) -> ErrorNode {
-        let t: ErrorNode = ErrorNode(badToken)
-        addAnyChild(t)
-        t.setParent(self)
-        return t
-    }
-
-    //	public void trace(int s) {
-    //		if ( states==null ) states = new ArrayList<Integer>();
-    //		states.add(s);
-    //	}
 
     /// Used by enterOuterAlt to toss out a RuleContext previously added as
     /// we entered a rule. If we have # label, we will need to remove
     /// generic ruleContext object.
     /// 
     open func removeLastChild() {
-    	if children != nil {
-            children!.remove(at: children!.count-1)
-    	}
+        children?.removeLast()
     }
 
-
-    override
-    /// 
-    /// Override to make type more specific
-    /// 
-    open func getParent() -> Tree? {
-        return super.getParent()
-    }
 
     override
     open func getChild(_ i: Int) -> Tree? {
-        guard let children = children , i >= 0 && i < children.count else {
+        guard let children = children, i >= 0 && i < children.count else {
             return nil
         }
         return children[i]
     }
 
-    open func getChild<T:ParseTree>(_ ctxType: T.Type, i: Int) -> T? {
-        guard let children = children , i >= 0 && i < children.count else {
+    open func getChild<T: ParseTree>(_ ctxType: T.Type, i: Int) -> T? {
+        guard let children = children, i >= 0 && i < children.count else {
             return nil
         }
-        var j: Int = -1 // what element have we found with ctxType?
-        for o: ParseTree in children {
-            //if ( ctxType.isInstance(o) ) {
+        var j = -1 // what element have we found with ctxType?
+        for o in children {
             if let o = o as? T {
                 j += 1
                 if j == i {
-                    return o //ctxType.cast(o);
+                    return o
                 }
             }
         }
+
         return nil
     }
 
     open func getToken(_ ttype: Int, _ i: Int) -> TerminalNode? {
-        guard let children = children , i >= 0 && i < children.count else {
+        guard let children = children, i >= 0 && i < children.count else {
             return nil
         }
-        var j: Int = -1 // what token with ttype have we found?
-        for o: ParseTree in children{
+        var j = -1 // what token with ttype have we found?
+        for o in children {
             if let tnode = o as? TerminalNode {
-                let symbol: Token = tnode.getSymbol()!
+                let symbol = tnode.getSymbol()!
                 if symbol.getType() == ttype {
                     j += 1
                     if j == i {
@@ -246,60 +202,40 @@ open class ParserRuleContext: RuleContext {
         return nil
     }
 
-    open func getTokens(_ ttype: Int) -> Array<TerminalNode> {
-        if children == nil {
-            return Array<TerminalNode>()
+    open func getTokens(_ ttype: Int) -> [TerminalNode] {
+        guard let children = children else {
+            return [TerminalNode]()
         }
 
-        var tokens: Array<TerminalNode>? = nil
-        for o: ParseTree in children! {
-            if o is TerminalNode {
-                let tnode: TerminalNode = o as! TerminalNode
-                let symbol: Token = tnode.getSymbol()!
-                if symbol.getType() == ttype {
-                    if tokens == nil {
-                        tokens = Array<TerminalNode>()
-                    }
-                    tokens?.append(tnode)
-                }
+        return children.flatMap {
+            if let tnode = $0 as? TerminalNode, let symbol = tnode.getSymbol(), symbol.getType() == ttype {
+                return tnode
+            }
+            else {
+                return nil
             }
         }
-
-        if tokens == nil {
-            return Array<TerminalNode>()
-        }
-
-        return tokens!
     }
 
-    open func getRuleContext<T:ParserRuleContext>(_ ctxType: T.Type, _ i: Int) -> T? {
-
+    open func getRuleContext<T: ParserRuleContext>(_ ctxType: T.Type, _ i: Int) -> T? {
         return getChild(ctxType, i: i)
     }
 
-    open func getRuleContexts<T:ParserRuleContext>(_ ctxType: T.Type) -> Array<T> {
-
-        guard let children = children  else {
-            return Array<T>()//Collections.emptyList();
+    open func getRuleContexts<T: ParserRuleContext>(_ ctxType: T.Type) -> [T] {
+        guard let children = children else {
+            return [T]()
         }
-        var contexts = Array<T>()
-        for o: ParseTree in children {
-            if let o = o as? T {
-                contexts.append(o)
-                //contexts.(ctxType.cast(o));
-            }
-        }
-        return contexts
+        return children.flatMap { $0 as? T }
     }
 
     override
     open func getChildCount() -> Int {
-        return children != nil ? children!.count : 0
+        return children?.count ?? 0
     }
 
     override
     open func getSourceInterval() -> Interval {
-        guard let start = start,let stop = stop else {
+        guard let start = start, let stop = stop else {
              return Interval.INVALID
         }
         return Interval.of(start.getTokenIndex(), stop.getTokenIndex())
@@ -324,10 +260,9 @@ open class ParserRuleContext: RuleContext {
 
     /// Used for rule context info debugging during parse-time, not so much for ATN debugging
     open func toInfoString(_ recognizer: Parser) -> String {
-        var rules: Array<String> = recognizer.getRuleInvocationStack(self)
-        // Collections.reverse(rules);
-        rules = rules.reversed()
-        return "ParserRuleContext\(rules){start= + \(String(describing: start)), stop=\(String(describing: stop))}"
-
+        let rules = Array(recognizer.getRuleInvocationStack(self).reversed())
+        let startStr = start == nil ? "<unknown>" : start!.description
+        let stopStr = stop == nil ? "<unknown>" : stop!.description
+        return "ParserRuleContext\(rules){start=\(startStr)), stop=\(stopStr)}"
     }
 }

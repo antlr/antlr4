@@ -6,27 +6,28 @@
 
 public class ParseTreeWalker {
     public static let DEFAULT = ParseTreeWalker()
-    public init() {
 
+    public init() {
     }
 
     public func walk(_ listener: ParseTreeListener, _ t: ParseTree) throws {
-        if t is ErrorNode {
-            listener.visitErrorNode(t as! ErrorNode)
-            return
-        } else {
-            if t is TerminalNode {
-                listener.visitTerminal(t as! TerminalNode)
-                return
+        if let errNode = t as? ErrorNode {
+            listener.visitErrorNode(errNode)
+        }
+        else if let termNode = t as? TerminalNode {
+            listener.visitTerminal(termNode)
+        }
+        else if let r = t as? RuleNode {
+            try enterRule(listener, r)
+            let n = r.getChildCount()
+            for i in 0..<n {
+                try walk(listener, r.getChild(i) as! ParseTree)
             }
+            try exitRule(listener, r)
         }
-        let r: RuleNode = t as! RuleNode
-        try enterRule(listener, r)
-        let n: Int = r.getChildCount()
-        for i in 0..<n {
-            try   walk(listener, r.getChild(i) as! ParseTree)
+        else {
+            preconditionFailure()
         }
-        try exitRule(listener, r)
     }
 
     /// 
@@ -36,13 +37,13 @@ public class ParseTreeWalker {
     /// the rule specific. We to them in reverse order upon finishing the node.
     /// 
     internal func enterRule(_ listener: ParseTreeListener, _ r: RuleNode) throws {
-        let ctx: ParserRuleContext = r.getRuleContext() as! ParserRuleContext
+        let ctx = r.getRuleContext() as! ParserRuleContext
         try listener.enterEveryRule(ctx)
         ctx.enterRule(listener)
     }
 
     internal func exitRule(_ listener: ParseTreeListener, _ r: RuleNode) throws {
-        let ctx: ParserRuleContext = r.getRuleContext() as! ParserRuleContext
+        let ctx = r.getRuleContext() as! ParserRuleContext
         ctx.exitRule(listener)
         try listener.exitEveryRule(ctx)
     }
