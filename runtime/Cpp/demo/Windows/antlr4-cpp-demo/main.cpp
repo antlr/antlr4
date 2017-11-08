@@ -29,26 +29,23 @@ using namespace antlrcpptest;
 using namespace antlr4;
 using namespace std;
 
-int main(int argc, const char * argv[]) {
-
+int main(int , const char **) {
   const std::string in_str = u8"🍴 = 🍐 + \"😎\";(((x * π))) * µ + ∰; a + (x * (y ? 0 : 1) + z); \"Т\" + \"М\" + \"Приве́т नमस्ते שָׁלוֹם\" = \"♥♣♠○• ♡ ❤ ♥\";";
   ANTLRInputStream input(in_str);
   TLexer lexer(&input);
   CommonTokenStream tokens(&lexer);
 
+  SetConsoleOutputCP (CP_UTF8);
+
   tokens.fill();
   for (auto token : tokens.getTokens()) {
-    cout << token->toString() << endl;
+	  cout << token->toString() << endl;
   }
 
   TParser parser(&tokens);
-  tree::ParseTree *tree = parser.main();
+  tree::ParseTree* tree = parser.main();
 
-  SetConsoleOutputCP(CP_UTF8);
-
-  std::string s = tree->toStringTree (&parser);
-  OutputDebugStringW (wstring (s.begin (), s.end ()).c_str ()); // Only works properly since VS 2015.
-  cout << s << endl << endl;
+  cout << tree->toStringTree(&parser) << endl << endl;
 
   return 0;
 }
