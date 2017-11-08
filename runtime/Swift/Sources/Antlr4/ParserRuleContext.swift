@@ -119,32 +119,27 @@ open class ParserRuleContext: RuleContext {
     /// 
     /// - Since: 4.7
     /// 
-    @discardableResult
-    open func addAnyChild<T: ParseTree>(_ t: T) -> T {
+    open func addAnyChild(_ t: ParseTree) {
         if children == nil {
-            children = [T]()
+            children = [ParseTree]()
         }
         children!.append(t)
-        return t
     }
 
-    @discardableResult
-    open func addChild(_ ruleInvocation: RuleContext) -> RuleContext {
-        return addAnyChild(ruleInvocation)
+    open func addChild(_ ruleInvocation: RuleContext) {
+        addAnyChild(ruleInvocation)
     }
 
     /// Add a token leaf node child and force its parent to be this node.
-    @discardableResult
-    open func addChild(_ t: TerminalNode) -> TerminalNode {
+    open func addChild(_ t: TerminalNode) {
         t.setParent(self)
-        return addAnyChild(t)
+        addAnyChild(t)
     }
 
     /// Add an error node child and force its parent to be this node.
-    @discardableResult
-    open func addErrorNode(_ errorNode: ErrorNode) -> ErrorNode {
+    open func addErrorNode(_ errorNode: ErrorNode) {
         errorNode.setParent(self)
-        return addAnyChild(errorNode)
+        addAnyChild(errorNode)
     }
 
 
@@ -231,6 +226,11 @@ open class ParserRuleContext: RuleContext {
     override
     open func getChildCount() -> Int {
         return children?.count ?? 0
+    }
+
+    override
+    open subscript(index: Int) -> ParseTree {
+        return children![index]
     }
 
     override

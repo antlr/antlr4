@@ -39,8 +39,8 @@ open class AbstractParseTreeVisitor<T>: ParseTreeVisitor<T> {
                 break
             }
 
-            let c = node.getChild(i) as? ParseTree
-            let childResult = c?.accept(self)
+            let c = node[i]
+            let childResult = c.accept(self)
             result = aggregateResult(result, childResult)
         }
 

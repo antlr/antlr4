@@ -276,7 +276,7 @@ public class ParseTreePatternMatcher {
             }
 
             for i in 0 ..< r1.getChildCount() {
-                if let childMatch = try matchImpl(r1.getChild(i) as! ParseTree, patternTree.getChild(i) as! ParseTree, labels) {
+                if let childMatch = try matchImpl(r1[i], patternTree[i], labels) {
                     return childMatch
                 }
             }
@@ -290,14 +290,12 @@ public class ParseTreePatternMatcher {
 
     /// Is `t` `(expr <expr>)` subtree?
     internal func getRuleTagToken(_ t: ParseTree) -> RuleTagToken? {
-        if let r = t as? RuleNode {
-            if r.getChildCount() == 1 && r.getChild(0) is TerminalNode {
-                let c = r.getChild(0) as! TerminalNode
-                if c.getSymbol() is RuleTagToken {
-//					print("rule tag subtree "+t.toStringTree(parser));
-                    return c.getSymbol() as? RuleTagToken
-                }
-            }
+        if let ruleNode = t as? RuleNode,
+            ruleNode.getChildCount() == 1,
+            let terminalNode = ruleNode[0] as? TerminalNode,
+            let ruleTag = terminalNode.getSymbol() as? RuleTagToken {
+//            print("rule tag subtree "+t.toStringTree(parser));
+            return ruleTag
         }
         return nil
     }

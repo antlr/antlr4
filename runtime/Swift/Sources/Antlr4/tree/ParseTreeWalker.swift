@@ -21,7 +21,7 @@ public class ParseTreeWalker {
             try enterRule(listener, r)
             let n = r.getChildCount()
             for i in 0..<n {
-                try walk(listener, r.getChild(i) as! ParseTree)
+                try walk(listener, r[i])
             }
             try exitRule(listener, r)
         }

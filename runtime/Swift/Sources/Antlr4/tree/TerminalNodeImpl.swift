@@ -13,31 +13,30 @@ public class TerminalNodeImpl: TerminalNode {
     }
 
 
-    public override func getChild(_ i: Int) -> Tree? {
+    public func getChild(_ i: Int) -> Tree? {
         return nil
     }
 
-    override
+    open subscript(index: Int) -> ParseTree {
+        preconditionFailure("Index out of range (TerminalNode never has children)")
+    }
+
     public func getSymbol() -> Token? {
         return symbol
     }
 
-    override
     public func getParent() -> Tree? {
         return parent
     }
 
-    override
     public func setParent(_ parent: RuleContext) {
         self.parent = parent
     }
 
-    override
     public func getPayload() -> AnyObject {
         return symbol
     }
 
-    override
     public func getSourceInterval() -> Interval {
         //if   symbol == nil   { return Interval.INVALID; }
 
@@ -45,28 +44,23 @@ public class TerminalNodeImpl: TerminalNode {
         return Interval(tokenIndex, tokenIndex)
     }
 
-    override
     public func getChildCount() -> Int {
         return 0
     }
 
 
-    override
     public func accept<T>(_ visitor: ParseTreeVisitor<T>) -> T? {
         return visitor.visitTerminal(self)
     }
 
-    override
     public func getText() -> String {
         return (symbol.getText())!
     }
 
-    override
     public func toStringTree(_ parser: Parser) -> String {
         return description
     }
 
-    override
     public var description: String {
         //TODO: symbol == nil?
         //if    symbol == nil   {return "<nil>"; }
@@ -75,10 +69,11 @@ public class TerminalNodeImpl: TerminalNode {
         }
         return symbol.getText()!
     }
-    public override var debugDescription: String {
+
+    public var debugDescription: String {
         return description
     }
-    override
+
     public func toStringTree() -> String {
         return description
     }
