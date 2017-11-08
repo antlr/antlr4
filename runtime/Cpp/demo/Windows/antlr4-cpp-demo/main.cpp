@@ -10,32 +10,45 @@
 //  Created by Mike Lischke on 13.03.16.
 //
 
+#include <io.h>
+#include <stdio.h>
 #include <iostream>
+#include <fcntl.h>
 
 #include "antlr4-runtime.h"
 #include "TLexer.h"
 #include "TParser.h"
 
-#include <Windows.h>
-
-#pragma execution_character_set("utf-8")
+#include <windows.h>
+#include <iostream>
+#include <string>
+#include <locale>
+#include <codecvt>
 
 using namespace antlrcpptest;
 using namespace antlr4;
+using namespace std;
 
 int main(int argc, const char * argv[]) {
 
-  ANTLRInputStream input("🍴 = 🍐 + \"😎\";(((x * π))) * µ + ∰; a + (x * (y ? 0 : 1) + z);");
+  const std::string in_str = u8"🍴 = 🍐 + \"😎\";(((x * π))) * µ + ∰; a + (x * (y ? 0 : 1) + z); \"Т\" + \"М\" + \"Приве́т नमस्ते שָׁלוֹם\" = \"♥♣♠○• ♡ ❤ ♥\";";
+  ANTLRInputStream input(in_str);
   TLexer lexer(&input);
   CommonTokenStream tokens(&lexer);
+
+  tokens.fill();
+  for (auto token : tokens.getTokens()) {
+    cout << token->toString() << endl;
+  }
 
   TParser parser(&tokens);
   tree::ParseTree *tree = parser.main();
 
-  std::wstring s = antlrcpp::s2ws(tree->toStringTree(&parser)) + L"\n";
+  SetConsoleOutputCP(CP_UTF8);
 
-  OutputDebugString(s.data()); // Only works properly since VS 2015.
-  //std::wcout << "Parse Tree: " << s << std::endl; Unicode output in the console is very limited.
+  std::string s = tree->toStringTree (&parser);
+  OutputDebugStringW (wstring (s.begin (), s.end ()).c_str ()); // Only works properly since VS 2015.
+  cout << s << endl << endl;
 
   return 0;
 }
