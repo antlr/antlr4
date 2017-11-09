@@ -27,7 +27,7 @@ public class DFA: CustomStringConvertible {
     /// `true` if this DFA is for a precedence decision; otherwise,
     /// `false`. This is the backing field for _#isPrecedenceDfa_.
     /// 
-    private final var precedenceDfa: Bool
+    private let precedenceDfa: Bool
     
     /// 
     /// mutex for DFAState changes.
@@ -42,19 +42,19 @@ public class DFA: CustomStringConvertible {
         self.atnStartState = atnStartState
         self.decision = decision
 
-        var precedenceDfa: Bool = false
-        if atnStartState is StarLoopEntryState {
-            if (atnStartState as! StarLoopEntryState).precedenceRuleDecision {
-                precedenceDfa = true
-                let precedenceState: DFAState = DFAState(ATNConfigSet())
-                precedenceState.edges = [DFAState]() //new DFAState[0];
-                precedenceState.isAcceptState = false
-                precedenceState.requiresFullContext = false
-                self.s0 = precedenceState
-            }
-        }
+        if let starLoopState = atnStartState as? StarLoopEntryState, starLoopState.precedenceRuleDecision {
+            let precedenceState = DFAState(ATNConfigSet())
+            precedenceState.edges = [DFAState]()
+            precedenceState.isAcceptState = false
+            precedenceState.requiresFullContext = false
 
-        self.precedenceDfa = precedenceDfa
+            precedenceDfa = true
+            s0 = precedenceState
+        }
+        else {
+            precedenceDfa = false
+            s0 = nil
+        }
     }
 
     /// 
@@ -130,25 +130,7 @@ public class DFA: CustomStringConvertible {
         }
     }
 
-    /// 
-    /// Sets whether this is a precedence DFA.
-    /// 
-    /// - parameter precedenceDfa: `true` if this is a precedence DFA; otherwise,
-    /// `false`
-    /// 
-    /// - throws: ANTLRError.unsupportedOperation if `precedenceDfa` does not
-    /// match the value of _#isPrecedenceDfa_ for the current DFA.
-    /// 
-    /// - note: This method no longer performs any action.
-    /// 
-    public final func setPrecedenceDfa(_ precedenceDfa: Bool) throws {
-        if precedenceDfa != isPrecedenceDfa() {
-            throw ANTLRError.unsupportedOperation(msg: "The precedenceDfa field cannot change after a DFA is constructed.")
-
-        }
-    }
-
-    /// 
+    ///
     /// Return a list of all states in this DFA, ordered by state number.
     /// 
     public func getStates() -> Array<DFAState> {
