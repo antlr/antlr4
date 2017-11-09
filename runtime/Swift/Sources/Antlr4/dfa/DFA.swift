@@ -32,7 +32,7 @@ public class DFA: CustomStringConvertible {
     /// 
     /// mutex for DFAState changes.
     /// 
-    private var dfaStateMutex = Mutex()
+    private let dfaStateMutex = Mutex()
 
     public convenience init(_ atnStartState: DecisionState) {
         self.init(atnStartState, 0)

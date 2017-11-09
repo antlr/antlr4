@@ -281,12 +281,12 @@ open class ParserATNSimulator: ATNSimulator {
     /// 
     /// mutex for DFAState change
     /// 
-    private var dfaStateMutex = Mutex()
+    private let dfaStateMutex = Mutex()
     
     /// 
     /// mutex for changes in a DFAStates map
     /// 
-    private var dfaStatesMutex = Mutex()
+    private let dfaStatesMutex = Mutex()
 
 //    /// Testing only!
 //    public convenience init(_ atn : ATN, _ decisionToDFA : [DFA],

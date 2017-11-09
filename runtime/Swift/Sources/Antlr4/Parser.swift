@@ -61,12 +61,12 @@ open class Parser: Recognizer<ParserATNSimulator> {
     /// 
     /// mutex for bypassAltsAtnCache updates
     /// 
-    private var bypassAltsAtnCacheMutex = Mutex()
+    private let bypassAltsAtnCacheMutex = Mutex()
     
     /// 
     /// mutex for decisionToDFA updates
     /// 
-    private var decisionToDFAMutex = Mutex()
+    private let decisionToDFAMutex = Mutex()
 
     /// 
     /// This field maps from the serialized ATN string to the deserialized _org.antlr.v4.runtime.atn.ATN_ with

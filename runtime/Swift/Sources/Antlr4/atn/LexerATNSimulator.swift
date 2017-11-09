@@ -77,12 +77,12 @@ open class LexerATNSimulator: ATNSimulator {
     /// 
     /// mutex for DFAState change
     /// 
-    private var dfaStateMutex = Mutex()
+    private let dfaStateMutex = Mutex()
     
     /// 
     /// mutex for changes to all DFAStates map
     /// 
-    private var dfaStatesMutex = Mutex()
+    private let dfaStatesMutex = Mutex()
 
     /// 
     /// Used during DFA/ATN exec to record the most recent accept configuration info
