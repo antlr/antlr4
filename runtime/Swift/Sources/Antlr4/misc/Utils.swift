@@ -34,9 +34,9 @@ public class Utils {
     }
 
 
-    public static func toMap(_ keys: [String]) -> Dictionary<String, Int> {
-        var m = Dictionary<String, Int>()
-        for (index,v) in keys.enumerated() {
+    public static func toMap(_ keys: [String]) -> [String: Int] {
+        var m = [String: Int]()
+        for (index, v) in keys.enumerated() {
             m[v] = index
         }
         return m

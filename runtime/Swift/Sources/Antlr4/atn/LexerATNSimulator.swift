@@ -15,8 +15,7 @@ open class LexerATNSimulator: ATNSimulator {
     public let dfa_debug = false
 
     public static let MIN_DFA_EDGE = 0
-    public static let MAX_DFA_EDGE = 127
-    // forces unicode to stay in ATN
+    public static let MAX_DFA_EDGE = 127  // forces unicode to stay in ATN
 
     /// 
     /// When we hit an accept state in either the DFA or the ATN, we

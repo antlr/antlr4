@@ -6,17 +6,16 @@
 
 
 public class ATN {
-    public static let INVALID_ALT_NUMBER: Int = 0
+    public static let INVALID_ALT_NUMBER = 0
 
-
-    public final var states: Array<ATNState?> = Array<ATNState?>()
+    public final var states = [ATNState?]()
 
     /// 
     /// Each subrule/rule is a decision point and we must track them so we
     /// can go back later and build DFA predictors for them.  This includes
     /// all the rules, subrules, optional blocks, ()+, ()* etc...
     /// 
-    public final var decisionToState: Array<DecisionState> = Array<DecisionState>()
+    public final var decisionToState = [DecisionState]()
 
     /// 
     /// Maps from rule index to starting state number.
@@ -35,12 +34,12 @@ public class ATN {
     /// 
     /// The type of the ATN.
     /// 
-    public  let grammarType: ATNType!
+    public let grammarType: ATNType!
 
     /// 
     /// The maximum value for any symbol recognized by a transition in the ATN.
     /// 
-    public  let maxTokenType: Int
+    public let maxTokenType: Int
 
     /// 
     /// For lexer ATNs, this maps the rule index to the resulting token type.
@@ -57,7 +56,7 @@ public class ATN {
     /// 
     public final var lexerActions: [LexerAction]!
 
-    public final  var modeToStartState: Array<TokensStartState> = Array<TokensStartState>()
+    public final var modeToStartState = [TokensStartState]()
 
     /// 
     /// Used for runtime deserialization of ATNs from strings
