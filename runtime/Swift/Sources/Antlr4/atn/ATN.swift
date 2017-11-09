@@ -85,13 +85,12 @@ public class ATN {
     /// rule.
     /// 
     public func nextTokens(_ s: ATNState) -> IntervalSet {
-        if let nextTokenWithinRule = s.nextTokenWithinRule
-        {
+        if let nextTokenWithinRule = s.nextTokenWithinRule {
             return nextTokenWithinRule
         }
         let intervalSet = nextTokens(s, nil)
         s.nextTokenWithinRule = intervalSet
-        try! intervalSet.setReadonly(true)
+        intervalSet.makeReadonly()
         return intervalSet
     }
 

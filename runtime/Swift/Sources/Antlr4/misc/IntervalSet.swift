@@ -22,13 +22,13 @@ public class IntervalSet: IntSet, Hashable, CustomStringConvertible {
     public static let COMPLETE_CHAR_SET: IntervalSet =
     {
         let set = IntervalSet.of(Lexer.MIN_CHAR_VALUE, Lexer.MAX_CHAR_VALUE)
-        try! set.setReadonly(true)
+        set.makeReadonly()
         return set
     }()
 
     public static let EMPTY_SET: IntervalSet = {
         let set = IntervalSet()
-        try! set.setReadonly(true)
+        set.makeReadonly()
         return set
     }()
 
@@ -702,12 +702,8 @@ public class IntervalSet: IntSet, Hashable, CustomStringConvertible {
         return readonly
     }
 
-    public func setReadonly(_ readonly: Bool) throws {
-        if self.readonly && !readonly {
-            throw ANTLRError.illegalState(msg: "can't alter readonly IntervalSet")
-
-        }
-        self.readonly = readonly
+    public func makeReadonly() {
+        readonly = true
     }
 }
 
