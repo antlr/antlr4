@@ -28,10 +28,6 @@ public class ATN {
     /// 
     public final var ruleToStopState: [RuleStopState]!
 
-
-    public final let modeNameToStartState: Dictionary<String, TokensStartState> =  Dictionary<String, TokensStartState>()
-    //LinkedHashMap<String, TokensStartState>();
-
     /// 
     /// The type of the ATN.
     /// 
