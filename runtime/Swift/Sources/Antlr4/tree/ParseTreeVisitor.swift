@@ -27,9 +27,7 @@ open class ParseTreeVisitor<T> {
     /// - Returns: The result of visiting the parse tree.
     /// 
     open func visit(_ tree: ParseTree) -> T? {
-        RuntimeException(" must overriden !")
-        return nil
-
+        fatalError(#function + " must be overridden")
     }
 
     /// 
@@ -40,9 +38,7 @@ open class ParseTreeVisitor<T> {
     /// - Returns: The result of visiting the children of the node.
     /// 
     open func visitChildren(_ node: RuleNode) -> T? {
-        RuntimeException(" must overriden !")
-        return nil
-
+        fatalError(#function + " must be overridden")
     }
 
     /// 
@@ -52,9 +48,7 @@ open class ParseTreeVisitor<T> {
     /// - Returns: The result of visiting the node.
     /// 
     open func visitTerminal(_ node: TerminalNode) -> T? {
-        RuntimeException(" must overriden !")
-        return nil
-
+        fatalError(#function + " must be overridden")
     }
 
     /// 
@@ -64,7 +58,6 @@ open class ParseTreeVisitor<T> {
     /// - Returns: The result of visiting the node.
     /// 
     open func visitErrorNode(_ node: ErrorNode) -> T? {
-        RuntimeException(" must overriden !")
-        return nil
+        fatalError(#function + " must be overridden")
     }
 }

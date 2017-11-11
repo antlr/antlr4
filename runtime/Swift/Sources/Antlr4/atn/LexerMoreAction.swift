@@ -58,7 +58,7 @@ public final class LexerMoreAction: LexerAction, CustomStringConvertible {
 
     override
     public var hashValue: Int {
-        var hash: Int = MurmurHash.initialize()
+        var hash = MurmurHash.initialize()
         hash = MurmurHash.update(hash, getActionType().rawValue)
         return MurmurHash.finish(hash, 1)
 

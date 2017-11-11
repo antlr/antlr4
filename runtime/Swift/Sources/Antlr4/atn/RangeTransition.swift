@@ -22,9 +22,8 @@ public final class RangeTransition: Transition, CustomStringConvertible {
     }
 
     override
-    //old label()
-    public func labelIntervalSet() throws -> IntervalSet {
-        return try IntervalSet.of(from, to)
+    public func labelIntervalSet() -> IntervalSet? {
+        return IntervalSet.of(from, to)
     }
 
     override

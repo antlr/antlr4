@@ -206,11 +206,13 @@ macro(antlr4cpp_process_grammar
   # export generated cpp files into list
   foreach(generated_file ${generated_files})
     list(APPEND antlr4cpp_src_files_${antlr4cpp_project_namespace} ${generated_file})
+    if (NOT CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     set_source_files_properties(
       ${generated_file}
       PROPERTIES
       COMPILE_FLAGS -Wno-overloaded-virtual
       )
+    endif ()
   endforeach(generated_file)
   message(STATUS "Antlr4Cpp  ${antlr4cpp_project_namespace} Generated: ${generated_files}")
 

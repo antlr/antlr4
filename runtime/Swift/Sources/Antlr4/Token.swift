@@ -98,5 +98,7 @@ public protocol Token: class, CustomStringConvertible {
     /// 
     func getInputStream() -> CharStream?
 
+    func getTokenSourceAndStream() -> TokenSourceAndStream
+
     var visited: Bool { get set }
 }

@@ -150,13 +150,12 @@ public class ATNConfig: Hashable, CustomStringConvertible {
     /// 
 
     public var hashValue: Int {
-        var hashCode: Int = MurmurHash.initialize(7)
+        var hashCode = MurmurHash.initialize(7)
         hashCode = MurmurHash.update(hashCode, state.stateNumber)
         hashCode = MurmurHash.update(hashCode, alt)
         hashCode = MurmurHash.update(hashCode, context)
         hashCode = MurmurHash.update(hashCode, semanticContext)
-        hashCode = MurmurHash.finish(hashCode, 4)
-        return hashCode
+        return MurmurHash.finish(hashCode, 4)
 
     }
 

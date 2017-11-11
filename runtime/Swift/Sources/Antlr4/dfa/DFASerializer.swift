@@ -10,18 +10,8 @@
 /// 
 
 public class DFASerializer: CustomStringConvertible {
-
     private let dfa: DFA
-
     private let vocabulary: Vocabulary
-
-    /// 
-    /// -  Use _#DFASerializer(org.antlr.v4.runtime.dfa.DFA, org.antlr.v4.runtime.Vocabulary)_ instead.
-    /// 
-    //@Deprecated
-    public convenience init(_ dfa: DFA, _ tokenNames: [String?]?) {
-        self.init(dfa, Vocabulary.fromTokenNames(tokenNames))
-    }
 
     public init(_ dfa: DFA, _ vocabulary: Vocabulary) {
         self.dfa = dfa
@@ -32,18 +22,17 @@ public class DFASerializer: CustomStringConvertible {
         if dfa.s0 == nil {
             return ""
         }
-        let buf: StringBuilder = StringBuilder()
-        let states: Array<DFAState> = dfa.getStates()
-        for s: DFAState in states {
-            var n: Int = 0
-            if let sEdges = s.edges {
-                n = sEdges.count
+        let buf = StringBuilder()
+        let states = dfa.getStates()
+        for s in states {
+            guard let edges = s.edges else {
+                continue
             }
+            let n = edges.count
             for i in 0..<n {
-                let t: DFAState? = s.edges![i]
-                if let t = t , t.stateNumber != Int.max {
+                if let t = s.edges![i], t.stateNumber != Int.max {
                     buf.append(getStateString(s))
-                    let label: String = getEdgeLabel(i)
+                    let label = getEdgeLabel(i)
                     buf.append("-")
                     buf.append(label)
                     buf.append("->")
@@ -53,7 +42,7 @@ public class DFASerializer: CustomStringConvertible {
             }
         }
 
-        let output: String = buf.toString()
+        let output = buf.toString()
         if output.length == 0 {
             return ""
         }
@@ -72,16 +61,16 @@ public class DFASerializer: CustomStringConvertible {
 
 
     internal func getStateString(_ s: DFAState) -> String {
-        let n: Int = s.stateNumber
+        let n = s.stateNumber
 
         let s1 = s.isAcceptState ? ":" : ""
         let s2 = s.requiresFullContext ? "^" : ""
-        let baseStateStr: String = s1 + "s" + String(n) + s2
+        let baseStateStr = s1 + "s" + String(n) + s2
         if s.isAcceptState {
             if let predicates = s.predicates {
                 return baseStateStr + "=>\(predicates)"
             } else {
-                return baseStateStr + "=>\(s.prediction!)"
+                return baseStateStr + "=>\(s.prediction)"
             }
         } else {
             return baseStateStr

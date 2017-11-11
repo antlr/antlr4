@@ -60,11 +60,20 @@ public class ErrorManager {
 			locationValid = true;
 		}
 		if (msg.fileName != null) {
-			File f = new File(msg.fileName);
-			// Don't show path to file in messages; too long.
 			String displayFileName = msg.fileName;
-			if ( f.exists() ) {
-				displayFileName = f.getName();
+			if (format.equals("antlr")) {
+				// Don't show path to file in messages in ANTLR format;
+				// they're too long.
+				File f = new File(msg.fileName);
+				if ( f.exists() ) {
+					displayFileName = f.getName();
+				}
+			}
+			else {
+				// For other message formats, use the full filename in the
+				// message.  This assumes that these formats are intended to
+				// be parsed by IDEs, and so they need the full path to
+				// resolve correctly.
 			}
 			locationST.add("file", displayFileName);
 			locationValid = true;

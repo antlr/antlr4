@@ -161,8 +161,13 @@ YYYY/MM/DD, github id, Full name, email
 2017/07/27, matthauck, Matt Hauck, matthauck@gmail.com
 2017/07/27, shirou, WAKAYAMA Shirou, shirou.faw@gmail.com
 2017/08/20, tiagomazzutti, Tiago Mazzutti, tiagomzt@gmail.com
+2017/08/20, milanaleksic, Milan Aleksic, milanaleksic@gmail.com
 2017/08/29, Eddy Reyes, eddy@mindsight.io
 2017/09/09, brauliobz, Bráulio Bezerra, brauliobezerra@gmail.com
 2017/09/11, sachinjain024, Sachin Jain, sachinjain024@gmail.com
 2017/10/06, bramp, Andrew Brampton, brampton@gmail.com
 2017/10/15, simkimsia, Sim Kim Sia, kimcity@gmail.com
+2017/10/27, Griffon26, Maurice van der Pot, griffon26@kfk4ever.com
+2017/05/29, rlfnb, Ralf Neeb, rlfnb@rlfnb.de
+2017/10/29, gendalph, Максим Прохоренко, Maxim\dotProhorenko@gm@il.com
+2017/11/02, jasonmoo, Jason Mooberry, jason.mooberry@gmail.com

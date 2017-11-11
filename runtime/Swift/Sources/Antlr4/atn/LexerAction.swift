@@ -22,8 +22,7 @@ public class LexerAction: Hashable {
     /// - returns: The serialization type of the lexer action.
     /// 
     public func getActionType() -> LexerActionType {
-        RuntimeException(" must overriden ")
-        fatalError()
+        fatalError(#function + " must be overridden")
     }
 
 
@@ -42,8 +41,7 @@ public class LexerAction: Hashable {
     /// otherwise, `false`.
     /// 
     public func isPositionDependent() -> Bool {
-        RuntimeException(" must overriden ")
-        fatalError()
+        fatalError(#function + " must be overridden")
     }
 
     /// 
@@ -55,12 +53,11 @@ public class LexerAction: Hashable {
     /// - parameter lexer: The lexer instance.
     /// 
     public func execute(_ lexer: Lexer) throws {
-        RuntimeException(" must overriden ")
+        fatalError(#function + " must be overridden")
     }
 
     public var hashValue: Int {
-        RuntimeException(" must overriden ")
-        fatalError()
+        fatalError(#function + " must be overridden")
     }
 
 }

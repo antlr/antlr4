@@ -16,7 +16,7 @@ public class Triple<A:Hashable, B:Hashable, C:Hashable>: Hashable, CustomStringC
         self.c = c
     }
     public var hashValue: Int {
-        var hash: Int = MurmurHash.initialize()
+        var hash = MurmurHash.initialize()
         hash = MurmurHash.update(hash, a)
         hash = MurmurHash.update(hash, b)
         hash = MurmurHash.update(hash, c)

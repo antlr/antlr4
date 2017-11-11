@@ -5,9 +5,7 @@
 
 public class TerminalNode: ParseTree {
     public func getSymbol() -> Token? {
-        RuntimeException(" must overriden !")
-        fatalError()
-
+        fatalError(#function + " must be overridden")
     }
 
     /// Set the parent for this leaf node.
@@ -20,7 +18,6 @@ public class TerminalNode: ParseTree {
     /// - Since: 4.7
     /// 
     public func setParent(_ parent: RuleContext) {
-        RuntimeException(" must overriden !")
-        fatalError()
+        fatalError(#function + " must be overridden")
     }
 }

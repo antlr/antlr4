@@ -101,7 +101,7 @@ size_t LexerActionExecutor::generateHashCode() const {
   for (auto lexerAction : _lexerActions) {
     hash = MurmurHash::update(hash, lexerAction);
   }
-  MurmurHash::finish(hash, _lexerActions.size());
+  hash = MurmurHash::finish(hash, _lexerActions.size());
 
   return hash;
 }

@@ -7,8 +7,6 @@
 
 using namespace antlr4::misc;
 
-Interval::~Interval() = default;
-
 size_t antlr4::misc::numericToSymbol(ssize_t v) {
   return static_cast<size_t>(v);
 }

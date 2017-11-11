@@ -28,57 +28,54 @@ namespace misc {
     Interval();
     explicit Interval(size_t a_, size_t b_); // For unsigned -> signed mappings.
     Interval(ssize_t a_, ssize_t b_);
-    Interval(Interval const&) = default;
-    virtual ~Interval();
-    Interval& operator=(Interval const&) = default;
 
     /// return number of elements between a and b inclusively. x..x is length 1.
     ///  if b < a, then length is 0.  9..10 has length 2.
-    virtual size_t length() const;
+    size_t length() const;
 
     bool operator == (const Interval &other) const;
 
-    virtual size_t hashCode() const;
+    size_t hashCode() const;
 
     /// <summary>
     /// Does this start completely before other? Disjoint </summary>
-    virtual bool startsBeforeDisjoint(const Interval &other) const;
+    bool startsBeforeDisjoint(const Interval &other) const;
 
     /// <summary>
     /// Does this start at or before other? Nondisjoint </summary>
-    virtual bool startsBeforeNonDisjoint(const Interval &other) const;
+    bool startsBeforeNonDisjoint(const Interval &other) const;
 
     /// <summary>
     /// Does this.a start after other.b? May or may not be disjoint </summary>
-    virtual bool startsAfter(const Interval &other) const;
+    bool startsAfter(const Interval &other) const;
 
     /// <summary>
     /// Does this start completely after other? Disjoint </summary>
-    virtual bool startsAfterDisjoint(const Interval &other) const;
+    bool startsAfterDisjoint(const Interval &other) const;
 
     /// <summary>
     /// Does this start after other? NonDisjoint </summary>
-    virtual bool startsAfterNonDisjoint(const Interval &other) const;
+    bool startsAfterNonDisjoint(const Interval &other) const;
 
     /// <summary>
     /// Are both ranges disjoint? I.e., no overlap? </summary>
-    virtual bool disjoint(const Interval &other) const;
+    bool disjoint(const Interval &other) const;
 
     /// <summary>
     /// Are two intervals adjacent such as 0..41 and 42..42? </summary>
-    virtual bool adjacent(const Interval &other) const;
+    bool adjacent(const Interval &other) const;
 
-    virtual bool properlyContains(const Interval &other) const;
+    bool properlyContains(const Interval &other) const;
 
     /// <summary>
     /// Return the interval computed from combining this and other </summary>
-    virtual Interval Union(const Interval &other) const;
+    Interval Union(const Interval &other) const;
 
     /// <summary>
     /// Return the interval in common between this and o </summary>
-    virtual Interval intersection(const Interval &other) const;
+    Interval intersection(const Interval &other) const;
 
-    virtual std::string toString() const;
+    std::string toString() const;
 
   private:
   };

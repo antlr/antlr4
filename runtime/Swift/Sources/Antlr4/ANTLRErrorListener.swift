@@ -93,7 +93,7 @@ public protocol ANTLRErrorListener: class {
                          _ stopIndex: Int,
                          _ exact: Bool,
                          _ ambigAlts: BitSet,
-                         _ configs: ATNConfigSet) throws
+                         _ configs: ATNConfigSet)
 
     /// 
     /// This method is called when an SLL conflict occurs and the parser is about
@@ -123,7 +123,7 @@ public protocol ANTLRErrorListener: class {
                                      _ startIndex: Int,
                                      _ stopIndex: Int,
                                      _ conflictingAlts: BitSet?,
-                                     _ configs: ATNConfigSet) throws
+                                     _ configs: ATNConfigSet)
 
     /// 
     /// This method is called by the parser when a full-context prediction has a
@@ -168,5 +168,5 @@ public protocol ANTLRErrorListener: class {
                                   _ startIndex: Int,
                                   _ stopIndex: Int,
                                   _ prediction: Int,
-                                  _ configs: ATNConfigSet) throws
+                                  _ configs: ATNConfigSet)
 }

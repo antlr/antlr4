@@ -32,10 +32,9 @@
 /// 
 
 public class DFAState: Hashable, CustomStringConvertible {
-    public var stateNumber: Int = -1
+    public var stateNumber = -1
 
-
-    public var configs: ATNConfigSet = ATNConfigSet()
+    public var configs = ATNConfigSet()
 
     /// 
     /// `edges[symbol]` points to target of symbol. Shift up by 1 so (-1)
@@ -43,14 +42,14 @@ public class DFAState: Hashable, CustomStringConvertible {
     ///
     public var edges: [DFAState?]!
 
-    public var isAcceptState: Bool = false
+    public var isAcceptState = false
 
     /// 
     /// if accept state, what ttype do we match or alt do we predict?
     /// This is set to _org.antlr.v4.runtime.atn.ATN#INVALID_ALT_NUMBER_ when _#predicates_`!=null` or
     /// _#requiresFullContext_.
     /// 
-    public var prediction: Int! = 0
+    public var prediction = 0
 
     public var lexerActionExecutor: LexerActionExecutor!
 
@@ -60,7 +59,7 @@ public class DFAState: Hashable, CustomStringConvertible {
     /// _org.antlr.v4.runtime.atn.ParserATNSimulator#execATN_ invocations immediately jumped doing
     /// full context prediction if this field is true.
     /// 
-    public var requiresFullContext: Bool = false
+    public var requiresFullContext = false
 
     /// 
     /// During SLL parsing, this is a list of predicates associated with the
@@ -83,20 +82,17 @@ public class DFAState: Hashable, CustomStringConvertible {
     /// 
 
     public class PredPrediction: CustomStringConvertible {
-
         public final var pred: SemanticContext
         // never null; at least SemanticContext.NONE
         public final var alt: Int
+
         public init(_ pred: SemanticContext, _ alt: Int) {
             self.alt = alt
             self.pred = pred
         }
 
-
         public var description: String {
-
             return "(\(pred),\(alt))"
-
         }
     }
 
@@ -116,18 +112,14 @@ public class DFAState: Hashable, CustomStringConvertible {
     /// DFA state.
     /// 
     public func getAltSet() -> Set<Int>? {
-
-        let alts = configs.getAltSet()
-
-        return alts
+        return configs.getAltSet()
     }
 
 
     public var hashValue: Int {
-        var hash: Int = MurmurHash.initialize(7)
+        var hash = MurmurHash.initialize(7)
         hash = MurmurHash.update(hash, configs.hashValue)
-        hash = MurmurHash.finish(hash, 1)
-        return hash
+        return MurmurHash.finish(hash, 1)
     }
 
     /// 
@@ -144,7 +136,7 @@ public class DFAState: Hashable, CustomStringConvertible {
     /// _#stateNumber_ is irrelevant.
     ///
     public var description: String {
-        let buf: StringBuilder = StringBuilder()
+        let buf = StringBuilder()
         buf.append(stateNumber).append(":").append(configs)
         if isAcceptState {
             buf.append("=>")
@@ -156,15 +148,11 @@ public class DFAState: Hashable, CustomStringConvertible {
         }
         return buf.toString()
     }
-
-
 }
 
 public func ==(lhs: DFAState, rhs: DFAState) -> Bool {
-
     if lhs === rhs {
         return true
     }
-    let sameSet: Bool = lhs.configs == rhs.configs
-    return sameSet
+    return (lhs.configs == rhs.configs)
 }
