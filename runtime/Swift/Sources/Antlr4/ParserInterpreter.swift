@@ -75,9 +75,8 @@ public class ParserInterpreter: Parser {
         self.atn = atn
         self.ruleNames = ruleNames
         self.vocabulary = vocabulary
-        self.decisionToDFA = [DFA]() //new DFA[atn.getNumberOfDecisions()];
-        let decisionToDFALength = decisionToDFA.count
-        for i in 0..<decisionToDFALength {
+        self.decisionToDFA = [DFA]()
+        for i in 0 ..< atn.getNumberOfDecisions() {
             decisionToDFA[i] = DFA(atn.getDecisionState(i)!, i)
         }
 
