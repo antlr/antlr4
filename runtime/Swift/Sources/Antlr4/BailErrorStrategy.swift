@@ -47,7 +47,7 @@ public class BailErrorStrategy: DefaultErrorStrategy {
             context = (contextWrap.getParent() as? ParserRuleContext)
         }
 
-        throw ANTLRException.recognition(e: e)
+        throw ANTLRException.parseCancellation(e: e)
     }
 
     /// 
@@ -63,7 +63,7 @@ public class BailErrorStrategy: DefaultErrorStrategy {
              context = (contextWrap.getParent() as? ParserRuleContext)
         }
 
-        throw ANTLRException.recognition(e: e)
+        throw ANTLRException.parseCancellation(e: e)
     }
 
     /// 
