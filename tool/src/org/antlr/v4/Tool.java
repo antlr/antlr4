@@ -396,8 +396,8 @@ public class Tool {
 		g.atn = factory.createATN();
 
 		if ( generate_ATN_dot ) generateATNs(g);
-		
-		generateInterpreterData(g);
+
+		if ( g.tool.getNumErrors()==0 ) generateInterpreterData(g);
 
 		// PERFORM GRAMMAR ANALYSIS ON ATN: BUILD DECISION DFAs
 		AnalysisPipeline anal = new AnalysisPipeline(g);
@@ -704,21 +704,21 @@ public class Tool {
 
 	private void generateInterpreterData(Grammar g) {
 		StringBuilder content = new StringBuilder();
-		
+
 		content.append("token literal names:\n");
 		String[] names = g.getTokenLiteralNames();
 		for (String name : names) {
 			content.append(name + "\n");
 		}
 		content.append("\n");
-		
+
 		content.append("token symbolic names:\n");
 		names = g.getTokenSymbolicNames();
 		for (String name : names) {
 			content.append(name + "\n");
 		}
 		content.append("\n");
-		
+
 		content.append("rule names:\n");
 		names = g.getRuleNames();
 		for (String name : names) {
@@ -734,18 +734,18 @@ public class Tool {
 				content.append(channel + "\n");
 			}
 			content.append("\n");
-			
+
 			content.append("mode names:\n");
 			for (String mode : ((LexerGrammar)g).modes.keySet()) {
 				content.append(mode + "\n");
 			}
 		}
 		content.append("\n");
-		
+
 		IntegerList serializedATN = ATNSerializer.getSerialized(g.atn);
 		content.append("atn:\n");
 		content.append(serializedATN.toString());
-		
+
 		try {
 			Writer fw = getOutputFileWriter(g, g.name + ".interp");
 			try {
@@ -753,13 +753,13 @@ public class Tool {
 			}
 			finally {
 				fw.close();
-			}	
+			}
 		}
 		catch (IOException ioe) {
 			errMgr.toolError(ErrorType.CANNOT_WRITE_FILE, ioe);
 		}
 	}
-	
+
 	/** This method is used by all code generators to create new output
 	 *  files. If the outputDir set by -o is not present it will be created.
 	 *  The final filename is sensitive to the output directory and
