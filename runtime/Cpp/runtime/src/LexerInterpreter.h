@@ -39,7 +39,7 @@ namespace antlr4 {
     // @deprecated
     std::vector<std::string> _tokenNames;
     const std::vector<std::string> &_ruleNames;
-	const std::vector<std::string> &_channelNames;
+    const std::vector<std::string> &_channelNames;
     const std::vector<std::string> &_modeNames;
     std::vector<dfa::DFA> _decisionToDFA;
 

@@ -54,8 +54,10 @@ namespace antlr4 {
     // UTF-32 encoded.
 #if defined(_MSC_VER) && _MSC_VER == 1900
     i32string _data; // Custom type for VS 2015.
+    typedef __int32 storage_type;
 #else
     std::u32string _data;
+    typedef char32_t storage_type;
 #endif
 
     /// <summary>
