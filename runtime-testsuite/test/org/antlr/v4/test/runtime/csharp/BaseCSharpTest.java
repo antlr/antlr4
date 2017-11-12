@@ -10,6 +10,7 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenSource;
 import org.antlr.v4.runtime.WritableToken;
+import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.test.runtime.ErrorQueue;
 import org.antlr.v4.test.runtime.RuntimeTestSupport;
 import org.antlr.v4.test.runtime.StreamVacuum;
@@ -394,10 +395,15 @@ public class BaseCSharpTest implements RuntimeTestSupport /*, SpecialRuntimeTest
 		stdoutVacuum.join();
 		stderrVacuum.join();
 		// xbuild sends errors to output, so check exit code
-		boolean success = process.exitValue()==0;
+		int exitValue = process.exitValue();
+		boolean success = (exitValue == 0);
 		if ( !success ) {
 			this.stderrDuringParse = stdoutVacuum.toString();
-			System.err.println("buildProject stderrVacuum: "+ this.stderrDuringParse);
+			String stderrString = stderrVacuum.toString();
+			System.err.println("buildProject command: " + Utils.join(args, " "));
+			System.err.println("buildProject exitValue: " + exitValue);
+			System.err.println("buildProject stdout: " + stderrDuringParse);
+			System.err.println("buildProject stderr: " + stderrString);
 		}
 		return success;
 	}
@@ -552,10 +558,14 @@ public class BaseCSharpTest implements RuntimeTestSupport /*, SpecialRuntimeTest
         process.waitFor();
         stdoutVacuum.join();
         stderrVacuum.join();
-        boolean success = process.exitValue()==0;
+        int exitValue = process.exitValue();
+        boolean success = (exitValue == 0);
         if ( !success ) {
             this.stderrDuringParse = stderrVacuum.toString();
-            System.err.println("runProcess stderrVacuum: "+ this.stderrDuringParse);
+            System.err.println("runProcess command: " + Utils.join(args, " "));
+            System.err.println("runProcess exitValue: " + exitValue);
+            System.err.println("runProcess stdoutVacuum: " + stdoutVacuum.toString());
+            System.err.println("runProcess stderrVacuum: " + stderrDuringParse);
         }
         return success;
     }
@@ -584,9 +594,28 @@ public class BaseCSharpTest implements RuntimeTestSupport /*, SpecialRuntimeTest
 			ProcessBuilder pb = new ProcessBuilder(args);
 			pb.directory(tmpdirFile);
 			Process process = pb.start();
+			StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
+			StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
+			stdoutVacuum.start();
+			stderrVacuum.start();
 			process.waitFor();
+			stdoutVacuum.join();
+			stderrVacuum.join();
 			String writtenOutput = TestOutputReading.read(output);
 			this.stderrDuringParse = TestOutputReading.read(errorOutput);
+			int exitValue = process.exitValue();
+			String stdoutString = stdoutVacuum.toString().trim();
+			String stderrString = stderrVacuum.toString().trim();
+			if (exitValue != 0) {
+				System.err.println("execTest command: " + Utils.join(args, " "));
+				System.err.println("execTest exitValue: " + exitValue);
+			}
+			if (!stdoutString.isEmpty()) {
+				System.err.println("execTest stdoutVacuum: " + stdoutString);
+			}
+			if (!stderrString.isEmpty()) {
+				System.err.println("execTest stderrVacuum: " + stderrString);
+			}
 			return writtenOutput;
 		}
 		catch (Exception e) {
