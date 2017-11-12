@@ -354,6 +354,7 @@ public class BaseCSharpTest implements RuntimeTestSupport /*, SpecialRuntimeTest
                     return false;
                 return true;
             } catch(Exception e) {
+                e.printStackTrace(System.err);
                 return false;
             }
         }
@@ -362,6 +363,7 @@ public class BaseCSharpTest implements RuntimeTestSupport /*, SpecialRuntimeTest
             try {
                 return buildDotnetProject();
             } catch(Exception e) {
+                e.printStackTrace(System.err);
                 return false;
             }
         }
