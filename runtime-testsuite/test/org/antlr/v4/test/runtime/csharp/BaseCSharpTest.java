@@ -548,6 +548,10 @@ public class BaseCSharpTest implements RuntimeTestSupport /*, SpecialRuntimeTest
     }
 
     private boolean runProcess(String[] args, String path) throws Exception {
+        return runProcess(args, path, 0);
+    }
+
+    private boolean runProcess(String[] args, String path, int retries) throws Exception {
         ProcessBuilder pb = new ProcessBuilder(args);
         pb.directory(new File(path));
         Process process = pb.start();
@@ -566,6 +570,20 @@ public class BaseCSharpTest implements RuntimeTestSupport /*, SpecialRuntimeTest
             System.err.println("runProcess exitValue: " + exitValue);
             System.err.println("runProcess stdoutVacuum: " + stdoutVacuum.toString());
             System.err.println("runProcess stderrVacuum: " + stderrDuringParse);
+        }
+        if (exitValue == 132) {
+            // Retry after SIGILL.  We are seeing this intermittently on
+            // macOS (issue #2078).
+            if (retries < 3) {
+                System.err.println("runProcess retrying; " + retries +
+                                   " retries so far");
+                 return runProcess(args, path, retries + 1);
+            }
+            else {
+                System.err.println("runProcess giving up after " + retries +
+                                   " retries");
+                return false;
+            }
         }
         return success;
     }
