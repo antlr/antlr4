@@ -337,7 +337,9 @@ public class BaseCSharpTest implements RuntimeTestSupport /*, SpecialRuntimeTest
 	}
 
 	public String execRecognizer() {
-		compile();
+		boolean success = compile();
+		assertTrue(success);
+
 		String output = execTest();
 		if ( output!=null && output.length()==0 ) {
 			output = null;
@@ -507,6 +509,7 @@ public class BaseCSharpTest implements RuntimeTestSupport /*, SpecialRuntimeTest
                 runtimeProjPath
             };
             boolean success = runProcess(args, tmpdir);
+            assertTrue(success);
 
             // restore project
             args = new String[] {
@@ -516,6 +519,7 @@ public class BaseCSharpTest implements RuntimeTestSupport /*, SpecialRuntimeTest
                 "--no-dependencies"
             };
             success = runProcess(args, tmpdir);
+            assertTrue(success);
 
             // build test
             args = new String[] {
@@ -527,6 +531,7 @@ public class BaseCSharpTest implements RuntimeTestSupport /*, SpecialRuntimeTest
                 "--no-dependencies"
             };
             success = runProcess(args, tmpdir);
+            assertTrue(success);
         }
         catch(Exception e) {
             e.printStackTrace(System.err);
