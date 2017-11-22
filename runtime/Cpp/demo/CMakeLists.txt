@@ -46,10 +46,9 @@ if (NOT CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
   set (flags_1 "-Wno-overloaded-virtual")
   set (main_src ${PROJECT_SOURCE_DIR}/demo/Linux/main.cpp)
 else()
-  set (flags_1 "-MP /wd4251")
+  set (flags_1 "-MP /wd4251 /std:c++latest /utf-8")
   add_definitions (-DUNICODE -D_UNICODE)
-  set (main_src ${PROJECT_SOURCE_DIR}/demo/Windows/main.cpp)
-#  set (main_src ${PROJECT_SOURCE_DIR}/demo/Windows/antlr4-cpp-demo/main.cpp)
+  set (main_src ${PROJECT_SOURCE_DIR}/demo/Windows/antlr4-cpp-demo/main.cpp)
 endif()
 
 set(antlr4-demo_SRC 
