@@ -8,8 +8,8 @@ var Token = require('./../Token').Token;
 var RuleNode = require('./Tree').RuleNode;
 var ErrorNode = require('./Tree').ErrorNode;
 var TerminalNode = require('./Tree').TerminalNode;
-var ParserRuleContext = require('./../ParserRuleContext').ParserRuleContext;
-var RuleContext = require('./../RuleContext').RuleContext;
+// var ParserRuleContext = require('../ParserRuleContext').ParserRuleContext;
+// var RuleContext = require('../RuleContext').RuleContext;
 var INVALID_ALT_NUMBER = require('./../atn/ATN').INVALID_ALT_NUMBER;
 
 
@@ -52,7 +52,7 @@ Trees.getNodeText = function(t, ruleNames, recog) {
         ruleNames = recog.ruleNames;
     }
     if(ruleNames!==null) {
-       if (t instanceof RuleContext) {
+    if (t.__proto__.constructor.name === 'RuleContext') {
            var altNumber = t.getAltNumber();
            if ( altNumber!=INVALID_ALT_NUMBER ) {
                return ruleNames[t.ruleIndex]+":"+altNumber;
@@ -117,7 +117,7 @@ Trees._findAllNodes = function(t, index, findTokens, nodes) {
 		if(t.symbol.type===index) {
 			nodes.push(t);
 		}
-	} else if(!findTokens && (t instanceof ParserRuleContext)) {
+  } else if(!findTokens && (t.__proto__.constructor.name === 'ParserRuleContext')) {
 		if(t.ruleIndex===index) {
 			nodes.push(t);
 		}
