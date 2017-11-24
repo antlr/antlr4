@@ -267,7 +267,7 @@ DefaultErrorStrategy.prototype.reportNoViableAlternative = function(recognizer, 
         if (e.startToken.type===Token.EOF) {
             input = "<EOF>";
         } else {
-            input = tokens.getText(new Interval(e.startToken, e.offendingToken));
+            input = tokens.getText(new Interval(e.startToken.tokenIndex, e.offendingToken.tokenIndex));
         }
     } else {
         input = "<unknown input>";
