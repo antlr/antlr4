@@ -32,8 +32,7 @@ Edit the repository looking for 4.5 or whatever and update it. Bump version in t
  * runtime/Python3/setup.py
  * runtime/Python3/src/antlr4/Recognizer.py
  * runtime/CSharp/runtime/CSharp/Antlr4.Runtime/Properties/AssemblyInfo.cs
- * runtime/CSharp/build/version.ps1
- * runtime/CSharp/runtime/CSharp/Package.nuspec
+ * runtime/CSharp/runtime/CSharp/Antlr4.Runtime/Antlr4.Runtime.dotnet.csproj
  * runtime/JavaScript/src/antlr4/package.json
  * runtime/JavaScript/src/antlr4/Recognizer.js
  * runtime/Cpp/VERSION
@@ -245,75 +244,55 @@ popd
 
 ### CSharp
 
-*Publishing to Nuget from Linux/MacOSX*
+*Publishing to Nuget from Windows*
 
 **Install the pre-requisites**
 
 Of course you need Mono and `nuget` to be installed. On mac:
 
-- mono - on mac, `brew install mono`
-- nuget - on mac, `brew install nuget` or you can [download nuget.exe](https://dist.nuget.org/win-x86-commandline/latest/nuget.exe)
+- .NET build tools - can be loaded from [here](https://www.visualstudio.com/downloads/)
+- nuget - download [nuget.exe](https://www.nuget.org/downloads)
 - dotnet - follow [the instructions here](https://www.microsoft.com/net/core)
 
-From the shell on mac, you can check all is ok by typing
+Alternatively, you can install Visual Studio 2017 and make sure to check boxes with .NET Core SDK.
 
-```bash
-nuget
+You also need to enable .NET Framework 3.5 support in Windows "Programs and Features".
+
+If everything is ok, the following command will restore nuget packages, build Antlr for .NET Standard and .NET 3.5 and create nuget package:
+
+```PS
+msbuild /target:restore /target:rebuild /target:pack /property:Configuration=Release .\Antlr4.dotnet.sln /verbosity:minimal
 ```
 
-This should display the nuget help. 
+This should display something like this: 
 
 **Creating and packaging the assembly**
 
-```bash
-$ cd runtime/CSharp/runtime/CSharp
-$ ./build-nuget-package.sh
-...
-Build succeeded.
-    0 Warning(s)
-    0 Error(s)
-Attempting to build package from 'Package.nuspec'.
-Successfully created package '/path/to/antlr/.../Antlr4.Runtime.Standard.4.7.0.nupkg'.
 ```
+Microsoft (R) Build Engine version 15.4.8.50001 for .NET Framework
+Copyright (C) Microsoft Corporation. All rights reserved.
 
-This should display: Successfully created package *&lt;package-path>*
-
-Alternately, you may want to build ANTLR using Xamarin Studio Community (free).
+  Restoring packages for C:\Code\antlr4-fork\runtime\CSharp\runtime\CSharp\Antlr4.Runtime\Antlr4.Runtime.dotnet.csproj...
+  Generating MSBuild file C:\Code\antlr4-fork\runtime\CSharp\runtime\CSharp\Antlr4.Runtime\obj\Antlr4.Runtime.dotnet.csproj.nuget.g.props.
+  Generating MSBuild file C:\Code\antlr4-fork\runtime\CSharp\runtime\CSharp\Antlr4.Runtime\obj\Antlr4.Runtime.dotnet.csproj.nuget.g.targets.
+  Restore completed in 427.62 ms for C:\Code\antlr4-fork\runtime\CSharp\runtime\CSharp\Antlr4.Runtime\Antlr4.Runtime.dotnet.csproj.
+  Antlr4.Runtime.dotnet -> C:\Code\antlr4-fork\runtime\CSharp\runtime\CSharp\Antlr4.Runtime\lib\Release\netstandard1.3\Antlr4.Runtime.Standard.dll
+  Antlr4.Runtime.dotnet -> C:\Code\antlr4-fork\runtime\CSharp\runtime\CSharp\Antlr4.Runtime\lib\Release\net35\Antlr4.Runtime.Standard.dll
+  Successfully created package 'C:\Code\antlr4-fork\runtime\CSharp\runtime\CSharp\Antlr4.Runtime\lib\Release\Antlr4.Runtime.Standard.4.7.2.nupkg'.
+```
 
 **Publishing to NuGet**
 
 You need to be a NuGet owner for "ANTLR 4 Standard Runtime"
-As a registered NuGet user, you can then manually upload the package spec here (`runtime/CSharp/runtime/CSharp/Package.nuspec`): [https://www.nuget.org/packages/manage/upload](https://www.nuget.org/packages/manage/upload)
+As a registered NuGet user, you can then manually upload the package here: [https://www.nuget.org/packages/manage/upload](https://www.nuget.org/packages/manage/upload)
 
 Alternately, you can publish from the cmd line. You need to get your NuGet key from [https://www.nuget.org/account#](https://www.nuget.org/account#) and then from the cmd line, you can then type:
 
-```bash
+```cmd
 nuget push Antlr4.Runtime.Standard.<version>.nupkg <your-key> -Source https://www.nuget.org/api/v2/package
 ```
 
-**Creating DLLs**
-
-```bash
-cd ~/antlr/code/antlr4/runtime/CSharp/runtime/CSharp
-# kill previous ones manually as "xbuild /t:Clean" didn't seem to do it
-rm Antlr4.Runtime/bin/net20/Release/Antlr4.Runtime.dll
-rm Antlr4.Runtime/obj/net20/Release/Antlr4.Runtime.dll
-# build
-xbuild /p:Configuration=Release Antlr4.Runtime/Antlr4.Runtime.mono.csproj
-# zip it up to get a version number on zip filename
-zip --junk-paths /tmp/antlr-csharp-runtime-4.7.zip Antlr4.Runtime/obj/net20/Release/Antlr4.Runtime.Standard.dll
-cp /tmp/antlr-csharp-runtime-4.7.zip ~/antlr/sites/website-antlr4/download
-```
-
-Move target to website
-
-```bash
-pushd ~/antlr/sites/website-antlr4/download
-git add antlr-csharp-runtime-4.7.zip
-git commit -a -m 'update C# runtime'
-git push origin gh-pages
-popd
-```
+Nuget packages are also accessible as artifacts of [AppVeyor builds](https://ci.appveyor.com/project/parrt/antlr4/build/artifacts). 
 
 ### Python
 
