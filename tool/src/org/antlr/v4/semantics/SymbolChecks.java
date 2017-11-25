@@ -207,8 +207,8 @@ public class SymbolChecks {
 					labelPair.type + "!=" + prevLabelPair.type);
 		}
 		if (!prevLabelPair.element.getText().equals(labelPair.element.getText()) &&
-				(prevLabelPair.type.equals(LabelType.RULE_LABEL) || prevLabelPair.type.equals(LabelType.RULE_LIST_LABEL)) &&
-				(labelPair.type.equals(LabelType.RULE_LABEL) || labelPair.type.equals(LabelType.RULE_LIST_LABEL))) {
+			(prevLabelPair.type.equals(LabelType.RULE_LABEL) || prevLabelPair.type.equals(LabelType.RULE_LIST_LABEL)) &&
+			(labelPair.type.equals(LabelType.RULE_LABEL) || labelPair.type.equals(LabelType.RULE_LIST_LABEL))) {
 
 			org.antlr.runtime.Token token = r instanceof LeftRecursiveRule
 					? ((GrammarAST) r.ast.getChild(0)).getToken()
@@ -294,7 +294,7 @@ public class SymbolChecks {
 			errMgr.grammarError(
 					errorType,
 					g.fileName,
-					attributes.get(key).token != null ? attributes.get(key).token : ((GrammarAST) r.ast.getChild(0)).token,
+					attributes.get(key).token != null ? attributes.get(key).token : ((GrammarAST)r.ast.getChild(0)).token,
 					key,
 					r.name);
 		}
@@ -303,14 +303,14 @@ public class SymbolChecks {
 	protected void checkReservedNames(Collection<Rule> rules) {
 		for (Rule rule : rules) {
 			if (reservedNames.contains(rule.name)) {
-				errMgr.grammarError(ErrorType.RESERVED_RULE_NAME, g.fileName, ((GrammarAST) rule.ast.getChild(0)).getToken(), rule.name);
+				errMgr.grammarError(ErrorType.RESERVED_RULE_NAME, g.fileName, ((GrammarAST)rule.ast.getChild(0)).getToken(), rule.name);
 			}
 		}
 	}
 
 	public void checkForModeConflicts(Grammar g) {
 		if (g.isLexer()) {
-			LexerGrammar lexerGrammar = (LexerGrammar) g;
+			LexerGrammar lexerGrammar = (LexerGrammar)g;
 			for (String modeName : lexerGrammar.modes.keySet()) {
 				if (!modeName.equals("DEFAULT_MODE") && reservedNames.contains(modeName)) {
 					Rule rule = lexerGrammar.modes.get(modeName).iterator().next();
@@ -337,7 +337,7 @@ public class SymbolChecks {
 	 */
 	public void checkForUnreachableTokens(Grammar g) {
 		if (g.isLexer()) {
-			LexerGrammar lexerGrammar = (LexerGrammar) g;
+			LexerGrammar lexerGrammar = (LexerGrammar)g;
 			for (List<Rule> rules : lexerGrammar.modes.values()) {
 				// Collect string literal lexer rules for each mode
 				List<Rule> stringLiteralRules = new ArrayList<>();
@@ -358,7 +358,7 @@ public class SymbolChecks {
 					Rule rule1 =  stringLiteralRules.get(i);
 					checkForOverlap(g, rule1, rule1, firstTokenStringValues, stringLiteralValues.get(i));
 
-					// Check fragment rules only with themselfs
+					// Check fragment rules only with themself
 					if (!rule1.isFragment()) {
 						for (int j = i + 1; j < stringLiteralRules.size(); j++) {
 							Rule rule2 = stringLiteralRules.get(j);
@@ -442,17 +442,17 @@ public class SymbolChecks {
 
 	// CAN ONLY CALL THE TWO NEXT METHODS AFTER GRAMMAR HAS RULE DEFS (see semanticpipeline)
 	public void checkRuleArgs(Grammar g, List<GrammarAST> rulerefs) {
-		if (rulerefs == null) return;
+		if ( rulerefs==null) return;
 		for (GrammarAST ref : rulerefs) {
 			String ruleName = ref.getText();
 			Rule r = g.getRule(ruleName);
-			GrammarAST arg = (GrammarAST) ref.getFirstChildWithType(ANTLRParser.ARG_ACTION);
-			if (arg != null && (r == null || r.args == null)) {
+			GrammarAST arg = (GrammarAST)ref.getFirstChildWithType(ANTLRParser.ARG_ACTION);
+			if ( arg!=null && (r==null || r.args==null) ) {
 				errMgr.grammarError(ErrorType.RULE_HAS_NO_ARGS,
 						g.fileName, ref.token, ruleName);
 
 			}
-			else if (arg == null && (r != null && r.args != null)) {
+			else if ( arg == null && (r!=null && r.args!=null) ) {
 				errMgr.grammarError(ErrorType.MISSING_RULE_ARGS,
 						g.fileName, ref.token, ruleName);
 			}
@@ -461,17 +461,17 @@ public class SymbolChecks {
 
 	public void checkForQualifiedRuleIssues(Grammar g, List<GrammarAST> qualifiedRuleRefs) {
 		for (GrammarAST dot : qualifiedRuleRefs) {
-			GrammarAST grammar = (GrammarAST) dot.getChild(0);
-			GrammarAST rule = (GrammarAST) dot.getChild(1);
-			g.tool.log("semantics", grammar.getText() + "." + rule.getText());
+			GrammarAST grammar = (GrammarAST)dot.getChild(0);
+			GrammarAST rule = (GrammarAST)dot.getChild(1);
+			g.tool.log("semantics", grammar.getText()+"."+rule.getText());
 			Grammar delegate = g.getImportedGrammar(grammar.getText());
-			if (delegate == null) {
+			if ( delegate==null ) {
 				errMgr.grammarError(ErrorType.NO_SUCH_GRAMMAR_SCOPE,
 						g.fileName, grammar.token, grammar.getText(),
 						rule.getText());
 			}
 			else {
-				if (g.getRule(grammar.getText(), rule.getText()) == null) {
+				if ( g.getRule(grammar.getText(), rule.getText())==null ) {
 					errMgr.grammarError(ErrorType.NO_SUCH_RULE_IN_SCOPE,
 							g.fileName, rule.token, grammar.getText(),
 							rule.getText());
