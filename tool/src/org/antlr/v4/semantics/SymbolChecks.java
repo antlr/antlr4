@@ -442,7 +442,7 @@ public class SymbolChecks {
 
 	// CAN ONLY CALL THE TWO NEXT METHODS AFTER GRAMMAR HAS RULE DEFS (see semanticpipeline)
 	public void checkRuleArgs(Grammar g, List<GrammarAST> rulerefs) {
-		if ( rulerefs==null) return;
+		if ( rulerefs==null ) return;
 		for (GrammarAST ref : rulerefs) {
 			String ruleName = ref.getText();
 			Rule r = g.getRule(ruleName);
@@ -452,7 +452,7 @@ public class SymbolChecks {
 						g.fileName, ref.token, ruleName);
 
 			}
-			else if ( arg == null && (r!=null && r.args!=null) ) {
+			else if ( arg==null && (r!=null && r.args!=null) ) {
 				errMgr.grammarError(ErrorType.MISSING_RULE_ARGS,
 						g.fileName, ref.token, ruleName);
 			}
