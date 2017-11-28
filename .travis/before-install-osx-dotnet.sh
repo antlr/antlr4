@@ -3,9 +3,9 @@
 set -euo pipefail
 
 cache_dir="$HOME/Library/Caches/Antlr4"
-dotnet_url='https://download.microsoft.com/download/B/9/F/B9F1AF57-C14A-4670-9973-CDF47209B5BF/dotnet-dev-osx-x64.1.0.4.pkg'
+dotnet_url='https://download.microsoft.com/download/F/4/F/F4FCB6EC-5F05-4DF8-822C-FF013DF1B17F/dotnet-dev-osx-x64.1.1.4.pkg'
 dotnet_file=$(basename "$dotnet_url")
-dotnet_shasum='63b5d99028cd8b2454736076106c96ba7d05f0fc'
+dotnet_shasum='dc46d93716db8bea8cc3c668088cc9e39384b5a4'
 
 thisdir=$(dirname "$0")
 
