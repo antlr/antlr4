@@ -61,6 +61,131 @@ public class TestCompositeGrammars extends BaseJavaToolTest {
 		assertEquals(0, equeue.size());
 	}
 
+	@Test public void testImportIntoLexerGrammar() throws Exception {
+		BaseRuntimeTest.mkdir(tmpdir);
+
+		String master =
+			"lexer grammar M;\n" +
+			"import S;\n" +
+			"A : 'a';\n" +
+			"B : 'b';\n";
+		writeFile(tmpdir, "M.g4", master);
+
+		String slave = 
+		    "lexer grammar S;\n" +
+			"C : 'c';\n";
+		writeFile(tmpdir, "S.g4", slave);
+
+		ErrorQueue equeue = BaseRuntimeTest.antlrOnString(tmpdir, "Java", "M.g4", false, "-lib", tmpdir);
+		assertEquals(0, equeue.errors.size());
+	}
+
+	@Test public void testImportModesIntoLexerGrammar() throws Exception {
+		BaseRuntimeTest.mkdir(tmpdir);
+
+		String master =
+			"lexer grammar M;\n" +
+			"import S;\n" +
+			"A : 'a' -> pushMode(X);\n" +
+			"B : 'b';\n";
+		writeFile(tmpdir, "M.g4", master);
+
+		String slave = 
+			"lexer grammar S;\n" +
+			"D : 'd';\n" +
+			"mode X;\n" +
+			"C : 'c' -> popMode;\n";
+		writeFile(tmpdir, "S.g4", slave);
+
+		ErrorQueue equeue = BaseRuntimeTest.antlrOnString(tmpdir, "Java", "M.g4", false, "-lib", tmpdir);
+		assertEquals(0, equeue.errors.size());
+	}
+	
+	@Test public void testImportChannelsIntoLexerGrammar() throws Exception {
+		BaseRuntimeTest.mkdir(tmpdir);
+
+		String master =
+			"lexer grammar M;\n" +
+			"import S;\n" +
+			"channels {CH_A, CH_B}\n" +
+			"A : 'a' -> channel(CH_A);\n" +
+			"B : 'b' -> channel(CH_B);\n";
+		writeFile(tmpdir, "M.g4", master);
+
+		String slave = 
+			"lexer grammar S;\n" +
+			"C : 'c';\n";
+		writeFile(tmpdir, "S.g4", slave);
+
+		ErrorQueue equeue = BaseRuntimeTest.antlrOnString(tmpdir, "Java", "M.g4", false, "-lib", tmpdir);
+		assertEquals(0, equeue.errors.size());
+	}
+	
+	@Test public void testImportMixedChannelsIntoLexerGrammar() throws Exception {
+		BaseRuntimeTest.mkdir(tmpdir);
+
+		String master =
+			"lexer grammar M;\n" +
+			"import S;\n" +
+			"channels {CH_A, CH_B}\n" +
+			"A : 'a' -> channel(CH_A);\n" +
+			"B : 'b' -> channel(CH_B);\n";
+		writeFile(tmpdir, "M.g4", master);
+
+		String slave = 
+			"lexer grammar S;\n" +
+			"channels {CH_C}\n" +
+			"C : 'c' -> channel(CH_C);\n";
+		writeFile(tmpdir, "S.g4", slave);
+
+		ErrorQueue equeue = BaseRuntimeTest.antlrOnString(tmpdir, "Java", "M.g4", false, "-lib", tmpdir);
+		assertEquals(0, equeue.errors.size());
+	}
+	
+	@Test public void testMergeModesIntoLexerGrammar() throws Exception {
+		BaseRuntimeTest.mkdir(tmpdir);
+
+		String master =
+			"lexer grammar M;\n" +
+			"import S;\n" +
+			"A : 'a' -> pushMode(X);\n" +
+			"mode X;\n" +
+			"B : 'b';\n";
+		writeFile(tmpdir, "M.g4", master);
+
+		String slave = 
+			"lexer grammar S;\n" +
+			"D : 'd';\n" +
+			"mode X;\n" +
+			"C : 'c' -> popMode;\n";
+		writeFile(tmpdir, "S.g4", slave);
+
+		ErrorQueue equeue = BaseRuntimeTest.antlrOnString(tmpdir, "Java", "M.g4", false, "-lib", tmpdir);
+		assertEquals(0, equeue.errors.size());
+	}
+	
+	@Test public void testEmptyModesInLexerGrammar() throws Exception {
+		BaseRuntimeTest.mkdir(tmpdir);
+
+		String master =
+			"lexer grammar M;\n" +
+			"import S;\n" +
+			"A : 'a';\n" +
+			"C : 'e';\n" + 
+			"B : 'b';\n";
+		writeFile(tmpdir, "M.g4", master);
+
+		String slave = 
+			"lexer grammar S;\n" +
+			"D : 'd';\n" +
+			"mode X;\n" +
+			"C : 'c' -> popMode;\n";
+		writeFile(tmpdir, "S.g4", slave);
+
+		ErrorQueue equeue = BaseRuntimeTest.antlrOnString(tmpdir, "Java", "M.g4", false, "-lib", tmpdir);
+		assertEquals(0, equeue.errors.size());
+	}	
+
 	@Test public void testDelegatesSeeSameTokenType() throws Exception {
 		String slaveS =
 			"parser grammar S;\n"+
