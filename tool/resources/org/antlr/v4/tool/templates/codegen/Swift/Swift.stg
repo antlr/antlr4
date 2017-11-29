@@ -48,6 +48,9 @@ SwiftTypeMap ::= [
 ]
 // args must be <object-model-object>, <fields-resulting-in-STs>
 
+accessLevelOpenOK(obj) ::= "<obj.accessLevel; null=\"open\">"
+accessLevelNotOpen(obj) ::= "<obj.accessLevel; null=\"public\">"
+
 ParserFile(file, parser, namedActions,contextSuperClass) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 <if(file.genPackage)>
@@ -71,7 +74,7 @@ import Antlr4
  * This interface defines a complete listener for a parse tree produced by
  * {@link <file.parserName>}.
  */
-public protocol <file.grammarName>Listener: ParseTreeListener {
+<accessLevelNotOpen(file)> protocol <file.grammarName>Listener: ParseTreeListener {
 	<file.listenerNames:{lname |
 /**
 <if(file.listenerLabelRuleNames.(lname))>
@@ -113,8 +116,8 @@ import Antlr4
  * which can be extended to create a listener which only needs to handle a subset
  * of the available methods.
  */
-open class <file.grammarName>BaseListener: <file.grammarName>Listener {
-    public init() { \}
+<accessLevelOpenOK(file)> class <file.grammarName>BaseListener: <file.grammarName>Listener {
+     <accessLevelNotOpen(file)> init() { \}
 	<file.listenerNames:{lname |
 
 /**
@@ -122,38 +125,38 @@ open class <file.grammarName>BaseListener: <file.grammarName>Listener {
  *
  * \<p>The default implementation does nothing.\</p>
  */
-open func enter<lname; format="cap">(_ ctx: <file.parserName>.<lname; format="cap">Context) { \}
+<accessLevelOpenOK(file)> func enter<lname; format="cap">(_ ctx: <file.parserName>.<lname; format="cap">Context) { \}
 /**
  * {@inheritDoc\}
  *
  * \<p>The default implementation does nothing.\</p>
  */
-open func exit<lname; format="cap">(_ ctx: <file.parserName>.<lname; format="cap">Context) { \}}; separator="\n">
+<accessLevelOpenOK(file)> func exit<lname; format="cap">(_ ctx: <file.parserName>.<lname; format="cap">Context) { \}}; separator="\n">
 
 	/**
 	 * {@inheritDoc\}
 	 *
 	 * \<p>The default implementation does nothing.\</p>
 	 */
-	open func enterEveryRule(_ ctx: ParserRuleContext) { }
+	<accessLevelOpenOK(file)> func enterEveryRule(_ ctx: ParserRuleContext) { }
 	/**
 	 * {@inheritDoc\}
 	 *
 	 * \<p>The default implementation does nothing.\</p>
 	 */
-	open func exitEveryRule(_ ctx: ParserRuleContext) { }
+	<accessLevelOpenOK(file)> func exitEveryRule(_ ctx: ParserRuleContext) { }
 	/**
 	 * {@inheritDoc\}
 	 *
 	 * \<p>The default implementation does nothing.\</p>
 	 */
-	open func visitTerminal(_ node: TerminalNode) { }
+	<accessLevelOpenOK(file)> func visitTerminal(_ node: TerminalNode) { }
 	/**
 	 * {@inheritDoc\}
 	 *
 	 * \<p>The default implementation does nothing.\</p>
 	 */
-	open func visitErrorNode(_ node: ErrorNode) { }
+	<accessLevelOpenOK(file)> func visitErrorNode(_ node: ErrorNode) { }
 }
 >>
 
@@ -172,7 +175,7 @@ import Antlr4
  * @param \<T> The return type of the visit operation. Use {@link Void} for
  * operations with no return type.
  */
-open class <file.grammarName>Visitor\<T>: ParseTreeVisitor\<T> {
+<accessLevelOpenOK(file)> class <file.grammarName>Visitor\<T>: ParseTreeVisitor\<T> {
 	<file.visitorNames:{lname |
 /**
 <if(file.visitorLabelRuleNames.(lname))>
@@ -185,7 +188,7 @@ open class <file.grammarName>Visitor\<T>: ParseTreeVisitor\<T> {
   - ctx: the parse tree
 - returns: the visitor result
  */
-open func visit<lname; format="cap">(_ ctx: <file.parserName>.<lname; format="cap">Context) -> T{
+<accessLevelOpenOK(file)> func visit<lname; format="cap">(_ ctx: <file.parserName>.<lname; format="cap">Context) -> T {
  	fatalError(#function + " must be overridden")
 \}
 }; separator="\n">
@@ -208,7 +211,7 @@ import Antlr4
  * @param \<T> The return type of the visit operation. Use {@link Void} for
  * operations with no return type.
  */
-open class <file.grammarName>BaseVisitor\<T>: AbstractParseTreeVisitor\<T> {
+<accessLevelOpenOK(file)> class <file.grammarName>BaseVisitor\<T>: AbstractParseTreeVisitor\<T> {
 	<file.visitorNames:{lname |
 /**
  * {@inheritDoc\}
@@ -216,7 +219,7 @@ open class <file.grammarName>BaseVisitor\<T>: AbstractParseTreeVisitor\<T> {
  * \<p>The default implementation returns the result of calling
  * {@link #visitChildren\} on {@code ctx\}.\</p>
  */
-open func visit<lname; format="cap">(_ ctx: <file.parserName>.<lname; format="cap">Context) -> T? { return visitChildren(ctx) \}}; separator="\n">
+<accessLevelOpenOK(file)> func visit<lname; format="cap">(_ ctx: <file.parserName>.<lname; format="cap">Context) -> T? { return visitChildren(ctx) \}}; separator="\n">
 }
 >>
 
@@ -230,7 +233,7 @@ Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
 
 Parser_(parser, funcs, atn, sempredFuncs, ctor, superClass) ::= <<
 <!//@SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})!>
-open class <parser.name>: <superClass; null="Parser"> {
+<accessLevelOpenOK(parser)> class <parser.name>: <superClass; null="Parser"> {
 
 	internal static var _decisionToDFA: [DFA] = {
           var decisionToDFA = [DFA]()
@@ -241,40 +244,46 @@ open class <parser.name>: <superClass; null="Parser"> {
            }
            return decisionToDFA
      }()
+
 	internal static let _sharedContextCache = PredictionContextCache()
 
 	<if(parser.tokens)>
-	public enum Tokens: Int {
+	<accessLevelNotOpen(parser)>
+	enum Tokens: Int {
 		case EOF = -1, <parser.tokens:{k | <k> = <parser.tokens.(k)>}; separator=", ", wrap, anchor>
 	}
         <endif>
 
-	public static let <parser.rules:{r | RULE_<r.name> = <r.index>}; separator=", ", wrap, anchor>
-	public static let ruleNames: [String] = [
+	<accessLevelNotOpen(parser)>
+	static let <parser.rules:{r | RULE_<r.name> = <r.index>}; separator=", ", wrap, anchor>
+
+	<accessLevelNotOpen(parser)>
+	static let ruleNames: [String] = [
 		<parser.ruleNames:{r | "<r>"}; separator=", ", wrap, anchor>
 	]
 
-	<vocabulary(parser.literalNames, parser.symbolicNames)>
+	<vocabulary(parser.literalNames, parser.symbolicNames,
+                    accessLevelNotOpen(parser))>
 
-	override
-	open func getGrammarFileName() -> String { return "<parser.grammarFileName; format="java-escape">" }
+	override <accessLevelOpenOK(parser)>
+	func getGrammarFileName() -> String { return "<parser.grammarFileName; format="java-escape">" }
 
-	override
-	open func getRuleNames() -> [String] { return <parser.name>.ruleNames }
+	override <accessLevelOpenOK(parser)>
+	func getRuleNames() -> [String] { return <parser.name>.ruleNames }
 
-	override
-	open func getSerializedATN() -> String { return <parser.name>._serializedATN }
+	override <accessLevelOpenOK(parser)>
+	func getSerializedATN() -> String { return <parser.name>._serializedATN }
 
-	override
-	open func getATN() -> ATN { return <parser.name>._ATN }
+	override <accessLevelOpenOK(parser)>
+	func getATN() -> ATN { return <parser.name>._ATN }
 
 	<namedActions.members>
 	<parser:(ctor)()>
 	<funcs; separator="\n">
 
 <if(sempredFuncs)>
-    override
-	open func sempred(_ _localctx: RuleContext?, _ ruleIndex: Int,  _ predIndex: Int)throws -> Bool {
+	override <accessLevelOpenOK(parser)>
+	func sempred(_ _localctx: RuleContext?, _ ruleIndex: Int,  _ predIndex: Int)throws -> Bool {
 		switch (ruleIndex) {
 		<parser.sempredFuncs.values:{f|
 case  <f.ruleIndex>:
@@ -287,25 +296,30 @@ case  <f.ruleIndex>:
 <endif>
 
 	<atn>
-   public static let _serializedATN = <parser.name>ATN().jsonString
-   public static let _ATN = ATNDeserializer().deserializeFromJson(_serializedATN)
+
+	<accessLevelNotOpen(parser)>
+	static let _serializedATN = <parser.name>ATN().jsonString
+
+	<accessLevelNotOpen(parser)>
+	static let _ATN = ATNDeserializer().deserializeFromJson(_serializedATN)
 }
 >>
 
-vocabulary(literalNames, symbolicNames) ::= <<
+vocabulary(literalNames, symbolicNames, accessLevel) ::= <<
 private static let _LITERAL_NAMES: [String?] = [
 	<literalNames:{t | <t>}; null="nil", separator=", ", wrap, anchor>
 ]
 private static let _SYMBOLIC_NAMES: [String?] = [
 	<symbolicNames:{t | <t>}; null="nil", separator=", ", wrap, anchor>
 ]
-public static let VOCABULARY = Vocabulary(_LITERAL_NAMES, _SYMBOLIC_NAMES)
+<accessLevel>
+static let VOCABULARY = Vocabulary(_LITERAL_NAMES, _SYMBOLIC_NAMES)
 >>
 
 dumpActions(recog, argFuncs, actionFuncs, sempredFuncs) ::= <<
 <if(actionFuncs)>
-override
-open func action(_ _localctx: RuleContext?,  _ ruleIndex: Int, _ actionIndex: Int) throws {
+override <accessLevelOpenOK(parser)>
+func action(_ _localctx: RuleContext?,  _ ruleIndex: Int, _ actionIndex: Int) throws {
 	switch (ruleIndex) {
 	<recog.actionFuncs.values:{f|
 case <f.ruleIndex>:
@@ -317,8 +331,8 @@ case <f.ruleIndex>:
 <actionFuncs.values; separator="\n">
 <endif>
 <if(sempredFuncs)>
-override
-open func sempred(_ _localctx: RuleContext?, _  ruleIndex: Int,_   predIndex: Int) throws -> Bool{
+override <accessLevelOpenOK(parser)>
+func sempred(_ _localctx: RuleContext?, _  ruleIndex: Int,_   predIndex: Int) throws -> Bool {
 	switch (ruleIndex) {
 	<recog.sempredFuncs.values:{f|
 case <f.ruleIndex>:
@@ -333,11 +347,13 @@ case <f.ruleIndex>:
 
 parser_ctor(p) ::= <<
 
-open override func getVocabulary() -> Vocabulary {
+override <accessLevelOpenOK(parser)>
+func getVocabulary() -> Vocabulary {
     return <p.name>.VOCABULARY
 }
 
-public override init(_ input:TokenStream) throws {
+override <accessLevelNotOpen(parser)>
+init(_ input:TokenStream) throws {
     RuntimeMetaData.checkVersion("4.7", RuntimeMetaData.VERSION)
 	try super.init(input)
 	_interp = ParserATNSimulator(self,<p.name>._ATN,<p.name>._decisionToDFA, <parser.name>._sharedContextCache)
@@ -378,7 +394,7 @@ RuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,namedActions,fina
 <ruleCtx>
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
 @discardableResult
-<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>open func <endif><currentRule.name>(<if(first(args))>_ <endif><args; separator=", _">) throws -> <currentRule.ctxType> {
+<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else> <accessLevelOpenOK(parser)> func <endif><currentRule.name>(<if(first(args))>_ <endif><args; separator=", _">) throws -> <currentRule.ctxType> {
 	var _localctx: <currentRule.ctxType> = <currentRule.ctxType>(_ctx, getState()<currentRule.args:{a | , <a.name>}>)
 	try enterRule(_localctx, <currentRule.startState>, <parser.name>.RULE_<currentRule.name>)
 	<namedActions.init>
@@ -416,7 +432,7 @@ LeftRecursiveRuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,
 <ruleCtx>
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
 
-<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public final <endif> func <currentRule.name>( <if(first(args))>_ <endif><args; separator=", _">) throws -> <currentRule.ctxType>   {
+<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else> <accessLevelNotOpen(parser)> final <endif> func <currentRule.name>( <if(first(args))>_ <endif><args; separator=", _">) throws -> <currentRule.ctxType>   {
 	return try <currentRule.name>(0<currentRule.args:{a | , <a.name>}>)
 }
 @discardableResult
@@ -758,33 +774,45 @@ AddToLabelList(a) ::= "<ctx(a.label)>.<a.listName>.append(<labelref(a.label)>)"
 
 TokenDecl(t) ::= "<t.name>: <SwiftTypeMap.(TokenLabelType())>!"
 TokenTypeDecl(t) ::= "var <t.name>: Int = 0"
-TokenListDecl(t) ::= "<t.name>: Array\<Token> = Array\<Token>()"
+TokenListDecl(t) ::= "<t.name>: [Token] = [Token]()"
 RuleContextDecl(r) ::= "<r.name>: <r.ctxName>!"
-RuleContextListDecl(rdecl) ::= "<rdecl.name>:Array\<<rdecl.ctxName>> = Array\<<rdecl.ctxName>>()"
+RuleContextListDecl(rdecl) ::= "<rdecl.name>: [<rdecl.ctxName>] = [<rdecl.ctxName>]()"
 
-ContextTokenGetterDecl(t)      ::=
-    "open func <t.name>() -> TerminalNode? { return getToken(<parser.name>.Tokens.<t.name>.rawValue, 0) }"
-ContextTokenListGetterDecl(t)  ::=
-    "open func <t.name>() -> Array\<TerminalNode> { return getTokens(<parser.name>.Tokens.<t.name>.rawValue) }"
-ContextTokenListIndexedGetterDecl(t)  ::= <<
-open func <t.name>(_ i:Int) -> TerminalNode?{
-	return getToken(<parser.name>.Tokens.<t.name>.rawValue, i)
-}
+ContextTokenGetterDecl(t) ::= <<
+	<accessLevelOpenOK(parser)>
+	func <t.name>() -> TerminalNode? {
+		return getToken(<parser.name>.Tokens.<t.name>.rawValue, 0)
+	}
 >>
-ContextRuleGetterDecl(r)       ::= <<
-open func <r.name>() -> <r.ctxName>? {
-	return getRuleContext(<r.ctxName>.self, 0)
-}
+ContextTokenListGetterDecl(t) ::= <<
+	<accessLevelOpenOK(parser)>
+	func <t.name>() -> [TerminalNode] {
+		return getTokens(<parser.name>.Tokens.<t.name>.rawValue)
+	}
 >>
-ContextRuleListGetterDecl(r)   ::= <<
-open func <r.name>() -> Array\<<r.ctxName>\> {
-	return getRuleContexts(<r.ctxName>.self)
-}
+ContextTokenListIndexedGetterDecl(t) ::= <<
+	<accessLevelOpenOK(parser)>
+	func <t.name>(_ i:Int) -> TerminalNode? {
+		return getToken(<parser.name>.Tokens.<t.name>.rawValue, i)
+	}
+>>
+ContextRuleGetterDecl(r) ::= <<
+	<accessLevelOpenOK(parser)>
+	func <r.name>() -> <r.ctxName>? {
+		return getRuleContext(<r.ctxName>.self, 0)
+	}
+>>
+ContextRuleListGetterDecl(r) ::= <<
+	<accessLevelOpenOK(parser)>
+	func <r.name>() -> [<r.ctxName>] {
+		return getRuleContexts(<r.ctxName>.self)
+	}
 >>
 ContextRuleListIndexedGetterDecl(r)   ::= <<
-open func <r.name>(_ i: Int) -> <r.ctxName>? {
-	return getRuleContext(<r.ctxName>.self, i)
-}
+	<accessLevelOpenOK(parser)>
+	func <r.name>(_ i: Int) -> <r.ctxName>? {
+		return getRuleContext(<r.ctxName>.self, i)
+	}
 >>
 
 LexerRuleContext() ::= "RuleContext"
@@ -804,20 +832,26 @@ CaptureNextTokenType(d) ::= "<d.varName> = try _input.LA(1)"
 
 StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers,
            superClass={ParserRuleContext}) ::= <<
-open class <struct.name>: <if(contextSuperClass)><contextSuperClass><else>ParserRuleContext<endif><if(interfaces)>, <interfaces; separator=", "><endif> {
-	<attrs:{a | public var <a>}; separator="\n">
+
+<accessLevelNotOpen(parser)> class <struct.name>: <if(contextSuperClass)><contextSuperClass><else>ParserRuleContext<endif><if(interfaces)>, <interfaces; separator=", "><endif> {
+	<attrs:{a | <accessLevelOpenOK(parser)> var <a>}; separator="\n">
 	<getters:{g | <g>}; separator="\n">
-	<! <if(ctorAttrs)>public init(_ parent: ParserRuleContext,_ invokingState: Int) { super.init(parent, invokingState)  }<endif> !>
-	 <if(ctorAttrs)>
-	 public convenience init(_ parent: ParserRuleContext?, _ invokingState: Int<ctorAttrs:{a | , _ <a>}>) {
+	<! <if(ctorAttrs)> <accessLevelNotOpen(parser)> init(_ parent: ParserRuleContext,_ invokingState: Int) { super.init(parent, invokingState)  }<endif> !>
+	<if(ctorAttrs)>
+	<accessLevelNotOpen(parser)> convenience init(_ parent: ParserRuleContext?, _ invokingState: Int<ctorAttrs:{a | , _ <a>}>) {
 		self.init(parent, invokingState)
 		<struct.ctorAttrs:{a | self.<a.name> = <a.name>;}; separator="\n">
-	 }
+	}
 	<endif>
-	open override func getRuleIndex() -> Int { return <parser.name>.RULE_<struct.derivedFromName> }
+
+	override <accessLevelOpenOK(parser)>
+	func getRuleIndex() -> Int {
+		return <parser.name>.RULE_<struct.derivedFromName>
+	}
 <if(struct.provideCopyFrom)> <! don't need copy unless we have subclasses !>
-	<!public init() { }!>
-	public  func copyFrom(_ ctx: <struct.name>) {
+	<! <accessLevelNotOpen(parser)> init() { }!>
+	<accessLevelOpenOK(parser)>
+	func copyFrom(_ ctx: <struct.name>) {
 		super.copyFrom(ctx)
 		<struct.attrs:{a | self.<a.name> = ctx.<a.name>;}; separator="\n">
 	}
@@ -828,10 +862,12 @@ open class <struct.name>: <if(contextSuperClass)><contextSuperClass><else>Parser
 >>
 
 AltLabelStructDecl(struct,attrs,getters,dispatchMethods) ::= <<
-public  final class <struct.name>: <currentRule.name; format="cap">Context {
-	<attrs:{a | public var <a>}; separator="\n">
+<accessLevelNotOpen(parser)> class <struct.name>: <currentRule.name; format="cap">Context {
+	<attrs:{a | <accessLevelNotOpen(parser)> var <a>}; separator="\n">
 	<getters:{g | <g>}; separator="\n">
-	public init(_ ctx: <currentRule.name; format="cap">Context) {
+
+	<accessLevelNotOpen(parser)>
+	init(_ ctx: <currentRule.name; format="cap">Context) {
 		super.init()
 		copyFrom(ctx)
 	}
@@ -840,8 +876,8 @@ public  final class <struct.name>: <currentRule.name; format="cap">Context {
 >>
 
 ListenerDispatchMethod(method) ::= <<
-override
-open func <if(method.isEnter)>enter<else>exit<endif>Rule(_ listener: ParseTreeListener) {
+override <accessLevelOpenOK(parser)>
+func <if(method.isEnter)>enter<else>exit<endif>Rule(_ listener: ParseTreeListener) {
 	if let listener = listener as? <parser.grammarName>Listener {
 		listener.<if(method.isEnter)>enter<else>exit<endif><struct.derivedFromName; format="cap">(self)
 	}
@@ -849,8 +885,8 @@ open func <if(method.isEnter)>enter<else>exit<endif>Rule(_ listener: ParseTreeLi
 >>
 
 VisitorDispatchMethod(method) ::= <<
-override
-open func accept\<T>(_ visitor: ParseTreeVisitor\<T>) -> T? {
+override <accessLevelOpenOK(parser)>
+func accept\<T>(_ visitor: ParseTreeVisitor\<T>) -> T? {
 	if let visitor = visitor as? <parser.grammarName>Visitor {
 	    return visitor.visit<struct.derivedFromName; format="cap">(self)
 	}
@@ -926,7 +962,8 @@ import Antlr4
 <lexer>
 >>
 Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
-open class <lexer.name>: <superClass; null="Lexer"> {
+<accessLevelOpenOK(lexer)> class <lexer.name>: <superClass; null="Lexer"> {
+
 	internal static var _decisionToDFA: [DFA] = {
           var decisionToDFA = [DFA]()
           let length = <lexer.name>._ATN.getNumberOfDecisions()
@@ -938,60 +975,76 @@ open class <lexer.name>: <superClass; null="Lexer"> {
      }()
 
 	internal static let _sharedContextCache = PredictionContextCache()
-	public static let <lexer.tokens:{k | <k>=<lexer.tokens.(k)>}; separator=", ", wrap, anchor>
+
+	<accessLevelNotOpen(lexer)>
+	static let <lexer.tokens:{k | <k>=<lexer.tokens.(k)>}; separator=", ", wrap, anchor>
+
 	<if(lexer.channels)>
-	public static let <lexer.channels:{k | <k>=<lexer.channels.(k)>}; separator=", ", wrap, anchor>
+	<accessLevelNotOpen(lexer)>
+	static let <lexer.channels:{k | <k>=<lexer.channels.(k)>}; separator=", ", wrap, anchor>
 	<endif>
 	<if(rest(lexer.modes))>
-	public static let <rest(lexer.modes):{m| <m>=<i>}; separator=", ", wrap, anchor>
+	<accessLevelNotOpen(lexer)>
+	static let <rest(lexer.modes):{m| <m>=<i>}; separator=", ", wrap, anchor>
 	<endif>
-	public static let channelNames: [String] = [
+	<accessLevelNotOpen(lexer)>
+	static let channelNames: [String] = [
 		"DEFAULT_TOKEN_CHANNEL", "HIDDEN"<if (lexer.channels)>, <lexer.channels:{c| "<c>"}; separator=", ", wrap, anchor><endif>
 	]
 
-	public static let modeNames: [String] = [
+	<accessLevelNotOpen(lexer)>
+	static let modeNames: [String] = [
 		<lexer.modes:{m| "<m>"}; separator=", ", wrap, anchor>
 	]
 
-	public static let ruleNames: [String] = [
+	<accessLevelNotOpen(lexer)>
+	static let ruleNames: [String] = [
 		<lexer.ruleNames:{r | "<r>"}; separator=", ", wrap, anchor>
 	]
 
-	<vocabulary(lexer.literalNames, lexer.symbolicNames)>
+	<vocabulary(lexer.literalNames, lexer.symbolicNames,
+                    accessLevelNotOpen(lexer))>
 
 	<namedActions.members>
-    open override func getVocabulary() -> Vocabulary {
-        return <lexer.name>.VOCABULARY
-    }
 
-	public required init(_ input: CharStream) {
+	override <accessLevelOpenOK(lexer)>
+	func getVocabulary() -> Vocabulary {
+		return <lexer.name>.VOCABULARY
+	}
+
+	<accessLevelNotOpen(lexer)>
+	required init(_ input: CharStream) {
 	    RuntimeMetaData.checkVersion("<lexerFile.ANTLRVersion>", RuntimeMetaData.VERSION)
 		super.init(input)
 		_interp = LexerATNSimulator(self, <lexer.name>._ATN, <lexer.name>._decisionToDFA, <lexer.name>._sharedContextCache)
 	}
 
-	override
-	open func getGrammarFileName() -> String { return "<lexer.grammarFileName>" }
+	override <accessLevelOpenOK(lexer)>
+	func getGrammarFileName() -> String { return "<lexer.grammarFileName>" }
 
-    override
-	open func getRuleNames() -> [String] { return <lexer.name>.ruleNames }
+	override <accessLevelOpenOK(lexer)>
+	func getRuleNames() -> [String] { return <lexer.name>.ruleNames }
 
-	override
-	open func getSerializedATN() -> String { return <lexer.name>._serializedATN }
+	override <accessLevelOpenOK(lexer)>
+	func getSerializedATN() -> String { return <lexer.name>._serializedATN }
 
-	override
-	open func getChannelNames() -> [String] { return <lexer.name>.channelNames }
+	override <accessLevelOpenOK(lexer)>
+	func getChannelNames() -> [String] { return <lexer.name>.channelNames }
 
-	override
-	open func getModeNames() -> [String] { return <lexer.name>.modeNames }
+	override <accessLevelOpenOK(lexer)>
+	func getModeNames() -> [String] { return <lexer.name>.modeNames }
 
-	override
-	open func getATN() -> ATN { return <lexer.name>._ATN }
+	override <accessLevelOpenOK(lexer)>
+	func getATN() -> ATN { return <lexer.name>._ATN }
 
 	<dumpActions(lexer, "", actionFuncs, sempredFuncs)>
 	<atn>
-    public static let _serializedATN: String = <lexer.name>ATN().jsonString
-	public static let _ATN: ATN = ATNDeserializer().deserializeFromJson(_serializedATN)
+
+	<accessLevelNotOpen(lexer)>
+	static let _serializedATN: String = <lexer.name>ATN().jsonString
+
+	<accessLevelNotOpen(lexer)>
+	static let _ATN: ATN = ATNDeserializer().deserializeFromJson(_serializedATN)
 }
 >>
 

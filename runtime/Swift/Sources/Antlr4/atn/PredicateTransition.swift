@@ -14,7 +14,7 @@
 /// multiple ATN configurations into a single DFA state.
 /// 
 
-public final class PredicateTransition: AbstractPredicateTransition {
+public final class PredicateTransition: AbstractPredicateTransition, CustomStringConvertible {
     public let ruleIndex: Int
     public let predIndex: Int
     public let isCtxDependent: Bool
@@ -47,9 +47,7 @@ public final class PredicateTransition: AbstractPredicateTransition {
         return SemanticContext.Predicate(ruleIndex, predIndex, isCtxDependent)
     }
 
-
-    public func toString() -> String {
+    public var description: String {
         return "pred_\(ruleIndex):\(predIndex)"
     }
-
 }

@@ -19,5 +19,4 @@ public enum ANTLRError: Error {
     case illegalState(msg:String)
     case illegalArgument(msg:String)
     case negativeArraySize(msg:String)
-    case parseCancellation
 }

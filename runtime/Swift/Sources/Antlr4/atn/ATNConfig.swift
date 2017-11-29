@@ -159,37 +159,27 @@ public class ATNConfig: Hashable, CustomStringConvertible {
 
     }
 
-    public func toString() -> String {
-        return description
-    }
     public var description: String {
         //return "MyClass \(string)"
         return toString(nil, true)
     }
     public func toString<T>(_ recog: Recognizer<T>?, _ showAlt: Bool) -> String {
-        let buf: StringBuilder = StringBuilder()
-        buf.append("(")
-        buf.append(state)
+        var buf = "(\(state)"
         if showAlt {
-            buf.append(",")
-            buf.append(alt)
+            buf += ",\(alt)"
         }
-        
-        if context != nil {
-            buf.append(",[")
-            buf.append(context!)
-            buf.append("]")
+        if let context = context {
+            buf += ",[\(context)]"
         }
-        
         if semanticContext != SemanticContext.NONE {
-            buf.append(",")
-            buf.append(semanticContext)
+            buf += ",\(semanticContext)"
         }
-        if getOuterContextDepth() > 0 {
-            buf.append(",up=").append(getOuterContextDepth())
+        let outerDepth = getOuterContextDepth()
+        if outerDepth > 0 {
+            buf += ",up=\(outerDepth)"
         }
-        buf.append(")")
-        return buf.toString()
+        buf += ")"
+        return buf
     }
 }
 

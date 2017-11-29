@@ -22,13 +22,13 @@ public class IntervalSet: IntSet, Hashable, CustomStringConvertible {
     public static let COMPLETE_CHAR_SET: IntervalSet =
     {
         let set = IntervalSet.of(Lexer.MIN_CHAR_VALUE, Lexer.MAX_CHAR_VALUE)
-        try! set.setReadonly(true)
+        set.makeReadonly()
         return set
     }()
 
     public static let EMPTY_SET: IntervalSet = {
         let set = IntervalSet()
-        try! set.setReadonly(true)
+        set.makeReadonly()
         return set
     }()
 
@@ -105,7 +105,6 @@ public class IntervalSet: IntSet, Hashable, CustomStringConvertible {
         if readonly {
             throw ANTLRError.illegalState(msg: "can't alter readonly IntervalSet")
         }
-        //System.out.println("add "+addition+" to "+intervals.toString());
         if addition.b < addition.a {
             return
         }
@@ -509,109 +508,112 @@ public class IntervalSet: IntSet, Hashable, CustomStringConvertible {
     public var description: String {
         return toString(false)
     }
-    public func toString() -> String {
-        return description
-    }
 
     public func toString(_ elemAreChar: Bool) -> String {
-        let buf = StringBuilder()
-        if self.intervals.isEmpty {
+        if intervals.isEmpty {
             return "{}"
         }
-        if self.size() > 1 {
-            buf.append("{")
+
+        let selfSize = size()
+
+        var buf = ""
+
+        if selfSize > 1 {
+            buf += "{"
         }
         var first = true
         for interval in intervals {
             if !first {
-                buf.append(", ")
+                buf += ", "
             }
             first = false
+
             let a = interval.a
             let b = interval.b
             if a == b {
                 if a == CommonToken.EOF {
-                    buf.append("<EOF>")
-                } else {
-                    if elemAreChar {
-                        buf.append("'").append(String(a)).append("'")
-                    } else {
-                        buf.append(a)
-                    }
+                    buf += "<EOF>"
                 }
-            } else {
-                if elemAreChar {
-                    buf.append("'").append(String(a)).append("'..'").append(String(b)).append("'")
-                } else {
-                    buf.append(a).append("..").append(b)
+                else if elemAreChar {
+                    buf += "'\(a)'"
+                }
+                else {
+                    buf += "\(a)"
                 }
             }
+            else if elemAreChar {
+                buf += "'\(a)'..'\(b)'"
+            }
+            else {
+                buf += "\(a)..\(b)"
+            }
         }
-        if self.size() > 1 {
-            buf.append("}")
+
+        if selfSize > 1 {
+            buf += "}"
         }
-        return buf.toString()
+
+        return buf
     }
 
     public func toString(_ vocabulary: Vocabulary) -> String {
-        let buf = StringBuilder()
-
-        if self.intervals.isEmpty {
+        if intervals.isEmpty {
             return "{}"
         }
-        if self.size() > 1 {
-            buf.append("{")
+
+        let selfSize = size()
+
+        var buf = ""
+
+        if selfSize > 1 {
+            buf += "{"
         }
 
         var first = true
         for interval in intervals {
             if !first {
-                buf.append(", ")
+                buf += ", "
             }
             first = false
 
             let a = interval.a
             let b = interval.b
             if a == b {
-                buf.append(elementName(vocabulary, a))
-            } else {
+                buf += elementName(vocabulary, a)
+            }
+            else {
                 for i in a...b {
                     if i > a {
-                        buf.append(", ")
+                        buf += ", "
                     }
-                    buf.append(elementName(vocabulary, i))
+                    buf += elementName(vocabulary, i)
                 }
             }
+        }
 
+        if selfSize > 1 {
+            buf += "}"
         }
-        if self.size() > 1 {
-            buf.append("}")
-        }
-        return buf.toString()
+
+        return buf
     }
 
     internal func elementName(_ vocabulary: Vocabulary, _ a: Int) -> String {
         if a == CommonToken.EOF {
             return "<EOF>"
-        } else {
-            if a == CommonToken.EPSILON {
-                return "<EPSILON>"
-            } else {
-                return vocabulary.getDisplayName(a)
-            }
+        }
+        else if a == CommonToken.EPSILON {
+            return "<EPSILON>"
+        }
+        else {
+            return vocabulary.getDisplayName(a)
         }
     }
 
 
     public func size() -> Int {
         var n = 0
-        let numIntervals = intervals.count
-        if numIntervals == 1 {
-            let firstInterval = intervals[0]
-            return firstInterval.b - firstInterval.a + 1
-        }
-        for i in 0..<numIntervals {
-            let interval = intervals[i]
+        for interval in intervals {
             n += (interval.b - interval.a + 1)
         }
         return n
@@ -702,12 +704,8 @@ public class IntervalSet: IntSet, Hashable, CustomStringConvertible {
         return readonly
     }
 
-    public func setReadonly(_ readonly: Bool) throws {
-        if self.readonly && !readonly {
-            throw ANTLRError.illegalState(msg: "can't alter readonly IntervalSet")
-
-        }
-        self.readonly = readonly
+    public func makeReadonly() {
+        readonly = true
     }
 }
 

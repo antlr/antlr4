@@ -27,12 +27,12 @@ public class DFA: CustomStringConvertible {
     /// `true` if this DFA is for a precedence decision; otherwise,
     /// `false`. This is the backing field for _#isPrecedenceDfa_.
     /// 
-    private final var precedenceDfa: Bool
+    private let precedenceDfa: Bool
     
     /// 
     /// mutex for DFAState changes.
     /// 
-    private var dfaStateMutex = Mutex()
+    private let dfaStateMutex = Mutex()
 
     public convenience init(_ atnStartState: DecisionState) {
         self.init(atnStartState, 0)
@@ -42,19 +42,19 @@ public class DFA: CustomStringConvertible {
         self.atnStartState = atnStartState
         self.decision = decision
 
-        var precedenceDfa: Bool = false
-        if atnStartState is StarLoopEntryState {
-            if (atnStartState as! StarLoopEntryState).precedenceRuleDecision {
-                precedenceDfa = true
-                let precedenceState: DFAState = DFAState(ATNConfigSet())
-                precedenceState.edges = [DFAState]() //new DFAState[0];
-                precedenceState.isAcceptState = false
-                precedenceState.requiresFullContext = false
-                self.s0 = precedenceState
-            }
-        }
+        if let starLoopState = atnStartState as? StarLoopEntryState, starLoopState.precedenceRuleDecision {
+            let precedenceState = DFAState(ATNConfigSet())
+            precedenceState.edges = [DFAState]()
+            precedenceState.isAcceptState = false
+            precedenceState.requiresFullContext = false
 
-        self.precedenceDfa = precedenceDfa
+            precedenceDfa = true
+            s0 = precedenceState
+        }
+        else {
+            precedenceDfa = false
+            s0 = nil
+        }
     }
 
     /// 
@@ -88,14 +88,11 @@ public class DFA: CustomStringConvertible {
 
         }
 
-        // s0.edges is never null for a precedence DFA
-        // if (precedence < 0 || precedence >= s0!.edges!.count) {
-        if precedence < 0 || s0 == nil ||
-                s0!.edges == nil || precedence >= s0!.edges!.count {
+        guard let s0 = s0, let edges = s0.edges, precedence >= 0, precedence < edges.count else {
             return nil
         }
 
-        return s0!.edges![precedence]
+        return edges[precedence]
     }
 
     /// 
@@ -111,12 +108,12 @@ public class DFA: CustomStringConvertible {
     public final func setPrecedenceStartState(_ precedence: Int, _ startState: DFAState) throws {
         if !isPrecedenceDfa() {
             throw ANTLRError.illegalState(msg: "Only precedence DFAs may contain a precedence start state.")
-
         }
 
-        guard let s0 = s0,let edges = s0.edges , precedence >= 0 else {
+        guard let s0 = s0, let edges = s0.edges, precedence >= 0 else {
             return
         }
+
         // synchronization on s0 here is ok. when the DFA is turned into a
         // precedence DFA, s0 will be initialized once and not updated again
         dfaStateMutex.synchronized {
@@ -130,29 +127,11 @@ public class DFA: CustomStringConvertible {
         }
     }
 
-    /// 
-    /// Sets whether this is a precedence DFA.
-    /// 
-    /// - parameter precedenceDfa: `true` if this is a precedence DFA; otherwise,
-    /// `false`
-    /// 
-    /// - throws: ANTLRError.unsupportedOperation if `precedenceDfa` does not
-    /// match the value of _#isPrecedenceDfa_ for the current DFA.
-    /// 
-    /// - note: This method no longer performs any action.
-    /// 
-    public final func setPrecedenceDfa(_ precedenceDfa: Bool) throws {
-        if precedenceDfa != isPrecedenceDfa() {
-            throw ANTLRError.unsupportedOperation(msg: "The precedenceDfa field cannot change after a DFA is constructed.")
-
-        }
-    }
-
-    /// 
+    ///
     /// Return a list of all states in this DFA, ordered by state number.
     /// 
-    public func getStates() -> Array<DFAState> {
-        var result: Array<DFAState> = Array<DFAState>(states.keys)
+    public func getStates() -> [DFAState] {
+        var result = [DFAState](states.keys)
 
         result = result.sorted {
             $0.stateNumber < $1.stateNumber
@@ -165,18 +144,13 @@ public class DFA: CustomStringConvertible {
         return toString(Vocabulary.EMPTY_VOCABULARY)
     }
 
-
-    public func toString() -> String {
-        return description
-    }
-
     public func toString(_ vocabulary: Vocabulary) -> String {
         if s0 == nil {
             return ""
         }
 
         let serializer = DFASerializer(self, vocabulary)
-        return serializer.toString()
+        return serializer.description
     }
 
     public func toLexerString() -> String {
@@ -184,7 +158,7 @@ public class DFA: CustomStringConvertible {
             return ""
         }
         let serializer = LexerDFASerializer(self)
-        return serializer.toString()
+        return serializer.description
     }
 
 }

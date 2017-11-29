@@ -40,7 +40,7 @@ open class ATNSimulator {
     /// more time I think and doesn't save on the overall footprint
     /// so it's not worth the complexity.
     /// 
-    internal final var sharedContextCache: PredictionContextCache?
+    internal let sharedContextCache: PredictionContextCache
 
     public init(_ atn: ATN,
                 _ sharedContextCache: PredictionContextCache) {
@@ -68,21 +68,17 @@ open class ATNSimulator {
         throw ANTLRError.unsupportedOperation(msg: "This ATN simulator does not support clearing the DFA. ")
     }
 
-    open func getSharedContextCache() -> PredictionContextCache? {
+    open func getSharedContextCache() -> PredictionContextCache {
         return sharedContextCache
     }
 
     open func getCachedContext(_ context: PredictionContext) -> PredictionContext {
-        if sharedContextCache == nil {
-            return context
-        }
-
         //TODO: synced (sharedContextCache!)
         //synced (sharedContextCache!) {
         let visited = HashMap<PredictionContext, PredictionContext>()
 
         return PredictionContext.getCachedContext(context,
-                sharedContextCache!,
+                sharedContextCache,
                 visited)
     }
 

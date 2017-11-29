@@ -413,29 +413,27 @@ open class Lexer: Recognizer<LexerATNSimulator>, TokenSource {
     }
 
     open func getErrorDisplay(_ s: String) -> String {
-        let buf = StringBuilder()
-        for c in s.characters {
-            buf.append(getErrorDisplay(c))
+        var buf = ""
+        for c in s {
+            buf += getErrorDisplay(c)
         }
-        return buf.toString()
+        return buf
     }
 
     open func getErrorDisplay(_ c: Character) -> String {
-        var s = String(c)
         if c.integerValue == CommonToken.EOF {
-            s = "<EOF>"
+            return "<EOF>"
         }
-        switch s {
+        switch c {
         case "\n":
-            s = "\\n"
+            return "\\n"
         case "\t":
-            s = "\\t"
+            return "\\t"
         case "\r":
-            s = "\\r"
+            return "\\r"
         default:
-            break
+            return String(c)
         }
-        return s
     }
 
     open func getCharErrorDisplay(_ c: Character) -> String {

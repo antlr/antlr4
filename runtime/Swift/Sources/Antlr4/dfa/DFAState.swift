@@ -136,17 +136,17 @@ public class DFAState: Hashable, CustomStringConvertible {
     /// _#stateNumber_ is irrelevant.
     ///
     public var description: String {
-        let buf = StringBuilder()
-        buf.append(stateNumber).append(":").append(configs)
+        var buf = "\(stateNumber):\(configs)"
         if isAcceptState {
-            buf.append("=>")
+            buf += "=>"
             if let predicates = predicates {
-                buf.append(predicates.map({ $0.description }))
-            } else {
-                buf.append(prediction)
+                buf += String(describing: predicates)
+            }
+            else {
+                buf += String(prediction)
             }
         }
-        return buf.toString()
+        return buf
     }
 }
 

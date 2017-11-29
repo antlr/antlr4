@@ -518,47 +518,40 @@ public class PredictionContext: Hashable, CustomStringConvertible {
         if context == nil {
             return ""
         }
-        let buf = StringBuilder()
-        buf.append("digraph G {\n")
-        buf.append("rankdir=LR;\n")
+        var buf = ""
+        buf += "digraph G {\n"
+        buf += "rankdir=LR;\n"
 
         var nodes = getAllContextNodes(context!)
 
         nodes.sort { $0.id > $1.id }
 
-
         for current in nodes {
             if current is SingletonPredictionContext {
-                let s = String(current.id)
-                buf.append("  s").append(s)
+                buf += "  s\(current.id)"
                 var returnState = String(current.getReturnState(0))
                 if current is EmptyPredictionContext {
                     returnState = "$"
                 }
-                buf.append(" [label=\"")
-                buf.append(returnState)
-                buf.append("\"];\n")
+                buf += " [label=\"\(returnState)\"];\n"
                 continue
             }
             let arr = current as! ArrayPredictionContext
-            buf.append("  s").append(arr.id)
-            buf.append(" [shape=box, label=\"")
-            buf.append("[")
+            buf += "  s\(arr.id) [shape=box, label=\"["
             var first = true
             let returnStates = arr.returnStates
             for inv in returnStates {
                 if !first {
-                    buf.append(", ")
+                    buf += ", "
                 }
                 if inv == EMPTY_RETURN_STATE {
-                    buf.append("$")
+                    buf += "$"
                 } else {
-                    buf.append(inv)
+                    buf += String(inv)
                 }
                 first = false
             }
-            buf.append("]")
-            buf.append("\"];\n")
+            buf += "]\"];\n"
         }
 
         for current in nodes {
@@ -570,21 +563,17 @@ public class PredictionContext: Hashable, CustomStringConvertible {
                 guard let currentParent = current.getParent(i) else {
                     continue
                 }
-                let s = String(current.id)
-                buf.append("  s").append(s)
-                buf.append("->")
-                buf.append("s")
-                buf.append(currentParent.id)
+                buf += "  s\(current.id) -> s\(currentParent.id)"
                 if current.size() > 1 {
-                    buf.append(" [label=\"parent[\(i)]\"];\n")
+                    buf += " [label=\"parent[\(i)]\"];\n"
                 } else {
-                    buf.append(";\n")
+                    buf += ";\n"
                 }
             }
         }
 
         buf.append("}\n")
-        return buf.toString()
+        return buf
     }
 
     // From Sam
@@ -700,8 +689,7 @@ public class PredictionContext: Hashable, CustomStringConvertible {
                 var last = true
                 var p = self
                 var stateNumber = currentState
-                let localBuffer = StringBuilder()
-                localBuffer.append("[")
+                var localBuffer = "["
                 while !p.isEmpty() && p !== stop {
                     var index = 0
                     if p.size() > 0 {
@@ -724,9 +712,9 @@ public class PredictionContext: Hashable, CustomStringConvertible {
                     }
 
                     if let recognizer = recognizer {
-                        if localBuffer.length > 1 {
+                        if localBuffer.count > 1 {
                             // first char is '[', if more than that this isn't the first rule
-                            localBuffer.append(" ")
+                            localBuffer += " "
                         }
 
                         let atn = recognizer.getATN()
@@ -736,19 +724,19 @@ public class PredictionContext: Hashable, CustomStringConvertible {
                     }
                     else if p.getReturnState(index) != PredictionContext.EMPTY_RETURN_STATE {
                         if !p.isEmpty() {
-                            if localBuffer.length > 1 {
+                            if localBuffer.count > 1 {
                                 // first char is '[', if more than that this isn't the first rule
-                                localBuffer.append(" ")
+                                localBuffer += " "
                             }
 
-                            localBuffer.append(p.getReturnState(index))
+                            localBuffer += String(p.getReturnState(index))
                         }
                     }
                     stateNumber = p.getReturnState(index)
                     p = p.getParent(index)!
                 }
-                localBuffer.append("]")
-                result.append(localBuffer.toString())
+                localBuffer += "]"
+                result.append(localBuffer)
 
                 if last {
                     break

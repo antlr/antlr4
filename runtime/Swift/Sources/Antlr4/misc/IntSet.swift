@@ -146,6 +146,4 @@ public protocol IntSet {
     /// in ascending numerical order.
     /// 
     func toList() -> [Int]
-
-    func toString() -> String
 }

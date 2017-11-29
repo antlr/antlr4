@@ -20,7 +20,8 @@ foreach( src_file ${antlr4-demo-GENERATED_SRC} )
           )
 endforeach( src_file ${antlr4-demo-GENERATED_SRC} )
 
-add_custom_target(GenerateParser
+add_custom_target(GenerateParser DEPENDS ${antlr4-demo-GENERATED_SRC})
+add_custom_command(OUTPUT ${antlr4-demo-GENERATED_SRC}
    COMMAND 
    ${CMAKE_COMMAND} -E make_directory ${PROJECT_SOURCE_DIR}/demo/generated/
    COMMAND

@@ -159,12 +159,6 @@ public class Interval: Hashable {
     }
 
 
-    public func toString() -> String {
-        return "\(a)..\(b)"
-
-    }
-
-
    public var description: String {
         return "\(a)..\(b)"
     }
