@@ -558,14 +558,16 @@ open class Parser: Recognizer<ParserATNSimulator> {
 
         if _buildParseTrees || hasListener {
             if _errHandler.inErrorRecoveryMode(self) {
-                let node = _ctx.addErrorNode(createErrorNode(parent: _ctx, t: o))
+                let node = createErrorNode(parent: _ctx, t: o)
+                _ctx.addErrorNode(node)
                 if let _parseListeners = _parseListeners {
                     for listener in _parseListeners {
                         listener.visitErrorNode(node)
                     }
                 }
             } else {
-                let node = _ctx.addChild(createTerminalNode(parent: _ctx, t: o))
+                let node = createTerminalNode(parent: _ctx, t: o)
+                _ctx.addChild(node)
                 if let _parseListeners = _parseListeners {
                     for listener in _parseListeners {
                         listener.visitTerminal(node)
@@ -582,7 +584,7 @@ open class Parser: Recognizer<ParserATNSimulator> {
     /// - Since: 4.7
     /// 
     public func createTerminalNode(parent: ParserRuleContext, t: Token) -> TerminalNode {
-     	return TerminalNodeImpl(t);
+        return TerminalNodeImpl(t)
     }
 
     /// How to create an error node, given a token, associated with a parent.
@@ -591,7 +593,7 @@ open class Parser: Recognizer<ParserATNSimulator> {
     /// - Since: 4.7
     /// 
     public func createErrorNode(parent: ParserRuleContext, t: Token) -> ErrorNode {
-    	return ErrorNode(t);
+        return ErrorNode(t)
     }
 
     internal func addContextToParseTree() {

@@ -4,8 +4,6 @@
  */
 
 
-open class RuleNode: ParseTree {
-    open func getRuleContext() -> RuleContext {
-        fatalError(#function + " must be overridden")
-    }
+public protocol RuleNode: ParseTree {
+    func getRuleContext() -> RuleContext
 }
