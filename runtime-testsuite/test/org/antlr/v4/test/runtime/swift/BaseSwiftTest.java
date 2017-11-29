@@ -290,8 +290,6 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 						"let tree = try parser.<parserStartRuleName>()\n" +
 						"<if(profile)>print(profiler.getDecisionInfo().description)<endif>\n" +
 						"try ParseTreeWalker.DEFAULT.walk(TreeShapeListener(), tree)\n" +
-						"}catch ANTLRException.cannotInvokeStartRule {\n" +
-						"    print(\"error occur: cannotInvokeStartRule\")\n" +
 						"}catch ANTLRException.recognition(let e )   {\n" +
 						"    print(\"error occur\\(e)\")\n" +
 						"}catch {\n" +
@@ -333,8 +331,6 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 
 						"do {\n" +
 						"	try tokens.fill()\n" +
-						"} catch ANTLRException.cannotInvokeStartRule {\n" +
-						"	print(\"error occur: cannotInvokeStartRule\")\n" +
 						"} catch ANTLRException.recognition(let e )   {\n" +
 						"	print(\"error occur\\(e)\")\n" +
 						"} catch {\n" +
