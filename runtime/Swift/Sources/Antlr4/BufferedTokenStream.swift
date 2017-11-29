@@ -441,14 +441,13 @@ public class BufferedTokenStream: TokenStream {
     /// Collect all hidden tokens (any off-default channel) to the left of
     /// the current token up until we see a token on DEFAULT_TOKEN_CHANNEL.
     /// 
-    public func getHiddenTokensToLeft(_ tokenIndex: Int) throws -> Array<Token>? {
+    public func getHiddenTokensToLeft(_ tokenIndex: Int) throws -> [Token]? {
         return try  getHiddenTokensToLeft(tokenIndex, -1)
     }
 
-    internal func filterForChannel(_ from: Int, _ to: Int, _ channel: Int) -> Array<Token>? {
-        var hidden: Array<Token> = Array<Token>()
-        for i in from...to {
-            let t: Token = tokens[i]
+    internal func filterForChannel(_ from: Int, _ to: Int, _ channel: Int) -> [Token]? {
+        var hidden = [Token]()
+        for t in tokens[from...to] {
             if channel == -1 {
                 if t.getChannel() != Lexer.DEFAULT_TOKEN_CHANNEL {
                     hidden.append(t)
@@ -478,8 +477,8 @@ public class BufferedTokenStream: TokenStream {
     }
 
     public func getText(_ interval: Interval) throws -> String {
-        let start: Int = interval.a
-        var stop: Int = interval.b
+        let start = interval.a
+        var stop = interval.b
         if start < 0 || stop < 0 {
             return ""
         }
@@ -488,15 +487,14 @@ public class BufferedTokenStream: TokenStream {
             stop = tokens.count - 1
         }
 
-        let buf: StringBuilder = StringBuilder()
-        for i in start...stop {
-            let t: Token = tokens[i]
+        var buf = ""
+        for t in tokens[start...stop] {
             if t.getType() == BufferedTokenStream.EOF {
                 break
             }
-            buf.append(t.getText()!)
+            buf += t.getText()!
         }
-        return buf.toString()
+        return buf
     }
 
 
@@ -518,9 +516,9 @@ public class BufferedTokenStream: TokenStream {
     /// 
     public func fill() throws {
         try lazyInit()
-        let blockSize: Int = 1000
+        let blockSize = 1000
         while true {
-            let fetched: Int = try fetch(blockSize)
+            let fetched = try fetch(blockSize)
             if fetched < blockSize {
                 return
             }

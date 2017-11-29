@@ -275,27 +275,21 @@ public class ATNConfigSet: Hashable, CustomStringConvertible {
     }
 
     public var description: String {
-        let buf = StringBuilder()
-        buf.append(elements().map({ $0.description }))
+        var buf = ""
+        buf += String(describing: elements())
         if hasSemanticContext {
-            buf.append(",hasSemanticContext=")
-            buf.append(hasSemanticContext)
+            buf += ",hasSemanticContext=true"
         }
         if uniqueAlt != ATN.INVALID_ALT_NUMBER {
-            buf.append(",uniqueAlt=")
-            buf.append(uniqueAlt)
+            buf += ",uniqueAlt=\(uniqueAlt)"
         }
         if let conflictingAlts = conflictingAlts {
-            buf.append(",conflictingAlts=")
-            buf.append(conflictingAlts.description)
+            buf += ",conflictingAlts=\(conflictingAlts)"
         }
         if dipsIntoOuterContext {
-            buf.append(",dipsIntoOuterContext")
+            buf += ",dipsIntoOuterContext"
         }
-        return buf.toString()
-    }
-    public func toString() -> String {
-        return description
+        return buf
     }
 
     /// 

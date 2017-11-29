@@ -225,21 +225,22 @@ public class DecisionInfo: CustomStringConvertible {
 
 
     public var description: String {
-        let desc: StringBuilder = StringBuilder()
-        desc.append("{")
-        desc.append("decision=\(decision)")
-        desc.append(", contextSensitivities=\(contextSensitivities.count)")
-        desc.append(", errors=\(errors.count)")
-        desc.append(", ambiguities=\(ambiguities.count)")
-        desc.append(", SLL_lookahead=\(SLL_TotalLook)")
-        desc.append(", SLL_ATNTransitions=\(SLL_ATNTransitions)")
-        desc.append(", SLL_DFATransitions=\(SLL_DFATransitions)")
-        desc.append(", LL_Fallback=\(LL_Fallback)")
-        desc.append(", LL_lookahead=\(LL_TotalLook)")
-        desc.append(", LL_ATNTransitions=\(LL_ATNTransitions)")
-        desc.append("}")
+        var desc = ""
 
-        return desc.toString()
+        desc += "{"
+        desc += "decision=\(decision)"
+        desc += ", contextSensitivities=\(contextSensitivities.count)"
+        desc += ", errors=\(errors.count)"
+        desc += ", ambiguities=\(ambiguities.count)"
+        desc += ", SLL_lookahead=\(SLL_TotalLook)"
+        desc += ", SLL_ATNTransitions=\(SLL_ATNTransitions)"
+        desc += ", SLL_DFATransitions=\(SLL_DFATransitions)"
+        desc += ", LL_Fallback=\(LL_Fallback)"
+        desc += ", LL_lookahead=\(LL_TotalLook)"
+        desc += ", LL_ATNTransitions=\(LL_ATNTransitions)"
+        desc += "}"
+
+        return desc
     }
 
 }

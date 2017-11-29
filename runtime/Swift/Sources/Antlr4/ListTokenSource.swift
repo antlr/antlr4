@@ -85,9 +85,8 @@ public class ListTokenSource: TokenSource {
             let lastToken = tokens[tokens.count - 1]
 
             if let tokenText = lastToken.getText() {
-                let lastNewLine = tokenText.lastIndexOf("\n")
-                if lastNewLine >= 0 {
-                    return tokenText.length - lastNewLine - 1
+                if let lastNewLine = tokenText.lastIndex(of: "\n") {
+                    return tokenText.distance(from: lastNewLine, to: tokenText.endIndex) - 1
                 }
             }
             return (lastToken.getCharPositionInLine() +
@@ -142,9 +141,8 @@ public class ListTokenSource: TokenSource {
                     var line = lastToken.getLine()
 
                     if let tokenText = lastToken.getText() {
-                        let length = tokenText.length
-                        for j in 0..<length {
-                            if String(tokenText[j]) == "\n" {
+                        for c in tokenText {
+                            if c == "\n" {
                                 line += 1
                             }
                         }

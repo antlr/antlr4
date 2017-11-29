@@ -42,9 +42,4 @@ public final class PrecedencePredicateTransition: AbstractPredicateTransition, C
     public var description: String {
         return "\(precedence)  >= _p"
     }
-
-    public func toString() -> String {
-        return description
-    }
-
 }

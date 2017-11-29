@@ -132,12 +132,12 @@ open class RuleContext: RuleNode {
             return ""
         }
 
-        let builder = StringBuilder()
+        var builder = ""
         for i in 0..<length {
-            builder.append((getChild(i) as! ParseTree).getText())
+            builder += (getChild(i) as! ParseTree).getText()
         }
 
-        return builder.toString()
+        return builder
     }
 
     open func getRuleIndex() -> Int {
@@ -202,31 +202,31 @@ open class RuleContext: RuleNode {
     }
 
     open func toString(_ ruleNames: [String]?, _ stop: RuleContext?) -> String {
-        let buf = StringBuilder()
+        var buf = ""
         var p: RuleContext? = self
-        buf.append("[")
+        buf += "["
         while let pWrap = p, pWrap !== stop {
             if let ruleNames = ruleNames {
                 let ruleIndex = pWrap.getRuleIndex()
                 let ruleIndexInRange = (ruleIndex >= 0 && ruleIndex < ruleNames.count)
                 let ruleName = (ruleIndexInRange ? ruleNames[ruleIndex] : String(ruleIndex))
-                buf.append(ruleName)
+                buf += ruleName
             }
             else {
                 if !pWrap.isEmpty() {
-                    buf.append(pWrap.invokingState)
+                    buf += String(pWrap.invokingState)
                 }
             }
 
             if pWrap.parent != nil && (ruleNames != nil || !pWrap.parent!.isEmpty()) {
-                buf.append(" ")
+                buf += " "
             }
 
             p = pWrap.parent
         }
 
-        buf.append("]")
-        return buf.toString()
+        buf += "]"
+        return buf
     }
 
     open func castdown<T>(_ subType: T.Type) -> T {

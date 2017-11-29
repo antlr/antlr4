@@ -42,8 +42,8 @@ public class ANTLRInputStream: CharStream {
     /// Copy data in string to a local char array
     /// 
     public init(_ input: String) {
-        self.data = Array(input.characters) // input.toCharArray();
-        self.n = input.length
+        self.data = Array(input)
+        self.n = data.count
     }
 
     /// 

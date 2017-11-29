@@ -64,24 +64,20 @@ public class Trees {
     /// parse trees and extract data appropriately.
     /// 
     public static func toStringTree(_ t: Tree, _ ruleNames: Array<String>?) -> String {
-        var s: String = Utils.escapeWhitespace(getNodeText(t, ruleNames), false)
+        let s = Utils.escapeWhitespace(getNodeText(t, ruleNames), false)
         if t.getChildCount() == 0 {
             return s
         }
-        let buf: StringBuilder = StringBuilder()
-        buf.append("(")
-        s = Utils.escapeWhitespace(getNodeText(t, ruleNames), false)
-        buf.append(s)
-        buf.append(" ")
+        var buf = "(\(s) "
         let length = t.getChildCount()
         for i in 0..<length {
             if i > 0 {
-                buf.append(" ")
+                buf += " "
             }
-            buf.append(toStringTree(t.getChild(i)!, ruleNames))
+            buf += toStringTree(t.getChild(i)!, ruleNames)
         }
-        buf.append(")")
-        return buf.toString()
+        buf += ")"
+        return buf
     }
 
     public static func getNodeText(_ t: Tree, _ recog: Parser?) -> String {

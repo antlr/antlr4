@@ -6,7 +6,7 @@ set -euo pipefail
 # here since environment variables doesn't pass
 # across scripts
 if [ $TRAVIS_OS_NAME == "linux" ]; then
-  export SWIFT_VERSION=swift-4.0
+  export SWIFT_VERSION=swift-4.0.2
   export SWIFT_HOME=$(pwd)/swift/$SWIFT_VERSION-RELEASE-ubuntu14.04/usr/bin/
   export PATH=$SWIFT_HOME:$PATH
 
