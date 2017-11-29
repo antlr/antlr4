@@ -19,26 +19,11 @@ public protocol RecognizerProtocol {
 
 
 open class Recognizer<ATNInterpreter: ATNSimulator>: RecognizerProtocol {
-    //TODO: WeakKeyDictionary NSMapTable Dictionary MapTable<Vocabulary,HashMap<String, Int>>
-    private let tokenTypeMapCache = HashMap<Vocabulary, [String : Int]>()
-
-    private let ruleIndexMapCache = HashMap<ArrayWrapper<String>, [String : Int]>()
-
     private var _listeners: [ANTLRErrorListener] = [ConsoleErrorListener.INSTANCE]
 
     public var _interp: ATNInterpreter!
 
     private var _stateNumber = -1
-    
-    /// 
-    /// mutex for tokenTypeMapCache updates
-    /// 
-    private let tokenTypeMapCacheMutex = Mutex()
-    
-    /// 
-    /// mutex for ruleIndexMapCacheMutex updates
-    /// 
-    private let ruleIndexMapCacheMutex = Mutex()
 
     open func getRuleNames() -> [String] {
         fatalError(#function + " must be overridden")
@@ -59,30 +44,30 @@ open class Recognizer<ATNInterpreter: ATNSimulator>: RecognizerProtocol {
     /// 
     /// Used for XPath and tree pattern compilation.
     /// 
-    public func getTokenTypeMap() -> [String : Int] {
+    public func getTokenTypeMap() -> [String: Int] {
+        return tokenTypeMap
+    }
+
+    public lazy var tokenTypeMap: [String: Int] = {
         let vocabulary = getVocabulary()
-        var result = tokenTypeMapCache[vocabulary]
-        tokenTypeMapCacheMutex.synchronized { [unowned self] in
-            if result == nil {
-                result = [String : Int]()
-                let length = self.getATN().maxTokenType
-                for i in 0...length {
-                    if let literalName = vocabulary.getLiteralName(i) {
-                        result![literalName] = i
-                    }
 
-                    if let symbolicName = vocabulary.getSymbolicName(i) {
-                        result![symbolicName] = i
-                    }
-                }
+        var result = [String: Int]()
+        let length = getATN().maxTokenType
+        for i in 0...length {
+            if let literalName = vocabulary.getLiteralName(i) {
+                result[literalName] = i
+            }
 
-                result!["EOF"] = CommonToken.EOF
-
-                self.tokenTypeMapCache[vocabulary] = result!
+            if let symbolicName = vocabulary.getSymbolicName(i) {
+                result[symbolicName] = i
             }
         }
-        return result!
-    }
+
+        result["EOF"] = CommonToken.EOF
+
+        return result
+    }()
+
 
     /// 
     /// Get a map from rule names to rule indexes.
@@ -90,16 +75,14 @@ open class Recognizer<ATNInterpreter: ATNSimulator>: RecognizerProtocol {
     /// Used for XPath and tree pattern compilation.
     /// 
     public func getRuleIndexMap() -> [String : Int] {
-        let ruleNames = getRuleNames()
-
-        let result = ruleIndexMapCache[ArrayWrapper<String>(ruleNames)]
-        ruleIndexMapCacheMutex.synchronized { [unowned self] in
-            if result == nil {
-                self.ruleIndexMapCache[ArrayWrapper<String>(ruleNames)] = Utils.toMap(ruleNames)
-            }
-        }
-        return result!
+        return ruleIndexMap
     }
+
+    public lazy var ruleIndexMap: [String: Int] = {
+        let ruleNames = getRuleNames()
+        return Utils.toMap(ruleNames)
+    }()
+
 
     public func getTokenType(_ tokenName: String) -> Int {
         return getTokenTypeMap()[tokenName] ?? CommonToken.INVALID_TYPE
