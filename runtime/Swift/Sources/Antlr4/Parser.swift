@@ -1024,11 +1024,10 @@ open class Parser: Recognizer<ParserATNSimulator> {
             if !(interp is ProfilingATNSimulator) {
                 setInterpreter(ProfilingATNSimulator(self))
             }
-        } else {
-            if interp is ProfilingATNSimulator {
-                let sim = ParserATNSimulator(self, getATN(), interp.decisionToDFA, interp.getSharedContextCache()!)
-                setInterpreter(sim)
-            }
+        }
+        else if interp is ProfilingATNSimulator {
+            let sim = ParserATNSimulator(self, getATN(), interp.decisionToDFA, interp.getSharedContextCache())
+            setInterpreter(sim)
         }
         getInterpreter().setPredictionMode(saveMode)
     }
