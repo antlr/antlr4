@@ -88,14 +88,11 @@ public class DFA: CustomStringConvertible {
 
         }
 
-        // s0.edges is never null for a precedence DFA
-        // if (precedence < 0 || precedence >= s0!.edges!.count) {
-        if precedence < 0 || s0 == nil ||
-                s0!.edges == nil || precedence >= s0!.edges!.count {
+        guard let s0 = s0, let edges = s0.edges, precedence >= 0, precedence < edges.count else {
             return nil
         }
 
-        return s0!.edges![precedence]
+        return edges[precedence]
     }
 
     /// 
@@ -111,12 +108,12 @@ public class DFA: CustomStringConvertible {
     public final func setPrecedenceStartState(_ precedence: Int, _ startState: DFAState) throws {
         if !isPrecedenceDfa() {
             throw ANTLRError.illegalState(msg: "Only precedence DFAs may contain a precedence start state.")
-
         }
 
-        guard let s0 = s0,let edges = s0.edges , precedence >= 0 else {
+        guard let s0 = s0, let edges = s0.edges, precedence >= 0 else {
             return
         }
+
         // synchronization on s0 here is ok. when the DFA is turned into a
         // precedence DFA, s0 will be initialized once and not updated again
         dfaStateMutex.synchronized {
@@ -133,8 +130,8 @@ public class DFA: CustomStringConvertible {
     ///
     /// Return a list of all states in this DFA, ordered by state number.
     /// 
-    public func getStates() -> Array<DFAState> {
-        var result: Array<DFAState> = Array<DFAState>(states.keys)
+    public func getStates() -> [DFAState] {
+        var result = [DFAState](states.keys)
 
         result = result.sorted {
             $0.stateNumber < $1.stateNumber

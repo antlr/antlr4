@@ -15,8 +15,7 @@ open class LexerATNSimulator: ATNSimulator {
     public let dfa_debug = false
 
     public static let MIN_DFA_EDGE = 0
-    public static let MAX_DFA_EDGE = 127
-    // forces unicode to stay in ATN
+    public static let MAX_DFA_EDGE = 127  // forces unicode to stay in ATN
 
     /// 
     /// When we hit an accept state in either the DFA or the ATN, we
@@ -115,24 +114,23 @@ open class LexerATNSimulator: ATNSimulator {
 
     open func match(_ input: CharStream, _ mode: Int) throws -> Int {
         LexerATNSimulator.match_calls += 1
+
         self.mode = mode
         var mark = input.mark()
-        do {
-            self.startIndex = input.index()
-            self.prevAccept.reset()
-            var dfa = decisionToDFA[mode]
-            defer {
-                try! input.release(mark)
-            }
-
-            if dfa.s0 == nil {
-                return try matchATN(input)
-            } else {
-                return try execATN(input, dfa.s0!)
-            }
+        defer {
+            try! input.release(mark)
         }
 
+        self.startIndex = input.index()
+        self.prevAccept.reset()
+        let dfa = decisionToDFA[mode]
 
+        if let s0 = dfa.s0 {
+            return try execATN(input, s0)
+        }
+        else {
+            return try matchATN(input)
+        }
     }
 
     override
