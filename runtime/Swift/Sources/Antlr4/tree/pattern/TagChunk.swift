@@ -87,10 +87,19 @@ public class TagChunk: Chunk, CustomStringConvertible {
     /// returned as just the tag name.
     /// 
     public var description: String {
-        if label != nil {
-            return label! + ":" + tag
+        if let label = label {
+            return "\(label):\(tag)"
         }
+        else {
+            return tag
+        }
+    }
 
-        return tag
+
+    override public func isEqual(_ other: Chunk) -> Bool {
+        guard let other = other as? TagChunk else {
+            return false
+        }
+        return tag == other.tag && label == other.label
     }
 }

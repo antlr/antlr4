@@ -281,7 +281,7 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 						"\n" +
 						"do {\n" +
 						"let args = CommandLine.arguments\n" +
-						"let input = ANTLRFileStream(args[1])\n" +
+						"let input = try ANTLRFileStream(args[1])\n" +
 						"let lex = <lexerName>(input)\n" +
 						"let tokens = CommonTokenStream(lex)\n" +
 						"<createParser>\n" +
@@ -327,7 +327,7 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 
 						"setbuf(stdout, nil)\n" +
 						"let args = CommandLine.arguments\n" +
-						"let input = ANTLRFileStream(args[1])\n" +
+						"let input = try ANTLRFileStream(args[1])\n" +
 						"let lex = <lexerName>(input)\n" +
 						"let tokens = CommonTokenStream(lex)\n" +
 

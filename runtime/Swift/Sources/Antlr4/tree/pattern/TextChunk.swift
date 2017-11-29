@@ -36,15 +36,19 @@ public class TextChunk: Chunk, CustomStringConvertible {
         return text
     }
 
-    /// 
-    /// 
-    /// 
+    ///
     /// The implementation for _org.antlr.v4.runtime.tree.pattern.TextChunk_ returns the result of
     /// _#getText()_ in single quotes.
-    /// 
-
-
+    ///
     public var description: String {
-        return "'" + text + "'"
+        return "'\(text)'"
+    }
+
+
+    override public func isEqual(_ other: Chunk) -> Bool {
+        guard let other = other as? TextChunk else {
+            return false
+        }
+        return text == other.text
     }
 }
