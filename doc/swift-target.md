@@ -151,3 +151,43 @@ The project is generated in your system's `/tmp/` directory, if you find it
 inconvenient, consider copy that generated ANTLR repository to some place 
 that won't be cleaned automatically and update `url` parameter in your 
 `Package.swift` file.
+
+## Swift access levels
+
+You may use the `accessLevel` option to control the access levels on generated
+code.  This option can either be specified with `-DaccessLevel=value` on
+the `antlr4` command line, or inside your `.g4` file like this:
+
+```
+options {
+    accessLevel = 'value';
+}
+```
+
+By default (with the `accessLevel` option unspecified) the generated code
+uses the following access levels:
+
+* `open` for anything that you can feasibly extend with subclassing:
+the generated parser, lexer, and context classes, the the listener and
+visitor base classes, and all their accessor and setter functions.
+* `public` for anything that should not be subclassed, but otherwise is
+useful to client code: protocols, initializers, and static definitions such
+as the lexer tokens, symbol names, and so on.
+* `internal` or `private` for anything that should not be accessed directly.
+
+If you specify `accessLevel = 'public'` then all items that are `open` by
+default will use `public` instead.  Otherwise, the behavior is the same as
+the default.
+
+If you specify `accessLevel = ''` or `accessLevel='internal'` then all items
+that are `open` or `public` by default will use Swift's default (internal)
+access level instead.
+
+Those are the only supported values for `accessLevel` when using the Swift
+code-generator.
+
+We recommend using `accessLevel = ''`.  Even if you are creating a parser
+as part of a library, you would usually want to wrap it in an API of your
+own and keep the ANTLR-generated parser internal to your module.  You
+only need to use the less restrictive access levels if you need to expose
+the parser directly as part of your own module's API.
