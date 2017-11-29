@@ -172,4 +172,5 @@ YYYY/MM/DD, github id, Full name, email
 2017/05/29, rlfnb, Ralf Neeb, rlfnb@rlfnb.de
 2017/10/29, gendalph, Максим Прохоренко, Maxim\dotProhorenko@gm@il.com
 2017/11/02, jasonmoo, Jason Mooberry, jason.mooberry@gmail.com
+2017/11/05, ajaypanyala, Ajay Panyala, ajay.panyala@gmail.com
 2017/11/24, zqlu.cn, Zhiqiang Lu, zqlu.cn@gmail.com
