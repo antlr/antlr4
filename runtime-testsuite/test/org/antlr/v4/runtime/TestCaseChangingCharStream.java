@@ -29,10 +29,10 @@ public class TestCaseChangingCharStream {
 	public void testUpper() {
 		List<Integer> expected = Lists.newArrayList((int)'A', (int)'B', (int)'C', (int)'D', IntStream.EOF);
 
-		CharStream stream = CharStreams.forceUpper(fromString("abcd"));
+		CharStream stream = CharStreams.toUpper(fromString("abcd"));
 		assertEquals(expected, readAll(stream));
 
-		stream = CharStreams.forceUpper(fromString("ABCD"));
+		stream = CharStreams.toUpper(fromString("ABCD"));
 		assertEquals(expected,  readAll(stream));
 	}
 
@@ -40,10 +40,10 @@ public class TestCaseChangingCharStream {
 	public void testLower() {
 		List<Integer> expected = Lists.newArrayList((int)'a', (int)'b', (int)'c', (int)'d', IntStream.EOF);
 
-		CharStream stream = CharStreams.forceLower(fromString("abcd"));
+		CharStream stream = CharStreams.toLower(fromString("abcd"));
 		assertEquals(expected, readAll(stream));
 
-		stream = CharStreams.forceLower(fromString("ABCD"));
+		stream = CharStreams.toLower(fromString("ABCD"));
 		assertEquals(expected,  readAll(stream));
 	}
 }

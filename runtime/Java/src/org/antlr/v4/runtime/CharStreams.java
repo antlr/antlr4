@@ -305,22 +305,24 @@ public final class CharStreams {
 	}
 
 	/**
-	 * Takes the stream and forces all symbols to uppercase.
+	 * Takes the stream and forces all symbols to uppercase for lexing purposes
+	 * but leaves the original text as-is.
 	 *
 	 * @param in
 	 * @return
 	 */
-	public static CharStream forceUpper(CharStream in) {
+	public static CharStream toUpper(CharStream in) {
 		return new CaseChangingCharStream(in, true);
 	}
 
 	/**
-	 * Takes the stream and forces all symbols to lowercase.
+	 * Takes the stream and forces all symbols to lowercase for lexing purposes
+	 * but leaves the original text as-is.
 	 *
 	 * @param in
 	 * @return
 	 */
-	public static CharStream forceLower(CharStream in) {
+	public static CharStream toLower(CharStream in) {
 		return new CaseChangingCharStream(in, false);
 	}
 }

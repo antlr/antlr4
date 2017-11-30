@@ -3,9 +3,13 @@ package org.antlr.v4.runtime;
 import org.antlr.v4.runtime.misc.Interval;
 
 /**
- * This class wraps an existing {@link CharStream} and converts all returned
- * symbols to upper or lower case. This is useful for case-insensitive grammars
- * where all input is assumed to be either upper or lower case.
+ * This class supports case-insensitive lexing by wrapping an existing
+ * {@link CharStream} and forcing the lexer to see either upper or
+ * lowercase characters. Grammar literals should then be either upper or
+ * lower case such as 'BEGIN' or 'begin'. The text of the character
+ * stream is unaffected. Example: input 'BeGiN' would match lexer rule
+ * 'BEGIN' if constructor parameter upper=true but getText() would return
+ * 'BeGiN'.
  */
 public class CaseChangingCharStream implements CharStream {
 
