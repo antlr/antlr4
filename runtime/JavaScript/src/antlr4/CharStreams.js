@@ -5,6 +5,7 @@
  */
 //
 
+var CaseInsensitiveInputStream = require('./CaseInsensitiveInputStream').CaseInsensitiveInputStream;
 var InputStream = require('./InputStream').InputStream;
 
 var isNodeJs = typeof window === 'undefined' && typeof importScripts === 'undefined';
@@ -65,6 +66,14 @@ var CharStreams = {
   fromPathSync: function(path, encoding) {
     var data = fs.readFileSync(path, encoding);
     return new InputStream(data, true);
+  },
+
+  toUpper: function(stream) {
+    return new CaseInsensitiveInputStream(stream, true);
+  },
+
+  toLower: function(stream) {
+    return new CaseInsensitiveInputStream(stream, false);
   }
 };
 
