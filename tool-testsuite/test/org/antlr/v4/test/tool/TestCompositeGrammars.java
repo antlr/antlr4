@@ -184,6 +184,34 @@ public class TestCompositeGrammars extends BaseJavaToolTest {
 
 		ErrorQueue equeue = BaseRuntimeTest.antlrOnString(tmpdir, "Java", "M.g4", false, "-lib", tmpdir);
 		assertEquals(0, equeue.errors.size());
+	}
+	
+	@Test public void testCombinedGrammarImportsModalLexerGrammar() throws Exception {
+		BaseRuntimeTest.mkdir(tmpdir);
+
+		String master =
+			"grammar M;\n" +
+			"import S;\n" +
+			"A : 'a';\n" +
+			"B : 'b';\n" +
+			"r : A B;\n";
+		writeFile(tmpdir, "M.g4", master);
+
+		String slave = 
+			"lexer grammar S;\n" +
+			"D : 'd';\n" +
+			"mode X;\n" +
+			"C : 'c' -> popMode;\n";
+		writeFile(tmpdir, "S.g4", slave);
+
+		ErrorQueue equeue = BaseRuntimeTest.antlrOnString(tmpdir, "Java", "M.g4", false, "-lib", tmpdir);
+		assertEquals(1, equeue.errors.size());
+		ANTLRMessage msg = equeue.errors.get(0);
+		assertEquals(ErrorType.MODE_NOT_IN_LEXER, msg.getErrorType());
+		assertEquals("X", msg.getArgs()[0]);
+		assertEquals(3, msg.line);
+		assertEquals(5, msg.charPosition);
+		assertEquals("M.g4", new File(msg.fileName).getName());
 	}	
 
 	@Test public void testDelegatesSeeSameTokenType() throws Exception {
