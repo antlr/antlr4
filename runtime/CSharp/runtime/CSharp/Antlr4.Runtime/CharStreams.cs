@@ -89,5 +89,15 @@ namespace Antlr4.Runtime
         {
             return new CodePointCharStream(s);
         }
+
+        public static ICharStream toUpper(ICharStream inStream)
+        {
+            return new CaseChangingCharStream(inStream, true);
+        }
+
+        public static ICharStream toLower(ICharStream inStream)
+        {
+            return new CaseChangingCharStream(inStream, false);
+        }
     }
 }
