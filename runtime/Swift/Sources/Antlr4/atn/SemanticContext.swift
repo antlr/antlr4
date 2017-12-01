@@ -277,10 +277,6 @@ public class SemanticContext: Hashable, CustomStringConvertible {
             return result
         }
 
-        public func toString() -> String {
-            return description
-        }
-
         override
         public var description: String {
             return opnds.map({ $0.description }).joined(separator: "&&")
@@ -384,11 +380,6 @@ public class SemanticContext: Hashable, CustomStringConvertible {
             }
 
             return result
-        }
-
-
-        public func toString() -> String {
-            return description
         }
 
         override

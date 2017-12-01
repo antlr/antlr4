@@ -68,12 +68,9 @@ public class ATNConfigSet: Hashable, CustomStringConvertible {
 
     private var cachedHashCode = -1
 
-    public init(_ fullCtx: Bool) {
+    public init(_ fullCtx: Bool = true) {
         configLookup = LookupDictionary()
         self.fullCtx = fullCtx
-    }
-    public convenience init() {
-        self.init(true)
     }
 
     public convenience init(_ old: ATNConfigSet) {
@@ -275,27 +272,21 @@ public class ATNConfigSet: Hashable, CustomStringConvertible {
     }
 
     public var description: String {
-        let buf = StringBuilder()
-        buf.append(elements().map({ $0.description }))
+        var buf = ""
+        buf += String(describing: elements())
         if hasSemanticContext {
-            buf.append(",hasSemanticContext=")
-            buf.append(hasSemanticContext)
+            buf += ",hasSemanticContext=true"
         }
         if uniqueAlt != ATN.INVALID_ALT_NUMBER {
-            buf.append(",uniqueAlt=")
-            buf.append(uniqueAlt)
+            buf += ",uniqueAlt=\(uniqueAlt)"
         }
         if let conflictingAlts = conflictingAlts {
-            buf.append(",conflictingAlts=")
-            buf.append(conflictingAlts.description)
+            buf += ",conflictingAlts=\(conflictingAlts)"
         }
         if dipsIntoOuterContext {
-            buf.append(",dipsIntoOuterContext")
+            buf += ",dipsIntoOuterContext"
         }
-        return buf.toString()
-    }
-    public func toString() -> String {
-        return description
+        return buf
     }
 
     /// 
@@ -548,42 +539,25 @@ public class ATNConfigSet: Hashable, CustomStringConvertible {
     }
 
     public final var hasConfigInRuleStopState: Bool {
-        for config in configs {
-            if config.state is RuleStopState {
-                return true
-            }
-        }
-
-        return false
+        return configs.contains(where: { $0.state is RuleStopState })
     }
 
     public final var allConfigsInRuleStopStates: Bool {
-        for config in configs {
-            if !(config.state is RuleStopState) {
-                return false
-            }
-        }
-
-        return true
+        return !configs.contains(where: { !($0.state is RuleStopState) })
     }
 }
 
 
 public func ==(lhs: ATNConfigSet, rhs: ATNConfigSet) -> Bool {
-
     if lhs === rhs {
         return true
     }
 
-    let same: Bool =
-    lhs.configs == rhs.configs && // includes stack context
+    return
+        lhs.configs == rhs.configs && // includes stack context
         lhs.fullCtx == rhs.fullCtx &&
         lhs.uniqueAlt == rhs.uniqueAlt &&
         lhs.conflictingAlts == rhs.conflictingAlts &&
         lhs.hasSemanticContext == rhs.hasSemanticContext &&
         lhs.dipsIntoOuterContext == rhs.dipsIntoOuterContext
-
-
-    return same
-
 }

@@ -49,8 +49,8 @@ public class SingletonPredictionContext: PredictionContext {
 
     override
     public var description: String {
-        let up: String = parent != nil ? parent!.description : ""
-        if up.length == 0 {
+        let up = parent?.description ?? ""
+        if up.isEmpty {
             if returnState == PredictionContext.EMPTY_RETURN_STATE {
                 return "$"
             }

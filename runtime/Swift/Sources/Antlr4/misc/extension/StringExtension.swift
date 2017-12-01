@@ -6,62 +6,38 @@
 
 import Foundation
 
-//http://stackoverflow.com/questions/28182441/swift-how-to-get-substring-from-start-to-last-index-of-character
-//https://github.com/williamFalcon/Bolt_Swift/blob/master/Bolt/BoltLibrary/String/String.swift
-
 extension String {
-
-    var length: Int {
-        return self.characters.count
-    }
-
-    func indexOf(_ target: String) -> Int {
-        let range = self.range(of: target)
-        if let range = range {
-            return self.characters.distance(from: self.startIndex, to: range.lowerBound)
-
-        } else {
-            return -1
+    func lastIndex(of target: String) -> String.Index? {
+        if target.isEmpty {
+            return nil
         }
-    }
-
-    func indexOf(_ target: String, startIndex: Int) -> Int {
-
-        let startRange = self.characters.index(self.startIndex, offsetBy: startIndex)
-        let range = self.range(of: target, options: .literal, range: startRange..<self.endIndex)
-
-        if let range = range {
-
-            return self.characters.distance(from: self.startIndex, to: range.lowerBound)
-        } else {
-            return -1
-        }
-    }
-
-    func lastIndexOf(_ target: String) -> Int {
-        var index = -1
-        var stepIndex = self.indexOf(target)
-        while stepIndex > -1 {
-            index = stepIndex
-            if stepIndex + target.length < self.length {
-                stepIndex = indexOf(target, startIndex: stepIndex + target.length)
-            } else {
-                stepIndex = -1
+        var result: String.Index? = nil
+        var substring = self[...]
+        while true {
+            guard let targetRange = substring.range(of: target) else {
+                return result
             }
+            result = targetRange.lowerBound
+            let nextChar = substring.index(after: targetRange.lowerBound)
+            substring = self[nextChar...]
         }
-        return index
-    }
-
-    subscript(integerIndex: Int) -> Character {
-        let index = characters.index(startIndex, offsetBy: integerIndex)
-        return self[index]
     }
 
     subscript(integerRange: Range<Int>) -> String {
-        let start = characters.index(startIndex, offsetBy: integerRange.lowerBound)
-        let end = characters.index(startIndex, offsetBy: integerRange.upperBound)
+        let start = index(startIndex, offsetBy: integerRange.lowerBound)
+        let end = index(startIndex, offsetBy: integerRange.upperBound)
         let range = start ..< end
         return String(self[range])
     }
 }
 
+
+// Implement Substring.hasPrefix, which is not currently in the Linux stdlib.
+// https://bugs.swift.org/browse/SR-5627
+#if os(Linux)
+extension Substring {
+    func hasPrefix(_ prefix: String) -> Bool {
+        return String(self).hasPrefix(prefix)
+    }
+}
+#endif
