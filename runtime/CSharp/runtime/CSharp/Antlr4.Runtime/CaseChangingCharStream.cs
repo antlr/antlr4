@@ -72,13 +72,19 @@ namespace Antlr4.Runtime
         {
             int c = stream.LA(i);
 
-            if (c <= 0) return c;
+            if (c <= 0)
+            {
+                return c;
+            }
 
-            var o = Convert.ToChar(c);
+            char o = (char)c;
 
-            if (upper) return Convert.ToInt32(char.ToUpper(o));
+            if (upper)
+            {
+                return (int)char.ToUpperInvariant(o);
+            }
 
-            return Convert.ToInt32(char.ToLower(o));
+            return (int)char.ToLowerInvariant(o);
         }
 
         public int Mark()
