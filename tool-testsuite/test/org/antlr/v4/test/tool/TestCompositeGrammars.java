@@ -141,6 +141,28 @@ public class TestCompositeGrammars extends BaseJavaToolTest {
 		ErrorQueue equeue = BaseRuntimeTest.antlrOnString(tmpdir, "Java", "M.g4", false, "-lib", tmpdir);
 		assertEquals(0, equeue.errors.size());
 	}
+
+	@Test public void testImportClashingChannelsIntoLexerGrammar() throws Exception {
+		BaseRuntimeTest.mkdir(tmpdir);
+
+		String master =
+			"lexer grammar M;\n" +
+			"import S;\n" +
+			"channels {CH_A, CH_B, CH_C}\n" +
+			"A : 'a' -> channel(CH_A);\n" +
+			"B : 'b' -> channel(CH_B);\n" +
+			"C : 'C' -> channel(CH_C);\n";
+		writeFile(tmpdir, "M.g4", master);
+
+		String slave = 
+			"lexer grammar S;\n" +
+			"channels {CH_C}\n" +
+			"C : 'c' -> channel(CH_C);\n";
+		writeFile(tmpdir, "S.g4", slave);
+
+		ErrorQueue equeue = BaseRuntimeTest.antlrOnString(tmpdir, "Java", "M.g4", false, "-lib", tmpdir);
+		assertEquals(0, equeue.errors.size());
+	}	
 	
 	@Test public void testMergeModesIntoLexerGrammar() throws Exception {
 		BaseRuntimeTest.mkdir(tmpdir);
