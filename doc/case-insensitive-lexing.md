@@ -69,3 +69,8 @@ CharStream s = CharStreams.fromPath(Paths.get('test.sql'));
 CaseChangingCharStream upper = new CaseChangingCharStream(s, true);
 Lexer lexer = new SomeSQLLexer(upper);
 ```
+
+Here are implementations of `CaseChangingCharStream` in various target languages:
+
+* [Java](https://github.com/parrt/antlr4/blob/case-insensitivity-doc/doc/resources/CaseChangingCharStream.java)
+* 
