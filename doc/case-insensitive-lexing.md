@@ -73,4 +73,5 @@ Lexer lexer = new SomeSQLLexer(upper);
 Here are implementations of `CaseChangingCharStream` in various target languages:
 
 * [Java](https://github.com/parrt/antlr4/blob/case-insensitivity-doc/doc/resources/CaseChangingCharStream.java)
-* 
+* [JavaScript](https://github.com/parrt/antlr4/blob/case-insensitivity-doc/doc/resources/CaseInsensitiveInputStream.js)
+* [Go](https://github.com/parrt/antlr4/blob/case-insensitivity-doc/doc/resources/case_changing_stream.go)
