@@ -68,13 +68,6 @@ var CharStreams = {
     return new InputStream(data, true);
   },
 
-  toUpper: function(stream) {
-    return new CaseInsensitiveInputStream(stream, true);
-  },
-
-  toLower: function(stream) {
-    return new CaseInsensitiveInputStream(stream, false);
-  }
 };
 
 exports.CharStreams = CharStreams;
