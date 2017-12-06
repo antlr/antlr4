@@ -175,4 +175,6 @@ YYYY/MM/DD, github id, Full name, email
 2017/11/05, ajaypanyala, Ajay Panyala, ajay.panyala@gmail.com
 2017/11/24, zqlu.cn, Zhiqiang Lu, zqlu.cn@gmail.com
 2017/11/28, niccroad, Nicolas Croad, nic.croad@gmail.com
+2017/12/01, DavidMoraisFerreira, David Morais Ferreira, david.moraisferreira@gmail.com
+2017/12/01, SebastianLng, Sebastian Lang, sebastian.lang@outlook.com
 2017/12/03, oranoran, Oran Epelbaum, oran / epelbaum me
