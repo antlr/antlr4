@@ -81,42 +81,42 @@ func TestCommonTokenStreamFetchOffChannel(t *testing.T) {
 	tokens := NewCommonTokenStream(lexEngine, TokenDefaultChannel)
 	tokens.Fill()
 
-	assert.Nil(tokens.getHiddenTokensToLeft(0, -1))
-	assert.Nil(tokens.getHiddenTokensToRight(0, -1))
+	assert.Nil(tokens.GetHiddenTokensToLeft(0, -1))
+	assert.Nil(tokens.GetHiddenTokensToRight(0, -1))
 
-	assert.Equal("[[@0,0:0=' ',<1>,channel=1,0:-1]]", tokensToString(tokens.getHiddenTokensToLeft(1, -1)))
-	assert.Equal("[[@2,0:0=' ',<1>,channel=1,0:-1]]", tokensToString(tokens.getHiddenTokensToRight(1, -1)))
+	assert.Equal("[[@0,0:0=' ',<1>,channel=1,0:-1]]", tokensToString(tokens.GetHiddenTokensToLeft(1, -1)))
+	assert.Equal("[[@2,0:0=' ',<1>,channel=1,0:-1]]", tokensToString(tokens.GetHiddenTokensToRight(1, -1)))
 
-	assert.Nil(tokens.getHiddenTokensToLeft(2, -1))
-	assert.Nil(tokens.getHiddenTokensToRight(2, -1))
+	assert.Nil(tokens.GetHiddenTokensToLeft(2, -1))
+	assert.Nil(tokens.GetHiddenTokensToRight(2, -1))
 
-	assert.Equal("[[@2,0:0=' ',<1>,channel=1,0:-1]]", tokensToString(tokens.getHiddenTokensToLeft(3, -1)))
-	assert.Nil(tokens.getHiddenTokensToRight(3, -1))
+	assert.Equal("[[@2,0:0=' ',<1>,channel=1,0:-1]]", tokensToString(tokens.GetHiddenTokensToLeft(3, -1)))
+	assert.Nil(tokens.GetHiddenTokensToRight(3, -1))
 
-	assert.Nil(tokens.getHiddenTokensToLeft(4, -1))
+	assert.Nil(tokens.GetHiddenTokensToLeft(4, -1))
 	assert.Equal("[[@5,0:0=' ',<1>,channel=1,0:-1], [@6,0:0=' ',<1>,channel=1,0:-1]]",
-		tokensToString(tokens.getHiddenTokensToRight(4, -1)))
+		tokensToString(tokens.GetHiddenTokensToRight(4, -1)))
 
-	assert.Nil(tokens.getHiddenTokensToLeft(5, -1))
+	assert.Nil(tokens.GetHiddenTokensToLeft(5, -1))
 	assert.Equal("[[@6,0:0=' ',<1>,channel=1,0:-1]]",
-		tokensToString(tokens.getHiddenTokensToRight(5, -1)))
+		tokensToString(tokens.GetHiddenTokensToRight(5, -1)))
 
 	assert.Equal("[[@5,0:0=' ',<1>,channel=1,0:-1]]",
-		tokensToString(tokens.getHiddenTokensToLeft(6, -1)))
-	assert.Nil(tokens.getHiddenTokensToRight(6, -1))
+		tokensToString(tokens.GetHiddenTokensToLeft(6, -1)))
+	assert.Nil(tokens.GetHiddenTokensToRight(6, -1))
 
 	assert.Equal("[[@5,0:0=' ',<1>,channel=1,0:-1], [@6,0:0=' ',<1>,channel=1,0:-1]]",
-		tokensToString(tokens.getHiddenTokensToLeft(7, -1)))
+		tokensToString(tokens.GetHiddenTokensToLeft(7, -1)))
 	assert.Equal("[[@8,0:0=' ',<1>,channel=1,0:-1], [@9,0:0='\\n',<1>,channel=1,0:-1]]",
-		tokensToString(tokens.getHiddenTokensToRight(7, -1)))
+		tokensToString(tokens.GetHiddenTokensToRight(7, -1)))
 
-	assert.Nil(tokens.getHiddenTokensToLeft(8, -1))
+	assert.Nil(tokens.GetHiddenTokensToLeft(8, -1))
 	assert.Equal("[[@9,0:0='\\n',<1>,channel=1,0:-1]]",
-		tokensToString(tokens.getHiddenTokensToRight(8, -1)))
+		tokensToString(tokens.GetHiddenTokensToRight(8, -1)))
 
 	assert.Equal("[[@8,0:0=' ',<1>,channel=1,0:-1]]",
-		tokensToString(tokens.getHiddenTokensToLeft(9, -1)))
-	assert.Nil(tokens.getHiddenTokensToRight(9, -1))
+		tokensToString(tokens.GetHiddenTokensToLeft(9, -1)))
+	assert.Nil(tokens.GetHiddenTokensToRight(9, -1))
 
 }
 
