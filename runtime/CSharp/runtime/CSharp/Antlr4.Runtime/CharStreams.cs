@@ -89,5 +89,27 @@ namespace Antlr4.Runtime
         {
             return new CodePointCharStream(s);
         }
+
+        /// <summary>
+        /// Takes the stream and forces all symbols to uppercase for lexing purposes 
+        /// but leaves the original text as-is.
+        /// </summary>
+        /// <param name="inStream"></param>
+        /// <returns></returns>
+        public static ICharStream toUpper(ICharStream inStream)
+        {
+            return new CaseChangingCharStream(inStream, true);
+        }
+
+        /// <summary>
+        /// Takes the stream and forces all symbols to lowercase for lexing purposes 
+        /// but leaves the original text as-is.
+        /// </summary>
+        /// <param name="inStream"></param>
+        /// <returns></returns>
+        public static ICharStream toLower(ICharStream inStream)
+        {
+            return new CaseChangingCharStream(inStream, false);
+        }
     }
 }
