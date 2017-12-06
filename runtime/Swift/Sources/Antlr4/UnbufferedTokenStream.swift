@@ -12,22 +12,22 @@ public class UnbufferedTokenStream: TokenStream {
     /// we keep adding to buffer. Otherwise, _#consume consume()_ resets so
     /// we start filling at index 0 again.
     /// 
-    internal var tokens: [Token]
+    internal var tokens = [Token]()
 
     /// 
-    /// The number of tokens currently in _#tokens tokens_.
+    /// The number of tokens currently in `self.tokens`.
     /// 
-    /// This is not the buffer capacity, that's `tokens.length`.
+    /// This is not the buffer capacity, that's `self.tokens.count`.
     /// 
-    internal var n: Int
+    internal var n = 0
 
     /// 
-    /// 0..n-1 index into _#tokens tokens_ of next token.
+    /// `0...n-1` index into `self.tokens` of next token.
     /// 
     /// The `LT(1)` token is `tokens[p]`. If `p == n`, we are
     /// out of buffered tokens.
     /// 
-    internal var p: Int = 0
+    internal var p = 0
 
     /// 
     /// Count up with _#mark mark()_ and down with
@@ -35,7 +35,7 @@ public class UnbufferedTokenStream: TokenStream {
     /// `numMarkers` reaches 0 and we reset the buffer. Copy
     /// `tokens[p]..tokens[n-1]` to `tokens[0]..tokens[(n-1)-p]`.
     /// 
-    internal var numMarkers: Int = 0
+    internal var numMarkers = 0
 
     /// 
     /// This is the `LT(-1)` token for the current position.
@@ -56,24 +56,18 @@ public class UnbufferedTokenStream: TokenStream {
     /// This value is used to set the token indexes if the stream provides tokens
     /// that implement _org.antlr.v4.runtime.WritableToken_.
     /// 
-    internal var currentTokenIndex: Int = 0
+    internal var currentTokenIndex = 0
 
-    public convenience init(_ tokenSource: TokenSource) throws {
-        try self.init(tokenSource, 256)
-    }
-    //TODO: bufferSize don't be use
-    public init(_ tokenSource: TokenSource, _ bufferSize: Int) throws {
+
+    public init(_ tokenSource: TokenSource) throws {
         self.tokenSource = tokenSource
-        //tokens =   [Token](count: bufferSize, repeatedValue: Token)   ;
-        tokens = [Token]()
-        n = 0
         try fill(1) // prime the pump
     }
 
 
     public func get(_ i: Int) throws -> Token {
         // get absolute index
-        let bufferStartIndex: Int = getBufferStartIndex()
+        let bufferStartIndex = getBufferStartIndex()
         if i < bufferStartIndex || i >= bufferStartIndex + n {
             throw ANTLRError.indexOutOfBounds(msg: "get(\(i)) outside buffer: \(bufferStartIndex)..\(bufferStartIndex + n)")
         }
@@ -103,7 +97,7 @@ public class UnbufferedTokenStream: TokenStream {
 
 
     public func LA(_ i: Int) throws -> Int {
-        return try  LT(i)!.getType()
+        return try LT(i)!.getType()
     }
 
 
@@ -184,8 +178,8 @@ public class UnbufferedTokenStream: TokenStream {
             //tokens = Arrays.copyOf(tokens, tokens.length * 2);
         }
 
-        if t is WritableToken {
-            (t as! WritableToken).setTokenIndex(getBufferStartIndex() + n)
+        if let wt = t as? WritableToken {
+            wt.setTokenIndex(getBufferStartIndex() + n)
         }
 
         tokens[n] = t
@@ -205,14 +199,14 @@ public class UnbufferedTokenStream: TokenStream {
             lastTokenBufferStart = lastToken
         }
 
-        let mark: Int = -numMarkers - 1
+        let mark = -numMarkers - 1
         numMarkers += 1
         return mark
     }
 
 
     public func release(_ marker: Int) throws {
-        let expectedMark: Int = -numMarkers
+        let expectedMark = -numMarkers
         if marker != expectedMark {
             throw ANTLRError.illegalState(msg: "release() called with an invalid marker.")
         }
@@ -224,7 +218,6 @@ public class UnbufferedTokenStream: TokenStream {
                 // Copy tokens[p]..tokens[n-1] to tokens[0]..tokens[(n-1)-p], reset ptrs
                 // p is last valid token; move nothing if p==n as we have no valid char
                 tokens = Array(tokens[p ... n - 1])
-                //System.arraycopy(tokens, p, tokens, 0, n - p); // shift n-p tokens from p to 0
                 n = n - p
                 p = 0
             }
@@ -251,16 +244,14 @@ public class UnbufferedTokenStream: TokenStream {
             index = min(index, getBufferStartIndex() + n - 1)
         }
 
-        let bufferStartIndex: Int = getBufferStartIndex()
-        let i: Int = index - bufferStartIndex
+        let bufferStartIndex = getBufferStartIndex()
+        let i = index - bufferStartIndex
         if i < 0 {
             throw ANTLRError.illegalState(msg: "cannot seek to negative index \(index)")
 
-        } else {
-            if i >= n {
-                throw ANTLRError.unsupportedOperation(msg: "seek to index outside buffer: \(index) not in \(bufferStartIndex)..\(bufferStartIndex + n)")
-
-            }
+        }
+        else if i >= n {
+            throw ANTLRError.unsupportedOperation(msg: "seek to index outside buffer: \(index) not in \(bufferStartIndex)..<\(bufferStartIndex + n)")
         }
 
         p = i
@@ -290,7 +281,7 @@ public class UnbufferedTokenStream: TokenStream {
         let start = interval.a
         let stop = interval.b
         if start < bufferStartIndex || stop > bufferStopIndex {
-            throw ANTLRError.unsupportedOperation(msg: "interval \(interval) not in token buffer window: \(bufferStartIndex)..bufferStopIndex)")
+            throw ANTLRError.unsupportedOperation(msg: "interval \(interval) not in token buffer window: \(bufferStartIndex)...\(bufferStopIndex)")
         }
 
         let a = start - bufferStartIndex
