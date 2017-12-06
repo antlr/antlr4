@@ -66,7 +66,7 @@ var CharStreams = {
   fromPathSync: function(path, encoding) {
     var data = fs.readFileSync(path, encoding);
     return new InputStream(data, true);
-  },
+  }
 
 };
 
