@@ -269,11 +269,11 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 			"grammar A;\n" +
 			"tokens{Foo}\n" +
 			"b : Foo ;\n" +
-			"X : 'foo' -> popmode;\n" + // "meant" to use -> popMode
-			"Y : 'foo' -> token(Foo);", // "meant" to use -> type(Foo)
+			"X : 'foo1' -> popmode;\n" + // "meant" to use -> popMode
+			"Y : 'foo2' -> token(Foo);", // "meant" to use -> type(Foo)
 
-			"error(" + ErrorType.INVALID_LEXER_COMMAND.code + "): A.g4:4:13: lexer command popmode does not exist or is not supported by the current target\n" +
-			"error(" + ErrorType.INVALID_LEXER_COMMAND.code + "): A.g4:5:13: lexer command token does not exist or is not supported by the current target\n"
+			"error(" + ErrorType.INVALID_LEXER_COMMAND.code + "): A.g4:4:14: lexer command popmode does not exist or is not supported by the current target\n" +
+			"error(" + ErrorType.INVALID_LEXER_COMMAND.code + "): A.g4:5:14: lexer command token does not exist or is not supported by the current target\n"
 		};
 		super.testErrors(pair, true);
 	}
@@ -283,11 +283,11 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 			"grammar A;\n" +
 			"tokens{Foo}\n" +
 			"b : Foo ;\n" +
-			"X : 'foo' -> popMode(Foo);\n" + // "meant" to use -> popMode
-			"Y : 'foo' -> type;", // "meant" to use -> type(Foo)
+			"X : 'foo1' -> popMode(Foo);\n" + // "meant" to use -> popMode
+			"Y : 'foo2' -> type;", // "meant" to use -> type(Foo)
 
-			"error(" + ErrorType.UNWANTED_LEXER_COMMAND_ARGUMENT.code + "): A.g4:4:13: lexer command popMode does not take any arguments\n" +
-			"error(" + ErrorType.MISSING_LEXER_COMMAND_ARGUMENT.code + "): A.g4:5:13: missing argument for lexer command type\n"
+			"error(" + ErrorType.UNWANTED_LEXER_COMMAND_ARGUMENT.code + "): A.g4:4:14: lexer command popMode does not take any arguments\n" +
+			"error(" + ErrorType.MISSING_LEXER_COMMAND_ARGUMENT.code + "): A.g4:5:14: missing argument for lexer command type\n"
 		};
 		super.testErrors(pair, true);
 	}
