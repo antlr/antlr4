@@ -150,47 +150,36 @@ public class ATNConfig: Hashable, CustomStringConvertible {
     /// 
 
     public var hashValue: Int {
-        var hashCode: Int = MurmurHash.initialize(7)
+        var hashCode = MurmurHash.initialize(7)
         hashCode = MurmurHash.update(hashCode, state.stateNumber)
         hashCode = MurmurHash.update(hashCode, alt)
         hashCode = MurmurHash.update(hashCode, context)
         hashCode = MurmurHash.update(hashCode, semanticContext)
-        hashCode = MurmurHash.finish(hashCode, 4)
-        return hashCode
+        return MurmurHash.finish(hashCode, 4)
 
     }
 
-    public func toString() -> String {
-        return description
-    }
     public var description: String {
         //return "MyClass \(string)"
         return toString(nil, true)
     }
-    public func toString<T:ATNSimulator>(_ recog: Recognizer<T>?, _ showAlt: Bool) -> String {
-        let buf: StringBuilder = StringBuilder()
-        buf.append("(")
-        buf.append(state)
+    public func toString<T>(_ recog: Recognizer<T>?, _ showAlt: Bool) -> String {
+        var buf = "(\(state)"
         if showAlt {
-            buf.append(",")
-            buf.append(alt)
+            buf += ",\(alt)"
         }
-        
-        if context != nil {
-            buf.append(",[")
-            buf.append(context!)
-            buf.append("]")
+        if let context = context {
+            buf += ",[\(context)]"
         }
-        
         if semanticContext != SemanticContext.NONE {
-            buf.append(",")
-            buf.append(semanticContext)
+            buf += ",\(semanticContext)"
         }
-        if getOuterContextDepth() > 0 {
-            buf.append(",up=").append(getOuterContextDepth())
+        let outerDepth = getOuterContextDepth()
+        if outerDepth > 0 {
+            buf += ",up=\(outerDepth)"
         }
-        buf.append(")")
-        return buf.toString()
+        buf += ")"
+        return buf
     }
 }
 

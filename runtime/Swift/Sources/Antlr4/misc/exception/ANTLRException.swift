@@ -15,6 +15,6 @@
 import Foundation
 
 public enum ANTLRException: Error {
-    case cannotInvokeStartRule
-    case recognition(e:AnyObject)
+    case parseCancellation(e: RecognitionException)
+    case recognition(e: RecognitionException)
 }

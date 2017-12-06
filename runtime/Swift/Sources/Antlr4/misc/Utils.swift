@@ -10,88 +10,31 @@ import Foundation
 public class Utils {
 
     public static func escapeWhitespace(_ s: String, _ escapeSpaces: Bool) -> String {
-        let buf: StringBuilder = StringBuilder()
-        for c: Character in s.characters {
+        var buf = ""
+        for c in s {
             if c == " " && escapeSpaces {
-                buf.append("\u{00B7}")
-            } else {
-                if c == "\t" {
-                    buf.append("\\t")
-                } else {
-                    if c == "\n" {
-                        buf.append("\\n")
-                    } else {
-                        if c == "\r" {
-                            buf.append("\\r")
-                        } else {
-                            buf.append(String(c))
-                        }
-                    }
-                }
+                buf += "\u{00B7}"
+            }
+            else if c == "\t" {
+                    buf += "\\t"
+            }
+            else if c == "\n" {
+                buf += "\\n"
+            }
+            else if c == "\r" {
+                buf += "\\r"
+            }
+            else {
+                buf.append(c)
             }
         }
-        return buf.toString()
+        return buf
     }
 
 
-    public static func writeFile(_ fileName: String, _ content: String, _ encoding: String.Encoding = String.Encoding.utf8) {
-
-        //writing
-        do {
-            try content.write(toFile: fileName, atomically: false, encoding: encoding)
-        } catch {
-            /* error handling here */
-            RuntimeException(" write file fail \(error)")
-        }
-
-    }
-
-
-    public static func readFile(_ path: String, _ encoding: String.Encoding = String.Encoding.utf8) -> [Character] {
-
-        var fileContents: String
-
-        do {
-            fileContents = try String(contentsOfFile: path, encoding: encoding)
-        } catch {
-            return [Character]()
-        }
-
-        return Array(fileContents.characters)
-    }
-
-    public static func readFile2String(_ fileName: String, _ encoding: String.Encoding = String.Encoding.utf8) -> String {
-        let path = Bundle.main.path(forResource: fileName, ofType: nil)
-        if path == nil {
-            return ""
-        }
-
-        var fileContents: String? = nil
-        do {
-            fileContents = try String(contentsOfFile: path!, encoding: encoding)
-        } catch {
-            return ""
-        }
-
-        return fileContents ?? ""
-    }
-
-    public static func readFile2StringByPath(_ path: String, _ encoding: String.Encoding = String.Encoding.utf8) -> String {
-
-        var fileContents: String? = nil
-        
-        do {
-            fileContents = try String(contentsOfFile: path, encoding: String.Encoding.utf8)
-        } catch {
-            return ""
-        }
-
-        return fileContents ?? ""
-    }
-
-    public static func toMap(_ keys: [String]) -> Dictionary<String, Int> {
-        var m = Dictionary<String, Int>()
-        for (index,v) in keys.enumerated() {
+    public static func toMap(_ keys: [String]) -> [String: Int] {
+        var m = [String: Int]()
+        for (index, v) in keys.enumerated() {
             m[v] = index
         }
         return m

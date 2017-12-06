@@ -151,8 +151,8 @@ public abstract class CodePointCharStream implements CharStream {
 		/** Return the UTF-16 encoded string for the given interval */
 		@Override
 		public String getText(Interval interval) {
-			int startIdx = Math.min(interval.a, size - 1);
-			int len = Math.min(interval.b - interval.a + 1, size);
+			int startIdx = Math.min(interval.a, size);
+			int len = Math.min(interval.b - interval.a + 1, size - startIdx);
 
 			// We know the maximum code point in byteArray is U+00FF,
 			// so we can treat this as if it were ISO-8859-1, aka Latin-1,

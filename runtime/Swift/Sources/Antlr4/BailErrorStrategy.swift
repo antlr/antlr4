@@ -32,22 +32,24 @@
 /// - seealso: org.antlr.v4.runtime.Parser#setErrorHandler(org.antlr.v4.runtime.ANTLRErrorStrategy)
 /// 
 /// 
-public class BailErrorStrategy: DefaultErrorStrategy {
-    public override init(){}
+open class BailErrorStrategy: DefaultErrorStrategy {
+    public override init() {
+    }
+
     /// 
     /// Instead of recovering from exception `e`, re-throw it wrapped
     /// in a _org.antlr.v4.runtime.misc.ParseCancellationException_ so it is not caught by the
     /// rule function catches.  Use _Exception#getCause()_ to get the
     /// original _org.antlr.v4.runtime.RecognitionException_.
     /// 
-    override public func recover(_ recognizer: Parser, _ e: AnyObject) throws {
-        var context: ParserRuleContext? = recognizer.getContext()
-        while let contextWrap = context{
+    override open func recover(_ recognizer: Parser, _ e: RecognitionException) throws {
+        var context = recognizer.getContext()
+        while let contextWrap = context {
             contextWrap.exception = e
             context = (contextWrap.getParent() as? ParserRuleContext)
         }
 
-        throw  ANTLRException.recognition(e: e)
+        throw ANTLRException.parseCancellation(e: e)
     }
 
     /// 
@@ -55,23 +57,22 @@ public class BailErrorStrategy: DefaultErrorStrategy {
     /// successfully recovers, it won't throw an exception.
     /// 
     override
-    public func recoverInline(_ recognizer: Parser) throws -> Token {
-        let e: InputMismatchException = try InputMismatchException(recognizer)
-        var context: ParserRuleContext? = recognizer.getContext()
+    open func recoverInline(_ recognizer: Parser) throws -> Token {
+        let e = InputMismatchException(recognizer)
+        var context = recognizer.getContext()
         while let contextWrap = context {
              contextWrap.exception = e
              context = (contextWrap.getParent() as? ParserRuleContext)
         }
 
-        throw  ANTLRException.recognition(e: e)
-
+        throw ANTLRException.parseCancellation(e: e)
     }
 
     /// 
     /// Make sure we don't attempt to recover from problems in subrules.
     /// 
     override
-    public func sync(_ recognizer: Parser) {
+    open func sync(_ recognizer: Parser) {
     }
 
 }

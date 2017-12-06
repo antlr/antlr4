@@ -6,7 +6,7 @@
 #pragma once
 
 #include "misc/Interval.h"
-#include <atomic>
+#include "Exceptions.h"
 
 namespace antlr4 {
 namespace misc {
@@ -28,20 +28,27 @@ namespace misc {
     static IntervalSet const COMPLETE_CHAR_SET;
     static IntervalSet const EMPTY_SET;
 
-  protected:
+  private:
     /// The list of sorted, disjoint intervals.
     std::vector<Interval> _intervals;
-    std::atomic<bool> _readonly;
+
+    explicit IntervalSet(std::vector<Interval>&& intervals);
 
   public:
     IntervalSet();
-    IntervalSet(const std::vector<Interval> &intervals);
-    IntervalSet(const IntervalSet &set);
-    IntervalSet(int numArgs, ...);
+    IntervalSet(IntervalSet const& set);
+    IntervalSet(IntervalSet&& set);
 
-    virtual ~IntervalSet();
+    template<typename T1, typename... T_NEXT>
+    IntervalSet(int, T1 t1, T_NEXT&&... next) : IntervalSet()
+    {
+	// The first int argument is an ignored count for compatibility
+	// with the previous varargs based interface.
+	addItems(t1, std::forward<T_NEXT>(next)...);
+    }
 
-    IntervalSet& operator=(const IntervalSet &set);
+    IntervalSet& operator=(IntervalSet const& set);
+    IntervalSet& operator=(IntervalSet&& set);
 
     /// Create a set with a single element, el.
     static IntervalSet of(ssize_t a);
@@ -49,11 +56,11 @@ namespace misc {
     /// Create a set with all ints within range [a..b] (inclusive)
     static IntervalSet of(ssize_t a, ssize_t b);
 
-    virtual void clear();
+    void clear();
 
     /// Add a single element to the set.  An isolated element is stored
     /// as a range el..el.
-    virtual void add(ssize_t el);
+    void add(ssize_t el);
 
     /// Add interval; i.e., add all integers from a to b to set.
     /// If b<a, do nothing.
@@ -61,30 +68,36 @@ namespace misc {
     /// If overlap, combine ranges.  For example,
     /// If this is {1..5, 10..20}, adding 6..7 yields
     /// {1..5, 6..7, 10..20}.  Adding 4..8 yields {1..8, 10..20}.
-    virtual void add(ssize_t a, ssize_t b);
+    void add(ssize_t a, ssize_t b);
 
-  public:
     /// combine all sets in the array returned the or'd value
     static IntervalSet Or(const std::vector<IntervalSet> &sets);
 
     // Copy on write so we can cache a..a intervals and sets of that.
-    virtual void add(const Interval &addition);
-    virtual IntervalSet& addAll(const IntervalSet &set);
+    void add(const Interval &addition);
+    IntervalSet& addAll(const IntervalSet &set);
 
-    virtual IntervalSet complement(ssize_t minElement, ssize_t maxElement) const;
+    template<typename T1, typename... T_NEXT>
+    void addItems(T1 t1, T_NEXT&&... next)
+    {
+	add(t1);
+	addItems(std::forward<T_NEXT>(next)...);
+    }
+
+    IntervalSet complement(ssize_t minElement, ssize_t maxElement) const;
 
     /// Given the set of possible values (rather than, say UNICODE or MAXINT),
     /// return a new set containing all elements in vocabulary, but not in
     /// this.  The computation is (vocabulary - this).
     ///
     /// 'this' is assumed to be either a subset or equal to vocabulary.
-    virtual IntervalSet complement(const IntervalSet &vocabulary) const;
+    IntervalSet complement(const IntervalSet &vocabulary) const;
 
     /// Compute this-other via this&~other.
     /// Return a new set containing all elements in this but not in other.
     /// other is assumed to be a subset of this;
     /// anything that is in other but not in this will be ignored.
-    virtual IntervalSet subtract(const IntervalSet &other) const;
+    IntervalSet subtract(const IntervalSet &other) const;
 
     /**
      * Compute the set difference between two interval sets. The specific
@@ -93,23 +106,23 @@ namespace misc {
      */
     static IntervalSet subtract(const IntervalSet &left, const IntervalSet &right);
 
-    virtual IntervalSet Or(const IntervalSet &a) const;
+    IntervalSet Or(const IntervalSet &a) const;
 
     /// Return a new set with the intersection of this set with other.  Because
     /// the intervals are sorted, we can use an iterator for each list and
     /// just walk them together.  This is roughly O(min(n,m)) for interval
     /// list lengths n and m.
-    virtual IntervalSet And(const IntervalSet &other) const;
+    IntervalSet And(const IntervalSet &other) const;
 
     /// Is el in any range of this set?
-    virtual bool contains(size_t el) const; // For mapping of e.g. Token::EOF to -1 etc.
-    virtual bool contains(ssize_t el) const;
+    bool contains(size_t el) const; // For mapping of e.g. Token::EOF to -1 etc.
+    bool contains(ssize_t el) const;
 
     /// return true if this set has no members
-    virtual bool isEmpty() const;
+    bool isEmpty() const;
 
     /// If this set is a single integer, return it otherwise Token.INVALID_TYPE.
-    virtual ssize_t getSingleElement() const;
+    ssize_t getSingleElement() const;
 
     /**
      * Returns the maximum value contained in the set.
@@ -117,7 +130,7 @@ namespace misc {
      * @return the maximum value contained in the set. If the set is empty, this
      * method returns {@link Token#INVALID_TYPE}.
      */
-    virtual ssize_t getMaxElement() const;
+    ssize_t getMaxElement() const;
 
     /**
      * Returns the minimum value contained in the set.
@@ -125,50 +138,48 @@ namespace misc {
      * @return the minimum value contained in the set. If the set is empty, this
      * method returns {@link Token#INVALID_TYPE}.
      */
-    virtual ssize_t getMinElement() const;
+    ssize_t getMinElement() const;
 
     /// <summary>
     /// Return a list of Interval objects. </summary>
-    virtual std::vector<Interval> getIntervals() const;
+    std::vector<Interval> const& getIntervals() const;
 
-    virtual size_t hashCode() const;
+    size_t hashCode() const;
 
     /// Are two IntervalSets equal?  Because all intervals are sorted
     ///  and disjoint, equals is a simple linear walk over both lists
     ///  to make sure they are the same.
     bool operator == (const IntervalSet &other) const;
-    virtual std::string toString() const;
-    virtual std::string toString(bool elemAreChar) const;
+    std::string toString() const;
+    std::string toString(bool elemAreChar) const;
 
     /**
      * @deprecated Use {@link #toString(Vocabulary)} instead.
      */
-    virtual std::string toString(const std::vector<std::string> &tokenNames) const;
-    virtual std::string toString(const dfa::Vocabulary &vocabulary) const;
+    std::string toString(const std::vector<std::string> &tokenNames) const;
+    std::string toString(const dfa::Vocabulary &vocabulary) const;
 
   protected:
     /**
      * @deprecated Use {@link #elementName(Vocabulary, int)} instead.
      */
-    virtual std::string elementName(const std::vector<std::string> &tokenNames, ssize_t a) const;
-    virtual std::string elementName(const dfa::Vocabulary &vocabulary, ssize_t a) const;
+    std::string elementName(const std::vector<std::string> &tokenNames, ssize_t a) const;
+    std::string elementName(const dfa::Vocabulary &vocabulary, ssize_t a) const;
 
   public:
-    virtual size_t size() const;
-    virtual std::vector<ssize_t> toList() const;
-    virtual std::set<ssize_t> toSet() const;
+    size_t size() const;
+    std::vector<ssize_t> toList() const;
+    std::set<ssize_t> toSet() const;
 
     /// Get the ith element of ordered set.  Used only by RandomPhrase so
     /// don't bother to implement if you're not doing that for a new
     /// ANTLR code gen target.
-    virtual ssize_t get(size_t i) const;
-    virtual void remove(size_t el); // For mapping of e.g. Token::EOF to -1 etc.
-    virtual void remove(ssize_t el);
-    virtual bool isReadOnly() const;
-    virtual void setReadOnly(bool readonly);
+    ssize_t get(size_t i) const;
+    void remove(size_t el); // For mapping of e.g. Token::EOF to -1 etc.
+    void remove(ssize_t el);
 
   private:
-    void InitializeInstanceFields();
+    void addItems() { /* No-op */ }
   };
 
 } // namespace atn

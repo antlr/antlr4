@@ -4,7 +4,7 @@
  */
 
 
-public class UnbufferedTokenStream<T>: TokenStream {
+public class UnbufferedTokenStream: TokenStream {
     internal var tokenSource: TokenSource
 
     /// 
@@ -274,10 +274,7 @@ public class UnbufferedTokenStream<T>: TokenStream {
 
 
     public func size() -> Int {
-
-        RuntimeException("Unbuffered stream cannot know its size")
-        fatalError()
-
+        fatalError("Unbuffered stream cannot know its size")
     }
 
 
@@ -287,27 +284,23 @@ public class UnbufferedTokenStream<T>: TokenStream {
 
 
     public func getText(_ interval: Interval) throws -> String {
-        let bufferStartIndex: Int = getBufferStartIndex()
-        let bufferStopIndex: Int = bufferStartIndex + tokens.count - 1
+        let bufferStartIndex = getBufferStartIndex()
+        let bufferStopIndex = bufferStartIndex + tokens.count - 1
 
-        let start: Int = interval.a
-        let stop: Int = interval.b
+        let start = interval.a
+        let stop = interval.b
         if start < bufferStartIndex || stop > bufferStopIndex {
-
             throw ANTLRError.unsupportedOperation(msg: "interval \(interval) not in token buffer window: \(bufferStartIndex)..bufferStopIndex)")
-
         }
 
-        let a: Int = start - bufferStartIndex
-        let b: Int = stop - bufferStartIndex
+        let a = start - bufferStartIndex
+        let b = stop - bufferStartIndex
 
-        let buf: StringBuilder = StringBuilder()
-        for i in a...b {
-            let t: Token = tokens[i]
-            buf.append(t.getText()!)
+        var buf = ""
+        for t in tokens[a...b] {
+            buf += t.getText()!
         }
-
-        return buf.toString()
+        return buf
     }
 
     internal final func getBufferStartIndex() -> Int {

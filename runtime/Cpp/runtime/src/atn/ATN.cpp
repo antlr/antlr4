@@ -87,21 +87,21 @@ misc::IntervalSet ATN::nextTokens(ATNState *s, RuleContext *ctx) const {
 
 }
 
-misc::IntervalSet& ATN::nextTokens(ATNState *s) const {
-  if (!s->nextTokenWithinRule.isReadOnly()) {
+misc::IntervalSet const& ATN::nextTokens(ATNState *s) const {
+  if (!s->_nextTokenUpdated) {
     std::unique_lock<std::mutex> lock { _mutex };
-    if (!s->nextTokenWithinRule.isReadOnly()) {
-      s->nextTokenWithinRule = nextTokens(s, nullptr);
-      s->nextTokenWithinRule.setReadOnly(true);
+    if (!s->_nextTokenUpdated) {
+      s->_nextTokenWithinRule = nextTokens(s, nullptr);
+      s->_nextTokenUpdated = true;
     }
   }
-  return s->nextTokenWithinRule;
+  return s->_nextTokenWithinRule;
 }
 
 void ATN::addState(ATNState *state) {
   if (state != nullptr) {
     //state->atn = this;
-    state->stateNumber = (int)states.size();
+    state->stateNumber = static_cast<int>(states.size());
   }
 
   states.push_back(state);
@@ -114,7 +114,7 @@ void ATN::removeState(ATNState *state) {
 
 int ATN::defineDecisionState(DecisionState *s) {
   decisionToState.push_back(s);
-  s->decision = (int)decisionToState.size() - 1;
+  s->decision = static_cast<int>(decisionToState.size() - 1);
   return s->decision;
 }
 
@@ -154,7 +154,7 @@ misc::IntervalSet ATN::getExpectedTokens(size_t stateNumber, RuleContext *contex
     if (ctx->parent == nullptr) {
       break;
     }
-    ctx = (RuleContext *)ctx->parent;
+    ctx = static_cast<RuleContext *>(ctx->parent);
   }
 
   if (following.contains(Token::EPSILON)) {

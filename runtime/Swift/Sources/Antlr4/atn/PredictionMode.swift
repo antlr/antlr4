@@ -164,7 +164,7 @@ public enum PredictionMode {
     /// the configurations to strip out all of the predicates so that a standard
     /// _org.antlr.v4.runtime.atn.ATNConfigSet_ will merge everything ignoring predicates.
     /// 
-    public static func hasSLLConflictTerminatingPrediction(_ mode: PredictionMode,_ configs: ATNConfigSet) throws -> Bool {
+    public static func hasSLLConflictTerminatingPrediction(_ mode: PredictionMode,_ configs: ATNConfigSet) -> Bool {
         var configs = configs
         /// 
         /// Configs in rule stop states indicate reaching the end of the decision
@@ -183,17 +183,16 @@ public enum PredictionMode {
             // since we'll often fail over anyway.
             if configs.hasSemanticContext {
                 // dup configs, tossing out semantic predicates
-                configs = try configs.dupConfigsWithoutSemanticPredicates()
+                configs = configs.dupConfigsWithoutSemanticPredicates()
             }
             // now we have combined contexts for configs with dissimilar preds
         }
 
         // pure SLL or combined SLL+LL mode parsing
 
-        let altsets: Array<BitSet> = try getConflictingAltSubsets(configs)
+        let altsets = getConflictingAltSubsets(configs)
 
-        let heuristic: Bool =
-        try hasConflictingAltSet(altsets) && !hasStateAssociatedWithOneAlt(configs)
+        let heuristic = hasConflictingAltSet(altsets) && !hasStateAssociatedWithOneAlt(configs)
         return heuristic
     }
 
@@ -364,8 +363,8 @@ public enum PredictionMode {
     /// we need exact ambiguity detection when the sets look like
     /// `A={{1,2`}} or `{{1,2`,{1,2}}}, etc...
     /// 
-    public static func resolvesToJustOneViableAlt(_ altsets: Array<BitSet>) throws -> Int {
-        return try  getSingleViableAlt(altsets)
+    public static func resolvesToJustOneViableAlt(_ altsets: [BitSet]) -> Int {
+        return getSingleViableAlt(altsets)
     }
 
     /// 
@@ -376,7 +375,7 @@ public enum PredictionMode {
     /// - returns: `true` if every _java.util.BitSet_ in `altsets` has
     /// _java.util.BitSet#cardinality cardinality_ &gt; 1, otherwise `false`
     /// 
-    public static func allSubsetsConflict(_ altsets: Array<BitSet>) -> Bool {
+    public static func allSubsetsConflict(_ altsets: [BitSet]) -> Bool {
         return !hasNonConflictingAltSet(altsets)
     }
 
@@ -388,7 +387,7 @@ public enum PredictionMode {
     /// - returns: `true` if `altsets` contains a _java.util.BitSet_ with
     /// _java.util.BitSet#cardinality cardinality_ 1, otherwise `false`
     /// 
-    public static func hasNonConflictingAltSet(_ altsets: Array<BitSet>) -> Bool {
+    public static func hasNonConflictingAltSet(_ altsets: [BitSet]) -> Bool {
         for alts: BitSet in altsets {
             if alts.cardinality() == 1 {
                 return true
@@ -405,7 +404,7 @@ public enum PredictionMode {
     /// - returns: `true` if `altsets` contains a _java.util.BitSet_ with
     /// _java.util.BitSet#cardinality cardinality_ &gt; 1, otherwise `false`
     /// 
-    public static func hasConflictingAltSet(_ altsets: Array<BitSet>) -> Bool {
+    public static func hasConflictingAltSet(_ altsets: [BitSet]) -> Bool {
         for alts: BitSet in altsets {
             if alts.cardinality() > 1 {
                 return true
@@ -421,7 +420,7 @@ public enum PredictionMode {
     /// - returns: `true` if every member of `altsets` is equal to the
     /// others, otherwise `false`
     /// 
-    public static func allSubsetsEqual(_ altsets: Array<BitSet>) -> Bool {
+    public static func allSubsetsEqual(_ altsets: [BitSet]) -> Bool {
 
         let first: BitSet = altsets[0]
         for it in altsets {
@@ -440,10 +439,10 @@ public enum PredictionMode {
     /// 
     /// - parameter altsets: a collection of alternative subsets
     /// 
-    public static func getUniqueAlt(_ altsets: Array<BitSet>) throws -> Int {
+    public static func getUniqueAlt(_ altsets: [BitSet]) -> Int {
         let all: BitSet = getAlts(altsets)
         if all.cardinality() == 1 {
-            return try all.nextSetBit(0)
+            return all.firstSetBit()
         }
         return ATN.INVALID_ALT_NUMBER
     }
@@ -467,9 +466,8 @@ public enum PredictionMode {
     /// 
     /// Get union of all alts from configs. - Since: 4.5.1
     /// 
-    public static func getAlts(_ configs: ATNConfigSet) throws -> BitSet {
-
-        return try configs.getAltBitSet()
+    public static func getAlts(_ configs: ATNConfigSet) -> BitSet {
+        return configs.getAltBitSet()
 
     }
 
@@ -483,9 +481,8 @@ public enum PredictionMode {
     /// 
     /// 
 
-    public static func getConflictingAltSubsets(_ configs: ATNConfigSet) throws -> Array<BitSet> {
-
-        return try configs.getConflictingAltSubsets()
+    public static func getConflictingAltSubsets(_ configs: ATNConfigSet) -> [BitSet] {
+        return configs.getConflictingAltSubsets()
     }
 
     /// 
@@ -496,16 +493,13 @@ public enum PredictionMode {
     /// map[c._org.antlr.v4.runtime.atn.ATNConfig#state state_] U= c._org.antlr.v4.runtime.atn.ATNConfig#alt alt_
     /// 
     /// 
-    public static func getStateToAltMap(_ configs: ATNConfigSet) throws -> HashMap<ATNState, BitSet> {
-
-        return try configs.getStateToAltMap()
+    public static func getStateToAltMap(_ configs: ATNConfigSet) -> HashMap<ATNState, BitSet> {
+        return configs.getStateToAltMap()
     }
 
-    public static func hasStateAssociatedWithOneAlt(_ configs: ATNConfigSet) throws -> Bool {
-        let x: HashMap<ATNState, BitSet> = try getStateToAltMap(configs)
-        let values = x.values
-        for alts: BitSet in values {
-
+    public static func hasStateAssociatedWithOneAlt(_ configs: ATNConfigSet) -> Bool {
+        let x = getStateToAltMap(configs)
+        for alts in x.values {
             if alts.cardinality() == 1 {
                 return true
             }
@@ -513,17 +507,17 @@ public enum PredictionMode {
         return false
     }
 
-    public static func getSingleViableAlt(_ altsets: Array<BitSet>) throws -> Int {
-        let viableAlts: BitSet = BitSet()
-        for alts: BitSet in altsets {
-            let minAlt: Int = try alts.nextSetBit(0)
-            try viableAlts.set(minAlt)
+    public static func getSingleViableAlt(_ altsets: [BitSet]) -> Int {
+        let viableAlts = BitSet()
+        for alts in altsets {
+            let minAlt = alts.firstSetBit()
+            try! viableAlts.set(minAlt)
             if viableAlts.cardinality() > 1 {
                 // more than 1 viable alt
                 return ATN.INVALID_ALT_NUMBER
             }
         }
-        return try viableAlts.nextSetBit(0)
+        return viableAlts.firstSetBit()
     }
 
 }

@@ -63,7 +63,7 @@ public protocol ANTLRErrorStrategy {
     /// - throws: _RecognitionException_ if the error strategy could not recover from
     /// the recognition exception
     /// 
-    func recover(_ recognizer: Parser, _ e: AnyObject) throws
+    func recover(_ recognizer: Parser, _ e: RecognitionException) throws
 
     /// 
     /// This method provides the error handler with an opportunity to handle
@@ -115,5 +115,5 @@ public protocol ANTLRErrorStrategy {
     /// - parameter recognizer: the parser instance
     /// - parameter e: the recognition exception to report
     /// 
-    func reportError(_ recognizer: Parser, _ e: AnyObject)
+    func reportError(_ recognizer: Parser, _ e: RecognitionException)
 }

@@ -22,19 +22,13 @@ public final class RangeTransition: Transition, CustomStringConvertible {
     }
 
     override
-    //old label()
-    public func labelIntervalSet() throws -> IntervalSet {
-        return try IntervalSet.of(from, to)
+    public func labelIntervalSet() -> IntervalSet? {
+        return IntervalSet.of(from, to)
     }
 
     override
     public func matches(_ symbol: Int, _ minVocabSymbol: Int, _ maxVocabSymbol: Int) -> Bool {
         return symbol >= from && symbol <= to
-    }
-
-
-    public func toString() -> String {
-        return description
     }
 
     public var description: String {

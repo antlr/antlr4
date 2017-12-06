@@ -27,6 +27,8 @@ import org.antlr.v4.parse.ToolANTLRParser;
 import org.antlr.v4.parse.v3TreeGrammarException;
 import org.antlr.v4.runtime.RuntimeMetaData;
 import org.antlr.v4.runtime.misc.LogManager;
+import org.antlr.v4.runtime.misc.IntegerList;
+import org.antlr.v4.runtime.atn.ATNSerializer;
 import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.tool.ANTLRMessage;
 import org.antlr.v4.tool.ANTLRToolListener;
@@ -115,26 +117,28 @@ public class Tool {
 	public Map<String, String> grammarOptions = null;
 	public boolean warnings_are_errors = false;
 	public boolean longMessages = false;
+	public boolean exact_output_dir = false;
 
     public static Option[] optionDefs = {
-        new Option("outputDirectory",	"-o", OptionArgType.STRING, "specify output directory where all output is generated"),
-        new Option("libDirectory",		"-lib", OptionArgType.STRING, "specify location of grammars, tokens files"),
-        new Option("generate_ATN_dot",	"-atn", "generate rule augmented transition network diagrams"),
-		new Option("grammarEncoding",	"-encoding", OptionArgType.STRING, "specify grammar file encoding; e.g., euc-jp"),
-		new Option("msgFormat",			"-message-format", OptionArgType.STRING, "specify output style for messages in antlr, gnu, vs2005"),
-		new Option("longMessages",		"-long-messages", "show exception details when available for errors and warnings"),
-		new Option("gen_listener",		"-listener", "generate parse tree listener (default)"),
-		new Option("gen_listener",		"-no-listener", "don't generate parse tree listener"),
-		new Option("gen_visitor",		"-visitor", "generate parse tree visitor"),
-		new Option("gen_visitor",		"-no-visitor", "don't generate parse tree visitor (default)"),
-		new Option("genPackage",		"-package", OptionArgType.STRING, "specify a package/namespace for the generated code"),
-		new Option("gen_dependencies",	"-depend", "generate file dependencies"),
-		new Option("",					"-D<option>=value", "set/override a grammar-level option"),
-		new Option("warnings_are_errors", "-Werror", "treat warnings as errors"),
-        new Option("launch_ST_inspector", "-XdbgST", "launch StringTemplate visualizer on generated code"),
+		new Option("outputDirectory",             "-o", OptionArgType.STRING, "specify output directory where all output is generated"),
+		new Option("libDirectory",                "-lib", OptionArgType.STRING, "specify location of grammars, tokens files"),
+		new Option("generate_ATN_dot",            "-atn", "generate rule augmented transition network diagrams"),
+		new Option("grammarEncoding",             "-encoding", OptionArgType.STRING, "specify grammar file encoding; e.g., euc-jp"),
+		new Option("msgFormat",                   "-message-format", OptionArgType.STRING, "specify output style for messages in antlr, gnu, vs2005"),
+		new Option("longMessages",                "-long-messages", "show exception details when available for errors and warnings"),
+		new Option("gen_listener",                "-listener", "generate parse tree listener (default)"),
+		new Option("gen_listener",                "-no-listener", "don't generate parse tree listener"),
+		new Option("gen_visitor",                 "-visitor", "generate parse tree visitor"),
+		new Option("gen_visitor",                 "-no-visitor", "don't generate parse tree visitor (default)"),
+		new Option("genPackage",                  "-package", OptionArgType.STRING, "specify a package/namespace for the generated code"),
+		new Option("gen_dependencies",            "-depend", "generate file dependencies"),
+		new Option("",                            "-D<option>=value", "set/override a grammar-level option"),
+		new Option("warnings_are_errors",         "-Werror", "treat warnings as errors"),
+		new Option("launch_ST_inspector",         "-XdbgST", "launch StringTemplate visualizer on generated code"),
 		new Option("ST_inspector_wait_for_close", "-XdbgSTWait", "wait for STViz to close before continuing"),
-        new Option("force_atn",			"-Xforce-atn", "use the ATN simulator for all predictions"),
-		new Option("log",   			"-Xlog", "dump lots of logging info to antlr-timestamp.log"),
+		new Option("force_atn",                   "-Xforce-atn", "use the ATN simulator for all predictions"),
+		new Option("log",                         "-Xlog", "dump lots of logging info to antlr-timestamp.log"),
+	    new Option("exact_output_dir",            "-Xexact-output-dir", "all output goes into -o dir regardless of paths/package"),
 	};
 
 	// helper vars for option management
@@ -191,8 +195,11 @@ public class Tool {
 	public Tool(String[] args) {
 		this.args = args;
 		errMgr = new ErrorManager(this);
-		errMgr.setFormat(msgFormat);
+		// We have to use the default message format until we have
+		// parsed the -message-format command line option.
+		errMgr.setFormat("antlr");
 		handleArgs();
+		errMgr.setFormat(msgFormat);
 	}
 
 	protected void handleArgs() {
@@ -246,7 +253,7 @@ public class Tool {
 			haveOutputDir = true;
 			if (outDir.exists() && !outDir.isDirectory()) {
 				errMgr.toolError(ErrorType.OUTPUT_DIR_IS_FILE, outputDirectory);
-				libDirectory = ".";
+				outputDirectory = ".";
 			}
 		}
 		else {
@@ -389,6 +396,8 @@ public class Tool {
 		g.atn = factory.createATN();
 
 		if ( generate_ATN_dot ) generateATNs(g);
+
+		if ( g.tool.getNumErrors()==0 ) generateInterpreterData(g);
 
 		// PERFORM GRAMMAR ANALYSIS ON ATN: BUILD DECISION DFAs
 		AnalysisPipeline anal = new AnalysisPipeline(g);
@@ -693,6 +702,64 @@ public class Tool {
 		}
 	}
 
+	private void generateInterpreterData(Grammar g) {
+		StringBuilder content = new StringBuilder();
+
+		content.append("token literal names:\n");
+		String[] names = g.getTokenLiteralNames();
+		for (String name : names) {
+			content.append(name + "\n");
+		}
+		content.append("\n");
+
+		content.append("token symbolic names:\n");
+		names = g.getTokenSymbolicNames();
+		for (String name : names) {
+			content.append(name + "\n");
+		}
+		content.append("\n");
+
+		content.append("rule names:\n");
+		names = g.getRuleNames();
+		for (String name : names) {
+			content.append(name + "\n");
+		}
+		content.append("\n");
+
+		if ( g.isLexer() ) {
+			content.append("channel names:\n");
+			content.append("DEFAULT_TOKEN_CHANNEL\n");
+			content.append("HIDDEN\n");
+			for (String channel : g.channelValueToNameList) {
+				content.append(channel + "\n");
+			}
+			content.append("\n");
+
+			content.append("mode names:\n");
+			for (String mode : ((LexerGrammar)g).modes.keySet()) {
+				content.append(mode + "\n");
+			}
+		}
+		content.append("\n");
+
+		IntegerList serializedATN = ATNSerializer.getSerialized(g.atn);
+		content.append("atn:\n");
+		content.append(serializedATN.toString());
+
+		try {
+			Writer fw = getOutputFileWriter(g, g.name + ".interp");
+			try {
+				fw.write(content.toString());
+			}
+			finally {
+				fw.close();
+			}
+		}
+		catch (IOException ioe) {
+			errMgr.toolError(ErrorType.CANNOT_WRITE_FILE, ioe);
+		}
+	}
+
 	/** This method is used by all code generators to create new output
 	 *  files. If the outputDir set by -o is not present it will be created.
 	 *  The final filename is sensitive to the output directory and
@@ -758,6 +825,10 @@ public class Tool {
 	 * @param fileNameWithPath path to input source
 	 */
 	public File getOutputDirectory(String fileNameWithPath) {
+		if ( exact_output_dir ) {
+			return new_getOutputDirectory(fileNameWithPath);
+		}
+
 		File outputDir;
 		String fileDirectory;
 
@@ -783,12 +854,12 @@ public class Tool {
 			// -o . /usr/lib/t.g4 => ./T.java
 			if (fileDirectory != null &&
 				(new File(fileDirectory).isAbsolute() ||
-				 fileDirectory.startsWith("~"))) { // isAbsolute doesn't count this :(
+					fileDirectory.startsWith("~"))) { // isAbsolute doesn't count this :(
 				// somebody set the dir, it takes precendence; write new file there
 				outputDir = new File(outputDirectory);
 			}
 			else {
-				// -o /tmp subdir/t.g4 => /tmp/subdir/t.g4
+				// -o /tmp subdir/t.g4 => /tmp/subdir/T.java
 				if (fileDirectory != null) {
 					outputDir = new File(outputDirectory, fileDirectory);
 				}
@@ -796,6 +867,37 @@ public class Tool {
 					outputDir = new File(outputDirectory);
 				}
 			}
+		}
+		else {
+			// they didn't specify a -o dir so just write to location
+			// where grammar is, absolute or relative, this will only happen
+			// with command line invocation as build tools will always
+			// supply an output directory.
+			outputDir = new File(fileDirectory);
+		}
+		return outputDir;
+	}
+
+	/** @since 4.7.1 in response to -Xexact-output-dir */
+	public File new_getOutputDirectory(String fileNameWithPath) {
+		File outputDir;
+		String fileDirectory;
+
+		if (fileNameWithPath.lastIndexOf(File.separatorChar) == -1) {
+			// No path is included in the file name, so make the file
+			// directory the same as the parent grammar (which might still be just ""
+			// but when it is not, we will write the file in the correct place.
+			fileDirectory = ".";
+		}
+		else {
+			fileDirectory = fileNameWithPath.substring(0, fileNameWithPath.lastIndexOf(File.separatorChar));
+		}
+		if ( haveOutputDir ) {
+			// -o /tmp /var/lib/t.g4 => /tmp/T.java
+			// -o subdir/output /usr/lib/t.g4 => subdir/output/T.java
+			// -o . /usr/lib/t.g4 => ./T.java
+			// -o /tmp subdir/t.g4 => /tmp/T.java
+			outputDir = new File(outputDirectory);
 		}
 		else {
 			// they didn't specify a -o dir so just write to location

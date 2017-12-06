@@ -270,7 +270,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	public static final boolean retry_debug = false;
 
 	/** Just in case this optimization is bad, add an ENV variable to turn it off */
-	public static final boolean TURN_OFF_LR_LOOP_ENTRY_BRANCH_OPT = Boolean.parseBoolean(System.getenv("TURN_OFF_LR_LOOP_ENTRY_BRANCH_OPT"));
+	public static final boolean TURN_OFF_LR_LOOP_ENTRY_BRANCH_OPT = Boolean.parseBoolean(getSafeEnv("TURN_OFF_LR_LOOP_ENTRY_BRANCH_OPT"));
 
 	protected final Parser parser;
 
@@ -1541,11 +1541,6 @@ public class ParserATNSimulator extends ATNSimulator {
 			ATNConfig c = getEpsilonTarget(config, t, continueCollecting,
 										   depth == 0, fullCtx, treatEofAsEpsilon);
 			if ( c!=null ) {
-				if (!t.isEpsilon() && !closureBusy.add(c)) {
-					// avoid infinite recursion for EOF* and EOF+
-					continue;
-				}
-
 				int newDepth = depth;
 				if ( config.state instanceof RuleStopState) {
 					assert !fullCtx;
@@ -1555,11 +1550,6 @@ public class ParserATNSimulator extends ATNSimulator {
 					// come in handy and we avoid evaluating context dependent
 					// preds if this is > 0.
 
-					if (!closureBusy.add(c)) {
-						// avoid infinite recursion for right-recursive rules
-						continue;
-					}
-
 					if (_dfa != null && _dfa.isPrecedenceDfa()) {
 						int outermostPrecedenceReturn = ((EpsilonTransition)t).outermostPrecedenceReturn();
 						if (outermostPrecedenceReturn == _dfa.atnStartState.ruleIndex) {
@@ -1568,15 +1558,28 @@ public class ParserATNSimulator extends ATNSimulator {
 					}
 
 					c.reachesIntoOuterContext++;
+
+					if (!closureBusy.add(c)) {
+						// avoid infinite recursion for right-recursive rules
+						continue;
+					}
+
 					configs.dipsIntoOuterContext = true; // TODO: can remove? only care when we add to set per middle of this method
 					assert newDepth > Integer.MIN_VALUE;
 					newDepth--;
 					if ( debug ) System.out.println("dips into outer ctx: "+c);
 				}
-				else if (t instanceof RuleTransition) {
-					// latch when newDepth goes negative - once we step out of the entry context we can't return
-					if (newDepth >= 0) {
-						newDepth++;
+				else {
+					if (!t.isEpsilon() && !closureBusy.add(c)) {
+						// avoid infinite recursion for EOF* and EOF+
+						continue;
+					}
+
+					if (t instanceof RuleTransition) {
+						// latch when newDepth goes negative - once we step out of the entry context we can't return
+						if (newDepth >= 0) {
+							newDepth++;
+						}
 					}
 				}
 
@@ -2177,5 +2180,15 @@ public class ParserATNSimulator extends ATNSimulator {
 	 */
 	public Parser getParser() {
 		return parser;
+	}
+
+	public static String getSafeEnv(String envName) {
+		try {
+			return System.getenv(envName);
+		}
+		catch(SecurityException e) {
+			// use the default value
+		}
+		return null;
 	}
 }

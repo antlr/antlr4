@@ -11,30 +11,18 @@
 /// Disambiguating predicate evaluation occurs when we test a predicate during
 /// prediction.
 /// 
-public class FailedPredicateException: RecognitionException<ParserATNSimulator> {
+public class FailedPredicateException: RecognitionException {
 	private final var ruleIndex: Int
 	private final var predicateIndex: Int
 	private final var predicate: String?
 
-	public convenience init(_ recognizer: Parser) throws {
-		try self.init(recognizer, nil)
-	}
+	public init(_ recognizer: Parser, _ predicate: String? = nil, _ message: String? = nil) {
+		let s = recognizer.getInterpreter().atn.states[recognizer.getState()]!
 
-	public convenience init(_ recognizer: Parser, _ predicate: String?)throws {
-		try self.init(recognizer, predicate, nil)
-	}
-
-	public   init(_ recognizer: Parser,
-									_ predicate: String?,
-									_ message: String?) throws
-	{
-
-		let s: ATNState  = recognizer.getInterpreter().atn.states[recognizer.getState()]!
-
-		let trans: AbstractPredicateTransition = s.transition(0) as! AbstractPredicateTransition
-		if trans is PredicateTransition {
-			self.ruleIndex = (trans as! PredicateTransition).ruleIndex
-			self.predicateIndex = (trans as! PredicateTransition).predIndex
+		let trans = s.transition(0) as! AbstractPredicateTransition
+		if let predex = trans as? PredicateTransition {
+			self.ruleIndex = predex.ruleIndex
+			self.predicateIndex = predex.predIndex
 		}
 		else {
 			self.ruleIndex = 0
@@ -43,9 +31,10 @@ public class FailedPredicateException: RecognitionException<ParserATNSimulator> 
 
 		self.predicate = predicate
 
-        super.init(FailedPredicateException.formatMessage(predicate!, message), recognizer  , recognizer.getInputStream()!, recognizer._ctx)
-
-		try self.setOffendingToken(recognizer.getCurrentToken())
+        super.init(recognizer, recognizer.getInputStream()!, recognizer._ctx, FailedPredicateException.formatMessage(predicate, message))
+        if let token = try? recognizer.getCurrentToken() {
+            setOffendingToken(token)
+        }
 	}
 
 	public func getRuleIndex() -> Int {
@@ -56,17 +45,17 @@ public class FailedPredicateException: RecognitionException<ParserATNSimulator> 
 		return predicateIndex
 	}
 
-
 	public func getPredicate() -> String? {
 		return predicate
 	}
 
 
-	private static func formatMessage(_ predicate: String, _ message: String?) -> String {
+	private static func formatMessage(_ predicate: String?, _ message: String?) -> String {
 		if message != nil {
 			return message!
 		}
 
-		return  "failed predicate: {predicate}?"   //String.format(Locale.getDefault(), "failed predicate: {%s}?", predicate);
+        let predstr = predicate ?? "<unknown>"
+		return "failed predicate: {\(predstr)}?"
 	}
 }

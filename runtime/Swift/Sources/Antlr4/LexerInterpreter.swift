@@ -9,63 +9,39 @@ public class LexerInterpreter: Lexer {
     internal final var grammarFileName: String
     internal final var atn: ATN
 
-    /// 
-    /// /@Deprecated
-    /// 
-    internal final var tokenNames: [String?]?
     internal final var ruleNames: [String]
     internal final var channelNames: [String]
     internal final var modeNames: [String]
 
-
     private final var vocabulary: Vocabulary?
 
     internal final var _decisionToDFA: [DFA]
-    internal final var _sharedContextCache: PredictionContextCache =
-    PredictionContextCache()
-//   public override init() {
-//    super.init()}
-
-//    public  convenience   init(_ input : CharStream) {
-//        self.init()
-//        self._input = input;
-//        self._tokenFactorySourcePair = (self, input);
-//    }
-    //@Deprecated
-    public convenience init(_ grammarFileName: String, _ tokenNames: Array<String?>?, _ ruleNames: Array<String>, _ channelNames: Array<String>, _ modeNames: Array<String>, _ atn: ATN, _ input: CharStream) throws {
-        try self.init(grammarFileName, Vocabulary.fromTokenNames(tokenNames), ruleNames, channelNames, modeNames, atn, input)
-    }
+    internal final var _sharedContextCache = PredictionContextCache()
 
     public init(_ grammarFileName: String, _ vocabulary: Vocabulary, _ ruleNames: Array<String>, _ channelNames: Array<String>, _ modeNames: Array<String>, _ atn: ATN, _ input: CharStream) throws {
 
         self.grammarFileName = grammarFileName
         self.atn = atn
-        self.tokenNames = [String?]()
-        //new String[atn.maxTokenType];
-        let length = tokenNames!.count
-        for i in 0..<length {
-            tokenNames![i] = vocabulary.getDisplayName(i)
-        }
-
         self.ruleNames = ruleNames
         self.channelNames = channelNames
         self.modeNames = modeNames
         self.vocabulary = vocabulary
 
-        self._decisionToDFA = [DFA]() //new DFA[atn.getNumberOfDecisions()];
-        let _decisionToDFALength = _decisionToDFA.count
-        for i in 0..<_decisionToDFALength {
+        self._decisionToDFA = [DFA]()
+        for i in 0 ..< atn.getNumberOfDecisions() {
             _decisionToDFA[i] = DFA(atn.getDecisionState(i)!, i)
         }
-        super.init()
-        self._input = input
-        self._tokenFactorySourcePair = (self, input)
+        super.init(input)
         self._interp = LexerATNSimulator(self, atn, _decisionToDFA, _sharedContextCache)
 
         if atn.grammarType != ATNType.lexer {
             throw ANTLRError.illegalArgument(msg: "The ATN must be a lexer ATN.")
 
         }
+    }
+
+    public required init(_ input: CharStream) {
+        fatalError("Use the other initializer")
     }
 
     override
@@ -76,14 +52,6 @@ public class LexerInterpreter: Lexer {
     override
     public func getGrammarFileName() -> String {
         return grammarFileName
-    }
-
-    override
-    /// 
-    /// /@Deprecated
-    /// 
-    public func getTokenNames() -> [String?]? {
-        return tokenNames
     }
 
     override

@@ -31,9 +31,9 @@ This file contains the actual layout of the messages emitted by ANTLR.
  This file contains the format that mimicks GCC output.
 */
 
-location(file, line, column) ::= "<file>:<line>:"
+location(file, line, column) ::= "<file>:<line>:<column>:"
 
-message(id, text) ::= "<text> (<id>)"
+message(id, text) ::= "<text> [error <id>]"
 
 report(location, message, type) ::= "<location> <type>: <message>"
 

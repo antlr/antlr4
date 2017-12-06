@@ -68,12 +68,12 @@ public class ParseTreePatternMatcher {
     /// 
     /// This is the backing field for _#getLexer()_.
     /// 
-    private final var lexer: Lexer
+    private final let lexer: Lexer
 
     /// 
     /// This is the backing field for _#getParser()_.
     /// 
-    private final var parser: Parser
+    private final let parser: Parser
 
     internal var start: String = "<"
     internal var stop: String = ">"
@@ -159,19 +159,18 @@ public class ParseTreePatternMatcher {
     /// _org.antlr.v4.runtime.tree.pattern.ParseTreePattern_ using this method.
     /// 
     public func compile(_ pattern: String, _ patternRuleIndex: Int) throws -> ParseTreePattern {
-        let tokenList: Array<Token> = try tokenize(pattern)
-        let tokenSrc: ListTokenSource = ListTokenSource(tokenList)
-        let tokens: CommonTokenStream = CommonTokenStream(tokenSrc)
+        let tokenList = try tokenize(pattern)
+        let tokenSrc = ListTokenSource(tokenList)
+        let tokens = CommonTokenStream(tokenSrc)
 
-        let parserInterp: ParserInterpreter = try ParserInterpreter(parser.getGrammarFileName(),
+        let parserInterp = try ParserInterpreter(parser.getGrammarFileName(),
                 parser.getVocabulary(),
                 parser.getRuleNames(),
                 parser.getATNWithBypassAlts(),
                 tokens)
 
-        var tree: ParseTree
         parserInterp.setErrorHandler(BailErrorStrategy())
-        tree = try parserInterp.parse(patternRuleIndex)
+        let tree = try parserInterp.parse(patternRuleIndex)
 
         // Make sure tree pattern compilation checks for a complete parse
         if try tokens.LA(1) != CommonToken.EOF {
@@ -214,8 +213,8 @@ public class ParseTreePatternMatcher {
 
         // x and <ID>, x and y, or x and x; or could be mismatched types
         if tree is TerminalNode && patternTree is TerminalNode {
-            let t1: TerminalNode = tree as! TerminalNode
-            let t2: TerminalNode = patternTree as! TerminalNode
+            let t1 = tree as! TerminalNode
+            let t2 = patternTree as! TerminalNode
             var mismatchedNode: ParseTree? = nil
             // both are tokens and they have same type
             if t1.getSymbol()!.getType() == t2.getSymbol()!.getType() {
@@ -252,7 +251,6 @@ public class ParseTreePatternMatcher {
             var mismatchedNode: ParseTree? = nil
             // (expr ...) and <expr>
             if let ruleTagToken = getRuleTagToken(r2) {
-                //var m : ParseTreeMatch? = nil;
                 if r1.getRuleContext().getRuleIndex() == r2.getRuleContext().getRuleIndex() {
                     // track label->list-of-nodes for both rule name and label (if any)
                     labels.map(ruleTagToken.getRuleName(), tree)
@@ -277,11 +275,8 @@ public class ParseTreePatternMatcher {
                 return mismatchedNode
             }
 
-            let n: Int = r1.getChildCount()
-            for i in 0..<n {
-                let childMatch: ParseTree? =
-                try matchImpl(r1.getChild(i) as! ParseTree, patternTree.getChild(i) as! ParseTree, labels)
-                if childMatch != nil {
+            for i in 0 ..< r1.getChildCount() {
+                if let childMatch = try matchImpl(r1[i], patternTree[i], labels) {
                     return childMatch
                 }
             }
@@ -295,41 +290,35 @@ public class ParseTreePatternMatcher {
 
     /// Is `t` `(expr <expr>)` subtree?
     internal func getRuleTagToken(_ t: ParseTree) -> RuleTagToken? {
-        if t is RuleNode {
-            let r: RuleNode = t as! RuleNode
-            if r.getChildCount() == 1 && r.getChild(0) is TerminalNode {
-                let c: TerminalNode = r.getChild(0) as! TerminalNode
-                if c.getSymbol() is RuleTagToken {
-//					print("rule tag subtree "+t.toStringTree(parser));
-                    return c.getSymbol() as? RuleTagToken
-                }
-            }
+        if let ruleNode = t as? RuleNode,
+            ruleNode.getChildCount() == 1,
+            let terminalNode = ruleNode[0] as? TerminalNode,
+            let ruleTag = terminalNode.getSymbol() as? RuleTagToken {
+//            print("rule tag subtree "+t.toStringTree(parser));
+            return ruleTag
         }
         return nil
     }
 
     public func tokenize(_ pattern: String) throws -> Array<Token> {
         // split pattern into chunks: sea (raw input) and islands (<ID>, <expr>)
-        let chunks: Array<Chunk> = try split(pattern)
+        let chunks = try split(pattern)
 
         // create token stream from text and tags
-        var tokens: Array<Token> = Array<Token>()
-        for chunk: Chunk in chunks {
-            if chunk is TagChunk {
-                let tagChunk: TagChunk = chunk as! TagChunk
+        var tokens = [Token]()
+        for chunk in chunks {
+            if let tagChunk = chunk as? TagChunk {
                 // add special rule token or conjure up new token from name
-                let firstStr = String(tagChunk.getTag()[0])
+                let firstStr = String(tagChunk.getTag().first!)
                 if firstStr.lowercased() != firstStr {
-                    //if ( Character.isUpperCase(tagChunk.getTag().charAt(0)) ) {
-                    let ttype: Int = parser.getTokenType(tagChunk.getTag())
+                    let ttype = parser.getTokenType(tagChunk.getTag())
                     if ttype == CommonToken.INVALID_TYPE {
                         throw ANTLRError.illegalArgument(msg: "Unknown token " + tagChunk.getTag() + " in pattern: " + pattern)
                     }
-                    let t: TokenTagToken = TokenTagToken(tagChunk.getTag(), ttype, tagChunk.getLabel())
+                    let t = TokenTagToken(tagChunk.getTag(), ttype, tagChunk.getLabel())
                     tokens.append(t)
                 } else {
                     if firstStr.uppercased() != firstStr {
-                        // if ( Character.isLowerCase(tagChunk.getTag().charAt(0)) ) {
                         let ruleIndex: Int = parser.getRuleIndex(tagChunk.getTag())
                         if ruleIndex == -1 {
                             throw ANTLRError.illegalArgument(msg: "Unknown rule " + tagChunk.getTag() + " in pattern: " + pattern)
@@ -341,10 +330,10 @@ public class ParseTreePatternMatcher {
                     }
                 }
             } else {
-                let textChunk: TextChunk = chunk as! TextChunk
-                let inputStream: ANTLRInputStream = ANTLRInputStream(textChunk.getText())
+                let textChunk = chunk as! TextChunk
+                let inputStream = ANTLRInputStream(textChunk.getText())
                 try lexer.setInputStream(inputStream)
-                var t: Token = try lexer.nextToken()
+                var t = try lexer.nextToken()
                 while t.getType() != CommonToken.EOF {
                     tokens.append(t)
                     t = try lexer.nextToken()
@@ -359,32 +348,35 @@ public class ParseTreePatternMatcher {
     /// 
     /// Split `<ID> = <e:expr> ;` into 4 chunks for tokenizing by _#tokenize_.
     /// 
-    public func split(_ pattern: String) throws -> Array<Chunk> {
-        var p: Int = 0
-        let n: Int = pattern.length
-        var chunks: Array<Chunk> = Array<Chunk>()
+    public func split(_ pattern: String) throws -> [Chunk] {
+        var p = pattern.startIndex
+        let n = pattern.endIndex
+        var chunks = [Chunk]()
         // find all start and stop indexes first, then collect
-        var starts: Array<Int> = Array<Int>()
-        var stops: Array<Int> = Array<Int>()
+        var starts = [Range<String.Index>]()
+        var stops = [Range<String.Index>]()
+        let escapedStart = escape + start
+        let escapedStop = escape + stop
         while p < n {
-            if p == pattern.indexOf(escape + start, startIndex: p) {
-                p += escape.length + start.length
-            } else {
-                if p == pattern.indexOf(escape + stop, startIndex: p) {
-                    p += escape.length + stop.length
-                } else {
-                    if p == pattern.indexOf(start, startIndex: p) {
-                        starts.append(p)
-                        p += start.length
-                    } else {
-                        if p == pattern.indexOf(stop, startIndex: p) {
-                            stops.append(p)
-                            p += stop.length
-                        } else {
-                            p += 1
-                        }
-                    }
-                }
+            let slice = pattern[p...]
+            if slice.hasPrefix(escapedStart) {
+                p = pattern.index(p, offsetBy: escapedStart.count)
+            }
+            else if slice.hasPrefix(escapedStop) {
+                p = pattern.index(p, offsetBy: escapedStop.count)
+            }
+            else if slice.hasPrefix(start) {
+                let upperBound = pattern.index(p, offsetBy: start.count)
+                starts.append(p ..< upperBound)
+                p = upperBound
+            }
+            else if slice.hasPrefix(stop) {
+                let upperBound = pattern.index(p, offsetBy: stop.count)
+                stops.append(p ..< upperBound)
+                p = upperBound
+            }
+            else {
+                p = pattern.index(after: p)
             }
         }
 
@@ -396,60 +388,61 @@ public class ParseTreePatternMatcher {
             throw ANTLRError.illegalArgument(msg: "missing start tag in pattern: " + pattern)
         }
 
-        let ntags: Int = starts.count
+        let ntags = starts.count
         for i in 0..<ntags {
-            if starts[i] != stops[i] {
+            if starts[i].lowerBound >= stops[i].lowerBound {
                 throw ANTLRError.illegalArgument(msg: "tag delimiters out of order in pattern: " + pattern)
-
             }
         }
 
         // collect into chunks now
         if ntags == 0 {
-
-            let text: String = pattern[0 ..< n]
+            let text = String(pattern[..<n])
             chunks.append(TextChunk(text))
         }
 
-        if ntags > 0 && starts[0] > 0 {
+        if ntags > 0 && starts[0].lowerBound > pattern.startIndex {
             // copy text up to first tag into chunks
-            let text: String = pattern[0 ..< starts[0]] //; substring(0, starts.get(0));
-            chunks.append(TextChunk(text))
+            let text = pattern[pattern.startIndex ..< starts[0].lowerBound]
+            chunks.append(TextChunk(String(text)))
         }
-        for i in 0..<ntags {
+
+        for i in 0 ..< ntags {
             // copy inside of <tag>
-            let tag: String = pattern[starts[i] + start.length ..< stops[i]]  // pattern.substring(starts.get(i) + start.length(), stops.get(i));
-            var ruleOrToken: String = tag
-            var label: String = ""
-            let colon: Int = tag.indexOf(":")
-            if colon >= 0 {
-                label = tag[0 ..< colon]    //(0,colon);
-                ruleOrToken = tag[colon + 1 ..< tag.length]   //(colon+1, tag.length());
+            let tag = pattern[starts[i].upperBound ..< stops[i].lowerBound]
+            let ruleOrToken: String
+            let label: String?
+            let bits = tag.split(separator: ":", maxSplits: 1)
+            if bits.count == 2 {
+                label = String(bits[0])
+                ruleOrToken = String(bits[1])
+            }
+            else {
+                label = nil
+                ruleOrToken = String(tag)
             }
             chunks.append(try TagChunk(label, ruleOrToken))
             if i + 1 < ntags {
                 // copy from end of <tag> to start of next
-                let text: String = pattern[stops[i] + stop.length ..< starts[i] + 1] //.substring(stops.get(i) + stop.length(), starts.get(i + 1));
-                chunks.append(TextChunk(text))
+                let text = pattern[stops[i].upperBound ..< starts[i + 1].lowerBound]
+                chunks.append(TextChunk(String(text)))
             }
         }
         if ntags > 0 {
-            let afterLastTag: Int = stops[ntags - 1] + stop.length
+            let afterLastTag = stops[ntags - 1].upperBound
             if afterLastTag < n {
                 // copy text from end of last tag to end
-                let text: String = pattern[afterLastTag ..< n]   //.substring(afterLastTag, n);
-                chunks.append(TextChunk(text))
+                let text = pattern[afterLastTag ..< n]
+                chunks.append(TextChunk(String(text)))
             }
         }
 
         // strip out the escape sequences from text chunks but not tags
-        let length = chunks.count
-        for i in 0..<length {
-            let c: Chunk = chunks[i]
-            if c is TextChunk {
-                let tc: TextChunk = c as! TextChunk
+        for i in 0 ..< chunks.count {
+            let c = chunks[i]
+            if let tc = c as? TextChunk {
                 let unescaped = tc.getText().replacingOccurrences(of: escape, with: "")
-                if unescaped.length < tc.getText().length {
+                if unescaped.count < tc.getText().count {
                     chunks[i] = TextChunk(unescaped)
                 }
             }

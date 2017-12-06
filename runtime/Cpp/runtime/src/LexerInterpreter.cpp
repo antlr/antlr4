@@ -38,7 +38,7 @@ LexerInterpreter::LexerInterpreter(const std::string &grammarFileName, const dfa
   for (size_t i = 0; i < atn.getNumberOfDecisions(); ++i) {
     _decisionToDFA.push_back(dfa::DFA(_atn.getDecisionState(i), i));
   }
-  _interpreter = new atn::LexerATNSimulator(_atn, _decisionToDFA, _sharedContextCache); /* mem-check: deleted in d-tor */
+  _interpreter = new atn::LexerATNSimulator(this, _atn, _decisionToDFA, _sharedContextCache); /* mem-check: deleted in d-tor */
 }
 
 LexerInterpreter::~LexerInterpreter()

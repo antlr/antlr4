@@ -85,27 +85,25 @@ public class Vocabulary: Hashable {
     /// the display names of tokens.
     /// 
     public static func fromTokenNames(_ tokenNames: [String?]?) -> Vocabulary {
-        guard let tokenNames = tokenNames , tokenNames.count > 0  else {
+        guard let tokenNames = tokenNames, tokenNames.count > 0 else {
             return EMPTY_VOCABULARY
         }
 
-        var literalNames: [String?] = tokenNames// Arrays.copyOf(tokenNames, tokenNames.length);
-        var symbolicNames: [String?] = tokenNames
+        var literalNames = tokenNames
+        var symbolicNames = tokenNames
         let length = tokenNames.count
         for i in 0..<length {
             guard let tokenName = tokenNames[i] else {
                 continue
             }
-            if !tokenName.isEmpty {
-                let firstChar: Character = tokenName[0]
+            if let firstChar = tokenName.first {
                 if firstChar == "\'" {
                     symbolicNames[i] = nil
                     continue
-                } else {
-                    if String(firstChar).uppercased() != String(firstChar) {
-                        literalNames[i] = nil
-                        continue
-                    }
+                }
+                else if String(firstChar).uppercased() != String(firstChar) {
+                    literalNames[i] = nil
+                    continue
                 }
             }
 
@@ -141,20 +139,17 @@ public class Vocabulary: Hashable {
 
     public func getDisplayName(_ tokenType: Int) -> String {
         if tokenType >= 0 && tokenType < displayNames.count {
-            let displayName: String? = displayNames[tokenType]
-            if displayName != nil {
-                return displayName!
+            if let displayName = displayNames[tokenType] {
+                return displayName
             }
         }
 
-        let literalName: String? = getLiteralName(tokenType)
-        if literalName != nil {
-            return literalName!
+        if let literalName = getLiteralName(tokenType) {
+            return literalName
         }
 
-        let symbolicName: String? = getSymbolicName(tokenType)
-        if symbolicName != nil {
-            return symbolicName!
+        if let symbolicName = getSymbolicName(tokenType) {
+            return symbolicName
         }
 
         return String(tokenType)

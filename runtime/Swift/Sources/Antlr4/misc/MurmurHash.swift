@@ -6,20 +6,28 @@
 
 
 /// 
+/// https://en.wikipedia.org/wiki/MurmurHash
 /// 
 /// - Author: Sam Harwell
 /// 
 
 public final class MurmurHash {
 
-    private static let DEFAULT_SEED: Int = 0
+    private static let DEFAULT_SEED: UInt32 = 0
+
+    private static let c1 = UInt32(0xCC9E2D51)
+    private static let c2 = UInt32(0x1B873593)
+    private static let r1 = UInt32(15)
+    private static let r2 = UInt32(13)
+    private static let m = UInt32(5)
+    private static let n = UInt32(0xE6546B64)
 
     /// 
     /// Initialize the hash using the default seed value.
     /// 
     /// - Returns: the intermediate hash value
     /// 
-    public static func initialize() -> Int {
+    public static func initialize() -> UInt32 {
         return initialize(DEFAULT_SEED)
     }
 
@@ -29,10 +37,18 @@ public final class MurmurHash {
     /// - Parameter seed: the seed
     /// - Returns: the intermediate hash value
     /// 
-    public static func initialize(_ seed: Int) -> Int {
+    public static func initialize(_ seed: UInt32) -> UInt32 {
         return seed
     }
 
+    private static func calcK(_ value: UInt32) -> UInt32 {
+        var k = value
+        k = k &* c1
+        k = (k << r1) | (k >> (32 - r1))
+        k = k &* c2
+        return k
+     }
+
     /// 
     /// Update the intermediate hash value for the next input `value`.
     /// 
@@ -40,31 +56,14 @@ public final class MurmurHash {
     /// - Parameter value: the value to add to the current hash
     /// - Returns: the updated intermediate hash value
     /// 
-    public static func update2(_ hashIn: Int, _ value: Int) -> Int {
-
-        let c1: Int32 = -862048943//0xCC9E2D51;
-        let c2: Int32 = 0x1B873593
-        let r1: Int32 = 15
-        let r2: Int32 = 13
-        let m: Int32 = 5
-        let n: Int32 = -430675100//0xE6546B64;
-
-        var k: Int32 = Int32(truncatingBitPattern: value)
-        k = Int32.multiplyWithOverflow(k, c1).0
-        // (k,_) = UInt32.multiplyWithOverflow(k, c1)     ;//( k * c1);
-        //TODO: CHECKE >>>
-        k = (k << r1) | (k >>> (Int32(32) - r1))  //k = (k << r1) | (k >>> (32 - r1));
-        //k =  UInt32 (truncatingBitPattern:Int64(Int64(k) * Int64(c2)));//( k * c2);
-        //(k,_) = UInt32.multiplyWithOverflow(k, c2)
-        k = Int32.multiplyWithOverflow(k, c2).0
-        var hash = Int32(hashIn)
+    public static func update2(_ hashIn: UInt32, _ value: Int) -> UInt32 {
+        let k = calcK(UInt32(truncatingIfNeeded: value))
+        var hash = hashIn
         hash = hash ^ k
-        hash = (hash << r2) | (hash >>> (Int32(32) - r2))//hash = (hash << r2) | (hash >>> (32 - r2));
-        (hash, _) = Int32.multiplyWithOverflow(hash, m)
-        (hash, _) = Int32.addWithOverflow(hash, n)
-        //hash = hash * m + n;
+        hash = (hash << r2) | (hash >> (32 - r2))
+        hash = hash &* m &+ n
         // print("murmur update2 : \(hash)")
-        return Int(hash)
+        return hash
     }
 
     /// 
@@ -74,9 +73,8 @@ public final class MurmurHash {
     /// - Parameter value: the value to add to the current hash
     /// - Returns: the updated intermediate hash value
     /// 
-    public static func update<T:Hashable>(_ hash: Int, _ value: T?) -> Int {
+    public static func update<T:Hashable>(_ hash: UInt32, _ value: T?) -> UInt32 {
         return update2(hash, value != nil ? value!.hashValue : 0)
-        // return update2(hash, value);
     }
 
     /// 
@@ -84,21 +82,24 @@ public final class MurmurHash {
     /// to form the final result of the MurmurHash 3 hash function.
     /// 
     /// - Parameter hash: the intermediate hash value
-    /// - Parameter numberOfWords: the number of integer values added to the hash
+    /// - Parameter numberOfWords: the number of UInt32 values added to the hash
     /// - Returns: the final hash result
     /// 
-    public static func finish(_ hashin: Int, _ numberOfWordsIn: Int) -> Int {
-        var hash = Int32(hashin)
-        let numberOfWords = Int32(numberOfWordsIn)
-        hash = hash ^ Int32.multiplyWithOverflow(numberOfWords, Int32(4)).0  //(numberOfWords * UInt32(4));
-        hash = hash ^ (hash >>> Int32(16))   //hash = hash ^ (hash >>> 16);
-        (hash, _) = Int32.multiplyWithOverflow(hash, Int32(-2048144789))//hash * UInt32(0x85EBCA6B);
-        hash = hash ^ (hash >>> Int32(13))//hash = hash ^ (hash >>> 13);
-        //hash = UInt32(truncatingBitPattern: UInt64(hash) * UInt64(0xC2B2AE35)) ;
-        (hash, _) = Int32.multiplyWithOverflow(hash, Int32(-1028477387))
-        hash = hash ^ (hash >>> Int32(16))//	hash = hash ^ (hash >>> 16);
+    public static func finish(_ hashin: UInt32, _ numberOfWords: Int) -> Int {
+        return Int(finish(hashin, byteCount: (numberOfWords &* 4)))
+    }
+
+    private static func finish(_ hashin: UInt32, byteCount byteCountInt: Int) -> UInt32 {
+        let byteCount = UInt32(truncatingIfNeeded: byteCountInt)
+        var hash = hashin
+        hash ^= byteCount
+        hash ^= (hash >> 16)
+        hash = hash &* 0x85EBCA6B
+        hash ^= (hash >> 13)
+        hash = hash &* 0xC2B2AE35
+        hash ^= (hash >> 16)
         //print("murmur finish : \(hash)")
-        return Int(hash)
+        return hash
     }
 
     /// 
@@ -111,14 +112,55 @@ public final class MurmurHash {
     /// - Returns: the hash code of the data
     /// 
     public static func hashCode<T:Hashable>(_ data: [T], _ seed: Int) -> Int {
-        var hash: Int = initialize(seed)
-        for value: T in data {
-            //var hashValue = value != nil ?  value.hashValue : 0
-            hash = update(hash, value.hashValue)
+        var hash = initialize(UInt32(truncatingIfNeeded: seed))
+        for value in data {
+            hash = update(hash, value)
         }
 
-        hash = finish(hash, data.count)
-        return hash
+        return finish(hash, data.count)
+    }
+
+    ///
+    /// Compute a hash for the given String and seed.  The String is encoded
+    /// using UTF-8, then the bytes are interpreted as unsigned 32-bit
+    /// little-endian values, giving UInt32 values for the update call.
+    ///
+    /// If the bytes do not evenly divide by 4, the final bytes are treated
+    /// slightly differently (not doing the final rotate / multiply / add).
+    ///
+    /// This matches the treatment of byte sequences in publicly available
+    /// test patterns (see MurmurHashTests.swift) and the example code on
+    /// Wikipedia.
+    ///
+    public static func hashString(_ s: String, _ seed: UInt32) -> UInt32 {
+        let bytes = Array(s.utf8)
+        return hashBytesLittleEndian(bytes, seed)
+    }
+
+    private static func hashBytesLittleEndian(_ bytes: [UInt8], _ seed: UInt32) -> UInt32 {
+        let byteCount = bytes.count
+
+        var hash = seed
+        for i in stride(from: 0, to: byteCount - 3, by: 4) {
+            var word = UInt32(bytes[i])
+            word |= UInt32(bytes[i + 1]) << 8
+            word |= UInt32(bytes[i + 2]) << 16
+            word |= UInt32(bytes[i + 3]) << 24
+
+            hash = update(hash, word)
+        }
+        let remaining = byteCount & 3
+        if remaining != 0 {
+            var lastWord = UInt32(0)
+            for r in 0 ..< remaining {
+                lastWord |= UInt32(bytes[byteCount - 1 - r]) << (8 * (remaining - 1 - r))
+            }
+
+            let k = calcK(lastWord)
+            hash ^= k
+        }
+
+        return finish(hash, byteCount: byteCount)
     }
 
     private init() {

@@ -136,9 +136,6 @@ public class ATNState: Hashable, CustomStringConvertible {
     }
 
 
-    public func toString() -> String {
-        return description
-    }
     public var description: String {
         //return "MyClass \(string)"
         return String(stateNumber)
@@ -183,8 +180,7 @@ public class ATNState: Hashable, CustomStringConvertible {
     }
 
     public func getStateType() -> Int {
-        RuntimeException(#function + " must be overridden")
-        return 0
+        fatalError(#function + " must be overridden")
     }
 
     public final func onlyHasEpsilonTransitions() -> Bool {

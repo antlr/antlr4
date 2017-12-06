@@ -176,7 +176,7 @@ public class BufferedTokenStream: TokenStream {
             let  index = tokens.count - 1
             throw ANTLRError.indexOutOfBounds(msg: "token index  \(i) out of range 0..\(index)")
         }
-        return tokens[i] //tokens[i]
+        return tokens[i]
     }
 
     /// 
@@ -202,7 +202,6 @@ public class BufferedTokenStream: TokenStream {
         return subset
     }
 
-    //TODO: LT(i)!.getType();
     public func LA(_ i: Int) throws -> Int {
         return try LT(i)!.getType()
     }
@@ -273,11 +272,11 @@ public class BufferedTokenStream: TokenStream {
         fetchedEOF = false
     }
 
-    public func getTokens() -> Array<Token> {
+    public func getTokens() -> [Token] {
         return tokens
     }
 
-    public func getTokens(_ start: Int, _ stop: Int) throws -> Array<Token>? {
+    public func getTokens(_ start: Int, _ stop: Int) throws -> [Token]? {
         return try getTokens(start, stop, nil)
     }
 
@@ -286,40 +285,36 @@ public class BufferedTokenStream: TokenStream {
     /// the token type BitSet.  Return null if no tokens were found.  This
     /// method looks at both on and off channel tokens.
     /// 
-    public func getTokens(_ start: Int, _ stop: Int, _ types: Set<Int>?) throws -> Array<Token>? {
+    public func getTokens(_ start: Int, _ stop: Int, _ types: Set<Int>?) throws -> [Token]? {
         try lazyInit()
-        if start < 0 || stop >= tokens.count ||
-                stop < 0 || start >= tokens.count {
-            throw ANTLRError.indexOutOfBounds(msg: "start \(start) or stop \(stop) not in 0..\(tokens.count - 1)")
+        if start < 0 || start >= tokens.count ||
+            stop < 0 || stop >= tokens.count {
+            throw ANTLRError.indexOutOfBounds(msg: "start \(start) or stop \(stop) not in 0...\(tokens.count - 1)")
 
         }
         if start > stop {
             return nil
         }
 
-
-        var filteredTokens: Array<Token> = Array<Token>()
+        var filteredTokens = [Token]()
         for i in start...stop {
-            let t: Token = tokens[i]
-            if let types = types , !types.contains(t.getType()) {
-            }else {
+            let t = tokens[i]
+            if let types = types, !types.contains(t.getType()) {
+            }
+            else {
                 filteredTokens.append(t)
             }
-
         }
         if filteredTokens.isEmpty {
             return nil
-            //filteredTokens = nil;
         }
         return filteredTokens
     }
 
-    public func getTokens(_ start: Int, _ stop: Int, _ ttype: Int) throws -> Array<Token>? {
-        //TODO Set<Int> initialCapacity
-        var s: Set<Int> = Set<Int>()
+    public func getTokens(_ start: Int, _ stop: Int, _ ttype: Int) throws -> [Token]? {
+        var s = Set<Int>()
         s.insert(ttype)
-        //s.append(ttype);
-        return try  getTokens(start, stop, s)
+        return try getTokens(start, stop, s)
     }
 
     /// 
@@ -446,14 +441,13 @@ public class BufferedTokenStream: TokenStream {
     /// Collect all hidden tokens (any off-default channel) to the left of
     /// the current token up until we see a token on DEFAULT_TOKEN_CHANNEL.
     /// 
-    public func getHiddenTokensToLeft(_ tokenIndex: Int) throws -> Array<Token>? {
+    public func getHiddenTokensToLeft(_ tokenIndex: Int) throws -> [Token]? {
         return try  getHiddenTokensToLeft(tokenIndex, -1)
     }
 
-    internal func filterForChannel(_ from: Int, _ to: Int, _ channel: Int) -> Array<Token>? {
-        var hidden: Array<Token> = Array<Token>()
-        for i in from...to {
-            let t: Token = tokens[i]
+    internal func filterForChannel(_ from: Int, _ to: Int, _ channel: Int) -> [Token]? {
+        var hidden = [Token]()
+        for t in tokens[from...to] {
             if channel == -1 {
                 if t.getChannel() != Lexer.DEFAULT_TOKEN_CHANNEL {
                     hidden.append(t)
@@ -464,7 +458,7 @@ public class BufferedTokenStream: TokenStream {
                 }
             }
         }
-        if hidden.count == 0 {
+        if hidden.isEmpty {
             return nil
         }
         return hidden
@@ -483,8 +477,8 @@ public class BufferedTokenStream: TokenStream {
     }
 
     public func getText(_ interval: Interval) throws -> String {
-        let start: Int = interval.a
-        var stop: Int = interval.b
+        let start = interval.a
+        var stop = interval.b
         if start < 0 || stop < 0 {
             return ""
         }
@@ -493,15 +487,14 @@ public class BufferedTokenStream: TokenStream {
             stop = tokens.count - 1
         }
 
-        let buf: StringBuilder = StringBuilder()
-        for i in start...stop {
-            let t: Token = tokens[i]
+        var buf = ""
+        for t in tokens[start...stop] {
             if t.getType() == BufferedTokenStream.EOF {
                 break
             }
-            buf.append(t.getText()!)
+            buf += t.getText()!
         }
-        return buf.toString()
+        return buf
     }
 
 
@@ -523,9 +516,9 @@ public class BufferedTokenStream: TokenStream {
     /// 
     public func fill() throws {
         try lazyInit()
-        let blockSize: Int = 1000
+        let blockSize = 1000
         while true {
-            let fetched: Int = try fetch(blockSize)
+            let fetched = try fetch(blockSize)
             if fetched < blockSize {
                 return
             }
