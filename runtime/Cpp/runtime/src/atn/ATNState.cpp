@@ -66,6 +66,7 @@ void ATNState::addTransition(size_t index, Transition *e) {
 }
 
 Transition *ATNState::removeTransition(size_t index) {
+  Transition *result = transitions[index];
   transitions.erase(transitions.begin() + index);
-  return nullptr;
+  return result;
 }
