@@ -66,7 +66,7 @@ set(ANTLR4CPP_EXTERNAL_ROOT ${CMAKE_BINARY_DIR}/externals/antlr4cpp)
 # external repository
 # GIT_REPOSITORY     https://github.com/antlr/antlr4.git
 set(ANTLR4CPP_EXTERNAL_REPO "https://github.com/antlr/antlr4.git")
-set(ANTLR4CPP_EXTERNAL_TAG  "4.7")
+set(ANTLR4CPP_EXTERNAL_TAG  "4.7.1")
 
 if(NOT EXISTS "${ANTLR4CPP_JAR_LOCATION}")
   message(FATAL_ERROR "Unable to find antlr tool. ANTLR4CPP_JAR_LOCATION:${ANTLR4CPP_JAR_LOCATION}")
