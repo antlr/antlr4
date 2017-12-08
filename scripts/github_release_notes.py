@@ -1,0 +1,49 @@
+# Get github issues / PR for a release
+# Exec with "python github_release_notes.py YOUR_GITHUB_API_ACCESS_TOKEN 4.7.1"
+
+from github import Github
+import sys
+
+TARGETS = ['csharp', 'cpp', 'go', 'java', 'javascript', 'python2', 'python3', 'swift']
+
+TOKEN=sys.argv[1]
+MILESTONE=sys.argv[2]
+g = Github(login_or_token=TOKEN)
+
+# Then play with your Github objects:
+org = g.get_organization("antlr")
+repo = org.get_repo("antlr4")
+milestone = [x for x in repo.get_milestones() if x.title==MILESTONE]
+milestone = milestone[0]
+
+issues = repo.get_issues(state="closed", milestone=milestone, sort="created", direction="desc")
+
+# dump bugs fixed
+print()
+print("## Issues fixed")
+for x in issues:
+    labels = [l.name for l in x.labels]
+    if x.pull_request is None and not ("type:improvement" in labels or "type:feature" in labels):
+        print("* [%s](%s) (%s)" % (x.title, x.html_url, ", ".join([l.name for l in x.labels])))
+
+
+print()
+# dump improvements closed for this release (issues or pulls)
+print("## Improvements, features")
+for x in issues:
+    labels = [l.name for l in x.labels]
+    if ("type:improvement" in labels or "type:feature" in labels):
+        print("* [%s](%s) (%s)" % (x.title, x.html_url, ", ".join(labels)))
+
+print()
+
+
+# dump PRs closed for this release by target
+print("## Pull requests grouped by target")
+for target in TARGETS:
+    print()
+    print(f"### {target} target")
+    for x in issues:
+        labels = [l.name for l in x.labels]
+        if x.pull_request is not None and f"target:{target}" in labels:
+            print("* [%s](%s) (%s)" % (x.title, x.html_url, ", ".join(labels)))
