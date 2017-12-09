@@ -159,6 +159,12 @@ With JDK 1.7 (not 6 or 8), do this:
 mvn release:prepare -Darguments="-DskipTests"
 ```
 
+Hm...per https://github.com/keybase/keybase-issues/issues/1712 we need this to make gpg work:
+
+```bash
+export GPG_TTY=$(tty)
+```
+
 Side note to set jdk 1.7 on os x:
 
 ```bash
