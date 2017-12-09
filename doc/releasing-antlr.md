@@ -159,6 +159,22 @@ With JDK 1.7 (not 6 or 8), do this:
 mvn release:prepare -Darguments="-DskipTests"
 ```
 
+Side note to set jdk 1.7 on os x:
+
+```bash
+alias java='/Library/Java/JavaVirtualMachines/jdk1.7.0_21.jdk/Contents/Home/bin/java'
+alias javac='/Library/Java/JavaVirtualMachines/jdk1.7.0_21.jdk/Contents/Home/bin/javac'
+alias javadoc='/Library/Java/JavaVirtualMachines/jdk1.7.0_21.jdk/Contents/Home/bin/javadoc'
+alias jar='/Library/Java/JavaVirtualMachines/jdk1.7.0_21.jdk/Contents/Home/bin/jar'
+```
+
+You should see 0x33 in generated .class files after 0xCAFEBABE; see [Java SE 7 = 51 (0x33 hex)](https://en.wikipedia.org/wiki/Java_class_file):
+
+```bash
+beast:/tmp/org/antlr/v4 $ od -h Tool.class |head -1
+0000000      feca    beba    0000    3300    fa04    0207    0ab8    0100
+```
+
 It will start out by asking you the version number:
 
 ```
