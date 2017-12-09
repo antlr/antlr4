@@ -10,7 +10,7 @@
 	<parent>
 		<groupId>org.antlr</groupId>
 		<artifactId>antlr4-master</artifactId>
-		<version>4.7.1</version>
+		<version>4.7.2-SNAPSHOT</version>
 	</parent>
 	<artifactId>antlr4-runtime-testsuite</artifactId>
 	<name>ANTLR 4 Runtime Tests (2nd generation)</name>
