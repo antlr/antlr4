@@ -355,8 +355,7 @@ and do again for Python 3 target
 ```bash
 cd ~/antlr/code/antlr4/runtime/Python3
 # assume you have ~/.pypirc set up
-python setup.py register -r pypi
-python setup.py sdist bdist_wininst upload -r pypi
+python3 setup.py sdist upload
 ```
 
 There are links to the artifacts in [download.html](http://www.antlr.org/download.html) already.

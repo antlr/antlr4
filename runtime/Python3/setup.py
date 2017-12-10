@@ -1,4 +1,4 @@
-from distutils.core import setup
+from setuptools import setup
 
 setup(
     name='antlr4-python3-runtime',
@@ -9,5 +9,5 @@ setup(
     license='BSD',
     author='Eric Vergnaud, Terence Parr, Sam Harwell',
     author_email='eric.vergnaud@wanadoo.fr',
-    description='ANTLR 4.7.1 runtime for Python 3.4.0'
+    description='ANTLR 4.7.1 runtime for Python 3.6.3'
 )
