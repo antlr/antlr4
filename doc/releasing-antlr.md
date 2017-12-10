@@ -347,8 +347,7 @@ Then run the usual python set up stuff:
 ```bash
 cd ~/antlr/code/antlr4/runtime/Python2
 # assume you have ~/.pypirc set up
-python setup.py register -r pypi
-python setup.py sdist bdist_wininst upload -r pypi
+python2 setup.py sdist upload
 ```
 
 and do again for Python 3 target
