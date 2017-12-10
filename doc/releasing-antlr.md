@@ -266,7 +266,9 @@ popd
 
 ### CSharp
 
-*Publishing to Nuget from Windows*
+Now we have [appveyor create artifact](https://ci.appveyor.com/project/parrt/antlr4/build/artifacts). Go to [nuget](https://www.nuget.org/packages/manage/upload) to upload the `.nupkg`.
+
+### Publishing to Nuget from Windows
 
 **Install the pre-requisites**
 
@@ -332,13 +334,12 @@ index-servers =
     pypitest
 
 [pypi]
-repository: https://pypi.python.org/pypi
 username: parrt
-password: XXX
+password: xxx
 
 [pypitest]
-repository: https://testpypi.python.org/pypi
 username: parrt
+password: xxx
 ```
 
 Then run the usual python set up stuff:
@@ -390,12 +391,12 @@ cd runtime/Cpp
 cp antlr4-cpp-runtime-source.zip ~/antlr/sites/website-antlr4/download/antlr4-cpp-runtime-4.7-source.zip
 ```
 
-On a Windows machine the build scripts checks if VS 2013 and/or VS 2015 are installed and builds binaries for each, if found. This script requires 7z to be installed (http://7-zip.org).
+On a Windows machine the build scripts checks if VS 2013 and/or VS 2015 are installed and builds binaries for each, if found. This script requires 7z to be installed (http://7-zip.org then do `set PATH=%PATH%;C:\Program Files\7-Zip\` from DOS not powershell).
 
 ```bash
 cd runtime/Cpp
 deploy-windows.cmd
-cp antlr4-cpp-runtime-vs2015.zip ~/antlr/sites/website-antlr4/download/antlr4-cpp-runtime-4.7-vs2015.zip
+cp runtime\bin\vs-2015\x64\Release DLL\antlr4-cpp-runtime-vs2015.zip ~/antlr/sites/website-antlr4/download/antlr4-cpp-runtime-4.7-vs2015.zip
 ```
 
 Move target to website (**_rename to a specific ANTLR version first if needed_**):
