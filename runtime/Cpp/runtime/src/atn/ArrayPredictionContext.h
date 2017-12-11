@@ -20,13 +20,12 @@ namespace atn {
     /// returnState == EMPTY_RETURN_STATE.
     // Also here: we use a strong reference to our parents to avoid having them freed prematurely.
     //            See also SinglePredictionContext.
-    const std::vector<Ref<PredictionContext>> parents;
 
-    /// Sorted for merge, no duplicates; if present, EMPTY_RETURN_STATE is always last.
-    const std::vector<size_t> returnStates;
+    /// Sorted for merge, no duplicates; if present, the SingletonPredictionContext with returnState EMPTY_RETURN_STATE is always last.
+    const std::vector<SingletonPredictionContext> contexts;
 
     ArrayPredictionContext(Ref<SingletonPredictionContext> const& a);
-    ArrayPredictionContext(std::vector<Ref<PredictionContext>> const& parents_, std::vector<size_t> const& returnStates);
+    ArrayPredictionContext(const std::vector<SingletonPredictionContext>& contexts_);
     virtual ~ArrayPredictionContext();
 
     virtual bool isEmpty() const override;

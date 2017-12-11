@@ -37,7 +37,7 @@ namespace atn {
 
   public:
     static size_t globalNodeCount;
-    const size_t id;
+    size_t id;
 
     /// <summary>
     /// Stores the computed hash code of this <seealso cref="PredictionContext"/>. The hash
@@ -60,9 +60,10 @@ namespace atn {
     ///  }
     /// </pre>
     /// </summary>
-    const size_t cachedHashCode;
+    size_t cachedHashCode;
 
   protected:
+    PredictionContext() = default;
     PredictionContext(size_t cachedHashCode);
     ~PredictionContext();
 
@@ -87,6 +88,7 @@ namespace atn {
     static size_t calculateHashCode(Ref<PredictionContext> parent, size_t returnState);
     static size_t calculateHashCode(const std::vector<Ref<PredictionContext>> &parents,
                                     const std::vector<size_t> &returnStates);
+    static size_t calculateHashCode(const std::vector<SingletonPredictionContext> &contexts);
 
   public:
     // dispatch
