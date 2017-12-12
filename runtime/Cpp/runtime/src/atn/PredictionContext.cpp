@@ -159,10 +159,6 @@ Ref<PredictionContext> PredictionContext::mergeSingletons(const Ref<SingletonPre
     if (existing) {
       return existing;
     }
-    existing = mergeCache->get(b, a);
-    if (existing) {
-      return existing;
-    }
   }
 
   Ref<PredictionContext> rootMerge = mergeRoot(a, b, rootIsWildcard);
@@ -248,10 +244,6 @@ Ref<PredictionContext> PredictionContext::mergeArrays(const Ref<ArrayPredictionC
     if (existing) {
       return existing;
     }
-    existing = mergeCache->get(b, a);
-    if (existing) {
-      return existing;
-    }
   }
 
   // merge sorted payloads a + b => M
@@ -316,10 +308,6 @@ Ref<PredictionContext> PredictionContext::mergeSingletonIntoArray(const Ref<Sing
 
     if (mergeCache != nullptr) {
         auto existing = mergeCache->get(a, b);
-        if (existing) {
-            return existing;
-        }
-        existing = mergeCache->get(b, a);
         if (existing) {
             return existing;
         }
@@ -618,33 +606,25 @@ std::vector<std::string> PredictionContext::toStrings(Recognizer *recognizer, co
 
 //----------------- PredictionContextMergeCache ------------------------------------------------------------------------
 
-Ref<PredictionContext> PredictionContextMergeCache::put(Ref<PredictionContext> const& key1, Ref<PredictionContext> const& key2,
-                                                        Ref<PredictionContext> const& value) {
-  Ref<PredictionContext> previous;
-
-  auto iterator = _data.find(key1);
-  if (iterator == _data.end())
-    _data[key1][key2] = value;
-  else {
-    auto iterator2 = iterator->second.find(key2);
-    if (iterator2 != iterator->second.end())
-      previous = iterator2->second;
-    iterator->second[key2] = value;
-  }
-
-  return previous;
+bool PredictionContextPair::operator == (const PredictionContextPair& o) const {
+    return *lhs == *o.lhs && *rhs == *o.rhs
+        || *lhs == *o.rhs && *rhs == *o.lhs;
 }
 
-Ref<PredictionContext> PredictionContextMergeCache::get(Ref<PredictionContext> const& key1, Ref<PredictionContext> const& key2) {
-  auto iterator = _data.find(key1);
-  if (iterator == _data.end())
-    return nullptr;
+Ref<PredictionContext> PredictionContextMergeCache::put(Ref<PredictionContext> const& key1,
+                                                        Ref<PredictionContext> const& key2,
+                                                        Ref<PredictionContext> const& value) {
+  PredictionContextPair entry({ key1, key2 });
+  return _data.insert(std::make_pair(entry, value)).first->second;
+}
 
-  auto iterator2 = iterator->second.find(key2);
-  if (iterator2 == iterator->second.end())
-    return nullptr;
-
-  return iterator2->second;
+Ref<PredictionContext> PredictionContextMergeCache::get(Ref<PredictionContext> const& key1, Ref<PredictionContext> const& key2) const {
+  PredictionContextPair entry = { key1, key2 };
+  auto i =  _data.find(entry);
+  if (i == _data.end()) {
+      return nullptr;
+  }
+  return i->second;
 }
 
 void PredictionContextMergeCache::clear() {
@@ -653,17 +633,12 @@ void PredictionContextMergeCache::clear() {
 
 std::string PredictionContextMergeCache::toString() const {
   std::string result;
-  for (auto pair : _data)
-    for (auto pair2 : pair.second)
-      result += pair2.second->toString() + "\n";
-
+  for (const auto& pair : _data)
+    result += pair.second->toString() + "\n";
   return result;
 }
 
 size_t PredictionContextMergeCache::count() const {
-  size_t result = 0;
-  for (auto entry : _data)
-    result += entry.second.size();
-  return result;
+  return _data.size();
 }
 
