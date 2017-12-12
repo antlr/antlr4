@@ -55,10 +55,10 @@ bool ArrayPredictionContext::operator == (PredictionContext const& o) const {
     return true;
   }
 
+  if (hashCode() != o.hashCode()) { return false; } // can't be same if hash is different
+
   const ArrayPredictionContext *other = dynamic_cast<const ArrayPredictionContext*>(&o);
-  if (other == nullptr || hashCode() != other->hashCode()) {
-    return false; // can't be same if hash is different
-  }
+  if (other == nullptr) { return false; }
 
   return antlrcpp::Arrays::equals(contexts, other->contexts);
 }

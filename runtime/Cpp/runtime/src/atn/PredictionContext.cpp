@@ -132,7 +132,6 @@ Ref<PredictionContext> PredictionContext::merge(const Ref<PredictionContext> &a,
   }
 
   // convert singleton so both are arrays to normalize
-  Ref<ArrayPredictionContext> left;
   if (is<SingletonPredictionContext>(a)) {
       return mergeSingletonIntoArray(std::dynamic_pointer_cast<SingletonPredictionContext>(a),
                                      std::dynamic_pointer_cast<ArrayPredictionContext>(b),
