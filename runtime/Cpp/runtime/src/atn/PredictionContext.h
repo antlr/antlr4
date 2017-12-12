@@ -15,6 +15,7 @@ namespace atn {
   struct PredictionContextHasher;
   struct PredictionContextComparer;
   class PredictionContextMergeCache;
+  class PredictionContextItem;
 
   typedef std::unordered_set<Ref<PredictionContext>, PredictionContextHasher, PredictionContextComparer> PredictionContextCache;
 
@@ -37,7 +38,7 @@ namespace atn {
 
   public:
     static size_t globalNodeCount;
-    size_t id;
+    const size_t id;
 
     /// <summary>
     /// Stores the computed hash code of this <seealso cref="PredictionContext"/>. The hash
@@ -60,10 +61,9 @@ namespace atn {
     ///  }
     /// </pre>
     /// </summary>
-    size_t cachedHashCode;
+    const size_t cachedHashCode;
 
   protected:
-    PredictionContext() = default;
     PredictionContext(size_t cachedHashCode);
     ~PredictionContext();
 
@@ -88,7 +88,7 @@ namespace atn {
     static size_t calculateHashCode(Ref<PredictionContext> parent, size_t returnState);
     static size_t calculateHashCode(const std::vector<Ref<PredictionContext>> &parents,
                                     const std::vector<size_t> &returnStates);
-    static size_t calculateHashCode(const std::vector<SingletonPredictionContext> &contexts);
+    static size_t calculateHashCode(const std::vector<PredictionContextItem> &contexts);
 
   public:
     // dispatch
@@ -194,6 +194,11 @@ namespace atn {
      */
     static Ref<PredictionContext> mergeArrays(const Ref<ArrayPredictionContext> &a,
       const Ref<ArrayPredictionContext> &b, bool rootIsWildcard, PredictionContextMergeCache *mergeCache);
+
+    static Ref<PredictionContext> mergeSingletonIntoArray(const Ref<SingletonPredictionContext> &a,
+                                                          const Ref<ArrayPredictionContext> &b,
+                                                          bool rootIsWildcard,
+                                                          PredictionContextMergeCache *mergeCache);
 
   protected:
     /// Make pass over all M parents; merge any equal() ones.

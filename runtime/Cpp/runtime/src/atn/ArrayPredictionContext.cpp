@@ -10,15 +10,23 @@
 
 using namespace antlr4::atn;
 
+PredictionContextItem::PredictionContextItem(const Ref<PredictionContext>& p, size_t s)
+  : parent(p),
+    returnState(s) { }
+
+bool PredictionContextItem::operator == (const PredictionContextItem& o) const {
+    return returnState == o.returnState && *parent == *o.parent;
+}
+
 ArrayPredictionContext::ArrayPredictionContext(Ref<SingletonPredictionContext> const& a)
   : PredictionContext(a->cachedHashCode),
-    contexts(1, *a) {
+    contexts(1, PredictionContextItem(a->parent, a->returnState)) {
    assert(a);
 }
 
-ArrayPredictionContext::ArrayPredictionContext(const std::vector<SingletonPredictionContext>& contexts_)
+ArrayPredictionContext::ArrayPredictionContext(std::vector<PredictionContextItem> contexts_)
   : PredictionContext(calculateHashCode(contexts_)),
-    contexts(contexts_) {
+    contexts(std::move(contexts_)) {
     assert(contexts.size() > 0);
 }
 

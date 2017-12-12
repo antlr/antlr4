@@ -12,6 +12,14 @@ namespace antlr4 {
 namespace atn {
 
   class SingletonPredictionContext;
+  class ANTLR4CPP_PUBLIC PredictionContextItem {
+  public:
+      Ref<PredictionContext> parent;
+      size_t returnState;
+
+      PredictionContextItem(const Ref<PredictionContext>& p, size_t s);
+      bool operator == (const PredictionContextItem& o) const;
+  };
 
   class ANTLR4CPP_PUBLIC ArrayPredictionContext : public PredictionContext {
   public:
@@ -22,10 +30,10 @@ namespace atn {
     //            See also SinglePredictionContext.
 
     /// Sorted for merge, no duplicates; if present, the SingletonPredictionContext with returnState EMPTY_RETURN_STATE is always last.
-    const std::vector<SingletonPredictionContext> contexts;
+    const std::vector<PredictionContextItem> contexts;
 
     ArrayPredictionContext(Ref<SingletonPredictionContext> const& a);
-    ArrayPredictionContext(const std::vector<SingletonPredictionContext>& contexts_);
+    ArrayPredictionContext(std::vector<PredictionContextItem> contexts_);
     virtual ~ArrayPredictionContext();
 
     virtual bool isEmpty() const override;
