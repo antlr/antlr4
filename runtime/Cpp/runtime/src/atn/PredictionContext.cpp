@@ -154,7 +154,7 @@ Ref<PredictionContext> PredictionContext::mergeSingletons(const Ref<SingletonPre
   const Ref<SingletonPredictionContext> &b, bool rootIsWildcard, PredictionContextMergeCache *mergeCache) {
 
   if (mergeCache != nullptr) { // Can be null if not given to the ATNState from which this call originates.
-    auto existing = mergeCache->get(a, b);
+    const Ref<PredictionContext>& existing = mergeCache->get(a, b);
     if (existing) {
       return existing;
     }
@@ -239,7 +239,7 @@ Ref<PredictionContext> PredictionContext::mergeArrays(const Ref<ArrayPredictionC
   const Ref<ArrayPredictionContext> &b, bool rootIsWildcard, PredictionContextMergeCache *mergeCache) {
 
   if (mergeCache != nullptr) {
-    auto existing = mergeCache->get(a, b);
+    const Ref<PredictionContext>& existing = mergeCache->get(a, b);
     if (existing) {
       return existing;
     }
@@ -306,7 +306,7 @@ Ref<PredictionContext> PredictionContext::mergeSingletonIntoArray(const Ref<Sing
                                                                   PredictionContextMergeCache *mergeCache) {
 
     if (mergeCache != nullptr) {
-        auto existing = mergeCache->get(a, b);
+        const Ref<PredictionContext>& existing = mergeCache->get(a, b);
         if (existing) {
             return existing;
         }
@@ -610,18 +610,19 @@ bool PredictionContextPair::operator == (const PredictionContextPair& o) const {
         || *lhs == *o.rhs && *rhs == *o.lhs;
 }
 
-Ref<PredictionContext> PredictionContextMergeCache::put(Ref<PredictionContext> const& key1,
-                                                        Ref<PredictionContext> const& key2,
-                                                        Ref<PredictionContext> const& value) {
+void PredictionContextMergeCache::put(Ref<PredictionContext> const& key1,
+                                      Ref<PredictionContext> const& key2,
+                                      Ref<PredictionContext> const& value) {
   PredictionContextPair entry({ key1, key2 });
-  return _data.insert(std::make_pair(entry, value)).first->second;
+  _data.insert(std::make_pair(entry, value));
 }
 
-Ref<PredictionContext> PredictionContextMergeCache::get(Ref<PredictionContext> const& key1, Ref<PredictionContext> const& key2) const {
+const Ref<PredictionContext>& PredictionContextMergeCache::get(Ref<PredictionContext> const& key1,
+                                                               Ref<PredictionContext> const& key2) const {
   PredictionContextPair entry = { key1, key2 };
   auto i =  _data.find(entry);
   if (i == _data.end()) {
-      return nullptr;
+      return _missing;
   }
   return i->second;
 }

@@ -261,15 +261,17 @@ namespace atn {
 
   class PredictionContextMergeCache {
   public:
-    Ref<PredictionContext> put(Ref<PredictionContext> const& key1, Ref<PredictionContext> const& key2,
-                               Ref<PredictionContext> const& value);
-    Ref<PredictionContext> get(Ref<PredictionContext> const& key1, Ref<PredictionContext> const& key2) const;
+    void put(Ref<PredictionContext> const& key1,
+             Ref<PredictionContext> const& key2,
+             Ref<PredictionContext> const& value);
+    const Ref<PredictionContext>& get(Ref<PredictionContext> const& key1, Ref<PredictionContext> const& key2) const;
 
     void clear();
     std::string toString() const;
     size_t count() const;
 
   private:
+    Ref<PredictionContext> _missing;
     std::unordered_map<PredictionContextPair, Ref<PredictionContext>> _data;
   };
 
