@@ -821,6 +821,12 @@ function <lexer.name>(input) {
 <lexer.name>.prototype = Object.create(<if(superClass)><superClass><else>antlr4.Lexer<endif>.prototype);
 <lexer.name>.prototype.constructor = <lexer.name>;
 
+Object.defineProperty(<lexer.name>.prototype, "atn", {
+        get : function() {
+                return atn;
+        }
+});
+
 <lexer.name>.EOF = antlr4.Token.EOF;
 <lexer.tokens:{k | <lexer.name>.<k> = <lexer.tokens.(k)>;}; separator="\n", wrap, anchor>
 

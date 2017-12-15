@@ -231,10 +231,10 @@ func (c *CommonTokenStream) previousTokenOnChannel(i, channel int) int {
 	return i
 }
 
-// getHiddenTokensToRight collects all tokens on a specified channel to the
+// GetHiddenTokensToRight collects all tokens on a specified channel to the
 // right of the current token up until we see a token on DEFAULT_TOKEN_CHANNEL
 // or EOF. If channel is -1, it finds any non-default channel token.
-func (c *CommonTokenStream) getHiddenTokensToRight(tokenIndex, channel int) []Token {
+func (c *CommonTokenStream) GetHiddenTokensToRight(tokenIndex, channel int) []Token {
 	c.lazyInit()
 
 	if tokenIndex < 0 || tokenIndex >= len(c.tokens) {
@@ -256,10 +256,10 @@ func (c *CommonTokenStream) getHiddenTokensToRight(tokenIndex, channel int) []To
 	return c.filterForChannel(from, to, channel)
 }
 
-// getHiddenTokensToLeft collects all tokens on channel to the left of the
+// GetHiddenTokensToLeft collects all tokens on channel to the left of the
 // current token until we see a token on DEFAULT_TOKEN_CHANNEL. If channel is
 // -1, it finds any non default channel token.
-func (c *CommonTokenStream) getHiddenTokensToLeft(tokenIndex, channel int) []Token {
+func (c *CommonTokenStream) GetHiddenTokensToLeft(tokenIndex, channel int) []Token {
 	c.lazyInit()
 
 	if tokenIndex < 0 || tokenIndex >= len(c.tokens) {
