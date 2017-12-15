@@ -199,11 +199,6 @@ namespace antlr4 {
                                                                   bool rootIsWildcard,
                                                                   PredictionContextMergeCache *mergeCache);
 
-        protected:
-            /// Make pass over all M parents; merge any equal() ones.
-            /// @returns true if the list has been changed (i.e. duplicates where found).
-            static bool combineCommonParents(std::vector<Ref<PredictionContext>> &parents);
-
         public:
             static std::string toDOTString(const Ref<PredictionContext> &context);
 

@@ -139,8 +139,7 @@ Ref<PredictionContext> PredictionContext::mergeSingletons(const Ref<SingletonPre
   const Ref<SingletonPredictionContext> &b, bool rootIsWildcard, PredictionContextMergeCache *mergeCache) {
 
   if (mergeCache != nullptr) { // Can be null if not given to the ATNState from which this call originates.
-    const Ref<PredictionContext>& existing = mergeCache->get(a, b);
-    if (existing) {
+    if (const Ref<PredictionContext>& existing = mergeCache->get(a, b)) {
       return existing;
     }
   }
@@ -224,8 +223,7 @@ Ref<PredictionContext> PredictionContext::mergeArrays(const Ref<ArrayPredictionC
   const Ref<ArrayPredictionContext> &b, bool rootIsWildcard, PredictionContextMergeCache *mergeCache) {
 
   if (mergeCache != nullptr) {
-    const Ref<PredictionContext>& existing = mergeCache->get(a, b);
-    if (existing) {
+    if (const Ref<PredictionContext>& existing = mergeCache->get(a, b)) {
       return existing;
     }
   }
@@ -262,23 +260,22 @@ Ref<PredictionContext> PredictionContext::mergeArrays(const Ref<ArrayPredictionC
       ++j;
   }
 
-  Ref<ArrayPredictionContext> M = std::make_shared<ArrayPredictionContext>(std::move(contexts));
-
   // if we created same array as a or b, return that instead
   // TO_DO: track whether this is possible above during merge sort for speed
-  if (*M == *a) {
-    if (mergeCache != nullptr) {
-      mergeCache->put(a, b, a);
-    }
-    return a;
+  if (antlrcpp::Arrays::equals(contexts, a->contexts)) {
+      if (mergeCache != nullptr) {
+          mergeCache->put(a, b, a);
+      }
+      return a;
   }
-  if (*M == *b) {
-    if (mergeCache != nullptr) {
-      mergeCache->put(a, b, b);
-    }
-    return b;
+  if (antlrcpp::Arrays::equals(contexts, b->contexts)) {
+      if (mergeCache != nullptr) {
+          mergeCache->put(a, b, b);
+      }
+      return b;
   }
 
+  Ref<ArrayPredictionContext> M = std::make_shared<ArrayPredictionContext>(std::move(contexts));
   if (mergeCache != nullptr) {
     mergeCache->put(a, b, M);
   }
@@ -291,8 +288,7 @@ Ref<PredictionContext> PredictionContext::mergeSingletonIntoArray(const Ref<Sing
                                                                   PredictionContextMergeCache *mergeCache) {
 
     if (mergeCache != nullptr) {
-        const Ref<PredictionContext>& existing = mergeCache->get(a, b);
-        if (existing) {
+        if (const Ref<PredictionContext>& existing = mergeCache->get(a, b)) {
             return existing;
         }
     }
@@ -313,44 +309,14 @@ Ref<PredictionContext> PredictionContext::mergeSingletonIntoArray(const Ref<Sing
         contexts.emplace(i, PredictionContextItem(a->parent, a->returnState));
     }
 
+    // Compared to mergeArrays the test for a merge constructing an input of a or b is impossible.
+    // If that happened it happened at return b; above.
+
     Ref<ArrayPredictionContext> M = std::make_shared<ArrayPredictionContext>(std::move(contexts));
-
-    // if we created same array as a or b, return that instead
-    // TO_DO: track whether this is possible above during merge sort for speed
-    if (*M == *a) {
-        if (mergeCache != nullptr) {
-            mergeCache->put(a, b, a);
-        }
-        return a;
-    }
-    if (*M == *b) {
-        if (mergeCache != nullptr) {
-            mergeCache->put(a, b, b);
-        }
-        return b;
-    }
-
     if (mergeCache != nullptr) {
         mergeCache->put(a, b, M);
     }
     return M;
-}
-
-bool PredictionContext::combineCommonParents(std::vector<Ref<PredictionContext>> &parents) {
-
-  std::set<Ref<PredictionContext>> uniqueParents;
-  for (size_t p = 0; p < parents.size(); ++p) {
-    Ref<PredictionContext> parent = parents[p];
-    if (uniqueParents.find(parent) == uniqueParents.end()) { // don't replace
-      uniqueParents.insert(parent);
-    }
-  }
-
-  for (size_t p = 0; p < parents.size(); ++p) {
-    parents[p] = *uniqueParents.find(parents[p]);
-  }
-
-  return true;
 }
 
 std::string PredictionContext::toDOTString(const Ref<PredictionContext> &context) {
