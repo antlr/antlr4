@@ -80,14 +80,13 @@ namespace antlr4 {
 
             /// This means only the EMPTY (wildcard? not sure) context is in set.
             virtual bool isEmpty() const;
+            virtual bool isSingleton() const = 0;
             virtual bool hasEmptyPath() const;
             virtual size_t hashCode() const;
 
         protected:
             static size_t calculateEmptyHashCode();
             static size_t calculateHashCode(Ref<PredictionContext> parent, size_t returnState);
-            static size_t calculateHashCode(const std::vector<Ref<PredictionContext>> &parents,
-                                            const std::vector<size_t> &returnStates);
             static size_t calculateHashCode(const std::vector<PredictionContextItem> &contexts);
 
         public:

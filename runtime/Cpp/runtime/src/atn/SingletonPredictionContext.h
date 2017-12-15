@@ -26,6 +26,7 @@ namespace atn {
     static Ref<SingletonPredictionContext> create(Ref<PredictionContext> const& parent, size_t returnState);
 
     virtual size_t size() const override;
+    virtual bool isSingleton() const override;
     virtual Ref<PredictionContext> getParent(size_t index) const override;
     virtual size_t getReturnState(size_t index) const override;
     virtual bool operator == (const PredictionContext &o) const override;

@@ -77,21 +77,6 @@ size_t PredictionContext::calculateHashCode(Ref<PredictionContext> parent, size_
   return hash;
 }
 
-size_t PredictionContext::calculateHashCode(const std::vector<Ref<PredictionContext>> &parents,
-                                            const std::vector<size_t> &returnStates) {
-  size_t hash = MurmurHash::initialize(INITIAL_HASH);
-
-  for (auto parent : parents) {
-    hash = MurmurHash::update(hash, parent);
-  }
-
-  for (auto returnState : returnStates) {
-    hash = MurmurHash::update(hash, returnState);
-  }
-
-  return MurmurHash::finish(hash, parents.size() + returnStates.size());
-}
-
 size_t PredictionContext::calculateHashCode(const std::vector<PredictionContextItem> &contexts) {
     size_t hash = MurmurHash::initialize(INITIAL_HASH);
 
@@ -115,37 +100,37 @@ Ref<PredictionContext> PredictionContext::merge(const Ref<PredictionContext> &a,
     return a;
   }
 
-  if (is<SingletonPredictionContext>(a) && is<SingletonPredictionContext>(b)) {
-    return mergeSingletons(std::dynamic_pointer_cast<SingletonPredictionContext>(a),
-                           std::dynamic_pointer_cast<SingletonPredictionContext>(b), rootIsWildcard, mergeCache);
+  if (a->isSingleton() && b->isSingleton()) {
+    return mergeSingletons(std::static_pointer_cast<SingletonPredictionContext>(a),
+                           std::static_pointer_cast<SingletonPredictionContext>(b), rootIsWildcard, mergeCache);
   }
 
   // At least one of a or b is array.
   // If one is $ and rootIsWildcard, return $ as * wildcard.
   if (rootIsWildcard) {
-    if (is<EmptyPredictionContext>(a)) {
+    if (a->isEmpty()) {
       return a;
     }
-    if (is<EmptyPredictionContext>(b)) {
+    if (b->isEmpty()) {
       return b;
     }
   }
 
   // convert singleton so both are arrays to normalize
-  if (is<SingletonPredictionContext>(a)) {
-      return mergeSingletonIntoArray(std::dynamic_pointer_cast<SingletonPredictionContext>(a),
-                                     std::dynamic_pointer_cast<ArrayPredictionContext>(b),
+  if (a->isSingleton()) {
+      return mergeSingletonIntoArray(std::static_pointer_cast<SingletonPredictionContext>(a),
+                                     std::static_pointer_cast<ArrayPredictionContext>(b),
                                      rootIsWildcard,
                                      mergeCache);
   }
-  if (is<SingletonPredictionContext>(b)) {
-      return mergeSingletonIntoArray(std::dynamic_pointer_cast<SingletonPredictionContext>(b),
-                                     std::dynamic_pointer_cast<ArrayPredictionContext>(a),
+  if (b->isSingleton()) {
+      return mergeSingletonIntoArray(std::static_pointer_cast<SingletonPredictionContext>(b),
+                                     std::static_pointer_cast<ArrayPredictionContext>(a),
                                      rootIsWildcard,
                                      mergeCache);
   }
-  return mergeArrays(std::dynamic_pointer_cast<ArrayPredictionContext>(a),
-                     std::dynamic_pointer_cast<ArrayPredictionContext>(b),
+  return mergeArrays(std::static_pointer_cast<ArrayPredictionContext>(a),
+                     std::static_pointer_cast<ArrayPredictionContext>(b),
                      rootIsWildcard,
                      mergeCache);
 }
@@ -486,7 +471,7 @@ Ref<PredictionContext> PredictionContext::getCachedContext(const Ref<PredictionC
   } else {
     std::vector<PredictionContextItem> contexts;
     for (size_t i = 0; i < parents.size(); ++i) {
-        contexts.push_back(PredictionContextItem(parents[i], std::dynamic_pointer_cast<ArrayPredictionContext>(context)->contexts[i].returnState));
+        contexts.push_back(PredictionContextItem(parents[i], std::static_pointer_cast<ArrayPredictionContext>(context)->contexts[i].returnState));
     }
     updated = std::make_shared<ArrayPredictionContext>(contexts);
     contextCache.insert(updated);

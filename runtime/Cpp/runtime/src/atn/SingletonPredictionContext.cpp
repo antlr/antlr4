@@ -27,6 +27,10 @@ Ref<SingletonPredictionContext> SingletonPredictionContext::create(Ref<Predictio
   return std::make_shared<SingletonPredictionContext>(parent, returnState);
 }
 
+bool SingletonPredictionContext::isSingleton() const {
+    return true;
+}
+
 size_t SingletonPredictionContext::size() const {
   return 1;
 }

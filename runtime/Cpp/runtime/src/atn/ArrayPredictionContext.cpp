@@ -38,6 +38,10 @@ bool ArrayPredictionContext::isEmpty() const {
   return contexts[0].returnState == EMPTY_RETURN_STATE;
 }
 
+bool ArrayPredictionContext::isSingleton() const {
+  return false;
+}
+
 size_t ArrayPredictionContext::size() const {
   return contexts.size();
 }
