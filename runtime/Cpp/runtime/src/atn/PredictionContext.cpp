@@ -152,16 +152,14 @@ Ref<PredictionContext> PredictionContext::mergeSingletons(const Ref<SingletonPre
     return rootMerge;
   }
 
-  Ref<PredictionContext> parentA = a->parent;
-  Ref<PredictionContext> parentB = b->parent;
   if (a->returnState == b->returnState) { // a == b
-    Ref<PredictionContext> parent = merge(parentA, parentB, rootIsWildcard, mergeCache);
+    Ref<PredictionContext> parent = merge(a->parent, b->parent, rootIsWildcard, mergeCache);
 
     // If parent is same as existing a or b parent or reduced to a parent, return it.
-    if (parent == parentA) { // ax + bx = ax, if a=b
+    if (*parent == *a->parent) { // ax + bx = ax, if a=b
       return a;
     }
-    if (parent == parentB) { // ax + bx = bx, if a=b
+    if (*parent == *b->parent) { // ax + bx = bx, if a=b
       return b;
     }
 
