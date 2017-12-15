@@ -555,8 +555,8 @@ std::vector<std::string> PredictionContext::toStrings(Recognizer *recognizer, co
 //----------------- PredictionContextMergeCache ------------------------------------------------------------------------
 
 bool PredictionContextPair::operator == (const PredictionContextPair& o) const {
-    return *lhs == *o.lhs && *rhs == *o.rhs
-        || *lhs == *o.rhs && *rhs == *o.lhs;
+    return (*lhs == *o.lhs && *rhs == *o.rhs)
+        || (*lhs == *o.rhs && *rhs == *o.lhs);
 }
 
 void PredictionContextMergeCache::put(Ref<PredictionContext> const& key1,
