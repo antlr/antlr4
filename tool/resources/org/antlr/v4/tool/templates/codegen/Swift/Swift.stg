@@ -354,7 +354,7 @@ func getVocabulary() -> Vocabulary {
 
 override <accessLevelNotOpen(parser)>
 init(_ input:TokenStream) throws {
-    RuntimeMetaData.checkVersion("4.7", RuntimeMetaData.VERSION)
+    RuntimeMetaData.checkVersion("4.7.1", RuntimeMetaData.VERSION)
 	try super.init(input)
 	_interp = ParserATNSimulator(self,<p.name>._ATN,<p.name>._decisionToDFA, <parser.name>._sharedContextCache)
 }

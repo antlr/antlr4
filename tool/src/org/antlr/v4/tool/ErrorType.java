@@ -1074,6 +1074,21 @@ public enum ErrorType {
 			"unicode property escapes not allowed in lexer charset range: <arg>",
 			ErrorSeverity.ERROR),
 
+	/**
+	 * Compiler Warning 184.
+	 *
+	 * <p>The token value overlapped by another token or self</p>
+	 *
+	 * <pre>
+	 * TOKEN1: 'value';
+	 * TOKEN2: 'value'; // warning
+	 * </pre>
+	 */
+	TOKEN_UNREACHABLE(
+			184,
+			"One of the token <arg> values unreachable. <arg2> is always overlapped by token <arg3>",
+			ErrorSeverity.WARNING),
+
 	/*
 	 * Backward incompatibility errors
 	 */

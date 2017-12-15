@@ -159,6 +159,28 @@ With JDK 1.7 (not 6 or 8), do this:
 mvn release:prepare -Darguments="-DskipTests"
 ```
 
+Hm...per https://github.com/keybase/keybase-issues/issues/1712 we need this to make gpg work:
+
+```bash
+export GPG_TTY=$(tty)
+```
+
+Side note to set jdk 1.7 on os x:
+
+```bash
+alias java='/Library/Java/JavaVirtualMachines/jdk1.7.0_21.jdk/Contents/Home/bin/java'
+alias javac='/Library/Java/JavaVirtualMachines/jdk1.7.0_21.jdk/Contents/Home/bin/javac'
+alias javadoc='/Library/Java/JavaVirtualMachines/jdk1.7.0_21.jdk/Contents/Home/bin/javadoc'
+alias jar='/Library/Java/JavaVirtualMachines/jdk1.7.0_21.jdk/Contents/Home/bin/jar'
+```
+
+You should see 0x33 in generated .class files after 0xCAFEBABE; see [Java SE 7 = 51 (0x33 hex)](https://en.wikipedia.org/wiki/Java_class_file):
+
+```bash
+beast:/tmp/org/antlr/v4 $ od -h Tool.class |head -1
+0000000      feca    beba    0000    3300    fa04    0207    0ab8    0100
+```
+
 It will start out by asking you the version number:
 
 ```
@@ -244,7 +266,9 @@ popd
 
 ### CSharp
 
-*Publishing to Nuget from Windows*
+Now we have [appveyor create artifact](https://ci.appveyor.com/project/parrt/antlr4/build/artifacts). Go to [nuget](https://www.nuget.org/packages/manage/upload) to upload the `.nupkg`.
+
+### Publishing to Nuget from Windows
 
 **Install the pre-requisites**
 
@@ -310,13 +334,12 @@ index-servers =
     pypitest
 
 [pypi]
-repository: https://pypi.python.org/pypi
 username: parrt
-password: XXX
+password: xxx
 
 [pypitest]
-repository: https://testpypi.python.org/pypi
 username: parrt
+password: xxx
 ```
 
 Then run the usual python set up stuff:
@@ -324,8 +347,7 @@ Then run the usual python set up stuff:
 ```bash
 cd ~/antlr/code/antlr4/runtime/Python2
 # assume you have ~/.pypirc set up
-python setup.py register -r pypi
-python setup.py sdist bdist_wininst upload -r pypi
+python2 setup.py sdist upload
 ```
 
 and do again for Python 3 target
@@ -333,8 +355,7 @@ and do again for Python 3 target
 ```bash
 cd ~/antlr/code/antlr4/runtime/Python3
 # assume you have ~/.pypirc set up
-python setup.py register -r pypi
-python setup.py sdist bdist_wininst upload -r pypi
+python3 setup.py sdist upload
 ```
 
 There are links to the artifacts in [download.html](http://www.antlr.org/download.html) already.
@@ -368,12 +389,12 @@ cd runtime/Cpp
 cp antlr4-cpp-runtime-source.zip ~/antlr/sites/website-antlr4/download/antlr4-cpp-runtime-4.7-source.zip
 ```
 
-On a Windows machine the build scripts checks if VS 2013 and/or VS 2015 are installed and builds binaries for each, if found. This script requires 7z to be installed (http://7-zip.org).
+On a Windows machine the build scripts checks if VS 2013 and/or VS 2015 are installed and builds binaries for each, if found. This script requires 7z to be installed (http://7-zip.org then do `set PATH=%PATH%;C:\Program Files\7-Zip\` from DOS not powershell).
 
 ```bash
 cd runtime/Cpp
 deploy-windows.cmd
-cp antlr4-cpp-runtime-vs2015.zip ~/antlr/sites/website-antlr4/download/antlr4-cpp-runtime-4.7-vs2015.zip
+cp runtime\bin\vs-2015\x64\Release DLL\antlr4-cpp-runtime-vs2015.zip ~/antlr/sites/website-antlr4/download/antlr4-cpp-runtime-4.7-vs2015.zip
 ```
 
 Move target to website (**_rename to a specific ANTLR version first if needed_**):

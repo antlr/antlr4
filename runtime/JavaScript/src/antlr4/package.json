@@ -1,6 +1,6 @@
 {
   "name": "antlr4",
-  "version": "4.7.0",
+  "version": "4.7.1",
   "description": "JavaScript runtime for ANTLR4",
   "main": "src/antlr4/index.js",
   "repository": "antlr/antlr4.git",
