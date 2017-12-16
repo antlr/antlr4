@@ -178,12 +178,18 @@ Ref<PredictionContext> PredictionContext::mergeSingletons(const Ref<SingletonPre
   } else {
     // a != b payloads differ
     // see if we can collapse parents due to $+x parents if local ctx
+    const Ref<PredictionContext>& parentA = a->parent;
+    Ref<PredictionContext> parentB = b->parent;
+    if (parentA == parentB || *parentA == *parentB) {
+        parentB = parentA; // modified the following so that ax + bx = [a,b]x
+    }
+    // ax + by = [ax,by] (or see above)
     Ref<PredictionContext> a_;
     if (a->returnState > b->returnState) {
-      std::vector<PredictionContextItem> contexts = { PredictionContextItem(b->parent, b->returnState), PredictionContextItem(a->parent, a->returnState) };
+      std::vector<PredictionContextItem> contexts = { PredictionContextItem(parentB, b->returnState), PredictionContextItem(parentA, a->returnState) };
       a_ = std::make_shared<ArrayPredictionContext>(contexts);
     } else {
-      std::vector<PredictionContextItem> contexts = { PredictionContextItem(a->parent, a->returnState), PredictionContextItem(b->parent, b->returnState) };
+      std::vector<PredictionContextItem> contexts = { PredictionContextItem(parentA, a->returnState), PredictionContextItem(parentB, b->returnState) };
       a_ = std::make_shared<ArrayPredictionContext>(contexts);
     }
     if (mergeCache != nullptr) {
