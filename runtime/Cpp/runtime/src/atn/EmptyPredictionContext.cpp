@@ -14,10 +14,6 @@ bool EmptyPredictionContext::isEmpty() const {
   return true;
 }
 
-bool EmptyPredictionContext::isSingleton() const {
-  return false;
-}
-
 size_t EmptyPredictionContext::size() const {
   return 1;
 }

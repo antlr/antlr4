@@ -15,7 +15,6 @@ namespace atn {
     EmptyPredictionContext();
 
     virtual bool isEmpty() const override;
-    virtual bool isSingleton() const final;
     virtual size_t size() const override;
     virtual Ref<PredictionContext> getParent(size_t index) const override;
     virtual size_t getReturnState(size_t index) const override;
