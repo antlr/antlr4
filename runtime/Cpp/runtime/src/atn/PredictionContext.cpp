@@ -139,6 +139,7 @@ Ref<PredictionContext> PredictionContext::mergeSingletons(const Ref<SingletonPre
   const Ref<SingletonPredictionContext> &b, bool rootIsWildcard, PredictionContextMergeCache *mergeCache) {
 
   if (mergeCache != nullptr) { // Can be null if not given to the ATNState from which this call originates.
+    // This is different to the Java runtime. Merge cache lookups are symmetric.
     if (const Ref<PredictionContext>& existing = mergeCache->get(a, b)) {
       return existing;
     }
@@ -221,6 +222,7 @@ Ref<PredictionContext> PredictionContext::mergeArrays(const Ref<ArrayPredictionC
   const Ref<ArrayPredictionContext> &b, bool rootIsWildcard, PredictionContextMergeCache *mergeCache) {
 
   if (mergeCache != nullptr) {
+    // This is different to the Java runtime. Merge cache lookups are symmetric.
     if (const Ref<PredictionContext>& existing = mergeCache->get(a, b)) {
       return existing;
     }
@@ -285,9 +287,10 @@ Ref<PredictionContext> PredictionContext::mergeSingletonIntoArray(const Ref<Sing
                                                                   PredictionContextMergeCache *mergeCache) {
 
     if (mergeCache != nullptr) {
-        if (const Ref<PredictionContext>& existing = mergeCache->get(a, b)) {
-            return existing;
-        }
+      // This is different to the Java runtime. Merge cache lookups are symmetric.
+      if (const Ref<PredictionContext>& existing = mergeCache->get(a, b)) {
+        return existing;
+      }
     }
 
     // merge sorted payloads a + b => M
