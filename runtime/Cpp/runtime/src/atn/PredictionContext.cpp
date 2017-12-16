@@ -232,45 +232,44 @@ Ref<PredictionContext> PredictionContext::mergeArrays(const Ref<ArrayPredictionC
   std::vector<PredictionContextItem>::const_iterator i = a->contexts.begin(), i_end = a->contexts.end();
   std::vector<PredictionContextItem>::const_iterator j = b->contexts.begin(), j_end = b->contexts.end();
   while (i != i_end && j != j_end) {
-      if (i->returnState == j->returnState) {
-          if (i->parent && j->parent && (i->returnState == EMPTY_RETURN_STATE || *i->parent == *j->parent)) {
-              contexts.emplace_back(i->parent, i->returnState);
-          } else {
-              contexts.emplace_back(merge(i->parent, j->parent, rootIsWildcard, mergeCache),
-                                    i->returnState);
-          }
-          ++i;
-          ++j;
-      } else if (i->returnState < j->returnState) {
-          contexts.emplace_back(i->parent, i->returnState);
-          ++i;
+    if (i->returnState == j->returnState) {
+      if (i->parent && j->parent && (i->returnState == EMPTY_RETURN_STATE || *i->parent == *j->parent)) {
+        contexts.emplace_back(i->parent, i->returnState);
       } else {
-          contexts.emplace_back(j->parent, j->returnState);
-          ++j;
+        contexts.emplace_back(merge(i->parent, j->parent, rootIsWildcard, mergeCache), i->returnState);
       }
-  }
-  while (i != i_end) {
+      ++i;
+      ++j;
+    } else if (i->returnState < j->returnState) {
       contexts.emplace_back(i->parent, i->returnState);
       ++i;
-  }
-  while (j != j_end) {
+    } else {
       contexts.emplace_back(j->parent, j->returnState);
       ++j;
+    }
+  }
+  while (i != i_end) {
+    contexts.emplace_back(i->parent, i->returnState);
+    ++i;
+  }
+  while (j != j_end) {
+    contexts.emplace_back(j->parent, j->returnState);
+    ++j;
   }
 
   // if we created same array as a or b, return that instead
   // TO_DO: track whether this is possible above during merge sort for speed
   if (antlrcpp::Arrays::equals(contexts, a->contexts)) {
-      if (mergeCache != nullptr) {
-          mergeCache->put(a, b, a);
-      }
-      return a;
+    if (mergeCache != nullptr) {
+      mergeCache->put(a, b, a);
+    }
+    return a;
   }
   if (antlrcpp::Arrays::equals(contexts, b->contexts)) {
-      if (mergeCache != nullptr) {
-          mergeCache->put(a, b, b);
-      }
-      return b;
+    if (mergeCache != nullptr) {
+      mergeCache->put(a, b, b);
+    }
+    return b;
   }
 
   Ref<ArrayPredictionContext> M = std::make_shared<ArrayPredictionContext>(std::move(contexts));
