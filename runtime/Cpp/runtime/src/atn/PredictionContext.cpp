@@ -177,11 +177,11 @@ Ref<PredictionContext> PredictionContext::mergeSingletons(const Ref<SingletonPre
     // see if we can collapse parents due to $+x parents if local ctx
     Ref<PredictionContext> a_;
     if (a->returnState > b->returnState) {
-        std::vector<PredictionContextItem> contexts = { PredictionContextItem(b->parent, b->returnState), PredictionContextItem(a->parent, a->returnState) };
-        a_ = std::make_shared<ArrayPredictionContext>(contexts);
+      std::vector<PredictionContextItem> contexts = { PredictionContextItem(b->parent, b->returnState), PredictionContextItem(a->parent, a->returnState) };
+      a_ = std::make_shared<ArrayPredictionContext>(contexts);
     } else {
-        std::vector<PredictionContextItem> contexts = { PredictionContextItem(a->parent, a->returnState), PredictionContextItem(b->parent, b->returnState) };
-        a_ = std::make_shared<ArrayPredictionContext>(contexts);
+      std::vector<PredictionContextItem> contexts = { PredictionContextItem(a->parent, a->returnState), PredictionContextItem(b->parent, b->returnState) };
+      a_ = std::make_shared<ArrayPredictionContext>(contexts);
     }
     if (mergeCache != nullptr) {
       mergeCache->put(a, b, a_);
@@ -293,17 +293,18 @@ Ref<PredictionContext> PredictionContext::mergeSingletonIntoArray(const Ref<Sing
     // merge sorted payloads a + b => M
     std::vector<PredictionContextItem> contexts(b->contexts.begin(), b->contexts.end());
     std::vector<PredictionContextItem>::iterator e = contexts.end(),
-        i = std::lower_bound(contexts.begin(), e, PredictionContextItem(a->parent, a->returnState), [] (const PredictionContextItem& lhs, const PredictionContextItem& rhs) {
-            return lhs.returnState < rhs.returnState;
+      i = std::lower_bound(contexts.begin(), e, PredictionContextItem(a->parent, a->returnState),
+        [] (const PredictionContextItem& lhs, const PredictionContextItem& rhs) {
+          return lhs.returnState < rhs.returnState;
         });
     if (i != e && i->returnState == a->returnState) {
-        if (*i->parent == *a->parent) {
-            return b;
-        } else {
-            i->parent = merge(a->parent, i->parent, rootIsWildcard, mergeCache);
-        }
+      if (*i->parent == *a->parent) {
+        return b;
+      } else {
+        i->parent = merge(a->parent, i->parent, rootIsWildcard, mergeCache);
+      }
     } else {
-        contexts.emplace(i, PredictionContextItem(a->parent, a->returnState));
+      contexts.emplace(i, PredictionContextItem(a->parent, a->returnState));
     }
 
     // Compared to mergeArrays the test for a merge constructing an input of a or b is impossible.
