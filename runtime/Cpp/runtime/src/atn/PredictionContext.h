@@ -194,6 +194,12 @@ namespace atn {
     static Ref<PredictionContext> mergeArrays(const Ref<ArrayPredictionContext> &a,
                                               const Ref<ArrayPredictionContext> &b, bool rootIsWildcard, PredictionContextMergeCache *mergeCache);
 
+    /**
+     * Merge a {@link SingletonPredictionContext} into an {@link ArrayPredictionContext} instance.
+     * This method should work as if an {@link ArrayPredictionContext} containing only a has been
+     * constructed and then the method {@link ArrayPredictionContext::mergeArrays} called with the
+     * same parameters.
+     */
     static Ref<PredictionContext> mergeSingletonIntoArray(const Ref<SingletonPredictionContext> &a,
                                                           const Ref<ArrayPredictionContext> &b,
                                                           bool rootIsWildcard,

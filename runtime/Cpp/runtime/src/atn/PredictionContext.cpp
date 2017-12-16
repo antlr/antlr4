@@ -116,7 +116,9 @@ Ref<PredictionContext> PredictionContext::merge(const Ref<PredictionContext> &a,
     }
   }
 
-  // convert singleton so both are arrays to normalize
+  // This is slightly different from Java, use a different merge function for singleton into
+  // array and array merge. In Java a temporary ArrayPredictionContext is created containing
+  // only one item and then the same merge function is used.
   if (a->isSingleton()) {
       return mergeSingletonIntoArray(std::static_pointer_cast<SingletonPredictionContext>(a),
                                      std::static_pointer_cast<ArrayPredictionContext>(b),
@@ -231,35 +233,44 @@ Ref<PredictionContext> PredictionContext::mergeArrays(const Ref<ArrayPredictionC
   // merge sorted payloads a + b => M
   std::vector<PredictionContextItem> contexts;
   contexts.reserve(a->contexts.size() + b->contexts.size());
-  std::vector<PredictionContextItem>::const_iterator i = a->contexts.begin(), i_end = a->contexts.end();
-  std::vector<PredictionContextItem>::const_iterator j = b->contexts.begin(), j_end = b->contexts.end();
-  while (i != i_end && j != j_end) {
+  std::vector<PredictionContextItem>::const_iterator i = a->contexts.begin(), // walks a
+                                                     iEnd = a->contexts.end();
+  std::vector<PredictionContextItem>::const_iterator j = b->contexts.begin(), // walks b
+                                                     jEnd = b->contexts.end();
+  while (i != iEnd && j != jEnd) {
     if (i->returnState == j->returnState) {
-      if (i->parent && j->parent && (i->returnState == EMPTY_RETURN_STATE || *i->parent == *j->parent)) {
+      // same payload (stack tops are equal), must yield merged singleton
+      size_t payload = i->returnState;
+      // $+$ = $
+      if (i->parent && j->parent && (payload == EMPTY_RETURN_STATE || *i->parent == *j->parent)) {
         contexts.emplace_back(i->parent, i->returnState);
-      } else {
+      } else { // ax+ay -> a'[x,y]
         contexts.emplace_back(merge(i->parent, j->parent, rootIsWildcard, mergeCache), i->returnState);
       }
       ++i;
       ++j;
-    } else if (i->returnState < j->returnState) {
+    } else if (i->returnState < j->returnState) { // copy a[i] to M
       contexts.emplace_back(i->parent, i->returnState);
       ++i;
-    } else {
+    } else { // b > a, copy b[j] to M
       contexts.emplace_back(j->parent, j->returnState);
       ++j;
     }
   }
-  while (i != i_end) {
-    contexts.emplace_back(i->parent, i->returnState);
-    ++i;
-  }
-  while (j != j_end) {
-    contexts.emplace_back(j->parent, j->returnState);
-    ++j;
+  // copy over any payloads remaining in either array
+  if (i != iEnd) {
+    do {
+      contexts.emplace_back(i->parent, i->returnState);
+      ++i;
+    } while (i != iEnd);
+  } else {
+    while (j != jEnd) {
+      contexts.emplace_back(j->parent, j->returnState);
+      ++j;
+    }
   }
 
-  // if we created same array as a or b, return that instead
+  // if we created same array as the contents of a or b, return a or b instead
   // TO_DO: track whether this is possible above during merge sort for speed
   if (antlrcpp::Arrays::equals(contexts, a->contexts)) {
     if (mergeCache != nullptr) {
@@ -274,6 +285,8 @@ Ref<PredictionContext> PredictionContext::mergeArrays(const Ref<ArrayPredictionC
     return b;
   }
 
+  // This is different to the Java runtime. Construction of the returned object has been deferred
+  // until we know it will be the return value.
   Ref<ArrayPredictionContext> M = std::make_shared<ArrayPredictionContext>(std::move(contexts));
   if (mergeCache != nullptr) {
     mergeCache->put(a, b, M);
@@ -286,38 +299,44 @@ Ref<PredictionContext> PredictionContext::mergeSingletonIntoArray(const Ref<Sing
                                                                   bool rootIsWildcard,
                                                                   PredictionContextMergeCache *mergeCache) {
 
-    if (mergeCache != nullptr) {
-      // This is different to the Java runtime. Merge cache lookups are symmetric.
-      if (const Ref<PredictionContext>& existing = mergeCache->get(a, b)) {
-        return existing;
-      }
+  if (mergeCache != nullptr) {
+    // This is different to the Java runtime. Merge cache lookups are symmetric.
+    if (const Ref<PredictionContext>& existing = mergeCache->get(a, b)) {
+      return existing;
     }
+  }
 
-    // merge sorted payloads a + b => M
-    std::vector<PredictionContextItem> contexts(b->contexts.begin(), b->contexts.end());
-    std::vector<PredictionContextItem>::iterator e = contexts.end(),
-      i = std::lower_bound(contexts.begin(), e, PredictionContextItem(a->parent, a->returnState),
-        [] (const PredictionContextItem& lhs, const PredictionContextItem& rhs) {
-          return lhs.returnState < rhs.returnState;
-        });
-    if (i != e && i->returnState == a->returnState) {
-      if (*i->parent == *a->parent) {
-        return b;
-      } else {
-        i->parent = merge(a->parent, i->parent, rootIsWildcard, mergeCache);
-      }
-    } else {
-      contexts.emplace(i, PredictionContextItem(a->parent, a->returnState));
+  // merge sorted payloads a + b => M
+  std::vector<PredictionContextItem> contexts(b->contexts.begin(), b->contexts.end());
+  std::vector<PredictionContextItem>::iterator jEnd = contexts.end(),
+    j = std::lower_bound(contexts.begin(), jEnd, PredictionContextItem(a->parent, a->returnState),
+      [] (const PredictionContextItem& lhs, const PredictionContextItem& rhs) {
+        return lhs.returnState < rhs.returnState;
+      });
+  if (j != jEnd && j->returnState == a->returnState) {
+    // same payload (stack tops are equal), must yield merged singleton
+    size_t payload = j->returnState;
+    // $+$ = $
+    if (a->parent && j->parent && (payload == EMPTY_RETURN_STATE || *j->parent == *a->parent)) {
+      // a was already a member of b so a+b = b
+      return b;
+    } else { // ax+ay -> a'[x,y]
+      j->parent = merge(a->parent, j->parent, rootIsWildcard, mergeCache);
     }
+  } else { // insert a into M in order.
+    contexts.emplace(j, PredictionContextItem(a->parent, a->returnState));
+  }
 
-    // Compared to mergeArrays the test for a merge constructing an input of a or b is impossible.
-    // If that happened it happened at return b; above.
+  // Compared to mergeArrays the test for a merge constructing an input of a or b is impossible.
+  // If that happened it happened at return b; above.
 
-    Ref<ArrayPredictionContext> M = std::make_shared<ArrayPredictionContext>(std::move(contexts));
-    if (mergeCache != nullptr) {
-        mergeCache->put(a, b, M);
-    }
-    return M;
+  // This is different to the Java runtime. Construction of the returned object has been deferred
+  // until we know it will be the return value.
+  Ref<ArrayPredictionContext> M = std::make_shared<ArrayPredictionContext>(std::move(contexts));
+  if (mergeCache != nullptr) {
+    mergeCache->put(a, b, M);
+  }
+  return M;
 }
 
 std::string PredictionContext::toDOTString(const Ref<PredictionContext> &context) {
