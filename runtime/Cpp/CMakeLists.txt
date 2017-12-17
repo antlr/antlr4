@@ -2,8 +2,6 @@
 cmake_minimum_required (VERSION 2.8)
 # 2.8 needed because of ExternalProject
 
-#cmake_minimum_required (VERSION 3.0) #suggested alternative fix
-
 # Detect build type, fallback to release and throw a warning if use didn't specify any
 if(NOT CMAKE_BUILD_TYPE)
   message(WARNING "Build type not set, falling back to Release mode.
