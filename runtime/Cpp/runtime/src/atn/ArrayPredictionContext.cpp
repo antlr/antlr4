@@ -33,12 +33,12 @@ ArrayPredictionContext::ArrayPredictionContext(std::vector<PredictionContextItem
 ArrayPredictionContext::~ArrayPredictionContext() {
 }
 
-bool ArrayPredictionContext::isEmpty() const {
-  // Since EMPTY_RETURN_STATE can only appear in the last position, we don't need to verify that size == 1.
-  return contexts[0].returnState == EMPTY_RETURN_STATE;
+bool ArrayPredictionContext::isEmptyContext() const {
+  // Difference from Java runtime. Array context must contain at least 2 items.
+  return false;
 }
 
-bool ArrayPredictionContext::isSingleton() const {
+bool ArrayPredictionContext::isSingletonContext() const {
   return false;
 }
 
@@ -68,7 +68,7 @@ bool ArrayPredictionContext::operator == (PredictionContext const& o) const {
 }
 
 std::string ArrayPredictionContext::toString() const {
-  if (isEmpty()) {
+  if (isEmptyContext()) {
     return "[]";
   }
 

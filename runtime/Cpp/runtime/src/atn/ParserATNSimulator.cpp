@@ -452,7 +452,7 @@ std::unique_ptr<ATNConfigSet> ParserATNSimulator::computeReachSet(ATNConfigSet *
   // First figure out where we can reach on input t
   for (auto &c : closure_->configs) {
     if (c->state->getStateType() == ATNState::RULE_STOP) {
-      assert(c->context->isEmpty());
+      assert(c->context->isEmptyContext());
 
       if (fullCtx || t == Token::EOF) {
         skippedStopStates.push_back(c);
@@ -830,7 +830,7 @@ void ParserATNSimulator::closureCheckingStopState(Ref<ATNConfig> const& config, 
   if (config->state->getStateType() == ATNState::RULE_STOP) {
     // We hit rule end. If we have context info, use it
     // run thru all possible stack tops in ctx
-    if (!config->context->isEmpty()) {
+    if (!config->context->isEmptyContext()) {
       for (size_t i = 0; i < config->context->size(); i++) {
         if (config->context->getReturnState(i) == PredictionContext::EMPTY_RETURN_STATE) {
           if (fullCtx) {
@@ -956,7 +956,7 @@ bool ParserATNSimulator::canDropLoopEntryEdgeInLeftRecursiveRule(ATNConfig *conf
   // global FOLLOW so we can't perform optimization
   if (p->getStateType() != ATNState::STAR_LOOP_ENTRY ||
       !((StarLoopEntryState *)p)->isPrecedenceDecision || // Are we the special loop entry/exit state?
-      config->context->isEmpty() ||                      // If SLL wildcard
+      config->context->isEmptyContext() ||                // If SLL wildcard
       config->context->hasEmptyPath())
   {
     return false;

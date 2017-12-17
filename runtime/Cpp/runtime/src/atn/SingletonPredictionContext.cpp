@@ -27,7 +27,7 @@ Ref<SingletonPredictionContext> SingletonPredictionContext::create(Ref<Predictio
   return std::make_shared<SingletonPredictionContext>(parent, returnState);
 }
 
-bool SingletonPredictionContext::isSingleton() const {
+bool SingletonPredictionContext::isSingletonContext() const {
     return true;
 }
 

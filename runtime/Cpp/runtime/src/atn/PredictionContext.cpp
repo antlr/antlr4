@@ -50,7 +50,7 @@ Ref<PredictionContext> PredictionContext::fromRuleContext(const ATN &atn, RuleCo
   return SingletonPredictionContext::create(parent, transition->followState->stateNumber);
 }
 
-bool PredictionContext::isEmpty() const {
+bool PredictionContext::isEmptyContext() const {
   return this == EMPTY.get();
 }
 
@@ -100,7 +100,7 @@ Ref<PredictionContext> PredictionContext::merge(const Ref<PredictionContext> &a,
     return a;
   }
 
-  if (a->isSingleton() && b->isSingleton()) {
+  if (a->isSingletonContext() && b->isSingletonContext()) {
     return mergeSingletons(std::static_pointer_cast<SingletonPredictionContext>(a),
                            std::static_pointer_cast<SingletonPredictionContext>(b), rootIsWildcard, mergeCache);
   }
@@ -108,10 +108,10 @@ Ref<PredictionContext> PredictionContext::merge(const Ref<PredictionContext> &a,
   // At least one of a or b is array.
   // If one is $ and rootIsWildcard, return $ as * wildcard.
   if (rootIsWildcard) {
-    if (a->isEmpty()) {
+    if (a->isEmptyContext()) {
       return a;
     }
-    if (b->isEmpty()) {
+    if (b->isEmptyContext()) {
       return b;
     }
   }
@@ -119,13 +119,13 @@ Ref<PredictionContext> PredictionContext::merge(const Ref<PredictionContext> &a,
   // This is slightly different from Java, use a different merge function for singleton into
   // array and array merge. In Java a temporary ArrayPredictionContext is created containing
   // only one item and then the same merge function is used.
-  if (a->isSingleton()) {
+  if (a->isSingletonContext()) {
       return mergeSingletonIntoArray(std::static_pointer_cast<SingletonPredictionContext>(a),
                                      std::static_pointer_cast<ArrayPredictionContext>(b),
                                      rootIsWildcard,
                                      mergeCache);
   }
-  if (b->isSingleton()) {
+  if (b->isSingletonContext()) {
       return mergeSingletonIntoArray(std::static_pointer_cast<SingletonPredictionContext>(b),
                                      std::static_pointer_cast<ArrayPredictionContext>(a),
                                      rootIsWildcard,
@@ -411,7 +411,7 @@ std::string PredictionContext::toDOTString(const Ref<PredictionContext> &context
 // The "visited" map is just a temporary structure to control the retrieval process (which is recursive).
 Ref<PredictionContext> PredictionContext::getCachedContext(const Ref<PredictionContext> &context,
   PredictionContextCache &contextCache, std::map<Ref<PredictionContext>, Ref<PredictionContext>> &visited) {
-  if (context->isEmpty()) {
+  if (context->isEmptyContext()) {
     return context;
   }
 
@@ -524,7 +524,7 @@ std::vector<std::string> PredictionContext::toStrings(Recognizer *recognizer, co
     std::stringstream ss;
     ss << "[";
     bool outerContinue = false;
-    while (!p->isEmpty() && p != stop.get()) {
+    while (!p->isEmptyContext() && p != stop.get()) {
       size_t index = 0;
       if (p->size() > 0) {
         size_t bits = 1;
@@ -553,7 +553,7 @@ std::vector<std::string> PredictionContext::toStrings(Recognizer *recognizer, co
         std::string ruleName = recognizer->getRuleNames()[s->ruleIndex];
         ss << ruleName;
       } else if (p->getReturnState(index) != EMPTY_RETURN_STATE) {
-        if (!p->isEmpty()) {
+        if (!p->isEmptyContext()) {
           if (ss.tellp() > 1) {
             // first char is '[', if more than that this isn't the first rule
             ss << ' ';
