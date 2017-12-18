@@ -27,9 +27,8 @@ public class LexerInterpreter: Lexer {
         self.modeNames = modeNames
         self.vocabulary = vocabulary
 
-        self._decisionToDFA = [DFA]() //new DFA[atn.getNumberOfDecisions()];
-        let _decisionToDFALength = _decisionToDFA.count
-        for i in 0..<_decisionToDFALength {
+        self._decisionToDFA = [DFA]()
+        for i in 0 ..< atn.getNumberOfDecisions() {
             _decisionToDFA[i] = DFA(atn.getDecisionState(i)!, i)
         }
         super.init(input)

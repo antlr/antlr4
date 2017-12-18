@@ -353,6 +353,34 @@ func PrintArrayJavaStyle(sa []string) string {
 	return buffer.String()
 }
 
+// The following routines were lifted from bits.rotate* available in Go 1.9.
+
+const uintSize = 32 << (^uint(0) >> 32 & 1) // 32 or 64
+
+// rotateLeft returns the value of x rotated left by (k mod UintSize) bits.
+// To rotate x right by k bits, call RotateLeft(x, -k).
+func rotateLeft(x uint, k int) uint {
+	if uintSize == 32 {
+		return uint(rotateLeft32(uint32(x), k))
+	}
+	return uint(rotateLeft64(uint64(x), k))
+}
+
+// rotateLeft32 returns the value of x rotated left by (k mod 32) bits.
+func rotateLeft32(x uint32, k int) uint32 {
+	const n = 32
+	s := uint(k) & (n - 1)
+	return x<<s | x>>(n-s)
+}
+
+// rotateLeft64 returns the value of x rotated left by (k mod 64) bits.
+func rotateLeft64(x uint64, k int) uint64 {
+	const n = 64
+	s := uint(k) & (n - 1)
+	return x<<s | x>>(n-s)
+}
+
+
 // murmur hash
 const (
 	c1_32 uint = 0xCC9E2D51
@@ -367,11 +395,11 @@ func murmurInit(seed int) int {
 func murmurUpdate(h1 int, k1 int) int {
 	var k1u uint
 	k1u = uint(k1) * c1_32
-	k1u = (k1u << 15) | (k1u >> 17) // rotl32(k1u, 15)
+	k1u = rotateLeft(k1u, 15)
 	k1u *= c2_32
 
 	var h1u = uint(h1) ^ k1u
-	h1u = (h1u << 13) | (h1u >> 19) // rotl32(h1u, 13)
+	k1u = rotateLeft(k1u, 13)
 	h1u = h1u*5 + 0xe6546b64
 	return int(h1u)
 }

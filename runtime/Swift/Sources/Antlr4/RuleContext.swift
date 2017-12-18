@@ -68,9 +68,7 @@ open class RuleContext: RuleNode {
     /// 
     public var invokingState = -1
 
-    override
     public init() {
-        super.init()
     }
 
     public init(_ parent: RuleContext?, _ invokingState: Int) {
@@ -98,22 +96,22 @@ open class RuleContext: RuleNode {
 
     // satisfy the ParseTree / SyntaxTree interface
 
-    override
     open func getSourceInterval() -> Interval {
         return Interval.INVALID
     }
 
-    override
     open func getRuleContext() -> RuleContext {
         return self
     }
 
-    override
     open func getParent() -> Tree? {
         return parent
     }
 
-    override
+    open func setParent(_ parent: RuleContext) {
+        self.parent = parent
+    }
+
     open func getPayload() -> AnyObject {
         return self
     }
@@ -126,18 +124,18 @@ open class RuleContext: RuleNode {
     /// method.
     /// 
 
-    open override func getText() -> String {
+    open func getText() -> String {
         let length = getChildCount()
         if length == 0 {
             return ""
         }
 
-        let builder = StringBuilder()
+        var builder = ""
         for i in 0..<length {
-            builder.append((getChild(i) as! ParseTree).getText())
+            builder += self[i].getText()
         }
 
-        return builder.toString()
+        return builder
     }
 
     open func getRuleIndex() -> Int {
@@ -147,16 +145,22 @@ open class RuleContext: RuleNode {
     open func getAltNumber() -> Int { return ATN.INVALID_ALT_NUMBER }
     open func setAltNumber(_ altNumber: Int) { }
 
-    open override func getChild(_ i: Int) -> Tree? {
+    open func getChild(_ i: Int) -> Tree? {
         return nil
     }
 
 
-    open override func getChildCount() -> Int {
+    open func getChildCount() -> Int {
         return 0
     }
 
-    open override func accept<T>(_ visitor: ParseTreeVisitor<T>) -> T? {
+
+    open subscript(index: Int) -> ParseTree {
+        preconditionFailure("Index out of range (RuleContext never has children, though its subclasses may).")
+    }
+
+
+    open func accept<T>(_ visitor: ParseTreeVisitor<T>) -> T? {
         return visitor.visitChildren(self)
     }
 
@@ -164,7 +168,7 @@ open class RuleContext: RuleNode {
     /// (root child1 .. childN). Print just a node if this is a leaf.
     /// We have to know the recognizer so we can get rule names.
     ///
-    open override func toStringTree(_ recog: Parser) -> String {
+    open func toStringTree(_ recog: Parser) -> String {
         return Trees.toStringTree(self, recog)
     }
 
@@ -175,15 +179,15 @@ open class RuleContext: RuleNode {
         return Trees.toStringTree(self, ruleNames)
     }
 
-    open override func toStringTree() -> String {
+    open func toStringTree() -> String {
         return toStringTree(nil)
     }
 
-    open override var description: String {
+    open var description: String {
         return toString(nil, nil)
     }
 
-     open override var debugDescription: String {
+     open var debugDescription: String {
          return description
     }
 
@@ -202,31 +206,31 @@ open class RuleContext: RuleNode {
     }
 
     open func toString(_ ruleNames: [String]?, _ stop: RuleContext?) -> String {
-        let buf = StringBuilder()
+        var buf = ""
         var p: RuleContext? = self
-        buf.append("[")
+        buf += "["
         while let pWrap = p, pWrap !== stop {
             if let ruleNames = ruleNames {
                 let ruleIndex = pWrap.getRuleIndex()
                 let ruleIndexInRange = (ruleIndex >= 0 && ruleIndex < ruleNames.count)
                 let ruleName = (ruleIndexInRange ? ruleNames[ruleIndex] : String(ruleIndex))
-                buf.append(ruleName)
+                buf += ruleName
             }
             else {
                 if !pWrap.isEmpty() {
-                    buf.append(pWrap.invokingState)
+                    buf += String(pWrap.invokingState)
                 }
             }
 
             if pWrap.parent != nil && (ruleNames != nil || !pWrap.parent!.isEmpty()) {
-                buf.append(" ")
+                buf += " "
             }
 
             p = pWrap.parent
         }
 
-        buf.append("]")
-        return buf.toString()
+        buf += "]"
+        return buf
     }
 
     open func castdown<T>(_ subType: T.Type) -> T {

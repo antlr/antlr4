@@ -9,30 +9,18 @@
 import Foundation
 
 public class ANTLRFileStream: ANTLRInputStream {
-    internal var fileName: String
+    private let fileName: String
 
-    public convenience override init(_ fileName: String) {
-        self.init(fileName, nil)
-    }
-
-    public init(_ fileName: String, _ encoding: String.Encoding?) {
+    public init(_ fileName: String, _ encoding: String.Encoding? = nil) throws {
         self.fileName = fileName
         super.init()
-        load(fileName, encoding)
-    }
-
-    public func load(_ fileName: String, _ encoding: String.Encoding?) {
-        if encoding != nil {
-            data = Utils.readFile(fileName, encoding!)
-        } else {
-            data = Utils.readFile(fileName)
-        }
-        self.n = data.count
+        let fileContents = try String(contentsOfFile: fileName, encoding: encoding ?? .utf8)
+        data = Array(fileContents)
+        n = data.count
     }
 
     override
     public func getSourceName() -> String {
         return fileName
     }
-
 }

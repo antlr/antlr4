@@ -58,28 +58,25 @@ public class ArrayPredictionContext: PredictionContext {
         if isEmpty() {
             return "[]"
         }
-        let buf: StringBuilder = StringBuilder()
-        buf.append("[")
-        let length = returnStates.count
-
-        for i in 0..<length {
+        var buf = "["
+        for (i, returnState) in returnStates.enumerated() {
             if i > 0 {
-                buf.append(", ")
+                buf += ", "
             }
-            if returnStates[i] == PredictionContext.EMPTY_RETURN_STATE {
-                buf.append("$")
+            if returnState == PredictionContext.EMPTY_RETURN_STATE {
+                buf += "$"
                 continue
             }
-            buf.append(returnStates[i])
-            if parents[i] != nil {
-                buf.append(" ")
-                buf.append(parents[i].debugDescription)
-            } else {
-                buf.append("null")
+            buf += "\(returnState)"
+            if let parent = parents[i] {
+                buf += " \(parent)"
+            }
+            else {
+                buf += "null"
             }
         }
-        buf.append("]")
-        return buf.toString()
+        buf += "]"
+        return buf
     }
 
     internal final func combineCommonParents() {

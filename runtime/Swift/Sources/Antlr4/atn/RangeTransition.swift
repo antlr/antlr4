@@ -31,11 +31,6 @@ public final class RangeTransition: Transition, CustomStringConvertible {
         return symbol >= from && symbol <= to
     }
 
-
-    public func toString() -> String {
-        return description
-    }
-
     public var description: String {
         return "'" + String(from) + "'..'" + String(to) + "'"
 

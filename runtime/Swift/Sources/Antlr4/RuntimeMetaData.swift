@@ -63,7 +63,7 @@ public class RuntimeMetaData {
     /// omitted, the `-` (hyphen-minus) appearing before it is also
     /// omitted.
     /// 
-    public static let VERSION: String = "4.7"
+    public static let VERSION: String = "4.7.1"
 
     /// 
     /// Gets the currently executing version of the ANTLR 4 runtime library.
@@ -163,18 +163,14 @@ public class RuntimeMetaData {
     /// only the major and minor components of the version string.
     /// 
     public static func getMajorMinorVersion(_ version: String) -> String {
-        let firstDot: Int = version.indexOf(".")
-        let secondDot: Int = firstDot >= 0 ? version.indexOf(".", startIndex: firstDot + 1) : -1
-        let firstDash: Int = version.indexOf("-")
-        var referenceLength: Int = version.length
-        if secondDot >= 0 {
-            referenceLength = min(referenceLength, secondDot)
+        var result = version
+
+        let dotBits = version.split(separator: ".", maxSplits: 2, omittingEmptySubsequences: false)
+        if dotBits.count >= 2 {
+            result = dotBits[0..<2].joined(separator: ".")
         }
 
-        if firstDash >= 0 {
-            referenceLength = min(referenceLength, firstDash)
-        }
-
-        return version[0 ..< referenceLength]   // version.substring(0, referenceLength);
+        let dashBits = result.split(separator: "-", maxSplits: 1, omittingEmptySubsequences: false)
+        return String(dashBits[0])
     }
 }

@@ -84,19 +84,19 @@
 import Foundation
 
 public class TokenStreamRewriter {
-    public let DEFAULT_PROGRAM_NAME: String = "default"
-    public static let PROGRAM_INIT_SIZE: Int = 100
-    public static let MIN_TOKEN_INDEX: Int = 0
+    public let DEFAULT_PROGRAM_NAME = "default"
+    public static let PROGRAM_INIT_SIZE = 100
+    public static let MIN_TOKEN_INDEX = 0
 
     // Define the rewrite operation hierarchy
     public class RewriteOperation: CustomStringConvertible {
         /// What index into rewrites List are we?
-        internal var instructionIndex: Int = 0
+        internal var instructionIndex = 0
         /// Token buffer index.
         internal var index: Int
         internal var text: String?
-        internal var lastIndex: Int = 0
-        internal weak var  tokens: TokenStream!
+        internal var lastIndex = 0
+        internal weak var tokens: TokenStream!
 
         init(_ index: Int, _ tokens: TokenStream) {
             self.index = index
@@ -112,7 +112,7 @@ public class TokenStreamRewriter {
         /// Execute the rewrite operation by possibly adding to the buffer.
         /// Return the index of the next token to operate on.
         /// 
-        public func execute(_ buf: StringBuilder) throws -> Int {
+        public func execute(_ buf: inout String) throws -> Int {
             return index
         }
 
@@ -123,16 +123,13 @@ public class TokenStreamRewriter {
     }
 
     public class InsertBeforeOp: RewriteOperation {
-        public override init(_ index: Int, _ text: String?, _ tokens: TokenStream) {
-            super.init(index, text, tokens)
-        }
-
-        override public func execute(_ buf: StringBuilder) throws -> Int {
-            if text != nil {
-                buf.append(text!)
+        override public func execute(_ buf: inout String) throws -> Int {
+            if let text = text {
+                buf.append(text)
             }
-            if try tokens.get(index).getType() != CommonToken.EOF {
-                buf.append(try tokens.get(index).getText()!)
+            let token = try tokens.get(index)
+            if token.getType() != CommonToken.EOF {
+                buf.append(token.getText()!)
             }
             return index + 1
         }
@@ -146,7 +143,7 @@ public class TokenStreamRewriter {
 
     /// I'm going to try replacing range from x..y with (y-x)+1 ReplaceOp
     /// instructions.
-    /// 
+    ///
 
     public class ReplaceOp: RewriteOperation {
 
@@ -156,27 +153,32 @@ public class TokenStreamRewriter {
         }
 
         override
-        public func execute(_ buf: StringBuilder) -> Int {
-            if text != nil {
-                buf.append(text!)
+        public func execute(_ buf: inout String) -> Int {
+            if let text = text {
+                buf += text
             }
             return lastIndex + 1
         }
+
         override
         public var description: String {
-            if text == nil {
-                return "<DeleteOp@\(try! tokens.get(index))..\(try! tokens.get(lastIndex))>"
+            let token = try! tokens.get(index)
+            let lastToken = try! tokens.get(lastIndex)
+            if let text = text {
+                return "<ReplaceOp@\(token)..\(lastToken):\"\(text)\">"
             }
-            return "<ReplaceOp@\(try! tokens.get(index))..\(try! tokens.get(lastIndex)):\"\(text!)\">"
+            return "<DeleteOp@\(token)..\(lastToken)>"
         }
     }
 
     public class RewriteOperationArray{
-        private final var rewrites: Array<RewriteOperation?> = Array<RewriteOperation?>()
-        public init(){
+        private final var rewrites = [RewriteOperation?]()
+
+        public init() {
             rewrites.reserveCapacity(TokenStreamRewriter.PROGRAM_INIT_SIZE)
         }
-        final func append(_ op: RewriteOperation){
+
+        final func append(_ op: RewriteOperation) {
             op.instructionIndex = rewrites.count
             rewrites.append(op)
         }
@@ -184,12 +186,15 @@ public class TokenStreamRewriter {
         final func rollback(_ instructionIndex: Int) {
             rewrites = Array(rewrites[TokenStreamRewriter.MIN_TOKEN_INDEX ..< instructionIndex])
         }
-        final var count: Int{
+
+        final var count: Int {
             return rewrites.count
         }
-        final var isEmpty: Bool{
+
+        final var isEmpty: Bool {
             return rewrites.isEmpty
         }
+
         /// We need to combine operations and report invalid operations (like
         /// overlapping replaces that are not completed nested). Inserts to
         /// same index need to be combined etc...  Here are the cases:
@@ -239,37 +244,34 @@ public class TokenStreamRewriter {
         /// 
         /// Return a map from token index to operation.
         /// 
-        final func reduceToSingleOperationPerIndex() throws -> Dictionary<Int, RewriteOperation> {
+        final func reduceToSingleOperationPerIndex() throws -> [Int: RewriteOperation] {
 
             let rewritesCount = rewrites.count
             // WALK REPLACES
             for i in 0..<rewritesCount {
-                guard let rop = rewrites[i]  else {
-                    continue
-                }
-                if !(rop is ReplaceOp) {
+                guard let rop = rewrites[i] as? ReplaceOp else {
                     continue
                 }
 
                 // Wipe prior inserts within range
-                let inserts =  getKindOfOps(&rewrites, InsertBeforeOp.self, i)
-                for j in inserts  {
+                let inserts = getKindOfOps(&rewrites, InsertBeforeOp.self, i)
+                for j in inserts {
                     if let iop = rewrites[j] {
                         if iop.index == rop.index {
                             // E.g., insert before 2, delete 2..2; update replace
                             // text to include insert before, kill insert
                             rewrites[iop.instructionIndex] = nil
                             rop.text = catOpText(iop.text, rop.text)
-
-                        } else if iop.index > rop.index && iop.index <= rop.lastIndex {
+                        }
+                        else if iop.index > rop.index && iop.index <= rop.lastIndex {
                             // delete insert as it's a no-op.
                             rewrites[iop.instructionIndex] = nil
                         }
                     }
                 }
                 // Drop any prior replaces contained within
-                let prevRopIndexList =  getKindOfOps(&rewrites, ReplaceOp.self, i)
-                for j in prevRopIndexList  {
+                let prevRopIndexList = getKindOfOps(&rewrites, ReplaceOp.self, i)
+                for j in prevRopIndexList {
                     if let prevRop = rewrites[j] {
                         if prevRop.index >= rop.index && prevRop.lastIndex <= rop.lastIndex {
                             // delete replace as it's a no-op.
@@ -285,7 +287,6 @@ public class TokenStreamRewriter {
                             rewrites[prevRop.instructionIndex] = nil // kill first delete
                             rop.index = min(prevRop.index, rop.index)
                             rop.lastIndex = max(prevRop.lastIndex, rop.lastIndex)
-                            print("new rop \(rop)")
                         } else if !disjoint {
                             throw ANTLRError.illegalArgument(msg: "replace op boundaries of \(rop.description) " +
                                 "overlap with previous \(prevRop.description)")
@@ -341,9 +342,9 @@ public class TokenStreamRewriter {
                 }
             }
 
-            var m: Dictionary<Int, RewriteOperation> = Dictionary<Int, RewriteOperation>()
+            var m = [Int: RewriteOperation]()
             for i in 0..<rewritesCount {
-                if let op: RewriteOperation = rewrites[i] {
+                if let op = rewrites[i] {
                     if m[op.index] != nil {
                         throw ANTLRError.illegalArgument(msg: "should only be one op per index")
                     }
@@ -355,17 +356,16 @@ public class TokenStreamRewriter {
         }
 
         final func catOpText(_ a: String?, _ b: String?) -> String {
-            let x: String = a ?? ""
-            let y: String = b ?? ""
-
+            let x = a ?? ""
+            let y = b ?? ""
             return x + y
         }
 
         /// Get all operations before an index of a particular kind
 
-        final func getKindOfOps<T: RewriteOperation>(_ rewrites: inout [RewriteOperation?], _ kind: T.Type, _ before: Int ) ->  [Int]  {
+        final func getKindOfOps<T: RewriteOperation>(_ rewrites: inout [RewriteOperation?], _ kind: T.Type, _ before: Int ) -> [Int] {
 
-            let length = min(before,rewrites.count)
+            let length = min(before, rewrites.count)
             var op = [Int]()
             op.reserveCapacity(length)
             for i in 0..<length {
@@ -375,7 +375,6 @@ public class TokenStreamRewriter {
             }
             return op
         }
-
     }
 
     /// Our source stream
@@ -385,14 +384,13 @@ public class TokenStreamRewriter {
     /// I'm calling these things "programs."
     /// Maps String (name) &rarr; rewrite (List)
     /// 
-    internal var programs: Dictionary<String, RewriteOperationArray> //Array<RewriteOperation>
+    internal var programs = [String: RewriteOperationArray]()
 
     /// Map String (program name) &rarr; Integer index
-    internal final var lastRewriteTokenIndexes: Dictionary<String, Int>
+    internal final var lastRewriteTokenIndexes: [String: Int]
 
     public init(_ tokens: TokenStream) {
         self.tokens = tokens
-        programs = Dictionary<String, RewriteOperationArray>()
         programs[DEFAULT_PROGRAM_NAME] = RewriteOperationArray()
         lastRewriteTokenIndexes = Dictionary<String, Int>()
     }
@@ -439,7 +437,7 @@ public class TokenStreamRewriter {
     public func insertAfter(_ programName: String, _ index: Int, _ text: String) {
         // to insert after, just insert before next index (even if past end)
         let op = InsertAfterOp(index, text, tokens)
-        let rewrites =  getProgram(programName)
+        let rewrites = getProgram(programName)
         rewrites.append(op)
     }
 
@@ -456,8 +454,8 @@ public class TokenStreamRewriter {
     }
 
     public func insertBefore(_ programName: String, _ index: Int, _ text: String) {
-        let op: RewriteOperation = InsertBeforeOp(index, text, tokens)
-        let rewrites: RewriteOperationArray = getProgram(programName)
+        let op = InsertBeforeOp(index, text, tokens)
+        let rewrites = getProgram(programName)
         rewrites.append(op)
     }
 
@@ -481,10 +479,9 @@ public class TokenStreamRewriter {
         if from > to || from < 0 || to < 0 || to >= tokens.size() {
             throw ANTLRError.illegalArgument(msg: "replace: range invalid: \(from)..\(to)(size=\(tokens.size()))")
         }
-        let op: RewriteOperation = ReplaceOp(from, to, text, tokens)
-        let rewritesArray: RewriteOperationArray = getProgram(programName)
+        let op = ReplaceOp(from, to, text, tokens)
+        let rewritesArray = getProgram(programName)
         rewritesArray.append(op)
-
     }
 
     public func replace(_ programName: String, _ from: Token, _ to: Token, _ text: String?) throws {
@@ -523,30 +520,24 @@ public class TokenStreamRewriter {
     }
 
     internal func getLastRewriteTokenIndex(_ programName: String) -> Int {
-        let I: Int? = lastRewriteTokenIndexes[programName]
-        if I == nil {
-            return -1
-        }
-        return I!
+        return lastRewriteTokenIndexes[programName] ?? -1
     }
 
     internal func setLastRewriteTokenIndex(_ programName: String, _ i: Int) {
         lastRewriteTokenIndexes[programName] = i
     }
 
-    internal func getProgram(_ name: String) -> RewriteOperationArray
-    {
-        var program: RewriteOperationArray? = programs[name]
-        if program == nil {
-            program = initializeProgram(name)
+    internal func getProgram(_ name: String) -> RewriteOperationArray {
+        if let program = programs[name] {
+            return program
         }
-        return program!
+        else {
+            return initializeProgram(name)
+        }
     }
 
-    private func initializeProgram(_ name: String) -> RewriteOperationArray
-    {
-        let program: RewriteOperationArray = RewriteOperationArray()
-
+    private func initializeProgram(_ name: String) -> RewriteOperationArray {
+        let program = RewriteOperationArray()
         programs[name] = program
         return program
     }
@@ -579,8 +570,8 @@ public class TokenStreamRewriter {
     }
 
     public func getText(_ programName: String, _ interval: Interval) throws -> String {
-        var start: Int = interval.a
-        var stop: Int = interval.b
+        var start = interval.a
+        var stop = interval.b
 
         // ensure start/end are in range
         if stop > tokens.size() - 1 {
@@ -589,32 +580,31 @@ public class TokenStreamRewriter {
         if start < 0 {
             start = 0
         }
-        guard let rewrites = programs[programName] , !rewrites.isEmpty else {
+        guard let rewrites = programs[programName], !rewrites.isEmpty else {
              return try tokens.getText(interval) // no instructions to execute
         }
 
-        let buf: StringBuilder = StringBuilder()
+        var buf = ""
 
         // First, optimize instruction stream
-        var indexToOp: Dictionary<Int, RewriteOperation> = try rewrites.reduceToSingleOperationPerIndex()
+        var indexToOp = try rewrites.reduceToSingleOperationPerIndex()
 
         // Walk buffer, executing instructions and emitting tokens
-        var i: Int = start
+        var i = start
         while i <= stop && i < tokens.size() {
-            let op: RewriteOperation? = indexToOp[i]
-            indexToOp.removeValue(forKey: i)
-            //indexToOp.remove(i); // remove so any left have index size-1
-            let t: Token = try tokens.get(i)
-            if op == nil {
+            let op = indexToOp[i]
+            indexToOp.removeValue(forKey: i)  // remove so any left have index size-1
+            let t = try tokens.get(i)
+            if let op = op {
+                i = try op.execute(&buf) // execute operation and skip
+            }
+            else {
                 // no operation at that index, just dump token
                 if t.getType() != CommonToken.EOF {
                     buf.append(t.getText()!)
                 }
                 i += 1 // move to next token
-            } else {
-                i = try op!.execute(buf) // execute operation and skip
             }
-
         }
 
         // include stuff after end if it's last index in buffer
@@ -623,14 +613,13 @@ public class TokenStreamRewriter {
         if stop == tokens.size() - 1 {
             // Scan any remaining operations after last token
             // should be included (they will be inserts).
-            for op: RewriteOperation in indexToOp.values {
+            for op in indexToOp.values {
                 if op.index >= tokens.size() - 1 {
-                    buf.append(op.text!)
+                    buf += op.text!
                 }
             }
         }
 
-        return buf.toString()
+        return buf
     }
-
 }

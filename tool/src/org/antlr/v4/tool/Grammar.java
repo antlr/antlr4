@@ -81,6 +81,7 @@ public class Grammar implements AttributeResolver {
 		parserOptions.add("TokenLabelType");
 		parserOptions.add("tokenVocab");
 		parserOptions.add("language");
+		parserOptions.add("accessLevel");
 		parserOptions.add("exportMacro");
 	}
 

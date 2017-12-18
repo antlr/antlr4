@@ -24,6 +24,7 @@ public abstract class Recognizer extends OutputModelObject {
 	public String name;
 	public String grammarName;
 	public String grammarFileName;
+	public String accessLevel;
 	public Map<String,Integer> tokens;
 
 	/**
@@ -51,6 +52,7 @@ public abstract class Recognizer extends OutputModelObject {
 		grammarFileName = new File(g.fileName).getName();
 		grammarName = g.name;
 		name = g.getRecognizerName();
+		accessLevel = g.getOptionString("accessLevel");
 		tokens = new LinkedHashMap<String,Integer>();
 		for (Map.Entry<String, Integer> entry : g.tokenNameToTypeMap.entrySet()) {
 			Integer ttype = entry.getValue();

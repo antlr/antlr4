@@ -281,12 +281,12 @@ open class ParserATNSimulator: ATNSimulator {
     /// 
     /// mutex for DFAState change
     /// 
-    private var dfaStateMutex = Mutex()
+    private let dfaStateMutex = Mutex()
     
     /// 
     /// mutex for changes in a DFAStates map
     /// 
-    private var dfaStatesMutex = Mutex()
+    private let dfaStatesMutex = Mutex()
 
 //    /// Testing only!
 //    public convenience init(_ atn : ATN, _ decisionToDFA : [DFA],
@@ -1907,7 +1907,7 @@ open class ParserATNSimulator: ATNSimulator {
                 }
                 else if let st = t as? SetTransition {
                     let not = st is NotSetTransition
-                    trans = (not ? "~" : "") + "Set " + st.set.toString()
+                    trans = (not ? "~" : "") + "Set " + st.set.description
                 }
             }
             errPrint("\(c.toString(parser, true)):\(trans)")

@@ -10,6 +10,7 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenSource;
 import org.antlr.v4.runtime.WritableToken;
+import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.test.runtime.ErrorQueue;
 import org.antlr.v4.test.runtime.RuntimeTestSupport;
 import org.antlr.v4.test.runtime.StreamVacuum;
@@ -337,7 +338,9 @@ public class BaseCSharpTest implements RuntimeTestSupport /*, SpecialRuntimeTest
 	}
 
 	public String execRecognizer() {
-		compile();
+		boolean success = compile();
+		assertTrue(success);
+
 		String output = execTest();
 		if ( output!=null && output.length()==0 ) {
 			output = null;
@@ -354,6 +357,7 @@ public class BaseCSharpTest implements RuntimeTestSupport /*, SpecialRuntimeTest
                     return false;
                 return true;
             } catch(Exception e) {
+                e.printStackTrace(System.err);
                 return false;
             }
         }
@@ -362,6 +366,7 @@ public class BaseCSharpTest implements RuntimeTestSupport /*, SpecialRuntimeTest
             try {
                 return buildDotnetProject();
             } catch(Exception e) {
+                e.printStackTrace(System.err);
                 return false;
             }
         }
@@ -390,10 +395,15 @@ public class BaseCSharpTest implements RuntimeTestSupport /*, SpecialRuntimeTest
 		stdoutVacuum.join();
 		stderrVacuum.join();
 		// xbuild sends errors to output, so check exit code
-		boolean success = process.exitValue()==0;
+		int exitValue = process.exitValue();
+		boolean success = (exitValue == 0);
 		if ( !success ) {
 			this.stderrDuringParse = stdoutVacuum.toString();
-			System.err.println("buildProject stderrVacuum: "+ this.stderrDuringParse);
+			String stderrString = stderrVacuum.toString();
+			System.err.println("buildProject command: " + Utils.join(args, " "));
+			System.err.println("buildProject exitValue: " + exitValue);
+			System.err.println("buildProject stdout: " + stderrDuringParse);
+			System.err.println("buildProject stderr: " + stderrString);
 		}
 		return success;
 	}
@@ -505,6 +515,7 @@ public class BaseCSharpTest implements RuntimeTestSupport /*, SpecialRuntimeTest
                 runtimeProjPath
             };
             boolean success = runProcess(args, tmpdir);
+            assertTrue(success);
 
             // restore project
             args = new String[] {
@@ -514,6 +525,7 @@ public class BaseCSharpTest implements RuntimeTestSupport /*, SpecialRuntimeTest
                 "--no-dependencies"
             };
             success = runProcess(args, tmpdir);
+            assertTrue(success);
 
             // build test
             args = new String[] {
@@ -525,6 +537,7 @@ public class BaseCSharpTest implements RuntimeTestSupport /*, SpecialRuntimeTest
                 "--no-dependencies"
             };
             success = runProcess(args, tmpdir);
+            assertTrue(success);
         }
         catch(Exception e) {
             e.printStackTrace(System.err);
@@ -535,6 +548,10 @@ public class BaseCSharpTest implements RuntimeTestSupport /*, SpecialRuntimeTest
     }
 
     private boolean runProcess(String[] args, String path) throws Exception {
+        return runProcess(args, path, 0);
+    }
+
+    private boolean runProcess(String[] args, String path, int retries) throws Exception {
         ProcessBuilder pb = new ProcessBuilder(args);
         pb.directory(new File(path));
         Process process = pb.start();
@@ -545,10 +562,28 @@ public class BaseCSharpTest implements RuntimeTestSupport /*, SpecialRuntimeTest
         process.waitFor();
         stdoutVacuum.join();
         stderrVacuum.join();
-        boolean success = process.exitValue()==0;
+        int exitValue = process.exitValue();
+        boolean success = (exitValue == 0);
         if ( !success ) {
             this.stderrDuringParse = stderrVacuum.toString();
-            System.err.println("runProcess stderrVacuum: "+ this.stderrDuringParse);
+            System.err.println("runProcess command: " + Utils.join(args, " "));
+            System.err.println("runProcess exitValue: " + exitValue);
+            System.err.println("runProcess stdoutVacuum: " + stdoutVacuum.toString());
+            System.err.println("runProcess stderrVacuum: " + stderrDuringParse);
+        }
+        if (exitValue == 132) {
+            // Retry after SIGILL.  We are seeing this intermittently on
+            // macOS (issue #2078).
+            if (retries < 3) {
+                System.err.println("runProcess retrying; " + retries +
+                                   " retries so far");
+                 return runProcess(args, path, retries + 1);
+            }
+            else {
+                System.err.println("runProcess giving up after " + retries +
+                                   " retries");
+                return false;
+            }
         }
         return success;
     }
@@ -577,9 +612,28 @@ public class BaseCSharpTest implements RuntimeTestSupport /*, SpecialRuntimeTest
 			ProcessBuilder pb = new ProcessBuilder(args);
 			pb.directory(tmpdirFile);
 			Process process = pb.start();
+			StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
+			StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
+			stdoutVacuum.start();
+			stderrVacuum.start();
 			process.waitFor();
+			stdoutVacuum.join();
+			stderrVacuum.join();
 			String writtenOutput = TestOutputReading.read(output);
 			this.stderrDuringParse = TestOutputReading.read(errorOutput);
+			int exitValue = process.exitValue();
+			String stdoutString = stdoutVacuum.toString().trim();
+			String stderrString = stderrVacuum.toString().trim();
+			if (exitValue != 0) {
+				System.err.println("execTest command: " + Utils.join(args, " "));
+				System.err.println("execTest exitValue: " + exitValue);
+			}
+			if (!stdoutString.isEmpty()) {
+				System.err.println("execTest stdoutVacuum: " + stdoutString);
+			}
+			if (!stderrString.isEmpty()) {
+				System.err.println("execTest stderrVacuum: " + stderrString);
+			}
 			return writtenOutput;
 		}
 		catch (Exception e) {

@@ -160,9 +160,6 @@ public class ParseTreeMatch: CustomStringConvertible {
         return tree
     }
 
-    public func toString() -> String {
-        return description
-    }
     public var description: String {
         let info = succeeded() ? "succeeded" : "failed"
         return "Match \(info); found \(getLabels().size()) labels"

@@ -41,7 +41,7 @@ public class ProfilingATNSimulator: ParserATNSimulator {
         super.init(parser,
                 parser.getInterpreter().atn,
                 parser.getInterpreter().decisionToDFA,
-                parser.getInterpreter().sharedContextCache!)
+                parser.getInterpreter().sharedContextCache)
 
         numDecisions = atn.decisionToState.count
         for i in 0..<numDecisions {
