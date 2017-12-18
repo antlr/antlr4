@@ -652,7 +652,7 @@ namespace atn {
                                                                    ATNConfigSet *configs, size_t nalts);
 
     virtual std::vector<dfa::DFAState::PredPrediction*> getPredicatePredictions(const antlrcpp::BitSet &ambigAlts,
-                                                                                std::vector<Ref<SemanticContext>> altToPred);
+                                                                                const std::vector<Ref<SemanticContext>>& altToPred);
 
     /**
      * This method is used to improve the localization of error messages by
@@ -724,7 +724,7 @@ namespace atn {
     ///  then we stop at the first predicate that evaluates to true. This
     ///  includes pairs with null predicates.
     /// </summary>
-    virtual antlrcpp::BitSet evalSemanticContext(std::vector<dfa::DFAState::PredPrediction*> predPredictions,
+    virtual antlrcpp::BitSet evalSemanticContext(const std::vector<dfa::DFAState::PredPrediction*>& predPredictions,
                                                  ParserRuleContext *outerContext, bool complete);
 
     /**

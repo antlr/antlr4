@@ -68,7 +68,7 @@ bool ATNConfigSet::add(const Ref<ATNConfig> &config, PredictionContextMergeCache
     existing->setPrecedenceFilterSuppressed(true);
   }
 
-  existing->context = merged; // replace context; no need to alt mapping
+  existing->context = std::move(merged); // replace context; no need to alt mapping
 
   return true;
 }

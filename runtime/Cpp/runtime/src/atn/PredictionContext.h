@@ -210,7 +210,7 @@ namespace atn {
 
     static Ref<PredictionContext> getCachedContext(const Ref<PredictionContext> &context,
                                                     PredictionContextCache &contextCache,
-                                                    std::map<Ref<PredictionContext>, Ref<PredictionContext>> &visited);
+                                                    std::map<PredictionContext*, Ref<PredictionContext>> &visited);
 
     // ter's recursive version of Sam's getAllNodes()
     static std::vector<Ref<PredictionContext>> getAllContextNodes(const Ref<PredictionContext> &context);

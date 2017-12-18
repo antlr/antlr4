@@ -412,20 +412,20 @@ std::string PredictionContext::toDOTString(const Ref<PredictionContext> &context
 
 // The "visited" map is just a temporary structure to control the retrieval process (which is recursive).
 Ref<PredictionContext> PredictionContext::getCachedContext(const Ref<PredictionContext> &context,
-  PredictionContextCache &contextCache, std::map<Ref<PredictionContext>, Ref<PredictionContext>> &visited) {
+  PredictionContextCache &contextCache, std::map<PredictionContext*, Ref<PredictionContext>> &visited) {
   if (context->isEmptyContext()) {
     return context;
   }
 
   {
-    auto iterator = visited.find(context);
+    auto iterator = visited.find(context.get());
     if (iterator != visited.end())
       return iterator->second; // Not necessarly the same as context.
   }
 
   auto iterator = contextCache.find(context);
   if (iterator != contextCache.end()) {
-    visited[context] = *iterator;
+    visited[context.get()] = *iterator;
 
     return *iterator;
   }
@@ -434,7 +434,7 @@ Ref<PredictionContext> PredictionContext::getCachedContext(const Ref<PredictionC
 
   std::vector<Ref<PredictionContext>> parents(context->size());
   for (size_t i = 0; i < parents.size(); i++) {
-    Ref<PredictionContext> parent = getCachedContext(context->getParent(i), contextCache, visited);
+    Ref<PredictionContext> parent = std::move(getCachedContext(context->getParent(i), contextCache, visited));
     if (changed || parent != context->getParent(i)) {
       if (!changed) {
         parents.clear();
@@ -445,13 +445,13 @@ Ref<PredictionContext> PredictionContext::getCachedContext(const Ref<PredictionC
         changed = true;
       }
 
-      parents[i] = parent;
+      parents[i] = std::move(parent);
     }
   }
 
   if (!changed) {
     contextCache.insert(context);
-    visited[context] = context;
+    visited[context.get()] = context;
 
     return context;
   }
@@ -464,15 +464,17 @@ Ref<PredictionContext> PredictionContext::getCachedContext(const Ref<PredictionC
     contextCache.insert(updated);
   } else {
     std::vector<PredictionContextItem> contexts;
+    contexts.reserve(parents.size());
+    const std::vector<PredictionContextItem>& returnStates = std::static_pointer_cast<ArrayPredictionContext>(context)->contexts;
     for (size_t i = 0; i < parents.size(); ++i) {
-        contexts.push_back(PredictionContextItem(parents[i], std::static_pointer_cast<ArrayPredictionContext>(context)->contexts[i].returnState));
+        contexts.emplace_back(parents[i], returnStates[i].returnState);
     }
     updated = std::make_shared<ArrayPredictionContext>(std::move(contexts));
     contextCache.insert(updated);
   }
 
-  visited[updated] = updated;
-  visited[context] = updated;
+  visited[updated.get()] = updated;
+  visited[context.get()] = updated;
 
   return updated;
 }
