@@ -33,7 +33,7 @@ namespace atn {
     const std::vector<PredictionContextItem> contexts;
 
     ArrayPredictionContext(Ref<SingletonPredictionContext> const& a);
-    ArrayPredictionContext(std::vector<PredictionContextItem> contexts_);
+    ArrayPredictionContext(std::vector<PredictionContextItem>&& contexts_);
     virtual ~ArrayPredictionContext();
 
     virtual bool isEmptyContext() const override;

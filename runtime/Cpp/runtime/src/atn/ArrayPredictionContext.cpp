@@ -24,7 +24,7 @@ ArrayPredictionContext::ArrayPredictionContext(Ref<SingletonPredictionContext> c
    assert(a);
 }
 
-ArrayPredictionContext::ArrayPredictionContext(std::vector<PredictionContextItem> contexts_)
+ArrayPredictionContext::ArrayPredictionContext(std::vector<PredictionContextItem>&& contexts_)
   : PredictionContext(calculateHashCode(contexts_)),
     contexts(std::move(contexts_)) {
     assert(contexts.size() > 0);
