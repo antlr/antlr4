@@ -179,10 +179,10 @@ Ref<PredictionContext> PredictionContext::mergeSingletons(const Ref<SingletonPre
     // a != b payloads differ
     // see if we can collapse parents due to $+x parents if local ctx
     const Ref<PredictionContext>& parentA = a->parent;
-    Ref<PredictionContext> parentB = b->parent;
-    if (parentA == parentB || *parentA == *parentB) {
-        parentB = parentA; // modified the following so that ax + bx = [a,b]x
-    }
+    // modifies the following so that ax + bx = [a,b]x
+    const Ref<PredictionContext>& parentB = (a->parent == b->parent || *a->parent == *b->parent)
+                                          ? a->parent
+                                          : b->parent;
     // ax + by = [ax,by] (or see above)
     Ref<PredictionContext> a_;
     if (a->returnState > b->returnState) {
