@@ -315,7 +315,7 @@ void ParserATNSimulator::predicateDFAState(dfa::DFAState *dfaState, DecisionStat
   BitSet altsToCollectPredsFrom = getConflictingAltsOrUniqueAlt(dfaState->configs.get());
   std::vector<Ref<SemanticContext>> altToPred = getPredsForAmbigAlts(altsToCollectPredsFrom, dfaState->configs.get(), nalts);
   if (!altToPred.empty()) {
-    dfaState->predicates = std::move(getPredicatePredictions(altsToCollectPredsFrom, altToPred));
+    dfaState->predicates = getPredicatePredictions(altsToCollectPredsFrom, altToPred);
     dfaState->prediction = ATN::INVALID_ALT_NUMBER; // make sure we use preds
   } else {
     // There are preds in configs but they might go away
@@ -700,7 +700,7 @@ std::vector<dfa::DFAState::PredPrediction *> ParserATNSimulator::getPredicatePre
   std::vector<dfa::DFAState::PredPrediction*> pairs;
   bool containsPredicate = false;
   for (size_t i = 1; i < altToPred.size(); i++) {
-    Ref<SemanticContext> pred = altToPred[i];
+    const Ref<SemanticContext>& pred = altToPred[i];
 
     // unpredicted is indicated by SemanticContext.NONE
     assert(pred != nullptr);

@@ -434,7 +434,7 @@ Ref<PredictionContext> PredictionContext::getCachedContext(const Ref<PredictionC
 
   std::vector<Ref<PredictionContext>> parents(context->size());
   for (size_t i = 0; i < parents.size(); i++) {
-    Ref<PredictionContext> parent = std::move(getCachedContext(context->getParent(i), contextCache, visited));
+    Ref<PredictionContext> parent = getCachedContext(context->getParent(i), contextCache, visited);
     if (changed || parent != context->getParent(i)) {
       if (!changed) {
         parents.clear();
