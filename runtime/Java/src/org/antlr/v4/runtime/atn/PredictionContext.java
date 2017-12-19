@@ -316,14 +316,14 @@ public abstract class PredictionContext {
 		}
 		else {
 			if ( a == EMPTY && b == EMPTY ) return EMPTY; // $ + $ = $
-			if ( a == EMPTY ) { // $ + x = [$,x]
+			if ( a == EMPTY ) { // $ + x = [x,$]
 				int[] payloads = {b.returnState, EMPTY_RETURN_STATE};
 				PredictionContext[] parents = {b.parent, null};
 				PredictionContext joined =
 					new ArrayPredictionContext(parents, payloads);
 				return joined;
 			}
-			if ( b == EMPTY ) { // x + $ = [$,x] ($ is always first if present)
+			if ( b == EMPTY ) { // x + $ = [x,$] ($ is always last if present)
 				int[] payloads = {a.returnState, EMPTY_RETURN_STATE};
 				PredictionContext[] parents = {a.parent, null};
 				PredictionContext joined =
