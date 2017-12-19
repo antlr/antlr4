@@ -705,7 +705,7 @@ std::vector<dfa::DFAState::PredPrediction *> ParserATNSimulator::getPredicatePre
 
   std::vector<dfa::DFAState::PredPrediction*> pairs;
   for (size_t i = 1; i < altToPred.size(); ++i) {
-    Ref<SemanticContext> pred = altToPred[i];
+    Ref<SemanticContext> const& pred = altToPred[i];
     assert(pred != nullptr); // unpredicted is indicated by SemanticContext.NONE
 
     if (ambigAlts.test(i)) {
