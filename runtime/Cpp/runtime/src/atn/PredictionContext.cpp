@@ -159,10 +159,10 @@ Ref<PredictionContext> PredictionContext::mergeSingletons(const Ref<SingletonPre
     Ref<PredictionContext> parent = merge(a->parent, b->parent, rootIsWildcard, mergeCache);
 
     // If parent is same object as existing a or b parent or reduced to a parent, return it.
-    if (parent == a->parent) { // ax + bx = ax, if a=b
+    if (*parent == *a->parent) { // ax + bx = ax, if a=b
       return a;
     }
-    if (parent == b->parent) { // ax + bx = bx, if a=b
+    if (*parent == *b->parent) { // ax + bx = bx, if a=b
       return b;
     }
 
@@ -314,7 +314,9 @@ Ref<PredictionContext> PredictionContext::mergeSingletonIntoArray(const Ref<Sing
   }
 
   // merge sorted payloads a + b => M
-  std::vector<PredictionContextItem> contexts(b->contexts.begin(), b->contexts.end());
+  std::vector<PredictionContextItem> contexts;
+  contexts.reserve(b->contexts.size() + 1);
+  contexts.insert(contexts.end(), b->contexts.begin(), b->contexts.end());
   { // This scope causes j to be invalidated before move construction from contexts vector.
     std::vector<PredictionContextItem>::iterator jEnd = contexts.end(),
     j = std::lower_bound(contexts.begin(), jEnd, PredictionContextItem(a->parent, a->returnState),
@@ -585,25 +587,28 @@ std::vector<std::string> PredictionContext::toStrings(Recognizer *recognizer, co
 }
 
 //----------------- PredictionContextMergeCache ------------------------------------------------------------------------
+PredictionContextPair::PredictionContextPair(const Ref<PredictionContext>& lhs_, const Ref<PredictionContext>& rhs_)
+  : lhs(lhs_), rhs(rhs_) { }
+
+PredictionContextPair::PredictionContextPair(PredictionContextPair&& other)
+  : lhs(std::move(other.lhs)), rhs(std::move(other.rhs)) { }
 
 bool PredictionContextPair::operator == (const PredictionContextPair& o) const {
-    return (*lhs == *o.lhs && *rhs == *o.rhs)
-        || (*lhs == *o.rhs && *rhs == *o.lhs);
+    return ((lhs == o.lhs || *lhs == *o.lhs) && (rhs == o.rhs || *rhs == *o.rhs))
+        || ((lhs == o.rhs || *lhs == *o.rhs) && (rhs == o.lhs || *rhs == *o.lhs));
 }
 
 void PredictionContextMergeCache::put(Ref<PredictionContext> const& key1,
                                       Ref<PredictionContext> const& key2,
                                       Ref<PredictionContext> const& value) {
-  PredictionContextPair entry({ key1, key2 });
-  _data.insert(std::make_pair(entry, value));
+  _data[PredictionContextPair(key1, key2)] = value;
 }
 
 const Ref<PredictionContext>& PredictionContextMergeCache::get(Ref<PredictionContext> const& key1,
                                                                Ref<PredictionContext> const& key2) const {
-  PredictionContextPair entry = { key1, key2 };
-  auto i =  _data.find(entry);
+  auto i =  _data.find(PredictionContextPair(key1, key2));
   if (i == _data.end()) {
-      return _missing;
+    return _missing;
   }
   return i->second;
 }

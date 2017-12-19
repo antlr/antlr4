@@ -225,6 +225,9 @@ namespace atn {
   };
 
   struct PredictionContextPair {
+    PredictionContextPair(const Ref<PredictionContext>& lhs_, const Ref<PredictionContext>& rhs_);
+    PredictionContextPair(PredictionContextPair&& other);
+
     Ref<PredictionContext> lhs;
     Ref<PredictionContext> rhs;
 
