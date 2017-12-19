@@ -697,6 +697,7 @@ std::vector<Ref<SemanticContext>> ParserATNSimulator::getPredsForAmbigAlts(const
 
 std::vector<dfa::DFAState::PredPrediction *> ParserATNSimulator::getPredicatePredictions(const antlrcpp::BitSet &ambigAlts,
   std::vector<Ref<SemanticContext>> altToPred) {
+  bool containsPredicate = false;
   for (size_t i = 1; i < altToPred.size(); i++) {
     const Ref<SemanticContext>& pred = altToPred[i];
 
@@ -704,11 +705,14 @@ std::vector<dfa::DFAState::PredPrediction *> ParserATNSimulator::getPredicatePre
     assert(pred != nullptr);
 
     if (pred != SemanticContext::NONE) {
-      return std::vector<dfa::DFAState::PredPrediction*>();
+      containsPredicate = true;
+      break;
     }
   }
 
   std::vector<dfa::DFAState::PredPrediction*> pairs;
+  if (!containsPredicate) return pairs;
+
   for (size_t i = 1; i < altToPred.size(); i++) {
     if (ambigAlts.test(i)) {
       pairs.push_back(new dfa::DFAState::PredPrediction(altToPred[i], (int)i)); /* mem-check: managed by the DFAState it will be assigned to after return */
