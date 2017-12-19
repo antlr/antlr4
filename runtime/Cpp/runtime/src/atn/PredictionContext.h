@@ -264,6 +264,8 @@ namespace atn {
 
   class PredictionContextMergeCache {
   public:
+    PredictionContextMergeCache();
+
     void put(Ref<PredictionContext> const& key1,
              Ref<PredictionContext> const& key2,
              Ref<PredictionContext> const& value);

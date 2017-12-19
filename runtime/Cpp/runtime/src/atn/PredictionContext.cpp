@@ -598,6 +598,10 @@ bool PredictionContextPair::operator == (const PredictionContextPair& o) const {
         || ((lhs == o.rhs || *lhs == *o.rhs) && (rhs == o.lhs || *rhs == *o.lhs));
 }
 
+PredictionContextMergeCache::PredictionContextMergeCache() {
+  _data.reserve(64);
+}
+
 void PredictionContextMergeCache::put(Ref<PredictionContext> const& key1,
                                       Ref<PredictionContext> const& key2,
                                       Ref<PredictionContext> const& value) {
