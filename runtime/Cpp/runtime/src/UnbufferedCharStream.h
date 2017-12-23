@@ -52,7 +52,7 @@ namespace antlr4 {
     /// we keep adding to buffer. Otherwise, <seealso cref="#consume consume()"/> resets so
     /// we start filling at index 0 again.
     // UTF-32 encoded.
-#if defined(_MSC_VER) && _MSC_VER == 1900
+#if defined(_MSC_VER) && _MSC_VER >= 1900 && _MSC_VER < 2000
     i32string _data; // Custom type for VS 2015.
     typedef __int32 storage_type;
 #else

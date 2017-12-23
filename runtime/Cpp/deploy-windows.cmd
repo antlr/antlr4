@@ -53,6 +53,44 @@ if exist "C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\Tools\VsDe
   rem if exist antlr4-cpp-runtime-vs2015.zip copy antlr4-cpp-runtime-vs2015.zip ~/antlr/sites/website-antlr4/download
 )
 
+echo on
+
+if exist "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\Tools\VsDevCmd.bat" (
+  set VSDEV_15_CMD="C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\Tools\VsDevCmd.bat"
+) 
+
+if exist "C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\Common7\Tools\VsDevCmd.bat" (
+  set VSDEV_15_CMD="C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\Common7\Tools\VsDevCmd.bat"
+) 
+
+if exist "C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\Common7\Tools\VsDevCmd.bat" (
+  set VSDEV_15_CMD="C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\Common7\Tools\VsDevCmd.bat"
+) 
+
+if not [%VSDEV_15_CMD%] == [] (
+
+  call %VSDEV_15_CMD%
+  CD /d "%~dp0"
+
+  pushd runtime
+  dir
+  msbuild antlr4cpp-vs2017.vcxproj /p:configuration="Release DLL" /p:platform=Win32 
+  msbuild antlr4cpp-vs2017.vcxproj /p:configuration="Release DLL" /p:platform=x64 
+  popd
+  
+  7z a antlr4-cpp-runtime-vs2017.zip antlr4-runtime
+  xcopy runtime\bin\*.dll lib\ /s
+  xcopy runtime\bin\*.lib lib\ /s
+  7z a antlr4-cpp-runtime-vs2017.zip lib
+  
+  rem rmdir /S /Q lib
+  rem rmdir /S /Q runtime\bin
+  rem rmdir /S /Q runtime\obj
+  
+  rem if exist antlr4-cpp-runtime-vs2015.zip copy antlr4-cpp-runtime-vs2015.zip ~/antlr/sites/website-antlr4/download
+
+)
+
 rmdir /S /Q antlr4-runtime
 
 :end

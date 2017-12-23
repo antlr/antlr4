@@ -1,0 +1,38 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "antlr4cpp-vs2017", "..\..\runtime\antlr4cpp-vs2017.vcxproj", "{A9762991-1B57-4DCE-90C0-EE42B96947BE}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "antlr4cpp-demo-vs2017", "antlr4-cpp-demo\antlr4-cpp-demo-vs2017.vcxproj", "{24EC5104-7402-4C76-B66B-27ADBE062D68}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug DLL|x64 = Debug DLL|x64
+		Debug DLL|x86 = Debug DLL|x86
+		Release DLL|x64 = Release DLL|x64
+		Release DLL|x86 = Release DLL|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A9762991-1B57-4DCE-90C0-EE42B96947BE}.Debug DLL|x64.ActiveCfg = Debug DLL|x64
+		{A9762991-1B57-4DCE-90C0-EE42B96947BE}.Debug DLL|x64.Build.0 = Debug DLL|x64
+		{A9762991-1B57-4DCE-90C0-EE42B96947BE}.Debug DLL|x86.ActiveCfg = Debug DLL|Win32
+		{A9762991-1B57-4DCE-90C0-EE42B96947BE}.Debug DLL|x86.Build.0 = Debug DLL|Win32
+		{A9762991-1B57-4DCE-90C0-EE42B96947BE}.Release DLL|x64.ActiveCfg = Release DLL|x64
+		{A9762991-1B57-4DCE-90C0-EE42B96947BE}.Release DLL|x64.Build.0 = Release DLL|x64
+		{A9762991-1B57-4DCE-90C0-EE42B96947BE}.Release DLL|x86.ActiveCfg = Release DLL|Win32
+		{A9762991-1B57-4DCE-90C0-EE42B96947BE}.Release DLL|x86.Build.0 = Release DLL|Win32
+		{24EC5104-7402-4C76-B66B-27ADBE062D68}.Debug DLL|x64.ActiveCfg = Debug DLL|x64
+		{24EC5104-7402-4C76-B66B-27ADBE062D68}.Debug DLL|x64.Build.0 = Debug DLL|x64
+		{24EC5104-7402-4C76-B66B-27ADBE062D68}.Debug DLL|x86.ActiveCfg = Debug DLL|Win32
+		{24EC5104-7402-4C76-B66B-27ADBE062D68}.Debug DLL|x86.Build.0 = Debug DLL|Win32
+		{24EC5104-7402-4C76-B66B-27ADBE062D68}.Release DLL|x64.ActiveCfg = Release DLL|x64
+		{24EC5104-7402-4C76-B66B-27ADBE062D68}.Release DLL|x64.Build.0 = Release DLL|x64
+		{24EC5104-7402-4C76-B66B-27ADBE062D68}.Release DLL|x86.ActiveCfg = Release DLL|Win32
+		{24EC5104-7402-4C76-B66B-27ADBE062D68}.Release DLL|x86.Build.0 = Release DLL|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
