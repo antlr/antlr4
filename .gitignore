@@ -97,3 +97,6 @@ xcuserdata
 # VSCode Java plugin temporary files
 javac-services.0.log
 javac-services.0.log.lck
+
+# Jetbrains Resharper cache directory
+_ReSharper.Caches/
