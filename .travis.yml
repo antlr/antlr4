@@ -151,28 +151,28 @@ matrix:
     - os: linux
       jdk: openjdk7
       env: TARGET=csharp
-      stage: extended-test
+      stage: main-test
     - os: linux
       jdk: oraclejdk8
       dist: trusty
       env:
         - TARGET=dotnet
         - GROUP=LEXER
-      stage: main-test
+      stage: extended-test
     - os: linux
       jdk: openjdk8
       dist: trusty
       env:
         - TARGET=dotnet
         - GROUP=PARSER
-      stage: main-test
+      stage: extended-test
     - os: linux
       jdk: oraclejdk8
       dist: trusty
       env:
         - TARGET=dotnet
         - GROUP=RECURSION
-      stage: main-test
+      stage: extended-test
     - os: linux
       jdk: openjdk7
       env: TARGET=python2
