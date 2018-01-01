@@ -176,7 +176,7 @@ matrix:
     - os: linux
       jdk: openjdk7
       env: TARGET=python2
-      stage: extended-test
+      stage: main-test
     - os: linux
       jdk: openjdk7
       env: TARGET=python3
