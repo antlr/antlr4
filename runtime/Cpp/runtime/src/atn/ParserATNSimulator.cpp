@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -696,31 +696,22 @@ std::vector<Ref<SemanticContext>> ParserATNSimulator::getPredsForAmbigAlts(const
 }
 
 std::vector<dfa::DFAState::PredPrediction *> ParserATNSimulator::getPredicatePredictions(const antlrcpp::BitSet &ambigAlts,
-  std::vector<Ref<SemanticContext>> altToPred) {
-  bool containsPredicate = false;
-  for (size_t i = 1; i < altToPred.size(); i++) {
-    const Ref<SemanticContext>& pred = altToPred[i];
-    // unpredicted is indicated by SemanticContext.NONE
-    assert(pred != nullptr);
-
-    if (pred != SemanticContext::NONE) {
-      containsPredicate = true;
-      break;
-    }
-  }
+  std::vector<Ref<SemanticContext>> const& altToPred) {
+  bool containsPredicate = std::find_if(altToPred.begin(), altToPred.end(), [](Ref<SemanticContext> const context) {
+    return context != SemanticContext::NONE;
+  }) != altToPred.end();
+  if (!containsPredicate)
+    return {};
 
   std::vector<dfa::DFAState::PredPrediction*> pairs;
-  if (!containsPredicate) return pairs;
-
-  for (size_t i = 1; i < altToPred.size(); i++) {
-    // unpredicted is indicated by SemanticContext.NONE
-    assert(altToPred[i] != nullptr);
+  for (size_t i = 1; i < altToPred.size(); ++i) {
+    Ref<SemanticContext> const& pred = altToPred[i];
+    assert(pred != nullptr); // unpredicted is indicated by SemanticContext.NONE
 
     if (ambigAlts.test(i)) {
-      pairs.push_back(new dfa::DFAState::PredPrediction(altToPred[i], (int)i)); /* mem-check: managed by the DFAState it will be assigned to after return */
+      pairs.push_back(new dfa::DFAState::PredPrediction(pred, (int)i)); /* mem-check: managed by the DFAState it will be assigned to after return */
     }
   }
-
   return pairs;
 }
 
