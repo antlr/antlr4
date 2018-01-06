@@ -95,11 +95,16 @@ Let's suppose that your grammar is named, as above, "MyGrammar". Let's suppose t
 Now a fully functioning script might look like the following:
 
 ```javascript
+   var antlr4 = require('antlr4');
+   var MyGrammarLexer = require('./MyGrammarLexer').MyGrammarLexer;
+   var MyGrammarParser = require('./MyGrammarParser').MyGrammarParser;
+   var MyGrammarListener = require('./MyGrammarListener').MyGrammarListener;
+
    var input = "your text to parse here"
    var chars = new antlr4.InputStream(input);
-   var lexer = new MyGrammarLexer.MyGrammarLexer(chars);
+   var lexer = new MyGrammarLexer(chars);
    var tokens  = new antlr4.CommonTokenStream(lexer);
-   var parser = new MyGrammarParser.MyGrammarParser(tokens);
+   var parser = new MyGrammarParser(tokens);
    parser.buildParseTrees = true;
    var tree = parser.MyStartRule();
 ```
