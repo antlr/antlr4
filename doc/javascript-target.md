@@ -128,30 +128,30 @@ Let's suppose your MyGrammar grammar comprises 2 rules: "key" and "value". The a
 ```
 
 In order to provide custom behavior, you might want to create the following class:
-  
+
 ```javascript
-    KeyPrinter = function() {
-         MyGrammarListener.call(this); // inherit default listener
-         return this;
-    };
- 
-// inherit default listener
+var KeyPrinter = function() {
+    MyGrammarListener.call(this); // inherit default listener
+    return this;
+};
+
+// continue inheriting default listener
 KeyPrinter.prototype = Object.create(MyGrammarListener.prototype);
 KeyPrinter.prototype.constructor = KeyPrinter;
- 
+
 // override default listener behavior
-       KeyPrinter.prototype.exitKey = function(ctx) {      
-       console.log("Oh, a key!");
-   }; 
+KeyPrinter.prototype.exitKey = function(ctx) {
+    console.log("Oh, a key!");
+};
 ```
 
 In order to execute this listener, you would simply add the following lines to the above code:
- 
+
 ```javascript
-        ...
-       tree = parser.StartRule() - only repeated here for reference
-   var printer = new KeyPrinter();
- antlr4.tree.ParseTreeWalker.DEFAULT.walk(printer, tree);
+    ...
+    tree = parser.StartRule() // only repeated here for reference
+var printer = new KeyPrinter();
+antlr4.tree.ParseTreeWalker.DEFAULT.walk(printer, tree);
 ```
 
 ## What about TypeScript?
