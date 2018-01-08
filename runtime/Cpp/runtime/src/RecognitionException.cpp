@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+﻿/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -10,7 +10,6 @@
 #include "misc/IntervalSet.h"
 
 #include "RecognitionException.h"
-#include "Token.h"
 
 using namespace antlr4;
 
@@ -21,12 +20,14 @@ RecognitionException::RecognitionException(Recognizer *recognizer, IntStream *in
 
 RecognitionException::RecognitionException(const std::string &message, Recognizer *recognizer, IntStream *input,
                                            ParserRuleContext *ctx, Token *offendingToken)
-  : RuntimeException(message + (offendingToken ? " near token " + offendingToken->getText() + " in line " + std::to_string(offendingToken->getLine()) : ""))
-  , _recognizer(recognizer), _input(input), _ctx(ctx), _offendingToken(offendingToken) {
+  : RuntimeException(message), _recognizer(recognizer), _input(input), _ctx(ctx), _offendingToken(offendingToken) {
   InitializeInstanceFields();
   if (recognizer != nullptr) {
     _offendingState = recognizer->getState();
   }
+}
+
+RecognitionException::~RecognitionException() {
 }
 
 size_t RecognitionException::getOffendingState() const {

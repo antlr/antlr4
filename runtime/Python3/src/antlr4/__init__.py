@@ -12,7 +12,7 @@ from antlr4.atn.LexerATNSimulator import LexerATNSimulator
 from antlr4.atn.ParserATNSimulator import ParserATNSimulator
 from antlr4.atn.PredictionMode import PredictionMode
 from antlr4.PredictionContext import PredictionContextCache
-from antlr4.ParserRuleContext import ParserRuleContext
+from antlr4.ParserRuleContext import RuleContext, ParserRuleContext
 from antlr4.tree.Tree import ParseTreeListener, ParseTreeVisitor, ParseTreeWalker, TerminalNode, ErrorNode, RuleNode
 from antlr4.error.Errors import RecognitionException, IllegalStateException, NoViableAltException
 from antlr4.error.ErrorStrategy import BailErrorStrategy

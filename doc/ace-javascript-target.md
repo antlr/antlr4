@@ -239,7 +239,7 @@ AnnotatingErrorListener.prototype.syntaxError = function(recognizer, offendingSy
 With this, all that remains to be done is plug the listener in when we parse the code. Here is how I do it:
 ```js
 var validate = function(input) {
-    var stream = new antlr4.InputStream(input);
+    var stream = CharStreams.fromString(input);
     var lexer = new mylanguage.MyLexer(stream);
     var tokens = new antlr4.CommonTokenStream(lexer);
     var parser = new mylanguage.MyParser(tokens);
@@ -252,4 +252,4 @@ var validate = function(input) {
 };
 ```
 You know what? That's it! You now have an ACE editor that does syntax validation using ANTLR! I hope you find this useful, and simple enough to get started.
-WNow wait, hey! How do you debug this? Well, as usual, using Chrome, since no other browser is able to debug worker code. What a shame...
+Now wait, hey! How do you debug this? Well, as usual, using Chrome, since no other browser is able to debug worker code. What a shame...

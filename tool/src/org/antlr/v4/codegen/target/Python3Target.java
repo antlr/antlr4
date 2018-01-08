@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -56,7 +56,7 @@ public class Python3Target extends Target {
 	@Override
 	public int getSerializedATNSegmentLimit() {
 		// set to something stupid to avoid segmentation
-		return 2 ^ 31;
+		return Integer.MAX_VALUE;
 	}
 
 	@Override
@@ -96,7 +96,7 @@ public class Python3Target extends Target {
 
 	@Override
 	public String getVersion() {
-		return "4.7";
+		return "4.7.1";
 	}
 
 	/** Avoid grammar symbols in this set to prevent conflicts in gen'd code. */

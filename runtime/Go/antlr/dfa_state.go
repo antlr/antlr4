@@ -1,4 +1,4 @@
-// Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 // Use of this file is governed by the BSD 3-clause license that
 // can be found in the LICENSE.txt file in the project root.
 
@@ -6,7 +6,6 @@ package antlr
 
 import (
 	"fmt"
-	"strconv"
 )
 
 // PredPrediction maps a predicate to a predicted alternative.
@@ -133,12 +132,7 @@ func (d *DFAState) equals(other interface{}) bool {
 }
 
 func (d *DFAState) String() string {
-	return strconv.Itoa(d.stateNumber) + ":" + d.Hash()
-}
-
-func (d *DFAState) Hash() string {
 	var s string
-
 	if d.isAcceptState {
 		if d.predicates != nil {
 			s = "=>" + fmt.Sprint(d.predicates)
@@ -147,5 +141,26 @@ func (d *DFAState) Hash() string {
 		}
 	}
 
-	return fmt.Sprint(d.configs) + s
+	return fmt.Sprintf("%d:%s%s", fmt.Sprint(d.configs), s)
+}
+
+func (d *DFAState) hash() int {
+	h := murmurInit(11)
+
+	c := 1
+	if d.isAcceptState {
+		if d.predicates != nil {
+			for _, p := range d.predicates {
+				h = murmurUpdate(h, p.alt)
+				h = murmurUpdate(h, p.pred.hash())
+				c += 2
+			}
+		} else {
+			h = murmurUpdate(h, d.prediction)
+			c += 1
+		}
+	}
+
+	h = murmurUpdate(h, d.configs.hash())
+	return murmurFinish(h, c)
 }

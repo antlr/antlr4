@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -401,11 +401,11 @@ DoubleDict.prototype.set = function (a, b, o) {
 
 
 function escapeWhitespace(s, escapeSpaces) {
-    s = s.replace("\t", "\\t");
-    s = s.replace("\n", "\\n");
-    s = s.replace("\r", "\\r");
+    s = s.replace(/\t/g, "\\t")
+         .replace(/\n/g, "\\n")
+         .replace(/\r/g, "\\r");
     if (escapeSpaces) {
-        s = s.replace(" ", "\u00B7");
+        s = s.replace(/ /g, "\u00B7");
     }
     return s;
 }

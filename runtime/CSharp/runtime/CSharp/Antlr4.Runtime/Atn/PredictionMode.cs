@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -110,7 +110,7 @@ namespace Antlr4.Runtime.Atn
             /// The hash code is only a function of the
             /// <see cref="ATNState.stateNumber"/>
             /// and
-            /// <see cref="ATNConfig.Context"/>
+            /// <see cref="ATNConfig.context"/>
             /// .
             /// </summary>
             public override int GetHashCode(ATNConfig o)
@@ -234,7 +234,7 @@ namespace Antlr4.Runtime.Atn
         /// (s, 1, x,
         /// ), (s, 1, x', {p}), (s, 2, x'', {})}</p>
         /// <p>If the configuration set has predicates (as indicated by
-        /// <see cref="ATNConfigSet.HasSemanticContext()"/>
+        /// <see cref="ATNConfigSet.hasSemanticContext"/>
         /// ), this algorithm makes a copy of
         /// the configurations to strip out all of the predicates so that a standard
         /// <see cref="ATNConfigSet"/>
@@ -353,12 +353,12 @@ namespace Antlr4.Runtime.Atn
         /// and singleton subsets with
         /// non-conflicting configurations. Two configurations conflict if they have
         /// identical
-        /// <see cref="ATNConfig.State"/>
+        /// <see cref="ATNConfig.state"/>
         /// and
-        /// <see cref="ATNConfig.Context"/>
+        /// <see cref="ATNConfig.context"/>
         /// values
         /// but different
-        /// <see cref="ATNConfig.Alt"/>
+        /// <see cref="ATNConfig.alt"/>
         /// value, e.g.
         /// <c>(s, i, ctx, _)</c>
         /// and
@@ -387,7 +387,7 @@ namespace Antlr4.Runtime.Atn
         /// :
         /// <pre>
         /// map[c] U= c.
-        /// <see cref="ATNConfig.Alt()">getAlt()</see>
+        /// <see cref="ATNConfig.alt">getAlt()</see>
         /// # map hash/equals uses s and x, not
         /// alt and not pred
         /// </pre>
@@ -801,7 +801,7 @@ namespace Antlr4.Runtime.Atn
         /// :
         /// <pre>
         /// map[c] U= c.
-        /// <see cref="ATNConfig.Alt()">getAlt()</see>
+        /// <see cref="ATNConfig.alt">getAlt()</see>
         /// # map hash/equals uses s and x, not
         /// alt and not pred
         /// </pre>
@@ -833,9 +833,9 @@ namespace Antlr4.Runtime.Atn
         /// :
         /// <pre>
         /// map[c.
-        /// <see cref="ATNConfig.State"/>
+        /// <see cref="ATNConfig.state"/>
         /// ] U= c.
-        /// <see cref="ATNConfig.Alt"/>
+        /// <see cref="ATNConfig.alt"/>
         /// </pre>
         /// </remarks>
         [return: NotNull]

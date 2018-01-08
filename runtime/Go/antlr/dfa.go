@@ -1,10 +1,13 @@
-// Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 // Use of this file is governed by the BSD 3-clause license that
 // can be found in the LICENSE.txt file in the project root.
 
 package antlr
 
-import "sort"
+import (
+	"sort"
+	"sync"
+)
 
 type DFA struct {
 	// atnStartState is the ATN state in which this was created
@@ -14,9 +17,11 @@ type DFA struct {
 
 	// states is all the DFA states. Use Map to get the old state back; Set can only
 	// indicate whether it is there.
-	states map[string]*DFAState
+	states map[int]*DFAState
+	statesMu sync.RWMutex
 
 	s0 *DFAState
+	s0Mu sync.RWMutex
 
 	// precedenceDfa is the backing field for isPrecedenceDfa and setPrecedenceDfa.
 	// True if the DFA is for a precedence decision and false otherwise.
@@ -27,7 +32,7 @@ func NewDFA(atnStartState DecisionState, decision int) *DFA {
 	return &DFA{
 		atnStartState: atnStartState,
 		decision:      decision,
-		states:        make(map[string]*DFAState),
+		states:        make(map[int]*DFAState),
 	}
 }
 
@@ -39,6 +44,9 @@ func (d *DFA) getPrecedenceStartState(precedence int) *DFAState {
 	if !d.precedenceDfa {
 		panic("only precedence DFAs may contain a precedence start state")
 	}
+
+	d.s0Mu.RLock()
+	defer d.s0Mu.RUnlock()
 
 	// s0.edges is never nil for a precedence DFA
 	if precedence < 0 || precedence >= len(d.s0.edges) {
@@ -59,6 +67,9 @@ func (d *DFA) setPrecedenceStartState(precedence int, startState *DFAState) {
 		return
 	}
 
+	d.s0Mu.Lock()
+	defer d.s0Mu.Unlock()
+
 	// Synchronization on s0 here is ok. When the DFA is turned into a
 	// precedence DFA, s0 will be initialized once and not updated again. s0.edges
 	// is never nil for a precedence DFA.
@@ -76,7 +87,7 @@ func (d *DFA) setPrecedenceStartState(precedence int, startState *DFAState) {
 // true or nil otherwise, and d.precedenceDfa is updated.
 func (d *DFA) setPrecedenceDfa(precedenceDfa bool) {
 	if d.precedenceDfa != precedenceDfa {
-		d.states = make(map[string]*DFAState)
+		d.states = make(map[int]*DFAState)
 
 		if precedenceDfa {
 			precedenceState := NewDFAState(-1, NewBaseATNConfigSet(false))
@@ -93,15 +104,42 @@ func (d *DFA) setPrecedenceDfa(precedenceDfa bool) {
 	}
 }
 
-func (d *DFA) GetStates() map[string]*DFAState {
-	return d.states
+func (d *DFA) getS0() *DFAState {
+	d.s0Mu.RLock()
+	defer d.s0Mu.RUnlock()
+	return d.s0
 }
 
-type DFAStateList []*DFAState
+func (d *DFA) setS0(s *DFAState) {
+	d.s0Mu.Lock()
+	defer d.s0Mu.Unlock()
+	d.s0 = s
+}
 
-func (d DFAStateList) Len() int           { return len(d) }
-func (d DFAStateList) Less(i, j int) bool { return d[i].stateNumber < d[j].stateNumber }
-func (d DFAStateList) Swap(i, j int)      { d[i], d[j] = d[j], d[i] }
+func (d *DFA) getState(hash int) (*DFAState, bool) {
+	d.statesMu.RLock()
+	defer d.statesMu.RUnlock()
+	s, ok := d.states[hash]
+	return s, ok
+}
+
+func (d *DFA) setState(hash int, state *DFAState) {
+	d.statesMu.Lock()
+	defer d.statesMu.Unlock()
+	d.states[hash] = state
+}
+
+func (d *DFA) numStates() int {
+	d.statesMu.RLock()
+	defer d.statesMu.RUnlock()
+	return len(d.states)
+}
+
+type dfaStateList []*DFAState
+
+func (d dfaStateList) Len() int           { return len(d) }
+func (d dfaStateList) Less(i, j int) bool { return d[i].stateNumber < d[j].stateNumber }
+func (d dfaStateList) Swap(i, j int)      { d[i], d[j] = d[j], d[i] }
 
 // sortedStates returns the states in d sorted by their state number.
 func (d *DFA) sortedStates() []*DFAState {
@@ -111,7 +149,7 @@ func (d *DFA) sortedStates() []*DFAState {
 		vs = append(vs, v)
 	}
 
-	sort.Sort(DFAStateList(vs))
+	sort.Sort(dfaStateList(vs))
 
 	return vs
 }

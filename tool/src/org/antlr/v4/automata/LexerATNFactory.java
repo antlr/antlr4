@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -346,19 +346,18 @@ public class LexerATNFactory extends ParserATNFactory {
 		String chars = stringLiteralAST.getText();
 		ATNState left = newState(stringLiteralAST);
 		ATNState right;
-		chars = CharSupport.getStringFromGrammarStringLiteral(chars);
-		if (chars == null) {
-			g.tool.errMgr.grammarError(ErrorType.INVALID_ESCAPE_SEQUENCE,
-					g.fileName, stringLiteralAST.getToken());
+		String s = CharSupport.getStringFromGrammarStringLiteral(chars);
+		if (s == null) {
+			// the lexer will already have given an error
 			return new Handle(left, left);
 		}
 
-		int n = chars.length();
+		int n = s.length();
 		ATNState prev = left;
 		right = null;
 		for (int i = 0; i < n; ) {
 			right = newState(stringLiteralAST);
-			int codePoint = chars.codePointAt(i);
+			int codePoint = s.codePointAt(i);
 			prev.addTransition(CodePointTransitions.createWithCodePoint(right, codePoint));
 			prev = right;
 			i += Character.charCount(codePoint);
@@ -462,8 +461,10 @@ public class LexerATNFactory extends ParserATNFactory {
 					EscapeSequenceParsing.parseEscape(chars, i);
 				switch (escapeParseResult.type) {
 					case INVALID:
+						String invalid = chars.substring(escapeParseResult.startOffset,
+						                                 escapeParseResult.startOffset+escapeParseResult.parseLength);
 						g.tool.errMgr.grammarError(ErrorType.INVALID_ESCAPE_SEQUENCE,
-									   g.fileName, charSetAST.getToken(), charSetAST.getText());
+						                           g.fileName, charSetAST.getToken(), invalid);
 						state = CharSetParseState.ERROR;
 						break;
 					case CODE_POINT:

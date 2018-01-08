@@ -1,4 +1,4 @@
-// Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 // Use of this file is governed by the BSD 3-clause license that
 // can be found in the LICENSE.txt file in the project root.
 
@@ -125,8 +125,10 @@ func (a *ATNDeserializer) reset(data []rune) {
 		// Don't adjust the first value since that's the version number
 		if i == 0 {
 			temp[i] = c
-		} else {
+		} else if c > 1 {
 			temp[i] = c - 2
+		} else {
+		    temp[i] = c + 65533
 		}
 	}
 

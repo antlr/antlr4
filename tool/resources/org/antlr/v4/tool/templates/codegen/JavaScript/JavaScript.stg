@@ -36,12 +36,12 @@
  *  REQUIRED.
  */
 
-pythonTypeInitMap ::= [
-	"bool":"False",
+javascriptTypeInitMap ::= [
+	"bool":"false",
 	"int":"0",
 	"float":"0.0",
 	"str":"",
-	default:"None" // anything other than a primitive type is an object
+	default:"{}" // anything other than a primitive type is an object
 ]
 
 // args must be <object-model-object>, <fields-resulting-in-STs>
@@ -530,7 +530,7 @@ else {
 
 Wildcard(w) ::= <<
 this.state = <w.stateNumber>;
-<if(w.labels)><w.labels:{l | <labelref(l)> = }><endif>matchWildcard();
+<if(w.labels)><w.labels:{l | <labelref(l)> = }><endif>this.matchWildcard();
 >>
 
 // ACTION STUFF
@@ -802,6 +802,9 @@ var antlr4 = require('antlr4/index');
 >>
 
 Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
+<if(superClass)>
+var <superClass> = require('./<superClass>').<superClass>;
+<endif>
 
 <atn>
 
@@ -817,6 +820,12 @@ function <lexer.name>(input) {
 
 <lexer.name>.prototype = Object.create(<if(superClass)><superClass><else>antlr4.Lexer<endif>.prototype);
 <lexer.name>.prototype.constructor = <lexer.name>;
+
+Object.defineProperty(<lexer.name>.prototype, "atn", {
+        get : function() {
+                return atn;
+        }
+});
 
 <lexer.name>.EOF = antlr4.Token.EOF;
 <lexer.tokens:{k | <lexer.name>.<k> = <lexer.tokens.(k)>;}; separator="\n", wrap, anchor>
@@ -860,7 +869,7 @@ var serializedATN = ["<model.serialized; wrap={",<\n>    "}>"].join("");
  *	must be an object, default value is "null".
  */
 initValue(typeName) ::= <<
-<javaTypeInitMap.(typeName)>
+<javacriptTypeInitMap.(typeName)>
 >>
 
 codeFileExtension() ::= ".js"

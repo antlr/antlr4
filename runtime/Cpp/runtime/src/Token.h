@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+﻿/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -18,11 +18,11 @@ namespace antlr4 {
 
     /// During lookahead operations, this "token" signifies we hit rule end ATN state
     /// and did not follow it despite needing to.
-    static const size_t EPSILON = (size_t)-2;
+    static const size_t EPSILON = static_cast<size_t>(-2);
     static const size_t MIN_USER_TOKEN_TYPE = 1;
     static const size_t EOF = IntStream::EOF;
 
-    virtual ~Token() {};
+    virtual ~Token();
 
     /// All tokens go to the parser (unless skip() is called in that rule)
     /// on a particular "channel".  The parser tunes to a particular channel

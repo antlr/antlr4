@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+﻿/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -15,6 +15,9 @@ DFASerializer::DFASerializer(const DFA *dfa, const std::vector<std::string>& tok
 }
 
 DFASerializer::DFASerializer(const DFA *dfa, const Vocabulary &vocabulary) : _dfa(dfa), _vocabulary(vocabulary) {
+}
+
+DFASerializer::~DFASerializer() {
 }
 
 std::string DFASerializer::toString() const {

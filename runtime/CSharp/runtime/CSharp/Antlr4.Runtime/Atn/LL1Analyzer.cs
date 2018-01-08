@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -184,7 +184,7 @@ namespace Antlr4.Runtime.Atn
         /// If
         /// <paramref name="ctx"/>
         /// is
-        /// <see cref="PredictionContext.EmptyLocal"/>
+        /// <see cref="PredictionContext.EMPTY"/>
         /// and
         /// <paramref name="stopState"/>
         /// or the end of the rule containing
@@ -194,7 +194,7 @@ namespace Antlr4.Runtime.Atn
         /// is added to the result set. If
         /// <paramref name="ctx"/>
         /// is not
-        /// <see cref="PredictionContext.EmptyLocal"/>
+        /// <see cref="PredictionContext.EMPTY"/>
         /// and
         /// <paramref name="addEOF"/>
         /// is
@@ -213,7 +213,7 @@ namespace Antlr4.Runtime.Atn
         /// </param>
         /// <param name="ctx">
         /// The outer context, or
-        /// <see cref="PredictionContext.EmptyLocal"/>
+        /// <see cref="PredictionContext.EMPTY"/>
         /// if
         /// the outer context should not be used.
         /// </param>
@@ -250,7 +250,7 @@ namespace Antlr4.Runtime.Atn
         /// outermost context is reached. This parameter has no effect if
         /// <paramref name="ctx"/>
         /// is
-        /// <see cref="PredictionContext.EmptyLocal"/>
+        /// <see cref="PredictionContext.EMPTY"/>
         /// .
         /// </param>
         protected internal virtual void Look(ATNState s, ATNState stopState, PredictionContext ctx, IntervalSet look, HashSet<ATNConfig> lookBusy, BitSet calledRuleStack, bool seeThruPreds, bool addEOF)

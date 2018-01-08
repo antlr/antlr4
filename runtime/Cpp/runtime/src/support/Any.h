@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -19,7 +19,7 @@ namespace antlrcpp {
 template<class T>
   using StorageType = typename std::decay<T>::type;
 
-struct Any
+struct ANTLR4CPP_PUBLIC Any
 {
   bool isNull() const { return _ptr == nullptr; }
   bool isNotNull() const { return _ptr != nullptr; }
@@ -92,9 +92,7 @@ struct Any
     return *this;
   }
 
-  virtual ~Any() {
-    delete _ptr;
-  }
+  virtual ~Any();
 
   virtual bool equals(Any other) const {
     return _ptr == other._ptr;
@@ -102,7 +100,7 @@ struct Any
 
 private:
   struct Base {
-    virtual ~Base() { }
+    virtual ~Base();
     virtual Base* clone() const = 0;
   };
 

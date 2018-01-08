@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+﻿/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -15,7 +15,7 @@ namespace dfa {
   public:
     DFASerializer(const DFA *dfa, const std::vector<std::string>& tnames);
     DFASerializer(const DFA *dfa, const Vocabulary &vocabulary);
-    virtual ~DFASerializer() {};
+    virtual ~DFASerializer();
 
     virtual std::string toString() const;
 

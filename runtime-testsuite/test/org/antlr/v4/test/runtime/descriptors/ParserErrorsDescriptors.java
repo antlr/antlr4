@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -580,5 +580,66 @@ public class ParserErrorsDescriptors {
 		@CommentHasStringValue
 		public String grammar;
 
+	}
+
+	public static class TokenMismatch3 extends BaseParserTestDescriptor {
+		public String input = "";
+		public String output = null;
+		public String errors = "line 1:0 mismatched input '<EOF>' expecting {'(', BOOLEAN_LITERAL, ID, '$'}\n";
+		public String startRule = "expression";
+		public String grammarName = "T";
+
+		/**
+		 grammar T;
+
+		 expression
+		 :   value
+		 |   expression op=AND expression
+		 |   expression op=OR expression
+		 ;
+		 value
+		 :   BOOLEAN_LITERAL
+		 |   ID
+		 |   ID1
+		 |   '(' expression ')'
+		 ;
+
+		 AND : '&&';
+		 OR  : '||';
+
+		 BOOLEAN_LITERAL : 'true' | 'false';
+
+		 ID  : [a-z]+;
+		 ID1 : '$';
+
+		 WS  : [ \t\r\n]+ -> skip ;
+		 */
+		@CommentHasStringValue
+		public String grammar;
+
+	}
+
+	public static class ExtraneousInput extends BaseParserTestDescriptor {
+		public String input = "baa";
+		public String output = null;
+		public String errors = "line 1:0 mismatched input 'b' expecting {<EOF>, 'a'}\n";
+		public String startRule = "file";
+		public String grammarName = "T";
+
+		/**
+		 grammar T;
+
+		 member : 'a';
+		 body : member*;
+		 file : body EOF;
+		 B : 'b';
+		 */
+		@CommentHasStringValue
+		public String grammar;
+
+		@Override
+		public boolean ignore(String targetName) {
+			return !"Java".equals(targetName);
+		}
 	}
 }

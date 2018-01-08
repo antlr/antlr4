@@ -1,4 +1,4 @@
-// Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 // Use of this file is governed by the BSD 3-clause license that
 // can be found in the LICENSE.txt file in the project root.
 
@@ -21,7 +21,7 @@ type LexerAction interface {
 	getActionType() int
 	getIsPositionDependent() bool
 	execute(lexer Lexer)
-	Hash() string
+	hash() int
 	equals(other LexerAction) bool
 }
 
@@ -51,8 +51,8 @@ func (b *BaseLexerAction) getIsPositionDependent() bool {
 	return b.isPositionDependent
 }
 
-func (b *BaseLexerAction) Hash() string {
-	return strconv.Itoa(b.actionType)
+func (b *BaseLexerAction) hash() int {
+	return b.actionType
 }
 
 func (b *BaseLexerAction) equals(other LexerAction) bool {
@@ -101,11 +101,14 @@ func NewLexerTypeAction(thetype int) *LexerTypeAction {
 }
 
 func (l *LexerTypeAction) execute(lexer Lexer) {
-	lexer.setType(l.thetype)
+	lexer.SetType(l.thetype)
 }
 
-func (l *LexerTypeAction) Hash() string {
-	return strconv.Itoa(l.actionType) + strconv.Itoa(l.thetype)
+func (l *LexerTypeAction) hash() int {
+	h := murmurInit(0)
+	h = murmurUpdate(h, l.actionType)
+	h = murmurUpdate(h, l.thetype)
+	return murmurFinish(h, 2)
 }
 
 func (l *LexerTypeAction) equals(other LexerAction) bool {
@@ -142,11 +145,14 @@ func NewLexerPushModeAction(mode int) *LexerPushModeAction {
 // <p>This action is implemented by calling {@link Lexer//pushMode} with the
 // value provided by {@link //getMode}.</p>
 func (l *LexerPushModeAction) execute(lexer Lexer) {
-	lexer.pushMode(l.mode)
+	lexer.PushMode(l.mode)
 }
 
-func (l *LexerPushModeAction) Hash() string {
-	return strconv.Itoa(l.actionType) + strconv.Itoa(l.mode)
+func (l *LexerPushModeAction) hash() int {
+	h := murmurInit(0)
+	h = murmurUpdate(h, l.actionType)
+	h = murmurUpdate(h, l.mode)
+	return murmurFinish(h, 2)
 }
 
 func (l *LexerPushModeAction) equals(other LexerAction) bool {
@@ -184,7 +190,7 @@ var LexerPopModeActionINSTANCE = NewLexerPopModeAction()
 
 // <p>This action is implemented by calling {@link Lexer//popMode}.</p>
 func (l *LexerPopModeAction) execute(lexer Lexer) {
-	lexer.popMode()
+	lexer.PopMode()
 }
 
 func (l *LexerPopModeAction) String() string {
@@ -236,11 +242,14 @@ func NewLexerModeAction(mode int) *LexerModeAction {
 // <p>This action is implemented by calling {@link Lexer//mode} with the
 // value provided by {@link //getMode}.</p>
 func (l *LexerModeAction) execute(lexer Lexer) {
-	lexer.setMode(l.mode)
+	lexer.SetMode(l.mode)
 }
 
-func (l *LexerModeAction) Hash() string {
-	return strconv.Itoa(l.actionType) + strconv.Itoa(l.mode)
+func (l *LexerModeAction) hash() int {
+	h := murmurInit(0)
+	h = murmurUpdate(h, l.actionType)
+	h = murmurUpdate(h, l.mode)
+	return murmurFinish(h, 2)
 }
 
 func (l *LexerModeAction) equals(other LexerAction) bool {
@@ -294,8 +303,12 @@ func (l *LexerCustomAction) execute(lexer Lexer) {
 	lexer.Action(nil, l.ruleIndex, l.actionIndex)
 }
 
-func (l *LexerCustomAction) Hash() string {
-	return strconv.Itoa(l.actionType) + strconv.Itoa(l.ruleIndex) + strconv.Itoa(l.actionIndex)
+func (l *LexerCustomAction) hash() int {
+	h := murmurInit(0)
+	h = murmurUpdate(h, l.actionType)
+	h = murmurUpdate(h, l.ruleIndex)
+	h = murmurUpdate(h, l.actionIndex)
+	return murmurFinish(h, 3)
 }
 
 func (l *LexerCustomAction) equals(other LexerAction) bool {
@@ -328,11 +341,14 @@ func NewLexerChannelAction(channel int) *LexerChannelAction {
 // <p>This action is implemented by calling {@link Lexer//setChannel} with the
 // value provided by {@link //getChannel}.</p>
 func (l *LexerChannelAction) execute(lexer Lexer) {
-	lexer.setChannel(l.channel)
+	lexer.SetChannel(l.channel)
 }
 
-func (l *LexerChannelAction) Hash() string {
-	return strconv.Itoa(l.actionType) + strconv.Itoa(l.channel)
+func (l *LexerChannelAction) hash() int {
+	h := murmurInit(0)
+	h = murmurUpdate(h, l.actionType)
+	h = murmurUpdate(h, l.channel)
+	return murmurFinish(h, 2)
 }
 
 func (l *LexerChannelAction) equals(other LexerAction) bool {
@@ -396,8 +412,12 @@ func (l *LexerIndexedCustomAction) execute(lexer Lexer) {
 	l.lexerAction.execute(lexer)
 }
 
-func (l *LexerIndexedCustomAction) Hash() string {
-	return strconv.Itoa(l.actionType) + strconv.Itoa(l.offset) + l.lexerAction.Hash()
+func (l *LexerIndexedCustomAction) hash() int {
+	h := murmurInit(0)
+	h = murmurUpdate(h, l.actionType)
+	h = murmurUpdate(h, l.offset)
+	h = murmurUpdate(h, l.lexerAction.hash())
+	return murmurFinish(h, 3)
 }
 
 func (l *LexerIndexedCustomAction) equals(other LexerAction) bool {

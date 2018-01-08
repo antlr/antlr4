@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -54,7 +54,6 @@ import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupString;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.net.BindException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -678,7 +677,7 @@ public abstract class BaseBrowserTest implements RuntimeTestSupport {
 			"			test = function() {\r\n" +
 			"				document.getElementById('output').value = ''\r\n" +
 			"				var input = document.getElementById('input').value;\r\n" +
-			"			var stream = new antlr4.InputStream(input, true);\n" +
+			"			var stream = antlr4.CharStreams.fromString(input);\n" +
 			"    			var lexer = new " + lexerName + "." + lexerName + "(stream);\n" +
 			"				lexer._listeners = [new listener()];\r\n" +
 			"    			var tokens = new antlr4.CommonTokenStream(lexer);\n" +
@@ -737,7 +736,7 @@ public abstract class BaseBrowserTest implements RuntimeTestSupport {
 			"			test = function() {\r\n" +
 			"				document.getElementById('output').value = ''\r\n" +
 			"				var input = document.getElementById('input').value;\r\n" +
-			"			var chars = new antlr4.InputStream(input, true);\r\n" +
+			"			var chars = antlr4.CharStreams.fromString(input);\r\n" +
 			"    			var lexer = new " + lexerName + "." + lexerName + "(chars);\r\n" +
 			"				lexer._listeners = [new listener()];\r\n" +
 			"    			var stream = new antlr4.CommonTokenStream(lexer);\r\n" +

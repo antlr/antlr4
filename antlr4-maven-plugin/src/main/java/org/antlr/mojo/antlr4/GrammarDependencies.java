@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -216,14 +216,14 @@ class GrammarDependencies {
             return;
 
         for (GrammarAST importDecl : grammar.getAllChildrenWithType(ANTLRParser.IMPORT)) {
-            Tree id = importDecl.getFirstChildWithType(ANTLRParser.ID);
+            for (Tree id: importDecl.getAllChildrenWithType(ANTLRParser.ID)) {
+                // missing id is not valid, but we don't want to prevent the root cause from
+                // being reported by the ANTLR tool
+                if (id != null) {
+                    String grammarPath = getRelativePath(grammarFile);
 
-            // missing id is not valid, but we don't want to prevent the root cause from
-            // being reported by the ANTLR tool
-            if (id != null) {
-                String grammarPath = getRelativePath(grammarFile);
-
-                graph.addEdge(id.getText() + ".g4", grammarPath);
+                    graph.addEdge(id.getText() + ".g4", grammarPath);
+                }
             }
         }
 

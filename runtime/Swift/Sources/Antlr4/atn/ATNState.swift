@@ -1,68 +1,70 @@
-/// Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/// 
+/// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
+/// 
 
 
-
+/// 
+/// 
 /// The following images show the relation of states and
-/// {@link org.antlr.v4.runtime.atn.ATNState#transitions} for various grammar constructs.
+/// _org.antlr.v4.runtime.atn.ATNState#transitions_ for various grammar constructs.
 /// 
-/// <ul>
 /// 
-/// <li>Solid edges marked with an &#0949; indicate a required
-/// {@link org.antlr.v4.runtime.atn.EpsilonTransition}.</li>
+/// * Solid edges marked with an &#0949; indicate a required
+/// _org.antlr.v4.runtime.atn.EpsilonTransition_.
 /// 
-/// <li>Dashed edges indicate locations where any transition derived from
-/// {@link org.antlr.v4.runtime.atn.Transition} might appear.</li>
+/// * Dashed edges indicate locations where any transition derived from
+/// _org.antlr.v4.runtime.atn.Transition_ might appear.
 /// 
-/// <li>Dashed nodes are place holders for either a sequence of linked
-/// {@link org.antlr.v4.runtime.atn.BasicState} states or the inclusion of a block representing a nested
-/// construct in one of the forms below.</li>
+/// * Dashed nodes are place holders for either a sequence of linked
+/// _org.antlr.v4.runtime.atn.BasicState_ states or the inclusion of a block representing a nested
+/// construct in one of the forms below.
 /// 
-/// <li>Nodes showing multiple outgoing alternatives with a {@code ...} support
-/// any number of alternatives (one or more). Nodes without the {@code ...} only
-/// support the exact number of alternatives shown in the diagram.</li>
+/// * Nodes showing multiple outgoing alternatives with a `...` support
+/// any number of alternatives (one or more). Nodes without the `...` only
+/// support the exact number of alternatives shown in the diagram.
 /// 
-/// </ul>
 /// 
-/// <h2>Basic Blocks</h2>
+/// ## Basic Blocks
 /// 
-/// <h3>Rule</h3>
+/// ### Rule
 /// 
-/// <embed src="images/Rule.svg" type="image/svg+xml"/>
 /// 
-/// <h3>Block of 1 or more alternatives</h3>
 /// 
-/// <embed src="images/Block.svg" type="image/svg+xml"/>
+/// ## Block of 1 or more alternatives
 /// 
-/// <h2>Greedy Loops</h2>
 /// 
-/// <h3>Greedy Closure: {@code (...)*}</h3>
 /// 
-/// <embed src="images/ClosureGreedy.svg" type="image/svg+xml"/>
+/// ## Greedy Loops
 /// 
-/// <h3>Greedy Positive Closure: {@code (...)+}</h3>
+/// ### Greedy Closure: `(...)*`
 /// 
-/// <embed src="images/PositiveClosureGreedy.svg" type="image/svg+xml"/>
 /// 
-/// <h3>Greedy Optional: {@code (...)?}</h3>
 /// 
-/// <embed src="images/OptionalGreedy.svg" type="image/svg+xml"/>
+/// ### Greedy Positive Closure: `(...)+`
 /// 
-/// <h2>Non-Greedy Loops</h2>
 /// 
-/// <h3>Non-Greedy Closure: {@code (...)*?}</h3>
 /// 
-/// <embed src="images/ClosureNonGreedy.svg" type="image/svg+xml"/>
+/// ### Greedy Optional: `(...)?`
 /// 
-/// <h3>Non-Greedy Positive Closure: {@code (...)+?}</h3>
 /// 
-/// <embed src="images/PositiveClosureNonGreedy.svg" type="image/svg+xml"/>
 /// 
-/// <h3>Non-Greedy Optional: {@code (...)??}</h3>
+/// ## Non-Greedy Loops
 /// 
-/// <embed src="images/OptionalNonGreedy.svg" type="image/svg+xml"/>
-
+/// ### Non-Greedy Closure: `(...)*?`
+/// 
+/// 
+/// 
+/// ### Non-Greedy Positive Closure: `(...)+?`
+/// 
+/// 
+/// 
+/// ### Non-Greedy Optional: `(...)??`
+/// 
+/// 
+/// 
+/// 
 public class ATNState: Hashable, CustomStringConvertible {
     public static let INITIAL_NUM_TRANSITIONS: Int = 4
 
@@ -100,7 +102,9 @@ public class ATNState: Hashable, CustomStringConvertible {
 
     public static let INVALID_STATE_NUMBER: Int = -1
 
+    /// 
     /// Which ATN are we in?
+    /// 
     public final var atn: ATN? = nil
 
     public final var stateNumber: Int = INVALID_STATE_NUMBER
@@ -110,11 +114,15 @@ public class ATNState: Hashable, CustomStringConvertible {
 
     public final var epsilonOnlyTransitions: Bool = false
 
+    /// 
     /// Track the transitions emanating from this ATN state.
+    /// 
     internal final var transitions: Array<Transition> = Array<Transition>()
     //Array<Transition>(INITIAL_NUM_TRANSITIONS);
 
+    /// 
     /// Used to cache lookahead during parsing, not used during construction
+    /// 
     public final var nextTokenWithinRule: IntervalSet?
 
 
@@ -128,9 +136,6 @@ public class ATNState: Hashable, CustomStringConvertible {
     }
 
 
-    public func toString() -> String {
-        return description
-    }
     public var description: String {
         //return "MyClass \(string)"
         return String(stateNumber)
@@ -175,8 +180,7 @@ public class ATNState: Hashable, CustomStringConvertible {
     }
 
     public func getStateType() -> Int {
-        RuntimeException(#function + " must be overridden")
-        return 0
+        fatalError(#function + " must be overridden")
     }
 
     public final func onlyHasEpsilonTransitions() -> Bool {

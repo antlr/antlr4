@@ -1,4 +1,4 @@
-﻿ANTLR Project Contributors Certification of Origin and Rights
+ANTLR Project Contributors Certification of Origin and Rights
 
 All contributors to ANTLR v4 must formally agree to abide by this
 certificate of origin by signing on the bottom with their github
@@ -138,5 +138,44 @@ YYYY/MM/DD, github id, Full name, email
 2017/02/14, xied75, Dong Xie, xied75@gmail.com
 2017/02/20, Thomasb81, Thomas Burg, thomasb81@gmail.com
 2017/02/26, jvasileff, John Vasileff, john@vasileff.com
-2017/03/03, chund, Christian Hund, christian.hund@gmail.com
 2017/03/08, harry-tallbelt, Igor Vysokopoyasny, harry.tallbelt@gmail.com
+2017/03/09, teverett, Tom Everett, tom@khubla.com
+2017/03/03, chund, Christian Hund, christian.hund@gmail.com
+2017/03/15, robertvanderhulst, Robert van der Hulst, robert@xsharp.eu
+2017/03/28, cmd-johnson, Jonas Auer, jonas.auer.94@gmail.com
+2017/04/12, lys0716, Yishuang Lu, luyscmu@gmail.com
+2017/04/30, shravanrn, Shravan Narayan, shravanrn@gmail.com
+2017/05/11, jimallman, Jim Allman, jim@ibang.com
+2017/05/26, waf, Will Fuqua, wafuqua@gmail.com
+2017/05/29, kosak, Corey Kosak, kosak@kosak.com
+2017/06/11, erikbra, Erik A. Brandstadmoen, erik@brandstadmoen.net
+2017/06/10, jm-mikkelsen, Jan Martin Mikkelsen, janm@transactionware.com
+2017/06/25, alimg, Alim Gökkaya, alim.gokkaya@gmail.com
+2017/06/28, jBugman, Sergey Parshukov, codedby@bugman.me
+2017/07/09, neatnerd, Mike Arshinskiy, neatnerd@users.noreply.github.com
+2017/07/11, dhalperi, Daniel Halperin, daniel@halper.in
+2017/07/17, vaibhavaingankar09, Vaibhav Vaingankar, vbhvvaingankar9@gmail.com
+2017/07/23, venkatperi, Venkat Peri, venkatperi@gmail.com
+2017/07/27, shirou, WAKAYAMA Shirou, shirou.faw@gmail.com
+2017/07/09, neatnerd, Mike Arshinskiy, neatnerd@users.noreply.github.com
+2017/07/27, matthauck, Matt Hauck, matthauck@gmail.com
+2017/07/27, shirou, WAKAYAMA Shirou, shirou.faw@gmail.com
+2017/08/20, tiagomazzutti, Tiago Mazzutti, tiagomzt@gmail.com
+2017/08/20, milanaleksic, Milan Aleksic, milanaleksic@gmail.com
+2017/08/29, Eddy Reyes, eddy@mindsight.io
+2017/09/09, brauliobz, Bráulio Bezerra, brauliobezerra@gmail.com
+2017/09/11, sachinjain024, Sachin Jain, sachinjain024@gmail.com
+2017/09/25, kaedvann, Rostislav Listerenko, r.listerenko@gmail.com
+2017/10/06, bramp, Andrew Brampton, brampton@gmail.com
+2017/10/15, simkimsia, Sim Kim Sia, kimcity@gmail.com
+2017/10/27, Griffon26, Maurice van der Pot, griffon26@kfk4ever.com
+2017/05/29, rlfnb, Ralf Neeb, rlfnb@rlfnb.de
+2017/10/29, gendalph, Максим Прохоренко, Maxim\dotProhorenko@gm@il.com
+2017/11/02, jasonmoo, Jason Mooberry, jason.mooberry@gmail.com
+2017/11/05, ajaypanyala, Ajay Panyala, ajay.panyala@gmail.com
+2017/11/24, zqlu.cn, Zhiqiang Lu, zqlu.cn@gmail.com
+2017/11/28, niccroad, Nicolas Croad, nic.croad@gmail.com
+2017/12/01, DavidMoraisFerreira, David Morais Ferreira, david.moraisferreira@gmail.com
+2017/12/01, SebastianLng, Sebastian Lang, sebastian.lang@outlook.com
+2017/12/03, oranoran, Oran Epelbaum, oran / epelbaum me
+2017/12/27, jkmar, Jakub Marciniszyn, marciniszyn.jk@gmail.com

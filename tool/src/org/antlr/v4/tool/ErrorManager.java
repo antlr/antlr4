@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -16,7 +16,6 @@ import java.io.File;
 import java.net.URL;
 import java.util.Collection;
 import java.util.EnumSet;
-import java.util.Locale;
 import java.util.Set;
 
 public class ErrorManager {
@@ -32,8 +31,6 @@ public class ErrorManager {
     /** The group of templates that represent the current message format. */
     STGroup format;
 
-    /** Messages should be sensitive to the locale. */
-    Locale locale;
     String formatName;
 
     ErrorBuffer initSTListener = new ErrorBuffer();
@@ -63,11 +60,20 @@ public class ErrorManager {
 			locationValid = true;
 		}
 		if (msg.fileName != null) {
-			File f = new File(msg.fileName);
-			// Don't show path to file in messages; too long.
 			String displayFileName = msg.fileName;
-			if ( f.exists() ) {
-				displayFileName = f.getName();
+			if (format.equals("antlr")) {
+				// Don't show path to file in messages in ANTLR format;
+				// they're too long.
+				File f = new File(msg.fileName);
+				if ( f.exists() ) {
+					displayFileName = f.getName();
+				}
+			}
+			else {
+				// For other message formats, use the full filename in the
+				// message.  This assumes that these formats are intended to
+				// be parsed by IDEs, and so they need the full path to
+				// resolve correctly.
 			}
 			locationST.add("file", displayFileName);
 			locationValid = true;

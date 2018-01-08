@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+﻿/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -33,7 +33,9 @@ namespace antlr4 {
                          Token *offendingToken = nullptr);
     RecognitionException(const std::string &message, Recognizer *recognizer, IntStream *input,
                          ParserRuleContext *ctx, Token *offendingToken = nullptr);
-    ~RecognitionException() {}
+    RecognitionException(RecognitionException const&) = default;
+    ~RecognitionException();
+    RecognitionException& operator=(RecognitionException const&) = default;
 
     /// Get the ATN state number the parser was in at the time the error
     /// occurred. For NoViableAltException and

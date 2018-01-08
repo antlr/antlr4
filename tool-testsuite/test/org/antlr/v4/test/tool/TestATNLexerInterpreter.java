@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -381,7 +381,7 @@ public class TestATNLexerInterpreter extends BaseJavaToolTest {
 
 	protected void checkLexerMatches(LexerGrammar lg, String inputString, String expecting) {
 		ATN atn = createATN(lg, true);
-		CharStream input = CharStreams.createWithString(inputString);
+		CharStream input = CharStreams.fromString(inputString);
 		ATNState startState = atn.modeNameToStartState.get("DEFAULT_MODE");
 		DOTGenerator dot = new DOTGenerator(lg);
 //		System.out.println(dot.getDOT(startState, true));

@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+﻿/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -30,6 +30,9 @@
 using namespace antlr4;
 using namespace antlr4::atn;
 using namespace antlrcpp;
+
+LexerATNSimulator::SimState::~SimState() {
+}
 
 void LexerATNSimulator::SimState::reset() {
   index = INVALID_INDEX;
@@ -82,8 +85,6 @@ size_t LexerATNSimulator::match(CharStream *input, size_t mode) {
   } else {
     return execATN(input, dfa.s0);
   }
-
-  return Token::EOF;
 }
 
 void LexerATNSimulator::reset() {
@@ -180,23 +181,21 @@ size_t LexerATNSimulator::execATN(CharStream *input, dfa::DFAState *ds0) {
 }
 
 dfa::DFAState *LexerATNSimulator::getExistingTargetState(dfa::DFAState *s, size_t t) {
-  if (s->edges.empty()|| /*t < MIN_DFA_EDGE ||*/ t > MAX_DFA_EDGE) { // MIN_DFA_EDGE is 0, hence code gives a warning, if left in.
-    return nullptr;
-  }
-
+  dfa::DFAState* retval = nullptr;
   _edgeLock.readLock();
-  auto iterator = s->edges.find(t - MIN_DFA_EDGE);
+  if (t <= MAX_DFA_EDGE) {
+    auto iterator = s->edges.find(t - MIN_DFA_EDGE);
 #if DEBUG_ATN == 1
-  if (iterator != s->edges.end()) {
-    std::cout << std::string("reuse state ") << s->stateNumber << std::string(" edge to ") << iterator->second->stateNumber << std::endl;
-  }
+    if (iterator != s->edges.end()) {
+      std::cout << std::string("reuse state ") << s->stateNumber << std::string(" edge to ") << iterator->second->stateNumber << std::endl;
+    }
 #endif
+
+    if (iterator != s->edges.end())
+	retval = iterator->second;
+  }
   _edgeLock.readUnlock();
-
-  if (iterator == s->edges.end())
-    return nullptr;
-
-  return iterator->second;
+  return retval;
 }
 
 dfa::DFAState *LexerATNSimulator::computeTargetState(CharStream *input, dfa::DFAState *s, size_t t) {

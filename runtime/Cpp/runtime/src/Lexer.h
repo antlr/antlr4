@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+﻿/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -19,8 +19,8 @@ namespace antlr4 {
   class ANTLR4CPP_PUBLIC Lexer : public Recognizer, public TokenSource {
   public:
     static const size_t DEFAULT_MODE = 0;
-    static const size_t MORE = (size_t)-2;
-    static const size_t SKIP = (size_t)-3;
+    static const size_t MORE = static_cast<size_t>(-2);
+    static const size_t SKIP = static_cast<size_t>(-3);
 
     static const size_t DEFAULT_TOKEN_CHANNEL = Token::DEFAULT_CHANNEL;
     static const size_t HIDDEN = Token::HIDDEN_CHANNEL;

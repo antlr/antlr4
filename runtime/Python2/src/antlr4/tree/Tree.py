@@ -1,4 +1,4 @@
-# Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+# Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 # Use of this file is governed by the BSD 3-clause license that
 # can be found in the LICENSE.txt file in the project root.
 #/
@@ -40,7 +40,7 @@ class ParseTreeVisitor(object):
         n = node.getChildCount()
         for i in range(n):
             if not self.shouldVisitNextChild(node, result):
-                return
+                return result
 
             c = node.getChild(i)
             childResult = c.accept(self)
@@ -108,13 +108,13 @@ class TerminalNodeImpl(TerminalNode):
         return visitor.visitTerminal(self)
 
     def getText(self):
-        return self.symbol.text
+        return unicode(self.symbol.text)
 
     def __unicode__(self):
         if self.symbol.type == Token.EOF:
-            return "<EOF>"
+            return u"<EOF>"
         else:
-            return self.symbol.text
+            return unicode(self.symbol.text)
 
 # Represents a token that was consumed during resynchronization
 #  rather than during a valid match operation. For example,

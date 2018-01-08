@@ -81,7 +81,10 @@ $ grun MyELang stat
 <= 	line 3:0 extraneous input ';' expecting {INT, ID}
 ```
 
-If there were any `tokens` specifications, the main grammar would merge the token sets. Any named actions such as `@members` would be merged. In general, you should avoid named actions and actions within rules in imported grammars since that limits their reuse. ANTLR also ignores any options in imported grammars.
+If there are modes in the main grammar or any of the imported grammars then the import process will import those modes and merge their rules where they are not overridden. In the event any mode becomes empty as all its
+rules have been overridden by rules outside the mode this mode will be discarded.
+
+If there were any `tokens` specifications, the main grammar would merge the token sets. If there were any `channel` specifications, the main grammar would merge the channel sets. Any named actions such as `@members` would be merged. In general, you should avoid named actions and actions within rules in imported grammars since that limits their reuse. ANTLR also ignores any options in imported grammars.
 
 Imported grammars can also import other grammars. ANTLR pursues all imported grammars in a depth-first fashion. If two or more imported grammars define rule `r`, ANTLR chooses the first version of `r` it finds. In the following diagram, ANTLR examines grammars in the following order `Nested`, `G1`, `G3`, `G2`.
 
@@ -91,9 +94,9 @@ Imported grammars can also import other grammars. ANTLR pursues all imported gra
 
 Not every kind of grammar can import every other kind of grammar:
 
-* Lexer grammars can import lexers.
+* Lexer grammars can import lexers, including lexers containing modes.
 * Parsers can import parsers.
-* Combined grammars can import lexers or parsers.
+* Combined grammars can import parsers or lexers without modes.
 
 ANTLR adds imported rules to the end of the rule list in a main lexer grammar. That means lexer rules in the main grammar get precedence over imported rules. For example, if a main grammar defines rule `IF : ’if’ ;` and an imported grammar defines rule `ID : [a-z]+ ;` (which also recognizes `if`), the imported `ID` won’t hide the main grammar’s `IF` token definition.
 

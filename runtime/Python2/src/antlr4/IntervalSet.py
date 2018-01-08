@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+# Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 # Use of this file is governed by the BSD 3-clause license that
 # can be found in the LICENSE.txt file in the project root.
 #
@@ -193,7 +193,7 @@ class IntervalSet(object):
         elif a==Token.EPSILON:
             return u"<EPSILON>"
         else:
-            if a<len(literalNames):
+            if a<len(literalNames) and literalNames[a] != u"<INVALID>":
                 return literalNames[a]
             if a<len(symbolicNames):
                 return symbolicNames[a]

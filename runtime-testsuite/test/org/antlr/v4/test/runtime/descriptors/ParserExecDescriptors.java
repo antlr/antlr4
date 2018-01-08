@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -240,8 +240,30 @@ public class ParserExecDescriptors {
 
 	}
 
+	/** Match assignments, ignore other tokens with wildcard. */
+	public static class Wildcard extends BaseParserTestDescriptor {
+		public String input = "x=10; abc;;;; y=99;";
+		public String output = "x=10;\ny=99;\n";
+		public String errors = null;
+		public String startRule = "a";
+		public String grammarName = "T";
+
+		/**
+		grammar T;
+		a : (assign|.)+ EOF ;
+		assign : ID '=' INT ';' {
+		<writeln("$text")>
+		} ;
+		ID : 'a'..'z'+ ;
+		INT : '0'..'9'+;
+		WS : (' '|'\n') -> skip;
+		*/
+		@CommentHasStringValue
+		public String grammar;
+	}
+
 	/**
-	 * This test ensures that {@link ParserATNSimulator} does not produce a
+	 * This test ensures that {@link org.antlr.v4.runtime.atn.ParserATNSimulator} does not produce a
 	 * {@link StackOverflowError} when it encounters an {@code EOF} transition
 	 * inside a closure.
 	 */

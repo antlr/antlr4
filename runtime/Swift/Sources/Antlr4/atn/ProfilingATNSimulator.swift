@@ -1,9 +1,13 @@
-/// Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/// 
+/// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
+/// 
 
 
+/// 
 /// -  4.3
+/// 
 
 import Foundation
 
@@ -17,6 +21,7 @@ public class ProfilingATNSimulator: ParserATNSimulator {
     internal var currentDecision: Int = 0
     internal var currentState: DFAState?
 
+    /// 
     /// At the point of LL failover, we record how SLL would resolve the conflict so that
     /// we can determine whether or not a decision / input pair is context-sensitive.
     /// If LL gives a different result than SLL's predicted alternative, we have a
@@ -27,6 +32,7 @@ public class ProfilingATNSimulator: ParserATNSimulator {
     /// was not required in order to produce a correct prediction for this decision and input sequence.
     /// It may in fact still be a context sensitivity but we don't know by looking at the
     /// minimum alternatives for the current input.
+    /// 
     internal var conflictingAltResolvedBySLL: Int = 0
 
     public init(_ parser: Parser) {
@@ -35,7 +41,7 @@ public class ProfilingATNSimulator: ParserATNSimulator {
         super.init(parser,
                 parser.getInterpreter().atn,
                 parser.getInterpreter().decisionToDFA,
-                parser.getInterpreter().sharedContextCache!)
+                parser.getInterpreter().sharedContextCache)
 
         numDecisions = atn.decisionToState.count
         for i in 0..<numDecisions {
@@ -57,7 +63,7 @@ public class ProfilingATNSimulator: ParserATNSimulator {
         decisions[decision].timeInPrediction += (stop - start)
         decisions[decision].invocations += 1
 
-        var SLL_k: Int64 = _sllStopIndex - _startIndex + 1
+        var SLL_k: Int64 = Int64(_sllStopIndex - _startIndex + 1)
         decisions[decision].SLL_TotalLook += SLL_k
         decisions[decision].SLL_MinLook = decisions[decision].SLL_MinLook == 0 ? SLL_k : min(decisions[decision].SLL_MinLook, SLL_k)
         if SLL_k > decisions[decision].SLL_MaxLook {
@@ -67,7 +73,7 @@ public class ProfilingATNSimulator: ParserATNSimulator {
         }
 
         if _llStopIndex >= 0 {
-            var LL_k: Int64 = _llStopIndex - _startIndex + 1
+            var LL_k: Int64 = Int64(_llStopIndex - _startIndex + 1)
             decisions[decision].LL_TotalLook += LL_k
             decisions[decision].LL_MinLook = decisions[decision].LL_MinLook == 0 ? LL_k : min(decisions[decision].LL_MinLook, LL_k)
             if LL_k > decisions[decision].LL_MaxLook {
@@ -107,7 +113,7 @@ public class ProfilingATNSimulator: ParserATNSimulator {
 
     override
     internal func computeTargetState(_ dfa: DFA, _ previousD: DFAState, _ t: Int) throws -> DFAState {
-        let state: DFAState = try  super.computeTargetState(dfa, previousD, t)
+        let state = try super.computeTargetState(dfa, previousD, t)
         currentState = state
         return state
     }
@@ -120,7 +126,7 @@ public class ProfilingATNSimulator: ParserATNSimulator {
             _llStopIndex = _input.index()
         }
 
-        let reachConfigs: ATNConfigSet? = try super.computeReachSet(closure, t, fullCtx)
+        let reachConfigs = try super.computeReachSet(closure, t, fullCtx)
         if fullCtx {
             decisions[currentDecision].LL_ATNTransitions += 1 // count computation even if error
             if reachConfigs != nil {
@@ -146,12 +152,12 @@ public class ProfilingATNSimulator: ParserATNSimulator {
 
     override
     internal func evalSemanticContext(_ pred: SemanticContext, _ parserCallStack: ParserRuleContext, _ alt: Int, _ fullCtx: Bool) throws -> Bool {
-        let result: Bool = try super.evalSemanticContext(pred, parserCallStack, alt, fullCtx)
+        let result = try super.evalSemanticContext(pred, parserCallStack, alt, fullCtx)
         if !(pred is SemanticContext.PrecedencePredicate) {
-            let fullContext: Bool = _llStopIndex >= 0
-            let stopIndex: Int = fullContext ? _llStopIndex : _sllStopIndex
+            let fullContext = _llStopIndex >= 0
+            let stopIndex = fullContext ? _llStopIndex : _sllStopIndex
             decisions[currentDecision].predicateEvals.append(
-            PredicateEvalInfo(currentDecision, _input, _startIndex, stopIndex, pred, result, alt, fullCtx)
+                PredicateEvalInfo(currentDecision, _input, _startIndex, stopIndex, pred, result, alt, fullCtx)
             )
         }
 
@@ -159,34 +165,36 @@ public class ProfilingATNSimulator: ParserATNSimulator {
     }
 
     override
-    internal func reportAttemptingFullContext(_ dfa: DFA, _ conflictingAlts: BitSet?, _ configs: ATNConfigSet, _ startIndex: Int, _ stopIndex: Int) throws {
+    internal func reportAttemptingFullContext(_ dfa: DFA, _ conflictingAlts: BitSet?, _ configs: ATNConfigSet, _ startIndex: Int, _ stopIndex: Int) {
         if let conflictingAlts = conflictingAlts {
-            conflictingAltResolvedBySLL = try conflictingAlts.nextSetBit(0)
+            conflictingAltResolvedBySLL = conflictingAlts.firstSetBit()
         } else {
-            conflictingAltResolvedBySLL = try configs.getAlts().nextSetBit(0)
+            let configAlts = configs.getAlts()
+            conflictingAltResolvedBySLL = configAlts.firstSetBit()
         }
         decisions[currentDecision].LL_Fallback += 1
-        try super.reportAttemptingFullContext(dfa, conflictingAlts, configs, startIndex, stopIndex)
+        super.reportAttemptingFullContext(dfa, conflictingAlts, configs, startIndex, stopIndex)
     }
 
     override
-    internal func reportContextSensitivity(_ dfa: DFA, _ prediction: Int, _ configs: ATNConfigSet, _ startIndex: Int, _ stopIndex: Int) throws {
+    internal func reportContextSensitivity(_ dfa: DFA, _ prediction: Int, _ configs: ATNConfigSet, _ startIndex: Int, _ stopIndex: Int) {
         if prediction != conflictingAltResolvedBySLL {
             decisions[currentDecision].contextSensitivities.append(
             ContextSensitivityInfo(currentDecision, configs, _input, startIndex, stopIndex)
             )
         }
-        try super.reportContextSensitivity(dfa, prediction, configs, startIndex, stopIndex)
+        super.reportContextSensitivity(dfa, prediction, configs, startIndex, stopIndex)
     }
 
     override
     internal func reportAmbiguity(_ dfa: DFA, _ D: DFAState, _ startIndex: Int, _ stopIndex: Int, _ exact: Bool,
-                                  _ ambigAlts: BitSet?, _ configs: ATNConfigSet) throws {
+                                  _ ambigAlts: BitSet?, _ configs: ATNConfigSet) {
         var prediction: Int
         if let ambigAlts = ambigAlts {
-            prediction = try ambigAlts.nextSetBit(0)
+            prediction = ambigAlts.firstSetBit()
         } else {
-            prediction = try configs.getAlts().nextSetBit(0)
+            let configAlts = configs.getAlts()
+            prediction = configAlts.firstSetBit()
         }
         if configs.fullCtx && prediction != conflictingAltResolvedBySLL {
             // Even though this is an ambiguity we are reporting, we can
@@ -202,7 +210,7 @@ public class ProfilingATNSimulator: ParserATNSimulator {
         AmbiguityInfo(currentDecision, configs, ambigAlts!,
                 _input, startIndex, stopIndex, configs.fullCtx)
         )
-        try super.reportAmbiguity(dfa, D, startIndex, stopIndex, exact, ambigAlts!, configs)
+        super.reportAmbiguity(dfa, D, startIndex, stopIndex, exact, ambigAlts!, configs)
     }
 
 

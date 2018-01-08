@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -20,6 +20,7 @@ import java.util.Set;
 
 public class VisitorFile extends OutputFile {
 	public String genPackage; // from -package cmd-line
+	public String accessLevel; // from -DaccessLevel cmd-line
 	public String exportMacro; // from -DexportMacro cmd-line
 	public String grammarName;
 	public String parserName;
@@ -58,7 +59,8 @@ public class VisitorFile extends OutputFile {
 		}
 		ActionAST ast = g.namedActions.get("header");
 		if ( ast!=null ) header = new Action(factory, ast);
-		genPackage = factory.getGrammar().tool.genPackage;
-		exportMacro = factory.getGrammar().getOptionString("exportMacro");
+		genPackage = g.tool.genPackage;
+		accessLevel = g.getOptionString("accessLevel");
+		exportMacro = g.getOptionString("exportMacro");
 	}
 }

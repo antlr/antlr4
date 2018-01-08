@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+﻿/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -15,7 +15,7 @@ namespace antlr4 {
   template<typename Symbol>
   class ANTLR4CPP_PUBLIC TokenFactory {
   public:
-    virtual ~TokenFactory() {};
+    virtual ~TokenFactory() {}
 
     /// This is the method used to create tokens in the lexer and in the
     /// error handling strategy. If text!=null, than the start and stop positions

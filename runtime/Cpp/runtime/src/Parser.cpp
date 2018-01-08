@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+﻿/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -33,7 +33,10 @@ using namespace antlrcpp;
 
 std::map<std::vector<uint16_t>, atn::ATN> Parser::bypassAltsAtnCache;
 
-Parser::TraceListener::TraceListener(Parser *outerInstance) : outerInstance(outerInstance) {
+Parser::TraceListener::TraceListener(Parser *outerInstance_) : outerInstance(outerInstance_) {
+}
+
+Parser::TraceListener::~TraceListener() {
 }
 
 void Parser::TraceListener::enterEveryRule(ParserRuleContext *ctx) {
@@ -55,6 +58,9 @@ void Parser::TraceListener::exitEveryRule(ParserRuleContext *ctx) {
 }
 
 Parser::TrimToSizeListener Parser::TrimToSizeListener::INSTANCE;
+
+Parser::TrimToSizeListener::~TrimToSizeListener() {
+}
 
 void Parser::TrimToSizeListener::enterEveryRule(ParserRuleContext * /*ctx*/) {
 }
@@ -294,7 +300,7 @@ Token* Parser::consume() {
   if (o->getType() != EOF) {
     getInputStream()->consume();
   }
-  
+
   bool hasListener = _parseListeners.size() > 0 && !_parseListeners.empty();
   if (_buildParseTrees || hasListener) {
     if (_errHandler->inErrorRecoveryMode(this)) {
