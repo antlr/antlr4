@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -242,10 +242,12 @@ public abstract class Target {
 						else {
 							toAdvance += 4;
 						}
-						String fullEscape = is.substring(i, i + toAdvance);
-						appendUnicodeEscapedCodePoint(
+						if ( i+toAdvance <= is.length() ) { // we might have an invalid \\uAB or something
+							String fullEscape = is.substring(i, i+toAdvance);
+							appendUnicodeEscapedCodePoint(
 								CharSupport.getCharValueFromCharInGrammarLiteral(fullEscape),
 								sb);
+						}
 						break;
 					default:
 						if (shouldUseUnicodeEscapeForCodePointInDoubleQuotedString(escapedCodePoint)) {

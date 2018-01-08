@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -20,6 +20,9 @@ Vocabulary::Vocabulary(const std::vector<std::string> &literalNames,
   : _literalNames(literalNames), _symbolicNames(symbolicNames), _displayNames(displayNames),
     _maxTokenType(std::max(_displayNames.size(), std::max(_literalNames.size(), _symbolicNames.size())) - 1) {
   // See note here on -1 part: https://github.com/antlr/antlr4/pull/1146
+}
+
+Vocabulary::~Vocabulary() {
 }
 
 Vocabulary Vocabulary::fromTokenNames(const std::vector<std::string> &tokenNames) {

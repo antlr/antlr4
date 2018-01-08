@@ -154,6 +154,10 @@ In order to execute this listener, you would simply add the following lines to t
  antlr4.tree.ParseTreeWalker.DEFAULT.walk(printer, tree);
 ```
 
+## What about TypeScript?
+
+We currently do not have a TypeScript target, but Sam Harwell is [working on a port](https://github.com/tunnelvisionlabs/antlr4ts). [Here](https://github.com/ChuckJonas/extract-interface-ts) is Section 4.3 of [ANTLR 4 book](http://a.co/5jUJYmh) converted to typescript.
+
 ## How do I integrate my parser with ACE editor?
 
 This specific task is described in this [dedicated page](ace-javascript-target.md).

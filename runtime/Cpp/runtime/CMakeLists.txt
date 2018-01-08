@@ -44,10 +44,16 @@ elseif(APPLE)
   target_link_libraries(antlr4_static ${COREFOUNDATION_LIBRARY})
 endif()
 
-set(disabled_compile_warnings "-Wno-overloaded-virtual")
+if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+  set(disabled_compile_warnings "/wd4251")
+else()
+  set(disabled_compile_warnings "-Wno-overloaded-virtual")
+endif ()
+
+
 if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
   set(disabled_compile_warnings "${disabled_compile_warnings} -Wno-dollar-in-identifier-extension -Wno-four-char-constants")
-elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
+elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU" OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "Intel")
   set(disabled_compile_warnings "${disabled_compile_warnings} -Wno-multichar")
 endif()
 
@@ -57,6 +63,20 @@ if (WIN32)
   set(extra_share_compile_flags "-DANTLR4CPP_EXPORTS")
   set(extra_static_compile_flags "-DANTLR4CPP_STATIC")
 endif(WIN32)
+if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+  target_compile_options(antlr4_shared PRIVATE "/MD$<$<CONFIG:Debug>:d>")
+  target_compile_options(antlr4_static PRIVATE "/MT$<$<CONFIG:Debug>:d>")
+endif()
+
+set(static_lib_suffix "")
+if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+  set(static_lib_suffix "-static")
+endif()
+
+if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+  set(extra_share_compile_flags "-DANTLR4CPP_EXPORTS -MP /wd4251")
+  set(extra_static_compile_flags "-DANTLR4CPP_STATIC -MP")
+endif()
 
 set_target_properties(antlr4_shared
                       PROPERTIES VERSION   ${ANTLR_VERSION}
@@ -72,7 +92,7 @@ set_target_properties(antlr4_shared
 set_target_properties(antlr4_static
                       PROPERTIES VERSION   ${ANTLR_VERSION}
                                  SOVERSION ${ANTLR_VERSION}
-                                 OUTPUT_NAME antlr4-runtime
+                                 OUTPUT_NAME "antlr4-runtime${static_lib_suffix}"
                                  ARCHIVE_OUTPUT_DIRECTORY ${LIB_OUTPUT_DIR}
                                  COMPILE_FLAGS "${disabled_compile_warnings} ${extra_static_compile_flags}")
 

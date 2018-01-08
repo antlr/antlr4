@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+﻿/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -28,7 +28,9 @@ namespace pattern {
     /// <param name="patternTree"> The tree pattern in <seealso cref="ParseTree"/> form. </param>
     ParseTreePattern(ParseTreePatternMatcher *matcher, const std::string &pattern, int patternRuleIndex,
                      ParseTree *patternTree);
-    virtual ~ParseTreePattern() {};
+    ParseTreePattern(ParseTreePattern const&) = default;
+    virtual ~ParseTreePattern();
+    ParseTreePattern& operator=(ParseTreePattern const&) = default;
 
     /// <summary>
     /// Match a specific parse tree against this tree pattern.

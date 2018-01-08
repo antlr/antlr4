@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -91,7 +91,7 @@ namespace Antlr4.Runtime.Atn
             this.maxTokenType = maxTokenType;
         }
 
- 
+
         public virtual PredictionContext GetCachedContext(PredictionContext context)
         {
             return PredictionContext.GetCachedContext(context, contextCache, new PredictionContext.IdentityHashMap());
@@ -104,7 +104,7 @@ namespace Antlr4.Runtime.Atn
         /// If
         /// <paramref name="ctx"/>
         /// is
-        /// <see cref="PredictionContext.EmptyLocal"/>
+        /// <see cref="PredictionContext.EMPTY"/>
         /// , the set of tokens will not include what can follow
         /// the rule surrounding
         /// <paramref name="s"/>

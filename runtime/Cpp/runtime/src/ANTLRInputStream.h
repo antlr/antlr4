@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+﻿/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -16,11 +16,7 @@ namespace antlr4 {
   protected:
     /// The data being scanned.
     // UTF-32
-#if defined(_MSC_VER) && _MSC_VER == 1900
-    i32string _data; // Custom type for VS 2015.
-#else
-    std::u32string _data;
-#endif
+    UTF32String _data;
 
     /// 0..n-1 index into string of next char </summary>
     size_t p;

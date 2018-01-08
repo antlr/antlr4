@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -394,11 +394,11 @@ public enum ErrorType {
 	 */
 	IMPORT_NAME_CLASH(113, "<arg.typeString> grammar <arg.name> and imported <arg2.typeString> grammar <arg2.name> both generate <arg2.recognizerName>", ErrorSeverity.ERROR),
 	/**
-	 * Compiler Error 160.
+	 * Compiler Error 114.
 	 *
 	 * <p>cannot find tokens file <em>filename</em></p>
 	 */
-	CANNOT_FIND_TOKENS_FILE_REFD_IN_GRAMMAR(160, "cannot find tokens file <arg>", ErrorSeverity.ERROR),
+	CANNOT_FIND_TOKENS_FILE_REFD_IN_GRAMMAR(114, "cannot find tokens file <arg>", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Warning 118.
 	 *
@@ -522,7 +522,7 @@ public enum ErrorType {
 	 */
 	USE_OF_BAD_WORD(134, "symbol <arg> conflicts with generated code in target language or runtime", ErrorSeverity.ERROR),
 	/**
-	 * Compiler Error 134.
+	 * Compiler Error 183.
 	 *
 	 * <p>rule reference <em>rule</em> is not currently supported in a set</p>
 	 *
@@ -530,7 +530,7 @@ public enum ErrorType {
 	 * Note: This error has the same number as the unrelated error
 	 * {@link #USE_OF_BAD_WORD}.</p>
 	 */
-	UNSUPPORTED_REFERENCE_IN_LEXER_SET(134, "rule reference <arg> is not currently supported in a set", ErrorSeverity.ERROR),
+	UNSUPPORTED_REFERENCE_IN_LEXER_SET(183, "rule reference <arg> is not currently supported in a set", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 135.
 	 *
@@ -824,7 +824,7 @@ public enum ErrorType {
 	 *
 	 * @since 4.2.1
 	 */
-	INVALID_ESCAPE_SEQUENCE(156, "invalid escape sequence", ErrorSeverity.WARNING),
+	INVALID_ESCAPE_SEQUENCE(156, "invalid escape sequence <arg>", ErrorSeverity.WARNING),
 	/**
 	 * Compiler Warning 157.
 	 *
@@ -1073,6 +1073,21 @@ public enum ErrorType {
 			182,
 			"unicode property escapes not allowed in lexer charset range: <arg>",
 			ErrorSeverity.ERROR),
+
+	/**
+	 * Compiler Warning 184.
+	 *
+	 * <p>The token value overlapped by another token or self</p>
+	 *
+	 * <pre>
+	 * TOKEN1: 'value';
+	 * TOKEN2: 'value'; // warning
+	 * </pre>
+	 */
+	TOKEN_UNREACHABLE(
+			184,
+			"One of the token <arg> values unreachable. <arg2> is always overlapped by token <arg3>",
+			ErrorSeverity.WARNING),
 
 	/*
 	 * Backward incompatibility errors

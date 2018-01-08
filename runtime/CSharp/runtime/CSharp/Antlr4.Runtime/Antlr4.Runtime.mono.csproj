@@ -52,6 +52,7 @@
     <Compile Include="Atn\ATNDeserializationOptions.cs" />
     <Compile Include="Atn\ATNDeserializer.cs" />
     <Compile Include="Atn\ConflictInfo.cs" />
+    <Compile Include="CharStreams.cs" />
     <Compile Include="Dfa\AcceptStateInfo.cs" />
     <Compile Include="IVocabulary.cs" />
     <Compile Include="Vocabulary.cs" />

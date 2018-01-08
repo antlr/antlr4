@@ -1,4 +1,4 @@
-// Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 // Use of this file is governed by the BSD 3-clause license that
 // can be found in the LICENSE.txt file in the project root.
 
@@ -18,10 +18,12 @@ import (
 //
 
 type SemanticContext interface {
-	Comparable
+	comparable
 
 	evaluate(parser Recognizer, outerContext RuleContext) bool
 	evalPrecedence(parser Recognizer, outerContext RuleContext) SemanticContext
+
+	hash() int
 	String() string
 }
 
@@ -93,10 +95,6 @@ func (p *Predicate) evaluate(parser Recognizer, outerContext RuleContext) bool {
 	return parser.Sempred(localctx, p.ruleIndex, p.predIndex)
 }
 
-func (p *Predicate) Hash() string {
-	return strconv.Itoa(p.ruleIndex) + "/" + strconv.Itoa(p.predIndex) + "/" + fmt.Sprint(p.isCtxDependent)
-}
-
 func (p *Predicate) equals(other interface{}) bool {
 	if p == other {
 		return true
@@ -107,6 +105,10 @@ func (p *Predicate) equals(other interface{}) bool {
 			p.predIndex == other.(*Predicate).predIndex &&
 			p.isCtxDependent == other.(*Predicate).isCtxDependent
 	}
+}
+
+func (p *Predicate) hash() int {
+	return p.ruleIndex*43 + p.predIndex*47
 }
 
 func (p *Predicate) String() string {
@@ -141,10 +143,6 @@ func (p *PrecedencePredicate) compareTo(other *PrecedencePredicate) int {
 	return p.precedence - other.precedence
 }
 
-func (p *PrecedencePredicate) Hash() string {
-	return "31"
-}
-
 func (p *PrecedencePredicate) equals(other interface{}) bool {
 	if p == other {
 		return true
@@ -153,6 +151,10 @@ func (p *PrecedencePredicate) equals(other interface{}) bool {
 	} else {
 		return p.precedence == other.(*PrecedencePredicate).precedence
 	}
+}
+
+func (p *PrecedencePredicate) hash() int {
+	return p.precedence * 51
 }
 
 func (p *PrecedencePredicate) String() string {
@@ -237,10 +239,6 @@ func (a *AND) equals(other interface{}) bool {
 	}
 }
 
-func (a *AND) Hash() string {
-	return fmt.Sprint(a.opnds) + "/AND"
-}
-
 //
 // {@inheritDoc}
 //
@@ -293,6 +291,22 @@ func (a *AND) evalPrecedence(parser Recognizer, outerContext RuleContext) Semant
 	}
 
 	return result
+}
+
+func (a *AND) hash() int {
+	h := murmurInit(37) // Init with a value different from OR
+	for _, op := range a.opnds {
+		h = murmurUpdate(h, op.hash())
+	}
+	return murmurFinish(h, len(a.opnds))
+}
+
+func (a *OR) hash() int {
+	h := murmurInit(41) // Init with a value different from AND
+	for _, op := range a.opnds {
+		h = murmurUpdate(h, op.hash())
+	}
+	return murmurFinish(h, len(a.opnds))
 }
 
 func (a *AND) String() string {
@@ -376,10 +390,6 @@ func (o *OR) equals(other interface{}) bool {
 		}
 		return true
 	}
-}
-
-func (o *OR) Hash() string {
-	return fmt.Sprint(o.opnds) + "/OR"
 }
 
 // <p>

@@ -1,14 +1,10 @@
 /*
- * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
 package org.antlr.v4.test.tool;
-
-import java.io.ByteArrayInputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 
 import org.antlr.v4.gui.Trees;
 import org.antlr.v4.runtime.ANTLRInputStream;
@@ -19,9 +15,11 @@ import org.antlr.v4.runtime.LexerInterpreter;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.GrammarParserInterpreter;
-
-import org.junit.Before;
 import org.junit.Test;
+
+import java.io.ByteArrayInputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 
 import static org.junit.Assert.assertEquals;
 
@@ -161,7 +159,7 @@ public class TestUnicodeGrammar extends BaseJavaToolTest {
 			String inputText) throws Exception {
 		Grammar grammar = new Grammar(grammarText);
 		LexerInterpreter lexEngine = grammar.createLexerInterpreter(
-				CharStreams.createWithString(inputText));
+				CharStreams.fromString(inputText));
 		CommonTokenStream tokens = new CommonTokenStream(lexEngine);
 		GrammarParserInterpreter parser = grammar.createGrammarParserInterpreter(tokens);
 		ParseTree parseTree = parser.parse(grammar.rules.get(rootRule).index);

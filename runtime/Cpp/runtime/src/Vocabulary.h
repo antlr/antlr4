@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -14,7 +14,9 @@ namespace dfa {
   /// interface.
   class ANTLR4CPP_PUBLIC Vocabulary {
   public:
-    virtual ~Vocabulary() {};
+    Vocabulary(Vocabulary const&) = default;
+    virtual ~Vocabulary();
+    Vocabulary& operator=(Vocabulary const&) = default;
 
     /// Gets an empty <seealso cref="Vocabulary"/> instance.
     ///
@@ -24,7 +26,7 @@ namespace dfa {
     /// except <seealso cref="Token#EOF"/>.</para>
     static const Vocabulary EMPTY_VOCABULARY;
 
-    Vocabulary() {};
+    Vocabulary() {}
 
     /// <summary>
     /// Constructs a new instance of <seealso cref="Vocabulary"/> from the specified

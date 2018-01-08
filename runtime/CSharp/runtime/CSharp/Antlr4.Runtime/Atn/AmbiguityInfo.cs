@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -20,7 +20,7 @@ namespace Antlr4.Runtime.Atn
     /// determine that the SLL conflict is truly an ambiguity. For example, if none
     /// of the ATN configurations in the conflicting SLL configuration set have
     /// traversed a global follow transition (i.e.
-    /// <see cref="ATNConfig.ReachesIntoOuterContext()"/>
+    /// <see cref="ATNConfig.reachesIntoOuterContext"/>
     /// is
     /// <see langword="false"/>
     /// for all

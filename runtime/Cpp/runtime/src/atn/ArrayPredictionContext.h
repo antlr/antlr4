@@ -1,5 +1,5 @@
 ﻿
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -27,7 +27,7 @@ namespace atn {
 
     ArrayPredictionContext(Ref<SingletonPredictionContext> const& a);
     ArrayPredictionContext(std::vector<Ref<PredictionContext>> const& parents_, std::vector<size_t> const& returnStates);
-    virtual ~ArrayPredictionContext() {};
+    virtual ~ArrayPredictionContext();
 
     virtual bool isEmpty() const override;
     virtual size_t size() const override;

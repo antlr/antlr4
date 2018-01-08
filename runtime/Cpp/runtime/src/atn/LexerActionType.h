@@ -1,9 +1,11 @@
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
 #pragma once
+
+#include "antlr4-common.h"
 
 namespace antlr4 {
 namespace atn {
@@ -14,7 +16,7 @@ namespace atn {
   /// @author Sam Harwell
   /// @since 4.2
   /// </summary>
-  enum class ANTLR4CPP_PUBLIC LexerActionType : size_t {
+  enum class LexerActionType : size_t {
     /// <summary>
     /// The type of a <seealso cref="LexerChannelAction"/> action.
     /// </summary>

@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -75,7 +75,14 @@ namespace Antlr4.Runtime.Atn
 			throw new Exception("This ATN simulator does not support clearing the DFA.");
 		}
 
-		public PredictionContextCache getSharedContextCache()
+        protected void ConsoleWriteLine(string format, params object[] arg)
+        {
+#if !PORTABLE
+            System.Console.WriteLine(format, arg);
+#endif
+        }
+
+        public PredictionContextCache getSharedContextCache()
 		{
 			return sharedContextCache;
 		}

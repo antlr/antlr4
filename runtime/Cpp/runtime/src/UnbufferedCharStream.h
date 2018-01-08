@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+﻿/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -54,8 +54,10 @@ namespace antlr4 {
     // UTF-32 encoded.
 #if defined(_MSC_VER) && _MSC_VER == 1900
     i32string _data; // Custom type for VS 2015.
+    typedef __int32 storage_type;
 #else
     std::u32string _data;
+    typedef char32_t storage_type;
 #endif
 
     /// <summary>

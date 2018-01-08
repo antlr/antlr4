@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+# Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 # Use of this file is governed by the BSD 3-clause license that
 # can be found in the LICENSE.txt file in the project root.
 import sys
@@ -226,6 +226,14 @@ class Parser (Recognizer):
                 self._ctx.exitRule(listener)
                 listener.exitEveryRule(self._ctx)
 
+
+    # Gets the number of syntax errors reported during parsing. This value is
+    # incremented each time {@link #notifyErrorListeners} is called.
+    #
+    # @see #notifyErrorListeners
+    #
+    def getNumberOfSyntaxErrors(self):
+        return self._syntaxErrors
 
     def getTokenFactory(self):
         return self._input.tokenSource._factory

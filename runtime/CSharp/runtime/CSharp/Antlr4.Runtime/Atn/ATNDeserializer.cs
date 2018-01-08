@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -583,7 +583,7 @@ namespace Antlr4.Runtime.Atn
         /// <see cref="StarLoopEntryState"/>
         /// states in the specified ATN to set
         /// the
-        /// <see cref="StarLoopEntryState.precedenceRuleDecision"/>
+        /// <see cref="StarLoopEntryState.isPrecedenceDecision"/>
         /// field to the
         /// correct value.
         /// </summary>
@@ -1092,7 +1092,10 @@ nextTransition_continue: ;
         protected internal Guid ReadUUID()
         {
 			byte[] d = BitConverter.GetBytes (ReadLong ());
-			Array.Reverse(d);
+			if(BitConverter.IsLittleEndian)
+			{
+				Array.Reverse(d);
+			}
 			short c = (short)ReadInt();
 			short b = (short)ReadInt();
 			int a = ReadInt32();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -24,6 +24,7 @@ public abstract class Recognizer extends OutputModelObject {
 	public String name;
 	public String grammarName;
 	public String grammarFileName;
+	public String accessLevel;
 	public Map<String,Integer> tokens;
 
 	/**
@@ -51,6 +52,7 @@ public abstract class Recognizer extends OutputModelObject {
 		grammarFileName = new File(g.fileName).getName();
 		grammarName = g.name;
 		name = g.getRecognizerName();
+		accessLevel = g.getOptionString("accessLevel");
 		tokens = new LinkedHashMap<String,Integer>();
 		for (Map.Entry<String, Integer> entry : g.tokenNameToTypeMap.entrySet()) {
 			Integer ttype = entry.getValue();

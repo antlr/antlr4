@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+﻿/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -35,7 +35,7 @@ CommonToken::CommonToken(std::pair<TokenSource*, CharStream*> source, size_t typ
   _start = start;
   _stop = stop;
   if (_source.first != nullptr) {
-    _line = (int)source.first->getLine();
+    _line = static_cast<int>(source.first->getLine());
     _charPositionInLine = source.first->getCharPositionInLine();
   }
 }
@@ -175,7 +175,7 @@ std::string CommonToken::toString(Recognizer *r) const {
   std::string typeString = std::to_string(symbolToNumeric(_type));
   if (r != nullptr)
     typeString = r->getVocabulary().getDisplayName(_type);
-  
+
   ss << "[@" << symbolToNumeric(getTokenIndex()) << "," << symbolToNumeric(_start) << ":" << symbolToNumeric(_stop)
     << "='" << txt << "',<" << typeString << ">" << channelStr << "," << _line << ":"
     << getCharPositionInLine() << "]";

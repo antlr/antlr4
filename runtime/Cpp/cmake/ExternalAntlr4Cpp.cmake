@@ -66,7 +66,7 @@ set(ANTLR4CPP_EXTERNAL_ROOT ${CMAKE_BINARY_DIR}/externals/antlr4cpp)
 # external repository
 # GIT_REPOSITORY     https://github.com/antlr/antlr4.git
 set(ANTLR4CPP_EXTERNAL_REPO "https://github.com/antlr/antlr4.git")
-set(ANTLR4CPP_EXTERNAL_TAG  "4.7")
+set(ANTLR4CPP_EXTERNAL_TAG  "4.7.1")
 
 if(NOT EXISTS "${ANTLR4CPP_JAR_LOCATION}")
   message(FATAL_ERROR "Unable to find antlr tool. ANTLR4CPP_JAR_LOCATION:${ANTLR4CPP_JAR_LOCATION}")
@@ -206,11 +206,13 @@ macro(antlr4cpp_process_grammar
   # export generated cpp files into list
   foreach(generated_file ${generated_files})
     list(APPEND antlr4cpp_src_files_${antlr4cpp_project_namespace} ${generated_file})
+    if (NOT CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     set_source_files_properties(
       ${generated_file}
       PROPERTIES
       COMPILE_FLAGS -Wno-overloaded-virtual
       )
+    endif ()
   endforeach(generated_file)
   message(STATUS "Antlr4Cpp  ${antlr4cpp_project_namespace} Generated: ${generated_files}")
 

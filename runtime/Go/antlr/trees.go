@@ -1,4 +1,4 @@
-// Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 // Use of this file is governed by the BSD 3-clause license that
 // can be found in the LICENSE.txt file in the project root.
 
@@ -103,11 +103,11 @@ func TreesfindAllRuleNodes(t ParseTree, ruleIndex int) []ParseTree {
 
 func TreesfindAllNodes(t ParseTree, index int, findTokens bool) []ParseTree {
 	nodes := make([]ParseTree, 0)
-	TreesFindAllNodes(t, index, findTokens, nodes)
+	treesFindAllNodes(t, index, findTokens, &nodes)
 	return nodes
 }
 
-func TreesFindAllNodes(t ParseTree, index int, findTokens bool, nodes []ParseTree) {
+func treesFindAllNodes(t ParseTree, index int, findTokens bool, nodes *[]ParseTree) {
 	// check this node (the root) first
 
 	t2, ok := t.(TerminalNode)
@@ -115,16 +115,16 @@ func TreesFindAllNodes(t ParseTree, index int, findTokens bool, nodes []ParseTre
 
 	if findTokens && ok {
 		if t2.GetSymbol().GetTokenType() == index {
-			nodes = append(nodes, t2)
+			*nodes = append(*nodes, t2)
 		}
 	} else if !findTokens && ok2 {
 		if t3.GetRuleIndex() == index {
-			nodes = append(nodes, t3)
+			*nodes = append(*nodes, t3)
 		}
 	}
 	// check children
 	for i := 0; i < t.GetChildCount(); i++ {
-		TreesFindAllNodes(t.GetChild(i).(ParseTree), index, findTokens, nodes)
+		treesFindAllNodes(t.GetChild(i).(ParseTree), index, findTokens, nodes)
 	}
 }
 

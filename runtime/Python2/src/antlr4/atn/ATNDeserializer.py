@@ -1,4 +1,4 @@
-# Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+# Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 # Use of this file is governed by the BSD 3-clause license that
 # can be found in the LICENSE.txt file in the project root.
 #/
@@ -86,7 +86,7 @@ class ATNDeserializer (object):
     def reset(self, data):
         def adjust(c):
             v = ord(c)
-            return v-2 if v>1 else -1
+            return v-2 if v>1 else v + 65533
         temp = [ adjust(c) for c in data ]
         # don't adjust the first value since that's the version number
         temp[0] = ord(data[0])

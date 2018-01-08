@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -674,6 +674,7 @@ public class BaseGoTest implements RuntimeTestSupport {
 				"import (\n"
 				+"	\"github.com/antlr/antlr4/runtime/Go/antlr\"\n"
 				+"	\"./parser\"\n"
+				+"	\"fmt\"\n"
 				+"	\"os\"\n"
 				+")\n"
 				+ "\n"
@@ -696,7 +697,11 @@ public class BaseGoTest implements RuntimeTestSupport {
 				+ "}\n"
 				+ "\n"
 				+ "func main() {\n"
-				+ "	input := antlr.NewFileStream(os.Args[1])\n"
+				+ "	input, err := antlr.NewFileStream(os.Args[1])\n"
+				+ "     if err != nil {\n"
+				+ "     	fmt.Printf(\"Failed to find file: %v\", err)\n"
+				+ "     	return\n"
+				+ "     }\n"
 				+ "	lexer := parser.New<lexerName>(input)\n"
 				+ "	stream := antlr.NewCommonTokenStream(lexer,0)\n"
 				+ "<createParser>"
@@ -734,7 +739,11 @@ public class BaseGoTest implements RuntimeTestSupport {
 				+ ")\n"
 				+ "\n"
 				+ "func main() {\n"
-				+ "	input := antlr.NewFileStream(os.Args[1])\n"
+				+ "	input, err := antlr.NewFileStream(os.Args[1])\n"
+				+ "     if err != nil {\n"
+				+ "     	fmt.Printf(\"Failed to find file: %v\", err)\n"
+				+ "     	return\n"
+				+ "     }\n"
 				+ "	lexer := parser.New<lexerName>(input)\n"
 				+ "	stream := antlr.NewCommonTokenStream(lexer,0)\n"
 				+ "	stream.Fill()\n"

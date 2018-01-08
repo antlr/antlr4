@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -17,6 +17,9 @@ using namespace antlrcpp;
 
 LexerActionExecutor::LexerActionExecutor(const std::vector<Ref<LexerAction>> &lexerActions)
   : _lexerActions(lexerActions), _hashCode(generateHashCode()) {
+}
+
+LexerActionExecutor::~LexerActionExecutor() {
 }
 
 Ref<LexerActionExecutor> LexerActionExecutor::append(Ref<LexerActionExecutor> const& lexerActionExecutor,
@@ -98,7 +101,7 @@ size_t LexerActionExecutor::generateHashCode() const {
   for (auto lexerAction : _lexerActions) {
     hash = MurmurHash::update(hash, lexerAction);
   }
-  MurmurHash::finish(hash, _lexerActions.size());
+  hash = MurmurHash::finish(hash, _lexerActions.size());
 
   return hash;
 }

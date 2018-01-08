@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+﻿/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -21,7 +21,7 @@ namespace antlr4 {
     class TraceListener : public tree::ParseTreeListener {
     public:
       TraceListener(Parser *outerInstance);
-      virtual ~TraceListener() {};
+      virtual ~TraceListener();
 
       virtual void enterEveryRule(ParserRuleContext *ctx) override;
       virtual void visitTerminal(tree::TerminalNode *node) override;
@@ -36,7 +36,7 @@ namespace antlr4 {
     public:
       static TrimToSizeListener INSTANCE;
 
-      virtual ~TrimToSizeListener() {};
+      virtual ~TrimToSizeListener();
 
       virtual void enterEveryRule(ParserRuleContext *ctx) override;
       virtual void visitTerminal(tree::TerminalNode *node) override;
@@ -375,7 +375,7 @@ namespace antlr4 {
      */
     bool isTrace() const;
 
-    tree::ParseTreeTracker& getTreeTracker() { return _tracker; };
+    tree::ParseTreeTracker& getTreeTracker() { return _tracker; }
 
     /** How to create a token leaf node associated with a parent.
      *  Typically, the terminal node to create is not a function of the parent

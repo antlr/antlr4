@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -9,7 +9,6 @@ package org.antlr.v4.test.tool;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.LexerGrammar;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -398,6 +397,41 @@ public class TestSymbolIssues extends BaseJavaToolTest {
 				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4:4:13: chars 'O'..'V' used multiple times in set 'Z' | 'K'..'R' | 'O'..'V'\n" +
 				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4::: chars 'g' used multiple times in set 'g'..'l'\n" +
 				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4::: chars '\\n' used multiple times in set '\\n'..'\\r'\n"
+		};
+
+		testErrors(test, false);
+	}
+
+	@Test public void testUnreachableTokens() {
+		String[] test = {
+				"lexer grammar Test;\n" +
+				"TOKEN1: 'as' 'df' | 'qwer';\n" +
+				"TOKEN2: [0-9];\n" +
+				"TOKEN3: 'asdf';\n" +
+				"TOKEN4: 'q' 'w' 'e' 'r' | A;\n" +
+				"TOKEN5: 'aaaa';\n" +
+				"TOKEN6: 'asdf';\n" +
+				"TOKEN7: 'qwer'+;\n" +
+				"TOKEN8: 'a' 'b' | 'b' | 'a' 'b';\n" +
+				"fragment\n" +
+				"TOKEN9: 'asdf' | 'qwer' | 'qwer';\n" +
+				"TOKEN10: '\\r\\n' | '\\r\\n';\n" +
+				"TOKEN11: '\\r\\n';\n" +
+				"\n" +
+				"mode MODE1;\n" +
+				"TOKEN12: 'asdf';\n" +
+				"\n" +
+				"fragment A: 'A';",
+
+				"warning(" + ErrorType.TOKEN_UNREACHABLE.code + "): Test.g4:4:0: One of the token TOKEN3 values unreachable. asdf is always overlapped by token TOKEN1\n" +
+				"warning(" + ErrorType.TOKEN_UNREACHABLE.code + "): Test.g4:5:0: One of the token TOKEN4 values unreachable. qwer is always overlapped by token TOKEN1\n" +
+				"warning(" + ErrorType.TOKEN_UNREACHABLE.code + "): Test.g4:7:0: One of the token TOKEN6 values unreachable. asdf is always overlapped by token TOKEN1\n" +
+				"warning(" + ErrorType.TOKEN_UNREACHABLE.code + "): Test.g4:7:0: One of the token TOKEN6 values unreachable. asdf is always overlapped by token TOKEN3\n" +
+				"warning(" + ErrorType.TOKEN_UNREACHABLE.code + "): Test.g4:9:0: One of the token TOKEN8 values unreachable. ab is always overlapped by token TOKEN8\n" +
+				"warning(" + ErrorType.TOKEN_UNREACHABLE.code + "): Test.g4:11:0: One of the token TOKEN9 values unreachable. qwer is always overlapped by token TOKEN9\n" +
+				"warning(" + ErrorType.TOKEN_UNREACHABLE.code + "): Test.g4:12:0: One of the token TOKEN10 values unreachable. \\r\\n is always overlapped by token TOKEN10\n" +
+				"warning(" + ErrorType.TOKEN_UNREACHABLE.code + "): Test.g4:13:0: One of the token TOKEN11 values unreachable. \\r\\n is always overlapped by token TOKEN10\n" +
+				"warning(" + ErrorType.TOKEN_UNREACHABLE.code + "): Test.g4:13:0: One of the token TOKEN11 values unreachable. \\r\\n is always overlapped by token TOKEN10\n"
 		};
 
 		testErrors(test, false);

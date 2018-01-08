@@ -1,4 +1,4 @@
-// Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 // Use of this file is governed by the BSD 3-clause license that
 // can be found in the LICENSE.txt file in the project root.
 
@@ -13,7 +13,7 @@ package antlr
 
 type LexerActionExecutor struct {
 	lexerActions     []LexerAction
-	cachedHashString string
+	cachedHash       int
 }
 
 func NewLexerActionExecutor(lexerActions []LexerAction) *LexerActionExecutor {
@@ -28,13 +28,10 @@ func NewLexerActionExecutor(lexerActions []LexerAction) *LexerActionExecutor {
 
 	// Caches the result of {@link //hashCode} since the hash code is an element
 	// of the performance-critical {@link LexerATNConfig//hashCode} operation.
-
-	var s string
+	l.cachedHash = murmurInit(57)
 	for _, a := range lexerActions {
-		s += a.Hash()
+		l.cachedHash = murmurUpdate(l.cachedHash, a.hash())
 	}
-
-	l.cachedHashString = s // "".join([str(la) for la in
 
 	return l
 }
@@ -57,10 +54,7 @@ func LexerActionExecutorappend(lexerActionExecutor *LexerActionExecutor, lexerAc
 		return NewLexerActionExecutor([]LexerAction{lexerAction})
 	}
 
-	lexerActions := append(lexerActionExecutor.lexerActions, lexerAction)
-
-	//	lexerActions := lexerActionExecutor.lexerActions.concat([ lexerAction ])
-	return NewLexerActionExecutor(lexerActions)
+	return NewLexerActionExecutor(append(lexerActionExecutor.lexerActions, lexerAction))
 }
 
 // Creates a {@link LexerActionExecutor} which encodes the current offset
@@ -157,8 +151,11 @@ func (l *LexerActionExecutor) execute(lexer Lexer, input CharStream, startIndex 
 	}
 }
 
-func (l *LexerActionExecutor) Hash() string {
-	return l.cachedHashString
+func (l *LexerActionExecutor) hash() int {
+	if l == nil {
+		return 61
+	}
+	return l.cachedHash
 }
 
 func (l *LexerActionExecutor) equals(other interface{}) bool {
@@ -167,7 +164,7 @@ func (l *LexerActionExecutor) equals(other interface{}) bool {
 	} else if _, ok := other.(*LexerActionExecutor); !ok {
 		return false
 	} else {
-		return l.cachedHashString == other.(*LexerActionExecutor).cachedHashString &&
+		return l.cachedHash == other.(*LexerActionExecutor).cachedHash &&
 			&l.lexerActions == &other.(*LexerActionExecutor).lexerActions
 	}
 }

@@ -1,23 +1,25 @@
-/// Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/// 
+/// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
+/// 
 
 
 public class ArrayPredictionContext: PredictionContext {
+    /// 
     /// Parent can be null only if full ctx mode and we make an array
-    /// from {@link #EMPTY} and non-empty. We merge {@link #EMPTY} by using null parent and
-    /// returnState == {@link #EMPTY_RETURN_STATE}.
+    /// from _#EMPTY_ and non-empty. We merge _#EMPTY_ by using null parent and
+    /// returnState == _#EMPTY_RETURN_STATE_.
+    /// 
     public final var parents: [PredictionContext?]
 
+    /// 
     /// Sorted for merge, no duplicates; if present,
-    /// {@link #EMPTY_RETURN_STATE} is always last.
+    /// _#EMPTY_RETURN_STATE_ is always last.
+    /// 
     public final let returnStates: [Int]
 
     public convenience init(_ a: SingletonPredictionContext) {
-//        if a.parent == nil {
-//            // print("parent is nil")
-//        }
-        //self.init(new, PredictionContext[] {a.parent}, new, int[] {a.returnState});
         let parents = [a.parent]
         self.init(parents, [a.returnState])
     }
@@ -51,39 +53,30 @@ public class ArrayPredictionContext: PredictionContext {
         return returnStates[index]
     }
 
-    //	@Override
-    //	public int findReturnState(int returnState) {
-    //		return Arrays.binarySearch(returnStates, returnState);
-    //	}
-
-
     override
     public var description: String {
         if isEmpty() {
             return "[]"
         }
-        let buf: StringBuilder = StringBuilder()
-        buf.append("[")
-        let length = returnStates.count
-
-        for i in 0..<length {
+        var buf = "["
+        for (i, returnState) in returnStates.enumerated() {
             if i > 0 {
-                buf.append(", ")
+                buf += ", "
             }
-            if returnStates[i] == PredictionContext.EMPTY_RETURN_STATE {
-                buf.append("$")
+            if returnState == PredictionContext.EMPTY_RETURN_STATE {
+                buf += "$"
                 continue
             }
-            buf.append(returnStates[i])
-            if parents[i] != nil {
-                buf.append(" ")
-                buf.append(parents[i].debugDescription)
-            } else {
-                buf.append("null")
+            buf += "\(returnState)"
+            if let parent = parents[i] {
+                buf += " \(parent)"
+            }
+            else {
+                buf += "null"
             }
         }
-        buf.append("]")
-        return buf.toString()
+        buf += "]"
+        return buf
     }
 
     internal final func combineCommonParents() {
@@ -118,8 +111,6 @@ public func ==(lhs: ArrayPredictionContext, rhs: ArrayPredictionContext) -> Bool
         return false
     }
 
-    // return lhs.returnStates == rhs.returnStates && lhs.parents == rhs.parents
-
-    return ArrayEquals(lhs.returnStates, rhs.returnStates) && ArrayEquals(lhs.parents, rhs.parents)
+    return lhs.returnStates == rhs.returnStates && lhs.parents == rhs.parents
 }
 

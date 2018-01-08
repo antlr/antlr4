@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+﻿/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -15,7 +15,7 @@ namespace atn {
    * utility methods for analyzing configuration sets for conflicts and/or
    * ambiguities.
    */
-  enum class ANTLR4CPP_PUBLIC PredictionMode {
+  enum class PredictionMode {
     /**
      * The SLL(*) prediction mode. This prediction mode ignores the current
      * parser context when making predictions. This is the fastest prediction

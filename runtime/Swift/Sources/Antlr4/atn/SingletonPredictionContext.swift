@@ -1,6 +1,8 @@
-/// Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/// 
+/// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
+/// 
 
 
 
@@ -47,8 +49,8 @@ public class SingletonPredictionContext: PredictionContext {
 
     override
     public var description: String {
-        let up: String = parent != nil ? parent!.description : ""
-        if up.length == 0 {
+        let up = parent?.description ?? ""
+        if up.isEmpty {
             if returnState == PredictionContext.EMPTY_RETURN_STATE {
                 return "$"
             }

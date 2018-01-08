@@ -59,8 +59,7 @@ Now, make sure C# runtime is built and installed locally.
 ```bash
 cd ~/antlr/code/antlr4/runtime/CSharp/runtime/CSharp
 # kill previous ones manually as "xbuild /t:Clean" didn't seem to do it
-rm Antlr4.Runtime/bin/net20/Release/Antlr4.Runtime.dll
-rm Antlr4.Runtime/obj/net20/Release/Antlr4.Runtime.dll
+find . -name '*.dll' -exec rm {} \;
 # build
 xbuild /p:Configuration=Release Antlr4.Runtime/Antlr4.Runtime.mono.csproj
 ```
@@ -255,6 +254,14 @@ where `<TARGET>` is replaced with Java, Cpp, CSharp, Python2, ... in the various
 ### Ignoring tests
 
 In order to turn off a test for a particular target, we need to use the `ignore` method. Given a target name, a descriptor object can decide whether to ignore the test. This is not always convenient but it is fully general and works well for the one case we have now where we have to ignore `Visitor` tests in all targets except JavaScript.
+
+### Target API/library testing
+
+Some parts of the runtime API need to be tested with code written specifically in the target language. For example, you can see all of the Java runtime API tests here:
+
+[https://github.com/antlr/antlr4/tree/master/runtime-testsuite/test/org/antlr/v4/test/runtime/java/api](https://github.com/antlr/antlr4/tree/master/runtime-testsuite/test/org/antlr/v4/test/runtime/java/api)
+
+Notice that it is under an `api` dir. The directory above is where all of the `Test*` files go.
 
 ### Cross-language actions embedded within grammars
 

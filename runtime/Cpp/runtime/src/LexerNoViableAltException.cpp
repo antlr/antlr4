@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+﻿/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -28,7 +28,7 @@ atn::ATNConfigSet* LexerNoViableAltException::getDeadEndConfigs() {
 std::string LexerNoViableAltException::toString() {
   std::string symbol;
   if (_startIndex < getInputStream()->size()) {
-    symbol = ((CharStream *)getInputStream())->getText(misc::Interval(_startIndex, _startIndex));
+    symbol = static_cast<CharStream *>(getInputStream())->getText(misc::Interval(_startIndex, _startIndex));
     symbol = antlrcpp::escapeWhitespace(symbol, false);
   }
   std::string format = "LexerNoViableAltException('" + symbol + "')";

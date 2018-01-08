@@ -15,7 +15,7 @@ grammar IP;
 
 file : ip+ (MARKER ip)* ;
 
-ip : BYTE '.' BYTE '.' BYTE '.' BYTE ;
+ip : BYTE BYTE BYTE BYTE ;
 
 MARKER : '\u00CA' '\u00FE' ;
 BYTE : '\u0000'..'\u00FF' ;
@@ -42,7 +42,7 @@ public class WriteBinaryFile {
 	};
 
 	public static void main(String[] args) throws IOException {
-		Files.write(new File("resources/ips").toPath(), bytes);
+		Files.write(new File("/tmp/ips").toPath(), bytes);
 	}
 }
 ```
@@ -50,14 +50,15 @@ public class WriteBinaryFile {
 Now we need to create a stream of bytes satisfactory to ANTLR, which is as simple as:
 
 ```java
-ANTLRFileStream bytesAsChar = new ANTLRFileStream("resources/ips", "ISO-8859-1");
+CharStream bytesAsChar = CharStreams.fromFileName("/tmp/ips", StandardCharsets.ISO_8859_1);
 ```
 
 The `ISO-8859-1` encoding is just the 8-bit char encoding for LATIN-1, which effectively tells the stream to treat each byte as a character. That's what we want. Then we have the usual test rig:
 
 
 ```java
-ANTLRFileStream bytesAsChar = new ANTLRFileStream("resources/ips", "ISO-8859-1");
+//ANTLRFileStream bytesAsChar = new ANTLRFileStream("/tmp/ips", "ISO-8859-1"); DEPRECATED in 4.7
+CharStream bytesAsChar = CharStreams.fromFileName("/tmp/ips", StandardCharsets.ISO_8859_1);
 IPLexer lexer = new IPLexer(bytesAsChar);
 CommonTokenStream tokens = new CommonTokenStream(lexer);
 IPParser parser = new IPParser(tokens);
@@ -93,6 +94,8 @@ We can't just print out the text because we are not reading in text. We need to 
 
 ## Custom stream
 
+(*ANTLRFileStream was deprecated in 4.7*)
+
 If you want to play around with the stream, you can. Here's an example that alters how "text" is computed from the byte stream (which changes how tokens print out their text as well):
 
 ```java
@@ -124,7 +127,7 @@ class BinaryANTLRFileStream extends ANTLRFileStream {
 The new test code starts out like this:
 
 ```java
-ANTLRFileStream bytesAsChar = new BinaryANTLRFileStream("resources/ips");
+ANTLRFileStream bytesAsChar = new BinaryANTLRFileStream("/tmp/ips");
 IPLexer lexer = new IPLexer(bytesAsChar);
 ...
 ```
@@ -155,9 +158,9 @@ Error handling proceeds exactly like any other parser. For example, let's alter 
 
 ```java
 public static final byte[] bytes = {
-	(byte)172, '.', 0, '.', '.', 1, (byte)0xCA, (byte)0xFE, // OOOPS
-	(byte)10, '.', 10, '.', 10, '.', 1, (byte)0xCA, (byte)0xFE,
-	(byte)10, '.', 10, '.', 10, '.', 99
+	(byte)172, 0, 1, (byte)0xCA, (byte)0xFE, // OOOPS
+	(byte)10, 10, 10, 1, (byte)0xCA, (byte)0xFE,
+	(byte)10, 10, 10, 99
 };
 ```
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -38,7 +38,7 @@ public class BasePython2Test extends BasePythonTest {
 						+ "        lexer = <lexerName>(input, output)\n"
 						+ "        stream = CommonTokenStream(lexer)\n"
 						+ "        stream.fill()\n"
-						+ "        [ print(t, file=output) for t in stream.tokens ]\n"
+						+ "        [ print(unicode(t), file=output) for t in stream.tokens ]\n"
 						+ (showDFA ? "        print(lexer._interp.decisionToDFA[Lexer.DEFAULT_MODE].toLexerString(), end='', file=output)\n"
 								: "") + "\n" + "if __name__ == '__main__':\n"
 						+ "    main(sys.argv)\n" + "\n");

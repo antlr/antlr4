@@ -1145,6 +1145,7 @@ csIdentifier ::= [
 	"ushort" : "@ushort",
 	"using" : "@using",
 	"virtual" : "@virtual",
+	"values" : "@values",
 	"void" : "@void",
 	"volatile" : "@volatile",
 	"while" : "@while",

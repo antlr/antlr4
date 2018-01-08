@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+﻿/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -26,7 +26,7 @@ namespace antlr4 {
   /// </summary>
   class ANTLR4CPP_PUBLIC TokenSource {
   public:
-    virtual ~TokenSource() {};
+    virtual ~TokenSource();
 
     /// Return a <seealso cref="Token"/> object from your input stream (usually a
     /// <seealso cref="CharStream"/>). Do not fail/return upon lexing error; keep chewing

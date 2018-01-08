@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+﻿/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -20,10 +20,10 @@ namespace dfa {
     /// Set only allows you to see if it's there.
 
     /// From which ATN state did we create this DFA?
-    atn::DecisionState *const atnStartState;
+    atn::DecisionState *atnStartState;
     std::unordered_set<DFAState *, DFAState::Hasher, DFAState::Comparer> states; // States are owned by this class.
     DFAState *s0;
-    const size_t decision;
+    size_t decision;
 
     DFA(atn::DecisionState *atnStartState);
     DFA(atn::DecisionState *atnStartState, size_t decision);
@@ -85,7 +85,6 @@ namespace dfa {
      * {@code false}. This is the backing field for {@link #isPrecedenceDfa}.
      */
     bool _precedenceDfa;
-    DFAState *_s0Shadow = nullptr; // ml: assigned when we created s0 ourselves.
   };
 
 } // namespace atn

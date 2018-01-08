@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+﻿/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -19,6 +19,9 @@ ArrayPredictionContext::ArrayPredictionContext(std::vector<Ref<PredictionContext
   : PredictionContext(calculateHashCode(parents_, returnStates)), parents(parents_), returnStates(returnStates) {
     assert(parents.size() > 0);
     assert(returnStates.size() > 0);
+}
+
+ArrayPredictionContext::~ArrayPredictionContext() {
 }
 
 bool ArrayPredictionContext::isEmpty() const {
