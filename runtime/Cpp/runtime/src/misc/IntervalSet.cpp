@@ -121,12 +121,7 @@ IntervalSet IntervalSet::Or(const std::vector<IntervalSet> &sets) {
 
 IntervalSet& IntervalSet::addAll(const IntervalSet &set) {
   // walk set and add each interval
-  //for (auto &interval : set._intervals) {
-  //  add(interval);
-  //}
-  //above loop gave error message "vector iterator not incrementable" in multi-threading (single thread was OK)
-  for (size_t i = 0; i < set._intervals.size(); i++) {
-    const Interval& interval = set._intervals[i];
+  for (auto &interval : set._intervals) {
     add(interval);
   }
   return *this;
