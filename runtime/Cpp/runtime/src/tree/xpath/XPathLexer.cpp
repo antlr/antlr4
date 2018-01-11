@@ -1,3 +1,5 @@
+#include "antlr4-common.h"
+
 #include "XPathLexer.h"
 
 

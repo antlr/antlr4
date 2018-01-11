@@ -3,6 +3,8 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include "antlr4-common.h"
+
 #include "Token.h"
 
 antlr4::Token::~Token() {

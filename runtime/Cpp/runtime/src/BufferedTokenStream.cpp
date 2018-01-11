@@ -2,6 +2,7 @@
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
+#include "antlr4-common.h"
 
 #include "WritableToken.h"
 #include "Lexer.h"
@@ -15,11 +16,11 @@
 using namespace antlr4;
 using namespace antlrcpp;
 
-BufferedTokenStream::BufferedTokenStream(TokenSource *tokenSource) : _tokenSource(tokenSource){
+BufferedTokenStream::BufferedTokenStream(antlr4::TokenSource *tokenSource) : _tokenSource(tokenSource){
   InitializeInstanceFields();
 }
 
-TokenSource* BufferedTokenStream::getTokenSource() const {
+antlr4::TokenSource* BufferedTokenStream::getTokenSource() const {
   return _tokenSource;
 }
 
@@ -189,7 +190,7 @@ void BufferedTokenStream::setup() {
   _p = adjustSeekIndex(0);
 }
 
-void BufferedTokenStream::setTokenSource(TokenSource *tokenSource) {
+void BufferedTokenStream::setTokenSource(antlr4::TokenSource *tokenSource) {
   _tokenSource = tokenSource;
   _tokens.clear();
   _fetchedEOF = false;

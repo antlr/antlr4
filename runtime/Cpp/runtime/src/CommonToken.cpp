@@ -2,6 +2,7 @@
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
+#include "antlr4-common.h"
 
 #include "TokenSource.h"
 #include "CharStream.h"
@@ -20,14 +21,14 @@ using namespace antlr4::misc;
 
 using namespace antlrcpp;
 
-const std::pair<TokenSource*, CharStream*> CommonToken::EMPTY_SOURCE;
+const std::pair<antlr4::TokenSource*, antlr4::CharStream*> CommonToken::EMPTY_SOURCE;
 
 CommonToken::CommonToken(size_t type) {
   InitializeInstanceFields();
   _type = type;
 }
 
-CommonToken::CommonToken(std::pair<TokenSource*, CharStream*> source, size_t type, size_t channel, size_t start, size_t stop) {
+CommonToken::CommonToken(std::pair<antlr4::TokenSource*, antlr4::CharStream*> source, size_t type, size_t channel, size_t start, size_t stop) {
   InitializeInstanceFields();
   _source = source;
   _type = type;

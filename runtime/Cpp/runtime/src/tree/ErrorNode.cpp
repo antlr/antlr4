@@ -3,6 +3,8 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include "antlr4-common.h"
+
 #include "tree/ErrorNode.h"
 
 antlr4::tree::ErrorNode::~ErrorNode() {

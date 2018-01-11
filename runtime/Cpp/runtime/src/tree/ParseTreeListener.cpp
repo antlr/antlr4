@@ -3,6 +3,8 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include "antlr4-common.h"
+
 #include "ParseTreeListener.h"
 
 antlr4::tree::ParseTreeListener::~ParseTreeListener() {
