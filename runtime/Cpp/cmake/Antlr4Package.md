@@ -13,24 +13,15 @@ given input file during build.
 
 The following table lists the parameters that can be used with the function:
  
-+-----------+-----------+-------------+------------------------------------------------------------------------------+
-| Argument# | Required  | Default     |                                                                              |
-+-----------+-----------+-------------+------------------------------------------------------------------------------+
-|     0     |   Yes     |    n/a      | Unique target name. It is used to generate CMake Variables to reference the  |
-|           |           |             | various outputs of the generation                                            |
-+-----------+-----------+-------------+------------------------------------------------------------------------------+
-|      1      |   Yes     |    n/a      | Input file containing the lexer/parser definition            |  
-+-----------+-----------+-------------+------------------------------------------------------------------------------+
-|     2     |    No     |    FALSE    | Boolean to indicate if a listener interface should be generated              |
-+-----------+-----------+-------------+------------------------------------------------------------------------------+
-|     3     |    No     |    FALSE    | Boolean to indicate if a visitor interface should be generated               |
-+-----------+-----------+-------------+------------------------------------------------------------------------------+
-|     4     |    No     |    none     | C++ namespace in which the generated classes should be placed                |
-+-----------+-----------+-------------+------------------------------------------------------------------------------+
-|     5     |    No     |    none     | Additional files on which the input depends                                  |
-+-----------+-----------+-------------+------------------------------------------------------------------------------+
-|     6     |    No     |    none     | Library path to use during generation                                        |
-+-----------+-----------+-------------+------------------------------------------------------------------------------+
+Argument# | Required  | Default | Use
+----------|-----------|---------|--
+0 | Yes | n/a | Unique target name. It is used to generate CMake Variables to reference the various outputs of the generation
+1 | Yes | n/a | Input file containing the lexer/parser definition
+2 | No  | FALSE | Boolean to indicate if a listener interface should be generated
+3 | No  | FALSE | Boolean to indicate if a visitor interface should be generated
+4 | No  | none | C++ namespace in which the generated classes should be placed
+5 | No  | none | Additional files on which the input depends
+6 | No  | none | Library path to use during generation
 
 The `ANTLR4_JAR_LOCATION` CMake variable must be set to the location where the `antlr-4*-complete.jar` generator is located.
 You can download the file from [here](http://www.antlr.org/download.html).
