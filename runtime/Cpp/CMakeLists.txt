@@ -126,13 +126,67 @@ if (WITH_DEMO)
  add_subdirectory(demo)
 endif(WITH_DEMO)
 
+# Generate CMake Package Files only if install is active
+if (ANTLR4_INSTALL)
+
+  include(GNUInstallDirs)
+  include(CMakePackageConfigHelpers)
+
+  if(NOT ANTLR4_CMAKE_DIR)
+    set(ANTLR4_CMAKE_DIR ${CMAKE_INSTALL_LIBDIR}/cmake/antlr4 CACHE STRING
+      "Installation directory for cmake files." FORCE )
+  endif(NOT ANTLR4_CMAKE_DIR)
+
+  set(version_config ${PROJECT_BINARY_DIR}/antlr4-config-version.cmake)
+  set(project_runtime_config ${PROJECT_BINARY_DIR}/antlr4-runtime-config.cmake)
+  set(project_generator_config ${PROJECT_BINARY_DIR}/antlr4-generator-config.cmake)
+  set(targets_export_name antlr4-targets)
+
+  set(ANTLR4_LIB_DIR ${CMAKE_INSTALL_LIBDIR} CACHE STRING
+      "Installation directory for libraries, relative to ${CMAKE_INSTALL_PREFIX}.")
+  
+  set(ANTLR4_INCLUDE_DIR ${CMAKE_INSTALL_INCLUDEDIR}/antlr4-runtime CACHE STRING
+      "Installation directory for include files, relative to ${CMAKE_INSTALL_PREFIX}.")
+
+  configure_package_config_file(
+    cmake/antlr4-runtime.cmake.in
+    ${project_runtime_config}
+    INSTALL_DESTINATION ${ANTLR4_CMAKE_DIR}
+    PATH_VARS 
+    ANTLR4_INCLUDE_DIR
+    ANTLR4_LIB_DIR )
+  
+configure_package_config_file(
+    cmake/antlr4-generator.cmake.in
+    ${project_generator_config}
+    INSTALL_DESTINATION ${ANTLR4_CMAKE_DIR}
+    PATH_VARS 
+    ANTLR4_INCLUDE_DIR
+    ANTLR4_LIB_DIR )
+  
+  write_basic_package_version_file(
+    ${version_config}
+    VERSION ${ANTLR_VERSION}
+    COMPATIBILITY SameMajorVersion )
+
+  install(EXPORT ${targets_export_name}
+          DESTINATION ${ANTLR4_CMAKE_DIR} )
+
+  install(FILES ${project_runtime_config}
+                ${project_generator_config}
+                ${version_config}
+          DESTINATION ${ANTLR4_CMAKE_DIR} )
+
+endif(ANTLR4_INSTALL)
+
 if( EXISTS LICENSE.txt)
-install(FILES LICENSE.txt
-        DESTINATION "share/doc/libantlr4")
-elseif(EXISTS ../../LICENSE.txt) 
-install(FILES ../../LICENSE.txt
-    DESTINATION "share/doc/libantlr4")
+  install(FILES LICENSE.txt
+          DESTINATION "share/doc/libantlr4")
+  elseif(EXISTS ../../LICENSE.txt) 
+  install(FILES ../../LICENSE.txt
+      DESTINATION "share/doc/libantlr4")
 endif()
 
 install(FILES README.md VERSION 
     DESTINATION "share/doc/libantlr4")
+
