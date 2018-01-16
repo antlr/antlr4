@@ -28,81 +28,12 @@ FIND_PACKAGE(Java COMPONENTS Runtime REQUIRED)
 #        -> <f>Listener.h
 #        -> <f>Listener.cpp
 #
-# The function "antlr4_generate" will generate the required setup to call ANTLR for a given input file
-# 
-# +-----------+-----------+-------------+------------------------------------------------------------------------------+
-# | Argument# | Required  | Defaults to |                                                                              |
-# +-----------+-----------+-------------+------------------------------------------------------------------------------+
-# |     0     |   Yes     |    n/a      | Unique target name. It is used to generate CMake Variables to reference the  |
-# |           |           |             | various outputs of the generation                                            |
-# +-----------+-----------+-------------+------------------------------------------------------------------------------+
-# |     1     |   Yes     |    n/a      | Input file containing the lexer/parser definition                            |  
-# +-----------+-----------+-------------+------------------------------------------------------------------------------+
-# |     2     |    No     |    FALSE    | Boolean to indicate if a listener interface should be generated              |
-# +-----------+-----------+-------------+------------------------------------------------------------------------------+
-# |     3     |    No     |    FALSE    | Boolean to indicate if a visitor interface should be generated               |
-# +-----------+-----------+-------------+------------------------------------------------------------------------------+
-# |     4     |    No     |    none     | C++ namespace in which the generated classes should be placed                |
-# +-----------+-----------+-------------+------------------------------------------------------------------------------+
-# |     5     |    No     |    none     | Additional files on which the input depends                                  |
-# +-----------+-----------+-------------+------------------------------------------------------------------------------+
-# |     6     |    No     |    none     | Library path to use during generation                                        |
-# +-----------+-----------+-------------+------------------------------------------------------------------------------+
+# See documentation in markup
 #
-# The ANTLR4_JAR_LOCATION must be set prior calling the function!
-#
-# The following CMake variables are available following a call to antlr4_generate
-#
-#  ANTLR4_INCLUDE_DIR_<Target name>       - Directory containing the generated header files
-#  ANTLR4_SRC_FILES_<Target name>         - List of generated source files
-#  ANTLR4_TOKEN_FILES_<Target name>       - List of generated token files
-#  ANTLR4_TOKEN_DIRECTORY_<Target name>   - Directory containing the generated token files
-#
-# Sample:
-#
-# # Bring in the required packages
-# find_package(antlr4-runtime REQUIRED)
-# find_package(antlr4-generator REQUIRED)
-# 
-# # Set path to generator
-# set(ANTLR4_JAR_LOCATION ${PROJECT_SOURCE_DIR}/thirdparty/antlr/antlr-4.7.1-complete.jar)
-# 
-# # generate lexer
-# antlr4_generate( 
-#   antlrcpptest_lexer
-#   ${CMAKE_CURRENT_SOURCE_DIR}/TLexer.g4
-#   FALSE
-#   FALSE
-#   "antlrcpptest"
-#   )
-# 
-# # generate parser
-# antlr4_generate( 
-#   antlrcpptest_parser
-#   ${CMAKE_CURRENT_SOURCE_DIR}/TParser.g4
-#   FALSE
-#   TRUE
-#   "antlrcpptest"
-#   "${ANTLR4_TOKEN_FILES_antlrcpptest_lexer}"
-#   "${ANTLR4_TOKEN_DIRECTORY_antlrcpptest_lexer}"
-#   )
-# 
-# # add directories for generated include files
-# include_directories( ${PROJECT_BINARY_DIR} ${ANTLR4_INCLUDE_DIR_antlrcpptest_lexer} ${ANTLR4_INCLUDE_DIR_antlrcpptest_parser} )
-# 
-# # add generated source files
-# add_executable( Parsertest main.cpp ${ANTLR4_SRC_FILES_antlrcpptest_lexer} ${ANTLR4_SRC_FILES_antlrcpptest_parser} )
-# 
-# # add required runtime library
-# add_dependencies( Parsertest antlr4_shared )
-# 
-# target_link_libraries( Parsertest PRIVATE 
-#                        antlr4_shared)
-# 
-# 
 function(antlr4_generate
     Antlr4_ProjectTarget
     Antlr4_InputFile
+    Antlr4_GeneratorType
     )
 
   set( Antlr4_GeneratedSrcDir ${ANTLR4_GENERATED_SRC_DIR}/${Antlr4_ProjectTarget} )
@@ -111,16 +42,41 @@ function(antlr4_generate
 
   list( APPEND Antlr4_GeneratorStatusMessage "Common Include-, Source- and Tokenfiles" )
 
+  if ( ${Antlr4_GeneratorType} STREQUAL "LEXER")
+    set(Antlr4_LexerBaseName "${Antlr4_InputFileBaseName}")
+    set(Antlr4_ParserBaseName "")
+  else()
+    if ( ${Antlr4_GeneratorType} STREQUAL "PARSER")
+      set(Antlr4_LexerBaseName "")
+      set(Antlr4_ParserBaseName "${Antlr4_InputFileBaseName}")
+    else()
+      if ( ${Antlr4_GeneratorType} STREQUAL "BOTH")
+        set(Antlr4_LexerBaseName "${Antlr4_InputFileBaseName}Lexer")
+        set(Antlr4_ParserBaseName "${Antlr4_InputFileBaseName}Parser")
+      else()
+        message(FATAL_ERROR "The third parameter must be LEXER, PARSER or BOTH")
+      endif ()
+    endif ()
+  endif ()
+
   # Prepare list of generated targets
-  list( APPEND Antlr4_GeneratedTargets "${Antlr4_GeneratedSrcDir}/${Antlr4_InputFileBaseName}.h" )
-  list( APPEND Antlr4_GeneratedTargets "${Antlr4_GeneratedSrcDir}/${Antlr4_InputFileBaseName}.cpp" )
   list( APPEND Antlr4_GeneratedTargets "${Antlr4_GeneratedSrcDir}/${Antlr4_InputFileBaseName}.tokens" )
   list( APPEND Antlr4_GeneratedTargets "${Antlr4_GeneratedSrcDir}/${Antlr4_InputFileBaseName}.interp" )
   list( APPEND DependentTargets "${Antlr4_GeneratedSrcDir}/${Antlr4_InputFileBaseName}.tokens" )
 
+  if ( NOT ${Antlr4_LexerBaseName} STREQUAL "" )
+    list( APPEND Antlr4_GeneratedTargets "${Antlr4_GeneratedSrcDir}/${Antlr4_LexerBaseName}.h" )
+    list( APPEND Antlr4_GeneratedTargets "${Antlr4_GeneratedSrcDir}/${Antlr4_LexerBaseName}.cpp" )
+  endif ()
+
+  if ( NOT ${Antlr4_ParserBaseName} STREQUAL "" )
+    list( APPEND Antlr4_GeneratedTargets "${Antlr4_GeneratedSrcDir}/${Antlr4_ParserBaseName}.h" )
+    list( APPEND Antlr4_GeneratedTargets "${Antlr4_GeneratedSrcDir}/${Antlr4_ParserBaseName}.cpp" )
+  endif ()
+
   # process optional arguments ...
 
-  if ( ( ARGC GREATER_EQUAL 3 ) AND ARGV2 )
+  if ( ( ARGC GREATER_EQUAL 4 ) AND ARGV3 )
     set(Antlr4_BuildListenerOption "-listener")
 
     list( APPEND Antlr4_GeneratedTargets "${Antlr4_GeneratedSrcDir}/${Antlr4_InputFileBaseName}BaseListener.h" )
@@ -133,7 +89,7 @@ function(antlr4_generate
     set(Antlr4_BuildListenerOption "-no-listener")
   endif ()
   
-  if ( ( ARGC GREATER_EQUAL 4 ) AND ARGV3 )
+  if ( ( ARGC GREATER_EQUAL 5 ) AND ARGV4 )
     set(Antlr4_BuildVisitorOption "-visitor")
 
     list( APPEND Antlr4_GeneratedTargets "${Antlr4_GeneratedSrcDir}/${Antlr4_InputFileBaseName}BaseVisitor.h" )
@@ -146,24 +102,24 @@ function(antlr4_generate
     set(Antlr4_BuildVisitorOption "-no-visitor")
   endif ()
   
-  if ( (ARGC GREATER_EQUAL 5 ) AND (NOT ${ARGV4} STREQUAL "") )
-    set(Antlr4_NamespaceOption "-package;${ARGV4}")
+  if ( (ARGC GREATER_EQUAL 6 ) AND (NOT ${ARGV5} STREQUAL "") )
+    set(Antlr4_NamespaceOption "-package;${ARGV5}")
 
-    list( APPEND Antlr4_GeneratorStatusMessage " in Namespace ${ARGV4}" )
+    list( APPEND Antlr4_GeneratorStatusMessage " in Namespace ${ARGV5}" )
   else()
     set(Antlr4_NamespaceOption "")
   endif ()
   
-  if ( (ARGC GREATER_EQUAL 6 ) AND (NOT ${ARGV5} STREQUAL "") )
-    set(Antlr4_AdditionalDependencies ${ARGV5})
+  if ( (ARGC GREATER_EQUAL 7 ) AND (NOT ${ARGV6} STREQUAL "") )
+    set(Antlr4_AdditionalDependencies ${ARGV6})
   else()
     set(Antlr4_AdditionalDependencies "")
   endif ()
 
-  if ( (ARGC GREATER_EQUAL 7 ) AND (NOT ${ARGV6} STREQUAL "") )
-    set(Antlr4_LibOption "-lib;${ARGV6}")
+  if ( (ARGC GREATER_EQUAL 8 ) AND (NOT ${ARGV7} STREQUAL "") )
+    set(Antlr4_LibOption "-lib;${ARGV7}")
 
-    list( APPEND Antlr4_GeneratorStatusMessage " using Library ${ARGV6}" )
+    list( APPEND Antlr4_GeneratorStatusMessage " using Library ${ARGV7}" )
   else()
     set(Antlr4_LibOption "")
   endif ()
@@ -187,7 +143,7 @@ function(antlr4_generate
     ${CMAKE_COMMAND} -E make_directory ${Antlr4_GeneratedSrcDir}
     COMMAND
     # Generate files
-    "${Java_JAVA_EXECUTABLE}" -jar "${ANTLR4_JAR_LOCATION}" -Werror -Dlanguage=Cpp ${Antlr4_BuildListenerOption} ${Antlr4_BuildVisitorOption} ${Antlr4_LibOption} -o "${Antlr4_GeneratedSrcDir}" ${Antlr4_NamespaceOption} "${Antlr4_InputFile}"
+    "${Java_JAVA_EXECUTABLE}" -jar "${ANTLR4_JAR_LOCATION}" -Werror -Dlanguage=Cpp ${Antlr4_BuildListenerOption} ${Antlr4_BuildVisitorOption} ${Antlr4_LibOption} ${ANTLR4_GENERATED_OPTIONS} -o "${Antlr4_GeneratedSrcDir}" ${Antlr4_NamespaceOption} "${Antlr4_InputFile}"
     WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
     MAIN_DEPENDENCY "${Antlr4_InputFile}"
     DEPENDS ${Antlr4_AdditionalDependencies}

@@ -17,14 +17,17 @@ Argument# | Required  | Default | Use
 ----------|-----------|---------|--
 0 | Yes | n/a | Unique target name. It is used to generate CMake Variables to reference the various outputs of the generation
 1 | Yes | n/a | Input file containing the lexer/parser definition
-2 | No  | FALSE | Boolean to indicate if a listener interface should be generated
-3 | No  | FALSE | Boolean to indicate if a visitor interface should be generated
-4 | No  | none | C++ namespace in which the generated classes should be placed
-5 | No  | none | Additional files on which the input depends
-6 | No  | none | Library path to use during generation
+2 | Yes | n/a | Type of Rules contained in the input: LEXER, PARSER or BOTH
+4 | No  | FALSE | Boolean to indicate if a listener interface should be generated
+5 | No  | FALSE | Boolean to indicate if a visitor interface should be generated
+6 | No  | none | C++ namespace in which the generated classes should be placed
+7 | No  | none | Additional files on which the input depends
+8 | No  | none | Library path to use during generation
 
 The `ANTLR4_JAR_LOCATION` CMake variable must be set to the location where the `antlr-4*-complete.jar` generator is located.
 You can download the file from [here](http://www.antlr.org/download.html).
+
+Additional option to the ANTLR4 generator can be passed in the `ANTLR4_GENERATED_OPTIONS` variable
 
 The following CMake variables are available following a call to `antlr4_generate`
 
@@ -42,6 +45,7 @@ Output variable  | Meaning
  antlr4_generate( 
    antlrcpptest_parser
    ${CMAKE_CURRENT_SOURCE_DIR}/TLexer.g4
+   LEXER
    FALSE
    TRUE
    "antlrcpptest"
@@ -98,6 +102,7 @@ target_link_libraries( Parsertest PRIVATE
  antlr4_generate( 
    antlrcpptest_lexer
    ${CMAKE_CURRENT_SOURCE_DIR}/TLexer.g4
+   LEXER
    FALSE
    FALSE
    "antlrcpptest"
@@ -107,6 +112,7 @@ target_link_libraries( Parsertest PRIVATE
  antlr4_generate( 
    antlrcpptest_parser
    ${CMAKE_CURRENT_SOURCE_DIR}/TParser.g4
+   PARSER
    FALSE
    TRUE
    "antlrcpptest"
