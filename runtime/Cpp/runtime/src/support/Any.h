@@ -48,7 +48,7 @@ struct ANTLR4CPP_PUBLIC Any
   bool is() const {
     typedef StorageType<U> T;
 
-    auto derived = dynamic_cast<Derived<T, std::is_copy_constructible<T>> *>(_ptr);
+    auto derived = dynamic_cast<Derived<T, std::is_copy_constructible<T>::value> *>(_ptr);
 
     return derived != nullptr;
   }
@@ -57,7 +57,7 @@ struct ANTLR4CPP_PUBLIC Any
   StorageType<U>& as() {
     typedef StorageType<U> T;
 
-    auto derived = dynamic_cast<Derived<T, std::is_copy_constructible<T>>*>(_ptr);
+    auto derived = dynamic_cast<Derived<T, std::is_copy_constructible<T>::value>*>(_ptr);
 
     if (!derived)
       throw std::bad_cast();
@@ -116,7 +116,7 @@ private:
     T value;
 
     Base* clone() const {
-      return new Derived<T, std::is_copy_constructible<T>>(value);
+      return new Derived<T, std::is_copy_constructible<T>::value>(value);
     }
 
   };
