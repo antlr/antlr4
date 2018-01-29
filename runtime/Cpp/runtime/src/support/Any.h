@@ -41,14 +41,14 @@ struct ANTLR4CPP_PUBLIC Any
   }
 
   template<typename U>
-  Any(U&& value) : _ptr(new Derived<StorageType<U>>(std::forward<U>(value))) {
+  Any(U&& value) : _ptr(new Derived<StorageType<U>, std::is_copy_constructible<StorageType<U>>::value>(std::forward<U>(value))) {
   }
 
   template<class U>
   bool is() const {
     typedef StorageType<U> T;
 
-    auto derived = dynamic_cast<Derived<T> *>(_ptr);
+    auto derived = dynamic_cast<Derived<T, std::is_copy_constructible<T>> *>(_ptr);
 
     return derived != nullptr;
   }
@@ -57,7 +57,7 @@ struct ANTLR4CPP_PUBLIC Any
   StorageType<U>& as() {
     typedef StorageType<U> T;
 
-    auto derived = dynamic_cast<Derived<T>*>(_ptr);
+    auto derived = dynamic_cast<Derived<T, std::is_copy_constructible<T>>*>(_ptr);
 
     if (!derived)
       throw std::bad_cast();
@@ -104,8 +104,11 @@ private:
     virtual Base* clone() const = 0;
   };
 
+  template<typename T, bool Cloneable>
+  struct Derived;
+
   template<typename T>
-  struct Derived : Base
+  struct Derived<T, true> : Base
   {
     template<typename U> Derived(U&& value_) : value(std::forward<U>(value_)) {
     }
@@ -113,7 +116,21 @@ private:
     T value;
 
     Base* clone() const {
-      return new Derived<T>(value);
+      return new Derived<T, std::is_copy_constructible<T>>(value);
+    }
+
+  };
+
+  template<typename T>
+  struct Derived<T, false> : Base
+  {
+    template<typename U> Derived(U&& value_) : value(std::forward<U>(value_)) {
+    }
+
+    T value;
+
+    Base* clone() const {
+      return nullptr;
     }
 
   };
