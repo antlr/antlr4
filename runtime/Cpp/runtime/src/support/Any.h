@@ -105,7 +105,7 @@ private:
   struct Cloneable<std::vector<T, A>> : std::is_copy_constructible<T> {};
 
   struct Base {
-    virtual ~Base();
+    virtual ~Base() {};
     virtual Base* clone() const = 0;
   };
 

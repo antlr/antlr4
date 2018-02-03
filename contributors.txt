@@ -179,3 +179,4 @@ YYYY/MM/DD, github id, Full name, email
 2017/12/01, SebastianLng, Sebastian Lang, sebastian.lang@outlook.com
 2017/12/03, oranoran, Oran Epelbaum, oran / epelbaum me
 2017/12/27, jkmar, Jakub Marciniszyn, marciniszyn.jk@gmail.com
+2018/01/29, EternalPhane, Zongyuan Zuo, eternalphane@gmail.com
