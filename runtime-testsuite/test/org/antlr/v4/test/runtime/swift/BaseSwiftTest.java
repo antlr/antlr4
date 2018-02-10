@@ -54,7 +54,7 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 		// build swift runtime
 		URL swiftRuntime = loader.getResource("Swift");
 		if (swiftRuntime == null) {
-			throw new RuntimeException("Swift runtime file not found at:" + swiftRuntime.getPath());
+			throw new RuntimeException("Swift runtime file not found");
 		}
 		ANTLR_RUNTIME_PATH = swiftRuntime.getPath();
 		fastFailRunProcess(ANTLR_RUNTIME_PATH, SWIFT_CMD, "build");

@@ -777,8 +777,10 @@ public class BaseGoTest implements RuntimeTestSupport {
 				return pathname.getName().endsWith(filesEndingWith);
 			}
 		});
-		for (File file : files) {
-			file.delete();
+		if(files != null) {
+			for (File file : files) {
+				file.delete();
+			}
 		}
 	}
 

@@ -10,9 +10,6 @@ import org.antlr.v4.runtime.Vocabulary;
 import org.antlr.v4.runtime.VocabularyImpl;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNDeserializer;
-import org.antlr.v4.runtime.dfa.DFA;
-
-import java.util.Collection;
 import java.util.List;
 import java.util.ArrayList;
 import java.io.BufferedReader;

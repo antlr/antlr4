@@ -500,10 +500,12 @@ public class BaseCppTest implements RuntimeTestSupport {
 		ArrayList<String> files = new ArrayList<String>();
 		File folder = new File(path);
 		File[] listOfFiles = folder.listFiles();
-		for (int i = 0; i < listOfFiles.length; i++) {
-			String file = listOfFiles[i].getAbsolutePath();
-			if (file.endsWith(".cpp")) {
-				files.add(file);
+		if(listOfFiles != null) {
+			for (int i = 0; i < listOfFiles.length; i++) {
+				String file = listOfFiles[i].getAbsolutePath();
+				if (file.endsWith(".cpp")) {
+					files.add(file);
+				}
 			}
 		}
 		return files;

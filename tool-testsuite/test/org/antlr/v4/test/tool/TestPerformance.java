@@ -753,20 +753,24 @@ public class TestPerformance extends BaseJavaToolTest {
         assert directory.isDirectory();
 
         File[] sources = directory.listFiles(filesFilter);
-        for (File file : sources) {
-			if (!file.isFile()) {
-				continue;
-			}
+        if(sources != null) {
+        	for (File file : sources) {
+        		if (!file.isFile()) {
+        			continue;
+        		}
 
-			result.add(new InputDescriptor(file.getAbsolutePath()));
+        		result.add(new InputDescriptor(file.getAbsolutePath()));
+        	}
         }
 
         if (recursive) {
             File[] children = directory.listFiles(directoriesFilter);
-            for (File child : children) {
-                if (child.isDirectory()) {
-                    loadSources(child, filesFilter, directoriesFilter, true, result);
-                }
+            if(children != null) {
+            	for (File child : children) {
+            		if (child.isDirectory()) {
+            			loadSources(child, filesFilter, directoriesFilter, true, result);
+            		}
+            	}
             }
         }
     }

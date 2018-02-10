@@ -381,10 +381,8 @@ public class TestATNInterpreter extends BaseJavaToolTest {
 			startState = startState.transition(0).target;
 		}
 
-		DOTGenerator dot = new DOTGenerator(g);
-//		System.out.println(dot.getDOT(atn.ruleToStartState[g.getRule("a").index]));
-		Rule r = g.getRule("e");
-//		if ( r!=null ) System.out.println(dot.getDOT(atn.ruleToStartState[r.index]));
+		new DOTGenerator(g);
+g.getRule("e");
 
 		int result = interp.matchATN(input, startState);
 		assertEquals(expected, result);

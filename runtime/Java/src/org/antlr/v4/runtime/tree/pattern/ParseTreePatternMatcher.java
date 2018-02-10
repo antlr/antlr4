@@ -413,7 +413,6 @@ public class ParseTreePatternMatcher {
 		int p = 0;
 		int n = pattern.length();
 		List<Chunk> chunks = new ArrayList<Chunk>();
-		StringBuilder buf = new StringBuilder();
 		// find all start and stop indexes first, then collect
 		List<Integer> starts = new ArrayList<Integer>();
 		List<Integer> stops = new ArrayList<Integer>();
