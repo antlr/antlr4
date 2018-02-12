@@ -381,8 +381,6 @@ public class TestATNInterpreter extends BaseJavaToolTest {
 			startState = startState.transition(0).target;
 		}
 
-		g.getRule("e");
-
 		int result = interp.matchATN(input, startState);
 		assertEquals(expected, result);
 	}
