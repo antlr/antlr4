@@ -24,7 +24,7 @@ You'll need to use git to set the release. For example, to set the release tag f
 
 ```bash
 cd $GOPATH/src/github.com/antlr/antlr4 # enter the antlr4 source directory
-git checkout tags/4.6.0 # the go runtime was added in release 4.6.0
+git checkout 4.6 # the go runtime was added in release 4.6.0
 ```
 
 A complete list of releases can be found on [the release page](https://github.com/antlr/antlr4/releases).
