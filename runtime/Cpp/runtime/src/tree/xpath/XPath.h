@@ -62,7 +62,7 @@ namespace xpath {
     virtual ~XPath() {}
 
     // TO_DO: check for invalid token/rule names, bad syntax
-    virtual std::vector<XPathElement> split(const std::string &path);
+    virtual std::vector<Ref<XPathElement*>>  split(const std::string &path);
 
     /// Return a list of all nodes starting at {@code t} as root that satisfy the
     /// path. The root {@code /} is relative to the node passed to
@@ -71,15 +71,15 @@ namespace xpath {
 
   protected:
     std::string _path;
-    std::vector<XPathElement> _elements;
+    std::vector<Ref<XPathElement*>> _elements;
     Parser *_parser;
 
     /// Convert word like {@code *} or {@code ID} or {@code expr} to a path
     /// element. {@code anywhere} is {@code true} if {@code //} precedes the
     /// word.
-    virtual XPathElement getXPathElement(Token *wordToken, bool anywhere);
+    virtual Ref<XPathElement*> getXPathElement(Token *wordToken, bool anywhere);
   };
-
+ 
 } // namespace xpath
 } // namespace tree
 } // namespace antlr4

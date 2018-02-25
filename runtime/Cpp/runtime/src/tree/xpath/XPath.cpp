@@ -28,8 +28,8 @@ XPath::XPath(Parser *parser, const std::string &path) {
   _elements = split(path);
 }
 
-std::vector<XPathElement> XPath::split(const std::string &path) {
-  ANTLRFileStream in(path);
+std::vector<Ref<XPathElement*>> XPath::split(const std::string &path) {
+  ANTLRInputStream in(path);
   XPathLexer lexer(&in);
   lexer.removeErrorListeners();
   XPathLexerErrorListener listener;
@@ -44,7 +44,7 @@ std::vector<XPathElement> XPath::split(const std::string &path) {
   }
 
   std::vector<Token *> tokens = tokenStream.getTokens();
-  std::vector<XPathElement> elements;
+  std::vector<Ref<XPathElement*>> elements;
   size_t n = tokens.size();
   size_t i = 0;
   bool done = false;
@@ -62,8 +62,8 @@ std::vector<XPathElement> XPath::split(const std::string &path) {
           i++;
           next = tokens[i];
         }
-        XPathElement pathElement = getXPathElement(next, anywhere);
-        pathElement.setInvert(invert);
+        Ref<XPathElement*> pathElement = getXPathElement(next, anywhere);
+        (*pathElement)->setInvert(invert);
         elements.push_back(pathElement);
         i++;
         break;
@@ -88,7 +88,7 @@ std::vector<XPathElement> XPath::split(const std::string &path) {
   return elements;
 }
 
-XPathElement XPath::getXPathElement(Token *wordToken, bool anywhere) {
+Ref<XPathElement*> XPath::getXPathElement(Token *wordToken, bool anywhere) {
   if (wordToken->getType() == Token::EOF) {
     throw IllegalArgumentException("Missing path element at end of path");
   }
@@ -98,8 +98,8 @@ XPathElement XPath::getXPathElement(Token *wordToken, bool anywhere) {
   switch (wordToken->getType()) {
     case XPathLexer::WILDCARD :
       if (anywhere)
-        return XPathWildcardAnywhereElement();
-      return XPathWildcardElement();
+        return std::make_shared<XPathElement*>(new XPathWildcardAnywhereElement);
+      return std::make_shared<XPathElement*>(new XPathWildcardElement());
 
     case XPathLexer::TOKEN_REF:
     case XPathLexer::STRING :
@@ -107,16 +107,16 @@ XPathElement XPath::getXPathElement(Token *wordToken, bool anywhere) {
         throw IllegalArgumentException(word + " at index " + std::to_string(wordToken->getStartIndex()) + " isn't a valid token name");
       }
       if (anywhere)
-        return XPathTokenAnywhereElement(word, (int)ttype);
-      return XPathTokenElement(word, (int)ttype);
+        return std::make_shared<XPathElement*>(new XPathTokenAnywhereElement(word, (int)ttype));
+      return std::make_shared<XPathElement*>(new XPathTokenElement(word, (int)ttype));
 
     default :
       if (ruleIndex == -1) {
         throw IllegalArgumentException(word + " at index " + std::to_string(wordToken->getStartIndex()) + " isn't a valid rule name");
       }
       if (anywhere)
-        return XPathRuleAnywhereElement(word, (int)ruleIndex);
-      return XPathRuleElement(word, (int)ruleIndex);
+        return std::make_shared<XPathElement*>(new XPathRuleAnywhereElement(word, (int)ruleIndex));
+      return std::make_shared<XPathElement*>(new XPathRuleElement(word, (int)ruleIndex));
   }
 }
 
@@ -135,8 +135,14 @@ std::vector<ParseTree *> XPath::evaluate(ParseTree *t) {
         // only try to match next element if it has children
         // e.g., //func/*/stat might have a token node for which
         // we can't go looking for stat nodes.
-        auto matching = _elements[i].evaluate(node);
-        next.insert(next.end(), matching.begin(), matching.end());
+        auto matching = (*_elements[i])->evaluate(node);
+
+		for each (auto var in matching)
+			// only add if not present already
+			if (std::find(next.begin(), next.end(), var) == next.end()) {
+			  next.push_back(var);
+			}
+         
       }
     }
     i++;
