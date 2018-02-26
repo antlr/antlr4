@@ -110,7 +110,7 @@ private:
   };
 
   template<typename T>
-  struct Derived<T> : Base
+  struct Derived : Base
   {
     template<typename U> Derived(U&& value_) : value(std::forward<U>(value_)) {
     }
