@@ -180,3 +180,4 @@ YYYY/MM/DD, github id, Full name, email
 2017/12/03, oranoran, Oran Epelbaum, oran / epelbaum me
 2017/12/20, kbsletten, Kyle Sletten, kbsletten@gmail.com
 2017/12/27, jkmar, Jakub Marciniszyn, marciniszyn.jk@gmail.com
+2018/02/25, chaseoxide, Marcus Ong, taccs97[at]gmail[dot]com
