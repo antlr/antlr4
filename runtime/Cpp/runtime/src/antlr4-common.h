@@ -78,9 +78,12 @@
     #endif
   #endif
 
-  namespace std {
-  class ANTLR4CPP_PUBLIC exception; // Needed for VS 2015.
-  } // namespace std
+  #if defined(_MSC_VER) && !defined(__clang__)
+    // clang-cl should escape this to prevent [ignored-attributes].
+    namespace std {
+    class ANTLR4CPP_PUBLIC exception; // Prevents warning C4275 from MSVC.
+    } // namespace std
+  #endif
 
 #elif defined(__APPLE__)
   typedef std::u32string UTF32String;
