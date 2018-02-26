@@ -41,14 +41,14 @@ struct ANTLR4CPP_PUBLIC Any
   }
 
   template<typename U>
-  Any(U&& value) : _ptr(new Derived<StorageType<U>, Cloneable<StorageType<U>>::value>(std::forward<U>(value))) {
+  Any(U&& value) : _ptr(new Derived<StorageType<U>>(std::forward<U>(value))) {
   }
 
   template<class U>
   bool is() const {
     typedef StorageType<U> T;
 
-    auto derived = dynamic_cast<Derived<T, Cloneable<T>::value> *>(_ptr);
+    auto derived = dynamic_cast<Derived<T> *>(_ptr);
 
     return derived != nullptr;
   }
@@ -57,7 +57,7 @@ struct ANTLR4CPP_PUBLIC Any
   StorageType<U>& as() {
     typedef StorageType<U> T;
 
-    auto derived = dynamic_cast<Derived<T, Cloneable<T>::value>*>(_ptr);
+    auto derived = dynamic_cast<Derived<T>*>(_ptr);
 
     if (!derived)
       throw std::bad_cast();
@@ -99,21 +99,18 @@ struct ANTLR4CPP_PUBLIC Any
   }
 
 private:
-  template<typename T>
+  template<class T, class V = void>
   struct Cloneable : std::is_copy_constructible<T> {};
-  template<typename T, typename A>
-  struct Cloneable<std::vector<T, A>> : std::is_copy_constructible<T> {};
+  template<class T, class A, template<class = T, class = A> class C>
+  struct Cloneable<C<T, A>, typename std::enable_if<std::is_copy_constructible<C<T, A>>::value && !std::is_nothrow_copy_constructible<C<T, A>>::value>::type> : std::is_copy_constructible<T> {};
 
   struct Base {
     virtual ~Base() {};
     virtual Base* clone() const = 0;
   };
 
-  template<typename T, bool Cloneable>
-  struct Derived;
-
   template<typename T>
-  struct Derived<T, true> : Base
+  struct Derived<T> : Base
   {
     template<typename U> Derived(U&& value_) : value(std::forward<U>(value_)) {
     }
@@ -121,20 +118,17 @@ private:
     T value;
 
     Base* clone() const {
-      return new Derived<T, Cloneable<T>::value>(value);
+      return clone<>();
     }
 
-  };
-
-  template<typename T>
-  struct Derived<T, false> : Base
-  {
-    template<typename U> Derived(U&& value_) : value(std::forward<U>(value_)) {
+  private:
+    template<int N = 0>
+    auto clone() const -> typename std::enable_if<N == N && Cloneable<T>::value, Base*>::type {
+      return new Derived<T>(value);
     }
 
-    T value;
-
-    Base* clone() const {
+    template<int N = 0>
+    auto clone() const -> typename std::enable_if<N == N && !Cloneable<T>::value, Base*>::type {
       return nullptr;
     }
 
