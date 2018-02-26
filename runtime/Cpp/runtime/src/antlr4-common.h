@@ -78,7 +78,9 @@
     #endif
   #endif
 
-  class ANTLR4CPP_PUBLIC std::exception; // Needed for VS 2015.
+  namespace std {
+  class ANTLR4CPP_PUBLIC exception; // Needed for VS 2015.
+  } // namespace std
 
 #elif defined(__APPLE__)
   typedef std::u32string UTF32String;
