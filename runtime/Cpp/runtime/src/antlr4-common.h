@@ -81,7 +81,7 @@
   #if defined(_MSC_VER) && !defined(__clang__)
     // clang-cl should escape this to prevent [ignored-attributes].
     namespace std {
-    class ANTLR4CPP_PUBLIC exception; // Prevents warning C4275 from MSVC.
+      class ANTLR4CPP_PUBLIC exception; // Prevents warning C4275 from MSVC.
     } // namespace std
   #endif
 
