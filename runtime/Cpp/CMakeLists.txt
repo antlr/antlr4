@@ -20,6 +20,8 @@ if(NOT WITH_DEMO)
 endif(NOT WITH_DEMO)
 
 option(WITH_LIBCXX "Building with clang++ and libc++(in Linux). To enable with: -DWITH_LIBCXX=On" On)
+option(WITH_STATIC_CRT "(Visual C++) Enable to statically link CRT, which avoids requiring users to install the redistribution package.
+ To disable with: -DWITH_STATIC_CRT=Off" On)
 
 project(LIBANTLR4)
 

@@ -22,6 +22,8 @@ set(CMAKE_CXX_STANDARD 11)
 # required if linking to static library
 add_definitions(-DANTLR4CPP_STATIC)
 
+# using /MD flag for antlr4_runtime (for Visual C++ compilers only)
+set(ANTLR4_WITH_STATIC_CRT OFF)
 # add external build for antlrcpp
 include(ExternalAntlr4Cpp)
 # add antrl4cpp artifacts to project environment
@@ -113,6 +115,8 @@ ANTLR4_RUNTIME_LIBRARIES - path to antlr4 shared runtime library (such as DLL an
 ANTLR4_TAG - branch/tag used for building antlr4 library
 ```
 `ANTLR4_TAG` is set to master branch by default to keep antlr4 updated. However, it will be required to rebuild after every `clean` is called. Set `ANTLR4_TAG` to a desired commit hash value to avoid rebuilding after every `clean` and keep the build stable, at the cost of not automatically update to latest commit.
+
+Visual C++ compiler users may want to additionally define `ANTLR4_WITH_STATIC_CRT` before including the file. Set `ANTLR4_WITH_STATIC_CRT` to true if ANTLR4 C++ runtime library should be compiled with `/MT` flag, otherwise will be compiled with `/MD` flag. This variable has a default value of `OFF`. Changing `ANTLR4_WITH_STATIC_CRT` after building the library may require reinitialization of CMake or `clean` for the library to get rebuilt.
 
 #### Examples
 To build and link ANTLR4 static library to a target one may call:

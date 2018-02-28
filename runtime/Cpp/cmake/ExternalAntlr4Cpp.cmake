@@ -60,6 +60,10 @@ else()
           --target)
 endif()
 
+if(NOT DEFINED ANTLR4_WITH_STATIC_CRT)
+  set(ANTLR4_WITH_STATIC_CRT ON)
+endif()
+
 ExternalProject_Add(
     antlr4_runtime
     PREFIX antlr4_runtime
@@ -72,6 +76,7 @@ ExternalProject_Add(
     SOURCE_SUBDIR runtime/Cpp
     CMAKE_CACHE_ARGS
         -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
+        -DWITH_STATIC_CRT:BOOL=${ANTLR4_WITH_STATIC_CRT}
     INSTALL_COMMAND ""
     EXCLUDE_FROM_ALL 1)
 
