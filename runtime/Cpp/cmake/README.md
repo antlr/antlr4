@@ -1,4 +1,4 @@
-### Getting started with Antlr4cpp
+## Getting started with Antlr4Cpp
 
 Here is how you can use this external project to create the antlr4cpp demo to start your project off.
 
@@ -53,8 +53,7 @@ add_executable(demo main.cpp
 target_link_libraries(demo antlr4_static)
 ```
 
----
-### Documentation for FindANTLR
+## Documentation for FindANTLR
 
 The module defines the following variables:
 ```
@@ -95,7 +94,7 @@ The options are:
 * `LISTENER` - tell ANTLR tool to generate a parse tree listener
 * `VISITOR` - tell ANTLR tool to generate a parse tree visitor
 
-#### Examples
+### Examples
 To generate C++ files from an ANTLR input file T.g4, which defines both lexer and parser grammar one may call:
 ```cmake
 find_package(ANTLR REQUIRED)
@@ -103,8 +102,7 @@ antlr_target(Sample T.g4)
 ```
 do note that this command will do nothing unless the outputs of `Sample`, i.e. `ANTLR_Sample_CXX_OUTPUTS` gets used by some target.
 
----
-### Documentation for ExternalAntlr4Cpp
+## Documentation for ExternalAntlr4Cpp
 
 Including ExternalAntlr4Cpp will add `antlr4_static` and `antlr4_shared` as an optional target. It will also define the following variables:
 ```
@@ -118,7 +116,7 @@ ANTLR4_TAG - branch/tag used for building antlr4 library
 
 Visual C++ compiler users may want to additionally define `ANTLR4_WITH_STATIC_CRT` before including the file. Set `ANTLR4_WITH_STATIC_CRT` to true if ANTLR4 C++ runtime library should be compiled with `/MT` flag, otherwise will be compiled with `/MD` flag. This variable has a default value of `OFF`. Changing `ANTLR4_WITH_STATIC_CRT` after building the library may require reinitialization of CMake or `clean` for the library to get rebuilt.
 
-#### Examples
+### Examples
 To build and link ANTLR4 static library to a target one may call:
 ```cmake
 include(ExternalAntlr4Cpp)
