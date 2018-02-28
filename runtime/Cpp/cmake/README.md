@@ -85,7 +85,7 @@ ANTLR_${name}_OUTPUT_DIR - the output directory for ANTLR
 
 The options are:
 * `PACKAGE` - defines a namespace for the generated C++ files
-* `OUTPUT_DIRECTORY` - the output directory for the generated files. By default it uses ${CMAKE_CURRENT_BINARY_DIR}
+* `OUTPUT_DIRECTORY` - the output directory for the generated files. By default it uses `${CMAKE_CURRENT_BINARY_DIR}`
 * `DEPENDS_ANTLR` - the dependent target generated from antlr_target for the current call
 * `COMPILE_FLAGS` - additional compile flags for ANTLR tool
 * `DEPENDS` - specify the files on which the command depends. It works the same way `DEPENDS` in [add_custom_command()](https://cmake.org/cmake/help/v3.11/command/add_custom_command.html)
@@ -109,7 +109,7 @@ Including ExternalAntlr4Cpp will add `antlr4_static` and `antlr4_shared` as an o
 ANTLR4_INCLUDE_DIRS - the include directory that should be included when compiling C++ source file
 ANTLR4_STATIC_LIBRARIES - path to antlr4 static library
 ANTLR4_SHARED_LIBRARIES - path to antlr4 shared library
-ANTLR4_RUNTIME_LIBRARIES - path to antlr4 shared runtime library (such as DLL and SO file)
+ANTLR4_RUNTIME_LIBRARIES - path to antlr4 shared runtime library (such as DLL, DYLIB and SO file)
 ANTLR4_TAG - branch/tag used for building antlr4 library
 ```
 `ANTLR4_TAG` is set to master branch by default to keep antlr4 updated. However, it will be required to rebuild after every `clean` is called. Set `ANTLR4_TAG` to a desired commit hash value to avoid rebuilding after every `clean` and keep the build stable, at the cost of not automatically update to latest commit.
@@ -125,7 +125,7 @@ add_executable(output main.cpp)
 target_link_libraries(output antlr4_static)
 ```
 
-It may also be a good idea to copy the runtime libraries (DLL or SO file) to the executable for it to run properly after build. i.e. To build and link antlr4 shared library to a target one may call:
+It may also be a good idea to copy the runtime libraries (DLL, DYLIB or SO file) to the executable for it to run properly after build. i.e. To build and link antlr4 shared library to a target one may call:
 ```cmake
 include(ExternalAntlr4Cpp)
 include_directories(${ANTLR4_INCLUDE_DIRS})
