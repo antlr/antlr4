@@ -13,6 +13,8 @@ endif()
 
 if(${CMAKE_GENERATOR} MATCHES "Visual Studio.*")
   set(ANTLR4_OUTPUT_DIR ${ANTLR4_ROOT}/runtime/Cpp/dist/$(Configuration))
+elseif(${CMAKE_GENERATOR} MATCHES "Xcode.*")
+  set(ANTLR4_OUTPUT_DIR ${ANTLR4_ROOT}/runtime/Cpp/dist/$(CONFIGURATION))
 else()
   set(ANTLR4_OUTPUT_DIR ${ANTLR4_ROOT}/runtime/Cpp/dist)
 endif()
@@ -55,6 +57,12 @@ elseif(${CMAKE_GENERATOR} MATCHES "Visual Studio.*")
       ${CMAKE_COMMAND}
           --build .
           --config $(Configuration)
+          --target)
+elseif(${CMAKE_GENERATOR} MATCHES "Xcode.*")
+  set(ANTLR4_BUILD_COMMAND
+      ${CMAKE_COMMAND}
+          --build .
+          --config $(CONFIGURATION)
           --target)
 else()
   set(ANTLR4_BUILD_COMMAND
