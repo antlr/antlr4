@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -40,11 +40,10 @@ namespace misc {
     IntervalSet(IntervalSet&& set);
 
     template<typename T1, typename... T_NEXT>
-    IntervalSet(int, T1 t1, T_NEXT&&... next) : IntervalSet()
-    {
-	// The first int argument is an ignored count for compatibility
-	// with the previous varargs based interface.
-	addItems(t1, std::forward<T_NEXT>(next)...);
+    IntervalSet(int, T1 t1, T_NEXT&&... next) : IntervalSet() {
+      // The first int argument is an ignored count for compatibility
+      // with the previous varargs based interface.
+      addItems(t1, std::forward<T_NEXT>(next)...);
     }
 
     IntervalSet& operator=(IntervalSet const& set);
@@ -78,10 +77,9 @@ namespace misc {
     IntervalSet& addAll(const IntervalSet &set);
 
     template<typename T1, typename... T_NEXT>
-    void addItems(T1 t1, T_NEXT&&... next)
-    {
-	add(t1);
-	addItems(std::forward<T_NEXT>(next)...);
+    void addItems(T1 t1, T_NEXT&&... next) {
+      add(t1);
+      addItems(std::forward<T_NEXT>(next)...);
     }
 
     IntervalSet complement(ssize_t minElement, ssize_t maxElement) const;
