@@ -3,7 +3,7 @@
 # This Cmake file is for those using a superbuild Cmake Pattern, it
 # will download the tools and build locally
 #
-# use 2the antlr4cpp_process_grammar to support multiple grammars in the
+# use the antlr4cpp_process_grammar to support multiple grammars in the
 # same project
 #
 # - Getting quicky started with Antlr4cpp
@@ -46,7 +46,7 @@
 # include_directories(${antlr4cpp_include_dirs_antlrcpptest})
 #
 # # add generated grammar to demo binary target
-# add_executable(demo main.cpp ${antlr4cpp_src_files_antlrcpptest})
+# add_executable(demo main.cpp ${antlr4cpp_src_files_antlrcpptest} ${antlr4cpp_generation_antlrcpptest})
 # add_dependencies(demo antlr4cpp antlr4cpp_generation_antlrcpptest)
 # target_link_libraries(demo antlr4-runtime)
 #
@@ -169,9 +169,9 @@ set(ANTLR4CPP_LIBS "${INSTALL_DIR}/lib")
 # macro to add dependencies to target
 #
 # Param 1 project name
-# Param 1 namespace (postfix for dependencies)
-# Param 2 Lexer file (full path)
-# Param 3 Parser File (full path)
+# Param 2 namespace (postfix for dependencies)
+# Param 3 Lexer file (full path)
+# Param 4 Parser File (full path)
 #
 # output
 #
