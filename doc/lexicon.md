@@ -79,7 +79,7 @@ These more or less correspond to `isJavaIdentifierPart` and `isJavaIdentifierSta
 
 ## Literals
 
-ANTLR does not distinguish between character and string literals as most languages do. All literal strings one or more characters in length are enclosed in single quotes such as `’;’`, `’if’`, `’>=’`, and `’\’` (refers to the one-character string containing the single quote character). Literals never contain regular expressions.
+ANTLR does not distinguish between character and string literals as most languages do. All literal strings one or more characters in length are enclosed in single quotes such as `’;’`, `’if’`, `’>=’`, and `’\’’` (refers to the one-character string containing the single quote character). Literals never contain regular expressions.
 
 Literals can contain Unicode escape sequences of the form `’\uXXXX’` (for Unicode code points up to `’U+FFFF’`) or `’\u{XXXXXX}’` (for all Unicode code points), where `’XXXX’` is the hexadecimal Unicode code point value.
 
