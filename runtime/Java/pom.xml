@@ -96,6 +96,7 @@
 						<phase>process-classes</phase>
 						<configuration>
 							<instructions>
+								<Automatic-Module-Name>org.antlr.antlr4.runtime</Automatic-Module-Name>
 								<Bundle-SymbolicName>org.antlr.antlr4-runtime</Bundle-SymbolicName>
 							</instructions>
 						</configuration>
