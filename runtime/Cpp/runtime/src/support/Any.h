@@ -99,11 +99,6 @@ struct ANTLR4CPP_PUBLIC Any
   }
 
 private:
-  template<class T, class V = void>
-  struct Cloneable : std::is_copy_constructible<T> {};
-  template<class T, class A, template<class = T, class = A> class C>
-  struct Cloneable<C<T, A>, typename std::enable_if<std::is_copy_constructible<C<T, A>>::value && !std::is_nothrow_copy_constructible<C<T, A>>::value>::type> : std::is_copy_constructible<T> {};
-
   struct Base {
     virtual ~Base() {};
     virtual Base* clone() const = 0;
@@ -122,13 +117,13 @@ private:
     }
 
   private:
-    template<int N = 0>
-    auto clone() const -> typename std::enable_if<N == N && Cloneable<T>::value, Base*>::type {
+    template<int N = 0, typename std::enable_if<N == N && std::is_nothrow_copy_constructible<T>::value, int>::type = 0>
+    Base* clone() const {
       return new Derived<T>(value);
     }
 
-    template<int N = 0>
-    auto clone() const -> typename std::enable_if<N == N && !Cloneable<T>::value, Base*>::type {
+    template<int N = 0, typename std::enable_if<N == N && !std::is_nothrow_copy_constructible<T>::value, int>::type = 0>
+    Base* clone() const {
       return nullptr;
     }
 
