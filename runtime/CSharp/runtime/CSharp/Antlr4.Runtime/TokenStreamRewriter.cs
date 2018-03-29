@@ -622,7 +622,7 @@ namespace Antlr4.Runtime
                         // kill first delete
                         rop.index = Math.Min(prevRop.index, rop.index);
                         rop.lastIndex = Math.Max(prevRop.lastIndex, rop.lastIndex);
-#if !PORTABLE
+#if !PORTABLE && !WINDOWS_UWP
                         System.Console.Out.WriteLine("new rop " + rop);
 #endif
                     }

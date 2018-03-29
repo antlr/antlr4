@@ -55,6 +55,7 @@
     <Compile Include="Atn\ATNDeserializer.cs" />
     <Compile Include="Atn\ConflictInfo.cs" />
     <Compile Include="CharStreams.cs" />
+    <Compile Include="Consoles.cs" />
     <Compile Include="Dfa\AbstractEdgeMap.cs" />
     <Compile Include="Dfa\AcceptStateInfo.cs" />
     <Compile Include="Dfa\ArrayEdgeMap.cs" />
@@ -76,6 +77,7 @@
     <Compile Include="Tree\IParseTreeVisitor.cs" />
     <Compile Include="Tree\ParseTreeProperty.cs" />
     <Compile Include="Tree\Xpath\XPathLexer.cs" />
+    <Compile Include="UwpConsole.cs" />
     <Compile Include="Vocabulary.cs" />
     <Compile Include="Atn\ATNSimulator.cs" />
     <Compile Include="Atn\ATNState.cs" />

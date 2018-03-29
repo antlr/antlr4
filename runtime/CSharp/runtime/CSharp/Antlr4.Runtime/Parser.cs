@@ -171,7 +171,7 @@ namespace Antlr4.Runtime
         protected readonly TextWriter Output;
         protected readonly TextWriter ErrorOutput;
 
-        public Parser(ITokenStream input) : this(input, Console.Out, Console.Error) { }
+        public Parser(ITokenStream input) : this(input, Consoles.Out, Consoles.Error) { }
 
         public Parser(ITokenStream input, TextWriter output, TextWriter errorOutput)
         {
