@@ -1,4 +1,4 @@
-ANTLR Project Contributors Certification of Origin and Rights
+﻿ANTLR Project Contributors Certification of Origin and Rights
 
 All contributors to ANTLR v4 must formally agree to abide by this
 certificate of origin by signing on the bottom with their github
@@ -181,3 +181,4 @@ YYYY/MM/DD, github id, Full name, email
 2017/12/20, kbsletten, Kyle Sletten, kbsletten@gmail.com
 2017/12/27, jkmar, Jakub Marciniszyn, marciniszyn.jk@gmail.com
 2018/02/11, io7m, Mark Raynsford, code@io7m.com
+2018/03/29, thegoldenmule, Benjamin Jordan, bmj465@gmail.com
