@@ -99,7 +99,7 @@ namespace Antlr4.Runtime
         /// </remarks>
 		private string _text;
 
-        public Lexer(ICharStream input) : this(input, Console.Out, Console.Error) { }
+        public Lexer(ICharStream input) : this(input, Consoles.Out, Consoles.Error) { }
 
         public Lexer(ICharStream input, TextWriter output, TextWriter errorOutput)
         {

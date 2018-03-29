@@ -95,7 +95,7 @@ namespace Antlr4.Runtime.Atn
             {
                 if (epsilonOnlyTransitions != e.IsEpsilon)
                 {
-#if !PORTABLE
+#if !PORTABLE && !WINDOWS_UWP
                     System.Console.Error.WriteLine("ATN state {0} has both epsilon and non-epsilon transitions.", stateNumber);
 #endif
                     epsilonOnlyTransitions = false;
