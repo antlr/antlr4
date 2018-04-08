@@ -23,11 +23,13 @@ type Token interface {
 	GetChannel() int
 	GetStart() int
 	GetStop() int
-	GetLine() int
 	GetColumn() int
 
 	GetTokenType() int
 	SetTokenType(t int)
+
+	GetLine() int
+	SetLine(l int)
 
 	GetText() string
 	SetText(s string)
@@ -89,6 +91,10 @@ func (b *BaseToken) GetStop() int {
 
 func (b *BaseToken) GetLine() int {
 	return b.line
+}
+
+func (b *BaseToken) SetLine(line int) {
+	b.line = line
 }
 
 func (b *BaseToken) GetColumn() int {
