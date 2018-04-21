@@ -70,7 +70,7 @@ DFAState* ProfilingATNSimulator::getExistingTargetState(DFAState *previousD, siz
   DFAState *existingTargetState = ParserATNSimulator::getExistingTargetState(previousD, t);
   if (existingTargetState != nullptr) {
     _decisions[_currentDecision].SLL_DFATransitions++; // count only if we transition over a DFA state
-    if (existingTargetState == ERROR.get()) {
+    if (existingTargetState == DFAStateError.get()) {
       _decisions[_currentDecision].errors.push_back(
         ErrorInfo(_currentDecision, previousD->configs.get(), _input, _startIndex, _sllStopIndex, false)
       );

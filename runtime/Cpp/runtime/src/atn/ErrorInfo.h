@@ -28,7 +28,7 @@ namespace atn {
     /// </summary>
     /// <param name="decision"> The decision number </param>
     /// <param name="configs"> The final configuration set reached during prediction
-    /// prior to reaching the <seealso cref="ATNSimulator#ERROR"/> state </param>
+    /// prior to reaching the <seealso cref="ATNSimulator#DFAStateError"/> state </param>
     /// <param name="input"> The input token stream </param>
     /// <param name="startIndex"> The start index for the current prediction </param>
     /// <param name="stopIndex"> The index at which the syntax error was identified </param>
