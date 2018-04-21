@@ -443,7 +443,7 @@ namespace atn {
     /// </param>
     /// <returns> The computed target DFA state for the given input symbol
     /// {@code t}. If {@code t} does not lead to a valid DFA state, this method
-    /// returns <seealso cref="#ERROR"/>. </returns>
+    /// returns <seealso cref="#DFAStateError"/>. </returns>
     virtual dfa::DFAState *computeTargetState(dfa::DFA &dfa, dfa::DFAState *previousD, size_t t);
 
     virtual void predicateDFAState(dfa::DFAState *dfaState, DecisionState *decisionState);
@@ -658,7 +658,7 @@ namespace atn {
      * This method is used to improve the localization of error messages by
      * choosing an alternative rather than throwing a
      * {@link NoViableAltException} in particular prediction scenarios where the
-     * {@link #ERROR} state was reached during ATN simulation.
+     * {@link #DFAStateError} state was reached during ATN simulation.
      *
      * <p>
      * The default implementation of this method uses the following
@@ -692,7 +692,7 @@ namespace atn {
      * </p>
      *
      * @param configs The ATN configurations which were valid immediately before
-     * the {@link #ERROR} state was reached
+     * the {@link #DFAStateError} state was reached
      * @param outerContext The is the \gamma_0 initial parser context from the paper
      * or the parser stack at the instant before prediction commences.
      *
@@ -867,7 +867,7 @@ namespace atn {
     /// is already in the DFA, the existing state is returned. Otherwise this
     /// method returns {@code D} after adding it to the DFA.
     /// <p/>
-    /// If {@code D} is <seealso cref="#ERROR"/>, this method returns <seealso cref="#ERROR"/> and
+    /// If {@code D} is <seealso cref="#DFAStateError"/>, this method returns <seealso cref="#DFAStateError"/> and
     /// does not change the DFA.
     /// </summary>
     /// <param name="dfa"> The dfa </param>

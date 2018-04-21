@@ -166,7 +166,7 @@ size_t ParserATNSimulator::execATN(dfa::DFA &dfa, dfa::DFAState *s0, TokenStream
       D = computeTargetState(dfa, previousD, t);
     }
 
-    if (D == ERROR.get()) {
+    if (D == DFAStateError.get()) {
       // if any configs in previous dipped into outer context, that
       // means that input up to t actually finished entry rule
       // at least for SLL decision. Full LL doesn't dip into outer
@@ -270,8 +270,8 @@ dfa::DFAState *ParserATNSimulator::getExistingTargetState(dfa::DFAState *previou
 dfa::DFAState *ParserATNSimulator::computeTargetState(dfa::DFA &dfa, dfa::DFAState *previousD, size_t t) {
   std::unique_ptr<ATNConfigSet> reach = computeReachSet(previousD->configs.get(), t, false);
   if (reach == nullptr) {
-    addDFAEdge(dfa, previousD, t, ERROR.get());
-    return ERROR.get();
+    addDFAEdge(dfa, previousD, t, DFAStateError.get());
+    return DFAStateError.get();
   }
 
   // create new target state; we'll add to DFA after it's complete
@@ -1271,7 +1271,7 @@ dfa::DFAState *ParserATNSimulator::addDFAEdge(dfa::DFA &dfa, dfa::DFAState *from
 }
 
 dfa::DFAState *ParserATNSimulator::addDFAState(dfa::DFA &dfa, dfa::DFAState *D) {
-  if (D == ERROR.get()) {
+  if (D == DFAStateError.get()) {
     return D;
   }
 

@@ -120,7 +120,7 @@ namespace atn {
     /// </param>
     /// <returns> The computed target DFA state for the given input symbol
     /// {@code t}. If {@code t} does not lead to a valid DFA state, this method
-    /// returns <seealso cref="#ERROR"/>. </returns>
+    /// returns <seealso cref="#DFAStateError"/>. </returns>
     virtual dfa::DFAState *computeTargetState(CharStream *input, dfa::DFAState *s, size_t t);
 
     virtual size_t failOrAccept(CharStream *input, ATNConfigSet *reach, size_t t);
