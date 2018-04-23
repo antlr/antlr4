@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -127,8 +127,10 @@ size_t ParserATNSimulator::adaptivePredict(TokenStream *input, size_t decision, 
       dfa::DFAState *newState = new dfa::DFAState(std::move(s0_closure)); /* mem-check: managed by the DFA or deleted below */
       s0 = addDFAState(dfa, newState);
 
-      delete dfa.s0; // Delete existing s0 DFA state, if there's any. 
-      dfa.s0 = s0;
+      if (dfa.s0 != s0) {
+        delete dfa.s0; // Delete existing s0 DFA state, if there's any.
+        dfa.s0 = s0;
+      }
       if (s0 != newState) {
         delete newState; // If there was already a state with this config set we don't need the new one.
       }

@@ -35,7 +35,7 @@ size_t ProfilingATNSimulator::adaptivePredict(TokenStream *input, size_t decisio
   _sllStopIndex = -1;
   _llStopIndex = -1;
   _currentDecision = decision;
-  high_resolution_clock::time_point start = high_resolution_clock::now(); // expensive but useful info
+  high_resolution_clock::time_point start = high_resolution_clock::now();
   size_t alt = ParserATNSimulator::adaptivePredict(input, decision, outerContext);
   high_resolution_clock::time_point stop = high_resolution_clock::now();
   _decisions[decision].timeInPrediction += duration_cast<nanoseconds>(stop - start).count();
