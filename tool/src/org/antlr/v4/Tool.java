@@ -838,7 +838,7 @@ public class Tool {
 		// or just or the relative path recorded for the parent grammar. This means
 		// that when we write the tokens files, or the .java files for imported grammars
 		// taht we will write them in the correct place.
-		if (fileNameWithPath.lastIndexOf(File.separatorChar) == -1) {
+		if ((fileNameWithPath == null) || (fileNameWithPath.lastIndexOf(File.separatorChar) == -1)) {
 			// No path is included in the file name, so make the file
 			// directory the same as the parent grammar (which might sitll be just ""
 			// but when it is not, we will write the file in the correct place.

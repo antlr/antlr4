@@ -231,8 +231,7 @@ public class ErrorManager {
             setFormat("antlr"); // recurse on this rule, trying the default message format
             return;
         }
-
-        format = new STGroupFile(fileName, "UTF-8");
+        format = new STGroupFile(url, "UTF-8", '<', '>');
         format.load();
 
         if ( !initSTListener.errors.isEmpty() ) {

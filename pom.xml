@@ -11,7 +11,7 @@
 		<artifactId>oss-parent</artifactId>
 		<version>9</version>
 	</parent>
-	<groupId>org.antlr</groupId>
+	<groupId>solussd</groupId>
 	<artifactId>antlr4-master</artifactId>
 	<version>4.7.2-SNAPSHOT</version>
 	<packaging>pom</packaging>
