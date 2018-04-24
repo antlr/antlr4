@@ -509,7 +509,7 @@ public abstract class Target {
 		URL url = Thread.currentThread().getContextClassLoader().getResource(groupFileName);
 		STGroup result = null;
 		try {
-			result = new STGroupFile(url.getPath());
+			result = new STGroupFile(url);
 		}
 		catch (IllegalArgumentException iae) {
 			result = null;
@@ -524,7 +524,7 @@ public abstract class Target {
 
 		STGroup result = null;
 		try {
-			result = new STGroupFile(url.getPath());
+			result = new STGroupFile(url);
 		}
 		catch (IllegalArgumentException iae) {
 			gen.tool.errMgr.toolError(ErrorType.MISSING_CODE_GEN_TEMPLATES,
