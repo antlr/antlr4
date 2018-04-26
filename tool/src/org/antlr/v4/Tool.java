@@ -397,7 +397,7 @@ public class Tool {
 
 		if ( generate_ATN_dot ) generateATNs(g);
 
-		if ( g.tool.getNumErrors()==0 ) generateInterpreterData(g);
+		if (gencode && g.tool.getNumErrors()==0 ) generateInterpreterData(g);
 
 		// PERFORM GRAMMAR ANALYSIS ON ATN: BUILD DECISION DFAs
 		AnalysisPipeline anal = new AnalysisPipeline(g);
