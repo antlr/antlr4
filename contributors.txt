@@ -182,3 +182,4 @@ YYYY/MM/DD, github id, Full name, email
 2017/12/27, jkmar, Jakub Marciniszyn, marciniszyn.jk@gmail.com
 2018/02/11, io7m, Mark Raynsford, code@io7m.com
 2018/15/05, johnvanderholt, jan dillingh johnvanderholte@gmail.com
+2018/17/05, sinopsysHK, Eric Bardes, sinofwd@gmail.com
