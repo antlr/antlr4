@@ -146,12 +146,13 @@ function <parser.name> (input) {
     this.ruleNames = ruleNames;
     this.literalNames = literalNames;
     this.symbolicNames = symbolicNames;
-	<namedActions.members>
     return this;
 }
 
 <parser.name>.prototype = Object.create(<superClass; null="antlr4.Parser">.prototype);
 <parser.name>.prototype.constructor = <parser.name>;
+
+<namedActions.members>
 
 Object.defineProperty(<parser.name>.prototype, "atn", {
 	get : function() {
@@ -597,8 +598,8 @@ ThisRulePropertyRef_text(r)	 ::= "this._input.getText(new antlr4.Interval(localc
 ThisRulePropertyRef_ctx(r)	 ::= "localctx"
 ThisRulePropertyRef_parser(r)	 ::= "this"
 
-NonLocalAttrRef(s)		 	 ::= "getInvokingContext(<s.ruleIndex>).<s.name>"
-SetNonLocalAttr(s, rhsChunks)  ::= "getInvokingContext(<s.ruleIndex>).<s.name> = <rhsChunks>"
+NonLocalAttrRef(s)		 	 ::= "this.getInvokingContext(<s.ruleIndex>).<s.name>"
+SetNonLocalAttr(s, rhsChunks)  ::= "this.getInvokingContext(<s.ruleIndex>).<s.name> = <rhsChunks>"
 
 AddToLabelList(a) ::= "<ctx(a.label)>.<a.listName>.push(<labelref(a.label)>);"
 
