@@ -146,12 +146,13 @@ function <parser.name> (input) {
     this.ruleNames = ruleNames;
     this.literalNames = literalNames;
     this.symbolicNames = symbolicNames;
-	<namedActions.members>
     return this;
 }
 
 <parser.name>.prototype = Object.create(<superClass; null="antlr4.Parser">.prototype);
 <parser.name>.prototype.constructor = <parser.name>;
+
+<namedActions.members>
 
 Object.defineProperty(<parser.name>.prototype, "atn", {
 	get : function() {
