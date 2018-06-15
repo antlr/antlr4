@@ -452,6 +452,25 @@ public class BaseJavaTest implements RuntimeTestSupport {
 	}
 
 	protected String execLexer(String grammarFileName,
+            String grammarStr,
+            String lexerName,
+            String input,
+            ST template) {
+
+		boolean success = rawGenerateAndBuildRecognizer(grammarFileName,
+                                        grammarStr,
+                                        null,
+                                        lexerName);
+		assertTrue(success);
+		writeFile(tmpdir, "input", input);
+		writeLexerTestFile(lexerName, template);
+		compile("Test.java");
+		String output = execClass("Test");
+		return output;
+		}
+
+	
+	protected String execLexer(String grammarFileName,
 	                           String grammarStr,
 	                           String lexerName,
 	                           String input) {
