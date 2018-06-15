@@ -991,6 +991,10 @@ public class BaseJavaTest implements RuntimeTestSupport {
 		writeFile(tmpdir, "Test.java", outputFileST.render());
 	}
 
+	protected void writeLexerTestFile(String lexerName, ST outputFileST) {
+		writeFile(tmpdir, "Test.java", outputFileST.render());
+	}
+	
 	protected void writeLexerTestFile(String lexerName, boolean showDFA) {
 		ST outputFileST = new ST(
 			"import java.nio.file.Paths;\n" +
