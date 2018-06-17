@@ -4,6 +4,8 @@
 
 package antlr
 
+import "fmt"
+
 // Represents an executor for a sequence of lexer actions which traversed during
 // the Matching operation of a lexer rule (token).
 //
@@ -12,8 +14,8 @@ package antlr
 // not cause bloating of the {@link DFA} created for the lexer.</p>
 
 type LexerActionExecutor struct {
-	lexerActions     []LexerAction
-	cachedHash       int
+	lexerActions []LexerAction
+	cachedHash   int
 }
 
 func NewLexerActionExecutor(lexerActions []LexerAction) *LexerActionExecutor {
@@ -167,4 +169,8 @@ func (l *LexerActionExecutor) equals(other interface{}) bool {
 		return l.cachedHash == other.(*LexerActionExecutor).cachedHash &&
 			&l.lexerActions == &other.(*LexerActionExecutor).lexerActions
 	}
+}
+
+func (l *LexerActionExecutor) String() string {
+	return fmt.Sprintf("%#v", l.lexerActions)
 }
