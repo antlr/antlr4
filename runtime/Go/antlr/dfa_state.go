@@ -141,7 +141,7 @@ func (d *DFAState) String() string {
 		}
 	}
 
-	return fmt.Sprintf("%d:%s%s", fmt.Sprint(d.configs), s)
+	return fmt.Sprintf("%d:%s%s", d.stateNumber, fmt.Sprint(d.configs), s)
 }
 
 func (d *DFAState) hash() int {

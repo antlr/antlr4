@@ -4,7 +4,10 @@
 
 package antlr
 
-import "strconv"
+import (
+	"fmt"
+	"strconv"
+)
 
 const (
 	LexerActionTypeChannel  = 0 //The type of a {@link LexerChannelAction} action.
@@ -23,6 +26,7 @@ type LexerAction interface {
 	execute(lexer Lexer)
 	hash() int
 	equals(other LexerAction) bool
+	String() string
 }
 
 type BaseLexerAction struct {
@@ -57,6 +61,10 @@ func (b *BaseLexerAction) hash() int {
 
 func (b *BaseLexerAction) equals(other LexerAction) bool {
 	return b == other
+}
+
+func (b *BaseLexerAction) String() string {
+	return fmt.Sprintf("%#v", b)
 }
 
 //
@@ -321,6 +329,10 @@ func (l *LexerCustomAction) equals(other LexerAction) bool {
 	}
 }
 
+func (l *LexerCustomAction) String() string {
+	return fmt.Sprintf("%#v", l)
+}
+
 // Implements the {@code channel} lexer action by calling
 // {@link Lexer//setChannel} with the assigned channel.
 // Constructs a New{@code channel} action with the specified channel value.
@@ -428,4 +440,8 @@ func (l *LexerIndexedCustomAction) equals(other LexerAction) bool {
 	} else {
 		return l.offset == other.(*LexerIndexedCustomAction).offset && l.lexerAction == other.(*LexerIndexedCustomAction).lexerAction
 	}
+}
+
+func (l *LexerIndexedCustomAction) String() string {
+	return fmt.Sprintf("%#v", l)
 }
