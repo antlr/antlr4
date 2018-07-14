@@ -236,9 +236,12 @@ public class <parser.name> extends <superClass; null="Parser"> {
 	<endif>
 	public static final int
 		<parser.rules:{r | RULE_<r.name> = <r.index>}; separator=", ", wrap, anchor>;
-	public static final String[] ruleNames = {
-		<parser.ruleNames:{r | "<r>"}; separator=", ", wrap, anchor>
-	};
+	private static String[] makeRuleNames() {
+		return new String[] {
+			<parser.ruleNames:{r | "<r>"}; separator=", ", wrap, anchor>
+		};
+	}
+	public static final String[] ruleNames = makeRuleNames();
 
 	<vocabulary(parser.literalNames, parser.symbolicNames)>
 
@@ -275,12 +278,18 @@ case <f.ruleIndex>:
 >>
 
 vocabulary(literalNames, symbolicNames) ::= <<
-private static final String[] _LITERAL_NAMES = {
-	<literalNames:{t | <t>}; null="null", separator=", ", wrap, anchor>
-};
-private static final String[] _SYMBOLIC_NAMES = {
-	<symbolicNames:{t | <t>}; null="null", separator=", ", wrap, anchor>
-};
+private static String[] makeLiteralNames() {
+	return new String[] {
+		<literalNames:{t | <t>}; null="null", separator=", ", wrap, anchor>
+	};
+}
+private static final String[] _LITERAL_NAMES = makeLiteralNames();
+private static String[] makeSymbolicNames() {
+	return new String[] {
+		<symbolicNames:{t | <t>}; null="null", separator=", ", wrap, anchor>
+	};
+}
+private static final String[] _SYMBOLIC_NAMES = makeSymbolicNames();
 public static final Vocabulary VOCABULARY = new VocabularyImpl(_LITERAL_NAMES, _SYMBOLIC_NAMES);
 
 /**
@@ -914,9 +923,12 @@ public class <lexer.name> extends <superClass; null="Lexer"> {
 		<lexer.modes:{m| "<m>"}; separator=", ", wrap, anchor>
 	};
 
-	public static final String[] ruleNames = {
-		<lexer.ruleNames:{r | "<r>"}; separator=", ", wrap, anchor>
-	};
+	private static String[] makeRuleNames() {
+		return new String[] {
+			<lexer.ruleNames:{r | "<r>"}; separator=", ", wrap, anchor>
+		};
+	}
+	public static final String[] ruleNames = makeRuleNames();
 
 	<vocabulary(lexer.literalNames, lexer.symbolicNames)>
 
