@@ -181,6 +181,8 @@ YYYY/MM/DD, github id, Full name, email
 2017/12/20, kbsletten, Kyle Sletten, kbsletten@gmail.com
 2017/12/27, jkmar, Jakub Marciniszyn, marciniszyn.jk@gmail.com
 2018/02/11, io7m, Mark Raynsford, code@io7m.com
-2018/05/15, johnvanderholt, jan dillingh johnvanderholte@gmail.com
+2018/15/05, johnvanderholt, jan dillingh johnvanderholte@gmail.com
 2018/05/23, srvance, Stephen Vance, steve@vance.com
+2018/06/14, alecont, Alessandro Contenti, alecontenti@hotmail.com
+2018/05/15, johnvanderholt, jan dillingh johnvanderholte@gmail.com
 2018/06/16, EternalPhane, Zongyuan Zuo, eternalphane@gmail.com
