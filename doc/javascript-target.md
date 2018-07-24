@@ -62,7 +62,7 @@ The steps to create your parsing code are the following:
 You are now ready to bundle your parsing code as follows:
  - following webpack specs, create a webpack.config file
  - in the webpack.config file, exclude node.js only modules using: node: { module: "empty", net: "empty", fs: "empty" }
- - from the cmd line, nag-vigate to the directory containing webpack.config and type: webpack
+ - from the cmd line, navigate to the directory containing webpack.config and type: webpack
  
 This will produce a single js file containing all your parsing code. Easy to include in your web pages!
 
