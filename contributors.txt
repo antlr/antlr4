@@ -180,6 +180,7 @@ YYYY/MM/DD, github id, Full name, email
 2017/12/03, oranoran, Oran Epelbaum, oran / epelbaum me
 2017/12/20, kbsletten, Kyle Sletten, kbsletten@gmail.com
 2017/12/27, jkmar, Jakub Marciniszyn, marciniszyn.jk@gmail.com
+2018/01/06, kasbah, Kaspar Emanuel, kaspar@monostable.co.uk
 2018/02/08, razfriman, Raz Friman, raz@razfriman.com
 2018/02/11, io7m, Mark Raynsford, code@io7m.com
 2018/05/15, johnvanderholt, jan dillingh johnvanderholte@gmail.com
