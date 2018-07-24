@@ -1608,7 +1608,7 @@ class ParserATNSimulator(ATNSimulator):
 
     def reportAttemptingFullContext(self, dfa:DFA, conflictingAlts:set, configs:ATNConfigSet, startIndex:int, stopIndex:int):
         if ParserATNSimulator.debug or ParserATNSimulator.retry_debug:
-            interval = range(startIndex, stopIndex + 1)
+            interval = (startIndex, stopIndex + 1)
             print("reportAttemptingFullContext decision=" + str(dfa.decision) + ":" + str(configs) +
                                ", input=" + self.parser.getTokenStream().getText(interval))
         if self.parser is not None:
@@ -1616,7 +1616,7 @@ class ParserATNSimulator(ATNSimulator):
 
     def reportContextSensitivity(self, dfa:DFA, prediction:int, configs:ATNConfigSet, startIndex:int, stopIndex:int):
         if ParserATNSimulator.debug or ParserATNSimulator.retry_debug:
-            interval = range(startIndex, stopIndex + 1)
+            interval = (startIndex, stopIndex + 1)
             print("reportContextSensitivity decision=" + str(dfa.decision) + ":" + str(configs) +
                                ", input=" + self.parser.getTokenStream().getText(interval))
         if self.parser is not None:
@@ -1642,7 +1642,7 @@ class ParserATNSimulator(ATNSimulator):
 #				}
 #				i++;
 #			}
-            interval = range(startIndex, stopIndex + 1)
+            interval = (startIndex, stopIndex + 1)
             print("reportAmbiguity " + str(ambigAlts) + ":" + str(configs) +
                                ", input=" + self.parser.getTokenStream().getText(interval))
         if self.parser is not None:
