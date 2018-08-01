@@ -8,6 +8,48 @@ import "fmt"
 
 /** A set of utility routines useful for all kinds of ANTLR trees. */
 
+// Print out a whole tree in LISP form.  {@link //getNodeText} is used on the
+//  node payloads to get the text for the nodes.  Detect
+//  parse trees and extract data appropriately.
+
+func TreesIndentedStringTree(tree Tree, indent string, ruleNames []string, recog Recognizer) string {
+
+	if recog != nil {
+		ruleNames = recog.GetRuleNames()
+	}
+
+	s := TreesGetNodeText(tree, ruleNames, nil)
+
+	if _, ok := tree.(TerminalNode); ok {
+		s = " " + s
+	}
+
+	s = EscapeWhitespace(s, false)
+	c := tree.GetChildCount()
+	if c == 0 {
+		return s
+	}
+	res := ""
+	if len(indent) > 0 {
+		res = res + "\n"
+	}
+	res = res + indent + "(" + s + " "
+	if c > 0 {
+		s = TreesIndentedStringTree(tree.GetChild(0), indent+" ", ruleNames, nil)
+		res += s
+	}
+	for i := 1; i < c; i++ {
+		s = TreesIndentedStringTree(tree.GetChild(i), indent+" ", ruleNames, nil)
+		res += s
+	}
+	if len(indent) > 0 {
+		indent = indent[:len(indent)-1]
+	}
+
+	res += ")" + "\n" + indent
+	return res
+}
+
 // Print out a whole tree in LISP form. {@link //getNodeText} is used on the
 //  node payloads to get the text for the nodes.  Detect
 //  parse trees and extract data appropriately.
@@ -53,10 +95,10 @@ func TreesGetNodeText(t Tree, ruleNames []string, recog Parser) string {
 			}
 			return ruleNames[t3.GetRuleIndex()]
 		case ErrorNode:
-			return fmt.Sprint(t2)
+			return "'" + fmt.Sprint(t2) + "'"
 		case TerminalNode:
 			if t2.GetSymbol() != nil {
-				return t2.GetSymbol().GetText()
+				return "'" + t2.GetSymbol().GetText() + "'"
 			}
 		}
 	}
