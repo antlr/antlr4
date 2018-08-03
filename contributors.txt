@@ -189,3 +189,4 @@ YYYY/MM/DD, github id, Full name, email
 2018/06/14, alecont, Alessandro Contenti, alecontenti@hotmail.com
 2018/06/16, EternalPhane, Zongyuan Zuo, eternalphane@gmail.com
 2018/07/27, Maksim Novikov, mnovikov.work@gmail.com
+2018/08/03, ENDOH takanao, djmchl@gmail.com
