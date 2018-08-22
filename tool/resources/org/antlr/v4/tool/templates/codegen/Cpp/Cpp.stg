@@ -542,7 +542,7 @@ public:
   <if (ctorAttrs)><struct.name>(antlr4::ParserRuleContext *parent, size_t invokingState);<endif>
   <struct.name>(antlr4::ParserRuleContext *parent, size_t invokingState<ctorAttrs: {a | , <a>}>);
 <if (struct.provideCopyFrom)> <! don't need copy unless we have subclasses !>
-  <struct.name>() : antlr4::ParserRuleContext() { }
+  <struct.name>() = default;
   void copyFrom(<struct.name> *context);
   using antlr4::ParserRuleContext::copyFrom;
 <endif>
