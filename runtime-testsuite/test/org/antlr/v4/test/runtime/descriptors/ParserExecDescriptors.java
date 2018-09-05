@@ -854,4 +854,39 @@ public class ParserExecDescriptors {
 		@CommentHasStringValue
 		public String grammar;
 	}
+
+	/**
+	 * This is a regression test for antlr/antlr4#2301.
+	 */
+	public static class OrderingPredicates extends BaseParserTestDescriptor {
+		public String input = "POINT AT X";
+		public String output = null;
+		public String errors = null;
+		public String startRule = "expr";
+		public String grammarName = "Issue2301";
+
+		/**
+		 grammar Issue2301;
+
+		 SPACES: [ \t\r\n]+ -> skip;
+
+		 AT: 'AT';
+		 X : 'X';
+		 Y : 'Y';
+
+		 ID: [A-Z]+;
+
+		 constant
+		 : 'DUMMY'
+		 ;
+
+		 expr
+		 : ID constant?
+		 | expr AT X
+		 | expr AT Y
+		 ;
+		 */
+		@CommentHasStringValue
+		public String grammar;
+	}
 }
