@@ -38,7 +38,7 @@
 // 16 byte value that can be passed around by value. It also supports
 // conversion to string (via the stream operator <<) and conversion from a
 // string via constructor.
-class Guid
+class ANTLR4CPP_PUBLIC Guid
 {
 public:
 
@@ -90,7 +90,7 @@ private:
 // function would no longer be cross-platform if we parameterized the android
 // version. Instead, construction of the GuidGenerator may be different on
 // each platform, but the use of newGuid is uniform.
-class GuidGenerator
+class ANTLR4CPP_PUBLIC GuidGenerator
 {
 public:
 #ifdef GUID_ANDROID

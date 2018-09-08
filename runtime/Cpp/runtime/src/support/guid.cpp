@@ -22,6 +22,7 @@
  THE SOFTWARE.
  */
 
+#include "antlr4-common.h"
 #include "guid.h"
 
 #ifdef GUID_LIBUUID
