@@ -631,6 +631,16 @@ public class Grammar implements AttributeResolver {
 		return i;
 	}
 
+	public String getTokenName(String literal) {
+		Grammar grammar = this;
+		while (grammar != null) {
+			if (grammar.stringLiteralToTypeMap.containsKey(literal))
+				return grammar.getTokenName(grammar.stringLiteralToTypeMap.get(literal));
+			grammar = grammar.parent;
+		}
+		return null;
+	}
+
 	/** Given a token type, get a meaningful name for it such as the ID
 	 *  or string literal.  If this is a lexer and the ttype is in the
 	 *  char vocabulary, compute an ANTLR-valid (possibly escaped) char literal.
