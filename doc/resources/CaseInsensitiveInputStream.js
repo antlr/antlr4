@@ -7,16 +7,28 @@
 
 function CaseInsensitiveInputStream(stream, upper) {
     this._stream = stream;
-    this._case = upper ? String.toUpperCase : String.toLowerCase;
-    return this;
+    this._case = upper ? String.prototype.toUpperCase : String.prototype.toLowerCase;
 }
 
-CaseInsensitiveInputStream.prototype.LA = function (offset) {
-    c = this._stream.LA(i);
-    if (c <= 0) {
-        return c;
+Object.defineProperty(CaseInsensitiveInputStream.prototype, 'index', {
+    get: function() {
+        return this._stream.index;
     }
-    return this._case.call(String.fromCodePoint(c))
+});
+
+Object.defineProperty(CaseInsensitiveInputStream.prototype, 'size', {
+    get: function() {
+        return this._stream.size;
+    }
+});
+
+CaseInsensitiveInputStream.prototype.LA = function (offset) {
+    const cp = this._stream.LA(offset);
+    if (cp <= 0) {
+        return cp;
+    }
+    const c = this._case.call(String.fromCodePoint(cp));
+    return c.codePointAt(0);
 };
 
 CaseInsensitiveInputStream.prototype.reset = function() {
@@ -39,8 +51,8 @@ CaseInsensitiveInputStream.prototype.release = function(marker) {
     return this._stream.release(marker);
 };
 
-CaseInsensitiveInputStream.prototype.seek = function(_index) {
-    return this._stream.getText(start, stop);
+CaseInsensitiveInputStream.prototype.seek = function(index) {
+    return this._stream.seek(index);
 };
 
 CaseInsensitiveInputStream.prototype.getText = function(start, stop) {
