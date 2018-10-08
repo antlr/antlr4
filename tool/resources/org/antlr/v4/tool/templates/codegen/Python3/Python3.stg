@@ -756,7 +756,13 @@ import sys
 >>
 
 Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
+<if(superClass)>
+if __name__ is not None and "." in __name__:
+    from .<superClass> import <superClass>
+else:
+    from <superClass> import <superClass>
 
+<endif>
 <atn>
 
 class <lexer.name>(<if(superClass)><superClass><else>Lexer<endif>):
