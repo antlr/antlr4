@@ -30,12 +30,6 @@ import java.util.Set;
  *
  * */
 public class GoTarget extends Target {
-	private static final String ParserSuffix = "Parser";
-	private static final String lexerSuffix = "Lexer";
-	private static final String ListenerSuffix = "Listener";
-	private static final String VisitorSuffix = "Visitor";
-	private static final String GoExt = ".go";
-
 	private static final String[] goKeywords = {
 			"break", "default", "func", "interface", "select",
 			"case", "defer", "go", "map", "struct",
@@ -157,65 +151,6 @@ public class GoTarget extends Target {
 		STGroup result = super.loadTemplates();
 		result.registerRenderer(String.class, new JavaStringRenderer(), true);
 		return result;
-	}
-
-	public String getRecognizerFileName(boolean header) {
-		CodeGenerator gen = getCodeGenerator();
-		Grammar g = gen.g;
-		assert g!=null;
-		String name;
-		switch ( g.getType()) {
-			case ANTLRParser.PARSER:
-				name = g.name.endsWith(ParserSuffix) ? g.name.substring(0, g.name.length() - ParserSuffix.length()) : g.name;
-				return name + ParserSuffix + GoExt;
-			case ANTLRParser.LEXER:
-				name = g.name.endsWith(lexerSuffix) ? g.name.substring(0, g.name.length() - lexerSuffix.length()) : g.name; // trim off "lexer"
-				return name + lexerSuffix + GoExt;
-			case ANTLRParser.COMBINED:
-				return g.name + ParserSuffix + GoExt;
-			default :
-				return "INVALID_FILE_NAME";
-		}
-	}
-
-	/** A given grammar T, return the listener name such as
-	 *  TListener.java, if we're using the Java target.
- 	 */
-	public String getListenerFileName(boolean header) {
-		CodeGenerator gen = getCodeGenerator();
-		Grammar g = gen.g;
-		assert g.name != null;
-		return g.name + ListenerSuffix + GoExt;
-	}
-
-	/** A given grammar T, return the visitor name such as
-	 *  TVisitor.java, if we're using the Java target.
- 	 */
-	public String getVisitorFileName(boolean header) {
-		CodeGenerator gen = getCodeGenerator();
-		Grammar g = gen.g;
-		assert g.name != null;
-		return g.name + VisitorSuffix + GoExt;
-	}
-
-	/** A given grammar T, return a blank listener implementation
-	 *  such as TBaseListener.java, if we're using the Java target.
- 	 */
-	public String getBaseListenerFileName(boolean header) {
-		CodeGenerator gen = getCodeGenerator();
-		Grammar g = gen.g;
-		assert g.name != null;
-		return g.name + "Base" + ListenerSuffix + GoExt;
-	}
-
-	/** A given grammar T, return a blank listener implementation
-	 *  such as TBaseListener.java, if we're using the Java target.
- 	 */
-	public String getBaseVisitorFileName(boolean header) {
-		CodeGenerator gen = getCodeGenerator();
-		Grammar g = gen.g;
-		assert g.name != null;
-		return g.name + "Base" + VisitorSuffix + GoExt;
 	}
 
 	protected static class JavaStringRenderer extends StringRenderer {
