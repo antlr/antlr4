@@ -30,6 +30,11 @@ import java.util.Set;
  *
  * */
 public class GoTarget extends Target {
+	private static final String ParserSuffix = "Parser";
+	private static final String lexerSuffix = "Lexer";
+	private static final String ListenerSuffix = "Listener";
+	private static final String VisitorSuffix = "Visitor";
+	private static final String GoExt = ".go";
 
 	private static final String[] goKeywords = {
 			"break", "default", "func", "interface", "select",
@@ -161,13 +166,13 @@ public class GoTarget extends Target {
 		String name;
 		switch ( g.getType()) {
 			case ANTLRParser.PARSER:
-				name = g.name.endsWith("Parser") ? g.name.substring(0, g.name.length()-6) : g.name;
-				return name.toLowerCase()+"_parser.go";
+				name = g.name.endsWith(ParserSuffix) ? g.name.substring(0, g.name.length() - ParserSuffix.length()) : g.name;
+				return name + ParserSuffix + GoExt;
 			case ANTLRParser.LEXER:
-				name = g.name.endsWith("Lexer") ? g.name.substring(0, g.name.length()-5) : g.name; // trim off "lexer"
-				return name.toLowerCase()+"_lexer.go";
+				name = g.name.endsWith(lexerSuffix) ? g.name.substring(0, g.name.length() - lexerSuffix.length()) : g.name; // trim off "lexer"
+				return name + lexerSuffix + GoExt;
 			case ANTLRParser.COMBINED:
-				return g.name.toLowerCase()+"_parser.go";
+				return g.name + ParserSuffix + GoExt;
 			default :
 				return "INVALID_FILE_NAME";
 		}
@@ -180,7 +185,7 @@ public class GoTarget extends Target {
 		CodeGenerator gen = getCodeGenerator();
 		Grammar g = gen.g;
 		assert g.name != null;
-		return g.name.toLowerCase()+"_listener.go";
+		return g.name + ListenerSuffix + GoExt;
 	}
 
 	/** A given grammar T, return the visitor name such as
@@ -190,7 +195,7 @@ public class GoTarget extends Target {
 		CodeGenerator gen = getCodeGenerator();
 		Grammar g = gen.g;
 		assert g.name != null;
-		return g.name.toLowerCase()+"_visitor.go";
+		return g.name + VisitorSuffix + GoExt;
 	}
 
 	/** A given grammar T, return a blank listener implementation
@@ -200,7 +205,7 @@ public class GoTarget extends Target {
 		CodeGenerator gen = getCodeGenerator();
 		Grammar g = gen.g;
 		assert g.name != null;
-		return g.name.toLowerCase()+"_base_listener.go";
+		return g.name + "Base" + ListenerSuffix + GoExt;
 	}
 
 	/** A given grammar T, return a blank listener implementation
@@ -210,7 +215,7 @@ public class GoTarget extends Target {
 		CodeGenerator gen = getCodeGenerator();
 		Grammar g = gen.g;
 		assert g.name != null;
-		return g.name.toLowerCase()+"_base_visitor.go";
+		return g.name + "Base" + VisitorSuffix + GoExt;
 	}
 
 	protected static class JavaStringRenderer extends StringRenderer {
