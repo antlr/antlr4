@@ -32,7 +32,7 @@ namespace Antlr4.Runtime
 
         private readonly ATN _atn;
 		
-		private readonly Dfa.DFA[] _decisionToDFA;
+        private readonly Dfa.DFA[] _decisionToDFA;
 
         protected internal readonly BitSet pushRecursionContextStates;
 
