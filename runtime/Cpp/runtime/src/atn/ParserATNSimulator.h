@@ -652,7 +652,7 @@ namespace atn {
                                                                    ATNConfigSet *configs, size_t nalts);
 
     virtual std::vector<dfa::DFAState::PredPrediction*> getPredicatePredictions(const antlrcpp::BitSet &ambigAlts,
-                                                                                std::vector<Ref<SemanticContext>> const& altToPred);
+                                                                                std::vector<Ref<SemanticContext>> altToPred);
 
     /**
      * This method is used to improve the localization of error messages by
