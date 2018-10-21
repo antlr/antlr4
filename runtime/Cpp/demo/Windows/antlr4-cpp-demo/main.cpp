@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
+﻿/* Copyright (c) 2012-2018 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -32,10 +32,13 @@ int main(int argc, const char * argv[]) {
   TParser parser(&tokens);
   tree::ParseTree *tree = parser.main();
 
-  std::wstring s = antlrcpp::s2ws(tree->toStringTree(&parser)) + L"\n";
+  std::string utf8 = tree->toStringTree(&parser) + "\n";
+  std::wstring utf16 = antlrcpp::s2ws(utf8);
 
-  OutputDebugString(s.data()); // Only works properly since VS 2015.
-  //std::wcout << "Parse Tree: " << s << std::endl; Unicode output in the console is very limited.
+  OutputDebugString(utf16.data()); // Only works properly since VS 2015.
+
+  SetConsoleOutputCP(65001);
+  std::cout << "Parse Tree: " << utf8 << std::endl; // Output quality depends on used console font.
 
   return 0;
 }

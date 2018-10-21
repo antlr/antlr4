@@ -42,7 +42,7 @@ Include the antlr4-runtime.h umbrella header in your target application to get e
 If you are compiling with cmake, the minimum version required is cmake 2.8.
 
 #### Compiling on Windows
-Simply open the VS solution (VS 2013+) and build it.
+Simply open the VS solution in the demo/Windows folder or the VS project in the runtime folder and build it.
 
 #### Compiling on OSX
 Either open the included XCode project and build that or use the cmake compilation as described for linux.

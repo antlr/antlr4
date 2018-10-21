@@ -1,0 +1,61 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28010.2046
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "antlr4cpp-demo", "antlr4-cpp-demo\antlr4-cpp-demo-vs2017.vcxproj", "{9C27F4F1-B50E-494C-8E88-8B2A0B1BD82C}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "antlr4cpp-vs2017", "..\..\runtime\antlr4cpp-vs2017.vcxproj", "{52BE1719-6FD1-4D6F-B679-FBB29CBF5F85}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug DLL|x64 = Debug DLL|x64
+		Debug DLL|x86 = Debug DLL|x86
+		Debug Static|x64 = Debug Static|x64
+		Debug Static|x86 = Debug Static|x86
+		Release DLL|x64 = Release DLL|x64
+		Release DLL|x86 = Release DLL|x86
+		Release Static|x64 = Release Static|x64
+		Release Static|x86 = Release Static|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9C27F4F1-B50E-494C-8E88-8B2A0B1BD82C}.Debug DLL|x64.ActiveCfg = Debug DLL|x64
+		{9C27F4F1-B50E-494C-8E88-8B2A0B1BD82C}.Debug DLL|x64.Build.0 = Debug DLL|x64
+		{9C27F4F1-B50E-494C-8E88-8B2A0B1BD82C}.Debug DLL|x86.ActiveCfg = Debug DLL|Win32
+		{9C27F4F1-B50E-494C-8E88-8B2A0B1BD82C}.Debug DLL|x86.Build.0 = Debug DLL|Win32
+		{9C27F4F1-B50E-494C-8E88-8B2A0B1BD82C}.Debug Static|x64.ActiveCfg = Debug Static|x64
+		{9C27F4F1-B50E-494C-8E88-8B2A0B1BD82C}.Debug Static|x64.Build.0 = Debug Static|x64
+		{9C27F4F1-B50E-494C-8E88-8B2A0B1BD82C}.Debug Static|x86.ActiveCfg = Debug Static|Win32
+		{9C27F4F1-B50E-494C-8E88-8B2A0B1BD82C}.Debug Static|x86.Build.0 = Debug Static|Win32
+		{9C27F4F1-B50E-494C-8E88-8B2A0B1BD82C}.Release DLL|x64.ActiveCfg = Release DLL|x64
+		{9C27F4F1-B50E-494C-8E88-8B2A0B1BD82C}.Release DLL|x64.Build.0 = Release DLL|x64
+		{9C27F4F1-B50E-494C-8E88-8B2A0B1BD82C}.Release DLL|x86.ActiveCfg = Release DLL|Win32
+		{9C27F4F1-B50E-494C-8E88-8B2A0B1BD82C}.Release DLL|x86.Build.0 = Release DLL|Win32
+		{9C27F4F1-B50E-494C-8E88-8B2A0B1BD82C}.Release Static|x64.ActiveCfg = Release Static|x64
+		{9C27F4F1-B50E-494C-8E88-8B2A0B1BD82C}.Release Static|x64.Build.0 = Release Static|x64
+		{9C27F4F1-B50E-494C-8E88-8B2A0B1BD82C}.Release Static|x86.ActiveCfg = Release Static|Win32
+		{9C27F4F1-B50E-494C-8E88-8B2A0B1BD82C}.Release Static|x86.Build.0 = Release Static|Win32
+		{52BE1719-6FD1-4D6F-B679-FBB29CBF5F85}.Debug DLL|x64.ActiveCfg = Debug DLL|x64
+		{52BE1719-6FD1-4D6F-B679-FBB29CBF5F85}.Debug DLL|x64.Build.0 = Debug DLL|x64
+		{52BE1719-6FD1-4D6F-B679-FBB29CBF5F85}.Debug DLL|x86.ActiveCfg = Debug DLL|Win32
+		{52BE1719-6FD1-4D6F-B679-FBB29CBF5F85}.Debug DLL|x86.Build.0 = Debug DLL|Win32
+		{52BE1719-6FD1-4D6F-B679-FBB29CBF5F85}.Debug Static|x64.ActiveCfg = Debug Static|x64
+		{52BE1719-6FD1-4D6F-B679-FBB29CBF5F85}.Debug Static|x64.Build.0 = Debug Static|x64
+		{52BE1719-6FD1-4D6F-B679-FBB29CBF5F85}.Debug Static|x86.ActiveCfg = Debug Static|Win32
+		{52BE1719-6FD1-4D6F-B679-FBB29CBF5F85}.Debug Static|x86.Build.0 = Debug Static|Win32
+		{52BE1719-6FD1-4D6F-B679-FBB29CBF5F85}.Release DLL|x64.ActiveCfg = Release DLL|x64
+		{52BE1719-6FD1-4D6F-B679-FBB29CBF5F85}.Release DLL|x64.Build.0 = Release DLL|x64
+		{52BE1719-6FD1-4D6F-B679-FBB29CBF5F85}.Release DLL|x86.ActiveCfg = Release DLL|Win32
+		{52BE1719-6FD1-4D6F-B679-FBB29CBF5F85}.Release DLL|x86.Build.0 = Release DLL|Win32
+		{52BE1719-6FD1-4D6F-B679-FBB29CBF5F85}.Release Static|x64.ActiveCfg = Release Static|x64
+		{52BE1719-6FD1-4D6F-B679-FBB29CBF5F85}.Release Static|x64.Build.0 = Release Static|x64
+		{52BE1719-6FD1-4D6F-B679-FBB29CBF5F85}.Release Static|x86.ActiveCfg = Release Static|Win32
+		{52BE1719-6FD1-4D6F-B679-FBB29CBF5F85}.Release Static|x86.Build.0 = Release Static|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4D5D08BF-61F2-4CF2-BA7F-F05E2E176559}
+	EndGlobalSection
+EndGlobal
