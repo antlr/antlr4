@@ -136,3 +136,7 @@ endif()
 
 install(FILES README.md VERSION 
     DESTINATION "share/doc/libantlr4")
+
+set(CPACK_PACKAGE_CONTACT "antlr-discussion@googlegroups.com")
+set(CPACK_PACKAGE_VERSION ${ANTLR_VERSION})
+include(CPack)
