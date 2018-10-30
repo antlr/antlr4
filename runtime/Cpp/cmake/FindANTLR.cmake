@@ -35,16 +35,16 @@ if(ANTLR_EXECUTABLE AND Java_JAVA_EXECUTABLE)
 
     set(ANTLR_${Name}_INPUT ${InputFile})
 
+    get_filename_component(ANTLR_INPUT ${InputFile} NAME_WE)
+
     if(ANTLR_TARGET_OUTPUT_DIRECTORY)
       set(ANTLR_${Name}_OUTPUT_DIR ${ANTLR_TARGET_OUTPUT_DIRECTORY})
     else()
-      set(ANTLR_${Name}_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR})
+      set(ANTLR_${Name}_OUTPUT_DIR
+          ${CMAKE_CURRENT_BINARY_DIR}/antlr4cpp_generated_src/${ANTLR_INPUT})
     endif()
 
     unset(ANTLR_${Name}_CXX_OUTPUTS)
-
-    # Get the shortest extension
-    string(REGEX REPLACE "\\.[^.]*$" "" ANTLR_INPUT ${InputFile})
 
     if((ANTLR_TARGET_LEXER AND NOT ANTLR_TARGET_PARSER) OR
        (ANTLR_TARGET_PARSER AND NOT ANTLR_TARGET_LEXER))

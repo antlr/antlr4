@@ -88,13 +88,14 @@ ANTLR_${name}_OUTPUT_DIR - the output directory for ANTLR
 ```
 
 The options are:
+
 * `PACKAGE` - defines a namespace for the generated C++ files
 * `OUTPUT_DIRECTORY` - the output directory for the generated files. By default it uses `${CMAKE_CURRENT_BINARY_DIR}`
 * `DEPENDS_ANTLR` - the dependent target generated from antlr_target for the current call
 * `COMPILE_FLAGS` - additional compile flags for ANTLR tool
-* `DEPENDS` - specify the files on which the command depends. It works the same way `DEPENDS` in [add_custom_command()](https://cmake.org/cmake/help/v3.11/command/add_custom_command.html)
-* `LEXER` - specify the input file is a lexer grammar
-* `PARSER` - specify the input file is a parser grammar
+* `DEPENDS` - specify the files on which the command depends. It works the same way `DEPENDS` in [`add_custom_command()`](https://cmake.org/cmake/help/v3.11/command/add_custom_command.html)
+* `LEXER` - specify that the input file is a lexer grammar
+* `PARSER` - specify that the input file is a parser grammar
 * `LISTENER` - tell ANTLR tool to generate a parse tree listener
 * `VISITOR` - tell ANTLR tool to generate a parse tree visitor
 
@@ -107,7 +108,7 @@ find_package(ANTLR REQUIRED)
 antlr_target(Sample T.g4)
 ```
 
-do note that this command will do nothing unless the outputs of `Sample`, i.e. `ANTLR_Sample_CXX_OUTPUTS` gets used by some target.
+Note that this command will do nothing unless the outputs of `Sample`, i.e. `ANTLR_Sample_CXX_OUTPUTS` gets used by some target.
 
 ## Documentation for ExternalAntlr4Cpp
 
@@ -122,6 +123,8 @@ ANTLR4_TAG - branch/tag used for building antlr4 library
 ```
 
 `ANTLR4_TAG` is set to master branch by default to keep antlr4 updated. However, it will be required to rebuild after every `clean` is called. Set `ANTLR4_TAG` to a desired commit hash value to avoid rebuilding after every `clean` and keep the build stable, at the cost of not automatically update to latest commit.
+
+The ANTLR C++ runtime source is downloaded from GitHub by default. However, users may specify `ANTLR4_ZIP_REPOSITORY` to list the zip file from [ANTLR downloads](http://www.antlr.org/download.html) (under *C++ Target*). This variable can list a zip file included in the project directory; this is useful for maintaining a canonical source for each new build.
 
 Visual C++ compiler users may want to additionally define `ANTLR4_WITH_STATIC_CRT` before including the file. Set `ANTLR4_WITH_STATIC_CRT` to true if ANTLR4 C++ runtime library should be compiled with `/MT` flag, otherwise will be compiled with `/MD` flag. This variable has a default value of `OFF`. Changing `ANTLR4_WITH_STATIC_CRT` after building the library may require reinitialization of CMake or `clean` for the library to get rebuilt.
 
