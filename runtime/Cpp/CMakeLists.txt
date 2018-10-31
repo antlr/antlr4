@@ -20,6 +20,8 @@ if(NOT WITH_DEMO)
 endif(NOT WITH_DEMO)
 
 option(WITH_LIBCXX "Building with clang++ and libc++(in Linux). To enable with: -DWITH_LIBCXX=On" On)
+option(WITH_STATIC_CRT "(Visual C++) Enable to statically link CRT, which avoids requiring users to install the redistribution package.
+ To disable with: -DWITH_STATIC_CRT=Off" On)
 
 project(LIBANTLR4)
 
@@ -47,11 +49,11 @@ endif()
 
 file(STRINGS "VERSION" ANTLR_VERSION)
 
-if (WITH_DEMO)
+if(WITH_DEMO)
   # Java is not necessary if building without demos.
   find_package(Java COMPONENTS Runtime REQUIRED)
 
-  if (NOT ANTLR_JAR_LOCATION)
+  if(NOT ANTLR_JAR_LOCATION)
     message(FATAL_ERROR "Missing antlr4.jar location. You can specify it's path using: -DANTLR_JAR_LOCATION=<path>")
   else()
     get_filename_component(ANTLR_NAME ${ANTLR_JAR_LOCATION} NAME_WE)
@@ -63,7 +65,7 @@ if (WITH_DEMO)
   endif()
 endif(WITH_DEMO)
 
-if (MSVC_VERSION)
+if(MSVC_VERSION)
   set(MY_CXX_WARNING_FLAGS "  /W4")
 else()
   set(MY_CXX_WARNING_FLAGS "  -Wall -pedantic -W")
@@ -82,7 +84,7 @@ else()
 endif()
 
 set(CMAKE_CXX_FLAGS                  "${CMAKE_CXX_FLAGS} ${MY_CXX_WARNING_FLAGS}")
-if (MSVC_VERSION)
+if(MSVC_VERSION)
   set(CMAKE_CXX_FLAGS_DEBUG          "${CMAKE_CXX_FLAGS_DEBUG} /Od /Zi /MP ${MY_CXX_WARNING_FLAGS}")
   set(CMAKE_CXX_FLAGS_MINSIZEREL     "${CMAKE_CXX_FLAGS_MINSIZEREL} /O1 /Oi /Ob2 /Gy /MP /DNDEBUG ${MY_CXX_WARNING_FLAGS}")
   set(CMAKE_CXX_FLAGS_RELEASE        "${CMAKE_CXX_FLAGS_RELEASE} /O2 /Oi /Ob2 /Gy /MP /DNDEBUG ${MY_CXX_WARNING_FLGAS}")
@@ -95,38 +97,38 @@ else()
 endif()
 
 # Compiler-specific C++11 activation.
-if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU" OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "Intel")
+if("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU" OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "Intel")
     execute_process(
         COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
     # Just g++-5.0 and greater contain <codecvt> header. (test in ubuntu)
-    if (NOT (GCC_VERSION VERSION_GREATER 5.0 OR GCC_VERSION VERSION_EQUAL 5.0))
+    if(NOT (GCC_VERSION VERSION_GREATER 5.0 OR GCC_VERSION VERSION_EQUAL 5.0))
         message(FATAL_ERROR "${PROJECT_NAME} requires g++ 5.0 or greater.")
-    endif ()
-elseif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang" AND APPLE)
+    endif()
+elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang" AND APPLE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
-elseif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang" AND CMAKE_SYSTEM_NAME MATCHES "Linux")
+elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang" AND CMAKE_SYSTEM_NAME MATCHES "Linux")
     execute_process(
         COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE CLANG_VERSION)
-    if (NOT (CLANG_VERSION VERSION_GREATER 4.2.1 OR CLANG_VERSION VERSION_EQUAL 4.2.1))
+    if(NOT (CLANG_VERSION VERSION_GREATER 4.2.1 OR CLANG_VERSION VERSION_EQUAL 4.2.1))
         message(FATAL_ERROR "${PROJECT_NAME} requires clang 4.2.1 or greater.")
-    endif ()
+    endif()
     # You can use libc++ to compile this project when g++ is NOT greater than or equal to 5.0.
-    if (WITH_LIBCXX)
+    if(WITH_LIBCXX)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
     endif()
-elseif ( MSVC_VERSION GREATER 1800 OR MSVC_VERSION EQUAL 1800 )
+elseif(MSVC_VERSION GREATER 1800 OR MSVC_VERSION EQUAL 1800)
   # Visual Studio 2012+ supports c++11 features 
 else ()
     message(FATAL_ERROR "Your C++ compiler does not support C++11.")
-endif ()
+endif()
 
 
 add_subdirectory(runtime)
-if (WITH_DEMO)
+if(WITH_DEMO)
  add_subdirectory(demo)
 endif(WITH_DEMO)
 
-if( EXISTS LICENSE.txt)
+if(EXISTS LICENSE.txt)
 install(FILES LICENSE.txt
         DESTINATION "share/doc/libantlr4")
 elseif(EXISTS ../../LICENSE.txt) 
