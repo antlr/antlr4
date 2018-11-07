@@ -202,7 +202,7 @@ open class ParserRuleContext: RuleContext {
             return [TerminalNode]()
         }
 
-        return children.flatMap {
+        return children.compactMap {
             if let tnode = $0 as? TerminalNode, let symbol = tnode.getSymbol(), symbol.getType() == ttype {
                 return tnode
             }
@@ -220,7 +220,7 @@ open class ParserRuleContext: RuleContext {
         guard let children = children else {
             return [T]()
         }
-        return children.flatMap { $0 as? T }
+        return children.compactMap { $0 as? T }
     }
 
     override

@@ -427,7 +427,7 @@ public class SemanticContext: Hashable, CustomStringConvertible {
     }
 
     private static func filterPrecedencePredicates(_ collection: inout Set<SemanticContext>) -> [PrecedencePredicate] {
-        let result = collection.flatMap {
+        let result = collection.compactMap {
             $0 as? PrecedencePredicate
         }
         collection = Set<SemanticContext>(collection.filter {
