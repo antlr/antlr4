@@ -18,11 +18,9 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>com.sun</groupId>
-			<artifactId>tools</artifactId>
-			<version>1.4.2</version>
-			<scope>system</scope>
-			<systemPath>${java.home}/../lib/tools.jar</systemPath>
+			<groupId>com.github.olivergondza</groupId>
+			<artifactId>maven-jdk-tools-wrapper</artifactId>
+			<version>0.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.antlr</groupId>
