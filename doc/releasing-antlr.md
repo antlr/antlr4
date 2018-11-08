@@ -150,13 +150,13 @@ Uploaded: https://oss.sonatype.org/content/repositories/snapshots/org/antlr/antl
 The maven deploy lifecycle phased deploys the artifacts and the poms for the ANTLR project to the [sonatype remote staging server](https://oss.sonatype.org/content/repositories/snapshots/).
 
 ```bash
-mvn deploy -DskipTests
+mvn -Dmaven.compiler.executable=`/usr/libexec/java_home -v 1.7` deploy -DskipTests
 ```
 
 With JDK 1.7 (not 6 or 8), do this:
 
 ```bash
-mvn release:prepare -Darguments="-DskipTests"
+mvn -Dmaven.compiler.executable=`/usr/libexec/java_home -v 1.7` release:prepare -Darguments="-DskipTests"
 ```
 
 Hm...per https://github.com/keybase/keybase-issues/issues/1712 we need this to make gpg work:
@@ -173,6 +173,12 @@ alias javac='/Library/Java/JavaVirtualMachines/jdk1.7.0_21.jdk/Contents/Home/bin
 alias javadoc='/Library/Java/JavaVirtualMachines/jdk1.7.0_21.jdk/Contents/Home/bin/javadoc'
 alias jar='/Library/Java/JavaVirtualMachines/jdk1.7.0_21.jdk/Contents/Home/bin/jar'
 export JAVA_HOME=`/usr/libexec/java_home -v 1.7`
+```
+
+But I think that this option on mvn works:
+
+```
+-Dmaven.compiler.executable=`/usr/libexec/java_home -v 1.7`
 ```
 
 You should see 0x33 in generated .class files after 0xCAFEBABE; see [Java SE 7 = 51 (0x33 hex)](https://en.wikipedia.org/wiki/Java_class_file):
