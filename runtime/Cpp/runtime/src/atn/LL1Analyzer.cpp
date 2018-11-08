@@ -84,7 +84,7 @@ void LL1Analyzer::_LOOK(ATNState *s, ATNState *stopState, Ref<PredictionContext>
     if (ctx == nullptr) {
       look.add(Token::EPSILON);
       return;
-    } else if (ctx->isEmpty() && addEOF) {
+    } else if (ctx->isEmptyContext() && addEOF) {
       look.add(Token::EOF);
       return;
     }
@@ -94,7 +94,7 @@ void LL1Analyzer::_LOOK(ATNState *s, ATNState *stopState, Ref<PredictionContext>
     if (ctx == nullptr) {
       look.add(Token::EPSILON);
       return;
-    } else if (ctx->isEmpty() && addEOF) {
+    } else if (ctx->isEmptyContext() && addEOF) {
       look.add(Token::EOF);
       return;
     }

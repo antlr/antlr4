@@ -27,6 +27,10 @@ Ref<SingletonPredictionContext> SingletonPredictionContext::create(Ref<Predictio
   return std::make_shared<SingletonPredictionContext>(parent, returnState);
 }
 
+bool SingletonPredictionContext::isSingletonContext() const {
+    return true;
+}
+
 size_t SingletonPredictionContext::size() const {
   return 1;
 }
@@ -48,24 +52,24 @@ bool SingletonPredictionContext::operator == (const PredictionContext &o) const 
     return true;
   }
 
-  const SingletonPredictionContext *other = dynamic_cast<const SingletonPredictionContext*>(&o);
-  if (other == nullptr) {
-    return false;
+  if (this->hashCode() != o.hashCode()) {
+      return false; // can't be same if hash is different
   }
 
-  if (this->hashCode() != other->hashCode()) {
-    return false; // can't be same if hash is different
-  }
+  if (!o.isSingletonContext())
+    return false;
+  const SingletonPredictionContext &other = static_cast<const SingletonPredictionContext&>(o);
 
-  if (returnState != other->returnState)
+  if (returnState != other.returnState)
     return false;
 
-  if (!parent && !other->parent)
+  // Also tests !parent && !other->parent as a side effect.
+  if (parent == other.parent)
     return true;
-  if (!parent || !other->parent)
+  if (!parent || !other.parent)
     return false;
 
-   return *parent == *other->parent;
+   return *parent == *other.parent;
 }
 
 std::string SingletonPredictionContext::toString() const {

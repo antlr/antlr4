@@ -12,6 +12,14 @@ namespace antlr4 {
 namespace atn {
 
   class SingletonPredictionContext;
+  class ANTLR4CPP_PUBLIC PredictionContextItem {
+  public:
+      Ref<PredictionContext> parent;
+      size_t returnState;
+
+      PredictionContextItem(const Ref<PredictionContext>& p, size_t s);
+      bool operator == (const PredictionContextItem& o) const;
+  };
 
   class ANTLR4CPP_PUBLIC ArrayPredictionContext : public PredictionContext {
   public:
@@ -20,16 +28,16 @@ namespace atn {
     /// returnState == EMPTY_RETURN_STATE.
     // Also here: we use a strong reference to our parents to avoid having them freed prematurely.
     //            See also SinglePredictionContext.
-    const std::vector<Ref<PredictionContext>> parents;
 
-    /// Sorted for merge, no duplicates; if present, EMPTY_RETURN_STATE is always last.
-    const std::vector<size_t> returnStates;
+    /// Sorted for merge, no duplicates; if present, the SingletonPredictionContext with returnState EMPTY_RETURN_STATE is always last.
+    const std::vector<PredictionContextItem> contexts;
 
     ArrayPredictionContext(Ref<SingletonPredictionContext> const& a);
-    ArrayPredictionContext(std::vector<Ref<PredictionContext>> const& parents_, std::vector<size_t> const& returnStates);
+    ArrayPredictionContext(std::vector<PredictionContextItem>&& contexts_);
     virtual ~ArrayPredictionContext();
 
-    virtual bool isEmpty() const override;
+    virtual bool isEmptyContext() const override;
+    virtual bool isSingletonContext() const final;
     virtual size_t size() const override;
     virtual Ref<PredictionContext> getParent(size_t index) const override;
     virtual size_t getReturnState(size_t index) const override;

@@ -10,35 +10,48 @@
 
 using namespace antlr4::atn;
 
-ArrayPredictionContext::ArrayPredictionContext(Ref<SingletonPredictionContext> const& a)
-  : ArrayPredictionContext({ a->parent }, { a->returnState }) {
+PredictionContextItem::PredictionContextItem(const Ref<PredictionContext>& p, size_t s)
+  : parent(p),
+    returnState(s) { }
+
+bool PredictionContextItem::operator == (const PredictionContextItem& o) const {
+    return returnState == o.returnState && *parent == *o.parent;
 }
 
-ArrayPredictionContext::ArrayPredictionContext(std::vector<Ref<PredictionContext>> const& parents_,
-                                               std::vector<size_t> const& returnStates)
-  : PredictionContext(calculateHashCode(parents_, returnStates)), parents(parents_), returnStates(returnStates) {
-    assert(parents.size() > 0);
-    assert(returnStates.size() > 0);
+ArrayPredictionContext::ArrayPredictionContext(Ref<SingletonPredictionContext> const& a)
+  : PredictionContext(a->cachedHashCode),
+    contexts(1, PredictionContextItem(a->parent, a->returnState)) {
+   assert(a);
+}
+
+ArrayPredictionContext::ArrayPredictionContext(std::vector<PredictionContextItem>&& contexts_)
+  : PredictionContext(calculateHashCode(contexts_)),
+    contexts(std::move(contexts_)) {
+    assert(contexts.size() > 0);
 }
 
 ArrayPredictionContext::~ArrayPredictionContext() {
 }
 
-bool ArrayPredictionContext::isEmpty() const {
-  // Since EMPTY_RETURN_STATE can only appear in the last position, we don't need to verify that size == 1.
-  return returnStates[0] == EMPTY_RETURN_STATE;
+bool ArrayPredictionContext::isEmptyContext() const {
+  // Difference from Java runtime. Array context must contain at least 2 items.
+  return false;
+}
+
+bool ArrayPredictionContext::isSingletonContext() const {
+  return false;
 }
 
 size_t ArrayPredictionContext::size() const {
-  return returnStates.size();
+  return contexts.size();
 }
 
 Ref<PredictionContext> ArrayPredictionContext::getParent(size_t index) const {
-  return parents[index];
+  return contexts[index].parent;
 }
 
 size_t ArrayPredictionContext::getReturnState(size_t index) const {
-  return returnStates[index];
+  return contexts[index].returnState;
 }
 
 bool ArrayPredictionContext::operator == (PredictionContext const& o) const {
@@ -46,33 +59,33 @@ bool ArrayPredictionContext::operator == (PredictionContext const& o) const {
     return true;
   }
 
-  const ArrayPredictionContext *other = dynamic_cast<const ArrayPredictionContext*>(&o);
-  if (other == nullptr || hashCode() != other->hashCode()) {
-    return false; // can't be same if hash is different
-  }
+  if (hashCode() != o.hashCode()) { return false; } // can't be same if hash is different
 
-  return antlrcpp::Arrays::equals(returnStates, other->returnStates) &&
-    antlrcpp::Arrays::equals(parents, other->parents);
+  if (o.isSingletonContext())
+    return false;
+  const ArrayPredictionContext& other = static_cast<const ArrayPredictionContext&>(o);
+
+  return antlrcpp::Arrays::equals(contexts, other.contexts);
 }
 
 std::string ArrayPredictionContext::toString() const {
-  if (isEmpty()) {
+  if (isEmptyContext()) {
     return "[]";
   }
 
   std::stringstream ss;
   ss << "[";
-  for (size_t i = 0; i < returnStates.size(); i++) {
+  for (size_t i = 0; i < contexts.size(); i++) {
     if (i > 0) {
       ss << ", ";
     }
-    if (returnStates[i] == EMPTY_RETURN_STATE) {
+    if (contexts[i].returnState == EMPTY_RETURN_STATE) {
       ss << "$";
       continue;
     }
-    ss << returnStates[i];
-    if (parents[i] != nullptr) {
-      ss << " " << parents[i]->toString();
+    ss << contexts[i].returnState;
+    if (contexts[i].parent != nullptr) {
+      ss << " " << contexts[i].parent->toString();
     } else {
       ss << "nul";
     }

@@ -329,7 +329,7 @@ bool LexerATNSimulator::closure(CharStream *input, const Ref<LexerATNConfig> &co
 #endif
 
     if (config->context == nullptr || config->context->hasEmptyPath()) {
-      if (config->context == nullptr || config->context->isEmpty()) {
+      if (config->context == nullptr || config->context->isEmptyContext()) {
         configs->add(config);
         return true;
       } else {
@@ -338,7 +338,7 @@ bool LexerATNSimulator::closure(CharStream *input, const Ref<LexerATNConfig> &co
       }
     }
 
-    if (config->context != nullptr && !config->context->isEmpty()) {
+    if (config->context != nullptr && !config->context->isEmptyContext()) {
       for (size_t i = 0; i < config->context->size(); i++) {
         if (config->context->getReturnState(i) != PredictionContext::EMPTY_RETURN_STATE) {
           std::weak_ptr<PredictionContext> newContext = config->context->getParent(i); // "pop" return state

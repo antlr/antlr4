@@ -10,7 +10,7 @@ using namespace antlr4::atn;
 EmptyPredictionContext::EmptyPredictionContext() : SingletonPredictionContext(nullptr, EMPTY_RETURN_STATE) {
 }
 
-bool EmptyPredictionContext::isEmpty() const {
+bool EmptyPredictionContext::isEmptyContext() const {
   return true;
 }
 
