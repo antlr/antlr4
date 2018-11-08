@@ -185,7 +185,7 @@ matrix:
           sources:
             - deadsnakes # source required so it finds the package definition below
           packages:
-            - python3.5
+            - python3.6
       stage: main-test
     - os: linux
       dist: trusty
