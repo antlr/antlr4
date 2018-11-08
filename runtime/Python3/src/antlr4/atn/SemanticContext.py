@@ -135,8 +135,8 @@ class PrecedencePredicate(SemanticContext):
         else:
             return None
 
-    def __cmp__(self, other):
-        return self.precedence - other.precedence
+    def __lt__(self, other):
+        return self.precedence < other.precedence
 
     def __hash__(self):
         return 31

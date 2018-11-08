@@ -749,6 +749,10 @@ import sys
 >>
 
 Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
+<if(superClass)>
+from .<superClass> import <superClass>
+
+<endif>
 
 <atn>
 
