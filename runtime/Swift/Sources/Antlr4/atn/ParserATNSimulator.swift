@@ -1432,15 +1432,6 @@ open class ParserATNSimulator: ATNSimulator {
                 let continueCollecting = !(t is ActionTransition) && collectPredicates
                 let c = try getEpsilonTarget(config, t, continueCollecting, depth == 0, fullCtx, treatEofAsEpsilon)
                 if let c = c {
-                    if !t.isEpsilon() {
-                        // avoid infinite recursion for EOF* and EOF+
-                        if closureBusy.contains(c) {
-                             continue
-                        }else{
-                            closureBusy.insert(c)
-                        }
-                    }
-
                     var newDepth = depth
                     if config.state is RuleStopState {
                         assert(!fullCtx, "Expected: !fullCtx")
@@ -1449,14 +1440,6 @@ open class ParserATNSimulator: ATNSimulator {
                         // track how far we dip into outer context.  Might
                         // come in handy and we avoid evaluating context dependent
                         // preds if this is > 0.
-                        if closureBusy.contains(c) {
-                            //if (!closureBusy.insert(c)) {
-                            // avoid infinite recursion for right-recursive rules
-                            continue
-                        } else {
-                            closureBusy.insert(c)
-                        }
-
                         if let _dfa = _dfa , _dfa.isPrecedenceDfa() {
                             let outermostPrecedenceReturn: Int = (t as! EpsilonTransition).outermostPrecedenceReturn()
                             if outermostPrecedenceReturn == _dfa.atnStartState.ruleIndex {
@@ -1465,6 +1448,13 @@ open class ParserATNSimulator: ATNSimulator {
                         }
 
                         c.reachesIntoOuterContext += 1
+                        if closureBusy.contains(c) {
+                            // avoid infinite recursion for right-recursive rules
+                            continue
+                        } else {
+                            closureBusy.insert(c)
+                        }
+
                         configs.dipsIntoOuterContext = true // TODO: can remove? only care when we add to set per middle of this method
                         //print("newDepth=>\(newDepth)")
                         assert(newDepth > Int.min, "Expected: newDepth>Integer.MIN_VALUE")
@@ -1473,13 +1463,24 @@ open class ParserATNSimulator: ATNSimulator {
                         if debug {
                             print("dips into outer ctx: \(c)")
                         }
-                    } else if t is RuleTransition {
-                        // latch when newDepth goes negative - once we step out of the entry context we can't return
-                        if newDepth >= 0 {
-                            newDepth += 1
+                    }
+                    else {
+                        if !t.isEpsilon() {
+                            if closureBusy.contains(c) {
+                                // avoid infinite recursion for EOF* and EOF+
+                                continue
+                            }
+                            else {
+                                closureBusy.insert(c)
+                            }
                         }
 
-
+                        if t is RuleTransition {
+                            // latch when newDepth goes negative - once we step out of the entry context we can't return
+                            if newDepth >= 0 {
+                                newDepth += 1
+                            }
+                        }
                     }
 
                     try closureCheckingStopState(c, configs, &closureBusy, continueCollecting,
