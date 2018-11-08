@@ -12,7 +12,7 @@ import Foundation
 /// This field maps from the serialized ATN string to the deserialized _org.antlr.v4.runtime.atn.ATN_ with
 /// bypass alternatives.
 ///
-/// - SeeAlso: org.antlr.v4.runtime.atn.ATNDeserializationOptions#isGenerateRuleBypassTransitions()
+/// - SeeAlso: `ATNDeserializationOptions.generateRuleBypassTransitions`
 ///
 private var bypassAltsAtnCache = [String: ATN]()
 
@@ -421,9 +421,9 @@ open class Parser: Recognizer<ParserATNSimulator> {
                 return cachedResult
             }
 
-            let deserializationOptions = ATNDeserializationOptions()
-            try! deserializationOptions.setGenerateRuleBypassTransitions(true)
-            let result = try! ATNDeserializer(deserializationOptions).deserialize(Array(serializedAtn))
+            var opts = ATNDeserializationOptions()
+            opts.generateRuleBypassTransitions = true
+            let result = try! ATNDeserializer(opts).deserialize(Array(serializedAtn))
             bypassAltsAtnCache[serializedAtn] = result
             return result
         }
