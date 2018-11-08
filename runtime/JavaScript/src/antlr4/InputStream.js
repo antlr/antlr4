@@ -11,7 +11,7 @@ require('./polyfills/fromcodepoint');
 
 // Vacuum all input from a string and then treat it like a buffer.
 
-function _loadString(stream, decodeToUnicodeCodePoints) {
+function _loadString(stream) {
 	stream._index = 0;
 	stream.data = [];
 	if (stream.decodeToUnicodeCodePoints) {

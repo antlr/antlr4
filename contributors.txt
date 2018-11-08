@@ -179,3 +179,24 @@ YYYY/MM/DD, github id, Full name, email
 2017/12/01, SebastianLng, Sebastian Lang, sebastian.lang@outlook.com
 2017/12/03, oranoran, Oran Epelbaum, oran / epelbaum me
 2017/12/13, enessoylu, Enes Soylu, enessoylutr@gmail.com
+2017/12/20, kbsletten, Kyle Sletten, kbsletten@gmail.com
+2017/12/27, jkmar, Jakub Marciniszyn, marciniszyn.jk@gmail.com
+2018/01/06, kasbah, Kaspar Emanuel, kaspar@monostable.co.uk
+2018/02/08, razfriman, Raz Friman, raz@razfriman.com
+2018/02/11, io7m, Mark Raynsford, code@io7m.com
+2018/15/05, johnvanderholt, jan dillingh johnvanderholte@gmail.com
+2018/06/16, EternalPhane, Zongyuan Zuo, eternalphane@gmail.com
+2018/06/27, wu-sheng, Wu Sheng, wu.sheng@foxmail.com
+2018/02/25, chaseoxide, Marcus Ong, taccs97[at]gmail[dot]com
+2018/05/15, johnvanderholt, jan dillingh johnvanderholte@gmail.com
+2018/06/16, EternalPhane, Zongyuan Zuo, eternalphane@gmail.com
+2018/05/15, johnvanderholt, jan dillingh johnvanderholte@gmail.com
+2018/05/17, sinopsysHK, Eric Bardes, sinofwd@gmail.com
+2018/05/23, srvance, Stephen Vance, steve@vance.com
+2018/06/14, alecont, Alessandro Contenti, alecontenti@hotmail.com
+2018/06/16, EternalPhane, Zongyuan Zuo, eternalphane@gmail.com
+2018/07/03, jgoppert, James Goppert, james.goppert@gmail.com
+2018/07/27, Maksim Novikov, mnovikov.work@gmail.com
+2018/07/31 Lucas Henrqiue, lucashenrique580@gmail.com
+2018/08/03, ENDOH takanao, djmchl@gmail.com
+2018/10/29, chrisaycock, Christopher Aycock, chris[at]chrisaycock[dot]com
