@@ -16,7 +16,7 @@ Also, I have prepared a [video](https://youtu.be/eW4WFgRtFeY) that will help you
 
 ### Eclipse
 
-Edgar Espina has created an [eclipse plugin for ANTLR v4](https://youtu.be/eW4WFgRtFeY). Features: Advanced Syntax Highlighting, Automatic Code Generation (on save), Manual Code Generation (through External Tools menu), Code Formatter (Ctrl+Shift+F), Syntax Diagrams, Advanced Rule Navigation between files (F3), Quick fixes.
+Edgar Espina has created an [eclipse plugin for ANTLR v4](https://marketplace.eclipse.org/content/antlr-ide). Features: Advanced Syntax Highlighting, Automatic Code Generation (on save), Manual Code Generation (through External Tools menu), Code Formatter (Ctrl+Shift+F), Syntax Diagrams, Advanced Rule Navigation between files (F3), Quick fixes.
 
 ### NetBeans
 
