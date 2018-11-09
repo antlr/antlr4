@@ -66,8 +66,6 @@
 /// 
 /// 
 public class ATNState: Hashable, CustomStringConvertible {
-    public static let INITIAL_NUM_TRANSITIONS: Int = 4
-
     // constants for serialization
     public static let INVALID_TYPE: Int = 0
     public static let BASIC: Int = 1
@@ -117,8 +115,7 @@ public class ATNState: Hashable, CustomStringConvertible {
     /// 
     /// Track the transitions emanating from this ATN state.
     /// 
-    internal final var transitions: Array<Transition> = Array<Transition>()
-    //Array<Transition>(INITIAL_NUM_TRANSITIONS);
+    internal final var transitions = [Transition]()
 
     /// 
     /// Used to cache lookahead during parsing, not used during construction
