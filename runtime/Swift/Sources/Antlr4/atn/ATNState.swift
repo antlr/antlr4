@@ -149,21 +149,33 @@ public class ATNState: Hashable, CustomStringConvertible {
     }
 
     public final func addTransition(_ e: Transition) {
-        addTransition(transitions.count, e)
-    }
-
-    public final func addTransition(_ index: Int, _ e: Transition) {
         if transitions.isEmpty {
             epsilonOnlyTransitions = e.isEpsilon()
-        } else {
-            if epsilonOnlyTransitions != e.isEpsilon() {
+        }
+        else if epsilonOnlyTransitions != e.isEpsilon() {
+            print("ATN state %d has both epsilon and non-epsilon transitions.\n", String(stateNumber))
+            epsilonOnlyTransitions = false
+        }
 
-                print("ATN state %d has both epsilon and non-epsilon transitions.\n", String(stateNumber))
-                epsilonOnlyTransitions = false
+        var alreadyPresent = false
+        for t in transitions {
+            if t.target.stateNumber == e.target.stateNumber {
+                if let tLabel = t.labelIntervalSet(), let eLabel = e.labelIntervalSet(), tLabel == eLabel {
+//                    print("Repeated transition upon \(eLabel) from \(stateNumber)->\(t.target.stateNumber)")
+                    alreadyPresent = true
+                    break
+                }
+                else if t.isEpsilon() && e.isEpsilon() {
+//                    print("Repeated epsilon transition from \(stateNumber)->\(t.target.stateNumber)")
+                    alreadyPresent = true
+                    break
+                }
             }
         }
-        transitions.insert(e, at: index)
 
+        if !alreadyPresent {
+            transitions.append(e)
+        }
     }
 
     public final func transition(_ i: Int) -> Transition {
