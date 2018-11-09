@@ -17,7 +17,7 @@ public class ListTokenSource: TokenSource {
     /// 
     /// The wrapped collection of _org.antlr.v4.runtime.Token_ objects to return.
     /// 
-    internal final var tokens: [Token]
+    internal let tokens: [Token]
 
     /// 
     /// The name of the input source. If this value is `null`, a call to
@@ -25,7 +25,7 @@ public class ListTokenSource: TokenSource {
     /// the next token in _#tokens_ (or the previous token if the end of
     /// the input has been reached).
     /// 
-    private final var sourceName: String?
+    private let sourceName: String?
 
     /// 
     /// The index into _#tokens_ of token to return by the next call to

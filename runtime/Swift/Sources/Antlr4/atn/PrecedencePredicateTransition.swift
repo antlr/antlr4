@@ -12,7 +12,7 @@
 /// 
 
 public final class PrecedencePredicateTransition: AbstractPredicateTransition, CustomStringConvertible {
-    public final var precedence: Int
+    public let precedence: Int
 
     public init(_ target: ATNState, _ precedence: Int) {
 
