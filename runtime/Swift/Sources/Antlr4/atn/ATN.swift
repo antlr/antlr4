@@ -30,7 +30,7 @@ public class ATN {
     /// 
     /// The type of the ATN.
     /// 
-    public let grammarType: ATNType!
+    public let grammarType: ATNType
 
     /// 
     /// The maximum value for any symbol recognized by a transition in the ATN.
