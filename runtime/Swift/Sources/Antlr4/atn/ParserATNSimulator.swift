@@ -255,7 +255,7 @@ open class ParserATNSimulator: ATNSimulator {
 
     public final var decisionToDFA: [DFA]
 
-    /// 
+    ///
     /// SLL, LL, or LL + exact ambig detection?
     /// 
 
@@ -2013,7 +2013,7 @@ open class ParserATNSimulator: ATNSimulator {
         
         return dfaStatesMutex.synchronized {
             if let existing = dfa.states[D] {
-                return existing!
+                return existing
             }
 
             D.stateNumber = dfa.states.count
