@@ -60,7 +60,7 @@ public class ATNDeserializer {
     private let deserializationOptions: ATNDeserializationOptions
 
     public init(_ deserializationOptions: ATNDeserializationOptions? = nil) {
-        self.deserializationOptions = deserializationOptions ?? ATNDeserializationOptions.getDefaultOptions()
+        self.deserializationOptions = deserializationOptions ?? ATNDeserializationOptions()
     }
 
     /// 
@@ -667,13 +667,13 @@ public class ATNDeserializer {
 
     private func finalizeATN(_ atn: ATN) throws {
         markPrecedenceDecisions(atn)
-        if deserializationOptions.isVerifyATN() {
+        if deserializationOptions.verifyATN {
             try verifyATN(atn)
         }
-        if deserializationOptions.isGenerateRuleBypassTransitions() && atn.grammarType == ATNType.parser {
+        if deserializationOptions.generateRuleBypassTransitions && atn.grammarType == ATNType.parser {
             try generateRuleBypassTransitions(atn)
 
-            if deserializationOptions.isVerifyATN() {
+            if deserializationOptions.verifyATN {
                 // reverify after modification
                 try verifyATN(atn)
             }

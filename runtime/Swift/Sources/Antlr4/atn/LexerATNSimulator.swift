@@ -711,7 +711,7 @@ open class LexerATNSimulator: ATNSimulator {
 
         return dfaStatesMutex.synchronized {
             if let existing = dfa.states[proposed] {
-                return existing!
+                return existing
             }
 
             let newState = proposed

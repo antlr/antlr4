@@ -7,20 +7,17 @@
 
 public class DFA: CustomStringConvertible {
     /// 
-    /// A set of all DFA states. Use _java.util.Map_ so we can get old state back
-    /// (_java.util.Set_ only allows you to see if it's there).
+    /// A set of all DFA states.
     /// 
+    public var states = [DFAState: DFAState]()
 
-    public final var states: HashMap<DFAState, DFAState?> = HashMap<DFAState, DFAState?>()
-
-    public /*volatile*/ var s0: DFAState?
+    public var s0: DFAState?
 
     public final var decision: Int
 
     /// 
     /// From which ATN state did we create this DFA?
-    /// 
-
+    ///
     public let atnStartState: DecisionState
 
     /// 

@@ -26,7 +26,7 @@
 		<dependency>
 			<groupId>org.antlr</groupId>
 			<artifactId>ST4</artifactId>
-			<version>4.0.8</version>
+			<version>4.1-SNAPSHOT</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -66,10 +66,10 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.eclipse.jetty</groupId>
-			<artifactId>jetty-server</artifactId>
-			<version>8.1.16.v20140903</version>
-			<scope>test</scope>
+		  <groupId>org.eclipse.jetty</groupId>
+		  <artifactId>jetty-server</artifactId>
+		  <version>[9.3.24.v20180605,)</version>
+		  <scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.glassfish</groupId>

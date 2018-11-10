@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -127,8 +127,10 @@ size_t ParserATNSimulator::adaptivePredict(TokenStream *input, size_t decision, 
       dfa::DFAState *newState = new dfa::DFAState(std::move(s0_closure)); /* mem-check: managed by the DFA or deleted below */
       s0 = addDFAState(dfa, newState);
 
-      delete dfa.s0; // Delete existing s0 DFA state, if there's any. 
-      dfa.s0 = s0;
+      if (dfa.s0 != s0) {
+        delete dfa.s0; // Delete existing s0 DFA state, if there's any.
+        dfa.s0 = s0;
+      }
       if (s0 != newState) {
         delete newState; // If there was already a state with this config set we don't need the new one.
       }
@@ -891,15 +893,6 @@ void ParserATNSimulator::closure_(Ref<ATNConfig> const& config, ATNConfigSet *co
     bool continueCollecting = !is<ActionTransition*>(t) && collectPredicates;
     Ref<ATNConfig> c = getEpsilonTarget(config, t, continueCollecting, depth == 0, fullCtx, treatEofAsEpsilon);
     if (c != nullptr) {
-      if (!t->isEpsilon()) {
-        // avoid infinite recursion for EOF* and EOF+
-        if (closureBusy.count(c) == 0) {
-          closureBusy.insert(c);
-        } else {
-          continue;
-        }
-      }
-
       int newDepth = depth;
       if (is<RuleStopState*>(config->state)) {
         assert(!fullCtx);
@@ -924,6 +917,16 @@ void ParserATNSimulator::closure_(Ref<ATNConfig> const& config, ATNConfigSet *co
         }
 
         c->reachesIntoOuterContext++;
+
+        if (!t->isEpsilon()) {
+          // avoid infinite recursion for EOF* and EOF+
+          if (closureBusy.count(c) == 0) {
+            closureBusy.insert(c);
+          } else {
+            continue;
+          }
+        }
+
         configs->dipsIntoOuterContext = true; // TO_DO: can remove? only care when we add to set per middle of this method
         assert(newDepth > INT_MIN);
 
@@ -932,7 +935,16 @@ void ParserATNSimulator::closure_(Ref<ATNConfig> const& config, ATNConfigSet *co
           std::cout << "dips into outer ctx: " << c << std::endl;
 #endif
 
-      } else if (is<RuleTransition*>(t)) {
+      } else  if (!t->isEpsilon()) {
+        // avoid infinite recursion for EOF* and EOF+
+        if (closureBusy.count(c) == 0) {
+          closureBusy.insert(c);
+        } else {
+          continue;
+        }
+      }
+
+      if (is<RuleTransition*>(t)) {
         // latch when newDepth goes negative - once we step out of the entry context we can't return
         if (newDepth >= 0) {
           newDepth++;
