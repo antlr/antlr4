@@ -202,4 +202,9 @@ before_install:
   - f="./.travis/before-install-$TRAVIS_OS_NAME-$TARGET.sh"; ! [ -x "$f" ] || "$f"
 
 script:
-  - cd runtime-testsuite; travis_wait 40 ../.travis/run-tests-$TARGET.sh
+  - |
+    cd runtime-testsuite;
+    travis_wait 40 ../.travis/run-tests-$TARGET.sh;
+    rc=$?;
+    cat target/surefire-reports/*.dumpstream || true;
+    exit $rc
