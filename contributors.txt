@@ -182,6 +182,7 @@ YYYY/MM/DD, github id, Full name, email
 2017/12/13, enessoylu, Enes Soylu, enessoylutr@gmail.com
 2017/12/20, kbsletten, Kyle Sletten, kbsletten@gmail.com
 2017/12/27, jkmar, Jakub Marciniszyn, marciniszyn.jk@gmail.com
+2018/03/10, uvguy, kangjoni76@gmail.com
 2018/01/06, kasbah, Kaspar Emanuel, kaspar@monostable.co.uk
 2018/01/15, xgcssch, Sönke Schau, xgcssch@users.noreply.github.com
 2018/02/08, razfriman, Raz Friman, raz@razfriman.com

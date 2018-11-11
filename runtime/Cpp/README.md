@@ -25,7 +25,7 @@ The C++ target has been the work of the following people:
 
 ## Project Status
 
-* Building on OS X, Windows, and Linux
+* Building on OS X, Windows, Android and Linux
 * No errors and warnings
 * Library linking
 * Some unit tests in the OSX project, for important base classes with almost 100% code coverage.
@@ -50,6 +50,9 @@ It will automatically use the CMake description to open up a Visual Studio Solut
 
 #### Compiling on OSX
 Either open the included XCode project and build that or use the cmake compilation as described for linux.
+
+#### Compiling on Android
+Try run cmake -DCMAKE_ANDROID_NDK=/folder/of/android_ndkr17_and_above -DCMAKE_SYSTEM_NAME=Android -DCMAKE_ANDROID_API=14 -DCMAKE_ANDROID_ARCH_ABI=x86 -DCMAKE_ANDROID_STL_TYPE=c++_shared -DCMAKE_ANDROID_NDK_TOOLCHAIN_VERSION=clang -DCMAKE_BUILD_TYPE=Release /folder/antlr4_src_dir -G Ninja.
 
 #### Compiling on Linux
 - cd <antlr4-dir>/runtime/Cpp (this is where this readme is located)
