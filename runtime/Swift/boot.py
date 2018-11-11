@@ -16,8 +16,10 @@ import shutil
 import argparse
 import fnmatch
 import os.path
+import subprocess
+import sys
 import time
-from subprocess import call
+from subprocess import check_call
 
 
 # ANTLR Version, here we only care about major version.
@@ -83,9 +85,9 @@ def gen_parser(grammar, a4):
         antlr_complains("Cannot find java. Check your JAVA_HOME setting.")
         return
 
-    call([java, "-jar", a4,
-          "-Dlanguage=Swift", grammar, "-visitor",
-          "-o", grammar_folder + "/gen"])
+    check_call([java, "-jar", a4,
+               "-Dlanguage=Swift", grammar, "-visitor",
+               "-o", grammar_folder + "/gen"])
 
 
 def swift_test():
@@ -93,7 +95,7 @@ def swift_test():
     Run unit tests.
     """
     generate_parser()
-    call(["swift", "test"])
+    check_call(["swift", "test"])
 
 
 def get_argument_parser():
@@ -141,10 +143,10 @@ def generate_spm_module(in_folder=TMP_FOLDER):
     shutil.copy("Package.swift", tmp_antlr_folder)
 
     os.chdir(tmp_antlr_folder)
-    call(["git", "init"])
-    call(["git", "add", "*"])
-    call(["git", "commit", "-m", "Initial commit."])
-    call(["git", "tag", "{}.0.0".format(MAJOR_VERSION)])
+    check_call(["git", "init"])
+    check_call(["git", "add", "*"])
+    check_call(["git", "commit", "-m", "Initial commit."])
+    check_call(["git", "tag", "{}.0.0".format(MAJOR_VERSION)])
 
     antlr_says("Created local repository.")
     antlr_says("(swift-tools-version:3.0) " 
@@ -163,7 +165,7 @@ def generate_xcodeproj():
     :return:
     """
     generate_parser()
-    call(["swift", "package", "generate-xcodeproj"])
+    check_call(["swift", "package", "generate-xcodeproj"])
 
 
 def generate_parser():
@@ -186,11 +188,16 @@ def antlr_complains(msg):
 if __name__ == "__main__":
     parser = get_argument_parser()
     args = parser.parse_args()
-    if args.gen_spm_module:
-        generate_spm_module()
-    elif args.gen_xcodeproj:
-        generate_xcodeproj()
-    elif args.test:
-        swift_test()
-    else:
-        parser.print_help()
+    try:
+        if args.gen_spm_module:
+            generate_spm_module()
+        elif args.gen_xcodeproj:
+            generate_xcodeproj()
+        elif args.test:
+            swift_test()
+        else:
+            parser.print_help()
+    except subprocess.CalledProcessError as err:
+        print >>sys.stderr, ("Error: command '%s' exited with status %d" %
+                             (' '.join(err.cmd), err.returncode))
+        sys.exit(err.returncode)
