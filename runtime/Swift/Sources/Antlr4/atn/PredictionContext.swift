@@ -580,71 +580,67 @@ public class PredictionContext: Hashable, CustomStringConvertible {
     public static func getCachedContext(
         _ context: PredictionContext,
         _ contextCache: PredictionContextCache,
-        _ visited: HashMap<PredictionContext, PredictionContext>) -> PredictionContext {
-            if context.isEmpty() {
+        _ visited: inout [PredictionContext: PredictionContext]) -> PredictionContext {
+        if context.isEmpty() {
+            return context
+        }
+
+        if let visitedContext = visited[context] {
+            return visitedContext
+        }
+
+        if let cachedContext = contextCache.get(context) {
+            visited[context] = cachedContext
+            return cachedContext
+        }
+
+        var changed = false
+        var parents = [PredictionContext?](repeating: nil, count: context.size())
+        let length = parents.count
+        for i in 0..<length {
+            if context.getParent(i) == nil {
                 return context
             }
 
-            var existing = visited[context]
-            if existing != nil {
-                return existing!
-            }
+            let parent = getCachedContext(context.getParent(i)!, contextCache, &visited)
+            if changed || parent !== context.getParent(i) {
+                if !changed {
+                    parents = [PredictionContext?](repeating: nil, count: context.size())
 
-            existing = contextCache.get(context)
-            if existing != nil {
-                visited[context] = existing!
-                return existing!
-            }
-
-            var changed = false
-            var parents = [PredictionContext?](repeating: nil, count: context.size())
-            let length = parents.count
-            for i in 0..<length {
-                //added by janyou
-                if context.getParent(i) == nil {
-                    return context
-                }
-
-                let parent = getCachedContext(context.getParent(i)!, contextCache, visited)
-                //modified by janyou != !==
-                if changed || parent !== context.getParent(i) {
-                    if !changed {
-                        parents = [PredictionContext?](repeating: nil, count: context.size())
-
-                        for j in 0..<context.size() {
-                            parents[j] = context.getParent(j)
-                        }
-
-                        changed = true
+                    for j in 0..<context.size() {
+                        parents[j] = context.getParent(j)
                     }
 
-                    parents[i] = parent
+                    changed = true
                 }
-            }
 
-            if !changed {
-                contextCache.add(context)
-                visited[context] = context
-                return context
+                parents[i] = parent
             }
+        }
 
-            let updated: PredictionContext
-            if parents.isEmpty {
-                updated = EMPTY
-            }
-            else if parents.count == 1 {
-                updated = SingletonPredictionContext.create(parents[0], context.getReturnState(0))
-            }
-            else {
-                let arrayPredictionContext = context as! ArrayPredictionContext
-                updated = ArrayPredictionContext(parents, arrayPredictionContext.returnStates)
-            }
+        if !changed {
+            contextCache.add(context)
+            visited[context] = context
+            return context
+        }
 
-            contextCache.add(updated)
-            visited[updated] = updated
-            visited[context] = updated
+        let updated: PredictionContext
+        if parents.isEmpty {
+            updated = EMPTY
+        }
+        else if parents.count == 1 {
+            updated = SingletonPredictionContext.create(parents[0], context.getReturnState(0))
+        }
+        else {
+            let arrayPredictionContext = context as! ArrayPredictionContext
+            updated = ArrayPredictionContext(parents, arrayPredictionContext.returnStates)
+        }
 
-            return updated
+        contextCache.add(updated)
+        visited[updated] = updated
+        visited[context] = updated
+
+        return updated
     }
 
 
@@ -652,14 +648,14 @@ public class PredictionContext: Hashable, CustomStringConvertible {
     // ter's recursive version of Sam's getAllNodes()
     public static func getAllContextNodes(_ context: PredictionContext) -> [PredictionContext] {
         var nodes = [PredictionContext]()
-        let visited = HashMap<PredictionContext, PredictionContext>()
-        getAllContextNodes_(context, &nodes, visited)
+        var visited = [PredictionContext: PredictionContext]()
+        getAllContextNodes_(context, &nodes, &visited)
         return nodes
     }
 
-    public static func getAllContextNodes_(_ context: PredictionContext?,
-                                           _ nodes: inout [PredictionContext],
-                                           _ visited: HashMap<PredictionContext, PredictionContext>) {
+    private static func getAllContextNodes_(_ context: PredictionContext?,
+                                            _ nodes: inout [PredictionContext],
+                                            _ visited: inout [PredictionContext: PredictionContext]) {
         guard let context = context, visited[context] == nil else {
             return
         }
@@ -667,7 +663,7 @@ public class PredictionContext: Hashable, CustomStringConvertible {
         nodes.append(context)
         let length = context.size()
         for i in 0..<length {
-            getAllContextNodes_(context.getParent(i), &nodes, visited)
+            getAllContextNodes_(context.getParent(i), &nodes, &visited)
         }
     }
 

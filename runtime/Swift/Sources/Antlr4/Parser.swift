@@ -8,7 +8,21 @@
 
 import Foundation
 
-/// 
+///
+/// This field maps from the serialized ATN string to the deserialized _org.antlr.v4.runtime.atn.ATN_ with
+/// bypass alternatives.
+///
+/// - SeeAlso: `ATNDeserializationOptions.generateRuleBypassTransitions`
+///
+private var bypassAltsAtnCache = [String: ATN]()
+
+///
+/// mutex for bypassAltsAtnCache updates
+///
+private let bypassAltsAtnCacheMutex = Mutex()
+
+
+///
 /// This is all the parsing support code essentially; most of it is error recovery stuff.
 /// 
 open class Parser: Recognizer<ParserATNSimulator> {
@@ -58,25 +72,6 @@ open class Parser: Recognizer<ParserATNSimulator> {
         }
     }
     
-    /// 
-    /// mutex for bypassAltsAtnCache updates
-    /// 
-    private let bypassAltsAtnCacheMutex = Mutex()
-    
-    /// 
-    /// mutex for decisionToDFA updates
-    /// 
-    private let decisionToDFAMutex = Mutex()
-
-    /// 
-    /// This field maps from the serialized ATN string to the deserialized _org.antlr.v4.runtime.atn.ATN_ with
-    /// bypass alternatives.
-    /// 
-    /// - SeeAlso: org.antlr.v4.runtime.atn.ATNDeserializationOptions#isGenerateRuleBypassTransitions()
-    /// 
-    private let bypassAltsAtnCache: HashMap<String, ATN> = HashMap<String, ATN>()
-
-
     /// 
     /// The error handling strategy for the parser. The default value is a new
     /// instance of _org.antlr.v4.runtime.DefaultErrorStrategy_.
@@ -417,23 +412,21 @@ open class Parser: Recognizer<ParserATNSimulator> {
     /// 
     /// The ATN with bypass alternatives is expensive to create so we create it
     /// lazily.
-    /// 
-    /// - Throws: _ANTLRError.unsupportedOperation_ if the current parser does not
-    /// implement the _#getSerializedATN()_ method.
-    /// 
+    ///
     public func getATNWithBypassAlts() -> ATN {
         let serializedAtn = getSerializedATN()
 
-        var result = bypassAltsAtnCache[serializedAtn]
-        bypassAltsAtnCacheMutex.synchronized { [unowned self] in
-            if result == nil {
-                let deserializationOptions = ATNDeserializationOptions()
-                try! deserializationOptions.setGenerateRuleBypassTransitions(true)
-                result = try! ATNDeserializer(deserializationOptions).deserialize(Array(serializedAtn))
-                self.bypassAltsAtnCache[serializedAtn] = result!
+        return bypassAltsAtnCacheMutex.synchronized {
+            if let cachedResult = bypassAltsAtnCache[serializedAtn] {
+                return cachedResult
             }
+
+            var opts = ATNDeserializationOptions()
+            opts.generateRuleBypassTransitions = true
+            let result = try! ATNDeserializer(opts).deserialize(Array(serializedAtn))
+            bypassAltsAtnCache[serializedAtn] = result
+            return result
         }
-        return result!
     }
 
     /// 
@@ -965,18 +958,13 @@ open class Parser: Recognizer<ParserATNSimulator> {
 
     /// For debugging and other purposes.
     public func getDFAStrings() -> [String] {
-        var s = [String]()
-        guard let _interp = _interp  else {
-            return s
+        guard let _interp = _interp else {
+            return []
         }
-        decisionToDFAMutex.synchronized { [unowned self] in
-            for d in 0..<_interp.decisionToDFA.count {
-                let dfa = _interp.decisionToDFA[d]
-                s.append(dfa.toString(self.getVocabulary()))
-            }
-
+        let vocab = getVocabulary()
+        return _interp.decisionToDFA.map {
+            $0.toString(vocab)
         }
-        return s
     }
 
     /// For debugging and other purposes.
@@ -984,19 +972,16 @@ open class Parser: Recognizer<ParserATNSimulator> {
         guard let _interp = _interp else {
             return
         }
-        decisionToDFAMutex.synchronized { [unowned self] in
-            var seenOne = false
-
-            for dfa in _interp.decisionToDFA {
-                if !dfa.states.isEmpty {
-                    if seenOne {
-                        print("")
-                    }
-                    print("Decision \(dfa.decision):")
-
-                    print(dfa.toString(self.getVocabulary()), terminator: "")
-                    seenOne = true
+        var seenOne = false
+        let vocab = getVocabulary()
+        for dfa in _interp.decisionToDFA {
+            if !dfa.states.isEmpty {
+                if seenOne {
+                    print("")
                 }
+                print("Decision \(dfa.decision):")
+                print(dfa.toString(vocab), terminator: "")
+                seenOne = true
             }
         }
     }

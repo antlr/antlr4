@@ -41,8 +41,12 @@ Include the antlr4-runtime.h umbrella header in your target application to get e
 
 If you are compiling with cmake, the minimum version required is cmake 2.8.
 
-#### Compiling on Windows
+#### Compiling on Windows with Visual Studio prior to 2017
 Simply open the VS solution (VS 2013+) and build it.
+
+#### Compiling on Windows with Visual Studio VS2017
+Use the "Open Folder" Feature from the File->Open->Folder menu to open the runtime/Cpp directory.
+It will automatically use the CMake description to open up a Visual Studio Solution.
 
 #### Compiling on OSX
 Either open the included XCode project and build that or use the cmake compilation as described for linux.
@@ -59,4 +63,11 @@ Try run cmake -DCMAKE_ANDROID_NDK=/folder/of/android_ndkr17_and_above -DCMAKE_SY
 
 If you don't want to build the demo then simply run cmake without parameters.
 There is another cmake script available in the subfolder cmake/ for those who prefer the superbuild cmake pattern.
+
+#### CMake Package support
+If the CMake variable 'ANTLR4_INSTALL' is set, CMake Packages will be build and installed during the install step.
+They expose two packages: antlr4_runtime and antlr4_generator which can be referenced to ease up the use of the
+ANTLR Generator and runtime.
+Use and Sample can be found [here](cmake/Antlr4Package.md)
+
 

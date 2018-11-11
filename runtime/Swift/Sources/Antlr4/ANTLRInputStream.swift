@@ -2,18 +2,17 @@
 /// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
+///
+
+///
 /// Vacuum all input from a _java.io.Reader_/_java.io.InputStream_ and then treat it
 /// like a `char[]` buffer. Can also pass in a _String_ or
 /// `char[]` to use.
 /// 
 /// If you need encoding, pass in stream/reader with correct encoding.
-/// 
-
+///
 public class ANTLRInputStream: CharStream {
-    public static let READ_BUFFER_SIZE: Int = 1024
-    public static let INITIAL_BUFFER_SIZE: Int = 1024
-
-    /// 
+    ///
     /// The data being scanned
     /// 
     internal var data: [Character]
@@ -24,9 +23,9 @@ public class ANTLRInputStream: CharStream {
     internal var n: Int
 
     /// 
-    /// 0..n-1 index into string of next char
+    /// 0...n-1 index into string of next char
     /// 
-    internal var p: Int = 0
+    internal var p = 0
 
     /// 
     /// What is name or source of this char stream?
@@ -62,7 +61,7 @@ public class ANTLRInputStream: CharStream {
         if p >= n {
             assert(LA(1) == ANTLRInputStream.EOF, "Expected: LA(1)==IntStream.EOF")
 
-            throw ANTLRError.illegalState(msg: "annot consume EOF")
+            throw ANTLRError.illegalState(msg: "cannot consume EOF")
 
         }
 
@@ -99,7 +98,7 @@ public class ANTLRInputStream: CharStream {
     }
 
     /// 
-    /// Return the current input symbol index 0..n where n indicates the
+    /// Return the current input symbol index 0...n where n indicates the
     /// last symbol has been read.  The index is the index of char to
     /// be returned from LA(1).
     /// 
@@ -136,29 +135,21 @@ public class ANTLRInputStream: CharStream {
         // seek forward, consume until p hits index or n (whichever comes first)
         index = min(index, n)
         while p < index {
-            try  consume()
+            try consume()
         }
     }
 
     public func getText(_ interval: Interval) -> String {
-        let start: Int = interval.a
-        var stop: Int = interval.b
-        if stop >= n {
-            stop = n - 1
-        }
-        let count = stop - start + 1;
+        let start = interval.a
         if start >= n {
             return ""
         }
-
-        return String(data[start ..< (start + count)])
+        let stop = min(n, interval.b + 1)
+        return String(data[start ..< stop])
     }
 
     public func getSourceName() -> String {
-        guard let name = name , !name.isEmpty else {
-             return ANTLRInputStream.UNKNOWN_SOURCE_NAME
-        }
-        return name
+        return name ?? ANTLRInputStream.UNKNOWN_SOURCE_NAME
     }
 
     public func toString() -> String {

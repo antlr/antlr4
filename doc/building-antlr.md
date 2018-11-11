@@ -28,16 +28,7 @@ Checking out files: 100% (1427/1427), done.
 # Compile
 
 ```bash
-$ cd /tmp
-$ git clone git@github.com:antlr/antlr4.git
-Cloning into 'antlr4'...
-remote: Counting objects: 59858, done.
-remote: Compressing objects: 100% (57/57), done.
-remote: Total 59858 (delta 28), reused 9 (delta 9), pack-reused 59786
-Receiving objects: 100% (59858/59858), 31.10 MiB | 819.00 KiB/s, done.
-Resolving deltas: 100% (31898/31898), done.
-Checking connectivity... done.
-$ cd antlr4
+$ cd /tmp/antlr4
 $ export MAVEN_OPTS="-Xmx1G"   # don't forget this on linux
 $ mvn clean                    # must be separate, not part of install/compile
 $ mvn -DskipTests install
