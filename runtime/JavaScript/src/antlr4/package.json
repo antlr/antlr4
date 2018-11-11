@@ -11,7 +11,7 @@
     "antlr4",
     "grammar"
   ],
-  "license": "BSD",
+  "license": "BSD-3-Clause",
   "bugs": {
     "url": "https://github.com/antlr/antlr4/issues"
   },
