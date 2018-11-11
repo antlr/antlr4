@@ -493,7 +493,7 @@ public enum PredictionMode {
     /// map[c._org.antlr.v4.runtime.atn.ATNConfig#state state_] U= c._org.antlr.v4.runtime.atn.ATNConfig#alt alt_
     /// 
     /// 
-    public static func getStateToAltMap(_ configs: ATNConfigSet) -> HashMap<ATNState, BitSet> {
+    public static func getStateToAltMap(_ configs: ATNConfigSet) -> [ATNState: BitSet] {
         return configs.getStateToAltMap()
     }
 

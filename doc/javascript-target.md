@@ -62,7 +62,7 @@ The steps to create your parsing code are the following:
 You are now ready to bundle your parsing code as follows:
  - following webpack specs, create a webpack.config file
  - in the webpack.config file, exclude node.js only modules using: node: { module: "empty", net: "empty", fs: "empty" }
- - from the cmd line, nag-vigate to the directory containing webpack.config and type: webpack
+ - from the cmd line, navigate to the directory containing webpack.config and type: webpack
  
 This will produce a single js file containing all your parsing code. Easy to include in your web pages!
 
@@ -95,11 +95,16 @@ Let's suppose that your grammar is named, as above, "MyGrammar". Let's suppose t
 Now a fully functioning script might look like the following:
 
 ```javascript
+   var antlr4 = require('antlr4');
+   var MyGrammarLexer = require('./MyGrammarLexer').MyGrammarLexer;
+   var MyGrammarParser = require('./MyGrammarParser').MyGrammarParser;
+   var MyGrammarListener = require('./MyGrammarListener').MyGrammarListener;
+
    var input = "your text to parse here"
    var chars = new antlr4.InputStream(input);
-   var lexer = new MyGrammarLexer.MyGrammarLexer(chars);
+   var lexer = new MyGrammarLexer(chars);
    var tokens  = new antlr4.CommonTokenStream(lexer);
-   var parser = new MyGrammarParser.MyGrammarParser(tokens);
+   var parser = new MyGrammarParser(tokens);
    parser.buildParseTrees = true;
    var tree = parser.MyStartRule();
 ```
@@ -128,30 +133,30 @@ Let's suppose your MyGrammar grammar comprises 2 rules: "key" and "value". The a
 ```
 
 In order to provide custom behavior, you might want to create the following class:
-  
+
 ```javascript
-    KeyPrinter = function() {
-         MyGrammarListener.call(this); // inherit default listener
-         return this;
-    };
- 
-// inherit default listener
+var KeyPrinter = function() {
+    MyGrammarListener.call(this); // inherit default listener
+    return this;
+};
+
+// continue inheriting default listener
 KeyPrinter.prototype = Object.create(MyGrammarListener.prototype);
 KeyPrinter.prototype.constructor = KeyPrinter;
- 
+
 // override default listener behavior
-       KeyPrinter.prototype.exitKey = function(ctx) {      
-       console.log("Oh, a key!");
-   }; 
+KeyPrinter.prototype.exitKey = function(ctx) {
+    console.log("Oh, a key!");
+};
 ```
 
 In order to execute this listener, you would simply add the following lines to the above code:
- 
+
 ```javascript
-        ...
-       tree = parser.StartRule() - only repeated here for reference
-   var printer = new KeyPrinter();
- antlr4.tree.ParseTreeWalker.DEFAULT.walk(printer, tree);
+    ...
+    tree = parser.StartRule() // only repeated here for reference
+var printer = new KeyPrinter();
+antlr4.tree.ParseTreeWalker.DEFAULT.walk(printer, tree);
 ```
 
 ## What about TypeScript?
