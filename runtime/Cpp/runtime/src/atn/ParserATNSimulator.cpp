@@ -176,7 +176,7 @@ size_t ParserATNSimulator::execATN(dfa::DFA &dfa, dfa::DFAState *s0, TokenStream
       // ATN states in SLL implies LL will also get nowhere.
       // If conflict in states that dip out, choose min since we
       // will get error no matter what.
-      NoViableAltException e = noViableAlt(input, outerContext, previousD->configs.get(), startIndex);
+      NoViableAltException e = noViableAlt(input, outerContext, previousD->configs.get(), startIndex, false);
       input->seek(startIndex);
       size_t alt = getSynValidOrSemInvalidAltThatFinishedDecisionEntryRule(previousD->configs.get(), outerContext);
       if (alt != ATN::INVALID_ALT_NUMBER) {
@@ -236,7 +236,7 @@ size_t ParserATNSimulator::execATN(dfa::DFA &dfa, dfa::DFAState *s0, TokenStream
       BitSet alts = evalSemanticContext(D->predicates, outerContext, true);
       switch (alts.count()) {
         case 0:
-          throw noViableAlt(input, outerContext, D->configs.get(), startIndex);
+          throw noViableAlt(input, outerContext, D->configs.get(), startIndex, false);
 
         case 1:
           return alts.nextSetBit(0);
@@ -351,7 +351,7 @@ size_t ParserATNSimulator::execATNWithFullContext(dfa::DFA &dfa, dfa::DFAState *
       // ATN states in SLL implies LL will also get nowhere.
       // If conflict in states that dip out, choose min since we
       // will get error no matter what.
-      NoViableAltException e = noViableAlt(input, outerContext, previous, startIndex);
+      NoViableAltException e = noViableAlt(input, outerContext, previous, startIndex, previous != s0);
       input->seek(startIndex);
       size_t alt = getSynValidOrSemInvalidAltThatFinishedDecisionEntryRule(previous, outerContext);
       if (alt != ATN::INVALID_ALT_NUMBER) {
@@ -1229,8 +1229,8 @@ void ParserATNSimulator::dumpDeadEndConfigs(NoViableAltException &nvae) {
 }
 
 NoViableAltException ParserATNSimulator::noViableAlt(TokenStream *input, ParserRuleContext *outerContext,
-  ATNConfigSet *configs, size_t startIndex) {
-  return NoViableAltException(parser, input, input->get(startIndex), input->LT(1), configs, outerContext);
+  ATNConfigSet *configs, size_t startIndex, bool deleteConfigs) {
+  return NoViableAltException(parser, input, input->get(startIndex), input->LT(1), configs, outerContext, deleteConfigs);
 }
 
 size_t ParserATNSimulator::getUniqueAlt(ATNConfigSet *configs) {
