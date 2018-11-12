@@ -21,7 +21,7 @@ You will find full instructions on the [Git repo page for ANTLR C# runtime](http
 
 Let's suppose that your grammar is named `MyGrammar`. The tool will generate for you the following files:
 
-*  MyGrammarLexer.cs
+*   MyGrammarLexer.cs
 *   MyGrammarParser.cs
 *   MyGrammarListener.cs (if you have not activated the -no-listener option)
 *   MyGrammarBaseListener.cs (if you have not activated the -no-listener option)
@@ -32,6 +32,7 @@ Now a fully functioning code might look like the following for start rule `Start
 
 ```
 using Antlr4.Runtime;
+using Antlr4.Runtime.Tree;
      
 public void MyParseMethod() {
       String input = "your text to parse here";
@@ -39,7 +40,7 @@ public void MyParseMethod() {
       ITokenSource lexer = new MyGrammarLexer(stream);
       ITokenStream tokens = new CommonTokenStream(lexer);
       MyGrammarParser parser = new MyGrammarParser(tokens);
-      parser.buildParseTrees = true;
+      parser.BuildParseTree = true;
       IParseTree tree = parser.StartRule();
 }
 ```
