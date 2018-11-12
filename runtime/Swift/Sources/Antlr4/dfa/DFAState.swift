@@ -122,19 +122,6 @@ public class DFAState: Hashable, CustomStringConvertible {
         return MurmurHash.finish(hash, 1)
     }
 
-    /// 
-    /// Two _org.antlr.v4.runtime.dfa.DFAState_ instances are equal if their ATN configuration sets
-    /// are the same. This method is used to see if a state already exists.
-    /// 
-    /// Because the number of alternatives and number of ATN configurations are
-    /// finite, there is a finite number of DFA states that can be processed.
-    /// This is necessary to show that the algorithm terminates.
-    /// 
-    /// Cannot test the DFA state numbers here because in
-    /// _org.antlr.v4.runtime.atn.ParserATNSimulator#addDFAState_ we need to know if any other state
-    /// exists that has this exact set of ATN configurations. The
-    /// _#stateNumber_ is irrelevant.
-    ///
     public var description: String {
         var buf = "\(stateNumber):\(configs)"
         if isAcceptState {
@@ -150,6 +137,19 @@ public class DFAState: Hashable, CustomStringConvertible {
     }
 }
 
+///
+/// Two _org.antlr.v4.runtime.dfa.DFAState_ instances are equal if their ATN configuration sets
+/// are the same. This method is used to see if a state already exists.
+///
+/// Because the number of alternatives and number of ATN configurations are
+/// finite, there is a finite number of DFA states that can be processed.
+/// This is necessary to show that the algorithm terminates.
+///
+/// Cannot test the DFA state numbers here because in
+/// _org.antlr.v4.runtime.atn.ParserATNSimulator#addDFAState_ we need to know if any other state
+/// exists that has this exact set of ATN configurations. The
+/// _#stateNumber_ is irrelevant.
+///
 public func ==(lhs: DFAState, rhs: DFAState) -> Bool {
     if lhs === rhs {
         return true
