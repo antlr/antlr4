@@ -286,7 +286,7 @@ open class LexerATNSimulator: ATNSimulator {
     /// 
 
     internal func computeTargetState(_ input: CharStream, _ s: DFAState, _ t: Int) throws -> DFAState {
-        let reach = OrderedATNConfigSet()
+        let reach = ATNConfigSet(true, isOrdered: true)
 
         // if we don't find an existing DFA state
         // Fill reach starting from closure, following t transitions
@@ -404,7 +404,7 @@ open class LexerATNSimulator: ATNSimulator {
     final func computeStartState(_ input: CharStream,
         _ p: ATNState) throws -> ATNConfigSet {
             let initialContext = PredictionContext.EMPTY
-            let configs = OrderedATNConfigSet()
+            let configs = ATNConfigSet(true, isOrdered: true)
             let length = p.getNumberOfTransitions()
             for i in 0..<length {
                 let target = p.transition(i).target
