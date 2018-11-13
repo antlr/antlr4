@@ -272,7 +272,7 @@ namespace antlr4 {
     /// <seealso cref="#_ctx"/> get the current context.
     virtual void enterRule(ParserRuleContext *localctx, size_t state, size_t ruleIndex);
 
-    virtual void exitRule();
+    void exitRule();
 
     virtual void enterOuterAlt(ParserRuleContext *localctx, size_t altNum);
 

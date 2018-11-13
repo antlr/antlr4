@@ -42,9 +42,9 @@ In order to perform the tests on all target languages, you need to have the foll
 * `mono` (e.g., `brew install mono`) on non-Windows boxes (on Windows it uses the Microsoft .net stack). Also must [`xbuild` the runtime](https://github.com/antlr/antlr4/blob/master/doc/releasing-antlr.md) before tests will run; see below
 * `nodejs`
 * Python 2.7
-* Python 3.5
+* Python 3.6
 * Go
-* Swift 3 (via XCode 8.x) tested currently only osx
+* Swift 4 (via XCode 10.x) tested currently only osx
 * clang (for C++ target) 
 * 
 To **install into local repository** `~/.m2/repository/org/antlr`, do this:
