@@ -506,10 +506,9 @@ public abstract class Target {
 
 	public boolean templatesExist() {
 		String groupFileName = CodeGenerator.TEMPLATE_ROOT + "/" + getLanguage() + "/" + getLanguage() + STGroup.GROUP_FILE_EXTENSION;
-		URL url = Thread.currentThread().getContextClassLoader().getResource(groupFileName);
 		STGroup result = null;
 		try {
-			result = new STGroupFile(url);
+			result = new STGroupFile(groupFileName);
 		}
 		catch (IllegalArgumentException iae) {
 			result = null;
@@ -520,11 +519,9 @@ public abstract class Target {
 
 	protected STGroup loadTemplates() {
 		String groupFileName = CodeGenerator.TEMPLATE_ROOT + "/" + getLanguage() + "/" + getLanguage() + STGroup.GROUP_FILE_EXTENSION;
-		URL url = Thread.currentThread().getContextClassLoader().getResource(groupFileName);
-
 		STGroup result = null;
 		try {
-			result = new STGroupFile(url);
+			result = new STGroupFile(groupFileName);
 		}
 		catch (IllegalArgumentException iae) {
 			gen.tool.errMgr.toolError(ErrorType.MISSING_CODE_GEN_TEMPLATES,
