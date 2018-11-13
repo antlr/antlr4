@@ -29,7 +29,7 @@
 		<dependency>
 			<groupId>org.antlr</groupId>
 			<artifactId>ST4</artifactId>
-			<version>4.2.1-SNAPSHOT</version>
+			<version>4.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.abego.treelayout</groupId>
