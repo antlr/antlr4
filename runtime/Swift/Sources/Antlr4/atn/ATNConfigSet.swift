@@ -27,22 +27,22 @@ public final class ATNConfigSet: Hashable, CustomStringConvertible {
     /// fields; in particular, conflictingAlts is set after
     /// we've made this readonly.
     ///
-    internal final var readonly = false
+    private var readonly = false
 
     /// 
     /// All configs but hashed by (s, i, _, pi) not including context. Wiped out
     /// when we go readonly as this set becomes a DFA state.
     /// 
-    public final var configLookup: LookupDictionary
+    private var configLookup: LookupDictionary
 
     /// 
     /// Track the elements as they are added to the set; supports get(i)
     /// 
-    public final var configs = [ATNConfig]()
+    public private(set) var configs = [ATNConfig]()
 
     // TODO: these fields make me pretty uncomfortable but nice to pack up info together, saves recomputation
     // TODO: can we track conflicts as they are added to save scanning configs later?
-    public final var uniqueAlt = 0
+    public internal(set) var uniqueAlt = 0
     //TODO no default
     /// 
     /// Currently this is only used when we detect SLL conflict; this does
@@ -50,13 +50,13 @@ public final class ATNConfigSet: Hashable, CustomStringConvertible {
     /// I should also point out that this seems to include predicated alternatives
     /// that have predicates that evaluate to false. Computed in computeTargetState().
     /// 
-    internal final var conflictingAlts: BitSet?
+    internal var conflictingAlts: BitSet?
 
     // Used in parser and lexer. In lexer, it indicates we hit a pred
     // while computing a closure operation.  Don't make a DFA state from this.
-    public final var hasSemanticContext = false
+    public internal(set) var hasSemanticContext = false
     //TODO no default
-    public final var dipsIntoOuterContext = false
+    public internal(set) var dipsIntoOuterContext = false
     //TODO no default
 
     /// 

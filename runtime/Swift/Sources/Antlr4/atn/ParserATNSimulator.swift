@@ -253,7 +253,7 @@ open class ParserATNSimulator: ATNSimulator {
 
     internal final unowned let parser: Parser
 
-    public final var decisionToDFA: [DFA]
+    public private(set) final var decisionToDFA: [DFA]
 
     ///
     /// SLL, LL, or LL + exact ambig detection?

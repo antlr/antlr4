@@ -31,27 +31,27 @@
 /// meaning that state was reached via a different set of rule invocations.
 /// 
 
-public class DFAState: Hashable, CustomStringConvertible {
-    public var stateNumber = -1
+public final class DFAState: Hashable, CustomStringConvertible {
+    public internal(set) var stateNumber = -1
 
-    public var configs = ATNConfigSet()
+    public internal(set) var configs = ATNConfigSet()
 
     /// 
     /// `edges[symbol]` points to target of symbol. Shift up by 1 so (-1)
     /// _org.antlr.v4.runtime.Token#EOF_ maps to `edges[0]`.
     ///
-    public var edges: [DFAState?]!
+    public internal(set) var edges: [DFAState?]!
 
-    public var isAcceptState = false
+    public internal(set) var isAcceptState = false
 
     /// 
     /// if accept state, what ttype do we match or alt do we predict?
     /// This is set to _org.antlr.v4.runtime.atn.ATN#INVALID_ALT_NUMBER_ when _#predicates_`!=null` or
     /// _#requiresFullContext_.
     /// 
-    public var prediction = 0
+    public internal(set) var prediction = 0
 
-    public var lexerActionExecutor: LexerActionExecutor!
+    public internal(set) var lexerActionExecutor: LexerActionExecutor?
 
     /// 
     /// Indicates that this state was created during SLL prediction that
@@ -59,7 +59,7 @@ public class DFAState: Hashable, CustomStringConvertible {
     /// _org.antlr.v4.runtime.atn.ParserATNSimulator#execATN_ invocations immediately jumped doing
     /// full context prediction if this field is true.
     /// 
-    public var requiresFullContext = false
+    public internal(set) var requiresFullContext = false
 
     /// 
     /// During SLL parsing, this is a list of predicates associated with the
@@ -75,13 +75,13 @@ public class DFAState: Hashable, CustomStringConvertible {
     /// This list is computed by _org.antlr.v4.runtime.atn.ParserATNSimulator#predicateDFAState_.
     /// 
 
-    public var predicates: [PredPrediction]?
+    public internal(set) var predicates: [PredPrediction]?
 
     /// 
     /// Map a predicate to a predicted alternative.
     /// 
 
-    public class PredPrediction: CustomStringConvertible {
+    public final class PredPrediction: CustomStringConvertible {
         public let pred: SemanticContext
         // never null; at least SemanticContext.NONE
         public let alt: Int
