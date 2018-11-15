@@ -4,7 +4,7 @@
 # when we call dotnet cli for restore and build, in order to speed up
 
 dotnet restore ../runtime/CSharp/runtime/CSharp/Antlr4.Runtime/Antlr4.Runtime.dotnet.csproj
-dotnet build -c Release ../runtime/CSharp/runtime/CSharp/Antlr4.Runtime/Antlr4.Runtime.dotnet.csproj
+dotnet build -c Release -f netstandard1.3 ../runtime/CSharp/runtime/CSharp/Antlr4.Runtime/Antlr4.Runtime.dotnet.csproj
 
 # call test
 
