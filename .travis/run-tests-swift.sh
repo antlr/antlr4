@@ -6,19 +6,20 @@ set -euo pipefail
 # here since environment variables doesn't pass
 # across scripts
 if [ $TRAVIS_OS_NAME == "linux" ]; then
-  export SWIFT_VERSION=swift-4.0.2
-  export SWIFT_HOME=$(pwd)/swift/$SWIFT_VERSION-RELEASE-ubuntu14.04/usr/bin/
+  export SWIFT_VERSION=swift-4.2.1
+  export SWIFT_HOME=$(pwd)/swift/$SWIFT_VERSION-RELEASE-ubuntu16.04/usr/bin/
   export PATH=$SWIFT_HOME:$PATH
 
   # download swift
   mkdir swift
-  curl https://swift.org/builds/$SWIFT_VERSION-release/ubuntu1404/$SWIFT_VERSION-RELEASE/$SWIFT_VERSION-RELEASE-ubuntu14.04.tar.gz -s | tar xz -C swift &> /dev/null
+  curl https://swift.org/builds/$SWIFT_VERSION-release/ubuntu1604/$SWIFT_VERSION-RELEASE/$SWIFT_VERSION-RELEASE-ubuntu16.04.tar.gz -s | tar xz -C swift &> /dev/null
 fi
 
 if [ -z "${JAVA_HOME-}" ]
 then
-  export JAVA_HOME="$(dirname $(java -XshowSettings:properties -version 2>&1 |
-                                    grep 'java\.home' | awk '{ print $3 }'))"
+  export JAVA_HOME="$(java -XshowSettings:properties -version 2>&1 |
+                          grep 'java\.home' | awk '{ print $3 }')"
+  echo "export JAVA_HOME=$JAVA_HOME"
 fi
 
 # check swift
