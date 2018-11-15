@@ -638,7 +638,7 @@ open class LexerATNSimulator: ATNSimulator {
     }
 
 
-    final func addDFAEdge(_ from: DFAState,
+    private final func addDFAEdge(_ from: DFAState,
         _ t: Int,
         _ q: ATNConfigSet) -> DFAState {
             /// 
@@ -665,7 +665,7 @@ open class LexerATNSimulator: ATNSimulator {
             return to
     }
 
-    final func addDFAEdge(_ p: DFAState, _ t: Int, _ q: DFAState) {
+    private final func addDFAEdge(_ p: DFAState, _ t: Int, _ q: DFAState) {
         if t < LexerATNSimulator.MIN_DFA_EDGE || t > LexerATNSimulator.MAX_DFA_EDGE {
             // Only track edges within the DFA bounds
             return
