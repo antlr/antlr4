@@ -66,25 +66,10 @@ public class ATNConfig: Hashable, CustomStringConvertible {
 
     public final let semanticContext: SemanticContext
 
-    public init(_ old: ATNConfig) {
-        // dup
-        self.state = old.state
-        self.alt = old.alt
-        self.context = old.context
-        self.semanticContext = old.semanticContext
-        self.reachesIntoOuterContext = old.reachesIntoOuterContext
-    }
-
-    public convenience init(_ state: ATNState,
-                            _ alt: Int,
-                            _ context: PredictionContext?) {
-        self.init(state, alt, context, SemanticContext.NONE)
-    }
-
     public init(_ state: ATNState,
                 _ alt: Int,
                 _ context: PredictionContext?,
-                _ semanticContext: SemanticContext) {
+                _ semanticContext: SemanticContext = SemanticContext.NONE) {
         self.state = state
         self.alt = alt
         self.context = context
