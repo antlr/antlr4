@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -euo pipefail
+
 # we need to build the runtime before test run, since we used "--no-dependencies"
 # when we call dotnet cli for restore and build, in order to speed up
 
