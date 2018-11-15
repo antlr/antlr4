@@ -1722,7 +1722,7 @@ open class ParserATNSimulator: ATNSimulator {
                                     _ pt: PrecedencePredicateTransition,
                                     _ collectPredicates: Bool,
                                     _ inContext: Bool,
-                                    _ fullCtx: Bool) throws -> ATNConfig {
+                                    _ fullCtx: Bool) throws -> ATNConfig? {
         if debug {
             print("PRED (collectPredicates=\(collectPredicates)) \(pt.precedence)>=_p, ctx dependent=true")
             //if ( parser != nil ) {
@@ -1757,7 +1757,7 @@ open class ParserATNSimulator: ATNSimulator {
         if debug {
             print("config from pred transition=\(c?.description ?? "nil")")
         }
-        return c!
+        return c
     }
 
 
