@@ -206,3 +206,4 @@ YYYY/MM/DD, github id, Full name, email
 2018/08/03, ENDOH takanao, djmchl@gmail.com
 2018/10/29, chrisaycock, Christopher Aycock, chris[at]chrisaycock[dot]com
 2018/11/12, vinoski, Steve Vinoski, vinoski@ieee.org
+2018/11/14, nxtstep, Adriaan (Arjan) Duz, codewithadriaan[et]gmail[dot]com
