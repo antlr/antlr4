@@ -11,6 +11,9 @@ USER_M2 constant below.
 
 the java version is used according to environment variable $JAVA_HOME.
 """
+
+from __future__ import print_function
+
 import glob
 import shutil
 import argparse
@@ -178,11 +181,11 @@ def generate_parser():
 
 
 def antlr_says(msg):
-    print GREEN + "[ANTLR] " + msg + RESET
+    print(GREEN + "[ANTLR] " + msg + RESET)
 
 
 def antlr_complains(msg):
-    print RED + "[ANTLR] " + msg + RESET
+    print(RED + "[ANTLR] " + msg + RESET)
 
 
 if __name__ == "__main__":
@@ -198,6 +201,9 @@ if __name__ == "__main__":
         else:
             parser.print_help()
     except subprocess.CalledProcessError as err:
-        print >>sys.stderr, ("Error: command '%s' exited with status %d" %
-                             (' '.join(err.cmd), err.returncode))
+        print("Error: command '%s' exited with status %d" %
+              (' '.join(err.cmd), err.returncode), file=sys.stderr)
         sys.exit(err.returncode)
+    except (IOError, OSError) as err:
+        print(err, file=sys.stderr)
+        sys.exit(1)
