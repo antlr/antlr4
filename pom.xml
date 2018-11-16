@@ -138,6 +138,8 @@
 					<filesets>
 						<fileset>
 							<directory>runtime/Swift/.build</directory>
+						</fileset>
+						<fileset>
 							<directory>runtime/Swift/Tests/Antlr4Tests/gen</directory>
 						</fileset>
 					</filesets>

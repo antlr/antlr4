@@ -92,6 +92,11 @@
 			</resource>
 			<resource>
 				<directory>../runtime</directory>
+				<excludes>
+					<exclude>**/.build/**</exclude>
+					<exclude>**/target/**</exclude>
+					<exclude>Swift/*.xcodeproj/**</exclude>
+				</excludes>
 			</resource>
 		</resources>
 		<plugins>

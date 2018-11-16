@@ -31,6 +31,8 @@ import java.util.Collections;
 import java.util.List;
 
 import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.fail;
+import static junit.framework.TestCase.failNotEquals;
 import static org.junit.Assume.assumeFalse;
 
 /** This class represents a single runtime test. It pulls data from
@@ -161,14 +163,7 @@ public abstract class BaseRuntimeTest {
 		                                   descriptor.getInput(),
 		                                   descriptor.showDiagnosticErrors()
 		                                  );
-		if ( delegate instanceof SpecialRuntimeTestAssert ) {
-			((SpecialRuntimeTestAssert)delegate).assertEqualStrings(descriptor.getErrors(), delegate.getParseErrors());
-			((SpecialRuntimeTestAssert)delegate).assertEqualStrings(descriptor.getOutput(), found);
-		}
-		else {
-			assertEquals(descriptor.getErrors(), delegate.getParseErrors());
-			assertEquals(descriptor.getOutput(), found);
-		}
+		assertCorrectOutput(descriptor, delegate, found);
 	}
 
 	public void testLexer(RuntimeTestDescriptor descriptor) throws Exception {
@@ -202,16 +197,7 @@ public abstract class BaseRuntimeTest {
 		grammar = grammarST.render();
 
 		String found = delegate.execLexer(grammarName+".g4", grammar, grammarName, descriptor.getInput(), descriptor.showDFA());
-		if ( delegate instanceof SpecialRuntimeTestAssert ) {
-			((SpecialRuntimeTestAssert)delegate).assertEqualStrings(descriptor.getOutput(), found);
-			((SpecialRuntimeTestAssert)delegate).assertEqualStrings(descriptor.getANTLRToolErrors(), delegate.getANTLRToolErrors());
-			((SpecialRuntimeTestAssert)delegate).assertEqualStrings(descriptor.getErrors(), delegate.getParseErrors());
-		}
-		else {
-			assertEquals(descriptor.getOutput(), found);
-			assertEquals(descriptor.getANTLRToolErrors(), delegate.getANTLRToolErrors());
-			assertEquals(descriptor.getErrors(), delegate.getParseErrors());
-		}
+		assertCorrectOutput(descriptor, delegate, found);
 	}
 
 	/** Write a grammar to tmpdir and run antlr */
@@ -311,6 +297,68 @@ public abstract class BaseRuntimeTest {
 		catch (IOException ioe) {
 			System.err.println("can't write file");
 			ioe.printStackTrace(System.err);
+		}
+	}
+
+
+	protected static void assertCorrectOutput(RuntimeTestDescriptor descriptor, RuntimeTestSupport delegate, String actualOutput) {
+		String actualParseErrors = delegate.getParseErrors();
+		String actualToolErrors = delegate.getANTLRToolErrors();
+		String expectedOutput = descriptor.getOutput();
+		String expectedParseErrors = descriptor.getErrors();
+		String expectedToolErrors = descriptor.getANTLRToolErrors();
+
+		if (actualOutput == null) {
+			actualOutput = "";
+		}
+		if (actualParseErrors == null) {
+			actualParseErrors = "";
+		}
+		if (actualToolErrors == null) {
+			actualToolErrors = "";
+		}
+		if (expectedOutput == null) {
+			expectedOutput = "";
+		}
+		if (expectedParseErrors == null) {
+			expectedParseErrors = "";
+		}
+		if (expectedToolErrors == null) {
+			expectedToolErrors = "";
+		}
+
+		if (actualOutput.equals(expectedOutput) &&
+				actualParseErrors.equals(expectedParseErrors) &&
+				actualToolErrors.equals(expectedToolErrors)) {
+			return;
+		}
+
+		if (actualOutput.equals(expectedOutput)) {
+			if (actualParseErrors.equals(expectedParseErrors)) {
+				failNotEquals("[" + descriptor.getTarget() + ":" + descriptor.getTestName() + "] " +
+								"Parse output and parse errors are as expected, but tool errors are incorrect",
+						expectedToolErrors, actualToolErrors);
+			}
+			else {
+				fail("[" + descriptor.getTarget() + ":" + descriptor.getTestName() + "] " +
+						"Parse output is as expected, but errors are not: " +
+						"expectedParseErrors:<" + expectedParseErrors +
+						">; actualParseErrors:<" + actualParseErrors +
+						">; expectedToolErrors:<" + expectedToolErrors +
+						">; actualToolErrors:<" + actualToolErrors +
+						">.");
+			}
+		}
+		else {
+			fail("[" + descriptor.getTarget() + ":" + descriptor.getTestName() + "] " +
+					"Parse output is incorrect: " +
+					"expectedOutput:<" + expectedOutput +
+					">; actualOutput:<" + actualOutput +
+					">; expectedParseErrors:<" + expectedParseErrors +
+					">; actualParseErrors:<" + actualParseErrors +
+					">; expectedToolErrors:<" + expectedToolErrors +
+					">; actualToolErrors:<" + actualToolErrors +
+					">.");
 		}
 	}
 }
