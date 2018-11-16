@@ -12,9 +12,9 @@
 /// prediction.
 /// 
 public class FailedPredicateException: RecognitionException {
-	private final var ruleIndex: Int
-	private final var predicateIndex: Int
-	private final var predicate: String?
+	private let ruleIndex: Int
+	private let predicateIndex: Int
+	private let predicate: String?
 
 	public init(_ recognizer: Parser, _ predicate: String? = nil, _ message: String? = nil) {
 		let s = recognizer.getInterpreter().atn.states[recognizer.getState()]!

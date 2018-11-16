@@ -14,7 +14,7 @@
 /// 
 
 public class LexerTypeAction: LexerAction, CustomStringConvertible {
-    fileprivate final var type: Int
+    fileprivate let type: Int
 
     /// 
     /// Constructs a new `type` action with the specified token type value.

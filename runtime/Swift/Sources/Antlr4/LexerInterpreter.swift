@@ -6,17 +6,17 @@
 
 
 public class LexerInterpreter: Lexer {
-    internal final var grammarFileName: String
-    internal final var atn: ATN
+    internal let grammarFileName: String
+    internal let atn: ATN
 
-    internal final var ruleNames: [String]
-    internal final var channelNames: [String]
-    internal final var modeNames: [String]
+    internal let ruleNames: [String]
+    internal let channelNames: [String]
+    internal let modeNames: [String]
 
-    private final var vocabulary: Vocabulary?
+    private let vocabulary: Vocabulary?
 
     internal final var _decisionToDFA: [DFA]
-    internal final var _sharedContextCache = PredictionContextCache()
+    internal let _sharedContextCache = PredictionContextCache()
 
     public init(_ grammarFileName: String, _ vocabulary: Vocabulary, _ ruleNames: Array<String>, _ channelNames: Array<String>, _ modeNames: Array<String>, _ atn: ATN, _ input: CharStream) throws {
 

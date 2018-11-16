@@ -66,8 +66,6 @@
 /// 
 /// 
 public class ATNState: Hashable, CustomStringConvertible {
-    public static let INITIAL_NUM_TRANSITIONS: Int = 4
-
     // constants for serialization
     public static let INVALID_TYPE: Int = 0
     public static let BASIC: Int = 1
@@ -107,23 +105,22 @@ public class ATNState: Hashable, CustomStringConvertible {
     /// 
     public final var atn: ATN? = nil
 
-    public final var stateNumber: Int = INVALID_STATE_NUMBER
+    public internal(set) final var stateNumber: Int = INVALID_STATE_NUMBER
 
-    public final var ruleIndex: Int?
+    public internal(set) final var ruleIndex: Int?
     // at runtime, we don't have Rule objects
 
-    public final var epsilonOnlyTransitions: Bool = false
+    public private(set) final var epsilonOnlyTransitions: Bool = false
 
     /// 
     /// Track the transitions emanating from this ATN state.
     /// 
-    internal final var transitions: Array<Transition> = Array<Transition>()
-    //Array<Transition>(INITIAL_NUM_TRANSITIONS);
+    internal private(set) final var transitions = [Transition]()
 
     /// 
     /// Used to cache lookahead during parsing, not used during construction
     /// 
-    public final var nextTokenWithinRule: IntervalSet?
+    public internal(set) final var nextTokenWithinRule: IntervalSet?
 
 
     public var hashValue: Int {
