@@ -39,9 +39,9 @@ $ alias grun='java -Xmx500M -cp "/usr/local/lib/antlr-4.7.1-complete.jar:$CLASSP
 (*Thanks to Graham Wideman*)
 
 0. Install Java (version 1.6 or higher)
-1. Download antlr-4.5.3-complete.jar (or whatever version) from [http://www.antlr.org/download/](http://www.antlr.org/download/)
+1. Download antlr-4.7.1-complete.jar (or whatever version) from [http://www.antlr.org/download/](http://www.antlr.org/download/)
 Save to your directory for 3rd party Java libraries, say `C:\Javalib`
-2. Add `antlr-4.5.3-complete.jar` to CLASSPATH, either:
+2. Add `antlr-4.7.1-complete.jar` to CLASSPATH, either:
   * Permanently: Using System Properties dialog > Environment variables > Create or append to `CLASSPATH` variable
   * Temporarily, at command line:
 ```
