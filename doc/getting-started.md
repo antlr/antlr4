@@ -53,6 +53,10 @@ SET CLASSPATH=.;C:\Javalib\antlr-4.7.1-complete.jar;%CLASSPATH%
 java org.antlr.v4.Tool %*
 ```
 ```
+@ECHO OFF
+SET TEST_CURRENT_DIR=%CLASSPATH:.;=%
+if "%TEST_CURRENT_DIR%" == "%CLASSPATH%" ( SET CLASSPATH=.;%CLASSPATH% )
+@ECHO ON
 java org.antlr.v4.gui.TestRig %*
 ```
   * Or, use doskey commands:
