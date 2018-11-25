@@ -352,7 +352,7 @@ namespace Antlr4.Runtime.Atn
 			for (int p = 0; p < parents.Length; p++)
 			{
 				PredictionContext parent = parents[p];
-				if (!uniqueParents.ContainsKey(parent))
+				if (parent!=null && !uniqueParents.ContainsKey(parent))
 				{ // don't replace
 					uniqueParents.Put(parent, parent);
 				}
@@ -360,7 +360,9 @@ namespace Antlr4.Runtime.Atn
 
 			for (int p = 0; p < parents.Length; p++)
 			{
-				parents[p] = uniqueParents.Get(parents[p]);
+				PredictionContext parent = parents[p];
+				if (parent!=null)
+					parents[p] = uniqueParents.Get(parent);
 			}
 		}
 
