@@ -19,36 +19,32 @@ milestone = milestone[0]
 
 issues = repo.get_issues(state="closed", milestone=milestone, sort="created", direction="desc")
 
-# # dump bugs fixed
-# print()
-# print("## Issues fixed")
-# for x in issues:
-#     labels = [l.name for l in x.labels]
-#     if x.pull_request is None and not ("type:improvement" in labels or "type:feature" in labels):
-#         print("* [%s](%s) (%s)" % (x.title, x.html_url, ", ".join([l.name for l in x.labels])))
-#
-#
-# print()
-# # dump improvements closed for this release (issues or pulls)
-# print("## Improvements, features")
-# for x in issues:
-#     labels = [l.name for l in x.labels]
-#     if ("type:improvement" in labels or "type:feature" in labels):
-#         print("* [%s](%s) (%s)" % (x.title, x.html_url, ", ".join(labels)))
-#
-# print()
-#
-#
-# # dump PRs closed for this release by target
-# print("## Pull requests grouped by target")
-# for target in TARGETS:
-#     print()
-#     print(f"### {target} target")
-#     for x in issues:
-#         labels = [l.name for l in x.labels]
-#         if x.pull_request is not None and f"target:{target}" in labels:
-#             print("* [%s](%s) (%s)" % (x.title, x.html_url, ", ".join(labels)))
-#
+# dump bugs fixed
+print()
+print("## Issues fixed")
+for x in issues:
+    labels = [l.name for l in x.labels]
+    if x.pull_request is None and not ("type:improvement" in labels or "type:feature" in labels):
+        print("* [%s](%s) (%s)" % (x.title, x.html_url, ", ".join([l.name for l in x.labels])))
+
+# dump improvements closed for this release (issues or pulls)
+print()
+print("## Improvements, features")
+for x in issues:
+    labels = [l.name for l in x.labels]
+    if ("type:improvement" in labels or "type:feature" in labels):
+        print("* [%s](%s) (%s)" % (x.title, x.html_url, ", ".join(labels)))
+
+# dump PRs closed for this release by target
+print()
+print("## Pull requests grouped by target")
+for target in TARGETS:
+    print()
+    print(f"### {target} target")
+    for x in issues:
+        labels = [l.name for l in x.labels]
+        if x.pull_request is not None and f"target:{target}" in labels:
+            print("* [%s](%s) (%s)" % (x.title, x.html_url, ", ".join(labels)))
 
 # dump contributors
 print()

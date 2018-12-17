@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Company>The ANTLR Organization</Company>
-    <Version>4.7.1.1</Version>
+    <Version>4.7.2</Version>
 	<NeutralLanguage>en-US</NeutralLanguage>
     <TargetFrameworks>netstandard1.3;net35</TargetFrameworks>
     <NoWarn>$(NoWarn);CS1591;CS1574;CS1580</NoWarn>
