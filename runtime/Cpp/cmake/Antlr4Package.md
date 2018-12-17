@@ -96,7 +96,7 @@ target_link_libraries( Parsertest PRIVATE
  find_package(antlr4-generator REQUIRED)
  
  # Set path to generator
- set(ANTLR4_JAR_LOCATION ${PROJECT_SOURCE_DIR}/thirdparty/antlr/antlr-4.7.1-complete.jar)
+ set(ANTLR4_JAR_LOCATION ${PROJECT_SOURCE_DIR}/thirdparty/antlr/antlr-4.7.2-complete.jar)
  
  # generate lexer
  antlr4_generate( 
