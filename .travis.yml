@@ -71,67 +71,67 @@ matrix:
             - clang-3.7
     - os: osx
       compiler: clang
-      osx_image: xcode9
+      osx_image: xcode10.1
       env:
         - TARGET=cpp
         - GROUP=LEXER
       stage: extended-test
     - os: osx
       compiler: clang
-      osx_image: xcode9
+      osx_image: xcode10.1
       env:
         - TARGET=cpp
         - GROUP=PARSER
       stage: extended-test
     - os: osx
       compiler: clang
-      osx_image: xcode9
+      osx_image: xcode10.1
       env:
         - TARGET=cpp
         - GROUP=RECURSION
       stage: extended-test
     - os: osx
       compiler: clang
-      osx_image: xcode9
+      osx_image: xcode10.1
       env:
         - TARGET=swift
         - GROUP=LEXER
       stage: main-test
     - os: osx
       compiler: clang
-      osx_image: xcode9
+      osx_image: xcode10.1
       env:
         - TARGET=swift
         - GROUP=PARSER
       stage: main-test
     - os: osx
       compiler: clang
-      osx_image: xcode9
+      osx_image: xcode10.1
       env:
         - TARGET=swift
         - GROUP=RECURSION
       stage: main-test
     - os: linux
-      dist: trusty
+      dist: xenial
       compiler: clang
       env:
        - TARGET=swift
        - GROUP=ALL
       stage: extended-test
     - os: osx
-      osx_image: xcode9
+      osx_image: xcode10.1
       env:
         - TARGET=dotnet
         - GROUP=LEXER
       stage: extended-test
     - os: osx
-      osx_image: xcode9
+      osx_image: xcode10.1
       env:
         - TARGET=dotnet
         - GROUP=PARSER
       stage: extended-test
     - os: osx
-      osx_image: xcode9
+      osx_image: xcode10.1
       env:
         - TARGET=dotnet
         - GROUP=RECURSION
@@ -202,4 +202,9 @@ before_install:
   - f="./.travis/before-install-$TRAVIS_OS_NAME-$TARGET.sh"; ! [ -x "$f" ] || "$f"
 
 script:
-  - cd runtime-testsuite; travis_wait 40 ../.travis/run-tests-$TARGET.sh
+  - |
+    cd runtime-testsuite;
+    travis_wait 40 ../.travis/run-tests-$TARGET.sh;
+    rc=$?;
+    cat target/surefire-reports/*.dumpstream || true;
+    exit $rc

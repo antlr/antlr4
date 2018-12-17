@@ -16,10 +16,10 @@ If you are going to integrate ANTLR into your existing build system using mvn, a
 1. Download
 ```
 $ cd /usr/local/lib
-$ curl -O http://www.antlr.org/download/antlr-4.7.1-complete.jar
+$ curl -O https://www.antlr.org/download/antlr-4.7.1-complete.jar
 ```
 Or just download in browser from website:
-    [http://www.antlr.org/download.html](http://www.antlr.org/download.html)
+    [https://www.antlr.org/download.html](https://www.antlr.org/download.html)
 and put it somewhere rational like `/usr/local/lib`.
 
 2. Add `antlr-4.7.1-complete.jar` to your `CLASSPATH`:
@@ -39,9 +39,9 @@ $ alias grun='java -Xmx500M -cp "/usr/local/lib/antlr-4.7.1-complete.jar:$CLASSP
 (*Thanks to Graham Wideman*)
 
 0. Install Java (version 1.6 or higher)
-1. Download antlr-4.5.3-complete.jar (or whatever version) from [http://www.antlr.org/download/](http://www.antlr.org/download/)
+1. Download antlr-4.7.1-complete.jar (or whatever version) from [https://www.antlr.org/download/](https://www.antlr.org/download/)
 Save to your directory for 3rd party Java libraries, say `C:\Javalib`
-2. Add `antlr-4.5.3-complete.jar` to CLASSPATH, either:
+2. Add `antlr-4.7.1-complete.jar` to CLASSPATH, either:
   * Permanently: Using System Properties dialog > Environment variables > Create or append to `CLASSPATH` variable
   * Temporarily, at command line:
 ```
@@ -53,6 +53,10 @@ SET CLASSPATH=.;C:\Javalib\antlr-4.7.1-complete.jar;%CLASSPATH%
 java org.antlr.v4.Tool %*
 ```
 ```
+@ECHO OFF
+SET TEST_CURRENT_DIR=%CLASSPATH:.;=%
+if "%TEST_CURRENT_DIR%" == "%CLASSPATH%" ( SET CLASSPATH=.;%CLASSPATH% )
+@ECHO ON
 java org.antlr.v4.gui.TestRig %*
 ```
   * Or, use doskey commands:

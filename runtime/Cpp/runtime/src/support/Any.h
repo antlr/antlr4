@@ -46,21 +46,21 @@ struct ANTLR4CPP_PUBLIC Any
 
   template<class U>
   bool is() const {
-    typedef StorageType<U> T;
-
-    auto derived = dynamic_cast<Derived<T> *>(_ptr);
+    auto derived = getDerived<U>(false);
 
     return derived != nullptr;
   }
 
   template<class U>
   StorageType<U>& as() {
-    typedef StorageType<U> T;
+    auto derived = getDerived<U>(true);
 
-    auto derived = dynamic_cast<Derived<T>*>(_ptr);
+    return derived->value;
+  }
 
-    if (!derived)
-      throw std::bad_cast();
+  template<class U>
+  const StorageType<U>& as() const {
+    auto derived = getDerived<U>(true);
 
     return derived->value;
   }
@@ -68,6 +68,11 @@ struct ANTLR4CPP_PUBLIC Any
   template<class U>
   operator U() {
     return as<StorageType<U>>();
+  }
+
+  template<class U>
+  operator const U() const {
+    return as<const StorageType<U>>();
   }
 
   Any& operator = (const Any& a) {
@@ -135,6 +140,18 @@ private:
       return _ptr->clone();
     else
       return nullptr;
+  }
+
+  template<class U>
+  Derived<StorageType<U>>* getDerived(bool checkCast) const {
+    typedef StorageType<U> T;
+
+    auto derived = dynamic_cast<Derived<T>*>(_ptr);
+
+    if (checkCast && !derived)
+      throw std::bad_cast();
+
+    return derived;
   }
 
   Base *_ptr;

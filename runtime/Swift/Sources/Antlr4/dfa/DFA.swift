@@ -13,7 +13,7 @@ public class DFA: CustomStringConvertible {
 
     public var s0: DFAState?
 
-    public final var decision: Int
+    public let decision: Int
 
     /// 
     /// From which ATN state did we create this DFA?

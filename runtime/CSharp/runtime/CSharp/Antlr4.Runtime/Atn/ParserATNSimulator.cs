@@ -1622,12 +1622,6 @@ namespace Antlr4.Runtime.Atn
 											   depth == 0, fullCtx, treatEofAsEpsilon);
 				if (c != null)
 				{
-					if (!t.IsEpsilon && !closureBusy.Add(c))
-					{
-						// avoid infinite recursion for EOF* and EOF+
-						continue;
-					}
-
 					int newDepth = depth;
 					if (config.state is RuleStopState)
 					{
@@ -1636,12 +1630,6 @@ namespace Antlr4.Runtime.Atn
 						// track how far we dip into outer context.  Might
 						// come in handy and we avoid evaluating context dependent
 						// preds if this is > 0.
-
-						if (!closureBusy.Add(c))
-						{
-							// avoid infinite recursion for right-recursive rules
-							continue;
-						}
 
 						if (thisDfa != null && thisDfa.IsPrecedenceDfa)
 						{
@@ -1653,17 +1641,32 @@ namespace Antlr4.Runtime.Atn
 						}
 
 						c.reachesIntoOuterContext++;
+						if (!closureBusy.Add(c))
+						{
+							// avoid infinite recursion for right-recursive rules
+							continue;
+						}
+
 						configs.dipsIntoOuterContext = true; // TODO: can remove? only care when we add to set per middle of this method
 						newDepth--;
 						if (debug)
 							ConsoleWriteLine("dips into outer ctx: " + c);
 					}
-					else if (t is RuleTransition)
+					else
 					{
-						// latch when newDepth goes negative - once we step out of the entry context we can't return
-						if (newDepth >= 0)
+
+						if (!t.IsEpsilon && !closureBusy.Add(c))
 						{
-							newDepth++;
+							// avoid infinite recursion for EOF* and EOF+
+							continue;
+						}
+						if (t is RuleTransition)
+						{
+							// latch when newDepth goes negative - once we step out of the entry context we can't return
+							if (newDepth >= 0)
+							{
+								newDepth++;
+							}
 						}
 					}
 

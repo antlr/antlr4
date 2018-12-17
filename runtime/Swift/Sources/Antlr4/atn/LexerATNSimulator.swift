@@ -69,7 +69,7 @@ open class LexerATNSimulator: ATNSimulator {
     /// 
     public var charPositionInLine = 0
 
-    public final var decisionToDFA: [DFA]
+    public private(set) final var decisionToDFA: [DFA]
     
     internal var mode = Lexer.DEFAULT_MODE
     
@@ -286,7 +286,7 @@ open class LexerATNSimulator: ATNSimulator {
     /// 
 
     internal func computeTargetState(_ input: CharStream, _ s: DFAState, _ t: Int) throws -> DFAState {
-        let reach = OrderedATNConfigSet()
+        let reach = ATNConfigSet(true, isOrdered: true)
 
         // if we don't find an existing DFA state
         // Fill reach starting from closure, following t transitions
@@ -404,7 +404,7 @@ open class LexerATNSimulator: ATNSimulator {
     final func computeStartState(_ input: CharStream,
         _ p: ATNState) throws -> ATNConfigSet {
             let initialContext = PredictionContext.EMPTY
-            let configs = OrderedATNConfigSet()
+            let configs = ATNConfigSet(true, isOrdered: true)
             let length = p.getNumberOfTransitions()
             for i in 0..<length {
                 let target = p.transition(i).target
@@ -638,7 +638,7 @@ open class LexerATNSimulator: ATNSimulator {
     }
 
 
-    final func addDFAEdge(_ from: DFAState,
+    private final func addDFAEdge(_ from: DFAState,
         _ t: Int,
         _ q: ATNConfigSet) -> DFAState {
             /// 
@@ -665,7 +665,7 @@ open class LexerATNSimulator: ATNSimulator {
             return to
     }
 
-    final func addDFAEdge(_ p: DFAState, _ t: Int, _ q: DFAState) {
+    private final func addDFAEdge(_ p: DFAState, _ t: Int, _ q: DFAState) {
         if t < LexerATNSimulator.MIN_DFA_EDGE || t > LexerATNSimulator.MAX_DFA_EDGE {
             // Only track edges within the DFA bounds
             return
