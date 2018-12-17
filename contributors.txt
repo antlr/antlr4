@@ -190,6 +190,7 @@ YYYY/MM/DD, github id, Full name, email
 2018/02/11, io7m, Mark Raynsford, code@io7m.com
 2018/04/24, solussd, Joe Smith, joe@uwcreations.com
 2018/15/05, johnvanderholt, jan dillingh johnvanderholte@gmail.com
+2018/06/14, scadgek, Sergey Chupov, scadgek@live.com
 2018/06/16, EternalPhane, Zongyuan Zuo, eternalphane@gmail.com
 2018/06/27, wu-sheng, Wu Sheng, wu.sheng@foxmail.com
 2018/02/25, chaseoxide, Marcus Ong, taccs97[at]gmail[dot]com
@@ -202,7 +203,7 @@ YYYY/MM/DD, github id, Full name, email
 2018/06/16, EternalPhane, Zongyuan Zuo, eternalphane@gmail.com
 2018/07/03, jgoppert, James Goppert, james.goppert@gmail.com
 2018/07/27, Maksim Novikov, mnovikov.work@gmail.com
-2018/07/31 Lucas Henrqiue, lucashenrique580@gmail.com
+2018/07/31, Lucas Henrqiue, lucashenrique580@gmail.com
 2018/08/03, ENDOH takanao, djmchl@gmail.com
 2018/10/29, chrisaycock, Christopher Aycock, chris[at]chrisaycock[dot]com
 2018/11/12, vinoski, Steve Vinoski, vinoski@ieee.org
