@@ -9,7 +9,7 @@
 	<parent>
 		<groupId>org.antlr</groupId>
 		<artifactId>antlr4-master</artifactId>
-		<version>4.7.2-SNAPSHOT</version>
+		<version>4.7.2</version>
 	</parent>
 	<artifactId>antlr4</artifactId>
 	<name>ANTLR 4 Tool</name>
