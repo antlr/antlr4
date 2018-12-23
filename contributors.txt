@@ -211,3 +211,4 @@ YYYY/MM/DD, github id, Full name, email
 2018/11/15, amykyta3, Alex Mykyta, amykyta3@users.noreply.github.com
 2018/11/29, hannemann-tamas, Ralf Hannemann-Tamas, ralf.ht@gmail.com
 2018/12/20, WalterCouto, Walter Couto, WalterCouto@users.noreply.github.com
+2018/12/23, youkaichao, Kaichao You, youkaichao@gmail.com
