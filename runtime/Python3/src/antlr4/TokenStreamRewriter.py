@@ -130,7 +130,7 @@ class TokenStreamRewriter(object):
 
         if stop == len(self.tokens.tokens)-1:
             for op in indexToOp.values():
-                if op.index >= len(self.tokens.tokens)-1: buf.write(op.text)
+                if op.index > len(self.tokens.tokens)-1: buf.write(op.text)
 
         return buf.getvalue()
 

@@ -135,7 +135,7 @@ class TokenStreamRewriter(object):
 
         if stop == len(self.tokens.tokens) - 1:
             for op in indexToOp.values():
-                if op.index >= len(self.tokens.tokens) - 1: buf.write(
+                if op.index > len(self.tokens.tokens) - 1: buf.write(
                     op.text)  # TODO: this check is probably not needed
 
         return buf.getvalue()
