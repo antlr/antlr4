@@ -8,6 +8,29 @@ from io import StringIO
 import unittest
 from antlr4.Token import Token
 
+class Interval(object):
+
+    def __init__(self, start, stop):
+        self.start = start
+        self.stop = stop
+        self.range = xrange(start, stop)
+
+    def __contains__(self, item):
+        return item in self.range
+
+    def __len__(self):
+        return self.stop - self.start
+
+    def __iter__(self):
+        return iter(self.range)
+
+    def __getitem__(self, idx):
+        if idx == 0:
+            return self.start
+        elif idx == 1:
+            return self.stop
+        raise IndexError('Interval index out or range [{}]'.format(idx))
+
 # need forward declarations
 IntervalSet = None
 

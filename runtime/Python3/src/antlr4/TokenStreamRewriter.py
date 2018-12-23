@@ -98,7 +98,7 @@ class TokenStreamRewriter(object):
 
     def getText(self, program_name, interval):
         """
-        :type interval: Interval.Interval
+        :type interval: IntervalSet.Interval
         :param program_name:
         :param interval:
         :return:
