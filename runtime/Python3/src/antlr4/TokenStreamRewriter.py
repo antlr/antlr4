@@ -9,6 +9,7 @@ from antlr4.Token import Token
 
 from antlr4.CommonTokenStream import CommonTokenStream
 
+from antlr4.IntervalSet import Interval
 
 class TokenStreamRewriter(object):
     DEFAULT_PROGRAM_NAME = "default"
@@ -96,13 +97,15 @@ class TokenStreamRewriter(object):
     def getProgram(self, program_name):
         return self.programs.setdefault(program_name, [])
 
-    def getText(self, program_name, interval):
+    def getText(self, program_name=None, interval=None):
         """
         :type interval: IntervalSet.Interval
         :param program_name:
         :param interval:
         :return:
         """
+        program_name = program_name or self.DEFAULT_PROGRAM_NAME
+        interval = interval or Interval(0, len(self.tokens.tokens) - 1)
         rewrites = self.programs.get(program_name)
         start = interval.start
         stop = interval.stop
