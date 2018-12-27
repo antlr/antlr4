@@ -85,7 +85,8 @@ class TokenStreamRewriter(object):
     def delete(self, program_name, from_idx, to_idx):
         if isinstance(from_idx, Token):
             self.replace(program_name, from_idx.tokenIndex, to_idx.tokenIndex, None)
-        self.replace(program_name, from_idx, to_idx, None)
+        else:
+            self.replace(program_name, from_idx, to_idx, None)
 
     def lastRewriteTokenIndex(self, program_name=DEFAULT_PROGRAM_NAME):
         return self.lastRewriteTokenIndexes.get(program_name, -1)
