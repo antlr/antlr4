@@ -25,7 +25,7 @@ namespace xpath {
 
     /// Given tree rooted at {@code t} return all nodes matched by this path
     /// element.
-    virtual std::vector<ParseTree *> evaluate(ParseTree *t);
+	virtual std::vector<ParseTree *> evaluate(ParseTree *t) = 0;
     virtual std::string toString() const;
 
     void setInvert(bool value);
