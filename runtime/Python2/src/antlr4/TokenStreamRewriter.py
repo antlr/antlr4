@@ -100,9 +100,9 @@ class TokenStreamRewriter(object):
         return self.programs.setdefault(program_name, [])
 
     def getDefaultText(self):
-        return self.getText(self.DEFAULT_PROGRAM_NAME, Interval(0, len(self.tokens.tokens)))
+        return self.getText(self.DEFAULT_PROGRAM_NAME, 0, len(self.tokens.tokens))
 
-    def getText(self, program_name, interval):
+    def getText(self, program_name, start, stop):
         """
         :type interval: Interval.Interval
         :param program_name:
@@ -110,15 +110,15 @@ class TokenStreamRewriter(object):
         :return:
         """
         rewrites = self.programs.get(program_name)
-        start = interval.start
-        stop = interval.stop
 
         # ensure start/end are in range
-        if stop > len(self.tokens.tokens) - 1: stop = len(self.tokens.tokens) - 1
-        if start < 0: start = 0
+        if stop > len(self.tokens.tokens) - 1:
+            stop = len(self.tokens.tokens) - 1
+        if start < 0:
+            start = 0
 
         # if no instructions to execute
-        if not rewrites: return self.tokens.getText(interval)
+        if not rewrites: return self.tokens.getText(start, stop)
         buf = StringIO()
         indexToOp = self._reduceToSingleOperationPerIndex(rewrites)
         i = start

@@ -46,7 +46,7 @@ class DiagnosticErrorListener(ErrorListener):
             buf.write(": ambigAlts=")
             buf.write(str(self.getConflictingAlts(ambigAlts, configs)))
             buf.write(", input='")
-            buf.write(recognizer.getTokenStream().getText((startIndex, stopIndex)))
+            buf.write(recognizer.getTokenStream().getText(startIndex, stopIndex))
             buf.write("'")
             recognizer.notifyErrorListeners(buf.getvalue())
 
@@ -57,7 +57,7 @@ class DiagnosticErrorListener(ErrorListener):
             buf.write("reportAttemptingFullContext d=")
             buf.write(self.getDecisionDescription(recognizer, dfa))
             buf.write(", input='")
-            buf.write(recognizer.getTokenStream().getText((startIndex, stopIndex)))
+            buf.write(recognizer.getTokenStream().getText(startIndex, stopIndex))
             buf.write("'")
             recognizer.notifyErrorListeners(buf.getvalue())
 
@@ -67,7 +67,7 @@ class DiagnosticErrorListener(ErrorListener):
             buf.write("reportContextSensitivity d=")
             buf.write(self.getDecisionDescription(recognizer, dfa))
             buf.write(", input='")
-            buf.write(recognizer.getTokenStream().getText((startIndex, stopIndex)))
+            buf.write(recognizer.getTokenStream().getText(startIndex, stopIndex))
             buf.write("'")
             recognizer.notifyErrorListeners(buf.getvalue())
 
