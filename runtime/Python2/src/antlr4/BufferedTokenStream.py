@@ -285,7 +285,7 @@ class BufferedTokenStream(TokenStream):
         elif stop is None or stop >= len(self.tokens):
             stop = len(self.tokens) - 1
         if start < 0 or stop < 0 or stop<start:
-            return ""
+            return u""
         with StringIO() as buf:
             for i in xrange(start, stop+1):
                 t = self.tokens[i]
