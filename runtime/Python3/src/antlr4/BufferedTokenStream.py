@@ -275,14 +275,14 @@ class BufferedTokenStream(TokenStream):
     def getText(self, start:int=None, stop:int=None):
         self.lazyInit()
         self.fill()
-        if start is None:
-            start = 0
-        elif isinstance(start, Token):
+        if isinstance(start, Token):
             start = start.tokenIndex
-        if stop is None or stop >= len(self.tokens):
-            stop = len(self.tokens) - 1
-        elif isinstance(stop, Token):
+        elif start is None:
+            start = 0
+        if isinstance(stop, Token):
             stop = stop.tokenIndex
+        elif stop is None or stop >= len(self.tokens):
+            stop = len(self.tokens) - 1
         if start < 0 or stop < 0 or stop < start:
             return ""
         with StringIO() as buf:
