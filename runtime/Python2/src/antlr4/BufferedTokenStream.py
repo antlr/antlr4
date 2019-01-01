@@ -269,35 +269,31 @@ class BufferedTokenStream(TokenStream):
     def getSourceName(self):
         return self.tokenSource.getSourceName()
 
-    def getText(self, interval=None):
+    def getText(self, start=None, stop=None):
         """
         Get the text of all tokens in this buffer.
-
-        :param interval:
-        :type interval: antlr4.IntervalSet.Interval
         :return: string
         """
         self.lazyInit()
         self.fill()
-        if interval is None:
-            interval = (0, len(self.tokens)-1)
-        start = interval[0]
-        if isinstance(start, Token):
+        if start is None:
+            start = 0
+        elif isinstance(start, Token):
             start = start.tokenIndex
-        stop = interval[1]
-        if isinstance(stop, Token):
+        if stop is None or stop >= len(self.tokens):
+            stop = len(self.tokens) - 1
+        elif isinstance(stop, Token):
             stop = stop.tokenIndex
-        if start is None or stop is None or start<0 or stop<0:
+        if start < 0 or stop < 0 or stop<start:
             return ""
-        if stop >= len(self.tokens):
-            stop = len(self.tokens)-1
         with StringIO() as buf:
-            for i in range(start, stop+1):
+            for i in xrange(start, stop+1):
                 t = self.tokens[i]
                 if t.type==Token.EOF:
                     break
                 buf.write(t.text)
             return buf.getvalue()
+
 
     def fill(self):
         """

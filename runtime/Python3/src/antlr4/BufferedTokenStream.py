@@ -272,21 +272,19 @@ class BufferedTokenStream(TokenStream):
         return self.tokenSource.getSourceName()
 
     # Get the text of all tokens in this buffer.#/
-    def getText(self, interval:tuple=None):
+    def getText(self, start:int=None, stop:int=None):
         self.lazyInit()
         self.fill()
-        if interval is None:
-            interval = (0, len(self.tokens)-1)
-        start = interval[0]
-        if isinstance(start, Token):
+        if start is None:
+            start = 0
+        elif isinstance(start, Token):
             start = start.tokenIndex
-        stop = interval[1]
-        if isinstance(stop, Token):
+        if stop is None or stop >= len(self.tokens):
+            stop = len(self.tokens) - 1
+        elif isinstance(stop, Token):
             stop = stop.tokenIndex
-        if start is None or stop is None or start<0 or stop<0:
+        if start < 0 or stop < 0 or stop < start:
             return ""
-        if stop >= len(self.tokens):
-            stop = len(self.tokens)-1
         with StringIO() as buf:
             for i in range(start, stop+1):
                 t = self.tokens[i]

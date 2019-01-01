@@ -96,23 +96,20 @@ class TokenStreamRewriter(object):
     def getProgram(self, program_name):
         return self.programs.setdefault(program_name, [])
 
-    def getText(self, program_name, interval):
+    def getText(self, program_name, start:int, stop:int):
         """
-        :type interval: Interval.Interval
-        :param program_name:
-        :param interval:
         :return:
         """
         rewrites = self.programs.get(program_name)
-        start = interval.start
-        stop = interval.stop
 
         # ensure start/end are in range
-        if stop > len(self.tokens.tokens) - 1: stop = len(self.tokens.tokens) - 1
-        if start < 0: start = 0
+        if stop > len(self.tokens.tokens) - 1:
+            stop = len(self.tokens.tokens) - 1
+        if start < 0:
+            start = 0
 
         # if no instructions to execute
-        if not rewrites: return self.tokens.getText(interval)
+        if not rewrites: return self.tokens.getText(start, stop)
         buf = StringIO()
         indexToOp = self._reduceToSingleOperationPerIndex(rewrites)
         i = start
@@ -149,12 +146,12 @@ class TokenStreamRewriter(object):
             prevReplaces = [op for op in rewrites[:i] if isinstance(op, TokenStreamRewriter.ReplaceOp)]
             for prevRop in prevReplaces:
                 if all((prevRop.index >= rop.index, prevRop.last_index <= rop.last_index)):
-                    rewrites[prevRop.instructioIndex] = None
+                    rewrites[prevRop.instructionIndex] = None
                     continue
                 isDisjoint = any((prevRop.last_index<rop.index, prevRop.index>rop))
                 isSame = all((prevRop.index == rop.index, prevRop.last_index == rop.last_index))
                 if all((prevRop.text is None, rop.text is None, not isDisjoint)):
-                    rewrites[prevRop.instructioIndex] = None
+                    rewrites[prevRop.instructionIndex] = None
                     rop.index = min(prevRop.index, rop.index)
                     rop.last_index = min(prevRop.last_index, rop.last_index)
                     print('New rop {}'.format(rop))
