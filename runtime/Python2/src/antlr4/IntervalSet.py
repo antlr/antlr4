@@ -24,12 +24,6 @@ class Interval(object):
     def __iter__(self):
         return iter(self.range)
 
-    def __getitem__(self, idx):
-        if idx == 0:
-            return self.start
-        elif idx == 1:
-            return self.stop
-        raise IndexError('Interval index out or range [{}]'.format(idx))
 
 class IntervalSet(object):
 
