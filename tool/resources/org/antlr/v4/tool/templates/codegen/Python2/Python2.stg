@@ -517,9 +517,8 @@ if not <chunks>:
 >>
 
 ExceptionClause(e, catchArg, catchAction) ::= <<
-catch (<catchArg>) {
+except <catchArg>:
     <catchAction>
-}
 >>
 
 // lexer actions are not associated with model objects
