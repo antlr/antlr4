@@ -703,19 +703,16 @@ namespace atn {
     size_t getSynValidOrSemInvalidAltThatFinishedDecisionEntryRule(ATNConfigSet *configs,
                                                                    ParserRuleContext *outerContext);
 
-    virtual size_t getAltThatFinishedDecisionEntryRule(ATNConfigSet *configs);
-
     /** Walk the list of configurations and split them according to
      *  those that have preds evaluating to true/false.  If no pred, assume
-     *  true pred and include in succeeded set.  Returns Pair of sets.
-     *
-     *  Create a new set so as not to alter the incoming parameter.
+     *  true pred and include in succeeded set.  Returns Pair of alt that
+     *  finished decision entry rule.
      *
      *  Assumption: the input stream has been restored to the starting point
      *  prediction, which is where predicates need to evaluate.
      */
-    std::pair<ATNConfigSet *, ATNConfigSet *> splitAccordingToSemanticValidity(ATNConfigSet *configs,
-                                                                               ParserRuleContext *outerContext);
+    std::pair<size_t, size_t> splitAccordingToSemanticValidity(ATNConfigSet *configs,
+                                                               ParserRuleContext *outerContext);
 
     /// <summary>
     /// Look through a list of predicate/alt pairs, returning alts for the
