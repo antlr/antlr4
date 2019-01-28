@@ -1111,7 +1111,7 @@ public class TestPerformance extends BaseJavaToolTest {
 			}
 		}
 		extraOptions.add("-visitor");
-        String[] extraOptionsArray = extraOptions.toArray(new String[extraOptions.size()]);
+        String[] extraOptionsArray = extraOptions.toArray(new String[0]);
         boolean success = rawGenerateAndBuildRecognizer(grammarFileName, body, parserName, lexerName, true, extraOptionsArray);
         assertTrue(success);
     }
