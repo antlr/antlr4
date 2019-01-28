@@ -33,9 +33,9 @@ public class SerializedATN extends OutputModelObject {
 		int segmentLimit = factory.getGenerator().getTarget().getSerializedATNSegmentLimit();
 		for (int i = 0; i < serialized.size(); i += segmentLimit) {
 			List<String> currentSegment = serialized.subList(i, Math.min(i + segmentLimit, serialized.size()));
-			segments.add(currentSegment.toArray(new String[currentSegment.size()]));
+			segments.add(currentSegment.toArray(new String[0]));
 		}
 
-		return segments.toArray(new String[segments.size()][]);
+		return segments.toArray(new String[0][]);
 	}
 }

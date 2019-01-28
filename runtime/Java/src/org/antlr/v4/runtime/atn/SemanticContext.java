@@ -219,7 +219,7 @@ public abstract class SemanticContext {
 				operands.add(reduced);
 			}
 
-			opnds = operands.toArray(new SemanticContext[operands.size()]);
+			opnds = operands.toArray(new SemanticContext[0]);
         }
 
 		@Override
@@ -316,7 +316,7 @@ public abstract class SemanticContext {
 				operands.add(reduced);
 			}
 
-			this.opnds = operands.toArray(new SemanticContext[operands.size()]);
+			this.opnds = operands.toArray(new SemanticContext[0]);
         }
 
 		@Override

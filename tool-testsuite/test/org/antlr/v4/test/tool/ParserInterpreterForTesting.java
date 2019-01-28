@@ -43,7 +43,7 @@ public class ParserInterpreterForTesting {
 
 		@Override
 		public String[] getRuleNames() {
-			return g.rules.keySet().toArray(new String[g.rules.size()]);
+			return g.rules.keySet().toArray(new String[0]);
 		}
 
 		@Override

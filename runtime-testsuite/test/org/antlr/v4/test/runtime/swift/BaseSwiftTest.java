@@ -366,6 +366,6 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 				files.add(grammarName + "BaseVisitor.swift");
 			}
 		}
-		addSourceFiles(files.toArray(new String[files.size()]));
+		addSourceFiles(files.toArray(new String[0]));
 	}
 }

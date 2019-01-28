@@ -50,7 +50,7 @@ public class TestSetInline extends SrcOp {
 			current.ttypes.add(factory.getGenerator().getTarget().getTokenTypeAsTargetLabel(factory.getGrammar(), ttype));
 		}
 
-		return bitsetList.toArray(new Bitset[bitsetList.size()]);
+		return bitsetList.toArray(new Bitset[0]);
 	}
 
 	public static final class Bitset {
