@@ -70,7 +70,8 @@ namespace atn {
   ///
   /// <embed src="images/OptionalNonGreedy.svg" type="image/svg+xml"/>
   /// </summary>
-  class ANTLR4CPP_PUBLIC ATN;
+  //ATN forward declaration does not need ANTLR4CPP_PUBLIC declaration
+  class  ATN;
 
   class ANTLR4CPP_PUBLIC ATNState {
   public:
