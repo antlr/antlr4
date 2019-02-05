@@ -147,7 +147,7 @@ public abstract class ATNState {
 	}
 
 	public Transition[] getTransitions() {
-		return transitions.toArray(new Transition[transitions.size()]);
+		return transitions.toArray(new Transition[0]);
 	}
 
 	public int getNumberOfTransitions() {

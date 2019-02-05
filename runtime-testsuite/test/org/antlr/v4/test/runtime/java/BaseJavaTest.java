@@ -620,7 +620,7 @@ public class BaseJavaTest implements RuntimeTestSupport {
 				files.add(grammarName+"BaseVisitor.java");
 			}
 		}
-		boolean allIsWell = compile(files.toArray(new String[files.size()]));
+		boolean allIsWell = compile(files.toArray(new String[0]));
 		return allIsWell;
 	}
 

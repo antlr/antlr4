@@ -198,7 +198,7 @@ public class RuleFunction extends OutputModelObject {
 				}
 			}
 
-			for (String ref : nonOptional.toArray(new String[nonOptional.size()])) {
+			for (String ref : nonOptional.toArray(new String[0])) {
 				if (minFreq.count(ref) == 0) {
 					nonOptional.remove(ref);
 				}
