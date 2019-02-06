@@ -40,6 +40,18 @@ javaTypeInitMap ::= [
 	default:"null" // anything other than a primitive type is an object
 ]
 
+javaBoxedTypeMap ::= [
+	"int": "Integer",
+	"long": "Long",
+	"float": "Float",
+	"double": "Double",
+	"boolean": "Boolean",
+	"byte": "Byte",
+	"short": "Short",
+	"char": "Char",
+	default: key
+]
+
 // args must be <object-model-object>, <fields-resulting-in-STs>
 
 ParserFile(file, parser, namedActions, contextSuperClass) ::= <<
@@ -394,7 +406,16 @@ protected ParserRuleContext createContext(int ruleIndex, ParserRuleContext paren
 	switch (ruleIndex) {
 <rules:{rule|
 	case RULE_<rule.name>:
+<if(rule.args)>
+		if (arguments != null && arguments.length > 0) {
+			return new <rule.name; format="cap">Context(parent, invokingState<rule.args.attributes.values:
+{attr|, (<javaBoxedTypeMap.(attr.type)>)Utils.getArgumentOrDefault(arguments, <i0>, (<attr.type>)<attr.initValue; null={<initValue(attr.type)>}>)}>);
+		\} else {
+			return new <rule.name; format="cap">Context(parent, invokingState);
+		\}
+<else>
 		return new <rule.name; format="cap">Context(parent, invokingState);
+<endif>
 }>
 	default:
 		return super.createContext(ruleIndex, parent, invokingState, arguments);
