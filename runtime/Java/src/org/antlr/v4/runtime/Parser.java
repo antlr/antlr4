@@ -249,6 +249,15 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 		return t;
 	}
 
+	protected ParserRuleContext createContext(int ruleIndex, int altIndex, ParserRuleContext parent, int invokingState, Object... arguments) {
+		InterpreterRuleContext context = new InterpreterRuleContext(parent, invokingState, ruleIndex);
+		if (altIndex > 0) {
+			context.setAltNumber(altIndex);
+		}
+
+		return context;
+	}
+
 	/**
 	 * Track the {@link ParserRuleContext} objects during the parse and hook
 	 * them up using the {@link ParserRuleContext#children} list so that it
