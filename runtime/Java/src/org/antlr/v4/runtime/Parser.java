@@ -250,12 +250,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 	}
 
 	protected ParserRuleContext createContext(int ruleIndex, int altIndex, ParserRuleContext parent, int invokingState, Object... arguments) {
-		InterpreterRuleContext context = new InterpreterRuleContext(parent, invokingState, ruleIndex);
-		if (altIndex > 0) {
-			context.setAltNumber(altIndex);
-		}
-
-		return context;
+		return new InterpreterRuleContext(parent, invokingState, ruleIndex);
 	}
 
 	/**

@@ -823,6 +823,11 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 				break;
 			}
 
+			if (atn.ruleToStartState[p.ruleIndex].transition(0).target == p) {
+				// Error recovery always uses the first alternative for rules
+				context.setAltNumber(1);
+			}
+
 			Transition transition = p.transition(edge);
 			if (transition.getSerializationType() == Transition.RULE) {
 				RuleTransition ruleTransition = (RuleTransition)transition;
