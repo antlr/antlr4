@@ -390,27 +390,35 @@ case <index>:
 
 ruleContextFactoryFunction(rules) ::= <<
 @Override
-protected ParserRuleContext createContext(int ruleIndex, int altIndex, ParserRuleContext parent, int invokingState, Object... arguments) {
+protected ParserRuleContext createContext(int ruleIndex, ParserRuleContext parent, int invokingState, Object... arguments) {
 	switch (ruleIndex) {
 <rules:{rule|
 	case RULE_<rule.name>:
+		return new <rule.name; format="cap">Context(parent, invokingState);
+}>
+	default:
+		return super.createContext(ruleIndex, parent, invokingState, arguments);
+	}
+}
+
+@Override
+protected ParserRuleContext createAltContext(int ruleIndex, int altIndex, ParserRuleContext ruleContext) {
+	switch (ruleIndex) {
+<rules:{rule|
 <if(rule.altSpecificContexts)>
+	case RULE_<rule.name>:
 		switch (altIndex) {
-		case 0:
-			return new <rule.name; format="cap">Context(parent, invokingState);
 <rule.altLabels:{alt|
 		case <i>:
-			return new <alt; format="cap">Context(new <rule.name; format="cap">Context(parent, invokingState));
+			return new <alt; format="cap">Context((<rule.name; format="cap">Context)ruleContext);
 }>
 		default:
-			return super.createContext(ruleIndex, altIndex, parent, invokingState, arguments);
+			return ruleContext;
 		\}
-<else>
-		return new <rule.name; format="cap">Context(parent, invokingState);
 <endif>
 }>
 	default:
-		return super.createContext(ruleIndex, altIndex, parent, invokingState, arguments);
+		return ruleContext;
 	}
 }
 >>

@@ -818,6 +818,14 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 
 				break;
 
+			case ATNState.BLOCK_START:
+				if (atn.ruleToStartState[p.ruleIndex].transition(0).target == p) {
+					context = recognizer.createAltContext(p.ruleIndex, 1, context);
+				}
+
+				edge = 0;
+				break;
+
 			default:
 				edge = 0;
 				break;
@@ -832,7 +840,7 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 			if (transition.getSerializationType() == Transition.RULE) {
 				RuleTransition ruleTransition = (RuleTransition)transition;
 				returnStateStack.push(ruleTransition.followState.stateNumber);
-				context = recognizer.createContext(ruleTransition.target.ruleIndex, 1, context, state);
+				context = recognizer.createContext(ruleTransition.target.ruleIndex, context, state);
 				state = ruleTransition.target.stateNumber;
 			}
 			else if (transition.isEpsilon()) {

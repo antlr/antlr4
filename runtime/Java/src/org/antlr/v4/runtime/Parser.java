@@ -249,8 +249,12 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 		return t;
 	}
 
-	protected ParserRuleContext createContext(int ruleIndex, int altIndex, ParserRuleContext parent, int invokingState, Object... arguments) {
+	protected ParserRuleContext createContext(int ruleIndex, ParserRuleContext parent, int invokingState, Object... arguments) {
 		return new InterpreterRuleContext(parent, invokingState, ruleIndex);
+	}
+
+	protected ParserRuleContext createAltContext(int ruleIndex, int altIndex, ParserRuleContext ruleContext) {
+		return ruleContext;
 	}
 
 	/**
