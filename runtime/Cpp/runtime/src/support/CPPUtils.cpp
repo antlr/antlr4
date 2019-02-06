@@ -51,14 +51,16 @@ namespace antlrcpp {
           }
           // else fall through
 #ifndef _MSC_VER
-#if __has_cpp_attribute(clang::fallthrough)
-          [[clang::fallthrough]];
-#endif
-          // gcc fall through
+#if (__cplusplus >= 201703L) || (__GNUC__)
 #if __has_cpp_attribute(fallthrough)
         [[fallthrough]];
 #endif
+#else //#if (__cplusplus >= 201703L) || (__GNUC__)
+#if __has_cpp_attribute(clang::fallthrough)
+          [[clang::fallthrough]];
 #endif
+#endif //#if (__cplusplus >= 201703L) || (__GNUC__)
+#endif //#ifndef _MSC_VER
         default:
           result += c;
       }
