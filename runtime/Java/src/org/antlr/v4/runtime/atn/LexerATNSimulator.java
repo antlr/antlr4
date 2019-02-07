@@ -70,7 +70,6 @@ public class LexerATNSimulator extends ATNSimulator {
 	/** The index of the character relative to the beginning of the line 0..n-1 */
 	protected int charPositionInLine = 0;
 
-
 	public final DFA[] decisionToDFA;
 	protected int mode = Lexer.DEFAULT_MODE;
 
@@ -735,8 +734,13 @@ public class LexerATNSimulator extends ATNSimulator {
 		if ( curChar=='\n' ) {
 			line++;
 			charPositionInLine=0;
-		}
-		else {
+		} else if ( curChar == '\r' ) {
+			int nextChar = input.LA(2);
+			if ( nextChar != '\n') {
+				line++;
+				charPositionInLine=0;
+			}
+		} else {
 			charPositionInLine++;
 		}
 		input.consume();
