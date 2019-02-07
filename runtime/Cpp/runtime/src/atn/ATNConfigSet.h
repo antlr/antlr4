@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <iostream>
 #include "support/BitSet.h"
 #include "atn/PredictionContext.h"
 
@@ -85,6 +86,8 @@ namespace atn {
     virtual bool isReadonly();
     virtual void setReadonly(bool readonly);
     virtual std::string toString();
+
+    friend std::ostream& operator<<(std::ostream& os, const ATNConfigSet& cs);
 
   protected:
     /// Indicates that the set of configurations is read-only. Do not

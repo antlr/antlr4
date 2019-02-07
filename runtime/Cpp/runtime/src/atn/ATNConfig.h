@@ -34,6 +34,8 @@ namespace atn {
 
     using Set = std::unordered_set<Ref<ATNConfig>, Hasher, Comparer>;
 
+    friend std::ostream& operator<<(std::ostream& os, const ATNConfig::Set& dt);
+
     /// The ATN state associated with this configuration.
     ATNState * state;
 

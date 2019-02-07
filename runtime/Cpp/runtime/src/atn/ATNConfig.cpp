@@ -49,6 +49,12 @@ ATNConfig::ATNConfig(Ref<ATNConfig> const& c, ATNState *state, Ref<PredictionCon
 ATNConfig::~ATNConfig() {
 }
 
+std::ostream& operator<<(std::ostream& os, const ATNConfig::Set& dt)
+{  
+  os << "unordered set ";
+  return os;  
+}  
+
 size_t ATNConfig::hashCode() const {
   size_t hashCode = misc::MurmurHash::initialize(7);
   hashCode = misc::MurmurHash::update(hashCode, state->stateNumber);

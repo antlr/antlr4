@@ -72,8 +72,11 @@ namespace antlrcpp {
 
   std::string arrayToString(const std::vector<std::string> &data) {
     std::string answer;
+
+    std::string delimiter = "";
     for (auto sub: data) {
-      answer += sub;
+      answer += delimiter + sub;
+      delimiter = ", ";
     }
     return answer;
   }

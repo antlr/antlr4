@@ -30,6 +30,12 @@ ATNConfigSet::ATNConfigSet(const Ref<ATNConfigSet> &old) : ATNConfigSet(old->ful
 ATNConfigSet::~ATNConfigSet() {
 }
 
+std::ostream& operator<<(std::ostream& os, const ATNConfigSet& dt)
+{  
+  os << "config set";
+  return os;
+}  
+
 bool ATNConfigSet::add(const Ref<ATNConfig> &config) {
   return add(config, nullptr);
 }

@@ -35,14 +35,33 @@ std::string Trees::toStringTree(ParseTree *t, Parser *recog) {
   return toStringTree(t, recog->getRuleNames());
 }
 
+std::string
+indentationString(const size_t aCount)
+{
+  std::stringstream			indentString;
+
+  if(aCount > 0)
+  {
+    indentString << std::endl;
+    for(size_t i = 0; i < aCount; ++i)
+      indentString << "    ";
+  }
+  return indentString.str();
+}
+
 std::string Trees::toStringTree(ParseTree *t, const std::vector<std::string> &ruleNames) {
   std::string temp = antlrcpp::escapeWhitespace(Trees::getNodeText(t, ruleNames), false);
   if (t->children.empty()) {
     return temp;
   }
 
+  size_t				indentationLevel = 1;
+  std::string			iString;
+
   std::stringstream ss;
-  ss << "(" << temp << ' ';
+
+  iString = indentationString(indentationLevel);
+  ss << "(" << temp << " ";
 
   // Implement the recursive walk as iteration to avoid trouble with deep nesting.
   std::stack<size_t> stack;
@@ -50,7 +69,7 @@ std::string Trees::toStringTree(ParseTree *t, const std::vector<std::string> &ru
   ParseTree *run = t;
   while (childIndex < run->children.size()) {
     if (childIndex > 0) {
-      ss << ' ';
+      ss << indentationString(indentationLevel);
     }
     ParseTree *child = run->children[childIndex];
     temp = antlrcpp::escapeWhitespace(Trees::getNodeText(child, ruleNames), false);
@@ -59,7 +78,7 @@ std::string Trees::toStringTree(ParseTree *t, const std::vector<std::string> &ru
       stack.push(childIndex);
       run = child;
       childIndex = 0;
-      ss << "(" << temp << " ";
+      ss << indentationString(++indentationLevel) << "(" << temp << " ";
     } else {
       ss << temp;
       while (++childIndex == run->children.size()) {
@@ -68,7 +87,7 @@ std::string Trees::toStringTree(ParseTree *t, const std::vector<std::string> &ru
           childIndex = stack.top();
           stack.pop();
           run = run->parent;
-          ss << ")";
+          ss << ")" << indentationString(--indentationLevel);
         } else {
           break;
         }
