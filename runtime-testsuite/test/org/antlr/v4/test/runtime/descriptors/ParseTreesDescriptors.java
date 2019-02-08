@@ -118,7 +118,7 @@ public class ParseTreesDescriptors {
 
 	public static class NoViableAlt extends BaseParserTestDescriptor {
 		public String input = "z";
-		public String output = "(a z)\n";
+		public String output = "(a <missing 'x'> z)\n";
 		public String errors = "line 1:0 mismatched input 'z' expecting {'x', 'y'}\n";
 		public String startRule = "s";
 		public String grammarName = "T";
@@ -142,6 +142,10 @@ public class ParseTreesDescriptors {
 		@CommentHasStringValue
 		public String grammar;
 
+		@Override
+		public boolean ignore(String targetName) {
+			return !targetName.matches("Java");
+		}
 	}
 
 	public static class RuleRef extends BaseParserTestDescriptor {
