@@ -1297,65 +1297,51 @@ public class ParserATNSimulator extends ATNSimulator {
 	protected int getSynValidOrSemInvalidAltThatFinishedDecisionEntryRule(ATNConfigSet configs,
 																		  ParserRuleContext outerContext)
 	{
-		Pair<ATNConfigSet,ATNConfigSet> sets =
-			splitAccordingToSemanticValidity(configs, outerContext);
-		ATNConfigSet semValidConfigs = sets.a;
-		ATNConfigSet semInvalidConfigs = sets.b;
-		int alt = getAltThatFinishedDecisionEntryRule(semValidConfigs);
-		if ( alt!=ATN.INVALID_ALT_NUMBER ) { // semantically/syntactically viable path exists
-			return alt;
-		}
-		// Is there a syntactically valid path with a failed pred?
-		if ( semInvalidConfigs.size()>0 ) {
-			alt = getAltThatFinishedDecisionEntryRule(semInvalidConfigs);
-			if ( alt!=ATN.INVALID_ALT_NUMBER ) { // syntactically viable path exists
-				return alt;
-			}
-		}
-		return ATN.INVALID_ALT_NUMBER;
-	}
-
-	protected int getAltThatFinishedDecisionEntryRule(ATNConfigSet configs) {
-		IntervalSet alts = new IntervalSet();
+		// The minimum alternative that finished the decision entry rule and is
+		// valid according to semantic predicates.
+		int minAltSucceeded = Integer.MAX_VALUE;
+		// The minimum alternative that finished the decision entry rule but is
+		// not valid according to semantic predicates. Only considered if
+		// minAltSucceeded does not produce an alternative.
+		int minAltFailed = Integer.MAX_VALUE;
 		for (ATNConfig c : configs) {
-			if ( c.getOuterContextDepth()>0 || (c.state instanceof RuleStopState && c.context.hasEmptyPath()) ) {
-				alts.add(c.alt);
+			if (c.alt >= minAltSucceeded) {
+				// This alternative is no better than our current best
+				continue;
 			}
-		}
-		if ( alts.size()==0 ) return ATN.INVALID_ALT_NUMBER;
-		return alts.getMinElement();
-	}
 
-	/** Walk the list of configurations and split them according to
-	 *  those that have preds evaluating to true/false.  If no pred, assume
-	 *  true pred and include in succeeded set.  Returns Pair of sets.
-	 *
-	 *  Create a new set so as not to alter the incoming parameter.
-	 *
-	 *  Assumption: the input stream has been restored to the starting point
-	 *  prediction, which is where predicates need to evaluate.
- 	 */
-	protected Pair<ATNConfigSet,ATNConfigSet> splitAccordingToSemanticValidity(
-		ATNConfigSet configs,
-		ParserRuleContext outerContext)
-	{
-		ATNConfigSet succeeded = new ATNConfigSet(configs.fullCtx);
-		ATNConfigSet failed = new ATNConfigSet(configs.fullCtx);
-		for (ATNConfig c : configs) {
+			if (c.getOuterContextDepth() == 0 && !(c.state instanceof RuleStopState && c.context.hasEmptyPath())) {
+				// This configuration did not finish the decision entry rule
+				continue;
+			}
+
 			if ( c.semanticContext!=SemanticContext.NONE ) {
 				boolean predicateEvaluationResult = evalSemanticContext(c.semanticContext, outerContext, c.alt, configs.fullCtx);
 				if ( predicateEvaluationResult ) {
-					succeeded.add(c);
+					minAltSucceeded = Math.min(minAltSucceeded, c.alt);
 				}
 				else {
-					failed.add(c);
+					minAltFailed = Math.min(minAltFailed, c.alt);
 				}
 			}
 			else {
-				succeeded.add(c);
+				minAltSucceeded = Math.min(minAltSucceeded, c.alt);
 			}
 		}
-		return new Pair<ATNConfigSet, ATNConfigSet>(succeeded,failed);
+
+		if (minAltSucceeded != Integer.MAX_VALUE) {
+			// A syntactically and semantically valid path to the end of the
+			// decision entry rule was found.
+			return minAltSucceeded;
+		}
+		else if (minAltFailed != Integer.MAX_VALUE) {
+			// A syntactically valid path to the end of the decision entry rule
+			// was found.
+			return minAltFailed;
+		}
+		else {
+			return ATN.INVALID_ALT_NUMBER;
+		}
 	}
 
 	/** Look through a list of predicate/alt pairs, returning alts for the
