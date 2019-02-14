@@ -104,7 +104,7 @@ DFA.prototype.setPrecedenceStartState = function(precedence, startState) {
 
 DFA.prototype.setPrecedenceDfa = function(precedenceDfa) {
 	if (this.precedenceDfa!==precedenceDfa) {
-		this._states = new DFAStatesSet();
+		this._states = new Set();
 		if (precedenceDfa) {
 			var precedenceState = new DFAState(null, new ATNConfigSet());
 			precedenceState.edges = [];
