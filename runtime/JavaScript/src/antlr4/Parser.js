@@ -309,8 +309,7 @@ Parser.prototype.compileParseTreePattern = function(pattern, patternRuleIndex, l
 	if (lexer === null) {
 		throw "Parser can't discover a lexer to use";
 	}
-	var m = new ParseTreePatternMatcher(lexer, this);
-	return m.compile(pattern, patternRuleIndex);
+	throw new Error('Unsupported operation compileParseTreePattern.');
 };
 
 Parser.prototype.getInputStream = function() {
