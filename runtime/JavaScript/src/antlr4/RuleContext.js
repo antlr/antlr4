@@ -27,7 +27,7 @@
 
 var RuleNode = require('./tree/Tree').RuleNode;
 var INVALID_INTERVAL = require('./tree/Tree').INVALID_INTERVAL;
-var INVALID_ALT_NUMBER = require('./atn/ATN').INVALID_ALT_NUMBER;
+var INVALID_ALT_NUMBER = require('./atn/ATN').ATN.INVALID_ALT_NUMBER;
 
 function RuleContext(parent, invokingState) {
 	RuleNode.call(this);
