@@ -255,6 +255,7 @@ var PredictionContext = require('./../PredictionContext').PredictionContext;
 var Interval = require('./../IntervalSet').Interval;
 var Transitions = require('./Transition');
 var Transition = Transitions.Transition;
+var AtomTransition = Transitions.AtomTransition;
 var SetTransition = Transitions.SetTransition;
 var NotSetTransition = Transitions.NotSetTransition;
 var RuleTransition = Transitions.RuleTransition;
