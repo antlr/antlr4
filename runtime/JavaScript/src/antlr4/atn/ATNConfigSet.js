@@ -183,7 +183,7 @@ ATNConfigSet.prototype.hashCode = function() {
 ATNConfigSet.prototype.updateHashCode = function(hash) {
 	if (this.readOnly) {
 		if (this.cachedHashCode === -1) {
-            var hash = new Hash();
+            hash = new Hash();
             hash.update(this.configs);
 			this.cachedHashCode = hash.finish();
 		}
