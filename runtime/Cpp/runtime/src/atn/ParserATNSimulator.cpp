@@ -728,7 +728,7 @@ size_t ParserATNSimulator::getSynValidOrSemInvalidAltThatFinishedDecisionEntryRu
   return sets.second;
 }
 
-inline static void addAlts(misc::IntervalSet &alts, const Ref<ATNConfig> &c) {
+inline static void addAlt(misc::IntervalSet &alts, const Ref<ATNConfig> &c) {
     if (c->getOuterContextDepth() > 0 || (is<RuleStopState *>(c->state) && c->context->hasEmptyPath())) {
       alts.add(c->alt);
     }
@@ -737,24 +737,31 @@ inline static void addAlts(misc::IntervalSet &alts, const Ref<ATNConfig> &c) {
 std::pair<size_t, size_t> ParserATNSimulator::splitAccordingToSemanticValidity(ATNConfigSet *configs,
   ParserRuleContext *outerContext) {
 
-  misc::IntervalSet succAlts, failAlts;
+  misc::IntervalSet succAlts;
+  misc::IntervalSet failAlts;
   
   for (Ref<ATNConfig> &c : configs->configs) {
     if (c->semanticContext != SemanticContext::NONE) {
       bool predicateEvaluationResult = evalSemanticContext(c->semanticContext, outerContext, c->alt, configs->fullCtx);
       if (predicateEvaluationResult) {
-        addAlts(succAlts, c);
+        addAlt(succAlts, c);
       } else {
-        addAlts(failAlts, c);
+        addAlt(failAlts, c);
       }
     } else {
-      addAlts(succAlts, c);
+      addAlt(succAlts, c);
     }
   }
   
-  size_t succeeded = antlr4::atn::ATN::INVALID_ALT_NUMBER, failed = antlr4::atn::ATN::INVALID_ALT_NUMBER;
-  if (succAlts.size()) succeeded = succAlts.getMinElement();
-  if (failAlts.size()) failed = failAlts.getMinElement();
+  size_t succeeded = antlr4::atn::ATN::INVALID_ALT_NUMBER;
+  size_t failed = antlr4::atn::ATN::INVALID_ALT_NUMBER;
+  if (succAlts.size()) {
+    succeeded = succAlts.getMinElement();
+  }
+  if (failAlts.size()) {
+    failed = failAlts.getMinElement();
+  }
+  
   return { succeeded, failed };
 }
 
