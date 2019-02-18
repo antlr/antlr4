@@ -212,4 +212,5 @@ YYYY/MM/DD, github id, Full name, email
 2018/11/29, hannemann-tamas, Ralf Hannemann-Tamas, ralf.ht@gmail.com
 2018/12/20, WalterCouto, Walter Couto, WalterCouto@users.noreply.github.com
 2018/12/23, youkaichao, Kaichao You, youkaichao@gmail.com
-2019/01/16, garzon, Jiajun Ou, garzonou@gmail.com
+2019/02/06, ralucado, Cristina Raluca Vijulie, ralucris.v[at]gmail[dot]com
+2019/02/18, garzon, Jiajun Ou, garzonou[at]gmail[dot]com
