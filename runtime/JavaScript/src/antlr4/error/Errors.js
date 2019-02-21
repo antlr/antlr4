@@ -78,7 +78,7 @@ LexerNoViableAltException.prototype.constructor = LexerNoViableAltException;
 LexerNoViableAltException.prototype.toString = function() {
     var symbol = "";
     if (this.startIndex >= 0 && this.startIndex < this.input.size) {
-        symbol = this.input.getText(this.startIndex);
+        symbol = this.input.getText(this.startIndex, this.startIndex);
     }
     return "LexerNoViableAltException" + symbol;
 };
