@@ -255,7 +255,6 @@ var PredictionContext = require('./../PredictionContext').PredictionContext;
 var Interval = require('./../IntervalSet').Interval;
 var Transitions = require('./Transition');
 var Transition = Transitions.Transition;
-var AtomTransition = Transitions.AtomTransition;
 var SetTransition = Transitions.SetTransition;
 var NotSetTransition = Transitions.NotSetTransition;
 var RuleTransition = Transitions.RuleTransition;
@@ -1571,29 +1570,6 @@ ParserATNSimulator.prototype.getTokenName = function( t) {
 
 ParserATNSimulator.prototype.getLookaheadName = function(input) {
     return this.getTokenName(input.LA(1));
-};
-
-// Used for debugging in adaptivePredict around execATN but I cut
-//  it out for clarity now that alg. works well. We can leave this
-//  "dead" code for a bit.
-//
-ParserATNSimulator.prototype.dumpDeadEndConfigs = function(nvae) {
-    console.log("dead end configs: ");
-    var decs = nvae.getDeadEndConfigs();
-    for(var i=0; i<decs.length; i++) {
-    	var c = decs[i];
-        var trans = "no edges";
-        if (c.state.transitions.length>0) {
-            var t = c.state.transitions[0];
-            if (t instanceof AtomTransition) {
-                trans = "Atom "+ this.getTokenName(t.label);
-            } else if (t instanceof SetTransition) {
-                var neg = (t instanceof NotSetTransition);
-                trans = (neg ? "~" : "") + "Set " + t.set;
-            }
-        }
-        console.error(c.toString(this.parser, true) + ":" + trans);
-    }
 };
 
 ParserATNSimulator.prototype.noViableAlt = function(input, outerContext, configs, startIndex) {

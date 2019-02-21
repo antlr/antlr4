@@ -296,22 +296,6 @@ Parser.prototype.getATNWithBypassAlts = function() {
 
 var Lexer = require('./Lexer').Lexer;
 
-Parser.prototype.compileParseTreePattern = function(pattern, patternRuleIndex, lexer) {
-	lexer = lexer || null;
-	if (lexer === null) {
-		if (this.getTokenStream() !== null) {
-			var tokenSource = this.getTokenStream().tokenSource;
-			if (tokenSource instanceof Lexer) {
-				lexer = tokenSource;
-			}
-		}
-	}
-	if (lexer === null) {
-		throw "Parser can't discover a lexer to use";
-	}
-	throw new Error('Unsupported operation compileParseTreePattern.');
-};
-
 Parser.prototype.getInputStream = function() {
 	return this.getTokenStream();
 };

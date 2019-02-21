@@ -85,39 +85,6 @@ DFA.prototype.setPrecedenceStartState = function(precedence, startState) {
 	this.s0.edges[precedence] = startState;
 };
 
-//
-// Sets whether this is a precedence DFA. If the specified value differs
-// from the current DFA configuration, the following actions are taken;
-// otherwise no changes are made to the current DFA.
-//
-// <ul>
-// <li>The {@link //states} map is cleared</li>
-// <li>If {@code precedenceDfa} is {@code false}, the initial state
-// {@link //s0} is set to {@code null}; otherwise, it is initialized to a new
-// {@link DFAState} with an empty outgoing {@link DFAState//edges} array to
-// store the start states for individual precedence values.</li>
-// <li>The {@link //precedenceDfa} field is updated</li>
-// </ul>
-//
-// @param precedenceDfa {@code true} if this is a precedence DFA; otherwise,
-// {@code false}
-
-DFA.prototype.setPrecedenceDfa = function(precedenceDfa) {
-	if (this.precedenceDfa!==precedenceDfa) {
-		this._states = new Set();
-		if (precedenceDfa) {
-			var precedenceState = new DFAState(null, new ATNConfigSet());
-			precedenceState.edges = [];
-			precedenceState.isAcceptState = false;
-			precedenceState.requiresFullContext = false;
-			this.s0 = precedenceState;
-		} else {
-			this.s0 = null;
-		}
-		this.precedenceDfa = precedenceDfa;
-	}
-};
-
 Object.defineProperty(DFA.prototype, "states", {
 	get : function() {
 		return this._states;
