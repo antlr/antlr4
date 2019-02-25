@@ -407,7 +407,7 @@ size_t ParserATNSimulator::execATNWithFullContext(dfa::DFA &dfa, dfa::DFAState *
   // on-the-fly when doing full context prediction.
 
   /*
-   In non-exact ambiguity detection mode, we might	actually be able to
+   In non-exact ambiguity detection mode, we might actually be able to
    detect an exact ambiguity, but I'm not going to spend the cycles
    needed to check. We only emit ambiguity warnings in exact ambiguity
    mode.
@@ -720,54 +720,48 @@ std::vector<dfa::DFAState::PredPrediction *> ParserATNSimulator::getPredicatePre
 size_t ParserATNSimulator::getSynValidOrSemInvalidAltThatFinishedDecisionEntryRule(ATNConfigSet *configs,
   ParserRuleContext *outerContext)
 {
-  std::pair<ATNConfigSet *, ATNConfigSet *> sets = splitAccordingToSemanticValidity(configs, outerContext);
-  std::unique_ptr<ATNConfigSet> semValidConfigs(sets.first);
-  std::unique_ptr<ATNConfigSet> semInvalidConfigs(sets.second);
-  size_t alt = getAltThatFinishedDecisionEntryRule(semValidConfigs.get());
+  std::pair<size_t, size_t> sets = splitAccordingToSemanticValidity(configs, outerContext);
+  size_t alt = sets.first;
   if (alt != ATN::INVALID_ALT_NUMBER) { // semantically/syntactically viable path exists
     return alt;
   }
-  // Is there a syntactically valid path with a failed pred?
-  if (!semInvalidConfigs->configs.empty()) {
-    alt = getAltThatFinishedDecisionEntryRule(semInvalidConfigs.get());
-    if (alt != ATN::INVALID_ALT_NUMBER) { // syntactically viable path exists
-      return alt;
-    }
-  }
-  return ATN::INVALID_ALT_NUMBER;
+  return sets.second;
 }
 
-size_t ParserATNSimulator::getAltThatFinishedDecisionEntryRule(ATNConfigSet *configs) {
-  misc::IntervalSet alts;
-  for (auto &c : configs->configs) {
+inline static void addAlt(misc::IntervalSet &alts, const Ref<ATNConfig> &c) {
     if (c->getOuterContextDepth() > 0 || (is<RuleStopState *>(c->state) && c->context->hasEmptyPath())) {
       alts.add(c->alt);
     }
-  }
-  if (alts.size() == 0) {
-    return ATN::INVALID_ALT_NUMBER;
-  }
-  return alts.getMinElement();
 }
 
-std::pair<ATNConfigSet *, ATNConfigSet *> ParserATNSimulator::splitAccordingToSemanticValidity(ATNConfigSet *configs,
+std::pair<size_t, size_t> ParserATNSimulator::splitAccordingToSemanticValidity(ATNConfigSet *configs,
   ParserRuleContext *outerContext) {
 
-  // mem-check: both pointers must be freed by the caller.
-  ATNConfigSet *succeeded(new ATNConfigSet(configs->fullCtx));
-  ATNConfigSet *failed(new ATNConfigSet(configs->fullCtx));
+  misc::IntervalSet succAlts;
+  misc::IntervalSet failAlts;
+  
   for (Ref<ATNConfig> &c : configs->configs) {
     if (c->semanticContext != SemanticContext::NONE) {
       bool predicateEvaluationResult = evalSemanticContext(c->semanticContext, outerContext, c->alt, configs->fullCtx);
       if (predicateEvaluationResult) {
-        succeeded->add(c);
+        addAlt(succAlts, c);
       } else {
-        failed->add(c);
+        addAlt(failAlts, c);
       }
     } else {
-      succeeded->add(c);
+      addAlt(succAlts, c);
     }
   }
+  
+  size_t succeeded = antlr4::atn::ATN::INVALID_ALT_NUMBER;
+  size_t failed = antlr4::atn::ATN::INVALID_ALT_NUMBER;
+  if (succAlts.size()) {
+    succeeded = succAlts.getMinElement();
+  }
+  if (failAlts.size()) {
+    failed = failAlts.getMinElement();
+  }
+  
   return { succeeded, failed };
 }
 
