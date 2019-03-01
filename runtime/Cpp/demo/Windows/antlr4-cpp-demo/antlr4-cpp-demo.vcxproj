@@ -167,12 +167,13 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>ANTLR4CPP_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(SolutionDir)..\generated;$(SolutionDir)..\..\runtime\src;$(SolutionDir)..\..\runtime\src\atn;$(SolutionDir)..\..\runtime\src\dfa;$(SolutionDir)..\..\runtime\src\misc;$(SolutionDir)..\..\runtime\src\support;$(SolutionDir)..\..\runtime\src\tree;$(SolutionDir)..\..\runtime\src\tree\xpath;$(SolutionDir)..\..\runtime\src\tree\pattern;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>
       </ForcedIncludeFiles>
       <DisableSpecificWarnings>4251</DisableSpecificWarnings>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -185,7 +186,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>ANTLR4CPP_EXPORTS%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(SolutionDir)..\generated;$(SolutionDir)..\..\runtime\src;$(SolutionDir)..\..\runtime\src\atn;$(SolutionDir)..\..\runtime\src\dfa;$(SolutionDir)..\..\runtime\src\misc;$(SolutionDir)..\..\runtime\src\support;$(SolutionDir)..\..\runtime\src\tree;$(SolutionDir)..\..\runtime\src\tree\xpath;$(SolutionDir)..\..\runtime\src\tree\pattern;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>
@@ -203,12 +204,13 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>ANTLR4CPP_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(SolutionDir)..\generated;$(SolutionDir)..\..\runtime\src;$(SolutionDir)..\..\runtime\src\atn;$(SolutionDir)..\..\runtime\src\dfa;$(SolutionDir)..\..\runtime\src\misc;$(SolutionDir)..\..\runtime\src\support;$(SolutionDir)..\..\runtime\src\tree;$(SolutionDir)..\..\runtime\src\tree\xpath;$(SolutionDir)..\..\runtime\src\tree\pattern;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>
       </ForcedIncludeFiles>
       <DisableSpecificWarnings>4251</DisableSpecificWarnings>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -221,7 +223,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>ANTLR4CPP_EXPORTS%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(SolutionDir)..\generated;$(SolutionDir)..\..\runtime\src;$(SolutionDir)..\..\runtime\src\atn;$(SolutionDir)..\..\runtime\src\dfa;$(SolutionDir)..\..\runtime\src\misc;$(SolutionDir)..\..\runtime\src\support;$(SolutionDir)..\..\runtime\src\tree;$(SolutionDir)..\..\runtime\src\tree\xpath;$(SolutionDir)..\..\runtime\src\tree\pattern;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>
@@ -241,12 +243,13 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>ANTLR4CPP_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(SolutionDir)..\generated;$(SolutionDir)..\..\runtime\src;$(SolutionDir)..\..\runtime\src\atn;$(SolutionDir)..\..\runtime\src\dfa;$(SolutionDir)..\..\runtime\src\misc;$(SolutionDir)..\..\runtime\src\support;$(SolutionDir)..\..\runtime\src\tree;$(SolutionDir)..\..\runtime\src\tree\xpath;$(SolutionDir)..\..\runtime\src\tree\pattern;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>
       </ForcedIncludeFiles>
       <DisableSpecificWarnings>4251</DisableSpecificWarnings>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -263,7 +266,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>ANTLR4CPP_EXPORTS%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(SolutionDir)..\generated;$(SolutionDir)..\..\runtime\src;$(SolutionDir)..\..\runtime\src\atn;$(SolutionDir)..\..\runtime\src\dfa;$(SolutionDir)..\..\runtime\src\misc;$(SolutionDir)..\..\runtime\src\support;$(SolutionDir)..\..\runtime\src\tree;$(SolutionDir)..\..\runtime\src\tree\xpath;$(SolutionDir)..\..\runtime\src\tree\pattern;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>
@@ -285,12 +288,13 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>ANTLR4CPP_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(SolutionDir)..\generated;$(SolutionDir)..\..\runtime\src;$(SolutionDir)..\..\runtime\src\atn;$(SolutionDir)..\..\runtime\src\dfa;$(SolutionDir)..\..\runtime\src\misc;$(SolutionDir)..\..\runtime\src\support;$(SolutionDir)..\..\runtime\src\tree;$(SolutionDir)..\..\runtime\src\tree\xpath;$(SolutionDir)..\..\runtime\src\tree\pattern;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>
       </ForcedIncludeFiles>
       <DisableSpecificWarnings>4251</DisableSpecificWarnings>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -307,7 +311,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>ANTLR4CPP_EXPORTS%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(SolutionDir)..\generated;$(SolutionDir)..\..\runtime\src;$(SolutionDir)..\..\runtime\src\atn;$(SolutionDir)..\..\runtime\src\dfa;$(SolutionDir)..\..\runtime\src\misc;$(SolutionDir)..\..\runtime\src\support;$(SolutionDir)..\..\runtime\src\tree;$(SolutionDir)..\..\runtime\src\tree\xpath;$(SolutionDir)..\..\runtime\src\tree\pattern;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>
