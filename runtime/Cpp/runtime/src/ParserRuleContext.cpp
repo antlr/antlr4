@@ -135,7 +135,10 @@ std::string ParserRuleContext::toInfoString(Parser *recognizer) {
   std::vector<std::string> rules = recognizer->getRuleInvocationStack(this);
   std::reverse(rules.begin(), rules.end());
   std::string rulesStr = antlrcpp::arrayToString(rules);
-  return "ParserRuleContext" + rulesStr + "{start=" + std::to_string(start->getTokenIndex()) + ", stop=" +
-    std::to_string(stop->getTokenIndex()) + '}';
+  std::string startString = this->start != nullptr ? std::to_string(start->getTokenIndex()) : "NULL";
+  std::string stopString = this->stop != nullptr ? std::to_string(stop->getTokenIndex()) : "NULL";
+
+  return "ParserRuleContext: " + rulesStr + " {start=" + startString + ", stop=" +
+    stopString + '}';
 }
 
