@@ -117,6 +117,44 @@ This program will work. But it won't be useful unless you do one of the followin
  
 (please note that production code is target specific, so you can't have multi target grammars that include production code)
  
+## How do I create and run a visitor?
+```javascript
+// test.js
+var antlr4 = require('antlr4');
+var MyGrammarLexer = require('./QueryLexer').QueryLexer;
+var MyGrammarParser = require('./QueryParser').QueryParser;
+var MyGrammarListener = require('./QueryListener').QueryListener;
+
+
+var input = "field = 123 AND items in (1,2,3)"
+var chars = new antlr4.InputStream(input);
+var lexer = new MyGrammarLexer(chars);
+var tokens = new antlr4.CommonTokenStream(lexer);
+var parser = new MyGrammarParser(tokens);
+parser.buildParseTrees = true;
+var tree = parser.query();
+
+class Visitor {
+  visitChildren(ctx) {
+    if (!ctx) {
+      return;
+    }
+
+    if (ctx.children) {
+      return ctx.children.map(child => {
+        if (child.children && child.children.length != 0) {
+          return child.accept(this);
+        } else {
+          return child.getText();
+        }
+      });
+    }
+  }
+}
+
+tree.accept(new Visitor());
+````
+
 ## How do I create and run a custom listener?
 
 Let's suppose your MyGrammar grammar comprises 2 rules: "key" and "value". The antlr4 tool will have generated the following listener: 
