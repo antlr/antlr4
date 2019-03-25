@@ -82,6 +82,7 @@ def exit<lname; format="cap">(self, ctx:<file.parserName>.<lname; format="cap">C
 
 }; separator="\n">
 
+del <file.parserName>
 >>
 
 
