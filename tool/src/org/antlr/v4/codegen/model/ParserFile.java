@@ -22,6 +22,7 @@ public class ParserFile extends OutputFile {
 	@ModelElement public Parser parser;
 	@ModelElement public Map<String, Action> namedActions;
 	@ModelElement public ActionChunk contextSuperClass;
+	public boolean incremental;
 	public String grammarName;
 
 	public ParserFile(OutputModelFactory factory, String fileName) {
@@ -34,6 +35,7 @@ public class ParserFile extends OutputFile {
 		genListener = g.tool.gen_listener;
 		genVisitor = g.tool.gen_visitor;
 		grammarName = g.name;
+		incremental = Boolean.parseBoolean(g.getOptionString("incremental"));
 
 		if (g.getOptionString("contextSuperClass") != null) {
 			contextSuperClass = new ActionText(null, g.getOptionString("contextSuperClass"));
