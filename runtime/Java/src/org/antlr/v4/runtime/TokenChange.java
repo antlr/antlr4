@@ -25,4 +25,4 @@ public class TokenChange {
         this.oldToken = oldToken;
         this.newToken = newToken;
     }
-};
+}

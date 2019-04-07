@@ -4,13 +4,7 @@
  */
 package org.antlr.v4.runtime;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.NavigableSet;
-import java.util.TreeMap;
-import java.util.TreeSet;
+import java.util.*;
 
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.Pair;
@@ -39,6 +33,33 @@ class CompareTokenOffsetRanges implements Comparator<Interval> {
 		}
 		// Overlapping
 		return 0;
+	}
+}
+
+class CompareTokensByStart implements Comparator<TokenChange> {
+	@Override
+	public int compare(TokenChange tc1, TokenChange tc2) {
+		int startDifference = getStartingIndex(tc1) - getStartingIndex(tc2);
+		if (startDifference != 0)
+			return startDifference;
+		if (tc1.changeType == tc2.changeType)
+			return 0;
+		if (tc1.changeType == TokenChangeType.REMOVED)
+			return -1;
+		if (tc2.changeType == TokenChangeType.REMOVED)
+			return 1;
+		return tc1.changeType.compareTo(tc2.changeType);
+
+	}
+
+	private int getStartingIndex(TokenChange tc) {
+		if (tc.changeType == TokenChangeType.CHANGED) {
+			return tc.oldToken.getStartIndex();
+		} else if (tc.changeType == TokenChangeType.ADDED) {
+			return tc.newToken.getStartIndex();
+		} else {
+			return tc.oldToken.getStartIndex();
+		}
 	}
 }
 
@@ -111,6 +132,7 @@ public class IncrementalParserData {
 		int indexOffset = 0;
 		ArrayList<Pair<Interval, Integer>> offsetRanges = new ArrayList<>();
 		this.changedTokens = new TreeSet<>();
+		Collections.sort(this.tokenChanges, new CompareTokensByStart());
 		for (TokenChange tokenChange : this.tokenChanges) {
 			int indexToPush = 0;
 			if (tokenChange.changeType == TokenChangeType.CHANGED) {
@@ -234,6 +256,7 @@ public class IncrementalParserData {
 		ParseTreeWalker.DEFAULT.walk(listener, tree);
 	}
 
+
 	/**
 	 * This class does two things: 1. Simple indexer to record the rule index and
 	 * token index start of each rule. 2. Adjust the min max token ranges for any
@@ -344,10 +367,14 @@ public class IncrementalParserData {
 			// reuse. Also don't touch contexts without an epoch. They must
 			// represent something the incremental parser never saw,
 			// since it sets epochs on all contexts it touches.
-			boolean usableContext = (incCtx.epoch != -1) && !ruleAffectedByTokenChanges(incCtx);
-			if (usableContext) {
-				if (tokenOffsets != null && tokenOffsets.size() != 0) {
-					adjustMinMax(incCtx);
+			if (incCtx.epoch == -1)
+				return;
+			boolean mayNeedAdjustment = tokenOffsets != null && tokenOffsets.size() != 0;
+			if (mayNeedAdjustment) {
+				adjustMinMax(incCtx);
+			}
+			if (!ruleAffectedByTokenChanges(incCtx)) {
+				if (mayNeedAdjustment) {
 					adjustStartStop(incCtx);
 				}
 				String key = getKeyFromContext(incCtx);
@@ -360,6 +387,5 @@ public class IncrementalParserData {
 
 		}
 	}
-
-	;
 }
+
