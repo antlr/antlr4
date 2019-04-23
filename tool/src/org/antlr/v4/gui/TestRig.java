@@ -11,6 +11,7 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.DiagnosticErrorListener;
+import org.antlr.v4.runtime.IncrementalTokenStream;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -148,8 +149,8 @@ public class TestRig {
 		if ( !startRuleName.equals(LEXER_START_RULE_NAME) ) {
 			String parserName = grammarName+"Parser";
 			parserClass = cl.loadClass(parserName).asSubclass(Parser.class);
-			Constructor<? extends Parser> parserCtor = parserClass.getConstructor(TokenStream.class);
-			parser = parserCtor.newInstance((TokenStream)null);
+			Constructor<? extends Parser> parserCtor = parserClass.getConstructor(IncrementalTokenStream.class);
+			parser = parserCtor.newInstance((IncrementalTokenStream)null);
 		}
 
 		Charset charset = ( encoding == null ? Charset.defaultCharset () : Charset.forName(encoding) );
@@ -169,7 +170,7 @@ public class TestRig {
 
 	protected void process(Lexer lexer, Class<? extends Parser> parserClass, Parser parser, CharStream input) throws IOException, IllegalAccessException, InvocationTargetException, PrintException {
 			lexer.setInputStream(input);
-			CommonTokenStream tokens = new CommonTokenStream(lexer);
+			IncrementalTokenStream tokens = new IncrementalTokenStream(lexer);
 
 			tokens.fill();
 
