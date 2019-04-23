@@ -162,7 +162,9 @@ public class IncrementalParserData {
 			}
 			// Push the range this change starts at, and what the effect is on
 			// the index.
-			offsetRanges.add(new Pair<>(Interval.of(indexToPush, indexToPush), indexOffset));
+			if (indexOffset != 0) {
+				offsetRanges.add(new Pair<>(Interval.of(indexToPush, indexToPush), indexOffset));
+			}
 
 		}
 		// End the final range at length of the old token stream. That is the
