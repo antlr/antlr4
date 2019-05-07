@@ -9,6 +9,7 @@ package antlr
 import (
 	"fmt"
 	"reflect"
+	"runtime"
 	"testing"
 )
 
@@ -69,7 +70,7 @@ func isNil(object interface{}) bool {
 
 func (a *assert) Panics(f func()) bool {
 	if funcDidPanic, panicValue := didPanic(f); !funcDidPanic {
-		return a.Fail(fmt.Sprintf("func %#v should panic\n\r\tPanic value:\t%v", f, panicValue))
+		return a.Fail(fmt.Sprintf("func %s should panic\n\r\tPanic value:\t%v", runtime.FuncForPC(reflect.ValueOf(f).Pointer()).Name(), panicValue))
 	}
 
 	return true
