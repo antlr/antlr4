@@ -21,8 +21,10 @@ NoViableAltException::NoViableAltException(Parser *recognizer, TokenStream *inpu
 }
 
 NoViableAltException::~NoViableAltException() {
-  if (_deleteConfigs)
-    delete _deadEndConfigs;
+  if (_deleteConfigs) {
+      _deadEndConfigs = nullptr;
+      _deleteConfigs = false;
+  }
 }
 
 Token* NoViableAltException::getStartToken() const {
@@ -30,5 +32,5 @@ Token* NoViableAltException::getStartToken() const {
 }
 
 atn::ATNConfigSet* NoViableAltException::getDeadEndConfigs() const {
-  return _deadEndConfigs;
+  return _deadEndConfigs.get();
 }
