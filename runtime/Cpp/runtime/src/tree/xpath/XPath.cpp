@@ -81,7 +81,7 @@ std::vector<XPathElement> XPath::split(const std::string &path) {
         break;
 
       default :
-        throw IllegalArgumentException("Unknown path element " + el->toString());
+        throw IllegalArgumentException("Unknow path element " + el->toString());
     }
   }
 
