@@ -357,7 +357,7 @@ std::unordered_map<size_t, TokenStreamRewriter::RewriteOperation*> TokenStreamRe
         rop->lastIndex = std::max(prevRop->lastIndex, rop->lastIndex);
         std::cout << "new rop " << rop << std::endl;
       }
-      else if ( !disjoint ) {
+      else if (!disjoint) {
         throw IllegalArgumentException("replace op boundaries of " + rop->toString() +
                                        " overlap with previous " + prevRop->toString());
       }
