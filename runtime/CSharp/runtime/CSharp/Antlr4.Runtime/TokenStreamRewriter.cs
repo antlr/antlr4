@@ -627,7 +627,7 @@ namespace Antlr4.Runtime
                     }
                     else
                     {
-                        if ( !disjoint )
+                        if (!disjoint)
                         {
                             throw new ArgumentException("replace op boundaries of " + rop + " overlap with previous " + prevRop);
                         }
