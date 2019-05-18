@@ -299,7 +299,7 @@ func (l *LexerATNSimulator) getReachableConfigSet(input CharStream, closure ATNC
 
 func (l *LexerATNSimulator) accept(input CharStream, lexerActionExecutor *LexerActionExecutor, startIndex, index, line, charPos int) {
 	if LexerATNSimulatorDebug {
-		fmt.Printf("ACTION %s\n", lexerActionExecutor)
+		fmt.Printf("ACTION %+v\n", lexerActionExecutor)
 	}
 	// seek to after last char in token
 	input.Seek(index)
