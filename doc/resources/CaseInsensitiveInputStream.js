@@ -32,11 +32,11 @@ CaseInsensitiveInputStream.prototype.LA = function (offset) {
 };
 
 CaseInsensitiveInputStream.prototype.reset = function() {
-    return this._stream.reset();
+    this._stream.reset();
 };
 
 CaseInsensitiveInputStream.prototype.consume = function() {
-    return this._stream.consume();
+    this._stream.consume();
 };
 
 CaseInsensitiveInputStream.prototype.LT = function(offset) {
@@ -48,11 +48,11 @@ CaseInsensitiveInputStream.prototype.mark = function() {
 };
 
 CaseInsensitiveInputStream.prototype.release = function(marker) {
-    return this._stream.release(marker);
+    this._stream.release(marker);
 };
 
 CaseInsensitiveInputStream.prototype.seek = function(index) {
-    return this._stream.seek(index);
+    this._stream.seek(index);
 };
 
 CaseInsensitiveInputStream.prototype.getText = function(start, stop) {
@@ -63,4 +63,4 @@ CaseInsensitiveInputStream.prototype.toString = function() {
     return this._stream.toString();
 };
 
-exports.CaseInsensitiveInputStream = CaseInsensitiveInputStream;
+export default CaseInsensitiveInputStream;
