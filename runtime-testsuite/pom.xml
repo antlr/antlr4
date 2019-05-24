@@ -10,7 +10,7 @@
 	<parent>
 		<groupId>org.antlr</groupId>
 		<artifactId>antlr4-master</artifactId>
-		<version>4.7.2-SNAPSHOT</version>
+		<version>4.7.3-SNAPSHOT</version>
 	</parent>
 	<artifactId>antlr4-runtime-testsuite</artifactId>
 	<name>ANTLR 4 Runtime Tests (2nd generation)</name>
@@ -26,7 +26,7 @@
 		<dependency>
 			<groupId>org.antlr</groupId>
 			<artifactId>ST4</artifactId>
-			<version>4.0.8</version>
+			<version>4.1</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -66,10 +66,10 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.eclipse.jetty</groupId>
-			<artifactId>jetty-server</artifactId>
-			<version>8.1.16.v20140903</version>
-			<scope>test</scope>
+		  <groupId>org.eclipse.jetty</groupId>
+		  <artifactId>jetty-server</artifactId>
+		  <version>[9.3.24.v20180605,)</version>
+		  <scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.glassfish</groupId>
@@ -92,6 +92,11 @@
 			</resource>
 			<resource>
 				<directory>../runtime</directory>
+				<excludes>
+					<exclude>**/.build/**</exclude>
+					<exclude>**/target/**</exclude>
+					<exclude>Swift/*.xcodeproj/**</exclude>
+				</excludes>
 			</resource>
 		</resources>
 		<plugins>

@@ -43,7 +43,7 @@ See the docs and the book to learn about writing lexer and parser grammars.
 ### Step 4: Generate the C# code
 
 This can be done either from the cmd line, or by adding a custom pre-build command in your project.
-At minimal, the cmd line should look as follows: ``java -jar antlr4-4.7.1.jar -Dlanguage=CSharp grammar.g4``
+At minimal, the cmd line should look as follows: ``java -jar antlr4-4.7.2.jar -Dlanguage=CSharp grammar.g4``
 This will generate the files, which you can then integrate in your project.
 This is just a quick start. The tool has many useful options to control generation, please refer to its documentation.
 

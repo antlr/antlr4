@@ -1,5 +1,12 @@
 # ANTLR4 Language Target, Runtime for Swift
 
+## Requirements
+
+ANTLR 4.7.2 requires Swift 4.2.  It works on Swift 4.2.1 also.
+
+ANTLR 4.7.1 requires Swift 4.0, and does not work on Swift 4.2.  (The status of
+Swift 4.1 support is unknown.)
+
 ## Performance Note
 
 To use ANTLR4 Swift target in production environment, make sure to turn on compiler optimizations by following [these instructions](https://github.com/apple/swift-package-manager/blob/master/Documentation/Usage.md#build-configurations) if you use SwiftPM to build your project. If you are using Xcode to build your project, it's unlikely you will not use `release` build for production build.

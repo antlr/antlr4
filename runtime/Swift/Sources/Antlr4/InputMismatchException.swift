@@ -11,10 +11,16 @@
 /// 
 
 public class InputMismatchException: RecognitionException {
-    public init(_ recognizer: Parser) {
-        super.init(recognizer, recognizer.getInputStream()!, recognizer._ctx)
+    public init(_ recognizer: Parser, state: Int = ATNState.INVALID_STATE_NUMBER, ctx: ParserRuleContext? = nil) {
+        let bestCtx = ctx ?? recognizer._ctx
+
+        super.init(recognizer, recognizer.getInputStream()!, bestCtx)
+
         if let token = try? recognizer.getCurrentToken() {
             setOffendingToken(token)
+        }
+        if (state != ATNState.INVALID_STATE_NUMBER) {
+            setOffendingState(state)
         }
     }
 }

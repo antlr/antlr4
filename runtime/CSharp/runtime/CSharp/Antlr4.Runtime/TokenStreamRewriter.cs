@@ -612,7 +612,6 @@ namespace Antlr4.Runtime
                     }
                     // throw exception unless disjoint or identical
                     bool disjoint = prevRop.lastIndex < rop.index || prevRop.index > rop.lastIndex;
-                    bool same = prevRop.index == rop.index && prevRop.lastIndex == rop.lastIndex;
                     // Delete special case of replace (text==null):
                     // D.i-j.u D.x-y.v	| boundaries overlap	combine to max(min)..max(right)
                     if (prevRop.text == null && rop.text == null && !disjoint)
@@ -628,7 +627,7 @@ namespace Antlr4.Runtime
                     }
                     else
                     {
-                        if (!disjoint && !same)
+                        if (!disjoint)
                         {
                             throw new ArgumentException("replace op boundaries of " + rop + " overlap with previous " + prevRop);
                         }

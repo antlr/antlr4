@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -euo pipefail
+
 if [ $GROUP == "LEXER" ]; then
     mvn -q -Dgroups="org.antlr.v4.test.runtime.category.LexerTests" -Dtest=cpp.* test 
 elif [ $GROUP == "PARSER" ]; then

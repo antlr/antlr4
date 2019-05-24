@@ -510,6 +510,7 @@ LeftRecursiveRuleFunction(currentRule, args, code, locals, ruleCtx, altLabelCtxs
   size_t parentState = getState();
   <parser.name>::<currentRule.ctxType> *_localctx = _tracker.createInstance\<<currentRule.ctxType>\>(_ctx, parentState<currentRule.args: {a | , <a.name>}>);
   <parser.name>::<currentRule.ctxType> *previousContext = _localctx;
+  (void)previousContext; // Silence compiler, in case the context is not used by generated code.
   size_t startState = <currentRule.startState>;
   enterRecursionRule(_localctx, <currentRule.startState>, <parser.name>::Rule<currentRule.name; format = "cap">, precedence);
 
@@ -542,7 +543,7 @@ public:
   <if (ctorAttrs)><struct.name>(antlr4::ParserRuleContext *parent, size_t invokingState);<endif>
   <struct.name>(antlr4::ParserRuleContext *parent, size_t invokingState<ctorAttrs: {a | , <a>}>);
 <if (struct.provideCopyFrom)> <! don't need copy unless we have subclasses !>
-  <struct.name>() : antlr4::ParserRuleContext() { }
+  <struct.name>() = default;
   void copyFrom(<struct.name> *context);
   using antlr4::ParserRuleContext::copyFrom;
 <endif>

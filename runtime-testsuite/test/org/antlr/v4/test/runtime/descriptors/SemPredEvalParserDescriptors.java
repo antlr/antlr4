@@ -291,7 +291,7 @@ public class SemPredEvalParserDescriptors {
 
 		@Override
 		public boolean ignore(String targetName) {
-			return !"Java".equals(targetName);
+			return !"Java".equals(targetName) && !"Swift".equals(targetName);
 		}
 	}
 

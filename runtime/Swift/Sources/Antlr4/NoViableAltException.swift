@@ -13,14 +13,14 @@
 public class NoViableAltException: RecognitionException {
     /// Which configurations did we try at input.index() that couldn't match input.LT(1)?
 
-    private final var deadEndConfigs: ATNConfigSet?
+    private let deadEndConfigs: ATNConfigSet?
 
     /// The token object at the start index; the input stream might
     /// not be buffering tokens so get a reference to it. (At the
     /// time the error occurred, of course the stream needs to keep a
     /// buffer all of the tokens but later we might not have access to those.)
     /// 
-    private final var startToken: Token
+    private let startToken: Token
 
     public convenience init(_ recognizer: Parser) {
         // LL(1) error

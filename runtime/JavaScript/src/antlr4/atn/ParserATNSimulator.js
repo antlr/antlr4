@@ -1272,10 +1272,6 @@ ParserATNSimulator.prototype.closure_ = function(config, configs, closureBusy, c
         var continueCollecting = collectPredicates && !(t instanceof ActionTransition);
         var c = this.getEpsilonTarget(config, t, continueCollecting, depth === 0, fullCtx, treatEofAsEpsilon);
         if (c!==null) {
-			if (!t.isEpsilon && closureBusy.add(c)!==c){
-				// avoid infinite recursion for EOF* and EOF+
-				continue;
-			}
             var newDepth = depth;
             if ( config.state instanceof RuleStopState) {
                 // target fell off end of rule; mark resulting c as having dipped into outer context
@@ -1283,12 +1279,6 @@ ParserATNSimulator.prototype.closure_ = function(config, configs, closureBusy, c
                 // track how far we dip into outer context.  Might
                 // come in handy and we avoid evaluating context dependent
                 // preds if this is > 0.
-
-                if (closureBusy.add(c)!==c) {
-                    // avoid infinite recursion for right-recursive rules
-                    continue;
-                }
-
 				if (this._dfa !== null && this._dfa.precedenceDfa) {
 					if (t.outermostPrecedenceReturn === this._dfa.atnStartState.ruleIndex) {
 						c.precedenceFilterSuppressed = true;
@@ -1296,15 +1286,25 @@ ParserATNSimulator.prototype.closure_ = function(config, configs, closureBusy, c
 				}
 
                 c.reachesIntoOuterContext += 1;
+                if (closureBusy.add(c)!==c) {
+                    // avoid infinite recursion for right-recursive rules
+                    continue;
+                }
                 configs.dipsIntoOuterContext = true; // TODO: can remove? only care when we add to set per middle of this method
                 newDepth -= 1;
                 if (this.debug) {
                     console.log("dips into outer ctx: " + c);
                 }
-            } else if (t instanceof RuleTransition) {
-                // latch when newDepth goes negative - once we step out of the entry context we can't return
-                if (newDepth >= 0) {
-                    newDepth += 1;
+            } else {
+                if (!t.isEpsilon && closureBusy.add(c)!==c){
+                    // avoid infinite recursion for EOF* and EOF+
+                    continue;
+                }
+                if (t instanceof RuleTransition) {
+                    // latch when newDepth goes negative - once we step out of the entry context we can't return
+                    if (newDepth >= 0) {
+                        newDepth += 1;
+                    }
                 }
             }
             this.closureCheckingStopState(c, configs, closureBusy, continueCollecting, fullCtx, newDepth, treatEofAsEpsilon);
