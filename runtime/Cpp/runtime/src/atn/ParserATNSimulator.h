@@ -836,7 +836,7 @@ namespace atn {
     virtual antlrcpp::BitSet getConflictingAltsOrUniqueAlt(ATNConfigSet *configs);
 
     virtual NoViableAltException noViableAlt(TokenStream *input, ParserRuleContext *outerContext,
-                                              ATNConfigSet *configs, size_t startIndex, bool deleteConfigs);
+                                              std::unique_ptr<ATNConfigSet> configs, size_t startIndex);
 
     static size_t getUniqueAlt(ATNConfigSet *configs);
 
