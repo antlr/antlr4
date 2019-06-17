@@ -96,8 +96,6 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<antlr.testinprocess>true</antlr.testinprocess>
-		<maven.compiler.source>1.7</maven.compiler.source>
-		<maven.compiler.target>1.7</maven.compiler.target>
 	</properties>
 
 	<mailingLists>
@@ -132,8 +130,27 @@
 		</testResources>
 		<plugins>
 			<plugin>
+			  <groupId>org.apache.maven.plugins</groupId>
+			  <artifactId>maven-enforcer-plugin</artifactId>
+			  <version>3.0.0-M2</version>
+			  <executions>
+			    <execution>
+			      <id>enforce-maven</id>
+			      <goals>
+			        <goal>enforce</goal>
+			      </goals>
+			      <configuration>
+			        <rules>
+			          <requireMavenVersion>
+			            <version>[3.0.5,)</version>
+			          </requireMavenVersion>
+			        </rules>    
+			      </configuration>
+			    </execution>
+			  </executions>
+			</plugin>
+			<plugin>
 				<artifactId>maven-clean-plugin</artifactId>
-				<version>3.0.0</version>
 				<configuration>
 					<filesets>
 						<fileset>
@@ -148,20 +165,102 @@
 		</plugins>
 		<pluginManagement>
 			<plugins>
+				<plugin> <!-- create src jar -->
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-source-plugin</artifactId>
+					<version>3.1.0</version>
+				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.6.0</version>
-					<configuration>
-						<source>${maven.compiler.source}</source>
-						<target>${maven.compiler.target}</target>
-					</configuration>
+					<version>3.8.1</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-javadoc-plugin</artifactId>
+					<version>3.1.0</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-clean-plugin</artifactId>
+					<version>3.1.0</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>3.0.0-M3</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-jar-plugin</artifactId>
+					<version>3.1.2</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-plugin-plugin</artifactId>
+					<version>3.6.0</version>
+				</plugin>
+				<plugin> <!-- this makes a fat jar with all dependencies -->
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-shade-plugin</artifactId>
+					<version>3.2.1</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>
 	</build>
+    <profiles>
+        <profile>
+          <id>jdk-11-compile</id>
+          <activation>
+            <jdk>11</jdk>
+          </activation>
+            <properties>
+                <maven.compiler.source>9</maven.compiler.source>
+                <maven.compiler.target>9</maven.compiler.target>
+            </properties>
+<!-- Could be used to differentiate artifacts names
+                <envClassifier>jdk11</envClassifier>
+ -->
+          <build>
+            <pluginManagement>
+              <plugins>
+                <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-compiler-plugin</artifactId>
+                  <configuration>
+                    <release>11</release>
+                  </configuration>
+                </plugin>
+              </plugins>
+            </pluginManagement>
+          </build>
+        </profile>
+        <profile>
+          <id>jdk-8-compile</id>
+          <activation>
+            <jdk>[,9)</jdk>
+          </activation>
+            <properties>
+                <maven.compiler.source>8</maven.compiler.source>
+                <maven.compiler.target>8</maven.compiler.target>
+            </properties>
+<!-- Could be used to differentiate artifacts names
+                <envClassifier>jdk8</envClassifier>
+ -->
+          <build>
+            <pluginManagement>
+              <plugins>
+                <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-compiler-plugin</artifactId>
+                  <configuration>
+                    <source>8</source>
+                    <target>8</target>
+                  </configuration>
+                </plugin>
+              </plugins>
+            </pluginManagement>
+          </build>
+        </profile>
+    </profiles>
 </project>
