@@ -15,7 +15,7 @@
 /// 
 
 public final class LexerPushModeAction: LexerAction, CustomStringConvertible {
-    fileprivate final var mode: Int
+    fileprivate let mode: Int
 
     /// 
     /// Constructs a new `pushMode` action with the specified mode value.

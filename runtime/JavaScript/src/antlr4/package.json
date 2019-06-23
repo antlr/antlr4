@@ -1,6 +1,6 @@
 {
   "name": "antlr4",
-  "version": "4.7.1",
+  "version": "4.7.2",
   "description": "JavaScript runtime for ANTLR4",
   "main": "src/antlr4/index.js",
   "repository": "antlr/antlr4.git",
@@ -11,7 +11,7 @@
     "antlr4",
     "grammar"
   ],
-  "license": "BSD",
+  "license": "BSD-3-Clause",
   "bugs": {
     "url": "https://github.com/antlr/antlr4/issues"
   },

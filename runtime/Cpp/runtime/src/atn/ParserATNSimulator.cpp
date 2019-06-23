@@ -53,7 +53,7 @@ ParserATNSimulator::ParserATNSimulator(const ATN &atn, std::vector<dfa::DFA> &de
 
 ParserATNSimulator::ParserATNSimulator(Parser *parser, const ATN &atn, std::vector<dfa::DFA> &decisionToDFA,
                                        PredictionContextCache &sharedContextCache)
-: ATNSimulator(atn, sharedContextCache), parser(parser), decisionToDFA(decisionToDFA) {
+: ATNSimulator(atn, sharedContextCache), decisionToDFA(decisionToDFA), parser(parser) {
   InitializeInstanceFields();
 }
 
@@ -176,7 +176,7 @@ size_t ParserATNSimulator::execATN(dfa::DFA &dfa, dfa::DFAState *s0, TokenStream
       // ATN states in SLL implies LL will also get nowhere.
       // If conflict in states that dip out, choose min since we
       // will get error no matter what.
-      NoViableAltException e = noViableAlt(input, outerContext, previousD->configs.get(), startIndex);
+      NoViableAltException e = noViableAlt(input, outerContext, previousD->configs.get(), startIndex, false);
       input->seek(startIndex);
       size_t alt = getSynValidOrSemInvalidAltThatFinishedDecisionEntryRule(previousD->configs.get(), outerContext);
       if (alt != ATN::INVALID_ALT_NUMBER) {
@@ -236,7 +236,7 @@ size_t ParserATNSimulator::execATN(dfa::DFA &dfa, dfa::DFAState *s0, TokenStream
       BitSet alts = evalSemanticContext(D->predicates, outerContext, true);
       switch (alts.count()) {
         case 0:
-          throw noViableAlt(input, outerContext, D->configs.get(), startIndex);
+          throw noViableAlt(input, outerContext, D->configs.get(), startIndex, false);
 
         case 1:
           return alts.nextSetBit(0);
@@ -351,7 +351,7 @@ size_t ParserATNSimulator::execATNWithFullContext(dfa::DFA &dfa, dfa::DFAState *
       // ATN states in SLL implies LL will also get nowhere.
       // If conflict in states that dip out, choose min since we
       // will get error no matter what.
-      NoViableAltException e = noViableAlt(input, outerContext, previous, startIndex);
+      NoViableAltException e = noViableAlt(input, outerContext, previous, startIndex, previous != s0);
       input->seek(startIndex);
       size_t alt = getSynValidOrSemInvalidAltThatFinishedDecisionEntryRule(previous, outerContext);
       if (alt != ATN::INVALID_ALT_NUMBER) {
@@ -698,27 +698,22 @@ std::vector<Ref<SemanticContext>> ParserATNSimulator::getPredsForAmbigAlts(const
 }
 
 std::vector<dfa::DFAState::PredPrediction *> ParserATNSimulator::getPredicatePredictions(const antlrcpp::BitSet &ambigAlts,
-  std::vector<Ref<SemanticContext>> altToPred) {
-  std::vector<dfa::DFAState::PredPrediction*> pairs;
-  bool containsPredicate = false;
-  for (size_t i = 1; i < altToPred.size(); i++) {
-    Ref<SemanticContext> pred = altToPred[i];
+  std::vector<Ref<SemanticContext>> const& altToPred) {
+  bool containsPredicate = std::find_if(altToPred.begin(), altToPred.end(), [](Ref<SemanticContext> const context) {
+    return context != SemanticContext::NONE;
+  }) != altToPred.end();
+  if (!containsPredicate)
+    return {};
 
-    // unpredicted is indicated by SemanticContext.NONE
-    assert(pred != nullptr);
+  std::vector<dfa::DFAState::PredPrediction*> pairs;
+  for (size_t i = 1; i < altToPred.size(); ++i) {
+    Ref<SemanticContext> const& pred = altToPred[i];
+    assert(pred != nullptr); // unpredicted is indicated by SemanticContext.NONE
 
     if (ambigAlts.test(i)) {
       pairs.push_back(new dfa::DFAState::PredPrediction(pred, (int)i)); /* mem-check: managed by the DFAState it will be assigned to after return */
     }
-    if (pred != SemanticContext::NONE) {
-      containsPredicate = true;
-    }
   }
-
-  if (!containsPredicate) {
-    pairs.clear();
-  }
-
   return pairs;
 }
 
@@ -893,15 +888,6 @@ void ParserATNSimulator::closure_(Ref<ATNConfig> const& config, ATNConfigSet *co
     bool continueCollecting = !is<ActionTransition*>(t) && collectPredicates;
     Ref<ATNConfig> c = getEpsilonTarget(config, t, continueCollecting, depth == 0, fullCtx, treatEofAsEpsilon);
     if (c != nullptr) {
-      if (!t->isEpsilon()) {
-        // avoid infinite recursion for EOF* and EOF+
-        if (closureBusy.count(c) == 0) {
-          closureBusy.insert(c);
-        } else {
-          continue;
-        }
-      }
-
       int newDepth = depth;
       if (is<RuleStopState*>(config->state)) {
         assert(!fullCtx);
@@ -926,6 +912,16 @@ void ParserATNSimulator::closure_(Ref<ATNConfig> const& config, ATNConfigSet *co
         }
 
         c->reachesIntoOuterContext++;
+
+        if (!t->isEpsilon()) {
+          // avoid infinite recursion for EOF* and EOF+
+          if (closureBusy.count(c) == 0) {
+            closureBusy.insert(c);
+          } else {
+            continue;
+          }
+        }
+
         configs->dipsIntoOuterContext = true; // TO_DO: can remove? only care when we add to set per middle of this method
         assert(newDepth > INT_MIN);
 
@@ -934,7 +930,16 @@ void ParserATNSimulator::closure_(Ref<ATNConfig> const& config, ATNConfigSet *co
           std::cout << "dips into outer ctx: " << c << std::endl;
 #endif
 
-      } else if (is<RuleTransition*>(t)) {
+      } else  if (!t->isEpsilon()) {
+        // avoid infinite recursion for EOF* and EOF+
+        if (closureBusy.count(c) == 0) {
+          closureBusy.insert(c);
+        } else {
+          continue;
+        }
+      }
+
+      if (is<RuleTransition*>(t)) {
         // latch when newDepth goes negative - once we step out of the entry context we can't return
         if (newDepth >= 0) {
           newDepth++;
@@ -1219,8 +1224,8 @@ void ParserATNSimulator::dumpDeadEndConfigs(NoViableAltException &nvae) {
 }
 
 NoViableAltException ParserATNSimulator::noViableAlt(TokenStream *input, ParserRuleContext *outerContext,
-  ATNConfigSet *configs, size_t startIndex) {
-  return NoViableAltException(parser, input, input->get(startIndex), input->LT(1), configs, outerContext);
+  ATNConfigSet *configs, size_t startIndex, bool deleteConfigs) {
+  return NoViableAltException(parser, input, input->get(startIndex), input->LT(1), configs, outerContext, deleteConfigs);
 }
 
 size_t ParserATNSimulator::getUniqueAlt(ATNConfigSet *configs) {

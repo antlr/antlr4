@@ -149,6 +149,16 @@ public class ElementFrequenciesVisitor extends GrammarTreeVisitor {
 		minFrequencies.peek().add(ref.getText());
 	}
 
+	@Override
+	public void stringRef(TerminalAST ref) {
+		String tokenName = ref.g.getTokenName(ref.getText());
+
+		if (tokenName != null && !tokenName.startsWith("T__")) {
+			frequencies.peek().add(tokenName);
+			minFrequencies.peek().add(tokenName);
+		}
+	}
+
 	/*
 	 * Parser rules
 	 */

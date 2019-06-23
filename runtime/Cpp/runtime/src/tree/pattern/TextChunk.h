@@ -43,7 +43,7 @@ namespace pattern {
     /// The implementation for <seealso cref="TextChunk"/> returns the result of
     /// <seealso cref="#getText()"/> in single quotes.
     /// </summary>
-    virtual std::string toString();
+    virtual std::string toString() override;
   };
 
 } // namespace pattern
