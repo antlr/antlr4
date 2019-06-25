@@ -319,7 +319,7 @@ package parser // <file.grammarName>
 //}
 
 <file.visitorNames:{lname |
-//func (v *<file.grammarName>Visitor) Visit<lname; format="cap">(ctx *<if(file.genPackage)><file.genPackage><else>parser<endif>.<lname; format="cap">Context, delegate antlr.ParseTreeVisitor, args ...interface{\}) (result interface{\}){    result = v.VisitChildren(ctx, delegate, args...);return\}
+//func (v *<file.grammarName>Visitor) Visit<lname; format="cap">(ctx <if(file.genPackage)><file.genPackage><else>parser<endif>.I<lname; format="cap">Context, delegate antlr.ParseTreeVisitor, args ...interface{\}) (result interface{\}){    result = v.VisitChildren(ctx, delegate, args...);return\}
 }>
 
 //  TODO list rules here
