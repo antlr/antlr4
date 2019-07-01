@@ -57,6 +57,12 @@ struct ANTLR4CPP_PUBLIC Any final
 
     return object;
   }
+  Object *object() {
+    return _ptr;
+  }
+  const Object *object() const {
+    return _ptr;
+  }
 
   Any& operator = (const Any &a) = delete;
   Any& operator = (Any&& a) {
