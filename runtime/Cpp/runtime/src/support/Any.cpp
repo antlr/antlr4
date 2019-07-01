@@ -7,6 +7,9 @@
 
 using namespace antlrcpp;
 
+Object::~Object()
+{
+}
 Any::~Any()
 {
     delete _ptr;
