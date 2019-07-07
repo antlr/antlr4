@@ -915,11 +915,11 @@ public class <lexer.name> extends <superClass; null="Lexer"> {
 	public static final int
 		<rest(lexer.modes):{m | <m>=<i>}; separator=", ", wrap, anchor>;
 	<endif>
-	public static String[] channelNames = {
+	public static final String[] channelNames = {
 		"DEFAULT_TOKEN_CHANNEL", "HIDDEN"<if (lexer.channels)>, <lexer.channels:{c| "<c>"}; separator=", ", wrap, anchor><endif>
 	};
 
-	public static String[] modeNames = {
+	public static final String[] modeNames = {
 		<lexer.modes:{m| "<m>"}; separator=", ", wrap, anchor>
 	};
 
