@@ -112,7 +112,9 @@ Now test it:
 
 ```
 $ grun Hello r -tree
+(Now enter the following test string)
 hello parrt
+(To execute the above,do:)
 ^D
 (r hello parrt)
 (That ^D means EOF on unix; it's ^Z in Windows.) The -tree option prints the parse tree in LISP notation.
