@@ -22,7 +22,7 @@ namespace antlrcpp {
   inline std::string utf32_to_utf8(T const& data)
   {
     // Don't make the converter static or we have to serialize access to it.
-    UTF32Converter converter;
+    thread_local UTF32Converter converter;
 
     #if defined(_MSC_VER) && _MSC_VER >= 1900 && _MSC_VER < 2000
       auto p = reinterpret_cast<const int32_t *>(data.data());
@@ -34,7 +34,7 @@ namespace antlrcpp {
 
   inline UTF32String utf8_to_utf32(const char* first, const char* last)
   {
-    UTF32Converter converter;
+    thread_local UTF32Converter converter;
 
     #if defined(_MSC_VER) && _MSC_VER >= 1900 && _MSC_VER < 2000
       auto r = converter.from_bytes(first, last);
