@@ -19,6 +19,7 @@ stages:
 matrix:
   include:
     - os: linux
+      dist: trusty
       compiler: clang
       jdk: openjdk10
       env:
@@ -36,6 +37,7 @@ matrix:
             - uuid-dev
             - clang-3.7
     - os: linux
+      dist: trusty
       compiler: clang
       jdk: openjdk10
       env:
@@ -53,6 +55,7 @@ matrix:
             - uuid-dev
             - clang-3.7
     - os: linux
+      dist: trusty
       compiler: clang
       jdk: openjdk10
       env:
