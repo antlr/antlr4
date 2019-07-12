@@ -218,3 +218,4 @@ YYYY/MM/DD, github id, Full name, email
 2019/03/13, base698, Justin Thomas, justin.thomas1@gmail.com
 2019/03/18, carlodri, Carlo Dri, carlo.dri@gmail.com
 2019/05/02, askingalot, Andy Collins, askingalot@gmail.com
+2019/07/11, olowo726, Olof Wolgast, olof@baah.se
