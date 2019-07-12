@@ -20,7 +20,7 @@ matrix:
   include:
     - os: linux
       compiler: clang
-      jdk: openjdk7
+      jdk: openjdk10
       env:
         - TARGET=cpp
         - CXX=g++-5
@@ -37,7 +37,7 @@ matrix:
             - clang-3.7
     - os: linux
       compiler: clang
-      jdk: openjdk7
+      jdk: openjdk10
       env:
         - TARGET=cpp
         - CXX=g++-5
@@ -54,7 +54,7 @@ matrix:
             - clang-3.7
     - os: linux
       compiler: clang
-      jdk: openjdk7
+      jdk: openjdk10
       env:
         - TARGET=cpp
         - CXX=g++-5
@@ -137,48 +137,48 @@ matrix:
         - GROUP=RECURSION
       stage: extended-test
     - os: linux
-      jdk: openjdk7
+      jdk: openjdk10
       env: TARGET=java
       stage: extended-test
     - os: linux
-      jdk: openjdk8
+      jdk: openjdk11
       env: TARGET=java
       stage: extended-test
     - os: linux
-      jdk: oraclejdk8
+      jdk: oraclejdk11
       env: TARGET=java
       stage: smoke-test
     - os: linux
-      jdk: openjdk7
+      jdk: openjdk10
       env: TARGET=csharp
       stage: main-test
     - os: linux
-      jdk: oraclejdk8
+      jdk: oraclejdk11
       dist: trusty
       env:
         - TARGET=dotnet
         - GROUP=LEXER
       stage: extended-test
     - os: linux
-      jdk: openjdk8
+      jdk: openjdk11
       dist: trusty
       env:
         - TARGET=dotnet
         - GROUP=PARSER
       stage: extended-test
     - os: linux
-      jdk: oraclejdk8
+      jdk: oraclejdk11
       dist: trusty
       env:
         - TARGET=dotnet
         - GROUP=RECURSION
       stage: extended-test
     - os: linux
-      jdk: openjdk7
+      jdk: openjdk10
       env: TARGET=python2
       stage: main-test
     - os: linux
-      jdk: openjdk7
+      jdk: openjdk10
       env: TARGET=python3
       addons:
         apt:
@@ -189,12 +189,12 @@ matrix:
       stage: main-test
     - os: linux
       dist: trusty
-      jdk: openjdk8
+      jdk: openjdk11
       env: TARGET=javascript
       stage: main-test
     - os: linux
       dist: trusty
-      jdk: openjdk8
+      jdk: openjdk11
       env: TARGET=go
       stage: main-test
 
