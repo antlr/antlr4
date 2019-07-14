@@ -145,7 +145,7 @@ matrix:
       env: TARGET=java
       stage: extended-test
     - os: linux
-      jdk: oraclejdk8
+      jdk: openjdk8
       env: TARGET=java
       stage: smoke-test
     - os: linux
@@ -153,7 +153,7 @@ matrix:
       env: TARGET=csharp
       stage: main-test
     - os: linux
-      jdk: oraclejdk8
+      jdk: openjdk8
       dist: trusty
       env:
         - TARGET=dotnet
@@ -167,7 +167,7 @@ matrix:
         - GROUP=PARSER
       stage: extended-test
     - os: linux
-      jdk: oraclejdk8
+      jdk: openjdk8
       dist: trusty
       env:
         - TARGET=dotnet
