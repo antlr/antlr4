@@ -19,7 +19,7 @@ stages:
 matrix:
   include:
     - os: linux
-	  dist: trusty
+      dist: trusty
       compiler: clang
       jdk: openjdk8
       env:
