@@ -140,9 +140,10 @@ matrix:
         - GROUP=RECURSION
       stage: extended-test
     - os: linux
+      dist: trusty
       jdk: openjdk7
       env: TARGET=java
-      stage: extended-test
+      stage: smoke-test
     - os: linux
       jdk: openjdk8
       env: TARGET=java
