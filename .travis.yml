@@ -20,7 +20,7 @@ matrix:
   include:
     - os: linux
       compiler: clang
-      jdk: openjdk7
+      jdk: openjdk8
       env:
         - TARGET=cpp
         - CXX=g++-5
@@ -37,7 +37,7 @@ matrix:
             - clang-3.7
     - os: linux
       compiler: clang
-      jdk: openjdk7
+      jdk: openjdk8
       env:
         - TARGET=cpp
         - CXX=g++-5
@@ -54,7 +54,7 @@ matrix:
             - clang-3.7
     - os: linux
       compiler: clang
-      jdk: openjdk7
+      jdk: openjdk8
       env:
         - TARGET=cpp
         - CXX=g++-5
@@ -143,13 +143,9 @@ matrix:
     - os: linux
       jdk: openjdk8
       env: TARGET=java
-      stage: extended-test
-    - os: linux
-      jdk: openjdk8
-      env: TARGET=java
       stage: smoke-test
     - os: linux
-      jdk: openjdk7
+      jdk: openjdk8
       env: TARGET=csharp
       stage: main-test
     - os: linux
@@ -174,11 +170,11 @@ matrix:
         - GROUP=RECURSION
       stage: extended-test
     - os: linux
-      jdk: openjdk7
+      jdk: openjdk8
       env: TARGET=python2
       stage: main-test
     - os: linux
-      jdk: openjdk7
+      jdk: openjdk8
       env: TARGET=python3
       addons:
         apt:
