@@ -7,6 +7,7 @@
 package org.antlr.v4.runtime.atn;
 
 import java.util.Arrays;
+import org.antlr.v4.runtime.misc.ParseCancellationException;
 
 public class ArrayPredictionContext extends PredictionContext {
 	/** Parent can be null only if full ctx mode and we make an array
@@ -62,6 +63,9 @@ public class ArrayPredictionContext extends PredictionContext {
 
 	@Override
 	public boolean equals(Object o) {
+		if (Thread.interrupted()) {
+			throw new ParseCancellationException(new InterruptedException());
+		}
 		if (this == o) {
 			return true;
 		}
