@@ -19,8 +19,9 @@ stages:
 matrix:
   include:
     - os: linux
+      dist: trusty
       compiler: clang
-      jdk: openjdk7
+      jdk: openjdk8
       env:
         - TARGET=cpp
         - CXX=g++-5
@@ -36,8 +37,9 @@ matrix:
             - uuid-dev
             - clang-3.7
     - os: linux
+      dist: trusty
       compiler: clang
-      jdk: openjdk7
+      jdk: openjdk8
       env:
         - TARGET=cpp
         - CXX=g++-5
@@ -53,8 +55,9 @@ matrix:
             - uuid-dev
             - clang-3.7
     - os: linux
+      dist: trusty
       compiler: clang
-      jdk: openjdk7
+      jdk: openjdk8
       env:
         - TARGET=cpp
         - CXX=g++-5
@@ -137,23 +140,20 @@ matrix:
         - GROUP=RECURSION
       stage: extended-test
     - os: linux
+      dist: trusty
       jdk: openjdk7
       env: TARGET=java
       stage: extended-test
     - os: linux
       jdk: openjdk8
       env: TARGET=java
-      stage: extended-test
-    - os: linux
-      jdk: oraclejdk8
-      env: TARGET=java
       stage: smoke-test
     - os: linux
-      jdk: openjdk7
+      jdk: openjdk8
       env: TARGET=csharp
       stage: main-test
     - os: linux
-      jdk: oraclejdk8
+      jdk: openjdk8
       dist: trusty
       env:
         - TARGET=dotnet
@@ -167,18 +167,18 @@ matrix:
         - GROUP=PARSER
       stage: extended-test
     - os: linux
-      jdk: oraclejdk8
+      jdk: openjdk8
       dist: trusty
       env:
         - TARGET=dotnet
         - GROUP=RECURSION
       stage: extended-test
     - os: linux
-      jdk: openjdk7
+      jdk: openjdk8
       env: TARGET=python2
       stage: main-test
     - os: linux
-      jdk: openjdk7
+      jdk: openjdk8
       env: TARGET=python3
       addons:
         apt:

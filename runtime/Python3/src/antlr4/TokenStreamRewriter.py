@@ -101,11 +101,11 @@ class TokenStreamRewriter(object):
         return self.programs.setdefault(program_name, [])
         
     def getDefaultText(self):
-        return self.getText(self.DEFAULT_PROGRAM_NAME, 0, len(self.tokens.tokens))
+        return self.getText(self.DEFAULT_PROGRAM_NAME, 0, len(self.tokens.tokens) - 1)
 
     def getText(self, program_name, start:int, stop:int):
         """
-        :return:
+        :return: the text in tokens[start, stop](closed interval)
         """
         rewrites = self.programs.get(program_name)
 
@@ -156,13 +156,12 @@ class TokenStreamRewriter(object):
                     rewrites[prevRop.instructionIndex] = None
                     continue
                 isDisjoint = any((prevRop.last_index<rop.index, prevRop.index>rop.last_index))
-                isSame = all((prevRop.index == rop.index, prevRop.last_index == rop.last_index))
                 if all((prevRop.text is None, rop.text is None, not isDisjoint)):
                     rewrites[prevRop.instructionIndex] = None
                     rop.index = min(prevRop.index, rop.index)
                     rop.last_index = min(prevRop.last_index, rop.last_index)
                     print('New rop {}'.format(rop))
-                elif not all((isDisjoint, isSame)):
+                elif (not(isDisjoint)):
                     raise ValueError("replace op boundaries of {} overlap with previous {}".format(rop, prevRop))
 
         # Walk inserts
