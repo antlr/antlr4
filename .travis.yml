@@ -12,8 +12,8 @@ cache:
   - $HOME/Library/Caches/Homebrew
 
 stages:
-#  - smoke-test
-#  - main-test
+  - smoke-test
+  - main-test
   - extended-test
 
 matrix:
@@ -72,27 +72,27 @@ matrix:
             - g++-5
             - uuid-dev
             - clang-3.7
-#    - os: osx
-#      compiler: clang
-#      osx_image: xcode10.1
-#      env:
-#        - TARGET=cpp
-#        - GROUP=LEXER
-#      stage: extended-test
-#    - os: osx
-#      compiler: clang
-#      osx_image: xcode10.1
-#      env:
-#        - TARGET=cpp
-#        - GROUP=PARSER
-#      stage: extended-test
-#    - os: osx
-#      compiler: clang
-#      osx_image: xcode10.1
-#      env:
-#        - TARGET=cpp
-#        - GROUP=RECURSION
-#      stage: extended-test
+    - os: osx
+      compiler: clang
+      osx_image: xcode10.1
+      env:
+        - TARGET=cpp
+        - GROUP=LEXER
+      stage: extended-test
+    - os: osx
+      compiler: clang
+      osx_image: xcode10.1
+      env:
+        - TARGET=cpp
+        - GROUP=PARSER
+      stage: extended-test
+    - os: osx
+      compiler: clang
+      osx_image: xcode10.1
+      env:
+        - TARGET=cpp
+        - GROUP=RECURSION
+      stage: extended-test
     - os: osx
       compiler: clang
       osx_image: xcode10.1
@@ -114,36 +114,36 @@ matrix:
         - TARGET=swift
         - GROUP=RECURSION
       stage: main-test
-#    - os: linux
-#      dist: xenial
-#      compiler: clang
-#      env:
-#       - TARGET=swift
-#       - GROUP=ALL
-#      stage: extended-test
-#    - os: osx
-#      osx_image: xcode10.1
-#      env:
-#        - TARGET=dotnet
-#        - GROUP=LEXER
-#      stage: extended-test
-#    - os: osx
-#      osx_image: xcode10.1
-#      env:
-#        - TARGET=dotnet
-#        - GROUP=PARSER
-#      stage: extended-test
-#    - os: osx
-#      osx_image: xcode10.1
-#      env:
-#        - TARGET=dotnet
-#        - GROUP=RECURSION
-#      stage: extended-test
-#    - os: linux
-#      dist: trusty
-#      jdk: openjdk7
-#      env: TARGET=java
-#      stage: extended-test
+    - os: linux
+      dist: xenial
+      compiler: clang
+      env:
+       - TARGET=swift
+       - GROUP=ALL
+      stage: extended-test
+    - os: osx
+      osx_image: xcode10.1
+      env:
+        - TARGET=dotnet
+        - GROUP=LEXER
+      stage: extended-test
+    - os: osx
+      osx_image: xcode10.1
+      env:
+        - TARGET=dotnet
+        - GROUP=PARSER
+      stage: extended-test
+    - os: osx
+      osx_image: xcode10.1
+      env:
+        - TARGET=dotnet
+        - GROUP=RECURSION
+      stage: extended-test
+    - os: linux
+      dist: trusty
+      jdk: openjdk7
+      env: TARGET=java
+      stage: extended-test
     - os: linux
       jdk: openjdk8
       env: TARGET=java
