@@ -14,7 +14,7 @@ given input file during build.
 The following table lists the parameters that can be used with the function:
  
 Argument# | Required  | Default | Use
-----------|-----------|---------|--
+----------|-----------|---------|---
 0 | Yes | n/a | Unique target name. It is used to generate CMake Variables to reference the various outputs of the generation
 1 | Yes | n/a | Input file containing the lexer/parser definition
 2 | Yes | n/a | Type of Rules contained in the input: LEXER, PARSER or BOTH
@@ -24,10 +24,10 @@ Argument# | Required  | Default | Use
 7 | No  | none | Additional files on which the input depends
 8 | No  | none | Library path to use during generation
 
-The `ANTLR4_JAR_LOCATION` CMake variable must be set to the location where the `antlr-4*-complete.jar` generator is located.
-You can download the file from [here](http://www.antlr.org/download.html).
+The `ANTLR4_JAR_LOCATION` CMake variable must be set to the location where the `antlr-4*-complete.jar` generator is located. You can download the file from [here](http://www.antlr.org/download.html).
 
-Additional option to the ANTLR4 generator can be passed in the `ANTLR4_GENERATED_OPTIONS` variable
+Additional options to the ANTLR4 generator can be passed in the `ANTLR4_GENERATED_OPTIONS` variable. Add the installation prefix of `antlr4-runtime` to `CMAKE_PREFIX_PATH` or set
+ `antlr4-runtime_DIR` to a directory containing the files.
 
 The following CMake variables are available following a call to `antlr4_generate`
 
