@@ -175,7 +175,7 @@ ATNConfigSet.prototype.equals = function(other) {
 
 ATNConfigSet.prototype.hashCode = function() {
     var hash = new Hash();
-    this.updateHashCode(hash);
+	hash.update(this.configs);
     return hash.finish();
 };
 
@@ -183,13 +183,11 @@ ATNConfigSet.prototype.hashCode = function() {
 ATNConfigSet.prototype.updateHashCode = function(hash) {
 	if (this.readOnly) {
 		if (this.cachedHashCode === -1) {
-            var hash = new Hash();
-            hash.update(this.configs);
-			this.cachedHashCode = hash.finish();
+            this.cachedHashCode = this.hashCode();
 		}
         hash.update(this.cachedHashCode);
 	} else {
-        hash.update(this.configs);
+        hash.update(this.hashCode());
 	}
 };
 
