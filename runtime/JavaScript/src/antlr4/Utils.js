@@ -339,7 +339,7 @@ Hash.prototype.update = function () {
         if (value == null)
             continue;
         if(Array.isArray(value))
-            this.update.apply(value);
+            this.update.apply(this, value);
         else {
             var k = 0;
             switch (typeof(value)) {
@@ -381,7 +381,7 @@ Hash.prototype.finish = function () {
 
 function hashStuff() {
     var hash = new Hash();
-    hash.update.apply(arguments);
+    hash.update.apply(hash, arguments);
     return hash.finish();
 }
 
