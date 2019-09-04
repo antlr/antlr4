@@ -218,23 +218,22 @@ class XPath(object):
         elif wordToken.type in [XPathLexer.TOKEN_REF, XPathLexer.STRING]:
             tsource = self.parser.getTokenStream().tokenSource
 
-            ttype = litType = None
+            ttype = -1
             if wordToken.type == XPathLexer.TOKEN_REF:
-                ttype = (tsource.ruleNames.index(word) + 1) if word in tsource.ruleNames    else None
+                if word in tsource.ruleNames:
+                    ttype = tsource.ruleNames.index(word) + 1
             else:
-                litType = tsource.literalNames.index(word)  if word in tsource.literalNames else None
+                if word in tsource.literalNames:
+                    ttype = tsource.literalNames.index(word)
 
-            # Decide which one is it
-            ttype = ttype or litType
-
-            if not ttype:
+            if ttype == -1:
                 raise Exception("%s at index %d isn't a valid token name" % (word, wordToken.tokenIndex))
             return XPathTokenAnywhereElement(word, ttype) if anywhere else XPathTokenElement(word, ttype)
 
         else:
-            ruleIndex = self.parser.ruleNames.index(word) if word in self.parser.ruleNames else None
+            ruleIndex = self.parser.ruleNames.index(word) if word in self.parser.ruleNames else -1
 
-            if not ruleIndex:
+            if ruleIndex == -1:
                 raise Exception("%s at index %d isn't a valid rule name" % (word, wordToken.tokenIndex))
             return XPathRuleAnywhereElement(word, ruleIndex) if anywhere else XPathRuleElement(word, ruleIndex)
 
