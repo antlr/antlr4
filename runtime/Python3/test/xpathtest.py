@@ -15,7 +15,7 @@ class XPathTest(unittest.TestCase):
     def setUp(self):
         self.input_stream = InputStream(
             "def f(x,y) { x = 3+4; y; ; }\n"
-			"def g(x) { return 1+2*x; }\n"
+            "def g(x) { return 1+2*x; }\n"
         )
 
         # Create the Token Stream
