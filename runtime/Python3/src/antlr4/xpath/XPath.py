@@ -192,7 +192,7 @@ class XPath(object):
                 else:
                     el = next_el
             # Add searched element
-            if el.type in [XPathLexer.TOKEN_REF, XPathLexer.RULE_REF, XPathLexer.WILDCARD]:
+            if el.type in [XPathLexer.TOKEN_REF, XPathLexer.RULE_REF, XPathLexer.WILDCARD, XPathLexer.STRING]:
                 element = self.getXPathElement(el, anywhere)
                 element.invert = invert
                 elements.append(element)
