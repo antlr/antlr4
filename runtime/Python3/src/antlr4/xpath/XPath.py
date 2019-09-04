@@ -261,6 +261,11 @@ class XPath(object):
                     # e.g., //func/*/stat might have a token node for which
                     # we can't go looking for stat nodes.
                     matching = element.evaluate(node)
+
+                    # See issue antlr#370 - Prevents XPath from returning the 
+                    # same node multiple times
+                    matching = filter(lambda m: m not in work_next, matching)
+                    
                     work_next.extend(matching)
             work = work_next
 
