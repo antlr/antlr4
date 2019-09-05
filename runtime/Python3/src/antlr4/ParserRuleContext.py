@@ -184,3 +184,6 @@ class InterpreterRuleContext(ParserRuleContext):
     def __init__(self, parent:ParserRuleContext, invokingStateNumber:int, ruleIndex:int):
         super().__init__(parent, invokingStateNumber)
         self.ruleIndex = ruleIndex
+
+    def getRuleIndex(self):
+        return self.ruleIndex

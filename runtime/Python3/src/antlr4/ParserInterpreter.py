@@ -42,13 +42,15 @@ class ParserInterpreter(Parser):
         self.decisionToDFA = [ DFA(state) for state in atn.decisionToState ]
         self.sharedContextCache = PredictionContextCache()
         self._parentContextStack = list()
+        self.literalNames = input.tokenSource.literalNames
+        self.symbolicNames = input.tokenSource.symbolicNames
         # identify the ATN states where pushNewRecursionContext must be called
-        self.pushRecursionContextStates = set()
+        self.pushRecursionContextStates = list()
         for state in atn.states:
             if not isinstance(state, StarLoopEntryState):
                 continue
             if state.isPrecedenceDecision:
-                self.pushRecursionContextStates.add(state.stateNumber)
+                self.pushRecursionContextStates.append(state.stateNumber)
         # get atn simulator that knows how to do predictions
         self._interp = ParserATNSimulator(self, atn, self.decisionToDFA, self.sharedContextCache)
 
@@ -64,11 +66,11 @@ class ParserInterpreter(Parser):
             p = self.getATNState()
             if p.stateType==ATNState.RULE_STOP :
                 # pop; return from rule
-                if len(self._ctx)==0:
+                if self._ctx.isEmpty():
                     if startRuleStartState.isPrecedenceRule:
                         result = self._ctx
-                        parentContext = self._parentContextStack.pop()
-                        self.unrollRecursionContexts(parentContext.a)
+                        (ruleContext, _) = self._parentContextStack.pop()
+                        self.unrollRecursionContexts(ruleContext)
                         return result
                     else:
                         self.exitRule()
@@ -91,6 +93,9 @@ class ParserInterpreter(Parser):
     def getATNState(self):
         return self.atn.states[self.state]
 
+    def getRuleNames(self):
+        return self.ruleNames
+
     def visitState(self, p:ATNState):
         edge = 0
         if len(p.transitions) > 1:
@@ -103,14 +108,15 @@ class ParserInterpreter(Parser):
         tt = transition.serializationType
         if tt==Transition.EPSILON:
 
-            if self.pushRecursionContextStates[p.stateNumber] and not isinstance(transition.target, LoopEndState):
-                t = self._parentContextStack[-1]
-                ctx = InterpreterRuleContext(t[0], t[1], self._ctx.ruleIndex)
-                self.pushNewRecursionContext(ctx, self.atn.ruleToStartState[p.ruleIndex].stateNumber, self._ctx.ruleIndex)
+            if p.stateNumber < len(self.pushRecursionContextStates) and not isinstance(transition.target, LoopEndState):
+                if len(self._parentContextStack) > 0:
+                    t = self._parentContextStack[-1]
+                    ctx = InterpreterRuleContext(t[0], t[1], self._ctx.ruleIndex)
+                    self.pushNewRecursionContext(ctx, self.atn.ruleToStartState[p.ruleIndex].stateNumber, self._ctx.ruleIndex)
 
         elif tt==Transition.ATOM:
 
-            self.match(transition.label)
+            self.match(transition.label[0])
 
         elif tt in [ Transition.RANGE, Transition.SET, Transition.NOT_SET]:
 
@@ -138,8 +144,8 @@ class ParserInterpreter(Parser):
                 raise FailedPredicateException(self)
 
         elif tt==Transition.ACTION:
-
-            self.action(self._ctx, transition.ruleIndex, transition.actionIndex)
+            # self.action(self._ctx, transition.ruleIndex, transition.actionIndex)
+            pass
 
         elif tt==Transition.PRECEDENCE:
 
@@ -155,9 +161,9 @@ class ParserInterpreter(Parser):
     def visitRuleStopState(self, p:ATNState):
         ruleStartState = self.atn.ruleToStartState[p.ruleIndex]
         if ruleStartState.isPrecedenceRule:
-            parentContext = self._parentContextStack.pop()
-            self.unrollRecursionContexts(parentContext.a)
-            self.state = parentContext[1]
+            (parentRuleContext, parentState) = self._parentContextStack.pop()
+            self.unrollRecursionContexts(parentRuleContext)
+            self.state = parentState
         else:
             self.exitRule()
 

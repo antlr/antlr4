@@ -69,10 +69,12 @@ class Recognizer(object):
         if ruleNames is None:
             from antlr4.error.Errors import UnsupportedOperationException
             raise UnsupportedOperationException("The current recognizer does not provide a list of rule names.")
-        result = self.ruleIndexMapCache.get(ruleNames, None)
+
+        rname_hash = str(ruleNames)
+        result = self.ruleIndexMapCache.get(rname_hash, None)
         if result is None:
-            result = zip( ruleNames, range(0, len(ruleNames)))
-            self.ruleIndexMapCache[ruleNames] = result
+            result = dict(zip( ruleNames, range(0, len(ruleNames))))
+            self.ruleIndexMapCache[rname_hash] = result
         return result
 
     def getTokenType(self, tokenName:str):

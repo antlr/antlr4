@@ -924,16 +924,17 @@ class ParserATNSimulator(ATNSimulator):
         #
         # From this, it is clear that NONE||anything==NONE.
         #
-        altToPred = [None] * (nalts + 1)
+
+        altToPred = dict()
         for c in configs:
             if c.alt in ambigAlts:
-                altToPred[c.alt] = orContext(altToPred[c.alt], c.semanticContext)
+                altToPred[c.alt] = orContext(altToPred.get(c.alt, None), c.semanticContext)
 
         nPredAlts = 0
-        for i in range(1, nalts+1):
-            if altToPred[i] is None:
+        for i in range(1, max(altToPred.keys()) + 1):
+            if altToPred.get(i, SemanticContext.NONE) is SemanticContext.NONE:
                 altToPred[i] = SemanticContext.NONE
-            elif altToPred[i] is not SemanticContext.NONE:
+            elif altToPred.get(i, SemanticContext.NONE) is not SemanticContext.NONE:
                 nPredAlts += 1
 
         # nonambig alts are null in altToPred
@@ -941,7 +942,11 @@ class ParserATNSimulator(ATNSimulator):
             altToPred = None
         if ParserATNSimulator.debug:
             print("getPredsForAmbigAlts result " + str_list(altToPred))
-        return altToPred
+
+        if altToPred:
+            return [altToPred.get(x, None) for x in range(0, max(altToPred.keys()) + 1)]
+        else:
+            return None
 
     def getPredicatePredictions(self, ambigAlts:set, altToPred:list):
         pairs = []
