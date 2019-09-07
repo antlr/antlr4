@@ -1415,6 +1415,7 @@ type <lexer.name> struct {
 	channelNames []string
 	modeNames []string
 	// TODO: EOF string
+	<namedActions.declarations>
 }
 
 // New<lexer.name> produces a new lexer instance for the optional input antlr.CharStream.
@@ -1441,6 +1442,8 @@ func New<lexer.name>(input antlr.CharStream) *<lexer.name> {
 	l.SymbolicNames = lexerSymbolicNames
 	l.GrammarFileName = "<lexer.grammarFileName>"
 	// TODO: l.EOF = antlr.TokenEOF
+
+	<namedActions.construction>
 
 	return l
 }
