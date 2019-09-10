@@ -78,7 +78,7 @@ public class LexerATNSimulator extends ATNSimulator {
 
 	protected final SimState prevAccept = new SimState();
 
-	public static int match_calls = 0;
+	public static volatile int match_calls = 0;
 
 	public LexerATNSimulator(ATN atn, DFA[] decisionToDFA,
 							 PredictionContextCache sharedContextCache)
