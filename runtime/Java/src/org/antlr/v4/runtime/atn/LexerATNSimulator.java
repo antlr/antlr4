@@ -103,7 +103,9 @@ public class LexerATNSimulator extends ATNSimulator {
 	}
 
 	public int match(CharStream input, int mode) {
-		match_calls++;
+		synchronized (LexerATNSimulator.class) {
+			match_calls++;
+		}
 		this.mode = mode;
 		int mark = input.mark();
 		try {
