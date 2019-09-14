@@ -418,7 +418,7 @@ public class CompositeParsersDescriptors {
 		parser grammar S;
 		type_ : 'int' ;
 		decl : type_ ID ';'
-			| type_ ID init_ ';' {<write("\"JavaDecl: \" + $text")>};
+			| type_ ID init_ ';' {<AppendStr("\"JavaDecl: \"","$text"):writeln()>};
 		init_ : '=' INT;
 		 */
 		@CommentHasStringValue
@@ -532,7 +532,7 @@ public class CompositeParsersDescriptors {
 
 		/**
 		parser grammar S;
-		a @after {<InitIntMember("x","0")>} : B;
+		a @after {<InitIntVar("x","0")>} : B;
 		 */
 		@CommentHasStringValue
 		public String slaveGrammarS;
