@@ -226,3 +226,4 @@ YYYY/MM/DD, github id, Full name, email
 2019/09/10, yar3333, Yaroslav Sivakov, yar3333@gmail.com
 2019/09/10, marcospassos, Marcos Passos, marcospassos.com@gmail.com
 2019/09/10, amorimjuliana, Juliana Amorim, juu.amorim@gmail.com
+2019/09/15, sullis, Sean Sullivan, github@seansullivan.com
