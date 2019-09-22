@@ -111,11 +111,13 @@ Object.defineProperty(PredictionContextCache.prototype, "length", {
 
 function SingletonPredictionContext(parent, returnState) {
 	var hashCode = 0;
+	var hash = new Hash();
 	if(parent !== null) {
-		var hash = new Hash();
 		hash.update(parent, returnState);
-        hashCode = hash.finish();
+	} else {
+		hash.update(1);
 	}
+	hashCode = hash.finish();
 	PredictionContext.call(this, hashCode);
 	this.parentCtx = parent;
 	this.returnState = returnState;
