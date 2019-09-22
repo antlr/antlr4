@@ -153,6 +153,13 @@ matrix:
       env: TARGET=csharp
       stage: main-test
     - os: linux
+      language: php
+      php:
+        - 7.2
+      jdk: openjdk8
+      env: TARGET=php
+      stage: main-test
+    - os: linux
       jdk: openjdk8
       dist: trusty
       env:
