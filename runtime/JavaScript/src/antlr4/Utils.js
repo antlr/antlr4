@@ -197,14 +197,14 @@ BitSet.prototype.toString = function () {
     return "{" + this.values().join(", ") + "}";
 };
 
-function Map(hashFunction, equalsFunction) {
+function Dictionary(hashFunction, equalsFunction) {
     this.data = {};
     this.hashFunction = hashFunction || standardHashCodeFunction;
     this.equalsFunction = equalsFunction || standardEqualsFunction;
     return this;
 }
 
-Object.defineProperty(Map.prototype, "length", {
+Object.defineProperty(Dictionary.prototype, "length", {
     get: function () {
         var l = 0;
         for (var hashKey in this.data) {
@@ -216,7 +216,7 @@ Object.defineProperty(Map.prototype, "length", {
     }
 });
 
-Map.prototype.put = function (key, value) {
+Dictionary.prototype.put = function (key, value) {
     var hashKey = "hash_" + this.hashFunction(key);
     if (hashKey in this.data) {
         var entries = this.data[hashKey];
@@ -236,7 +236,7 @@ Map.prototype.put = function (key, value) {
     }
 };
 
-Map.prototype.containsKey = function (key) {
+Dictionary.prototype.containsKey = function (key) {
     var hashKey = "hash_" + this.hashFunction(key);
     if(hashKey in this.data) {
         var entries = this.data[hashKey];
@@ -249,7 +249,7 @@ Map.prototype.containsKey = function (key) {
     return false;
 };
 
-Map.prototype.get = function (key) {
+Dictionary.prototype.get = function (key) {
     var hashKey = "hash_" + this.hashFunction(key);
     if(hashKey in this.data) {
         var entries = this.data[hashKey];
@@ -262,7 +262,7 @@ Map.prototype.get = function (key) {
     return null;
 };
 
-Map.prototype.entries = function () {
+Dictionary.prototype.entries = function () {
     var l = [];
     for (var key in this.data) {
         if (key.indexOf("hash_") === 0) {
@@ -273,21 +273,21 @@ Map.prototype.entries = function () {
 };
 
 
-Map.prototype.getKeys = function () {
+Dictionary.prototype.getKeys = function () {
     return this.entries().map(function(e) {
         return e.key;
     });
 };
 
 
-Map.prototype.getValues = function () {
+Dictionary.prototype.getValues = function () {
     return this.entries().map(function(e) {
             return e.value;
     });
 };
 
 
-Map.prototype.toString = function () {
+Dictionary.prototype.toString = function () {
     var ss = this.entries().map(function(entry) {
         return '{' + entry.key + ':' + entry.value + '}';
     });
@@ -324,6 +324,7 @@ AltDict.prototype.values = function () {
 };
 
 function DoubleDict() {
+    this['doubleDictMap'] = this['doubleDictMap'] || new Map();
     return this;
 }
 
@@ -389,17 +390,17 @@ function hashStuff() {
 }
 
 DoubleDict.prototype.get = function (a, b) {
-    var d = this[a] || null;
-    return d === null ? null : (d[b] || null);
+    var d = this['doubleDictMap'].get(a) || null;
+    return d === null ? null : (d.get(b) || null);
 };
 
 DoubleDict.prototype.set = function (a, b, o) {
-    var d = this[a] || null;
+    var d = this['doubleDictMap'].get(a) || null;
     if (d === null) {
-        d = {};
-        this[a] = d;
+        d = new Map();
+        this['doubleDictMap'].set(a, d);
     }
-    d[b] = o;
+    d.set(b, o);
 };
 
 
@@ -438,7 +439,7 @@ function equalArrays(a, b)
 
 exports.Hash = Hash;
 exports.Set = Set;
-exports.Map = Map;
+exports.Dictionary = Dictionary;
 exports.BitSet = BitSet;
 exports.AltDict = AltDict;
 exports.DoubleDict = DoubleDict;

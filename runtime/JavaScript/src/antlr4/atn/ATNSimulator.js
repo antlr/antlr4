@@ -44,7 +44,7 @@ ATNSimulator.prototype.getCachedContext = function(context) {
     if (this.sharedContextCache ===null) {
         return context;
     }
-    var visited = {};
+    var visited = new Map();
     return getCachedPredictionContext(context, this.sharedContextCache, visited);
 };
 
