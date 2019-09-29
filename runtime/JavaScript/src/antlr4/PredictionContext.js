@@ -79,7 +79,7 @@ function calculateHashString(parent, returnState) {
 // can be used for both lexers and parsers.
 
 function PredictionContextCache() {
-	this.cache = new Map();
+	this.cache = {};
 	return this;
 }
 
@@ -91,16 +91,16 @@ PredictionContextCache.prototype.add = function(ctx) {
 	if (ctx === PredictionContext.EMPTY) {
 		return PredictionContext.EMPTY;
 	}
-	var existing = this.cache.get(ctx) || null;
+	var existing = this.cache[ctx] || null;
 	if (existing !== null) {
 		return existing;
 	}
-	this.cache.set(ctx, ctx);
+	this.cache[ctx] = ctx;
 	return ctx;
 };
 
 PredictionContextCache.prototype.get = function(ctx) {
-	return this.cache.get(ctx) || null;
+	return this.cache[ctx] || null;
 };
 
 Object.defineProperty(PredictionContextCache.prototype, "length", {
@@ -642,16 +642,16 @@ function mergeArrays(a, b, rootIsWildcard, mergeCache) {
 // ones.
 // /
 function combineCommonParents(parents) {
-	var uniqueParents = new Map();
+	var uniqueParents = {};
 
 	for (var p = 0; p < parents.length; p++) {
 		var parent = parents[p];
-		if (!uniqueParents.get(parent)) {
-			uniqueParents.set(parent, parent);
+		if (!(parent in uniqueParents)) {
+			uniqueParents[parent] = parent;
 		}
 	}
 	for (var q = 0; q < parents.length; q++) {
-		parents[q] = uniqueParents.get(parents[q]);
+		parents[q] = uniqueParents[parents[q]];
 	}
 }
 
@@ -659,13 +659,13 @@ function getCachedPredictionContext(context, contextCache, visited) {
 	if (context.isEmpty()) {
 		return context;
 	}
-	var existing = visited.get(context) || null;
+	var existing = visited[context] || null;
 	if (existing !== null) {
 		return existing;
 	}
 	existing = contextCache.get(context);
 	if (existing !== null) {
-		visited.set(context, existing);
+		visited[context] = existing;
 		return existing;
 	}
 	var changed = false;
@@ -685,7 +685,7 @@ function getCachedPredictionContext(context, contextCache, visited) {
 	}
 	if (!changed) {
 		contextCache.add(context);
-		visited.set(context, context);
+		visited[context] = context;
 		return context;
 	}
 	var updated = null;
@@ -698,8 +698,8 @@ function getCachedPredictionContext(context, contextCache, visited) {
 		updated = new ArrayPredictionContext(parents, context.returnStates);
 	}
 	contextCache.add(updated);
-	visited.set(updated, updated);
-	visited.set(context, updated);
+	visited[updated] = updated;
+	visited[context] = updated;
 
 	return updated;
 }
@@ -710,13 +710,13 @@ function getAllContextNodes(context, nodes, visited) {
 		nodes = [];
 		return getAllContextNodes(context, nodes, visited);
 	} else if (visited === null) {
-		visited = new Map();
+		visited = {};
 		return getAllContextNodes(context, nodes, visited);
 	} else {
-		if (context === null || visited.get(context) !== null) {
+		if (context === null || visited[context] !== null) {
 			return nodes;
 		}
-		visited.set(context, context);
+		visited[context] = context;
 		nodes.push(context);
 		for (var i = 0; i < context.length; i++) {
 			getAllContextNodes(context.getParent(i), nodes, visited);

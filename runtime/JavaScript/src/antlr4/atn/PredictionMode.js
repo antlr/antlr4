@@ -10,7 +10,7 @@
 // ambiguities.
 
 var Set = require('./../Utils').Set;
-var Map = require('./../Utils').Dictionary;
+var Map = require('./../Utils').Map;
 var BitSet = require('./../Utils').BitSet;
 var AltDict = require('./../Utils').AltDict;
 var ATN = require('./ATN').ATN;
