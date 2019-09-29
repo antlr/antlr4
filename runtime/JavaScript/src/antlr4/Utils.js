@@ -389,17 +389,17 @@ function hashStuff() {
 }
 
 DoubleDict.prototype.get = function (a, b) {
-    var d = this[a] || null;
-    return d === null ? null : (d[b] || null);
+    var d = this[a.hashCode()] || null;
+    return d === null ? null : (d[b.hashCode()] || null);
 };
 
 DoubleDict.prototype.set = function (a, b, o) {
-    var d = this[a] || null;
+    var d = this[a.hashCode()] || null;
     if (d === null) {
         d = {};
-        this[a] = d;
+        this[a.hashCode()] = d;
     }
-    d[b] = o;
+    d[b.hashCode()] = o;
 };
 
 
