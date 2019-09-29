@@ -91,16 +91,16 @@ PredictionContextCache.prototype.add = function(ctx) {
 	if (ctx === PredictionContext.EMPTY) {
 		return PredictionContext.EMPTY;
 	}
-	var existing = this.cache[ctx] || null;
+	var existing = this.cache[ctx.hashCode()] || null;
 	if (existing !== null) {
 		return existing;
 	}
-	this.cache[ctx] = ctx;
+	this.cache[ctx.hashCode()] = ctx;
 	return ctx;
 };
 
 PredictionContextCache.prototype.get = function(ctx) {
-	return this.cache[ctx] || null;
+	return this.cache[ctx.hashCode()] || null;
 };
 
 Object.defineProperty(PredictionContextCache.prototype, "length", {
@@ -646,12 +646,12 @@ function combineCommonParents(parents) {
 
 	for (var p = 0; p < parents.length; p++) {
 		var parent = parents[p];
-		if (!(parent in uniqueParents)) {
-			uniqueParents[parent] = parent;
+		if (!(uniqueParents[parent.hashCode()])) {
+			uniqueParents[parent.hashCode()] = parent;
 		}
 	}
 	for (var q = 0; q < parents.length; q++) {
-		parents[q] = uniqueParents[parents[q]];
+		parents[q] = uniqueParents[parents[q].hashCode()];
 	}
 }
 
@@ -659,13 +659,13 @@ function getCachedPredictionContext(context, contextCache, visited) {
 	if (context.isEmpty()) {
 		return context;
 	}
-	var existing = visited[context] || null;
+	var existing = visited[context.hashCode()] || null;
 	if (existing !== null) {
 		return existing;
 	}
 	existing = contextCache.get(context);
 	if (existing !== null) {
-		visited[context] = existing;
+		visited[context.hashCode()] = existing;
 		return existing;
 	}
 	var changed = false;
@@ -685,7 +685,7 @@ function getCachedPredictionContext(context, contextCache, visited) {
 	}
 	if (!changed) {
 		contextCache.add(context);
-		visited[context] = context;
+		visited[context.hashCode()] = context;
 		return context;
 	}
 	var updated = null;
@@ -698,8 +698,8 @@ function getCachedPredictionContext(context, contextCache, visited) {
 		updated = new ArrayPredictionContext(parents, context.returnStates);
 	}
 	contextCache.add(updated);
-	visited[updated] = updated;
-	visited[context] = updated;
+	visited[updated.hashCode()] = updated;
+	visited[context.hashCode()] = updated;
 
 	return updated;
 }
@@ -713,10 +713,10 @@ function getAllContextNodes(context, nodes, visited) {
 		visited = {};
 		return getAllContextNodes(context, nodes, visited);
 	} else {
-		if (context === null || visited[context] !== null) {
+		if (context === null || visited[context.hashCode()] !== null) {
 			return nodes;
 		}
-		visited[context] = context;
+		visited[context.hashCode()] = context;
 		nodes.push(context);
 		for (var i = 0; i < context.length; i++) {
 			getAllContextNodes(context.getParent(i), nodes, visited);
