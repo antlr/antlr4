@@ -7,6 +7,7 @@
 
 var RuleContext = require('./RuleContext').RuleContext;
 var Hash = require('./Utils').Hash;
+var Map = require('./Utils').Map;
 
 function PredictionContext(cachedHashCode) {
 	this.cachedHashCode = cachedHashCode;
@@ -79,7 +80,7 @@ function calculateHashString(parent, returnState) {
 // can be used for both lexers and parsers.
 
 function PredictionContextCache() {
-	this.cache = {};
+	this.cache = new Map();
 	return this;
 }
 
@@ -91,16 +92,16 @@ PredictionContextCache.prototype.add = function(ctx) {
 	if (ctx === PredictionContext.EMPTY) {
 		return PredictionContext.EMPTY;
 	}
-	var existing = this.cache[ctx.hashCode()] || null;
+	var existing = this.cache.get(ctx) || null;
 	if (existing !== null) {
 		return existing;
 	}
-	this.cache[ctx.hashCode()] = ctx;
+	this.cache.put(ctx, ctx);
 	return ctx;
 };
 
 PredictionContextCache.prototype.get = function(ctx) {
-	return this.cache[ctx.hashCode()] || null;
+	return this.cache.get(ctx) || null;
 };
 
 Object.defineProperty(PredictionContextCache.prototype, "length", {
@@ -642,16 +643,16 @@ function mergeArrays(a, b, rootIsWildcard, mergeCache) {
 // ones.
 // /
 function combineCommonParents(parents) {
-	var uniqueParents = {};
+	var uniqueParents = new Map();
 
 	for (var p = 0; p < parents.length; p++) {
 		var parent = parents[p];
-		if (!(uniqueParents[parent.hashCode()])) {
-			uniqueParents[parent.hashCode()] = parent;
+		if (!(uniqueParents.containsKey(parent))) {
+			uniqueParents.put(parent, parent);
 		}
 	}
 	for (var q = 0; q < parents.length; q++) {
-		parents[q] = uniqueParents[parents[q].hashCode()];
+		parents[q] = uniqueParents.get(parents[q]);
 	}
 }
 
@@ -710,13 +711,13 @@ function getAllContextNodes(context, nodes, visited) {
 		nodes = [];
 		return getAllContextNodes(context, nodes, visited);
 	} else if (visited === null) {
-		visited = {};
+		visited = new Map();
 		return getAllContextNodes(context, nodes, visited);
 	} else {
-		if (context === null || visited[context.hashCode()] !== null) {
+		if (context === null || visited.containsKey(context)) {
 			return nodes;
 		}
-		visited[context.hashCode()] = context;
+		visited.put(context, context);
 		nodes.push(context);
 		for (var i = 0; i < context.length; i++) {
 			getAllContextNodes(context.getParent(i), nodes, visited);
