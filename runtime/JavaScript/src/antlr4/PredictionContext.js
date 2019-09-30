@@ -660,13 +660,13 @@ function getCachedPredictionContext(context, contextCache, visited) {
 	if (context.isEmpty()) {
 		return context;
 	}
-	var existing = visited[context.hashCode()] || null;
+	var existing = visited.get(context) || null;
 	if (existing !== null) {
 		return existing;
 	}
 	existing = contextCache.get(context);
 	if (existing !== null) {
-		visited[context.hashCode()] = existing;
+		visited.put(context, existing);
 		return existing;
 	}
 	var changed = false;
@@ -686,7 +686,7 @@ function getCachedPredictionContext(context, contextCache, visited) {
 	}
 	if (!changed) {
 		contextCache.add(context);
-		visited[context.hashCode()] = context;
+		visited.put(context, context);
 		return context;
 	}
 	var updated = null;
@@ -699,8 +699,8 @@ function getCachedPredictionContext(context, contextCache, visited) {
 		updated = new ArrayPredictionContext(parents, context.returnStates);
 	}
 	contextCache.add(updated);
-	visited[updated.hashCode()] = updated;
-	visited[context.hashCode()] = updated;
+	visited.put(updated, updated);
+	visited.put(context, updated);
 
 	return updated;
 }
