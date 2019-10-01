@@ -323,7 +323,9 @@ AltDict.prototype.values = function () {
     });
 };
 
-function DoubleDict() {
+function DoubleDict(defaultMapCtor) {
+    this.defaultMapCtor = defaultMapCtor || Map;
+    this.cacheMap = new this.defaultMapCtor();
     return this;
 }
 
@@ -389,17 +391,17 @@ function hashStuff() {
 }
 
 DoubleDict.prototype.get = function (a, b) {
-    var d = this[a] || null;
-    return d === null ? null : (d[b] || null);
+    var d = this.cacheMap.get(a) || null;
+    return d === null ? null : (d.get(b) || null);
 };
 
 DoubleDict.prototype.set = function (a, b, o) {
-    var d = this[a] || null;
+    var d = this.cacheMap.get(a) || null;
     if (d === null) {
-        d = {};
-        this[a] = d;
+        d = new this.defaultMapCtor();
+        this.cacheMap.put(a, d);
     }
-    d[b] = o;
+    d.put(b, o);
 };
 
 
