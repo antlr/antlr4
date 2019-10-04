@@ -341,8 +341,9 @@ namespace <if(file.genPackage)><file.genPackage>\\<endif>Context {
 	<if (file.genListener)>use <if(file.genPackage)><file.genPackage>\\<endif><file.grammarName>Listener;<endif>
 	<namedActions.contexts>
 
-	<funcs :{ func | <func.ruleCtx> }; separator="\n\n">
-	<funcs :{ func | <func.altLabelCtxs:{l | <func.altLabelCtxs.(l)>}; separator="\n\n">}>
+	<funcs :{ func | <func.ruleCtx><if(func.altLabelCtxs)>
+
+<func.altLabelCtxs:{l | <func.altLabelCtxs.(l)>}; separator="\n\n"><endif> }; separator="\n\n">
 }
 >>
 
@@ -371,7 +372,6 @@ public function action(?RuleContext $localContext, int $ruleIndex, int $actionIn
 	<recog.actionFuncs.values:{f|
 	case <f.ruleIndex>:
 		$this->action<f.name; format="cap">($localContext, $actionIndex);
-
 		break;}; separator="\n\n">
 	}
 }
@@ -447,7 +447,7 @@ RuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,namedActions,fina
 {
     $localContext = new Context\\<currentRule.ctxType>($this->ctx, $this->getState()<currentRule.args:{a | , $<a.name>}>);
 
-    $this->enterRule($localContext, <currentRule.startState>, <parser.name>::RULE_<currentRule.name>);
+    $this->enterRule($localContext, <currentRule.startState>, self::RULE_<currentRule.name>);
     <namedActions.init>
     <locals; separator="\n">
 
@@ -487,7 +487,7 @@ private function recursive<currentRule.name; format="cap">(int $precedence<args:
 	$localContext = new Context\\<currentRule.ctxType>($this->ctx, $parentState<currentRule.args:{a | , <a.name>}>);
 	$previousContext = $localContext;
 	$startState = <currentRule.startState>;
-	$this->enterRecursionRule($localContext, <currentRule.startState>, <parser.name>::RULE_<currentRule.name>, $precedence);
+	$this->enterRecursionRule($localContext, <currentRule.startState>, self::RULE_<currentRule.name>, $precedence);
 	<namedActions.init>
 	<locals; separator="\n">
 
@@ -644,7 +644,6 @@ do {
 	<alts:{alt|
 case <i><if(!choice.ast.greedy)>+1<endif>:
 	<alt>
-
 	break;}; separator="\n\n">
 	default:
 		<error>
@@ -693,17 +692,17 @@ bitsetInlineComparison(s, bits) ::= <%
 %>
 
 cases(ttypes) ::= <<
-<ttypes:{t | case <parser.name>::<t>:}; separator="\n">
+<ttypes:{t | case self::<t>:}; separator="\n">
 >>
 
 InvokeRule(r, argExprsChunks) ::= <<
 $this->setState(<r.stateNumber>);
-<if(r.labels)><r.labels:{l | <labelref(l)> = }><endif>$this-><if(r.ast.options.p)>recursive<endif><r.name; format="cap">(<if(r.ast.options.p)><r.ast.options.p><if(argExprsChunks)>,<endif><endif><argExprsChunks>);
+<if(r.labels)><r.labels:{l | <labelref(l)> = }><endif>$this-><if(r.ast.options.p)>recursive<r.name; format="cap"><else><r.name><endif>(<if(r.ast.options.p)><r.ast.options.p><if(argExprsChunks)>,<endif><endif><argExprsChunks>);
 >>
 
 MatchToken(m) ::= <<
 $this->setState(<m.stateNumber>);
-<if(m.labels)><m.labels:{l | <labelref(l)> = }><endif>$this->match(<parser.name>::<m.name>);
+<if(m.labels)><m.labels:{l | <labelref(l)> = }><endif>$this->match(self::<m.name>);
 >>
 
 MatchSet(m, expr, capture) ::= "<CommonSetStuff(m, expr, capture, false)>"
@@ -1023,9 +1022,8 @@ $localContext-><label>[] = $previousContext;
 $localContext-><label> = $previousContext;
 <endif>
 <endif>
-<if(label)>$localContext-><label> = $previousContext;<endif>
 
-$this->pushNewRecursionContext($localContext, $startState, <parser.name>::RULE_<ruleName>);
+$this->pushNewRecursionContext($localContext, $startState, self::RULE_<ruleName>);
 >>
 
 recRuleLabeledAltStartAction(ruleName, currentAltLabel, label, isListLabel) ::= <<
@@ -1038,7 +1036,7 @@ $localContext-><label> = $previousContext;
 <endif>
 <endif>
 
-$this->pushNewRecursionContext($localContext, $startState, <parser.name>::RULE_<ruleName>);
+$this->pushNewRecursionContext($localContext, $startState, self::RULE_<ruleName>);
 >>
 
 recRuleReplaceContext(ctxName) ::= <<
