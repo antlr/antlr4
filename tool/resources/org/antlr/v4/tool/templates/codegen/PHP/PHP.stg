@@ -149,12 +149,12 @@ VisitorFile(file, header, namedActions) ::= <<
 <if(file.genPackage)>
 namespace <file.genPackage>;
 <endif>
+
 <header>
 use Antlr\\Antlr4\\Runtime\\Tree\\ParseTreeVisitor;
 
 /**
- * This interface defines a complete generic visitor for a parse tree produced
-  by {@see <file.parserName>}.
+ * This interface defines a complete generic visitor for a parse tree produced by {@see <file.parserName>}.
  */
 interface <file.grammarName>Visitor extends ParseTreeVisitor
 {
@@ -166,7 +166,8 @@ interface <file.grammarName>Visitor extends ParseTreeVisitor
 <else>
  * Visit a parse tree produced by {@see <file.parserName>::<lname>()\}.
 <endif>
- * @param <lname; format="cap">Context $context The parse tree.
+ *
+ * @param Context\\<lname; format="cap">Context $context The parse tree.
  *
  * @return mixed The visitor result.
  */
@@ -206,7 +207,10 @@ public function visit<lname; format="cap">(Context\\<lname; format="cap">Context
 fileHeader(grammarFileName, ANTLRVersion) ::= <<
 \<?php
 
-// Generated from <grammarFileName> by ANTLR <ANTLRVersion>
+/*
+ * Generated from <grammarFileName> by ANTLR <ANTLRVersion>
+ */
+
 >>
 Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
 <Parser_(ctor="parser_ctor", ...)>
@@ -214,7 +218,7 @@ Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
 
 Parser_(parser, funcs, atn, sempredFuncs, ctor, superClass) ::= <<
 namespace<if(file.genPackage)> <file.genPackage><endif> {
-	<namedActions.header>
+<if(namedActions.header)><namedActions.header><endif>
 	use Antlr\\Antlr4\\Runtime\\Atn\\ATN;
 	use Antlr\\Antlr4\\Runtime\\Atn\\ATNDeserializer;
 	use Antlr\\Antlr4\\Runtime\\Atn\\ParserATNSimulator;
@@ -230,7 +234,7 @@ namespace<if(file.genPackage)> <file.genPackage><endif> {
 	use Antlr\\Antlr4\\Runtime\\VocabularyImpl;
 	use Antlr\\Antlr4\\Runtime\\RuntimeMetaData;
 	use Antlr\\Antlr4\\Runtime\\Parser;
-	<namedActions.definitions>
+<if(namedActions.definitions)><namedActions.definitions><endif>
 
 	final class <parser.name> extends <superClass; null="Parser">
 	{
@@ -1061,7 +1065,7 @@ LexerFile(lexerFile, lexer, namedActions) ::= <<
 
 Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
 namespace<if(lexerFile.genPackage)> <lexerFile.genPackage><endif> {
-	<namedActions.header>
+<if(namedActions.header)><namedActions.header><endif>
 	use Antlr\\Antlr4\\Runtime\\Atn\\ATNDeserializer;
 	use Antlr\\Antlr4\\Runtime\\Atn\\LexerATNSimulator;
 	use Antlr\\Antlr4\\Runtime\\Lexer;
@@ -1073,7 +1077,7 @@ namespace<if(lexerFile.genPackage)> <lexerFile.genPackage><endif> {
 	use Antlr\\Antlr4\\Runtime\\Vocabulary;
 	use Antlr\\Antlr4\\Runtime\\RuntimeMetaData;
 	use Antlr\\Antlr4\\Runtime\\VocabularyImpl;
-	<namedActions.definitions>
+<if(namedActions.definitions)><namedActions.definitions><endif>
 
 	final class <lexer.name> extends <superClass; null="Lexer">
 	{
