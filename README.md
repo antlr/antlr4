@@ -22,6 +22,7 @@ ANTLR project lead and supreme dictator for life
 * [Janyou](https://github.com/janyou) (Swift target)
 * [Ewan Mellor](https://github.com/ewanmellor), [Hanzhou Shi](https://github.com/hanjoes) (Swift target merging)
 * [Ben Hamilton](https://github.com/bhamiltoncx) (Full Unicode support in serialized ATN and all languages' runtimes for code points > U+FFFF)
+* [Marcos Passos](https://github.com/marcospassos) (PHP target)
 
 ## Useful information
 

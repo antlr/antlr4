@@ -50,6 +50,7 @@ public abstract class BaseRuntimeTest {
 		"Go",
 		"CSharp",
 		"Python2", "Python3",
+		"PHP",
 		"Node", "Safari", "Firefox", "Explorer", "Chrome"
 	};
 	public final static String[] JavaScriptTargets = {
@@ -116,6 +117,7 @@ public abstract class BaseRuntimeTest {
 			System.out.printf("Ignore "+descriptor);
 			return;
 		}
+
 		if ( descriptor.getTestType().contains("Parser") ) {
 			testParser(descriptor);
 		}
