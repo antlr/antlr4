@@ -221,3 +221,12 @@ YYYY/MM/DD, github id, Full name, email
 2019/07/11, olowo726, Olof Wolgast, olof@baah.se
 2019/07/16, abhijithneilabraham, Abhijith Neil Abraham, abhijithneilabrahampk@gmail.com
 2019/07/26, Braavos96, Eric Hettiaratchi, erichettiaratchi@gmail.com
+2019/08/23, akaJes, Oleksandr Mamchyts, akaJes@gmail.com
+2019/09/10, ImanHosseini, Iman Hosseini, hosseini.iman@yahoo.com
+2019/09/03, João Henrique, johnnyonflame@hotmail.com
+2019/09/10, neko1235, Ihar Mokharau, igor.mohorev@gmail.com
+2019/09/10, yar3333, Yaroslav Sivakov, yar3333@gmail.com
+2019/09/10, marcospassos, Marcos Passos, marcospassos.com@gmail.com
+2019/09/10, amorimjuliana, Juliana Amorim, juu.amorim@gmail.com
+2019/09/17, kaz, Kazuki Sawada, kazuki@6715.jp
+2019/09/28, lmy269, Mingyang Liu, lmy040758@gmail.com
