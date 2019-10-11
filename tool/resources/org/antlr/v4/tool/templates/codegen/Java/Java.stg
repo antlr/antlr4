@@ -275,6 +275,8 @@ case <f.ruleIndex>:
 
 	<atn>
 }
+
+<namedActions.footer>
 >>
 
 vocabulary(literalNames, symbolicNames) ::= <<
@@ -960,6 +962,8 @@ public class <lexer.name> extends <superClass; null="Lexer"> {
 	<dumpActions(lexer, "", actionFuncs, sempredFuncs)>
 	<atn>
 }
+
+<namedActions.footer>
 >>
 
 SerializedATN(model) ::= <<
