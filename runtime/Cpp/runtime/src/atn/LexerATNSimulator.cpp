@@ -422,7 +422,7 @@ Ref<LexerATNConfig> LexerATNSimulator::getEpsilonTarget(CharStream *input, const
       if (config->context == nullptr|| config->context->hasEmptyPath()) {
         // execute actions anywhere in the start rule for a token.
         //
-        // TO_DO: if the entry rule is invoked recursively, some
+        // TODO: if the entry rule is invoked recursively, some
         // actions may be executed during the recursive call. The
         // problem can appear when hasEmptyPath() is true but
         // isEmpty() is false. In this case, the config needs to be
