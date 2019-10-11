@@ -139,12 +139,6 @@ DFAState.prototype.toString = function() {
 DFAState.prototype.hashCode = function() {
 	var hash = new Hash();
 	hash.update(this.configs);
-	if(this.isAcceptState) {
-        if (this.predicates !== null)
-            hash.update(this.predicates);
-        else
-            hash.update(this.prediction);
-    }
     return hash.finish();
 };
 

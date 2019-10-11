@@ -14,6 +14,8 @@ Cast(t,v) ::= "<v>"
 
 Append(a,b) ::= "<a> + <b>"
 
+AppendStr(a,b) ::= <%<Append(a,b)>%>
+
 Concat(a,b) ::= "<a><b>"
 
 DeclareLocal(s,v) ::= "var <s> = <v>;"
@@ -25,6 +27,12 @@ AssignLocal(s,v) ::= "<s> = <v>;"
 InitIntMember(n,v) ::= <%this.<n> = <v>;%>
 
 InitBooleanMember(n,v) ::= <%this.<n> = <v>;%>
+
+InitIntVar(n,v) ::= <%<InitIntMember(n,v)>%>
+
+IntArg(n) ::= "<n>"
+
+VarRef(n) ::= "<n>"
 
 GetMember(n) ::= <%this.<n>%>
 
@@ -99,6 +107,8 @@ this.Property = function() {
 >>
 
 ParserPropertyCall(p, call) ::= "<p>.<call>"
+
+PositionAdjustingLexerDef() ::= ""
 
 PositionAdjustingLexer() ::= <<
 
