@@ -58,6 +58,8 @@ import java.util.Iterator;
 import java.util.ArrayList;
 
 <parser>
+
+<namedActions.footer>
 >>
 
 ListenerFile(file, header, namedActions) ::= <<
@@ -893,6 +895,8 @@ import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.*;
 
 <lexer>
+
+<namedActions.footer>
 >>
 
 Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
