@@ -58,6 +58,8 @@ import java.util.Iterator;
 import java.util.ArrayList;
 
 <parser>
+
+<namedActions.footer>
 >>
 
 ListenerFile(file, header, namedActions) ::= <<
@@ -275,8 +277,6 @@ case <f.ruleIndex>:
 
 	<atn>
 }
-
-<namedActions.footer>
 >>
 
 vocabulary(literalNames, symbolicNames) ::= <<
@@ -895,6 +895,8 @@ import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.*;
 
 <lexer>
+
+<namedActions.footer>
 >>
 
 Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
@@ -962,8 +964,6 @@ public class <lexer.name> extends <superClass; null="Lexer"> {
 	<dumpActions(lexer, "", actionFuncs, sempredFuncs)>
 	<atn>
 }
-
-<namedActions.footer>
 >>
 
 SerializedATN(model) ::= <<
