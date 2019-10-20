@@ -230,3 +230,4 @@ YYYY/MM/DD, github id, Full name, email
 2019/09/10, amorimjuliana, Juliana Amorim, juu.amorim@gmail.com
 2019/09/17, kaz, Kazuki Sawada, kazuki@6715.jp
 2019/09/28, lmy269, Mingyang Liu, lmy040758@gmail.com
+2019/10/20, ethall, Evan Hall, evan.tom.hall@gmail.com
