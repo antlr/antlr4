@@ -97,10 +97,10 @@ ParseTreeListener.prototype.visitTerminal = function(node) {
 ParseTreeListener.prototype.visitErrorNode = function(node) {
 };
 
-ParseTreeListener.prototype.enterEveryRule = function(node) {
+ParseTreeListener.prototype.enterEveryRule = function(ctx) {
 };
 
-ParseTreeListener.prototype.exitEveryRule = function(node) {
+ParseTreeListener.prototype.exitEveryRule = function(ctx) {
 };
 
 function TerminalNodeImpl(symbol) {
