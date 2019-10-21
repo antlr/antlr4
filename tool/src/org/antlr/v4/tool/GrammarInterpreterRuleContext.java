@@ -38,7 +38,7 @@ public class GrammarInterpreterRuleContext extends InterpreterRuleContext {
 	}
 
 	@Override
-	public void setAltNumber(int altNumber) {
-		setOuterAltNum(altNumber);
+	public void setAltNumber(int altNum) {
+		setOuterAltNum(altNum);
 	}
 }

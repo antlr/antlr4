@@ -927,8 +927,8 @@ public class Tool {
 		info("ANTLR Parser Generator  Version " + Tool.VERSION);
 		for (Option o : optionDefs) {
 			String name = o.name + (o.argType!=OptionArgType.NONE? " ___" : "");
-			String s = String.format(" %-19s %s", name, o.description);
-			info(s);
+			String msg = String.format(" %-19s %s", name, o.description);
+			info(msg);
 		}
 	}
 

@@ -1055,16 +1055,16 @@ public class Grammar implements AttributeResolver {
 	 * @param name The channel name.
 	 * @return The constant channel value assigned to the channel.
 	 */
-	public int defineChannelName(String name, int value) {
+	public int defineChannelName(String name, int channelValue) {
 		Integer prev = channelNameToValueMap.get(name);
 		if (prev != null) {
 			return prev;
 		}
 
-		channelNameToValueMap.put(name, value);
-		setChannelNameForValue(value, name);
-		maxChannelType = Math.max(maxChannelType, value);
-		return value;
+		channelNameToValueMap.put(name, channelValue);
+		setChannelNameForValue(channelValue, name);
+		maxChannelType = Math.max(maxChannelType, channelValue);
+		return channelValue;
 	}
 
 	/**

@@ -343,10 +343,10 @@ public class LexerATNFactory extends ParserATNFactory {
 	 */
 	@Override
 	public Handle stringLiteral(TerminalAST stringLiteralAST) {
-		String chars = stringLiteralAST.getText();
+		String literal = stringLiteralAST.getText();
 		ATNState left = newState(stringLiteralAST);
 		ATNState right;
-		String s = CharSupport.getStringFromGrammarStringLiteral(chars);
+		String s = CharSupport.getStringFromGrammarStringLiteral(literal);
 		if (s == null) {
 			// the lexer will already have given an error
 			return new Handle(left, left);

@@ -64,9 +64,9 @@ public class FlexibleHashMap<K,V> implements Map<K, V> {
 		this.initialBucketCapacity = initialBucketCapacity;
 	}
 
-	private static <K, V> LinkedList<Entry<K, V>>[] createEntryListArray(int length) {
+	private static <K, V> LinkedList<Entry<K, V>>[] createEntryListArray(int capacity) {
 		@SuppressWarnings("unchecked")
-		LinkedList<Entry<K, V>>[] result = (LinkedList<Entry<K, V>>[])new LinkedList<?>[length];
+		LinkedList<Entry<K, V>>[] result = (LinkedList<Entry<K, V>>[])new LinkedList<?>[capacity];
 		return result;
 	}
 

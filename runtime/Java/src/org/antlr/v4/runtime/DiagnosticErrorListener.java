@@ -76,8 +76,8 @@ public class DiagnosticErrorListener extends BaseErrorListener {
 		String decision = getDecisionDescription(recognizer, dfa);
 		BitSet conflictingAlts = getConflictingAlts(ambigAlts, configs);
 		String text = recognizer.getTokenStream().getText(Interval.of(startIndex, stopIndex));
-		String message = String.format(format, decision, conflictingAlts, text);
-		recognizer.notifyErrorListeners(message);
+		String msg = String.format(format, decision, conflictingAlts, text);
+		recognizer.notifyErrorListeners(msg);
 	}
 
 	@Override
@@ -91,8 +91,8 @@ public class DiagnosticErrorListener extends BaseErrorListener {
 		String format = "reportAttemptingFullContext d=%s, input='%s'";
 		String decision = getDecisionDescription(recognizer, dfa);
 		String text = recognizer.getTokenStream().getText(Interval.of(startIndex, stopIndex));
-		String message = String.format(format, decision, text);
-		recognizer.notifyErrorListeners(message);
+		String msg = String.format(format, decision, text);
+		recognizer.notifyErrorListeners(msg);
 	}
 
 	@Override
@@ -106,8 +106,8 @@ public class DiagnosticErrorListener extends BaseErrorListener {
 		String format = "reportContextSensitivity d=%s, input='%s'";
 		String decision = getDecisionDescription(recognizer, dfa);
 		String text = recognizer.getTokenStream().getText(Interval.of(startIndex, stopIndex));
-		String message = String.format(format, decision, text);
-		recognizer.notifyErrorListeners(message);
+		String msg = String.format(format, decision, text);
+		recognizer.notifyErrorListeners(msg);
 	}
 
 	protected String getDecisionDescription(Parser recognizer, DFA dfa) {
