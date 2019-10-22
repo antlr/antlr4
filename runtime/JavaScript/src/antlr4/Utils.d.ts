@@ -71,13 +71,13 @@ export class Map<K, V> {
     toString(): string
 }
 
-export class AltDict<string, V> {
+export class AltDict<K extends string, V> {
     public data: Map<string, V>
 
     constructor()
 
-    get(key: string): V | null
-    put(key: string, value: V): void
+    get(key: K): V | null
+    put(key: K, value: V): void
     values(): Array<V>
 }
 
