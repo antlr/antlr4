@@ -29,7 +29,7 @@ export class IntervalSet {
     addRange(l: number, h: number): void
     addInterval(v: number): void
     addSet(other: IntervalSet): IntervalSet
-    reduce(k): void
+    reduce(k: number): void
     complement(start: number, stop: number): IntervalSet
     contains(item: Interval): boolean
     removeRange(v: number): void

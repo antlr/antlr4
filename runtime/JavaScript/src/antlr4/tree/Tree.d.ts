@@ -3,6 +3,7 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 import { Interval } from "../IntervalSet"
+import { ParserRuleContext } from "../ParserRuleContext"
 import { Token } from "../Token"
 import "../Utils"
 
@@ -64,7 +65,7 @@ export class TerminalNodeImpl extends TerminalNode {
     getPayload(): Token
     getSourceInterval(): Interval
     getChildCount(): 0
-    accept<T>(visitor: ParseTreeVisitor): T
+    accept<T>(visitor: ParseTreeVisitor<T>): T
     getText(): string
     toString(): string
 }
@@ -73,7 +74,7 @@ export class ErrorNodeImpl extends TerminalNodeImpl {
     constructor(token: Token)
 
     isErrorNode(): true
-    accept<T>(visitor: ParseTreeVisitor): T
+    accept<T>(visitor: ParseTreeVisitor<T>): T
 }
 
 export class ParseTreeWalker {

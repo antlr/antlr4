@@ -4,7 +4,7 @@
  */
 import { CommonToken, SourcePair } from "./Token"
 
-abstract class TokenFactory {
+export class TokenFactory {
     constructor()
 }
 
@@ -25,5 +25,5 @@ export class CommonTokenFactory extends TokenFactory {
         line: number,
         column: number
     ): CommonToken
-    createThin(type: number, text: string): CommonToken
+    createThin(type: number, text: string | null): CommonToken
 }
