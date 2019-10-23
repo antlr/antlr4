@@ -42,7 +42,7 @@ Recognizer.prototype.getTokenTypeMap = function() {
     }
     var result = this.tokenTypeMapCache[tokenNames];
     if(result===undefined) {
-        result = tokenNames.reduce(function(o, k, i) { o[k] = i; });
+        result = tokenNames.reduce(function(o, k, i) { o[k] = i; return o; }, {});
         result.EOF = Token.EOF;
         this.tokenTypeMapCache[tokenNames] = result;
     }
@@ -60,7 +60,7 @@ Recognizer.prototype.getRuleIndexMap = function() {
     }
     var result = this.ruleIndexMapCache[ruleNames];
     if(result===undefined) {
-        result = ruleNames.reduce(function(o, k, i) { o[k] = i; });
+        result = ruleNames.reduce(function(o, k, i) { o[k] = i; return o; }, {});
         this.ruleIndexMapCache[ruleNames] = result;
     }
     return result;
