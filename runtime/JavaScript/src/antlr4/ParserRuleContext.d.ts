@@ -34,12 +34,12 @@ export class ParserRuleContext extends RuleContext {
     addErrorNode(badToken: Token): ErrorNodeImpl
 
     getChild(i: number): ParseTree | null
-    getChild<T extends typeof ParseTree>(i: number, type: T): T | null
+    getChild<T extends ParseTree>(i: number, type: T): T | null
 
     getToken(ttype: number, i: number): TerminalNode | null
     getTokens(ttype: number): Array<TerminalNode>
-    getTypedRuleContext<T extends typeof ParseTree>(ctxType: T, i: number): T | null
-    getTypedRuleContexts<T extends typeof ParseTree>(ctxType: T): Array<T>
+    getTypedRuleContext<T extends ParseTree>(ctxType: T, i: number): T | null
+    getTypedRuleContexts<T extends ParseTree>(ctxType: T): Array<T>
     getChildCount(): number
     getSourceInterval(): Interval
 }

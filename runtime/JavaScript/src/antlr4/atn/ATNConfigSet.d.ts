@@ -29,7 +29,7 @@ export class ATNConfigSet {
     getStates(): Set<ATNState>
     getPredicates(): Array<SemanticContext>
     optimizeConfigs(interpreter: ATNSimulator): void
-    addAll<T extends typeof ATNConfig>(coll: Iterable<T>): boolean
+    addAll<T extends ATNConfig>(coll: Iterable<T>): boolean
     equals(other: any): boolean
     hashCode(): number
     updateHashCode(hash: Hash): void

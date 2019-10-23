@@ -14,7 +14,7 @@ import { RecognitionException } from "./Errors"
 export class ErrorListener {
     constructor()
 
-    syntaxError<R extends typeof Recognizer>(
+    syntaxError<R extends Recognizer>(
         recognizer: R,
         offendingSymbol: Token,
         line: number,
@@ -22,7 +22,7 @@ export class ErrorListener {
         msg: string,
         e: RecognitionException
     ): void
-    syntaxError<L extends typeof Lexer>(
+    syntaxError<L extends Lexer>(
         recognizer: L,
         offendingSymbol: null,
         line: number,
@@ -31,7 +31,7 @@ export class ErrorListener {
         e: RecognitionException
     ): void
 
-    reportAmbiguity<P extends typeof Parser>(
+    reportAmbiguity<P extends Parser>(
         recognizer: P,
         dfa: DFA,
         startIndex: number,
@@ -41,7 +41,7 @@ export class ErrorListener {
         configs: ATNConfigSet
     ): void
 
-    reportAttemptingFullContext<P extends typeof Parser>(
+    reportAttemptingFullContext<P extends Parser>(
         recognizer: P,
         dfa: DFA,
         startIndex: number,
@@ -50,7 +50,7 @@ export class ErrorListener {
         configs: ATNConfigSet
     ): void
 
-    reportContextSensitivity<P extends typeof Parser>(
+    reportContextSensitivity<P extends Parser>(
         recognizer: P,
         dfa: DFA,
         startIndex: number,
