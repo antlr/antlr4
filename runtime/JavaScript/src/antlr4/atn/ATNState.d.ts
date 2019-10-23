@@ -131,6 +131,6 @@ export class LoopEndState extends ATNState {
     public loopBackState: ATNState | null
 }
 
-export class TokenStartState extends DecisionState {
+export class TokensStartState extends DecisionState {
     public stateType: ATNState.TOKEN_START
 }
