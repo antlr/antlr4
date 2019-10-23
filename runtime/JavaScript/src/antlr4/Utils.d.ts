@@ -71,8 +71,8 @@ export class Map<K, V> {
     toString(): string
 }
 
-export class AltDict<K extends string, V> {
-    public data: Map<string, V>
+export class AltDict<K, V> {
+    public data: Map<K, V>
 
     constructor()
 
