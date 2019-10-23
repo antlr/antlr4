@@ -5,16 +5,9 @@
 import { InputStream } from "./InputStream"
 import { Lexer } from "./Lexer"
 
-export type SourcePair = Tuple<Lexer | null, InputStream | null>
+export type SourcePair = [Lexer | null, InputStream | null]
 
 export class Token {
-    static readonly INVALID_TYPE: number
-    static readonly EPSILON: number
-    static readonly MIN_USER_TOKEN_TYPE: number
-    static readonly EOF: number
-    static readonly DEFAULT_CHANNEL: number
-    static readonly HIDDEN_CHANNEL: number
-
     public source: SourcePair | null
     public type: number | null
     public channel: number | null
@@ -29,15 +22,27 @@ export class Token {
     constructor()
 
     get text(): string
-    set text(text: string): void
+    set text(text: string)
 
     getTokenSource(): Lexer | null
     getInputStream(): InputStream | null
 }
+export namespace Token {
+    export const INVALID_TYPE: number
+    export const EPSILON: number
+    export const MIN_USER_TOKEN_TYPE: number
+    export const EOF: number
+    export const DEFAULT_CHANNEL: number
+    export const HIDDEN_CHANNEL: number
+    export type INVALID_TYPE = typeof Token.INVALID_TYPE
+    export type EPSILON = typeof Token.EPSILON
+    export type MIN_USER_TOKEN_TYPE = typeof Token.MIN_USER_TOKEN_TYPE
+    export type EOF = typeof Token.EOF
+    export type DEFAULT_CHANNEL = typeof Token.DEFAULT_CHANNEL
+    export type HIDDEN_CHANNEL = typeof Token.HIDDEN_CHANNEL
+}
 
 export class CommonToken extends Token {
-    static readonly EMPTY_SOURCE: Tuple<null, null>
-
     constructor(
         source?: SourcePair,
         type?: number,
@@ -48,4 +53,8 @@ export class CommonToken extends Token {
 
     clone(): CommonToken
     toString(): string
+}
+export namespace CommonToken {
+    export const EMPTY_SOURCE: [null, null]
+    export type EMPTY_SOURCE = typeof CommonToken.EMPTY_SOURCE
 }

@@ -37,6 +37,7 @@ export class ParseTreeVisitor<T> {
 
     visit(ctx: Array<ParserRuleContext>): Array<T>
     visit(ctx: ParserRuleContext): T
+
     visitChildren(ctx: ParserRuleContext): T | null
     visitTerminal(node: TerminalNode): void
     visitErrorNode(node: ErrorNode): void

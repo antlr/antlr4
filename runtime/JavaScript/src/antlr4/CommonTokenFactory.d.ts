@@ -18,23 +18,12 @@ export class CommonTokenFactory extends TokenFactory {
     create(
         source: SourcePair,
         type: number,
-        text: string,
+        text: string | null,
         channel: number,
         start: undefined,
         stop: undefined,
         line: number,
         column: number
     ): CommonToken
-    create(
-        source: SourcePair,
-        type: number,
-        text: null,
-        channel: number,
-        start: number,
-        stop: number,
-        line: number,
-        column: number
-    ): CommonToken
-
     createThin(type: number, text: string): CommonToken
 }
