@@ -26,7 +26,7 @@ export abstract class ATNState {
     public stateNumber: ATNState.INVALID_STATE_NUMBER
     public stateType: ATNStateNumber | null
     public ruleIndex: number
-    public epsilonOnlyTransitions: false
+    public epsilonOnlyTransitions: boolean
     public transitions: Array<Transition>
     public nextTokenWithinRule: IntervalSet | null
 
@@ -34,6 +34,7 @@ export abstract class ATNState {
 
     toString(): string
     equals(other: any): boolean
+    // Returns a `false` literal.
     isNonGreedyExitState(): false
     addTransition(trans: Transition, index?: number): void
 }
