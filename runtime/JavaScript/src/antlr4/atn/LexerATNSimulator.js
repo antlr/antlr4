@@ -93,7 +93,7 @@ LexerATNSimulator.prototype.copyState = function(simulator) {
 };
 
 LexerATNSimulator.prototype.match = function(input, mode) {
-	this.match_calls += 1;
+	LexerATNSimulator.match_calls += 1;
 	this.mode = mode;
 	var mark = input.mark();
 	try {
