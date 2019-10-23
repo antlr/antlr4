@@ -34,7 +34,10 @@ ErrorStrategy.prototype.sync = function(recognizer){
 ErrorStrategy.prototype.inErrorRecoveryMode = function(recognizer){
 };
 
-ErrorStrategy.prototype.reportError = function(recognizer){
+ErrorStrategy.prototype.reportMatch = function(recognizer){
+};
+
+ErrorStrategy.prototype.reportError = function(recognizer, e){
 };
 
 
