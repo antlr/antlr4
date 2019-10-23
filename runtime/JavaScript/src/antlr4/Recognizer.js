@@ -40,11 +40,11 @@ Recognizer.prototype.getTokenTypeMap = function() {
     if (tokenNames===null) {
         throw("The current recognizer does not provide a list of token names.");
     }
-    var result = this.tokenTypeMapCache[tokenNames];
+    var result = Recognizer.tokenTypeMapCache[tokenNames];
     if(result===undefined) {
         result = tokenNames.reduce(function(o, k, i) { o[k] = i; return o; }, {});
         result.EOF = Token.EOF;
-        this.tokenTypeMapCache[tokenNames] = result;
+        Recognizer.tokenTypeMapCache[tokenNames] = result;
     }
     return result;
 };
@@ -58,10 +58,10 @@ Recognizer.prototype.getRuleIndexMap = function() {
     if (ruleNames===null) {
         throw("The current recognizer does not provide a list of rule names.");
     }
-    var result = this.ruleIndexMapCache[ruleNames];
+    var result = Recognizer.ruleIndexMapCache[ruleNames];
     if(result===undefined) {
         result = ruleNames.reduce(function(o, k, i) { o[k] = i; return o; }, {});
-        this.ruleIndexMapCache[ruleNames] = result;
+        Recognizer.ruleIndexMapCache[ruleNames] = result;
     }
     return result;
 };
