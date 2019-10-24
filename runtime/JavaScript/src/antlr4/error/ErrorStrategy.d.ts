@@ -18,7 +18,7 @@ export interface ErrorStrategy {
     recover(recognizer: Parser, e: RecognitionException): void
     sync(recognizer: Parser): void
     inErrorRecoveryMode(recognizer: Parser): void
-    reportMatch(recognizer: Parser)
+    reportMatch(recognizer: Parser): void
     reportError(recognizer: Parser, e: RecognitionException): void
 }
 
@@ -30,7 +30,7 @@ export class DefaultErrorStrategy implements ErrorStrategy {
     constructor()
 
     reset(recognizer: Parser): void
-    recoverInline(recognizer: Parser): void
+    recoverInline(recognizer: Parser): Token
     recover(recognizer: Parser, e: RecognitionException): void
     sync(recognizer: Parser): void
     inErrorRecoveryMode(recognizer: Parser): void
