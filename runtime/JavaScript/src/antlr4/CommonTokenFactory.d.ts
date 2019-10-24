@@ -4,12 +4,9 @@
  */
 import { Lexer } from "./Lexer"
 import { CommonToken, SourcePair } from "./Token"
+import { TokenFactory } from "./TokenFactory"
 
-export class TokenFactory {
-    constructor()
-}
-
-export class CommonTokenFactory extends TokenFactory {
+export class CommonTokenFactory implements TokenFactory {
     static readonly DEFAULT: CommonTokenFactory
 
     public copyText: boolean
