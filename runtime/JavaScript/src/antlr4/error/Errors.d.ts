@@ -4,7 +4,6 @@
  */
 import { ATNConfigSet } from "../atn/ATNConfigSet"
 import { PredicateTransition } from "../atn/Transition"
-import { TokenStream } from "../BufferedTokenStream"
 import { InputStream } from "../InputStream"
 import { IntervalSet } from "../IntervalSet"
 import { Lexer } from "../Lexer"
@@ -12,11 +11,13 @@ import { Parser } from "../Parser"
 import { ParserRuleContext } from "../ParserRuleContext"
 import { Recognizer } from "../Recognizer"
 import { Token } from "../Token"
+import { TokenSource } from "../TokenSource"
+import { TokenStream } from "../TokenStream"
 
 export class RecognitionException extends Error {
     public message: string
     public recognizer: Recognizer | null
-    public input: InputStream | TokenStream | null
+    public input: TokenSource | TokenStream | null
     public ctx: ParserRuleContext | null
     public offendingToken: Token | null
     public offendingState: number
@@ -24,7 +25,7 @@ export class RecognitionException extends Error {
     constructor(params: {
         message: string,
         recognizer: Recognizer | null,
-        input: InputStream | TokenStream | null,
+        input: TokenSource | TokenStream | null,
         ctx: ParserRuleContext | null
     })
 
