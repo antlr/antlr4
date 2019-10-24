@@ -3,7 +3,7 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
-export enum ATNType {
+export declare enum ATNType {
     LEXER = 0,
     PARSER = 1
 }

@@ -3,17 +3,20 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 import { IntervalSet } from "../IntervalSet"
+
 import { ATN } from "./ATN"
 import { Transition } from "./Transition"
 
-export abstract class ATNState {
-    public atn: ATN | null
-    public stateNumber: ATNState.INVALID_STATE_NUMBER
-    public stateType: ATNStateType | null
-    public ruleIndex: number
-    public epsilonOnlyTransitions: boolean
-    public transitions: Array<Transition>
-    public nextTokenWithinRule: IntervalSet | null
+export declare abstract class ATNState {
+    static serializationNames: ReadonlyArray<string>
+
+    atn: ATN | null
+    stateNumber: number
+    stateType: ATNStateType | null
+    ruleIndex: number
+    epsilonOnlyTransitions: boolean
+    transitions: Array<Transition>
+    nextTokenWithinRule: IntervalSet | null
 
     constructor()
 
@@ -22,7 +25,7 @@ export abstract class ATNState {
     isNonGreedyExitState(): boolean
     addTransition(trans: Transition, index?: number): void
 }
-export namespace ATNState {
+export declare namespace ATNState {
     export const INVALID_TYPE: 0
     export const BASIC: 1
     export const RULE_START: 2
@@ -36,100 +39,72 @@ export namespace ATNState {
     export const STAR_LOOP_ENTRY: 10
     export const PLUS_LOOP_BACK: 11
     export const LOOP_END: 12
-    export type INVALID_TYPE = typeof ATNState.INVALID_TYPE
-    export type BASIC = typeof ATNState.BASIC
-    export type RULE_START = typeof ATNState.RULE_START
-    export type BLOCK_START = typeof ATNState.BLOCK_START
-    export type PLUS_BLOCK_START = typeof ATNState.PLUS_BLOCK_START
-    export type STAR_BLOCK_START = typeof ATNState.STAR_BLOCK_START
-    export type TOKEN_START = typeof ATNState.TOKEN_START
-    export type RULE_STOP = typeof ATNState.RULE_STOP
-    export type BLOCK_END = typeof ATNState.BLOCK_END
-    export type STAR_LOOP_BACK = typeof ATNState.STAR_LOOP_BACK
-    export type STAR_LOOP_ENTRY = typeof ATNState.STAR_LOOP_ENTRY
-    export type PLUS_LOOP_BACK = typeof ATNState.PLUS_LOOP_BACK
-    export type LOOP_END = typeof ATNState.LOOP_END
 
-    export const INVALID_STATE_NUMBER: -1
-    export type INVALID_STATE_NUMBER = typeof ATNState.INVALID_STATE_NUMBER
-
-    export const serializationNames: Array<string>
-}
-export type ATNStateType =
-    ATNState.INVALID_TYPE
-    | ATNState.BASIC
-    | ATNState.RULE_START
-    | ATNState.BLOCK_START
-    | ATNState.PLUS_BLOCK_START
-    | ATNState.STAR_BLOCK_START
-    | ATNState.TOKEN_START
-    | ATNState.RULE_STOP
-    | ATNState.BLOCK_END
-    | ATNState.STAR_LOOP_BACK
-    | ATNState.STAR_LOOP_ENTRY
-    | ATNState.PLUS_LOOP_BACK
-    | ATNState.LOOP_END
-
-export abstract class BasicState extends ATNState {
-    public stateType: ATNState.BASIC
+    export const INVALID_STATE_NUMBER: number
 }
 
-export abstract class DecisionState extends ATNState {
-    public decision: -1
-    public nonGreedy: boolean
+export declare type ATNStateType = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
+
+export declare class BasicState extends ATNState {
+    stateType: ATNStateType
+}
+
+export declare abstract class DecisionState extends ATNState {
+    decision: -1
+    nonGreedy: boolean
 }
 
 export abstract class BlockStartState extends DecisionState {
-    public endState: BlockEndState | null
+    endState: BlockEndState | null
 }
 
-export class BasicBlockStartState extends BlockStartState {
-    public stateType: ATNState.BLOCK_START
+export declare class BasicBlockStartState extends BlockStartState {
+    stateType: ATNStateType
 }
 
-export class BlockEndState extends ATNState {
-    public stateType: ATNState.BLOCK_END
-    public startState: BlockStartState | null
+export declare class BlockEndState extends ATNState {
+    stateType: ATNStateType
+    startState: BlockStartState | null
 }
 
-export class RuleStopState extends ATNState {
-    public stateType: ATNState.RULE_STOP
+export declare class RuleStopState extends ATNState {
+    stateType: ATNStateType
 }
 
-export class RuleStartState extends ATNState {
-    public stateType: ATNState.RULE_START
-    public stopState: RuleStopState | null
-    public isPrecedenceRule: boolean
+export declare class RuleStartState extends ATNState {
+    stateType: ATNStateType
+    stopState: RuleStopState | null
+    isPrecedenceRule: boolean
 }
 
-export class PlusLoopbackState extends ATNState {
-    public stateType: ATNState.PLUS_LOOP_BACK
+export declare class PlusLoopbackState extends ATNState {
+    stateType: ATNStateType
 }
 
-export class PlusBlockStartState extends ATNState {
-    public stateType: ATNState.PLUS_BLOCK_START
-    public loopBackState: PlusLoopbackState | null
+export declare class PlusBlockStartState extends ATNState {
+    stateType: ATNStateType
+    loopBackState: PlusLoopbackState | null
 }
 
-export class StarBlockStartState extends BlockStartState {
-    public stateType: ATNState.STAR_BLOCK_START
+export declare class StarBlockStartState extends BlockStartState {
+    stateType: ATNStateType
 }
 
-export class StarLoopbackState extends ATNState {
-    public stateType: ATNState.STAR_LOOP_BACK
+export declare class StarLoopbackState extends ATNState {
+    stateType: ATNStateType
 }
 
-export class StarLoopEntryState extends DecisionState {
-    public stateType: ATNState.STAR_LOOP_ENTRY
-    public loopBackState: StarLoopbackState | null
-    public isPrecedenceDecision: boolean | null
+export declare class StarLoopEntryState extends DecisionState {
+    stateType: ATNStateType
+    loopBackState: StarLoopbackState | null
+    isPrecedenceDecision: boolean | null
 }
 
-export class LoopEndState extends ATNState {
-    public stateType: ATNState.LOOP_END
-    public loopBackState: ATNState | null
+export declare class LoopEndState extends ATNState {
+    stateType: ATNStateType
+    loopBackState: ATNState | null
 }
 
-export class TokensStartState extends DecisionState {
-    public stateType: ATNState.TOKEN_START
+export declare class TokensStartState extends DecisionState {
+    stateType: ATNStateType
 }

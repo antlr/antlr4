@@ -6,24 +6,24 @@ import { Recognizer } from "../Recognizer"
 import { RuleContext } from "../RuleContext"
 import { Hash, Set } from "../Utils"
 
-export class SemanticContext {
-    constructor()
+export declare class SemanticContext {
+    protected constructor()
 
     hashCode(): number
     evaluate(parser: Recognizer, outerContext: RuleContext): void
-    evalPrecedence(parser: Recognizer, outerContext: RuleContext): SemanticContext
+    evalPrecedence(parser: Recognizer, outerContext: RuleContext): SemanticContext | null
+
+    static andContext(a: SemanticContext, b: SemanticContext): SemanticContext
+    static orContext(a: SemanticContext, b: SemanticContext): SemanticContext
 }
-export namespace SemanticContext {
+export declare namespace SemanticContext {
     export const NONE: Predicate
-
-    export function andContext(a: SemanticContext, b: SemanticContext): SemanticContext
-    export function orContext(a: SemanticContext, b: SemanticContext): SemanticContext
 }
 
-export class Predicate extends SemanticContext {
-    public ruleIndex: number
-    public predIndex: number
-    public isCtxDependent: boolean
+export declare class Predicate extends SemanticContext {
+    ruleIndex: number
+    predIndex: number
+    isCtxDependent: boolean
 
     constructor(ruleIndex?: number, predIndex?: number, isCtxDependent?: boolean)
 
@@ -33,8 +33,8 @@ export class Predicate extends SemanticContext {
     toString(): string
 }
 
-export class PrecedencePredicate extends SemanticContext {
-    public precedence: number
+export declare class PrecedencePredicate extends SemanticContext {
+    precedence: number
 
     constructor(precedence: number)
 
@@ -44,7 +44,6 @@ export class PrecedencePredicate extends SemanticContext {
     updateHashCode(hash: Hash): void
     equals(other: any): boolean
     toString(): string
-}
-export namespace PrecedencePredicate {
-    export function filterPrecedencePredicates(set: Array<SemanticContext>): Array<PrecedencePredicate>
+
+    static filterPrecedencePredicates(set: Array<SemanticContext>): Array<PrecedencePredicate>
 }

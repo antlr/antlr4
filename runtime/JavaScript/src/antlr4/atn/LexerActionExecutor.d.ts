@@ -8,9 +8,9 @@ import { Hash, hashStuff } from "../Utils"
 
 import { LexerAction, LexerIndexedCustomAction } from "./LexerAction"
 
-export class LexerActionExecutor {
-    public lexerActions: Array<LexerAction>
-    public cachedHashCode: number
+export declare class LexerActionExecutor {
+    lexerActions: Array<LexerAction>
+    cachedHashCode: number
 
     constructor(lexerActions: Array<LexerAction>)
 
@@ -19,10 +19,6 @@ export class LexerActionExecutor {
     hashCode(): number
     updateHashCode(hash: Hash): void
     equals(other: any): boolean
-}
-export namespace LexerActionExecutor {
-    export function append(
-        LexerActionExecutor: LexerActionExecutor,
-        LexerAction: LexerAction
-    ): LexerActionExecutor
+
+    static append(lexerActionExecutor: LexerActionExecutor, lexerAction: LexerAction): LexerActionExecutor
 }

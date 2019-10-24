@@ -3,13 +3,13 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
-export class ATNDeserializationOptions {
-    public readOnly: boolean
-    public verifyATN: boolean
-    public generateRuleBypassTransitions: boolean
+export declare class ATNDeserializationOptions {
+    static defaultOptions: ATNDeserializationOptions
 
-    constructor(copyFrom?: ATNDeserializationOptions | null)
-}
-export namespace ATNDeserializationOptions {
-    export const defaultOptions: ATNDeserializationOptions
+    readOnly: boolean
+    verifyATN: boolean
+    generateRuleBypassTransitions: boolean
+
+    constructor()
+    constructor(copyFrom: ATNDeserializationOptions | null)
 }

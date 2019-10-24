@@ -3,31 +3,28 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 import { PredictionContext } from "../PredictionContext"
+import { Hash } from "../Utils"
+
 import { ATNState } from "./ATNState"
 import { LexerActionExecutor } from "./LexerActionExecutor"
 import { SemanticContext } from "./SemanticContext"
 
-interface ATNConfigParams {
-    state?: ATNState
-    alt?: number
-    context?: PredictionContext
-    semanticContext?: SemanticContext
-}
-interface ATNConfigLike extends ATNConfigParams {
-    reachesIntoOuterContext?: number
-    precedenceFilterSuppressed?: boolean
-}
-export class ATNConfig {
-    public state: ATNState | null
-    public alt: number | null
-    public context: PredictionContext | null
-    public semanticContext: SemanticContext | null
-    public reachesIntoOuterContext: number
-    public precedenceFilterSuppressed: boolean
+export declare class ATNConfig {
+    state: ATNState | null
+    alt: number | null
+    context: PredictionContext | null
+    semanticContext: SemanticContext | null
+    reachesIntoOuterContext: number
+    precedenceFilterSuppressed: boolean
 
-    constructor(params: ATNConfigParams, config: ATNConfigLike | null)
+    // Don't use config.
+    constructor(params: { state: ATNState, alt: number, context: PredictionContext, semanticContext?: SemanticContext }, config: null)
+    // Use config sparingly.
+    constructor(params: { state: ATNState, context?: PredictionContext, semanticContext?: SemanticContext }, config: ATNConfig)
+    constructor(params: { semanticContext: SemanticContext }, config: ATNConfig)
+    // Only use config.
+    constructor(params: {}, config: ATNConfig)
 
-    checkContext(params: { context?: object | null }, config: { context?: object | null } | null): void
     hashCode(): number
     updateHashCode(hash: Hash): void
     equals(other: any): boolean
@@ -35,22 +32,18 @@ export class ATNConfig {
     equalsForConfigSet(other: any): boolean
     toString(): string
 }
-export namespace ATNConfig {
+export declare namespace ATNConfig {
     export const SUPPRESS_PRECEDENCE_FILTER: number
-    export type SUPPRESS_PRECEDENCE_FILTER = typeof ATNConfig.SUPPRESS_PRECEDENCE_FILTER
 }
 
-interface LexerATNConfigParams extends ATNConfigParams {
-    lexerActionExecutor?: LexerActionExecutor
-}
-interface LexerATNConfigLike extends LexerATNConfigParams {
+export declare class LexerATNConfig extends ATNConfig {
     lexerActionExecutor: LexerActionExecutor
-}
-export class LexerATNConfig extends ATNConfig {
-    public lexerActionExecutor: LexerActionExecutor
-    public passedThroughNonGreedyDecision: boolean
+    passedThroughNonGreedyDecision: boolean
 
-    constructor(params: LexerATNConfigParams, config: LexerATNConfigLike | null)
+    // Don't use config.
+    constructor(params: { state: ATNState, alt: number, context: PredictionContext, lexerActionExecutor?: LexerActionExecutor }, config: null)
+    // Use config sparingly.
+    constructor(params: { state: ATNState, context?: PredictionContext, lexerActionExecutor?: LexerActionExecutor }, config: LexerATNConfig)
 
     updateHashCode(hash: Hash): void
     equals(other: any): boolean

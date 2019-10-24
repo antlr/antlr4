@@ -5,7 +5,7 @@
 import { Lexer } from "../Lexer"
 import { Hash } from "../Utils"
 
-export enum LexerActionType {
+export declare enum LexerActionType {
     CHANNEL = 0,
     CUSTOM = 1,
     MODE = 2,
@@ -16,9 +16,9 @@ export enum LexerActionType {
     TYPE = 7
 }
 
-export class LexerAction {
-    public actionType: LexerActionType
-    public isPositionDependent: boolean
+export declare class LexerAction {
+    actionType: LexerActionType
+    isPositionDependent: boolean
 
     constructor(action: LexerActionType)
 
@@ -27,17 +27,17 @@ export class LexerAction {
     equals(other: any): boolean
 }
 
-export class LexerSkipAction {
+export declare class LexerSkipAction {
     static readonly INSTANCE: LexerSkipAction
 
-    constructor()
+    private constructor()
 
     execute(lexer: Lexer): void
     toString(): string
 }
 
-export class LexerTypeAction {
-    public type: LexerActionType
+export declare class LexerTypeAction {
+    type: LexerActionType
 
     constructor(type: LexerActionType)
 
@@ -47,8 +47,8 @@ export class LexerTypeAction {
     toString(): string
 }
 
-export class LexerPushModeAction {
-    public mode: number
+export declare class LexerPushModeAction {
+    mode: number
 
     constructor(mode: number)
 
@@ -58,26 +58,26 @@ export class LexerPushModeAction {
     toString(): string
 }
 
-export class LexerPopModeAction {
+export declare class LexerPopModeAction {
     static readonly INSTANCE: LexerPopModeAction
 
-    constructor()
+    private constructor()
 
     execute(lexer: Lexer): void
     toString(): string
 }
 
-export class LexerMoreAction {
+export declare class LexerMoreAction {
     static readonly INSTANCE: LexerMoreAction
 
-    constructor()
+    private constructor()
 
     execute(lexer: Lexer): void
     toString(): string
 }
 
-export class LexerModeAction {
-    public mode: number
+export declare class LexerModeAction {
+    mode: number
 
     constructor(mode: number)
 
@@ -87,9 +87,9 @@ export class LexerModeAction {
     toString(): string
 }
 
-export class LexerCustomAction extends LexerAction {
-    public ruleIndex: number
-    public actionIndex: number
+export declare class LexerCustomAction extends LexerAction {
+    ruleIndex: number
+    actionIndex: number
 
     constructor(ruleIndex: number, actionIndex: number)
 
@@ -98,8 +98,8 @@ export class LexerCustomAction extends LexerAction {
     equals(other: any): boolean
 }
 
-export class LexerChannelAction extends LexerAction {
-    public channel: number
+export declare class LexerChannelAction extends LexerAction {
+    channel: number
 
     constructor(channel: number)
 
@@ -109,9 +109,9 @@ export class LexerChannelAction extends LexerAction {
     toString(): string
 }
 
-export class LexerIndexedCustomAction extends LexerAction {
-    public offset: number
-    public action: LexerAction
+export declare class LexerIndexedCustomAction extends LexerAction {
+    offset: number
+    action: LexerAction
 
     constructor(offset: number, action: LexerAction)
 

@@ -5,16 +5,17 @@
 import { DFAState } from "../dfa/DFAState"
 import { PredictionContext, PredictionContextCache } from "../PredictionContext"
 import { Map } from "../Utils"
+
 import { ATN } from "./ATN"
 
-export class ATNSimulator {
-    public atn: ATN
-    public sharedContextCache: PredictionContextCache
+export declare class ATNSimulator {
+    atn: ATN
+    sharedContextCache: PredictionContextCache
 
     constructor(atn: ATN, sharedContextCache: PredictionContextCache)
 
     getCachedContext(context: PredictionContext): PredictionContext
 }
-export namespace ATNSimulator {
+export declare namespace ATNSimulator {
     export const ERROR: DFAState
 }

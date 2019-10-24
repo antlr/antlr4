@@ -3,15 +3,16 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 import { AltDict, BitSet } from "../Utils"
+
 import { ATNConfigSet } from "./ATNConfigSet"
 import { ATNState } from "./ATNState"
 
-export enum PredictionMode {
+export declare enum PredictionMode {
     SLL = 0,
     LL,
     LL_EXACT_AMBIG_DETECTION
 }
-export namespace PredictionMode {
+export declare namespace PredictionMode {
     export function hasSLLConflictTerminatingPrediction(mode: PredictionMode, configs: ATNConfigSet): boolean
     export function hasConfigInRuleStopState(configs: ATNConfigSet): boolean
     export function allConfigsInRuleStopStates(configs: ATNConfigSet): boolean

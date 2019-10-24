@@ -4,45 +4,52 @@
  */
 import { PredictionContext } from "../PredictionContext"
 import { BitSet, DoubleDict, Hash, Set } from "../Utils"
+
 import { ATNConfig } from "./ATNConfig"
 import { ATNSimulator } from "./ATNSimulator"
 import { ATNState } from "./ATNState"
 import { SemanticContext } from "./SemanticContext"
 
-export class ATNConfigSet {
-    public configLookup: Set<ATNConfig>
-    public fullCtx: boolean
-    public readonly: boolean
-    public configs: Array<ATNConfig>
-    public uniqueAlt: number
-    public conflictingAlts: BitSet | null
-    public hasSemanticContext: boolean
-    public dipsIntroOuterContext: boolean
-    public cachedHashCode: number
+declare interface Indexable<T> {
+    [index: number]: T
+}
+
+export declare class ATNConfigSet {
+    configLookup: Set<ATNConfig> | null
+    fullCtx: boolean
+    readOnly: boolean
+    configs: Array<ATNConfig>
+    uniqueAlt: number
+    conflictingAlts: BitSet | null
+    hasSemanticContext: boolean
+    dipsIntroOuterContext: boolean
+    cachedHashCode: number
 
     constructor(fullCtx?: boolean)
 
     get items(): Array<ATNConfig>
+
     get length(): number
 
-    add(
-        config: ATNConfig,
-        mergeCache?: DoubleDict<PredictionContext, PredictionContext, PredictionContext> | null
-    ): boolean
+    add(config: ATNConfig, mergeCache?: DoubleDict<PredictionContext, PredictionContext, PredictionContext> | null): boolean
     getStates(): Set<ATNState>
     getPredicates(): Array<SemanticContext>
     optimizeConfigs(interpreter: ATNSimulator): void
-    addAll<T extends ATNConfig>(coll: Iterable<T>): boolean
+    addAll<T extends ATNConfig>(coll: Array<T>): boolean
     equals(other: any): boolean
     hashCode(): number
     updateHashCode(hash: Hash): void
     isEmpty(): boolean
     contains(item: any): boolean
-    containsFast(item: ATNConfig): boolean
+    /** FIXME: Replace return type with `boolean` once fixed.
+     *
+     * (PR #2674)
+    */
+    containsFast(item: ATNConfig): never
     clear(): void
     toString(): string
 }
 
-export class OrderedATNConfigSet extends ATNConfigSet {
+export declare class OrderedATNConfigSet extends ATNConfigSet {
     constructor()
 }
