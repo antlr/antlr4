@@ -57,6 +57,8 @@ interface Container<I, J> {
 }
 export class Map<K, V> {
     public data: Map<string, Array<Container<K, V>>>
+    public hashFunction: HashFunction
+    public equalsFunction: EqualsFunction
 
     constructor(hashFunction?: HashFunction, equalsFunction?: EqualsFunction)
 
@@ -97,11 +99,11 @@ export class Hash {
 
     constructor()
 
-    update(...arguments): void
+    update(...args: Array<any>): void
     finish(): number
 }
 
-export function hashStuff(...arguments): number
+export function hashStuff(...args: Array<any>): number
 
 export function escapeWhitespace(s: string, escapeSpaces: boolean): string
 
