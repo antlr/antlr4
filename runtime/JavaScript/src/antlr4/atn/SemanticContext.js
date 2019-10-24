@@ -335,7 +335,7 @@ function OR(a, b) {
 OR.prototype = Object.create(SemanticContext.prototype);
 OR.prototype.constructor = OR;
 
-OR.prototype.constructor = function(other) {
+OR.prototype.equals = function(other) {
 	if (this === other) {
 		return true;
 	} else if (!(other instanceof OR)) {
