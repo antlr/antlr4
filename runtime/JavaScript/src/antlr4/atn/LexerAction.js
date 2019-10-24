@@ -5,6 +5,8 @@
  */
  //
 
+var Hash = require('./../Utils').Hash;
+
 function LexerActionType() {
 }
 
