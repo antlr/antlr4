@@ -73,7 +73,7 @@ export class TerminalNodeImpl extends TerminalNode {
 export class ErrorNodeImpl extends TerminalNodeImpl {
     constructor(token: Token)
 
-    isErrorNode(): true
+    isErrorNode(): boolean
     accept<T>(visitor: ParseTreeVisitor<T>): T
 }
 

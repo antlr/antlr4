@@ -25,15 +25,15 @@ export namespace PredictionContext {
     export type EMPTY_RETURN_STATE = typeof PredictionContext.EMPTY_RETURN_STATE
 }
 
-export class PredictionContextCache<PC extends PredictionContext> {
-    public cache: Map<PC, PC>
+export class PredictionContextCache {
+    public cache: Map<PredictionContext, PredictionContext>
 
     constructor()
 
     get length(): number
 
-    add(ctx: PC): PC
-    get(ctx: PC): PC | null
+    add(ctx: PredictionContext): PredictionContext
+    get(ctx: PredictionContext): PredictionContext | null
 }
 
 export class SingletonPredictionContext extends PredictionContext {
@@ -59,7 +59,6 @@ export namespace SingletonPredictionContext {
 export class EmptyPredictionContext extends SingletonPredictionContext {
     constructor()
 
-    isEmpty(): true
     getParent(): PredictionContext.EMPTY
     getReturnState(): PredictionContext.EMPTY_RETURN_STATE
 }
@@ -89,6 +88,6 @@ export function merge(
 
 export function getCachedPredictionContext(
     context: PredictionContext,
-    contextCache: PredictionContextCache<PredictionContext>,
+    contextCache: PredictionContextCache,
     visited: Map<PredictionContext, PredictionContext>
 ): PredictionContext

@@ -7,5 +7,5 @@ import { InputStream } from "./InputStream"
 export class FileStream extends InputStream {
     public fileName: string
 
-    constructor(fileName: string, decodeToUnicodeCodePoints?: boolean)
+    constructor(fileName: string, decodeToUnicodeCodePoints?: boolean | null)
 }

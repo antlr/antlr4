@@ -12,7 +12,7 @@ export class InputStream {
     protected _index: number
     protected _size: number
 
-    constructor(data: string, decodeToUnicodeCodePoints?: boolean)
+    constructor(data: string, decodeToUnicodeCodePoints?: boolean | null)
 
     get index(): number
     get size(): number

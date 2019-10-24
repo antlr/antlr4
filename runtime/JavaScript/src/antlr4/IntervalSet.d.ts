@@ -35,9 +35,9 @@ export class IntervalSet {
     removeRange(v: number): void
     removeOne(v: number): void
     toString(
-        literalNames?: Array<string | null>,
-        symbolicNames?: Array<string | null>,
-        elemsAreChar?: boolean
+        literalNames?: Array<string | null> | null,
+        symbolicNames?: Array<string | null> | null,
+        elemsAreChar?: boolean | null
     ): string
     toCharString(): string
     toIndexString(): string

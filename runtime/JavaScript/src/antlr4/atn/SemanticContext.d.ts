@@ -11,7 +11,7 @@ export class SemanticContext {
 
     hashCode(): number
     evaluate(parser: Recognizer, outerContext: RuleContext): void
-    evalPrecedence(parser: Recognizer, outerContext: RuleContext): void
+    evalPrecedence(parser: Recognizer, outerContext: RuleContext): SemanticContext
 }
 export namespace SemanticContext {
     export const NONE: Predicate

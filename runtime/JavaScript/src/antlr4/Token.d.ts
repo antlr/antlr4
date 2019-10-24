@@ -5,10 +5,11 @@
 import { InputStream } from "./InputStream"
 import { Lexer } from "./Lexer"
 
-export type SourcePair = [Lexer | null, InputStream | null]
+export type SourcePair = [Lexer, InputStream]
+export type NullableSourcePair = [Lexer | null, InputStream | null]
 
 export class Token {
-    public source: SourcePair | null
+    public source: NullableSourcePair | null
     public type: number | null
     public channel: number | null
     public start: number | null
@@ -44,7 +45,7 @@ export namespace Token {
 
 export class CommonToken extends Token {
     constructor(
-        source?: SourcePair,
+        source?: NullableSourcePair,
         type?: number,
         channel?: number,
         start?: number,

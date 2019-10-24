@@ -8,7 +8,7 @@ export class ATNDeserializationOptions {
     public verifyATN: boolean
     public generateRuleBypassTransitions: boolean
 
-    constructor(copyFrom?: ATNDeserializationOptions)
+    constructor(copyFrom?: ATNDeserializationOptions | null)
 }
 export namespace ATNDeserializationOptions {
     export const defaultOptions: ATNDeserializationOptions

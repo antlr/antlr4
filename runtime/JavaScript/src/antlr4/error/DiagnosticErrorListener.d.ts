@@ -11,7 +11,7 @@ import { ErrorListener } from "./ErrorListener"
 export class DiagnosticErrorListener extends ErrorListener {
     public exactOnly: boolean
 
-    constructor(exactOnly?: boolean)
+    constructor(exactOnly?: boolean | null)
 
     protected getDecisionDescription(recognizer: Parser, dfa: DFA): string
 

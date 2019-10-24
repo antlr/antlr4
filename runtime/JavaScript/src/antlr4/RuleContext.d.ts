@@ -26,8 +26,8 @@ export class RuleContext extends RuleNode {
     getChild(i: number): ParseTree | null
     getChildCount(): number
     accept<T>(visitor: ParseTreeVisitor<T>): T
-    toStringTree(ruleNames?: Array<string>, recog?: Parser): string
-    toString(ruleNames?: Array<string>, stop?: number): string
+    toStringTree(ruleNames?: Array<string> | null, recog?: Parser | null): string
+    toString(ruleNames?: Array<string> | null, stop?: number | null): string
 }
 export namespace RuleContext {
     export const EMPTY: ParserRuleContext

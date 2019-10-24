@@ -25,7 +25,10 @@ export class ATNConfigSet {
     get items(): Array<ATNConfig>
     get length(): number
 
-    add(config: ATNConfig, mergeCache?: DoubleDict<PredictionContext, PredictionContext, PredictionContext>): boolean
+    add(
+        config: ATNConfig,
+        mergeCache?: DoubleDict<PredictionContext, PredictionContext, PredictionContext> | null
+    ): boolean
     getStates(): Set<ATNState>
     getPredicates(): Array<SemanticContext>
     optimizeConfigs(interpreter: ATNSimulator): void

@@ -10,7 +10,7 @@ export class DFASerializer {
     public literalNames: Array<string>
     public symbolicNames: Array<string>
 
-    constructor(dfa: DFA, literalNames?: Array<string>, symbolicNames?: Array<string>)
+    constructor(dfa: DFA, literalNames?: Array<string> | null, symbolicNames?: Array<string> | null)
 
     toString(): string
     getEdgeLabel(i: number): string

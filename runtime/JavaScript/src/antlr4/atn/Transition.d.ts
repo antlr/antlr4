@@ -10,7 +10,7 @@ import { Predicate, PrecedencePredicate } from "./SemanticContext"
 
 export class Transition {
     public target: ATNState
-    public isEpsilon: false
+    public isEpsilon: boolean
     public label: IntervalSet | null
 
     constructor(target: ATNState)
@@ -51,11 +51,23 @@ export namespace Transition {
         export const PrecedencePredicateTransition: Transition.PRECEDENCE
     }
 }
+export type TransitionType =
+    Transition.EPSILON
+    | Transition.RANGE
+    | Transition.RULE
+    | Transition.PREDICATE
+    | Transition.ATOM
+    | Transition.ACTION
+    | Transition.ACTION
+    | Transition.SET
+    | Transition.NOT_SET
+    | Transition.WILDCARD
+    | Transition.PRECEDENCE
 
 export class AtomTransition extends Transition {
     public label_: number
     public label: IntervalSet
-    public serializationType: Transition.ATOM
+    public serializationType: TransitionType
 
     constructor(target: ATNState, label: number)
 
@@ -68,27 +80,27 @@ export class RuleTransition extends Transition {
     public ruleIndex: number
     public precedence: number
     public followState: ATNState
-    public serializationType: Transition.RULE
-    public isEpsilon: true
+    public serializationType: TransitionType
+    public isEpsilon: boolean
 
     constructor(ruleStart: ATNState, ruleIndex: number, precedence: number, followState: ATNState)
 
-    matches(symbol: number, minVocabSymbol: number, maxVocabSymbol: number): false
+    matches(symbol: number, minVocabSymbol: number, maxVocabSymbol: number): boolean
 }
 
 export class EpsilonTransition extends Transition {
-    public serializationType: Transition.EPSILON
-    public isEpsilon: true
+    public serializationType: TransitionType
+    public isEpsilon: boolean
     public outermostPrecedenceReturn: number
 
     constructor(target: ATNState, outermostPrecedenceReturn: number)
 
-    matches(symbol: number, minVocabSymbol: number, maxVocabSymbol: number): false
+    matches(symbol: number, minVocabSymbol: number, maxVocabSymbol: number): boolean
     toString(): string
 }
 
 export class RangeTransition extends Transition {
-    public serializationType: Transition.RANGE
+    public serializationType: TransitionType
     public start: number
     public stop: number
     public label: IntervalSet
@@ -104,34 +116,34 @@ export abstract class AbstractPredicateTransition extends Transition {
 }
 
 export class PredicateTransition extends AbstractPredicateTransition {
-    public serializationType: Transition.PREDICATE
+    public serializationType: TransitionType
     public ruleIndex: number
     public predIndex: number
     public isCtxDependent: boolean
-    public isEpsilon: true
+    public isEpsilon: boolean
 
     constructor(target: ATNState, ruleIndex: number, predIndex: number, isCtxDependent: boolean)
 
-    matches(symbol: number, minVocabSymbol: number, maxVocabSymbol: number): false
+    matches(symbol: number, minVocabSymbol: number, maxVocabSymbol: number): boolean
     getPredicate(): Predicate
     toString(): string
 }
 
 export class ActionTransition extends Transition {
-    public serializationType: Transition.ACTION
+    public serializationType: TransitionType
     public ruleIndex: number
     public actionIndex: number
     public isCtxDependent: boolean
-    public isEpsilon: true
+    public isEpsilon: boolean
 
     constructor(target: ATNState, ruleIndex: number, actionIndex?: number, isCtxDependent?: boolean)
 
-    matches(symbol: number, minVocabSymbol: number, maxVocabSymbol: number): false
+    matches(symbol: number, minVocabSymbol: number, maxVocabSymbol: number): boolean
     toString(): string
 }
 
 export class SetTransition extends Transition {
-    public serializationType: Transition.SET
+    public serializationType: TransitionType
     public label: IntervalSet
 
     constructor(target: ATNState, set?: IntervalSet | null)
@@ -141,27 +153,27 @@ export class SetTransition extends Transition {
 }
 
 export class NotSetTransition extends SetTransition {
-    public serializationType: Transition.NOT_SET
+    public serializationType: TransitionType
 
     matches(symbol: number, minVocabSymbol: number, maxVocabSymbol: number): boolean
     toString(): string
 }
 
 export class WildcardTransition extends Transition {
-    public serializationType: Transition.WILDCARD
+    public serializationType: TransitionType
 
     matches(symbol: number, minVocabSymbol: number, maxVocabSymbol: number): boolean
     toString(): string
 }
 
 export class PrecedencePredicateTransition extends AbstractPredicateTransition {
-    public serializationType: Transition.PRECEDENCE
+    public serializationType: TransitionType
     public precedence: number
-    public isEpsilon: true
+    public isEpsilon: boolean
 
     constructor(target: ATNState, precedence: number)
 
-    matches(symbol: number, minVocabSymbol: number, maxVocabSymbol: number): false
+    matches(symbol: number, minVocabSymbol: number, maxVocabSymbol: number): boolean
     getPredicate(): Predicate
     toString(): string
 }

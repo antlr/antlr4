@@ -2,16 +2,24 @@
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
+import atn = require("./atn")
+import dfa = require("./dfa")
+import error = require("./error")
 import codepointat = require("./polyfills/codepointat")
 import fromcodepoint = require("./polyfills/fromcodepoint")
+import tree = require("./tree")
 import Utils = require("./Utils")
 
-export { codepointat, fromcodepoint, Utils }
+export {
+    atn,
+    codepointat,
+    dfa,
+    error,
+    fromcodepoint,
+    tree,
+    Utils
+}
 
-export { atn } from "./atn"
-export { dfa } from "./dfa"
-export { tree } from "./tree"
-export { error } from "./error"
 export { CommonToken, Token } from "./Token"
 export { CharStreams } from "./CharStreams"
 export { InputStream } from "./InputStream"

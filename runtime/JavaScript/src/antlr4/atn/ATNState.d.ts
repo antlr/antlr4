@@ -6,25 +6,10 @@ import { IntervalSet } from "../IntervalSet"
 import { ATN } from "./ATN"
 import { Transition } from "./Transition"
 
-type ATNStateNumber =
-    ATNState.INVALID_TYPE
-    | ATNState.BASIC
-    | ATNState.RULE_START
-    | ATNState.BLOCK_START
-    | ATNState.PLUS_BLOCK_START
-    | ATNState.STAR_BLOCK_START
-    | ATNState.TOKEN_START
-    | ATNState.RULE_STOP
-    | ATNState.BLOCK_END
-    | ATNState.STAR_LOOP_BACK
-    | ATNState.STAR_LOOP_ENTRY
-    | ATNState.PLUS_LOOP_BACK
-    | ATNState.LOOP_END
-
 export abstract class ATNState {
     public atn: ATN | null
     public stateNumber: ATNState.INVALID_STATE_NUMBER
-    public stateType: ATNStateNumber | null
+    public stateType: ATNStateType | null
     public ruleIndex: number
     public epsilonOnlyTransitions: boolean
     public transitions: Array<Transition>
@@ -34,8 +19,7 @@ export abstract class ATNState {
 
     toString(): string
     equals(other: any): boolean
-    // Returns a `false` literal.
-    isNonGreedyExitState(): false
+    isNonGreedyExitState(): boolean
     addTransition(trans: Transition, index?: number): void
 }
 export namespace ATNState {
@@ -71,6 +55,20 @@ export namespace ATNState {
 
     export const serializationNames: Array<string>
 }
+export type ATNStateType =
+    ATNState.INVALID_TYPE
+    | ATNState.BASIC
+    | ATNState.RULE_START
+    | ATNState.BLOCK_START
+    | ATNState.PLUS_BLOCK_START
+    | ATNState.STAR_BLOCK_START
+    | ATNState.TOKEN_START
+    | ATNState.RULE_STOP
+    | ATNState.BLOCK_END
+    | ATNState.STAR_LOOP_BACK
+    | ATNState.STAR_LOOP_ENTRY
+    | ATNState.PLUS_LOOP_BACK
+    | ATNState.LOOP_END
 
 export abstract class BasicState extends ATNState {
     public stateType: ATNState.BASIC
@@ -78,7 +76,7 @@ export abstract class BasicState extends ATNState {
 
 export abstract class DecisionState extends ATNState {
     public decision: -1
-    public nonGreedy: false
+    public nonGreedy: boolean
 }
 
 export abstract class BlockStartState extends DecisionState {
@@ -101,7 +99,7 @@ export class RuleStopState extends ATNState {
 export class RuleStartState extends ATNState {
     public stateType: ATNState.RULE_START
     public stopState: RuleStopState | null
-    public isPrecedenceRule: false
+    public isPrecedenceRule: boolean
 }
 
 export class PlusLoopbackState extends ATNState {

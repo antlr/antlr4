@@ -46,15 +46,15 @@ export class LexerNoViableAltException extends RecognitionException {
 }
 
 export class NoViableAltException extends RecognitionException {
-    public deadEndConfigs?: ATNConfigSet
+    public deadEndConfigs: ATNConfigSet
     public startToken: Token
 
     constructor(
         recognizer: Parser,
-        input?: InputStream | TokenStream,
+        input: InputStream | TokenStream | undefined,
         startToken: Token | undefined,
         offendingToken: Token | undefined,
-        deadEndConfigs: ATNConfigSet | undefined,
+        deadEndConfigs: ATNConfigSet,
         ctx: ParserRuleContext | undefined
     )
 

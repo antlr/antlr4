@@ -6,7 +6,6 @@ import { DFAState } from "../dfa/DFAState"
 import { PredictionContext, PredictionContextCache } from "../PredictionContext"
 import { Map } from "../Utils"
 import { ATN } from "./ATN"
-import {} from "./ATNConfigSet"
 
 export class ATNSimulator {
     public atn: ATN
