@@ -209,11 +209,9 @@ ATNConfigSet.prototype.contains = function(item) {
 	return this.configLookup.contains(item);
 };
 
+// Equivalent to {@link ATNConfigSet//contains}.
 ATNConfigSet.prototype.containsFast = function(item) {
-	if (this.configLookup === null) {
-		throw "This method is not implemented for readonly sets.";
-	}
-	return this.configLookup.containsFast(item);
+	return this.contains(item);
 };
 
 ATNConfigSet.prototype.clear = function() {
