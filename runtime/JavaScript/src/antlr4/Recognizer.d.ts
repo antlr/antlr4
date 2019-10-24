@@ -20,11 +20,20 @@ export abstract class Recognizer {
     checkVersion(toolVersion: string): void
     addErrorListener(listener: ErrorListener): void
     removeErrorListeners(): void
-    /** FIXME: Replace return type with `Map<string, number>` once fixed. */
+    /** FIXME: Replace return type with `Map<string, number>` once fixed.
+     *
+     * Calls `Recognizer#getTokenNames()`, which isn't implemented.
+    */
     getTokenTypeMap(): never
-    /** FIXME: Replace return type with `Map<string, number>` once fixed. */
+    /** FIXME: Replace return type with `Map<string, number>` once fixed.
+     *
+     * (PR #2674)
+    */
     getRuleIndexMap(): never
-    /** FIXME: Replace return type with `number` once fixed. */
+    /** FIXME: Replace return type with `number` once fixed.
+     *
+     * Calls `Recognizer#getTokenTypeMap()`, which errors immediately.
+    */
     getTokenType(tokenName: string): never
     getErrorHeader(e: RecognitionException): string
     getTokenErrorDisplay(t: Token): string
