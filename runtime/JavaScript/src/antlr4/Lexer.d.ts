@@ -18,16 +18,16 @@ export class Lexer extends Recognizer implements TokenSource {
     public _channel: number
     public _modeStack: Array<number>
     public _mode: number
-    protected _input: InputStream
+    protected _input: TokenSource
     protected _type: number
     protected _text: string | null
     protected _factory: TokenFactory
     protected _tokenFactorySourcePair: SourcePair
 
-    constructor(input: InputStream)
+    constructor(input: TokenSource)
 
-    get inputStream(): InputStream
-    set inputStream(input: InputStream)
+    get inputStream(): TokenSource
+    set inputStream(input: TokenSource)
 
     get sourceName(): string
 
