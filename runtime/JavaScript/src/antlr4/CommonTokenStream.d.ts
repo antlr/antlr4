@@ -7,7 +7,7 @@ import { Lexer } from "./Lexer"
 import { Token } from "./Token"
 
 export class CommonTokenStream extends BufferedTokenStream {
-    public channel: number | Token.DEFAULT_CHANNEL
+    public channel: number
 
     constructor(lexer: Lexer, channel?: number)
 
