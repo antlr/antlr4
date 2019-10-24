@@ -498,7 +498,7 @@ PredictionMode.getAlts = function(altsets) {
 
 PredictionMode.getConflictingAltSubsets = function(configs) {
     var configToAlts = new Map();
-    configToAlts.hashFunction = function(cfg) { hashStuff(cfg.state.stateNumber, cfg.context); };
+    configToAlts.hashFunction = function(cfg) { return hashStuff(cfg.state.stateNumber, cfg.context); };
     configToAlts.equalsFunction = function(c1, c2) { return c1.state.stateNumber==c2.state.stateNumber && c1.context.equals(c2.context);}
     configs.items.map(function(cfg) {
         var alts = configToAlts.get(cfg);
