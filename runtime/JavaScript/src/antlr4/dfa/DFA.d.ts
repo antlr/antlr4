@@ -7,7 +7,7 @@ import { Map, Set } from "../Utils"
 
 import { DFAState } from "./DFAState"
 
-export class DFA {
+export declare class DFA {
     atnStartState: DecisionState
     decision: number
     s0: DFAState | null

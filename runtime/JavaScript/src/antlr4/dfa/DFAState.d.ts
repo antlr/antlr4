@@ -7,7 +7,7 @@ import { LexerActionExecutor } from "../atn/LexerActionExecutor"
 import { SemanticContext } from "../atn/SemanticContext"
 import { Hash, Set } from "../Utils"
 
-export class PredPrediction {
+export declare class PredPrediction {
     alt: number
     pred: SemanticContext
 
@@ -16,7 +16,7 @@ export class PredPrediction {
     toString(): string
 }
 
-export class DFAState {
+export declare class DFAState {
     stateNumber: number
     configs: ATNConfigSet
     edges: Array<DFAState> | null

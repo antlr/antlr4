@@ -5,7 +5,7 @@
 import { DFA } from "./DFA"
 import { DFAState } from "./DFAState"
 
-export class DFASerializer {
+export declare class DFASerializer {
     dfa: DFA
     literalNames: Array<string>
     symbolicNames: Array<string>
@@ -18,6 +18,6 @@ export class DFASerializer {
     protected getStateString(s: DFAState): string
 }
 
-export class LexerDFASerializer extends DFASerializer {
+export declare class LexerDFASerializer extends DFASerializer {
     constructor(dfa: DFA)
 }
