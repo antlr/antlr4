@@ -8,9 +8,9 @@ import { ParserRuleContext } from "./ParserRuleContext"
 import { ParseTreeVisitor, RuleNode } from "./tree"
 import { ParseTree } from "./tree/Tree"
 
-export class RuleContext extends RuleNode {
-    public parentCtx: RuleContext | null
-    public invokingState: number
+export declare class RuleContext extends RuleNode {
+    parentCtx: RuleContext | null
+    invokingState: number
 
     constructor()
     constructor(parent: RuleContext, invokingState: number)
@@ -25,11 +25,10 @@ export class RuleContext extends RuleNode {
     setAltNumber(altNumber: number): void
     getChild(i: number): ParseTree | null
     getChildCount(): number
-    accept<T>(visitor: ParseTreeVisitor<T>): T
+    accept(visitor: ParseTreeVisitor): any
     toStringTree(ruleNames?: Array<string> | null, recog?: Parser | null): string
     toString(ruleNames?: Array<string> | null, stop?: number | null): string
 }
-export namespace RuleContext {
+export declare namespace RuleContext {
     export const EMPTY: ParserRuleContext
-    export type EMPTY = typeof ParserRuleContext.EMPTY
 }

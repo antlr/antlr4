@@ -6,21 +6,14 @@ import { RecognitionException } from "./error"
 import { Interval } from "./IntervalSet"
 import { RuleContext } from "./RuleContext"
 import { Token } from "./Token"
-import {
-    ErrorNodeImpl,
-    INVALID_INTERVAL,
-    ParseTree,
-    ParseTreeListener,
-    TerminalNode,
-    TerminalNodeImpl
-} from "./tree/Tree"
+import { ErrorNodeImpl, INVALID_INTERVAL, ParseTree, ParseTreeListener, TerminalNode, TerminalNodeImpl } from "./tree/Tree"
 
-export class ParserRuleContext extends RuleContext {
-    public ruleIndex: number
-    public children: Array<ParseTree> | null
-    public start: Token | null
-    public stop: Token | null
-    public exception: RecognitionException | null
+export declare class ParserRuleContext extends RuleContext {
+    ruleIndex: number
+    children: Array<ParseTree> | null
+    start: Token | null
+    stop: Token | null
+    exception: RecognitionException | null
 
     constructor()
     constructor(parent: ParserRuleContext, invokingStateNumber: number)
@@ -32,10 +25,8 @@ export class ParserRuleContext extends RuleContext {
     removeLastChild(): void
     addTokenNode(token: Token): TerminalNodeImpl
     addErrorNode(badToken: Token): ErrorNodeImpl
-
     getChild(i: number): ParseTree | null
     getChild<T extends ParseTree>(i: number, type: T): T | null
-
     getToken(ttype: number, i: number): TerminalNode | null
     getTokens(ttype: number): Array<TerminalNode>
     getTypedRuleContext<T extends ParseTree>(ctxType: T, i: number): T | null

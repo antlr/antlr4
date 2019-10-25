@@ -17,8 +17,8 @@ import { RecognitionException } from "./error"
 import { RuleContext } from "./RuleContext"
 import { IntervalSet } from "./IntervalSet"
 
-export class TraceListener extends ParseTreeListener {
-    public parser: Parser
+export declare class TraceListener extends ParseTreeListener {
+    parser: Parser
 
     constructor(parser: Parser)
 
@@ -27,61 +27,61 @@ export class TraceListener extends ParseTreeListener {
     exitEveryRule(ctx: ParserRuleContext): void
 }
 
-export class Parser extends Recognizer {
-    public _input: TokenStream | null
-    public _errHandler: ErrorStrategy
-    public _precedenceStack: Array<number>
-    public _ctx: ParserRuleContext | null
-    public buildParseTrees: boolean
-    public _tracer: TraceListener | null
-    public _parseListeners: Array<ParseTreeListener> | null
-    public _syntaxErrors: number
+export declare class Parser extends Recognizer {
+    _input: TokenStream | null
+    _errHandler: ErrorStrategy
+    _precedenceStack: Array<number>
+    _ctx: ParserRuleContext | null
+    buildParseTrees: boolean
+    _tracer: TraceListener | null
+    _parseListeners: Array<ParseTreeListener> | null
+    _syntaxErrors: number
 
     constructor(input: TokenStream)
 
-    public reset(): void
-    public match(ttype: number): Token | null
-    public matchWildcard(): Token | null
-    public getParseListeners(): ReadonlyArray<ParseTreeListener>
-    public addParseListener(listener: ParseTreeListener): void
-    public removeParseListener(listener: ParseTreeListener): void
-    public removeParseListeners(): void
-    public getTokenFactory(): TokenFactory
-    public setTokenFactory<F extends TokenFactory>(factory: F): void
-    public getATNWithBypassAlts(): ATN
+    reset(): void
+    match(ttype: number): Token | null
+    matchWildcard(): Token | null
+    getParseListeners(): ReadonlyArray<ParseTreeListener>
+    addParseListener(listener: ParseTreeListener): void
+    removeParseListener(listener: ParseTreeListener): void
+    removeParseListeners(): void
+    getTokenFactory(): TokenFactory
+    setTokenFactory<F extends TokenFactory>(factory: F): void
+    getATNWithBypassAlts(): ATN
     /** TODO: not implemented.
      *
      * Replace with `ParseTreePattern` once complete.
      */
-    public compileParseTreePattern(pattern: string, patternRuleIndex: number, lexer?: Lexer): never
-    public getInputStream(): TokenStream
-    public setInputStream<S extends TokenStream>(input: S): void
-    public getTokenStream(): TokenSource
-    public setTokenStream<S extends TokenSource>(input: S): void
-    public getCurrentToken(): Token | null
-    public notifyErrorListeners(msg: string, offendingToken: Token | undefined | null, err: RecognitionException): void
-    public consume(): Token | null
-    public enterRule(): void
-    public exitRule(): void
-    public enterOuterAlt(localctx: ParserRuleContext, altNum: number): void
-    public getPrecedence(): number
-    public enterRecursionRule(localctx: ParserRuleContext, state: number, ruleIndex: number, precedence: number): void
-    public pushNewRecursionContext(localctx: ParserRuleContext, state: number, ruleIndex: number): void
-    public unrollRecursionContexts(parentCtx: ParserRuleContext): void
-    public getInvokingContext(ruleIndex?: number): ParserRuleContext | null
-    public precpred(localctx: RuleContext, precedence: number): boolean
-    public inContext(context: string): boolean
-    public isExpectedToken(symbol: number): boolean
-    public getExpectedTokens(): IntervalSet
-    public getExpectedTokensWithinCurrentRule(): IntervalSet
+    compileParseTreePattern(pattern: string, patternRuleIndex: number, lexer?: Lexer): never
+    getInputStream(): TokenStream
+    setInputStream(input: TokenStream): void
+    getTokenStream(): TokenSource
+    setTokenStream(input: TokenSource): void
+    getCurrentToken(): Token | null
+    notifyErrorListeners(msg: string, offendingToken: Token | undefined | null, err: RecognitionException): void
+    consume(): Token | null
+    enterRule(): void
+    exitRule(): void
+    enterOuterAlt(localctx: ParserRuleContext, altNum: number): void
+    getPrecedence(): number
+    enterRecursionRule(localctx: ParserRuleContext, state: number, ruleIndex: number, precedence: number): void
+    pushNewRecursionContext(localctx: ParserRuleContext, state: number, ruleIndex: number): void
+    unrollRecursionContexts(parentCtx: ParserRuleContext): void
+    getInvokingContext(ruleIndex?: number): ParserRuleContext | null
+    precpred(localctx: RuleContext, precedence: number): boolean
+    inContext(context: string): boolean
+    isExpectedToken(symbol: number): boolean
+    getExpectedTokens(): IntervalSet
+    getExpectedTokensWithinCurrentRule(): IntervalSet
     /** TODO: `getRuleIndexMap` method not implemeted in generated parser.
      *
      * Replace with `number` once complete.
      */
-    public getRuleIndex(ruleName: string): never
-    public getRuleInvocationStack(p?: RuleContext): Array<string>
-    public getDFAStrings(): Array<string>
-    public dumpDFA(): void
+    getRuleIndex(ruleName: string): never
+    getRuleInvocationStack(p?: RuleContext): Array<string>
+    getDFAStrings(): Array<string>
+    dumpDFA(): void
     /** TODO: `sourceName` property not implemented in any extending classes of TokenStream.
      *
      * Replace with `string` once complete.
@@ -89,8 +89,8 @@ export class Parser extends Recognizer {
      * If `this._input` is non-null, then this method returns `undefined`.
      * If `this._input` is null, then an error will be thrown.
      */
-    public getSourceName(): never
-    public setTrace(trace: boolean): void
+    getSourceName(): never
+    setTrace(trace: boolean): void
 
     protected triggerEnterRuleEvent(): void
     protected triggerExitRuleEvent(): void

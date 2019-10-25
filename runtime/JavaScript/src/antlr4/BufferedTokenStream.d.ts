@@ -7,33 +7,33 @@ import { Token } from "./Token"
 import { TokenSource } from "./TokenSource"
 import { TokenStream } from "./TokenStream"
 
-export class BufferedTokenStream implements TokenStream {
-    public tokenSource: TokenSource
-    public tokens: Array<Token>
-    public index: number
-    public fetchedEOF: boolean
+export declare class BufferedTokenStream implements TokenStream {
+    tokenSource: TokenSource
+    tokens: Array<Token>
+    index: number
+    fetchedEOF: boolean
 
     constructor(tokenSource: TokenSource)
 
-    public mark(): number
-    public release(marker: number): void
-    public reset(): void
-    public seek(index: number): void
-    public get(index: number): Token | undefined
-    public consume(): void
-    public getTokens(start: number, stop: number, types?: number | null): Array<Token> | null
-    public LA(i: number): number
-    public LT(k: number): Token | null
-    public setTokenSource(tokenSource: TokenSource): void
-    public getHiddenTokensToRight(tokenIndex: number, channel: number): Array<Token>
-    public getHiddenTokensToLeft(tokenIndex: number, channel: number): Array<Token>
+    mark(): number
+    release(marker: number): void
+    reset(): void
+    seek(index: number): void
+    get(index: number): Token | undefined
+    consume(): void
+    getTokens(start: number, stop: number, types?: number | null): Array<Token> | null
+    LA(i: number): number
+    LT(k: number): Token | null
+    setTokenSource(tokenSource: TokenSource): void
+    getHiddenTokensToRight(tokenIndex: number, channel: number): Array<Token>
+    getHiddenTokensToLeft(tokenIndex: number, channel: number): Array<Token>
     /** FIXME: Replace with `string` once fixed.
      *
      * Calls `this.tokenSource.getSourceName()`, which isn't implemented.
     */
-    public getSourceName(): never
-    public getText(interval: Interval): string
-    public fill(): void
+    getSourceName(): never
+    getText(interval: Interval): string
+    fill(): void
 
     protected sync(i: number): boolean
     protected fetch(n: number): number

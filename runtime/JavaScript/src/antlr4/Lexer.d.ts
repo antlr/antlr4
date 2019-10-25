@@ -9,16 +9,17 @@ import { SourcePair, Token } from "./Token"
 import { TokenFactory } from "./TokenFactory"
 import { TokenSource } from "./TokenSource"
 
-export class Lexer extends Recognizer implements TokenSource {
-    public _token: Token | null
-    public _tokenStartCharIndex: number
-    public _tokenStartLine: number
-    public _tokenStartColumn: number
-    public _hitEOF: boolean
-    public _channel: number
-    public _modeStack: Array<number>
-    public _mode: number
-    public _factory: TokenFactory
+export declare class Lexer extends Recognizer implements TokenSource {
+    _token: Token | null
+    _tokenStartCharIndex: number
+    _tokenStartLine: number
+    _tokenStartColumn: number
+    _hitEOF: boolean
+    _channel: number
+    _modeStack: Array<number>
+    _mode: number
+    _factory: TokenFactory
+
     protected _input: TokenSource
     protected _type: number
     protected _text: string | null
@@ -40,29 +41,29 @@ export class Lexer extends Recognizer implements TokenSource {
     get column(): number
     set column(column: number)
 
-    get text(): string
+    get text(): string | null
     set text(text: string | null)
 
-    public reset(): void
-    public nextToken(): Token
-    public skip(): void
-    public more(): void
-    public mode(m: number): void
-    public pushMode(m: number): void
-    public popMode(): number
-    public emitToken(token: Token): void
-    public emit(): Token
-    public emitEOF(): Token
-    public getCharIndex(): number
-    public getAllTokens(): Array<Token>
-    public notifyListeners(e: LexerNoViableAltException): void
-    public getErrorDisplay(s: string): string
-    public getCharErrorDisplay(c: string): string
-    public recover(re: LexerNoViableAltException): void
+    reset(): void
+    nextToken(): Token
+    skip(): void
+    more(): void
+    mode(m: number): void
+    pushMode(m: number): void
+    popMode(): number
+    emitToken(token: Token): void
+    emit(): Token
+    emitEOF(): Token
+    getCharIndex(): number
+    getAllTokens(): Array<Token>
+    notifyListeners(e: LexerNoViableAltException): void
+    getErrorDisplay(s: string): string
+    getCharErrorDisplay(c: string): string
+    recover(re: LexerNoViableAltException): void
 
     protected getErrorDisplayForChar(c: string): string
 }
-export namespace Lexer {
+export declare namespace Lexer {
     export const DEFAULT_MODE: number
     export const MORE: number
     export const SKIP: number

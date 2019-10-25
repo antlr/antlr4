@@ -5,57 +5,44 @@
 import { InputStream } from "./InputStream"
 import { Lexer } from "./Lexer"
 
-export type SourcePair = [Lexer, InputStream]
-export type NullableSourcePair = [Lexer | null, InputStream | null]
+export declare type SourcePair = [Lexer, InputStream]
+export declare type NullableSourcePair = [Lexer | null, InputStream | null]
 
-export class Token {
-    public source: NullableSourcePair | null
-    public type: number | null
-    public channel: number | null
-    public start: number | null
-    public stop: number | null
-    public tokenIndex: number | null
-    public line: number | null
-    public column: number | null
+export declare class Token {
+    source: NullableSourcePair | null
+    type: number | null
+    channel: number | null
+    start: number | null
+    stop: number | null
+    tokenIndex: number | null
+    line: number | null
+    column: number | null
 
     protected _text: string | null
 
     constructor()
 
-    get text(): string
-    set text(text: string)
+    get text(): string | null
+    set text(text: string | null)
 
     getTokenSource(): Lexer | null
     getInputStream(): InputStream | null
 }
-export namespace Token {
+export declare namespace Token {
     export const INVALID_TYPE: number
     export const EPSILON: number
     export const MIN_USER_TOKEN_TYPE: number
     export const EOF: number
     export const DEFAULT_CHANNEL: number
     export const HIDDEN_CHANNEL: number
-    export type INVALID_TYPE = typeof Token.INVALID_TYPE
-    export type EPSILON = typeof Token.EPSILON
-    export type MIN_USER_TOKEN_TYPE = typeof Token.MIN_USER_TOKEN_TYPE
-    export type EOF = typeof Token.EOF
-    export type DEFAULT_CHANNEL = typeof Token.DEFAULT_CHANNEL
-    export type HIDDEN_CHANNEL = typeof Token.HIDDEN_CHANNEL
 }
 
-export class CommonToken extends Token {
-    constructor(
-        source?: NullableSourcePair,
-        type?: number,
-        channel?: number,
-        start?: number,
-        stop?: number
-    )
+export declare class CommonToken extends Token {
+    constructor(source?: NullableSourcePair, type?: number, channel?: number, start?: number, stop?: number)
 
     clone(): CommonToken
     toString(): string
 }
-export namespace CommonToken {
+export declare namespace CommonToken {
     export const EMPTY_SOURCE: [null, null]
-    export type EMPTY_SOURCE = typeof CommonToken.EMPTY_SOURCE
 }

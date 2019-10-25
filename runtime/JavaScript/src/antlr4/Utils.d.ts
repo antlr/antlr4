@@ -3,7 +3,7 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
-export function arrayToString(a: Array<any>): string
+export declare function arrayToString(a: Array<any>): string
 
 declare global {
     interface String {
@@ -12,17 +12,18 @@ declare global {
     }
 }
 
-type HashObject = { hashCode: () => number }
-type HashFunction = (a: HashObject) => number
-type EqualsObject = { equals: (b: any) => boolean }
-type EqualsFunction = (a: EqualsObject, b: any) => boolean
+export declare type HashableObject = { hashCode: () => number }
+export declare type HashCallback = (a: HashableObject) => number
 
-export class Set<T> {
-    public data: Map<string, T>
-    public hashFunction: HashFunction
-    public equalsFunction: EqualsFunction
+export declare type EqualityObject = { equals: (b: any) => boolean }
+export declare type EqualsCallback = (a: EqualityObject, b: any) => boolean
 
-    constructor(hashFunction?: HashFunction, equalsFunction?: EqualsFunction)
+export declare class Set<T> {
+    data: { [index: string]: T }
+    hashFunction: HashCallback
+    equalsFunction: EqualsCallback
+
+    constructor(hashFunction?: HashCallback, equalsFunction?: EqualsCallback)
 
     get length(): number
 
@@ -33,8 +34,8 @@ export class Set<T> {
     toString(): string
 }
 
-export class BitSet {
-    public data: Map<number, boolean>
+export declare class BitSet {
+    data: { [index: number]: boolean }
 
     constructor()
 
@@ -51,30 +52,27 @@ export class BitSet {
     toString(): string
 }
 
-interface Container<I, J> {
-    key: I,
-    value: J
-}
-export class Map<K, V> {
-    public data: Map<string, Array<Container<K, V>>>
-    public hashFunction: HashFunction
-    public equalsFunction: EqualsFunction
+declare class Map_<K extends object, V> {
+    data: { [index: string]: Array<{ key: K, value: V }> }
+    hashFunction: HashCallback
+    equalsFunction: EqualsCallback
 
-    constructor(hashFunction?: HashFunction, equalsFunction?: EqualsFunction)
+    constructor(hashFunction?: HashCallback, equalsFunction?: EqualsCallback)
 
     get length(): number
 
     put(key: K, value: V): V
     containsKey(key: K): boolean
-    get(key: K): Container<K, V> | null
-    entries(): Array<Container<K, V>>
+    get(key: K): { key: K, value: V } | null
+    entries(): Array<{ key: K, value: V }>
     getKeys(): Array<K>
     getValues(): Array<V>
     toString(): string
 }
+export { Map_ as Map }
 
-export class AltDict<K, V> {
-    public data: Map<K, V>
+export declare class AltDict<K extends object, V> {
+    data: { [index: string]: V }
 
     constructor()
 
@@ -83,19 +81,20 @@ export class AltDict<K, V> {
     values(): Array<V>
 }
 
-export class DoubleDict<K1, K2, V> {
-    public defaultMapCtor: typeof Map
-    public cacheMap: Map<K1, Map<K2, V>>
+export declare class DoubleDict<K1 extends object, K2 extends object, V> {
+    defaultMapCtor: typeof Map_ | typeof AltDict
 
-    constructor(defaultMapCtor?: typeof Map)
+    protected cacheMap: { [index: string]: { [index: string]: V } }
+
+    constructor(defaultMapCtor?: typeof Map_ | typeof AltDict)
 
     get(a: K1, b: K2): V | null
     set(a: K1, b: K2, o: V): void
 }
 
-export class Hash {
-    public count: number
-    public hash: number
+export declare class Hash {
+    count: number
+    hash: number
 
     constructor()
 
@@ -103,10 +102,10 @@ export class Hash {
     finish(): number
 }
 
-export function hashStuff(...args: Array<any>): number
+export declare function hashStuff(...args: Array<any>): number
 
-export function escapeWhitespace(s: string, escapeSpaces: boolean): string
+export declare function escapeWhitespace(s: string, escapeSpaces: boolean): string
 
-export function titleCase(str: string): string
+export declare function titleCase(str: string): string
 
-export function equalArrays(a: Array<EqualsObject>, b: Array<EqualsObject>): boolean
+export declare function equalArrays(a: Array<EqualityObject>, b: Array<EqualityObject>): boolean

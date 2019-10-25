@@ -10,15 +10,7 @@ import fromcodepoint = require("./polyfills/fromcodepoint")
 import tree = require("./tree")
 import Utils = require("./Utils")
 
-export {
-    atn,
-    codepointat,
-    dfa,
-    error,
-    fromcodepoint,
-    tree,
-    Utils
-}
+export { atn, codepointat, dfa, error, fromcodepoint, tree, Utils }
 
 export { CommonToken, Token } from "./Token"
 export { CharStreams } from "./CharStreams"

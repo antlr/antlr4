@@ -7,7 +7,10 @@ import { ErrorListener, RecognitionException } from "./error"
 import { Token } from "./Token"
 import { RuleContext } from "./RuleContext"
 
-export abstract class Recognizer {
+export declare class Recognizer {
+    static tokenTypeMapCache: object
+    static ruleIndexMapCache: object
+
     protected _listeners: Array<ErrorListener>
     protected _interp: ATNSimulator
     protected _stateNumber: number
@@ -39,8 +42,4 @@ export abstract class Recognizer {
     getTokenErrorDisplay(t: Token): string
     sempred(localctx: RuleContext, ruleIndex: number, actionIndex: number): boolean
     precpred(localctx: RuleContext, precedence: number): boolean
-}
-export namespace Recognizer {
-    export const tokenTypeMapCache: Map<Array<string>, Map<string, number>>
-    export const ruleIndexMapCache: Map<Array<string>, Map<string, number>>
 }

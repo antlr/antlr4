@@ -4,8 +4,8 @@
  */
 import { InputStream } from "./InputStream"
 
-export class FileStream extends InputStream {
-    public fileName: string
+export declare class FileStream extends InputStream {
+    fileName: string
 
     constructor(fileName: string, decodeToUnicodeCodePoints?: boolean | null)
 }

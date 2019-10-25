@@ -6,8 +6,8 @@ import { BufferedTokenStream } from "./BufferedTokenStream"
 import { Lexer } from "./Lexer"
 import { Token } from "./Token"
 
-export class CommonTokenStream extends BufferedTokenStream {
-    public channel: number
+export declare class CommonTokenStream extends BufferedTokenStream {
+    channel: number
 
     constructor(lexer: Lexer, channel?: number)
 

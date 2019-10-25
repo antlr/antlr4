@@ -4,10 +4,10 @@
  */
 import { Token } from "./Token"
 
-export class InputStream {
-    public name: string
-    public strdata: string
-    public decodeToUnicodeCodePoints: boolean
+export declare class InputStream {
+    name: string
+    strdata: string
+    decodeToUnicodeCodePoints: boolean
 
     protected _index: number
     protected _size: number
@@ -15,6 +15,7 @@ export class InputStream {
     constructor(data: string, decodeToUnicodeCodePoints?: boolean | null)
 
     get index(): number
+
     get size(): number
 
     reset(): void

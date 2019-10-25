@@ -4,9 +4,9 @@
  */
 import { Token } from "./Token"
 
-export class Interval {
-    public start: number
-    public stop: number
+export declare class Interval {
+    start: number
+    stop: number
 
     constructor(start: number, stop: number)
 
@@ -16,15 +16,15 @@ export class Interval {
     toString(): string
 }
 
-export class IntervalSet {
-    public intervals: Array<Interval> | null
-    public readOnly: boolean
+export declare class IntervalSet {
+    intervals: Array<Interval> | null
+    readOnly: boolean
 
     constructor()
 
     get length(): number
 
-    first(): typeof Token.INVALID_TYPE | number
+    first(): number
     addOne(v: number): void
     addRange(l: number, h: number): void
     addInterval(v: number): void
@@ -34,17 +34,9 @@ export class IntervalSet {
     contains(item: Interval): boolean
     removeRange(v: number): void
     removeOne(v: number): void
-    toString(
-        literalNames?: Array<string | null> | null,
-        symbolicNames?: Array<string | null> | null,
-        elemsAreChar?: boolean | null
-    ): string
+    toString(literalNames?: Array<string | null> | null, symbolicNames?: Array<string | null> | null, elemsAreChar?: boolean | null): string
     toCharString(): string
     toIndexString(): string
     toTokenString(): string
-    elementName(
-        literalNames: Array<string | null>,
-        symbolicNames: Array<string | null>,
-        a: number
-    ): string | null
+    elementName(literalNames: Array<string | null>, symbolicNames: Array<string | null>, a: number): string | null
 }
