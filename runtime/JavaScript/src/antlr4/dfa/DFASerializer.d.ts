@@ -6,15 +6,16 @@ import { DFA } from "./DFA"
 import { DFAState } from "./DFAState"
 
 export class DFASerializer {
-    public dfa: DFA
-    public literalNames: Array<string>
-    public symbolicNames: Array<string>
+    dfa: DFA
+    literalNames: Array<string>
+    symbolicNames: Array<string>
 
     constructor(dfa: DFA, literalNames?: Array<string> | null, symbolicNames?: Array<string> | null)
 
     toString(): string
-    getEdgeLabel(i: number): string
-    getStateString(s: DFAState): string
+
+    protected getEdgeLabel(i: number): string
+    protected getStateString(s: DFAState): string
 }
 
 export class LexerDFASerializer extends DFASerializer {

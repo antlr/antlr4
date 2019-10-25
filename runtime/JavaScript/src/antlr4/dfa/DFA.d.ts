@@ -4,13 +4,14 @@
  */
 import { DecisionState } from "../atn/ATNState"
 import { Map, Set } from "../Utils"
+
 import { DFAState } from "./DFAState"
 
 export class DFA {
-    public atnStartState: DecisionState
-    public decision: number
-    public s0: DFAState | null
-    public precedenceDfa: boolean
+    atnStartState: DecisionState
+    decision: number
+    s0: DFAState | null
+    precedenceDfa: boolean
 
     protected _states: Set<DFAState>
 

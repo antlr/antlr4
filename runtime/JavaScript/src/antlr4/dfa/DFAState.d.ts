@@ -8,8 +8,8 @@ import { SemanticContext } from "../atn/SemanticContext"
 import { Hash, Set } from "../Utils"
 
 export class PredPrediction {
-    public alt: number
-    public pred: SemanticContext
+    alt: number
+    pred: SemanticContext
 
     constructor(pred: SemanticContext, alt: number)
 
@@ -17,13 +17,14 @@ export class PredPrediction {
 }
 
 export class DFAState {
-    public stateNumber: number
-    public configs: ATNConfigSet
-    public edges: Array<DFAState> | null
-    public isAcceptState: boolean
-    public prediction: number
-    public lexerActionExecutor: LexerActionExecutor | null
-    public predicates: Array<PredPrediction> | null
+    stateNumber: number
+    configs: ATNConfigSet
+    edges: Array<DFAState> | null
+    isAcceptState: boolean
+    prediction: number
+    lexerActionExecutor: LexerActionExecutor | null
+    requiresFullContext: boolean
+    predicates: Array<PredPrediction> | null
 
     constructor(stateNumber: number | null, configs: ATNConfigSet | null)
 
