@@ -4,58 +4,80 @@
  */
 import { Interval } from "../IntervalSet"
 import { ParserRuleContext } from "../ParserRuleContext"
+import { RuleContext } from "../RuleContext"
 import { Token } from "../Token"
 import "../Utils"
 
-export const INVALID_INTERVAL: Interval
+export declare const INVALID_INTERVAL: Interval
 
-export class Tree {
-    constructor()
+export declare interface Tree {
+    // getChild(i: number): Tree | null
+    // getChildCount(): number
+    // getPayload(): object
+    // getParent(): Tree | null
+    // toString(): string
 }
 
-export class SyntaxTree extends Tree {
-    constructor()
+export declare interface SyntaxTree extends Tree {
+    // getSourceInterval(): Interval
 }
 
-export class ParseTree extends SyntaxTree {
-    constructor()
+export declare interface ParseTree extends SyntaxTree {
+    // accept(visitor: ParseTreeVisitor): any
+    // getParent(): ParseTree | null
 }
 
-export class RuleNode extends ParseTree {
-    constructor()
+export declare abstract class RuleNode implements ParseTree {
+    protected constructor()
+
+    abstract accept(visitor: ParseTreeVisitor): any
+    abstract getChild(i: number): Tree | null
+    abstract getChildCount(): number
+    // abstract getParent(): ParseTree | null
+    abstract getPayload(): object
+    abstract getSourceInterval(): Interval
+    abstract toString(): string
 }
 
-export class TerminalNode extends ParseTree {
-    constructor()
+export declare abstract class TerminalNode implements ParseTree {
+    protected constructor()
+
+    abstract accept(visitor: ParseTreeVisitor): any
+    abstract getChild(i: number): Tree | null
+    abstract getChildCount(): number
+    abstract getParent(): ParseTree | null
+    abstract getPayload(): object
+    abstract getSourceInterval(): Interval
+    abstract getSymbol(): Token
+    abstract toString(): string
 }
 
-export class ErrorNode extends TerminalNode {
-    constructor()
+export declare abstract class ErrorNode extends TerminalNode {
+    protected constructor()
 }
 
-export class ParseTreeVisitor<T> {
+export declare class ParseTreeVisitor {
     constructor()
 
-    visit(ctx: Array<ParserRuleContext>): Array<T>
-    visit(ctx: ParserRuleContext): T
+    visit(ctx: Array<ParseTree>): Array<any>
+    visit(ctx: RuleContext): any
+    visitChildren(ctx: RuleContext): any | null
+    visitErrorNode(node: ErrorNode): any
+    visitTerminal(node: TerminalNode): any
+}
 
-    visitChildren(ctx: ParserRuleContext): T | null
-    visitTerminal(node: TerminalNode): void
+export declare class ParseTreeListener {
+    constructor()
+
     visitErrorNode(node: ErrorNode): void
-}
-
-export class ParseTreeListener {
-    constructor()
-
     visitTerminal(node: TerminalNode): void
-    visitErrorNode(node: ErrorNode): void
     enterEveryRule(ctx: ParserRuleContext): void
     exitEveryRule(ctx: ParserRuleContext): void
 }
 
-export class TerminalNodeImpl extends TerminalNode {
-    public parentCtx: ParseTree
-    public symbol: Token
+export declare class TerminalNodeImpl implements TerminalNode {
+    parentCtx: ParseTree
+    symbol: Token
 
     constructor(symbol: Token)
 
@@ -64,25 +86,26 @@ export class TerminalNodeImpl extends TerminalNode {
     getParent(): ParseTree
     getPayload(): Token
     getSourceInterval(): Interval
-    getChildCount(): 0
-    accept<T>(visitor: ParseTreeVisitor<T>): T
+    getChildCount(): number
+    accept(visitor: ParseTreeVisitor): any
     getText(): string
     toString(): string
 }
 
-export class ErrorNodeImpl extends TerminalNodeImpl {
+export declare class ErrorNodeImpl extends TerminalNodeImpl implements ErrorNode {
     constructor(token: Token)
 
     isErrorNode(): boolean
-    accept<T>(visitor: ParseTreeVisitor<T>): T
+    accept(visitor: ParseTreeVisitor): any
 }
 
-export class ParseTreeWalker {
+export declare class ParseTreeWalker {
     static readonly DEFAULT: ParseTreeWalker
 
     constructor()
 
     walk(listener: ParseTreeListener, t: ParseTree): void
-    enterRule(listener: ParseTreeListener, r: RuleNode): void
-    exitRule(listener: ParseTreeListener, r: RuleNode): void
+
+    protected enterRule(listener: ParseTreeListener, r: RuleNode): void
+    protected exitRule(listener: ParseTreeListener, r: RuleNode): void
 }

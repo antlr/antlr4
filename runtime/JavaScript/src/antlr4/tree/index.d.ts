@@ -3,9 +3,4 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 export { Trees } from "./Trees"
-export {
-    ParseTreeListener,
-    ParseTreeVisitor,
-    ParseTreeWalker,
-    RuleNode
-} from "./Tree"
+export { ParseTreeListener, ParseTreeVisitor, ParseTreeWalker, RuleNode } from "./Tree"

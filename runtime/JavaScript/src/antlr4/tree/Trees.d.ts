@@ -3,11 +3,11 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 import { Parser } from "../Parser"
+
 import { Tree, ParseTree } from "./Tree"
 
 export namespace Trees {
-    export function toStringTree(tree: Tree): string
-    export function toStringTree(tree: Tree, ruleNames: Array<string>): string
+    export function toStringTree(tree: Tree, ruleNames?: Array<string>): string
     export function toStringTree(tree: Tree, ruleNames: undefined, recog: Parser): string
 
     export function getNodeText(t: Tree, ruleNames: Array<string>): string
