@@ -9,65 +9,27 @@ import { Parser } from "../Parser"
 import { Recognizer } from "../Recognizer"
 import { Token } from "../Token"
 import { BitSet } from "../Utils"
+
 import { RecognitionException } from "./Errors"
 
-export class ErrorListener {
+export declare class ErrorListener {
     constructor()
 
-    syntaxError<R extends Recognizer>(
-        recognizer: R,
-        offendingSymbol: Token,
-        line: number,
-        column: number,
-        msg: string,
-        e: RecognitionException
-    ): void
-    syntaxError<L extends Lexer>(
-        recognizer: L,
-        offendingSymbol: null,
-        line: number,
-        column: number,
-        msg: string,
-        e: RecognitionException
-    ): void
-
-    reportAmbiguity<P extends Parser>(
-        recognizer: P,
-        dfa: DFA,
-        startIndex: number,
-        stopIndex: number,
-        exact: boolean,
-        ambigAlts: BitSet | null,
-        configs: ATNConfigSet
-    ): void
-
-    reportAttemptingFullContext<P extends Parser>(
-        recognizer: P,
-        dfa: DFA,
-        startIndex: number,
-        stopIndex: number,
-        conflictingAlts: BitSet | null,
-        configs: ATNConfigSet
-    ): void
-
-    reportContextSensitivity<P extends Parser>(
-        recognizer: P,
-        dfa: DFA,
-        startIndex: number,
-        stopIndex: number,
-        prediction: number,
-        configs: ATNConfigSet
-    ): void
+    // If the recognizer is a Lexer, then the offendingSymbol not used.
+    syntaxError<R extends Recognizer>(recognizer: R, offendingSymbol: R extends Lexer ? null : Token, line: number, column: number, msg: string, e: RecognitionException): void
+    reportAmbiguity(recognizer: Parser, dfa: DFA, startIndex: number, stopIndex: number, exact: boolean, ambigAlts: BitSet | null, configs: ATNConfigSet): void
+    reportAttemptingFullContext(recognizer: Parser, dfa: DFA, startIndex: number, stopIndex: number, conflictingAlts: BitSet | null, configs: ATNConfigSet): void
+    reportContextSensitivity(recognizer: Parser, dfa: DFA, startIndex: number, stopIndex: number, prediction: number, configs: ATNConfigSet): void
 }
 
-export class ConsoleErrorListener extends ErrorListener {
+export declare class ConsoleErrorListener extends ErrorListener {
     static readonly INSTANCE: ConsoleErrorListener
 
     constructor()
 }
 
-export class ProxyErrorListener extends ErrorListener {
-    public delegates: Array<ErrorListener>
+export declare class ProxyErrorListener extends ErrorListener {
+    protected delegates: Array<ErrorListener>
 
     constructor(delegates: Array<ErrorListener>)
 }

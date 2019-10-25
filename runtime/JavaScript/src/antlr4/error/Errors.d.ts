@@ -11,74 +11,58 @@ import { Parser } from "../Parser"
 import { ParserRuleContext } from "../ParserRuleContext"
 import { Recognizer } from "../Recognizer"
 import { Token } from "../Token"
-import { TokenSource } from "../TokenSource"
 import { TokenStream } from "../TokenStream"
 
-export class RecognitionException extends Error {
-    public message: string
-    public recognizer: Recognizer | null
-    public input: TokenSource | TokenStream | null
-    public ctx: ParserRuleContext | null
-    public offendingToken: Token | null
-    public offendingState: number
+export declare class RecognitionException extends Error {
+    message: string
+    recognizer: Recognizer | null
+    input: InputStream | TokenStream | null
+    ctx: ParserRuleContext | null
+    offendingToken: Token | null
+    offendingState: number
 
-    constructor(params: {
-        message: string,
-        recognizer: Recognizer | null,
-        input: TokenSource | TokenStream | null,
-        ctx: ParserRuleContext | null
-    })
+    constructor(params: { message: string, recognizer: Recognizer | null, input: InputStream | TokenStream | null, ctx: ParserRuleContext | null })
 
     getExpectedTokens(): IntervalSet | null
     toString(): string
 }
 
-export class LexerNoViableAltException extends RecognitionException {
-    public startIndex: number
-    public deadEndConfigs: ATNConfigSet
+export declare class LexerNoViableAltException extends RecognitionException {
+    startIndex: number
+    deadEndConfigs: ATNConfigSet
 
-    // The decision to make `lexer` of type `Lexer` rather than `Lexer | null`
-    // was chosen based on existing usage.
     constructor(lexer: Lexer, input: InputStream, startIndex: number, deadEndConfigs: ATNConfigSet)
 
-    // NOTE: If the `lexer` constructor parameter is changed to be to be of
-    // type `Lexer | null`, then remove the next line.
     getExpectedTokens(): IntervalSet
 }
 
-export class NoViableAltException extends RecognitionException {
-    public deadEndConfigs: ATNConfigSet
-    public startToken: Token
+export declare class NoViableAltException extends RecognitionException {
+    deadEndConfigs: ATNConfigSet
+    startToken: Token
 
-    constructor(
-        recognizer: Parser,
-        input: InputStream | TokenStream | undefined,
-        startToken: Token | undefined,
-        offendingToken: Token | undefined,
-        deadEndConfigs: ATNConfigSet,
-        ctx: ParserRuleContext | undefined
-    )
+    constructor(recognizer: Parser, input?: TokenStream, startToken?: Token, offendingToken?: Token, deadEndConfigs?: ATNConfigSet, ctx?: ParserRuleContext)
 
     getExpectedTokens(): IntervalSet
 }
 
-export class InputMismatchException extends RecognitionException {
+export declare class InputMismatchException extends RecognitionException {
     constructor(recognizer: Parser)
 
     getExpectedTokens(): IntervalSet
 }
 
-export class FailedPredicateException extends RecognitionException {
-    public ruleIndex: number
-    public predicateIndex: number
-    public predicate: string
+export declare class FailedPredicateException extends RecognitionException {
+    ruleIndex: number
+    predicateIndex: number
+    predicate: string
 
     constructor(recognizer: Parser, predicate: string, message?: string)
 
     getExpectedTokens(): IntervalSet
-    formatMessage(predicate: string, message: string | null): string
+
+    protected formatMessage(predicate: string, message: string | null): string
 }
 
-export class ParseCancellationException extends Error {
-    constructor()
+export declare class ParseCancellationException extends Error {
+    constructor(message?: string, cause?: Error)
 }

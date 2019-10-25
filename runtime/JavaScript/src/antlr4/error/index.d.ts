@@ -5,10 +5,4 @@
 export { DiagnosticErrorListener } from "./DiagnosticErrorListener"
 export { ErrorListener } from "./ErrorListener"
 export { BailErrorStrategy } from "./ErrorStrategy"
-export {
-    FailedPredicateException,
-    InputMismatchException,
-    LexerNoViableAltException,
-    NoViableAltException,
-    RecognitionException
-} from "./Errors"
+export { FailedPredicateException, InputMismatchException, LexerNoViableAltException, NoViableAltException, RecognitionException } from "./Errors"

@@ -5,14 +5,10 @@
 import { IntervalSet } from "../IntervalSet"
 import { Parser } from "../Parser"
 import { Token } from "../Token"
-import {
-    FailedPredicateException,
-    InputMismatchException,
-    NoViableAltException,
-    RecognitionException
-} from "./Errors"
 
-export interface ErrorStrategy {
+import { FailedPredicateException, InputMismatchException, NoViableAltException, RecognitionException } from "./Errors"
+
+export declare interface ErrorStrategy {
     reset(recognizer: Parser): void
     recoverInline(recognizer: Parser): void
     recover(recognizer: Parser, e: RecognitionException): void
@@ -22,10 +18,10 @@ export interface ErrorStrategy {
     reportError(recognizer: Parser, e: RecognitionException): void
 }
 
-export class DefaultErrorStrategy implements ErrorStrategy {
-    public errorRecoveryMode: boolean
-    public lastErrorIndex: number
-    public lastErrorStates: IntervalSet | null
+export declare class DefaultErrorStrategy implements ErrorStrategy {
+    errorRecoveryMode: boolean
+    lastErrorIndex: number
+    lastErrorStates: IntervalSet | null
 
     constructor()
 
@@ -54,7 +50,7 @@ export class DefaultErrorStrategy implements ErrorStrategy {
     protected consumeUntil(recognizer: Parser, set: IntervalSet): void
 }
 
-export class BailErrorStrategy extends DefaultErrorStrategy {
+export declare class BailErrorStrategy extends DefaultErrorStrategy {
     constructor()
 
     recoverInline(recognizer: Parser): never

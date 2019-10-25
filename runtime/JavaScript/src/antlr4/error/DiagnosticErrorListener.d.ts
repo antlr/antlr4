@@ -6,15 +6,14 @@ import { ATNConfigSet } from "../atn/ATNConfigSet"
 import { DFA } from "../dfa"
 import { Parser } from "../Parser"
 import { BitSet } from "../Utils"
+
 import { ErrorListener } from "./ErrorListener"
 
-export class DiagnosticErrorListener extends ErrorListener {
-    public exactOnly: boolean
+export declare class DiagnosticErrorListener extends ErrorListener {
+    exactOnly: boolean
 
     constructor(exactOnly?: boolean | null)
 
     protected getDecisionDescription(recognizer: Parser, dfa: DFA): string
-
-    protected getConflictingAlts(reportedAlts: BitSet, configs: ATNConfigSet): BitSet
-    protected getConflictingAlts(reportedAlts: null, configs: ATNConfigSet): BitSet
+    protected getConflictingAlts(reportedAlts: BitSet | null, configs: ATNConfigSet): BitSet
 }
