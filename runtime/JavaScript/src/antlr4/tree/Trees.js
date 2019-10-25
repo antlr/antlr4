@@ -10,7 +10,7 @@ var ErrorNode = require('./Tree').ErrorNode;
 var TerminalNode = require('./Tree').TerminalNode;
 var ParserRuleContext = require('./../ParserRuleContext').ParserRuleContext;
 var RuleContext = require('./../RuleContext').RuleContext;
-var INVALID_ALT_NUMBER = require('./../atn/ATN').INVALID_ALT_NUMBER;
+var INVALID_ALT_NUMBER = require('./../atn/ATN').ATN.INVALID_ALT_NUMBER;
 
 
 /** A set of utility routines useful for all kinds of ANTLR trees. */
