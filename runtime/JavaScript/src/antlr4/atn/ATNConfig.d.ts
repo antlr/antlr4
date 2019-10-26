@@ -19,11 +19,19 @@ export declare class ATNConfig {
 
     // Don't use config.
     constructor(params: { state: ATNState, alt: number, context: PredictionContext, semanticContext?: SemanticContext }, config: null)
-    // Use config sparingly.
-    constructor(params: { state: ATNState, context?: PredictionContext, semanticContext?: SemanticContext }, config: ATNConfig)
-    constructor(params: { semanticContext: SemanticContext }, config: ATNConfig)
-    // Only use config.
-    constructor(params: {}, config: ATNConfig)
+    constructor(
+        // Use config sparingly.
+        params: {
+            state: ATNState,
+            context?: PredictionContext,
+            semanticContext?: SemanticContext
+        } | {
+            semanticContext: SemanticContext
+        } | {
+            // Only use config.
+        },
+        config: ATNConfig
+    )
 
     hashCode(): number
     updateHashCode(hash: Hash): void

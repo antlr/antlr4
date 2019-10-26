@@ -10,6 +10,5 @@ export declare class ATNDeserializationOptions {
     verifyATN: boolean
     generateRuleBypassTransitions: boolean
 
-    constructor()
-    constructor(copyFrom: ATNDeserializationOptions | null)
+    constructor(copyFrom?: ATNDeserializationOptions | null)
 }
