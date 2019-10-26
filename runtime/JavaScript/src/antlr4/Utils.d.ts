@@ -52,7 +52,7 @@ export declare class BitSet {
     toString(): string
 }
 
-declare class Map_<K extends object, V> {
+declare class Map_<K, V> {
     data: { [index: string]: Array<{ key: K, value: V }> }
     hashFunction: HashCallback
     equalsFunction: EqualsCallback
@@ -71,7 +71,7 @@ declare class Map_<K extends object, V> {
 }
 export { Map_ as Map }
 
-export declare class AltDict<K extends object, V> {
+export declare class AltDict<K, V> {
     data: { [index: string]: V }
 
     constructor()
@@ -81,7 +81,7 @@ export declare class AltDict<K extends object, V> {
     values(): Array<V>
 }
 
-export declare class DoubleDict<K1 extends object, K2 extends object, V> {
+export declare class DoubleDict<K1, K2, V> {
     defaultMapCtor: typeof Map_ | typeof AltDict
 
     protected cacheMap: { [index: string]: { [index: string]: V } }
