@@ -4,7 +4,7 @@
  */
 import { Parser } from "../Parser"
 
-import { Tree, ParseTree } from "./Tree"
+import { ParseTree, Tree } from "./Tree"
 
 export namespace Trees {
     export function toStringTree(tree: Tree, ruleNames?: Array<string>): string

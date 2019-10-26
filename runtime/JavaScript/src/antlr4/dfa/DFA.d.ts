@@ -3,7 +3,7 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 import { DecisionState } from "../atn/ATNState"
-import { Map, Set } from "../Utils"
+import { Set } from "../Utils"
 
 import { DFAState } from "./DFAState"
 

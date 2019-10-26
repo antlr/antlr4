@@ -2,11 +2,10 @@
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
-import { Token } from "../Token"
 import { IntervalSet } from "../IntervalSet"
 
 import { ATNState } from "./ATNState"
-import { Predicate, PrecedencePredicate } from "./SemanticContext"
+import { Predicate } from "./SemanticContext"
 
 export declare class Transition {
     static readonly serializationNames: Array<string>

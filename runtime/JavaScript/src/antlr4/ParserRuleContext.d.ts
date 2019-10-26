@@ -6,7 +6,7 @@ import { RecognitionException } from "./error"
 import { Interval } from "./IntervalSet"
 import { RuleContext } from "./RuleContext"
 import { Token } from "./Token"
-import { ErrorNodeImpl, INVALID_INTERVAL, ParseTree, ParseTreeListener, TerminalNode, TerminalNodeImpl } from "./tree/Tree"
+import { ErrorNodeImpl, ParseTree, ParseTreeListener, TerminalNode, TerminalNodeImpl } from "./tree/Tree"
 
 export declare class ParserRuleContext extends RuleContext {
     ruleIndex: number

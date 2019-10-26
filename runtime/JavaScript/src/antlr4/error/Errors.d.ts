@@ -3,7 +3,6 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 import { ATNConfigSet } from "../atn/ATNConfigSet"
-import { PredicateTransition } from "../atn/Transition"
 import { InputStream } from "../InputStream"
 import { IntervalSet } from "../IntervalSet"
 import { Lexer } from "../Lexer"

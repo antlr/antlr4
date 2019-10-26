@@ -4,9 +4,9 @@
  */
 import { InputStream } from "../InputStream"
 import { Lexer } from "../Lexer"
-import { Hash, hashStuff } from "../Utils"
+import { Hash } from "../Utils"
 
-import { LexerAction, LexerIndexedCustomAction } from "./LexerAction"
+import { LexerAction } from "./LexerAction"
 
 export declare class LexerActionExecutor {
     lexerActions: Array<LexerAction>

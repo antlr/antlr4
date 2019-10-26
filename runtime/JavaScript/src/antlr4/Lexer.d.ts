@@ -3,7 +3,6 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 import { LexerNoViableAltException } from "./error"
-import { InputStream } from "./InputStream"
 import { Recognizer } from "./Recognizer"
 import { SourcePair, Token } from "./Token"
 import { TokenFactory } from "./TokenFactory"

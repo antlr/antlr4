@@ -5,7 +5,7 @@
 import { ATNConfigSet } from "../atn/ATNConfigSet"
 import { LexerActionExecutor } from "../atn/LexerActionExecutor"
 import { SemanticContext } from "../atn/SemanticContext"
-import { Hash, Set } from "../Utils"
+import { Set } from "../Utils"
 
 export declare class PredPrediction {
     alt: number

@@ -4,7 +4,7 @@
  */
 import { Recognizer } from "../Recognizer"
 import { RuleContext } from "../RuleContext"
-import { Hash, Set } from "../Utils"
+import { Hash } from "../Utils"
 
 export declare class SemanticContext {
     protected constructor()
