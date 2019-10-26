@@ -7,6 +7,7 @@ import { Recognizer } from "./Recognizer"
 import { SourcePair, Token } from "./Token"
 import { TokenFactory } from "./TokenFactory"
 import { TokenSource } from "./TokenSource"
+import { InputStream } from "./InputStream"
 
 export declare class Lexer extends Recognizer implements TokenSource {
     _token: Token | null
@@ -19,15 +20,15 @@ export declare class Lexer extends Recognizer implements TokenSource {
     _mode: number
     _factory: TokenFactory
 
-    protected _input: TokenSource
+    protected _input: InputStream
     protected _type: number
     protected _text: string | null
     protected _tokenFactorySourcePair: SourcePair
 
-    constructor(input: TokenSource)
+    constructor(input: InputStream)
 
-    get inputStream(): TokenSource
-    set inputStream(input: TokenSource)
+    get inputStream(): InputStream
+    set inputStream(input: InputStream)
 
     get sourceName(): string
 
