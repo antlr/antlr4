@@ -10,7 +10,7 @@
 // graph-structured stack.
 ///
 
-var ATN = require('./ATN').ATN;
+var INVALID_ALT_NUMBER = require('./ATN').INVALID_ALT_NUMBER;
 var Utils = require('./../Utils');
 var Hash = Utils.Hash;
 var Set = Utils.Set;
@@ -233,7 +233,7 @@ ATNConfigSet.prototype.setReadonly = function(readOnly) {
 ATNConfigSet.prototype.toString = function() {
 	return Utils.arrayToString(this.configs) +
 		(this.hasSemanticContext ? ",hasSemanticContext=" + this.hasSemanticContext : "") +
-		(this.uniqueAlt !== ATN.INVALID_ALT_NUMBER ? ",uniqueAlt=" + this.uniqueAlt : "") +
+		(this.uniqueAlt !== INVALID_ALT_NUMBER ? ",uniqueAlt=" + this.uniqueAlt : "") +
 		(this.conflictingAlts !== null ? ",conflictingAlts=" + this.conflictingAlts : "") +
 		(this.dipsIntoOuterContext ? ",dipsIntoOuterContext" : "");
 };

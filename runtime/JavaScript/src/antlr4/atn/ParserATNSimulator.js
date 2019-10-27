@@ -237,7 +237,7 @@ var Utils = require('./../Utils');
 var Set = Utils.Set;
 var BitSet = Utils.BitSet;
 var DoubleDict = Utils.DoubleDict;
-var ATN = require('./ATN').ATN;
+var INVALID_ALT_NUMBER = require('./ATN').INVALID_ALT_NUMBER;
 var ATNState = require('./ATNState').ATNState;
 var ATNConfig = require('./ATNConfig').ATNConfig;
 var ATNConfigSet = require('./ATNConfigSet').ATNConfigSet;
@@ -431,7 +431,7 @@ ParserATNSimulator.prototype.execATN = function(dfa, s0, input, startIndex, oute
             var e = this.noViableAlt(input, outerContext, previousD.configs, startIndex);
             input.seek(startIndex);
             alt = this.getSynValidOrSemInvalidAltThatFinishedDecisionEntryRule(previousD.configs, outerContext);
-            if(alt!==ATN.INVALID_ALT_NUMBER) {
+            if(alt!==INVALID_ALT_NUMBER) {
                 return alt;
             } else {
                 throw e;
@@ -547,7 +547,7 @@ ParserATNSimulator.prototype.computeTargetState = function(dfa, previousD, t) {
                     PredictionMode.allSubsetsConflict(altSubSets) + ", conflictingAlts=" +
                     this.getConflictingAlts(reach));
     }
-    if (predictedAlt!==ATN.INVALID_ALT_NUMBER) {
+    if (predictedAlt!==INVALID_ALT_NUMBER) {
         // NO CONFLICT, UNIQUELY PREDICTED ALT
         D.isAcceptState = true;
         D.configs.uniqueAlt = predictedAlt;
@@ -563,7 +563,7 @@ ParserATNSimulator.prototype.computeTargetState = function(dfa, previousD, t) {
     if (D.isAcceptState && D.configs.hasSemanticContext) {
         this.predicateDFAState(D, this.atn.getDecisionState(dfa.decision));
         if( D.predicates!==null) {
-            D.prediction = ATN.INVALID_ALT_NUMBER;
+            D.prediction = INVALID_ALT_NUMBER;
         }
     }
     // all adds to dfa are done after we've created full D state
@@ -581,7 +581,7 @@ ParserATNSimulator.prototype.predicateDFAState = function(dfaState, decisionStat
     var altToPred = this.getPredsForAmbigAlts(altsToCollectPredsFrom, dfaState.configs, nalts);
     if (altToPred!==null) {
         dfaState.predicates = this.getPredicatePredictions(altsToCollectPredsFrom, altToPred);
-        dfaState.prediction = ATN.INVALID_ALT_NUMBER; // make sure we use preds
+        dfaState.prediction = INVALID_ALT_NUMBER; // make sure we use preds
     } else {
         // There are preds in configs but they might go away
         // when OR'd together like {p}? || NONE == NONE. If neither
@@ -621,7 +621,7 @@ ParserATNSimulator.prototype.execATNWithFullContext = function(dfa, D, // how fa
             var e = this.noViableAlt(input, outerContext, previous, startIndex);
             input.seek(startIndex);
             var alt = this.getSynValidOrSemInvalidAltThatFinishedDecisionEntryRule(previous, outerContext);
-            if(alt!==ATN.INVALID_ALT_NUMBER) {
+            if(alt!==INVALID_ALT_NUMBER) {
                 return alt;
             } else {
                 throw e;
@@ -635,12 +635,12 @@ ParserATNSimulator.prototype.execATNWithFullContext = function(dfa, D, // how fa
         }
         reach.uniqueAlt = this.getUniqueAlt(reach);
         // unique prediction?
-        if(reach.uniqueAlt!==ATN.INVALID_ALT_NUMBER) {
+        if(reach.uniqueAlt!==INVALID_ALT_NUMBER) {
             predictedAlt = reach.uniqueAlt;
             break;
         } else if (this.predictionMode !== PredictionMode.LL_EXACT_AMBIG_DETECTION) {
             predictedAlt = PredictionMode.resolvesToJustOneViableAlt(altSubSets);
-            if(predictedAlt !== ATN.INVALID_ALT_NUMBER) {
+            if(predictedAlt !== INVALID_ALT_NUMBER) {
                 break;
             }
         } else {
@@ -664,7 +664,7 @@ ParserATNSimulator.prototype.execATNWithFullContext = function(dfa, D, // how fa
     // If the configuration set uniquely predicts an alternative,
     // without conflict, then we know that it's a full LL decision
     // not SLL.
-    if (reach.uniqueAlt !== ATN.INVALID_ALT_NUMBER ) {
+    if (reach.uniqueAlt !== INVALID_ALT_NUMBER ) {
         this.reportContextSensitivity(dfa, predictedAlt, reach, startIndex, input.index);
         return predictedAlt;
     }
@@ -770,7 +770,7 @@ ParserATNSimulator.prototype.computeReachSet = function(closure, t, fullCtx) {
             // Also don't pursue the closure if there is unique alternative
             // among the configurations.
             reach = intermediate;
-        } else if (this.getUniqueAlt(intermediate)!==ATN.INVALID_ALT_NUMBER) {
+        } else if (this.getUniqueAlt(intermediate)!==INVALID_ALT_NUMBER) {
             // Also don't pursue the closure if there is unique alternative
             // among the configurations.
             reach = intermediate;
@@ -1097,17 +1097,17 @@ ParserATNSimulator.prototype.getSynValidOrSemInvalidAltThatFinishedDecisionEntry
     var semValidConfigs = cfgs[0];
     var semInvalidConfigs = cfgs[1];
     var alt = this.getAltThatFinishedDecisionEntryRule(semValidConfigs);
-    if (alt!==ATN.INVALID_ALT_NUMBER) { // semantically/syntactically viable path exists
+    if (alt!==INVALID_ALT_NUMBER) { // semantically/syntactically viable path exists
         return alt;
     }
     // Is there a syntactically valid path with a failed pred?
     if (semInvalidConfigs.items.length>0) {
         alt = this.getAltThatFinishedDecisionEntryRule(semInvalidConfigs);
-        if (alt!==ATN.INVALID_ALT_NUMBER) { // syntactically viable path exists
+        if (alt!==INVALID_ALT_NUMBER) { // syntactically viable path exists
             return alt;
         }
     }
-    return ATN.INVALID_ALT_NUMBER;
+    return INVALID_ALT_NUMBER;
 };
 
 ParserATNSimulator.prototype.getAltThatFinishedDecisionEntryRule = function(configs) {
@@ -1121,7 +1121,7 @@ ParserATNSimulator.prototype.getAltThatFinishedDecisionEntryRule = function(conf
         }
     }
     if (alts.length===0) {
-        return ATN.INVALID_ALT_NUMBER;
+        return INVALID_ALT_NUMBER;
     } else {
         return Math.min.apply(null, alts);
     }
@@ -1543,7 +1543,7 @@ ParserATNSimulator.prototype.getConflictingAlts = function(configs) {
 
 ParserATNSimulator.prototype.getConflictingAltsOrUniqueAlt = function(configs) {
     var conflictingAlts = null;
-    if (configs.uniqueAlt!== ATN.INVALID_ALT_NUMBER) {
+    if (configs.uniqueAlt!== INVALID_ALT_NUMBER) {
         conflictingAlts = new BitSet();
         conflictingAlts.add(configs.uniqueAlt);
     } else {
@@ -1600,13 +1600,13 @@ ParserATNSimulator.prototype.noViableAlt = function(input, outerContext, configs
 };
 
 ParserATNSimulator.prototype.getUniqueAlt = function(configs) {
-    var alt = ATN.INVALID_ALT_NUMBER;
+    var alt = INVALID_ALT_NUMBER;
     for(var i=0;i<configs.items.length;i++) {
     	var c = configs.items[i];
-        if (alt === ATN.INVALID_ALT_NUMBER) {
+        if (alt === INVALID_ALT_NUMBER) {
             alt = c.alt // found first alt
         } else if( c.alt!==alt) {
-            return ATN.INVALID_ALT_NUMBER;
+            return INVALID_ALT_NUMBER;
         }
     }
     return alt;

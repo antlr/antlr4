@@ -23,7 +23,7 @@
 
 var Token = require('./../Token').Token;
 var Lexer = require('./../Lexer').Lexer;
-var ATN = require('./ATN').ATN;
+var INVALID_ALT_NUMBER = require('./ATN').INVALID_ALT_NUMBER;
 var ATNSimulator = require('./ATNSimulator').ATNSimulator;
 var DFAState = require('./../dfa/DFAState').DFAState;
 var ATNConfigSet = require('./ATNConfigSet').ATNConfigSet;
@@ -279,7 +279,7 @@ LexerATNSimulator.prototype.getReachableConfigSet = function(input, closure,
 		reach, t) {
 	// this is used to skip processing for configs which have a lower priority
 	// than a config that already reached an accept state for the same rule
-	var skipAlt = ATN.INVALID_ALT_NUMBER;
+	var skipAlt = INVALID_ALT_NUMBER;
 	for (var i = 0; i < closure.items.length; i++) {
 		var cfg = closure.items[i];
 		var currentAltReachedAcceptState = (cfg.alt === skipAlt);

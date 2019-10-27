@@ -13,7 +13,7 @@ var Set = require('./../Utils').Set;
 var Map = require('./../Utils').Map;
 var BitSet = require('./../Utils').BitSet;
 var AltDict = require('./../Utils').AltDict;
-var ATN = require('./ATN').ATN;
+var INVALID_ALT_NUMBER = require('./ATN').INVALID_ALT_NUMBER;
 var RuleStopState = require('./ATNState').RuleStopState;
 var ATNConfigSet = require('./ATNConfigSet').ATNConfigSet;
 var ATNConfig = require('./ATNConfig').ATNConfig;
@@ -470,7 +470,7 @@ PredictionMode.getUniqueAlt = function(altsets) {
     if (all.length===1) {
         return all.minValue();
     } else {
-        return ATN.INVALID_ALT_NUMBER;
+        return INVALID_ALT_NUMBER;
     }
 };
 
@@ -550,7 +550,7 @@ PredictionMode.getSingleViableAlt = function(altsets) {
         if(result===null) {
             result = minAlt;
         } else if(result!==minAlt) { // more than 1 viable alt
-            return ATN.INVALID_ALT_NUMBER;
+            return INVALID_ALT_NUMBER;
         }
 	}
     return result;

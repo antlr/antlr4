@@ -3,6 +3,12 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+// Exposed constant as its own export before importing LL1Analyzer to
+// prevent a circular dependency with antlr4.tree.Trees and
+// antlr4.RuleContext.
+var INVALID_ALT_NUMBER = 0;
+exports.INVALID_ALT_NUMBER = INVALID_ALT_NUMBER;
+
 var LL1Analyzer = require('./../LL1Analyzer').LL1Analyzer;
 var IntervalSet = require('./../IntervalSet').IntervalSet;
 
@@ -136,7 +142,5 @@ ATN.prototype.getExpectedTokens = function( stateNumber, ctx ) {
     }
     return expected;
 };
-
-ATN.INVALID_ALT_NUMBER = 0;
 
 exports.ATN = ATN;
