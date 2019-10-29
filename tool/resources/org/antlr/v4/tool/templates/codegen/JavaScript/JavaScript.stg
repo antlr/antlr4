@@ -815,6 +815,7 @@ var decisionsToDFA = atn.decisionToState.map( function(ds, index) { return new a
 function <lexer.name>(input) {
 	<if(superClass)><superClass><else>antlr4.Lexer<endif>.call(this, input);
     this._interp = new antlr4.atn.LexerATNSimulator(this, atn, decisionsToDFA, new antlr4.PredictionContextCache());
+	<namedActions.members>
     return this;
 }
 
@@ -849,8 +850,6 @@ Object.defineProperty(<lexer.name>.prototype, "atn", {
 <lexer.name>.prototype.ruleNames = [ <lexer.ruleNames:{r | "<r>"}; separator=", ", wrap, anchor> ];
 
 <lexer.name>.prototype.grammarFileName = "<lexer.grammarFileName>";
-
-<namedActions.members>
 
 <dumpActions(lexer, "", actionFuncs, sempredFuncs)>
 
