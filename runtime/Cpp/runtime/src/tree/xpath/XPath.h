@@ -73,7 +73,6 @@ namespace xpath {
 
   protected:
     std::string _path;
-    std::vector<std::unique_ptr<XPathElement>> _elements;
     Parser *_parser;
 
     /// Convert word like {@code *} or {@code ID} or {@code expr} to a path

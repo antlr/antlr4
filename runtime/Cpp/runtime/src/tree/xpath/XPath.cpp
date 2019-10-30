@@ -25,7 +25,6 @@ const std::string XPath::NOT = "!";
 XPath::XPath(Parser *parser, const std::string &path) {
   _parser = parser;
   _path = path;
-  _elements = split(path);
 }
 
 std::vector<std::unique_ptr<XPathElement>> XPath::split(const std::string &path) {
@@ -134,14 +133,16 @@ std::vector<ParseTree *> XPath::evaluate(ParseTree *t) {
   std::vector<ParseTree *> work = { &dummyRoot };
 
   size_t i = 0;
-  while (i < _elements.size()) {
+  std::vector<std::unique_ptr<XPathElement>> elements = split(_path);
+
+  while (i < elements.size()) {
     std::vector<ParseTree *> next;
     for (auto node : work) {
       if (!node->children.empty()) {
         // only try to match next element if it has children
         // e.g., //func/*/stat might have a token node for which
         // we can't go looking for stat nodes.
-        auto matching = _elements[i]->evaluate(node);
+        auto matching = elements[i]->evaluate(node);
         next.insert(next.end(), matching.begin(), matching.end());
       }
     }
