@@ -766,6 +766,10 @@ public class LexerExecDescriptors {
 		/**
 		 lexer grammar PositionAdjustingLexer;
 
+		 @definitions {
+		 <PositionAdjustingLexerDef()>
+		 }
+
 		 @members {
 		 <PositionAdjustingLexer()>
 		 }

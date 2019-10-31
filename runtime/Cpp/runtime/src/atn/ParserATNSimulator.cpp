@@ -922,7 +922,7 @@ void ParserATNSimulator::closure_(Ref<ATNConfig> const& config, ATNConfigSet *co
           }
         }
 
-        configs->dipsIntoOuterContext = true; // TO_DO: can remove? only care when we add to set per middle of this method
+        configs->dipsIntoOuterContext = true; // TODO: can remove? only care when we add to set per middle of this method
         assert(newDepth > INT_MIN);
 
         newDepth--;
