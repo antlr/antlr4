@@ -26,8 +26,8 @@ The Javadoc comments are hidden from the parser and are ignored at the moment.  
 Token names always start with a capital letter and so do lexer rules as defined by Java’s `Character.isUpperCase` method. Parser rule names always start with a lowercase letter (those that fail `Character.isUpperCase`). The initial character can be followed by uppercase and lowercase letters, digits, and underscores. Here are some sample names:
 
 ```
-ID, LPAREN, RIGHT_CURLY // token names/rules
-expr, simpleDeclarator, d2, header_file // rule names
+ID, LPAREN, RIGHT_CURLY // token names/lexer rules
+expr, simpleDeclarator, d2, header_file // parser rule names
 ```
 
 Like Java, ANTLR accepts Unicode characters in ANTLR names:
