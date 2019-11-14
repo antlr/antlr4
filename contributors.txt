@@ -203,6 +203,8 @@ YYYY/MM/DD, github id, Full name, email
 2018/06/16, EternalPhane, Zongyuan Zuo, eternalphane@gmail.com
 2018/07/03, jgoppert, James Goppert, james.goppert@gmail.com
 2018/07/27, Maksim Novikov, mnovikov.work@gmail.com
+2018/08/03, ENDOH takanao, djmchl@gmail.com
+2018/10/18, edirgarcia, Edir García Lazo, edirgl@hotmail.com
 2018/07/31, Lucas Henrqiue, lucashenrique580@gmail.com
 2018/08/03, ENDOH takanao, djmchl@gmail.com
 2018/10/29, chrisaycock, Christopher Aycock, chris[at]chrisaycock[dot]com
@@ -214,3 +216,20 @@ YYYY/MM/DD, github id, Full name, email
 2018/12/23, youkaichao, Kaichao You, youkaichao@gmail.com
 2019/02/06, ralucado, Cristina Raluca Vijulie, ralucris.v[at]gmail[dot]com
 2019/02/23, gedimitr, Gerasimos Dimitriadis, gedimitr@gmail.com
+2019/03/13, base698, Justin Thomas, justin.thomas1@gmail.com
+2019/03/18, carlodri, Carlo Dri, carlo.dri@gmail.com
+2019/05/02, askingalot, Andy Collins, askingalot@gmail.com
+2019/07/11, olowo726, Olof Wolgast, olof@baah.se
+2019/07/16, abhijithneilabraham, Abhijith Neil Abraham, abhijithneilabrahampk@gmail.com
+2019/07/26, Braavos96, Eric Hettiaratchi, erichettiaratchi@gmail.com
+2019/08/23, akaJes, Oleksandr Mamchyts, akaJes@gmail.com
+2019/09/10, ImanHosseini, Iman Hosseini, hosseini.iman@yahoo.com
+2019/09/03, João Henrique, johnnyonflame@hotmail.com
+2019/09/10, neko1235, Ihar Mokharau, igor.mohorev@gmail.com
+2019/09/10, yar3333, Yaroslav Sivakov, yar3333@gmail.com
+2019/09/10, marcospassos, Marcos Passos, marcospassos.com@gmail.com
+2019/09/10, amorimjuliana, Juliana Amorim, juu.amorim@gmail.com
+2019/09/17, kaz, Kazuki Sawada, kazuki@6715.jp
+2019/09/28, lmy269, Mingyang Liu, lmy040758@gmail.com
+2019/10/31, a-square, Alexei Averchenko, lex.aver@gmail.com
+2019/11/11, foxeverl, Liu Xinfeng, liuxf1986[at]gmail[dot]com

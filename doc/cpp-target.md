@@ -45,7 +45,7 @@ The generation step above created a listener and base listener class for you. Th
 #include "MyGrammarParser.h"
 #include "MyGrammarBaseListener.h"
 
-using namespace org::antlr::v4::runtime;
+using namespace antlr4;
 
 class TreeShapeListener : public MyGrammarBaseListener {
 public:
