@@ -233,3 +233,4 @@ YYYY/MM/DD, github id, Full name, email
 2019/09/28, lmy269, Mingyang Liu, lmy040758@gmail.com
 2019/10/31, a-square, Alexei Averchenko, lex.aver@gmail.com
 2019/11/11, foxeverl, Liu Xinfeng, liuxf1986[at]gmail[dot]com
+2019/11/18, mlilback, Mark Lilback, mark@lilback.com

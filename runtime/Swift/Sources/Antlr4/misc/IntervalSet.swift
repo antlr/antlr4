@@ -326,8 +326,8 @@ public class IntervalSet: IntSet, Hashable, CustomStringConvertible {
             return nil // nothing in common with null set
         }
 
-        var myIntervals = self.intervals
-        var theirIntervals = (other as! IntervalSet).intervals
+        let myIntervals = self.intervals
+        let theirIntervals = (other as! IntervalSet).intervals
         var intersection: IntervalSet? = nil
         let mySize = myIntervals.count
         let theirSize = theirIntervals.count
