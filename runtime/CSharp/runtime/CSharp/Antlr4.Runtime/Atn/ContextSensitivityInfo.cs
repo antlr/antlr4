@@ -35,9 +35,8 @@ namespace Antlr4.Runtime.Atn
         /// with the specified detailed context sensitivity information.
         /// </summary>
         /// <param name="decision">The decision number</param>
-        /// <param name="state">
-        /// The final simulator state containing the unique
-        /// alternative identified by full-context prediction
+        /// <param name="configs">The final configuration set identifying the ambiguous
+        /// alternatives for the current input
         /// </param>
         /// <param name="input">The input token stream</param>
         /// <param name="startIndex">The start index for the current prediction</param>
@@ -45,8 +44,8 @@ namespace Antlr4.Runtime.Atn
         /// The index at which the context sensitivity was
         /// identified during full-context prediction
         /// </param>
-        public ContextSensitivityInfo(int decision, SimulatorState state, ITokenStream input, int startIndex, int stopIndex)
-            : base(decision, state, input, startIndex, stopIndex, true)
+        public ContextSensitivityInfo(int decision, ATNConfigSet configs, ITokenStream input, int startIndex, int stopIndex)
+            : base(decision, configs, input, startIndex, stopIndex, true)
         {
         }
     }
