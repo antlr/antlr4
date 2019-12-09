@@ -18,8 +18,6 @@ AppendStr(a,b) ::= <%<Append(a,b)>%>
 
 Concat(a,b) ::= "<a><b>"
 
-DeclareLocal(s,v) ::= "var <s> = <v>;"
-
 AssertIsList(v) ::= <<if ( !(v instanceof Array) ) {throw "value is not an array";}>>
 
 AssignLocal(s,v) ::= "<s> = <v>;"
@@ -39,8 +37,6 @@ GetMember(n) ::= <%this.<n>%>
 SetMember(n,v) ::= <%this.<n> = <v>;%>
 
 AddMember(n,v) ::= <%this.<n> += <v>;%>
-
-PlusMember(v,n) ::= <%<v> + this.<n>%>
 
 MemberEquals(n,v) ::= <%this.<n> === <v>%>
 
