@@ -11,8 +11,6 @@ Append(a,b) ::= "<a> + <b>->toString()"
 Concat(a,b) ::= "<a><b>"
 AppendStr(a,b) ::= "<a> + <b>"
 
-DeclareLocal(s,v) ::= "<s> = <v>"
-
 AssertIsList(v) ::= "assert(<v>.size() >= 0);" // Use a method that exists only on a list (vector actually).
 AssignLocal(s,v) ::= "<s> = <v>;"
 
@@ -25,7 +23,6 @@ VarRef(n) ::= "<n>"
 GetMember(n) ::= "<n>"
 SetMember(n,v) ::= "<n> = <v>;"
 AddMember(n,v) ::= "<n> += <v>;"
-PlusMember(v,n) ::= "<v> + <n>"
 MemberEquals(n,v) ::= "<n> == <v>"
 ModMemberEquals(n,m,v) ::= "<n> % <m> == <v>"
 ModMemberNotEquals(n,m,v) ::= "<n> % <m> != <v>"

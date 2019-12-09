@@ -18,8 +18,6 @@ AppendStr(a,b) ::= <%<Append(a,b)>%>
 
 Concat(a,b) ::= "<a><b>"
 
-DeclareLocal(s,v) ::= "var <s> = <v>"
-
 AssertIsList(v) ::= "var __ttt__ = <v>;" // just use static type system
 
 AssignLocal(s,v) ::= "<s> = <v>"
@@ -39,8 +37,6 @@ GetMember(n) ::= <%self.<n>%>
 SetMember(n,v) ::= <%self.<n> = <v>%>
 
 AddMember(n,v) ::= <%self.<n> += <v>%>
-
-PlusMember(v,n) ::= <%<v> + self.<n>%>
 
 MemberEquals(n,v) ::= <%self.<n> == <v>%>
 
