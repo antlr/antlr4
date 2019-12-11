@@ -110,15 +110,15 @@ namespace antlr4 {
     ///  (root child1 .. childN). Print just a node if this is a leaf.
     ///  We have to know the recognizer so we can get rule names.
     /// </summary>
-    virtual std::string toStringTree(Parser *recog) override;
+    virtual std::string toStringTree(Parser *recog, bool pretty = false) override;
 
     /// <summary>
     /// Print out a whole tree, not just a node, in LISP format
     ///  (root child1 .. childN). Print just a node if this is a leaf.
     /// </summary>
-    virtual std::string toStringTree(std::vector<std::string> &ruleNames);
+    virtual std::string toStringTree(std::vector<std::string> &ruleNames, bool pretty = false);
 
-    virtual std::string toStringTree() override;
+    virtual std::string toStringTree(bool pretty = false) override;
     virtual std::string toString() override;
     std::string toString(Recognizer *recog);
     std::string toString(const std::vector<std::string> &ruleNames);

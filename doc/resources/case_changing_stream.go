@@ -1,13 +1,15 @@
-package antlr
+package antlr_resource
 
 import (
 	"unicode"
+
+	"github.com/antlr/antlr4/runtime/Go/antlr"
 )
 
 // CaseChangingStream wraps an existing CharStream, but upper cases, or
 // lower cases the input before it is tokenized.
 type CaseChangingStream struct {
-	CharStream
+	antlr.CharStream
 
 	upper bool
 }
@@ -15,10 +17,8 @@ type CaseChangingStream struct {
 // NewCaseChangingStream returns a new CaseChangingStream that forces
 // all tokens read from the underlying stream to be either upper case
 // or lower case based on the upper argument.
-func NewCaseChangingStream(in CharStream, upper bool) *CaseChangingStream {
-	return &CaseChangingStream{
-		in, upper,
-	}
+func NewCaseChangingStream(in antlr.CharStream, upper bool) *CaseChangingStream {
+	return &CaseChangingStream{in, upper}
 }
 
 // LA gets the value of the symbol at offset from the current position

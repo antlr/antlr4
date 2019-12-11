@@ -1607,17 +1607,15 @@ class ParserATNSimulator(ATNSimulator):
 
     def reportAttemptingFullContext(self, dfa:DFA, conflictingAlts:set, configs:ATNConfigSet, startIndex:int, stopIndex:int):
         if ParserATNSimulator.debug or ParserATNSimulator.retry_debug:
-            interval = (startIndex, stopIndex + 1)
             print("reportAttemptingFullContext decision=" + str(dfa.decision) + ":" + str(configs) +
-                               ", input=" + self.parser.getTokenStream().getText(interval))
+                               ", input=" + self.parser.getTokenStream().getText(startIndex, stopIndex))
         if self.parser is not None:
             self.parser.getErrorListenerDispatch().reportAttemptingFullContext(self.parser, dfa, startIndex, stopIndex, conflictingAlts, configs)
 
     def reportContextSensitivity(self, dfa:DFA, prediction:int, configs:ATNConfigSet, startIndex:int, stopIndex:int):
         if ParserATNSimulator.debug or ParserATNSimulator.retry_debug:
-            interval = (startIndex, stopIndex + 1)
             print("reportContextSensitivity decision=" + str(dfa.decision) + ":" + str(configs) +
-                               ", input=" + self.parser.getTokenStream().getText(interval))
+                               ", input=" + self.parser.getTokenStream().getText(startIndex, stopIndex))
         if self.parser is not None:
             self.parser.getErrorListenerDispatch().reportContextSensitivity(self.parser, dfa, startIndex, stopIndex, prediction, configs)
 
@@ -1641,9 +1639,8 @@ class ParserATNSimulator(ATNSimulator):
 #				}
 #				i++;
 #			}
-            interval = (startIndex, stopIndex + 1)
             print("reportAmbiguity " + str(ambigAlts) + ":" + str(configs) +
-                               ", input=" + self.parser.getTokenStream().getText(interval))
+                               ", input=" + self.parser.getTokenStream().getText(startIndex, stopIndex))
         if self.parser is not None:
             self.parser.getErrorListenerDispatch().reportAmbiguity(self.parser, dfa, startIndex, stopIndex, exact, ambigAlts, configs)
 

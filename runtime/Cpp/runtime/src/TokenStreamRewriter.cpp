@@ -348,7 +348,6 @@ std::unordered_map<size_t, TokenStreamRewriter::RewriteOperation*> TokenStreamRe
       }
       // throw exception unless disjoint or identical
       bool disjoint = prevRop->lastIndex < rop->index || prevRop->index > rop->lastIndex;
-      bool same = prevRop->index == rop->index && prevRop->lastIndex == rop->lastIndex;
       // Delete special case of replace (text==null):
       // D.i-j.u D.x-y.v    | boundaries overlap    combine to max(min)..max(right)
       if (prevRop->text.empty() && rop->text.empty() && !disjoint) {
@@ -358,7 +357,7 @@ std::unordered_map<size_t, TokenStreamRewriter::RewriteOperation*> TokenStreamRe
         rop->lastIndex = std::max(prevRop->lastIndex, rop->lastIndex);
         std::cout << "new rop " << rop << std::endl;
       }
-      else if (!disjoint && !same) {
+      else if (!disjoint) {
         throw IllegalArgumentException("replace op boundaries of " + rop->toString() +
                                        " overlap with previous " + prevRop->toString());
       }

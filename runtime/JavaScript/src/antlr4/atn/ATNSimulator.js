@@ -8,6 +8,7 @@
 var DFAState = require('./../dfa/DFAState').DFAState;
 var ATNConfigSet = require('./ATNConfigSet').ATNConfigSet;
 var getCachedPredictionContext = require('./../PredictionContext').getCachedPredictionContext;
+var Map = require('./../Utils').Map;
 
 function ATNSimulator(atn, sharedContextCache) {
 
@@ -44,7 +45,7 @@ ATNSimulator.prototype.getCachedContext = function(context) {
     if (this.sharedContextCache ===null) {
         return context;
     }
-    var visited = {};
+    var visited = new Map();
     return getCachedPredictionContext(context, this.sharedContextCache, visited);
 };
 

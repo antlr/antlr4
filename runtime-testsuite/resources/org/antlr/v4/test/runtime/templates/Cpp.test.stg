@@ -9,19 +9,20 @@ Assert(s) ::= ""
 Cast(t,v) ::= "dynamic_cast\<<t> *>(<v>)" // Should actually use a more specific name. We may have to use other casts as well.
 Append(a,b) ::= "<a> + <b>->toString()"
 Concat(a,b) ::= "<a><b>"
-
-DeclareLocal(s,v) ::= "<s> = <v>"
+AppendStr(a,b) ::= "<a> + <b>"
 
 AssertIsList(v) ::= "assert(<v>.size() >= 0);" // Use a method that exists only on a list (vector actually).
 AssignLocal(s,v) ::= "<s> = <v>;"
 
 InitIntMember(n,v) ::= "int <n> = <v>;"
 InitBooleanMember(n,v) ::= "bool <n> = <v>;"
+InitIntVar(n,v) ::= <%<InitIntMember(n,v)>%>
+IntArg(n) ::= "int <n>"
+VarRef(n) ::= "<n>"
 
 GetMember(n) ::= "<n>"
 SetMember(n,v) ::= "<n> = <v>;"
 AddMember(n,v) ::= "<n> += <v>;"
-PlusMember(v,n) ::= "<v> + <n>"
 MemberEquals(n,v) ::= "<n> == <v>"
 ModMemberEquals(n,m,v) ::= "<n> % <m> == <v>"
 ModMemberNotEquals(n,m,v) ::= "<n> % <m> != <v>"
@@ -67,6 +68,8 @@ bool Property() {
 >>
 
 ParserPropertyCall(p, call) ::= "<call>"
+
+PositionAdjustingLexerDef() ::= ""
 
 PositionAdjustingLexer() ::= <<
 protected:

@@ -332,7 +332,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "pushd ..\nif [ TParser.g4 -nt generated/TParser.cpp  -o  TLexer.g4 -nt generated/TLexer.cpp ]; then\n./generate.sh;\nfi\npopd";
+			shellScript = "pushd ..\nif [ TParser.g4 -nt generated/TParser.cpp  -o  TLexer.g4 -nt generated/TLexer.cpp ]; then\n./generate.sh;\nfi\npopd\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
