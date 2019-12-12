@@ -7,6 +7,7 @@
 
 var RuleContext = require('./RuleContext').RuleContext;
 var Hash = require('./Utils').Hash;
+var Map = require('./Utils').Map;
 
 function PredictionContext(cachedHashCode) {
 	this.cachedHashCode = cachedHashCode;
@@ -79,7 +80,7 @@ function calculateHashString(parent, returnState) {
 // can be used for both lexers and parsers.
 
 function PredictionContextCache() {
-	this.cache = {};
+	this.cache = new Map();
 	return this;
 }
 
@@ -91,16 +92,16 @@ PredictionContextCache.prototype.add = function(ctx) {
 	if (ctx === PredictionContext.EMPTY) {
 		return PredictionContext.EMPTY;
 	}
-	var existing = this.cache[ctx] || null;
+	var existing = this.cache.get(ctx) || null;
 	if (existing !== null) {
 		return existing;
 	}
-	this.cache[ctx] = ctx;
+	this.cache.put(ctx, ctx);
 	return ctx;
 };
 
 PredictionContextCache.prototype.get = function(ctx) {
-	return this.cache[ctx] || null;
+	return this.cache.get(ctx) || null;
 };
 
 Object.defineProperty(PredictionContextCache.prototype, "length", {
@@ -111,11 +112,13 @@ Object.defineProperty(PredictionContextCache.prototype, "length", {
 
 function SingletonPredictionContext(parent, returnState) {
 	var hashCode = 0;
+	var hash = new Hash();
 	if(parent !== null) {
-		var hash = new Hash();
 		hash.update(parent, returnState);
-        hashCode = hash.finish();
+	} else {
+		hash.update(1);
 	}
+	hashCode = hash.finish();
 	PredictionContext.call(this, hashCode);
 	this.parentCtx = parent;
 	this.returnState = returnState;
@@ -640,16 +643,16 @@ function mergeArrays(a, b, rootIsWildcard, mergeCache) {
 // ones.
 // /
 function combineCommonParents(parents) {
-	var uniqueParents = {};
+	var uniqueParents = new Map();
 
 	for (var p = 0; p < parents.length; p++) {
 		var parent = parents[p];
-		if (!(parent in uniqueParents)) {
-			uniqueParents[parent] = parent;
+		if (!(uniqueParents.containsKey(parent))) {
+			uniqueParents.put(parent, parent);
 		}
 	}
 	for (var q = 0; q < parents.length; q++) {
-		parents[q] = uniqueParents[parents[q]];
+		parents[q] = uniqueParents.get(parents[q]);
 	}
 }
 
@@ -657,13 +660,13 @@ function getCachedPredictionContext(context, contextCache, visited) {
 	if (context.isEmpty()) {
 		return context;
 	}
-	var existing = visited[context] || null;
+	var existing = visited.get(context) || null;
 	if (existing !== null) {
 		return existing;
 	}
 	existing = contextCache.get(context);
 	if (existing !== null) {
-		visited[context] = existing;
+		visited.put(context, existing);
 		return existing;
 	}
 	var changed = false;
@@ -683,7 +686,7 @@ function getCachedPredictionContext(context, contextCache, visited) {
 	}
 	if (!changed) {
 		contextCache.add(context);
-		visited[context] = context;
+		visited.put(context, context);
 		return context;
 	}
 	var updated = null;
@@ -696,8 +699,8 @@ function getCachedPredictionContext(context, contextCache, visited) {
 		updated = new ArrayPredictionContext(parents, context.returnStates);
 	}
 	contextCache.add(updated);
-	visited[updated] = updated;
-	visited[context] = updated;
+	visited.put(updated, updated);
+	visited.put(context, updated);
 
 	return updated;
 }
@@ -708,13 +711,13 @@ function getAllContextNodes(context, nodes, visited) {
 		nodes = [];
 		return getAllContextNodes(context, nodes, visited);
 	} else if (visited === null) {
-		visited = {};
+		visited = new Map();
 		return getAllContextNodes(context, nodes, visited);
 	} else {
-		if (context === null || visited[context] !== null) {
+		if (context === null || visited.containsKey(context)) {
 			return nodes;
 		}
-		visited[context] = context;
+		visited.put(context, context);
 		nodes.push(context);
 		for (var i = 0; i < context.length; i++) {
 			getAllContextNodes(context.getParent(i), nodes, visited);

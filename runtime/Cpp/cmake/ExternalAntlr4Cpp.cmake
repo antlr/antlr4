@@ -109,6 +109,12 @@ else()
 endif()
 
 # Seperate build step as rarely people want both
+set(ANTLR4_BUILD_DIR ${ANTLR4_ROOT})
+if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.14.0")
+  # CMake 3.14 builds in above's SOURCE_SUBDIR when BUILD_IN_SOURCE is true
+  set(ANTLR4_BUILD_DIR ${ANTLR4_ROOT}/runtime/Cpp)
+endif()
+
 ExternalProject_Add_Step(
     antlr4_runtime
     build_static
@@ -118,7 +124,7 @@ ExternalProject_Add_Step(
     DEPENDS antlr4_runtime
     BYPRODUCTS ${ANTLR4_STATIC_LIBRARIES}
     EXCLUDE_FROM_MAIN 1
-    WORKING_DIRECTORY ${ANTLR4_ROOT})
+    WORKING_DIRECTORY ${ANTLR4_BUILD_DIR})
 ExternalProject_Add_StepTargets(antlr4_runtime build_static)
 
 add_library(antlr4_static STATIC IMPORTED)
@@ -135,7 +141,7 @@ ExternalProject_Add_Step(
     DEPENDS antlr4_runtime
     BYPRODUCTS ${ANTLR4_SHARED_LIBRARIES} ${ANTLR4_RUNTIME_LIBRARIES}
     EXCLUDE_FROM_MAIN 1
-    WORKING_DIRECTORY ${ANTLR4_ROOT})
+    WORKING_DIRECTORY ${ANTLR4_BUILD_DIR})
 ExternalProject_Add_StepTargets(antlr4_runtime build_shared)
 
 add_library(antlr4_shared SHARED IMPORTED)

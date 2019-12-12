@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -57,7 +57,7 @@ namespace atn {
      * <p>
      * closure() tracks the depth of how far we dip into the outer context:
      * depth > 0.  Note that it may not be totally accurate depth since I
-     * don't ever decrement. TO_DO: make it a boolean then</p>
+     * don't ever decrement. TODO: make it a boolean then</p>
      *
      * <p>
      * For memory efficiency, the {@link #isPrecedenceFilterSuppressed} method
@@ -87,7 +87,6 @@ namespace atn {
 
     ATNConfig(ATNConfig const&) = default;
     virtual ~ATNConfig();
-    ATNConfig& operator=(ATNConfig const&) = default;
 
     virtual size_t hashCode() const;
 

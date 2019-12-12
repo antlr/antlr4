@@ -50,8 +50,8 @@ from MyGrammarLexer import MyGrammarLexer
 from MyGrammarParser import MyGrammarParser
  
 def main(argv):
-    input = FileStream(argv[1])
-    lexer = MyGrammarLexer(input)
+    input_stream = FileStream(argv[1])
+    lexer = MyGrammarLexer(input_stream)
     stream = CommonTokenStream(lexer)
     parser = MyGrammarParser(stream)
     tree = parser.startRule()

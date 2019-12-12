@@ -14,9 +14,9 @@ Cast(t,v) ::= "<v>"
 
 Append(a,b) ::= "<a> + <b>"
 
-Concat(a,b) ::= "<a><b>"
+AppendStr(a,b) ::= <%<Append(a,b)>%>
 
-DeclareLocal(s,v) ::= "var <s> = <v>;"
+Concat(a,b) ::= "<a><b>"
 
 AssertIsList(v) ::= <<if ( !(v instanceof Array) ) {throw "value is not an array";}>>
 
@@ -26,13 +26,17 @@ InitIntMember(n,v) ::= <%this.<n> = <v>;%>
 
 InitBooleanMember(n,v) ::= <%this.<n> = <v>;%>
 
+InitIntVar(n,v) ::= <%<InitIntMember(n,v)>%>
+
+IntArg(n) ::= "<n>"
+
+VarRef(n) ::= "<n>"
+
 GetMember(n) ::= <%this.<n>%>
 
 SetMember(n,v) ::= <%this.<n> = <v>;%>
 
 AddMember(n,v) ::= <%this.<n> += <v>;%>
-
-PlusMember(v,n) ::= <%<v> + this.<n>%>
 
 MemberEquals(n,v) ::= <%this.<n> === <v>%>
 
@@ -97,6 +101,8 @@ this.Property = function() {
 >>
 
 ParserPropertyCall(p, call) ::= "<p>.<call>"
+
+PositionAdjustingLexerDef() ::= ""
 
 PositionAdjustingLexer() ::= <<
 

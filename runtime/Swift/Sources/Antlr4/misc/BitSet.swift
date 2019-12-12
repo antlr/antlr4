@@ -1053,7 +1053,7 @@ public class BitSet: Hashable, CustomStringConvertible {
     /// 
     /// - returns: the hash code value for this bit set
     /// 
-    public var hashValue: Int {
+    private var hashCode: Int {
         var h: Int64 = 1234
         var i: Int = wordsInUse
         i -= 1
@@ -1063,6 +1063,10 @@ public class BitSet: Hashable, CustomStringConvertible {
         }
 
         return Int(Int32((h >> 32) ^ h))
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(hashCode)
     }
 
     /// 
