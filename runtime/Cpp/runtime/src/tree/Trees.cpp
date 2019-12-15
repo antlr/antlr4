@@ -25,17 +25,17 @@ using namespace antlrcpp;
 Trees::Trees() {
 }
 
-std::string Trees::toStringTree(ParseTree *t) {
-  return toStringTree(t, nullptr);
+std::string Trees::toStringTree(ParseTree *t, bool pretty) {
+  return toStringTree(t, nullptr, pretty);
 }
 
-std::string Trees::toStringTree(ParseTree *t, Parser *recog) {
+std::string Trees::toStringTree(ParseTree *t, Parser *recog, bool pretty) {
   if (recog == nullptr)
-    return toStringTree(t, std::vector<std::string>());
-  return toStringTree(t, recog->getRuleNames());
+    return toStringTree(t, std::vector<std::string>(), pretty);
+  return toStringTree(t, recog->getRuleNames(), pretty);
 }
 
-std::string Trees::toStringTree(ParseTree *t, const std::vector<std::string> &ruleNames) {
+std::string Trees::toStringTree(ParseTree *t, const std::vector<std::string> &ruleNames, bool pretty) {
   std::string temp = antlrcpp::escapeWhitespace(Trees::getNodeText(t, ruleNames), false);
   if (t->children.empty()) {
     return temp;
@@ -48,6 +48,7 @@ std::string Trees::toStringTree(ParseTree *t, const std::vector<std::string> &ru
   std::stack<size_t> stack;
   size_t childIndex = 0;
   ParseTree *run = t;
+  size_t indentationLevel = 1;
   while (childIndex < run->children.size()) {
     if (childIndex > 0) {
       ss << ' ';
@@ -59,6 +60,13 @@ std::string Trees::toStringTree(ParseTree *t, const std::vector<std::string> &ru
       stack.push(childIndex);
       run = child;
       childIndex = 0;
+      if (pretty) {
+        ++indentationLevel;
+        ss << std::endl;
+        for (size_t i = 0; i < indentationLevel; ++i) {
+          ss << "    ";
+        }
+      }
       ss << "(" << temp << " ";
     } else {
       ss << temp;
@@ -68,6 +76,9 @@ std::string Trees::toStringTree(ParseTree *t, const std::vector<std::string> &ru
           childIndex = stack.top();
           stack.pop();
           run = run->parent;
+          if (pretty) {
+            --indentationLevel;
+          }
           ss << ")";
         } else {
           break;

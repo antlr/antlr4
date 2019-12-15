@@ -56,7 +56,7 @@ public class LexerAction: Hashable {
         fatalError(#function + " must be overridden")
     }
 
-    public var hashValue: Int {
+    public func hash(into hasher: inout Hasher) {
         fatalError(#function + " must be overridden")
     }
 
