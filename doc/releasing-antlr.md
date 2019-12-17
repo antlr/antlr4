@@ -22,6 +22,14 @@ $ git push origin 4.7-rc1
 $ git push upstream 4.7-rc1
 ```
 
+## Update submodules
+
+Update the runtime submodules by running the following command:
+
+```bash
+ git submodule update --recursive
+ ```
+
 ## Bump version
 
 Edit the repository looking for 4.5 or whatever and update it. Bump version in the following files:
