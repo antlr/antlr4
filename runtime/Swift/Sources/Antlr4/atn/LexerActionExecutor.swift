@@ -176,11 +176,9 @@ public class LexerActionExecutor: Hashable {
     }
 
 
-    public var hashValue: Int {
-        return self.hashCode
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(hashCode)
     }
-
-
 }
 
 public func ==(lhs: LexerActionExecutor, rhs: LexerActionExecutor) -> Bool {

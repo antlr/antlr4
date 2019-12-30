@@ -760,7 +760,7 @@ namespace atn {
     virtual bool evalSemanticContext(Ref<SemanticContext> const& pred, ParserRuleContext *parserCallStack,
                                      size_t alt, bool fullCtx);
 
-    /* TO_DO: If we are doing predicates, there is no point in pursuing
+    /* TODO: If we are doing predicates, there is no point in pursuing
      closure operations if we reach a DFA state that uniquely predicts
      alternative. We will not be caching that DFA state and it is a
      waste to pursue the closure. Might have to advance when we do

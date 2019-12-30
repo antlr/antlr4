@@ -323,7 +323,9 @@ AltDict.prototype.values = function () {
     });
 };
 
-function DoubleDict() {
+function DoubleDict(defaultMapCtor) {
+    this.defaultMapCtor = defaultMapCtor || Map;
+    this.cacheMap = new this.defaultMapCtor();
     return this;
 }
 
@@ -339,7 +341,7 @@ Hash.prototype.update = function () {
         if (value == null)
             continue;
         if(Array.isArray(value))
-            this.update.apply(value);
+            this.update.apply(this, value);
         else {
             var k = 0;
             switch (typeof(value)) {
@@ -354,7 +356,10 @@ Hash.prototype.update = function () {
                     k = value.hashCode();
                     break;
                 default:
-                    value.updateHashCode(this);
+                    if(value.updateHashCode)
+                        value.updateHashCode(this);
+                    else
+                        console.log("No updateHashCode for " + value.toString())
                     continue;
             }
             k = k * 0xCC9E2D51;
@@ -367,7 +372,7 @@ Hash.prototype.update = function () {
             this.hash = hash;
         }
     }
-}
+};
 
 Hash.prototype.finish = function () {
     var hash = this.hash ^ (this.count * 4);
@@ -377,26 +382,26 @@ Hash.prototype.finish = function () {
     hash = hash * 0xC2B2AE35;
     hash = hash ^ (hash >>> 16);
     return hash;
-}
+};
 
 function hashStuff() {
     var hash = new Hash();
-    hash.update.apply(arguments);
+    hash.update.apply(hash, arguments);
     return hash.finish();
 }
 
 DoubleDict.prototype.get = function (a, b) {
-    var d = this[a] || null;
-    return d === null ? null : (d[b] || null);
+    var d = this.cacheMap.get(a) || null;
+    return d === null ? null : (d.get(b) || null);
 };
 
 DoubleDict.prototype.set = function (a, b, o) {
-    var d = this[a] || null;
+    var d = this.cacheMap.get(a) || null;
     if (d === null) {
-        d = {};
-        this[a] = d;
+        d = new this.defaultMapCtor();
+        this.cacheMap.put(a, d);
     }
-    d[b] = o;
+    d.put(b, o);
 };
 
 
