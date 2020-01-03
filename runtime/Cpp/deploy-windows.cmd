@@ -1,4 +1,7 @@
 @echo off
+setlocal
+
+if [%1] == [] goto Usage
 
 rem Clean left overs from previous builds if there are any
 if exist bin rmdir /S /Q runtime\bin
@@ -9,11 +12,14 @@ if exist antlr4-cpp-runtime-vs2017.zip erase antlr4-cpp-runtime-vs2017.zip
 if exist antlr4-cpp-runtime-vs2019.zip erase antlr4-cpp-runtime-vs2019.zip
 
 rem Headers
-xcopy runtime\src\*.h antlr4-runtime\ /s
+echo Copying header files ...
+xcopy runtime\src\*.h antlr4-runtime\ /s /q
 
 rem Binaries
-if exist "C:\Program Files (x86)\Microsoft Visual Studio 15.0\Common7\Tools\VsDevCmd.bat" (
-  call "C:\Program Files (x86)\Microsoft Visual Studio 15.0\Common7\Tools\VsDevCmd.bat"
+if exist "X:\Program Files (x86)\Microsoft Visual Studio\2017\%1\Common7\Tools\VsDevCmd.bat" (
+  echo.
+  
+  call "C:\Program Files (x86)\Microsoft Visual Studio\2017\%1\Common7\Tools\VsDevCmd.bat"
 
   pushd runtime
   msbuild antlr4cpp-vs2017.vcxproj /p:configuration="Release DLL" /p:platform=Win32
@@ -32,8 +38,11 @@ if exist "C:\Program Files (x86)\Microsoft Visual Studio 15.0\Common7\Tools\VsDe
   rem if exist antlr4-cpp-runtime-vs2017.zip copy antlr4-cpp-runtime-vs2017.zip ~/antlr/sites/website-antlr4/download
 )
 
-if exist "C:\Program Files (x86)\Microsoft Visual Studio 16.0\Common7\Tools\VsDevCmd.bat" (
-  call "C:\Program Files (x86)\Microsoft Visual Studio 16.0\Common7\Tools\VsDevCmd.bat"
+set VCTargetsPath=C:\Program Files (x86)\Microsoft Visual Studio\2019\%1\MSBuild\Microsoft\VC\v160\
+if exist "C:\Program Files (x86)\Microsoft Visual Studio\2019\%1\Common7\Tools\VsDevCmd.bat" (
+  echo.
+
+  call "C:\Program Files (x86)\Microsoft Visual Studio\2019\%1\Common7\Tools\VsDevCmd.bat"
 
   pushd runtime
   msbuild antlr4cpp-vs2019.vcxproj /p:configuration="Release DLL" /p:platform=Win32
@@ -53,5 +62,18 @@ if exist "C:\Program Files (x86)\Microsoft Visual Studio 16.0\Common7\Tools\VsDe
 )
 
 rmdir /S /Q antlr4-runtime
+echo.
+echo === Build done ===
+
+goto end
+
+:Usage
+
+echo This script builds Visual Studio 2017 and/or 2019 libraries of the ANTLR4 runtime.
+echo You have to specify the name(s) of the VS type you have installed (Community, Professional etc.).
+echo.
+echo Example:
+echo   %0 Professional
+echo.
 
 :end
