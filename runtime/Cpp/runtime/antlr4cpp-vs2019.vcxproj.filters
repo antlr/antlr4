@@ -336,6 +336,9 @@
     <ClInclude Include="src\misc\MurmurHash.h">
       <Filter>Header Files\misc</Filter>
     </ClInclude>
+    <ClInclude Include="src\misc\TestRig.h">
+      <Filter>Header Files\misc</Filter>
+    </ClInclude>
     <ClInclude Include="src\support\Arrays.h">
       <Filter>Header Files\support</Filter>
     </ClInclude>
@@ -528,14 +531,14 @@
     <ClInclude Include="src\antlr4-runtime.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\support\Any.h">
+      <Filter>Source Files\support</Filter>
+    </ClInclude>
     <ClInclude Include="src\tree\IterativeParseTreeWalker.h">
       <Filter>Header Files\tree</Filter>
     </ClInclude>
     <ClInclude Include="src\misc\InterpreterDataReader.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\support\Any.h">
-      <Filter>Header Files\support</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

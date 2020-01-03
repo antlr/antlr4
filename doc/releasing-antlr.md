@@ -379,7 +379,7 @@ There are links to the artifacts in [download.html](http://www.antlr.org/downloa
 
 The C++ target is the most complex one, because it addresses multiple platforms, which require individual handling. We have 4 scenarios to cover:
 
-* **Windows**: static and dynamic libraries for the VC++ runtime 2013 or 2015 (corresponding to Visual Studio 2013 or 2015) + header files. All that in 32 and 64bit, debug + release.
+* **Windows**: static and dynamic libraries for the VC++ runtime 2017 or 2019 (corresponding to Visual Studio 2017 or 2019) + header files. All that in 32 and 64bit, debug + release.
 * **MacOS**: static and dynamic release libraries + header files.
 * **iOS**: no prebuilt binaries, but just a zip of the source, including the XCode project to build everything from source.
 * **Linux**: no prebuilt binaries, but just a zip of the source code, including the cmake file to build everything from source there.
@@ -404,12 +404,12 @@ cd runtime/Cpp
 cp antlr4-cpp-runtime-source.zip ~/antlr/sites/website-antlr4/download/antlr4-cpp-runtime-4.7-source.zip
 ```
 
-On a Windows machine the build scripts checks if VS 2013 and/or VS 2015 are installed and builds binaries for each, if found. This script requires 7z to be installed (http://7-zip.org then do `set PATH=%PATH%;C:\Program Files\7-Zip\` from DOS not powershell).
+On a Windows machine the build scripts checks if VS 2017 and/or VS 2019 are installed and builds binaries for each, if found. This script requires 7z to be installed (http://7-zip.org then do `set PATH=%PATH%;C:\Program Files\7-Zip\` from DOS not powershell).
 
 ```bash
 cd runtime/Cpp
-deploy-windows.cmd
-cp runtime\bin\vs-2015\x64\Release DLL\antlr4-cpp-runtime-vs2015.zip ~/antlr/sites/website-antlr4/download/antlr4-cpp-runtime-4.7-vs2015.zip
+deploy-windows.cmd Community
+cp antlr4-cpp-runtime-vs2019.zip ~/antlr/sites/website-antlr4/download/antlr4-cpp-runtime-4.7-vs2019.zip
 ```
 
 Move target to website (**_rename to a specific ANTLR version first if needed_**):

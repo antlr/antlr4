@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug Static|Win32">
       <Configuration>Debug Static</Configuration>
@@ -586,6 +586,7 @@
     <ClInclude Include="src\misc\IntervalSet.h" />
     <ClInclude Include="src\misc\MurmurHash.h" />
     <ClInclude Include="src\misc\Predicate.h" />
+    <ClInclude Include="src\misc\TestRig.h" />
     <ClInclude Include="src\NoViableAltException.h" />
     <ClInclude Include="src\Parser.h" />
     <ClInclude Include="src\ParserInterpreter.h" />
