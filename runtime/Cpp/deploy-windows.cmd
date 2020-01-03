@@ -16,6 +16,7 @@ echo Copying header files ...
 xcopy runtime\src\*.h antlr4-runtime\ /s /q
 
 rem Binaries
+rem VS 2017 disabled by default. Change the X to a C to enable it.
 if exist "X:\Program Files (x86)\Microsoft Visual Studio\2017\%1\Common7\Tools\VsDevCmd.bat" (
   echo.
   
@@ -70,7 +71,8 @@ goto end
 :Usage
 
 echo This script builds Visual Studio 2017 and/or 2019 libraries of the ANTLR4 runtime.
-echo You have to specify the name(s) of the VS type you have installed (Community, Professional etc.).
+echo You have to specify the type of your VS installation (Community, Professional etc.) to construct
+echo the correct build tools path.
 echo.
 echo Example:
 echo   %0 Professional
