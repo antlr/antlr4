@@ -105,8 +105,8 @@ public class PredictionContext: Hashable, CustomStringConvertible {
         return getReturnState(size() - 1) == PredictionContext.EMPTY_RETURN_STATE
     }
 
-    public final var hashValue: Int {
-        return cachedHashCode
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(cachedHashCode)
     }
 
     static func calculateEmptyHashCode() -> Int {
@@ -668,7 +668,7 @@ public class PredictionContext: Hashable, CustomStringConvertible {
     }
 
     public func toString<T>(_ recog: Recognizer<T>) -> String {
-        return NSStringFromClass(PredictionContext.self)
+        return String(describing: PredictionContext.self)
         //		return toString(recog, ParserRuleContext.EMPTY);
     }
 
