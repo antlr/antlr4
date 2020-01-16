@@ -54,7 +54,7 @@ public class PHPTarget extends Target {
 
     @Override
     public String getVersion() {
-        return "4.7.2";
+        return "4.8";
     }
 
 	@Override
