@@ -24,6 +24,13 @@ $ git push upstream 4.8-rc1
 
 ## Update submodules
 
+Make sure you tell git to pull in the submodule (for every clone you do of antlr4):
+
+```bash
+git submodule init
+git submodule update
+```
+
 Update the runtime submodules by running the following command:
 
 ```bash
