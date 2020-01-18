@@ -235,7 +235,7 @@ Now, go here:
 
 and on the left click "Staging Repositories". You click the staging repo and close it, then you refresh, click it and release it. It's done when you see it here:
 
-&nbsp;&nbsp;&nbsp;&nbsp;[http://repo1.maven.org/maven2/org/antlr/antlr4-runtime/](http://repo1.maven.org/maven2/org/antlr/antlr4-runtime/)
+&nbsp;&nbsp;&nbsp;&nbsp;[https://oss.sonatype.org/service/local/repositories/releases/content/org/antlr/antlr4-runtime/4.8-1/antlr4-runtime-4.8-1.jar](https://oss.sonatype.org/service/local/repositories/releases/content/org/antlr/antlr4-runtime/4.8-1/antlr4-runtime-4.8-1.jar)
 
 Copy the jars to antlr.org site and update download/index.html
 
