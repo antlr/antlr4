@@ -237,6 +237,8 @@ and on the left click "Staging Repositories". You click the staging repo and clo
 
 &nbsp;&nbsp;&nbsp;&nbsp;[https://oss.sonatype.org/service/local/repositories/releases/content/org/antlr/antlr4-runtime/4.8-1/antlr4-runtime-4.8-1.jar](https://oss.sonatype.org/service/local/repositories/releases/content/org/antlr/antlr4-runtime/4.8-1/antlr4-runtime-4.8-1.jar)
 
+All releases should be here: https://repo1.maven.org/maven2/org/antlr/antlr4-runtime/
+
 Copy the jars to antlr.org site and update download/index.html
 
 ```bash
