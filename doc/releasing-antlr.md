@@ -28,7 +28,6 @@ Make sure you tell git to pull in the submodule (for every clone you do of antlr
 
 ```bash
 git submodule init
-git submodule update
 ```
 
 Update the runtime submodules by running the following command:
@@ -73,6 +72,10 @@ find tool runtime -type f -exec grep -l '4\.6' {} \;
 ```
 
 Commit to repository.
+
+## Building
+
+ugh. apparently you have to `mvn install` and then `mvn compile` or some such or subdir pom.xml's won't see the latest runtime build.
 
 ## Maven Repository Settings
 
