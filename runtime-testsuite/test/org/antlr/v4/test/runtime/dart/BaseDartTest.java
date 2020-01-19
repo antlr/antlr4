@@ -22,10 +22,8 @@ import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.semantics.SemanticPipeline;
-import org.antlr.v4.test.runtime.BaseRuntimeTest;
-import org.antlr.v4.test.runtime.ErrorQueue;
-import org.antlr.v4.test.runtime.RuntimeTestSupport;
-import org.antlr.v4.test.runtime.StreamVacuum;
+import org.antlr.v4.test.runtime.*;
+import org.antlr.v4.test.runtime.descriptors.PerformanceDescriptors;
 import org.antlr.v4.tool.*;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
@@ -46,6 +44,8 @@ import static org.junit.Assert.assertArrayEquals;
 
 
 public class BaseDartTest implements RuntimeTestSupport {
+	private static final List<String> AOT_COMPILE_TESTS = Collections.singletonList(new PerformanceDescriptors.DropLoopEntryBranchInLRRule_4().input);
+
 	public static final String newline = System.getProperty("line.separator");
 	public static final String pathSep = System.getProperty("path.separator");
 
@@ -380,7 +380,7 @@ public class BaseDartTest implements RuntimeTestSupport {
 		assertTrue(success);
 		writeFile(tmpdir, "input", input);
 		writeLexerTestFile(lexerName, showDFA);
-		String output = execClass("Test.dart");
+		String output = execClass("Test", false);
 		return output;
 	}
 
@@ -478,7 +478,8 @@ public class BaseDartTest implements RuntimeTestSupport {
 			lexerName,
 			startRuleName,
 			showDiagnosticErrors,
-			profile);
+			profile,
+			AOT_COMPILE_TESTS.contains(input));
 	}
 
 	/**
@@ -555,7 +556,8 @@ public class BaseDartTest implements RuntimeTestSupport {
 									   String lexerName,
 									   String parserStartRuleName,
 									   boolean debug,
-									   boolean profile) {
+									   boolean profile,
+									   boolean aotCompile) {
 		this.stderrDuringParse = null;
 		if (parserName == null) {
 			writeLexerTestFile(lexerName, false);
@@ -567,19 +569,40 @@ public class BaseDartTest implements RuntimeTestSupport {
 				profile);
 		}
 
-		return execClass("Test.dart");
+		return execClass("Test", true);
 	}
 
-	public String execRecognizer() {
-		return execClass("Test.dart");
-	}
-
-	public String execClass(String className) {
+	public String execClass(String className, boolean compile) {
 		try {
-			String[] args = new String[]{
-				locateDart(),
-				className, new File(tmpdir, "input").getAbsolutePath()
-			};
+			if (compile) {
+				String[] args = new String[]{
+					locateDart2Native(),
+					className + ".dart", "-o", className
+				};
+				String cmdLine = Utils.join(args, " ");
+				System.err.println("Compile: " + cmdLine);
+				Process process =
+					Runtime.getRuntime().exec(args, null, new File(tmpdir));
+				StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
+				stderrVacuum.start();
+				int result = process.waitFor();
+				if (result != 0) {
+					stderrVacuum.join();
+					System.err.print("Error compiling dart file: " + stderrVacuum.toString());
+				}
+			}
+
+			String[] args;
+			if (compile) {
+				args = new String[]{
+					new File(tmpdir, className).getAbsolutePath(), new File(tmpdir, "input").getAbsolutePath()
+				};
+			} else {
+				args = new String[]{
+					locateDart(),
+					className + ".dart", new File(tmpdir, "input").getAbsolutePath()
+				};
+			}
 			String cmdLine = Utils.join(args, " ");
 			System.err.println("execParser: " + cmdLine);
 			Process process =
@@ -647,6 +670,23 @@ public class BaseDartTest implements RuntimeTestSupport {
 
 		if (prop == null || prop.length() == 0) {
 			prop = locateTool("dart");
+		}
+
+		File file = new File(prop);
+
+		if (!file.exists()) {
+			throw new RuntimeException("Missing system property:" + propName);
+		}
+
+		return file.getAbsolutePath();
+	}
+
+	protected String locateDart2Native() {
+		String propName = getPropertyPrefix() + "-dart2native";
+		String prop = System.getProperty(propName);
+
+		if (prop == null || prop.length() == 0) {
+			prop = locateTool("dart2native");
 		}
 
 		File file = new File(prop);
@@ -935,31 +975,6 @@ public class BaseDartTest implements RuntimeTestSupport {
 
 		outputFileST.add("lexerName", lexerName);
 		writeFile(tmpdir, "Test.dart", outputFileST.render());
-	}
-
-	public void writeRecognizerAndCompile(String parserName, String lexerName,
-										  String parserStartRuleName,
-										  boolean debug,
-										  boolean profile) {
-		if (parserName == null) {
-			writeLexerTestFile(lexerName, debug);
-		} else {
-			writeTestFile(parserName,
-				lexerName,
-				parserStartRuleName,
-				debug,
-				profile);
-		}
-	}
-
-	protected void eraseFiles(final String filesEndingWith) {
-		File tmpdirF = new File(tmpdir);
-		String[] files = tmpdirF.list();
-		for (int i = 0; files != null && i < files.length; i++) {
-			if (files[i].endsWith(filesEndingWith)) {
-				new File(tmpdir + "/" + files[i]).delete();
-			}
-		}
 	}
 
 	protected void eraseFiles() {

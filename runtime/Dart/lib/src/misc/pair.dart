@@ -4,6 +4,8 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+import '../util/murmur_hash.dart';
+
 class Pair<A, B> {
   final A a;
   final B b;
@@ -12,7 +14,7 @@ class Pair<A, B> {
 
   @override
   bool operator ==(other) {
-    return other is Pair<A, B> && a == other.a && b == other.b;
+    return identical(this, other) || other is Pair && a == other.a && b == other.b;
   }
 
   String toString() {
@@ -21,6 +23,11 @@ class Pair<A, B> {
 
   @override
   int get hashCode {
-    return a.hashCode ^ b.hashCode;
+    MurmurHash.initialize();
+
+    int hash = MurmurHash.initialize();
+    hash = MurmurHash.update(hash, a);
+    hash = MurmurHash.update(hash, b);
+    return MurmurHash.finish(hash, 2);
   }
 }
