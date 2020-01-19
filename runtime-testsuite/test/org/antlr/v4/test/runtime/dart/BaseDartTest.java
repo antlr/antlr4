@@ -22,7 +22,10 @@ import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.semantics.SemanticPipeline;
-import org.antlr.v4.test.runtime.*;
+import org.antlr.v4.test.runtime.BaseRuntimeTest;
+import org.antlr.v4.test.runtime.ErrorQueue;
+import org.antlr.v4.test.runtime.RuntimeTestSupport;
+import org.antlr.v4.test.runtime.StreamVacuum;
 import org.antlr.v4.test.runtime.descriptors.PerformanceDescriptors;
 import org.antlr.v4.tool.*;
 import org.stringtemplate.v4.ST;
@@ -630,10 +633,10 @@ public class BaseDartTest implements RuntimeTestSupport {
 	}
 
 	private String locateTool(String tool) {
-		final String phpPath = System.getProperty("DART_PATH");
+		final String dartPath = System.getProperty("DART_PATH");
 
-		if (phpPath != null && new File(phpPath).exists()) {
-			return phpPath;
+		if (dartPath != null && new File(dartPath + tool).exists()) {
+			return dartPath + tool;
 		}
 
 		String[] roots = {"/usr/local/bin/", "/opt/local/bin/", "/usr/bin/", "/usr/lib/dart/bin/"};
