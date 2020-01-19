@@ -30,11 +30,21 @@ Make sure you tell git to pull in the submodule (for every clone you do of antlr
 git submodule init
 ```
 
+Also bump version to 4.8 in `runtime/PHP/src/RuntimeMetaData.php`.
+
 Update the runtime submodules by running the following command:
 
 ```bash
- git submodule update --recursive
- ```
+git submodule update --recursive
+git submodule update --remote --merge # might only need this last one but do both
+```
+
+Make sure these changes go back to antlr4 repo:
+
+```bash
+git add runtime/PHP
+git commit -m "Update PHP Runtime to latest version"
+```
 
 ## Bump version
 
