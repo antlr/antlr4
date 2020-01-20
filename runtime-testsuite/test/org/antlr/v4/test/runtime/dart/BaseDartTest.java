@@ -126,7 +126,7 @@ public class BaseDartTest implements RuntimeTestSupport {
 	private static String cacheDartPackages;
 
 	private String getPropertyPrefix() {
-		return "antlr-php";
+		return "antlr-dart";
 	}
 
 	@Override
@@ -572,7 +572,7 @@ public class BaseDartTest implements RuntimeTestSupport {
 				profile);
 		}
 
-		return execClass("Test", true);
+		return execClass("Test", aotCompile);
 	}
 
 	public String execClass(String className, boolean compile) {
