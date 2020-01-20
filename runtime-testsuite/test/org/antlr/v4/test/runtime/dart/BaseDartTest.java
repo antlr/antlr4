@@ -26,6 +26,7 @@ import org.antlr.v4.test.runtime.BaseRuntimeTest;
 import org.antlr.v4.test.runtime.ErrorQueue;
 import org.antlr.v4.test.runtime.RuntimeTestSupport;
 import org.antlr.v4.test.runtime.StreamVacuum;
+import org.antlr.v4.test.runtime.descriptors.LexerExecDescriptors;
 import org.antlr.v4.test.runtime.descriptors.PerformanceDescriptors;
 import org.antlr.v4.tool.*;
 import org.stringtemplate.v4.ST;
@@ -47,7 +48,10 @@ import static org.junit.Assert.assertArrayEquals;
 
 
 public class BaseDartTest implements RuntimeTestSupport {
-	private static final List<String> AOT_COMPILE_TESTS = Collections.singletonList(new PerformanceDescriptors.DropLoopEntryBranchInLRRule_4().input);
+	private static final List<String> AOT_COMPILE_TESTS = Arrays.asList(
+		new PerformanceDescriptors.DropLoopEntryBranchInLRRule_4().input,
+		new LexerExecDescriptors.LargeLexer().input
+	);
 
 	public static final String newline = System.getProperty("line.separator");
 	public static final String pathSep = System.getProperty("path.separator");
@@ -383,7 +387,7 @@ public class BaseDartTest implements RuntimeTestSupport {
 		assertTrue(success);
 		writeFile(tmpdir, "input", input);
 		writeLexerTestFile(lexerName, showDFA);
-		String output = execClass("Test", false);
+		String output = execClass("Test", AOT_COMPILE_TESTS.contains(input));
 		return output;
 	}
 
