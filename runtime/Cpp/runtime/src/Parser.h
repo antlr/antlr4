@@ -193,7 +193,7 @@ namespace antlr4 {
     /// <seealso cref= #notifyErrorListeners </seealso>
     virtual size_t getNumberOfSyntaxErrors();
 
-    virtual Ref<TokenFactory<CommonToken>> getTokenFactory() override;
+    virtual TokenFactory<CommonToken>* getTokenFactory() override;
 
     /// <summary>
     /// Tell our token source and error strategy about a new way to create tokens. </summary>

@@ -138,7 +138,7 @@ namespace antlr4 {
 
     virtual void setInputStream(IntStream *input) = 0;
 
-    virtual Ref<TokenFactory<CommonToken>> getTokenFactory() = 0;
+    virtual TokenFactory<CommonToken>* getTokenFactory() = 0;
 
     template<typename T1>
     void setTokenFactory(TokenFactory<T1> *input);
