@@ -1056,5 +1056,10 @@ public class LexerExecDescriptors {
 
 			return new Pair<>(grammarName, grammar);
 		}
+
+		@Override
+		public boolean ignore(String targetName) {
+			return targetName.equals("Dart");
+		}
 	}
 }
