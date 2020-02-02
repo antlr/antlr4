@@ -141,8 +141,8 @@ class FailedPredicateException extends RecognitionException {
             message: formatMessage(predicate, message || null), recognizer: recognizer,
             input: recognizer.getInputStream(), ctx: recognizer._ctx
         });
-        var s = recognizer._interp.atn.states[recognizer.state];
-        var trans = s.transitions[0];
+        const s = recognizer._interp.atn.states[recognizer.state]
+        const trans = s.transitions[0]
         if (trans instanceof PredicateTransition) {
             this.ruleIndex = trans.ruleIndex;
             this.predicateIndex = trans.predIndex;
@@ -152,7 +152,6 @@ class FailedPredicateException extends RecognitionException {
         }
         this.predicate = predicate;
         this.offendingToken = recognizer.getCurrentToken();
-        return this;
     }
 }
 
