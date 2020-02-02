@@ -169,4 +169,5 @@ module.exports = {
     LexerNoViableAltException,
     InputMismatchException,
     FailedPredicateException,
-    ParseCancellationException};
+    ParseCancellationException
+};

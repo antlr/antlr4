@@ -547,15 +547,15 @@ class DefaultErrorStrategy extends ErrorStrategy {
         return recognizer.getExpectedTokens();
     }
 
-/**
- * How should a token be displayed in an error message? The default
- * is to display just the text, but during development you might
- * want to have a lot of information spit out. Override in that case
- * to use t.toString() (which, for CommonToken, dumps everything about
- * the token). This is better than forcing you to override a method in
- * your token objects because you don't have to go modify your lexer
- * so that it creates a new Java type.
- */
+    /**
+     * How should a token be displayed in an error message? The default
+     * is to display just the text, but during development you might
+     * want to have a lot of information spit out. Override in that case
+     * to use t.toString() (which, for CommonToken, dumps everything about
+     * the token). This is better than forcing you to override a method in
+     * your token objects because you don't have to go modify your lexer
+     * so that it creates a new Java type.
+     */
     getTokenErrorDisplay(t) {
         if (t === null) {
             return "<no token>";
@@ -746,10 +746,10 @@ class BailErrorStrategy extends DefaultErrorStrategy {
         throw new ParseCancellationException(e);
     }
 
-/**
- * Make sure we don't attempt to recover inline; if the parser
- * successfully recovers, it won't throw an exception.
- * */
+    /**
+     * Make sure we don't attempt to recover inline; if the parser
+     * successfully recovers, it won't throw an exception.
+     */
     recoverInline(recognizer) {
         this.recover(recognizer, new InputMismatchException(recognizer));
     }
