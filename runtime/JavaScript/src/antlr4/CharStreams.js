@@ -5,17 +5,15 @@
  */
 //
 
-var InputStream = require('./InputStream').InputStream;
-
-var isNodeJs = typeof window === 'undefined' && typeof importScripts === 'undefined';
-var fs = isNodeJs ? require("fs") : null;
+const {InputStream} = require('./InputStream');
+const fs = require("fs");
 
 // Utility functions to create InputStreams from various sources.
 //
 // All returned InputStreams support the full range of Unicode
 // up to U+10FFFF (the default behavior of InputStream only supports
 // code points up to U+FFFF).
-var CharStreams = {
+const CharStreams = {
   // Creates an InputStream from a string.
   fromString: function(str) {
     return new InputStream(str, true);
@@ -28,9 +26,9 @@ var CharStreams = {
   // Invokes onLoad(result) on success, onError(error) on
   // failure.
   fromBlob: function(blob, encoding, onLoad, onError) {
-    var reader = FileReader();
+    const reader = new window.FileReader();
     reader.onload = function(e) {
-      var is = new InputStream(e.target.result, true);
+      const is = new InputStream(e.target.result, true);
       onLoad(is);
     };
     reader.onerror = onError;
@@ -51,7 +49,7 @@ var CharStreams = {
   // Invokes callback(error, result) on completion.
   fromPath: function(path, encoding, callback) {
     fs.readFile(path, encoding, function(err, data) {
-      var is = null;
+      let is = null;
       if (data !== null) {
         is = new InputStream(data, true);
       }
@@ -63,9 +61,9 @@ var CharStreams = {
   // on disk and the encoding of the bytes in that file (defaults to
   // 'utf8' if encoding is null).
   fromPathSync: function(path, encoding) {
-    var data = fs.readFileSync(path, encoding);
+    const data = fs.readFileSync(path, encoding);
     return new InputStream(data, true);
   }
 };
 
-exports.CharStreams = CharStreams;
+module.exports = { CharStreams }
