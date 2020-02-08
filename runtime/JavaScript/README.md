@@ -27,7 +27,7 @@ That's it!
 ### to browser
 
 To publish antlr4 for browser usage you need to bundle it into a single
-file with `npm build`. This will create `dist/antlr4.js` file. Upload it
+file with `npm run build`. This will create `dist/antlr4.js` file. Upload it
 to your favourite server.
 
 That's it!

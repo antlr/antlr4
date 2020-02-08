@@ -292,7 +292,7 @@ npm publish antlr4
 Move target to website
 
 ```bash
-npm build
+npm run build
 cp /dist/antlr4.js ~/antlr/sites/website-antlr4/download
 ```
 
