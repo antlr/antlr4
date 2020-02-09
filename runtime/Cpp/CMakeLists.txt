@@ -141,11 +141,12 @@ if (ANTLR4_INSTALL)
   include(CMakePackageConfigHelpers)
 
   if(NOT ANTLR4_CMAKE_DIR)
-    set(ANTLR4_CMAKE_DIR ${CMAKE_INSTALL_LIBDIR}/cmake/antlr4 CACHE STRING
+    set(ANTLR4_CMAKE_DIR ${CMAKE_INSTALL_LIBDIR}/cmake CACHE STRING
       "Installation directory for cmake files." FORCE )
   endif(NOT ANTLR4_CMAKE_DIR)
 
-  set(version_config ${PROJECT_BINARY_DIR}/antlr4-config-version.cmake)
+  set(version_runtime_config ${PROJECT_BINARY_DIR}/antlr4-runtime-config-version.cmake)
+  set(version_generator_config ${PROJECT_BINARY_DIR}/antlr4-generator-config-version.cmake)
   set(project_runtime_config ${PROJECT_BINARY_DIR}/antlr4-runtime-config.cmake)
   set(project_generator_config ${PROJECT_BINARY_DIR}/antlr4-generator-config.cmake)
   set(targets_export_name antlr4-targets)
@@ -159,31 +160,39 @@ if (ANTLR4_INSTALL)
   configure_package_config_file(
     cmake/antlr4-runtime.cmake.in
     ${project_runtime_config}
-    INSTALL_DESTINATION ${ANTLR4_CMAKE_DIR}
+    INSTALL_DESTINATION ${ANTLR4_CMAKE_DIR}/antlr4-runtime
     PATH_VARS 
     ANTLR4_INCLUDE_DIR
     ANTLR4_LIB_DIR )
   
-configure_package_config_file(
+  configure_package_config_file(
     cmake/antlr4-generator.cmake.in
     ${project_generator_config}
-    INSTALL_DESTINATION ${ANTLR4_CMAKE_DIR}
+    INSTALL_DESTINATION ${ANTLR4_CMAKE_DIR}/antlr4-generator
     PATH_VARS 
     ANTLR4_INCLUDE_DIR
     ANTLR4_LIB_DIR )
   
   write_basic_package_version_file(
-    ${version_config}
+    ${version_runtime_config}
+    VERSION ${ANTLR_VERSION}
+    COMPATIBILITY SameMajorVersion )
+
+  write_basic_package_version_file(
+    ${version_generator_config}
     VERSION ${ANTLR_VERSION}
     COMPATIBILITY SameMajorVersion )
 
   install(EXPORT ${targets_export_name}
-          DESTINATION ${ANTLR4_CMAKE_DIR} )
+          DESTINATION ${ANTLR4_CMAKE_DIR}/antlr4-runtime )
 
   install(FILES ${project_runtime_config}
-                ${project_generator_config}
-                ${version_config}
-          DESTINATION ${ANTLR4_CMAKE_DIR} )
+                ${version_runtime_config}
+          DESTINATION ${ANTLR4_CMAKE_DIR}/antlr4-runtime )
+
+  install(FILES ${project_generator_config}
+                ${version_generator_config}
+          DESTINATION ${ANTLR4_CMAKE_DIR}/antlr4-generator )
 
 endif(ANTLR4_INSTALL)
 
