@@ -3,11 +3,11 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
-exports.RecognitionException = require('./Errors').RecognitionException;
-exports.NoViableAltException = require('./Errors').NoViableAltException;
-exports.LexerNoViableAltException = require('./Errors').LexerNoViableAltException;
-exports.InputMismatchException = require('./Errors').InputMismatchException;
-exports.FailedPredicateException = require('./Errors').FailedPredicateException;
-exports.DiagnosticErrorListener = require('./DiagnosticErrorListener').DiagnosticErrorListener;
-exports.BailErrorStrategy = require('./ErrorStrategy').BailErrorStrategy;
-exports.ErrorListener = require('./ErrorListener').ErrorListener;
+module.exports.RecognitionException = require('./Errors').RecognitionException;
+module.exports.NoViableAltException = require('./Errors').NoViableAltException;
+module.exports.LexerNoViableAltException = require('./Errors').LexerNoViableAltException;
+module.exports.InputMismatchException = require('./Errors').InputMismatchException;
+module.exports.FailedPredicateException = require('./Errors').FailedPredicateException;
+module.exports.DiagnosticErrorListener = require('./DiagnosticErrorListener').DiagnosticErrorListener;
+module.exports.BailErrorStrategy = require('./ErrorStrategy').BailErrorStrategy;
+module.exports.ErrorListener = require('./ErrorListener').ErrorListener;
