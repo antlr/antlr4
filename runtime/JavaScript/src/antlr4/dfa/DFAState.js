@@ -153,5 +153,4 @@ class DFAState {
 	}
 }
 
-module.exports = {DFAState};
-module.exports = {PredPrediction};
+module.exports = { DFAState, PredPrediction };

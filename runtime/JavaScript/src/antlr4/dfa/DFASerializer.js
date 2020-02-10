@@ -73,6 +73,5 @@ class LexerDFASerializer extends DFASerializer {
     }
 }
 
-module.exports = { DFASerializer };
-module.exports = { LexerDFASerializer };
+module.exports = { DFASerializer , LexerDFASerializer };
 
