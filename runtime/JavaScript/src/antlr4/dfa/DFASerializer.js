@@ -17,14 +17,14 @@ class DFASerializer {
        if(this.dfa.s0 === null) {
            return null;
        }
-       var buf = "";
-       var states = this.dfa.sortedStates();
-       for(var i=0;i<states.length;i++) {
-           var s = states[i];
+       let buf = "";
+       const states = this.dfa.sortedStates();
+       for(let i=0; i<states.length; i++) {
+           const s = states[i];
            if(s.edges!==null) {
-                var n = s.edges.length;
-                for(var j=0;j<n;j++) {
-                    var t = s.edges[j] || null;
+                const n = s.edges.length;
+                for(const j=0;j<n;j++) {
+                    const t = s.edges[j] || null;
                     if(t!==null && t.stateNumber !== 0x7FFFFFFF) {
                         buf = buf.concat(this.getStateString(s));
                         buf = buf.concat("-");
@@ -50,7 +50,7 @@ class DFASerializer {
     }
 
     getStateString(s) {
-        var baseStateStr = ( s.isAcceptState ? ":" : "") + "s" + s.stateNumber + ( s.requiresFullContext ? "^" : "");
+        const baseStateStr = ( s.isAcceptState ? ":" : "") + "s" + s.stateNumber + ( s.requiresFullContext ? "^" : "");
         if(s.isAcceptState) {
             if (s.predicates !== null) {
                 return baseStateStr + "=>" + s.predicates.toString();
@@ -66,7 +66,6 @@ class DFASerializer {
 class LexerDFASerializer extends DFASerializer {
     constructor(dfa) {
         super(dfa, null);
-        return this;
     }
 
     getEdgeLabel(i) {
@@ -74,7 +73,6 @@ class LexerDFASerializer extends DFASerializer {
     }
 }
 
-
-exports.DFASerializer = DFASerializer;
-exports.LexerDFASerializer = LexerDFASerializer;
+module.exports = { DFASerializer };
+module.exports = { LexerDFASerializer };
 
