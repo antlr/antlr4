@@ -4,14 +4,12 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
-const Set = require("../Utils").Set;
-const DFAState = require('./DFAState').DFAState;
-const StarLoopEntryState = require('../atn/ATNState').StarLoopEntryState;
-const ATNConfigSet = require('./../atn/ATNConfigSet').ATNConfigSet;
-const DFASerializer = require('./DFASerializer').DFASerializer;
-const LexerDFASerializer = require('./DFASerializer').LexerDFASerializer;
-
-
+const {Set} = require("../Utils");
+const {DFAState} = require('./DFAState');
+const {StarLoopEntryState} = require('../atn/ATNState');
+const {ATNConfigSet} = require('./../atn/ATNConfigSet');
+const {DFASerializer} = require('./DFASerializer');
+const {LexerDFASerializer} = require('./DFASerializer');
 
 class DFA {
 	constructor(atnStartState, decision) {
@@ -148,4 +146,4 @@ class DFA {
 }
 
 
-exports.DFA = DFA;
+module.exports = { DFA };
