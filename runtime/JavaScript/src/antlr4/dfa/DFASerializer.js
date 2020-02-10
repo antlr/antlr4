@@ -3,9 +3,9 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
-// A DFA walker that knows how to dump them to serialized strings.#/
-
-
+/**
+ * A DFA walker that knows how to dump them to serialized strings.
+ */
 class DFASerializer {
     constructor(dfa, literalNames, symbolicNames) {
         this.dfa = dfa;
