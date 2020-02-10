@@ -5,10 +5,8 @@
  */
 ///
 
-var ATNConfigSet = require('./../atn/ATNConfigSet').ATNConfigSet;
-var Utils = require('./../Utils');
-var Hash = Utils.Hash;
-var Set = Utils.Set;
+const {ATNConfigSet} = require('./../atn/ATNConfigSet');
+const {Hash, Set} = require('./../Utils');
 
 // Map a predicate to a predicted alternative.///
 
@@ -94,10 +92,10 @@ class DFAState {
 // Get the set of all alts mentioned by all ATN configurations in this
 // DFA state.
 	getAltSet() {
-		var alts = new Set();
+		const alts = new Set();
 		if (this.configs !== null) {
-			for (var i = 0; i < this.configs.length; i++) {
-				var c = this.configs[i];
+			for (let i = 0; i < this.configs.length; i++) {
+				const c = this.configs[i];
 				alts.add(c.alt);
 			}
 		}
@@ -127,7 +125,7 @@ class DFAState {
 	}
 
 	toString() {
-		var s = "" + this.stateNumber + ":" + this.configs;
+		let s = "" + this.stateNumber + ":" + this.configs;
 		if(this.isAcceptState) {
 			s = s + "=>";
 			if (this.predicates !== null)
@@ -139,11 +137,11 @@ class DFAState {
 	}
 
 	hashCode() {
-		var hash = new Hash();
+		const hash = new Hash();
 		hash.update(this.configs);
 		return hash.finish();
 	}
 }
 
-exports.DFAState = DFAState;
-exports.PredPrediction = PredPrediction;
+module.exports = {DFAState};
+module.exports = {PredPrediction};
