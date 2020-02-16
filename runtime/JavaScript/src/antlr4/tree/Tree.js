@@ -8,8 +8,8 @@
 //  It is the most abstract interface for all the trees used by ANTLR.
 ///
 
-const Token = require('./../Token').Token;
-const Interval = require('./../IntervalSet').Interval;
+const {Token} = require('./../Token');
+const {Interval} = require('./../IntervalSet');
 const INVALID_INTERVAL = new Interval(-1, -2);
 
 class Tree {}
@@ -196,12 +196,14 @@ class ParseTreeWalker {
 
 ParseTreeWalker.DEFAULT = new ParseTreeWalker();
 
-exports.RuleNode = RuleNode;
-exports.ErrorNode = ErrorNode;
-exports.TerminalNode = TerminalNode;
-exports.ErrorNodeImpl = ErrorNodeImpl;
-exports.TerminalNodeImpl = TerminalNodeImpl;
-exports.ParseTreeListener = ParseTreeListener;
-exports.ParseTreeVisitor = ParseTreeVisitor;
-exports.ParseTreeWalker = ParseTreeWalker;
-exports.INVALID_INTERVAL = INVALID_INTERVAL;
+module.exports = {
+	RuleNode,
+	ErrorNode,
+	TerminalNode,
+	ErrorNodeImpl,
+	TerminalNodeImpl,
+	ParseTreeListener,
+	ParseTreeVisitor,
+	ParseTreeWalker,
+	INVALID_INTERVAL
+}
