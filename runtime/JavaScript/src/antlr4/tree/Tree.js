@@ -8,10 +8,9 @@
 //  It is the most abstract interface for all the trees used by ANTLR.
 ///
 
-var Token = require('./../Token').Token;
-var Interval = require('./../IntervalSet').Interval;
-var INVALID_INTERVAL = new Interval(-1, -2);
-var Utils = require('../Utils.js');
+const Token = require('./../Token').Token;
+const Interval = require('./../IntervalSet').Interval;
+const INVALID_INTERVAL = new Interval(-1, -2);
 
 class Tree {}
 
@@ -112,7 +111,7 @@ class TerminalNodeImpl extends TerminalNode {
 		if (this.symbol === null) {
 			return INVALID_INTERVAL;
 		}
-		var tokenIndex = this.symbol.tokenIndex;
+		const tokenIndex = this.symbol.tokenIndex;
 		return new Interval(tokenIndex, tokenIndex);
 	}
 
@@ -160,7 +159,7 @@ class ErrorNodeImpl extends TerminalNodeImpl {
 
 class ParseTreeWalker {
 	walk(listener, t) {
-		var errorNode = t instanceof ErrorNode ||
+		const errorNode = t instanceof ErrorNode ||
 				(t.isErrorNode !== undefined && t.isErrorNode());
 		if (errorNode) {
 			listener.visitErrorNode(t);
@@ -168,8 +167,8 @@ class ParseTreeWalker {
 			listener.visitTerminal(t);
 		} else {
 			this.enterRule(listener, t);
-			for (var i = 0; i < t.getChildCount(); i++) {
-				var child = t.getChild(i);
+			for (let i = 0; i < t.getChildCount(); i++) {
+				const child = t.getChild(i);
 				this.walk(listener, child);
 			}
 			this.exitRule(listener, t);
@@ -183,13 +182,13 @@ class ParseTreeWalker {
 // the rule specific. We to them in reverse order upon finishing the node.
 //
 	enterRule(listener, r) {
-		var ctx = r.getRuleContext();
+		const ctx = r.getRuleContext();
 		listener.enterEveryRule(ctx);
 		ctx.enterRule(listener);
 	}
 
 	exitRule(listener, r) {
-		var ctx = r.getRuleContext();
+		const ctx = r.getRuleContext();
 		ctx.exitRule(listener);
 		listener.exitEveryRule(ctx);
 	}
