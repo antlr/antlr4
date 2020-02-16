@@ -118,7 +118,7 @@ RuleContext.prototype.accept = function(visitor) {
 };
 
 //need to manage circular dependencies, so export now
-exports.RuleContext = RuleContext;
+module.exports = RuleContext;
 var Trees = require('./tree/Trees');
 
 

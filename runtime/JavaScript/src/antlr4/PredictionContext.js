@@ -5,7 +5,7 @@
  */
 ///
 
-var RuleContext = require('./RuleContext').RuleContext;
+var RuleContext = require('./RuleContext');
 var Hash = require('./Utils').Hash;
 var Map = require('./Utils').Map;
 
