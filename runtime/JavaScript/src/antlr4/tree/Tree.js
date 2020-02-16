@@ -2,16 +2,15 @@
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
-///
-
-// The basic notion of a tree has a parent, a payload, and a list of children.
-//  It is the most abstract interface for all the trees used by ANTLR.
-///
 
 const {Token} = require('./../Token');
 const {Interval} = require('./../IntervalSet');
 const INVALID_INTERVAL = new Interval(-1, -2);
 
+/**
+ * The basic notion of a tree has a parent, a payload, and a list of children.
+ * It is the most abstract interface for all the trees used by ANTLR.
+ */
 class Tree {}
 
 class SyntaxTree extends Tree {
@@ -137,12 +136,13 @@ class TerminalNodeImpl extends TerminalNode {
 }
 
 
-// Represents a token that was consumed during resynchronization
-// rather than during a valid match operation. For example,
-// we will create this kind of a node during single token insertion
-// and deletion as well as during "consume until error recovery set"
-// upon no viable alternative exceptions.
-
+/**
+ * Represents a token that was consumed during resynchronization
+ * rather than during a valid match operation. For example,
+ * we will create this kind of a node during single token insertion
+ * and deletion as well as during "consume until error recovery set"
+ * upon no viable alternative exceptions.
+ */
 class ErrorNodeImpl extends TerminalNodeImpl {
 	constructor(token) {
 		super(token);
@@ -175,12 +175,12 @@ class ParseTreeWalker {
 		}
 	}
 
-//
-// The discovery of a rule node, involves sending two events: the generic
-// {@link ParseTreeListener//enterEveryRule} and a
-// {@link RuleContext}-specific event. First we trigger the generic and then
-// the rule specific. We to them in reverse order upon finishing the node.
-//
+	/**
+	 * The discovery of a rule node, involves sending two events: the generic
+	 * {@link ParseTreeListener//enterEveryRule} and a
+	 * {@link RuleContext}-specific event. First we trigger the generic and then
+	 * the rule specific. We to them in reverse order upon finishing the node.
+	 */
 	enterRule(listener, r) {
 		const ctx = r.getRuleContext();
 		listener.enterEveryRule(ctx);
