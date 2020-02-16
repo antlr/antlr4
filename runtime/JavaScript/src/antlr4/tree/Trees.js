@@ -14,9 +14,11 @@ const {ATN: {INVALID_ALT_NUMBER}} = require('./../atn/ATN');
 function Trees() {
 }
 
-// Print out a whole tree in LISP form. {@link //getNodeText} is used on the
-//  node payloads to get the text for the nodes.  Detect
-//  parse trees and extract data appropriately.
+/**
+ * Print out a whole tree in LISP form. {@link //getNodeText} is used on the
+ *  node payloads to get the text for the nodes.  Detect
+ *  parse trees and extract data appropriately.
+ */
 Trees.toStringTree = function(tree, ruleNames, recog) {
 	ruleNames = ruleNames || null;
 	recog = recog || null;
@@ -72,7 +74,9 @@ Trees.getNodeText = function(t, ruleNames, recog) {
 };
 
 
-// Return ordered list of all children of this node
+/**
+ * Return ordered list of all children of this node
+ */
 Trees.getChildren = function(t) {
 	const list = [];
 	for(let i=0;i<t.getChildCount();i++) {
@@ -81,9 +85,10 @@ Trees.getChildren = function(t) {
 	return list;
 };
 
-// Return a list of all ancestors of this node.  The first node of
-//  list is the root and the last is the parent of this node.
-//
+/**
+ * Return a list of all ancestors of this node.  The first node of
+ * list is the root and the last is the parent of this node.
+ */
 Trees.getAncestors = function(t) {
     let ancestors = [];
     t = t.getParent();
