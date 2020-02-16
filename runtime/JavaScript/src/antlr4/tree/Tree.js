@@ -45,50 +45,45 @@ class ErrorNode extends TerminalNode {
 	}
 }
 
-function ParseTreeVisitor() {
-	return this;
-}
-
-ParseTreeVisitor.prototype.visit = function(ctx) {
- 	if (Array.isArray(ctx)) {
-		return ctx.map(function(child) {
-            return child.accept(this);
-        }, this);
-	} else {
-		return ctx.accept(this);
+class ParseTreeVisitor {
+	visit(ctx) {
+		 if (Array.isArray(ctx)) {
+			return ctx.map(function(child) {
+				return child.accept(this);
+			}, this);
+		} else {
+			return ctx.accept(this);
+		}
 	}
-};
 
-ParseTreeVisitor.prototype.visitChildren = function(ctx) {
-	if (ctx.children) {
-		return this.visit(ctx.children);
-	} else {
-		return null;
+	visitChildren(ctx) {
+		if (ctx.children) {
+			return this.visit(ctx.children);
+		} else {
+			return null;
+		}
+	}
+
+	visitTerminal(node) {
+	}
+
+	visitErrorNode(node) {
 	}
 }
 
-ParseTreeVisitor.prototype.visitTerminal = function(node) {
-};
+class ParseTreeListener {
+	visitTerminal(node) {
+	}
 
-ParseTreeVisitor.prototype.visitErrorNode = function(node) {
-};
+	visitErrorNode(node) {
+	}
 
+	enterEveryRule(node) {
+	}
 
-function ParseTreeListener() {
-	return this;
+	exitEveryRule(node) {
+	}
 }
-
-ParseTreeListener.prototype.visitTerminal = function(node) {
-};
-
-ParseTreeListener.prototype.visitErrorNode = function(node) {
-};
-
-ParseTreeListener.prototype.enterEveryRule = function(node) {
-};
-
-ParseTreeListener.prototype.exitEveryRule = function(node) {
-};
 
 class TerminalNodeImpl extends TerminalNode {
 	constructor(symbol) {
@@ -163,43 +158,42 @@ class ErrorNodeImpl extends TerminalNodeImpl {
 	}
 }
 
-function ParseTreeWalker() {
-	return this;
-}
-
-ParseTreeWalker.prototype.walk = function(listener, t) {
-	var errorNode = t instanceof ErrorNode ||
-			(t.isErrorNode !== undefined && t.isErrorNode());
-	if (errorNode) {
-		listener.visitErrorNode(t);
-	} else if (t instanceof TerminalNode) {
-		listener.visitTerminal(t);
-	} else {
-		this.enterRule(listener, t);
-		for (var i = 0; i < t.getChildCount(); i++) {
-			var child = t.getChild(i);
-			this.walk(listener, child);
+class ParseTreeWalker {
+	walk(listener, t) {
+		var errorNode = t instanceof ErrorNode ||
+				(t.isErrorNode !== undefined && t.isErrorNode());
+		if (errorNode) {
+			listener.visitErrorNode(t);
+		} else if (t instanceof TerminalNode) {
+			listener.visitTerminal(t);
+		} else {
+			this.enterRule(listener, t);
+			for (var i = 0; i < t.getChildCount(); i++) {
+				var child = t.getChild(i);
+				this.walk(listener, child);
+			}
+			this.exitRule(listener, t);
 		}
-		this.exitRule(listener, t);
 	}
-};
+
 //
 // The discovery of a rule node, involves sending two events: the generic
 // {@link ParseTreeListener//enterEveryRule} and a
 // {@link RuleContext}-specific event. First we trigger the generic and then
 // the rule specific. We to them in reverse order upon finishing the node.
 //
-ParseTreeWalker.prototype.enterRule = function(listener, r) {
-	var ctx = r.getRuleContext();
-	listener.enterEveryRule(ctx);
-	ctx.enterRule(listener);
-};
+	enterRule(listener, r) {
+		var ctx = r.getRuleContext();
+		listener.enterEveryRule(ctx);
+		ctx.enterRule(listener);
+	}
 
-ParseTreeWalker.prototype.exitRule = function(listener, r) {
-	var ctx = r.getRuleContext();
-	ctx.exitRule(listener);
-	listener.exitEveryRule(ctx);
-};
+	exitRule(listener, r) {
+		var ctx = r.getRuleContext();
+		ctx.exitRule(listener);
+		listener.exitEveryRule(ctx);
+	}
+}
 
 ParseTreeWalker.DEFAULT = new ParseTreeWalker();
 
