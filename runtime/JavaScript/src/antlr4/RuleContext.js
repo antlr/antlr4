@@ -119,7 +119,7 @@ RuleContext.prototype.accept = function(visitor) {
 
 //need to manage circular dependencies, so export now
 exports.RuleContext = RuleContext;
-var Trees = require('./tree/Trees').Trees;
+var Trees = require('./tree/Trees');
 
 
 // Print out a whole tree, not just a node, in LISP format

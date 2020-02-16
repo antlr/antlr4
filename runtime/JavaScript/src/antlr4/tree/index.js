@@ -4,7 +4,7 @@
  */
 
 var Tree = require('./Tree');
-exports.Trees = require('./Trees').Trees;
+exports.Trees = require('./Trees');
 exports.RuleNode = Tree.RuleNode;
 exports.ParseTreeListener = Tree.ParseTreeListener;
 exports.ParseTreeVisitor = Tree.ParseTreeVisitor;

@@ -136,4 +136,4 @@ const Trees = {
     }
 }
 
-module.exports = {Trees};
+module.exports = Trees;
