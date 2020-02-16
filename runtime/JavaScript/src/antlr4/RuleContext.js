@@ -30,7 +30,7 @@ var INVALID_INTERVAL = require('./tree/Tree').INVALID_INTERVAL;
 var INVALID_ALT_NUMBER = require('./atn/ATN').INVALID_ALT_NUMBER;
 
 function RuleContext(parent, invokingState) {
-	RuleNode.call(this);
+	//RuleNode.call(this);
 	// What context invoked this rule?
 	this.parentCtx = parent || null;
 	// What state invoked the rule associated with this context?
