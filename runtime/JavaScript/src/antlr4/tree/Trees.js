@@ -8,7 +8,7 @@ const {Token} = require('./../Token');
 const {ErrorNode, TerminalNode} = require('./Tree');
 const {ParserRuleContext} = require('./../ParserRuleContext');
 const {RuleContext} = require('./../RuleContext');
-const {ATN: {INVALID_ALT_NUMBER}} = require('./../atn/ATN');
+const {ATN} = require('./../atn/ATN');
 
 /** A set of utility routines useful for all kinds of ANTLR trees. */
 const Trees = {
@@ -51,7 +51,7 @@ const Trees = {
         if(ruleNames!==null) {
             if (t instanceof RuleContext) {
                 const altNumber = t.getAltNumber();
-                if ( altNumber!=INVALID_ALT_NUMBER ) {
+                if ( altNumber != ATN.INVALID_ALT_NUMBER ) {
                     return ruleNames[t.ruleIndex]+":"+altNumber;
                 }
                 return ruleNames[t.ruleIndex];
