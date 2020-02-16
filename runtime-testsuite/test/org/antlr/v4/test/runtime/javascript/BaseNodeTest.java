@@ -627,7 +627,6 @@ public class BaseNodeTest implements RuntimeTestSupport {
 						+ "var <visitorName> = require('./<visitorName>').<visitorName>;\n"
 						+ "\n"
 						+ "function TreeShapeListener() {\n"
-						+ "	antlr4.tree.ParseTreeListener.call(this);\n"
 						+ "	return this;\n"
 						+ "}\n"
 						+ "\n"
