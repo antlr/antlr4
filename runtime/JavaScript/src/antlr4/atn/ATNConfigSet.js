@@ -10,7 +10,7 @@
 // graph-structured stack.
 ///
 
-var ATN = require('./ATN').ATN;
+var ATN = require('./ATN');
 var Utils = require('./../Utils');
 var Hash = Utils.Hash;
 var Set = Utils.Set;

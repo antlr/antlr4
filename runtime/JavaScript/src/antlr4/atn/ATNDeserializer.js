@@ -4,7 +4,7 @@
  */
 
 var Token = require('./../Token').Token;
-var ATN = require('./ATN').ATN;
+var ATN = require('./ATN');
 var ATNType = require('./ATNType').ATNType;
 var ATNStates = require('./ATNState');
 var ATNState = ATNStates.ATNState;

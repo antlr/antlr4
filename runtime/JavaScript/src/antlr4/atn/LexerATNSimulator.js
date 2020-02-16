@@ -23,7 +23,7 @@
 
 var Token = require('./../Token').Token;
 var Lexer = require('./../Lexer').Lexer;
-var ATN = require('./ATN').ATN;
+var ATN = require('./ATN');
 var ATNSimulator = require('./ATNSimulator').ATNSimulator;
 var DFAState = require('./../dfa/DFAState').DFAState;
 var ATNConfigSet = require('./ATNConfigSet').ATNConfigSet;

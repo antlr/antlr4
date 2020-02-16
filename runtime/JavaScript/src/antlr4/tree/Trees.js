@@ -8,7 +8,7 @@ const {Token} = require('./../Token');
 const {ErrorNode, TerminalNode} = require('./Tree');
 const {ParserRuleContext} = require('./../ParserRuleContext');
 const {RuleContext} = require('./../RuleContext');
-const {ATN} = require('./../atn/ATN');
+const ATN = require('./../atn/ATN');
 
 /** A set of utility routines useful for all kinds of ANTLR trees. */
 const Trees = {

@@ -139,4 +139,4 @@ ATN.prototype.getExpectedTokens = function( stateNumber, ctx ) {
 
 ATN.INVALID_ALT_NUMBER = 0;
 
-exports.ATN = ATN;
+module.exports = ATN;
