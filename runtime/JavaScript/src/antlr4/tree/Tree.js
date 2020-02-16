@@ -13,50 +13,37 @@ var Interval = require('./../IntervalSet').Interval;
 var INVALID_INTERVAL = new Interval(-1, -2);
 var Utils = require('../Utils.js');
 
+class Tree {}
 
-function Tree() {
-	return this;
+class SyntaxTree extends Tree {
+	constructor() {
+		super();
+	}
 }
 
-function SyntaxTree() {
-	Tree.call(this);
-	return this;
+class ParseTree extends SyntaxTree {
+	constructor() {
+		super();
+	}
 }
 
-SyntaxTree.prototype = Object.create(Tree.prototype);
-SyntaxTree.prototype.constructor = SyntaxTree;
-
-function ParseTree() {
-	SyntaxTree.call(this);
-	return this;
+class RuleNode extends ParseTree {
+	constructor() {
+		super();
+	}
 }
 
-ParseTree.prototype = Object.create(SyntaxTree.prototype);
-ParseTree.prototype.constructor = ParseTree;
-
-function RuleNode() {
-	ParseTree.call(this);
-	return this;
+class TerminalNode extends ParseTree {
+	constructor() {
+		super();
+	}
 }
 
-RuleNode.prototype = Object.create(ParseTree.prototype);
-RuleNode.prototype.constructor = RuleNode;
-
-function TerminalNode() {
-	ParseTree.call(this);
-	return this;
+class ErrorNode extends TerminalNode {
+	constructor() {
+		super();
+	}
 }
-
-TerminalNode.prototype = Object.create(ParseTree.prototype);
-TerminalNode.prototype.constructor = TerminalNode;
-
-function ErrorNode() {
-	TerminalNode.call(this);
-	return this;
-}
-
-ErrorNode.prototype = Object.create(TerminalNode.prototype);
-ErrorNode.prototype.constructor = ErrorNode;
 
 function ParseTreeVisitor() {
 	return this;
@@ -103,59 +90,58 @@ ParseTreeListener.prototype.enterEveryRule = function(node) {
 ParseTreeListener.prototype.exitEveryRule = function(node) {
 };
 
-function TerminalNodeImpl(symbol) {
-	TerminalNode.call(this);
-	this.parentCtx = null;
-	this.symbol = symbol;
-	return this;
-}
-
-TerminalNodeImpl.prototype = Object.create(TerminalNode.prototype);
-TerminalNodeImpl.prototype.constructor = TerminalNodeImpl;
-
-TerminalNodeImpl.prototype.getChild = function(i) {
-	return null;
-};
-
-TerminalNodeImpl.prototype.getSymbol = function() {
-	return this.symbol;
-};
-
-TerminalNodeImpl.prototype.getParent = function() {
-	return this.parentCtx;
-};
-
-TerminalNodeImpl.prototype.getPayload = function() {
-	return this.symbol;
-};
-
-TerminalNodeImpl.prototype.getSourceInterval = function() {
-	if (this.symbol === null) {
-		return INVALID_INTERVAL;
+class TerminalNodeImpl extends TerminalNode {
+	constructor(symbol) {
+		super();
+		this.parentCtx = null;
+		this.symbol = symbol;
 	}
-	var tokenIndex = this.symbol.tokenIndex;
-	return new Interval(tokenIndex, tokenIndex);
-};
 
-TerminalNodeImpl.prototype.getChildCount = function() {
-	return 0;
-};
+	getChild(i) {
+		return null;
+	}
 
-TerminalNodeImpl.prototype.accept = function(visitor) {
-	return visitor.visitTerminal(this);
-};
+	getSymbol() {
+		return this.symbol;
+	}
 
-TerminalNodeImpl.prototype.getText = function() {
-	return this.symbol.text;
-};
+	getParent() {
+		return this.parentCtx;
+	}
 
-TerminalNodeImpl.prototype.toString = function() {
-	if (this.symbol.type === Token.EOF) {
-		return "<EOF>";
-	} else {
+	getPayload() {
+		return this.symbol;
+	}
+
+	getSourceInterval() {
+		if (this.symbol === null) {
+			return INVALID_INTERVAL;
+		}
+		var tokenIndex = this.symbol.tokenIndex;
+		return new Interval(tokenIndex, tokenIndex);
+	}
+
+	getChildCount() {
+		return 0;
+	}
+
+	accept(visitor) {
+		return visitor.visitTerminal(this);
+	}
+
+	getText() {
 		return this.symbol.text;
 	}
-};
+
+	toString() {
+		if (this.symbol.type === Token.EOF) {
+			return "<EOF>";
+		} else {
+			return this.symbol.text;
+		}
+	}
+}
+
 
 // Represents a token that was consumed during resynchronization
 // rather than during a valid match operation. For example,
@@ -163,21 +149,19 @@ TerminalNodeImpl.prototype.toString = function() {
 // and deletion as well as during "consume until error recovery set"
 // upon no viable alternative exceptions.
 
-function ErrorNodeImpl(token) {
-	TerminalNodeImpl.call(this, token);
-	return this;
+class ErrorNodeImpl extends TerminalNodeImpl {
+	constructor(token) {
+		super(token);
+	}
+
+	isErrorNode() {
+		return true;
+	}
+
+	accept(visitor) {
+		return visitor.visitErrorNode(this);
+	}
 }
-
-ErrorNodeImpl.prototype = Object.create(TerminalNodeImpl.prototype);
-ErrorNodeImpl.prototype.constructor = ErrorNodeImpl;
-
-ErrorNodeImpl.prototype.isErrorNode = function() {
-	return true;
-};
-
-ErrorNodeImpl.prototype.accept = function(visitor) {
-	return visitor.visitErrorNode(this);
-};
 
 function ParseTreeWalker() {
 	return this;
