@@ -5,11 +5,10 @@
 
 const Utils = require('./../Utils');
 const {Token} = require('./../Token');
-const {RuleNode, ErrorNode, TerminalNode} = require('./Tree');
+const {ErrorNode, TerminalNode} = require('./Tree');
 const {ParserRuleContext} = require('./../ParserRuleContext');
 const {RuleContext} = require('./../RuleContext');
-const INVALID_ALT_NUMBER = require('./../atn/ATN').INVALID_ALT_NUMBER;
-
+const {ATN: {INVALID_ALT_NUMBER}} = require('./../atn/ATN');
 
 /** A set of utility routines useful for all kinds of ANTLR trees. */
 function Trees() {
