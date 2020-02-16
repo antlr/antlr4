@@ -3,14 +3,12 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
-var Utils = require('./../Utils');
-var Token = require('./../Token').Token;
-var RuleNode = require('./Tree').RuleNode;
-var ErrorNode = require('./Tree').ErrorNode;
-var TerminalNode = require('./Tree').TerminalNode;
-var ParserRuleContext = require('./../ParserRuleContext').ParserRuleContext;
-var RuleContext = require('./../RuleContext').RuleContext;
-var INVALID_ALT_NUMBER = require('./../atn/ATN').INVALID_ALT_NUMBER;
+const Utils = require('./../Utils');
+const {Token} = require('./../Token');
+const {RuleNode, ErrorNode, TerminalNode} = require('./Tree');
+const {ParserRuleContext} = require('./../ParserRuleContext');
+const {RuleContext} = require('./../RuleContext');
+const INVALID_ALT_NUMBER = require('./../atn/ATN').INVALID_ALT_NUMBER;
 
 
 /** A set of utility routines useful for all kinds of ANTLR trees. */
@@ -26,18 +24,18 @@ Trees.toStringTree = function(tree, ruleNames, recog) {
     if(recog!==null) {
        ruleNames = recog.ruleNames;
     }
-    var s = Trees.getNodeText(tree, ruleNames);
+    let s = Trees.getNodeText(tree, ruleNames);
     s = Utils.escapeWhitespace(s, false);
-    var c = tree.getChildCount();
+    const c = tree.getChildCount();
     if(c===0) {
         return s;
     }
-    var res = "(" + s + ' ';
+    let res = "(" + s + ' ';
     if(c>0) {
         s = Trees.toStringTree(tree.getChild(0), ruleNames);
         res = res.concat(s);
     }
-    for(var i=1;i<c;i++) {
+    for(let i=1;i<c;i++) {
         s = Trees.toStringTree(tree.getChild(i), ruleNames);
         res = res.concat(' ' + s);
     }
@@ -53,7 +51,7 @@ Trees.getNodeText = function(t, ruleNames, recog) {
     }
     if(ruleNames!==null) {
        if (t instanceof RuleContext) {
-           var altNumber = t.getAltNumber();
+           const altNumber = t.getAltNumber();
            if ( altNumber!=INVALID_ALT_NUMBER ) {
                return ruleNames[t.ruleIndex]+":"+altNumber;
            }
@@ -67,7 +65,7 @@ Trees.getNodeText = function(t, ruleNames, recog) {
        }
     }
     // no recog for rule names
-    var payload = t.getPayload();
+    const payload = t.getPayload();
     if (payload instanceof Token ) {
        return payload.text;
     }
@@ -77,8 +75,8 @@ Trees.getNodeText = function(t, ruleNames, recog) {
 
 // Return ordered list of all children of this node
 Trees.getChildren = function(t) {
-	var list = [];
-	for(var i=0;i<t.getChildCount();i++) {
+	const list = [];
+	for(let i=0;i<t.getChildCount();i++) {
 		list.push(t.getChild(i));
 	}
 	return list;
@@ -88,7 +86,7 @@ Trees.getChildren = function(t) {
 //  list is the root and the last is the parent of this node.
 //
 Trees.getAncestors = function(t) {
-    var ancestors = [];
+    let ancestors = [];
     t = t.getParent();
     while(t!==null) {
         ancestors = [t].concat(ancestors);
@@ -106,7 +104,7 @@ Trees.findAllRuleNodes = function(t, ruleIndex) {
 };
 
 Trees.findAllNodes = function(t, index, findTokens) {
-	var nodes = [];
+	const nodes = [];
 	Trees._findAllNodes(t, index, findTokens, nodes);
 	return nodes;
 };
@@ -123,14 +121,14 @@ Trees._findAllNodes = function(t, index, findTokens, nodes) {
 		}
 	}
 	// check children
-	for(var i=0;i<t.getChildCount();i++) {
+	for(let i=0;i<t.getChildCount();i++) {
 		Trees._findAllNodes(t.getChild(i), index, findTokens, nodes);
 	}
 };
 
 Trees.descendants = function(t) {
-	var nodes = [t];
-    for(var i=0;i<t.getChildCount();i++) {
+	let nodes = [t];
+    for(let i=0;i<t.getChildCount();i++) {
         nodes = nodes.concat(Trees.descendants(t.getChild(i)));
     }
     return nodes;
