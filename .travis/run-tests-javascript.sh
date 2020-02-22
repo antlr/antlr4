@@ -2,4 +2,4 @@
 
 set -euo pipefail
 
-mvn -q -Dparallel=methods -DthreadCount=4 -Dtest=node.* test
+mvn -q -Dparallel=methods -DthreadCount=4 -Dtest=javascript.* test
