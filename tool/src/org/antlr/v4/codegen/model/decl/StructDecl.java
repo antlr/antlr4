@@ -12,9 +12,11 @@ import org.antlr.v4.codegen.model.ListenerDispatchMethod;
 import org.antlr.v4.codegen.model.ModelElement;
 import org.antlr.v4.codegen.model.OutputModelObject;
 import org.antlr.v4.codegen.model.VisitorDispatchMethod;
+import org.antlr.v4.codegen.model.chunk.ActionText;
 import org.antlr.v4.runtime.misc.OrderedHashSet;
 import org.antlr.v4.tool.Attribute;
 import org.antlr.v4.tool.Rule;
+import org.antlr.v4.tool.ast.RuleAST;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -46,6 +48,11 @@ public class StructDecl extends Decl {
 	public StructDecl(OutputModelFactory factory, Rule r) {
 		super(factory, factory.getGenerator().getTarget().getRuleFunctionContextStructName(r));
 		addDispatchMethods(r);
+		final RuleAST ast = r.ast;
+		final String contextImplements = ast.getOptionString("contextImplements");
+		if (contextImplements != null) {
+			implementInterface(new ActionText(this, contextImplements));
+		}
 		derivedFromName = r.name;
 		provideCopyFrom = r.hasAltSpecificContexts();
 	}
