@@ -626,23 +626,17 @@ public class BaseNodeTest implements RuntimeTestSupport {
 						+ "var <listenerName> = require('./<listenerName>').<listenerName>;\n"
 						+ "var <visitorName> = require('./<visitorName>').<visitorName>;\n"
 						+ "\n"
-						+ "function TreeShapeListener() {\n"
-						+ "	antlr4.tree.ParseTreeListener.call(this);\n"
-						+ "	return this;\n"
-						+ "}\n"
-						+ "\n"
-						+ "TreeShapeListener.prototype = Object.create(antlr4.tree.ParseTreeListener.prototype);\n"
-						+ "TreeShapeListener.prototype.constructor = TreeShapeListener;\n"
-						+ "\n"
-						+ "TreeShapeListener.prototype.enterEveryRule = function(ctx) {\n"
-						+ "	for(var i=0;i\\<ctx.getChildCount; i++) {\n"
-						+ "		var child = ctx.getChild(i);\n"
-						+ "       var parent = child.parentCtx;\n"
-						+ "       if(parent.getRuleContext() !== ctx || !(parent instanceof antlr4.tree.RuleNode)) {\n"
-						+ "           throw \"Invalid parse tree shape detected.\";\n"
-						+ "		}\n"
-						+ "	}\n"
-						+ "};\n"
+						+ "class TreeShapeListener extends antlr4.tree.ParseTreeListener {\n" +
+						"    enterEveryRule(ctx) {\n" +
+						"        for (let i = 0; i \\< ctx.getChildCount; i++) {\n" +
+						"            const child = ctx.getChild(i)\n" +
+						"            const parent = child.parentCtx\n" +
+						"            if (parent.getRuleContext() !== ctx || !(parent instanceof antlr4.tree.RuleNode)) {\n" +
+						"                throw `Invalid parse tree shape detected.`\n" +
+						"            }\n" +
+						"        }\n" +
+						"    }\n" +
+						"}\n"
 						+ "\n"
 						+ "function main(argv) {\n"
 						+ "    var input = new antlr4.FileStream(argv[2], true);\n"

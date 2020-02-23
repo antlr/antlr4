@@ -26,7 +26,7 @@
 //  group values such as this aggregate.  The getters/setters are there to
 //  satisfy the superclass interface.
 
-var RuleContext = require('./RuleContext').RuleContext;
+var RuleContext = require('./RuleContext');
 var Tree = require('./tree/Tree');
 var INVALID_INTERVAL = Tree.INVALID_INTERVAL;
 var TerminalNode = Tree.TerminalNode;

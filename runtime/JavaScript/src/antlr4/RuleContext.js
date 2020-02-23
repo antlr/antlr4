@@ -27,10 +27,9 @@
 
 var RuleNode = require('./tree/Tree').RuleNode;
 var INVALID_INTERVAL = require('./tree/Tree').INVALID_INTERVAL;
-var INVALID_ALT_NUMBER = require('./atn/ATN').INVALID_ALT_NUMBER;
+var INVALID_ALT_NUMBER = require('./atn/ATN').INVALID_ALT_NUMBER || 0; // TODO: solve cyclic dependency to avoid || 0
 
 function RuleContext(parent, invokingState) {
-	RuleNode.call(this);
 	// What context invoked this rule?
 	this.parentCtx = parent || null;
 	// What state invoked the rule associated with this context?
@@ -118,8 +117,8 @@ RuleContext.prototype.accept = function(visitor) {
 };
 
 //need to manage circular dependencies, so export now
-exports.RuleContext = RuleContext;
-var Trees = require('./tree/Trees').Trees;
+module.exports = RuleContext;
+var Trees = require('./tree/Trees');
 
 
 // Print out a whole tree, not just a node, in LISP format
