@@ -270,7 +270,7 @@ delegateGrammars
 	: IMPORT delegateGrammar (COMMA delegateGrammar)* SEMI -> ^(IMPORT delegateGrammar+)
 	;
 
-// A possibly named grammar file that should be imported to this gramamr
+// A possibly named grammar file that should be imported to this grammar
 // and delgated to for the rules it specifies
 delegateGrammar
     :   id ASSIGN^ id
@@ -725,7 +725,7 @@ labeledElement
 		)
 	;
 
-// A block of gramamr structure optionally followed by standard EBNF
+// A block of grammar structure optionally followed by standard EBNF
 // notation, or ANTLR specific notation. I.E. ? + ^ and so on
 ebnf
     : block
