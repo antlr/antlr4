@@ -51,7 +51,7 @@ const Trees = {
         if(ruleNames!==null) {
             if (t instanceof RuleContext) {
                 const altNumber = t.getAltNumber();
-                if ( altNumber != ATN.INVALID_ALT_NUMBER ) {
+                if ( altNumber != (ATN.INVALID_ALT_NUMBER || 0) ) { // TODO: solve cyclic dependency to avoid || 0
                     return ruleNames[t.ruleIndex]+":"+altNumber;
                 }
                 return ruleNames[t.ruleIndex];

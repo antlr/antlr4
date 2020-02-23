@@ -27,7 +27,7 @@
 
 var RuleNode = require('./tree/Tree').RuleNode;
 var INVALID_INTERVAL = require('./tree/Tree').INVALID_INTERVAL;
-var INVALID_ALT_NUMBER = require('./atn/ATN').INVALID_ALT_NUMBER;
+var INVALID_ALT_NUMBER = require('./atn/ATN').INVALID_ALT_NUMBER || 0; // TODO: solve cyclic dependency to avoid || 0
 
 function RuleContext(parent, invokingState) {
 	// What context invoked this rule?
