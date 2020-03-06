@@ -33,7 +33,7 @@ var SingletonPredictionContext = require('./../PredictionContext').SingletonPred
 var RuleStopState = require('./ATNState').RuleStopState;
 var LexerATNConfig = require('./ATNConfig').LexerATNConfig;
 var Transition = require('./Transition').Transition;
-var LexerActionExecutor = require('./LexerActionExecutor').LexerActionExecutor;
+var LexerActionExecutor = require('./LexerActionExecutor');
 var LexerNoViableAltException = require('./../error/Errors').LexerNoViableAltException;
 
 function resetSimState(sim) {
