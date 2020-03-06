@@ -249,5 +249,7 @@ class OrderedATNConfigSet extends ATNConfigSet {
 	}
 }
 
-module.exports.ATNConfigSet = ATNConfigSet;
-module.exports.OrderedATNConfigSet = OrderedATNConfigSet;
+module.exports = {
+	ATNConfigSet,
+	OrderedATNConfigSet
+}
