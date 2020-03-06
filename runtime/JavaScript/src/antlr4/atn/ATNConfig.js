@@ -1,32 +1,22 @@
-//
 /* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
-///
 
-// A tuple: (ATN state, predicted alt, syntactic, semantic context).
-//  The syntactic context is a graph-structured stack node whose
-//  path(s) to the root is the rule invocation(s)
-//  chain used to arrive at the state.  The semantic context is
-//  the tree of semantic predicates encountered before reaching
-//  an ATN state.
-///
-
-var DecisionState = require('./ATNState').DecisionState;
-var SemanticContext = require('./SemanticContext').SemanticContext;
-var Hash = require("../Utils").Hash;
+const DecisionState = require('./ATNState').DecisionState;
+const SemanticContext = require('./SemanticContext').SemanticContext;
+const Hash = require("../Utils").Hash;
 
 
 function checkParams(params, isCfg) {
 	if(params===null) {
-		var result = { state:null, alt:null, context:null, semanticContext:null };
+		const result = { state:null, alt:null, context:null, semanticContext:null };
 		if(isCfg) {
 			result.reachesIntoOuterContext = 0;
 		}
 		return result;
 	} else {
-		var props = {};
+		const props = {};
 		props.state = params.state || null;
 		props.alt = (params.alt === undefined) ? null : params.alt;
 		props.context = params.context || null;
@@ -40,6 +30,14 @@ function checkParams(params, isCfg) {
 }
 
 class ATNConfig {
+    /**
+     * @param {Object} params A tuple: (ATN state, predicted alt, syntactic, semantic context).
+     * The syntactic context is a graph-structured stack node whose
+     * path(s) to the root is the rule invocation(s)
+     * chain used to arrive at the state.  The semantic context is
+     * the tree of semantic predicates encountered before reaching
+     * an ATN state
+     */
     constructor(params, config) {
         this.checkContext(params, config);
         params = checkParams(params);
@@ -48,24 +46,27 @@ class ATNConfig {
         this.state = params.state!==null ? params.state : config.state;
         // What alt (or lexer rule) is predicted by this configuration///
         this.alt = params.alt!==null ? params.alt : config.alt;
-        // The stack of invoking states leading to the rule/states associated
-        //  with this config.  We track only those contexts pushed during
-        //  execution of the ATN simulator.
+        /**
+         * The stack of invoking states leading to the rule/states associated
+         * with this config.  We track only those contexts pushed during
+         * execution of the ATN simulator
+         */
         this.context = params.context!==null ? params.context : config.context;
         this.semanticContext = params.semanticContext!==null ? params.semanticContext :
             (config.semanticContext!==null ? config.semanticContext : SemanticContext.NONE);
-        // We cannot execute predicates dependent upon local context unless
-        // we know for sure we are in the correct context. Because there is
-        // no way to do this efficiently, we simply cannot evaluate
-        // dependent predicates unless we are in the rule that initially
-        // invokes the ATN simulator.
-        //
-        // closure() tracks the depth of how far we dip into the
-        // outer context: depth &gt; 0.  Note that it may not be totally
-        // accurate depth since I don't ever decrement. TODO: make it a boolean then
+        // TODO: make it a boolean then
+        /**
+         * We cannot execute predicates dependent upon local context unless
+         * we know for sure we are in the correct context. Because there is
+         * no way to do this efficiently, we simply cannot evaluate
+         * dependent predicates unless we are in the rule that initially
+         * invokes the ATN simulator.
+         * closure() tracks the depth of how far we dip into the
+         * outer context: depth &gt; 0.  Note that it may not be totally
+         * accurate depth since I don't ever decrement
+         */
         this.reachesIntoOuterContext = config.reachesIntoOuterContext;
         this.precedenceFilterSuppressed = config.precedenceFilterSuppressed;
-        return this;
     }
 
     checkContext(params, config) {
@@ -76,7 +77,7 @@ class ATNConfig {
     }
 
     hashCode() {
-        var hash = new Hash();
+        const hash = new Hash();
         this.updateHashCode(hash);
         return hash.finish();
     }
@@ -85,9 +86,11 @@ class ATNConfig {
         hash.update(this.state.stateNumber, this.alt, this.context, this.semanticContext);
     }
 
-// An ATN configuration is equal to another if both have
-//  the same state, they predict the same alternative, and
-//  syntactic/semantic contexts are the same.
+    /**
+     * An ATN configuration is equal to another if both have
+     * the same state, they predict the same alternative, and
+     * syntactic/semantic contexts are the same
+     */
     equals(other) {
         if (this === other) {
             return true;
@@ -103,7 +106,7 @@ class ATNConfig {
     }
 
     hashCodeForConfigSet() {
-        var hash = new Hash();
+        const hash = new Hash();
         hash.update(this.state.stateNumber, this.alt, this.semanticContext);
         return hash.finish();
     }
@@ -138,7 +141,7 @@ class LexerATNConfig extends ATNConfig {
         super(params, config);
 
         // This is the backing field for {@link //getLexerActionExecutor}.
-        var lexerActionExecutor = params.lexerActionExecutor || null;
+        const lexerActionExecutor = params.lexerActionExecutor || null;
         this.lexerActionExecutor = lexerActionExecutor || (config!==null ? config.lexerActionExecutor : null);
         this.passedThroughNonGreedyDecision = config!==null ? this.checkNonGreedyDecision(config, this.state) : false;
         this.hashCodeForConfigSet = LexerATNConfig.prototype.hashCode;
