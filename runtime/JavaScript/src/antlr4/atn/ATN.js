@@ -5,6 +5,7 @@
 
 const LL1Analyzer = require('./../LL1Analyzer').LL1Analyzer;
 const IntervalSet = require('./../IntervalSet').IntervalSet;
+const Token = require('./../Token').Token;
 
 class ATN {
     constructor(grammarType , maxTokenType) {
@@ -102,6 +103,27 @@ class ATN {
         }
     }
 
+    /**
+     * Computes the set of input symbols which could follow ATN state number
+     * {@code stateNumber} in the specified full {@code context}. This method
+     * considers the complete parser context, but does not evaluate semantic
+     * predicates (i.e. all predicates encountered during the calculation are
+     * assumed true). If a path in the ATN exists from the starting state to the
+     * {@link RuleStopState} of the outermost context without matching any
+     * symbols, {@link Token//EOF} is added to the returned set.
+     *
+     * <p>If {@code context} is {@code null}, it is treated as
+     * {@link ParserRuleContext//EMPTY}.</p>
+     *
+     * @param stateNumber the ATN state number
+     * @param ctx the full parse context
+     *
+     * @return {IntervalSet} The set of potentially valid input symbols which could follow the
+     * specified state in the specified context.
+     *
+     * @throws IllegalArgumentException if the ATN does not contain a state with
+     * number {@code stateNumber}
+     */
     getExpectedTokens(stateNumber, ctx ) {
         if ( stateNumber < 0 || stateNumber >= this.states.length ) {
             throw("Invalid state number.");
@@ -128,27 +150,6 @@ class ATN {
         return expected;
     }
 }
-
-/**
- * Computes the set of input symbols which could follow ATN state number
- * {@code stateNumber} in the specified full {@code context}. This method
- * considers the complete parser context, but does not evaluate semantic
- * predicates (i.e. all predicates encountered during the calculation are
- * assumed true). If a path in the ATN exists from the starting state to the
- * {@link RuleStopState} of the outermost context without matching any
- * symbols, {@link Token//EOF} is added to the returned set.
- *
- * <p>If {@code context} is {@code null}, it is treated as
- * {@link ParserRuleContext//EMPTY}.</p>
- *
- * @param stateNumber the ATN state number
- * @param context the full parse context
- * @return The set of potentially valid input symbols which could follow the
- * specified state in the specified context.
- * @throws IllegalArgumentException if the ATN does not contain a state with
- * number {@code stateNumber}
- */
-const Token = require('./../Token').Token;
 
 ATN.INVALID_ALT_NUMBER = 0;
 

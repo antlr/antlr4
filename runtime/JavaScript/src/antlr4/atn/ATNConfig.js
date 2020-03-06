@@ -168,5 +168,5 @@ class LexerATNConfig extends ATNConfig {
 }
 
 
-exports.ATNConfig = ATNConfig;
-exports.LexerATNConfig = LexerATNConfig;
+module.exports.ATNConfig = ATNConfig;
+module.exports.LexerATNConfig = LexerATNConfig;
