@@ -5,7 +5,7 @@
 
 const {LL1Analyzer} = require('./../LL1Analyzer');
 const {IntervalSet} = require('./../IntervalSet');
-const {Token} = require('./../Token').Token;
+const {Token} = require('./../Token');
 
 class ATN {
     constructor(grammarType , maxTokenType) {
