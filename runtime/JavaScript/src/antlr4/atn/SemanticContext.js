@@ -98,7 +98,6 @@ class Predicate extends SemanticContext {
 		this.ruleIndex = ruleIndex === undefined ? -1 : ruleIndex;
 		this.predIndex = predIndex === undefined ? -1 : predIndex;
 		this.isCtxDependent = isCtxDependent === undefined ? false : isCtxDependent; // e.g., $i ref in pred
-		return this;
 	}
 
 	evaluate(parser, outerContext) {
@@ -219,7 +218,6 @@ class AND extends SemanticContext {
 			operands.add(reduced);
 		}
 		this.opnds = operands.values();
-		return this;
 	}
 
 	equals(other) {
@@ -324,7 +322,6 @@ class OR extends SemanticContext {
 			operands.add(reduced);
 		}
 		this.opnds = operands.values();
-		return this;
 	}
 
 	equals(other) {
