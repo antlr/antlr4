@@ -7,4 +7,4 @@ exports.ATN = require('./ATN');
 exports.ATNDeserializer = require('./ATNDeserializer');
 exports.LexerATNSimulator = require('./LexerATNSimulator');
 exports.ParserATNSimulator = require('./ParserATNSimulator');
-exports.PredictionMode = require('./PredictionMode').PredictionMode;
+exports.PredictionMode = require('./PredictionMode');
