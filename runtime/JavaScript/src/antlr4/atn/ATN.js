@@ -3,9 +3,9 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
-const LL1Analyzer = require('./../LL1Analyzer').LL1Analyzer;
-const IntervalSet = require('./../IntervalSet').IntervalSet;
-const Token = require('./../Token').Token;
+const {LL1Analyzer} = require('./../LL1Analyzer');
+const {IntervalSet} = require('./../IntervalSet');
+const {Token} = require('./../Token').Token;
 
 class ATN {
     constructor(grammarType , maxTokenType) {

@@ -3,50 +3,57 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
-const Token = require('./../Token').Token;
+const {Token} = require('./../Token');
 const ATN = require('./ATN');
 const ATNType = require('./ATNType');
-const ATNStates = require('./ATNState');
-const ATNState = ATNStates.ATNState;
-const BasicState = ATNStates.BasicState;
-const DecisionState = ATNStates.DecisionState;
-const BlockStartState = ATNStates.BlockStartState;
-const BlockEndState = ATNStates.BlockEndState;
-const LoopEndState = ATNStates.LoopEndState;
-const RuleStartState = ATNStates.RuleStartState;
-const RuleStopState = ATNStates.RuleStopState;
-const TokensStartState = ATNStates.TokensStartState;
-const PlusLoopbackState = ATNStates.PlusLoopbackState;
-const StarLoopbackState = ATNStates.StarLoopbackState;
-const StarLoopEntryState = ATNStates.StarLoopEntryState;
-const PlusBlockStartState = ATNStates.PlusBlockStartState;
-const StarBlockStartState = ATNStates.StarBlockStartState;
-const BasicBlockStartState = ATNStates.BasicBlockStartState;
-const Transitions = require('./Transition');
-const Transition = Transitions.Transition;
-const AtomTransition = Transitions.AtomTransition;
-const SetTransition = Transitions.SetTransition;
-const NotSetTransition = Transitions.NotSetTransition;
-const RuleTransition = Transitions.RuleTransition;
-const RangeTransition = Transitions.RangeTransition;
-const ActionTransition = Transitions.ActionTransition;
-const EpsilonTransition = Transitions.EpsilonTransition;
-const WildcardTransition = Transitions.WildcardTransition;
-const PredicateTransition = Transitions.PredicateTransition;
-const PrecedencePredicateTransition = Transitions.PrecedencePredicateTransition;
-const IntervalSet = require('./../IntervalSet').IntervalSet;
-const Interval = require('./../IntervalSet').Interval;
+
+const {
+    ATNState,
+    BasicState,
+    DecisionState,
+    BlockStartState,
+    BlockEndState,
+    LoopEndState,
+    RuleStartState,
+    RuleStopState,
+    TokensStartState,
+    PlusLoopbackState,
+    StarLoopbackState,
+    StarLoopEntryState,
+    PlusBlockStartState,
+    StarBlockStartState,
+    BasicBlockStartState
+} = require('./ATNState');
+
+const {
+    Transition,
+    AtomTransition,
+    SetTransition,
+    NotSetTransition,
+    RuleTransition,
+    RangeTransition,
+    ActionTransition,
+    EpsilonTransition,
+    WildcardTransition,
+    PredicateTransition,
+    PrecedencePredicateTransition
+} = require('./Transition')
+
+const {IntervalSet} = require('./../IntervalSet');
 const ATNDeserializationOptions = require('./ATNDeserializationOptions');
-const LexerActions = require('./LexerAction');
-const LexerActionType = LexerActions.LexerActionType;
-const LexerSkipAction = LexerActions.LexerSkipAction;
-const LexerChannelAction = LexerActions.LexerChannelAction;
-const LexerCustomAction = LexerActions.LexerCustomAction;
-const LexerMoreAction = LexerActions.LexerMoreAction;
-const LexerTypeAction = LexerActions.LexerTypeAction;
-const LexerPushModeAction = LexerActions.LexerPushModeAction;
-const LexerPopModeAction = LexerActions.LexerPopModeAction;
-const LexerModeAction = LexerActions.LexerModeAction;
+
+const {
+    LexerActionType,
+    LexerSkipAction,
+    LexerChannelAction,
+    LexerCustomAction,
+    LexerMoreAction,
+    LexerTypeAction,
+    LexerPushModeAction,
+    LexerPopModeAction,
+    LexerModeAction,
+} = require('./LexerAction');
+
 // This is the earliest supported serialized UUID.
 // stick to serialized version for now, we don't need a UUID instance
 const BASE_SERIALIZED_UUID = "AADB8D7E-AEEF-4415-AD2B-8204D6CF042E";

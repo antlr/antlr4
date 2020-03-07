@@ -5,10 +5,8 @@
 
 const ATN = require('./ATN');
 const Utils = require('./../Utils');
-const Hash = Utils.Hash;
-const Set = Utils.Set;
-const SemanticContext = require('./SemanticContext').SemanticContext;
-const merge = require('./../PredictionContext').merge;
+const {SemanticContext} = require('./SemanticContext');
+const {merge} = require('./../PredictionContext');
 
 function hashATNConfig(c) {
 	return c.hashCodeForConfigSet();
@@ -42,7 +40,7 @@ class ATNConfigSet {
 		 * All configs but hashed by (s, i, _, pi) not including context. Wiped out
 		 * when we go readonly as this set becomes a DFA state
 		 */
-		this.configLookup = new Set(hashATNConfig, equalATNConfigs);
+		this.configLookup = new Utils.Set(hashATNConfig, equalATNConfigs);
 		/**
 		 * Indicates that this configuration set is part of a full context
 		 * LL prediction. It will be used to determine how to merge $. With SLL
@@ -124,7 +122,7 @@ class ATNConfigSet {
 	}
 
 	getStates() {
-		const states = new Set();
+		const states = new Utils.Set();
 		for (let i = 0; i < this.configs.length; i++) {
 			states.add(this.configs[i].state);
 		}
@@ -174,7 +172,7 @@ class ATNConfigSet {
 	}
 
 	hashCode() {
-		const hash = new Hash();
+		const hash = new Utils.Hash();
 		hash.update(this.configs);
 		return hash.finish();
 	}
@@ -214,7 +212,7 @@ class ATNConfigSet {
 		}
 		this.configs = [];
 		this.cachedHashCode = -1;
-		this.configLookup = new Set();
+		this.configLookup = new Utils.Set();
 	}
 
 	setReadonly(readOnly) {
@@ -245,7 +243,7 @@ class ATNConfigSet {
 class OrderedATNConfigSet extends ATNConfigSet {
 	constructor() {
 		super();
-		this.configLookup = new Set();
+		this.configLookup = new Utils.Set();
 	}
 }
 

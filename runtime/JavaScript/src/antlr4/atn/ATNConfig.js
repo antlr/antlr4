@@ -3,9 +3,9 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
-const DecisionState = require('./ATNState').DecisionState;
-const SemanticContext = require('./SemanticContext').SemanticContext;
-const Hash = require("../Utils").Hash;
+const {DecisionState} = require('./ATNState');
+const {SemanticContext} = require('./SemanticContext');
+const {Hash} = require("../Utils");
 
 
 function checkParams(params, isCfg) {

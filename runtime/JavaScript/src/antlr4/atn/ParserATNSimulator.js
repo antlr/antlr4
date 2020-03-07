@@ -12,8 +12,7 @@ const {ATNState, RuleStopState} = require('./ATNState');
 const {ATNConfig} = require('./ATNConfig');
 const {ATNConfigSet} = require('./ATNConfigSet');
 const {Token} = require('./../Token');
-const {DFAState} = require('./../dfa/DFAState');
-const {PredPrediction} = require('./../dfa/DFAState');
+const {DFAState, PredPrediction} = require('./../dfa/DFAState');
 const ATNSimulator = require('./ATNSimulator');
 const PredictionMode = require('./PredictionMode');
 const RuleContext = require('./../RuleContext');
@@ -23,8 +22,7 @@ const PredictionContext = require('./../PredictionContext');
 const {Interval} = require('./../IntervalSet');
 const {Transition, SetTransition, NotSetTransition, RuleTransition, ActionTransition} = require('./Transition');
 const {NoViableAltException} = require('./../error/Errors');
-const {SingletonPredictionContext} = require('./../PredictionContext');
-const {predictionContextFromRuleContext} = require('./../PredictionContext');
+const {SingletonPredictionContext, predictionContextFromRuleContext} = require('./../PredictionContext');
 
 
 /**
@@ -1715,6 +1713,5 @@ class ParserATNSimulator extends ATNSimulator {
         }
     }
 }
-
 
 module.exports = ParserATNSimulator;
