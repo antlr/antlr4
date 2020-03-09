@@ -3,15 +3,15 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
-function ATNDeserializationOptions(copyFrom) {
-	if(copyFrom===undefined) {
-		copyFrom = null;
+class ATNDeserializationOptions {
+	constructor(copyFrom) {
+		if(copyFrom===undefined) {
+			copyFrom = null;
+		}
+		this.readOnly = false;
+		this.verifyATN = copyFrom===null ? true : copyFrom.verifyATN;
+		this.generateRuleBypassTransitions = copyFrom===null ? false : copyFrom.generateRuleBypassTransitions;
 	}
-	this.readOnly = false;
-    this.verifyATN = copyFrom===null ? true : copyFrom.verifyATN;
-    this.generateRuleBypassTransitions = copyFrom===null ? false : copyFrom.generateRuleBypassTransitions;
-
-    return this;
 }
 
 ATNDeserializationOptions.defaultOptions = new ATNDeserializationOptions();
@@ -22,4 +22,4 @@ ATNDeserializationOptions.defaultOptions.readOnly = true;
 //            raise Exception("The object is read only.")
 //        super(type(self), self).__setattr__(key,value)
 
-exports.ATNDeserializationOptions = ATNDeserializationOptions;
+module.exports = ATNDeserializationOptions

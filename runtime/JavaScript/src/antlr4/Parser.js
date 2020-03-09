@@ -7,8 +7,8 @@ var Token = require('./Token').Token;
 var ParseTreeListener = require('./tree/Tree').ParseTreeListener;
 var Recognizer = require('./Recognizer').Recognizer;
 var DefaultErrorStrategy = require('./error/ErrorStrategy').DefaultErrorStrategy;
-var ATNDeserializer = require('./atn/ATNDeserializer').ATNDeserializer;
-var ATNDeserializationOptions = require('./atn/ATNDeserializationOptions').ATNDeserializationOptions;
+var ATNDeserializer = require('./atn/ATNDeserializer');
+var ATNDeserializationOptions = require('./atn/ATNDeserializationOptions');
 var TerminalNode = require('./tree/Tree').TerminalNode;
 var ErrorNode = require('./tree/Tree').ErrorNode;
 
