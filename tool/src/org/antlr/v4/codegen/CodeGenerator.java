@@ -8,6 +8,9 @@ package org.antlr.v4.codegen;
 
 import org.antlr.v4.Tool;
 import org.antlr.v4.codegen.model.OutputModelObject;
+import org.antlr.v4.codegen.inMemoryResult.InMemoryCodeGenResult;
+import org.antlr.v4.codegen.inMemoryResult.InMemoryFile;
+import org.antlr.v4.codegen.inMemoryResult.DataFiles;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
@@ -20,6 +23,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.lang.reflect.Constructor;
 import java.util.LinkedHashMap;
+import java.util.ArrayList;
 import java.util.Map;
 
 /** General controller for code gen.  Can instantiate sub generator(s).
@@ -42,6 +46,8 @@ public class CodeGenerator {
 	private Target target;
 
 	public int lineWidth = 72;
+
+	public InMemoryCodeGenResult result = null;
 
 	private CodeGenerator(String language) {
 		this.g = null;
@@ -166,32 +172,104 @@ public class CodeGenerator {
 	}
 
 	public void writeRecognizer(ST outputFileST, boolean header) {
-		getTarget().genFile(g, outputFileST, getRecognizerFileName(header));
+		Target t = getTarget();
+		String fn = getRecognizerFileName(header);
+		if (result != null){
+			InMemoryFile res = new InMemoryFile(fn, t.genString(g, outputFileST));
+			if(g.isLexer()){
+				if(result.lexer == null)
+					result.lexer = new ArrayList<InMemoryFile>();
+				result.lexer.add(res);
+			} else {
+				if(result.parser == null)
+					result.parser = new ArrayList<InMemoryFile>();
+				result.parser.add(res);
+			}
+		}else
+			t.genFile(g, outputFileST, fn);
 	}
 
 	public void writeListener(ST outputFileST, boolean header) {
-		getTarget().genFile(g, outputFileST, getListenerFileName(header));
+		Target t = getTarget();
+		String fn = getListenerFileName(header);
+		if (result != null){
+			if(result.listener == null)
+				result.listener = new ArrayList<InMemoryFile>();
+			result.listener.add(new InMemoryFile(fn, t.genString(g, outputFileST)));
+		}else
+			t.genFile(g, outputFileST, fn);
 	}
 
 	public void writeBaseListener(ST outputFileST, boolean header) {
-		getTarget().genFile(g, outputFileST, getBaseListenerFileName(header));
+		Target t = getTarget();
+		String fn = getBaseListenerFileName(header);
+		if (result != null){
+			if(result.baseListener == null)
+				result.baseListener = new ArrayList<InMemoryFile>();
+			result.baseListener.add(new InMemoryFile(fn, t.genString(g, outputFileST)));
+		}else
+			t.genFile(g, outputFileST, fn);
+
 	}
 
 	public void writeVisitor(ST outputFileST, boolean header) {
-		getTarget().genFile(g, outputFileST, getVisitorFileName(header));
+		Target t = getTarget();
+		String fn = getVisitorFileName(header);
+		if (result != null){
+			if(result.visitor == null)
+				result.visitor = new ArrayList<InMemoryFile>();
+			result.visitor.add(new InMemoryFile(fn, t.genString(g, outputFileST)));
+		}else
+			t.genFile(g, outputFileST, fn);
 	}
 
 	public void writeBaseVisitor(ST outputFileST, boolean header) {
-		getTarget().genFile(g, outputFileST, getBaseVisitorFileName(header));
+		Target t = getTarget();
+		String fn = getBaseVisitorFileName(header);
+		if (result != null){
+			if(result.baseVisitor == null)
+				result.baseVisitor = new ArrayList<InMemoryFile>();
+			result.baseVisitor.add(new InMemoryFile(fn, t.genString(g, outputFileST)));
+		}else
+			t.genFile(g, outputFileST, fn);
 	}
 
 	public void writeVocabFile() {
 		// write out the vocab interchange file; used by antlr,
 		// does not change per target
 		ST tokenVocabSerialization = getTokenVocabOutput();
+		Target t = getTarget();
 		String fileName = getVocabFileName();
 		if ( fileName!=null ) {
-			getTarget().genFile(g, tokenVocabSerialization, fileName);
+			if (result != null){
+				DataFiles selectedDFiles = (g.isLexer()?result.lexerData:result.mainData);
+				selectedDFiles.tokens = new InMemoryFile(fileName, t.genString(g, tokenVocabSerialization));
+			}else{
+				t.genFile(g, tokenVocabSerialization, fileName);
+			}
+		}
+	}
+
+	private void writeToWriter(ST code, Writer w) throws IOException{
+		STWriter wr = new AutoIndentWriter(w);
+		wr.setLineWidth(lineWidth);
+		code.write(wr);
+	}
+
+	public String writeToString(ST code) {
+		try {
+//			long start = System.currentTimeMillis();
+			Writer w = tool.getOutputFileWriter(g, null);
+			writeToWriter(code, w);
+			w.close();
+			return w.toString();
+//			long stop = System.currentTimeMillis();
+		}
+		catch (IOException ioe) {
+			tool.errMgr.toolError(ErrorType.CANNOT_WRITE_FILE,
+								  ioe,
+								  "");
+			return null;
 		}
 	}
 
@@ -199,9 +277,7 @@ public class CodeGenerator {
 		try {
 //			long start = System.currentTimeMillis();
 			Writer w = tool.getOutputFileWriter(g, fileName);
-			STWriter wr = new AutoIndentWriter(w);
-			wr.setLineWidth(lineWidth);
-			code.write(wr);
+			writeToWriter(code, w);
 			w.close();
 //			long stop = System.currentTimeMillis();
 		}

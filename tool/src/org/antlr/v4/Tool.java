@@ -18,6 +18,9 @@ import org.antlr.v4.automata.LexerATNFactory;
 import org.antlr.v4.automata.ParserATNFactory;
 import org.antlr.v4.codegen.CodeGenPipeline;
 import org.antlr.v4.codegen.CodeGenerator;
+import org.antlr.v4.codegen.inMemoryResult.InMemoryCodeGenResult;
+import org.antlr.v4.codegen.inMemoryResult.InMemoryFile;
+import org.antlr.v4.codegen.inMemoryResult.DataFiles;
 import org.antlr.v4.misc.Graph;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.GrammarASTAdaptor;
@@ -330,13 +333,23 @@ public class Tool {
 		}
 	}
 
+	public void process(Grammar g, boolean gencode) {
+		process(g, gencode, null);
+	}
+
+	public InMemoryCodeGenResult processInMemory(Grammar g, boolean gencode) {
+		InMemoryCodeGenResult res = new InMemoryCodeGenResult();
+		process(g, gencode, res);
+		return res;
+	}
+
 	/** To process a grammar, we load all of its imported grammars into
 		subordinate grammar objects. Then we merge the imported rules
 		into the root grammar. If a root grammar is a combined grammar,
 		we have to extract the implicit lexer. Once all this is done, we
 		process the lexer first, if present, and then the parser grammar
 	 */
-	public void process(Grammar g, boolean gencode) {
+	public void process(Grammar g, boolean gencode, InMemoryCodeGenResult res) {
 		g.loadImportedGrammars();
 
 		GrammarTransformPipeline transform = new GrammarTransformPipeline(g, this);
@@ -358,7 +371,7 @@ public class Tool {
 				lexerg.originalGrammar = g;
 				g.implicitLexer = lexerg;
 				lexerg.implicitLexerOwner = g;
-				processNonCombinedGrammar(lexerg, gencode);
+				processNonCombinedGrammar(lexerg, gencode, res);
 //				System.out.println("lexer tokens="+lexerg.tokenNameToTypeMap);
 //				System.out.println("lexer strings="+lexerg.stringLiteralToTypeMap);
 			}
@@ -366,15 +379,15 @@ public class Tool {
 		if ( g.implicitLexer!=null ) g.importVocab(g.implicitLexer);
 //		System.out.println("tokens="+g.tokenNameToTypeMap);
 //		System.out.println("strings="+g.stringLiteralToTypeMap);
-		processNonCombinedGrammar(g, gencode);
+		processNonCombinedGrammar(g, gencode, res);
 	}
 
-	public void processNonCombinedGrammar(Grammar g, boolean gencode) {
-		if ( g.ast==null || g.ast.hasErrors ) return;
+	public boolean prepareProcessNonCombinedGrammar(Grammar g) {
+		if ( g.ast==null || g.ast.hasErrors ) return false;
 		if ( internalOption_PrintGrammarTree ) System.out.println(g.ast.toStringTree());
 
 		boolean ruleFail = checkForRuleIssues(g);
-		if ( ruleFail ) return;
+		if ( ruleFail ) return false;
 
 		int prevErrors = errMgr.getNumErrors();
 		// MAKE SURE GRAMMAR IS SEMANTICALLY CORRECT (FILL IN GRAMMAR OBJECT)
@@ -384,10 +397,10 @@ public class Tool {
 		String language = g.getOptionString("language");
 		if ( !CodeGenerator.targetExists(language) ) {
 			errMgr.toolError(ErrorType.CANNOT_CREATE_TARGET_GENERATOR, language);
-			return;
+			 return false;
 		}
 
-		if ( errMgr.getNumErrors()>prevErrors ) return;
+		if ( errMgr.getNumErrors()>prevErrors ) return false;
 
 		// BUILD ATN FROM AST
 		ATNFactory factory;
@@ -396,8 +409,25 @@ public class Tool {
 		g.atn = factory.createATN();
 
 		if ( generate_ATN_dot ) generateATNs(g);
+		return true;
+	}
 
-		if (gencode && g.tool.getNumErrors()==0 ) generateInterpreterData(g);
+	public void processNonCombinedGrammar(Grammar g, boolean gencode) {
+		processNonCombinedGrammar(g, gencode, null);
+	}
+
+	public void processNonCombinedGrammar(Grammar g, boolean gencode, InMemoryCodeGenResult res) {
+		if (!prepareProcessNonCombinedGrammar(g)) return;
+		int prevErrors = errMgr.getNumErrors();
+
+		if (gencode && g.tool.getNumErrors()==0 ){
+			if(res != null){
+				DataFiles selectedDFiles = (g.isLexer()?res.lexerData:res.mainData);
+				selectedDFiles.interp = new InMemoryFile(getInterpFileName(g), generateInterpreterString(g));
+			}else{
+				generateInterpreterData(g);
+			}
+		}
 
 		// PERFORM GRAMMAR ANALYSIS ON ATN: BUILD DECISION DFAs
 		AnalysisPipeline anal = new AnalysisPipeline(g);
@@ -410,8 +440,14 @@ public class Tool {
 		// GENERATE CODE
 		if ( gencode ) {
 			CodeGenPipeline gen = new CodeGenPipeline(g);
-			gen.process();
+			gen.process(res);
 		}
+	}
+
+	public InMemoryCodeGenResult processNonCombinedGrammarInMemory(Grammar g) {
+		InMemoryCodeGenResult res = new InMemoryCodeGenResult();
+		processNonCombinedGrammar(g, true, res);
+		return res;
 	}
 
 	/**
@@ -695,14 +731,14 @@ public class Tool {
 						writeDOTFile(g, r, dot);
 					}
 				}
-                catch (IOException ioe) {
+				catch (IOException ioe) {
 					errMgr.toolError(ErrorType.CANNOT_WRITE_FILE, ioe);
 				}
 			}
 		}
 	}
 
-	private void generateInterpreterData(Grammar g) {
+	public String generateInterpreterString(Grammar g) {
 		StringBuilder content = new StringBuilder();
 
 		content.append("token literal names:\n");
@@ -745,11 +781,18 @@ public class Tool {
 		IntegerList serializedATN = ATNSerializer.getSerialized(g.atn);
 		content.append("atn:\n");
 		content.append(serializedATN.toString());
+		return content.toString();
+	}
 
+	private String getInterpFileName(Grammar g){
+		return g.name + ".interp";
+	}
+
+	private void generateInterpreterData(Grammar g) {
 		try {
-			Writer fw = getOutputFileWriter(g, g.name + ".interp");
+			Writer fw = getOutputFileWriter(g, getInterpFileName(g));
 			try {
-				fw.write(content.toString());
+				fw.write(generateInterpreterString(g));
 			}
 			finally {
 				fw.close();
@@ -778,7 +821,7 @@ public class Tool {
 	 *  If outputDirectory==null then write a String.
 	 */
 	public Writer getOutputFileWriter(Grammar g, String fileName) throws IOException {
-		if (outputDirectory == null) {
+		if (outputDirectory == null || fileName == null) {
 			return new StringWriter();
 		}
 		// output directory is a function of where the grammar file lives

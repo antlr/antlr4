@@ -97,6 +97,11 @@ public abstract class Target {
 		getCodeGenerator().write(outputFileST, fileName);
 	}
 
+	protected String genString(Grammar g, ST outputFileST)
+	{
+		return getCodeGenerator().writeToString(outputFileST);
+	}
+
 	/** Get a meaningful name for a token type useful during code generation.
 	 *  Literals without associated names are converted to the string equivalent
 	 *  of their integer values. Used to generate x==ID and x==34 type comparisons

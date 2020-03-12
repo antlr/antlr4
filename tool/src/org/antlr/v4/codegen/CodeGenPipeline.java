@@ -12,20 +12,97 @@ import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.gui.STViz;
+import org.antlr.v4.codegen.inMemoryResult.InMemoryCodeGenResult;
+import org.antlr.v4.codegen.inMemoryResult.InMemoryFile;
 
 import java.util.List;
 
 public class CodeGenPipeline {
 	Grammar g;
+	int errorCount;
 
 	public CodeGenPipeline(Grammar g) {
 		this.g = g;
 	}
 
-	public void process() {
-		if ( !CodeGenerator.targetExists(g.getOptionString("language")) ) return;
+	public void processLexer(CodeGenerator gen, Grammar g){
+		if (gen.getTarget().needsHeader()) {
+			ST lexer = gen.generateLexer(true); // Header file if needed.
+			if (g.tool.errMgr.getNumErrors() == errorCount) {
+				writeRecognizer(lexer, gen, true);
+			}
+		}
+		ST lexer = gen.generateLexer(false);
+		if (g.tool.errMgr.getNumErrors() == errorCount) {
+			writeRecognizer(lexer, gen, false);
+		}
+	}
 
-		CodeGenerator gen = new CodeGenerator(g);
+	public void processParser(CodeGenerator gen, Grammar g){
+		if (gen.getTarget().needsHeader()) {
+			ST parser = gen.generateParser(true);
+			if (g.tool.errMgr.getNumErrors() == errorCount) {
+				writeRecognizer(parser, gen, true);
+			}
+		}
+		ST parser = gen.generateParser(false);
+		if (g.tool.errMgr.getNumErrors() == errorCount) {
+			writeRecognizer(parser, gen, false);
+		}
+
+		if ( g.tool.gen_listener ) {
+			if (gen.getTarget().needsHeader()) {
+				ST listener = gen.generateListener(true);
+				if (g.tool.errMgr.getNumErrors() == errorCount) {
+					gen.writeListener(listener, true);
+				}
+			}
+			ST listener = gen.generateListener(false);
+			if (g.tool.errMgr.getNumErrors() == errorCount) {
+				gen.writeListener(listener, false);
+			}
+
+			if (gen.getTarget().needsHeader()) {
+				ST baseListener = gen.generateBaseListener(true);
+				if (g.tool.errMgr.getNumErrors() == errorCount) {
+					gen.writeBaseListener(baseListener, true);
+				}
+			}
+			if (gen.getTarget().wantsBaseListener()) {
+				ST baseListener = gen.generateBaseListener(false);
+				if ( g.tool.errMgr.getNumErrors()==errorCount ) {
+					gen.writeBaseListener(baseListener, false);
+				}
+			}
+		}
+		if ( g.tool.gen_visitor ) {
+			if (gen.getTarget().needsHeader()) {
+				ST visitor = gen.generateVisitor(true);
+				if (g.tool.errMgr.getNumErrors() == errorCount) {
+					gen.writeVisitor(visitor, true);
+				}
+			}
+			ST visitor = gen.generateVisitor(false);
+			if (g.tool.errMgr.getNumErrors() == errorCount) {
+				gen.writeVisitor(visitor, false);
+			}
+
+			if (gen.getTarget().needsHeader()) {
+				ST baseVisitor = gen.generateBaseVisitor(true);
+				if (g.tool.errMgr.getNumErrors() == errorCount) {
+					gen.writeBaseVisitor(baseVisitor, true);
+				}
+			}
+			if (gen.getTarget().wantsBaseVisitor()) {
+				ST baseVisitor = gen.generateBaseVisitor(false);
+				if ( g.tool.errMgr.getNumErrors()==errorCount ) {
+					gen.writeBaseVisitor(baseVisitor, false);
+				}
+			}
+		}
+	}
+
+	public void processWithCodeGen(CodeGenerator gen){
 		IntervalSet idTypes = new IntervalSet();
 		idTypes.add(ANTLRParser.ID);
 		idTypes.add(ANTLRParser.RULE_REF);
@@ -42,85 +119,25 @@ public class CodeGenPipeline {
 		// all templates are generated in memory to report the most complete
 		// error information possible, but actually writing output files stops
 		// after the first error is reported
-		int errorCount = g.tool.errMgr.getNumErrors();
+		errorCount = g.tool.errMgr.getNumErrors();
 
 		if ( g.isLexer() ) {
-			if (gen.getTarget().needsHeader()) {
-				ST lexer = gen.generateLexer(true); // Header file if needed.
-				if (g.tool.errMgr.getNumErrors() == errorCount) {
-					writeRecognizer(lexer, gen, true);
-				}
-			}
-			ST lexer = gen.generateLexer(false);
-			if (g.tool.errMgr.getNumErrors() == errorCount) {
-				writeRecognizer(lexer, gen, false);
-			}
+			processLexer(gen, g);
 		}
 		else {
-			if (gen.getTarget().needsHeader()) {
-				ST parser = gen.generateParser(true);
-				if (g.tool.errMgr.getNumErrors() == errorCount) {
-					writeRecognizer(parser, gen, true);
-				}
-			}
-			ST parser = gen.generateParser(false);
-			if (g.tool.errMgr.getNumErrors() == errorCount) {
-				writeRecognizer(parser, gen, false);
-			}
-
-			if ( g.tool.gen_listener ) {
-				if (gen.getTarget().needsHeader()) {
-					ST listener = gen.generateListener(true);
-					if (g.tool.errMgr.getNumErrors() == errorCount) {
-						gen.writeListener(listener, true);
-					}
-				}
-				ST listener = gen.generateListener(false);
-				if (g.tool.errMgr.getNumErrors() == errorCount) {
-					gen.writeListener(listener, false);
-				}
-
-				if (gen.getTarget().needsHeader()) {
-					ST baseListener = gen.generateBaseListener(true);
-					if (g.tool.errMgr.getNumErrors() == errorCount) {
-						gen.writeBaseListener(baseListener, true);
-					}
-				}
-				if (gen.getTarget().wantsBaseListener()) {
-					ST baseListener = gen.generateBaseListener(false);
-					if ( g.tool.errMgr.getNumErrors()==errorCount ) {
-						gen.writeBaseListener(baseListener, false);
-					}
-				}
-			}
-			if ( g.tool.gen_visitor ) {
-				if (gen.getTarget().needsHeader()) {
-					ST visitor = gen.generateVisitor(true);
-					if (g.tool.errMgr.getNumErrors() == errorCount) {
-						gen.writeVisitor(visitor, true);
-					}
-				}
-				ST visitor = gen.generateVisitor(false);
-				if (g.tool.errMgr.getNumErrors() == errorCount) {
-					gen.writeVisitor(visitor, false);
-				}
-
-				if (gen.getTarget().needsHeader()) {
-					ST baseVisitor = gen.generateBaseVisitor(true);
-					if (g.tool.errMgr.getNumErrors() == errorCount) {
-						gen.writeBaseVisitor(baseVisitor, true);
-					}
-				}
-				if (gen.getTarget().wantsBaseVisitor()) {
-					ST baseVisitor = gen.generateBaseVisitor(false);
-					if ( g.tool.errMgr.getNumErrors()==errorCount ) {
-						gen.writeBaseVisitor(baseVisitor, false);
-					}
-				}
-			}
+			processParser(gen, g);
 		}
+	}
+
+	public void process(InMemoryCodeGenResult res) {
+		if ( !CodeGenerator.targetExists(g.getOptionString("language")) ) return;
+
+		CodeGenerator gen = new CodeGenerator(g);
+		gen.result = res;
+		processWithCodeGen(gen);
 		gen.writeVocabFile();
 	}
+
 
 	protected void writeRecognizer(ST template, CodeGenerator gen, boolean header) {
 		if ( g.tool.launch_ST_inspector ) {
