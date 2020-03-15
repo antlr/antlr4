@@ -8,11 +8,7 @@ const {Lexer} = require('./Lexer');
 const {Interval} = require('./IntervalSet');
 
 // this is just to keep meaningful parameter types to Parser
-class TokenStream {
-	constructor() {
-		return this;
-	}
-}
+class TokenStream {}
 
 /**
  * This implementation of {@link TokenStream} loads tokens from a
@@ -70,7 +66,6 @@ class BufferedTokenStream extends TokenStream {
 		 * <ul>
 		 */
 		this.fetchedEOF = false;
-		return this;
 	}
 
 	mark() {
