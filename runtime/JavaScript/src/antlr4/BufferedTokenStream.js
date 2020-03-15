@@ -214,8 +214,8 @@ class BufferedTokenStream extends TokenStream {
 	 * that
 	 * the seek target is always an on-channel token.</p>
 	 *
-	 * @param i The target token index.
-	 * @return The adjusted target token index.
+	 * @param {Number} i The target token index.
+	 * @return {Number} The adjusted target token index.
 	 */
 	adjustSeekIndex(i) {
 		return i;
