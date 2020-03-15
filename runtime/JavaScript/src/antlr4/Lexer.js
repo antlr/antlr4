@@ -67,8 +67,6 @@ class Lexer extends Recognizer {
 		 * the input char buffer. Use setText() or can set this instance var.
 		 */
 		this._text = null;
-
-		return this;
 	}
 
 	reset() {
