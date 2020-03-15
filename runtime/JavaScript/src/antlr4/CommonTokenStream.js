@@ -31,7 +31,7 @@
 ///
 
 var Token = require('./Token').Token;
-var BufferedTokenStream = require('./BufferedTokenStream').BufferedTokenStream;
+var BufferedTokenStream = require('./BufferedTokenStream');
 
 function CommonTokenStream(lexer, channel) {
 	BufferedTokenStream.call(this, lexer);
