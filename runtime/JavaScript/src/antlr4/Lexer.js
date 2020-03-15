@@ -10,7 +10,7 @@
 
 var Token = require('./Token').Token;
 var Recognizer = require('./Recognizer').Recognizer;
-var CommonTokenFactory = require('./CommonTokenFactory').CommonTokenFactory;
+var CommonTokenFactory = require('./CommonTokenFactory');
 var RecognitionException  = require('./error/Errors').RecognitionException;
 var LexerNoViableAltException = require('./error/Errors').LexerNoViableAltException;
 
