@@ -5,7 +5,7 @@
 
 var Token = require('./Token').Token;
 var ParseTreeListener = require('./tree/Tree').ParseTreeListener;
-var Recognizer = require('./Recognizer').Recognizer;
+var Recognizer = require('./Recognizer');
 var DefaultErrorStrategy = require('./error/ErrorStrategy').DefaultErrorStrategy;
 var ATNDeserializer = require('./atn/ATNDeserializer');
 var ATNDeserializationOptions = require('./atn/ATNDeserializationOptions');
@@ -294,7 +294,7 @@ Parser.prototype.getATNWithBypassAlts = function() {
 // String id = m.get("ID");
 // </pre>
 
-var Lexer = require('./Lexer').Lexer;
+var Lexer = require('./Lexer');
 
 Parser.prototype.compileParseTreePattern = function(pattern, patternRuleIndex, lexer) {
 	lexer = lexer || null;

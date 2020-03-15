@@ -4,7 +4,7 @@
  */
 
 const {Token} = require('./Token');
-const {Lexer} = require('./Lexer');
+const Lexer = require('./Lexer');
 const {Interval} = require('./IntervalSet');
 
 // this is just to keep meaningful parameter types to Parser
