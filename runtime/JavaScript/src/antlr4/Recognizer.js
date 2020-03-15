@@ -52,7 +52,7 @@ class Recognizer {
         if (ruleNames===null) {
             throw("The current recognizer does not provide a list of rule names.");
         }
-        let result = this.ruleIndexMapCache[ruleNames];
+        let result = this.ruleIndexMapCache[ruleNames]; // todo: should it be Recognizer.ruleIndexMapCache ?
         if(result===undefined) {
             result = ruleNames.reduce(function(o, k, i) { o[k] = i; });
             this.ruleIndexMapCache[ruleNames] = result;
@@ -69,7 +69,7 @@ class Recognizer {
         }
     }
 
-    // What is the error header, normally line/character position information?//
+    // What is the error header, normally line/character position information?
     getErrorHeader(e) {
         const line = e.getOffendingToken().line;
         const column = e.getOffendingToken().column;
