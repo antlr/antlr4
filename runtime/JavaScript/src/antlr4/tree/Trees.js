@@ -6,7 +6,7 @@
 const Utils = require('./../Utils');
 const {Token} = require('./../Token');
 const {ErrorNode, TerminalNode} = require('./Tree');
-const {ParserRuleContext} = require('./../ParserRuleContext');
+const ParserRuleContext = require('./../ParserRuleContext');
 const RuleContext = require('./../RuleContext');
 const ATN = require('./../atn/ATN');
 
