@@ -363,7 +363,7 @@ class BufferedTokenStream extends TokenStream {
 			stop = this.tokens.length - 1;
 		}
 		let s = "";
-		for (const i = start; i < stop + 1; i++) {
+		for (let i = start; i < stop + 1; i++) {
 			const t = this.tokens[i];
 			if (t.type === Token.EOF) {
 				break;
