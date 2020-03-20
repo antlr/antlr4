@@ -701,11 +701,12 @@ class <struct.name> extends <if(contextSuperClass)><contextSuperClass><else>antl
 >>
 
 AltLabelStructDecl(struct,attrs,getters,dispatchMethods) ::= <<
-function <struct.name>(parser, ctx) {
-	<currentRule.name; format="cap">Context.call(this, parser);
-    <attrs:{a | <a>;}; separator="\n">
-    <currentRule.name; format="cap">Context.prototype.copyFrom.call(this, ctx);
-    return this;
+class <struct.name> extends <currentRule.name; format="cap">Context {
+    constructor(parser, ctx) {
+        super(parser);
+        <attrs:{a | <a>;}; separator="\n">
+        <currentRule.name; format="cap">Context.prototype.copyFrom.call(this, ctx);
+    }
 }
 
 <struct.name>.prototype = Object.create(<currentRule.name; format="cap">Context.prototype);
