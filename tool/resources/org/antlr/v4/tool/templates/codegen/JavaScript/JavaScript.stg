@@ -147,7 +147,6 @@ class <parser.name> extends <superClass; null="antlr4.Parser"> {
         this.literalNames = literalNames;
         this.symbolicNames = symbolicNames;
         <namedActions.members>
-        return this;
     }
 
     get atn() {
@@ -232,7 +231,7 @@ case <index>:
  * overriding implementation impossible to maintain.
  */
 RuleSempredFunction(r, actions) ::= <<
-<if (r.factory.g.lexer)><lexer.name><else><parser.name><endif>.prototype.<r.name>_sempred = function(localctx, predIndex) {
+    <r.name>_sempred(localctx, predIndex) {
 	switch(predIndex) {
 		<actions:{index| case <index>:
 	return <actions.(index)>;}; separator="\n">
