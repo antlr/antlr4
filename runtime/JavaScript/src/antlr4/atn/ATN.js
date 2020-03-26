@@ -3,7 +3,7 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
-const {LL1Analyzer} = require('./../LL1Analyzer');
+const LL1Analyzer = require('./../LL1Analyzer');
 const {IntervalSet} = require('./../IntervalSet');
 const {Token} = require('./../Token');
 
