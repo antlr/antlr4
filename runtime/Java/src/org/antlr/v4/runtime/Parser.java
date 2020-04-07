@@ -638,10 +638,14 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 		else {
 			_ctx.stop = _input.LT(-1); // stop node is what we just matched
 		}
-        // trigger event on _ctx, before it reverts to parent
-        if ( _parseListeners != null) triggerExitRuleEvent();
-		setState(_ctx.invokingState);
-		_ctx = (ParserRuleContext)_ctx.parent;
+		try {
+		    // trigger event on _ctx, before it reverts to parent
+		    if ( _parseListeners != null) triggerExitRuleEvent();
+		}
+		finally {
+		    setState(_ctx.invokingState);
+		    _ctx = (ParserRuleContext)_ctx.parent;
+		}
     }
 
 	public void enterOuterAlt(ParserRuleContext localctx, int altNum) {
@@ -947,4 +951,3 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 		return _tracer != null;
 	}
 }
-
