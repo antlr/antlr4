@@ -64,7 +64,7 @@ public:
 <endif>
 
   <lexer.name>(antlr4::CharStream *input);
-  ~<lexer.name>();
+  ~<lexer.name>() override;
 
   <namedActions.members>
   virtual std::string getGrammarFileName() const override;
@@ -291,11 +291,11 @@ public:
 <endif>
 
   <parser.name>(antlr4::TokenStream *input);
-  ~<parser.name>();
+  ~<parser.name> override();
 
   virtual std::string getGrammarFileName() const override;
-  virtual const antlr4::atn::ATN& getATN() const override { return _atn; };
-  virtual const std::vector\<std::string>& getTokenNames() const override { return _tokenNames; }; // deprecated: use vocabulary instead.
+  virtual const antlr4::atn::ATN& getATN() const override { return _atn; }
+  virtual const std::vector\<std::string>& getTokenNames() const override { return _tokenNames; } // deprecated: use vocabulary instead.
   virtual const std::vector\<std::string>& getRuleNames() const override;
   virtual antlr4::dfa::Vocabulary& getVocabulary() const override;
 

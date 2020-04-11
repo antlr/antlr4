@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -17,7 +17,7 @@ namespace misc {
     std::vector<std::string> channels; // Only valid for lexer grammars.
     std::vector<std::string> modes; // ditto
 
-    InterpreterData() {}; // For invalid content.
+    InterpreterData() {} // For invalid content.
     InterpreterData(std::vector<std::string> const& literalNames, std::vector<std::string> const& symbolicNames);
   };
 

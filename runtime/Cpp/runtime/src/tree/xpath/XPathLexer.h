@@ -14,7 +14,7 @@ public:
   };
 
   XPathLexer(antlr4::CharStream *input);
-  ~XPathLexer();
+  ~XPathLexer() override;
 
   virtual std::string getGrammarFileName() const override;
   virtual const std::vector<std::string>& getRuleNames() const override;

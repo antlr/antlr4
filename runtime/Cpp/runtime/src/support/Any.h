@@ -105,7 +105,7 @@ struct ANTLR4CPP_PUBLIC Any
 
 private:
   struct Base {
-    virtual ~Base() {};
+    virtual ~Base() {}
     virtual Base* clone() const = 0;
   };
 
