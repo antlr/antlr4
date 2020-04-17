@@ -5,9 +5,7 @@
 
 const Utils = require('./../Utils');
 const {Token} = require('./../Token');
-const {ErrorNode, TerminalNode} = require('./Tree');
-const ParserRuleContext = require('./../ParserRuleContext');
-const RuleContext = require('./../RuleContext');
+const {ErrorNode, TerminalNode, RuleNode} = require('./Tree');
 const ATN = require('./../atn/ATN');
 
 /** A set of utility routines useful for all kinds of ANTLR trees. */
@@ -49,8 +47,9 @@ const Trees = {
             ruleNames = recog.ruleNames;
         }
         if(ruleNames!==null) {
-            if (t instanceof RuleContext) {
-                const altNumber = t.getAltNumber();
+            if (t instanceof RuleNode) {
+                const context = t.getRuleContext()
+                const altNumber = context.getAltNumber();
                 if ( altNumber != (ATN.INVALID_ALT_NUMBER || 0) ) { // TODO: solve cyclic dependency to avoid || 0
                     return ruleNames[t.ruleIndex]+":"+altNumber;
                 }
@@ -116,7 +115,7 @@ const Trees = {
             if(t.symbol.type===index) {
                 nodes.push(t);
             }
-        } else if(!findTokens && (t instanceof ParserRuleContext)) {
+        } else if(!findTokens && (t instanceof RuleNode)) {
             if(t.ruleIndex===index) {
                 nodes.push(t);
             }
