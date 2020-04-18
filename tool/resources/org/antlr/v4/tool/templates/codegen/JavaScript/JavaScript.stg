@@ -139,24 +139,33 @@ var symbolicNames = [ <parser.symbolicNames:{t | <t>}; null="null", separator=",
 
 var ruleNames =  [ <parser.ruleNames:{r | "<r>"}; separator=", ", wrap, anchor> ];
 
-function <parser.name> (input) {
-	<superClass; null="antlr4.Parser">.call(this, input);
-    this._interp = new antlr4.atn.ParserATNSimulator(this, atn, decisionsToDFA, sharedContextCache);
-    this.ruleNames = ruleNames;
-    this.literalNames = literalNames;
-    this.symbolicNames = symbolicNames;
-	<namedActions.members>
-    return this;
+class <parser.name> extends <superClass; null="antlr4.Parser"> {
+    constructor(input) {
+        super(input);
+        this._interp = new antlr4.atn.ParserATNSimulator(this, atn, decisionsToDFA, sharedContextCache);
+        this.ruleNames = ruleNames;
+        this.literalNames = literalNames;
+        this.symbolicNames = symbolicNames;
+        <namedActions.members>
+    }
+
+    get atn() {
+        return atn;
+    }
+
+    <if(sempredFuncs)>
+    sempred(localctx, ruleIndex, predIndex) {
+    	switch(ruleIndex) {
+    	<parser.sempredFuncs.values:{f | case <f.ruleIndex>:
+    		return this.<f.name>_sempred(localctx, predIndex);}; separator="\n">
+        default:
+            throw "No predicate with index:" + ruleIndex;
+       }
+    };
+
+    <sempredFuncs.values; separator="\n">
+    <endif>
 }
-
-<parser.name>.prototype = Object.create(<superClass; null="antlr4.Parser">.prototype);
-<parser.name>.prototype.constructor = <parser.name>;
-
-Object.defineProperty(<parser.name>.prototype, "atn", {
-	get : function() {
-		return atn;
-	}
-});
 
 <parser.name>.EOF = antlr4.Token.EOF;
 <if(parser.tokens)>
@@ -167,20 +176,7 @@ Object.defineProperty(<parser.name>.prototype, "atn", {
 
 <funcs; separator="\n">
 
-<if(sempredFuncs)>
-<parser.name>.prototype.sempred = function(localctx, ruleIndex, predIndex) {
-	switch(ruleIndex) {
-	<parser.sempredFuncs.values:{f | case <f.ruleIndex>:
-		return this.<f.name>_sempred(localctx, predIndex);}; separator="\n">
-    default:
-        throw "No predicate with index:" + ruleIndex;
-   }
-};
-
-<sempredFuncs.values; separator="\n">
-<endif>
-
-exports.<parser.name> = <parser.name>;
+module.exports.<parser.name> = <parser.name>;
 
 >>
 
@@ -235,7 +231,7 @@ case <index>:
  * overriding implementation impossible to maintain.
  */
 RuleSempredFunction(r, actions) ::= <<
-<if (r.factory.g.lexer)><lexer.name><else><parser.name><endif>.prototype.<r.name>_sempred = function(localctx, predIndex) {
+<if (r.factory.g.lexer)><lexer.name>.prototype.<r.name>_sempred = function<else><r.name>_sempred<endif>(localctx, predIndex) {
 	switch(predIndex) {
 		<actions:{index| case <index>:
 	return <actions.(index)>;}; separator="\n">
@@ -675,23 +671,21 @@ CaptureNextToken(d) ::= "<d.varName> = self._input.LT(1)"
 CaptureNextTokenType(d) ::= "<d.varName> = this._input.LA(1);"
 
 StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers) ::= <<
-function <struct.name>(parser, parent, invokingState<struct.ctorAttrs:{a | , <a.name>}>) {
-	if(parent===undefined) {
-	    parent = null;
-	}
-	if(invokingState===undefined || invokingState===null) {
-		invokingState = -1;
-	}
-	<if(contextSuperClass)><contextSuperClass><else>antlr4.ParserRuleContext<endif>.call(this, parent, invokingState);
-    this.parser = parser;
-    this.ruleIndex = <parser.name>.RULE_<struct.derivedFromName>;
-    <attrs:{a | <a>}; separator="\n">
-    <struct.ctorAttrs:{a | this.<a.name> = <a.name> || null;}; separator="\n">
-    return this;
+class <struct.name> extends <if(contextSuperClass)><contextSuperClass><else>antlr4.ParserRuleContext<endif> {
+    constructor(parser, parent, invokingState<struct.ctorAttrs:{a | , <a.name>}>) {
+        if(parent===undefined) {
+            parent = null;
+        }
+        if(invokingState===undefined || invokingState===null) {
+            invokingState = -1;
+        }
+        super(parent, invokingState);
+        this.parser = parser;
+        this.ruleIndex = <parser.name>.RULE_<struct.derivedFromName>;
+        <attrs:{a | <a>}; separator="\n">
+        <struct.ctorAttrs:{a | this.<a.name> = <a.name> || null;}; separator="\n">
+    }
 }
-
-<struct.name>.prototype = Object.create(<if(contextSuperClass)><contextSuperClass><else>antlr4.ParserRuleContext<endif>.prototype);
-<struct.name>.prototype.constructor = <struct.name>;
 
 <getters:{g | <struct.name>.prototype.<g>}; separator="\n\n">
 
@@ -707,11 +701,12 @@ function <struct.name>(parser, parent, invokingState<struct.ctorAttrs:{a | , <a.
 >>
 
 AltLabelStructDecl(struct,attrs,getters,dispatchMethods) ::= <<
-function <struct.name>(parser, ctx) {
-	<currentRule.name; format="cap">Context.call(this, parser);
-    <attrs:{a | <a>;}; separator="\n">
-    <currentRule.name; format="cap">Context.prototype.copyFrom.call(this, ctx);
-    return this;
+class <struct.name> extends <currentRule.name; format="cap">Context {
+    constructor(parser, ctx) {
+        super(parser);
+        <attrs:{a | <a>;}; separator="\n">
+        <currentRule.name; format="cap">Context.prototype.copyFrom.call(this, ctx);
+    }
 }
 
 <struct.name>.prototype = Object.create(<currentRule.name; format="cap">Context.prototype);
@@ -811,21 +806,29 @@ var atn = new antlr4.atn.ATNDeserializer().deserialize(serializedATN);
 
 var decisionsToDFA = atn.decisionToState.map( function(ds, index) { return new antlr4.dfa.DFA(ds, index); });
 
-function <lexer.name>(input) {
-	<if(superClass)><superClass><else>antlr4.Lexer<endif>.call(this, input);
-    this._interp = new antlr4.atn.LexerATNSimulator(this, atn, decisionsToDFA, new antlr4.PredictionContextCache());
-	<namedActions.members>
-    return this;
+class <lexer.name> extends <if(superClass)><superClass><else>antlr4.Lexer<endif> {
+    constructor(input) {
+        super(input)
+        this._interp = new antlr4.atn.LexerATNSimulator(this, atn, decisionsToDFA, new antlr4.PredictionContextCache());
+        <namedActions.members>
+
+        this.channelNames = [ "DEFAULT_TOKEN_CHANNEL", "HIDDEN"<if (lexer.channels)>, <lexer.channels:{c| "<c>"}; separator=", ", wrap, anchor><endif> ];
+
+        this.modeNames = [ <lexer.modes:{m| "<m>"}; separator=", ", wrap, anchor> ];
+
+        this.literalNames = [ <lexer.literalNames:{t | <t>}; null="null", separator=", ", wrap, anchor> ];
+
+        this.symbolicNames = [ <lexer.symbolicNames:{t | <t>}; null="null", separator=", ", wrap, anchor> ];
+
+        this.ruleNames = [ <lexer.ruleNames:{r | "<r>"}; separator=", ", wrap, anchor> ];
+
+        this.grammarFileName = "<lexer.grammarFileName>";
+    }
+
+    get atn() {
+        return atn;
+    }
 }
-
-<lexer.name>.prototype = Object.create(<if(superClass)><superClass><else>antlr4.Lexer<endif>.prototype);
-<lexer.name>.prototype.constructor = <lexer.name>;
-
-Object.defineProperty(<lexer.name>.prototype, "atn", {
-        get : function() {
-                return atn;
-        }
-});
 
 <lexer.name>.EOF = antlr4.Token.EOF;
 <lexer.tokens:{k | <lexer.name>.<k> = <lexer.tokens.(k)>;}; separator="\n", wrap, anchor>
@@ -838,21 +841,10 @@ Object.defineProperty(<lexer.name>.prototype, "atn", {
 <rest(lexer.modes):{m| <lexer.name>.<m> = <i>;}; separator="\n">
 
 <endif>
-<lexer.name>.prototype.channelNames = [ "DEFAULT_TOKEN_CHANNEL", "HIDDEN"<if (lexer.channels)>, <lexer.channels:{c| "<c>"}; separator=", ", wrap, anchor><endif> ];
-
-<lexer.name>.prototype.modeNames = [ <lexer.modes:{m| "<m>"}; separator=", ", wrap, anchor> ];
-
-<lexer.name>.prototype.literalNames = [ <lexer.literalNames:{t | <t>}; null="null", separator=", ", wrap, anchor> ];
-
-<lexer.name>.prototype.symbolicNames = [ <lexer.symbolicNames:{t | <t>}; null="null", separator=", ", wrap, anchor> ];
-
-<lexer.name>.prototype.ruleNames = [ <lexer.ruleNames:{r | "<r>"}; separator=", ", wrap, anchor> ];
-
-<lexer.name>.prototype.grammarFileName = "<lexer.grammarFileName>";
 
 <dumpActions(lexer, "", actionFuncs, sempredFuncs)>
 
-exports.<lexer.name> = <lexer.name>;
+module.exports.<lexer.name> = <lexer.name>;
 
 >>
 
