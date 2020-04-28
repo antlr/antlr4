@@ -610,8 +610,8 @@ public class BaseDartTest implements RuntimeTestSupport {
 					className + ".dart", new File(tmpdir, "input").getAbsolutePath()
 				};
 			}
-			String cmdLine = Utils.join(args, " ");
-			System.err.println("execParser: " + cmdLine);
+			//String cmdLine = Utils.join(args, " ");
+			//System.err.println("execParser: " + cmdLine);
 			Process process =
 				Runtime.getRuntime().exec(args, null, new File(tmpdir));
 			StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
