@@ -204,7 +204,127 @@ matrix:
       jdk: openjdk8
       env: TARGET=go
       stage: main-test
-
+    - os: linux
+      arch: s390x
+      dist: bionic
+      compiler: clang
+      jdk: openjdk11
+      env:
+        - TARGET=cpp
+        - CXX=g++
+        - GROUP=LEXER
+      stage: main-test
+      addons:
+        apt:
+          packages:
+            - g++
+            - uuid-dev
+            - clang
+            - maven	
+    - os: linux
+      arch: s390x
+      dist: bionic
+      compiler: clang
+      jdk: openjdk11
+      env:
+        - TARGET=cpp
+        - CXX=g++
+        - GROUP=PARSER
+      stage: main-test
+      addons:
+        apt:
+          packages:
+            - g++
+            - uuid-dev
+            - clang
+            - maven		
+    - os: linux
+      arch: s390x
+      dist: bionic
+      compiler: clang
+      jdk: openjdk11
+      env:
+        - TARGET=cpp
+        - CXX=g++
+        - GROUP=RECURSION
+      stage: main-test
+      addons:
+        apt:
+          packages:
+            - g++
+            - uuid-dev
+            - clang
+            - maven    
+    - os: linux
+      arch: s390x
+      dist: bionic
+      jdk: openjdk11
+      env: TARGET=java
+      addons:
+        apt:
+          - maven
+      stage: extended-test	  
+    - os: linux
+      arch: s390x
+      jdk: openjdk11
+      dist: bionic
+      env: TARGET=java
+      addons:
+        apt:
+          - maven
+      stage: smoke-test
+    - os: linux
+      arch: s390x
+      dist: bionic
+      language: php
+      php:
+        - 7.2
+      jdk: openjdk11
+      env: TARGET=php
+      addons:
+        apt:
+          - maven
+      stage: main-test  
+    - os: linux
+      arch: s390x
+      dist: bionic
+      jdk: openjdk11
+      env: TARGET=python2
+      addons:
+        apt:
+          - maven
+      stage: main-test 
+    - os: linux
+      arch: s390x
+      dist: bionic
+      jdk: openjdk11
+      env: TARGET=python3
+      addons:
+        apt:
+          packages:
+            - python3.7
+            - maven
+      stage: main-test  
+    - os: linux
+      arch: s390x
+      dist: bionic
+      jdk: openjdk11
+      env: TARGET=javascript
+      addons:
+        apt:
+          - maven
+      stage: main-test
+    - os: linux
+      arch: s390x
+      dist: bionic
+      jdk: openjdk11
+      env: TARGET=go
+      addons:
+        apt:
+          - maven
+          - golang
+      stage: main-test
+      
 before_install:
   - f="./.travis/before-install-$TRAVIS_OS_NAME-$TARGET.sh"; ! [ -x "$f" ] || "$f"
 
@@ -214,4 +334,4 @@ script:
     travis_wait 40 ../.travis/run-tests-$TARGET.sh;
     rc=$?;
     cat target/surefire-reports/*.dumpstream || true;
-    exit $rc
+    travis_terminate $rc
