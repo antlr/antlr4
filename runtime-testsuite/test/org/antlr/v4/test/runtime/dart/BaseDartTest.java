@@ -921,7 +921,7 @@ public class BaseDartTest implements RuntimeTestSupport {
 				"import '<lexerName>.dart';\n" +
 				"import '<parserName>.dart';\n" +
 				"\n" +
-				"void main(List<String> args) async {\n" +
+				"void main(List\\<String> args) async {\n" +
 				"  CharStream input = await InputStream.fromPath(args[0]);\n" +
 				"  <lexerName> lex = new <lexerName>(input);\n" +
 				"  CommonTokenStream tokens = new CommonTokenStream(lex);\n" +
@@ -980,7 +980,7 @@ public class BaseDartTest implements RuntimeTestSupport {
 				"\n" +
 				"import '<lexerName>.dart';\n" +
 				"\n" +
-				"void main(List<String> args) async {\n" +
+				"void main(List\\<String> args) async {\n" +
 				"  CharStream input = await InputStream.fromPath(args[0]);\n" +
 				"  <lexerName> lex = new <lexerName>(input);\n" +
 				"  CommonTokenStream tokens = new CommonTokenStream(lex);\n" +
