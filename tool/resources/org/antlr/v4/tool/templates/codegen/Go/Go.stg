@@ -205,10 +205,6 @@ func New<parser.name>(input antlr.TokenStream) *<parser.name> {
 	return this
 }
 
-var (
-	lexer
-)
-
 <if(namedActions.members)>
 
 <namedActions.members>
