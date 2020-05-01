@@ -242,3 +242,4 @@ YYYY/MM/DD, github id, Full name, email
 2020/02/21, StochasticTinkr, Daniel Pitts, github@coloraura.com
 2020/03/17, XsongyangX, Song Yang, songyang1218@gmail.com
 2020/04/07, deniskyashif, Denis Kyashif, denis.kyashif@gmail.com
+2020/04/30, TristonianJones, Tristan Swadell, tswadell@google.com
