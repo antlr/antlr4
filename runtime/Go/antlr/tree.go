@@ -18,7 +18,7 @@ type Tree interface {
 	GetChildCount() int
 	GetChildren() []Tree
 
-	VisitFunc(ParserTreeVisitorHandlers, ...interface{}) interface{}
+	VisitFunc(nv NodeVisitor, tv ParserTreeVisitorHandlers, args ...interface{}) interface{}
 }
 
 type SyntaxTree interface {
@@ -62,6 +62,16 @@ type ParseTreeVisitor interface {
 	VisitTerminal(node TerminalNode)
 	VisitErrorNode(node ErrorNode)
 	VisitChildren(node RuleNode, delegate ParseTreeVisitor, args ...interface{}) (result interface{})
+}
+type NodeVisitor interface {
+	TerminalVisitor
+	ErrorNodeVisitor
+}
+type TerminalVisitor interface {
+	VisitTerminal(node TerminalNode)
+}
+type ErrorNodeVisitor interface {
+	VisitErrorNode(node ErrorNode)
 }
 type AggregateResultVisitor interface {
 	AggregateResult(aggregate, nextResult interface{}) (result interface{})
@@ -179,7 +189,7 @@ func NewTerminalNodeImpl(symbol Token) *TerminalNodeImpl {
 	return tn
 }
 
-func (t *TerminalNodeImpl) VisitFunc(x ParserTreeVisitorHandlers, args ...interface{}) interface{} {
+func (t *TerminalNodeImpl) VisitFunc(nv NodeVisitor, x ParserTreeVisitorHandlers, args ...interface{}) interface{} {
 	return nil
 }
 

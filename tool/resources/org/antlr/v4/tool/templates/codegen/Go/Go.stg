@@ -234,7 +234,7 @@ type <file.grammarName>Handlers struct {
 	ExitEveryRule  func(ctx antlr.RuleNode)
 
 	<file.visitorNames:{lname |
-<lname; format="cap"> func(ctx I<lname; format="cap">Context, this *<file.grammarName>Handlers, args ...interface{\}) (result interface{\})
+<lname; format="cap"> func(ctx I<lname; format="cap">Context, nv antlr.NodeVisitor, this *<file.grammarName>Handlers, args ...interface{\}) (result interface{\})
 }>
 }
 
@@ -318,10 +318,9 @@ package parser // <file.grammarName>
 }>
 //}
 
-<file.visitorNames:{lname |
-//func (v *<file.grammarName>Visitor) Visit<lname; format="cap">(ctx <if(file.genPackage)><file.genPackage><else>parser<endif>.I<lname; format="cap">Context, delegate antlr.ParseTreeVisitor, args ...interface{\}) (result interface{\}){    result = v.VisitChildren(ctx, delegate, args...);return\}
-}>
-
+// Example method
+// 
+//func (v *FormulaWalkerVisitor) VisitStartexpr(ctx walker.IStartexprContext, delegate antlr.ParseTreeVisitor, args ...interface{}) (result interface{}){
 //  TODO list rules here
 //  Visit rules manually
 //  eg a : b c* | d;
@@ -329,15 +328,25 @@ package parser // <file.grammarName>
 //    result1 = ctx.GetB(ctx, delegate, args)
 //    for _, c := range ctx.GetC() {
 //      resultS = c.GetC(ctx, delegate, args)
-//    \}
-//  \} else { ... \}
+//    }
+//  } else { ... }
 //  OR visit all children rules
 //  // before children
 //  v.VisitChildren(ctx, delegate)
 //  // afer children
 //
 //  return result
+//}
 
+
+<file.visitorNames:{lname |
+//func (v *<file.grammarName>Visitor) Visit<lname; format="cap">(ctx <if(file.genPackage)><file.genPackage><else>parser<endif>.I<lname; format="cap">Context, delegate antlr.ParseTreeVisitor, args ...interface{\}) (result interface{\}){    result = v.VisitChildren(ctx, delegate, args...);return\}
+}>
+
+//  // before children
+//  v.VisitChildren(ctx, delegate)
+//  // afer children
+//  return result
 
 >>
 
@@ -1490,15 +1499,15 @@ func (s *<struct.name>) ExitRule(listener antlr.ParseTreeListener) {
 >>
 
 VisitorDispatchMethod(method) ::= <<
-func (s *<struct.name>) VisitFunc(hdls antlr.ParserTreeVisitorHandlers, args ...interface{}) (result interface{}) {
+func (s *<struct.name>) VisitFunc(nv antlr.NodeVisitor, hdls antlr.ParserTreeVisitorHandlers, args ...interface{}) (result interface{}) {
 	h := hdls.(*<file.grammarName>Handlers)
 	if h.EnterEveryRule != nil {
 		h.EnterEveryRule(s)
 	}
 	if h.<struct.derivedFromName; format="cap"> != nil {
-		h.<struct.derivedFromName; format="cap">(s, h, args...)
+		h.<struct.derivedFromName; format="cap">(s, nv, h, args...)
 	} else {
-		s.VisitChildrenFunc(h, args...)
+		s.VisitChildrenFunc(nv, h, args...)
 	}
 	if h.ExitEveryRule != nil {
 		h.ExitEveryRule(s)
