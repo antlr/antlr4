@@ -8,7 +8,7 @@ ANTLR is really two things: a tool that translates your grammar to a parser/lexe
 
 The first thing you should do is probably download and install a development tool plug-in. Even if you only use such tools for editing, they are great. Then, follow the instructions below to get the runtime environment available to your system to run generated parsers/lexers.  In what follows, I talk about antlr-4.7.1-complete.jar, which has the tool and the runtime and any other support libraries (e.g., ANTLR v4 is written in v3).
 
-If you are going to integrate ANTLR into your existing build system using mvn, ant, or want to get ANTLR into your IDE such as eclipse or intellij, see Integrating ANTLR into Development Systems.
+If you are going to integrate ANTLR into your existing build system using mvn, ant, or want to get ANTLR into your IDE such as eclipse or intellij, see [Integrating ANTLR into Development Systems](https://github.com/antlr/antlr4/blob/master/doc/IDEs.md).
 
 ### UNIX
 
