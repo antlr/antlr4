@@ -11,7 +11,7 @@ package org.antlr.v4.codegen;
  * languages' syntaxes.
  */
 public abstract class UnicodeEscapes {
-	static public void appendJavaStyleEscapedCodePoint(int codePoint, StringBuilder sb) {
+	public static void appendJavaStyleEscapedCodePoint(int codePoint, StringBuilder sb) {
 		if (Character.isSupplementaryCodePoint(codePoint)) {
 			// char is not an 'integral' type, so we have to explicitly convert
 			// to int before passing to the %X formatter or else it throws.
@@ -23,7 +23,7 @@ public abstract class UnicodeEscapes {
 		}
 	}
 
-	static public void appendPythonStyleEscapedCodePoint(int codePoint, StringBuilder sb) {
+	public static void appendPythonStyleEscapedCodePoint(int codePoint, StringBuilder sb) {
 		if (Character.isSupplementaryCodePoint(codePoint)) {
 			sb.append(String.format("\\U%08X", codePoint));
 		}
@@ -32,7 +32,7 @@ public abstract class UnicodeEscapes {
 		}
 	}
 
-	static public void appendSwiftStyleEscapedCodePoint(int codePoint, StringBuilder sb) {
+	public static void appendSwiftStyleEscapedCodePoint(int codePoint, StringBuilder sb) {
 		sb.append(String.format("\\u{%04X}", codePoint));
 	}
 }

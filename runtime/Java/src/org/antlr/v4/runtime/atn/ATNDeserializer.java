@@ -148,7 +148,7 @@ public class ATNDeserializer {
 	 * serialized ATN at or after the feature identified by {@code feature} was
 	 * introduced; otherwise, {@code false}.
 	 */
-	static protected boolean isFeatureSupported(UUID feature, UUID actualUuid) {
+	protected static boolean isFeatureSupported(UUID feature, UUID actualUuid) {
 		int featureIndex = SUPPORTED_UUIDS.indexOf(feature);
 		if (featureIndex < 0) {
 			return false;
