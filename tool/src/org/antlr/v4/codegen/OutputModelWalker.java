@@ -82,7 +82,7 @@ public class OutputModelWalker {
 
 		// COMPUTE STs FOR EACH NESTED MODEL OBJECT MARKED WITH @ModelElement AND MAKE ST ATTRIBUTE
 		Set<String> usedFieldNames = new HashSet<String>();
-		Field fields[] = cl.getFields();
+		Field[] fields = cl.getFields();
 		for (Field fi : fields) {
 			ModelElement annotation = fi.getAnnotation(ModelElement.class);
 			if (annotation == null) {

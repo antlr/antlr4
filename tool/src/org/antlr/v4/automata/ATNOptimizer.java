@@ -100,9 +100,7 @@ public class ATNOptimizer {
 					}
 					IntervalSet set =  matchTransition.label();
 					List<Interval> intervals = set.getIntervals();
-					int n = intervals.size();
-					for (int k = 0; k < n; k++) {
-						Interval setInterval = intervals.get(k);
+					for (Interval setInterval : intervals) {
 						int a = setInterval.a;
 						int b = setInterval.b;
 						if (a != -1 && b != -1) {

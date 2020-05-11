@@ -177,7 +177,7 @@ public class SymbolChecks {
 				return altAST.altLabel.toString();
 			}
 			else if (altAST.leftRecursiveAltInfo != null) {
-				return altAST.leftRecursiveAltInfo.altLabel.toString();
+				return altAST.leftRecursiveAltInfo.altLabel;
 			}
 			else {
 				return findAltLabelName(label.parent);
@@ -312,7 +312,7 @@ public class SymbolChecks {
 		if (g.isLexer()) {
 			LexerGrammar lexerGrammar = (LexerGrammar)g;
 			for (String modeName : lexerGrammar.modes.keySet()) {
-				if (!modeName.equals("DEFAULT_MODE") && reservedNames.contains(modeName)) {
+				if (!"DEFAULT_MODE".equals(modeName) && reservedNames.contains(modeName)) {
 					Rule rule = lexerGrammar.modes.get(modeName).iterator().next();
 					g.tool.errMgr.grammarError(ErrorType.MODE_CONFLICTS_WITH_COMMON_CONSTANTS, g.fileName, rule.ast.parent.getToken(), modeName);
 				}
@@ -342,9 +342,7 @@ public class SymbolChecks {
 				// Collect string literal lexer rules for each mode
 				List<Rule> stringLiteralRules = new ArrayList<>();
 				List<List<String>> stringLiteralValues = new ArrayList<>();
-				for (int i = 0; i < rules.size(); i++) {
-					Rule rule = rules.get(i);
-
+				for (Rule rule : rules) {
 					List<String> ruleStringAlts = getSingleTokenValues(rule);
 					if (ruleStringAlts != null && ruleStringAlts.size() > 0) {
 						stringLiteralRules.add(rule);
@@ -407,7 +405,7 @@ public class SymbolChecks {
 					}
 					else {
 						String text = terminalAST.token.getText();
-						currentValue.append(text.substring(1, text.length() - 1));
+						currentValue.append(text, 1, text.length() - 1);
 					}
 				}
 

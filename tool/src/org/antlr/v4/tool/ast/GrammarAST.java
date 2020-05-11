@@ -145,9 +145,8 @@ public class GrammarAST extends CommonTree {
 	}
 
 	public boolean deleteChild(org.antlr.runtime.tree.Tree t) {
-		for (int i=0; i<children.size(); i++) {
-			Object c = children.get(i);
-			if ( c == t ) {
+		for (Object c : children) {
+			if (c == t) {
 				deleteChild(t.getChildIndex());
 				return true;
 			}

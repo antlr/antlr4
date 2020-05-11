@@ -79,7 +79,7 @@ public class Tool {
 	public static final List<String> ALL_GRAMMAR_EXTENSIONS =
 		Collections.unmodifiableList(Arrays.asList(GRAMMAR_EXTENSION, LEGACY_GRAMMAR_EXTENSION));
 
-	public static enum OptionArgType { NONE, STRING } // NONE implies boolean
+	public enum OptionArgType { NONE, STRING } // NONE implies boolean
 	public static class Option {
 		String fieldName;
 		String name;
@@ -291,7 +291,7 @@ public class Tool {
 			if ( Grammar.parserOptions.contains(option) ||
 				 Grammar.lexerOptions.contains(option) )
 			{
-				if ( grammarOptions==null ) grammarOptions = new HashMap<String, String>();
+				if ( grammarOptions==null ) grammarOptions = new HashMap<String, String>(1);
 				grammarOptions.put(option, value);
 			}
 			else {
@@ -708,21 +708,21 @@ public class Tool {
 		content.append("token literal names:\n");
 		String[] names = g.getTokenLiteralNames();
 		for (String name : names) {
-			content.append(name + "\n");
+			content.append(name).append("\n");
 		}
 		content.append("\n");
 
 		content.append("token symbolic names:\n");
 		names = g.getTokenSymbolicNames();
 		for (String name : names) {
-			content.append(name + "\n");
+			content.append(name).append("\n");
 		}
 		content.append("\n");
 
 		content.append("rule names:\n");
 		names = g.getRuleNames();
 		for (String name : names) {
-			content.append(name + "\n");
+			content.append(name).append("\n");
 		}
 		content.append("\n");
 
@@ -731,13 +731,13 @@ public class Tool {
 			content.append("DEFAULT_TOKEN_CHANNEL\n");
 			content.append("HIDDEN\n");
 			for (String channel : g.channelValueToNameList) {
-				content.append(channel + "\n");
+				content.append(channel).append("\n");
 			}
 			content.append("\n");
 
 			content.append("mode names:\n");
 			for (String mode : ((LexerGrammar)g).modes.keySet()) {
-				content.append(mode + "\n");
+				content.append(mode).append("\n");
 			}
 		}
 		content.append("\n");

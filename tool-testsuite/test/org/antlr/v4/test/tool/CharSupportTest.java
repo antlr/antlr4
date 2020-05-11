@@ -64,11 +64,11 @@ public class CharSupportTest {
 			CharSupport.getCharValueFromCharInGrammarLiteral("f"));
 
 		Assert.assertEquals(-1,
-			CharSupport.getCharValueFromCharInGrammarLiteral("\' "));
+			CharSupport.getCharValueFromCharInGrammarLiteral("' "));
 		Assert.assertEquals(-1,
 			CharSupport.getCharValueFromCharInGrammarLiteral("\\ "));
 		Assert.assertEquals(39,
-			CharSupport.getCharValueFromCharInGrammarLiteral("\\\'"));
+			CharSupport.getCharValueFromCharInGrammarLiteral("\\'"));
 		Assert.assertEquals(10,
 			CharSupport.getCharValueFromCharInGrammarLiteral("\\n"));
 

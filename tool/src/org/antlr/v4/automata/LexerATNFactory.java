@@ -600,7 +600,7 @@ public class LexerATNFactory extends ParserATNFactory {
 	@Override
 	public Handle tokenRef(TerminalAST node) {
 		// Ref to EOF in lexer yields char transition on -1
-		if (node.getText().equals("EOF") ) {
+		if ("EOF".equals(node.getText()) ) {
 			ATNState left = newState(node);
 			ATNState right = newState(node);
 			left.addTransition(new AtomTransition(right, IntStream.EOF));
@@ -665,43 +665,42 @@ public class LexerATNFactory extends ParserATNFactory {
 
 	private void checkCommands(String command, Token commandToken) {
 		// Command combinations list: https://github.com/antlr/antlr4/issues/1388#issuecomment-263344701
-		if (!command.equals("pushMode") && !command.equals("popMode")) {
+		if (!"pushMode".equals(command) && !"popMode".equals(command)) {
 			if (ruleCommands.contains(command)) {
 				g.tool.errMgr.grammarError(ErrorType.DUPLICATED_COMMAND, g.fileName, commandToken, command);
 			}
 
-			if (!ruleCommands.equals("mode")) {
+			if (!"mode".equals(ruleCommands.toString())) {
 				String firstCommand = null;
 
-				if (command.equals("skip")) {
-					if (ruleCommands.contains("more")) {
-						firstCommand = "more";
-					}
-					else if (ruleCommands.contains("type")) {
-						firstCommand = "type";
-					}
-					else if (ruleCommands.contains("channel")) {
-						firstCommand = "channel";
-					}
-				}
-				else if (command.equals("more")) {
-					if (ruleCommands.contains("skip")) {
-						firstCommand = "skip";
-					}
-					else if (ruleCommands.contains("type")) {
-						firstCommand = "type";
-					}
-					else if (ruleCommands.contains("channel")) {
-						firstCommand = "channel";
-					}
-				}
-				else if (command.equals("type") || command.equals("channel")) {
-					if (ruleCommands.contains("more")) {
-						firstCommand = "more";
-					}
-					else if (ruleCommands.contains("skip")) {
-						firstCommand = "skip";
-					}
+				switch (command) {
+					case "skip":
+						if (ruleCommands.contains("more")) {
+							firstCommand = "more";
+						} else if (ruleCommands.contains("type")) {
+							firstCommand = "type";
+						} else if (ruleCommands.contains("channel")) {
+							firstCommand = "channel";
+						}
+						break;
+					case "more":
+						if (ruleCommands.contains("skip")) {
+							firstCommand = "skip";
+						} else if (ruleCommands.contains("type")) {
+							firstCommand = "type";
+						} else if (ruleCommands.contains("channel")) {
+							firstCommand = "channel";
+						}
+						break;
+					case "type":
+					case "channel":
+						if (ruleCommands.contains("more")) {
+							firstCommand = "more";
+						} else if (ruleCommands.contains("skip")) {
+							firstCommand = "skip";
+						}
+						break;
+					default:
 				}
 
 				if (firstCommand != null) {
@@ -718,7 +717,7 @@ public class LexerATNFactory extends ParserATNFactory {
 			return null;
 		}
 
-		if (modeName.equals("DEFAULT_MODE")) {
+		if ("DEFAULT_MODE".equals(modeName)) {
 			return Lexer.DEFAULT_MODE;
 		}
 		if (COMMON_CONSTANTS.containsKey(modeName)) {
@@ -745,7 +744,7 @@ public class LexerATNFactory extends ParserATNFactory {
 			return null;
 		}
 
-		if (tokenName.equals("EOF")) {
+		if ("EOF".equals(tokenName)) {
 			return Lexer.EOF;
 		}
 		if (COMMON_CONSTANTS.containsKey(tokenName)) {
@@ -771,10 +770,10 @@ public class LexerATNFactory extends ParserATNFactory {
 			return null;
 		}
 
-		if (channelName.equals("HIDDEN")) {
+		if ("HIDDEN".equals(channelName)) {
 			return Lexer.HIDDEN;
 		}
-		if (channelName.equals("DEFAULT_TOKEN_CHANNEL")) {
+		if ("DEFAULT_TOKEN_CHANNEL".equals(channelName)) {
 			return Lexer.DEFAULT_TOKEN_CHANNEL;
 		}
 		if (COMMON_CONSTANTS.containsKey(channelName)) {

@@ -110,10 +110,11 @@ public class CommonTokenStream extends BufferedTokenStream {
 	public int getNumberOfOnChannelTokens() {
 		int n = 0;
 		fill();
-		for (int i = 0; i < tokens.size(); i++) {
-			Token t = tokens.get(i);
-			if ( t.getChannel()==channel ) n++;
-			if ( t.getType()==Token.EOF ) break;
+		for (Token t : tokens) {
+			if (t.getChannel() == channel)
+				n++;
+			if (t.getType() == Token.EOF)
+				break;
 		}
 		return n;
 	}

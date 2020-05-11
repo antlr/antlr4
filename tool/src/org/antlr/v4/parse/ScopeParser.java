@@ -73,7 +73,7 @@ public class ScopeParser {
 		int equalsIndex = decl.a.indexOf('=');
 		if (equalsIndex > 0) {
 			// everything after the '=' is the init value
-			attr.initValue = decl.a.substring(equalsIndex + 1, decl.a.length()).trim();
+			attr.initValue = decl.a.substring(equalsIndex + 1).trim();
 			rightEdgeOfDeclarator = equalsIndex - 1;
 		}
 
@@ -183,7 +183,7 @@ public class ScopeParser {
 		// the type is the decl minus the ID (could be empty)
 		attr.type = decl.substring(0, start);
 		if (stop <= decl.length() - 1) {
-			attr.type += decl.substring(stop, decl.length());
+			attr.type += decl.substring(stop);
 		}
 
 		attr.type = attr.type.trim();
@@ -237,7 +237,7 @@ public class ScopeParser {
 			attr.type = "";
 		}
 		else {
-			attr.type = decl.substring(colon + 1, decl.length());
+			attr.type = decl.substring(colon + 1);
 		}
 		attr.type = attr.type.trim();
 

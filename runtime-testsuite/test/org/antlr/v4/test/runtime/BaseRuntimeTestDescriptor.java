@@ -126,7 +126,7 @@ public abstract class BaseRuntimeTestDescriptor implements RuntimeTestDescriptor
 		if ( s==null ) return "";
 		if ( s.equals("\n") ) return s;
 		s = Utils.expandTabs(s, 4);
-		String lines[] = s.split("\\r?\\n");
+		String[] lines = s.split("\\r?\\n");
 		String first = lines[0];
 		Pattern wspat = Pattern.compile("^\\s+");
 		Matcher matcher = wspat.matcher(first);

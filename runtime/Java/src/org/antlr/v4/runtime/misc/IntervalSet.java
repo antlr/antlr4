@@ -462,7 +462,7 @@ public class IntervalSet implements IntSet {
      */
     @Override
     public boolean equals(Object obj) {
-        if ( obj==null || !(obj instanceof IntervalSet) ) {
+        if (!(obj instanceof IntervalSet)) {
             return false;
         }
         IntervalSet other = (IntervalSet)obj;
@@ -573,9 +573,8 @@ public class IntervalSet implements IntSet {
 			Interval firstInterval = this.intervals.get(0);
 			return firstInterval.b-firstInterval.a+1;
 		}
-		for (int i = 0; i < numIntervals; i++) {
-			Interval I = intervals.get(i);
-			n += (I.b-I.a+1);
+		for (Interval I : intervals) {
+			n += (I.b - I.a + 1);
 		}
 		return n;
     }
@@ -583,11 +582,10 @@ public class IntervalSet implements IntSet {
 	public IntegerList toIntegerList() {
 		IntegerList values = new IntegerList(size());
 		int n = intervals.size();
-		for (int i = 0; i < n; i++) {
-			Interval I = intervals.get(i);
+		for (Interval I : intervals) {
 			int a = I.a;
 			int b = I.b;
-			for (int v=a; v<=b; v++) {
+			for (int v = a; v <= b; v++) {
 				values.add(v);
 			}
 		}
@@ -598,11 +596,10 @@ public class IntervalSet implements IntSet {
     public List<Integer> toList() {
 		List<Integer> values = new ArrayList<Integer>();
 		int n = intervals.size();
-		for (int i = 0; i < n; i++) {
-			Interval I = intervals.get(i);
+		for (Interval I : intervals) {
 			int a = I.a;
 			int b = I.b;
-			for (int v=a; v<=b; v++) {
+			for (int v = a; v <= b; v++) {
 				values.add(v);
 			}
 		}
@@ -628,12 +625,11 @@ public class IntervalSet implements IntSet {
 	public int get(int i) {
 		int n = intervals.size();
 		int index = 0;
-		for (int j = 0; j < n; j++) {
-			Interval I = intervals.get(j);
+		for (Interval I : intervals) {
 			int a = I.a;
 			int b = I.b;
-			for (int v=a; v<=b; v++) {
-				if ( index==i ) {
+			for (int v = a; v <= b; v++) {
+				if (index == i) {
 					return v;
 				}
 				index++;

@@ -21,7 +21,7 @@ public interface TokenStream extends IntStream {
 	 *
 	 * @see IntStream#LA
 	 */
-	public Token LT(int k);
+	Token LT(int k);
 
 	/**
 	 * Gets the {@link Token} at the specified {@code index} in the stream. When
@@ -41,13 +41,13 @@ public interface TokenStream extends IntStream {
 	 * @throws UnsupportedOperationException if the stream does not support
 	 * retrieving the token at the specified index
 	 */
-	public Token get(int index);
+	Token get(int index);
 
 	/**
 	 * Gets the underlying {@link TokenSource} which provides tokens for this
 	 * stream.
 	 */
-	public TokenSource getTokenSource();
+	TokenSource getTokenSource();
 
 	/**
 	 * Return the text of all tokens within the specified {@code interval}. This
@@ -70,7 +70,7 @@ public interface TokenStream extends IntStream {
 	 *
 	 * @throws NullPointerException if {@code interval} is {@code null}
 	 */
-	public String getText(Interval interval);
+	String getText(Interval interval);
 
 	/**
 	 * Return the text of all tokens in the stream. This method behaves like the
@@ -85,7 +85,7 @@ public interface TokenStream extends IntStream {
 	 *
 	 * @return The text of all tokens in the stream.
 	 */
-	public String getText();
+	String getText();
 
 	/**
 	 * Return the text of all tokens in the source interval of the specified
@@ -105,7 +105,7 @@ public interface TokenStream extends IntStream {
 	 * text for.
 	 * @return The text of all tokens within the source interval of {@code ctx}.
 	 */
-	public String getText(RuleContext ctx);
+	String getText(RuleContext ctx);
 
 	/**
 	 * Return the text of all tokens in this stream between {@code start} and
@@ -136,5 +136,5 @@ public interface TokenStream extends IntStream {
 	 * @throws UnsupportedOperationException if this stream does not support
 	 * this method for the specified tokens
 	 */
-	public String getText(Token start, Token stop);
+	String getText(Token start, Token stop);
 }

@@ -154,6 +154,7 @@ public class GoTarget extends Target {
 		return result;
 	}
 
+	@Override
 	public String getRecognizerFileName(boolean header) {
 		CodeGenerator gen = getCodeGenerator();
 		Grammar g = gen.g;
@@ -176,6 +177,7 @@ public class GoTarget extends Target {
 	/** A given grammar T, return the listener name such as
 	 *  TListener.java, if we're using the Java target.
  	 */
+	@Override
 	public String getListenerFileName(boolean header) {
 		CodeGenerator gen = getCodeGenerator();
 		Grammar g = gen.g;
@@ -186,6 +188,7 @@ public class GoTarget extends Target {
 	/** A given grammar T, return the visitor name such as
 	 *  TVisitor.java, if we're using the Java target.
  	 */
+	@Override
 	public String getVisitorFileName(boolean header) {
 		CodeGenerator gen = getCodeGenerator();
 		Grammar g = gen.g;
@@ -196,6 +199,7 @@ public class GoTarget extends Target {
 	/** A given grammar T, return a blank listener implementation
 	 *  such as TBaseListener.java, if we're using the Java target.
  	 */
+	@Override
 	public String getBaseListenerFileName(boolean header) {
 		CodeGenerator gen = getCodeGenerator();
 		Grammar g = gen.g;
@@ -206,6 +210,7 @@ public class GoTarget extends Target {
 	/** A given grammar T, return a blank listener implementation
 	 *  such as TBaseListener.java, if we're using the Java target.
  	 */
+	@Override
 	public String getBaseVisitorFileName(boolean header) {
 		CodeGenerator gen = getCodeGenerator();
 		Grammar g = gen.g;

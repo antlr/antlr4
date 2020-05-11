@@ -11,27 +11,27 @@ package org.antlr.v4.runtime;
  *  we obtained this token.
  */
 public interface Token {
-	public static final int INVALID_TYPE = 0;
+	int INVALID_TYPE = 0;
 
     /** During lookahead operations, this "token" signifies we hit rule end ATN state
      *  and did not follow it despite needing to.
      */
-    public static final int EPSILON = -2;
+	int EPSILON = -2;
 
-	public static final int MIN_USER_TOKEN_TYPE = 1;
+	int MIN_USER_TOKEN_TYPE = 1;
 
-    public static final int EOF = IntStream.EOF;
+    int EOF = IntStream.EOF;
 
 	/** All tokens go to the parser (unless skip() is called in that rule)
 	 *  on a particular "channel".  The parser tunes to a particular channel
 	 *  so that whitespace etc... can go to the parser on a "hidden" channel.
 	 */
-	public static final int DEFAULT_CHANNEL = 0;
+	int DEFAULT_CHANNEL = 0;
 
 	/** Anything on different channel than DEFAULT_CHANNEL is not parsed
 	 *  by parser.
 	 */
-	public static final int HIDDEN_CHANNEL = 1;
+	int HIDDEN_CHANNEL = 1;
 
 	/**
 	 * This is the minimum constant value which can be assigned to a
@@ -44,7 +44,7 @@ public interface Token {
 	 *
 	 * @see Token#getChannel()
 	 */
-	public static final int MIN_USER_CHANNEL_VALUE = 2;
+	int MIN_USER_CHANNEL_VALUE = 2;
 
 	/**
 	 * Get the text of the token.

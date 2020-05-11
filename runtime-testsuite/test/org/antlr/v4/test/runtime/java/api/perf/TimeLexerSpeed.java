@@ -262,7 +262,7 @@ public class TimeLexerSpeed { // don't call it Test else it'll run during "mvn t
 		long tus = (stop-start)/1000;
 		int size = input[0].size();
 		String currentMethodName = new Exception().getStackTrace()[0].getMethodName();
-		GraphLayout olayout = GraphLayout.parseInstance((Object) input[0]);
+		GraphLayout olayout = GraphLayout.parseInstance(input[0]);
 		long streamSize = olayout.totalSize();
 		streamFootprints.add(basename(resourceName)+" ("+size+" char): "+olayout.toFootprint());
 		if ( output ) System.out.printf("%27s average time %5dus size %6db over %4d loads of %5d symbols from %s\n",
@@ -290,8 +290,8 @@ public class TimeLexerSpeed { // don't call it Test else it'll run during "mvn t
 		long stop = System.nanoTime();
 		long tus = (stop-start)/1000;
 		int size = input[0].size();
-		long streamSize = GraphLayout.parseInstance((Object)input[0]).totalSize();
-		streamFootprints.add(basename(resourceName)+" ("+size+" char): "+GraphLayout.parseInstance((Object)input[0]).toFootprint());
+		long streamSize = GraphLayout.parseInstance(input[0]).totalSize();
+		streamFootprints.add(basename(resourceName)+" ("+size+" char): "+GraphLayout.parseInstance(input[0]).toFootprint());
 		String currentMethodName = new Exception().getStackTrace()[0].getMethodName();
 		if ( output ) System.out.printf("%27s average time %5dus size %6db over %4d loads of %5d symbols from %s\n",
 		                                currentMethodName,
@@ -320,8 +320,8 @@ public class TimeLexerSpeed { // don't call it Test else it'll run during "mvn t
 		long stop = System.nanoTime();
 		long tus = (stop-start)/1000;
 		int size = input[0].size();
-		long streamSize = GraphLayout.parseInstance((Object)input[0]).totalSize();
-		streamFootprints.add(basename(resourceName)+" ("+size+" char): "+GraphLayout.parseInstance((Object)input[0]).toFootprint());
+		long streamSize = GraphLayout.parseInstance(input[0]).totalSize();
+		streamFootprints.add(basename(resourceName)+" ("+size+" char): "+GraphLayout.parseInstance(input[0]).toFootprint());
 		String currentMethodName = new Exception().getStackTrace()[0].getMethodName();
 		if ( output ) System.out.printf("%27s average time %5dus size %6db over %4d loads of %5d symbols from %s\n",
 		                                currentMethodName,
@@ -350,8 +350,8 @@ public class TimeLexerSpeed { // don't call it Test else it'll run during "mvn t
 		long stop = System.nanoTime();
 		long tus = (stop-start)/1000;
 		int size = input[0].size();
-		long streamSize = GraphLayout.parseInstance((Object)input[0]).totalSize();
-		streamFootprints.add(basename(resourceName)+" ("+size+" char): "+GraphLayout.parseInstance((Object)input[0]).toFootprint());
+		long streamSize = GraphLayout.parseInstance(input[0]).totalSize();
+		streamFootprints.add(basename(resourceName)+" ("+size+" char): "+GraphLayout.parseInstance(input[0]).toFootprint());
 		String currentMethodName = new Exception().getStackTrace()[0].getMethodName();
 		if ( output ) System.out.printf("%27s average time %5dus size %6db over %4d loads of %5d symbols from %s\n",
 						currentMethodName,
@@ -490,7 +490,7 @@ public class TimeLexerSpeed { // don't call it Test else it'll run during "mvn t
 		return path.getName(0).toString();
 	}
 
-	public static final long getResourceSize(ClassLoader loader, String resourceName) throws IOException {
+	public static long getResourceSize(ClassLoader loader, String resourceName) throws IOException {
 		URLConnection uc = null;
 		try {
 			// Sadly, URLConnection is not AutoCloseable, but it leaks resources if

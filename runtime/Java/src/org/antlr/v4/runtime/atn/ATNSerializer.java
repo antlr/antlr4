@@ -269,8 +269,6 @@ public class ATNSerializer {
 						arg3 = at.isCtxDependent ? 1 : 0 ;
 						break;
 					case Transition.SET :
-						arg1 = setIndices.get(((SetTransition)t).set);
-						break;
 					case Transition.NOT_SET :
 						arg1 = setIndices.get(((SetTransition)t).set);
 						break;
@@ -301,55 +299,47 @@ public class ATNSerializer {
 			for (LexerAction action : atn.lexerActions) {
 				data.add(action.getActionType().ordinal());
 				switch (action.getActionType()) {
-				case CHANNEL:
-					int channel = ((LexerChannelAction)action).getChannel();
-					data.add(channel != -1 ? channel : 0xFFFF);
-					data.add(0);
-					break;
+					case CHANNEL:
+						int channel = ((LexerChannelAction)action).getChannel();
+						data.add(channel != -1 ? channel : 0xFFFF);
+						data.add(0);
+						break;
 
-				case CUSTOM:
-					int ruleIndex = ((LexerCustomAction)action).getRuleIndex();
-					int actionIndex = ((LexerCustomAction)action).getActionIndex();
-					data.add(ruleIndex != -1 ? ruleIndex : 0xFFFF);
-					data.add(actionIndex != -1 ? actionIndex : 0xFFFF);
-					break;
+					case CUSTOM:
+						int ruleIndex = ((LexerCustomAction)action).getRuleIndex();
+						int actionIndex = ((LexerCustomAction)action).getActionIndex();
+						data.add(ruleIndex != -1 ? ruleIndex : 0xFFFF);
+						data.add(actionIndex != -1 ? actionIndex : 0xFFFF);
+						break;
 
-				case MODE:
-					int mode = ((LexerModeAction)action).getMode();
-					data.add(mode != -1 ? mode : 0xFFFF);
-					data.add(0);
-					break;
+					case MODE:
+						int mode = ((LexerModeAction)action).getMode();
+						data.add(mode != -1 ? mode : 0xFFFF);
+						data.add(0);
+						break;
 
-				case MORE:
-					data.add(0);
-					data.add(0);
-					break;
+					case MORE:
+					case POP_MODE:
+					case SKIP:
+						data.add(0);
+						data.add(0);
+						break;
 
-				case POP_MODE:
-					data.add(0);
-					data.add(0);
-					break;
+					case PUSH_MODE:
+						mode = ((LexerPushModeAction)action).getMode();
+						data.add(mode != -1 ? mode : 0xFFFF);
+						data.add(0);
+						break;
 
-				case PUSH_MODE:
-					mode = ((LexerPushModeAction)action).getMode();
-					data.add(mode != -1 ? mode : 0xFFFF);
-					data.add(0);
-					break;
+					case TYPE:
+						int type = ((LexerTypeAction)action).getType();
+						data.add(type != -1 ? type : 0xFFFF);
+						data.add(0);
+						break;
 
-				case SKIP:
-					data.add(0);
-					data.add(0);
-					break;
-
-				case TYPE:
-					int type = ((LexerTypeAction)action).getType();
-					data.add(type != -1 ? type : 0xFFFF);
-					data.add(0);
-					break;
-
-				default:
-					String message = String.format(Locale.getDefault(), "The specified lexer action type %s is not valid.", action.getActionType());
-					throw new IllegalArgumentException(message);
+					default:
+						String message = String.format(Locale.getDefault(), "The specified lexer action type %s is not valid.", action.getActionType());
+						throw new IllegalArgumentException(message);
 				}
 			}
 		}

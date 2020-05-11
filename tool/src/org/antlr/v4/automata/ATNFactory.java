@@ -20,7 +20,7 @@ public interface ATNFactory {
 	/** A pair of states pointing to the left/right (start and end) states of a
 	 *  state submachine.  Used to build ATNs.
 	 */
-	public static class Handle {
+	class Handle {
 		public ATNState left;
 		public ATNState right;
 

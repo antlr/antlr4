@@ -480,13 +480,13 @@ public class BaseCppTest implements RuntimeTestSupport {
 	public static String getOS() {
 		if (detectedOS == null) {
 			String os = System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH);
-			if ((os.indexOf("mac") >= 0) || (os.indexOf("darwin") >= 0)) {
+			if ((os.contains("mac")) || (os.contains("darwin"))) {
 				detectedOS = "mac";
 			}
-			else if (os.indexOf("win") >= 0) {
+			else if (os.contains("win")) {
 				detectedOS = "windows";
 			}
-			else if (os.indexOf("nux") >= 0) {
+			else if (os.contains("nux")) {
 				detectedOS = "linux";
 			}
 			else {
@@ -500,8 +500,8 @@ public class BaseCppTest implements RuntimeTestSupport {
 		ArrayList<String> files = new ArrayList<String>();
 		File folder = new File(path);
 		File[] listOfFiles = folder.listFiles();
-		for (int i = 0; i < listOfFiles.length; i++) {
-			String file = listOfFiles[i].getAbsolutePath();
+		for (File listOfFile : listOfFiles) {
+			String file = listOfFile.getAbsolutePath();
 			if (file.endsWith(".cpp")) {
 				files.add(file);
 			}
@@ -537,7 +537,7 @@ public class BaseCppTest implements RuntimeTestSupport {
 		return output;
 	}
 
-	private String runCommand(String command[], String workPath, String description, boolean showStderr) throws Exception {
+	private String runCommand(String[] command, String workPath, String description, boolean showStderr) throws Exception {
 		ProcessBuilder builder = new ProcessBuilder(command);
 		builder.directory(new File(workPath));
 
@@ -550,7 +550,7 @@ public class BaseCppTest implements RuntimeTestSupport {
 		System.out.println("Building ANTLR4 C++ runtime (if necessary) at "+ runtimePath);
 
 		try {
-			String command[] = { "cmake", ".", /*"-DCMAKE_CXX_COMPILER=clang++",*/ "-DCMAKE_BUILD_TYPE=release" };
+			String[] command = { "cmake", ".", /*"-DCMAKE_CXX_COMPILER=clang++",*/ "-DCMAKE_BUILD_TYPE=release" };
 			if (runCommand(command, runtimePath, "antlr runtime cmake", false) == null) {
 				return false;
 			}
@@ -560,7 +560,7 @@ public class BaseCppTest implements RuntimeTestSupport {
 		}
 
 		try {
-			String command[] = { "make", "-j", "8" }; // Assuming a reasonable amount of available CPU cores.
+			String[] command = { "make", "-j", "8" }; // Assuming a reasonable amount of available CPU cores.
 			if (runCommand(command, runtimePath, "building antlr runtime", true) == null)
 				return false;
 		}
@@ -568,7 +568,7 @@ public class BaseCppTest implements RuntimeTestSupport {
 			System.err.println("can't compile antlr cpp runtime");
 			e.printStackTrace(System.err);
 			try {
-			    String command[] = { "ls", "-la" };
+			    String[] command = { "ls", "-la" };
 					String output = runCommand(command, runtimePath + "/dist/", "printing library folder content", true);
 				System.out.println(output);
 			}
@@ -604,7 +604,7 @@ public class BaseCppTest implements RuntimeTestSupport {
 		synchronized (runtimeBuiltOnce) {
 			if ( !runtimeBuiltOnce ) {
 				try {
-					String command[] = {"clang++", "--version"};
+					String[] command = {"clang++", "--version"};
 					String output = runCommand(command, tmpdir, "printing compiler version", false);
 					System.out.println("Compiler version is: "+output);
 				}
@@ -624,7 +624,7 @@ public class BaseCppTest implements RuntimeTestSupport {
 		// Create symlink to the runtime. Currently only used on OSX.
 		String libExtension = (getOS().equals("mac")) ? "dylib" : "so";
 		try {
-			String command[] = { "ln", "-s", runtimePath + "/dist/libantlr4-runtime." + libExtension };
+			String[] command = { "ln", "-s", runtimePath + "/dist/libantlr4-runtime." + libExtension };
 			if (runCommand(command, tmpdir, "sym linking C++ runtime", true) == null)
 				return null;
 		}
@@ -983,7 +983,7 @@ public class BaseCppTest implements RuntimeTestSupport {
 		}
 		String[] lines = this.stderrDuringParse.split("\n");
 		String prefix="Exception in thread \"main\" ";
-		return lines[0].substring(prefix.length(),lines[0].length());
+		return lines[0].substring(prefix.length());
 	}
 
 	/**
@@ -1110,8 +1110,7 @@ public class BaseCppTest implements RuntimeTestSupport {
 
 	/** Sort a list */
 	public <T extends Comparable<? super T>> List<T> sort(List<T> data) {
-		List<T> dup = new ArrayList<T>();
-		dup.addAll(data);
+		List<T> dup = new ArrayList<T>(data);
 		Collections.sort(dup);
 		return dup;
 	}
@@ -1119,8 +1118,7 @@ public class BaseCppTest implements RuntimeTestSupport {
 	/** Return map sorted by key */
 	public <K extends Comparable<? super K>,V> LinkedHashMap<K,V> sort(Map<K,V> data) {
 		LinkedHashMap<K,V> dup = new LinkedHashMap<K, V>();
-		List<K> keys = new ArrayList<K>();
-		keys.addAll(data.keySet());
+		List<K> keys = new ArrayList<K>(data.keySet());
 		Collections.sort(keys);
 		for (K k : keys) {
 			dup.put(k, data.get(k));

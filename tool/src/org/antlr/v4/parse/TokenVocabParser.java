@@ -26,6 +26,8 @@ import java.util.regex.Pattern;
 
 /** */
 public class TokenVocabParser {
+	protected static final Pattern tokenDefPattern = Pattern.compile("([^\n]+?)[ \\t]*?=[ \\t]*?([0-9]+)");
+
 	protected final Grammar g;
 
 	public TokenVocabParser(Grammar g) {
@@ -42,7 +44,6 @@ public class TokenVocabParser {
 		Tool tool = g.tool;
 		String vocabName = g.getOptionString("tokenVocab");
 		try {
-			Pattern tokenDefPattern = Pattern.compile("([^\n]+?)[ \\t]*?=[ \\t]*?([0-9]+)");
 			fis = new FileInputStream(fullFile);
 			InputStreamReader isr;
 			if (tool.grammarEncoding != null) {
@@ -62,7 +63,7 @@ public class TokenVocabParser {
 					String tokenTypeS = matcher.group(2);
 					int tokenType;
 					try {
-						tokenType = Integer.valueOf(tokenTypeS);
+						tokenType = Integer.parseInt(tokenTypeS);
 					}
 					catch (NumberFormatException nfe) {
 						tool.errMgr.toolError(ErrorType.TOKENS_FILE_SYNTAX_ERROR,
@@ -149,7 +150,7 @@ public class TokenVocabParser {
 		if ( f.exists() ) {
 			return f;
 		}
-		
+
 		// Still not found? Use the grammar's subfolder then.
 		String fileDirectory;
 

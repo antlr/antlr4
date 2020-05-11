@@ -27,13 +27,13 @@ public interface IntStream {
 	 * The value returned by {@link #LA LA()} when the end of the stream is
 	 * reached.
 	 */
-	public static final int EOF = -1;
+	int EOF = -1;
 
 	/**
 	 * The value returned by {@link #getSourceName} when the actual name of the
 	 * underlying source is not known.
 	 */
-	public static final String UNKNOWN_SOURCE_NAME = "<unknown>";
+	String UNKNOWN_SOURCE_NAME = "<unknown>";
 
 	/**
 	 * Consumes the current symbol in the stream. This method has the following
@@ -212,5 +212,5 @@ public interface IntStream {
 	 * returns {@link #UNKNOWN_SOURCE_NAME}.
 	 */
 
-	public String getSourceName();
+	String getSourceName();
 }

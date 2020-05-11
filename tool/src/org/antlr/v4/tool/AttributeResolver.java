@@ -38,10 +38,10 @@ import org.antlr.v4.tool.ast.ActionAST;
  *  $s::y	Attribute: s is a global scope; y is prop within
  */
 public interface AttributeResolver {
-	public boolean resolvesToListLabel(String x, ActionAST node);
-	public boolean resolvesToLabel(String x, ActionAST node);
-	public boolean resolvesToAttributeDict(String x, ActionAST node);
-	public boolean resolvesToToken(String x, ActionAST node);
-	public Attribute resolveToAttribute(String x, ActionAST node);
-	public Attribute resolveToAttribute(String x, String y, ActionAST node);
+	boolean resolvesToListLabel(String x, ActionAST node);
+	boolean resolvesToLabel(String x, ActionAST node);
+	boolean resolvesToAttributeDict(String x, ActionAST node);
+	boolean resolvesToToken(String x, ActionAST node);
+	Attribute resolveToAttribute(String x, ActionAST node);
+	Attribute resolveToAttribute(String x, String y, ActionAST node);
 }

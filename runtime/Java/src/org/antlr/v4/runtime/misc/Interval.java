@@ -50,7 +50,7 @@ public class Interval {
 
 	@Override
 	public boolean equals(Object o) {
-		if ( o==null || !(o instanceof Interval) ) {
+		if (!(o instanceof Interval)) {
 			return false;
 		}
 		Interval other = (Interval)o;

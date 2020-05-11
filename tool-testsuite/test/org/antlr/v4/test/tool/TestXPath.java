@@ -70,7 +70,7 @@ public class TestXPath extends BaseJavaToolTest {
 										  "ExprLexer", false);
 		assertTrue(ok);
 
-		String xpath[] = {
+		String[] xpath = {
 			"/prog/func",		// all funcs under prog at root
 			"/prog/*",			// all children of prog at root
 			"/*/func",			// all func kids of any root node
@@ -93,7 +93,7 @@ public class TestXPath extends BaseJavaToolTest {
 			"/!*",				// nothing at root
 			"//expr//ID",		// any ID under any expression (tests antlr/antlr4#370)
 		};
-		String expected[] = {
+		String[] expected = {
 			"[func, func]",
 			"[func, func]",
 			"[func, func]",

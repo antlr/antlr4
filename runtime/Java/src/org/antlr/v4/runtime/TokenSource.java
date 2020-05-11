@@ -27,7 +27,7 @@ public interface TokenSource {
 	 * on the characters until you get a good one; errors are not passed through
 	 * to the parser.
 	 */
-	public Token nextToken();
+	Token nextToken();
 
 	/**
 	 * Get the line number for the current position in the input stream. The
@@ -36,7 +36,7 @@ public interface TokenSource {
 	 * @return The line number for the current position in the input stream, or
 	 * 0 if the current token source does not track line numbers.
 	 */
-	public int getLine();
+	int getLine();
 
 	/**
 	 * Get the index into the current line for the current position in the input
@@ -45,7 +45,7 @@ public interface TokenSource {
 	 * @return The line number for the current position in the input stream, or
 	 * -1 if the current token source does not track character positions.
 	 */
-	public int getCharPositionInLine();
+	int getCharPositionInLine();
 
 	/**
 	 * Get the {@link CharStream} from which this token source is currently
@@ -55,14 +55,14 @@ public interface TokenSource {
 	 * the input, or {@code null} if no input stream is available for the token
 	 * source.
 	 */
-	public CharStream getInputStream();
+	CharStream getInputStream();
 
 	/**
 	 * Gets the name of the underlying input source. This method returns a
 	 * non-null, non-empty string. If such a name is not known, this method
 	 * returns {@link IntStream#UNKNOWN_SOURCE_NAME}.
 	 */
-	public String getSourceName();
+	String getSourceName();
 
 	/**
 	 * Set the {@link TokenFactory} this token source should use for creating
@@ -70,7 +70,7 @@ public interface TokenSource {
 	 *
 	 * @param factory The {@link TokenFactory} to use for creating tokens.
 	 */
-	public void setTokenFactory(TokenFactory<?> factory);
+	void setTokenFactory(TokenFactory<?> factory);
 
 	/**
 	 * Gets the {@link TokenFactory} this token source is currently using for
@@ -78,5 +78,5 @@ public interface TokenSource {
 	 *
 	 * @return The {@link TokenFactory} currently used by this token source.
 	 */
-	public TokenFactory<?> getTokenFactory();
+	TokenFactory<?> getTokenFactory();
 }

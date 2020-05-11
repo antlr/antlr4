@@ -204,8 +204,8 @@ public class TreeViewer extends JComponent {
 		FontMetrics m = getFontMetrics(font);
 		int x = (int) box.x + arcSize / 2 + nodeWidthPadding;
 		int y = (int) box.y + m.getAscent() + m.getLeading() + 1 + nodeHeightPadding;
-		for (int i = 0; i < lines.length; i++) {
-			text(g, lines[i], x, y);
+		for (String line : lines) {
+			text(g, line, x, y);
 			y += m.getHeight();
 		}
 	}

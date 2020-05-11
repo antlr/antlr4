@@ -37,7 +37,7 @@ import java.util.Map;
  *  our pattern.
  */
 public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
-	public static enum ASSOC { left, right }
+	public enum ASSOC { left, right }
 
 	public Tool tool;
 	public String ruleName;
@@ -386,7 +386,9 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 
 			// Are there args on a rule?
 			if ( tok.getType()==RULE_REF && i<=tokenStopIndex && tokenStream.get(i).getType()==ARG_ACTION ) {
-				buf.append('['+tokenStream.get(i).getText()+']');
+				buf.append('[')
+						.append(tokenStream.get(i).getText())
+						.append(']');
 				i++;
 			}
 

@@ -39,6 +39,6 @@ public enum ErrorSeverity {
      *
      * @param text The human readable string representing the severity level
      */
-    private ErrorSeverity(String text) { this.text = text; }
+    ErrorSeverity(String text) { this.text = text; }
 }
 

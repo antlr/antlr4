@@ -47,9 +47,8 @@ public class TestCodeGeneration extends BaseJavaToolTest {
 				"a[int xyz] : 'a' ;\n";
 		List<String> evals = getEvalInfoForString(g, "int xyz");
 		System.out.println(evals);
-		for (int i = 0; i < evals.size(); i++) {
-			String eval = evals.get(i);
-			assertFalse("eval should not be POJO: "+eval, eval.startsWith("<pojo:"));
+		for (String eval : evals) {
+			assertFalse("eval should not be POJO: " + eval, eval.startsWith("<pojo:"));
 		}
 	}
 

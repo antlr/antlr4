@@ -49,10 +49,12 @@ public class CppTarget extends Target {
 		super(gen, "Cpp");
 	}
 
+	@Override
 	public String getVersion() {
 		return "4.8";
 	}
 
+	@Override
     public boolean needsHeader() { return true; }
 
 	public Set<String> getBadWords() {

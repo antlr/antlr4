@@ -130,10 +130,10 @@ public class ANTLRInputStream implements CharStream {
 		}
 
 		//System.out.println("prev p="+p+", c="+(char)data[p]);
-        if ( p < n ) {
-            p++;
+        //if ( p < n ) {
+		p++;
 			//System.out.println("p moves to "+p+" (c='"+(char)data[p]+"')");
-        }
+        //}
     }
 
     @Override

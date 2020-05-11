@@ -121,7 +121,7 @@ public class TokenStreamRewriter {
 		public String toString() {
 			String opName = getClass().getName();
 			int $index = opName.indexOf('$');
-			opName = opName.substring($index+1, opName.length());
+			opName = opName.substring($index+1);
 			return "<"+opName+"@"+tokens.get(index)+
 					":\""+text+"\">";
 		}
@@ -534,11 +534,11 @@ public class TokenStreamRewriter {
 			List<? extends InsertBeforeOp> prevInserts = getKindOfOps(rewrites, InsertBeforeOp.class, i);
 			for (InsertBeforeOp prevIop : prevInserts) {
 				if ( prevIop.index==iop.index ) {
-					if ( InsertAfterOp.class.isInstance(prevIop) ) {
+					if (prevIop instanceof InsertAfterOp) {
 						iop.text = catOpText(prevIop.text, iop.text);
 						rewrites.set(prevIop.instructionIndex, null);
 					}
-					else if ( InsertBeforeOp.class.isInstance(prevIop) ) { // combine objects
+					else if (prevIop instanceof InsertBeforeOp) { // combine objects
 						// convert to strings...we're in process of toString'ing
 						// whole token buffer so no lazy eval issue with any templates
 						iop.text = catOpText(iop.text, prevIop.text);
@@ -562,10 +562,10 @@ public class TokenStreamRewriter {
 		}
 		// System.out.println("rewrites after="+rewrites);
 		Map<Integer, RewriteOperation> m = new HashMap<Integer, RewriteOperation>();
-		for (int i = 0; i < rewrites.size(); i++) {
-			RewriteOperation op = rewrites.get(i);
-			if ( op==null ) continue; // ignore deleted ops
-			if ( m.get(op.index)!=null ) {
+		for (RewriteOperation op : rewrites) {
+			if (op == null)
+				continue; // ignore deleted ops
+			if (m.get(op.index) != null) {
 				throw new Error("should only be one op per index");
 			}
 			m.put(op.index, op);

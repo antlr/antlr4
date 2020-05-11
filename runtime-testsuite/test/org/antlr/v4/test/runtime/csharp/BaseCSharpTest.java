@@ -245,8 +245,7 @@ public class BaseCSharpTest implements RuntimeTestSupport {
 	Set<String> sourceFiles = new HashSet<String>();
 
 	private void addSourceFiles(String ... files) {
-		for(String file : files)
-			this.sourceFiles.add(file);
+		this.sourceFiles.addAll(Arrays.asList(files));
 	}
 
 	@Override
@@ -872,7 +871,7 @@ public class BaseCSharpTest implements RuntimeTestSupport {
 		}
 		String[] lines = this.stderrDuringParse.split("\n");
 		String prefix="Exception in thread \"main\" ";
-		return lines[0].substring(prefix.length(),lines[0].length());
+		return lines[0].substring(prefix.length());
 	}
 
 	public List<String> realElements(List<String> elements) {
@@ -893,8 +892,7 @@ public class BaseCSharpTest implements RuntimeTestSupport {
 	/** Return map sorted by key */
 	public <K extends Comparable<? super K>,V> LinkedHashMap<K,V> sort(Map<K,V> data) {
 		LinkedHashMap<K,V> dup = new LinkedHashMap<K, V>();
-		List<K> keys = new ArrayList<K>();
-		keys.addAll(data.keySet());
+		List<K> keys = new ArrayList<K>(data.keySet());
 		Collections.sort(keys);
 		for (K k : keys) {
 			dup.put(k, data.get(k));

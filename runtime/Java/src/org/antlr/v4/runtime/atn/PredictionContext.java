@@ -470,9 +470,8 @@ public abstract class PredictionContext {
 		Map<PredictionContext, PredictionContext> uniqueParents =
 			new HashMap<PredictionContext, PredictionContext>();
 
-		for (int p = 0; p < parents.length; p++) {
-			PredictionContext parent = parents[p];
-			if ( !uniqueParents.containsKey(parent) ) { // don't replace
+		for (PredictionContext parent : parents) {
+			if (!uniqueParents.containsKey(parent)) { // don't replace
 				uniqueParents.put(parent, parent);
 			}
 		}
@@ -529,7 +528,7 @@ public abstract class PredictionContext {
 				buf.append("->");
 				buf.append("s");
 				buf.append(current.getParent(i).id);
-				if ( current.size()>1 ) buf.append(" [label=\"parent["+i+"]\"];\n");
+				if ( current.size()>1 ) buf.append(" [label=\"parent[").append(i).append("]\"];\n");
 				else buf.append(";\n");
 			}
 		}

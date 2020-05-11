@@ -110,14 +110,14 @@ public class GrammarTransformPipeline {
 		if ( tree==null ) return;
 
 		List<GrammarAST> optionsSubTrees = tree.getNodesWithType(ANTLRParser.ELEMENT_OPTIONS);
-		for (int i = 0; i < optionsSubTrees.size(); i++) {
-			GrammarAST t = optionsSubTrees.get(i);
+		for (GrammarAST t : optionsSubTrees) {
 			CommonTree elWithOpt = t.parent;
-			if ( elWithOpt instanceof GrammarASTWithOptions ) {
+			if (elWithOpt instanceof GrammarASTWithOptions) {
 				Map<String, GrammarAST> options = ((GrammarASTWithOptions) elWithOpt).getOptions();
-				if ( options.containsKey(LeftRecursiveRuleTransformer.TOKENINDEX_OPTION_NAME) ) {
+				if (options.containsKey(LeftRecursiveRuleTransformer.TOKENINDEX_OPTION_NAME)) {
 					GrammarToken newTok = new GrammarToken(g, elWithOpt.getToken());
-					newTok.originalTokenIndex = Integer.valueOf(options.get(LeftRecursiveRuleTransformer.TOKENINDEX_OPTION_NAME).getText());
+					newTok.originalTokenIndex =
+							Integer.parseInt(options.get(LeftRecursiveRuleTransformer.TOKENINDEX_OPTION_NAME).getText());
 					elWithOpt.token = newTok;
 
 					GrammarAST originalNode = g.ast.getNodeWithTokenIndex(newTok.getTokenIndex());
@@ -126,8 +126,7 @@ public class GrammarTransformPipeline {
 						// of the corresponding node in the original parse tree.
 						elWithOpt.setTokenStartIndex(originalNode.getTokenStartIndex());
 						elWithOpt.setTokenStopIndex(originalNode.getTokenStopIndex());
-					}
-					else {
+					} else {
 						// the original AST node could not be located by index;
 						// make sure to assign valid values for the start/stop
 						// index so toTokenString will not throw exceptions.
@@ -276,7 +275,7 @@ public class GrammarTransformPipeline {
 			}
 
 			// COPY MODES
-			// The strategy is to copy all the mode sections rules across to any 
+			// The strategy is to copy all the mode sections rules across to any
 			// mode section in the new grammar with the same name or a new
 			// mode section if no matching mode is resolved. Rules which are
 			// already in the new grammar are ignored for copy. If the mode
@@ -311,7 +310,7 @@ public class GrammarTransformPipeline {
 						    destinationAST.addChild(r);
 							addedRules++;
 						    rootRuleNames.add(ruleName);
-					    }                        
+					    }
 					}
 					if (!rootAlreadyHasMode && addedRules > 0) {
 						rootGrammar.ast.addChild(destinationAST);
@@ -420,7 +419,7 @@ public class GrammarTransformPipeline {
 		for (GrammarAST e : elements) {
 			if ( e.getType()==ANTLRParser.AT ) {
 				lexerAST.addChild((Tree)adaptor.dupTree(e));
-				if ( e.getChild(0).getText().equals("lexer") ) {
+				if ( "lexer".equals(e.getChild(0).getText()) ) {
 					actionsWeMoved.add(e);
 				}
 			}

@@ -50,11 +50,10 @@ public class Utils {
 	}
 
 	public static String sortLinesInString(String s) {
-		String lines[] = s.split("\n");
+		String[] lines = s.split("\n");
 		Arrays.sort(lines);
-		List<String> linesL = Arrays.asList(lines);
 		StringBuilder buf = new StringBuilder();
-		for (String l : linesL) {
+		for (String l : lines) {
 			buf.append(l);
 			buf.append('\n');
 		}

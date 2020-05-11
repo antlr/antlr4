@@ -160,14 +160,14 @@ public class BuildDependencyGenerator {
 
 	public File getOutputFile(String fileName) {
 		File outputDir = tool.getOutputDirectory(g.fileName);
-		if ( outputDir.toString().equals(".") ) {
+		if ( ".".equals(outputDir.toString()) ) {
 			// pay attention to -o then
 			outputDir = tool.getOutputDirectory(fileName);
 		}
-		if ( outputDir.toString().equals(".") ) {
+		if ( ".".equals(outputDir.toString()) ) {
 			return new File(fileName);
 		}
-		if (outputDir.getName().equals(".")) {
+		if (".".equals(outputDir.getName())) {
 			String fname = outputDir.toString();
 			int dot = fname.lastIndexOf('.');
 			outputDir = new File(outputDir.toString().substring(0,dot));
@@ -221,7 +221,7 @@ public class BuildDependencyGenerator {
 			String fileName =
 				tokenVocab + CodeGenerator.VOCAB_FILE_EXTENSION;
 			File vocabFile;
-			if ( tool.libDirectory.equals(".") ) {
+			if ( ".".equals(tool.libDirectory) ) {
 				vocabFile = new File(fileName);
 			}
 			else {
@@ -253,7 +253,7 @@ public class BuildDependencyGenerator {
     }
 
     public String groomQualifiedFileName(String outputDir, String fileName) {
-        if (outputDir.equals(".")) {
+        if (".".equals(outputDir)) {
             return fileName;
         }
 		else if (outputDir.indexOf(' ') >= 0) { // has spaces?

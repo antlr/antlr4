@@ -61,7 +61,7 @@ public class ErrorManager {
 		}
 		if (msg.fileName != null) {
 			String displayFileName = msg.fileName;
-			if (format.equals("antlr")) {
+			if ("antlr".equals(format.toString())) {
 				// Don't show path to file in messages in ANTLR format;
 				// they're too long.
 				File f = new File(msg.fileName);
@@ -106,7 +106,7 @@ public class ErrorManager {
         return format.getInstanceOf("message");
     }
     public boolean formatWantsSingleLineMessage() {
-        return format.getInstanceOf("wantsSingleLineMessage").render().equals("true");
+        return "true".equals(format.getInstanceOf("wantsSingleLineMessage").render());
     }
 
 	public void info(String msg) { tool.info(msg); }
@@ -193,15 +193,13 @@ public class ErrorManager {
 	public void emit(ErrorType etype, ANTLRMessage msg) {
 		switch ( etype.severity ) {
 			case WARNING_ONE_OFF:
+			case ERROR_ONE_OFF:
 				if ( errorTypes.contains(etype) ) break;
 				// fall thru
 			case WARNING:
 				warnings++;
 				tool.warning(msg);
 				break;
-			case ERROR_ONE_OFF:
-				if ( errorTypes.contains(etype) ) break;
-				// fall thru
 			case ERROR:
 				errors++;
 				tool.error(msg);
@@ -222,7 +220,7 @@ public class ErrorManager {
             cl = ErrorManager.class.getClassLoader();
             url = cl.getResource(fileName);
         }
-        if ( url==null && formatName.equals("antlr") ) {
+        if ( url==null && "antlr".equals(formatName) ) {
             rawError("ANTLR installation corrupted; cannot find ANTLR messages format file "+fileName);
             panic();
         }
@@ -241,7 +239,7 @@ public class ErrorManager {
         }
 
         boolean formatOK = verifyFormat();
-        if ( !formatOK && formatName.equals("antlr") ) {
+        if ( !formatOK && "antlr".equals(formatName) ) {
             rawError("ANTLR installation corrupted; ANTLR messages format file "+formatName+".stg incomplete");
             panic();
         }

@@ -76,39 +76,42 @@ public class TestRig {
 				inputFiles.add(arg);
 				continue;
 			}
-			if ( arg.equals("-tree") ) {
+			if ( "-tree".equals(arg) ) {
 				printTree = true;
 			}
-			if ( arg.equals("-gui") ) {
+			if ( "-gui".equals(arg) ) {
 				gui = true;
 			}
-			if ( arg.equals("-tokens") ) {
-				showTokens = true;
-			}
-			else if ( arg.equals("-trace") ) {
-				trace = true;
-			}
-			else if ( arg.equals("-SLL") ) {
-				SLL = true;
-			}
-			else if ( arg.equals("-diagnostics") ) {
-				diagnostics = true;
-			}
-			else if ( arg.equals("-encoding") ) {
-				if ( i>=args.length ) {
-					System.err.println("missing encoding on -encoding");
-					return;
-				}
-				encoding = args[i];
-				i++;
-			}
-			else if ( arg.equals("-ps") ) {
-				if ( i>=args.length ) {
-					System.err.println("missing filename on -ps");
-					return;
-				}
-				psFile = args[i];
-				i++;
+			switch (arg) {
+				case "-tokens":
+					showTokens = true;
+					break;
+				case "-trace":
+					trace = true;
+					break;
+				case "-SLL":
+					SLL = true;
+					break;
+				case "-diagnostics":
+					diagnostics = true;
+					break;
+				case "-encoding":
+					if (i >= args.length) {
+						System.err.println("missing encoding on -encoding");
+						return;
+					}
+					encoding = args[i];
+					i++;
+					break;
+				case "-ps":
+					if (i >= args.length) {
+						System.err.println("missing filename on -ps");
+						return;
+					}
+					psFile = args[i];
+					i++;
+					break;
+				default:
 			}
 		}
 	}

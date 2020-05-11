@@ -421,12 +421,10 @@ public class SwiftTarget extends Target {
                         arg3 = at.isCtxDependent ? 1 : 0 ;
                         break;
                     case Transition.SET :
-                        arg1 = setIndices.get(((SetTransition)t).set);
+					case Transition.NOT_SET :
+						arg1 = setIndices.get(((SetTransition)t).set);
                         break;
-                    case Transition.NOT_SET :
-                        arg1 = setIndices.get(((SetTransition)t).set);
-                        break;
-                    case Transition.WILDCARD :
+					case Transition.WILDCARD :
                         break;
                 }
                 transitionBuilder.add("src",src);
@@ -487,31 +485,21 @@ public class SwiftTarget extends Target {
 
 
                     case MORE:
+					case POP_MODE:
 
-                        lexerActionBuilder.add("a",0);
+					case SKIP:
+						lexerActionBuilder.add("a",0);
                         lexerActionBuilder.add("b",0);
                         break;
 
-                    case POP_MODE:
-                        lexerActionBuilder.add("a",0);
-                        lexerActionBuilder.add("b",0);
-                        break;
-
-                    case PUSH_MODE:
+					case PUSH_MODE:
                         mode = ((LexerPushModeAction)action).getMode();
-
                         lexerActionBuilder.add("a",mode);
                         lexerActionBuilder.add("b",0);
                         break;
 
-                    case SKIP:
-                        lexerActionBuilder.add("a",0);
-                        lexerActionBuilder.add("b",0);
-                        break;
-
-                    case TYPE:
+					case TYPE:
                         int type = ((LexerTypeAction)action).getType();
-
                         lexerActionBuilder.add("a",type);
                         lexerActionBuilder.add("b",0);
                         break;

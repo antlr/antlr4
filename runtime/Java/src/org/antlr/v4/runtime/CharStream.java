@@ -26,5 +26,5 @@ public interface CharStream extends IntStream {
 	 * @throws UnsupportedOperationException if the stream does not support
 	 * getting the text of the specified interval
 	 */
-	public String getText(Interval interval);
+	String getText(Interval interval);
 }

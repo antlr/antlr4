@@ -111,7 +111,7 @@ public abstract class BaseRuntimeTest {
 	public void testOne() throws Exception {
 		// System.out.println(delegate.getTmpDir());
 		if ( descriptor.ignore(descriptor.getTarget()) ) {
-			System.out.printf("Ignore "+descriptor);
+			System.out.print("Ignore " + descriptor);
 			return;
 		}
 

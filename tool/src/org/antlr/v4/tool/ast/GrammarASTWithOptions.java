@@ -28,7 +28,7 @@ public abstract class GrammarASTWithOptions extends GrammarAST {
     public GrammarASTWithOptions(int type, Token t, String text) { super(type,t,text); }
 
     public void setOption(String key, GrammarAST node) {
-        if ( options==null ) options = new HashMap<String, GrammarAST>();
+        if ( options==null ) options = new HashMap<String, GrammarAST>(1);
         options.put(key, node);
     }
 

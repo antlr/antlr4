@@ -307,7 +307,7 @@ public class Rule implements AttributeResolver {
 	public boolean isFragment() {
 		if ( modifiers==null ) return false;
 		for (GrammarAST a : modifiers) {
-			if ( a.getText().equals("fragment") ) return true;
+			if ( "fragment".equals(a.getText()) ) return true;
 		}
 		return false;
 	}

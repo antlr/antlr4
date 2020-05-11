@@ -1048,7 +1048,7 @@ public class BaseJavaTest implements RuntimeTestSupport {
 		}
 		String[] lines = this.stderrDuringParse.split("\n");
 		String prefix="Exception in thread \"main\" ";
-		return lines[0].substring(prefix.length(),lines[0].length());
+		return lines[0].substring(prefix.length());
 	}
 
     /**
@@ -1179,8 +1179,7 @@ public class BaseJavaTest implements RuntimeTestSupport {
 
 	/** Sort a list */
 	public <T extends Comparable<? super T>> List<T> sort(List<T> data) {
-		List<T> dup = new ArrayList<T>();
-		dup.addAll(data);
+		List<T> dup = new ArrayList<T>(data);
 		Collections.sort(dup);
 		return dup;
 	}
@@ -1188,8 +1187,7 @@ public class BaseJavaTest implements RuntimeTestSupport {
 	/** Return map sorted by key */
 	public <K extends Comparable<? super K>,V> LinkedHashMap<K,V> sort(Map<K,V> data) {
 		LinkedHashMap<K,V> dup = new LinkedHashMap<K, V>();
-		List<K> keys = new ArrayList<K>();
-		keys.addAll(data.keySet());
+		List<K> keys = new ArrayList<K>(data.keySet());
 		Collections.sort(keys);
 		for (K k : keys) {
 			dup.put(k, data.get(k));

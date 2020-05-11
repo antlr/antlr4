@@ -115,9 +115,13 @@ public class LeftRecursiveRule extends Rule {
 	/** Get -&gt; labels from those alts we deleted for left-recursive rules. */
 	@Override
 	public Map<String, List<Pair<Integer, AltAST>>> getAltLabels() {
-		Map<String, List<Pair<Integer, AltAST>>> labels = new HashMap<String, List<Pair<Integer, AltAST>>>();
 		Map<String, List<Pair<Integer, AltAST>>> normalAltLabels = super.getAltLabels();
-		if ( normalAltLabels!=null ) labels.putAll(normalAltLabels);
+		Map<String, List<Pair<Integer, AltAST>>> labels;
+		if ( normalAltLabels!=null ) {
+			labels = new HashMap<String, List<Pair<Integer, AltAST>>>(normalAltLabels);
+		} else {
+			labels = new HashMap<String, List<Pair<Integer, AltAST>>>();
+		}
 		if ( recPrimaryAlts!=null ) {
 			for (LeftRecursiveRuleAltInfo altInfo : recPrimaryAlts) {
 				if (altInfo.altLabel != null) {

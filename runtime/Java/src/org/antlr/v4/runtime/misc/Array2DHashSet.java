@@ -93,7 +93,7 @@ public class Array2DHashSet<T> implements Set<T> {
 	}
 
 	public T get(T o) {
-		if ( o==null ) return o;
+		if ( o==null ) return null;
 		int b = getBucket(o);
 		T[] bucket = buckets[b];
 		if ( bucket==null ) return null; // no bucket
