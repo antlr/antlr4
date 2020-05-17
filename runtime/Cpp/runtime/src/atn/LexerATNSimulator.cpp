@@ -360,8 +360,7 @@ bool LexerATNSimulator::closure(CharStream *input, const Ref<LexerATNConfig> &co
   }
 
   ATNState *p = config->state;
-  for (size_t i = 0; i < p->transitions.size(); i++) {
-    Transition *t = p->transitions[i];
+  for (Transition* t: p->transitions) {
     Ref<LexerATNConfig> c = getEpsilonTarget(input, config, t, configs, speculative, treatEofAsEpsilon);
     if (c != nullptr) {
       currentAltReachedAcceptState = closure(input, c, configs, currentAltReachedAcceptState, speculative, treatEofAsEpsilon);
@@ -374,13 +373,11 @@ bool LexerATNSimulator::closure(CharStream *input, const Ref<LexerATNConfig> &co
 Ref<LexerATNConfig> LexerATNSimulator::getEpsilonTarget(CharStream *input, const Ref<LexerATNConfig> &config, Transition *t,
   ATNConfigSet *configs, bool speculative, bool treatEofAsEpsilon) {
 
-  Ref<LexerATNConfig> c = nullptr;
   switch (t->getSerializationType()) {
     case Transition::RULE: {
       RuleTransition *ruleTransition = static_cast<RuleTransition*>(t);
       Ref<PredictionContext> newContext = SingletonPredictionContext::create(config->context, ruleTransition->followState->stateNumber);
-      c = std::make_shared<LexerATNConfig>(config, t->target, newContext);
-      break;
+      return std::make_shared<LexerATNConfig>(config, t->target, newContext);
     }
 
     case Transition::PRECEDENCE:
@@ -413,7 +410,7 @@ Ref<LexerATNConfig> LexerATNSimulator::getEpsilonTarget(CharStream *input, const
 
       configs->hasSemanticContext = true;
       if (evaluatePredicate(input, pt->ruleIndex, pt->predIndex, speculative)) {
-        c = std::make_shared<LexerATNConfig>(config, t->target);
+        return std::make_shared<LexerATNConfig>(config, t->target);
       }
       break;
     }
@@ -434,26 +431,22 @@ Ref<LexerATNConfig> LexerATNSimulator::getEpsilonTarget(CharStream *input, const
         // the split operation.
         Ref<LexerActionExecutor> lexerActionExecutor = LexerActionExecutor::append(config->getLexerActionExecutor(),
           atn.lexerActions[static_cast<ActionTransition *>(t)->actionIndex]);
-        c = std::make_shared<LexerATNConfig>(config, t->target, lexerActionExecutor);
-        break;
+        return std::make_shared<LexerATNConfig>(config, t->target, lexerActionExecutor);
       }
       else {
         // ignore actions in referenced rules
-        c = std::make_shared<LexerATNConfig>(config, t->target);
-        break;
+        return std::make_shared<LexerATNConfig>(config, t->target);
       }
 
     case Transition::EPSILON:
-      c = std::make_shared<LexerATNConfig>(config, t->target);
-      break;
+      return std::make_shared<LexerATNConfig>(config, t->target);
 
     case Transition::ATOM:
     case Transition::RANGE:
     case Transition::SET:
       if (treatEofAsEpsilon) {
         if (t->matches(Token::EOF, Lexer::MIN_CHAR_VALUE, Lexer::MAX_CHAR_VALUE)) {
-          c = std::make_shared<LexerATNConfig>(config, t->target);
-          break;
+          return std::make_shared<LexerATNConfig>(config, t->target);
         }
       }
 
@@ -463,7 +456,7 @@ Ref<LexerATNConfig> LexerATNSimulator::getEpsilonTarget(CharStream *input, const
       break;
   }
 
-  return c;
+  return nullptr;
 }
 
 bool LexerATNSimulator::evaluatePredicate(CharStream *input, size_t ruleIndex, size_t predIndex, bool speculative) {
