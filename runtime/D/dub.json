@@ -1,0 +1,22 @@
+{
+    "name": "antlr-d",
+    "license": "BSD",
+    "copyright": "Copyright (c) 2012-2019 The ANTLR Project. All rights reserved.",
+    "description": "ANTLR4 runtime library",
+    "dependencies": {
+    },
+    "authors": [
+    "Egbert Voigt <Egbert.Voigt@funkwerk-itk.com>"
+    ],
+
+    "configurations":
+    [
+    {
+        "name": "antlr4_library",
+            "sourcePaths": ["."],
+            "targetName": "antlr-d",
+            "targetPath": "lib",
+            "targetType": "dynamicLibrary"
+    }
+    ]
+}
