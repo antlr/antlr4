@@ -188,17 +188,20 @@ walker.walk(new this.LeafListener(), <s>);
 
 TreeNodeWithAltNumField(X) ::= <<
 @parser::header {
-MyRuleNode = function(parent, invokingState) {
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+class MyRuleNode extends antlr4.ParserRuleContext {
+    constructor(parent, invokingState) {
+        super(parent, invokingState);
+        this.altNum = 0;
+    }
 
-	this.altNum = 0;
-	return this;
+    getAltNumber() {
+        return this.altNum;
+    }
+
+    setAltNumber(altNumber){
+        this.altNum = altNumber;
+    }
 };
-
-MyRuleNode.prototype = Object.create(antlr4.ParserRuleContext.prototype);
-MyRuleNode.prototype.constructor = MyRuleNode;
-MyRuleNode.prototype.getAltNumber = function() { return this.altNum; }
-MyRuleNode.prototype.setAltNumber = function(altNumber) { this.altNum = altNumber; }
 
 }
 >>

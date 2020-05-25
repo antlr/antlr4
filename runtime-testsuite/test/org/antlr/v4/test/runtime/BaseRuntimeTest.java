@@ -51,11 +51,8 @@ public abstract class BaseRuntimeTest {
 		"CSharp",
 		"Python2", "Python3",
 		"PHP",
-		"Node", "Safari", "Firefox", "Explorer", "Chrome",
+		"Node",
 		"Dart"
-	};
-	public final static String[] JavaScriptTargets = {
-		"Node", "Safari", "Firefox", "Explorer", "Chrome"
 	};
 
 	static {

@@ -48,8 +48,7 @@ namespace Antlr4.Runtime
                 System.Diagnostics.Debug.Assert(LA(1) == IntStreamConstants.EOF);
                 throw new InvalidOperationException("cannot consume EOF");
             }
-            //System.out.println("prev p="+p+", c="+(char)data[p]);
-            if (p < n)
+            else
             {
                 p++;
             }
