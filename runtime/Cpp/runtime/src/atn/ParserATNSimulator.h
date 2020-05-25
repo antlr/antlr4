@@ -898,10 +898,12 @@ namespace atn {
     static bool getLrLoopSetting();
     void InitializeInstanceFields();
 
+    static sbit::UnsynchronizedObjectPool<ATNConfig> _configPool;
+
     template< class... Args >
     ATNConfig::Ptr makeConfig(Args&&... args)
     {
-        return std::make_shared<ATNConfig>(std::forward<Args>(args)...);
+        return _configPool.create(std::forward<Args>(args)...);
     }
   };
 

@@ -103,6 +103,8 @@ namespace atn {
   protected:
     virtual void _LOOK(ATNState *s, ATNState *stopState, PredictionContext::Ptr const& ctx, misc::IntervalSet &look,
       ATNConfig::Set &lookBusy, antlrcpp::BitSet &calledRuleStack, bool seeThruPreds, bool addEOF) const;
+
+    static sbit::UnsynchronizedObjectPool<ATNConfig> _configPool;
   };
 
 } // namespace atn

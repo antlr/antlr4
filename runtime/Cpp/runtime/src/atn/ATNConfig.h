@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "atn/usop.h"
+
 namespace antlr4 {
 namespace atn {
 
@@ -19,18 +21,18 @@ namespace atn {
   class ANTLR4CPP_PUBLIC ATNConfig {
   public:
 
-    using Ptr = std::shared_ptr<ATNConfig>;
+    using Ptr = sbit::PooledPointer<ATNConfig>;
 
     struct Hasher
     {
-      size_t operator()(ATNConfig const& k) const {
-        return k.hashCode();
+      size_t operator()(ATNConfig::Ptr const& k) const {
+        return k->hashCode();
       }
     };
 
     struct Comparer {
-      bool operator()(ATNConfig const& lhs, ATNConfig const& rhs) const {
-        return (&lhs == &rhs) || (lhs == rhs);
+      bool operator()(ATNConfig::Ptr const& lhs, ATNConfig::Ptr const& rhs) const {
+        return (lhs == rhs);
       }
     };
 

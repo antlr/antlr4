@@ -205,10 +205,12 @@ namespace atn {
   private:
     void InitializeInstanceFields();
 
+    static sbit::UnsynchronizedObjectPool<LexerATNConfig> _configPool;
+
     template< class... Args >
     LexerATNConfig::Ptr makeConfig(Args&&... args)
     {
-        return std::make_shared<LexerATNConfig>(std::forward<Args>(args)...);
+        return _configPool.create(std::forward<Args>(args)...);
     }
   };
 

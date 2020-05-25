@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "atn/usop.h"
 #include "support/BitSet.h"
 
 namespace antlr4 {
@@ -430,6 +431,9 @@ namespace atn {
     static bool hasStateAssociatedWithOneAlt(ATNConfigSet *configs);
 
     static size_t getSingleViableAlt(const std::vector<antlrcpp::BitSet> &altsets);
+
+    static sbit::UnsynchronizedObjectPool<ATNConfig> _configPool;
+
   };
 
 } // namespace atn

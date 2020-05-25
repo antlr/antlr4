@@ -73,7 +73,7 @@ void LL1Analyzer::_LOOK(ATNState *s, ATNState *stopState, PredictionContext::Ptr
   ATNConfig::Set &lookBusy, antlrcpp::BitSet &calledRuleStack, bool seeThruPreds, bool addEOF) const {
 
   {
-    auto c = std::make_shared<ATNConfig>(s, 0, ctx);
+    auto c = _configPool.create(s, 0, ctx);
 
     if (lookBusy.count(c) > 0) // Keep in mind comparison is based on members of the class, not the actual instance.
       return;
@@ -158,3 +158,5 @@ void LL1Analyzer::_LOOK(ATNState *s, ATNState *stopState, PredictionContext::Ptr
     }
   }
 }
+
+sbit::UnsynchronizedObjectPool<ATNConfig> LL1Analyzer::_configPool{/* size = */ 4096};

@@ -887,7 +887,7 @@ void ParserATNSimulator::closure_(ATNConfig::Ptr const& config, ATNConfigSet *co
     Transition *t = p->transitions[i];
     bool continueCollecting = !is<ActionTransition*>(t) && collectPredicates;
     ATNConfig::Ptr c = getEpsilonTarget(config, t, continueCollecting, depth == 0, fullCtx, treatEofAsEpsilon);
-    if (c != nullptr) {
+    if (c.get() != nullptr) {
       int newDepth = depth;
       if (is<RuleStopState*>(config->state)) {
         assert(!fullCtx);
@@ -1065,10 +1065,10 @@ ATNConfig::Ptr ParserATNSimulator::getEpsilonTarget(ATNConfig::Ptr const& config
         }
       }
 
-      return nullptr;
+      return ATNConfig::Ptr{};
 
     default:
-      return nullptr;
+      return ATNConfig::Ptr{};
   }
 }
 
@@ -1362,3 +1362,5 @@ void ParserATNSimulator::InitializeInstanceFields() {
   _mode = PredictionMode::LL;
   _startIndex = 0;
 }
+
+sbit::UnsynchronizedObjectPool<ATNConfig> ParserATNSimulator::_configPool{/* size = */ 4096};

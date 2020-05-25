@@ -243,7 +243,7 @@ void LexerATNSimulator::getReachableConfigSet(CharStream *input, ATNConfigSet *c
 
   for (auto& c : closure_->configs) {
     bool currentAltReachedAcceptState = c->alt == skipAlt;
-    if (currentAltReachedAcceptState && (std::static_pointer_cast<LexerATNConfig>(c))->hasPassedThroughNonGreedyDecision()) {
+    if (currentAltReachedAcceptState && (sbit::static_pointer_cast<LexerATNConfig>(c))->hasPassedThroughNonGreedyDecision()) {
       continue;
     }
 
@@ -256,13 +256,13 @@ void LexerATNSimulator::getReachableConfigSet(CharStream *input, ATNConfigSet *c
       Transition *trans = c->state->transitions[ti];
       ATNState *target = getReachableTarget(trans, (int)t);
       if (target != nullptr) {
-        Ref<LexerActionExecutor> lexerActionExecutor = std::static_pointer_cast<LexerATNConfig>(c)->getLexerActionExecutor();
+        Ref<LexerActionExecutor> lexerActionExecutor = sbit::static_pointer_cast<LexerATNConfig>(c)->getLexerActionExecutor();
         if (lexerActionExecutor != nullptr) {
           lexerActionExecutor = lexerActionExecutor->fixOffsetBeforeMatch((int)input->index() - (int)_startIndex);
         }
 
         bool treatEofAsEpsilon = t == Token::EOF;
-        auto config = makeConfig(std::static_pointer_cast<LexerATNConfig>(c),
+        auto config = makeConfig(sbit::static_pointer_cast<LexerATNConfig>(c),
           target, lexerActionExecutor);
 
         if (closure(input, config, reach, currentAltReachedAcceptState, true, treatEofAsEpsilon)) {
@@ -363,7 +363,7 @@ bool LexerATNSimulator::closure(CharStream *input, const LexerATNConfig::Ptr &co
   for (size_t i = 0; i < p->transitions.size(); i++) {
     Transition *t = p->transitions[i];
     LexerATNConfig::Ptr c = getEpsilonTarget(input, config, t, configs, speculative, treatEofAsEpsilon);
-    if (c != nullptr) {
+    if (c.get() != nullptr) {
       currentAltReachedAcceptState = closure(input, c, configs, currentAltReachedAcceptState, speculative, treatEofAsEpsilon);
     }
   }
@@ -541,7 +541,7 @@ dfa::DFAState *LexerATNSimulator::addDFAState(ATNConfigSet *configs) {
   assert(!configs->hasSemanticContext);
 
   dfa::DFAState *proposed = new dfa::DFAState(std::unique_ptr<ATNConfigSet>(configs)); /* mem-check: managed by the DFA or deleted below */
-  ATNConfig::Ptr firstConfigWithRuleStopState = nullptr;
+  ATNConfig::Ptr firstConfigWithRuleStopState;
   for (auto &c : configs->configs) {
     if (is<RuleStopState *>(c->state)) {
       firstConfigWithRuleStopState = c;
@@ -549,9 +549,9 @@ dfa::DFAState *LexerATNSimulator::addDFAState(ATNConfigSet *configs) {
     }
   }
 
-  if (firstConfigWithRuleStopState != nullptr) {
+  if (firstConfigWithRuleStopState.get() != nullptr) {
     proposed->isAcceptState = true;
-    proposed->lexerActionExecutor = std::dynamic_pointer_cast<LexerATNConfig>(firstConfigWithRuleStopState)->getLexerActionExecutor();
+    proposed->lexerActionExecutor = sbit::static_pointer_cast<LexerATNConfig>(firstConfigWithRuleStopState)->getLexerActionExecutor();
     proposed->prediction = atn.ruleToTokenType[firstConfigWithRuleStopState->state->ruleIndex];
   }
 
@@ -625,3 +625,5 @@ void LexerATNSimulator::InitializeInstanceFields() {
   _charPositionInLine = 0;
   _mode = antlr4::Lexer::DEFAULT_MODE;
 }
+
+sbit::UnsynchronizedObjectPool<LexerATNConfig> LexerATNSimulator::_configPool{/* size = */ 4096};

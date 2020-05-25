@@ -39,6 +39,8 @@ struct AltAndContextConfigComparer {
   }
 };
 
+sbit::UnsynchronizedObjectPool<ATNConfig> PredictionModeClass::_configPool{/* size = */ 4096};
+
 bool PredictionModeClass::hasSLLConflictTerminatingPrediction(PredictionMode mode, ATNConfigSet *configs) {
   /* Configs in rule stop states indicate reaching the end of the decision
    * rule (local context) or end of start rule (full context). If all
@@ -62,7 +64,7 @@ bool PredictionModeClass::hasSLLConflictTerminatingPrediction(PredictionMode mod
     // dup configs, tossing out semantic predicates
     ATNConfigSet dup(true);
     for (auto &config : configs->configs) {
-      dup.add(std::make_shared<ATNConfig>(config, SemanticContext::NONE)); // TODO(florin) use local pool
+      dup.add(_configPool.create(config, SemanticContext::NONE));
     }
     std::vector<antlrcpp::BitSet> altsets = getConflictingAltSubsets(&dup);
     heuristic = hasConflictingAltSet(altsets) && !hasStateAssociatedWithOneAlt(&dup);

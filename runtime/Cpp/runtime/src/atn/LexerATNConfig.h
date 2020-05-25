@@ -12,7 +12,7 @@ namespace atn {
 
   class ANTLR4CPP_PUBLIC LexerATNConfig : public ATNConfig {
   public:
-    using Ptr = std::shared_ptr<LexerATNConfig>;
+    using Ptr = sbit::PooledPointer<LexerATNConfig>;
 
     LexerATNConfig(ATNState *state, int alt, PredictionContext::Ptr const& context);
     LexerATNConfig(ATNState *state, int alt, PredictionContext::Ptr const& context, Ref<LexerActionExecutor> const& lexerActionExecutor);
