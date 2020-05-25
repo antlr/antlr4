@@ -62,8 +62,7 @@ bool PredictionModeClass::hasSLLConflictTerminatingPrediction(PredictionMode mod
     // dup configs, tossing out semantic predicates
     ATNConfigSet dup(true);
     for (auto &config : configs->configs) {
-      Ref<ATNConfig> c = std::make_shared<ATNConfig>(config, SemanticContext::NONE);
-      dup.add(c);
+      dup.add(std::make_shared<ATNConfig>(config, SemanticContext::NONE)); // TODO(florin) use local pool
     }
     std::vector<antlrcpp::BitSet> altsets = getConflictingAltSubsets(&dup);
     heuristic = hasConflictingAltSet(altsets) && !hasStateAssociatedWithOneAlt(&dup);

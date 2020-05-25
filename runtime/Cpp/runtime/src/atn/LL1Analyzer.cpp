@@ -72,12 +72,14 @@ misc::IntervalSet LL1Analyzer::LOOK(ATNState *s, ATNState *stopState, RuleContex
 void LL1Analyzer::_LOOK(ATNState *s, ATNState *stopState, Ref<PredictionContext> const& ctx, misc::IntervalSet &look,
   ATNConfig::Set &lookBusy, antlrcpp::BitSet &calledRuleStack, bool seeThruPreds, bool addEOF) const {
 
-  Ref<ATNConfig> c = std::make_shared<ATNConfig>(s, 0, ctx);
+  {
+    auto c = std::make_shared<ATNConfig>(s, 0, ctx);
 
-  if (lookBusy.count(c) > 0) // Keep in mind comparison is based on members of the class, not the actual instance.
-    return;
+    if (lookBusy.count(c) > 0) // Keep in mind comparison is based on members of the class, not the actual instance.
+      return;
 
-  lookBusy.insert(c);
+    lookBusy.insert(c);
+  }
 
   // ml: s can never be null, hence no need to check if stopState is != null.
   if (s == stopState) {

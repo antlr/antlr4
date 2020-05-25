@@ -897,6 +897,12 @@ namespace atn {
 
     static bool getLrLoopSetting();
     void InitializeInstanceFields();
+
+    template< class... Args >
+    Ref<ATNConfig> makeConfig(Args&&... args)
+    {
+        return std::make_shared<ATNConfig>(std::forward<Args>(args)...);
+    }
   };
 
 } // namespace atn
