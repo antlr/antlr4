@@ -610,8 +610,8 @@ public class BaseDartTest implements RuntimeTestSupport {
 					className + ".dart", new File(tmpdir, "input").getAbsolutePath()
 				};
 			}
-			String cmdLine = Utils.join(args, " ");
-			System.err.println("execParser: " + cmdLine);
+			//String cmdLine = Utils.join(args, " ");
+			//System.err.println("execParser: " + cmdLine);
 			Process process =
 				Runtime.getRuntime().exec(args, null, new File(tmpdir));
 			StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
@@ -639,15 +639,27 @@ public class BaseDartTest implements RuntimeTestSupport {
 	private String locateTool(String tool) {
 		final String dartPath = System.getProperty("DART_PATH");
 
-		if (dartPath != null && new File(dartPath + tool).exists()) {
-			return dartPath + tool;
+		final String[] tools = isWindows()
+				? new String[]{tool + ".exe", tool + ".bat", tool}
+				: new String[]{tool};
+
+		if (dartPath != null) {
+			for (String t : tools) {
+				if (new File(dartPath + t).exists()) {
+					return dartPath + t;
+				}
+			}
 		}
 
-		String[] roots = {"/usr/local/bin/", "/opt/local/bin/", "/usr/bin/", "/usr/lib/dart/bin/"};
+		final String[] roots = isWindows()
+				? new String[]{"C:\\tools\\dart-sdk\\bin\\"}
+				: new String[]{"/usr/local/bin/", "/opt/local/bin/", "/usr/bin/", "/usr/lib/dart/bin/"};
 
 		for (String root : roots) {
-			if (new File(root + tool).exists()) {
-				return root + tool;
+			for (String t : tools) {
+				if (new File(root + t).exists()) {
+					return root + t;
+				}
 			}
 		}
 
@@ -909,7 +921,7 @@ public class BaseDartTest implements RuntimeTestSupport {
 				"import '<lexerName>.dart';\n" +
 				"import '<parserName>.dart';\n" +
 				"\n" +
-				"void main(List<String> args) async {\n" +
+				"void main(List\\<String> args) async {\n" +
 				"  CharStream input = await InputStream.fromPath(args[0]);\n" +
 				"  <lexerName> lex = new <lexerName>(input);\n" +
 				"  CommonTokenStream tokens = new CommonTokenStream(lex);\n" +
@@ -968,7 +980,7 @@ public class BaseDartTest implements RuntimeTestSupport {
 				"\n" +
 				"import '<lexerName>.dart';\n" +
 				"\n" +
-				"void main(List<String> args) async {\n" +
+				"void main(List\\<String> args) async {\n" +
 				"  CharStream input = await InputStream.fromPath(args[0]);\n" +
 				"  <lexerName> lex = new <lexerName>(input);\n" +
 				"  CommonTokenStream tokens = new CommonTokenStream(lex);\n" +

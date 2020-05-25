@@ -1051,15 +1051,10 @@ public class LexerExecDescriptors {
 				grammar = new String(Files.readAllBytes(Paths.get(stuff.toURI())));
 			}
 			catch (Exception e) {
-				System.err.println("Cannot find grammar org/antlr/v4/test/runtime/LarseLexer.g4");
+				System.err.println("Cannot find grammar org/antlr/v4/test/runtime/LargeLexer.g4");
 			}
 
 			return new Pair<>(grammarName, grammar);
-		}
-
-		@Override
-		public boolean ignore(String targetName) {
-			return targetName.equals("Dart");
 		}
 	}
 }

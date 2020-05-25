@@ -101,7 +101,7 @@ ParserPropertyCall(p, call) ::= "<p>.<call>"
 PositionAdjustingLexerDef() ::= <<
 class PositionAdjustingLexerATNSimulator extends LexerATNSimulator {
   PositionAdjustingLexerATNSimulator(Lexer recog, ATN atn,
-      List<DFA> decisionToDFA, PredictionContextCache sharedContextCache)
+      List\<DFA> decisionToDFA, PredictionContextCache sharedContextCache)
       : super(atn, decisionToDFA, sharedContextCache, recog: recog);
 
   void resetAcceptPosition(CharStream input, int index, int line,
