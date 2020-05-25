@@ -241,7 +241,7 @@ void LexerATNSimulator::getReachableConfigSet(CharStream *input, ATNConfigSet *c
   // than a config that already reached an accept state for the same rule
   size_t skipAlt = ATN::INVALID_ALT_NUMBER;
 
-  for (auto c : closure_->configs) {
+  for (auto& c : closure_->configs) {
     bool currentAltReachedAcceptState = c->alt == skipAlt;
     if (currentAltReachedAcceptState && (std::static_pointer_cast<LexerATNConfig>(c))->hasPassedThroughNonGreedyDecision()) {
       continue;
