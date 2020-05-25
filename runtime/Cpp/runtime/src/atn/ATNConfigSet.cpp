@@ -30,11 +30,11 @@ ATNConfigSet::ATNConfigSet(const Ref<ATNConfigSet> &old) : ATNConfigSet(old->ful
 ATNConfigSet::~ATNConfigSet() {
 }
 
-bool ATNConfigSet::add(const Ref<ATNConfig> &config) {
+bool ATNConfigSet::add(const ATNConfig::Ptr &config) {
   return add(config, nullptr);
 }
 
-bool ATNConfigSet::add(const Ref<ATNConfig> &config, PredictionContextMergeCache *mergeCache) {
+bool ATNConfigSet::add(const ATNConfig::Ptr &config, PredictionContextMergeCache *mergeCache) {
   if (_readonly) {
     throw IllegalStateException("This set is readonly");
   }
@@ -115,7 +115,7 @@ std::vector<Ref<SemanticContext>> ATNConfigSet::getPredicates() {
   return preds;
 }
 
-Ref<ATNConfig> ATNConfigSet::get(size_t i) const {
+ATNConfig::Ptr ATNConfigSet::get(size_t i) const {
   return configs[i];
 }
 

@@ -313,7 +313,7 @@ std::unique_ptr<ATNConfigSet> LexerATNSimulator::computeStartState(CharStream *i
   return configs;
 }
 
-bool LexerATNSimulator::closure(CharStream *input, const Ref<LexerATNConfig> &config, ATNConfigSet *configs,
+bool LexerATNSimulator::closure(CharStream *input, const LexerATNConfig::Ptr &config, ATNConfigSet *configs,
                                 bool currentAltReachedAcceptState, bool speculative, bool treatEofAsEpsilon) {
 #if DEBUG_ATN == 1
     std::cout << "closure(" << config->toString(true) << ")" << std::endl;
@@ -362,7 +362,7 @@ bool LexerATNSimulator::closure(CharStream *input, const Ref<LexerATNConfig> &co
   ATNState *p = config->state;
   for (size_t i = 0; i < p->transitions.size(); i++) {
     Transition *t = p->transitions[i];
-    Ref<LexerATNConfig> c = getEpsilonTarget(input, config, t, configs, speculative, treatEofAsEpsilon);
+    LexerATNConfig::Ptr c = getEpsilonTarget(input, config, t, configs, speculative, treatEofAsEpsilon);
     if (c != nullptr) {
       currentAltReachedAcceptState = closure(input, c, configs, currentAltReachedAcceptState, speculative, treatEofAsEpsilon);
     }
@@ -371,7 +371,7 @@ bool LexerATNSimulator::closure(CharStream *input, const Ref<LexerATNConfig> &co
   return currentAltReachedAcceptState;
 }
 
-Ref<LexerATNConfig> LexerATNSimulator::getEpsilonTarget(CharStream *input, const Ref<LexerATNConfig> &config, Transition *t,
+LexerATNConfig::Ptr LexerATNSimulator::getEpsilonTarget(CharStream *input, const LexerATNConfig::Ptr &config, Transition *t,
   ATNConfigSet *configs, bool speculative, bool treatEofAsEpsilon) {
 
   switch (t->getSerializationType()) {
@@ -462,7 +462,7 @@ Ref<LexerATNConfig> LexerATNSimulator::getEpsilonTarget(CharStream *input, const
       break;
   }
 
-  return Ref<LexerATNConfig>{};
+  return LexerATNConfig::Ptr{};
 }
 
 bool LexerATNSimulator::evaluatePredicate(CharStream *input, size_t ruleIndex, size_t predIndex, bool speculative) {
@@ -541,7 +541,7 @@ dfa::DFAState *LexerATNSimulator::addDFAState(ATNConfigSet *configs) {
   assert(!configs->hasSemanticContext);
 
   dfa::DFAState *proposed = new dfa::DFAState(std::unique_ptr<ATNConfigSet>(configs)); /* mem-check: managed by the DFA or deleted below */
-  Ref<ATNConfig> firstConfigWithRuleStopState = nullptr;
+  ATNConfig::Ptr firstConfigWithRuleStopState = nullptr;
   for (auto &c : configs->configs) {
     if (is<RuleStopState *>(c->state)) {
       firstConfigWithRuleStopState = c;

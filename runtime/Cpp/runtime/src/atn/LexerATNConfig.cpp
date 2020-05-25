@@ -26,17 +26,17 @@ LexerATNConfig::LexerATNConfig(ATNState *state, int alt, Ref<PredictionContext> 
     _passedThroughNonGreedyDecision(false) {
 }
 
-LexerATNConfig::LexerATNConfig(Ref<LexerATNConfig> const& c, ATNState *state)
+LexerATNConfig::LexerATNConfig(LexerATNConfig::Ptr const& c, ATNState *state)
   : ATNConfig(c, state, c->context, c->semanticContext), _lexerActionExecutor(c->_lexerActionExecutor),
    _passedThroughNonGreedyDecision(checkNonGreedyDecision(c, state)) {
 }
 
-LexerATNConfig::LexerATNConfig(Ref<LexerATNConfig> const& c, ATNState *state, Ref<LexerActionExecutor> const& lexerActionExecutor)
+LexerATNConfig::LexerATNConfig(LexerATNConfig::Ptr const& c, ATNState *state, Ref<LexerActionExecutor> const& lexerActionExecutor)
   : ATNConfig(c, state, c->context, c->semanticContext), _lexerActionExecutor(lexerActionExecutor),
     _passedThroughNonGreedyDecision(checkNonGreedyDecision(c, state)) {
 }
 
-LexerATNConfig::LexerATNConfig(Ref<LexerATNConfig> const& c, ATNState *state, Ref<PredictionContext> const& context)
+LexerATNConfig::LexerATNConfig(LexerATNConfig::Ptr const& c, ATNState *state, Ref<PredictionContext> const& context)
   : ATNConfig(c, state, context, c->semanticContext), _lexerActionExecutor(c->_lexerActionExecutor),
     _passedThroughNonGreedyDecision(checkNonGreedyDecision(c, state)) {
 }
@@ -78,7 +78,7 @@ bool LexerATNConfig::operator == (const LexerATNConfig& other) const
   return ATNConfig::operator == (other);
 }
 
-bool LexerATNConfig::checkNonGreedyDecision(Ref<LexerATNConfig> const& source, ATNState *target) {
+bool LexerATNConfig::checkNonGreedyDecision(LexerATNConfig::Ptr const& source, ATNState *target) {
   return source->_passedThroughNonGreedyDecision ||
     (is<DecisionState*>(target) && (static_cast<DecisionState*>(target))->nonGreedy);
 }

@@ -18,6 +18,9 @@ namespace atn {
   /// </summary>
   class ANTLR4CPP_PUBLIC ATNConfig {
   public:
+
+    using Ptr = std::shared_ptr<ATNConfig>;
+
     struct Hasher
     {
       size_t operator()(ATNConfig const& k) const {
@@ -32,7 +35,7 @@ namespace atn {
     };
 
 
-    using Set = std::unordered_set<Ref<ATNConfig>, Hasher, Comparer>;
+    using Set = std::unordered_set<ATNConfig::Ptr, Hasher, Comparer>;
 
     /// The ATN state associated with this configuration.
     ATNState * state;
@@ -78,12 +81,12 @@ namespace atn {
     ATNConfig(ATNState *state, size_t alt, Ref<PredictionContext> const& context);
     ATNConfig(ATNState *state, size_t alt, Ref<PredictionContext> const& context, Ref<SemanticContext> const& semanticContext);
 
-    ATNConfig(Ref<ATNConfig> const& c); // dup
-    ATNConfig(Ref<ATNConfig> const& c, ATNState *state);
-    ATNConfig(Ref<ATNConfig> const& c, ATNState *state, Ref<SemanticContext> const& semanticContext);
-    ATNConfig(Ref<ATNConfig> const& c, Ref<SemanticContext> const& semanticContext);
-    ATNConfig(Ref<ATNConfig> const& c, ATNState *state, Ref<PredictionContext> const& context);
-    ATNConfig(Ref<ATNConfig> const& c, ATNState *state, Ref<PredictionContext> const& context, Ref<SemanticContext> const& semanticContext);
+    ATNConfig(ATNConfig::Ptr const& c); // dup
+    ATNConfig(ATNConfig::Ptr const& c, ATNState *state);
+    ATNConfig(ATNConfig::Ptr const& c, ATNState *state, Ref<SemanticContext> const& semanticContext);
+    ATNConfig(ATNConfig::Ptr const& c, Ref<SemanticContext> const& semanticContext);
+    ATNConfig(ATNConfig::Ptr const& c, ATNState *state, Ref<PredictionContext> const& context);
+    ATNConfig(ATNConfig::Ptr const& c, ATNState *state, Ref<PredictionContext> const& context, Ref<SemanticContext> const& semanticContext);
 
     ATNConfig(ATNConfig const&) = delete;
     virtual ~ATNConfig();
@@ -134,9 +137,9 @@ namespace std {
     }
   };
 
-  template <> struct hash<std::vector<Ref<ATNConfig>>>
+  template <> struct hash<std::vector<ATNConfig::Ptr>>
   {
-    size_t operator() (const std::vector<Ref<ATNConfig>> &vector) const
+    size_t operator() (const std::vector<ATNConfig::Ptr> &vector) const
     {
       std::size_t seed = 0;
       for (auto &config : vector) {

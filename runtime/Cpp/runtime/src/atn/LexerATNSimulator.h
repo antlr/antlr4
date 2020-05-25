@@ -149,11 +149,11 @@ namespace atn {
     /// </summary>
     /// <returns> {@code true} if an accept state is reached, otherwise
     /// {@code false}. </returns>
-    virtual bool closure(CharStream *input, const Ref<LexerATNConfig> &config, ATNConfigSet *configs,
+    virtual bool closure(CharStream *input, const LexerATNConfig::Ptr &config, ATNConfigSet *configs,
                          bool currentAltReachedAcceptState, bool speculative, bool treatEofAsEpsilon);
 
     // side-effect: can alter configs.hasSemanticContext
-    virtual Ref<LexerATNConfig> getEpsilonTarget(CharStream *input, const Ref<LexerATNConfig> &config, Transition *t,
+    virtual LexerATNConfig::Ptr getEpsilonTarget(CharStream *input, const LexerATNConfig::Ptr &config, Transition *t,
       ATNConfigSet *configs, bool speculative, bool treatEofAsEpsilon);
 
     /// <summary>
@@ -206,7 +206,7 @@ namespace atn {
     void InitializeInstanceFields();
 
     template< class... Args >
-    Ref<LexerATNConfig> makeConfig(Args&&... args)
+    LexerATNConfig::Ptr makeConfig(Args&&... args)
     {
         return std::make_shared<LexerATNConfig>(std::forward<Args>(args)...);
     }

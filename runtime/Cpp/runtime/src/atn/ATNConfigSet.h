@@ -7,6 +7,7 @@
 
 #include "support/BitSet.h"
 #include "atn/PredictionContext.h"
+#include "atn/ATNConfig.h"
 
 namespace antlr4 {
 namespace atn {
@@ -16,7 +17,7 @@ namespace atn {
   class ANTLR4CPP_PUBLIC ATNConfigSet {
   public:
     /// Track the elements as they are added to the set; supports get(i)
-    std::vector<Ref<ATNConfig>> configs;
+    std::vector<ATNConfig::Ptr> configs;
 
     // TODO: these fields make me pretty uncomfortable but nice to pack up info together, saves recomputation
     // TODO: can we track conflicts as they are added to save scanning configs later?
@@ -44,7 +45,7 @@ namespace atn {
 
     virtual ~ATNConfigSet();
 
-    virtual bool add(const Ref<ATNConfig> &config);
+    virtual bool add(const ATNConfig::Ptr &config);
 
     /// <summary>
     /// Adding a new config means merging contexts with existing configs for
@@ -56,7 +57,7 @@ namespace atn {
     /// This method updates <seealso cref="#dipsIntoOuterContext"/> and
     /// <seealso cref="#hasSemanticContext"/> when necessary.
     /// </summary>
-    virtual bool add(const Ref<ATNConfig> &config, PredictionContextMergeCache *mergeCache);
+    virtual bool add(const ATNConfig::Ptr &config, PredictionContextMergeCache *mergeCache);
 
     virtual std::vector<ATNState *> getStates();
 
@@ -71,7 +72,7 @@ namespace atn {
     antlrcpp::BitSet getAlts();
     virtual std::vector<Ref<SemanticContext>> getPredicates();
 
-    virtual Ref<ATNConfig> get(size_t i) const;
+    virtual ATNConfig::Ptr get(size_t i) const;
 
     virtual void optimizeConfigs(ATNSimulator *interpreter);
 
