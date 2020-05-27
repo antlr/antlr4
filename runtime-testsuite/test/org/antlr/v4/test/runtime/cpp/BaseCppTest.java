@@ -880,6 +880,7 @@ public class BaseCppTest implements RuntimeTestSupport {
 				+ "  TreeShapeListener listener;\n"
 				+ "  tree::ParseTreeWalker::DEFAULT.walk(&listener, tree);\n"
 				+ "\n"
+				+ "  lexer.getInterpreter\\<antlr4::atn::LexerATNSimulator>()->clearDFA();\n"
 				+ "  return 0;\n"
 				+ "}\n"
 		);
