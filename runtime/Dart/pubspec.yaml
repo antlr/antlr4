@@ -6,5 +6,8 @@ license: "BSD-3-Clause"
 dependencies: 
   logging: ^0.11.4
   collection: ^1.14.12
+dev_dependencies:
+  pedantic: ^1.0.0
+
 environment:
   sdk: ">=2.7.0 <3.0.0"

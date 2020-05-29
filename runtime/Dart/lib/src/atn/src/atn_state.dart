@@ -30,73 +30,71 @@ enum StateType {
   LOOP_END,
 }
 
-/**
- * The following images show the relation of states and
- * {@link ATNState#transitions} for various grammar constructs.
- *
- * <ul>
- *
- * <li>Solid edges marked with an &#0949; indicate a required
- * [EpsilonTransition].</li>
- *
- * <li>Dashed edges indicate locations where any transition derived from
- * [Transition] might appear.</li>
- *
- * <li>Dashed nodes are place holders for either a sequence of linked
- * [BasicState] states or the inclusion of a block representing a nested
- * construct in one of the forms below.</li>
- *
- * <li>Nodes showing multiple outgoing alternatives with a {@code ...} support
- * any number of alternatives (one or more). Nodes without the {@code ...} only
- * support the exact number of alternatives shown in the diagram.</li>
- *
- * </ul>
- *
- * <h2>Basic Blocks</h2>
- *
- * <h3>Rule</h3>
- *
- * <embed src="images/Rule.svg" type="image/svg+xml"/>
- *
- * <h3>Block of 1 or more alternatives</h3>
- *
- * <embed src="images/Block.svg" type="image/svg+xml"/>
- *
- * <h2>Greedy Loops</h2>
- *
- * <h3>Greedy Closure: {@code (...)*}</h3>
- *
- * <embed src="images/ClosureGreedy.svg" type="image/svg+xml"/>
- *
- * <h3>Greedy Positive Closure: {@code (...)+}</h3>
- *
- * <embed src="images/PositiveClosureGreedy.svg" type="image/svg+xml"/>
- *
- * <h3>Greedy Optional: {@code (...)?}</h3>
- *
- * <embed src="images/OptionalGreedy.svg" type="image/svg+xml"/>
- *
- * <h2>Non-Greedy Loops</h2>
- *
- * <h3>Non-Greedy Closure: {@code (...)*?}</h3>
- *
- * <embed src="images/ClosureNonGreedy.svg" type="image/svg+xml"/>
- *
- * <h3>Non-Greedy Positive Closure: {@code (...)+?}</h3>
- *
- * <embed src="images/PositiveClosureNonGreedy.svg" type="image/svg+xml"/>
- *
- * <h3>Non-Greedy Optional: {@code (...)??}</h3>
- *
- * <embed src="images/OptionalNonGreedy.svg" type="image/svg+xml"/>
- */
+/// The following images show the relation of states and
+/// {@link ATNState#transitions} for various grammar constructs.
+///
+/// <ul>
+///
+/// <li>Solid edges marked with an &#0949; indicate a required
+/// [EpsilonTransition].</li>
+///
+/// <li>Dashed edges indicate locations where any transition derived from
+/// [Transition] might appear.</li>
+///
+/// <li>Dashed nodes are place holders for either a sequence of linked
+/// [BasicState] states or the inclusion of a block representing a nested
+/// construct in one of the forms below.</li>
+///
+/// <li>Nodes showing multiple outgoing alternatives with a {@code ...} support
+/// any number of alternatives (one or more). Nodes without the {@code ...} only
+/// support the exact number of alternatives shown in the diagram.</li>
+///
+/// </ul>
+///
+/// <h2>Basic Blocks</h2>
+///
+/// <h3>Rule</h3>
+///
+/// <embed src="images/Rule.svg" type="image/svg+xml"/>
+///
+/// <h3>Block of 1 or more alternatives</h3>
+///
+/// <embed src="images/Block.svg" type="image/svg+xml"/>
+///
+/// <h2>Greedy Loops</h2>
+///
+/// <h3>Greedy Closure: {@code (...)*}</h3>
+///
+/// <embed src="images/ClosureGreedy.svg" type="image/svg+xml"/>
+///
+/// <h3>Greedy Positive Closure: {@code (...)+}</h3>
+///
+/// <embed src="images/PositiveClosureGreedy.svg" type="image/svg+xml"/>
+///
+/// <h3>Greedy Optional: {@code (...)?}</h3>
+///
+/// <embed src="images/OptionalGreedy.svg" type="image/svg+xml"/>
+///
+/// <h2>Non-Greedy Loops</h2>
+///
+/// <h3>Non-Greedy Closure: {@code (...)*?}</h3>
+///
+/// <embed src="images/ClosureNonGreedy.svg" type="image/svg+xml"/>
+///
+/// <h3>Non-Greedy Positive Closure: {@code (...)+?}</h3>
+///
+/// <embed src="images/PositiveClosureNonGreedy.svg" type="image/svg+xml"/>
+///
+/// <h3>Non-Greedy Optional: {@code (...)??}</h3>
+///
+/// <embed src="images/OptionalNonGreedy.svg" type="image/svg+xml"/>
 abstract class ATNState {
   static final int INITIAL_NUM_TRANSITIONS = 4;
 
   static final int INVALID_STATE_NUMBER = -1;
 
-  /** Which ATN are we in? */
-  ATN atn = null;
+  /// Which ATN are we in? */
+  ATN atn;
 
   int stateNumber = INVALID_STATE_NUMBER;
 
@@ -104,16 +102,18 @@ abstract class ATNState {
 
   bool epsilonOnlyTransitions = false;
 
-  /** Track the transitions emanating from this ATN state. */
+  /// Track the transitions emanating from this ATN state. */
   List<Transition> transitions = [];
 
-  /** Used to cache lookahead during parsing, not used during construction */
+  /// Used to cache lookahead during parsing, not used during construction */
   IntervalSet nextTokenWithinRule;
 
+  @override
   int get hashCode {
     return stateNumber;
   }
 
+  @override
   bool operator ==(Object o) {
     // are these states same object?
     if (o is ATNState) return stateNumber == o.stateNumber;
@@ -124,6 +124,7 @@ abstract class ATNState {
     return false;
   }
 
+  @override
   String toString() {
     return stateNumber.toString();
   }
@@ -140,13 +141,13 @@ abstract class ATNState {
     if (transitions.isEmpty) {
       epsilonOnlyTransitions = e.isEpsilon;
     } else if (epsilonOnlyTransitions != e.isEpsilon) {
-      log("ATN state $stateNumber has both epsilon and non-epsilon transitions.\n",
+      log('ATN state $stateNumber has both epsilon and non-epsilon transitions.\n',
           level: Level.SEVERE.value);
       epsilonOnlyTransitions = false;
     }
 
-    bool alreadyPresent = false;
-    for (Transition t in transitions) {
+    var alreadyPresent = false;
+    for (var t in transitions) {
       if (t.target.stateNumber == e.target.stateNumber) {
         if (t.label != null && e.label != null && t.label == e.label) {
 //					System.err.println("Repeated transition upon "+e.label()+" from "+stateNumber+"->"+t.target.stateNumber);
@@ -191,7 +192,7 @@ class BasicState extends ATNState {
 }
 
 class RuleStartState extends ATNState {
-  var stopState = null;
+  var stopState;
   var isLeftRecursiveRule = false;
 
   @override
@@ -213,11 +214,10 @@ class BasicBlockStartState extends BlockStartState {
   StateType get stateType => StateType.BLOCK_START;
 }
 
-/** Start of {@code (A|B|...)+} loop. Technically a decision state, but
- *  we don't use for code generation; somebody might need it, so I'm defining
- *  it for completeness. In reality, the [PlusLoopbackState] node is the
- *  real decision-making note for {@code A+}.
- */
+/// Start of {@code (A|B|...)+} loop. Technically a decision state, but
+///  we don't use for code generation; somebody might need it, so I'm defining
+///  it for completeness. In reality, the [PlusLoopbackState] node is the
+///  real decision-making note for {@code A+}.
 class PlusBlockStartState extends BlockStartState {
   PlusLoopbackState loopBackState;
 
@@ -248,7 +248,7 @@ class RuleStopState extends ATNState {
 
 /// Terminal node of a simple {@code (a|b|c)} block.
 class BlockEndState extends ATNState {
-  BlockStartState startState = null;
+  BlockStartState startState;
 
   @override
   StateType get stateType => StateType.BLOCK_END;
@@ -266,16 +266,14 @@ class StarLoopbackState extends ATNState {
 class StarLoopEntryState extends DecisionState {
   StarLoopbackState loopBackState;
 
-  /**
-   * Indicates whether this state can benefit from a precedence DFA during SLL
-   * decision making.
-   *
-   * <p>This is a computed property that is calculated during ATN deserialization
-   * and stored for use in [ParserATNSimulator] and
-   * [ParserInterpreter].</p>
-   *
-   * @see DFA#isPrecedenceDfa()
-   */
+  /// Indicates whether this state can benefit from a precedence DFA during SLL
+  /// decision making.
+  ///
+  /// <p>This is a computed property that is calculated during ATN deserialization
+  /// and stored for use in [ParserATNSimulator] and
+  /// [ParserInterpreter].</p>
+  ///
+  /// @see DFA#isPrecedenceDfa()
   bool isPrecedenceDecision = false;
 
   @override

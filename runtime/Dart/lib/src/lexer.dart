@@ -31,51 +31,52 @@ abstract class Lexer extends Recognizer<LexerATNSimulator>
   CharStream _input;
 
   Pair<TokenSource, CharStream> _tokenFactorySourcePair;
+  @override
   TokenFactory tokenFactory = CommonTokenFactory.DEFAULT;
 
-  // The goal of all lexer rules/methods is to create a token object.
-  // this is an instance variable as multiple rules may collaborate to
-  // create a single token. nextToken will return this object after
-  // matching lexer rule(s). If you subclass to allow multiple token
-  // emissions, then set this to the last token to be matched or
-  // something nonnull so that the auto token emit mechanism will not
-  // emit another token.
-  Token _token = null;
+  /// The goal of all lexer rules/methods is to create a token object.
+  /// this is an instance variable as multiple rules may collaborate to
+  /// create a single token. nextToken will return this object after
+  /// matching lexer rule(s). If you subclass to allow multiple token
+  /// emissions, then set this to the last token to be matched or
+  /// something nonnull so that the auto token emit mechanism will not
+  /// emit another token.
+  Token _token;
 
-  // What character index in the stream did the current token start at?
-  // Needed, for example, to get the text for current token. Set at
-  // the start of nextToken.
+  /// What character index in the stream did the current token start at?
+  /// Needed, for example, to get the text for current token. Set at
+  /// the start of nextToken.
   int tokenStartCharIndex = -1;
 
-  // The line on which the first character of the token resides///
+  /// The line on which the first character of the token resides
   int tokenStartLine = -1;
 
-  // The character position of first character within the line///
+  /// The character position of first character within the line
   int tokenStartCharPositionInLine = -1;
 
-  // Once we see EOF on char stream, next token will be EOF.
-  // If you have DONE : EOF ; then you see DONE EOF.
+  /// Once we see EOF on char stream, next token will be EOF.
+  /// If you have DONE : EOF ; then you see DONE EOF.
   bool _hitEOF = false;
 
-  // The channel number for the current token///
+  /// The channel number for the current token
   int channel = Token.DEFAULT_CHANNEL;
 
-  // The token type for the current token///
+  /// The token type for the current token
   int type = Token.INVALID_TYPE;
 
-  List<int> _modeStack = [];
+  final List<int> _modeStack = [];
   int mode_ = Lexer.DEFAULT_MODE;
 
   /// You can set the text for the current token to override what is in
   /// the input char buffer. Use setText() or can set this instance var.
-  String _text = null;
+  String _text;
 
   Lexer(CharStream input) {
-    this._input = input;
-    this._tokenFactorySourcePair = Pair(this, input);
+    _input = input;
+    _tokenFactorySourcePair = Pair(this, input);
   }
 
-  reset() {
+  void reset() {
     // wack Lexer state variables
     if (_input != null) {
       _input.seek(0); // rewind the input
@@ -96,14 +97,15 @@ abstract class Lexer extends Recognizer<LexerATNSimulator>
   }
 
   /// Return a token from this source; i.e., match a token on the char stream.
+  @override
   Token nextToken() {
     if (_input == null) {
-      throw new StateError("nextToken requires a non-null input stream.");
+      throw StateError('nextToken requires a non-null input stream.');
     }
 
     // Mark start location in char stream so unbuffered streams are
     // guaranteed at least have text of current token
-    int tokenStartMarker = _input.mark();
+    final tokenStartMarker = _input.mark();
     try {
       outer:
       while (true) {
@@ -154,70 +156,71 @@ abstract class Lexer extends Recognizer<LexerATNSimulator>
   /// a lexer rule finishes with token set to SKIP_TOKEN. Recall that
   /// if token==null at end of any token rule, it creates one for you
   /// and emits it.
-  skip() {
-    this.type = Lexer.SKIP;
+  void skip() {
+    type = Lexer.SKIP;
   }
 
-  more() {
-    this.type = Lexer.MORE;
+  void more() {
+    type = Lexer.MORE;
   }
 
-  mode(int m) {
-    this.mode_ = m;
+  void mode(int m) {
+    mode_ = m;
   }
 
-  pushMode(int m) {
+  void pushMode(int m) {
     if (LexerATNSimulator.debug) {
-      log("pushMode $m");
+      log('pushMode $m');
     }
     _modeStack.add(mode_);
     mode(m);
   }
 
   int popMode() {
-    if (_modeStack.isEmpty) throw new StateError("");
-    if (LexerATNSimulator.debug) log("popMode back to ${_modeStack.last}");
+    if (_modeStack.isEmpty) throw StateError('');
+    if (LexerATNSimulator.debug) log('popMode back to ${_modeStack.last}');
     mode(_modeStack.removeLast());
     return mode_;
   }
 
-  /** Set the char stream and reset the lexer */
-  void set inputStream(IntStream input) {
-    this._input = null;
-    this._tokenFactorySourcePair =
-        new Pair<TokenSource, CharStream>(this, _input);
+  /// Set the char stream and reset the lexer
+  @override
+  set inputStream(IntStream input) {
+    _input = null;
+    _tokenFactorySourcePair =
+        Pair<TokenSource, CharStream>(this, _input);
     reset();
-    this._input = input;
-    this._tokenFactorySourcePair =
-        new Pair<TokenSource, CharStream>(this, _input);
+    _input = input;
+    _tokenFactorySourcePair =
+        Pair<TokenSource, CharStream>(this, _input);
   }
 
+  @override
   String get sourceName {
     return _input.sourceName;
   }
 
+  @override
   CharStream get inputStream {
     return _input;
   }
 
-  /** By default does not support multiple emits per nextToken invocation
-   *  for efficiency reasons.  Subclass and override this method, nextToken,
-   *  and getToken (to push tokens into a list and pull from that list
-   *  rather than a single variable as this implementation does).
-   */
+  /// By default does not support multiple emits per nextToken invocation
+  ///  for efficiency reasons.  Subclass and override this method, nextToken,
+  ///  and getToken (to push tokens into a list and pull from that list
+  ///  rather than a single variable as this implementation does).
   void emitToken(Token token) {
     //System.err.println("emit "+token);
-    this._token = token;
+    _token = token;
   }
 
-  /** The standard method called to automatically emit a token at the
-   *  outermost lexical rule.  The token object should point into the
-   *  char buffer start..stop.  If there is a text override in 'text',
-   *  use that to set the token's text.  Override this method to emit
-   *  custom Token objects or provide a new factory.
-   */
+  /// The standard method called to automatically emit a token at the
+  ///  outermost lexical rule.  The token object should point into the
+  ///  char buffer start..stop.  If there is a text override in 'text',
+  ///  use that to set the token's text.  Override this method to emit
+  ///  custom Token objects or provide a new factory.
   Token emit() {
-    Token t = tokenFactory.create(
+    final t = tokenFactory.create(
         type,
         _text,
         _tokenFactorySourcePair,
@@ -231,37 +234,38 @@ abstract class Lexer extends Recognizer<LexerATNSimulator>
   }
 
   Token emitEOF() {
-    int cpos = charPositionInLine;
-    Token eof = tokenFactory.create(Token.EOF, null, _tokenFactorySourcePair,
+    final cpos = charPositionInLine;
+    final eof = tokenFactory.create(Token.EOF, null, _tokenFactorySourcePair,
         Token.DEFAULT_CHANNEL, _input.index, _input.index - 1, line, cpos);
     emitToken(eof);
     return eof;
   }
 
+  @override
   int get charPositionInLine {
     return interpreter.charPositionInLine;
   }
 
+  @override
   int get line {
     return interpreter.line;
   }
 
-  void set line(int line) {
+  set line(int line) {
     interpreter.line = line;
   }
 
-  void set charPositionInLine(int charPositionInLine) {
+  set charPositionInLine(int charPositionInLine) {
     interpreter.charPositionInLine = charPositionInLine;
   }
 
-  /** What is the index of the current character of lookahead? */
+  /// What is the index of the current character of lookahead?
   int get charIndex {
     return _input.index;
   }
 
-  /** Return the text matched so far for the current token or any
-   *  text override.
-   */
+  /// Return the text matched so far for the current token or any
+  ///  text override.
   String get text {
     if (_text != null) {
       return _text;
@@ -269,14 +273,13 @@ abstract class Lexer extends Recognizer<LexerATNSimulator>
     return interpreter.getText(_input);
   }
 
-  /** Set the complete text of this token; it wipes any previous
-   *  changes to the text.
-   */
-  void set text(String text) {
-    this._text = text;
+  /// Set the complete text of this token; it wipes any previous
+  ///  changes to the text.
+  set text(String text) {
+    _text = text;
   }
 
-  /** Override if emitting multiple tokens. */
+  /// Override if emitting multiple tokens.
   Token get token {
     return _token;
   }
@@ -289,12 +292,11 @@ abstract class Lexer extends Recognizer<LexerATNSimulator>
 
   List<String> get modeNames => null;
 
-  /** Return a list of all Token objects in input char stream.
-   *  Forces load of all tokens. Does not include EOF token.
-   */
+  /// Return a list of all Token objects in input char stream.
+  ///  Forces load of all tokens. Does not include EOF token.
   List<Token> get allTokens {
-    List<Token> tokens = [];
-    Token t = nextToken();
+    final tokens = <Token>[];
+    var t = nextToken();
     while (t.type != Token.EOF) {
       tokens.add(t);
       t = nextToken();
@@ -303,11 +305,11 @@ abstract class Lexer extends Recognizer<LexerATNSimulator>
   }
 
   void notifyListeners(LexerNoViableAltException e) {
-    String text =
+    final text =
         _input.getText(Interval.of(tokenStartCharIndex, _input.index));
-    String msg = "token recognition error at: '" + getErrorDisplay(text) + "'";
+    final msg = "token recognition error at: '" + getErrorDisplay(text) + "'";
 
-    ErrorListener listener = errorListenerDispatch;
+    final listener = errorListenerDispatch;
     listener.syntaxError(
         this, null, tokenStartLine, tokenStartCharPositionInLine, msg, e);
   }
@@ -317,15 +319,14 @@ abstract class Lexer extends Recognizer<LexerATNSimulator>
   }
 
   String getCharErrorDisplay(int c) {
-    String s = getErrorDisplay(String.fromCharCode(c));
+    final s = getErrorDisplay(String.fromCharCode(c));
     return "'$s'";
   }
 
-  /** Lexers can normally match any char in it's vocabulary after matching
-   *  a token, so do the easy thing and just kill a character and hope
-   *  it all works out.  You can instead use the rule invocation stack
-   *  to do sophisticated error recovery if you are in a fragment rule.
-   */
+  /// Lexers can normally match any char in it's vocabulary after matching
+  ///  a token, so do the easy thing and just kill a character and hope
+  ///  it all works out.  You can instead use the rule invocation stack
+  ///  to do sophisticated error recovery if you are in a fragment rule.
   void recover(RecognitionException re) {
     if (re is LexerNoViableAltException) {
       if (_input.LA(1) != IntStream.EOF) {

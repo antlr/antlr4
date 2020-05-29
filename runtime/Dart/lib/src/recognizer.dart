@@ -18,7 +18,7 @@ abstract class Recognizer<ATNInterpreter extends ATNSimulator> {
 
   static final Map<Vocabulary, Map<String, int>> tokenTypeMapCache = {};
   static final Map<List<String>, Map<String, int>> ruleIndexMapCache = {};
-  List<ErrorListener> _listeners = [ConsoleErrorListener.INSTANCE];
+  final List<ErrorListener> _listeners = [ConsoleErrorListener.INSTANCE];
 
   /// The ATN interpreter used by the recognizer for prediction.
   ATNInterpreter interpreter;
@@ -26,38 +26,34 @@ abstract class Recognizer<ATNInterpreter extends ATNSimulator> {
 
   List<String> get ruleNames;
 
-  /**
-   * Get the vocabulary used by the recognizer.
-   *
-   * @return A [Vocabulary] instance providing information about the
-   * vocabulary used by the grammar.
-   */
+  /// Get the vocabulary used by the recognizer.
+  ///
+  /// @return A [Vocabulary] instance providing information about the
+  /// vocabulary used by the grammar.
   Vocabulary get vocabulary;
 
-  /**
-   * Get a map from token names to token types.
-   *
-   * <p>Used for XPath and tree pattern compilation.</p>
-   */
+  /// Get a map from token names to token types.
+  ///
+  /// <p>Used for XPath and tree pattern compilation.</p>
   Map<String, int> get tokenTypeMap {
-    Vocabulary _vocabulary = vocabulary;
+    final _vocabulary = vocabulary;
 
-    Map<String, int> result = tokenTypeMapCache[_vocabulary];
+    var result = tokenTypeMapCache[_vocabulary];
     if (result == null) {
       result = {};
-      for (int i = 0; i <= getATN().maxTokenType; i++) {
-        String literalName = _vocabulary.getLiteralName(i);
+      for (var i = 0; i <= getATN().maxTokenType; i++) {
+        final literalName = _vocabulary.getLiteralName(i);
         if (literalName != null) {
           result[literalName] = i;
         }
 
-        String symbolicName = _vocabulary.getSymbolicName(i);
+        final symbolicName = _vocabulary.getSymbolicName(i);
         if (symbolicName != null) {
           result[symbolicName] = i;
         }
       }
 
-      result["EOF"] = Token.EOF;
+      result['EOF'] = Token.EOF;
       result = Map.unmodifiable(result);
       tokenTypeMapCache[_vocabulary] = result;
     }
@@ -65,16 +61,14 @@ abstract class Recognizer<ATNInterpreter extends ATNSimulator> {
     return result;
   }
 
-  /**
-   * Get a map from rule names to rule indexes.
-   *
-   * <p>Used for XPath and tree pattern compilation.</p>
-   */
+  /// Get a map from rule names to rule indexes.
+  ///
+  /// <p>Used for XPath and tree pattern compilation.</p>
   Map<String, int> get ruleIndexMap {
     final _ruleNames = ruleNames;
     if (_ruleNames == null) {
       throw UnsupportedError(
-          "The current recognizer does not provide a list of rule names.");
+          'The current recognizer does not provide a list of rule names.');
     }
 
     var result = ruleIndexMapCache[_ruleNames];
@@ -92,51 +86,43 @@ abstract class Recognizer<ATNInterpreter extends ATNSimulator> {
     return Token.INVALID_TYPE;
   }
 
-  /**
-   * If this recognizer was generated, it will have a serialized ATN
-   * representation of the grammar.
-   *
-   * <p>For interpreters, we don't know their serialized ATN despite having
-   * created the interpreter from it.</p>
-   */
+  /// If this recognizer was generated, it will have a serialized ATN
+  /// representation of the grammar.
+  ///
+  /// <p>For interpreters, we don't know their serialized ATN despite having
+  /// created the interpreter from it.</p>
   String get serializedATN {
-    throw new UnsupportedError("there is no serialized ATN");
+    throw UnsupportedError('there is no serialized ATN');
   }
 
-  /** For debugging and other purposes, might want the grammar name.
-   *  Have ANTLR generate an implementation for this method.
-   */
+  /// For debugging and other purposes, might want the grammar name.
+  ///  Have ANTLR generate an implementation for this method.
   String get grammarFileName;
 
-  /**
-   * Get the [ATN] used by the recognizer for prediction.
-   *
-   * @return The [ATN] used by the recognizer for prediction.
-   */
+  /// Get the [ATN] used by the recognizer for prediction.
+  ///
+  /// @return The [ATN] used by the recognizer for prediction.
   ATN getATN();
 
-  /** If profiling during the parse/lex, this will return DecisionInfo records
-   *  for each decision in recognizer in a ParseInfo object.
-   *
-   * @since 4.3
-   */
+  /// If profiling during the parse/lex, this will return DecisionInfo records
+  ///  for each decision in recognizer in a ParseInfo object.
+  ///
+  /// @since 4.3
   ParseInfo get parseInfo {
     return null;
   }
 
-  /** What is the error header, normally line/character position information? */
+  /// What is the error header, normally line/character position information? */
   String getErrorHeader(RecognitionException e) {
-    int line = e.offendingToken.line;
-    int charPositionInLine = e.offendingToken.charPositionInLine;
-    return "line $line:$charPositionInLine";
+    final line = e.offendingToken.line;
+    final charPositionInLine = e.offendingToken.charPositionInLine;
+    return 'line $line:$charPositionInLine';
   }
 
-  /**
-   * @exception NullPointerException if [listener] is null.
-   */
+  /// @exception NullPointerException if [listener] is null.
   void addErrorListener(ErrorListener listener) {
     if (listener == null) {
-      throw new ArgumentError.notNull("listener");
+      throw ArgumentError.notNull('listener');
     }
 
     _listeners.add(listener);
@@ -155,7 +141,7 @@ abstract class Recognizer<ATNInterpreter extends ATNSimulator> {
   }
 
   ErrorListener get errorListenerDispatch {
-    return new ProxyErrorListener(errorListeners);
+    return ProxyErrorListener(errorListeners);
   }
 
   // subclass needs to override these if there are sempreds or actions
@@ -174,14 +160,13 @@ abstract class Recognizer<ATNInterpreter extends ATNSimulator> {
     return _stateNumber;
   }
 
-  /** Indicate that the recognizer has changed internal state that is
-   *  consistent with the ATN state passed in.  This way we always know
-   *  where we are in the ATN as the parser goes along. The rule
-   *  context objects form a stack that lets us see the stack of
-   *  invoking rules. Combine this and we have complete ATN
-   *  configuration information.
-   */
-  void set state(int atnState) {
+  /// Indicate that the recognizer has changed internal state that is
+  ///  consistent with the ATN state passed in.  This way we always know
+  ///  where we are in the ATN as the parser goes along. The rule
+  ///  context objects form a stack that lets us see the stack of
+  ///  invoking rules. Combine this and we have complete ATN
+  ///  configuration information.
+  set state(int atnState) {
 //		System.err.println("setState "+atnState);
     _stateNumber = atnState;
 //		if ( traceATNStates ) _ctx.trace(atnState);
@@ -189,9 +174,9 @@ abstract class Recognizer<ATNInterpreter extends ATNSimulator> {
 
   IntStream get inputStream;
 
-  void set inputStream(IntStream input);
+  set inputStream(IntStream input);
 
   TokenFactory get tokenFactory;
 
-  void set tokenFactory(TokenFactory input);
+  set tokenFactory(TokenFactory input);
 }

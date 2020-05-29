@@ -540,14 +540,16 @@ public class BaseDartTest implements RuntimeTestSupport {
 				"  antlr4:\n" +
 				"    path: " + runtime + "\n");
 		if (cacheDartPackages == null) {
-			System.out.println("Not skipping" + tmpdir);
 			try {
 				Process process = Runtime.getRuntime().exec(new String[]{locatePub(), "get"}, null, new File(tmpdir));
 				StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
 				stderrVacuum.start();
 				process.waitFor();
 				stderrVacuum.join();
-				System.out.println(stderrVacuum.toString());
+				String stderrDuringPubGet = stderrVacuum.toString();
+				if (!stderrDuringPubGet.isEmpty()) {
+					System.out.println("Pub Get error: " + stderrVacuum.toString());
+				}
 			} catch (IOException | InterruptedException e) {
 				e.printStackTrace();
 				return false;
@@ -923,14 +925,14 @@ public class BaseDartTest implements RuntimeTestSupport {
 				"\n" +
 				"void main(List\\<String> args) async {\n" +
 				"  CharStream input = await InputStream.fromPath(args[0]);\n" +
-				"  <lexerName> lex = new <lexerName>(input);\n" +
-				"  CommonTokenStream tokens = new CommonTokenStream(lex);\n" +
+				"  final lex = <lexerName>(input);\n" +
+				"  final tokens = CommonTokenStream(lex);\n" +
 				"  <createParser>\n" +
 				"  parser.buildParseTree = true;\n" +
 				"  <profile>\n" +
 				"  ParserRuleContext tree = parser.<parserStartRuleName>();\n" +
 				"  <if(profile)>print('[${profiler.getDecisionInfo().join(', ')}]');<endif>\n" +
-				"  ParseTreeWalker.DEFAULT.walk(new TreeShapeListener(), tree);\n" +
+				"  ParseTreeWalker.DEFAULT.walk(TreeShapeListener(), tree);\n" +
 				"}\n" +
 				"\n" +
 				"class TreeShapeListener implements ParseTreeListener {\n" +
@@ -942,25 +944,25 @@ public class BaseDartTest implements RuntimeTestSupport {
 				"\n" +
 				"  @override\n" +
 				"  void enterEveryRule(ParserRuleContext ctx) {\n" +
-				"    for (int i = 0; i \\< ctx.childCount; i++) {\n" +
-				"      ParseTree parent = ctx.getChild(i).parent;\n" +
+				"    for (var i = 0; i \\< ctx.childCount; i++) {\n" +
+				"      final parent = ctx.getChild(i).parent;\n" +
 				"      if (!(parent is RuleNode) || (parent as RuleNode).ruleContext != ctx) {\n" +
-				"        throw new StateError(\"Invalid parse tree shape detected.\");\n" +
+				"        throw StateError('Invalid parse tree shape detected.');\n" +
 				"      }\n" +
 				"    }\n" +
 				"  }\n" +
 				"}\n"
 		);
-		ST createParserST = new ST("  <parserName> parser = new <parserName>(tokens);\n");
+		ST createParserST = new ST("final parser = <parserName>(tokens);\n");
 		if (debug) {
 			createParserST =
 				new ST(
-					"  <parserName> parser = new <parserName>(tokens);\n" +
+					"final parser = <parserName>(tokens);\n" +
 						"  parser.addErrorListener(new DiagnosticErrorListener());\n");
 		}
 		if (profile) {
 			outputFileST.add("profile",
-				"ProfilingATNSimulator profiler = new ProfilingATNSimulator(parser);\n" +
+				"ProfilingATNSimulator profiler = ProfilingATNSimulator(parser);\n" +
 					"parser.setInterpreter(profiler);");
 		} else {
 			outputFileST.add("profile", new ArrayList<Object>());
@@ -982,8 +984,8 @@ public class BaseDartTest implements RuntimeTestSupport {
 				"\n" +
 				"void main(List\\<String> args) async {\n" +
 				"  CharStream input = await InputStream.fromPath(args[0]);\n" +
-				"  <lexerName> lex = new <lexerName>(input);\n" +
-				"  CommonTokenStream tokens = new CommonTokenStream(lex);\n" +
+				"  <lexerName> lex = <lexerName>(input);\n" +
+				"  CommonTokenStream tokens = CommonTokenStream(lex);\n" +
 				"  tokens.fill();\n" +
 				"  for (Object t in tokens.getTokens())\n" +
 				"    print(t);\n" +

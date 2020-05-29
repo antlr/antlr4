@@ -10,55 +10,48 @@ import '../../recognizer.dart';
 import '../../rule_context.dart';
 import '../../util/murmur_hash.dart';
 
-/** A tree structure used to record the semantic context in which
- *  an ATN configuration is valid.  It's either a single predicate,
- *  a conjunction {@code p1&&p2}, or a sum of products {@code p1||p2}.
- *
- *  <p>I have scoped the [AND], [OR], and [Predicate] subclasses of
- *  [SemanticContext] within the scope of this outer class.</p>
- */
+/// A tree structure used to record the semantic context in which
+///  an ATN configuration is valid.  It's either a single predicate,
+///  a conjunction {@code p1&&p2}, or a sum of products {@code p1||p2}.
+///
+///  <p>I have scoped the [AND], [OR], and [Predicate] subclasses of
+///  [SemanticContext] within the scope of this outer class.</p>
 abstract class SemanticContext {
-  /**
-   * The default [SemanticContext], which is semantically equivalent to
-   * a predicate of the form {@code {true}?}.
-   */
-  static const SemanticContext NONE = const Predicate();
+  /// The default [SemanticContext], which is semantically equivalent to
+  /// a predicate of the form {@code {true}?}.
+  static const SemanticContext NONE = Predicate();
 
   const SemanticContext();
 
-  /**
-   * For context independent predicates, we evaluate them without a local
-   * context (i.e., null context). That way, we can evaluate them without
-   * having to create proper rule-specific context during prediction (as
-   * opposed to the parser, which creates them naturally). In a practical
-   * sense, this avoids a cast exception from RuleContext to myruleContext.
-   *
-   * <p>For context dependent predicates, we must pass in a local context so that
-   * references such as $arg evaluate properly as _localctx.arg. We only
-   * capture context dependent predicates in the context in which we begin
-   * prediction, so we passed in the outer context here in case of context
-   * dependent predicate evaluation.</p>
-   */
+  /// For context independent predicates, we evaluate them without a local
+  /// context (i.e., null context). That way, we can evaluate them without
+  /// having to create proper rule-specific context during prediction (as
+  /// opposed to the parser, which creates them naturally). In a practical
+  /// sense, this avoids a cast exception from RuleContext to myruleContext.
+  ///
+  /// <p>For context dependent predicates, we must pass in a local context so that
+  /// references such as $arg evaluate properly as _localctx.arg. We only
+  /// capture context dependent predicates in the context in which we begin
+  /// prediction, so we passed in the outer context here in case of context
+  /// dependent predicate evaluation.</p>
   bool eval(Recognizer parser, RuleContext parserCallStack);
 
-  /**
-   * Evaluate the precedence predicates for the context and reduce the result.
-   *
-   * @param parser The parser instance.
-   * @param parserCallStack
-   * @return The simplified semantic context after precedence predicates are
-   * evaluated, which will be one of the following values.
-   * <ul>
-   * <li>{@link #NONE}in if the predicate simplifies to [true] after
-   * precedence predicates are evaluated.</li>
-   * <li>nullin if the predicate simplifies to [false] after
-   * precedence predicates are evaluated.</li>
-   * <li>[this]in if the semantic context is not changed as a result of
-   * precedence predicate evaluation.</li>
-   * <li>A non-null [SemanticContext]in the new simplified
-   * semantic context after precedence predicates are evaluated.</li>
-   * </ul>
-   */
+  /// Evaluate the precedence predicates for the context and reduce the result.
+  ///
+  /// @param parser The parser instance.
+  /// @param parserCallStack
+  /// @return The simplified semantic context after precedence predicates are
+  /// evaluated, which will be one of the following values.
+  /// <ul>
+  /// <li>{@link #NONE}in if the predicate simplifies to [true] after
+  /// precedence predicates are evaluated.</li>
+  /// <li>nullin if the predicate simplifies to [false] after
+  /// precedence predicates are evaluated.</li>
+  /// <li>[this]in if the semantic context is not changed as a result of
+  /// precedence predicate evaluation.</li>
+  /// <li>A non-null [SemanticContext]in the new simplified
+  /// semantic context after precedence predicates are evaluated.</li>
+  /// </ul>
   SemanticContext evalPrecedence(Recognizer parser,
       RuleContext parserCallStack) {
     return this;
@@ -67,7 +60,7 @@ abstract class SemanticContext {
   static SemanticContext and(SemanticContext a, SemanticContext b) {
     if (a == null || a == NONE) return b;
     if (b == null || b == NONE) return a;
-    AND result = new AND(a, b);
+    final result = AND(a, b);
     if (result.opnds.length == 1) {
       return result.opnds[0];
     }
@@ -75,15 +68,13 @@ abstract class SemanticContext {
     return result;
   }
 
-  /**
-   *
-   *  @see ParserATNSimulator#getPredsForAmbigAlts
-   */
+  ///
+  ///  @see ParserATNSimulator#getPredsForAmbigAlts
   static SemanticContext or(SemanticContext a, SemanticContext b) {
     if (a == null) return b;
     if (b == null) return a;
     if (a == NONE || b == NONE) return NONE;
-    OR result = new OR(a, b);
+    final result = OR(a, b);
     if (result.opnds.length == 1) {
       return result.opnds[0];
     }
@@ -93,7 +84,7 @@ abstract class SemanticContext {
 
   static Iterable<PrecedencePredicate> filterPrecedencePredicates(
       Iterable<SemanticContext> collection) {
-    return collection.where((e) => e is PrecedencePredicate).map((e)=> e as PrecedencePredicate);
+    return collection.whereType<PrecedencePredicate>();
   }
 
   static Iterable<SemanticContext> filterNonPrecedencePredicates(
@@ -110,13 +101,15 @@ class Predicate extends SemanticContext {
   const Predicate(
       [this.ruleIndex = -1, this.predIndex = -1, this.isCtxDependent = false]);
 
+  @override
   bool eval(Recognizer parser, RuleContext parserCallStack) {
-    RuleContext localctx = isCtxDependent ? parserCallStack : null;
+    final localctx = isCtxDependent ? parserCallStack : null;
     return parser.sempred(localctx, ruleIndex, predIndex);
   }
 
+  @override
   int get hashCode {
-    int hashCode = MurmurHash.initialize();
+    var hashCode = MurmurHash.initialize();
     hashCode = MurmurHash.update(hashCode, ruleIndex);
     hashCode = MurmurHash.update(hashCode, predIndex);
     hashCode = MurmurHash.update(hashCode, isCtxDependent ? 1 : 0);
@@ -124,15 +117,17 @@ class Predicate extends SemanticContext {
     return hashCode;
   }
 
-  operator ==(Object obj) {
+  @override
+  bool operator ==(Object obj) {
     return obj is Predicate &&
-        this.ruleIndex == obj.ruleIndex &&
-        this.predIndex == obj.predIndex &&
-        this.isCtxDependent == obj.isCtxDependent;
+        ruleIndex == obj.ruleIndex &&
+        predIndex == obj.predIndex &&
+        isCtxDependent == obj.isCtxDependent;
   }
 
+  @override
   String toString() {
-    return "{$ruleIndex:$predIndex}?";
+    return '{$ruleIndex:$predIndex}?';
   }
 }
 
@@ -142,10 +137,12 @@ class PrecedencePredicate extends SemanticContext
 
   PrecedencePredicate([this.precedence = 0]);
 
+  @override
   bool eval(Recognizer parser, RuleContext parserCallStack) {
     return parser.precpred(parserCallStack, precedence);
   }
 
+  @override
   SemanticContext evalPrecedence(Recognizer parser,
       RuleContext parserCallStack) {
     if (parser.precpred(parserCallStack, precedence)) {
@@ -155,74 +152,74 @@ class PrecedencePredicate extends SemanticContext
     }
   }
 
+  @override
   int compareTo(PrecedencePredicate o) {
     return precedence - o.precedence;
   }
 
-  get hashCode {
-    int hashCode = 1;
+  @override
+  int get hashCode {
+    var hashCode = 1;
     hashCode = 31 * hashCode + precedence;
     return hashCode;
   }
 
-  operator ==(Object obj) {
+  @override
+  bool operator ==(Object obj) {
     if (!(obj is PrecedencePredicate)) {
       return false;
     }
     PrecedencePredicate other = obj;
-    return this.precedence == other.precedence;
+    return precedence == other.precedence;
   }
 
 // precedence >= _precedenceStack.peek()
+  @override
   String toString() {
-    return "{$precedence>=prec}?";
+    return '{$precedence>=prec}?';
   }
 }
 
-/**
- * This is the base class for semantic context "operators", which operate on
- * a collection of semantic context "operands".
- *
- * @since 4.3
- */
+/// This is the base class for semantic context "operators", which operate on
+/// a collection of semantic context "operands".
+///
+/// @since 4.3
 abstract class Operator extends SemanticContext {
-  /**
-   * Gets the operands for the semantic context operator.
-   *
-   * @return a collection of [SemanticContext] operands for the
-   * operator.
-   *
-   * @since 4.3
-   */
+  /// Gets the operands for the semantic context operator.
+  ///
+  /// @return a collection of [SemanticContext] operands for the
+  /// operator.
+  ///
+  /// @since 4.3
   List<SemanticContext> get operands;
 }
 
-/**
- * A semantic context which is true whenever none of the contained contexts
- * is false.
- */
+/// A semantic context which is true whenever none of the contained contexts
+/// is false.
 
 class AND extends Operator {
   List<SemanticContext> opnds;
 
   AND(SemanticContext a, SemanticContext b) {
-    Set<SemanticContext> operands = Set();
-    if (a is AND)
+    var operands = <SemanticContext>{};
+    if (a is AND) {
       operands.addAll(a.opnds);
-    else
+    } else {
       operands.add(a);
-    if (b is AND)
+    }
+    if (b is AND) {
       operands.addAll(b.opnds);
-    else
+    } else {
       operands.add(b);
+    }
 
-    Iterable<PrecedencePredicate> precedencePredicates =
+    final precedencePredicates =
     SemanticContext.filterPrecedencePredicates(operands);
 
     operands = SemanticContext.filterNonPrecedencePredicates(operands).toSet();
-    if (!precedencePredicates.isEmpty) {
+    if (precedencePredicates.isNotEmpty) {
       // interested in the transition with the lowest precedence
-      PrecedencePredicate reduced =
+      final reduced =
       precedencePredicates.reduce((a, b) => a.compareTo(b) <= 0 ? a : b);
       operands.add(reduced);
     }
@@ -230,41 +227,44 @@ class AND extends Operator {
     opnds = operands.toList();
   }
 
+  @override
   List<SemanticContext> get operands {
     return opnds;
   }
 
-  operator ==(Object obj) {
+  @override
+  bool operator ==(Object obj) {
     if (!(obj is AND)) return false;
     AND other = obj;
-    return ListEquality().equals(this.opnds, other.opnds);
+    return ListEquality().equals(opnds, other.opnds);
   }
 
-  get hashCode {
-    return MurmurHash.getHashCode(opnds, this.runtimeType.hashCode);
+  @override
+  int get hashCode {
+    return MurmurHash.getHashCode(opnds, runtimeType.hashCode);
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * <p>
-   * The evaluation of predicates by this context is short-circuiting, but
-   * unordered.</p>
-   */
+  /// {@inheritDoc}
+  ///
+  /// <p>
+  /// The evaluation of predicates by this context is short-circuiting, but
+  /// unordered.</p>
 
+  @override
   bool eval(Recognizer parser, RuleContext parserCallStack) {
-    for (SemanticContext opnd in opnds) {
+    for (var opnd in opnds) {
       if (!opnd.eval(parser, parserCallStack)) return false;
     }
     return true;
   }
 
+  @override
   SemanticContext evalPrecedence(Recognizer parser,
       RuleContext parserCallStack) {
-    bool differs = false;
-    List<SemanticContext> operands = [];
-    for (SemanticContext context in opnds) {
-      SemanticContext evaluated =
+    var differs = false;
+    final operands = <SemanticContext>[];
+    for (var context in opnds) {
+      final evaluated =
       context.evalPrecedence(parser, parserCallStack);
       differs |= (evaluated != context);
       if (evaluated == null) {
@@ -285,86 +285,90 @@ class AND extends Operator {
       return SemanticContext.NONE;
     }
 
-    SemanticContext result = operands[0];
-    for (int i = 1; i < operands.length; i++) {
+    var result = operands[0];
+    for (var i = 1; i < operands.length; i++) {
       result = SemanticContext.and(result, operands[i]);
     }
 
     return result;
   }
 
+  @override
   String toString() {
-    return opnds.join("&&");
+    return opnds.join('&&');
   }
 }
 
-/**
- * A semantic context which is true whenever at least one of the contained
- * contexts is true.
- */
+/// A semantic context which is true whenever at least one of the contained
+/// contexts is true.
 class OR extends Operator {
   List<SemanticContext> opnds;
 
   OR(SemanticContext a, SemanticContext b) {
-    Set<SemanticContext> operands = Set();
-    if (a is OR)
+    var operands = <SemanticContext>{};
+    if (a is OR) {
       operands.addAll(a.opnds);
-    else
+    } else {
       operands.add(a);
-    if (b is OR)
+    }
+    if (b is OR) {
       operands.addAll(b.opnds);
-    else
+    } else {
       operands.add(b);
+    }
 
-    Iterable<PrecedencePredicate> precedencePredicates =
+    final precedencePredicates =
     SemanticContext.filterPrecedencePredicates(operands);
 
     operands = SemanticContext.filterNonPrecedencePredicates(operands).toSet();
-    if (!precedencePredicates.isEmpty) {
+    if (precedencePredicates.isNotEmpty) {
       // interested in the transition with the highest precedence
-      PrecedencePredicate reduced =
+      final reduced =
       precedencePredicates.reduce((a, b) => a.compareTo(b) >= 0 ? a : b);
       operands.add(reduced);
     }
 
-    this.opnds = operands.toList();
+    opnds = operands.toList();
   }
 
+  @override
   List<SemanticContext> get operands {
     return opnds;
   }
 
-  operator ==(Object obj) {
+  @override
+  bool operator ==(Object obj) {
     if (!(obj is OR)) return false;
     OR other = obj;
-    return ListEquality().equals(this.opnds, other.opnds);
+    return ListEquality().equals(opnds, other.opnds);
   }
 
-  get hashCode {
-    return MurmurHash.getHashCode(opnds, this.runtimeType.hashCode);
+  @override
+  int get hashCode {
+    return MurmurHash.getHashCode(opnds, runtimeType.hashCode);
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * <p>
-   * The evaluation of predicates by this context is short-circuiting, but
-   * unordered.</p>
-   */
+  /// {@inheritDoc}
+  ///
+  /// <p>
+  /// The evaluation of predicates by this context is short-circuiting, but
+  /// unordered.</p>
 
+  @override
   bool eval(Recognizer parser, RuleContext parserCallStack) {
-    for (SemanticContext opnd in opnds) {
+    for (var opnd in opnds) {
       if (opnd.eval(parser, parserCallStack)) return true;
     }
     return false;
   }
 
+  @override
   SemanticContext evalPrecedence(Recognizer parser,
       RuleContext parserCallStack) {
-    bool differs = false;
-    List<SemanticContext> operands = [];
-    for (SemanticContext context in opnds) {
-      SemanticContext evaluated =
+    var differs = false;
+    final operands = <SemanticContext>[];
+    for (var context in opnds) {
+      final evaluated =
       context.evalPrecedence(parser, parserCallStack);
       differs |= (evaluated != context);
       if (evaluated == SemanticContext.NONE) {
@@ -385,15 +389,16 @@ class OR extends Operator {
       return null;
     }
 
-    SemanticContext result = operands[0];
-    for (int i = 1; i < operands.length; i++) {
+    var result = operands[0];
+    for (var i = 1; i < operands.length; i++) {
       result = SemanticContext.or(result, operands[i]);
     }
 
     return result;
   }
 
+  @override
   String toString() {
-    return opnds.join("||");
+    return opnds.join('||');
   }
 }

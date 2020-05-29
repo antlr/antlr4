@@ -23,39 +23,36 @@ enum TransitionType {
   PRECEDENCE,
 }
 
-/** An ATN transition between any two ATN states.  Subclasses define
- *  atom, set, epsilon, action, predicate, rule transitions.
- *
- *  <p>This is a one way link.  It emanates from a state (usually via a list of
- *  transitions) and has a target state.</p>
- *
- *  <p>Since we never have to change the ATN transitions once we construct it,
- *  we can fix these transitions as specific classes. The DFA transitions
- *  on the other hand need to update the labels as it adds transitions to
- *  the states. We'll use the term Edge for the DFA to distinguish them from
- *  ATN transitions.</p>
- */
+/// An ATN transition between any two ATN states.  Subclasses define
+///  atom, set, epsilon, action, predicate, rule transitions.
+///
+///  <p>This is a one way link.  It emanates from a state (usually via a list of
+///  transitions) and has a target state.</p>
+///
+///  <p>Since we never have to change the ATN transitions once we construct it,
+///  we can fix these transitions as specific classes. The DFA transitions
+///  on the other hand need to update the labels as it adds transitions to
+///  the states. We'll use the term Edge for the DFA to distinguish them from
+///  ATN transitions.</p>
 abstract class Transition {
-  /** The target of this transition. */
+  /// The target of this transition. */
   ATNState target;
 
   Transition(this.target) {
     if (target == null) {
-      throw new ArgumentError.notNull("target cannot be null.");
+      throw ArgumentError.notNull('target cannot be null.');
     }
   }
 
   TransitionType get type;
 
-  /**
-   * Determines if the transition is an "epsilon" transition.
-   *
-   * <p>The default implementation returns [false].</p>
-   *
-   * @return [true] if traversing this transition in the ATN does not
-   * consume an input symbol; otherwise, [false] if traversing this
-   * transition consumes (matches) an input symbol.
-   */
+  /// Determines if the transition is an "epsilon" transition.
+  ///
+  /// <p>The default implementation returns [false].</p>
+  ///
+  /// @return [true] if traversing this transition in the ATN does not
+  /// consume an input symbol; otherwise, [false] if traversing this
+  /// transition consumes (matches) an input symbol.
   bool get isEpsilon => false;
 
   IntervalSet get label => null;
@@ -64,27 +61,28 @@ abstract class Transition {
 }
 
 class EpsilonTransition extends Transition {
-  /**
-   * @return the rule index of a precedence rule for which this transition is
-   * returning from, where the precedence value is 0; otherwise, -1.
-   *
-   * @see ATNConfig#isPrecedenceFilterSuppressed()
-   * @see ParserATNSimulator#applyPrecedenceFilter(ATNConfigSet)
-   * @since 4.4.1
-   */
+  /// @return the rule index of a precedence rule for which this transition is
+  /// returning from, where the precedence value is 0; otherwise, -1.
+  ///
+  /// @see ATNConfig#isPrecedenceFilterSuppressed()
+  /// @see ParserATNSimulator#applyPrecedenceFilter(ATNConfigSet)
+  /// @since 4.4.1
   final int outermostPrecedenceReturn;
 
   EpsilonTransition(ATNState target, [this.outermostPrecedenceReturn = -1])
       : super(target);
 
-  get isEpsilon => true;
+  @override
+  bool get isEpsilon => true;
 
+  @override
   bool matches(int symbol, int minVocabSymbol, int maxVocabSymbol) {
     return false;
   }
 
+  @override
   String toString() {
-    return "epsilon";
+    return 'epsilon';
   }
 
   @override
@@ -97,14 +95,17 @@ class RangeTransition extends Transition {
 
   RangeTransition(ATNState target, this.from, this.to) : super(target);
 
+  @override
   IntervalSet get label {
     return IntervalSet.ofRange(from, to);
   }
 
+  @override
   bool matches(int symbol, int minVocabSymbol, int maxVocabSymbol) {
     return symbol >= from && symbol <= to;
   }
 
+  @override
   String toString() {
     return "'$from..$to'";
   }
@@ -114,20 +115,22 @@ class RangeTransition extends Transition {
 }
 
 class RuleTransition extends Transition {
-  /** Ptr to the rule definition object for this rule ref */
+  /// Ptr to the rule definition object for this rule ref */
   final int ruleIndex; // no Rule object at runtime
 
   final int precedence;
 
-  /** What node to begin computations following ref to rule */
+  /// What node to begin computations following ref to rule */
   ATNState followState;
 
   RuleTransition(RuleStartState ruleStart, this.ruleIndex, this.precedence,
       this.followState)
       : super(ruleStart);
 
-  get isEpsilon => true;
+  @override
+  bool get isEpsilon => true;
 
+  @override
   bool matches(int symbol, int minVocabSymbol, int maxVocabSymbol) {
     return false;
   }
@@ -149,38 +152,44 @@ class PredicateTransition extends AbstractPredicateTransition {
       target, this.ruleIndex, this.predIndex, this.isCtxDependent)
       : super(target);
 
-  get isEpsilon => true;
+  @override
+  bool get isEpsilon => true;
 
-  matches(symbol, minVocabSymbol, maxVocabSymbol) {
+  @override
+  bool matches(symbol, minVocabSymbol, maxVocabSymbol) {
     return false;
   }
 
-  get predicate => new Predicate(this.ruleIndex, this.predIndex, this.isCtxDependent);
+  Predicate get predicate => Predicate(ruleIndex, predIndex, isCtxDependent);
 
 
-  toString() {
-    return "pred_$ruleIndex:$predIndex";
+  @override
+  String toString() {
+    return 'pred_$ruleIndex:$predIndex';
   }
 
   @override
   TransitionType get type => TransitionType.PREDICATE;
 }
 
-/** TODO: make all transitions sets? no, should remove set edges */
+/// TODO: make all transitions sets? no, should remove set edges */
 class AtomTransition extends Transition {
-  /** The token type or character value; or, signifies special label. */
+  /// The token type or character value; or, signifies special label. */
   final int atomLabel;
 
   AtomTransition(ATNState target, this.atomLabel) : super(target);
 
+  @override
   IntervalSet get label {
     return IntervalSet.ofOne(atomLabel);
   }
 
+  @override
   bool matches(int symbol, int minVocabSymbol, int maxVocabSymbol) {
     return atomLabel == symbol;
   }
 
+  @override
   String toString() {
     return label.toString();
   }
@@ -198,13 +207,16 @@ class ActionTransition extends Transition {
       [this.actionIndex = -1, this.isCtxDependent = false])
       : super(target);
 
+  @override
   bool get isEpsilon =>
       true; // we are to be ignored by analysis 'cept for predicates
 
-  matches(symbol, minVocabSymbol, maxVocabSymbol) => false;
+  @override
+  bool matches(symbol, minVocabSymbol, maxVocabSymbol) => false;
 
-  toString() {
-    return "action_$ruleIndex:$actionIndex";
+  @override
+  String toString() {
+    return 'action_$ruleIndex:$actionIndex';
   }
 
   @override
@@ -213,18 +225,21 @@ class ActionTransition extends Transition {
 
 // A transition containing a set of values.
 class SetTransition extends Transition {
+  @override
   IntervalSet label;
 
   SetTransition(ATNState target, [IntervalSet st]) : super(target) {
-    this.label = st ?? IntervalSet.ofOne(Token.INVALID_TYPE);
+    label = st ?? IntervalSet.ofOne(Token.INVALID_TYPE);
   }
 
-  matches(symbol, minVocabSymbol, maxVocabSymbol) {
-    return this.label.contains(symbol);
+  @override
+  bool matches(symbol, minVocabSymbol, maxVocabSymbol) {
+    return label.contains(symbol);
   }
 
-  toString() {
-    return this.label.toString();
+  @override
+  String toString() {
+    return label.toString();
   }
 
   @override
@@ -234,13 +249,15 @@ class SetTransition extends Transition {
 class NotSetTransition extends SetTransition {
   NotSetTransition(target, st) : super(target, st);
 
-  matches(symbol, minVocabSymbol, maxVocabSymbol) {
+  @override
+  bool matches(symbol, minVocabSymbol, maxVocabSymbol) {
     return symbol >= minVocabSymbol &&
         symbol <= maxVocabSymbol &&
         !super.matches(symbol, minVocabSymbol, maxVocabSymbol);
   }
 
-  toString() {
+  @override
+  String toString() {
     return '~' + super.toString();
   }
 
@@ -251,12 +268,14 @@ class NotSetTransition extends SetTransition {
 class WildcardTransition extends Transition {
   WildcardTransition(target) : super(target);
 
-  matches(symbol, minVocabSymbol, maxVocabSymbol) {
+  @override
+  bool matches(symbol, minVocabSymbol, maxVocabSymbol) {
     return symbol >= minVocabSymbol && symbol <= maxVocabSymbol;
   }
 
-  toString() {
-    return ".";
+  @override
+  String toString() {
+    return '.';
   }
 
   @override
@@ -268,15 +287,18 @@ class PrecedencePredicateTransition extends AbstractPredicateTransition {
 
   PrecedencePredicateTransition(target, this.precedence) : super(target);
 
-  get isEpsilon => true;
+  @override
+  bool get isEpsilon => true;
 
-  matches(symbol, minVocabSymbol, maxVocabSymbol) => false;
+  @override
+  bool matches(symbol, minVocabSymbol, maxVocabSymbol) => false;
 
   PrecedencePredicate get predicate {
-    return new PrecedencePredicate(precedence);
+    return PrecedencePredicate(precedence);
   }
 
-  toString() => "$precedence >= _p";
+  @override
+  String toString() => '$precedence >= _p';
 
   @override
   TransitionType get type => TransitionType.PRECEDENCE;

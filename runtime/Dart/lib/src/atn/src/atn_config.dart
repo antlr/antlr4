@@ -11,83 +11,77 @@ import 'atn_state.dart';
 import 'lexer_action_executor.dart';
 import 'semantic_context.dart';
 
-checkParams(params, isCfg) {
+Map<String, dynamic> checkParams(params, isCfg) {
   if (params == null) {
-    Map<String, dynamic> result = {
-      "state": null,
-      "alt": null,
-      "context": null,
-      "semanticContext": null
+    final result = <String, dynamic>{
+      'state': null,
+      'alt': null,
+      'context': null,
+      'semanticContext': null
     };
     if (isCfg) {
-      result["reachesIntoOuterContext"] = 0;
+      result['reachesIntoOuterContext'] = 0;
     }
     return result;
   } else {
-    Map<String, dynamic> props = {};
-    props["state"] = params.state ?? null;
-    props["alt"] = (params.alt == null) ? null : params.alt;
-    props["context"] = params.context ?? null;
-    props["semanticContext"] = params.semanticContext ?? null;
+    final props = <String, dynamic>{};
+    props['state'] = params.state;
+    props['alt'] = (params.alt == null) ? null : params.alt;
+    props['context'] = params.context;
+    props['semanticContext'] = params.semanticContext;
     if (isCfg) {
-      props["reachesIntoOuterContext"] = params.reachesIntoOuterContext ?? 0;
-      props["precedenceFilterSuppressed"] =
+      props['reachesIntoOuterContext'] = params.reachesIntoOuterContext ?? 0;
+      props['precedenceFilterSuppressed'] =
           params.precedenceFilterSuppressed ?? false;
     }
     return props;
   }
 }
 
-/** A tuple: (ATN state, predicted alt, syntactic, semantic context).
- *  The syntactic context is a graph-structured stack node whose
- *  path(s) to the root is the rule invocation(s)
- *  chain used to arrive at the state.  The semantic context is
- *  the tree of semantic predicates encountered before reaching
- *  an ATN state.
- */
+/// A tuple: (ATN state, predicted alt, syntactic, semantic context).
+///  The syntactic context is a graph-structured stack node whose
+///  path(s) to the root is the rule invocation(s)
+///  chain used to arrive at the state.  The semantic context is
+///  the tree of semantic predicates encountered before reaching
+///  an ATN state.
 class ATNConfig {
-  /**
-   * This field stores the bit mask for implementing the
-   * {@link #isPrecedenceFilterSuppressed} property as a bit within the
-   * existing {@link #reachesIntoOuterContext} field.
-   */
+  /// This field stores the bit mask for implementing the
+  /// {@link #isPrecedenceFilterSuppressed} property as a bit within the
+  /// existing {@link #reachesIntoOuterContext} field.
   static final int SUPPRESS_PRECEDENCE_FILTER = 0x40000000;
 
-  /** The ATN state associated with this configuration */
+  /// The ATN state associated with this configuration */
   ATNState state;
 
-  /** What alt (or lexer rule) is predicted by this configuration */
+  /// What alt (or lexer rule) is predicted by this configuration */
   int alt;
 
-  /** The stack of invoking states leading to the rule/states associated
-   *  with this config.  We track only those contexts pushed during
-   *  execution of the ATN simulator.
-   */
+  /// The stack of invoking states leading to the rule/states associated
+  ///  with this config.  We track only those contexts pushed during
+  ///  execution of the ATN simulator.
   PredictionContext context;
 
-  /**
-   * We cannot execute predicates dependent upon local context unless
-   * we know for sure we are in the correct context. Because there is
-   * no way to do this efficiently, we simply cannot evaluate
-   * dependent predicates unless we are in the rule that initially
-   * invokes the ATN simulator.
-   *
-   * <p>
-   * closure() tracks the depth of how far we dip into the outer context:
-   * depth &gt; 0.  Note that it may not be totally accurate depth since I
-   * don't ever decrement. TODO: make it a bool then</p>
-   *
-   * <p>
-   * For memory efficiency, the {@link #isPrecedenceFilterSuppressed} method
-   * is also backed by this field. Since the field is ly accessible, the
-   * highest bit which would not cause the value to become negative is used to
-   * store this field. This choice minimizes the risk that code which only
-   * compares this value to 0 would be affected by the new purpose of the
-   * flag. It also ensures the performance of the existing [ATNConfig]
-   * constructors as well as certain operations like
-   * {@link ATNConfigSet#add(ATNConfig, DoubleKeyMap)} method are
-   * <em>completely</em> unaffected by the change.</p>
-   */
+  /// We cannot execute predicates dependent upon local context unless
+  /// we know for sure we are in the correct context. Because there is
+  /// no way to do this efficiently, we simply cannot evaluate
+  /// dependent predicates unless we are in the rule that initially
+  /// invokes the ATN simulator.
+  ///
+  /// <p>
+  /// closure() tracks the depth of how far we dip into the outer context:
+  /// depth &gt; 0.  Note that it may not be totally accurate depth since I
+  /// don't ever decrement. TODO: make it a bool then</p>
+  ///
+  /// <p>
+  /// For memory efficiency, the {@link #isPrecedenceFilterSuppressed} method
+  /// is also backed by this field. Since the field is ly accessible, the
+  /// highest bit which would not cause the value to become negative is used to
+  /// store this field. This choice minimizes the risk that code which only
+  /// compares this value to 0 would be affected by the new purpose of the
+  /// flag. It also ensures the performance of the existing [ATNConfig]
+  /// constructors as well as certain operations like
+  /// {@link ATNConfigSet#add(ATNConfig, DoubleKeyMap)} method are
+  /// <em>completely</em> unaffected by the change.</p>
   int reachesIntoOuterContext = 0;
 
   SemanticContext semanticContext;
@@ -97,19 +91,17 @@ class ATNConfig {
 
   ATNConfig.dup(ATNConfig c,
       {this.state, this.alt, this.context, this.semanticContext}) {
-    this.state = state ?? c.state;
-    this.alt = alt ?? c.alt;
-    this.context = context ?? c.context;
-    this.semanticContext = semanticContext ?? c.semanticContext;
-    this.reachesIntoOuterContext =
+    state = state ?? c.state;
+    alt = alt ?? c.alt;
+    context = context ?? c.context;
+    semanticContext = semanticContext ?? c.semanticContext;
+    reachesIntoOuterContext =
         c.reachesIntoOuterContext ?? reachesIntoOuterContext;
   }
 
-  /**
-   * This method gets the value of the {@link #reachesIntoOuterContext} field
-   * as it existed prior to the introduction of the
-   * {@link #isPrecedenceFilterSuppressed} method.
-   */
+  /// This method gets the value of the {@link #reachesIntoOuterContext} field
+  /// as it existed prior to the introduction of the
+  /// {@link #isPrecedenceFilterSuppressed} method.
   int get outerContextDepth {
     return reachesIntoOuterContext & ~SUPPRESS_PRECEDENCE_FILTER;
   }
@@ -120,31 +112,32 @@ class ATNConfig {
 
   void setPrecedenceFilterSuppressed(bool value) {
     if (value) {
-      this.reachesIntoOuterContext |= 0x40000000;
+      reachesIntoOuterContext |= 0x40000000;
     } else {
-      this.reachesIntoOuterContext &= ~SUPPRESS_PRECEDENCE_FILTER;
+      reachesIntoOuterContext &= ~SUPPRESS_PRECEDENCE_FILTER;
     }
   }
 
-  /** An ATN configuration is equal to another if both have
-   *  the same state, they predict the same alternative, and
-   *  syntactic/semantic contexts are the same.
-   */
-  operator ==(Object other) {
+  /// An ATN configuration is equal to another if both have
+  ///  the same state, they predict the same alternative, and
+  ///  syntactic/semantic contexts are the same.
+  @override
+  bool operator ==(Object other) {
     if (other is ATNConfig && other != null) {
-      return this.state.stateNumber == other.state.stateNumber &&
-          this.alt == other.alt &&
-          (this.context == other.context ||
-              (this.context != null && this.context == other.context)) &&
-          this.semanticContext == other.semanticContext &&
-          this.isPrecedenceFilterSuppressed() ==
+      return state.stateNumber == other.state.stateNumber &&
+          alt == other.alt &&
+          (context == other.context ||
+              (context != null && context == other.context)) &&
+          semanticContext == other.semanticContext &&
+          isPrecedenceFilterSuppressed() ==
               other.isPrecedenceFilterSuppressed();
     }
     return false;
   }
 
-  get hashCode {
-    int hashCode = MurmurHash.initialize(7);
+  @override
+  int get hashCode {
+    var hashCode = MurmurHash.initialize(7);
     hashCode = MurmurHash.update(hashCode, state.stateNumber);
     hashCode = MurmurHash.update(hashCode, alt);
     hashCode = MurmurHash.update(hashCode, context);
@@ -153,8 +146,9 @@ class ATNConfig {
     return hashCode;
   }
 
+  @override
   String toString([Recognizer recog, bool showAlt = true]) {
-    StringBuffer buf = new StringBuffer();
+    final buf = StringBuffer();
     // if ( state.ruleIndex>=0 ) {
     //  if ( recog!=null ) buf.write(recog.ruleNames[state.ruleIndex]+":");
     //  else buf.write(state.ruleIndex+":");
@@ -162,20 +156,20 @@ class ATNConfig {
     buf.write('(');
     buf.write(state);
     if (showAlt) {
-      buf.write(",");
+      buf.write(',');
       buf.write(alt);
     }
     if (context != null) {
-      buf.write(",[");
+      buf.write(',[');
       buf.write(context.toString());
-      buf.write("]");
+      buf.write(']');
     }
     if (semanticContext != null && semanticContext != SemanticContext.NONE) {
-      buf.write(",");
+      buf.write(',');
       buf.write(semanticContext);
     }
     if (outerContextDepth > 0) {
-      buf.write(",up=");
+      buf.write(',up=');
       buf.write(outerContextDepth);
     }
     buf.write(')');
@@ -184,10 +178,8 @@ class ATNConfig {
 }
 
 class LexerATNConfig extends ATNConfig {
-  /**
-   * Gets the [LexerActionExecutor] capable of executing the embedded
-   * action(s) for the current configuration.
-   */
+  /// Gets the [LexerActionExecutor] capable of executing the embedded
+  /// action(s) for the current configuration.
   LexerActionExecutor lexerActionExecutor;
 
   bool passedThroughNonGreedyDecision = false;
@@ -195,22 +187,23 @@ class LexerATNConfig extends ATNConfig {
   LexerATNConfig(ATNState state, int alt, PredictionContext context,
       [this.lexerActionExecutor])
       : super(state, alt, context, SemanticContext.NONE) {
-    this.passedThroughNonGreedyDecision = false;
+    passedThroughNonGreedyDecision = false;
   }
 
   LexerATNConfig.dup(LexerATNConfig c, ATNState state,
       {this.lexerActionExecutor, PredictionContext context})
       : super.dup(c, state: state, context: context) {
-    this.lexerActionExecutor = lexerActionExecutor ?? c.lexerActionExecutor;
-    this.passedThroughNonGreedyDecision = checkNonGreedyDecision(c, state);
+    lexerActionExecutor = lexerActionExecutor ?? c.lexerActionExecutor;
+    passedThroughNonGreedyDecision = checkNonGreedyDecision(c, state);
   }
 
   bool hasPassedThroughNonGreedyDecision() {
     return passedThroughNonGreedyDecision;
   }
 
+  @override
   int get hashCode {
-    int hashCode = MurmurHash.initialize(7);
+    var hashCode = MurmurHash.initialize(7);
     hashCode = MurmurHash.update(hashCode, state.stateNumber);
     hashCode = MurmurHash.update(hashCode, alt);
     hashCode = MurmurHash.update(hashCode, context);
@@ -222,11 +215,12 @@ class LexerATNConfig extends ATNConfig {
     return hashCode;
   }
 
+  @override
   bool operator ==(Object other) {
     if (identical(this, other)) {
       return true;
     } else if (other is LexerATNConfig) {
-      LexerATNConfig lexerOther = other;
+      final lexerOther = other;
       if (passedThroughNonGreedyDecision !=
           lexerOther.passedThroughNonGreedyDecision) {
         return false;

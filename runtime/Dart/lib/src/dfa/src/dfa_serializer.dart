@@ -4,12 +4,12 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
-import '../../vocabulary.dart';
 import '../../util/utils.dart';
+import '../../vocabulary.dart';
 import 'dfa.dart';
 import 'dfa_state.dart';
 
-/** A DFA walker that knows how to dump them to serialized strings. */
+/// A DFA walker that knows how to dump them to serialized strings. */
 class DFASerializer {
   final DFA dfa;
 
@@ -17,29 +17,30 @@ class DFASerializer {
 
   DFASerializer(this.dfa, this.vocabulary);
 
+  @override
   String toString() {
     if (dfa.s0 == null) return null;
-    StringBuffer buf = new StringBuffer();
-    List<DFAState> states = dfa.getStates();
-    for (DFAState s in states) {
-      int n = 0;
+    final buf = StringBuffer();
+    final states = dfa.getStates();
+    for (var s in states) {
+      var n = 0;
       if (s.edges != null) n = s.edges.length;
-      for (int i = 0; i < n; i++) {
-        DFAState t = s.edges[i];
+      for (var i = 0; i < n; i++) {
+        final t = s.edges[i];
         if (t != null && t.stateNumber != 0x7FFFFFFF) {
           buf.write(getStateString(s));
-          String label = getEdgeLabel(i);
-          buf.write("-");
+          final label = getEdgeLabel(i);
+          buf.write('-');
           buf.write(label);
-          buf.write("->");
+          buf.write('->');
           buf.write(getStateString(t));
           buf.write('\n');
         }
       }
     }
 
-    String output = buf.toString();
-    if (output.length == 0) return null;
+    final output = buf.toString();
+    if (output.isEmpty) return null;
     //return Utils.sortLinesInString(output);
     return output;
   }
@@ -49,15 +50,15 @@ class DFASerializer {
   }
 
   String getStateString(DFAState s) {
-    int n = s.stateNumber;
-    final String baseStateStr = (s.isAcceptState ? ":" : "") +
-        "s$n" +
-        (s.requiresFullContext ? "^" : "");
+    final n = s.stateNumber;
+    final baseStateStr = (s.isAcceptState ? ':' : '') +
+        's$n' +
+        (s.requiresFullContext ? '^' : '');
     if (s.isAcceptState) {
       if (s.predicates != null) {
-        return baseStateStr + "=>${arrayToString(s.predicates)}";
+        return baseStateStr + '=>${arrayToString(s.predicates)}';
       } else {
-        return baseStateStr + "=>${s.prediction}";
+        return baseStateStr + '=>${s.prediction}';
       }
     } else {
       return baseStateStr;
@@ -68,6 +69,7 @@ class DFASerializer {
 class LexerDFASerializer extends DFASerializer {
   LexerDFASerializer(dfa) : super(dfa, VocabularyImpl.EMPTY_VOCABULARY);
 
+  @override
   String getEdgeLabel(i) {
     return "'" + String.fromCharCode(i) + "'";
   }

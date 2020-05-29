@@ -13,11 +13,11 @@ import 'token.dart';
 import 'util/murmur_hash.dart';
 import 'vocabulary.dart';
 
-/** An immutable inclusive interval a..b */
+/// An immutable inclusive interval a..b */
 class Interval {
   static final int INTERVAL_POOL_MAX_VALUE = 1000;
 
-  static final Interval INVALID = new Interval(-1, -2);
+  static final Interval INVALID = Interval(-1, -2);
 
   static List<Interval> cache = List<Interval>(INTERVAL_POOL_MAX_VALUE + 1);
 
@@ -31,139 +31,137 @@ class Interval {
 
   Interval(this.a, this.b);
 
-  /** Interval objects are used readonly so share all with the
-   *  same single value a==b up to some max size.  Use an array as a perfect hash.
-   *  Return shared object for 0..INTERVAL_POOL_MAX_VALUE or a new
-   *  Interval object with a..a in it.  On Java.g4, 218623 IntervalSets
-   *  have a..a (set with 1 element).
-   */
+  /// Interval objects are used readonly so share all with the
+  ///  same single value a==b up to some max size.  Use an array as a perfect hash.
+  ///  Return shared object for 0..INTERVAL_POOL_MAX_VALUE or a new
+  ///  Interval object with a..a in it.  On Java.g4, 218623 IntervalSets
+  ///  have a..a (set with 1 element).
   static Interval of(int a, int b) {
     // cache just a..a
     if (a != b || a < 0 || a > INTERVAL_POOL_MAX_VALUE) {
-      return new Interval(a, b);
+      return Interval(a, b);
     }
     if (cache[a] == null) {
-      cache[a] = new Interval(a, a);
+      cache[a] = Interval(a, a);
     }
     return cache[a];
   }
 
-  /** return number of elements between a and b inclusively. x..x is length 1.
-   *  if b &lt; a, then length is 0.  9..10 has length 2.
-   */
+  /// return number of elements between a and b inclusively. x..x is length 1.
+  ///  if b &lt; a, then length is 0.  9..10 has length 2.
   int get length {
     if (b < a) return 0;
     return b - a + 1;
   }
 
+  @override
   bool operator ==(Object o) {
     if (o == null || !(o is Interval)) {
       return false;
     }
     Interval other = o;
-    return this.a == other.a && this.b == other.b;
+    return a == other.a && b == other.b;
   }
 
+  @override
   int get hashCode {
-    int hash = 23;
+    var hash = 23;
     hash = hash * 31 + a;
     hash = hash * 31 + b;
     return hash;
   }
 
-  /** Does this start completely before other? Disjoint */
+  /// Does this start completely before other? Disjoint */
   bool startsBeforeDisjoint(Interval other) {
-    return this.a < other.a && this.b < other.a;
+    return a < other.a && b < other.a;
   }
 
-  /** Does this start at or before other? Nondisjoint */
+  /// Does this start at or before other? Nondisjoint */
   bool startsBeforeNonDisjoint(Interval other) {
-    return this.a <= other.a && this.b >= other.a;
+    return a <= other.a && b >= other.a;
   }
 
-  /** Does this.a start after other.b? May or may not be disjoint */
+  /// Does this.a start after other.b? May or may not be disjoint */
   bool startsAfter(Interval other) {
-    return this.a > other.a;
+    return a > other.a;
   }
 
-  /** Does this start completely after other? Disjoint */
+  /// Does this start completely after other? Disjoint */
   bool startsAfterDisjoint(Interval other) {
-    return this.a > other.b;
+    return a > other.b;
   }
 
-  /** Does this start after other? NonDisjoint */
+  /// Does this start after other? NonDisjoint */
   bool startsAfterNonDisjoint(Interval other) {
-    return this.a > other.a && this.a <= other.b; // this.b>=other.b implied
+    return a > other.a && a <= other.b; // this.b>=other.b implied
   }
 
-  /** Are both ranges disjoint? I.e., no overlap? */
+  /// Are both ranges disjoint? I.e., no overlap? */
   bool disjoint(Interval other) {
     return startsBeforeDisjoint(other) || startsAfterDisjoint(other);
   }
 
-  /** Are two intervals adjacent such as 0..41 and 42..42? */
+  /// Are two intervals adjacent such as 0..41 and 42..42? */
   bool adjacent(Interval other) {
-    return this.a == other.b + 1 || this.b == other.a - 1;
+    return a == other.b + 1 || b == other.a - 1;
   }
 
   bool properlyContains(Interval other) {
-    return other.a >= this.a && other.b <= this.b;
+    return other.a >= a && other.b <= b;
   }
 
-  /** Return the interval computed from combining this and other */
+  /// Return the interval computed from combining this and other */
   Interval union(Interval other) {
     return Interval.of(min(a, other.a), max(b, other.b));
   }
 
-  /** Return the interval in common between this and o */
+  /// Return the interval in common between this and o */
   Interval intersection(Interval other) {
     return Interval.of(max(a, other.a), min(b, other.b));
   }
 
-  /** Return the interval with elements from this not in other;
-   *  other must not be totally enclosed (properly contained)
-   *  within this, which would result in two disjoint intervals
-   *  instead of the single one returned by this method.
-   */
+  /// Return the interval with elements from this not in other;
+  ///  other must not be totally enclosed (properly contained)
+  ///  within this, which would result in two disjoint intervals
+  ///  instead of the single one returned by this method.
   Interval differenceNotProperlyContained(Interval other) {
-    Interval diff = null;
+    Interval diff;
     // other.a to left of this.a (or same)
     if (other.startsBeforeNonDisjoint(this)) {
-      diff = Interval.of(max(this.a, other.b + 1), this.b);
+      diff = Interval.of(max(a, other.b + 1), b);
     }
 
     // other.a to right of this.a
     else if (other.startsAfterNonDisjoint(this)) {
-      diff = Interval.of(this.a, other.a - 1);
+      diff = Interval.of(a, other.a - 1);
     }
     return diff;
   }
 
+  @override
   String toString() {
-    return "$a..$b";
+    return '$a..$b';
   }
 }
 
-/**
- * This class implements the [IntervalSet] backed by a sorted array of
- * non-overlapping intervals. It is particularly efficient for representing
- * large collections of numbers, where the majority of elements appear as part
- * of a sequential range of numbers that are all part of the set. For example,
- * the set { 1, 2, 3, 4, 7, 8 } may be represented as { [1, 4], [7, 8] }.
- *
- * <p>
- * This class is able to represent sets containing any combination of values in
- * the range {@link int#MIN_VALUE} to {@link int#MAX_VALUE}
- * (inclusive).</p>
- */
+/// This class implements the [IntervalSet] backed by a sorted array of
+/// non-overlapping intervals. It is particularly efficient for representing
+/// large collections of numbers, where the majority of elements appear as part
+/// of a sequential range of numbers that are all part of the set. For example,
+/// the set { 1, 2, 3, 4, 7, 8 } may be represented as { [1, 4], [7, 8] }.
+///
+/// <p>
+/// This class is able to represent sets containing any combination of values in
+/// the range {@link int#MIN_VALUE} to {@link int#MAX_VALUE}
+/// (inclusive).</p>
 class IntervalSet {
   static final IntervalSet COMPLETE_CHAR_SET =
       IntervalSet.ofRange(Lexer.MIN_CHAR_VALUE, Lexer.MAX_CHAR_VALUE)
         ..setReadonly(true);
 
-  static final IntervalSet EMPTY_SET = new IntervalSet([])..setReadonly(true);
+  static final IntervalSet EMPTY_SET = IntervalSet([])..setReadonly(true);
 
-  /** The list of sorted, disjoint intervals. */
+  /// The list of sorted, disjoint intervals. */
   List<Interval> intervals = [];
 
   bool readonly = false;
@@ -187,65 +185,63 @@ class IntervalSet {
 //}
 //}
 
-  /** Create a set with a single element, el. */
+  /// Create a set with a single element, el. */
 
   IntervalSet.ofOne(int a) {
     addOne(a);
   }
 
-  /** Create a set with all ints within range [a..b] (inclusive) */
+  /// Create a set with all ints within range [a..b] (inclusive) */
   static IntervalSet ofRange(int a, int b) {
-    IntervalSet s = new IntervalSet();
+    final s = IntervalSet();
     s.addRange(a, b);
     return s;
   }
 
   void clear() {
-    if (readonly) throw new StateError("can't alter readonly IntervalSet");
+    if (readonly) throw StateError("can't alter readonly IntervalSet");
     intervals.clear();
   }
 
-  /** Add a single element to the set.  An isolated element is stored
-   *  as a range el..el.
-   */
+  /// Add a single element to the set.  An isolated element is stored
+  ///  as a range el..el.
 
   void addOne(int el) {
-    if (readonly) throw new StateError("can't alter readonly IntervalSet");
+    if (readonly) throw StateError("can't alter readonly IntervalSet");
     addRange(el, el);
   }
 
-  /** Add interval; i.e., add all integers from a to b to set.
-   *  If b&lt;a, do nothing.
-   *  Keep list in sorted order (by left range value).
-   *  If overlap, combine ranges.  For example,
-   *  If this is {1..5, 10..20}, adding 6..7 yields
-   *  {1..5, 6..7, 10..20}.  Adding 4..8 yields {1..8, 10..20}.
-   */
+  /// Add interval; i.e., add all integers from a to b to set.
+  ///  If b&lt;a, do nothing.
+  ///  Keep list in sorted order (by left range value).
+  ///  If overlap, combine ranges.  For example,
+  ///  If this is {1..5, 10..20}, adding 6..7 yields
+  ///  {1..5, 6..7, 10..20}.  Adding 4..8 yields {1..8, 10..20}.
   void addRange(int a, int b) {
     add(Interval.of(a, b));
   }
 
   // copy on write so we can cache a..a intervals and sets of that
   void add(Interval addition) {
-    if (readonly) throw new StateError("can't alter readonly IntervalSet");
+    if (readonly) throw StateError("can't alter readonly IntervalSet");
     //System.out.println("add "+addition+" to "+intervals.toString());
     if (addition.b < addition.a) {
       return;
     }
-    for (int i = 0; i < intervals.length; i++) {
-      Interval r = intervals[i];
+    for (var i = 0; i < intervals.length; i++) {
+      final r = intervals[i];
       if (addition == r) {
         return;
       }
       if (addition.adjacent(r) || !addition.disjoint(r)) {
         // next to each other, make a single larger interval
-        Interval bigger = addition.union(r);
+        final bigger = addition.union(r);
         intervals[i] = bigger;
 
         // make sure we didn't just create an interval that
         // should be merged with next interval in list
         for (i++; i < intervals.length; i++) {
-          Interval next = intervals[i];
+          final next = intervals[i];
           if (!bigger.adjacent(next) && bigger.disjoint(next)) {
             break;
           }
@@ -270,15 +266,17 @@ class IntervalSet {
     intervals.add(addition);
   }
 
-  /** combine all sets in the array returned the or'd value */
+  /// combine all sets in the array returned the or'd value */
   static IntervalSet or(List<IntervalSet> sets) {
-    IntervalSet r = new IntervalSet();
-    for (IntervalSet s in sets) r.addAll(s);
+    final r = IntervalSet();
+    for (final s in sets) {
+      r.addAll(s);
+    }
     return r;
   }
 
   IntervalSet operator |(IntervalSet a) {
-    IntervalSet o = new IntervalSet();
+    final o = IntervalSet();
     o.addAll(this);
     o.addAll(a);
     return o;
@@ -290,15 +288,15 @@ class IntervalSet {
     }
 
     if (set is IntervalSet) {
-      IntervalSet other = set;
+      final other = set;
       // walk set and add each interval
-      int n = other.intervals.length;
-      for (int i = 0; i < n; i++) {
-        Interval I = other.intervals[i];
-        this.addRange(I.a, I.b);
+      final n = other.intervals.length;
+      for (var i = 0; i < n; i++) {
+        final I = other.intervals[i];
+        addRange(I.a, I.b);
       }
     } else {
-      for (int value in set.toList()) {
+      for (final value in set.toList()) {
         addOne(value);
       }
     }
@@ -307,10 +305,10 @@ class IntervalSet {
   }
 
   IntervalSet complementRange(int minElement, int maxElement) {
-    return this.complement(IntervalSet.ofRange(minElement, maxElement));
+    return complement(IntervalSet.ofRange(minElement, maxElement));
   }
 
-  /** {@inheritDoc} */
+  /// {@inheritDoc} */
   IntervalSet complement(IntervalSet vocabulary) {
     if (vocabulary == null || vocabulary.isNil) {
       return null; // nothing in common with null set
@@ -319,7 +317,7 @@ class IntervalSet {
     if (vocabulary is IntervalSet) {
       vocabularyIS = vocabulary;
     } else {
-      vocabularyIS = new IntervalSet();
+      vocabularyIS = IntervalSet();
       vocabularyIS.addAll(vocabulary);
     }
 
@@ -328,40 +326,38 @@ class IntervalSet {
 
   IntervalSet operator -(IntervalSet a) {
     if (a == null || a.isNil) {
-      return new IntervalSet.ofSet(this);
+      return IntervalSet.ofSet(this);
     }
 
     if (a is IntervalSet) {
       return subtract(this, a);
     }
 
-    IntervalSet other = new IntervalSet();
+    final other = IntervalSet();
     other.addAll(a);
     return subtract(this, other);
   }
 
-  /**
-   * Compute the set difference between two interval sets. The specific
-   * operation is {@code left - right}. If either of the input sets is
-   * null, it is treated as though it was an empty set.
-   */
+  /// Compute the set difference between two interval sets. The specific
+  /// operation is {@code left - right}. If either of the input sets is
+  /// null, it is treated as though it was an empty set.
   static IntervalSet subtract(IntervalSet left, IntervalSet right) {
     if (left == null || left.isNil) {
-      return new IntervalSet();
+      return IntervalSet();
     }
 
-    IntervalSet result = new IntervalSet.ofSet(left);
+    final result = IntervalSet.ofSet(left);
     if (right == null || right.isNil) {
       // right set has no elements; just return the copy of the current set
       return result;
     }
 
-    int resultI = 0;
-    int rightI = 0;
+    var resultI = 0;
+    var rightI = 0;
     while (
         resultI < result.intervals.length && rightI < right.intervals.length) {
-      Interval resultInterval = result.intervals[resultI];
-      Interval rightInterval = right.intervals[rightI];
+      final resultInterval = result.intervals[resultI];
+      final rightInterval = right.intervals[rightI];
 
 // operation: (resultInterval - rightInterval) and update indexes
 
@@ -375,14 +371,14 @@ class IntervalSet {
         continue;
       }
 
-      Interval beforeCurrent = null;
-      Interval afterCurrent = null;
+      Interval beforeCurrent;
+      Interval afterCurrent;
       if (rightInterval.a > resultInterval.a) {
-        beforeCurrent = new Interval(resultInterval.a, rightInterval.a - 1);
+        beforeCurrent = Interval(resultInterval.a, rightInterval.a - 1);
       }
 
       if (rightInterval.b < resultInterval.b) {
-        afterCurrent = new Interval(rightInterval.b + 1, resultInterval.b);
+        afterCurrent = Interval(rightInterval.b + 1, resultInterval.b);
       }
 
       if (beforeCurrent != null) {
@@ -419,24 +415,24 @@ class IntervalSet {
     return result;
   }
 
-  /** {@inheritDoc} */
+  /// {@inheritDoc} */
   IntervalSet operator +(IntervalSet other) {
     if (other == null) {
       //|| !(other is IntervalSet) ) {
       return null; // nothing in common with null set
     }
 
-    List<Interval> myIntervals = this.intervals;
-    List<Interval> theirIntervals = (other).intervals;
-    IntervalSet intersection = null;
-    int mySize = myIntervals.length;
-    int theirSize = theirIntervals.length;
-    int i = 0;
-    int j = 0;
+    final myIntervals = intervals;
+    final theirIntervals = (other).intervals;
+    IntervalSet intersection;
+    final mySize = myIntervals.length;
+    final theirSize = theirIntervals.length;
+    var i = 0;
+    var j = 0;
 // iterate down both interval lists looking for nondisjoint intervals
     while (i < mySize && j < theirSize) {
-      Interval mine = myIntervals[i];
-      Interval theirs = theirIntervals[j];
+      final mine = myIntervals[i];
+      final theirs = theirIntervals[j];
 //System.out.println("mine="+mine+" and theirs="+theirs);
       if (mine.startsBeforeDisjoint(theirs)) {
 // move this iterator looking for interval that might overlap
@@ -446,24 +442,15 @@ class IntervalSet {
         j++;
       } else if (mine.properlyContains(theirs)) {
 // overlap, add intersection, get next theirs
-        if (intersection == null) {
-          intersection = new IntervalSet();
-        }
-        intersection.add(mine.intersection(theirs));
+        intersection ??= IntervalSet();     intersection.add(mine.intersection(theirs));
         j++;
       } else if (theirs.properlyContains(mine)) {
 // overlap, add intersection, get next mine
-        if (intersection == null) {
-          intersection = new IntervalSet();
-        }
-        intersection.add(mine.intersection(theirs));
+        intersection ??= IntervalSet();     intersection.add(mine.intersection(theirs));
         i++;
       } else if (!mine.disjoint(theirs)) {
 // overlap, add intersection
-        if (intersection == null) {
-          intersection = new IntervalSet();
-        }
-        intersection.add(mine.intersection(theirs));
+        intersection ??= IntervalSet();     intersection.add(mine.intersection(theirs));
 // Move the iterator of lower range [a..b], but not
 // the upper range as it may contain elements that will collide
 // with the next iterator. So, if mine=[0..115] and
@@ -479,24 +466,24 @@ class IntervalSet {
       }
     }
     if (intersection == null) {
-      return new IntervalSet();
+      return IntervalSet();
     }
     return intersection;
   }
 
-  /** {@inheritDoc} */
+  /// {@inheritDoc} */
 
   bool contains(int el) {
-    int n = intervals.length;
-    int l = 0;
-    int r = n - 1;
+    final n = intervals.length;
+    var l = 0;
+    var r = n - 1;
 // Binary search for the element in the (sorted,
 // disjoint) array of intervals.
     while (l <= r) {
-      int m = ((l + r) / 2).floor();
-      Interval I = intervals[m];
-      int a = I.a;
-      int b = I.b;
+      final m = ((l + r) / 2).floor();
+      final I = intervals[m];
+      final a = I.a;
+      final b = I.b;
       if (b < el) {
         l = m + 1;
       } else if (a > el) {
@@ -509,42 +496,39 @@ class IntervalSet {
     return false;
   }
 
-  /** {@inheritDoc} */
+  /// {@inheritDoc} */
 
   bool get isNil {
     return intervals == null || intervals.isEmpty;
   }
 
-  /**
-   * Returns the maximum value contained in the set if not isNil().
-   *
-   * @return the maximum value contained in the set.
-   * @throws RuntimeException if set is empty
-   */
+  /// Returns the maximum value contained in the set if not isNil().
+  ///
+  /// @return the maximum value contained in the set.
+  /// @throws RuntimeException if set is empty
   int get maxElement {
     if (isNil) {
-      throw new StateError("set is empty");
+      throw StateError('set is empty');
     }
     return intervals.last.b;
   }
 
-  /**
-   * Returns the minimum value contained in the set if not isNil().
-   *
-   * @return the minimum value contained in the set.
-   * @throws RuntimeException if set is empty
-   */
+  /// Returns the minimum value contained in the set if not isNil().
+  ///
+  /// @return the minimum value contained in the set.
+  /// @throws RuntimeException if set is empty
   int get minElement {
     if (isNil) {
-      throw new StateError("set is empty");
+      throw StateError('set is empty');
     }
 
     return intervals.first.a;
   }
 
+  @override
   int get hashCode {
-    int hash = MurmurHash.initialize();
-    for (Interval I in intervals) {
+    var hash = MurmurHash.initialize();
+    for (final I in intervals) {
       hash = MurmurHash.update(hash, I.a);
       hash = MurmurHash.update(hash, I.b);
     }
@@ -553,35 +537,36 @@ class IntervalSet {
     return hash;
   }
 
-  /** Are two IntervalSets equal?  Because all intervals are sorted
-   *  and disjoint, equals is a simple linear walk over both lists
-   *  to make sure they are the same.  Interval.equals() is used
-   *  by the List.equals() method to check the ranges.
-   */
+  /// Are two IntervalSets equal?  Because all intervals are sorted
+  ///  and disjoint, equals is a simple linear walk over both lists
+  ///  to make sure they are the same.  Interval.equals() is used
+  ///  by the List.equals() method to check the ranges.
 
+  @override
   bool operator ==(Object obj) {
     if (obj == null || !(obj is IntervalSet)) {
       return false;
     }
     IntervalSet other = obj;
-    return ListEquality().equals(this.intervals, other.intervals);
+    return ListEquality().equals(intervals, other?.intervals);
   }
 
+  @override
   String toString({bool elemAreChar = false, Vocabulary vocabulary}) {
-    if (this.intervals == null || this.intervals.isEmpty) {
-      return "{}";
+    if (intervals == null || intervals.isEmpty) {
+      return '{}';
     }
 
-    final elemStr = this.intervals.map((I) {
-      StringBuffer buf = new StringBuffer();
-      int a = I.a;
-      int b = I.b;
+    final elemStr = intervals.map((Interval I) {
+      final buf = StringBuffer();
+      final a = I.a;
+      final b = I.b;
       if (a == b) {
         if (vocabulary != null) {
           buf.write(elementName(vocabulary, a));
         } else {
           if (a == Token.EOF) {
-            buf.write("<EOF>");
+            buf.write('<EOF>');
           } else if (elemAreChar) {
             buf.write("'");
             buf.writeCharCode(a);
@@ -592,8 +577,8 @@ class IntervalSet {
         }
       } else {
         if (vocabulary != null) {
-          for (int i = a; i <= b; i++) {
-            if (i > a) buf.write(", ");
+          for (var i = a; i <= b; i++) {
+            if (i > a) buf.write(', ');
             buf.write(elementName(vocabulary, i));
           }
         } else {
@@ -605,51 +590,51 @@ class IntervalSet {
             buf.write("'");
           } else {
             buf.write(a);
-            buf.write("..");
+            buf.write('..');
             buf.write(b);
           }
         }
       }
       return buf;
-    }).join(", ");
-    if (this.length > 1) {
-      return "{$elemStr}";
+    }).join(', ');
+    if (length > 1) {
+      return '{$elemStr}';
     }
     return elemStr;
   }
 
   String elementName(Vocabulary vocabulary, int a) {
     if (a == Token.EOF) {
-      return "<EOF>";
+      return '<EOF>';
     } else if (a == Token.EPSILON) {
-      return "<EPSILON>";
+      return '<EPSILON>';
     } else {
       return vocabulary.getDisplayName(a);
     }
   }
 
   int get length {
-    int n = 0;
-    int numIntervals = intervals.length;
+    var n = 0;
+    final numIntervals = intervals.length;
     if (numIntervals == 1) {
-      Interval firstInterval = this.intervals[0];
+      final firstInterval = intervals[0];
       return firstInterval.b - firstInterval.a + 1;
     }
-    for (int i = 0; i < numIntervals; i++) {
-      Interval I = intervals[i];
+    for (var i = 0; i < numIntervals; i++) {
+      final I = intervals[i];
       n += (I.b - I.a + 1);
     }
     return n;
   }
 
   List<int> toIntegerList() {
-    List<int> values = new List<int>(length);
-    int n = intervals.length;
-    for (int i = 0; i < n; i++) {
-      Interval I = intervals[i];
-      int a = I.a;
-      int b = I.b;
-      for (int v = a; v <= b; v++) {
+    final values = List<int>(length);
+    final n = intervals.length;
+    for (var i = 0; i < n; i++) {
+      final I = intervals[i];
+      final a = I.a;
+      final b = I.b;
+      for (var v = a; v <= b; v++) {
         values.add(v);
       }
     }
@@ -657,13 +642,13 @@ class IntervalSet {
   }
 
   List<int> toList() {
-    List<int> values = [];
-    int n = intervals.length;
-    for (int i = 0; i < n; i++) {
-      Interval I = intervals[i];
-      int a = I.a;
-      int b = I.b;
-      for (int v = a; v <= b; v++) {
+    final values = <int>[];
+    final n = intervals.length;
+    for (var i = 0; i < n; i++) {
+      final I = intervals[i];
+      final a = I.a;
+      final b = I.b;
+      for (var v = a; v <= b; v++) {
         values.add(v);
       }
     }
@@ -671,29 +656,28 @@ class IntervalSet {
   }
 
   Set<int> toSet() {
-    Set<int> s = new Set();
-    for (Interval I in intervals) {
-      int a = I.a;
-      int b = I.b;
-      for (int v = a; v <= b; v++) {
+    final s = <int>{};
+    for (final I in intervals) {
+      final a = I.a;
+      final b = I.b;
+      for (var v = a; v <= b; v++) {
         s.add(v);
       }
     }
     return s;
   }
 
-  /** Get the ith element of ordered set.  Used only by RandomPhrase so
-   *  don't bother to implement if you're not doing that for a new
-   *  ANTLR code gen target.
-   */
+  /// Get the ith element of ordered set.  Used only by RandomPhrase so
+  ///  don't bother to implement if you're not doing that for a new
+  ///  ANTLR code gen target.
   int get(int i) {
-    int n = intervals.length;
-    int index = 0;
-    for (int j = 0; j < n; j++) {
-      Interval I = intervals[j];
-      int a = I.a;
-      int b = I.b;
-      for (int v = a; v <= b; v++) {
+    final n = intervals.length;
+    var index = 0;
+    for (var j = 0; j < n; j++) {
+      final I = intervals[j];
+      final a = I.a;
+      final b = I.b;
+      for (var v = a; v <= b; v++) {
         if (index == i) {
           return v;
         }
@@ -704,12 +688,12 @@ class IntervalSet {
   }
 
   void remove(int el) {
-    if (readonly) throw new StateError("can't alter readonly IntervalSet");
-    int n = intervals.length;
-    for (int i = 0; i < n; i++) {
-      Interval I = intervals[i];
-      int a = I.a;
-      int b = I.b;
+    if (readonly) throw StateError("can't alter readonly IntervalSet");
+    final n = intervals.length;
+    for (var i = 0; i < n; i++) {
+      final I = intervals[i];
+      final a = I.a;
+      final b = I.b;
       if (el < a) {
         break; // list is sorted and el is before this interval; not here
       }
@@ -731,7 +715,7 @@ class IntervalSet {
 // if in middle a..x..b, split interval
       if (el > a && el < b) {
         // found in this interval
-        int oldb = I.b;
+        final oldb = I.b;
         I.b = el - 1; // [a..x-1]
         addRange(el + 1, oldb); // add [x+1..b]
       }
@@ -743,8 +727,9 @@ class IntervalSet {
   }
 
   void setReadonly(bool readonly) {
-    if (this.readonly && !readonly)
-      throw new StateError("can't alter readonly IntervalSet");
+    if (this.readonly && !readonly) {
+      throw StateError("can't alter readonly IntervalSet");
+    }
     this.readonly = readonly;
   }
 }

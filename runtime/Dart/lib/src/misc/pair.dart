@@ -17,15 +17,16 @@ class Pair<A, B> {
     return identical(this, other) || other is Pair && a == other.a && b == other.b;
   }
 
+  @override
   String toString() {
-    return "($a, $b)";
+    return '($a, $b)';
   }
 
   @override
   int get hashCode {
     MurmurHash.initialize();
 
-    int hash = MurmurHash.initialize();
+    var hash = MurmurHash.initialize();
     hash = MurmurHash.update(hash, a);
     hash = MurmurHash.update(hash, b);
     return MurmurHash.finish(hash, 2);

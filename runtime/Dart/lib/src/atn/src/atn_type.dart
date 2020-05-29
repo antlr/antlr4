@@ -6,13 +6,9 @@
 
 /// Represents the type of recognizer an ATN applies to.
 enum ATNType {
-  /**
-   * A lexer grammar.
-   */
+  /// A lexer grammar.
   LEXER,
 
-  /**
-   * A parser grammar.
-   */
+  /// A parser grammar.
   PARSER
 }

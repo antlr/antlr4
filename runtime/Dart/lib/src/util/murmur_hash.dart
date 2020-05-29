@@ -7,32 +7,28 @@
 class MurmurHash {
   static final int DEFAULT_SEED = 0;
 
-  /**
-   * Initialize the hash using the specified [seed].
-   *
-   * @param seed the seed
-   * @return the intermediate hash value
-   */
+  /// Initialize the hash using the specified [seed].
+  ///
+  /// @param seed the seed
+  /// @return the intermediate hash value
   static int initialize([int seed]) {
     return seed ?? DEFAULT_SEED;
   }
 
-  /**
-   * Update the intermediate hash value for the next input [value].
-   *
-   * @param hash the intermediate hash value
-   * @param value the value to add to the current hash
-   * @return the updated intermediate hash value
-   */
+  /// Update the intermediate hash value for the next input [value].
+  ///
+  /// @param hash the intermediate hash value
+  /// @param value the value to add to the current hash
+  /// @return the updated intermediate hash value
   static int update(int hash, [value]) {
-    final int c1 = 0xCC9E2D51;
-    final int c2 = 0x1B873593;
-    final int r1 = 15;
-    final int r2 = 13;
-    final int m = 5;
-    final int n = 0xE6546B64;
+    final c1 = 0xCC9E2D51;
+    final c2 = 0x1B873593;
+    final r1 = 15;
+    final r2 = 13;
+    final m = 5;
+    final n = 0xE6546B64;
 
-    int k = value is int ? value : value?.hashCode ?? 0;
+    var k = value is int ? value : value?.hashCode ?? 0;
 
     k = k * c1;
     k = (k << r1) | (k >> (32 - r1));
@@ -45,14 +41,12 @@ class MurmurHash {
     return hash;
   }
 
-  /**
-   * Apply the final computation steps to the intermediate value [hash]
-   * to form the final result of the MurmurHash 3 hash function.
-   *
-   * @param hash the intermediate hash value
-   * @param numberOfWords the number of integer values added to the hash
-   * @return the final hash result
-   */
+  /// Apply the final computation steps to the intermediate value [hash]
+  /// to form the final result of the MurmurHash 3 hash function.
+  ///
+  /// @param hash the intermediate hash value
+  /// @param numberOfWords the number of integer values added to the hash
+  /// @return the final hash result
   static int finish(int hash, int numberOfWords) {
     hash = hash ^ (numberOfWords * 4);
     hash = hash ^ (hash >> 16);
@@ -63,19 +57,17 @@ class MurmurHash {
     return hash;
   }
 
-  /**
-   * Utility function to compute the hash code of an array using the
-   * MurmurHash algorithm.
-   *
-   * @param <T> the array element type
-   * @param data the array data
-   * @param seed the seed for the MurmurHash algorithm
-   * @return the hash code of the data
-   */
+  /// Utility function to compute the hash code of an array using the
+  /// MurmurHash algorithm.
+  ///
+  /// @param <T> the array element type
+  /// @param data the array data
+  /// @param seed the seed for the MurmurHash algorithm
+  /// @return the hash code of the data
   static int getHashCode<T>(List<T> data, int seed) {
-    int hash = initialize(seed);
+    var hash = initialize(seed);
 
-    for (T value in data) {
+    for (var value in data) {
       hash = update(hash, value);
     }
 

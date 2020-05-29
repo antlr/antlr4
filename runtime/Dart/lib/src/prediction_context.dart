@@ -13,17 +13,13 @@ import 'rule_context.dart';
 import 'util/murmur_hash.dart';
 
 abstract class PredictionContext {
-  /**
-   * Represents {@code $} in local context prediction, which means wildcard.
-   * {@code *+x = *}.
-   */
-  static final EmptyPredictionContext EMPTY = new EmptyPredictionContext();
+  /// Represents {@code $} in local context prediction, which means wildcard.
+  /// {@code *+x = *}.
+  static final EmptyPredictionContext EMPTY = EmptyPredictionContext();
 
-  /**
-   * Represents {@code $} in an array in full context mode, when {@code $}
-   * doesn't mean wildcard: {@code $ + x = [$,x]}. Here,
-   * {@code $} = {@link #EMPTY_RETURN_STATE}.
-   */
+  /// Represents {@code $} in an array in full context mode, when {@code $}
+  /// doesn't mean wildcard: {@code $ + x = [$,x]}. Here,
+  /// {@code $} = {@link #EMPTY_RETURN_STATE}.
   static final int EMPTY_RETURN_STATE = 0x7FFFFFFF;
 
   static final int INITIAL_HASH = 1;
@@ -31,36 +27,33 @@ abstract class PredictionContext {
   static int globalNodeCount = 0;
   int id = globalNodeCount++;
 
-  /**
-   * Stores the computed hash code of this [PredictionContext]. The hash
-   * code is computed in parts to match the following reference algorithm.
-   *
-   * <pre>
-   *   int referenceHashCode() {
-   *      int hash = {@link MurmurHash#initialize MurmurHash.initialize}({@link #INITIAL_HASH});
-   *
-   *      for (int i = 0; i &lt; {@link #size()}; i++) {
-   *          hash = {@link MurmurHash#update MurmurHash.update}(hash, {@link #getParent getParent}(i));
-   *      }
-   *
-   *      for (int i = 0; i &lt; {@link #size()}; i++) {
-   *          hash = {@link MurmurHash#update MurmurHash.update}(hash, {@link #getReturnState getReturnState}(i));
-   *      }
-   *
-   *      hash = {@link MurmurHash#finish MurmurHash.finish}(hash, 2 * {@link #size()});
-   *      return hash;
-   *  }
-   * </pre>
-   */
+  /// Stores the computed hash code of this [PredictionContext]. The hash
+  /// code is computed in parts to match the following reference algorithm.
+  ///
+  /// <pre>
+  ///   int referenceHashCode() {
+  ///      int hash = {@link MurmurHash#initialize MurmurHash.initialize}({@link #INITIAL_HASH});
+  ///
+  ///      for (int i = 0; i &lt; {@link #size()}; i++) {
+  ///          hash = {@link MurmurHash#update MurmurHash.update}(hash, {@link #getParent getParent}(i));
+  ///      }
+  ///
+  ///      for (int i = 0; i &lt; {@link #size()}; i++) {
+  ///          hash = {@link MurmurHash#update MurmurHash.update}(hash, {@link #getReturnState getReturnState}(i));
+  ///      }
+  ///
+  ///      hash = {@link MurmurHash#finish MurmurHash.finish}(hash, 2 * {@link #size()});
+  ///      return hash;
+  ///  }
+  /// </pre>
   final int cachedHashCode;
 
   PredictionContext(this.cachedHashCode);
 
-  /** Convert a [RuleContext] tree to a [PredictionContext] graph.
-   *  Return {@link #EMPTY} if [outerContext] is empty or null.
-   */
+  /// Convert a [RuleContext] tree to a [PredictionContext] graph.
+  ///  Return {@link #EMPTY} if [outerContext] is empty or null.
   static PredictionContext fromRuleContext(ATN atn, RuleContext outerContext) {
-    if (outerContext == null) outerContext = RuleContext.EMPTY;
+    outerContext ??= RuleContext.EMPTY;
 
     // if we are in RuleContext of start rule, s, then PredictionContext
     // is EMPTY. Nobody called us. (if we are empty, return empty)
@@ -72,7 +65,7 @@ abstract class PredictionContext {
     PredictionContext parent = EMPTY;
     parent = PredictionContext.fromRuleContext(atn, outerContext.parent);
 
-    ATNState state = atn.states[outerContext.invokingState];
+    final state = atn.states[outerContext.invokingState];
     RuleTransition transition = state.transition(0);
     return SingletonPredictionContext.create(
         parent, transition.followState.stateNumber);
@@ -84,7 +77,7 @@ abstract class PredictionContext {
 
   int getReturnState(int index);
 
-  /** This means only the {@link #EMPTY} (wildcard? not sure) context is in set. */
+  /// This means only the {@link #EMPTY} (wildcard? not sure) context is in set. */
   bool get isEmpty {
     return this == EMPTY;
   }
@@ -94,27 +87,29 @@ abstract class PredictionContext {
     return getReturnState(length - 1) == EMPTY_RETURN_STATE;
   }
 
+  @override
   int get hashCode {
     return cachedHashCode;
   }
 
+  @override
   bool operator ==(Object obj);
 
   static int calculateEmptyHashCode() {
-    int hash = MurmurHash.initialize(INITIAL_HASH);
+    var hash = MurmurHash.initialize(INITIAL_HASH);
     hash = MurmurHash.finish(hash, 0);
     return hash;
   }
 
   static int calculateHashCode(
       List<PredictionContext> parents, List<int> returnStates) {
-    int hash = MurmurHash.initialize(INITIAL_HASH);
+    var hash = MurmurHash.initialize(INITIAL_HASH);
 
-    for (PredictionContext parent in parents) {
+    for (var parent in parents) {
       hash = MurmurHash.update(hash, parent);
     }
 
-    for (int returnState in returnStates) {
+    for (var returnState in returnStates) {
       hash = MurmurHash.update(hash, returnState);
     }
 
@@ -147,41 +142,39 @@ abstract class PredictionContext {
 
     // convert singleton so both are arrays to normalize
     if (a is SingletonPredictionContext) {
-      a = new ArrayPredictionContext.of(a);
+      a = ArrayPredictionContext.of(a);
     }
     if (b is SingletonPredictionContext) {
-      b = new ArrayPredictionContext.of(b);
+      b = ArrayPredictionContext.of(b);
     }
     return mergeArrays(a, b, rootIsWildcard, mergeCache);
   }
 
-  /**
-   * Merge two [SingletonPredictionContext] instances.
-   *
-   * <p>Stack tops equal, parents merge is same; return left graph.<br>
-   * <embed src="images/SingletonMerge_SameRootSamePar.svg" type="image/svg+xml"/></p>
-   *
-   * <p>Same stack top, parents differ; merge parents giving array node, then
-   * remainders of those graphs. A new root node is created to point to the
-   * merged parents.<br>
-   * <embed src="images/SingletonMerge_SameRootDiffPar.svg" type="image/svg+xml"/></p>
-   *
-   * <p>Different stack tops pointing to same parent. Make array node for the
-   * root where both element in the root point to the same (original)
-   * parent.<br>
-   * <embed src="images/SingletonMerge_DiffRootSamePar.svg" type="image/svg+xml"/></p>
-   *
-   * <p>Different stack tops pointing to different parents. Make array node for
-   * the root where each element points to the corresponding original
-   * parent.<br>
-   * <embed src="images/SingletonMerge_DiffRootDiffPar.svg" type="image/svg+xml"/></p>
-   *
-   * @param a the first [SingletonPredictionContext]
-   * @param b the second [SingletonPredictionContext]
-   * @param rootIsWildcard [true] if this is a local-context merge,
-   * otherwise false to indicate a full-context merge
-   * @param mergeCache
-   */
+  /// Merge two [SingletonPredictionContext] instances.
+  ///
+  /// <p>Stack tops equal, parents merge is same; return left graph.<br>
+  /// <embed src="images/SingletonMerge_SameRootSamePar.svg" type="image/svg+xml"/></p>
+  ///
+  /// <p>Same stack top, parents differ; merge parents giving array node, then
+  /// remainders of those graphs. A new root node is created to point to the
+  /// merged parents.<br>
+  /// <embed src="images/SingletonMerge_SameRootDiffPar.svg" type="image/svg+xml"/></p>
+  ///
+  /// <p>Different stack tops pointing to same parent. Make array node for the
+  /// root where both element in the root point to the same (original)
+  /// parent.<br>
+  /// <embed src="images/SingletonMerge_DiffRootSamePar.svg" type="image/svg+xml"/></p>
+  ///
+  /// <p>Different stack tops pointing to different parents. Make array node for
+  /// the root where each element points to the corresponding original
+  /// parent.<br>
+  /// <embed src="images/SingletonMerge_DiffRootDiffPar.svg" type="image/svg+xml"/></p>
+  ///
+  /// @param a the first [SingletonPredictionContext]
+  /// @param b the second [SingletonPredictionContext]
+  /// @param rootIsWildcard [true] if this is a local-context merge,
+  /// otherwise false to indicate a full-context merge
+  /// @param mergeCache
   static PredictionContext mergeSingletons(
       SingletonPredictionContext a,
       SingletonPredictionContext b,
@@ -189,13 +182,13 @@ abstract class PredictionContext {
       Map<Pair<PredictionContext, PredictionContext>, PredictionContext>
           mergeCache) {
     if (mergeCache != null) {
-      PredictionContext previous = mergeCache[Pair(a, b)];
+      var previous = mergeCache[Pair(a, b)];
       if (previous != null) return previous;
       previous = mergeCache[Pair(b, a)];
       if (previous != null) return previous;
     }
 
-    PredictionContext rootMerge = mergeRoot(a, b, rootIsWildcard);
+    final rootMerge = mergeRoot(a, b, rootIsWildcard);
     if (rootMerge != null) {
       if (mergeCache != null) mergeCache[Pair(a, b)] = rootMerge;
       return rootMerge;
@@ -203,7 +196,7 @@ abstract class PredictionContext {
 
     if (a.returnState == b.returnState) {
       // a == b
-      PredictionContext parent =
+      final parent =
           merge(a.parent, b.parent, rootIsWildcard, mergeCache);
       // if parent is same as existing a or b parent or reduced to a parent, return it
       if (parent == a.parent) return a; // ax + bx = ax, if a=b
@@ -219,7 +212,7 @@ abstract class PredictionContext {
     } else {
       // a != b payloads differ
       // see if we can collapse parents due to $+x parents if local ctx
-      PredictionContext singleParent = null;
+      PredictionContext singleParent;
       if (a == b || (a.parent != null && a.parent == b.parent)) {
         // ax + bx = [a,b]x
         singleParent = a.parent;
@@ -227,71 +220,69 @@ abstract class PredictionContext {
       if (singleParent != null) {
         // parents are same
         // sort payloads and use same parent
-        List<int> payloads = [a.returnState, b.returnState];
+        final payloads = <int>[a.returnState, b.returnState];
         if (a.returnState > b.returnState) {
           payloads[0] = b.returnState;
           payloads[1] = a.returnState;
         }
-        List<PredictionContext> parents = [singleParent, singleParent];
-        PredictionContext a_ = new ArrayPredictionContext(parents, payloads);
+        final parents = <PredictionContext>[singleParent, singleParent];
+        PredictionContext a_ = ArrayPredictionContext(parents, payloads);
         if (mergeCache != null) mergeCache[Pair(a, b)] = a_;
         return a_;
       }
       // parents differ and can't merge them. Just pack together
       // into array; can't merge.
       // ax + by = [ax,by]
-      List<int> payloads = [a.returnState, b.returnState];
-      List<PredictionContext> parents = [a.parent, b.parent];
+      final payloads = <int>[a.returnState, b.returnState];
+      var parents = <PredictionContext>[a.parent, b.parent];
       if (a.returnState > b.returnState) {
         // sort by payload
         payloads[0] = b.returnState;
         payloads[1] = a.returnState;
         parents = [b.parent, a.parent];
       }
-      PredictionContext a_ = new ArrayPredictionContext(parents, payloads);
+      PredictionContext a_ = ArrayPredictionContext(parents, payloads);
       if (mergeCache != null) mergeCache[Pair(a, b)] = a_;
       return a_;
     }
   }
 
-  /**
-   * Handle case where at least one of [a] or [b] is
-   * {@link #EMPTY}. In the following diagrams, the symbol {@code $} is used
-   * to represent {@link #EMPTY}.
-   *
-   * <h2>Local-Context Merges</h2>
-   *
-   * <p>These local-context merge operations are used when [rootIsWildcard]
-   * is true.</p>
-   *
-   * <p>{@link #EMPTY} is superset of any graph; return {@link #EMPTY}.<br>
-   * <embed src="images/LocalMerge_EmptyRoot.svg" type="image/svg+xml"/></p>
-   *
-   * <p>{@link #EMPTY} and anything is {@code #EMPTY}, so merged parent is
-   * {@code #EMPTY}; return left graph.<br>
-   * <embed src="images/LocalMerge_EmptyParent.svg" type="image/svg+xml"/></p>
-   *
-   * <p>Special case of last merge if local context.<br>
-   * <embed src="images/LocalMerge_DiffRoots.svg" type="image/svg+xml"/></p>
-   *
-   * <h2>Full-Context Merges</h2>
-   *
-   * <p>These full-context merge operations are used when [rootIsWildcard]
-   * is false.</p>
-   *
-   * <p><embed src="images/FullMerge_EmptyRoots.svg" type="image/svg+xml"/></p>
-   *
-   * <p>Must keep all contexts; {@link #EMPTY} in array is a special value (and
-   * null parent).<br>
-   * <embed src="images/FullMerge_EmptyRoot.svg" type="image/svg+xml"/></p>
-   *
-   * <p><embed src="images/FullMerge_SameRoot.svg" type="image/svg+xml"/></p>
-   *
-   * @param a the first [SingletonPredictionContext]
-   * @param b the second [SingletonPredictionContext]
-   * @param rootIsWildcard [true] if this is a local-context merge,
-   * otherwise false to indicate a full-context merge
-   */
+  /// Handle case where at least one of [a] or [b] is
+  /// {@link #EMPTY}. In the following diagrams, the symbol {@code $} is used
+  /// to represent {@link #EMPTY}.
+  ///
+  /// <h2>Local-Context Merges</h2>
+  ///
+  /// <p>These local-context merge operations are used when [rootIsWildcard]
+  /// is true.</p>
+  ///
+  /// <p>{@link #EMPTY} is superset of any graph; return {@link #EMPTY}.<br>
+  /// <embed src="images/LocalMerge_EmptyRoot.svg" type="image/svg+xml"/></p>
+  ///
+  /// <p>{@link #EMPTY} and anything is {@code #EMPTY}, so merged parent is
+  /// {@code #EMPTY}; return left graph.<br>
+  /// <embed src="images/LocalMerge_EmptyParent.svg" type="image/svg+xml"/></p>
+  ///
+  /// <p>Special case of last merge if local context.<br>
+  /// <embed src="images/LocalMerge_DiffRoots.svg" type="image/svg+xml"/></p>
+  ///
+  /// <h2>Full-Context Merges</h2>
+  ///
+  /// <p>These full-context merge operations are used when [rootIsWildcard]
+  /// is false.</p>
+  ///
+  /// <p><embed src="images/FullMerge_EmptyRoots.svg" type="image/svg+xml"/></p>
+  ///
+  /// <p>Must keep all contexts; {@link #EMPTY} in array is a special value (and
+  /// null parent).<br>
+  /// <embed src="images/FullMerge_EmptyRoot.svg" type="image/svg+xml"/></p>
+  ///
+  /// <p><embed src="images/FullMerge_SameRoot.svg" type="image/svg+xml"/></p>
+  ///
+  /// @param a the first [SingletonPredictionContext]
+  /// @param b the second [SingletonPredictionContext]
+  /// @param rootIsWildcard [true] if this is a local-context merge,
+  /// otherwise false to indicate a full-context merge
   static PredictionContext mergeRoot(SingletonPredictionContext a,
       SingletonPredictionContext b, bool rootIsWildcard) {
     if (rootIsWildcard) {
@@ -301,43 +292,41 @@ abstract class PredictionContext {
       if (a == EMPTY && b == EMPTY) return EMPTY; // $ + $ = $
       if (a == EMPTY) {
         // $ + x = [x,$]
-        List<int> payloads = [b.returnState, EMPTY_RETURN_STATE];
-        List<PredictionContext> parents = [b.parent, null];
+        final payloads = <int>[b.returnState, EMPTY_RETURN_STATE];
+        final parents = <PredictionContext>[b.parent, null];
         PredictionContext joined =
-            new ArrayPredictionContext(parents, payloads);
+            ArrayPredictionContext(parents, payloads);
         return joined;
       }
       if (b == EMPTY) {
         // x + $ = [x,$] ($ is always last if present)
-        List<int> payloads = [a.returnState, EMPTY_RETURN_STATE];
+        final payloads = <int>[a.returnState, EMPTY_RETURN_STATE];
         final parents = [a.parent, null];
         PredictionContext joined =
-            new ArrayPredictionContext(parents, payloads);
+            ArrayPredictionContext(parents, payloads);
         return joined;
       }
     }
     return null;
   }
 
-  /**
-   * Merge two [ArrayPredictionContext] instances.
-   *
-   * <p>Different tops, different parents.<br>
-   * <embed src="images/ArrayMerge_DiffTopDiffPar.svg" type="image/svg+xml"/></p>
-   *
-   * <p>Shared top, same parents.<br>
-   * <embed src="images/ArrayMerge_ShareTopSamePar.svg" type="image/svg+xml"/></p>
-   *
-   * <p>Shared top, different parents.<br>
-   * <embed src="images/ArrayMerge_ShareTopDiffPar.svg" type="image/svg+xml"/></p>
-   *
-   * <p>Shared top, all shared parents.<br>
-   * <embed src="images/ArrayMerge_ShareTopSharePar.svg" type="image/svg+xml"/></p>
-   *
-   * <p>Equal tops, merge parents and reduce top to
-   * [SingletonPredictionContext].<br>
-   * <embed src="images/ArrayMerge_EqualTop.svg" type="image/svg+xml"/></p>
-   */
+  /// Merge two [ArrayPredictionContext] instances.
+  ///
+  /// <p>Different tops, different parents.<br>
+  /// <embed src="images/ArrayMerge_DiffTopDiffPar.svg" type="image/svg+xml"/></p>
+  ///
+  /// <p>Shared top, same parents.<br>
+  /// <embed src="images/ArrayMerge_ShareTopSamePar.svg" type="image/svg+xml"/></p>
+  ///
+  /// <p>Shared top, different parents.<br>
+  /// <embed src="images/ArrayMerge_ShareTopDiffPar.svg" type="image/svg+xml"/></p>
+  ///
+  /// <p>Shared top, all shared parents.<br>
+  /// <embed src="images/ArrayMerge_ShareTopSharePar.svg" type="image/svg+xml"/></p>
+  ///
+  /// <p>Equal tops, merge parents and reduce top to
+  /// [SingletonPredictionContext].<br>
+  /// <embed src="images/ArrayMerge_EqualTop.svg" type="image/svg+xml"/></p>
   static PredictionContext mergeArrays(
       ArrayPredictionContext a,
       ArrayPredictionContext b,
@@ -345,40 +334,40 @@ abstract class PredictionContext {
       Map<Pair<PredictionContext, PredictionContext>, PredictionContext>
           mergeCache) {
     if (mergeCache != null) {
-      PredictionContext previous = mergeCache[Pair(a, b)];
+      var previous = mergeCache[Pair(a, b)];
       if (previous != null) return previous;
       previous = mergeCache[Pair(b, a)];
       if (previous != null) return previous;
     }
 
     // merge sorted payloads a + b => M
-    int i = 0; // walks a
-    int j = 0; // walks b
-    int k = 0; // walks target M array
+    var i = 0; // walks a
+    var j = 0; // walks b
+    var k = 0; // walks target M array
 
-    List<int> mergedReturnStates = List(
+    var mergedReturnStates = List<int>(
         a.returnStates.length + b.returnStates.length); // TODO Will it grow?
     var mergedParents = List<PredictionContext>(
         a.returnStates.length + b.returnStates.length); // TODO Will it grow?
     // walk and merge to yield mergedParents, mergedReturnStates
     while (i < a.returnStates.length && j < b.returnStates.length) {
-      PredictionContext a_parent = a.parents[i];
-      PredictionContext b_parent = b.parents[j];
+      final a_parent = a.parents[i];
+      final b_parent = b.parents[j];
       if (a.returnStates[i] == b.returnStates[j]) {
         // same payload (stack tops are equal), must yield merged singleton
-        int payload = a.returnStates[i];
+        final payload = a.returnStates[i];
         // $+$ = $
-        bool both$ = payload == EMPTY_RETURN_STATE &&
+        final both$ = payload == EMPTY_RETURN_STATE &&
             a_parent == null &&
             b_parent == null;
-        bool ax_ax = (a_parent != null && b_parent != null) &&
+        final ax_ax = (a_parent != null && b_parent != null) &&
             a_parent == b_parent; // ax+ax -> ax
         if (both$ || ax_ax) {
           mergedParents[k] = a_parent; // choose left
           mergedReturnStates[k] = payload;
         } else {
           // ax+ay -> a'[x,y]
-          PredictionContext mergedParent =
+          final mergedParent =
               merge(a_parent, b_parent, rootIsWildcard, mergeCache);
           mergedParents[k] = mergedParent;
           mergedReturnStates[k] = payload;
@@ -401,13 +390,13 @@ abstract class PredictionContext {
 
     // copy over any payloads remaining in either array
     if (i < a.returnStates.length) {
-      for (int p = i; p < a.returnStates.length; p++) {
+      for (var p = i; p < a.returnStates.length; p++) {
         mergedParents[k] = a.parents[p];
         mergedReturnStates[k] = a.returnStates[p];
         k++;
       }
     } else {
-      for (int p = j; p < b.returnStates.length; p++) {
+      for (var p = j; p < b.returnStates.length; p++) {
         mergedParents[k] = b.parents[p];
         mergedReturnStates[k] = b.returnStates[p];
         k++;
@@ -429,7 +418,7 @@ abstract class PredictionContext {
     }
 
     PredictionContext M =
-        new ArrayPredictionContext(mergedParents, mergedReturnStates);
+        ArrayPredictionContext(mergedParents, mergedReturnStates);
 
     // if we created same array as a or b, return that instead
     // TODO: track whether this is possible above during merge sort for speed
@@ -448,86 +437,86 @@ abstract class PredictionContext {
     return M;
   }
 
-  /**
-   * Make pass over all <em>M</em> [parents]; merge any {@code equals()}
-   * ones.
-   */
+  /// Make pass over all <em>M</em> [parents]; merge any {@code equals()}
+  /// ones.
   static void combineCommonParents(List<PredictionContext> parents) {
-    Map<PredictionContext, PredictionContext> uniqueParents =
-        new Map<PredictionContext, PredictionContext>();
+    final uniqueParents =
+        <PredictionContext, PredictionContext>{};
 
-    for (int p = 0; p < parents.length; p++) {
-      PredictionContext parent = parents[p];
+    for (var p = 0; p < parents.length; p++) {
+      final parent = parents[p];
       if (!uniqueParents.containsKey(parent)) {
         // don't replace
         uniqueParents[parent] = parent;
       }
     }
 
-    for (int p = 0; p < parents.length; p++) {
+    for (var p = 0; p < parents.length; p++) {
       parents[p] = uniqueParents[parents[p]];
     }
   }
 
   static String toDOTString(PredictionContext context) {
-    if (context == null) return "";
-    StringBuffer buf = new StringBuffer();
-    buf.write("digraph G {\n");
-    buf.write("rankdir=LR;\n");
+    if (context == null) return '';
+    final buf = StringBuffer();
+    buf.write('digraph G {\n');
+    buf.write('rankdir=LR;\n');
 
-    List<PredictionContext> nodes = getAllContextNodes(context);
+    final nodes = getAllContextNodes(context);
     nodes.sort((PredictionContext o1, PredictionContext o2) {
       return o1.id - o2.id;
     });
 
-    for (PredictionContext current in nodes) {
+    for (var current in nodes) {
       if (current is SingletonPredictionContext) {
-        String s = current.id.toString();
-        buf.write("  s");
+        final s = current.id.toString();
+        buf.write('  s');
         buf.write(s);
-        String returnState = current.getReturnState(0).toString();
-        if (current is EmptyPredictionContext) returnState = r"$";
-        buf.write(" [label=\"");
+        var returnState = current.getReturnState(0).toString();
+        if (current is EmptyPredictionContext) returnState = r'$';
+        buf.write(' [label=\"');
         buf.write(returnState);
-        buf.write("\"];\n");
+        buf.write('\"];\n');
         continue;
       }
       ArrayPredictionContext arr = current;
-      buf.write("  s");
+      buf.write('  s');
       buf.write(arr.id);
-      buf.write(" [shape=box, label=\"");
-      buf.write("[");
-      bool first = true;
-      for (int inv in arr.returnStates) {
-        if (!first) buf.write(", ");
-        if (inv == EMPTY_RETURN_STATE)
-          buf.write(r"$");
-        else
+      buf.write(' [shape=box, label=\"');
+      buf.write('[');
+      var first = true;
+      for (var inv in arr.returnStates) {
+        if (!first) buf.write(', ');
+        if (inv == EMPTY_RETURN_STATE) {
+          buf.write(r'$');
+        } else {
           buf.write(inv);
+        }
         first = false;
       }
-      buf.write("]");
-      buf.write("\"];\n");
+      buf.write(']');
+      buf.write('\"];\n');
     }
 
-    for (PredictionContext current in nodes) {
+    for (var current in nodes) {
       if (current == EMPTY) continue;
-      for (int i = 0; i < current.length; i++) {
+      for (var i = 0; i < current.length; i++) {
         if (current.getParent(i) == null) continue;
-        String s = current.id.toString();
-        buf.write("  s");
+        final s = current.id.toString();
+        buf.write('  s');
         buf.write(s);
-        buf.write("->");
-        buf.write("s");
+        buf.write('->');
+        buf.write('s');
         buf.write(current.getParent(i).id);
-        if (current.length > 1)
-          buf.write(" [label=\"parent[$i]\"];\n");
-        else
-          buf.write(";\n");
+        if (current.length > 1) {
+          buf.write(' [label=\"parent[$i]\"];\n');
+        } else {
+          buf.write(';\n');
+        }
       }
     }
 
-    buf.write("}\n");
+    buf.write('}\n');
     return buf.toString();
   }
 
@@ -540,7 +529,7 @@ abstract class PredictionContext {
       return context;
     }
 
-    PredictionContext existing = visited[context];
+    var existing = visited[context];
     if (existing != null) {
       return existing;
     }
@@ -551,15 +540,15 @@ abstract class PredictionContext {
       return existing;
     }
 
-    bool changed = false;
+    var changed = false;
     var parents = List<PredictionContext>(context.length);
-    for (int i = 0; i < parents.length; i++) {
-      PredictionContext parent =
+    for (var i = 0; i < parents.length; i++) {
+      final parent =
           getCachedContext(context.getParent(i), contextCache, visited);
       if (changed || parent != context.getParent(i)) {
         if (!changed) {
           parents = List<PredictionContext>(context.length);
-          for (int j = 0; j < context.length; j++) {
+          for (var j = 0; j < context.length; j++) {
             parents[j] = context.getParent(j);
           }
 
@@ -577,14 +566,14 @@ abstract class PredictionContext {
     }
 
     PredictionContext updated;
-    if (parents.length == 0) {
+    if (parents.isEmpty) {
       updated = EMPTY;
     } else if (parents.length == 1) {
       updated = SingletonPredictionContext.create(
           parents[0], context.getReturnState(0));
     } else {
       ArrayPredictionContext arrayPredictionContext = context;
-      updated = new ArrayPredictionContext(
+      updated = ArrayPredictionContext(
           parents, arrayPredictionContext.returnStates);
     }
 
@@ -619,9 +608,9 @@ abstract class PredictionContext {
 
   // ter's recursive version of Sam's getAllNodes()
   static List<PredictionContext> getAllContextNodes(PredictionContext context) {
-    List<PredictionContext> nodes = List<PredictionContext>();
-    Map<PredictionContext, PredictionContext> visited =
-        Map<PredictionContext, PredictionContext>();
+    final nodes = <PredictionContext>[];
+    final visited =
+        <PredictionContext, PredictionContext>{};
     getAllContextNodes_(context, nodes, visited);
     return nodes;
   }
@@ -633,7 +622,7 @@ abstract class PredictionContext {
     if (context == null || visited.containsKey(context)) return;
     visited[context] = context;
     nodes.add(context);
-    for (int i = 0; i < context.length; i++) {
+    for (var i = 0; i < context.length; i++) {
       getAllContextNodes_(context.getParent(i), nodes, visited);
     }
   }
@@ -641,25 +630,25 @@ abstract class PredictionContext {
   // FROM SAM
   List<String> toStrings(
       Recognizer recognizer, PredictionContext stop, int currentState) {
-    List<String> result = [];
+    final result = <String>[];
 
     outer:
-    for (int perm = 0;; perm++) {
-      int offset = 0;
-      bool last = true;
-      PredictionContext p = this;
-      int stateNumber = currentState;
-      StringBuffer localBuffer = new StringBuffer();
-      localBuffer.write("[");
+    for (var perm = 0;; perm++) {
+      var offset = 0;
+      var last = true;
+      var p = this;
+      var stateNumber = currentState;
+      final localBuffer = StringBuffer();
+      localBuffer.write('[');
       while (!p.isEmpty && p != stop) {
-        int index = 0;
+        var index = 0;
         if (p.length > 0) {
-          int bits = 1;
+          var bits = 1;
           while ((1 << bits) < p.length) {
             bits++;
           }
 
-          int mask = (1 << bits) - 1;
+          final mask = (1 << bits) - 1;
           index = (perm >> offset) & mask;
           last &= index >= p.length - 1;
           if (index >= p.length) {
@@ -674,9 +663,9 @@ abstract class PredictionContext {
             localBuffer.write(' ');
           }
 
-          ATN atn = recognizer.getATN();
-          ATNState s = atn.states[stateNumber];
-          String ruleName = recognizer.ruleNames[s.ruleIndex];
+          final atn = recognizer.getATN();
+          final s = atn.states[stateNumber];
+          final ruleName = recognizer.ruleNames[s.ruleIndex];
           localBuffer.write(ruleName);
         } else if (p.getReturnState(index) != EMPTY_RETURN_STATE) {
           if (!p.isEmpty) {
@@ -691,7 +680,7 @@ abstract class PredictionContext {
         stateNumber = p.getReturnState(index);
         p = p.getParent(index);
       }
-      localBuffer.write("]");
+      localBuffer.write(']');
       result.add(localBuffer.toString());
 
       if (last) {
@@ -707,11 +696,11 @@ class SingletonPredictionContext extends PredictionContext {
   final PredictionContext parent;
   final int returnState;
 
-  SingletonPredictionContext(PredictionContext this.parent, this.returnState)
+  SingletonPredictionContext(this.parent, this.returnState)
       : super(parent != null
             ? PredictionContext.calculateHashCode([parent], [returnState])
             : PredictionContext.calculateEmptyHashCode()) {
-    assert(this.returnState != ATNState.INVALID_STATE_NUMBER);
+    assert(returnState != ATNState.INVALID_STATE_NUMBER);
   }
 
   static SingletonPredictionContext create(
@@ -720,84 +709,92 @@ class SingletonPredictionContext extends PredictionContext {
       // someone can pass in the bits of an array ctx that mean $
       return PredictionContext.EMPTY;
     }
-    return new SingletonPredictionContext(parent, returnState);
+    return SingletonPredictionContext(parent, returnState);
   }
 
+  @override
   int get length {
     return 1;
   }
 
+  @override
   PredictionContext getParent(int index) {
     assert(index == 0);
     return parent;
   }
 
+  @override
   int getReturnState(int index) {
     assert(index == 0);
     return returnState;
   }
 
+  @override
   bool operator ==(Object o) {
     if (identical(this, o)) {
       return true;
     } else if (o is SingletonPredictionContext) {
-      if (this.hashCode != o.hashCode) {
+      if (hashCode != o.hashCode) {
         return false; // can't be same if hash is different
       }
 
-      SingletonPredictionContext s = o;
+      final s = o;
       return returnState == s.returnState &&
           (parent != null && parent == s.parent);
     }
     return false;
   }
 
+  @override
   String toString() {
-    String up = parent != null ? parent.toString() : "";
-    if (up.length == 0) {
+    final up = parent != null ? parent.toString() : '';
+    if (up.isEmpty) {
       if (returnState == PredictionContext.EMPTY_RETURN_STATE) {
-        return r"$";
+        return r'$';
       }
       return returnState.toString();
     }
-    return "$returnState $up";
+    return '$returnState $up';
   }
 }
 
 class EmptyPredictionContext extends SingletonPredictionContext {
   EmptyPredictionContext() : super(null, PredictionContext.EMPTY_RETURN_STATE);
 
+  @override
   bool get isEmpty {
     return true;
   }
 
+  @override
   int get length {
     return 1;
   }
 
+  @override
   PredictionContext getParent(int index) {
     return null;
   }
 
+  @override
   int getReturnState(int index) {
     return returnState;
   }
 
+  @override
   String toString() {
-    return r"$";
+    return r'$';
   }
 }
 
 class ArrayPredictionContext extends PredictionContext {
-  /** Parent can be null only if full ctx mode and we make an array
-   *  from {@link #EMPTY} and non-empty. We merge {@link #EMPTY} by using null parent and
-   *  returnState == {@link #EMPTY_RETURN_STATE}.
-   */
+  /// Parent can be null only if full ctx mode and we make an array
+  ///  from {@link #EMPTY} and non-empty. We merge {@link #EMPTY} by using null parent and
+  ///  returnState == {@link #EMPTY_RETURN_STATE}.
   List<PredictionContext> parents;
 
-  /** Sorted for merge, no duplicates; if present,
-   *  {@link #EMPTY_RETURN_STATE} is always last.
-   */
+  /// Sorted for merge, no duplicates; if present,
+  ///  {@link #EMPTY_RETURN_STATE} is always last.
   List<int> returnStates;
 
   ArrayPredictionContext.of(SingletonPredictionContext a)
@@ -806,27 +803,31 @@ class ArrayPredictionContext extends PredictionContext {
   ArrayPredictionContext(
       List<PredictionContext> parents, List<int> returnStates)
       : super(PredictionContext.calculateHashCode(parents, returnStates)) {
-    assert(parents != null && parents.length > 0);
-    assert(returnStates != null && returnStates.length > 0);
+    assert(parents != null && parents.isNotEmpty);
+    assert(returnStates != null && returnStates.isNotEmpty);
 //		System.err.println("CREATE ARRAY: "+Arrays.toString(parents)+", "+Arrays.toString(returnStates));
     this.parents = parents;
     this.returnStates = returnStates;
   }
 
+  @override
   bool get isEmpty {
     // since EMPTY_RETURN_STATE can only appear in the last position, we
     // don't need to verify that size==1
     return returnStates[0] == PredictionContext.EMPTY_RETURN_STATE;
   }
 
+  @override
   int get length {
     return returnStates.length;
   }
 
+  @override
   PredictionContext getParent(int index) {
     return parents[index];
   }
 
+  @override
   int getReturnState(int index) {
     return returnStates[index];
   }
@@ -835,29 +836,31 @@ class ArrayPredictionContext extends PredictionContext {
 //		return Arrays.binarySearch(returnStates, returnState);
 //	}
 
+  @override
   bool operator ==(Object o) {
     if (identical(this, o)) {
       return true;
     } else if (o is ArrayPredictionContext) {
-      if (this.hashCode != o.hashCode) {
+      if (hashCode != o.hashCode) {
         return false; // can't be same if hash is different
       }
 
-      ArrayPredictionContext a = o;
+      final a = o;
       return ListEquality().equals(returnStates, a.returnStates) &&
           ListEquality().equals(parents, a.parents);
     }
     return false;
   }
 
+  @override
   String toString() {
-    if (isEmpty) return "[]";
-    StringBuffer buf = new StringBuffer();
-    buf.write("[");
-    for (int i = 0; i < returnStates.length; i++) {
-      if (i > 0) buf.write(", ");
+    if (isEmpty) return '[]';
+    final buf = StringBuffer();
+    buf.write('[');
+    for (var i = 0; i < returnStates.length; i++) {
+      if (i > 0) buf.write(', ');
       if (returnStates[i] == PredictionContext.EMPTY_RETURN_STATE) {
-        buf.write(r"$");
+        buf.write(r'$');
         continue;
       }
       buf.write(returnStates[i]);
@@ -865,10 +868,10 @@ class ArrayPredictionContext extends PredictionContext {
         buf.write(' ');
         buf.write(parents[i].toString());
       } else {
-        buf.write("null");
+        buf.write('null');
       }
     }
-    buf.write("]");
+    buf.write(']');
     return buf.toString();
   }
 }

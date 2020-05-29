@@ -66,11 +66,11 @@ TextEquals(a) ::= <%this.text == "<a>"%>
 
 PlusText(a) ::= <%"<a>" + this.text%>
 
-InputText() ::= "this.tokenStream.text"
+InputText() ::= "tokenStream.text"
 
-LTEquals(i, v) ::= <%this.tokenStream.LT(<i>).text == <v>%>
+LTEquals(i, v) ::= <%tokenStream.LT(<i>).text == <v>%>
 
-LANotEquals(i, v) ::= <%this.tokenStream.LA(<i>)!=<v>%>
+LANotEquals(i, v) ::= <%tokenStream.LA(<i>)!=<v>%>
 
 TokenStartColumnEquals(i) ::= <%this.tokenStartCharPositionInLine==<i>%>
 
