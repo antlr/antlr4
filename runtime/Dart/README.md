@@ -6,6 +6,6 @@ This runtime is available through [pub](https://pub.dev). The package name is 'a
 
 See www.antlr.org for more information on ANTLR.
 
-See https://github.com/antlr/antlr4/blob/master/doc/Dart-target.md for more information on using ANTLR in Dart.
+See https://github.com/antlr/antlr4/blob/master/doc/dart-target.md for more information on using ANTLR in Dart.
 
 

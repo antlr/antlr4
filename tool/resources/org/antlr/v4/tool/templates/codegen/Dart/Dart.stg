@@ -225,7 +225,7 @@ Parser_(parser, funcs, atn, sempredFuncs, ctor, superClass) ::= <<
 <if(namedActions.definitions)><namedActions.definitions><endif>
 const int <parser.rules:{r | RULE_<r.name> = <r.index>}; separator=", ", wrap, anchor>;
 class <parser.name> extends <superClass; null="Parser"> {
-  static final void versionCheck = () { RuntimeMetaData.checkVersion('<file.ANTLRVersion>', RuntimeMetaData.VERSION); }();
+  static final checkVersion = () => RuntimeMetaData.checkVersion('<file.ANTLRVersion>', RuntimeMetaData.VERSION);
   static const int TOKEN_EOF = IntStream.EOF;
 
   static final List\<DFA> _decisionToDFA = List.generate(
@@ -827,7 +827,7 @@ Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
 <if(namedActions.definitions)><namedActions.definitions><endif>
 
 class <lexer.name> extends <superClass; null="Lexer"> {
-  static final versionCheck = () { RuntimeMetaData.checkVersion('<lexerFile.ANTLRVersion>', RuntimeMetaData.VERSION); }();
+  static final checkVersion = () => RuntimeMetaData.checkVersion('<lexerFile.ANTLRVersion>', RuntimeMetaData.VERSION);
 
   static final List\<DFA> _decisionToDFA = List.generate(
         _ATN.numberOfDecisions, (i) => DFA(_ATN.getDecisionState(i), i));
