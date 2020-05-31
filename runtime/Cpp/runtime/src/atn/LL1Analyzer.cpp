@@ -60,7 +60,7 @@ misc::IntervalSet LL1Analyzer::LOOK(ATNState *s, RuleContext *ctx) const {
 misc::IntervalSet LL1Analyzer::LOOK(ATNState *s, ATNState *stopState, RuleContext *ctx) const {
   misc::IntervalSet r;
   bool seeThruPreds = true; // ignore preds; get all lookahead
-  Ref<PredictionContext> lookContext = ctx != nullptr ? PredictionContext::fromRuleContext(_atn, ctx) : nullptr;
+  PredictionContext::Ptr lookContext = ctx != nullptr ? PredictionContext::fromRuleContext(_atn, ctx) : nullptr;
 
   ATNConfig::Set lookBusy;
   antlrcpp::BitSet callRuleStack;
@@ -69,7 +69,7 @@ misc::IntervalSet LL1Analyzer::LOOK(ATNState *s, ATNState *stopState, RuleContex
   return r;
 }
 
-void LL1Analyzer::_LOOK(ATNState *s, ATNState *stopState, Ref<PredictionContext> const& ctx, misc::IntervalSet &look,
+void LL1Analyzer::_LOOK(ATNState *s, ATNState *stopState, PredictionContext::Ptr const& ctx, misc::IntervalSet &look,
   ATNConfig::Set &lookBusy, antlrcpp::BitSet &calledRuleStack, bool seeThruPreds, bool addEOF) const {
 
   {
@@ -129,7 +129,7 @@ void LL1Analyzer::_LOOK(ATNState *s, ATNState *stopState, Ref<PredictionContext>
         continue;
       }
 
-      Ref<PredictionContext> newContext = SingletonPredictionContext::create(ctx, (static_cast<RuleTransition*>(t))->followState->stateNumber);
+      PredictionContext::Ptr newContext = SingletonPredictionContext::create(ctx, (static_cast<RuleTransition*>(t))->followState->stateNumber);
       auto onExit = finally([t, &calledRuleStack] {
         calledRuleStack[(static_cast<RuleTransition*>(t))->target->ruleIndex] = false;
       });

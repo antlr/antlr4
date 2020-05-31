@@ -101,7 +101,7 @@ namespace atn {
     /// outermost context is reached. This parameter has no effect if {@code ctx}
     /// is {@code null}. </param>
   protected:
-    virtual void _LOOK(ATNState *s, ATNState *stopState, Ref<PredictionContext> const& ctx, misc::IntervalSet &look,
+    virtual void _LOOK(ATNState *s, ATNState *stopState, PredictionContext::Ptr const& ctx, misc::IntervalSet &look,
       ATNConfig::Set &lookBusy, antlrcpp::BitSet &calledRuleStack, bool seeThruPreds, bool addEOF) const;
   };
 

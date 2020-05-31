@@ -84,8 +84,8 @@ namespace atn {
   public:
     static int match_calls;
 
-    LexerATNSimulator(const ATN &atn, std::vector<dfa::DFA> &decisionToDFA, PredictionContextCache &sharedContextCache);
-    LexerATNSimulator(Lexer *recog, const ATN &atn, std::vector<dfa::DFA> &decisionToDFA, PredictionContextCache &sharedContextCache);
+    LexerATNSimulator(const ATN &atn, std::vector<dfa::DFA> &decisionToDFA, PredictionContext::Cache &sharedContextCache);
+    LexerATNSimulator(Lexer *recog, const ATN &atn, std::vector<dfa::DFA> &decisionToDFA, PredictionContext::Cache &sharedContextCache);
     virtual ~LexerATNSimulator () {}
 
     virtual void copyState(LexerATNSimulator *simulator);

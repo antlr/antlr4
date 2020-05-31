@@ -246,10 +246,10 @@ namespace atn {
   public:
     /// Testing only!
     ParserATNSimulator(const ATN &atn, std::vector<dfa::DFA> &decisionToDFA,
-                       PredictionContextCache &sharedContextCache);
+                       PredictionContext::Cache &sharedContextCache);
 
     ParserATNSimulator(Parser *parser, const ATN &atn, std::vector<dfa::DFA> &decisionToDFA,
-                       PredictionContextCache &sharedContextCache);
+                       PredictionContext::Cache &sharedContextCache);
 
     virtual void reset() override;
     virtual void clearDFA() override;

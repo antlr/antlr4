@@ -14,12 +14,12 @@ namespace atn {
   public:
     using Ptr = std::shared_ptr<LexerATNConfig>;
 
-    LexerATNConfig(ATNState *state, int alt, Ref<PredictionContext> const& context);
-    LexerATNConfig(ATNState *state, int alt, Ref<PredictionContext> const& context, Ref<LexerActionExecutor> const& lexerActionExecutor);
+    LexerATNConfig(ATNState *state, int alt, PredictionContext::Ptr const& context);
+    LexerATNConfig(ATNState *state, int alt, PredictionContext::Ptr const& context, Ref<LexerActionExecutor> const& lexerActionExecutor);
 
     LexerATNConfig(LexerATNConfig::Ptr const& c, ATNState *state);
     LexerATNConfig(LexerATNConfig::Ptr const& c, ATNState *state, Ref<LexerActionExecutor> const& lexerActionExecutor);
-    LexerATNConfig(LexerATNConfig::Ptr const& c, ATNState *state, Ref<PredictionContext> const& context);
+    LexerATNConfig(LexerATNConfig::Ptr const& c, ATNState *state, PredictionContext::Ptr const& context);
 
     /**
      * Gets the {@link LexerActionExecutor} capable of executing the embedded

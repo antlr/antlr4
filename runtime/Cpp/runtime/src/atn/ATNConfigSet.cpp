@@ -57,7 +57,7 @@ bool ATNConfigSet::add(const ATNConfig::Ptr &config, PredictionContextMergeCache
 
   // a previous (s,i,pi,_), merge with it and save result
   bool rootIsWildcard = !fullCtx;
-  Ref<PredictionContext> merged = PredictionContext::merge(existing->context, config->context, rootIsWildcard, mergeCache);
+  PredictionContext::Ptr merged = PredictionContext::merge(existing->context, config->context, rootIsWildcard, mergeCache);
   // no need to check for existing.context, config.context in cache
   // since only way to create new graphs is "call rule" and here. We
   // cache at both places.

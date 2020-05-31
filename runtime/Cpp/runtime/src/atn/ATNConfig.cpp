@@ -13,11 +13,11 @@ using namespace antlr4::atn;
 
 const size_t ATNConfig::SUPPRESS_PRECEDENCE_FILTER = 0x40000000;
 
-ATNConfig::ATNConfig(ATNState *state_, size_t alt_, Ref<PredictionContext> const& context_)
+ATNConfig::ATNConfig(ATNState *state_, size_t alt_, PredictionContext::Ptr const& context_)
   : ATNConfig(state_, alt_, context_, SemanticContext::NONE) {
 }
 
-ATNConfig::ATNConfig(ATNState *state_, size_t alt_, Ref<PredictionContext> const& context_, Ref<SemanticContext> const& semanticContext_)
+ATNConfig::ATNConfig(ATNState *state_, size_t alt_, PredictionContext::Ptr const& context_, Ref<SemanticContext> const& semanticContext_)
   : state(state_), alt(alt_), context(context_), semanticContext(semanticContext_) {
   reachesIntoOuterContext = 0;
 }
@@ -36,11 +36,11 @@ ATNConfig::ATNConfig(ATNConfig::Ptr const& c, Ref<SemanticContext> const& semant
   : ATNConfig(c, c->state, c->context, semanticContext) {
 }
 
-ATNConfig::ATNConfig(ATNConfig::Ptr const& c, ATNState *state, Ref<PredictionContext> const& context)
+ATNConfig::ATNConfig(ATNConfig::Ptr const& c, ATNState *state, PredictionContext::Ptr const& context)
   : ATNConfig(c, state, context, c->semanticContext) {
 }
 
-ATNConfig::ATNConfig(ATNConfig::Ptr const& c, ATNState *state, Ref<PredictionContext> const& context,
+ATNConfig::ATNConfig(ATNConfig::Ptr const& c, ATNState *state, PredictionContext::Ptr const& context,
                      Ref<SemanticContext> const& semanticContext)
   : state(state), alt(c->alt), context(context), reachesIntoOuterContext(c->reachesIntoOuterContext),
     semanticContext(semanticContext) {

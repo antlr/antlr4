@@ -47,12 +47,12 @@ using namespace antlrcpp;
 const bool ParserATNSimulator::TURN_OFF_LR_LOOP_ENTRY_BRANCH_OPT = ParserATNSimulator::getLrLoopSetting();
 
 ParserATNSimulator::ParserATNSimulator(const ATN &atn, std::vector<dfa::DFA> &decisionToDFA,
-                                       PredictionContextCache &sharedContextCache)
+                                       PredictionContext::Cache &sharedContextCache)
 : ParserATNSimulator(nullptr, atn, decisionToDFA, sharedContextCache) {
 }
 
 ParserATNSimulator::ParserATNSimulator(Parser *parser, const ATN &atn, std::vector<dfa::DFA> &decisionToDFA,
-                                       PredictionContextCache &sharedContextCache)
+                                       PredictionContext::Cache &sharedContextCache)
 : ATNSimulator(atn, sharedContextCache), decisionToDFA(decisionToDFA), parser(parser) {
   InitializeInstanceFields();
 }
@@ -585,7 +585,7 @@ ATNConfigSet* ParserATNSimulator::removeAllConfigsNotInRuleStopState(ATNConfigSe
 
 std::unique_ptr<ATNConfigSet> ParserATNSimulator::computeStartState(ATNState *p, RuleContext *ctx, bool fullCtx) {
   // always at least the implicit call to start rule
-  Ref<PredictionContext> initialContext = PredictionContext::fromRuleContext(atn, ctx);
+  PredictionContext::Ptr initialContext = PredictionContext::fromRuleContext(atn, ctx);
   std::unique_ptr<ATNConfigSet> configs(new ATNConfigSet(fullCtx));
 
   for (size_t i = 0; i < p->transitions.size(); i++) {
@@ -599,7 +599,7 @@ std::unique_ptr<ATNConfigSet> ParserATNSimulator::computeStartState(ATNState *p,
 }
 
 std::unique_ptr<ATNConfigSet> ParserATNSimulator::applyPrecedenceFilter(ATNConfigSet *configs) {
-  std::map<size_t, Ref<PredictionContext>> statesFromAlt1;
+  std::map<size_t, PredictionContext::Ptr> statesFromAlt1;
   std::unique_ptr<ATNConfigSet> configSet(new ATNConfigSet(configs->fullCtx));
   for (ATNConfig::Ptr &config : configs->configs) {
     // handle alt 1 first
@@ -1163,7 +1163,7 @@ ATNConfig::Ptr ParserATNSimulator::ruleTransition(ATNConfig::Ptr const& config, 
 #endif
 
   atn::ATNState *returnState = t->followState;
-  Ref<PredictionContext> newContext = SingletonPredictionContext::create(config->context, returnState->stateNumber);
+  PredictionContext::Ptr newContext = SingletonPredictionContext::create(config->context, returnState->stateNumber);
   return makeConfig(config, t->target, newContext);
 }
 

@@ -51,12 +51,12 @@ int LexerATNSimulator::match_calls = 0;
 
 
 LexerATNSimulator::LexerATNSimulator(const ATN &atn, std::vector<dfa::DFA> &decisionToDFA,
-                                     PredictionContextCache &sharedContextCache)
+                                     PredictionContext::Cache &sharedContextCache)
   : LexerATNSimulator(nullptr, atn, decisionToDFA, sharedContextCache) {
 }
 
 LexerATNSimulator::LexerATNSimulator(Lexer *recog, const ATN &atn, std::vector<dfa::DFA> &decisionToDFA,
-                                     PredictionContextCache &sharedContextCache)
+                                     PredictionContext::Cache &sharedContextCache)
   : ATNSimulator(atn, sharedContextCache), _recog(recog), _decisionToDFA(decisionToDFA) {
   InitializeInstanceFields();
 }
@@ -302,7 +302,7 @@ atn::ATNState *LexerATNSimulator::getReachableTarget(Transition *trans, size_t t
 }
 
 std::unique_ptr<ATNConfigSet> LexerATNSimulator::computeStartState(CharStream *input, ATNState *p) {
-  Ref<PredictionContext> initialContext = PredictionContext::EMPTY; // ml: the purpose of this assignment is unclear
+  PredictionContext::Ptr initialContext = PredictionContext::EMPTY; // ml: the purpose of this assignment is unclear
   std::unique_ptr<ATNConfigSet> configs(new OrderedATNConfigSet());
   for (size_t i = 0; i < p->transitions.size(); i++) {
     ATNState *target = p->transitions[i]->target;
@@ -377,7 +377,7 @@ LexerATNConfig::Ptr LexerATNSimulator::getEpsilonTarget(CharStream *input, const
   switch (t->getSerializationType()) {
     case Transition::RULE: {
       RuleTransition *ruleTransition = static_cast<RuleTransition*>(t);
-      Ref<PredictionContext> newContext = SingletonPredictionContext::create(config->context, ruleTransition->followState->stateNumber);
+      PredictionContext::Ptr newContext = SingletonPredictionContext::create(config->context, ruleTransition->followState->stateNumber);
       return makeConfig(config, t->target, newContext);
       break;
     }

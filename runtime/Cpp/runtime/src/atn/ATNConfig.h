@@ -48,7 +48,7 @@ namespace atn {
     /// execution of the ATN simulator.
     ///
     /// Can be shared between multiple ANTConfig instances.
-    Ref<PredictionContext> context;
+    PredictionContext::Ptr context;
 
     /**
      * We cannot execute predicates dependent upon local context unless
@@ -78,15 +78,15 @@ namespace atn {
     /// Can be shared between multiple ATNConfig instances.
     Ref<SemanticContext> semanticContext;
 
-    ATNConfig(ATNState *state, size_t alt, Ref<PredictionContext> const& context);
-    ATNConfig(ATNState *state, size_t alt, Ref<PredictionContext> const& context, Ref<SemanticContext> const& semanticContext);
+    ATNConfig(ATNState *state, size_t alt, PredictionContext::Ptr const& context);
+    ATNConfig(ATNState *state, size_t alt, PredictionContext::Ptr const& context, Ref<SemanticContext> const& semanticContext);
 
     ATNConfig(ATNConfig::Ptr const& c); // dup
     ATNConfig(ATNConfig::Ptr const& c, ATNState *state);
     ATNConfig(ATNConfig::Ptr const& c, ATNState *state, Ref<SemanticContext> const& semanticContext);
     ATNConfig(ATNConfig::Ptr const& c, Ref<SemanticContext> const& semanticContext);
-    ATNConfig(ATNConfig::Ptr const& c, ATNState *state, Ref<PredictionContext> const& context);
-    ATNConfig(ATNConfig::Ptr const& c, ATNState *state, Ref<PredictionContext> const& context, Ref<SemanticContext> const& semanticContext);
+    ATNConfig(ATNConfig::Ptr const& c, ATNState *state, PredictionContext::Ptr const& context);
+    ATNConfig(ATNConfig::Ptr const& c, ATNState *state, PredictionContext::Ptr const& context, Ref<SemanticContext> const& semanticContext);
 
     ATNConfig(ATNConfig const&) = delete;
     virtual ~ATNConfig();

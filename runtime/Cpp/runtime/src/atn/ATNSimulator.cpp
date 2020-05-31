@@ -19,7 +19,7 @@ const Ref<DFAState> ATNSimulator::ERROR = std::make_shared<DFAState>(INT32_MAX);
 antlrcpp::SingleWriteMultipleReadLock ATNSimulator::_stateLock;
 antlrcpp::SingleWriteMultipleReadLock ATNSimulator::_edgeLock;
 
-ATNSimulator::ATNSimulator(const ATN &atn, PredictionContextCache &sharedContextCache)
+ATNSimulator::ATNSimulator(const ATN &atn, PredictionContext::Cache &sharedContextCache)
 : atn(atn), _sharedContextCache(sharedContextCache) {
 }
 
@@ -30,13 +30,13 @@ void ATNSimulator::clearDFA() {
   throw UnsupportedOperationException("This ATN simulator does not support clearing the DFA.");
 }
 
-PredictionContextCache& ATNSimulator::getSharedContextCache() {
+PredictionContext::Cache& ATNSimulator::getSharedContextCache() {
   return _sharedContextCache;
 }
 
-Ref<PredictionContext> ATNSimulator::getCachedContext(Ref<PredictionContext> const& context) {
+PredictionContext::Ptr ATNSimulator::getCachedContext(PredictionContext::Ptr const& context) {
   // This function must only be called with an active state lock, as we are going to change a shared structure.
-  std::map<Ref<PredictionContext>, Ref<PredictionContext>> visited;
+  std::map<PredictionContext::Ptr, PredictionContext::Ptr> visited;
   return PredictionContext::getCachedContext(context, _sharedContextCache, visited);
 }
 
