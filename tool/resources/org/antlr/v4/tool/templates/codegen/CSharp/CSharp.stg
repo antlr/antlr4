@@ -116,6 +116,7 @@ using ParserRuleContext = Antlr4.Runtime.ParserRuleContext;
 /// of the available methods.
 /// \</summary>
 [System.CodeDom.Compiler.GeneratedCode("ANTLR", "<file.ANTLRVersion>")]
+[System.Diagnostics.DebuggerStepThrough]
 [System.CLSCompliant(false)]
 public partial class <file.grammarName>BaseListener : I<file.grammarName>Listener {
 	<file.listenerNames:{lname |
@@ -214,6 +215,7 @@ using ParserRuleContext = Antlr4.Runtime.ParserRuleContext;
 /// \</summary>
 /// \<typeparam name="Result">The return type of the visit operation.\</typeparam>
 [System.CodeDom.Compiler.GeneratedCode("ANTLR", "<file.ANTLRVersion>")]
+[System.Diagnostics.DebuggerStepThrough]
 [System.CLSCompliant(false)]
 public partial class <file.grammarName>BaseVisitor\<Result> : AbstractParseTreeVisitor\<Result>, I<file.grammarName>Visitor\<Result> {
 	<file.visitorNames:{lname |
@@ -268,6 +270,7 @@ Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
 
 Parser_(parser, funcs, atn, sempredFuncs, ctor, superClass) ::= <<
 [System.CodeDom.Compiler.GeneratedCode("ANTLR", "<file.ANTLRVersion>")]
+[System.Diagnostics.DebuggerStepThrough]
 [System.CLSCompliant(false)]
 public partial class <csIdentifier.(parser.name)> : <superClass; null="Parser"> {
 	protected static DFA[] decisionToDFA;
@@ -855,6 +858,7 @@ CaptureNextTokenType(d) ::= "<d.varName> = TokenStream.LA(1);"
 
 StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers,
            superClass={ParserRuleContext}) ::= <<
+[System.Diagnostics.DebuggerStepThrough]
 public partial class <struct.name> : <if(contextSuperClass)><contextSuperClass><else>ParserRuleContext<endif><if(interfaces)>, <interfaces; separator=", "><endif> {
 	<attrs:{a | public <a>;}; separator="\n">
 	<getters:{g | <g>}; separator="\n">
@@ -878,6 +882,7 @@ public partial class <struct.name> : <if(contextSuperClass)><contextSuperClass><
 >>
 
 AltLabelStructDecl(struct,attrs,getters,dispatchMethods) ::= <<
+[System.Diagnostics.DebuggerStepThrough]
 public partial class <struct.name> : <currentRule.name; format="cap">Context {
 	<attrs:{a | public <a>;}; separator="\n">
 	<getters:{g | <g>}; separator="\n">
@@ -976,6 +981,7 @@ using DFA = Antlr4.Runtime.Dfa.DFA;
 
 Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
 [System.CodeDom.Compiler.GeneratedCode("ANTLR", "<file.ANTLRVersion>")]
+[System.Diagnostics.DebuggerStepThrough]
 [System.CLSCompliant(false)]
 public partial class <csIdentifier.(lexer.name)> : <superClass; null="Lexer"> {
 	protected static DFA[] decisionToDFA;
