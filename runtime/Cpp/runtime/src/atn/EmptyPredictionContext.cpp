@@ -18,7 +18,7 @@ size_t EmptyPredictionContext::size() const {
   return 1;
 }
 
-Ref<PredictionContext> EmptyPredictionContext::getParent(size_t /*index*/) const {
+PredictionContext::Ptr EmptyPredictionContext::getParent(size_t /*index*/) const {
   return nullptr;
 }
 

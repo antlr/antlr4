@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "atn/usop.h"
+
 namespace antlr4 {
 namespace atn {
 
@@ -18,21 +20,24 @@ namespace atn {
   /// </summary>
   class ANTLR4CPP_PUBLIC ATNConfig {
   public:
+
+    using Ptr = sbit::PooledPointer<ATNConfig>;
+
     struct Hasher
     {
-      size_t operator()(ATNConfig const& k) const {
-        return k.hashCode();
+      size_t operator()(ATNConfig::Ptr const& k) const {
+        return k->hashCode();
       }
     };
 
     struct Comparer {
-      bool operator()(ATNConfig const& lhs, ATNConfig const& rhs) const {
-        return (&lhs == &rhs) || (lhs == rhs);
+      bool operator()(ATNConfig::Ptr const& lhs, ATNConfig::Ptr const& rhs) const {
+        return (lhs == rhs);
       }
     };
 
 
-    using Set = std::unordered_set<Ref<ATNConfig>, Hasher, Comparer>;
+    using Set = std::unordered_set<ATNConfig::Ptr, Hasher, Comparer>;
 
     /// The ATN state associated with this configuration.
     ATNState * state;
@@ -45,7 +50,7 @@ namespace atn {
     /// execution of the ATN simulator.
     ///
     /// Can be shared between multiple ANTConfig instances.
-    Ref<PredictionContext> context;
+    PredictionContext::Ptr context;
 
     /**
      * We cannot execute predicates dependent upon local context unless
@@ -75,17 +80,17 @@ namespace atn {
     /// Can be shared between multiple ATNConfig instances.
     Ref<SemanticContext> semanticContext;
 
-    ATNConfig(ATNState *state, size_t alt, Ref<PredictionContext> const& context);
-    ATNConfig(ATNState *state, size_t alt, Ref<PredictionContext> const& context, Ref<SemanticContext> const& semanticContext);
+    ATNConfig(ATNState *state, size_t alt, PredictionContext::Ptr const& context);
+    ATNConfig(ATNState *state, size_t alt, PredictionContext::Ptr const& context, Ref<SemanticContext> const& semanticContext);
 
-    ATNConfig(Ref<ATNConfig> const& c); // dup
-    ATNConfig(Ref<ATNConfig> const& c, ATNState *state);
-    ATNConfig(Ref<ATNConfig> const& c, ATNState *state, Ref<SemanticContext> const& semanticContext);
-    ATNConfig(Ref<ATNConfig> const& c, Ref<SemanticContext> const& semanticContext);
-    ATNConfig(Ref<ATNConfig> const& c, ATNState *state, Ref<PredictionContext> const& context);
-    ATNConfig(Ref<ATNConfig> const& c, ATNState *state, Ref<PredictionContext> const& context, Ref<SemanticContext> const& semanticContext);
+    ATNConfig(ATNConfig::Ptr const& c); // dup
+    ATNConfig(ATNConfig::Ptr const& c, ATNState *state);
+    ATNConfig(ATNConfig::Ptr const& c, ATNState *state, Ref<SemanticContext> const& semanticContext);
+    ATNConfig(ATNConfig::Ptr const& c, Ref<SemanticContext> const& semanticContext);
+    ATNConfig(ATNConfig::Ptr const& c, ATNState *state, PredictionContext::Ptr const& context);
+    ATNConfig(ATNConfig::Ptr const& c, ATNState *state, PredictionContext::Ptr const& context, Ref<SemanticContext> const& semanticContext);
 
-    ATNConfig(ATNConfig const&) = default;
+    ATNConfig(ATNConfig const&) = delete;
     virtual ~ATNConfig();
 
     virtual size_t hashCode() const;
@@ -134,9 +139,9 @@ namespace std {
     }
   };
 
-  template <> struct hash<std::vector<Ref<ATNConfig>>>
+  template <> struct hash<std::vector<ATNConfig::Ptr>>
   {
-    size_t operator() (const std::vector<Ref<ATNConfig>> &vector) const
+    size_t operator() (const std::vector<ATNConfig::Ptr> &vector) const
     {
       std::size_t seed = 0;
       for (auto &config : vector) {

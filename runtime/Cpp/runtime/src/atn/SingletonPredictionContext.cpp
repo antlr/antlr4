@@ -9,7 +9,7 @@
 
 using namespace antlr4::atn;
 
-SingletonPredictionContext::SingletonPredictionContext(Ref<PredictionContext> const& parent, size_t returnState)
+SingletonPredictionContext::SingletonPredictionContext(PredictionContext::Ptr const& parent, size_t returnState)
   : PredictionContext(parent ? calculateHashCode(parent, returnState) : calculateEmptyHashCode()),
     parent(parent), returnState(returnState) {
   assert(returnState != ATNState::INVALID_STATE_NUMBER);
@@ -18,7 +18,7 @@ SingletonPredictionContext::SingletonPredictionContext(Ref<PredictionContext> co
 SingletonPredictionContext::~SingletonPredictionContext() {
 }
 
-Ref<SingletonPredictionContext> SingletonPredictionContext::create(Ref<PredictionContext> const& parent, size_t returnState) {
+Ref<SingletonPredictionContext> SingletonPredictionContext::create(PredictionContext::Ptr const& parent, size_t returnState) {
 
   if (returnState == EMPTY_RETURN_STATE && parent) {
     // someone can pass in the bits of an array ctx that mean $
@@ -31,7 +31,7 @@ size_t SingletonPredictionContext::size() const {
   return 1;
 }
 
-Ref<PredictionContext> SingletonPredictionContext::getParent(size_t index) const {
+PredictionContext::Ptr SingletonPredictionContext::getParent(size_t index) const {
   assert(index == 0);
   ((void)(index)); // Make Release build happy.
   return parent;

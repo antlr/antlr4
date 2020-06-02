@@ -116,7 +116,7 @@ namespace antlr4 {
     std::vector<std::string> _ruleNames;
 
     std::vector<dfa::DFA> _decisionToDFA; // not shared like it is for generated parsers
-    atn::PredictionContextCache _sharedContextCache;
+    atn::PredictionContext::Cache _sharedContextCache;
 
     /** This stack corresponds to the _parentctx, _parentState pair of locals
      *  that would exist on call stack frames with a recursive descent parser;

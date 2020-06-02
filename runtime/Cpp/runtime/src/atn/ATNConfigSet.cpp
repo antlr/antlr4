@@ -30,11 +30,11 @@ ATNConfigSet::ATNConfigSet(const Ref<ATNConfigSet> &old) : ATNConfigSet(old->ful
 ATNConfigSet::~ATNConfigSet() {
 }
 
-bool ATNConfigSet::add(const Ref<ATNConfig> &config) {
+bool ATNConfigSet::add(const ATNConfig::Ptr &config) {
   return add(config, nullptr);
 }
 
-bool ATNConfigSet::add(const Ref<ATNConfig> &config, PredictionContextMergeCache *mergeCache) {
+bool ATNConfigSet::add(const ATNConfig::Ptr &config, PredictionContextMergeCache *mergeCache) {
   if (_readonly) {
     throw IllegalStateException("This set is readonly");
   }
@@ -57,7 +57,7 @@ bool ATNConfigSet::add(const Ref<ATNConfig> &config, PredictionContextMergeCache
 
   // a previous (s,i,pi,_), merge with it and save result
   bool rootIsWildcard = !fullCtx;
-  Ref<PredictionContext> merged = PredictionContext::merge(existing->context, config->context, rootIsWildcard, mergeCache);
+  PredictionContext::Ptr merged = PredictionContext::merge(existing->context, config->context, rootIsWildcard, mergeCache);
   // no need to check for existing.context, config.context in cache
   // since only way to create new graphs is "call rule" and here. We
   // cache at both places.
@@ -99,8 +99,8 @@ std::vector<ATNState*> ATNConfigSet::getStates() {
 
 BitSet ATNConfigSet::getAlts() {
   BitSet alts;
-  for (ATNConfig config : configs) {
-    alts.set(config.alt);
+  for (const auto& config : configs) {
+    alts.set(config->alt);
   }
   return alts;
 }
@@ -115,7 +115,7 @@ std::vector<Ref<SemanticContext>> ATNConfigSet::getPredicates() {
   return preds;
 }
 
-Ref<ATNConfig> ATNConfigSet::get(size_t i) const {
+ATNConfig::Ptr ATNConfigSet::get(size_t i) const {
   return configs[i];
 }
 

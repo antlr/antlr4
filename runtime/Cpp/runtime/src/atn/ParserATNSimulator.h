@@ -246,10 +246,10 @@ namespace atn {
   public:
     /// Testing only!
     ParserATNSimulator(const ATN &atn, std::vector<dfa::DFA> &decisionToDFA,
-                       PredictionContextCache &sharedContextCache);
+                       PredictionContext::Cache &sharedContextCache);
 
     ParserATNSimulator(Parser *parser, const ATN &atn, std::vector<dfa::DFA> &decisionToDFA,
-                       PredictionContextCache &sharedContextCache);
+                       PredictionContext::Cache &sharedContextCache);
 
     virtual void reset() override;
     virtual void clearDFA() override;
@@ -348,7 +348,7 @@ namespace atn {
     bool canDropLoopEntryEdgeInLeftRecursiveRule(ATNConfig *config) const;
     virtual std::string getRuleName(size_t index);
 
-    virtual Ref<ATNConfig> precedenceTransition(Ref<ATNConfig> const& config, PrecedencePredicateTransition *pt,
+    virtual ATNConfig::Ptr precedenceTransition(ATNConfig::Ptr const& config, PrecedencePredicateTransition *pt,
                                                 bool collectPredicates, bool inContext, bool fullCtx);
 
     void setPredictionMode(PredictionMode newMode);
@@ -766,24 +766,24 @@ namespace atn {
      waste to pursue the closure. Might have to advance when we do
      ambig detection thought :(
      */
-    virtual void closure(Ref<ATNConfig> const& config, ATNConfigSet *configs, ATNConfig::Set &closureBusy,
+    virtual void closure(ATNConfig::Ptr const& config, ATNConfigSet *configs, ATNConfig::Set &closureBusy,
                          bool collectPredicates, bool fullCtx, bool treatEofAsEpsilon);
 
-    virtual void closureCheckingStopState(Ref<ATNConfig> const& config, ATNConfigSet *configs, ATNConfig::Set &closureBusy,
+    virtual void closureCheckingStopState(ATNConfig::Ptr const& config, ATNConfigSet *configs, ATNConfig::Set &closureBusy,
                                           bool collectPredicates, bool fullCtx, int depth, bool treatEofAsEpsilon);
     
     /// Do the actual work of walking epsilon edges.
-    virtual void closure_(Ref<ATNConfig> const& config, ATNConfigSet *configs, ATNConfig::Set &closureBusy,
+    virtual void closure_(ATNConfig::Ptr const& config, ATNConfigSet *configs, ATNConfig::Set &closureBusy,
                           bool collectPredicates, bool fullCtx, int depth, bool treatEofAsEpsilon);
     
-    virtual Ref<ATNConfig> getEpsilonTarget(Ref<ATNConfig> const& config, Transition *t, bool collectPredicates,
+    virtual ATNConfig::Ptr getEpsilonTarget(ATNConfig::Ptr const& config, Transition *t, bool collectPredicates,
                                             bool inContext, bool fullCtx, bool treatEofAsEpsilon);
-    virtual Ref<ATNConfig> actionTransition(Ref<ATNConfig> const& config, ActionTransition *t);
+    virtual ATNConfig::Ptr actionTransition(ATNConfig::Ptr const& config, ActionTransition *t);
 
-    virtual Ref<ATNConfig> predTransition(Ref<ATNConfig> const& config, PredicateTransition *pt, bool collectPredicates,
+    virtual ATNConfig::Ptr predTransition(ATNConfig::Ptr const& config, PredicateTransition *pt, bool collectPredicates,
                                           bool inContext, bool fullCtx);
 
-    virtual Ref<ATNConfig> ruleTransition(Ref<ATNConfig> const& config, RuleTransition *t);
+    virtual ATNConfig::Ptr ruleTransition(ATNConfig::Ptr const& config, RuleTransition *t);
 
     /**
      * Gets a {@link BitSet} containing the alternatives in {@code configs}
@@ -897,6 +897,14 @@ namespace atn {
 
     static bool getLrLoopSetting();
     void InitializeInstanceFields();
+
+    static sbit::UnsynchronizedObjectPool<ATNConfig> _configPool;
+
+    template< class... Args >
+    ATNConfig::Ptr makeConfig(Args&&... args)
+    {
+        return _configPool.create(std::forward<Args>(args)...);
+    }
   };
 
 } // namespace atn
