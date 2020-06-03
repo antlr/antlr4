@@ -88,7 +88,7 @@ namespace tree {
     }
 
     void reset() {
-      for (auto entry : _allocated)
+      for (auto * entry : _allocated)
         delete entry;
       _allocated.clear();
     }
