@@ -441,7 +441,6 @@ class LexerSkipAction implements LexerAction {
   /// <p>This action is implemented by calling {@link Lexer#skip}.</p>
   @override
   void execute(Lexer lexer) {
-    lexer.skip();
   }
 
   @override
