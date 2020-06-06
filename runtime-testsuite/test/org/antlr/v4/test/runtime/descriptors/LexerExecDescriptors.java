@@ -23,6 +23,7 @@ public class LexerExecDescriptors {
 		stuff2: ab
 		ab
 		[@0,0:1='ab',<1>,1:0]
+		[@1,2:1='<EOF>',<-1>,1:2]
 		 */
 		@CommentHasStringValue
 		public String output;
