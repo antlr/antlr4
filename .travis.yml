@@ -149,6 +149,11 @@ matrix:
       env: TARGET=java
       stage: smoke-test
     - os: linux
+      dist: bionic
+      jdk: openjdk8
+      env: TARGET=dlang
+      stage: main-test
+    - os: linux
       jdk: openjdk8
       env: TARGET=csharp
       stage: main-test
@@ -204,12 +209,6 @@ matrix:
       jdk: openjdk8
       env: TARGET=go
       stage: main-test
-    - os: linux
-      dist: bionic
-      jdk: openjdk8
-      env: TARGET=dlang
-      stage: main-test
-
 
 before_install:
   - f="./.travis/before-install-$TRAVIS_OS_NAME-$TARGET.sh"; ! [ -x "$f" ] || "$f"
