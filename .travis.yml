@@ -151,7 +151,7 @@ matrix:
     - os: linux
       dist: bionic
       jdk: openjdk8
-      env: TARGET=dlang
+      env: TARGET=d
       stage: main-test
     - os: linux
       jdk: openjdk8
