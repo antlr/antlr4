@@ -94,9 +94,9 @@ import std.variant;
 class TokenStreamRewriter
 {
 
-    public static immutable string DEFAULT_PROGRAM_NAME = "default";
+    enum string DEFAULT_PROGRAM_NAME = "default";
 
-    public static immutable int MIN_TOKEN_INDEX = 0;
+    enum int MIN_TOKEN_INDEX = 0;
 
     /**
      * Our source stream

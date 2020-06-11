@@ -33,7 +33,7 @@ import antlr.v4.runtime.atn.ParseInfo;
 abstract class Recognizer(U, V) : InterfaceRecognizer
 {
 
-    public static immutable int EOF = -1;
+    enum int EOF = -1;
 
     public int[string][Vocabulary] tokenTypeMapCache;
 

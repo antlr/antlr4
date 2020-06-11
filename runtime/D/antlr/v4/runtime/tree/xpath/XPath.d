@@ -82,13 +82,13 @@ class XPath
      * @uml
      * word not operator/separator
      */
-    public static immutable string WILDCARD = "*";
+    enum string WILDCARD = "*";
 
     /**
      * @uml
      * word for invert operator
      */
-    public static immutable string NOT = "!";
+    enum string NOT = "!";
 
     protected string path;
 

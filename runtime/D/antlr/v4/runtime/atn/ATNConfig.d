@@ -32,7 +32,7 @@ class ATNConfig
      * {@link #isPrecedenceFilterSuppressed} property as a bit within the
      * existing {@link #reachesIntoOuterContext} field.
      */
-    public static immutable int SUPPRESS_PRECEDENCE_FILTER = 0x40000000;
+    enum int SUPPRESS_PRECEDENCE_FILTER = 0x40000000;
 
     /**
      * The ATN state associated with this configuration.

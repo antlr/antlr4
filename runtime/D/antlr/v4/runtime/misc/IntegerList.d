@@ -144,8 +144,7 @@ class IntegerList
     public final void removeRange(int fromIndex, int toIndex)
     in
     {
-        assert(fromIndex >= 0 || toIndex >= 0 || fromIndex <= data_.length
-                || toIndex <= data_.length, "IndexOutOfBoundsException");
+        assert(fromIndex >= 0 || toIndex >= 0 || fromIndex <= data_.length || toIndex <= data_.length, "IndexOutOfBoundsException");
         assert(fromIndex <= toIndex, "IllegalArgumentException");
     }
     do

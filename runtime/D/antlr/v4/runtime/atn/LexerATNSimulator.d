@@ -44,12 +44,12 @@ import antlr.v4.runtime.misc;
 class LexerATNSimulator : ATNSimulator
 {
 
-    public static immutable int MIN_DFA_EDGE = 0;
+    enum int MIN_DFA_EDGE = 0;
 
     /**
      * forces unicode to stay in ATN
      */
-    public static immutable int MAX_DFA_EDGE = 127;
+    enum int MAX_DFA_EDGE = 127;
 
     protected Lexer recog;
 

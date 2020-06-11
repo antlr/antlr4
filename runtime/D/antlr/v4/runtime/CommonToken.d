@@ -111,12 +111,13 @@ class CommonToken : WritableToken
 
     public this(TokenFactorySourcePair source, int type, int channel, size_t start, size_t stop)
     {
-    this.source = source;
+        this.source = source;
         this.type = type;
         this.channel = channel;
         this.startIndex_ = start;
         this.stopIndex_ = stop;
-        if (source.a) {
+        if (source.a)
+        {
             this.line = source.a.getLine;
             this.charPositionInLine = source.a.getCharPositionInLine;
         }
@@ -131,7 +132,7 @@ class CommonToken : WritableToken
      */
     public this(int type, Variant text)
     {
-    this.type = type;
+        this.type = type;
         this.channel = TokenConstantDefinition.DEFAULT_CHANNEL;
         this.text = text;
         this.source = EMPTY_SOURCE;
@@ -152,7 +153,7 @@ class CommonToken : WritableToken
      */
     public this(Token oldToken)
     {
-    type = oldToken.getType;
+        type = oldToken.getType;
         line = oldToken.getLine;
         index = oldToken.getTokenIndex;
         charPositionInLine = oldToken.getCharPositionInLine;
@@ -160,15 +161,16 @@ class CommonToken : WritableToken
         startIndex_ = oldToken.startIndex;
         stopIndex_ = oldToken.stopIndex;
 
-        if (cast(CommonToken)oldToken) {
-            text = (cast(CommonToken)oldToken).text;
-            source = (cast(CommonToken)oldToken).source;
+        if (cast(CommonToken) oldToken)
+        {
+            text = (cast(CommonToken) oldToken).text;
+            source = (cast(CommonToken) oldToken).source;
         }
-        else {
+        else
+        {
             text = oldToken.getText;
-            TokenFactorySourcePair sourceNew = tuple(
-                                                     oldToken.getTokenSource,
-                                                     oldToken.getInputStream);
+            TokenFactorySourcePair sourceNew = tuple(oldToken.getTokenSource,
+                    oldToken.getInputStream);
             source = sourceNew;
         }
     }
@@ -196,13 +198,16 @@ class CommonToken : WritableToken
         }
 
         CharStream input = getInputStream;
-        if (input is null) return Null;
+        if (input is null)
+            return Null;
         auto n = input.size;
-        if (startIndex_ < n && stopIndex_ < n) {
+        if (startIndex_ < n && stopIndex_ < n)
+        {
             Variant v = input.getText(Interval.of(to!int(startIndex_), to!int(stopIndex_)));
             return v;
         }
-        else {
+        else
+        {
             Variant v = "<EOF>";
             return v;
         }
@@ -319,16 +324,19 @@ class CommonToken : WritableToken
         import std.format : format;
 
         string channelStr = "";
-        if (channel > 0) {
-            channelStr=",channel=" ~ to!string(channel);
+        if (channel > 0)
+        {
+            channelStr = ",channel=" ~ to!string(channel);
         }
         auto txt = getText.get!(string);
-        if (txt.length > 0) {
-            txt = txt.replace("\n","\\n");
-            txt = txt.replace("\r","\\r");
-            txt = txt.replace("\t","\\t");
+        if (txt.length > 0)
+        {
+            txt = txt.replace("\n", "\\n");
+            txt = txt.replace("\r", "\\r");
+            txt = txt.replace("\t", "\\t");
         }
-        else {
+        else
+        {
             txt = "<no text>";
         }
         return format!"[@%s,%s:%s='%s',<%s>%s,%s:%s]"(cast(int)getTokenIndex,

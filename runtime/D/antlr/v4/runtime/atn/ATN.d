@@ -28,7 +28,7 @@ import antlr.v4.runtime.misc.IntervalSet;
 class ATN
 {
 
-    public static immutable int INVALID_ALT_NUMBER = 0;
+    enum int INVALID_ALT_NUMBER = 0;
 
     public ATNState[] states;
 

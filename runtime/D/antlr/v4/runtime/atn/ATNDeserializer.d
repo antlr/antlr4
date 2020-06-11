@@ -69,7 +69,7 @@ import std.utf;
 class ATNDeserializer
 {
 
-    public static immutable int SERIALIZED_VERSION = 3;
+    enum int SERIALIZED_VERSION = 3;
 
     /**
      * This is the earliest supported serialized UUID.

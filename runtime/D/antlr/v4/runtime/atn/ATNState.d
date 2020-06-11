@@ -46,9 +46,9 @@ import std.algorithm.mutation: remove;
 abstract class ATNState
 {
 
-    public static immutable int INITIAL_NUM_TRANSITIONS = 4;
+    enum int INITIAL_NUM_TRANSITIONS = 4;
 
-    public static immutable int INVALID_STATE_NUMBER = -1;
+    enum int INVALID_STATE_NUMBER = -1;
 
     /**
      * @uml
