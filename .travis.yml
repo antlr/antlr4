@@ -19,13 +19,8 @@ stages:
 matrix:
   include:
     - os: linux
-      dist: bionic
       jdk: openjdk8
       env: TARGET=d
-      stage: main-test
-    - os: linux
-      jdk: openjdk8
-      env: TARGET=csharp
       stage: main-test
 
 before_install:
