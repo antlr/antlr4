@@ -63,7 +63,7 @@ public:
   };
 <endif>
 
-  <lexer.name>(antlr4::CharStream *input);
+  explicit <lexer.name>(antlr4::CharStream *input);
   ~<lexer.name>();
 
   <namedActions.members>
@@ -290,7 +290,7 @@ public:
   };
 <endif>
 
-  <parser.name>(antlr4::TokenStream *input);
+  explicit <parser.name>(antlr4::TokenStream *input);
   ~<parser.name>();
 
   virtual std::string getGrammarFileName() const override;
