@@ -1,5 +1,9 @@
 ANTLR Project Contributors Certification of Origin and Rights
 
+NOTE: This tool is mature and Terence is mostly occupied elsewhere. We
+can't accept any changes that could have widespread effects on thousands
+of existing projects. Sorry!
+
 All contributors to ANTLR v4 must formally agree to abide by this
 certificate of origin by signing on the bottom with their github
 userid, full name, email address (you can obscure your e-mail, but it
