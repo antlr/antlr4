@@ -1,5 +1,9 @@
 ANTLR Project Contributors Certification of Origin and Rights
 
+NOTE: This tool is mature and Terence is mostly occupied elsewhere. We
+can't accept any changes that could have widespread effects on thousands
+of existing projects. Sorry!
+
 All contributors to ANTLR v4 must formally agree to abide by this
 certificate of origin by signing on the bottom with their github
 userid, full name, email address (you can obscure your e-mail, but it
@@ -242,5 +246,6 @@ YYYY/MM/DD, github id, Full name, email
 2020/02/21, StochasticTinkr, Daniel Pitts, github@coloraura.com
 2020/03/17, XsongyangX, Song Yang, songyang1218@gmail.com
 2020/04/07, deniskyashif, Denis Kyashif, denis.kyashif@gmail.com
-2020/04/30, TristonianJones, Tristan Swadell, tswadell@google.com
 2020/04/23, kaczmarj, Jakub Kaczmarzyk, jakub.kaczmarzyk@stonybrookmedicine.edu
+2020/04/30, TristonianJones, Tristan Swadell, tswadell@google.com
+2020/05/31, d-markey, David Markey, dmarkey@free.fr
