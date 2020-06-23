@@ -16,6 +16,8 @@
 #  the states. We'll use the term Edge for the DFA to distinguish them from
 #  ATN transitions.</p>
 #
+import builtins
+vars(globals()['__builtins__']) is vars(builtins)
 from __builtin__ import unicode
 from antlr4.IntervalSet import IntervalSet, Interval
 from antlr4.Token import Token
