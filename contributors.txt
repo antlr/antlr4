@@ -248,3 +248,4 @@ YYYY/MM/DD, github id, Full name, email
 2020/04/07, deniskyashif, Denis Kyashif, denis.kyashif@gmail.com
 2020/04/30, TristonianJones, Tristan Swadell, tswadell@google.com
 2020/05/31, d-markey, David Markey, dmarkey@free.fr
+2020/07/01, sha-N, Shan M Mathews, admin@bluestarqatar.com
