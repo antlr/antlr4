@@ -60,19 +60,6 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.seleniumhq.selenium</groupId>
-			<artifactId>selenium-java</artifactId>
-			<version>2.46.0</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-		  <groupId>org.eclipse.jetty</groupId>
-		  <artifactId>jetty-server</artifactId>
-          <!-- stick to version 9 for jdk compatibility -->
-		  <version>9.4.19.v20190610</version>
-		  <scope>test</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.glassfish</groupId>
 			<artifactId>javax.json</artifactId>
 			<version>1.0.4</version>
@@ -112,7 +99,7 @@
                         <include>**/csharp/Test*.java</include>
                         <include>**/java/Test*.java</include>
                         <include>**/go/Test*.java</include>
-                        <include>**/javascript/node/Test*.java</include>
+                        <include>**/javascript/Test*.java</include>
                         <include>**/python2/Test*.java</include>
                         <include>**/python3/Test*.java</include>
                         <include>**/php/Test*.java</include>

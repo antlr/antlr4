@@ -57,7 +57,7 @@ Edit the repository looking for 4.5 or whatever and update it. Bump version in t
  * runtime/Python3/src/antlr4/Recognizer.py
  * runtime/CSharp/runtime/CSharp/Antlr4.Runtime/Properties/AssemblyInfo.cs
  * runtime/CSharp/runtime/CSharp/Antlr4.Runtime/Antlr4.Runtime.dotnet.csproj
- * runtime/JavaScript/src/antlr4/package.json
+ * runtime/JavaScript/package.json
  * runtime/JavaScript/src/antlr4/Recognizer.js
  * runtime/Cpp/VERSION
  * runtime/Cpp/runtime/src/RuntimeMetaData.cpp
@@ -277,16 +277,14 @@ git push origin gh-pages
 ### JavaScript
 
 ```bash
-cd runtime/JavaScript/src
-zip -r /tmp/antlr-javascript-runtime-4.8.zip antlr4
-cp /tmp/antlr-javascript-runtime-4.8.zip ~/antlr/sites/website-antlr4/download
+cd runtime/JavaScript
 # git add, commit, push
 ```
 
 **Push to npm**
 
 ```bash
-cd runtime/JavaScript/src
+cd runtime/JavaScript
 npm login
 npm publish antlr4
 ```
@@ -294,11 +292,8 @@ npm publish antlr4
 Move target to website
 
 ```bash
-pushd ~/antlr/sites/website-antlr4/download
-git add antlr-javascript-runtime-4.8.zip
-git commit -a -m 'update JS runtime'
-git push origin gh-pages
-popd
+npm run build
+cp /dist/antlr4.js ~/antlr/sites/website-antlr4/download
 ```
 
 ### CSharp
