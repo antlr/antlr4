@@ -10,4 +10,5 @@ module.exports.InputMismatchException = require('./Errors').InputMismatchExcepti
 module.exports.FailedPredicateException = require('./Errors').FailedPredicateException;
 module.exports.DiagnosticErrorListener = require('./DiagnosticErrorListener');
 module.exports.BailErrorStrategy = require('./ErrorStrategy').BailErrorStrategy;
+module.exports.DefaultErrorStrategy = require('./ErrorStrategy').DefaultErrorStrategy;
 module.exports.ErrorListener = require('./ErrorListener').ErrorListener;
