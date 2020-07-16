@@ -4,5 +4,6 @@ src_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__
 sys.path.insert(0,src_path)
 from TestTokenStreamRewriter import TestTokenStreamRewriter
 from xpathtest import XPathTest
+from versiontest import TestVersion
 import unittest
 unittest.main()

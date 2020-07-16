@@ -1,3 +1,4 @@
+from antlr4.version import __version__
 from antlr4.Token import Token
 from antlr4.InputStream import InputStream
 from antlr4.FileStream import FileStream
