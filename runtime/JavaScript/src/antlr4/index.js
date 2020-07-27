@@ -20,4 +20,6 @@ var pc = require('./PredictionContext');
 exports.PredictionContextCache = pc.PredictionContextCache;
 exports.ParserRuleContext = require('./ParserRuleContext');
 exports.Interval = require('./IntervalSet').Interval;
+exports.IntervalSet = require('./IntervalSet').IntervalSet;
 exports.Utils = require('./Utils');
+exports.LL1Analyzer = require('./LL1Analyzer').LL1Analyzer;

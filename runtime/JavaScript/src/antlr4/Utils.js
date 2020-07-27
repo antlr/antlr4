@@ -66,11 +66,11 @@ String.prototype.hashCode = function () {
 };
 
 function standardEqualsFunction(a, b) {
-    return a.equals(b);
+    return a ? a.equals(b) : a==b;
 }
 
 function standardHashCodeFunction(a) {
-    return a.hashCode();
+    return a ? a.hashCode() : -1;
 }
 
 class Set {
