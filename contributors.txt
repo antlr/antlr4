@@ -241,11 +241,13 @@ YYYY/MM/DD, github id, Full name, email
 2019/11/11, foxeverl, Liu Xinfeng, liuxf1986[at]gmail[dot]com
 2019/11/17, felixn, Felix Nieuwenhuizhen, felix@tdlrali.com
 2019/11/18, mlilback, Mark Lilback, mark@lilback.com
+2020/01/19, lingyv-li, Lingyu Li, lingyv.li@gmail.com
 2020/02/02, carocad, Camilo Roca, carocad@unal.edu.co
 2020/02/10, julibert, Julián Bermúdez Ortega, julibert.dev@gmail.com
 2020/02/21, StochasticTinkr, Daniel Pitts, github@coloraura.com
 2020/03/17, XsongyangX, Song Yang, songyang1218@gmail.com
 2020/04/07, deniskyashif, Denis Kyashif, denis.kyashif@gmail.com
 2020/04/30, TristonianJones, Tristan Swadell, tswadell@google.com
+2020/05/25, graknol, Sindre van der Linden, graknol@gmail.com
 2020/05/31, d-markey, David Markey, dmarkey@free.fr
 2020/07/01, sha-N, Shan M Mathews, admin@bluestarqatar.com

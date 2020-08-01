@@ -8,6 +8,7 @@ install:
   - git submodule update --init --recursive
   - cinst -y php --params "/InstallDir:C:\tools\php"
   - cinst -y composer
+  - cinst -y dart-sdk
 build_script:
   - mvn -DskipTests install --batch-mode
   - msbuild /target:restore /target:rebuild /property:Configuration=Release /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /verbosity:detailed runtime/CSharp/runtime/CSharp/Antlr4.dotnet.sln
@@ -15,7 +16,7 @@ build_script:
 after_build: 
   - msbuild /target:pack /property:Configuration=Release /verbosity:detailed runtime/CSharp/runtime/CSharp/Antlr4.dotnet.sln
 test_script:
-  - mvn install -Dantlr-php-php="C:\tools\php\php.exe" -Dantlr-python2-python="C:\Python27\python.exe" -Dantlr-python3-python="C:\Python35\python.exe" -Dantlr-javascript-nodejs="C:\Program Files (x86)\nodejs\node.exe" --batch-mode
+  - mvn install -Dantlr-php-php="C:\tools\php\php.exe" -Dantlr-dart-dart="C:\tools\dart-sdk\bin\dart.exe" -Dantlr-dart-pub="C:\tools\dart-sdk\bin\pub.bat" -Dantlr-dart-dart2native="C:\tools\dart-sdk\bin\dart2native.bat" -Dantlr-python2-python="C:\Python27\python.exe" -Dantlr-python3-python="C:\Python35\python.exe" -Dantlr-javascript-nodejs="C:\Program Files (x86)\nodejs\node.exe" --batch-mode
 artifacts:
 - path: 'runtime\**\*.nupkg'  
   name: NuGet

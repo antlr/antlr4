@@ -65,6 +65,8 @@ Edit the repository looking for 4.5 or whatever and update it. Bump version in t
  * runtime/Cpp/demo/generate.cmd
  * runtime/Go/antlr/recognizer.go
  * runtime/Swift/Antlr4/org/antlr/v4/runtime/RuntimeMetaData.swift
+ * runtime/Dart/lib/src/runtime_meta_data.dart
+ * runtime/Dart/pubspec.yaml
  * tool/src/org/antlr/v4/codegen/target/GoTarget.java
  * tool/src/org/antlr/v4/codegen/target/CppTarget.java
  * tool/src/org/antlr/v4/codegen/target/CSharpTarget.java
@@ -441,6 +443,19 @@ git commit -a -m 'update C++ runtime'
 git push origin gh-pages
 popd
 ```
+
+### Dart
+
+Push to pub.dev
+
+```bash
+cd runtime/Dart
+pub publish
+```
+
+It will warn that no change log found for the new version.
+If there are changes relevant to dart in this release, edit [CHANGELOG.md](https://github.com/antlr/antlr4/blob/master/runtime/Dart/CHANGELOG.md) to describe the changes.
+Otherwise enter `N` to ignore the warning.
 
 ## Update javadoc for runtime and tool
 
