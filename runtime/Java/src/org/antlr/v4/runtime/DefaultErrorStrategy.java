@@ -596,7 +596,7 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 			current = lookback;
 		}
 		return
-			recognizer.getTokenFactory().create(new Pair<TokenSource, CharStream>(current.getTokenSource(), current.getTokenSource().getInputStream()), expectedTokenType, tokenText,
+			recognizer.getTokenFactory().create(new Pair<TokenSource, CharStream>(current.getTokenSource(), current.getInputStream()), expectedTokenType, tokenText,
 							Token.DEFAULT_CHANNEL,
 							-1, -1,
 							current.getLine(), current.getCharPositionInLine());

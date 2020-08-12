@@ -412,7 +412,7 @@ public class ParserInterpreter extends Parser {
 					expectedTokenType = ime.getExpectedTokens().getMinElement(); // get any element
 				}
 				Token errToken =
-					getTokenFactory().create(new Pair<TokenSource, CharStream>(tok.getTokenSource(), tok.getTokenSource().getInputStream()),
+					getTokenFactory().create(new Pair<TokenSource, CharStream>(tok.getTokenSource(), tok.getInputStream()),
 				                             expectedTokenType, tok.getText(),
 				                             Token.DEFAULT_CHANNEL,
 				                            -1, -1, // invalid start/stop
@@ -422,7 +422,7 @@ public class ParserInterpreter extends Parser {
 			else { // NoViableAlt
 				Token tok = e.getOffendingToken();
 				Token errToken =
-					getTokenFactory().create(new Pair<TokenSource, CharStream>(tok.getTokenSource(), tok.getTokenSource().getInputStream()),
+					getTokenFactory().create(new Pair<TokenSource, CharStream>(tok.getTokenSource(), tok.getInputStream()),
 				                             Token.INVALID_TYPE, tok.getText(),
 				                             Token.DEFAULT_CHANNEL,
 				                            -1, -1, // invalid start/stop
