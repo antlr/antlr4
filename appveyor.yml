@@ -8,7 +8,7 @@ install:
   - git submodule update --init --recursive
   - cinst -y php --params "/InstallDir:C:\tools\php"
   - cinst -y composer
-  - cinst -y dart-sdk
+  - cinst -y dart-sdk --version=2.8.4
 build_script:
   - mvn -DskipTests install --batch-mode
   - msbuild /target:restore /target:rebuild /property:Configuration=Release /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /verbosity:detailed runtime/CSharp/runtime/CSharp/Antlr4.dotnet.sln
