@@ -1,5 +1,7 @@
 # ANTLR4 Runtime for Dart
 
+Notice: Dart target may generate code incompatible with Dart 2.9 sound null safety. Please set the minimum SDK constraint to 2.8.4 or lower if such violation is found. Contributions are welcomed.
+
 ### First steps
 
 #### 1. Install ANTLR4
