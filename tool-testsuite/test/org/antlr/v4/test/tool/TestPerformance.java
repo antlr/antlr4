@@ -933,12 +933,12 @@ public class TestPerformance extends BaseJavaToolTest {
 						continue;
 					}
 
-					states += dfa.states.size();
+                    states += dfa.states.size();
 					for (DFAState state : dfa.states.values()) {
 						configs += state.configs.size();
 						uniqueConfigs.addAll(state.configs);
 					}
-				}
+                }
 
                 System.out.format("There are %d parser DFAState instances, %d configs (%d unique).%n", states, configs, uniqueConfigs.size());
 

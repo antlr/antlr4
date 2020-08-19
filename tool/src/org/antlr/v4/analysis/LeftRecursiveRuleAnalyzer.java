@@ -386,9 +386,7 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 
 			// Are there args on a rule?
 			if ( tok.getType()==RULE_REF && i<=tokenStopIndex && tokenStream.get(i).getType()==ARG_ACTION ) {
-				buf.append('[')
-						.append(tokenStream.get(i).getText())
-						.append(']');
+				buf.append('[').append(tokenStream.get(i).getText()).append(']');
 				i++;
 			}
 
