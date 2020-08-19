@@ -20,7 +20,7 @@ public interface Token {
 
 	int MIN_USER_TOKEN_TYPE = 1;
 
-    int EOF = IntStream.EOF;
+	int EOF = IntStream.EOF;
 
 	/** All tokens go to the parser (unless skip() is called in that rule)
 	 *  on a particular "channel".  The parser tunes to a particular channel
