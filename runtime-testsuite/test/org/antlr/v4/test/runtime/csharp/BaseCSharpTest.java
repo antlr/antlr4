@@ -245,7 +245,8 @@ public class BaseCSharpTest implements RuntimeTestSupport {
 	Set<String> sourceFiles = new HashSet<String>();
 
 	private void addSourceFiles(String ... files) {
-		this.sourceFiles.addAll(Arrays.asList(files));
+		for(String file : files)
+			this.sourceFiles.add(file);
 	}
 
 	@Override
