@@ -961,19 +961,19 @@ AddToLabelList(a) ::= <<
 
 TokenLabelType() ::= "<file.TokenLabelType; null = {Token}> *"
 
-TokenDeclHeader(t) ::= "antlr4::<TokenLabelType()><t.name> = nullptr;"
+TokenDeclHeader(t) ::= "antlr4::<TokenLabelType()><t.name> = nullptr"
 TokenDecl(t) ::= "<! Variable Declaration !>"
 
 TokenTypeDeclHeader(t) ::= "<! Local Variable !>"
 TokenTypeDecl(t) ::= "size_t <t.name> = 0;"
 
-TokenListDeclHeader(t) ::= "std::vector\<antlr4::Token *> <t.name>;"
+TokenListDeclHeader(t) ::= "std::vector\<antlr4::Token *> <t.name>"
 TokenListDecl(t) ::= "<! Variable Declaration !>"
 
-RuleContextDeclHeader(r) ::= "<parser.name>::<r.ctxName> *<r.name> = nullptr;"
+RuleContextDeclHeader(r) ::= "<parser.name>::<r.ctxName> *<r.name> = nullptr"
 RuleContextDecl(r) ::= "<! Variable Declaration !>"
 
-RuleContextListDeclHeader(rdecl) ::= "std::vector\<<rdecl.ctxName> *> <rdecl.name>;"
+RuleContextListDeclHeader(rdecl) ::= "std::vector\<<rdecl.ctxName> *> <rdecl.name>"
 RuleContextListDecl(rdecl) ::= "<! Variable Declaration !>"
 
 ContextTokenGetterDeclHeader(t) ::= "antlr4::tree::TerminalNode *<t.name>();"
