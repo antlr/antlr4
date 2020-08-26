@@ -51,7 +51,8 @@ public abstract class BaseRuntimeTest {
 		"CSharp",
 		"Python2", "Python3",
 		"PHP",
-		"Node"
+		"Node",
+		"Dart"
 	};
 
 	static {
@@ -299,6 +300,16 @@ public abstract class BaseRuntimeTest {
 		}
 	}
 
+	public static String readFile(String dir, String fileName) {
+		try {
+			return String.copyValueOf(Utils.readFile(dir+"/"+fileName, "UTF-8"));
+		}
+		catch (IOException ioe) {
+			System.err.println("can't read file");
+			ioe.printStackTrace(System.err);
+		}
+		return null;
+	}
 
 	protected static void assertCorrectOutput(RuntimeTestDescriptor descriptor, RuntimeTestSupport delegate, String actualOutput) {
 		String actualParseErrors = delegate.getParseErrors();
