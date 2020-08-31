@@ -6,44 +6,33 @@
 #pragma once
 
 #include "antlr4-common.h"
+#include "utf8.h"
 
 namespace antlrcpp {
 
-  // For all conversions utf8 <-> utf32.
-  // VS 2015 and VS 2017 have different bugs in std::codecvt_utf8<char32_t> (VS 2013 works fine).
-#if defined(_MSC_VER) && _MSC_VER >= 1900 && _MSC_VER < 2000
-  typedef std::wstring_convert<std::codecvt_utf8<__int32>, __int32> UTF32Converter;
-#else
-  typedef std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> UTF32Converter;
-#endif
+  // I wouldn't prefer wstring_convert for two reasons:
+  // 1. According to https://en.cppreference.com/w/cpp/locale/wstring_convert,
+  //    wstring_convert is deprecated in C++17.
+  // 2. GCC 4.9 doesn't support codecvt header. And many projects still use
+  //    GCC 4.9 as compiler.
+  // utfcpp (https://github.com/nemtrif/utfcpp) is a substitution.
 
   // The conversion functions fails in VS2017, so we explicitly use a workaround.
   template<typename T>
   inline std::string utf32_to_utf8(T const& data)
   {
-    // Don't make the converter static or we have to serialize access to it.
-    thread_local UTF32Converter converter;
+    std::string narrow;
+    utf8::utf32to8(data.begin(), data.end(), std::back_inserter(narrow));
 
-    #if defined(_MSC_VER) && _MSC_VER >= 1900 && _MSC_VER < 2000
-      const auto p = reinterpret_cast<const int32_t *>(data.data());
-      return converter.to_bytes(p, p + data.size());
-    #else
-      return converter.to_bytes(data);
-    #endif
+    return narrow;
   }
 
   inline UTF32String utf8_to_utf32(const char* first, const char* last)
   {
-    thread_local UTF32Converter converter;
+    UTF32String wide;
+    utf8::utf8to32(first, last, std::back_inserter(wide));
 
-    #if defined(_MSC_VER) && _MSC_VER >= 1900 && _MSC_VER < 2000
-      auto r = converter.from_bytes(first, last);
-      i32string s = reinterpret_cast<const int32_t *>(r.data());
-    #else
-      std::u32string s = converter.from_bytes(first, last);
-    #endif
-
-    return s;
+    return wide;
   }
 
   void replaceAll(std::string &str, std::string const& from, std::string const& to);

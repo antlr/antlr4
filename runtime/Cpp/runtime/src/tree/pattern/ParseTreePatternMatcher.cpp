@@ -109,7 +109,12 @@ ParseTreePattern ParseTreePatternMatcher::compile(const std::string &pattern, in
     throw e;
 #else
   } catch (std::exception & /*e*/) {
+#if defined(__clang__) || (defined(__GNUC__) && (__GNUC___ >= 5))
     std::throw_with_nested((const char*)"Cannot invoke start rule"); // Wrap any other exception. We should however probably use one of the ANTLR exceptions here.
+#else
+    // throw_with_nested doesn't accept const char* as argument in GCC 4.9.
+    std::throw_with_nested(std::runtime_error("Cannot invoke start rule"));
+#endif
 #endif
   }
 

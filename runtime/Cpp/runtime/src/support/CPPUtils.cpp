@@ -51,8 +51,11 @@ namespace antlrcpp {
           }
           // else fall through
 #ifndef _MSC_VER
+// GCC 4.9 can't recognize clang::fallthrough.
+#if defined(__clang__) || (defined(__GNUC__) && (__GNUC___ >= 5))
 #if __has_cpp_attribute(clang::fallthrough)
           [[clang::fallthrough]];
+#endif
 #endif
 #endif
 
