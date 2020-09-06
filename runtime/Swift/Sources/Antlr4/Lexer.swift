@@ -174,10 +174,11 @@ open class Lexer: Recognizer<LexerATNSimulator>, TokenSource {
                     }
                 } while _type == Lexer.MORE
 
-                if _token == nil {
+                if let t = _token {
+                    return t
+                } else {
                     emit()
                 }
-                return _token!
             }
         }
 
