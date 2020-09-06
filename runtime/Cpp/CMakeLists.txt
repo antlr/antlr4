@@ -66,7 +66,7 @@ if(WITH_DEMO)
 endif(WITH_DEMO)
 
 if(MSVC_VERSION)
-  set(MY_CXX_WARNING_FLAGS "  /W4")
+  set(MY_CXX_WARNING_FLAGS "  /W4 /wd4996")
 else()
   set(MY_CXX_WARNING_FLAGS "  -Wall -pedantic -W")
 endif()
