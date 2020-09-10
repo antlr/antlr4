@@ -65,7 +65,7 @@ int main(int argc, const char* argv[]) {
 
   tree::ParseTree *tree = parser.key();
   TreeShapeListener listener;
-  tree::ParseTreeWalker::DEFAULT->walk(&listener, tree);
+  tree::ParseTreeWalker::DEFAULT.walk(&listener, tree);
 
   return 0;
 }
