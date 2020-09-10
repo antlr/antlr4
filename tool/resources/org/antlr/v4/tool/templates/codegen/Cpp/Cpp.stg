@@ -710,6 +710,8 @@ switch (getInterpreter\<atn::ParserATNSimulator>()->adaptivePredict(_input, <cho
   break;
 \}
 }; separator="\n">
+default:
+  break;
 }
 >>
 
@@ -724,6 +726,8 @@ switch (getInterpreter\<atn::ParserATNSimulator>()->adaptivePredict(_input, <cho
   break;
 \}
 }; separator = "\n">
+default:
+  break;
 }
 >>
 
