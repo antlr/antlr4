@@ -22,8 +22,7 @@ Vocabulary::Vocabulary(const std::vector<std::string> &literalNames,
   // See note here on -1 part: https://github.com/antlr/antlr4/pull/1146
 }
 
-Vocabulary::~Vocabulary() {
-}
+Vocabulary::~Vocabulary() = default;
 
 Vocabulary Vocabulary::fromTokenNames(const std::vector<std::string> &tokenNames) {
   if (tokenNames.empty()) {
@@ -34,25 +33,18 @@ Vocabulary Vocabulary::fromTokenNames(const std::vector<std::string> &tokenNames
   std::vector<std::string> symbolicNames = tokenNames;
   std::locale locale;
   for (size_t i = 0; i < tokenNames.size(); i++) {
-    std::string tokenName = tokenNames[i];
-    if (tokenName == "") {
+    const std::string& tokenName = tokenNames[i];
+    if (tokenName.empty()) {
       continue;
+    } else if (tokenName.front() == '\'') {
+      symbolicNames[i].clear();
+    } else if (std::isupper(tokenName.front(), locale)) {
+      literalNames[i].clear();
+    } else {
+      // wasn't a literal or symbolic name
+      literalNames[i].clear();
+      symbolicNames[i].clear();
     }
-
-    if (!tokenName.empty()) {
-      char firstChar = tokenName[0];
-      if (firstChar == '\'') {
-        symbolicNames[i] = "";
-        continue;
-      } else if (std::isupper(firstChar, locale)) {
-        literalNames[i] = "";
-        continue;
-      }
-    }
-
-    // wasn't a literal or symbolic name
-    literalNames[i] = "";
-    symbolicNames[i] = "";
   }
 
   return Vocabulary(literalNames, symbolicNames, tokenNames);
