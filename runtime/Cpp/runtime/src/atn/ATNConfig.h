@@ -139,7 +139,7 @@ namespace std {
     size_t operator() (const std::vector<Ref<ATNConfig>> &vector) const
     {
       std::size_t seed = 0;
-      for (auto &config : vector) {
+      for (const auto &config : vector) {
         seed ^= config->hashCode() + 0x9e3779b9 + (seed << 6) + (seed >> 2);
       }
       return seed;
