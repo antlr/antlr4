@@ -282,7 +282,7 @@ public abstract class Target {
 		return sb.toString();
 	}
 
-	private static boolean shouldUseUnicodeEscapeForCodePointInDoubleQuotedString(int codePoint) {
+	protected boolean shouldUseUnicodeEscapeForCodePointInDoubleQuotedString(int codePoint) {
 		// We don't want anyone passing 0x0A (newline) or 0x22
 		// (double-quote) here because Java treats \\u000A as
 		// a literal newline and \\u0022 as a literal
