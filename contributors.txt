@@ -255,3 +255,4 @@ YYYY/MM/DD, github id, Full name, email
 2020/07/01, sha-N, Shan M Mathews, admin@bluestarqatar.com
 2020/08/22, stevenjohnstone, Steven Johnstone, steven.james.johnstone@gmail.com
 2020/09/06, ArthurSonzogni, Sonzogni Arthur, arthursonzogni@gmail.com
+2020/09/10, Khailian, Arunav Sanyal, arunav.sanyal91@gmail.com
