@@ -103,6 +103,7 @@
                         <include>**/python2/Test*.java</include>
                         <include>**/python3/Test*.java</include>
                         <include>**/php/Test*.java</include>
+                        <include>**/dart/Test*.java</include>
                         <include>${antlr.tests.swift}</include>
                     </includes>
 				</configuration>
