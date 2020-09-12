@@ -36,7 +36,7 @@ namespace antlrcpp {
       thread_local UTF32Converter converter;
 
       #if defined(_MSC_VER) && _MSC_VER >= 1900 && _MSC_VER < 2000
-        auto p = reinterpret_cast<const int32_t *>(data.data());
+        const auto p = reinterpret_cast<const int32_t *>(data.data());
         return converter.to_bytes(p, p + data.size());
       #else
         return converter.to_bytes(data);
