@@ -2,10 +2,10 @@
 
 set -euo pipefail
 
-python --version
+python2.7 --version
 
 mvn -q -Dparallel=methods -DthreadCount=4 -Dtest=python2.* test
 
 cd ../runtime/Python2/tests
 
-python run.py
+python2.7 run.py

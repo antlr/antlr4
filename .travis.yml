@@ -19,59 +19,56 @@ stages:
 matrix:
   include:
     - os: linux
-      dist: trusty
+      dist: focal
       compiler: clang
-      jdk: openjdk8
+      jdk: openjdk11
       env:
         - TARGET=cpp
-        - CXX=g++-5
+        - CXX=g++-10
         - GROUP=LEXER
       stage: main-test
       addons:
         apt:
           sources:
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-precise-3.7
+            - sourceline: 'deb http://apt.llvm.org/focal/ llvm-toolchain-focal-10 main'
           packages:
-            - g++-5
+            - g++-10
             - uuid-dev
-            - clang-3.7
+            - clang-10
     - os: linux
-      dist: trusty
+      dist: focal
       compiler: clang
-      jdk: openjdk8
+      jdk: openjdk11
       env:
         - TARGET=cpp
-        - CXX=g++-5
+        - CXX=g++-10
         - GROUP=PARSER
       stage: main-test
       addons:
         apt:
           sources:
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-precise-3.7
+            - sourceline: 'deb http://apt.llvm.org/focal/ llvm-toolchain-focal-10 main'
           packages:
-            - g++-5
+            - g++-10
             - uuid-dev
-            - clang-3.7
+            - clang-10
     - os: linux
-      dist: trusty
+      dist: focal
       compiler: clang
-      jdk: openjdk8
+      jdk: openjdk11
       env:
         - TARGET=cpp
-        - CXX=g++-5
+        - CXX=g++-10
         - GROUP=RECURSION
       stage: main-test
       addons:
         apt:
           sources:
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-precise-3.7
+            - sourceline: 'deb http://apt.llvm.org/focal/ llvm-toolchain-focal-10 main'
           packages:
-            - g++-5
+            - g++-10
             - uuid-dev
-            - clang-3.7
+            - clang-10
     - os: osx
       compiler: clang
       osx_image: xcode10.2
@@ -140,27 +137,30 @@ matrix:
         - GROUP=RECURSION
       stage: extended-test
     - os: linux
-      dist: trusty
-      jdk: openjdk7
+      dist: focal
+      jdk: openjdk11
       env: TARGET=java
       stage: extended-test
     - os: linux
-      jdk: openjdk8
+      dist: focal
+      jdk: openjdk11
       env: TARGET=java
       stage: smoke-test
     - os: linux
-      jdk: openjdk8
+      dist: focal
+      jdk: openjdk11
       env: TARGET=csharp
       stage: main-test
     - os: linux
-      jdk: openjdk8
+      dist: focal
+      jdk: openjdk11
       env: TARGET=dart
       stage: main-test
     - os: linux
+      dist: focal
       language: php
-      php:
-        - 7.2
-      jdk: openjdk8
+      php: 7.4
+      jdk: openjdk11
       env: TARGET=php
       stage: main-test
     - os: linux
@@ -185,30 +185,30 @@ matrix:
         - GROUP=RECURSION
       stage: extended-test
     - os: linux
-      jdk: openjdk8
+      dist: focal
+      jdk: openjdk11
       env: TARGET=python2
       stage: main-test
-    - os: linux
-      jdk: openjdk8
-      env: TARGET=python3
       addons:
         apt:
-          sources:
-            - deadsnakes # source required so it finds the package definition below
           packages:
-            - python3.7
+            - python2.7
+    - os: linux
+      dist: focal
+      jdk: openjdk11
+      env: TARGET=python3
       stage: main-test
     - os: linux
-      dist: trusty
-      jdk: openjdk8
+      dist: focal
+      jdk: openjdk11
       env: TARGET=javascript
       stage: main-test
       before_install:
         - nvm install 14 # otherwise it runs by default on node 8
         - f="./.travis/before-install-linux-javascript.sh"; ! [ -x "$f" ] || "$f"
     - os: linux
-      dist: trusty
-      jdk: openjdk8
+      dist: focal
+      jdk: openjdk11
       env: TARGET=go
       stage: main-test
 
