@@ -422,9 +422,6 @@ class Parser extends Recognizer {
 		if (this.buildParseTrees) {
 			this.addContextToParseTree();
 		}
-		if (this._parseListeners !== null) {
-			this.triggerEnterRuleEvent();
-		}
 	}
 
 	exitRule() {
@@ -448,6 +445,9 @@ class Parser extends Recognizer {
 			}
 		}
 		this._ctx = localctx;
+		if (this._parseListeners !== null) {
+			this.triggerEnterRuleEvent();
+		}
 	}
 
 	/**

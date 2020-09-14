@@ -366,8 +366,6 @@ class Parser (Recognizer):
         self._ctx.start = self._input.LT(1)
         if self.buildParseTrees:
             self.addContextToParseTree()
-        if self._parseListeners  is not None:
-            self.triggerEnterRuleEvent()
 
     def exitRule(self):
         self._ctx.stop = self._input.LT(-1)
@@ -386,6 +384,8 @@ class Parser (Recognizer):
                 self._ctx.parentCtx.removeLastChild()
                 self._ctx.parentCtx.addChild(localctx)
         self._ctx = localctx
+        if self._parseListeners  is not None:
+            self.triggerEnterRuleEvent()
 
     # Get the precedence level for the top-most precedence rule.
     #

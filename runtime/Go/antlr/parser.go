@@ -461,9 +461,6 @@ func (p *BaseParser) EnterRule(localctx ParserRuleContext, state, ruleIndex int)
 	if p.BuildParseTrees {
 		p.addContextToParseTree()
 	}
-	if p.parseListeners != nil {
-		p.TriggerEnterRuleEvent()
-	}
 }
 
 func (p *BaseParser) ExitRule() {
@@ -491,6 +488,9 @@ func (p *BaseParser) EnterOuterAlt(localctx ParserRuleContext, altNum int) {
 		}
 	}
 	p.ctx = localctx
+	if p.parseListeners != nil {
+		p.TriggerEnterRuleEvent()
+	}
 }
 
 // Get the precedence level for the top-most precedence rule.

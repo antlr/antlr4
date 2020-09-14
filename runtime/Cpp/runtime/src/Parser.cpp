@@ -339,9 +339,6 @@ void Parser::enterRule(ParserRuleContext *localctx, size_t state, size_t /*ruleI
   if (_buildParseTrees) {
     addContextToParseTree();
   }
-  if (_parseListeners.size() > 0) {
-    triggerEnterRuleEvent();
-  }
 }
 
 void Parser::exitRule() {
@@ -373,6 +370,9 @@ void Parser::enterOuterAlt(ParserRuleContext *localctx, size_t altNum) {
     }
   }
   _ctx = localctx;
+  if (_parseListeners.size() > 0) {
+    triggerEnterRuleEvent();
+  }
 }
 
 int Parser::getPrecedence() const {

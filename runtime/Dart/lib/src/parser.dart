@@ -475,7 +475,6 @@ abstract class Parser extends Recognizer<ParserATNSimulator> {
     _ctx = localctx;
     _ctx.start = _input.LT(1);
     if (_buildParseTrees) addContextToParseTree();
-    if (_parseListeners != null) triggerEnterRuleEvent();
   }
 
   void exitRule() {
@@ -503,6 +502,7 @@ abstract class Parser extends Recognizer<ParserATNSimulator> {
       }
     }
     _ctx = localctx;
+    if (_parseListeners != null) triggerEnterRuleEvent();
   }
 
   /// Get the precedence level for the top-most precedence rule.

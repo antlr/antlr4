@@ -809,10 +809,6 @@ namespace Antlr4.Runtime
             {
                 AddContextToParseTree();
             }
-            if (_parseListeners != null)
-            {
-                TriggerEnterRuleEvent();
-            }
         }
 
         public virtual void ExitRule()
@@ -842,6 +838,10 @@ namespace Antlr4.Runtime
                 }
             }
             _ctx = localctx;
+            if (_parseListeners != null)
+            {
+                TriggerEnterRuleEvent();
+            }
         }
 
         /// <summary>Get the precedence level for the top-most precedence rule.</summary>
