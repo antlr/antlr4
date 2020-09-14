@@ -257,3 +257,4 @@ YYYY/MM/DD, github id, Full name, email
 2020/08/22, stevenjohnstone, Steven Johnstone, steven.james.johnstone@gmail.com
 2020/09/06, ArthurSonzogni, Sonzogni Arthur, arthursonzogni@gmail.com
 2020/09/12, Clcanny, Charles Ruan, a837940593@gmail.com
+2020/09/14, 3c1u, Hikaru Terazono, 3c1u@vulpesgames.tokyo
