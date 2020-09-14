@@ -511,10 +511,6 @@ func (p *BaseParser) EnterRecursionRule(localctx ParserRuleContext, state, ruleI
 	p.precedenceStack.Push(precedence)
 	p.ctx = localctx
 	p.ctx.SetStart(p.input.LT(1))
-	if p.parseListeners != nil {
-		p.TriggerEnterRuleEvent() // simulates rule entry for
-		// left-recursive rules
-	}
 }
 
 //

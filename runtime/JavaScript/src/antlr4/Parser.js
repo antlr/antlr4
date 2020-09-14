@@ -469,10 +469,6 @@ class Parser extends Recognizer {
 	   this._precedenceStack.push(precedence);
 	   this._ctx = localctx;
 	   this._ctx.start = this._input.LT(1);
-	   if (this._parseListeners !== null) {
-		   this.triggerEnterRuleEvent(); // simulates rule entry for
-		   									// left-recursive rules
-	   }
    }
 
 	// Like {@link //enterRule} but for recursive rules.

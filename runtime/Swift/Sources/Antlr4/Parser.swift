@@ -669,9 +669,6 @@ open class Parser: Recognizer<ParserATNSimulator> {
         _precedenceStack.push(precedence)
         _ctx = localctx
         _ctx!.start = try _input.LT(1)
-        if _parseListeners != nil {
-            try triggerEnterRuleEvent() // simulates rule entry for left-recursive rules
-        }
     }
 
     /// Like _#enterRule_ but for recursive rules.

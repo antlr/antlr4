@@ -523,9 +523,6 @@ abstract class Parser extends Recognizer<ParserATNSimulator> {
     _precedenceStack.add(precedence);
     _ctx = localctx;
     _ctx.start = _input.LT(1);
-    if (_parseListeners != null) {
-      triggerEnterRuleEvent(); // simulates rule entry for left-recursive rules
-    }
   }
 
   /// Like {@link #enterRule} but for recursive rules.

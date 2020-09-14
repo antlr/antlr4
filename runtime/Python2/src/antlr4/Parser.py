@@ -394,8 +394,6 @@ class Parser (Recognizer):
         self._precedenceStack.append(precedence)
         self._ctx = localctx
         self._ctx.start = self._input.LT(1)
-        if self._parseListeners is not None:
-            self.triggerEnterRuleEvent() # simulates rule entry for left-recursive rules
 
     #
     # Like {@link #enterRule} but for recursive rules.

@@ -392,9 +392,6 @@ void Parser::enterRecursionRule(ParserRuleContext *localctx, size_t state, size_
   _precedenceStack.push_back(precedence);
   _ctx = localctx;
   _ctx->start = _input->LT(1);
-  if (!_parseListeners.empty()) {
-    triggerEnterRuleEvent(); // simulates rule entry for left-recursive rules
-  }
 }
 
 void Parser::pushNewRecursionContext(ParserRuleContext *localctx, size_t state, size_t /*ruleIndex*/) {

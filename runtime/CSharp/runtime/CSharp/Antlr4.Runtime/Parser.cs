@@ -787,10 +787,6 @@ namespace Antlr4.Runtime
             {
                 AddContextToParseTree();
             }
-            if (_parseListeners != null)
-            {
-                TriggerEnterRuleEvent();
-            }
         }
 
         public virtual void EnterLeftFactoredRule(ParserRuleContext localctx, int state, int ruleIndex)
@@ -874,10 +870,6 @@ namespace Antlr4.Runtime
             _precedenceStack.Add(precedence);
             _ctx = localctx;
             _ctx.Start = _input.LT(1);
-            if (_parseListeners != null)
-            {
-                TriggerEnterRuleEvent();
-            }
         }
 
         // simulates rule entry for left-recursive rules
