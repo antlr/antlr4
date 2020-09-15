@@ -430,7 +430,7 @@ function equalArrays(a, b) {
     for (let i = 0; i < a.length; i++) {
         if (a[i] == b[i])
             continue;
-        if (!a[i].equals(b[i]))
+        if (!a[i].equals || !a[i].equals(b[i]))
             return false;
     }
     return true;
