@@ -48,7 +48,7 @@ func (s *IntStack) Push(e int) {
 }
 
 type Set struct {
-	data             map[int][]interface{}
+	data             map[int]*[]interface{}
 	hashcodeFunction func(interface{}) int
 	equalsFunction   func(interface{}, interface{}) bool
 }
@@ -59,7 +59,7 @@ func NewSet(
 
 	s := new(Set)
 
-	s.data = make(map[int][]interface{})
+	s.data = make(map[int]*[]interface{})
 
 	if hashcodeFunction != nil {
 		s.hashcodeFunction = hashcodeFunction
@@ -111,19 +111,20 @@ func (s *Set) add(value interface{}) interface{} {
 	values := s.data[key]
 
 	if s.data[key] != nil {
-		for i := 0; i < len(values); i++ {
-			if s.equalsFunction(value, values[i]) {
-				return values[i]
+		for i := 0; i < len(*values); i++ {
+			if s.equalsFunction(value, (*values)[i]) {
+				return (*values)[i]
 			}
 		}
 
-		s.data[key] = append(s.data[key], value)
+		r := append(*(s.data)[key], value)
+		s.data[key] = &r
 		return value
 	}
 
 	v := make([]interface{}, 1, 10)
 	v[0] = value
-	s.data[key] = v
+	s.data[key] = &v
 
 	return value
 }
@@ -135,8 +136,8 @@ func (s *Set) contains(value interface{}) bool {
 	values := s.data[key]
 
 	if s.data[key] != nil {
-		for i := 0; i < len(values); i++ {
-			if s.equalsFunction(value, values[i]) {
+		for i := 0; i < len(*values); i++ {
+			if s.equalsFunction(value, (*values)[i]) {
 				return true
 			}
 		}
@@ -148,7 +149,7 @@ func (s *Set) values() []interface{} {
 	var l []interface{}
 
 	for _, v := range s.data {
-		l = append(l, v...)
+		l = append(l, *v...)
 	}
 
 	return l
@@ -158,7 +159,7 @@ func (s *Set) String() string {
 	r := ""
 
 	for _, av := range s.data {
-		for _, v := range av {
+		for _, v := range *av {
 			r += fmt.Sprint(v)
 		}
 	}
