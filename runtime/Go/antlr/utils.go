@@ -8,8 +8,6 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"sort"
-	"strconv"
 	"strings"
 )
 
@@ -165,94 +163,6 @@ func (s *Set) String() string {
 	}
 
 	return r
-}
-
-type BitSet struct {
-	data map[int]bool
-}
-
-func NewBitSet() *BitSet {
-	b := new(BitSet)
-	b.data = make(map[int]bool)
-	return b
-}
-
-func (b *BitSet) add(value int) {
-	b.data[value] = true
-}
-
-func (b *BitSet) clear(index int) {
-	delete(b.data, index)
-}
-
-func (b *BitSet) or(set *BitSet) {
-	for k := range set.data {
-		b.add(k)
-	}
-}
-
-func (b *BitSet) remove(value int) {
-	delete(b.data, value)
-}
-
-func (b *BitSet) contains(value int) bool {
-	return b.data[value]
-}
-
-func (b *BitSet) values() []int {
-	ks := make([]int, len(b.data))
-	i := 0
-	for k := range b.data {
-		ks[i] = k
-		i++
-	}
-	sort.Ints(ks)
-	return ks
-}
-
-func (b *BitSet) minValue() int {
-	min := 2147483647
-
-	for k := range b.data {
-		if k < min {
-			min = k
-		}
-	}
-
-	return min
-}
-
-func (b *BitSet) equals(other interface{}) bool {
-	otherBitSet, ok := other.(*BitSet)
-	if !ok {
-		return false
-	}
-
-	if len(b.data) != len(otherBitSet.data) {
-		return false
-	}
-
-	for k, v := range b.data {
-		if otherBitSet.data[k] != v {
-			return false
-		}
-	}
-
-	return true
-}
-
-func (b *BitSet) length() int {
-	return len(b.data)
-}
-
-func (b *BitSet) String() string {
-	vals := b.values()
-	valsS := make([]string, len(vals))
-
-	for i, val := range vals {
-		valsS[i] = strconv.Itoa(val)
-	}
-	return "{" + strings.Join(valsS, ", ") + "}"
 }
 
 type AltDict struct {
