@@ -158,7 +158,7 @@ class SingletonPredictionContext(PredictionContext):
 class EmptyPredictionContext(SingletonPredictionContext):
 
     def __init__(self):
-        super().__init__(None, self.EMPTY_RETURN_STATE)
+        super().__init__(None, PredictionContext.EMPTY_RETURN_STATE)
 
     def isEmpty(self):
         return True
