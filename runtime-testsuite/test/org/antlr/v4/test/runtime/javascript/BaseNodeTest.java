@@ -45,6 +45,7 @@ import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupString;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -243,8 +244,9 @@ public class BaseNodeTest implements RuntimeTestSupport {
 		assertTrue(success);
 		writeFile(tmpdir, "input", input);
 		writeLexerTestFile(lexerName, showDFA);
+		writeFile(tmpdir, "package.json", "{\"type\": \"module\"}");
 		String output = execModule("Test.js");
-		if ( output.length()==0 ) {
+		if ( output!=null && output.length()==0 ) {
 			output = null;
 		}
 		return output;
@@ -262,6 +264,7 @@ public class BaseNodeTest implements RuntimeTestSupport {
 		writeFile(tmpdir, "input", input);
 		rawBuildRecognizerTestFile(parserName, lexerName, listenerName,
 		                           visitorName, startRuleName, showDiagnosticErrors);
+		writeFile(tmpdir, "package.json", "{\"type\": \"module\"}");
 		return execRecognizer();
 	}
 
@@ -323,17 +326,18 @@ public class BaseNodeTest implements RuntimeTestSupport {
 	}
 
 	public String execModule(String fileName) {
-		String nodejsPath = locateNodeJS();
-		String runtimePath = locateRuntime();
-		String modulePath = new File(new File(tmpdir), fileName)
-				.getAbsolutePath();
-		String inputPath = new File(new File(tmpdir), "input")
-				.getAbsolutePath();
 		try {
-			ProcessBuilder builder = new ProcessBuilder(nodejsPath, modulePath,
+			String npmPath = locateNpm();
+			registerRuntime(npmPath);
+			String modulePath = new File(new File(tmpdir), fileName)
+					.getAbsolutePath();
+			linkRuntime(npmPath);
+			String nodejsPath = locateNodeJS();
+			String inputPath = new File(new File(tmpdir), "input")
+					.getAbsolutePath();
+			ProcessBuilder builder = new ProcessBuilder(nodejsPath, "--trace-warnings", modulePath,
 					inputPath);
-			builder.environment().put("NODE_PATH",
-					runtimePath + File.pathSeparator + tmpdir);
+			builder.environment().put("NODE_PATH", tmpdir);
 			builder.directory(new File(tmpdir));
 			Process process = builder.start();
 			StreamVacuum stdoutVacuum = new StreamVacuum(
@@ -361,6 +365,31 @@ public class BaseNodeTest implements RuntimeTestSupport {
 		return null;
 	}
 
+	private void registerRuntime(String npmPath) throws IOException, InterruptedException {
+		String runtimePath = locateRuntime();
+		ProcessBuilder builder = new ProcessBuilder(npmPath, "link");
+		builder.directory(new File(runtimePath));
+		builder.redirectError(new File(tmpdir, "error.txt"));
+		builder.redirectOutput(new File(tmpdir, "output.txt"));
+		Process process = builder.start();
+		process.waitFor();
+		int error = process.exitValue();
+		if(error!=0)
+			throw new IOException("'npm link' failed");
+	}
+
+	private void linkRuntime(String npmPath) throws IOException, InterruptedException {
+		ProcessBuilder builder = new ProcessBuilder(npmPath, "link", "antlr4");
+		builder.directory(new File(tmpdir));
+		builder.redirectError(new File(tmpdir, "error.txt"));
+		builder.redirectOutput(new File(tmpdir, "output.txt"));
+		Process process = builder.start();
+		process.waitFor();
+		int error = process.exitValue();
+		if(error!=0)
+			throw new IOException("'npm link antlr4' failed");
+	}
+
 	private String locateTool(String tool) {
 		String[] roots = { "/usr/bin/", "/usr/local/bin/" };
 		for (String root : roots) {
@@ -381,11 +410,13 @@ public class BaseNodeTest implements RuntimeTestSupport {
 			process.waitFor();
 			vacuum.join();
 			return process.exitValue() == 0;
+		} catch (Exception e) {
+			return false;
 		}
-		catch (Exception e) {
-			;
-		}
-		return false;
+	}
+
+	private String locateNpm() {
+		return "npm"; // everywhere
 	}
 
 	private String locateNodeJS() {
@@ -404,7 +435,7 @@ public class BaseNodeTest implements RuntimeTestSupport {
 
 	private String locateRuntime() {
 		final ClassLoader loader = Thread.currentThread().getContextClassLoader();
-		final URL runtimeSrc = loader.getResource("JavaScript/src");
+		final URL runtimeSrc = loader.getResource("JavaScript");
 		if ( runtimeSrc==null ) {
 			throw new RuntimeException("Cannot find JavaScript runtime");
 		}
@@ -620,11 +651,11 @@ public class BaseNodeTest implements RuntimeTestSupport {
 			String listenerName, String visitorName,
 			String parserStartRuleName, boolean debug) {
 		ST outputFileST = new ST(
-				"var antlr4 = require('antlr4');\n"
-						+ "var <lexerName> = require('./<lexerName>');\n"
-						+ "var <parserName> = require('./<parserName>');\n"
-						+ "var <listenerName> = require('./<listenerName>').<listenerName>;\n"
-						+ "var <visitorName> = require('./<visitorName>').<visitorName>;\n"
+				"import antlr4 from 'antlr4';\n"
+						+ "import <lexerName> from './<lexerName>.js';\n"
+						+ "import <parserName> from './<parserName>.js';\n"
+						+ "import <listenerName> from './<listenerName>.js';\n"
+						+ "import <visitorName> from './<visitorName>.js';\n"
 						+ "\n"
 						+ "class TreeShapeListener extends antlr4.tree.ParseTreeListener {\n" +
 						"    enterEveryRule(ctx) {\n" +
@@ -640,11 +671,11 @@ public class BaseNodeTest implements RuntimeTestSupport {
 						+ "\n"
 						+ "function main(argv) {\n"
 						+ "    var input = new antlr4.FileStream(argv[2], true);\n"
-						+ "    var lexer = new <lexerName>.<lexerName>(input);\n"
+						+ "    var lexer = new <lexerName>(input);\n"
 						+ "    var stream = new antlr4.CommonTokenStream(lexer);\n"
 						+ "<createParser>"
 						+ "    parser.buildParseTrees = true;\n"
-						+ "	 printer = function() {\n"
+						+ "	   const printer = function() {\n"
 						+ "		this.println = function(s) { console.log(s); }\n"
 						+ "		this.print = function(s) { process.stdout.write(s); }\n"
 						+ "		return this;\n"
@@ -654,10 +685,10 @@ public class BaseNodeTest implements RuntimeTestSupport {
 						+ "    antlr4.tree.ParseTreeWalker.DEFAULT.walk(new TreeShapeListener(), tree);\n"
 						+ "}\n" + "\n" + "main(process.argv);\n" + "\n");
 		ST createParserST = new ST(
-				"	var parser = new <parserName>.<parserName>(stream);\n");
+				"	var parser = new <parserName>(stream);\n");
 		if (debug) {
 			createParserST = new ST(
-					"	var parser = new <parserName>.<parserName>(stream);\n"
+					"	var parser = new <parserName>(stream);\n"
 							+ "	parser.addErrorListener(new antlr4.error.DiagnosticErrorListener());\n");
 		}
 		outputFileST.add("createParser", createParserST);
@@ -671,12 +702,12 @@ public class BaseNodeTest implements RuntimeTestSupport {
 
 	protected void writeLexerTestFile(String lexerName, boolean showDFA) {
 		ST outputFileST = new ST(
-				"var antlr4 = require('antlr4');\n"
-						+ "var <lexerName> = require('./<lexerName>');\n"
+				"import antlr4 from 'antlr4';\n"
+						+ "import <lexerName> from './<lexerName>.js';\n"
 						+ "\n"
 						+ "function main(argv) {\n"
 						+ "    var input = new antlr4.FileStream(argv[2], true);\n"
-						+ "    var lexer = new <lexerName>.<lexerName>(input);\n"
+						+ "    var lexer = new <lexerName>(input);\n"
 						+ "    var stream = new antlr4.CommonTokenStream(lexer);\n"
 						+ "    stream.fill();\n"
 						+ "    for(var i=0; i\\<stream.tokens.length; i++) {\n"
