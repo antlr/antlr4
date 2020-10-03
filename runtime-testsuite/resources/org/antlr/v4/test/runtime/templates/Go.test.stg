@@ -74,6 +74,8 @@ LANotEquals(i, v) ::= <%p.GetTokenStream().LA(<i>) != <v>%>
 
 TokenStartColumnEquals(i) ::= <%p.TokenStartColumn == <i>%>
 
+ImportListener(X) ::= ""
+
 GetExpectedTokenNames() ::= "p.GetExpectedTokens().StringVerbose(p.GetTokenNames(), nil, false)"
 
 RuleInvocationStack() ::= "antlr.PrintArrayJavaStyle(p.GetRuleInvocationStack(nil))"

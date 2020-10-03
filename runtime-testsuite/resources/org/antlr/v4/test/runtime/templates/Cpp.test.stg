@@ -45,6 +45,8 @@ LTEquals(i, v) ::= "_input->LT(<i>)->getText() == <v>"
 LANotEquals(i, v) ::= "_input->LA(<i>) != <v>"
 TokenStartColumnEquals(i) ::= "tokenStartCharPositionInLine == <i>"
 
+ImportListener(X) ::= ""
+
 GetExpectedTokenNames() ::= "getExpectedTokens().toString(_tokenNames)"
 
 RuleInvocationStack() ::= "Arrays::listToString(getRuleInvocationStack(), \", \")"

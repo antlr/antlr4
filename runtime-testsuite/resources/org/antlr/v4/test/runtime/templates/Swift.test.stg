@@ -74,6 +74,8 @@ LANotEquals(i, v) ::= <%try self._input.LA(<i>) != <v>%>
 
 TokenStartColumnEquals(i) ::= <%self._tokenStartCharPositionInLine == <i>%>
 
+ImportListener(X) ::= ""
+
 GetExpectedTokenNames() ::= "try self.getExpectedTokens().toString(self.getVocabulary())"
 
 RuleInvocationStack() ::= "getRuleInvocationStack().description.replacingOccurrences(of: \"\\\"\", with: \"\")"

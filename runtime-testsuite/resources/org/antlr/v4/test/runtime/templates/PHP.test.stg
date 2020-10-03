@@ -48,6 +48,8 @@ LTEquals(i, v) ::= <%\$this->input->LT(<i>)->getText() === <v>%>
 LANotEquals(i, v) ::= <%\$this->input->LA(<i>) !== <v>%>
 TokenStartColumnEquals(i) ::= <%\$this->tokenStartCharPositionInLine === <i>%>
 
+ImportListener(X) ::= ""
+
 GetExpectedTokenNames() ::= "\$this->getExpectedTokens()->toStringVocabulary(\$this->getVocabulary())"
 
 RuleInvocationStack() ::= "'[' . \implode(', ', \$this->getRuleInvocationStack()) . ']'"

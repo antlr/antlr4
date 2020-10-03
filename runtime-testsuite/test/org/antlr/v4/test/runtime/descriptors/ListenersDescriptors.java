@@ -27,6 +27,7 @@ public class ListenersDescriptors {
 		/**
 		 grammar T;
 
+		 <ImportListener("T")>
 		 <BasicListener("T")>
 
 		 s
@@ -69,6 +70,7 @@ public class ListenersDescriptors {
 		/**
 		 grammar T;
 
+		 <ImportListener("T")>
 		 <LRListener("T")>
 
 		 s
@@ -111,6 +113,7 @@ public class ListenersDescriptors {
 		/**
 		 grammar T;
 
+		 <ImportListener("T")>
 		 <LRWithLabelsListener("T")>
 
 		 s
@@ -142,6 +145,7 @@ public class ListenersDescriptors {
 		/**
 		 grammar T;
 
+		 <ImportListener("T")>
 		 <RuleGetterListener("T")>
 
 		 s
@@ -193,6 +197,7 @@ public class ListenersDescriptors {
 		/**
 		 grammar T;
 
+		 <ImportListener("T")>
 		 <TokenGetterListener("T")>
 
 		 s

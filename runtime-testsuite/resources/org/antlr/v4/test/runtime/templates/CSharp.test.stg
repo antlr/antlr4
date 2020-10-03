@@ -74,6 +74,8 @@ LANotEquals(i, v) ::= <%this.InputStream.LA(<i>)!=<v>%>
 
 TokenStartColumnEquals(i) ::= <%this.TokenStartColumn==<i>%>
 
+ImportListener(X) ::= ""
+
 GetExpectedTokenNames() ::= "this.GetExpectedTokens().ToString(this.Vocabulary)"
 
 RuleInvocationStack() ::= "GetRuleInvocationStackAsString()"
