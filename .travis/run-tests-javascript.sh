@@ -1,10 +1,10 @@
 #!/bin/bash
 
-cd runtime/JavaScript
+cd target/classes/JavaScript
 
 npm install
 
-cd ../../
+cd ../../..
 
 set -euo pipefail
 
