@@ -202,11 +202,10 @@ matrix:
     - os: linux
       dist: trusty
       jdk: openjdk8
-      language: node_js
-      node_js:
-        - 14
       env: TARGET=javascript
       stage: main-test
+      before_install:
+        - nvm install 14
 #    - os: linux
 #      dist: trusty
 #      jdk: openjdk8
