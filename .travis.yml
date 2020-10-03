@@ -202,6 +202,7 @@ matrix:
     - os: linux
       dist: trusty
       jdk: openjdk8
+      language: node_js
       node_js:
         - 14
       env: TARGET=javascript
