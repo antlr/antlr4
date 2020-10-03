@@ -74,8 +74,6 @@ LANotEquals(i, v) ::= <%this._input.LA(<i>)!=<v>%>
 
 TokenStartColumnEquals(i) ::= <%this._tokenStartCharPositionInLine==<i>%>
 
-ImportListener(X) ::= ""
-
 GetExpectedTokenNames() ::= "this.getExpectedTokens().toString(this.tokenNames)"
 
 RuleInvocationStack() ::= "getRuleInvocationStack()"

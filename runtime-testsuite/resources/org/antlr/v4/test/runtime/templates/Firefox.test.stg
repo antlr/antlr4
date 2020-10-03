@@ -76,12 +76,6 @@ LANotEquals(i, v) ::= <%this._input.LA(<i>)!=<v>%>
 
 TokenStartColumnEquals(i) ::= <%this._tokenStartColumn===<i>%>
 
-ImportListener(X) ::= <<
-@parser::header {
-var <X>Listener = require('./<X>Listener').<X>Listener;
-}
->>
-
 GetExpectedTokenNames() ::= "this.getExpectedTokens().toString(this.literalNames)"
 
 RuleInvocationStack() ::= "antlr4.Utils.arrayToString(this.getRuleInvocationStack())"

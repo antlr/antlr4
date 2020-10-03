@@ -48,12 +48,12 @@ javascriptTypeInitMap ::= [
 
 ParserFile(file, parser, namedActions, contextSuperClass) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
-const antlr4 = require('antlr4');
+import antlr4 from 'antlr4';
 <if(file.genListener)>
-const <file.grammarName>Listener = require('./<file.grammarName>Listener').default;
+import <file.grammarName>Listener from './<file.grammarName>Listener.js';
 <endif>
 <if(file.genVisitor)>
-const <file.grammarName>Visitor = require('./<file.grammarName>Visitor').default;
+import <file.grammarName>Visitor from './<file.grammarName>Visitor.js';
 <endif>
 
 <namedActions.header>
@@ -62,7 +62,7 @@ const <file.grammarName>Visitor = require('./<file.grammarName>Visitor').default
 
 ListenerFile(file, header, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
-const antlr4 = require('antlr4');
+import antlr4 from 'antlr4';
 
 // This class defines a complete listener for a parse tree produced by <file.parserName>.
 export default class <file.grammarName>Listener extends antlr4.tree.ParseTreeListener {
@@ -84,7 +84,7 @@ export default class <file.grammarName>Listener extends antlr4.tree.ParseTreeLis
 
 VisitorFile(file, header, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
-const antlr4 = require('antlr4');
+import antlr4 from 'antlr4';
 
 // This class defines a complete generic visitor for a parse tree produced by <file.parserName>.
 
@@ -92,7 +92,7 @@ export default class <file.grammarName>Visitor extends antlr4.tree.ParseTreeVisi
 
 <file.visitorNames:{lname |
 	// Visit a parse tree produced by <file.parserName>#<lname>.
-	visit<lname; format="cap"> = function(ctx) {
+	visit<lname; format="cap">(ctx) {
 	  return this.visitChildren(ctx);
 	\}
 
@@ -109,7 +109,7 @@ fileHeader(grammarFileName, ANTLRVersion) ::= <<
 
 Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
 <if(superClass)>
-const <superClass> = require('./<superClass>.js').default;
+import <superClass> from './<superClass>.js';
 <endif>
 
 <atn>
@@ -120,22 +120,19 @@ const decisionsToDFA = atn.decisionToState.map( (ds, index) => new antlr4.dfa.DF
 
 const sharedContextCache = new antlr4.PredictionContextCache();
 
-const literalNames = [ <parser.literalNames:{t | <t>}; null="null", separator=", ", wrap, anchor> ];
-
-const symbolicNames = [ <parser.symbolicNames:{t | <t>}; null="null", separator=", ", wrap, anchor> ];
-
-const ruleNames =  [ <parser.ruleNames:{r | "<r>"}; separator=", ", wrap, anchor> ];
-
 export default class <parser.name> extends <superClass; null="antlr4.Parser"> {
 
-	static grammarFileName = "<parser.grammarFileName; format="java-escape">";
+    static grammarFileName = "<parser.grammarFileName; format="java-escape">";
+    static literalNames = [ <parser.literalNames:{t | <t>}; null="null", separator=", ", wrap, anchor> ];
+    static symbolicNames = [ <parser.symbolicNames:{t | <t>}; null="null", separator=", ", wrap, anchor> ];
+    static ruleNames = [ <parser.ruleNames:{r | "<r>"}; separator=", ", wrap, anchor> ];
 
     constructor(input) {
         super(input);
         this._interp = new antlr4.atn.ParserATNSimulator(this, atn, decisionsToDFA, sharedContextCache);
-        this.ruleNames = ruleNames;
-        this.literalNames = literalNames;
-        this.symbolicNames = symbolicNames;
+        this.ruleNames = <parser.name>.ruleNames;
+        this.literalNames = <parser.name>.literalNames;
+        this.symbolicNames = <parser.name>.symbolicNames;
         <namedActions.members>
     }
 
@@ -723,13 +720,13 @@ ListenerDispatchMethod(method) ::= <<
 >>
 
 VisitorDispatchMethod(method) ::= <<
-<struct.name>.prototype.accept = function(visitor) {
+accept(visitor) {
     if ( visitor instanceof <parser.grammarName>Visitor ) {
         return visitor.visit<struct.derivedFromName; format="cap">(this);
     } else {
         return visitor.visitChildren(this);
     }
-};
+}
 
 >>
 
@@ -780,7 +777,7 @@ _prevctx = localctx;
 
 LexerFile(lexerFile, lexer, namedActions) ::= <<
 <fileHeader(lexerFile.grammarFileName, lexerFile.ANTLRVersion)>
-const antlr4 = require('antlr4');
+import antlr4 from 'antlr4';
 
 <namedActions.header>
 
@@ -790,7 +787,7 @@ const antlr4 = require('antlr4');
 
 Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
 <if(superClass)>
-const <superClass> = require('./<superClass>.js').default;
+import <superClass> from './<superClass>.js';
 <endif>
 
 <atn>
@@ -833,7 +830,6 @@ export default class <lexer.name> extends <if(superClass)><superClass><else>antl
 
 <dumpActions(lexer, "", actionFuncs, sempredFuncs)>
 
-module.exports.<lexer.name> = <lexer.name>;
 
 >>
 

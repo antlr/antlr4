@@ -74,8 +74,6 @@ LANotEquals(i, v) ::= <%tokenStream.LA(<i>)!=<v>%>
 
 TokenStartColumnEquals(i) ::= <%this.tokenStartCharPositionInLine==<i>%>
 
-ImportListener(X) ::= ""
-
 GetExpectedTokenNames() ::= "this.expectedTokens.toString(vocabulary: this.vocabulary)"
 
 RuleInvocationStack() ::= "ruleInvocationStack"

@@ -74,13 +74,6 @@ LANotEquals(i, v) ::= <%self._input.LA(<i>)!=<v>%>
 
 TokenStartColumnEquals(i) ::= <%self._tokenStartColumn==<i>%>
 
-ImportListener(X) ::= <<
-@parser::header {
-class MockListener:
-    pass
-}
->>
-
 GetExpectedTokenNames() ::= "self.getExpectedTokens().toString(self.literalNames, self.symbolicNames)"
 
 RuleInvocationStack() ::= "str_list(self.getRuleInvocationStack())"
