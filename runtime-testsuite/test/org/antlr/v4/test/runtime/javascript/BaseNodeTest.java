@@ -335,7 +335,7 @@ public class BaseNodeTest implements RuntimeTestSupport {
 			String nodejsPath = locateNodeJS();
 			String inputPath = new File(new File(tmpdir), "input")
 					.getAbsolutePath();
-			ProcessBuilder builder = new ProcessBuilder(nodejsPath, "--trace-warnings", modulePath,
+			ProcessBuilder builder = new ProcessBuilder(nodejsPath, modulePath,
 					inputPath);
 			builder.environment().put("NODE_PATH", tmpdir);
 			builder.directory(new File(tmpdir));
