@@ -2,6 +2,9 @@ sudo: true
 
 language: java
 
+node_js:
+  - 14
+
 before_cache:
   - rm -rf $HOME/.m2/repository/org/antlr
 cache:
