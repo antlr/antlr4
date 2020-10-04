@@ -130,16 +130,6 @@ public class BaseNodeTest implements RuntimeTestSupport {
 		return antlrToolErrors.toString();
 	}
 
-	protected org.antlr.v4.Tool newTool(String[] args) {
-		Tool tool = new Tool(args);
-		return tool;
-	}
-
-	protected Tool newTool() {
-		org.antlr.v4.Tool tool = new Tool(new String[] { "-o", tmpdir });
-		return tool;
-	}
-
 	protected ATN createATN(Grammar g, boolean useSerializer) {
 		if (g.atn == null) {
 			semanticProcess(g);
@@ -179,57 +169,6 @@ public class BaseNodeTest implements RuntimeTestSupport {
 				}
 			}
 		}
-	}
-
-	IntegerList getTypesFromString(Grammar g, String expecting) {
-		IntegerList expectingTokenTypes = new IntegerList();
-		if (expecting != null && !expecting.trim().isEmpty()) {
-			for (String tname : expecting.replace(" ", "").split(",")) {
-				int ttype = g.getTokenType(tname);
-				expectingTokenTypes.add(ttype);
-			}
-		}
-		return expectingTokenTypes;
-	}
-
-	public IntegerList getTokenTypesViaATN(String input,
-			LexerATNSimulator lexerATN) {
-		ANTLRInputStream in = new ANTLRInputStream(input);
-		IntegerList tokenTypes = new IntegerList();
-		int ttype;
-		do {
-			ttype = lexerATN.match(in, Lexer.DEFAULT_MODE);
-			tokenTypes.add(ttype);
-		} while (ttype != Token.EOF);
-		return tokenTypes;
-	}
-
-	public List<String> getTokenTypes(LexerGrammar lg, ATN atn, CharStream input) {
-		LexerATNSimulator interp = new LexerATNSimulator(atn,
-				new DFA[] { new DFA(
-						atn.modeToStartState.get(Lexer.DEFAULT_MODE)) }, null);
-		List<String> tokenTypes = new ArrayList<String>();
-		int ttype;
-		boolean hitEOF = false;
-		do {
-			if (hitEOF) {
-				tokenTypes.add("EOF");
-				break;
-			}
-			int t = input.LA(1);
-			ttype = interp.match(input, Lexer.DEFAULT_MODE);
-			if (ttype == Token.EOF) {
-				tokenTypes.add("EOF");
-			}
-			else {
-				tokenTypes.add(lg.typeToTokenList.get(ttype));
-			}
-
-			if (t == IntStream.EOF) {
-				hitEOF = true;
-			}
-		} while (ttype != Token.EOF);
-		return tokenTypes;
 	}
 
 	protected String execLexer(String grammarFileName, String grammarStr,
@@ -329,6 +268,7 @@ public class BaseNodeTest implements RuntimeTestSupport {
 	public String execModule(String fileName) {
 		try {
 			String npmPath = locateNpm();
+			installRuntime(npmPath);
 			registerRuntime(npmPath);
 			String modulePath = new File(new File(tmpdir), fileName)
 					.getAbsolutePath();
@@ -366,6 +306,19 @@ public class BaseNodeTest implements RuntimeTestSupport {
 		return null;
 	}
 
+	private void installRuntime(String npmPath) throws IOException, InterruptedException {
+		String runtimePath = locateRuntime();
+		ProcessBuilder builder = new ProcessBuilder(npmPath, "install");
+		builder.directory(new File(runtimePath));
+		builder.redirectError(new File(tmpdir, "error.txt"));
+		builder.redirectOutput(new File(tmpdir, "output.txt"));
+		Process process = builder.start();
+		process.waitFor(30L, TimeUnit.SECONDS);
+		int error = process.exitValue();
+		if(error!=0)
+			throw new IOException("'npm link' failed");
+	}
+
 	private void registerRuntime(String npmPath) throws IOException, InterruptedException {
 		String runtimePath = locateRuntime();
 		ProcessBuilder builder = new ProcessBuilder(npmPath, "link");
@@ -373,7 +326,7 @@ public class BaseNodeTest implements RuntimeTestSupport {
 		builder.redirectError(new File(tmpdir, "error.txt"));
 		builder.redirectOutput(new File(tmpdir, "output.txt"));
 		Process process = builder.start();
-		process.waitFor(3L, TimeUnit.SECONDS);
+		process.waitFor(30L, TimeUnit.SECONDS);
 		int error = process.exitValue();
 		if(error!=0)
 			throw new IOException("'npm link' failed");
@@ -385,7 +338,7 @@ public class BaseNodeTest implements RuntimeTestSupport {
 		builder.redirectError(new File(tmpdir, "error.txt"));
 		builder.redirectOutput(new File(tmpdir, "output.txt"));
 		Process process = builder.start();
-		process.waitFor(3L, TimeUnit.SECONDS);
+		process.waitFor(30L, TimeUnit.SECONDS);
 		int error = process.exitValue();
 		if(error!=0)
 			throw new IOException("'npm link antlr4' failed");
@@ -408,7 +361,7 @@ public class BaseNodeTest implements RuntimeTestSupport {
 			Process process = builder.start();
 			StreamVacuum vacuum = new StreamVacuum(process.getInputStream());
 			vacuum.start();
-			process.waitFor(3L, TimeUnit.SECONDS);
+			process.waitFor(30L, TimeUnit.SECONDS);
 			vacuum.join();
 			return process.exitValue() == 0;
 		} catch (Exception e) {
@@ -422,9 +375,7 @@ public class BaseNodeTest implements RuntimeTestSupport {
 
 	private String locateNodeJS() {
 		// typically /usr/local/bin/node
-		String propName = "antlr-javascript-nodejs";
-		String prop = System.getProperty(propName);
-
+		String prop = System.getProperty("antlr-javascript-nodejs");
 		if ( prop!=null && prop.length()!=0 ) {
 			return prop;
 		}
@@ -450,203 +401,6 @@ public class BaseNodeTest implements RuntimeTestSupport {
 		return System.getProperty("os.name").toLowerCase().contains("windows");
 	}
 
-	// void ambig(List<Message> msgs, int[] expectedAmbigAlts, String
-	// expectedAmbigInput)
-	// throws Exception
-	// {
-	// ambig(msgs, 0, expectedAmbigAlts, expectedAmbigInput);
-	// }
-
-	// void ambig(List<Message> msgs, int i, int[] expectedAmbigAlts, String
-	// expectedAmbigInput)
-	// throws Exception
-	// {
-	// List<Message> amsgs = getMessagesOfType(msgs, AmbiguityMessage.class);
-	// AmbiguityMessage a = (AmbiguityMessage)amsgs.get(i);
-	// if ( a==null ) assertNull(expectedAmbigAlts);
-	// else {
-	// assertEquals(a.conflictingAlts.toString(),
-	// Arrays.toString(expectedAmbigAlts));
-	// }
-	// assertEquals(expectedAmbigInput, a.input);
-	// }
-
-	// void unreachable(List<Message> msgs, int[] expectedUnreachableAlts)
-	// throws Exception
-	// {
-	// unreachable(msgs, 0, expectedUnreachableAlts);
-	// }
-
-	// void unreachable(List<Message> msgs, int i, int[]
-	// expectedUnreachableAlts)
-	// throws Exception
-	// {
-	// List<Message> amsgs = getMessagesOfType(msgs,
-	// UnreachableAltsMessage.class);
-	// UnreachableAltsMessage u = (UnreachableAltsMessage)amsgs.get(i);
-	// if ( u==null ) assertNull(expectedUnreachableAlts);
-	// else {
-	// assertEquals(u.conflictingAlts.toString(),
-	// Arrays.toString(expectedUnreachableAlts));
-	// }
-	// }
-
-	List<ANTLRMessage> getMessagesOfType(List<ANTLRMessage> msgs,
-			Class<? extends ANTLRMessage> c) {
-		List<ANTLRMessage> filtered = new ArrayList<ANTLRMessage>();
-		for (ANTLRMessage m : msgs) {
-			if (m.getClass() == c)
-				filtered.add(m);
-		}
-		return filtered;
-	}
-
-	void checkRuleATN(Grammar g, String ruleName, String expecting) {
-		ParserATNFactory f = new ParserATNFactory(g);
-		ATN atn = f.createATN();
-
-		DOTGenerator dot = new DOTGenerator(g);
-		System.out
-				.println(dot.getDOT(atn.ruleToStartState[g.getRule(ruleName).index]));
-
-		Rule r = g.getRule(ruleName);
-		ATNState startState = atn.ruleToStartState[r.index];
-		ATNPrinter serializer = new ATNPrinter(g, startState);
-		String result = serializer.asString();
-
-		// System.out.print(result);
-		assertEquals(expecting, result);
-	}
-
-	public void testActions(String templates, String actionName, String action,
-			String expected) throws org.antlr.runtime.RecognitionException {
-		int lp = templates.indexOf('(');
-		String name = templates.substring(0, lp);
-		STGroup group = new STGroupString(templates);
-		ST st = group.getInstanceOf(name);
-		st.add(actionName, action);
-		String grammar = st.render();
-		ErrorQueue equeue = new ErrorQueue();
-		Grammar g = new Grammar(grammar, equeue);
-		if (g.ast != null && !g.ast.hasErrors) {
-			SemanticPipeline sem = new SemanticPipeline(g);
-			sem.process();
-
-			ATNFactory factory = new ParserATNFactory(g);
-			if (g.isLexer())
-				factory = new LexerATNFactory((LexerGrammar) g);
-			g.atn = factory.createATN();
-
-			CodeGenerator gen = new CodeGenerator(g);
-			ST outputFileST = gen.generateParser();
-			String output = outputFileST.render();
-			// System.out.println(output);
-			String b = "#" + actionName + "#";
-			int start = output.indexOf(b);
-			String e = "#end-" + actionName + "#";
-			int end = output.indexOf(e);
-			String snippet = output.substring(start + b.length(), end);
-			assertEquals(expected, snippet);
-		}
-		if (equeue.size() > 0) {
-			System.err.println(equeue.toString());
-		}
-	}
-
-	protected void checkGrammarSemanticsError(ErrorQueue equeue,
-			GrammarSemanticsMessage expectedMessage) throws Exception {
-		ANTLRMessage foundMsg = null;
-		for (int i = 0; i < equeue.errors.size(); i++) {
-			ANTLRMessage m = equeue.errors.get(i);
-			if (m.getErrorType() == expectedMessage.getErrorType()) {
-				foundMsg = m;
-			}
-		}
-		assertNotNull("no error; " + expectedMessage.getErrorType()
-				+ " expected", foundMsg);
-		assertTrue("error is not a GrammarSemanticsMessage",
-				foundMsg instanceof GrammarSemanticsMessage);
-		assertEquals(Arrays.toString(expectedMessage.getArgs()),
-				Arrays.toString(foundMsg.getArgs()));
-		if (equeue.size() != 1) {
-			System.err.println(equeue);
-		}
-	}
-
-	protected void checkGrammarSemanticsWarning(ErrorQueue equeue,
-			GrammarSemanticsMessage expectedMessage) throws Exception {
-		ANTLRMessage foundMsg = null;
-		for (int i = 0; i < equeue.warnings.size(); i++) {
-			ANTLRMessage m = equeue.warnings.get(i);
-			if (m.getErrorType() == expectedMessage.getErrorType()) {
-				foundMsg = m;
-			}
-		}
-		assertNotNull("no error; " + expectedMessage.getErrorType()
-				+ " expected", foundMsg);
-		assertTrue("error is not a GrammarSemanticsMessage",
-				foundMsg instanceof GrammarSemanticsMessage);
-		assertEquals(Arrays.toString(expectedMessage.getArgs()),
-				Arrays.toString(foundMsg.getArgs()));
-		if (equeue.size() != 1) {
-			System.err.println(equeue);
-		}
-	}
-
-	protected void checkError(ErrorQueue equeue, ANTLRMessage expectedMessage)
-			throws Exception {
-		// System.out.println("errors="+equeue);
-		ANTLRMessage foundMsg = null;
-		for (int i = 0; i < equeue.errors.size(); i++) {
-			ANTLRMessage m = equeue.errors.get(i);
-			if (m.getErrorType() == expectedMessage.getErrorType()) {
-				foundMsg = m;
-			}
-		}
-		assertTrue("no error; " + expectedMessage.getErrorType() + " expected",
-				!equeue.errors.isEmpty());
-		assertTrue("too many errors; " + equeue.errors,
-				equeue.errors.size() <= 1);
-		assertNotNull(
-				"couldn't find expected error: "
-						+ expectedMessage.getErrorType(), foundMsg);
-		/*
-		 * assertTrue("error is not a GrammarSemanticsMessage", foundMsg
-		 * instanceof GrammarSemanticsMessage);
-		 */
-		assertArrayEquals(expectedMessage.getArgs(), foundMsg.getArgs());
-	}
-
-	public static class FilteringTokenStream extends CommonTokenStream {
-		public FilteringTokenStream(TokenSource src) {
-			super(src);
-		}
-
-		Set<Integer> hide = new HashSet<Integer>();
-
-		@Override
-		protected boolean sync(int i) {
-			if (!super.sync(i)) {
-				return false;
-			}
-
-			Token t = get(i);
-			if (hide.contains(t.getType())) {
-				((WritableToken) t).setChannel(Token.HIDDEN_CHANNEL);
-			}
-
-			return true;
-		}
-
-		public void setTokenTypeChannel(int ttype, int channel) {
-			hide.add(ttype);
-		}
-	}
-
-	protected void mkdir(String dir) {
-		File f = new File(dir);
-		f.mkdirs();
-	}
 
 	protected void writeParserTestFile(String parserName, String lexerName,
 			String listenerName, String visitorName,
@@ -721,28 +475,6 @@ public class BaseNodeTest implements RuntimeTestSupport {
 		writeFile(tmpdir, "Test.js", outputFileST.render());
 	}
 
-	public void writeRecognizer(String parserName, String lexerName,
-			String listenerName, String visitorName,
-			String parserStartRuleName, boolean debug) {
-		if (parserName == null) {
-			writeLexerTestFile(lexerName, debug);
-		}
-		else {
-			writeParserTestFile(parserName, lexerName, listenerName,
-					visitorName, parserStartRuleName, debug);
-		}
-	}
-
-	protected void eraseFiles(final String filesEndingWith) {
-		File tmpdirF = new File(tmpdir);
-		String[] files = tmpdirF.list();
-		for (int i = 0; files != null && i < files.length; i++) {
-			if (files[i].endsWith(filesEndingWith)) {
-				new File(tmpdir + "/" + files[i]).delete();
-			}
-		}
-	}
-
 	protected void eraseFiles(File dir) {
 		String[] files = dir.list();
 		for (int i = 0; files != null && i < files.length; i++) {
@@ -766,148 +498,6 @@ public class BaseNodeTest implements RuntimeTestSupport {
 		}
 	}
 
-	public String getFirstLineOfException() {
-		if (this.stderrDuringParse == null) {
-			return null;
-		}
-		String[] lines = this.stderrDuringParse.split("\n");
-		String prefix = "Exception in thread \"main\" ";
-		return lines[0].substring(prefix.length(), lines[0].length());
-	}
-
-	/**
-	 * When looking at a result set that consists of a Map/HashTable we cannot
-	 * rely on the output order, as the hashing algorithm or other aspects of
-	 * the implementation may be different on differnt JDKs or platforms. Hence
-	 * we take the Map, convert the keys to a List, sort them and Stringify the
-	 * Map, which is a bit of a hack, but guarantees that we get the same order
-	 * on all systems. We assume that the keys are strings.
-	 *
-	 * @param m
-	 *            The Map that contains keys we wish to return in sorted order
-	 * @return A string that represents all the keys in sorted order.
-	 */
-	public <K, V> String sortMapToString(Map<K, V> m) {
-		// Pass in crap, and get nothing back
-		//
-		if (m == null) {
-			return null;
-		}
-
-		System.out.println("Map toString looks like: " + m.toString());
-
-		// Sort the keys in the Map
-		//
-		TreeMap<K, V> nset = new TreeMap<K, V>(m);
-
-		System.out.println("Tree map looks like: " + nset.toString());
-		return nset.toString();
-	}
-
-	public List<String> realElements(List<String> elements) {
-		return elements.subList(Token.MIN_USER_TOKEN_TYPE, elements.size());
-	}
-
-	public void assertNotNullOrEmpty(String message, String text) {
-		assertNotNull(message, text);
-		assertFalse(message, text.isEmpty());
-	}
-
-	public void assertNotNullOrEmpty(String text) {
-		assertNotNull(text);
-		assertFalse(text.isEmpty());
-	}
-
-	public static class IntTokenStream implements TokenStream {
-		IntegerList types;
-		int p = 0;
-
-		public IntTokenStream(IntegerList types) {
-			this.types = types;
-		}
-
-		@Override
-		public void consume() {
-			p++;
-		}
-
-		@Override
-		public int LA(int i) {
-			return LT(i).getType();
-		}
-
-		@Override
-		public int mark() {
-			return index();
-		}
-
-		@Override
-		public int index() {
-			return p;
-		}
-
-		@Override
-		public void release(int marker) {
-			seek(marker);
-		}
-
-		@Override
-		public void seek(int index) {
-			p = index;
-		}
-
-		@Override
-		public int size() {
-			return types.size();
-		}
-
-		@Override
-		public String getSourceName() {
-			return null;
-		}
-
-		@Override
-		public Token LT(int i) {
-			CommonToken t;
-			int rawIndex = p + i - 1;
-			if (rawIndex >= types.size())
-				t = new CommonToken(Token.EOF);
-			else
-				t = new CommonToken(types.get(rawIndex));
-			t.setTokenIndex(rawIndex);
-			return t;
-		}
-
-		@Override
-		public Token get(int i) {
-			return new org.antlr.v4.runtime.CommonToken(types.get(i));
-		}
-
-		@Override
-		public TokenSource getTokenSource() {
-			return null;
-		}
-
-		@Override
-		public String getText() {
-			throw new UnsupportedOperationException("can't give strings");
-		}
-
-		@Override
-		public String getText(Interval interval) {
-			throw new UnsupportedOperationException("can't give strings");
-		}
-
-		@Override
-		public String getText(RuleContext ctx) {
-			throw new UnsupportedOperationException("can't give strings");
-		}
-
-		@Override
-		public String getText(Token start, Token stop) {
-			throw new UnsupportedOperationException("can't give strings");
-		}
-	}
 
 	/** Sort a list */
 	public <T extends Comparable<? super T>> List<T> sort(List<T> data) {
