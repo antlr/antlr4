@@ -289,8 +289,10 @@ public class BaseNodeTest implements RuntimeTestSupport {
 					process.getErrorStream());
 			stdoutVacuum.start();
 			stderrVacuum.start();
-			if(!process.waitFor(1L, TimeUnit.MINUTES))
-				process.destroyForcibly();
+			// TODO switch to jdk 8
+			process.waitFor();
+			// if(!process.waitFor(1L, TimeUnit.MINUTES))
+			//	process.destroyForcibly();
 			stdoutVacuum.join();
 			stderrVacuum.join();
 			String output = stdoutVacuum.toString();
@@ -320,8 +322,10 @@ public class BaseNodeTest implements RuntimeTestSupport {
 		builder.redirectError(new File(tmpdir, "error.txt"));
 		builder.redirectOutput(new File(tmpdir, "output.txt"));
 		Process process = builder.start();
-		if(!process.waitFor(30L, TimeUnit.SECONDS))
-			process.destroyForcibly();
+		// TODO switch to jdk 8
+		process.waitFor();
+		// if(!process.waitFor(30L, TimeUnit.SECONDS))
+		// 	process.destroyForcibly();
 		int error = process.exitValue();
 		if(error!=0)
 			throw new IOException("'npm install' failed");
@@ -334,8 +338,10 @@ public class BaseNodeTest implements RuntimeTestSupport {
 		builder.redirectError(new File(tmpdir, "error.txt"));
 		builder.redirectOutput(new File(tmpdir, "output.txt"));
 		Process process = builder.start();
-		if(!process.waitFor(30L, TimeUnit.SECONDS))
-			process.destroyForcibly();
+		// TODO switch to jdk 8
+		process.waitFor();
+		// if(!process.waitFor(30L, TimeUnit.SECONDS))
+		//	process.destroyForcibly();
 		int error = process.exitValue();
 		if(error!=0)
 			throw new IOException("'npm link' failed");
@@ -347,8 +353,10 @@ public class BaseNodeTest implements RuntimeTestSupport {
 		builder.redirectError(new File(tmpdir, "error.txt"));
 		builder.redirectOutput(new File(tmpdir, "output.txt"));
 		Process process = builder.start();
-		if(!process.waitFor(30L, TimeUnit.SECONDS))
-			process.destroyForcibly();
+		// TODO switch to jdk 8
+		process.waitFor();
+		// if(!process.waitFor(30L, TimeUnit.SECONDS))
+		//	process.destroyForcibly();
 		int error = process.exitValue();
 		if(error!=0)
 			throw new IOException("'npm link antlr4' failed");
@@ -371,8 +379,10 @@ public class BaseNodeTest implements RuntimeTestSupport {
 			Process process = builder.start();
 			StreamVacuum vacuum = new StreamVacuum(process.getInputStream());
 			vacuum.start();
-			if(!process.waitFor(30L, TimeUnit.SECONDS))
-				process.destroyForcibly();
+			// TODO switch to jdk 8
+			process.waitFor();
+			// if(!process.waitFor(30L, TimeUnit.SECONDS))
+			//	process.destroyForcibly();
 			vacuum.join();
 			return process.exitValue() == 0;
 		} catch (Exception e) {
