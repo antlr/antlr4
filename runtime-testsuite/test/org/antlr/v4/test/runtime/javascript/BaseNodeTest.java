@@ -56,6 +56,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.concurrent.TimeUnit;
 
 import static org.antlr.v4.test.runtime.BaseRuntimeTest.antlrOnString;
 import static org.antlr.v4.test.runtime.BaseRuntimeTest.writeFile;
@@ -346,7 +347,7 @@ public class BaseNodeTest implements RuntimeTestSupport {
 					process.getErrorStream());
 			stdoutVacuum.start();
 			stderrVacuum.start();
-			process.waitFor();
+			process.waitFor(1L, TimeUnit.MINUTES);
 			stdoutVacuum.join();
 			stderrVacuum.join();
 			String output = stdoutVacuum.toString();
@@ -372,7 +373,7 @@ public class BaseNodeTest implements RuntimeTestSupport {
 		builder.redirectError(new File(tmpdir, "error.txt"));
 		builder.redirectOutput(new File(tmpdir, "output.txt"));
 		Process process = builder.start();
-		process.waitFor();
+		process.waitFor(3L, TimeUnit.SECONDS);
 		int error = process.exitValue();
 		if(error!=0)
 			throw new IOException("'npm link' failed");
@@ -384,7 +385,7 @@ public class BaseNodeTest implements RuntimeTestSupport {
 		builder.redirectError(new File(tmpdir, "error.txt"));
 		builder.redirectOutput(new File(tmpdir, "output.txt"));
 		Process process = builder.start();
-		process.waitFor();
+		process.waitFor(3L, TimeUnit.SECONDS);
 		int error = process.exitValue();
 		if(error!=0)
 			throw new IOException("'npm link antlr4' failed");
@@ -407,7 +408,7 @@ public class BaseNodeTest implements RuntimeTestSupport {
 			Process process = builder.start();
 			StreamVacuum vacuum = new StreamVacuum(process.getInputStream());
 			vacuum.start();
-			process.waitFor();
+			process.waitFor(3L, TimeUnit.SECONDS);
 			vacuum.join();
 			return process.exitValue() == 0;
 		} catch (Exception e) {
