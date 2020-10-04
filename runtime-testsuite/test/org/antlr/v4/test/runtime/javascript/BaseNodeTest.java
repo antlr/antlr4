@@ -268,8 +268,10 @@ public class BaseNodeTest implements RuntimeTestSupport {
 	public String execModule(String fileName) {
 		try {
 			String npmPath = locateNpm();
-			// installRuntime(npmPath);
-			// registerRuntime(npmPath);
+			if(!isTravisCI()) {
+				installRuntime(npmPath);
+				registerRuntime(npmPath);
+			}
 			String modulePath = new File(new File(tmpdir), fileName)
 					.getAbsolutePath();
 			linkRuntime(npmPath);
@@ -305,6 +307,10 @@ public class BaseNodeTest implements RuntimeTestSupport {
 			System.err.println();
 			return null;
 		}
+	}
+
+	private boolean isTravisCI() {
+		return "true".equals(System.getenv("TRAVIS"));
 	}
 
 	private void installRuntime(String npmPath) throws IOException, InterruptedException {
