@@ -287,7 +287,8 @@ public class BaseNodeTest implements RuntimeTestSupport {
 					process.getErrorStream());
 			stdoutVacuum.start();
 			stderrVacuum.start();
-			process.waitFor(1L, TimeUnit.MINUTES);
+			if(!process.waitFor(1L, TimeUnit.MINUTES))
+				process.destroyForcibly();
 			stdoutVacuum.join();
 			stderrVacuum.join();
 			String output = stdoutVacuum.toString();
@@ -298,13 +299,12 @@ public class BaseNodeTest implements RuntimeTestSupport {
 				this.stderrDuringParse = stderrVacuum.toString();
 			}
 			return output;
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			System.err.println("can't exec recognizer");
 			e.printStackTrace(System.err);
 			System.err.println();
+			return null;
 		}
-		return null;
 	}
 
 	private void installRuntime(String npmPath) throws IOException, InterruptedException {
@@ -314,7 +314,8 @@ public class BaseNodeTest implements RuntimeTestSupport {
 		builder.redirectError(new File(tmpdir, "error.txt"));
 		builder.redirectOutput(new File(tmpdir, "output.txt"));
 		Process process = builder.start();
-		process.waitFor(30L, TimeUnit.SECONDS);
+		if(!process.waitFor(30L, TimeUnit.SECONDS))
+			process.destroyForcibly();
 		int error = process.exitValue();
 		if(error!=0)
 			throw new IOException("'npm link' failed");
@@ -327,7 +328,8 @@ public class BaseNodeTest implements RuntimeTestSupport {
 		builder.redirectError(new File(tmpdir, "error.txt"));
 		builder.redirectOutput(new File(tmpdir, "output.txt"));
 		Process process = builder.start();
-		process.waitFor(30L, TimeUnit.SECONDS);
+		if(!process.waitFor(30L, TimeUnit.SECONDS))
+			process.destroyForcibly();
 		int error = process.exitValue();
 		if(error!=0)
 			throw new IOException("'npm link' failed");
@@ -339,7 +341,8 @@ public class BaseNodeTest implements RuntimeTestSupport {
 		builder.redirectError(new File(tmpdir, "error.txt"));
 		builder.redirectOutput(new File(tmpdir, "output.txt"));
 		Process process = builder.start();
-		process.waitFor(30L, TimeUnit.SECONDS);
+		if(!process.waitFor(30L, TimeUnit.SECONDS))
+			process.destroyForcibly();
 		int error = process.exitValue();
 		if(error!=0)
 			throw new IOException("'npm link antlr4' failed");
@@ -362,7 +365,8 @@ public class BaseNodeTest implements RuntimeTestSupport {
 			Process process = builder.start();
 			StreamVacuum vacuum = new StreamVacuum(process.getInputStream());
 			vacuum.start();
-			process.waitFor(30L, TimeUnit.SECONDS);
+			if(!process.waitFor(30L, TimeUnit.SECONDS))
+				process.destroyForcibly();
 			vacuum.join();
 			return process.exitValue() == 0;
 		} catch (Exception e) {
@@ -502,8 +506,7 @@ public class BaseNodeTest implements RuntimeTestSupport {
 
 	/** Sort a list */
 	public <T extends Comparable<? super T>> List<T> sort(List<T> data) {
-		List<T> dup = new ArrayList<T>();
-		dup.addAll(data);
+		List<T> dup = new ArrayList<T>(data);
 		Collections.sort(dup);
 		return dup;
 	}
@@ -512,8 +515,7 @@ public class BaseNodeTest implements RuntimeTestSupport {
 	public <K extends Comparable<? super K>, V> LinkedHashMap<K, V> sort(
 			Map<K, V> data) {
 		LinkedHashMap<K, V> dup = new LinkedHashMap<K, V>();
-		List<K> keys = new ArrayList<K>();
-		keys.addAll(data.keySet());
+		List<K> keys = new ArrayList<K>(data.keySet());
 		Collections.sort(keys);
 		for (K k : keys) {
 			dup.put(k, data.get(k));
