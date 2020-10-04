@@ -318,7 +318,7 @@ public class BaseNodeTest implements RuntimeTestSupport {
 			process.destroyForcibly();
 		int error = process.exitValue();
 		if(error!=0)
-			throw new IOException("'npm link' failed");
+			throw new IOException("'npm install' failed");
 	}
 
 	private void registerRuntime(String npmPath) throws IOException, InterruptedException {
