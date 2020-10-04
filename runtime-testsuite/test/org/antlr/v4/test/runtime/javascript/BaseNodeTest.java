@@ -302,6 +302,7 @@ public class BaseNodeTest implements RuntimeTestSupport {
 		catch (Exception e) {
 			System.err.println("can't exec recognizer");
 			e.printStackTrace(System.err);
+			System.err.println();
 		}
 		return null;
 	}
