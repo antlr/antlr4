@@ -9,11 +9,9 @@ package org.antlr.v4.test.runtime.javascript;
 import org.antlr.v4.test.runtime.BaseRuntimeTest;
 import org.antlr.v4.test.runtime.RuntimeTestDescriptor;
 import org.antlr.v4.test.runtime.descriptors.SemPredEvalParserDescriptors;
-import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-@Ignore
 @RunWith(Parameterized.class)
 public class TestSemPredEvalParser extends BaseRuntimeTest {
 	public TestSemPredEvalParser(RuntimeTestDescriptor descriptor) {
