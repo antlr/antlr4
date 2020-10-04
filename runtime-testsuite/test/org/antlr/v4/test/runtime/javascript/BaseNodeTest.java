@@ -268,8 +268,8 @@ public class BaseNodeTest implements RuntimeTestSupport {
 	public String execModule(String fileName) {
 		try {
 			String npmPath = locateNpm();
-			installRuntime(npmPath);
-			registerRuntime(npmPath);
+			// installRuntime(npmPath);
+			// registerRuntime(npmPath);
 			String modulePath = new File(new File(tmpdir), fileName)
 					.getAbsolutePath();
 			linkRuntime(npmPath);
