@@ -203,6 +203,8 @@ matrix:
       jdk: openjdk8
       env: TARGET=javascript
       stage: main-test
+      before_install:
+        - nvm install 14 # otherwise it runs by default on node 8
     - os: linux
       dist: trusty
       jdk: openjdk8
