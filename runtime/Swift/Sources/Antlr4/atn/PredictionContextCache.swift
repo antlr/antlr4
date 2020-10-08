@@ -12,12 +12,12 @@
 /// 
 
 public final class PredictionContextCache {
-    //internal final var
-    var cache: HashMap<PredictionContext, PredictionContext> =
-    HashMap<PredictionContext, PredictionContext>()
+    private var cache = [PredictionContext: PredictionContext]()
+
     public init() {
     }
-    /// 
+
+    ///
     /// Add a context to the cache and return it. If the context already exists,
     /// return that one instead and do not add a new context to the cache.
     /// Protect shared cache from unsafe thread access.
@@ -27,10 +27,9 @@ public final class PredictionContextCache {
         if ctx === PredictionContext.EMPTY {
             return PredictionContext.EMPTY
         }
-        let existing: PredictionContext? = cache[ctx]
-        if existing != nil {
+        if let existing = cache[ctx] {
 //			print(name+" reuses "+existing);
-            return existing!
+            return existing
         }
         cache[ctx] = ctx
         return ctx

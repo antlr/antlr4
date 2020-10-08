@@ -1,0 +1,1233 @@
+/*
+ * [The "BSD license"]
+ *  Copyright (c) 2012-2016 Terence Parr
+ *  Copyright (c) 2012-2016 Sam Harwell
+ *  All rights reserved.
+ *
+ *  Redistribution and use in source and binary forms, with or without
+ *  modification, are permitted provided that the following conditions
+ *  are met:
+ *
+ *  1. Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *  2. Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer in the
+ *     documentation and/or other materials provided with the distribution.
+ *  3. The name of the author may not be used to endorse or promote products
+ *     derived from this software without specific prior written permission.
+ *
+ *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ *  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ *  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+phpTypeInitMap ::= [
+	"int":"0",
+	"long":"0",
+	"float":"0.0",
+	"double":"0.0",
+	"boolean":"false",
+	default:"null"
+]
+
+// args must be <object-model-object>, <fields-resulting-in-STs>
+
+ParserFile(file, parser, namedActions, contextSuperClass) ::= <<
+<fileHeader(file.grammarFileName, file.ANTLRVersion)>
+<parser>
+>>
+
+ListenerFile(file, header, namedActions) ::= <<
+<fileHeader(file.grammarFileName, file.ANTLRVersion)>
+<if(file.genPackage)>
+namespace <file.genPackage>;
+<endif>
+<header>
+use Antlr\\Antlr4\\Runtime\\Tree\\ParseTreeListener;
+
+/**
+ * This interface defines a complete listener for a parse tree produced by
+ * {@see <file.parserName>}.
+ */
+interface <file.grammarName>Listener extends ParseTreeListener {
+	<file.listenerNames:{lname |
+/**
+<if(file.listenerLabelRuleNames.(lname))>
+ * Enter a parse tree produced by the `<lname>`
+ * labeled alternative in {@see <file.parserName>::<file.listenerLabelRuleNames.(lname)>()\}.
+<else>
+ * Enter a parse tree produced by {@see <file.parserName>::<lname>()\}.
+<endif>
+ * @param $context The parse tree.
+ */
+public function enter<lname; format="cap">(Context\\<lname; format="cap">Context $context) : void;
+/**
+<if(file.listenerLabelRuleNames.(lname))>
+ * Exit a parse tree produced by the `<lname>` labeled alternative
+ * in {@see <file.parserName>::<file.listenerLabelRuleNames.(lname)>()\}.
+<else>
+ * Exit a parse tree produced by {@see <file.parserName>::<lname>()\}.
+<endif>
+ * @param $context The parse tree.
+ */
+public function exit<lname; format="cap">(Context\\<lname; format="cap">Context $context) : void;}; separator="\n">
+}
+>>
+
+BaseListenerFile(file, header, namedActions) ::= <<
+<fileHeader(file.grammarFileName, file.ANTLRVersion)>
+<if(file.genPackage)>
+namespace <file.genPackage>;
+<endif>
+<header>
+
+use Antlr\\Antlr4\\Runtime\\ParserRuleContext;
+use Antlr\\Antlr4\\Runtime\\Tree\\ErrorNode;
+use Antlr\\Antlr4\\Runtime\\Tree\\TerminalNode;
+
+/**
+ * This class provides an empty implementation of {@see <file.grammarName>Listener},
+ * which can be extended to create a listener which only needs to handle a subset
+ * of the available methods.
+ */
+class <file.grammarName>BaseListener implements <file.grammarName>Listener
+{
+	<file.listenerNames:{lname |
+/**
+ * {@inheritdoc\}
+ *
+ * The default implementation does nothing.
+ */
+public function enter<lname; format="cap">(Context\\<lname; format="cap">Context $context) : void {\}
+
+/**
+ * {@inheritdoc\}
+ *
+ * The default implementation does nothing.
+ */
+public function exit<lname; format="cap">(Context\\<lname; format="cap">Context $context) : void {\}}; separator="\n">
+
+	/**
+	 * {@inheritdoc\}
+	 *
+	 * The default implementation does nothing.
+	 */
+	public function enterEveryRule(ParserRuleContext $context) : void {}
+
+	/**
+	 * {@inheritdoc\}
+	 *
+	 * The default implementation does nothing.
+	 */
+	public function exitEveryRule(ParserRuleContext $context) : void {}
+
+	/**
+	 * {@inheritdoc\}
+	 *
+	 * The default implementation does nothing.
+	 */
+	public function visitTerminal(TerminalNode $node) : void {}
+
+	/**
+	 * {@inheritdoc\}
+	 *
+	 * The default implementation does nothing.
+	 */
+	public function visitErrorNode(ErrorNode $node) : void {}
+}
+>>
+
+VisitorFile(file, header, namedActions) ::= <<
+<fileHeader(file.grammarFileName, file.ANTLRVersion)>
+<if(file.genPackage)>
+namespace <file.genPackage>;
+<endif>
+
+<header>
+use Antlr\\Antlr4\\Runtime\\Tree\\ParseTreeVisitor;
+
+/**
+ * This interface defines a complete generic visitor for a parse tree produced by {@see <file.parserName>}.
+ */
+interface <file.grammarName>Visitor extends ParseTreeVisitor
+{
+	<file.visitorNames:{lname |
+/**
+<if(file.visitorLabelRuleNames.(lname))>
+ * Visit a parse tree produced by the `<lname>` labeled alternative
+ * in {@see <file.parserName>::<file.visitorLabelRuleNames.(lname)>()\}.
+<else>
+ * Visit a parse tree produced by {@see <file.parserName>::<lname>()\}.
+<endif>
+ *
+ * @param Context\\<lname; format="cap">Context $context The parse tree.
+ *
+ * @return mixed The visitor result.
+ */
+public function visit<lname; format="cap">(Context\\<lname; format="cap">Context $context);}; separator="\n\n">
+}
+>>
+
+BaseVisitorFile(file, header, namedActions) ::= <<
+<fileHeader(file.grammarFileName, file.ANTLRVersion)>
+<if(file.genPackage)>
+namespace <file.genPackage>;
+<endif>
+<header>
+use Antlr\\Antlr4\\Runtime\\Tree\\AbstractParseTreeVisitor;
+
+/**
+ * This class provides an empty implementation of {@see <file.grammarName>Visitor},
+ * which can be extended to create a visitor which only needs to handle a subset
+ * of the available methods.
+ */
+class <file.grammarName>BaseVisitor extends AbstractParseTreeVisitor implements <file.grammarName>Visitor
+{
+	<file.visitorNames:{lname |
+/**
+ * {@inheritdoc\}
+ *
+ * The default implementation returns the result of calling
+ * {@see self::visitChildren()\} on `context`.
+ */
+public function visit<lname; format="cap">(Context\\<lname; format="cap">Context $context)
+{
+    return $this->visitChildren($context);
+\}}; separator="\n\n">
+}
+>>
+
+fileHeader(grammarFileName, ANTLRVersion) ::= <<
+\<?php
+
+/*
+ * Generated from <grammarFileName> by ANTLR <ANTLRVersion>
+ */
+
+>>
+Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
+<Parser_(ctor="parser_ctor", ...)>
+>>
+
+Parser_(parser, funcs, atn, sempredFuncs, ctor, superClass) ::= <<
+namespace<if(file.genPackage)> <file.genPackage><endif> {
+<if(namedActions.header)><namedActions.header><endif>
+	use Antlr\\Antlr4\\Runtime\\Atn\\ATN;
+	use Antlr\\Antlr4\\Runtime\\Atn\\ATNDeserializer;
+	use Antlr\\Antlr4\\Runtime\\Atn\\ParserATNSimulator;
+	use Antlr\\Antlr4\\Runtime\\Dfa\\DFA;
+	use Antlr\\Antlr4\\Runtime\\Error\\Exceptions\\FailedPredicateException;
+	use Antlr\\Antlr4\\Runtime\\Error\\Exceptions\\NoViableAltException;
+	use Antlr\\Antlr4\\Runtime\\PredictionContexts\\PredictionContextCache;
+	use Antlr\\Antlr4\\Runtime\\Error\\Exceptions\\RecognitionException;
+	use Antlr\\Antlr4\\Runtime\\RuleContext;
+	use Antlr\\Antlr4\\Runtime\\Token;
+	use Antlr\\Antlr4\\Runtime\\TokenStream;
+	use Antlr\\Antlr4\\Runtime\\Vocabulary;
+	use Antlr\\Antlr4\\Runtime\\VocabularyImpl;
+	use Antlr\\Antlr4\\Runtime\\RuntimeMetaData;
+	use Antlr\\Antlr4\\Runtime\\Parser;
+<if(namedActions.definitions)><namedActions.definitions><endif>
+
+	final class <parser.name> extends <superClass; null="Parser">
+	{
+		<if(parser.tokens)>
+		public const <parser.tokens:{k | <k> = <parser.tokens.(k)>}; separator=", ", wrap, anchor>;
+		<endif>
+
+		public const <parser.rules:{r | RULE_<r.name> = <r.index>}; separator=", ", wrap, anchor>;
+
+		/**
+		 * @var array\<string>
+		 */
+		public const RULE_NAMES = [
+			<parser.ruleNames:{r | '<r>'}; separator=", ", wrap, anchor>
+		];
+
+		<vocabulary(parser.literalNames, parser.symbolicNames)>
+
+		<atn>
+		protected static $atn;
+		protected static $decisionToDFA;
+		protected static $sharedContextCache;
+		<if(namedActions.members)>
+
+		<namedActions.members>
+		<endif>
+
+
+		<parser:(ctor)()>
+
+		private static function initialize() : void
+		{
+			if (self::$atn !== null) {
+				return;
+			}
+
+			RuntimeMetaData::checkVersion('<file.ANTLRVersion>', RuntimeMetaData::VERSION);
+
+			$atn = (new ATNDeserializer())->deserialize(self::SERIALIZED_ATN);
+
+			$decisionToDFA = [];
+			for ($i = 0, $count = $atn->getNumberOfDecisions(); $i \< $count; $i++) {
+				$decisionToDFA[] = new DFA($atn->getDecisionState($i), $i);
+			}
+
+			self::$atn = $atn;
+			self::$decisionToDFA = $decisionToDFA;
+			self::$sharedContextCache = new PredictionContextCache();
+		}
+
+		public function getGrammarFileName() : string
+		{
+			return "<parser.grammarFileName>";
+		}
+
+		public function getRuleNames() : array
+		{
+			return self::RULE_NAMES;
+		}
+
+		public function getSerializedATN() : string
+		{
+			return self::SERIALIZED_ATN;
+		}
+
+		public function getATN() : ATN
+		{
+			return self::$atn;
+		}
+
+		public function getVocabulary() : Vocabulary
+        {
+            static $vocabulary;
+
+			return $vocabulary = $vocabulary ?? new VocabularyImpl(self::LITERAL_NAMES, self::SYMBOLIC_NAMES);
+        }
+<if(funcs)>
+
+		<funcs; separator="\n\n">
+<endif>
+<if(sempredFuncs)>
+
+		public function sempred(?RuleContext $localContext, int $ruleIndex, int $predicateIndex) : bool
+		{
+			switch ($ruleIndex) {
+			<parser.sempredFuncs.values:{f|
+		case <f.ruleIndex>:
+			return $this->sempred<f.name; format="cap">($localContext, $predicateIndex);}; separator="\n\n">
+
+				default:
+					return true;
+				}
+		}
+
+		<sempredFuncs.values; separator="\n\n">
+<endif>
+	}
+}
+
+namespace <if(file.genPackage)><file.genPackage>\\<endif>Context {
+	use Antlr\\Antlr4\\Runtime\\ParserRuleContext;
+	use Antlr\\Antlr4\\Runtime\\Token;
+	use Antlr\\Antlr4\\Runtime\\Tree\\ParseTreeVisitor;
+	use Antlr\\Antlr4\\Runtime\\Tree\\TerminalNode;
+	use Antlr\\Antlr4\\Runtime\\Tree\\ParseTreeListener;
+	use <if(file.genPackage)><file.genPackage>\\<endif><parser.name>;
+	<if (file.genVisitor)>use <if(file.genPackage)><file.genPackage>\\<endif><file.grammarName>Visitor;<endif>
+	<if (file.genListener)>use <if(file.genPackage)><file.genPackage>\\<endif><file.grammarName>Listener;<endif>
+	<namedActions.contexts>
+
+	<funcs :{ func | <func.ruleCtx><if(func.altLabelCtxs)>
+
+<func.altLabelCtxs:{l | <func.altLabelCtxs.(l)>}; separator="\n\n"><endif> }; separator="\n\n">
+}
+>>
+
+vocabulary(literalNames, symbolicNames) ::= <<
+/**
+ * @var array\<string|null>
+ */
+private const LITERAL_NAMES = [
+    <literalNames:{t | <t>}; null="null", separator=", ", wrap, anchor>
+];
+
+/**
+ * @var array\<string>
+ */
+private const SYMBOLIC_NAMES = [
+    <symbolicNames:{t | <t>}; null="null", separator=", ", wrap, anchor>
+];
+>>
+
+dumpActions(recog, argFuncs, actionFuncs, sempredFuncs) ::= <<
+<if(actionFuncs)>
+
+public function action(?RuleContext $localContext, int $ruleIndex, int $actionIndex) : void
+{
+	switch ($ruleIndex) {
+	<recog.actionFuncs.values:{f|
+	case <f.ruleIndex>:
+		$this->action<f.name; format="cap">($localContext, $actionIndex);
+		break;}; separator="\n\n">
+	}
+}
+
+<actionFuncs.values; separator="\n">
+<endif>
+<if(sempredFuncs)>
+
+public function sempred(?RuleContext $localContext, int $ruleIndex, int $predicateIndex) : bool
+{
+	switch ($ruleIndex) {
+	<recog.sempredFuncs.values:{f|
+    case <f.ruleIndex>:
+        return $this->sempred<f.name; format="cap">($localContext, $predicateIndex);}; separator="\n\n">
+	}
+
+	return true;
+}
+<sempredFuncs.values; separator="\n\n">
+<endif>
+>>
+
+parser_ctor(p) ::= <<
+public function __construct(TokenStream $input)
+{
+	parent::__construct($input);
+
+	self::initialize();
+
+	$this->interp = new ParserATNSimulator($this, self::$atn, self::$decisionToDFA, self::$sharedContextCache);
+}
+>>
+
+/**
+ * This generates a private method since the actionIndex is generated, making
+ * an overriding implementation impossible to maintain.
+ */
+RuleActionFunction(r, actions) ::= <<
+private function action<r.name; format="cap">(?<r.ctxType> $localContext, int $actionIndex) : void
+{
+	switch ($actionIndex) {
+	<actions:{index|
+	case <index>:
+	<actions.(index)>
+
+	break;}; separator="\n\n">
+	}
+}
+>>
+
+/**
+ * This generates a private method since the predicateIndex is generated, making
+ * an overriding implementation impossible to maintain.
+ */
+RuleSempredFunction(r, actions) ::= <<
+private function sempred<r.name; format="cap">(?Context\\<r.ctxType> $localContext, int $predicateIndex) : bool
+{
+	switch ($predicateIndex) {
+	<actions:{index|
+    case <index>:
+        return <actions.(index)>;}; separator="\n\n">
+	}
+
+	return true;
+}
+>>
+
+RuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAction,exceptions,postamble) ::= <<
+/**
+ * @throws RecognitionException
+ */
+<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><endif>public function <currentRule.name>(<args; separator=",">) : Context\\<currentRule.ctxType>
+{
+    $localContext = new Context\\<currentRule.ctxType>($this->ctx, $this->getState()<currentRule.args:{a | , $<a.name>}>);
+
+    $this->enterRule($localContext, <currentRule.startState>, self::RULE_<currentRule.name>);
+    <namedActions.init>
+    <locals; separator="\n">
+
+    try {
+        <code>
+        <postamble; separator="\n">
+        <namedActions.after>
+    }<if(exceptions)><exceptions; separator="\n"><else> catch (RecognitionException $exception) {
+        $localContext->exception = $exception;
+        $this->errorHandler->reportError($this, $exception);
+        $this->errorHandler->recover($this, $exception);
+    }<endif> finally {
+        <finallyAction>
+        $this->exitRule();
+    }
+
+    return $localContext;
+}
+>>
+
+LeftRecursiveRuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAction,postamble) ::= <<
+/**
+ * @throws RecognitionException
+ */
+<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><endif>public function <currentRule.name>(<args; separator=", ">) : Context\\<currentRule.ctxType>
+{
+	return $this->recursive<currentRule.name; format="cap">(0<currentRule.args:{a | , <a.name>}>);
+}
+
+/**
+ * @throws RecognitionException
+ */
+private function recursive<currentRule.name; format="cap">(int $precedence<args:{a | , <a>}>) : Context\\<currentRule.ctxType>
+{
+	$parentContext = $this->ctx;
+	$parentState = $this->getState();
+	$localContext = new Context\\<currentRule.ctxType>($this->ctx, $parentState<currentRule.args:{a | , <a.name>}>);
+	$previousContext = $localContext;
+	$startState = <currentRule.startState>;
+	$this->enterRecursionRule($localContext, <currentRule.startState>, self::RULE_<currentRule.name>, $precedence);
+	<namedActions.init>
+	<locals; separator="\n">
+
+	try {
+		<code>
+		<postamble; separator="\n">
+		<namedActions.after>
+	} catch (RecognitionException $exception) {
+		$localContext->exception = $exception;
+		$this->errorHandler->reportError($this, $exception);
+		$this->errorHandler->recover($this, $exception);
+	} finally {
+		<finallyAction>
+		$this->unrollRecursionContexts($parentContext);
+	}
+
+	return $localContext;
+}
+>>
+
+CodeBlockForOuterMostAlt(currentOuterMostAltCodeBlock, locals, preamble, ops) ::= <<
+<if(currentOuterMostAltCodeBlock.altLabel)>$localContext = new Context\\<currentOuterMostAltCodeBlock.altLabel; format="cap">Context($localContext);<endif>
+$this->enterOuterAlt($localContext, <currentOuterMostAltCodeBlock.alt.altNum>);
+<CodeBlockForAlt(currentAltCodeBlock=currentOuterMostAltCodeBlock, ...)>
+>>
+
+CodeBlockForAlt(currentAltCodeBlock, locals, preamble, ops) ::= <<
+<locals; separator="\n">
+<preamble; separator="\n">
+<ops; separator="\n">
+>>
+
+LL1AltBlock(choice, preamble, alts, error) ::= <<
+$this->setState(<choice.stateNumber>);
+$this->errorHandler->sync($this);
+<if(choice.label)><labelref(choice.label)> = $this->input->LT(1);<endif>
+<preamble; separator="\n">
+
+switch ($this->input->LA(1)) {
+    <choice.altLook,alts:{look,alt| <cases(ttypes=look)>
+	<alt>
+	break;}; separator="\n\n">
+
+default:
+	<error>
+}
+>>
+
+LL1OptionalBlock(choice, alts, error) ::= <<
+$this->setState(<choice.stateNumber>);
+$this->errorHandler->sync($this);
+
+switch ($this->input->LA(1)) {
+    <choice.altLook,alts:{look,alt| <cases(ttypes=look)>
+	<alt>
+	break;}; separator="\n\n">
+
+default:
+	break;
+}
+>>
+
+LL1OptionalBlockSingleAlt(choice, expr, alts, preamble, error, followExpr) ::= <<
+$this->setState(<choice.stateNumber>);
+$this->errorHandler->sync($this);
+<preamble; separator="\n">
+
+if (<expr>) {
+	<alts; separator="\n">
+}
+>>
+
+LL1StarBlockSingleAlt(choice, loopExpr, alts, preamble, iteration) ::= <<
+$this->setState(<choice.stateNumber>);
+$this->errorHandler->sync($this);
+
+<preamble; separator="\n">
+while (<loopExpr>) {
+	<alts; separator="\n">
+	$this->setState(<choice.loopBackStateNumber>);
+	$this->errorHandler->sync($this);
+	<iteration>
+}
+>>
+
+LL1PlusBlockSingleAlt(choice, loopExpr, alts, preamble, iteration) ::= <<
+$this->setState(<choice.blockStartStateNumber>); <! alt block decision !>
+$this->errorHandler->sync($this);
+
+<preamble; separator="\n">
+do {
+	<alts; separator="\n">
+	$this->setState(<choice.stateNumber>); <! loopback/exit decision !>
+	$this->errorHandler->sync($this);
+	<iteration>
+} while (<loopExpr>);
+>>
+
+// LL(*) stuff
+
+AltBlock(choice, preamble, alts, error) ::= <<
+$this->setState(<choice.stateNumber>);
+$this->errorHandler->sync($this);
+<if(choice.label)><labelref(choice.label)> = $this->input->LT(1);<endif>
+<preamble; separator="\n">
+
+switch ($this->getInterpreter()->adaptivePredict($this->input, <choice.decision>, $this->ctx)) {
+	<alts:{alt |
+case <i>:
+    <alt>
+break;}; separator="\n\n">
+}
+>>
+
+OptionalBlock(choice, alts, error) ::= <<
+$this->setState(<choice.stateNumber>);
+$this->errorHandler->sync($this);
+
+switch ($this->getInterpreter()->adaptivePredict($this->input, <choice.decision>, $this->ctx)) {
+<alts:{alt |
+    case <i><if(!choice.ast.greedy)>+1<endif>:
+	    <alt>
+	break;}; separator="\n\n">
+}
+>>
+
+StarBlock(choice, alts, sync, iteration) ::= <<
+$this->setState(<choice.stateNumber>);
+$this->errorHandler->sync($this);
+
+$alt = $this->getInterpreter()->adaptivePredict($this->input, <choice.decision>, $this->ctx);
+
+while ($alt !== <choice.exitAlt> && $alt !== ATN::INVALID_ALT_NUMBER) {
+	if ($alt === 1<if(!choice.ast.greedy)>+1<endif>) {
+		<iteration>
+		<alts> <! should only be one !>
+	}
+
+	$this->setState(<choice.loopBackStateNumber>);
+	$this->errorHandler->sync($this);
+
+	$alt = $this->getInterpreter()->adaptivePredict($this->input, <choice.decision>, $this->ctx);
+}
+>>
+
+PlusBlock(choice, alts, error) ::= <<
+$this->setState(<choice.blockStartStateNumber>); <! alt block decision !>
+$this->errorHandler->sync($this);
+
+$alt = 1<if(!choice.ast.greedy)>+1<endif>;
+
+do {
+	switch ($alt) {
+	<alts:{alt|
+case <i><if(!choice.ast.greedy)>+1<endif>:
+	<alt>
+	break;}; separator="\n\n">
+	default:
+		<error>
+	}
+
+	$this->setState(<choice.loopBackStateNumber>); <! loopback/exit decision !>
+	$this->errorHandler->sync($this);
+
+	$alt = $this->getInterpreter()->adaptivePredict($this->input, <choice.decision>, $this->ctx);
+} while ($alt !== <choice.exitAlt> && $alt !== ATN::INVALID_ALT_NUMBER);
+>>
+
+Sync(s) ::= "sync(<s.expecting.name>);"
+
+ThrowNoViableAlt(t) ::= "throw new NoViableAltException($this);"
+
+TestSetInline(s) ::= <<
+<s.bitsets:{bits | <if(rest(rest(bits.ttypes)))><bitsetBitfieldComparison(s, bits)><else><bitsetInlineComparison(s, bits)><endif>}; separator=" || ">
+>>
+
+// Java language spec 15.19 - shift operators mask operands rather than overflow to 0... need range test
+testShiftInRange(shiftAmount) ::= <<
+((<shiftAmount>) & ~0x3f) === 0
+>>
+
+// produces smaller bytecode only when bits.ttypes contains more than two items
+bitsetBitfieldComparison(s, bits) ::= <%
+(<testShiftInRange({<offsetShiftVar(s.varName, bits.shift)>})> && ((1 \<\< <offsetShiftVar(s.varName, bits.shift)>) & (<bits.ttypes:{ttype | (1 \<\< <offsetShiftConst(ttype, bits.shift)>)}; separator=" | ">)) !== 0)
+%>
+
+isZero ::= [
+"0":true,
+default:false
+]
+
+offsetShiftVar(shiftAmount, offset) ::= <%
+<if(!isZero.(offset))>($<shiftAmount> - <offset>)<else>$<shiftAmount><endif>
+%>
+offsetShiftConst(shiftAmount, offset) ::= <%
+<if(!isZero.(offset))>(self::<shiftAmount> - <offset>)<else>self::<shiftAmount><endif>
+%>
+
+// produces more efficient bytecode when bits.ttypes contains at most two items
+bitsetInlineComparison(s, bits) ::= <%
+<bits.ttypes:{ttype | $<s.varName> === self::<ttype>}; separator=" || ">
+%>
+
+cases(ttypes) ::= <<
+<ttypes:{t | case self::<t>:}; separator="\n">
+>>
+
+InvokeRule(r, argExprsChunks) ::= <<
+$this->setState(<r.stateNumber>);
+<if(r.labels)><r.labels:{l | <labelref(l)> = }><endif>$this-><if(r.ast.options.p)>recursive<r.name; format="cap"><else><r.name><endif>(<if(r.ast.options.p)><r.ast.options.p><if(argExprsChunks)>,<endif><endif><argExprsChunks>);
+>>
+
+MatchToken(m) ::= <<
+$this->setState(<m.stateNumber>);
+<if(m.labels)><m.labels:{l | <labelref(l)> = }><endif>$this->match(self::<m.name>);
+>>
+
+MatchSet(m, expr, capture) ::= "<CommonSetStuff(m, expr, capture, false)>"
+
+MatchNotSet(m, expr, capture) ::= "<CommonSetStuff(m, expr, capture, true)>"
+
+CommonSetStuff(m, expr, capture, invert) ::= <<
+$this->setState(<m.stateNumber>);
+
+<if(m.labels)><m.labels:{l | <labelref(l)> = }>$this->input->LT(1);<endif>
+<capture>
+
+if (<if(invert)>$<m.varName> \<= 0 || <else>!<endif>(<expr>)) {
+	    <if(m.labels)><m.labels:{l | <labelref(l)> = }><endif>$this->errorHandler->recoverInline($this);
+} else {
+	if ($this->input->LA(1) === Token::EOF) {
+	    $this->matchedEOF = true;
+    }
+
+	$this->errorHandler->reportMatch($this);
+	$this->consume();
+}
+>>
+
+Wildcard(w) ::= <<
+$this->setState(<w.stateNumber>);
+<if(w.labels)><w.labels:{l | <labelref(l)> = }><endif>$this->matchWildcard();
+>>
+
+// ACTION STUFF
+
+Action(a, foo, chunks) ::= "<chunks>"
+
+ArgAction(a, chunks) ::= "<chunks>"
+
+SemPred(p, chunks, failChunks) ::= <<
+$this->setState(<p.stateNumber>);
+
+if (!(<chunks>)) {
+    throw new FailedPredicateException($this, <p.predicate><if(failChunks)>, <failChunks><elseif(p.msg)>, <p.msg><endif>);
+}
+>>
+
+ExceptionClause(e, catchArg, catchAction) ::= <<
+catch (<catchArg>) {
+	<catchAction>
+}
+>>
+
+// lexer actions are not associated with model objects
+
+LexerSkipCommand()  ::= "$this->skip();"
+LexerMoreCommand()  ::= "$this->more();"
+LexerPopModeCommand() ::= "$this->popMode();"
+
+LexerTypeCommand(arg, grammar)      ::= "$this->type = <arg>;"
+LexerChannelCommand(arg, grammar)   ::= "$this->channel = <arg>;"
+LexerModeCommand(arg, grammar)      ::= "$this->mode = <arg>;"
+LexerPushModeCommand(arg, grammar)  ::= "$this->pushMode(<arg>);"
+
+ActionText(t) ::= "<t.text>"
+ActionTemplate(t) ::= "<t.st>"
+ArgRef(a) ::= "$localContext-><a.name>"
+LocalRef(a) ::= "$localContext-><a.name>"
+RetValueRef(a) ::= "$localContext-><a.name>"
+QRetValueRef(a) ::= "<ctx(a)>-><a.dict>-><a.name>"
+/** How to translate $tokenLabel */
+TokenRef(t) ::= "<ctx(t)>-><t.name>"
+LabelRef(t) ::= "<ctx(t)>-><t.name>"
+ListLabelRef(t) ::= "<ctx(t)>-><ListLabelName(t.name)>"
+SetAttr(s,rhsChunks) ::= "<ctx(s)>-><s.name> = <rhsChunks>;"
+
+TokenLabelType() ::= "<file.TokenLabelType; null={Token}>"
+InputSymbolType() ::= "<file.InputSymbolType; null={Token}>"
+
+TokenPropertyRef_text(t) ::= "(<ctx(t)>-><t.label> !== null ? <ctx(t)>-><t.label>->getText() : null)"
+TokenPropertyRef_type(t) ::= "(<ctx(t)>-><t.label> !== null ? <ctx(t)>-><t.label>->getType() : 0)"
+TokenPropertyRef_line(t) ::= "(<ctx(t)>-><t.label> !== null ? <ctx(t)>-><t.label>->getLine() : 0)"
+TokenPropertyRef_pos(t) ::= "(<ctx(t)>-><t.label> !== null ? <ctx(t)>-><t.label>->getCharPositionInLine() : 0)"
+TokenPropertyRef_channel(t) ::= "(<ctx(t)>-><t.label> !== null ? <ctx(t)>-><t.label>->getChannel() : 0)"
+TokenPropertyRef_index(t) ::= "(<ctx(t)>-><t.label> !== null ? <ctx(t)>-><t.label>->getTokenIndex() : 0)"
+TokenPropertyRef_int(t) ::= "(<ctx(t)>-><t.label> !== null ? (int) <ctx(t)>-><t.label>->getText() : 0)"
+
+RulePropertyRef_start(r) ::= "(<ctx(r)>-><r.label> !== null ? (<ctx(r)>-><r.label>->start) : null)"
+RulePropertyRef_stop(r)	 ::= "(<ctx(r)>-><r.label> !== null ? (<ctx(r)>-><r.label>->stop) : null)"
+RulePropertyRef_text(r)	 ::= "(<ctx(r)>-><r.label> !== null ? $this->input->getTextByTokens(<ctx(r)>-><r.label>->start, <ctx(r)>-><r.label>->stop) : null)"
+RulePropertyRef_ctx(r)	 ::= "<ctx(r)>-><r.label>"
+RulePropertyRef_parser(r)::= "\$this"
+
+ThisRulePropertyRef_start(r) ::= "$localContext->start"
+ThisRulePropertyRef_stop(r)	 ::= "$localContext->stop"
+ThisRulePropertyRef_text(r)	 ::= "$this->input->getTextByTokens($localContext->start, $this->input->LT(-1))"
+ThisRulePropertyRef_ctx(r)	 ::= "$localContext"
+ThisRulePropertyRef_parser(r)::= "$this"
+
+NonLocalAttrRef(s)		      ::= "\$this->getInvokingContext(<s.ruleIndex>)-><s.name>"
+SetNonLocalAttr(s, rhsChunks) ::= "\$this->getInvokingContext(<s.ruleIndex>)-><s.name> = <rhsChunks>;"
+
+AddToLabelList(a) ::= "<ctx(a.label)>-><a.listName>[] = <labelref(a.label)>;"
+
+TokenDecl(t) ::= "<TokenLabelType()> $<t.name>"
+TokenTypeDecl(t) ::= ""
+TokenListDecl(t) ::= "array $<t.name> = []"
+RuleContextDecl(r) ::= "<r.ctxName> $<r.name>"
+RuleContextListDecl(rdecl) ::= "array $<rdecl.name> = []"
+AttributeDecl(d) ::= "<d.type> $<d.name><if(d.initValue)> = <d.initValue><endif>"
+
+PropertiesDecl(struct) ::= <<
+<if(struct.tokenListDecls)>
+	<struct.tokenListDecls : {d | /**
+ * @var array\<Token>|null $<d.name>
+ */
+public $<d.name>;}; separator="\n\n">
+<endif>
+<if(struct.tokenDecls)>
+<if(struct.tokenListDecls)>
+
+<endif>
+	<struct.tokenDecls : {d | /**
+ * @var <TokenLabelType()>|null $<d.name>
+ */
+public $<d.name>;}; separator="\n\n">
+<endif>
+<if(struct.ruleContextDecls)>
+<if(struct.tokenListDecls || struct.tokenDecls)>
+
+<endif>
+	<struct.ruleContextDecls : {d | /**
+ * @var <d.ctxName>|null $<d.name>
+ */
+public $<d.name>;}; separator="\n\n">
+<endif>
+<if(struct.ruleContextListDecls)>
+<if(struct.tokenListDecls || struct.tokenDecls || struct.ruleContextDecls)>
+
+<endif>
+	<struct.ruleContextListDecls : {d | /**
+ * @var array\<<d.ctxName>\>|null $<d.name>
+ */
+public $<d.name>;}; separator="\n\n">
+<endif>
+<if(struct.attributeDecls)>
+<if(struct.tokenListDecls || struct.tokenDecls || struct.ruleContextDecls || struct.ruleContextListDecls)>
+
+<endif>
+	<struct.attributeDecls : {d | /**
+ * @var <d.type><if(!d.initValue)>|null<endif> $<d.name>
+ */
+public $<d.name><if(d.initValue)> = <d.initValue><endif>;}; separator="\n\n">
+<endif>
+
+>>
+
+ContextTokenGetterDecl(t) ::= <<
+public function <t.name>() : ?TerminalNode
+{
+    return $this->getToken(<parser.name>::<t.name>, 0);
+}
+>>
+
+ContextTokenListGetterDecl(t)  ::= <<
+>>
+
+ContextTokenListIndexedGetterDecl(t)  ::= <<
+/**
+ * @return array\<TerminalNode>|TerminalNode|null
+ */
+public function <t.name>(?int $index = null)
+{
+	if ($index === null) {
+		return $this->getTokens(<parser.name>::<t.name>);
+	}
+
+    return $this->getToken(<parser.name>::<t.name>, $index);
+}
+>>
+
+ContextRuleGetterDecl(r)       ::= <<
+public function <r.name>() : ?<r.ctxName>
+{
+	return $this->getTypedRuleContext(<r.ctxName>::class, 0);
+}
+>>
+
+ContextRuleListGetterDecl(r)   ::= <<
+>>
+
+ContextRuleListIndexedGetterDecl(r)   ::= <<
+/**
+ * @return array\<<r.ctxName>\>|<r.ctxName>|null
+ */
+public function <r.name>(?int $index = null)
+{
+	if ($index === null) {
+		return $this->getTypedRuleContexts(<r.ctxName>::class);
+	}
+
+    return $this->getTypedRuleContext(<r.ctxName>::class, $index);
+}
+>>
+
+LexerRuleContext() ::= "RuleContext"
+
+/**
+ * The rule context name is the rule followed by a suffix; e.g., r becomes rContext.
+ */
+RuleContextNameSuffix() ::= "Context"
+
+ImplicitTokenLabel(tokenName) ::= "<tokenName>"
+ImplicitRuleLabel(ruleName)	  ::= "<ruleName>"
+ImplicitSetLabel(id)		  ::= "_tset<id>"
+ListLabelName(label)		  ::= "<label>"
+
+CaptureNextToken(d) ::= "$<d.varName> = \$this->input->LT(1);"
+CaptureNextTokenType(d) ::= "$<d.varName> = $this->input->LA(1);"
+
+StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers) ::= <<
+class <struct.name> extends <if(contextSuperClass)><contextSuperClass><else>ParserRuleContext<endif><if(interfaces)> implements <interfaces; separator=", "><endif>
+{
+<PropertiesDecl(struct)>
+	public function __construct(?ParserRuleContext $parent, ?int $invokingState = null<ctorAttrs:{a | , ?<a> = null}>)
+	{
+		parent::__construct($parent, $invokingState);
+<if(struct.ctorAttrs)>
+
+		<struct.ctorAttrs:{a | $this-><a.name> = $<a.name> ?? $this-><a.name>;}; separator="\n">
+<endif>
+	}
+
+	public function getRuleIndex() : int
+	{
+	    return <parser.name>::RULE_<struct.derivedFromName>;
+    }
+<if(getters)>
+
+    <getters:{g | <g>}; separator="\n\n">
+<endif>
+<if(struct.provideCopyFrom)> <! don't need copy unless we have subclasses !>
+	public function copyFrom(ParserRuleContext $context) : void
+	{
+		parent::copyFrom($context);
+
+		<struct.attrs:{a | $this-><a.name> = $context-><a.name>;}; separator="\n">
+	}
+<endif>
+<if(dispatchMethods)>
+
+	<dispatchMethods; separator="\n\n">
+<endif>
+<if(extensionMembers)>
+
+	<extensionMembers; separator="\n\n">
+<endif>
+}
+>>
+
+AltLabelStructDecl(struct,attrs,getters,dispatchMethods) ::= <<
+class <struct.name> extends <struct.parentRule; format="cap">Context
+{
+<PropertiesDecl(struct)>
+	public function __construct(<struct.parentRule; format="cap">Context $context)
+	{
+	    parent::__construct($context);
+
+	    $this->copyFrom($context);
+    }
+<if(getters)>
+
+    <getters:{g | <g>}; separator="\n\n">
+<endif>
+<if(dispatchMethods)>
+
+	<dispatchMethods; separator="\n\n">
+<endif>
+}
+>>
+
+ListenerDispatchMethod(method) ::= <<
+public function <if(method.isEnter)>enter<else>exit<endif>Rule(ParseTreeListener $listener) : void
+{
+	if ($listener instanceof <parser.grammarName>Listener) {
+	    $listener-><if(method.isEnter)>enter<else>exit<endif><struct.derivedFromName; format="cap">($this);
+    }
+}
+>>
+
+VisitorDispatchMethod(method) ::= <<
+public function accept(ParseTreeVisitor $visitor)
+{
+	if ($visitor instanceof <parser.grammarName>Visitor) {
+	    return $visitor->visit<struct.derivedFromName; format="cap">($this);
+    }
+
+	return $visitor->visitChildren($this);
+}
+>>
+
+/** If we don't know location of label def x, use this template */
+labelref(x) ::= "<if(!x.isLocal)>$localContext-><endif><x.name>"
+
+/** For any action chunk, what is correctly-typed context struct ptr? */
+ctx(actionChunk) ::= "$localContext"
+
+// used for left-recursive rules
+recRuleAltPredicate(ruleName,opPrec)  ::= "\$this->precpred(\$this->ctx, <opPrec>)"
+
+recRuleSetReturnAction(src,name)	  ::= "\$<name> = \$<src>-><name>;"
+
+recRuleSetStopToken()                 ::= "$this->ctx->stop = $this->input->LT(-1);"
+
+recRuleAltStartAction(ruleName, ctxName, label, isListLabel) ::= <<
+$localContext = new Context\\<ctxName>Context($parentContext, $parentState);
+<if(label)>
+<if(isListLabel)>
+$localContext-><label>[] = $previousContext;
+<else>
+$localContext-><label> = $previousContext;
+<endif>
+<endif>
+
+$this->pushNewRecursionContext($localContext, $startState, self::RULE_<ruleName>);
+>>
+
+recRuleLabeledAltStartAction(ruleName, currentAltLabel, label, isListLabel) ::= <<
+$localContext = new Context\\<currentAltLabel; format="cap">Context(new Context\\<ruleName; format="cap">Context($parentContext, $parentState));
+<if(label)>
+<if(isListLabel)>
+$localContext-><label>[] = $previousContext;
+<else>
+$localContext-><label> = $previousContext;
+<endif>
+<endif>
+
+$this->pushNewRecursionContext($localContext, $startState, self::RULE_<ruleName>);
+>>
+
+recRuleReplaceContext(ctxName) ::= <<
+$localContext = new Context\\<ctxName>Context($localContext);
+$this->ctx = $localContext;
+$previousContext = $localContext;
+>>
+
+recRuleSetPrevCtx() ::= <<
+if ($this->getParseListeners() !== null) {
+    $this->triggerExitRuleEvent();
+}
+
+$previousContext = $localContext;
+>>
+
+
+LexerFile(lexerFile, lexer, namedActions) ::= <<
+<fileHeader(lexerFile.grammarFileName, lexerFile.ANTLRVersion)>
+<lexer>
+>>
+
+Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
+namespace<if(lexerFile.genPackage)> <lexerFile.genPackage><endif> {
+<if(namedActions.header)><namedActions.header><endif>
+	use Antlr\\Antlr4\\Runtime\\Atn\\ATNDeserializer;
+	use Antlr\\Antlr4\\Runtime\\Atn\\LexerATNSimulator;
+	use Antlr\\Antlr4\\Runtime\\Lexer;
+	use Antlr\\Antlr4\\Runtime\\CharStream;
+	use Antlr\\Antlr4\\Runtime\\PredictionContexts\\PredictionContextCache;
+	use Antlr\\Antlr4\\Runtime\\RuleContext;
+	use Antlr\\Antlr4\\Runtime\\Atn\\ATN;
+	use Antlr\\Antlr4\\Runtime\\Dfa\\DFA;
+	use Antlr\\Antlr4\\Runtime\\Vocabulary;
+	use Antlr\\Antlr4\\Runtime\\RuntimeMetaData;
+	use Antlr\\Antlr4\\Runtime\\VocabularyImpl;
+<if(namedActions.definitions)><namedActions.definitions><endif>
+
+	final class <lexer.name> extends <superClass; null="Lexer">
+	{
+		<if(lexer.tokens)>
+		public const <lexer.tokens:{k | <k> = <lexer.tokens.(k)>}; separator=", ", wrap, anchor>;
+		<endif>
+
+		<if(lexer.channels)>
+		public const <lexer.channels:{c | <c> = <lexer.channels.(c)>}; separator=", ", wrap, anchor>;
+		<endif>
+
+		<if(rest(lexer.modes))>
+		public const <rest(lexer.modes):{m | <m>=<i>}; separator=", ", wrap, anchor>;
+		<endif>
+
+		/**
+		 * @var array\<string>
+		 */
+		public const CHANNEL_NAMES = [
+			'DEFAULT_TOKEN_CHANNEL', 'HIDDEN'<if (lexer.channels)>, <lexer.channels:{c| '<c>'}; separator=", ", wrap, anchor><endif>
+		];
+
+		/**
+		 * @var array\<string>
+		 */
+		public const MODE_NAMES = [
+			<lexer.modes:{m| '<m>'}; separator=", ", wrap, anchor>
+		];
+
+		/**
+		 * @var array\<string>
+		 */
+		public const RULE_NAMES = [
+			<lexer.ruleNames:{r | '<r>'}; separator=", ", wrap, anchor>
+		];
+
+		<vocabulary(lexer.literalNames, lexer.symbolicNames)>
+
+		<atn>
+		protected static $atn;
+		protected static $decisionToDFA;
+		protected static $sharedContextCache;
+<if(namedActions.members)>
+
+		<namedActions.members>
+<endif>
+
+		public function __construct(CharStream $input)
+		{
+			parent::__construct($input);
+
+			self::initialize();
+
+			$this->interp = new LexerATNSimulator($this, self::$atn, self::$decisionToDFA, self::$sharedContextCache);
+		}
+
+		private static function initialize() : void
+		{
+			if (self::$atn !== null) {
+				return;
+			}
+
+			RuntimeMetaData::checkVersion('<lexerFile.ANTLRVersion>', RuntimeMetaData::VERSION);
+
+			$atn = (new ATNDeserializer())->deserialize(self::SERIALIZED_ATN);
+
+			$decisionToDFA = [];
+			for ($i = 0, $count = $atn->getNumberOfDecisions(); $i \< $count; $i++) {
+				$decisionToDFA[] = new DFA($atn->getDecisionState($i), $i);
+			}
+
+			self::$atn = $atn;
+			self::$decisionToDFA = $decisionToDFA;
+			self::$sharedContextCache = new PredictionContextCache();
+		}
+
+		public static function vocabulary() : Vocabulary
+		{
+			static $vocabulary;
+
+			return $vocabulary = $vocabulary ?? new VocabularyImpl(self::LITERAL_NAMES, self::SYMBOLIC_NAMES);
+		}
+
+		public function getGrammarFileName() : string
+		{
+			return '<lexer.grammarFileName>';
+		}
+
+		public function getRuleNames() : array
+		{
+			return self::RULE_NAMES;
+		}
+
+		public function getSerializedATN() : string
+		{
+			return self::SERIALIZED_ATN;
+		}
+
+		/**
+		 * @return array\<string>
+		 */
+		public function getChannelNames() : array
+		{
+			return self::CHANNEL_NAMES;
+		}
+
+		/**
+		 * @return array\<string>
+		 */
+		public function getModeNames() : array
+		{
+			return self::MODE_NAMES;
+		}
+
+		public function getATN() : ATN
+		{
+			return self::$atn;
+		}
+
+		public function getVocabulary() : Vocabulary
+		{
+			return self::vocabulary();
+		}
+		<dumpActions(lexer, "", actionFuncs, sempredFuncs)>
+	}
+}
+>>
+
+SerializedATN(model) ::= <<
+<if(rest(model.segments))>
+/**
+ * @var string
+ */
+private const SERIALIZED_ATN =
+	<model.segments:{segment| "<segment; wrap={" .<\n>"}>"}; separator=" .\n">;
+<else>
+/**
+ * @var string
+ */
+private const SERIALIZED_ATN =
+	"<model.serialized; wrap={" .<\n>    "}>";
+<endif>
+>>
+
+/**
+ * Using a type to init value map, try to init a type; if not in table
+ * must be an object, default value is `null`.
+ */
+initValue(typeName) ::= <<
+<phpTypeInitMap.(typeName)>
+>>
+
+codeFileExtension() ::= ".php"

@@ -20,36 +20,20 @@ public class LookupATNConfig: Hashable {
         // dup
         config = old
     }
-    public var hashValue: Int {
 
-        var hashCode: Int = 7
-        hashCode = 31 * hashCode + config.state.stateNumber
-        hashCode = 31 * hashCode + config.alt
-        hashCode = 31 * hashCode + config.semanticContext.hashValue
-        return hashCode
-
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(config.state.stateNumber)
+        hasher.combine(config.alt)
+        hasher.combine(config.semanticContext)
     }
-
-
 }
 
 public func ==(lhs: LookupATNConfig, rhs: LookupATNConfig) -> Bool {
-
-
     if lhs.config === rhs.config {
         return true
     }
 
-    if (lhs is OrderedATNConfig) && (rhs is OrderedATNConfig) {
-        return lhs.config == rhs.config
-    }
-
-
-    let same: Bool =
-    lhs.config.state.stateNumber == rhs.config.state.stateNumber &&
+    return lhs.config.state.stateNumber == rhs.config.state.stateNumber &&
             lhs.config.alt == rhs.config.alt &&
             lhs.config.semanticContext == rhs.config.semanticContext
-
-    return same
-
 }

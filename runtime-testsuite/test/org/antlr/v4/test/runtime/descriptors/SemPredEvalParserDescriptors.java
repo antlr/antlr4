@@ -144,8 +144,8 @@ public class SemPredEvalParserDescriptors {
 		/**
 		 grammar T;
 		 s : b[2] ';' |  b[2] '.' ; // decision in s drills down to ctx-dependent pred in a;
-		 b[int i] : a[i] ;
-		 a[int i]
+		 b[<IntArg("i")>] : a[<VarRef("i")>] ;
+		 a[<IntArg("i")>]
 		   : {<ValEquals("$i","1")>}? ID {<writeln("\"alt 1\"")>}
 		     | {<ValEquals("$i","2")>}? ID {<writeln("\"alt 2\"")>}
 		     ;
@@ -291,7 +291,7 @@ public class SemPredEvalParserDescriptors {
 
 		@Override
 		public boolean ignore(String targetName) {
-			return !"Java".equals(targetName);
+			return !"Java".equals(targetName) && !"Swift".equals(targetName);
 		}
 	}
 
@@ -310,7 +310,7 @@ public class SemPredEvalParserDescriptors {
 		 grammar T;
 		 @parser::members {<InitBooleanMember("enumKeyword",True())>}
 		 primary
-		     :   ID {<writeln("\"ID \"+$ID.text")>}
+		     :   ID {<AppendStr("\"ID \"", "$ID.text"):writeln()>}
 		     |   {<GetMember("enumKeyword"):Not()>}? 'enum' {<writeln("\"enum\"")>}
 		     ;
 		 ID : [a-z]+ ;

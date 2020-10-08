@@ -10,7 +10,7 @@
 	<parent>
 		<groupId>org.antlr</groupId>
 		<artifactId>antlr4-master</artifactId>
-		<version>4.7.2-SNAPSHOT</version>
+		<version>4.8-2-SNAPSHOT</version>
 	</parent>
 	<artifactId>antlr4-runtime-testsuite</artifactId>
 	<name>ANTLR 4 Runtime Tests (2nd generation)</name>
@@ -26,7 +26,7 @@
 		<dependency>
 			<groupId>org.antlr</groupId>
 			<artifactId>ST4</artifactId>
-			<version>4.0.8</version>
+			<version>4.3</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -60,18 +60,6 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.seleniumhq.selenium</groupId>
-			<artifactId>selenium-java</artifactId>
-			<version>2.46.0</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse.jetty</groupId>
-			<artifactId>jetty-server</artifactId>
-			<version>8.1.16.v20140903</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.glassfish</groupId>
 			<artifactId>javax.json</artifactId>
 			<version>1.0.4</version>
@@ -92,6 +80,11 @@
 			</resource>
 			<resource>
 				<directory>../runtime</directory>
+				<excludes>
+					<exclude>**/.build/**</exclude>
+					<exclude>**/target/**</exclude>
+					<exclude>Swift/*.xcodeproj/**</exclude>
+				</excludes>
 			</resource>
 		</resources>
 		<plugins>
@@ -103,14 +96,16 @@
 					<!-- SUREFIRE-951: file.encoding cannot be set via systemPropertyVariables -->
 					<argLine>-Dfile.encoding=UTF-8</argLine>
 					<includes>
-						<include>**/csharp/Test*.java</include>
-						<include>**/java/Test*.java</include>
-						<include>**/go/Test*.java</include>
-						<include>**/javascript/node/Test*.java</include>
-						<include>**/python2/Test*.java</include>
-						<include>**/python3/Test*.java</include>
-						<include>${antlr.tests.swift}</include>
-					</includes>
+                        <include>**/csharp/Test*.java</include>
+                        <include>**/java/Test*.java</include>
+                        <include>**/go/Test*.java</include>
+                        <include>**/javascript/Test*.java</include>
+                        <include>**/python2/Test*.java</include>
+                        <include>**/python3/Test*.java</include>
+                        <include>**/php/Test*.java</include>
+                        <include>**/dart/Test*.java</include>
+                        <include>${antlr.tests.swift}</include>
+                    </includes>
 				</configuration>
 			</plugin>
 			<plugin>

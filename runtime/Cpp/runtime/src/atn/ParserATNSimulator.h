@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -652,7 +652,7 @@ namespace atn {
                                                                    ATNConfigSet *configs, size_t nalts);
 
     virtual std::vector<dfa::DFAState::PredPrediction*> getPredicatePredictions(const antlrcpp::BitSet &ambigAlts,
-                                                                                std::vector<Ref<SemanticContext>> altToPred);
+                                                                                std::vector<Ref<SemanticContext>> const& altToPred);
 
     /**
      * This method is used to improve the localization of error messages by
@@ -760,7 +760,7 @@ namespace atn {
     virtual bool evalSemanticContext(Ref<SemanticContext> const& pred, ParserRuleContext *parserCallStack,
                                      size_t alt, bool fullCtx);
 
-    /* TO_DO: If we are doing predicates, there is no point in pursuing
+    /* TODO: If we are doing predicates, there is no point in pursuing
      closure operations if we reach a DFA state that uniquely predicts
      alternative. We will not be caching that DFA state and it is a
      waste to pursue the closure. Might have to advance when we do
@@ -836,7 +836,7 @@ namespace atn {
     virtual antlrcpp::BitSet getConflictingAltsOrUniqueAlt(ATNConfigSet *configs);
 
     virtual NoViableAltException noViableAlt(TokenStream *input, ParserRuleContext *outerContext,
-                                              ATNConfigSet *configs, size_t startIndex);
+                                              ATNConfigSet *configs, size_t startIndex, bool deleteConfigs);
 
     static size_t getUniqueAlt(ATNConfigSet *configs);
 

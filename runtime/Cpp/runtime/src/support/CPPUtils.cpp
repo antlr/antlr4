@@ -46,10 +46,15 @@ namespace antlrcpp {
 
         case ' ':
           if (escapeSpaces) {
-            result += "·";
+            result += "\u00B7";
             break;
           }
           // else fall through
+#ifndef _MSC_VER
+#if __has_cpp_attribute(clang::fallthrough)
+          [[clang::fallthrough]];
+#endif
+#endif
 
         default:
           result += c;

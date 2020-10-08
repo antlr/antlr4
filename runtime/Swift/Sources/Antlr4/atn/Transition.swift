@@ -54,16 +54,16 @@ public class Transition {
 
     public static let serializationTypes: Dictionary<String, Int> = [
 
-            NSStringFromClass(EpsilonTransition.self): EPSILON,
-            NSStringFromClass(RangeTransition.self): RANGE,
-            NSStringFromClass(RuleTransition.self): RULE,
-            NSStringFromClass(PredicateTransition.self): PREDICATE,
-            NSStringFromClass(AtomTransition.self): ATOM,
-            NSStringFromClass(ActionTransition.self): ACTION,
-            NSStringFromClass(SetTransition.self): SET,
-            NSStringFromClass(NotSetTransition.self): NOT_SET,
-            NSStringFromClass(WildcardTransition.self): WILDCARD,
-            NSStringFromClass(PrecedencePredicateTransition.self): PRECEDENCE,
+            String(describing: EpsilonTransition.self): EPSILON,
+            String(describing: RangeTransition.self): RANGE,
+            String(describing: RuleTransition.self): RULE,
+            String(describing: PredicateTransition.self): PREDICATE,
+            String(describing: AtomTransition.self): ATOM,
+            String(describing: ActionTransition.self): ACTION,
+            String(describing: SetTransition.self): SET,
+            String(describing: NotSetTransition.self): NOT_SET,
+            String(describing: WildcardTransition.self): WILDCARD,
+            String(describing: PrecedencePredicateTransition.self): PRECEDENCE,
 
 
     ]
@@ -73,7 +73,7 @@ public class Transition {
     /// The target of this transition.
     /// 
 
-    public final var target: ATNState
+    public internal(set) final var target: ATNState
 
     init(_ target: ATNState) {
 

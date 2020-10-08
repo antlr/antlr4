@@ -57,12 +57,23 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 			throw new RuntimeException("Swift runtime file not found at:" + swiftRuntime.getPath());
 		}
 		ANTLR_RUNTIME_PATH = swiftRuntime.getPath();
-		fastFailRunProcess(ANTLR_RUNTIME_PATH, SWIFT_CMD, "build");
+		try {
+			fastFailRunProcess(ANTLR_RUNTIME_PATH, SWIFT_CMD, "build");
+		}
+		catch (IOException | InterruptedException e) {
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
 
 		// shutdown logic
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			public void run() {
-				fastFailRunProcess(ANTLR_RUNTIME_PATH, SWIFT_CMD, "package", "clean");
+				try {
+					fastFailRunProcess(ANTLR_RUNTIME_PATH, SWIFT_CMD, "package", "clean");
+				}
+				catch (IOException | InterruptedException e) {
+					e.printStackTrace();
+				}
 			}
 		});
 	}
@@ -145,8 +156,14 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 
 		String projectName = "testcase-" + System.currentTimeMillis();
 		String projectDir = getTmpDir() + "/" + projectName;
-		buildProject(projectDir, projectName);
-		return execTest(projectDir, projectName);
+		try {
+			buildProject(projectDir, projectName);
+			return execTest(projectDir, projectName);
+		}
+		catch (IOException | InterruptedException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	@Override
@@ -183,7 +200,7 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 		Collections.addAll(this.sourceFiles, files);
 	}
 
-	private void buildProject(String projectDir, String projectName) {
+	private void buildProject(String projectDir, String projectName) throws IOException, InterruptedException {
 		mkdir(projectDir);
 		fastFailRunProcess(projectDir, SWIFT_CMD, "package", "init", "--type", "executable");
 		for (String sourceFile: sourceFiles) {
@@ -191,20 +208,16 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 			fastFailRunProcess(getTmpDir(), "mv", "-f", absPath, projectDir + "/Sources/" + projectName);
 		}
 		fastFailRunProcess(getTmpDir(), "mv", "-f", "input", projectDir);
-
-		try {
-			String dylibPath = ANTLR_RUNTIME_PATH + "/.build/debug/";
-			Pair<String, String> buildResult = runProcess(projectDir, SWIFT_CMD, "build",
-					"-Xswiftc", "-I"+dylibPath,
-					"-Xlinker", "-L"+dylibPath,
-					"-Xlinker", "-lAntlr4",
-					"-Xlinker", "-rpath",
-					"-Xlinker", dylibPath);
-			if (buildResult.b.length() > 0) {
-				throw new RuntimeException("unit test build failed: " + buildResult.a + "\n" + buildResult.b);
-			}
-		} catch (IOException | InterruptedException e) {
-			e.printStackTrace();
+		String dylibPath = ANTLR_RUNTIME_PATH + "/.build/debug/";
+//		System.err.println(dylibPath);
+		Pair<String, String> buildResult = runProcess(projectDir, SWIFT_CMD, "build",
+				"-Xswiftc", "-I"+dylibPath,
+				"-Xlinker", "-L"+dylibPath,
+				"-Xlinker", "-lAntlr4",
+				"-Xlinker", "-rpath",
+				"-Xlinker", dylibPath);
+		if (buildResult.b.length() > 0) {
+			throw new IOException("unit test build failed: " + buildResult.a + "\n" + buildResult.b);
 		}
 	}
 
@@ -214,20 +227,22 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 		StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
 		stdoutVacuum.start();
 		stderrVacuum.start();
-		process.waitFor();
+		int status = process.waitFor();
 		stdoutVacuum.join();
 		stderrVacuum.join();
+		if (status != 0) {
+			throw new IOException("Process exited with status " + status + ":\n" + stdoutVacuum.toString() + "\n" + stderrVacuum.toString());
+		}
 		return new Pair<>(stdoutVacuum.toString(), stderrVacuum.toString());
 	}
 
-	private static void fastFailRunProcess(String workingDir, String... command) {
+	private static void fastFailRunProcess(String workingDir, String... command) throws IOException, InterruptedException {
 		ProcessBuilder builder = new ProcessBuilder(command);
 		builder.directory(new File(workingDir));
-		try {
-			Process p = builder.start();
-			p.waitFor();
-		} catch (Exception e) {
-			e.printStackTrace();
+		Process p = builder.start();
+		int status = p.waitFor();
+		if (status != 0) {
+			throw new IOException("Process exited with status " + status);
 		}
 	}
 
@@ -251,8 +266,14 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 		addSourceFiles("main.swift");
 		String projectName = "testcase-" + System.currentTimeMillis();
 		String projectDir = getTmpDir() + "/" + projectName;
-		buildProject(projectDir, projectName);
-		return execTest(projectDir, projectName);
+		try {
+			buildProject(projectDir, projectName);
+			return execTest(projectDir, projectName);
+		}
+		catch (IOException | InterruptedException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	private void writeParserTestFile(String parserName,
@@ -279,7 +300,6 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 						"    }\n" +
 						"}\n" +
 						"\n" +
-						"do {\n" +
 						"let args = CommandLine.arguments\n" +
 						"let input = try ANTLRFileStream(args[1])\n" +
 						"let lex = <lexerName>(input)\n" +
@@ -289,12 +309,7 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 						"<profile>\n" +
 						"let tree = try parser.<parserStartRuleName>()\n" +
 						"<if(profile)>print(profiler.getDecisionInfo().description)<endif>\n" +
-						"try ParseTreeWalker.DEFAULT.walk(TreeShapeListener(), tree)\n" +
-						"}catch ANTLRException.recognition(let e )   {\n" +
-						"    print(\"error occur\\(e)\")\n" +
-						"}catch {\n" +
-						"    print(\"error occur\")\n" +
-						"}\n"
+						"try ParseTreeWalker.DEFAULT.walk(TreeShapeListener(), tree)\n"
 		);
 		ST createParserST = new ST("       let parser = try <parserName>(tokens)\n");
 		if (debug) {
@@ -329,13 +344,7 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 						"let lex = <lexerName>(input)\n" +
 						"let tokens = CommonTokenStream(lex)\n" +
 
-						"do {\n" +
-						"	try tokens.fill()\n" +
-						"} catch ANTLRException.recognition(let e )   {\n" +
-						"	print(\"error occur\\(e)\")\n" +
-						"} catch {\n" +
-						"	print(\"error occur\")\n" +
-						"}\n" +
+						"try tokens.fill()\n" +
 
 						"for t in tokens.getTokens() {\n" +
 						"	print(t)\n" +

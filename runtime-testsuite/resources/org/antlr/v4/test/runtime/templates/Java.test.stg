@@ -14,9 +14,9 @@ Cast(t,v) ::= "((<t>)<v>)"
 
 Append(a,b) ::= "<a> + <b>"
 
-Concat(a,b) ::= "<a><b>"
+AppendStr(a,b) ::= <%<Append(a,b)>%>
 
-DeclareLocal(s,v) ::= "Object <s> = <v>;"
+Concat(a,b) ::= "<a><b>"
 
 AssertIsList(v) ::= "List\<?> __ttt__ = <v>;" // just use static type system
 
@@ -26,13 +26,17 @@ InitIntMember(n,v) ::= <%int <n> = <v>;%>
 
 InitBooleanMember(n,v) ::= <%boolean <n> = <v>;%>
 
+InitIntVar(n,v) ::= <%<InitIntMember(n,v)>%>
+
+IntArg(n) ::= "int <n>"
+
+VarRef(n) ::= "<n>"
+
 GetMember(n) ::= <%this.<n>%>
 
 SetMember(n,v) ::= <%this.<n> = <v>;%>
 
 AddMember(n,v) ::= <%this.<n> += <v>;%>
-
-PlusMember(v,n) ::= <%<v> + this.<n>%>
 
 MemberEquals(n,v) ::= <%this.<n> == <v>%>
 
@@ -93,6 +97,8 @@ boolean Property() {
 >>
 
 ParserPropertyCall(p, call) ::= "<p>.<call>"
+
+PositionAdjustingLexerDef() ::= ""
 
 PositionAdjustingLexer() ::= <<
 

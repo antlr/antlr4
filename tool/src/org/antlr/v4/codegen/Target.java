@@ -26,6 +26,8 @@ import org.stringtemplate.v4.STGroupFile;
 import org.stringtemplate.v4.StringRenderer;
 import org.stringtemplate.v4.misc.STMessage;
 
+import java.net.URL;
+
 /** */
 public abstract class Target {
 	/** For pure strings of Java 16-bit Unicode char, how can we display
@@ -280,7 +282,7 @@ public abstract class Target {
 		return sb.toString();
 	}
 
-	private static boolean shouldUseUnicodeEscapeForCodePointInDoubleQuotedString(int codePoint) {
+	protected boolean shouldUseUnicodeEscapeForCodePointInDoubleQuotedString(int codePoint) {
 		// We don't want anyone passing 0x0A (newline) or 0x22
 		// (double-quote) here because Java treats \\u000A as
 		// a literal newline and \\u0022 as a literal

@@ -15,16 +15,16 @@ public class RuleTagToken: Token, CustomStringConvertible {
     /// 
     /// This is the backing field for _#getRuleName_.
     /// 
-    private final var ruleName: String
+    private let ruleName: String
     /// 
     /// The token type for the current token. This is the token type assigned to
     /// the bypass alternative for the rule during ATN deserialization.
     /// 
-    private final var bypassTokenType: Int
+    private let bypassTokenType: Int
     /// 
     /// This is the backing field for _#getLabel_.
     /// 
-    private final var label: String?
+    private let label: String?
 
     public var visited = false
 

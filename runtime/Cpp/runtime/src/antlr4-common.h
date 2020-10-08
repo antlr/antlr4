@@ -8,7 +8,6 @@
 #include <algorithm>
 #include <assert.h>
 #include <atomic>
-#include <codecvt>
 #include <chrono>
 #include <fstream>
 #include <iostream>
@@ -36,6 +35,10 @@
 #include <bitset>
 #include <condition_variable>
 #include <functional>
+
+#ifndef USE_UTF8_INSTEAD_OF_CODECVT
+  #include <codecvt>
+#endif
 
 // Defines for the Guid class and other platform dependent stuff.
 #ifdef _WIN32
@@ -78,7 +81,12 @@
     #endif
   #endif
 
-  class ANTLR4CPP_PUBLIC std::exception; // Needed for VS 2015.
+  #if defined(_MSC_VER) && !defined(__clang__)
+    // clang-cl should escape this to prevent [ignored-attributes].
+    namespace std {
+      class ANTLR4CPP_PUBLIC exception; // Prevents warning C4275 from MSVC.
+    } // namespace std
+  #endif
 
 #elif defined(__APPLE__)
   typedef std::u32string UTF32String;

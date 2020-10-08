@@ -37,7 +37,7 @@ public class ATNConfig: Hashable, CustomStringConvertible {
     /// with this config.  We track only those contexts pushed during
     /// execution of the ATN simulator.
     /// 
-    public final var context: PredictionContext?
+    public internal(set) final var context: PredictionContext?
 
     /// 
     /// We cannot execute predicates dependent upon local context unless
@@ -62,31 +62,14 @@ public class ATNConfig: Hashable, CustomStringConvertible {
     /// _org.antlr.v4.runtime.atn.ATNConfigSet#add(org.antlr.v4.runtime.atn.ATNConfig, DoubleKeyMap)_ method are
     /// __completely__ unaffected by the change.
     /// 
-    public final var reachesIntoOuterContext: Int = 0
-    //=0 intital by janyou
-
+    public internal(set) final var reachesIntoOuterContext: Int = 0
 
     public final let semanticContext: SemanticContext
-
-    public init(_ old: ATNConfig) {
-        // dup
-        self.state = old.state
-        self.alt = old.alt
-        self.context = old.context
-        self.semanticContext = old.semanticContext
-        self.reachesIntoOuterContext = old.reachesIntoOuterContext
-    }
-
-    public convenience init(_ state: ATNState,
-                            _ alt: Int,
-                            _ context: PredictionContext?) {
-        self.init(state, alt, context, SemanticContext.NONE)
-    }
 
     public init(_ state: ATNState,
                 _ alt: Int,
                 _ context: PredictionContext?,
-                _ semanticContext: SemanticContext) {
+                _ semanticContext: SemanticContext = SemanticContext.NONE) {
         self.state = state
         self.alt = alt
         self.context = context
@@ -143,20 +126,11 @@ public class ATNConfig: Hashable, CustomStringConvertible {
         }
     }
 
-    /// 
-    /// An ATN configuration is equal to another if both have
-    /// the same state, they predict the same alternative, and
-    /// syntactic/semantic contexts are the same.
-    /// 
-
-    public var hashValue: Int {
-        var hashCode = MurmurHash.initialize(7)
-        hashCode = MurmurHash.update(hashCode, state.stateNumber)
-        hashCode = MurmurHash.update(hashCode, alt)
-        hashCode = MurmurHash.update(hashCode, context)
-        hashCode = MurmurHash.update(hashCode, semanticContext)
-        return MurmurHash.finish(hashCode, 4)
-
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(state.stateNumber)
+        hasher.combine(alt)
+        hasher.combine(context)
+        hasher.combine(semanticContext)
     }
 
     public var description: String {
@@ -183,6 +157,11 @@ public class ATNConfig: Hashable, CustomStringConvertible {
     }
 }
 
+///
+/// An ATN configuration is equal to another if both have
+/// the same state, they predict the same alternative, and
+/// syntactic/semantic contexts are the same.
+///
 public func ==(lhs: ATNConfig, rhs: ATNConfig) -> Bool {
 
     if lhs === rhs {

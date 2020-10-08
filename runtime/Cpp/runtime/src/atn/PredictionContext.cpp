@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -278,7 +278,7 @@ Ref<PredictionContext> PredictionContext::mergeArrays(const Ref<ArrayPredictionC
       // same payload (stack tops are equal), must yield merged singleton
       size_t payload = a->returnStates[i];
       // $+$ = $
-      bool both$ = payload == EMPTY_RETURN_STATE && a_parent && b_parent;
+      bool both$ = payload == EMPTY_RETURN_STATE && !a_parent && !b_parent;
       bool ax_ax = (a_parent && b_parent) && *a_parent == *b_parent; // ax+ax -> ax
       if (both$ || ax_ax) {
         mergedParents[k] = a_parent; // choose left
@@ -335,7 +335,7 @@ Ref<PredictionContext> PredictionContext::mergeArrays(const Ref<ArrayPredictionC
   Ref<ArrayPredictionContext> M = std::make_shared<ArrayPredictionContext>(mergedParents, mergedReturnStates);
 
   // if we created same array as a or b, return that instead
-  // TO_DO: track whether this is possible above during merge sort for speed
+  // TODO: track whether this is possible above during merge sort for speed
   if (*M == *a) {
     if (mergeCache != nullptr) {
       mergeCache->put(a, b, a);

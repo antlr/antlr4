@@ -15,7 +15,7 @@
 /// 
 
 public final class LexerPushModeAction: LexerAction, CustomStringConvertible {
-    fileprivate final var mode: Int
+    fileprivate let mode: Int
 
     /// 
     /// Constructs a new `pushMode` action with the specified mode value.
@@ -63,15 +63,10 @@ public final class LexerPushModeAction: LexerAction, CustomStringConvertible {
         lexer.pushMode(mode)
     }
 
-
-    override
-    public var hashValue: Int {
-        var hash = MurmurHash.initialize()
-        hash = MurmurHash.update(hash, getActionType().rawValue)
-        hash = MurmurHash.update(hash, mode)
-        return MurmurHash.finish(hash, 2)
-
+    public override func hash(into hasher: inout Hasher) {
+        hasher.combine(mode)
     }
+
     public var description: String {
         return "pushMode(\(mode))"
     }
@@ -79,10 +74,8 @@ public final class LexerPushModeAction: LexerAction, CustomStringConvertible {
 
 
 public func ==(lhs: LexerPushModeAction, rhs: LexerPushModeAction) -> Bool {
-
     if lhs === rhs {
         return true
     }
-
     return lhs.mode == rhs.mode
 }

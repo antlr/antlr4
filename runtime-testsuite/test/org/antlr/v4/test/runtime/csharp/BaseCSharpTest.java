@@ -56,7 +56,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class BaseCSharpTest implements RuntimeTestSupport /*, SpecialRuntimeTestAssert*/ {
+public class BaseCSharpTest implements RuntimeTestSupport {
 	public static final String newline = System.getProperty("line.separator");
 	public static final String pathSep = System.getProperty("path.separator");
 

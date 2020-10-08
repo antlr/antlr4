@@ -19,8 +19,8 @@ public class BasePython3Test extends BasePythonTest {
 
 	@Override
 	protected String getPythonExecutable() {
-		return "python3.5";
-	} // force 3.5
+		return "python3.7";
+	} // force 3.7
 
 	@Override
 	protected void writeLexerTestFile(String lexerName, boolean showDFA) {

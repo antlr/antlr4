@@ -112,7 +112,7 @@ public class ParseTreesDescriptors {
 
 		@Override
 		public boolean ignore(String targetName) {
-			return !targetName.matches("Java|Python2|Python3|Node|Swift|CSharp");
+			return !targetName.matches("Java|Python2|Python3|Node|Swift|CSharp|Dart");
 		}
 	}
 

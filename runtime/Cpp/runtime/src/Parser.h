@@ -193,7 +193,7 @@ namespace antlr4 {
     /// <seealso cref= #notifyErrorListeners </seealso>
     virtual size_t getNumberOfSyntaxErrors();
 
-    virtual Ref<TokenFactory<CommonToken>> getTokenFactory() override;
+    virtual TokenFactory<CommonToken>* getTokenFactory() override;
 
     /// <summary>
     /// Tell our token source and error strategy about a new way to create tokens. </summary>
@@ -272,7 +272,7 @@ namespace antlr4 {
     /// <seealso cref="#_ctx"/> get the current context.
     virtual void enterRule(ParserRuleContext *localctx, size_t state, size_t ruleIndex);
 
-    virtual void exitRule();
+    void exitRule();
 
     virtual void enterOuterAlt(ParserRuleContext *localctx, size_t altNum);
 

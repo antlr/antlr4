@@ -1,6 +1,6 @@
-writeln(s) ::= <<print(<s>)>>
+writeln(s) ::= <<print((<s>) ?? "nil")>>
 
-write(s) ::= <<print(<s>, terminator: "")>>
+write(s) ::= <<print((<s>) ?? "nil", terminator: "")>>
 
 False() ::= "false"
 
@@ -14,9 +14,9 @@ Cast(t,v) ::= "((<v> as! <t>))"
 
 Append(a,b) ::= "<a> + <b>"
 
-Concat(a,b) ::= "<a><b>"
+AppendStr(a,b) ::= <%<Append(a,b)>%>
 
-DeclareLocal(s,v) ::= "var <s> = <v>"
+Concat(a,b) ::= "<a><b>"
 
 AssertIsList(v) ::= "var __ttt__ = <v>;" // just use static type system
 
@@ -26,13 +26,17 @@ InitIntMember(n,v) ::= <%var <n> = <v>%>
 
 InitBooleanMember(n,v) ::= <%var <n> = <v>%>
 
+InitIntVar(n,v) ::= <%<InitIntMember(n,v)>%>
+
+IntArg(n) ::= "int <n>"
+
+VarRef(n) ::= "<n>"
+
 GetMember(n) ::= <%self.<n>%>
 
 SetMember(n,v) ::= <%self.<n> = <v>%>
 
 AddMember(n,v) ::= <%self.<n> += <v>%>
-
-PlusMember(v,n) ::= <%<v> + self.<n>%>
 
 MemberEquals(n,v) ::= <%self.<n> == <v>%>
 
@@ -96,6 +100,8 @@ ParserPropertyCall(parser, property) ::= <<
 <parser>.<property>
 >>
 
+PositionAdjustingLexerDef() ::= ""
+
 PositionAdjustingLexer() ::= <<
 
 override
@@ -123,7 +129,7 @@ open func emit() -> Token  {
 private func handleAcceptPositionForIdentifier() -> Bool {
 	let tokenText = getText()
 	var identifierLength = 0
-	while ((identifierLength \< tokenText.characters.count)  &&  isIdentifierChar(tokenText[tokenText.characters.index(tokenText.startIndex, offsetBy: identifierLength)])) {
+	while ((identifierLength \< tokenText.count)  &&  isIdentifierChar(tokenText[tokenText.index(tokenText.startIndex, offsetBy: identifierLength)])) {
 		identifierLength += 1
 	}
 
@@ -137,8 +143,8 @@ private func handleAcceptPositionForIdentifier() -> Bool {
 }
 
 private func handleAcceptPositionForKeyword(_ keyword:String) -> Bool  {
-	if  getInputStream()!.index() > _tokenStartCharIndex + keyword.characters.count   {
-		let offset = keyword.characters.count  - 1
+	if getInputStream()!.index() > _tokenStartCharIndex + keyword.count {
+		let offset = keyword.count - 1
 		(getInterpreter() as! PositionAdjustingLexerATNSimulator).resetAcceptPosition(getInputStream()!, _tokenStartCharIndex + offset, _tokenStartLine, _tokenStartCharPositionInLine + offset)
 		return true
 	}

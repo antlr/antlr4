@@ -326,8 +326,8 @@ public class IntervalSet: IntSet, Hashable, CustomStringConvertible {
             return nil // nothing in common with null set
         }
 
-        var myIntervals = self.intervals
-        var theirIntervals = (other as! IntervalSet).intervals
+        let myIntervals = self.intervals
+        let theirIntervals = (other as! IntervalSet).intervals
         var intersection: IntervalSet? = nil
         let mySize = myIntervals.count
         let theirSize = theirIntervals.count
@@ -470,25 +470,13 @@ public class IntervalSet: IntSet, Hashable, CustomStringConvertible {
         return intervals
     }
 
-
-    public func hashCode() -> Int {
-        var hash = MurmurHash.initialize()
-        for I: Interval in intervals {
-            hash = MurmurHash.update(hash, I.a)
-            hash = MurmurHash.update(hash, I.b)
+    public func hash(into hasher: inout Hasher) {
+        for interval in intervals {
+            hasher.combine(interval.a)
+            hasher.combine(interval.b)
         }
-
-        return MurmurHash.finish(hash, intervals.count * 2)
     }
-    public var hashValue: Int {
-        var hash = MurmurHash.initialize()
-        for I: Interval in intervals {
-            hash = MurmurHash.update(hash, I.a)
-            hash = MurmurHash.update(hash, I.b)
-        }
 
-        return MurmurHash.finish(hash, intervals.count * 2)
-    }
     /// 
     /// Are two IntervalSets equal?  Because all intervals are sorted
     /// and disjoint, equals is a simple linear walk over both lists

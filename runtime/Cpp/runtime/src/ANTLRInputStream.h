@@ -25,11 +25,19 @@ namespace antlr4 {
     /// What is name or source of this char stream?
     std::string name;
 
+#if __cplusplus >= 201703L
+    ANTLRInputStream(std::string_view input = "");
+#else
     ANTLRInputStream(const std::string &input = "");
+#endif
     ANTLRInputStream(const char data_[], size_t numberOfActualCharsInArray);
     ANTLRInputStream(std::istream &stream);
 
+#if __cplusplus >= 201703L
+    virtual void load(std::string_view input);
+#else
     virtual void load(const std::string &input);
+#endif
     virtual void load(std::istream &stream);
 
     /// Reset the stream so that it's in the same state it was

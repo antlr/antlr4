@@ -4,8 +4,6 @@
 
 import unittest
 
-from antlr4.IntervalSet import Interval
-
 from mocks.TestLexer import TestLexer, TestLexer2
 from antlr4.TokenStreamRewriter import TokenStreamRewriter
 from antlr4.InputStream import InputStream
@@ -88,8 +86,8 @@ class TestTokenStreamRewriter(unittest.TestCase):
         rewriter.replaceRange(4, 8, '0')
 
         self.assertEquals(rewriter.getDefaultText(), 'x = 0;')
-        self.assertEquals(rewriter.getText('default', Interval(0, 9)), 'x = 0;')
-        self.assertEquals(rewriter.getText('default', Interval(4, 8)), '0')
+        self.assertEquals(rewriter.getText('default', 0, 9), 'x = 0;')
+        self.assertEquals(rewriter.getText('default', 4, 8), '0')
 
     def testToStringStartStop2(self):
         input = InputStream('x = 3 * 0 + 2 * 0;')
@@ -103,15 +101,15 @@ class TestTokenStreamRewriter(unittest.TestCase):
         # replace 3 * 0 with 0
         rewriter.replaceRange(4, 8, '0')
         self.assertEquals('x = 0 + 2 * 0;', rewriter.getDefaultText())
-        self.assertEquals('x = 0 + 2 * 0;', rewriter.getText('default', Interval(0, 17)))
-        self.assertEquals('0', rewriter.getText('default', Interval(4, 8)))
-        self.assertEquals('x = 0', rewriter.getText('default', Interval(0, 8)))
-        self.assertEquals('2 * 0', rewriter.getText('default', Interval(12, 16)))
+        self.assertEquals('x = 0 + 2 * 0;', rewriter.getText('default', 0, 17))
+        self.assertEquals('0', rewriter.getText('default', 4, 8))
+        self.assertEquals('x = 0', rewriter.getText('default', 0, 8))
+        self.assertEquals('2 * 0', rewriter.getText('default', 12, 16))
 
         rewriter.insertAfter(17, "// comment")
-        self.assertEquals('2 * 0;// comment', rewriter.getText('default', Interval(12, 18)))
+        self.assertEquals('2 * 0;// comment', rewriter.getText('default', 12, 18))
 
-        self.assertEquals('x = 0', rewriter.getText('default', Interval(0, 8)))
+        self.assertEquals('x = 0', rewriter.getText('default', 0, 8))
 
     def test2ReplaceMiddleIndex(self):
         input = InputStream('abc')

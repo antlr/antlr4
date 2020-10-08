@@ -14,10 +14,13 @@ class RuntimeMetaDataTests: XCTestCase {
         doGetMajorMinorVersionTest("4.", "4.")
         doGetMajorMinorVersionTest("4.7", "4.7")
         doGetMajorMinorVersionTest("4.7.1", "4.7")
+        doGetMajorMinorVersionTest("4.7.2", "4.7")
+        doGetMajorMinorVersionTest("4.8", "4.8")
         doGetMajorMinorVersionTest("4-SNAPSHOT", "4")
         doGetMajorMinorVersionTest("4.-SNAPSHOT", "4.")
         doGetMajorMinorVersionTest("4.7-SNAPSHOT", "4.7")
         doGetMajorMinorVersionTest("4.7.1-SNAPSHOT", "4.7")
+        doGetMajorMinorVersionTest("4.7.2-SNAPSHOT", "4.7")
     }
 }
 

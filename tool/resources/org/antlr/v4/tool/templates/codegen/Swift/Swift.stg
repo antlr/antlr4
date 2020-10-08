@@ -354,7 +354,7 @@ func getVocabulary() -> Vocabulary {
 
 override <accessLevelNotOpen(parser)>
 init(_ input:TokenStream) throws {
-    RuntimeMetaData.checkVersion("4.7.1", RuntimeMetaData.VERSION)
+    RuntimeMetaData.checkVersion("4.8", RuntimeMetaData.VERSION)
 	try super.init(input)
 	_interp = ParserATNSimulator(self,<p.name>._ATN,<p.name>._decisionToDFA, <parser.name>._sharedContextCache)
 }
@@ -848,11 +848,11 @@ StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMe
 	func getRuleIndex() -> Int {
 		return <parser.name>.RULE_<struct.derivedFromName>
 	}
-<if(struct.provideCopyFrom)> <! don't need copy unless we have subclasses !>
-	<! <accessLevelNotOpen(parser)> init() { }!>
+<if(struct.provideCopyFrom && struct.attrs)> <! don't need copy unless we have subclasses !>
 	<accessLevelOpenOK(parser)>
-	func copyFrom(_ ctx: <struct.name>) {
-		super.copyFrom(ctx)
+	override func copyFrom(_ ctx_: ParserRuleContext) {
+		super.copyFrom(ctx_)
+		let ctx = ctx_ as! <struct.name>
 		<struct.attrs:{a | self.<a.name> = ctx.<a.name>;}; separator="\n">
 	}
 <endif>

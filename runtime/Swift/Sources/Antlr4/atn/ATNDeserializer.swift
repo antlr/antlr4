@@ -60,7 +60,7 @@ public class ATNDeserializer {
     private let deserializationOptions: ATNDeserializationOptions
 
     public init(_ deserializationOptions: ATNDeserializationOptions? = nil) {
-        self.deserializationOptions = deserializationOptions ?? ATNDeserializationOptions.getDefaultOptions()
+        self.deserializationOptions = deserializationOptions ?? ATNDeserializationOptions()
     }
 
     /// 
@@ -78,8 +78,8 @@ public class ATNDeserializer {
     /// 
     internal func isFeatureSupported(_ feature: UUID, _ actualUuid: UUID) -> Bool {
         let supported = ATNDeserializer.SUPPORTED_UUIDS
-        guard let featureIndex = supported.index(of: feature),
-            let actualIndex = supported.index(of: actualUuid) else {
+        guard let featureIndex = supported.firstIndex(of: feature),
+            let actualIndex = supported.firstIndex(of: actualUuid) else {
                 return false
         }
         return actualIndex >= featureIndex
@@ -667,13 +667,13 @@ public class ATNDeserializer {
 
     private func finalizeATN(_ atn: ATN) throws {
         markPrecedenceDecisions(atn)
-        if deserializationOptions.isVerifyATN() {
+        if deserializationOptions.verifyATN {
             try verifyATN(atn)
         }
-        if deserializationOptions.isGenerateRuleBypassTransitions() && atn.grammarType == ATNType.parser {
+        if deserializationOptions.generateRuleBypassTransitions && atn.grammarType == ATNType.parser {
             try generateRuleBypassTransitions(atn)
 
-            if deserializationOptions.isVerifyATN() {
+            if deserializationOptions.verifyATN {
                 // reverify after modification
                 try verifyATN(atn)
             }
