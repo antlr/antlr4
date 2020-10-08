@@ -208,6 +208,7 @@ YYYY/MM/DD, github id, Full name, email
 2018/07/03, jgoppert, James Goppert, james.goppert@gmail.com
 2018/07/27, Maksim Novikov, mnovikov.work@gmail.com
 2018/08/03, ENDOH takanao, djmchl@gmail.com
+2018/10/08, xsIceman, Andreas Skaar, andreas.skaar@gmail.com
 2018/10/18, edirgarcia, Edir García Lazo, edirgl@hotmail.com
 2018/07/31, Lucas Henrqiue, lucashenrique580@gmail.com
 2018/08/03, ENDOH takanao, djmchl@gmail.com
