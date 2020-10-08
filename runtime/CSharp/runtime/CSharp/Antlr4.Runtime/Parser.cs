@@ -22,20 +22,20 @@ namespace Antlr4.Runtime
 #if !PORTABLE
         public class TraceListener : IParseTreeListener
         {
-            private readonly TextWriter Output;
 
-            public TraceListener(TextWriter output) {
-                Output = output;
+            public TraceListener(TextWriter output,Parser enclosing) {
+                _output = output;
+                _enclosing = enclosing;
             }
 
             public virtual void EnterEveryRule(ParserRuleContext ctx)
             {
-                Output.WriteLine("enter   " + this._enclosing.RuleNames[ctx.RuleIndex] + ", LT(1)=" + this._enclosing._input.LT(1).Text);
+                _output.WriteLine("enter   " + this._enclosing.RuleNames[ctx.RuleIndex] + ", LT(1)=" + this._enclosing._input.LT(1).Text);
             }
 
             public virtual void ExitEveryRule(ParserRuleContext ctx)
             {
-                Output.WriteLine("exit    " + this._enclosing.RuleNames[ctx.RuleIndex] + ", LT(1)=" + this._enclosing._input.LT(1).Text);
+                _output.WriteLine("exit    " + this._enclosing.RuleNames[ctx.RuleIndex] + ", LT(1)=" + this._enclosing._input.LT(1).Text);
             }
 
             public virtual void VisitErrorNode(IErrorNode node)
@@ -46,15 +46,17 @@ namespace Antlr4.Runtime
             {
                 ParserRuleContext parent = (ParserRuleContext)((IRuleNode)node.Parent).RuleContext;
                 IToken token = node.Symbol;
-                Output.WriteLine("consume " + token + " rule " + this._enclosing.RuleNames[parent.RuleIndex]);
+                _output.WriteLine("consume " + token + " rule " + this._enclosing.RuleNames[parent.RuleIndex]);
             }
 
             internal TraceListener(Parser _enclosing)
             {
                 this._enclosing = _enclosing;
+                _output = Console.Out;
             }
 
             private readonly Parser _enclosing;
+            private readonly TextWriter _output;
         }
 #endif
 
