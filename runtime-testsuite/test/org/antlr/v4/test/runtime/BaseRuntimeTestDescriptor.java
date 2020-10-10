@@ -165,8 +165,8 @@ public abstract class BaseRuntimeTestDescriptor implements RuntimeTestDescriptor
 
 	@Override
 	public boolean ignore(String targetName) {
-		if("Node".equals(targetName) || "Swift".equals(targetName))
-			return !isAppVeyorCI();
+		if(isAppVeyorCI())
+			return !targetName.matches("CSharp");
 		else
 			return false;
 	}
