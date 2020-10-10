@@ -8,6 +8,8 @@ environment:
   nodejs_version: "14"
 install:
   - ps: Install-Product node $env:nodejs_version
+  - node --version
+  - npm --version
   - git submodule update --init --recursive
   - cinst -y php --params "/InstallDir:C:\tools\php"
   - cinst -y composer
