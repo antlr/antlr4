@@ -113,7 +113,7 @@ public class ParseTreesDescriptors {
 		@Override
 		public boolean ignore(String targetName) {
 			if(isAppVeyorCI())
-				return "Node".equals(targetName) || "Swift".equals(targetName);
+				return targetName.matches("Node|Swift");
 			else
 				return !targetName.matches("Java|Python2|Python3|Node|Swift|CSharp|Dart");
 		}
