@@ -2,4 +2,8 @@
 
 set -euo pipefail
 
-mvn -q -Dparallel=methods -DthreadCount=4 -Dtest=javascript.* test
+cd ../runtime/JavaScript
+npm install
+npm link
+cd ../../runtime-testsuite
+mvn -q -Dparallel=methods -DthreadCount=1 -Dtest=javascript.* test
