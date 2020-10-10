@@ -12,7 +12,7 @@ public abstract class TestContext {
 
 	public static boolean isSupportedTarget(String target) {
 		if(isAppVeyorCI())
-			return !target.matches("Cpp|Swift|Node");
+			return !target.matches("Swift|Node");
 		else
 			return true;
 	}
