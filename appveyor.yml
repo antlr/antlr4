@@ -4,12 +4,7 @@ cache:
   - '%USERPROFILE%\.nuget\packages -> **\project.json'
 image: Visual Studio 2017  
 build: off
-environment:
-  nodejs_version: "14"
 install:
-  - ps: Install-Product node $env:nodejs_version
-  - node --version
-  - npm --version
   - git submodule update --init --recursive
   - cinst -y php --params "/InstallDir:C:\tools\php"
   - cinst -y composer

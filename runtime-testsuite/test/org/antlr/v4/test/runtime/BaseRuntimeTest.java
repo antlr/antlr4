@@ -52,6 +52,7 @@ public abstract class BaseRuntimeTest {
 		"Python2", "Python3",
 		"PHP",
 		"Node",
+		"Swift",
 		"Dart"
 	};
 
