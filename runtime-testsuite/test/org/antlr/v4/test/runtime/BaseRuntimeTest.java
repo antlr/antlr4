@@ -98,7 +98,7 @@ public abstract class BaseRuntimeTest {
 		// "The default JUnit runner treats tests with failing assumptions as ignored"
 		boolean ignored = descriptor.ignore(descriptor.getTarget());
 		if(ignored)
-			System.out.printf("Ignore " + descriptor);
+			System.out.println("Ignore " + descriptor);
 		assumeFalse(ignored);
 		delegate.testSetUp();
 	}
@@ -116,7 +116,7 @@ public abstract class BaseRuntimeTest {
 	public void testOne() throws Exception {
 		// System.out.println(delegate.getTmpDir());
 		if ( descriptor.ignore(descriptor.getTarget()) ) {
-			System.out.printf("Ignore " + descriptor);
+			System.out.println("Ignore " + descriptor);
 			return;
 		}
 

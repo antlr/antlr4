@@ -112,10 +112,7 @@ public class ParseTreesDescriptors {
 
 		@Override
 		public boolean ignore(String targetName) {
-			if(isAppVeyorCI())
-				return !targetName.matches("CSharp");
-			else
-				return !targetName.matches("Java|Python2|Python3|Node|Swift|CSharp|Dart");
+			return !targetName.matches("Java|Python2|Python3|Node|Swift|CSharp|Dart");
 		}
 	}
 
