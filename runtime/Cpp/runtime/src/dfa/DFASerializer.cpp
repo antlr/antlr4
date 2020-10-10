@@ -27,7 +27,7 @@ std::string DFASerializer::toString() const {
 
   std::stringstream ss;
   std::vector<DFAState *> states = _dfa->getStates();
-  for (auto s : states) {
+  for (auto *s : states) {
     for (size_t i = 0; i < s->edges.size(); i++) {
       DFAState *t = s->edges[i];
       if (t != nullptr && t->stateNumber != INT32_MAX) {

@@ -774,7 +774,7 @@ std::pair<ATNConfigSet *, ATNConfigSet *> ParserATNSimulator::splitAccordingToSe
 BitSet ParserATNSimulator::evalSemanticContext(std::vector<dfa::DFAState::PredPrediction*> predPredictions,
                                                ParserRuleContext *outerContext, bool complete) {
   BitSet predictions;
-  for (auto prediction : predPredictions) {
+  for (auto *prediction : predPredictions) {
     if (prediction->pred == SemanticContext::NONE) {
       predictions.set(prediction->alt);
       if (!complete) {

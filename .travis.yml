@@ -153,6 +153,10 @@ matrix:
       env: TARGET=csharp
       stage: main-test
     - os: linux
+      jdk: openjdk8
+      env: TARGET=dart
+      stage: main-test
+    - os: linux
       language: php
       php:
         - 7.2

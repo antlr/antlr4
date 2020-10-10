@@ -4,7 +4,7 @@
  */
 
 const RuleContext = require('./RuleContext');
-const {Hash, Map} = require('./Utils');
+const {Hash, Map, equalArrays} = require('./Utils');
 
 class PredictionContext {
 	constructor(cachedHashCode) {
@@ -249,8 +249,8 @@ class ArrayPredictionContext extends PredictionContext {
 		} else if (this.hashCode() !== other.hashCode()) {
 			return false; // can't be same if hash is different
 		} else {
-			return this.returnStates === other.returnStates &&
-					this.parents === other.parents;
+			return equalArrays(this.returnStates, other.returnStates) &&
+				equalArrays(this.parents, other.parents);
 		}
 	}
 
@@ -557,7 +557,7 @@ function mergeArrays(a, b, rootIsWildcard, mergeCache) {
 	while (i < a.returnStates.length && j < b.returnStates.length) {
 		const a_parent = a.parents[i];
 		const b_parent = b.parents[j];
-		if (a.returnStates[i] === b.returnStates[j]) {
+		if (equalArrays(a.returnStates[i], b.returnStates[j])) {
 			// same payload (stack tops are equal), must yield merged singleton
 			const payload = a.returnStates[i];
 			// $+$ = $

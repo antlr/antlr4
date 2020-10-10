@@ -66,11 +66,11 @@ String.prototype.hashCode = function () {
 };
 
 function standardEqualsFunction(a, b) {
-    return a.equals(b);
+    return a ? a.equals(b) : a==b;
 }
 
 function standardHashCodeFunction(a) {
-    return a.hashCode();
+    return a ? a.hashCode() : -1;
 }
 
 class Set {
@@ -430,7 +430,7 @@ function equalArrays(a, b) {
     for (let i = 0; i < a.length; i++) {
         if (a[i] == b[i])
             continue;
-        if (!a[i].equals(b[i]))
+        if (!a[i].equals || !a[i].equals(b[i]))
             return false;
     }
     return true;

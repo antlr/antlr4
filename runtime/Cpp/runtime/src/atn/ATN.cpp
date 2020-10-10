@@ -183,7 +183,7 @@ std::string ATN::toString() const {
   ss << "states (" << states.size() << ") {" << std::endl;
 
   size_t index = 0;
-  for (auto state : states) {
+  for (auto *state : states) {
     if (state == nullptr) {
       ss << "  " << index++ << ": nul" << std::endl;
     } else {
@@ -193,7 +193,7 @@ std::string ATN::toString() const {
   }
 
   index = 0;
-  for (auto state : decisionToState) {
+  for (auto *state : decisionToState) {
     if (state == nullptr) {
       ss << "  " << index++ << ": nul" << std::endl;
     } else {
