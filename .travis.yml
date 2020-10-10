@@ -19,8 +19,9 @@ stages:
 matrix:
   include:
     - os: linux
+      dist: trusty
       compiler: clang
-      jdk: openjdk7
+      jdk: openjdk8
       env:
         - TARGET=cpp
         - CXX=g++-5
@@ -36,8 +37,9 @@ matrix:
             - uuid-dev
             - clang-3.7
     - os: linux
+      dist: trusty
       compiler: clang
-      jdk: openjdk7
+      jdk: openjdk8
       env:
         - TARGET=cpp
         - CXX=g++-5
@@ -53,8 +55,9 @@ matrix:
             - uuid-dev
             - clang-3.7
     - os: linux
+      dist: trusty
       compiler: clang
-      jdk: openjdk7
+      jdk: openjdk8
       env:
         - TARGET=cpp
         - CXX=g++-5
@@ -71,42 +74,42 @@ matrix:
             - clang-3.7
     - os: osx
       compiler: clang
-      osx_image: xcode10.1
+      osx_image: xcode10.2
       env:
         - TARGET=cpp
         - GROUP=LEXER
       stage: extended-test
     - os: osx
       compiler: clang
-      osx_image: xcode10.1
+      osx_image: xcode10.2
       env:
         - TARGET=cpp
         - GROUP=PARSER
       stage: extended-test
     - os: osx
       compiler: clang
-      osx_image: xcode10.1
+      osx_image: xcode10.2
       env:
         - TARGET=cpp
         - GROUP=RECURSION
       stage: extended-test
     - os: osx
       compiler: clang
-      osx_image: xcode10.1
+      osx_image: xcode10.2
       env:
         - TARGET=swift
         - GROUP=LEXER
       stage: main-test
     - os: osx
       compiler: clang
-      osx_image: xcode10.1
+      osx_image: xcode10.2
       env:
         - TARGET=swift
         - GROUP=PARSER
       stage: main-test
     - os: osx
       compiler: clang
-      osx_image: xcode10.1
+      osx_image: xcode10.2
       env:
         - TARGET=swift
         - GROUP=RECURSION
@@ -119,41 +122,49 @@ matrix:
        - GROUP=ALL
       stage: extended-test
     - os: osx
-      osx_image: xcode10.1
+      osx_image: xcode10.2
       env:
         - TARGET=dotnet
         - GROUP=LEXER
       stage: extended-test
     - os: osx
-      osx_image: xcode10.1
+      osx_image: xcode10.2
       env:
         - TARGET=dotnet
         - GROUP=PARSER
       stage: extended-test
     - os: osx
-      osx_image: xcode10.1
+      osx_image: xcode10.2
       env:
         - TARGET=dotnet
         - GROUP=RECURSION
       stage: extended-test
     - os: linux
+      dist: trusty
       jdk: openjdk7
       env: TARGET=java
       stage: extended-test
     - os: linux
       jdk: openjdk8
-      env: TARGET=java
-      stage: extended-test
-    - os: linux
-      jdk: oraclejdk8
       env: TARGET=java
       stage: smoke-test
     - os: linux
-      jdk: openjdk7
+      jdk: openjdk8
       env: TARGET=csharp
       stage: main-test
     - os: linux
-      jdk: oraclejdk8
+      jdk: openjdk8
+      env: TARGET=dart
+      stage: main-test
+    - os: linux
+      language: php
+      php:
+        - 7.2
+      jdk: openjdk8
+      env: TARGET=php
+      stage: main-test
+    - os: linux
+      jdk: openjdk8
       dist: trusty
       env:
         - TARGET=dotnet
@@ -167,25 +178,25 @@ matrix:
         - GROUP=PARSER
       stage: extended-test
     - os: linux
-      jdk: oraclejdk8
+      jdk: openjdk8
       dist: trusty
       env:
         - TARGET=dotnet
         - GROUP=RECURSION
       stage: extended-test
     - os: linux
-      jdk: openjdk7
+      jdk: openjdk8
       env: TARGET=python2
       stage: main-test
     - os: linux
-      jdk: openjdk7
+      jdk: openjdk8
       env: TARGET=python3
       addons:
         apt:
           sources:
             - deadsnakes # source required so it finds the package definition below
           packages:
-            - python3.6
+            - python3.7
       stage: main-test
     - os: linux
       dist: trusty

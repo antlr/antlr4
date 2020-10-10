@@ -23,9 +23,9 @@ namespace tree {
     virtual antlrcpp::Any accept(ParseTreeVisitor *visitor) override;
 
     virtual std::string getText() override;
-    virtual std::string toStringTree(Parser *parser) override;
+    virtual std::string toStringTree(Parser *parser, bool pretty = false) override;
     virtual std::string toString() override;
-    virtual std::string toStringTree() override;
+    virtual std::string toStringTree(bool pretty = false) override;
 
   };
 

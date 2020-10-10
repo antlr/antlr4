@@ -82,11 +82,11 @@ std::string ListTokenSource::getSourceName() {
   return "List";
 }
 
-Ref<TokenFactory<CommonToken>> ListTokenSource::getTokenFactory() {
+TokenFactory<CommonToken>* ListTokenSource::getTokenFactory() {
   return _factory;
 }
 
 void ListTokenSource::InitializeInstanceFields() {
   i = 0;
-  _factory = CommonTokenFactory::DEFAULT;
+  _factory = CommonTokenFactory::DEFAULT.get();
 }

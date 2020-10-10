@@ -46,7 +46,7 @@ namespace antlrcpp {
 
         case ' ':
           if (escapeSpaces) {
-            result += "·";
+            result += "\u00B7";
             break;
           }
           // else fall through

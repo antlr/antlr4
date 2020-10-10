@@ -50,10 +50,9 @@ public abstract class BaseRuntimeTest {
 		"Go",
 		"CSharp",
 		"Python2", "Python3",
-		"Node", "Safari", "Firefox", "Explorer", "Chrome"
-	};
-	public final static String[] JavaScriptTargets = {
-		"Node", "Safari", "Firefox", "Explorer", "Chrome"
+		"PHP",
+		"Node",
+		"Dart"
 	};
 
 	static {
@@ -116,6 +115,7 @@ public abstract class BaseRuntimeTest {
 			System.out.printf("Ignore "+descriptor);
 			return;
 		}
+
 		if ( descriptor.getTestType().contains("Parser") ) {
 			testParser(descriptor);
 		}
@@ -300,6 +300,16 @@ public abstract class BaseRuntimeTest {
 		}
 	}
 
+	public static String readFile(String dir, String fileName) {
+		try {
+			return String.copyValueOf(Utils.readFile(dir+"/"+fileName, "UTF-8"));
+		}
+		catch (IOException ioe) {
+			System.err.println("can't read file");
+			ioe.printStackTrace(System.err);
+		}
+		return null;
+	}
 
 	protected static void assertCorrectOutput(RuntimeTestDescriptor descriptor, RuntimeTestSupport delegate, String actualOutput) {
 		String actualParseErrors = delegate.getParseErrors();

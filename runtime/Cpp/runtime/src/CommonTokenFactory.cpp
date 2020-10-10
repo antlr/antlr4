@@ -11,7 +11,7 @@
 
 using namespace antlr4;
 
-const Ref<TokenFactory<CommonToken>> CommonTokenFactory::DEFAULT = std::make_shared<CommonTokenFactory>();
+const std::unique_ptr<TokenFactory<CommonToken>> CommonTokenFactory::DEFAULT(new CommonTokenFactory);
 
 CommonTokenFactory::CommonTokenFactory(bool copyText_) : copyText(copyText_) {
 }

@@ -15,7 +15,7 @@ The tests were conducted using Selenium. No issue was found, so you should find 
 
 ## Is NodeJS supported?
 
-The runtime has also been extensively tested against Node.js 0.12.7. No issue was found.
+The runtime has also been extensively tested against Node.js 10 LTS. No issue was found.
 
 ## How to create a JavaScript lexer or parser?
 
@@ -55,31 +55,16 @@ You can get [information on webpack here](https://webpack.github.io).
 
 The steps to create your parsing code are the following:
  - generate your lexer, parser, listener and visitor using the antlr tool
- - write your parse tree handling code by providig your custom listener or visitor, and associated code, using 'require' to load antlr.
+ - write your parse tree handling code by providing your custom listener or visitor, and associated code, using 'require' to load antlr.
  - create an index.js file with the entry point to your parsing code (or several if required).
  - test your parsing logic thoroughly using node.js
  
 You are now ready to bundle your parsing code as follows:
  - following webpack specs, create a webpack.config file
- - in the webpack.config file, exclude node.js only modules using: node: { module: "empty", net: "empty", fs: "empty" }
+ - in the `webpack.config` file, exclude node.js only modules using: `node: { module: "empty", net: "empty", fs: "empty" }`
  - from the cmd line, navigate to the directory containing webpack.config and type: webpack
  
 This will produce a single js file containing all your parsing code. Easy to include in your web pages!
-
-If you can't use webpack, you can use the lib/require.js script which implements the Node.js 'require' function in brwsers.
-
-This script is provided by Torben Haase, and is NOT part of ANTLR JavaScript runtime.   
-
-Assuming you have, at the root of your web site, both the 'antlr4' directory and a 'lib' directory with 'require.js' inside it, all you need to put in your HTML header is the following:
-
-```xml
-<script src='lib/require.js'>
-<script>
-    var antlr4 = require('antlr4/index');
- </script>
-```
-
-This will load the runtime asynchronously.
 
 ## How do I run the generated lexer and/or parser?
 
@@ -117,6 +102,44 @@ This program will work. But it won't be useful unless you do one of the followin
  
 (please note that production code is target specific, so you can't have multi target grammars that include production code)
  
+## How do I create and run a visitor?
+```javascript
+// test.js
+var antlr4 = require('antlr4');
+var MyGrammarLexer = require('./QueryLexer').QueryLexer;
+var MyGrammarParser = require('./QueryParser').QueryParser;
+var MyGrammarListener = require('./QueryListener').QueryListener;
+
+
+var input = "field = 123 AND items in (1,2,3)"
+var chars = new antlr4.InputStream(input);
+var lexer = new MyGrammarLexer(chars);
+var tokens = new antlr4.CommonTokenStream(lexer);
+var parser = new MyGrammarParser(tokens);
+parser.buildParseTrees = true;
+var tree = parser.query();
+
+class Visitor {
+  visitChildren(ctx) {
+    if (!ctx) {
+      return;
+    }
+
+    if (ctx.children) {
+      return ctx.children.map(child => {
+        if (child.children && child.children.length != 0) {
+          return child.accept(this);
+        } else {
+          return child.getText();
+        }
+      });
+    }
+  }
+}
+
+tree.accept(new Visitor());
+````
+
 ## How do I create and run a custom listener?
 
 Let's suppose your MyGrammar grammar comprises 2 rules: "key" and "value". The antlr4 tool will have generated the following listener: 

@@ -31,7 +31,7 @@ include_directories(${ANTLR4_INCLUDE_DIRS})
 
 # set variable pointing to the antlr tool that supports C++
 # this is not required if the jar file can be found under PATH environment
-set(ANTLR_EXECUTABLE /home/user/antlr-4.7.2-complete.jar)
+set(ANTLR_EXECUTABLE /home/user/antlr-4.8-complete.jar)
 # add macros to generate ANTLR Cpp code from grammar
 find_package(ANTLR REQUIRED)
 
@@ -40,7 +40,8 @@ antlr_target(SampleGrammarLexer TLexer.g4 LEXER
              PACKAGE antlrcpptest)
 antlr_target(SampleGrammarParser TParser.g4 PARSER
              PACKAGE antlrcpptest
-             DEPENDS_ANTLR SampleGrammarLexer)
+             DEPENDS_ANTLR SampleGrammarLexer
+             COMPILE_FLAGS -lib ${ANTLR_SampleGrammarLexer_OUTPUT_DIR})
 
 # include generated files in project environment
 include_directories(${ANTLR_SampleGrammarLexer_OUTPUT_DIR})

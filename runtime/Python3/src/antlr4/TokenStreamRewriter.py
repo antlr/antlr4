@@ -156,13 +156,12 @@ class TokenStreamRewriter(object):
                     rewrites[prevRop.instructionIndex] = None
                     continue
                 isDisjoint = any((prevRop.last_index<rop.index, prevRop.index>rop.last_index))
-                isSame = all((prevRop.index == rop.index, prevRop.last_index == rop.last_index))
                 if all((prevRop.text is None, rop.text is None, not isDisjoint)):
                     rewrites[prevRop.instructionIndex] = None
                     rop.index = min(prevRop.index, rop.index)
                     rop.last_index = min(prevRop.last_index, rop.last_index)
                     print('New rop {}'.format(rop))
-                elif not all((isDisjoint, isSame)):
+                elif (not(isDisjoint)):
                     raise ValueError("replace op boundaries of {} overlap with previous {}".format(rop, prevRop))
 
         # Walk inserts

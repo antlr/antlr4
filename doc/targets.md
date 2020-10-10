@@ -9,12 +9,14 @@ This page lists the available and upcoming ANTLR runtimes. Please note that you 
 * [Go](go-target.md)
 * [C++](cpp-target.md)
 * [Swift](swift-target.md)
+* [PHP](php-target.md)
+* [Dart](dart-target.md)
 
 ## Target feature parity
 
 New features generally appear in the Java target and then migrate to the other targets, but these other targets don't always get updated in the same overall tool release. This section tries to identify features added to Java that have not been added to the other targets.
 
-|Feature|Java|C&sharp;|Python2|Python3|JavaScript|Go|C++|Swift|
-|---|---|---|---|---|---|---|---|---|
-|Ambiguous tree construction|4.5.1|-|-|-|-|-|-|-|
+|Feature|Java|C&sharp;|Python2|Python3|JavaScript|Go|C++|Swift|PHP|Dart
+|---|---|---|---|---|---|---|---|---|---|---|
+|Ambiguous tree construction|4.5.1|-|-|-|-|-|-|-|-|-|
 

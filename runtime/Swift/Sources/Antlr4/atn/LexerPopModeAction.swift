@@ -57,21 +57,15 @@ public final class LexerPopModeAction: LexerAction, CustomStringConvertible {
     }
 
 
-    override
-    public var hashValue: Int {
-        var hash = MurmurHash.initialize()
-        hash = MurmurHash.update(hash, getActionType().rawValue)
-        return MurmurHash.finish(hash, 1)
-
+    public override func hash(into hasher: inout Hasher) {
+        hasher.combine(ObjectIdentifier(self))
     }
+
     public var description: String {
         return "popMode"
     }
 }
 
 public func ==(lhs: LexerPopModeAction, rhs: LexerPopModeAction) -> Bool {
-
     return lhs === rhs
-
-
 }

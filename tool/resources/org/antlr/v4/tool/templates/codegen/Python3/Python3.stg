@@ -51,8 +51,11 @@ ParserFile(file, parser, namedActions, contextSuperClass) ::= <<
 # encoding: utf-8
 from antlr4 import *
 from io import StringIO
-from typing.io import TextIO
 import sys
+if sys.version_info[1] > 5:
+	from typing import TextIO
+else:
+	from typing.io import TextIO
 
 <namedActions.header>
 <parser>
@@ -82,6 +85,7 @@ def exit<lname; format="cap">(self, ctx:<file.parserName>.<lname; format="cap">C
 
 }; separator="\n">
 
+del <file.parserName>
 >>
 
 
@@ -579,8 +583,8 @@ ThisRulePropertyRef_text(r)	 ::= "self._input.getText(localctx.start, self._inpu
 ThisRulePropertyRef_ctx(r)	 ::= "localctx"
 ThisRulePropertyRef_parser(r)	 ::= "self"
 
-NonLocalAttrRef(s)		 	 ::= "getInvokingContext(<s.ruleIndex>).<s.name>"
-SetNonLocalAttr(s, rhsChunks)  ::= "getInvokingContext(<s.ruleIndex>).<s.name> = <rhsChunks>"
+NonLocalAttrRef(s)		 	 ::= "self.getInvokingContext(<s.ruleIndex>).<s.name>"
+SetNonLocalAttr(s, rhsChunks)  ::= "self.getInvokingContext(<s.ruleIndex>).<s.name> = <rhsChunks>"
 
 AddToLabelList(a) ::= "<ctx(a.label)>.<a.listName>.append(<labelref(a.label)>)"
 

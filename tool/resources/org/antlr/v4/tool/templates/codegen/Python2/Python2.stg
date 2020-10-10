@@ -110,7 +110,10 @@ Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
 
 Parser_(parser, funcs, atn, sempredFuncs, ctor, superClass) ::= <<
 <if(superClass)>
-from .<superClass> import <superClass>
+if __name__ is not None and "." in __name__:
+    from .<superClass> import <superClass>
+else:
+    from <superClass> import <superClass>
 
 <endif>
 <atn>
@@ -567,8 +570,8 @@ ThisRulePropertyRef_text(r)	 ::= "self._input.getText(localctx.start, self._inpu
 ThisRulePropertyRef_ctx(r)	 ::= "localctx"
 ThisRulePropertyRef_parser(r)	 ::= "self"
 
-NonLocalAttrRef(s)		 	 ::= "getInvokingContext(<s.ruleIndex>).<s.name>"
-SetNonLocalAttr(s, rhsChunks)  ::= "getInvokingContext(<s.ruleIndex>).<s.name> = <rhsChunks>"
+NonLocalAttrRef(s)		 	 ::= "self.getInvokingContext(<s.ruleIndex>).<s.name>"
+SetNonLocalAttr(s, rhsChunks)  ::= "self.getInvokingContext(<s.ruleIndex>).<s.name> = <rhsChunks>"
 
 AddToLabelList(a) ::= "<ctx(a.label)>.<a.listName>.append(<labelref(a.label)>)"
 
@@ -749,7 +752,10 @@ import sys
 
 Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
 <if(superClass)>
-from .<superClass> import <superClass>
+if __name__ is not None and "." in __name__:
+    from .<superClass> import <superClass>
+else:
+    from <superClass> import <superClass>
 
 <endif>
 
