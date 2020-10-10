@@ -46,14 +46,14 @@ import static org.junit.Assume.assumeFalse;
 public abstract class BaseRuntimeTest {
 	public final static String[] Targets = {
 		"Cpp",
-		"Java",
-		"Go",
 		"CSharp",
-		"Python2", "Python3",
-		"PHP",
+		"Dart",
+		"Go",
+		"Java",
 		"Node",
-		"Swift",
-		"Dart"
+		"PHP",
+		"Python2", "Python3",
+		"Swift"
 	};
 
 	static {
@@ -288,8 +288,10 @@ public abstract class BaseRuntimeTest {
 			if ( RuntimeTestDescriptor.class.isAssignableFrom(nestedClass) && !Modifier.isAbstract(modifiers) ) {
 				try {
 					RuntimeTestDescriptor d = (RuntimeTestDescriptor) nestedClass.newInstance();
-					d.setTarget(targetName);
-					descriptors.add(d);
+					if(!d.ignore(targetName)) {
+						d.setTarget(targetName);
+						descriptors.add(d);
+					}
 				} catch (Exception e) {
 					e.printStackTrace(System.err);
 				}
