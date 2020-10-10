@@ -3,27 +3,17 @@ package org.antlr.v4.test.runtime;
 public abstract class TestContext {
 
 	public static boolean isTravisCI() {
-		String value = System.getenv("TRAVIS");
-		if(value==null)
-			return false;
-		else
-			return "true".equals(value.toLowerCase());
+		return "true".equals(String.valueOf(System.getenv("TRAVIS")).toLowerCase());
 	}
 
 	public static boolean isAppVeyorCI() {
-		System.out.println(System.getenv("APPVEYOR"));
-		String value = System.getenv("APPVEYOR");
-		if(value==null)
-			return false;
-		else
-			return "true".equals(value.toLowerCase());
+		return "true".equals(String.valueOf(System.getenv("APPVEYOR")).toLowerCase());
 	}
 
-	public static boolean isUnsupportedTarget(String target) {
+	public static boolean isSupportedTarget(String target) {
 		if(isAppVeyorCI())
-			return !"CSharp".equals(target);
-			// return target.matches("Cpp|Node");
+			return !target.matches("Cpp|Swift|Node");
 		else
-			return false;
+			return true;
 	}
 }

@@ -101,7 +101,7 @@ public abstract class BaseRuntimeTest {
 	}
 
 	public boolean checkIgnored() {
-		boolean ignored = TestContext.isUnsupportedTarget(descriptor.getTarget()) || descriptor.ignore(descriptor.getTarget());
+		boolean ignored = !TestContext.isSupportedTarget(descriptor.getTarget()) || descriptor.ignore(descriptor.getTarget());
 		if(ignored)
 			System.out.println("Ignore " + descriptor);
 		return ignored;
