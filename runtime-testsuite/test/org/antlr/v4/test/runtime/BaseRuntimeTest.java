@@ -96,11 +96,15 @@ public abstract class BaseRuntimeTest {
 	public void setUp() throws Exception {
 		// From http://junit.sourceforge.net/javadoc/org/junit/Assume.html
 		// "The default JUnit runner treats tests with failing assumptions as ignored"
-		boolean ignored = descriptor.ignore(descriptor.getTarget());
+		assumeFalse(checkIgnored());
+		delegate.testSetUp();
+	}
+
+	public boolean checkIgnored() {
+		boolean ignored = TestContext.isUnsupportedTarget(descriptor.getTarget()) || descriptor.ignore(descriptor.getTarget());
 		if(ignored)
 			System.out.println("Ignore " + descriptor);
-		assumeFalse(ignored);
-		delegate.testSetUp();
+		return ignored;
 	}
 
 	@Rule

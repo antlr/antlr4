@@ -34,6 +34,7 @@ import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.test.runtime.ErrorQueue;
 import org.antlr.v4.test.runtime.RuntimeTestSupport;
 import org.antlr.v4.test.runtime.StreamVacuum;
+import org.antlr.v4.test.runtime.TestContext;
 import org.antlr.v4.tool.ANTLRMessage;
 import org.antlr.v4.tool.DOTGenerator;
 import org.antlr.v4.tool.Grammar;
@@ -268,7 +269,7 @@ public class BaseNodeTest implements RuntimeTestSupport {
 	public String execModule(String fileName) {
 		try {
 			String npmPath = locateNpm();
-			if(!isTravisCI()) {
+			if(!TestContext.isTravisCI()) {
 				installRuntime(npmPath);
 				registerRuntime(npmPath);
 			}
@@ -309,10 +310,6 @@ public class BaseNodeTest implements RuntimeTestSupport {
 			System.err.println();
 			return null;
 		}
-	}
-
-	private boolean isTravisCI() {
-		return "true".equals(System.getenv("TRAVIS"));
 	}
 
 	private void installRuntime(String npmPath) throws IOException, InterruptedException {

@@ -168,11 +168,6 @@ public abstract class BaseRuntimeTestDescriptor implements RuntimeTestDescriptor
 		return false;
 	}
 
-	protected boolean isAppVeyorCI() {
-		return "true".equals(System.getenv("APPVEYOR"));
-	}
-
-
 	@Override
 	public String toString() {
 		return getTarget()+":"+getTestName();
