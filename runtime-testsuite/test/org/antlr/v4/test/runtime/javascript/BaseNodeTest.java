@@ -362,16 +362,6 @@ public class BaseNodeTest implements RuntimeTestSupport {
 			throw new IOException("'npm link antlr4' failed");
 	}
 
-	private String locateTool(String tool) {
-		String[] roots = { "/usr/bin/", "/usr/local/bin/" };
-		for (String root : roots) {
-			if (new File(root + tool).exists()) {
-				return root + tool;
-			}
-		}
-		return null;
-	}
-
 	private boolean canExecute(String tool) {
 		try {
 			ProcessBuilder builder = new ProcessBuilder(tool, "--version");
@@ -391,6 +381,11 @@ public class BaseNodeTest implements RuntimeTestSupport {
 	}
 
 	private String locateNpm() {
+		// typically /usr/local/bin/npm
+		String prop = System.getProperty("antlr-javascript-npm");
+		if ( prop!=null && prop.length()!=0 ) {
+			return prop;
+		}
 		return "npm"; // everywhere
 	}
 
