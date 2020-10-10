@@ -281,6 +281,8 @@ public abstract class BaseRuntimeTest {
 	// ---- support ----
 
 	public static RuntimeTestDescriptor[] getRuntimeTestDescriptors(Class<?> clazz, String targetName) {
+		if(!TestContext.isSupportedTarget(targetName))
+			return new RuntimeTestDescriptor[0];
 		Class<?>[] nestedClasses = clazz.getClasses();
 		List<RuntimeTestDescriptor> descriptors = new ArrayList<RuntimeTestDescriptor>();
 		for (Class<?> nestedClass : nestedClasses) {
