@@ -441,7 +441,6 @@ public class BufferedTokenStream implements TokenStream {
 
 	@Override
 	public String getText() {
-		fill();
 		return getText(Interval.of(0,size()-1));
 	}
 
