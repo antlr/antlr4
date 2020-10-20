@@ -252,6 +252,7 @@ YYYY/MM/DD, github id, Full name, email
 2020/04/23, martinvw, Martin van Wingerden, martin@martinvw.nl
 2020/04/30, TristonianJones, Tristan Swadell, tswadell@google.com
 2020/05/06, iammosespaulr, Moses Paul R, iammosespaulr@gmail.com
+2020/05/10, gomerser, Erik Gomersbach, gomerser@gomersba.ch
 2020/06/04, sigmasoldi3r, Pablo Blanco, pablobc.1995@gmail.com
 2020/05/25, graknol, Sindre van der Linden, graknol@gmail.com
 2020/05/31, d-markey, David Markey, dmarkey@free.fr
