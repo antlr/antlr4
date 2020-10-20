@@ -102,4 +102,12 @@ public class PHPTarget extends Target {
 	protected void appendUnicodeEscapedCodePoint(int codePoint, StringBuilder sb) {
 		UnicodeEscapes.appendPythonStyleEscapedCodePoint(codePoint, sb);
 	}
+
+   @Override
+   public String getTargetStringLiteralFromANTLRStringLiteral(CodeGenerator generator, String literal, boolean addQuotes) {
+	   String targetStringLiteral = super.getTargetStringLiteralFromANTLRStringLiteral(generator, literal, addQuotes);
+	   targetStringLiteral = targetStringLiteral.replace("$", "\\$");
+
+	   return targetStringLiteral;
+   }
 }
