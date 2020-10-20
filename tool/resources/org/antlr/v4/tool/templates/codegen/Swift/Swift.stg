@@ -138,13 +138,13 @@ import Antlr4
 	 *
 	 * \<p>The default implementation does nothing.\</p>
 	 */
-	<accessLevelOpenOK(file)> func enterEveryRule(_ ctx: ParserRuleContext) { }
+	<accessLevelOpenOK(file)> func enterEveryRule(_ ctx: ParserRuleContext) throws { }
 	/**
 	 * {@inheritDoc\}
 	 *
 	 * \<p>The default implementation does nothing.\</p>
 	 */
-	<accessLevelOpenOK(file)> func exitEveryRule(_ ctx: ParserRuleContext) { }
+	<accessLevelOpenOK(file)> func exitEveryRule(_ ctx: ParserRuleContext) throws { }
 	/**
 	 * {@inheritDoc\}
 	 *
