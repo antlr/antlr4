@@ -74,7 +74,7 @@ LANotEquals(i, v) ::= <%this._input.LA(<i>)!=<v>%>
 
 TokenStartColumnEquals(i) ::= <%this._tokenStartColumn===<i>%>
 
-ImportListener(X) ::= <<var <X>Listener = require('./<X>Listener').<X>Listener;>>
+ImportListener(X) ::= ""
 
 GetExpectedTokenNames() ::= "this.getExpectedTokens().toString(this.literalNames)"
 

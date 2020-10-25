@@ -208,6 +208,7 @@ YYYY/MM/DD, github id, Full name, email
 2018/07/03, jgoppert, James Goppert, james.goppert@gmail.com
 2018/07/27, Maksim Novikov, mnovikov.work@gmail.com
 2018/08/03, ENDOH takanao, djmchl@gmail.com
+2018/10/08, xsIceman, Andreas Skaar, andreas.skaar@gmail.com
 2018/10/18, edirgarcia, Edir García Lazo, edirgl@hotmail.com
 2018/07/31, Lucas Henrqiue, lucashenrique580@gmail.com
 2018/08/03, ENDOH takanao, djmchl@gmail.com
@@ -218,6 +219,7 @@ YYYY/MM/DD, github id, Full name, email
 2018/11/29, hannemann-tamas, Ralf Hannemann-Tamas, ralf.ht@gmail.com
 2018/12/20, WalterCouto, Walter Couto, WalterCouto@users.noreply.github.com
 2018/12/23, youkaichao, Kaichao You, youkaichao@gmail.com
+2019/01/02, wkhemir, Wail Khemir, khemirwail@gmail.com
 2019/01/16, kuegi, Markus Zancolo, markus.zancolo@roomle.com
 2019/02/06, ralucado, Cristina Raluca Vijulie, ralucris.v[at]gmail[dot]com
 2019/02/23, gedimitr, Gerasimos Dimitriadis, gedimitr@gmail.com
@@ -247,7 +249,10 @@ YYYY/MM/DD, github id, Full name, email
 2020/02/21, StochasticTinkr, Daniel Pitts, github@coloraura.com
 2020/03/17, XsongyangX, Song Yang, songyang1218@gmail.com
 2020/04/07, deniskyashif, Denis Kyashif, denis.kyashif@gmail.com
+2020/04/23, martinvw, Martin van Wingerden, martin@martinvw.nl
 2020/04/30, TristonianJones, Tristan Swadell, tswadell@google.com
+2020/05/06, iammosespaulr, Moses Paul R, iammosespaulr@gmail.com
+2020/05/10, gomerser, Erik Gomersbach, gomerser@gomersba.ch
 2020/06/04, sigmasoldi3r, Pablo Blanco, pablobc.1995@gmail.com
 2020/05/25, graknol, Sindre van der Linden, graknol@gmail.com
 2020/05/31, d-markey, David Markey, dmarkey@free.fr
@@ -259,3 +264,7 @@ YYYY/MM/DD, github id, Full name, email
 2020/09/12, Clcanny, Charles Ruan, a837940593@gmail.com
 2020/09/15, rmcgregor1990, Robert McGregor, rmcgregor1990@gmail.com
 2020/09/15, dmitrys99, Dmitry Solomennikov, dmitrys99/mail/ru
+2020/09/16, trenki2, Markus Trenkwalder, trenki2[at]gmx[dot]net
+2020/10/08, Marti2203, Martin Mirchev, mirchevmartin2203@gmail.com
+2020/10/20, adamwojs, Adam Wójs, adam[at]wojs.pl
+2020/10/24, cliid, Jiwu Jang, jiwujang@naver.com

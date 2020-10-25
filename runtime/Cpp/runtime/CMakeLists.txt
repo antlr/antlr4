@@ -9,7 +9,7 @@ ExternalProject_Add(
   GIT_TAG               "v3.1.1"
   SOURCE_DIR            ${UTFCPP_DIR}
   UPDATE_DISCONNECTED   1
-  CMAKE_ARGS            -DCMAKE_INSTALL_PREFIX=${UTFCPP_DIR}/install
+  CMAKE_ARGS            -DCMAKE_INSTALL_PREFIX=${UTFCPP_DIR}/install -Dgtest_force_shared_crt=ON
   TEST_AFTER_INSTALL    1
   STEP_TARGETS          build)
 

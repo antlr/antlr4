@@ -11,11 +11,18 @@ In practice, this target has been extensively tested against:
 * Chrome 39.0.2171
 * Explorer 11.0.3
  
-The tests were conducted using Selenium. No issue was found, so you should find that the runtime works pretty much against any recent JavaScript engine.
+The above tests were conducted using Selenium. No issue was found, so you should find that the runtime works pretty much against any recent JavaScript engine.
 
 ## Is NodeJS supported?
 
-The runtime has also been extensively tested against Node.js 10 LTS. No issue was found.
+The runtime has also been extensively tested against Node.js 14 LTS. No issue was found.
+NodeJS together with a packaging tool is now the preferred development path, developers are encouraged to follow it.
+
+## What about modules?
+
+Starting with version 8.1, Antlr4 JavaScript runtime follows esm semantics (see https://tc39.es/ecma262/#sec-modules for details)
+Generated lexers, parsers, listeners and visitors also follow this new standard.
+If you have used previous versions of the runtime, you will need to migrate and make your parser a module.
 
 ## How to create a JavaScript lexer or parser?
 
@@ -80,18 +87,18 @@ Let's suppose that your grammar is named, as above, "MyGrammar". Let's suppose t
 Now a fully functioning script might look like the following:
 
 ```javascript
-   var antlr4 = require('antlr4');
-   var MyGrammarLexer = require('./MyGrammarLexer').MyGrammarLexer;
-   var MyGrammarParser = require('./MyGrammarParser').MyGrammarParser;
-   var MyGrammarListener = require('./MyGrammarListener').MyGrammarListener;
+   import antlr4 from 'antlr4';
+   import MyGrammarLexer from './MyGrammarLexer.js');
+   import MyGrammarParser from './MyGrammarParser.js';
+   import MyGrammarListener from './MyGrammarListener.js';
 
-   var input = "your text to parse here"
-   var chars = new antlr4.InputStream(input);
-   var lexer = new MyGrammarLexer(chars);
-   var tokens  = new antlr4.CommonTokenStream(lexer);
-   var parser = new MyGrammarParser(tokens);
+   const input = "your text to parse here"
+   const chars = new antlr4.InputStream(input);
+   const lexer = new MyGrammarLexer(chars);
+   const tokens  = new antlr4.CommonTokenStream(lexer);
+   const parser = new MyGrammarParser(tokens);
    parser.buildParseTrees = true;
-   var tree = parser.MyStartRule();
+   const tree = parser.MyStartRule();
 ```
 
 This program will work. But it won't be useful unless you do one of the following:
@@ -105,19 +112,19 @@ This program will work. But it won't be useful unless you do one of the followin
 ## How do I create and run a visitor?
 ```javascript
 // test.js
-var antlr4 = require('antlr4');
-var MyGrammarLexer = require('./QueryLexer').QueryLexer;
-var MyGrammarParser = require('./QueryParser').QueryParser;
-var MyGrammarListener = require('./QueryListener').QueryListener;
+import antlr4 from 'antlr4';
+import MyGrammarLexer from './QueryLexer.js';
+import MyGrammarParser from './QueryParser.js';
+import MyGrammarListener from './QueryListener.js';
 
 
-var input = "field = 123 AND items in (1,2,3)"
-var chars = new antlr4.InputStream(input);
-var lexer = new MyGrammarLexer(chars);
-var tokens = new antlr4.CommonTokenStream(lexer);
-var parser = new MyGrammarParser(tokens);
+const input = "field = 123 AND items in (1,2,3)"
+const chars = new antlr4.InputStream(input);
+const lexer = new MyGrammarLexer(chars);
+const tokens = new antlr4.CommonTokenStream(lexer);
+const parser = new MyGrammarParser(tokens);
 parser.buildParseTrees = true;
-var tree = parser.query();
+const tree = parser.query();
 
 class Visitor {
   visitChildren(ctx) {
@@ -145,40 +152,37 @@ tree.accept(new Visitor());
 Let's suppose your MyGrammar grammar comprises 2 rules: "key" and "value". The antlr4 tool will have generated the following listener: 
 
 ```javascript
-   MyGrammarListener = function(ParseTreeListener) {
-       // some code here
-   }
-   // some code here
-   MyGrammarListener.prototype.enterKey = function(ctx) {};
-   MyGrammarListener.prototype.exitKey = function(ctx) {};
-   MyGrammarListener.prototype.enterValue = function(ctx) {};
-   MyGrammarListener.prototype.exitValue = function(ctx) {};
+class MyGrammarListener extends ParseTreeListener {
+       
+    constructor() {
+        super();
+    }
+   
+   enterKey(ctx) {}
+   exitKey(ctx) {}
+   enterValue(ctx) {}
+   exitValue(ctx) {}
+}
 ```
 
 In order to provide custom behavior, you might want to create the following class:
 
 ```javascript
-var KeyPrinter = function() {
-    MyGrammarListener.call(this); // inherit default listener
-    return this;
-};
+class KeyPrinter extends MyGrammarListener {
 
-// continue inheriting default listener
-KeyPrinter.prototype = Object.create(MyGrammarListener.prototype);
-KeyPrinter.prototype.constructor = KeyPrinter;
-
-// override default listener behavior
-KeyPrinter.prototype.exitKey = function(ctx) {
-    console.log("Oh, a key!");
-};
+    // override default listener behavior
+    exitKey(ctx) {
+        console.log("Oh, a key!");
+    }
+}
 ```
 
 In order to execute this listener, you would simply add the following lines to the above code:
 
 ```javascript
-    ...
-    tree = parser.StartRule() // only repeated here for reference
-var printer = new KeyPrinter();
+...
+tree = parser.StartRule() // only repeated here for reference
+const printer = new KeyPrinter();
 antlr4.tree.ParseTreeWalker.DEFAULT.walk(printer, tree);
 ```
 
