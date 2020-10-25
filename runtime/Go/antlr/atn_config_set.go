@@ -149,7 +149,7 @@ func (b *BaseATNConfigSet) GetStates() *Set {
 	states := NewSet(nil, nil)
 
 	for i := 0; i < len(b.configs); i++ {
-		states.add(b.configs[i].GetState())
+		states.add(b.configs[i].GetStateValue())
 	}
 
 	return states
@@ -379,7 +379,7 @@ func equalATNConfigs(a, b interface{}) bool {
 		return false
 	}
 
-	nums := ai.GetState().GetStateNumber() == bi.GetState().GetStateNumber()
+	nums := ai.GetStateValue() == bi.GetStateValue()
 	alts := ai.GetAlt() == bi.GetAlt()
 	cons := ai.GetSemanticContext().equals(bi.GetSemanticContext())
 

@@ -6,6 +6,7 @@ package antlr
 
 import (
 	"fmt"
+	"strconv"
 )
 
 type comparable interface {
@@ -22,7 +23,8 @@ type ATNConfig interface {
 
 	hash() int
 
-	GetState() ATNState
+	GetState(a *ATN) ATNState
+	GetStateValue() int
 	GetAlt() int
 	GetSemanticContext() SemanticContext
 
@@ -33,6 +35,7 @@ type ATNConfig interface {
 	SetReachesIntoOuterContext(int)
 
 	String() string
+	GetStateString() string
 
 	getPrecedenceFilterSuppressed() bool
 	setPrecedenceFilterSuppressed(bool)
@@ -40,7 +43,7 @@ type ATNConfig interface {
 
 type BaseATNConfig struct {
 	precedenceFilterSuppressed bool
-	state                      ATNState
+	state                      int
 	alt                        int
 	context                    PredictionContext
 	semanticContext            SemanticContext
@@ -57,11 +60,11 @@ func NewBaseATNConfig7(old *BaseATNConfig) *BaseATNConfig { // TODO: Dup
 	}
 }
 
-func NewBaseATNConfig6(state ATNState, alt int, context PredictionContext) *BaseATNConfig {
+func NewBaseATNConfig6(state int, alt int, context PredictionContext) *BaseATNConfig {
 	return NewBaseATNConfig5(state, alt, context, SemanticContextNone)
 }
 
-func NewBaseATNConfig5(state ATNState, alt int, context PredictionContext, semanticContext SemanticContext) *BaseATNConfig {
+func NewBaseATNConfig5(state int, alt int, context PredictionContext, semanticContext SemanticContext) *BaseATNConfig {
 	if semanticContext == nil {
 		panic("semanticContext cannot be nil") // TODO: Necessary?
 	}
@@ -69,23 +72,23 @@ func NewBaseATNConfig5(state ATNState, alt int, context PredictionContext, seman
 	return &BaseATNConfig{state: state, alt: alt, context: context, semanticContext: semanticContext}
 }
 
-func NewBaseATNConfig4(c ATNConfig, state ATNState) *BaseATNConfig {
+func NewBaseATNConfig4(c ATNConfig, state int) *BaseATNConfig {
 	return NewBaseATNConfig(c, state, c.GetContext(), c.GetSemanticContext())
 }
 
-func NewBaseATNConfig3(c ATNConfig, state ATNState, semanticContext SemanticContext) *BaseATNConfig {
+func NewBaseATNConfig3(c ATNConfig, state int, semanticContext SemanticContext) *BaseATNConfig {
 	return NewBaseATNConfig(c, state, c.GetContext(), semanticContext)
 }
 
 func NewBaseATNConfig2(c ATNConfig, semanticContext SemanticContext) *BaseATNConfig {
-	return NewBaseATNConfig(c, c.GetState(), c.GetContext(), semanticContext)
+	return NewBaseATNConfig(c, c.GetStateValue(), c.GetContext(), semanticContext)
 }
 
-func NewBaseATNConfig1(c ATNConfig, state ATNState, context PredictionContext) *BaseATNConfig {
+func NewBaseATNConfig1(c ATNConfig, state int, context PredictionContext) *BaseATNConfig {
 	return NewBaseATNConfig(c, state, context, c.GetSemanticContext())
 }
 
-func NewBaseATNConfig(c ATNConfig, state ATNState, context PredictionContext, semanticContext SemanticContext) *BaseATNConfig {
+func NewBaseATNConfig(c ATNConfig, state int, context PredictionContext, semanticContext SemanticContext) *BaseATNConfig {
 	if semanticContext == nil {
 		panic("semanticContext cannot be nil")
 	}
@@ -108,8 +111,17 @@ func (b *BaseATNConfig) setPrecedenceFilterSuppressed(v bool) {
 	b.precedenceFilterSuppressed = v
 }
 
-func (b *BaseATNConfig) GetState() ATNState {
+func (b *BaseATNConfig) GetStateValue() int {
 	return b.state
+}
+
+func (b *BaseATNConfig) GetState(a *ATN) ATNState {
+	if a != nil && a.states != nil && b.state >= 0 && b.state <= len(a.states) {
+		return a.states[b.state]
+	} else {
+		panic("GetState")
+		return nil
+	}
 }
 
 func (b *BaseATNConfig) GetAlt() int {
@@ -157,7 +169,7 @@ func (b *BaseATNConfig) equals(o interface{}) bool {
 	}
 
 	var (
-		nums = b.state.GetStateNumber() == other.state.GetStateNumber()
+		nums = b.state == other.state
 		alts = b.alt == other.alt
 		cons = b.semanticContext.equals(other.semanticContext)
 		sups = b.precedenceFilterSuppressed == other.precedenceFilterSuppressed
@@ -173,11 +185,15 @@ func (b *BaseATNConfig) hash() int {
 	}
 
 	h := murmurInit(7)
-	h = murmurUpdate(h, b.state.GetStateNumber())
+	h = murmurUpdate(h, b.state)
 	h = murmurUpdate(h, b.alt)
 	h = murmurUpdate(h, c)
 	h = murmurUpdate(h, b.semanticContext.hash())
 	return murmurFinish(h, 4)
+}
+
+func (b *BaseATNConfig) GetStateString() string {
+	return strconv.Itoa(b.state)
 }
 
 func (b *BaseATNConfig) String() string {
@@ -205,19 +221,19 @@ type LexerATNConfig struct {
 }
 
 func NewLexerATNConfig6(state ATNState, alt int, context PredictionContext) *LexerATNConfig {
-	return &LexerATNConfig{BaseATNConfig: NewBaseATNConfig5(state, alt, context, SemanticContextNone)}
+	return &LexerATNConfig{BaseATNConfig: NewBaseATNConfig5(state.GetStateNumber(), alt, context, SemanticContextNone)}
 }
 
 func NewLexerATNConfig5(state ATNState, alt int, context PredictionContext, lexerActionExecutor *LexerActionExecutor) *LexerATNConfig {
 	return &LexerATNConfig{
-		BaseATNConfig:       NewBaseATNConfig5(state, alt, context, SemanticContextNone),
+		BaseATNConfig:       NewBaseATNConfig5(state.GetStateNumber(), alt, context, SemanticContextNone),
 		lexerActionExecutor: lexerActionExecutor,
 	}
 }
 
 func NewLexerATNConfig4(c *LexerATNConfig, state ATNState) *LexerATNConfig {
 	return &LexerATNConfig{
-		BaseATNConfig:                  NewBaseATNConfig(c, state, c.GetContext(), c.GetSemanticContext()),
+		BaseATNConfig:                  NewBaseATNConfig(c, state.GetStateNumber(), c.GetContext(), c.GetSemanticContext()),
 		lexerActionExecutor:            c.lexerActionExecutor,
 		passedThroughNonGreedyDecision: checkNonGreedyDecision(c, state),
 	}
@@ -225,7 +241,7 @@ func NewLexerATNConfig4(c *LexerATNConfig, state ATNState) *LexerATNConfig {
 
 func NewLexerATNConfig3(c *LexerATNConfig, state ATNState, lexerActionExecutor *LexerActionExecutor) *LexerATNConfig {
 	return &LexerATNConfig{
-		BaseATNConfig:                  NewBaseATNConfig(c, state, c.GetContext(), c.GetSemanticContext()),
+		BaseATNConfig:                  NewBaseATNConfig(c, state.GetStateNumber(), c.GetContext(), c.GetSemanticContext()),
 		lexerActionExecutor:            lexerActionExecutor,
 		passedThroughNonGreedyDecision: checkNonGreedyDecision(c, state),
 	}
@@ -233,14 +249,18 @@ func NewLexerATNConfig3(c *LexerATNConfig, state ATNState, lexerActionExecutor *
 
 func NewLexerATNConfig2(c *LexerATNConfig, state ATNState, context PredictionContext) *LexerATNConfig {
 	return &LexerATNConfig{
-		BaseATNConfig:                  NewBaseATNConfig(c, state, context, c.GetSemanticContext()),
+		BaseATNConfig:                  NewBaseATNConfig(c, state.GetStateNumber(), context, c.GetSemanticContext()),
 		lexerActionExecutor:            c.lexerActionExecutor,
 		passedThroughNonGreedyDecision: checkNonGreedyDecision(c, state),
 	}
 }
 
 func NewLexerATNConfig1(state ATNState, alt int, context PredictionContext) *LexerATNConfig {
-	return &LexerATNConfig{BaseATNConfig: NewBaseATNConfig5(state, alt, context, SemanticContextNone)}
+	return &LexerATNConfig{BaseATNConfig: NewBaseATNConfig5(state.GetStateNumber(), alt, context, SemanticContextNone)}
+}
+
+func (b *LexerATNConfig) GetStateString() string {
+	return strconv.Itoa(b.state)
 }
 
 func (l *LexerATNConfig) hash() int {
@@ -251,7 +271,7 @@ func (l *LexerATNConfig) hash() int {
 		f = 0
 	}
 	h := murmurInit(7)
-	h = murmurUpdate(h, l.state.hash())
+	h = murmurUpdate(h, l.GetStateValue())
 	h = murmurUpdate(h, l.alt)
 	h = murmurUpdate(h, l.context.hash())
 	h = murmurUpdate(h, l.semanticContext.hash())
