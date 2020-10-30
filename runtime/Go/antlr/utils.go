@@ -8,8 +8,6 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"sort"
-	"strconv"
 	"strings"
 )
 
@@ -48,7 +46,7 @@ func (s *IntStack) Push(e int) {
 }
 
 type Set struct {
-	data             map[int][]interface{}
+	data             map[int]*[]interface{}
 	hashcodeFunction func(interface{}) int
 	equalsFunction   func(interface{}, interface{}) bool
 }
@@ -59,7 +57,7 @@ func NewSet(
 
 	s := new(Set)
 
-	s.data = make(map[int][]interface{})
+	s.data = make(map[int]*[]interface{})
 
 	if hashcodeFunction != nil {
 		s.hashcodeFunction = hashcodeFunction
@@ -111,19 +109,20 @@ func (s *Set) add(value interface{}) interface{} {
 	values := s.data[key]
 
 	if s.data[key] != nil {
-		for i := 0; i < len(values); i++ {
-			if s.equalsFunction(value, values[i]) {
-				return values[i]
+		for i := 0; i < len(*values); i++ {
+			if s.equalsFunction(value, (*values)[i]) {
+				return (*values)[i]
 			}
 		}
 
-		s.data[key] = append(s.data[key], value)
+		r := append(*(s.data)[key], value)
+		s.data[key] = &r
 		return value
 	}
 
 	v := make([]interface{}, 1, 10)
 	v[0] = value
-	s.data[key] = v
+	s.data[key] = &v
 
 	return value
 }
@@ -135,8 +134,8 @@ func (s *Set) contains(value interface{}) bool {
 	values := s.data[key]
 
 	if s.data[key] != nil {
-		for i := 0; i < len(values); i++ {
-			if s.equalsFunction(value, values[i]) {
+		for i := 0; i < len(*values); i++ {
+			if s.equalsFunction(value, (*values)[i]) {
 				return true
 			}
 		}
@@ -148,7 +147,7 @@ func (s *Set) values() []interface{} {
 	var l []interface{}
 
 	for _, v := range s.data {
-		l = append(l, v...)
+		l = append(l, *v...)
 	}
 
 	return l
@@ -158,100 +157,12 @@ func (s *Set) String() string {
 	r := ""
 
 	for _, av := range s.data {
-		for _, v := range av {
+		for _, v := range *av {
 			r += fmt.Sprint(v)
 		}
 	}
 
 	return r
-}
-
-type BitSet struct {
-	data map[int]bool
-}
-
-func NewBitSet() *BitSet {
-	b := new(BitSet)
-	b.data = make(map[int]bool)
-	return b
-}
-
-func (b *BitSet) add(value int) {
-	b.data[value] = true
-}
-
-func (b *BitSet) clear(index int) {
-	delete(b.data, index)
-}
-
-func (b *BitSet) or(set *BitSet) {
-	for k := range set.data {
-		b.add(k)
-	}
-}
-
-func (b *BitSet) remove(value int) {
-	delete(b.data, value)
-}
-
-func (b *BitSet) contains(value int) bool {
-	return b.data[value]
-}
-
-func (b *BitSet) values() []int {
-	ks := make([]int, len(b.data))
-	i := 0
-	for k := range b.data {
-		ks[i] = k
-		i++
-	}
-	sort.Ints(ks)
-	return ks
-}
-
-func (b *BitSet) minValue() int {
-	min := 2147483647
-
-	for k := range b.data {
-		if k < min {
-			min = k
-		}
-	}
-
-	return min
-}
-
-func (b *BitSet) equals(other interface{}) bool {
-	otherBitSet, ok := other.(*BitSet)
-	if !ok {
-		return false
-	}
-
-	if len(b.data) != len(otherBitSet.data) {
-		return false
-	}
-
-	for k, v := range b.data {
-		if otherBitSet.data[k] != v {
-			return false
-		}
-	}
-
-	return true
-}
-
-func (b *BitSet) length() int {
-	return len(b.data)
-}
-
-func (b *BitSet) String() string {
-	vals := b.values()
-	valsS := make([]string, len(vals))
-
-	for i, val := range vals {
-		valsS[i] = strconv.Itoa(val)
-	}
-	return "{" + strings.Join(valsS, ", ") + "}"
 }
 
 type AltDict struct {
@@ -357,29 +268,6 @@ func PrintArrayJavaStyle(sa []string) string {
 
 const uintSize = 32 << (^uint(0) >> 32 & 1) // 32 or 64
 
-// rotateLeft returns the value of x rotated left by (k mod UintSize) bits.
-// To rotate x right by k bits, call RotateLeft(x, -k).
-func rotateLeft(x uint, k int) uint {
-	if uintSize == 32 {
-		return uint(rotateLeft32(uint32(x), k))
-	}
-	return uint(rotateLeft64(uint64(x), k))
-}
-
-// rotateLeft32 returns the value of x rotated left by (k mod 32) bits.
-func rotateLeft32(x uint32, k int) uint32 {
-	const n = 32
-	s := uint(k) & (n - 1)
-	return x<<s | x>>(n-s)
-}
-
-// rotateLeft64 returns the value of x rotated left by (k mod 64) bits.
-func rotateLeft64(x uint64, k int) uint64 {
-	const n = 64
-	s := uint(k) & (n - 1)
-	return x<<s | x>>(n-s)
-}
-
 
 // murmur hash
 const (
@@ -395,18 +283,21 @@ func murmurInit(seed int) int {
 func murmurUpdate(h1 int, k1 int) int {
 	var k1u uint
 	k1u = uint(k1) * c1_32
-	k1u = rotateLeft(k1u, 15)
+	//k1u = rotateLeft(k1u, 15)
+	k1u = k1u << 15 | k1u >> (uintSize - 15)
 	k1u *= c2_32
 
 	var h1u = uint(h1) ^ k1u
-	k1u = rotateLeft(k1u, 13)
+	//k1u = rotateLeft(k1u, 13)
+	k1u = k1u << 13 | k1u >> (uintSize - 13)
+
 	h1u = h1u*5 + 0xe6546b64
 	return int(h1u)
 }
 
 func murmurFinish(h1 int, numberOfWords int) int {
 	var h1u uint = uint(h1)
-	h1u ^= uint(numberOfWords * 4)
+	h1u ^= uint(numberOfWords << 2)
 	h1u ^= h1u >> 16
 	h1u *= uint(0x85ebca6b)
 	h1u ^= h1u >> 13

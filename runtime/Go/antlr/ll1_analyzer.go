@@ -128,7 +128,7 @@ func (la *LL1Analyzer) look2(s, stopState ATNState, ctx PredictionContext, look 
 
 func (la *LL1Analyzer) look1(s, stopState ATNState, ctx PredictionContext, look *IntervalSet, lookBusy *Set, calledRuleStack *BitSet, seeThruPreds, addEOF bool) {
 
-	c := NewBaseATNConfig6(s, 0, ctx)
+	c := NewBaseATNConfig6(s.GetStateNumber(), 0, ctx)
 
 	if lookBusy.contains(c) {
 		return

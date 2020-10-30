@@ -263,6 +263,7 @@ YYYY/MM/DD, github id, Full name, email
 2020/09/06, ArthurSonzogni, Sonzogni Arthur, arthursonzogni@gmail.com
 2020/09/12, Clcanny, Charles Ruan, a837940593@gmail.com
 2020/09/15, rmcgregor1990, Robert McGregor, rmcgregor1990@gmail.com
+2020/09/15, dmitrys99, Dmitry Solomennikov, dmitrys99/mail/ru
 2020/09/16, trenki2, Markus Trenkwalder, trenki2[at]gmx[dot]net
 2020/10/08, Marti2203, Martin Mirchev, mirchevmartin2203@gmail.com
 2020/10/16, adarshbhat, Adarsh Bhat, adarshbhat@users.noreply.github.com
