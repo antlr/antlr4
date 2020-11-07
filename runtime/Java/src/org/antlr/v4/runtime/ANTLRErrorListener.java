@@ -50,11 +50,11 @@ public interface ANTLRErrorListener {
 	 *        surrounding rule.
 	 */
 	public void syntaxError(Recognizer<?, ?> recognizer,
-							Object offendingSymbol,
-							int line,
-							int charPositionInLine,
-							String msg,
-							RecognitionException e);
+                            Object offendingSymbol,
+                            int line,
+                            int charPositionInLine,
+                            String msg,
+                            RecognitionException e);
 
 	/**
 	 * This method is called by the parser when a full-context prediction
@@ -97,12 +97,12 @@ public interface ANTLRErrorListener {
 	 * identified
 	 */
 	void reportAmbiguity(Parser recognizer,
-						 DFA dfa,
-						 int startIndex,
-						 int stopIndex,
-						 boolean exact,
-						 BitSet ambigAlts,
-						 ATNConfigSet configs);
+                         DFA dfa,
+                         int startIndex,
+                         int stopIndex,
+                         boolean exact,
+                         BitSet ambigAlts,
+                         ATNConfigSet configs);
 
 	/**
 	 * This method is called when an SLL conflict occurs and the parser is about
@@ -128,11 +128,11 @@ public interface ANTLRErrorListener {
 	 * detected
 	 */
 	void reportAttemptingFullContext(Parser recognizer,
-									 DFA dfa,
-									 int startIndex,
-									 int stopIndex,
-									 BitSet conflictingAlts,
-									 ATNConfigSet configs);
+                                     DFA dfa,
+                                     int startIndex,
+                                     int stopIndex,
+                                     BitSet conflictingAlts,
+                                     ATNConfigSet configs);
 
 	/**
 	 * This method is called by the parser when a full-context prediction has a
@@ -173,9 +173,9 @@ public interface ANTLRErrorListener {
 	 * was determined
 	 */
 	void reportContextSensitivity(Parser recognizer,
-								  DFA dfa,
-								  int startIndex,
-								  int stopIndex,
-								  int prediction,
-								  ATNConfigSet configs);
+                                  DFA dfa,
+                                  int startIndex,
+                                  int stopIndex,
+                                  int prediction,
+                                  ATNConfigSet configs);
 }

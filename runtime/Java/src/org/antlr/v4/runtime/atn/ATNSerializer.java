@@ -77,7 +77,7 @@ public class ATNSerializer {
 		// Note that we use a LinkedHashMap as a set to
 		// maintain insertion order while deduplicating
 		// entries with the same key.
-		Map<IntervalSet, Boolean> sets = new LinkedHashMap<>();
+		Map<IntervalSet, Boolean> sets = new LinkedHashMap<IntervalSet, Boolean>();
 
 		// dump states, count edges and collect sets while doing so
 		IntegerList nonGreedyStates = new IntegerList();
@@ -163,8 +163,8 @@ public class ATNSerializer {
 				data.add(modeStartState.stateNumber);
 			}
 		}
-		List<IntervalSet> bmpSets = new ArrayList<>();
-		List<IntervalSet> smpSets = new ArrayList<>();
+		List<IntervalSet> bmpSets = new ArrayList<IntervalSet>();
+		List<IntervalSet> smpSets = new ArrayList<IntervalSet>();
 		for (IntervalSet set : sets.keySet()) {
 			if (set.getMaxElement() <= Character.MAX_VALUE) {
 				bmpSets.add(set);
@@ -191,7 +191,7 @@ public class ATNSerializer {
 					serializeInt(data, cp);
 				}
 			});
-		Map<IntervalSet, Integer> setIndices = new HashMap<>();
+		Map<IntervalSet, Integer> setIndices = new HashMap<IntervalSet, Integer>();
 		int setIndex = 0;
 		for (IntervalSet bmpSet : bmpSets) {
 			setIndices.put(bmpSet, setIndex++);

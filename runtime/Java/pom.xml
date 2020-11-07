@@ -19,6 +19,9 @@
 	<properties>
 		<!-- Assumes dot is in the system path, or specified for the build. -->
 		<dot.path>dot</dot.path>
+
+        <maven.compiler.target>1.6</maven.compiler.target>
+        <maven.compiler.source>1.6</maven.compiler.source>
 	</properties>
 
 	<build>
@@ -59,7 +62,7 @@
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<version>2.10.4</version>
 				<configuration>
-					<javadocVersion>1.7</javadocVersion>
+					<javadocVersion>1.6</javadocVersion>
 					<failOnError>false</failOnError>
 				</configuration>
 				<executions>

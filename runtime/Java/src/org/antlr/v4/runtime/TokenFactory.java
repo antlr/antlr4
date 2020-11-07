@@ -18,8 +18,8 @@ public interface TokenFactory<Symbol extends Token> {
 	 *  are wiped to -1 in the text override is set in the CommonToken.
 	 */
 	Symbol create(Pair<TokenSource, CharStream> source, int type, String text,
-				  int channel, int start, int stop,
-				  int line, int charPositionInLine);
+                  int channel, int start, int stop,
+                  int line, int charPositionInLine);
 
 	/** Generically useful */
 	Symbol create(int type, String text);

@@ -6,9 +6,8 @@
 
 package org.antlr.v4.runtime;
 
+import org.antlr.v4.runtime.java7.StandardCharsets;
 import org.antlr.v4.runtime.misc.Interval;
-
-import java.nio.charset.StandardCharsets;
 
 /**
  * Alternative to {@link ANTLRInputStream} which treats the input

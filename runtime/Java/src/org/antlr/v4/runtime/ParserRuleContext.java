@@ -99,7 +99,7 @@ public class ParserRuleContext extends RuleContext {
 
 		// copy any error nodes to alt label node
 		if ( ctx.children!=null ) {
-			this.children = new ArrayList<>();
+			this.children = new ArrayList<ParseTree>();
 			// reset parent pointer for any error nodes
 			for (ParseTree child : ctx.children) {
 				if ( child instanceof ErrorNode ) {
@@ -130,7 +130,7 @@ public class ParserRuleContext extends RuleContext {
 	 *  @since 4.7
 	 */
 	public <T extends ParseTree> T addAnyChild(T t) {
-		if ( children==null ) children = new ArrayList<>();
+		if ( children==null ) children = new ArrayList<ParseTree>();
 		children.add(t);
 		return t;
 	}

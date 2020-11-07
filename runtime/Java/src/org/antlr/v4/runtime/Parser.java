@@ -298,7 +298,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 
 	/**
 	 * @return {@code true} if the {@link ParserRuleContext#children} list is trimmed
-	 * using the default {@link Parser.TrimToSizeListener} during the parse process.
+	 * using the default {@link TrimToSizeListener} during the parse process.
 	 */
 	public boolean getTrimParseTree() {
 		return getParseListeners().contains(TrimToSizeListener.INSTANCE);

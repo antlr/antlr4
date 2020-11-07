@@ -6,6 +6,9 @@
 
 package org.antlr.v4.runtime;
 
+import org.antlr.v4.runtime.java7.StandardCharsets;
+
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -17,10 +20,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CoderResult;
 import java.nio.charset.CodingErrorAction;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 /** This class represents the primary interface for creating {@link CharStream}s
  *  from a variety of sources as of 4.7.  The motivation was to support
@@ -67,42 +66,13 @@ public final class CharStreams {
 	private CharStreams() { }
 
 	/**
-	 * Creates a {@link CharStream} given a path to a UTF-8
-	 * encoded file on disk.
-	 *
-	 * Reads the entire contents of the file into the result before returning.
-	 */
-	public static CharStream fromPath(Path path) throws IOException {
-		return fromPath(path, StandardCharsets.UTF_8);
-	}
-
-	/**
-	 * Creates a {@link CharStream} given a path to a file on disk and the
-	 * charset of the bytes contained in the file.
-	 *
-	 * Reads the entire contents of the file into the result before returning.
-	 */
-	public static CharStream fromPath(Path path, Charset charset) throws IOException {
-		long size = Files.size(path);
-		try (ReadableByteChannel channel = Files.newByteChannel(path)) {
-			return fromChannel(
-				channel,
-				charset,
-				DEFAULT_BUFFER_SIZE,
-				CodingErrorAction.REPLACE,
-				path.toString(),
-				size);
-		}
-	}
-
-	/**
 	 * Creates a {@link CharStream} given a string containing a
 	 * path to a UTF-8 file on disk.
 	 *
 	 * Reads the entire contents of the file into the result before returning.
 	 */
 	public static CharStream fromFileName(String fileName) throws IOException {
-		return fromPath(Paths.get(fileName), StandardCharsets.UTF_8);
+		return fromStream(new FileInputStream(fileName), StandardCharsets.UTF_8);
 	}
 
 	/**
@@ -113,7 +83,7 @@ public final class CharStreams {
 	 * Reads the entire contents of the file into the result before returning.
 	 */
 	public static CharStream fromFileName(String fileName, Charset charset) throws IOException {
-		return fromPath(Paths.get(fileName), charset);
+		return fromStream(new FileInputStream(fileName), charset);
 	}
 
 
@@ -140,7 +110,9 @@ public final class CharStreams {
 	}
 
 	public static CharStream fromStream(InputStream is, Charset charset, long inputSize) throws IOException {
-		try (ReadableByteChannel channel = Channels.newChannel(is)) {
+		ReadableByteChannel channel = null;
+		try {
+			channel = Channels.newChannel(is);
 			return fromChannel(
 				channel,
 				charset,
@@ -148,6 +120,10 @@ public final class CharStreams {
 				CodingErrorAction.REPLACE,
 				IntStream.UNKNOWN_SOURCE_NAME,
 				inputSize);
+		}finally {
+			if( channel != null ){
+				channel.close();
+			}
 		}
 	}
 
