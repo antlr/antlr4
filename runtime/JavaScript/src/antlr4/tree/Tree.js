@@ -195,9 +195,11 @@ class ParseTreeWalker {
 	 * @param r The grammar rule containing the rule context
 	 */
 	enterRule(listener, r) {
-		const ctx = r.getRuleContext();
-		listener.enterEveryRule(ctx);
-		ctx.enterRule(listener);
+		if(r.getRuleContext) {
+			const ctx = r.getRuleContext();
+			listener.enterEveryRule(ctx);
+			ctx.enterRule(listener);
+		}
 	}
 
 	/**
@@ -207,9 +209,11 @@ class ParseTreeWalker {
 	 * @param r The grammar rule containing the rule context
 	 */
 	exitRule(listener, r) {
-		const ctx = r.getRuleContext();
-		ctx.exitRule(listener);
-		listener.exitEveryRule(ctx);
+		if(r.getRuleContext) {
+			const ctx = r.getRuleContext();
+			ctx.exitRule(listener);
+			listener.exitEveryRule(ctx);
+		}
 	}
 }
 
