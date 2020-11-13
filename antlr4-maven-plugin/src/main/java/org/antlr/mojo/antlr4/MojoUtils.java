@@ -55,7 +55,7 @@ class MojoUtils {
      * directory and reflect the input organization of the grammar files.
      *
      * @param   sourceDirectory  The source directory {@link File} object
-     * @param   grammarFileName  The full path to the input grammar file
+     * @param   grammarFile      The full path to the input grammar file
      *
      * @return  The path to the grammar file relative to the source directory
      */

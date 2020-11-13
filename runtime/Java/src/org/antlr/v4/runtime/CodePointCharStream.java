@@ -16,7 +16,7 @@ import java.nio.charset.StandardCharsets;
  * code units.
  *
  * Use this if you need to parse input which potentially contains
- * Unicode values > U+FFFF.
+ * Unicode values &gt; U+FFFF.
  */
 public abstract class CodePointCharStream implements CharStream {
 	protected final int size;
