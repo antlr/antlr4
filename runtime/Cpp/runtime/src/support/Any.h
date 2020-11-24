@@ -79,7 +79,7 @@ struct ANTLR4CPP_PUBLIC Any
     if (_ptr == a._ptr)
       return *this;
 
-    auto old_ptr = _ptr;
+    auto * old_ptr = _ptr;
     _ptr = a.clone();
 
     if (old_ptr)

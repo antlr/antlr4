@@ -6,7 +6,6 @@
 const Utils = require('./../Utils');
 const {Token} = require('./../Token');
 const {ErrorNode, TerminalNode, RuleNode} = require('./Tree');
-const ATN = require('./../atn/ATN');
 
 /** A set of utility routines useful for all kinds of ANTLR trees. */
 const Trees = {
@@ -50,7 +49,8 @@ const Trees = {
             if (t instanceof RuleNode) {
                 const context = t.getRuleContext()
                 const altNumber = context.getAltNumber();
-                if ( altNumber != (ATN.INVALID_ALT_NUMBER || 0) ) { // TODO: solve cyclic dependency to avoid || 0
+                // use const value of ATN.INVALID_ALT_NUMBER to avoid circular dependency
+                if ( altNumber != 0 ) {
                     return ruleNames[t.ruleIndex]+":"+altNumber;
                 }
                 return ruleNames[t.ruleIndex];

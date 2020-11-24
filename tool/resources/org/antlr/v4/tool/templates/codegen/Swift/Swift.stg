@@ -138,13 +138,13 @@ import Antlr4
 	 *
 	 * \<p>The default implementation does nothing.\</p>
 	 */
-	<accessLevelOpenOK(file)> func enterEveryRule(_ ctx: ParserRuleContext) { }
+	<accessLevelOpenOK(file)> func enterEveryRule(_ ctx: ParserRuleContext) throws { }
 	/**
 	 * {@inheritDoc\}
 	 *
 	 * \<p>The default implementation does nothing.\</p>
 	 */
-	<accessLevelOpenOK(file)> func exitEveryRule(_ ctx: ParserRuleContext) { }
+	<accessLevelOpenOK(file)> func exitEveryRule(_ ctx: ParserRuleContext) throws { }
 	/**
 	 * {@inheritDoc\}
 	 *
@@ -438,10 +438,10 @@ LeftRecursiveRuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,
 @discardableResult
 private func <currentRule.name>(_ _p<args:{a | , <a>}>: Int) throws -> <currentRule.ctxType>   {
 	let _parentctx: ParserRuleContext? = _ctx
-	var _parentState: Int = getState()
+	let _parentState: Int = getState()
 	var _localctx: <currentRule.ctxType> = <currentRule.ctxType>(_ctx, _parentState<currentRule.args:{a | , <a.name>}>)
-	var  _prevctx: <currentRule.ctxType> = _localctx
-	var _startState: Int = <currentRule.startState>
+	var _prevctx: <currentRule.ctxType> = _localctx
+	let _startState: Int = <currentRule.startState>
 	try enterRecursionRule(_localctx, <currentRule.startState>, <parser.name>.RULE_<currentRule.name>, _p)
 	<namedActions.init>
 	<locals; separator="\n">

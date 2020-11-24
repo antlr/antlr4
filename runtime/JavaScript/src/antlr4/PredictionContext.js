@@ -4,9 +4,10 @@
  */
 
 const RuleContext = require('./RuleContext');
-const {Hash, Map} = require('./Utils');
+const {Hash, Map, equalArrays} = require('./Utils');
 
 class PredictionContext {
+
 	constructor(cachedHashCode) {
 		this.cachedHashCode = cachedHashCode;
 	}
@@ -83,6 +84,7 @@ function calculateHashString(parent, returnState) {
  * can be used for both lexers and parsers.
  */
 class PredictionContextCache {
+
 	constructor() {
 		this.cache = new Map();
 	}
@@ -115,6 +117,7 @@ class PredictionContextCache {
 
 
 class SingletonPredictionContext extends PredictionContext {
+
 	constructor(parent, returnState) {
 		let hashCode = 0;
 		const hash = new Hash();
@@ -182,6 +185,7 @@ class SingletonPredictionContext extends PredictionContext {
 }
 
 class EmptyPredictionContext extends SingletonPredictionContext {
+
 	constructor() {
 		super(null, PredictionContext.EMPTY_RETURN_STATE);
 	}
@@ -211,6 +215,7 @@ class EmptyPredictionContext extends SingletonPredictionContext {
 PredictionContext.EMPTY = new EmptyPredictionContext();
 
 class ArrayPredictionContext extends PredictionContext {
+
 	constructor(parents, returnStates) {
 		/**
 		 * Parent can be null only if full ctx mode and we make an array
@@ -249,8 +254,8 @@ class ArrayPredictionContext extends PredictionContext {
 		} else if (this.hashCode() !== other.hashCode()) {
 			return false; // can't be same if hash is different
 		} else {
-			return this.returnStates === other.returnStates &&
-					this.parents === other.parents;
+			return equalArrays(this.returnStates, other.returnStates) &&
+				equalArrays(this.parents, other.parents);
 		}
 	}
 
@@ -557,7 +562,7 @@ function mergeArrays(a, b, rootIsWildcard, mergeCache) {
 	while (i < a.returnStates.length && j < b.returnStates.length) {
 		const a_parent = a.parents[i];
 		const b_parent = b.parents[j];
-		if (a.returnStates[i] === b.returnStates[j]) {
+		if (equalArrays(a.returnStates[i], b.returnStates[j])) {
 			// same payload (stack tops are equal), must yield merged singleton
 			const payload = a.returnStates[i];
 			// $+$ = $
