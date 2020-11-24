@@ -75,16 +75,16 @@ antlrcpp::Any RuleContext::accept(tree::ParseTreeVisitor *visitor) {
   return visitor->visitChildren(this);
 }
 
-std::string RuleContext::toStringTree(Parser *recog) {
-  return tree::Trees::toStringTree(this, recog);
+std::string RuleContext::toStringTree(Parser *recog, bool pretty) {
+  return tree::Trees::toStringTree(this, recog, pretty);
 }
 
-std::string RuleContext::toStringTree(std::vector<std::string> &ruleNames) {
-  return tree::Trees::toStringTree(this, ruleNames);
+std::string RuleContext::toStringTree(std::vector<std::string> &ruleNames, bool pretty) {
+  return tree::Trees::toStringTree(this, ruleNames, pretty);
 }
 
-std::string RuleContext::toStringTree() {
-  return toStringTree(nullptr);
+std::string RuleContext::toStringTree(bool pretty) {
+  return toStringTree(nullptr, pretty);
 }
 
 

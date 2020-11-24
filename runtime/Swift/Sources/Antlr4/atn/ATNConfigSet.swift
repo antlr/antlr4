@@ -203,16 +203,16 @@ public final class ATNConfigSet: Hashable, CustomStringConvertible {
         return false
     }
 
-    public var hashValue: Int {
+    public func hash(into hasher: inout Hasher) {
         if isReadonly() {
             if cachedHashCode == -1 {
-                cachedHashCode = configsHashValue//configs.hashValue ;
+                cachedHashCode = configsHashValue
             }
-
-            return cachedHashCode
+            hasher.combine(cachedHashCode)
         }
-
-        return configsHashValue // configs.hashValue;
+        else {
+            hasher.combine(configsHashValue)
+        }
     }
 
     private var configsHashValue: Int {

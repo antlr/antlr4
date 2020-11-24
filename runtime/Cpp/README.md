@@ -25,30 +25,30 @@ The C++ target has been the work of the following people:
 
 ## Project Status
 
-* Building on OS X, Windows, Android and Linux
+* Building on macOS, Windows, Android and Linux
 * No errors and warnings
 * Library linking
-* Some unit tests in the OSX project, for important base classes with almost 100% code coverage.
+* Some unit tests in the macOS project, for important base classes with almost 100% code coverage.
 * All memory allocations checked
 * Simple command line demo application working on all supported platforms.
 * All runtime tests pass.
 
 ### Build + Usage Notes
 
-The minimum C++ version to compile the ANTLR C++ runtime with is C++11. The supplied projects can built the runtime either as static or dynamic library, as both 32bit and 64bit arch. The OSX project contains a target for iOS and can also be built using cmake (instead of XCode).
+The minimum C++ version to compile the ANTLR C++ runtime with is C++11. The supplied projects can built the runtime either as static or dynamic library, as both 32bit and 64bit arch. The macOS project contains a target for iOS and can also be built using cmake (instead of XCode).
 
 Include the antlr4-runtime.h umbrella header in your target application to get everything needed to use the library.
 
 If you are compiling with cmake, the minimum version required is cmake 2.8.
 
-#### Compiling on Windows with Visual Studio prior to 2017
-Simply open the VS solution (VS 2013+) and build it.
+#### Compiling on Windows with Visual Studio using he Visual Studio projects
+Simply open the VS project from the runtime folder (VS 2013+) and build it.
 
-#### Compiling on Windows with Visual Studio VS2017
+#### Compiling on Windows using cmake with Visual Studio VS2017 and later
 Use the "Open Folder" Feature from the File->Open->Folder menu to open the runtime/Cpp directory.
 It will automatically use the CMake description to open up a Visual Studio Solution.
 
-#### Compiling on OSX
+#### Compiling on macOS
 Either open the included XCode project and build that or use the cmake compilation as described for linux.
 
 #### Compiling on Android

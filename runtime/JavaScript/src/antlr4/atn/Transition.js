@@ -2,45 +2,48 @@
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
-//
 
-//  An ATN transition between any two ATN states.  Subclasses define
-//  atom, set, epsilon, action, predicate, rule transitions.
-//
-//  <p>This is a one way link.  It emanates from a state (usually via a list of
-//  transitions) and has a target state.</p>
-//
-//  <p>Since we never have to change the ATN transitions once we construct it,
-//  we can fix these transitions as specific classes. The DFA transitions
-//  on the other hand need to update the labels as it adds transitions to
-//  the states. We'll use the term Edge for the DFA to distinguish them from
-//  ATN transitions.</p>
+const {Token} = require('./../Token');
+const {IntervalSet} = require('./../IntervalSet');
+const {Predicate, PrecedencePredicate} = require('./SemanticContext');
 
-var Token = require('./../Token').Token;
-var Interval = require('./../IntervalSet').Interval;
-var IntervalSet = require('./../IntervalSet').IntervalSet;
-var Predicate = require('./SemanticContext').Predicate;
-var PrecedencePredicate = require('./SemanticContext').PrecedencePredicate;
-
-function Transition (target) {
-    // The target of this transition.
-    if (target===undefined || target===null) {
-        throw "target cannot be null.";
+/**
+ * An ATN transition between any two ATN states.  Subclasses define
+ * atom, set, epsilon, action, predicate, rule transitions.
+ *
+ * <p>This is a one way link.  It emanates from a state (usually via a list of
+ * transitions) and has a target state.</p>
+ *
+ * <p>Since we never have to change the ATN transitions once we construct it,
+ * we can fix these transitions as specific classes. The DFA transitions
+ * on the other hand need to update the labels as it adds transitions to
+ * the states. We'll use the term Edge for the DFA to distinguish them from
+ * ATN transitions.</p>
+ */
+class Transition {
+    constructor(target) {
+        // The target of this transition.
+        if (target===undefined || target===null) {
+            throw "target cannot be null.";
+        }
+        this.target = target;
+        // Are we epsilon, action, sempred?
+        this.isEpsilon = false;
+        this.label = null;
     }
-    this.target = target;
-    // Are we epsilon, action, sempred?
-    this.isEpsilon = false;
-    this.label = null;
-    return this;
 }
-    // constants for serialization
+
+// constants for serialization
+
 Transition.EPSILON = 1;
 Transition.RANGE = 2;
 Transition.RULE = 3;
-Transition.PREDICATE = 4; // e.g., {isType(input.LT(1))}?
+// e.g., {isType(input.LT(1))}?
+Transition.PREDICATE = 4;
 Transition.ATOM = 5;
 Transition.ACTION = 6;
-Transition.SET = 7; // ~(A|B) or ~atom, wildcard, which convert to next 2
+// ~(A|B) or ~atom, wildcard, which convert to next 2
+Transition.SET = 7;
 Transition.NOT_SET = 8;
 Transition.WILDCARD = 9;
 Transition.PRECEDENCE = 10;
@@ -74,243 +77,227 @@ Transition.serializationTypes = {
 
 
 // TODO: make all transitions sets? no, should remove set edges
-function AtomTransition(target, label) {
-	Transition.call(this, target);
-	this.label_ = label; // The token type or character value; or, signifies special label.
-    this.label = this.makeLabel();
-    this.serializationType = Transition.ATOM;
-    return this;
+
+class AtomTransition extends Transition {
+    constructor(target, label) {
+        super(target);
+        // The token type or character value; or, signifies special label.
+        this.label_ = label;
+        this.label = this.makeLabel();
+        this.serializationType = Transition.ATOM;
+    }
+
+    makeLabel() {
+        const s = new IntervalSet();
+        s.addOne(this.label_);
+        return s;
+    }
+
+    matches(symbol, minVocabSymbol, maxVocabSymbol) {
+        return this.label_ === symbol;
+    }
+
+    toString() {
+        return this.label_;
+    }
 }
 
-AtomTransition.prototype = Object.create(Transition.prototype);
-AtomTransition.prototype.constructor = AtomTransition;
 
-AtomTransition.prototype.makeLabel = function() {
-	var s = new IntervalSet();
-    s.addOne(this.label_);
-    return s;
-};
+class RuleTransition extends Transition {
+    constructor(ruleStart, ruleIndex, precedence, followState) {
+        super(ruleStart);
+        // ptr to the rule definition object for this rule ref
+        this.ruleIndex = ruleIndex;
+        this.precedence = precedence;
+        // what node to begin computations following ref to rule
+        this.followState = followState;
+        this.serializationType = Transition.RULE;
+        this.isEpsilon = true;
+    }
 
-AtomTransition.prototype.matches = function( symbol, minVocabSymbol,  maxVocabSymbol) {
-    return this.label_ === symbol;
-};
-
-AtomTransition.prototype.toString = function() {
-	return this.label_;
-};
-
-function RuleTransition(ruleStart, ruleIndex, precedence, followState) {
-	Transition.call(this, ruleStart);
-    this.ruleIndex = ruleIndex; // ptr to the rule definition object for this rule ref
-    this.precedence = precedence;
-    this.followState = followState; // what node to begin computations following ref to rule
-    this.serializationType = Transition.RULE;
-    this.isEpsilon = true;
-    return this;
+    matches(symbol, minVocabSymbol, maxVocabSymbol) {
+        return false;
+    }
 }
 
-RuleTransition.prototype = Object.create(Transition.prototype);
-RuleTransition.prototype.constructor = RuleTransition;
+class EpsilonTransition extends Transition {
+    constructor(target, outermostPrecedenceReturn) {
+        super(target);
+        this.serializationType = Transition.EPSILON;
+        this.isEpsilon = true;
+        this.outermostPrecedenceReturn = outermostPrecedenceReturn;
+    }
 
-RuleTransition.prototype.matches = function(symbol, minVocabSymbol,  maxVocabSymbol) {
-	return false;
-};
+    matches(symbol, minVocabSymbol, maxVocabSymbol) {
+        return false;
+    }
 
-
-function EpsilonTransition(target, outermostPrecedenceReturn) {
-	Transition.call(this, target);
-    this.serializationType = Transition.EPSILON;
-    this.isEpsilon = true;
-    this.outermostPrecedenceReturn = outermostPrecedenceReturn;
-    return this;
+    toString() {
+        return "epsilon";
+    }
 }
 
-EpsilonTransition.prototype = Object.create(Transition.prototype);
-EpsilonTransition.prototype.constructor = EpsilonTransition;
 
-EpsilonTransition.prototype.matches = function( symbol, minVocabSymbol,  maxVocabSymbol) {
-	return false;
-};
+class RangeTransition extends Transition {
+    constructor(target, start, stop) {
+        super(target);
+        this.serializationType = Transition.RANGE;
+        this.start = start;
+        this.stop = stop;
+        this.label = this.makeLabel();
+    }
 
-EpsilonTransition.prototype.toString = function() {
-	return "epsilon";
-};
+    makeLabel() {
+        const s = new IntervalSet();
+        s.addRange(this.start, this.stop);
+        return s;
+    }
 
-function RangeTransition(target, start, stop) {
-	Transition.call(this, target);
-	this.serializationType = Transition.RANGE;
-    this.start = start;
-    this.stop = stop;
-    this.label = this.makeLabel();
-    return this;
+    matches(symbol, minVocabSymbol, maxVocabSymbol) {
+        return symbol >= this.start && symbol <= this.stop;
+    }
+
+    toString() {
+        return "'" + String.fromCharCode(this.start) + "'..'" + String.fromCharCode(this.stop) + "'";
+    }
 }
 
-RangeTransition.prototype = Object.create(Transition.prototype);
-RangeTransition.prototype.constructor = RangeTransition;
 
-RangeTransition.prototype.makeLabel = function() {
-    var s = new IntervalSet();
-    s.addRange(this.start, this.stop);
-    return s;
-};
-
-RangeTransition.prototype.matches = function(symbol, minVocabSymbol,  maxVocabSymbol) {
-	return symbol >= this.start && symbol <= this.stop;
-};
-
-RangeTransition.prototype.toString = function() {
-	return "'" + String.fromCharCode(this.start) + "'..'" + String.fromCharCode(this.stop) + "'";
-};
-
-function AbstractPredicateTransition(target) {
-	Transition.call(this, target);
-	return this;
+class AbstractPredicateTransition extends Transition {
+    constructor(target) {
+        super(target);
+    }
 }
 
-AbstractPredicateTransition.prototype = Object.create(Transition.prototype);
-AbstractPredicateTransition.prototype.constructor = AbstractPredicateTransition;
+class PredicateTransition extends AbstractPredicateTransition {
+    constructor(target, ruleIndex, predIndex, isCtxDependent) {
+        super(target);
+        this.serializationType = Transition.PREDICATE;
+        this.ruleIndex = ruleIndex;
+        this.predIndex = predIndex;
+        this.isCtxDependent = isCtxDependent; // e.g., $i ref in pred
+        this.isEpsilon = true;
+    }
 
-function PredicateTransition(target, ruleIndex, predIndex, isCtxDependent) {
-	AbstractPredicateTransition.call(this, target);
-    this.serializationType = Transition.PREDICATE;
-    this.ruleIndex = ruleIndex;
-    this.predIndex = predIndex;
-    this.isCtxDependent = isCtxDependent; // e.g., $i ref in pred
-    this.isEpsilon = true;
-    return this;
+    matches(symbol, minVocabSymbol, maxVocabSymbol) {
+        return false;
+    }
+
+    getPredicate() {
+        return new Predicate(this.ruleIndex, this.predIndex, this.isCtxDependent);
+    }
+
+    toString() {
+        return "pred_" + this.ruleIndex + ":" + this.predIndex;
+    }
 }
 
-PredicateTransition.prototype = Object.create(AbstractPredicateTransition.prototype);
-PredicateTransition.prototype.constructor = PredicateTransition;
 
-PredicateTransition.prototype.matches = function(symbol, minVocabSymbol,  maxVocabSymbol) {
-	return false;
-};
+class ActionTransition extends Transition {
+    constructor(target, ruleIndex, actionIndex, isCtxDependent) {
+        super(target);
+        this.serializationType = Transition.ACTION;
+        this.ruleIndex = ruleIndex;
+        this.actionIndex = actionIndex===undefined ? -1 : actionIndex;
+        this.isCtxDependent = isCtxDependent===undefined ? false : isCtxDependent; // e.g., $i ref in pred
+        this.isEpsilon = true;
+    }
 
-PredicateTransition.prototype.getPredicate = function() {
-	return new Predicate(this.ruleIndex, this.predIndex, this.isCtxDependent);
-};
+    matches(symbol, minVocabSymbol, maxVocabSymbol) {
+        return false;
+    }
 
-PredicateTransition.prototype.toString = function() {
-	return "pred_" + this.ruleIndex + ":" + this.predIndex;
-};
-
-function ActionTransition(target, ruleIndex, actionIndex, isCtxDependent) {
-	Transition.call(this, target);
-    this.serializationType = Transition.ACTION;
-    this.ruleIndex = ruleIndex;
-    this.actionIndex = actionIndex===undefined ? -1 : actionIndex;
-    this.isCtxDependent = isCtxDependent===undefined ? false : isCtxDependent; // e.g., $i ref in pred
-    this.isEpsilon = true;
-    return this;
+    toString() {
+        return "action_" + this.ruleIndex + ":" + this.actionIndex;
+    }
 }
-
-ActionTransition.prototype = Object.create(Transition.prototype);
-ActionTransition.prototype.constructor = ActionTransition;
-
-
-ActionTransition.prototype.matches = function(symbol, minVocabSymbol,  maxVocabSymbol) {
-	return false;
-};
-
-ActionTransition.prototype.toString = function() {
-	return "action_" + this.ruleIndex + ":" + this.actionIndex;
-};
 
 
 // A transition containing a set of values.
-function SetTransition(target, set) {
-	Transition.call(this, target);
-	this.serializationType = Transition.SET;
-    if (set !==undefined && set !==null) {
-        this.label = set;
-    } else {
-        this.label = new IntervalSet();
-        this.label.addOne(Token.INVALID_TYPE);
+class SetTransition extends Transition {
+    constructor(target, set) {
+        super(target);
+        this.serializationType = Transition.SET;
+        if (set !==undefined && set !==null) {
+            this.label = set;
+        } else {
+            this.label = new IntervalSet();
+            this.label.addOne(Token.INVALID_TYPE);
+        }
     }
-    return this;
+
+    matches(symbol, minVocabSymbol, maxVocabSymbol) {
+        return this.label.contains(symbol);
+    }
+
+    toString() {
+        return this.label.toString();
+    }
 }
 
-SetTransition.prototype = Object.create(Transition.prototype);
-SetTransition.prototype.constructor = SetTransition;
+class NotSetTransition extends SetTransition {
+    constructor(target, set) {
+        super(target, set);
+        this.serializationType = Transition.NOT_SET;
+    }
 
-SetTransition.prototype.matches = function(symbol, minVocabSymbol,  maxVocabSymbol) {
-	return this.label.contains(symbol);
-};
+    matches(symbol, minVocabSymbol, maxVocabSymbol) {
+        return symbol >= minVocabSymbol && symbol <= maxVocabSymbol &&
+                !super.matches(symbol, minVocabSymbol, maxVocabSymbol);
+    }
 
-
-SetTransition.prototype.toString = function() {
-	return this.label.toString();
-};
-
-function NotSetTransition(target, set) {
-	SetTransition.call(this, target, set);
-	this.serializationType = Transition.NOT_SET;
-	return this;
+    toString() {
+        return '~' + super.toString();
+    }
 }
 
-NotSetTransition.prototype = Object.create(SetTransition.prototype);
-NotSetTransition.prototype.constructor = NotSetTransition;
+class WildcardTransition extends Transition {
+    constructor(target) {
+        super(target);
+        this.serializationType = Transition.WILDCARD;
+    }
 
-NotSetTransition.prototype.matches = function(symbol, minVocabSymbol,  maxVocabSymbol) {
-	return symbol >= minVocabSymbol && symbol <= maxVocabSymbol &&
-			!SetTransition.prototype.matches.call(this, symbol, minVocabSymbol, maxVocabSymbol);
-};
+    matches(symbol, minVocabSymbol, maxVocabSymbol) {
+        return symbol >= minVocabSymbol && symbol <= maxVocabSymbol;
+    }
 
-NotSetTransition.prototype.toString = function() {
-	return '~' + SetTransition.prototype.toString.call(this);
-};
-
-function WildcardTransition(target) {
-	Transition.call(this, target);
-	this.serializationType = Transition.WILDCARD;
-	return this;
+    toString() {
+        return ".";
+    }
 }
 
-WildcardTransition.prototype = Object.create(Transition.prototype);
-WildcardTransition.prototype.constructor = WildcardTransition;
+class PrecedencePredicateTransition extends AbstractPredicateTransition {
+    constructor(target, precedence) {
+        super(target);
+        this.serializationType = Transition.PRECEDENCE;
+        this.precedence = precedence;
+        this.isEpsilon = true;
+    }
 
+    matches(symbol, minVocabSymbol, maxVocabSymbol) {
+        return false;
+    }
 
-WildcardTransition.prototype.matches = function(symbol, minVocabSymbol,  maxVocabSymbol) {
-	return symbol >= minVocabSymbol && symbol <= maxVocabSymbol;
-};
+    getPredicate() {
+        return new PrecedencePredicate(this.precedence);
+    }
 
-WildcardTransition.prototype.toString = function() {
-	return ".";
-};
-
-function PrecedencePredicateTransition(target, precedence) {
-	AbstractPredicateTransition.call(this, target);
-    this.serializationType = Transition.PRECEDENCE;
-    this.precedence = precedence;
-    this.isEpsilon = true;
-    return this;
+    toString() {
+        return this.precedence + " >= _p";
+    }
 }
 
-PrecedencePredicateTransition.prototype = Object.create(AbstractPredicateTransition.prototype);
-PrecedencePredicateTransition.prototype.constructor = PrecedencePredicateTransition;
-
-PrecedencePredicateTransition.prototype.matches = function(symbol, minVocabSymbol,  maxVocabSymbol) {
-	return false;
-};
-
-PrecedencePredicateTransition.prototype.getPredicate = function() {
-	return new PrecedencePredicate(this.precedence);
-};
-
-PrecedencePredicateTransition.prototype.toString = function() {
-	return this.precedence + " >= _p";
-};
-
-exports.Transition = Transition;
-exports.AtomTransition = AtomTransition;
-exports.SetTransition = SetTransition;
-exports.NotSetTransition = NotSetTransition;
-exports.RuleTransition = RuleTransition;
-exports.ActionTransition = ActionTransition;
-exports.EpsilonTransition = EpsilonTransition;
-exports.RangeTransition = RangeTransition;
-exports.WildcardTransition = WildcardTransition;
-exports.PredicateTransition = PredicateTransition;
-exports.PrecedencePredicateTransition = PrecedencePredicateTransition;
-exports.AbstractPredicateTransition = AbstractPredicateTransition;
+module.exports = {
+    Transition,
+    AtomTransition,
+    SetTransition,
+    NotSetTransition,
+    RuleTransition,
+    ActionTransition,
+    EpsilonTransition,
+    RangeTransition,
+    WildcardTransition,
+    PredicateTransition,
+    PrecedencePredicateTransition,
+    AbstractPredicateTransition
+}
