@@ -230,6 +230,7 @@ YYYY/MM/DD, github id, Full name, email
 2019/07/16, abhijithneilabraham, Abhijith Neil Abraham, abhijithneilabrahampk@gmail.com
 2019/07/26, Braavos96, Eric Hettiaratchi, erichettiaratchi@gmail.com
 2019/08/23, akaJes, Oleksandr Mamchyts, akaJes@gmail.com
+2019/08/27, wurzelpeter, Markus Franke, markus[hyphen]franke[at]web[dot]de
 2019/09/10, ImanHosseini, Iman Hosseini, hosseini.iman@yahoo.com
 2019/09/03, João Henrique, johnnyonflame@hotmail.com
 2019/09/10, neko1235, Ihar Mokharau, igor.mohorev@gmail.com

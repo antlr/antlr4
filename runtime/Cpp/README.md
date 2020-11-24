@@ -55,11 +55,11 @@ Either open the included XCode project and build that or use the cmake compilati
 Try run cmake -DCMAKE_ANDROID_NDK=/folder/of/android_ndkr17_and_above -DCMAKE_SYSTEM_NAME=Android -DCMAKE_ANDROID_API=14 -DCMAKE_ANDROID_ARCH_ABI=x86 -DCMAKE_ANDROID_STL_TYPE=c++_shared -DCMAKE_ANDROID_NDK_TOOLCHAIN_VERSION=clang -DCMAKE_BUILD_TYPE=Release /folder/antlr4_src_dir -G Ninja.
 
 #### Compiling on Linux
-- cd <antlr4-dir>/runtime/Cpp (this is where this readme is located)
+- cd \<antlr4-dir\>/runtime/Cpp (this is where this readme is located)
 - mkdir build && mkdir run && cd build
 - cmake .. -DANTLR_JAR_LOCATION=full/path/to/antlr4-4.5.4-SNAPSHOT.jar -DWITH_DEMO=True
 - make
-- DESTDIR=<antlr4-dir>/runtime/Cpp/run make install
+- DESTDIR=\<antlr4-dir\>/runtime/Cpp/run make install
 
 If you don't want to build the demo then simply run cmake without parameters.
 There is another cmake script available in the subfolder cmake/ for those who prefer the superbuild cmake pattern.
