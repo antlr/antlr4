@@ -71,6 +71,9 @@ else()
   set(MY_CXX_WARNING_FLAGS "  -Wall -pedantic -W")
 endif()
 
+# Define USE_UTF8_INSTEAD_OF_CODECVT macro.
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DUSE_UTF8_INSTEAD_OF_CODECVT")
+
 # Initialize CXXFLAGS.
 if("${CMAKE_VERSION}" VERSION_GREATER 3.1.0)
   set(CMAKE_CXX_STANDARD 11)
