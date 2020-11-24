@@ -9,6 +9,16 @@ namespace Antlr4.Runtime.Tree
     {
         public static readonly ParseTreeWalker Default = new ParseTreeWalker();
 
+        /// <summary>
+        /// Performs a walk on the given parse tree starting at the root and going down recursively
+	    /// with depth-first search. On each node, 
+        /// <see cref="ParseTreeWalker.EnterRule(IParseTreeListener, IRuleNode)"/> is called before
+	    /// recursively walking down into child nodes, then
+	    /// <see cref="ParseTreeWalker.ExitRule(IParseTreeListener, IRuleNode)"/>
+        /// is called after the recursive call to wind up.
+        /// </summary>
+        /// <param name="listener">The listener used by the walker to process grammar rules</param>
+        /// <param name="t">The parse tree to be walked on</param>
         public virtual void Walk(IParseTreeListener listener, IParseTree t)
         {
             if (t is IErrorNode)
@@ -35,13 +45,12 @@ namespace Antlr4.Runtime.Tree
         }
 
         /// <summary>
-        /// The discovery of a rule node, involves sending two events: the generic
-        /// <see cref="IParseTreeListener.EnterEveryRule(Antlr4.Runtime.ParserRuleContext)"/>
-        /// and a
-        /// <see cref="Antlr4.Runtime.RuleContext"/>
-        /// -specific event. First we trigger the generic and then
-        /// the rule specific. We to them in reverse order upon finishing the node.
+        /// Enters a grammar rule by first triggering the generic event 
+        /// <see cref="IParseTreeListener.EnterEveryRule"/>
+	    /// then by triggering the event specific to the given parse tree node
         /// </summary>
+        /// <param name="listener"> The listener responding to the trigger events </param>
+        /// <param name="r">The grammar rule containing the rule context</param>
         protected internal virtual void EnterRule(IParseTreeListener listener, IRuleNode r)
         {
             ParserRuleContext ctx = (ParserRuleContext)r.RuleContext;
@@ -49,6 +58,13 @@ namespace Antlr4.Runtime.Tree
             ctx.EnterRule(listener);
         }
 
+        /// <summary>
+        /// Exits a grammar rule by first triggering the event specific to the given parse tree node
+	    /// then by triggering the generic event 
+        /// <see cref="IParseTreeListener.ExitEveryRule"/>
+        /// </summary>
+        /// <param name="listener"> The listener responding to the trigger events </param>
+        /// <param name="r">The grammar rule containing the rule context</param>
         protected internal virtual void ExitRule(IParseTreeListener listener, IRuleNode r)
         {
             ParserRuleContext ctx = (ParserRuleContext)r.RuleContext;

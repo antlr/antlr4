@@ -14,9 +14,9 @@ Cast(t,v) ::= "<v>"
 
 Append(a,b) ::= "<a> + str(<b>)"
 
-Concat(a,b) ::= "<a><b>"
+AppendStr(a,b) ::= "<a> + <b>"
 
-DeclareLocal(s,v) ::= "<s> = <v>"
+Concat(a,b) ::= "<a><b>"
 
 AssertIsList(v) ::= "assert isinstance(v, (list, tuple))"
 
@@ -26,13 +26,17 @@ InitIntMember(n,v) ::= <%<n> = <v>%>
 
 InitBooleanMember(n,v) ::= <%<n> = <v>%>
 
+InitIntVar(n,v) ::= <%<InitIntMember(n,v)>%>
+
+IntArg(n) ::= "<n>"
+
+VarRef(n) ::= "<n>"
+
 GetMember(n) ::= <%self.<n>%>
 
 SetMember(n,v) ::= <%self.<n> = <v>%>
 
 AddMember(n,v) ::= <%self.<n> += <v>%>
-
-PlusMember(v,n) ::= <%<v> + str(self.<n>)%>
 
 MemberEquals(n,v) ::= <%self.<n> == <v>%>
 
@@ -98,6 +102,8 @@ def Property(self):
 >>
 
 ParserPropertyCall(p, call) ::= "<p>.<call>"
+
+PositionAdjustingLexerDef() ::= ""
 
 PositionAdjustingLexer() ::= <<
 

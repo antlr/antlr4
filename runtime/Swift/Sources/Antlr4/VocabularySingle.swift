@@ -155,11 +155,9 @@ public class Vocabulary: Hashable {
         return String(tokenType)
     }
 
-    public var hashValue: Int {
-        return Unmanaged.passUnretained(self).toOpaque().hashValue
-//        return unsafeAddress(of: self).hashValue
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(ObjectIdentifier(self))
     }
-
 }
 
 public func ==(lhs: Vocabulary, rhs: Vocabulary) -> Bool {

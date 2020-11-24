@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -190,7 +190,7 @@ void Parser::removeParseListeners() {
 }
 
 void Parser::triggerEnterRuleEvent() {
-  for (auto listener : _parseListeners) {
+  for (auto *listener : _parseListeners) {
     listener->enterEveryRule(_ctx);
     _ctx->enterRule(listener);
   }
@@ -208,7 +208,7 @@ size_t Parser::getNumberOfSyntaxErrors() {
   return _syntaxErrors;
 }
 
-Ref<TokenFactory<CommonToken>> Parser::getTokenFactory() {
+TokenFactory<CommonToken>* Parser::getTokenFactory() {
   return _input->getTokenSource()->getTokenFactory();
 }
 
@@ -307,14 +307,14 @@ Token* Parser::consume() {
       tree::ErrorNode *node = createErrorNode(o);
       _ctx->addChild(node);
       if (_parseListeners.size() > 0) {
-        for (auto listener : _parseListeners) {
+        for (auto *listener : _parseListeners) {
           listener->visitErrorNode(node);
         }
       }
     } else {
       tree::TerminalNode *node = _ctx->addChild(createTerminalNode(o));
       if (_parseListeners.size() > 0) {
-        for (auto listener : _parseListeners) {
+        for (auto *listener : _parseListeners) {
           listener->visitTerminal(node);
         }
       }
@@ -464,7 +464,7 @@ bool Parser::precpred(RuleContext * /*localctx*/, int precedence) {
 }
 
 bool Parser::inContext(const std::string &/*context*/) {
-  // TO_DO: useful in parser?
+  // TODO: useful in parser?
   return false;
 }
 
