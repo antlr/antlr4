@@ -125,7 +125,7 @@ ESC : '\\' . ; // match any escaped \x character
 
 <tr>
 <td>{«action»}</td><td>
-Lexer actions can appear anywhere as of 4.2, not just at the end of the outermost alternative. The lexer executes the actions at the appropriate input position, according to the placement of the action within the rule. To execute a single action for a role that has multiple alternatives, you can enclose the alts in parentheses and put the action afterwards:
+Lexer actions can appear anywhere as of 4.2, not just at the end of the outermost alternative. The lexer executes the actions at the appropriate input position, according to the placement of the action within the rule. To execute a single action for a rule that has multiple alternatives, you can enclose the alts in parentheses and put the action afterwards:
  	
 <pre>
 END : ('endif'|'end') {System.out.println("found an end");} ;
