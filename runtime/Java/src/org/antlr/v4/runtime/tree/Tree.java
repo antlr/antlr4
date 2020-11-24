@@ -19,7 +19,7 @@ public interface Tree {
 	Tree getParent();
 
 	/**
-	 * This method returns whatever object represents the data at this note. For
+	 * This method returns whatever object represents the data at this node. For
 	 * example, for parse trees, the payload can be a {@link Token} representing
 	 * a leaf node or a {@link RuleContext} object representing a rule
 	 * invocation. For abstract syntax trees (ASTs), this is a {@link Token}

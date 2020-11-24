@@ -766,6 +766,10 @@ public class LexerExecDescriptors {
 		/**
 		 lexer grammar PositionAdjustingLexer;
 
+		 @definitions {
+		 <PositionAdjustingLexerDef()>
+		 }
+
 		 @members {
 		 <PositionAdjustingLexer()>
 		 }
@@ -1047,10 +1051,39 @@ public class LexerExecDescriptors {
 				grammar = new String(Files.readAllBytes(Paths.get(stuff.toURI())));
 			}
 			catch (Exception e) {
-				System.err.println("Cannot find grammar org/antlr/v4/test/runtime/LarseLexer.g4");
+				System.err.println("Cannot find grammar org/antlr/v4/test/runtime/LargeLexer.g4");
 			}
 
 			return new Pair<>(grammarName, grammar);
+		}
+	}
+
+	/**
+	 * This is a regression test for antlr/antlr4#2709 "PHP target generates
+	 * invalid output when $ is used as part of the literal in lexer rule"
+	 * https://github.com/antlr/antlr4/issues/2709
+	 */
+	public static class EscapeTargetStringLiteral extends BaseLexerTestDescriptor {
+		/**
+		[@0,0:-1='<EOF>',<-1>,1:0]
+		 */
+		@CommentHasStringValue
+		public String output;
+
+		public String errors = null;
+		public String startRule = "";
+		public String grammarName = "L";
+
+		/**
+		 lexer grammar L;
+		 ACTION_WITH_DOLLAR: '$ACTION';
+		 */
+		@CommentHasStringValue
+		public String grammar;
+
+		@Override
+		public boolean ignore(String targetName) {
+			return !targetName.equals("PHP");
 		}
 	}
 }

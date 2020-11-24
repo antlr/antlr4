@@ -13,7 +13,13 @@ namespace atn {
 
   class ANTLR4CPP_PUBLIC ATNDeserializer {
   public:
-    static const size_t SERIALIZED_VERSION;
+#if __cplusplus >= 201703L
+    static constexpr size_t SERIALIZED_VERSION = 3;
+#else
+    enum : size_t {
+      SERIALIZED_VERSION = 3,
+    };
+#endif
 
     /// This is the current serialized UUID.
     // ml: defined as function to avoid the “static initialization order fiasco”.

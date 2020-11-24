@@ -116,6 +116,7 @@ using ParserRuleContext = Antlr4.Runtime.ParserRuleContext;
 /// of the available methods.
 /// \</summary>
 [System.CodeDom.Compiler.GeneratedCode("ANTLR", "<file.ANTLRVersion>")]
+[System.Diagnostics.DebuggerNonUserCode]
 [System.CLSCompliant(false)]
 public partial class <file.grammarName>BaseListener : I<file.grammarName>Listener {
 	<file.listenerNames:{lname |
@@ -214,6 +215,7 @@ using ParserRuleContext = Antlr4.Runtime.ParserRuleContext;
 /// \</summary>
 /// \<typeparam name="Result">The return type of the visit operation.\</typeparam>
 [System.CodeDom.Compiler.GeneratedCode("ANTLR", "<file.ANTLRVersion>")]
+[System.Diagnostics.DebuggerNonUserCode]
 [System.CLSCompliant(false)]
 public partial class <file.grammarName>BaseVisitor\<Result> : AbstractParseTreeVisitor\<Result>, I<file.grammarName>Visitor\<Result> {
 	<file.visitorNames:{lname |
@@ -813,27 +815,27 @@ contextGetterCollection(elementType) ::= <%
 %>
 
 ContextTokenGetterDecl(t)      ::=
-    "public ITerminalNode <csIdentifier.(tokenType.(t.name))>() { return GetToken(<csIdentifier.(parser.name)>.<csIdentifier.(tokenType.(t.name))>, 0); }"
+    "[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode <csIdentifier.(tokenType.(t.name))>() { return GetToken(<csIdentifier.(parser.name)>.<csIdentifier.(tokenType.(t.name))>, 0); }"
 ContextTokenListGetterDecl(t)  ::= <<
-public <contextGetterCollection("ITerminalNode")> <csIdentifier.(tokenType.(t.name))>() { return GetTokens(<csIdentifier.(parser.name)>.<csIdentifier.(tokenType.(t.name))>); }
+[System.Diagnostics.DebuggerNonUserCode] public <contextGetterCollection("ITerminalNode")> <csIdentifier.(tokenType.(t.name))>() { return GetTokens(<csIdentifier.(parser.name)>.<csIdentifier.(tokenType.(t.name))>); }
 >>
 ContextTokenListIndexedGetterDecl(t)  ::= <<
-public ITerminalNode <csIdentifier.(tokenType.(t.name))>(int i) {
+[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode <csIdentifier.(tokenType.(t.name))>(int i) {
 	return GetToken(<csIdentifier.(parser.name)>.<csIdentifier.(tokenType.(t.name))>, i);
 }
 >>
 ContextRuleGetterDecl(r)       ::= <<
-public <r.ctxName> <csIdentifier.(r.name)>() {
+[System.Diagnostics.DebuggerNonUserCode] public <r.ctxName> <csIdentifier.(r.name)>() {
 	return GetRuleContext\<<r.ctxName>\>(0);
 }
 >>
 ContextRuleListGetterDecl(r)   ::= <<
-public <contextGetterCollection({<r.ctxName>})> <csIdentifier.(r.name)>() {
+[System.Diagnostics.DebuggerNonUserCode] public <contextGetterCollection({<r.ctxName>})> <csIdentifier.(r.name)>() {
 	return GetRuleContexts\<<r.ctxName>\>();
 }
 >>
 ContextRuleListIndexedGetterDecl(r)   ::= <<
-public <r.ctxName> <csIdentifier.(r.name)>(int i) {
+[System.Diagnostics.DebuggerNonUserCode] public <r.ctxName> <csIdentifier.(r.name)>(int i) {
 	return GetRuleContext\<<r.ctxName>\>(i);
 }
 >>
@@ -887,6 +889,7 @@ public partial class <struct.name> : <currentRule.name; format="cap">Context {
 >>
 
 ListenerDispatchMethod(method) ::= <<
+[System.Diagnostics.DebuggerNonUserCode]
 public override void <if(method.isEnter)>Enter<else>Exit<endif>Rule(IParseTreeListener listener) {
 	I<parser.grammarName>Listener typedListener = listener as I<parser.grammarName>Listener;
 	if (typedListener != null) typedListener.<if(method.isEnter)>Enter<else>Exit<endif><struct.derivedFromName; format="cap">(this);
@@ -894,6 +897,7 @@ public override void <if(method.isEnter)>Enter<else>Exit<endif>Rule(IParseTreeLi
 >>
 
 VisitorDispatchMethod(method) ::= <<
+[System.Diagnostics.DebuggerNonUserCode]
 public override TResult Accept\<TResult>(IParseTreeVisitor\<TResult> visitor) {
 	I<parser.grammarName>Visitor\<TResult> typedVisitor = visitor as I<parser.grammarName>Visitor\<TResult>;
 	if (typedVisitor != null) return typedVisitor.Visit<struct.derivedFromName; format="cap">(this);
