@@ -23,7 +23,7 @@ public class BasePython3Test extends BasePythonTest {
 	@Override
 	protected List<String> getPythonExecutables() {
 		return Arrays.asList("python3.7", "python3.8");
-	} // force 3.7
+	} // force 3.7 or 3.8
 
 	@Override
 	protected void writeLexerTestFile(String lexerName, boolean showDFA) {
