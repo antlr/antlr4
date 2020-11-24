@@ -50,7 +50,7 @@ For writing a compiler, either generate [LLVM-type static-single-assignment](htt
 
 ### XPath
 
-XPath works great when you need to find specific nodes, possibly in certain contexts. The context is limited to the parents on the way to the root of the tree. For example, if you want to find all ID nodes, use path `//ID`. If you want all variable declarations, you might use path `//vardecl`.  If you only want fields declarations, then you can use some context information via path `/classdef/vardecl`, which would only find vardecls that our children of class definitions. You can merge the results of multiple XPath `findAll()`s simulating a set union for XPath. The only caveat is that the order from the original tree is not preserved when you union multiple `findAll()` sets.
+XPath works great when you need to find specific nodes, possibly in certain contexts. The context is limited to the parents on the way to the root of the tree. For example, if you want to find all ID nodes, use path `//ID`. If you want all variable declarations, you might use path `//vardecl`.  If you only want fields declarations, then you can use some context information via path `/classdef/vardecl`, which would only find vardecls that are children of class definitions. You can merge the results of multiple XPath `findAll()`s simulating a set union for XPath. The only caveat is that the order from the original tree is not preserved when you union multiple `findAll()` sets.
 
 ### Tree pattern matching
 

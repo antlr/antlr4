@@ -520,9 +520,8 @@ if not <chunks>:
 >>
 
 ExceptionClause(e, catchArg, catchAction) ::= <<
-catch (<catchArg>) {
+except <catchArg>:
     <catchAction>
-}
 >>
 
 // lexer actions are not associated with model objects
@@ -571,8 +570,8 @@ ThisRulePropertyRef_text(r)	 ::= "self._input.getText(localctx.start, self._inpu
 ThisRulePropertyRef_ctx(r)	 ::= "localctx"
 ThisRulePropertyRef_parser(r)	 ::= "self"
 
-NonLocalAttrRef(s)		 	 ::= "getInvokingContext(<s.ruleIndex>).<s.name>"
-SetNonLocalAttr(s, rhsChunks)  ::= "getInvokingContext(<s.ruleIndex>).<s.name> = <rhsChunks>"
+NonLocalAttrRef(s)		 	 ::= "self.getInvokingContext(<s.ruleIndex>).<s.name>"
+SetNonLocalAttr(s, rhsChunks)  ::= "self.getInvokingContext(<s.ruleIndex>).<s.name> = <rhsChunks>"
 
 AddToLabelList(a) ::= "<ctx(a.label)>.<a.listName>.append(<labelref(a.label)>)"
 

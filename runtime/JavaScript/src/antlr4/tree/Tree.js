@@ -29,6 +29,10 @@ class RuleNode extends ParseTree {
 	constructor() {
 		super();
 	}
+
+	getRuleContext(){
+		throw new Error("missing interface implementation")
+	}
 }
 
 class TerminalNode extends ParseTree {

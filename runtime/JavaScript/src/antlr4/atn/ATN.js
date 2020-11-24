@@ -8,8 +8,8 @@ const {IntervalSet} = require('./../IntervalSet');
 const {Token} = require('./../Token');
 
 class ATN {
-    constructor(grammarType , maxTokenType) {
 
+    constructor(grammarType , maxTokenType) {
         /**
          * Used for runtime deserialization of ATNs from strings
          * The type of the ATN.

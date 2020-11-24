@@ -151,9 +151,6 @@ var parserATN = <atn>
 var parserATN []uint16
 <endif>
 
-var deserializer = antlr.NewATNDeserializer(nil)
-var deserializedATN = deserializer.DeserializeFromUInt16(parserATN)
-
 <if(parser.literalNames)>
 var literalNames = []string{
 	<parser.literalNames; null="\"\"", separator=", ", wrap>,
@@ -179,21 +176,24 @@ var ruleNames = []string{
 var ruleNames []string
 <endif>
 
-var decisionToDFA = make([]*antlr.DFA, len(deserializedATN.DecisionToState))
-
-func init() {
-	for index, ds := range deserializedATN.DecisionToState {
-		decisionToDFA[index] = antlr.NewDFA(ds, index)
-	}
-}
-
 type <parser.name> struct {
 	<superClass; null="*antlr.BaseParser">
 }
 
+// New<parser.name> produces a new parser instance for the optional input antlr.TokenStream.
+//
+// The *<parser.name> instance produced may be reused by calling the SetInputStream method.
+// The initial parser configuration is expensive to construct, and the object is not thread-safe;
+// however, if used within a Golang sync.Pool, the construction cost amortizes well and the
+// objects can be used in a thread-safe manner.
 func New<parser.name>(input antlr.TokenStream) *<parser.name> {
 	this := new(<parser.name>)
-
+	deserializer := antlr.NewATNDeserializer(nil)
+	deserializedATN := deserializer.DeserializeFromUInt16(parserATN)
+	decisionToDFA := make([]*antlr.DFA, len(deserializedATN.DecisionToState))
+	for index, ds := range deserializedATN.DecisionToState {
+		decisionToDFA[index] = antlr.NewDFA(ds, index)
+	}
 	this.BaseParser = antlr.NewBaseParser(input)
 
 	this.Interpreter = antlr.NewParserATNSimulator(this, deserializedATN, decisionToDFA, antlr.NewPredictionContextCache())
@@ -204,6 +204,7 @@ func New<parser.name>(input antlr.TokenStream) *<parser.name> {
 
 	return this
 }
+
 <if(namedActions.members)>
 
 <namedActions.members>
@@ -1375,9 +1376,6 @@ var serializedLexerAtn []uint16
 <endif>
 
 
-var lexerDeserializer = antlr.NewATNDeserializer(nil)
-var lexerAtn = lexerDeserializer.DeserializeFromUInt16(serializedLexerAtn)
-
 var lexerChannelNames = []string{
 	"DEFAULT_TOKEN_CHANNEL", "HIDDEN"<if (lexer.channels)>, <lexer.channels:{c | "<c>"}; separator=", ", wrap><endif>,
 }
@@ -1412,7 +1410,6 @@ var lexerRuleNames = []string{
 var lexerRuleNames []string
 <endif>
 
-
 type <lexer.name> struct {
 	*<if(superClass)><superClass><else>antlr.BaseLexer<endif>
 	channelNames []string
@@ -1420,18 +1417,20 @@ type <lexer.name> struct {
 	// TODO: EOF string
 }
 
-var lexerDecisionToDFA = make([]*antlr.DFA, len(lexerAtn.DecisionToState))
-
-func init() {
+// New<lexer.name> produces a new lexer instance for the optional input antlr.CharStream.
+//
+// The *<lexer.name> instance produced may be reused by calling the SetInputStream method.
+// The initial lexer configuration is expensive to construct, and the object is not thread-safe;
+// however, if used within a Golang sync.Pool, the construction cost amortizes well and the
+// objects can be used in a thread-safe manner.
+func New<lexer.name>(input antlr.CharStream) *<lexer.name> {
+	l := new(<lexer.name>)
+	lexerDeserializer := antlr.NewATNDeserializer(nil)
+	lexerAtn := lexerDeserializer.DeserializeFromUInt16(serializedLexerAtn)
+	lexerDecisionToDFA := make([]*antlr.DFA, len(lexerAtn.DecisionToState))
 	for index, ds := range lexerAtn.DecisionToState {
 		lexerDecisionToDFA[index] = antlr.NewDFA(ds, index)
 	}
-}
-
-func New<lexer.name>(input antlr.CharStream) *<lexer.name> {
-
-	l := new(<lexer.name>)
-
 	l.BaseLexer = antlr.NewBaseLexer(input)
 	l.Interpreter = antlr.NewLexerATNSimulator(l, lexerAtn, lexerDecisionToDFA, antlr.NewPredictionContextCache())
 

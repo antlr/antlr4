@@ -96,7 +96,7 @@ The recognizers that ANTLR generates assume a character vocabulary containing al
 
 ## Actions
 
-Actions are code blocks written in the target language. You can use actions in a number of places within a grammar, but the syntax is always the same: arbitrary text surrounded by curly braces. You don’t need to escape a closing curly character if it’s in a string or comment: `"}"` or `/*}*/`. If the curlies are balanced, you also don’t need to escape }: `{...}`. Otherwise, escape extra curlies with a backslash: `\{` or `\}`. The action text should conform to the target language as specified with thelanguage option.
+Actions are code blocks written in the target language. You can use actions in a number of places within a grammar, but the syntax is always the same: arbitrary text surrounded by curly braces. You don’t need to escape a closing curly character if it’s in a string or comment: `"}"` or `/*}*/`. If the curlies are balanced, you also don’t need to escape }: `{...}`. Otherwise, escape extra curlies with a backslash: `\{` or `\}`. The action text should conform to the target language as specified with the language option.
 
 Embedded code can appear in: `@header` and `@members` named actions, parser and lexer rules, exception catching specifications, attribute sections for parser rules (return values, arguments, and locals), and some rule element options (currently predicates).
 

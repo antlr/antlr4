@@ -17,7 +17,11 @@ using namespace antlrcpp;
 
 using misc::Interval;
 
+#if __cplusplus >= 201703L
+ANTLRInputStream::ANTLRInputStream(std::string_view input) {
+#else
 ANTLRInputStream::ANTLRInputStream(const std::string &input) {
+#endif
   InitializeInstanceFields();
   load(input);
 }
@@ -31,6 +35,16 @@ ANTLRInputStream::ANTLRInputStream(std::istream &stream) {
   load(stream);
 }
 
+#if __cplusplus >= 201703L
+void ANTLRInputStream::load(std::string_view input) {
+  // Remove the UTF-8 BOM if present.
+  constexpr std::string_view bom = "\xef\xbb\xbf";
+  if (input.compare(0, 3, bom) == 0)
+    input.remove_prefix(3);
+  _data = antlrcpp::utf8_to_utf32(input.data(), input.data() + input.size());
+  p = 0;
+}
+#else
 void ANTLRInputStream::load(const std::string &input) {
   // Remove the UTF-8 BOM if present.
   const char bom[4] = "\xef\xbb\xbf";
@@ -40,6 +54,7 @@ void ANTLRInputStream::load(const std::string &input) {
     _data = antlrcpp::utf8_to_utf32(input.data(), input.data() + input.size());
   p = 0;
 }
+#endif
 
 void ANTLRInputStream::load(std::istream &stream) {
   if (!stream.good() || stream.eof()) // No fail, bad or EOF.
