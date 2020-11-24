@@ -25,7 +25,7 @@ fragment DIGIT : [0-9] ; // not a token by itself
 
 ## Lexical Modes
 
-Modes allow you to group lexical rules by context, such as inside and outside of XML tags. It’s like having multiple sublexers, one for context. The lexer can only return tokens matched by entering a rule in the current mode. Lexers start out in the so-called default mode. All rules are considered to be within the default mode unless you specify a mode command. Modes are not allowed within combined grammars, just lexer grammars. (See grammar `XMLLexer` from [Tokenizing XML](http://pragprog.com/book/tpantlr2/the-definitive-antlr-4-reference).)
+Modes allow you to group lexical rules by context, such as inside and outside of XML tags. It’s like having multiple sublexers, one for each context. The lexer can only return tokens matched by entering a rule in the current mode. Lexers start out in the so-called default mode. All rules are considered to be within the default mode unless you specify a mode command. Modes are not allowed within combined grammars, just lexer grammars. (See grammar `XMLLexer` from [Tokenizing XML](http://pragprog.com/book/tpantlr2/the-definitive-antlr-4-reference).)
 
 ```
 rules in default mode
@@ -58,7 +58,7 @@ Match that character or sequence of characters. E.g., ’while’ or ’=’.</t
 
 <tr>
 <td>[char set]</td><td>
-<p>Match one of the characters specified in the character set. Interpret <tt>x-y</tt> as the set of characters between range <tt>x</tt> and <tt>y</tt>, inclusively. The following escaped characters are interpreted as single special characters: <tt>\n</tt>, <tt>\r</tt>, <tt>\b</tt>, <tt>\t</tt>, <tt>\f</tt>, <tt>\uXXXX</tt>, and <tt>\u{XXXXXX}</tt>. To get <tt>]</tt>, <tt>\</tt>, or <tt>-</tt> you must escape them with <tt>\</tt>.</p>
+<p>Match one of the characters specified in the character set. Interpret <tt>x-y</tt> as the set of characters between range <tt>x</tt> and <tt>y</tt>, inclusively. The following escaped characters are interpreted as single special characters: <tt>\n</tt>, <tt>\r</tt>, <tt>\b</tt>, <tt>\t</tt>, <tt>\f</tt>, <tt>\uXXXX</tt>, and <tt>\u{XXXXXX}</tt>. To get <tt>]</tt> or <tt>\</tt> you must escape them with <tt>\</tt>. To get <tt>-</tt> you must escape it with <tt>\</tt> too, except for the case when <tt>-</tt> is the first or last character in the set.</p>
 
 <p>You can also include all characters matching Unicode properties (general category, boolean, or enumerated including scripts and blocks) with <tt>\p{PropertyName}</tt> or <tt>\p{EnumProperty=Value}</tt>. (You can invert the test with <tt>\P{PropertyName}</tt> or <tt>\P{EnumProperty=Value}</tt>).</p>
 
@@ -90,6 +90,8 @@ UNICODE_ID : [\p{Alpha}\p{General_Category=Other_Letter}] [\p{Alnum}\p{General_C
 EMOJI : [\u{1F4A9}\u{1F926}] ; // note Unicode code points > U+FFFF
 
 DASHBRACK : [\-\]]+ ; // match - or ] one or more times
+
+DASH : [---] ; // match a single -, i.e., "any character" between - and - (note first and last - not escaped)
 </pre>
 </td>
 </tr>
@@ -123,7 +125,7 @@ ESC : '\\' . ; // match any escaped \x character
 
 <tr>
 <td>{«action»}</td><td>
-Lexer actions can appear anywhere as of 4.2, not just at the end of the outermost alternative. The lexer executes the actions at the appropriate input position, according to the placement of the action within the rule. To execute a single action for a role that has multiple alternatives, you can enclose the alts in parentheses and put the action afterwards:
+Lexer actions can appear anywhere as of 4.2, not just at the end of the outermost alternative. The lexer executes the actions at the appropriate input position, according to the placement of the action within the rule. To execute a single action for a rule that has multiple alternatives, you can enclose the alts in parentheses and put the action afterwards:
  	
 <pre>
 END : ('endif'|'end') {System.out.println("found an end");} ;
@@ -244,7 +246,8 @@ The mode commands alter the mode stack and hence the mode of the lexer. The 'mor
 ```
 // Default "mode": Everything OUTSIDE of a tag
 COMMENT : '<!--' .*? '-->' ;
-CDATA   : '<![CDATA[' .*? ']]>' ;OPEN : '<' -> pushMode(INSIDE) ;
+CDATA   : '<![CDATA[' .*? ']]>' ;
+OPEN : '<' -> pushMode(INSIDE) ;
  ...
 XMLDeclOpen : '<?xml' S -> pushMode(INSIDE) ;
 SPECIAL_OPEN: '<?' Name -> more, pushMode(PROC_INSTR) ;

@@ -65,7 +65,7 @@ Another common option to the ANTLR tool is `-visitor`, which generates a parse t
 
 We'll write a small main func to call the generated parser/lexer (assuming they are separate). This one writes out the encountered `ParseTreeContext`'s. Suppose the gen'ed parser code is in the `parser` directory relative to this code:
 
-```
+```golang
 package main
 
 import (

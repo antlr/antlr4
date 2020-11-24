@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -24,7 +24,7 @@ namespace antlr4 {
   /// Implementations of this interface report syntax errors by calling
   /// <seealso cref="Parser#notifyErrorListeners"/>.
   /// <p/>
-  /// TO_DO: what to do about lexers
+  /// TODO: what to do about lexers
   /// </summary>
   class ANTLR4CPP_PUBLIC ANTLRErrorStrategy {
   public:

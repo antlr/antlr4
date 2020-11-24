@@ -14,9 +14,9 @@ Cast(t,v) ::= "(<v>)"
 
 Append(a,b) ::= "<a> + fmt.Sprint(<b>)"
 
-Concat(a,b) ::= "<a><b>"
+AppendStr(a,b) ::= "<a> + <b>"
 
-DeclareLocal(s, v) ::= "var <s> = <v>"
+Concat(a,b) ::= "<a><b>"
 
 AssertIsList(v) ::= ""
 
@@ -26,13 +26,17 @@ InitIntMember(n, v) ::= <%var <n> int = <v>; var _ int = <n>; %>
 
 InitBooleanMember(n, v) ::= <%var <n> bool = <v>; var _ bool = <n>; %>
 
+InitIntVar(n,v) ::= <%<InitIntMember(n,v)>%>
+
+IntArg(n) ::= "int <n>"
+
+VarRef(n) ::= "<n>"
+
 GetMember(n) ::= <%<n>%>
 
 SetMember(n, v) ::= <%<n> = <v>;%>
 
 AddMember(n, v) ::= <%<n> += <v>;%>
-
-PlusMember(v, n) ::= <%<v> + fmt.Sprint(<n>)%>
 
 MemberEquals(n, v) ::= <%<n> == <v>%>
 
@@ -94,9 +98,13 @@ func (p *TParser) Property() bool {
 
 ParserPropertyCall(p, call) ::= "<p>.<call>"
 
+PositionAdjustingLexerDef() ::= ""
+
 PositionAdjustingLexer() ::= <<
 func (p *PositionAdjustingLexer) NextToken() antlr.Token {
 	if _, ok := p.Interpreter.(*PositionAdjustingLexerATNSimulator); !ok {
+		lexerDeserializer := antlr.NewATNDeserializer(nil)
+		lexerAtn := lexerDeserializer.DeserializeFromUInt16(serializedLexerAtn)
 		p.Interpreter = NewPositionAdjustingLexerATNSimulator(p, lexerAtn, p.Interpreter.DecisionToDFA(), p.Interpreter.SharedContextCache())
 		p.Virt = p
 	}

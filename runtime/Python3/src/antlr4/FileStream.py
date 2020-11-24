@@ -10,7 +10,6 @@
 #
 
 import codecs
-import unittest
 from antlr4.InputStream import InputStream
 
 
@@ -25,10 +24,3 @@ class FileStream(InputStream):
         with open(fileName, 'rb') as file:
             bytes = file.read()
             return codecs.decode(bytes, encoding, errors)
-
-
-class TestFileStream(unittest.TestCase):
-
-    def testStream(self):
-        stream = FileStream(__file__)
-        self.assertTrue(stream.size>0)

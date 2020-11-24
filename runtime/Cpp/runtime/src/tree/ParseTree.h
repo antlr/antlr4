@@ -39,12 +39,12 @@ namespace tree {
 
     /// Print out a whole tree, not just a node, in LISP format
     /// {@code (root child1 .. childN)}. Print just a node if this is a leaf.
-    virtual std::string toStringTree() = 0;
+    virtual std::string toStringTree(bool pretty = false) = 0;
     virtual std::string toString() = 0;
 
     /// Specialize toStringTree so that it can print out more information
     /// based upon the parser.
-    virtual std::string toStringTree(Parser *parser) = 0;
+    virtual std::string toStringTree(Parser *parser, bool pretty = false) = 0;
 
     virtual bool operator == (const ParseTree &other) const;
 
@@ -88,7 +88,7 @@ namespace tree {
     }
 
     void reset() {
-      for (auto entry : _allocated)
+      for (auto * entry : _allocated)
         delete entry;
       _allocated.clear();
     }

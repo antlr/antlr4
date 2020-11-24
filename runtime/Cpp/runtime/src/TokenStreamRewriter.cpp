@@ -94,7 +94,7 @@ TokenStreamRewriter::TokenStreamRewriter(TokenStream *tokens_) : tokens(tokens_)
 
 TokenStreamRewriter::~TokenStreamRewriter() {
   for (auto program : _programs) {
-    for (auto operation : program.second) {
+    for (auto *operation : program.second) {
       delete operation;
     }
   }
@@ -323,7 +323,7 @@ std::unordered_map<size_t, TokenStreamRewriter::RewriteOperation*> TokenStreamRe
 
     // Wipe prior inserts within range
     std::vector<InsertBeforeOp *> inserts = getKindOfOps<InsertBeforeOp>(rewrites, i);
-    for (auto iop : inserts) {
+    for (auto *iop : inserts) {
       if (iop->index == rop->index) {
         // E.g., insert before 2, delete 2..2; update replace
         // text to include insert before, kill insert
@@ -339,7 +339,7 @@ std::unordered_map<size_t, TokenStreamRewriter::RewriteOperation*> TokenStreamRe
     }
     // Drop any prior replaces contained within
     std::vector<ReplaceOp*> prevReplaces = getKindOfOps<ReplaceOp>(rewrites, i);
-    for (auto prevRop : prevReplaces) {
+    for (auto *prevRop : prevReplaces) {
       if (prevRop->index >= rop->index && prevRop->lastIndex <= rop->lastIndex) {
         // delete replace as it's a no-op.
         delete rewrites[prevRop->instructionIndex];
@@ -373,7 +373,7 @@ std::unordered_map<size_t, TokenStreamRewriter::RewriteOperation*> TokenStreamRe
     // combine current insert with prior if any at same index
 
     std::vector<InsertBeforeOp *> prevInserts = getKindOfOps<InsertBeforeOp>(rewrites, i);
-    for (auto prevIop : prevInserts) {
+    for (auto *prevIop : prevInserts) {
       if (prevIop->index == iop->index) { // combine objects
                                           // convert to strings...we're in process of toString'ing
                                           // whole token buffer so no lazy eval issue with any templates
@@ -385,7 +385,7 @@ std::unordered_map<size_t, TokenStreamRewriter::RewriteOperation*> TokenStreamRe
     }
     // look for replaces where iop.index is in range; error
     std::vector<ReplaceOp*> prevReplaces = getKindOfOps<ReplaceOp>(rewrites, i);
-    for (auto rop : prevReplaces) {
+    for (auto *rop : prevReplaces) {
       if (iop->index == rop->index) {
         rop->text = catOpText(&iop->text, &rop->text);
         delete rewrites[i];
