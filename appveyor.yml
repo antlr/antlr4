@@ -1,8 +1,8 @@
-version: '4.7.1-SNAPSHOT+AppVeyor.{build}'
+version: '4.9.1-SNAPSHOT+AppVeyor.{build}'
 cache:
   - '%USERPROFILE%\.m2'
   - '%USERPROFILE%\.nuget\packages -> **\project.json'
-image: Visual Studio 2017  
+image: Visual Studio 2017
 build: off
 install:
   - git submodule update --init --recursive
@@ -13,10 +13,10 @@ build_script:
   - mvn -DskipTests install --batch-mode
   - msbuild /target:restore /target:rebuild /property:Configuration=Release /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /verbosity:detailed runtime/CSharp/runtime/CSharp/Antlr4.dotnet.sln
   - msbuild ./runtime-testsuite/target/classes/CSharp/runtime/CSharp/Antlr4.vs2013.sln /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /verbosity:detailed
-after_build: 
+after_build:
   - msbuild /target:pack /property:Configuration=Release /verbosity:detailed runtime/CSharp/runtime/CSharp/Antlr4.dotnet.sln
 test_script:
   - mvn install -Dantlr-php-php="C:\tools\php\php.exe" -Dantlr-dart-dart="C:\tools\dart-sdk\bin\dart.exe" -Dantlr-dart-pub="C:\tools\dart-sdk\bin\pub.bat" -Dantlr-dart-dart2native="C:\tools\dart-sdk\bin\dart2native.bat" -Dantlr-python2-python="C:\Python27\python.exe" -Dantlr-python3-python="C:\Python35\python.exe" --batch-mode
 artifacts:
-- path: 'runtime\**\*.nupkg'  
+- path: 'runtime\**\*.nupkg'
   name: NuGet
