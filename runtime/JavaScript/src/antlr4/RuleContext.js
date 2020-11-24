@@ -5,7 +5,7 @@
 
 const {RuleNode} = require('./tree/Tree');
 const {INVALID_INTERVAL} = require('./tree/Tree');
-const INVALID_ALT_NUMBER = require('./atn/ATN').INVALID_ALT_NUMBER || 0; // TODO: solve cyclic dependency to avoid || 0
+const Trees = require('./tree/Trees');
 
 class RuleContext extends RuleNode {
 	/** A rule context is a record of a single rule invocation. It knows
@@ -97,7 +97,10 @@ class RuleContext extends RuleNode {
 	 * option contextSuperClass.
 	 * to set it.
 	 */
-	getAltNumber() { return INVALID_ALT_NUMBER; }
+	getAltNumber() {
+	    // use constant value of ATN.INVALID_ALT_NUMBER to avoid circular dependency
+	    return 0;
+    }
 
 	/**
 	 * Set the outer alternative number for this context node. Default
@@ -154,7 +157,4 @@ class RuleContext extends RuleNode {
 	}
 }
 
-//need to manage circular dependencies, so export now
 module.exports = RuleContext;
-
-const Trees = require('./tree/Trees');

@@ -18,14 +18,27 @@ namespace antlr4 {
   /// of speed.
   class ANTLR4CPP_PUBLIC Lexer : public Recognizer, public TokenSource {
   public:
-    static const size_t DEFAULT_MODE = 0;
-    static const size_t MORE = static_cast<size_t>(-2);
-    static const size_t SKIP = static_cast<size_t>(-3);
+#if __cplusplus >= 201703L
+    static constexpr size_t DEFAULT_MODE = 0;
+    static constexpr size_t MORE = std::numeric_limits<size_t>::max() - 1;
+    static constexpr size_t SKIP = std::numeric_limits<size_t>::max() - 2;
 
-    static const size_t DEFAULT_TOKEN_CHANNEL = Token::DEFAULT_CHANNEL;
-    static const size_t HIDDEN = Token::HIDDEN_CHANNEL;
-    static const size_t MIN_CHAR_VALUE = 0;
-    static const size_t MAX_CHAR_VALUE = 0x10FFFF;
+    static constexpr size_t DEFAULT_TOKEN_CHANNEL = Token::DEFAULT_CHANNEL;
+    static constexpr size_t HIDDEN = Token::HIDDEN_CHANNEL;
+    static constexpr size_t MIN_CHAR_VALUE = 0;
+    static constexpr size_t MAX_CHAR_VALUE = 0x10FFFF;
+#else
+    enum : size_t {
+      DEFAULT_MODE = 0,
+      MORE = static_cast<size_t>(-2), // std::numeric_limits<size_t>::max() - 1; doesn't work in VS 2013
+      SKIP = static_cast<size_t>(-3), // std::numeric_limits<size_t>::max() - 2; doesn't work in VS 2013
+
+      DEFAULT_TOKEN_CHANNEL = Token::DEFAULT_CHANNEL,
+      HIDDEN = Token::HIDDEN_CHANNEL,
+      MIN_CHAR_VALUE = 0,
+      MAX_CHAR_VALUE = 0x10FFFF,
+    };
+#endif
 
     CharStream *_input; // Pure reference, usually from statically allocated instance.
 

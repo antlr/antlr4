@@ -86,7 +86,7 @@ In order to execute this listener, you would simply add the following lines to t
 ...
 IParseTree tree = parser.StartRule() - only repeated here for reference
 KeyPrinter printer = new KeyPrinter();
-ParseTreeWalker.DEFAULT.walk(printer, tree);
+ParseTreeWalker.Default.Walk(printer, tree);
 ```
         
 Further information can be found from The Definitive ANTLR Reference book.
