@@ -288,15 +288,17 @@ cd runtime/JavaScript
 
 ```bash
 cd runtime/JavaScript
+npm update
+npm run build 
 npm login
-npm publish antlr4
+npm publish   # don't put antlr4 on there or it will try to push the old version for some reason
 ```
 
-Move target to website
+Move (and zip) target to website:
 
 ```bash
-npm run build
-cp /dist/antlr4.js ~/antlr/sites/website-antlr4/download
+cd src
+zip -r ~/antlr/sites/website-antlr4/download/antlr-javascript-runtime-4.9.zip .
 ```
 
 ### CSharp
@@ -437,9 +439,9 @@ Move target to website (**_rename to a specific ANTLR version first if needed_**
 ```bash
 pushd ~/antlr/sites/website-antlr4/download
 # vi index.html
-git add antlr4cpp-runtime-4.9-macos.zip
-git add antlr4cpp-runtime-4.9-windows.zip
-git add antlr4cpp-runtime-4.9-source.zip
+git add antlr4-cpp-runtime-4.9-macos.zip
+git add antlr4-cpp-runtime-4.9-windows.zip
+git add antlr4-cpp-runtime-4.9-source.zip
 git commit -a -m 'update C++ runtime'
 git push origin gh-pages
 popd
