@@ -41,7 +41,7 @@ std::string TerminalNodeImpl::getText() {
   return symbol->getText();
 }
 
-std::string TerminalNodeImpl::toStringTree(Parser * /*parser*/) {
+std::string TerminalNodeImpl::toStringTree(Parser * /*parser*/, bool /*pretty*/) {
   return toString();
 }
 
@@ -52,6 +52,6 @@ std::string TerminalNodeImpl::toString() {
   return symbol->getText();
 }
 
-std::string TerminalNodeImpl::toStringTree() {
+std::string TerminalNodeImpl::toStringTree(bool /*pretty*/) {
   return toString();
 }

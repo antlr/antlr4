@@ -18,8 +18,6 @@ AppendStr(a,b) ::= <%<Append(a,b)>%>
 
 Concat(a,b) ::= "<a><b>"
 
-DeclareLocal(s,v) ::= "var <s> = <v>;"
-
 AssertIsList(v) ::= <<if ( !(v instanceof Array) ) {throw "value is not an array";}>>
 
 AssignLocal(s,v) ::= "<s> = <v>;"
@@ -39,8 +37,6 @@ GetMember(n) ::= <%this.<n>%>
 SetMember(n,v) ::= <%this.<n> = <v>;%>
 
 AddMember(n,v) ::= <%this.<n> += <v>;%>
-
-PlusMember(v,n) ::= <%<v> + this.<n>%>
 
 MemberEquals(n,v) ::= <%this.<n> === <v>%>
 
@@ -78,11 +74,7 @@ LANotEquals(i, v) ::= <%this._input.LA(<i>)!=<v>%>
 
 TokenStartColumnEquals(i) ::= <%this._tokenStartColumn===<i>%>
 
-ImportListener(X) ::= <<
-@parser::header {
-var <X>Listener = require('./<X>Listener').<X>Listener;
-}
->>
+ImportListener(X) ::= ""
 
 GetExpectedTokenNames() ::= "this.getExpectedTokens().toString(this.literalNames)"
 
@@ -192,17 +184,20 @@ walker.walk(new this.LeafListener(), <s>);
 
 TreeNodeWithAltNumField(X) ::= <<
 @parser::header {
-MyRuleNode = function(parent, invokingState) {
-	antlr4.ParserRuleContext.call(this, parent, invokingState);
+class MyRuleNode extends antlr4.ParserRuleContext {
+    constructor(parent, invokingState) {
+        super(parent, invokingState);
+        this.altNum = 0;
+    }
 
-	this.altNum = 0;
-	return this;
+    getAltNumber() {
+        return this.altNum;
+    }
+
+    setAltNumber(altNumber){
+        this.altNum = altNumber;
+    }
 };
-
-MyRuleNode.prototype = Object.create(antlr4.ParserRuleContext.prototype);
-MyRuleNode.prototype.constructor = MyRuleNode;
-MyRuleNode.prototype.getAltNumber = function() { return this.altNum; }
-MyRuleNode.prototype.setAltNumber = function(altNumber) { this.altNum = altNumber; }
 
 }
 >>

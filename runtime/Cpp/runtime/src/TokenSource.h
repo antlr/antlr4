@@ -79,7 +79,7 @@ namespace antlr4 {
     /// creating <seealso cref="Token"/> objects from the input.
     /// </summary>
     /// <returns> The <seealso cref="TokenFactory"/> currently used by this token source. </returns>
-    virtual Ref<TokenFactory<CommonToken>> getTokenFactory() = 0;
+    virtual TokenFactory<CommonToken>* getTokenFactory() = 0;
   };
 
 } // namespace antlr4

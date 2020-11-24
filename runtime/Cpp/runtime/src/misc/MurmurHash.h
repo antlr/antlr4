@@ -13,7 +13,13 @@ namespace misc {
   class ANTLR4CPP_PUBLIC MurmurHash {
 
   private:
-    static const size_t DEFAULT_SEED = 0;
+#if __cplusplus >= 201703L
+    static constexpr size_t DEFAULT_SEED = 0;
+#else
+    enum : size_t {
+      DEFAULT_SEED = 0,
+    };
+#endif
 
     /// Initialize the hash using the default seed value.
     /// Returns the intermediate hash value.

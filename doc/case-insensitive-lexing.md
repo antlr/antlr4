@@ -14,7 +14,7 @@ For the 4.7.1 release, we discussed both approaches in [detail](https://github.c
 
 ## Case-insensitive grammars
 
-As a prime example of a grammar that specifically describes case insensitive keywords, see the 
+As a prime example of a grammar that specifically describes case insensitive keywords, see the
 [SQLite grammar](https://github.com/antlr/grammars-v4/blob/master/sqlite/SQLite.g4).  To match a case insensitive keyword, there are rules such as
 
 ```
@@ -72,7 +72,8 @@ Lexer lexer = new SomeSQLLexer(upper);
 
 Here are implementations of `CaseChangingCharStream` in various target languages:
 
-* [Java](https://github.com/parrt/antlr4/blob/case-insensitivity-doc/doc/resources/CaseChangingCharStream.java)
-* [JavaScript](https://github.com/parrt/antlr4/blob/case-insensitivity-doc/doc/resources/CaseInsensitiveInputStream.js)
-* [Go](https://github.com/parrt/antlr4/blob/case-insensitivity-doc/doc/resources/case_changing_stream.go)
-* [C#](https://github.com/parrt/antlr4/blob/case-insensitivity-doc/doc/resources/CaseChangingCharStream.cs)
+* [C#](https://github.com/antlr/antlr4/blob/master/doc/resources/CaseChangingCharStream.cs)
+* [Go](https://github.com/antlr/antlr4/blob/master/doc/resources/case_changing_stream.go)
+* [Java](https://github.com/antlr/antlr4/blob/master/doc/resources/CaseChangingCharStream.java)
+* [JavaScript](https://github.com/antlr/antlr4/blob/master/doc/resources/CaseChangingStream.js)
+* [Python2/3](https://github.com/antlr/antlr4/blob/master/doc/resources/CaseChangingStream.py)

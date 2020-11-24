@@ -20,17 +20,12 @@ public class LookupATNConfig: Hashable {
         // dup
         config = old
     }
-    public var hashValue: Int {
 
-        var hashCode: Int = 7
-        hashCode = 31 * hashCode + config.state.stateNumber
-        hashCode = 31 * hashCode + config.alt
-        hashCode = 31 * hashCode + config.semanticContext.hashValue
-        return hashCode
-
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(config.state.stateNumber)
+        hasher.combine(config.alt)
+        hasher.combine(config.semanticContext)
     }
-
-
 }
 
 public func ==(lhs: LookupATNConfig, rhs: LookupATNConfig) -> Bool {
