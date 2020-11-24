@@ -199,10 +199,10 @@ export GPG_TTY=$(tty)
 Side note to set jdk 1.7 on os x:
 
 ```bash
-alias java='/Library/Java/JavaVirtualMachines/jdk1.7.0_21.jdk/Contents/Home/bin/java'
-alias javac='/Library/Java/JavaVirtualMachines/jdk1.7.0_21.jdk/Contents/Home/bin/javac'
-alias javadoc='/Library/Java/JavaVirtualMachines/jdk1.7.0_21.jdk/Contents/Home/bin/javadoc'
-alias jar='/Library/Java/JavaVirtualMachines/jdk1.7.0_21.jdk/Contents/Home/bin/jar'
+alias java="`/usr/libexec/java_home -v 1.7`/bin/java"
+alias javac="`/usr/libexec/java_home -v 1.7`/bin/javac"
+alias javadoc="`/usr/libexec/java_home -v 1.7`/bin/javadoc"
+alias jar="`/usr/libexec/java_home -v 1.7`/bin/jar"
 export JAVA_HOME=`/usr/libexec/java_home -v 1.7`
 ```
 
