@@ -254,11 +254,12 @@ YYYY/MM/DD, github id, Full name, email
 2020/04/30, TristonianJones, Tristan Swadell, tswadell@google.com
 2020/05/06, iammosespaulr, Moses Paul R, iammosespaulr@gmail.com
 2020/05/10, gomerser, Erik Gomersbach, gomerser@gomersba.ch
-2020/06/04, sigmasoldi3r, Pablo Blanco, pablobc.1995@gmail.com
+2020/05/22, keywan-ghadami-oxid, Keywan Ghadami, keywan.ghadami@oxid-esales.com
 2020/05/25, graknol, Sindre van der Linden, graknol@gmail.com
 2020/05/31, d-markey, David Markey, dmarkey@free.fr
 2020/06/02, cohomology, Kilian Kilger, kkilger AT gmail.com
 2020/06/04, IohannRabeson, Iohann Rabeson, iotaka6@gmail.com
+2020/06/04, sigmasoldi3r, Pablo Blanco, pablobc.1995@gmail.com
 2020/07/01, sha-N, Shan M Mathews, admin@bluestarqatar.com
 2020/08/22, stevenjohnstone, Steven Johnstone, steven.james.johnstone@gmail.com
 2020/09/06, ArthurSonzogni, Sonzogni Arthur, arthursonzogni@gmail.com
