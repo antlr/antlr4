@@ -159,4 +159,4 @@ class DFA {
 }
 
 
-module.exports = { DFA };
+module.exports = DFA;

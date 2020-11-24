@@ -15,5 +15,14 @@ module.exports = {
         net: "empty",
         fs: "empty"
     },
-    target: "web"
+    target: "web",
+    module: {
+        rules: [{
+            test: /\.js$/,
+            exclude: /node_modules/,
+            use: {
+                loader: 'babel-loader',
+            }
+        }]
+    }
 }

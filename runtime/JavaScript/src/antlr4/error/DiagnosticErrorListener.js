@@ -102,4 +102,4 @@ class DiagnosticErrorListener extends ErrorListener {
 	}
 }
 
-module.exports = {DiagnosticErrorListener}
+module.exports = DiagnosticErrorListener
