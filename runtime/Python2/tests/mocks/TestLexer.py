@@ -39,7 +39,7 @@ class TestLexer(Lexer):
 
     def __init__(self, input=None):
         super(TestLexer, self).__init__(input)
-        self.checkVersion("4.8")
+        self.checkVersion("4.9")
         self._interp = LexerATNSimulator(self, self.atn, self.decisionsToDFA, PredictionContextCache())
         self._actions = None
         self._predicates = None

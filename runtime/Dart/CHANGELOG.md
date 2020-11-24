@@ -1,4 +1,4 @@
 
-## 4.8.0-dev.2
+## 4.9.0
 
 * Initial release
