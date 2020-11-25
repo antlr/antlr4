@@ -1,0 +1,1 @@
+module.exports = require('./src/antlr4/index.js');
