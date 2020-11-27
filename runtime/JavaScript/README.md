@@ -11,25 +11,15 @@ See www.antlr.org for more information on ANTLR
 See [Javascript Target](https://github.com/antlr/antlr4/blob/master/doc/javascript-target.md)
 for more information on using ANTLR in JavaScript
 
+This runtime requires node version >= 14, the first version to officially support ES semantics.
 
-## publishing
+ANTLR 4 runtime is available in 10 target languages, and favors consistency of versioning across targets.
+As such it cannot follow recommended NPM semantic versioning.
+If you install a specific version of antlr4, we strongly recommend you remove the corresponding ^ in your package.json.
 
-The JavaScript itself is tested using npm, so assumption is npm is already installed.
-The current npm version used is 3.10.9.
+ 
 
-### to npm
 
-The publishing itself relies on the information in package.json.
-To publish run `npm login` from Terminal, then `npm publish antlr4`
 
-That's it!
-
-### to browser
-
-To publish antlr4 for browser usage you need to bundle it into a single
-file with `npm run build`. This will create `dist/antlr4.js` file. Upload it
-to your favourite server.
-
-That's it!
 
 
