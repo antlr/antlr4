@@ -5,7 +5,6 @@
  */
 package org.antlr.v4.test.runtime.python;
 
-import com.sun.codemodel.internal.JForEach;
 import org.antlr.v4.Tool;
 import org.antlr.v4.automata.ATNFactory;
 import org.antlr.v4.automata.ATNPrinter;
