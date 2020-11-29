@@ -139,7 +139,7 @@ Edit the pom.xml file. Now we need to extensively modify the pom.xml file. The f
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>3.8.1</version>
+      <version>4.13.1</version>
     </dependency>
   </dependencies>
   <build>
