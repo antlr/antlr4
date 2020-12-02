@@ -3,7 +3,7 @@
     <Company>The ANTLR Organization</Company>
     <Version>4.9</Version>
     <NeutralLanguage>en-US</NeutralLanguage>
-    <TargetFrameworks>netstandard1.3;</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
     <NoWarn>$(NoWarn);CS1591;CS1574;CS1580</NoWarn>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AssemblyName>Antlr4.Runtime.Standard</AssemblyName>
@@ -44,7 +44,7 @@
     <Optimize>true</Optimize>
     <OutputPath>lib\Release</OutputPath>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(TargetFramework)'=='netstandard1.3'">
-    <DefineConstants>DOTNETCORE;NET40PLUS;NET45PLUS</DefineConstants>
+  <PropertyGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
+    <DefineConstants>NETSTANDARD20</DefineConstants>
   </PropertyGroup>
 </Project>
