@@ -2,7 +2,7 @@ version: '4.9.1-SNAPSHOT+AppVeyor.{build}'
 cache:
   - '%USERPROFILE%\.m2'
   - '%USERPROFILE%\.nuget\packages -> **\project.json'
-image: Visual Studio 2017
+image: Visual Studio 2019
 build: off
 install:
   - git submodule update --init --recursive
