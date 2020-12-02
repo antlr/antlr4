@@ -77,9 +77,7 @@ namespace Antlr4.Runtime.Atn
 
         protected void ConsoleWriteLine(string format, params object[] arg)
         {
-#if !PORTABLE
             System.Console.WriteLine(format, arg);
-#endif
         }
 
         public PredictionContextCache getSharedContextCache()

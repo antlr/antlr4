@@ -279,11 +279,7 @@ namespace Antlr4.Runtime
             return null;
         }
 
-#if (NET45PLUS && !DOTNETCORE)
         public virtual IReadOnlyList<ITerminalNode> GetTokens(int ttype)
-#else
-        public virtual ITerminalNode[] GetTokens(int ttype)
-#endif
         {
             if (children == null)
             {
@@ -310,11 +306,8 @@ namespace Antlr4.Runtime
             {
                 return Collections.EmptyList<ITerminalNode>();
             }
-#if (NET45PLUS && !DOTNETCORE)
+
             return tokens;
-#else
-            return tokens.ToArray();
-#endif
         }
 
         public virtual T GetRuleContext<T>(int i)
@@ -323,13 +316,8 @@ namespace Antlr4.Runtime
             return GetChild<T>(i);
         }
 
-#if (NET45PLUS && !DOTNETCORE)
         public virtual IReadOnlyList<T> GetRuleContexts<T>()
             where T : Antlr4.Runtime.ParserRuleContext
-#else
-        public virtual T[] GetRuleContexts<T>()
-            where T : Antlr4.Runtime.ParserRuleContext
-#endif
         {
             if (children == null)
             {
@@ -351,11 +339,8 @@ namespace Antlr4.Runtime
             {
                 return Collections.EmptyList<T>();
             }
-#if (NET45PLUS && !DOTNETCORE)
+
             return contexts;
-#else
-            return contexts.ToArray();
-#endif
         }
 
         public override int ChildCount

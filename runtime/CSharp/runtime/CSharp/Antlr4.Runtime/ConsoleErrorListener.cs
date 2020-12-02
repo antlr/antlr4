@@ -3,10 +3,6 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
-#if !PORTABLE
-
-using Antlr4.Runtime;
-using Antlr4.Runtime.Sharpen;
 using System.IO;
 
 namespace Antlr4.Runtime
@@ -45,5 +41,3 @@ namespace Antlr4.Runtime
         }
     }
 }
-
-#endif

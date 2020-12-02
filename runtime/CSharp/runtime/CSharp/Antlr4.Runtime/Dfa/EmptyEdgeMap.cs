@@ -3,11 +3,7 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 using System.Collections.Generic;
-using Antlr4.Runtime.Sharpen;
-
-#if NET45PLUS
 using System.Collections.ObjectModel;
-#endif
 
 namespace Antlr4.Runtime.Dfa
 {
@@ -74,18 +70,9 @@ namespace Antlr4.Runtime.Dfa
             }
         }
 
-#if NET45PLUS
         public override IReadOnlyDictionary<int, T> ToMap()
-#else
-        public override IDictionary<int, T> ToMap()
-#endif
         {
-            Dictionary<int, T> result = new Dictionary<int, T>();
-#if NET45PLUS
-            return new ReadOnlyDictionary<int, T>(result);
-#else
-            return result;
-#endif
+            return new ReadOnlyDictionary<int, T>(new Dictionary<int, T>());
         }
     }
 }

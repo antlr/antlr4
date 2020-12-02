@@ -3,7 +3,7 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
-#if PORTABLE || DOTNETCORE
+#if NETSTANDARD20
 
 namespace System
 {
@@ -14,4 +14,3 @@ namespace System
 }
 
 #endif
-

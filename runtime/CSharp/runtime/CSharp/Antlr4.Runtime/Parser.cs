@@ -19,7 +19,6 @@ namespace Antlr4.Runtime
     /// <remarks>This is all the parsing support code essentially; most of it is error recovery stuff.</remarks>
     public abstract class Parser : Recognizer<IToken, ParserATNSimulator>
     {
-#if !PORTABLE
         public class TraceListener : IParseTreeListener
         {
 
@@ -58,7 +57,6 @@ namespace Antlr4.Runtime
             private readonly Parser _enclosing;
             private readonly TextWriter _output;
         }
-#endif
 
         public class TrimToSizeListener : IParseTreeListener
         {
@@ -133,7 +131,6 @@ namespace Antlr4.Runtime
         /// <seealso cref="BuildParseTree"/>
         private bool _buildParseTrees = true;
 
-#if !PORTABLE
         /// <summary>
         /// When
         /// <see cref="Trace"/>
@@ -149,7 +146,6 @@ namespace Antlr4.Runtime
         /// other parser methods.
         /// </summary>
         private Parser.TraceListener _tracer;
-#endif
 
         /// <summary>
         /// The list of
@@ -192,9 +188,7 @@ namespace Antlr4.Runtime
             _errHandler.Reset(this);
             _ctx = null;
             _syntaxErrors = 0;
-#if !PORTABLE
             Trace = false;
-#endif
             _precedenceStack.Clear();
             _precedenceStack.Add(0);
             ATNSimulator interpreter = Interpreter;
@@ -1146,7 +1140,6 @@ namespace Antlr4.Runtime
             return s;
         }
 
-#if !PORTABLE
         /// <summary>For debugging and other purposes.</summary>
         /// <remarks>For debugging and other purposes.</remarks>
         public virtual void DumpDFA()
@@ -1167,7 +1160,6 @@ namespace Antlr4.Runtime
                 }
             }
         }
-#endif
 
         public virtual string SourceName
         {
@@ -1214,7 +1206,6 @@ namespace Antlr4.Runtime
             }
         }
 
-#if !PORTABLE
         /// <summary>
         /// During a parse is sometimes useful to listen in on the rule entry and exit
         /// events as well as token matches.
@@ -1258,6 +1249,5 @@ namespace Antlr4.Runtime
                 }
             }
         }
-#endif
     }
 }

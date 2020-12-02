@@ -2112,9 +2112,7 @@ namespace Antlr4.Runtime.Atn
 		 */
 		public void DumpDeadEndConfigs(NoViableAltException nvae)
 		{
-#if !PORTABLE
             System.Console.Error.WriteLine("dead end configs: ");
-#endif
             foreach (ATNConfig c in nvae.DeadEndConfigs.configs)
 			{
 				String trans = "no edges";
@@ -2133,9 +2131,8 @@ namespace Antlr4.Runtime.Atn
 						trans = (not ? "~" : "") + "Set " + st.set.ToString();
 					}
 				}
-#if !PORTABLE
+
                 System.Console.Error.WriteLine(c.ToString(parser, true) + ":" + trans);
-#endif
 			}
 		}
 

@@ -160,9 +160,7 @@ namespace Antlr4.Runtime
                     }
                     else
                     {
-#if !PORTABLE
                         System.Console.Error.WriteLine("unknown recognition error type: " + e.GetType().FullName);
-#endif
                         NotifyErrorListeners(recognizer, e.Message, e);
                     }
                 }

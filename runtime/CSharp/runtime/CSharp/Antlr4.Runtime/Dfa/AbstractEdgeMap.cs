@@ -4,8 +4,6 @@
  */
 using System.Collections;
 using System.Collections.Generic;
-using Antlr4.Runtime.Dfa;
-using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime.Dfa
 {
@@ -78,11 +76,7 @@ namespace Antlr4.Runtime.Dfa
             get;
         }
 
-#if NET45PLUS
         public abstract IReadOnlyDictionary<int, T> ToMap();
-#else
-        public abstract IDictionary<int, T> ToMap();
-#endif
 
         public virtual IEnumerator<KeyValuePair<int, T>> GetEnumerator()
         {

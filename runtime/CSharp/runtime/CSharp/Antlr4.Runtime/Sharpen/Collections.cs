@@ -4,7 +4,6 @@
  */
 namespace Antlr4.Runtime.Sharpen
 {
-    using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
 
@@ -15,11 +14,7 @@ namespace Antlr4.Runtime.Sharpen
             return EmptyListImpl<T>.Instance;
         }
 
-#if NET45PLUS
         public static ReadOnlyDictionary<TKey, TValue> EmptyMap<TKey, TValue>()
-#else
-        public static IDictionary<TKey, TValue> EmptyMap<TKey, TValue>()
-#endif
         {
             return EmptyMapImpl<TKey, TValue>.Instance;
         }
@@ -29,17 +24,9 @@ namespace Antlr4.Runtime.Sharpen
             return new ReadOnlyCollection<T>(new T[] { item });
         }
 
-#if NET45PLUS
         public static ReadOnlyDictionary<TKey, TValue> SingletonMap<TKey, TValue>(TKey key, TValue value)
-#else
-        public static IDictionary<TKey, TValue> SingletonMap<TKey, TValue>(TKey key, TValue value)
-#endif
         {
-#if NET45PLUS
             return new ReadOnlyDictionary<TKey,TValue>(new Dictionary<TKey, TValue> { { key, value } });
-#else
-            return new Dictionary<TKey, TValue> { { key, value } };
-#endif
         }
 
         private static class EmptyListImpl<T>
@@ -49,18 +36,8 @@ namespace Antlr4.Runtime.Sharpen
 
         private static class EmptyMapImpl<TKey, TValue>
         {
-#if NET45PLUS
             public static readonly ReadOnlyDictionary<TKey, TValue> Instance =
                 new ReadOnlyDictionary<TKey, TValue>(new Dictionary<TKey, TValue>());
-#else
-            public static IDictionary<TKey, TValue> Instance
-            {
-                get
-                {
-                    return new Dictionary<TKey, TValue>();
-                }
-            }
-#endif
         }
     }
 

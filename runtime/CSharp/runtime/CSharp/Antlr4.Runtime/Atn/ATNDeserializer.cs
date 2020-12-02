@@ -398,7 +398,7 @@ namespace Antlr4.Runtime.Atn
 			}
 		}
 
-		protected internal virtual void ReadSets(ATN atn, IList<IntervalSet> sets, Func<int> readUnicode)
+		protected internal virtual void ReadSets(ATN atn, IList<IntervalSet> sets, System.Func<int> readUnicode)
 		{
 			//
 			// SETS

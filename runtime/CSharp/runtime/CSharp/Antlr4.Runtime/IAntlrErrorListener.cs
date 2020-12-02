@@ -2,19 +2,14 @@
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
-using Antlr4.Runtime;
-using Antlr4.Runtime.Sharpen;
+
 using System.IO;
 
 namespace Antlr4.Runtime
 {
     /// <summary>How to emit recognition errors.</summary>
     /// <remarks>How to emit recognition errors.</remarks>
-#if COMPACT
-    public interface IAntlrErrorListener<TSymbol>
-#else
     public interface IAntlrErrorListener<in TSymbol>
-#endif
     {
         /// <summary>Upon syntax error, notify any interested parties.</summary>
         /// <remarks>

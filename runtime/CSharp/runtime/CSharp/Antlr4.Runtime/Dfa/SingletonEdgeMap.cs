@@ -3,7 +3,6 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 using System.Collections.Generic;
-using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime.Dfa
 {
@@ -123,17 +122,13 @@ namespace Antlr4.Runtime.Dfa
             return this;
         }
 
-#if NET45PLUS
         public override IReadOnlyDictionary<int, T> ToMap()
-#else
-        public override IDictionary<int, T> ToMap()
-#endif
         {
             if (IsEmpty)
             {
                 return Sharpen.Collections.EmptyMap<int, T>();
             }
-            return Antlr4.Runtime.Sharpen.Collections.SingletonMap(key, value);
+            return Sharpen.Collections.SingletonMap(key, value);
         }
     }
 }

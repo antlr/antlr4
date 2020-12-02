@@ -5,7 +5,6 @@
 namespace Antlr4.Runtime.Sharpen
 {
 	using System.Collections.Generic;
-	using Antlr4.Runtime.Misc;
 
 	internal static class ListExtensions
     {
@@ -16,8 +15,5 @@ namespace Antlr4.Runtime.Sharpen
             list[index] = value;
             return previous;
         }
-
-
-
-	}
+    }
 }
