@@ -19,59 +19,56 @@ stages:
 matrix:
   include:
     - os: linux
-      dist: trusty
+      dist: focal
       compiler: clang
-      jdk: openjdk8
+      jdk: openjdk11
       env:
         - TARGET=cpp
-        - CXX=g++-5
+        - CXX=g++-10
         - GROUP=LEXER
       stage: main-test
       addons:
         apt:
           sources:
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-precise-3.7
+            - sourceline: 'deb http://apt.llvm.org/focal/ llvm-toolchain-focal-10 main'
           packages:
-            - g++-5
+            - g++-10
             - uuid-dev
-            - clang-3.7
+            - clang-10
     - os: linux
-      dist: trusty
+      dist: focal
       compiler: clang
-      jdk: openjdk8
+      jdk: openjdk11
       env:
         - TARGET=cpp
-        - CXX=g++-5
+        - CXX=g++-10
         - GROUP=PARSER
       stage: main-test
       addons:
         apt:
           sources:
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-precise-3.7
+            - sourceline: 'deb http://apt.llvm.org/focal/ llvm-toolchain-focal-10 main'
           packages:
-            - g++-5
+            - g++-10
             - uuid-dev
-            - clang-3.7
+            - clang-10
     - os: linux
-      dist: trusty
+      dist: focal
       compiler: clang
-      jdk: openjdk8
+      jdk: openjdk11
       env:
         - TARGET=cpp
-        - CXX=g++-5
+        - CXX=g++-10
         - GROUP=RECURSION
       stage: main-test
       addons:
         apt:
           sources:
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-precise-3.7
+            - sourceline: 'deb http://apt.llvm.org/focal/ llvm-toolchain-focal-10 main'
           packages:
-            - g++-5
+            - g++-10
             - uuid-dev
-            - clang-3.7
+            - clang-10
     - os: osx
       compiler: clang
       osx_image: xcode10.2
