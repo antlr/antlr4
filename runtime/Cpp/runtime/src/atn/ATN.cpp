@@ -158,7 +158,7 @@ misc::IntervalSet ATN::getExpectedTokens(size_t stateNumber, RuleContext *contex
   }
 
   if (following.contains(Token::EPSILON)) {
-    expected.add(Token::EOF);
+    expected.add(static_cast<ssize_t>(Token::EOF));
   }
 
   return expected;

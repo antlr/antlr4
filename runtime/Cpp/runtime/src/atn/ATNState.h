@@ -70,7 +70,7 @@ namespace atn {
   ///
   /// <embed src="images/OptionalNonGreedy.svg" type="image/svg+xml"/>
   /// </summary>
-  class ANTLR4CPP_PUBLIC ATN;
+  class ATN;
 
   class ANTLR4CPP_PUBLIC ATNState {
   public:

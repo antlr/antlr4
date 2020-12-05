@@ -49,13 +49,15 @@ namespace antlrcpp {
             result += "\u00B7";
             break;
           }
-          // else fall through
 #ifndef _MSC_VER
-#if __has_cpp_attribute(clang::fallthrough)
+#   ifdef __has_cpp_attribute
+#       if __has_cpp_attribute(clang::fallthrough)
           [[clang::fallthrough]];
+#   endif
+#   elif __GNUC__ >= 7
+          __attribute__ ((fallthrough));
+#   endif
 #endif
-#endif
-
         default:
           result += c;
       }

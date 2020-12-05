@@ -82,20 +82,20 @@ void LL1Analyzer::_LOOK(ATNState *s, ATNState *stopState, Ref<PredictionContext>
   // ml: s can never be null, hence no need to check if stopState is != null.
   if (s == stopState) {
     if (ctx == nullptr) {
-      look.add(Token::EPSILON);
+      look.add(static_cast<ssize_t>(Token::EPSILON));
       return;
     } else if (ctx->isEmpty() && addEOF) {
-      look.add(Token::EOF);
+      look.add(static_cast<ssize_t>(Token::EOF));
       return;
     }
   }
 
   if (s->getStateType() == ATNState::RULE_STOP) {
     if (ctx == nullptr) {
-      look.add(Token::EPSILON);
+      look.add(static_cast<ssize_t>(Token::EPSILON));
       return;
     } else if (ctx->isEmpty() && addEOF) {
-      look.add(Token::EOF);
+      look.add(static_cast<ssize_t>(Token::EOF));
       return;
     }
 

@@ -103,7 +103,7 @@ ParseTreePattern ParseTreePatternMatcher::compile(const std::string &pattern, in
 #endif
   } catch (RecognitionException &re) {
     throw re;
-#if defined(_MSC_FULL_VER) && _MSC_FULL_VER < 190023026
+#if (defined(_MSC_FULL_VER) && _MSC_FULL_VER < 190023026) || __GNUC__ < 6
   } catch (std::exception &e) {
     // throw_with_nested is not available before VS 2015.
     throw e;

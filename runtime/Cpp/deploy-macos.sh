@@ -11,7 +11,7 @@ if [ ! -d utfcpp ]
 then
     git clone https://github.com/nemtrif/utfcpp.git utfcpp
     pushd utfcpp
-    git checkout tags/v3.1.1
+    git checkout tags/v3.1.2
     popd
 fi
 popd
