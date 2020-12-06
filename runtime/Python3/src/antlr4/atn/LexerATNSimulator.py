@@ -75,6 +75,9 @@ class LexerATNSimulator(ATNSimulator):
         self.column = 0
         from antlr4.Lexer import Lexer
         self.mode = Lexer.DEFAULT_MODE
+        # Cache Lexer properties to avoid further imports
+        self.DEFAULT_MODE = Lexer.DEFAULT_MODE
+        self.MAX_CHAR_VALUE = Lexer.MAX_CHAR_VALUE
         # Used during DFA/ATN exec to record the most recent accept configuration info
         self.prevAccept = SimState()
 
@@ -105,8 +108,7 @@ class LexerATNSimulator(ATNSimulator):
         self.startIndex = -1
         self.line = 1
         self.column = 0
-        from antlr4.Lexer import Lexer
-        self.mode = Lexer.DEFAULT_MODE
+        self.mode = self.DEFAULT_MODE
 
     def matchATN(self, input:InputStream):
         startState = self.atn.modeToStartState[self.mode]
@@ -291,8 +293,7 @@ class LexerATNSimulator(ATNSimulator):
             lexerActionExecutor.execute(self.recog, input, startIndex)
 
     def getReachableTarget(self, trans:Transition, t:int):
-        from antlr4.Lexer import Lexer
-        if trans.matches(t, 0, Lexer.MAX_CHAR_VALUE):
+        if trans.matches(t, 0, self.MAX_CHAR_VALUE):
             return trans.target
         else:
             return None
@@ -420,8 +421,7 @@ class LexerATNSimulator(ATNSimulator):
 
         elif t.serializationType in [ Transition.ATOM, Transition.RANGE, Transition.SET ]:
             if treatEofAsEpsilon:
-                from antlr4.Lexer import Lexer
-                if t.matches(Token.EOF, 0, Lexer.MAX_CHAR_VALUE):
+                if t.matches(Token.EOF, 0, self.MAX_CHAR_VALUE):
                     c = LexerATNConfig(state=t.target, config=config)
 
         return c
