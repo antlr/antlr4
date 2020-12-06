@@ -1,76 +1,76 @@
-# ANTLR 4 Documentation
+# ANTLR 4 Dökümantasyonu
 
-Please check [Frequently asked questions (FAQ)](faq/index.md) before asking questions on stackoverflow or antlr-discussion list.
+Lütfen Stackoverflow'da veya antlr tartışma listesinde soru sormadan önce [Sık sorulan sorular (SSS)](faq/index.md) 'ı inceleyin.
 
-Notes:
-<ul>
-<li>To add to or improve this documentation, <a href=https://help.github.com/articles/fork-a-repo>fork</a> the <a href=https://github.com/antlr/antlr4>antlr/antlr4 repo</a> then update this `doc/index.md` or file(s) in that directory.  Submit a <a href=https://help.github.com/articles/creating-a-pull-request>pull request</a> to get your changes incorporated into the main repository. Do not mix code and documentation updates in the sample pull request. <b>You must sign the contributors.txt certificate of origin with your pull request if you've not done so before.</b></li>
+Notlar:
+<ul> 
+<li>Bu dökümantasyona katkıda bulunmak istiyorsanız, <a href=https://github.com/antlr/antlr4>antlr/antlr4 repo</a>sunu <a href=https://help.github.com/articles/fork-a-repo>fork</a>layın. Ardından `doc/index.md` veya bu klasördeki dosyalara katkıda bulunun. Ana repo için bir <a href=https://help.github.com/articles/creating-a-pull-request>pull request</a> oluşturun. Kod ve dökümantasyon için güncellediğiniz dosyaları tek bir <a href=https://help.github.com/articles/creating-a-pull-request>pull request</a> ile bildirmeyin. <b>Eğer daha önce pull request bildirmediyseniz kendinizi [contributors.txt](https://github.com/antlr/antlr4/blob/master/contributors.txt) dosyasına kayıt etmeniz gerekir.</b></li>
 
 <li>Copyright © 2012, The Pragmatic Bookshelf.  Pragmatic Bookshelf grants a nonexclusive, irrevocable, royalty-free, worldwide license to reproduce, distribute, prepare derivative works, and otherwise use this contribution as part of the ANTLR project and associated documentation.</li>
 
-<li>Much of this text was copied with permission from the <a href=http://pragprog.com/book/tpantlr2/the-definitive-antlr-4-reference>The Definitive ANTLR 4 Reference</a>, though it is being morphed over time as the tool changes.</li>
+<li>Bu metnin çoğu parçası  izinleri dahilinde <a href=http://pragprog.com/book/tpantlr2/the-definitive-antlr-4-reference>The Definitive ANTLR 4 Reference</a> kitabından kopyalanmıştır. Aradan geçen zaman içinde değişen araçlara göre biçimlendirilmiştir.</li>
 </ul>
 
-Links in the documentation refer to various sections of the book but have been redirected to the general book page on the publisher's site. There are two excerpts on the publisher's website that might be useful to you without having to purchase the book: [Let's get Meta](http://media.pragprog.com/titles/tpantlr2/picture.pdf) and [Building a Translator with a Listener](http://media.pragprog.com/titles/tpantlr2/listener.pdf). You should also consider reading the following books (the vid describes the reference book):
-
+Dökümantasyonda ki linkler kitabın çeşitli bölümlerine atıfta bulunur ve kitabın yayıncı sitesindeki sayfasına yönlendirir. Yayıncı websitesinde kitabı almadan okuyabileceğiniz iki alıntı mevcut: [Dinleyici ile bir Çevirici oluşturmak (İngilizce)](http://media.pragprog.com/titles/tpantlr2/listener.pdf), [Hadi Meta Verisini Alalım (İngilizce)](http://media.pragprog.com/titles/tpantlr2/picture.pdf). Ayrıca aşağıda gösterilen kitapları okumayıda düşünebilirsiniz (video referans kitabının incelemesini içerir):
 <a href=""><img src=images/tpantlr2.png width=120></a>
 <a href=""><img src=images/tpdsl.png width=120></a>
 <a href="https://www.youtube.com/watch?v=OAoA3E-cyug"><img src=images/teronbook.png width=250></a>
 
-This documentation is a reference and summarizes grammar syntax and the key semantics of ANTLR grammars. The source code for all examples in the book, not just this chapter, are free at the publisher's website. The following video is a general tour of ANTLR 4 and includes a description of how to use parse tree listeners to process Java files easily:
+Bu dökümantasyon ANTLR gramerinin anahtar kısımlarına ve gramer sözdizimine bir referans oluşturur ve özet geçer.
+Kitapta ki tüm örnek kaynak kodlar, sadece bu bölüm için değil, yayıncı websitesinde ücretsiz erişilebilir durumdadır. Aşağıda ki video genel olarak ANTLR4'ü anlatır ve parse tree listeners kullanarak java dosyalarının nasıl kolayca işleneceğine dair bir açıklama içerir.
 
 <a href="https://vimeo.com/59285751"><img src=images/tertalk.png width=200></a>
 
-For those using Java, here's a great [set of ANTLR in Intellij notes](https://docs.google.com/document/d/1gQ2lsidvN2cDUUsHEkT05L-wGbX5mROB7d70Aaj3R64/edit#heading=h.xr0jj8vcdsgc) by Andreas Stefik.
+Bunları Java ile kullanmak için Andreas Stefik'in [Intellij için ANTLR ayarlama notları](https://docs.google.com/document/d/1gQ2lsidvN2cDUUsHEkT05L-wGbX5mROB7d70Aaj3R64/edit#heading=h.xr0jj8vcdsgc)'nı okuyabilirsiniz.
 
-## Sections
+## Başlıklar
 
-* [Getting Started with ANTLR v4](getting-started.md)
+* [ANTLR v4'e Başlarken](getting-started.md)
 
-* [Grammar Lexicon](lexicon.md)
+* [Gramer Sözlüğü](lexicon.md)
 
-* [Grammar Structure](grammars.md)
+* [Gramer Yapısı](grammars.md)
 
-* [Parser Rules](parser-rules.md)
+* [Parser Kuralları](parser-rules.md)
 
-* [Left-recursive rules](left-recursion.md)
+* [Sol-recursive Kuralları](left-recursion.md)
 
-* [Actions and Attributes](actions.md)
+* [Aksiyon ve Nitelikler](actions.md)
 
-* [Lexer Rules](lexer-rules.md)
+* [Lexer Kuralları](lexer-rules.md)
 
-* [Wildcard Operator and Nongreedy Subrules](wildcard.md)
+* [Joker Operatörü ve Beklentisiz Alt kuralları](wildcard.md)
 
 * [Parse Tree Listeners](listeners.md)
 
-* [Parse Tree Matching and XPath](tree-matching.md)
+* [Parse Tree Eşleşmesi ve XPath](tree-matching.md)
 
-* [Semantic Predicates](predicates.md)
+* [Semantik Yüklemler](predicates.md)
 
-* [Options](options.md)
+* [Ayarlar](options.md)
 
-* [ANTLR Tool Command Line Options](tool-options.md)
+* [ANTLR Aracı Komut Satırı Ayarları](tool-options.md)
 
-* [Runtime Libraries and Code Generation Targets](targets.md)
+* [Çalışma Zamanı Kütüphaneleri ve Kod Oluşturma Hedefleri](targets.md)
 
-* [Unicode U+FFFF, U+10FFFF character streams](unicode.md)
+* [Unicode U+FFFF, U+10FFFF karakter akışları](unicode.md)
 
-* [Parsing binary streams](parsing-binary-files.md)
+* [İkili Akışları Parse Etmek](parsing-binary-files.md)
 
-* [Case-Insensitive Lexing](case-insensitive-lexing.md)
+* [Harf Büyük-Küçük Fark Etmeksizin Lexer İşlemi](case-insensitive-lexing.md)
 
-* [Parser and lexer interpreters](interpreters.md)
+* [Parser ve lexer Yorumlayıcıları](interpreters.md)
 
-* [Resources](resources.md)
+* [Kaynaklar](resources.md)
 
-# Building / releasing ANTLR itself
+# ANTLR inşa etmek 
 
-* [Building ANTLR itself](building-antlr.md)
+* [ANTLR'ı Kendi Başına İnşa Etmek](building-antlr.md)
 
-* [Contributing to ANTLR](/CONTRIBUTING.md)
+* [ANTLR'a Katkıda Bulunmak](/CONTRIBUTING.md)
 
-* [Cutting an ANTLR Release](releasing-antlr.md)
+* [ANTLR Release Sürümünü Değiştirmek](releasing-antlr.md)
 
-* [ANTLR project unit tests](antlr-project-testing.md)
+* [ANTLR Projesi Unit testleri](antlr-project-testing.md)
 
-* [Creating an ANTLR Language Target](creating-a-language-target.md)
+* [ANTLR İçin Hedef Dil Oluşturmak](creating-a-language-target.md)
