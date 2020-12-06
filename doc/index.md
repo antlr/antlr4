@@ -4,7 +4,7 @@ Lütfen Stackoverflow'da veya antlr tartışma listesinde soru sormadan önce [S
 
 Notlar:
 <ul> 
-<li>Bu dökümantasyona katkıda bulunmak istiyorsanız, <a href=https://github.com/antlr/antlr4>antlr/antlr4 repo</a>sunu <a href=https://help.github.com/articles/fork-a-repo>fork</a>layın. Ardından `doc/index.md` veya bu klasördeki dosyalara katkıda bulunun. Ana repo için bir <a href=https://help.github.com/articles/creating-a-pull-request>pull request</a> oluşturun. Kod ve dökümantasyon için güncellediğiniz dosyaları tek bir <a href=https://help.github.com/articles/creating-a-pull-request>pull request</a> ile bildirmeyin. <b>Eğer daha önce pull request bildirmediyseniz kendinizi [contributors.txt](https://github.com/antlr/antlr4/blob/master/contributors.txt) dosyasına kayıt etmeniz gerekir.</b></li>
+<li>Bu dökümantasyona katkıda bulunmak istiyorsanız, <a href=https://github.com/antlr/antlr4>antlr/antlr4 repo</a>sunu <a href=https://help.github.com/articles/fork-a-repo>fork</a>layın. Ardından `doc/index.md` veya bu klasördeki dosyalara katkıda bulunun. Ana repo için bir <a href=https://help.github.com/articles/creating-a-pull-request>pull request</a> oluşturun. Kod ve dökümantasyon için güncellediğiniz dosyaları tek bir <a href=https://help.github.com/articles/creating-a-pull-request>pull request</a> ile bildirmeyin. <b>Eğer daha önce pull request bildirmediyseniz kendinizi <a href="https://github.com/antlr/antlr4/blob/master/contributors.txt">contributors.txt</a> dosyasına kayıt etmeniz gerekir.</b></li>
 
 <li>Copyright © 2012, The Pragmatic Bookshelf.  Pragmatic Bookshelf grants a nonexclusive, irrevocable, royalty-free, worldwide license to reproduce, distribute, prepare derivative works, and otherwise use this contribution as part of the ANTLR project and associated documentation.</li>
 
@@ -12,6 +12,8 @@ Notlar:
 </ul>
 
 Dökümantasyonda ki linkler kitabın çeşitli bölümlerine atıfta bulunur ve kitabın yayıncı sitesindeki sayfasına yönlendirir. Yayıncı websitesinde kitabı almadan okuyabileceğiniz iki alıntı mevcut: [Dinleyici ile bir Çevirici oluşturmak (İngilizce)](http://media.pragprog.com/titles/tpantlr2/listener.pdf), [Hadi Meta Verisini Alalım (İngilizce)](http://media.pragprog.com/titles/tpantlr2/picture.pdf). Ayrıca aşağıda gösterilen kitapları okumayıda düşünebilirsiniz (video referans kitabının incelemesini içerir):
+
+
 <a href=""><img src=images/tpantlr2.png width=120></a>
 <a href=""><img src=images/tpdsl.png width=120></a>
 <a href="https://www.youtube.com/watch?v=OAoA3E-cyug"><img src=images/teronbook.png width=250></a>
