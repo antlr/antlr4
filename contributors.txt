@@ -283,3 +283,4 @@ YYYY/MM/DD, github id, Full name, email
 2020/11/05, MichelHartmann, Michel Hartmann, MichelHartmann@users.noreply.github.com
 2020/12/01, maxence-lefebvre, Maxence Lefebvre, maxence-lefebvre@users.noreply.github.com
 2020/12/03, electrum, David Phillips, david@acz.org
+2020/12/06, devman200, Mohammed Haytham Karamuk, a_developer_2002@outlook.com
