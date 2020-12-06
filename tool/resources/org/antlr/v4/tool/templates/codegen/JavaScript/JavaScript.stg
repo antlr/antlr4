@@ -266,10 +266,9 @@ RuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,namedActions,fina
         <code>
         <postamble; separator="\n">
         <namedActions.after>
-    <if(exceptions)>
+    }<if(exceptions)>
     <exceptions; separator="\n">
-    <else>
-    } catch (re) {
+    <else> catch (re) {
     	if(re instanceof antlr4.error.RecognitionException) {
 	        localctx.exception = re;
 	        this._errHandler.reportError(this, re);
