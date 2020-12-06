@@ -113,7 +113,7 @@ class ParserRuleContext(RuleContext):
 
     def getChild(self, i:int, ttype:type = None):
         if ttype is None:
-            return self.children[i] if len(self.children)>=i else None
+            return self.children[i] if len(self.children)>i else None
         else:
             for child in self.getChildren():
                 if not isinstance(child, ttype):

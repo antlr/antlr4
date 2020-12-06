@@ -14,10 +14,6 @@ namespace dfa {
   /// interface.
   class ANTLR4CPP_PUBLIC Vocabulary {
   public:
-    Vocabulary(Vocabulary const&) = default;
-    virtual ~Vocabulary();
-    Vocabulary& operator=(Vocabulary const&) = default;
-
     /// Gets an empty <seealso cref="Vocabulary"/> instance.
     ///
     /// <para>
@@ -27,6 +23,8 @@ namespace dfa {
     static const Vocabulary EMPTY_VOCABULARY;
 
     Vocabulary() {}
+    Vocabulary(Vocabulary const&) = default;
+    virtual ~Vocabulary();
 
     /// <summary>
     /// Constructs a new instance of <seealso cref="Vocabulary"/> from the specified

@@ -33,7 +33,7 @@ class Recognizer(object):
         return major, minor
 
     def checkVersion(self, toolVersion):
-        runtimeVersion = "4.7.2"
+        runtimeVersion = "4.9"
         rvmajor, rvminor = self.extractVersion(runtimeVersion)
         tvmajor, tvminor = self.extractVersion(toolVersion)
         if rvmajor!=tvmajor or rvminor!=tvminor:
@@ -144,17 +144,3 @@ class Recognizer(object):
         self._stateNumber = atnState
 
 del RecognitionException
-
-import unittest
-class Test(unittest.TestCase):
-
-    def testVersion(self):
-        major, minor = Recognizer().extractVersion("1.2")
-        self.assertEqual("1", major)
-        self.assertEqual("2", minor)
-        major, minor = Recognizer().extractVersion("1.2.3")
-        self.assertEqual("1", major)
-        self.assertEqual("2", minor)
-        major, minor = Recognizer().extractVersion("1.2-snapshot")
-        self.assertEqual("1", major)
-        self.assertEqual("2", minor)

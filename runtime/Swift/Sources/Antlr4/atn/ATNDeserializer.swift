@@ -78,8 +78,8 @@ public class ATNDeserializer {
     /// 
     internal func isFeatureSupported(_ feature: UUID, _ actualUuid: UUID) -> Bool {
         let supported = ATNDeserializer.SUPPORTED_UUIDS
-        guard let featureIndex = supported.index(of: feature),
-            let actualIndex = supported.index(of: actualUuid) else {
+        guard let featureIndex = supported.firstIndex(of: feature),
+            let actualIndex = supported.firstIndex(of: actualUuid) else {
                 return false
         }
         return actualIndex >= featureIndex

@@ -46,14 +46,14 @@ import static org.junit.Assume.assumeFalse;
 public abstract class BaseRuntimeTest {
 	public final static String[] Targets = {
 		"Cpp",
-		"Java",
-		"Go",
 		"CSharp",
+		"Dart",
+		"Go",
+		"Java",
+		"Node",
+		"PHP",
 		"Python2", "Python3",
-		"Node", "Safari", "Firefox", "Explorer", "Chrome"
-	};
-	public final static String[] JavaScriptTargets = {
-		"Node", "Safari", "Firefox", "Explorer", "Chrome"
+		"Swift"
 	};
 
 	static {
@@ -96,8 +96,15 @@ public abstract class BaseRuntimeTest {
 	public void setUp() throws Exception {
 		// From http://junit.sourceforge.net/javadoc/org/junit/Assume.html
 		// "The default JUnit runner treats tests with failing assumptions as ignored"
-		assumeFalse(descriptor.ignore(descriptor.getTarget()));
+		assumeFalse(checkIgnored());
 		delegate.testSetUp();
+	}
+
+	public boolean checkIgnored() {
+		boolean ignored = !TestContext.isSupportedTarget(descriptor.getTarget()) || descriptor.ignore(descriptor.getTarget());
+		if(ignored)
+			System.out.println("Ignore " + descriptor);
+		return ignored;
 	}
 
 	@Rule
@@ -113,9 +120,10 @@ public abstract class BaseRuntimeTest {
 	public void testOne() throws Exception {
 		// System.out.println(delegate.getTmpDir());
 		if ( descriptor.ignore(descriptor.getTarget()) ) {
-			System.out.printf("Ignore "+descriptor);
+			System.out.println("Ignore " + descriptor);
 			return;
 		}
+
 		if ( descriptor.getTestType().contains("Parser") ) {
 			testParser(descriptor);
 		}
@@ -273,6 +281,8 @@ public abstract class BaseRuntimeTest {
 	// ---- support ----
 
 	public static RuntimeTestDescriptor[] getRuntimeTestDescriptors(Class<?> clazz, String targetName) {
+		if(!TestContext.isSupportedTarget(targetName))
+			return new RuntimeTestDescriptor[0];
 		Class<?>[] nestedClasses = clazz.getClasses();
 		List<RuntimeTestDescriptor> descriptors = new ArrayList<RuntimeTestDescriptor>();
 		for (Class<?> nestedClass : nestedClasses) {
@@ -280,8 +290,10 @@ public abstract class BaseRuntimeTest {
 			if ( RuntimeTestDescriptor.class.isAssignableFrom(nestedClass) && !Modifier.isAbstract(modifiers) ) {
 				try {
 					RuntimeTestDescriptor d = (RuntimeTestDescriptor) nestedClass.newInstance();
-					d.setTarget(targetName);
-					descriptors.add(d);
+					if(!d.ignore(targetName)) {
+						d.setTarget(targetName);
+						descriptors.add(d);
+					}
 				} catch (Exception e) {
 					e.printStackTrace(System.err);
 				}
@@ -300,6 +312,16 @@ public abstract class BaseRuntimeTest {
 		}
 	}
 
+	public static String readFile(String dir, String fileName) {
+		try {
+			return String.copyValueOf(Utils.readFile(dir+"/"+fileName, "UTF-8"));
+		}
+		catch (IOException ioe) {
+			System.err.println("can't read file");
+			ioe.printStackTrace(System.err);
+		}
+		return null;
+	}
 
 	protected static void assertCorrectOutput(RuntimeTestDescriptor descriptor, RuntimeTestSupport delegate, String actualOutput) {
 		String actualParseErrors = delegate.getParseErrors();

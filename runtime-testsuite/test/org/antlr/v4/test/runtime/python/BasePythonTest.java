@@ -513,31 +513,33 @@ public abstract class BasePythonTest implements RuntimeTestSupport {
 		return null;
 	}
 
-	private String locateTool(String tool) {
+	private String locateTool(List<String> tools) {
 		String[] roots = {
 			"/opt/local/bin", "/usr/bin/", "/usr/local/bin/",
 		    "/Users/"+System.getProperty("user.name")+"/anaconda3/bin/"
 		};
 		for(String root : roots) {
-			if(new File(root + tool).exists()) {
-				return root+tool;
+			for (String tool : tools) {
+				if ( new File(root+tool).exists() ) {
+					return root+tool;
+				}
 			}
 		}
-		throw new RuntimeException("Could not locate " + tool);
+		throw new RuntimeException("Could not locate " + tools);
 	}
 
 	protected String locatePython() {
 		String propName = getPropertyPrefix() + "-python";
 		String prop = System.getProperty(propName);
 		if(prop==null || prop.length()==0)
-			prop = locateTool(getPythonExecutable());
+			prop = locateTool(getPythonExecutables());
 		File file = new File(prop);
 		if(!file.exists())
 			throw new RuntimeException("Missing system property:" + propName);
 		return file.getAbsolutePath();
 	}
 
-	protected abstract String getPythonExecutable();
+	protected abstract List<String> getPythonExecutables();
 
 	protected String locateRuntime() { return locateRuntime(getLanguage()); }
 

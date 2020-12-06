@@ -372,7 +372,7 @@ public class FullContextParsingDescriptors {
 		 	: expr_or_assign*;
 		 expr_or_assign
 		 	: expr '++' {<writeln("\"fail.\"")>}
-		 	|  expr {<writeln("\"pass: \"+$expr.text")>}
+		 	|  expr {<AppendStr("\"pass: \"","$expr.text"):writeln()>}
 		 	;
 		 expr: expr_primary ('\<-' ID)?;
 		 expr_primary

@@ -166,7 +166,7 @@ std::vector<size_t> ATNSerializer::serialize() {
     }
 
     data.push_back(containsEof ? 1 : 0);
-    for (auto &interval : set.getIntervals()) {
+    for (const auto &interval : set.getIntervals()) {
       if (interval.a == -1) {
         if (interval.b == -1) {
           continue;

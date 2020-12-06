@@ -8,7 +8,6 @@
 #include <algorithm>
 #include <assert.h>
 #include <atomic>
-#include <codecvt>
 #include <chrono>
 #include <fstream>
 #include <iostream>
@@ -36,6 +35,10 @@
 #include <bitset>
 #include <condition_variable>
 #include <functional>
+
+#ifndef USE_UTF8_INSTEAD_OF_CODECVT
+  #include <codecvt>
+#endif
 
 // Defines for the Guid class and other platform dependent stuff.
 #ifdef _WIN32

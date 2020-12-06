@@ -31,6 +31,8 @@ namespace Antlr4.Runtime
         private readonly string _grammarFileName;
 
         private readonly ATN _atn;
+		
+        private readonly Dfa.DFA[] _decisionToDFA;
 
         protected internal readonly BitSet pushRecursionContextStates;
 
@@ -61,8 +63,17 @@ namespace Antlr4.Runtime
                     this.pushRecursionContextStates.Set(state.stateNumber);
                 }
             }
-            // get atn simulator that knows how to do predictions
-            Interpreter = new ParserATNSimulator(this, atn, null, null);
+			
+            //init decision DFA
+            int numberofDecisions = atn.NumberOfDecisions;
+            this._decisionToDFA = new Dfa.DFA[numberofDecisions];
+            for (int i = 0; i < numberofDecisions; i++)
+            {
+                DecisionState decisionState = atn.GetDecisionState(i);
+                _decisionToDFA[i] = new Dfa.DFA(decisionState, i);
+            }
+             // get atn simulator that knows how to do predictions
+            Interpreter = new ParserATNSimulator(this, atn, _decisionToDFA, null);
         }
 
         public override ATN Atn

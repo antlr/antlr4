@@ -1,6 +1,6 @@
 # C++
 
-The C++ target supports all platforms that can either run MS Visual Studio 2013 (or newer), XCode 7 (or newer) or CMake (C++11 required). All build tools can either create static or dynamic libraries, both as 64bit or 32bit arch. Additionally, XCode can create an iOS library. Also see [Antlr4 for C++ with CMake: A practical example](http://blorente.me//Antlr-,-C++-and-CMake-Wait-what.html).
+The C++ target supports all platforms that can either run MS Visual Studio 2013 (or newer), XCode 7 (or newer) or CMake (C++11 required). All build tools can either create static or dynamic libraries, both as 64bit or 32bit arch. Additionally, XCode can create an iOS library. Also see [Antlr4 for C++ with CMake: A practical example](http://blorente.me/beyond-the-loop/Antlr-cpp-cmake/).
 
 ## How to create a C++ lexer or parser?
 This is pretty much the same as creating a Java lexer or parser, except you need to specify the language target, for example:
@@ -45,7 +45,7 @@ The generation step above created a listener and base listener class for you. Th
 #include "MyGrammarParser.h"
 #include "MyGrammarBaseListener.h"
 
-using namespace org::antlr::v4::runtime;
+using namespace antlr4;
 
 class TreeShapeListener : public MyGrammarBaseListener {
 public:
@@ -65,7 +65,7 @@ int main(int argc, const char* argv[]) {
 
   tree::ParseTree *tree = parser.key();
   TreeShapeListener listener;
-  tree::ParseTreeWalker::DEFAULT->walk(&listener, tree);
+  tree::ParseTreeWalker::DEFAULT.walk(&listener, tree);
 
   return 0;
 }
@@ -74,7 +74,7 @@ int main(int argc, const char* argv[]) {
  
 This example assumes your grammar contains a parser rule named `key` for which the enterKey function was generated.
 
-## Specialities of this ANTLR target
+## Special cases for this ANTLR target
 
 There are a couple of things that only the C++ ANTLR target has to deal with. They are described here.
 

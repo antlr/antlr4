@@ -110,7 +110,10 @@ Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
 
 Parser_(parser, funcs, atn, sempredFuncs, ctor, superClass) ::= <<
 <if(superClass)>
-from .<superClass> import <superClass>
+if __name__ is not None and "." in __name__:
+    from .<superClass> import <superClass>
+else:
+    from <superClass> import <superClass>
 
 <endif>
 <atn>
@@ -517,9 +520,8 @@ if not <chunks>:
 >>
 
 ExceptionClause(e, catchArg, catchAction) ::= <<
-catch (<catchArg>) {
+except <catchArg>:
     <catchAction>
-}
 >>
 
 // lexer actions are not associated with model objects
@@ -549,27 +551,27 @@ TokenLabelType() ::= "<file.TokenLabelType; null={Token}>"
 InputSymbolType() ::= "<file.InputSymbolType; null={Token}>"
 
 TokenPropertyRef_text(t) ::= "(None if <ctx(t)>.<t.label> is None else <ctx(t)>.<t.label>.text)"
-TokenPropertyRef_type(t) ::= "(0 if <ctx(t)>.<t.label> is None else <ctx(t)>.<t.label>.type()"
+TokenPropertyRef_type(t) ::= "(0 if <ctx(t)>.<t.label> is None else <ctx(t)>.<t.label>.type)"
 TokenPropertyRef_line(t) ::= "(0 if <ctx(t)>.<t.label> is None else <ctx(t)>.<t.label>.line)"
 TokenPropertyRef_pos(t) ::= "(0 if <ctx(t)>.<t.label> is None else <ctx(t)>.<t.label>.column)"
-TokenPropertyRef_channel(t) ::= "(0 if (<ctx(t)>.<t.label> is None else <ctx(t)>.<t.label>.channel)"
+TokenPropertyRef_channel(t) ::= "(0 if <ctx(t)>.<t.label> is None else <ctx(t)>.<t.label>.channel)"
 TokenPropertyRef_index(t) ::= "(0 if <ctx(t)>.<t.label> is None else <ctx(t)>.<t.label>.tokenIndex)"
 TokenPropertyRef_int(t) ::= "(0 if <ctx(t)>.<t.label> is None else int(<ctx(t)>.<t.label>.text))"
 
 RulePropertyRef_start(r) ::= "(None if <ctx(r)>.<r.label> is None else <ctx(r)>.<r.label>.start)"
 RulePropertyRef_stop(r)	 ::= "(None if <ctx(r)>.<r.label> is None else <ctx(r)>.<r.label>.stop)"
-RulePropertyRef_text(r)	 ::= "(None if <ctx(r)>.<r.label> is None else self._input.getText((<ctx(r)>.<r.label>.start,<ctx(r)>.<r.label>.stop)))"
+RulePropertyRef_text(r)	 ::= "(None if <ctx(r)>.<r.label> is None else self._input.getText(<ctx(r)>.<r.label>.start,<ctx(r)>.<r.label>.stop))"
 RulePropertyRef_ctx(r)	 ::= "<ctx(r)>.<r.label>"
 RulePropertyRef_parser(r)	 ::= "self"
 
 ThisRulePropertyRef_start(r) ::= "localctx.start"
 ThisRulePropertyRef_stop(r)	 ::= "localctx.stop"
-ThisRulePropertyRef_text(r)	 ::= "self._input.getText((localctx.start, self._input.LT(-1)))"
+ThisRulePropertyRef_text(r)	 ::= "self._input.getText(localctx.start, self._input.LT(-1))"
 ThisRulePropertyRef_ctx(r)	 ::= "localctx"
 ThisRulePropertyRef_parser(r)	 ::= "self"
 
-NonLocalAttrRef(s)		 	 ::= "getInvokingContext(<s.ruleIndex>).<s.name>"
-SetNonLocalAttr(s, rhsChunks)  ::= "getInvokingContext(<s.ruleIndex>).<s.name> = <rhsChunks>"
+NonLocalAttrRef(s)		 	 ::= "self.getInvokingContext(<s.ruleIndex>).<s.name>"
+SetNonLocalAttr(s, rhsChunks)  ::= "self.getInvokingContext(<s.ruleIndex>).<s.name> = <rhsChunks>"
 
 AddToLabelList(a) ::= "<ctx(a.label)>.<a.listName>.append(<labelref(a.label)>)"
 
@@ -750,7 +752,10 @@ import sys
 
 Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
 <if(superClass)>
-from .<superClass> import <superClass>
+if __name__ is not None and "." in __name__:
+    from .<superClass> import <superClass>
+else:
+    from <superClass> import <superClass>
 
 <endif>
 

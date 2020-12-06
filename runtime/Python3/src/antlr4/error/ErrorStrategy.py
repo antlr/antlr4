@@ -243,7 +243,7 @@ class DefaultErrorStrategy(ErrorStrategy):
             if e.startToken.type==Token.EOF:
                 input = "<EOF>"
             else:
-                input = tokens.getText((e.startToken, e.offendingToken))
+                input = tokens.getText(e.startToken, e.offendingToken)
         else:
             input = "<unknown input>"
         msg = "no viable alternative at input " + self.escapeWSAndQuote(input)

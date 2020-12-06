@@ -38,8 +38,8 @@ This is the main landing page for the ANTLR 4 FAQ. The links below will take you
 
 ## Translation
 
-* [ASTs vs parse trees](parse-trees.md)
-* [Decoupling input walking from output generation](parse-trees.md)
+* [ASTs vs parse trees](translation.md)
+* [Decoupling input walking from output generation](translation.md)
 
 ## Actions and semantic predicates
 
