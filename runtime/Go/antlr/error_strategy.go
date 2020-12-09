@@ -558,6 +558,8 @@ func (d *DefaultErrorStrategy) GetTokenErrorDisplay(t Token) string {
 		} else {
 			s = "<" + strconv.Itoa(t.GetTokenType()) + ">"
 		}
+	} else {
+		s = fmt.Sprintf("%s <%s>", s, strconv.Itoa(t.GetTokenType()))
 	}
 	return d.escapeWSAndQuote(s)
 }
