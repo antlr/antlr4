@@ -706,11 +706,13 @@ cases(ttypes) ::= <<
 >>
 
 InvokeRule(r, argExprsChunks) ::= <<
-State = <r.stateNumber>; <if(r.labels)><r.labels:{l | <labelref(l)> = }><endif><csIdentifier.(r.name)>(<if(r.ast.options.p)><r.ast.options.p><if(argExprsChunks)>,<endif><endif><argExprsChunks>);
+State = <r.stateNumber>;
+<if(r.labels)><r.labels:{l | <labelref(l)> = }><endif><csIdentifier.(r.name)>(<if(r.ast.options.p)><r.ast.options.p><if(argExprsChunks)>,<endif><endif><argExprsChunks>);
 >>
 
 MatchToken(m) ::= <<
-State = <m.stateNumber>; <if(m.labels)><m.labels:{l | <labelref(l)> = }><endif>Match(<tokenType.(m.name)>);
+State = <m.stateNumber>;
+<if(m.labels)><m.labels:{l | <labelref(l)> = }><endif>Match(<tokenType.(m.name)>);
 >>
 
 MatchSet(m, expr, capture) ::= "<CommonSetStuff(m, expr, capture, false)>"
