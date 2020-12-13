@@ -85,7 +85,7 @@ namespace Antlr4.Runtime
 
         /// <summary>Creates an <see cref="ICharStream"/> given a <see cref="string"/>.
         /// </summary>
-        public static ICharStream fromstring(string s)
+        public static ICharStream fromString(string s)
         {
             return new CodePointCharStream(s);
         }
