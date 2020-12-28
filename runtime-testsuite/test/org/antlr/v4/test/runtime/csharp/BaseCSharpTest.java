@@ -324,7 +324,7 @@ public class BaseCSharpTest implements RuntimeTestSupport {
 
 			// find runtime package
 			final ClassLoader loader = Thread.currentThread().getContextClassLoader();
-			final URL runtimeProj = loader.getResource("CSharp/runtime/CSharp/Antlr4.Runtime/Antlr4.Runtime.csproj");
+			final URL runtimeProj = loader.getResource("CSharp/Antlr4.csproj");
 			if (runtimeProj == null) {
 				throw new RuntimeException("C# runtime project file not found!");
 			}

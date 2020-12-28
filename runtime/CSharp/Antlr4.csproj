@@ -7,7 +7,7 @@
     <NoWarn>$(NoWarn);CS1591;CS1574;CS1580</NoWarn>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AssemblyName>Antlr4.Runtime.Standard</AssemblyName>
-    <AssemblyOriginatorKeyFile>../../Antlr4.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>Antlr4.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
     <PackageId>Antlr4.Runtime.Standard</PackageId>
@@ -19,8 +19,7 @@
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageLicenseExpression>BSD-3-Clause</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/antlr/antlr4</PackageProjectUrl>
-    <!-- <PackageIcon>Antlr.png</PackageIcon> -->
-    <PackageIconUrl>https://raw.github.com/antlr/website-antlr4/master/images/icons/antlr.png</PackageIconUrl>
+    <PackageIcon>Antlr.png</PackageIcon>
     <PackageReleaseNotes>https://github.com/antlr/antlr4/releases</PackageReleaseNotes>
     <PackageTags>antlr parsing grammar</PackageTags>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
@@ -44,4 +43,9 @@
     <Optimize>true</Optimize>
     <OutputPath>lib\Release</OutputPath>
   </PropertyGroup>
+  <ItemGroup>
+    <None Update="Antlr.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>
