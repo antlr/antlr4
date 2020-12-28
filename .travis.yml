@@ -147,7 +147,9 @@ matrix:
       stage: smoke-test
     - os: linux
       jdk: openjdk8
-      env: TARGET=csharp
+      env:
+        - TARGET=dotnet
+        - GROUP=MAIN
       stage: main-test
     - os: linux
       jdk: openjdk8
@@ -162,21 +164,18 @@ matrix:
       stage: main-test
     - os: linux
       jdk: openjdk8
-      dist: trusty
       env:
         - TARGET=dotnet
         - GROUP=LEXER
       stage: extended-test
     - os: linux
       jdk: openjdk8
-      dist: trusty
       env:
         - TARGET=dotnet
         - GROUP=PARSER
       stage: extended-test
     - os: linux
       jdk: openjdk8
-      dist: trusty
       env:
         - TARGET=dotnet
         - GROUP=RECURSION
