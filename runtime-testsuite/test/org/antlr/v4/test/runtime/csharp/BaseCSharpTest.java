@@ -166,40 +166,6 @@ public class BaseCSharpTest implements RuntimeTestSupport {
 		return antlrToolErrors.toString();
 	}
 
-	protected org.antlr.v4.Tool newTool(String[] args) {
-		Tool tool = new Tool(args);
-		return tool;
-	}
-
-	protected Tool newTool() {
-		org.antlr.v4.Tool tool = new Tool(new String[]{"-o", tmpdir});
-		return tool;
-	}
-
-	protected String load(String fileName, String encoding)
-			throws IOException {
-		if (fileName == null) {
-			return null;
-		}
-
-		String fullFileName = getClass().getPackage().getName().replace('.', '/') + '/' + fileName;
-		int size = 65000;
-		InputStreamReader isr;
-		InputStream fis = getClass().getClassLoader().getResourceAsStream(fullFileName);
-		if (encoding != null) {
-			isr = new InputStreamReader(fis, encoding);
-		} else {
-			isr = new InputStreamReader(fis);
-		}
-		try {
-			char[] data = new char[size];
-			int n = isr.read(data);
-			return new String(data, 0, n);
-		} finally {
-			isr.close();
-		}
-	}
-
 	protected String execLexer(String grammarFileName,
 							   String grammarStr,
 							   String lexerName,
@@ -232,7 +198,7 @@ public class BaseCSharpTest implements RuntimeTestSupport {
 		return output;
 	}
 
-	Set<String> sourceFiles = new HashSet<String>();
+	Set<String> sourceFiles = new HashSet<>();
 
 	private void addSourceFiles(String... files) {
 		for (String file : files)
@@ -346,12 +312,8 @@ public class BaseCSharpTest implements RuntimeTestSupport {
 		}
 	}
 
-	private boolean isWindows() {
-		return System.getProperty("os.name").toLowerCase().contains("windows");
-	}
-
 	private String locateExec() {
-		return new File(tmpdir, "bin/Release/netcoreapp2.0/Test.dll").getAbsolutePath();
+		return new File(tmpdir, "bin/Release/netcoreapp3.1/Test.dll").getAbsolutePath();
 	}
 
 	public boolean buildProject() {
