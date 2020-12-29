@@ -1089,6 +1089,20 @@ public enum ErrorType {
 			"One of the token <arg> values unreachable. <arg2> is always overlapped by token <arg3>",
 			ErrorSeverity.WARNING),
 
+	/**
+	 * <p>Fragment rule can be used only in another lexer rule, not in parser rule</p>
+	 *
+	 * <pre>
+	 * root: FRAGMENT;  // error
+	 * fragment FRAGMENT: 'FRAGMENT';
+	 * </pre>
+	 */
+	FRAGMENT_RULE_CAN_BE_USED_ONLY_IN_ANOTHER_LEXER_RULE(
+			185,
+			"Fragment rule <arg> can be used only in another lexer rule, not in parser rule",
+			ErrorSeverity.ERROR
+	),
+
 	/*
 	 * Backward incompatibility errors
 	 */
