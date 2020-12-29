@@ -209,8 +209,7 @@ public class SemanticPipeline {
 	}
 
 	void assignTokenTypes(Grammar g, List<GrammarAST> tokensDefs,
-						  List<GrammarAST> tokenIDs, List<GrammarAST> terminals)
-	{
+						  List<GrammarAST> tokenIDs, List<GrammarAST> terminals) {
 		//Grammar G = g.getOutermostGrammar(); // put in root, even if imported
 
 		// create token types for tokens { A, B, C } ALIASES
@@ -224,8 +223,24 @@ public class SemanticPipeline {
 
 		// DEFINE TOKEN TYPES FOR TOKEN REFS LIKE ID, INT
 		for (GrammarAST idAST : tokenIDs) {
-			if (g.getTokenType(idAST.getText()) == Token.INVALID_TYPE) {
-				g.tool.errMgr.grammarError(ErrorType.IMPLICIT_TOKEN_DEFINITION, g.fileName, idAST.token, idAST.getText());
+			String tokenText = idAST.getText();
+			int tokenType;
+			if (g.implicitLexer != null) {
+				Rule rule = g.implicitLexer.getRule(tokenText);
+				tokenType = rule != null && rule.isFragment() ? Token.FRAGMENT : g.getTokenType(tokenText);
+			}
+			else {
+				tokenType = g.getTokenType(tokenText);
+			}
+			ErrorType messageType = null;
+			if (tokenType == Token.INVALID_TYPE) {
+				messageType = ErrorType.IMPLICIT_TOKEN_DEFINITION;
+			} else if (tokenType == Token.FRAGMENT) {
+				messageType = ErrorType.FRAGMENT_RULE_CAN_BE_USED_ONLY_IN_ANOTHER_LEXER_RULE;
+			}
+
+			if (messageType != null) {
+				g.tool.errMgr.grammarError(messageType, g.fileName, idAST.token, tokenText);
 			}
 
 			g.defineTokenName(idAST.getText());
@@ -242,8 +257,8 @@ public class SemanticPipeline {
 			}
 		}
 
-		g.tool.log("semantics", "tokens="+g.tokenNameToTypeMap);
-        g.tool.log("semantics", "strings="+g.stringLiteralToTypeMap);
+		g.tool.log("semantics", "tokens=" + g.tokenNameToTypeMap);
+		g.tool.log("semantics", "strings=" + g.stringLiteralToTypeMap);
 	}
 
 	/**

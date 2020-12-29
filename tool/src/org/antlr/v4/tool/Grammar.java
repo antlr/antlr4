@@ -975,7 +975,9 @@ public class Grammar implements AttributeResolver {
 		Integer prev = tokenNameToTypeMap.get(name);
 		if ( prev!=null ) return prev;
 		tokenNameToTypeMap.put(name, ttype);
-		setTokenForType(ttype, name);
+		if (ttype >= Token.MIN_USER_TOKEN_TYPE) {
+			setTokenForType(ttype, name);
+		}
 		maxTokenType = Math.max(maxTokenType, ttype);
 		return ttype;
 	}

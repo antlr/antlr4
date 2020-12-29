@@ -11,6 +11,7 @@ import org.antlr.v4.codegen.model.OutputModelObject;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.Rule;
 import org.stringtemplate.v4.AutoIndentWriter;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
@@ -146,17 +147,23 @@ public class CodeGenerator {
 		// make constants for the token names
 		for (String t : g.tokenNameToTypeMap.keySet()) {
 			int tokenType = g.tokenNameToTypeMap.get(t);
-			if ( tokenType>=Token.MIN_USER_TOKEN_TYPE) {
+			if (tokenType>=Token.MIN_USER_TOKEN_TYPE) {
 				tokens.put(t, tokenType);
 			}
 		}
+		for (Rule rule : g.rules.values()) {
+			if (rule.isFragment()) {
+				tokens.put(rule.name, Token.FRAGMENT);
+			}
+		}
+
 		vocabFileST.add("tokens", tokens);
 
 		// now dump the strings
 		Map<String,Integer> literals = new LinkedHashMap<String,Integer>();
 		for (String literal : g.stringLiteralToTypeMap.keySet()) {
 			int tokenType = g.stringLiteralToTypeMap.get(literal);
-			if ( tokenType>=Token.MIN_USER_TOKEN_TYPE) {
+			if (tokenType>=Token.MIN_USER_TOKEN_TYPE) {
 				literals.put(literal, tokenType);
 			}
 		}
@@ -237,5 +244,4 @@ public class CodeGenerator {
 		String recognizerName = g.getRecognizerName();
 		return recognizerName+extST.render();
 	}
-
 }
