@@ -34,6 +34,7 @@ from antlr4.dfa.DFAState import DFAState
 from antlr4.error.Errors import LexerNoViableAltException, UnsupportedOperationException
 
 class SimState(object):
+    __slots__ = ('index', 'line', 'column', 'dfaState')
 
     def __init__(self):
         self.reset()
@@ -49,6 +50,10 @@ Lexer = None
 LexerATNSimulator = None
 
 class LexerATNSimulator(ATNSimulator):
+    __slots__ = (
+        'decisionToDFA', 'recog', 'startIndex', 'line', 'column', 'mode',
+        'DEFAULT_MODE', 'MAX_CHAR_VALUE', 'prevAccept'
+    )
 
     debug = False
     dfa_debug = False
@@ -57,8 +62,6 @@ class LexerATNSimulator(ATNSimulator):
     MAX_DFA_EDGE = 127 # forces unicode to stay in ATN
 
     ERROR = None
-
-    match_calls = 0
 
     def __init__(self, recog:Lexer, atn:ATN, decisionToDFA:list, sharedContextCache:PredictionContextCache):
         super().__init__(atn, sharedContextCache)
@@ -89,7 +92,6 @@ class LexerATNSimulator(ATNSimulator):
         self.startIndex = simulator.startIndex
 
     def match(self, input:InputStream , mode:int):
-        self.match_calls += 1
         self.mode = mode
         mark = input.mark()
         try:

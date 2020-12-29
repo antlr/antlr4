@@ -31,6 +31,7 @@ SERIALIZED_VERSION = 3
 SERIALIZED_UUID = ADDED_UNICODE_SMP
 
 class ATNDeserializer (object):
+    __slots__ = ('deserializationOptions', 'data', 'pos', 'uuid')
 
     def __init__(self, options : ATNDeserializationOptions = None):
         if options is None:

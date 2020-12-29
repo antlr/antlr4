@@ -652,6 +652,7 @@ CaptureNextTokenType(d) ::= "<d.varName> = self._input.LA(1)"
 
 StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers) ::= <<
 class <struct.name>(<if(contextSuperClass)><contextSuperClass><else>ParserRuleContext<endif>):
+    __slots__ = 'parser'
 
     def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1<struct.ctorAttrs:{a | , <a.name><if(a.type)>:<a.type><endif>=None}>):
         super().__init__(parent, invokingState)

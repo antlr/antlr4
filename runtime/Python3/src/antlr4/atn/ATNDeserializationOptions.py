@@ -6,6 +6,7 @@
 ATNDeserializationOptions = None
 
 class ATNDeserializationOptions(object):
+    __slots__ = ('readOnly', 'verifyATN', 'generateRuleBypassTransitions')
 
     defaultOptions = None
 
@@ -21,4 +22,3 @@ class ATNDeserializationOptions(object):
 
 ATNDeserializationOptions.defaultOptions = ATNDeserializationOptions()
 ATNDeserializationOptions.defaultOptions.readOnly = True
-

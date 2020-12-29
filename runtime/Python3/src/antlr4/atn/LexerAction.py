@@ -22,6 +22,7 @@ class LexerActionType(IntEnum):
     TYPE = 7        #The type of a {@link LexerTypeAction} action.
 
 class LexerAction(object):
+    __slots__ = ('actionType', 'isPositionDependent')
 
     def __init__(self, action:LexerActionType):
         self.actionType = action
@@ -39,7 +40,7 @@ class LexerAction(object):
 #
 # <p>The {@code skip} command does not have any parameters, so this action is
 # implemented as a singleton instance exposed by {@link #INSTANCE}.</p>
-class LexerSkipAction(LexerAction ):
+class LexerSkipAction(LexerAction):
 
     # Provides a singleton instance of this parameterless lexer action.
     INSTANCE = None
@@ -58,6 +59,7 @@ LexerSkipAction.INSTANCE = LexerSkipAction()
 #  Implements the {@code type} lexer action by calling {@link Lexer#setType}
 # with the assigned type.
 class LexerTypeAction(LexerAction):
+    __slots__ = 'type'
 
     def __init__(self, type:int):
         super().__init__(LexerActionType.TYPE)
@@ -84,6 +86,7 @@ class LexerTypeAction(LexerAction):
 # Implements the {@code pushMode} lexer action by calling
 # {@link Lexer#pushMode} with the assigned mode.
 class LexerPushModeAction(LexerAction):
+    __slots__ = 'mode'
 
     def __init__(self, mode:int):
         super().__init__(LexerActionType.PUSH_MODE)
@@ -152,6 +155,7 @@ LexerMoreAction.INSTANCE = LexerMoreAction()
 # Implements the {@code mode} lexer action by calling {@link Lexer#mode} with
 # the assigned mode.
 class LexerModeAction(LexerAction):
+    __slots__ = 'mode'
 
     def __init__(self, mode:int):
         super().__init__(LexerActionType.MODE)
@@ -186,6 +190,7 @@ class LexerModeAction(LexerAction):
 # command argument could not be evaluated when the grammar was compiled.</p>
 
 class LexerCustomAction(LexerAction):
+    __slots__ = ('ruleIndex', 'actionIndex')
 
     # Constructs a custom lexer action with the specified rule and action
     # indexes.
@@ -220,6 +225,7 @@ class LexerCustomAction(LexerAction):
 # Implements the {@code channel} lexer action by calling
 # {@link Lexer#setChannel} with the assigned channel.
 class LexerChannelAction(LexerAction):
+    __slots__ = 'channel'
 
     # Constructs a new {@code channel} action with the specified channel value.
     # @param channel The channel value to pass to {@link Lexer#setChannel}.
@@ -255,6 +261,7 @@ class LexerChannelAction(LexerAction):
 # lexer actions, see {@link LexerActionExecutor#append} and
 # {@link LexerActionExecutor#fixOffsetBeforeMatch}.</p>
 class LexerIndexedCustomAction(LexerAction):
+    __slots__ = ('offset', 'action')
 
     # Constructs a new indexed custom action by associating a character offset
     # with a {@link LexerAction}.

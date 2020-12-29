@@ -11,6 +11,8 @@ from antlr4.CommonTokenStream import CommonTokenStream
 
 
 class TokenStreamRewriter(object):
+    __slots__ = ('tokens', 'programs', 'lastRewriteTokenIndexes')
+
     DEFAULT_PROGRAM_NAME = "default"
     PROGRAM_INIT_SIZE = 100
     MIN_TOKEN_INDEX = 0
@@ -99,7 +101,7 @@ class TokenStreamRewriter(object):
 
     def getProgram(self, program_name):
         return self.programs.setdefault(program_name, [])
-        
+
     def getDefaultText(self):
         return self.getText(self.DEFAULT_PROGRAM_NAME, 0, len(self.tokens.tokens) - 1)
 
@@ -195,6 +197,7 @@ class TokenStreamRewriter(object):
         return reduced
 
     class RewriteOperation(object):
+        __slots__ = ('tokens', 'index', 'text', 'instructionIndex')
 
         def __init__(self, tokens, index, text=""):
             """
@@ -233,8 +236,9 @@ class TokenStreamRewriter(object):
 
     class InsertAfterOp(InsertBeforeOp):
         pass
-            
+
     class ReplaceOp(RewriteOperation):
+        __slots__ = 'last_index'
 
         def __init__(self, from_idx, to_idx, tokens, text):
             super(TokenStreamRewriter.ReplaceOp, self).__init__(tokens, from_idx, text)
@@ -244,7 +248,7 @@ class TokenStreamRewriter(object):
             if self.text:
                 buf.write(self.text)
             return self.last_index + 1
-            
+
         def __str__(self):
             if self.text:
                 return '<ReplaceOp@{}..{}:"{}">'.format(self.tokens.get(self.index), self.tokens.get(self.last_index),

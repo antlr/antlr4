@@ -15,6 +15,8 @@ class TokenFactory(object):
     pass
 
 class CommonTokenFactory(TokenFactory):
+    __slots__ = 'copyText'
+
     #
     # The default {@link CommonTokenFactory} instance.
     #
