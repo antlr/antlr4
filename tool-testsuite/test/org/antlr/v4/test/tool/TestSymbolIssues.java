@@ -6,11 +6,14 @@
 
 package org.antlr.v4.test.tool;
 
+import org.antlr.v4.test.runtime.BaseRuntimeTest;
+import org.antlr.v4.test.runtime.ErrorQueue;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.LexerGrammar;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.antlr.v4.test.runtime.BaseRuntimeTest.writeFile;
 import static org.junit.Assert.assertEquals;
 
 /** */
@@ -435,5 +438,56 @@ public class TestSymbolIssues extends BaseJavaToolTest {
 		};
 
 		testErrors(test, false);
+	}
+
+	@Test public void testFragmentRuleInParserRuleInCombinedGrammar() {
+		String[] test = {
+				"grammar Test;\n" +
+				"parserRule1: FRAGMENT;\n" +
+				"parserRule2: NOT_FRAGMENT;\n" +
+				"parserRule3: NOT_EXISTING;\n" +
+				"parserRule4: 'STRING_FRAGMENT';\n" +
+				"parserRule5: 'STRING_TOKEN';\n" +
+				"fragment FRAGMENT: 'FRAGMENT';\n" +
+				"NOT_FRAGMENT: 'NOT_FRAGMENT';\n" +
+				"fragment STRING_FRAGMENT: 'STRING_FRAGMENT';\n" +
+				"STRING_TOKEN: 'STRING_TOKEN';",
+
+				"error(" + ErrorType.FRAGMENT_RULE_CAN_BE_USED_ONLY_IN_ANOTHER_LEXER_RULE.code + "): Test.g4:2:13: Fragment rule FRAGMENT can be used only in another lexer rule, not in parser rule\n" +
+				"warning(" + ErrorType.IMPLICIT_TOKEN_DEFINITION.code + "): Test.g4:4:13: implicit definition of token NOT_EXISTING in parser\n"
+		};
+
+		testErrors(test, false);
+	}
+
+	@Test public void testFragmentRuleInParserRuleInSeparatedGrammar() {
+		String lexer =
+				"lexer grammar Lexer;\n" +
+				"fragment FRAGMENT: 'FRAGMENT';\n" +
+				"NOT_FRAGMENT: 'NOT_FRAGMENT';\n" +
+				"fragment STRING_FRAGMENT: 'STRING_FRAGMENT';\n" +
+				"STRING_TOKEN: 'STRING_TOKEN';";
+		String parser =
+				"parser grammar Parser;\n" +
+				"options { tokenVocab=Lexer; }\n" +
+				"parserRule1: FRAGMENT;\n" +
+				"parserRule2: NOT_FRAGMENT;\n" +
+				"parserRule3: NOT_EXISTING;\n" +
+				"parserRule4: 'STRING_FRAGMENT';\n" +
+				"parserRule5: 'STRING_TOKEN';";
+
+		BaseRuntimeTest.mkdir(tmpdir);
+		writeFile(tmpdir, "Lexer.g4", lexer);
+		writeFile(tmpdir, "Parser.g4", parser);
+
+		BaseRuntimeTest.antlrOnString(tmpdir, "Java", "Lexer.g4", false);
+		ErrorQueue equeue = BaseRuntimeTest.antlrOnString(tmpdir, "Java", "Parser.g4", false);
+
+		String actual = getErrorString(equeue);
+		String expected = "error(" + ErrorType.FRAGMENT_RULE_CAN_BE_USED_ONLY_IN_ANOTHER_LEXER_RULE.code + "): Parser.g4:3:13: Fragment rule FRAGMENT can be used only in another lexer rule, not in parser rule\n" +
+				"warning(" + ErrorType.IMPLICIT_TOKEN_DEFINITION.code + "): Parser.g4:5:13: implicit definition of token NOT_EXISTING in parser\n" +
+				"error(" + ErrorType.IMPLICIT_STRING_DEFINITION.code + "): Parser.g4:6:13: cannot create implicit token for string literal in non-combined grammar: 'STRING_FRAGMENT'\n";
+
+		assertEquals(expected, actual);
 	}
 }

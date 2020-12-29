@@ -17,25 +17,29 @@ import static org.junit.Assert.assertEquals;
 
 public class BaseJavaToolTest extends BaseJavaTest {
 	public void testErrors(String[] pairs, boolean printTree) {
-        for (int i = 0; i < pairs.length; i+=2) {
-            String grammarStr = pairs[i];
-            String expect = pairs[i+1];
+		for (int i = 0; i < pairs.length; i += 2) {
+			String grammarStr = pairs[i];
+			String expect = pairs[i + 1];
 
 			String[] lines = grammarStr.split("\n");
 			String fileName = getFilenameFromFirstLineOfGrammar(lines[0]);
 			ErrorQueue equeue = BaseRuntimeTest.antlrOnString(tmpdir, null, fileName, grammarStr, false); // use default language target in case test overrides
 
-			String actual = equeue.toString(true);
-			actual = actual.replace(tmpdir + File.separator, "");
-//			System.err.println(actual);
+			String actual = getErrorString(equeue);
 			String msg = grammarStr;
-			msg = msg.replace("\n","\\n");
-			msg = msg.replace("\r","\\r");
-			msg = msg.replace("\t","\\t");
+			msg = msg.replace("\n", "\\n");
+			msg = msg.replace("\r", "\\r");
+			msg = msg.replace("\t", "\\t");
 
-            assertEquals("error in: "+msg,expect,actual);
-        }
-    }
+			assertEquals("error in: " + msg, expect, actual);
+		}
+	}
+
+	public String getErrorString(ErrorQueue equeue) {
+		String actual = equeue.toString(true);
+		actual = actual.replace(tmpdir + File.separator, "");
+		return actual;
+	}
 
 	public String getFilenameFromFirstLineOfGrammar(String line) {
 		String fileName = "A" + Tool.GRAMMAR_EXTENSION;
