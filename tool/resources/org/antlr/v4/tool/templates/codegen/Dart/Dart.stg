@@ -223,7 +223,9 @@ Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
 
 Parser_(parser, funcs, atn, sempredFuncs, ctor, superClass) ::= <<
 <if(namedActions.definitions)><namedActions.definitions><endif>
+<if(parser.rules)>
 const int <parser.rules:{r | RULE_<r.name> = <r.index>}; separator=", ", wrap, anchor>;
+<endif>
 class <parser.name> extends <superClass; null="Parser"> {
   static final checkVersion = () => RuntimeMetaData.checkVersion('<file.ANTLRVersion>', RuntimeMetaData.VERSION);
   static const int TOKEN_EOF = IntStream.EOF;

@@ -234,8 +234,10 @@ public class <parser.name> extends <superClass; null="Parser"> {
 	public static final int
 		<parser.tokens:{k | <k>=<parser.tokens.(k)>}; separator=", ", wrap, anchor>;
 	<endif>
+	<if(parser.rules)>
 	public static final int
 		<parser.rules:{r | RULE_<r.name> = <r.index>}; separator=", ", wrap, anchor>;
+	<endif>
 	private static String[] makeRuleNames() {
 		return new String[] {
 			<parser.ruleNames:{r | "<r>"}; separator=", ", wrap, anchor>
