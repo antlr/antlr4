@@ -12,6 +12,7 @@ from antlr4.dfa.DFAState import DFAState
 
 
 class DFASerializer(object):
+    __slots__ = ('dfa', 'literalNames', 'symbolicNames')
 
     def __init__(self, dfa:DFA, literalNames:list=None, symbolicNames:list=None):
         self.dfa = dfa

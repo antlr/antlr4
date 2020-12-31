@@ -11,6 +11,7 @@ from antlr4.Token import Token
 IntervalSet = None
 
 class IntervalSet(object):
+    __slots__ = ('intervals', 'readOnly')
 
     def __init__(self):
         self.intervals = None

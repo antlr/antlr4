@@ -27,6 +27,7 @@ class TokenStream(object):
 
 
 class BufferedTokenStream(TokenStream):
+    __slots__ = ('tokenSource', 'tokens', 'index', 'fetchedEOF')
 
     def __init__(self, tokenSource:Lexer):
         # The {@link TokenSource} from which tokens for this stream are fetched.

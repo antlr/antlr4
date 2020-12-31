@@ -14,6 +14,7 @@ from antlr4.atn.Transition import WildcardTransition, NotSetTransition, Abstract
 
 
 class LL1Analyzer (object):
+    __slots__ = 'atn'
 
     #* Special value added to the lookahead sets to indicate that we hit
     #  a predicate during analysis if {@code seeThruPreds==false}.

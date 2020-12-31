@@ -13,7 +13,7 @@ from antlr4.Token import CommonToken
 
 
 class TokenTagToken(CommonToken):
-
+    __slots__ = ('tokenName', 'label')
     # Constructs a new instance of {@link TokenTagToken} with the specified
     # token name, type, and label.
     #
