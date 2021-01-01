@@ -119,12 +119,12 @@ public abstract class BaseRuntimeTest {
 	@Test
 	public void testOne() throws Exception {
 		// System.out.println(delegate.getTmpDir());
-		if ( descriptor.ignore(descriptor.getTarget()) ) {
+		if (descriptor.ignore(descriptor.getTarget()) ) {
 			System.out.println("Ignore " + descriptor);
 			return;
 		}
 
-		if ( descriptor.getTestType().contains("Parser") ) {
+		if (descriptor.getTestType().contains("Parser") ) {
 			testParser(descriptor);
 		}
 		else {

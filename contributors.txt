@@ -219,6 +219,7 @@ YYYY/MM/DD, github id, Full name, email
 2018/11/29, hannemann-tamas, Ralf Hannemann-Tamas, ralf.ht@gmail.com
 2018/12/20, WalterCouto, Walter Couto, WalterCouto@users.noreply.github.com
 2018/12/23, youkaichao, Kaichao You, youkaichao@gmail.com
+2019/01/01, khoroshilov, Alexey Khoroshilov, khoroshilov@ispras.ru
 2019/01/02, wkhemir, Wail Khemir, khemirwail@gmail.com
 2019/01/16, kuegi, Markus Zancolo, markus.zancolo@roomle.com
 2019/02/06, ralucado, Cristina Raluca Vijulie, ralucris.v[at]gmail[dot]com
@@ -281,3 +282,5 @@ YYYY/MM/DD, github id, Full name, email
 2020/10/24, cliid, Jiwu Jang, jiwujang@naver.com
 2020/11/05, MichelHartmann, Michel Hartmann, MichelHartmann@users.noreply.github.com
 2020/11/26, mr-c, Michael R. Crusoe, 1330696+mr-c@users.noreply.github.com
+2020/12/01, maxence-lefebvre, Maxence Lefebvre, maxence-lefebvre@users.noreply.github.com
+2020/12/03, electrum, David Phillips, david@acz.org

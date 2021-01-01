@@ -14,7 +14,7 @@ from antlr4.tree.Tree import ParseTree
 
 
 class ParseTreeMatch(object):
-
+    __slots__ = ('tree', 'pattern', 'labels', 'mismatchedNode')
     #
     # Constructs a new instance of {@link ParseTreeMatch} from the specified
     # parse tree and pattern.

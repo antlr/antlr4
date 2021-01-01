@@ -11,6 +11,7 @@ from antlr4.error.ErrorListener import ProxyErrorListener, ConsoleErrorListener
 RecognitionException = None
 
 class Recognizer(object):
+    __slots__ = ('_listeners', '_interp', '_stateNumber')
 
     tokenTypeMapCache = dict()
     ruleIndexMapCache = dict()

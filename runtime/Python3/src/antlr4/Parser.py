@@ -23,6 +23,7 @@ from antlr4.tree.ParseTreePatternMatcher import ParseTreePatternMatcher
 from antlr4.tree.Tree import ParseTreeListener, TerminalNode, ErrorNode
 
 class TraceListener(ParseTreeListener):
+    __slots__ = '_parser'
 
     def __init__(self, parser):
         self._parser = parser
@@ -44,7 +45,11 @@ class TraceListener(ParseTreeListener):
 
 # self is all the parsing support code essentially; most of it is error recovery stuff.#
 class Parser (Recognizer):
+    __slots__ = (
+        '_input', '_output', '_errHandler', '_precedenceStack', '_ctx',
+        'buildParseTrees', '_tracer', '_parseListeners', '_syntaxErrors'
 
+    )
     # self field maps from the serialized ATN string to the deserialized {@link ATN} with
     # bypass alternatives.
     #

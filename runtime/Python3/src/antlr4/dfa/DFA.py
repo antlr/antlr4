@@ -11,6 +11,7 @@ from antlr4.error.Errors import IllegalStateException
 
 
 class DFA(object):
+    __slots__ = ('atnStartState', 'decision', '_states', 's0', 'precedenceDfa')
 
     def __init__(self, atnStartState:DecisionState, decision:int=0):
         # From which ATN state did we create this DFA?
@@ -130,4 +131,3 @@ class DFA(object):
         from antlr4.dfa.DFASerializer import LexerDFASerializer
         serializer = LexerDFASerializer(self)
         return str(serializer)
-
