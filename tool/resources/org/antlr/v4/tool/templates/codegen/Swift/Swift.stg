@@ -252,10 +252,12 @@ Parser_(parser, funcs, atn, sempredFuncs, ctor, superClass) ::= <<
 	enum Tokens: Int {
 		case EOF = -1, <parser.tokens:{k | <k> = <parser.tokens.(k)>}; separator=", ", wrap, anchor>
 	}
-        <endif>
+	<endif>
 
 	<accessLevelNotOpen(parser)>
+	<if(parser.rules)>
 	static let <parser.rules:{r | RULE_<r.name> = <r.index>}; separator=", ", wrap, anchor>
+	<endif>
 
 	<accessLevelNotOpen(parser)>
 	static let ruleNames: [String] = [
@@ -977,7 +979,9 @@ Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
 	internal static let _sharedContextCache = PredictionContextCache()
 
 	<accessLevelNotOpen(lexer)>
+	<if(lexer.tokens)>
 	static let <lexer.tokens:{k | <k>=<lexer.tokens.(k)>}; separator=", ", wrap, anchor>
+	<endif>
 
 	<if(lexer.channels)>
 	<accessLevelNotOpen(lexer)>
