@@ -15,10 +15,10 @@ public class ANTLRInputStream: CharStream {
     ///
     /// The data being scanned
     /// 
-    internal var data: [Character]
+    internal let data: String.UnicodeScalarView
 
     /// 
-    /// How many characters are actually in the buffer
+    /// How many unicode scalars are actually in the buffer
     /// 
     internal var n: Int
 
@@ -34,22 +34,32 @@ public class ANTLRInputStream: CharStream {
 
     public init() {
         n = 0
-        data = [Character]()
+        data = String.UnicodeScalarView()
     }
 
     /// 
     /// Copy data in string to a local char array
     /// 
     public init(_ input: String) {
-        self.data = Array(input)
+        self.data = input.unicodeScalars
         self.n = data.count
     }
 
     /// 
     /// This is the preferred constructor for strings as no data is copied
     /// 
-    public init(_ data: [Character], _ numberOfActualCharsInArray: Int) {
+    public init(_ data: String.UnicodeScalarView, _ numberOfActualUnicodeScalarsInArray: Int) {
         self.data = data
+        self.n = numberOfActualUnicodeScalarsInArray
+    }
+
+    ///
+    /// This is only for backward compatibility that accepts array of `Character`.
+    /// Use `init(_ data: [UnicodeScalar], _ numberOfActualUnicodeScalarsInArray: Int)` instead.
+    ///
+    public init(_ data: [Character], _ numberOfActualCharsInArray: Int) {
+        let string = String(data)
+        self.data = string.unicodeScalars
         self.n = numberOfActualCharsInArray
     }
 
@@ -90,7 +100,8 @@ public class ANTLRInputStream: CharStream {
         }
         //print("char LA("+i+")="+(char)data[p+i-1]+"; p="+p);
         //print("LA("+i+"); p="+p+" n="+n+" data.length="+data.length);
-        return data[p + i - 1].unicodeValue
+        let index = data.index(data.startIndex, offsetBy: p + i - 1)
+        return Int(data[index].value)
     }
 
     public func LT(_ i: Int) -> Int {
@@ -145,7 +156,10 @@ public class ANTLRInputStream: CharStream {
             return ""
         }
         let stop = min(n, interval.b + 1)
-        return String(data[start ..< stop])
+
+        let startIndex = data.index(data.startIndex, offsetBy: start)
+        let stopIndex = data.index(data.startIndex, offsetBy: stop)
+        return String(data[startIndex ..< stopIndex])
     }
 
     public func getSourceName() -> String {
