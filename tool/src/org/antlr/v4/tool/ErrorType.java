@@ -341,7 +341,7 @@ public enum ErrorType {
 	 * <li>implicitly generated grammar <em>grammar</em> has no rules</li>
 	 * </ul>
 	 */
-	NO_RULES(99, "<if(arg2.implicitLexerOwner)>implicitly generated <endif>grammar <arg> has no rules", ErrorSeverity.ERROR),
+	NO_RULES(99, "<if(arg2.implicitLexerOwner)>implicitly generated <endif>grammar <arg> has no non-fragment rules", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 105.
 	 *

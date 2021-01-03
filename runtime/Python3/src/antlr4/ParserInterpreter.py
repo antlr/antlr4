@@ -32,6 +32,11 @@ from antlr4.error.Errors import RecognitionException, UnsupportedOperationExcept
 
 
 class ParserInterpreter(Parser):
+    __slots__ = (
+        'grammarFileName', 'atn', 'tokenNames', 'ruleNames', 'decisionToDFA',
+        'sharedContextCache', '_parentContextStack',
+        'pushRecursionContextStates'
+    )
 
     def __init__(self, grammarFileName:str, tokenNames:list, ruleNames:list, atn:ATN, input:TokenStream):
         super().__init__(input)

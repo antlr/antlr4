@@ -13,7 +13,8 @@ from antlr4.Token import Token
 
 
 class RuleTagToken(Token):
-   #
+    __slots__ = ('label', 'ruleName')
+    #
     # Constructs a new instance of {@link RuleTagToken} with the specified rule
     # name, bypass token type, and label.
     #

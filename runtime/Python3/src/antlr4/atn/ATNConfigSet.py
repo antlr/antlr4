@@ -20,6 +20,12 @@ from antlr4.error.Errors import UnsupportedOperationException, IllegalStateExcep
 ATNSimulator = None
 
 class ATNConfigSet(object):
+    __slots__ = (
+        'configLookup', 'fullCtx', 'readonly', 'configs', 'uniqueAlt',
+        'conflictingAlts', 'hasSemanticContext', 'dipsIntoOuterContext',
+        'cachedHashCode'
+    )
+
     #
     # The reason that we need this is because we don't want the hash map to use
     # the standard hash code and equals. We need all configurations with the same
@@ -204,6 +210,3 @@ class OrderedATNConfigSet(ATNConfigSet):
 
     def __init__(self):
         super().__init__()
-
-
-

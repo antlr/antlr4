@@ -19,59 +19,56 @@ stages:
 matrix:
   include:
     - os: linux
-      dist: trusty
+      dist: focal
       compiler: clang
-      jdk: openjdk8
+      jdk: openjdk11
       env:
         - TARGET=cpp
-        - CXX=g++-5
+        - CXX=g++-10
         - GROUP=LEXER
       stage: main-test
       addons:
         apt:
           sources:
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-precise-3.7
+            - sourceline: 'deb http://apt.llvm.org/focal/ llvm-toolchain-focal-10 main'
           packages:
-            - g++-5
+            - g++-10
             - uuid-dev
-            - clang-3.7
+            - clang-10
     - os: linux
-      dist: trusty
+      dist: focal
       compiler: clang
-      jdk: openjdk8
+      jdk: openjdk11
       env:
         - TARGET=cpp
-        - CXX=g++-5
+        - CXX=g++-10
         - GROUP=PARSER
       stage: main-test
       addons:
         apt:
           sources:
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-precise-3.7
+            - sourceline: 'deb http://apt.llvm.org/focal/ llvm-toolchain-focal-10 main'
           packages:
-            - g++-5
+            - g++-10
             - uuid-dev
-            - clang-3.7
+            - clang-10
     - os: linux
-      dist: trusty
+      dist: focal
       compiler: clang
-      jdk: openjdk8
+      jdk: openjdk11
       env:
         - TARGET=cpp
-        - CXX=g++-5
+        - CXX=g++-10
         - GROUP=RECURSION
       stage: main-test
       addons:
         apt:
           sources:
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-precise-3.7
+            - sourceline: 'deb http://apt.llvm.org/focal/ llvm-toolchain-focal-10 main'
           packages:
-            - g++-5
+            - g++-10
             - uuid-dev
-            - clang-3.7
+            - clang-10
     - os: osx
       compiler: clang
       osx_image: xcode10.2
@@ -150,7 +147,13 @@ matrix:
       stage: smoke-test
     - os: linux
       jdk: openjdk8
-      env: TARGET=csharp
+      env:
+        - TARGET=dotnet
+        - GROUP=MAIN
+      stage: main-test
+    - os: linux
+      jdk: openjdk8
+      env: TARGET=dart
       stage: main-test
     - os: linux
       language: php
@@ -161,21 +164,18 @@ matrix:
       stage: main-test
     - os: linux
       jdk: openjdk8
-      dist: trusty
       env:
         - TARGET=dotnet
         - GROUP=LEXER
       stage: extended-test
     - os: linux
       jdk: openjdk8
-      dist: trusty
       env:
         - TARGET=dotnet
         - GROUP=PARSER
       stage: extended-test
     - os: linux
       jdk: openjdk8
-      dist: trusty
       env:
         - TARGET=dotnet
         - GROUP=RECURSION
@@ -192,13 +192,16 @@ matrix:
           sources:
             - deadsnakes # source required so it finds the package definition below
           packages:
-            - python3.6
+            - python3.7
       stage: main-test
     - os: linux
       dist: trusty
       jdk: openjdk8
       env: TARGET=javascript
       stage: main-test
+      before_install:
+        - nvm install 14 # otherwise it runs by default on node 8
+        - f="./.travis/before-install-linux-javascript.sh"; ! [ -x "$f" ] || "$f"
     - os: linux
       dist: trusty
       jdk: openjdk8
@@ -211,7 +214,7 @@ before_install:
 script:
   - |
     cd runtime-testsuite;
-    travis_wait 40 ../.travis/run-tests-$TARGET.sh;
-    rc=$?;
-    cat target/surefire-reports/*.dumpstream || true;
+    travis_wait 40 ../.travis/run-tests-$TARGET.sh
+    rc=$?
+    cat target/surefire-reports/*.dumpstream || true
     exit $rc

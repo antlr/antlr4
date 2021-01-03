@@ -242,7 +242,9 @@ namespace<if(file.genPackage)> <file.genPackage><endif> {
 		public const <parser.tokens:{k | <k> = <parser.tokens.(k)>}; separator=", ", wrap, anchor>;
 		<endif>
 
+		<if(parser.rules)>
 		public const <parser.rules:{r | RULE_<r.name> = <r.index>}; separator=", ", wrap, anchor>;
+		<endif>
 
 		/**
 		 * @var array\<string>
