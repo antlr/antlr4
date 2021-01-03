@@ -314,6 +314,13 @@ Of course you need Mono and `nuget` to be installed. On mac:
 - nuget - download [nuget.exe](https://www.nuget.org/downloads)
 - dotnet - follow [the instructions here](https://www.microsoft.com/net/core)
 
+From @kvanTTT: Install `dotnet` on any platform (see https://dotnet.microsoft.com/download) and run the following command on any OS (Win, Linux, macOS):
+
+* building: `dotnet build runtime/CSharp/Antlr4.csproj -c Release`
+  Output `.dll` will be in `runtime/CSharp/bin/Release/netstandard2.0` or in `runtime/CSharp/bin/Release/netstandard2.1`
+* packing: `dotnet pack runtime/CSharp/Antlr4.csproj -c Release`
+  Output `.nupkg` will be in `runtime/CSharp/bin/Release/Antlr4.Runtime.Standard.4.9.0.nupkg`
+
 Alternatively, you can install Visual Studio 2017 and make sure to check boxes with .NET Core SDK.
 
 You also need to enable .NET Framework 3.5 support in Windows "Programs and Features".
