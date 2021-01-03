@@ -315,7 +315,7 @@ Now we have [appveyor create artifact](https://ci.appveyor.com/project/parrt/ant
 
 Of course you need Mono and `nuget` to be installed. On mac:
 
-- .NET build tools - can be loaded from [here](https://www.visualstudio.com/downloads/)
+- .NET build tools - can be loaded from [here](https://www.visualstudio.com/downloads/) (I need dotnet 5 and 3.1 versions)
 - nuget - download [nuget.exe](https://www.nuget.org/downloads)
 - dotnet - follow [the instructions here](https://www.microsoft.com/net/core)
 
