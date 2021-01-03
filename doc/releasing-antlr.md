@@ -22,28 +22,27 @@ $ git push origin 4.9-rc1
 $ git push upstream 4.9-rc1
 ```
 
-## Update submodules
+## Copy PHP runtime over
 
-Make sure you tell git to pull in the submodule (for every clone you do of antlr4):
+Bump version to 4.9 in `runtime/PHP/src/RuntimeMetaData.php` in separate repository and commit plus push.
 
-```bash
-git submodule init
 ```
-
-Also bump version to 4.9 in `runtime/PHP/src/RuntimeMetaData.php`.
-
-Update the runtime submodules by running the following command from outside submodule:
-
-```bash
-git submodule update --recursive
-git submodule update --remote --merge # might only need this last one but do both
-```
-
-Make sure these changes go back to antlr4 repo:
-
-```bash
-cd runtime/PHP
+cd ~/antlr/code/antlr-php-runtime
+... vi src/RuntimeMetaData.php ...
 git commit -a -m "Update PHP Runtime to latest version"
+```
+
+them back over in the ANTLR repo:
+
+```
+cd runtime
+mkdir PHP
+cp ~/antlr/code/antlr-php-runtime/LICENSE PHP
+cp ~/antlr/code/antlr-php-runtime/README.md PHP
+cp ~/antlr/code/antlr-php-runtime/composer.json PHP
+cp ~/antlr/code/antlr-php-runtime/phpcs.xml.dist PHP
+cp ~/antlr/code/antlr-php-runtime/phpstan.neon.dist PHP
+cp -r ~/antlr/code/antlr-php-runtime/src PHP
 ```
 
 ## Bump version
