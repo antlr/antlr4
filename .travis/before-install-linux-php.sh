@@ -7,4 +7,5 @@ sudo apt-get update -qq
 
 php -v
 
+git clone https://github.com/antlr/antlr-php-runtime.git
 mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
