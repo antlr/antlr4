@@ -63,7 +63,7 @@ public class RuntimeMetaData {
     /// omitted, the `-` (hyphen-minus) appearing before it is also
     /// omitted.
     /// 
-    public static let VERSION: String = "4.9"
+    public static let VERSION: String = "4.9.1"
 
     /// 
     /// Gets the currently executing version of the ANTLR 4 runtime library.

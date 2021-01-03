@@ -32,7 +32,7 @@ git submodule init
 
 Also bump version to 4.9 in `runtime/PHP/src/RuntimeMetaData.php`.
 
-Update the runtime submodules by running the following command:
+Update the runtime submodules by running the following command from outside submodule:
 
 ```bash
 git submodule update --recursive
@@ -42,8 +42,8 @@ git submodule update --remote --merge # might only need this last one but do bot
 Make sure these changes go back to antlr4 repo:
 
 ```bash
-git add runtime/PHP
-git commit -m "Update PHP Runtime to latest version"
+cd runtime/PHP
+git commit -a -m "Update PHP Runtime to latest version"
 ```
 
 ## Bump version
@@ -77,10 +77,15 @@ Edit the repository looking for 4.5 or whatever and update it. Bump version in t
  * tool/src/org/antlr/v4/codegen/Target.java
  * tool/resources/org/antlr/v4/tool/templates/codegen/Swift/Swift.stg
  
-Here is a simple script to display any line from the critical files with, say, `4.5` in it:
+Here is a simple script to display any line from the critical files with, say, `4.9` in it:
 
 ```bash
-find tool runtime -type f -exec grep -l '4\.6' {} \;
+mvn clean
+rm -rf runtime/CSharp/bin
+rm -rf runtime/CSharp/obj
+rm -rf runtime/gen
+find tool runtime -type f -exec grep -l '4\.9' {} \;
+find runtime runtime -type f -exec grep -l '4\.9' {} \;
 ```
 
 Commit to repository.
