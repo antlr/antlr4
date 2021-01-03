@@ -146,6 +146,7 @@ The goal is to get a snapshot, such as `4.9-SNAPSHOT`, to the staging server: [a
 Do this:
 
 ```bash
+$ mvn install -DskipTests  # seems required to get the jar files visible to maven
 $ mvn deploy -DskipTests
 ...
 [INFO] --- maven-deploy-plugin:2.7:deploy (default-deploy) @ antlr4-tool-testsuite ---
