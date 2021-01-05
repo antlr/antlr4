@@ -293,6 +293,7 @@ cd runtime/JavaScript
 ```bash
 cd runtime/JavaScript
 npm update
+npm install
 npm run build 
 npm login
 npm publish   # don't put antlr4 on there or it will try to push the old version for some reason
