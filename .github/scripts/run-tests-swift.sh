@@ -5,7 +5,7 @@ set -euo pipefail
 # linux specific setup, those setup have to be
 # here since environment variables doesn't pass
 # across scripts
-if [ $$RUNNER_OS == "Linux" ]; then
+if [ $RUNNER_OS == "Linux" ]; then
   export SWIFT_VERSION=swift-5.0.1
   export SWIFT_HOME=$(pwd)/swift/$SWIFT_VERSION-RELEASE-ubuntu16.04/usr/bin/
   export PATH=$SWIFT_HOME:$PATH
