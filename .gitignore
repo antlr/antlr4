@@ -50,6 +50,9 @@ bld/
 # Visual Studio 2015 cache/options directory
 .vs/
 
+# Nuget package
+.nupkg
+
 # NetBeans user configuration files
 nbactions*.xml
 /nbproject/private/
