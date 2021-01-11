@@ -15,7 +15,7 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 1.8
-    - name: Build with Maven
+    - name: Build and test with Maven
       run: ../scripts/run-tests-swift.sh
       env: 
         TARGET: swift
