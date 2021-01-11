@@ -51,7 +51,7 @@ bld/
 .vs/
 
 # Nuget package
-.nupkg
+*.nupkg
 
 # NetBeans user configuration files
 nbactions*.xml
