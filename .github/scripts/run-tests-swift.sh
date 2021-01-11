@@ -26,10 +26,6 @@ fi
 swift --version
 swift build --version
 
-cd ../..
-
-pwd
-
 pushd runtime/Swift
 ./boot.py --test
 popd
