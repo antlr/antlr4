@@ -16,7 +16,7 @@ jobs:
       with:
         java-version: 1.8
     - name: Build and test with Maven
-      run: pwd; ../antlr4/.github/scripts/run-tests-swift.sh
+      run: .github/scripts/run-tests-swift.sh
       env: 
         TARGET: swift
         GROUP: LEXER
