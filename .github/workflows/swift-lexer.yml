@@ -1,4 +1,4 @@
-name: Java CI with Maven
+name: Swift/MacOSX
 
 on:
   push:
