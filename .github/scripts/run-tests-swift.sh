@@ -28,7 +28,7 @@ swift build --version
 
 cd ../..
 
-echo ${pwd}
+pwd
 
 pushd runtime/Swift
 ./boot.py --test
