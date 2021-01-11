@@ -15,7 +15,7 @@ public class ANTLRInputStream: CharStream {
     ///
     /// The data being scanned
     /// 
-    internal let data: String.UnicodeScalarView
+    internal let data: [UnicodeScalar]
 
     /// 
     /// How many unicode scalars are actually in the buffer
@@ -34,21 +34,21 @@ public class ANTLRInputStream: CharStream {
 
     public init() {
         n = 0
-        data = String.UnicodeScalarView()
+        data = []
     }
 
     /// 
     /// Copy data in string to a local char array
     /// 
     public init(_ input: String) {
-        self.data = input.unicodeScalars
+        self.data = Array(input.unicodeScalars)
         self.n = data.count
     }
 
     /// 
     /// This is the preferred constructor for strings as no data is copied
     /// 
-    public init(_ data: String.UnicodeScalarView, _ numberOfActualUnicodeScalarsInArray: Int) {
+    public init(_ data: [UnicodeScalar], _ numberOfActualUnicodeScalarsInArray: Int) {
         self.data = data
         self.n = numberOfActualUnicodeScalarsInArray
     }
@@ -57,10 +57,10 @@ public class ANTLRInputStream: CharStream {
     /// This is only for backward compatibility that accepts array of `Character`.
     /// Use `init(_ data: [UnicodeScalar], _ numberOfActualUnicodeScalarsInArray: Int)` instead.
     ///
-    public init(_ data: [Character], _ numberOfActualCharsInArray: Int) {
+    public init(_ data: [Character], _ numberOfActualUnicodeScalarsInArray: Int) {
         let string = String(data)
-        self.data = string.unicodeScalars
-        self.n = numberOfActualCharsInArray
+        self.data = Array(string.unicodeScalars)
+        self.n = numberOfActualUnicodeScalarsInArray
     }
 
     public func reset() {
@@ -100,8 +100,7 @@ public class ANTLRInputStream: CharStream {
         }
         //print("char LA("+i+")="+(char)data[p+i-1]+"; p="+p);
         //print("LA("+i+"); p="+p+" n="+n+" data.length="+data.length);
-        let index = data.index(data.startIndex, offsetBy: p + i - 1)
-        return Int(data[index].value)
+        return Int(data[p + i - 1].value)
     }
 
     public func LT(_ i: Int) -> Int {
@@ -157,9 +156,9 @@ public class ANTLRInputStream: CharStream {
         }
         let stop = min(n, interval.b + 1)
 
-        let startIndex = data.index(data.startIndex, offsetBy: start)
-        let stopIndex = data.index(data.startIndex, offsetBy: stop)
-        return String(data[startIndex ..< stopIndex])
+        var unicodeScalarView = String.UnicodeScalarView()
+        unicodeScalarView.append(contentsOf: data[start ..< stop])
+        return String(unicodeScalarView)
     }
 
     public func getSourceName() -> String {
@@ -167,6 +166,8 @@ public class ANTLRInputStream: CharStream {
     }
 
     public func toString() -> String {
-        return String(data)
+        var unicodeScalarView = String.UnicodeScalarView()
+        unicodeScalarView.append(contentsOf: data)
+        return String(unicodeScalarView)
     }
 }
