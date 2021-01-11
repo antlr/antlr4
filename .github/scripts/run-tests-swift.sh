@@ -28,7 +28,9 @@ swift build --version
 
 cd ../..
 
-pushd ../runtime/Swift
+echo ${wd}
+
+pushd runtime/Swift
 ./boot.py --test
 popd
 
