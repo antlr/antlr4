@@ -29,16 +29,22 @@ swift build --version
 # run swift tests
 pushd runtime/Swift
 ./boot.py --test
+rc=$?
 popd
 
-# run java tests
-cd runtime-testsuite/
-if [ $GROUP == "LEXER" ]; then
-    mvn -q -Dgroups="org.antlr.v4.test.runtime.category.LexerTests" -Dtest="swift.*" test
-elif [ $GROUP == "PARSER" ]; then
-    mvn -q -Dgroups="org.antlr.v4.test.runtime.category.ParserTests" -Dtest="swift.*" test
-elif [ $GROUP == "RECURSION" ]; then
-    mvn -q -Dgroups="org.antlr.v4.test.runtime.category.LeftRecursionTests" -Dtest="swift.*" test
-else
-    mvn -q -Dtest=swift.* test
+if [ $rc == 0 ] then
+  # run java tests
+  cd runtime-testsuite/
+  if [ $GROUP == "LEXER" ]; then
+      mvn -q -Dgroups="org.antlr.v4.test.runtime.category.LexerTests" -Dtest="swift.*" test
+  elif [ $GROUP == "PARSER" ]; then
+      mvn -q -Dgroups="org.antlr.v4.test.runtime.category.ParserTests" -Dtest="swift.*" test
+  elif [ $GROUP == "RECURSION" ]; then
+      mvn -q -Dgroups="org.antlr.v4.test.runtime.category.LeftRecursionTests" -Dtest="swift.*" test
+  else
+      mvn -q -Dtest=swift.* test
+  fi
+  rc=$?
+  cat target/surefire-reports/*.dumpstream || true
 fi
+exit $rc
