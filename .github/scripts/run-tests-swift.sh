@@ -30,6 +30,8 @@ pushd runtime/Swift
 ./boot.py --test
 popd
 
+echo GROUP = $GROUP
+
 if [ $GROUP == "LEXER" ]; then
     mvn -q -Dgroups="org.antlr.v4.test.runtime.category.LexerTests" -Dtest=swift.* test
 elif [ $GROUP == "PARSER" ]; then
