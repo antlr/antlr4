@@ -32,7 +32,7 @@ pushd runtime/Swift
 rc=$?
 popd
 
-if [ $rc == 0 ] then
+if [ $rc == 0 ]; then
   # run java tests
   cd runtime-testsuite/
   if [ $GROUP == "LEXER" ]; then
