@@ -25,3 +25,4 @@ jobs:
       run: .github/scripts/run-tests-java.sh
       env: 
         TARGET: swift
+        GROUP: ALL
