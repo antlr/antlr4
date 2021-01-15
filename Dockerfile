@@ -1,4 +1,4 @@
-FROM openjdk:8-alpine as builder
+FROM openjdk:8-alpine AS builder
 WORKDIR /opt/antlr4
 COPY . .
 ARG MAVEN_OPTS="-Xmx1G"
@@ -9,5 +9,8 @@ RUN apk add --no-cache maven \
 
 FROM openjdk:8-alpine
 COPY --from=builder /opt/antlr4/antlr4-tool.jar /usr/local/lib/
+RUN addgroup -g 1000 nonroot \
+    && adduser -u 1000 -G nonroot -D -H nonroot
+USER 1000:1000
 WORKDIR /work
 ENTRYPOINT ["java", "-Xmx500M", "-cp", "/usr/local/lib/antlr4-tool.jar", "org.antlr.v4.Tool"]
