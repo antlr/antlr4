@@ -45,11 +45,7 @@ class AntlrError {
 class RecognitionException extends AntlrError {
     constructor(params) {
         super(params.message);
-        if (!!Error.captureStackTrace) {
-            Error.captureStackTrace(this, RecognitionException);
-        } else {
-            var stack = new Error().stack;
-        }
+
         this.message = params.message;
         this.recognizer = params.recognizer;
         this.input = params.input;
@@ -188,7 +184,6 @@ class FailedPredicateException extends RecognitionException {
 class ParseCancellationException extends AntlrError {
     constructor() {
         super()
-        Error.captureStackTrace(this, ParseCancellationException);
     }
 }
 
