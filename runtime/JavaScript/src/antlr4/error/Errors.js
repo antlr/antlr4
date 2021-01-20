@@ -13,7 +13,36 @@
 
 const {PredicateTransition} = require('./../atn/Transition')
 
-class RecognitionException extends Error {
+/**
+ * The base class for error classes.  This is used instead of the system Error class to avoid
+ * incompatibilities with transpilers targeting ECMASCript 5.
+ */
+class AntlrError {
+    constructor(message) {
+        this.name = 'Error';
+        this.message = message === undefined ? '' : message;
+
+        this.stack = new Error().stack;
+    }
+
+    toString() {
+        // Emulate the system Error.prototype.toString()
+        const name = (this.name === undefined) ? 'Error' : String(this.name);
+        const msg =  (this.message === undefined) ? '' : String(this.message);
+
+        if (name === '') {
+          return msg;
+        }
+
+        if (msg === '') {
+          return name;
+        }
+
+        return name + ': ' + msg;
+    }
+}
+
+class RecognitionException extends AntlrError {
     constructor(params) {
         super(params.message);
         if (!!Error.captureStackTrace) {
@@ -156,7 +185,7 @@ class FailedPredicateException extends RecognitionException {
 }
 
 
-class ParseCancellationException extends Error{
+class ParseCancellationException extends AntlrError {
     constructor() {
         super()
         Error.captureStackTrace(this, ParseCancellationException);

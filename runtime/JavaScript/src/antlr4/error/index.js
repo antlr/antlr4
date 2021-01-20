@@ -3,6 +3,7 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+module.exports.AntlrError = require('./Errors').AntlrError;
 module.exports.RecognitionException = require('./Errors').RecognitionException;
 module.exports.NoViableAltException = require('./Errors').NoViableAltException;
 module.exports.LexerNoViableAltException = require('./Errors').LexerNoViableAltException;
