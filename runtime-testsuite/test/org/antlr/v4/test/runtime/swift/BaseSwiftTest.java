@@ -12,8 +12,10 @@ import org.antlr.v4.test.runtime.RuntimeTestSupport;
 import org.antlr.v4.test.runtime.StreamVacuum;
 import org.stringtemplate.v4.ST;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.*;
 
@@ -42,7 +44,7 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 	static {
 		Map<String, String> env = System.getenv();
 		String swiftHome = env.containsKey(SWIFT_HOME_ENV_KEY) ? env.get(SWIFT_HOME_ENV_KEY) : "";
-		SWIFT_CMD = swiftHome + "swift";
+		SWIFT_CMD = getArchitecturePrefix() + swiftHome + "swift";
 
 		ClassLoader loader = Thread.currentThread().getContextClassLoader();
 		// build swift runtime
@@ -70,6 +72,21 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 				}
 			}
 		});
+	}
+
+	private static String getArchitecturePrefix() {
+		String os = System.getProperty("os.name").toLowerCase();
+		if(!os.contains("macos"))
+			return "";
+		try {
+			Process p = Runtime.getRuntime().exec("uname -m");
+			BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			String arch = in.readLine();
+			return "arch -" + arch + " ";
+		} catch (IOException e) {
+			e.printStackTrace();
+			return "";
+		}
 	}
 
 	public String tmpdir = null;
