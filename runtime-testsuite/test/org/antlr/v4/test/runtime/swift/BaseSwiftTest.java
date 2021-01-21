@@ -232,8 +232,10 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 	static Boolean IS_MAC_ARM_64 = null;
 
 	private static boolean isMacOSArm64() {
-		if (IS_MAC_ARM_64 == null)
+		if (IS_MAC_ARM_64 == null) {
 			IS_MAC_ARM_64 = computeIsMacOSArm64();
+			System.err.println("IS_MAC_ARM_64 = " + IS_MAC_ARM_64);
+		}
 		return IS_MAC_ARM_64;
 	}
 
