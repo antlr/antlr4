@@ -193,7 +193,7 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 
 	private String execTest(String projectDir, String projectName) {
 		try {
-			Pair<String, String> output = runProcess(projectDir, "arch", "-arm64", "./.build/debug/" + projectName, "input");
+			Pair<String, String> output = runProcess(projectDir, "./.build/debug/" + projectName, "input");
 			if (output.b.length() > 0) {
 				stderrDuringParse = output.b;
 			}
@@ -232,8 +232,27 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 		}
 	}
 
+	private static boolean isMacOSArm64() {
+		String os = System.getenv("RUNNER_OS");
+		if(os==null || !os.toLowerCase().equals("macos"))
+			return false;
+		try {
+			Process p = Runtime.getRuntime().exec("uname -a");
+			BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			String uname = in.readLine();
+			return uname.contains("_ARM64_");
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
 	private static Pair<String,String> runProcess(String execPath, String... args) throws IOException, InterruptedException {
-		final Process process = Runtime.getRuntime().exec(args, null, new File(execPath));
+		List<String> argsWithArch = new ArrayList<>();
+		if(isMacOSArm64())
+			argsWithArch.addAll(Arrays.asList("arch", "-arm64"));
+		argsWithArch.addAll(Arrays.asList(args));
+		final Process process = Runtime.getRuntime().exec(argsWithArch.toArray(new String[0]), null, new File(execPath));
 		StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
 		StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
 		stdoutVacuum.start();
