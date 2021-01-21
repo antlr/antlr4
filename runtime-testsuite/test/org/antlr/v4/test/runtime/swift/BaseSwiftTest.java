@@ -8,6 +8,7 @@ package org.antlr.v4.test.runtime.swift;
 
 import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.test.runtime.ErrorQueue;
+import org.antlr.v4.test.runtime.RuntimeTestDescriptor;
 import org.antlr.v4.test.runtime.RuntimeTestSupport;
 import org.antlr.v4.test.runtime.StreamVacuum;
 import org.stringtemplate.v4.ST;
@@ -29,12 +30,12 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 	/**
 	 * Path of the ANTLR runtime.
 	 */
-	private static String ANTLR_RUNTIME_PATH;
+	private static final String ANTLR_RUNTIME_PATH;
 
 	/**
 	 * Absolute path to swift command.
 	 */
-	private static String SWIFT_CMD;
+	private static final String SWIFT_CMD;
 
 	/**
 	 * Environment variable name for swift home.
@@ -50,7 +51,7 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 		// build swift runtime
 		URL swiftRuntime = loader.getResource("Swift");
 		if (swiftRuntime == null) {
-			throw new RuntimeException("Swift runtime file not found at:" + swiftRuntime.getPath());
+			throw new RuntimeException("Swift runtime file not found");
 		}
 		ANTLR_RUNTIME_PATH = swiftRuntime.getPath();
 		try {
@@ -74,21 +75,6 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 		});
 	}
 
-	private static String getArchitecturePrefix() {
-		String os = System.getenv("RUNNER_OS").toLowerCase();
-		if(!os.equals("macos"))
-			return "";
-		try {
-			Process p = Runtime.getRuntime().exec("uname -m");
-			BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
-			String arch = in.readLine();
-			return "arch -" + arch + " ";
-		} catch (IOException e) {
-			e.printStackTrace();
-			return "";
-		}
-	}
-
 	public String tmpdir = null;
 
 	/**
@@ -105,7 +91,7 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 	/**
 	 * Source files used in each small swift project.
 	 */
-	private Set<String> sourceFiles = new HashSet<>();
+	private final Set<String> sourceFiles = new HashSet<>();
 
 	@Override
 	public void testSetUp() throws Exception {
@@ -126,6 +112,17 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 
 	@Override
 	public void testTearDown() throws Exception {
+	}
+
+	@Override
+	public void beforeTest(RuntimeTestDescriptor descriptor) {
+		// write to output because for some unknown reason, tests will hang on Mac Mini M1 if no output
+		if(isMacOSArm64())
+			System.out.println(descriptor.getTestName());
+	}
+
+	@Override
+	public void afterTest(RuntimeTestDescriptor descriptor) {
 	}
 
 	@Override
@@ -232,9 +229,17 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 		}
 	}
 
+	static Boolean IS_MAC_ARM_64 = null;
+
 	private static boolean isMacOSArm64() {
+		if (IS_MAC_ARM_64 == null)
+			IS_MAC_ARM_64 = computeIsMacOSArm64();
+		return IS_MAC_ARM_64;
+	}
+
+	private static boolean computeIsMacOSArm64() {
 		String os = System.getenv("RUNNER_OS");
-		if(os==null || !os.toLowerCase().equals("macos"))
+		if(os==null || !os.equalsIgnoreCase("macos"))
 			return false;
 		try {
 			Process p = Runtime.getRuntime().exec("uname -a");
@@ -292,6 +297,7 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 		}
 	}
 
+	@SuppressWarnings("SameParameterValue")
 	private String execParser(String parserName,
 							  String lexerName,
 							  String parserStartRuleName,
@@ -370,7 +376,7 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 							"parser.setInterpreter(profiler)");
 		}
 		else {
-			outputFileST.add("profile", new ArrayList<Object>());
+			outputFileST.add("profile", new ArrayList<>());
 		}
 		outputFileST.add("createParser", createParserST);
 		outputFileST.add("parserName", parserName);
@@ -433,6 +439,6 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 				files.add(grammarName + "BaseVisitor.swift");
 			}
 		}
-		addSourceFiles(files.toArray(new String[files.size()]));
+		addSourceFiles(files.toArray(new String[0]));
 	}
 }

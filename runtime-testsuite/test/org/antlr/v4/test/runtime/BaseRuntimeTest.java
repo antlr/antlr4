@@ -148,13 +148,14 @@ public abstract class BaseRuntimeTest {
 			System.out.println("Ignore " + descriptor);
 			return;
 		}
-
+		delegate.beforeTest(descriptor);
 		if (descriptor.getTestType().contains("Parser") ) {
 			testParser(descriptor);
 		}
 		else {
 			testLexer(descriptor);
 		}
+		delegate.afterTest(descriptor);
 	}
 
 	public void testParser(RuntimeTestDescriptor descriptor) throws Exception {
