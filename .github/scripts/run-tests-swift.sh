@@ -36,7 +36,7 @@ if [ $rc == 0 ]; then
   # run java tests
   cd runtime-testsuite/
   if [ $GROUP == "LEXER" ]; then
-      -Dgroups="org.antlr.v4.test.runtime.category.LexerTests" -Dtest="swift.*" test
+      mvn -Dgroups="org.antlr.v4.test.runtime.category.LexerTests" -Dtest="swift.*" test
   elif [ $GROUP == "PARSER" ]; then
       mvn -q -Dgroups="org.antlr.v4.test.runtime.category.ParserTests" -Dtest="swift.*" test
   elif [ $GROUP == "RECURSION" ]; then
