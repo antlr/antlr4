@@ -193,7 +193,7 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 
 	private String execTest(String projectDir, String projectName) {
 		try {
-			Pair<String, String> output = runProcess(projectDir, "./.build/debug/" + projectName, "input");
+			Pair<String, String> output = runProcess(projectDir, "arch", "-arm64", "./.build/debug/" + projectName, "input");
 			if (output.b.length() > 0) {
 				stderrDuringParse = output.b;
 			}
