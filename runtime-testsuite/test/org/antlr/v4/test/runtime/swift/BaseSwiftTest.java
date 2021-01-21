@@ -45,7 +45,6 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 		Map<String, String> env = System.getenv();
 		String swiftHome = env.containsKey(SWIFT_HOME_ENV_KEY) ? env.get(SWIFT_HOME_ENV_KEY) : "";
 		SWIFT_CMD = swiftHome + "swift";
-		System.out.println("Swift command: " + SWIFT_CMD);
 
 		ClassLoader loader = Thread.currentThread().getContextClassLoader();
 		// build swift runtime
@@ -194,7 +193,6 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 
 	private String execTest(String projectDir, String projectName) {
 		try {
-			System.out.println("projectDir: " + projectDir);
 			Pair<String, String> output = runProcess(projectDir, "./.build/debug/" + projectName, "input");
 			if (output.b.length() > 0) {
 				stderrDuringParse = output.b;
