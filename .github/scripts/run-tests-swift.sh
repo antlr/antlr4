@@ -19,8 +19,8 @@ if [ -z "${JAVA_HOME-}" ]
 then
   export JAVA_HOME="$(java -XshowSettings:properties -version 2>&1 |
                           grep 'java\.home' | awk '{ print $3 }')"
-  echo "export JAVA_HOME=$JAVA_HOME"
 fi
+echo "export JAVA_HOME=$JAVA_HOME"
 
 # check swift
 swift --version
