@@ -45,6 +45,7 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 		Map<String, String> env = System.getenv();
 		String swiftHome = env.containsKey(SWIFT_HOME_ENV_KEY) ? env.get(SWIFT_HOME_ENV_KEY) : "";
 		SWIFT_CMD = getArchitecturePrefix() + swiftHome + "swift";
+		System.out.println("Swift command: " + SWIFT_CMD);
 
 		ClassLoader loader = Thread.currentThread().getContextClassLoader();
 		// build swift runtime
@@ -75,8 +76,8 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 	}
 
 	private static String getArchitecturePrefix() {
-		String os = System.getProperty("os.name").toLowerCase();
-		if(!os.contains("macos"))
+		String os = System.getenv("RUNNER_OS").toLowerCase();
+		if(!os.equals("macos"))
 			return "";
 		try {
 			Process p = Runtime.getRuntime().exec("uname -m");
