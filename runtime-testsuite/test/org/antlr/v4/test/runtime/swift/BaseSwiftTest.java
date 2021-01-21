@@ -28,7 +28,7 @@ import static org.junit.Assert.assertTrue;
 public class BaseSwiftTest implements RuntimeTestSupport {
 
 	private static final boolean USE_ARCH_ARM64 = false;
-	private static final boolean VERBOSE = false;
+	private static final boolean VERBOSE = true;
 
 	/**
 	 * Path of the ANTLR runtime.
