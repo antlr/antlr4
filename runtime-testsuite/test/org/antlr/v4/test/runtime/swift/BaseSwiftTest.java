@@ -44,7 +44,7 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 	static {
 		Map<String, String> env = System.getenv();
 		String swiftHome = env.containsKey(SWIFT_HOME_ENV_KEY) ? env.get(SWIFT_HOME_ENV_KEY) : "";
-		SWIFT_CMD = getArchitecturePrefix() + swiftHome + "swift";
+		SWIFT_CMD = swiftHome + "swift";
 		System.out.println("Swift command: " + SWIFT_CMD);
 
 		ClassLoader loader = Thread.currentThread().getContextClassLoader();
