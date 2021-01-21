@@ -271,7 +271,7 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 				try {
 					process.destroy();
 				} catch(Exception e) {
-					e.printStackTrace();
+					e.printStackTrace(System.err);
 				}
 			}
 		}, 120_000);
@@ -290,11 +290,25 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 		if(isMacOSArm64())
 			argsWithArch.addAll(Arrays.asList("arch", "-arm64"));
 		argsWithArch.addAll(Arrays.asList(command));
+		System.err.println("Executing " + argsWithArch.toString());
 		ProcessBuilder builder = new ProcessBuilder(argsWithArch.toArray(new String[0]));
 		builder.directory(new File(workingDir));
-		Process p = builder.start();
-		int status = p.waitFor();
+		final Process process = builder.start();
+		Timer timer = new Timer();
+		timer.schedule(new TimerTask() {
+			@Override
+			public void run() {
+				try {
+					process.destroy();
+				} catch(Exception e) {
+					e.printStackTrace(System.err);
+				}
+			}
+		}, 120_000);
+		int status = process.waitFor();
+		System.err.println("Done executing " + argsWithArch.toString());
 		if (status != 0) {
+			System.err.println("Process exited with status " + status);
 			throw new IOException("Process exited with status " + status);
 		}
 	}
