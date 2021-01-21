@@ -15,13 +15,7 @@ import org.stringtemplate.v4.ST;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static org.antlr.v4.test.runtime.BaseRuntimeTest.antlrOnString;
 import static org.antlr.v4.test.runtime.BaseRuntimeTest.mkdir;
@@ -222,12 +216,24 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 	}
 
 	private static Pair<String,String> runProcess(String execPath, String... args) throws IOException, InterruptedException {
-		Process process = Runtime.getRuntime().exec(args, null, new File(execPath));
+		final Process process = Runtime.getRuntime().exec(args, null, new File(execPath));
 		StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
 		StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
 		stdoutVacuum.start();
 		stderrVacuum.start();
+		Timer timer = new Timer();
+		timer.schedule(new TimerTask() {
+			@Override
+			public void run() {
+				try {
+					process.destroy();
+				} catch(Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}, 120_000);
 		int status = process.waitFor();
+		timer.cancel();
 		stdoutVacuum.join();
 		stderrVacuum.join();
 		if (status != 0) {
