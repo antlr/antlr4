@@ -27,6 +27,9 @@ import static org.junit.Assert.assertTrue;
 
 public class BaseSwiftTest implements RuntimeTestSupport {
 
+	private static final boolean USE_ARCH_ARM64 = false;
+	private static final boolean VERBOSE = false;
+
 	/**
 	 * Path of the ANTLR runtime.
 	 */
@@ -116,8 +119,7 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 
 	@Override
 	public void beforeTest(RuntimeTestDescriptor descriptor) {
-		// write to output because for some unknown reason, tests will hang on Mac Mini M1 if no output
-		if(isMacOSArm64())
+		if(VERBOSE && isMacOSArm64())
 			System.out.println(descriptor.getTestName());
 	}
 
@@ -256,10 +258,11 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 
 	private static Pair<String,String> runProcess(String execPath, String... args) throws IOException, InterruptedException {
 		List<String> argsWithArch = new ArrayList<>();
-		if(isMacOSArm64())
+		if(USE_ARCH_ARM64 && isMacOSArm64())
 			argsWithArch.addAll(Arrays.asList("arch", "-arm64"));
 		argsWithArch.addAll(Arrays.asList(args));
-		System.err.println("Executing " + argsWithArch.toString() + " " + execPath);
+		if(VERBOSE)
+			System.err.println("Executing " + argsWithArch.toString() + " " + execPath);
 		final Process process = Runtime.getRuntime().exec(argsWithArch.toArray(new String[0]), null, new File(execPath));
 		StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
 		StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
@@ -280,7 +283,8 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 		timer.cancel();
 		stdoutVacuum.join();
 		stderrVacuum.join();
-		System.err.println("Done executing " + argsWithArch.toString() + " " + execPath);
+		if(VERBOSE)
+			System.err.println("Done executing " + argsWithArch.toString() + " " + execPath);
 		if (status != 0) {
 			System.err.println("Process exited with status " + status);
 			throw new IOException("Process exited with status " + status + ":\n" + stdoutVacuum.toString() + "\n" + stderrVacuum.toString());
@@ -290,10 +294,11 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 
 	private static void fastFailRunProcess(String workingDir, String... command) throws IOException, InterruptedException {
 		List<String> argsWithArch = new ArrayList<>();
-		if(isMacOSArm64())
+		if(USE_ARCH_ARM64 && isMacOSArm64())
 			argsWithArch.addAll(Arrays.asList("arch", "-arm64"));
 		argsWithArch.addAll(Arrays.asList(command));
-		System.err.println("Executing " + argsWithArch.toString() + " " + workingDir);
+		if(VERBOSE)
+			System.err.println("Executing " + argsWithArch.toString() + " " + workingDir);
 		ProcessBuilder builder = new ProcessBuilder(argsWithArch.toArray(new String[0]));
 		builder.directory(new File(workingDir));
 		final Process process = builder.start();
@@ -309,7 +314,9 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 			}
 		}, 120_000);
 		int status = process.waitFor();
-		System.err.println("Done executing " + argsWithArch.toString() + " " + workingDir);
+		timer.cancel();
+		if(VERBOSE)
+			System.err.println("Done executing " + argsWithArch.toString() + " " + workingDir);
 		if (status != 0) {
 			System.err.println("Process exited with status " + status);
 			throw new IOException("Process exited with status " + status);

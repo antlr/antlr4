@@ -22,7 +22,7 @@ jobs:
     - name: Build tool with Maven
       run: mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
     - name: Test with Maven
-      run: .github/scripts/run-tests-swift.sh
+      run: arch -x86_64 .github/scripts/run-tests-swift.sh
       env: 
         TARGET: swift
         GROUP: LEXER
