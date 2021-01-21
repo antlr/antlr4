@@ -279,7 +279,11 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 	}
 
 	private static void fastFailRunProcess(String workingDir, String... command) throws IOException, InterruptedException {
-		ProcessBuilder builder = new ProcessBuilder(command);
+		List<String> argsWithArch = new ArrayList<>();
+		if(isMacOSArm64())
+			argsWithArch.addAll(Arrays.asList("arch", "-arm64"));
+		argsWithArch.addAll(Arrays.asList(command));
+		ProcessBuilder builder = new ProcessBuilder(argsWithArch.toArray(new String[0]));
 		builder.directory(new File(workingDir));
 		Process p = builder.start();
 		int status = p.waitFor();
