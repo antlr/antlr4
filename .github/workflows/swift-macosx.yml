@@ -10,6 +10,7 @@ jobs:
   build:
     runs-on: [self-hosted, macOS, x64]
     strategy:
+      fail-fast: false
       matrix:
         include:
           - GROUP: LEXER
