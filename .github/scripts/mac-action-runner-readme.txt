@@ -8,8 +8,9 @@ XCode (you need XCode to build the Swift runtime):
 Brew (you need Brew to install maven):
   - get the script from https://brew.sh
   - once installed, run the following:
-    echo 'eval $(/opt/homebrew/bin/brew shellenv)' >> /Users/macosx-ci-1/.zprofile
-    eval $(/opt/homebrew/bin/brew shellenv)   
+    echo 'eval $(/opt/homebrew/bin/brew shellenv)' >> /Users/{user-account}/.zprofile
+    eval $(/opt/homebrew/bin/brew shellenv)
+    (you need to repeat these last steps for each user account)
  
 Maven (supposedly installed by the github workflow, but it's convenient to have a global install for troubleshooting):
  - brew install maven
