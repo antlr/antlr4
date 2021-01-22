@@ -132,7 +132,7 @@ open class Lexer: Recognizer<LexerATNSimulator>, TokenSource {
 
         // Mark start location in char stream so unbuffered streams are
         // guaranteed at least have text of current token
-        var tokenStartMarker = _input.mark()
+        let tokenStartMarker = _input.mark()
         defer {
             // make sure we release marker after match or
             // unbuffered char stream will keep buffering
