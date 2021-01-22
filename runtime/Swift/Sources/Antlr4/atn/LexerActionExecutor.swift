@@ -149,7 +149,7 @@ public class LexerActionExecutor: Hashable {
     /// 
     public func execute(_ lexer: Lexer, _ input: CharStream, _ startIndex: Int) throws {
         var requiresSeek: Bool = false
-        var stopIndex: Int = input.index()
+        let stopIndex: Int = input.index()
         defer {
             if requiresSeek {
                 try! input.seek(stopIndex)
