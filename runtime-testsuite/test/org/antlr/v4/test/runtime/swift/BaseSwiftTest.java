@@ -28,7 +28,7 @@ import static org.junit.Assert.assertTrue;
 public class BaseSwiftTest implements RuntimeTestSupport {
 
 	private static final boolean USE_ARCH_ARM64 = false;
-	private static final boolean VERBOSE = true;
+	private static final boolean VERBOSE = false;
 
 	/**
 	 * Path of the ANTLR runtime.
@@ -119,8 +119,7 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 
 	@Override
 	public void beforeTest(RuntimeTestDescriptor descriptor) {
-		if(VERBOSE && isMacOSArm64())
-			System.out.println(descriptor.getTestName());
+		System.out.println(descriptor.getTestName());
 	}
 
 	@Override
