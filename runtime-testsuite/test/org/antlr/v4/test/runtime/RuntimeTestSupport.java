@@ -39,4 +39,7 @@ public interface RuntimeTestSupport {
 	                  String startRuleName,
 	                  String input,
 	                  boolean showDiagnosticErrors);
+
+    void beforeTest(RuntimeTestDescriptor descriptor);
+	void afterTest(RuntimeTestDescriptor descriptor);
 }
