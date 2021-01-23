@@ -128,17 +128,17 @@ class LL1Analyzer {
                 return;
             }
             if (ctx !== PredictionContext.EMPTY) {
-                // run thru all possible stack tops in ctx
-                for(let i=0; i<ctx.length; i++) {
-                    const returnState = this.atn.states[ctx.getReturnState(i)];
-                    const removed = calledRuleStack.contains(returnState.ruleIndex);
-                    try {
-                        calledRuleStack.remove(returnState.ruleIndex);
+                const removed = calledRuleStack.contains(s.ruleIndex);
+                try {
+                    calledRuleStack.remove(s.ruleIndex);
+                    // run thru all possible stack tops in ctx
+                    for (let i = 0; i < ctx.length; i++) {
+                        const returnState = this.atn.states[ctx.getReturnState(i)];
                         this._LOOK(returnState, stopState, ctx.getParent(i), look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
-                    } finally {
-                        if (removed) {
-                            calledRuleStack.add(returnState.ruleIndex);
-                        }
+                    }
+                }finally {
+                    if (removed) {
+                        calledRuleStack.add(s.ruleIndex);
                     }
                 }
                 return;
