@@ -42,6 +42,21 @@ namespace Antlr4.Runtime
 
         protected internal IntervalSet lastErrorStates;
 
+        /**
+         * This field is used to propagate information about the lookahead following
+         * the previous match. Since prediction prefers completing the current rule
+         * to error recovery efforts, error reporting may occur later than the
+         * original point where it was discoverable. The original context is used to
+         * compute the true expected sets as though the reporting occurred as early
+         * as possible.
+         */
+        protected ParserRuleContext nextTokensContext;
+
+        /**
+         * @see #nextTokensContext
+         */
+        protected int nextTokensState;
+
         /// <summary>
         /// <inheritDoc/>
         /// <p>The default implementation simply calls
@@ -264,8 +279,22 @@ namespace Antlr4.Runtime
             int la = tokens.LA(1);
             // try cheaper subset first; might get lucky. seems to shave a wee bit off
             var nextTokens = recognizer.Atn.NextTokens(s);
-            if (nextTokens.Contains(TokenConstants.EPSILON) || nextTokens.Contains(la))
+            if (nextTokens.Contains(la))
             {
+                nextTokensContext = null;
+                nextTokensState = ATNState.InvalidStateNumber;
+                return;
+            }
+
+            if (nextTokens.Contains(TokenConstants.EPSILON))
+            {
+                if (nextTokensContext == null)
+                {
+                    // It's possible the next token won't match; information tracked
+                    // by sync is restricted for performance.
+                    nextTokensContext = recognizer.Context;
+                    nextTokensState = recognizer.State;
+                }
                 return;
             }
             switch (s.StateType)
