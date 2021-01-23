@@ -112,16 +112,6 @@ func (la *LL1Analyzer) Look(s, stopState ATNState, ctx RuleContext) *IntervalSet
 func (la *LL1Analyzer) look2(s, stopState ATNState, ctx PredictionContext, look *IntervalSet, lookBusy *Set, calledRuleStack *BitSet, seeThruPreds, addEOF bool, i int) {
 
 	returnState := la.atn.states[ctx.getReturnState(i)]
-
-	removed := calledRuleStack.contains(returnState.GetRuleIndex())
-
-	defer func() {
-		if removed {
-			calledRuleStack.add(returnState.GetRuleIndex())
-		}
-	}()
-
-	calledRuleStack.remove(returnState.GetRuleIndex())
 	la.look1(returnState, stopState, ctx.GetParent(i), look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
 
 }
@@ -158,6 +148,13 @@ func (la *LL1Analyzer) look1(s, stopState ATNState, ctx PredictionContext, look 
 		}
 
 		if ctx != BasePredictionContextEMPTY {
+	        removed := calledRuleStack.contains(s.GetRuleIndex())
+            defer func() {
+                if removed {
+                    calledRuleStack.add(s.GetRuleIndex())
+                }
+            }()
+        	calledRuleStack.remove(s.GetRuleIndex())
 			// run thru all possible stack tops in ctx
 			for i := 0; i < ctx.length(); i++ {
 				returnState := la.atn.states[ctx.getReturnState(i)]
