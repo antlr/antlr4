@@ -227,7 +227,7 @@ class DefaultErrorStrategy extends ErrorStrategy {
             this.nextTokenState = ATNState.INVALID_STATE_NUMBER;
             return;
         } else if (nextTokens.contains(Token.EPSILON)) {
-            if(self.nextTokensContext === null) {
+            if(this.nextTokensContext === null) {
                 // It's possible the next token won't match information tracked
                 // by sync is restricted for performance.
                 this.nextTokensContext = recognizer._ctx;
