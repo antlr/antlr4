@@ -156,7 +156,7 @@ class LexerATNConfig extends ATNConfig {
     equals(other) {
         return this === other ||
                 (other instanceof LexerATNConfig &&
-                this.passedThroughNonGreedyDecision == other.passedThroughNonGreedyDecision &&
+                this.passedThroughNonGreedyDecision === other.passedThroughNonGreedyDecision &&
                 (this.lexerActionExecutor ? this.lexerActionExecutor.equals(other.lexerActionExecutor) : !other.lexerActionExecutor) &&
                 super.equals(other));
     }
