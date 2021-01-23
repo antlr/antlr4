@@ -53,6 +53,8 @@ class DefaultErrorStrategy(ErrorStrategy):
         #
         self.lastErrorIndex = -1
         self.lastErrorStates = None
+        self.nextTokensContext = None
+        self.nextTokenState = 0
 
     # <p>The default implementation simply calls {@link #endErrorCondition} to
     # ensure that the handler is not in error recovery mode.</p>
@@ -203,7 +205,16 @@ class DefaultErrorStrategy(ErrorStrategy):
         la = recognizer.getTokenStream().LA(1)
         # try cheaper subset first; might get lucky. seems to shave a wee bit off
         nextTokens = recognizer.atn.nextTokens(s)
-        if Token.EPSILON in nextTokens or la in nextTokens:
+        if la in nextTokens:
+            self.nextTokensContext = None
+            self.nextTokenState = ATNState.INVALID_STATE_NUMBER
+            return
+        elif Token.EPSILON in nextTokens:
+            if self.nextTokensContext is None:
+                # It's possible the next token won't match information tracked
+                # by sync is restricted for performance.
+                self.nextTokensContext = recognizer._ctx
+                self.nextTokensState = recognizer._stateNumber
             return
 
         if s.stateType in [ATNState.BLOCK_START, ATNState.STAR_BLOCK_START,
