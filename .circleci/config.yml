@@ -17,7 +17,7 @@ jobs:
         type: string
         default: x
     steps:
-      - run: echo "Hello <<parameters.target>> <<parameters.saywhat>>"
+      - run: echo "Hello <<parameters.target>> <<parameters.group>>"
 
 workflows:
   build:
