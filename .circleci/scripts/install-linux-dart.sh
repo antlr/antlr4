@@ -2,10 +2,13 @@
 
 set -euo pipefail
 
-echo "fetching dart runtime..."
-wget https://storage.googleapis.com/dart-archive/channels/stable/release/2.8.4/linux_packages/dart_2.8.4-1_amd64.deb
 echo "installing dart runtime..."
-sudo dpkg -i ./dart_2.8.4-1_amd64.deb
-sudo rm ./dart_2.8.4-1_amd64.deb
+sudo apt-get update
+sudo apt-get install apt-transport-https
+sudo sh -c 'wget -qO- https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -'
+sudo sh -c 'wget -qO- https://storage.googleapis.com/download.dartlang.org/linux/debian/dart_stable.list > /etc/apt/sources.list.d/dart_stable.list'
+sudo apt-get update
+sudo apt-get install dart
+export PATH="$PATH:/usr/lib/dart/bin"
 echo "done installing dart runtime"
 sudo apt-get install -f
