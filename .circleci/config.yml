@@ -31,7 +31,7 @@ jobs:
   test_runtime_group:
     machine: true
     parameters:
-      group:
+      test-group:
         description: The section
         type: string
         default: MAIN
@@ -40,7 +40,7 @@ jobs:
         type: string
         default: java
     steps:
-      - run: echo "Hello <<parameters.target>> <<parameters.group>>"
+      - run: echo "Hello <<parameters.target>> <<parameters.test-group>>"
 
 workflows:
   build:
@@ -56,5 +56,5 @@ workflows:
             parameters:
 #              target: [ cpp, dotnet, swift ]
 #              group: [ LEXER, PARSER, RECURSION ]
-              group: [ LEXER ]
+              test-group: [ LEXER ]
               target: [ cpp ]
