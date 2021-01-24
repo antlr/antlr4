@@ -9,15 +9,15 @@ jobs:
     machine: true
     parameters:
       target:
-        description: "To whom shall we say hello?"
-        default: "World"
+        description: The target
         type: string
+        default: a
       saywhat:
-        description: "To whom shall we say hello?"
-        default: "World"
+        description: The section
         type: string
+        default: x
     steps:
-      - run: echo "Hello <<parameters.saywhat>>"
+      - run: echo "Hello <<parameters.target>> <<parameters.saywhat>>"
 
 workflows:
   build:
@@ -26,4 +26,5 @@ workflows:
       - test_fast_runtime: # invokes the parameterized job
           matrix:
             parameters:
-              saywhat: [ Everyone, Jogh, Gillian ]
+              target: [ a, b, c ]
+              saywhat: [ x, y, z ]
