@@ -12,6 +12,9 @@ python2 --version
 
 mvn -q -Dparallel=methods -DthreadCount=4 -Dtest=python2.* test
 
-cd ../runtime/Python2/tests
+pushd runtime/Python2/tests
+  python2 run.py
+  rc=$?
+popd
 
-python2 run.py
+return $rc
