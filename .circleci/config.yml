@@ -11,7 +11,7 @@ jobs:
       target:
         description: The target
         type: string
-        default: a
+        default: java
     steps:
       - run: echo "Hello <<parameters.target>>"
   test_runtime_target_group:
@@ -20,11 +20,11 @@ jobs:
       target:
         description: The target
         type: string
-        default: a
+        default: java
       group:
         description: The section
         type: string
-        default: x
+        default: MAIN
     steps:
       - run: echo "Hello <<parameters.target>> <<parameters.group>>"
 
@@ -35,9 +35,9 @@ workflows:
       - test_runtime_target: # invokes the parameterized job
           matrix:
             parameters:
-              target: [ a, b, c ]
+              target: [ dart, go, python2, python3, javascript ]
       - test_runtime_target_group: # invokes the parameterized job
           matrix:
             parameters:
-              target: [ a, b, c ]
-              group: [ x, y, z ]
+              target: [ cpp, dotnet, swift ]
+              group: [ LEXER, PARSER, RECURSION ]
