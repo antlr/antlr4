@@ -31,14 +31,14 @@ jobs:
   test_runtime_group:
     machine: true
     parameters:
-      target:
-        description: The target
-        type: string
-        default: java
       group:
         description: The section
         type: string
         default: MAIN
+      target:
+        description: The target
+        type: string
+        default: java
     steps:
       - run: echo "Hello <<parameters.target>> <<parameters.group>>"
 

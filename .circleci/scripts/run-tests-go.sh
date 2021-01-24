@@ -2,4 +2,9 @@
 
 set -euo pipefail
 
-mvn -q -Dparallel=methods -DthreadCount=4 -Dtest=go.* test
+go --version
+
+pushd runtime-testsuite
+    echo "running maven tests..."
+    mvn -q -Dparallel=methods -DthreadCount=4 -Dtest=go.* test
+popd
