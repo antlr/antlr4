@@ -4,7 +4,7 @@ orbs:
   maven: circleci/maven@1.1.0
 
 jobs:
-  build and test tool, build and test Java runtime:
+  Java_tool_and_runtime:
     docker:
       - image: cimg/openjdk:8.0
     steps:
@@ -24,4 +24,4 @@ workflows:
   version: 2
   build-and-test-java:
     jobs:
-      - build and test tool, build and test Java runtime
+      - Java_tool_and_runtime
