@@ -25,7 +25,7 @@ jobs:
           command: |
             f=".circleci/scripts/install-linux-$TARGET.sh"; ! [ -x "$f" ] || "$f"
       - run:
-          name: test $TARGET runtime
+          name: test << parameters.target >> runtime
           command: |
             .circleci/scripts/run-tests-$TARGET.sh
   test_runtime_target_group:

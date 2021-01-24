@@ -27,4 +27,4 @@ if [ $rc == 0 ]; then
   popd
 fi
 
-return $rc
+# return $rc
