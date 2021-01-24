@@ -19,9 +19,24 @@ jobs:
           cd tool-testsuite
           mvn -q -Dparallel=methods -DthreadCount=4 test
           cd ..
+  Fast_runtime:
+    docker:
+      - image: cimg/openjdk:8.0
+    steps:
+      - checkout
+      - run:
+          mvn -B -V -DskipTests=true -Dmaven.javadoc.skip=true install
+      - run: |
+          f=".circleci/scripts/install-linux-$TARGET.sh"; ! [ -x "$f" ] || "$f"
+      - run: |
+          .circleci/scripts/run-tests-linux-$TARGET.sh
 
 workflows:
   version: 2
   build-and-test-java:
     jobs:
       - Java_tool_and_runtime
+      - Fast_runtime:
+          matrix:
+            parameters:
+              TARGET: [ dart, go, python2, python3, javascript ]
