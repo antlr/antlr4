@@ -6,7 +6,7 @@ orbs:
 jobs:
   build and test tool, build and test Java runtime:
     docker:
-      - image: ubuntu:14.04
+      - image: cimg/openjdk:8.0
     steps:
       - checkout
       - run:
