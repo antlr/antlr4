@@ -11,6 +11,7 @@ echo "done installing python"
 python2 --version
 
 pushd runtime/Python2/tests
+  echo "running native tests..."
   python2 run.py
   rc=$?
   if [ $rc != 0 ]; then
@@ -19,7 +20,8 @@ pushd runtime/Python2/tests
 popd
 
 if [ $rc == 0 ]; then
-  pushd runtime-test-suite
+  pushd runtime-testsuite
+    echo "running maven tests..."
     mvn -q -Dtest=python2.* test
     rc=$?
   popd
