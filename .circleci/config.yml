@@ -4,7 +4,7 @@ orbs:
   maven: circleci/maven@1.1.0
 
 jobs:
-  java_tool_and_runtime:
+  test_java_tool_and_runtime:
     docker:
       - image: cimg/openjdk:8.0
     steps:
@@ -19,11 +19,25 @@ jobs:
           cd tool-testsuite
           mvn -q -Dparallel=methods -DthreadCount=4 test
           cd ..
-  fast_runtime:
+  test_fast_runtime:
     docker:
       - image: cimg/openjdk:8.0
     environment:
       TARGET: << matrix.target >>
+    steps:
+      - checkout
+      - run:
+          mvn -B -V -DskipTests=true -Dmaven.javadoc.skip=true install
+      - run: |
+          f=".circleci/scripts/install-linux-$TARGET.sh"; ! [ -x "$f" ] || "$f"
+      - run: |
+          .circleci/scripts/run-tests-linux-$TARGET.sh
+  test_slow_runtime:
+    docker:
+      - image: cimg/openjdk:8.0
+    environment:
+      TARGET: << matrix.target >>
+      GROUP: << matrix.group >>
     steps:
       - checkout
       - run:
@@ -37,11 +51,16 @@ workflows:
   version: 2.1
   build-and-test:
     jobs:
-      - java_tool_and_runtime
-      - fast_runtime:
+      - test_java_tool_and_runtime
+      - test_fast_runtime:
           matrix:
             parameters:
               target: [ "dart", "go", "python2", "python3", "javascript" ]
+      - test_slow_runtime:
+          matrix:
+            parameters:
+              target: [ "cpp", "dotnet", "swift" ]
+              group: [ "LEXER", "PARSER", "RECURSION" ]
 
 
 
