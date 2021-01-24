@@ -1,21 +1,25 @@
 version: 2.1
 
 jobs:
-  sayhello: # defines a parameterized job
-    description: A job that does very little other than demonstrate what a parameterized job looks like
+  test_java_tool_and_runtime: # defines a parameterized job
+    machine: true
+    steps:
+      - run: echo "Hello java"
+  test_fast_runtime: # defines a parameterized job
+    machine: true
     parameters:
       saywhat:
         description: "To whom shall we say hello?"
         default: "World"
         type: string
-    machine: true
     steps:
-      - run: echo "Hello << parameters.saywhat >>"
+      - run: echo "Hello <<parameters.saywhat>>"
 
 workflows:
   build:
     jobs:
-      - sayhello: # invokes the parameterized job
+      - test_java_tool_and_runtime
+      - test_fast_runtime: # invokes the parameterized job
           matrix:
             parameters:
               saywhat: [ Everyone, Jogh, Gillian ]
