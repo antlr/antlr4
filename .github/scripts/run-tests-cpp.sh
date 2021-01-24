@@ -2,6 +2,8 @@
 
 set -euo pipefail
 
+cd runtime-testsuite/
+
 if [ $GROUP == "LEXER" ]; then
     mvn -q -Dgroups="org.antlr.v4.test.runtime.category.LexerTests" -Dtest=cpp.* test 
 elif [ $GROUP == "PARSER" ]; then
@@ -11,4 +13,3 @@ elif [ $GROUP == "RECURSION" ]; then
 else
     mvn -q -Dtest=cpp.* test 
 fi
-
