@@ -1,9 +1,27 @@
 version: 2.1
 
 orbs:
-  maven: circleci/maven@0.0.12
+  maven: circleci/maven@1.1.0
+
+jobs:
+  build and test tool, build and test Java runtime:
+    docker:
+      - image: ubuntu:14.04
+    steps:
+      - checkout
+      - run:
+          mvn -B -V -DskipTests=true -Dmaven.javadoc.skip=true install
+      - run: |
+          cd ../runtime-testsuite
+          mvn -q -Dparallel=methods -DthreadCount=4 -Dtest=java.* test
+          cd ..
+      - run: |
+          cd ../tool-testsuite
+          mvn -q -Dparallel=methods -DthreadCount=4 test
+          cd ..
 
 workflows:
-  maven_test:
+  version: 2
+  build-and-test-java:
     jobs:
-      - maven/test # checkout, build, test, and upload test results
+      - build and test tool, build and test Java runtime
