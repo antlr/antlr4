@@ -11,6 +11,7 @@ fi
 
 # run java tests
 cd runtime-testsuite/
+
 if [ $GROUP == "LEXER" ]; then
     mvn -X -e -q -Dgroups="org.antlr.v4.test.runtime.category.LexerTests" -Dtest="swift.*" test
 elif [ $GROUP == "PARSER" ]; then
