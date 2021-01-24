@@ -12,7 +12,7 @@ jobs:
         description: The target
         type: string
         default: a
-      saywhat:
+      group:
         description: The section
         type: string
         default: x
@@ -27,4 +27,4 @@ workflows:
           matrix:
             parameters:
               target: [ a, b, c ]
-              saywhat: [ x, y, z ]
+              group: [ x, y, z ]
