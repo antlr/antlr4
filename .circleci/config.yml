@@ -12,10 +12,12 @@ jobs:
       - run:
           mvn -B -V -DskipTests=true -Dmaven.javadoc.skip=true install
       - run: |
+          echo $PWD
           cd ../runtime-testsuite
           mvn -q -Dparallel=methods -DthreadCount=4 -Dtest=java.* test
           cd ..
       - run: |
+          echo $PWD
           cd ../tool-testsuite
           mvn -q -Dparallel=methods -DthreadCount=4 test
           cd ..
