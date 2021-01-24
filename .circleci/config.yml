@@ -25,10 +25,14 @@ jobs:
             mvn -q -Dparallel=methods -DthreadCount=4 test
             cd ..
   test_fast_runtime:
+    parameters:
+      target:
+        type: string
+        default: "java"
     docker:
       - image: cimg/openjdk:8.0
     environment:
-      TARGET: << matrix.target >>
+      TARGET: << parameters.target >>
     steps:
       - checkout
       - run:
@@ -39,23 +43,35 @@ jobs:
           command: |
             f=".circleci/scripts/install-linux-$TARGET.sh"; ! [ -x "$f" ] || "$f"
       - run:
-          name: test tool
+          name: test $TARGET runtime
           command: |
             .circleci/scripts/run-tests-linux-$TARGET.sh
   test_slow_runtime:
+    parameters:
+      target:
+        type: string
+        default: "java"
+      group:
+        type: string
+        default: "MAIN"
     docker:
       - image: cimg/openjdk:8.0
     environment:
-      TARGET: << matrix.target >>
-      GROUP: << matrix.group >>
+      TARGET: << parameters.target >>
+      GROUP: << parameters.group >>
     steps:
       - checkout
       - run:
-          mvn -B -V -DskipTests=true -Dmaven.javadoc.skip=true install
-      - run: |
-          f=".circleci/scripts/install-linux-$TARGET.sh"; ! [ -x "$f" ] || "$f"
-      - run: |
-          .circleci/scripts/run-tests-linux-$TARGET.sh
+          name: build tool
+          command: mvn -B -V -DskipTests=true -Dmaven.javadoc.skip=true install
+      - run:
+          name: install $TARGET pre-requisites
+          command: |
+            f=".circleci/scripts/install-linux-$TARGET.sh"; ! [ -x "$f" ] || "$f"
+      - run:
+          name: test $TARGET runtime
+          command: |
+            .circleci/scripts/run-tests-linux-$TARGET.sh
 
 workflows:
   version: 2.1
@@ -63,11 +79,39 @@ workflows:
     jobs:
       - test_java_tool_and_runtime
       - test_fast_runtime:
-          matrix:
-            parameters:
-              target: [ "dart", "go", "python2", "python3", "javascript" ]
+          target: "dart"
+      - test_fast_runtime:
+          target: "go"
+      - test_fast_runtime:
+          target: "python2"
+      - test_fast_runtime:
+          target: "python3"
+      - test_fast_runtime:
+          target: "javascript"
       - test_slow_runtime:
-          matrix:
-            parameters:
-              target: [ "cpp", "dotnet", "swift" ]
-              group: [ "LEXER", "PARSER", "RECURSION" ]
+          target: "cpp"
+          group: "LEXER"
+      - test_slow_runtime:
+          target: "cpp"
+          group: "PARSER"
+      - test_slow_runtime:
+          target: "cpp"
+          group: "RECURSION"
+      - test_slow_runtime:
+          target: "swift"
+          group: "LEXER"
+      - test_slow_runtime:
+          target: "swift"
+          group: "PARSER"
+      - test_slow_runtime:
+          target: "swift"
+          group: "RECURSION"
+      - test_slow_runtime:
+          target: "dotnet"
+          group: "LEXER"
+      - test_slow_runtime:
+          target: "dotnet"
+          group: "PARSER"
+      - test_slow_runtime:
+          target: "dotnet"
+          group: "RECURSION"
