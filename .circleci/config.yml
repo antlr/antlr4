@@ -1,11 +1,20 @@
 version: 2.1
 
 jobs:
-  test_java_tool_and_runtime: # defines a parameterized job
+  test_java_tool_and_runtime:
     machine: true
     steps:
       - run: echo "Hello java"
-  test_fast_runtime: # defines a parameterized job
+  test_runtime_target:
+    machine: true
+    parameters:
+      target:
+        description: The target
+        type: string
+        default: a
+    steps:
+      - run: echo "Hello <<parameters.target>>"
+  test_runtime_target_group:
     machine: true
     parameters:
       target:
@@ -23,7 +32,11 @@ workflows:
   build:
     jobs:
       - test_java_tool_and_runtime
-      - test_fast_runtime: # invokes the parameterized job
+      - test_runtime_target: # invokes the parameterized job
+          matrix:
+            parameters:
+              target: [ a, b, c ]
+      - test_runtime_target_group: # invokes the parameterized job
           matrix:
             parameters:
               target: [ a, b, c ]
