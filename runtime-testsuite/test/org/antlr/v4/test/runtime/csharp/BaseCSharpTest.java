@@ -142,6 +142,7 @@ public class BaseCSharpTest implements RuntimeTestSupport {
 
 	@Override
 	public void beforeTest(RuntimeTestDescriptor descriptor) {
+		System.out.println(descriptor.getTestName());
 	}
 
 	@Override

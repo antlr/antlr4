@@ -1,4 +1,4 @@
-name: Java/MacOSX
+name: MacOSX
 
 on:
   push:
@@ -9,6 +9,11 @@ on:
 jobs:
   build:
     runs-on: [self-hosted, macOS, x64]
+    strategy:
+      fail-fast: false
+      matrix:
+        GROUP: [LEXER, PARSER, RECURSION]
+        TARGET: [swift, cpp, dotnet]
     steps:
     - uses: actions/checkout@v2
     - name: Set up JDK 1.8
@@ -22,7 +27,7 @@ jobs:
     - name: Build tool with Maven
       run: mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
     - name: Test with Maven
-      run: .github/scripts/run-tests-java.sh
+      run: arch -x86_64 .github/scripts/run-tests-${{ matrix.TARGET }}.sh
       env: 
-        TARGET: swift
-        GROUP: ALL
+        TARGET: ${{ matrix.TARGET }}
+        GROUP: ${{ matrix.GROUP }}
