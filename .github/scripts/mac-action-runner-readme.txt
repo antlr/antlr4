@@ -24,3 +24,7 @@ JDK (we need a specific JDK):
 
 C++:
  - brew install cmake
+
+C#:
+ - .github/scripts/install-dotnet-on-osx.sh
+    (you need to repeat this step for each user account)
