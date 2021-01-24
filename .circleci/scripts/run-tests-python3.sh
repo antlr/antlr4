@@ -4,7 +4,7 @@ set -euo pipefail
 
 python3 --version
 
-pushd runtime/Python2/tests
+pushd runtime/Python3/tests
   echo "running native tests..."
   python3 run.py
   rc=$?
