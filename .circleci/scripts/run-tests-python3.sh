@@ -4,8 +4,21 @@ set -euo pipefail
 
 python3 --version
 
-mvn -q -Dparallel=methods -DthreadCount=4 -Dtest=python3.* test
+pushd runtime/Python2/tests
+  echo "running native tests..."
+  python3 run.py
+  rc=$?
+  if [ $rc != 0 ]; then
+    echo "failed running native tests"
+  fi
+popd
 
-cd ../runtime/Python3/test
+if [ $rc == 0 ]; then
+  pushd runtime-testsuite
+    echo "running maven tests..."
+    mvn -q -Dtest=python3.* test
+    rc=$?
+  popd
+fi
 
-python3 run.py
+# return $rc

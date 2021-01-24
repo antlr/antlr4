@@ -50,7 +50,7 @@ workflows:
           matrix:
             parameters:
 #              target: [ dart, go, python2, python3, javascript ]
-              target: [ python2 ]
+              target: [ python3 ]
       - test_runtime_target_group: # invokes the parameterized job
           matrix:
             parameters:
