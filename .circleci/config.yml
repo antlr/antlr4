@@ -34,7 +34,7 @@ jobs:
           .circleci/scripts/run-tests-linux-$TARGET.sh
 
 workflows:
-  version: 2
+  version: 2.1
   build-and-test:
     jobs:
       - java_tool_and_runtime
