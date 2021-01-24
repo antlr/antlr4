@@ -18,4 +18,9 @@ pushd runtime/Python2/tests
   rc=$?
 popd
 
+if [ $rc == 0 ]; then
+  mvn -q -Dtest=python2.* test
+  rc=$?
+fi
+
 return $rc
