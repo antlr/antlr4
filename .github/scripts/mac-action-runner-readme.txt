@@ -21,3 +21,6 @@ JDK (we need a specific JDK):
  - fix the JAVA_HOME mess as follows:
     sudo rm -fr /Library/Internet\ Plug-Ins/JavaAppletPlugin.plugin
     sudo rm -fr /Library/PreferencePanes/JavaControlPanel.prefpane
+
+C++:
+ - brew install cmake

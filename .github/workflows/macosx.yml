@@ -15,7 +15,7 @@ jobs:
  #       GROUP: [LEXER, PARSER, RECURSION]
  #       TARGET: [swift, cpp, dotnet]
         GROUP: [LEXER]
-        TARGET: [cpp]
+        TARGET: [dotnet]
     steps:
     - uses: actions/checkout@v2
     - name: Set up JDK 1.8
