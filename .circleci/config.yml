@@ -27,7 +27,7 @@ jobs:
       - run:
           name: test $TARGET runtime
           command: |
-            .circleci/scripts/run-tests-linux-$TARGET.sh
+            .circleci/scripts/run-tests-$TARGET.sh
   test_runtime_target_group:
     machine: true
     parameters:
@@ -49,7 +49,8 @@ workflows:
       - test_runtime_target: # invokes the parameterized job
           matrix:
             parameters:
-              target: [ dart, go, python2, python3, javascript ]
+#              target: [ dart, go, python2, python3, javascript ]
+              target: [ python2 ]
       - test_runtime_target_group: # invokes the parameterized job
           matrix:
             parameters:
