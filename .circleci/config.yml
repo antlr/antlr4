@@ -8,6 +8,10 @@ jobs:
   test_fast_runtime: # defines a parameterized job
     machine: true
     parameters:
+      target:
+        description: "To whom shall we say hello?"
+        default: "World"
+        type: string
       saywhat:
         description: "To whom shall we say hello?"
         default: "World"
