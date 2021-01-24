@@ -27,9 +27,9 @@ jobs:
       - run:
           mvn -B -V -DskipTests=true -Dmaven.javadoc.skip=true install
       - run: |
-          f=".circleci/scripts/install-linux-$TARGET.sh"; ! [ -x "$f" ] || "$f"
+          f=".circleci/scripts/install-linux-<< matrix.TARGET >>.sh"; ! [ -x "$f" ] || "$f"
       - run: |
-          .circleci/scripts/run-tests-linux-$TARGET.sh
+          .circleci/scripts/run-tests-linux-<< matrix.TARGET >>.sh
 
 workflows:
   version: 2
