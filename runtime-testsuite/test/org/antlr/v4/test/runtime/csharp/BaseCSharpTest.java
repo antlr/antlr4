@@ -121,6 +121,17 @@ public class BaseCSharpTest implements RuntimeTestSupport {
 	 */
 	protected StringBuilder antlrToolErrors;
 
+	@org.junit.Rule
+	public final TestRule testWatcher = new TestWatcher() {
+
+		@Override
+		protected void succeeded(Description description) {
+			// remove tmpdir if no error.
+			eraseTempDir();
+		}
+
+	};
+
 	@Override
 	public void testSetUp() throws Exception {
 		if (CREATE_PER_TEST_DIRECTORIES) {
