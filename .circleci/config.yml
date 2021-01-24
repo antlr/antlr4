@@ -5,7 +5,7 @@ jobs:
     machine: true
     steps:
       - run: echo "Hello java"
-  test_runtime_target:
+  test_runtime:
     parameters:
       target:
         description: The target
@@ -28,7 +28,7 @@ jobs:
           name: test << parameters.target >> runtime
           command: |
             .circleci/scripts/run-tests-$TARGET.sh
-  test_runtime_target_group:
+  test_runtime_group:
     machine: true
     parameters:
       target:
@@ -46,15 +46,15 @@ workflows:
   build:
     jobs:
       - test_java_tool_and_runtime
-      - test_runtime_target: # invokes the parameterized job
+      - test_runtime: # invokes the parameterized job
           matrix:
             parameters:
 #              target: [ dart, go, python2, python3, javascript ]
               target: [ dart ]
-      - test_runtime_target_group: # invokes the parameterized job
+      - test_runtime_group: # invokes the parameterized job
           matrix:
             parameters:
 #              target: [ cpp, dotnet, swift ]
 #              group: [ LEXER, PARSER, RECURSION ]
-              target: [ cpp ]
               group: [ LEXER ]
+              target: [ cpp ]
