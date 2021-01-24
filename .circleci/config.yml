@@ -1,117 +1,21 @@
 version: 2.1
 
-orbs:
-  maven: circleci/maven@1.1.0
-
 jobs:
-  test_java_tool_and_runtime:
-    docker:
-      - image: cimg/openjdk:8.0
-    steps:
-      - checkout
-      - run:
-          name: build tool
-          command: mvn -B -V -DskipTests=true -Dmaven.javadoc.skip=true install
-      - run:
-          name: test runtime
-          command: |
-            cd runtime-testsuite
-            mvn -q -Dparallel=methods -DthreadCount=4 -Dtest=java.* test
-            cd ..
-      - run:
-          name: test tool
-          command: |
-            cd tool-testsuite
-            mvn -q -Dparallel=methods -DthreadCount=4 test
-            cd ..
-  test_fast_runtime:
+  sayhello: # defines a parameterized job
+    description: A job that does very little other than demonstrate what a parameterized job looks like
     parameters:
-      target:
+      saywhat:
+        description: "To whom shall we say hello?"
+        default: "World"
         type: string
-        default: "java"
-    docker:
-      - image: cimg/openjdk:8.0
-    environment:
-      TARGET: << parameters.target >>
+    machine: true
     steps:
-      - checkout
-      - run:
-          name: build tool
-          command: mvn -B -V -DskipTests=true -Dmaven.javadoc.skip=true install
-      - run:
-          name: install << matrix.target >> pre-requisites
-          command: |
-            f=".circleci/scripts/install-linux-$TARGET.sh"; ! [ -x "$f" ] || "$f"
-      - run:
-          name: test $TARGET runtime
-          command: |
-            .circleci/scripts/run-tests-linux-$TARGET.sh
-  test_slow_runtime:
-    parameters:
-      target:
-        type: string
-        default: "java"
-      group:
-        type: string
-        default: "MAIN"
-    docker:
-      - image: cimg/openjdk:8.0
-    environment:
-      TARGET: << parameters.target >>
-      GROUP: << parameters.group >>
-    steps:
-      - checkout
-      - run:
-          name: build tool
-          command: mvn -B -V -DskipTests=true -Dmaven.javadoc.skip=true install
-      - run:
-          name: install $TARGET pre-requisites
-          command: |
-            f=".circleci/scripts/install-linux-$TARGET.sh"; ! [ -x "$f" ] || "$f"
-      - run:
-          name: test $TARGET runtime
-          command: |
-            .circleci/scripts/run-tests-linux-$TARGET.sh
+      - run: echo "Hello << parameters.saywhat >>"
 
 workflows:
-  version: 2.1
-  build-and-test:
+  build:
     jobs:
-      - test_java_tool_and_runtime
-      - test_fast_runtime:
-          target: "dart"
-      - test_fast_runtime:
-          target: "go"
-      - test_fast_runtime:
-          target: "python2"
-      - test_fast_runtime:
-          target: "python3"
-      - test_fast_runtime:
-          target: "javascript"
-      - test_slow_runtime:
-          target: "cpp"
-          group: "LEXER"
-      - test_slow_runtime:
-          target: "cpp"
-          group: "PARSER"
-      - test_slow_runtime:
-          target: "cpp"
-          group: "RECURSION"
-      - test_slow_runtime:
-          target: "swift"
-          group: "LEXER"
-      - test_slow_runtime:
-          target: "swift"
-          group: "PARSER"
-      - test_slow_runtime:
-          target: "swift"
-          group: "RECURSION"
-      - test_slow_runtime:
-          target: "dotnet"
-          group: "LEXER"
-      - test_slow_runtime:
-          target: "dotnet"
-          group: "PARSER"
-      - test_slow_runtime:
-          target: "dotnet"
-          group: "RECURSION"
+      - sayhello: # invokes the parameterized job
+          matrix:
+            parameters:
+              saywhat: [ Everyone, Jogh, Gillian ]
