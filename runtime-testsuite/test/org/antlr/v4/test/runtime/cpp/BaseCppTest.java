@@ -114,6 +114,7 @@ public class BaseCppTest implements RuntimeTestSupport {
 
 	@Override
 	public void beforeTest(RuntimeTestDescriptor descriptor) {
+		System.out.println(descriptor.getTestName());
 	}
 
 	@Override
