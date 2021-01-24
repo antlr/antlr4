@@ -18,14 +18,14 @@ jobs:
     steps:
       - checkout
       - run:
-          name: build tool
+          name: Build ANTLR4 tool
           command: mvn -B -V -DskipTests=true -Dmaven.javadoc.skip=true install
       - run:
-          name: install << parameters.target >> pre-requisites
+          name: Install << parameters.target >> pre-requisites
           command: |
             f=".circleci/scripts/install-linux-$TARGET.sh"; ! [ -x "$f" ] || "$f"
       - run:
-          name: test << parameters.target >> runtime
+          name: Test << parameters.target >> runtime
           command: |
             .circleci/scripts/run-tests-$TARGET.sh
   test_runtime_group:
