@@ -10,17 +10,19 @@ sudo apt-get install python2
 echo "done installing python"
 python2 --version
 
-mvn -q -Dparallel=methods -DthreadCount=4 -Dtest=python2.* test
-
-echo $PWD
 pushd runtime/Python2/tests
   python2 run.py
   rc=$?
+  if [ $rc != 0 ]; then
+    echo "failed running native tests"
+  fi
 popd
 
 if [ $rc == 0 ]; then
-  mvn -q -Dtest=python2.* test
-  rc=$?
+  pushd runtime-test-suite
+    mvn -q -Dtest=python2.* test
+    rc=$?
+  popd
 fi
 
 return $rc
