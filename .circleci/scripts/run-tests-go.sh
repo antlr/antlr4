@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-go --version
+go version
 
 pushd runtime-testsuite
     echo "running maven tests..."
