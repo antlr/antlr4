@@ -7,5 +7,7 @@ curl -sL -o ~/bin/gimme https://raw.githubusercontent.com/travis-ci/gimme/master
 chmod +x ~/bin/gimme
 echo "installing go..."
 eval "$(sudo gimme 1.7.3)"
-( go version ; go env ) || true
+export PATH=$PATH:~/go/bin
+go version
+go env
 echo "done installing go"
