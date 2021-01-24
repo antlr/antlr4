@@ -54,5 +54,7 @@ workflows:
       - test_runtime_target_group: # invokes the parameterized job
           matrix:
             parameters:
-              target: [ cpp, dotnet, swift ]
-              group: [ LEXER, PARSER, RECURSION ]
+#              target: [ cpp, dotnet, swift ]
+#              group: [ LEXER, PARSER, RECURSION ]
+              target: [ cpp ]
+              group: [ LEXER ]
