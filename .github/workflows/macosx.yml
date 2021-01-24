@@ -1,4 +1,4 @@
-name: Swift/MacOSX
+name: MacOSX
 
 on:
   push:
