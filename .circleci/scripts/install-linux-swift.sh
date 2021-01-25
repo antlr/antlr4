@@ -1,3 +1,5 @@
+#!/bin/bash
+
 set -euo pipefail
 
 echo "installing swift SDK..."

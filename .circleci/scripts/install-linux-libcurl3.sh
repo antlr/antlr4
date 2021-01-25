@@ -1,4 +1,4 @@
-set -euo pipefail
+#!/bin/bash
 
 echo "before patching"
 ls -all /lib/x86_64-linux-gnu/ | grep libcurl
