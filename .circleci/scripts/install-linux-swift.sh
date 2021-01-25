@@ -24,8 +24,13 @@ sudo ln -sf ld.gold /usr/bin/ld
 # This would fix missing libtinfo.so.5
 sudo apt install libncurses5
 # This would fix missing CURL_OPENSSL_3
-sudo deb http://security.ubuntu.com/ubuntu xenial-security main
-sudo apt-get install libcurl3
+mkdir ~/libcurl3 && cd ~/libcurl3
+sudo apt-get download -o=dir::cache=~/libcurl3 libcurl3
+sd ar x libcurl3* data.tar.xz
+sudo tar xf data.tar.xz
+sudo cp -L ~/libcurl3/usr/lib/x86_64-linux-gnu/libcurl.so.4 /usr/lib/libcurl.so.3
+cd .. && rm -rf ~/libcurl3
+
 ls -all /usr/lib/x86_64-linux-gnu/ | grep libcurl
 
 echo "done installing swift SDK..."
