@@ -3,7 +3,8 @@ set -euo pipefail
 echo "installing swift SDK..."
 sudo apt-get update
 sudo apt-get install clang libicu-dev
-sudo apt-get install libcurl3 libpython2.7 libpython2.7-dev
+#sudo apt-get install libcurl3 libpython2.7 libpython2.7-dev
+sudo apt-get install libpython2.7 libpython2.7-dev
 
 export SWIFT_VERSION=swift-5.0.1
 echo "installing gpg key..."
