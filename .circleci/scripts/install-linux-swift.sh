@@ -3,7 +3,7 @@ set -euo pipefail
 echo "installing swift SDK..."
 # see https://tecadmin.net/install-swift-ubuntu-1604-xenial/
 sudo apt-get update -y
-sudo apt-get install clang libicu-dev
+# sudo apt-get install clang libicu-dev
 # sudo apt-get install libpython2.7 libpython2.7-dev
 
 #export SWIFT_VERSION=swift-5.3.2
@@ -16,13 +16,13 @@ sudo apt-get install clang libicu-dev
 #sudo tar xzf $SWIFT_VERSION-RELEASE-ubuntu16.04.tar.gz
 #mv $SWIFT_VERSION-RELEASE-ubuntu16.04 $PWD/swift
 
-export SWIFT_HOME=$PWD/swift/$SWIFT_VERSION-RELEASE-ubuntu16.04/usr/bin/
-export PATH=$PWD/swift/usr/bin:$PATH
+# export SWIFT_HOME=$PWD/swift/$SWIFT_VERSION-RELEASE-ubuntu16.04/usr/bin/
+# export PATH=$PWD/swift/usr/bin:$PATH
 
 # This would fix a know linker issue mentioned in: # https://bugs.swift.org/browse/SR-2299
-sudo ln -sf ld.gold /usr/bin/ld
+# sudo ln -sf ld.gold /usr/bin/ld
 # This would fix missing libtinfo.so.5
-sudo apt install libncurses5
+# sudo apt install libncurses5
 # This would fix missing CURL_OPENSSL_3
 mkdir ~/libcurl3 && cd ~/libcurl3
 wget http://archive.ubuntu.com/ubuntu/pool/main/c/curl/libcurl3_7.47.0-1ubuntu2_amd64.deb
