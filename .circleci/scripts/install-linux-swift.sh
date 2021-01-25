@@ -23,7 +23,7 @@ export PATH=$PWD/swift/usr/bin:$PATH
 # This would fix a know linker issue mentioned in: # https://bugs.swift.org/browse/SR-2299
 sudo ln -sf ld.gold /usr/bin/ld
 # This would fix missing libtinfo.so.5
-sudo ln -s /usr/lib/libncursesw.so.6 /usr/lib/libtinfo.so.5
+sudo apt install libncurses5
 
 echo "done installing swift SDK..."
 
