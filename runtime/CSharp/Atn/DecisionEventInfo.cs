@@ -25,15 +25,13 @@ namespace Antlr4.Runtime.Atn
         /// <seealso cref="ATN.decisionToState"/>
         public readonly int decision;
 
-        /// <summary>
-        /// The simulator state containing additional information relevant to the
-        /// prediction state when the current event occurred, or
-        /// <see langword="null"/>
-        /// if no
-        /// additional information is relevant or available.
-        /// </summary>
-        [Nullable]
-        public readonly SimulatorState state;
+        /// <summary>The configuration set containing additional information relevant to the
+        /// prediction state when the current event occurred, or {@code null} if no
+        /// additional information is relevant or available.</summary>
+        /// <remarks>The configuration set containing additional information relevant to the
+        /// prediction state when the current event occurred, or {@code null} if no
+        /// additional information is relevant or available.</remarks>
+        public readonly ATNConfigSet configs;
 
         /// <summary>The input token stream which is being parsed.</summary>
         /// <remarks>The input token stream which is being parsed.</remarks>
@@ -63,14 +61,17 @@ namespace Antlr4.Runtime.Atn
         /// </summary>
         public readonly bool fullCtx;
 
-        public DecisionEventInfo(int decision, SimulatorState state, ITokenStream input, int startIndex, int stopIndex, bool fullCtx)
+        public DecisionEventInfo(int decision,
+            ATNConfigSet configs,
+            ITokenStream input, int startIndex, int stopIndex,
+            bool fullCtx)
         {
             this.decision = decision;
             this.fullCtx = fullCtx;
             this.stopIndex = stopIndex;
             this.input = input;
             this.startIndex = startIndex;
-            this.state = state;
+            this.configs = configs;
         }
     }
 }
