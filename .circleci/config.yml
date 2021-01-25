@@ -58,7 +58,7 @@ jobs:
       - image: cimg/openjdk:8.0
     environment:
       TARGET: << parameters.target >>
-      GROUP: << parameters.group >>
+      GROUP: << parameters.test-group >>
     steps:
       - checkout
       - run:
