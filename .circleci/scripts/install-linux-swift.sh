@@ -30,11 +30,14 @@ wget http://archive.ubuntu.com/ubuntu/pool/main/c/curl/libcurl3_7.47.0-1ubuntu2_
 ar x libcurl3* data.tar.xz
 tar xf data.tar.xz
 ls -all ~/libcurl3/usr/lib/x86_64-linux-gnu/
-sudo cp -L ~/libcurl3/usr/lib/x86_64-linux-gnu/libcurl.so.4.4.0 /usr/lib/
-sudo ln -sf /usr/lib/ /usr/bin/libcurl.so.4.4.0
+sudo cp -L ~/libcurl3/usr/lib/x86_64-linux-gnu/libcurl.so.4 /usr/lib/
+# sudo ln -sf /usr/lib/ /usr/bin/libcurl.so.4.4.0
 cd ..
 sudo rm -rf ~/libcurl3
 
+echof "ls /usr/lib/"
+ls -all /usr/lib/ | grep libcurl
+echof "ls /usr/lib/x86_64-linux-gnu/"
 ls -all /usr/lib/x86_64-linux-gnu/ | grep libcurl
 
 echo "done installing swift SDK..."
