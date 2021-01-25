@@ -20,7 +20,7 @@ jobs:
       - run:
           name: Install << parameters.target >> pre-requisites
           command: |
-            .circleci/scripts/install-linux-<< parameters.target >>.sh
+            f=".circleci/scripts/install-linux-$TARGET.sh"; ! [ -x "$f" ] || "$f"
       - run:
           name: Build ANTLR4 tool
           command: mvn -B -V -DskipTests=true -Dmaven.javadoc.skip=true install
@@ -50,7 +50,7 @@ workflows:
           matrix:
             parameters:
 #              target: [ dart, go, python2, python3, javascript ]
-              target: [ python2 ]
+              target: [ go ]
       - test_runtime_group: # invokes the parameterized job
           matrix:
             parameters:
