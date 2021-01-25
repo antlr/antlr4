@@ -3,11 +3,13 @@
 set -euo pipefail
 
 echo "installing go runtime..."
-echo "fetching gimme..."
+echo "creating bin dir..."
 mkdir ~/bin
-export PATH="$PATH:~/bin"
-curl -sL -o ~/bin/gimme https://raw.githubusercontent.com/travis-ci/gimme/master/gimme
-chmod +x ~/bin/gimme
+export PATH=$PATH:~/bin
+echo "fetching gimme..."
+curl -sL -o /tmp/gimme https://raw.githubusercontent.com/travis-ci/gimme/master/gimme
+sudo mv /tmp/gimme ~/bin/gimme
+sudo chmod +x ~/bin/gimme
 echo "installing go using gimme..."
 eval "$(sudo gimme 1.7.3)"
 echo "done installing go using gimme..."
