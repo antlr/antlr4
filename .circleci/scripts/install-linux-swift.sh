@@ -4,11 +4,14 @@ echo "installing swift SDK..."
 sudo apt-get update
 sudo apt-get install clang libicu-dev
 sudo apt-get install libcurl3 libpython2.7 libpython2.7-dev
-wget -q -O - https://swift.org/keys/all-keys.asc | sudo gpg --import -
 
 export SWIFT_VERSION=swift-5.0.1
-
-wget https://swift.org/builds/$SWIFT_VERSION-release/ubuntu1604/$SWIFT_VERSION-RELEASE/$SWIFT_VERSION-RELEASE-ubuntu16.04.tar.gz
+echo "installing gpg key..."
+wget -q -O - https://swift.org/keys/all-keys.asc | sudo gpg --import -
+echo "downloading SDK gpg key..."
+SWIFT_SDK=https://swift.org/builds/$SWIFT_VERSION-release/ubuntu1604/$SWIFT_VERSION-RELEASE/$SWIFT_VERSION-RELEASE-ubuntu16.04.tar.gz
+echo $SWIFT_SDK
+wget $SWIFT_SDK
 sudo tar xzf swift-4.0.3-RELEASE-ubuntu16.04.tar.gz
 mv swift-4.0.3-RELEASE-ubuntu16.04 $PWD/swift
 
