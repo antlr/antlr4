@@ -25,6 +25,8 @@ sudo ln -sf ld.gold /usr/bin/ld
 sudo apt install libncurses5
 # This would fix missing CURL_OPENSSL_3
 sudo apt remove -y libcurl4
+sudo apt clean
+apt-cache policy libcurl3
 sudo apt install -y libcurl3
 echo "done installing swift SDK..."
 
