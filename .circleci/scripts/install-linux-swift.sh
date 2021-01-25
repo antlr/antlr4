@@ -35,7 +35,7 @@ sudo cp -L ~/libcurl3/usr/lib/x86_64-linux-gnu/libcurl.so.4 /usr/lib/libcurl.so.
 cd ..
 sudo rm -rf ~/libcurl3
 
-echof "ls /usr/lib/"
+echo "ls /usr/lib/"
 ls -all /usr/lib/ | grep libcurl
 
 echo "done installing swift SDK..."
