@@ -4,6 +4,7 @@ echo "installing swift SDK..."
 # see https://tecadmin.net/install-swift-ubuntu-1604-xenial/
 sudo apt-get update -y
 sudo apt-get install clang libicu-dev
+sudo apt-get --purge remove libcurl4
 sudo apt-get install -y libcurl3
 sudo apt-get install libpython2.7 libpython2.7-dev
 
