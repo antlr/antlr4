@@ -2,9 +2,25 @@ version: 2.1
 
 jobs:
   test_tool_and_runtime_java:
-    machine: true
+    docker:
+      - image: cimg/openjdk:8.0
     steps:
-      - run: echo "Hello java"
+      - checkout
+      - run:
+          name: build tool
+          command: mvn -B -V -DskipTests=true -Dmaven.javadoc.skip=true install
+      - run:
+          name: test runtime
+          command: |
+            cd runtime-testsuite
+            mvn -q -Dparallel=methods -DthreadCount=4 -Dtest=java.* test
+            cd ..
+      - run:
+          name: test tool
+          command: |
+            cd tool-testsuite
+            mvn -q -Dparallel=methods -DthreadCount=4 test
+            cd ..
   test_runtime:
     parameters:
       target:
@@ -45,12 +61,12 @@ jobs:
 workflows:
   build:
     jobs:
-      - test_tool_and_runtime_java
+#      - test_tool_and_runtime_java
       - test_runtime: # invokes the parameterized job
           matrix:
             parameters:
 #              target: [ dart, go, python2, python3, javascript ]
-              target: [ go ]
+              target: [ javascript ]
       - test_runtime_group: # invokes the parameterized job
           matrix:
             parameters:
