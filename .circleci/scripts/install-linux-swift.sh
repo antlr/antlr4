@@ -1,6 +1,7 @@
 set -euo pipefail
 
 echo "installing swift SDK..."
+# see https://tecadmin.net/install-swift-ubuntu-1604-xenial/
 sudo apt-get update
 sudo apt-get install clang libicu-dev
 #sudo apt-get install libcurl3 libpython2.7 libpython2.7-dev
@@ -13,8 +14,8 @@ echo "downloading SDK gpg key..."
 SWIFT_SDK=https://swift.org/builds/$SWIFT_VERSION-release/ubuntu1604/$SWIFT_VERSION-RELEASE/$SWIFT_VERSION-RELEASE-ubuntu16.04.tar.gz
 echo $SWIFT_SDK
 wget $SWIFT_SDK
-sudo tar xzf swift-4.0.3-RELEASE-ubuntu16.04.tar.gz
-mv swift-4.0.3-RELEASE-ubuntu16.04 $PWD/swift
+sudo tar xzf $SWIFT_VERSION-RELEASE-ubuntu16.04.tar.gz
+mv $SWIFT_VERSION-RELEASE-ubuntu16.04 $PWD/swift
 
 export SWIFT_HOME=$PWD/swift/$SWIFT_VERSION-RELEASE-ubuntu16.04/usr/bin/
 export PATH=$PWD/swift/usr/bin:$PATH
