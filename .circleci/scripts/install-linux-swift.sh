@@ -21,10 +21,11 @@ export PATH=$PWD/swift/usr/bin:$PATH
 
 # This would fix a know linker issue mentioned in: # https://bugs.swift.org/browse/SR-2299
 sudo ln -sf ld.gold /usr/bin/ld
-# This would fix missing CURL_OPENSSL_3
-sudo apt-get install -y libcurl3-gnutls
 # This would fix missing libtinfo.so.5
 sudo apt install libncurses5
+# This would fix missing CURL_OPENSSL_3
+sudo apt-get remove --auto-remove libcurl4
+sudo apt-get install -y libcurl3-gnutls
 
 echo "done installing swift SDK..."
 
