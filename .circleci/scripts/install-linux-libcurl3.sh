@@ -15,7 +15,7 @@ ar x libcurl3* data.tar.xz
 tar xf data.tar.xz
 # copy libcurl.so.3 where required
 sudo cp -L ~/libcurl3/usr/lib/x86_64-linux-gnu/libcurl.so.4.4.0 /lib/x86_64-linux-gnu/libcurl.so.4.4.0
-sudo ls -sf /lib/x86_64-linux-gnu/libcurl.so.4.4.0 /lib/x86_64-linux-gnu/libcurl.so.4
+sudo ln -sf /lib/x86_64-linux-gnu/libcurl.so.4.4.0 /lib/x86_64-linux-gnu/libcurl.so.4
 cd ..
 # drop dedicated temp dir
 sudo rm -rf ~/libcurl3
