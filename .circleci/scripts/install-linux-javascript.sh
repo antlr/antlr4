@@ -4,9 +4,8 @@ set -euo pipefail
 
 # use v14 and check
 echo "installing nodejs..."
-sudo apt update
-sudo apt install nodejs 14
-sudo apt install npm
+curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
+sudo apt-get install -y nodejs
 echo node version: $(node --version)
 echo "done installing nodejs..."
 
