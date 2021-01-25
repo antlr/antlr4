@@ -2,9 +2,9 @@
 
 set -euo pipefail
 
-echo "installing go..."
+echo "installing go runtime..."
 sudo apt-get update
 sudo apt-get install gccgo-go=1.7.3
 go version
 go env
-echo "done installing go"
+echo "done installing go runtime"
