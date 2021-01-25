@@ -284,3 +284,4 @@ YYYY/MM/DD, github id, Full name, email
 2020/11/26, mr-c, Michael R. Crusoe, 1330696+mr-c@users.noreply.github.com
 2020/12/01, maxence-lefebvre, Maxence Lefebvre, maxence-lefebvre@users.noreply.github.com
 2020/12/03, electrum, David Phillips, david@acz.org
+2020/12/08, wbbradley, William Bradley, williambbradley@gmail.com
