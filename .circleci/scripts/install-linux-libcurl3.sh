@@ -1,6 +1,6 @@
 set -euo pipefail
 
-ls -all /lib/x86_64-linux-gnu/ || grep libcurl
+ls -all /lib/x86_64-linux-gnu/ | grep libcurl
 
 # This would fix missing CURL_OPENSSL_3
 # use a dedicated temp dir in the user space
