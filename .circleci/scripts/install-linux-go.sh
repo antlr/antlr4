@@ -11,7 +11,7 @@ curl -sL -o /tmp/gimme https://raw.githubusercontent.com/travis-ci/gimme/master/
 sudo mv /tmp/gimme ~/bin/gimme
 sudo chmod +x ~/bin/gimme
 echo "installing go using gimme..."
-eval "$(sudo ~/bin/gimme 1.7.3)"
+sudo ~/bin/gimme 1.7.3
 echo "done installing go using gimme..."
 go version
 go env
