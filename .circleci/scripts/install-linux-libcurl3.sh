@@ -1,5 +1,6 @@
 set -euo pipefail
 
+echo "before patching"
 ls -all /lib/x86_64-linux-gnu/ | grep libcurl
 
 # This would fix missing CURL_OPENSSL_3
@@ -13,7 +14,11 @@ ar x libcurl3* data.tar.xz
 # extract all from data.tar.xz
 tar xf data.tar.xz
 # copy libcurl.so.3 where required
-sudo cp -L ~/libcurl3/usr/lib/x86_64-linux-gnu/libcurl.so.4 /usr/lib/libcurl.so.3
+sudo cp -L ~/libcurl3/usr/lib/x86_64-linux-gnu/libcurl.so.4.4.0 /lib/x86_64-linux-gnu/libcurl.so.4.4.0
+sudo ls -sf /lib/x86_64-linux-gnu/libcurl.so.4.4.0 /lib/x86_64-linux-gnu/libcurl.so.4
 cd ..
 # drop dedicated temp dir
 sudo rm -rf ~/libcurl3
+
+echo "after patching"
+ls -all /lib/x86_64-linux-gnu/ | grep libcurl
