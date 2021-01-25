@@ -3,11 +3,12 @@
 set -euo pipefail
 
 echo "installing go runtime..."
-pushd /tmp
-  curl -sL -o gimme https://raw.githubusercontent.com/travis-ci/gimme/master/gimme
-  chmod +x gimme
-  eval "$(sudo gimme 1.7.3)"
-popd
+echo "fetching gimme..."
+curl -sL -o /tmp/gimme https://raw.githubusercontent.com/travis-ci/gimme/master/gimme
+chmod +x /tmp/gimme
+echo "installing go using gimme..."
+eval "$(sudo /tmp/gimme 1.7.3)"
+echo "done installing go using gimme..."
 go version
 go env
 echo "done installing go runtime"
