@@ -23,6 +23,8 @@ export PATH=$PWD/swift/usr/bin:$PATH
 sudo ln -sf ld.gold /usr/bin/ld
 # This would fix missing CURL_OPENSSL_3
 sudo apt-get install -y libcurl3-gnutls
+# This would fix missing libtinfo.so.5
+sudo apt install libncurses5
 
 echo "done installing swift SDK..."
 
