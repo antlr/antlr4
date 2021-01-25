@@ -19,8 +19,7 @@ jobs:
       - run:
           name: Install << parameters.target >> pre-requisites
           command: |
-            echo "TARGET: << parameters.target >>"
-            f=".circleci/scripts/install-linux-<< parameters.target >>.sh"; ! [ -x "$f" ] || "$f"
+            .circleci/scripts/install-linux-<< parameters.target >>.sh
       - checkout
       - run:
           name: Build ANTLR4 tool
