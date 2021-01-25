@@ -13,6 +13,7 @@ popd
 
 if [ $rc == 0 ]; then
   pushd runtime-testsuite
+    echo "running maven tests..."
     if [ $GROUP == "LEXER" ]; then
         mvn -q -Dgroups="org.antlr.v4.test.runtime.category.LexerTests" -Dtest=swift.TestCompositeLexer test
     elif [ $GROUP == "PARSER" ]; then

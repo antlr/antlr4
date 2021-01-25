@@ -2,8 +2,10 @@ set -euo pipefail
 
 echo "installing clang..."
 sudo apt-get update
-sudo apt-get install clang-3.6 libxml2
-sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-3.6 100
+sudo apt-get install -y libxml2
+sudo apt-get install -y clang-3.6
+# sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-3.6 100
+ls /usr/bin/
 
 # This would fix a know linker issue mentioned in:
 # https://bugs.swift.org/browse/SR-2299
