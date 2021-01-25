@@ -9,9 +9,9 @@ sudo apt-get install -y nodejs
 echo node version: $(node --version)
 echo "done installing nodejs..."
 
-echo "installing javascript runtime..."
+echo "packaging javascript runtime..."
 pushd runtime/JavaScript
   sudo npm install
   sudo npm link
 popd
-echo "done installing javascript runtime"
+echo "done packaging javascript runtime"

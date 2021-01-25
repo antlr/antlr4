@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-echo "installing dart runtime..."
+echo "installing dart SDK..."
 sudo apt-get update
 sudo apt-get install apt-transport-https
 sudo sh -c 'wget -qO- https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -'
@@ -10,5 +10,5 @@ sudo sh -c 'wget -qO- https://storage.googleapis.com/download.dartlang.org/linux
 sudo apt-get update
 sudo apt-get install dart=2.8.4-1
 export PATH="$PATH:/usr/lib/dart/bin"
-echo "done installing dart runtime"
+echo "done installing dart SDK"
 sudo apt-get install -f
