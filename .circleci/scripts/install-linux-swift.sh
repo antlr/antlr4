@@ -2,7 +2,7 @@ set -euo pipefail
 
 echo "installing swift SDK..."
 
-./install-linux-libcurl3.sh
+.circleci/scripts/install-linux-libcurl3.sh
 
 # see https://tecadmin.net/install-swift-ubuntu-1604-xenial/
 sudo apt-get update -y
