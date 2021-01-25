@@ -4,11 +4,9 @@ echo "installing swift SDK..."
 # see https://tecadmin.net/install-swift-ubuntu-1604-xenial/
 sudo apt-get update -y
 sudo apt-get install clang libicu-dev
-sudo apt-get --purge remove libcurl4
-sudo apt-get install -y libcurl3
 sudo apt-get install libpython2.7 libpython2.7-dev
 
-export SWIFT_VERSION=swift-5.0.1
+export SWIFT_VERSION=swift-5.3.2
 echo "installing gpg key..."
 wget -q -O - https://swift.org/keys/all-keys.asc | sudo gpg --import -
 echo "downloading SDK gpg key..."
