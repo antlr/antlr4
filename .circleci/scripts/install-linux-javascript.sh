@@ -11,7 +11,7 @@ echo "done installing nodejs..."
 
 echo "installing javascript runtime..."
 pushd runtime/JavaScript
-  npm install
-  npm link
+  sudo npm install
+  sudo npm link
 popd
 echo "done installing javascript runtime"
