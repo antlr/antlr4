@@ -5,7 +5,7 @@ set -euo pipefail
 pushd runtime-testsuite/
   echo "running maven tests..."
   if [ $GROUP == "LEXER" ]; then
-      mvn -q -Dgroups="org.antlr.v4.test.runtime.category.LexerTests" -Dparallel=classes -DthreadCount=4 -Dtest=csharp.TestCompositeLexers test
+      mvn -q -Dgroups="org.antlr.v4.test.runtime.category.LexerTests" -Dparallel=classes -DthreadCount=4 -Dtest=csharp.* test
   elif [ $GROUP == "PARSER" ]; then
       mvn -q -Dgroups="org.antlr.v4.test.runtime.category.ParserTests" -Dparallel=classes -DthreadCount=4 -Dtest=csharp.* test
   elif [ $GROUP == "RECURSION" ]; then
