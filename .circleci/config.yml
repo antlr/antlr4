@@ -16,11 +16,11 @@ jobs:
     environment:
       TARGET: << parameters.target >>
     steps:
+      - checkout
       - run:
           name: Install << parameters.target >> pre-requisites
           command: |
             .circleci/scripts/install-linux-<< parameters.target >>.sh
-      - checkout
       - run:
           name: Build ANTLR4 tool
           command: mvn -B -V -DskipTests=true -Dmaven.javadoc.skip=true install
