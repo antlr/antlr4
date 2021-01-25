@@ -24,11 +24,10 @@ sudo ln -sf ld.gold /usr/bin/ld
 # This would fix missing libtinfo.so.5
 sudo apt install libncurses5
 # This would fix missing CURL_OPENSSL_3
-# shellcheck disable=SC2010
+sudo apt-get install -y libcurl3-gnutls
 ls -all /usr/lib/x86_64-linux-gnu/ | grep libcurl
 # sudo apt-get remove --auto-remove libcurl4
 # sudo apt-get remove --auto-remove libcurl4-gnutls
-# sudo apt-get install -y libcurl3-gnutls
 
 echo "done installing swift SDK..."
 
