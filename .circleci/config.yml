@@ -63,4 +63,4 @@ workflows:
             parameters:
 #              target: [ cpp, dotnet, swift ]
               target: [ cpp, dotnet ]
-              group: [ LEXER, PARSER, RECURSION ]
+              test-group: [ LEXER, PARSER, RECURSION ]
