@@ -23,33 +23,10 @@ jobs:
             cd ..
   test_runtime:
     parameters:
-      target:
-        description: The target
-        type: string
-        default: java
-    docker:
-      - image: cimg/openjdk:8.0
-    environment:
-      TARGET: << parameters.target >>
-    steps:
-      - checkout
-      - run:
-          name: Install << parameters.target >> pre-requisites
-          command: |
-            f=".circleci/scripts/install-linux-<< parameters.target >>.sh"; ! [ -x "$f" ] || "$f"
-      - run:
-          name: Build ANTLR4 tool
-          command: mvn -B -V -DskipTests=true -Dmaven.javadoc.skip=true install
-      - run:
-          name: Test << parameters.target >> runtime
-          command: |
-            .circleci/scripts/run-tests-<< parameters.target >>.sh
-  test_runtime_group:
-    parameters:
       test-group:
         description: The section
         type: string
-        default: MAIN
+        default: ALL
       target:
         description: The target
         type: string
@@ -76,16 +53,14 @@ jobs:
 workflows:
   build:
     jobs:
-#      - test_tool_and_runtime_java
-#      - test_runtime: # invokes the parameterized job
-#          matrix:
-#            parameters:
-#              target: [ dart, go, python2, python3, javascript ]
-#              target: [ javascript ]
-      - test_runtime_group: # invokes the parameterized job
+      - test_tool_and_runtime_java
+      - test_runtime:
+          matrix:
+            parameters:
+              target: [ dart, go, python2, python3, javascript ]
+      - test_runtime:
           matrix:
             parameters:
 #              target: [ cpp, dotnet, swift ]
-#              group: [ LEXER, PARSER, RECURSION ]
-              test-group: [ LEXER ]
-              target: [ cpp ]
+              target: [ cpp, dotnet ]
+              group: [ LEXER, PARSER, RECURSION ]

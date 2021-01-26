@@ -15,7 +15,7 @@ if [ $rc == 0 ]; then
   pushd runtime-testsuite
     echo "running maven tests..."
     if [ $GROUP == "LEXER" ]; then
-        mvn -q -Dgroups="org.antlr.v4.test.runtime.category.LexerTests" -Dtest=swift.TestCompositeLexer test
+        mvn -q -Dgroups="org.antlr.v4.test.runtime.category.LexerTests" -Dtest=swift.* test
     elif [ $GROUP == "PARSER" ]; then
         mvn -q -Dgroups="org.antlr.v4.test.runtime.category.ParserTests" -Dtest=swift.* test
     elif [ $GROUP == "RECURSION" ]; then
