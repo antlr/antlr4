@@ -88,4 +88,4 @@ workflows:
 #              target: [ cpp, dotnet, swift ]
 #              group: [ LEXER, PARSER, RECURSION ]
               test-group: [ LEXER ]
-              target: [ swift ]
+              target: [ cpp ]
