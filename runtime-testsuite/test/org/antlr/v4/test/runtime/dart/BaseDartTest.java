@@ -1031,11 +1031,17 @@ public class BaseDartTest implements RuntimeTestSupport {
 
 	@Override
 	public void eraseTempDir() {
-		File tmpdirF = new File(tmpdir);
-		if (tmpdirF.exists()) {
-			eraseFiles();
-			tmpdirF.delete();
+		if(shouldEraseTempDir()) {
+			File tmpdirF = new File(tmpdir);
+			if (tmpdirF.exists()) {
+				eraseFiles();
+				tmpdirF.delete();
+			}
 		}
+	}
+
+	private boolean shouldEraseTempDir() {
+		return tmpdir!=null;
 	}
 
 	public String getFirstLineOfException() {

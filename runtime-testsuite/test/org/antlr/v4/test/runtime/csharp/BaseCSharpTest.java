@@ -581,13 +581,17 @@ public class BaseCSharpTest implements RuntimeTestSupport {
 
 	@Override
 	public void eraseTempDir() {
-		if (!PRESERVE_TEST_DIR) {
+		if (shouldEraseTempDir()) {
 			File tmpdirF = new File(tmpdir);
 			if (tmpdirF.exists()) {
 				eraseDirectory(tmpdirF);
 				tmpdirF.delete();
 			}
 		}
+	}
+
+	private boolean shouldEraseTempDir() {
+		return tmpdir!=null && !PRESERVE_TEST_DIR;
 	}
 
 	/**
