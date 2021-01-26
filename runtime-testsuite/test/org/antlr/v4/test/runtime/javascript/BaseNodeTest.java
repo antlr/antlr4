@@ -251,7 +251,7 @@ public class BaseNodeTest implements RuntimeTestSupport {
 	public String execModule(String fileName) {
 		try {
 			String npmPath = locateNpm();
-			if(!TestContext.isTravisCI()) {
+			if(!TestContext.isTravisCI() && !TestContext.isCircleCI()) {
 				installRuntime(npmPath);
 				registerRuntime(npmPath);
 			}
@@ -327,7 +327,11 @@ public class BaseNodeTest implements RuntimeTestSupport {
 	}
 
 	private void linkRuntime(String npmPath) throws IOException, InterruptedException {
-		ProcessBuilder builder = new ProcessBuilder(npmPath, "link", "antlr4");
+		List<String> args = new ArrayList<>();
+		if(TestContext.isCircleCI())
+			args.add("sudo");
+		args.addAll(Arrays.asList(npmPath, "link", "antlr4"));
+		ProcessBuilder builder = new ProcessBuilder(args.toArray(new String[0]));
 		builder.directory(new File(tmpdir));
 		builder.redirectError(new File(tmpdir, "error.txt"));
 		builder.redirectOutput(new File(tmpdir, "output.txt"));
@@ -479,12 +483,7 @@ public class BaseNodeTest implements RuntimeTestSupport {
 
 	@Override
 	public void eraseTempDir() {
-		boolean doErase = true;
-		String propName = "antlr-javascript-erase-test-dir";
-		String prop = System.getProperty(propName);
-		if (prop != null && prop.length() > 0)
-			doErase = Boolean.getBoolean(prop);
-		if (doErase) {
+		if (shouldEraseTempDir()) {
 			File tmpdirF = new File(tmpdir);
 			if (tmpdirF.exists()) {
 				eraseFiles(tmpdirF);
@@ -493,6 +492,16 @@ public class BaseNodeTest implements RuntimeTestSupport {
 		}
 	}
 
+	private boolean shouldEraseTempDir() {
+		if(tmpdir==null)
+			return false;
+		String propName = "antlr-javascript-erase-test-dir";
+		String prop = System.getProperty(propName);
+		if (prop != null && prop.length() > 0)
+			return Boolean.getBoolean(prop);
+		else
+			return true;
+	}
 
 	/** Sort a list */
 	public <T extends Comparable<? super T>> List<T> sort(List<T> data) {

@@ -534,7 +534,7 @@ public class BaseCppTest implements RuntimeTestSupport {
 	}
 
 	private String runProcess(ProcessBuilder builder, String description, boolean showStderr) throws Exception {
-//		System.out.println("BUILDER: "+builder.command());
+		System.out.println("BUILDER: " + builder.command() + " @ " + builder.directory().toString());
 		Process process = builder.start();
 		StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
 		StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
@@ -712,7 +712,7 @@ public class BaseCppTest implements RuntimeTestSupport {
 			p = Paths.get(runtimeURL.toURI()).toFile().toString();
 		}
 		catch (URISyntaxException use) {
-			p = "Can't find runtime";
+			p = "Can't find runtime at " + runtimeURL.toString();
 		}
 		return p;
 	}
@@ -987,18 +987,24 @@ public class BaseCppTest implements RuntimeTestSupport {
 
 	@Override
 	public void eraseTempDir() {
-		boolean doErase = true;
-		String propName = getPropertyPrefix() + "-erase-test-dir";
-		String prop = System.getProperty(propName);
-		if(prop!=null && prop.length()>0)
-			doErase = Boolean.getBoolean(prop);
-		if(doErase) {
+		if (shouldEraseTempDir()) {
 			File tmpdirF = new File(tmpdir);
-			if ( tmpdirF.exists() ) {
+			if (tmpdirF.exists()) {
 				eraseFiles(tmpdirF);
 				tmpdirF.delete();
 			}
 		}
+	}
+
+	private boolean shouldEraseTempDir() {
+		if(tmpdir==null)
+			return false;
+		String propName = getPropertyPrefix() + "-erase-test-dir";
+		String prop = System.getProperty(propName);
+		if (prop != null && prop.length() > 0)
+			return Boolean.getBoolean(prop);
+		else
+			return true;
 	}
 
 	public String getFirstLineOfException() {
@@ -1152,3 +1158,4 @@ public class BaseCppTest implements RuntimeTestSupport {
 		return dup;
 	}
 }
+

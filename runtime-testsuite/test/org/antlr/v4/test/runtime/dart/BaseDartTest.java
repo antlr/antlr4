@@ -560,10 +560,22 @@ public class BaseDartTest implements RuntimeTestSupport {
 				"    path: " + runtime + "\n");
 		if (cacheDartPackages == null) {
 			try {
-				Process process = Runtime.getRuntime().exec(new String[]{locatePub(), "get"}, null, new File(tmpdir));
+				final Process process = Runtime.getRuntime().exec(new String[]{locatePub(), "get"}, null, new File(tmpdir));
 				StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
 				stderrVacuum.start();
+				Timer timer = new Timer();
+				timer.schedule(new TimerTask() {
+					@Override
+					public void run() {
+						try {
+							process.destroy();
+						} catch(Exception e) {
+							e.printStackTrace(System.err);
+						}
+					}
+				}, 30_000);
 				process.waitFor();
+				timer.cancel();
 				stderrVacuum.join();
 				String stderrDuringPubGet = stderrVacuum.toString();
 				if (!stderrDuringPubGet.isEmpty()) {
@@ -609,11 +621,23 @@ public class BaseDartTest implements RuntimeTestSupport {
 				};
 				String cmdLine = Utils.join(args, " ");
 				System.err.println("Compile: " + cmdLine);
-				Process process =
+				final Process process =
 					Runtime.getRuntime().exec(args, null, new File(tmpdir));
 				StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
 				stderrVacuum.start();
+				Timer timer = new Timer();
+				timer.schedule(new TimerTask() {
+					@Override
+					public void run() {
+						try {
+							process.destroy();
+						} catch(Exception e) {
+							e.printStackTrace(System.err);
+						}
+					}
+				}, 30_000);
 				int result = process.waitFor();
+				timer.cancel();
 				if (result != 0) {
 					stderrVacuum.join();
 					System.err.print("Error compiling dart file: " + stderrVacuum.toString());
@@ -633,13 +657,25 @@ public class BaseDartTest implements RuntimeTestSupport {
 			}
 			//String cmdLine = Utils.join(args, " ");
 			//System.err.println("execParser: " + cmdLine);
-			Process process =
+			final Process process =
 				Runtime.getRuntime().exec(args, null, new File(tmpdir));
 			StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
 			StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
 			stdoutVacuum.start();
 			stderrVacuum.start();
+			Timer timer = new Timer();
+			timer.schedule(new TimerTask() {
+				@Override
+				public void run() {
+					try {
+						process.destroy();
+					} catch(Exception e) {
+						e.printStackTrace(System.err);
+					}
+				}
+			}, 30_000);
 			process.waitFor();
+			timer.cancel();
 			stdoutVacuum.join();
 			stderrVacuum.join();
 			String output = stdoutVacuum.toString();
@@ -1031,11 +1067,17 @@ public class BaseDartTest implements RuntimeTestSupport {
 
 	@Override
 	public void eraseTempDir() {
-		File tmpdirF = new File(tmpdir);
-		if (tmpdirF.exists()) {
-			eraseFiles();
-			tmpdirF.delete();
+		if(shouldEraseTempDir()) {
+			File tmpdirF = new File(tmpdir);
+			if (tmpdirF.exists()) {
+				eraseFiles();
+				tmpdirF.delete();
+			}
 		}
+	}
+
+	private boolean shouldEraseTempDir() {
+		return tmpdir!=null;
 	}
 
 	public String getFirstLineOfException() {

@@ -821,16 +821,22 @@ public class BaseGoTest implements RuntimeTestSupport {
 	}
 
 	public void eraseTempDir() {
-		boolean doErase = true;
-		String propName = "antlr-go-erase-test-dir";
-		String prop = System.getProperty(propName);
-		if (prop != null && prop.length() > 0)
-			doErase = Boolean.getBoolean(prop);
-		if (doErase) {
+		if (shouldEraseTempDir()) {
 			if ( overall_tmpdir.exists()) {
 				eraseDirectory(overall_tmpdir);
 			}
 		}
+	}
+
+	private boolean shouldEraseTempDir() {
+		if(overall_tmpdir==null)
+			return false;
+		String propName = "antlr-go-erase-test-dir";
+		String prop = System.getProperty(propName);
+		if (prop != null && prop.length() > 0)
+			return Boolean.getBoolean(prop);
+		else
+			return true;
 	}
 
 	public String getFirstLineOfException() {

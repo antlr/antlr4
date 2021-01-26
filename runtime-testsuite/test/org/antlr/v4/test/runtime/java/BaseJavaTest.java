@@ -1032,6 +1032,9 @@ public class BaseJavaTest implements RuntimeTestSupport {
 
 
     protected void eraseFiles(final String filesEndingWith) {
+		if (tmpdir == null) {
+			return;
+		}
         File tmpdirF = new File(tmpdir);
         String[] files = tmpdirF.list();
         for(int i = 0; files!=null && i < files.length; i++) {
@@ -1045,7 +1048,6 @@ public class BaseJavaTest implements RuntimeTestSupport {
 		if (tmpdir == null) {
 			return;
 		}
-
         File tmpdirF = new File(tmpdir);
         String[] files = tmpdirF.list();
         for(int i = 0; files!=null && i < files.length; i++) {
@@ -1054,12 +1056,19 @@ public class BaseJavaTest implements RuntimeTestSupport {
     }
 
     public void eraseTempDir() {
-        File tmpdirF = new File(tmpdir);
-        if ( tmpdirF.exists() ) {
-            eraseFiles();
-            tmpdirF.delete();
-        }
+		if (shouldEraseTempDir()) {
+			File tmpdirF = new File(tmpdir);
+			if (tmpdirF.exists()) {
+				eraseFiles();
+				tmpdirF.delete();
+			}
+		}
     }
+
+	private boolean shouldEraseTempDir() {
+		return tmpdir != null;
+	}
+
 
 	public String getFirstLineOfException() {
 		if ( this.stderrDuringParse ==null ) {
