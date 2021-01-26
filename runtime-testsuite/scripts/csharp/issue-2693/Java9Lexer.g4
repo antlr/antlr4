@@ -4,8 +4,6 @@ options {
     superClass=LexerBase;
 }
 
-// §3.9 Keywords
-
 ABSTRACT : 'abstract' ;
 ASSERT : 'assert' ;
 BOOLEAN : 'boolean' ;
@@ -66,11 +64,7 @@ VOID : 'void' ;
 VOLATILE : 'volatile' ;
 WHILE : 'while' ;
 WITH : 'with' ;
-
 UNDER_SCORE : '_' ;//Introduced in Java 9
-
-// §3.10.1 Integer Literals
-
 IntegerLiteral : DecimalIntegerLiteral | HexIntegerLiteral | OctalIntegerLiteral | BinaryIntegerLiteral ;
 fragment DecimalIntegerLiteral : DecimalNumeral IntegerTypeSuffix? ;
 fragment HexIntegerLiteral : HexNumeral IntegerTypeSuffix? ;
@@ -99,9 +93,6 @@ fragment BinaryDigits : BinaryDigit (BinaryDigitsAndUnderscores? BinaryDigit)? ;
 fragment BinaryDigit : [01] ;
 fragment BinaryDigitsAndUnderscores : BinaryDigitOrUnderscore+ ;
 fragment BinaryDigitOrUnderscore : BinaryDigit|'_' ;
-
-// §3.10.2 Floating-Point Literals
-
 FloatingPointLiteral : DecimalFloatingPointLiteral | HexadecimalFloatingPointLiteral ;
 fragment DecimalFloatingPointLiteral : Digits '.' Digits? ExponentPart? FloatTypeSuffix? | '.' Digits ExponentPart? FloatTypeSuffix? | Digits ExponentPart FloatTypeSuffix? | Digits FloatTypeSuffix ;
 fragment ExponentPart : ExponentIndicator SignedInteger ;
@@ -181,7 +172,6 @@ JavaLetter
     |   // covers UTF-16 surrogate pairs encodings for U+10000 to U+10FFFF
     [\uD800-\uDBFF] [\uDC00-\uDFFF] { testIsJavaIdentifierStart2() }?
     ;
-
 fragment
 JavaLetterOrDigit
     : [a-zA-Z0-9$_] // these are the "java letters or digits" below 0x7F
@@ -190,11 +180,6 @@ JavaLetterOrDigit
     |   // covers UTF-16 surrogate pairs encodings for U+10000 to U+10FFFF
     [\uD800-\uDBFF] [\uDC00-\uDFFF] { testIsJavaIdentifierStart4() }?
     ;
-
-//
-// Whitespace and comments
-//
-
 WS : [ \t\r\n\u000C]+ -> channel(HIDDEN) ;
 COMMENT : '/*' .*? '*/' -> channel(HIDDEN) ;
 LINE_COMMENT : '//' ~[\r\n]* -> channel(HIDDEN) ;
