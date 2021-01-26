@@ -698,7 +698,7 @@ public class BaseCppTest implements RuntimeTestSupport {
 			p = Paths.get(runtimeURL.toURI()).toFile().toString();
 		}
 		catch (URISyntaxException use) {
-			p = "Can't find runtime";
+			p = "Can't find runtime at " + runtimeURL.toString();
 		}
 		return p;
 	}
