@@ -520,7 +520,7 @@ public class BaseCppTest implements RuntimeTestSupport {
 	}
 
 	private String runProcess(ProcessBuilder builder, String description, boolean showStderr) throws Exception {
-//		System.out.println("BUILDER: "+builder.command());
+		System.out.println("BUILDER: " + builder.command() + " @ " + builder.directory().toString());
 		Process process = builder.start();
 		StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
 		StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
