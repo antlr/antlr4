@@ -1,9 +1,11 @@
 # ANTLR v4
 
-[![Github CI Build Status (MacOSX)](https://github.com/antlr/antlr4/workflows/MacOSX/badge.svg)](https://github.com/antlr/antlr4/actions) 
-[![AppVeyor CI Build Status (Windows)](https://ci.appveyor.com/api/projects/status/5acpbx1pg7bhgh8v/branch/master?svg=true)](https://ci.appveyor.com/project/parrt/antlr4) [![Java 7+](https://img.shields.io/badge/java-7+-4c7e9f.svg)](http://java.oracle.com) [![License](https://img.shields.io/badge/license-BSD-blue.svg)](https://raw.githubusercontent.com/antlr/antlr4/master/LICENSE.txt)
-[![Circle CI Build Status (Linux)](https://circleci.com/gh/antlr/antlr4.svg?style=svg)](https://app.circleci.com/pipelines/github/antlr/antlr4)
-[![Travis-CI Build Status](https://travis-ci.org/antlr/antlr4.svg?branch=master)](https://travis-ci.org/antlr/antlr4)
+[![Github CI Build Status (MacOSX)](https://img.shields.io/github/workflow/status/antlr/antlr4/MacOSX?label=MacOSX)](https://github.com/antlr/antlr4/actions) 
+[![AppVeyor CI Build Status (Windows)](https://img.shields.io/appveyor/build/parrt/antlr4?label=Windows)](https://ci.appveyor.com/project/parrt/antlr4) 
+[![Circle CI Build Status (Linux)](https://img.shields.io/circleci/build/gh/antlr/antlr4/master?label=Linux)](https://app.circleci.com/pipelines/github/antlr/antlr4)
+[![Travis-CI Build Status (Swift-Linux)](https://img.shields.io/travis/antlr/antlr4.svg?label=Linux-Swift&branch=master)](https://travis-ci.org/antlr/antlr4)
+[![Java 7+](https://img.shields.io/badge/java-7+-4c7e9f.svg)](http://java.oracle.com) 
+[![License](https://img.shields.io/badge/license-BSD-blue.svg)](https://raw.githubusercontent.com/antlr/antlr4/master/LICENSE.txt)
 
 **ANTLR** (ANother Tool for Language Recognition) is a powerful parser generator for reading, processing, executing, or translating structured text or binary files. It's widely used to build languages, tools, and frameworks. From a grammar, ANTLR generates a parser that can build parse trees and also generates a listener interface (or visitor) that makes it easy to respond to the recognition of phrases of interest.
 
