@@ -11,6 +11,9 @@ import org.antlr.v4.test.runtime.ErrorQueue;
 import org.antlr.v4.test.runtime.RuntimeTestDescriptor;
 import org.antlr.v4.test.runtime.RuntimeTestSupport;
 import org.antlr.v4.test.runtime.StreamVacuum;
+import org.junit.rules.TestRule;
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
 import org.stringtemplate.v4.ST;
 
 import java.io.BufferedReader;
@@ -95,6 +98,17 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 	 * Source files used in each small swift project.
 	 */
 	private final Set<String> sourceFiles = new HashSet<>();
+
+	@org.junit.Rule
+	public final TestRule testWatcher = new TestWatcher() {
+
+		@Override
+		protected void succeeded(Description description) {
+			// remove tmpdir if no error.
+			eraseTempDir();
+		}
+
+	};
 
 	@Override
 	public void testSetUp() throws Exception {

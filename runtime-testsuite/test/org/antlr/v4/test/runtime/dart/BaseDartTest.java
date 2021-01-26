@@ -26,6 +26,9 @@ import org.antlr.v4.test.runtime.*;
 import org.antlr.v4.test.runtime.descriptors.LexerExecDescriptors;
 import org.antlr.v4.test.runtime.descriptors.PerformanceDescriptors;
 import org.antlr.v4.tool.*;
+import org.junit.rules.TestRule;
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupString;
@@ -125,6 +128,17 @@ public class BaseDartTest implements RuntimeTestSupport {
 	protected StringBuilder antlrToolErrors;
 
 	private static String cacheDartPackages;
+
+	@org.junit.Rule
+	public final TestRule testWatcher = new TestWatcher() {
+
+		@Override
+		protected void succeeded(Description description) {
+			// remove tmpdir if no error.
+			eraseTempDir();
+		}
+
+	};
 
 	private String getPropertyPrefix() {
 		return "antlr-dart";
@@ -1053,11 +1067,17 @@ public class BaseDartTest implements RuntimeTestSupport {
 
 	@Override
 	public void eraseTempDir() {
-		File tmpdirF = new File(tmpdir);
-		if (tmpdirF.exists()) {
-			eraseFiles();
-			tmpdirF.delete();
+		if(shouldEraseTempDir()) {
+			File tmpdirF = new File(tmpdir);
+			if (tmpdirF.exists()) {
+				eraseFiles();
+				tmpdirF.delete();
+			}
 		}
+	}
+
+	private boolean shouldEraseTempDir() {
+		return tmpdir!=null;
 	}
 
 	public String getFirstLineOfException() {

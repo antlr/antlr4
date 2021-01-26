@@ -15,6 +15,9 @@ import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.test.runtime.*;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
+import org.junit.rules.TestRule;
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
 import org.stringtemplate.v4.ST;
 
 import java.io.File;
@@ -45,6 +48,17 @@ public class BaseNodeTest implements RuntimeTestSupport {
 
 	/** Errors found while running antlr */
 	protected StringBuilder antlrToolErrors;
+
+	@org.junit.Rule
+	public final TestRule testWatcher = new TestWatcher() {
+
+		@Override
+		protected void succeeded(Description description) {
+			// remove tmpdir if no error.
+			eraseTempDir();
+		}
+
+	};
 
 	@Override
 	public void testSetUp() throws Exception {
@@ -469,12 +483,7 @@ public class BaseNodeTest implements RuntimeTestSupport {
 
 	@Override
 	public void eraseTempDir() {
-		boolean doErase = true;
-		String propName = "antlr-javascript-erase-test-dir";
-		String prop = System.getProperty(propName);
-		if (prop != null && prop.length() > 0)
-			doErase = Boolean.getBoolean(prop);
-		if (doErase) {
+		if (shouldEraseTempDir()) {
 			File tmpdirF = new File(tmpdir);
 			if (tmpdirF.exists()) {
 				eraseFiles(tmpdirF);
@@ -483,6 +492,16 @@ public class BaseNodeTest implements RuntimeTestSupport {
 		}
 	}
 
+	private boolean shouldEraseTempDir() {
+		if(tmpdir==null)
+			return false;
+		String propName = "antlr-javascript-erase-test-dir";
+		String prop = System.getProperty(propName);
+		if (prop != null && prop.length() > 0)
+			return Boolean.getBoolean(prop);
+		else
+			return true;
+	}
 
 	/** Sort a list */
 	public <T extends Comparable<? super T>> List<T> sort(List<T> data) {
