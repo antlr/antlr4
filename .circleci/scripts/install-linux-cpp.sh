@@ -5,7 +5,8 @@ set -euo pipefail
 echo "installing cpp SDK..."
 
 sudo apt-get update -y
-sudo apt-get install clang
+sudo apt-get install -y clang
+sudo apt-get install -y cmake
 
 echo "done installing cpp SDK"
 
