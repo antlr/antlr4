@@ -109,294 +109,69 @@ fragment ExponentIndicator : [eE] ;
 fragment SignedInteger : Sign? Digits ;
 fragment Sign : [+-] ;
 fragment FloatTypeSuffix : [fFdD] ;
-fragment
-HexadecimalFloatingPointLiteral
-    : HexSignificand BinaryExponent FloatTypeSuffix?
-    ;
-
-fragment
-HexSignificand
-    : HexNumeral '.'?
-    | '0' [xX] HexDigits? '.' HexDigits
-    ;
-
-fragment
-BinaryExponent
-    : BinaryExponentIndicator SignedInteger
-    ;
-
-fragment
-BinaryExponentIndicator
-    : [pP]
-    ;
-
-// §3.10.3 Boolean Literals
-
-BooleanLiteral
-    : 'true'|'false'
-    ;
-
-// §3.10.4 Character Literals
-
-CharacterLiteral
-    : '\'' SingleCharacter '\''
-    | '\'' EscapeSequence '\''
-    ;
-
-fragment
-SingleCharacter
-    : ~['\\\r\n]
-    ;
-
-// §3.10.5 String Literals
-
-StringLiteral
-    : '"' StringCharacters? '"'
-    ;
-
-fragment
-StringCharacters
-    : StringCharacter+
-    ;
-
-fragment
-StringCharacter
-    : ~["\\\r\n]|EscapeSequence
-    ;
-
-// §3.10.6 Escape Sequences for Character and String Literals
-
-fragment
-EscapeSequence
-    : '\\' [btnfr"'\\]|OctalEscape|UnicodeEscape // This is not in the spec but prevents having to preprocess the input
-    ;
-
-fragment
-OctalEscape
-    : '\\' OctalDigit
-    | '\\' OctalDigit OctalDigit
-    | '\\' ZeroToThree OctalDigit OctalDigit
-    ;
-
-fragment
-ZeroToThree
-    : [0-3]
-    ;
-
-// This is not in the spec but prevents having to preprocess the input
-
-fragment
-UnicodeEscape
-    : '\\' 'u'+ HexDigit HexDigit HexDigit HexDigit
-    ;
-
-// §3.10.7 The Null Literal
-
-NullLiteral
-    : 'null'
-    ;
-
-// §3.11 Separators
-
-LPAREN
-    : '('
-    ;
-
-RPAREN
-    : ')'
-    ;
-
-LBRACE
-    : '{'
-    ;
-
-RBRACE
-    : '}'
-    ;
-
-LBRACK
-    : '['
-    ;
-
-RBRACK
-    : ']'
-    ;
-
-SEMI
-    : ';'
-    ;
-
-COMMA
-    : ','
-    ;
-
-DOT
-    : '.'
-    ;
-
-ELLIPSIS
-    : '...'
-    ;
-
-AT
-    : '@'
-    ;
-
-COLONCOLON
-    : '::'
-    ;
-
-
-// §3.12 Operators
-
-ASSIGN
-    : '='
-    ;
-
-GT
-    : '>'
-    ;
-
-LT
-    : '<'
-    ;
-
-BANG
-    : '!'
-    ;
-
-TILDE
-    : '~'
-    ;
-
-QUESTION
-    : '?'
-    ;
-
-COLON
-    : ':'
-    ;
-
-ARROW
-    : '->'
-    ;
-
-EQUAL
-    : '=='
-    ;
-
-LE
-    : '<='
-    ;
-
-GE
-    : '>='
-    ;
-
-NOTEQUAL
-    : '!='
-    ;
-
-AND
-    : '&&'
-    ;
-
-OR
-    : '||'
-    ;
-
-INC
-    : '++'
-    ;
-
-DEC
-    : '--'
-    ;
-
-ADD
-    : '+'
-    ;
-
-SUB
-    : '-'
-    ;
-
-MUL
-    : '*'
-    ;
-
-DIV
-    : '/'
-    ;
-
-BITAND
-    : '&'
-    ;
-
-BITOR
-    : '|'
-    ;
-
-CARET
-    : '^'
-    ;
-
-MOD
-    : '%'
-    ;
-//LSHIFT : '<<';
-//RSHIFT : '>>';
-//URSHIFT : '>>>';
-
-ADD_ASSIGN
-    : '+='
-    ;
-
-SUB_ASSIGN
-    : '-='
-    ;
-
-MUL_ASSIGN
-    : '*='
-    ;
-
-DIV_ASSIGN
-    : '/='
-    ;
-
-AND_ASSIGN
-    : '&='
-    ;
-
-OR_ASSIGN
-    : '|='
-    ;
-
-XOR_ASSIGN
-    : '^='
-    ;
-
-MOD_ASSIGN
-    : '%='
-    ;
-
-LSHIFT_ASSIGN
-    : '<<='
-    ;
-
-RSHIFT_ASSIGN
-    : '>>='
-    ;
-
-URSHIFT_ASSIGN
-    : '>>>='
-    ;
-
-// §3.8 Identifiers (must appear after all keywords in the grammar)
-
-Identifier
-    : JavaLetter JavaLetterOrDigit*
-    ;
+fragment HexadecimalFloatingPointLiteral : HexSignificand BinaryExponent FloatTypeSuffix? ;
+fragment HexSignificand : HexNumeral '.'? | '0' [xX] HexDigits? '.' HexDigits ;
+fragment BinaryExponent : BinaryExponentIndicator SignedInteger ;
+fragment BinaryExponentIndicator : [pP] ;
+BooleanLiteral : 'true' | 'false' ;
+CharacterLiteral : '\'' SingleCharacter '\'' | '\'' EscapeSequence '\'' ;
+fragment SingleCharacter : ~['\\\r\n] ;
+StringLiteral : '"' StringCharacters? '"' ;
+fragment StringCharacters : StringCharacter+ ;
+fragment StringCharacter : ~["\\\r\n]|EscapeSequence ;
+fragment EscapeSequence : '\\' [btnfr"'\\]|OctalEscape|UnicodeEscape ;
+fragment OctalEscape : '\\' OctalDigit | '\\' OctalDigit OctalDigit | '\\' ZeroToThree OctalDigit OctalDigit ;
+fragment ZeroToThree : [0-3] ;
+fragment UnicodeEscape : '\\' 'u'+ HexDigit HexDigit HexDigit HexDigit ;
+NullLiteral : 'null' ;
+LPAREN : '(' ;
+RPAREN : ')' ;
+LBRACE : '{' ;
+RBRACE : '}' ;
+LBRACK : '[' ;
+RBRACK : ']' ;
+SEMI : ';' ;
+COMMA : ',' ;
+DOT : '.' ;
+ELLIPSIS : '...' ;
+AT : '@' ;
+COLONCOLON : '::' ;
+ASSIGN : '=' ;
+GT : '>' ;
+LT : '<' ;
+BANG : '!' ;
+TILDE : '~' ;
+QUESTION : '?' ;
+COLON : ':' ;
+ARROW : '->' ;
+EQUAL : '==' ;
+LE : '<=' ;
+GE : '>=' ;
+NOTEQUAL : '!=' ;
+AND : '&&' ;
+OR : '||' ;
+INC : '++' ;
+DEC : '--' ;
+ADD : '+' ;
+SUB : '-' ;
+MUL : '*' ;
+DIV : '/' ;
+BITAND : '&' ;
+BITOR : '|' ;
+CARET : '^' ;
+MOD : '%' ;
+ADD_ASSIGN : '+=' ;
+SUB_ASSIGN : '-=' ;
+MUL_ASSIGN : '*=' ;
+DIV_ASSIGN : '/=' ;
+AND_ASSIGN : '&=' ;
+OR_ASSIGN : '|=' ;
+XOR_ASSIGN : '^=' ;
+MOD_ASSIGN : '%=' ;
+LSHIFT_ASSIGN : '<<=' ;
+RSHIFT_ASSIGN : '>>=' ;
+URSHIFT_ASSIGN : '>>>=' ;
+Identifier : JavaLetter JavaLetterOrDigit* ;
 
 fragment
 JavaLetter
@@ -420,14 +195,6 @@ JavaLetterOrDigit
 // Whitespace and comments
 //
 
-WS
-    : [ \t\r\n\u000C]+ -> channel(HIDDEN)
-    ;
-
-COMMENT
-    : '/*' .*? '*/'                         -> channel(HIDDEN)
-    ;
-
-LINE_COMMENT
-    : '//' ~[\r\n]* -> channel(HIDDEN)
-    ;
+WS : [ \t\r\n\u000C]+ -> channel(HIDDEN) ;
+COMMENT : '/*' .*? '*/' -> channel(HIDDEN) ;
+LINE_COMMENT : '//' ~[\r\n]* -> channel(HIDDEN) ;
