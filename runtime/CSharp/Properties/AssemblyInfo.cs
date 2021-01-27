@@ -3,5 +3,7 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 using System;
+using System.Reflection;
 
 [assembly: CLSCompliant(true)]
+[assembly: AssemblyVersion("4.9.1")]
