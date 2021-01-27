@@ -12,7 +12,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        TARGET: [swift, cpp, dotnet]
+#        TARGET: [swift, cpp, dotnet] disabling dotnet which is unstable on M1
+        TARGET: [swift, cpp]
         GROUP: [LEXER, PARSER, RECURSION]
     steps:
     - uses: actions/checkout@v2
