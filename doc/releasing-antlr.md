@@ -461,6 +461,8 @@ popd
 
 ### Dart
 
+Install Dart SDK from https://dart.dev/get-dart
+
 Push to pub.dev
 
 ```bash
