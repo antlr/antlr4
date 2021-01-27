@@ -28,6 +28,6 @@ jobs:
       run: mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
     - name: Test with Maven
       run: arch -x86_64 .github/scripts/run-tests-${{ matrix.TARGET }}.sh
-      env: 
-        TARGET: ${{ matrix.TARGET }}
+      env:
         GROUP: ${{ matrix.GROUP }}
+        TARGET: ${{ matrix.TARGET }}
