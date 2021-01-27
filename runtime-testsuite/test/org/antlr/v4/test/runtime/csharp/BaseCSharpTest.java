@@ -224,6 +224,19 @@ public class BaseCSharpTest implements RuntimeTestSupport {
 
 	@Override
 	public String execParser(String grammarFileName,
+							String grammarStr,
+							String parserName,
+							String lexerName,
+							String listenerName,
+							String visitorName,
+							String startRuleName,
+							String input,
+							boolean showDiagnosticErrors) {
+		return execParser(grammarFileName, grammarStr, parserName, lexerName,
+						  listenerName, visitorName, startRuleName, input, showDiagnosticErrors, false);
+	}
+
+	public String execParser(String grammarFileName,
 							 String grammarStr,
 							 String parserName,
 							 String lexerName,
@@ -231,7 +244,9 @@ public class BaseCSharpTest implements RuntimeTestSupport {
 							 String visitorName,
 							 String startRuleName,
 							 String input,
-							 boolean showDiagnosticErrors) {
+							 boolean showDiagnosticErrors,
+							 boolean profile
+							 ) {
 		boolean success = rawGenerateRecognizer(grammarFileName,
 				grammarStr,
 				parserName,
@@ -242,7 +257,8 @@ public class BaseCSharpTest implements RuntimeTestSupport {
 		return rawExecRecognizer(parserName,
 				lexerName,
 				startRuleName,
-				showDiagnosticErrors);
+				showDiagnosticErrors,
+				profile);
 	}
 
 	/**
@@ -294,7 +310,9 @@ public class BaseCSharpTest implements RuntimeTestSupport {
 	protected String rawExecRecognizer(String parserName,
 									   String lexerName,
 									   String parserStartRuleName,
-									   boolean debug) {
+									   boolean debug,
+									   boolean profile
+									   ) {
 		this.stderrDuringParse = null;
 		if (parserName == null) {
 			writeLexerTestFile(lexerName, false);
@@ -302,7 +320,8 @@ public class BaseCSharpTest implements RuntimeTestSupport {
 			writeParserTestFile(parserName,
 					lexerName,
 					parserStartRuleName,
-					debug);
+					debug,
+					profile);
 		}
 
 		addSourceFiles("Test.cs");
@@ -482,13 +501,16 @@ public class BaseCSharpTest implements RuntimeTestSupport {
 	protected void writeParserTestFile(String parserName,
 									   String lexerName,
 									   String parserStartRuleName,
-									   boolean debug) {
+									   boolean debug,
+									   boolean profile
+					  ) {
 		ST outputFileST = new ST(
 				"using System;\n" +
 						"using Antlr4.Runtime;\n" +
 						"using Antlr4.Runtime.Tree;\n" +
 						"using System.IO;\n" +
 						"using System.Text;\n" +
+						"using System.Linq;\n" +
 						"\n" +
 						"public class Test {\n" +
 						"    public static void Main(string[] args) {\n" +
@@ -496,39 +518,30 @@ public class BaseCSharpTest implements RuntimeTestSupport {
 						"        using (FileStream fsOut = new FileStream(args[1], FileMode.Create, FileAccess.Write))\n" +
 						"        using (FileStream fsErr = new FileStream(args[2], FileMode.Create, FileAccess.Write))\n" +
 						"        using (TextWriter output = new StreamWriter(fsOut),\n" +
-						"                          errorOutput = new StreamWriter(fsErr)) {\n" +
-						"                <lexerName> lex = new <lexerName>(input, output, errorOutput);\n" +
-						"                CommonTokenStream tokens = new CommonTokenStream(lex);\n" +
-						"                <createParser>\n" +
-						"			 parser.BuildParseTree = true;\n" +
-						"                ParserRuleContext tree = parser.<parserStartRuleName>();\n" +
-						"                ParseTreeWalker.Default.Walk(new TreeShapeListener(), tree);\n" +
+						"            errorOutput = new StreamWriter(fsErr)) {\n" +
+						"            <lexerName> lex = new <lexerName>(input, output, errorOutput);\n" +
+						"            CommonTokenStream tokens = new CommonTokenStream(lex);\n" +
+						"            <createParser>\n" +
+						"            parser.BuildParseTree = true;\n" +
+						"            <if(profile)>parser.Profile = true;<endif>\n" +
+						"            ParserRuleContext tree = parser.<parserStartRuleName>();\n" +
+						"            <if(profile)>output.WriteLine(String.Join(\", \", parser.ParseInfo.getDecisionInfo().Select(d=>d.ToString())));<endif>\n" +
 						"        }\n" +
 						"    }\n" +
-						"}\n" +
-						"\n" +
-						"class TreeShapeListener : IParseTreeListener {\n" +
-						"	public void VisitTerminal(ITerminalNode node) { }\n" +
-						"	public void VisitErrorNode(IErrorNode node) { }\n" +
-						"	public void ExitEveryRule(ParserRuleContext ctx) { }\n" +
-						"\n" +
-						"	public void EnterEveryRule(ParserRuleContext ctx) {\n" +
-						"		for (int i = 0; i \\< ctx.ChildCount; i++) {\n" +
-						"			IParseTree parent = ctx.GetChild(i).Parent;\n" +
-						"			if (!(parent is IRuleNode) || ((IRuleNode)parent).RuleContext != ctx) {\n" +
-						"				throw new Exception(\"Invalid parse tree shape detected.\");\n" +
-						"			}\n" +
-						"		}\n" +
-						"	}\n" +
-						"}"
+						"}\n"
 		);
-		ST createParserST = new ST("        <parserName> parser = new <parserName>(tokens, output, errorOutput);\n");
+		ST createParserST = new ST("<parserName> parser = new <parserName>(tokens, output, errorOutput);\n");
 		if (debug) {
 			createParserST =
 					new ST(
-							"        <parserName> parser = new <parserName>(tokens, output, errorOutput);\n" +
-									"        parser.AddErrorListener(new DiagnosticErrorListener());\n");
+							"<parserName> parser = new <parserName>(tokens, output, errorOutput);\n" +
+							"            parser.AddErrorListener(new DiagnosticErrorListener());\n");
 		}
+		if (profile) {
+			outputFileST.add("profile", "true");
+		} else {outputFileST.add("profile", new ArrayList<Object>());
+		}
+
 		outputFileST.add("createParser", createParserST);
 		outputFileST.add("parserName", parserName);
 		outputFileST.add("lexerName", lexerName);
