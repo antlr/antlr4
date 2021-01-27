@@ -12,8 +12,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        GROUP: [LEXER, PARSER, RECURSION]
         TARGET: [swift, cpp, dotnet]
+        GROUP: [LEXER, PARSER, RECURSION]
     steps:
     - uses: actions/checkout@v2
     - name: Set up JDK 1.8
@@ -29,5 +29,5 @@ jobs:
     - name: Test with Maven
       run: arch -x86_64 .github/scripts/run-tests-${{ matrix.TARGET }}.sh
       env:
-        GROUP: ${{ matrix.GROUP }}
         TARGET: ${{ matrix.TARGET }}
+        GROUP: ${{ matrix.GROUP }}
