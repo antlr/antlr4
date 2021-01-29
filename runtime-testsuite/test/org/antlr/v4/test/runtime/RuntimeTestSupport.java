@@ -14,13 +14,16 @@ package org.antlr.v4.test.runtime;
  *  @since 4.6
  */
 public interface RuntimeTestSupport {
-	void testSetUp() throws Exception;
-	void testTearDown() throws Exception;
+
+	String getTempDirPath();
 	void eraseTempDir();
 
-	String getTmpDir();
+    void testSetUp() throws Exception;
+	void testTearDown() throws Exception;
 
-	String getStdout();
+	void beforeTest(RuntimeTestDescriptor descriptor);
+	void afterTest(RuntimeTestDescriptor descriptor);
+
 	String getParseErrors();
 	String getANTLRToolErrors();
 
@@ -40,6 +43,4 @@ public interface RuntimeTestSupport {
 	                  String input,
 	                  boolean showDiagnosticErrors);
 
-    void beforeTest(RuntimeTestDescriptor descriptor);
-	void afterTest(RuntimeTestDescriptor descriptor);
 }

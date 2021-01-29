@@ -7,10 +7,7 @@
 package org.antlr.v4.test.runtime.swift;
 
 import org.antlr.v4.runtime.misc.Pair;
-import org.antlr.v4.test.runtime.ErrorQueue;
-import org.antlr.v4.test.runtime.RuntimeTestDescriptor;
-import org.antlr.v4.test.runtime.RuntimeTestSupport;
-import org.antlr.v4.test.runtime.StreamVacuum;
+import org.antlr.v4.test.runtime.*;
 import org.junit.rules.TestRule;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
@@ -28,7 +25,7 @@ import static org.antlr.v4.test.runtime.BaseRuntimeTest.mkdir;
 import static org.antlr.v4.test.runtime.BaseRuntimeTest.writeFile;
 import static org.junit.Assert.assertTrue;
 
-public class BaseSwiftTest implements RuntimeTestSupport {
+public class BaseSwiftTest extends BaseRuntimeTestSupport implements RuntimeTestSupport {
 
 	private static final boolean USE_ARCH_ARM64 = false;
 	private static final boolean VERBOSE = false;
@@ -81,91 +78,16 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 		});
 	}
 
-	public String tmpdir = null;
-
-	/**
-	 * If error during parser execution, store stderr here; can't return
-	 * stdout and stderr.  This doesn't trap errors from running antlr.
-	 */
-	private String stderrDuringParse;
-
-	/**
-	 * Errors found while running antlr
-	 */
-	private StringBuilder antlrToolErrors;
+	@Override
+	protected String getPropertyPrefix() {
+		return "antrl4-swift";
+	}
 
 	/**
 	 * Source files used in each small swift project.
 	 */
 	private final Set<String> sourceFiles = new HashSet<>();
 
-	@org.junit.Rule
-	public final TestRule testWatcher = new TestWatcher() {
-
-		@Override
-		protected void succeeded(Description description) {
-			// remove tmpdir if no error.
-			eraseTempDir();
-		}
-
-	};
-
-	@Override
-	public void testSetUp() throws Exception {
-		// new output dir for each test
-		String propName = "antlr-swift-test-dir";
-		String prop = System.getProperty(propName);
-		if (prop != null && prop.length() > 0) {
-			tmpdir = prop;
-		}
-		else {
-			String classSimpleName = getClass().getSimpleName();
-			String threadName = Thread.currentThread().getName();
-			String childPath = String.format("%s-%s-%s", classSimpleName, threadName, System.currentTimeMillis());
-			tmpdir = new File(System.getProperty("java.io.tmpdir"), childPath).getAbsolutePath();
-		}
-		antlrToolErrors = new StringBuilder();
-	}
-
-	@Override
-	public void testTearDown() throws Exception {
-	}
-
-	@Override
-	public void beforeTest(RuntimeTestDescriptor descriptor) {
-		System.out.println(descriptor.getTestName());
-	}
-
-	@Override
-	public void afterTest(RuntimeTestDescriptor descriptor) {
-	}
-
-	@Override
-	public void eraseTempDir() {
-	}
-
-	@Override
-	public String getTmpDir() {
-		return tmpdir;
-	}
-
-	@Override
-	public String getStdout() {
-		return null;
-	}
-
-	@Override
-	public String getParseErrors() {
-		return stderrDuringParse;
-	}
-
-	@Override
-	public String getANTLRToolErrors() {
-		if (antlrToolErrors.length() == 0) {
-			return null;
-		}
-		return antlrToolErrors.toString();
-	}
 
 	@Override
 	public String execLexer(String grammarFileName, String grammarStr, String lexerName, String input, boolean showDFA) {
@@ -173,12 +95,12 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 				grammarStr,
 				null,
 				lexerName);
-		writeFile(tmpdir, "input", input);
+		writeFile(getTempDirPath(), "input", input);
 		writeLexerTestFile(lexerName, showDFA);
 		addSourceFiles("main.swift");
 
 		String projectName = "testcase-" + System.currentTimeMillis();
-		String projectDir = getTmpDir() + "/" + projectName;
+		String projectDir = new File(getTempDir(), projectName).getAbsolutePath();
 		try {
 			buildProject(projectDir, projectName);
 			return execTest(projectDir, projectName);
@@ -196,7 +118,7 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 				parserName,
 				lexerName,
 				"-visitor");
-		writeFile(getTmpDir(), "input", input);
+		writeFile(getTempDirPath(), "input", input);
 		return execParser(parserName,
 				lexerName,
 				startRuleName,
@@ -207,7 +129,7 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 		try {
 			Pair<String, String> output = runProcess(projectDir, "./.build/debug/" + projectName, "input");
 			if (output.b.length() > 0) {
-				stderrDuringParse = output.b;
+				setParseErrors(output.b);
 			}
 			String stdout = output.a;
 			return stdout.length() > 0 ? stdout : null;
@@ -227,10 +149,10 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 		mkdir(projectDir);
 		fastFailRunProcess(projectDir, SWIFT_CMD, "package", "init", "--type", "executable");
 		for (String sourceFile: sourceFiles) {
-			String absPath = getTmpDir() + "/" + sourceFile;
-			fastFailRunProcess(getTmpDir(), "mv", "-f", absPath, projectDir + "/Sources/" + projectName);
+			String absPath = new File(getTempDir(), sourceFile).getAbsolutePath();
+			fastFailRunProcess(getTempDirPath(), "mv", "-f", absPath, projectDir + "/Sources/" + projectName);
 		}
-		fastFailRunProcess(getTmpDir(), "mv", "-f", "input", projectDir);
+		fastFailRunProcess(getTempDirPath(), "mv", "-f", "input", projectDir);
 		String dylibPath = ANTLR_RUNTIME_PATH + "/.build/debug/";
 //		System.err.println(dylibPath);
 		Pair<String, String> buildResult = runProcess(projectDir, SWIFT_CMD, "build",
@@ -356,7 +278,7 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 
 		addSourceFiles("main.swift");
 		String projectName = "testcase-" + System.currentTimeMillis();
-		String projectDir = getTmpDir() + "/" + projectName;
+		String projectDir = new File(getTempDir(), projectName).getAbsolutePath();
 		try {
 			buildProject(projectDir, projectName);
 			return execTest(projectDir, projectName);
@@ -421,7 +343,7 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 		outputFileST.add("parserName", parserName);
 		outputFileST.add("lexerName", lexerName);
 		outputFileST.add("parserStartRuleName", parserStartRuleName);
-		writeFile(tmpdir, "main.swift", outputFileST.render());
+		writeFile(getTempDirPath(), "main.swift", outputFileST.render());
 	}
 
 	private void writeLexerTestFile(String lexerName, boolean showDFA) {
@@ -443,7 +365,7 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 						(showDFA ? "print(lex.getInterpreter().getDFA(Lexer.DEFAULT_MODE).toLexerString(), terminator: \"\" )\n" : ""));
 
 		outputFileST.add("lexerName", lexerName);
-		writeFile(tmpdir, "main.swift", outputFileST.render());
+		writeFile(getTempDirPath(), "main.swift", outputFileST.render());
 	}
 
 	/**
@@ -454,7 +376,7 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 								String parserName,
 								String lexerName,
 								String... extraOptions) {
-		ErrorQueue equeue = antlrOnString(getTmpDir(), "Swift", grammarFileName, grammarStr, false, extraOptions);
+		ErrorQueue equeue = antlrOnString(getTempDirPath(), "Swift", grammarFileName, grammarStr, false, extraOptions);
 		assertTrue(equeue.errors.isEmpty());
 //		System.out.println(getTmpDir());
 
@@ -480,4 +402,5 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 		}
 		addSourceFiles(files.toArray(new String[0]));
 	}
+
 }

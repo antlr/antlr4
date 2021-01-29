@@ -159,7 +159,7 @@ public abstract class BaseRuntimeTest {
 	}
 
 	public void testParser(RuntimeTestDescriptor descriptor) throws Exception {
-		mkdir(delegate.getTmpDir());
+		mkdir(delegate.getTempDirPath());
 
 		Pair<String, String> pair = descriptor.getGrammar();
 
@@ -176,7 +176,7 @@ public abstract class BaseRuntimeTest {
 				g.registerRenderer(String.class, new StringRenderer());
 				g.importTemplates(targetTemplates);
 				ST grammarST = new ST(g, spair.b);
-				writeFile(delegate.getTmpDir(), spair.a+".g4", grammarST.render());
+				writeFile(delegate.getTempDirPath(), spair.a+".g4", grammarST.render());
 			}
 		}
 
@@ -201,7 +201,7 @@ public abstract class BaseRuntimeTest {
 	}
 
 	public void testLexer(RuntimeTestDescriptor descriptor) throws Exception {
-		mkdir(delegate.getTmpDir());
+		mkdir(delegate.getTempDirPath());
 
 		Pair<String, String> pair = descriptor.getGrammar();
 
@@ -218,7 +218,7 @@ public abstract class BaseRuntimeTest {
 				g.registerRenderer(String.class, new StringRenderer());
 				g.importTemplates(targetTemplates);
 				ST grammarST = new ST(g, spair.b);
-				writeFile(delegate.getTmpDir(), spair.a+".g4", grammarST.render());
+				writeFile(delegate.getTempDirPath(), spair.a+".g4", grammarST.render());
 			}
 		}
 
