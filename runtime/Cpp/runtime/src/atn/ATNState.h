@@ -81,8 +81,15 @@ namespace atn {
 
     ATNState& operator=(ATNState const&) = delete;
 
-    static const size_t INITIAL_NUM_TRANSITIONS = 4;
-    static const size_t INVALID_STATE_NUMBER = static_cast<size_t>(-1); // std::numeric_limits<size_t>::max();
+#if __cplusplus >= 201703L
+    static constexpr size_t INITIAL_NUM_TRANSITIONS = 4;
+    static constexpr size_t INVALID_STATE_NUMBER = std::numeric_limits<size_t>::max();
+#else
+    enum : size_t {
+      INITIAL_NUM_TRANSITIONS = 4,
+      INVALID_STATE_NUMBER = static_cast<size_t>(-1), // std::numeric_limits<size_t>::max(); doesn't work in VS 2013
+    };
+#endif
 
     enum {
       ATN_INVALID_TYPE = 0,

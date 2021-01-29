@@ -321,7 +321,16 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	}
 
 	void checkNumRules(GrammarAST rulesNode) {
-		if ( rulesNode.getChildCount()==0 ) {
+		Boolean emptyGrammar = true;
+
+		for (Rule rule : ruleCollector.rules.values()) {
+			if (!rule.isFragment()) {
+				emptyGrammar = false;
+				break;
+			}
+		}
+
+		if (emptyGrammar) {
 			GrammarAST root = (GrammarAST)rulesNode.getParent();
 			GrammarAST IDNode = (GrammarAST)root.getChild(0);
 			g.tool.errMgr.grammarError(ErrorType.NO_RULES, g.fileName,

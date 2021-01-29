@@ -35,6 +35,7 @@ import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.test.runtime.ErrorQueue;
+import org.antlr.v4.test.runtime.RuntimeTestDescriptor;
 import org.antlr.v4.test.runtime.RuntimeTestSupport;
 import org.antlr.v4.test.runtime.StreamVacuum;
 import org.antlr.v4.tool.ANTLRMessage;
@@ -43,6 +44,9 @@ import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.GrammarSemanticsMessage;
 import org.antlr.v4.tool.LexerGrammar;
 import org.antlr.v4.tool.Rule;
+import org.junit.rules.TestRule;
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupString;
@@ -88,6 +92,17 @@ public class BaseCppTest implements RuntimeTestSupport {
 	/** Errors found while running antlr */
 	protected StringBuilder antlrToolErrors;
 
+	@org.junit.Rule
+	public final TestRule testWatcher = new TestWatcher() {
+
+		@Override
+		protected void succeeded(Description description) {
+			// remove tmpdir if no error.
+			eraseTempDir();
+		}
+
+	};
+
 	private String getPropertyPrefix() {
 		return "antlr-" + getLanguage().toLowerCase();
 	}
@@ -109,6 +124,15 @@ public class BaseCppTest implements RuntimeTestSupport {
 
 	@Override
 	public void testTearDown() throws Exception {
+	}
+
+	@Override
+	public void beforeTest(RuntimeTestDescriptor descriptor) {
+		System.out.println(descriptor.getTestName());
+	}
+
+	@Override
+	public void afterTest(RuntimeTestDescriptor descriptor) {
 	}
 
 	@Override
@@ -510,7 +534,7 @@ public class BaseCppTest implements RuntimeTestSupport {
 	}
 
 	private String runProcess(ProcessBuilder builder, String description, boolean showStderr) throws Exception {
-//		System.out.println("BUILDER: "+builder.command());
+		// System.out.println("BUILDER: " + builder.command() + " @ " + builder.directory().toString());
 		Process process = builder.start();
 		StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
 		StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
@@ -688,7 +712,7 @@ public class BaseCppTest implements RuntimeTestSupport {
 			p = Paths.get(runtimeURL.toURI()).toFile().toString();
 		}
 		catch (URISyntaxException use) {
-			p = "Can't find runtime";
+			p = "Can't find runtime at " + runtimeURL.toString();
 		}
 		return p;
 	}
@@ -963,18 +987,24 @@ public class BaseCppTest implements RuntimeTestSupport {
 
 	@Override
 	public void eraseTempDir() {
-		boolean doErase = true;
-		String propName = getPropertyPrefix() + "-erase-test-dir";
-		String prop = System.getProperty(propName);
-		if(prop!=null && prop.length()>0)
-			doErase = Boolean.getBoolean(prop);
-		if(doErase) {
+		if (shouldEraseTempDir()) {
 			File tmpdirF = new File(tmpdir);
-			if ( tmpdirF.exists() ) {
+			if (tmpdirF.exists()) {
 				eraseFiles(tmpdirF);
 				tmpdirF.delete();
 			}
 		}
+	}
+
+	private boolean shouldEraseTempDir() {
+		if(tmpdir==null)
+			return false;
+		String propName = getPropertyPrefix() + "-erase-test-dir";
+		String prop = System.getProperty(propName);
+		if (prop != null && prop.length() > 0)
+			return Boolean.getBoolean(prop);
+		else
+			return true;
 	}
 
 	public String getFirstLineOfException() {
@@ -1128,3 +1158,4 @@ public class BaseCppTest implements RuntimeTestSupport {
 		return dup;
 	}
 }
+

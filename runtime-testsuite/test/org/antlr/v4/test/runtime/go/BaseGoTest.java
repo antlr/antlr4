@@ -32,6 +32,7 @@ import org.antlr.v4.runtime.misc.IntegerList;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.test.runtime.ErrorQueue;
+import org.antlr.v4.test.runtime.RuntimeTestDescriptor;
 import org.antlr.v4.test.runtime.RuntimeTestSupport;
 import org.antlr.v4.test.runtime.StreamVacuum;
 import org.antlr.v4.tool.ANTLRMessage;
@@ -40,6 +41,9 @@ import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.GrammarSemanticsMessage;
 import org.antlr.v4.tool.LexerGrammar;
 import org.antlr.v4.tool.Rule;
+import org.junit.rules.TestRule;
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupString;
@@ -85,6 +89,17 @@ public class BaseGoTest implements RuntimeTestSupport {
 	/** Errors found while running antlr */
 	protected StringBuilder antlrToolErrors;
 
+	@org.junit.Rule
+	public final TestRule testWatcher = new TestWatcher() {
+
+		@Override
+		protected void succeeded(Description description) {
+			// remove tmpdir if no error.
+			eraseTempDir();
+		}
+
+	};
+
 	/**
 	 * Copies all files from go runtime to a temporary folder that is inside a valid GOPATH project structure.
 	 */
@@ -118,6 +133,14 @@ public class BaseGoTest implements RuntimeTestSupport {
 
 	@Override
 	public void testTearDown() throws Exception {
+	}
+
+	@Override
+	public void beforeTest(RuntimeTestDescriptor descriptor) {
+	}
+
+	@Override
+	public void afterTest(RuntimeTestDescriptor descriptor) {
 	}
 
 	@Override
@@ -798,16 +821,22 @@ public class BaseGoTest implements RuntimeTestSupport {
 	}
 
 	public void eraseTempDir() {
-		boolean doErase = true;
-		String propName = "antlr-go-erase-test-dir";
-		String prop = System.getProperty(propName);
-		if (prop != null && prop.length() > 0)
-			doErase = Boolean.getBoolean(prop);
-		if (doErase) {
+		if (shouldEraseTempDir()) {
 			if ( overall_tmpdir.exists()) {
 				eraseDirectory(overall_tmpdir);
 			}
 		}
+	}
+
+	private boolean shouldEraseTempDir() {
+		if(overall_tmpdir==null)
+			return false;
+		String propName = "antlr-go-erase-test-dir";
+		String prop = System.getProperty(propName);
+		if (prop != null && prop.length() > 0)
+			return Boolean.getBoolean(prop);
+		else
+			return true;
 	}
 
 	public String getFirstLineOfException() {

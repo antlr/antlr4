@@ -8,6 +8,9 @@ package org.antlr.v4.test.runtime.python3;
 import org.antlr.v4.test.runtime.python.BasePythonTest;
 import org.stringtemplate.v4.ST;
 
+import java.util.Arrays;
+import java.util.List;
+
 import static org.antlr.v4.test.runtime.BaseRuntimeTest.writeFile;
 
 public class BasePython3Test extends BasePythonTest {
@@ -18,9 +21,9 @@ public class BasePython3Test extends BasePythonTest {
 	}
 
 	@Override
-	protected String getPythonExecutable() {
-		return "python3.7";
-	} // force 3.7
+	protected List<String> getPythonExecutables() {
+		return Arrays.asList("python3.7", "python3.8");
+	} // force 3.7 or 3.8
 
 	@Override
 	protected void writeLexerTestFile(String lexerName, boolean showDFA) {

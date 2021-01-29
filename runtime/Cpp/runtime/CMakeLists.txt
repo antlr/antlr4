@@ -1,4 +1,19 @@
 
+include(${CMAKE_ROOT}/Modules/ExternalProject.cmake)
+
+set(THIRDPARTY_DIR ${CMAKE_BINARY_DIR}/runtime/thirdparty)
+set(UTFCPP_DIR ${THIRDPARTY_DIR}/utfcpp)
+ExternalProject_Add(
+  utfcpp
+  GIT_REPOSITORY        "git://github.com/nemtrif/utfcpp"
+  GIT_TAG               "v3.1.1"
+  SOURCE_DIR            ${UTFCPP_DIR}
+  UPDATE_DISCONNECTED   1
+  CMAKE_ARGS            -DCMAKE_INSTALL_PREFIX=${UTFCPP_DIR}/install -Dgtest_force_shared_crt=ON
+  TEST_AFTER_INSTALL    1
+  STEP_TARGETS          build)
+
+
 include_directories(
   ${PROJECT_SOURCE_DIR}/runtime/src
   ${PROJECT_SOURCE_DIR}/runtime/src/atn
@@ -8,6 +23,8 @@ include_directories(
   ${PROJECT_SOURCE_DIR}/runtime/src/tree
   ${PROJECT_SOURCE_DIR}/runtime/src/tree/pattern
   ${PROJECT_SOURCE_DIR}/runtime/src/tree/xpath
+  ${UTFCPP_DIR}/install/include/utf8cpp
+  ${UTFCPP_DIR}/install/include/utf8cpp/utf8
 )
 
 
@@ -33,8 +50,8 @@ add_custom_target(make_lib_output_dir ALL
     COMMAND ${CMAKE_COMMAND} -E make_directory ${LIB_OUTPUT_DIR}
     )
 
-add_dependencies(antlr4_shared make_lib_output_dir)
-add_dependencies(antlr4_static make_lib_output_dir)
+add_dependencies(antlr4_shared make_lib_output_dir utfcpp)
+add_dependencies(antlr4_static make_lib_output_dir utfcpp)
 
 if(CMAKE_SYSTEM_NAME MATCHES "Linux")
   target_link_libraries(antlr4_shared ${UUID_LIBRARIES})
@@ -102,15 +119,23 @@ set_target_properties(antlr4_static
                                  COMPILE_FLAGS "${disabled_compile_warnings} ${extra_static_compile_flags}")
 
 install(TARGETS antlr4_shared
-        DESTINATION lib 
+        DESTINATION lib
         EXPORT antlr4-targets)
 install(TARGETS antlr4_static
         DESTINATION lib
         EXPORT antlr4-targets)
 
-install(DIRECTORY "${PROJECT_SOURCE_DIR}/runtime/src/" 
+install(DIRECTORY "${PROJECT_SOURCE_DIR}/runtime/src/"
         DESTINATION "include/antlr4-runtime"
-        COMPONENT dev 
+        COMPONENT dev
+        FILES_MATCHING PATTERN "*.h"
+        )
+
+install(FILES "${UTFCPP_DIR}/source/utf8.h"
+        DESTINATION "include/antlr4-runtime")
+install(DIRECTORY "${UTFCPP_DIR}/source/utf8"
+        DESTINATION "include/antlr4-runtime"
+        COMPONENT dev
         FILES_MATCHING PATTERN "*.h"
         )
 

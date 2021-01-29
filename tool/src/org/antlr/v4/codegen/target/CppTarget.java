@@ -47,10 +47,11 @@ public class CppTarget extends Target {
 
 	public CppTarget(CodeGenerator gen) {
 		super(gen, "Cpp");
+		targetCharValueEscape['?'] = "\\?";
 	}
 
 	public String getVersion() {
-		return "4.8";
+		return "4.9.1";
 	}
 
     public boolean needsHeader() { return true; }
@@ -67,6 +68,18 @@ public class CppTarget extends Target {
 		badWords.addAll(Arrays.asList(cppKeywords));
 		badWords.add("rule");
 		badWords.add("parserRule");
+	}
+
+  @Override
+	protected boolean shouldUseUnicodeEscapeForCodePointInDoubleQuotedString(int codePoint) {
+		if (codePoint == '?') {
+			// in addition to the default escaped code points, also escape ? to prevent trigraphs
+			// ideally, we would escape ? with \?, but escaping as unicode \u003F works as well
+			return true;
+		}
+		else {
+			return super.shouldUseUnicodeEscapeForCodePointInDoubleQuotedString(codePoint);
+		}
 	}
 
 	@Override

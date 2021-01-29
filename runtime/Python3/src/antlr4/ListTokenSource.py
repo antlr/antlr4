@@ -18,6 +18,7 @@ from antlr4.Token import Token
 
 
 class ListTokenSource(TokenSource):
+    __slots__ = ('tokens', 'sourceName', 'pos', 'eofToken', '_factory')
 
     # Constructs a new {@link ListTokenSource} instance from the specified
     # collection of {@link Token} objects and source name.

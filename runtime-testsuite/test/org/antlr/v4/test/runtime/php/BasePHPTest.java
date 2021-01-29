@@ -25,10 +25,14 @@ import org.antlr.v4.runtime.atn.ATNDeserializer;
 import org.antlr.v4.runtime.atn.ATNSerializer;
 import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.test.runtime.ErrorQueue;
+import org.antlr.v4.test.runtime.RuntimeTestDescriptor;
 import org.antlr.v4.test.runtime.RuntimeTestSupport;
 import org.antlr.v4.test.runtime.StreamVacuum;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
+import org.junit.rules.TestRule;
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
 import org.stringtemplate.v4.ST;
 
 import static org.antlr.v4.test.runtime.BaseRuntimeTest.antlrOnString;
@@ -51,6 +55,17 @@ public class BasePHPTest implements RuntimeTestSupport {
 	 * Errors found while running antlr
 	 */
 	protected StringBuilder antlrToolErrors;
+
+	@org.junit.Rule
+	public final TestRule testWatcher = new TestWatcher() {
+
+		@Override
+		protected void succeeded(Description description) {
+			// remove tmpdir if no error.
+			eraseTempDir();
+		}
+
+	};
 
 	private String getPropertyPrefix() {
 		return "antlr-php";
@@ -76,6 +91,14 @@ public class BasePHPTest implements RuntimeTestSupport {
 
 	@Override
 	public void testTearDown() throws Exception {
+	}
+
+	@Override
+	public void beforeTest(RuntimeTestDescriptor descriptor) {
+	}
+
+	@Override
+	public void afterTest(RuntimeTestDescriptor descriptor) {
 	}
 
 	@Override
@@ -558,19 +581,24 @@ public class BasePHPTest implements RuntimeTestSupport {
 
 	@Override
 	public void eraseTempDir() {
-		boolean doErase = true;
-		String propName = getPropertyPrefix() + "-erase-test-dir";
-		String prop = System.getProperty(propName);
-		if (prop != null && prop.length() > 0) {
-			doErase = Boolean.getBoolean(prop);
-		}
-		if (doErase) {
+		if (shouldEraseTempDir()) {
 			File tmpdirF = new File(tmpdir);
 			if (tmpdirF.exists()) {
 				eraseFiles(tmpdirF);
 				tmpdirF.delete();
 			}
 		}
+	}
+
+	private boolean shouldEraseTempDir() {
+		if(tmpdir==null)
+			return false;
+		String propName = getPropertyPrefix() + "-erase-test-dir";
+		String prop = System.getProperty(propName);
+		if (prop != null && prop.length() > 0)
+			return Boolean.getBoolean(prop);
+		else
+			return true;
 	}
 
 	/**

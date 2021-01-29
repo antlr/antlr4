@@ -18,7 +18,7 @@ XPathRuleElement::XPathRuleElement(const std::string &ruleName, size_t ruleIndex
 std::vector<ParseTree *> XPathRuleElement::evaluate(ParseTree *t) {
   // return all children of t that match nodeName
   std::vector<ParseTree *> nodes;
-  for (auto c : t->children) {
+  for (auto *c : t->children) {
     if (antlrcpp::is<ParserRuleContext *>(c)) {
       ParserRuleContext *ctx = dynamic_cast<ParserRuleContext *>(c);
       if ((ctx->getRuleIndex() == _ruleIndex && !_invert) || (ctx->getRuleIndex() != _ruleIndex && _invert)) {

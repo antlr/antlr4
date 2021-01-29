@@ -16,7 +16,7 @@ std::string Arrays::listToString(const std::vector<std::string> &list, const std
   bool firstEntry = true;
 
   ss << '[';
-  for (auto &entry : list) {
+  for (const auto &entry : list) {
     ss << entry;
     if (firstEntry) {
       ss << separator;
@@ -32,7 +32,7 @@ template <>
 std::string Arrays::toString(const std::vector<antlr4::tree::ParseTree*> &source) {
   std::string result = "[";
   bool firstEntry = true;
-  for (auto value : source) {
+  for (auto *value : source) {
     result += value->toStringTree();
     if (firstEntry) {
       result += ", ";

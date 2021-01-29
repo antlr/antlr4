@@ -34,10 +34,7 @@ import org.antlr.v4.runtime.misc.IntegerList;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.semantics.SemanticPipeline;
-import org.antlr.v4.test.runtime.ErrorQueue;
-import org.antlr.v4.test.runtime.RuntimeTestSupport;
-import org.antlr.v4.test.runtime.StreamVacuum;
-import org.antlr.v4.test.runtime.TestOutputReading;
+import org.antlr.v4.test.runtime.*;
 import org.antlr.v4.tool.ANTLRMessage;
 import org.antlr.v4.tool.DOTGenerator;
 import org.antlr.v4.tool.Grammar;
@@ -123,6 +120,14 @@ public abstract class BasePythonTest implements RuntimeTestSupport {
 
 	@Override
 	public void testTearDown() throws Exception {
+	}
+
+	@Override
+	public void beforeTest(RuntimeTestDescriptor descriptor) {
+	}
+
+	@Override
+	public void afterTest(RuntimeTestDescriptor descriptor) {
 	}
 
 	@Override
@@ -513,31 +518,33 @@ public abstract class BasePythonTest implements RuntimeTestSupport {
 		return null;
 	}
 
-	private String locateTool(String tool) {
+	private String locateTool(List<String> tools) {
 		String[] roots = {
 			"/opt/local/bin", "/usr/bin/", "/usr/local/bin/",
 		    "/Users/"+System.getProperty("user.name")+"/anaconda3/bin/"
 		};
 		for(String root : roots) {
-			if(new File(root + tool).exists()) {
-				return root+tool;
+			for (String tool : tools) {
+				if ( new File(root+tool).exists() ) {
+					return root+tool;
+				}
 			}
 		}
-		throw new RuntimeException("Could not locate " + tool);
+		throw new RuntimeException("Could not locate " + tools);
 	}
 
 	protected String locatePython() {
 		String propName = getPropertyPrefix() + "-python";
 		String prop = System.getProperty(propName);
 		if(prop==null || prop.length()==0)
-			prop = locateTool(getPythonExecutable());
+			prop = locateTool(getPythonExecutables());
 		File file = new File(prop);
 		if(!file.exists())
 			throw new RuntimeException("Missing system property:" + propName);
 		return file.getAbsolutePath();
 	}
 
-	protected abstract String getPythonExecutable();
+	protected abstract List<String> getPythonExecutables();
 
 	protected String locateRuntime() { return locateRuntime(getLanguage()); }
 
@@ -786,18 +793,24 @@ public abstract class BasePythonTest implements RuntimeTestSupport {
 
 	@Override
 	public void eraseTempDir() {
-		boolean doErase = true;
-		String propName = getPropertyPrefix() + "-erase-test-dir";
-		String prop = System.getProperty(propName);
-		if(prop!=null && prop.length()>0)
-			doErase = Boolean.getBoolean(prop);
-		if(doErase) {
+		if(shouldEraseTempDir()) {
 			File tmpdirF = new File(tmpdir);
 			if ( tmpdirF.exists() ) {
 				eraseFiles(tmpdirF);
 				tmpdirF.delete();
 			}
 		}
+	}
+
+	private boolean shouldEraseTempDir() {
+		if(tmpdir==null)
+			return false;
+		String propName = getPropertyPrefix() + "-erase-test-dir";
+		String prop = System.getProperty(propName);
+		if (prop != null && prop.length() > 0)
+			return Boolean.getBoolean(prop);
+		else
+			return true;
 	}
 
 	protected void eraseTempPyCache() {

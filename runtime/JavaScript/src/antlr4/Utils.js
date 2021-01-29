@@ -66,11 +66,11 @@ String.prototype.hashCode = function () {
 };
 
 function standardEqualsFunction(a, b) {
-    return a.equals(b);
+    return a ? a.equals(b) : a==b;
 }
 
 function standardHashCodeFunction(a) {
-    return a.hashCode();
+    return a ? a.hashCode() : -1;
 }
 
 class Set {
@@ -423,14 +423,14 @@ function titleCase(str) {
 function equalArrays(a, b) {
     if (!Array.isArray(a) || !Array.isArray(b))
         return false;
-    if (a == b)
+    if (a === b)
         return true;
-    if (a.length != b.length)
+    if (a.length !== b.length)
         return false;
     for (let i = 0; i < a.length; i++) {
-        if (a[i] == b[i])
+        if (a[i] === b[i])
             continue;
-        if (!a[i].equals(b[i]))
+        if (!a[i].equals || !a[i].equals(b[i]))
             return false;
     }
     return true;

@@ -132,7 +132,9 @@ class <parser.name> ( <if(superClass)><superClass><else>Parser<endif> ):
 
     symbolicNames = [ <parser.symbolicNames:{t | u<t>}; null="u\"\<INVALID>\"", separator=", ", wrap, anchor> ]
 
+    <if(parser.rules)>
     <parser.rules:{r | RULE_<r.name> = <r.index>}; separator="\n", wrap, anchor>
+    <endif>
 
     ruleNames =  [ <parser.ruleNames:{r | u"<r>"}; separator=", ", wrap, anchor> ]
 
@@ -520,9 +522,8 @@ if not <chunks>:
 >>
 
 ExceptionClause(e, catchArg, catchAction) ::= <<
-catch (<catchArg>) {
+except <catchArg>:
     <catchAction>
-}
 >>
 
 // lexer actions are not associated with model objects
@@ -552,10 +553,10 @@ TokenLabelType() ::= "<file.TokenLabelType; null={Token}>"
 InputSymbolType() ::= "<file.InputSymbolType; null={Token}>"
 
 TokenPropertyRef_text(t) ::= "(None if <ctx(t)>.<t.label> is None else <ctx(t)>.<t.label>.text)"
-TokenPropertyRef_type(t) ::= "(0 if <ctx(t)>.<t.label> is None else <ctx(t)>.<t.label>.type()"
+TokenPropertyRef_type(t) ::= "(0 if <ctx(t)>.<t.label> is None else <ctx(t)>.<t.label>.type)"
 TokenPropertyRef_line(t) ::= "(0 if <ctx(t)>.<t.label> is None else <ctx(t)>.<t.label>.line)"
 TokenPropertyRef_pos(t) ::= "(0 if <ctx(t)>.<t.label> is None else <ctx(t)>.<t.label>.column)"
-TokenPropertyRef_channel(t) ::= "(0 if (<ctx(t)>.<t.label> is None else <ctx(t)>.<t.label>.channel)"
+TokenPropertyRef_channel(t) ::= "(0 if <ctx(t)>.<t.label> is None else <ctx(t)>.<t.label>.channel)"
 TokenPropertyRef_index(t) ::= "(0 if <ctx(t)>.<t.label> is None else <ctx(t)>.<t.label>.tokenIndex)"
 TokenPropertyRef_int(t) ::= "(0 if <ctx(t)>.<t.label> is None else int(<ctx(t)>.<t.label>.text))"
 
@@ -571,8 +572,8 @@ ThisRulePropertyRef_text(r)	 ::= "self._input.getText(localctx.start, self._inpu
 ThisRulePropertyRef_ctx(r)	 ::= "localctx"
 ThisRulePropertyRef_parser(r)	 ::= "self"
 
-NonLocalAttrRef(s)		 	 ::= "getInvokingContext(<s.ruleIndex>).<s.name>"
-SetNonLocalAttr(s, rhsChunks)  ::= "getInvokingContext(<s.ruleIndex>).<s.name> = <rhsChunks>"
+NonLocalAttrRef(s)		 	 ::= "self.getInvokingContext(<s.ruleIndex>).<s.name>"
+SetNonLocalAttr(s, rhsChunks)  ::= "self.getInvokingContext(<s.ruleIndex>).<s.name> = <rhsChunks>"
 
 AddToLabelList(a) ::= "<ctx(a.label)>.<a.listName>.append(<labelref(a.label)>)"
 
@@ -776,7 +777,9 @@ class <lexer.name>(<if(superClass)><superClass><else>Lexer<endif>):
     <rest(lexer.modes):{m| <m> = <i>}; separator="\n">
 
 <endif>
+    <if(lexer.tokens)>
     <lexer.tokens:{k | <k> = <lexer.tokens.(k)>}; separator="\n", wrap, anchor>
+    <endif>
 
     channelNames = [ u"DEFAULT_TOKEN_CHANNEL", u"HIDDEN"<if (lexer.channels)>, <lexer.channels:{c| u"<c>"}; separator=", ", wrap, anchor><endif> ]
 

@@ -17,7 +17,7 @@ ATNState::ATNState() {
 }
 
 ATNState::~ATNState() {
-  for (auto transition : transitions) {
+  for (auto *transition : transitions) {
     delete transition;
   }
 }

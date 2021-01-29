@@ -36,15 +36,15 @@ import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.semantics.SemanticPipeline;
-import org.antlr.v4.test.runtime.BaseRuntimeTest;
-import org.antlr.v4.test.runtime.ErrorQueue;
-import org.antlr.v4.test.runtime.RuntimeTestSupport;
-import org.antlr.v4.test.runtime.StreamVacuum;
+import org.antlr.v4.test.runtime.*;
 import org.antlr.v4.tool.ANTLRMessage;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.GrammarSemanticsMessage;
 import org.antlr.v4.tool.LexerGrammar;
 import org.antlr.v4.tool.Rule;
+import org.junit.rules.TestRule;
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupString;
@@ -173,6 +173,17 @@ public class BaseJavaTest implements RuntimeTestSupport {
 	 */
 	protected StringBuilder antlrToolErrors;
 
+	@org.junit.Rule
+	public final TestRule testWatcher = new TestWatcher() {
+
+		@Override
+		protected void succeeded(Description description) {
+			// remove tmpdir if no error.
+			eraseTempDir();
+		}
+
+	};
+
 	@Override
 	public void testSetUp() throws Exception {
 //		STGroup.verbose = true;
@@ -194,6 +205,14 @@ public class BaseJavaTest implements RuntimeTestSupport {
 
 	@Override
 	public void testTearDown() throws Exception {
+	}
+
+	@Override
+	public void beforeTest(RuntimeTestDescriptor descriptor) {
+	}
+
+	@Override
+	public void afterTest(RuntimeTestDescriptor descriptor) {
 	}
 
 	@Override
@@ -1013,6 +1032,9 @@ public class BaseJavaTest implements RuntimeTestSupport {
 
 
     protected void eraseFiles(final String filesEndingWith) {
+		if (tmpdir == null) {
+			return;
+		}
         File tmpdirF = new File(tmpdir);
         String[] files = tmpdirF.list();
         for(int i = 0; files!=null && i < files.length; i++) {
@@ -1026,7 +1048,6 @@ public class BaseJavaTest implements RuntimeTestSupport {
 		if (tmpdir == null) {
 			return;
 		}
-
         File tmpdirF = new File(tmpdir);
         String[] files = tmpdirF.list();
         for(int i = 0; files!=null && i < files.length; i++) {
@@ -1035,12 +1056,19 @@ public class BaseJavaTest implements RuntimeTestSupport {
     }
 
     public void eraseTempDir() {
-        File tmpdirF = new File(tmpdir);
-        if ( tmpdirF.exists() ) {
-            eraseFiles();
-            tmpdirF.delete();
-        }
+		if (shouldEraseTempDir()) {
+			File tmpdirF = new File(tmpdir);
+			if (tmpdirF.exists()) {
+				eraseFiles();
+				tmpdirF.delete();
+			}
+		}
     }
+
+	private boolean shouldEraseTempDir() {
+		return tmpdir != null;
+	}
+
 
 	public String getFirstLineOfException() {
 		if ( this.stderrDuringParse ==null ) {

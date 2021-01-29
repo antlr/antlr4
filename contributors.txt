@@ -208,6 +208,7 @@ YYYY/MM/DD, github id, Full name, email
 2018/07/03, jgoppert, James Goppert, james.goppert@gmail.com
 2018/07/27, Maksim Novikov, mnovikov.work@gmail.com
 2018/08/03, ENDOH takanao, djmchl@gmail.com
+2018/10/08, xsIceman, Andreas Skaar, andreas.skaar@gmail.com
 2018/10/18, edirgarcia, Edir García Lazo, edirgl@hotmail.com
 2018/07/31, Lucas Henrqiue, lucashenrique580@gmail.com
 2018/08/03, ENDOH takanao, djmchl@gmail.com
@@ -218,34 +219,70 @@ YYYY/MM/DD, github id, Full name, email
 2018/11/29, hannemann-tamas, Ralf Hannemann-Tamas, ralf.ht@gmail.com
 2018/12/20, WalterCouto, Walter Couto, WalterCouto@users.noreply.github.com
 2018/12/23, youkaichao, Kaichao You, youkaichao@gmail.com
+2019/01/01, khoroshilov, Alexey Khoroshilov, khoroshilov@ispras.ru
+2019/01/02, wkhemir, Wail Khemir, khemirwail@gmail.com
 2019/01/16, kuegi, Markus Zancolo, markus.zancolo@roomle.com
 2019/02/06, ralucado, Cristina Raluca Vijulie, ralucris.v[at]gmail[dot]com
 2019/02/23, gedimitr, Gerasimos Dimitriadis, gedimitr@gmail.com
 2019/03/13, base698, Justin Thomas, justin.thomas1@gmail.com
 2019/03/18, carlodri, Carlo Dri, carlo.dri@gmail.com
 2019/05/02, askingalot, Andy Collins, askingalot@gmail.com
+2019/05/13, mapio, Massimo Santini, massimo.santini@gmail.com
 2019/07/11, olowo726, Olof Wolgast, olof@baah.se
 2019/07/16, abhijithneilabraham, Abhijith Neil Abraham, abhijithneilabrahampk@gmail.com
 2019/07/26, Braavos96, Eric Hettiaratchi, erichettiaratchi@gmail.com
+2019/08/02, thron7, Thomas Herchenroeder, thron7[at]users[dot]sourceforge[dot]net
+2019/08/12, easonlin404, Eason Lin, easonlin404@gmail.com
 2019/08/23, akaJes, Oleksandr Mamchyts, akaJes@gmail.com
+2019/08/27, wurzelpeter, Markus Franke, markus[hyphen]franke[at]web[dot]de
 2019/09/10, ImanHosseini, Iman Hosseini, hosseini.iman@yahoo.com
 2019/09/03, João Henrique, johnnyonflame@hotmail.com
 2019/09/10, neko1235, Ihar Mokharau, igor.mohorev@gmail.com
 2019/09/10, yar3333, Yaroslav Sivakov, yar3333@gmail.com
 2019/09/10, marcospassos, Marcos Passos, marcospassos.com@gmail.com
 2019/09/10, amorimjuliana, Juliana Amorim, juu.amorim@gmail.com
+2019/09/15, sullis, Sean Sullivan, github@seansullivan.com
 2019/09/17, kaz, Kazuki Sawada, kazuki@6715.jp
 2019/09/28, lmy269, Mingyang Liu, lmy040758@gmail.com
 2019/10/29, tehbone, Tabari Alexander, tehbone@gmail.com
 2019/10/31, a-square, Alexei Averchenko, lex.aver@gmail.com
+2019/11/05, listba, Ben List, ben.list89@gmail.com
 2019/11/11, foxeverl, Liu Xinfeng, liuxf1986[at]gmail[dot]com
 2019/11/17, felixn, Felix Nieuwenhuizhen, felix@tdlrali.com
 2019/11/18, mlilback, Mark Lilback, mark@lilback.com
+2020/01/19, lingyv-li, Lingyu Li, lingyv.li@gmail.com
 2020/02/02, carocad, Camilo Roca, carocad@unal.edu.co
 2020/02/10, julibert, Julián Bermúdez Ortega, julibert.dev@gmail.com
+2020/02/17, quantumsheep, Nathanael Demacon, nathanael.dmc@outlook.fr
 2020/02/21, StochasticTinkr, Daniel Pitts, github@coloraura.com
 2020/03/17, XsongyangX, Song Yang, songyang1218@gmail.com
 2020/04/07, deniskyashif, Denis Kyashif, denis.kyashif@gmail.com
+2020/04/08, lwehmeier, Leon Wehmeier, wehmeier@st.ovgu.de
+2020/04/10, agrabski, Adam Grabski, adam.gr@outlook.com
+2020/04/23, martinvw, Martin van Wingerden, martin@martinvw.nl
 2020/04/23, kaczmarj, Jakub Kaczmarzyk, jakub.kaczmarzyk@stonybrookmedicine.edu
 2020/04/30, TristonianJones, Tristan Swadell, tswadell@google.com
+2020/05/06, iammosespaulr, Moses Paul R, iammosespaulr@gmail.com
+2020/05/10, gomerser, Erik Gomersbach, gomerser@gomersba.ch
+2020/05/22, keywan-ghadami-oxid, Keywan Ghadami, keywan.ghadami@oxid-esales.com
+2020/05/25, graknol, Sindre van der Linden, graknol@gmail.com
 2020/05/31, d-markey, David Markey, dmarkey@free.fr
+2020/06/02, cohomology, Kilian Kilger, kkilger AT gmail.com
+2020/06/04, IohannRabeson, Iohann Rabeson, iotaka6@gmail.com
+2020/06/04, sigmasoldi3r, Pablo Blanco, pablobc.1995@gmail.com
+2020/07/01, sha-N, Shan M Mathews, admin@bluestarqatar.com
+2020/08/22, stevenjohnstone, Steven Johnstone, steven.james.johnstone@gmail.com
+2020/09/06, ArthurSonzogni, Sonzogni Arthur, arthursonzogni@gmail.com
+2020/09/10, Khailian, Arunav Sanyal, arunav.sanyal91@gmail.com
+2020/09/12, Clcanny, Charles Ruan, a837940593@gmail.com
+2020/09/15, rmcgregor1990, Robert McGregor, rmcgregor1990@gmail.com
+2020/09/16, trenki2, Markus Trenkwalder, trenki2[at]gmx[dot]net
+2020/10/08, Marti2203, Martin Mirchev, mirchevmartin2203@gmail.com
+2020/10/16, adarshbhat, Adarsh Bhat, adarshbhat@users.noreply.github.com
+2020/10/20, adamwojs, Adam Wójs, adam[at]wojs.pl
+2020/10/24, cliid, Jiwu Jang, jiwujang@naver.com
+2020/11/05, MichelHartmann, Michel Hartmann, MichelHartmann@users.noreply.github.com
+2020/11/26, mr-c, Michael R. Crusoe, 1330696+mr-c@users.noreply.github.com
+2020/12/01, maxence-lefebvre, Maxence Lefebvre, maxence-lefebvre@users.noreply.github.com
+2020/12/03, electrum, David Phillips, david@acz.org
+2021/01/25, l215884529, Qiheng Liu, 13607681+l215884529@users.noreply.github.com

@@ -69,6 +69,10 @@ from antlr4.atn.Transition import Transition
 INITIAL_NUM_TRANSITIONS = 4
 
 class ATNState(object):
+    __slots__ = (
+        'atn', 'stateNumber', 'stateType', 'ruleIndex', 'epsilonOnlyTransitions',
+        'transitions', 'nextTokenWithinRule',
+    )
 
     # constants for serialization
     INVALID_TYPE = 0
@@ -148,7 +152,7 @@ class BasicState(ATNState):
 
 
 class DecisionState(ATNState):
-
+    __slots__ = ('decision', 'nonGreedy')
     def __init__(self):
         super().__init__()
         self.decision = -1
@@ -156,6 +160,7 @@ class DecisionState(ATNState):
 
 #  The start of a regular {@code (...)} block.
 class BlockStartState(DecisionState):
+    __slots__ = 'endState'
 
     def __init__(self):
         super().__init__()
@@ -169,6 +174,7 @@ class BasicBlockStartState(BlockStartState):
 
 # Terminal node of a simple {@code (a|b|c)} block.
 class BlockEndState(ATNState):
+    __slots__ = 'startState'
 
     def __init__(self):
         super().__init__()
@@ -187,6 +193,7 @@ class RuleStopState(ATNState):
         self.stateType = self.RULE_STOP
 
 class RuleStartState(ATNState):
+    __slots__ = ('stopState', 'isPrecedenceRule')
 
     def __init__(self):
         super().__init__()
@@ -209,6 +216,7 @@ class PlusLoopbackState(DecisionState):
 #  real decision-making note for {@code A+}.
 #
 class PlusBlockStartState(BlockStartState):
+    __slots__ = 'loopBackState'
 
     def __init__(self):
         super().__init__()
@@ -230,6 +238,7 @@ class StarLoopbackState(ATNState):
 
 
 class StarLoopEntryState(DecisionState):
+    __slots__ = ('loopBackState', 'isPrecedenceDecision')
 
     def __init__(self):
         super().__init__()
@@ -240,6 +249,7 @@ class StarLoopEntryState(DecisionState):
 
 # Mark the end of a * or + loop.
 class LoopEndState(ATNState):
+    __slots__ = 'loopBackState'
 
     def __init__(self):
         super().__init__()

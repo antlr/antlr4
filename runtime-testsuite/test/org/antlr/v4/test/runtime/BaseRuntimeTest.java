@@ -11,9 +11,7 @@ import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.tool.ANTLRMessage;
 import org.antlr.v4.tool.DefaultToolListener;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.rules.TestRule;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
@@ -44,28 +42,56 @@ import static org.junit.Assume.assumeFalse;
  *  @since 4.6.
  */
 public abstract class BaseRuntimeTest {
+
 	public final static String[] Targets = {
 		"Cpp",
-		"Java",
-		"Go",
 		"CSharp",
-		"Python2", "Python3",
+		"Dart",
+		"Go",
+		"Java",
+		"Node",
 		"PHP",
-		"Node"
+		"Python2", "Python3",
+		"Swift"
 	};
 
-	static {
-		// Add heartbeat thread to gen minimal output for travis, appveyor to
-		// avoid timeout.
+	@BeforeClass
+	public static void startHeartbeatToAvoidTimeout() {
+		if (isTravisCI() || isAppVeyorCI())
+			startHeartbeat();
+	}
+
+	@AfterClass
+	public static void stopHeartbeat() {
+		heartbeat = false;
+	}
+
+	private static boolean isAppVeyorCI() {
+		// see https://www.appveyor.com/docs/environment-variables/
+		String s = System.getenv("APPVEYOR");
+		return s!=null && "true".equals(s.toLowerCase());
+	}
+
+	private static boolean isTravisCI() {
+		// see https://docs.travis-ci.com/user/environment-variables/#default-environment-variables
+		String s = System.getenv("TRAVIS");
+		return s!=null && "true".equals(s.toLowerCase());
+	}
+
+	static boolean heartbeat = false;
+
+	private static void startHeartbeat() {
+		// Add heartbeat thread to gen minimal output for travis, appveyor to avoid timeout.
 		Thread t = new Thread("heartbeat") {
 			@Override
 			public void run() {
-				while (true) {
+				heartbeat = true;
+				while (heartbeat) {
 					System.out.print('.');
 					try {
+						//noinspection BusyWait
 						Thread.sleep(5000);
-					}
-					catch (Exception e) {
+					} catch (Exception e) {
 						e.printStackTrace();
 					}
 				}
@@ -94,8 +120,15 @@ public abstract class BaseRuntimeTest {
 	public void setUp() throws Exception {
 		// From http://junit.sourceforge.net/javadoc/org/junit/Assume.html
 		// "The default JUnit runner treats tests with failing assumptions as ignored"
-		assumeFalse(descriptor.ignore(descriptor.getTarget()));
+		assumeFalse(checkIgnored());
 		delegate.testSetUp();
+	}
+
+	public boolean checkIgnored() {
+		boolean ignored = !TestContext.isSupportedTarget(descriptor.getTarget()) || descriptor.ignore(descriptor.getTarget());
+		if(ignored)
+			System.out.println("Ignore " + descriptor);
+		return ignored;
 	}
 
 	@Rule
@@ -109,18 +142,20 @@ public abstract class BaseRuntimeTest {
 
 	@Test
 	public void testOne() throws Exception {
+		// System.out.println(descriptor.getTestName());
 		// System.out.println(delegate.getTmpDir());
-		if ( descriptor.ignore(descriptor.getTarget()) ) {
-			System.out.printf("Ignore "+descriptor);
+		if (descriptor.ignore(descriptor.getTarget()) ) {
+			System.out.println("Ignore " + descriptor);
 			return;
 		}
-
-		if ( descriptor.getTestType().contains("Parser") ) {
+		delegate.beforeTest(descriptor);
+		if (descriptor.getTestType().contains("Parser") ) {
 			testParser(descriptor);
 		}
 		else {
 			testLexer(descriptor);
 		}
+		delegate.afterTest(descriptor);
 	}
 
 	public void testParser(RuntimeTestDescriptor descriptor) throws Exception {
@@ -272,6 +307,8 @@ public abstract class BaseRuntimeTest {
 	// ---- support ----
 
 	public static RuntimeTestDescriptor[] getRuntimeTestDescriptors(Class<?> clazz, String targetName) {
+		if(!TestContext.isSupportedTarget(targetName))
+			return new RuntimeTestDescriptor[0];
 		Class<?>[] nestedClasses = clazz.getClasses();
 		List<RuntimeTestDescriptor> descriptors = new ArrayList<RuntimeTestDescriptor>();
 		for (Class<?> nestedClass : nestedClasses) {
@@ -279,8 +316,10 @@ public abstract class BaseRuntimeTest {
 			if ( RuntimeTestDescriptor.class.isAssignableFrom(nestedClass) && !Modifier.isAbstract(modifiers) ) {
 				try {
 					RuntimeTestDescriptor d = (RuntimeTestDescriptor) nestedClass.newInstance();
-					d.setTarget(targetName);
-					descriptors.add(d);
+					if(!d.ignore(targetName)) {
+						d.setTarget(targetName);
+						descriptors.add(d);
+					}
 				} catch (Exception e) {
 					e.printStackTrace(System.err);
 				}
@@ -299,6 +338,16 @@ public abstract class BaseRuntimeTest {
 		}
 	}
 
+	public static String readFile(String dir, String fileName) {
+		try {
+			return String.copyValueOf(Utils.readFile(dir+"/"+fileName, "UTF-8"));
+		}
+		catch (IOException ioe) {
+			System.err.println("can't read file");
+			ioe.printStackTrace(System.err);
+		}
+		return null;
+	}
 
 	protected static void assertCorrectOutput(RuntimeTestDescriptor descriptor, RuntimeTestSupport delegate, String actualOutput) {
 		String actualParseErrors = delegate.getParseErrors();

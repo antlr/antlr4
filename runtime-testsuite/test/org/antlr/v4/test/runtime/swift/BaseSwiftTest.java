@@ -8,20 +8,20 @@ package org.antlr.v4.test.runtime.swift;
 
 import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.test.runtime.ErrorQueue;
+import org.antlr.v4.test.runtime.RuntimeTestDescriptor;
 import org.antlr.v4.test.runtime.RuntimeTestSupport;
 import org.antlr.v4.test.runtime.StreamVacuum;
+import org.junit.rules.TestRule;
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
 import org.stringtemplate.v4.ST;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static org.antlr.v4.test.runtime.BaseRuntimeTest.antlrOnString;
 import static org.antlr.v4.test.runtime.BaseRuntimeTest.mkdir;
@@ -30,15 +30,18 @@ import static org.junit.Assert.assertTrue;
 
 public class BaseSwiftTest implements RuntimeTestSupport {
 
+	private static final boolean USE_ARCH_ARM64 = false;
+	private static final boolean VERBOSE = false;
+
 	/**
 	 * Path of the ANTLR runtime.
 	 */
-	private static String ANTLR_RUNTIME_PATH;
+	private static final String ANTLR_RUNTIME_PATH;
 
 	/**
 	 * Absolute path to swift command.
 	 */
-	private static String SWIFT_CMD;
+	private static final String SWIFT_CMD;
 
 	/**
 	 * Environment variable name for swift home.
@@ -54,7 +57,7 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 		// build swift runtime
 		URL swiftRuntime = loader.getResource("Swift");
 		if (swiftRuntime == null) {
-			throw new RuntimeException("Swift runtime file not found at:" + swiftRuntime.getPath());
+			throw new RuntimeException("Swift runtime file not found");
 		}
 		ANTLR_RUNTIME_PATH = swiftRuntime.getPath();
 		try {
@@ -94,7 +97,18 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 	/**
 	 * Source files used in each small swift project.
 	 */
-	private Set<String> sourceFiles = new HashSet<>();
+	private final Set<String> sourceFiles = new HashSet<>();
+
+	@org.junit.Rule
+	public final TestRule testWatcher = new TestWatcher() {
+
+		@Override
+		protected void succeeded(Description description) {
+			// remove tmpdir if no error.
+			eraseTempDir();
+		}
+
+	};
 
 	@Override
 	public void testSetUp() throws Exception {
@@ -115,6 +129,15 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 
 	@Override
 	public void testTearDown() throws Exception {
+	}
+
+	@Override
+	public void beforeTest(RuntimeTestDescriptor descriptor) {
+		System.out.println(descriptor.getTestName());
+	}
+
+	@Override
+	public void afterTest(RuntimeTestDescriptor descriptor) {
 	}
 
 	@Override
@@ -221,31 +244,99 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 		}
 	}
 
+	static Boolean IS_MAC_ARM_64 = null;
+
+	private static boolean isMacOSArm64() {
+		if (IS_MAC_ARM_64 == null) {
+			IS_MAC_ARM_64 = computeIsMacOSArm64();
+			System.err.println("IS_MAC_ARM_64 = " + IS_MAC_ARM_64);
+		}
+		return IS_MAC_ARM_64;
+	}
+
+	private static boolean computeIsMacOSArm64() {
+		String os = System.getenv("RUNNER_OS");
+		if(os==null || !os.equalsIgnoreCase("macos"))
+			return false;
+		try {
+			Process p = Runtime.getRuntime().exec("uname -a");
+			BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			String uname = in.readLine();
+			return uname.contains("_ARM64_");
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
 	private static Pair<String,String> runProcess(String execPath, String... args) throws IOException, InterruptedException {
-		Process process = Runtime.getRuntime().exec(args, null, new File(execPath));
+		List<String> argsWithArch = new ArrayList<>();
+		if(USE_ARCH_ARM64 && isMacOSArm64())
+			argsWithArch.addAll(Arrays.asList("arch", "-arm64"));
+		argsWithArch.addAll(Arrays.asList(args));
+		if(VERBOSE)
+			System.err.println("Executing " + argsWithArch.toString() + " " + execPath);
+		final Process process = Runtime.getRuntime().exec(argsWithArch.toArray(new String[0]), null, new File(execPath));
 		StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
 		StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
 		stdoutVacuum.start();
 		stderrVacuum.start();
+		Timer timer = new Timer();
+		timer.schedule(new TimerTask() {
+			@Override
+			public void run() {
+				try {
+					process.destroy();
+				} catch(Exception e) {
+					e.printStackTrace(System.err);
+				}
+			}
+		}, 120_000);
 		int status = process.waitFor();
+		timer.cancel();
 		stdoutVacuum.join();
 		stderrVacuum.join();
+		if(VERBOSE)
+			System.err.println("Done executing " + argsWithArch.toString() + " " + execPath);
 		if (status != 0) {
+			System.err.println("Process exited with status " + status);
 			throw new IOException("Process exited with status " + status + ":\n" + stdoutVacuum.toString() + "\n" + stderrVacuum.toString());
 		}
 		return new Pair<>(stdoutVacuum.toString(), stderrVacuum.toString());
 	}
 
 	private static void fastFailRunProcess(String workingDir, String... command) throws IOException, InterruptedException {
-		ProcessBuilder builder = new ProcessBuilder(command);
+		List<String> argsWithArch = new ArrayList<>();
+		if(USE_ARCH_ARM64 && isMacOSArm64())
+			argsWithArch.addAll(Arrays.asList("arch", "-arm64"));
+		argsWithArch.addAll(Arrays.asList(command));
+		if(VERBOSE)
+			System.err.println("Executing " + argsWithArch.toString() + " " + workingDir);
+		ProcessBuilder builder = new ProcessBuilder(argsWithArch.toArray(new String[0]));
 		builder.directory(new File(workingDir));
-		Process p = builder.start();
-		int status = p.waitFor();
+		final Process process = builder.start();
+		Timer timer = new Timer();
+		timer.schedule(new TimerTask() {
+			@Override
+			public void run() {
+				try {
+					process.destroy();
+				} catch(Exception e) {
+					e.printStackTrace(System.err);
+				}
+			}
+		}, 120_000);
+		int status = process.waitFor();
+		timer.cancel();
+		if(VERBOSE)
+			System.err.println("Done executing " + argsWithArch.toString() + " " + workingDir);
 		if (status != 0) {
+			System.err.println("Process exited with status " + status);
 			throw new IOException("Process exited with status " + status);
 		}
 	}
 
+	@SuppressWarnings("SameParameterValue")
 	private String execParser(String parserName,
 							  String lexerName,
 							  String parserStartRuleName,
@@ -324,7 +415,7 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 							"parser.setInterpreter(profiler)");
 		}
 		else {
-			outputFileST.add("profile", new ArrayList<Object>());
+			outputFileST.add("profile", new ArrayList<>());
 		}
 		outputFileST.add("createParser", createParserST);
 		outputFileST.add("parserName", parserName);
@@ -387,6 +478,6 @@ public class BaseSwiftTest implements RuntimeTestSupport {
 				files.add(grammarName + "BaseVisitor.swift");
 			}
 		}
-		addSourceFiles(files.toArray(new String[files.size()]));
+		addSourceFiles(files.toArray(new String[0]));
 	}
 }

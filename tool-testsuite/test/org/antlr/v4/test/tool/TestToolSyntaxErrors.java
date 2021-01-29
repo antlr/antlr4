@@ -13,16 +13,21 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class TestToolSyntaxErrors extends BaseJavaToolTest {
-    static String[] A = {
-	    // INPUT
+	static String[] A = {
+		// INPUT
 		"grammar A;\n" +
 		"",
 		// YIELDS
-		"error(" + ErrorType.NO_RULES.code + "): A.g4::: grammar A has no rules\n",
+		"error(" + ErrorType.NO_RULES.code + "): A.g4::: grammar A has no non-fragment rules\n",
 
 		"lexer grammar A;\n" +
 		"",
-		"error(" + ErrorType.NO_RULES.code + "): A.g4::: grammar A has no rules\n",
+		"error(" + ErrorType.NO_RULES.code + "): A.g4::: grammar A has no non-fragment rules\n",
+
+		"lexer grammar A;\n" +
+		"fragment FRAGMENT: 'FRAGMENT';\n" +
+		"",
+		"error(" + ErrorType.NO_RULES.code + "): A.g4::: grammar A has no non-fragment rules\n",
 
 		"A;",
 		"error(" + ErrorType.SYNTAX_ERROR.code + "): A.g4:1:0: syntax error: 'A' came as a complete surprise to me\n",

@@ -19,7 +19,7 @@ if(NOT WITH_DEMO)
     FORCE)
 endif(NOT WITH_DEMO)
 
-option(WITH_LIBCXX "Building with clang++ and libc++(in Linux). To enable with: -DWITH_LIBCXX=On" On)
+option(WITH_LIBCXX "Building with clang++ and libc++(in Linux). To enable with: -DWITH_LIBCXX=On" Off)
 option(WITH_STATIC_CRT "(Visual C++) Enable to statically link CRT, which avoids requiring users to install the redistribution package.
  To disable with: -DWITH_STATIC_CRT=Off" On)
 
@@ -70,6 +70,9 @@ if(MSVC_VERSION)
 else()
   set(MY_CXX_WARNING_FLAGS "  -Wall -pedantic -W")
 endif()
+
+# Define USE_UTF8_INSTEAD_OF_CODECVT macro.
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DUSE_UTF8_INSTEAD_OF_CODECVT")
 
 # Initialize CXXFLAGS.
 if("${CMAKE_VERSION}" VERSION_GREATER 3.1.0)

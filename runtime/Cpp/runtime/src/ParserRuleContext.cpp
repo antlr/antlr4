@@ -38,8 +38,8 @@ void ParserRuleContext::copyFrom(ParserRuleContext *ctx) {
 
   // copy any error nodes to alt label node
   if (!ctx->children.empty()) {
-    for (auto child : ctx->children) {
-      auto errorNode = dynamic_cast<ErrorNode *>(child);
+    for (auto *child : ctx->children) {
+      auto *errorNode = dynamic_cast<ErrorNode *>(child);
       if (errorNode != nullptr) {
         errorNode->setParent(this);
         children.push_back(errorNode);
@@ -82,7 +82,7 @@ tree::TerminalNode* ParserRuleContext::getToken(size_t ttype, size_t i) {
   }
 
   size_t j = 0; // what token with ttype have we found?
-  for (auto o : children) {
+  for (auto *o : children) {
     if (is<tree::TerminalNode *>(o)) {
       tree::TerminalNode *tnode = dynamic_cast<tree::TerminalNode *>(o);
       Token *symbol = tnode->getSymbol();
