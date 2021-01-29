@@ -5,65 +5,19 @@
  */
 package org.antlr.v4.test.runtime.cpp;
 
-import org.antlr.v4.Tool;
-import org.antlr.v4.automata.ATNFactory;
-import org.antlr.v4.automata.ATNPrinter;
-import org.antlr.v4.automata.LexerATNFactory;
-import org.antlr.v4.automata.ParserATNFactory;
-import org.antlr.v4.codegen.CodeGenerator;
-import org.antlr.v4.runtime.ANTLRInputStream;
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CommonToken;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.IntStream;
-import org.antlr.v4.runtime.Lexer;
-import org.antlr.v4.runtime.Parser;
-import org.antlr.v4.runtime.RuleContext;
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.TokenSource;
-import org.antlr.v4.runtime.TokenStream;
-import org.antlr.v4.runtime.WritableToken;
-import org.antlr.v4.runtime.atn.ATN;
-import org.antlr.v4.runtime.atn.ATNDeserializer;
-import org.antlr.v4.runtime.atn.ATNSerializer;
-import org.antlr.v4.runtime.atn.ATNState;
-import org.antlr.v4.runtime.atn.DecisionState;
-import org.antlr.v4.runtime.atn.LexerATNSimulator;
-import org.antlr.v4.runtime.dfa.DFA;
-import org.antlr.v4.runtime.misc.IntegerList;
-import org.antlr.v4.runtime.misc.Interval;
-import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.test.runtime.*;
-import org.antlr.v4.tool.ANTLRMessage;
-import org.antlr.v4.tool.DOTGenerator;
-import org.antlr.v4.tool.Grammar;
-import org.antlr.v4.tool.GrammarSemanticsMessage;
-import org.antlr.v4.tool.LexerGrammar;
-import org.antlr.v4.tool.Rule;
-import org.junit.rules.TestRule;
-import org.junit.rules.TestWatcher;
-import org.junit.runner.Description;
 import org.stringtemplate.v4.ST;
-import org.stringtemplate.v4.STGroup;
-import org.stringtemplate.v4.STGroupString;
 
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 
 import static org.antlr.v4.test.runtime.BaseRuntimeTest.antlrOnString;
 import static org.antlr.v4.test.runtime.BaseRuntimeTest.writeFile;
@@ -311,8 +265,8 @@ public class BaseCppTest extends BaseRuntimeTestSupport implements RuntimeTestSu
 	public String execModule(String fileName) {
 		String runtimePath = locateRuntime();
 		String includePath = runtimePath + "/runtime/src";
-		String binPath = new File(getTempDir(), "a.out").getAbsolutePath();
-		String inputPath = new File(getTempDir(), "input").getAbsolutePath();
+		String binPath = new File(getTempTestDir(), "a.out").getAbsolutePath();
+		String inputPath = new File(getTempTestDir(), "input").getAbsolutePath();
 
 		// Build runtime using cmake once.
 		synchronized (runtimeBuiltOnce) {
@@ -365,7 +319,7 @@ public class BaseCppTest extends BaseRuntimeTestSupport implements RuntimeTestSu
 		setParseErrors(null);
 		try {
 			ProcessBuilder builder = new ProcessBuilder(binPath, inputPath);
-			builder.directory(getTempDir());
+			builder.directory(getTempTestDir());
 			Map<String, String> env = builder.environment();
 			env.put("LD_PRELOAD", runtimePath + "/dist/libantlr4-runtime." + libExtension);
 			String output = runProcess(builder, "running test binary", false);

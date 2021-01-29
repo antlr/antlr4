@@ -5,36 +5,14 @@
  */
 package org.antlr.v4.test.runtime.csharp;
 
-import org.antlr.v4.Tool;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.TokenSource;
-import org.antlr.v4.runtime.WritableToken;
 import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.test.runtime.*;
-import org.antlr.v4.tool.ANTLRMessage;
-import org.antlr.v4.tool.GrammarSemanticsMessage;
-import org.junit.rules.TestRule;
-import org.junit.rules.TestWatcher;
-import org.junit.runner.Description;
 import org.stringtemplate.v4.ST;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathFactory;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.URL;
 import java.nio.file.Path;
@@ -206,14 +184,14 @@ public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTes
 	}
 
 	private String locateExec() {
-		return new File(getTempDir(), "bin/Release/netcoreapp3.1/Test.dll").getAbsolutePath();
+		return new File(getTempTestDir(), "bin/Release/netcoreapp3.1/Test.dll").getAbsolutePath();
 	}
 
 	public boolean buildProject() {
 		try {
 			// save auxiliary files
 			String pack = BaseCSharpTest.class.getPackage().getName().replace(".", "/") + "/";
-			saveResourceAsFile(pack + "Antlr4.Test.csproj", new File(getTempDir(), "Antlr4.Test.csproj"));
+			saveResourceAsFile(pack + "Antlr4.Test.csproj", new File(getTempTestDir(), "Antlr4.Test.csproj"));
 
 			// find runtime package
 			final ClassLoader loader = Thread.currentThread().getContextClassLoader();
@@ -349,7 +327,7 @@ public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTes
 
 	private String[] getExecTestArgs(String exec, Path output, Path errorOutput) {
 		return new String[]{
-				"dotnet", exec, new File(getTempDir(), "input").getAbsolutePath(),
+				"dotnet", exec, new File(getTempTestDir(), "input").getAbsolutePath(),
 				output.toAbsolutePath().toString(),
 				errorOutput.toAbsolutePath().toString()
 		};

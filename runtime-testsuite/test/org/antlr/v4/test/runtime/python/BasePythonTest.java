@@ -248,7 +248,7 @@ public abstract class BasePythonTest extends BaseRuntimeTestSupport implements R
 
 
 	protected void eraseTempPyCache() {
-		File tmpdirF = new File(getTempDir() + "/__pycache__");
+		File tmpdirF = new File(getTempTestDir() + "/__pycache__");
 		if ( tmpdirF.exists() ) {
 			eraseFilesInDir(tmpdirF);
 			tmpdirF.delete();

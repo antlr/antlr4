@@ -42,6 +42,7 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.antlr.v4.test.runtime.BaseRuntimeTest;
 import org.antlr.v4.test.runtime.ErrorQueue;
+import org.antlr.v4.test.runtime.RuntimeTestUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -1135,7 +1136,7 @@ public class TestPerformance extends BaseJavaToolTest {
 
     protected ParserFactory getParserFactory(String lexerName, String parserName, String listenerName, final String entryPoint) {
         try {
-            ClassLoader loader = new URLClassLoader(new URL[] { getTempDir().toURI().toURL() }, ClassLoader.getSystemClassLoader());
+            ClassLoader loader = new URLClassLoader(new URL[] { getTempTestDir().toURI().toURL() }, ClassLoader.getSystemClassLoader());
             final Class<? extends Lexer> lexerClass = loader.loadClass(lexerName).asSubclass(Lexer.class);
             final Class<? extends Parser> parserClass = loader.loadClass(parserName).asSubclass(Parser.class);
             final Class<? extends ParseTreeListener> listenerClass = loader.loadClass(listenerName).asSubclass(ParseTreeListener.class);
@@ -1952,7 +1953,7 @@ public class TestPerformance extends BaseJavaToolTest {
 			"\n" +
 			"rule_%d_%d : EOF;\n";
 
-		BaseRuntimeTest.mkdir(getTempDirPath());
+		RuntimeTestUtils.mkdir(getTempDirPath());
 
 		long startTime = System.nanoTime();
 

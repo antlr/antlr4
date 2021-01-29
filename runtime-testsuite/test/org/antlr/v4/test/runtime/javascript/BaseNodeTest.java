@@ -125,16 +125,16 @@ public class BaseNodeTest extends BaseRuntimeTestSupport implements RuntimeTestS
 				installRuntime(npmPath);
 				registerRuntime(npmPath);
 			}
-			String modulePath = new File(getTempDir(), fileName)
+			String modulePath = new File(getTempTestDir(), fileName)
 					.getAbsolutePath();
 			linkRuntime(npmPath);
 			String nodejsPath = locateNodeJS();
-			String inputPath = new File(getTempDir(), "input")
+			String inputPath = new File(getTempTestDir(), "input")
 					.getAbsolutePath();
 			ProcessBuilder builder = new ProcessBuilder(nodejsPath, modulePath,
 					inputPath);
 			builder.environment().put("NODE_PATH", getTempDirPath());
-			builder.directory(getTempDir());
+			builder.directory(getTempTestDir());
 			Process process = builder.start();
 			StreamVacuum stdoutVacuum = new StreamVacuum(
 					process.getInputStream());
@@ -168,8 +168,8 @@ public class BaseNodeTest extends BaseRuntimeTestSupport implements RuntimeTestS
 		String runtimePath = locateRuntime();
 		ProcessBuilder builder = new ProcessBuilder(npmPath, "install");
 		builder.directory(new File(runtimePath));
-		builder.redirectError(new File(getTempDir(), "error.txt"));
-		builder.redirectOutput(new File(getTempDir(), "output.txt"));
+		builder.redirectError(new File(getTempTestDir(), "error.txt"));
+		builder.redirectOutput(new File(getTempTestDir(), "output.txt"));
 		Process process = builder.start();
 		// TODO switch to jdk 8
 		process.waitFor();
@@ -184,8 +184,8 @@ public class BaseNodeTest extends BaseRuntimeTestSupport implements RuntimeTestS
 		String runtimePath = locateRuntime();
 		ProcessBuilder builder = new ProcessBuilder(npmPath, "link");
 		builder.directory(new File(runtimePath));
-		builder.redirectError(new File(getTempDir(), "error.txt"));
-		builder.redirectOutput(new File(getTempDir(), "output.txt"));
+		builder.redirectError(new File(getTempTestDir(), "error.txt"));
+		builder.redirectOutput(new File(getTempTestDir(), "output.txt"));
 		Process process = builder.start();
 		// TODO switch to jdk 8
 		process.waitFor();
@@ -202,9 +202,9 @@ public class BaseNodeTest extends BaseRuntimeTestSupport implements RuntimeTestS
 			args.add("sudo");
 		args.addAll(Arrays.asList(npmPath, "link", "antlr4"));
 		ProcessBuilder builder = new ProcessBuilder(args.toArray(new String[0]));
-		builder.directory(getTempDir());
-		builder.redirectError(new File(getTempDir(), "error.txt"));
-		builder.redirectOutput(new File(getTempDir(), "output.txt"));
+		builder.directory(getTempTestDir());
+		builder.redirectError(new File(getTempTestDir(), "error.txt"));
+		builder.redirectOutput(new File(getTempTestDir(), "output.txt"));
 		Process process = builder.start();
 		// TODO switch to jdk 8
 		process.waitFor();

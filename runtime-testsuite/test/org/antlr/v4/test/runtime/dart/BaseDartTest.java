@@ -6,39 +6,14 @@
 
 package org.antlr.v4.test.runtime.dart;
 
-import org.antlr.v4.Tool;
-import org.antlr.v4.analysis.AnalysisPipeline;
-import org.antlr.v4.automata.ATNFactory;
-import org.antlr.v4.automata.ATNPrinter;
-import org.antlr.v4.automata.LexerATNFactory;
-import org.antlr.v4.automata.ParserATNFactory;
-import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.misc.Utils;
-import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.atn.*;
-import org.antlr.v4.runtime.dfa.DFA;
-import org.antlr.v4.runtime.misc.IntegerList;
-import org.antlr.v4.runtime.misc.Interval;
-import org.antlr.v4.runtime.misc.Pair;
-import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.test.runtime.*;
 import org.antlr.v4.test.runtime.descriptors.LexerExecDescriptors;
 import org.antlr.v4.test.runtime.descriptors.PerformanceDescriptors;
-import org.antlr.v4.tool.*;
-import org.junit.rules.TestRule;
-import org.junit.rules.TestWatcher;
-import org.junit.runner.Description;
 import org.stringtemplate.v4.ST;
-import org.stringtemplate.v4.STGroup;
-import org.stringtemplate.v4.STGroupString;
 
 import java.io.*;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.*;
 
 import static junit.framework.TestCase.*;
@@ -168,7 +143,7 @@ public class BaseDartTest extends BaseRuntimeTestSupport implements RuntimeTestS
 				"    path: " + runtime + "\n");
 		if (cacheDartPackages == null) {
 			try {
-				final Process process = Runtime.getRuntime().exec(new String[]{locatePub(), "get"}, null, getTempDir());
+				final Process process = Runtime.getRuntime().exec(new String[]{locatePub(), "get"}, null, getTempTestDir());
 				StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
 				stderrVacuum.start();
 				Timer timer = new Timer();
@@ -230,7 +205,7 @@ public class BaseDartTest extends BaseRuntimeTestSupport implements RuntimeTestS
 				String cmdLine = Utils.join(args, " ");
 				System.err.println("Compile: " + cmdLine);
 				final Process process =
-					Runtime.getRuntime().exec(args, null, getTempDir());
+					Runtime.getRuntime().exec(args, null, getTempTestDir());
 				StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
 				stderrVacuum.start();
 				Timer timer = new Timer();
@@ -255,18 +230,18 @@ public class BaseDartTest extends BaseRuntimeTestSupport implements RuntimeTestS
 			String[] args;
 			if (compile) {
 				args = new String[]{
-					new File(getTempDir(), className).getAbsolutePath(), new File(getTempDir(), "input").getAbsolutePath()
+					new File(getTempTestDir(), className).getAbsolutePath(), new File(getTempTestDir(), "input").getAbsolutePath()
 				};
 			} else {
 				args = new String[]{
 					locateDart(),
-					className + ".dart", new File(getTempDir(), "input").getAbsolutePath()
+					className + ".dart", new File(getTempTestDir(), "input").getAbsolutePath()
 				};
 			}
 			//String cmdLine = Utils.join(args, " ");
 			//System.err.println("execParser: " + cmdLine);
 			final Process process =
-				Runtime.getRuntime().exec(args, null, getTempDir());
+				Runtime.getRuntime().exec(args, null, getTempTestDir());
 			StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
 			StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
 			stdoutVacuum.start();

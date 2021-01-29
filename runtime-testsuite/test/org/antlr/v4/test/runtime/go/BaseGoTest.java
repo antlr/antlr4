@@ -83,7 +83,12 @@ public class BaseGoTest extends BaseRuntimeTestSupport implements RuntimeTestSup
 	public void testSetUp() throws Exception {
 		eraseParserTempDir();
 		super.testSetUp();
-		parserTempDir = new File(getTempDir(), "parser");
+		parserTempDir = new File(getTempTestDir(), "parser");
+	}
+
+	@Override
+	public File getTempParserDir() {
+		return parserTempDir;
 	}
 
 	private void eraseParserTempDir() {
@@ -91,10 +96,6 @@ public class BaseGoTest extends BaseRuntimeTestSupport implements RuntimeTestSup
 			eraseDirectory(parserTempDir);
 			parserTempDir = null;
 		}
-	}
-
-	private String getParserDirPath() {
-		return parserTempDir == null ? null : parserTempDir.getAbsolutePath();
 	}
 
 	protected String execLexer(String grammarFileName, String grammarStr,
@@ -140,7 +141,7 @@ public class BaseGoTest extends BaseRuntimeTestSupport implements RuntimeTestSup
 	protected boolean rawGenerateAndBuildRecognizer(String grammarFileName,
 	                                                String grammarStr, String parserName, String lexerName,
 	                                                boolean defaultListener, String... extraOptions) {
-		ErrorQueue equeue = antlrOnString(getParserDirPath(), "Go", grammarFileName, grammarStr,
+		ErrorQueue equeue = antlrOnString(getTempParserDirPath(), "Go", grammarFileName, grammarStr,
 		                                  defaultListener, extraOptions);
 		if (!equeue.errors.isEmpty()) {
 			return false;
@@ -167,12 +168,12 @@ public class BaseGoTest extends BaseRuntimeTestSupport implements RuntimeTestSup
 
 	public String execModule(String fileName) {
 		String goExecutable = locateGo();
-		String modulePath = new File(getTempDir(), fileName).getAbsolutePath();
-		String inputPath = new File(getTempDir(), "input").getAbsolutePath();
+		String modulePath = new File(getTempTestDir(), fileName).getAbsolutePath();
+		String inputPath = new File(getTempTestDir(), "input").getAbsolutePath();
 		try {
 			ProcessBuilder builder = new ProcessBuilder(goExecutable, "run", modulePath, inputPath);
 			builder.environment().put("GOPATH", tmpGopath.getPath());
-			builder.directory(getTempDir());
+			builder.directory(getTempTestDir());
 			Process process = builder.start();
 			StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
 			StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());

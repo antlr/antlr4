@@ -81,4 +81,9 @@ public abstract class RuntimeTestUtils {
 		is.close();
 		os.close();
 	}
+
+    public static void mkdir(String dir) {
+        File f = new File(dir);
+        f.mkdirs();
+    }
 }

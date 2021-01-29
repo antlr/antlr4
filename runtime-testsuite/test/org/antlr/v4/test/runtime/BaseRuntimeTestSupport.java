@@ -27,7 +27,7 @@ public abstract class BaseRuntimeTestSupport implements RuntimeTestSupport {
 	public static final String NEW_LINE = System.getProperty("line.separator");
 	public static final String PATH_SEP = System.getProperty("path.separator");
 
-	private File tempDir = null;
+	private File tempTestDir = null;
 
 	/** If error during parser execution, store stderr here; can't return
 	 *  stdout and stderr.  This doesn't trap errors from running antlr.
@@ -52,13 +52,26 @@ public abstract class BaseRuntimeTestSupport implements RuntimeTestSupport {
 		eraseTempDir();
 	}
 
-	protected final File getTempDir() {
-		return tempDir;
+	@Override
+	public File getTempParserDir() {
+		return getTempTestDir();
 	}
 
-	public final String getTempDirPath() {
-		return tempDir==null ? null : tempDir.getAbsolutePath();
+	@Override
+	public String getTempParserDirPath() {
+		return getTempParserDir() == null ? null : getTempParserDir().getAbsolutePath();
 	}
+
+	@Override
+	public final File getTempTestDir() {
+		return tempTestDir;
+	}
+
+	@Override
+	public final String getTempDirPath() {
+		return tempTestDir ==null ? null : tempTestDir.getAbsolutePath();
+	}
+
 
 	public void setParseErrors(String errors) {
 		this.parseErrors = errors;
@@ -88,11 +101,11 @@ public abstract class BaseRuntimeTestSupport implements RuntimeTestSupport {
 		String propName = getPropertyPrefix() + "-test-dir";
 		String prop = System.getProperty(propName);
 		if(prop!=null && prop.length()>0) {
-			tempDir = new File(prop);
+			tempTestDir = new File(prop);
 		}
 		else {
 			String dirName = getClass().getSimpleName() +  "-" + Thread.currentThread().getName() + "-" + System.currentTimeMillis();
-			tempDir = new File(System.getProperty("java.io.tmpdir"), dirName);
+			tempTestDir = new File(System.getProperty("java.io.tmpdir"), dirName);
 		}
 	}
 
@@ -110,12 +123,12 @@ public abstract class BaseRuntimeTestSupport implements RuntimeTestSupport {
 
 	public void eraseTempDir() {
 		if(shouldEraseTempDir()) {
-			eraseDirectory(getTempDir());
+			eraseDirectory(getTempTestDir());
 		}
 	}
 
 	protected boolean shouldEraseTempDir() {
-		if(tempDir == null)
+		if(tempTestDir == null)
 			return false;
 		String propName = getPropertyPrefix() + "-erase-test-dir";
 		String prop = System.getProperty(propName);

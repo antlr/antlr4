@@ -5,7 +5,6 @@
  */
 package org.antlr.v4.test.runtime.java;
 
-import org.antlr.v4.Tool;
 import org.antlr.v4.analysis.AnalysisPipeline;
 import org.antlr.v4.automata.ATNFactory;
 import org.antlr.v4.automata.ATNPrinter;
@@ -14,25 +13,12 @@ import org.antlr.v4.automata.ParserATNFactory;
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.IntStream;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.Parser;
-import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.TokenSource;
 import org.antlr.v4.runtime.TokenStream;
-import org.antlr.v4.runtime.WritableToken;
-import org.antlr.v4.runtime.atn.ATN;
-import org.antlr.v4.runtime.atn.ATNDeserializer;
-import org.antlr.v4.runtime.atn.ATNSerializer;
 import org.antlr.v4.runtime.atn.ATNState;
-import org.antlr.v4.runtime.atn.DecisionState;
-import org.antlr.v4.runtime.atn.LexerATNSimulator;
-import org.antlr.v4.runtime.dfa.DFA;
-import org.antlr.v4.runtime.misc.IntegerList;
-import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.semantics.SemanticPipeline;
@@ -42,9 +28,6 @@ import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.GrammarSemanticsMessage;
 import org.antlr.v4.tool.LexerGrammar;
 import org.antlr.v4.tool.Rule;
-import org.junit.rules.TestRule;
-import org.junit.rules.TestWatcher;
-import org.junit.runner.Description;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupString;
@@ -68,13 +51,9 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertFalse;
@@ -143,7 +122,7 @@ public class BaseJavaTest extends BaseRuntimeTestSupport implements RuntimeTestS
 	protected boolean compile(String... fileNames) {
 		List<File> files = new ArrayList<File>();
 		for (String fileName : fileNames) {
-			File f = new File(getTempDir(), fileName);
+			File f = new File(getTempTestDir(), fileName);
 			files.add(f);
 		}
 
@@ -245,7 +224,7 @@ public class BaseJavaTest extends BaseRuntimeTestSupport implements RuntimeTestS
 
 	public Class<?> loadClassFromTempDir(String name) throws Exception {
 		ClassLoader loader =
-			new URLClassLoader(new URL[]{getTempDir().toURI().toURL()},
+			new URLClassLoader(new URL[]{getTempTestDir().toURI().toURL()},
 			                   ClassLoader.getSystemClassLoader());
 		return loader.loadClass(name);
 	}
@@ -374,7 +353,7 @@ public class BaseJavaTest extends BaseRuntimeTestSupport implements RuntimeTestS
 	public String execClass(String className) {
 		if (TEST_IN_SAME_PROCESS) {
 			try {
-				ClassLoader loader = new URLClassLoader(new URL[] { getTempDir().toURI().toURL() }, ClassLoader.getSystemClassLoader());
+				ClassLoader loader = new URLClassLoader(new URL[] { getTempTestDir().toURI().toURL() }, ClassLoader.getSystemClassLoader());
                 final Class<?> mainClass = (Class<?>)loader.loadClass(className);
 				final Method mainMethod = mainClass.getDeclaredMethod("main", String[].class);
 				PipedInputStream stdoutIn = new PipedInputStream();
@@ -392,7 +371,7 @@ public class BaseJavaTest extends BaseRuntimeTestSupport implements RuntimeTestS
 						System.setErr(new PrintStream(stderrOut));
 						stdoutVacuum.start();
 						stderrVacuum.start();
-						mainMethod.invoke(null, (Object)new String[] { new File(getTempDir(), "input").getAbsolutePath() });
+						mainMethod.invoke(null, (Object)new String[] { new File(getTempTestDir(), "input").getAbsolutePath() });
 					}
 					finally {
 						System.setErr(originalErr);
@@ -424,12 +403,12 @@ public class BaseJavaTest extends BaseRuntimeTestSupport implements RuntimeTestS
 			String[] args = new String[] {
 				"java", "-classpath", getTempDirPath() + PATH_SEP + CLASSPATH,
 				"-Dfile.encoding=UTF-8",
-				className, new File(getTempDir(), "input").getAbsolutePath()
+				className, new File(getTempTestDir(), "input").getAbsolutePath()
 			};
 //			String cmdLine = Utils.join(args, " ");
 //			System.err.println("execParser: "+cmdLine);
 			Process process =
-				Runtime.getRuntime().exec(args, null, getTempDir());
+				Runtime.getRuntime().exec(args, null, getTempTestDir());
 			StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
 			StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
 			stdoutVacuum.start();

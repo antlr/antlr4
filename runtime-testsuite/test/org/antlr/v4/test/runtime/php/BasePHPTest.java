@@ -11,25 +11,11 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import org.antlr.v4.Tool;
-import org.antlr.v4.automata.LexerATNFactory;
-import org.antlr.v4.automata.ParserATNFactory;
-import org.antlr.v4.runtime.atn.ATN;
-import org.antlr.v4.runtime.atn.ATNDeserializer;
-import org.antlr.v4.runtime.atn.ATNSerializer;
-import org.antlr.v4.semantics.SemanticPipeline;
+
 import org.antlr.v4.test.runtime.*;
-import org.antlr.v4.tool.Grammar;
-import org.antlr.v4.tool.LexerGrammar;
-import org.junit.rules.TestRule;
-import org.junit.rules.TestWatcher;
-import org.junit.runner.Description;
 import org.stringtemplate.v4.ST;
 
 import static org.antlr.v4.test.runtime.BaseRuntimeTest.antlrOnString;
@@ -218,14 +204,14 @@ public class BasePHPTest extends BaseRuntimeTestSupport implements RuntimeTestSu
 		String phpPath = locatePhp();
 		String runtimePath = locateRuntime();
 
-		String modulePath = new File(getTempDir(), fileName).getAbsolutePath();
-		String inputPath = new File(getTempDir(), "input").getAbsolutePath();
-		Path outputPath = getTempDir().toPath().resolve("output").toAbsolutePath();
+		String modulePath = new File(getTempTestDir(), fileName).getAbsolutePath();
+		String inputPath = new File(getTempTestDir(), "input").getAbsolutePath();
+		Path outputPath = getTempTestDir().toPath().resolve("output").toAbsolutePath();
 
 		try {
 			ProcessBuilder builder = new ProcessBuilder(phpPath, modulePath, inputPath, outputPath.toString());
 			builder.environment().put("RUNTIME", runtimePath);
-			builder.directory(getTempDir());
+			builder.directory(getTempTestDir());
 			Process process = builder.start();
 			StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
 			StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());

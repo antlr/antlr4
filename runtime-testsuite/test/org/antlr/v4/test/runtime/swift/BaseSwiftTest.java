@@ -8,9 +8,6 @@ package org.antlr.v4.test.runtime.swift;
 
 import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.test.runtime.*;
-import org.junit.rules.TestRule;
-import org.junit.rules.TestWatcher;
-import org.junit.runner.Description;
 import org.stringtemplate.v4.ST;
 
 import java.io.BufferedReader;
@@ -21,7 +18,7 @@ import java.net.URL;
 import java.util.*;
 
 import static org.antlr.v4.test.runtime.BaseRuntimeTest.antlrOnString;
-import static org.antlr.v4.test.runtime.BaseRuntimeTest.mkdir;
+import static org.antlr.v4.test.runtime.RuntimeTestUtils.mkdir;
 import static org.antlr.v4.test.runtime.BaseRuntimeTest.writeFile;
 import static org.junit.Assert.assertTrue;
 
@@ -100,7 +97,7 @@ public class BaseSwiftTest extends BaseRuntimeTestSupport implements RuntimeTest
 		addSourceFiles("main.swift");
 
 		String projectName = "testcase-" + System.currentTimeMillis();
-		String projectDir = new File(getTempDir(), projectName).getAbsolutePath();
+		String projectDir = new File(getTempTestDir(), projectName).getAbsolutePath();
 		try {
 			buildProject(projectDir, projectName);
 			return execTest(projectDir, projectName);
@@ -149,7 +146,7 @@ public class BaseSwiftTest extends BaseRuntimeTestSupport implements RuntimeTest
 		mkdir(projectDir);
 		fastFailRunProcess(projectDir, SWIFT_CMD, "package", "init", "--type", "executable");
 		for (String sourceFile: sourceFiles) {
-			String absPath = new File(getTempDir(), sourceFile).getAbsolutePath();
+			String absPath = new File(getTempTestDir(), sourceFile).getAbsolutePath();
 			fastFailRunProcess(getTempDirPath(), "mv", "-f", absPath, projectDir + "/Sources/" + projectName);
 		}
 		fastFailRunProcess(getTempDirPath(), "mv", "-f", "input", projectDir);
@@ -278,7 +275,7 @@ public class BaseSwiftTest extends BaseRuntimeTestSupport implements RuntimeTest
 
 		addSourceFiles("main.swift");
 		String projectName = "testcase-" + System.currentTimeMillis();
-		String projectDir = new File(getTempDir(), projectName).getAbsolutePath();
+		String projectDir = new File(getTempTestDir(), projectName).getAbsolutePath();
 		try {
 			buildProject(projectDir, projectName);
 			return execTest(projectDir, projectName);
