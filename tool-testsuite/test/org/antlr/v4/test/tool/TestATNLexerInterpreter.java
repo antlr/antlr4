@@ -11,6 +11,7 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.misc.Utils;
+import org.antlr.v4.test.runtime.RuntimeTestUtils;
 import org.antlr.v4.tool.DOTGenerator;
 import org.antlr.v4.tool.LexerGrammar;
 import org.junit.Before;
@@ -386,7 +387,7 @@ public class TestATNLexerInterpreter extends BaseJavaToolTest {
 		DOTGenerator dot = new DOTGenerator(lg);
 //		System.out.println(dot.getDOT(startState, true));
 
-		List<String> tokenTypes = getTokenTypes(lg, atn, input);
+		List<String> tokenTypes = RuntimeTestUtils.getTokenTypes(lg, atn, input);
 
 		String result = Utils.join(tokenTypes.iterator(), ", ");
 //		System.out.println(tokenTypes);
