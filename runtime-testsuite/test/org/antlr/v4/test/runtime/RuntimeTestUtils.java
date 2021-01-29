@@ -7,6 +7,7 @@ import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntegerList;
 import org.antlr.v4.tool.LexerGrammar;
 
+import java.io.*;
 import java.util.*;
 
 public abstract class RuntimeTestUtils {
@@ -69,4 +70,15 @@ public abstract class RuntimeTestUtils {
 		return tokenTypes;
 	}
 
+	public static void copyFile(File source, File dest) throws IOException {
+		InputStream is = new FileInputStream(source);
+		OutputStream os = new FileOutputStream(dest);
+		byte[] buf = new byte[4 << 10];
+		int l;
+		while ((l = is.read(buf)) > -1) {
+			os.write(buf, 0, l);
+		}
+		is.close();
+		os.close();
+	}
 }

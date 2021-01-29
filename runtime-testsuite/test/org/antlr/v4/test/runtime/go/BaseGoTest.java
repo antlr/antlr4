@@ -10,11 +10,6 @@ import org.antlr.v4.test.runtime.*;
 import org.stringtemplate.v4.ST;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,6 +23,8 @@ public class BaseGoTest extends BaseRuntimeTestSupport implements RuntimeTestSup
 	private static File tmpGopath = null;
 	private static final String GO_RUNTIME_IMPORT_PATH = "github.com/antlr/antlr4/runtime/Go/antlr"; // TODO: Change this before merging with upstream
 
+	private File parserTempDir; // "parser" with tempDir
+
 	@Override
 	protected String getPropertyPrefix() {
 		return "antlr4-go";
@@ -37,8 +34,7 @@ public class BaseGoTest extends BaseRuntimeTestSupport implements RuntimeTestSup
 	 * Copies all files from go runtime to a temporary folder that is inside a valid GOPATH project structure.
 	 */
 	public static void groupSetUp() throws Exception {
-		tmpGopath = new File(System.getProperty("java.io.tmpdir"), "antlr-goruntime-tmpgopath-"
-			+ Long.toHexString(System.currentTimeMillis()));
+		tmpGopath = new File(System.getProperty("java.io.tmpdir"), "antlr-goruntime-tmpgopath-" + Long.toHexString(System.currentTimeMillis()));
 
 		ArrayList<String> pathsegments = new ArrayList<String>();
 		pathsegments.add("src");
@@ -58,7 +54,7 @@ public class BaseGoTest extends BaseRuntimeTestSupport implements RuntimeTestSup
 		}
 		for (File runtimeFile : runtimeFiles) {
 			File dest = new File(tmpPackageDir, runtimeFile.getName());
-			copyFile(runtimeFile, dest);
+			RuntimeTestUtils.copyFile(runtimeFile, dest);
 		}
 
 		cacheGoRuntime(tmpPackageDir);
@@ -84,20 +80,21 @@ public class BaseGoTest extends BaseRuntimeTestSupport implements RuntimeTestSup
 		}
 	}
 
-	private static void copyFile(File source, File dest) throws IOException {
-		InputStream is = new FileInputStream(source);
-		OutputStream os = new FileOutputStream(dest);
-		byte[] buf = new byte[4 << 10];
-		int l;
-		while ((l = is.read(buf)) > -1) {
-			os.write(buf, 0, l);
-		}
-		is.close();
-		os.close();
+	public void testSetUp() throws Exception {
+		eraseParserTempDir();
+		super.testSetUp();
+		parserTempDir = new File(getTempDir(), "parser");
 	}
 
-	public void testSetUp() throws Exception {
-		super.testSetUp();
+	private void eraseParserTempDir() {
+		if(parserTempDir != null) {
+			eraseDirectory(parserTempDir);
+			parserTempDir = null;
+		}
+	}
+
+	private String getParserDirPath() {
+		return parserTempDir == null ? null : parserTempDir.getAbsolutePath();
 	}
 
 	protected String execLexer(String grammarFileName, String grammarStr,
@@ -143,7 +140,7 @@ public class BaseGoTest extends BaseRuntimeTestSupport implements RuntimeTestSup
 	protected boolean rawGenerateAndBuildRecognizer(String grammarFileName,
 	                                                String grammarStr, String parserName, String lexerName,
 	                                                boolean defaultListener, String... extraOptions) {
-		ErrorQueue equeue = antlrOnString(getTempDirPath(), "Go", grammarFileName, grammarStr,
+		ErrorQueue equeue = antlrOnString(getParserDirPath(), "Go", grammarFileName, grammarStr,
 		                                  defaultListener, extraOptions);
 		if (!equeue.errors.isEmpty()) {
 			return false;
