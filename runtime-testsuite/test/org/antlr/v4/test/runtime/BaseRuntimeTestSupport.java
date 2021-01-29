@@ -1,5 +1,14 @@
 package org.antlr.v4.test.runtime;
 
+import org.antlr.v4.Tool;
+import org.antlr.v4.automata.LexerATNFactory;
+import org.antlr.v4.automata.ParserATNFactory;
+import org.antlr.v4.runtime.atn.ATN;
+import org.antlr.v4.runtime.atn.ATNDeserializer;
+import org.antlr.v4.runtime.atn.ATNSerializer;
+import org.antlr.v4.semantics.SemanticPipeline;
+import org.antlr.v4.tool.Grammar;
+import org.antlr.v4.tool.LexerGrammar;
 import org.junit.rules.TestRule;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
@@ -7,6 +16,8 @@ import org.junit.runner.Description;
 import java.io.File;
 import java.util.Locale;
 import java.util.logging.Logger;
+
+import static org.junit.Assert.assertEquals;
 
 public abstract class BaseRuntimeTestSupport implements RuntimeTestSupport {
 
@@ -154,4 +165,38 @@ public abstract class BaseRuntimeTestSupport implements RuntimeTestSupport {
 	public static boolean isWindows() {
 		return getOS().equalsIgnoreCase("windows");
 	}
+
+	protected ATN createATN(Grammar g, boolean useSerializer) {
+		if ( g.atn==null ) {
+			semanticProcess(g);
+			assertEquals(0, g.tool.getNumErrors());
+
+			ParserATNFactory f = g.isLexer() ? new LexerATNFactory((LexerGrammar) g) : new ParserATNFactory(g);
+
+			g.atn = f.createATN();
+			assertEquals(0, g.tool.getNumErrors());
+		}
+
+		ATN atn = g.atn;
+		if ( useSerializer ) {
+			char[] serialized = ATNSerializer.getSerializedAsChars(atn);
+			return new ATNDeserializer().deserialize(serialized);
+		}
+
+		return atn;
+	}
+	protected void semanticProcess(Grammar g) {
+		if ( g.ast!=null && !g.ast.hasErrors ) {
+//			System.out.println(g.ast.toStringTree());
+			Tool antlr = new Tool();
+			SemanticPipeline sem = new SemanticPipeline(g);
+			sem.process();
+			if ( g.getImportedGrammars()!=null ) { // process imported grammars (if any)
+				for (Grammar imp : g.getImportedGrammars()) {
+					antlr.processNonCombinedGrammar(imp, false);
+				}
+			}
+		}
+	}
+
 }

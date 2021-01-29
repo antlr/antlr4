@@ -1,5 +1,12 @@
 package org.antlr.v4.test.runtime;
 
+import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.atn.ATN;
+import org.antlr.v4.runtime.atn.LexerATNSimulator;
+import org.antlr.v4.runtime.dfa.DFA;
+import org.antlr.v4.runtime.misc.IntegerList;
+import org.antlr.v4.tool.LexerGrammar;
+
 import java.util.*;
 
 public abstract class RuntimeTestUtils {
@@ -22,4 +29,44 @@ public abstract class RuntimeTestUtils {
 		}
 		return dup;
 	}
+
+	public static List<String> getTokenTypes(LexerGrammar lg,
+									  ATN atn,
+									  CharStream input) {
+		LexerATNSimulator interp = new LexerATNSimulator(atn, new DFA[]{new DFA(atn.modeToStartState.get(Lexer.DEFAULT_MODE))}, null);
+		List<String> tokenTypes = new ArrayList<String>();
+		int ttype;
+		boolean hitEOF = false;
+		do {
+			if ( hitEOF ) {
+				tokenTypes.add("EOF");
+				break;
+			}
+			int t = input.LA(1);
+			ttype = interp.match(input, Lexer.DEFAULT_MODE);
+			if ( ttype==Token.EOF ) {
+				tokenTypes.add("EOF");
+			}
+			else {
+				tokenTypes.add(lg.typeToTokenList.get(ttype));
+			}
+
+			if ( t== IntStream.EOF ) {
+				hitEOF = true;
+			}
+		} while ( ttype!=Token.EOF );
+		return tokenTypes;
+	}
+
+	public static IntegerList getTokenTypesViaATN(String input, LexerATNSimulator lexerATN) {
+		ANTLRInputStream in = new ANTLRInputStream(input);
+		IntegerList tokenTypes = new IntegerList();
+		int ttype;
+		do {
+			ttype = lexerATN.match(in, Lexer.DEFAULT_MODE);
+			tokenTypes.add(ttype);
+		} while ( ttype!= Token.EOF );
+		return tokenTypes;
+	}
+
 }
