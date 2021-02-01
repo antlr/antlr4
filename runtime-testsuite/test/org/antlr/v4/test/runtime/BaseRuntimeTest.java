@@ -111,11 +111,6 @@ public abstract class BaseRuntimeTest {
 		this.delegate = delegate;
 	}
 
-	public static void mkdir(String dir) {
-		File f = new File(dir);
-		f.mkdirs();
-	}
-
 	@Before
 	public void setUp() throws Exception {
 		// From http://junit.sourceforge.net/javadoc/org/junit/Assume.html
@@ -159,7 +154,7 @@ public abstract class BaseRuntimeTest {
 	}
 
 	public void testParser(RuntimeTestDescriptor descriptor) throws Exception {
-		mkdir(delegate.getTmpDir());
+		RuntimeTestUtils.mkdir(delegate.getTempParserDirPath());
 
 		Pair<String, String> pair = descriptor.getGrammar();
 
@@ -176,7 +171,7 @@ public abstract class BaseRuntimeTest {
 				g.registerRenderer(String.class, new StringRenderer());
 				g.importTemplates(targetTemplates);
 				ST grammarST = new ST(g, spair.b);
-				writeFile(delegate.getTmpDir(), spair.a+".g4", grammarST.render());
+				writeFile(delegate.getTempParserDirPath(), spair.a+".g4", grammarST.render());
 			}
 		}
 
@@ -201,7 +196,7 @@ public abstract class BaseRuntimeTest {
 	}
 
 	public void testLexer(RuntimeTestDescriptor descriptor) throws Exception {
-		mkdir(delegate.getTmpDir());
+		RuntimeTestUtils.mkdir(delegate.getTempParserDirPath());
 
 		Pair<String, String> pair = descriptor.getGrammar();
 
@@ -218,7 +213,7 @@ public abstract class BaseRuntimeTest {
 				g.registerRenderer(String.class, new StringRenderer());
 				g.importTemplates(targetTemplates);
 				ST grammarST = new ST(g, spair.b);
-				writeFile(delegate.getTmpDir(), spair.a+".g4", grammarST.render());
+				writeFile(delegate.getTempParserDirPath(), spair.a+".g4", grammarST.render());
 			}
 		}
 
@@ -242,7 +237,7 @@ public abstract class BaseRuntimeTest {
 	                                       boolean defaultListener,
 	                                       String... extraOptions)
 	{
-		mkdir(workdir);
+		RuntimeTestUtils.mkdir(workdir);
 		writeFile(workdir, grammarFileName, grammarStr);
 		return antlrOnString(workdir, targetName, grammarFileName, defaultListener, extraOptions);
 	}

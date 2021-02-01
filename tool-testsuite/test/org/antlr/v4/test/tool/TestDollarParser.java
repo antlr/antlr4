@@ -28,7 +28,7 @@ public class TestDollarParser extends BaseJavaToolTest {
 		String found = execParser("T.g4", grammar, "TParser", "TLexer",
 		                          null, null, "a", "x", true);
 		assertTrue(found.indexOf(this.getClass().getSimpleName())>=0);
-		assertNull(this.stderrDuringParse);
+		assertNull(getParseErrors());
 	}
 
 }
