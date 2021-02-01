@@ -54,7 +54,7 @@ Edit the repository looking for 4.5 or whatever and update it. Bump version in t
  * runtime/Python2/src/antlr4/Recognizer.py
  * runtime/Python3/setup.py
  * runtime/Python3/src/antlr4/Recognizer.py
- * runtime/CSharp/Antlr4.csproj
+ * runtime/CSharp/src/Antlr4.csproj
  * runtime/PHP/src/RuntimeMetaData.php
  * runtime/JavaScript/package.json
  * runtime/JavaScript/src/antlr4/Recognizer.js
@@ -80,8 +80,8 @@ Here is a simple script to display any line from the critical files with, say, `
 
 ```bash
 mvn clean
-rm -rf runtime/CSharp/bin
-rm -rf runtime/CSharp/obj
+rm -rf runtime/CSharp/src/bin
+rm -rf runtime/CSharp/src/obj
 rm -rf runtime/gen
 find tool runtime -type f -exec grep -l '4\.9' {} \;
 find runtime runtime -type f -exec grep -l '4\.9' {} \;
@@ -322,10 +322,10 @@ Of course you need Mono and `nuget` to be installed. On mac:
 
 From @kvanTTT: Install `dotnet` on any platform (see https://dotnet.microsoft.com/download) and run the following command on any OS (Win, Linux, macOS):
 
-* building: `dotnet build runtime/CSharp/Antlr4.csproj -c Release`
-  Output `.dll` will be in `runtime/CSharp/bin/Release/netstandard2.0` or in `runtime/CSharp/bin/Release/netstandard2.1`
-* packing: `dotnet pack runtime/CSharp/Antlr4.csproj -c Release`
-  Output `.nupkg` will be in `runtime/CSharp/bin/Release/Antlr4.Runtime.Standard.4.9.0.nupkg`
+* building: `dotnet build runtime/CSharp/src/Antlr4.csproj -c Release`
+  Output `.dll` will be in `runtime/CSharp/src/bin/Release/netstandard2.0` or in `runtime/CSharp/src/bin/Release/netstandard2.1`
+* packing: `dotnet pack runtime/CSharp/src/Antlr4.csproj -c Release`
+  Output `.nupkg` will be in `runtime/CSharp/src/bin/Release/Antlr4.Runtime.Standard.4.9.1.nupkg`
 
 Alternatively, you can install Visual Studio 2017 and make sure to check boxes with .NET Core SDK.
 
