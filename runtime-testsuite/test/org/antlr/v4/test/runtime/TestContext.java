@@ -10,10 +10,15 @@ public abstract class TestContext {
 		return "true".equals(String.valueOf(System.getenv("APPVEYOR")).toLowerCase());
 	}
 
+	public static boolean isCircleCI() {
+		return "true".equals(String.valueOf(System.getenv("CIRCLECI")).toLowerCase());
+	}
+
 	public static boolean isSupportedTarget(String target) {
 		if(isAppVeyorCI())
 			return !target.matches("Swift|Node");
 		else
 			return true;
 	}
+
 }

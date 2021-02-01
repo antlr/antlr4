@@ -100,18 +100,16 @@ void LL1Analyzer::_LOOK(ATNState *s, ATNState *stopState, Ref<PredictionContext>
     }
 
     if (ctx != PredictionContext::EMPTY) {
-      // run thru all possible stack tops in ctx
+      bool removed = calledRuleStack.test(s->ruleIndex);
+      calledRuleStack[s->ruleIndex] = false;
+       auto onExit = finally([removed, &calledRuleStack, s] {
+                if (removed) {
+                  calledRuleStack.set(s->ruleIndex);
+                }
+              });
+       // run thru all possible stack tops in ctx
       for (size_t i = 0; i < ctx->size(); i++) {
         ATNState *returnState = _atn.states[ctx->getReturnState(i)];
-
-        bool removed = calledRuleStack.test(returnState->ruleIndex);
-        auto onExit = finally([removed, &calledRuleStack, returnState] {
-          if (removed) {
-            calledRuleStack.set(returnState->ruleIndex);
-          }
-        });
-
-        calledRuleStack[returnState->ruleIndex] = false;
         _LOOK(returnState, stopState, ctx->getParent(i), look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
       }
       return;

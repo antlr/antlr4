@@ -17,6 +17,7 @@ import org.antlr.v4.runtime.atn.LexerATNSimulator;
 import org.antlr.v4.runtime.atn.PredictionContextCache;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntegerList;
+import org.antlr.v4.test.runtime.MockIntTokenStream;
 import org.antlr.v4.tool.DOTGenerator;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LeftRecursiveRule;
@@ -27,6 +28,7 @@ import org.junit.Test;
 
 import java.util.Arrays;
 
+import static org.antlr.v4.test.runtime.RuntimeTestUtils.getTokenTypesViaATN;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -526,7 +528,7 @@ public class TestATNParserPrediction extends BaseJavaToolTest {
 
 		// Check ATN prediction
 //		ParserATNSimulator interp = new ParserATNSimulator(atn);
-		TokenStream input = new IntTokenStream(types);
+		TokenStream input = new MockIntTokenStream(types);
 		ParserInterpreterForTesting interp = new ParserInterpreterForTesting(g, input);
 		int alt = interp.adaptivePredict(input, decision, ParserRuleContext.EMPTY);
 
@@ -559,7 +561,7 @@ public class TestATNParserPrediction extends BaseJavaToolTest {
 			// Check DFA
 			IntegerList types = getTokenTypesViaATN(inputString[i], lexInterp);
 //			System.out.println(types);
-			TokenStream input = new IntTokenStream(types);
+			TokenStream input = new MockIntTokenStream(types);
 			try {
 				interp.adaptivePredict(input, decision, ParserRuleContext.EMPTY);
 			}

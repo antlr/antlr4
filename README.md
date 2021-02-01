@@ -1,6 +1,14 @@
 # ANTLR v4
 
-[![Build Travis-CI Status](https://travis-ci.org/antlr/antlr4.svg?branch=master)](https://travis-ci.org/antlr/antlr4) [![Build AppVeyor  Status](https://ci.appveyor.com/api/projects/status/5acpbx1pg7bhgh8v/branch/master?svg=true)](https://ci.appveyor.com/project/parrt/antlr4) [![Java 7+](https://img.shields.io/badge/java-7+-4c7e9f.svg)](http://java.oracle.com) [![License](https://img.shields.io/badge/license-BSD-blue.svg)](https://raw.githubusercontent.com/antlr/antlr4/master/LICENSE.txt)
+[![Java 7+](https://img.shields.io/badge/java-7+-4c7e9f.svg)](http://java.oracle.com)
+[![License](https://img.shields.io/badge/license-BSD-blue.svg)](https://raw.githubusercontent.com/antlr/antlr4/master/LICENSE.txt)
+
+**Build status**
+
+[![Github CI Build Status (MacOSX)](https://img.shields.io/github/workflow/status/antlr/antlr4/MacOSX?label=MacOSX)](https://github.com/antlr/antlr4/actions) 
+[![AppVeyor CI Build Status (Windows)](https://img.shields.io/appveyor/build/parrt/antlr4?label=Windows)](https://ci.appveyor.com/project/parrt/antlr4) 
+[![Circle CI Build Status (Linux)](https://img.shields.io/circleci/build/gh/antlr/antlr4/master?label=Linux)](https://app.circleci.com/pipelines/github/antlr/antlr4)
+[![Travis-CI Build Status (Swift-Linux)](https://img.shields.io/travis/antlr/antlr4.svg?label=Linux-Swift&branch=master)](https://travis-ci.com/github/antlr/antlr4)
 
 **ANTLR** (ANother Tool for Language Recognition) is a powerful parser generator for reading, processing, executing, or translating structured text or binary files. It's widely used to build languages, tools, and frameworks. From a grammar, ANTLR generates a parser that can build parse trees and also generates a listener interface (or visitor) that makes it easy to respond to the recognition of phrases of interest.
 
@@ -13,8 +21,8 @@
 * [Terence Parr](http://www.cs.usfca.edu/~parrt/), parrt@cs.usfca.edu
 ANTLR project lead and supreme dictator for life
 [University of San Francisco](http://www.usfca.edu/)
-* [Sam Harwell](http://tunnelvisionlabs.com/) (Tool co-author, Java and C# target)
-* Eric Vergnaud (Javascript, Python2, Python3 targets and significant work on C# target)
+* [Sam Harwell](http://tunnelvisionlabs.com/) (Tool co-author, Java and original C# target)
+* [Eric Vergnaud](https://github.com/ericvergnaud) (Javascript, Python2, Python3 targets and maintenance of C# target)
 * [Peter Boyer](https://github.com/pboyer) (Go target)
 * [Mike Lischke](http://www.soft-gems.net/) (C++ completed target)
 * Dan McLaughlin (C++ initial target)

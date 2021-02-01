@@ -11,9 +11,7 @@ import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.tool.ANTLRMessage;
 import org.antlr.v4.tool.DefaultToolListener;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.rules.TestRule;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
@@ -44,6 +42,7 @@ import static org.junit.Assume.assumeFalse;
  *  @since 4.6.
  */
 public abstract class BaseRuntimeTest {
+
 	public final static String[] Targets = {
 		"Cpp",
 		"CSharp",
@@ -56,18 +55,43 @@ public abstract class BaseRuntimeTest {
 		"Swift"
 	};
 
-	static {
-		// Add heartbeat thread to gen minimal output for travis, appveyor to
-		// avoid timeout.
+	@BeforeClass
+	public static void startHeartbeatToAvoidTimeout() {
+		if (isTravisCI() || isAppVeyorCI())
+			startHeartbeat();
+	}
+
+	@AfterClass
+	public static void stopHeartbeat() {
+		heartbeat = false;
+	}
+
+	private static boolean isAppVeyorCI() {
+		// see https://www.appveyor.com/docs/environment-variables/
+		String s = System.getenv("APPVEYOR");
+		return s!=null && "true".equals(s.toLowerCase());
+	}
+
+	private static boolean isTravisCI() {
+		// see https://docs.travis-ci.com/user/environment-variables/#default-environment-variables
+		String s = System.getenv("TRAVIS");
+		return s!=null && "true".equals(s.toLowerCase());
+	}
+
+	static boolean heartbeat = false;
+
+	private static void startHeartbeat() {
+		// Add heartbeat thread to gen minimal output for travis, appveyor to avoid timeout.
 		Thread t = new Thread("heartbeat") {
 			@Override
 			public void run() {
-				while (true) {
+				heartbeat = true;
+				while (heartbeat) {
 					System.out.print('.');
 					try {
+						//noinspection BusyWait
 						Thread.sleep(5000);
-					}
-					catch (Exception e) {
+					} catch (Exception e) {
 						e.printStackTrace();
 					}
 				}
@@ -85,11 +109,6 @@ public abstract class BaseRuntimeTest {
 	public BaseRuntimeTest(RuntimeTestDescriptor descriptor, RuntimeTestSupport delegate) {
 		this.descriptor = descriptor;
 		this.delegate = delegate;
-	}
-
-	public static void mkdir(String dir) {
-		File f = new File(dir);
-		f.mkdirs();
 	}
 
 	@Before
@@ -118,22 +137,24 @@ public abstract class BaseRuntimeTest {
 
 	@Test
 	public void testOne() throws Exception {
+		// System.out.println(descriptor.getTestName());
 		// System.out.println(delegate.getTmpDir());
 		if (descriptor.ignore(descriptor.getTarget()) ) {
 			System.out.println("Ignore " + descriptor);
 			return;
 		}
-
+		delegate.beforeTest(descriptor);
 		if (descriptor.getTestType().contains("Parser") ) {
 			testParser(descriptor);
 		}
 		else {
 			testLexer(descriptor);
 		}
+		delegate.afterTest(descriptor);
 	}
 
 	public void testParser(RuntimeTestDescriptor descriptor) throws Exception {
-		mkdir(delegate.getTmpDir());
+		RuntimeTestUtils.mkdir(delegate.getTempParserDirPath());
 
 		Pair<String, String> pair = descriptor.getGrammar();
 
@@ -150,7 +171,7 @@ public abstract class BaseRuntimeTest {
 				g.registerRenderer(String.class, new StringRenderer());
 				g.importTemplates(targetTemplates);
 				ST grammarST = new ST(g, spair.b);
-				writeFile(delegate.getTmpDir(), spair.a+".g4", grammarST.render());
+				writeFile(delegate.getTempParserDirPath(), spair.a+".g4", grammarST.render());
 			}
 		}
 
@@ -175,7 +196,7 @@ public abstract class BaseRuntimeTest {
 	}
 
 	public void testLexer(RuntimeTestDescriptor descriptor) throws Exception {
-		mkdir(delegate.getTmpDir());
+		RuntimeTestUtils.mkdir(delegate.getTempParserDirPath());
 
 		Pair<String, String> pair = descriptor.getGrammar();
 
@@ -192,7 +213,7 @@ public abstract class BaseRuntimeTest {
 				g.registerRenderer(String.class, new StringRenderer());
 				g.importTemplates(targetTemplates);
 				ST grammarST = new ST(g, spair.b);
-				writeFile(delegate.getTmpDir(), spair.a+".g4", grammarST.render());
+				writeFile(delegate.getTempParserDirPath(), spair.a+".g4", grammarST.render());
 			}
 		}
 
@@ -216,7 +237,7 @@ public abstract class BaseRuntimeTest {
 	                                       boolean defaultListener,
 	                                       String... extraOptions)
 	{
-		mkdir(workdir);
+		RuntimeTestUtils.mkdir(workdir);
 		writeFile(workdir, grammarFileName, grammarStr);
 		return antlrOnString(workdir, targetName, grammarFileName, defaultListener, extraOptions);
 	}

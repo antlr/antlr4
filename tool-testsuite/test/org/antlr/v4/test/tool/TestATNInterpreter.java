@@ -9,12 +9,14 @@ package org.antlr.v4.test.tool;
 import org.antlr.v4.automata.ParserATNFactory;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.NoViableAltException;
+import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.atn.BlockStartState;
 import org.antlr.v4.runtime.atn.LexerATNSimulator;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntegerList;
+import org.antlr.v4.test.runtime.MockIntTokenStream;
 import org.antlr.v4.tool.DOTGenerator;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
@@ -22,6 +24,7 @@ import org.antlr.v4.tool.Rule;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.antlr.v4.test.runtime.RuntimeTestUtils.getTokenTypesViaATN;
 import static org.junit.Assert.assertEquals;
 
 	// NOTICE: TOKENS IN LEXER, PARSER MUST BE SAME OR TOKEN TYPE MISMATCH
@@ -373,7 +376,7 @@ public class TestATNInterpreter extends BaseJavaToolTest {
 		ParserATNFactory f = new ParserATNFactory(g);
 		ATN atn = f.createATN();
 
-		IntTokenStream input = new IntTokenStream(types);
+		TokenStream input = new MockIntTokenStream(types);
 //		System.out.println("input="+input.types);
 		ParserInterpreterForTesting interp = new ParserInterpreterForTesting(g, input);
 		ATNState startState = atn.ruleToStartState[g.getRule("a").index];

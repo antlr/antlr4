@@ -111,7 +111,7 @@ class DFA {
 	 */
 	setPrecedenceDfa(precedenceDfa) {
 		if (this.precedenceDfa!==precedenceDfa) {
-			this._states = new DFAStatesSet();
+			this._states = new Set();
 			if (precedenceDfa) {
 				const precedenceState = new DFAState(null, new ATNConfigSet());
 				precedenceState.edges = [];

@@ -6,6 +6,8 @@
 
 package org.antlr.v4.test.runtime;
 
+import java.io.File;
+
 /** This interface describes functionality needed to execute a runtime test.
  *  Unfortunately the Base*Test.java files are big junk drawers. This is
  *  an attempt to make it more obvious what new target implementers have to
@@ -14,13 +16,22 @@ package org.antlr.v4.test.runtime;
  *  @since 4.6
  */
 public interface RuntimeTestSupport {
-	void testSetUp() throws Exception;
-	void testTearDown() throws Exception;
+
+	// dir containing grammar input and output
+	File getTempParserDir();
+	String getTempParserDirPath();
+
+	// dir containing test input and output
+	File getTempTestDir();
+	String getTempDirPath();
 	void eraseTempDir();
 
-	String getTmpDir();
+    void testSetUp() throws Exception;
+	void testTearDown() throws Exception;
 
-	String getStdout();
+	void beforeTest(RuntimeTestDescriptor descriptor);
+	void afterTest(RuntimeTestDescriptor descriptor);
+
 	String getParseErrors();
 	String getANTLRToolErrors();
 
@@ -39,4 +50,5 @@ public interface RuntimeTestSupport {
 	                  String startRuleName,
 	                  String input,
 	                  boolean showDiagnosticErrors);
+
 }
