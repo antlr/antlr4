@@ -188,7 +188,7 @@ func (d *DefaultErrorStrategy) Recover(recognizer Parser, e RecognitionException
 // sub rule or what follows loop. Yes, that is pretty aggressive. We opt to
 // stay in the loop as long as possible.
 //
-// <strong>ORIGINS</strong>
+// ORIGINS
 //
 // Previous versions of ANTLR did a poor job of their recovery within loops.
 // A single mismatch token or missing token would force the parser to bail
@@ -357,7 +357,7 @@ func (d *DefaultErrorStrategy) ReportMissingToken(recognizer Parser) {
 // recovery attempt fails, d method panics an
 // InputMisMatchException.
 //
-// <strong>EXTRA TOKEN</strong> (single token deletion)
+// EXTRA TOKEN (single token deletion)
 //
 // LA(1) is not what we are looking for. If LA(2) has the
 // right token, however, then assume LA(1) is some extra spurious
@@ -367,7 +367,7 @@ func (d *DefaultErrorStrategy) ReportMissingToken(recognizer Parser) {
 // This recovery strategy is implemented by {@link
 // //singleTokenDeletion}.
 //
-// <strong>MISSING TOKEN</strong> (single token insertion)
+// MISSING TOKEN (single token insertion)
 //
 // If current token (at LA(1)) is consistent with what could come
 // after the expected LA(1) token, then assume the token is missing
@@ -378,7 +378,7 @@ func (d *DefaultErrorStrategy) ReportMissingToken(recognizer Parser) {
 // This recovery strategy is implemented by {@link
 // //singleTokenInsertion}.
 //
-// <strong>EXAMPLE</strong>
+// EXAMPLE
 //
 // For example, Input i=(3 is clearly missing the ')'. When
 // the parser returns from the nested call to expr, it will have
@@ -697,13 +697,13 @@ func (d *DefaultErrorStrategy) consumeUntil(recognizer Parser, set *IntervalSet)
 // This error strategy is useful in the following scenarios.
 //
 // <ul>
-// <li><strong>Two-stage parsing:</strong> This error strategy allows the first
+// <li>Two-stage parsing: This error strategy allows the first
 // stage of two-stage parsing to immediately terminate if an error is
 // encountered, and immediately fall back to the second stage. In addition to
 // avoiding wasted work by attempting to recover from errors here, the empty
 // implementation of BailErrorStrategy//Sync improves the performance of
 // the first stage.</li>
-// <li><strong>Silent validation:</strong> When syntax errors are not being
+// <li>Silent validation: When syntax errors are not being
 // Reported or logged, and the parse result is simply ignored if errors occur,
 // the BailErrorStrategy avoids wasting work on recovering from errors
 // when the result will be ignored either way.</li>

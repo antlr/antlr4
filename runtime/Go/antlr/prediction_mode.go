@@ -82,7 +82,7 @@ const (
 // <li>Pure SLL without LL fallback</li>
 // </ul>
 //
-// <strong>COMBINED SLL+LL PARSING</strong>
+// COMBINED SLL+LL PARSING
 //
 // When LL-fallback is enabled upon SLL conflict, correct predictions are
 // ensured regardless of how the termination condition is computed by this
@@ -101,7 +101,7 @@ const (
 // stops when it sees only conflicting configuration subsets. In contrast,
 // full LL keeps going when there is uncertainty.
 //
-// <strong>HEURISTIC</strong>
+// HEURISTIC
 //
 // As a heuristic, we stop prediction when we see any conflicting subset
 // unless we see a state that only has one alternative associated with it.
@@ -129,13 +129,13 @@ const (
 // associated with the conflicting configs, but since we can continue
 // looking for input reasonably, don't declare the state done.
 //
-// <strong>PURE SLL PARSING</strong>
+// PURE SLL PARSING
 //
 // To handle pure SLL parsing, all we have to do is make sure that we
 // combine stack contexts for configurations that differ only by semantic
 // predicate. From there, we can do the usual SLL termination heuristic.
 //
-// <strong>PREDICATES IN SLL+LL PARSING</strong>
+// PREDICATES IN SLL+LL PARSING
 //
 // SLL decisions don't evaluate predicates until after they reach DFA stop
 // states because they need to create the DFA cache that works in all
@@ -285,7 +285,7 @@ func PredictionModeallConfigsInRuleStopStates(configs ATNConfigSet) bool {
 // no configuration contains a semantic context during the termination
 // check.
 //
-// <strong>CONFLICTING CONFIGS</strong>
+// CONFLICTING CONFIGS
 //
 // Two configurations (s, i, x) and (s, j, x'), conflict
 // when i!=j but x=x'. Because we merge all
@@ -308,7 +308,7 @@ func PredictionModeallConfigsInRuleStopStates(configs ATNConfigSet) bool {
 // simplicity but also because that is the test you need to detect the
 // alternatives that are actually in conflict.
 //
-// <strong>CONTINUE/STOP RULE</strong>
+// CONTINUE/STOP RULE
 //
 // Continue if union of resolved alternative sets from non-conflicting and
 // conflicting alternative subsets has more than one alternative. We are
@@ -321,7 +321,7 @@ func PredictionModeallConfigsInRuleStopStates(configs ATNConfigSet) bool {
 // conflicts to the configuration with a minimum alternate for the
 // conflicting set.
 //
-// <strong>CASES</strong>
+// CASES
 //
 // <ul>
 //
@@ -353,7 +353,7 @@ func PredictionModeallConfigsInRuleStopStates(configs ATNConfigSet) bool {
 //
 // </ul>
 //
-// <strong>EXACT AMBIGUITY DETECTION</strong>
+// EXACT AMBIGUITY DETECTION
 //
 // If all states Report the same conflicting set of alternatives, then we
 // know we have the exact ambiguity set.
