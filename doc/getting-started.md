@@ -118,8 +118,8 @@ hello parrt
 ^D
 (The output:)
 (r hello parrt)
-(That ^D means EOF on unix; it's ^Z in Windows.) The -tree option prints the parse tree in LISP notation.
-It's nicer to look at parse trees visually.
+(That ^D means EOF on unix; it's Ctrl+Z in Windows, when you Ctrl+Z, it will display ^Z)
+The -tree option prints the parse tree in LISP notation. It's nicer to look at parse trees visually.
 $ grun Hello r -gui
 hello parrt
 ^D
