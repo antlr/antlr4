@@ -25,6 +25,22 @@ Checking connectivity... done.
 Checking out files: 100% (1427/1427), done.
 ```
 
+# Check your environment
+
+If you are starting from a clean, minimum Ubuntu OS, check your environment.
+
+
+```bash
+$ sudo apt-get update
+$ # Get Java
+$ java > /dev/null 2>&1
+$ if [[ "$?" != "0" ]]; then sudo apt install -y openjdk-11-jre-headless; fi
+$ # Get Mvn
+$ mvn > /dev/null 2>&1
+$ if [[ "$?" != "0" ]]; then sudo apt install -y maven; fi
+
+```
+
 # Compile
 
 ```bash
