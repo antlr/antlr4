@@ -10,7 +10,7 @@ import (
 	"strconv"
 )
 
-// Provides an empty default implementation of {@link ANTLRErrorListener}. The
+// Provides an empty default implementation of ANTLRErrorListener. The
 // default implementation of each method does nothing, but can be overridden as
 // necessary.
 
@@ -49,7 +49,7 @@ func NewConsoleErrorListener() *ConsoleErrorListener {
 }
 
 //
-// Provides a default instance of {@link ConsoleErrorListener}.
+// Provides a default instance of ConsoleErrorListener.
 //
 var ConsoleErrorListenerINSTANCE = NewConsoleErrorListener()
 
@@ -57,8 +57,8 @@ var ConsoleErrorListenerINSTANCE = NewConsoleErrorListener()
 // {@inheritDoc}
 //
 // <p>
-// This implementation prints messages to {@link System//err} containing the
-// values of {@code line}, {@code charPositionInLine}, and {@code msg} using
+// This implementation prints messages to System//err containing the
+// values of line, charPositionInLine, and msg using
 // the following format.</p>
 //
 // <pre>

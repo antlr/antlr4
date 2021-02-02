@@ -7,14 +7,14 @@ package antlr
 import "strconv"
 
 const (
-	LexerActionTypeChannel  = 0 //The type of a {@link LexerChannelAction} action.
-	LexerActionTypeCustom   = 1 //The type of a {@link LexerCustomAction} action.
-	LexerActionTypeMode     = 2 //The type of a {@link LexerModeAction} action.
-	LexerActionTypeMore     = 3 //The type of a {@link LexerMoreAction} action.
-	LexerActionTypePopMode  = 4 //The type of a {@link LexerPopModeAction} action.
-	LexerActionTypePushMode = 5 //The type of a {@link LexerPushModeAction} action.
-	LexerActionTypeSkip     = 6 //The type of a {@link LexerSkipAction} action.
-	LexerActionTypeType     = 7 //The type of a {@link LexerTypeAction} action.
+	LexerActionTypeChannel  = 0 //The type of a LexerChannelAction action.
+	LexerActionTypeCustom   = 1 //The type of a LexerCustomAction action.
+	LexerActionTypeMode     = 2 //The type of a LexerModeAction action.
+	LexerActionTypeMore     = 3 //The type of a LexerMoreAction action.
+	LexerActionTypePopMode  = 4 //The type of a LexerPopModeAction action.
+	LexerActionTypePushMode = 5 //The type of a LexerPushModeAction action.
+	LexerActionTypeSkip     = 6 //The type of a LexerSkipAction action.
+	LexerActionTypeType     = 7 //The type of a LexerTypeAction action.
 )
 
 type LexerAction interface {
@@ -60,10 +60,10 @@ func (b *BaseLexerAction) equals(other LexerAction) bool {
 }
 
 //
-// Implements the {@code Skip} lexer action by calling {@link Lexer//Skip}.
+// Implements the Skip lexer action by calling Lexer//Skip.
 //
-// <p>The {@code Skip} command does not have any parameters, so l action is
-// implemented as a singleton instance exposed by {@link //INSTANCE}.</p>
+// <p>The Skip command does not have any parameters, so l action is
+// implemented as a singleton instance exposed by //INSTANCE.</p>
 type LexerSkipAction struct {
 	*BaseLexerAction
 }
@@ -85,7 +85,7 @@ func (l *LexerSkipAction) String() string {
 	return "skip"
 }
 
-//  Implements the {@code type} lexer action by calling {@link Lexer//setType}
+//  Implements the type lexer action by calling Lexer//setType
 // with the assigned type.
 type LexerTypeAction struct {
 	*BaseLexerAction
@@ -125,8 +125,8 @@ func (l *LexerTypeAction) String() string {
 	return "actionType(" + strconv.Itoa(l.thetype) + ")"
 }
 
-// Implements the {@code pushMode} lexer action by calling
-// {@link Lexer//pushMode} with the assigned mode.
+// Implements the pushMode lexer action by calling
+// Lexer//pushMode with the assigned mode.
 type LexerPushModeAction struct {
 	*BaseLexerAction
 
@@ -142,8 +142,8 @@ func NewLexerPushModeAction(mode int) *LexerPushModeAction {
 	return l
 }
 
-// <p>This action is implemented by calling {@link Lexer//pushMode} with the
-// value provided by {@link //getMode}.</p>
+// <p>This action is implemented by calling Lexer//pushMode with the
+// value provided by //getMode.</p>
 func (l *LexerPushModeAction) execute(lexer Lexer) {
 	lexer.PushMode(l.mode)
 }
@@ -169,10 +169,10 @@ func (l *LexerPushModeAction) String() string {
 	return "pushMode(" + strconv.Itoa(l.mode) + ")"
 }
 
-// Implements the {@code popMode} lexer action by calling {@link Lexer//popMode}.
+// Implements the popMode lexer action by calling Lexer//popMode.
 //
-// <p>The {@code popMode} command does not have any parameters, so l action is
-// implemented as a singleton instance exposed by {@link //INSTANCE}.</p>
+// <p>The popMode command does not have any parameters, so l action is
+// implemented as a singleton instance exposed by //INSTANCE.</p>
 type LexerPopModeAction struct {
 	*BaseLexerAction
 }
@@ -188,7 +188,7 @@ func NewLexerPopModeAction() *LexerPopModeAction {
 
 var LexerPopModeActionINSTANCE = NewLexerPopModeAction()
 
-// <p>This action is implemented by calling {@link Lexer//popMode}.</p>
+// <p>This action is implemented by calling Lexer//popMode.</p>
 func (l *LexerPopModeAction) execute(lexer Lexer) {
 	lexer.PopMode()
 }
@@ -197,10 +197,10 @@ func (l *LexerPopModeAction) String() string {
 	return "popMode"
 }
 
-// Implements the {@code more} lexer action by calling {@link Lexer//more}.
+// Implements the more lexer action by calling Lexer//more.
 //
-// <p>The {@code more} command does not have any parameters, so l action is
-// implemented as a singleton instance exposed by {@link //INSTANCE}.</p>
+// <p>The more command does not have any parameters, so l action is
+// implemented as a singleton instance exposed by //INSTANCE.</p>
 
 type LexerMoreAction struct {
 	*BaseLexerAction
@@ -215,7 +215,7 @@ func NewLexerMoreAction() *LexerMoreAction {
 
 var LexerMoreActionINSTANCE = NewLexerMoreAction()
 
-// <p>This action is implemented by calling {@link Lexer//popMode}.</p>
+// <p>This action is implemented by calling Lexer//popMode.</p>
 func (l *LexerMoreAction) execute(lexer Lexer) {
 	lexer.More()
 }
@@ -224,7 +224,7 @@ func (l *LexerMoreAction) String() string {
 	return "more"
 }
 
-// Implements the {@code mode} lexer action by calling {@link Lexer//mode} with
+// Implements the mode lexer action by calling Lexer//mode with
 // the assigned mode.
 type LexerModeAction struct {
 	*BaseLexerAction
@@ -239,8 +239,8 @@ func NewLexerModeAction(mode int) *LexerModeAction {
 	return l
 }
 
-// <p>This action is implemented by calling {@link Lexer//mode} with the
-// value provided by {@link //getMode}.</p>
+// <p>This action is implemented by calling Lexer//mode with the
+// value provided by //getMode.</p>
 func (l *LexerModeAction) execute(lexer Lexer) {
 	lexer.SetMode(l.mode)
 }
@@ -266,10 +266,10 @@ func (l *LexerModeAction) String() string {
 	return "mode(" + strconv.Itoa(l.mode) + ")"
 }
 
-// Executes a custom lexer action by calling {@link Recognizer//action} with the
+// Executes a custom lexer action by calling Recognizer//action with the
 // rule and action indexes assigned to the custom action. The implementation of
 // a custom action is added to the generated code for the lexer in an override
-// of {@link Recognizer//action} when the grammar is compiled.
+// of Recognizer//action when the grammar is compiled.
 //
 // <p>This class may represent embedded actions created with the <code>{...}</code>
 // syntax in ANTLR 4, as well as actions created for lexer commands where the
@@ -279,9 +279,9 @@ func (l *LexerModeAction) String() string {
 // indexes.
 //
 // @param ruleIndex The rule index to use for calls to
-// {@link Recognizer//action}.
+// Recognizer//action.
 // @param actionIndex The action index to use for calls to
-// {@link Recognizer//action}.
+// Recognizer//action.
 
 type LexerCustomAction struct {
 	*BaseLexerAction
@@ -297,7 +297,7 @@ func NewLexerCustomAction(ruleIndex, actionIndex int) *LexerCustomAction {
 	return l
 }
 
-// <p>Custom actions are implemented by calling {@link Lexer//action} with the
+// <p>Custom actions are implemented by calling Lexer//action with the
 // appropriate rule and action indexes.</p>
 func (l *LexerCustomAction) execute(lexer Lexer) {
 	lexer.Action(nil, l.ruleIndex, l.actionIndex)
@@ -321,10 +321,10 @@ func (l *LexerCustomAction) equals(other LexerAction) bool {
 	}
 }
 
-// Implements the {@code channel} lexer action by calling
-// {@link Lexer//setChannel} with the assigned channel.
-// Constructs a New{@code channel} action with the specified channel value.
-// @param channel The channel value to pass to {@link Lexer//setChannel}.
+// Implements the channel lexer action by calling
+// Lexer//setChannel with the assigned channel.
+// Constructs a Newchannel action with the specified channel value.
+// @param channel The channel value to pass to Lexer//setChannel.
 type LexerChannelAction struct {
 	*BaseLexerAction
 
@@ -338,8 +338,8 @@ func NewLexerChannelAction(channel int) *LexerChannelAction {
 	return l
 }
 
-// <p>This action is implemented by calling {@link Lexer//setChannel} with the
-// value provided by {@link //getChannel}.</p>
+// <p>This action is implemented by calling Lexer//setChannel with the
+// value provided by //getChannel.</p>
 func (l *LexerChannelAction) execute(lexer Lexer) {
 	lexer.SetChannel(l.channel)
 }
@@ -365,26 +365,26 @@ func (l *LexerChannelAction) String() string {
 	return "channel(" + strconv.Itoa(l.channel) + ")"
 }
 
-// This implementation of {@link LexerAction} is used for tracking input offsets
-// for position-dependent actions within a {@link LexerActionExecutor}.
+// This implementation of LexerAction is used for tracking input offsets
+// for position-dependent actions within a LexerActionExecutor.
 //
 // <p>This action is not serialized as part of the ATN, and is only required for
 // position-dependent lexer actions which appear at a location other than the
 // end of a rule. For more information about DFA optimizations employed for
-// lexer actions, see {@link LexerActionExecutor//append} and
-// {@link LexerActionExecutor//fixOffsetBeforeMatch}.</p>
+// lexer actions, see LexerActionExecutor//append and
+// LexerActionExecutor//fixOffsetBeforeMatch.</p>
 
 // Constructs a Newindexed custom action by associating a character offset
-// with a {@link LexerAction}.
+// with a LexerAction.
 //
 // <p>Note: This class is only required for lexer actions for which
-// {@link LexerAction//isPositionDependent} returns {@code true}.</p>
+// LexerAction//isPositionDependent returns true.</p>
 //
-// @param offset The offset into the input {@link CharStream}, relative to
+// @param offset The offset into the input CharStream, relative to
 // the token start index, at which the specified lexer action should be
 // executed.
 // @param action The lexer action to execute at a particular offset in the
-// input {@link CharStream}.
+// input CharStream.
 type LexerIndexedCustomAction struct {
 	*BaseLexerAction
 
@@ -405,8 +405,8 @@ func NewLexerIndexedCustomAction(offset int, lexerAction LexerAction) *LexerInde
 	return l
 }
 
-// <p>This method calls {@link //execute} on the result of {@link //getAction}
-// using the provided {@code lexer}.</p>
+// <p>This method calls //execute on the result of //getAction
+// using the provided lexer.</p>
 func (l *LexerIndexedCustomAction) execute(lexer Lexer) {
 	// assume the input stream position was properly set by the calling code
 	l.lexerAction.execute(lexer)

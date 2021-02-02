@@ -8,7 +8,7 @@ import "fmt"
 
 /** A set of utility routines useful for all kinds of ANTLR trees. */
 
-// Print out a whole tree in LISP form. {@link //getNodeText} is used on the
+// Print out a whole tree in LISP form. //getNodeText is used on the
 //  node payloads to get the text for the nodes.  Detect
 //  parse trees and extract data appropriately.
 func TreesStringTree(tree Tree, ruleNames []string, recog Recognizer) string {

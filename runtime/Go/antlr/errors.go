@@ -43,14 +43,14 @@ func NewBaseRecognitionException(message string, recognizer Recognizer, input In
 	t.recognizer = recognizer
 	t.input = input
 	t.ctx = ctx
-	// The current {@link Token} when an error occurred. Since not all streams
-	// support accessing symbols by index, we have to track the {@link Token}
+	// The current Token when an error occurred. Since not all streams
+	// support accessing symbols by index, we have to track the Token
 	// instance itself.
 	t.offendingToken = nil
 	// Get the ATN state number the parser was in at the time the error
-	// occurred. For {@link NoViableAltException} and
-	// {@link LexerNoViableAltException} exceptions, this is the
-	// {@link DecisionState} number. For others, it is the state whose outgoing
+	// occurred. For NoViableAltException and
+	// LexerNoViableAltException exceptions, this is the
+	// DecisionState number. For others, it is the state whose outgoing
 	// edge we couldn't Match.
 	t.offendingState = -1
 	if t.recognizer != nil {
@@ -79,10 +79,10 @@ func (b *BaseRecognitionException) GetInputStream() IntStream {
 // previously Matched symbol at the time b exception was panicn.
 //
 // <p>If the set of expected tokens is not known and could not be computed,
-// b method returns {@code nil}.</p>
+// b method returns nil.</p>
 //
 // @return The set of token types that could potentially follow the current
-// state in the ATN, or {@code nil} if the information is not available.
+// state in the ATN, or nil if the information is not available.
 // /
 func (b *BaseRecognitionException) getExpectedTokens() *IntervalSet {
 	if b.recognizer != nil {

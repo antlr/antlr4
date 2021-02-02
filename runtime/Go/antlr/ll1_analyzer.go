@@ -15,7 +15,7 @@ func NewLL1Analyzer(atn *ATN) *LL1Analyzer {
 }
 
 //* Special value added to the lookahead sets to indicate that we hit
-//  a predicate during analysis if {@code seeThruPreds==false}.
+//  a predicate during analysis if seeThruPreds==false.
 ///
 const (
 	LL1AnalyzerHitPred = TokenInvalidType
@@ -23,13 +23,13 @@ const (
 
 //*
 // Calculates the SLL(1) expected lookahead set for each outgoing transition
-// of an {@link ATNState}. The returned array has one element for each
-// outgoing transition in {@code s}. If the closure from transition
+// of an ATNState. The returned array has one element for each
+// outgoing transition in s. If the closure from transition
 // <em>i</em> leads to a semantic predicate before Matching a symbol, the
-// element at index <em>i</em> of the result will be {@code nil}.
+// element at index <em>i</em> of the result will be nil.
 //
 // @param s the ATN state
-// @return the expected symbols for each outgoing transition of {@code s}.
+// @return the expected symbols for each outgoing transition of s.
 func (la *LL1Analyzer) getDecisionLookahead(s ATNState) []*IntervalSet {
 	if s == nil {
 		return nil
@@ -51,22 +51,22 @@ func (la *LL1Analyzer) getDecisionLookahead(s ATNState) []*IntervalSet {
 }
 
 //*
-// Compute set of tokens that can follow {@code s} in the ATN in the
-// specified {@code ctx}.
+// Compute set of tokens that can follow s in the ATN in the
+// specified ctx.
 //
-// <p>If {@code ctx} is {@code nil} and the end of the rule containing
-// {@code s} is reached, {@link Token//EPSILON} is added to the result set.
-// If {@code ctx} is not {@code nil} and the end of the outermost rule is
-// reached, {@link Token//EOF} is added to the result set.</p>
+// <p>If ctx is nil and the end of the rule containing
+// s is reached, Token//EPSILON is added to the result set.
+// If ctx is not nil and the end of the outermost rule is
+// reached, Token//EOF is added to the result set.</p>
 //
 // @param s the ATN state
 // @param stopState the ATN state to stop at. This can be a
-// {@link BlockEndState} to detect epsilon paths through a closure.
-// @param ctx the complete parser context, or {@code nil} if the context
+// BlockEndState to detect epsilon paths through a closure.
+// @param ctx the complete parser context, or nil if the context
 // should be ignored
 //
-// @return The set of tokens that can follow {@code s} in the ATN in the
-// specified {@code ctx}.
+// @return The set of tokens that can follow s in the ATN in the
+// specified ctx.
 ///
 func (la *LL1Analyzer) Look(s, stopState ATNState, ctx RuleContext) *IntervalSet {
 	r := NewIntervalSet()
@@ -80,34 +80,34 @@ func (la *LL1Analyzer) Look(s, stopState ATNState, ctx RuleContext) *IntervalSet
 }
 
 //*
-// Compute set of tokens that can follow {@code s} in the ATN in the
-// specified {@code ctx}.
+// Compute set of tokens that can follow s in the ATN in the
+// specified ctx.
 //
-// <p>If {@code ctx} is {@code nil} and {@code stopState} or the end of the
-// rule containing {@code s} is reached, {@link Token//EPSILON} is added to
-// the result set. If {@code ctx} is not {@code nil} and {@code addEOF} is
-// {@code true} and {@code stopState} or the end of the outermost rule is
-// reached, {@link Token//EOF} is added to the result set.</p>
+// <p>If ctx is nil and stopState or the end of the
+// rule containing s is reached, Token//EPSILON is added to
+// the result set. If ctx is not nil and addEOF is
+// true and stopState or the end of the outermost rule is
+// reached, Token//EOF is added to the result set.</p>
 //
 // @param s the ATN state.
 // @param stopState the ATN state to stop at. This can be a
-// {@link BlockEndState} to detect epsilon paths through a closure.
-// @param ctx The outer context, or {@code nil} if the outer context should
+// BlockEndState to detect epsilon paths through a closure.
+// @param ctx The outer context, or nil if the outer context should
 // not be used.
 // @param look The result lookahead set.
 // @param lookBusy A set used for preventing epsilon closures in the ATN
 // from causing a stack overflow. Outside code should pass
-// {@code NewSet<ATNConfig>} for la argument.
+// NewSet<ATNConfig> for la argument.
 // @param calledRuleStack A set used for preventing left recursion in the
 // ATN from causing a stack overflow. Outside code should pass
-// {@code NewBitSet()} for la argument.
-// @param seeThruPreds {@code true} to true semantic predicates as
-// implicitly {@code true} and "see through them", otherwise {@code false}
-// to treat semantic predicates as opaque and add {@link //HitPred} to the
+// NewBitSet() for la argument.
+// @param seeThruPreds true to true semantic predicates as
+// implicitly true and "see through them", otherwise false
+// to treat semantic predicates as opaque and add //HitPred to the
 // result if one is encountered.
-// @param addEOF Add {@link Token//EOF} to the result if the end of the
-// outermost context is reached. This parameter has no effect if {@code ctx}
-// is {@code nil}.
+// @param addEOF Add Token//EOF to the result if the end of the
+// outermost context is reached. This parameter has no effect if ctx
+// is nil.
 
 func (la *LL1Analyzer) look2(s, stopState ATNState, ctx PredictionContext, look *IntervalSet, lookBusy *Set, calledRuleStack *BitSet, seeThruPreds, addEOF bool, i int) {
 
@@ -148,13 +148,13 @@ func (la *LL1Analyzer) look1(s, stopState ATNState, ctx PredictionContext, look 
 		}
 
 		if ctx != BasePredictionContextEMPTY {
-	        removed := calledRuleStack.contains(s.GetRuleIndex())
-            defer func() {
-                if removed {
-                    calledRuleStack.add(s.GetRuleIndex())
-                }
-            }()
-        	calledRuleStack.remove(s.GetRuleIndex())
+			removed := calledRuleStack.contains(s.GetRuleIndex())
+			defer func() {
+				if removed {
+					calledRuleStack.add(s.GetRuleIndex())
+				}
+			}()
+			calledRuleStack.remove(s.GetRuleIndex())
 			// run thru all possible stack tops in ctx
 			for i := 0; i < ctx.length(); i++ {
 				returnState := la.atn.states[ctx.getReturnState(i)]

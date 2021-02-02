@@ -59,27 +59,27 @@ func NewBaseParser(input TokenStream) *BaseParser {
 	// The input stream.
 	p.input = nil
 	// The error handling strategy for the parser. The default value is a new
-	// instance of {@link DefaultErrorStrategy}.
+	// instance of DefaultErrorStrategy.
 	p.errHandler = NewDefaultErrorStrategy()
 	p.precedenceStack = make([]int, 0)
 	p.precedenceStack.Push(0)
-	// The {@link ParserRuleContext} object for the currently executing rule.
+	// The ParserRuleContext object for the currently executing rule.
 	// p.is always non-nil during the parsing process.
 	p.ctx = nil
 	// Specifies whether or not the parser should construct a parse tree during
-	// the parsing process. The default value is {@code true}.
+	// the parsing process. The default value is true.
 	p.BuildParseTrees = true
-	// When {@link //setTrace}{@code (true)} is called, a reference to the
-	// {@link TraceListener} is stored here so it can be easily removed in a
-	// later call to {@link //setTrace}{@code (false)}. The listener itself is
+	// When //setTrace(true) is called, a reference to the
+	// TraceListener is stored here so it can be easily removed in a
+	// later call to //setTrace(false). The listener itself is
 	// implemented as a parser listener so p.field is not directly used by
 	// other parser methods.
 	p.tracer = nil
-	// The list of {@link ParseTreeListener} listeners registered to receive
+	// The list of ParseTreeListener listeners registered to receive
 	// events during the parse.
 	p.parseListeners = nil
 	// The number of syntax errors Reported during parsing. p.value is
-	// incremented each time {@link //NotifyErrorListeners} is called.
+	// incremented each time //NotifyErrorListeners is called.
 	p._SyntaxErrors = 0
 	p.SetInputStream(input)
 
@@ -118,21 +118,21 @@ func (p *BaseParser) SetErrorHandler(e ErrorStrategy) {
 	p.errHandler = e
 }
 
-// Match current input symbol against {@code ttype}. If the symbol type
-// Matches, {@link ANTLRErrorStrategy//ReportMatch} and {@link //consume} are
+// Match current input symbol against ttype. If the symbol type
+// Matches, ANTLRErrorStrategy//ReportMatch and //consume are
 // called to complete the Match process.
 //
 // <p>If the symbol type does not Match,
-// {@link ANTLRErrorStrategy//recoverInline} is called on the current error
-// strategy to attempt recovery. If {@link //getBuildParseTree} is
-// {@code true} and the token index of the symbol returned by
-// {@link ANTLRErrorStrategy//recoverInline} is -1, the symbol is added to
-// the parse tree by calling {@link ParserRuleContext//addErrorNode}.</p>
+// ANTLRErrorStrategy//recoverInline is called on the current error
+// strategy to attempt recovery. If //getBuildParseTree is
+// true and the token index of the symbol returned by
+// ANTLRErrorStrategy//recoverInline is -1, the symbol is added to
+// the parse tree by calling ParserRuleContext//addErrorNode.</p>
 //
 // @param ttype the token type to Match
 // @return the Matched symbol
 // @panics RecognitionException if the current input symbol did not Match
-// {@code ttype} and the error strategy could not recover from the
+// ttype and the error strategy could not recover from the
 // mismatched symbol
 
 func (p *BaseParser) Match(ttype int) Token {
@@ -156,15 +156,15 @@ func (p *BaseParser) Match(ttype int) Token {
 }
 
 // Match current input symbol as a wildcard. If the symbol type Matches
-// (i.e. has a value greater than 0), {@link ANTLRErrorStrategy//ReportMatch}
-// and {@link //consume} are called to complete the Match process.
+// (i.e. has a value greater than 0), ANTLRErrorStrategy//ReportMatch
+// and //consume are called to complete the Match process.
 //
 // <p>If the symbol type does not Match,
-// {@link ANTLRErrorStrategy//recoverInline} is called on the current error
-// strategy to attempt recovery. If {@link //getBuildParseTree} is
-// {@code true} and the token index of the symbol returned by
-// {@link ANTLRErrorStrategy//recoverInline} is -1, the symbol is added to
-// the parse tree by calling {@link ParserRuleContext//addErrorNode}.</p>
+// ANTLRErrorStrategy//recoverInline is called on the current error
+// strategy to attempt recovery. If //getBuildParseTree is
+// true and the token index of the symbol returned by
+// ANTLRErrorStrategy//recoverInline is -1, the symbol is added to
+// the parse tree by calling ParserRuleContext//addErrorNode.</p>
 //
 // @return the Matched symbol
 // @panics RecognitionException if the current input symbol did not Match
@@ -203,13 +203,13 @@ func (p *BaseParser) GetParseListeners() []ParseTreeListener {
 	return p.parseListeners
 }
 
-// Registers {@code listener} to receive events during the parsing process.
+// Registers listener to receive events during the parsing process.
 //
 // <p>To support output-preserving grammar transformations (including but not
 // limited to left-recursion removal, automated left-factoring, and
 // optimized code generation), calls to listener methods during the parse
 // may differ substantially from calls made by
-// {@link ParseTreeWalker//DEFAULT} used after the parse is complete. In
+// ParseTreeWalker//DEFAULT used after the parse is complete. In
 // particular, rule entry and exit events may occur in a different order
 // during the parse than after the parser. In addition, calls to certain
 // rule entry methods may be omitted.</p>
@@ -229,7 +229,7 @@ func (p *BaseParser) GetParseListeners() []ParseTreeListener {
 //
 // @param listener the listener to add
 //
-// @panics nilPointerException if {@code} listener is {@code nil}
+// @panics nilPointerException if {@code} listener is nil
 //
 func (p *BaseParser) AddParseListener(listener ParseTreeListener) {
 	if listener == nil {
@@ -242,9 +242,9 @@ func (p *BaseParser) AddParseListener(listener ParseTreeListener) {
 }
 
 //
-// Remove {@code listener} from the list of parse listeners.
+// Remove listener from the list of parse listeners.
 //
-// <p>If {@code listener} is {@code nil} or has not been added as a parse
+// <p>If listener is nil or has not been added as a parse
 // listener, p.method does nothing.</p>
 // @param listener the listener to remove
 //
@@ -329,7 +329,7 @@ func (p *BaseParser) setTokenFactory(factory TokenFactory) {
 // lazily.
 //
 // @panics UnsupportedOperationException if the current parser does not
-// implement the {@link //getSerializedATN()} method.
+// implement the //getSerializedATN() method.
 //
 func (p *BaseParser) GetATNWithBypassAlts() {
 
@@ -518,7 +518,7 @@ func (p *BaseParser) EnterRecursionRule(localctx ParserRuleContext, state, ruleI
 }
 
 //
-// Like {@link //EnterRule} but for recursive rules.
+// Like //EnterRule but for recursive rules.
 
 func (p *BaseParser) PushNewRecursionContext(localctx ParserRuleContext, state, ruleIndex int) {
 	previous := p.ctx
@@ -579,7 +579,7 @@ func (p *BaseParser) inContext(context ParserRuleContext) bool {
 }
 
 //
-// Checks whether or not {@code symbol} can follow the current state in the
+// Checks whether or not symbol can follow the current state in the
 // ATN. The behavior of p.method is equivalent to the following, but is
 // implemented such that the complete context-sensitive follow set does not
 // need to be explicitly constructed.
@@ -589,8 +589,8 @@ func (p *BaseParser) inContext(context ParserRuleContext) bool {
 // </pre>
 //
 // @param symbol the symbol type to check
-// @return {@code true} if {@code symbol} can follow the current state in
-// the ATN, otherwise {@code false}.
+// @return true if symbol can follow the current state in
+// the ATN, otherwise false.
 
 func (p *BaseParser) IsExpectedToken(symbol int) bool {
 	atn := p.Interpreter.atn
@@ -620,7 +620,7 @@ func (p *BaseParser) IsExpectedToken(symbol int) bool {
 }
 
 // Computes the set of input symbols which could follow the current parser
-// state and context, as given by {@link //GetState} and {@link //GetContext},
+// state and context, as given by //GetState and //GetContext,
 // respectively.
 //
 // @see ATN//getExpectedTokens(int, RuleContext)
@@ -635,7 +635,7 @@ func (p *BaseParser) GetExpectedTokensWithinCurrentRule() *IntervalSet {
 	return atn.NextTokens(s, nil)
 }
 
-// Get a rule's index (i.e., {@code RULE_ruleName} field) or -1 if not found.//
+// Get a rule's index (i.e., RULE_ruleName field) or -1 if not found.//
 func (p *BaseParser) GetRuleIndex(ruleName string) int {
 	var ruleIndex, ok = p.GetRuleIndexMap()[ruleName]
 	if ok {

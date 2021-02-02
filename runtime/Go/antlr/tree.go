@@ -235,7 +235,7 @@ func (p *ParseTreeWalker) Walk(listener ParseTreeListener, t Tree) {
 }
 
 //
-// Enters a grammar rule by first triggering the generic event {@link ParseTreeListener//EnterEveryRule}
+// Enters a grammar rule by first triggering the generic event ParseTreeListener//EnterEveryRule
 // then by triggering the event specific to the given parse tree node
 //
 func (p *ParseTreeWalker) EnterRule(listener ParseTreeListener, r RuleNode) {
@@ -245,7 +245,7 @@ func (p *ParseTreeWalker) EnterRule(listener ParseTreeListener, r RuleNode) {
 }
 
 // Exits a grammar rule by first triggering the event specific to the given parse tree node
-// then by triggering the generic event {@link ParseTreeListener//ExitEveryRule}
+// then by triggering the generic event ParseTreeListener//ExitEveryRule
 //
 func (p *ParseTreeWalker) ExitRule(listener ParseTreeListener, r RuleNode) {
 	ctx := r.GetRuleContext().(ParserRuleContext)

@@ -9,11 +9,11 @@ package antlr
 //
 // <p>The executor tracks position information for position-dependent lexer actions
 // efficiently, ensuring that actions appearing only at the end of the rule do
-// not cause bloating of the {@link DFA} created for the lexer.</p>
+// not cause bloating of the DFA created for the lexer.</p>
 
 type LexerActionExecutor struct {
-	lexerActions     []LexerAction
-	cachedHash       int
+	lexerActions []LexerAction
+	cachedHash   int
 }
 
 func NewLexerActionExecutor(lexerActions []LexerAction) *LexerActionExecutor {
@@ -26,8 +26,8 @@ func NewLexerActionExecutor(lexerActions []LexerAction) *LexerActionExecutor {
 
 	l.lexerActions = lexerActions
 
-	// Caches the result of {@link //hashCode} since the hash code is an element
-	// of the performance-critical {@link LexerATNConfig//hashCode} operation.
+	// Caches the result of //hashCode since the hash code is an element
+	// of the performance-critical LexerATNConfig//hashCode operation.
 	l.cachedHash = murmurInit(57)
 	for _, a := range lexerActions {
 		l.cachedHash = murmurUpdate(l.cachedHash, a.hash())
@@ -36,19 +36,19 @@ func NewLexerActionExecutor(lexerActions []LexerAction) *LexerActionExecutor {
 	return l
 }
 
-// Creates a {@link LexerActionExecutor} which executes the actions for
-// the input {@code lexerActionExecutor} followed by a specified
-// {@code lexerAction}.
+// Creates a LexerActionExecutor which executes the actions for
+// the input lexerActionExecutor followed by a specified
+// lexerAction.
 //
 // @param lexerActionExecutor The executor for actions already traversed by
 // the lexer while Matching a token within a particular
-// {@link LexerATNConfig}. If this is {@code nil}, the method behaves as
+// LexerATNConfig. If this is nil, the method behaves as
 // though it were an empty executor.
 // @param lexerAction The lexer action to execute after the actions
-// specified in {@code lexerActionExecutor}.
+// specified in lexerActionExecutor.
 //
-// @return A {@link LexerActionExecutor} for executing the combine actions
-// of {@code lexerActionExecutor} and {@code lexerAction}.
+// @return A LexerActionExecutor for executing the combine actions
+// of lexerActionExecutor and lexerAction.
 func LexerActionExecutorappend(lexerActionExecutor *LexerActionExecutor, lexerAction LexerAction) *LexerActionExecutor {
 	if lexerActionExecutor == nil {
 		return NewLexerActionExecutor([]LexerAction{lexerAction})
@@ -57,12 +57,12 @@ func LexerActionExecutorappend(lexerActionExecutor *LexerActionExecutor, lexerAc
 	return NewLexerActionExecutor(append(lexerActionExecutor.lexerActions, lexerAction))
 }
 
-// Creates a {@link LexerActionExecutor} which encodes the current offset
+// Creates a LexerActionExecutor which encodes the current offset
 // for position-dependent lexer actions.
 //
 // <p>Normally, when the executor encounters lexer actions where
-// {@link LexerAction//isPositionDependent} returns {@code true}, it calls
-// {@link IntStream//seek} on the input {@link CharStream} to set the input
+// LexerAction//isPositionDependent returns true, it calls
+// IntStream//seek on the input CharStream to set the input
 // position to the <em>end</em> of the current token. This behavior provides
 // for efficient DFA representation of lexer actions which appear at the end
 // of a lexer rule, even when the lexer rule Matches a variable number of
@@ -77,12 +77,12 @@ func LexerActionExecutorappend(lexerActionExecutor *LexerActionExecutor, lexerAc
 // position in the input stream.</p>
 //
 // <p>If the current executor already has offsets assigned to all
-// position-dependent lexer actions, the method returns {@code this}.</p>
+// position-dependent lexer actions, the method returns this.</p>
 //
 // @param offset The current offset to assign to all position-dependent
 // lexer actions which do not already have offsets assigned.
 //
-// @return A {@link LexerActionExecutor} which stores input stream offsets
+// @return A LexerActionExecutor which stores input stream offsets
 // for all position-dependent lexer actions.
 // /
 func (l *LexerActionExecutor) fixOffsetBeforeMatch(offset int) *LexerActionExecutor {
@@ -109,21 +109,21 @@ func (l *LexerActionExecutor) fixOffsetBeforeMatch(offset int) *LexerActionExecu
 }
 
 // Execute the actions encapsulated by l executor within the context of a
-// particular {@link Lexer}.
+// particular Lexer.
 //
-// <p>This method calls {@link IntStream//seek} to set the position of the
-// {@code input} {@link CharStream} prior to calling
-// {@link LexerAction//execute} on a position-dependent action. Before the
+// <p>This method calls IntStream//seek to set the position of the
+// input CharStream prior to calling
+// LexerAction//execute on a position-dependent action. Before the
 // method returns, the input position will be restored to the same position
 // it was in when the method was invoked.</p>
 //
 // @param lexer The lexer instance.
 // @param input The input stream which is the source for the current token.
-// When l method is called, the current {@link IntStream//index} for
-// {@code input} should be the start of the following token, i.e. 1
+// When l method is called, the current IntStream//index for
+// input should be the start of the following token, i.e. 1
 // character past the end of the current token.
 // @param startIndex The token start index. This value may be passed to
-// {@link IntStream//seek} to set the {@code input} position to the beginning
+// IntStream//seek to set the input position to the beginning
 // of the token.
 // /
 func (l *LexerActionExecutor) execute(lexer Lexer, input CharStream, startIndex int) {

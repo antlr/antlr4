@@ -142,20 +142,20 @@ func NewCommonToken(source *TokenSourceCharStreamPair, tokenType, channel, start
 	return t
 }
 
-// An empty {@link Pair} which is used as the default value of
-// {@link //source} for tokens that do not have a source.
+// An empty Pair which is used as the default value of
+// //source for tokens that do not have a source.
 
 //CommonToken.EMPTY_SOURCE = [ nil, nil ]
 
-// Constructs a New{@link CommonToken} as a copy of another {@link Token}.
+// Constructs a NewCommonToken as a copy of another Token.
 //
 // <p>
-// If {@code oldToken} is also a {@link CommonToken} instance, the newly
-// constructed token will share a reference to the {@link //text} field and
-// the {@link Pair} stored in {@link //source}. Otherwise, {@link //text} will
-// be assigned the result of calling {@link //GetText}, and {@link //source}
-// will be constructed from the result of {@link Token//GetTokenSource} and
-// {@link Token//GetInputStream}.</p>
+// If oldToken is also a CommonToken instance, the newly
+// constructed token will share a reference to the //text field and
+// the Pair stored in //source. Otherwise, //text will
+// be assigned the result of calling //GetText, and //source
+// will be constructed from the result of Token//GetTokenSource and
+// Token//GetInputStream.</p>
 //
 // @param oldToken The token to copy.
 //

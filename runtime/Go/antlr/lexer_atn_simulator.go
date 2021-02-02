@@ -194,12 +194,12 @@ func (l *LexerATNSimulator) execATN(input CharStream, ds0 *DFAState) int {
 
 // Get an existing target state for an edge in the DFA. If the target state
 // for the edge has not yet been computed or is otherwise not available,
-// l method returns {@code nil}.
+// l method returns nil.
 //
 // @param s The current DFA state
 // @param t The next input symbol
 // @return The existing target DFA state for the given input symbol
-// {@code t}, or {@code nil} if the target state for l edge is not
+// t, or nil if the target state for l edge is not
 // already cached
 func (l *LexerATNSimulator) getExistingTargetState(s *DFAState, t int) *DFAState {
 	if s.edges == nil || t < LexerATNSimulatorMinDFAEdge || t > LexerATNSimulatorMaxDFAEdge {
@@ -221,8 +221,8 @@ func (l *LexerATNSimulator) getExistingTargetState(s *DFAState, t int) *DFAState
 // @param t The next input symbol
 //
 // @return The computed target DFA state for the given input symbol
-// {@code t}. If {@code t} does not lead to a valid DFA state, l method
-// returns {@link //ERROR}.
+// t. If t does not lead to a valid DFA state, l method
+// returns //ERROR.
 func (l *LexerATNSimulator) computeTargetState(input CharStream, s *DFAState, t int) *DFAState {
 	reach := NewOrderedATNConfigSet()
 
@@ -259,7 +259,7 @@ func (l *LexerATNSimulator) failOrAccept(prevAccept *SimState, input CharStream,
 }
 
 // Given a starting configuration set, figure out all ATN configurations
-// we can reach upon input {@code t}. Parameter {@code reach} is a return
+// we can reach upon input t. Parameter reach is a return
 // parameter.
 func (l *LexerATNSimulator) getReachableConfigSet(input CharStream, closure ATNConfigSet, reach ATNConfigSet, t int) {
 	// l is used to Skip processing for configs which have a lower priority
@@ -332,11 +332,11 @@ func (l *LexerATNSimulator) computeStartState(input CharStream, p ATNState) *Ord
 // Since the alternatives within any lexer decision are ordered by
 // preference, l method stops pursuing the closure as soon as an accept
 // state is reached. After the first accept state is reached by depth-first
-// search from {@code config}, all other (potentially reachable) states for
+// search from config, all other (potentially reachable) states for
 // l rule would have a lower priority.
 //
-// @return {@code true} if an accept state is reached, otherwise
-// {@code false}.
+// @return true if an accept state is reached, otherwise
+// false.
 func (l *LexerATNSimulator) closure(input CharStream, config *LexerATNConfig, configs ATNConfigSet,
 	currentAltReachedAcceptState, speculative, treatEOFAsEpsilon bool) bool {
 
@@ -471,23 +471,23 @@ func (l *LexerATNSimulator) getEpsilonTarget(input CharStream, config *LexerATNC
 
 // Evaluate a predicate specified in the lexer.
 //
-// <p>If {@code speculative} is {@code true}, l method was called before
-// {@link //consume} for the Matched character. This method should call
-// {@link //consume} before evaluating the predicate to ensure position
-// sensitive values, including {@link Lexer//GetText}, {@link Lexer//GetLine},
-// and {@link Lexer//getcolumn}, properly reflect the current
-// lexer state. This method should restore {@code input} and the simulator
+// <p>If speculative is true, l method was called before
+// //consume for the Matched character. This method should call
+// //consume before evaluating the predicate to ensure position
+// sensitive values, including Lexer//GetText, Lexer//GetLine,
+// and Lexer//getcolumn, properly reflect the current
+// lexer state. This method should restore input and the simulator
 // to the original state before returning (i.e. undo the actions made by the
-// call to {@link //consume}.</p>
+// call to //consume.</p>
 //
 // @param input The input stream.
 // @param ruleIndex The rule containing the predicate.
 // @param predIndex The index of the predicate within the rule.
-// @param speculative {@code true} if the current index in {@code input} is
+// @param speculative true if the current index in input is
 // one character before the predicate's location.
 //
-// @return {@code true} if the specified predicate evaluates to
-// {@code true}.
+// @return true if the specified predicate evaluates to
+// true.
 // /
 func (l *LexerATNSimulator) evaluatePredicate(input CharStream, ruleIndex, predIndex int, speculative bool) bool {
 	// assume true if no recognizer was provided

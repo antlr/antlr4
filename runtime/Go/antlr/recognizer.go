@@ -179,9 +179,9 @@ func (b *BaseRecognizer) GetErrorHeader(e RecognitionException) string {
 //  so that it creates a NewJava type.
 //
 // @deprecated This method is not called by the ANTLR 4 Runtime. Specific
-// implementations of {@link ANTLRErrorStrategy} may provide a similar
+// implementations of ANTLRErrorStrategy may provide a similar
 // feature when necessary. For example, see
-// {@link DefaultErrorStrategy//GetTokenErrorDisplay}.
+// DefaultErrorStrategy//GetTokenErrorDisplay.
 //
 func (b *BaseRecognizer) GetTokenErrorDisplay(t Token) string {
 	if t == nil {

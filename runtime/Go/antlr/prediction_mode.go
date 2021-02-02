@@ -20,11 +20,11 @@ const (
 	// <p>
 	// When using this prediction mode, the parser will either return a correct
 	// parse tree (i.e. the same parse tree that would be returned with the
-	// {@link //LL} prediction mode), or it will Report a syntax error. If a
-	// syntax error is encountered when using the {@link //SLL} prediction mode,
+	// //LL prediction mode), or it will Report a syntax error. If a
+	// syntax error is encountered when using the //SLL prediction mode,
 	// it may be due to either an actual syntax error in the input or indicate
 	// that the particular combination of grammar and input requires the more
-	// powerful {@link //LL} prediction abilities to complete successfully.</p>
+	// powerful //LL prediction abilities to complete successfully.</p>
 	//
 	// <p>
 	// This prediction mode does not provide any guarantees for prediction
@@ -52,7 +52,7 @@ const (
 	PredictionModeLL = 1
 	//
 	// The LL(*) prediction mode with exact ambiguity detection. In addition to
-	// the correctness guarantees provided by the {@link //LL} prediction mode,
+	// the correctness guarantees provided by the //LL prediction mode,
 	// this prediction mode instructs the prediction algorithm to determine the
 	// complete and exact set of ambiguous alternatives for every ambiguous
 	// decision encountered while parsing.
@@ -93,7 +93,7 @@ const (
 // <p>Assuming combined SLL+LL parsing, an SLL configuration set with only
 // conflicting subsets should fall back to full LL, even if the
 // configuration sets don't resolve to the same alternative (e.g.
-// {@code {1,2}} and {@code {3,4}}. If there is at least one non-conflicting
+// {1,2} and {3,4}. If there is at least one non-conflicting
 // configuration, SLL could continue with the hopes that more lookahead will
 // resolve via one of those non-conflicting configurations.</p>
 //
@@ -108,17 +108,17 @@ const (
 // The single-alt-state thing lets prediction continue upon rules like
 // (otherwise, it would admit defeat too soon):</p>
 //
-// <p>{@code [12|1|[], 6|2|[], 12|2|[]]. s : (ID | ID ID?) '' }</p>
+// <p>[12|1|[], 6|2|[], 12|2|[]]. s : (ID | ID ID?) '' </p>
 //
-// <p>When the ATN simulation reaches the state before {@code ''}, it has a
-// DFA state that looks like: {@code [12|1|[], 6|2|[], 12|2|[]]}. Naturally
-// {@code 12|1|[]} and {@code 12|2|[]} conflict, but we cannot stop
+// <p>When the ATN simulation reaches the state before '', it has a
+// DFA state that looks like: [12|1|[], 6|2|[], 12|2|[]]. Naturally
+// 12|1|[] and 12|2|[] conflict, but we cannot stop
 // processing this node because alternative to has another way to continue,
-// via {@code [6|2|[]]}.</p>
+// via [6|2|[]].</p>
 //
 // <p>It also let's us continue for this rule:</p>
 //
-// <p>{@code [1|1|[], 1|2|[], 8|3|[]] a : A | A | A B }</p>
+// <p>[1|1|[], 1|2|[], 8|3|[]] a : A | A | A B </p>
 //
 // <p>After Matching input A, we reach the stop state for rule A, state 1.
 // State 8 is the state right before B. Clearly alternatives 1 and 2
@@ -144,23 +144,23 @@ const (
 // This means that SLL termination detection can totally ignore semantic
 // predicates.</p>
 //
-// <p>Implementation-wise, {@link ATNConfigSet} combines stack contexts but not
+// <p>Implementation-wise, ATNConfigSet combines stack contexts but not
 // semantic predicate contexts so we might see two configurations like the
 // following.</p>
 //
-// <p>{@code (s, 1, x, {}), (s, 1, x', {p})}</p>
+// <p>(s, 1, x, {), (s, 1, x', {p})}</p>
 //
 // <p>Before testing these configurations against others, we have to merge
-// {@code x} and {@code x'} (without modifying the existing configurations).
-// For example, we test {@code (x+x')==x''} when looking for conflicts in
+// x and x' (without modifying the existing configurations).
+// For example, we test (x+x')==x'' when looking for conflicts in
 // the following configurations.</p>
 //
-// <p>{@code (s, 1, x, {}), (s, 1, x', {p}), (s, 2, x'', {})}</p>
+// <p>(s, 1, x, {), (s, 1, x', {p}), (s, 2, x'', {})}</p>
 //
 // <p>If the configuration set has predicates (as indicated by
-// {@link ATNConfigSet//hasSemanticContext}), this algorithm makes a copy of
+// ATNConfigSet//hasSemanticContext), this algorithm makes a copy of
 // the configurations to strip out all of the predicates so that a standard
-// {@link ATNConfigSet} will merge everything ignoring predicates.</p>
+// ATNConfigSet will merge everything ignoring predicates.</p>
 //
 func PredictionModehasSLLConflictTerminatingPrediction(mode int, configs ATNConfigSet) bool {
 	// Configs in rule stop states indicate reaching the end of the decision
@@ -194,14 +194,14 @@ func PredictionModehasSLLConflictTerminatingPrediction(mode int, configs ATNConf
 	return PredictionModehasConflictingAltSet(altsets) && !PredictionModehasStateAssociatedWithOneAlt(configs)
 }
 
-// Checks if any configuration in {@code configs} is in a
-// {@link RuleStopState}. Configurations meeting this condition have reached
+// Checks if any configuration in configs is in a
+// RuleStopState. Configurations meeting this condition have reached
 // the end of the decision rule (local context) or end of start rule (full
 // context).
 //
 // @param configs the configuration set to test
-// @return {@code true} if any configuration in {@code configs} is in a
-// {@link RuleStopState}, otherwise {@code false}
+// @return true if any configuration in configs is in a
+// RuleStopState, otherwise false
 func PredictionModehasConfigInRuleStopState(configs ATNConfigSet) bool {
 	for _, c := range configs.GetItems() {
 		if _, ok := c.GetState().(*RuleStopState); ok {
@@ -211,14 +211,14 @@ func PredictionModehasConfigInRuleStopState(configs ATNConfigSet) bool {
 	return false
 }
 
-// Checks if all configurations in {@code configs} are in a
-// {@link RuleStopState}. Configurations meeting this condition have reached
+// Checks if all configurations in configs are in a
+// RuleStopState. Configurations meeting this condition have reached
 // the end of the decision rule (local context) or end of start rule (full
 // context).
 //
 // @param configs the configuration set to test
-// @return {@code true} if all configurations in {@code configs} are in a
-// {@link RuleStopState}, otherwise {@code false}
+// @return true if all configurations in configs are in a
+// RuleStopState, otherwise false
 func PredictionModeallConfigsInRuleStopStates(configs ATNConfigSet) bool {
 
 	for _, c := range configs.GetItems() {
@@ -241,30 +241,30 @@ func PredictionModeallConfigsInRuleStopStates(configs ATNConfigSet) bool {
 // minimums. That means we need more look ahead to decide which of those
 // alternatives we should predict.</p>
 //
-// <p>The basic idea is to split the set of configurations {@code C}, into
-// conflicting subsets {@code (s, _, ctx, _)} and singleton subsets with
+// <p>The basic idea is to split the set of configurations C, into
+// conflicting subsets (s, _, ctx, _) and singleton subsets with
 // non-conflicting configurations. Two configurations conflict if they have
-// identical {@link ATNConfig//state} and {@link ATNConfig//context} values
-// but different {@link ATNConfig//alt} value, e.g. {@code (s, i, ctx, _)}
-// and {@code (s, j, ctx, _)} for {@code i!=j}.</p>
+// identical ATNConfig//state and ATNConfig//context values
+// but different ATNConfig//alt value, e.g. (s, i, ctx, _)
+// and (s, j, ctx, _) for i!=j.</p>
 //
 // <p>Reduce these configuration subsets to the set of possible alternatives.
 // You can compute the alternative subsets in one pass as follows:</p>
 //
-// <p>{@code A_s,ctx = {i | (s, i, ctx, _)}} for each configuration in
-// {@code C} holding {@code s} and {@code ctx} fixed.</p>
+// <p>A_s,ctx = {i | (s, i, ctx, _)} for each configuration in
+// C holding s and ctx fixed.</p>
 //
-// <p>Or in pseudo-code, for each configuration {@code c} in {@code C}:</p>
+// <p>Or in pseudo-code, for each configuration c in C:</p>
 //
 // <pre>
-// map[c] U= c.{@link ATNConfig//alt alt} // map hash/equals uses s and x, not
+// map[c] U= c.ATNConfig//alt alt // map hash/equals uses s and x, not
 // alt and not pred
 // </pre>
 //
-// <p>The values in {@code map} are the set of {@code A_s,ctx} sets.</p>
+// <p>The values in map are the set of A_s,ctx sets.</p>
 //
-// <p>If {@code |A_s,ctx|=1} then there is no conflict associated with
-// {@code s} and {@code ctx}.</p>
+// <p>If |A_s,ctx|=1 then there is no conflict associated with
+// s and ctx.</p>
 //
 // <p>Reduce the subsets to singletons by choosing a minimum of each subset. If
 // the union of these alternative subsets is a singleton, then no amount of
@@ -287,23 +287,23 @@ func PredictionModeallConfigsInRuleStopStates(configs ATNConfigSet) bool {
 //
 // <p><strong>CONFLICTING CONFIGS</strong></p>
 //
-// <p>Two configurations {@code (s, i, x)} and {@code (s, j, x')}, conflict
-// when {@code i!=j} but {@code x=x'}. Because we merge all
-// {@code (s, i, _)} configurations together, that means that there are at
-// most {@code n} configurations associated with state {@code s} for
-// {@code n} possible alternatives in the decision. The merged stacks
-// complicate the comparison of configuration contexts {@code x} and
-// {@code x'}. Sam checks to see if one is a subset of the other by calling
-// merge and checking to see if the merged result is either {@code x} or
-// {@code x'}. If the {@code x} associated with lowest alternative {@code i}
-// is the superset, then {@code i} is the only possible prediction since the
-// others resolve to {@code min(i)} as well. However, if {@code x} is
-// associated with {@code j>i} then at least one stack configuration for
-// {@code j} is not in conflict with alternative {@code i}. The algorithm
+// <p>Two configurations (s, i, x) and (s, j, x'), conflict
+// when i!=j but x=x'. Because we merge all
+// (s, i, _) configurations together, that means that there are at
+// most n configurations associated with state s for
+// n possible alternatives in the decision. The merged stacks
+// complicate the comparison of configuration contexts x and
+// x'. Sam checks to see if one is a subset of the other by calling
+// merge and checking to see if the merged result is either x or
+// x'. If the x associated with lowest alternative i
+// is the superset, then i is the only possible prediction since the
+// others resolve to min(i) as well. However, if x is
+// associated with j>i then at least one stack configuration for
+// j is not in conflict with alternative i. The algorithm
 // should keep going, looking for more lookahead due to the uncertainty.</p>
 //
-// <p>For simplicity, I'm doing a equality check between {@code x} and
-// {@code x'} that lets the algorithm continue to consume lookahead longer
+// <p>For simplicity, I'm doing a equality check between x and
+// x' that lets the algorithm continue to consume lookahead longer
 // than necessary. The reason I like the equality is of course the
 // simplicity but also because that is the test you need to detect the
 // alternatives that are actually in conflict.</p>
@@ -314,7 +314,7 @@ func PredictionModeallConfigsInRuleStopStates(configs ATNConfigSet) bool {
 // conflicting alternative subsets has more than one alternative. We are
 // uncertain about which alternative to predict.</p>
 //
-// <p>The complete set of alternatives, {@code [i for (_,i,_)]}, tells us which
+// <p>The complete set of alternatives, [i for (_,i,_)], tells us which
 // alternatives are still in the running for the amount of input we've
 // consumed at this point. The conflicting sets let us to strip away
 // configurations that won't lead to more states because we resolve
@@ -327,29 +327,29 @@ func PredictionModeallConfigsInRuleStopStates(configs ATNConfigSet) bool {
 //
 // <li>no conflicts and more than 1 alternative in set =&gt continue</li>
 //
-// <li> {@code (s, 1, x)}, {@code (s, 2, x)}, {@code (s, 3, z)},
-// {@code (s', 1, y)}, {@code (s', 2, y)} yields non-conflicting set
-// {@code {3}} U conflicting sets {@code min({1,2})} U {@code min({1,2})} =
-// {@code {1,3}} =&gt continue
+// <li> (s, 1, x), (s, 2, x), (s, 3, z),
+// (s', 1, y), (s', 2, y) yields non-conflicting set
+// {3} U conflicting sets min({1,2)} U min({1,2)} =
+// {1,3} =&gt continue
 // </li>
 //
-// <li>{@code (s, 1, x)}, {@code (s, 2, x)}, {@code (s', 1, y)},
-// {@code (s', 2, y)}, {@code (s'', 1, z)} yields non-conflicting set
-// {@code {1}} U conflicting sets {@code min({1,2})} U {@code min({1,2})} =
-// {@code {1}} =&gt stop and predict 1</li>
+// <li>(s, 1, x), (s, 2, x), (s', 1, y),
+// (s', 2, y), (s'', 1, z) yields non-conflicting set
+// {1} U conflicting sets min({1,2)} U min({1,2)} =
+// {1} =&gt stop and predict 1</li>
 //
-// <li>{@code (s, 1, x)}, {@code (s, 2, x)}, {@code (s', 1, y)},
-// {@code (s', 2, y)} yields conflicting, reduced sets {@code {1}} U
-// {@code {1}} = {@code {1}} =&gt stop and predict 1, can announce
-// ambiguity {@code {1,2}}</li>
+// <li>(s, 1, x), (s, 2, x), (s', 1, y),
+// (s', 2, y) yields conflicting, reduced sets {1} U
+// {1} = {1} =&gt stop and predict 1, can announce
+// ambiguity {1,2}</li>
 //
-// <li>{@code (s, 1, x)}, {@code (s, 2, x)}, {@code (s', 2, y)},
-// {@code (s', 3, y)} yields conflicting, reduced sets {@code {1}} U
-// {@code {2}} = {@code {1,2}} =&gt continue</li>
+// <li>(s, 1, x), (s, 2, x), (s', 2, y),
+// (s', 3, y) yields conflicting, reduced sets {1} U
+// {2} = {1,2} =&gt continue</li>
 //
-// <li>{@code (s, 1, x)}, {@code (s, 2, x)}, {@code (s', 3, y)},
-// {@code (s', 4, y)} yields conflicting, reduced sets {@code {1}} U
-// {@code {3}} = {@code {1,3}} =&gt continue</li>
+// <li>(s, 1, x), (s, 2, x), (s', 3, y),
+// (s', 4, y) yields conflicting, reduced sets {1} U
+// {3} = {1,3} =&gt continue</li>
 //
 // </ul>
 //
@@ -361,38 +361,38 @@ func PredictionModeallConfigsInRuleStopStates(configs ATNConfigSet) bool {
 // <p><code>|A_<em>i</em>|&gt1</code> and
 // <code>A_<em>i</em> = A_<em>j</em></code> for all <em>i</em>, <em>j</em>.</p>
 //
-// <p>In other words, we continue examining lookahead until all {@code A_i}
-// have more than one alternative and all {@code A_i} are the same. If
-// {@code A={{1,2}, {1,3}}}, then regular LL prediction would terminate
-// because the resolved set is {@code {1}}. To determine what the real
+// <p>In other words, we continue examining lookahead until all A_i
+// have more than one alternative and all A_i are the same. If
+// A={{1,2, {1,3}}}, then regular LL prediction would terminate
+// because the resolved set is {1}. To determine what the real
 // ambiguity is, we have to know whether the ambiguity is between one and
 // two or one and three so we keep going. We can only stop prediction when
 // we need exact ambiguity detection when the sets look like
-// {@code A={{1,2}}} or {@code {{1,2},{1,2}}}, etc...</p>
+// A={{1,2}} or {{1,2,{1,2}}}, etc...</p>
 //
 func PredictionModeresolvesToJustOneViableAlt(altsets []*BitSet) int {
 	return PredictionModegetSingleViableAlt(altsets)
 }
 
 //
-// Determines if every alternative subset in {@code altsets} contains more
+// Determines if every alternative subset in altsets contains more
 // than one alternative.
 //
 // @param altsets a collection of alternative subsets
-// @return {@code true} if every {@link BitSet} in {@code altsets} has
-// {@link BitSet//cardinality cardinality} &gt 1, otherwise {@code false}
+// @return true if every BitSet in altsets has
+// BitSet//cardinality cardinality &gt 1, otherwise false
 //
 func PredictionModeallSubsetsConflict(altsets []*BitSet) bool {
 	return !PredictionModehasNonConflictingAltSet(altsets)
 }
 
 //
-// Determines if any single alternative subset in {@code altsets} contains
+// Determines if any single alternative subset in altsets contains
 // exactly one alternative.
 //
 // @param altsets a collection of alternative subsets
-// @return {@code true} if {@code altsets} contains a {@link BitSet} with
-// {@link BitSet//cardinality cardinality} 1, otherwise {@code false}
+// @return true if altsets contains a BitSet with
+// BitSet//cardinality cardinality 1, otherwise false
 //
 func PredictionModehasNonConflictingAltSet(altsets []*BitSet) bool {
 	for i := 0; i < len(altsets); i++ {
@@ -405,12 +405,12 @@ func PredictionModehasNonConflictingAltSet(altsets []*BitSet) bool {
 }
 
 //
-// Determines if any single alternative subset in {@code altsets} contains
+// Determines if any single alternative subset in altsets contains
 // more than one alternative.
 //
 // @param altsets a collection of alternative subsets
-// @return {@code true} if {@code altsets} contains a {@link BitSet} with
-// {@link BitSet//cardinality cardinality} &gt 1, otherwise {@code false}
+// @return true if altsets contains a BitSet with
+// BitSet//cardinality cardinality &gt 1, otherwise false
 //
 func PredictionModehasConflictingAltSet(altsets []*BitSet) bool {
 	for i := 0; i < len(altsets); i++ {
@@ -423,11 +423,11 @@ func PredictionModehasConflictingAltSet(altsets []*BitSet) bool {
 }
 
 //
-// Determines if every alternative subset in {@code altsets} is equivalent.
+// Determines if every alternative subset in altsets is equivalent.
 //
 // @param altsets a collection of alternative subsets
-// @return {@code true} if every member of {@code altsets} is equal to the
-// others, otherwise {@code false}
+// @return true if every member of altsets is equal to the
+// others, otherwise false
 //
 func PredictionModeallSubsetsEqual(altsets []*BitSet) bool {
 	var first *BitSet
@@ -446,8 +446,8 @@ func PredictionModeallSubsetsEqual(altsets []*BitSet) bool {
 
 //
 // Returns the unique alternative predicted by all alternative subsets in
-// {@code altsets}. If no such alternative exists, this method returns
-// {@link ATN//INVALID_ALT_NUMBER}.
+// altsets. If no such alternative exists, this method returns
+// ATN//INVALID_ALT_NUMBER.
 //
 // @param altsets a collection of alternative subsets
 //
@@ -461,11 +461,11 @@ func PredictionModegetUniqueAlt(altsets []*BitSet) int {
 }
 
 // Gets the complete set of represented alternatives for a collection of
-// alternative subsets. This method returns the union of each {@link BitSet}
-// in {@code altsets}.
+// alternative subsets. This method returns the union of each BitSet
+// in altsets.
 //
 // @param altsets a collection of alternative subsets
-// @return the set of represented alternatives in {@code altsets}
+// @return the set of represented alternatives in altsets
 //
 func PredictionModeGetAlts(altsets []*BitSet) *BitSet {
 	all := NewBitSet()
@@ -477,10 +477,10 @@ func PredictionModeGetAlts(altsets []*BitSet) *BitSet {
 
 //
 // This func gets the conflicting alt subsets from a configuration set.
-// For each configuration {@code c} in {@code configs}:
+// For each configuration c in configs:
 //
 // <pre>
-// map[c] U= c.{@link ATNConfig//alt alt} // map hash/equals uses s and x, not
+// map[c] U= c.ATNConfig//alt alt // map hash/equals uses s and x, not
 // alt and not pred
 // </pre>
 //
@@ -488,7 +488,7 @@ func PredictionModegetConflictingAltSubsets(configs ATNConfigSet) []*BitSet {
 	configToAlts := make(map[int]*BitSet)
 
 	for _, c := range configs.GetItems() {
-		key := 31 * c.GetState().GetStateNumber() + c.GetContext().hash()
+		key := 31*c.GetState().GetStateNumber() + c.GetContext().hash()
 
 		alts, ok := configToAlts[key]
 		if !ok {
@@ -507,10 +507,10 @@ func PredictionModegetConflictingAltSubsets(configs ATNConfigSet) []*BitSet {
 
 //
 // Get a map from state to alt subset from a configuration set. For each
-// configuration {@code c} in {@code configs}:
+// configuration c in configs:
 //
 // <pre>
-// map[c.{@link ATNConfig//state state}] U= c.{@link ATNConfig//alt alt}
+// map[c.ATNConfig//state state] U= c.ATNConfig//alt alt
 // </pre>
 //
 func PredictionModeGetStateToAltMap(configs ATNConfigSet) *AltDict {

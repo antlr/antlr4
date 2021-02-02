@@ -54,7 +54,7 @@ func NewBaseParserRuleContext(parent ParserRuleContext, invokingStateNumber int)
 	prc.start = nil
 	prc.stop = nil
 	// The exception that forced prc rule to return. If the rule successfully
-	// completed, prc is {@code nil}.
+	// completed, prc is nil.
 	prc.exception = nil
 
 	return prc

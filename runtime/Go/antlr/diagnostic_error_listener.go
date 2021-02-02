@@ -9,9 +9,9 @@ import (
 )
 
 //
-// This implementation of {@link ANTLRErrorListener} can be used to identify
+// This implementation of ANTLRErrorListener can be used to identify
 // certain potential correctness and performance problems in grammars. "reports"
-// are made by calling {@link Parser//NotifyErrorListeners} with the appropriate
+// are made by calling Parser//NotifyErrorListeners with the appropriate
 // message.
 //
 // <ul>
@@ -95,8 +95,8 @@ func (d *DiagnosticErrorListener) getDecisionDescription(recognizer Parser, dfa 
 // @param ReportedAlts The set of conflicting or ambiguous alternatives, as
 // Reported by the parser.
 // @param configs The conflicting or ambiguous configuration set.
-// @return Returns {@code ReportedAlts} if it is not {@code nil}, otherwise
-// returns the set of alternatives represented in {@code configs}.
+// @return Returns ReportedAlts if it is not nil, otherwise
+// returns the set of alternatives represented in configs.
 //
 func (d *DiagnosticErrorListener) getConflictingAlts(ReportedAlts *BitSet, set ATNConfigSet) *BitSet {
 	if ReportedAlts != nil {
