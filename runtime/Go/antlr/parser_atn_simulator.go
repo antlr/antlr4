@@ -678,27 +678,24 @@ func (p *ParserATNSimulator) computeStartState(a ATNState, ctx RuleContext, full
 // process applies the following changes to the start state's configuration
 // set.
 //
-// <ol>
-// <li>Evaluate the precedence predicates for each configuration using
-// SemanticContext//evalPrecedence.</li>
-// <li>Remove all configurations which predict an alternative greater than
+// 1. Evaluate the precedence predicates for each configuration using
+// SemanticContext//evalPrecedence.
+//
+// 2. Remove all configurations which predict an alternative greater than
 // 1, for which another configuration that predicts alternative 1 is in the
 // same ATN state with the same prediction context. This transformation is
 // valid for the following reasons:
-// <ul>
-// <li>The closure block cannot contain any epsilon transitions which bypass
-// the body of the closure, so all states reachable via alternative 1 are
-// part of the precedence alternatives of the transformed left-recursive
-// rule.</li>
-// <li>The "primary" portion of a left recursive rule cannot contain an
-// epsilon transition, so the only way an alternative other than 1 can exist
-// in a state that is also reachable via alternative 1 is by nesting calls
-// to the left-recursive rule, with the outer calls not being at the
-// preferred precedence level.</li>
-// </ul>
-// </li>
-// </ol>
 //
+//	• The closure block cannot contain any epsilon transitions which bypass
+// 	the body of the closure, so all states reachable via alternative 1 are
+// 	part of the precedence alternatives of the transformed left-recursive
+// 	rule.
+//
+// 	• The "primary" portion of a left recursive rule cannot contain an
+// 	epsilon transition, so the only way an alternative other than 1 can exist
+// 	in a state that is also reachable via alternative 1 is by nesting calls
+// 	to the left-recursive rule, with the outer calls not being at the
+// 	preferred precedence level.
 //
 // The prediction context must be considered by p filter to address
 // situations like the following.
@@ -834,15 +831,13 @@ func (p *ParserATNSimulator) getPredicatePredictions(ambigAlts *BitSet, altToPre
 // and valid, and the syntax error will be Reported later at a more
 // localized location.
 //
-// <ul>
-// <li>If a syntactically valid path or paths reach the end of the decision rule and
-// they are semantically valid if predicated, return the min associated alt.</li>
-// <li>Else, if a semantically invalid but syntactically valid path exist
-// or paths exist, return the minimum associated alt.
-// </li>
-// <li>Otherwise, return ATN//INVALID_ALT_NUMBER.</li>
-// </ul>
+// • If a syntactically valid path or paths reach the end of the decision rule and
+// they are semantically valid if predicated, return the min associated alt.
 //
+// • Else, if a semantically invalid but syntactically valid path exist
+// or paths exist, return the minimum associated alt.
+//
+// • Otherwise, return ATN//INVALID_ALT_NUMBER.
 //
 // In some scenarios, the algorithm described above could predict an
 // alternative which will result in a FailedPredicateException in

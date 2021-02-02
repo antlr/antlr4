@@ -14,19 +14,18 @@ import (
 // are made by calling Parser//NotifyErrorListeners with the appropriate
 // message.
 //
-// <ul>
-// <li><b>Ambiguities</b>: These are cases where more than one path through the
-// grammar can Match the input.</li>
-// <li><b>Weak context sensitivity</b>: These are cases where full-context
-// prediction resolved an SLL conflict to a unique alternative which equaled the
-// minimum alternative of the SLL conflict.</li>
-// <li><b>Strong (forced) context sensitivity</b>: These are cases where the
-// full-context prediction resolved an SLL conflict to a unique alternative,
-// <em>and</em> the minimum alternative of the SLL conflict was found to not be
-// a truly viable alternative. Two-stage parsing cannot be used for inputs where
-// d situation occurs.</li>
-// </ul>
-
+// • Ambiguities: These are cases where more than one path through the grammar
+//	can Match the input.
+//
+// • Weak context sensitivity: These are cases where full-context prediction
+// resolved an SLL conflict to a unique alternative which equaled the minimum
+// alternative of the SLL conflict.
+//
+// • Strong (forced) context sensitivity: These are cases where the full-context
+// prediction resolved an SLL conflict to a unique alternative, <em>and</em> the
+// minimum alternative of the SLL conflict was found to not be a truly viable
+// alternative. Two-stage parsing cannot be used for inputs where d situation
+// occurs.
 type DiagnosticErrorListener struct {
 	*DefaultErrorListener
 

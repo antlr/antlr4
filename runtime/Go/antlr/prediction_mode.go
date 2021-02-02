@@ -77,10 +77,8 @@ const (
 // This method computes the SLL prediction termination condition for both of
 // the following cases.
 //
-// <ul>
-// <li>The usual SLL+LL fallback upon SLL conflict</li>
-// <li>Pure SLL without LL fallback</li>
-// </ul>
+// • The usual SLL+LL fallback upon SLL conflict
+// • Pure SLL without LL fallback
 //
 // COMBINED SLL+LL PARSING
 //
@@ -323,35 +321,24 @@ func PredictionModeallConfigsInRuleStopStates(configs ATNConfigSet) bool {
 //
 // CASES
 //
-// <ul>
+// • no conflicts and more than 1 alternative in set =&gt continue.
 //
-// <li>no conflicts and more than 1 alternative in set =&gt continue</li>
+// • (s, 1, x), (s, 2, x), (s, 3, z), (s', 1, y), (s', 2, y) yields
+// non-conflicting set {3} U conflicting sets min({1,2)} U min({1,2)} = {1,3}
+// =&gt continue.
 //
-// <li> (s, 1, x), (s, 2, x), (s, 3, z),
-// (s', 1, y), (s', 2, y) yields non-conflicting set
-// {3} U conflicting sets min({1,2)} U min({1,2)} =
-// {1,3} =&gt continue
-// </li>
+// • (s, 1, x), (s, 2, x), (s', 1, y), (s', 2, y), (s'', 1, z) yields
+// non-conflicting set {1} U conflicting sets min({1,2)} U min({1,2)} = {1} →
+// stop and predict 1.
 //
-// <li>(s, 1, x), (s, 2, x), (s', 1, y),
-// (s', 2, y), (s'', 1, z) yields non-conflicting set
-// {1} U conflicting sets min({1,2)} U min({1,2)} =
-// {1} =&gt stop and predict 1</li>
+// • (s, 1, x), (s, 2, x), (s', 1, y), (s', 2, y) yields conflicting, reduced
+// sets {1} U {1} = {1} =&gt stop and predict 1, can announce ambiguity {1,2}.
 //
-// <li>(s, 1, x), (s, 2, x), (s', 1, y),
-// (s', 2, y) yields conflicting, reduced sets {1} U
-// {1} = {1} =&gt stop and predict 1, can announce
-// ambiguity {1,2}</li>
+// • (s, 1, x), (s, 2, x), (s', 2, y), (s', 3, y) yields conflicting, reduced
+// sets {1} U {2} = {1,2} =&gt continue.
 //
-// <li>(s, 1, x), (s, 2, x), (s', 2, y),
-// (s', 3, y) yields conflicting, reduced sets {1} U
-// {2} = {1,2} =&gt continue</li>
-//
-// <li>(s, 1, x), (s, 2, x), (s', 3, y),
-// (s', 4, y) yields conflicting, reduced sets {1} U
-// {3} = {1,3} =&gt continue</li>
-//
-// </ul>
+// • (s, 1, x), (s, 2, x), (s', 3, y), (s', 4, y) yields conflicting, reduced
+// sets {1} U {3} = {1,3} =&gt continue.
 //
 // EXACT AMBIGUITY DETECTION
 //

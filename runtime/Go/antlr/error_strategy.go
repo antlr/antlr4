@@ -104,16 +104,14 @@ func (d *DefaultErrorStrategy) ReportMatch(recognizer Parser) {
 // and dispatches the Reporting task based on the runtime type of e
 // according to the following table.
 //
-// <ul>
-// <li>NoViableAltException: Dispatches the call to
-// //ReportNoViableAlternative</li>
-// <li>InputMisMatchException: Dispatches the call to
-// //ReportInputMisMatch</li>
-// <li>FailedPredicateException: Dispatches the call to
-// //ReportFailedPredicate</li>
-// <li>All other types: calls Parser//NotifyErrorListeners to Report
-// the exception</li>
-// </ul>
+// • NoViableAltException: Dispatches the call to //ReportNoViableAlternative.
+//
+// • InputMisMatchException: Dispatches the call to //ReportInputMisMatch.
+//
+// • FailedPredicateException: Dispatches the call to //ReportFailedPredicate.
+//
+// • All other types: calls Parser//NotifyErrorListeners to Report the
+// exception.
 //
 func (d *DefaultErrorStrategy) ReportError(recognizer Parser, e RecognitionException) {
 	// if we've already Reported an error and have not Matched a token
@@ -696,21 +694,20 @@ func (d *DefaultErrorStrategy) consumeUntil(recognizer Parser, set *IntervalSet)
 //
 // This error strategy is useful in the following scenarios.
 //
-// <ul>
-// <li>Two-stage parsing: This error strategy allows the first
+// • Two-stage parsing: This error strategy allows the first
 // stage of two-stage parsing to immediately terminate if an error is
 // encountered, and immediately fall back to the second stage. In addition to
 // avoiding wasted work by attempting to recover from errors here, the empty
 // implementation of BailErrorStrategy//Sync improves the performance of
-// the first stage.</li>
-// <li>Silent validation: When syntax errors are not being
+// the first stage.
+//
+// • Silent validation: When syntax errors are not being
 // Reported or logged, and the parse result is simply ignored if errors occur,
 // the BailErrorStrategy avoids wasting work on recovering from errors
-// when the result will be ignored either way.</li>
-// </ul>
+// when the result will be ignored either way.
 //
 //
-// myparser.setErrorHandler(NewBailErrorStrategy())
+//		myparser.setErrorHandler(NewBailErrorStrategy())
 //
 // @see Parser//setErrorHandler(ANTLRErrorStrategy)
 

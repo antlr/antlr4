@@ -218,14 +218,14 @@ func (p *BaseParser) GetParseListeners() []ParseTreeListener {
 // <em>deterministic</em>, i.e. for identical input the calls to listener
 // methods will be the same.
 //
-// <ul>
-// <li>Alterations to the grammar used to generate code may change the
-// behavior of the listener calls.</li>
-// <li>Alterations to the command line options passed to ANTLR 4 when
-// generating the parser may change the behavior of the listener calls.</li>
-// <li>Changing the version of the ANTLR Tool used to generate the parser
-// may change the behavior of the listener calls.</li>
-// </ul>
+// • Alterations to the grammar used to generate code may change the behavior of
+// the listener calls.
+//
+// • Alterations to the command line options passed to ANTLR 4 when generating
+// the parser may change the behavior of the listener calls.
+//
+// • Changing the version of the ANTLR Tool used to generate the parser may
+// change the behavior of the listener calls.
 //
 // @param listener the listener to add
 //
