@@ -471,14 +471,14 @@ func (l *LexerATNSimulator) getEpsilonTarget(input CharStream, config *LexerATNC
 
 // Evaluate a predicate specified in the lexer.
 //
-// <p>If speculative is true, l method was called before
+// If speculative is true, l method was called before
 // //consume for the Matched character. This method should call
 // //consume before evaluating the predicate to ensure position
 // sensitive values, including Lexer//GetText, Lexer//GetLine,
 // and Lexer//getcolumn, properly reflect the current
 // lexer state. This method should restore input and the simulator
 // to the original state before returning (i.e. undo the actions made by the
-// call to //consume.</p>
+// call to //consume.
 //
 // @param input The input stream.
 // @param ruleIndex The rule containing the predicate.

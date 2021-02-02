@@ -54,10 +54,10 @@ func (la *LL1Analyzer) getDecisionLookahead(s ATNState) []*IntervalSet {
 // Compute set of tokens that can follow s in the ATN in the
 // specified ctx.
 //
-// <p>If ctx is nil and the end of the rule containing
+// If ctx is nil and the end of the rule containing
 // s is reached, Token//EPSILON is added to the result set.
 // If ctx is not nil and the end of the outermost rule is
-// reached, Token//EOF is added to the result set.</p>
+// reached, Token//EOF is added to the result set.
 //
 // @param s the ATN state
 // @param stopState the ATN state to stop at. This can be a
@@ -83,11 +83,11 @@ func (la *LL1Analyzer) Look(s, stopState ATNState, ctx RuleContext) *IntervalSet
 // Compute set of tokens that can follow s in the ATN in the
 // specified ctx.
 //
-// <p>If ctx is nil and stopState or the end of the
+// If ctx is nil and stopState or the end of the
 // rule containing s is reached, Token//EPSILON is added to
 // the result set. If ctx is not nil and addEOF is
 // true and stopState or the end of the outermost rule is
-// reached, Token//EOF is added to the result set.</p>
+// reached, Token//EOF is added to the result set.
 //
 // @param s the ATN state.
 // @param stopState the ATN state to stop at. This can be a

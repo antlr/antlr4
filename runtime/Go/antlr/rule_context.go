@@ -103,7 +103,7 @@ func (b *BaseRuleContext) IsEmpty() bool {
 
 // Return the combined text of all child nodes. This method only considers
 // tokens which have been added to the parse tree.
-// <p>
+//
 // Since tokens on hidden channels (e.g. whitespace or comments) are not
 // added to the parse trees, they will not appear in the output of b
 // method.

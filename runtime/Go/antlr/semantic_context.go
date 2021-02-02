@@ -13,8 +13,8 @@ import (
 //  an ATN configuration is valid.  It's either a single predicate,
 //  a conjunction p1&&p2, or a sum of products p1||p2.
 //
-//  <p>I have scoped the AND, OR, and Predicate subclasses of
-//  SemanticContext within the scope of this outer class.</p>
+//  I have scoped the AND, OR, and Predicate subclasses of
+//  SemanticContext within the scope of this outer class.
 //
 
 type SemanticContext interface {
@@ -242,9 +242,9 @@ func (a *AND) equals(other interface{}) bool {
 //
 // {@inheritDoc}
 //
-// <p>
+//
 // The evaluation of predicates by a context is short-circuiting, but
-// unordered.</p>
+// unordered.
 //
 func (a *AND) evaluate(parser Recognizer, outerContext RuleContext) bool {
 	for i := 0; i < len(a.opnds); i++ {
@@ -392,9 +392,9 @@ func (o *OR) equals(other interface{}) bool {
 	}
 }
 
-// <p>
+//
 // The evaluation of predicates by o context is short-circuiting, but
-// unordered.</p>
+// unordered.
 //
 func (o *OR) evaluate(parser Recognizer, outerContext RuleContext) bool {
 	for i := 0; i < len(o.opnds); i++ {

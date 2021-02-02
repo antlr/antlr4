@@ -620,10 +620,10 @@ func (p *ParserATNSimulator) computeReachSet(closure ATNConfigSet, t int, fullCt
 // configurations in configs are already in a rule stop state, p
 // method simply returns configs.
 //
-// <p>When lookToEndOfRule is true, p method uses
+// When lookToEndOfRule is true, p method uses
 // ATN//NextTokens for each configuration in configs which is
 // not already in a rule stop state to see if a rule stop state is reachable
-// from the configuration via epsilon-only transitions.</p>
+// from the configuration via epsilon-only transitions.
 //
 // @param configs the configuration set to update
 // @param lookToEndOfRule when true, p method checks for rule stop states
@@ -699,10 +699,10 @@ func (p *ParserATNSimulator) computeStartState(a ATNState, ctx RuleContext, full
 // </li>
 // </ol>
 //
-// <p>
+//
 // The prediction context must be considered by p filter to address
 // situations like the following.
-// </p>
+//
 // <code>
 // <pre>
 // grammar TA
@@ -711,7 +711,7 @@ func (p *ParserATNSimulator) computeStartState(a ATNState, ctx RuleContext, full
 // letterA: 'a'
 // </pre>
 // </code>
-// <p>
+//
 // If the above grammar, the ATN state immediately before the token
 // reference 'a' in letterA is reachable from the left edge
 // of both the primary and closure blocks of the left-recursive rule
@@ -719,7 +719,7 @@ func (p *ParserATNSimulator) computeStartState(a ATNState, ctx RuleContext, full
 // configurations distinguishes between them, and prevents the alternative
 // which stepped out to prog (and then back in to statement
 // from being eliminated by the filter.
-// </p>
+//
 //
 // @param configs The configuration set computed by
 // //computeStartState as the start state for the DFA.
@@ -830,13 +830,13 @@ func (p *ParserATNSimulator) getPredicatePredictions(ambigAlts *BitSet, altToPre
 // NoViableAltException in particular prediction scenarios where the
 // //ERROR state was reached during ATN simulation.
 //
-// <p>
+//
 // The default implementation of p method uses the following
 // algorithm to identify an ATN configuration which successfully parsed the
 // decision entry rule. Choosing such an alternative ensures that the
 // ParserRuleContext returned by the calling rule will be complete
 // and valid, and the syntax error will be Reported later at a more
-// localized location.</p>
+// localized location.
 //
 // <ul>
 // <li>If a syntactically valid path or paths reach the end of the decision rule and
@@ -847,7 +847,7 @@ func (p *ParserATNSimulator) getPredicatePredictions(ambigAlts *BitSet, altToPre
 // <li>Otherwise, return ATN//INVALID_ALT_NUMBER.</li>
 // </ul>
 //
-// <p>
+//
 // In some scenarios, the algorithm described above could predict an
 // alternative which will result in a FailedPredicateException in
 // the parser. Specifically, p could occur if the <em>only</em> configuration
@@ -859,7 +859,7 @@ func (p *ParserATNSimulator) getPredicatePredictions(ambigAlts *BitSet, altToPre
 // predicate which is preventing the parser from successfully parsing the
 // decision rule, which helps developers identify and correct logic errors
 // in semantic predicates.
-// </p>
+//
 //
 // @param configs The ATN configurations which were valid immediately before
 // the //ERROR state was reached
@@ -1361,9 +1361,9 @@ func (p *ParserATNSimulator) getUniqueAlt(configs ATNConfigSet) int {
 // range of edges that can be represented in the DFA tables, p method
 // returns without adding the edge to the DFA.
 //
-// <p>If to is nil, p method returns nil.
+// If to is nil, p method returns nil.
 // Otherwise, p method returns the DFAState returned by calling
-// //addDFAState for the to state.</p>
+// //addDFAState for the to state.
 //
 // @param dfa The DFA
 // @param from The source state for the edge
@@ -1407,8 +1407,8 @@ func (p *ParserATNSimulator) addDFAEdge(dfa *DFA, from *DFAState, t int, to *DFA
 // is already in the DFA, the existing state is returned. Otherwise p
 // method returns D after adding it to the DFA.
 //
-// <p>If D is //ERROR, p method returns //ERROR and
-// does not change the DFA.</p>
+// If D is //ERROR, p method returns //ERROR and
+// does not change the DFA.
 //
 // @param dfa The dfa
 // @param D The DFA state to add

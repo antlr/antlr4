@@ -56,10 +56,10 @@ var ConsoleErrorListenerINSTANCE = NewConsoleErrorListener()
 //
 // {@inheritDoc}
 //
-// <p>
+//
 // This implementation prints messages to System//err containing the
 // values of line, charPositionInLine, and msg using
-// the following format.</p>
+// the following format.
 //
 // <pre>
 // line <em>line</em>:<em>charPositionInLine</em> <em>msg</em>

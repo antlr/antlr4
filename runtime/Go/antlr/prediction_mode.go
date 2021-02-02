@@ -17,18 +17,18 @@ const (
 	// may result in syntax errors for grammar and input combinations which are
 	// not SLL.
 	//
-	// <p>
+	//
 	// When using this prediction mode, the parser will either return a correct
 	// parse tree (i.e. the same parse tree that would be returned with the
 	// //LL prediction mode), or it will Report a syntax error. If a
 	// syntax error is encountered when using the //SLL prediction mode,
 	// it may be due to either an actual syntax error in the input or indicate
 	// that the particular combination of grammar and input requires the more
-	// powerful //LL prediction abilities to complete successfully.</p>
+	// powerful //LL prediction abilities to complete successfully.
 	//
-	// <p>
+	//
 	// This prediction mode does not provide any guarantees for prediction
-	// behavior for syntactically-incorrect inputs.</p>
+	// behavior for syntactically-incorrect inputs.
 	//
 	PredictionModeSLL = 0
 	//
@@ -38,16 +38,16 @@ const (
 	// parse results for all combinations of grammars with syntactically correct
 	// inputs.
 	//
-	// <p>
+	//
 	// When using this prediction mode, the parser will make correct decisions
 	// for all syntactically-correct grammar and input combinations. However, in
 	// cases where the grammar is truly ambiguous this prediction mode might not
 	// Report a precise answer for <em>exactly which</em> alternatives are
-	// ambiguous.</p>
+	// ambiguous.
 	//
-	// <p>
+	//
 	// This prediction mode does not provide any guarantees for prediction
-	// behavior for syntactically-incorrect inputs.</p>
+	// behavior for syntactically-incorrect inputs.
 	//
 	PredictionModeLL = 1
 	//
@@ -57,15 +57,15 @@ const (
 	// complete and exact set of ambiguous alternatives for every ambiguous
 	// decision encountered while parsing.
 	//
-	// <p>
+	//
 	// This prediction mode may be used for diagnosing ambiguities during
 	// grammar development. Due to the performance overhead of calculating sets
 	// of ambiguous alternatives, this prediction mode should be avoided when
-	// the exact results are not necessary.</p>
+	// the exact results are not necessary.
 	//
-	// <p>
+	//
 	// This prediction mode does not provide any guarantees for prediction
-	// behavior for syntactically-incorrect inputs.</p>
+	// behavior for syntactically-incorrect inputs.
 	//
 	PredictionModeLLExactAmbigDetection = 2
 )
@@ -73,94 +73,94 @@ const (
 //
 // Computes the SLL prediction termination condition.
 //
-// <p>
+//
 // This method computes the SLL prediction termination condition for both of
-// the following cases.</p>
+// the following cases.
 //
 // <ul>
 // <li>The usual SLL+LL fallback upon SLL conflict</li>
 // <li>Pure SLL without LL fallback</li>
 // </ul>
 //
-// <p><strong>COMBINED SLL+LL PARSING</strong></p>
+// <strong>COMBINED SLL+LL PARSING</strong>
 //
-// <p>When LL-fallback is enabled upon SLL conflict, correct predictions are
+// When LL-fallback is enabled upon SLL conflict, correct predictions are
 // ensured regardless of how the termination condition is computed by this
 // method. Due to the substantially higher cost of LL prediction, the
 // prediction should only fall back to LL when the additional lookahead
-// cannot lead to a unique SLL prediction.</p>
+// cannot lead to a unique SLL prediction.
 //
-// <p>Assuming combined SLL+LL parsing, an SLL configuration set with only
+// Assuming combined SLL+LL parsing, an SLL configuration set with only
 // conflicting subsets should fall back to full LL, even if the
 // configuration sets don't resolve to the same alternative (e.g.
 // {1,2} and {3,4}. If there is at least one non-conflicting
 // configuration, SLL could continue with the hopes that more lookahead will
-// resolve via one of those non-conflicting configurations.</p>
+// resolve via one of those non-conflicting configurations.
 //
-// <p>Here's the prediction termination rule them: SLL (for SLL+LL parsing)
+// Here's the prediction termination rule them: SLL (for SLL+LL parsing)
 // stops when it sees only conflicting configuration subsets. In contrast,
-// full LL keeps going when there is uncertainty.</p>
+// full LL keeps going when there is uncertainty.
 //
-// <p><strong>HEURISTIC</strong></p>
+// <strong>HEURISTIC</strong>
 //
-// <p>As a heuristic, we stop prediction when we see any conflicting subset
+// As a heuristic, we stop prediction when we see any conflicting subset
 // unless we see a state that only has one alternative associated with it.
 // The single-alt-state thing lets prediction continue upon rules like
-// (otherwise, it would admit defeat too soon):</p>
+// (otherwise, it would admit defeat too soon):
 //
-// <p>[12|1|[], 6|2|[], 12|2|[]]. s : (ID | ID ID?) '' </p>
+// [12|1|[], 6|2|[], 12|2|[]]. s : (ID | ID ID?) ''
 //
-// <p>When the ATN simulation reaches the state before '', it has a
+// When the ATN simulation reaches the state before '', it has a
 // DFA state that looks like: [12|1|[], 6|2|[], 12|2|[]]. Naturally
 // 12|1|[] and 12|2|[] conflict, but we cannot stop
 // processing this node because alternative to has another way to continue,
-// via [6|2|[]].</p>
+// via [6|2|[]].
 //
-// <p>It also let's us continue for this rule:</p>
+// It also let's us continue for this rule:
 //
-// <p>[1|1|[], 1|2|[], 8|3|[]] a : A | A | A B </p>
+// [1|1|[], 1|2|[], 8|3|[]] a : A | A | A B
 //
-// <p>After Matching input A, we reach the stop state for rule A, state 1.
+// After Matching input A, we reach the stop state for rule A, state 1.
 // State 8 is the state right before B. Clearly alternatives 1 and 2
 // conflict and no amount of further lookahead will separate the two.
 // However, alternative 3 will be able to continue and so we do not stop
 // working on this state. In the previous example, we're concerned with
 // states associated with the conflicting alternatives. Here alt 3 is not
 // associated with the conflicting configs, but since we can continue
-// looking for input reasonably, don't declare the state done.</p>
+// looking for input reasonably, don't declare the state done.
 //
-// <p><strong>PURE SLL PARSING</strong></p>
+// <strong>PURE SLL PARSING</strong>
 //
-// <p>To handle pure SLL parsing, all we have to do is make sure that we
+// To handle pure SLL parsing, all we have to do is make sure that we
 // combine stack contexts for configurations that differ only by semantic
-// predicate. From there, we can do the usual SLL termination heuristic.</p>
+// predicate. From there, we can do the usual SLL termination heuristic.
 //
-// <p><strong>PREDICATES IN SLL+LL PARSING</strong></p>
+// <strong>PREDICATES IN SLL+LL PARSING</strong>
 //
-// <p>SLL decisions don't evaluate predicates until after they reach DFA stop
+// SLL decisions don't evaluate predicates until after they reach DFA stop
 // states because they need to create the DFA cache that works in all
 // semantic situations. In contrast, full LL evaluates predicates collected
 // during start state computation so it can ignore predicates thereafter.
 // This means that SLL termination detection can totally ignore semantic
-// predicates.</p>
+// predicates.
 //
-// <p>Implementation-wise, ATNConfigSet combines stack contexts but not
+// Implementation-wise, ATNConfigSet combines stack contexts but not
 // semantic predicate contexts so we might see two configurations like the
-// following.</p>
+// following.
 //
-// <p>(s, 1, x, {), (s, 1, x', {p})}</p>
+// (s, 1, x, {), (s, 1, x', {p})}
 //
-// <p>Before testing these configurations against others, we have to merge
+// Before testing these configurations against others, we have to merge
 // x and x' (without modifying the existing configurations).
 // For example, we test (x+x')==x'' when looking for conflicts in
-// the following configurations.</p>
+// the following configurations.
 //
-// <p>(s, 1, x, {), (s, 1, x', {p}), (s, 2, x'', {})}</p>
+// (s, 1, x, {), (s, 1, x', {p}), (s, 2, x'', {})}
 //
-// <p>If the configuration set has predicates (as indicated by
+// If the configuration set has predicates (as indicated by
 // ATNConfigSet//hasSemanticContext), this algorithm makes a copy of
 // the configurations to strip out all of the predicates so that a standard
-// ATNConfigSet will merge everything ignoring predicates.</p>
+// ATNConfigSet will merge everything ignoring predicates.
 //
 func PredictionModehasSLLConflictTerminatingPrediction(mode int, configs ATNConfigSet) bool {
 	// Configs in rule stop states indicate reaching the end of the decision
@@ -232,62 +232,62 @@ func PredictionModeallConfigsInRuleStopStates(configs ATNConfigSet) bool {
 //
 // Full LL prediction termination.
 //
-// <p>Can we stop looking ahead during ATN simulation or is there some
+// Can we stop looking ahead during ATN simulation or is there some
 // uncertainty as to which alternative we will ultimately pick, after
 // consuming more input? Even if there are partial conflicts, we might know
 // that everything is going to resolve to the same minimum alternative. That
 // means we can stop since no more lookahead will change that fact. On the
 // other hand, there might be multiple conflicts that resolve to different
 // minimums. That means we need more look ahead to decide which of those
-// alternatives we should predict.</p>
+// alternatives we should predict.
 //
-// <p>The basic idea is to split the set of configurations C, into
+// The basic idea is to split the set of configurations C, into
 // conflicting subsets (s, _, ctx, _) and singleton subsets with
 // non-conflicting configurations. Two configurations conflict if they have
 // identical ATNConfig//state and ATNConfig//context values
 // but different ATNConfig//alt value, e.g. (s, i, ctx, _)
-// and (s, j, ctx, _) for i!=j.</p>
+// and (s, j, ctx, _) for i!=j.
 //
-// <p>Reduce these configuration subsets to the set of possible alternatives.
-// You can compute the alternative subsets in one pass as follows:</p>
+// Reduce these configuration subsets to the set of possible alternatives.
+// You can compute the alternative subsets in one pass as follows:
 //
-// <p>A_s,ctx = {i | (s, i, ctx, _)} for each configuration in
-// C holding s and ctx fixed.</p>
+// A_s,ctx = {i | (s, i, ctx, _)} for each configuration in
+// C holding s and ctx fixed.
 //
-// <p>Or in pseudo-code, for each configuration c in C:</p>
+// Or in pseudo-code, for each configuration c in C:
 //
 // <pre>
 // map[c] U= c.ATNConfig//alt alt // map hash/equals uses s and x, not
 // alt and not pred
 // </pre>
 //
-// <p>The values in map are the set of A_s,ctx sets.</p>
+// The values in map are the set of A_s,ctx sets.
 //
-// <p>If |A_s,ctx|=1 then there is no conflict associated with
-// s and ctx.</p>
+// If |A_s,ctx|=1 then there is no conflict associated with
+// s and ctx.
 //
-// <p>Reduce the subsets to singletons by choosing a minimum of each subset. If
+// Reduce the subsets to singletons by choosing a minimum of each subset. If
 // the union of these alternative subsets is a singleton, then no amount of
 // more lookahead will help us. We will always pick that alternative. If,
 // however, there is more than one alternative, then we are uncertain which
 // alternative to predict and must continue looking for resolution. We may
 // or may not discover an ambiguity in the future, even if there are no
-// conflicting subsets this round.</p>
+// conflicting subsets this round.
 //
-// <p>The biggest sin is to terminate early because it means we've made a
+// The biggest sin is to terminate early because it means we've made a
 // decision but were uncertain as to the eventual outcome. We haven't used
 // enough lookahead. On the other hand, announcing a conflict too late is no
 // big deal you will still have the conflict. It's just inefficient. It
-// might even look until the end of file.</p>
+// might even look until the end of file.
 //
-// <p>No special consideration for semantic predicates is required because
+// No special consideration for semantic predicates is required because
 // predicates are evaluated on-the-fly for full LL prediction, ensuring that
 // no configuration contains a semantic context during the termination
-// check.</p>
+// check.
 //
-// <p><strong>CONFLICTING CONFIGS</strong></p>
+// <strong>CONFLICTING CONFIGS</strong>
 //
-// <p>Two configurations (s, i, x) and (s, j, x'), conflict
+// Two configurations (s, i, x) and (s, j, x'), conflict
 // when i!=j but x=x'. Because we merge all
 // (s, i, _) configurations together, that means that there are at
 // most n configurations associated with state s for
@@ -300,28 +300,28 @@ func PredictionModeallConfigsInRuleStopStates(configs ATNConfigSet) bool {
 // others resolve to min(i) as well. However, if x is
 // associated with j>i then at least one stack configuration for
 // j is not in conflict with alternative i. The algorithm
-// should keep going, looking for more lookahead due to the uncertainty.</p>
+// should keep going, looking for more lookahead due to the uncertainty.
 //
-// <p>For simplicity, I'm doing a equality check between x and
+// For simplicity, I'm doing a equality check between x and
 // x' that lets the algorithm continue to consume lookahead longer
 // than necessary. The reason I like the equality is of course the
 // simplicity but also because that is the test you need to detect the
-// alternatives that are actually in conflict.</p>
+// alternatives that are actually in conflict.
 //
-// <p><strong>CONTINUE/STOP RULE</strong></p>
+// <strong>CONTINUE/STOP RULE</strong>
 //
-// <p>Continue if union of resolved alternative sets from non-conflicting and
+// Continue if union of resolved alternative sets from non-conflicting and
 // conflicting alternative subsets has more than one alternative. We are
-// uncertain about which alternative to predict.</p>
+// uncertain about which alternative to predict.
 //
-// <p>The complete set of alternatives, [i for (_,i,_)], tells us which
+// The complete set of alternatives, [i for (_,i,_)], tells us which
 // alternatives are still in the running for the amount of input we've
 // consumed at this point. The conflicting sets let us to strip away
 // configurations that won't lead to more states because we resolve
 // conflicts to the configuration with a minimum alternate for the
-// conflicting set.</p>
+// conflicting set.
 //
-// <p><strong>CASES</strong></p>
+// <strong>CASES</strong>
 //
 // <ul>
 //
@@ -353,22 +353,22 @@ func PredictionModeallConfigsInRuleStopStates(configs ATNConfigSet) bool {
 //
 // </ul>
 //
-// <p><strong>EXACT AMBIGUITY DETECTION</strong></p>
+// <strong>EXACT AMBIGUITY DETECTION</strong>
 //
-// <p>If all states Report the same conflicting set of alternatives, then we
-// know we have the exact ambiguity set.</p>
+// If all states Report the same conflicting set of alternatives, then we
+// know we have the exact ambiguity set.
 //
-// <p><code>|A_<em>i</em>|&gt1</code> and
-// <code>A_<em>i</em> = A_<em>j</em></code> for all <em>i</em>, <em>j</em>.</p>
+// <code>|A_<em>i</em>|&gt1</code> and
+// <code>A_<em>i</em> = A_<em>j</em></code> for all <em>i</em>, <em>j</em>.
 //
-// <p>In other words, we continue examining lookahead until all A_i
+// In other words, we continue examining lookahead until all A_i
 // have more than one alternative and all A_i are the same. If
 // A={{1,2, {1,3}}}, then regular LL prediction would terminate
 // because the resolved set is {1}. To determine what the real
 // ambiguity is, we have to know whether the ambiguity is between one and
 // two or one and three so we keep going. We can only stop prediction when
 // we need exact ambiguity detection when the sets look like
-// A={{1,2}} or {{1,2,{1,2}}}, etc...</p>
+// A={{1,2}} or {{1,2,{1,2}}}, etc...
 //
 func PredictionModeresolvesToJustOneViableAlt(altsets []*BitSet) int {
 	return PredictionModegetSingleViableAlt(altsets)

@@ -122,12 +122,12 @@ func (p *BaseParser) SetErrorHandler(e ErrorStrategy) {
 // Matches, ANTLRErrorStrategy//ReportMatch and //consume are
 // called to complete the Match process.
 //
-// <p>If the symbol type does not Match,
+// If the symbol type does not Match,
 // ANTLRErrorStrategy//recoverInline is called on the current error
 // strategy to attempt recovery. If //getBuildParseTree is
 // true and the token index of the symbol returned by
 // ANTLRErrorStrategy//recoverInline is -1, the symbol is added to
-// the parse tree by calling ParserRuleContext//addErrorNode.</p>
+// the parse tree by calling ParserRuleContext//addErrorNode.
 //
 // @param ttype the token type to Match
 // @return the Matched symbol
@@ -159,12 +159,12 @@ func (p *BaseParser) Match(ttype int) Token {
 // (i.e. has a value greater than 0), ANTLRErrorStrategy//ReportMatch
 // and //consume are called to complete the Match process.
 //
-// <p>If the symbol type does not Match,
+// If the symbol type does not Match,
 // ANTLRErrorStrategy//recoverInline is called on the current error
 // strategy to attempt recovery. If //getBuildParseTree is
 // true and the token index of the symbol returned by
 // ANTLRErrorStrategy//recoverInline is -1, the symbol is added to
-// the parse tree by calling ParserRuleContext//addErrorNode.</p>
+// the parse tree by calling ParserRuleContext//addErrorNode.
 //
 // @return the Matched symbol
 // @panics RecognitionException if the current input symbol did not Match
@@ -205,18 +205,18 @@ func (p *BaseParser) GetParseListeners() []ParseTreeListener {
 
 // Registers listener to receive events during the parsing process.
 //
-// <p>To support output-preserving grammar transformations (including but not
+// To support output-preserving grammar transformations (including but not
 // limited to left-recursion removal, automated left-factoring, and
 // optimized code generation), calls to listener methods during the parse
 // may differ substantially from calls made by
 // ParseTreeWalker//DEFAULT used after the parse is complete. In
 // particular, rule entry and exit events may occur in a different order
 // during the parse than after the parser. In addition, calls to certain
-// rule entry methods may be omitted.</p>
+// rule entry methods may be omitted.
 //
-// <p>With the following specific exceptions, calls to listener events are
+// With the following specific exceptions, calls to listener events are
 // <em>deterministic</em>, i.e. for identical input the calls to listener
-// methods will be the same.</p>
+// methods will be the same.
 //
 // <ul>
 // <li>Alterations to the grammar used to generate code may change the
@@ -244,8 +244,8 @@ func (p *BaseParser) AddParseListener(listener ParseTreeListener) {
 //
 // Remove listener from the list of parse listeners.
 //
-// <p>If listener is nil or has not been added as a parse
-// listener, p.method does nothing.</p>
+// If listener is nil or has not been added as a parse
+// listener, p.method does nothing.
 // @param listener the listener to remove
 //
 func (p *BaseParser) RemoveParseListener(listener ParseTreeListener) {

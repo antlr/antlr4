@@ -72,14 +72,14 @@ func (b *BaseRecognitionException) GetInputStream() IntStream {
 	return b.input
 }
 
-// <p>If the state number is not known, b method returns -1.</p>
+// If the state number is not known, b method returns -1.
 
 //
 // Gets the set of input symbols which could potentially follow the
 // previously Matched symbol at the time b exception was panicn.
 //
-// <p>If the set of expected tokens is not known and could not be computed,
-// b method returns nil.</p>
+// If the set of expected tokens is not known and could not be computed,
+// b method returns nil.
 //
 // @return The set of token types that could potentially follow the current
 // state in the ATN, or nil if the information is not available.

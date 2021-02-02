@@ -7,9 +7,9 @@ package antlr
 // Represents an executor for a sequence of lexer actions which traversed during
 // the Matching operation of a lexer rule (token).
 //
-// <p>The executor tracks position information for position-dependent lexer actions
+// The executor tracks position information for position-dependent lexer actions
 // efficiently, ensuring that actions appearing only at the end of the rule do
-// not cause bloating of the DFA created for the lexer.</p>
+// not cause bloating of the DFA created for the lexer.
 
 type LexerActionExecutor struct {
 	lexerActions []LexerAction
@@ -60,24 +60,24 @@ func LexerActionExecutorappend(lexerActionExecutor *LexerActionExecutor, lexerAc
 // Creates a LexerActionExecutor which encodes the current offset
 // for position-dependent lexer actions.
 //
-// <p>Normally, when the executor encounters lexer actions where
+// Normally, when the executor encounters lexer actions where
 // LexerAction//isPositionDependent returns true, it calls
 // IntStream//seek on the input CharStream to set the input
 // position to the <em>end</em> of the current token. This behavior provides
 // for efficient DFA representation of lexer actions which appear at the end
 // of a lexer rule, even when the lexer rule Matches a variable number of
-// characters.</p>
+// characters.
 //
-// <p>Prior to traversing a Match transition in the ATN, the current offset
+// Prior to traversing a Match transition in the ATN, the current offset
 // from the token start index is assigned to all position-dependent lexer
 // actions which have not already been assigned a fixed offset. By storing
 // the offsets relative to the token start index, the DFA representation of
 // lexer actions which appear in the middle of tokens remains efficient due
 // to sharing among tokens of the same length, regardless of their absolute
-// position in the input stream.</p>
+// position in the input stream.
 //
-// <p>If the current executor already has offsets assigned to all
-// position-dependent lexer actions, the method returns this.</p>
+// If the current executor already has offsets assigned to all
+// position-dependent lexer actions, the method returns this.
 //
 // @param offset The current offset to assign to all position-dependent
 // lexer actions which do not already have offsets assigned.
@@ -111,11 +111,11 @@ func (l *LexerActionExecutor) fixOffsetBeforeMatch(offset int) *LexerActionExecu
 // Execute the actions encapsulated by l executor within the context of a
 // particular Lexer.
 //
-// <p>This method calls IntStream//seek to set the position of the
+// This method calls IntStream//seek to set the position of the
 // input CharStream prior to calling
 // LexerAction//execute on a position-dependent action. Before the
 // method returns, the input position will be restored to the same position
-// it was in when the method was invoked.</p>
+// it was in when the method was invoked.
 //
 // @param lexer The lexer instance.
 // @param input The input stream which is the source for the current token.

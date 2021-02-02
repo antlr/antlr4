@@ -11,12 +11,12 @@ import (
 
 //  atom, set, epsilon, action, predicate, rule transitions.
 //
-//  <p>This is a one way link.  It emanates from a state (usually via a list of
-//  transitions) and has a target state.</p>
+//  This is a one way link.  It emanates from a state (usually via a list of
+//  transitions) and has a target state.
 //
-//  <p>Since we never have to change the ATN transitions once we construct it,
+//  Since we never have to change the ATN transitions once we construct it,
 //  the states. We'll use the term Edge for the DFA to distinguish them from
-//  ATN transitions.</p>
+//  ATN transitions.
 
 type Transition interface {
 	getTarget() ATNState

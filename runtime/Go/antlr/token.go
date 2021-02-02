@@ -149,13 +149,13 @@ func NewCommonToken(source *TokenSourceCharStreamPair, tokenType, channel, start
 
 // Constructs a NewCommonToken as a copy of another Token.
 //
-// <p>
+//
 // If oldToken is also a CommonToken instance, the newly
 // constructed token will share a reference to the //text field and
 // the Pair stored in //source. Otherwise, //text will
 // be assigned the result of calling //GetText, and //source
 // will be constructed from the result of Token//GetTokenSource and
-// Token//GetInputStream.</p>
+// Token//GetInputStream.
 //
 // @param oldToken The token to copy.
 //

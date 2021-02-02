@@ -107,7 +107,7 @@ func (b *BaseRecognizer) SetState(v int) {
 
 // Get a map from rule names to rule indexes.
 //
-// <p>Used for XPath and tree pattern compilation.</p>
+// Used for XPath and tree pattern compilation.
 //
 func (b *BaseRecognizer) GetRuleIndexMap() map[string]int {
 
