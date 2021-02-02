@@ -271,7 +271,7 @@ func (l *LexerModeAction) String() string {
 // a custom action is added to the generated code for the lexer in an override
 // of Recognizer//action when the grammar is compiled.
 //
-// This class may represent embedded actions created with the <code>{...}</code>
+// This class may represent embedded actions created with the {...}
 // syntax in ANTLR 4, as well as actions created for lexer commands where the
 // command argument could not be evaluated when the grammar was compiled.
 

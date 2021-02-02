@@ -703,14 +703,10 @@ func (p *ParserATNSimulator) computeStartState(a ATNState, ctx RuleContext, full
 // The prediction context must be considered by p filter to address
 // situations like the following.
 //
-// <code>
-// <pre>
-// grammar TA
-// prog: statement* EOF
-// statement: letterA | statement letterA 'b'
-// letterA: 'a'
-// </pre>
-// </code>
+//		grammar TA
+// 		prog: statement* EOF
+// 		statement: letterA | statement letterA 'b'
+// 		letterA: 'a'
 //
 // If the above grammar, the ATN state immediately before the token
 // reference 'a' in letterA is reachable from the left edge

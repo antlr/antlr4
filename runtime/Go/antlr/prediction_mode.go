@@ -358,8 +358,7 @@ func PredictionModeallConfigsInRuleStopStates(configs ATNConfigSet) bool {
 // If all states Report the same conflicting set of alternatives, then we
 // know we have the exact ambiguity set.
 //
-// <code>|A_<em>i</em>|&gt1</code> and
-// <code>A_<em>i</em> = A_<em>j</em></code> for all <em>i</em>, <em>j</em>.
+//		| A_i | > 1 and A_i = A_j for all i, j
 //
 // In other words, we continue examining lookahead until all A_i
 // have more than one alternative and all A_i are the same. If
