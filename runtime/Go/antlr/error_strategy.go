@@ -390,7 +390,7 @@ func (d *DefaultErrorStrategy) ReportMissingToken(recognizer Parser) {
 // derivation:
 //
 // <pre>
-// =&gt ID '=' '(' INT ')' ('+' atom)* ''
+// → ID '=' '(' INT ')' ('+' atom)* ''
 // ^
 // </pre>
 //

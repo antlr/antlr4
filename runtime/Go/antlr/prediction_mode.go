@@ -321,24 +321,24 @@ func PredictionModeallConfigsInRuleStopStates(configs ATNConfigSet) bool {
 //
 // CASES
 //
-// • no conflicts and more than 1 alternative in set =&gt continue.
+// • no conflicts and more than 1 alternative in set → continue.
 //
 // • (s, 1, x), (s, 2, x), (s, 3, z), (s', 1, y), (s', 2, y) yields
 // non-conflicting set {3} U conflicting sets min({1,2)} U min({1,2)} = {1,3}
-// =&gt continue.
+// → continue.
 //
 // • (s, 1, x), (s, 2, x), (s', 1, y), (s', 2, y), (s'', 1, z) yields
 // non-conflicting set {1} U conflicting sets min({1,2)} U min({1,2)} = {1} →
 // stop and predict 1.
 //
 // • (s, 1, x), (s, 2, x), (s', 1, y), (s', 2, y) yields conflicting, reduced
-// sets {1} U {1} = {1} =&gt stop and predict 1, can announce ambiguity {1,2}.
+// sets {1} U {1} = {1} → stop and predict 1, can announce ambiguity {1,2}.
 //
 // • (s, 1, x), (s, 2, x), (s', 2, y), (s', 3, y) yields conflicting, reduced
-// sets {1} U {2} = {1,2} =&gt continue.
+// sets {1} U {2} = {1,2} → continue.
 //
 // • (s, 1, x), (s, 2, x), (s', 3, y), (s', 4, y) yields conflicting, reduced
-// sets {1} U {3} = {1,3} =&gt continue.
+// sets {1} U {3} = {1,3} → continue.
 //
 // EXACT AMBIGUITY DETECTION
 //
@@ -366,7 +366,7 @@ func PredictionModeresolvesToJustOneViableAlt(altsets []*BitSet) int {
 //
 // @param altsets a collection of alternative subsets
 // @return true if every BitSet in altsets has
-// BitSet//cardinality cardinality &gt 1, otherwise false
+// BitSet//cardinality cardinality > 1, otherwise false
 //
 func PredictionModeallSubsetsConflict(altsets []*BitSet) bool {
 	return !PredictionModehasNonConflictingAltSet(altsets)
@@ -396,7 +396,7 @@ func PredictionModehasNonConflictingAltSet(altsets []*BitSet) bool {
 //
 // @param altsets a collection of alternative subsets
 // @return true if altsets contains a BitSet with
-// BitSet//cardinality cardinality &gt 1, otherwise false
+// BitSet//cardinality cardinality > 1, otherwise false
 //
 func PredictionModehasConflictingAltSet(altsets []*BitSet) bool {
 	for i := 0; i < len(altsets); i++ {
