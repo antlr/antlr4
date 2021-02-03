@@ -149,7 +149,11 @@ public abstract class BaseRuntimeTestSupport implements RuntimeTestSupport {
 	public static void eraseFilesInDir(File dir) {
 		String[] files = dir.list();
 		for(int i = 0; files!=null && i < files.length; i++) {
-			new File(dir,files[i]).delete();
+			File file = new File(dir,files[i]);
+			if(file.isDirectory())
+				eraseDirectory(file);
+			else
+				file.delete();
 		}
 	}
 
