@@ -49,7 +49,7 @@ type BaseParser struct {
 }
 
 // p.is all the parsing support code essentially most of it is error
-// recovery stuff.//
+// recovery stuff.
 func NewBaseParser(input TokenStream) *BaseParser {
 
 	p := new(BaseParser)
@@ -391,7 +391,7 @@ func (p *BaseParser) GetTokenStream() TokenStream {
 	return p.input
 }
 
-// Set the token stream and reset the parser.//
+// Set the token stream and reset the parser.
 func (p *BaseParser) SetTokenStream(input TokenStream) {
 	p.input = nil
 	p.reset()

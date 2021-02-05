@@ -14,8 +14,8 @@ func NewLL1Analyzer(atn *ATN) *LL1Analyzer {
 	return la
 }
 
-//* Special value added to the lookahead sets to indicate that we hit
-//  a predicate during analysis if seeThruPreds==false.
+// Special value added to the lookahead sets to indicate that we hit
+// a predicate during analysis if seeThruPreds==false.
 const (
 	LL1AnalyzerHitPred = TokenInvalidType
 )
@@ -49,7 +49,6 @@ func (la *LL1Analyzer) getDecisionLookahead(s ATNState) []*IntervalSet {
 	return look
 }
 
-//*
 // Compute set of tokens that can follow s in the ATN in the
 // specified ctx.
 //
@@ -66,7 +65,6 @@ func (la *LL1Analyzer) getDecisionLookahead(s ATNState) []*IntervalSet {
 //
 // @return The set of tokens that can follow s in the ATN in the
 // specified ctx.
-///
 func (la *LL1Analyzer) Look(s, stopState ATNState, ctx RuleContext) *IntervalSet {
 	r := NewIntervalSet()
 	seeThruPreds := true // ignore preds get all lookahead

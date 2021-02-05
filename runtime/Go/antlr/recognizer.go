@@ -163,7 +163,7 @@ func (b *BaseRecognizer) GetTokenType(tokenName string) int {
 //    }
 //}
 
-// What is the error header, normally line/character position information?//
+// What is the error header, normally line/character position information?
 func (b *BaseRecognizer) GetErrorHeader(e RecognitionException) string {
 	line := e.GetOffendingToken().GetLine()
 	column := e.GetOffendingToken().GetColumn()
@@ -171,18 +171,17 @@ func (b *BaseRecognizer) GetErrorHeader(e RecognitionException) string {
 }
 
 // How should a token be displayed in an error message? The default
-//  is to display just the text, but during development you might
-//  want to have a lot of information spit out.  Override in that case
-//  to use t.String() (which, for CommonToken, dumps everything about
-//  the token). This is better than forcing you to override a method in
-//  your token objects because you don't have to go modify your lexer
-//  so that it creates a NewJava type.
+// is to display just the text, but during development you might
+// want to have a lot of information spit out.  Override in that case
+// to use t.String() (which, for CommonToken, dumps everything about
+// the token). This is better than forcing you to override a method in
+// your token objects because you don't have to go modify your lexer
+// so that it creates a NewJava type.
 //
 // @deprecated This method is not called by the ANTLR 4 Runtime. Specific
 // implementations of ANTLRErrorStrategy may provide a similar
 // feature when necessary. For example, see
 // DefaultErrorStrategy//GetTokenErrorDisplay.
-//
 func (b *BaseRecognizer) GetTokenErrorDisplay(t Token) string {
 	if t == nil {
 		return "<no token>"

@@ -119,7 +119,7 @@ func (prc *BaseParserRuleContext) AddChild(child RuleContext) RuleContext {
 	return child
 }
 
-// * Used by EnterOuterAlt to toss out a RuleContext previously added as
+// Used by EnterOuterAlt to toss out a RuleContext previously added as
 // we entered a rule. If we have // label, we will need to remove
 // generic ruleContext object.
 func (prc *BaseParserRuleContext) RemoveLastChild() {
