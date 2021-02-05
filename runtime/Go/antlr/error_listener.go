@@ -52,10 +52,6 @@ func NewConsoleErrorListener() *ConsoleErrorListener {
 //
 var ConsoleErrorListenerINSTANCE = NewConsoleErrorListener()
 
-//
-// {@inheritDoc}
-//
-//
 // This implementation prints messages to System//err containing the
 // values of line, charPositionInLine, and msg using
 // the following format.

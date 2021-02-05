@@ -86,18 +86,11 @@ func (d *DefaultErrorStrategy) endErrorCondition(recognizer Parser) {
 	d.lastErrorIndex = -1
 }
 
-//
-// {@inheritDoc}
-//
 // The default implementation simply calls //endErrorCondition.
-//
 func (d *DefaultErrorStrategy) ReportMatch(recognizer Parser) {
 	d.endErrorCondition(recognizer)
 }
 
-//
-// {@inheritDoc}
-//
 // The default implementation returns immediately if the handler is already
 // in error recovery mode. Otherwise, it calls //beginErrorCondition
 // and dispatches the Reporting task based on the runtime type of e
@@ -111,7 +104,6 @@ func (d *DefaultErrorStrategy) ReportMatch(recognizer Parser) {
 //
 // • All other types: calls Parser//NotifyErrorListeners to Report the
 // exception.
-//
 func (d *DefaultErrorStrategy) ReportError(recognizer Parser, e RecognitionException) {
 	// if we've already Reported an error and have not Matched a token
 	// yet successfully, don't Report any errors.
@@ -134,12 +126,9 @@ func (d *DefaultErrorStrategy) ReportError(recognizer Parser, e RecognitionExcep
 	}
 }
 
-// {@inheritDoc}
-//
 // The default implementation reSynchronizes the parser by consuming tokens
 // until we find one in the reSynchronization set--loosely the set of tokens
 // that can follow the current rule.
-//
 func (d *DefaultErrorStrategy) Recover(recognizer Parser, e RecognitionException) {
 
 	if d.lastErrorIndex == recognizer.GetInputStream().Index() &&

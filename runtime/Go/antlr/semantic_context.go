@@ -10,13 +10,11 @@ import (
 )
 
 // A tree structure used to record the semantic context in which
-//  an ATN configuration is valid.  It's either a single predicate,
-//  a conjunction p1&&p2, or a sum of products p1||p2.
+// an ATN configuration is valid.  It's either a single predicate,
+// a conjunction p1&&p2, or a sum of products p1||p2.
 //
-//  I have scoped the AND, OR, and Predicate subclasses of
-//  SemanticContext within the scope of this outer class.
-//
-
+// I have scoped the AND, OR, and Predicate subclasses of
+// SemanticContext within the scope of this outer class.
 type SemanticContext interface {
 	comparable
 
@@ -75,9 +73,8 @@ func NewPredicate(ruleIndex, predIndex int, isCtxDependent bool) *Predicate {
 	return p
 }
 
-//The default SemanticContext, which is semantically equivalent to
-//a predicate of the form {true?}.
-
+// The default SemanticContext, which is semantically equivalent to
+// a predicate of the form {true?}.
 var SemanticContextNone SemanticContext = NewPredicate(-1, -1, false)
 
 func (p *Predicate) evalPrecedence(parser Recognizer, outerContext RuleContext) SemanticContext {
@@ -238,10 +235,6 @@ func (a *AND) equals(other interface{}) bool {
 	}
 }
 
-//
-// {@inheritDoc}
-//
-//
 // The evaluation of predicates by a context is short-circuiting, but
 // unordered.
 //
