@@ -10,7 +10,6 @@ import (
 
 // Represents $ in local context prediction, which means wildcard.
 // {@code//+x =//}.
-// /
 const (
 	BasePredictionContextEmptyReturnState = 0x7FFFFFFF
 )
@@ -18,8 +17,6 @@ const (
 // Represents $ in an array in full context mode, when $
 // doesn't mean wildcard: $ + x = [$,x]. Here,
 // $ = //EmptyReturnState.
-// /
-
 var (
 	BasePredictionContextglobalNodeCount = 1
 	BasePredictionContextid              = BasePredictionContextglobalNodeCount
@@ -66,7 +63,6 @@ func calculateEmptyHash() int {
 // Used to cache BasePredictionContext objects. Its used for the shared
 // context cash associated with contexts in DFA states. This cache
 // can be used for both lexers and parsers.
-
 type PredictionContextCache struct {
 	cache map[PredictionContext]PredictionContext
 }
@@ -345,7 +341,6 @@ func (a *ArrayPredictionContext) String() string {
 
 // Convert a RuleContext tree to a BasePredictionContext graph.
 // Return //EMPTY if outerContext is empty or nil.
-// /
 func predictionContextFromRuleContext(a *ATN, outerContext RuleContext) PredictionContext {
 	if outerContext == nil {
 		outerContext = RuleContextEmpty

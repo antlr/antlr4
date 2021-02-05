@@ -17,7 +17,6 @@ type TokenSourceCharStreamPair struct {
 // A token has properties: text, type, line, character position in the line
 // (so we can ignore tabs), token channel, index, and source from which
 // we obtained this token.
-
 type Token interface {
 	GetSource() *TokenSourceCharStreamPair
 	GetTokenType() int
@@ -64,12 +63,10 @@ const (
 	// All tokens go to the parser (unless Skip() is called in that rule)
 	// on a particular "channel". The parser tunes to a particular channel
 	// so that whitespace etc... can go to the parser on a "hidden" channel.
-
 	TokenDefaultChannel = 0
 
 	// Anything on different channel than DEFAULT_CHANNEL is not parsed
 	// by parser.
-
 	TokenHiddenChannel = 1
 )
 

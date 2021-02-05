@@ -13,7 +13,6 @@ import (
 // Provides an empty default implementation of ANTLRErrorListener. The
 // default implementation of each method does nothing, but can be overridden as
 // necessary.
-
 type ErrorListener interface {
 	SyntaxError(recognizer Recognizer, offendingSymbol interface{}, line, column int, msg string, e RecognitionException)
 	ReportAmbiguity(recognizer Parser, dfa *DFA, startIndex, stopIndex int, exact bool, ambigAlts *BitSet, configs ATNConfigSet)

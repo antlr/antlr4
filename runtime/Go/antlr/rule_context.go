@@ -108,7 +108,6 @@ func (b *BaseRuleContext) IsEmpty() bool {
 // added to the parse trees, they will not appear in the output of b
 // method.
 //
-
 func (b *BaseRuleContext) GetParent() Tree {
 	return b.parentCtx
 }

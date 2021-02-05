@@ -49,7 +49,6 @@ func NewBaseParserRuleContext(parent ParserRuleContext, invokingStateNumber int)
 	// with prc rule's context. This is empty for parsing w/o tree constr.
 	// operation because we don't the need to track the details about
 	// how we parse prc rule.
-	// /
 	prc.children = nil
 	prc.start = nil
 	prc.stop = nil
@@ -123,7 +122,6 @@ func (prc *BaseParserRuleContext) AddChild(child RuleContext) RuleContext {
 // * Used by EnterOuterAlt to toss out a RuleContext previously added as
 // we entered a rule. If we have // label, we will need to remove
 // generic ruleContext object.
-// /
 func (prc *BaseParserRuleContext) RemoveLastChild() {
 	if prc.children != nil && len(prc.children) > 0 {
 		prc.children = prc.children[0 : len(prc.children)-1]
@@ -306,7 +304,6 @@ func (prc *BaseParserRuleContext) GetSourceInterval() *Interval {
 // Print out a whole tree, not just a node, in LISP format
 // (root child1 .. childN). Print just a node if b is a leaf.
 //
-
 func (prc *BaseParserRuleContext) String(ruleNames []string, stop RuleContext) string {
 
 	var p ParserRuleContext = prc

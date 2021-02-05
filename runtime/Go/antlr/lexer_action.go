@@ -274,7 +274,7 @@ func (l *LexerModeAction) String() string {
 // This class may represent embedded actions created with the {...}
 // syntax in ANTLR 4, as well as actions created for lexer commands where the
 // command argument could not be evaluated when the grammar was compiled.
-
+//
 // Constructs a custom lexer action with the specified rule and action
 // indexes.
 //
@@ -282,7 +282,6 @@ func (l *LexerModeAction) String() string {
 // Recognizer//action.
 // @param actionIndex The action index to use for calls to
 // Recognizer//action.
-
 type LexerCustomAction struct {
 	*BaseLexerAction
 	ruleIndex, actionIndex int

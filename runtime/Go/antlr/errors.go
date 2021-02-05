@@ -9,7 +9,6 @@ package antlr
 //  mismatched input errors. In each case, the parser knows where it is
 //  in the input, where it is in the ATN, the rule invocation stack,
 //  and what kind of problem occurred.
-
 type RecognitionException interface {
 	GetOffendingToken() Token
 	GetMessage() string
@@ -193,7 +192,6 @@ func NewInputMisMatchException(recognizer Parser) *InputMisMatchException {
 // occurs when normally parsing the alternative just like Matching a token.
 // Disambiguating predicate evaluation occurs when we test a predicate during
 // prediction.
-
 type FailedPredicateException struct {
 	*BaseRecognitionException
 

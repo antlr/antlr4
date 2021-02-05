@@ -23,7 +23,6 @@ type ErrorStrategy interface {
 
 // This is the default implementation of ANTLRErrorStrategy used for
 // error Reporting and recovery in ANTLR parsers.
-//
 type DefaultErrorStrategy struct {
 	errorRecoveryMode bool
 	lastErrorIndex    int

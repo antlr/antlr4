@@ -16,7 +16,6 @@ func NewLL1Analyzer(atn *ATN) *LL1Analyzer {
 
 //* Special value added to the lookahead sets to indicate that we hit
 //  a predicate during analysis if seeThruPreds==false.
-///
 const (
 	LL1AnalyzerHitPred = TokenInvalidType
 )

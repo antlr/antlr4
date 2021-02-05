@@ -134,7 +134,6 @@ func (p *BaseParser) SetErrorHandler(e ErrorStrategy) {
 // @panics RecognitionException if the current input symbol did not Match
 // ttype and the error strategy could not recover from the
 // mismatched symbol
-
 func (p *BaseParser) Match(ttype int) Token {
 
 	t := p.GetCurrentToken()
@@ -170,7 +169,6 @@ func (p *BaseParser) Match(ttype int) Token {
 // @panics RecognitionException if the current input symbol did not Match
 // a wildcard and the error strategy could not recover from the mismatched
 // symbol
-
 func (p *BaseParser) MatchWildcard() Token {
 	t := p.GetCurrentToken()
 	if t.GetTokenType() > 0 {
@@ -497,7 +495,6 @@ func (p *BaseParser) EnterOuterAlt(localctx ParserRuleContext, altNum int) {
 //
 // @return The precedence level for the top-most precedence rule, or -1 if
 // the parser context is not nested within a precedence rule.
-
 func (p *BaseParser) GetPrecedence() int {
 	if len(p.precedenceStack) == 0 {
 		return -1
@@ -519,7 +516,6 @@ func (p *BaseParser) EnterRecursionRule(localctx ParserRuleContext, state, ruleI
 
 //
 // Like //EnterRule but for recursive rules.
-
 func (p *BaseParser) PushNewRecursionContext(localctx ParserRuleContext, state, ruleIndex int) {
 	previous := p.ctx
 	previous.SetParent(localctx)
@@ -651,7 +647,6 @@ func (p *BaseParser) GetRuleIndex(ruleName string) int {
 // in the ATN a rule is invoked.
 //
 // this very useful for error messages.
-
 func (p *BaseParser) GetRuleInvocationStack(c ParserRuleContext) []string {
 	if c == nil {
 		c = p.ctx

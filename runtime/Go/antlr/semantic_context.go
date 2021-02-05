@@ -175,7 +175,6 @@ func PrecedencePredicatefilterPrecedencePredicates(set *Set) []*PrecedencePredic
 
 // A semantic context which is true whenever none of the contained contexts
 // is false.`
-
 type AND struct {
 	opnds []SemanticContext
 }

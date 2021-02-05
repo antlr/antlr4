@@ -13,8 +13,6 @@ import (
 //  lexer grammars result in a subclass of this object. A Lexer object
 //  uses simplified Match() and error recovery mechanisms in the interest
 //  of speed.
-///
-
 type Lexer interface {
 	TokenSource
 	Recognizer
@@ -99,7 +97,6 @@ func NewBaseLexer(input CharStream) *BaseLexer {
 
 	// You can set the text for the current token to override what is in
 	// the input char buffer. Use setText() or can set l instance var.
-	// /
 	lexer.text = ""
 
 	return lexer
@@ -241,7 +238,6 @@ func (b *BaseLexer) NextToken() Token {
 // a lexer rule finishes with token set to SKIPTOKEN. Recall that
 // if token==nil at end of any token rule, it creates one for you
 // and emits it.
-// /
 func (b *BaseLexer) Skip() {
 	b.thetype = LexerSkip
 }
@@ -295,7 +291,6 @@ func (b *BaseLexer) GetTokenSourceCharStreamPair() *TokenSourceCharStreamPair {
 // for efficiency reasons. Subclass and override l method, NextToken,
 // and GetToken (to push tokens into a list and pull from that list
 // rather than a single variable as l implementation does).
-// /
 func (b *BaseLexer) EmitToken(token Token) {
 	b.token = token
 }
@@ -305,7 +300,6 @@ func (b *BaseLexer) EmitToken(token Token) {
 // char buffer start..stop. If there is a text override in 'text',
 // use that to set the token's text. Override l method to emit
 // custom Token objects or provide a Newfactory.
-// /
 func (b *BaseLexer) Emit() Token {
 	t := b.factory.Create(b.tokenFactorySourcePair, b.thetype, b.text, b.channel, b.TokenStartCharIndex, b.GetCharIndex()-1, b.TokenStartLine, b.TokenStartColumn)
 	b.EmitToken(t)
@@ -336,7 +330,7 @@ func (b *BaseLexer) SetType(t int) {
 	b.thetype = t
 }
 
-// What is the index of the current character of lookahead?///
+// What is the index of the current character of lookahead?
 func (b *BaseLexer) GetCharIndex() int {
 	return b.input.Index()
 }
@@ -361,7 +355,6 @@ func (b *BaseLexer) GetATN() *ATN {
 
 // Return a list of all Token objects in input char stream.
 // Forces load of all tokens. Does not include EOF token.
-// /
 func (b *BaseLexer) GetAllTokens() []Token {
 	vl := b.Virt
 	tokens := make([]Token, 0)
@@ -404,7 +397,6 @@ func (b *BaseLexer) getCharErrorDisplay(c rune) string {
 // a token, so do the easy thing and just kill a character and hope
 // it all works out. You can instead use the rule invocation stack
 // to do sophisticated error recovery if you are in a fragment rule.
-// /
 func (b *BaseLexer) Recover(re RecognitionException) {
 	if b.input.LA(1) != TokenEOF {
 		if _, ok := re.(*LexerNoViableAltException); ok {
