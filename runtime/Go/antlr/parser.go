@@ -351,14 +351,11 @@ func (p *BaseParser) GetATNWithBypassAlts() {
 // The preferred method of getting a tree pattern. For example, here's a
 // sample use:
 //
-// <pre>
-// ParseTree t = parser.expr()
-// ParseTreePattern p = parser.compileParseTreePattern("&ltID&gt+0",
-// MyParser.RULE_expr)
-// ParseTreeMatch m = p.Match(t)
-// String id = m.Get("ID")
-// </pre>
-
+//		ParseTree t = parser.expr()
+// 		ParseTreePattern p = parser.compileParseTreePattern("&ltID&gt+0",
+// 		MyParser.RULE_expr)
+// 		ParseTreeMatch m = p.Match(t)
+// 		String id = m.Get("ID")
 func (p *BaseParser) compileParseTreePattern(pattern, patternRuleIndex, lexer Lexer) {
 
 	panic("NewParseTreePatternMatcher not implemented!")
@@ -574,20 +571,16 @@ func (p *BaseParser) inContext(context ParserRuleContext) bool {
 	return false
 }
 
-//
 // Checks whether or not symbol can follow the current state in the
 // ATN. The behavior of p.method is equivalent to the following, but is
 // implemented such that the complete context-sensitive follow set does not
 // need to be explicitly constructed.
 //
-// <pre>
-// return getExpectedTokens().contains(symbol)
-// </pre>
+//		return getExpectedTokens().contains(symbol)
 //
 // @param symbol the symbol type to check
 // @return true if symbol can follow the current state in
 // the ATN, otherwise false.
-
 func (p *BaseParser) IsExpectedToken(symbol int) bool {
 	atn := p.Interpreter.atn
 	ctx := p.ctx

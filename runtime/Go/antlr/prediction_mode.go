@@ -254,10 +254,8 @@ func PredictionModeallConfigsInRuleStopStates(configs ATNConfigSet) bool {
 //
 // Or in pseudo-code, for each configuration c in C:
 //
-// <pre>
-// map[c] U= c.ATNConfig//alt alt // map hash/equals uses s and x, not
-// alt and not pred
-// </pre>
+//		map[c] U= c.ATNConfig//alt alt // map hash/equals uses s and x, not
+// 		alt and not pred
 //
 // The values in map are the set of A_s,ctx sets.
 //
@@ -465,10 +463,8 @@ func PredictionModeGetAlts(altsets []*BitSet) *BitSet {
 // This func gets the conflicting alt subsets from a configuration set.
 // For each configuration c in configs:
 //
-// <pre>
-// map[c] U= c.ATNConfig//alt alt // map hash/equals uses s and x, not
-// alt and not pred
-// </pre>
+//		map[c] U= c.ATNConfig//alt alt // map hash/equals uses s and x, not
+// 		alt and not pred
 //
 func PredictionModegetConflictingAltSubsets(configs ATNConfigSet) []*BitSet {
 	configToAlts := make(map[int]*BitSet)
@@ -495,9 +491,7 @@ func PredictionModegetConflictingAltSubsets(configs ATNConfigSet) []*BitSet {
 // Get a map from state to alt subset from a configuration set. For each
 // configuration c in configs:
 //
-// <pre>
-// map[c.ATNConfig//state state] U= c.ATNConfig//alt alt
-// </pre>
+//		map[c.ATNConfig//state state] U= c.ATNConfig//alt alt
 //
 func PredictionModeGetStateToAltMap(configs ATNConfigSet) *AltDict {
 	m := NewAltDict()

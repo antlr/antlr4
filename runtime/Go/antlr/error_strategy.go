@@ -167,10 +167,8 @@ func (d *DefaultErrorStrategy) Recover(recognizer Parser, e RecognitionException
 // Implements Jim Idle's magic Sync mechanism in closures and optional
 // subrules. E.g.,
 //
-// <pre>
-// a : Sync ( stuff Sync )*
-// Sync : {consume to what can follow Sync}
-// </pre>
+//		a : Sync ( stuff Sync )*
+// 		Sync : {consume to what can follow Sync}
 //
 // At the start of a sub rule upon error, //Sync performs single
 // token deletion, if possible. If it can't do that, it bails on the current
@@ -191,9 +189,7 @@ func (d *DefaultErrorStrategy) Recover(recognizer Parser, e RecognitionException
 // A single mismatch token or missing token would force the parser to bail
 // out of the entire rules surrounding the loop. So, for rule
 //
-// <pre>
-// classfunc : 'class' ID '{' member* '}'
-// </pre>
+//		classfunc : 'class' ID '{' member* '}'
 //
 // input with an extra token between members would force the parser to
 // consume until it found the next class definition rather than the next
@@ -381,23 +377,18 @@ func (d *DefaultErrorStrategy) ReportMissingToken(recognizer Parser) {
 // the parser returns from the nested call to expr, it will have
 // call chain:
 //
-// <pre>
-// stat &rarr expr &rarr atom
-// </pre>
+//		stat &rarr expr &rarr atom
 //
 // and it will be trying to Match the ')' at d point in the
 // derivation:
 //
-// <pre>
-// → ID '=' '(' INT ')' ('+' atom)* ''
-// ^
-// </pre>
+//		→ ID '=' '(' INT ')' ('+' atom)* ''
+// 		^
 //
 // The attempt to Match ')' will fail when it sees '' and
 // call //recoverInline. To recover, it sees that LA(1)==''
 // is in the set of tokens that can follow the ')' token reference
 // in rule atom. It can assume that you forgot the ')'.
-//
 func (d *DefaultErrorStrategy) RecoverInline(recognizer Parser) Token {
 	// SINGLE TOKEN DELETION
 	MatchedSymbol := d.SingleTokenDeletion(recognizer)
@@ -415,7 +406,6 @@ func (d *DefaultErrorStrategy) RecoverInline(recognizer Parser) Token {
 	panic(NewInputMisMatchException(recognizer))
 }
 
-//
 // This method implements the single-token insertion inline error recovery
 // strategy. It is called by //recoverInline if the single-token
 // deletion strategy fails to recover from the mismatched input. If this
@@ -431,7 +421,6 @@ func (d *DefaultErrorStrategy) RecoverInline(recognizer Parser) Token {
 // @param recognizer the parser instance
 // @return true if single-token insertion is a viable recovery
 // strategy for the current mismatched input, otherwise false
-//
 func (d *DefaultErrorStrategy) SingleTokenInsertion(recognizer Parser) bool {
 	currentSymbolType := recognizer.GetTokenStream().LA(1)
 	// if current token is consistent with what could come after current
@@ -466,7 +455,6 @@ func (d *DefaultErrorStrategy) SingleTokenInsertion(recognizer Parser) bool {
 // @return the successfully Matched Token instance if single-token
 // deletion successfully recovers from the mismatched input, otherwise
 // nil
-//
 func (d *DefaultErrorStrategy) SingleTokenDeletion(recognizer Parser) Token {
 	NextTokenType := recognizer.GetTokenStream().LA(2)
 	expecting := d.GetExpectedTokens(recognizer)
