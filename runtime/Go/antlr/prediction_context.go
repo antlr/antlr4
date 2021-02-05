@@ -684,7 +684,7 @@ func mergeArrays(a, b *ArrayPredictionContext, rootIsWildcard bool, mergeCache *
 }
 
 //
-// Make pass over all <em>M</em> parents merge any equals()
+// Make pass over all M parents merge any equals()
 // ones.
 // /
 func combineCommonParents(parents []PredictionContext) {

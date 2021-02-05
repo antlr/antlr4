@@ -8,7 +8,6 @@ import (
 	"strconv"
 )
 
-//
 // This implementation of ANTLRErrorListener can be used to identify
 // certain potential correctness and performance problems in grammars. "reports"
 // are made by calling Parser//NotifyErrorListeners with the appropriate
@@ -22,7 +21,7 @@ import (
 // alternative of the SLL conflict.
 //
 // • Strong (forced) context sensitivity: These are cases where the full-context
-// prediction resolved an SLL conflict to a unique alternative, <em>and</em> the
+// prediction resolved an SLL conflict to a unique alternative, and the
 // minimum alternative of the SLL conflict was found to not be a truly viable
 // alternative. Two-stage parsing cannot be used for inputs where d situation
 // occurs.

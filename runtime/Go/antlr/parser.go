@@ -213,7 +213,7 @@ func (p *BaseParser) GetParseListeners() []ParseTreeListener {
 // rule entry methods may be omitted.
 //
 // With the following specific exceptions, calls to listener events are
-// <em>deterministic</em>, i.e. for identical input the calls to listener
+// deterministic, i.e. for identical input the calls to listener
 // methods will be the same.
 //
 // • Alterations to the grammar used to generate code may change the behavior of

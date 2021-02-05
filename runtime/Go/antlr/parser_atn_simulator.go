@@ -841,7 +841,7 @@ func (p *ParserATNSimulator) getPredicatePredictions(ambigAlts *BitSet, altToPre
 //
 // In some scenarios, the algorithm described above could predict an
 // alternative which will result in a FailedPredicateException in
-// the parser. Specifically, p could occur if the <em>only</em> configuration
+// the parser. Specifically, p could occur if the only configuration
 // capable of successfully parsing to the end of the decision rule is
 // blocked by a semantic predicate. By choosing p alternative within
 // //AdaptivePredict instead of panicing a

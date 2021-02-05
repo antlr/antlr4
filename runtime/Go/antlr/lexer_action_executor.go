@@ -63,7 +63,7 @@ func LexerActionExecutorappend(lexerActionExecutor *LexerActionExecutor, lexerAc
 // Normally, when the executor encounters lexer actions where
 // LexerAction//isPositionDependent returns true, it calls
 // IntStream//seek on the input CharStream to set the input
-// position to the <em>end</em> of the current token. This behavior provides
+// position to the end of the current token. This behavior provides
 // for efficient DFA representation of lexer actions which appear at the end
 // of a lexer rule, even when the lexer rule Matches a variable number of
 // characters.

@@ -42,7 +42,7 @@ const (
 	// When using this prediction mode, the parser will make correct decisions
 	// for all syntactically-correct grammar and input combinations. However, in
 	// cases where the grammar is truly ambiguous this prediction mode might not
-	// Report a precise answer for <em>exactly which</em> alternatives are
+	// Report a precise answer for exactly which alternatives are
 	// ambiguous.
 	//
 	//

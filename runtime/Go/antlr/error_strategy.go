@@ -442,7 +442,7 @@ func (d *DefaultErrorStrategy) SingleTokenInsertion(recognizer Parser) bool {
 // strategy. It is called by //recoverInline to attempt to recover
 // from mismatched input. If this method returns nil, the parser and error
 // handler state will not have changed. If this method returns non-nil,
-// recognizer will <em>not</em> be in error recovery mode since the
+// recognizer will not be in error recovery mode since the
 // returned token was a successful Match.
 //
 // If the single-token deletion is successful, d method calls
