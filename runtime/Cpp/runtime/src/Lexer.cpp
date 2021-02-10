@@ -93,7 +93,10 @@ std::unique_ptr<Token> Lexer::nextToken() {
       if (type == SKIP) {
         goto outerContinue;
       }
-    } while (type == MORE);
+      if (type == LESS) {
+        _input->seek(tokenStartCharIndex);
+      }
+    } while (type == MORE || type == LESS);
     if (token == nullptr) {
       emit();
     }
@@ -107,6 +110,10 @@ void Lexer::skip() {
 
 void Lexer::more() {
   type = MORE;
+}
+
+void Lexer::less() {
+  type = LESS;
 }
 
 void Lexer::setMode(size_t m) {

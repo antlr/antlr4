@@ -137,6 +137,10 @@ class Lexer extends Recognizer {
 						continueOuter = true;
 						break;
 					}
+					if (this._type === Lexer.LESS) {
+						this._input.seek(this._tokenStartCharIndex);
+						continue;
+					}
 					if (this._type !== Lexer.MORE) {
 						break;
 					}
@@ -169,6 +173,10 @@ class Lexer extends Recognizer {
 
 	more() {
 		this._type = Lexer.MORE;
+	}
+
+	less() {
+		this._type = Lexer.LESS;
 	}
 
 	mode(m) {

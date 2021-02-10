@@ -478,6 +478,12 @@ public class SwiftTarget extends Target {
                         lexerActionBuilder.add("b",actionIndex);
                         break;
 
+                    case LESS:
+
+                        lexerActionBuilder.add("a",0);
+                        lexerActionBuilder.add("b",0);
+                        break;
+
                     case MODE:
                         int mode = ((LexerModeAction)action).getMode();
 

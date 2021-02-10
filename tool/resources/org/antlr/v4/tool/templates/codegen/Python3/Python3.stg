@@ -541,6 +541,7 @@ except <catchArg>:
 
 LexerSkipCommand()  ::= "skip()"
 LexerMoreCommand()  ::= "more()"
+LexerLessCommand()  ::= "less()"
 LexerPopModeCommand() ::= "popMode()"
 
 LexerTypeCommand(arg, grammar)      ::= "_type = <arg>"

@@ -507,7 +507,7 @@ class ATNDeserializer (object):
 
     def lexerActionFactory(self, type, data1, data2):
         if self.actionFactories is None:
-            af = [ None ] * 8
+            af = [ None ] * 9
             af[LexerActionType.CHANNEL] = lambda data1, data2: LexerChannelAction(data1)
             af[LexerActionType.CUSTOM] = lambda data1, data2: LexerCustomAction(data1, data2)
             af[LexerActionType.MODE] = lambda data1, data2: LexerModeAction(data1)
@@ -516,6 +516,7 @@ class ATNDeserializer (object):
             af[LexerActionType.PUSH_MODE] = lambda data1, data2: LexerPushModeAction(data1)
             af[LexerActionType.SKIP] = lambda data1, data2: LexerSkipAction.INSTANCE
             af[LexerActionType.TYPE] = lambda data1, data2: LexerTypeAction(data1)
+            af[LexerActionType.LESS] = lambda data1, data2: LexerLessAction.INSTANCE
             self.actionFactories = af
 
         if type> len(self.actionFactories) or self.actionFactories[type] is None:

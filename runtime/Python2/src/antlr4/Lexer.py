@@ -26,6 +26,7 @@ class Lexer(Recognizer, TokenSource):
     DEFAULT_MODE = 0
     MORE = -2
     SKIP = -3
+    LESS = -4
 
     DEFAULT_TOKEN_CHANNEL = Token.DEFAULT_CHANNEL
     HIDDEN = Token.HIDDEN_CHANNEL
@@ -134,6 +135,9 @@ class Lexer(Recognizer, TokenSource):
                     if self._type == self.SKIP:
                         continueOuter = True
                         break
+                    if self._type == self.LESS:
+                        self._input.seek(self._tokenStartCharIndex)
+                        continue
                     if self._type!=self.MORE:
                         break
                 if continueOuter:
@@ -157,6 +161,9 @@ class Lexer(Recognizer, TokenSource):
 
     def more(self):
         self._type = self.MORE
+
+    def less(self):
+        self._type = self.LESS
 
     def mode(self, m):
         self._mode = m

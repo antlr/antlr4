@@ -86,6 +86,7 @@
 #include "atn/LexerChannelAction.h"
 #include "atn/LexerCustomAction.h"
 #include "atn/LexerIndexedCustomAction.h"
+#include "atn/LexerLessAction.h"
 #include "atn/LexerModeAction.h"
 #include "atn/LexerMoreAction.h"
 #include "atn/LexerPopModeAction.h"

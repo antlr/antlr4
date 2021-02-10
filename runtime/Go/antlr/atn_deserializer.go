@@ -804,6 +804,9 @@ func (a *ATNDeserializer) lexerActionFactory(typeIndex, data1, data2 int) LexerA
 	case LexerActionTypeCustom:
 		return NewLexerCustomAction(data1, data2)
 
+	case LexerActionTypeLess:
+		return LexerLessActionINSTANCE
+
 	case LexerActionTypeMode:
 		return NewLexerModeAction(data1)
 

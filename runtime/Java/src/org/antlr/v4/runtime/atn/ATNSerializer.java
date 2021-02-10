@@ -314,6 +314,11 @@ public class ATNSerializer {
 					data.add(actionIndex != -1 ? actionIndex : 0xFFFF);
 					break;
 
+				case LESS:
+					data.add(0);
+					data.add(0);
+					break;
+
 				case MODE:
 					int mode = ((LexerModeAction)action).getMode();
 					data.add(mode != -1 ? mode : 0xFFFF);

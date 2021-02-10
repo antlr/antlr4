@@ -538,6 +538,7 @@ catch (<catchArg>) {
 
 LexerSkipCommand()  ::= "this.skip()"
 LexerMoreCommand()  ::= "this.more()"
+LexerLessCommand()  ::= "this.less()"
 LexerPopModeCommand() ::= "this.popMode()"
 LexerTypeCommand(arg, grammar)      ::= "this._type = <arg>"
 LexerChannelCommand(arg, grammar)   ::= "this._channel = <arg>"

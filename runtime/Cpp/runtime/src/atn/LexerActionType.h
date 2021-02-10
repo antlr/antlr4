@@ -49,6 +49,10 @@ namespace atn {
     /// The type of a <seealso cref="LexerTypeAction"/> action.
     /// </summary>
     TYPE,
+    /// <summary>
+    /// The type of a <seealso cref="LexerLessAction"/> action.
+    /// </summary>
+    LESS,
   };
 
 } // namespace atn

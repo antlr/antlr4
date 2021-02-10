@@ -22,6 +22,7 @@ abstract class Lexer extends Recognizer<LexerATNSimulator>
   static final DEFAULT_MODE = 0;
   static final MORE = -2;
   static final SKIP = -3;
+  static final LESS = -4;
 
   static final DEFAULT_TOKEN_CHANNEL = Token.DEFAULT_CHANNEL;
   static final HIDDEN = Token.HIDDEN_CHANNEL;
@@ -140,7 +141,10 @@ abstract class Lexer extends Recognizer<LexerATNSimulator>
           if (type == SKIP) {
             continue outer;
           }
-        } while (type == MORE);
+          if (type == LESS) {
+            _input.seek(tokenStartCharIndex);
+          }
+        } while (type == MORE || type == LESS);
         if (_token == null) emit();
         return _token;
       }
@@ -162,6 +166,10 @@ abstract class Lexer extends Recognizer<LexerATNSimulator>
 
   void more() {
     type = Lexer.MORE;
+  }
+
+  void less() {
+    type = Lexer.LESS;
   }
 
   void mode(int m) {

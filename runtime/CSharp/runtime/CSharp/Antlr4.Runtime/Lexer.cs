@@ -192,8 +192,12 @@ namespace Antlr4.Runtime
                         {
                             goto outer_continue;
                         }
+                        if (_type == TokenTypes.Less)
+                        {
+                            _input.Seek(_tokenStartCharIndex);
+                        }
                     }
-                    while (_type == TokenTypes.More);
+                    while (_type == TokenTypes.More || _type == TokenTypes.Less);
                     if (_token == null)
                     {
                         Emit();
@@ -229,6 +233,11 @@ outer_continue: ;
         public virtual void More()
         {
             _type = TokenTypes.More;
+        }
+
+        public virtual void Less()
+        {
+            _type = TokenTypes.Less;
         }
 
         public virtual void Mode(int m)

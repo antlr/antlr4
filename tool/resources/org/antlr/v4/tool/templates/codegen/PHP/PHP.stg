@@ -760,6 +760,7 @@ catch (<catchArg>) {
 
 LexerSkipCommand()  ::= "$this->skip();"
 LexerMoreCommand()  ::= "$this->more();"
+LexerLessCommand()  ::= "$this->less();"
 LexerPopModeCommand() ::= "$this->popMode();"
 
 LexerTypeCommand(arg, grammar)      ::= "$this->type = <arg>;"

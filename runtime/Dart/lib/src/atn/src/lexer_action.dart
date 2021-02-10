@@ -27,6 +27,8 @@ enum LexerActionType {
   SKIP,
   /// The type of a [LexerTypeAction] action.
   TYPE,
+  /// The type of a [LexerLessAction] action.
+  LESS,
 }
 
 /// Represents a single action which can be executed following the successful
@@ -194,6 +196,54 @@ class LexerCustomAction implements LexerAction {
       return ruleIndex == obj.ruleIndex && actionIndex == obj.actionIndex;
     }
     return false;
+  }
+}
+
+/// Implements the [less] lexer action by calling {@link Lexer#less}.
+///
+/// <p>The [less] command does not have any parameters, so this action is
+/// implemented as a singleton instance exposed by {@link #INSTANCE}.</p>
+///
+/// @since 4.2
+class LexerLessAction implements LexerAction {
+  /// Provides a singleton instance of this parameterless lexer action.
+  static final LexerLessAction INSTANCE = LexerLessAction();
+
+  /// {@inheritDoc}
+  /// @return This method returns {@link LexerActionType#LESS}.
+  @override
+  LexerActionType get actionType => LexerActionType.LESS;
+
+  /// {@inheritDoc}
+  /// @return This method returns [false].
+
+  @override
+  bool get isPositionDependent => false;
+
+  /// {@inheritDoc}
+  ///
+  /// <p>This action is implemented by calling {@link Lexer#less}.</p>
+
+  @override
+  void execute(Lexer lexer) {
+    lexer.less();
+  }
+
+  @override
+  int get hashCode {
+    var hash = MurmurHash.initialize();
+    hash = MurmurHash.update(hash, actionType.index);
+    return MurmurHash.finish(hash, 1);
+  }
+
+  @override
+  bool operator ==(Object obj) {
+    return identical(obj, this);
+  }
+
+  @override
+  String toString() {
+    return 'less';
   }
 }
 

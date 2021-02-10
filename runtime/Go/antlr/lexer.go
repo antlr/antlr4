@@ -109,6 +109,7 @@ const (
 	LexerDefaultMode = 0
 	LexerMore        = -2
 	LexerSkip        = -3
+	LexerLess        = -4
 )
 
 const (
@@ -219,6 +220,10 @@ func (b *BaseLexer) NextToken() Token {
 				continueOuter = true
 				break
 			}
+			if b.thetype == LexerLess {
+				b.input.Seek(b.TokenStartCharIndex)
+				continue
+			}
 			if b.thetype != LexerMore {
 				break
 			}
@@ -248,6 +253,10 @@ func (b *BaseLexer) Skip() {
 
 func (b *BaseLexer) More() {
 	b.thetype = LexerMore
+}
+
+func (b *BaseLexer) Less() {
+	b.thetype = LexerLess
 }
 
 func (b *BaseLexer) SetMode(m int) {

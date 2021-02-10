@@ -86,6 +86,7 @@ namespace antlr4 {
     class LexerATNConfig;
     class LexerATNSimulator;
     class LexerMoreAction;
+    class LexerLessAction;
     class LexerPopModeAction;
     class LexerSkipAction;
     class LookaheadEventInfo;

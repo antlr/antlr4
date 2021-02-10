@@ -19,7 +19,9 @@ const LexerActionType = {
     //The type of a {@link LexerSkipAction} action.
     SKIP: 6,
     //The type of a {@link LexerTypeAction} action.
-    TYPE: 7
+    TYPE: 7,
+    //The type of a {@link LexerLessAction} action.
+    LESS: 8
 }
 
 class LexerAction {
@@ -188,6 +190,30 @@ class LexerMoreAction extends LexerAction {
 
 LexerMoreAction.INSTANCE = new LexerMoreAction();
 
+/**
+ * Implements the {@code less} lexer action by calling {@link Lexer//less}.
+ *
+ * <p>The {@code less} command does not have any parameters, so this action is
+ * implemented as a singleton instance exposed by {@link //INSTANCE}.</p>
+ */
+class LexerLessAction extends LexerAction {
+    constructor() {
+        super(LexerActionType.LESS);
+    }
+
+    /**
+     * <p>This action is implemented by calling {@link Lexer//popMode}.</p>
+     */
+    execute(lexer) {
+        lexer.less();
+    }
+
+    toString() {
+        return "less";
+    }
+}
+
+LexerLessAction.INSTANCE = new LexerLessAction();
 
 /**
  * Implements the {@code mode} lexer action by calling {@link Lexer//mode} with
@@ -380,5 +406,6 @@ module.exports = {
     LexerTypeAction,
     LexerPushModeAction,
     LexerPopModeAction,
-    LexerModeAction
+    LexerModeAction,
+    LexerLessAction
 }

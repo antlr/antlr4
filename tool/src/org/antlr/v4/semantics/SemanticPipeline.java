@@ -203,6 +203,9 @@ public class SemanticPipeline {
 			else if ("more".equals(node.getText())) {
 				return true;
 			}
+			else if ("less".equals(node.getText())) {
+				return true;
+			}
 		}
 
 		return false;

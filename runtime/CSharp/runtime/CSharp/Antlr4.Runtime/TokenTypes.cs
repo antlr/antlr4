@@ -9,5 +9,7 @@ namespace Antlr4.Runtime
         public const int More = -2;
 
         public const int Skip = -3;
+
+        public const int Less = -4;
     }
 }

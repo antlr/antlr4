@@ -756,6 +756,7 @@ catch (<catchArg>) {
 
 LexerSkipCommand()  ::= "Skip();"
 LexerMoreCommand()  ::= "More();"
+LexerLessCommand()  ::= "Less();"
 LexerPopModeCommand() ::= "PopMode();"
 
 LexerTypeCommand(arg, grammar)      ::= "_type = <tokenType.(arg)>;"

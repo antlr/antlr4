@@ -78,6 +78,8 @@ public func ==(lhs: LexerAction, rhs: LexerAction) -> Bool {
         return (lhs as! LexerModeAction) == (rhs as! LexerModeAction)
     } else if (lhs is LexerMoreAction) && (rhs is LexerMoreAction) {
         return (lhs as! LexerMoreAction) == (rhs as! LexerMoreAction)
+    } else if (lhs is LexerLessAction) && (rhs is LexerLessAction) {
+        return (lhs as! LexerLessAction) == (rhs as! LexerLessAction)
     } else if (lhs is LexerPopModeAction) && (rhs is LexerPopModeAction) {
         return (lhs as! LexerPopModeAction) == (rhs as! LexerPopModeAction)
     } else if (lhs is LexerPushModeAction) && (rhs is LexerPushModeAction) {

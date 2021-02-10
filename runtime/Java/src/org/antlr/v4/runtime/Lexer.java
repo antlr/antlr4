@@ -25,6 +25,7 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 	public static final int DEFAULT_MODE = 0;
 	public static final int MORE = -2;
 	public static final int SKIP = -3;
+	public static final int LESS = -4;
 
 	public static final int DEFAULT_TOKEN_CHANNEL = Token.DEFAULT_CHANNEL;
 	public static final int HIDDEN = Token.HIDDEN_CHANNEL;
@@ -152,7 +153,10 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 					if ( _type ==SKIP ) {
 						continue outer;
 					}
-				} while ( _type ==MORE );
+					if ( _type ==LESS ) {
+						_input.seek(_tokenStartCharIndex);
+					}
+				} while ( _type ==MORE || _type ==LESS );
 				if ( _token == null ) emit();
 				return _token;
 			}
@@ -176,6 +180,10 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 
 	public void more() {
 		_type = MORE;
+	}
+
+	public void less() {
+		_type = LESS;
 	}
 
 	public void mode(int m) {

@@ -52,6 +52,7 @@ const {
     LexerPushModeAction,
     LexerPopModeAction,
     LexerModeAction,
+    LexerLessAction,
 } = require('./LexerAction');
 
 // This is the earliest supported serialized UUID.
@@ -659,6 +660,7 @@ class ATNDeserializer {
             af[LexerActionType.PUSH_MODE] = (data1, data2) => new LexerPushModeAction(data1);
             af[LexerActionType.SKIP] = (data1, data2) => LexerSkipAction.INSTANCE;
             af[LexerActionType.TYPE] = (data1, data2) => new LexerTypeAction(data1);
+            af[LexerActionType.LESS] = (data1, data2) => LexerLessAction.INSTANCE;
             this.actionFactories = af;
         }
         if (type>this.actionFactories.length || this.actionFactories[type] === null) {

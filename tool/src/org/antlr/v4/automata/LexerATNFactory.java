@@ -22,6 +22,7 @@ import org.antlr.v4.runtime.atn.CodePointTransitions;
 import org.antlr.v4.runtime.atn.LexerAction;
 import org.antlr.v4.runtime.atn.LexerChannelAction;
 import org.antlr.v4.runtime.atn.LexerCustomAction;
+import org.antlr.v4.runtime.atn.LexerLessAction;
 import org.antlr.v4.runtime.atn.LexerModeAction;
 import org.antlr.v4.runtime.atn.LexerMoreAction;
 import org.antlr.v4.runtime.atn.LexerPopModeAction;
@@ -69,6 +70,7 @@ public class LexerATNFactory extends ParserATNFactory {
 		COMMON_CONSTANTS.put("DEFAULT_MODE", Lexer.DEFAULT_MODE);
 		COMMON_CONSTANTS.put("SKIP", Lexer.SKIP);
 		COMMON_CONSTANTS.put("MORE", Lexer.MORE);
+		COMMON_CONSTANTS.put("LESS", Lexer.LESS);
 		COMMON_CONSTANTS.put("EOF", Lexer.EOF);
 		COMMON_CONSTANTS.put("MAX_CHAR_VALUE", Lexer.MAX_CHAR_VALUE);
 		COMMON_CONSTANTS.put("MIN_CHAR_VALUE", Lexer.MIN_CHAR_VALUE);
@@ -619,6 +621,9 @@ public class LexerATNFactory extends ParserATNFactory {
 		else if ("more".equals(command) && arg == null) {
 			return LexerMoreAction.INSTANCE;
 		}
+		else if ("less".equals(command) && arg == null) {
+			return LexerLessAction.INSTANCE;
+		}
 		else if ("popMode".equals(command) && arg == null) {
 			return LexerPopModeAction.INSTANCE;
 		}
@@ -677,6 +682,9 @@ public class LexerATNFactory extends ParserATNFactory {
 					if (ruleCommands.contains("more")) {
 						firstCommand = "more";
 					}
+					else if (ruleCommands.contains("less")) {
+						firstCommand = "less";
+					}
 					else if (ruleCommands.contains("type")) {
 						firstCommand = "type";
 					}
@@ -686,6 +694,23 @@ public class LexerATNFactory extends ParserATNFactory {
 				}
 				else if (command.equals("more")) {
 					if (ruleCommands.contains("skip")) {
+						firstCommand = "skip";
+					}
+					else if (ruleCommands.contains("less")) {
+						firstCommand = "less";
+					}
+					else if (ruleCommands.contains("type")) {
+						firstCommand = "type";
+					}
+					else if (ruleCommands.contains("channel")) {
+						firstCommand = "channel";
+					}
+				}
+				else if (command.equals("less")) {
+					if (ruleCommands.contains("more")) {
+						firstCommand = "more";
+					}
+					else if (ruleCommands.contains("skip")) {
 						firstCommand = "skip";
 					}
 					else if (ruleCommands.contains("type")) {
@@ -701,6 +726,9 @@ public class LexerATNFactory extends ParserATNFactory {
 					}
 					else if (ruleCommands.contains("skip")) {
 						firstCommand = "skip";
+					}
+					else if (ruleCommands.contains("less")) {
+						firstCommand = "less";
 					}
 				}
 

@@ -785,6 +785,9 @@ class ATNDeserializer {
       case LexerActionType.CUSTOM:
         return LexerCustomAction(data1, data2);
 
+      case LexerActionType.LESS:
+        return LexerLessAction.INSTANCE;
+
       case LexerActionType.MODE:
         return LexerModeAction(data1);
 

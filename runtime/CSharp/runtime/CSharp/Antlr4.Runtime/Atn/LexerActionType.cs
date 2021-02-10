@@ -18,6 +18,7 @@ namespace Antlr4.Runtime.Atn
         PopMode,
         PushMode,
         Skip,
-        Type
+        Type,
+        Less
     }
 }

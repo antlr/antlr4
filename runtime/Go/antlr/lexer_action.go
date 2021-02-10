@@ -15,6 +15,7 @@ const (
 	LexerActionTypePushMode = 5 //The type of a {@link LexerPushModeAction} action.
 	LexerActionTypeSkip     = 6 //The type of a {@link LexerSkipAction} action.
 	LexerActionTypeType     = 7 //The type of a {@link LexerTypeAction} action.
+	LexerActionTypeLess     = 8 //The type of a {@link LexerLessAction} action.
 )
 
 type LexerAction interface {
@@ -222,6 +223,33 @@ func (l *LexerMoreAction) execute(lexer Lexer) {
 
 func (l *LexerMoreAction) String() string {
 	return "more"
+}
+
+// Implements the {@code less} lexer action by calling {@link Lexer//less}.
+//
+// <p>The {@code less} command does not have any parameters, so l action is
+// implemented as a singleton instance exposed by {@link //INSTANCE}.</p>
+
+type LexerLessAction struct {
+	*BaseLexerAction
+}
+
+func NewLexerLessAction() *LexerLessAction {
+	l := new(LexerLessAction)
+	l.BaseLexerAction = NewBaseLexerAction(LexerActionTypeLess)
+
+	return l
+}
+
+var LexerLessActionINSTANCE = NewLexerLessAction()
+
+// <p>This action is implemented by calling {@link Lexer//less}.</p>
+func (l *LexerLessAction) execute(lexer Lexer) {
+	lexer.Less()
+}
+
+func (l *LexerLessAction) String() string {
+	return "less"
 }
 
 // Implements the {@code mode} lexer action by calling {@link Lexer//mode} with

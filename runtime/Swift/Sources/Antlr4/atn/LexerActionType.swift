@@ -46,4 +46,8 @@ public enum LexerActionType: Int {
     /// The type of a _org.antlr.v4.runtime.atn.LexerTypeAction_ action.
     /// 
     case type
+    /// 
+    /// The type of a _org.antlr.v4.runtime.atn.LexerLessAction_ action.
+    /// 
+    case less
 }

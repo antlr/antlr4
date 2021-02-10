@@ -1284,6 +1284,11 @@ nextTransition_continue: ;
                     return new LexerCustomAction(data1, data2);
                 }
 
+                case LexerActionType.Less:
+                {
+                    return LexerLessAction.Instance;
+                }
+
                 case LexerActionType.Mode:
                 {
                     return new LexerModeAction(data1);

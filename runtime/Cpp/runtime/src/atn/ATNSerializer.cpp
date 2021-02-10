@@ -307,6 +307,11 @@ std::vector<size_t> ATNSerializer::serialize() {
           break;
         }
 
+        case LexerActionType::LESS:
+          data.push_back(0);
+          data.push_back(0);
+          break;
+
         case LexerActionType::MODE:
         {
           int mode = std::dynamic_pointer_cast<LexerModeAction>(action)->getMode();

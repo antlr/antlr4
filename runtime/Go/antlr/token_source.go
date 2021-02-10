@@ -8,6 +8,7 @@ type TokenSource interface {
 	NextToken() Token
 	Skip()
 	More()
+	Less()
 	GetLine() int
 	GetCharPositionInLine() int
 	GetInputStream() CharStream
