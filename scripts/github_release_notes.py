@@ -5,7 +5,7 @@ from github import Github
 from collections import Counter
 import sys
 
-TARGETS = ['csharp', 'cpp', 'go', 'java', 'javascript', 'python2', 'python3', 'swift', 'php']
+TARGETS = ['csharp', 'cpp', 'go', 'java', 'javascript', 'python2', 'python3', 'swift', 'php', 'dart']
 
 TOKEN=sys.argv[1]
 MILESTONE=sys.argv[2]

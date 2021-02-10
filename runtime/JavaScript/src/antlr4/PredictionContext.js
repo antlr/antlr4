@@ -562,7 +562,7 @@ function mergeArrays(a, b, rootIsWildcard, mergeCache) {
 	while (i < a.returnStates.length && j < b.returnStates.length) {
 		const a_parent = a.parents[i];
 		const b_parent = b.parents[j];
-		if (equalArrays(a.returnStates[i], b.returnStates[j])) {
+		if (a.returnStates[i] === b.returnStates[j]) {
 			// same payload (stack tops are equal), must yield merged singleton
 			const payload = a.returnStates[i];
 			// $+$ = $

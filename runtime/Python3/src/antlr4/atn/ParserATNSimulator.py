@@ -255,6 +255,10 @@ from antlr4.error.Errors import NoViableAltException
 
 
 class ParserATNSimulator(ATNSimulator):
+    __slots__ = (
+        'parser', 'decisionToDFA', 'predictionMode', '_input', '_startIndex',
+        '_outerContext', '_dfa', 'mergeCache'
+    )
 
     debug = False
     debug_list_atn_decisions = False
@@ -1643,4 +1647,3 @@ class ParserATNSimulator(ATNSimulator):
                                ", input=" + self.parser.getTokenStream().getText(startIndex, stopIndex))
         if self.parser is not None:
             self.parser.getErrorListenerDispatch().reportAmbiguity(self.parser, dfa, startIndex, stopIndex, exact, ambigAlts, configs)
-

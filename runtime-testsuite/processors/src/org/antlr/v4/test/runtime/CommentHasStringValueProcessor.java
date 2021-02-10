@@ -6,10 +6,11 @@
 
 package org.antlr.v4.test.runtime;
 
+import com.sun.tools.javac.main.JavaCompiler;
 import com.sun.tools.javac.model.JavacElements;
-import com.sun.tools.javac.processing.JavacProcessingEnvironment;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.TreeMaker;
+import com.sun.tools.javac.util.Context;
 import com.sun.tools.javac.util.List;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -20,6 +21,7 @@ import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
+import java.lang.reflect.Field;
 import java.util.Set;
 
 /**
@@ -38,6 +40,7 @@ import java.util.Set;
 @SupportedAnnotationTypes({"org.antlr.v4.test.runtime.CommentHasStringValue"})
 @SupportedSourceVersion(SourceVersion.RELEASE_7)
 public class CommentHasStringValueProcessor extends AbstractProcessor {
+
 	protected JavacElements utilities;
 	protected TreeMaker treeMaker;
 
@@ -46,9 +49,21 @@ public class CommentHasStringValueProcessor extends AbstractProcessor {
 		super.init(processingEnv);
 //		Messager messager = processingEnv.getMessager();
 //		messager.printMessage(Diagnostic.Kind.NOTE, "WOW INIT--------------------");
-		JavacProcessingEnvironment javacProcessingEnv = (JavacProcessingEnvironment) processingEnv;
-		utilities = javacProcessingEnv.getElementUtils();
-		treeMaker = TreeMaker.instance(javacProcessingEnv.getContext());
+		utilities = (JavacElements)processingEnv.getElementUtils();
+		treeMaker = TreeMaker.instance(extractContext(utilities));
+	}
+
+	private static Context extractContext(JavacElements utilities) {
+		try {
+			Field compilerField = JavacElements.class.getDeclaredField("javaCompiler");
+			compilerField.setAccessible(true);
+			JavaCompiler compiler = (JavaCompiler)compilerField.get(utilities);
+			Field contextField = JavaCompiler.class.getDeclaredField("context");
+			contextField.setAccessible(true);
+			return (Context)contextField.get(compiler);
+		} catch (NoSuchFieldException | IllegalAccessException e) {
+			throw new IllegalStateException(e);
+		}
 	}
 
 	@Override
@@ -66,8 +81,7 @@ public class CommentHasStringValueProcessor extends AbstractProcessor {
 			else if ( elementTree instanceof JCTree.JCMethodDecl ) {
 				JCTree.JCStatement[] statements = new JCTree.JCStatement[1];
 				statements[0] = treeMaker.Return(literal);
-				JCTree.JCBlock body = treeMaker.Block(0, List.from(statements));
-				((JCTree.JCMethodDecl)elementTree).body = body;
+				((JCTree.JCMethodDecl)elementTree).body = treeMaker.Block(0, List.from(statements));
 			}
 		}
 		return true;

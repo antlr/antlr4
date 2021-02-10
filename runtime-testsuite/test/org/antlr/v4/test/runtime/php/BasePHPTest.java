@@ -11,24 +11,11 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import org.antlr.v4.Tool;
-import org.antlr.v4.automata.LexerATNFactory;
-import org.antlr.v4.automata.ParserATNFactory;
-import org.antlr.v4.runtime.atn.ATN;
-import org.antlr.v4.runtime.atn.ATNDeserializer;
-import org.antlr.v4.runtime.atn.ATNSerializer;
-import org.antlr.v4.semantics.SemanticPipeline;
-import org.antlr.v4.test.runtime.ErrorQueue;
-import org.antlr.v4.test.runtime.RuntimeTestSupport;
-import org.antlr.v4.test.runtime.StreamVacuum;
-import org.antlr.v4.tool.Grammar;
-import org.antlr.v4.tool.LexerGrammar;
+
+import org.antlr.v4.test.runtime.*;
 import org.stringtemplate.v4.ST;
 
 import static org.antlr.v4.test.runtime.BaseRuntimeTest.antlrOnString;
@@ -36,122 +23,10 @@ import static org.antlr.v4.test.runtime.BaseRuntimeTest.writeFile;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class BasePHPTest implements RuntimeTestSupport {
-	public static final String newline = System.getProperty("line.separator");
+public class BasePHPTest extends BaseRuntimeTestSupport implements RuntimeTestSupport {
 
-	public String tmpdir = null;
-
-	/**
-	 * If error during parser execution, store stderr here; can't return
-	 * stdout and stderr.  This doesn't trap errors from running antlr.
-	 */
-	protected String stderrDuringParse;
-
-	/**
-	 * Errors found while running antlr
-	 */
-	protected StringBuilder antlrToolErrors;
-
-	private String getPropertyPrefix() {
+	public String getPropertyPrefix() {
 		return "antlr-php";
-	}
-
-	@Override
-	public void testSetUp() throws Exception {
-		// new output dir for each test
-		String propName = getPropertyPrefix() + "-test-dir";
-		String prop = System.getProperty(propName);
-
-		if (prop != null && prop.length() > 0) {
-			tmpdir = prop;
-		} else {
-			String classSimpleName = getClass().getSimpleName();
-			String threadName = Thread.currentThread().getName();
-			String childPath = String.format("%s-%s-%s", classSimpleName, threadName, System.currentTimeMillis());
-			tmpdir = new File(System.getProperty("java.io.tmpdir"), childPath).getAbsolutePath();
-		}
-
-		antlrToolErrors = new StringBuilder();
-	}
-
-	@Override
-	public void testTearDown() throws Exception {
-	}
-
-	@Override
-	public String getTmpDir() {
-		return tmpdir;
-	}
-
-	@Override
-	public String getStdout() {
-		return null;
-	}
-
-	@Override
-	public String getParseErrors() {
-		return stderrDuringParse;
-	}
-
-	@Override
-	public String getANTLRToolErrors() {
-		if (antlrToolErrors.length() == 0) {
-			return null;
-		}
-
-		return antlrToolErrors.toString();
-	}
-
-	protected ATN createATN(Grammar g, boolean useSerializer) {
-		if (g.atn == null) {
-			semanticProcess(g);
-
-			assertEquals(0, g.tool.getNumErrors());
-
-			ParserATNFactory f;
-
-			if (g.isLexer()) {
-				f = new LexerATNFactory((LexerGrammar) g);
-			} else {
-				f = new ParserATNFactory(g);
-			}
-
-			g.atn = f.createATN();
-			assertEquals(0, g.tool.getNumErrors());
-		}
-
-		ATN atn = g.atn;
-
-		if (useSerializer) {
-			char[] serialized = ATNSerializer.getSerializedAsChars(atn);
-
-			return new ATNDeserializer().deserialize(serialized);
-		}
-
-		return atn;
-	}
-
-	protected void semanticProcess(Grammar g) {
-		if (g.ast != null && !g.ast.hasErrors) {
-			Tool antlr = new Tool();
-			SemanticPipeline sem = new SemanticPipeline(g);
-			sem.process();
-
-			if (g.getImportedGrammars() != null) {
-				for (Grammar imp: g.getImportedGrammars()) {
-					antlr.processNonCombinedGrammar(imp, false);
-				}
-			}
-		}
-	}
-
-	protected String execLexer(
-		String grammarFileName,
-		String grammarStr,
-		String lexerName,
-		String input
-	) {
-		return execLexer(grammarFileName, grammarStr, lexerName, input, false);
 	}
 
 	@Override
@@ -170,11 +45,9 @@ public class BasePHPTest implements RuntimeTestSupport {
 			"-no-listener"
 		);
 		assertTrue(success);
-		writeFile(tmpdir, "input", input);
+		writeFile(getTempDirPath(), "input", input);
 		writeLexerTestFile(lexerName, showDFA);
-		String output = execModule("Test.php");
-
-		return output;
+		return execModule("Test.php");
 	}
 
 	public String execParser(
@@ -224,7 +97,7 @@ public class BasePHPTest implements RuntimeTestSupport {
 
 		assertTrue(success);
 
-		writeFile(tmpdir, "input", input);
+		writeFile(getTempDirPath(), "input", input);
 
 		rawBuildRecognizerTestFile(
 			parserName,
@@ -270,7 +143,7 @@ public class BasePHPTest implements RuntimeTestSupport {
 		boolean defaultListener,
 		String... extraOptions
 	) {
-		ErrorQueue equeue = antlrOnString(getTmpDir(), "PHP", grammarFileName, grammarStr, defaultListener, extraOptions);
+		ErrorQueue equeue = antlrOnString(getTempDirPath(), "PHP", grammarFileName, grammarStr, defaultListener, extraOptions);
 
 		if (!equeue.errors.isEmpty()) {
 			return false;
@@ -307,7 +180,7 @@ public class BasePHPTest implements RuntimeTestSupport {
 		boolean debug,
 		boolean trace
 	) {
-		this.stderrDuringParse = null;
+		setParseErrors(null);
 		if (parserName == null) {
 			writeLexerTestFile(lexerName, false);
 		} else {
@@ -331,15 +204,14 @@ public class BasePHPTest implements RuntimeTestSupport {
 		String phpPath = locatePhp();
 		String runtimePath = locateRuntime();
 
-		File tmpdirFile = new File(tmpdir);
-		String modulePath = new File(tmpdirFile, fileName).getAbsolutePath();
-		String inputPath = new File(tmpdirFile, "input").getAbsolutePath();
-		Path outputPath = tmpdirFile.toPath().resolve("output").toAbsolutePath();
+		String modulePath = new File(getTempTestDir(), fileName).getAbsolutePath();
+		String inputPath = new File(getTempTestDir(), "input").getAbsolutePath();
+		Path outputPath = getTempTestDir().toPath().resolve("output").toAbsolutePath();
 
 		try {
 			ProcessBuilder builder = new ProcessBuilder(phpPath, modulePath, inputPath, outputPath.toString());
 			builder.environment().put("RUNTIME", runtimePath);
-			builder.directory(tmpdirFile);
+			builder.directory(getTempTestDir());
 			Process process = builder.start();
 			StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
 			StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
@@ -355,7 +227,7 @@ public class BasePHPTest implements RuntimeTestSupport {
 			}
 
 			if (stderrVacuum.toString().length() > 0) {
-				this.stderrDuringParse = stderrVacuum.toString();
+				setParseErrors(stderrVacuum.toString());
 			}
 
 			return output;
@@ -464,7 +336,7 @@ public class BasePHPTest implements RuntimeTestSupport {
 
 		outputFileST.add("lexerName", lexerName);
 
-		writeFile(tmpdir, "Test.php", outputFileST.render());
+		writeFile(getTempDirPath(), "Test.php", outputFileST.render());
 	}
 
 	protected void writeParserTestFile(
@@ -546,54 +418,7 @@ public class BasePHPTest implements RuntimeTestSupport {
 		outputFileST.add("visitorName", visitorName);
 		outputFileST.add("parserStartRuleName", parserStartRuleName);
 
-		writeFile(tmpdir, "Test.php", outputFileST.render());
+		writeFile(getTempDirPath(), "Test.php", outputFileST.render());
 	}
 
-	protected void eraseFiles(File dir) {
-		String[] files = dir.list();
-		for (int i = 0; files != null && i < files.length; i++) {
-			new File(dir, files[i]).delete();
-		}
-	}
-
-	@Override
-	public void eraseTempDir() {
-		boolean doErase = true;
-		String propName = getPropertyPrefix() + "-erase-test-dir";
-		String prop = System.getProperty(propName);
-		if (prop != null && prop.length() > 0) {
-			doErase = Boolean.getBoolean(prop);
-		}
-		if (doErase) {
-			File tmpdirF = new File(tmpdir);
-			if (tmpdirF.exists()) {
-				eraseFiles(tmpdirF);
-				tmpdirF.delete();
-			}
-		}
-	}
-
-	/**
-	 * Sort a list
-	 */
-	public <T extends Comparable<? super T>> List<T> sort(List<T> data) {
-		List<T> dup = new ArrayList<T>();
-		dup.addAll(data);
-		Collections.sort(dup);
-		return dup;
-	}
-
-	/**
-	 * Return map sorted by key
-	 */
-	public <K extends Comparable<? super K>, V> LinkedHashMap<K, V> sort(Map<K, V> data) {
-		LinkedHashMap<K, V> dup = new LinkedHashMap<K, V>();
-		List<K> keys = new ArrayList<K>();
-		keys.addAll(data.keySet());
-		Collections.sort(keys);
-		for (K k: keys) {
-			dup.put(k, data.get(k));
-		}
-		return dup;
-	}
 }

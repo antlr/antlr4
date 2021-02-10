@@ -3,7 +3,7 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
-const {InputStream} = require('./InputStream');
+const InputStream = require('./InputStream');
 const fs = require("fs");
 
 /**
@@ -73,4 +73,4 @@ const CharStreams = {
   }
 };
 
-module.exports = CharStreams
+module.exports = CharStreams;

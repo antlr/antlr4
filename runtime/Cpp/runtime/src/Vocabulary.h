@@ -22,7 +22,7 @@ namespace dfa {
     /// except <seealso cref="Token#EOF"/>.</para>
     static const Vocabulary EMPTY_VOCABULARY;
 
-    Vocabulary() = default;
+    Vocabulary() {}
     Vocabulary(Vocabulary const&) = default;
     virtual ~Vocabulary();
 

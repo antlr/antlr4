@@ -35,6 +35,7 @@ from antlr4.Token import Token
 
 
 class CommonTokenStream(BufferedTokenStream):
+    __slots__ = 'channel'
 
     def __init__(self, lexer:Lexer, channel:int=Token.DEFAULT_CHANNEL):
         super().__init__(lexer)

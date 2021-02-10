@@ -75,7 +75,7 @@ public class TestParserExec extends BaseJavaToolTest {
 			"s1-INT->s2\n" +
 			"s2-EOF->:s3=>1\n"; // Must point at accept state
 		assertEquals(expecting, result);
-		assertNull(this.stderrDuringParse);
+		assertNull(getParseErrors());
 	}
 
 	/**
@@ -88,7 +88,7 @@ public class TestParserExec extends BaseJavaToolTest {
 		String grammar = load("Psl.g4", "UTF-8");
 		String found = execParser("Psl.g4", grammar, "PslParser", "PslLexer", null, null, "floating_constant", " . 234", false);
 		assertEquals(null, found);
-		assertEquals("line 1:6 rule floating_constant DEC:A floating-point constant cannot have internal white space\n", stderrDuringParse);
+		assertEquals("line 1:6 rule floating_constant DEC:A floating-point constant cannot have internal white space\n", getParseErrors());
 	}
 
 	/**
@@ -129,7 +129,7 @@ public class TestParserExec extends BaseJavaToolTest {
 		String found = execParser("ModeTagsParser.g4", parserGrammar, "ModeTagsParser", "ModeTagsLexer",
 		                          null, null, "file", "", false);
 		assertEquals(null, found);
-		assertNull(stderrDuringParse);
+		assertNull(getParseErrors());
 	}
 
 	/**
@@ -158,6 +158,6 @@ public class TestParserExec extends BaseJavaToolTest {
 		String found = execParser("Data.g4", grammar, "DataParser", "DataLexer",
 		                          null, null, "file", input, false);
 		assertEquals("6\n", found);
-		assertNull(stderrDuringParse);
+		assertNull(getParseErrors());
 	}
 }

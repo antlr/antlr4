@@ -162,7 +162,9 @@ export default class <parser.name> extends <superClass; null="antlr4.Parser"> {
 <parser.tokens:{k | <parser.name>.<k> = <parser.tokens.(k)>;}; separator="\n", wrap, anchor>
 <endif>
 
+<if(parser.rules)>
 <parser.rules:{r | <parser.name>.RULE_<r.name> = <r.index>;}; separator="\n", wrap, anchor>
+<endif>
 
 <funcs:{f | <ruleContexts(f)>}; separator="\n">
 
@@ -251,10 +253,9 @@ RuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,namedActions,fina
         <code>
         <postamble; separator="\n">
         <namedActions.after>
-    <if(exceptions)>
+    }<if(exceptions)>
     <exceptions; separator="\n">
-    <else>
-    } catch (re) {
+    <else> catch (re) {
     	if(re instanceof antlr4.error.RecognitionException) {
 	        localctx.exception = re;
 	        this._errHandler.reportError(this, re);
@@ -411,7 +412,7 @@ if(la_===<i><if(!choice.ast.greedy)>+1<endif>) {
 StarBlock(choice, alts, sync, iteration) ::= <<
 this.state = <choice.stateNumber>;
 this._errHandler.sync(this);
-let _alt = this._interp.adaptivePredict(this._input,<choice.decision>,this._ctx)
+var _alt = this._interp.adaptivePredict(this._input,<choice.decision>,this._ctx)
 while(_alt!=<choice.exitAlt> && _alt!=antlr4.atn.ATN.INVALID_ALT_NUMBER) {
     if(_alt===1<if(!choice.ast.greedy)>+1<endif>) {
         <iteration>
@@ -427,7 +428,7 @@ while(_alt!=<choice.exitAlt> && _alt!=antlr4.atn.ATN.INVALID_ALT_NUMBER) {
 PlusBlock(choice, alts, error) ::= <<
 this.state = <choice.blockStartStateNumber>; <! alt block decision !>
 this._errHandler.sync(this);
-let _alt = 1<if(!choice.ast.greedy)>+1<endif>;
+var _alt = 1<if(!choice.ast.greedy)>+1<endif>;
 do {
 	switch (_alt) {
 	<alts:{alt|
@@ -818,7 +819,9 @@ export default class <lexer.name> extends <if(superClass)><superClass><else>antl
 }
 
 <lexer.name>.EOF = antlr4.Token.EOF;
+<if(lexer.tokens)>
 <lexer.tokens:{k | <lexer.name>.<k> = <lexer.tokens.(k)>;}; separator="\n", wrap, anchor>
+<endif>
 
 <if(lexer.channels)>
 <lexer.channels:{c| <lexer.name>.<c> = <lexer.channels.(c)>;}; separator="\n">
