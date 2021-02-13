@@ -16,6 +16,8 @@ import org.junit.runner.Description;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
 import java.util.Locale;
 import java.util.logging.Logger;
 
@@ -161,13 +163,18 @@ public abstract class BaseRuntimeTestSupport implements RuntimeTestSupport {
 
 	private static void eraseFile(File dir, String name) throws IOException {
 		File file = new File(dir,name);
-		if(Files.isSymbolicLink(file.toPath()))
+		if(Files.isSymbolicLink((file.toPath())))
 			Files.delete(file.toPath());
-		else if(file.isDirectory())
-			eraseDirectory(file);
-		else
+		else if(file.isDirectory()) {
+			// work around issue where Files.isSymbolicLink returns false on Windows for node/antlr4 linked package
+			if("antlr4".equals(name))
+				; // logger.warning("antlr4 not seen as a symlink");
+			else
+				eraseDirectory(file);
+		} else
 			file.delete();
 	}
+
 
 	private static String detectedOS;
 
