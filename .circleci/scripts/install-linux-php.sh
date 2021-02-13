@@ -10,8 +10,6 @@ sudo apt update
 sudo apt install php-cli
 sudo apt install composer
 
-php -v
-
 git clone https://github.com/antlr/antlr-php-runtime.git runtime/PHP
 
 mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
