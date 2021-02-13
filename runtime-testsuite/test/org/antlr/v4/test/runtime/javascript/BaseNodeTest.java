@@ -121,7 +121,7 @@ public class BaseNodeTest extends BaseRuntimeTestSupport implements RuntimeTestS
 	public String execModule(String fileName) {
 		try {
 			String npmPath = locateNpm();
-			if(!TestContext.isTravisCI() && !TestContext.isCircleCI()) {
+			if(!TestContext.isCI()) {
 				installRuntime(npmPath);
 				registerRuntime(npmPath);
 			}

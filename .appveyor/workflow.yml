@@ -81,8 +81,14 @@ for:
       - cinst nodejs.install
       - node --version
       - npm --version
+      - echo %node%
+      - echo %npm%
     build_script:
       - mvn -DskipTests install --batch-mode
+      - cd runtime\JavaScript\
+      - npm install
+      - npm link
+      - cd ..\..
     test_script:
       - cd runtime-testsuite
       - mvn -Dtest=javascript.* test
