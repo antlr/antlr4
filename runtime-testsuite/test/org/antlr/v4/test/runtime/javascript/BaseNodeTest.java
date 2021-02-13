@@ -5,6 +5,7 @@
  */
 package org.antlr.v4.test.runtime.javascript;
 
+import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.test.runtime.*;
 import org.stringtemplate.v4.ST;
 
@@ -129,9 +130,6 @@ public class BaseNodeTest extends BaseRuntimeTestSupport implements RuntimeTestS
 					.getAbsolutePath();
 			linkRuntime(npmPath);
 			String nodejsPath = locateNodeJS();
-			System.out.println("nodejsPath=" + nodejsPath);
-			if(nodejsPath.contains(" "))
-				nodejsPath = "\"" + nodejsPath + "\"";
 			String inputPath = new File(getTempTestDir(), "input")
 					.getAbsolutePath();
 			ProcessBuilder builder = new ProcessBuilder(nodejsPath, modulePath,
@@ -200,16 +198,14 @@ public class BaseNodeTest extends BaseRuntimeTestSupport implements RuntimeTestS
 	}
 
 	private void linkRuntime(String npmPath) throws IOException, InterruptedException {
-		System.out.println("npmPath=" + npmPath);
 		List<String> args = new ArrayList<>();
 		if(TestContext.isCircleCI())
 			args.add("sudo");
-		if(npmPath.contains(" "))
-			npmPath = "\"" + npmPath + "\"";
 		args.addAll(Arrays.asList(npmPath, "link", "antlr4"));
 		ProcessBuilder builder = new ProcessBuilder(args.toArray(new String[0]));
 		builder.directory(getTempTestDir());
-		builder.redirectError(new File(getTempTestDir(), "error.txt"));
+		File errorFile = new File(getTempTestDir(), "error.txt");
+		builder.redirectError(errorFile);
 		builder.redirectOutput(new File(getTempTestDir(), "output.txt"));
 		Process process = builder.start();
 		// TODO switch to jdk 8
@@ -217,8 +213,10 @@ public class BaseNodeTest extends BaseRuntimeTestSupport implements RuntimeTestS
 		// if(!process.waitFor(30L, TimeUnit.SECONDS))
 		//	process.destroyForcibly();
 		int error = process.exitValue();
-		if(error!=0)
-			throw new IOException("'npm link antlr4' failed");
+		if(error!=0) {
+			char[] errors = Utils.readFile(errorFile.getAbsolutePath());
+			throw new IOException("'npm link antlr4' failed: " + new String(errors));
+		}
 	}
 
 	private boolean canExecute(String tool) {
@@ -243,6 +241,8 @@ public class BaseNodeTest extends BaseRuntimeTestSupport implements RuntimeTestS
 		// typically /usr/local/bin/npm
 		String prop = System.getProperty("antlr-javascript-npm");
 		if ( prop!=null && prop.length()!=0 ) {
+			if(prop.contains(" "))
+				prop = "\"" + prop + "\"";
 			return prop;
 		}
 		return "npm"; // everywhere
@@ -252,6 +252,8 @@ public class BaseNodeTest extends BaseRuntimeTestSupport implements RuntimeTestS
 		// typically /usr/local/bin/node
 		String prop = System.getProperty("antlr-javascript-nodejs");
 		if ( prop!=null && prop.length()!=0 ) {
+			if(prop.contains(" "))
+				prop = "\"" + prop + "\"";
 			return prop;
 		}
 		if (canExecute("nodejs")) {
