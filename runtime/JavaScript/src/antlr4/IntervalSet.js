@@ -94,7 +94,7 @@ class IntervalSet {
 
 	reduce(k) {
 		// only need to reduce if k is not the last
-		if (k < this.intervalslength - 1) {
+		if (k < this.intervals.length - 1) {
 			const l = this.intervals[k];
 			const r = this.intervals[k + 1];
 			// if r contained in l
@@ -103,7 +103,7 @@ class IntervalSet {
 				this.reduce(k);
 			} else if (l.stop >= r.start) {
 				this.intervals[k] = new Interval(l.start, r.stop);
-				this.intervals = this.intervals.splice(k + 1, 1);
+				this.intervals.splice(k + 1, 1);
 			}
 		}
 	}
