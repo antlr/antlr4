@@ -29,7 +29,7 @@ build: off
 for:
   - matrix:
       only:
-        job_name: java-tool-and-runtime
+        - job_name: java-tool-and-runtime
     build_script:
       - mvn -DskipTests install --batch-mode
     test_script:
@@ -37,7 +37,7 @@ for:
 
   - matrix:
       only:
-        job_name: csharp-runtime
+        - job_name: csharp-runtime
     build_script:
       - mvn -DskipTests install --batch-mode
       - dotnet build runtime/CSharp/src/Antlr4.csproj -c Release
@@ -52,7 +52,7 @@ for:
 
   - matrix:
       only:
-        job_name: dart-runtime
+        - job_name: dart-runtime
     install:
       - cinst -y dart-sdk --version=2.8.4
     build_script:
@@ -65,7 +65,7 @@ for:
 
   - matrix:
       only:
-        job_name: go-runtime
+        - job_name: go-runtime
     build_script:
       - mvn -DskipTests install --batch-mode
     test_script:
@@ -74,7 +74,7 @@ for:
 
   - matrix:
       only:
-        job_name: javascript-runtime
+        - job_name: javascript-runtime
     build_script:
       - mvn -DskipTests install --batch-mode
     test_script:
@@ -83,7 +83,7 @@ for:
 
   - matrix:
       only:
-        job_name: php-runtime
+        - job_name: php-runtime
     install:
       - git clone https://github.com/antlr/antlr-php-runtime.git
       - mv antlr-php-runtime runtime/PHP
@@ -97,7 +97,7 @@ for:
 
   - matrix:
       only:
-        job_name: python2-runtime
+        - job_name: python2-runtime
     build_script:
       - mvn -DskipTests install --batch-mode
     test_script:
@@ -106,7 +106,7 @@ for:
 
   - matrix:
       only:
-        job_name: python3-runtime
+        - job_name: python3-runtime
     build_script:
       - mvn -DskipTests install --batch-mode
     test_script:
