@@ -163,9 +163,12 @@ public abstract class BaseRuntimeTestSupport implements RuntimeTestSupport {
 		File file = new File(dir,name);
 		if(Files.isSymbolicLink(file.toPath()))
 			Files.delete(file.toPath());
-		else if(file.isDirectory())
-			eraseDirectory(file);
-		else
+		else if(file.isDirectory()) {
+			if("antlr4".equals(name))
+				logger.warning("antlr4 not seen as a symlink");
+			else
+				eraseDirectory(file);
+		} else
 			file.delete();
 	}
 
