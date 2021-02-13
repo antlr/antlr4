@@ -7,7 +7,7 @@ sudo apt-get update -qq
 
 sudo apt update
 
-sudo apt install php-cli
+sudo apt install php-cli unzip
 sudo apt install composer
 
 git clone https://github.com/antlr/antlr-php-runtime.git runtime/PHP
