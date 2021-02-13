@@ -81,16 +81,15 @@ for:
       - cinst nodejs.install
       - node --version
       - npm --version
-      - dir "C:\Program Files\nodejs\"
     build_script:
       - cd runtime\JavaScript\
       - npm install
       - npm link
       - cd ..\..
-#    - mvn -DskipTests install --batch-mode
+      - mvn -DskipTests install --batch-mode
     test_script:
       - cd runtime-testsuite
-#      - mvn -Dtest=javascript.* test
+      - mvn -Dtest=javascript.* test -Dantlr-javascript-npm="C:\Program Files\nodejs\npm.cmd" -Dantlr-javascript-nodejs="C:\Program Files\nodejs\node.exe"
 
   - matrix:
       only:
