@@ -6,6 +6,8 @@ sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328
 sudo apt-get update -qq
 
 sudo apt update
+sudo apt list
+
 sudo apt install php7.2-cli
 
 php -v
