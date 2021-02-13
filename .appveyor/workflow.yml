@@ -86,6 +86,7 @@ for:
       - npm install
       - npm link
       - cd ..\..
+      - dir C:\Users\appveyor\AppData\Roaming\npm\node_modules\antlr4\
       - mvn -q -DskipTests install --batch-mode
     test_script:
       - cd runtime-testsuite
