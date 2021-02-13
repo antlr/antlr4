@@ -53,15 +53,14 @@ jobs:
 workflows:
   build:
     jobs:
-#     - test_tool_and_runtime_java
+      - test_tool_and_runtime_java
       - test_runtime:
           matrix:
             parameters:
-#             target: [ dart, go, python2, python3, javascript, php ]
-              target: [ php ]
-#      - test_runtime:
-#          matrix:
-#            parameters:
+              target: [ dart, go, python2, python3, javascript, php ]
+      - test_runtime:
+          matrix:
+            parameters:
 #              target: [ cpp, dotnet, swift ]
-#              target: [ cpp, dotnet ]
-#              test-group: [ LEXER, PARSER, RECURSION ]
+              target: [ cpp, dotnet ]
+              test-group: [ LEXER, PARSER, RECURSION ]
