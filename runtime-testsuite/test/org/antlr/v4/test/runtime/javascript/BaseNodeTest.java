@@ -129,6 +129,9 @@ public class BaseNodeTest extends BaseRuntimeTestSupport implements RuntimeTestS
 					.getAbsolutePath();
 			linkRuntime(npmPath);
 			String nodejsPath = locateNodeJS();
+			System.out.println("nodejsPath=" + nodejsPath);
+			if(nodejsPath.contains(" "))
+				nodejsPath = "\"" + nodejsPath + "\"";
 			String inputPath = new File(getTempTestDir(), "input")
 					.getAbsolutePath();
 			ProcessBuilder builder = new ProcessBuilder(nodejsPath, modulePath,
@@ -197,9 +200,12 @@ public class BaseNodeTest extends BaseRuntimeTestSupport implements RuntimeTestS
 	}
 
 	private void linkRuntime(String npmPath) throws IOException, InterruptedException {
+		System.out.println("npmPath=" + npmPath);
 		List<String> args = new ArrayList<>();
 		if(TestContext.isCircleCI())
 			args.add("sudo");
+		if(npmPath.contains(" "))
+			npmPath = "\"" + npmPath + "\"";
 		args.addAll(Arrays.asList(npmPath, "link", "antlr4"));
 		ProcessBuilder builder = new ProcessBuilder(args.toArray(new String[0]));
 		builder.directory(getTempTestDir());
@@ -236,7 +242,6 @@ public class BaseNodeTest extends BaseRuntimeTestSupport implements RuntimeTestS
 	private String locateNpm() {
 		// typically /usr/local/bin/npm
 		String prop = System.getProperty("antlr-javascript-npm");
-		System.err.println("antlr-javascript-npm=" + prop);
 		if ( prop!=null && prop.length()!=0 ) {
 			return prop;
 		}
@@ -246,7 +251,6 @@ public class BaseNodeTest extends BaseRuntimeTestSupport implements RuntimeTestS
 	private String locateNodeJS() {
 		// typically /usr/local/bin/node
 		String prop = System.getProperty("antlr-javascript-nodejs");
-		System.err.println("antlr-javascript-nodejs=" + prop);
 		if ( prop!=null && prop.length()!=0 ) {
 			return prop;
 		}
