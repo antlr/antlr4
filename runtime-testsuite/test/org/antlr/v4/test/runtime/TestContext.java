@@ -16,7 +16,7 @@ public abstract class TestContext {
 
 	public static boolean isSupportedTarget(String target) {
 		if(isAppVeyorCI())
-			return !target.matches("Swift|Node");
+			return !target.matches("Swift");
 		else
 			return true;
 	}

@@ -24,6 +24,7 @@ cache:
   - '%USERPROFILE%\.m2'
   - '%USERPROFILE%\.nuget\packages -> **\project.json'
 image: Visual Studio 2019
+# not using MSBuild
 build: off
 
 for:
