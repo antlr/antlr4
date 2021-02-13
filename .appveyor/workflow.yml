@@ -81,19 +81,16 @@ for:
       - cinst nodejs.install
       - node --version
       - npm --version
-      - echo on
-      - echo %node%
-      - echo %npm%
-      - echo off
+      - dir "C:\Program Files\"
     build_script:
       - cd runtime\JavaScript\
       - npm install
       - npm link
       - cd ..\..
-      - mvn -DskipTests install --batch-mode
+#    - mvn -DskipTests install --batch-mode
     test_script:
       - cd runtime-testsuite
-      - mvn -Dtest=javascript.* test
+#      - mvn -Dtest=javascript.* test
 
   - matrix:
       only:
