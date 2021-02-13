@@ -3,8 +3,8 @@ environment:
     - job_name: java-tool-and-runtime
 #    - job_name: csharp-runtime
 #      job_depends_on: java-tool-and-runtime
-    - job_name: dart-runtime
-      job_depends_on: java-tool-and-runtime
+#    - job_name: dart-runtime
+#      job_depends_on: java-tool-and-runtime
 #    - job_name: go-runtime
 #      job_depends_on: java-tool-and-runtime
     - job_name: javascript-runtime
@@ -76,6 +76,8 @@ for:
   - matrix:
       only:
         - job_name: javascript-runtime
+    install:
+      - cinst nodejs.install
     build_script:
       - mvn -DskipTests install --batch-mode
     test_script:
