@@ -1,0 +1,11 @@
+version: '4.9.2-SNAPSHOT+AppVeyor.{build}'
+cache:
+  - '%USERPROFILE%\.m2'
+  - '%USERPROFILE%\.nuget\packages -> **\project.json'
+image: Visual Studio 2019
+build: off
+build_script:
+  - mvn -DskipTests install --batch-mode
+test_script:
+  - cd runtime-testsuite
+  - mvn -Dtest=javascript.* test

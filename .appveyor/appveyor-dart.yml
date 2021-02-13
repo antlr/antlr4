@@ -1,0 +1,13 @@
+version: '4.9.2-SNAPSHOT+AppVeyor.{build}'
+cache:
+  - '%USERPROFILE%\.m2'
+  - '%USERPROFILE%\.nuget\packages -> **\project.json'
+image: Visual Studio 2019
+build: off
+install:
+  - cinst -y dart-sdk --version=2.8.4
+build_script:
+  - mvn -DskipTests install --batch-mode
+test_script:
+  - cd runtime-testsuite
+  - mvn -Dtest=dart.* test -Dantlr-dart-dart="C:\tools\dart-sdk\bin\dart.exe" -Dantlr-dart-pub="C:\tools\dart-sdk\bin\pub.bat" -Dantlr-dart-dart2native="C:\tools\dart-sdk\bin\dart2native.bat"
