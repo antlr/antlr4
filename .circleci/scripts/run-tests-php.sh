@@ -4,8 +4,6 @@ set -euo pipefail
 
 php -v
 
-composer install -d runtime/PHP
-
 php_path=$(which php)
 pushd runtime-testsuite
   echo "running maven tests..."
