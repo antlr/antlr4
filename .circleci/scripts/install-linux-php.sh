@@ -8,6 +8,7 @@ sudo apt-get update -qq
 sudo apt update
 
 sudo apt install php-cli
+sudo apt install composer
 
 php -v
 
