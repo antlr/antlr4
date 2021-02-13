@@ -31,9 +31,12 @@ for:
       only:
         - job_name: java-tool-and-runtime
     build_script:
-      - mvn -e -DskipTests install --batch-mode
+      - mvn -DskipTests install --batch-mode
     test_script:
-      - mvn -Dtest=java.* install --batch-mode
+      - cd tool-testsuite
+      - mvn test
+      - cd ..\runtime-testsuite
+      - mvn -Dtest=java.* test
 
   - matrix:
       only:
