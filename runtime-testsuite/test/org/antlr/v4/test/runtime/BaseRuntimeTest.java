@@ -87,13 +87,13 @@ public abstract class BaseRuntimeTest {
 			public void run() {
 				heartbeat = true;
 				while (heartbeat) {
-					System.out.print('.');
 					try {
 						//noinspection BusyWait
-						Thread.sleep(5000);
+						Thread.sleep(10000);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
+					System.out.print('.');
 				}
 			}
 		};

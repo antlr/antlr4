@@ -90,7 +90,8 @@ for:
       - mvn -q -DskipTests install --batch-mode
     test_script:
       - cd runtime-testsuite
-      - mvn -q -Dtest=javascript.* test -Dantlr-javascript-npm="C:\Program Files\nodejs\npm.cmd" -Dantlr-javascript-nodejs="C:\Program Files\nodejs\node.exe"
+      - mvn -q -Dtest=javascript.* test
+#    - mvn -q -Dtest=javascript.* test -Dantlr-javascript-npm="C:\Program Files\nodejs\npm.cmd" -Dantlr-javascript-nodejs="C:\Program Files\nodejs\node.exe"
 
   - matrix:
       only:
