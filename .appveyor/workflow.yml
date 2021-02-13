@@ -1,20 +1,20 @@
 environment:
   matrix:
-#    - job_name: java-tool-and-runtime
-#    - job_name: csharp-runtime
-#      job_depends_on: java-tool-and-runtime
-#    - job_name: dart-runtime
-#      job_depends_on: java-tool-and-runtime
-#    - job_name: go-runtime
-#      job_depends_on: java-tool-and-runtime
+    - job_name: java-tool-and-runtime
+    - job_name: csharp-runtime
+      job_depends_on: java-tool-and-runtime
+    - job_name: dart-runtime
+      job_depends_on: java-tool-and-runtime
+    - job_name: go-runtime
+      job_depends_on: java-tool-and-runtime
     - job_name: javascript-runtime
-#      job_depends_on: java-tool-and-runtime
-#    - job_name: php-runtime
-#      job_depends_on: java-tool-and-runtime
-#    - job_name: python2-runtime
-#      job_depends_on: java-tool-and-runtime
-#    - job_name: python3-runtime
-#      job_depends_on: java-tool-and-runtime
+      job_depends_on: java-tool-and-runtime
+    - job_name: php-runtime
+      job_depends_on: java-tool-and-runtime
+    - job_name: python2-runtime
+      job_depends_on: java-tool-and-runtime
+    - job_name: python3-runtime
+      job_depends_on: java-tool-and-runtime
 
 matrix:
   fast_finish: false
@@ -86,12 +86,10 @@ for:
       - npm install
       - npm link
       - cd ..\..
-      - dir C:\Users\appveyor\AppData\Roaming\npm\node_modules\antlr4\
       - mvn -q -DskipTests install --batch-mode
     test_script:
       - cd runtime-testsuite
-      - mvn -q -Dtest=javascript.* test
-#    - mvn -q -Dtest=javascript.* test -Dantlr-javascript-npm="C:\Program Files\nodejs\npm.cmd" -Dantlr-javascript-nodejs="C:\Program Files\nodejs\node.exe"
+      - mvn -q -Dtest=javascript.* test -Dantlr-javascript-npm="C:\Program Files\nodejs\npm.cmd" -Dantlr-javascript-nodejs="C:\Program Files\nodejs\node.exe"
 
   - matrix:
       only:
