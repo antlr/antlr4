@@ -236,6 +236,7 @@ public class BaseNodeTest extends BaseRuntimeTestSupport implements RuntimeTestS
 	private String locateNpm() {
 		// typically /usr/local/bin/npm
 		String prop = System.getProperty("antlr-javascript-npm");
+		System.err.println("antlr-javascript-npm=" + prop);
 		if ( prop!=null && prop.length()!=0 ) {
 			return prop;
 		}
@@ -245,6 +246,7 @@ public class BaseNodeTest extends BaseRuntimeTestSupport implements RuntimeTestS
 	private String locateNodeJS() {
 		// typically /usr/local/bin/node
 		String prop = System.getProperty("antlr-javascript-nodejs");
+		System.err.println("antlr-javascript-nodejs=" + prop);
 		if ( prop!=null && prop.length()!=0 ) {
 			return prop;
 		}
