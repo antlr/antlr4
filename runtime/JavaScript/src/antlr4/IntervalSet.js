@@ -99,7 +99,7 @@ class IntervalSet {
 			const r = this.intervals[k + 1];
 			// if r contained in l
 			if (l.stop >= r.stop) {
-				this.intervals = this.intervals.splice(k + 1, 1);
+				this.intervals.splice(k + 1, 1);
 				this.reduce(k);
 			} else if (l.stop >= r.start) {
 				this.intervals[k] = new Interval(l.start, r.stop);
