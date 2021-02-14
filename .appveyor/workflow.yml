@@ -81,6 +81,7 @@ for:
       - cinst nodejs.install
       - node --version
       - npm --version
+      - npm install -g yarn@v1.22.10
     build_script:
       - cd runtime\JavaScript\
       - npm install
@@ -89,6 +90,7 @@ for:
       - mvn -q -DskipTests install --batch-mode
     test_script:
       - cd runtime-testsuite
+      - yarn test
       - mvn -q -Dtest=javascript.* test -Dantlr-javascript-npm="C:\Program Files\nodejs\npm.cmd" -Dantlr-javascript-nodejs="C:\Program Files\nodejs\node.exe"
 
   - matrix:

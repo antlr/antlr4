@@ -26,7 +26,8 @@
     "webpack-cli": "^3.3.12"
   },
   "scripts": {
-    "build": "webpack"
+    "build": "webpack",
+    "test": "jest"
   },
   "engines": {
     "node": ">=14"
