@@ -1,7 +1,14 @@
 import antlr4 from "../antlr4/index.js";
 
-it("merges simple interval sets properly", () => {
+it("computes interval set length", () => {
+    const s1 = new antlr4.IntervalSet();
+    s1.addOne(20);
+    s1.addOne(154);
+    s1.addRange(169, 171);
+    expect(s1.length).toEqual(5);
+});
 
+it("merges simple interval sets", () => {
     const s1 = new antlr4.IntervalSet();
     s1.addOne(10);
     expect(s1.toString()).toEqual("10");
@@ -28,7 +35,7 @@ it("merges simple interval sets properly", () => {
 
 });
 
-it("merges complex interval sets properly", () => {
+it("merges complex interval sets", () => {
     const s1 = new antlr4.IntervalSet();
     s1.addOne(20);
     s1.addOne(141);
