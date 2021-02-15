@@ -129,6 +129,8 @@ The ANTLR C++ runtime source is downloaded from GitHub by default. However, user
 
 Visual C++ compiler users may want to additionally define `ANTLR4_WITH_STATIC_CRT` before including the file. Set `ANTLR4_WITH_STATIC_CRT` to true if ANTLR4 C++ runtime library should be compiled with `/MT` flag, otherwise will be compiled with `/MD` flag. This variable has a default value of `OFF`. Changing `ANTLR4_WITH_STATIC_CRT` after building the library may require reinitialization of CMake or `clean` for the library to get rebuilt.
 
+You may need to modify your local copy of ExternalAntlr4Cpp.cpp to modify some build settings. For example, to specify the C++ standard to use when building the runtime, add `-DCMAKE_CXX_STANDARD:STRING=17` to `CMAKE_CACHE_ARGS`.
+
 ### Examples
 
 To build and link ANTLR4 static library to a target one may call:
