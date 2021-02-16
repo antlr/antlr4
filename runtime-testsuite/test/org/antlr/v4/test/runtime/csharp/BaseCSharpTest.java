@@ -5,39 +5,14 @@
  */
 package org.antlr.v4.test.runtime.csharp;
 
-import org.antlr.v4.Tool;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.TokenSource;
-import org.antlr.v4.runtime.WritableToken;
 import org.antlr.v4.runtime.misc.Utils;
-import org.antlr.v4.test.runtime.ErrorQueue;
-import org.antlr.v4.test.runtime.RuntimeTestSupport;
-import org.antlr.v4.test.runtime.StreamVacuum;
-import org.antlr.v4.test.runtime.TestOutputReading;
-import org.antlr.v4.tool.ANTLRMessage;
-import org.antlr.v4.tool.GrammarSemanticsMessage;
-import org.junit.rules.TestRule;
-import org.junit.rules.TestWatcher;
-import org.junit.runner.Description;
+import org.antlr.v4.test.runtime.*;
 import org.stringtemplate.v4.ST;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathFactory;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.URL;
 import java.nio.file.Path;
@@ -56,114 +31,11 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class BaseCSharpTest implements RuntimeTestSupport {
-	public static final String newline = System.getProperty("line.separator");
-
-	/**
-	 * When the {@code antlr.preserve-test-dir} runtime property is set to
-	 * {@code true}, the temporary directories created by the test run will not
-	 * be removed at the end of the test run, even for tests that completed
-	 * successfully.
-	 *
-	 * <p>
-	 * The default behavior (used in all other cases) is removing the temporary
-	 * directories for all tests which completed successfully, and preserving
-	 * the directories for tests which failed.</p>
-	 */
-	public static final boolean PRESERVE_TEST_DIR = Boolean.parseBoolean(System.getProperty("antlr-preserve-csharp-test-dir"));
-
-	/**
-	 * The base test directory is the directory where generated files get placed
-	 * during unit test execution.
-	 *
-	 * <p>
-	 * The default value for this property is the {@code java.io.tmpdir} system
-	 * property, and can be overridden by setting the
-	 * {@code antlr.java-test-dir} property to a custom location. Note that the
-	 * {@code antlr.java-test-dir} property directly affects the
-	 * {@link #CREATE_PER_TEST_DIRECTORIES} value as well.</p>
-	 */
-	public static final String BASE_TEST_DIR;
-
-	/**
-	 * When {@code true}, a temporary directory will be created for each test
-	 * executed during the test run.
-	 *
-	 * <p>
-	 * This value is {@code true} when the {@code antlr.java-test-dir} system
-	 * property is set, and otherwise {@code false}.</p>
-	 */
-	public static final boolean CREATE_PER_TEST_DIRECTORIES;
-
-	static {
-		String baseTestDir = System.getProperty("antlr-csharp-test-dir");
-		boolean perTestDirectories = false;
-		if (baseTestDir == null || baseTestDir.isEmpty()) {
-			baseTestDir = System.getProperty("java.io.tmpdir");
-			perTestDirectories = true;
-		}
-
-		if (!new File(baseTestDir).isDirectory()) {
-			throw new UnsupportedOperationException("The specified base test directory does not exist: " + baseTestDir);
-		}
-
-		BASE_TEST_DIR = baseTestDir;
-		CREATE_PER_TEST_DIRECTORIES = perTestDirectories;
-	}
-
-	public String tmpdir = null;
-
-	/**
-	 * If error during parser execution, store stderr here; can't return
-	 * stdout and stderr.  This doesn't trap errors from running antlr.
-	 */
-	protected String stderrDuringParse;
-
-	/**
-	 * Errors found while running antlr
-	 */
-	protected StringBuilder antlrToolErrors;
+public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTestSupport {
 
 	@Override
-	public void testSetUp() throws Exception {
-		if (CREATE_PER_TEST_DIRECTORIES) {
-			// new output dir for each test
-			String testDirectory = getClass().getSimpleName() + "-" + Thread.currentThread().getName() + "-" + System.currentTimeMillis();
-			tmpdir = new File(BASE_TEST_DIR, testDirectory).getAbsolutePath();
-		} else {
-			tmpdir = new File(BASE_TEST_DIR).getAbsolutePath();
-			if (!PRESERVE_TEST_DIR && new File(tmpdir).exists()) {
-				eraseDirectory(new File(tmpdir));
-			}
-		}
-		antlrToolErrors = new StringBuilder();
-	}
-
-	@Override
-	public void testTearDown() throws Exception {
-	}
-
-	@Override
-	public String getTmpDir() {
-		return tmpdir;
-	}
-
-	@Override
-	public String getStdout() {
-		return null;
-	}
-
-	@Override
-	public String getParseErrors() {
-		return stderrDuringParse;
-	}
-
-	@Override
-	public String getANTLRToolErrors() {
-		if (antlrToolErrors.length() == 0) {
-			return null;
-		}
-		return antlrToolErrors.toString();
+	protected String getPropertyPrefix() {
+		return "antlr4-csharp";
 	}
 
 	protected String execLexer(String grammarFileName,
@@ -184,12 +56,12 @@ public class BaseCSharpTest implements RuntimeTestSupport {
 				null,
 				lexerName);
 		assertTrue(success);
-		writeFile(tmpdir, "input", input);
+		writeFile(getTempDirPath(), "input", input);
 		writeLexerTestFile(lexerName, showDFA);
 		addSourceFiles("Test.cs");
 		if (!compile()) {
 			System.err.println("Failed to compile!");
-			return stderrDuringParse;
+			return getParseErrors();
 		}
 		String output = execTest();
 		if (output != null && output.length() == 0) {
@@ -201,8 +73,7 @@ public class BaseCSharpTest implements RuntimeTestSupport {
 	Set<String> sourceFiles = new HashSet<>();
 
 	private void addSourceFiles(String... files) {
-		for (String file : files)
-			this.sourceFiles.add(file);
+		Collections.addAll(sourceFiles, files);
 	}
 
 	@Override
@@ -221,7 +92,7 @@ public class BaseCSharpTest implements RuntimeTestSupport {
 				lexerName,
 				"-visitor");
 		assertTrue(success);
-		writeFile(tmpdir, "input", input);
+		writeFile(getTempDirPath(), "input", input);
 		return rawExecRecognizer(parserName,
 				lexerName,
 				startRuleName,
@@ -248,7 +119,7 @@ public class BaseCSharpTest implements RuntimeTestSupport {
 											String lexerName,
 											boolean defaultListener,
 											String... extraOptions) {
-		ErrorQueue equeue = antlrOnString(getTmpDir(), "CSharp", grammarFileName, grammarStr, defaultListener, extraOptions);
+		ErrorQueue equeue = antlrOnString(getTempDirPath(), "CSharp", grammarFileName, grammarStr, defaultListener, extraOptions);
 		if (!equeue.errors.isEmpty()) {
 			return false;
 		}
@@ -278,7 +149,7 @@ public class BaseCSharpTest implements RuntimeTestSupport {
 									   String lexerName,
 									   String parserStartRuleName,
 									   boolean debug) {
-		this.stderrDuringParse = null;
+		setParseErrors(null);
 		if (parserName == null) {
 			writeLexerTestFile(lexerName, false);
 		} else {
@@ -313,18 +184,18 @@ public class BaseCSharpTest implements RuntimeTestSupport {
 	}
 
 	private String locateExec() {
-		return new File(tmpdir, "bin/Release/netcoreapp3.1/Test.dll").getAbsolutePath();
+		return new File(getTempTestDir(), "bin/Release/netcoreapp3.1/Test.dll").getAbsolutePath();
 	}
 
 	public boolean buildProject() {
 		try {
 			// save auxiliary files
 			String pack = BaseCSharpTest.class.getPackage().getName().replace(".", "/") + "/";
-			saveResourceAsFile(pack + "Antlr4.Test.csproj", new File(tmpdir, "Antlr4.Test.csproj"));
+			saveResourceAsFile(pack + "Antlr4.Test.csproj", new File(getTempTestDir(), "Antlr4.Test.csproj"));
 
 			// find runtime package
 			final ClassLoader loader = Thread.currentThread().getContextClassLoader();
-			final URL runtimeProj = loader.getResource("CSharp/Antlr4.csproj");
+			final URL runtimeProj = loader.getResource("CSharp/src/Antlr4.csproj");
 			if (runtimeProj == null) {
 				throw new RuntimeException("C# runtime project file not found!");
 			}
@@ -339,7 +210,7 @@ public class BaseCSharpTest implements RuntimeTestSupport {
 					"reference",
 					runtimeProjPath
 			};
-			boolean success = runProcess(args, tmpdir);
+			boolean success = runProcess(args, getTempDirPath());
 			assertTrue(success);
 
 			// build test
@@ -350,7 +221,7 @@ public class BaseCSharpTest implements RuntimeTestSupport {
 					"-c",
 					"Release"
 			};
-			success = runProcess(args, tmpdir);
+			success = runProcess(args, getTempDirPath());
 			assertTrue(success);
 		} catch (Exception e) {
 			e.printStackTrace(System.err);
@@ -378,11 +249,11 @@ public class BaseCSharpTest implements RuntimeTestSupport {
 		int exitValue = process.exitValue();
 		boolean success = (exitValue == 0);
 		if (!success) {
-			this.stderrDuringParse = stderrVacuum.toString();
+			setParseErrors(stderrVacuum.toString());
 			System.err.println("runProcess command: " + Utils.join(args, " "));
 			System.err.println("runProcess exitValue: " + exitValue);
 			System.err.println("runProcess stdoutVacuum: " + stdoutVacuum.toString());
-			System.err.println("runProcess stderrVacuum: " + stderrDuringParse);
+			System.err.println("runProcess stderrVacuum: " + getParseErrors());
 		}
 		if (exitValue == 132) {
 			// Retry after SIGILL.  We are seeing this intermittently on
@@ -417,7 +288,7 @@ public class BaseCSharpTest implements RuntimeTestSupport {
 	public String execTest() {
 		String exec = locateExec();
 		try {
-			File tmpdirFile = new File(tmpdir);
+			File tmpdirFile = new File(getTempDirPath());
 			Path output = tmpdirFile.toPath().resolve("output");
 			Path errorOutput = tmpdirFile.toPath().resolve("error-output");
 			String[] args = getExecTestArgs(exec, output, errorOutput);
@@ -432,7 +303,7 @@ public class BaseCSharpTest implements RuntimeTestSupport {
 			stdoutVacuum.join();
 			stderrVacuum.join();
 			String writtenOutput = TestOutputReading.read(output);
-			this.stderrDuringParse = TestOutputReading.read(errorOutput);
+			setParseErrors(TestOutputReading.read(errorOutput));
 			int exitValue = process.exitValue();
 			String stdoutString = stdoutVacuum.toString().trim();
 			String stderrString = stderrVacuum.toString().trim();
@@ -456,7 +327,7 @@ public class BaseCSharpTest implements RuntimeTestSupport {
 
 	private String[] getExecTestArgs(String exec, Path output, Path errorOutput) {
 		return new String[]{
-				"dotnet", exec, new File(tmpdir, "input").getAbsolutePath(),
+				"dotnet", exec, new File(getTempTestDir(), "input").getAbsolutePath(),
 				output.toAbsolutePath().toString(),
 				errorOutput.toAbsolutePath().toString()
 		};
@@ -516,7 +387,7 @@ public class BaseCSharpTest implements RuntimeTestSupport {
 		outputFileST.add("parserName", parserName);
 		outputFileST.add("lexerName", lexerName);
 		outputFileST.add("parserStartRuleName", parserStartRuleName);
-		writeFile(tmpdir, "Test.cs", outputFileST.render());
+		writeFile(getTempDirPath(), "Test.cs", outputFileST.render());
 	}
 
 	protected void writeLexerTestFile(String lexerName, boolean showDFA) {
@@ -545,32 +416,7 @@ public class BaseCSharpTest implements RuntimeTestSupport {
 		);
 
 		outputFileST.add("lexerName", lexerName);
-		writeFile(tmpdir, "Test.cs", outputFileST.render());
-	}
-
-	protected void eraseDirectory(File dir) {
-		File[] files = dir.listFiles();
-		if (files != null) {
-			for (File file : files) {
-				if (file.isDirectory()) {
-					eraseDirectory(file);
-				} else {
-					file.delete();
-				}
-			}
-		}
-		dir.delete();
-	}
-
-	@Override
-	public void eraseTempDir() {
-		if (!PRESERVE_TEST_DIR) {
-			File tmpdirF = new File(tmpdir);
-			if (tmpdirF.exists()) {
-				eraseDirectory(tmpdirF);
-				tmpdirF.delete();
-			}
-		}
+		writeFile(getTempDirPath(), "Test.cs", outputFileST.render());
 	}
 
 	/**
@@ -578,8 +424,7 @@ public class BaseCSharpTest implements RuntimeTestSupport {
 	 */
 	public <K extends Comparable<? super K>, V> LinkedHashMap<K, V> sort(Map<K, V> data) {
 		LinkedHashMap<K, V> dup = new LinkedHashMap<K, V>();
-		List<K> keys = new ArrayList<K>();
-		keys.addAll(data.keySet());
+		List<K> keys = new ArrayList<K>(data.keySet());
 		Collections.sort(keys);
 		for (K k : keys) {
 			dup.put(k, data.get(k));

@@ -38,7 +38,7 @@ else()
     set(ANTLR4_SHARED_LIBRARIES
         ${ANTLR4_OUTPUT_DIR}/libantlr4-runtime.dll.a)
     set(ANTLR4_RUNTIME_LIBRARIES
-        ${ANTLR4_OUTPUT_DIR}/cygantlr4-runtime-4.9.dll)
+        ${ANTLR4_OUTPUT_DIR}/cygantlr4-runtime-4.9.1.dll)
   elseif(APPLE)
     set(ANTLR4_RUNTIME_LIBRARIES
         ${ANTLR4_OUTPUT_DIR}/libantlr4-runtime.dylib)

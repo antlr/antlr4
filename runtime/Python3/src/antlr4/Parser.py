@@ -453,7 +453,7 @@ class Parser (Recognizer):
     def getInvokingContext(self, ruleIndex:int):
         ctx = self._ctx
         while ctx is not None:
-            if ctx.ruleIndex == ruleIndex:
+            if ctx.getRuleIndex() == ruleIndex:
                 return ctx
             ctx = ctx.parentCtx
         return None

@@ -169,16 +169,18 @@ public class LL1Analyzer {
             }
 
             if ctx != PredictionContext.EMPTY {
+                let removed = try! calledRuleStack.get(s.ruleIndex!)
+                try! calledRuleStack.clear(s.ruleIndex!)
+                defer {
+                    if removed {
+                         try! calledRuleStack.set(s.ruleIndex!)
+                     }
+                }
                 // run thru all possible stack tops in ctx
                 let length = ctx.size()
                 for i in 0..<length {
                     let returnState = atn.states[(ctx.getReturnState(i))]!
-                    let removed = try! calledRuleStack.get(returnState.ruleIndex!)
-                    try! calledRuleStack.clear(returnState.ruleIndex!)
                     _LOOK(returnState, stopState, ctx.getParent(i), look, &lookBusy, calledRuleStack, seeThruPreds, addEOF)
-                    if removed {
-                        try! calledRuleStack.set(returnState.ruleIndex!)
-                    }
                 }
                 return
             }

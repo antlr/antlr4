@@ -73,4 +73,4 @@ const CharStreams = {
   }
 };
 
-module.exports = CharStreams
+module.exports = CharStreams;

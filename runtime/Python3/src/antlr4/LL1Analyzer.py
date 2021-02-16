@@ -132,16 +132,16 @@ class LL1Analyzer (object):
                 return
 
             if ctx != PredictionContext.EMPTY:
-                # run thru all possible stack tops in ctx
-                for i in range(0, len(ctx)):
-                    returnState = self.atn.states[ctx.getReturnState(i)]
-                    removed = returnState.ruleIndex in calledRuleStack
-                    try:
-                        calledRuleStack.discard(returnState.ruleIndex)
+                removed = s.ruleIndex in calledRuleStack
+                try:
+                    calledRuleStack.discard(s.ruleIndex)
+                    # run thru all possible stack tops in ctx
+                    for i in range(0, len(ctx)):
+                        returnState = self.atn.states[ctx.getReturnState(i)]
                         self._LOOK(returnState, stopState, ctx.getParent(i), look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
-                    finally:
-                        if removed:
-                            calledRuleStack.add(returnState.ruleIndex)
+                finally:
+                    if removed:
+                        calledRuleStack.add(s.ruleIndex)
                 return
 
         for t in s.transitions:
