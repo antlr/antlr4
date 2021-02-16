@@ -2,17 +2,17 @@
 
 ## The `antlr4-generator` Package
 
-To use the Package you must insert a 
+To use the Package you must insert a
 ```cmake
 find_package(antlr4-generator REQUIRED)
 ```
 line in your `CMakeList.txt` file.
 
-The package exposes a function `antlr4_generate` that generates the required setup to call ANTLR for a 
+The package exposes a function `antlr4_generate` that generates the required setup to call ANTLR for a
 given input file during build.
 
 The following table lists the parameters that can be used with the function:
- 
+
 Argument# | Required  | Default | Use
 ----------|-----------|---------|---
 0 | Yes | n/a | Unique target name. It is used to generate CMake Variables to reference the various outputs of the generation
@@ -42,7 +42,7 @@ Output variable  | Meaning
 ```cmake
  # generate parser with visitor classes.
  # put the classes in C++ namespace 'antlrcpptest::'
- antlr4_generate( 
+ antlr4_generate(
    antlrcpptest_parser
    ${CMAKE_CURRENT_SOURCE_DIR}/TLexer.g4
    LEXER
@@ -56,7 +56,7 @@ Output variable  | Meaning
 
 ## The `antlr4-runtime` Package
 
-To use the Package you must insert a 
+To use the Package you must insert a
 ```cmake
 find_package(antlr4-runtime REQUIRED)
 ```
@@ -85,7 +85,7 @@ include_directories( ${ANTLR4_INCLUDE_DIR} )
 add_dependencies( Parsertest antlr4_shared )
 
 # add runtime to project link libraries
-target_link_libraries( Parsertest PRIVATE 
+target_link_libraries( Parsertest PRIVATE
                        antlr4_shared)
 ```
 
@@ -94,12 +94,12 @@ target_link_libraries( Parsertest PRIVATE
  # Bring in the required packages
  find_package(antlr4-runtime REQUIRED)
  find_package(antlr4-generator REQUIRED)
- 
+
  # Set path to generator
  set(ANTLR4_JAR_LOCATION ${PROJECT_SOURCE_DIR}/thirdparty/antlr/antlr-4.9.1-complete.jar)
- 
+
  # generate lexer
- antlr4_generate( 
+ antlr4_generate(
    antlrcpptest_lexer
    ${CMAKE_CURRENT_SOURCE_DIR}/TLexer.g4
    LEXER
@@ -107,9 +107,9 @@ target_link_libraries( Parsertest PRIVATE
    FALSE
    "antlrcpptest"
    )
- 
+
  # generate parser
- antlr4_generate( 
+ antlr4_generate(
    antlrcpptest_parser
    ${CMAKE_CURRENT_SOURCE_DIR}/TParser.g4
    PARSER
@@ -119,18 +119,18 @@ target_link_libraries( Parsertest PRIVATE
    "${ANTLR4_TOKEN_FILES_antlrcpptest_lexer}"
    "${ANTLR4_TOKEN_DIRECTORY_antlrcpptest_lexer}"
    )
- 
+
  # add directories for generated include files
  include_directories( ${PROJECT_BINARY_DIR} ${ANTLR4_INCLUDE_DIR} ${ANTLR4_INCLUDE_DIR_antlrcpptest_lexer} ${ANTLR4_INCLUDE_DIR_antlrcpptest_parser} )
- 
+
  # add generated source files
  add_executable( Parsertest main.cpp ${ANTLR4_SRC_FILES_antlrcpptest_lexer} ${ANTLR4_SRC_FILES_antlrcpptest_parser} )
- 
+
  # add required runtime library
  add_dependencies( Parsertest antlr4_shared )
- 
- target_link_libraries( Parsertest PRIVATE 
+
+ target_link_libraries( Parsertest PRIVATE
                         antlr4_shared)
- 
+
 ```
- 
+

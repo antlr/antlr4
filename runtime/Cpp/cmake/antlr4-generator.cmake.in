@@ -88,7 +88,7 @@ function(antlr4_generate
   else()
     set(Antlr4_BuildListenerOption "-no-listener")
   endif ()
-  
+
   if ( ( ARGC GREATER_EQUAL 5 ) AND ARGV4 )
     set(Antlr4_BuildVisitorOption "-visitor")
 
@@ -101,7 +101,7 @@ function(antlr4_generate
   else()
     set(Antlr4_BuildVisitorOption "-no-visitor")
   endif ()
-  
+
   if ( (ARGC GREATER_EQUAL 6 ) AND (NOT ${ARGV5} STREQUAL "") )
     set(Antlr4_NamespaceOption "-package;${ARGV5}")
 
@@ -109,7 +109,7 @@ function(antlr4_generate
   else()
     set(Antlr4_NamespaceOption "")
   endif ()
-  
+
   if ( (ARGC GREATER_EQUAL 7 ) AND (NOT ${ARGV6} STREQUAL "") )
     set(Antlr4_AdditionalDependencies ${ARGV6})
   else()
@@ -157,7 +157,7 @@ function(antlr4_generate
 
   # export generated cpp files into list
   foreach(generated_file ${Antlr4_GeneratedTargets})
-  
+
     if (NOT CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
       set_source_files_properties(
         ${generated_file}
