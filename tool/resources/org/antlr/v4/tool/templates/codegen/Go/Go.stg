@@ -134,12 +134,21 @@ package parser // <file.grammarName>
 import "github.com/antlr/antlr4/runtime/Go/antlr"
 
 type Base<file.grammarName>Visitor struct {
-	*antlr.BaseParseTreeVisitor
+        *antlr.BaseParseTreeVisitor
+        super antlr.ParseTreeVisitor
+}
+
+func (v *Base<file.grammarName>Visitor) SetSuper(super antlr.ParseTreeVisitor) {
+        v.super = super
 }
 
 <file.visitorNames:{lname |
 func (v *Base<file.grammarName>Visitor) Visit<lname; format="cap">(ctx *<lname; format="cap">Context) interface{\} {
-	return v.VisitChildren(ctx)
+        if v.super != nil {
+                return v.super.VisitChildren(ctx)
+        \}
+
+        return v.VisitChildren(ctx)
 \}}; separator="\n\n">
 
 >>
