@@ -95,6 +95,8 @@ std::unique_ptr<Token> Lexer::nextToken() {
       }
       if (type == LESS) {
         _input->seek(tokenStartCharIndex);
+        getInterpreter<atn::LexerATNSimulator>()->setCharPositionInLine(tokenStartCharPositionInLine);
+        getInterpreter<atn::LexerATNSimulator>()->setLine(tokenStartLine);
       }
     } while (type == MORE || type == LESS);
     if (token == nullptr) {

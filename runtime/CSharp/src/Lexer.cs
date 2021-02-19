@@ -195,6 +195,8 @@ namespace Antlr4.Runtime
                         if (_type == TokenTypes.Less)
                         {
                             _input.Seek(_tokenStartCharIndex);
+                            Interpreter.Column = _tokenStartColumn;
+                            Interpreter.Line = _tokenStartLine;
                         }
                     }
                     while (_type == TokenTypes.More || _type == TokenTypes.Less);

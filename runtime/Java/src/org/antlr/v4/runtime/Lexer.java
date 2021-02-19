@@ -155,6 +155,8 @@ public abstract class Lexer extends Recognizer<Integer, LexerATNSimulator>
 					}
 					if ( _type ==LESS ) {
 						_input.seek(_tokenStartCharIndex);
+						getInterpreter().setCharPositionInLine(_tokenStartCharPositionInLine);
+						getInterpreter().setLine(_tokenStartLine);
 					}
 				} while ( _type ==MORE || _type ==LESS );
 				if ( _token == null ) emit();

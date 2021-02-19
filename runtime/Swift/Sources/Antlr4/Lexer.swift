@@ -175,6 +175,8 @@ open class Lexer: Recognizer<LexerATNSimulator>, TokenSource {
                     }
                     if _type == Lexer.LESS {
                         try _input.seek(_tokenStartCharIndex)
+                        getInterpreter().setCharPositionInLine(_tokenStartCharPositionInLine)
+                        getInterpreter().setLine(_tokenStartLine)
                         continue
                     }
                 } while _type == Lexer.MORE

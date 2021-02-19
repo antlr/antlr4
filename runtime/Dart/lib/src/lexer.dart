@@ -143,6 +143,8 @@ abstract class Lexer extends Recognizer<LexerATNSimulator>
           }
           if (type == LESS) {
             _input.seek(tokenStartCharIndex);
+            interpreter.charPositionInLine = tokenStartCharPositionInLine;
+            interpreter.line = tokenStartLine;
           }
         } while (type == MORE || type == LESS);
         if (_token == null) emit();

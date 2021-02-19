@@ -137,6 +137,8 @@ class Lexer(Recognizer, TokenSource):
                         break
                     if self._type == self.LESS:
                         self._input.seek(self._tokenStartCharIndex)
+                        self._interp.column = self._tokenStartColumn
+                        self._interp.line = self._tokenStartLine
                         continue
                     if self._type!=self.MORE:
                         break

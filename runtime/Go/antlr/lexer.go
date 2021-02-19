@@ -222,6 +222,8 @@ func (b *BaseLexer) NextToken() Token {
 			}
 			if b.thetype == LexerLess {
 				b.input.Seek(b.TokenStartCharIndex)
+				b.Interpreter.SetCharPositionInLine(b.TokenStartColumn)
+                b.Interpreter.SetLine(b.TokenStartLine)
 				continue
 			}
 			if b.thetype != LexerMore {

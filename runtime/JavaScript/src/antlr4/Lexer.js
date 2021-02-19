@@ -139,6 +139,8 @@ class Lexer extends Recognizer {
 					}
 					if (this._type === Lexer.LESS) {
 						this._input.seek(this._tokenStartCharIndex);
+						this._interp.column = this._tokenStartColumn;
+						this._interp.line = this._tokenStartLine;
 						continue;
 					}
 					if (this._type !== Lexer.MORE) {
