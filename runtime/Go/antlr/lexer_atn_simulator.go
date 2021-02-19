@@ -25,7 +25,9 @@ type ILexerATNSimulator interface {
 	reset()
 	Match(input CharStream, mode int) int
 	GetCharPositionInLine() int
+	SetCharPositionInLine(linePos int)
 	GetLine() int
+	SetLine(line int)
 	GetText(input CharStream) string
 	Consume(input CharStream)
 }
@@ -621,8 +623,16 @@ func (l *LexerATNSimulator) GetCharPositionInLine() int {
 	return l.CharPositionInLine
 }
 
+func (l *LexerATNSimulator) SetCharPositionInLine(linePos int) {
+	l.CharPositionInLine = linePos
+}
+
 func (l *LexerATNSimulator) GetLine() int {
 	return l.Line
+}
+
+func (l *LexerATNSimulator) SetLine(line int) {
+	l.Line = line
 }
 
 func (l *LexerATNSimulator) GetTokenName(tt int) string {
