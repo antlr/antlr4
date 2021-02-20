@@ -336,7 +336,7 @@ func (b *BaseLexer) GetCharPositionInLine() int {
 }
 
 func (b *BaseLexer) SetCharPositionInLine(linePos int) {
-	return b.Interpreter.SetCharPositionInLine(linePos)
+	b.Interpreter.SetCharPositionInLine(linePos)
 }
 
 func (b *BaseLexer) GetLine() int {
