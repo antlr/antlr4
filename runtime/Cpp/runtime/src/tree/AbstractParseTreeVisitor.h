@@ -40,7 +40,7 @@ namespace tree {
         }
 
         antlrcpp::Any childResult = node->children[i]->accept(this);
-        result = aggregateResult(std::move(result), childResult);
+        result = aggregateResult(std::move(result), std::move(childResult));
       }
 
       return result;
@@ -91,8 +91,8 @@ namespace tree {
     /// a child node.
     /// </param>
     /// <returns> The updated aggregate result. </returns>
-    virtual antlrcpp::Any aggregateResult(antlrcpp::Any /*aggregate*/, const antlrcpp::Any &nextResult) {
-      return nextResult;
+    virtual antlrcpp::Any aggregateResult(antlrcpp::Any /*aggregate*/, antlrcpp::Any nextResult) {
+      return std::move(nextResult);
     }
 
     /// <summary>
