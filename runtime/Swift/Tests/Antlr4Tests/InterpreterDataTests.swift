@@ -41,7 +41,7 @@ class InterpreterDataTests: XCTestCase {
         let lexer = try lexerInterpData.createLexer(input:ANTLRInputStream(input))
         let parserInterpPath = sourceDir.appendingPathComponent("gen/VisitorCalc.interp").path
         let parserInterpData = try InterpreterDataReader(parserInterpPath)
-        let parser = try parserInterpData.makeParser(input:CommonTokenStream(lexer))
+        let parser = try parserInterpData.createParser(input:CommonTokenStream(lexer))
 
         let context = try parser.parse(parser.getRuleIndex("s"))
         XCTAssertEqual("(s (expr (expr 2) + (expr (expr 8) / (expr 2))) <EOF>)", context.toStringTree(parser))
