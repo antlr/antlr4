@@ -254,8 +254,8 @@ public class ParseTreePatternMatcher {
                 if r1.getRuleContext().getRuleIndex() == r2.getRuleContext().getRuleIndex() {
                     // track label->list-of-nodes for both rule name and label (if any)
                     labels.map(ruleTagToken.getRuleName(), tree)
-                    if ruleTagToken.getLabel() != nil {
-                        labels.map(ruleTagToken.getLabel()!, tree)
+                    if let label = ruleTagToken.getLabel() {
+                        labels.map(label, tree)
                     }
                 } else {
                     if mismatchedNode == nil {
