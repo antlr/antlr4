@@ -886,8 +886,8 @@ ThisRulePropertyRef_text(r) ::= "p.GetTokenStream().GetTextFromTokens(localctx.G
 ThisRulePropertyRef_ctx(r) ::= "<ctx(r)>"
 ThisRulePropertyRef_parser(r) ::= "p"
 
-NonLocalAttrRef(s) ::= "GetInvokingContext(<s.ruleIndex>).<s.name>"
-SetNonLocalAttr(s, rhsChunks) ::= "GetInvokingContext(<s.ruleIndex>).<s.name> = <rhsChunks>"
+NonLocalAttrRef(s) ::= "p.GetInvokingContext(<s.ruleIndex>).(*<s.ruleName; format={cap}>Context).<s.name>"
+SetNonLocalAttr(s, rhsChunks) ::= "p.GetInvokingContext(<s.ruleIndex>).(*<s.ruleName; format={cap}>Context).<s.name> = <rhsChunks>"
 
 AddToLabelList(a) ::= "<ctx(a.label)>.<a.listName> = append(<ctx(a.label)>.<a.listName>, <labelref(a.label)>)"
 
