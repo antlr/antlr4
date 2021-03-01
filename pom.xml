@@ -132,6 +132,31 @@
 		</testResources>
 		<plugins>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-enforcer-plugin</artifactId>
+				<!--
+				 ! The following only needed because the oss-parent uses the version hard coded in
+				 ! the build area instead of controlling that via pluginManagement.
+				 ! Solution: Do not use oss-parent anymore.
+			  -->
+				<version>3.0.0-M3</version>
+        <executions>
+          <execution>
+            <id>enforce-maven</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <requireMavenVersion>
+                  <version>3.3.9</version>
+                </requireMavenVersion>
+              </rules>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+			<plugin>
 				<artifactId>maven-clean-plugin</artifactId>
 				<version>3.0.0</version>
 				<configuration>
@@ -160,6 +185,11 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-javadoc-plugin</artifactId>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-enforcer-plugin</artifactId>
+					<version>3.0.0-M3</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>
