@@ -91,7 +91,7 @@ Now a fully functioning script might look like the following:
 
 ```javascript
    import antlr4 from 'antlr4';
-   import MyGrammarLexer from './MyGrammarLexer.js');
+   import MyGrammarLexer from './MyGrammarLexer.js';
    import MyGrammarParser from './MyGrammarParser.js';
    import MyGrammarListener from './MyGrammarListener.js';
 
