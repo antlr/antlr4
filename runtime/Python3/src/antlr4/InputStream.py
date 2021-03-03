@@ -12,6 +12,7 @@ from antlr4.Token import Token
 
 
 class InputStream (object):
+    __slots__ = ('name', 'strdata', '_index', 'data', '_size')
 
     def __init__(self, data: str):
         self.name = "<empty>"

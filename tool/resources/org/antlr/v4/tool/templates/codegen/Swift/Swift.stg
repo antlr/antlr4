@@ -252,10 +252,12 @@ Parser_(parser, funcs, atn, sempredFuncs, ctor, superClass) ::= <<
 	enum Tokens: Int {
 		case EOF = -1, <parser.tokens:{k | <k> = <parser.tokens.(k)>}; separator=", ", wrap, anchor>
 	}
-        <endif>
+	<endif>
 
 	<accessLevelNotOpen(parser)>
+	<if(parser.rules)>
 	static let <parser.rules:{r | RULE_<r.name> = <r.index>}; separator=", ", wrap, anchor>
+	<endif>
 
 	<accessLevelNotOpen(parser)>
 	static let ruleNames: [String] = [
@@ -354,7 +356,7 @@ func getVocabulary() -> Vocabulary {
 
 override <accessLevelNotOpen(parser)>
 init(_ input:TokenStream) throws {
-    RuntimeMetaData.checkVersion("4.9", RuntimeMetaData.VERSION)
+    RuntimeMetaData.checkVersion("4.9.1", RuntimeMetaData.VERSION)
 	try super.init(input)
 	_interp = ParserATNSimulator(self,<p.name>._ATN,<p.name>._decisionToDFA, <parser.name>._sharedContextCache)
 }
@@ -977,7 +979,9 @@ Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
 	internal static let _sharedContextCache = PredictionContextCache()
 
 	<accessLevelNotOpen(lexer)>
+	<if(lexer.tokens)>
 	static let <lexer.tokens:{k | <k>=<lexer.tokens.(k)>}; separator=", ", wrap, anchor>
+	<endif>
 
 	<if(lexer.channels)>
 	<accessLevelNotOpen(lexer)>

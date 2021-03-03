@@ -278,8 +278,10 @@ public partial class <csIdentifier.(parser.name)> : <superClass; null="Parser"> 
 	public const int
 		<parser.tokens:{k | <k>=<parser.tokens.(k)>}; separator=", ", wrap, anchor>;
 	<endif>
+	<if(parser.rules)>
 	public const int
 		<parser.rules:{r | RULE_<r.name> = <r.index>}; separator=", ", wrap, anchor>;
+	<endif>
 	public static readonly string[] ruleNames = {
 		<parser.ruleNames:{r | "<r>"}; separator=", ", wrap, anchor>
 	};
@@ -986,8 +988,10 @@ Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
 public partial class <csIdentifier.(lexer.name)> : <superClass; null="Lexer"> {
 	protected static DFA[] decisionToDFA;
 	protected static PredictionContextCache sharedContextCache = new PredictionContextCache();
+	<if(lexer.tokens)>
 	public const int
 		<lexer.tokens:{k | <tokenType.(k)>=<lexer.tokens.(k)>}; separator=", ", wrap, anchor>;
+	<endif>
 	<if(lexer.channels)>
 	public const int
 		<lexer.channels:{k | <csIdentifier.(k)>=<lexer.channels.(k)>}; separator=", ", wrap, anchor>;

@@ -80,6 +80,7 @@ class ParseTreeListener(object):
 del ParserRuleContext
 
 class TerminalNodeImpl(TerminalNode):
+    __slots__ = ('parentCtx', 'symbol')
 
     def __init__(self, symbol:Token):
         self.parentCtx = None

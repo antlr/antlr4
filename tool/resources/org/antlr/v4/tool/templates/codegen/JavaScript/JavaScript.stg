@@ -162,7 +162,9 @@ export default class <parser.name> extends <superClass; null="antlr4.Parser"> {
 <parser.tokens:{k | <parser.name>.<k> = <parser.tokens.(k)>;}; separator="\n", wrap, anchor>
 <endif>
 
+<if(parser.rules)>
 <parser.rules:{r | <parser.name>.RULE_<r.name> = <r.index>;}; separator="\n", wrap, anchor>
+<endif>
 
 <funcs:{f | <ruleContexts(f)>}; separator="\n">
 
@@ -816,7 +818,9 @@ export default class <lexer.name> extends <if(superClass)><superClass><else>antl
 }
 
 <lexer.name>.EOF = antlr4.Token.EOF;
+<if(lexer.tokens)>
 <lexer.tokens:{k | <lexer.name>.<k> = <lexer.tokens.(k)>;}; separator="\n", wrap, anchor>
+<endif>
 
 <if(lexer.channels)>
 <lexer.channels:{c| <lexer.name>.<c> = <lexer.channels.(c)>;}; separator="\n">

@@ -132,7 +132,9 @@ class <parser.name> ( <if(superClass)><superClass><else>Parser<endif> ):
 
     symbolicNames = [ <parser.symbolicNames:{t | u<t>}; null="u\"\<INVALID>\"", separator=", ", wrap, anchor> ]
 
+    <if(parser.rules)>
     <parser.rules:{r | RULE_<r.name> = <r.index>}; separator="\n", wrap, anchor>
+    <endif>
 
     ruleNames =  [ <parser.ruleNames:{r | u"<r>"}; separator=", ", wrap, anchor> ]
 
@@ -775,7 +777,9 @@ class <lexer.name>(<if(superClass)><superClass><else>Lexer<endif>):
     <rest(lexer.modes):{m| <m> = <i>}; separator="\n">
 
 <endif>
+    <if(lexer.tokens)>
     <lexer.tokens:{k | <k> = <lexer.tokens.(k)>}; separator="\n", wrap, anchor>
+    <endif>
 
     channelNames = [ u"DEFAULT_TOKEN_CHANNEL", u"HIDDEN"<if (lexer.channels)>, <lexer.channels:{c| u"<c>"}; separator=", ", wrap, anchor><endif> ]
 

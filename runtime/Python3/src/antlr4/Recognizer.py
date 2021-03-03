@@ -11,6 +11,7 @@ from antlr4.error.ErrorListener import ProxyErrorListener, ConsoleErrorListener
 RecognitionException = None
 
 class Recognizer(object):
+    __slots__ = ('_listeners', '_interp', '_stateNumber')
 
     tokenTypeMapCache = dict()
     ruleIndexMapCache = dict()
@@ -33,7 +34,7 @@ class Recognizer(object):
         return major, minor
 
     def checkVersion(self, toolVersion):
-        runtimeVersion = "4.9"
+        runtimeVersion = "4.9.1"
         rvmajor, rvminor = self.extractVersion(runtimeVersion)
         tvmajor, tvminor = self.extractVersion(toolVersion)
         if rvmajor!=tvmajor or rvminor!=tvminor:

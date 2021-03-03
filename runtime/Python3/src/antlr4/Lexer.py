@@ -28,6 +28,11 @@ class TokenSource(object):
 
 
 class Lexer(Recognizer, TokenSource):
+    __slots__ = (
+        '_input', '_output', '_factory', '_tokenFactorySourcePair', '_token',
+        '_tokenStartCharIndex', '_tokenStartLine', '_tokenStartColumn',
+        '_hitEOF', '_channel', '_type', '_modeStack', '_mode', '_text'
+    )
 
     DEFAULT_MODE = 0
     MORE = -2
@@ -322,4 +327,3 @@ class Lexer(Recognizer, TokenSource):
             else:
                 # TODO: Do we lose character or line position information?
                 self._input.consume()
-

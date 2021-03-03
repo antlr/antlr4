@@ -22,28 +22,27 @@ $ git push origin 4.9-rc1
 $ git push upstream 4.9-rc1
 ```
 
-## Update submodules
+## Copy PHP runtime over
 
-Make sure you tell git to pull in the submodule (for every clone you do of antlr4):
+Bump version to 4.9 in `runtime/PHP/src/RuntimeMetaData.php` in separate repository and commit plus push.
 
-```bash
-git submodule init
+```
+cd ~/antlr/code/antlr-php-runtime
+... vi src/RuntimeMetaData.php ...
+git commit -a -m "Update PHP Runtime to latest version"
 ```
 
-Also bump version to 4.9 in `runtime/PHP/src/RuntimeMetaData.php`.
+them back over in the ANTLR repo:
 
-Update the runtime submodules by running the following command:
-
-```bash
-git submodule update --recursive
-git submodule update --remote --merge # might only need this last one but do both
 ```
-
-Make sure these changes go back to antlr4 repo:
-
-```bash
-git add runtime/PHP
-git commit -m "Update PHP Runtime to latest version"
+cd runtime
+mkdir PHP
+cp ~/antlr/code/antlr-php-runtime/LICENSE PHP
+cp ~/antlr/code/antlr-php-runtime/README.md PHP
+cp ~/antlr/code/antlr-php-runtime/composer.json PHP
+cp ~/antlr/code/antlr-php-runtime/phpcs.xml.dist PHP
+cp ~/antlr/code/antlr-php-runtime/phpstan.neon.dist PHP
+cp -r ~/antlr/code/antlr-php-runtime/src PHP
 ```
 
 ## Bump version
@@ -55,8 +54,7 @@ Edit the repository looking for 4.5 or whatever and update it. Bump version in t
  * runtime/Python2/src/antlr4/Recognizer.py
  * runtime/Python3/setup.py
  * runtime/Python3/src/antlr4/Recognizer.py
- * runtime/CSharp/runtime/CSharp/Antlr4.Runtime/Properties/AssemblyInfo.cs
- * runtime/CSharp/runtime/CSharp/Antlr4.Runtime/Antlr4.Runtime.dotnet.csproj
+ * runtime/CSharp/src/Antlr4.csproj
  * runtime/PHP/src/RuntimeMetaData.php
  * runtime/JavaScript/package.json
  * runtime/JavaScript/src/antlr4/Recognizer.js
@@ -78,10 +76,15 @@ Edit the repository looking for 4.5 or whatever and update it. Bump version in t
  * tool/src/org/antlr/v4/codegen/Target.java
  * tool/resources/org/antlr/v4/tool/templates/codegen/Swift/Swift.stg
  
-Here is a simple script to display any line from the critical files with, say, `4.5` in it:
+Here is a simple script to display any line from the critical files with, say, `4.9` in it:
 
 ```bash
-find tool runtime -type f -exec grep -l '4\.6' {} \;
+mvn clean
+rm -rf runtime/CSharp/src/bin
+rm -rf runtime/CSharp/src/obj
+rm -rf runtime/gen
+find tool runtime -type f -exec grep -l '4\.9' {} \;
+find runtime runtime -type f -exec grep -l '4\.9' {} \;
 ```
 
 Commit to repository.
@@ -142,6 +145,7 @@ The goal is to get a snapshot, such as `4.9-SNAPSHOT`, to the staging server: [a
 Do this:
 
 ```bash
+$ mvn install -DskipTests  # seems required to get the jar files visible to maven
 $ mvn deploy -DskipTests
 ...
 [INFO] --- maven-deploy-plugin:2.7:deploy (default-deploy) @ antlr4-tool-testsuite ---
@@ -289,6 +293,7 @@ cd runtime/JavaScript
 ```bash
 cd runtime/JavaScript
 npm update
+npm install
 npm run build 
 npm login
 npm publish   # don't put antlr4 on there or it will try to push the old version for some reason
@@ -311,9 +316,16 @@ Now we have [appveyor create artifact](https://ci.appveyor.com/project/parrt/ant
 
 Of course you need Mono and `nuget` to be installed. On mac:
 
-- .NET build tools - can be loaded from [here](https://www.visualstudio.com/downloads/)
+- .NET build tools - can be loaded from [here](https://www.visualstudio.com/downloads/) (I need dotnet 5 and 3.1 versions)
 - nuget - download [nuget.exe](https://www.nuget.org/downloads)
 - dotnet - follow [the instructions here](https://www.microsoft.com/net/core)
+
+From @kvanTTT: Install `dotnet` on any platform (see https://dotnet.microsoft.com/download) and run the following command on any OS (Win, Linux, macOS):
+
+* building: `dotnet build runtime/CSharp/src/Antlr4.csproj -c Release`
+  Output `.dll` will be in `runtime/CSharp/src/bin/Release/netstandard2.0` or in `runtime/CSharp/src/bin/Release/netstandard2.1`
+* packing: `dotnet pack runtime/CSharp/src/Antlr4.csproj -c Release`
+  Output `.nupkg` will be in `runtime/CSharp/src/bin/Release/Antlr4.Runtime.Standard.4.9.1.nupkg`
 
 Alternatively, you can install Visual Studio 2017 and make sure to check boxes with .NET Core SDK.
 
@@ -448,6 +460,8 @@ popd
 ```
 
 ### Dart
+
+Install Dart SDK from https://dart.dev/get-dart
 
 Push to pub.dev
 

@@ -281,6 +281,12 @@ YYYY/MM/DD, github id, Full name, email
 2020/10/20, adamwojs, Adam Wójs, adam[at]wojs.pl
 2020/10/24, cliid, Jiwu Jang, jiwujang@naver.com
 2020/11/05, MichelHartmann, Michel Hartmann, MichelHartmann@users.noreply.github.com
+2020/11/26, mr-c, Michael R. Crusoe, 1330696+mr-c@users.noreply.github.com
 2020/12/01, maxence-lefebvre, Maxence Lefebvre, maxence-lefebvre@users.noreply.github.com
 2020/12/03, electrum, David Phillips, david@acz.org
-2020/12/05, xTachyon, Damian Andrei, xTachyon@users.noreply.github.com
+2021/01/25, l215884529, Qiheng Liu, 13607681+l215884529@users.noreply.github.com
+2021/02/02, tsotnikov, Taras Sotnikov, taras.sotnikov@gmail.com
+2021/02/21, namasikanam, Xingyu Xie, namasikanam@gmail.com
+2021/02/27, khmarbaise, Karl Heinz Marbaise, github@soebes.com
+2021/03/02, hackeris
+2021/03/03, xTachyon, Damian Andrei, xTachyon@users.noreply.github.com

@@ -47,7 +47,7 @@ public class BasePython2Test extends BasePythonTest {
 								: "") + "\n" + "if __name__ == '__main__':\n"
 						+ "    main(sys.argv)\n" + "\n");
 		outputFileST.add("lexerName", lexerName);
-		writeFile(tmpdir, "Test.py", outputFileST.render());
+		writeFile(getTempDirPath(), "Test.py", outputFileST.render());
 	}
 
 	@Override
@@ -105,6 +105,6 @@ public class BasePython2Test extends BasePythonTest {
 		outputFileST.add("listenerName", listenerName);
 		outputFileST.add("visitorName", visitorName);
 		outputFileST.add("parserStartRuleName", parserStartRuleName);
-		writeFile(tmpdir, "Test.py", outputFileST.render());
+		writeFile(getTempDirPath(), "Test.py", outputFileST.render());
 	}
 }

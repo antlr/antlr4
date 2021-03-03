@@ -7,7 +7,7 @@
 
 using namespace antlr4;
 
-const std::string RuntimeMetaData::VERSION = "4.9";
+const std::string RuntimeMetaData::VERSION = "4.9.1";
 
 std::string RuntimeMetaData::getRuntimeVersion() {
   return VERSION;
