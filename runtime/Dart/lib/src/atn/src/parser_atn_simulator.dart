@@ -286,12 +286,15 @@ class ParserATNSimulator extends ATNSimulator {
   // LAME globals to avoid parameters!!!!! I need these down deep in predTransition
   TokenStream input;
   int startIndex = 0;
-  ParserRuleContext _outerContext;
-  DFA _dfa;
+  ParserRuleContext? _outerContext;
+  DFA? _dfa;
 
-  ParserATNSimulator(this.parser, ATN atn, this.decisionToDFA,
-      PredictionContextCache sharedContextCache)
-      : super(atn, sharedContextCache) {
+  ParserATNSimulator(
+    this.parser,
+    ATN atn,
+    this.decisionToDFA,
+    PredictionContextCache sharedContextCache,
+  ) : super(atn, sharedContextCache) {
     //		DOTGenerator dot = new DOTGenerator(null);
     //		log(dot.getDOT(atn.rules.get(0), parser.getRuleNames()));
     //		log(dot.getDOT(atn.rules.get(1), parser.getRuleNames()));
@@ -308,7 +311,10 @@ class ParserATNSimulator extends ATNSimulator {
   }
 
   int adaptivePredict(
-      TokenStream input_, int decision, ParserRuleContext outerContext) {
+    TokenStream input_,
+    int decision,
+    ParserRuleContext outerContext,
+  ) {
     if (debug || debug_list_atn_decisions) {
       log('adaptivePredict decision $decision' ' exec LA(1)==' +
           getLookaheadName(input_) +
@@ -562,11 +568,10 @@ class ParserATNSimulator extends ATNSimulator {
 
     if (debug) {
       final altSubSets =
-      PredictionModeExtension.getConflictingAltSubsets(reach);
-      log(
-          'SLL altSubSets=$altSubSets' ', configs=$reach' ', predict=$predictedAlt, allSubsetsConflict=${PredictionModeExtension
-              .allSubsetsConflict(
-              altSubSets)}, conflictingAlts=${getConflictingAlts(reach)}');
+          PredictionModeExtension.getConflictingAltSubsets(reach);
+      log('SLL altSubSets=$altSubSets'
+          ', configs=$reach'
+          ', predict=$predictedAlt, allSubsetsConflict=${PredictionModeExtension.allSubsetsConflict(altSubSets)}, conflictingAlts=${getConflictingAlts(reach)}');
     }
 
     if (predictedAlt != ATN.INVALID_ALT_NUMBER) {
@@ -652,8 +657,7 @@ class ParserATNSimulator extends ATNSimulator {
         // ATN states in SLL implies LL will also get nowhere.
         // If conflict in states that dip out, choose min since we
         // will get error no matter what.
-        final e =
-            noViableAlt(input, outerContext, previous, startIndex);
+        final e = noViableAlt(input, outerContext, previous, startIndex);
         input.seek(startIndex);
         final alt = getSynValidOrSemInvalidAltThatFinishedDecisionEntryRule(
             previous, outerContext);
@@ -666,7 +670,9 @@ class ParserATNSimulator extends ATNSimulator {
       final altSubSets =
           PredictionModeExtension.getConflictingAltSubsets(reach);
       if (debug) {
-        log('LL altSubSets=$altSubSets' ', predict=${PredictionModeExtension.getUniqueAlt(altSubSets)}' ', resolvesToJustOneViableAlt=${PredictionModeExtension.resolvesToJustOneViableAlt(altSubSets)}');
+        log('LL altSubSets=$altSubSets'
+            ', predict=${PredictionModeExtension.getUniqueAlt(altSubSets)}'
+            ', resolvesToJustOneViableAlt=${PredictionModeExtension.resolvesToJustOneViableAlt(altSubSets)}');
       }
 
 //			log("altSubSets: "+altSubSets);
@@ -740,8 +746,8 @@ class ParserATNSimulator extends ATNSimulator {
 		the fact that we should predict alternative 1.  We just can't say for
 		sure that there is an ambiguity without looking further.
 		*/
-    reportAmbiguity(dfa, D, startIndex, input.index, foundExactAmbig,
-        reach.alts, reach);
+    reportAmbiguity(
+        dfa, D, startIndex, input.index, foundExactAmbig, reach.alts, reach);
 
     return predictedAlt;
   }
@@ -907,8 +913,7 @@ class ParserATNSimulator extends ATNSimulator {
         final nextTokens = atn.nextTokens(config.state);
         if (nextTokens.contains(Token.EPSILON)) {
           ATNState endOfRuleState = atn.ruleToStopState[config.state.ruleIndex];
-          result.add(
-              ATNConfig.dup(config, state: endOfRuleState), mergeCache);
+          result.add(ATNConfig.dup(config, state: endOfRuleState), mergeCache);
         }
       }
     }
@@ -918,8 +923,7 @@ class ParserATNSimulator extends ATNSimulator {
 
   ATNConfigSet computeStartState(ATNState p, RuleContext ctx, bool fullCtx) {
     // always at least the implicit call to start rule
-    final initialContext =
-        PredictionContext.fromRuleContext(atn, ctx);
+    final initialContext = PredictionContext.fromRuleContext(atn, ctx);
     final configs = ATNConfigSet(fullCtx);
 
     for (var i = 0; i < p.numberOfTransitions; i++) {
@@ -1112,8 +1116,7 @@ class ParserATNSimulator extends ATNSimulator {
       statesFromAlt1[config.state.stateNumber] = config.context;
       if (updatedContext != config.semanticContext) {
         configSet.add(
-            ATNConfig.dup(config, semanticContext: updatedContext),
-            mergeCache);
+            ATNConfig.dup(config, semanticContext: updatedContext), mergeCache);
       } else {
         configSet.add(config, mergeCache);
       }
@@ -1263,8 +1266,7 @@ class ParserATNSimulator extends ATNSimulator {
   /// identified and {@link #adaptivePredict} should report an error instead.
   int getSynValidOrSemInvalidAltThatFinishedDecisionEntryRule(
       ATNConfigSet configs, ParserRuleContext outerContext) {
-    final sets =
-        splitAccordingToSemanticValidity(configs, outerContext);
+    final sets = splitAccordingToSemanticValidity(configs, outerContext);
     final semValidConfigs = sets.a;
     final semInvalidConfigs = sets.b;
     var alt = getAltThatFinishedDecisionEntryRule(semValidConfigs);
@@ -1446,8 +1448,7 @@ class ParserATNSimulator extends ATNSimulator {
             continue;
           }
           final returnState = atn.states[config.context.getReturnState(i)];
-          final newContext =
-              config.context.getParent(i); // "pop" return state
+          final newContext = config.context.getParent(i); // "pop" return state
           final c = ATNConfig(
               returnState, config.alt, newContext, config.semanticContext);
           // While we have context to pop back from, we may have
@@ -1795,8 +1796,7 @@ class ParserATNSimulator extends ATNSimulator {
       } else {
         final newSemCtx =
             SemanticContext.and(config.semanticContext, pt.predicate);
-        c = ATNConfig.dup(config,
-            state: pt.target, semanticContext: newSemCtx);
+        c = ATNConfig.dup(config, state: pt.target, semanticContext: newSemCtx);
       }
     } else {
       c = ATNConfig.dup(config, state: pt.target);
@@ -1809,7 +1809,9 @@ class ParserATNSimulator extends ATNSimulator {
   ATNConfig predTransition(ATNConfig config, PredicateTransition pt,
       bool collectPredicates, bool inContext, bool fullCtx) {
     if (debug) {
-      log('PRED (collectPredicates=$collectPredicates) ' '${pt.ruleIndex}:${pt.predIndex}' ', ctx dependent=${pt.isCtxDependent}');
+      log('PRED (collectPredicates=$collectPredicates) '
+          '${pt.ruleIndex}:${pt.predIndex}'
+          ', ctx dependent=${pt.isCtxDependent}');
       if (parser != null) {
         log('context surrounding pred is ${parser.getRuleInvocationStack()}');
       }
@@ -1834,8 +1836,7 @@ class ParserATNSimulator extends ATNSimulator {
       } else {
         final newSemCtx =
             SemanticContext.and(config.semanticContext, pt.predicate);
-        c = ATNConfig.dup(config,
-            state: pt.target, semanticContext: newSemCtx);
+        c = ATNConfig.dup(config, state: pt.target, semanticContext: newSemCtx);
       }
     } else {
       c = ATNConfig.dup(config, state: pt.target);
@@ -1866,8 +1867,7 @@ class ParserATNSimulator extends ATNSimulator {
   /// conflicting alternative subsets. If [configs] does not contain any
   /// conflicting subsets, this method returns an empty [BitSet].
   BitSet getConflictingAlts(ATNConfigSet configs) {
-    final altsets =
-        PredictionModeExtension.getConflictingAltSubsets(configs);
+    final altsets = PredictionModeExtension.getConflictingAltSubsets(configs);
     return PredictionModeExtension.getAlts(altsets);
   }
 
@@ -1921,9 +1921,8 @@ class ParserATNSimulator extends ATNSimulator {
       return 'EOF';
     }
 
-    final vocabulary = parser != null
-        ? parser.vocabulary
-        : VocabularyImpl.EMPTY_VOCABULARY;
+    final vocabulary =
+        parser != null ? parser.vocabulary : VocabularyImpl.EMPTY_VOCABULARY;
     final displayName = vocabulary.getDisplayName(t);
     if (displayName == t.toString()) {
       return displayName;
@@ -2057,7 +2056,8 @@ class ParserATNSimulator extends ATNSimulator {
       ATNConfigSet configs, int startIndex, int stopIndex) {
     if (debug || retry_debug) {
       final interval = Interval.of(startIndex, stopIndex);
-      log('reportAttemptingFullContext decision=${dfa.decision}:$configs' ', input=' +
+      log('reportAttemptingFullContext decision=${dfa.decision}:$configs'
+              ', input=' +
           parser.tokenStream.getText(interval));
     }
     if (parser != null) {
@@ -2070,7 +2070,8 @@ class ParserATNSimulator extends ATNSimulator {
       int startIndex, int stopIndex) {
     if (debug || retry_debug) {
       final interval = Interval.of(startIndex, stopIndex);
-      log('reportContextSensitivity decision=${dfa.decision}:$configs' ', input=' +
+      log('reportContextSensitivity decision=${dfa.decision}:$configs'
+              ', input=' +
           parser.tokenStream.getText(interval));
     }
     if (parser != null) {
@@ -2125,6 +2126,7 @@ enum PredictionMode {
   /// This prediction mode does not provide any guarantees for prediction
   /// behavior for syntactically-incorrect inputs.</p>
   SLL,
+
   /// The LL(*) prediction mode. This prediction mode allows the current parser
   /// context to be used for resolving SLL conflicts that occur during
   /// prediction. This is the fastest prediction mode that guarantees correct
@@ -2142,6 +2144,7 @@ enum PredictionMode {
   /// This prediction mode does not provide any guarantees for prediction
   /// behavior for syntactically-incorrect inputs.</p>
   LL,
+
   /// The LL(*) prediction mode with exact ambiguity detection. In addition to
   /// the correctness guarantees provided by the {@link #LL} prediction mode,
   /// this prediction mode instructs the prediction algorithm to determine the
@@ -2561,7 +2564,7 @@ extension PredictionModeExtension on PredictionMode {
   /// </pre>
   static List<BitSet> getConflictingAltSubsets(ATNConfigSet configs) {
     final configToAlts =
-    HashMap<ATNConfig, BitSet>(equals: (ATNConfig a, ATNConfig b) {
+        HashMap<ATNConfig, BitSet>(equals: (ATNConfig a, ATNConfig b) {
       if (identical(a, b)) return true;
       if (a == null || b == null) return false;
       return a.state.stateNumber == b.state.stateNumber &&

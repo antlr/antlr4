@@ -327,8 +327,7 @@ abstract class Parser extends Recognizer<ParserATNSimulator> {
 
     var result = bypassAltsAtnCache[serializedAtn];
     if (result == null) {
-      final deserializationOptions =
-          ATNDeserializationOptions();
+      final deserializationOptions = ATNDeserializationOptions();
       deserializationOptions.setGenerateRuleBypassTransitions(true);
       result = ATNDeserializer(deserializationOptions)
           .deserialize(serializedAtn.codeUnits);
@@ -385,8 +384,11 @@ abstract class Parser extends Recognizer<ParserATNSimulator> {
     return _input.LT(1);
   }
 
-  void notifyErrorListeners(String msg,
-      [Token offendingToken, RecognitionException e]) {
+  void notifyErrorListeners(
+    String msg, [
+    Token? offendingToken,
+    RecognitionException? e,
+  ]) {
     offendingToken = offendingToken ?? currentToken;
     _syntaxErrors++;
     var line = -1;
@@ -396,7 +398,13 @@ abstract class Parser extends Recognizer<ParserATNSimulator> {
 
     final listener = errorListenerDispatch;
     listener.syntaxError(
-        this, offendingToken, line, charPositionInLine, msg, e);
+      this,
+      offendingToken,
+      line,
+      charPositionInLine,
+      msg,
+      e,
+    );
   }
 
   /// Consume and return the {@linkplain #getCurrentToken current symbol}.
@@ -745,7 +753,11 @@ abstract class Parser extends Recognizer<ParserATNSimulator> {
       }
     } else if (interp is ProfilingATNSimulator) {
       final sim = ParserATNSimulator(
-          this, getATN(), interp.decisionToDFA, interp.sharedContextCache);
+        this,
+        getATN(),
+        interp.decisionToDFA,
+        interp.sharedContextCache,
+      );
       interpreter = sim;
     }
     interpreter.predictionMode = saveMode;

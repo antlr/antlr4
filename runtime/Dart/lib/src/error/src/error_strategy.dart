@@ -253,7 +253,8 @@ class DefaultErrorStrategy implements ErrorStrategy {
       recognizer.consume();
     }
     lastErrorIndex = recognizer.inputStream.index;
-    lastErrorStates ??= IntervalSet(); lastErrorStates.addOne(recognizer.state);
+    lastErrorStates ??= IntervalSet();
+    lastErrorStates.addOne(recognizer.state);
     final followSet = getErrorRecoverySet(recognizer);
     consumeUntil(recognizer, followSet);
   }
@@ -408,8 +409,7 @@ class DefaultErrorStrategy implements ErrorStrategy {
   /// @param recognizer the parser instance
   /// @param e the recognition exception
   void reportFailedPredicate(Parser recognizer, FailedPredicateException e) {
-    final ruleName =
-        recognizer.ruleNames[recognizer.context.ruleIndex];
+    final ruleName = recognizer.ruleNames[recognizer.context.ruleIndex];
     final msg = 'rule ' + ruleName + ' ' + e.message;
     recognizer.notifyErrorListeners(msg, e.offendingToken, e);
   }
@@ -576,8 +576,7 @@ class DefaultErrorStrategy implements ErrorStrategy {
     // if current token is consistent with what could come after current
     // ATN state, then we know we're missing a token; error recovery
     // is free to conjure up and insert the missing token
-    final currentState =
-        recognizer.interpreter.atn.states[recognizer.state];
+    final currentState = recognizer.interpreter.atn.states[recognizer.state];
     final next = currentState.transition(0).target;
     final atn = recognizer.interpreter.atn;
     final expectingAtLL2 = atn.nextTokens(next, recognizer.context);
@@ -665,14 +664,15 @@ class DefaultErrorStrategy implements ErrorStrategy {
       current = lookback;
     }
     return recognizer.tokenFactory.create(
-        expectedTokenType,
-        tokenText,
-        Pair(current.tokenSource, current.tokenSource.inputStream),
-        Token.DEFAULT_CHANNEL,
-        -1,
-        -1,
-        current.line,
-        current.charPositionInLine);
+      expectedTokenType,
+      tokenText,
+      Pair(current.tokenSource, current.tokenSource?.inputStream),
+      Token.DEFAULT_CHANNEL,
+      -1,
+      -1,
+      current.line,
+      current.charPositionInLine,
+    );
   }
 
   IntervalSet getExpectedTokens(Parser recognizer) {
@@ -699,7 +699,7 @@ class DefaultErrorStrategy implements ErrorStrategy {
     return escapeWSAndQuote(s);
   }
 
-  String getSymbolText(Token symbol) {
+  String? getSymbolText(Token symbol) {
     return symbol.text;
   }
 

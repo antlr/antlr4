@@ -34,8 +34,7 @@ class ParserInterpreter extends Parser {
   final ATN atn;
 
   List<DFA> decisionToDFA; // not shared like it is for generated parsers
-  final PredictionContextCache sharedContextCache =
-      PredictionContextCache();
+  final PredictionContextCache sharedContextCache = PredictionContextCache();
 
   @override
   final List<String> ruleNames;
@@ -113,7 +112,10 @@ class ParserInterpreter extends Parser {
     final startRuleStartState = atn.ruleToStartState[startRuleIndex];
 
     rootContext = createInterpreterRuleContext(
-        null, ATNState.INVALID_STATE_NUMBER, startRuleIndex);
+      null,
+      ATNState.INVALID_STATE_NUMBER,
+      startRuleIndex,
+    );
     if (startRuleStartState.isLeftRecursiveRule) {
       enterRecursionRule(
           rootContext, startRuleStartState.stateNumber, startRuleIndex, 0);
@@ -129,8 +131,7 @@ class ParserInterpreter extends Parser {
           if (context.isEmpty) {
             if (startRuleStartState.isLeftRecursiveRule) {
               final result = context;
-              final parentContext =
-                  _parentContextStack.removeLast();
+              final parentContext = _parentContextStack.removeLast();
               unrollRecursionContexts(parentContext.a);
               return result;
             } else {
@@ -160,8 +161,7 @@ class ParserInterpreter extends Parser {
   @override
   void enterRecursionRule(
       ParserRuleContext localctx, int state, int ruleIndex, int precedence) {
-    final pair =
-        Pair<ParserRuleContext, int>(context, localctx.invokingState);
+    final pair = Pair<ParserRuleContext, int>(context, localctx.invokingState);
     _parentContextStack.add(pair);
     super.enterRecursionRule(localctx, state, ruleIndex, precedence);
   }
@@ -279,15 +279,17 @@ class ParserInterpreter extends Parser {
   /// Provide simple "factory" for InterpreterRuleContext's.
   ///  @since 4.5.1
   InterpreterRuleContext createInterpreterRuleContext(
-      ParserRuleContext parent, int invokingStateNumber, int ruleIndex) {
+    ParserRuleContext? parent,
+    int invokingStateNumber,
+    int ruleIndex,
+  ) {
     return InterpreterRuleContext(parent, invokingStateNumber, ruleIndex);
   }
 
   void visitRuleStopState(ATNState p) {
     final ruleStartState = atn.ruleToStartState[p.ruleIndex];
     if (ruleStartState.isLeftRecursiveRule) {
-      final parentContext =
-          _parentContextStack.removeLast();
+      final parentContext = _parentContextStack.removeLast();
       unrollRecursionContexts(parentContext.a);
       state = parentContext.b;
     } else {
