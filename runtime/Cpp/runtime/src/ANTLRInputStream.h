@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -27,9 +27,8 @@ namespace antlr4 {
 
 #if __cplusplus >= 201703L
     ANTLRInputStream(std::string_view input = "");
-#else
-    ANTLRInputStream(const std::string &input = "");
 #endif
+    ANTLRInputStream(const std::string &input = "");
     ANTLRInputStream(const char data_[], size_t numberOfActualCharsInArray);
     ANTLRInputStream(std::istream &stream);
 
