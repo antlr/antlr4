@@ -88,6 +88,8 @@ if(ANTLR4_ZIP_REPOSITORY)
       CMAKE_CACHE_ARGS
           -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
           -DWITH_STATIC_CRT:BOOL=${ANTLR4_WITH_STATIC_CRT}
+          # -DCMAKE_CXX_STANDARD:STRING=17 # if desired, compile the runtime with a different C++ standard
+          # -DCMAKE_CXX_STANDARD:STRING=${CMAKE_CXX_STANDARD} # alternatively, compile the runtime with the same C++ standard as the outer project
       INSTALL_COMMAND ""
       EXCLUDE_FROM_ALL 1)
 else()
@@ -104,6 +106,8 @@ else()
       CMAKE_CACHE_ARGS
           -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
           -DWITH_STATIC_CRT:BOOL=${ANTLR4_WITH_STATIC_CRT}
+          # -DCMAKE_CXX_STANDARD:STRING=17 # if desired, compile the runtime with a different C++ standard
+          # -DCMAKE_CXX_STANDARD:STRING=${CMAKE_CXX_STANDARD} # alternatively, compile the runtime with the same C++ standard as the outer project
       INSTALL_COMMAND ""
       EXCLUDE_FROM_ALL 1)
 endif()
