@@ -38,18 +38,18 @@ class ParserRuleContext extends RuleContext {
   ///  with this rule's context. This is empty for parsing w/o tree constr.
   ///  operation because we don't the need to track the details about
   ///  how we parse this rule.
-  List<ParseTree> children;
+  List<ParseTree>? children;
 
   /// Get the initial/final token in this context.
   /// Note that the range from start to stop is inclusive, so for rules that do not consume anything
   /// (for example, zero length or error productions) this token may exceed stop.
-  Token start, stop;
+  late Token start, stop; // Todo: keep an eye on this late
 
   /// The exception that forced this rule to return. If the rule successfully
   /// completed, this is null.
-  RecognitionException exception;
+  RecognitionException? exception;
 
-  ParserRuleContext([RuleContext parent, int invokingStateNumber])
+  ParserRuleContext([RuleContext? parent, int? invokingStateNumber])
       : super(parent: parent, invokingState: invokingStateNumber);
 
   /// COPY a ctx (I'm deliberately not using copy constructor) to avoid
@@ -74,7 +74,7 @@ class ParserRuleContext extends RuleContext {
     if (ctx.children != null) {
       children = [];
       // reset parent pointer for any error nodes
-      for (var child in ctx.children) {
+      for (var child in ctx.children!) {
         if (child is ErrorNode) {
           addChild(child);
         }
@@ -100,7 +100,7 @@ class ParserRuleContext extends RuleContext {
   ///  @since 4.7
   T addAnyChild<T extends ParseTree>(T t) {
     children ??= [];
-    children.add(t);
+    children!.add(t);
     return t;
   }
 
@@ -114,7 +114,7 @@ class ParserRuleContext extends RuleContext {
   ///
   /// @since 4.7
   ErrorNode addErrorNode(ErrorNode errorNode) {
-    errorNode.parent=this;
+    errorNode.parent = this;
     return addAnyChild(errorNode);
   }
 
@@ -123,27 +123,26 @@ class ParserRuleContext extends RuleContext {
   ///  generic ruleContext object.
   void removeLastChild() {
     if (children != null) {
-      children.removeLast();
+      children!.removeLast();
     }
   }
 
   // Override to make type more specific
   @override
-  ParserRuleContext get parent {
-    return super.parent;
+  ParserRuleContext? get parent {
+    return super.parent as ParserRuleContext;
   }
 
   @override
-  ParseTree getChild<T>(int i) {
-    if (children == null || i < 0 || i >= children.length) {
+  T? getChild<T extends ParseTree>(int i) {
+    if (children == null || i < 0 || i >= children!.length) {
       return null;
     }
-
-    if (T == null) {
-      return children[i];
+    if (T == ParseTree) {
+      return children![i] as T;
     }
     var j = -1; // what element have we found with ctxType?
-    for (var o in children) {
+    for (var o in children!) {
       if (o is T) {
         j++;
         if (j == i) {
@@ -154,13 +153,13 @@ class ParserRuleContext extends RuleContext {
     return null;
   }
 
-  TerminalNode getToken(int ttype, int i) {
-    if (children == null || i < 0 || i >= children.length) {
+  TerminalNode? getToken(int ttype, int i) {
+    if (children == null || i < 0 || i >= children!.length) {
       return null;
     }
 
     var j = -1; // what token with ttype have we found?
-    for (var o in children) {
+    for (var o in children!) {
       if (o is TerminalNode) {
         final tnode = o;
         final symbol = tnode.symbol;
@@ -181,26 +180,21 @@ class ParserRuleContext extends RuleContext {
       return [];
     }
 
-    List<TerminalNode> tokens;
-    for (var o in children) {
+    var tokens = <TerminalNode>[];
+    for (var o in children!) {
       if (o is TerminalNode) {
         final tnode = o;
         final symbol = tnode.symbol;
         if (symbol.type == ttype) {
-          tokens ??= [];
           tokens.add(tnode);
         }
       }
     }
 
-    if (tokens == null) {
-      return [];
-    }
-
     return tokens;
   }
 
-  T getRuleContext<T extends ParserRuleContext>(int i) {
+  T? getRuleContext<T extends ParserRuleContext>(int i) {
     return getChild<T>(i);
   }
 
@@ -209,17 +203,11 @@ class ParserRuleContext extends RuleContext {
       return [];
     }
 
-    List<T> contexts;
-    for (var o in children) {
+    var contexts = <T>[];
+    for (var o in children!) {
       if (o is T) {
-        contexts ??= [];
-
         contexts.add(o);
       }
-    }
-
-    if (contexts == null) {
-      return [];
     }
 
     return contexts;
@@ -270,6 +258,8 @@ class InterpreterRuleContext extends ParserRuleContext {
   /// @param invokingStateNumber The invoking state number.
   /// @param ruleIndex The rule index for the current context.
   InterpreterRuleContext(
-      ParserRuleContext parent, int invokingStateNumber, this.ruleIndex)
-      : super(parent, invokingStateNumber);
+    ParserRuleContext? parent,
+    int invokingStateNumber,
+    this.ruleIndex,
+  ) : super(parent, invokingStateNumber);
 }

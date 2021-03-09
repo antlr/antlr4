@@ -196,8 +196,7 @@ abstract class PredictionContext {
 
     if (a.returnState == b.returnState) {
       // a == b
-      final parent =
-          merge(a.parent, b.parent, rootIsWildcard, mergeCache);
+      final parent = merge(a.parent, b.parent, rootIsWildcard, mergeCache);
       // if parent is same as existing a or b parent or reduced to a parent, return it
       if (parent == a.parent) return a; // ax + bx = ax, if a=b
       if (parent == b.parent) return b; // ax + bx = bx, if a=b
@@ -294,16 +293,14 @@ abstract class PredictionContext {
         // $ + x = [x,$]
         final payloads = <int>[b.returnState, EMPTY_RETURN_STATE];
         final parents = <PredictionContext>[b.parent, null];
-        PredictionContext joined =
-            ArrayPredictionContext(parents, payloads);
+        PredictionContext joined = ArrayPredictionContext(parents, payloads);
         return joined;
       }
       if (b == EMPTY) {
         // x + $ = [x,$] ($ is always last if present)
         final payloads = <int>[a.returnState, EMPTY_RETURN_STATE];
         final parents = [a.parent, null];
-        PredictionContext joined =
-            ArrayPredictionContext(parents, payloads);
+        PredictionContext joined = ArrayPredictionContext(parents, payloads);
         return joined;
       }
     }
@@ -440,8 +437,7 @@ abstract class PredictionContext {
   /// Make pass over all <em>M</em> [parents]; merge any {@code equals()}
   /// ones.
   static void combineCommonParents(List<PredictionContext> parents) {
-    final uniqueParents =
-        <PredictionContext, PredictionContext>{};
+    final uniqueParents = <PredictionContext, PredictionContext>{};
 
     for (var p = 0; p < parents.length; p++) {
       final parent = parents[p];
@@ -573,8 +569,8 @@ abstract class PredictionContext {
           parents[0], context.getReturnState(0));
     } else {
       ArrayPredictionContext arrayPredictionContext = context;
-      updated = ArrayPredictionContext(
-          parents, arrayPredictionContext.returnStates);
+      updated =
+          ArrayPredictionContext(parents, arrayPredictionContext.returnStates);
     }
 
     contextCache.add(updated);
@@ -609,8 +605,7 @@ abstract class PredictionContext {
   // ter's recursive version of Sam's getAllNodes()
   static List<PredictionContext> getAllContextNodes(PredictionContext context) {
     final nodes = <PredictionContext>[];
-    final visited =
-        <PredictionContext, PredictionContext>{};
+    final visited = <PredictionContext, PredictionContext>{};
     getAllContextNodes_(context, nodes, visited);
     return nodes;
   }
@@ -693,7 +688,7 @@ abstract class PredictionContext {
 }
 
 class SingletonPredictionContext extends PredictionContext {
-  final PredictionContext parent;
+  final PredictionContext? parent;
   final int returnState;
 
   SingletonPredictionContext(this.parent, this.returnState)
@@ -801,10 +796,11 @@ class ArrayPredictionContext extends PredictionContext {
       : this([a.parent], [a.returnState]);
 
   ArrayPredictionContext(
-      List<PredictionContext> parents, List<int> returnStates)
-      : super(PredictionContext.calculateHashCode(parents, returnStates)) {
-    assert(parents != null && parents.isNotEmpty);
-    assert(returnStates != null && returnStates.isNotEmpty);
+    List<PredictionContext> parents,
+    List<int> returnStates,
+  ) : super(PredictionContext.calculateHashCode(parents, returnStates)) {
+    assert(parents.isNotEmpty);
+    assert(returnStates.isNotEmpty);
 //		System.err.println("CREATE ARRAY: "+Arrays.toString(parents)+", "+Arrays.toString(returnStates));
     this.parents = parents;
     this.returnStates = returnStates;

@@ -154,7 +154,7 @@ class BitSet {
 
   BitSet clone() {
     final result = BitSet();
-    result._data = List.from(_data);
+    result._data = Uint32List.fromList(_data);
     return result;
   }
 

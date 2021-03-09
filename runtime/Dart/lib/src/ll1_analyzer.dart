@@ -68,13 +68,25 @@ class LL1Analyzer {
   /// @return The set of tokens that can follow [s] in the ATN in the
   /// specified [ctx].
 
-  IntervalSet LOOK(ATNState s, RuleContext ctx, [ATNState stopState]) {
+  IntervalSet LOOK(
+    ATNState s,
+    RuleContext ctx, [
+    ATNState? stopState,
+  ]) {
     final r = IntervalSet();
     final seeThruPreds = true; // ignore preds; get all lookahead
     final lookContext =
         ctx != null ? PredictionContext.fromRuleContext(s.atn, ctx) : null;
     _LOOK(
-        s, stopState, lookContext, r, <ATNConfig>{}, BitSet(), seeThruPreds, true);
+      s,
+      stopState,
+      lookContext,
+      r,
+      <ATNConfig>{},
+      BitSet(),
+      seeThruPreds,
+      true,
+    );
     return r;
   }
 
@@ -108,8 +120,8 @@ class LL1Analyzer {
   /// is null.
   void _LOOK(
       ATNState s,
-      ATNState stopState,
-      PredictionContext ctx,
+      ATNState? stopState,
+      PredictionContext? ctx,
       IntervalSet look,
       Set<ATNConfig> lookBusy,
       BitSet calledRuleStack,

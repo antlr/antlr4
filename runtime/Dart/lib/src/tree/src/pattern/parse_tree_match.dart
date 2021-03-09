@@ -23,13 +23,12 @@ class ParseTreeMatch {
   /// Get the parse tree we are trying to match to a pattern.
   ///
   /// @return The [ParseTree] we are trying to match to a pattern.
-  final ParseTree tree;
+  final ParseTree tree; //Todo: may never be null
 
   /// Get the tree pattern we are matching against.
   ///
   /// @return The tree pattern we are matching against.
-  final ParseTreePattern pattern;
-
+  final ParseTreePattern pattern; //Todo: may never be null
 
   /// Return a mapping from label &rarr; [list of nodes].
   ///
@@ -39,13 +38,13 @@ class ParseTreeMatch {
   ///
   /// @return A mapping from labels to parse tree nodes. If the parse tree
   /// pattern did not contain any rule or token tags, this map will be empty.
-  final MultiMap<String, ParseTree> labels;
+  final MultiMap<String, ParseTree> labels; //Todo: may never be null
 
   /// Get the node at which we first detected a mismatch.
   ///
   /// @return the node at which we first detected a mismatch, or null
   /// if the match was successful.
-  final ParseTree mismatchedNode;
+  final ParseTree? mismatchedNode;
 
   /// Constructs a new instance of [ParseTreeMatch] from the specified
   /// parse tree and pattern.
@@ -57,22 +56,7 @@ class ParseTreeMatch {
   /// @param mismatchedNode The first node which failed to match the tree
   /// pattern during the matching process.
   ///
-  /// @exception ArgumentError.notNull) if [tree] is null
-  /// @exception ArgumentError.notNull) if [pattern] is null
-  /// @exception ArgumentError.notNull) if [labels] is null
-  ParseTreeMatch(this.tree, this.pattern, this.labels, this.mismatchedNode) {
-    if (tree == null) {
-      throw ArgumentError.notNull('tree');
-    }
-
-    if (pattern == null) {
-      throw ArgumentError.notNull('pattern');
-    }
-
-    if (labels == null) {
-      throw ArgumentError.notNull('labels');
-    }
-  }
+  ParseTreeMatch(this.tree, this.pattern, this.labels, this.mismatchedNode);
 
   /// Get the last node associated with a specific [label].
   ///
@@ -89,7 +73,7 @@ class ParseTreeMatch {
   /// @return The last [ParseTree] to match a tag with the specified
   /// label, or null if no parse tree matched a tag with the label.
 
-  ParseTree get(String label) {
+  ParseTree? get(String label) {
     final parseTrees = labels[label];
     if (parseTrees == null || parseTrees.isEmpty) {
       return null;
@@ -157,7 +141,6 @@ class ParseTreePattern {
   /// @return The tree pattern in concrete syntax form.
   final String pattern;
 
-
   /// Get the tree pattern as a [ParseTree]. The rule and token tags from
   /// the pattern are present in the parse tree as terminal nodes with a symbol
   /// of type [RuleTagToken] or [TokenTagToken].
@@ -180,7 +163,11 @@ class ParseTreePattern {
   /// tree pattern.
   /// @param patternTree The tree pattern in [ParseTree] form.
   ParseTreePattern(
-      this.matcher, this.pattern, this.patternRuleIndex, this.patternTree);
+    this.matcher,
+    this.pattern,
+    this.patternRuleIndex,
+    this.patternTree,
+  );
 
   /// Match a specific parse tree against this tree pattern.
   ///
@@ -302,13 +289,17 @@ class ParseTreePatternMatcher {
 
   /// Does [pattern] matched as rule patternRuleIndex match tree? Pass in a
   ///  compiled pattern instead of a string representation of a tree pattern.
-  bool matches(ParseTree tree,
-      {ParseTreePattern pattern, String patternStr, int patternRuleIndex}) {
-    pattern ??= compile(patternStr, patternRuleIndex);
+  bool matches(
+    ParseTree tree, {
+    ParseTreePattern? pattern,
+    String? patternStr,
+    int? patternRuleIndex,
+  }) {
+    assert(pattern != null || patternStr != null && patternRuleIndex != null);
+    pattern ??= compile(patternStr!, patternRuleIndex!);
 
     final labels = MultiMap<String, ParseTree>();
-    final mismatchedNode =
-        matchImpl(tree, pattern.patternTree, labels);
+    final mismatchedNode = matchImpl(tree, pattern.patternTree, labels);
     return mismatchedNode == null;
   }
 
@@ -317,13 +308,17 @@ class ParseTreePatternMatcher {
   /// node at which the match failed. Pass in a compiled pattern instead of a
   /// string representation of a tree pattern.
 
-  ParseTreeMatch match(ParseTree tree,
-      {ParseTreePattern pattern, String patternStr, int patternRuleIndex}) {
-    pattern ??= compile(patternStr, patternRuleIndex);
+  ParseTreeMatch match(
+    ParseTree tree, {
+    ParseTreePattern? pattern,
+    String? patternStr,
+    int? patternRuleIndex,
+  }) {
+    assert(pattern != null || patternStr != null && patternRuleIndex != null);
+    pattern ??= compile(patternStr!, patternRuleIndex!);
 
     final labels = MultiMap<String, ParseTree>();
-    final mismatchedNode =
-        matchImpl(tree, pattern.patternTree, labels);
+    final mismatchedNode = matchImpl(tree, pattern.patternTree, labels);
     return ParseTreeMatch(tree, pattern, labels, mismatchedNode);
   }
 
@@ -334,12 +329,8 @@ class ParseTreePatternMatcher {
     final tokenSrc = ListTokenSource(tokenList);
     final tokens = CommonTokenStream(tokenSrc);
 
-    final parserInterp = ParserInterpreter(
-        parser.grammarFileName,
-        parser.vocabulary,
-        parser.ruleNames,
-        parser.ATNWithBypassAlts,
-        tokens);
+    final parserInterp = ParserInterpreter(parser.grammarFileName,
+        parser.vocabulary, parser.ruleNames, parser.ATNWithBypassAlts, tokens);
 
     ParseTree tree;
     try {
@@ -351,7 +342,7 @@ class ParseTreePatternMatcher {
     } on RecognitionException {
       rethrow;
     } catch (e) {
-      throw CannotInvokeStartRule(e);
+      throw CannotInvokeStartRule(e as String);
     }
 
     // Make sure tree pattern compilation checks for a complete parse
@@ -372,39 +363,34 @@ class ParseTreePatternMatcher {
   /// was successful. The specific node returned depends on the matching
   /// algorithm used by the implementation, and may be overridden.
 
-  ParseTree matchImpl(ParseTree tree, ParseTree patternTree,
-      MultiMap<String, ParseTree> labels) {
-    if (tree == null) {
-      throw ArgumentError('tree cannot be null');
-    }
-
-    if (patternTree == null) {
-      throw ArgumentError('patternTree cannot be null');
-    }
-
+  ParseTree? matchImpl(
+    ParseTree tree, // Todo: never make it null
+    ParseTree patternTree, // Todo: never make it null
+    MultiMap<String, ParseTree> labels,
+  ) {
     // x and <ID>, x and y, or x and x; or could be mismatched types
     if (tree is TerminalNode && patternTree is TerminalNode) {
       final t1 = tree;
       final t2 = patternTree;
-      ParseTree mismatchedNode;
+      late final ParseTree mismatchedNode;
       // both are tokens and they have same type
       if (t1.symbol.type == t2.symbol.type) {
         if (t2.symbol is TokenTagToken) {
           // x and <ID>
-          TokenTagToken tokenTagToken = t2.symbol;
+          final tokenTagToken = t2.symbol as TokenTagToken;
           // track label->list-of-nodes for both token name and label (if any)
           labels.put(tokenTagToken.tokenName, tree);
           if (tokenTagToken.label != null) {
-            labels.put(tokenTagToken.label, tree);
+            labels.put(tokenTagToken.label!, tree);
           }
         } else if (t1.text == t2.text) {
           // x and x
         } else {
           // x and y
-          mismatchedNode ??= t1;
+          mismatchedNode = t1;
         }
       } else {
-        mismatchedNode ??= t1;
+        mismatchedNode = t1;
       }
 
       return mismatchedNode;
@@ -413,7 +399,7 @@ class ParseTreePatternMatcher {
     if (tree is ParserRuleContext && patternTree is ParserRuleContext) {
       final r1 = tree;
       final r2 = patternTree;
-      ParseTree mismatchedNode;
+      late final ParseTree mismatchedNode;
       // (expr ...) and <expr>
       final ruleTagToken = getRuleTagToken(r2);
       if (ruleTagToken != null) {
@@ -421,10 +407,10 @@ class ParseTreePatternMatcher {
           // track label->list-of-nodes for both rule name and label (if any)
           labels.put(ruleTagToken.ruleName, tree);
           if (ruleTagToken.label != null) {
-            labels.put(ruleTagToken.label, tree);
+            labels.put(ruleTagToken.label!, tree);
           }
         } else {
-          mismatchedNode ??= r1;
+          mismatchedNode = r1;
         }
 
         return mismatchedNode;
@@ -432,7 +418,7 @@ class ParseTreePatternMatcher {
 
       // (expr ...) and (expr ...)
       if (r1.childCount != r2.childCount) {
-        mismatchedNode ??= r1;
+        mismatchedNode = r1;
 
         return mismatchedNode;
       }
@@ -440,13 +426,13 @@ class ParseTreePatternMatcher {
       final n = r1.childCount;
       for (var i = 0; i < n; i++) {
         final childMatch =
-            matchImpl(r1.getChild(i), patternTree.getChild(i), labels);
+            matchImpl(r1.getChild(i)!, patternTree.getChild(i)!, labels);
         if (childMatch != null) {
           return childMatch;
         }
       }
 
-      return mismatchedNode;
+      return null;
     }
 
     // if nodes aren't both tokens or both rule nodes, can't match
@@ -454,14 +440,13 @@ class ParseTreePatternMatcher {
   }
 
   /// Is [t] {@code (expr <expr>)} subtree? */
-  RuleTagToken getRuleTagToken(ParseTree t) {
+  RuleTagToken? getRuleTagToken(ParseTree t) {
     if (t is RuleNode) {
       final r = t;
       if (r.childCount == 1 && r.getChild(0) is TerminalNode) {
-        TerminalNode c = r.getChild(0);
+        final c = r.getChild<TerminalNode>(0)!;
         if (c.symbol is RuleTagToken) {
-//					System.out.println("rule tag subtree "+t.toStringTree(parser));
-          return c.symbol;
+          return c.symbol as RuleTagToken;
         }
       }
     }
@@ -481,21 +466,16 @@ class ParseTreePatternMatcher {
         if (isUpperCase(tagChunk.tag[0])) {
           final ttype = parser.getTokenType(tagChunk.tag);
           if (ttype == Token.INVALID_TYPE) {
-            throw ArgumentError('Unknown token ' +
-                tagChunk.tag +
-                ' in pattern: ' +
-                pattern);
+            throw ArgumentError(
+                'Unknown token ' + tagChunk.tag + ' in pattern: ' + pattern);
           }
-          final t =
-              TokenTagToken(tagChunk.tag, ttype, tagChunk.label);
+          final t = TokenTagToken(tagChunk.tag, ttype, tagChunk.label);
           tokens.add(t);
         } else if (isLowerCase(tagChunk.tag[0])) {
           final ruleIndex = parser.getRuleIndex(tagChunk.tag);
           if (ruleIndex == -1) {
-            throw ArgumentError('Unknown rule ' +
-                tagChunk.tag +
-                ' in pattern: ' +
-                pattern);
+            throw ArgumentError(
+                'Unknown rule ' + tagChunk.tag + ' in pattern: ' + pattern);
           }
           final ruleImaginaryTokenType =
               parser.ATNWithBypassAlts.ruleToTokenType[ruleIndex];
@@ -506,9 +486,8 @@ class ParseTreePatternMatcher {
               'invalid tag: ' + tagChunk.tag + ' in pattern: ' + pattern);
         }
       } else {
-        TextChunk textChunk = chunk;
-        final inputStream =
-            InputStream.fromString(textChunk.text);
+        final textChunk = chunk as TextChunk;
+        final inputStream = InputStream.fromString(textChunk.text);
         lexer.inputStream = inputStream;
         var t = lexer.nextToken();
         while (t.type != Token.EOF) {
@@ -580,7 +559,7 @@ class ParseTreePatternMatcher {
       // copy inside of <tag>
       final tag = pattern.substring(starts[i] + start.length, stops[i]);
       var ruleOrToken = tag;
-      String label;
+      String? label;
       final colon = tag.indexOf(':');
       if (colon >= 0) {
         label = tag.substring(0, colon);

@@ -45,8 +45,14 @@ abstract class ErrorListener {
   ///        the reporting of an error. It is null in the case where
   ///        the parser was able to recover in line without exiting the
   ///        surrounding rule.
-  void syntaxError(Recognizer recognizer, Object offendingSymbol, int line,
-      int charPositionInLine, String msg, RecognitionException e);
+  void syntaxError(
+    Recognizer recognizer,
+    Object? offendingSymbol,
+    int line,
+    int charPositionInLine,
+    String msg,
+    RecognitionException? e,
+  );
 
   /// This method is called by the parser when a full-context prediction
   /// results in an ambiguity.

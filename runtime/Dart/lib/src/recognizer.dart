@@ -108,7 +108,7 @@ abstract class Recognizer<ATNInterpreter extends ATNSimulator> {
   ///  for each decision in recognizer in a ParseInfo object.
   ///
   /// @since 4.3
-  ParseInfo get parseInfo {
+  ParseInfo? get parseInfo {
     return null;
   }
 
@@ -174,7 +174,7 @@ abstract class Recognizer<ATNInterpreter extends ATNSimulator> {
 
   IntStream get inputStream;
 
-  set inputStream(IntStream input);
+  set inputStream(covariant IntStream input);
 
   TokenFactory get tokenFactory;
 

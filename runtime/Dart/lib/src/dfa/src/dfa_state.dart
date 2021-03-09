@@ -45,14 +45,14 @@ class PredPrediction {
 ///  but with different ATN contexts (with same or different alts)
 ///  meaning that state was reached via a different set of rule invocations.</p>
 class DFAState {
-  int stateNumber = -1;
+  int stateNumber;
 
-  ATNConfigSet configs = ATNConfigSet();
+  ATNConfigSet? configs = ATNConfigSet();
 
   /// {@code edges[symbol]} points to target of symbol. Shift up by 1 so (-1)
   ///  {@link Token#EOF} maps to {@code edges[0]}.
 
-  List<DFAState> edges;
+  List<DFAState?>? edges;
 
   bool isAcceptState = false;
 
@@ -61,7 +61,7 @@ class DFAState {
   ///  {@link #requiresFullContext}.
   int prediction = 0;
 
-  LexerActionExecutor lexerActionExecutor;
+  LexerActionExecutor? lexerActionExecutor;
 
   /// Indicates that this state was created during SLL prediction that
   /// discovered a conflict between the configurations in the state. Future
@@ -81,16 +81,16 @@ class DFAState {
   ///
   ///  <p>This list is computed by {@link ParserATNSimulator#predicateDFAState}.</p>
 
-  List<PredPrediction> predicates;
+  List<PredPrediction>? predicates;
 
-  DFAState({this.stateNumber, this.configs});
+  DFAState({this.stateNumber = -1, this.configs});
 
   /// Get the set of all alts mentioned by all ATN configurations in this
   ///  DFA state.
-  Set<int> get altSet {
+  Set<int>? get altSet {
     final alts = <int>{};
     if (configs != null) {
-      for (var c in configs) {
+      for (var c in configs!) {
         alts.add(c.alt);
       }
     }
