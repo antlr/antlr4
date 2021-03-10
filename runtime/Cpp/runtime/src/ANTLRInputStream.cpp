@@ -3,6 +3,8 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include <string.h>
+
 #include "Exceptions.h"
 #include "misc/Interval.h"
 #include "IntStream.h"
