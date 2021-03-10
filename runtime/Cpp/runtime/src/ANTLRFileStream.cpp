@@ -9,6 +9,9 @@
 
 using namespace antlr4;
 
+ANTLRFileStream::ANTLRFileStream(): ANTLRInputStream() {
+}
+
 void ANTLRFileStream::loadFromFile(const std::string &fileName) {
   _fileName = fileName;
   if (_fileName.empty()) {

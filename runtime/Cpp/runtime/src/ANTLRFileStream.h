@@ -14,6 +14,7 @@ namespace antlr4 {
   // TODO: this class needs testing.
   class ANTLR4CPP_PUBLIC ANTLRFileStream : public ANTLRInputStream {
   public:
+    ANTLRFileStream();
     ANTLRFileStream(const std::string &) = delete;
     ANTLRFileStream(const char *data, size_t length) = delete;
     ANTLRFileStream(std::istream &stream) = delete;
