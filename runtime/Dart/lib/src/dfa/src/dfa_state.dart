@@ -50,36 +50,36 @@ class DFAState {
   ATNConfigSet configs = ATNConfigSet();
 
   /// {@code edges[symbol]} points to target of symbol. Shift up by 1 so (-1)
-  ///  {@link Token#EOF} maps to {@code edges[0]}.
+  /// [Token.EOF] maps to {@code edges[0]}.
 
   List<DFAState> edges;
 
   bool isAcceptState = false;
 
   /// if accept state, what ttype do we match or alt do we predict?
-  ///  This is set to {@link ATN#INVALID_ALT_NUMBER} when {@link #predicates}{@code !=null} or
-  ///  {@link #requiresFullContext}.
+  ///  This is set to [ATN.INVALID_ALT_NUMBER] when [predicates]{@code !=null} or
+  ///  [requiresFullContext].
   int prediction = 0;
 
   LexerActionExecutor lexerActionExecutor;
 
   /// Indicates that this state was created during SLL prediction that
   /// discovered a conflict between the configurations in the state. Future
-  /// {@link ParserATNSimulator#execATN} invocations immediately jumped doing
+  /// [ParserATNSimulator.execATN] invocations immediately jumped doing
   /// full context prediction if this field is true.
   bool requiresFullContext = false;
 
   /// During SLL parsing, this is a list of predicates associated with the
   ///  ATN configurations of the DFA state. When we have predicates,
-  ///  {@link #requiresFullContext} is [false] since full context prediction evaluates predicates
-  ///  on-the-fly. If this is not null, then {@link #prediction} is
-  ///  {@link ATN#INVALID_ALT_NUMBER}.
+  ///  [requiresFullContext] is [false] since full context prediction evaluates predicates
+  ///  on-the-fly. If this is not null, then [prediction] is
+  ///  [ATN.INVALID_ALT_NUMBER].
   ///
-  ///  <p>We only use these for non-{@link #requiresFullContext} but conflicting states. That
+  ///  <p>We only use these for non-[requiresFullContext] but conflicting states. That
   ///  means we know from the context (it's $ or we don't dip into outer
   ///  context) that it's an ambiguity not a conflict.</p>
   ///
-  ///  <p>This list is computed by {@link ParserATNSimulator#predicateDFAState}.</p>
+  ///  <p>This list is computed by [ParserATNSimulator.predicateDFAState].</p>
 
   List<PredPrediction> predicates;
 
@@ -114,9 +114,9 @@ class DFAState {
   /// This is necessary to show that the algorithm terminates.</p>
   ///
   /// <p>Cannot test the DFA state numbers here because in
-  /// {@link ParserATNSimulator#addDFAState} we need to know if any other state
+  /// [ParserATNSimulator.addDFAState] we need to know if any other state
   /// exists that has this exact set of ATN configurations. The
-  /// {@link #stateNumber} is irrelevant.</p>
+  /// [stateNumber] is irrelevant.</p>
 
   @override
   bool operator ==(Object o) {

@@ -43,11 +43,11 @@ abstract class SemanticContext {
   /// @return The simplified semantic context after precedence predicates are
   /// evaluated, which will be one of the following values.
   /// <ul>
-  /// <li>{@link #NONE}in if the predicate simplifies to [true] after
+  /// <li>[NONE] in if the predicate simplifies to [true] after
   /// precedence predicates are evaluated.</li>
   /// <li>nullin if the predicate simplifies to [false] after
   /// precedence predicates are evaluated.</li>
-  /// <li>[this]in if the semantic context is not changed as a result of
+  /// <li>[this] in if the semantic context is not changed as a result of
   /// precedence predicate evaluation.</li>
   /// <li>A non-null [SemanticContext]in the new simplified
   /// semantic context after precedence predicates are evaluated.</li>

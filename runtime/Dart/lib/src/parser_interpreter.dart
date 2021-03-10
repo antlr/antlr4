@@ -6,6 +6,8 @@
 
 import 'dart:collection';
 
+import 'package:antlr4/antlr4.dart';
+
 import 'atn/atn.dart';
 import 'dfa/dfa.dart';
 import 'error/error.dart';
@@ -34,8 +36,7 @@ class ParserInterpreter extends Parser {
   final ATN atn;
 
   List<DFA> decisionToDFA; // not shared like it is for generated parsers
-  final PredictionContextCache sharedContextCache =
-      PredictionContextCache();
+  final PredictionContextCache sharedContextCache = PredictionContextCache();
 
   @override
   final List<String> ruleNames;
@@ -129,8 +130,7 @@ class ParserInterpreter extends Parser {
           if (context.isEmpty) {
             if (startRuleStartState.isLeftRecursiveRule) {
               final result = context;
-              final parentContext =
-                  _parentContextStack.removeLast();
+              final parentContext = _parentContextStack.removeLast();
               unrollRecursionContexts(parentContext.a);
               return result;
             } else {
@@ -160,8 +160,7 @@ class ParserInterpreter extends Parser {
   @override
   void enterRecursionRule(
       ParserRuleContext localctx, int state, int ruleIndex, int precedence) {
-    final pair =
-        Pair<ParserRuleContext, int>(context, localctx.invokingState);
+    final pair = Pair<ParserRuleContext, int>(context, localctx.invokingState);
     _parentContextStack.add(pair);
     super.enterRecursionRule(localctx, state, ruleIndex, precedence);
   }
@@ -286,8 +285,7 @@ class ParserInterpreter extends Parser {
   void visitRuleStopState(ATNState p) {
     final ruleStartState = atn.ruleToStartState[p.ruleIndex];
     if (ruleStartState.isLeftRecursiveRule) {
-      final parentContext =
-          _parentContextStack.removeLast();
+      final parentContext = _parentContextStack.removeLast();
       unrollRecursionContexts(parentContext.a);
       state = parentContext.b;
     } else {
@@ -324,8 +322,7 @@ class ParserInterpreter extends Parser {
   ///
   ///  Rather than trying to optimize this and make
   ///  some intelligent decisions for optimization purposes, I settled on
-  ///  just re-parsing the whole input and then using
-  ///  {link Trees#getRootOfSubtreeEnclosingRegion} to find the minimal
+  ///  just re-parsing the whole input and then using [Trees.getRootOfSubtreeEnclosingRegion]
   ///  subtree that contains the ambiguous sequence. I originally tried to
   ///  record the call stack at the point the parser detected and ambiguity but
   ///  left recursive rules create a parse tree stack that does not reflect

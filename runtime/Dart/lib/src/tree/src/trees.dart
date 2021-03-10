@@ -16,7 +16,7 @@ import 'tree.dart';
 
 /// A set of utility routines useful for all kinds of ANTLR trees. */
 class Trees {
-  /// Print out a whole tree in LISP form. {@link #getNodeText} is used on the
+  /// Print out a whole tree in LISP form. [getNodeText] is used on the
   ///  node payloads to get the text for the nodes.  Detect
   ///  parse trees and extract data appropriately.
   static String toStringTree(Tree t, {Parser recog, List<String> ruleNames}) {

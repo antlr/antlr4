@@ -35,7 +35,7 @@ class ParseTreeMatch {
   ///
   /// <p>The map includes special entries corresponding to the names of rules and
   /// tokens referenced in tags in the original pattern. For additional
-  /// information, see the description of {@link #getAll(String)}.</p>
+  /// information, see the description of [getAll].</p>
   ///
   /// @return A mapping from labels to parse tree nodes. If the parse tree
   /// pattern did not contain any rule or token tags, this map will be empty.
@@ -143,7 +143,7 @@ class ParseTreeMatch {
 }
 
 /// A pattern like {@code <ID> = <expr>;} converted to a [ParseTree] by
-/// {@link ParseTreePatternMatcher#compile(String, int)}.
+/// [ParseTreePatternMatcher.compile].
 class ParseTreePattern {
   /// Get the parser rule which serves as the outermost rule for the tree
   /// pattern.
@@ -186,7 +186,7 @@ class ParseTreePattern {
   ///
   /// @param tree The parse tree to match against this tree pattern.
   /// @return A [ParseTreeMatch] object describing the result of the
-  /// match operation. The {@link ParseTreeMatch#succeeded()} method can be
+  /// match operation. The [ParseTreeMatch.succeeded] method can be
   /// used to determine whether or not the match was successful.
 
   ParseTreeMatch match(ParseTree tree) {
@@ -212,7 +212,7 @@ class ParseTreePattern {
 ///
 /// <p>Given a pattern start rule such as [statement], this object constructs
 /// a [ParseTree] with placeholders for the [ID] and [expr]
-/// subtree. Then the {@link #match} routines can compare an actual
+/// subtree. Then the [match] routines can compare an actual
 /// [ParseTree] from a parse with this pattern. Tag {@code <ID>} matches
 /// any [ID] token and tag {@code <expr>} references the result of the
 /// [expr] rule (generally an instance of [ExprContext].</p>
@@ -221,12 +221,12 @@ class ParseTreePattern {
 /// except that it requires the identifier to be [x] and the expression to
 /// be {@code 0}.</p>
 ///
-/// <p>The {@link #matches} routines return [true] or [false] based
+/// <p>The [matches] routines return [true] or [false] based
 /// upon a match for the tree rooted at the parameter sent in. The
-/// {@link #match} routines return a [ParseTreeMatch] object that
+/// [match] routines return a [ParseTreeMatch] object that
 /// contains the parse tree, the parse tree pattern, and a map from tag name to
 /// matched nodes (more below). A subtree that fails to match, returns with
-/// {@link ParseTreeMatch#mismatchedNode} set to the first tree node that did not
+/// [ParseTreeMatch.mismatchedNode] set to the first tree node that did not
 /// match.</p>
 ///
 /// <p>For efficiency, you can compile a tree pattern in string form to a
@@ -234,7 +234,7 @@ class ParseTreePattern {
 ///
 /// <p>See [TestParseTreeMatcher] for lots of examples.
 /// [ParseTreePattern] has two static helper methods:
-/// {@link ParseTreePattern#findAll} and {@link ParseTreePattern#match} that
+/// [ParseTreePattern.findAll] and [ParseTreePattern.match] that
 /// are easy to use but not super efficient because they create new
 /// [ParseTreePatternMatcher] objects each time and have to compile the
 /// pattern in string form before using it.</p>
@@ -256,7 +256,7 @@ class ParseTreePattern {
 ///
 /// <p>Delimiters are {@code <} and {@code >}, with {@code \} as the escape string
 /// by default, but you can set them to whatever you want using
-/// {@link #setDelimiters}. You must escape both start and stop strings
+/// [setDelimiters]. You must escape both start and stop strings
 /// {@code \<} and {@code \>}.</p>
 class ParseTreePatternMatcher {
   /// Used to convert the tree pattern string into a series of tokens. The
@@ -364,8 +364,7 @@ class ParseTreePatternMatcher {
 
   // ---- SUPPORT CODE ----
 
-  /// Recursively walk [tree] against [patternTree], filling
-  /// {@code match.}{@link ParseTreeMatch#labels labels}.
+  /// Recursively walk [tree] against [patternTree], filling [ParseTreeMatch.labels]
   ///
   /// @return the first node encountered in [tree] which does not match
   /// a corresponding node in [patternTree], or null if the match
@@ -522,7 +521,7 @@ class ParseTreePatternMatcher {
     return tokens;
   }
 
-  /// Split {@code <ID> = <e:expr> ;} into 4 chunks for tokenizing by {@link #tokenize}. */
+  /// Split {@code <ID> = <e:expr> ;} into 4 chunks for tokenizing by [tokenize]. */
   List<Chunk> split(String pattern) {
     var p = 0;
     final n = pattern.length;

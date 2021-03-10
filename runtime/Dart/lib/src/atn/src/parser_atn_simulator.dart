@@ -175,7 +175,7 @@ import 'transition.dart';
 /// <p>
 /// All instances of the same parser share the same decision DFAs through a
 /// static field. Each instance gets its own ATN simulator but they share the
-/// same {@link #decisionToDFA} field. They also share a
+/// same [decisionToDFA] field. They also share a
 /// [PredictionContextCache] object that makes sure that all
 /// [PredictionContext] objects are shared among the DFA states. This makes
 /// a big size difference.</p>
@@ -184,26 +184,26 @@ import 'transition.dart';
 /// <strong>THREAD SAFETY</strong></p>
 ///
 /// <p>
-/// The [ParserATNSimulator] locks on the {@link #decisionToDFA} field when
-/// it adds a new DFA object to that array. {@link #addDFAEdge}
+/// The [ParserATNSimulator] locks on the [decisionToDFA] field when
+/// it adds a new DFA object to that array. [addDFAEdge]
 /// locks on the DFA for the current decision when setting the
-/// {@link DFAState#edges} field. {@link #addDFAState} locks on
+/// [DFAState.edges] field. [addDFAState] locks on
 /// the DFA for the current decision when looking up a DFA state to see if it
 /// already exists. We must make sure that all requests to add DFA states that
 /// are equivalent result in the same shared DFA object. This is because lots of
 /// threads will be trying to update the DFA at once. The
-/// {@link #addDFAState} method also locks inside the DFA lock
+/// [addDFAState] method also locks inside the DFA lock
 /// but this time on the shared context cache when it rebuilds the
 /// configurations' [PredictionContext] objects using cached
 /// subgraphs/nodes. No other locking occurs, even during DFA simulation. This is
 /// safe as long as we can guarantee that all threads referencing
 /// {@code s.edge[t]} get the same physical target [DFAState], or
 /// null. Once into the DFA, the DFA simulation does not reference the
-/// {@link DFA#states} map. It follows the {@link DFAState#edges} field to new
-/// targets. The DFA simulator will either find {@link DFAState#edges} to be
+/// [DFA.states] map. It follows the [DFAState.edges] field to new
+/// targets. The DFA simulator will either find [DFAState.edges] to be
 /// null, to be non-null and {@code dfa.edges[t]} null, or
 /// {@code dfa.edges[t]} to be non-null. The
-/// {@link #addDFAEdge} method could be racing to set the field
+/// [addDFAEdge] method could be racing to set the field
 /// but in either case the DFA simulator works; if null, and requests ATN
 /// simulation. It could also race trying to get {@code dfa.edges[t]}, but either
 /// way it will work because it's not doing a test and set operation.</p>
@@ -219,7 +219,7 @@ import 'transition.dart';
 /// mode with the [BailErrorStrategy]:</p>
 ///
 /// <pre>
-/// parser.{@link Parser#interpreter interpreter}.{@link #setPredictionMode setPredictionMode}{@code (}{@link PredictionMode#SLL}{@code )};
+/// parser.{@link Parser#interpreter interpreter}.[setPredictionMode]{@code (}[PredictionMode.SLL]{@code )};
 /// parser.{@link Parser#setErrorHandler setErrorHandler}(new [BailErrorStrategy]());
 /// </pre>
 ///
@@ -547,7 +547,7 @@ class ParserATNSimulator extends ATNSimulator {
   ///
   /// @return The computed target DFA state for the given input symbol
   /// [t]. If [t] does not lead to a valid DFA state, this method
-  /// returns {@link #ERROR}.
+  /// returns [ERROR].
   DFAState computeTargetState(DFA dfa, DFAState previousD, int t) {
     final reach = computeReachSet(previousD.configs, t, false);
     if (reach == null) {
@@ -878,7 +878,7 @@ class ParserATNSimulator extends ATNSimulator {
   /// method simply returns [configs].
   ///
   /// <p>When [lookToEndOfRule] is true, this method uses
-  /// {@link ATN#nextTokens} for each configuration in [configs] which is
+  /// [ATN.nextTokens] for each configuration in [configs] which is
   /// not already in a rule stop state to see if a rule stop state is reachable
   /// from the configuration via epsilon-only transitions.</p>
   ///
@@ -1036,15 +1036,15 @@ class ParserATNSimulator extends ATNSimulator {
 	 */
 
   /// This method transforms the start state computed by
-  /// {@link #computeStartState} to the special start state used by a
+  /// [computeStartState] to the special start state used by a
   /// precedence DFA for a particular precedence value. The transformation
   /// process applies the following changes to the start state's configuration
   /// set.
   ///
   /// <ol>
   /// <li>Evaluate the precedence predicates for each configuration using
-  /// {@link SemanticContext#evalPrecedence}.</li>
-  /// <li>When {@link ATNConfig#isPrecedenceFilterSuppressed} is [false],
+  /// [SemanticContext.evalPrecedence].</li>
+  /// <li>When [ATNConfig.isPrecedenceFilterSuppressed] is [false],
   /// remove all configurations which predict an alternative greater than 1,
   /// for which another configuration that predicts alternative 1 is in the
   /// same ATN state with the same prediction context. This transformation is
@@ -1059,7 +1059,7 @@ class ParserATNSimulator extends ATNSimulator {
   /// in a state that is also reachable via alternative 1 is by nesting calls
   /// to the left-recursive rule, with the outer calls not being at the
   /// preferred precedence level. The
-  /// {@link ATNConfig#isPrecedenceFilterSuppressed} property marks ATN
+  /// [ATNConfig.isPrecedenceFilterSuppressed] property marks ATN
   /// configurations which do not meet this condition, and therefore are not
   /// eligible for elimination during the filtering process.</li>
   /// </ul>
@@ -1089,10 +1089,10 @@ class ParserATNSimulator extends ATNSimulator {
   /// </p>
   ///
   /// @param configs The configuration set computed by
-  /// {@link #computeStartState} as the start state for the DFA.
+  /// [computeStartState] as the start state for the DFA.
   /// @return The transformed configuration set representing the start state
   /// for a precedence DFA at a particular precedence level (determined by
-  /// calling {@link Parser#getPrecedence}).
+  /// calling [Parser.precedence]).
   ATNConfigSet applyPrecedenceFilter(ATNConfigSet configs) {
     final statesFromAlt1 = <int, PredictionContext>{};
     final configSet = ATNConfigSet(configs.fullCtx);
@@ -1220,7 +1220,7 @@ class ParserATNSimulator extends ATNSimulator {
   /// This method is used to improve the localization of error messages by
   /// choosing an alternative rather than throwing a
   /// [NoViableAltException] in particular prediction scenarios where the
-  /// {@link #ERROR} state was reached during ATN simulation.
+  /// [ERROR] state was reached during ATN simulation.
   ///
   /// <p>
   /// The default implementation of this method uses the following
@@ -1236,7 +1236,7 @@ class ParserATNSimulator extends ATNSimulator {
   /// <li>Else, if a semantically invalid but syntactically valid path exist
   /// or paths exist, return the minimum associated alt.
   /// </li>
-  /// <li>Otherwise, return {@link ATN#INVALID_ALT_NUMBER}.</li>
+  /// <li>Otherwise, return [ATN.INVALID_ALT_NUMBER].</li>
   /// </ul>
   ///
   /// <p>
@@ -1245,7 +1245,7 @@ class ParserATNSimulator extends ATNSimulator {
   /// the parser. Specifically, this could occur if the <em>only</em> configuration
   /// capable of successfully parsing to the end of the decision rule is
   /// blocked by a semantic predicate. By choosing this alternative within
-  /// {@link #adaptivePredict} instead of throwing a
+  /// [adaptivePredict] instead of throwing a
   /// [NoViableAltException], the resulting
   /// [FailedPredicateException] in the parser will identify the specific
   /// predicate which is preventing the parser from successfully parsing the
@@ -1254,13 +1254,13 @@ class ParserATNSimulator extends ATNSimulator {
   /// </p>
   ///
   /// @param configs The ATN configurations which were valid immediately before
-  /// the {@link #ERROR} state was reached
+  /// the [ERROR] state was reached
   /// @param outerContext The is the \gamma_0 initial parser context from the paper
   /// or the parser stack at the instant before prediction commences.
   ///
-  /// @return The value to return from {@link #adaptivePredict}, or
-  /// {@link ATN#INVALID_ALT_NUMBER} if a suitable alternative was not
-  /// identified and {@link #adaptivePredict} should report an error instead.
+  /// @return The value to return from [adaptivePredict], or
+  /// [ATN.INVALID_ALT_NUMBER] if a suitable alternative was not
+  /// identified and [adaptivePredict] should report an error instead.
   int getSynValidOrSemInvalidAltThatFinishedDecisionEntryRule(
       ATNConfigSet configs, ParserRuleContext outerContext) {
     final sets =
@@ -1368,11 +1368,10 @@ class ParserATNSimulator extends ATNSimulator {
   ///
   /// <ul>
   /// <li>Precedence predicates (represented by
-  /// {@link SemanticContext.PrecedencePredicate}) are not currently evaluated
+  /// [PrecedencePredicate]) are not currently evaluated
   /// through this method.</li>
-  /// <li>Operator predicates (represented by {@link SemanticContext.AND} and
-  /// {@link SemanticContext.OR}) are evaluated as a single semantic
-  /// context, rather than evaluating the operands individually.
+  /// <li>Operator predicates (represented by [AND] and [OR]) are evaluated as
+  /// a single semantic context, rather than evaluating the operands individually.
   /// Implementations which require evaluation results from individual
   /// predicates should override this method to explicitly handle evaluation of
   /// the operands within operator predicates.</li>
@@ -1977,14 +1976,14 @@ class ParserATNSimulator extends ATNSimulator {
   }
 
   /// Add an edge to the DFA, if possible. This method calls
-  /// {@link #addDFAState} to ensure the [to] state is present in the
+  /// [addDFAState] to ensure the [to] state is present in the
   /// DFA. If [from] is null, or if [t] is outside the
   /// range of edges that can be represented in the DFA tables, this method
   /// returns without adding the edge to the DFA.
   ///
   /// <p>If [to] is null, this method returns null.
   /// Otherwise, this method returns the [DFAState] returned by calling
-  /// {@link #addDFAState} for the [to] state.</p>
+  /// [addDFAState] for the [to] state.</p>
   ///
   /// @param dfa The DFA
   /// @param from The source state for the edge
@@ -1992,7 +1991,7 @@ class ParserATNSimulator extends ATNSimulator {
   /// @param to The target state for the edge
   ///
   /// @return If [to] is null, this method returns null;
-  /// otherwise this method returns the result of calling {@link #addDFAState}
+  /// otherwise this method returns the result of calling [addDFAState]
   /// on [to]
   DFAState addDFAEdge(DFA dfa, DFAState from, int t, DFAState to) {
     if (debug) {
@@ -2027,7 +2026,7 @@ class ParserATNSimulator extends ATNSimulator {
   /// is already in the DFA, the existing state is returned. Otherwise this
   /// method returns [D] after adding it to the DFA.
   ///
-  /// <p>If [D] is {@link #ERROR}, this method returns {@link #ERROR} and
+  /// <p>If [D] is [ERROR], this method returns [ERROR] and
   /// does not change the DFA.</p>
   ///
   /// @param dfa The dfa
@@ -2115,11 +2114,11 @@ enum PredictionMode {
   /// <p>
   /// When using this prediction mode, the parser will either return a correct
   /// parse tree (i.e. the same parse tree that would be returned with the
-  /// {@link #LL} prediction mode), or it will report a syntax error. If a
-  /// syntax error is encountered when using the {@link #SLL} prediction mode,
+  /// [LL] prediction mode), or it will report a syntax error. If a
+  /// syntax error is encountered when using the [SLL] prediction mode,
   /// it may be due to either an actual syntax error in the input or indicate
   /// that the particular combination of grammar and input requires the more
-  /// powerful {@link #LL} prediction abilities to complete successfully.</p>
+  /// powerful [LL] prediction abilities to complete successfully.</p>
   ///
   /// <p>
   /// This prediction mode does not provide any guarantees for prediction
@@ -2143,7 +2142,7 @@ enum PredictionMode {
   /// behavior for syntactically-incorrect inputs.</p>
   LL,
   /// The LL(*) prediction mode with exact ambiguity detection. In addition to
-  /// the correctness guarantees provided by the {@link #LL} prediction mode,
+  /// the correctness guarantees provided by the [LL] prediction mode,
   /// this prediction mode instructs the prediction algorithm to determine the
   /// complete and exact set of ambiguous alternatives for every ambiguous
   /// decision encountered while parsing.
@@ -2248,7 +2247,7 @@ extension PredictionModeExtension on PredictionMode {
   /// <p>{@code (s, 1, x, {}), (s, 1, x', {p}), (s, 2, x'', {})}</p>
   ///
   /// <p>If the configuration set has predicates (as indicated by
-  /// {@link ATNConfigSet#hasSemanticContext}), this algorithm makes a copy of
+  /// [ATNConfigSet.hasSemanticContext]), this algorithm makes a copy of
   /// the configurations to strip out all of the predicates so that a standard
   /// [ATNConfigSet] will merge everything ignoring predicates.</p>
   static bool hasSLLConflictTerminatingPrediction(
@@ -2337,8 +2336,8 @@ extension PredictionModeExtension on PredictionMode {
   /// <p>The basic idea is to split the set of configurations [C], into
   /// conflicting subsets {@code (s, _, ctx, _)} and singleton subsets with
   /// non-conflicting configurations. Two configurations conflict if they have
-  /// identical {@link ATNConfig#state} and {@link ATNConfig#context} values
-  /// but different {@link ATNConfig#alt} value, e.g. {@code (s, i, ctx, _)}
+  /// identical [ATNConfig.state] and [ATNConfig.context] values
+  /// but different [ATNConfig.alt] value, e.g. {@code (s, i, ctx, _)}
   /// and {@code (s, j, ctx, _)} for {@code i!=j}.</p>
   ///
   /// <p>Reduce these configuration subsets to the set of possible alternatives.
@@ -2471,7 +2470,7 @@ extension PredictionModeExtension on PredictionMode {
   ///
   /// @param altsets a collection of alternative subsets
   /// @return [true] if every [BitSet] in [altsets] has
-  /// {@link BitSet#cardinality cardinality} &gt; 1, otherwise [false]
+  /// [cardinality][BitSet.cardinality] &gt; 1, otherwise [false]
   static bool allSubsetsConflict(List<BitSet> altsets) {
     return !hasNonConflictingAltSet(altsets);
   }
@@ -2481,7 +2480,7 @@ extension PredictionModeExtension on PredictionMode {
   ///
   /// @param altsets a collection of alternative subsets
   /// @return [true] if [altsets] contains a [BitSet] with
-  /// {@link BitSet#cardinality cardinality} 1, otherwise [false]
+  /// [cardinality][BitSet.cardinality] 1, otherwise [false]
   static bool hasNonConflictingAltSet(List<BitSet> altsets) {
     for (var alts in altsets) {
       if (alts.cardinality == 1) {
@@ -2496,7 +2495,7 @@ extension PredictionModeExtension on PredictionMode {
   ///
   /// @param altsets a collection of alternative subsets
   /// @return [true] if [altsets] contains a [BitSet] with
-  /// {@link BitSet#cardinality cardinality} &gt; 1, otherwise [false]
+  /// [cardinality][BitSet.cardinality] &gt; 1, otherwise [false]
   static bool hasConflictingAltSet(List<BitSet> altsets) {
     for (var alts in altsets) {
       if (alts.cardinality > 1) {
@@ -2518,7 +2517,7 @@ extension PredictionModeExtension on PredictionMode {
 
   /// Returns the unique alternative predicted by all alternative subsets in
   /// [altsets]. If no such alternative exists, this method returns
-  /// {@link ATN#INVALID_ALT_NUMBER}.
+  /// [ATN.INVALID_ALT_NUMBER].
   ///
   /// @param altsets a collection of alternative subsets
   static int getUniqueAlt(List<BitSet> altsets) {
@@ -2568,8 +2567,8 @@ extension PredictionModeExtension on PredictionMode {
           a.context == b.context;
     }, hashCode: (ATNConfig o) {
       /**
-       * The hash code is only a function of the {@link ATNState#stateNumber}
-       * and {@link ATNConfig#context}.
+       * The hash code is only a function of the [ATNState.stateNumber]
+       * and [ATNConfig.context].
        */
       var hashCode = MurmurHash.initialize(7);
       hashCode = MurmurHash.update(hashCode, o.state.stateNumber);

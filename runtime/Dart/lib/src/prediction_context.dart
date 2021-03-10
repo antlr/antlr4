@@ -19,7 +19,7 @@ abstract class PredictionContext {
 
   /// Represents {@code $} in an array in full context mode, when {@code $}
   /// doesn't mean wildcard: {@code $ + x = [$,x]}. Here,
-  /// {@code $} = {@link #EMPTY_RETURN_STATE}.
+  /// {@code $} = [EMPTY_RETURN_STATE].
   static final int EMPTY_RETURN_STATE = 0x7FFFFFFF;
 
   static final int INITIAL_HASH = 1;
@@ -30,28 +30,28 @@ abstract class PredictionContext {
   /// Stores the computed hash code of this [PredictionContext]. The hash
   /// code is computed in parts to match the following reference algorithm.
   ///
-  /// <pre>
+  /// ```
   ///   int referenceHashCode() {
-  ///      int hash = {@link MurmurHash#initialize MurmurHash.initialize}({@link #INITIAL_HASH});
+  ///      int hash = MurmurHash.initialize(INITIAL_HASH);
   ///
-  ///      for (int i = 0; i &lt; {@link #size()}; i++) {
-  ///          hash = {@link MurmurHash#update MurmurHash.update}(hash, {@link #getParent getParent}(i));
+  ///      for (int i = 0; i &lt; size(); i++) {
+  ///          hash = MurmurHash.update(hash, getParent(i));
   ///      }
   ///
-  ///      for (int i = 0; i &lt; {@link #size()}; i++) {
-  ///          hash = {@link MurmurHash#update MurmurHash.update}(hash, {@link #getReturnState getReturnState}(i));
+  ///      for (int i = 0; i &lt; size(); i++) {
+  ///          hash = MurmurHash.update(hash, getReturnState(i));
   ///      }
   ///
-  ///      hash = {@link MurmurHash#finish MurmurHash.finish}(hash, 2 * {@link #size()});
+  ///      hash = MurmurHash.finish(hash, 2 * size());
   ///      return hash;
   ///  }
-  /// </pre>
+  /// ```
   final int cachedHashCode;
 
   PredictionContext(this.cachedHashCode);
 
   /// Convert a [RuleContext] tree to a [PredictionContext] graph.
-  ///  Return {@link #EMPTY} if [outerContext] is empty or null.
+  ///  Return [EMPTY] if [outerContext] is empty or null.
   static PredictionContext fromRuleContext(ATN atn, RuleContext outerContext) {
     outerContext ??= RuleContext.EMPTY;
 
@@ -77,7 +77,7 @@ abstract class PredictionContext {
 
   int getReturnState(int index);
 
-  /// This means only the {@link #EMPTY} (wildcard? not sure) context is in set. */
+  /// This means only the [EMPTY] (wildcard? not sure) context is in set. */
   bool get isEmpty {
     return this == EMPTY;
   }
@@ -248,18 +248,18 @@ abstract class PredictionContext {
   }
 
   /// Handle case where at least one of [a] or [b] is
-  /// {@link #EMPTY}. In the following diagrams, the symbol {@code $} is used
-  /// to represent {@link #EMPTY}.
+  /// [EMPTY]. In the following diagrams, the symbol {@code $} is used
+  /// to represent [EMPTY].
   ///
   /// <h2>Local-Context Merges</h2>
   ///
   /// <p>These local-context merge operations are used when [rootIsWildcard]
   /// is true.</p>
   ///
-  /// <p>{@link #EMPTY} is superset of any graph; return {@link #EMPTY}.<br>
+  /// <p>[EMPTY] is superset of any graph; return [EMPTY].<br>
   /// <embed src="images/LocalMerge_EmptyRoot.svg" type="image/svg+xml"/></p>
   ///
-  /// <p>{@link #EMPTY} and anything is {@code #EMPTY}, so merged parent is
+  /// <p>[EMPTY] and anything is {@code #EMPTY}, so merged parent is
   /// {@code #EMPTY}; return left graph.<br>
   /// <embed src="images/LocalMerge_EmptyParent.svg" type="image/svg+xml"/></p>
   ///
@@ -273,7 +273,7 @@ abstract class PredictionContext {
   ///
   /// <p><embed src="images/FullMerge_EmptyRoots.svg" type="image/svg+xml"/></p>
   ///
-  /// <p>Must keep all contexts; {@link #EMPTY} in array is a special value (and
+  /// <p>Must keep all contexts; [EMPTY] in array is a special value (and
   /// null parent).<br>
   /// <embed src="images/FullMerge_EmptyRoot.svg" type="image/svg+xml"/></p>
   ///
@@ -789,12 +789,12 @@ class EmptyPredictionContext extends SingletonPredictionContext {
 
 class ArrayPredictionContext extends PredictionContext {
   /// Parent can be null only if full ctx mode and we make an array
-  ///  from {@link #EMPTY} and non-empty. We merge {@link #EMPTY} by using null parent and
-  ///  returnState == {@link #EMPTY_RETURN_STATE}.
+  ///  from [EMPTY] and non-empty. We merge [EMPTY] by using null parent and
+  ///  returnState == [EMPTY_RETURN_STATE].
   List<PredictionContext> parents;
 
   /// Sorted for merge, no duplicates; if present,
-  ///  {@link #EMPTY_RETURN_STATE} is always last.
+  ///  [EMPTY_RETURN_STATE] is always last.
   List<int> returnStates;
 
   ArrayPredictionContext.of(SingletonPredictionContext a)

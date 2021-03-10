@@ -18,7 +18,7 @@ import 'semantic_context.dart';
 /// In some cases, the unique alternative identified by LL prediction is not
 /// equal to the minimum represented alternative in the conflicting SLL
 /// configuration set. Grammars and inputs which result in this scenario are
-/// unable to use {@link PredictionMode#SLL}, which in turn means they cannot use
+/// unable to use [PredictionMode.SLL], which in turn means they cannot use
 /// the two-stage parsing strategy to improve parsing performance for that
 /// input.</p>
 ///
@@ -96,31 +96,31 @@ class DecisionEventInfo {
 ///
 /// @since 4.3
 class DecisionInfo {
-  /// The decision number, which is an index into {@link ATN#decisionToState}.
+  /// The decision number, which is an index into [ATN.decisionToState].
   final int decision;
 
-  /// The total number of times {@link ParserATNSimulator#adaptivePredict} was
+  /// The total number of times [ParserATNSimulator.adaptivePredict] was
   /// invoked for this decision.
   int invocations;
 
-  /// The total time spent in {@link ParserATNSimulator#adaptivePredict} for
+  /// The total time spent in [ParserATNSimulator.adaptivePredict] for
   /// this decision, in nanoseconds.
   ///
   /// <p>
   /// The value of this field contains the sum of differential results obtained
-  /// by {@link System#nanoTime()}, and is not adjusted to compensate for JIT
+  /// by [System.nanoTime], and is not adjusted to compensate for JIT
   /// and/or garbage collection overhead. For best accuracy, use a modern JVM
   /// implementation that provides precise results from
-  /// {@link System#nanoTime()}, and perform profiling in a separate process
+  /// [System.nanoTime], and perform profiling in a separate process
   /// which is warmed up by parsing the input prior to profiling. If desired,
-  /// call {@link ATNSimulator#clearDFA} to reset the DFA cache to its initial
+  /// call [ATNSimulator.clearDFA] to reset the DFA cache to its initial
   /// state before starting the profiling measurement pass.</p>
   int timeInPrediction;
 
   /// The sum of the lookahead required for SLL prediction for this decision.
   /// Note that SLL prediction is used before LL prediction for performance
-  /// reasons even when {@link PredictionMode#LL} or
-  /// {@link PredictionMode#LL_EXACT_AMBIG_DETECTION} is used.
+  /// reasons even when [PredictionMode.LL] or
+  /// [PredictionMode.LL_EXACT_AMBIG_DETECTION] is used.
   int SLL_TotalLook;
 
   /// Gets the minimum lookahead required for any single SLL prediction to
@@ -134,7 +134,7 @@ class DecisionInfo {
   int SLL_MaxLook;
 
   /// Gets the [LookaheadEventInfo] associated with the event where the
-  /// {@link #SLL_MaxLook} value was set.
+  /// [SLL_MaxLook] value was set.
   LookaheadEventInfo SLL_MaxLookEvent;
 
   /// The sum of the lookahead required for LL prediction for this decision.
@@ -145,19 +145,19 @@ class DecisionInfo {
   /// Gets the minimum lookahead required for any single LL prediction to
   /// complete for this decision. An LL prediction completes when the algorithm
   /// reaches a unique prediction, a conflict state (for
-  /// {@link PredictionMode#LL}, an ambiguity state (for
-  /// {@link PredictionMode#LL_EXACT_AMBIG_DETECTION}, or a syntax error.
+  /// [PredictionMode.LL], an ambiguity state (for
+  /// [PredictionMode.LL_EXACT_AMBIG_DETECTION], or a syntax error.
   int LL_MinLook;
 
   /// Gets the maximum lookahead required for any single LL prediction to
   /// complete for this decision. An LL prediction completes when the algorithm
   /// reaches a unique prediction, a conflict state (for
-  /// {@link PredictionMode#LL}, an ambiguity state (for
-  /// {@link PredictionMode#LL_EXACT_AMBIG_DETECTION}, or a syntax error.
+  /// [PredictionMode.LL], an ambiguity state (for
+  /// [PredictionMode.LL_EXACT_AMBIG_DETECTION], or a syntax error.
   int LL_MaxLook;
 
   /// Gets the [LookaheadEventInfo] associated with the event where the
-  /// {@link #LL_MaxLook} value was set.
+  /// [LL_MaxLook] value was set.
   LookaheadEventInfo LL_MaxLookEvent;
 
   /// A collection of [ContextSensitivityInfo] instances describing the
@@ -167,7 +167,7 @@ class DecisionInfo {
   final List<ContextSensitivityInfo> contextSensitivities = [];
 
   /// A collection of [ErrorInfo] instances describing the parse errors
-  /// identified during calls to {@link ParserATNSimulator#adaptivePredict} for
+  /// identified during calls to [ParserATNSimulator.adaptivePredict] for
   /// this decision.
   ///
   /// @see ErrorInfo
@@ -216,11 +216,11 @@ class DecisionInfo {
   /// state, resulting in fallback to LL prediction.
   ///
   /// <p>Note that this value is not related to whether or not
-  /// {@link PredictionMode#SLL} may be used successfully with a particular
+  /// [PredictionMode.SLL] may be used successfully with a particular
   /// grammar. If the ambiguity resolution algorithm applied to the SLL
   /// conflicts for this decision produce the same result as LL prediction for
-  /// this decision, {@link PredictionMode#SLL} would produce the same overall
-  /// parsing result as {@link PredictionMode#LL}.</p>
+  /// this decision, [PredictionMode.SLL] would produce the same overall
+  /// parsing result as [PredictionMode.LL].</p>
   int LL_Fallback;
 
   /// The total number of ATN transitions required during LL prediction for
@@ -278,7 +278,7 @@ class DecisionInfo {
 /// determine that the SLL conflict is truly an ambiguity. For example, if none
 /// of the ATN configurations in the conflicting SLL configuration set have
 /// traversed a global follow transition (i.e.
-/// {@link ATNConfig#reachesIntoOuterContext} is 0 for all configurations), then
+/// [ATNConfig.reachesIntoOuterContext] is 0 for all configurations), then
 /// the result of SLL prediction for that input is known to be equivalent to the
 /// result of LL prediction for that input.</p>
 ///
@@ -286,7 +286,7 @@ class DecisionInfo {
 /// In some cases, the minimum represented alternative in the conflicting LL
 /// configuration set is not equal to the minimum represented alternative in the
 /// conflicting SLL configuration set. Grammars and inputs which result in this
-/// scenario are unable to use {@link PredictionMode#SLL}, which in turn means
+/// scenario are unable to use [PredictionMode.SLL], which in turn means
 /// they cannot use the two-stage parsing strategy to improve parsing performance
 /// for that input.</p>
 ///
@@ -333,7 +333,7 @@ class ErrorInfo extends DecisionEventInfo {
   ///
   /// @param decision The decision number
   /// @param configs The final configuration set reached during prediction
-  /// prior to reaching the {@link ATNSimulator#ERROR} state
+  /// prior to reaching the [ATNSimulator.ERROR] state
   /// @param input The input token stream
   /// @param startIndex The start index for the current prediction
   /// @param stopIndex The index at which the syntax error was identified
@@ -385,12 +385,12 @@ class PredicateEvalInfo extends DecisionEventInfo {
   final SemanticContext semctx;
 
   /// The alternative number for the decision which is guarded by the semantic
-  /// context {@link #semctx}. Note that other ATN
+  /// context [semctx]. Note that other ATN
   /// configurations may predict the same alternative which are guarded by
-  /// other semantic contexts and/or {@link SemanticContext#NONE}.
+  /// other semantic contexts and/or [SemanticContext.NONE].
   final int predictedAlt;
 
-  /// The result of evaluating the semantic context {@link #semctx}.
+  /// The result of evaluating the semantic context [semctx].
   final bool evalResult;
 
   /// Constructs a new instance of the [PredicateEvalInfo] class with the
@@ -405,7 +405,7 @@ class PredicateEvalInfo extends DecisionEventInfo {
   /// @param semctx The semantic context which was evaluated
   /// @param evalResult The results of evaluating the semantic context
   /// @param predictedAlt The alternative number for the decision which is
-  /// guarded by the semantic context [semctx]. See {@link #predictedAlt}
+  /// guarded by the semantic context [semctx]. See [predictedAlt]
   /// for more information.
   /// @param fullCtx [true] if the semantic context was
   /// evaluated during LL prediction; otherwise, [false] if the semantic
@@ -445,7 +445,7 @@ class ParseInfo {
 
   /// Gets the decision numbers for decisions that required one or more
   /// full-context predictions during parsing. These are decisions for which
-  /// {@link DecisionInfo#LL_Fallback} is non-zero.
+  /// [DecisionInfo.LL_Fallback] is non-zero.
   ///
   /// @return A list of decision numbers which required one or more
   /// full-context predictions during parsing.
@@ -461,7 +461,7 @@ class ParseInfo {
 
   /// Gets the total time spent during prediction across all decisions made
   /// during parsing. This value is the sum of
-  /// {@link DecisionInfo#timeInPrediction} for all decisions.
+  /// [DecisionInfo.timeInPrediction] for all decisions.
   int get totalTimeInPrediction {
     final decisions = atnSimulator.decisionInfo;
     var t = 0;
@@ -473,7 +473,7 @@ class ParseInfo {
 
   /// Gets the total number of SLL lookahead operations across all decisions
   /// made during parsing. This value is the sum of
-  /// {@link DecisionInfo#SLL_TotalLook} for all decisions.
+  /// [DecisionInfo.SLL_TotalLook] for all decisions.
   int get totalSLLLookaheadOps {
     final decisions = atnSimulator.decisionInfo;
     var k = 0;
@@ -485,7 +485,7 @@ class ParseInfo {
 
   /// Gets the total number of LL lookahead operations across all decisions
   /// made during parsing. This value is the sum of
-  /// {@link DecisionInfo#LL_TotalLook} for all decisions.
+  /// [DecisionInfo.LL_TotalLook] for all decisions.
   int get totalLLLookaheadOps {
     final decisions = atnSimulator.decisionInfo;
     var k = 0;
@@ -521,8 +521,8 @@ class ParseInfo {
   /// prediction across all decisions made during parsing.
   ///
   /// <p>
-  /// This value is the sum of {@link #getTotalSLLATNLookaheadOps} and
-  /// {@link #getTotalLLATNLookaheadOps}.</p>
+  /// This value is the sum of [totalSLLATNLookaheadOps] and
+  /// [totalLLATNLookaheadOps].</p>
   int get totalATNLookaheadOps {
     final decisions = atnSimulator.decisionInfo;
     var k = 0;

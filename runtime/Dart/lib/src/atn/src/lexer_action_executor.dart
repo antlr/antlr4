@@ -9,6 +9,7 @@ import 'package:collection/collection.dart';
 import '../../input_stream.dart';
 import '../../lexer.dart';
 import '../../util/murmur_hash.dart';
+import '../atn.dart';
 import 'lexer_action.dart';
 
 /// Represents an executor for a sequence of lexer actions which traversed during
@@ -24,8 +25,8 @@ class LexerActionExecutor {
   /// @return The lexer actions to be executed by this executor.
   final List<LexerAction> lexerActions;
 
-  /// Caches the result of {@link #hashCode} since the hash code is an element
-  /// of the performance-critical {@link LexerATNConfig#hashCode} operation.
+  /// Caches the result of [hashCode] since the hash code is an element
+  /// of the performance-critical [LexerATNConfig.hashCode] operation.
   @override
   int get hashCode {
     var hash = MurmurHash.initialize();
@@ -69,8 +70,8 @@ class LexerActionExecutor {
   /// for position-dependent lexer actions.
   ///
   /// <p>Normally, when the executor encounters lexer actions where
-  /// {@link LexerAction#isPositionDependent} returns [true], it calls
-  /// {@link IntStream#seek} on the input [CharStream] to set the input
+  /// [LexerAction.isPositionDependent] returns [true], it calls
+  /// [IntStream.seek] on the input [CharStream] to set the input
   /// position to the <em>end</em> of the current token. This behavior provides
   /// for efficient DFA representation of lexer actions which appear at the end
   /// of a lexer rule, even when the lexer rule matches a variable number of
@@ -114,19 +115,19 @@ class LexerActionExecutor {
   /// Execute the actions encapsulated by this executor within the context of a
   /// particular [Lexer].
   ///
-  /// <p>This method calls {@link IntStream#seek} to set the position of the
+  /// <p>This method calls [IntStream.seek] to set the position of the
   /// [input] [CharStream] prior to calling
-  /// {@link LexerAction#execute} on a position-dependent action. Before the
+  /// [LexerAction.execute] on a position-dependent action. Before the
   /// method returns, the input position will be restored to the same position
   /// it was in when the method was invoked.</p>
   ///
   /// @param lexer The lexer instance.
   /// @param input The input stream which is the source for the current token.
-  /// When this method is called, the current {@link IntStream#index} for
+  /// When this method is called, the current [IntStream.index] for
   /// [input] should be the start of the following token, i.e. 1
   /// character past the end of the current token.
   /// @param startIndex The token start index. This value may be passed to
-  /// {@link IntStream#seek} to set the [input] position to the beginning
+  /// [IntStream.seek] to set the [input] position to the beginning
   /// of the token.
   void execute(Lexer lexer, CharStream input, int startIndex) {
     var requiresSeek = false;
