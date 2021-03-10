@@ -45,8 +45,8 @@ void ANTLRInputStream::load(const std::string &input) {
 
 void ANTLRInputStream::load(const char *data, size_t length) {
   // Remove the UTF-8 BOM if present.
-  const char bom[4] = "\xef\xbb\xbf";
-  if (strncmp(data, bom, 3) == 0)
+  const char *bom = "\xef\xbb\xbf";
+  if (length > 3 && strncmp(data, bom, 3) == 0)
     _data = antlrcpp::utf8_to_utf32(data + 3, data + length);
   else
     _data = antlrcpp::utf8_to_utf32(data, data + length);
