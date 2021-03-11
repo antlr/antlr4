@@ -234,8 +234,16 @@ abstract class Lexer extends Recognizer<LexerATNSimulator>
 
   Token emitEOF() {
     final cpos = charPositionInLine;
-    final eof = tokenFactory.create(Token.EOF, null, _tokenFactorySourcePair,
-        Token.DEFAULT_CHANNEL, _input.index, _input.index - 1, line, cpos);
+    final eof = tokenFactory.create(
+      Token.EOF,
+      null,
+      _tokenFactorySourcePair,
+      Token.DEFAULT_CHANNEL,
+      _input.index,
+      _input.index - 1,
+      line,
+      cpos,
+    );
     emitToken(eof);
     return eof;
   }

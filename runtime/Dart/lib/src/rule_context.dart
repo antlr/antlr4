@@ -143,7 +143,7 @@ abstract class RuleContext extends RuleNode {
   int get childCount => 0;
 
   @override
-  T accept<T>(ParseTreeVisitor<T> visitor) {
+  T? accept<T>(ParseTreeVisitor<T> visitor) {
     return visitor.visitChildren(this);
   }
 

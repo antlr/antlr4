@@ -79,9 +79,13 @@ class ParserInterpreter extends Parser {
   /// @since 4.5.1
   InterpreterRuleContext rootContext;
 
-  ParserInterpreter(this.grammarFileName, this.vocabulary, this.ruleNames,
-      this.atn, TokenStream input)
-      : super(input) {
+  ParserInterpreter(
+    this.grammarFileName,
+    this.vocabulary,
+    this.ruleNames,
+    this.atn,
+    TokenStream input,
+  ) : super(input) {
     // init decision DFA
     final numberOfDecisions = atn.numberOfDecisions;
     decisionToDFA = List<DFA>(numberOfDecisions);
@@ -189,8 +193,11 @@ class ParserInterpreter extends Parser {
               _parentContextStack.last.a,
               _parentContextStack.last.b,
               context.ruleIndex);
-          pushNewRecursionContext(localctx,
-              atn.ruleToStartState[p.ruleIndex].stateNumber, context.ruleIndex);
+          pushNewRecursionContext(
+            localctx,
+            atn.ruleToStartState[p.ruleIndex].stateNumber,
+            context.ruleIndex,
+          );
         }
         break;
 
@@ -361,29 +368,31 @@ class ParserInterpreter extends Parser {
           expectedTokenType = ime.expectedTokens.minElement; // get any element
         }
         final errToken = tokenFactory.create(
-            expectedTokenType,
-            tok.text,
-            Pair(tok.tokenSource, tok.tokenSource.inputStream),
-            Token.DEFAULT_CHANNEL,
-            -1,
-            -1,
-            // invalid start/stop
-            tok.line,
-            tok.charPositionInLine);
+          expectedTokenType,
+          tok.text,
+          Pair(tok.tokenSource, tok.tokenSource.inputStream),
+          Token.DEFAULT_CHANNEL,
+          -1,
+          -1,
+          // invalid start/stop
+          tok.line,
+          tok.charPositionInLine,
+        );
         context.addErrorNode(createErrorNode(context, errToken));
       } else {
         // NoViableAlt
         final tok = e.offendingToken;
         final errToken = tokenFactory.create(
-            Token.INVALID_TYPE,
-            tok.text,
-            Pair(tok.tokenSource, tok.tokenSource.inputStream),
-            Token.DEFAULT_CHANNEL,
-            -1,
-            -1,
-            // invalid start/stop
-            tok.line,
-            tok.charPositionInLine);
+          Token.INVALID_TYPE,
+          tok.text,
+          Pair(tok.tokenSource, tok.tokenSource.inputStream),
+          Token.DEFAULT_CHANNEL,
+          -1,
+          -1,
+          // invalid start/stop
+          tok.line,
+          tok.charPositionInLine,
+        );
         context.addErrorNode(createErrorNode(context, errToken));
       }
     }

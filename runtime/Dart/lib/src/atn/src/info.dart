@@ -64,7 +64,7 @@ class DecisionEventInfo {
   /// The configuration set containing additional information relevant to the
   /// prediction state when the current event occurred, or null if no
   /// additional information is relevant or available.
-  final ATNConfigSet configs;
+  final ATNConfigSet? configs;
 
   /// The input token stream which is being parsed.
   final TokenStream input;
@@ -80,8 +80,14 @@ class DecisionEventInfo {
   /// otherwise, [false] if the input occurred during SLL prediction.
   final bool fullCtx;
 
-  DecisionEventInfo(this.decision, this.configs, this.input, this.startIndex,
-      this.stopIndex, this.fullCtx);
+  DecisionEventInfo(
+    this.decision,
+    this.configs,
+    this.input,
+    this.startIndex,
+    this.stopIndex,
+    this.fullCtx,
+  );
 }
 
 /// This class contains profiling gathered for a particular decision.
@@ -101,7 +107,7 @@ class DecisionInfo {
 
   /// The total number of times {@link ParserATNSimulator#adaptivePredict} was
   /// invoked for this decision.
-  int invocations;
+  int? invocations;
 
   /// The total time spent in {@link ParserATNSimulator#adaptivePredict} for
   /// this decision, in nanoseconds.
@@ -115,50 +121,50 @@ class DecisionInfo {
   /// which is warmed up by parsing the input prior to profiling. If desired,
   /// call {@link ATNSimulator#clearDFA} to reset the DFA cache to its initial
   /// state before starting the profiling measurement pass.</p>
-  int timeInPrediction;
+  int? timeInPrediction;
 
   /// The sum of the lookahead required for SLL prediction for this decision.
   /// Note that SLL prediction is used before LL prediction for performance
   /// reasons even when {@link PredictionMode#LL} or
   /// {@link PredictionMode#LL_EXACT_AMBIG_DETECTION} is used.
-  int SLL_TotalLook;
+  int? SLL_TotalLook;
 
   /// Gets the minimum lookahead required for any single SLL prediction to
   /// complete for this decision, by reaching a unique prediction, reaching an
   /// SLL conflict state, or encountering a syntax error.
-  int SLL_MinLook;
+  int? SLL_MinLook;
 
   /// Gets the maximum lookahead required for any single SLL prediction to
   /// complete for this decision, by reaching a unique prediction, reaching an
   /// SLL conflict state, or encountering a syntax error.
-  int SLL_MaxLook;
+  int? SLL_MaxLook;
 
   /// Gets the [LookaheadEventInfo] associated with the event where the
   /// {@link #SLL_MaxLook} value was set.
-  LookaheadEventInfo SLL_MaxLookEvent;
+  LookaheadEventInfo? SLL_MaxLookEvent;
 
   /// The sum of the lookahead required for LL prediction for this decision.
   /// Note that LL prediction is only used when SLL prediction reaches a
   /// conflict state.
-  int LL_TotalLook;
+  int? LL_TotalLook;
 
   /// Gets the minimum lookahead required for any single LL prediction to
   /// complete for this decision. An LL prediction completes when the algorithm
   /// reaches a unique prediction, a conflict state (for
   /// {@link PredictionMode#LL}, an ambiguity state (for
   /// {@link PredictionMode#LL_EXACT_AMBIG_DETECTION}, or a syntax error.
-  int LL_MinLook;
+  int? LL_MinLook;
 
   /// Gets the maximum lookahead required for any single LL prediction to
   /// complete for this decision. An LL prediction completes when the algorithm
   /// reaches a unique prediction, a conflict state (for
   /// {@link PredictionMode#LL}, an ambiguity state (for
   /// {@link PredictionMode#LL_EXACT_AMBIG_DETECTION}, or a syntax error.
-  int LL_MaxLook;
+  int? LL_MaxLook;
 
   /// Gets the [LookaheadEventInfo] associated with the event where the
   /// {@link #LL_MaxLook} value was set.
-  LookaheadEventInfo LL_MaxLookEvent;
+  LookaheadEventInfo? LL_MaxLookEvent;
 
   /// A collection of [ContextSensitivityInfo] instances describing the
   /// context sensitivities encountered during LL prediction for this decision.
@@ -200,7 +206,7 @@ class DecisionInfo {
   /// @see #SLL_ATNTransitions
   /// @see ParserATNSimulator#computeTargetState
   /// @see LexerATNSimulator#computeTargetState
-  int SLL_ATNTransitions;
+  int? SLL_ATNTransitions;
 
   /// The total number of DFA transitions required during SLL prediction for
   /// this decision.
@@ -210,7 +216,7 @@ class DecisionInfo {
   ///
   /// @see ParserATNSimulator#getExistingTargetState
   /// @see LexerATNSimulator#getExistingTargetState
-  int SLL_DFATransitions;
+  int? SLL_DFATransitions;
 
   /// Gets the total number of times SLL prediction completed in a conflict
   /// state, resulting in fallback to LL prediction.
@@ -221,7 +227,7 @@ class DecisionInfo {
   /// conflicts for this decision produce the same result as LL prediction for
   /// this decision, {@link PredictionMode#SLL} would produce the same overall
   /// parsing result as {@link PredictionMode#LL}.</p>
-  int LL_Fallback;
+  int? LL_Fallback;
 
   /// The total number of ATN transitions required during LL prediction for
   /// this decision. An ATN transition is determined by the number of times the
@@ -237,7 +243,7 @@ class DecisionInfo {
   /// @see #LL_DFATransitions
   /// @see ParserATNSimulator#computeTargetState
   /// @see LexerATNSimulator#computeTargetState
-  int LL_ATNTransitions;
+  int? LL_ATNTransitions;
 
   /// The total number of DFA transitions required during LL prediction for
   /// this decision.
@@ -247,7 +253,7 @@ class DecisionInfo {
   ///
   /// @see ParserATNSimulator#getExistingTargetState
   /// @see LexerATNSimulator#getExistingTargetState
-  int LL_DFATransitions;
+  int? LL_DFATransitions;
 
   /// Constructs a new instance of the [DecisionInfo] class to contain
   /// statistics for a particular decision.
@@ -340,9 +346,14 @@ class ErrorInfo extends DecisionEventInfo {
   /// @param fullCtx [true] if the syntax error was identified during LL
   /// prediction; otherwise, [false] if the syntax error was identified
   /// during SLL prediction
-  ErrorInfo(int decision, ATNConfigSet configs, TokenStream input,
-      int startIndex, int stopIndex, bool fullCtx)
-      : super(decision, configs, input, startIndex, stopIndex, fullCtx);
+  ErrorInfo(
+    int decision,
+    ATNConfigSet? configs,
+    TokenStream input,
+    int startIndex,
+    int stopIndex,
+    bool fullCtx,
+  ) : super(decision, configs, input, startIndex, stopIndex, fullCtx);
 }
 
 /// This class represents profiling event information for tracking the lookahead
@@ -369,9 +380,15 @@ class LookaheadEventInfo extends DecisionEventInfo {
   /// @param fullCtx [true] if the current lookahead is part of an LL
   /// prediction; otherwise, [false] if the current lookahead is part of
   /// an SLL prediction
-  LookaheadEventInfo(int decision, ATNConfigSet configs, this.predictedAlt,
-      TokenStream input, int startIndex, int stopIndex, bool fullCtx)
-      : super(decision, configs, input, startIndex, stopIndex, fullCtx);
+  LookaheadEventInfo(
+    int decision,
+    ATNConfigSet? configs,
+    this.predictedAlt,
+    TokenStream input,
+    int startIndex,
+    int stopIndex,
+    bool fullCtx,
+  ) : super(decision, configs, input, startIndex, stopIndex, fullCtx);
 }
 
 /// This class represents profiling event information for semantic predicate
@@ -453,7 +470,8 @@ class ParseInfo {
     final decisions = atnSimulator.decisionInfo;
     final LL = <int>[];
     for (var i = 0; i < decisions.length; i++) {
-      final fallBack = decisions[i].LL_Fallback;
+      //Todo: i assumed if it is null we should not add it
+      final fallBack = decisions[i].LL_Fallback ?? 0;
       if (fallBack > 0) LL.add(i);
     }
     return LL;
@@ -466,7 +484,8 @@ class ParseInfo {
     final decisions = atnSimulator.decisionInfo;
     var t = 0;
     for (var i = 0; i < decisions.length; i++) {
-      t += decisions[i].timeInPrediction;
+      //Todo: I assumed if it is null we should not add it, this value is never initialized
+      t += decisions[i].timeInPrediction ?? 0;
     }
     return t;
   }
@@ -478,7 +497,8 @@ class ParseInfo {
     final decisions = atnSimulator.decisionInfo;
     var k = 0;
     for (var i = 0; i < decisions.length; i++) {
-      k += decisions[i].SLL_TotalLook;
+      //Todo: I assumed if it is null we should not add it, this value is never initialized
+      k += decisions[i].SLL_TotalLook ?? 0;
     }
     return k;
   }
@@ -490,7 +510,8 @@ class ParseInfo {
     final decisions = atnSimulator.decisionInfo;
     var k = 0;
     for (var i = 0; i < decisions.length; i++) {
-      k += decisions[i].LL_TotalLook;
+      //Todo: I assumed if it is null we should not add it, this value is never initialized
+      k += decisions[i].LL_TotalLook ?? 0;
     }
     return k;
   }
@@ -501,7 +522,8 @@ class ParseInfo {
     final decisions = atnSimulator.decisionInfo;
     var k = 0;
     for (var i = 0; i < decisions.length; i++) {
-      k += decisions[i].SLL_ATNTransitions;
+      //Todo: I assumed if it is null we should not add it, this value is never initialized
+      k += decisions[i].SLL_ATNTransitions ?? 0;
     }
     return k;
   }
@@ -512,7 +534,8 @@ class ParseInfo {
     final decisions = atnSimulator.decisionInfo;
     var k = 0;
     for (var i = 0; i < decisions.length; i++) {
-      k += decisions[i].LL_ATNTransitions;
+      //Todo: I assumed if it is null we should not add it, this value is never initialized
+      k += decisions[i].LL_ATNTransitions ?? 0;
     }
     return k;
   }
@@ -527,8 +550,9 @@ class ParseInfo {
     final decisions = atnSimulator.decisionInfo;
     var k = 0;
     for (var i = 0; i < decisions.length; i++) {
-      k += decisions[i].SLL_ATNTransitions;
-      k += decisions[i].LL_ATNTransitions;
+      //Todo: I assumed if it is null we should not add it, this value is never initialized
+      k += decisions[i].SLL_ATNTransitions ?? 0;
+      k += decisions[i].LL_ATNTransitions ?? 0;
     }
     return k;
   }

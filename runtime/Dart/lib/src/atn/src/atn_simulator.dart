@@ -12,8 +12,10 @@ import 'atn_config_set.dart';
 abstract class ATNSimulator {
   /// Must distinguish between missing edge and edge we know leads nowhere */
 
-  static final DFAState ERROR =
-      DFAState(stateNumber: 0x7FFFFFFF, configs: ATNConfigSet());
+  static final DFAState ERROR = DFAState(
+    stateNumber: 0x7FFFFFFF,
+    configs: ATNConfigSet(),
+  );
 
   final ATN atn;
 
@@ -85,7 +87,7 @@ class PredictionContextCache {
     return ctx;
   }
 
-  PredictionContext operator [](PredictionContext ctx) {
+  PredictionContext? operator [](PredictionContext ctx) {
     return cache[ctx];
   }
 

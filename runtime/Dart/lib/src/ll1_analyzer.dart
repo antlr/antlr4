@@ -70,7 +70,7 @@ class LL1Analyzer {
 
   IntervalSet LOOK(
     ATNState s,
-    RuleContext ctx, [
+    RuleContext? ctx, [
     ATNState? stopState,
   ]) {
     final r = IntervalSet();
@@ -156,7 +156,7 @@ class LL1Analyzer {
         try {
           calledRuleStack.clear(s.ruleIndex);
           for (var i = 0; i < ctx.length; i++) {
-            final returnState = atn.states[ctx.getReturnState(i)];
+            final returnState = atn.states[ctx.getReturnState(i)]!;
 //					    System.out.println("popping back to "+retState);
             _LOOK(returnState, stopState, ctx.getParent(i), look, lookBusy,
                 calledRuleStack, seeThruPreds, addEOF);

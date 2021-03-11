@@ -47,7 +47,7 @@ class PredPrediction {
 class DFAState {
   int stateNumber;
 
-  ATNConfigSet? configs = ATNConfigSet();
+  ATNConfigSet configs = ATNConfigSet();
 
   /// {@code edges[symbol]} points to target of symbol. Shift up by 1 so (-1)
   ///  {@link Token#EOF} maps to {@code edges[0]}.
@@ -83,7 +83,7 @@ class DFAState {
 
   List<PredPrediction>? predicates;
 
-  DFAState({this.stateNumber = -1, this.configs});
+  DFAState({this.stateNumber = -1, required this.configs});
 
   /// Get the set of all alts mentioned by all ATN configurations in this
   ///  DFA state.

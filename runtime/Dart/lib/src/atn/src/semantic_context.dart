@@ -52,8 +52,10 @@ abstract class SemanticContext {
   /// <li>A non-null [SemanticContext]in the new simplified
   /// semantic context after precedence predicates are evaluated.</li>
   /// </ul>
-  SemanticContext evalPrecedence(Recognizer parser,
-      RuleContext parserCallStack) {
+  SemanticContext? evalPrecedence(
+    Recognizer parser,
+    RuleContext parserCallStack,
+  ) {
     return this;
   }
 
@@ -143,8 +145,10 @@ class PrecedencePredicate extends SemanticContext
   }
 
   @override
-  SemanticContext evalPrecedence(Recognizer parser,
-      RuleContext parserCallStack) {
+  SemanticContext? evalPrecedence(
+    Recognizer parser,
+    RuleContext parserCallStack,
+  ) {
     if (parser.precpred(parserCallStack, precedence)) {
       return SemanticContext.NONE;
     } else {
@@ -198,7 +202,7 @@ abstract class Operator extends SemanticContext {
 /// is false.
 
 class AND extends Operator {
-  List<SemanticContext> opnds;
+  late final List<SemanticContext> opnds;
 
   AND(SemanticContext a, SemanticContext b) {
     var operands = <SemanticContext>{};
@@ -214,13 +218,13 @@ class AND extends Operator {
     }
 
     final precedencePredicates =
-    SemanticContext.filterPrecedencePredicates(operands);
+        SemanticContext.filterPrecedencePredicates(operands);
 
     operands = SemanticContext.filterNonPrecedencePredicates(operands).toSet();
     if (precedencePredicates.isNotEmpty) {
       // interested in the transition with the lowest precedence
       final reduced =
-      precedencePredicates.reduce((a, b) => a.compareTo(b) <= 0 ? a : b);
+          precedencePredicates.reduce((a, b) => a.compareTo(b) <= 0 ? a : b);
       operands.add(reduced);
     }
 
@@ -259,13 +263,14 @@ class AND extends Operator {
   }
 
   @override
-  SemanticContext evalPrecedence(Recognizer parser,
-      RuleContext parserCallStack) {
+  SemanticContext? evalPrecedence(
+    Recognizer parser,
+    RuleContext parserCallStack,
+  ) {
     var differs = false;
     final operands = <SemanticContext>[];
     for (var context in opnds) {
-      final evaluated =
-      context.evalPrecedence(parser, parserCallStack);
+      final evaluated = context.evalPrecedence(parser, parserCallStack);
       differs |= (evaluated != context);
       if (evaluated == null) {
         // The AND context is false if any element is false
@@ -302,7 +307,7 @@ class AND extends Operator {
 /// A semantic context which is true whenever at least one of the contained
 /// contexts is true.
 class OR extends Operator {
-  List<SemanticContext> opnds;
+  late final List<SemanticContext> opnds;
 
   OR(SemanticContext a, SemanticContext b) {
     var operands = <SemanticContext>{};
@@ -318,13 +323,13 @@ class OR extends Operator {
     }
 
     final precedencePredicates =
-    SemanticContext.filterPrecedencePredicates(operands);
+        SemanticContext.filterPrecedencePredicates(operands);
 
     operands = SemanticContext.filterNonPrecedencePredicates(operands).toSet();
     if (precedencePredicates.isNotEmpty) {
       // interested in the transition with the highest precedence
       final reduced =
-      precedencePredicates.reduce((a, b) => a.compareTo(b) >= 0 ? a : b);
+          precedencePredicates.reduce((a, b) => a.compareTo(b) >= 0 ? a : b);
       operands.add(reduced);
     }
 
@@ -363,13 +368,14 @@ class OR extends Operator {
   }
 
   @override
-  SemanticContext evalPrecedence(Recognizer parser,
-      RuleContext parserCallStack) {
+  SemanticContext? evalPrecedence(
+    Recognizer parser,
+    RuleContext parserCallStack,
+  ) {
     var differs = false;
     final operands = <SemanticContext>[];
     for (var context in opnds) {
-      final evaluated =
-      context.evalPrecedence(parser, parserCallStack);
+      final evaluated = context.evalPrecedence(parser, parserCallStack);
       differs |= (evaluated != context);
       if (evaluated == SemanticContext.NONE) {
         // The OR context is true if any element is true

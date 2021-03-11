@@ -266,7 +266,7 @@ class ParserATNSimulator extends ATNSimulator {
   static final bool TURN_OFF_LR_LOOP_ENTRY_BRANCH_OPT =
       bool.fromEnvironment('TURN_OFF_LR_LOOP_ENTRY_BRANCH_OPT');
 
-  final Parser parser;
+  final Parser? parser;
 
   final List<DFA> decisionToDFA;
 
@@ -1957,10 +1957,20 @@ class ParserATNSimulator extends ATNSimulator {
     }
   }
 
-  NoViableAltException noViableAlt(TokenStream input,
-      ParserRuleContext outerContext, ATNConfigSet configs, int startIndex) {
-    return NoViableAltException(parser, input, input.get(startIndex),
-        input.LT(1), configs, outerContext);
+  NoViableAltException noViableAlt(
+    TokenStream input,
+    ParserRuleContext outerContext,
+    ATNConfigSet configs,
+    int startIndex,
+  ) {
+    return NoViableAltException(
+      parser,
+      input,
+      input.get(startIndex),
+      input.LT(1),
+      configs,
+      outerContext,
+    );
   }
 
   static int getUniqueAlt(ATNConfigSet configs) {
@@ -1993,7 +2003,7 @@ class ParserATNSimulator extends ATNSimulator {
   /// @return If [to] is null, this method returns null;
   /// otherwise this method returns the result of calling {@link #addDFAState}
   /// on [to]
-  DFAState addDFAEdge(DFA dfa, DFAState from, int t, DFAState to) {
+  DFAState? addDFAEdge(DFA dfa, DFAState? from, int t, DFAState? to) {
     if (debug) {
       log('EDGE $from -> $to upon ' + getTokenName(t));
     }
@@ -2007,14 +2017,14 @@ class ParserATNSimulator extends ATNSimulator {
       return to;
     }
 
-    from.edges ??= List(atn.maxTokenType + 1 + 1);
+    from.edges ??= List.filled(atn.maxTokenType + 1 + 1, null);
 
-    from.edges[t + 1] = to; // connect
+    from.edges![t + 1] = to; // connect
 
     if (debug) {
       log('DFA=\n' +
           dfa.toString(parser != null
-              ? parser.vocabulary
+              ? parser!.vocabulary
               : VocabularyImpl.EMPTY_VOCABULARY));
     }
 
@@ -2052,17 +2062,30 @@ class ParserATNSimulator extends ATNSimulator {
     return D;
   }
 
-  void reportAttemptingFullContext(DFA dfa, BitSet conflictingAlts,
-      ATNConfigSet configs, int startIndex, int stopIndex) {
+  void reportAttemptingFullContext(
+    DFA dfa,
+    BitSet? conflictingAlts,
+    ATNConfigSet configs,
+    int startIndex,
+    int stopIndex,
+  ) {
     if (debug || retry_debug) {
       final interval = Interval.of(startIndex, stopIndex);
-      log('reportAttemptingFullContext decision=${dfa.decision}:$configs'
-              ', input=' +
-          parser.tokenStream.getText(interval));
+      log(
+        'reportAttemptingFullContext decision=${dfa.decision}:$configs'
+                ', input=' +
+            (parser?.tokenStream.getText(interval) ?? ''),
+      );
     }
     if (parser != null) {
-      parser.errorListenerDispatch.reportAttemptingFullContext(
-          parser, dfa, startIndex, stopIndex, conflictingAlts, configs);
+      parser!.errorListenerDispatch.reportAttemptingFullContext(
+        parser!,
+        dfa,
+        startIndex,
+        stopIndex,
+        conflictingAlts,
+        configs,
+      );
     }
   }
 
@@ -2070,34 +2093,52 @@ class ParserATNSimulator extends ATNSimulator {
       int startIndex, int stopIndex) {
     if (debug || retry_debug) {
       final interval = Interval.of(startIndex, stopIndex);
-      log('reportContextSensitivity decision=${dfa.decision}:$configs'
-              ', input=' +
-          parser.tokenStream.getText(interval));
+      log(
+        'reportContextSensitivity decision=${dfa.decision}:$configs'
+                ', input=' +
+            (parser?.tokenStream.getText(interval) ?? ''),
+      );
     }
     if (parser != null) {
-      parser.errorListenerDispatch.reportContextSensitivity(
-          parser, dfa, startIndex, stopIndex, prediction, configs);
+      parser!.errorListenerDispatch.reportContextSensitivity(
+        parser!,
+        dfa,
+        startIndex,
+        stopIndex,
+        prediction,
+        configs,
+      );
     }
   }
 
   /// If context sensitive parsing, we know it's ambiguity not conflict */
   void reportAmbiguity(
-      DFA dfa,
-      DFAState D, // the DFA state from execATN() that had SLL conflicts
-      int startIndex,
-      int stopIndex,
-      bool exact,
-      BitSet ambigAlts,
-      ATNConfigSet configs) // configs that LL not SLL considered conflicting
+    DFA dfa,
+    DFAState D, // the DFA state from execATN() that had SLL conflicts
+    int startIndex,
+    int stopIndex,
+    bool exact,
+    BitSet ambigAlts,
+    ATNConfigSet configs,
+  ) // configs that LL not SLL considered conflicting
   {
     if (debug || retry_debug) {
       final interval = Interval.of(startIndex, stopIndex);
-      log('reportAmbiguity $ambigAlts:$configs' ', input=' +
-          parser.tokenStream.getText(interval));
+      log(
+        'reportAmbiguity $ambigAlts:$configs' ', input=' +
+            (parser?.tokenStream.getText(interval) ?? ''),
+      );
     }
     if (parser != null) {
-      parser.errorListenerDispatch.reportAmbiguity(
-          parser, dfa, startIndex, stopIndex, exact, ambigAlts, configs);
+      parser!.errorListenerDispatch.reportAmbiguity(
+        parser!,
+        dfa,
+        startIndex,
+        stopIndex,
+        exact,
+        ambigAlts,
+        configs,
+      );
     }
   }
 }

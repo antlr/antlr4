@@ -19,14 +19,14 @@ abstract class TokenFactory<Symbol extends Token> {
   ///  are wiped to -1 in the text override is set in the CommonToken.
   Symbol create(
     int type,
-    String text, [
+    String? text,
     Pair<TokenSource?, CharStream?> source,
     int channel,
     int start,
     int stop,
-    int line,
+    int? line,
     int charPositionInLine,
-  ]);
+  );
 }
 
 /// This default implementation of [TokenFactory] creates
@@ -67,14 +67,14 @@ class CommonTokenFactory implements TokenFactory<CommonToken> {
   @override
   CommonToken create(
     int type,
-    String text, [
+    String? text,
     Pair<TokenSource?, CharStream?>? source,
-    int? channel,
-    int? start,
-    int? stop,
+    int channel,
+    int start,
+    int stop,
     int? line,
-    int? charPositionInLine,
-  ]) {
+    int charPositionInLine,
+  ) {
     if (source == null) {
       return CommonToken(type, text: text);
     }
@@ -89,9 +89,9 @@ class CommonTokenFactory implements TokenFactory<CommonToken> {
     t.line = line;
     t.charPositionInLine = charPositionInLine;
     if (text != null) {
-      t.text = text!;
+      t.text = text;
     } else if (copyText && source.b != null) {
-      t.text = source.b.getText(Interval.of(start, stop));
+      t.text = source.b!.getText(Interval.of(start, stop));
     }
 
     return t;
