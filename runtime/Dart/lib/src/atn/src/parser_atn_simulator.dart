@@ -287,7 +287,7 @@ class ParserATNSimulator extends ATNSimulator {
   // LAME globals to avoid parameters!!!!! I need these down deep in predTransition
   late TokenStream input;
   int startIndex = 0;
-  late ParserRuleContext _outerContext;
+  ParserRuleContext? _outerContext;
   DFA? _dfa;
 
   ParserATNSimulator(
@@ -310,7 +310,7 @@ class ParserATNSimulator extends ATNSimulator {
   int adaptivePredict(
     TokenStream input_,
     int decision,
-    ParserRuleContext outerContext,
+    ParserRuleContext? outerContext,
   ) {
     if (debug || debug_list_atn_decisions) {
       log('adaptivePredict decision $decision' ' exec LA(1)==' +
@@ -1441,7 +1441,7 @@ class ParserATNSimulator extends ATNSimulator {
   /// @since 4.3
   bool evalSemanticContextOne(
     SemanticContext pred,
-    ParserRuleContext parserCallStack,
+    ParserRuleContext? parserCallStack,
     int alt,
     bool fullCtx,
   ) {

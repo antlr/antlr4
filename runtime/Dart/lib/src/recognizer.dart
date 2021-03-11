@@ -147,7 +147,7 @@ abstract class Recognizer<ATNInterpreter extends ATNSimulator> {
     return true;
   }
 
-  bool precpred(RuleContext localctx, int precedence) {
+  bool precpred(RuleContext? localctx, int precedence) {
     return true;
   }
 
