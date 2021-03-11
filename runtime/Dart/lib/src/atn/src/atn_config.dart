@@ -84,7 +84,7 @@ class ATNConfig {
   /// <em>completely</em> unaffected by the change.</p>
   int reachesIntoOuterContext;
 
-  SemanticContext? semanticContext;
+  SemanticContext semanticContext;
 
   ATNConfig(
     this.state,

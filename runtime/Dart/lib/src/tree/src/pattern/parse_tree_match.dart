@@ -477,8 +477,9 @@ class ParseTreePatternMatcher {
             throw ArgumentError(
                 'Unknown rule ' + tagChunk.tag + ' in pattern: ' + pattern);
           }
+          //Todo: I didnt get why ruleToTokenType is called here since it can be null if we are in a PARSER
           final ruleImaginaryTokenType =
-              parser.ATNWithBypassAlts.ruleToTokenType[ruleIndex];
+              parser.ATNWithBypassAlts.ruleToTokenType![ruleIndex];
           tokens.add(RuleTagToken(
               tagChunk.tag, ruleImaginaryTokenType, tagChunk.label));
         } else {

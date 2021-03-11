@@ -61,14 +61,14 @@ class Trees {
         final symbol = (t).symbol;
         if (symbol != null) {
           final s = symbol.text;
-          return s;
+          return s ?? '';
         }
       }
     }
     // no recog for rule names
     Object payload = t.payload;
     if (payload is Token) {
-      return payload.text;
+      return payload.text ?? '';
     }
     return t.payload.toString();
   }

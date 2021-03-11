@@ -316,7 +316,7 @@ class TerminalNodeImpl extends TerminalNode {
   @override
   String toString() {
     if (symbol.type == Token.EOF) return '<EOF>';
-    return symbol.text;
+    return symbol.text ?? '';
   }
 }
 

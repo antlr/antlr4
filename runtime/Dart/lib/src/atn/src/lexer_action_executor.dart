@@ -93,7 +93,7 @@ class LexerActionExecutor {
   /// @return A [LexerActionExecutor] which stores input stream offsets
   /// for all position-dependent lexer actions.
   LexerActionExecutor fixOffsetBeforeMatch(int offset) {
-    List<LexerAction> updatedLexerActions;
+    List<LexerAction>? updatedLexerActions;
     for (var i = 0; i < lexerActions.length; i++) {
       if (lexerActions[i].isPositionDependent &&
           !(lexerActions[i] is LexerIndexedCustomAction)) {

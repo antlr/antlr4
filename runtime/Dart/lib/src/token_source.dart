@@ -36,7 +36,7 @@ abstract class TokenSource {
   ///
   /// @return The line number for the current position in the input stream, or
   /// 0 if the current token source does not track line numbers.
-  int get line;
+  int? get line;
 
   /// Get the index into the current line for the current position in the input
   /// stream. The first character on a line has position 0.
@@ -143,8 +143,8 @@ class ListTokenSource implements TokenSource {
       }
 
       return lastToken.charPositionInLine +
-          lastToken.stopIndex -
-          lastToken.startIndex +
+          lastToken.stopIndex! -
+          lastToken.startIndex! +
           1;
     }
 
@@ -161,7 +161,7 @@ class ListTokenSource implements TokenSource {
       if (eofToken == null) {
         var start = -1;
         if (tokens.isNotEmpty) {
-          final previousStop = tokens[tokens.length - 1].stopIndex;
+          final previousStop = tokens[tokens.length - 1].stopIndex!;
           if (previousStop != -1) {
             start = previousStop + 1;
           }
@@ -195,7 +195,7 @@ class ListTokenSource implements TokenSource {
   /// {@inheritDoc}
 
   @override
-  int get line {
+  int? get line {
     if (i < tokens.length) {
       return tokens[i].line;
     } else if (eofToken != null) {
@@ -204,7 +204,7 @@ class ListTokenSource implements TokenSource {
       // have to calculate the result from the line/column of the previous
       // token, along with the text of the token.
       final lastToken = tokens[tokens.length - 1];
-      var line = lastToken.line;
+      var line = lastToken.line ?? 0;
 
       final tokenText = lastToken.text;
       if (tokenText != null) {

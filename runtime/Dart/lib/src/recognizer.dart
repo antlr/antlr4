@@ -21,7 +21,7 @@ abstract class Recognizer<ATNInterpreter extends ATNSimulator> {
   final List<ErrorListener> _listeners = [ConsoleErrorListener.INSTANCE];
 
   /// The ATN interpreter used by the recognizer for prediction.
-  ATNInterpreter interpreter;
+  late ATNInterpreter interpreter;
   int _stateNumber = -1;
 
   List<String> get ruleNames;
@@ -119,12 +119,9 @@ abstract class Recognizer<ATNInterpreter extends ATNSimulator> {
     return 'line $line:$charPositionInLine';
   }
 
-  /// @exception NullPointerException if [listener] is null.
-  void addErrorListener(ErrorListener listener) {
-    if (listener == null) {
-      throw ArgumentError.notNull('listener');
-    }
-
+  void addErrorListener(
+    ErrorListener listener, // Todo: should never be null
+  ) {
     _listeners.add(listener);
   }
 
@@ -146,7 +143,7 @@ abstract class Recognizer<ATNInterpreter extends ATNSimulator> {
 
   // subclass needs to override these if there are sempreds or actions
   // that the ATN interp needs to execute
-  bool sempred(RuleContext _localctx, int ruleIndex, int actionIndex) {
+  bool sempred(RuleContext? _localctx, int ruleIndex, int actionIndex) {
     return true;
   }
 
@@ -154,7 +151,7 @@ abstract class Recognizer<ATNInterpreter extends ATNSimulator> {
     return true;
   }
 
-  void action(RuleContext _localctx, int ruleIndex, int actionIndex) {}
+  void action(RuleContext? _localctx, int ruleIndex, int actionIndex) {}
 
   int get state {
     return _stateNumber;

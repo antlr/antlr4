@@ -18,8 +18,8 @@ import 'parser_atn_simulator.dart';
 import 'semantic_context.dart';
 
 class ProfilingATNSimulator extends ParserATNSimulator {
-  List<DecisionInfo> decisions;
-  int numDecisions;
+  late List<DecisionInfo> decisions;
+  late int numDecisions;
 
   int _sllStopIndex;
   int _llStopIndex;
@@ -40,18 +40,25 @@ class ProfilingATNSimulator extends ParserATNSimulator {
   int conflictingAltResolvedBySLL;
 
   ProfilingATNSimulator(Parser parser)
-      : super(parser, parser.interpreter.atn, parser.interpreter.decisionToDFA,
-            parser.interpreter.sharedContextCache) {
+      : super(
+          parser,
+          parser.interpreter.atn,
+          parser.interpreter.decisionToDFA,
+          parser.interpreter.sharedContextCache,
+        ) {
     numDecisions = atn.decisionToState.length;
-    decisions = List<DecisionInfo>(numDecisions);
-    for (var i = 0; i < numDecisions; i++) {
-      decisions[i] = DecisionInfo(i);
-    }
+    decisions = List<DecisionInfo>.generate(
+      numDecisions,
+      (index) => DecisionInfo(index),
+    );
   }
 
   @override
   int adaptivePredict(
-      TokenStream input, int decision, ParserRuleContext outerContext) {
+    TokenStream input,
+    int decision,
+    ParserRuleContext outerContext,
+  ) {
     try {
       _sllStopIndex = -1;
       _llStopIndex = -1;
@@ -73,7 +80,14 @@ class ProfilingATNSimulator extends ParserATNSimulator {
       if (SLL_k > decisions[decision].SLL_MaxLook) {
         decisions[decision].SLL_MaxLook = SLL_k;
         decisions[decision].SLL_MaxLookEvent = LookaheadEventInfo(
-            decision, null, alt, input, startIndex, _sllStopIndex, false);
+          decision,
+          null,
+          alt,
+          input,
+          startIndex,
+          _sllStopIndex,
+          false,
+        );
       }
 
       if (_llStopIndex >= 0) {
@@ -106,8 +120,16 @@ class ProfilingATNSimulator extends ParserATNSimulator {
       decisions[currentDecision]
           .SLL_DFATransitions++; // count only if we transition over a DFA state
       if (existingTargetState == ATNSimulator.ERROR) {
-        decisions[currentDecision].errors.add(ErrorInfo(currentDecision,
-            previousD.configs, input, startIndex, _sllStopIndex, false));
+        decisions[currentDecision].errors.add(
+              ErrorInfo(
+                currentDecision,
+                previousD.configs,
+                input,
+                startIndex,
+                _sllStopIndex,
+                false,
+              ),
+            );
       }
     }
 
@@ -176,16 +198,33 @@ class ProfilingATNSimulator extends ParserATNSimulator {
   }
 
   @override
-  void reportAttemptingFullContext(DFA dfa, BitSet conflictingAlts,
-      ATNConfigSet configs, int startIndex, int stopIndex) {
+  void reportAttemptingFullContext(
+    DFA dfa,
+    BitSet? conflictingAlts,
+    ATNConfigSet configs,
+    int startIndex,
+    int stopIndex,
+  ) {
     if (conflictingAlts != null) {
       conflictingAltResolvedBySLL = conflictingAlts.nextset(0);
     } else {
       conflictingAltResolvedBySLL = configs.alts.nextset(0);
     }
-    decisions[currentDecision].LL_Fallback++;
+    //Todo: I assumed if it is null it should be zero
+    if (decisions[currentDecision].LL_Fallback == null) {
+      decisions[currentDecision].LL_Fallback = 1;
+    } else {
+      decisions[currentDecision].LL_Fallback =
+          decisions[currentDecision].LL_Fallback! + 1;
+    }
+
     super.reportAttemptingFullContext(
-        dfa, conflictingAlts, configs, startIndex, stopIndex);
+      dfa,
+      conflictingAlts,
+      configs,
+      startIndex,
+      stopIndex,
+    );
   }
 
   @override

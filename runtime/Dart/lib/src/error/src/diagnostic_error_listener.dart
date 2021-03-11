@@ -56,11 +56,18 @@ class DiagnosticErrorListener extends BaseErrorListener {
   }
 
   @override
-  void reportAttemptingFullContext(Parser recognizer, DFA dfa, int startIndex,
-      int stopIndex, BitSet conflictingAlts, ATNConfigSet configs) {
+  void reportAttemptingFullContext(
+    Parser recognizer,
+    DFA dfa,
+    int startIndex,
+    int stopIndex,
+    BitSet? conflictingAlts,
+    ATNConfigSet configs,
+  ) {
     final decision = getDecisionDescription(recognizer, dfa);
-    final text =
-        recognizer.tokenStream.getText(Interval.of(startIndex, stopIndex));
+    final text = recognizer.tokenStream.getText(
+      Interval.of(startIndex, stopIndex),
+    );
     final message = "reportAttemptingFullContext d=$decision, input='$text'";
     recognizer.notifyErrorListeners(message);
   }
