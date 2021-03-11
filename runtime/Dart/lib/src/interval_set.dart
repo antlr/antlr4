@@ -283,7 +283,7 @@ class IntervalSet {
     return o;
   }
 
-  IntervalSet addAll(IntervalSet set) {
+  IntervalSet addAll(IntervalSet? set) {
     if (set == null) {
       return this;
     }

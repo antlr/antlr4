@@ -94,7 +94,7 @@ abstract class ATNState {
   static final int INVALID_STATE_NUMBER = -1;
 
   /// Which ATN are we in? */
-  ATN? atn;
+  late ATN atn;
 
   int stateNumber = INVALID_STATE_NUMBER;
 
@@ -280,8 +280,7 @@ class StarLoopbackState extends ATNState {
   StarLoopbackState(int ruleIndex) : super(ruleIndex);
 
   StarLoopEntryState get loopEntryState {
-    //Todo: evaluate this typing
-    return transition(0).target;
+    return transition(0).target as StarLoopEntryState;
   }
 
   @override

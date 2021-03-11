@@ -21,7 +21,7 @@ class DFA {
 
   /// From which ATN state did we create this DFA? */
 
-  DecisionState atnStartState;
+  DecisionState? atnStartState;
 
   /// [true] if this DFA is for a precedence decision; otherwise,
   /// [false]. This is the backing field for [isPrecedenceDfa].

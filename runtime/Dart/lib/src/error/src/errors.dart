@@ -28,7 +28,7 @@ class RecognitionException<StreamType extends IntStream> extends StateError {
   ///
   /// @return The recognizer where this exception occurred, or null if
   /// the recognizer is not available.
-  final Recognizer recognizer;
+  final Recognizer? recognizer;
 
   /// Gets the [RuleContext] at the time this exception was thrown.
   ///
@@ -120,7 +120,7 @@ class LexerNoViableAltException extends RecognitionException<CharStream> {
 class NoViableAltException extends RecognitionException {
   /// Which configurations did we try at input.index() that couldn't match input.LT(1)? */
 
-  final ATNConfigSet? deadEndConfigs;
+  final ATNConfigSet deadEndConfigs;
 
   /// The token object at the start index; the input stream might
   /// 	not be buffering tokens so get a reference to it. (At the
@@ -150,13 +150,13 @@ class NoViableAltException extends RecognitionException {
   }
 
   NoViableAltException(
-    Parser recognizer, [
+    Parser recognizer,
     TokenStream? input,
     Token? startToken,
     Token? offendingToken,
-    ATNConfigSet? deadEndConfigs,
+    ATNConfigSet deadEndConfigs,
     ParserRuleContext? ctx,
-  ]) : this._(
+  ) : this._(
           recognizer,
           input ?? recognizer.inputStream,
           startToken ?? recognizer.currentToken,

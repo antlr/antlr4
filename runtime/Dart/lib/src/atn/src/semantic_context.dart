@@ -59,7 +59,7 @@ abstract class SemanticContext {
     return this;
   }
 
-  static SemanticContext and(SemanticContext a, SemanticContext b) {
+  static SemanticContext? and(SemanticContext? a, SemanticContext? b) {
     if (a == null || a == NONE) return b;
     if (b == null || b == NONE) return a;
     final result = AND(a, b);
@@ -72,7 +72,7 @@ abstract class SemanticContext {
 
   ///
   ///  @see ParserATNSimulator#getPredsForAmbigAlts
-  static SemanticContext or(SemanticContext a, SemanticContext b) {
+  static SemanticContext? or(SemanticContext? a, SemanticContext? b) {
     if (a == null) return b;
     if (b == null) return a;
     if (a == NONE || b == NONE) return NONE;
@@ -290,7 +290,7 @@ class AND extends Operator {
       return SemanticContext.NONE;
     }
 
-    var result = operands[0];
+    SemanticContext? result = operands[0];
     for (var i = 1; i < operands.length; i++) {
       result = SemanticContext.and(result, operands[i]);
     }
@@ -395,7 +395,7 @@ class OR extends Operator {
       return null;
     }
 
-    var result = operands[0];
+    SemanticContext? result = operands[0];
     for (var i = 1; i < operands.length; i++) {
       result = SemanticContext.or(result, operands[i]);
     }

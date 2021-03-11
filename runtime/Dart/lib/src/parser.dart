@@ -45,7 +45,7 @@ abstract class Parser extends Recognizer<ParserATNSimulator> {
 
   /// The [ParserRuleContext] object for the currently executing rule.
   /// This is always non-null during the parsing process.
-  ParserRuleContext? _ctx;
+  ParserRuleContext? context;
 
   /// Specifies whether or not the parser should construct a parse tree during
   /// the parsing process. The default value is [true].
@@ -59,7 +59,7 @@ abstract class Parser extends Recognizer<ParserATNSimulator> {
   /// later call to {@link #setTrace}{@code (false)}. The listener itself is
   /// implemented as a parser listener so this field is not directly used by
   /// other parser methods.
-  TraceListener _tracer;
+  TraceListener? _tracer; // Todo: this is nullable and nothing can change this
 
   /// The list of [ParseTreeListener] listeners registered to receive
   /// events during the parse.
@@ -74,15 +74,15 @@ abstract class Parser extends Recognizer<ParserATNSimulator> {
   /// Indicates parser has match()ed EOF token. See {@link #exitRule()}. */
   bool matchedEOF = false;
 
-  Parser(TokenStream input) {
-    inputStream = input;
+  Parser(this._input) {
+    reset(false);
   }
 
   /// reset the parser's state */
   void reset([bool resetInput = true]) {
     if (resetInput) inputStream.seek(0);
     errorHandler.reset(this);
-    _ctx = null;
+    context = null;
     _syntaxErrors = 0;
     matchedEOF = false;
     setTrace(false);
@@ -123,7 +123,7 @@ abstract class Parser extends Recognizer<ParserATNSimulator> {
       if (_buildParseTrees && t.tokenIndex == -1) {
         // we must have conjured up a new token during single token insertion
         // if it's not the current symbol
-        _ctx.addErrorNode(createErrorNode(_ctx, t));
+        context!.addErrorNode(createErrorNode(context!, t));
       }
     }
     return t;
@@ -155,7 +155,7 @@ abstract class Parser extends Recognizer<ParserATNSimulator> {
       if (_buildParseTrees && t.tokenIndex == -1) {
         // we must have conjured up a new token during single token insertion
         // if it's not the current symbol
-        _ctx.addErrorNode(createErrorNode(_ctx, t));
+        context!.addErrorNode(createErrorNode(context!, t));
       }
     }
 
@@ -205,7 +205,7 @@ abstract class Parser extends Recognizer<ParserATNSimulator> {
   /// @return [true] if the {@link ParserRuleContext#children} list is trimmed
   /// using the default {@link Parser.TrimToSizeListener} during the parse process.
   bool get trimParseTree {
-    return parseListeners.contains(TrimToSizeListener.INSTANCE);
+    return parseListeners?.contains(TrimToSizeListener.INSTANCE) ?? false;
   }
 
   List<ParseTreeListener>? get parseListeners => _parseListeners;
@@ -253,7 +253,7 @@ abstract class Parser extends Recognizer<ParserATNSimulator> {
   /// @see #addParseListener
   ///
   /// @param listener the listener to remove
-  void removeParseListener(ParseTreeListener listener) {
+  void removeParseListener(ParseTreeListener? listener) {
     if (_parseListeners != null) {
       if (_parseListeners!.remove(listener)) {
         if (_parseListeners!.isEmpty) {
@@ -276,8 +276,8 @@ abstract class Parser extends Recognizer<ParserATNSimulator> {
   void triggerEnterRuleEvent() {
     if (_parseListeners == null) return;
     for (var listener in _parseListeners!) {
-      listener.enterEveryRule(_ctx!);
-      _ctx!.enterRule(listener);
+      listener.enterEveryRule(context!);
+      context!.enterRule(listener);
     }
   }
 
@@ -289,8 +289,8 @@ abstract class Parser extends Recognizer<ParserATNSimulator> {
     // reverse order walk of listeners
     for (var i = _parseListeners!.length - 1; i >= 0; i--) {
       final listener = _parseListeners![i];
-      _ctx!.exitRule(listener);
-      listener.exitEveryRule(_ctx!);
+      context!.exitRule(listener);
+      listener.exitEveryRule(context!);
     }
   }
 
@@ -383,7 +383,7 @@ abstract class Parser extends Recognizer<ParserATNSimulator> {
   ///  into the label for the associated token ref; e.g., x=ID.
 
   Token get currentToken {
-    return _input.LT(1);
+    return _input.LT(1)!;
   }
 
   void notifyErrorListeners(
@@ -393,7 +393,7 @@ abstract class Parser extends Recognizer<ParserATNSimulator> {
   ]) {
     offendingToken = offendingToken ?? currentToken;
     _syntaxErrors++;
-    var line = -1;
+    int? line = -1;
     var charPositionInLine = -1;
     line = offendingToken.line;
     charPositionInLine = offendingToken.charPositionInLine;
@@ -433,19 +433,19 @@ abstract class Parser extends Recognizer<ParserATNSimulator> {
     if (o.type != IntStream.EOF) {
       inputStream.consume();
     }
-    final hasListener = _parseListeners != null && _parseListeners.isNotEmpty;
+    final hasListener = _parseListeners != null && _parseListeners!.isNotEmpty;
     if (_buildParseTrees || hasListener) {
       if (errorHandler.inErrorRecoveryMode(this)) {
-        final node = _ctx.addErrorNode(createErrorNode(_ctx, o));
+        final node = context!.addErrorNode(createErrorNode(context!, o));
         if (_parseListeners != null) {
-          for (var listener in _parseListeners) {
+          for (var listener in _parseListeners!) {
             listener.visitErrorNode(node);
           }
         }
       } else {
-        final node = _ctx.addChild(createTerminalNode(_ctx, o));
+        final node = context!.addChild(createTerminalNode(context!, o));
         if (_parseListeners != null) {
-          for (var listener in _parseListeners) {
+          for (var listener in _parseListeners!) {
             listener.visitTerminal(node);
           }
         }
@@ -471,10 +471,10 @@ abstract class Parser extends Recognizer<ParserATNSimulator> {
   }
 
   void addContextToParseTree() {
-    final parent = _ctx.parent;
+    final parent = context?.parent;
     // add current context to parent if we have a parent
     if (parent != null) {
-      parent.addAnyChild(_ctx);
+      parent.addAnyChild(context!);
     }
   }
 
@@ -482,37 +482,39 @@ abstract class Parser extends Recognizer<ParserATNSimulator> {
   /// {@link #_ctx} get the current context.
   void enterRule(ParserRuleContext localctx, int state, int ruleIndex) {
     this.state = state;
-    _ctx = localctx;
-    _ctx.start = _input.LT(1);
+    context = localctx;
+    context!.start = _input.LT(1)!;
     if (_buildParseTrees) addContextToParseTree();
     if (_parseListeners != null) triggerEnterRuleEvent();
   }
 
   void exitRule() {
+    assert(context != null);
     if (matchedEOF) {
       // if we have matched EOF, it cannot consume past EOF so we use LT(1) here
-      _ctx.stop = _input.LT(1); // LT(1) will be end of file
+      context!.stop = _input.LT(1)!; // LT(1) will be end of file
     } else {
-      _ctx.stop = _input.LT(-1); // stop node is what we just matched
+      context!.stop = _input.LT(-1)!; // stop node is what we just matched
     }
     // trigger event on _ctx, before it reverts to parent
     if (_parseListeners != null) triggerExitRuleEvent();
-    state = _ctx.invokingState;
-    _ctx = _ctx.parent!;
+    state = context!.invokingState;
+    context = context!.parent!;
   }
 
   void enterOuterAlt(ParserRuleContext localctx, int altNum) {
+    assert(context != null);
     localctx.altNumber = altNum;
     // if we have new localctx, make sure we replace existing ctx
     // that is previous child of parse tree
-    if (_buildParseTrees && _ctx != localctx) {
-      final parent = _ctx.parent;
+    if (_buildParseTrees && context != localctx) {
+      final parent = context!.parent;
       if (parent != null) {
         parent.removeLastChild();
         parent.addAnyChild(localctx);
       }
     }
-    _ctx = localctx;
+    context = localctx;
   }
 
   /// Get the precedence level for the top-most precedence rule.
@@ -531,8 +533,8 @@ abstract class Parser extends Recognizer<ParserATNSimulator> {
       ParserRuleContext localctx, int state, int ruleIndex, int precedence) {
     this.state = state;
     _precedenceStack.add(precedence);
-    _ctx = localctx;
-    _ctx.start = _input.LT(1);
+    context = localctx;
+    context!.start = _input.LT(1)!;
     if (_parseListeners != null) {
       triggerEnterRuleEvent(); // simulates rule entry for left-recursive rules
     }
@@ -541,16 +543,20 @@ abstract class Parser extends Recognizer<ParserATNSimulator> {
   /// Like {@link #enterRule} but for recursive rules.
   ///  Make the current context the child of the incoming localctx.
   void pushNewRecursionContext(
-      ParserRuleContext localctx, int state, int ruleIndex) {
-    final previous = _ctx;
+    ParserRuleContext localctx,
+    int state,
+    int? ruleIndex,
+  ) {
+    assert(context != null);
+    final previous = context!;
     previous.parent = localctx;
     previous.invokingState = state;
-    previous.stop = _input.LT(-1);
+    previous.stop = _input.LT(-1)!;
 
-    _ctx = localctx;
-    _ctx.start = previous.start;
+    context = localctx;
+    context!.start = previous.start;
     if (_buildParseTrees) {
-      _ctx.addAnyChild(previous);
+      context!.addAnyChild(previous);
     }
 
     if (_parseListeners != null) {
@@ -558,19 +564,20 @@ abstract class Parser extends Recognizer<ParserATNSimulator> {
     }
   }
 
-  void unrollRecursionContexts(ParserRuleContext> _parentctx) {
+  void unrollRecursionContexts(ParserRuleContext? _parentctx) {
+    assert(context != null);
     _precedenceStack.removeLast();
-    _ctx.stop = _input.LT(-1);
-    final retctx = _ctx; // save current ctx (return value)
+    context!.stop = _input.LT(-1)!;
+    final retctx = context!; // save current ctx (return value)
 
     // unroll so _ctx is as it was before call to recursive method
     if (_parseListeners != null) {
-      while (_ctx != _parentctx) {
+      while (context != _parentctx) {
         triggerExitRuleEvent();
-        _ctx = _ctx.parent;
+        context = context!.parent;
       }
     } else {
-      _ctx = _parentctx;
+      context = _parentctx;
     }
 
     // hook into tree
@@ -583,7 +590,7 @@ abstract class Parser extends Recognizer<ParserATNSimulator> {
   }
 
   ParserRuleContext? getInvokingContext(int ruleIndex) {
-    var p = _ctx;
+    var p = context;
     while (p != null) {
       if (p.ruleIndex == ruleIndex) return p;
       p = p.parent;
@@ -591,16 +598,8 @@ abstract class Parser extends Recognizer<ParserATNSimulator> {
     return null;
   }
 
-  ParserRuleContext? get context {
-    return _ctx;
-  }
-
-  set context(ParserRuleContext? ctx) {
-    _ctx = ctx;
-  }
-
   @override
-  bool precpred(RuleContext localctx, int precedence) {
+  bool precpred(RuleContext? localctx, int precedence) {
     return precedence >= _precedenceStack.last;
   }
 
@@ -624,7 +623,7 @@ abstract class Parser extends Recognizer<ParserATNSimulator> {
   bool isExpectedToken(int symbol) {
 //   		return interpreter.atn.nextTokens(_ctx);
     final atn = interpreter.atn;
-    var ctx = _ctx;
+    var ctx = context;
     final s = atn.states[state];
     var following = atn.nextTokens(s!);
     if (following.contains(symbol)) {
@@ -636,8 +635,8 @@ abstract class Parser extends Recognizer<ParserATNSimulator> {
     while (ctx != null &&
         ctx.invokingState >= 0 &&
         following.contains(Token.EPSILON)) {
-      final invokingState = atn.states[ctx.invokingState];
-      RuleTransition rt = invokingState.transition(0);
+      final invokingState = atn.states[ctx.invokingState]!;
+      final rt = invokingState.transition(0) as RuleTransition;
       following = atn.nextTokens(rt.followState);
       if (following.contains(symbol)) {
         return true;
@@ -668,7 +667,7 @@ abstract class Parser extends Recognizer<ParserATNSimulator> {
 
   IntervalSet get expectedTokensWithinCurrentRule {
     final atn = interpreter.atn;
-    final s = atn.states[state];
+    final s = atn.states[state]!;
     return atn.nextTokens(s);
   }
 
@@ -680,7 +679,8 @@ abstract class Parser extends Recognizer<ParserATNSimulator> {
   }
 
   ParserRuleContext get ruleContext {
-    return _ctx;
+    assert(context != null);
+    return context!;
   }
 
   List<String> get ruleInvocationStack => getRuleInvocationStack();
@@ -691,8 +691,8 @@ abstract class Parser extends Recognizer<ParserATNSimulator> {
   ///  in the ATN a rule is invoked.
   ///
   ///  This is very useful for error messages.
-  List<String> getRuleInvocationStack([RuleContext p]) {
-    p = p ?? _ctx;
+  List<String> getRuleInvocationStack([RuleContext? p]) {
+    p = p ?? context;
     final _ruleNames = ruleNames;
     final stack = <String>[];
     while (p != null) {
@@ -737,7 +737,7 @@ abstract class Parser extends Recognizer<ParserATNSimulator> {
   }
 
   @override
-  ParseInfo get parseInfo {
+  ParseInfo? get parseInfo {
     final interp = interpreter;
     if (interp is ProfilingATNSimulator) {
       return ParseInfo(interp);
@@ -777,7 +777,7 @@ abstract class Parser extends Recognizer<ParserATNSimulator> {
       } else {
         _tracer = TraceListener(this);
       }
-      addParseListener(_tracer);
+      addParseListener(_tracer!);
     }
   }
 

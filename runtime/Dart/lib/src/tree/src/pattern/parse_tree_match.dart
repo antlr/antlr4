@@ -329,8 +329,13 @@ class ParseTreePatternMatcher {
     final tokenSrc = ListTokenSource(tokenList);
     final tokens = CommonTokenStream(tokenSrc);
 
-    final parserInterp = ParserInterpreter(parser.grammarFileName,
-        parser.vocabulary, parser.ruleNames, parser.ATNWithBypassAlts, tokens);
+    final parserInterp = ParserInterpreter(
+      parser.grammarFileName,
+      parser.vocabulary,
+      parser.ruleNames,
+      parser.ATNWithBypassAlts,
+      tokens,
+    );
 
     ParseTree tree;
     try {
