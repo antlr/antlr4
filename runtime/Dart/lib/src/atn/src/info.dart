@@ -102,12 +102,16 @@ class DecisionEventInfo {
 ///
 /// @since 4.3
 class DecisionInfo {
+
+  //  Todo: this class is full of int fields that are never initialized and somehow it call ++ on them in some places
+  // I had to figure out some asumptions here
+
   /// The decision number, which is an index into {@link ATN#decisionToState}.
   final int decision;
 
   /// The total number of times {@link ParserATNSimulator#adaptivePredict} was
   /// invoked for this decision.
-  int? invocations;
+  int invocations = 0;
 
   /// The total time spent in {@link ParserATNSimulator#adaptivePredict} for
   /// this decision, in nanoseconds.
@@ -121,23 +125,23 @@ class DecisionInfo {
   /// which is warmed up by parsing the input prior to profiling. If desired,
   /// call {@link ATNSimulator#clearDFA} to reset the DFA cache to its initial
   /// state before starting the profiling measurement pass.</p>
-  int? timeInPrediction;
+  int timeInPrediction = 0;
 
   /// The sum of the lookahead required for SLL prediction for this decision.
   /// Note that SLL prediction is used before LL prediction for performance
   /// reasons even when {@link PredictionMode#LL} or
   /// {@link PredictionMode#LL_EXACT_AMBIG_DETECTION} is used.
-  int? SLL_TotalLook;
+  int SLL_TotalLook = 0;
 
   /// Gets the minimum lookahead required for any single SLL prediction to
   /// complete for this decision, by reaching a unique prediction, reaching an
   /// SLL conflict state, or encountering a syntax error.
-  int? SLL_MinLook;
+  int SLL_MinLook = 0;
 
   /// Gets the maximum lookahead required for any single SLL prediction to
   /// complete for this decision, by reaching a unique prediction, reaching an
   /// SLL conflict state, or encountering a syntax error.
-  int? SLL_MaxLook;
+  int SLL_MaxLook = 0;
 
   /// Gets the [LookaheadEventInfo] associated with the event where the
   /// {@link #SLL_MaxLook} value was set.
@@ -146,21 +150,21 @@ class DecisionInfo {
   /// The sum of the lookahead required for LL prediction for this decision.
   /// Note that LL prediction is only used when SLL prediction reaches a
   /// conflict state.
-  int? LL_TotalLook;
+  int LL_TotalLook = 0;
 
   /// Gets the minimum lookahead required for any single LL prediction to
   /// complete for this decision. An LL prediction completes when the algorithm
   /// reaches a unique prediction, a conflict state (for
   /// {@link PredictionMode#LL}, an ambiguity state (for
   /// {@link PredictionMode#LL_EXACT_AMBIG_DETECTION}, or a syntax error.
-  int? LL_MinLook;
+  int LL_MinLook = 0;
 
   /// Gets the maximum lookahead required for any single LL prediction to
   /// complete for this decision. An LL prediction completes when the algorithm
   /// reaches a unique prediction, a conflict state (for
   /// {@link PredictionMode#LL}, an ambiguity state (for
   /// {@link PredictionMode#LL_EXACT_AMBIG_DETECTION}, or a syntax error.
-  int? LL_MaxLook;
+  int LL_MaxLook = 0;
 
   /// Gets the [LookaheadEventInfo] associated with the event where the
   /// {@link #LL_MaxLook} value was set.
@@ -302,7 +306,7 @@ class DecisionInfo {
 /// @since 4.3
 class AmbiguityInfo extends DecisionEventInfo {
   /// The set of alternative numbers for this decision event that lead to a valid parse. */
-  BitSet ambigAlts;
+  BitSet? ambigAlts;
 
   /// Constructs a new instance of the [AmbiguityInfo] class with the
   /// specified detailed ambiguity information.

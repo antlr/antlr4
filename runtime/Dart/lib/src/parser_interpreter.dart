@@ -33,7 +33,7 @@ class ParserInterpreter extends Parser {
   final String grammarFileName;
   final ATN atn;
 
-  List<DFA> decisionToDFA; // not shared like it is for generated parsers
+  late List<DFA> decisionToDFA; // not shared like it is for generated parsers
   final PredictionContextCache sharedContextCache = PredictionContextCache();
 
   @override
@@ -54,7 +54,7 @@ class ParserInterpreter extends Parser {
   ///
   ///  Those values are used to create new recursive rule invocation contexts
   ///  associated with left operand of an alt like "expr '*' expr".
-  final DoubleLinkedQueue<Pair<ParserRuleContext, int>> _parentContextStack =
+  final DoubleLinkedQueue<Pair<ParserRuleContext?, int>> _parentContextStack =
       DoubleLinkedQueue();
 
   /// We need a map from (decision,inputIndex)->forced alt for computing ambiguous
@@ -68,7 +68,7 @@ class ParserInterpreter extends Parser {
   /// What is the current context when we override a decisions?  This tells
   ///  us what the root of the parse tree is when using override
   ///  for an ambiguity/lookahead check.
-  InterpreterRuleContext overrideDecisionRoot;
+  InterpreterRuleContext? overrideDecisionRoot;
 
   /// Return the root of the parse, which can be useful if the parser
   ///  bails out. You still can access the top node. Note that,
@@ -77,7 +77,7 @@ class ParserInterpreter extends Parser {
   ///  called and left recursive rule that fails.
   ///
   /// @since 4.5.1
-  InterpreterRuleContext rootContext;
+  late InterpreterRuleContext rootContext;
 
   ParserInterpreter(
     this.grammarFileName,
@@ -88,20 +88,23 @@ class ParserInterpreter extends Parser {
   ) : super(input) {
     // init decision DFA
     final numberOfDecisions = atn.numberOfDecisions;
-    decisionToDFA = List<DFA>(numberOfDecisions);
-    for (var i = 0; i < numberOfDecisions; i++) {
-      final decisionState = atn.getDecisionState(i);
-      decisionToDFA[i] = DFA(decisionState, i);
-    }
+    decisionToDFA = List<DFA>.generate(numberOfDecisions, (n) {
+      final decisionState = atn.getDecisionState(n);
+      return DFA(decisionState, n);
+    });
 
     // get atn simulator that knows how to do predictions
-    interpreter =
-        ParserATNSimulator(this, atn, decisionToDFA, sharedContextCache);
+    interpreter = ParserATNSimulator(
+      this,
+      atn,
+      decisionToDFA,
+      sharedContextCache,
+    );
   }
 
   @override
-  void reset() {
-    super.reset();
+  void reset([bool resetInput = true]) {
+    super.reset(resetInput);
     overrideDecisionReached = false;
     overrideDecisionRoot = null;
   }
@@ -132,9 +135,9 @@ class ParserInterpreter extends Parser {
       switch (p.stateType) {
         case StateType.RULE_STOP:
           // pop; return from rule
-          if (context.isEmpty) {
+          if (context!.isEmpty) {
             if (startRuleStartState.isLeftRecursiveRule) {
-              final result = context;
+              final result = context!;
               final parentContext = _parentContextStack.removeLast();
               unrollRecursionContexts(parentContext.a);
               return result;
@@ -152,7 +155,7 @@ class ParserInterpreter extends Parser {
             visitState(p);
           } on RecognitionException catch (e) {
             state = atn.ruleToStopState[p.ruleIndex].stateNumber;
-            context.exception = e;
+            context!.exception = e;
             errorHandler.reportError(this, e);
             recover(e);
           }
@@ -164,17 +167,22 @@ class ParserInterpreter extends Parser {
 
   @override
   void enterRecursionRule(
-      ParserRuleContext localctx, int state, int ruleIndex, int precedence) {
-    final pair = Pair<ParserRuleContext, int>(context, localctx.invokingState);
+    ParserRuleContext localctx,
+    int state,
+    int ruleIndex,
+    int precedence,
+  ) {
+    final pair = Pair<ParserRuleContext?, int>(context, localctx.invokingState);
     _parentContextStack.add(pair);
     super.enterRecursionRule(localctx, state, ruleIndex, precedence);
   }
 
   ATNState get atnState {
-    return atn.states[state];
+    return atn.states[state]!;
   }
 
   void visitState(ATNState p) {
+    assert(context != null);
 //		System.out.println("visitState "+p.stateNumber);
     var predictedAlt = 1;
     if (p is DecisionState) {
@@ -190,13 +198,14 @@ class ParserInterpreter extends Parser {
           // We are at the start of a left recursive rule's (...)* loop
           // and we're not taking the exit branch of loop.
           final localctx = createInterpreterRuleContext(
-              _parentContextStack.last.a,
-              _parentContextStack.last.b,
-              context.ruleIndex);
+            _parentContextStack.last.a,
+            _parentContextStack.last.b,
+            context!.ruleIndex,
+          );
           pushNewRecursionContext(
             localctx,
             atn.ruleToStartState[p.ruleIndex].stateNumber,
-            context.ruleIndex,
+            context!.ruleIndex,
           );
         }
         break;
@@ -209,7 +218,10 @@ class ParserInterpreter extends Parser {
       case TransitionType.SET:
       case TransitionType.NOT_SET:
         if (!transition.matches(
-            inputStream.LA(1), Token.MIN_USER_TOKEN_TYPE, 65535)) {
+          inputStream.LA(1)!,
+          Token.MIN_USER_TOKEN_TYPE,
+          65535,
+        )) {
           recoverInline();
         }
         matchWildcard();
@@ -220,7 +232,7 @@ class ParserInterpreter extends Parser {
         break;
 
       case TransitionType.RULE:
-        RuleStartState ruleStartState = transition.target;
+        final ruleStartState = transition.target as RuleStartState;
         final ruleIndex = ruleStartState.ruleIndex;
         final newctx =
             createInterpreterRuleContext(context, p.stateNumber, ruleIndex);
@@ -233,7 +245,7 @@ class ParserInterpreter extends Parser {
         break;
 
       case TransitionType.PREDICATE:
-        PredicateTransition predicateTransition = transition;
+        final predicateTransition = transition as PredicateTransition;
         if (!sempred(context, predicateTransition.ruleIndex,
             predicateTransition.predIndex)) {
           throw FailedPredicateException(this);
@@ -242,14 +254,19 @@ class ParserInterpreter extends Parser {
         break;
 
       case TransitionType.ACTION:
-        ActionTransition actionTransition = transition;
+        final actionTransition = transition as ActionTransition;
         action(
-            context, actionTransition.ruleIndex, actionTransition.actionIndex);
+          context,
+          actionTransition.ruleIndex,
+          actionTransition.actionIndex,
+        );
         break;
 
       case TransitionType.PRECEDENCE:
-        if (!precpred(context,
-            (transition as PrecedencePredicateTransition).precedence)) {
+        if (!precpred(
+          context,
+          (transition as PrecedencePredicateTransition).precedence,
+        )) {
           throw FailedPredicateException(this,
               'precpred(context, ${(transition as PrecedencePredicateTransition).precedence})');
         }
@@ -267,6 +284,7 @@ class ParserInterpreter extends Parser {
   ///  for subclasses to track interesting things.
   int visitDecisionState(DecisionState p) {
     var predictedAlt = 1;
+    assert(context != null);
     if (p.numberOfTransitions > 1) {
       errorHandler.sync(this);
       final decision = p.decision;
@@ -276,8 +294,11 @@ class ParserInterpreter extends Parser {
         predictedAlt = overrideDecisionAlt;
         overrideDecisionReached = true;
       } else {
-        predictedAlt =
-            interpreter.adaptivePredict(inputStream, decision, context);
+        predictedAlt = interpreter.adaptivePredict(
+          inputStream,
+          decision,
+          context!,
+        );
       }
     }
     return predictedAlt;
@@ -303,7 +324,7 @@ class ParserInterpreter extends Parser {
       exitRule();
     }
 
-    RuleTransition ruleTransition = atn.states[state].transition(0);
+    final ruleTransition = atn.states[state]!.transition(0) as RuleTransition;
     state = ruleTransition.followState.stateNumber;
   }
 
@@ -358,19 +379,21 @@ class ParserInterpreter extends Parser {
   void recover(RecognitionException e) {
     final i = inputStream.index;
     errorHandler.recover(this, e);
+    assert(this.context != null);
+    final context = this.context as ParserRuleContext;
     if (inputStream.index == i) {
       // no input consumed, better add an error node
       if (e is InputMismatchException) {
         final ime = e;
         final tok = e.offendingToken;
         var expectedTokenType = Token.INVALID_TYPE;
-        if (!ime.expectedTokens.isNil) {
-          expectedTokenType = ime.expectedTokens.minElement; // get any element
+        if (ime.expectedTokens != null && !ime.expectedTokens!.isNil) {
+          expectedTokenType = ime.expectedTokens!.minElement; // get any element
         }
         final errToken = tokenFactory.create(
           expectedTokenType,
           tok.text,
-          Pair(tok.tokenSource, tok.tokenSource.inputStream),
+          Pair(tok.tokenSource, tok.tokenSource?.inputStream),
           Token.DEFAULT_CHANNEL,
           -1,
           -1,
@@ -385,7 +408,7 @@ class ParserInterpreter extends Parser {
         final errToken = tokenFactory.create(
           Token.INVALID_TYPE,
           tok.text,
-          Pair(tok.tokenSource, tok.tokenSource.inputStream),
+          Pair(tok.tokenSource, tok.tokenSource?.inputStream),
           Token.DEFAULT_CHANNEL,
           -1,
           -1,

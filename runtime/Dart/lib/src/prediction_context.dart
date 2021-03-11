@@ -735,7 +735,7 @@ class SingletonPredictionContext extends PredictionContext {
   }
 
   static SingletonPredictionContext create(
-    PredictionContext parent,
+    PredictionContext? parent,
     int returnState,
   ) {
     if (returnState == PredictionContext.EMPTY_RETURN_STATE && parent == null) {

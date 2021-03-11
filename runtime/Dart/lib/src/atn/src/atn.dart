@@ -92,9 +92,9 @@ class ATN {
     return s.decision;
   }
 
-  DecisionState? getDecisionState(int decision) {
-    if (decisionToState.isNotEmpty) {
-      return decisionToState[decision];
+  DecisionState? getDecisionState(int? decision) {
+    if (decisionToState.isNotEmpty || decision != null) {
+      return decisionToState[decision!];
     }
     return null;
   }

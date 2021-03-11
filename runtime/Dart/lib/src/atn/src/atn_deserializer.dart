@@ -351,7 +351,7 @@ class ATNDeserializer {
 
     // edges for rule stop states can be derived, so they aren't serialized
     for (var state in atn.states) {
-      if(state == null) {
+      if (state == null) {
         continue;
       }
       for (var i = 0; i < state.numberOfTransitions; i++) {
@@ -443,7 +443,7 @@ class ATNDeserializer {
         // form, which is the index of a LexerCustomAction
         final legacyLexerActions = <LexerAction>[];
         for (var state in atn.states) {
-          if(state == null) {
+          if (state == null) {
             continue;
           }
           for (var i = 0; i < state.numberOfTransitions; i++) {
@@ -469,7 +469,7 @@ class ATNDeserializer {
   void generateRuleBypassTransitions(ATN atn) {
     for (var i = 0; i < atn.ruleToStartState.length; i++) {
       //Todo: I didnt get why ruleToTokenType is called here since it can be null if we are in a PARSER
-      atn.ruleToTokenType[i] = atn.maxTokenType + i + 1;
+      atn.ruleToTokenType![i] = atn.maxTokenType + i + 1;
     }
     for (var i = 0; i < atn.ruleToStartState.length; i++) {
       generateRuleBypassTransition(atn, i);
@@ -494,7 +494,7 @@ class ATNDeserializer {
       // wrap from the beginning of the rule to the StarLoopEntryState
       endState = null;
       for (var state in atn.states) {
-        if(state == null) {
+        if (state == null) {
           continue;
         }
         if (state.ruleIndex != idx) {
@@ -532,7 +532,7 @@ class ATNDeserializer {
 
     // all non-excluded transitions that currently target end state need to target blockEnd instead
     for (var state in atn.states) {
-      if(state == null) {
+      if (state == null) {
         continue;
       }
       for (var transition in state.transitions) {
@@ -562,8 +562,10 @@ class ATNDeserializer {
     atn.addState(matchState);
 
     //Todo: I didnt get why ruleToTokenType is called here since it can be null if we are in a PARSER
-    matchState
-        .addTransition(AtomTransition(bypassStop, atn.ruleToTokenType[idx]));
+    matchState.addTransition(AtomTransition(
+      bypassStop,
+      atn.ruleToTokenType![idx],
+    ));
     bypassStart.addTransition(EpsilonTransition(matchState));
   }
 
@@ -731,7 +733,8 @@ class ATNDeserializer {
             ? RangeTransition(target, Token.EOF, arg2)
             : RangeTransition(target, arg1, arg2);
       case TransitionType.RULE:
-        final rt = RuleTransition(atn.states[arg1] as RuleStartState, arg2, arg3, target);
+        final rt = RuleTransition(
+            atn.states[arg1] as RuleStartState, arg2, arg3, target);
         return rt;
       case TransitionType.PREDICATE:
         final pt = PredicateTransition(target, arg1, arg2, arg3 != 0);

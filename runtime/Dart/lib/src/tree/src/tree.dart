@@ -235,7 +235,7 @@ class TraceListener implements ParseTreeListener {
   @override
   void visitTerminal(TerminalNode node) {
     log('consume ${node.symbol} rule ' +
-        parser.ruleNames[parser.context.ruleIndex]);
+        parser.ruleNames[parser.context!.ruleIndex]);
   }
 
   @override
@@ -345,7 +345,8 @@ class ParseTreeWalker {
       listener.visitTerminal(t);
       return;
     }
-    RuleNode r = t as RuleNode; // Todo: review this cast: we have a confusion between RuleNode and ParseTree on this class
+    RuleNode r = t
+        as RuleNode; // Todo: review this cast: we have a confusion between RuleNode and ParseTree on this class
     enterRule(listener, r);
     for (var i = 0; i < r.childCount; i++) {
       walk(listener, r.getChild(i)!);
@@ -358,13 +359,15 @@ class ParseTreeWalker {
   /// [RuleContext]-specific event. First we trigger the generic and then
   /// the rule specific. We to them in reverse order upon finishing the node.
   void enterRule(ParseTreeListener listener, RuleNode r) {
-    var ctx = r.ruleContext as ParserRuleContext; // Todo: review this cast: we have a confusion between RuleNode and ParseTree on this class
+    var ctx = r.ruleContext
+        as ParserRuleContext; // Todo: review this cast: we have a confusion between RuleNode and ParseTree on this class
     listener.enterEveryRule(ctx);
     ctx.enterRule(listener);
   }
 
   void exitRule(ParseTreeListener listener, RuleNode r) {
-    var ctx = r.ruleContext as ParserRuleContext; // Todo: review this cast: we have a confusion between RuleNode and ParseTree on this class
+    var ctx = r.ruleContext
+        as ParserRuleContext; // Todo: review this cast: we have a confusion between RuleNode and ParseTree on this class
     ctx.exitRule(listener);
     listener.exitEveryRule(ctx);
   }

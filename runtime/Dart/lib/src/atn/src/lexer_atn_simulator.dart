@@ -727,7 +727,7 @@ class LexerATNSimulator extends ATNSimulator {
           (firstConfigWithRuleStopState as LexerATNConfig).lexerActionExecutor;
       //Todo: I didnt get why ruleToTokenType is called here since it can be null if we are in a PARSER
       proposed.prediction =
-          atn.ruleToTokenType[firstConfigWithRuleStopState.state.ruleIndex];
+          atn.ruleToTokenType![firstConfigWithRuleStopState.state.ruleIndex];
     }
 
     final dfa = decisionToDFA[mode];

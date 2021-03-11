@@ -48,7 +48,7 @@ abstract class ErrorListener {
   void syntaxError(
     Recognizer recognizer,
     Object? offendingSymbol,
-    int line,
+    int? line,
     int charPositionInLine,
     String msg,
     RecognitionException? e,
@@ -92,8 +92,15 @@ abstract class ErrorListener {
   /// set of represented alternatives in [configs]
   /// @param configs the ATN configuration set where the ambiguity was
   /// identified
-  void reportAmbiguity(Parser recognizer, DFA dfa, int startIndex,
-      int stopIndex, bool exact, BitSet ambigAlts, ATNConfigSet configs);
+  void reportAmbiguity(
+    Parser recognizer,
+    DFA dfa,
+    int startIndex,
+    int stopIndex,
+    bool exact,
+    BitSet? ambigAlts,
+    ATNConfigSet configs,
+  );
 
   /// This method is called when an SLL conflict occurs and the parser is about
   /// to use the full context information to make an LL decision.
@@ -179,7 +186,7 @@ class BaseErrorListener extends ErrorListener {
     int startIndex,
     int stopIndex,
     bool exact,
-    BitSet ambigAlts,
+    BitSet? ambigAlts,
     ATNConfigSet configs,
   ) {}
 
@@ -207,7 +214,7 @@ class BaseErrorListener extends ErrorListener {
   void syntaxError(
     Recognizer<ATNSimulator> recognizer,
     Object? offendingSymbol,
-    int line,
+    int? line,
     int charPositionInLine,
     String msg,
     RecognitionException? e,
@@ -251,7 +258,7 @@ class ProxyErrorListener implements ErrorListener {
   void syntaxError(
     Recognizer recognizer,
     Object? offendingSymbol,
-    int line,
+    int? line,
     int charPositionInLine,
     String msg,
     RecognitionException? e,
@@ -275,7 +282,7 @@ class ProxyErrorListener implements ErrorListener {
     int startIndex,
     int stopIndex,
     bool exact,
-    BitSet ambigAlts,
+    BitSet? ambigAlts,
     ATNConfigSet configs,
   ) {
     for (final listener in delegates) {

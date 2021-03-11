@@ -228,8 +228,6 @@ class BitSet {
   }
 
   void and(BitSet set) {
-    if (set == null) throw ArgumentError.notNull('set');
-
     final length = min(_data.length, set._data.length);
     for (var i = 0; i < length; i++) {
       _data[i] &= set._data[i];
@@ -241,8 +239,6 @@ class BitSet {
   }
 
   void or(BitSet set) {
-    if (set == null) throw ArgumentError.notNull('set');
-
     if (set._data.length > _data.length) {
       final newList = Uint32List(set._data.length)
         ..setRange(0, _data.length, _data);

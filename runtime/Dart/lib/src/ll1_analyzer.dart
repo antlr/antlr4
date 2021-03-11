@@ -29,26 +29,33 @@ class LL1Analyzer {
   ///
   /// @param s the ATN state
   /// @return the expected symbols for each outgoing transition of [s].
-  List<IntervalSet> getDecisionLookahead(ATNState s) {
+  List<IntervalSet>? getDecisionLookahead(ATNState? s) {
 //		System.out.println("LOOK("+s.stateNumber+")");
     if (s == null) {
       return null;
     }
-
-    final look = List<IntervalSet>(s.numberOfTransitions);
-    for (var alt = 0; alt < s.numberOfTransitions; alt++) {
-      look[alt] = IntervalSet();
+    final look = List<IntervalSet?>.generate(s.numberOfTransitions, (n) {
+      final lookAlt = IntervalSet();
       final lookBusy = <ATNConfig>{};
       final seeThruPreds = false; // fail to get lookahead upon pred
-      _LOOK(s.transition(alt).target, null, PredictionContext.EMPTY, look[alt],
-          lookBusy, BitSet(), seeThruPreds, false);
+      _LOOK(
+        s.transition(n).target,
+        null,
+        PredictionContext.EMPTY,
+        lookAlt,
+        lookBusy,
+        BitSet(),
+        seeThruPreds,
+        false,
+      );
+
       // Wipe out lookahead for this alternative if we found nothing
       // or we had a predicate when we !seeThruPreds
-      if (look[alt].length == 0 || look[alt].contains(HIT_PRED)) {
-        look[alt] = null;
+      if (lookAlt.length == 0 || lookAlt.contains(HIT_PRED)) {
+        return null;
       }
-    }
-    return look;
+      return lookAlt;
+    });
   }
 
   /// Compute set of tokens that can follow [s] in the ATN in the
@@ -177,8 +184,10 @@ class LL1Analyzer {
           continue;
         }
 
-        PredictionContext newContext =
-            SingletonPredictionContext.create(ctx, t.followState.stateNumber);
+        PredictionContext newContext = SingletonPredictionContext.create(
+          ctx,
+          t.followState.stateNumber,
+        );
 
         try {
           calledRuleStack.set(t.target.ruleIndex);
@@ -189,8 +198,16 @@ class LL1Analyzer {
         }
       } else if (t is AbstractPredicateTransition) {
         if (seeThruPreds) {
-          _LOOK(t.target, stopState, ctx, look, lookBusy, calledRuleStack,
-              seeThruPreds, addEOF);
+          _LOOK(
+            t.target,
+            stopState,
+            ctx,
+            look,
+            lookBusy,
+            calledRuleStack,
+            seeThruPreds,
+            addEOF,
+          );
         } else {
           look.addOne(HIT_PRED);
         }
@@ -199,14 +216,16 @@ class LL1Analyzer {
             seeThruPreds, addEOF);
       } else if (t is WildcardTransition) {
         look.addAll(
-            IntervalSet.ofRange(Token.MIN_USER_TOKEN_TYPE, atn.maxTokenType));
+          IntervalSet.ofRange(Token.MIN_USER_TOKEN_TYPE, atn.maxTokenType),
+        );
       } else {
 //				System.out.println("adding "+ t);
         var set = t.label;
         if (set != null) {
           if (t is NotSetTransition) {
-            set = set.complement(IntervalSet.ofRange(
-                Token.MIN_USER_TOKEN_TYPE, atn.maxTokenType));
+            set = set.complement(
+              IntervalSet.ofRange(Token.MIN_USER_TOKEN_TYPE, atn.maxTokenType),
+            );
           }
           look.addAll(set);
         }
