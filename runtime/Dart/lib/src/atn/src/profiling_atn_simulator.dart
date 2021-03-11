@@ -57,7 +57,7 @@ class ProfilingATNSimulator extends ParserATNSimulator {
   int adaptivePredict(
     TokenStream input,
     int decision,
-    ParserRuleContext outerContext,
+    ParserRuleContext? outerContext,
   ) {
     try {
       _sllStopIndex = -1;
@@ -196,7 +196,7 @@ class ProfilingATNSimulator extends ParserATNSimulator {
   @override
   bool evalSemanticContextOne(
     SemanticContext pred,
-    ParserRuleContext parserCallStack,
+    ParserRuleContext? parserCallStack,
     int alt,
     bool fullCtx,
   ) {
