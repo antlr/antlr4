@@ -242,9 +242,9 @@ TokenGetterListener(X) ::= <<
 class LeafListener extends TBaseListener {
   void exitA(AContext ctx) {
     if (ctx.childCount==2)
-      stdout.write("${ctx.INT(0).symbol.text} ${ctx.INT(1).symbol.text} ${ctx.INTs()}");
+      stdout.write("${ctx.INT(0)?.symbol.text} ${ctx.INT(1)?.symbol.text} ${ctx.INTs()}");
     else
-      print(ctx.ID().symbol);
+      print(ctx.ID()?.symbol);
   }
 }
 }

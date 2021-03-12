@@ -208,7 +208,7 @@ class <file.grammarName>BaseVisitor\<T> extends ParseTreeVisitor\<T> implements 
 /// The default implementation returns the result of calling
 /// [visitChildren] on [ctx].
 @override
-T visit<lname; format="cap">(<lname; format="cap">Context ctx) => visitChildren(ctx);}; separator="\n">
+T? visit<lname; format="cap">(<lname; format="cap">Context ctx) => visitChildren(ctx);}; separator="\n">
 }
 >>
 
@@ -755,7 +755,7 @@ void <if(method.isEnter)>enter<else>exit<endif>Rule(ParseTreeListener listener) 
 
 VisitorDispatchMethod(method) ::= <<
 @override
-T accept\<T>(ParseTreeVisitor\<T> visitor) {
+T? accept\<T>(ParseTreeVisitor\<T> visitor) {
   if (visitor is <parser.grammarName>Visitor\<T>) {
    return visitor.visit<struct.derivedFromName; format="cap">(this);
   } else {

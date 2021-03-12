@@ -138,11 +138,11 @@ public class BaseDartTest extends BaseRuntimeTestSupport implements RuntimeTestS
 		String runtime = locateRuntime();
 		writeFile(getTempDirPath(), "pubspec.yaml",
 			"name: \"test\"\n" +
-				"environment:\n" +
-  				"  sdk: \">=2.12.0 <3.0.0\"\n" +
 				"dependencies:\n" +
 				"  antlr4:\n" +
-				"    path: " + runtime + "\n");
+				"    path: " + runtime + "\n" +
+				"environment:\n" +
+  				"  sdk: \">=2.12.0 <3.0.0\"\n");
 		if (cacheDartPackages == null) {
 			try {
 				final Process process = Runtime.getRuntime().exec(new String[]{locatePub(), "get"}, null, getTempTestDir());
@@ -404,7 +404,7 @@ public class BaseDartTest extends BaseRuntimeTestSupport implements RuntimeTestS
 				"  @override\n" +
 				"  void enterEveryRule(ParserRuleContext ctx) {\n" +
 				"    for (var i = 0; i \\< ctx.childCount; i++) {\n" +
-				"      final parent = ctx.getChild(i).parent;\n" +
+				"      final parent = ctx.getChild(i)?.parent;\n" +
 				"      if (!(parent is RuleNode) || (parent as RuleNode).ruleContext != ctx) {\n" +
 				"        throw StateError('Invalid parse tree shape detected.');\n" +
 				"      }\n" +
