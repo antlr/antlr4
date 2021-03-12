@@ -38,7 +38,7 @@ abstract class ATNSimulator {
   ///  whacked after each adaptivePredict(). It cost a little bit
   ///  more time I think and doesn't save on the overall footprint
   ///  so it's not worth the complexity.</p>
-  final PredictionContextCache sharedContextCache;
+  final PredictionContextCache? sharedContextCache;
 
   ATNSimulator(this.atn, this.sharedContextCache);
 
@@ -62,8 +62,7 @@ abstract class ATNSimulator {
     if (sharedContextCache == null) return context;
 
     final visited = <PredictionContext, PredictionContext>{};
-    return PredictionContext.getCachedContext(
-        context, sharedContextCache, visited);
+    return PredictionContext.getCachedContext(context, sharedContextCache!, visited);
   }
 }
 

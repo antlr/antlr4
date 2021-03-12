@@ -56,11 +56,10 @@ class Interval {
   }
 
   @override
-  bool operator ==(Object o) {
-    if (o == null || !(o is Interval)) {
+  bool operator ==(Object other) {
+    if (other is! Interval) {
       return false;
     }
-    Interval other = o;
     return a == other.a && b == other.b;
   }
 
@@ -509,7 +508,7 @@ class IntervalSet {
     if (isNil) {
       throw StateError('set is empty');
     }
-    return intervals!.last.b;
+    return intervals.last.b;
   }
 
   /// Returns the minimum value contained in the set if not isNil().
@@ -521,7 +520,7 @@ class IntervalSet {
       throw StateError('set is empty');
     }
 
-    return intervals!.first.a;
+    return intervals.first.a;
   }
 
   @override
@@ -543,16 +542,15 @@ class IntervalSet {
 
   @override
   bool operator ==(Object obj) {
-    if (obj == null || !(obj is IntervalSet)) {
+    if (obj is! IntervalSet) {
       return false;
     }
-    IntervalSet other = obj;
-    return ListEquality().equals(intervals, other?.intervals);
+    return ListEquality().equals(intervals, obj.intervals);
   }
 
   @override
   String toString({bool elemAreChar = false, Vocabulary? vocabulary}) {
-    if (intervals == null || intervals.isEmpty) {
+    if (intervals.isEmpty) {
       return '{}';
     }
 

@@ -274,12 +274,12 @@ class ParseTreePatternMatcher {
   /// @exception ArgumentError if [start] is null or empty.
   /// @exception ArgumentError if [stop] is null or empty.
   void setDelimiters(String start, String stop, String escapeLeft) {
-    if (start == null || start.isEmpty) {
-      throw ArgumentError.value(start, 'start', 'cannot be null or empty');
+    if (start.isEmpty) {
+      throw ArgumentError.value(start, 'start', 'cannot be empty');
     }
 
-    if (stop == null || stop.isEmpty) {
-      throw ArgumentError.value(stop, 'stop', 'cannot be null or empty');
+    if (stop.isEmpty) {
+      throw ArgumentError.value(stop, 'stop', 'cannot be empty');
     }
 
     this.start = start;

@@ -65,16 +65,10 @@ abstract class Recognizer<ATNInterpreter extends ATNSimulator> {
   ///
   /// <p>Used for XPath and tree pattern compilation.</p>
   Map<String, int> get ruleIndexMap {
-    final _ruleNames = ruleNames;
-    if (_ruleNames == null) {
-      throw UnsupportedError(
-          'The current recognizer does not provide a list of rule names.');
-    }
-
-    var result = ruleIndexMapCache[_ruleNames];
+    var result = ruleIndexMapCache[ruleNames];
     if (result == null) {
-      result = Map.unmodifiable(toMap(_ruleNames));
-      ruleIndexMapCache[_ruleNames] = result;
+      result = Map.unmodifiable(toMap(ruleNames));
+      ruleIndexMapCache[ruleNames] = result;
     }
 
     return result;
@@ -91,7 +85,7 @@ abstract class Recognizer<ATNInterpreter extends ATNSimulator> {
   ///
   /// <p>For interpreters, we don't know their serialized ATN despite having
   /// created the interpreter from it.</p>
-  String get serializedATN {
+  String? get serializedATN {
     throw UnsupportedError('there is no serialized ATN');
   }
 

@@ -488,8 +488,7 @@ class ParseInfo {
     final decisions = atnSimulator.decisionInfo;
     var t = 0;
     for (var i = 0; i < decisions.length; i++) {
-      //Todo: I assumed if it is null we should not add it, this value is never initialized
-      t += decisions[i].timeInPrediction ?? 0;
+      t += decisions[i].timeInPrediction;
     }
     return t;
   }
@@ -501,8 +500,7 @@ class ParseInfo {
     final decisions = atnSimulator.decisionInfo;
     var k = 0;
     for (var i = 0; i < decisions.length; i++) {
-      //Todo: I assumed if it is null we should not add it, this value is never initialized
-      k += decisions[i].SLL_TotalLook ?? 0;
+      k += decisions[i].SLL_TotalLook;
     }
     return k;
   }
@@ -514,8 +512,7 @@ class ParseInfo {
     final decisions = atnSimulator.decisionInfo;
     var k = 0;
     for (var i = 0; i < decisions.length; i++) {
-      //Todo: I assumed if it is null we should not add it, this value is never initialized
-      k += decisions[i].LL_TotalLook ?? 0;
+      k += decisions[i].LL_TotalLook;
     }
     return k;
   }

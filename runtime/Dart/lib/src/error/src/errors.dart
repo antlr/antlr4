@@ -95,7 +95,7 @@ class LexerNoViableAltException extends RecognitionException<CharStream> {
   final ATNConfigSet deadEndConfigs;
 
   LexerNoViableAltException(
-    Lexer lexer,
+    Lexer? lexer,
     CharStream input,
     this.startIndex,
     this.deadEndConfigs,
@@ -109,7 +109,7 @@ class LexerNoViableAltException extends RecognitionException<CharStream> {
       symbol = escapeWhitespace(symbol);
     }
 
-    return "${LexerNoViableAltException}('${symbol}')";
+    return "$LexerNoViableAltException('$symbol')";
   }
 }
 

@@ -253,7 +253,6 @@ class BitSet {
   @override
   bool operator ==(obj) {
     final other = obj as BitSet;
-    if (other == null) return false;
 
     if (isEmpty) return other.isEmpty;
 

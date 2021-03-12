@@ -373,15 +373,13 @@ class DefaultErrorStrategy implements ErrorStrategy {
   void reportNoViableAlternative(Parser recognizer, NoViableAltException e) {
     final tokens = recognizer.inputStream;
     String input;
-    if (tokens != null) {
-      if (e.startToken.type == Token.EOF) {
-        input = '<EOF>';
-      } else {
-        input = tokens.getTextRange(e.startToken, e.offendingToken);
-      }
+
+    if (e.startToken.type == Token.EOF) {
+      input = '<EOF>';
     } else {
-      input = '<unknown input>';
+      input = tokens.getTextRange(e.startToken, e.offendingToken);
     }
+
     final msg = 'no viable alternative at input ' + escapeWSAndQuote(input);
     recognizer.notifyErrorListeners(msg, e.offendingToken, e);
   }
@@ -409,7 +407,7 @@ class DefaultErrorStrategy implements ErrorStrategy {
   /// @param recognizer the parser instance
   /// @param e the recognition exception
   void reportFailedPredicate(Parser recognizer, FailedPredicateException e) {
-    final ruleIndex  = recognizer.context?.ruleIndex;
+    final ruleIndex = recognizer.context?.ruleIndex;
     final ruleName = ruleIndex != null ? recognizer.ruleNames[ruleIndex] : '';
     final msg = 'rule ' + ruleName + ' ' + e.message;
     recognizer.notifyErrorListeners(msg, e.offendingToken, e);
@@ -690,7 +688,7 @@ class DefaultErrorStrategy implements ErrorStrategy {
   ///  the token). This is better than forcing you to override a method in
   ///  your token objects because you don't have to go modify your lexer
   ///  so that it creates a new Java type.
-  String getTokenErrorDisplay(Token t) {
+  String getTokenErrorDisplay(Token? t) {
     if (t == null) return '<no token>';
     var s = getSymbolText(t);
     if (s == null) {

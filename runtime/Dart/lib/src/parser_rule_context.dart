@@ -43,7 +43,7 @@ class ParserRuleContext extends RuleContext {
   /// Get the initial/final token in this context.
   /// Note that the range from start to stop is inclusive, so for rules that do not consume anything
   /// (for example, zero length or error productions) this token may exceed stop.
-  late Token start, stop; // Todo: keep an eye on this late
+  Token? start, stop; // Todo: keep an eye on this late
 
   /// The exception that forced this rule to return. If the rule successfully
   /// completed, this is null.
@@ -218,13 +218,10 @@ class ParserRuleContext extends RuleContext {
 
   @override
   Interval get sourceInterval {
-    if (start == null) {
-      return Interval.INVALID;
+    if (stop == null || stop!.tokenIndex < start!.tokenIndex) {
+      return Interval(start!.tokenIndex, start!.tokenIndex - 1); // empty
     }
-    if (stop == null || stop.tokenIndex < start.tokenIndex) {
-      return Interval(start.tokenIndex, start.tokenIndex - 1); // empty
-    }
-    return Interval(start.tokenIndex, stop.tokenIndex);
+    return Interval(start!.tokenIndex, stop!.tokenIndex);
   }
 
   /// Used for rule context info debugging during parse-time, not so much for ATN debugging */

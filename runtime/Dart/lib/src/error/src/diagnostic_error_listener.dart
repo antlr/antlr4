@@ -92,7 +92,7 @@ class DiagnosticErrorListener extends BaseErrorListener {
     }
 
     final ruleName = ruleNames[ruleIndex];
-    if (ruleName == null || ruleName.isEmpty) {
+    if (ruleName.isEmpty) {
       return decision.toString();
     }
 

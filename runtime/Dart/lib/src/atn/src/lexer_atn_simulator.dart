@@ -381,8 +381,8 @@ class LexerATNSimulator extends ATNSimulator {
     this.line = line;
     charPositionInLine = charPos;
 
-    if (lexerActionExecutor != null && recog != null) {
-      lexerActionExecutor.execute(recog!, input, startIndex);
+    if (lexerActionExecutor != null) {
+      lexerActionExecutor.execute(recog, input, startIndex);
     }
   }
 
@@ -427,12 +427,7 @@ class LexerATNSimulator extends ATNSimulator {
 
     if (config.state is RuleStopState) {
       if (debug) {
-        if (recog != null) {
-          log('closure at ${recog!.ruleNames[config.state.ruleIndex]} rule stop $config\n',
-              level: Level.FINE.value);
-        } else {
-          log('closure at rule stop $config\n', level: Level.FINE.value);
-        }
+        log('closure at ${recog.ruleNames[config.state.ruleIndex]} rule stop $config\n', level: Level.FINE.value);
       }
 
       if (config.context == null || config.context!.hasEmptyPath()) {
@@ -503,7 +498,7 @@ class LexerATNSimulator extends ATNSimulator {
 
   // side-effect: can alter configs.hasSemanticContext
 
-  LexerATNConfig getEpsilonTarget(
+  LexerATNConfig? getEpsilonTarget(
     CharStream input,
     LexerATNConfig config,
     Transition t,
@@ -511,7 +506,7 @@ class LexerATNSimulator extends ATNSimulator {
     bool speculative,
     bool treatEofAsEpsilon,
   ) {
-    late LexerATNConfig c;
+    LexerATNConfig? c;
     switch (t.type) {
       case TransitionType.RULE:
         final ruleTransition = t as RuleTransition;
@@ -631,13 +626,8 @@ class LexerATNSimulator extends ATNSimulator {
     int predIndex,
     bool speculative,
   ) {
-    // assume true if no recognizer was provided
-    if (recog == null) {
-      return true;
-    }
-
     if (!speculative) {
-      return recog!.sempred(null, ruleIndex, predIndex);
+      return recog.sempred(null, ruleIndex, predIndex);
     }
 
     final savedCharPositionInLine = charPositionInLine;
@@ -646,7 +636,7 @@ class LexerATNSimulator extends ATNSimulator {
     final marker = input.mark();
     try {
       consume(input);
-      return recog!.sempred(null, ruleIndex, predIndex);
+      return recog.sempred(null, ruleIndex, predIndex);
     } finally {
       charPositionInLine = savedCharPositionInLine;
       line = savedLine;

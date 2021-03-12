@@ -59,10 +59,8 @@ class Trees {
         return t.toString();
       } else if (t is TerminalNode) {
         final symbol = (t).symbol;
-        if (symbol != null) {
-          final s = symbol.text;
-          return s ?? '';
-        }
+        final s = symbol.text;
+        return s ?? '';
       }
     }
     // no recog for rule names
@@ -101,7 +99,7 @@ class Trees {
   ///  Use == not equals().
   ///
   ///  @since 4.5.1
-  static bool isAncestorOf(Tree t, Tree u) {
+  static bool isAncestorOf(Tree? t, Tree? u) {
     if (t == null || u == null || t.parent == null) return false;
     var p = u.parent;
     while (p != null) {
@@ -184,12 +182,11 @@ class Trees {
       if (r != null) return r;
     }
     if (t is ParserRuleContext) {
-      final r = t;
-      if (startTokenIndex >=
-              r.start.tokenIndex && // is range fully contained in t?
-          (r.stop == null || stopTokenIndex <= r.stop.tokenIndex)) {
-        // note: r.getStop()==null likely implies that we bailed out of parser and there's nothing to the right
-        return r;
+      // is range fully contained in t?
+      final start = t.start != null && startTokenIndex >= t.start!.tokenIndex;
+      final end = t.stop == null || stopTokenIndex <= t.stop!.tokenIndex;
+      if (start && end) {
+        return t;
       }
     }
     return null;

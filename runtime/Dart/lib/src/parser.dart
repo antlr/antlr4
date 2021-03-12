@@ -88,9 +88,7 @@ abstract class Parser extends Recognizer<ParserATNSimulator> {
     setTrace(false);
     _precedenceStack.clear();
     _precedenceStack.add(0);
-    if (interpreter != null) {
-      interpreter!.reset();
-    }
+    interpreter.reset();
   }
 
   /// Match current input symbol against [ttype]. If the symbol type
@@ -319,19 +317,18 @@ abstract class Parser extends Recognizer<ParserATNSimulator> {
   /// @throws UnsupportedOperationException if the current parser does not
   /// implement the {@link #getSerializedATN()} method.
   ATN get ATNWithBypassAlts {
-    final serializedAtn = serializedATN;
-    if (serializedAtn == null) {
+    if (serializedATN == null) {
       throw UnsupportedError(
           'The current parser does not support an ATN with bypass alternatives.');
     }
 
-    var result = bypassAltsAtnCache[serializedAtn];
+    var result = bypassAltsAtnCache[serializedATN];
     if (result == null) {
       final deserializationOptions = ATNDeserializationOptions(false);
       deserializationOptions.setGenerateRuleBypassTransitions(true);
       result = ATNDeserializer(deserializationOptions)
-          .deserialize(serializedAtn.codeUnits);
-      bypassAltsAtnCache[serializedAtn] = result;
+          .deserialize(serializedATN!.codeUnits);
+      bypassAltsAtnCache[serializedATN!] = result;
     }
 
     return result;
@@ -352,8 +349,8 @@ abstract class Parser extends Recognizer<ParserATNSimulator> {
     Lexer? lexer,
   ]) {
     if (lexer == null) {
-      final tokenSource = tokenStream?.tokenSource;
-      if (tokenSource == null || !(tokenSource is Lexer)) {
+      final tokenSource = tokenStream.tokenSource;
+      if (tokenSource is! Lexer) {
         throw UnsupportedError("Parser can't discover a lexer to use");
       }
       lexer = tokenSource;

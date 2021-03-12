@@ -286,14 +286,14 @@ class ATNDeserializer {
         if (!isFeatureSupported(ADDED_LEXER_ACTIONS, uuid)) {
           // this piece of unused metadata was serialized prior to the
           // addition of LexerAction
-          final actionIndexIgnored = readInt();
+          readInt();
         }
       }
     }
 
     final stopStates = List<RuleStopState?>.filled(nrules, null);
     for (var state in atn.states) {
-      if (!(state is RuleStopState)) {
+      if (state is! RuleStopState) {
         continue;
       }
       atn.ruleToStopState[state.ruleIndex] = state;
@@ -501,13 +501,13 @@ class ATNDeserializer {
           continue;
         }
 
-        if (!(state is StarLoopEntryState)) {
+        if (state is! StarLoopEntryState) {
           continue;
         }
 
         final maybeLoopEndState =
             state.transition(state.numberOfTransitions - 1).target;
-        if (!(maybeLoopEndState is LoopEndState)) {
+        if (maybeLoopEndState is! LoopEndState) {
           continue;
         }
 

@@ -91,7 +91,7 @@ abstract class SemanticContext {
 
   static Iterable<SemanticContext> filterNonPrecedencePredicates(
       Iterable<SemanticContext> collection) {
-    return collection.where((e) => !(e is PrecedencePredicate));
+    return collection.where((e) => e is! PrecedencePredicate);
   }
 }
 
@@ -169,11 +169,10 @@ class PrecedencePredicate extends SemanticContext
   }
 
   @override
-  bool operator ==(Object obj) {
-    if (!(obj is PrecedencePredicate)) {
+  bool operator ==(Object other) {
+    if (other is! PrecedencePredicate) {
       return false;
     }
-    PrecedencePredicate other = obj;
     return precedence == other.precedence;
   }
 
@@ -237,9 +236,8 @@ class AND extends Operator {
   }
 
   @override
-  bool operator ==(Object obj) {
-    if (!(obj is AND)) return false;
-    AND other = obj;
+  bool operator ==(Object other) {
+    if (other is! AND) return false;
     return ListEquality().equals(opnds, other.opnds);
   }
 
@@ -342,9 +340,8 @@ class OR extends Operator {
   }
 
   @override
-  bool operator ==(Object obj) {
-    if (!(obj is OR)) return false;
-    OR other = obj;
+  bool operator ==(Object other) {
+    if (other is! OR) return false;
     return ListEquality().equals(opnds, other.opnds);
   }
 

@@ -289,7 +289,7 @@ class TerminalNodeImpl extends TerminalNode {
   Interval get sourceInterval {
     //if (symbol == null) return Interval.INVALID; Todo: review this nullability that nobody kind of defines, change here or change on to String
 
-    final tokenIndex = symbol!.tokenIndex;
+    final tokenIndex = symbol.tokenIndex;
     return Interval(tokenIndex, tokenIndex);
   }
 
@@ -345,8 +345,7 @@ class ParseTreeWalker {
       listener.visitTerminal(t);
       return;
     }
-    RuleNode r = t
-        as RuleNode; // Todo: review this cast: we have a confusion between RuleNode and ParseTree on this class
+    final r = t as RuleNode;
     enterRule(listener, r);
     for (var i = 0; i < r.childCount; i++) {
       walk(listener, r.getChild(i)!);

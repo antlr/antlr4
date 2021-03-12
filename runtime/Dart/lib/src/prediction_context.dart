@@ -477,7 +477,7 @@ abstract class PredictionContext {
     }
   }
 
-  static String toDOTString(PredictionContext context) {
+  static String toDOTString(PredictionContext? context) {
     if (context == null) return '';
     final buf = StringBuffer();
     buf.write('digraph G {\n');

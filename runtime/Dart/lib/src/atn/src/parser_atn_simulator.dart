@@ -22,7 +22,6 @@ import '../../token.dart';
 import '../../token_stream.dart';
 import '../../util/bit_set.dart';
 import '../../util/murmur_hash.dart';
-import '../../vocabulary.dart';
 import 'atn.dart';
 import 'atn_config.dart';
 import 'atn_config_set.dart';
@@ -294,7 +293,7 @@ class ParserATNSimulator extends ATNSimulator {
     this.parser,
     ATN atn,
     this.decisionToDFA,
-    PredictionContextCache sharedContextCache,
+    PredictionContextCache? sharedContextCache,
   ) : super(atn, sharedContextCache);
 
   @override
@@ -486,7 +485,7 @@ class ParserATNSimulator extends ATNSimulator {
           }
         }
 
-        if (dfa_debug) log('ctx sensitive state ${outerContext} in $D');
+        if (dfa_debug) log('ctx sensitive state $outerContext in $D');
         final fullCtx = true;
         final s0_closure = computeStartState(
           dfa.atnStartState!,
@@ -1140,8 +1139,10 @@ class ParserATNSimulator extends ATNSimulator {
         continue;
       }
 
-      final updatedContext =
-          config.semanticContext.evalPrecedence(parser, _outerContext);
+      final updatedContext = config.semanticContext.evalPrecedence(
+        parser,
+        _outerContext,
+      );
       if (updatedContext == null) {
         // the configuration was eliminated
         continue;
@@ -1359,7 +1360,11 @@ class ParserATNSimulator extends ATNSimulator {
     for (var c in configs) {
       if (c.semanticContext != SemanticContext.NONE) {
         final predicateEvaluationResult = evalSemanticContextOne(
-            c.semanticContext, outerContext, c.alt, configs.fullCtx);
+          c.semanticContext,
+          outerContext,
+          c.alt,
+          configs.fullCtx,
+        );
         if (predicateEvaluationResult) {
           succeeded.add(c);
         } else {
@@ -1581,7 +1586,7 @@ class ParserATNSimulator extends ATNSimulator {
       if (i == 0 && canDropLoopEntryEdgeInLeftRecursiveRule(config)) continue;
 
       final t = p.transition(i);
-      final continueCollecting = !(t is ActionTransition) && collectPredicates;
+      final continueCollecting = (t is! ActionTransition) && collectPredicates;
       final c = getEpsilonTarget(config, t, continueCollecting, depth == 0,
           fullCtx, treatEofAsEpsilon);
       if (c != null) {
@@ -1805,7 +1810,7 @@ class ParserATNSimulator extends ATNSimulator {
   }
 
   String getRuleName(int index) {
-    if (parser != null && index >= 0) return parser.ruleNames[index];
+    if (index >= 0) return parser.ruleNames[index];
     return '<rule $index>';
   }
 
@@ -1874,9 +1879,8 @@ class ParserATNSimulator extends ATNSimulator {
       bool fullCtx) {
     if (debug) {
       log('PRED (collectPredicates=$collectPredicates) ${pt.precedence}>=_p, ctx dependent=true');
-      if (parser != null) {
-        log('context surrounding pred is ${parser.getRuleInvocationStack()}');
-      }
+
+      log('context surrounding pred is ${parser.getRuleInvocationStack()}');
     }
 
     ATNConfig? c;
@@ -1920,9 +1924,8 @@ class ParserATNSimulator extends ATNSimulator {
       log('PRED (collectPredicates=$collectPredicates) '
           '${pt.ruleIndex}:${pt.predIndex}'
           ', ctx dependent=${pt.isCtxDependent}');
-      if (parser != null) {
-        log('context surrounding pred is ${parser.getRuleInvocationStack()}');
-      }
+
+      log('context surrounding pred is ${parser.getRuleInvocationStack()}');
     }
 
     ATNConfig? c;
@@ -2033,8 +2036,7 @@ class ParserATNSimulator extends ATNSimulator {
       return 'EOF';
     }
 
-    final vocabulary =
-        parser != null ? parser.vocabulary : VocabularyImpl.EMPTY_VOCABULARY;
+    final vocabulary = parser.vocabulary;
     final displayName = vocabulary.getDisplayName(t);
     if (displayName == t.toString()) {
       return displayName;
@@ -2134,10 +2136,7 @@ class ParserATNSimulator extends ATNSimulator {
     from.edges![t + 1] = to; // connect
 
     if (debug) {
-      log('DFA=\n' +
-          dfa.toString(parser != null
-              ? parser!.vocabulary
-              : VocabularyImpl.EMPTY_VOCABULARY));
+      log('DFA=\n' + dfa.toString(parser.vocabulary));
     }
 
     return to;
@@ -2186,19 +2185,18 @@ class ParserATNSimulator extends ATNSimulator {
       log(
         'reportAttemptingFullContext decision=${dfa.decision}:$configs'
                 ', input=' +
-            (parser?.tokenStream.getText(interval) ?? ''),
+            parser.tokenStream.getText(interval),
       );
     }
-    if (parser != null) {
-      parser!.errorListenerDispatch.reportAttemptingFullContext(
-        parser!,
-        dfa,
-        startIndex,
-        stopIndex,
-        conflictingAlts,
-        configs,
-      );
-    }
+
+    parser.errorListenerDispatch.reportAttemptingFullContext(
+      parser,
+      dfa,
+      startIndex,
+      stopIndex,
+      conflictingAlts,
+      configs,
+    );
   }
 
   void reportContextSensitivity(DFA dfa, int prediction, ATNConfigSet configs,
@@ -2208,19 +2206,18 @@ class ParserATNSimulator extends ATNSimulator {
       log(
         'reportContextSensitivity decision=${dfa.decision}:$configs'
                 ', input=' +
-            (parser?.tokenStream.getText(interval) ?? ''),
+            parser.tokenStream.getText(interval),
       );
     }
-    if (parser != null) {
-      parser!.errorListenerDispatch.reportContextSensitivity(
-        parser!,
-        dfa,
-        startIndex,
-        stopIndex,
-        prediction,
-        configs,
-      );
-    }
+
+    parser.errorListenerDispatch.reportContextSensitivity(
+      parser,
+      dfa,
+      startIndex,
+      stopIndex,
+      prediction,
+      configs,
+    );
   }
 
   /// If context sensitive parsing, we know it's ambiguity not conflict */
@@ -2238,20 +2235,19 @@ class ParserATNSimulator extends ATNSimulator {
       final interval = Interval.of(startIndex, stopIndex);
       log(
         'reportAmbiguity $ambigAlts:$configs' ', input=' +
-            (parser?.tokenStream.getText(interval) ?? ''),
+            parser.tokenStream.getText(interval),
       );
     }
-    if (parser != null) {
-      parser!.errorListenerDispatch.reportAmbiguity(
-        parser!,
-        dfa,
-        startIndex,
-        stopIndex,
-        exact,
-        ambigAlts,
-        configs,
-      );
-    }
+
+    parser.errorListenerDispatch.reportAmbiguity(
+      parser,
+      dfa,
+      startIndex,
+      stopIndex,
+      exact,
+      ambigAlts,
+      configs,
+    );
   }
 }
 
@@ -2471,7 +2467,7 @@ extension PredictionModeExtension on PredictionMode {
   /// [RuleStopState], otherwise [false]
   static bool allConfigsInRuleStopStates(ATNConfigSet configs) {
     for (var config in configs) {
-      if (!(config.state is RuleStopState)) {
+      if (config.state is! RuleStopState) {
         return false;
       }
     }
@@ -2717,7 +2713,7 @@ extension PredictionModeExtension on PredictionMode {
   /// </pre>
   static List<BitSet> getConflictingAltSubsets(ATNConfigSet configs) {
     final configToAlts =
-        HashMap<ATNConfig, BitSet>(equals: (ATNConfig a, ATNConfig b) {
+        HashMap<ATNConfig, BitSet>(equals: (ATNConfig? a, ATNConfig? b) {
       if (identical(a, b)) return true;
       if (a == null || b == null) return false;
       return a.state.stateNumber == b.state.stateNumber &&

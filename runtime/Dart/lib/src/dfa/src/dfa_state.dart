@@ -89,11 +89,11 @@ class DFAState {
   ///  DFA state.
   Set<int>? get altSet {
     final alts = <int>{};
-    if (configs != null) {
-      for (var c in configs!) {
-        alts.add(c.alt);
-      }
+
+    for (var c in configs) {
+      alts.add(c.alt);
     }
+
     if (alts.isEmpty) return null;
     return alts;
   }
@@ -119,19 +119,15 @@ class DFAState {
   /// {@link #stateNumber} is irrelevant.</p>
 
   @override
-  bool operator ==(Object o) {
+  bool operator ==(Object other) {
     // compare set of ATN configurations in this set with other
-    if (identical(this, o)) return true;
+    if (identical(this, other)) return true;
 
-    if (!(o is DFAState)) {
+    if (other is! DFAState) {
       return false;
     }
 
-    DFAState other = o;
-    // TODO (sam): what to do when configs==null?
-    final sameSet = configs == other.configs;
-//		System.out.println("DFAState.equals: "+configs+(sameSet?"==":"!=")+other.configs);
-    return sameSet;
+    return configs == other.configs;
   }
 
   @override

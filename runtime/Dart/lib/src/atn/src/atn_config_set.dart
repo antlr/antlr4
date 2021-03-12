@@ -173,8 +173,8 @@ class ATNConfigSet extends Iterable<ATNConfig> {
     return alts;
   }
 
-  List<SemanticContext> get predicates {
-    final preds = <SemanticContext>[];
+  List<SemanticContext?> get predicates {
+    final preds = <SemanticContext?>[];
     for (var c in configs) {
       if (c.semanticContext != SemanticContext.NONE) {
         preds.add(c.semanticContext);

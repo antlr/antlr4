@@ -73,11 +73,7 @@ class TextChunk extends Chunk {
   ///
   /// @param text The text of this chunk.
   /// @exception IllegalArgumentException if [text] is null.
-  TextChunk(this.text) {
-    if (text == null) {
-      throw ArgumentError.notNull('text');
-    }
-  }
+  TextChunk(this.text);
 
   /// {@inheritDoc}
   ///

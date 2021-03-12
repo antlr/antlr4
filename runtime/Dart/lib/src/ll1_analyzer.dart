@@ -29,12 +29,12 @@ class LL1Analyzer {
   ///
   /// @param s the ATN state
   /// @return the expected symbols for each outgoing transition of [s].
-  List<IntervalSet>? getDecisionLookahead(ATNState? s) {
+  List<IntervalSet?>? getDecisionLookahead(ATNState? s) {
 //		System.out.println("LOOK("+s.stateNumber+")");
     if (s == null) {
       return null;
     }
-    final look = List<IntervalSet?>.generate(s.numberOfTransitions, (n) {
+    return List<IntervalSet?>.generate(s.numberOfTransitions, (n) {
       final lookAlt = IntervalSet();
       final lookBusy = <ATNConfig>{};
       final seeThruPreds = false; // fail to get lookahead upon pred

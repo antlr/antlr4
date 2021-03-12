@@ -194,7 +194,7 @@ class ParserInterpreter extends Parser {
       case TransitionType.EPSILON:
         if (p.stateType == StateType.STAR_LOOP_ENTRY &&
             (p as StarLoopEntryState).isPrecedenceDecision &&
-            !(transition.target is LoopEndState)) {
+            (transition.target is! LoopEndState)) {
           // We are at the start of a left recursive rule's (...)* loop
           // and we're not taking the exit branch of loop.
           final localctx = createInterpreterRuleContext(
@@ -268,7 +268,7 @@ class ParserInterpreter extends Parser {
           (transition as PrecedencePredicateTransition).precedence,
         )) {
           throw FailedPredicateException(this,
-              'precpred(context, ${(transition as PrecedencePredicateTransition).precedence})');
+              'precpred(context, ${(transition).precedence})');
         }
         break;
 

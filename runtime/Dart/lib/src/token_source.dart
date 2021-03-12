@@ -116,11 +116,9 @@ class ListTokenSource implements TokenSource {
   /// been reached).
   ///
   /// @exception NullPointerException if [tokens] is null
-  ListTokenSource(this.tokens, [this._sourceName]) {
-    if (tokens == null) {
-      throw ArgumentError.notNull('tokens');
-    }
-  }
+  ListTokenSource(this.tokens, [this._sourceName]);
+
+
 
   /// {@inheritDoc}
 

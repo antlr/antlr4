@@ -7,7 +7,6 @@
 import 'input_stream.dart';
 import 'interval_set.dart';
 import 'misc/pair.dart';
-import 'recognizer.dart';
 import 'token_source.dart';
 
 /// A token has properties: text, type, line, character position in the line

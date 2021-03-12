@@ -5,7 +5,6 @@
  */
 
 import '../../prediction_context.dart';
-import '../../recognizer.dart';
 import '../../util/murmur_hash.dart';
 import 'atn_state.dart';
 import 'lexer_action_executor.dart';
@@ -103,7 +102,7 @@ class ATNConfig {
         alt = alt ?? c.alt,
         context = context ?? c.context,
         semanticContext = semanticContext ?? c.semanticContext,
-        reachesIntoOuterContext = c.reachesIntoOuterContext ?? 0;
+        reachesIntoOuterContext = c.reachesIntoOuterContext;
 
   /// This method gets the value of the {@link #reachesIntoOuterContext} field
   /// as it existed prior to the introduction of the
@@ -129,7 +128,7 @@ class ATNConfig {
   ///  syntactic/semantic contexts are the same.
   @override
   bool operator ==(Object other) {
-    if (other is ATNConfig && other != null) {
+    if (other is ATNConfig) {
       return state.stateNumber == other.state.stateNumber &&
           alt == other.alt &&
           (context == other.context ||
@@ -170,7 +169,7 @@ class ATNConfig {
       buf.write(context.toString());
       buf.write(']');
     }
-    if (semanticContext != null && semanticContext != SemanticContext.NONE) {
+    if (semanticContext != SemanticContext.NONE) {
       buf.write(',');
       buf.write(semanticContext);
     }

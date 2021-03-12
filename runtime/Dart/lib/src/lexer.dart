@@ -99,15 +99,9 @@ abstract class Lexer extends Recognizer<LexerATNSimulator>
   /// Return a token from this source; i.e., match a token on the char stream.
   @override
   Token nextToken() {
-    if (_input == null) {
-      throw StateError('nextToken requires a non-null input stream.');
-    }
-
-    final _input_nonnull = _input!;
-
     // Mark start location in char stream so unbuffered streams are
     // guaranteed at least have text of current token
-    final tokenStartMarker = _input_nonnull.mark();
+    final tokenStartMarker = _input.mark();
     try {
       outer:
       while (true) {
@@ -118,7 +112,7 @@ abstract class Lexer extends Recognizer<LexerATNSimulator>
 
         _token = null;
         channel = Token.DEFAULT_CHANNEL;
-        tokenStartCharIndex = _input_nonnull.index;
+        tokenStartCharIndex = _input.index;
         tokenStartCharPositionInLine = interpreter.charPositionInLine;
         tokenStartLine = interpreter.line;
         _text = null;
@@ -129,13 +123,13 @@ abstract class Lexer extends Recognizer<LexerATNSimulator>
 //								   " at index "+input.index());
           late int ttype;
           try {
-            ttype = interpreter.match(_input_nonnull, mode_);
+            ttype = interpreter.match(_input, mode_);
           } on LexerNoViableAltException catch (e) {
             notifyListeners(e); // report error
             recover(e);
             ttype = SKIP;
           }
-          if (_input_nonnull.LA(1) == IntStream.EOF) {
+          if (_input.LA(1) == IntStream.EOF) {
             _hitEOF = true;
           }
           if (type == Token.INVALID_TYPE) type = ttype;
@@ -149,7 +143,7 @@ abstract class Lexer extends Recognizer<LexerATNSimulator>
     } finally {
       // make sure we release marker after match or
       // unbuffered char stream will keep buffering
-      _input_nonnull.release(tokenStartMarker);
+      _input.release(tokenStartMarker);
     }
   }
 
@@ -196,7 +190,7 @@ abstract class Lexer extends Recognizer<LexerATNSimulator>
 
   @override
   String get sourceName {
-    return _input!.sourceName;
+    return _input.sourceName;
   }
 
   @override

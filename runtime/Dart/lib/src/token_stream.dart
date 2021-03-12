@@ -160,11 +160,7 @@ class BufferedTokenStream implements TokenStream {
   /// <ul>
   bool fetchedEOF = false;
 
-  BufferedTokenStream(this._tokenSource) {
-    if (_tokenSource == null) {
-      throw ArgumentError.notNull('tokenSource');
-    }
-  }
+  BufferedTokenStream(this._tokenSource);
 
   @override
   int get index => p;
@@ -518,7 +514,7 @@ class BufferedTokenStream implements TokenStream {
   }
 
   @override
-  String getTextRange(Token start, Token stop) {
+  String getTextRange(Token? start, Token? stop) {
     if (start != null && stop != null) {
       return getText(Interval.of(start.tokenIndex, stop.tokenIndex));
     }
