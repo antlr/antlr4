@@ -151,11 +151,11 @@ class NoViableAltException extends RecognitionException {
 
   NoViableAltException(
     Parser recognizer,
-    TokenStream? input,
+    [TokenStream? input,
     Token? startToken,
     Token? offendingToken,
     ATNConfigSet deadEndConfigs,
-    ParserRuleContext? ctx,
+    ParserRuleContext? ctx]
   ) : this._(
           recognizer,
           input ?? recognizer.inputStream,
