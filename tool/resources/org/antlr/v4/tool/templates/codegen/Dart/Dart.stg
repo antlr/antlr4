@@ -593,7 +593,7 @@ state = <m.stateNumber>;
 if (<if(invert)><m.varName> \<= 0 || <else>!<endif>(<expr>)) {
   <if(m.labels)><m.labels:{l | <labelref(l)> = }><endif>errorHandler.recoverInline(this);
 } else {
-  if ( tokenStream.LA(1)!==IntStream.EOF ) matchedEOF = true;
+  if ( tokenStream.LA(1)! == IntStream.EOF ) matchedEOF = true;
   errorHandler.reportMatch(this);
   consume();
 }
@@ -739,6 +739,7 @@ class <struct.name> extends <if(contextSuperClass)><contextSuperClass><else>Pars
 
 AltLabelStructDecl(struct,attrs,getters,dispatchMethods) ::= <<
 class <struct.name> extends <struct.parentRule; format="cap">Context {
+  <attrs:{a | late <a>;}; separator="\n">
   <getters:{g | <g>}; separator="\n">
   <struct.name>(<struct.parentRule; format="cap">Context ctx) { copyFrom(ctx); }
   <dispatchMethods; separator="\n">
