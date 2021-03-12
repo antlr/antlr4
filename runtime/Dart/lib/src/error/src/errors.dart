@@ -120,7 +120,7 @@ class LexerNoViableAltException extends RecognitionException<CharStream> {
 class NoViableAltException extends RecognitionException {
   /// Which configurations did we try at input.index() that couldn't match input.LT(1)? */
 
-  final ATNConfigSet deadEndConfigs;
+  final ATNConfigSet? deadEndConfigs;
 
   /// The token object at the start index; the input stream might
   /// 	not be buffering tokens so get a reference to it. (At the
@@ -150,13 +150,13 @@ class NoViableAltException extends RecognitionException {
   }
 
   NoViableAltException(
-    Parser recognizer,
-    [TokenStream? input,
+    Parser recognizer, [
+    TokenStream? input,
     Token? startToken,
     Token? offendingToken,
-    ATNConfigSet deadEndConfigs,
-    ParserRuleContext? ctx]
-  ) : this._(
+    ATNConfigSet? deadEndConfigs,
+    ParserRuleContext? ctx,
+  ]) : this._(
           recognizer,
           input ?? recognizer.inputStream,
           startToken ?? recognizer.currentToken,

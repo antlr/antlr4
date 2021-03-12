@@ -2054,7 +2054,7 @@ class ParserATNSimulator extends ATNSimulator {
   ///  "dead" code for a bit.
   void dumpDeadEndConfigs(NoViableAltException nvae) {
     log('dead end configs: ', level: Level.SEVERE.value);
-    for (var c in nvae.deadEndConfigs) {
+    for (var c in nvae.deadEndConfigs!) {
       var trans = 'no edges';
       if (c.state.numberOfTransitions > 0) {
         final t = c.state.transition(0);
