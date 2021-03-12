@@ -138,6 +138,8 @@ public class BaseDartTest extends BaseRuntimeTestSupport implements RuntimeTestS
 		String runtime = locateRuntime();
 		writeFile(getTempDirPath(), "pubspec.yaml",
 			"name: \"test\"\n" +
+				"environment:\n" +
+  				"  sdk: \">=2.12.0 <3.0.0\"\n" +
 				"dependencies:\n" +
 				"  antlr4:\n" +
 				"    path: " + runtime + "\n");
