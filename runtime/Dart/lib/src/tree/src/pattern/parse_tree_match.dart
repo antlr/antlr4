@@ -347,7 +347,7 @@ class ParseTreePatternMatcher {
     } on RecognitionException {
       rethrow;
     } catch (e) {
-      throw CannotInvokeStartRule(e as String);
+      throw CannotInvokeStartRule(e.toString());
     }
 
     // Make sure tree pattern compilation checks for a complete parse

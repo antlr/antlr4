@@ -2117,13 +2117,9 @@ class ParserATNSimulator extends ATNSimulator {
   /// @return If [to] is null, this method returns null;
   /// otherwise this method returns the result of calling {@link #addDFAState}
   /// on [to]
-  DFAState? addDFAEdge(DFA dfa, DFAState? from, int t, DFAState? to) {
+  DFAState? addDFAEdge(DFA dfa, DFAState? from, int t, DFAState to) {
     if (debug) {
       log('EDGE $from -> $to upon ' + getTokenName(t));
-    }
-
-    if (to == null) {
-      return null;
     }
 
     to = addDFAState(dfa, to); // used existing if possible not incoming

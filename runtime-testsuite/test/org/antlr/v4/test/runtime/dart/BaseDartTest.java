@@ -437,6 +437,7 @@ public class BaseDartTest extends BaseRuntimeTestSupport implements RuntimeTestS
 		outputFileST.add("lexerName", lexerName);
 		outputFileST.add("parserStartRuleName", parserStartRuleName);
 		writeFile(getTempDirPath(), "Test.dart", outputFileST.render());
+		System.out.println(getTempDirPath());
 	}
 
 	protected void writeLexerTestFile(String lexerName, boolean showDFA) {
@@ -452,7 +453,7 @@ public class BaseDartTest extends BaseRuntimeTestSupport implements RuntimeTestS
 				"  <lexerName> lex = <lexerName>(input);\n" +
 				"  CommonTokenStream tokens = CommonTokenStream(lex);\n" +
 				"  tokens.fill();\n" +
-				"  for (Object t in tokens.getTokens())\n" +
+				"  for (Object t in tokens.getTokens()!)\n" +
 				"    print(t);\n" +
 				"\n" +
 				(showDFA ? "stdout.write(lex.interpreter.getDFA(Lexer.DEFAULT_MODE).toLexerString());\n" : "") +

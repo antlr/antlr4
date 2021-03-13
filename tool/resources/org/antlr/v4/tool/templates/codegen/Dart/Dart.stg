@@ -181,7 +181,7 @@ abstract class <file.grammarName>Visitor\<T> extends ParseTreeVisitor\<T> {
 <endif>
 /// [ctx] the parse tree.
 /// Return the visitor result.
-T visit<lname; format="cap">(<lname; format="cap">Context ctx);}; separator="\n">
+T? visit<lname; format="cap">(<lname; format="cap">Context ctx);}; separator="\n">
 }
 >>
 
@@ -296,7 +296,7 @@ Vocabulary get vocabulary {
 
 dumpActions(recog, argFuncs, actionFuncs, sempredFuncs) ::= <<
 <if(actionFuncs)>
-void action(RuleContext _localctx, int ruleIndex, int actionIndex) {
+void action(RuleContext? _localctx, int ruleIndex, int actionIndex) {
   switch (ruleIndex) {
   <recog.actionFuncs.values:{f|
 case <f.ruleIndex>:
@@ -307,7 +307,7 @@ case <f.ruleIndex>:
 <actionFuncs.values; separator="\n">
 <endif>
 <if(sempredFuncs)>
-bool sempred(RuleContext _localctx, int ruleIndex, int predIndex) {
+bool sempred(RuleContext? _localctx, int ruleIndex, int predIndex) {
   switch (ruleIndex) {
   <recog.sempredFuncs.values:{f|
 case <f.ruleIndex>:
@@ -717,7 +717,7 @@ CaptureNextTokenType(d) ::= "<d.varName> = tokenStream.LA(1)!;"
 StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers)
   ::= <<
 class <struct.name> extends <if(contextSuperClass)><contextSuperClass><else>ParserRuleContext<endif><if(interfaces)> implements <interfaces; separator=", "><endif> {
-  <attrs:{a | <a>;}; separator="\n">
+  <attrs:{a | late <a>;}; separator="\n">
   <getters:{g | <g>}; separator="\n">
   <struct.name>([ParserRuleContext? parent, int? invokingState<ctorAttrs:{a | , <a>}>]) : super(parent, invokingState)<if(struct.ctorAttrs)> {
     <struct.ctorAttrs:{a | this.<a.name> = <a.name>;}; separator="\n">

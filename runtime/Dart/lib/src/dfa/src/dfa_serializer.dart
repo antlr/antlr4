@@ -19,7 +19,7 @@ class DFASerializer {
 
   @override
   String toString() {
-    if (dfa.s0 == null) return '';
+    if (dfa.s0 == null) return 'null';
     final buf = StringBuffer();
     final states = dfa.getStates();
     for (var s in states) {
@@ -40,7 +40,7 @@ class DFASerializer {
     }
 
     final output = buf.toString();
-    if (output.isEmpty) return '';
+    if (output.isEmpty) return 'null';
     //return Utils.sortLinesInString(output);
     return output;
   }
