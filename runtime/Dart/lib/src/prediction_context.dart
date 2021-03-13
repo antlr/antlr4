@@ -418,6 +418,9 @@ abstract class PredictionContext {
       }
     }
 
+    var safeMergedReturnStates = <int>[];
+    var safeMergedParents = <PredictionContext>[];
+
     // trim merged if we combined a few that had same stack tops
     if (k < mergedParents.length) {
       // write index < last position; trim
@@ -430,16 +433,16 @@ abstract class PredictionContext {
         if (mergeCache != null) mergeCache[Pair(a, b)] = a_;
         return a_;
       }
-      mergedParents = List.generate(k, (n) => mergedParents[n]);
-      mergedReturnStates = List.generate(k, (n) => mergedReturnStates[n]);
+      safeMergedParents = List.generate(k, (n) => mergedParents[n]!);
+      safeMergedReturnStates = List.generate(k, (n) => mergedReturnStates[n]!);
+    } else {
+        safeMergedParents = List.generate(mergedParents.length, (n) => mergedParents[n]!);
+        safeMergedReturnStates = List.generate(mergedReturnStates.length, (n) => mergedReturnStates[n]!);
     }
 
-    mergedParents = mergedParents as List<PredictionContext>;
-    mergedReturnStates = mergedReturnStates as List<int>;
-
     PredictionContext M = ArrayPredictionContext(
-      mergedParents,
-      mergedReturnStates,
+      safeMergedParents,
+      safeMergedReturnStates,
     );
 
     // if we created same array as a or b, return that instead
@@ -453,7 +456,7 @@ abstract class PredictionContext {
       return b;
     }
 
-    combineCommonParents(mergedParents);
+    combineCommonParents(safeMergedParents);
 
     if (mergeCache != null) mergeCache[Pair(a, b)] = M;
     return M;
@@ -563,7 +566,7 @@ abstract class PredictionContext {
     }
 
     var changed = false;
-    var parents = List<PredictionContext?>.filled(context.length, null);
+    var parents = <PredictionContext>[];
     for (var i = 0; i < parents.length; i++) {
       final parent = getCachedContext(
         context.getParent(i)!,
@@ -572,9 +575,9 @@ abstract class PredictionContext {
       );
       if (changed || parent != context.getParent(i)) {
         if (!changed) {
-          parents = List<PredictionContext?>.filled(context.length, null);
+          parents = <PredictionContext>[];
           for (var j = 0; j < context.length; j++) {
-            parents[j] = context.getParent(j);
+            parents.add(context.getParent(j)!);
           }
 
           changed = true;
@@ -583,7 +586,6 @@ abstract class PredictionContext {
         parents[i] = parent;
       }
     }
-    // parents = parents as List<PredictionContext>;
 
     if (!changed) {
       contextCache.add(context);

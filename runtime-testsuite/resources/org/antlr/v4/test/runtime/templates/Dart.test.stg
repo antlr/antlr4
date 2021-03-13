@@ -221,12 +221,12 @@ walker.walk(new LeafListener(), <s>);
 TreeNodeWithAltNumField(X) ::= <<
 @parser::definitions {
 class MyRuleNode extends ParserRuleContext {
-  int? altNum;
+  late int altNum;
 
   MyRuleNode(ParserRuleContext parent, int invokingStateNumber)
       : super(parent, invokingStateNumber);
 
-  @override int? get altNumber {
+  @override int get altNumber {
     return altNum;
   }
 
