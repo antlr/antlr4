@@ -665,7 +665,7 @@ RulePropertyRef_parser(r)	 ::= "this"
 
 ThisRulePropertyRef_start(r) ::= "_localctx.start"
 ThisRulePropertyRef_stop(r)	 ::= "_localctx.stop"
-ThisRulePropertyRef_text(r)	 ::= "tokenStream.getTextRange(_localctx.start, tokenStream.LT(-1))"
+ThisRulePropertyRef_text(r)	 ::= "tokenStream.getTextRange(_localctx.start, tokenStream.LT(-1)!)"
 ThisRulePropertyRef_ctx(r)	 ::= "_localctx"
 ThisRulePropertyRef_parser(r)	 ::= "this"
 
