@@ -548,7 +548,7 @@ abstract class Parser extends Recognizer<ParserATNSimulator> {
     final previous = context!;
     previous.parent = localctx;
     previous.invokingState = state;
-    previous.stop = _input.LT(-1)!;
+    previous.stop = _input.LT(-1);
 
     context = localctx;
     context!.start = previous.start;
@@ -564,7 +564,7 @@ abstract class Parser extends Recognizer<ParserATNSimulator> {
   void unrollRecursionContexts(ParserRuleContext? _parentctx) {
     assert(context != null);
     _precedenceStack.removeLast();
-    context!.stop = _input.LT(-1)!;
+    context!.stop = _input.LT(-1);
     final retctx = context!; // save current ctx (return value)
 
     // unroll so _ctx is as it was before call to recursive method
