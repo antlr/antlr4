@@ -1913,7 +1913,7 @@ class ParserATNSimulator extends ATNSimulator {
     return c;
   }
 
-  ATNConfig predTransition(
+  ATNConfig? predTransition(
     ATNConfig config,
     PredicateTransition pt,
     bool collectPredicates,
@@ -1958,7 +1958,7 @@ class ParserATNSimulator extends ATNSimulator {
     }
 
     if (debug) log('config from pred transition=$c');
-    return c!;
+    return c;
   }
 
   ATNConfig ruleTransition(ATNConfig config, RuleTransition t) {

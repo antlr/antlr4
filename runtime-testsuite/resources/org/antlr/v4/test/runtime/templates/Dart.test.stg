@@ -68,7 +68,7 @@ PlusText(a) ::= <%"<a>" + this.text%>
 
 InputText() ::= "tokenStream.text"
 
-LTEquals(i, v) ::= <%tokenStream.LT(<i>).text == <v>%>
+LTEquals(i, v) ::= <%tokenStream.LT(<i>)!.text == <v>%>
 
 LANotEquals(i, v) ::= <%tokenStream.LA(<i>)!=<v>%>
 
@@ -80,7 +80,7 @@ GetExpectedTokenNames() ::= "this.expectedTokens.toString(vocabulary: this.vocab
 
 RuleInvocationStack() ::= "ruleInvocationStack"
 
-LL_EXACT_AMBIG_DETECTION() ::= <<interpreter.predictionMode = PredictionMode.LL_EXACT_AMBIG_DETECTION;>>
+LL_EXACT_AMBIG_DETECTION() ::= <<interpreter!.predictionMode = PredictionMode.LL_EXACT_AMBIG_DETECTION;>>
 
 ParserToken(parser, token) ::= <%<parser>.TOKEN_<token>%>
 
@@ -221,12 +221,12 @@ walker.walk(new LeafListener(), <s>);
 TreeNodeWithAltNumField(X) ::= <<
 @parser::definitions {
 class MyRuleNode extends ParserRuleContext {
-  int altNum;
+  int? altNum;
 
   MyRuleNode(ParserRuleContext parent, int invokingStateNumber)
       : super(parent, invokingStateNumber);
 
-  @override int get altNumber {
+  @override int? get altNumber {
     return altNum;
   }
 

@@ -118,7 +118,7 @@ abstract class TokenStream extends IntStream {
   ///
   /// @throws UnsupportedOperationException if this stream does not support
   /// this method for the specified tokens
-  String getTextRange(Token start, Token stop);
+  String getTextRange(Token? start, Token? stop);
 }
 
 /// This implementation of [TokenStream] loads tokens from a

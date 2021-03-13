@@ -328,7 +328,7 @@ parser_ctor(p) ::= <<
 /// This generates a private method since the actionIndex is generated, making an
 /// overriding implementation impossible to maintain.
 RuleActionFunction(r, actions) ::= <<
-void _<r.name>_action(<r.ctxType> _localctx, int actionIndex) {
+void _<r.name>_action(<r.ctxType>? _localctx, int actionIndex) {
   switch (actionIndex) {
     <actions:{index|case <index>: <actions.(index)> break;}; separator="\n">
   }
@@ -665,7 +665,7 @@ RulePropertyRef_parser(r)	 ::= "this"
 
 ThisRulePropertyRef_start(r) ::= "_localctx.start"
 ThisRulePropertyRef_stop(r)	 ::= "_localctx.stop"
-ThisRulePropertyRef_text(r)	 ::= "tokenStream.getTextRange(_localctx.start, tokenStream.LT(-1)!)"
+ThisRulePropertyRef_text(r)	 ::= "tokenStream.getTextRange(_localctx.start, tokenStream.LT(-1))"
 ThisRulePropertyRef_ctx(r)	 ::= "_localctx"
 ThisRulePropertyRef_parser(r)	 ::= "this"
 

@@ -427,7 +427,8 @@ class LexerATNSimulator extends ATNSimulator {
 
     if (config.state is RuleStopState) {
       if (debug) {
-        log('closure at ${recog.ruleNames[config.state.ruleIndex]} rule stop $config\n', level: Level.FINE.value);
+        log('closure at ${recog.ruleNames[config.state.ruleIndex]} rule stop $config\n',
+            level: Level.FINE.value);
       }
 
       if (config.context == null || config.context!.hasEmptyPath()) {
@@ -564,7 +565,7 @@ class LexerATNSimulator extends ATNSimulator {
           // additional modifications are needed before we can support
           // the split operation.
           final lexerActionExecutor = LexerActionExecutor.append(
-            config.lexerActionExecutor!,
+            config.lexerActionExecutor,
             atn.lexerActions![(t as ActionTransition).actionIndex],
           );
           c = LexerATNConfig.dup(config, t.target,
