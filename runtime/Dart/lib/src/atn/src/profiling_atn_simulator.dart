@@ -42,9 +42,9 @@ class ProfilingATNSimulator extends ParserATNSimulator {
   ProfilingATNSimulator(Parser parser)
       : super(
           parser,
-          parser.interpreter.atn,
-          parser.interpreter.decisionToDFA,
-          parser.interpreter.sharedContextCache,
+          parser.interpreter!.atn,
+          parser.interpreter!.decisionToDFA,
+          parser.interpreter!.sharedContextCache,
         ) {
     numDecisions = atn.decisionToState.length;
     decisions = List<DecisionInfo>.generate(

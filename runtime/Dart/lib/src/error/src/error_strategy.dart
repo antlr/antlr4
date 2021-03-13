@@ -306,7 +306,7 @@ class DefaultErrorStrategy implements ErrorStrategy {
 
   @override
   void sync(Parser recognizer) {
-    final s = recognizer.interpreter.atn.states[recognizer.state]!;
+    final s = recognizer.interpreter!.atn.states[recognizer.state]!;
 //		log("sync @ "+s.stateNumber+"="+s.getClass().getSimpleName(), level: Level.SEVERE.value);
     // If already recovering, don't try to sync
     if (inErrorRecoveryMode(recognizer)) {
@@ -578,9 +578,9 @@ class DefaultErrorStrategy implements ErrorStrategy {
     // if current token is consistent with what could come after current
     // ATN state, then we know we're missing a token; error recovery
     // is free to conjure up and insert the missing token
-    final currentState = recognizer.interpreter.atn.states[recognizer.state]!;
+    final currentState = recognizer.interpreter!.atn.states[recognizer.state]!;
     final next = currentState.transition(0).target;
-    final atn = recognizer.interpreter.atn;
+    final atn = recognizer.interpreter!.atn;
     final expectingAtLL2 = atn.nextTokens(next, recognizer.context);
 //		System.out.println("LT(2) set="+expectingAtLL2.toString(recognizer.getTokenNames()));
     if (expectingAtLL2.contains(currentSymbolType)) {
@@ -810,7 +810,7 @@ class DefaultErrorStrategy implements ErrorStrategy {
 	 *  at run-time upon error to avoid overhead during parsing.
 	 */
   IntervalSet getErrorRecoverySet(Parser recognizer) {
-    final atn = recognizer.interpreter.atn;
+    final atn = recognizer.interpreter!.atn;
     RuleContext? ctx = recognizer.context;
     final recoverSet = IntervalSet();
     while (ctx != null && ctx.invokingState >= 0) {

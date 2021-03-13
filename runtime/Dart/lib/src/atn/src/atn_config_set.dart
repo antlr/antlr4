@@ -194,7 +194,7 @@ class ATNConfigSet extends Iterable<ATNConfig> {
 
     for (var config in configs) {
 //			int before = PredictionContext.getAllContextNodes(config.context).length;
-      config.context = interpreter.getCachedContext(config.context);
+      config.context = interpreter!.getCachedContext(config.context);
 //			int after = PredictionContext.getAllContextNodes(config.context).length;
 //			System.out.println("configs "+before+"->"+after);
     }

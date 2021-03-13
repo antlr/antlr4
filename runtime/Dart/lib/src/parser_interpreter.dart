@@ -267,8 +267,8 @@ class ParserInterpreter extends Parser {
           context,
           (transition as PrecedencePredicateTransition).precedence,
         )) {
-          throw FailedPredicateException(this,
-              'precpred(context, ${(transition).precedence})');
+          throw FailedPredicateException(
+              this, 'precpred(context, ${(transition).precedence})');
         }
         break;
 
@@ -294,7 +294,7 @@ class ParserInterpreter extends Parser {
         predictedAlt = overrideDecisionAlt;
         overrideDecisionReached = true;
       } else {
-        predictedAlt = interpreter.adaptivePredict(
+        predictedAlt = interpreter!.adaptivePredict(
           inputStream,
           decision,
           context!,

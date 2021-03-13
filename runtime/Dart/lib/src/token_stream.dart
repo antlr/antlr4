@@ -18,6 +18,9 @@ abstract class TokenStream extends IntStream {
   /// are met, the return value is non-null and the value of
   /// `LT(k).getType()==LA(k)`.
   ///
+  /// TODO: in this doc it says that is non-null, but the implementation says
+  /// otherwise
+  ///
   /// Se also:
   /// ntStream.LA
   Token? LT(int k);

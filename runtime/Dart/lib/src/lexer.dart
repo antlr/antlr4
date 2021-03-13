@@ -93,7 +93,7 @@ abstract class Lexer extends Recognizer<LexerATNSimulator>
     mode_ = Lexer.DEFAULT_MODE;
     _modeStack.clear();
 
-    interpreter.reset();
+    interpreter?.reset();
   }
 
   /// Return a token from this source; i.e., match a token on the char stream.
@@ -113,8 +113,8 @@ abstract class Lexer extends Recognizer<LexerATNSimulator>
         _token = null;
         channel = Token.DEFAULT_CHANNEL;
         tokenStartCharIndex = _input.index;
-        tokenStartCharPositionInLine = interpreter.charPositionInLine;
-        tokenStartLine = interpreter.line;
+        tokenStartCharPositionInLine = interpreter!.charPositionInLine;
+        tokenStartLine = interpreter!.line;
         _text = null;
         do {
           type = Token.INVALID_TYPE;
@@ -123,7 +123,7 @@ abstract class Lexer extends Recognizer<LexerATNSimulator>
 //								   " at index "+input.index());
           late int ttype;
           try {
-            ttype = interpreter.match(_input, mode_);
+            ttype = interpreter!.match(_input, mode_);
           } on LexerNoViableAltException catch (e) {
             notifyListeners(e); // report error
             recover(e);
@@ -244,20 +244,20 @@ abstract class Lexer extends Recognizer<LexerATNSimulator>
 
   @override
   int get charPositionInLine {
-    return interpreter.charPositionInLine;
+    return interpreter!.charPositionInLine;
   }
 
   @override
   int get line {
-    return interpreter.line;
+    return interpreter!.line;
   }
 
   set line(int line) {
-    interpreter.line = line;
+    interpreter!.line = line;
   }
 
   set charPositionInLine(int charPositionInLine) {
-    interpreter.charPositionInLine = charPositionInLine;
+    interpreter!.charPositionInLine = charPositionInLine;
   }
 
   /// What is the index of the current character of lookahead?
@@ -271,7 +271,7 @@ abstract class Lexer extends Recognizer<LexerATNSimulator>
     if (_text != null) {
       return _text!;
     }
-    return interpreter.getText(_input);
+    return interpreter!.getText(_input);
   }
 
   /// Set the complete text of this token; it wipes any previous
@@ -337,7 +337,7 @@ abstract class Lexer extends Recognizer<LexerATNSimulator>
     if (re is LexerNoViableAltException) {
       if (_input.LA(1) != IntStream.EOF) {
         // skip a char and try again
-        interpreter.consume(_input);
+        interpreter!.consume(_input);
       }
     } else {
       //System.out.println("consuming char "+(char)input.LA(1)+" during recovery");

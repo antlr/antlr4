@@ -88,7 +88,7 @@ abstract class Parser extends Recognizer<ParserATNSimulator> {
     setTrace(false);
     _precedenceStack.clear();
     _precedenceStack.add(0);
-    interpreter.reset();
+    interpreter?.reset();
   }
 
   /// Match current input symbol against [ttype]. If the symbol type
@@ -489,14 +489,14 @@ abstract class Parser extends Recognizer<ParserATNSimulator> {
     assert(context != null);
     if (matchedEOF) {
       // if we have matched EOF, it cannot consume past EOF so we use LT(1) here
-      context!.stop = _input.LT(1)!; // LT(1) will be end of file
+      context!.stop = _input.LT(1); // LT(1) will be end of file
     } else {
-      context!.stop = _input.LT(-1)!; // stop node is what we just matched
+      context!.stop = _input.LT(-1); // stop node is what we just matched
     }
     // trigger event on _ctx, before it reverts to parent
     if (_parseListeners != null) triggerExitRuleEvent();
     state = context!.invokingState;
-    context = context!.parent!;
+    context = context?.parent;
   }
 
   void enterOuterAlt(ParserRuleContext localctx, int altNum) {
@@ -618,8 +618,8 @@ abstract class Parser extends Recognizer<ParserATNSimulator> {
   /// @return [true] if [symbol] can follow the current state in
   /// the ATN, otherwise [false].
   bool isExpectedToken(int symbol) {
-//   		return interpreter.atn.nextTokens(_ctx);
-    final atn = interpreter.atn;
+//   		return interpreter!.atn.nextTokens(_ctx);
+    final atn = interpreter!.atn;
     var ctx = context;
     final s = atn.states[state];
     var following = atn.nextTokens(s!);
@@ -663,7 +663,7 @@ abstract class Parser extends Recognizer<ParserATNSimulator> {
   }
 
   IntervalSet get expectedTokensWithinCurrentRule {
-    final atn = interpreter.atn;
+    final atn = interpreter!.atn;
     final s = atn.states[state]!;
     return atn.nextTokens(s);
   }
@@ -708,8 +708,8 @@ abstract class Parser extends Recognizer<ParserATNSimulator> {
   /// For debugging and other purposes. */
   List<String> get dfaStrings {
     final s = <String>[];
-    for (var d = 0; d < interpreter.decisionToDFA.length; d++) {
-      final dfa = interpreter.decisionToDFA[d];
+    for (var d = 0; d < interpreter!.decisionToDFA.length; d++) {
+      final dfa = interpreter!.decisionToDFA[d];
       s.add(dfa.toString(vocabulary));
     }
     return s;
@@ -718,8 +718,8 @@ abstract class Parser extends Recognizer<ParserATNSimulator> {
   /// For debugging and other purposes. */
   void dumpDFA() {
     var seenOne = false;
-    for (var d = 0; d < interpreter.decisionToDFA.length; d++) {
-      final dfa = interpreter.decisionToDFA[d];
+    for (var d = 0; d < interpreter!.decisionToDFA.length; d++) {
+      final dfa = interpreter!.decisionToDFA[d];
       if (dfa.states.isNotEmpty) {
         if (seenOne) print('');
         print('Decision ${dfa.decision}:');
@@ -744,7 +744,7 @@ abstract class Parser extends Recognizer<ParserATNSimulator> {
 
   /// @since 4.3
   void setProfile(bool profile) {
-    final interp = interpreter;
+    final interp = interpreter!;
     final saveMode = interp.predictionMode;
     if (profile) {
       if (!(interp is ProfilingATNSimulator)) {
@@ -759,7 +759,7 @@ abstract class Parser extends Recognizer<ParserATNSimulator> {
       );
       interpreter = sim;
     }
-    interpreter.predictionMode = saveMode;
+    interpreter!.predictionMode = saveMode;
   }
 
   /// During a parse is sometimes useful to listen in on the rule entry and exit

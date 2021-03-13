@@ -130,7 +130,7 @@ class ParserRuleContext extends RuleContext {
   // Override to make type more specific
   @override
   ParserRuleContext? get parent {
-    return super.parent as ParserRuleContext;
+    return super.parent as ParserRuleContext?;
   }
 
   @override

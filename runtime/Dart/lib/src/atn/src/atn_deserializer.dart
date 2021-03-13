@@ -291,7 +291,9 @@ class ATNDeserializer {
       }
     }
 
-    final stopStates = List<RuleStopState?>.filled(nrules, null);
+    atn.ruleToStopState = List<RuleStopState>.generate(
+        nrules, (int index) => RuleStopState(index));
+
     for (var state in atn.states) {
       if (state is! RuleStopState) {
         continue;
@@ -299,8 +301,6 @@ class ATNDeserializer {
       atn.ruleToStopState[state.ruleIndex] = state;
       atn.ruleToStartState[state.ruleIndex].stopState = state;
     }
-
-    atn.ruleToStopState = stopStates as List<RuleStopState>;
   }
 
   void readModes(ATN atn) {

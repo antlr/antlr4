@@ -21,7 +21,7 @@ abstract class Recognizer<ATNInterpreter extends ATNSimulator> {
   final List<ErrorListener> _listeners = [ConsoleErrorListener.INSTANCE];
 
   /// The ATN interpreter used by the recognizer for prediction.
-  late ATNInterpreter interpreter;
+  ATNInterpreter? interpreter;
   int _stateNumber = -1;
 
   List<String> get ruleNames;

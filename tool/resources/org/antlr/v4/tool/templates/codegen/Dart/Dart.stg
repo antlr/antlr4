@@ -483,7 +483,7 @@ state = <choice.stateNumber>;
 errorHandler.sync(this);
 <if(choice.label)><labelref(choice.label)> = tokenStream.LT(1);<endif>
 <preamble; separator="\n">
-switch (interpreter.adaptivePredict(tokenStream, <choice.decision>, context)) {
+switch (interpreter!.adaptivePredict(tokenStream, <choice.decision>, context)) {
 <alts:{alt |
 case <i>:
   <alt>
@@ -494,7 +494,7 @@ case <i>:
 OptionalBlock(choice, alts, error) ::= <<
 state = <choice.stateNumber>;
 errorHandler.sync(this);
-switch (interpreter.adaptivePredict(tokenStream, <choice.decision>, context)) {
+switch (interpreter!.adaptivePredict(tokenStream, <choice.decision>, context)) {
 <alts:{alt |
 case <i><if(!choice.ast.greedy)>+1<endif>:
   <alt>
@@ -505,7 +505,7 @@ case <i><if(!choice.ast.greedy)>+1<endif>:
 StarBlock(choice, alts, sync, iteration) ::= <<
 state = <choice.stateNumber>;
 errorHandler.sync(this);
-_alt = interpreter.adaptivePredict(tokenStream, <choice.decision>, context);
+_alt = interpreter!.adaptivePredict(tokenStream, <choice.decision>, context);
 while (_alt != <choice.exitAlt> && _alt != ATN.INVALID_ALT_NUMBER) {
   if (_alt == 1<if(!choice.ast.greedy)> + 1<endif>) {
     <iteration>
@@ -513,7 +513,7 @@ while (_alt != <choice.exitAlt> && _alt != ATN.INVALID_ALT_NUMBER) {
   }
   state = <choice.loopBackStateNumber>;
   errorHandler.sync(this);
-  _alt = interpreter.adaptivePredict(tokenStream, <choice.decision>, context);
+  _alt = interpreter!.adaptivePredict(tokenStream, <choice.decision>, context);
 }
 >>
 
@@ -532,7 +532,7 @@ case <i><if(!choice.ast.greedy)> + 1<endif>:
   }
   state = <choice.loopBackStateNumber>; <! loopback/exit decision !>
   errorHandler.sync(this);
-  _alt = interpreter.adaptivePredict(tokenStream, <choice.decision>, context);
+  _alt = interpreter!.adaptivePredict(tokenStream, <choice.decision>, context);
 } while (_alt != <choice.exitAlt> && _alt != ATN.INVALID_ALT_NUMBER);
 >>
 

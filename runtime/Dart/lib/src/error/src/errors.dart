@@ -200,7 +200,7 @@ class FailedPredicateException extends RecognitionException {
           recognizer.context,
           formatMessage(predicate, message),
         ) {
-    final s = recognizer.interpreter.atn.states[recognizer.state]!;
+    final s = recognizer.interpreter!.atn.states[recognizer.state]!;
 
     //Todo: review type inference here
     final trans = s.transition(0) as AbstractPredicateTransition;

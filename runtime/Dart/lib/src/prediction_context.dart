@@ -583,7 +583,7 @@ abstract class PredictionContext {
         parents[i] = parent;
       }
     }
-    parents = parents as List<PredictionContext>;
+    // parents = parents as List<PredictionContext>;
 
     if (!changed) {
       contextCache.add(context);
