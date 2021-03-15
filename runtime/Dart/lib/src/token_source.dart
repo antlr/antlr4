@@ -118,8 +118,6 @@ class ListTokenSource implements TokenSource {
   /// @exception NullPointerException if [tokens] is null
   ListTokenSource(this.tokens, [this._sourceName]);
 
-
-
   /// {@inheritDoc}
 
   @override
@@ -141,8 +139,8 @@ class ListTokenSource implements TokenSource {
       }
 
       return lastToken.charPositionInLine +
-          lastToken.stopIndex! -
-          lastToken.startIndex! +
+          lastToken.stopIndex -
+          lastToken.startIndex +
           1;
     }
 
@@ -159,7 +157,7 @@ class ListTokenSource implements TokenSource {
       if (eofToken == null) {
         var start = -1;
         if (tokens.isNotEmpty) {
-          final previousStop = tokens[tokens.length - 1].stopIndex!;
+          final previousStop = tokens[tokens.length - 1].stopIndex;
           if (previousStop != -1) {
             start = previousStop + 1;
           }

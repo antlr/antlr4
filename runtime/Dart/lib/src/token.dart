@@ -72,11 +72,11 @@ abstract class Token {
 
   /// The starting character index of the token
   ///  This method is optional; return -1 if not implemented.
-  int? get startIndex;
+  int get startIndex;
 
   /// The last character index of the token.
   ///  This method is optional; return -1 if not implemented.
-  int? get stopIndex;
+  int get stopIndex;
 
   /// Gets the [TokenSource] which created this token.
   TokenSource? get tokenSource;
@@ -132,10 +132,10 @@ class CommonToken extends WritableToken {
   int tokenIndex = -1;
 
   @override
-  int? startIndex;
+  int startIndex;
 
   @override
-  int? stopIndex;
+  int stopIndex;
 
   /// Constructs a new [CommonToken] with the specified token type and
   /// text.
@@ -146,8 +146,8 @@ class CommonToken extends WritableToken {
     this.type, {
     this.source = EMPTY_SOURCE,
     this.channel = Token.DEFAULT_CHANNEL,
-    this.startIndex,
-    this.stopIndex,
+    this.startIndex = -1,
+    this.stopIndex = -1,
     text,
   }) {
     _text = text;
@@ -197,11 +197,9 @@ class CommonToken extends WritableToken {
     final input = inputStream;
     if (input == null) return null;
     final n = input.size;
-    if(startIndex == null || stopIndex == null) {
-      return '';
-    }
-    if (startIndex! < n && stopIndex! < n) {
-      return input.getText(Interval.of(startIndex!, stopIndex!));
+
+    if (startIndex < n && stopIndex < n) {
+      return input.getText(Interval.of(startIndex, stopIndex));
     } else {
       return '<EOF>';
     }
