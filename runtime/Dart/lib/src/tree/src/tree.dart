@@ -14,12 +14,12 @@ import '../../token.dart';
 
 /// The basic notion of a tree has a parent, a payload, and a list of children.
 ///  It is the most abstract interface for all the trees used by ANTLR.
-abstract class Tree<ChildType> {
+abstract class Tree {
   Tree? get parent;
 
   dynamic get payload;
 
-  T? getChild<T extends ChildType>(int i);
+  T? getChild<T>(int i);
 
 //  Tree getChild(int i);
 
@@ -28,7 +28,7 @@ abstract class Tree<ChildType> {
   String toStringTree();
 }
 
-abstract class SyntaxTree<ChildType> extends Tree<ChildType> {
+abstract class SyntaxTree extends Tree {
   /// Return an [Interval] indicating the index in the
   /// [TokenStream] of the first and last token associated with this
   /// subtree. If this node is a leaf, then the interval represents a single
@@ -46,16 +46,16 @@ abstract class SyntaxTree<ChildType> extends Tree<ChildType> {
   Interval get sourceInterval;
 
   @override
-  T? getChild<T extends ChildType>(int i);
+  T? getChild<T>(int i);
 }
 
-abstract class ParseTree extends SyntaxTree<ParseTree> {
+abstract class ParseTree extends SyntaxTree {
   // the following methods narrow the return type; they are not additional methods
   @override
   ParseTree? get parent;
 
   @override
-  T? getChild<T extends ParseTree>(int i);
+  T? getChild<T>(int i);
 
   /// Set the parent for this node.
   ///
@@ -278,7 +278,7 @@ class TerminalNodeImpl extends TerminalNode {
   TerminalNodeImpl(this.symbol);
 
   @override
-  T? getChild<T extends ParseTree>(i) {
+  T? getChild<T>(i) {
     return null;
   }
 

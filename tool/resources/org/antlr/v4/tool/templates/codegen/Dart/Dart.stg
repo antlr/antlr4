@@ -338,7 +338,7 @@ void _<r.name>_action(<r.ctxType>? _localctx, int actionIndex) {
 /// This generates a private method since the predIndex is generated, making an
 /// overriding implementation impossible to maintain.
 RuleSempredFunction(r, actions) ::= <<
-bool _<r.name>_sempred(<r.ctxType>? _localctx, int predIndex) {
+bool _<r.name>_sempred(dynamic _localctx, int predIndex) {
   switch (predIndex) {
     <actions:{index|case <index>: return <actions.(index)>;}; separator="\n">
   }
@@ -649,7 +649,7 @@ SetAttr(s,rhsChunks) ::= "<ctx(s)>.<s.name> = <rhsChunks>;"
 TokenLabelType() ::= "<file.TokenLabelType; null={Token}>"
 InputSymbolType() ::= "<file.InputSymbolType; null={Token}>"
 
-TokenPropertyRef_text(t) ::= "<ctx(t)>.<t.label>?.text"
+TokenPropertyRef_text(t) ::= "<ctx(t)>.<t.label>.text"
 TokenPropertyRef_type(t) ::= "<ctx(t)>.<t.label> != null ? <ctx(t)>.<t.label>.type : 0"
 TokenPropertyRef_line(t) ::= "<ctx(t)>.<t.label> != null ? <ctx(t)>.<t.label>.line : 0"
 TokenPropertyRef_pos(t) ::= "<ctx(t)>.<t.label> != null ? <ctx(t)>.<t.label>.charPositionInLine : 0"
@@ -657,8 +657,8 @@ TokenPropertyRef_channel(t) ::= "<ctx(t)>.<t.label> != null ? <ctx(t)>.<t.label>
 TokenPropertyRef_index(t) ::= "<ctx(t)>.<t.label> != null ? <ctx(t)>.<t.label>.tokenIndex : 0"
 TokenPropertyRef_int(t) ::= "<ctx(t)>.<t.label> != null ? int.parse(<ctx(t)>.<t.label>.text) : 0"
 
-RulePropertyRef_start(r) ::= "<ctx(r)>.<r.label>?.start"
-RulePropertyRef_stop(r)	 ::= "<ctx(r)>.<r.label>?.stop"
+RulePropertyRef_start(r) ::= "<ctx(r)>.<r.label>.start"
+RulePropertyRef_stop(r)	 ::= "<ctx(r)>.<r.label>.stop"
 RulePropertyRef_text(r)	 ::= "(<ctx(r)>.<r.label> != null ? tokenStream.getTextRange(<ctx(r)>.<r.label>.start, <ctx(r)>.<r.label>.stop) : null)"
 RulePropertyRef_ctx(r)	 ::= "<ctx(r)>.<r.label>"
 RulePropertyRef_parser(r)	 ::= "this"
@@ -675,11 +675,11 @@ SetNonLocalAttr(s, rhsChunks)	  ::=
 
 AddToLabelList(a) ::= "<ctx(a.label)>.<a.listName>.add(<labelref(a.label)>);"
 
-TokenDecl(t) ::= "<TokenLabelType()> <t.name>"
-TokenTypeDecl(t) ::= "int <t.name>;"
-TokenListDecl(t) ::= "List\<Token> <t.name> = List\<Token>()"
-RuleContextDecl(r) ::= "<r.ctxName> <r.name>"
-RuleContextListDecl(rdecl) ::= "List\<<rdecl.ctxName>> <rdecl.name> = List\<<rdecl.ctxName>>()"
+TokenDecl(t) ::= "<TokenLabelType()>? <t.name>"
+TokenTypeDecl(t) ::= "int? <t.name>;"
+TokenListDecl(t) ::= "var <t.name> = \<Token>[]"
+RuleContextDecl(r) ::= "<r.ctxName>? <r.name>"
+RuleContextListDecl(rdecl) ::= "var <rdecl.name> = \<<rdecl.ctxName>>[]"
 
 ContextTokenGetterDecl(t) ::= <<
 TerminalNode? <t.name>() => getToken(<parser.name>.TOKEN_<t.name>, 0);
@@ -717,7 +717,7 @@ CaptureNextTokenType(d) ::= "<d.varName> = tokenStream.LA(1)!;"
 StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers)
   ::= <<
 class <struct.name> extends <if(contextSuperClass)><contextSuperClass><else>ParserRuleContext<endif><if(interfaces)> implements <interfaces; separator=", "><endif> {
-  <attrs:{a | late <a>;}; separator="\n">
+  <attrs:{a | <a>;}; separator="\n">
   <getters:{g | <g>}; separator="\n">
   <struct.name>([ParserRuleContext? parent, int? invokingState<ctorAttrs:{a | , <a>}>]) : super(parent, invokingState)<if(struct.ctorAttrs)> {
     <struct.ctorAttrs:{a | this.<a.name> = <a.name>;}; separator="\n">
@@ -729,7 +729,7 @@ class <struct.name> extends <if(contextSuperClass)><contextSuperClass><else>Pars
   @override
   void copyFrom(<if(contextSuperClass)><contextSuperClass><else>ParserRuleContext<endif> ctx) {
     super.copyFrom(ctx);
-    <struct.attrs:{a | this.<a.name> = (ctx as <struct.name>).<a.name>;}; separator="\n">
+    <struct.attrs:{a | if((ctx as <struct.name>).<a.name> != null) this.<a.name> = (ctx as <struct.name>).<a.name>;}; separator="\n">
   }
 <endif>
   <dispatchMethods; separator="\n">
@@ -764,7 +764,7 @@ T? accept\<T>(ParseTreeVisitor\<T> visitor) {
 }
 >>
 
-AttributeDecl(d) ::= "<d.type> <d.name><if(d.initValue)> = <d.initValue><endif>"
+AttributeDecl(d) ::= "<d.type><if(d.initValue)><else>?<endif> <d.name><if(d.initValue)> = <d.initValue><endif>"
 
 // If we don't know location of label def x, use this template
 labelref(x) ::= "<if(!x.isLocal)>_localctx.<endif><x.name>"
@@ -775,7 +775,7 @@ ctx(actionChunk) ::= "_localctx"
 // used for left-recursive rules
 recRuleAltPredicate(ruleName,opPrec)  ::= "precpred(context, <opPrec>)"
 recRuleSetReturnAction(src,name)	  ::= "$<name> = $<src>.<name>;"
-recRuleSetStopToken()                 ::= "context!.stop = tokenStream.LT(-1)!;"
+recRuleSetStopToken()                 ::= "context!.stop = tokenStream.LT(-1);"
 
 recRuleAltStartAction(ruleName, ctxName, label, isListLabel) ::= <<
 _localctx = <ctxName>Context(_parentctx, _parentState);

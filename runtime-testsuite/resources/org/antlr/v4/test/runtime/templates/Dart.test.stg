@@ -223,7 +223,7 @@ TreeNodeWithAltNumField(X) ::= <<
 class MyRuleNode extends ParserRuleContext {
   late int altNum;
 
-  MyRuleNode(ParserRuleContext parent, int invokingStateNumber)
+  MyRuleNode(ParserRuleContext? parent, int? invokingStateNumber)
       : super(parent, invokingStateNumber);
 
   @override int get altNumber {
@@ -292,9 +292,9 @@ class LeafListener extends TBaseListener {
 
 DeclareContextListGettersFunction() ::= <<
 void foo() {
-  SContext s = null;
-  List\<AContext> a = s.as();
-  List\<BContext> b = s.bs();
+  SContext? s = null;
+  List\<AContext>? a = s?.as();
+  List\<BContext>? b = s?.bs();
 }
 >>
 
@@ -315,4 +315,4 @@ Invoke_pred(v) ::= <<this.pred(<v>)>>
 ParserTokenType(t) ::= "Parser.<t>"
 ContextRuleFunction(ctx, rule) ::= "<ctx>.<rule>"
 StringType() ::= "String"
-ContextMember(ctx, subctx, member) ::= "<ctx>.<subctx>.<member>"
+ContextMember(ctx, subctx, member) ::= "<ctx>.<subctx>!.<member>!"
