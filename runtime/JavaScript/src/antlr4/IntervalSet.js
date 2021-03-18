@@ -7,9 +7,14 @@ const {Token} = require('./Token');
 
 /* stop is not included! */
 class Interval {
+
 	constructor(start, stop) {
 		this.start = start;
 		this.stop = stop;
+	}
+
+	clone() {
+		return new Interval(this.start, this.stop);
 	}
 
 	contains(item) {
@@ -55,7 +60,7 @@ class IntervalSet {
 	addInterval(toAdd) {
 		if (this.intervals === null) {
 			this.intervals = [];
-			this.intervals.push(toAdd);
+			this.intervals.push(toAdd.clone());
 		} else {
 			// find insert pos
 			for (let pos = 0; pos < this.intervals.length; pos++) {
@@ -78,7 +83,7 @@ class IntervalSet {
 				}
 			}
 			// greater than any existing
-			this.intervals.push(toAdd);
+			this.intervals.push(toAdd.clone());
 		}
 	}
 
