@@ -134,19 +134,19 @@ class ParserRuleContext extends RuleContext {
   }
 
   @override
-  T? getChild<T>(int i) {
+  ParseTree? getChild<T>(int i) {
     if (children == null || i < 0 || i >= children!.length) {
       return null;
     }
     if (T == dynamic) {
-      return children![i] as T;
+      return children![i];
     }
     var j = -1; // what element have we found with ctxType?
     for (var o in children!) {
       if (o is T) {
         j++;
         if (j == i) {
-          return o as T;
+          return o;
         }
       }
     }
@@ -195,7 +195,7 @@ class ParserRuleContext extends RuleContext {
   }
 
   T? getRuleContext<T extends ParserRuleContext>(int i) {
-    return getChild<T>(i);
+    return getChild<T>(i) as T?;
   }
 
   List<T> getRuleContexts<T extends ParserRuleContext>() {

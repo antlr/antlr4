@@ -20,10 +20,11 @@ class Trees {
   ///  node payloads to get the text for the nodes.  Detect
   ///  parse trees and extract data appropriately.
   static String toStringTree(
-    Tree t, {
+    Tree? t, {
     Parser? recog,
     List<String>? ruleNames,
   }) {
+    if (t == null) return 'null';
     ruleNames ??= recog?.ruleNames;
     var s = escapeWhitespace(getNodeText(t, ruleNames: ruleNames), false);
     if (t.childCount == 0) return s;

@@ -19,9 +19,7 @@ abstract class Tree {
 
   dynamic get payload;
 
-  T? getChild<T>(int i);
-
-//  Tree getChild(int i);
+  Tree? getChild<T>(int i);
 
   int get childCount;
 
@@ -44,9 +42,6 @@ abstract class SyntaxTree extends Tree {
   /// <p>As a weird special case, the source interval for rules matched after
   /// EOF is unspecified.</p>
   Interval get sourceInterval;
-
-  @override
-  T? getChild<T>(int i);
 }
 
 abstract class ParseTree extends SyntaxTree {
@@ -55,7 +50,7 @@ abstract class ParseTree extends SyntaxTree {
   ParseTree? get parent;
 
   @override
-  T? getChild<T>(int i);
+  ParseTree? getChild<T>(int i);
 
   /// Set the parent for this node.
   ///
@@ -278,7 +273,7 @@ class TerminalNodeImpl extends TerminalNode {
   TerminalNodeImpl(this.symbol);
 
   @override
-  T? getChild<T>(i) {
+  ParseTree? getChild<T>(i) {
     return null;
   }
 

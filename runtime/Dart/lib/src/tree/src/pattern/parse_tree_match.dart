@@ -449,7 +449,7 @@ class ParseTreePatternMatcher {
     if (t is RuleNode) {
       final r = t;
       if (r.childCount == 1 && r.getChild(0) is TerminalNode) {
-        final c = r.getChild<TerminalNode>(0)!;
+        final c = r.getChild<TerminalNode>(0)! as TerminalNode;
         if (c.symbol is RuleTagToken) {
           return c.symbol as RuleTagToken;
         }
