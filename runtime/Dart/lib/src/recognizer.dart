@@ -114,7 +114,7 @@ abstract class Recognizer<ATNInterpreter extends ATNSimulator> {
   }
 
   void addErrorListener(
-    ErrorListener listener, // Todo: should never be null
+    ErrorListener listener,
   ) {
     _listeners.add(listener);
   }

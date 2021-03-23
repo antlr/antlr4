@@ -281,7 +281,7 @@ class ParserATNSimulator extends ATNSimulator {
   ///  the merge if we ever see a and b again.  Note that (b,a)&rarr;c should
   ///  also be examined during cache lookup.
   Map<Pair<PredictionContext, PredictionContext>, PredictionContext>?
-      mergeCache; // Todo: this is null and nothing can change it
+      mergeCache;
 
   // LAME globals to avoid parameters!!!!! I need these down deep in predTransition
   late TokenStream input;

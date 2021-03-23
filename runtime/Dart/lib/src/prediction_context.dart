@@ -121,8 +121,8 @@ abstract class PredictionContext {
 
   // dispatch
   static PredictionContext merge(
-    PredictionContext a, //Todo: never make it null
-    PredictionContext b, //Todo: never make it null
+    PredictionContext a,
+    PredictionContext b,
     bool rootIsWildcard,
     Map<Pair<PredictionContext, PredictionContext>, PredictionContext>?
         mergeCache,
@@ -436,8 +436,10 @@ abstract class PredictionContext {
       safeMergedParents = List.generate(k, (n) => mergedParents[n]!);
       safeMergedReturnStates = List.generate(k, (n) => mergedReturnStates[n]!);
     } else {
-        safeMergedParents = List.generate(mergedParents.length, (n) => mergedParents[n]!);
-        safeMergedReturnStates = List.generate(mergedReturnStates.length, (n) => mergedReturnStates[n]!);
+      safeMergedParents =
+          List.generate(mergedParents.length, (n) => mergedParents[n]!);
+      safeMergedReturnStates = List.generate(
+          mergedReturnStates.length, (n) => mergedReturnStates[n]!);
     }
 
     PredictionContext M = ArrayPredictionContext(

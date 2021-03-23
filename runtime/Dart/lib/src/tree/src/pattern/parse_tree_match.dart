@@ -23,12 +23,12 @@ class ParseTreeMatch {
   /// Get the parse tree we are trying to match to a pattern.
   ///
   /// @return The [ParseTree] we are trying to match to a pattern.
-  final ParseTree tree; //Todo: may never be null
+  final ParseTree tree;
 
   /// Get the tree pattern we are matching against.
   ///
   /// @return The tree pattern we are matching against.
-  final ParseTreePattern pattern; //Todo: may never be null
+  final ParseTreePattern pattern;
 
   /// Return a mapping from label &rarr; [list of nodes].
   ///
@@ -38,7 +38,7 @@ class ParseTreeMatch {
   ///
   /// @return A mapping from labels to parse tree nodes. If the parse tree
   /// pattern did not contain any rule or token tags, this map will be empty.
-  final MultiMap<String, ParseTree> labels; //Todo: may never be null
+  final MultiMap<String, ParseTree> labels;
 
   /// Get the node at which we first detected a mismatch.
   ///
@@ -369,8 +369,8 @@ class ParseTreePatternMatcher {
   /// algorithm used by the implementation, and may be overridden.
 
   ParseTree? matchImpl(
-    ParseTree tree, // Todo: never make it null
-    ParseTree patternTree, // Todo: never make it null
+    ParseTree tree,
+    ParseTree patternTree,
     MultiMap<String, ParseTree> labels,
   ) {
     // x and <ID>, x and y, or x and x; or could be mismatched types
@@ -482,9 +482,8 @@ class ParseTreePatternMatcher {
             throw ArgumentError(
                 'Unknown rule ' + tagChunk.tag + ' in pattern: ' + pattern);
           }
-          //Todo: I didnt get why ruleToTokenType is called here since it can be null if we are in a PARSER
           final ruleImaginaryTokenType =
-              parser.ATNWithBypassAlts.ruleToTokenType![ruleIndex];
+              parser.ATNWithBypassAlts.ruleToTokenType[ruleIndex];
           tokens.add(RuleTagToken(
               tagChunk.tag, ruleImaginaryTokenType, tagChunk.label));
         } else {

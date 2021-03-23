@@ -36,7 +36,7 @@ enum TransitionType {
 ///  ATN transitions.</p>
 abstract class Transition {
   /// The target of this transition. */
-  ATNState target; // Todo: never make it null
+  ATNState target;
 
   Transition(this.target);
 

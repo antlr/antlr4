@@ -280,7 +280,7 @@ class ATNDeserializer {
           tokenType = Token.EOF;
         }
 
-        atn.ruleToTokenType!.add(tokenType);
+        atn.ruleToTokenType.add(tokenType);
 
         if (!isFeatureSupported(ADDED_LEXER_ACTIONS, uuid)) {
           // this piece of unused metadata was serialized prior to the
@@ -466,10 +466,10 @@ class ATNDeserializer {
   }
 
   void generateRuleBypassTransitions(ATN atn) {
-    for (var i = 0; i < atn.ruleToStartState.length; i++) {
-      //Todo: I didnt get why ruleToTokenType is called here since it can be null if we are in a PARSER
-      atn.ruleToTokenType![i] = atn.maxTokenType + i + 1;
-    }
+    final length = atn.ruleToStartState.length;
+    atn.ruleToTokenType =
+        List<int>.generate(length, (index) => atn.maxTokenType + index + 1);
+
     for (var i = 0; i < atn.ruleToStartState.length; i++) {
       generateRuleBypassTransition(atn, i);
     }
@@ -556,14 +556,12 @@ class ATNDeserializer {
     atn.ruleToStartState[idx].addTransition(EpsilonTransition(bypassStart));
     bypassStop.addTransition(EpsilonTransition(endState));
 
-    // Todo: review this idx passed to this rule
     ATNState matchState = BasicState(idx);
     atn.addState(matchState);
 
-    //Todo: I didnt get why ruleToTokenType is called here since it can be null if we are in a PARSER
     matchState.addTransition(AtomTransition(
       bypassStop,
-      atn.ruleToTokenType![idx],
+      atn.ruleToTokenType[idx],
     ));
     bypassStart.addTransition(EpsilonTransition(matchState));
   }

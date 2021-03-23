@@ -42,7 +42,7 @@ class ATN {
   /// type if the
   /// {@link ATNDeserializationOptions#isGenerateRuleBypassTransitions}
   /// deserialization option was specified; otherwise, this is null.
-  List<int>? ruleToTokenType;
+  late List<int> ruleToTokenType;
 
   /// For lexer ATNs, this is an array of [LexerAction] objects which may
   /// be referenced by action transitions in the ATN.

@@ -44,14 +44,14 @@ abstract class Token {
   static const int MIN_USER_CHANNEL_VALUE = 2;
 
   /// Get the text of the token.
-  String? get text; // Todo: this is null and nothing can change this
+  String? get text;
 
   /// Get the token type of the token */
   int get type;
 
   /// The line number on which the 1st character of this token was matched,
   ///  line=1..n
-  int? get line; // Todo: this is null and nothing can change this
+  int? get line;
 
   /// The index of the first character of this token relative to the
   ///  beginning of the line at which it occurs, 0..n-1
