@@ -117,11 +117,8 @@ class ProfilingATNSimulator extends ParserATNSimulator {
 
     final existingTargetState = super.getExistingTargetState(previousD, t);
     if (existingTargetState != null) {
-      //Todo: I assumed if it is null we should consider it zero
-      final SLL_DFATransitions =
-          decisions[currentDecision].SLL_DFATransitions ?? 0;
       // count only if we transition over a DFA state
-      decisions[currentDecision].SLL_DFATransitions = SLL_DFATransitions + 1;
+      decisions[currentDecision].SLL_DFATransitions += 1;
       if (existingTargetState == ATNSimulator.ERROR) {
         decisions[currentDecision].errors.add(
               ErrorInfo(
@@ -157,12 +154,8 @@ class ProfilingATNSimulator extends ParserATNSimulator {
 
     final reachConfigs = super.computeReachSet(closure, t, fullCtx);
     if (fullCtx) {
-      //Todo: I assumed if it is null we should consider it zero
-      final LL_ATNTransitions =
-          decisions[currentDecision].LL_ATNTransitions ?? 0;
-
       // count computation even if error
-      decisions[currentDecision].LL_ATNTransitions = LL_ATNTransitions + 1;
+      decisions[currentDecision].LL_ATNTransitions += 1;
       if (reachConfigs != null) {
       } else {
         // no reach on current lookahead symbol. ERROR.
@@ -179,15 +172,18 @@ class ProfilingATNSimulator extends ParserATNSimulator {
             );
       }
     } else {
-      //Todo: I assumed if it is null we should consider it zero
-      final SLL_ATNTransitions =
-          decisions[currentDecision].SLL_ATNTransitions ?? 0;
-      decisions[currentDecision].SLL_ATNTransitions = SLL_ATNTransitions + 1;
+      decisions[currentDecision].SLL_ATNTransitions += 1;
       if (reachConfigs != null) {
       } else {
         // no reach on current lookahead symbol. ERROR.
         decisions[currentDecision].errors.add(ErrorInfo(
-            currentDecision, closure, input, startIndex, _sllStopIndex, false));
+              currentDecision,
+              closure,
+              input,
+              startIndex,
+              _sllStopIndex,
+              false,
+            ));
       }
     }
     return reachConfigs;
@@ -236,13 +232,8 @@ class ProfilingATNSimulator extends ParserATNSimulator {
     } else {
       conflictingAltResolvedBySLL = configs.alts.nextset(0);
     }
-    //Todo: I assumed if it is null it should be zero
-    if (decisions[currentDecision].LL_Fallback == null) {
-      decisions[currentDecision].LL_Fallback = 1;
-    } else {
-      decisions[currentDecision].LL_Fallback =
-          decisions[currentDecision].LL_Fallback! + 1;
-    }
+
+    decisions[currentDecision].LL_Fallback += 1;
 
     super.reportAttemptingFullContext(
       dfa,

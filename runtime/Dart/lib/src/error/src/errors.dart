@@ -36,7 +36,7 @@ class RecognitionException<StreamType extends IntStream> extends StateError {
   ///
   /// @return The [RuleContext] at the time this exception was thrown.
   /// If the context is not available, this method returns null.
-  final RuleContext? ctx; // Todo: this is nullable and nothing can change it
+  final RuleContext? ctx;
 
   /// Gets the input stream which is the symbol source for the recognizer where
   /// this exception was thrown.
@@ -202,7 +202,6 @@ class FailedPredicateException extends RecognitionException {
         ) {
     final s = recognizer.interpreter!.atn.states[recognizer.state]!;
 
-    //Todo: review type inference here
     final trans = s.transition(0) as AbstractPredicateTransition;
     if (trans is PredicateTransition) {
       ruleIndex = trans.ruleIndex;

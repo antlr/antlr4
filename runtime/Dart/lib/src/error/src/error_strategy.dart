@@ -130,7 +130,7 @@ class DefaultErrorStrategy implements ErrorStrategy {
   ///  one token/tree node is consumed for two errors.
   int lastErrorIndex = -1;
 
-  IntervalSet? lastErrorStates; // Todo: this is null and nothing can change it
+  IntervalSet? lastErrorStates;
 
   /// This field is used to propagate information about the lookahead following
   /// the previous match. Since prediction prefers completing the current rule

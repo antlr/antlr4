@@ -245,7 +245,7 @@ class ConsoleErrorListener extends BaseErrorListener {
 /// collection of delegate listeners. This reduces the effort required to support multiple
 /// listeners.
 class ProxyErrorListener implements ErrorListener {
-  final List<ErrorListener> delegates; //Todo: never make it null;
+  final List<ErrorListener> delegates;
 
   ProxyErrorListener(this.delegates) {
     // ignore: unnecessary_null_comparison

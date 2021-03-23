@@ -684,7 +684,7 @@ class ATNDeserializer {
       256, (i) => i.toRadixString(16).padLeft(2, '0').toUpperCase());
 
   String readUUID() {
-    final bb = List<int>.filled(16, 0); // Todo: keep an eye on this zero
+    final bb = List<int>.filled(16, 0);
 
     for (var i = 7; i >= 0; i--) {
       final int = readInt();

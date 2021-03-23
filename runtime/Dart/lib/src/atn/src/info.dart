@@ -103,8 +103,6 @@ class DecisionEventInfo {
 /// @since 4.3
 class DecisionInfo {
 
-  //  Todo: this class is full of int fields that are never initialized and somehow it call ++ on them in some places
-  // I had to figure out some asumptions here
 
   /// The decision number, which is an index into {@link ATN#decisionToState}.
   final int decision;
@@ -210,7 +208,7 @@ class DecisionInfo {
   /// @see #SLL_ATNTransitions
   /// @see ParserATNSimulator#computeTargetState
   /// @see LexerATNSimulator#computeTargetState
-  int? SLL_ATNTransitions;
+  int SLL_ATNTransitions = 0;
 
   /// The total number of DFA transitions required during SLL prediction for
   /// this decision.
@@ -220,7 +218,7 @@ class DecisionInfo {
   ///
   /// @see ParserATNSimulator#getExistingTargetState
   /// @see LexerATNSimulator#getExistingTargetState
-  int? SLL_DFATransitions;
+  int SLL_DFATransitions = 0;
 
   /// Gets the total number of times SLL prediction completed in a conflict
   /// state, resulting in fallback to LL prediction.
@@ -231,7 +229,7 @@ class DecisionInfo {
   /// conflicts for this decision produce the same result as LL prediction for
   /// this decision, {@link PredictionMode#SLL} would produce the same overall
   /// parsing result as {@link PredictionMode#LL}.</p>
-  int? LL_Fallback;
+  int LL_Fallback = 0;
 
   /// The total number of ATN transitions required during LL prediction for
   /// this decision. An ATN transition is determined by the number of times the
@@ -247,7 +245,7 @@ class DecisionInfo {
   /// @see #LL_DFATransitions
   /// @see ParserATNSimulator#computeTargetState
   /// @see LexerATNSimulator#computeTargetState
-  int? LL_ATNTransitions;
+  int LL_ATNTransitions = 0;
 
   /// The total number of DFA transitions required during LL prediction for
   /// this decision.
@@ -257,7 +255,7 @@ class DecisionInfo {
   ///
   /// @see ParserATNSimulator#getExistingTargetState
   /// @see LexerATNSimulator#getExistingTargetState
-  int? LL_DFATransitions;
+  int LL_DFATransitions = 0;
 
   /// Constructs a new instance of the [DecisionInfo] class to contain
   /// statistics for a particular decision.
@@ -474,8 +472,7 @@ class ParseInfo {
     final decisions = atnSimulator.decisionInfo;
     final LL = <int>[];
     for (var i = 0; i < decisions.length; i++) {
-      //Todo: i assumed if it is null we should not add it
-      final fallBack = decisions[i].LL_Fallback ?? 0;
+      final fallBack = decisions[i].LL_Fallback;
       if (fallBack > 0) LL.add(i);
     }
     return LL;
@@ -523,8 +520,7 @@ class ParseInfo {
     final decisions = atnSimulator.decisionInfo;
     var k = 0;
     for (var i = 0; i < decisions.length; i++) {
-      //Todo: I assumed if it is null we should not add it, this value is never initialized
-      k += decisions[i].SLL_ATNTransitions ?? 0;
+      k += decisions[i].SLL_ATNTransitions;
     }
     return k;
   }
@@ -535,8 +531,7 @@ class ParseInfo {
     final decisions = atnSimulator.decisionInfo;
     var k = 0;
     for (var i = 0; i < decisions.length; i++) {
-      //Todo: I assumed if it is null we should not add it, this value is never initialized
-      k += decisions[i].LL_ATNTransitions ?? 0;
+      k += decisions[i].LL_ATNTransitions;
     }
     return k;
   }
@@ -551,9 +546,8 @@ class ParseInfo {
     final decisions = atnSimulator.decisionInfo;
     var k = 0;
     for (var i = 0; i < decisions.length; i++) {
-      //Todo: I assumed if it is null we should not add it, this value is never initialized
-      k += decisions[i].SLL_ATNTransitions ?? 0;
-      k += decisions[i].LL_ATNTransitions ?? 0;
+      k += decisions[i].SLL_ATNTransitions;
+      k += decisions[i].LL_ATNTransitions;
     }
     return k;
   }
