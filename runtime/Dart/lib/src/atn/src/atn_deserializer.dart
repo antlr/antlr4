@@ -267,8 +267,7 @@ class ATNDeserializer {
   void readRules(ATN atn) {
     final nrules = readInt();
     if (atn.grammarType == ATNType.LEXER) {
-      atn.ruleToTokenType =
-          List<int>.filled(nrules, 0); //Todo: keep an eye on this zero
+      atn.ruleToTokenType = <int>[];
     }
 
     for (var i = 0; i < nrules; i++) {
@@ -281,7 +280,7 @@ class ATNDeserializer {
           tokenType = Token.EOF;
         }
 
-        atn.ruleToTokenType![i] = tokenType;
+        atn.ruleToTokenType!.add(tokenType);
 
         if (!isFeatureSupported(ADDED_LEXER_ACTIONS, uuid)) {
           // this piece of unused metadata was serialized prior to the

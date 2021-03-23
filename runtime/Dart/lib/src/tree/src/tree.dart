@@ -66,7 +66,7 @@ abstract class ParseTree extends SyntaxTree {
   ///  minimal change, which is to add this method.
   ///
   ///  @since 4.7
-  set parent(covariant ParseTree? parent); // Todo: review type fix
+  set parent(covariant ParseTree? parent);
 
   /// The [ParseTreeVisitor] needs a double dispatch method. */
   T? accept<T>(ParseTreeVisitor<T> visitor);
