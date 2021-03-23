@@ -43,7 +43,7 @@ class ParserRuleContext extends RuleContext {
   /// Get the initial/final token in this context.
   /// Note that the range from start to stop is inclusive, so for rules that do not consume anything
   /// (for example, zero length or error productions) this token may exceed stop.
-  Token? start, stop; // Todo: keep an eye on this late
+  Token? start, stop;
 
   /// The exception that forced this rule to return. If the rule successfully
   /// completed, this is null.

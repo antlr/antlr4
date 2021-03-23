@@ -828,8 +828,7 @@ class ArrayPredictionContext extends PredictionContext {
   /// Parent can be null only if full ctx mode and we make an array
   ///  from {@link #EMPTY} and non-empty. We merge {@link #EMPTY} by using null parent and
   ///  returnState == {@link #EMPTY_RETURN_STATE}.
-  List<PredictionContext?>
-      parents; // Todo: this generic should be null this wont change
+  List<PredictionContext?> parents;
 
   /// Sorted for merge, no duplicates; if present,
   ///  {@link #EMPTY_RETURN_STATE} is always last.

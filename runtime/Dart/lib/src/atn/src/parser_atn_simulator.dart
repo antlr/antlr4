@@ -626,7 +626,7 @@ class ParserATNSimulator extends ATNSimulator {
   }
 
   void predicateDFAState(DFAState dfaState, DecisionState? decisionState) {
-    // Todo: this if was added due to a possuble null pointer error
+    // Todo: this if was added due to a possible null pointer error
     if (decisionState == null) return;
 
     // We need to test all predicates, even in DFA states that

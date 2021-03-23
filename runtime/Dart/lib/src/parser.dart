@@ -59,7 +59,7 @@ abstract class Parser extends Recognizer<ParserATNSimulator> {
   /// later call to {@link #setTrace}{@code (false)}. The listener itself is
   /// implemented as a parser listener so this field is not directly used by
   /// other parser methods.
-  TraceListener? _tracer; // Todo: this is nullable and nothing can change this
+  TraceListener? _tracer;
 
   /// The list of [ParseTreeListener] listeners registered to receive
   /// events during the parse.
@@ -236,7 +236,7 @@ abstract class Parser extends Recognizer<ParserATNSimulator> {
   ///
   /// @throws NullPointerException if {@code} listener is null
   void addParseListener(
-    ParseTreeListener listener, //Todo: never make it null
+    ParseTreeListener listener,
   ) {
     _parseListeners ??= [];
 
