@@ -256,13 +256,13 @@ import 'transition.dart';
 /// both SLL and LL parsing. Erroneous input will therefore require 2 passes over
 /// the input.</p>
 class ParserATNSimulator extends ATNSimulator {
-  static final bool debug = false;
-  static final bool debug_list_atn_decisions = false;
-  static final bool dfa_debug = false;
-  static final bool retry_debug = false;
+  static const bool debug = false;
+  static const bool debug_list_atn_decisions = false;
+  static const bool dfa_debug = false;
+  static const bool retry_debug = false;
 
   /// Just in case this optimization is bad, add an ENV variable to turn it off */
-  static final bool TURN_OFF_LR_LOOP_ENTRY_BRANCH_OPT =
+  static const bool TURN_OFF_LR_LOOP_ENTRY_BRANCH_OPT =
       bool.fromEnvironment('TURN_OFF_LR_LOOP_ENTRY_BRANCH_OPT');
 
   final Parser parser;

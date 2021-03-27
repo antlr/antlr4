@@ -356,9 +356,9 @@ abstract class PredictionContext {
     var j = 0; // walks b
     var k = 0; // walks target M array
 
-    var mergedReturnStates = List<int?>.filled(
+    var mergedReturnStates = List<int>.filled(
       a.returnStates.length + b.returnStates.length,
-      null,
+      0,
     ); // TODO Will it grow?
     var mergedParents = List<PredictionContext?>.filled(
       a.returnStates.length + b.returnStates.length,
@@ -418,9 +418,6 @@ abstract class PredictionContext {
       }
     }
 
-    var safeMergedReturnStates = <int>[];
-    var safeMergedParents = <PredictionContext>[];
-
     // trim merged if we combined a few that had same stack tops
     if (k < mergedParents.length) {
       // write index < last position; trim
@@ -428,23 +425,19 @@ abstract class PredictionContext {
         // for just one merged element, return singleton top
         PredictionContext a_ = SingletonPredictionContext.create(
           mergedParents[0]!,
-          mergedReturnStates[0]!,
+          mergedReturnStates[0],
         );
         if (mergeCache != null) mergeCache[Pair(a, b)] = a_;
         return a_;
       }
-      safeMergedParents = List.generate(k, (n) => mergedParents[n]!);
-      safeMergedReturnStates = List.generate(k, (n) => mergedReturnStates[n]!);
-    } else {
-      safeMergedParents =
-          List.generate(mergedParents.length, (n) => mergedParents[n]!);
-      safeMergedReturnStates = List.generate(
-          mergedReturnStates.length, (n) => mergedReturnStates[n]!);
+
+      mergedParents = List.generate(k, (n) => mergedParents[n]!);
+      mergedReturnStates = List.generate(k, (n) => mergedReturnStates[n]);
     }
 
     PredictionContext M = ArrayPredictionContext(
-      safeMergedParents,
-      safeMergedReturnStates,
+      mergedParents,
+      mergedReturnStates,
     );
 
     // if we created same array as a or b, return that instead
@@ -458,7 +451,7 @@ abstract class PredictionContext {
       return b;
     }
 
-    combineCommonParents(safeMergedParents);
+    combineCommonParents(mergedParents);
 
     if (mergeCache != null) mergeCache[Pair(a, b)] = M;
     return M;
@@ -466,12 +459,12 @@ abstract class PredictionContext {
 
   /// Make pass over all <em>M</em> [parents]; merge any {@code equals()}
   /// ones.
-  static void combineCommonParents(List<PredictionContext> parents) {
+  static void combineCommonParents(List<PredictionContext?> parents) {
     final uniqueParents = <PredictionContext, PredictionContext>{};
 
     for (var p = 0; p < parents.length; p++) {
       final parent = parents[p];
-      if (!uniqueParents.containsKey(parent)) {
+      if (parent != null && !uniqueParents.containsKey(parent)) {
         // don't replace
         uniqueParents[parent] = parent;
       }
