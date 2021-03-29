@@ -54,11 +54,11 @@ class SimState {
 
 /// "dup" of ParserInterpreter */
 class LexerATNSimulator extends ATNSimulator {
-  static final bool debug = true;
-  static final bool dfa_debug = true;
+  static const bool debug = false;
+  static const bool dfa_debug = false;
 
-  static final int MIN_DFA_EDGE = 0;
-  static final int MAX_DFA_EDGE = 127; // forces unicode to stay in ATN
+  static const int MIN_DFA_EDGE = 0;
+  static const int MAX_DFA_EDGE = 127; // forces unicode to stay in ATN
 
   final Lexer recog;
 
