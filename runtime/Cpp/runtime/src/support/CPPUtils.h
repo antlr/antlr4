@@ -19,8 +19,9 @@ namespace antlrcpp {
   std::string indent(const std::string &s, const std::string &indentation, bool includingFirst = true);
 
   // Using RAII + a lambda to implement a "finally" replacement.
+  template <typename OnEnd>
   struct FinalAction {
-    FinalAction(std::function<void ()> f) : _cleanUp { f } {}
+    FinalAction(OnEnd f) : _cleanUp { std::move(f) } {}
     FinalAction(FinalAction &&other) :
 	_cleanUp(std::move(other._cleanUp)), _enabled(other._enabled) {
       other._enabled = false; // Don't trigger the lambda after ownership has moved.
@@ -29,11 +30,14 @@ namespace antlrcpp {
 
     void disable() { _enabled = false; }
   private:
-    std::function<void ()> _cleanUp;
+    OnEnd _cleanUp;
     bool _enabled {true};
   };
 
-  ANTLR4CPP_PUBLIC FinalAction finally(std::function<void ()> f);
+  template <typename OnEnd>
+  FinalAction<OnEnd> finally(OnEnd f) {
+    return FinalAction<OnEnd>(std::move(f));
+  }
 
   // Convenience functions to avoid lengthy dynamic_cast() != nullptr checks in many places.
   template <typename T1, typename T2>
