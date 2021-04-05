@@ -19,6 +19,13 @@ namespace Antlr4.Runtime.Atn
     /// <since>4.3</since>
     public class LookaheadEventInfo : DecisionEventInfo
     {
+        /// <summary>The alternative chosen by adaptivePredict(), not necessarily
+        ///  the outermost alt shown for a rule; left-recursive rules have
+        ///  user-level alts that differ from the rewritten rule with a (...) block
+        ///  and a (..)* loop.
+        /// </summary>
+        public int predictedAlt;
+
         /// <summary>
         /// Constructs a new instance of the
         /// <see cref="LookaheadEventInfo"/>
@@ -26,18 +33,15 @@ namespace Antlr4.Runtime.Atn
         /// the specified detailed lookahead information.
         /// </summary>
         /// <param name="decision">The decision number</param>
-        /// <param name="state">
-        /// The final simulator state containing the necessary
-        /// information to determine the result of a prediction, or
-        /// <see langword="null"/>
-        /// if
-        /// the final state is not available
+        /// <param name="configs">The final configuration set containing the necessary
+        /// information to determine the result of a prediction, or {@code null} if
+        /// the final configuration set is not available
         /// </param>
+        /// <param name="predictedAlt"></param>
         /// <param name="input">The input token stream</param>
         /// <param name="startIndex">The start index for the current prediction</param>
         /// <param name="stopIndex">The index at which the prediction was finally made</param>
         /// <param name="fullCtx">
-        ///
         /// <see langword="true"/>
         /// if the current lookahead is part of an LL
         /// prediction; otherwise,
@@ -45,9 +49,10 @@ namespace Antlr4.Runtime.Atn
         /// if the current lookahead is part of
         /// an SLL prediction
         /// </param>
-        public LookaheadEventInfo(int decision, SimulatorState state, ITokenStream input, int startIndex, int stopIndex, bool fullCtx)
-            : base(decision, state, input, startIndex, stopIndex, fullCtx)
+        public LookaheadEventInfo(int decision, ATNConfigSet configs, int predictedAlt, ITokenStream input, int startIndex, int stopIndex, bool fullCtx)
+            : base(decision, configs, input, startIndex, stopIndex, fullCtx)
         {
+            this.predictedAlt = predictedAlt;
         }
     }
 }

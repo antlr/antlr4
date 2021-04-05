@@ -30,17 +30,18 @@ namespace Antlr4.Runtime.Atn
         /// specified detailed syntax error information.
         /// </summary>
         /// <param name="decision">The decision number</param>
-        /// <param name="state">
-        /// The final simulator state reached during prediction
-        /// prior to reaching the
-        /// <see cref="ATNSimulator.ERROR"/>
-        /// state
+        /// <param name="configs">The final configuration set reached during prediction
+        /// prior to reaching the {@link ATNSimulator#ERROR} state
         /// </param>
         /// <param name="input">The input token stream</param>
         /// <param name="startIndex">The start index for the current prediction</param>
         /// <param name="stopIndex">The index at which the syntax error was identified</param>
-        public ErrorInfo(int decision, SimulatorState state, ITokenStream input, int startIndex, int stopIndex)
-            : base(decision, state, input, startIndex, stopIndex, state.useContext)
+        /// <param name="fullCtx">{@code true} if the syntax error was identified during LL
+        /// prediction; otherwise, {@code false} if the syntax error was identified
+        /// during SLL prediction
+        /// </param>
+        public ErrorInfo(int decision, ATNConfigSet configs, ITokenStream input, int startIndex, int stopIndex, bool fullCtx)
+            : base(decision, configs, input, startIndex, stopIndex, fullCtx)
         {
         }
     }
