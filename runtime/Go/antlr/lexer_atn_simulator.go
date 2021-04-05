@@ -90,11 +90,11 @@ func (l *LexerATNSimulator) Match(input CharStream, mode int) int {
 
 	dfa := l.decisionToDFA[mode]
 
-	if dfa.s0 == nil {
+	if dfa.getS0() == nil {
 		return l.MatchATN(input)
 	}
 
-	return l.execATN(input, dfa.s0)
+	return l.execATN(input, dfa.getS0())
 }
 
 func (l *LexerATNSimulator) reset() {
@@ -202,11 +202,11 @@ func (l *LexerATNSimulator) execATN(input CharStream, ds0 *DFAState) int {
 // {@code t}, or {@code nil} if the target state for l edge is not
 // already cached
 func (l *LexerATNSimulator) getExistingTargetState(s *DFAState, t int) *DFAState {
-	if s.edges == nil || t < LexerATNSimulatorMinDFAEdge || t > LexerATNSimulatorMaxDFAEdge {
+	if s.getEdges() == nil || t < LexerATNSimulatorMinDFAEdge || t > LexerATNSimulatorMaxDFAEdge {
 		return nil
 	}
 
-	target := s.edges[t-LexerATNSimulatorMinDFAEdge]
+	target := s.getIthEdge(t-LexerATNSimulatorMinDFAEdge)
 	if LexerATNSimulatorDebug && target != nil {
 		fmt.Println("reuse state " + strconv.Itoa(s.stateNumber) + " edge to " + strconv.Itoa(target.stateNumber))
 	}
@@ -550,11 +550,11 @@ func (l *LexerATNSimulator) addDFAEdge(from *DFAState, tk int, to *DFAState, cfg
 	if LexerATNSimulatorDebug {
 		fmt.Println("EDGE " + from.String() + " -> " + to.String() + " upon " + strconv.Itoa(tk))
 	}
-	if from.edges == nil {
+	if from.getEdges() == nil {
 		// make room for tokens 1..n and -1 masquerading as index 0
-		from.edges = make([]*DFAState, LexerATNSimulatorMaxDFAEdge-LexerATNSimulatorMinDFAEdge+1)
+		from.setEdges(make([]*DFAState, LexerATNSimulatorMaxDFAEdge-LexerATNSimulatorMinDFAEdge+1))
 	}
-	from.edges[tk-LexerATNSimulatorMinDFAEdge] = to // connect
+	from.setIthEdge(tk-LexerATNSimulatorMinDFAEdge, to) // connect
 
 	return to
 }

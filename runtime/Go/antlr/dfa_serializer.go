@@ -34,7 +34,7 @@ func NewDFASerializer(dfa *DFA, literalNames, symbolicNames []string) *DFASerial
 }
 
 func (d *DFASerializer) String() string {
-	if d.dfa.s0 == nil {
+	if d.dfa.getS0() == nil {
 		return ""
 	}
 
@@ -116,7 +116,7 @@ func (l *LexerDFASerializer) getEdgeLabel(i int) string {
 }
 
 func (l *LexerDFASerializer) String() string {
-	if l.dfa.s0 == nil {
+	if l.dfa.getS0() == nil {
 		return ""
 	}
 

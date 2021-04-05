@@ -6,6 +6,7 @@ package antlr
 
 import (
 	"fmt"
+	"sync"
 )
 
 // PredPrediction maps a predicate to a predicted alternative.
@@ -50,6 +51,7 @@ type DFAState struct {
 	// edges elements point to the target of the symbol. Shift up by 1 so (-1)
 	// Token.EOF maps to the first element.
 	edges []*DFAState
+	edgesMu	sync.RWMutex
 
 	isAcceptState bool
 
@@ -104,6 +106,36 @@ func (d *DFAState) GetAltSet() *Set {
 	}
 
 	return alts
+}
+
+func (d *DFAState) getEdges() []*DFAState {
+	d.edgesMu.RLock()
+	defer d.edgesMu.RUnlock()
+	return d.edges
+}
+
+func (d *DFAState) numEdges() int {
+	d.edgesMu.RLock()
+	defer d.edgesMu.RUnlock()
+	return len(d.edges)
+}
+
+func (d *DFAState) getIthEdge(i int) *DFAState {
+	d.edgesMu.RLock()
+	defer d.edgesMu.RUnlock()
+	return d.edges[i]
+}
+
+func (d *DFAState) setEdges(newEdges []*DFAState) {
+	d.edgesMu.Lock()
+	defer d.edgesMu.Unlock()
+	d.edges = newEdges
+}
+
+func (d *DFAState) setIthEdge(i int, edge *DFAState) {
+	d.edgesMu.Lock()
+	defer d.edgesMu.Unlock()
+	d.edges[i] = edge
 }
 
 func (d *DFAState) setPrediction(v int) {
