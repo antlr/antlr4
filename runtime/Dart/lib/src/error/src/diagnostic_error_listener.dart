@@ -13,7 +13,7 @@ import 'error_listener.dart';
 
 /// This implementation of [ANTLRErrorListener] can be used to identify
 /// certain potential correctness and performance problems in grammars. "Reports"
-/// are made by calling {@link Parser#notifyErrorListeners} with the appropriate
+/// are made by calling [Parser.notifyErrorListeners] with the appropriate
 /// message.
 ///
 /// <ul>

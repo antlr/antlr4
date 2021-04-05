@@ -11,7 +11,7 @@ import 'misc/pair.dart';
 import 'token.dart';
 import 'token_factory.dart';
 
-/// A source of tokens must provide a sequence of tokens via {@link #nextToken()}
+/// A source of tokens must provide a sequence of tokens via [nextToken]
 /// and also must reveal it's source of characters; [CommonToken]'s text is
 /// computed from a [CharStream]; it only store indices into the char
 /// stream.
@@ -55,7 +55,7 @@ abstract class TokenSource {
 
   /// Gets the name of the underlying input source. This method returns a
   /// non-null, non-empty string. If such a name is not known, this method
-  /// returns {@link IntStream#UNKNOWN_SOURCE_NAME}.
+  /// returns [IntStream.UNKNOWN_SOURCE_NAME].
   String get sourceName;
 
   /// Set the [TokenFactory] this token source should use for creating
@@ -74,8 +74,8 @@ abstract class TokenSource {
 /// Provides an implementation of [TokenSource] as a wrapper around a list
 /// of [Token] objects.
 ///
-/// <p>If the final token in the list is an {@link Token#EOF} token, it will be used
-/// as the EOF token for every call to {@link #nextToken} after the end of the
+/// <p>If the final token in the list is an[Token.EOF] token, it will be used
+/// as the EOF token for every call to [nextToken] after the end of the
 /// list is reached. Otherwise, an EOF token will be created.</p>
 class ListTokenSource implements TokenSource {
   /// The wrapped collection of [Token] objects to return.
@@ -83,16 +83,15 @@ class ListTokenSource implements TokenSource {
 
   final String _sourceName;
 
-  /// The index into {@link #tokens} of token to return by the next call to
-  /// {@link #nextToken}. The end of the input is indicated by this value
-  /// being greater than or equal to the number of items in {@link #tokens}.
+  /// The index into [tokens] of token to return by the next call to
+  /// [nextToken]. The end of the input is indicated by this value
+  /// being greater than or equal to the number of items in [tokens].
   int i;
 
   /// This field caches the EOF token for the token source.
   Token eofToken;
 
-  /// This is the backing field for {@link #getTokenFactory} and
-  /// [setTokenFactory].
+  /// This is the backing field for [tokenFactory].
   @override
   TokenFactory tokenFactory = CommonTokenFactory.DEFAULT;
 
@@ -111,9 +110,8 @@ class ListTokenSource implements TokenSource {
   /// @param tokens The collection of [Token] objects to provide as a
   /// [TokenSource].
   /// @param sourceName The name of the [TokenSource]. If this value is
-  /// null, {@link #getSourceName} will attempt to infer the name from
-  /// the next [Token] (or the previous token if the end of the input has
-  /// been reached).
+  /// null, [sourceName] will attempt to infer the name from the next [Token]
+  /// (or the previous token if the end of the input has been reached).
   ///
   /// @exception NullPointerException if [tokens] is null
   ListTokenSource(this.tokens, [this._sourceName]) {
@@ -233,8 +231,8 @@ class ListTokenSource implements TokenSource {
   }
 
   /// The name of the input source. If this value is null, a call to
-  /// {@link #getSourceName} should return the source name used to create the
-  /// the next token in {@link #tokens} (or the previous token if the end of
+  /// [sourceName] should return the source name used to create the
+  /// the next token in [tokens] (or the previous token if the end of
   /// the input has been reached).
   @override
   String get sourceName =>_sourceName ?? inputStream?.sourceName ?? 'List';

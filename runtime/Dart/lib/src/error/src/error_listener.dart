@@ -15,7 +15,7 @@ import 'errors.dart';
 
 abstract class ErrorListener {
   /// Upon syntax error, notify any interested parties. This is not how to
-  /// recover from errors or compute error messages. [ANTLRErrorStrategy]
+  /// recover from errors or compute error messages. [ErrorStrategy]
   /// specifies how to recover from syntax errors and how to compute error
   /// messages. This listener's job is simply to emit a computed message,
   /// though it has enough information to create its own message in many cases.
@@ -45,19 +45,25 @@ abstract class ErrorListener {
   ///        the reporting of an error. It is null in the case where
   ///        the parser was able to recover in line without exiting the
   ///        surrounding rule.
-  void syntaxError(Recognizer recognizer, Object offendingSymbol, int line,
-      int charPositionInLine, String msg, RecognitionException e);
+  void syntaxError(
+    Recognizer recognizer,
+    Object offendingSymbol,
+    int line,
+    int charPositionInLine,
+    String msg,
+    RecognitionException e,
+  );
 
   /// This method is called by the parser when a full-context prediction
   /// results in an ambiguity.
   ///
   /// <p>Each full-context prediction which does not result in a syntax error
-  /// will call either {@link #reportContextSensitivity} or
-  /// {@link #reportAmbiguity}.</p>
+  /// will call either [reportContextSensitivity] or
+  /// [reportAmbiguity].</p>
   ///
   /// <p>When [ambigAlts] is not null, it contains the set of potentially
   /// viable alternatives identified by the prediction algorithm. When
-  /// [ambigAlts] is null, use {@link ATNConfigSet#getAlts} to obtain the
+  /// [ambigAlts] is null, use [ATNConfigSet.alts] to obtain the
   /// represented alternatives from the [configs] argument.</p>
   ///
   /// <p>When [exact] is [true], <em>all</em> of the potentially
@@ -68,7 +74,7 @@ abstract class ErrorListener {
   /// least the <em>minimum</em> potentially viable alternative is truly
   /// viable.</p>
   ///
-  /// <p>When the {@link PredictionMode#LL_EXACT_AMBIG_DETECTION} prediction
+  /// <p>When the [PredictionMode.LL_EXACT_AMBIG_DETECTION] prediction
   /// mode is used, the parser is required to identify exact ambiguities so
   /// [exact] will always be [true].</p>
   ///
@@ -80,14 +86,21 @@ abstract class ErrorListener {
   /// @param stopIndex the input input where the ambiguity was identified
   /// @param exact [true] if the ambiguity is exactly known, otherwise
   /// [false]. This is always [true] when
-  /// {@link PredictionMode#LL_EXACT_AMBIG_DETECTION} is used.
+  /// [PredictionMode.LL_EXACT_AMBIG_DETECTION] is used.
   /// @param ambigAlts the potentially ambiguous alternatives, or null
   /// to indicate that the potentially ambiguous alternatives are the complete
   /// set of represented alternatives in [configs]
   /// @param configs the ATN configuration set where the ambiguity was
   /// identified
-  void reportAmbiguity(Parser recognizer, DFA dfa, int startIndex,
-      int stopIndex, bool exact, BitSet ambigAlts, ATNConfigSet configs);
+  void reportAmbiguity(
+    Parser recognizer,
+    DFA dfa,
+    int startIndex,
+    int stopIndex,
+    bool exact,
+    BitSet ambigAlts,
+    ATNConfigSet configs,
+  );
 
   /// This method is called when an SLL conflict occurs and the parser is about
   /// to use the full context information to make an LL decision.
@@ -110,15 +123,21 @@ abstract class ErrorListener {
   /// as null).
   /// @param configs the ATN configuration set where the SLL conflict was
   /// detected
-  void reportAttemptingFullContext(Parser recognizer, DFA dfa, int startIndex,
-      int stopIndex, BitSet conflictingAlts, ATNConfigSet configs);
+  void reportAttemptingFullContext(
+    Parser recognizer,
+    DFA dfa,
+    int startIndex,
+    int stopIndex,
+    BitSet conflictingAlts,
+    ATNConfigSet configs,
+  );
 
   /// This method is called by the parser when a full-context prediction has a
   /// unique result.
   ///
   /// <p>Each full-context prediction which does not result in a syntax error
-  /// will call either {@link #reportContextSensitivity} or
-  /// {@link #reportAmbiguity}.</p>
+  /// will call either [reportContextSensitivity] or
+  /// [reportAmbiguity].</p>
   ///
   /// <p>For prediction implementations that only evaluate full-context
   /// predictions when an SLL conflict is found (including the default
@@ -134,7 +153,7 @@ abstract class ErrorListener {
   /// is passed as the [prediction] argument.</p>
   ///
   /// <p>Note that the definition of "context sensitivity" in this method
-  /// differs from the concept in {@link DecisionInfo#contextSensitivities}.
+  /// differs from the concept in [DecisionInfo.contextSensitivities].
   /// This method reports all instances where an SLL conflict occurred but LL
   /// parsing produced a unique result, whether or not that unique result
   /// matches the minimum alternative in the SLL conflicting set.</p>
@@ -149,26 +168,57 @@ abstract class ErrorListener {
   /// @param prediction the unambiguous result of the full-context prediction
   /// @param configs the ATN configuration set where the unambiguous prediction
   /// was determined
-  void reportContextSensitivity(Parser recognizer, DFA dfa, int startIndex,
-      int stopIndex, int prediction, ATNConfigSet configs);
+  void reportContextSensitivity(
+    Parser recognizer,
+    DFA dfa,
+    int startIndex,
+    int stopIndex,
+    int prediction,
+    ATNConfigSet configs,
+  );
 }
 
 class BaseErrorListener extends ErrorListener {
   @override
-  void reportAmbiguity(Parser recognizer, DFA dfa, int startIndex,
-      int stopIndex, bool exact, BitSet ambigAlts, ATNConfigSet configs) {}
+  void reportAmbiguity(
+    Parser recognizer,
+    DFA dfa,
+    int startIndex,
+    int stopIndex,
+    bool exact,
+    BitSet ambigAlts,
+    ATNConfigSet configs,
+  ) {}
 
   @override
-  void reportAttemptingFullContext(Parser recognizer, DFA dfa, int startIndex,
-      int stopIndex, BitSet conflictingAlts, ATNConfigSet configs) {}
+  void reportAttemptingFullContext(
+    Parser recognizer,
+    DFA dfa,
+    int startIndex,
+    int stopIndex,
+    BitSet conflictingAlts,
+    ATNConfigSet configs,
+  ) {}
 
   @override
-  void reportContextSensitivity(Parser recognizer, DFA dfa, int startIndex,
-      int stopIndex, int prediction, ATNConfigSet configs) {}
+  void reportContextSensitivity(
+    Parser recognizer,
+    DFA dfa,
+    int startIndex,
+    int stopIndex,
+    int prediction,
+    ATNConfigSet configs,
+  ) {}
 
   @override
-  void syntaxError(Recognizer<ATNSimulator> recognizer, Object offendingSymbol,
-      int line, int charPositionInLine, String msg, RecognitionException e) {}
+  void syntaxError(
+    Recognizer<ATNSimulator> recognizer,
+    Object offendingSymbol,
+    int line,
+    int charPositionInLine,
+    String msg,
+    RecognitionException e,
+  ) {}
 }
 
 class ConsoleErrorListener extends BaseErrorListener {
@@ -178,7 +228,7 @@ class ConsoleErrorListener extends BaseErrorListener {
   /// {@inheritDoc}
   ///
   /// <p>
-  /// This implementation prints messages to {@link System//err} containing the
+  /// This implementation prints messages to `stderr.writeln` containing the
   /// values of [line], [charPositionInLine], and [msg] using
   /// the following format.</p>
   ///
@@ -204,38 +254,88 @@ class ProxyErrorListener implements ErrorListener {
   }
 
   @override
-  void syntaxError(Recognizer recognizer, Object offendingSymbol, int line,
-      int charPositionInLine, String msg, RecognitionException e) {
+  void syntaxError(
+    Recognizer recognizer,
+    Object offendingSymbol,
+    int line,
+    int charPositionInLine,
+    String msg,
+    RecognitionException e,
+  ) {
     for (final listener in delegates) {
       listener.syntaxError(
-          recognizer, offendingSymbol, line, charPositionInLine, msg, e);
+        recognizer,
+        offendingSymbol,
+        line,
+        charPositionInLine,
+        msg,
+        e,
+      );
     }
   }
 
   @override
-  void reportAmbiguity(Parser recognizer, DFA dfa, int startIndex,
-      int stopIndex, bool exact, BitSet ambigAlts, ATNConfigSet configs) {
+  void reportAmbiguity(
+    Parser recognizer,
+    DFA dfa,
+    int startIndex,
+    int stopIndex,
+    bool exact,
+    BitSet ambigAlts,
+    ATNConfigSet configs,
+  ) {
     for (final listener in delegates) {
       listener.reportAmbiguity(
-          recognizer, dfa, startIndex, stopIndex, exact, ambigAlts, configs);
+        recognizer,
+        dfa,
+        startIndex,
+        stopIndex,
+        exact,
+        ambigAlts,
+        configs,
+      );
     }
   }
 
   @override
-  void reportAttemptingFullContext(Parser recognizer, DFA dfa, int startIndex,
-      int stopIndex, BitSet conflictingAlts, ATNConfigSet configs) {
+  void reportAttemptingFullContext(
+    Parser recognizer,
+    DFA dfa,
+    int startIndex,
+    int stopIndex,
+    BitSet conflictingAlts,
+    ATNConfigSet configs,
+  ) {
     for (final listener in delegates) {
       listener.reportAttemptingFullContext(
-          recognizer, dfa, startIndex, stopIndex, conflictingAlts, configs);
+        recognizer,
+        dfa,
+        startIndex,
+        stopIndex,
+        conflictingAlts,
+        configs,
+      );
     }
   }
 
   @override
-  void reportContextSensitivity(Parser recognizer, DFA dfa, int startIndex,
-      int stopIndex, int prediction, ATNConfigSet configs) {
+  void reportContextSensitivity(
+    Parser recognizer,
+    DFA dfa,
+    int startIndex,
+    int stopIndex,
+    int prediction,
+    ATNConfigSet configs,
+  ) {
     for (final listener in delegates) {
       listener.reportContextSensitivity(
-          recognizer, dfa, startIndex, stopIndex, prediction, configs);
+        recognizer,
+        dfa,
+        startIndex,
+        stopIndex,
+        prediction,
+        configs,
+      );
     }
   }
 }

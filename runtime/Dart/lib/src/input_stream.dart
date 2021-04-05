@@ -15,23 +15,21 @@ import 'token.dart';
 /// A simple stream of symbols whose values are represented as integers. This
 /// interface provides <em>marked ranges</em> with support for a minimum level
 /// of buffering necessary to implement arbitrary lookahead during prediction.
-/// For more information on marked ranges, see {@link #mark}.
+/// For more information on marked ranges, see [mark].
 ///
 /// <p><strong>Initializing Methods:</strong> Some methods in this interface have
 /// unspecified behavior if no call to an initializing method has occurred after
 /// the stream was constructed. The following is a list of initializing methods:</p>
 ///
-/// <ul>
-///   <li>{@link #LA}</li>
-///   <li>{@link #consume}</li>
-///   <li>{@link #size}</li>
-/// </ul>
+/// - [LA]
+/// - [consume]
+/// - [size]
+///
 abstract class IntStream {
-  /// The value returned by {@link #LA LA()} when the end of the stream is
-  /// reached.
+  /// The value returned by [LA] when the end of the stream is reached.
   static const int EOF = -1;
 
-  /// The value returned by {@link #getSourceName} when the actual name of the
+  /// The value returned by [sourceName] when the actual name of the
   /// underlying source is not known.
   static const UNKNOWN_SOURCE_NAME = '<unknown>';
 
@@ -39,9 +37,7 @@ abstract class IntStream {
   /// effects:
   ///
   /// <ul>
-  ///   <li><strong>Forward movement:</strong> The value of {@link #index index()}
-  ///		before calling this method is less than the value of {@code index()}
-  ///		after calling this method.</li>
+  ///   <li></li>
   ///   <li><strong>Ordered lookahead:</strong> The value of {@code LA(1)} before
   ///		calling this method becomes the value of {@code LA(-1)} after calling
   ///		this method.</li>
@@ -53,8 +49,7 @@ abstract class IntStream {
   /// between "on-channel" and "off-channel" tokens).
   ///
   /// @throws IllegalStateException if an attempt is made to consume the
-  /// end of the stream (i.e. if {@code LA(1)==}{@link #EOF EOF} before calling
-  /// [consume]).
+  /// end of the stream (i.e. if `LA(1)==EOF` before calling [consume]).
   void consume();
 
   /// Gets the value of the symbol at offset [i] from the current
@@ -69,7 +64,7 @@ abstract class IntStream {
   ///
   /// <ul>
   ///   <li>{@code i>0}</li>
-  ///   <li>{@code i==-1} and {@link #index index()} returns a value greater
+  ///   <li>`i==-1` and [index] returns a value greater
   ///     than the value of {@code index()} after the stream was constructed
   ///     and {@code LA(1)} was called in that order. Specifying the current
   ///     {@code index()} relative to the index after the stream was created
@@ -81,44 +76,42 @@ abstract class IntStream {
   /// </ul>
   ///
   /// <p>If [i] represents a position at or beyond the end of the stream,
-  /// this method returns {@link #EOF}.</p>
+  /// this method returns [EOF].</p>
   ///
   /// <p>The return value is unspecified if {@code i<0} and fewer than {@code -i}
-  /// calls to {@link #consume consume()} have occurred from the beginning of
+  /// calls to [consume] have occurred from the beginning of
   /// the stream before calling this method.</p>
   ///
   /// @throws UnsupportedOperationException if the stream does not support
   /// retrieving the value of the specified symbol
   int LA(int i);
 
-  /// A mark provides a guarantee that {@link #seek seek()} operations will be
+  /// A mark provides a guarantee that [seek] operations will be
   /// valid over a "marked range" extending from the index where {@code mark()}
-  /// was called to the current {@link #index index()}. This allows the use of
+  /// was called to the current [index]. This allows the use of
   /// streaming input sources by specifying the minimum buffering requirements
   /// to support arbitrary lookahead during prediction.
   ///
-  /// <p>The returned mark is an opaque handle (type [int]) which is passed
-  /// to {@link #release release()} when the guarantees provided by the marked
+  /// The returned mark is an opaque handle (type [int]) which is passed
+  /// to [release] when the guarantees provided by the marked
   /// range are no longer necessary. When calls to
   /// {@code mark()}/{@code release()} are nested, the marks must be released
   /// in reverse order of which they were obtained. Since marked regions are
   /// used during performance-critical sections of prediction, the specific
   /// behavior of invalid usage is unspecified (i.e. a mark is not released, or
   /// a mark is released twice, or marks are not released in reverse order from
-  /// which they were created).</p>
+  /// which they were created).
   ///
-  /// <p>The behavior of this method is unspecified if no call to an
-  /// {@link IntStream initializing method} has occurred after this stream was
-  /// constructed.</p>
+  /// The behavior of this method is unspecified if no call to an
+  /// [initializing method][IntStream] has occurred after this stream was
+  /// constructed.
   ///
-  /// <p>This method does not change the current position in the input stream.</p>
+  /// This method does not change the current position in the input stream.
   ///
-  /// <p>The following example shows the use of {@link #mark mark()},
-  /// {@link #release release(mark)}, {@link #index index()}, and
-  /// {@link #seek seek(index)} as part of an operation to safely work within a
-  /// marked region, then restore the stream position to its original value and
-  /// release the mark.</p>
-  /// <pre>
+  /// The following example shows the use of [mark], [release], [index], and
+  /// [seek] as part of an operation to safely work within a marked region,
+  /// then restore the stream position to its original value and release the mark.
+  /// ```
   /// IntStream stream = ...;
   /// int index = -1;
   /// int mark = stream.mark();
@@ -131,19 +124,19 @@ abstract class IntStream {
   ///   }
   ///   stream.release(mark);
   /// }
-  /// </pre>
+  /// ```
   ///
-  /// @return An opaque marker which should be passed to
-  /// {@link #release release()} when the marked range is no longer required.
+  /// @return An opaque marker which should be passed to [release] when the
+  /// marked range is no longer required.
   int mark();
 
-  /// This method releases a marked range created by a call to
-  /// {@link #mark mark()}. Calls to {@code release()} must appear in the
+  /// This method releases a marked range created by a call to [mark].
+  /// Calls to `release()` must appear in the
   /// reverse order of the corresponding calls to {@code mark()}. If a mark is
   /// released twice, or if marks are not released in reverse order of the
   /// corresponding calls to {@code mark()}, the behavior is unspecified.
   ///
-  /// <p>For more information and an example, see {@link #mark}.</p>
+  /// <p>For more information and an example, see [mark].</p>
   ///
   /// @param marker A marker returned by a call to {@code mark()}.
   /// @see #mark
@@ -152,9 +145,9 @@ abstract class IntStream {
   /// Return the index into the stream of the input symbol referred to by
   /// {@code LA(1)}.
   ///
-  /// <p>The behavior of this method is unspecified if no call to an
-  /// {@link IntStream initializing method} has occurred after this stream was
-  /// constructed.</p>
+  /// The behavior of this method is unspecified if no call to an
+  /// [initializing method][IntStream] has occurred after this stream was
+  /// constructed.
   int get index;
 
   /// Set the input cursor to the position indicated by [index]. If the
@@ -164,18 +157,18 @@ abstract class IntStream {
   /// will be true.
   ///
   /// <ul>
-  ///   <li>{@link #index index()} will return the index of the first symbol
+  ///   <li>[index] will return the index of the first symbol
   ///     appearing at or after the specified [index]. Specifically,
   ///     implementations which filter their sources should automatically
   ///     adjust [index] forward the minimum amount required for the
   ///     operation to target a non-ignored symbol.</li>
-  ///   <li>{@code LA(1)} returns {@link #EOF}</li>
+  ///   <li>{@code LA(1)} returns [EOF]</li>
   /// </ul>
   ///
   /// This operation is guaranteed to not throw an exception if [index]
   /// lies within a marked region. For more information on marked regions, see
-  /// {@link #mark}. The behavior of this method is unspecified if no call to
-  /// an {@link IntStream initializing method} has occurred after this stream
+  /// [mark]. The behavior of this method is unspecified if no call to
+  /// an [initializing method][IntStream] has occurred after this stream
   /// was constructed.
   ///
   /// @param index The absolute index to seek to.
@@ -194,7 +187,7 @@ abstract class IntStream {
 
   /// Gets the name of the underlying symbol source. This method returns a
   /// non-null, non-empty string. If such a name is not known, this method
-  /// returns {@link #UNKNOWN_SOURCE_NAME}.
+  /// returns [UNKNOWN_SOURCE_NAME].
 
   String get sourceName;
 }
@@ -204,7 +197,7 @@ abstract class CharStream extends IntStream {
   /// This method returns the text for a range of characters within this input
   /// stream. This method is guaranteed to not throw an exception if the
   /// specified [interval] lies entirely within a marked range. For more
-  /// information about marked ranges, see {@link IntStream#mark}.
+  /// information about marked ranges, see  [IntStream.mark].
   ///
   /// @param interval an interval within the stream
   /// @return the text of the specified interval

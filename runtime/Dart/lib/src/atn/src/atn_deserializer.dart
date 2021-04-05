@@ -76,12 +76,12 @@ class ATNDeserializer {
   /// This is the earliest supported serialized UUID.
   static final BASE_SERIALIZED_UUID = '33761B2D-78BB-4A43-8B0B-4F5BEE8AACF3';
 
-  /// This UUID indicates an extension of {@link BASE_SERIALIZED_UUID} for the
+  /// This UUID indicates an extension of [BASE_SERIALIZED_UUID] for the
   /// addition of precedence predicates.
   static final ADDED_PRECEDENCE_TRANSITIONS =
       '1DA0C57D-6C06-438A-9B27-10BCB3CE0F61';
 
-  /// This UUID indicates an extension of {@link #ADDED_PRECEDENCE_TRANSITIONS}
+  /// This UUID indicates an extension of [ADDED_PRECEDENCE_TRANSITIONS]
   /// for the addition of lexer actions encoded as a sequence of
   /// [LexerAction] instances.
   static final ADDED_LEXER_ACTIONS = 'AADB8D7E-AEEF-4415-AD2B-8204D6CF042E';
@@ -556,7 +556,7 @@ class ATNDeserializer {
   }
 
   /// Analyze the [StarLoopEntryState] states in the specified ATN to set
-  /// the {@link StarLoopEntryState#isPrecedenceDecision} field to the
+  /// the [StarLoopEntryState.isPrecedenceDecision] field to the
   /// correct value.
   ///
   /// @param atn The ATN.

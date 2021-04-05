@@ -37,9 +37,9 @@ abstract class Token {
   /// user-defined token channel.
   ///
   /// <p>
-  /// The non-negative numbers less than {@link #MIN_USER_CHANNEL_VALUE} are
-  /// assigned to the predefined channels {@link #DEFAULT_CHANNEL} and
-  /// {@link #HIDDEN_CHANNEL}.</p>
+  /// The non-negative numbers less than [MIN_USER_CHANNEL_VALUE] are
+  /// assigned to the predefined channels [DEFAULT_CHANNEL] and
+  /// [HIDDEN_CHANNEL].</p>
   ///
   /// @see Token#getChannel()
   static const int MIN_USER_CHANNEL_VALUE = 2;
@@ -102,7 +102,7 @@ abstract class WritableToken extends Token {
 
 class CommonToken extends WritableToken {
   /// An empty [Pair] which is used as the default value of
-  /// {@link #source} for tokens that do not have a source.
+  /// [source] for tokens that do not have a source.
   static const Pair<TokenSource, CharStream> EMPTY_SOURCE =
       Pair<TokenSource, CharStream>(null, null);
 
@@ -124,8 +124,8 @@ class CommonToken extends WritableToken {
   /// [Pair] containing these values.</p>
   Pair<TokenSource, CharStream> source;
 
-  /// This is the backing field for {@link #getText} when the token text is
-  /// explicitly set in the constructor or via {@link #setText}.
+  /// This is the backing field for [text] when the token text is
+  /// explicitly set in the constructor or via [text].
   ///
   /// @see #getText()
   String _text;
@@ -161,11 +161,11 @@ class CommonToken extends WritableToken {
   ///
   /// <p>
   /// If [oldToken] is also a [CommonToken] instance, the newly
-  /// constructed token will share a reference to the {@link #text} field and
-  /// the [Pair] stored in {@link #source}. Otherwise, {@link #text} will
-  /// be assigned the result of calling {@link #getText}, and {@link #source}
-  /// will be constructed from the result of {@link Token#getTokenSource} and
-  /// {@link Token#getInputStream}.</p>
+  /// constructed token will share a reference to the [text] field and
+  /// the [Pair] stored in [source]. Otherwise, [text] will
+  /// be assigned the result of calling [text], and [source]
+  /// will be constructed from the result of [Token.tokenSource] and
+  /// [Token.inputStream].</p>
   ///
   /// @param oldToken The token to copy.
   CommonToken.copy(Token oldToken) {
@@ -204,7 +204,7 @@ class CommonToken extends WritableToken {
   }
 
   /// Explicitly set the text for this token. If {code text} is not
-  /// null, then {@link #getText} will return this value rather than
+  /// null, then [text] will return this value rather than
   /// extracting the text from the input.
   ///
   /// @param text The explicit text of the token, or null if the text
@@ -280,7 +280,7 @@ class RuleTagToken implements Token {
 
   /// {@inheritDoc}
   ///
-  /// <p>Rule tag tokens are always placed on the {@link #DEFAULT_CHANNEL}.</p>
+  /// <p>Rule tag tokens are always placed on the [DEFAULT_CHANNEL].</p>
 
   @override
   int get channel {

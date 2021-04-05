@@ -36,29 +36,27 @@ class CommonTokenFactory implements TokenFactory<CommonToken> {
   /// tokens.</p>
   static final TokenFactory<CommonToken> DEFAULT = CommonTokenFactory();
 
-  /// Indicates whether {@link CommonToken#setText} should be called after
+  /// Indicates whether [CommonToken.text] should be set after
   /// constructing tokens to explicitly set the text. This is useful for cases
   /// where the input stream might not be able to provide arbitrary substrings
   /// of text from the input after the lexer creates a token (e.g. the
-  /// implementation of {@link CharStream#getText} in
+  /// implementation of [CharStream.text] getter in
   /// [UnbufferedCharStream] throws an
   /// [UnsupportedOperationException]). Explicitly setting the token text
-  /// allows {@link Token#getText} to be called at any time regardless of the
+  /// allows [Token.text] to be called at any time regardless of the
   /// input stream implementation.
   ///
-  /// <p>
   /// The default value is [false] to avoid the performance and memory
-  /// overhead of copying text for every token unless explicitly requested.</p>
+  /// overhead of copying text for every token unless explicitly requested.
   final bool copyText;
 
   /// Constructs a [CommonTokenFactory] with the specified value for
-  /// {@link #copyText}.
+  /// [copyText].
   ///
-  /// <p>
-  /// When [copyText] is [false], the {@link #DEFAULT} instance
-  /// should be used instead of constructing a new instance.</p>
+  /// When [copyText] is `false`, the [DEFAULT] instance
+  /// should be used instead of constructing a new instance.
   ///
-  /// @param copyText The value for {@link #copyText}.
+  /// @param copyText The value for [copyText].
   CommonTokenFactory([this.copyText = false]);
 
   @override

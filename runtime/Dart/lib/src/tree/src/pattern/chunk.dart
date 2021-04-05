@@ -4,13 +4,15 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+import 'parse_tree_match.dart';
+
 /// A chunk is either a token tag, a rule tag, or a span of literal text within a
 /// tree pattern.
 ///
-/// <p>The method {@link ParseTreePatternMatcher#split(String)} returns a list of
+/// <p>The method [ParseTreePatternMatcher.split] returns a list of
 /// chunks in preparation for creating a token stream by
-/// {@link ParseTreePatternMatcher#tokenize(String)}. From there, we get a parse
-/// tree from with {@link ParseTreePatternMatcher#compile(String, int)}. These
+/// [ParseTreePatternMatcher.tokenize]. From there, we get a parse
+/// tree from with [ParseTreePatternMatcher.compile]. These
 /// chunks are converted to [RuleTagToken], [TokenTagToken], or the
 /// regular tokens of the text surrounding the tags.</p>
 abstract class Chunk {}
@@ -82,7 +84,7 @@ class TextChunk extends Chunk {
   /// {@inheritDoc}
   ///
   /// <p>The implementation for [TextChunk] returns the result of
-  /// {@link #getText()} in single quotes.</p>
+  /// [text] in single quotes.</p>
   @override
   String toString() {
     return "'" + text + "'";

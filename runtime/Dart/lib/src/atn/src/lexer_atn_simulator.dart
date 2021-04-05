@@ -25,7 +25,7 @@ import 'transition.dart';
 
 /// When we hit an accept state in either the DFA or the ATN, we
 ///  have to notify the character stream to start buffering characters
-///  via {@link IntStream#mark} and record the current state. The current sim state
+///  via [IntStream.mark] and record the current state. The current sim state
 ///  includes the current index into the input, the current line,
 ///  and current character position in that line. Note that the Lexer is
 ///  tracking the starting line and characterization of the token. These
@@ -254,8 +254,7 @@ class LexerATNSimulator extends ATNSimulator {
   /// @param t The next input symbol
   ///
   /// @return The computed target DFA state for the given input symbol
-  /// [t]. If [t] does not lead to a valid DFA state, this method
-  /// returns {@link #ERROR}.
+  /// [t]. If [t] does not lead to a valid DFA state, this method returns [ERROR].
 
   DFAState computeTargetState(CharStream input, DFAState s, int t) {
     ATNConfigSet reach = OrderedATNConfigSet();
@@ -571,13 +570,13 @@ class LexerATNSimulator extends ATNSimulator {
   /// Evaluate a predicate specified in the lexer.
   ///
   /// <p>If [speculative] is [true], this method was called before
-  /// {@link #consume} for the matched character. This method should call
-  /// {@link #consume} before evaluating the predicate to ensure position
-  /// sensitive values, including {@link Lexer#getText}, {@link Lexer#getLine},
-  /// and {@link Lexer#getCharPositionInLine}, properly reflect the current
+  /// [consume] for the matched character. This method should call
+  /// [consume] before evaluating the predicate to ensure position
+  /// sensitive values, including [Lexer.text], [Lexer.line],
+  /// and [Lexer.charPositionInLine], properly reflect the current
   /// lexer state. This method should restore [input] and the simulator
   /// to the original state before returning (i.e. undo the actions made by the
-  /// call to {@link #consume}.</p>
+  /// call to [consume].</p>
   ///
   /// @param input The input stream.
   /// @param ruleIndex The rule containing the predicate.

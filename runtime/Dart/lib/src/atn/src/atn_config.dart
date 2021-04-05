@@ -7,6 +7,7 @@
 import '../../prediction_context.dart';
 import '../../recognizer.dart';
 import '../../util/murmur_hash.dart';
+import 'atn_config_set.dart';
 import 'atn_state.dart';
 import 'lexer_action_executor.dart';
 import 'semantic_context.dart';
@@ -46,8 +47,8 @@ Map<String, dynamic> checkParams(params, isCfg) {
 ///  an ATN state.
 class ATNConfig {
   /// This field stores the bit mask for implementing the
-  /// {@link #isPrecedenceFilterSuppressed} property as a bit within the
-  /// existing {@link #reachesIntoOuterContext} field.
+  /// [isPrecedenceFilterSuppressed] property as a bit within the
+  /// existing [reachesIntoOuterContext] field.
   static final int SUPPRESS_PRECEDENCE_FILTER = 0x40000000;
 
   /// The ATN state associated with this configuration */
@@ -73,14 +74,14 @@ class ATNConfig {
   /// don't ever decrement. TODO: make it a bool then</p>
   ///
   /// <p>
-  /// For memory efficiency, the {@link #isPrecedenceFilterSuppressed} method
+  /// For memory efficiency, the [isPrecedenceFilterSuppressed] method
   /// is also backed by this field. Since the field is ly accessible, the
   /// highest bit which would not cause the value to become negative is used to
   /// store this field. This choice minimizes the risk that code which only
   /// compares this value to 0 would be affected by the new purpose of the
   /// flag. It also ensures the performance of the existing [ATNConfig]
   /// constructors as well as certain operations like
-  /// {@link ATNConfigSet#add(ATNConfig, DoubleKeyMap)} method are
+  /// [ATNConfigSet.add] method are
   /// <em>completely</em> unaffected by the change.</p>
   int reachesIntoOuterContext = 0;
 
@@ -99,9 +100,9 @@ class ATNConfig {
         c.reachesIntoOuterContext ?? reachesIntoOuterContext;
   }
 
-  /// This method gets the value of the {@link #reachesIntoOuterContext} field
+  /// This method gets the value of the [reachesIntoOuterContext] field
   /// as it existed prior to the introduction of the
-  /// {@link #isPrecedenceFilterSuppressed} method.
+  /// [isPrecedenceFilterSuppressed] method.
   int get outerContextDepth {
     return reachesIntoOuterContext & ~SUPPRESS_PRECEDENCE_FILTER;
   }

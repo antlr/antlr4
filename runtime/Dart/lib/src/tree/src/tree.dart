@@ -39,7 +39,7 @@ abstract class SyntaxTree extends Tree {
   /// token stream.  Currently, the code base can only have i=0..n-1 but
   /// in concept one could have an empty interval after EOF. </p>
   ///
-  /// <p>If source interval is unknown, this returns {@link Interval#INVALID}.</p>
+  /// <p>If source interval is unknown, this returns [Interval.INVALID].</p>
   ///
   /// <p>As a weird special case, the source interval for rules matched after
   /// EOF is unspecified.</p>
@@ -97,7 +97,7 @@ abstract class ErrorNode extends TerminalNode {}
 abstract class ParseTreeVisitor<T> {
   /// {@inheritDoc}
   ///
-  /// <p>The default implementation calls {@link ParseTree#accept} on the
+  /// <p>The default implementation calls [ParseTree.accept] on the
   /// specified tree.</p>
   T visit(ParseTree tree) {
     return tree.accept(this);
@@ -106,11 +106,10 @@ abstract class ParseTreeVisitor<T> {
   /// {@inheritDoc}
   ///
   /// <p>The default implementation initializes the aggregate result to
-  /// {@link #defaultResult defaultResult()}. Before visiting each child, it
-  /// calls {@link #shouldVisitNextChild shouldVisitNextChild}; if the result
-  /// is [false] no more children are visited and the current aggregate
+  /// [defaultResult]. Before visiting each child, it calls
+  /// [shouldVisitNextChild]; if the result is [false] no more children are visited and the current aggregate
   /// result is returned. After visiting a child, the aggregate result is
-  /// updated by calling {@link #aggregateResult aggregateResult} with the
+  /// updated by calling [aggregateResult] with the
   /// previous aggregate result and the result of visiting the child.</p>
   ///
   /// <p>The default implementation is not safe for use in visitors that modify
@@ -135,7 +134,7 @@ abstract class ParseTreeVisitor<T> {
   /// {@inheritDoc}
   ///
   /// <p>The default implementation returns the result of
-  /// {@link #defaultResult defaultResult}.</p>
+  /// [defaultResult].</p>
 
   T visitTerminal(TerminalNode node) {
     return defaultResult();
@@ -144,7 +143,7 @@ abstract class ParseTreeVisitor<T> {
   /// {@inheritDoc}
   ///
   /// <p>The default implementation returns the result of
-  /// {@link #defaultResult defaultResult}.</p>
+  /// [defaultResult].</p>
 
   T visitErrorNode(ErrorNode node) {
     return defaultResult();
@@ -152,8 +151,8 @@ abstract class ParseTreeVisitor<T> {
 
   /// Gets the default value returned by visitor methods. This value is
   /// returned by the default implementations of
-  /// {@link #visitTerminal visitTerminal}, {@link #visitErrorNode visitErrorNode}.
-  /// The default implementation of {@link #visitChildren visitChildren}
+  /// [visitTerminal], [visitErrorNode].
+  /// The default implementation of [visitChildren]
   /// initializes its aggregate result to this value.
   ///
   /// <p>The base implementation returns null.</p>
@@ -164,17 +163,17 @@ abstract class ParseTreeVisitor<T> {
   }
 
   /// Aggregates the results of visiting multiple children of a node. After
-  /// either all children are visited or {@link #shouldVisitNextChild} returns
+  /// either all children are visited or [shouldVisitNextChild] returns
   /// [false], the aggregate value is returned as the result of
-  /// {@link #visitChildren}.
+  /// [visitChildren].
   ///
   /// <p>The default implementation returns [nextResult], meaning
-  /// {@link #visitChildren} will return the result of the last child visited
+  /// [visitChildren] will return the result of the last child visited
   /// (or return the initial value if the node has no children).</p>
   ///
   /// @param aggregate The previous aggregate value. In the default
   /// implementation, the aggregate value is initialized to
-  /// {@link #defaultResult}, which is passed as the [aggregate] argument
+  /// [defaultResult], which is passed as the [aggregate] argument
   /// to this method after the first child node is visited.
   /// @param nextResult The result of the immediately preceeding call to visit
   /// a child node.
@@ -183,10 +182,10 @@ abstract class ParseTreeVisitor<T> {
   T aggregateResult(T aggregate, T nextResult) => nextResult;
 
   /// This method is called after visiting each child in
-  /// {@link #visitChildren}. This method is first called before the first
+  /// [visitChildren]. This method is first called before the first
   /// child is visited; at that point [currentResult] will be the initial
   /// value (in the default implementation, the initial value is returned by a
-  /// call to {@link #defaultResult}. This method is not called after the last
+  /// call to [defaultResult]. This method is not called after the last
   /// child is visited.
   ///
   /// <p>The default implementation always returns [true], indicating that
@@ -203,7 +202,7 @@ abstract class ParseTreeVisitor<T> {
   ///
   /// @return [true] to continue visiting children. Otherwise return
   /// [false] to stop visiting children and immediately return the
-  /// current aggregate result from {@link #visitChildren}.
+  /// current aggregate result from [visitChildren].
   bool shouldVisitNextChild(RuleNode node, T currentResult) => true;
 }
 
@@ -351,7 +350,7 @@ class ParseTreeWalker {
   }
 
   /// The discovery of a rule node, involves sending two events: the generic
-  /// {@link ParseTreeListener#enterEveryRule} and a
+  /// [ParseTreeListener.enterEveryRule] and a
   /// [RuleContext]-specific event. First we trigger the generic and then
   /// the rule specific. We to them in reverse order upon finishing the node.
   void enterRule(ParseTreeListener listener, RuleNode r) {

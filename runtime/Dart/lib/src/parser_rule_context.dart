@@ -114,7 +114,7 @@ class ParserRuleContext extends RuleContext {
   ///
   /// @since 4.7
   ErrorNode addErrorNode(ErrorNode errorNode) {
-    errorNode.parent=this;
+    errorNode.parent = this;
     return addAnyChild(errorNode);
   }
 
@@ -209,19 +209,12 @@ class ParserRuleContext extends RuleContext {
       return [];
     }
 
-    List<T> contexts;
+    final contexts = <T>[];
     for (var o in children) {
       if (o is T) {
-        contexts ??= [];
-
         contexts.add(o);
       }
     }
-
-    if (contexts == null) {
-      return [];
-    }
-
     return contexts;
   }
 
@@ -250,12 +243,12 @@ class ParserRuleContext extends RuleContext {
 }
 
 /// This class extends [ParserRuleContext] by allowing the value of
-/// {@link #getRuleIndex} to be explicitly set for the context.
+/// [ruleIndex] to be explicitly set for the context.
 ///
 /// <p>
 /// [ParserRuleContext] does not include field storage for the rule index
 /// since the context classes created by the code generator override the
-/// {@link #getRuleIndex} method to return the correct value for that context.
+/// [ruleIndex] method to return the correct value for that context.
 /// Since the parser interpreter does not use the context classes generated for a
 /// parser, this class (with slightly more memory overhead per node) is used to
 /// provide equivalent functionality.</p>

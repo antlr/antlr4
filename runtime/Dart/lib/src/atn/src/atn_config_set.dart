@@ -94,12 +94,12 @@ class ATNConfigSet extends Iterable<ATNConfig> {
 
   /// Adding a new config means merging contexts with existing configs for
   /// {@code (s, i, pi, _)}, where [s] is the
-  /// {@link ATNConfig#state}, [i] is the {@link ATNConfig#alt}, and
-  /// [pi] is the {@link ATNConfig#semanticContext}. We use
+  /// [ATNConfig.state], [i] is the [ATNConfig.alt], and
+  /// [pi] is the [ATNConfig.semanticContext]. We use
   /// {@code (s,i,pi)} as key.
   ///
-  /// <p>This method updates {@link #dipsIntoOuterContext} and
-  /// {@link #hasSemanticContext} when necessary.</p>
+  /// <p>This method updates [dipsIntoOuterContext] and
+  /// [hasSemanticContext] when necessary.</p>
   bool add(ATNConfig config,
       [Map<Pair<PredictionContext, PredictionContext>, PredictionContext>
           mergeCache]) {

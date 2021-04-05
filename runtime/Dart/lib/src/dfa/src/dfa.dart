@@ -24,7 +24,7 @@ class DFA {
   DecisionState atnStartState;
 
   /// [true] if this DFA is for a precedence decision; otherwise,
-  /// [false]. This is the backing field for {@link #isPrecedenceDfa}.
+  /// [false]. This is the backing field for [isPrecedenceDfa].
   bool precedenceDfa;
 
   DFA(this.atnStartState, [this.decision]) {
@@ -44,8 +44,8 @@ class DFA {
   }
 
   /// Gets whether this DFA is a precedence DFA. Precedence DFAs use a special
-  /// start state {@link #s0} which is not stored in {@link #states}. The
-  /// {@link DFAState#edges} array for this start state contains outgoing edges
+  /// start state [s0] which is not stored in [states]. The
+  /// [DFAState.edges] array for this start state contains outgoing edges
   /// supplying individual start states corresponding to specific precedence
   /// values.
   ///

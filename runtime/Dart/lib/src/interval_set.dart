@@ -150,10 +150,8 @@ class Interval {
 /// of a sequential range of numbers that are all part of the set. For example,
 /// the set { 1, 2, 3, 4, 7, 8 } may be represented as { [1, 4], [7, 8] }.
 ///
-/// <p>
 /// This class is able to represent sets containing any combination of values in
-/// the range {@link int#MIN_VALUE} to {@link int#MAX_VALUE}
-/// (inclusive).</p>
+/// the range [int64MinValue] to [int64MaxValue] (inclusive).
 class IntervalSet {
   static final IntervalSet COMPLETE_CHAR_SET =
       IntervalSet.ofRange(Lexer.MIN_CHAR_VALUE, Lexer.MAX_CHAR_VALUE)

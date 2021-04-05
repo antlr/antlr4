@@ -31,7 +31,7 @@ enum StateType {
 }
 
 /// The following images show the relation of states and
-/// {@link ATNState#transitions} for various grammar constructs.
+/// [ATNState.transitions] for various grammar constructs.
 ///
 /// <ul>
 ///

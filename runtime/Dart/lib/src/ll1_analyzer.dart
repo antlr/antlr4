@@ -54,10 +54,10 @@ class LL1Analyzer {
   /// Compute set of tokens that can follow [s] in the ATN in the
   /// specified [ctx].
   ///
-  /// <p>If [ctx] is null and the end of the rule containing
-  /// [s] is reached, {@link Token#EPSILON} is added to the result set.
+  /// If [ctx] is null and the end of the rule containing
+  /// [s] is reached, [Token.EPSILON] is added to the result set.
   /// If [ctx] is not null and the end of the outermost rule is
-  /// reached, {@link Token#EOF} is added to the result set.</p>
+  /// reached, [Token.EOF] is added to the result set.
   ///
   /// @param s the ATN state
   /// @param stopState the ATN state to stop at. This can be a
@@ -81,11 +81,11 @@ class LL1Analyzer {
   /// Compute set of tokens that can follow [s] in the ATN in the
   /// specified [ctx].
   ///
-  /// <p>If [ctx] is null and [stopState] or the end of the
-  /// rule containing [s] is reached, {@link Token#EPSILON} is added to
+  /// If [ctx] is null and [stopState] or the end of the
+  /// rule containing [s] is reached, [Token.EPSILON] is added to
   /// the result set. If [ctx] is not null and [addEOF] is
   /// [true] and [stopState] or the end of the outermost rule is
-  /// reached, {@link Token#EOF} is added to the result set.</p>
+  /// reached, [Token.EOF] is added to the result set.
   ///
   /// @param s the ATN state.
   /// @param stopState the ATN state to stop at. This can be a
@@ -101,9 +101,9 @@ class LL1Analyzer {
   /// {@code new BitSet()} for this argument.
   /// @param seeThruPreds [true] to true semantic predicates as
   /// implicitly [true] and "see through them", otherwise [false]
-  /// to treat semantic predicates as opaque and add {@link #HIT_PRED} to the
+  /// to treat semantic predicates as opaque and add [HIT_PRED] to the
   /// result if one is encountered.
-  /// @param addEOF Add {@link Token#EOF} to the result if the end of the
+  /// @param addEOF Add [Token.EOF] to the result if the end of the
   /// outermost context is reached. This parameter has no effect if [ctx]
   /// is null.
   void _LOOK(

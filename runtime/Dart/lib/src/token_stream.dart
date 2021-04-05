@@ -13,8 +13,9 @@ import 'token_source.dart';
 /// An [IntStream] whose symbols are [Token] instances.
 abstract class TokenStream extends IntStream {
   /// Get the [Token] instance associated with the value returned by
-  /// {@link #LA LA(k)}. This method has the same pre- and post-conditions as
-  /// {@link IntStream#LA}. In addition, when the preconditions of this method
+  /// [LA]. This method has the same pre- and post-conditions as [IntStream.LA].
+  ///
+  /// In addition, when the preconditions of this method
   /// are met, the return value is non-null and the value of
   /// {@code LT(k).getType()==LA(k)}.
   ///
@@ -25,7 +26,7 @@ abstract class TokenStream extends IntStream {
   /// the preconditions of this method are met, the return value is non-null.
   ///
   /// <p>The preconditions for this method are the same as the preconditions of
-  /// {@link IntStream#seek}. If the behavior of {@code seek(index)} is
+  /// [IntStream.seek]. If the behavior of {@code seek(index)} is
   /// unspecified for the current state and given [index], then the
   /// behavior of this method is also unspecified.</p>
   ///
@@ -45,7 +46,7 @@ abstract class TokenStream extends IntStream {
 
   /// Return the text of all tokens within the specified [interval]. This
   /// method behaves like the following code (including potential exceptions
-  /// for violating preconditions of {@link #get}, but may be optimized by the
+  /// for violating preconditions of [get], but may be optimized by the
   /// specific implementation.
   ///
   /// <pre>
@@ -76,7 +77,7 @@ abstract class TokenStream extends IntStream {
 
   /// Return the text of all tokens in the source interval of the specified
   /// context. This method behaves like the following code, including potential
-  /// exceptions from the call to {@link #getText(Interval)}, but may be
+  /// exceptions from the call to [getText]`(Interval)`, but may be
   /// optimized by the specific implementation.
   ///
   /// <p>If {@code ctx.getSourceInterval()} does not return a valid interval of
@@ -94,7 +95,7 @@ abstract class TokenStream extends IntStream {
   /// this stream, or if the [stop] occurred before the [start]
   /// token, the behavior is unspecified.</p>
   ///
-  /// <p>For streams which ensure that the {@link Token#getTokenIndex} method is
+  /// <p>For streams which ensure that the [Token.tokenIndex] method is
   /// accurate for all of its provided tokens, this method behaves like the
   /// following code. Other streams may implement this method in other ways
   /// provided the behavior is consistent with this at a high level.</p>
@@ -121,29 +122,27 @@ abstract class TokenStream extends IntStream {
 /// [TokenSource] on-demand, and places the tokens in a buffer to provide
 /// access to any previous token by index.
 ///
-/// <p>
-/// This token stream ignores the value of {@link Token#getChannel}. If your
+/// This token stream ignores the value of [Token.channel]. If your
 /// parser requires the token stream filter tokens to only those on a particular
-/// channel, such as {@link Token#DEFAULT_CHANNEL} or
-/// {@link Token#HIDDEN_CHANNEL}, use a filtering token stream such a
-/// [CommonTokenStream].</p>
+/// channel, such as [Token.DEFAULT_CHANNEL] or [Token.HIDDEN_CHANNEL],
+/// use a filtering token stream such a [CommonTokenStream].
 class BufferedTokenStream implements TokenStream {
   /// The [TokenSource] from which tokens for this stream are fetched.
   TokenSource _tokenSource;
 
   /// A collection of all tokens fetched from the token source. The list is
-  /// considered a complete view of the input once {@link #fetchedEOF} is set
+  /// considered a complete view of the input once [fetchedEOF] is set
   /// to [true].
   List<Token> tokens = <Token>[];
 
   /// The index into [tokens] of the current token (next token to [consume]).
   /// [tokens][p] should be [LT(1)].
   ///
-  /// <p>This field is set to -1 when the stream is first constructed or when
+  /// This field is set to -1 when the stream is first constructed or when
   /// [tokenSource] is set, indicating that the first token has
   /// not yet been fetched from the token source. For additional information,
   /// see the documentation of [IntStream] for a description of
-  /// Initializing Methods.</p>
+  /// Initializing Methods.
   int p = -1;
 
   /// Indicates whether the [Token.EOF] token has been fetched from
@@ -151,11 +150,11 @@ class BufferedTokenStream implements TokenStream {
   /// performance for the following cases:
   ///
   /// <ul>
-  /// <li>{@link #consume}: The lookahead check in {@link #consume} to prevent
+  /// <li>[consume]: The lookahead check in [consume] to prevent
   /// consuming the EOF symbol is optimized by checking the values of
-  /// {@link #fetchedEOF} and {@link #p} instead of calling {@link #LA}.</li>
-  /// <li>{@link #fetch}: The check to prevent adding multiple EOF symbols into
-  /// [{@link #]tokens} is trivial with this field.</li>
+  /// [fetchedEOF] and [p] instead of calling [LA].</li>
+  /// <li>[fetch]: The check to prevent adding multiple EOF symbols into
+  /// [tokens] is trivial with this field.</li>
   /// <ul>
   bool fetchedEOF = false;
 
@@ -531,40 +530,34 @@ class BufferedTokenStream implements TokenStream {
 }
 
 /// This class extends [BufferedTokenStream] with functionality to filter
-/// token streams to tokens on a particular channel (tokens where
-/// {@link Token#getChannel} returns a particular value).
+/// token streams to tokens on a particular channel (tokens where [Token.channel]
+/// returns a particular value).
 ///
-/// <p>
 /// This token stream provides access to all tokens by index or when calling
-/// methods like {@link #getText}. The channel filtering is only used for code
-/// accessing tokens via the lookahead methods {@link #LA}, {@link #LT}, and
-/// {@link #LB}.</p>
+/// methods like [getText]. The channel filtering is only used for code
+/// accessing tokens via the lookahead methods [LA], [LT], and
+/// [LB].
 ///
-/// <p>
 /// By default, tokens are placed on the default channel
-/// ({@link Token#DEFAULT_CHANNEL}), but may be reassigned by using the
+/// ([Token.DEFAULT_CHANNEL]), but may be reassigned by using the
 /// {@code ->channel(HIDDEN)} lexer command, or by using an embedded action to
-/// call {@link Lexer#setChannel}.
-/// </p>
+/// set [Lexer.channel].
 ///
-/// <p>
 /// Note: lexer rules which use the {@code ->skip} lexer command or call
-/// {@link Lexer#skip} do not produce tokens at all, so input text matched by
+/// [Lexer.skip] do not produce tokens at all, so input text matched by
 /// such a rule will not be available as part of the token stream, regardless of
-/// channel.</p>we
+/// channel.
 class CommonTokenStream extends BufferedTokenStream {
   /// Specifies the channel to use for filtering tokens.
   ///
-  /// <p>
-  /// The default value is {@link Token#DEFAULT_CHANNEL}, which matches the
-  /// default channel assigned to tokens created by the lexer.</p>
+  /// The default value is [Token.DEFAULT_CHANNEL], which matches the
+  /// default channel assigned to tokens created by the lexer.
   int channel;
 
   /// Constructs a new [CommonTokenStream] using the specified token
   /// source and filtering tokens to the specified channel. Only tokens whose
-  /// {@link Token#getChannel} matches [channel] or have the
-  /// {@link Token#getType} equal to {@link Token#EOF} will be returned by the
-  /// token stream lookahead methods.
+  /// [Token.channel] matches [channel] or have the [Token.type] equal to
+  /// [Token.EOF] will be returned by the token stream lookahead methods.
   ///
   /// @param tokenSource The token source.
   /// @param channel The channel to use for filtering tokens.
