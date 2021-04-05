@@ -98,6 +98,7 @@ def swift_test():
     Run unit tests.
     """
     generate_parser()
+    check_call(["cd","./../.."])
     check_call(["swift", "test"])
 
 
