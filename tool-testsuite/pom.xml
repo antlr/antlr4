@@ -10,7 +10,7 @@
   <parent>
     <groupId>org.antlr</groupId>
     <artifactId>antlr4-master</artifactId>
-    <version>4.8-2-SNAPSHOT</version>
+    <version>4.9.3-SNAPSHOT</version>
   </parent>
   <artifactId>antlr4-tool-testsuite</artifactId>
   <name>ANTLR 4 Tool Tests</name>
@@ -45,8 +45,8 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.12</version>
-			<scope>test</scope>
+      <version>4.13.1</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 
@@ -67,7 +67,6 @@
           <systemPropertyVariables>
             <antlr-python2-runtime>../../antlr4-python2/src</antlr-python2-runtime>
             <antlr-python3-runtime>../../antlr4-python3/src</antlr-python3-runtime>
-            <antlr-csharp-runtime-project>../../antlr4-csharp/runtime/CSharp/Antlr4.Runtime/Antlr4.Runtime.mono.csproj</antlr-csharp-runtime-project>
             <antlr-cpp-runtime>../../antlr4-cpp/src</antlr-cpp-runtime>
             <antlr-javascript-runtime>../../antlr4-javascript/src</antlr-javascript-runtime>
           </systemPropertyVariables>

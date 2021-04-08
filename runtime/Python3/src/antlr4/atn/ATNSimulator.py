@@ -10,6 +10,7 @@ from antlr4.dfa.DFAState import DFAState
 
 
 class ATNSimulator(object):
+    __slots__ = ('atn', 'sharedContextCache', '__dict__')
 
     # Must distinguish between missing edge and edge we know leads nowhere#/
     ERROR = DFAState(configs=ATNConfigSet())
@@ -44,4 +45,3 @@ class ATNSimulator(object):
             return context
         visited = dict()
         return getCachedPredictionContext(context, self.sharedContextCache, visited)
-

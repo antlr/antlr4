@@ -3,7 +3,10 @@
 # Use of this file is governed by the BSD 3-clause license that
 # can be found in the LICENSE.txt file in the project root.
 import sys
-from typing.io import TextIO
+if sys.version_info[1] > 5:
+    from typing import TextIO
+else:
+    from typing.io import TextIO
 from antlr4.BufferedTokenStream import TokenStream
 from antlr4.CommonTokenFactory import TokenFactory
 from antlr4.error.ErrorStrategy import DefaultErrorStrategy
@@ -20,6 +23,7 @@ from antlr4.tree.ParseTreePatternMatcher import ParseTreePatternMatcher
 from antlr4.tree.Tree import ParseTreeListener, TerminalNode, ErrorNode
 
 class TraceListener(ParseTreeListener):
+    __slots__ = '_parser'
 
     def __init__(self, parser):
         self._parser = parser
@@ -41,7 +45,11 @@ class TraceListener(ParseTreeListener):
 
 # self is all the parsing support code essentially; most of it is error recovery stuff.#
 class Parser (Recognizer):
+    __slots__ = (
+        '_input', '_output', '_errHandler', '_precedenceStack', '_ctx',
+        'buildParseTrees', '_tracer', '_parseListeners', '_syntaxErrors'
 
+    )
     # self field maps from the serialized ATN string to the deserialized {@link ATN} with
     # bypass alternatives.
     #
@@ -445,7 +453,7 @@ class Parser (Recognizer):
     def getInvokingContext(self, ruleIndex:int):
         ctx = self._ctx
         while ctx is not None:
-            if ctx.ruleIndex == ruleIndex:
+            if ctx.getRuleIndex() == ruleIndex:
                 return ctx
             ctx = ctx.parentCtx
         return None

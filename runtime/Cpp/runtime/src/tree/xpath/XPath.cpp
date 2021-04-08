@@ -137,7 +137,7 @@ std::vector<ParseTree *> XPath::evaluate(ParseTree *t) {
 
   while (i < elements.size()) {
     std::vector<ParseTree *> next;
-    for (auto node : work) {
+    for (auto *node : work) {
       if (!node->children.empty()) {
         // only try to match next element if it has children
         // e.g., //func/*/stat might have a token node for which

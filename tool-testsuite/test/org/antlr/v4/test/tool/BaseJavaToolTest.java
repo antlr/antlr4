@@ -16,6 +16,7 @@ import java.io.File;
 import static org.junit.Assert.assertEquals;
 
 public class BaseJavaToolTest extends BaseJavaTest {
+
 	public void testErrors(String[] pairs, boolean printTree) {
         for (int i = 0; i < pairs.length; i+=2) {
             String grammarStr = pairs[i];
@@ -23,10 +24,10 @@ public class BaseJavaToolTest extends BaseJavaTest {
 
 			String[] lines = grammarStr.split("\n");
 			String fileName = getFilenameFromFirstLineOfGrammar(lines[0]);
-			ErrorQueue equeue = BaseRuntimeTest.antlrOnString(tmpdir, null, fileName, grammarStr, false); // use default language target in case test overrides
+			ErrorQueue equeue = BaseRuntimeTest.antlrOnString(getTempDirPath(), null, fileName, grammarStr, false); // use default language target in case test overrides
 
 			String actual = equeue.toString(true);
-			actual = actual.replace(tmpdir + File.separator, "");
+			actual = actual.replace(getTempDirPath() + File.separator, "");
 //			System.err.println(actual);
 			String msg = grammarStr;
 			msg = msg.replace("\n","\\n");

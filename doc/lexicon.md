@@ -26,8 +26,8 @@ The Javadoc comments are hidden from the parser and are ignored at the moment.  
 Token names always start with a capital letter and so do lexer rules as defined by Java’s `Character.isUpperCase` method. Parser rule names always start with a lowercase letter (those that fail `Character.isUpperCase`). The initial character can be followed by uppercase and lowercase letters, digits, and underscores. Here are some sample names:
 
 ```
-ID, LPAREN, RIGHT_CURLY // token names/rules
-expr, simpleDeclarator, d2, header_file // rule names
+ID, LPAREN, RIGHT_CURLY // token names/lexer rules
+expr, simpleDeclarator, d2, header_file // parser rule names
 ```
 
 Like Java, ANTLR accepts Unicode characters in ANTLR names:
@@ -79,7 +79,7 @@ These more or less correspond to `isJavaIdentifierPart` and `isJavaIdentifierSta
 
 ## Literals
 
-ANTLR does not distinguish between character and string literals as most languages do. All literal strings one or more characters in length are enclosed in single quotes such as `’;’`, `’if’`, `’>=’`, and `’\’` (refers to the one-character string containing the single quote character). Literals never contain regular expressions.
+ANTLR does not distinguish between character and string literals as most languages do. All literal strings one or more characters in length are enclosed in single quotes such as `’;’`, `’if’`, `’>=’`, and `’\’’` (refers to the one-character string containing the single quote character). Literals never contain regular expressions.
 
 Literals can contain Unicode escape sequences of the form `’\uXXXX’` (for Unicode code points up to `’U+FFFF’`) or `’\u{XXXXXX}’` (for all Unicode code points), where `’XXXX’` is the hexadecimal Unicode code point value.
 
@@ -96,7 +96,7 @@ The recognizers that ANTLR generates assume a character vocabulary containing al
 
 ## Actions
 
-Actions are code blocks written in the target language. You can use actions in a number of places within a grammar, but the syntax is always the same: arbitrary text surrounded by curly braces. You don’t need to escape a closing curly character if it’s in a string or comment: `"}"` or `/*}*/`. If the curlies are balanced, you also don’t need to escape }: `{...}`. Otherwise, escape extra curlies with a backslash: `\{` or `\}`. The action text should conform to the target language as specified with thelanguage option.
+Actions are code blocks written in the target language. You can use actions in a number of places within a grammar, but the syntax is always the same: arbitrary text surrounded by curly braces. You don’t need to escape a closing curly character if it’s in a string or comment: `"}"` or `/*}*/`. If the curlies are balanced, you also don’t need to escape }: `{...}`. Otherwise, escape extra curlies with a backslash: `\{` or `\}`. The action text should conform to the target language as specified with the language option.
 
 Embedded code can appear in: `@header` and `@members` named actions, parser and lexer rules, exception catching specifications, attribute sections for parser rules (return values, arguments, and locals), and some rule element options (currently predicates).
 

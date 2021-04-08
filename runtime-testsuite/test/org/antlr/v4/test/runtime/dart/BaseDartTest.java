@@ -6,39 +6,14 @@
 
 package org.antlr.v4.test.runtime.dart;
 
-import org.antlr.v4.Tool;
-import org.antlr.v4.analysis.AnalysisPipeline;
-import org.antlr.v4.automata.ATNFactory;
-import org.antlr.v4.automata.ATNPrinter;
-import org.antlr.v4.automata.LexerATNFactory;
-import org.antlr.v4.automata.ParserATNFactory;
-import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.misc.Utils;
-import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.atn.*;
-import org.antlr.v4.runtime.dfa.DFA;
-import org.antlr.v4.runtime.misc.IntegerList;
-import org.antlr.v4.runtime.misc.Interval;
-import org.antlr.v4.runtime.misc.Pair;
-import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.semantics.SemanticPipeline;
-import org.antlr.v4.test.runtime.BaseRuntimeTest;
-import org.antlr.v4.test.runtime.ErrorQueue;
-import org.antlr.v4.test.runtime.RuntimeTestSupport;
-import org.antlr.v4.test.runtime.StreamVacuum;
+import org.antlr.v4.test.runtime.*;
 import org.antlr.v4.test.runtime.descriptors.LexerExecDescriptors;
 import org.antlr.v4.test.runtime.descriptors.PerformanceDescriptors;
-import org.antlr.v4.tool.*;
 import org.stringtemplate.v4.ST;
-import org.stringtemplate.v4.STGroup;
-import org.stringtemplate.v4.STGroupString;
 
 import java.io.*;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.*;
 
 import static junit.framework.TestCase.*;
@@ -47,331 +22,17 @@ import static org.antlr.v4.test.runtime.BaseRuntimeTest.writeFile;
 import static org.junit.Assert.assertArrayEquals;
 
 
-public class BaseDartTest implements RuntimeTestSupport {
+public class BaseDartTest extends BaseRuntimeTestSupport implements RuntimeTestSupport {
+
 	private static final List<String> AOT_COMPILE_TESTS = Arrays.asList(
 		new PerformanceDescriptors.DropLoopEntryBranchInLRRule_4().input,
 		new LexerExecDescriptors.LargeLexer().input
 	);
 
-	public static final String newline = System.getProperty("line.separator");
-	public static final String pathSep = System.getProperty("path.separator");
-
-
-	/**
-	 * When the {@code antlr.preserve-test-dir} runtime property is set to
-	 * {@code true}, the temporary directories created by the test run will not
-	 * be removed at the end of the test run, even for tests that completed
-	 * successfully.
-	 * <p>
-	 * <p>
-	 * The default behavior (used in all other cases) is removing the temporary
-	 * directories for all tests which completed successfully, and preserving
-	 * the directories for tests which failed.</p>
-	 */
-	public static final boolean PRESERVE_TEST_DIR = Boolean.parseBoolean(System.getProperty("antlr.preserve-test-dir", "false"));
-
-	/**
-	 * The base test directory is the directory where generated files get placed
-	 * during unit test execution.
-	 * <p>
-	 * <p>
-	 * The default value for this property is the {@code java.io.tmpdir} system
-	 * property, and can be overridden by setting the
-	 * {@code antlr.java-test-dir} property to a custom location. Note that the
-	 * {@code antlr.java-test-dir} property directly affects the
-	 * {@link #CREATE_PER_TEST_DIRECTORIES} value as well.</p>
-	 */
-	public static final String BASE_TEST_DIR;
-
-	/**
-	 * When {@code true}, a temporary directory will be created for each test
-	 * executed during the test run.
-	 * <p>
-	 * <p>
-	 * This value is {@code true} when the {@code antlr.java-test-dir} system
-	 * property is set, and otherwise {@code false}.</p>
-	 */
-	public static final boolean CREATE_PER_TEST_DIRECTORIES;
-
-	static {
-		String baseTestDir = System.getProperty("antlr.dart-test-dir");
-		boolean perTestDirectories = false;
-		if (baseTestDir == null || baseTestDir.isEmpty()) {
-			baseTestDir = System.getProperty("java.io.tmpdir");
-			perTestDirectories = true;
-		}
-
-		if (!new File(baseTestDir).isDirectory()) {
-			throw new UnsupportedOperationException("The specified base test directory does not exist: " + baseTestDir);
-		}
-
-		BASE_TEST_DIR = baseTestDir;
-		CREATE_PER_TEST_DIRECTORIES = perTestDirectories;
-	}
-
-	/**
-	 * Build up the full classpath we need, including the surefire path (if present)
-	 */
-	public static final String CLASSPATH = System.getProperty("java.class.path");
-
-	public String tmpdir = null;
-
-	/**
-	 * If error during parser execution, store stderr here; can't return
-	 * stdout and stderr. This doesn't trap errors from running antlr.
-	 */
-	protected String stderrDuringParse;
-
-	/**
-	 * Errors found while running antlr
-	 */
-	protected StringBuilder antlrToolErrors;
-
 	private static String cacheDartPackages;
 
-	private String getPropertyPrefix() {
+	public String getPropertyPrefix() {
 		return "antlr-dart";
-	}
-
-	@Override
-	public void testSetUp() throws Exception {
-		if (CREATE_PER_TEST_DIRECTORIES) {
-			// new output dir for each test
-			String threadName = Thread.currentThread().getName();
-			String testDirectory = getClass().getSimpleName() + "-" + threadName + "-" + System.nanoTime();
-			tmpdir = new File(BASE_TEST_DIR, testDirectory).getAbsolutePath();
-		} else {
-			tmpdir = new File(BASE_TEST_DIR).getAbsolutePath();
-			if (!PRESERVE_TEST_DIR && new File(tmpdir).exists()) {
-				eraseFiles();
-			}
-		}
-		antlrToolErrors = new StringBuilder();
-	}
-
-	@Override
-	public void testTearDown() throws Exception {
-	}
-
-	@Override
-	public String getTmpDir() {
-		return tmpdir;
-	}
-
-	@Override
-	public String getStdout() {
-		return null;
-	}
-
-	@Override
-	public String getParseErrors() {
-		return stderrDuringParse;
-	}
-
-	@Override
-	public String getANTLRToolErrors() {
-		if (antlrToolErrors.length() == 0) {
-			return null;
-		}
-		return antlrToolErrors.toString();
-	}
-
-	protected Tool newTool(String[] args) {
-		Tool tool = new Tool(args);
-		return tool;
-	}
-
-	protected ATN createATN(Grammar g, boolean useSerializer) {
-		if (g.atn == null) {
-			semanticProcess(g);
-			assertEquals(0, g.tool.getNumErrors());
-
-			ParserATNFactory f;
-			if (g.isLexer()) {
-				f = new LexerATNFactory((LexerGrammar) g);
-			} else {
-				f = new ParserATNFactory(g);
-			}
-
-			g.atn = f.createATN();
-			assertEquals(0, g.tool.getNumErrors());
-		}
-
-		ATN atn = g.atn;
-		if (useSerializer) {
-			char[] serialized = ATNSerializer.getSerializedAsChars(atn);
-			return new ATNDeserializer().deserialize(serialized);
-		}
-
-		return atn;
-	}
-
-	protected void semanticProcess(Grammar g) {
-		if (g.ast != null && !g.ast.hasErrors) {
-//			System.out.println(g.ast.toStringTree());
-			Tool antlr = new Tool();
-			SemanticPipeline sem = new SemanticPipeline(g);
-			sem.process();
-			if (g.getImportedGrammars() != null) { // process imported grammars (if any)
-				for (Grammar imp : g.getImportedGrammars()) {
-					antlr.processNonCombinedGrammar(imp, false);
-				}
-			}
-		}
-	}
-
-	public DFA createDFA(Grammar g, DecisionState s) {
-//		PredictionDFAFactory conv = new PredictionDFAFactory(g, s);
-//		DFA dfa = conv.createDFA();
-//		conv.issueAmbiguityWarnings();
-//		System.out.print("DFA="+dfa);
-//		return dfa;
-		return null;
-	}
-
-//	public void minimizeDFA(DFA dfa) {
-//		DFAMinimizer dmin = new DFAMinimizer(dfa);
-//		dfa.minimized = dmin.minimize();
-//	}
-
-	IntegerList getTypesFromString(Grammar g, String expecting) {
-		IntegerList expectingTokenTypes = new IntegerList();
-		if (expecting != null && !expecting.trim().isEmpty()) {
-			for (String tname : expecting.replace(" ", "").split(",")) {
-				int ttype = g.getTokenType(tname);
-				expectingTokenTypes.add(ttype);
-			}
-		}
-		return expectingTokenTypes;
-	}
-
-	public IntegerList getTokenTypesViaATN(String input, LexerATNSimulator lexerATN) {
-		ANTLRInputStream in = new ANTLRInputStream(input);
-		IntegerList tokenTypes = new IntegerList();
-		int ttype;
-		do {
-			ttype = lexerATN.match(in, Lexer.DEFAULT_MODE);
-			tokenTypes.add(ttype);
-		} while (ttype != Token.EOF);
-		return tokenTypes;
-	}
-
-	public List<String> getTokenTypes(LexerGrammar lg,
-									  ATN atn,
-									  CharStream input) {
-		LexerATNSimulator interp = new LexerATNSimulator(atn, new DFA[]{new DFA(atn.modeToStartState.get(Lexer.DEFAULT_MODE))}, null);
-		List<String> tokenTypes = new ArrayList<String>();
-		int ttype;
-		boolean hitEOF = false;
-		do {
-			if (hitEOF) {
-				tokenTypes.add("EOF");
-				break;
-			}
-			int t = input.LA(1);
-			ttype = interp.match(input, Lexer.DEFAULT_MODE);
-			if (ttype == Token.EOF) {
-				tokenTypes.add("EOF");
-			} else {
-				tokenTypes.add(lg.typeToTokenList.get(ttype));
-			}
-
-			if (t == IntStream.EOF) {
-				hitEOF = true;
-			}
-		} while (ttype != Token.EOF);
-		return tokenTypes;
-	}
-
-	List<ANTLRMessage> checkRuleDFA(String gtext, String ruleName, String expecting)
-		throws Exception {
-		ErrorQueue equeue = new ErrorQueue();
-		Grammar g = new Grammar(gtext, equeue);
-		ATN atn = createATN(g, false);
-		ATNState s = atn.ruleToStartState[g.getRule(ruleName).index];
-		if (s == null) {
-			System.err.println("no such rule: " + ruleName);
-			return null;
-		}
-		ATNState t = s.transition(0).target;
-		if (!(t instanceof DecisionState)) {
-			System.out.println(ruleName + " has no decision");
-			return null;
-		}
-		DecisionState blk = (DecisionState) t;
-		checkRuleDFA(g, blk, expecting);
-		return equeue.all;
-	}
-
-	List<ANTLRMessage> checkRuleDFA(String gtext, int decision, String expecting)
-		throws Exception {
-		ErrorQueue equeue = new ErrorQueue();
-		Grammar g = new Grammar(gtext, equeue);
-		ATN atn = createATN(g, false);
-		DecisionState blk = atn.decisionToState.get(decision);
-		checkRuleDFA(g, blk, expecting);
-		return equeue.all;
-	}
-
-	void checkRuleDFA(Grammar g, DecisionState blk, String expecting)
-		throws Exception {
-		DFA dfa = createDFA(g, blk);
-		String result = null;
-		if (dfa != null) result = dfa.toString();
-		assertEquals(expecting, result);
-	}
-
-	List<ANTLRMessage> checkLexerDFA(String gtext, String expecting)
-		throws Exception {
-		return checkLexerDFA(gtext, LexerGrammar.DEFAULT_MODE_NAME, expecting);
-	}
-
-	List<ANTLRMessage> checkLexerDFA(String gtext, String modeName, String expecting)
-		throws Exception {
-		ErrorQueue equeue = new ErrorQueue();
-		LexerGrammar g = new LexerGrammar(gtext, equeue);
-		g.atn = createATN(g, false);
-//		LexerATNToDFAConverter conv = new LexerATNToDFAConverter(g);
-//		DFA dfa = conv.createDFA(modeName);
-//		g.setLookaheadDFA(0, dfa); // only one decision to worry about
-//
-//		String result = null;
-//		if ( dfa!=null ) result = dfa.toString();
-//		assertEquals(expecting, result);
-//
-//		return equeue.all;
-		return null;
-	}
-
-	protected String load(String fileName, String encoding)
-		throws IOException {
-		if (fileName == null) {
-			return null;
-		}
-
-		String fullFileName = getClass().getPackage().getName().replace('.', '/') + '/' + fileName;
-		int size = 65000;
-		InputStreamReader isr;
-		InputStream fis = getClass().getClassLoader().getResourceAsStream(fullFileName);
-		if (encoding != null) {
-			isr = new InputStreamReader(fis, encoding);
-		} else {
-			isr = new InputStreamReader(fis);
-		}
-		try {
-			char[] data = new char[size];
-			int n = isr.read(data);
-			return new String(data, 0, n);
-		} finally {
-			isr.close();
-		}
-	}
-
-	protected String execLexer(String grammarFileName,
-							   String grammarStr,
-							   String lexerName,
-							   String input) {
-		return execLexer(grammarFileName, grammarStr, lexerName, input, false);
 	}
 
 	@Override
@@ -385,69 +46,10 @@ public class BaseDartTest implements RuntimeTestSupport {
 			null,
 			lexerName);
 		assertTrue(success);
-		writeFile(tmpdir, "input", input);
+		writeFile(getTempDirPath(), "input", input);
 		writeLexerTestFile(lexerName, showDFA);
 		String output = execClass("Test", AOT_COMPILE_TESTS.contains(input));
 		return output;
-	}
-
-	public ParseTree execParser(String startRuleName, String input,
-								String parserName, String lexerName)
-		throws Exception {
-		Pair<Parser, Lexer> pl = getParserAndLexer(input, parserName, lexerName);
-		Parser parser = pl.a;
-		return execStartRule(startRuleName, parser);
-	}
-
-	public ParseTree execStartRule(String startRuleName, Parser parser)
-		throws IllegalAccessException, InvocationTargetException,
-		NoSuchMethodException {
-		Method startRule = null;
-		Object[] args = null;
-		try {
-			startRule = parser.getClass().getMethod(startRuleName);
-		} catch (NoSuchMethodException nsme) {
-			// try with int _p arg for recursive func
-			startRule = parser.getClass().getMethod(startRuleName, int.class);
-			args = new Integer[]{0};
-		}
-		ParseTree result = (ParseTree) startRule.invoke(parser, args);
-//		System.out.println("parse tree = "+result.toStringTree(parser));
-		return result;
-	}
-
-	public Pair<Parser, Lexer> getParserAndLexer(String input,
-												 String parserName, String lexerName)
-		throws Exception {
-		final Class<? extends Lexer> lexerClass = loadLexerClassFromTempDir(lexerName);
-		final Class<? extends Parser> parserClass = loadParserClassFromTempDir(parserName);
-
-		ANTLRInputStream in = new ANTLRInputStream(new StringReader(input));
-
-		Class<? extends Lexer> c = lexerClass.asSubclass(Lexer.class);
-		Constructor<? extends Lexer> ctor = c.getConstructor(CharStream.class);
-		Lexer lexer = ctor.newInstance(in);
-
-		Class<? extends Parser> pc = parserClass.asSubclass(Parser.class);
-		Constructor<? extends Parser> pctor = pc.getConstructor(TokenStream.class);
-		CommonTokenStream tokens = new CommonTokenStream(lexer);
-		Parser parser = pctor.newInstance(tokens);
-		return new Pair<Parser, Lexer>(parser, lexer);
-	}
-
-	public Class<?> loadClassFromTempDir(String name) throws Exception {
-		ClassLoader loader =
-			new URLClassLoader(new URL[]{new File(tmpdir).toURI().toURL()},
-				ClassLoader.getSystemClassLoader());
-		return loader.loadClass(name);
-	}
-
-	public Class<? extends Lexer> loadLexerClassFromTempDir(String name) throws Exception {
-		return loadClassFromTempDir(name).asSubclass(Lexer.class);
-	}
-
-	public Class<? extends Parser> loadParserClassFromTempDir(String name) throws Exception {
-		return loadClassFromTempDir(name).asSubclass(Parser.class);
 	}
 
 	@Override
@@ -480,7 +82,7 @@ public class BaseDartTest implements RuntimeTestSupport {
 			lexerName,
 			"-visitor");
 		assertTrue(success);
-		writeFile(tmpdir, "input", input);
+		writeFile(getTempDirPath(), "input", input);
 		return rawExecRecognizer(parserName,
 			lexerName,
 			startRuleName,
@@ -510,7 +112,7 @@ public class BaseDartTest implements RuntimeTestSupport {
 													boolean defaultListener,
 													String... extraOptions) {
 		ErrorQueue equeue =
-			BaseRuntimeTest.antlrOnString(getTmpDir(), "Dart", grammarFileName, grammarStr, defaultListener, extraOptions);
+			BaseRuntimeTest.antlrOnString(getTempDirPath(), "Dart", grammarFileName, grammarStr, defaultListener, extraOptions);
 		if (!equeue.errors.isEmpty()) {
 			return false;
 		}
@@ -534,17 +136,29 @@ public class BaseDartTest implements RuntimeTestSupport {
 		}
 
 		String runtime = locateRuntime();
-		writeFile(tmpdir, "pubspec.yaml",
+		writeFile(getTempDirPath(), "pubspec.yaml",
 			"name: \"test\"\n" +
 				"dependencies:\n" +
 				"  antlr4:\n" +
 				"    path: " + runtime + "\n");
 		if (cacheDartPackages == null) {
 			try {
-				Process process = Runtime.getRuntime().exec(new String[]{locatePub(), "get"}, null, new File(tmpdir));
+				final Process process = Runtime.getRuntime().exec(new String[]{locatePub(), "get"}, null, getTempTestDir());
 				StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
 				stderrVacuum.start();
+				Timer timer = new Timer();
+				timer.schedule(new TimerTask() {
+					@Override
+					public void run() {
+						try {
+							process.destroy();
+						} catch(Exception e) {
+							e.printStackTrace(System.err);
+						}
+					}
+				}, 30_000);
 				process.waitFor();
+				timer.cancel();
 				stderrVacuum.join();
 				String stderrDuringPubGet = stderrVacuum.toString();
 				if (!stderrDuringPubGet.isEmpty()) {
@@ -554,9 +168,9 @@ public class BaseDartTest implements RuntimeTestSupport {
 				e.printStackTrace();
 				return false;
 			}
-			cacheDartPackages = readFile(tmpdir, ".packages");
+			cacheDartPackages = readFile(getTempDirPath(), ".packages");
 		} else {
-			writeFile(tmpdir, ".packages", cacheDartPackages);
+			writeFile(getTempDirPath(), ".packages", cacheDartPackages);
 		}
 		return true; // allIsWell: no compile
 	}
@@ -567,7 +181,7 @@ public class BaseDartTest implements RuntimeTestSupport {
 									   boolean debug,
 									   boolean profile,
 									   boolean aotCompile) {
-		this.stderrDuringParse = null;
+		setParseErrors(null);
 		if (parserName == null) {
 			writeLexerTestFile(lexerName, false);
 		} else {
@@ -590,11 +204,23 @@ public class BaseDartTest implements RuntimeTestSupport {
 				};
 				String cmdLine = Utils.join(args, " ");
 				System.err.println("Compile: " + cmdLine);
-				Process process =
-					Runtime.getRuntime().exec(args, null, new File(tmpdir));
+				final Process process =
+					Runtime.getRuntime().exec(args, null, getTempTestDir());
 				StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
 				stderrVacuum.start();
+				Timer timer = new Timer();
+				timer.schedule(new TimerTask() {
+					@Override
+					public void run() {
+						try {
+							process.destroy();
+						} catch(Exception e) {
+							e.printStackTrace(System.err);
+						}
+					}
+				}, 30_000);
 				int result = process.waitFor();
+				timer.cancel();
 				if (result != 0) {
 					stderrVacuum.join();
 					System.err.print("Error compiling dart file: " + stderrVacuum.toString());
@@ -604,23 +230,35 @@ public class BaseDartTest implements RuntimeTestSupport {
 			String[] args;
 			if (compile) {
 				args = new String[]{
-					new File(tmpdir, className).getAbsolutePath(), new File(tmpdir, "input").getAbsolutePath()
+					new File(getTempTestDir(), className).getAbsolutePath(), new File(getTempTestDir(), "input").getAbsolutePath()
 				};
 			} else {
 				args = new String[]{
 					locateDart(),
-					className + ".dart", new File(tmpdir, "input").getAbsolutePath()
+					className + ".dart", new File(getTempTestDir(), "input").getAbsolutePath()
 				};
 			}
 			//String cmdLine = Utils.join(args, " ");
 			//System.err.println("execParser: " + cmdLine);
-			Process process =
-				Runtime.getRuntime().exec(args, null, new File(tmpdir));
+			final Process process =
+				Runtime.getRuntime().exec(args, null, getTempTestDir());
 			StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
 			StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
 			stdoutVacuum.start();
 			stderrVacuum.start();
+			Timer timer = new Timer();
+			timer.schedule(new TimerTask() {
+				@Override
+				public void run() {
+					try {
+						process.destroy();
+					} catch(Exception e) {
+						e.printStackTrace(System.err);
+					}
+				}
+			}, 30_000);
 			process.waitFor();
+			timer.cancel();
 			stdoutVacuum.join();
 			stderrVacuum.join();
 			String output = stdoutVacuum.toString();
@@ -628,7 +266,7 @@ public class BaseDartTest implements RuntimeTestSupport {
 				output = null;
 			}
 			if (stderrVacuum.toString().length() > 0) {
-				this.stderrDuringParse = stderrVacuum.toString();
+				setParseErrors(stderrVacuum.toString());
 			}
 			return output;
 		} catch (Exception e) {
@@ -731,187 +369,6 @@ public class BaseDartTest implements RuntimeTestSupport {
 		return runtimeSrc.getPath();
 	}
 
-	private boolean isWindows() {
-		return System.getProperty("os.name").toLowerCase().contains("windows");
-	}
-
-//	void ambig(List<Message> msgs, int[] expectedAmbigAlts, String expectedAmbigInput)
-//		throws Exception
-//	{
-//		ambig(msgs, 0, expectedAmbigAlts, expectedAmbigInput);
-//	}
-
-//	void ambig(List<Message> msgs, int i, int[] expectedAmbigAlts, String expectedAmbigInput)
-//		throws Exception
-//	{
-//		List<Message> amsgs = getMessagesOfType(msgs, AmbiguityMessage.class);
-//		AmbiguityMessage a = (AmbiguityMessage)amsgs.get(i);
-//		if ( a==null ) assertNull(expectedAmbigAlts);
-//		else {
-//			assertEquals(a.conflictingAlts.toString(), Arrays.toString(expectedAmbigAlts));
-//		}
-//		assertEquals(expectedAmbigInput, a.input);
-//	}
-
-//	void unreachable(List<Message> msgs, int[] expectedUnreachableAlts)
-//		throws Exception
-//	{
-//		unreachable(msgs, 0, expectedUnreachableAlts);
-//	}
-
-//	void unreachable(List<Message> msgs, int i, int[] expectedUnreachableAlts)
-//		throws Exception
-//	{
-//		List<Message> amsgs = getMessagesOfType(msgs, UnreachableAltsMessage.class);
-//		UnreachableAltsMessage u = (UnreachableAltsMessage)amsgs.get(i);
-//		if ( u==null ) assertNull(expectedUnreachableAlts);
-//		else {
-//			assertEquals(u.conflictingAlts.toString(), Arrays.toString(expectedUnreachableAlts));
-//		}
-//	}
-
-	List<ANTLRMessage> getMessagesOfType(List<ANTLRMessage> msgs, Class<? extends ANTLRMessage> c) {
-		List<ANTLRMessage> filtered = new ArrayList<ANTLRMessage>();
-		for (ANTLRMessage m : msgs) {
-			if (m.getClass() == c) filtered.add(m);
-		}
-		return filtered;
-	}
-
-	public void checkRuleATN(Grammar g, String ruleName, String expecting) {
-//		DOTGenerator dot = new DOTGenerator(g);
-//		System.out.println(dot.getDOT(g.atn.ruleToStartState[g.getRule(ruleName).index]));
-
-		Rule r = g.getRule(ruleName);
-		ATNState startState = g.getATN().ruleToStartState[r.index];
-		ATNPrinter serializer = new ATNPrinter(g, startState);
-		String result = serializer.asString();
-
-		//System.out.print(result);
-		assertEquals(expecting, result);
-	}
-
-	public void testActions(String templates, String actionName, String action, String expected) throws org.antlr.runtime.RecognitionException {
-		int lp = templates.indexOf('(');
-		String name = templates.substring(0, lp);
-		STGroup group = new STGroupString(templates);
-		ST st = group.getInstanceOf(name);
-		st.add(actionName, action);
-		String grammar = st.render();
-		ErrorQueue equeue = new ErrorQueue();
-		Grammar g = new Grammar(grammar, equeue);
-		if (g.ast != null && !g.ast.hasErrors) {
-			SemanticPipeline sem = new SemanticPipeline(g);
-			sem.process();
-
-			ATNFactory factory = new ParserATNFactory(g);
-			if (g.isLexer()) factory = new LexerATNFactory((LexerGrammar) g);
-			g.atn = factory.createATN();
-
-			AnalysisPipeline anal = new AnalysisPipeline(g);
-			anal.process();
-
-			CodeGenerator gen = new CodeGenerator(g);
-			ST outputFileST = gen.generateParser(false);
-			String output = outputFileST.render();
-			//System.out.println(output);
-			String b = "#" + actionName + "#";
-			int start = output.indexOf(b);
-			String e = "#end-" + actionName + "#";
-			int end = output.indexOf(e);
-			String snippet = output.substring(start + b.length(), end);
-			assertEquals(expected, snippet);
-		}
-		if (equeue.size() > 0) {
-//			System.err.println(equeue.toString());
-		}
-	}
-
-	protected void checkGrammarSemanticsError(ErrorQueue equeue,
-											  GrammarSemanticsMessage expectedMessage)
-		throws Exception {
-		ANTLRMessage foundMsg = null;
-		for (int i = 0; i < equeue.errors.size(); i++) {
-			ANTLRMessage m = equeue.errors.get(i);
-			if (m.getErrorType() == expectedMessage.getErrorType()) {
-				foundMsg = m;
-			}
-		}
-		assertNotNull("no error; " + expectedMessage.getErrorType() + " expected", foundMsg);
-		assertTrue("error is not a GrammarSemanticsMessage",
-			foundMsg instanceof GrammarSemanticsMessage);
-		assertEquals(Arrays.toString(expectedMessage.getArgs()), Arrays.toString(foundMsg.getArgs()));
-		if (equeue.size() != 1) {
-			System.err.println(equeue);
-		}
-	}
-
-	protected void checkGrammarSemanticsWarning(ErrorQueue equeue,
-												GrammarSemanticsMessage expectedMessage)
-		throws Exception {
-		ANTLRMessage foundMsg = null;
-		for (int i = 0; i < equeue.warnings.size(); i++) {
-			ANTLRMessage m = equeue.warnings.get(i);
-			if (m.getErrorType() == expectedMessage.getErrorType()) {
-				foundMsg = m;
-			}
-		}
-		assertNotNull("no error; " + expectedMessage.getErrorType() + " expected", foundMsg);
-		assertTrue("error is not a GrammarSemanticsMessage",
-			foundMsg instanceof GrammarSemanticsMessage);
-		assertEquals(Arrays.toString(expectedMessage.getArgs()), Arrays.toString(foundMsg.getArgs()));
-		if (equeue.size() != 1) {
-			System.err.println(equeue);
-		}
-	}
-
-	protected void checkError(ErrorQueue equeue,
-							  ANTLRMessage expectedMessage)
-		throws Exception {
-		//System.out.println("errors="+equeue);
-		ANTLRMessage foundMsg = null;
-		for (int i = 0; i < equeue.errors.size(); i++) {
-			ANTLRMessage m = equeue.errors.get(i);
-			if (m.getErrorType() == expectedMessage.getErrorType()) {
-				foundMsg = m;
-			}
-		}
-		assertTrue("no error; " + expectedMessage.getErrorType() + " expected", !equeue.errors.isEmpty());
-		assertTrue("too many errors; " + equeue.errors, equeue.errors.size() <= 1);
-		assertNotNull("couldn't find expected error: " + expectedMessage.getErrorType(), foundMsg);
-		/*
-		 * assertTrue("error is not a GrammarSemanticsMessage", foundMsg
-		 * instanceof GrammarSemanticsMessage);
-		 */
-		assertArrayEquals(expectedMessage.getArgs(), foundMsg.getArgs());
-	}
-
-	public static class FilteringTokenStream extends CommonTokenStream {
-		public FilteringTokenStream(TokenSource src) {
-			super(src);
-		}
-
-		Set<Integer> hide = new HashSet<Integer>();
-
-		@Override
-		protected boolean sync(int i) {
-			if (!super.sync(i)) {
-				return false;
-			}
-
-			Token t = get(i);
-			if (hide.contains(t.getType())) {
-				((WritableToken) t).setChannel(Token.HIDDEN_CHANNEL);
-			}
-
-			return true;
-		}
-
-		public void setTokenTypeChannel(int ttype, int channel) {
-			hide.add(ttype);
-		}
-	}
-
 	protected void writeTestFile(String parserName,
 								 String lexerName,
 								 String parserStartRuleName,
@@ -971,7 +428,7 @@ public class BaseDartTest implements RuntimeTestSupport {
 		outputFileST.add("parserName", parserName);
 		outputFileST.add("lexerName", lexerName);
 		outputFileST.add("parserStartRuleName", parserStartRuleName);
-		writeFile(tmpdir, "Test.dart", outputFileST.render());
+		writeFile(getTempDirPath(), "Test.dart", outputFileST.render());
 	}
 
 	protected void writeLexerTestFile(String lexerName, boolean showDFA) {
@@ -995,191 +452,7 @@ public class BaseDartTest implements RuntimeTestSupport {
 		);
 
 		outputFileST.add("lexerName", lexerName);
-		writeFile(tmpdir, "Test.dart", outputFileST.render());
+		writeFile(getTempDirPath(), "Test.dart", outputFileST.render());
 	}
 
-	protected void eraseFiles() {
-		if (tmpdir == null) {
-			return;
-		}
-
-		File tmpdirF = new File(tmpdir);
-		String[] files = tmpdirF.list();
-		for (int i = 0; files != null && i < files.length; i++) {
-			new File(tmpdir + "/" + files[i]).delete();
-		}
-	}
-
-	@Override
-	public void eraseTempDir() {
-		File tmpdirF = new File(tmpdir);
-		if (tmpdirF.exists()) {
-			eraseFiles();
-			tmpdirF.delete();
-		}
-	}
-
-	public String getFirstLineOfException() {
-		if (this.stderrDuringParse == null) {
-			return null;
-		}
-		String[] lines = this.stderrDuringParse.split("\n");
-		String prefix = "Exception in thread \"main\" ";
-		return lines[0].substring(prefix.length(), lines[0].length());
-	}
-
-	/**
-	 * When looking at a result set that consists of a Map/HashTable
-	 * we cannot rely on the output order, as the hashing algorithm or other aspects
-	 * of the implementation may be different on differnt JDKs or platforms. Hence
-	 * we take the Map, convert the keys to a List, sort them and Stringify the Map, which is a
-	 * bit of a hack, but guarantees that we get the same order on all systems. We assume that
-	 * the keys are strings.
-	 *
-	 * @param m The Map that contains keys we wish to return in sorted order
-	 * @return A string that represents all the keys in sorted order.
-	 */
-	public <K, V> String sortMapToString(Map<K, V> m) {
-		// Pass in crap, and get nothing back
-		//
-		if (m == null) {
-			return null;
-		}
-
-		System.out.println("Map toString looks like: " + m.toString());
-
-		// Sort the keys in the Map
-		//
-		TreeMap<K, V> nset = new TreeMap<K, V>(m);
-
-		System.out.println("Tree map looks like: " + nset.toString());
-		return nset.toString();
-	}
-
-	public List<String> realElements(List<String> elements) {
-		return elements.subList(Token.MIN_USER_TOKEN_TYPE, elements.size());
-	}
-
-	public void assertNotNullOrEmpty(String message, String text) {
-		assertNotNull(message, text);
-		assertFalse(message, text.isEmpty());
-	}
-
-	public void assertNotNullOrEmpty(String text) {
-		assertNotNull(text);
-		assertFalse(text.isEmpty());
-	}
-
-	public static class IntTokenStream implements TokenStream {
-		public IntegerList types;
-		int p = 0;
-
-		public IntTokenStream(IntegerList types) {
-			this.types = types;
-		}
-
-		@Override
-		public void consume() {
-			p++;
-		}
-
-		@Override
-		public int LA(int i) {
-			return LT(i).getType();
-		}
-
-		@Override
-		public int mark() {
-			return index();
-		}
-
-		@Override
-		public int index() {
-			return p;
-		}
-
-		@Override
-		public void release(int marker) {
-			seek(marker);
-		}
-
-		@Override
-		public void seek(int index) {
-			p = index;
-		}
-
-		@Override
-		public int size() {
-			return types.size();
-		}
-
-		@Override
-		public String getSourceName() {
-			return UNKNOWN_SOURCE_NAME;
-		}
-
-		@Override
-		public Token LT(int i) {
-			CommonToken t;
-			int rawIndex = p + i - 1;
-			if (rawIndex >= types.size()) t = new CommonToken(Token.EOF);
-			else t = new CommonToken(types.get(rawIndex));
-			t.setTokenIndex(rawIndex);
-			return t;
-		}
-
-		@Override
-		public Token get(int i) {
-			return new CommonToken(types.get(i));
-		}
-
-		@Override
-		public TokenSource getTokenSource() {
-			return null;
-		}
-
-		@Override
-		public String getText() {
-			throw new UnsupportedOperationException("can't give strings");
-		}
-
-		@Override
-		public String getText(Interval interval) {
-			throw new UnsupportedOperationException("can't give strings");
-		}
-
-		@Override
-		public String getText(RuleContext ctx) {
-			throw new UnsupportedOperationException("can't give strings");
-		}
-
-		@Override
-		public String getText(Token start, Token stop) {
-			throw new UnsupportedOperationException("can't give strings");
-		}
-	}
-
-	/**
-	 * Sort a list
-	 */
-	public <T extends Comparable<? super T>> List<T> sort(List<T> data) {
-		List<T> dup = new ArrayList<T>();
-		dup.addAll(data);
-		Collections.sort(dup);
-		return dup;
-	}
-
-	/**
-	 * Return map sorted by key
-	 */
-	public <K extends Comparable<? super K>, V> LinkedHashMap<K, V> sort(Map<K, V> data) {
-		LinkedHashMap<K, V> dup = new LinkedHashMap<K, V>();
-		List<K> keys = new ArrayList<K>();
-		keys.addAll(data.keySet());
-		Collections.sort(keys);
-		for (K k : keys) {
-			dup.put(k, data.get(k));
-		}
-		return dup;
-	}
 }

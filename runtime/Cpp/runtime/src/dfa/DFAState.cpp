@@ -42,7 +42,7 @@ DFAState::DFAState(std::unique_ptr<ATNConfigSet> configs_) : DFAState() {
 }
 
 DFAState::~DFAState() {
-  for (auto predicate : predicates) {
+  for (auto *predicate : predicates) {
     delete predicate;
   }
 }

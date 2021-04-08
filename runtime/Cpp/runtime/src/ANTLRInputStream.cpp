@@ -1,7 +1,9 @@
-﻿/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
+
+#include <string.h>
 
 #include "Exceptions.h"
 #include "misc/Interval.h"
@@ -17,27 +19,39 @@ using namespace antlrcpp;
 
 using misc::Interval;
 
-ANTLRInputStream::ANTLRInputStream(const std::string &input) {
+ANTLRInputStream::ANTLRInputStream() {
   InitializeInstanceFields();
-  load(input);
 }
 
-ANTLRInputStream::ANTLRInputStream(const char data_[], size_t numberOfActualCharsInArray)
-  : ANTLRInputStream(std::string(data_, numberOfActualCharsInArray)) {
+#if __cplusplus >= 201703L
+ANTLRInputStream::ANTLRInputStream(const std::string_view &input): ANTLRInputStream() {
+  load(input.data(), input.length());
+}
+#endif
+
+ANTLRInputStream::ANTLRInputStream(const std::string &input): ANTLRInputStream() {
+  load(input.data(), input.size());
 }
 
-ANTLRInputStream::ANTLRInputStream(std::istream &stream) {
-  InitializeInstanceFields();
+ANTLRInputStream::ANTLRInputStream(const char *data, size_t length) {
+  load(data, length);
+}
+
+ANTLRInputStream::ANTLRInputStream(std::istream &stream): ANTLRInputStream() {
   load(stream);
 }
 
 void ANTLRInputStream::load(const std::string &input) {
+  load(input.data(), input.size());
+}
+
+void ANTLRInputStream::load(const char *data, size_t length) {
   // Remove the UTF-8 BOM if present.
-  const char bom[4] = "\xef\xbb\xbf";
-  if (input.compare(0, 3, bom, 3) == 0)
-    _data = antlrcpp::utf8_to_utf32(input.data() + 3, input.data() + input.size());
+  const char *bom = "\xef\xbb\xbf";
+  if (length >= 3 && strncmp(data, bom, 3) == 0)
+    _data = antlrcpp::utf8_to_utf32(data + 3, data + length);
   else
-    _data = antlrcpp::utf8_to_utf32(input.data(), input.data() + input.size());
+    _data = antlrcpp::utf8_to_utf32(data, data + length);
   p = 0;
 }
 
@@ -48,7 +62,7 @@ void ANTLRInputStream::load(std::istream &stream) {
   _data.clear();
 
   std::string s((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
-  load(s);
+  load(s.data(), s.length());
 }
 
 void ANTLRInputStream::reset() {

@@ -57,8 +57,6 @@ using namespace antlr4;
 using namespace antlr4::atn;
 using namespace antlrcpp;
 
-const size_t ATNDeserializer::SERIALIZED_VERSION = 3;
-
 namespace {
 
 uint32_t deserializeInt32(const std::vector<uint16_t>& data, size_t offset) {

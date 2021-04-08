@@ -190,7 +190,7 @@ void Parser::removeParseListeners() {
 }
 
 void Parser::triggerEnterRuleEvent() {
-  for (auto listener : _parseListeners) {
+  for (auto *listener : _parseListeners) {
     listener->enterEveryRule(_ctx);
     _ctx->enterRule(listener);
   }
@@ -307,14 +307,14 @@ Token* Parser::consume() {
       tree::ErrorNode *node = createErrorNode(o);
       _ctx->addChild(node);
       if (_parseListeners.size() > 0) {
-        for (auto listener : _parseListeners) {
+        for (auto *listener : _parseListeners) {
           listener->visitErrorNode(node);
         }
       }
     } else {
       tree::TerminalNode *node = _ctx->addChild(createTerminalNode(o));
       if (_parseListeners.size() > 0) {
-        for (auto listener : _parseListeners) {
+        for (auto *listener : _parseListeners) {
           listener->visitTerminal(node);
         }
       }

@@ -30,10 +30,22 @@ namespace atn {
     // ml: originally Integer.MAX_VALUE, which would be -1 for us, but this is already used in places where
     //     -1 is converted to unsigned, so we use a different value here. Any value does the job provided it doesn't
     //     conflict with real return states.
-    static const size_t EMPTY_RETURN_STATE = static_cast<size_t>(-10); // std::numeric_limits<size_t>::max() - 9;
+#if __cplusplus >= 201703L
+    static constexpr size_t EMPTY_RETURN_STATE = std::numeric_limits<size_t>::max() - 9;
+#else
+    enum : size_t {
+      EMPTY_RETURN_STATE = static_cast<size_t>(-10), // std::numeric_limits<size_t>::max() - 9; doesn't work in VS 2013
+    };
+#endif
 
   private:
-    static const size_t INITIAL_HASH = 1;
+#if __cplusplus >= 201703L
+    static constexpr size_t INITIAL_HASH = 1;
+#else
+    enum : size_t {
+      INITIAL_HASH = 1,
+    };
+#endif
 
   public:
     static size_t globalNodeCount;

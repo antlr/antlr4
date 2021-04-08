@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -25,11 +25,18 @@ namespace antlr4 {
     /// What is name or source of this char stream?
     std::string name;
 
-    ANTLRInputStream(const std::string &input = "");
-    ANTLRInputStream(const char data_[], size_t numberOfActualCharsInArray);
+    ANTLRInputStream();
+    
+#if __cplusplus >= 201703L
+    ANTLRInputStream(const std::string_view &input);
+#endif
+    
+    ANTLRInputStream(const std::string &input);
+    ANTLRInputStream(const char *data, size_t length);
     ANTLRInputStream(std::istream &stream);
 
     virtual void load(const std::string &input);
+    virtual void load(const char *data, size_t length);
     virtual void load(std::istream &stream);
 
     /// Reset the stream so that it's in the same state it was

@@ -89,6 +89,7 @@ class StartRuleDoesNotConsumeFullPattern(Exception):
 
 
 class ParseTreePatternMatcher(object):
+    __slots__ = ('lexer', 'parser', 'start', 'stop', 'escape')
 
     # Constructs a {@link ParseTreePatternMatcher} or from a {@link Lexer} and
     # {@link Parser} object. The lexer input stream is altered for tokenizing

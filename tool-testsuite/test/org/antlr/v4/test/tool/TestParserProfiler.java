@@ -223,7 +223,7 @@ public class TestParserProfiler extends BaseJavaToolTest {
 			" {decision=1, contextSensitivities=0, errors=0, ambiguities=0, SLL_lookahead=6, " +
 			"SLL_ATNTransitions=3, SLL_DFATransitions=3, LL_Fallback=0, LL_lookahead=0, LL_ATNTransitions=0}]\n";
 		assertEquals(expecting, found);
-		assertEquals(null, stderrDuringParse);
+		assertEquals(null, getParseErrors());
 	}
 
 	public DecisionInfo[] interpAndGetDecisionInfo(

@@ -55,7 +55,7 @@ import java.util.Set;
 	name = "antlr4",
 	defaultPhase = LifecyclePhase.GENERATE_SOURCES,
 	requiresDependencyResolution = ResolutionScope.COMPILE,
-	requiresProject = true)
+	requiresProject = true, threadSafe = true)
 public class Antlr4Mojo extends AbstractMojo {
 
     // First, let's deal with the options that the ANTLR tool itself
