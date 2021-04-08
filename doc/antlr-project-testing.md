@@ -57,11 +57,9 @@ $ mvn install -DskipTests=true   # make sure all artifacts are visible on this m
 Now, make sure C# runtime is built and installed locally.
 
 ```bash
-cd ~/antlr/code/antlr4/runtime/CSharp/runtime/CSharp
-# kill previous ones manually as "xbuild /t:Clean" didn't seem to do it
-find . -name '*.dll' -exec rm {} \;
-# build
-xbuild /p:Configuration=Release Antlr4.Runtime/Antlr4.Runtime.mono.csproj
+cd ~/antlr/code/antlr4/runtime/CSharp/src
+rm -rf `find . -name '{obj,bin}'`
+dotnet build -c Release runtime/CSharp/src/Antlr4.csproj
 ```
 
 C++ test rig automatically builds C++ runtime during tests. Others don't need a prebuilt lib.

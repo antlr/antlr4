@@ -1,0 +1,27 @@
+<!-- Template generated code from Antlr4BuildTasks.dotnet-antlr v 1.3 -->
+<Project Sdk="Microsoft.NET.Sdk" >
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Antlr4 Include="asm8080.g4" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <AntlrToolPath>../../../../tool/target/antlr4-*-SNAPSHOT-complete.jar</AntlrToolPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Antlr4.csproj" />
+    <PackageReference Include="Antlr4BuildTasks" Version = "8.13" PrivateAssets="all"/>
+  </ItemGroup>
+
+  <PropertyGroup>
+    <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'" >
+    <NoWarn>1701;1702;3021</NoWarn>
+  </PropertyGroup>
+</Project>

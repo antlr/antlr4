@@ -41,6 +41,9 @@ namespace Antlr4.Runtime.Atn
     /// <since>4.3</since>
     public class AmbiguityInfo : DecisionEventInfo
     {
+        /** The set of alternative numbers for this decision event that lead to a valid parse. */
+        public BitSet ambigAlts;
+
         /// <summary>
         /// Constructs a new instance of the
         /// <see cref="AmbiguityInfo"/>
@@ -48,9 +51,11 @@ namespace Antlr4.Runtime.Atn
         /// specified detailed ambiguity information.
         /// </summary>
         /// <param name="decision">The decision number</param>
-        /// <param name="state">
-        /// The final simulator state identifying the ambiguous
+        /// <param name="configs">The final configuration set identifying the ambiguous
         /// alternatives for the current input
+        /// </param>
+        /// <param name="ambigAlts">The set of alternatives in the decision that lead to a valid parse.
+        /// The predicted alt is the min(ambigAlts)
         /// </param>
         /// <param name="input">The input token stream</param>
         /// <param name="startIndex">The start index for the current prediction</param>
@@ -58,9 +63,18 @@ namespace Antlr4.Runtime.Atn
         /// The index at which the ambiguity was identified during
         /// prediction
         /// </param>
-        public AmbiguityInfo(int decision, SimulatorState state, ITokenStream input, int startIndex, int stopIndex)
-            : base(decision, state, input, startIndex, stopIndex, state.useContext)
+        /// <param name="fullCtx">@code true} if the ambiguity was identified during LL
+        /// prediction; otherwise, {@code false} if the ambiguity was identified
+        /// during SLL prediction
+        /// </param>
+        public AmbiguityInfo(int decision,
+                 ATNConfigSet configs,
+                 BitSet ambigAlts,
+                 ITokenStream input, int startIndex, int stopIndex,
+                 bool fullCtx)
+        : base(decision, configs, input, startIndex, stopIndex, fullCtx)
         {
+            this.ambigAlts = ambigAlts;
         }
     }
 }

@@ -5,6 +5,7 @@
  */
 package org.antlr.v4.test.runtime.javascript;
 
+import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.test.runtime.*;
 import org.stringtemplate.v4.ST;
 
@@ -121,7 +122,7 @@ public class BaseNodeTest extends BaseRuntimeTestSupport implements RuntimeTestS
 	public String execModule(String fileName) {
 		try {
 			String npmPath = locateNpm();
-			if(!TestContext.isTravisCI() && !TestContext.isCircleCI()) {
+			if(!TestContext.isCI()) {
 				installRuntime(npmPath);
 				registerRuntime(npmPath);
 			}
@@ -203,7 +204,8 @@ public class BaseNodeTest extends BaseRuntimeTestSupport implements RuntimeTestS
 		args.addAll(Arrays.asList(npmPath, "link", "antlr4"));
 		ProcessBuilder builder = new ProcessBuilder(args.toArray(new String[0]));
 		builder.directory(getTempTestDir());
-		builder.redirectError(new File(getTempTestDir(), "error.txt"));
+		File errorFile = new File(getTempTestDir(), "error.txt");
+		builder.redirectError(errorFile);
 		builder.redirectOutput(new File(getTempTestDir(), "output.txt"));
 		Process process = builder.start();
 		// TODO switch to jdk 8
@@ -211,8 +213,10 @@ public class BaseNodeTest extends BaseRuntimeTestSupport implements RuntimeTestS
 		// if(!process.waitFor(30L, TimeUnit.SECONDS))
 		//	process.destroyForcibly();
 		int error = process.exitValue();
-		if(error!=0)
-			throw new IOException("'npm link antlr4' failed");
+		if(error!=0) {
+			char[] errors = Utils.readFile(errorFile.getAbsolutePath());
+			throw new IOException("'npm link antlr4' failed: " + new String(errors));
+		}
 	}
 
 	private boolean canExecute(String tool) {
@@ -237,6 +241,8 @@ public class BaseNodeTest extends BaseRuntimeTestSupport implements RuntimeTestS
 		// typically /usr/local/bin/npm
 		String prop = System.getProperty("antlr-javascript-npm");
 		if ( prop!=null && prop.length()!=0 ) {
+			if(prop.contains(" "))
+				prop = "\"" + prop + "\"";
 			return prop;
 		}
 		return "npm"; // everywhere
@@ -246,6 +252,8 @@ public class BaseNodeTest extends BaseRuntimeTestSupport implements RuntimeTestS
 		// typically /usr/local/bin/node
 		String prop = System.getProperty("antlr-javascript-nodejs");
 		if ( prop!=null && prop.length()!=0 ) {
+			if(prop.contains(" "))
+				prop = "\"" + prop + "\"";
 			return prop;
 		}
 		if (canExecute("nodejs")) {
