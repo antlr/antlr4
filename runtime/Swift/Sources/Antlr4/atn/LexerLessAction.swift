@@ -48,7 +48,7 @@ public final class LexerLessAction: LexerAction, CustomStringConvertible {
     /// 
     /// 
     /// 
-    /// This action is implemented by calling _org.antlr.v4.runtime.Lexer#more_.
+    /// This action is implemented by calling _org.antlr.v4.runtime.Lexer#less_.
     /// 
     override
     public func execute(_ lexer: Lexer) {

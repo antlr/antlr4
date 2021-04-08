@@ -29,7 +29,7 @@ namespace atn {
 
     /// <summary>
     /// {@inheritDoc} </summary>
-    /// <returns> This method returns <seealso cref="LexerActionType#MORE"/>. </returns>
+    /// <returns> This method returns <seealso cref="LexerActionType#LESS"/>. </returns>
     virtual LexerActionType getActionType() const override;
 
     /// <summary>
