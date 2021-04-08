@@ -22,5 +22,23 @@
     <Lib  Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
         <AdditionalLibraryDirectories>$(MSBuildThisFileDirectory)x64\rel;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
+    <Link  Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+        <AdditionalLibraryDirectories>$(MSBuildThisFileDirectory)x86\dbg;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+    <Link  Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
+        <AdditionalLibraryDirectories>$(MSBuildThisFileDirectory)x86\dbg;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+    <Link  Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+        <AdditionalLibraryDirectories>$(MSBuildThisFileDirectory)x64\dbg;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+    <Link  Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+        <AdditionalLibraryDirectories>$(MSBuildThisFileDirectory)x86\rel;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+    <Link  Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
+        <AdditionalLibraryDirectories>$(MSBuildThisFileDirectory)x86\rel;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+    <Link  Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+        <AdditionalLibraryDirectories>$(MSBuildThisFileDirectory)x64\rel;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
   </ItemDefinitionGroup>
 </Project>
