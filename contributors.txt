@@ -285,3 +285,12 @@ YYYY/MM/DD, github id, Full name, email
 2020/12/01, maxence-lefebvre, Maxence Lefebvre, maxence-lefebvre@users.noreply.github.com
 2020/12/03, electrum, David Phillips, david@acz.org
 2021/01/11, zosrothko, Francis ANDRE, francis.andre.kampbell@orange.fr
+2021/01/25, l215884529, Qiheng Liu, 13607681+l215884529@users.noreply.github.com
+2021/02/02, tsotnikov, Taras Sotnikov, taras.sotnikov@gmail.com
+2021/02/10, jirislaby, Jiri Slaby, jirislaby@gmail.com
+2021/02/21, namasikanam, Xingyu Xie, namasikanam@gmail.com
+2021/02/27, khmarbaise, Karl Heinz Marbaise, github@soebes.com
+2021/03/02, hackeris
+2021/03/03, xTachyon, Damian Andrei, xTachyon@users.noreply.github.com
+2021/04/08, bigerl, Alexander Bigerl, bigerl@mail.upb.de
+2021/04/07, b1f6c1c4, Jinzheng Tu, b1f6c1c4@gmail.com

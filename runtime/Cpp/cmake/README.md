@@ -31,7 +31,7 @@ include_directories(${ANTLR4_INCLUDE_DIRS})
 
 # set variable pointing to the antlr tool that supports C++
 # this is not required if the jar file can be found under PATH environment
-set(ANTLR_EXECUTABLE /home/user/antlr-4.9.1-complete.jar)
+set(ANTLR_EXECUTABLE /home/user/antlr-4.9.2-complete.jar)
 # add macros to generate ANTLR Cpp code from grammar
 find_package(ANTLR REQUIRED)
 
@@ -128,6 +128,8 @@ ANTLR4_TAG - branch/tag used for building antlr4 library
 The ANTLR C++ runtime source is downloaded from GitHub by default. However, users may specify `ANTLR4_ZIP_REPOSITORY` to list the zip file from [ANTLR downloads](http://www.antlr.org/download.html) (under *C++ Target*). This variable can list a zip file included in the project directory; this is useful for maintaining a canonical source for each new build.
 
 Visual C++ compiler users may want to additionally define `ANTLR4_WITH_STATIC_CRT` before including the file. Set `ANTLR4_WITH_STATIC_CRT` to true if ANTLR4 C++ runtime library should be compiled with `/MT` flag, otherwise will be compiled with `/MD` flag. This variable has a default value of `OFF`. Changing `ANTLR4_WITH_STATIC_CRT` after building the library may require reinitialization of CMake or `clean` for the library to get rebuilt.
+
+You may need to modify your local copy of ExternalAntlr4Cpp.cpp to modify some build settings. For example, to specify the C++ standard to use when building the runtime, add `-DCMAKE_CXX_STANDARD:STRING=17` to `CMAKE_CACHE_ARGS`.
 
 ### Examples
 

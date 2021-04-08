@@ -4,22 +4,24 @@ if (!String.prototype.codePointAt) {
 		'use strict'; // needed to support `apply`/`call` with `undefined`/`null`
 		var defineProperty = (function() {
 			// IE 8 only supports `Object.defineProperty` on DOM elements
+			let result;
 			try {
-				var object = {};
-				var $defineProperty = Object.defineProperty;
-				var result = $defineProperty(object, object, object) && $defineProperty;
-			} catch(error) {}
+				const object = {};
+				const $defineProperty = Object.defineProperty;
+				result = $defineProperty(object, object, object) && $defineProperty;
+			} catch(error) {
+			}
 			return result;
 		}());
-		var codePointAt = function(position) {
+		const codePointAt = function(position) {
 			if (this == null) {
 				throw TypeError();
 			}
-			var string = String(this);
-			var size = string.length;
+			const string = String(this);
+			const size = string.length;
 			// `ToInteger`
-			var index = position ? Number(position) : 0;
-			if (index != index) { // better `isNaN`
+			let index = position ? Number(position) : 0;
+			if (index !== index) { // better `isNaN`
 				index = 0;
 			}
 			// Account for out-of-bounds indices:
@@ -27,8 +29,8 @@ if (!String.prototype.codePointAt) {
 				return undefined;
 			}
 			// Get the first code unit
-			var first = string.charCodeAt(index);
-			var second;
+			const first = string.charCodeAt(index);
+			let second;
 			if ( // check if it’s the start of a surrogate pair
 				first >= 0xD800 && first <= 0xDBFF && // high surrogate
 				size > index + 1 // there is a next code unit
