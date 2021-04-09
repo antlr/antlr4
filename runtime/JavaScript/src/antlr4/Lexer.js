@@ -372,6 +372,7 @@ class Lexer extends Recognizer {
 Lexer.DEFAULT_MODE = 0;
 Lexer.MORE = -2;
 Lexer.SKIP = -3;
+Lexer.LESS = -4;
 
 Lexer.DEFAULT_TOKEN_CHANNEL = Token.DEFAULT_CHANNEL;
 Lexer.HIDDEN = Token.HIDDEN_CHANNEL;
