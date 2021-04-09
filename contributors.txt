@@ -291,5 +291,4 @@ YYYY/MM/DD, github id, Full name, email
 2021/02/27, khmarbaise, Karl Heinz Marbaise, github@soebes.com
 2021/03/02, hackeris
 2021/03/03, xTachyon, Damian Andrei, xTachyon@users.noreply.github.com
-2021/04/08, bigerl, Alexander Bigerl, bigerl@mail.upb.de
 2021/04/07, b1f6c1c4, Jinzheng Tu, b1f6c1c4@gmail.com
