@@ -51,6 +51,8 @@ namespace atn {
     TYPE,
     /// <summary>
     /// The type of a <seealso cref="LexerLessAction"/> action.
+    ///
+    /// @since 4.9.3
     /// </summary>
     LESS,
   };

@@ -47,6 +47,8 @@ public enum LexerActionType {
 	TYPE,
 	/**
 	 * The type of a {@link LexerLessAction} action.
+	 *
+	 * @since 4.9.3
 	 */
 	LESS,
 }

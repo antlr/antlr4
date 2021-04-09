@@ -22,8 +22,8 @@ namespace Antlr4.Runtime.Atn
     /// <see cref="Instance"/>
     /// .</p>
     /// </summary>
-    /// <author>Sam Harwell</author>
-    /// <since>4.2</since>
+    /// <author>David Kleszyk</author>
+    /// <since>4.9.3</since>
     public sealed class LexerLessAction : ILexerAction
     {
         /// <summary>Provides a singleton instance of this parameterless lexer action.</summary>

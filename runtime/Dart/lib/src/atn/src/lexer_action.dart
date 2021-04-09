@@ -28,6 +28,8 @@ enum LexerActionType {
   /// The type of a [LexerTypeAction] action.
   TYPE,
   /// The type of a [LexerLessAction] action.
+  ///
+  /// @since 4.9.3
   LESS,
 }
 
@@ -204,7 +206,7 @@ class LexerCustomAction implements LexerAction {
 /// <p>The [less] command does not have any parameters, so this action is
 /// implemented as a singleton instance exposed by {@link #INSTANCE}.</p>
 ///
-/// @since 4.2
+/// @since 4.9.3
 class LexerLessAction implements LexerAction {
   /// Provides a singleton instance of this parameterless lexer action.
   static final LexerLessAction INSTANCE = LexerLessAction();

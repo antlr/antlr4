@@ -15,8 +15,8 @@ import org.antlr.v4.runtime.misc.MurmurHash;
  * <p>The {@code less} command does not have any parameters, so this action is
  * implemented as a singleton instance exposed by {@link #INSTANCE}.</p>
  *
- * @author Sam Harwell
- * @since 4.2
+ * @author David Kleszyk
+ * @since 4.9.3
  */
 public final class LexerLessAction implements LexerAction {
 	/**

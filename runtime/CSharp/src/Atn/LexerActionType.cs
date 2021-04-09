@@ -19,6 +19,7 @@ namespace Antlr4.Runtime.Atn
         PushMode,
         Skip,
         Type,
+        /// <since>4.9.3</since>
         Less
     }
 }

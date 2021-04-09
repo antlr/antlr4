@@ -17,8 +17,8 @@ namespace atn {
   /// <para>The {@code less} command does not have any parameters, so this action is
   /// implemented as a singleton instance exposed by <seealso cref="#INSTANCE"/>.</para>
   ///
-  /// @author Sam Harwell
-  /// @since 4.2
+  /// @author David Kleszyk
+  /// @since 4.9.3
   /// </summary>
   class ANTLR4CPP_PUBLIC LexerLessAction final : public LexerAction {
   public:

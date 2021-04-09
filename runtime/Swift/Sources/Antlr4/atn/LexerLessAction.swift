@@ -11,8 +11,8 @@
 /// The `less` command does not have any parameters, so this action is
 /// implemented as a singleton instance exposed by _#INSTANCE_.
 /// 
-/// -  Sam Harwell
-/// -  4.2
+/// -  David Kleszyk
+/// -  4.9.3
 /// 
 
 public final class LexerLessAction: LexerAction, CustomStringConvertible {
