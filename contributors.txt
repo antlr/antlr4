@@ -269,6 +269,7 @@ YYYY/MM/DD, github id, Full name, email
 2020/06/02, cohomology, Kilian Kilger, kkilger AT gmail.com
 2020/06/04, IohannRabeson, Iohann Rabeson, iotaka6@gmail.com
 2020/06/04, sigmasoldi3r, Pablo Blanco, pablobc.1995@gmail.com
+2020/06/15, mattpaletta, Matthew Paletta, mattpaletta@gmail.com
 2020/07/01, sha-N, Shan M Mathews, admin@bluestarqatar.com
 2020/08/22, stevenjohnstone, Steven Johnstone, steven.james.johnstone@gmail.com
 2020/09/06, ArthurSonzogni, Sonzogni Arthur, arthursonzogni@gmail.com
@@ -292,5 +293,5 @@ YYYY/MM/DD, github id, Full name, email
 2021/02/27, khmarbaise, Karl Heinz Marbaise, github@soebes.com
 2021/03/02, hackeris
 2021/03/03, xTachyon, Damian Andrei, xTachyon@users.noreply.github.com
-2021/04/08, bigerl, Alexander Bigerl, bigerl@mail.upb.de
 2021/04/07, b1f6c1c4, Jinzheng Tu, b1f6c1c4@gmail.com
+2021/04/08, bigerl, Alexander Bigerl, bigerl@mail.upb.de
