@@ -39,7 +39,8 @@ find_package(utf8cpp QUIET)
 
 set(INSTALL_utf8cpp FALSE)
 
-if (utf8cpp_FOUND)
+if (utf8cpp_FOUND OR TARGET utf8cpp)
+  # If found through system install or as part of CMake tree, use it.
   target_link_libraries(antlr4_shared utf8cpp)
   target_link_libraries(antlr4_static utf8cpp)
 else()
@@ -163,6 +164,3 @@ if (INSTALL_utf8cpp)
 	  FILES_MATCHING PATTERN "*.h"
 	  )
 endif()
-
-
-
