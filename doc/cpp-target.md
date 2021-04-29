@@ -72,7 +72,7 @@ int main(int argc, const char* argv[]) {
 
 ```
  
-This example assumes your grammar contains a parser rule named `key` for which the enterKey function was generated.
+This example assumes your grammar contains a parser rule named `key` for which the `enterKey` function was generated.
 
 ## Special cases for this ANTLR target
 
@@ -103,7 +103,9 @@ In order to create a static lib in Visual Studio define the `ANTLR4CPP_STATIC` m
 For gcc and clang it is possible to use the `-fvisibility=hidden` setting to hide all symbols except those that are made default-visible (which has been defined for all public classes in the runtime).
 
 ### Memory Management
-Since C++ has no built-in memory management we need to take extra care. For that we rely mostly on smart pointers, which however might cause time penalties or memory side effects (like cyclic references) if not used with care. Currently however the memory household looks very stable. Generally, when you see a raw pointer in code consider this as being managed elsewehere. You should never try to manage such a pointer (delete, assign to smart pointer etc.).
+Since C++ has no built-in memory management we need to take extra care. For that we rely mostly on smart pointers, which however might cause time penalties or memory side effects (like cyclic references) if not used with care. Currently however the memory household looks very stable. Generally, when you see a raw pointer in code consider this as being managed elsewhere. You should never try to manage such a pointer (delete, assign to smart pointer etc.).
+
+Accordingly a parse tree is only valid for the lifetime of its parser. The parser, in turn, is only valid for the lifetime of its token stream, and so on back to the original `ANTLRInputStream` (or equivalent). To retain a tree across function calls you'll need to create and store all of these and `delete` all but the tree when you no longer need it.
 
 ### Unicode Support
 Encoding is mostly an input issue, i.e. when the lexer converts text input into lexer tokens. The parser is completely encoding unaware.
@@ -111,7 +113,7 @@ Encoding is mostly an input issue, i.e. when the lexer converts text input into 
 The C++ target always expects UTF-8 input (either in a string or stream) which is then converted to UTF-32 (a char32_t array) and fed to the lexer.
 
 ### Named Actions
-In order to help customizing the generated files there are a number of additional socalled **named actions**. These actions are tight to specific areas in the generated code and allow to add custom (target specific) code. All targets support these actions
+In order to help customizing the generated files there are a number of additional so-called **named actions**. These actions are tight to specific areas in the generated code and allow to add custom (target specific) code. All targets support these actions
 
 * @parser::header
 * @parser::members
@@ -127,7 +129,7 @@ In addition to that the C++ target supports many more such named actions. Unfort
 * **@lexer::preinclude** - Placed right before the first #include (e.g. good for headers that must appear first, for system headers etc.). Appears in both lexer h and cpp file.
 * **@lexer::postinclude** - Placed right after the last #include, but before any class code (e.g. for additional namespaces). Appears in both lexer h and cpp file.
 * **@lexer::context** - Placed right before the lexer class declaration. Use for e.g. additional types, aliases, forward declarations and the like. Appears in the lexer h file.
-* **@lexer::declarations** - Placed in the private section of the lexer declaration (generated sections in all classes strictly follow the pattern: public, protected, privat, from top to bottom). Use this for private vars etc.
+* **@lexer::declarations** - Placed in the private section of the lexer declaration (generated sections in all classes strictly follow the pattern: public, protected, private, from top to bottom). Use this for private vars etc.
 * **@lexer::definitions** - Placed before other implementations in the cpp file (but after *@postinclude*). Use this to implement e.g. private types.
 
 For the parser there are the same actions as shown above for the lexer. In addition to that there are even more actions for visitor and listener classes:
