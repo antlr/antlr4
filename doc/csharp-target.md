@@ -2,19 +2,23 @@
 
 ## Which frameworks are supported?
 
-The C# runtime is CLS compliant, and only requires a corresponding 3.5 .Net framework.
+The ANTLR C# runtime is a .NET Standard 2.0 library. The versions of .NET that support .NET Standard 2.0 include:
 
-In practice, the runtime has been extensively tested against:
+* .NET 5.0
+* .NET Core 2.0
+* .NET Framework 4.6.1 (.NET Framework 4.7.2 recommended for best experience)
+* Mono 5.4
+* Xamarin.iOS 10.14
+* Xamarin.Mac 3.8
+* Xamarin.Android 8.0
+* Universal Windows Platform 10.0.16299
 
-* Microsoft .Net 3.5 framework
-* Mono .Net 3.5 framework
-
-No issue was found, so you should find that the runtime works pretty much against any recent .Net framework.
+For more information about .NET Standard, see [Microsoft's documentation](https://docs.microsoft.com/dotnet/standard/net-standard).
 
 ## How do I get started?
 
-You will find full instructions on the [Git repo page for ANTLR C# runtime](https://github.com/antlr/antlr4/tree/master/runtime/CSharp).
- 
+You will find full instructions [on this page](../runtime/CSharp/src/README.md).
+
 ## How do I use the runtime from my project?
 
 (i.e., How do I run the generated lexer and/or parser?)
