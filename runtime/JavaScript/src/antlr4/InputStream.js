@@ -29,9 +29,10 @@ class InputStream {
 				i += codePoint <= 0xFFFF ? 1 : 2;
 			}
 		} else {
+			this.data = new Array(this.strdata.length);
 			for (let i = 0; i < this.strdata.length; i++) {
 				const codeUnit = this.strdata.charCodeAt(i);
-				this.data.push(codeUnit);
+				this.data[i] = codeUnit;
 			}
 		}
 		this._size = this.data.length;
