@@ -30,6 +30,6 @@ docker run --rm -u $(id -u ${USER}):$(id -g ${USER}) -v `pwd`:/work antlr/antlr4
 
 ## Integration as alias
 
-      alias antrl4='docker run -it -u $(id -u ${USER}):$(id -g ${USER}) -v $(pwd):/work antlr $@'
+      alias antlr4='docker run -it -u $(id -u ${USER}):$(id -g ${USER}) -v $(pwd):/work antlr/antlr4 $@'
 
 
