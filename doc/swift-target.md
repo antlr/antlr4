@@ -136,7 +136,7 @@ The runtime and generated grammar should now build correctly.
 ### Swift Package Manager Projects
 
 Since we cannot have a separate repository for Swift target (see issue [#1774](https://github.com/antlr/antlr4/issues/1774)), 
-and Swift is currently not ABI stable. We currently support support SPM-based
+and Swift is currently not ABI stable. We currently support SPM-based
 projects by creating temporary local repository.
 
 For people using [Swift Package Manager](https://swift.org/package-manager/),
