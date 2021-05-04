@@ -58,16 +58,40 @@ type ParseTreeVisitor interface {
 	VisitChildren(node RuleNode) interface{}
 	VisitTerminal(node TerminalNode) interface{}
 	VisitErrorNode(node ErrorNode) interface{}
+	VisitNonTerminalChildren(node RuleNode) interface{}
 }
 
 type BaseParseTreeVisitor struct{}
 
 var _ ParseTreeVisitor = &BaseParseTreeVisitor{}
 
-func (v *BaseParseTreeVisitor) Visit(tree ParseTree) interface{}            { return nil }
-func (v *BaseParseTreeVisitor) VisitChildren(node RuleNode) interface{}     { return nil }
-func (v *BaseParseTreeVisitor) VisitTerminal(node TerminalNode) interface{} { return nil }
-func (v *BaseParseTreeVisitor) VisitErrorNode(node ErrorNode) interface{}   { return nil }
+func (v *BaseParseTreeVisitor) Visit(tree ParseTree) interface{} {
+	return tree.Accept(v)
+}
+
+func (v *BaseParseTreeVisitor) VisitChildren(node RuleNode) interface{} {
+
+	var result []interface{}
+	n := node.GetChildCount()
+	for i := 0; i < n; i++ {
+		if !v.shouldVisitNextChild(node, result) {
+			break
+		}
+
+		c := node.GetChild(i).(ParseTree)
+		childResult := c.Accept(v)
+		result = append(result, childResult)
+	}
+	return result
+}
+
+func (v *BaseParseTreeVisitor) shouldVisitNextChild(_ RuleNode, _ interface{}) bool {
+	return true
+}
+
+func (v *BaseParseTreeVisitor) VisitTerminal(node TerminalNode) interface{}        { return nil }
+func (v *BaseParseTreeVisitor) VisitErrorNode(node ErrorNode) interface{}          { return nil }
+func (v *BaseParseTreeVisitor) VisitNonTerminalChildren(node RuleNode) interface{} { return nil }
 
 // TODO
 //func (this ParseTreeVisitor) Visit(ctx) {
