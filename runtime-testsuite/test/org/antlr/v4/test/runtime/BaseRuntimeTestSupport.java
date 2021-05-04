@@ -14,11 +14,16 @@ import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
 import java.util.Locale;
 import java.util.logging.Logger;
 
 import static org.junit.Assert.assertEquals;
 
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public abstract class BaseRuntimeTestSupport implements RuntimeTestSupport {
 
 	// -J-Dorg.antlr.v4.test.BaseTest.level=FINE
@@ -102,8 +107,7 @@ public abstract class BaseRuntimeTestSupport implements RuntimeTestSupport {
 		String prop = System.getProperty(propName);
 		if(prop!=null && prop.length()>0) {
 			tempTestDir = new File(prop);
-		}
-		else {
+		} else {
 			String dirName = getClass().getSimpleName() +  "-" + Thread.currentThread().getName() + "-" + System.currentTimeMillis();
 			tempTestDir = new File(System.getProperty("java.io.tmpdir"), dirName);
 		}
@@ -149,26 +153,41 @@ public abstract class BaseRuntimeTestSupport implements RuntimeTestSupport {
 	public static void eraseFilesInDir(File dir) {
 		String[] files = dir.list();
 		for(int i = 0; files!=null && i < files.length; i++) {
-			File file = new File(dir,files[i]);
-			if(file.isDirectory())
-				eraseDirectory(file);
-			else
-				file.delete();
+			try {
+				eraseFile(dir, files[i]);
+			} catch(IOException e) {
+				logger.info(e.getMessage());
+			}
 		}
 	}
+
+	private static void eraseFile(File dir, String name) throws IOException {
+		File file = new File(dir,name);
+		if(Files.isSymbolicLink((file.toPath())))
+			Files.delete(file.toPath());
+		else if(file.isDirectory()) {
+			// work around issue where Files.isSymbolicLink returns false on Windows for node/antlr4 linked package
+			if("antlr4".equals(name))
+				; // logger.warning("antlr4 not seen as a symlink");
+			else
+				eraseDirectory(file);
+		} else
+			file.delete();
+	}
+
 
 	private static String detectedOS;
 
 	public static String getOS() {
 		if (detectedOS == null) {
 			String os = System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH);
-			if ((os.indexOf("mac") >= 0) || (os.indexOf("darwin") >= 0)) {
+			if (os.contains("mac") || os.contains("darwin")) {
 				detectedOS = "mac";
 			}
-			else if (os.indexOf("win") >= 0) {
+			else if (os.contains("win")) {
 				detectedOS = "windows";
 			}
-			else if (os.indexOf("nux") >= 0) {
+			else if (os.contains("nux")) {
 				detectedOS = "linux";
 			}
 			else {

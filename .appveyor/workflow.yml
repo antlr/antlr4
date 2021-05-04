@@ -1,0 +1,128 @@
+environment:
+  matrix:
+    - job_name: java-tool-and-runtime
+    - job_name: csharp-runtime
+      job_depends_on: java-tool-and-runtime
+    - job_name: dart-runtime
+      job_depends_on: java-tool-and-runtime
+    - job_name: go-runtime
+      job_depends_on: java-tool-and-runtime
+    - job_name: javascript-runtime
+      job_depends_on: java-tool-and-runtime
+    - job_name: php-runtime
+      job_depends_on: java-tool-and-runtime
+    - job_name: python2-runtime
+      job_depends_on: java-tool-and-runtime
+    - job_name: python3-runtime
+      job_depends_on: java-tool-and-runtime
+
+matrix:
+  fast_finish: false
+
+version: '4.9.1-SNAPSHOT+AppVeyor.{build}'
+cache:
+  - '%USERPROFILE%\.m2'
+  - '%USERPROFILE%\.nuget\packages -> **\project.json'
+image: Visual Studio 2019
+# not using MSBuild
+build: off
+
+for:
+  - matrix:
+      only:
+        - job_name: java-tool-and-runtime
+    build_script:
+      - mvn -q -DskipTests install --batch-mode
+    test_script:
+      - cd tool-testsuite
+      - mvn -q test
+      - cd ..\runtime-testsuite
+      - mvn -q -Dtest=java.* test
+
+  - matrix:
+      only:
+        - job_name: csharp-runtime
+    build_script:
+      - mvn -q -DskipTests install --batch-mode
+      - dotnet build runtime/CSharp/src/Antlr4.csproj -c Release
+    after_build:
+      - dotnet pack runtime/CSharp/src/Antlr4.csproj -c Release
+    test_script:
+      - cd runtime-testsuite
+      - mvn -q -Dtest=csharp.* test
+    artifacts:
+      - path: 'runtime\**\*.nupkg'
+        name: NuGet
+
+  - matrix:
+      only:
+        - job_name: dart-runtime
+    install:
+      - cinst -y dart-sdk --version=2.8.4
+    build_script:
+      - mvn -q -DskipTests install --batch-mode
+    test_script:
+      - cd runtime-testsuite
+      - mvn -q -Dtest=dart.* test -Dantlr-dart-dart="C:\tools\dart-sdk\bin\dart.exe" -Dantlr-dart-pub="C:\tools\dart-sdk\bin\pub.bat" -Dantlr-dart-dart2native="C:\tools\dart-sdk\bin\dart2native.bat"
+
+  - matrix:
+      only:
+        - job_name: go-runtime
+    build_script:
+      - mvn -q -DskipTests install --batch-mode
+    test_script:
+      - cd runtime-testsuite
+      - mvn -q -Dtest=go.* test
+
+  - matrix:
+      only:
+        - job_name: javascript-runtime
+    install:
+      - cinst nodejs.install
+      - node --version
+      - npm --version
+      - npm install -g yarn@v1.22.10
+    build_script:
+      - cd runtime\JavaScript\
+      - npm install
+      - npm link
+      - cd ..\..
+      - mvn -q -DskipTests install --batch-mode
+    test_script:
+      - cd runtime\JavaScript\
+      - yarn test
+      - cd ..\..
+      - cd runtime-testsuite
+      - mvn -q -Dtest=javascript.* test -Dantlr-javascript-npm="C:\Program Files\nodejs\npm.cmd" -Dantlr-javascript-nodejs="C:\Program Files\nodejs\node.exe"
+
+  - matrix:
+      only:
+        - job_name: php-runtime
+    install:
+      - git clone https://github.com/antlr/antlr-php-runtime.git
+      - mv antlr-php-runtime runtime/PHP
+      - cinst -y php --params "/InstallDir:C:\tools\php"
+      - cinst -y composer
+    build_script:
+      - mvn -q -DskipTests install --batch-mode
+    test_script:
+      - cd runtime-testsuite
+      - mvn -q -Dtest=php.* test -Dantlr-php-php="C:\tools\php\php.exe"
+
+  - matrix:
+      only:
+        - job_name: python2-runtime
+    build_script:
+      - mvn -q -DskipTests install --batch-mode
+    test_script:
+      - cd runtime-testsuite
+      - mvn -q -Dtest=python2.* test -Dantlr-python2-python="C:\Python27\python.exe"
+
+  - matrix:
+      only:
+        - job_name: python3-runtime
+    build_script:
+      - mvn -q -DskipTests install --batch-mode
+    test_script:
+      - cd runtime-testsuite
+      - mvn -q -Dtest=python3.* test -Dantlr-python3-python="C:\Python35\python.exe"

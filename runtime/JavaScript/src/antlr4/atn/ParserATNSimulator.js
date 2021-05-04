@@ -712,7 +712,7 @@ class ParserATNSimulator extends ATNSimulator {
         // First figure out where we can reach on input t
         for (let i=0; i<closure.items.length;i++) {
             const c = closure.items[i];
-            if(this.debug_add) {
+            if(this.debug) {
                 console.log("testing " + this.getTokenName(t) + " at " + c);
             }
             if (c.state instanceof RuleStopState) {

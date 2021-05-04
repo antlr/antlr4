@@ -260,6 +260,7 @@ YYYY/MM/DD, github id, Full name, email
 2020/04/08, lwehmeier, Leon Wehmeier, wehmeier@st.ovgu.de
 2020/04/10, agrabski, Adam Grabski, adam.gr@outlook.com
 2020/04/23, martinvw, Martin van Wingerden, martin@martinvw.nl
+2020/04/23, kaczmarj, Jakub Kaczmarzyk, jakub.kaczmarzyk@stonybrookmedicine.edu
 2020/04/30, TristonianJones, Tristan Swadell, tswadell@google.com
 2020/05/06, iammosespaulr, Moses Paul R, iammosespaulr@gmail.com
 2020/05/10, gomerser, Erik Gomersbach, gomerser@gomersba.ch
@@ -269,6 +270,7 @@ YYYY/MM/DD, github id, Full name, email
 2020/06/02, cohomology, Kilian Kilger, kkilger AT gmail.com
 2020/06/04, IohannRabeson, Iohann Rabeson, iotaka6@gmail.com
 2020/06/04, sigmasoldi3r, Pablo Blanco, pablobc.1995@gmail.com
+2020/06/15, mattpaletta, Matthew Paletta, mattpaletta@gmail.com
 2020/07/01, sha-N, Shan M Mathews, admin@bluestarqatar.com
 2020/08/22, stevenjohnstone, Steven Johnstone, steven.james.johnstone@gmail.com
 2020/09/06, ArthurSonzogni, Sonzogni Arthur, arthursonzogni@gmail.com
@@ -290,3 +292,13 @@ YYYY/MM/DD, github id, Full name, email
 2021/02/17, Akshat-Tripathi, Akshat Tripathi, akshat.tripathi6568@gmail.com
 2021/02/17, tas2168, Akshat Tripathi, akshat.tripathi6568@gmail.com
 2021/02/17, vladsft, Vlad Safta, vladixsafta@yahoo.com
+2021/02/10, jirislaby, Jiri Slaby, jirislaby@gmail.com
+2021/02/21, namasikanam, Xingyu Xie, namasikanam@gmail.com
+2021/02/27, khmarbaise, Karl Heinz Marbaise, github@soebes.com
+2021/03/02, hackeris
+2021/03/03, xTachyon, Damian Andrei, xTachyon@users.noreply.github.com
+2021/04/07, b1f6c1c4, Jinzheng Tu, b1f6c1c4@gmail.com
+2021/04/17, jaggerjo, Josua Jäger, mail@jaggerjo.com
+2021/04/24, bigerl, Alexander Bigerl, alexander [äät] bigerl [pkt] eu
+2021/05/02, michalharakal, Michal Harakal, michal.harakal@users.noreply.github.com
+2021/05/03, redexp, Sergii Kliuchnyk, redexp@users.noreply.github.com

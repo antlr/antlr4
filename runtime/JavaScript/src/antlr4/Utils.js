@@ -4,7 +4,7 @@
  */
 
 function arrayToString(a) {
-    return "[" + a.join(", ") + "]";
+    return Array.isArray(a) ? ("[" + a.join(", ") + "]") : "null";
 }
 
 String.prototype.seed = String.prototype.seed || Math.round(Math.random() * Math.pow(2, 32));
