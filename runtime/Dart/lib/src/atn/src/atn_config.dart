@@ -5,7 +5,6 @@
  */
 
 import '../../prediction_context.dart';
-import '../../recognizer.dart';
 import '../../util/murmur_hash.dart';
 import 'atn_state.dart';
 import 'lexer_action_executor.dart';
@@ -59,7 +58,7 @@ class ATNConfig {
   /// The stack of invoking states leading to the rule/states associated
   ///  with this config.  We track only those contexts pushed during
   ///  execution of the ATN simulator.
-  PredictionContext context;
+  PredictionContext? context;
 
   /// We cannot execute predicates dependent upon local context unless
   /// we know for sure we are in the correct context. Because there is
@@ -82,22 +81,28 @@ class ATNConfig {
   /// constructors as well as certain operations like
   /// {@link ATNConfigSet#add(ATNConfig, DoubleKeyMap)} method are
   /// <em>completely</em> unaffected by the change.</p>
-  int reachesIntoOuterContext = 0;
+  int reachesIntoOuterContext;
 
   SemanticContext semanticContext;
 
-  ATNConfig(this.state, this.alt, this.context,
-      [this.semanticContext = SemanticContext.NONE]);
+  ATNConfig(
+    this.state,
+    this.alt,
+    this.context, [
+    this.semanticContext = SemanticContext.NONE,
+  ]) : reachesIntoOuterContext = 0;
 
-  ATNConfig.dup(ATNConfig c,
-      {this.state, this.alt, this.context, this.semanticContext}) {
-    state = state ?? c.state;
-    alt = alt ?? c.alt;
-    context = context ?? c.context;
-    semanticContext = semanticContext ?? c.semanticContext;
-    reachesIntoOuterContext =
-        c.reachesIntoOuterContext ?? reachesIntoOuterContext;
-  }
+  ATNConfig.dup(
+    ATNConfig c, {
+    ATNState? state,
+    int? alt,
+    PredictionContext? context,
+    SemanticContext? semanticContext,
+  })  : state = state ?? c.state,
+        alt = alt ?? c.alt,
+        context = context ?? c.context,
+        semanticContext = semanticContext ?? c.semanticContext,
+        reachesIntoOuterContext = c.reachesIntoOuterContext;
 
   /// This method gets the value of the {@link #reachesIntoOuterContext} field
   /// as it existed prior to the introduction of the
@@ -123,7 +128,7 @@ class ATNConfig {
   ///  syntactic/semantic contexts are the same.
   @override
   bool operator ==(Object other) {
-    if (other is ATNConfig && other != null) {
+    if (other is ATNConfig) {
       return state.stateNumber == other.state.stateNumber &&
           alt == other.alt &&
           (context == other.context ||
@@ -147,7 +152,7 @@ class ATNConfig {
   }
 
   @override
-  String toString([Recognizer recog, bool showAlt = true]) {
+  String toString([_, bool showAlt = true]) {
     final buf = StringBuffer();
     // if ( state.ruleIndex>=0 ) {
     //  if ( recog!=null ) buf.write(recog.ruleNames[state.ruleIndex]+":");
@@ -164,7 +169,7 @@ class ATNConfig {
       buf.write(context.toString());
       buf.write(']');
     }
-    if (semanticContext != null && semanticContext != SemanticContext.NONE) {
+    if (semanticContext != SemanticContext.NONE) {
       buf.write(',');
       buf.write(semanticContext);
     }
@@ -180,19 +185,25 @@ class ATNConfig {
 class LexerATNConfig extends ATNConfig {
   /// Gets the [LexerActionExecutor] capable of executing the embedded
   /// action(s) for the current configuration.
-  LexerActionExecutor lexerActionExecutor;
+  LexerActionExecutor? lexerActionExecutor;
 
   bool passedThroughNonGreedyDecision = false;
 
-  LexerATNConfig(ATNState state, int alt, PredictionContext context,
-      [this.lexerActionExecutor])
-      : super(state, alt, context, SemanticContext.NONE) {
+  LexerATNConfig(
+    ATNState state,
+    int alt,
+    PredictionContext context, [
+    this.lexerActionExecutor,
+  ]) : super(state, alt, context, SemanticContext.NONE) {
     passedThroughNonGreedyDecision = false;
   }
 
-  LexerATNConfig.dup(LexerATNConfig c, ATNState state,
-      {this.lexerActionExecutor, PredictionContext context})
-      : super.dup(c, state: state, context: context) {
+  LexerATNConfig.dup(
+    LexerATNConfig c,
+    ATNState state, {
+    this.lexerActionExecutor,
+    PredictionContext? context,
+  }) : super.dup(c, state: state, context: context) {
     lexerActionExecutor = lexerActionExecutor ?? c.lexerActionExecutor;
     passedThroughNonGreedyDecision = checkNonGreedyDecision(c, state);
   }

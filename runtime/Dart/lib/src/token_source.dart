@@ -36,7 +36,7 @@ abstract class TokenSource {
   ///
   /// @return The line number for the current position in the input stream, or
   /// 0 if the current token source does not track line numbers.
-  int get line;
+  int? get line;
 
   /// Get the index into the current line for the current position in the input
   /// stream. The first character on a line has position 0.
@@ -51,7 +51,7 @@ abstract class TokenSource {
   /// @return The [CharStream] associated with the current position in
   /// the input, or null if no input stream is available for the token
   /// source.
-  CharStream get inputStream;
+  CharStream? get inputStream;
 
   /// Gets the name of the underlying input source. This method returns a
   /// non-null, non-empty string. If such a name is not known, this method
@@ -81,15 +81,15 @@ class ListTokenSource implements TokenSource {
   /// The wrapped collection of [Token] objects to return.
   final List<Token> tokens;
 
-  final String _sourceName;
+  final String? _sourceName;
 
   /// The index into {@link #tokens} of token to return by the next call to
   /// {@link #nextToken}. The end of the input is indicated by this value
   /// being greater than or equal to the number of items in {@link #tokens}.
-  int i;
+  late int i; // todo: uncertain
 
   /// This field caches the EOF token for the token source.
-  Token eofToken;
+  Token? eofToken;
 
   /// This is the backing field for {@link #getTokenFactory} and
   /// [setTokenFactory].
@@ -116,11 +116,7 @@ class ListTokenSource implements TokenSource {
   /// been reached).
   ///
   /// @exception NullPointerException if [tokens] is null
-  ListTokenSource(this.tokens, [this._sourceName]) {
-    if (tokens == null) {
-      throw ArgumentError.notNull('tokens');
-    }
-  }
+  ListTokenSource(this.tokens, [this._sourceName]);
 
   /// {@inheritDoc}
 
@@ -129,7 +125,7 @@ class ListTokenSource implements TokenSource {
     if (i < tokens.length) {
       return tokens[i].charPositionInLine;
     } else if (eofToken != null) {
-      return eofToken.charPositionInLine;
+      return eofToken!.charPositionInLine;
     } else if (tokens.isNotEmpty) {
       // have to calculate the result from the line/column of the previous
       // token, along with the text of the token.
@@ -168,11 +164,19 @@ class ListTokenSource implements TokenSource {
         }
 
         final stop = max(-1, start - 1);
-        eofToken = tokenFactory.create(Token.EOF, 'EOF', Pair(this, inputStream),
-            Token.DEFAULT_CHANNEL, start, stop, line, charPositionInLine);
+        eofToken = tokenFactory.create(
+          Token.EOF,
+          'EOF',
+          Pair(this, inputStream),
+          Token.DEFAULT_CHANNEL,
+          start,
+          stop,
+          line,
+          charPositionInLine,
+        );
       }
 
-      return eofToken;
+      return eofToken!;
     }
 
     final t = tokens[i];
@@ -187,16 +191,16 @@ class ListTokenSource implements TokenSource {
   /// {@inheritDoc}
 
   @override
-  int get line {
+  int? get line {
     if (i < tokens.length) {
       return tokens[i].line;
     } else if (eofToken != null) {
-      return eofToken.line;
+      return eofToken!.line;
     } else if (tokens.isNotEmpty) {
       // have to calculate the result from the line/column of the previous
       // token, along with the text of the token.
       final lastToken = tokens[tokens.length - 1];
-      var line = lastToken.line;
+      var line = lastToken.line ?? 0;
 
       final tokenText = lastToken.text;
       if (tokenText != null) {
@@ -219,11 +223,11 @@ class ListTokenSource implements TokenSource {
   /// {@inheritDoc}
 
   @override
-  CharStream get inputStream {
+  CharStream? get inputStream {
     if (i < tokens.length) {
       return tokens[i].inputStream;
     } else if (eofToken != null) {
-      return eofToken.inputStream;
+      return eofToken!.inputStream;
     } else if (tokens.isNotEmpty) {
       return tokens[tokens.length - 1].inputStream;
     }
@@ -237,5 +241,5 @@ class ListTokenSource implements TokenSource {
   /// the next token in {@link #tokens} (or the previous token if the end of
   /// the input has been reached).
   @override
-  String get sourceName =>_sourceName ?? inputStream?.sourceName ?? 'List';
+  String get sourceName => _sourceName ?? inputStream?.sourceName ?? 'List';
 }

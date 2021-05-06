@@ -154,7 +154,7 @@ class BitSet {
 
   BitSet clone() {
     final result = BitSet();
-    result._data = List.from(_data);
+    result._data = Uint32List.fromList(_data);
     return result;
   }
 
@@ -228,8 +228,6 @@ class BitSet {
   }
 
   void and(BitSet set) {
-    if (set == null) throw ArgumentError.notNull('set');
-
     final length = min(_data.length, set._data.length);
     for (var i = 0; i < length; i++) {
       _data[i] &= set._data[i];
@@ -241,8 +239,6 @@ class BitSet {
   }
 
   void or(BitSet set) {
-    if (set == null) throw ArgumentError.notNull('set');
-
     if (set._data.length > _data.length) {
       final newList = Uint32List(set._data.length)
         ..setRange(0, _data.length, _data);
@@ -257,7 +253,6 @@ class BitSet {
   @override
   bool operator ==(obj) {
     final other = obj as BitSet;
-    if (other == null) return false;
 
     if (isEmpty) return other.isEmpty;
 

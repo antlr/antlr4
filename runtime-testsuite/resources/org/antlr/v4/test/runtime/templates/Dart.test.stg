@@ -68,7 +68,7 @@ PlusText(a) ::= <%"<a>" + this.text%>
 
 InputText() ::= "tokenStream.text"
 
-LTEquals(i, v) ::= <%tokenStream.LT(<i>).text == <v>%>
+LTEquals(i, v) ::= <%tokenStream.LT(<i>)!.text == <v>%>
 
 LANotEquals(i, v) ::= <%tokenStream.LA(<i>)!=<v>%>
 
@@ -80,7 +80,7 @@ GetExpectedTokenNames() ::= "this.expectedTokens.toString(vocabulary: this.vocab
 
 RuleInvocationStack() ::= "ruleInvocationStack"
 
-LL_EXACT_AMBIG_DETECTION() ::= <<interpreter.predictionMode = PredictionMode.LL_EXACT_AMBIG_DETECTION;>>
+LL_EXACT_AMBIG_DETECTION() ::= <<interpreter!.predictionMode = PredictionMode.LL_EXACT_AMBIG_DETECTION;>>
 
 ParserToken(parser, token) ::= <%<parser>.TOKEN_<token>%>
 
@@ -221,9 +221,9 @@ walker.walk(new LeafListener(), <s>);
 TreeNodeWithAltNumField(X) ::= <<
 @parser::definitions {
 class MyRuleNode extends ParserRuleContext {
-  int altNum;
+  late int altNum;
 
-  MyRuleNode(ParserRuleContext parent, int invokingStateNumber)
+  MyRuleNode(ParserRuleContext? parent, int? invokingStateNumber)
       : super(parent, invokingStateNumber);
 
   @override int get altNumber {
@@ -242,9 +242,9 @@ TokenGetterListener(X) ::= <<
 class LeafListener extends TBaseListener {
   void exitA(AContext ctx) {
     if (ctx.childCount==2)
-      stdout.write("${ctx.INT(0).symbol.text} ${ctx.INT(1).symbol.text} ${ctx.INTs()}");
+      stdout.write("${ctx.INT(0)?.symbol.text} ${ctx.INT(1)?.symbol.text} ${ctx.INTs()}");
     else
-      print(ctx.ID().symbol);
+      print(ctx.ID()?.symbol);
   }
 }
 }
@@ -255,9 +255,9 @@ RuleGetterListener(X) ::= <<
 class LeafListener extends TBaseListener {
   void exitA(AContext ctx) {
     if (ctx.childCount==2) {
-      stdout.write("${ctx.b(0).start.text} ${ctx.b(1).start.text} ${ctx.bs()[0].start.text}");
+      stdout.write("${ctx.b(0)?.start?.text} ${ctx.b(1)?.start?.text} ${ctx.bs()[0].start?.text}");
     } else
-      print(ctx.b(0).start.text);
+      print(ctx.b(0)?.start?.text);
   }
 }
 }
@@ -269,9 +269,9 @@ LRListener(X) ::= <<
 class LeafListener extends TBaseListener {
   void exitE(EContext ctx) {
     if (ctx.childCount==3) {
-      stdout.write("${ctx.e(0).start.text} ${ctx.e(1).start.text} ${ctx.es()[0].start.text}\n");
+      stdout.write("${ctx.e(0)?.start?.text} ${ctx.e(1)?.start?.text} ${ctx.es()[0].start?.text}\n");
     } else
-      print(ctx.INT().symbol.text);
+      print(ctx.INT()?.symbol.text);
   }
 }
 }
@@ -281,10 +281,10 @@ LRWithLabelsListener(X) ::= <<
 @parser::definitions {
 class LeafListener extends TBaseListener {
   void exitCall(CallContext ctx) {
-    stdout.write("${ctx.e().start.text} ${ctx.eList()}");
+    stdout.write("${ctx.e()?.start?.text} ${ctx.eList()}");
   }
   void exitInt(IntContext ctx) {
-    print(ctx.INT().symbol.text);
+    print(ctx.INT()?.symbol.text);
   }
 }
 }
@@ -292,9 +292,9 @@ class LeafListener extends TBaseListener {
 
 DeclareContextListGettersFunction() ::= <<
 void foo() {
-  SContext s = null;
-  List\<AContext> a = s.as();
-  List\<BContext> b = s.bs();
+  SContext? s = null;
+  List\<AContext>? a = s?.as();
+  List\<BContext>? b = s?.bs();
 }
 >>
 
@@ -315,4 +315,4 @@ Invoke_pred(v) ::= <<this.pred(<v>)>>
 ParserTokenType(t) ::= "Parser.<t>"
 ContextRuleFunction(ctx, rule) ::= "<ctx>.<rule>"
 StringType() ::= "String"
-ContextMember(ctx, subctx, member) ::= "<ctx>.<subctx>.<member>"
+ContextMember(ctx, subctx, member) ::= "<ctx>.<subctx>!.<member>!"

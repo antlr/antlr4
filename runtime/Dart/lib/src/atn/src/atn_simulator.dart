@@ -12,8 +12,10 @@ import 'atn_config_set.dart';
 abstract class ATNSimulator {
   /// Must distinguish between missing edge and edge we know leads nowhere */
 
-  static final DFAState ERROR =
-      DFAState(stateNumber: 0x7FFFFFFF, configs: ATNConfigSet());
+  static final DFAState ERROR = DFAState(
+    stateNumber: 0x7FFFFFFF,
+    configs: ATNConfigSet(),
+  );
 
   final ATN atn;
 
@@ -36,7 +38,7 @@ abstract class ATNSimulator {
   ///  whacked after each adaptivePredict(). It cost a little bit
   ///  more time I think and doesn't save on the overall footprint
   ///  so it's not worth the complexity.</p>
-  final PredictionContextCache sharedContextCache;
+  final PredictionContextCache? sharedContextCache;
 
   ATNSimulator(this.atn, this.sharedContextCache);
 
@@ -60,8 +62,7 @@ abstract class ATNSimulator {
     if (sharedContextCache == null) return context;
 
     final visited = <PredictionContext, PredictionContext>{};
-    return PredictionContext.getCachedContext(
-        context, sharedContextCache, visited);
+    return PredictionContext.getCachedContext(context, sharedContextCache!, visited);
   }
 }
 
@@ -85,7 +86,7 @@ class PredictionContextCache {
     return ctx;
   }
 
-  PredictionContext operator [](PredictionContext ctx) {
+  PredictionContext? operator [](PredictionContext ctx) {
     return cache[ctx];
   }
 
