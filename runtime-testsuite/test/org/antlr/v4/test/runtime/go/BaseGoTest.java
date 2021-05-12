@@ -80,36 +80,36 @@ public class BaseGoTest extends BaseRuntimeTestSupport implements RuntimeTestSup
 		}
 	}
 
-    private static void setupGoMod() throws Exception{
-        String goExecutable = locateGo();
-        ProcessBuilder pb = new ProcessBuilder(goExecutable, "mod", "init");
-        pb.redirectErrorStream(true);
-        Process process = pb.start();
-        StreamVacuum sucker = new StreamVacuum(process.getInputStream());
-        sucker.start();
-        int exit = process.waitFor();
-        sucker.join();
-        if (exit != 0) {
-            throw new Exception("Non-zero exit while setting up go.mod:" + sucker.toString());
-        }
+	private static void setupGoMod() throws Exception{
+		String goExecutable = locateGo();
+		ProcessBuilder pb = new ProcessBuilder(goExecutable, "mod", "init");
+		pb.redirectErrorStream(true);
+		Process process = pb.start();
+		StreamVacuum sucker = new StreamVacuum(process.getInputStream());
+		sucker.start();
+		int exit = process.waitFor();
+		sucker.join();
+		if (exit != 0) {
+			throw new Exception("Non-zero exit while setting up go.mod:" + sucker.toString());
+		}
 
-        pb = new ProcessBuilder(goExecutable, "get", "github.com/antlr/antlr4/runtime/Go");
-        pb.redirectErrorStream(true);
-        process = pb.start();
-        sucker = new StreamVacuum(process.getInputStream());
-        sucker.start();
-        exit = process.waitFor();
-        sucker.join();
-        if (exit != 0) {
-            throw new Exception("Non-zero exit while setting up go.mod:" + sucker.toString());
-        }
-    }
+		pb = new ProcessBuilder(goExecutable, "get", "github.com/antlr/antlr4/runtime/Go");
+		pb.redirectErrorStream(true);
+		process = pb.start();
+		sucker = new StreamVacuum(process.getInputStream());
+		sucker.start();
+		exit = process.waitFor();
+		sucker.join();
+		if (exit != 0) {
+			throw new Exception("Non-zero exit while setting up go.mod:" + sucker.toString());
+		}
+	}
 
 	public void testSetUp() throws Exception {
 		eraseParserTempDir();
 		super.testSetUp();
 		parserTempDir = new File(getTempTestDir(), "parser");
-        setupGoMod();
+		setupGoMod();
 	}
 
 	@Override
