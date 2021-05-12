@@ -58,6 +58,7 @@ public class BaseGoTest extends BaseRuntimeTestSupport implements RuntimeTestSup
 		}
 
 		// cacheGoRuntime(tmpPackageDir);
+		setupGoMod();
 	}
 
 	public static void groupTearDown() throws Exception {
@@ -82,7 +83,7 @@ public class BaseGoTest extends BaseRuntimeTestSupport implements RuntimeTestSup
 
 	private static void setupGoMod() throws Exception{
 		String goExecutable = locateGo();
-		ProcessBuilder pb = new ProcessBuilder(goExecutable, "mod", "init");
+		ProcessBuilder pb = new ProcessBuilder(goExecutable, "mod", "init", "antlr.org/test-runtime");
 		pb.redirectErrorStream(true);
 		Process process = pb.start();
 		StreamVacuum sucker = new StreamVacuum(process.getInputStream());
@@ -109,7 +110,6 @@ public class BaseGoTest extends BaseRuntimeTestSupport implements RuntimeTestSup
 		eraseParserTempDir();
 		super.testSetUp();
 		parserTempDir = new File(getTempTestDir(), "parser");
-		setupGoMod();
 	}
 
 	@Override
