@@ -80,7 +80,7 @@ public class BaseGoTest extends BaseRuntimeTestSupport implements RuntimeTestSup
 		}
 	}
 
-    private static void setupGoMod() {
+    private static void setupGoMod() throws Exception{
         String goExecutable = locateGo();
         ProcessBuilder pb = new ProcessBuilder(goExecutable, "mod", "init");
         pb.redirectErrorStream(true);
