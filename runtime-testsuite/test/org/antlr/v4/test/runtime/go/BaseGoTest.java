@@ -58,7 +58,9 @@ public class BaseGoTest extends BaseRuntimeTestSupport implements RuntimeTestSup
 		}
 
 		// cacheGoRuntime(tmpPackageDir);
-		setupGoMod();
+        if (!File("go.sum").exists()) {
+            setupGoMod();
+        }
 	}
 
 	public static void groupTearDown() throws Exception {
