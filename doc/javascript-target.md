@@ -90,18 +90,18 @@ Let's suppose that your grammar is named, as above, "MyGrammar". Let's suppose t
 Now a fully functioning script might look like the following:
 
 ```javascript
-   import antlr4 from 'antlr4';
-   import MyGrammarLexer from './MyGrammarLexer.js';
-   import MyGrammarParser from './MyGrammarParser.js';
-   import MyGrammarListener from './MyGrammarListener.js';
+import antlr4 from 'antlr4';
+import MyGrammarLexer from './MyGrammarLexer.js';
+import MyGrammarParser from './MyGrammarParser.js';
+import MyGrammarListener from './MyGrammarListener.js';
 
-   const input = "your text to parse here"
-   const chars = new antlr4.InputStream(input);
-   const lexer = new MyGrammarLexer(chars);
-   const tokens  = new antlr4.CommonTokenStream(lexer);
-   const parser = new MyGrammarParser(tokens);
-   parser.buildParseTrees = true;
-   const tree = parser.MyStartRule();
+const input = "your text to parse here"
+const chars = new antlr4.InputStream(input);
+const lexer = new MyGrammarLexer(chars);
+const tokens  = new antlr4.CommonTokenStream(lexer);
+const parser = new MyGrammarParser(tokens);
+parser.buildParseTrees = true;
+const tree = parser.MyStartRule();
 ```
 
 This program will work. But it won't be useful unless you do one of the following:
@@ -156,15 +156,14 @@ Let's suppose your MyGrammar grammar comprises 2 rules: "key" and "value". The a
 
 ```javascript
 class MyGrammarListener extends ParseTreeListener {
-       
     constructor() {
         super();
     }
    
-   enterKey(ctx) {}
-   exitKey(ctx) {}
-   enterValue(ctx) {}
-   exitValue(ctx) {}
+    enterKey(ctx) {}
+    exitKey(ctx) {}
+    enterValue(ctx) {}
+    exitValue(ctx) {}
 }
 ```
 
