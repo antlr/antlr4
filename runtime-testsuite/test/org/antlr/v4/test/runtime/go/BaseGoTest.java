@@ -58,7 +58,8 @@ public class BaseGoTest extends BaseRuntimeTestSupport implements RuntimeTestSup
 		}
 
 		// cacheGoRuntime(tmpPackageDir);
-        if (!File("go.sum").exists()) {
+        File gomod = new File("go.mod")
+        if (!gomod.exists()) {
             setupGoMod();
         }
 	}
