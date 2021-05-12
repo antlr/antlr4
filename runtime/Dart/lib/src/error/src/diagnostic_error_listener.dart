@@ -41,7 +41,7 @@ class DiagnosticErrorListener extends BaseErrorListener {
 
   @override
   void reportAmbiguity(Parser recognizer, DFA dfa, int startIndex,
-      int stopIndex, bool exact, BitSet ambigAlts, ATNConfigSet configs) {
+      int stopIndex, bool exact, BitSet? ambigAlts, ATNConfigSet configs) {
     if (exactOnly && !exact) {
       return;
     }
@@ -56,11 +56,18 @@ class DiagnosticErrorListener extends BaseErrorListener {
   }
 
   @override
-  void reportAttemptingFullContext(Parser recognizer, DFA dfa, int startIndex,
-      int stopIndex, BitSet conflictingAlts, ATNConfigSet configs) {
+  void reportAttemptingFullContext(
+    Parser recognizer,
+    DFA dfa,
+    int startIndex,
+    int stopIndex,
+    BitSet? conflictingAlts,
+    ATNConfigSet configs,
+  ) {
     final decision = getDecisionDescription(recognizer, dfa);
-    final text =
-        recognizer.tokenStream.getText(Interval.of(startIndex, stopIndex));
+    final text = recognizer.tokenStream.getText(
+      Interval.of(startIndex, stopIndex),
+    );
     final message = "reportAttemptingFullContext d=$decision, input='$text'";
     recognizer.notifyErrorListeners(message);
   }
@@ -77,15 +84,15 @@ class DiagnosticErrorListener extends BaseErrorListener {
 
   String getDecisionDescription(Parser recognizer, DFA dfa) {
     final decision = dfa.decision;
-    final ruleIndex = dfa.atnStartState.ruleIndex;
+    final ruleIndex = dfa.atnStartState?.ruleIndex;
 
     final ruleNames = recognizer.ruleNames;
-    if (ruleIndex < 0 || ruleIndex >= ruleNames.length) {
+    if (ruleIndex == null || ruleIndex < 0 || ruleIndex >= ruleNames.length) {
       return decision.toString();
     }
 
     final ruleName = ruleNames[ruleIndex];
-    if (ruleName == null || ruleName.isEmpty) {
+    if (ruleName.isEmpty) {
       return decision.toString();
     }
 
@@ -101,7 +108,7 @@ class DiagnosticErrorListener extends BaseErrorListener {
   /// @param configs The conflicting or ambiguous configuration set.
   /// @return Returns [reportedAlts] if it is not null, otherwise
   /// returns the set of alternatives represented in [configs].
-  BitSet getConflictingAlts(BitSet reportedAlts, ATNConfigSet configs) {
+  BitSet getConflictingAlts(BitSet? reportedAlts, ATNConfigSet configs) {
     if (reportedAlts != null) {
       return reportedAlts;
     }

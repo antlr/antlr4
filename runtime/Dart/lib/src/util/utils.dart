@@ -7,7 +7,7 @@
 /// Convert array of strings to string&rarr;index map. Useful for
 ///  converting rulenames to name&rarr;ruleindex map.
 Map<String, int> toMap(List<String> keys) {
-  final m = {};
+  final m = <String, int>{};
   for (var i = 0; i < keys.length; i++) {
     m[keys[i]] = i;
   }
