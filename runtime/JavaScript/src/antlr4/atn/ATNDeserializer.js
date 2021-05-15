@@ -123,11 +123,11 @@ class ATNDeserializer {
         this.readModes(atn);
         const sets = [];
         // First, deserialize sets with 16-bit arguments <= U+FFFF.
-        this.readSets(atn, sets, this.readInt.bind(this));
+        this.readSets(atn, sets, 'readInt');
         // Next, if the ATN was serialized with the Unicode SMP feature,
         // deserialize sets with 32-bit arguments <= U+10FFFF.
         if (this.isFeatureSupported(ADDED_UNICODE_SMP, this.uuid)) {
-            this.readSets(atn, sets, this.readInt32.bind(this));
+            this.readSets(atn, sets, 'readInt32');
         }
         this.readEdges(atn, sets);
         this.readDecisions(atn);
@@ -275,8 +275,8 @@ class ATNDeserializer {
                 iset.addOne(-1);
             }
             for (let j=0; j<n; j++) {
-                const i1 = readUnicode();
-                const i2 = readUnicode();
+                const i1 = this[readUnicode]();
+                const i2 = this[readUnicode]();
                 iset.addRange(i1, i2);
             }
         }
