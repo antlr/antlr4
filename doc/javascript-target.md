@@ -98,7 +98,7 @@ import MyGrammarListener from './MyGrammarListener.js';
 const input = "your text to parse here"
 const chars = new antlr4.InputStream(input);
 const lexer = new MyGrammarLexer(chars);
-const tokens  = new antlr4.CommonTokenStream(lexer);
+const tokens = new antlr4.CommonTokenStream(lexer);
 const parser = new MyGrammarParser(tokens);
 parser.buildParseTrees = true;
 const tree = parser.MyStartRule();
@@ -119,7 +119,6 @@ import antlr4 from 'antlr4';
 import MyGrammarLexer from './QueryLexer.js';
 import MyGrammarParser from './QueryParser.js';
 import MyGrammarListener from './QueryListener.js';
-
 
 const input = "field = 123 AND items in (1,2,3)"
 const chars = new antlr4.InputStream(input);
@@ -171,7 +170,6 @@ In order to provide custom behavior, you might want to create the following clas
 
 ```javascript
 class KeyPrinter extends MyGrammarListener {
-
     // override default listener behavior
     exitKey(ctx) {
         console.log("Oh, a key!");
