@@ -14,21 +14,21 @@ import 'lexer_action.dart';
 import 'transition.dart';
 
 class ATNDeserializationOptions {
-  static final ATNDeserializationOptions defaultOptions =
-      ATNDeserializationOptions()..makeReadOnly();
+  static late final ATNDeserializationOptions defaultOptions =
+      ATNDeserializationOptions(true);
 
   bool readOnly;
-  bool verifyATN;
-  bool generateRuleBypassTransitions;
+  late bool verifyATN;
+  late bool generateRuleBypassTransitions;
 
-  ATNDeserializationOptions([ATNDeserializationOptions options]) {
+  ATNDeserializationOptions(this.readOnly,
+      [ATNDeserializationOptions? options]) {
     if (options == null) {
       verifyATN = true;
       generateRuleBypassTransitions = false;
     } else {
       verifyATN = options.verifyATN;
-      generateRuleBypassTransitions =
-          options.generateRuleBypassTransitions;
+      generateRuleBypassTransitions = options.generateRuleBypassTransitions;
     }
   }
 
@@ -73,6 +73,7 @@ class ATNDeserializer {
   /** WARNING: DO NOT MERGE THESE LINES. If UUIDs differ during a merge,
    * resolve the conflict by generating a new ID!
    */
+
   /// This is the earliest supported serialized UUID.
   static final BASE_SERIALIZED_UUID = '33761B2D-78BB-4A43-8B0B-4F5BEE8AACF3';
 
@@ -103,12 +104,12 @@ class ATNDeserializer {
   /// This is the current serialized UUID.
   static final SERIALIZED_UUID = ADDED_UNICODE_SMP;
 
-  ATNDeserializationOptions deserializationOptions;
-  List<int> data;
-  var pos;
-  String uuid;
+  late final ATNDeserializationOptions deserializationOptions;
+  late List<int> data;
+  int pos = 0;
+  late String uuid;
 
-  ATNDeserializer([options]) {
+  ATNDeserializer([ATNDeserializationOptions? options]) {
     deserializationOptions =
         options ?? ATNDeserializationOptions.defaultOptions;
   }
@@ -266,39 +267,38 @@ class ATNDeserializer {
   void readRules(ATN atn) {
     final nrules = readInt();
     if (atn.grammarType == ATNType.LEXER) {
-      atn.ruleToTokenType = List<int>(nrules);
+      atn.ruleToTokenType = <int>[];
     }
 
-    atn.ruleToStartState = List<RuleStartState>(nrules);
     for (var i = 0; i < nrules; i++) {
       final s = readInt();
-      RuleStartState startState = atn.states[s];
-      atn.ruleToStartState[i] = startState;
+      final startState = atn.states[s] as RuleStartState;
+      atn.ruleToStartState.add(startState);
       if (atn.grammarType == ATNType.LEXER) {
         var tokenType = readInt();
         if (tokenType == 0xFFFF) {
           tokenType = Token.EOF;
         }
 
-        atn.ruleToTokenType[i] = tokenType;
+        atn.ruleToTokenType.add(tokenType);
 
         if (!isFeatureSupported(ADDED_LEXER_ACTIONS, uuid)) {
           // this piece of unused metadata was serialized prior to the
           // addition of LexerAction
-          final actionIndexIgnored = readInt();
+          readInt();
         }
       }
     }
 
-    atn.ruleToStopState = List<RuleStopState>(nrules);
+    atn.ruleToStopState = List<RuleStopState>.generate(
+        nrules, (int index) => RuleStopState(index));
+
     for (var state in atn.states) {
-      if (!(state is RuleStopState)) {
+      if (state is! RuleStopState) {
         continue;
       }
-
-      RuleStopState stopState = state;
-      atn.ruleToStopState[state.ruleIndex] = stopState;
-      atn.ruleToStartState[state.ruleIndex].stopState = stopState;
+      atn.ruleToStopState[state.ruleIndex] = state;
+      atn.ruleToStartState[state.ruleIndex].stopState = state;
     }
   }
 
@@ -339,18 +339,20 @@ class ATNDeserializer {
       final arg1 = readInt();
       final arg2 = readInt();
       final arg3 = readInt();
-      final trans =
-          edgeFactory(atn, ttype, src, trg, arg1, arg2, arg3, sets);
+      final trans = edgeFactory(atn, ttype, src, trg, arg1, arg2, arg3, sets);
 //			System.out.println("EDGE "+trans.getClass().getSimpleName()+" "+
 //							   src+"->"+trg+
 //					   " "+Transition.serializationNames[ttype]+
 //					   " "+arg1+","+arg2+","+arg3);
-      final srcState = atn.states[src];
+      final srcState = atn.states[src]!;
       srcState.addTransition(trans);
     }
 
     // edges for rule stop states can be derived, so they aren't serialized
     for (var state in atn.states) {
+      if (state == null) {
+        continue;
+      }
       for (var i = 0; i < state.numberOfTransitions; i++) {
         final t = state.transition(i);
         if (t is RuleTransition) {
@@ -379,11 +381,11 @@ class ATNDeserializer {
         }
 
         // block end states can only be associated to a single block start state
-        if (state.endState.startState != null) {
+        if (state.endState!.startState != null) {
           throw StateError('');
         }
 
-        state.endState.startState = state;
+        state.endState!.startState = state;
       }
 
       if (state is PlusLoopbackState) {
@@ -410,7 +412,7 @@ class ATNDeserializer {
     final ndecisions = readInt();
     for (var i = 1; i <= ndecisions; i++) {
       final s = readInt();
-      DecisionState decState = atn.states[s];
+      final decState = atn.states[s] as DecisionState;
       atn.decisionToState.add(decState);
       decState.decision = i - 1;
     }
@@ -419,8 +421,7 @@ class ATNDeserializer {
   void readLexerActions(ATN atn) {
     if (atn.grammarType == ATNType.LEXER) {
       if (isFeatureSupported(ADDED_LEXER_ACTIONS, uuid)) {
-        atn.lexerActions = List<LexerAction>(readInt());
-        for (var i = 0; i < atn.lexerActions.length; i++) {
+        atn.lexerActions = List<LexerAction>.generate(readInt(), (index) {
           final actionType = LexerActionType.values[readInt()];
           var data1 = readInt();
           if (data1 == 0xFFFF) {
@@ -431,24 +432,25 @@ class ATNDeserializer {
           if (data2 == 0xFFFF) {
             data2 = -1;
           }
-          final lexerAction =
-              lexerActionFactory(actionType, data1, data2);
+          final lexerAction = lexerActionFactory(actionType, data1, data2);
 
-          atn.lexerActions[i] = lexerAction;
-        }
+          return lexerAction;
+        });
       } else {
         // for compatibility with older serialized ATNs, convert the old
         // serialized action index for action transitions to the new
         // form, which is the index of a LexerCustomAction
         final legacyLexerActions = <LexerAction>[];
         for (var state in atn.states) {
+          if (state == null) {
+            continue;
+          }
           for (var i = 0; i < state.numberOfTransitions; i++) {
             final transition = state.transition(i);
             if (transition is ActionTransition) {
               final ruleIndex = transition.ruleIndex;
               final actionIndex = transition.actionIndex;
-              final lexerAction =
-                  LexerCustomAction(ruleIndex, actionIndex);
+              final lexerAction = LexerCustomAction(ruleIndex, actionIndex);
               state.setTransition(
                   i,
                   ActionTransition(transition.target, ruleIndex,
@@ -464,21 +466,20 @@ class ATNDeserializer {
   }
 
   void generateRuleBypassTransitions(ATN atn) {
-    for (var i = 0; i < atn.ruleToStartState.length; i++) {
-      atn.ruleToTokenType[i] = atn.maxTokenType + i + 1;
-    }
+    final length = atn.ruleToStartState.length;
+    atn.ruleToTokenType =
+        List<int>.generate(length, (index) => atn.maxTokenType + index + 1);
+
     for (var i = 0; i < atn.ruleToStartState.length; i++) {
       generateRuleBypassTransition(atn, i);
     }
   }
 
   void generateRuleBypassTransition(ATN atn, int idx) {
-    final bypassStart = BasicBlockStartState();
-    bypassStart.ruleIndex = idx;
+    final bypassStart = BasicBlockStartState(idx);
     atn.addState(bypassStart);
 
-    final bypassStop = BlockEndState();
-    bypassStop.ruleIndex = idx;
+    final bypassStop = BlockEndState(idx);
     atn.addState(bypassStop);
 
     bypassStart.endState = bypassStop;
@@ -486,23 +487,26 @@ class ATNDeserializer {
 
     bypassStop.startState = bypassStart;
 
-    ATNState endState;
-    Transition excludeTransition;
+    ATNState? endState;
+    Transition? excludeTransition;
     if (atn.ruleToStartState[idx].isLeftRecursiveRule) {
       // wrap from the beginning of the rule to the StarLoopEntryState
       endState = null;
       for (var state in atn.states) {
+        if (state == null) {
+          continue;
+        }
         if (state.ruleIndex != idx) {
           continue;
         }
 
-        if (!(state is StarLoopEntryState)) {
+        if (state is! StarLoopEntryState) {
           continue;
         }
 
         final maybeLoopEndState =
             state.transition(state.numberOfTransitions - 1).target;
-        if (!(maybeLoopEndState is LoopEndState)) {
+        if (maybeLoopEndState is! LoopEndState) {
           continue;
         }
 
@@ -515,17 +519,21 @@ class ATNDeserializer {
 
       if (endState == null) {
         throw UnsupportedError(
-            "Couldn't identify final state of the precedence rule prefix section.");
+          "Couldn't identify final state of the precedence rule prefix section.",
+        );
       }
 
       excludeTransition =
-          (endState as StarLoopEntryState).loopBackState.transition(0);
+          (endState as StarLoopEntryState).loopBackState!.transition(0);
     } else {
       endState = atn.ruleToStopState[idx];
     }
 
     // all non-excluded transitions that currently target end state need to target blockEnd instead
     for (var state in atn.states) {
+      if (state == null) {
+        continue;
+      }
       for (var transition in state.transitions) {
         if (transition == excludeTransition) {
           continue;
@@ -539,8 +547,8 @@ class ATNDeserializer {
 
     // all transitions leaving the rule start state need to leave blockStart instead
     while (atn.ruleToStartState[idx].numberOfTransitions > 0) {
-      final transition = atn.ruleToStartState[idx].removeTransition(
-          atn.ruleToStartState[idx].numberOfTransitions - 1);
+      final transition = atn.ruleToStartState[idx]
+          .removeTransition(atn.ruleToStartState[idx].numberOfTransitions - 1);
       bypassStart.addTransition(transition);
     }
 
@@ -548,10 +556,13 @@ class ATNDeserializer {
     atn.ruleToStartState[idx].addTransition(EpsilonTransition(bypassStart));
     bypassStop.addTransition(EpsilonTransition(endState));
 
-    ATNState matchState = BasicState();
+    ATNState matchState = BasicState(idx);
     atn.addState(matchState);
-    matchState.addTransition(
-        AtomTransition(bypassStop, atn.ruleToTokenType[idx]));
+
+    matchState.addTransition(AtomTransition(
+      bypassStop,
+      atn.ruleToTokenType[idx],
+    ));
     bypassStart.addTransition(EpsilonTransition(matchState));
   }
 
@@ -588,8 +599,8 @@ class ATNDeserializer {
         continue;
       }
 
-      checkCondition(state.onlyHasEpsilonTransitions() ||
-          state.numberOfTransitions <= 1);
+      checkCondition(
+          state.onlyHasEpsilonTransitions() || state.numberOfTransitions <= 1);
 
       if (state is PlusBlockStartState) {
         checkCondition(state.loopBackState != null);
@@ -667,29 +678,50 @@ class ATNDeserializer {
     return (low & 0x00000000FFFFFFFF) | (high << 32);
   }
 
-  static final byteToHex  = List.generate(256, (i) => i.toRadixString(16).padLeft(2, '0').toUpperCase());
+  static final byteToHex = List.generate(
+      256, (i) => i.toRadixString(16).padLeft(2, '0').toUpperCase());
 
   String readUUID() {
-    final bb = List<int>(16);
+    final bb = List<int>.filled(16, 0);
+
     for (var i = 7; i >= 0; i--) {
       final int = readInt();
-      /* jshint bitwise: false */
       bb[(2 * i) + 1] = int & 0xFF;
       bb[2 * i] = (int >> 8) & 0xFF;
     }
-    return byteToHex[bb[0]] + byteToHex[bb[1]] +
-        byteToHex[bb[2]] + byteToHex[bb[3]] + '-' +
-        byteToHex[bb[4]] + byteToHex[bb[5]] + '-' +
-        byteToHex[bb[6]] + byteToHex[bb[7]] + '-' +
-        byteToHex[bb[8]] + byteToHex[bb[9]] + '-' +
-        byteToHex[bb[10]] + byteToHex[bb[11]] +
-        byteToHex[bb[12]] + byteToHex[bb[13]] +
-        byteToHex[bb[14]] + byteToHex[bb[15]];
+    return byteToHex[bb[0]] +
+        byteToHex[bb[1]] +
+        byteToHex[bb[2]] +
+        byteToHex[bb[3]] +
+        '-' +
+        byteToHex[bb[4]] +
+        byteToHex[bb[5]] +
+        '-' +
+        byteToHex[bb[6]] +
+        byteToHex[bb[7]] +
+        '-' +
+        byteToHex[bb[8]] +
+        byteToHex[bb[9]] +
+        '-' +
+        byteToHex[bb[10]] +
+        byteToHex[bb[11]] +
+        byteToHex[bb[12]] +
+        byteToHex[bb[13]] +
+        byteToHex[bb[14]] +
+        byteToHex[bb[15]];
   }
 
-  Transition edgeFactory(ATN atn, TransitionType type, int src, int trg,
-      int arg1, int arg2, int arg3, List<IntervalSet> sets) {
-    final target = atn.states[trg];
+  Transition edgeFactory(
+    ATN atn,
+    TransitionType type,
+    int src,
+    int trg,
+    int arg1,
+    int arg2,
+    int arg3,
+    List<IntervalSet> sets,
+  ) {
+    final target = atn.states[trg]!;
     switch (type) {
       case TransitionType.EPSILON:
         return EpsilonTransition(target);
@@ -698,12 +730,11 @@ class ATNDeserializer {
             ? RangeTransition(target, Token.EOF, arg2)
             : RangeTransition(target, arg1, arg2);
       case TransitionType.RULE:
-        final rt =
-            RuleTransition(atn.states[arg1], arg2, arg3, target);
+        final rt = RuleTransition(
+            atn.states[arg1] as RuleStartState, arg2, arg3, target);
         return rt;
       case TransitionType.PREDICATE:
-        final pt =
-            PredicateTransition(target, arg1, arg2, arg3 != 0);
+        final pt = PredicateTransition(target, arg1, arg2, arg3 != 0);
         return pt;
       case TransitionType.PRECEDENCE:
         return PrecedencePredicateTransition(target, arg1);
@@ -712,8 +743,7 @@ class ATNDeserializer {
             ? AtomTransition(target, Token.EOF)
             : AtomTransition(target, arg1);
       case TransitionType.ACTION:
-        final a =
-            ActionTransition(target, arg1, arg2, arg3 != 0);
+        final a = ActionTransition(target, arg1, arg2, arg3 != 0);
         return a;
       case TransitionType.SET:
         return SetTransition(target, sets[arg1]);
@@ -728,52 +758,51 @@ class ATNDeserializer {
     }
   }
 
-  ATNState stateFactory(StateType type, int ruleIndex) {
+  ATNState? stateFactory(StateType type, int ruleIndex) {
     ATNState s;
     switch (type) {
       case StateType.INVALID_TYPE:
         return null;
       case StateType.BASIC:
-        s = BasicState();
+        s = BasicState(ruleIndex);
         break;
       case StateType.RULE_START:
-        s = RuleStartState();
+        s = RuleStartState(ruleIndex);
         break;
       case StateType.BLOCK_START:
-        s = BasicBlockStartState();
+        s = BasicBlockStartState(ruleIndex);
         break;
       case StateType.PLUS_BLOCK_START:
-        s = PlusBlockStartState();
+        s = PlusBlockStartState(ruleIndex);
         break;
       case StateType.STAR_BLOCK_START:
-        s = StarBlockStartState();
+        s = StarBlockStartState(ruleIndex);
         break;
       case StateType.TOKEN_START:
-        s = TokensStartState();
+        s = TokensStartState(ruleIndex);
         break;
       case StateType.RULE_STOP:
-        s = RuleStopState();
+        s = RuleStopState(ruleIndex);
         break;
       case StateType.BLOCK_END:
-        s = BlockEndState();
+        s = BlockEndState(ruleIndex);
         break;
       case StateType.STAR_LOOP_BACK:
-        s = StarLoopbackState();
+        s = StarLoopbackState(ruleIndex);
         break;
       case StateType.STAR_LOOP_ENTRY:
-        s = StarLoopEntryState();
+        s = StarLoopEntryState(ruleIndex);
         break;
       case StateType.PLUS_LOOP_BACK:
-        s = PlusLoopbackState();
+        s = PlusLoopbackState(ruleIndex);
         break;
       case StateType.LOOP_END:
-        s = LoopEndState();
+        s = LoopEndState(ruleIndex);
         break;
       default:
         throw ArgumentError.value(type, 'state type', 'not valid.');
     }
 
-    s.ruleIndex = ruleIndex;
     return s;
   }
 
