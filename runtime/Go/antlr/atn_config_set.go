@@ -6,12 +6,13 @@ package antlr
 
 import "fmt"
 
+// ATNConfigSet extends ATNConfig in the form of an unordered set.
 type ATNConfigSet interface {
 	hash() int
 	Add(ATNConfig, *DoubleDict) bool
 	AddAll([]ATNConfig) bool
 
-	GetStates() *Set
+	getStates() *set
 	GetPredicates() []SemanticContext
 	GetItems() []ATNConfig
 
@@ -32,8 +33,8 @@ type ATNConfigSet interface {
 	ReadOnly() bool
 	SetReadOnly(bool)
 
-	GetConflictingAlts() *BitSet
-	SetConflictingAlts(*BitSet)
+	getConflictingAlts() *bitSet
+	setConflictingAlts(*bitSet)
 
 	FullContext() bool
 
@@ -55,7 +56,7 @@ type BaseATNConfigSet struct {
 	// effectively doubles the number of objects associated with ATNConfigs. All
 	// keys are hashed by (s, i, _, pi), not including the context. Wiped out when
 	// read-only because a set becomes a DFA state.
-	configLookup *Set
+	configLookup *set
 
 	// configs is the added elements.
 	configs []ATNConfig
@@ -63,7 +64,7 @@ type BaseATNConfigSet struct {
 	// TODO: These fields make me pretty uncomfortable, but it is nice to pack up
 	// info together because it saves recomputation. Can we track conflicts as they
 	// are added to save scanning configs later?
-	conflictingAlts *BitSet
+	conflictingAlts *bitSet
 
 	// dipsIntoOuterContext is used by parsers and lexers. In a lexer, it indicates
 	// we hit a pred while computing a closure operation. Do not make a DFA state
@@ -91,11 +92,12 @@ type BaseATNConfigSet struct {
 	uniqueAlt int
 }
 
+// NewBaseATNConfigSet returns a new instance of BaseATNConfigSet.
 func NewBaseATNConfigSet(fullCtx bool) *BaseATNConfigSet {
 	return &BaseATNConfigSet{
-		cachedHash: -1,
-		configLookup:     NewSet(nil, equalATNConfigs),
-		fullCtx:          fullCtx,
+		cachedHash:   -1,
+		configLookup: newSet(nil, equalATNConfigs),
+		fullCtx:      fullCtx,
 	}
 }
 
@@ -145,8 +147,9 @@ func (b *BaseATNConfigSet) Add(config ATNConfig, mergeCache *DoubleDict) bool {
 	return true
 }
 
-func (b *BaseATNConfigSet) GetStates() *Set {
-	states := NewSet(nil, nil)
+// getStates returns the config states contained in this object.
+func (b *BaseATNConfigSet) getStates() *set {
+	states := newSet(nil, nil)
 
 	for i := 0; i < len(b.configs); i++ {
 		states.add(b.configs[i].GetState())
@@ -155,14 +158,17 @@ func (b *BaseATNConfigSet) GetStates() *Set {
 	return states
 }
 
+// HasSemanticContext returns true if this config has a semantic context.
 func (b *BaseATNConfigSet) HasSemanticContext() bool {
 	return b.hasSemanticContext
 }
 
+// SetHasSemanticContext sets whether this config has a semantic context.
 func (b *BaseATNConfigSet) SetHasSemanticContext(v bool) {
 	b.hasSemanticContext = v
 }
 
+// GetPredicates returns a slice with the predicates of this object's elements.
 func (b *BaseATNConfigSet) GetPredicates() []SemanticContext {
 	preds := make([]SemanticContext, 0)
 
@@ -177,10 +183,14 @@ func (b *BaseATNConfigSet) GetPredicates() []SemanticContext {
 	return preds
 }
 
+// GetItems returns the configurations contained in this object.
 func (b *BaseATNConfigSet) GetItems() []ATNConfig {
 	return b.configs
 }
 
+// OptimizeConfigs optimizes the elements in this object by retrieving the
+// cached contexts in the given interpreter. The method will panic if the
+// object is read-only.
 func (b *BaseATNConfigSet) OptimizeConfigs(interpreter *BaseATNSimulator) {
 	if b.readOnly {
 		panic("set is read-only")
@@ -190,13 +200,12 @@ func (b *BaseATNConfigSet) OptimizeConfigs(interpreter *BaseATNSimulator) {
 		return
 	}
 
-	for i := 0; i < len(b.configs); i++ {
-		config := b.configs[i]
-
+	for _, config := range b.configs {
 		config.SetContext(interpreter.getCachedContext(config.GetContext()))
 	}
 }
 
+// AddAll adds all the elements in the given slice.
 func (b *BaseATNConfigSet) AddAll(coll []ATNConfig) bool {
 	for i := 0; i < len(coll); i++ {
 		b.Add(coll[i], nil)
@@ -205,6 +214,7 @@ func (b *BaseATNConfigSet) AddAll(coll []ATNConfig) bool {
 	return false
 }
 
+// Equals returns true if the given element is equal to this one.
 func (b *BaseATNConfigSet) Equals(other interface{}) bool {
 	if b == other {
 		return true
@@ -245,14 +255,17 @@ func (b *BaseATNConfigSet) hashCodeConfigs() int {
 	return murmurFinish(h, len(b.configs))
 }
 
+// Length returns the number of configs in this object.
 func (b *BaseATNConfigSet) Length() int {
 	return len(b.configs)
 }
 
+// IsEmpty returns true if this object doesn't contain any configs.
 func (b *BaseATNConfigSet) IsEmpty() bool {
 	return len(b.configs) == 0
 }
 
+// Contains returns true if the given item is contained in this set.
 func (b *BaseATNConfigSet) Contains(item ATNConfig) bool {
 	if b.configLookup == nil {
 		panic("not implemented for read-only sets")
@@ -261,6 +274,7 @@ func (b *BaseATNConfigSet) Contains(item ATNConfig) bool {
 	return b.configLookup.contains(item)
 }
 
+// ContainsFast returns true if the given item is contained in this set.
 func (b *BaseATNConfigSet) ContainsFast(item ATNConfig) bool {
 	if b.configLookup == nil {
 		panic("not implemented for read-only sets")
@@ -269,6 +283,7 @@ func (b *BaseATNConfigSet) ContainsFast(item ATNConfig) bool {
 	return b.configLookup.contains(item) // TODO: containsFast is not implemented for Set
 }
 
+// Clear removes all contained objects from this set.
 func (b *BaseATNConfigSet) Clear() {
 	if b.readOnly {
 		panic("set is read-only")
@@ -276,41 +291,55 @@ func (b *BaseATNConfigSet) Clear() {
 
 	b.configs = make([]ATNConfig, 0)
 	b.cachedHash = -1
-	b.configLookup = NewSet(nil, equalATNConfigs)
+	b.configLookup = newSet(nil, equalATNConfigs)
 }
 
+// FullContext returns true if this set is a full context
 func (b *BaseATNConfigSet) FullContext() bool {
 	return b.fullCtx
 }
 
+// GetDipsIntoOuterContext returns whether this set dips into its outer
+// context.
 func (b *BaseATNConfigSet) GetDipsIntoOuterContext() bool {
 	return b.dipsIntoOuterContext
 }
 
+// SetDipsIntoOuterContext sets whether this set dips into it's outer context.
 func (b *BaseATNConfigSet) SetDipsIntoOuterContext(v bool) {
 	b.dipsIntoOuterContext = v
 }
 
+// TODO: This *seems* to be what it does, based on the usage
+
+// GetUniqueAlt returns this set's unique alternative. This number identifies
+// this alternative as distinct.
 func (b *BaseATNConfigSet) GetUniqueAlt() int {
 	return b.uniqueAlt
 }
 
+// SetUniqueAlt sets the unique alternative for this set.This number identifies
+// this alternative as distinct.
 func (b *BaseATNConfigSet) SetUniqueAlt(v int) {
 	b.uniqueAlt = v
 }
 
-func (b *BaseATNConfigSet) GetConflictingAlts() *BitSet {
+// getConflictingAlts returns the conflicting alternatives in this config.
+func (b *BaseATNConfigSet) getConflictingAlts() *bitSet {
 	return b.conflictingAlts
 }
 
-func (b *BaseATNConfigSet) SetConflictingAlts(v *BitSet) {
+// setConflictingAlts sets the conflicting alternatives in this config.
+func (b *BaseATNConfigSet) setConflictingAlts(v *bitSet) {
 	b.conflictingAlts = v
 }
 
+// ReadOnly returns whether this set is read-only.
 func (b *BaseATNConfigSet) ReadOnly() bool {
 	return b.readOnly
 }
 
+// SetReadOnly controls whether this set is read-only.
 func (b *BaseATNConfigSet) SetReadOnly(readOnly bool) {
 	b.readOnly = readOnly
 
@@ -319,6 +348,9 @@ func (b *BaseATNConfigSet) SetReadOnly(readOnly bool) {
 	}
 }
 
+// String implements the stringer interface. The returned string has the format:
+//
+//		[<configs>],<flags>
 func (b *BaseATNConfigSet) String() string {
 	s := "["
 
@@ -351,14 +383,16 @@ func (b *BaseATNConfigSet) String() string {
 	return s
 }
 
+// OrderedATNConfigSet extends BaseATNConfigSet.
 type OrderedATNConfigSet struct {
 	*BaseATNConfigSet
 }
 
+// NewOrderedATNConfigSet returns a new instance of OrderedATNConfigSet.
 func NewOrderedATNConfigSet() *OrderedATNConfigSet {
 	b := NewBaseATNConfigSet(false)
 
-	b.configLookup = NewSet(nil, nil)
+	b.configLookup = newSet(nil, nil)
 
 	return &OrderedATNConfigSet{BaseATNConfigSet: b}
 }

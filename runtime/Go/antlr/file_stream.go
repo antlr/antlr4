@@ -10,15 +10,15 @@ import (
 	"os"
 )
 
-//  This is an InputStream that is loaded from a file all at once
-//  when you construct the object.
-
+// FileStream is an InputStream that is loaded from a file all at once
+// when you construct the object.
 type FileStream struct {
 	*InputStream
 
 	filename string
 }
 
+// NewFileStream returns a new instance of FileStream.
 func NewFileStream(fileName string) (*FileStream, error) {
 
 	buf := bytes.NewBuffer(nil)
@@ -32,18 +32,18 @@ func NewFileStream(fileName string) (*FileStream, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	fs := new(FileStream)
-
-	fs.filename = fileName
 	s := string(buf.Bytes())
 
-	fs.InputStream = NewInputStream(s)
+	fs := &FileStream{
+		InputStream: NewInputStream(s),
+		filename:    fileName,
+	}
 
 	return fs, nil
 
 }
 
+// GetSourceName returns the name of the file this object was created from.
 func (f *FileStream) GetSourceName() string {
 	return f.filename
 }

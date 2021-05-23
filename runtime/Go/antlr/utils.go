@@ -27,37 +27,35 @@ func intMax(a, b int) int {
 	return b
 }
 
-// A simple integer stack
+type intStack []int
 
-type IntStack []int
+var errEmptyStack = errors.New("Stack is empty")
 
-var ErrEmptyStack = errors.New("Stack is empty")
-
-func (s *IntStack) Pop() (int, error) {
+func (s *intStack) Pop() (int, error) {
 	l := len(*s) - 1
 	if l < 0 {
-		return 0, ErrEmptyStack
+		return 0, errEmptyStack
 	}
 	v := (*s)[l]
 	*s = (*s)[0:l]
 	return v, nil
 }
 
-func (s *IntStack) Push(e int) {
+func (s *intStack) Push(e int) {
 	*s = append(*s, e)
 }
 
-type Set struct {
+type set struct {
 	data             map[int][]interface{}
 	hashcodeFunction func(interface{}) int
 	equalsFunction   func(interface{}, interface{}) bool
 }
 
-func NewSet(
+func newSet(
 	hashcodeFunction func(interface{}) int,
-	equalsFunction func(interface{}, interface{}) bool) *Set {
+	equalsFunction func(interface{}, interface{}) bool) *set {
 
-	s := new(Set)
+	s := &set{}
 
 	s.data = make(map[int][]interface{})
 
@@ -100,11 +98,11 @@ type hasher interface {
 	hash() int
 }
 
-func (s *Set) length() int {
+func (s *set) length() int {
 	return len(s.data)
 }
 
-func (s *Set) add(value interface{}) interface{} {
+func (s *set) add(value interface{}) interface{} {
 
 	key := s.hashcodeFunction(value)
 
@@ -128,7 +126,7 @@ func (s *Set) add(value interface{}) interface{} {
 	return value
 }
 
-func (s *Set) contains(value interface{}) bool {
+func (s *set) contains(value interface{}) bool {
 
 	key := s.hashcodeFunction(value)
 
@@ -144,7 +142,7 @@ func (s *Set) contains(value interface{}) bool {
 	return false
 }
 
-func (s *Set) values() []interface{} {
+func (s *set) values() []interface{} {
 	var l []interface{}
 
 	for _, v := range s.data {
@@ -154,7 +152,7 @@ func (s *Set) values() []interface{} {
 	return l
 }
 
-func (s *Set) String() string {
+func (s *set) String() string {
 	r := ""
 
 	for _, av := range s.data {
@@ -166,39 +164,40 @@ func (s *Set) String() string {
 	return r
 }
 
-type BitSet struct {
+type bitSet struct {
 	data map[int]bool
 }
 
-func NewBitSet() *BitSet {
-	b := new(BitSet)
-	b.data = make(map[int]bool)
+func newBitSet() *bitSet {
+	b := &bitSet{
+		data: make(map[int]bool),
+	}
 	return b
 }
 
-func (b *BitSet) add(value int) {
+func (b *bitSet) add(value int) {
 	b.data[value] = true
 }
 
-func (b *BitSet) clear(index int) {
+func (b *bitSet) clear(index int) {
 	delete(b.data, index)
 }
 
-func (b *BitSet) or(set *BitSet) {
+func (b *bitSet) or(set *bitSet) {
 	for k := range set.data {
 		b.add(k)
 	}
 }
 
-func (b *BitSet) remove(value int) {
+func (b *bitSet) remove(value int) {
 	delete(b.data, value)
 }
 
-func (b *BitSet) contains(value int) bool {
+func (b *bitSet) contains(value int) bool {
 	return b.data[value]
 }
 
-func (b *BitSet) values() []int {
+func (b *bitSet) values() []int {
 	ks := make([]int, len(b.data))
 	i := 0
 	for k := range b.data {
@@ -209,7 +208,7 @@ func (b *BitSet) values() []int {
 	return ks
 }
 
-func (b *BitSet) minValue() int {
+func (b *bitSet) minValue() int {
 	min := 2147483647
 
 	for k := range b.data {
@@ -221,8 +220,8 @@ func (b *BitSet) minValue() int {
 	return min
 }
 
-func (b *BitSet) equals(other interface{}) bool {
-	otherBitSet, ok := other.(*BitSet)
+func (b *bitSet) equals(other interface{}) bool {
+	otherBitSet, ok := other.(*bitSet)
 	if !ok {
 		return false
 	}
@@ -240,11 +239,11 @@ func (b *BitSet) equals(other interface{}) bool {
 	return true
 }
 
-func (b *BitSet) length() int {
+func (b *bitSet) length() int {
 	return len(b.data)
 }
 
-func (b *BitSet) String() string {
+func (b *bitSet) String() string {
 	vals := b.values()
 	valsS := make([]string, len(vals))
 
@@ -254,27 +253,28 @@ func (b *BitSet) String() string {
 	return "{" + strings.Join(valsS, ", ") + "}"
 }
 
-type AltDict struct {
+type altDict struct {
 	data map[string]interface{}
 }
 
-func NewAltDict() *AltDict {
-	d := new(AltDict)
-	d.data = make(map[string]interface{})
+func newAltDict() *altDict {
+	d := &altDict{
+		data: make(map[string]interface{}),
+	}
 	return d
 }
 
-func (a *AltDict) Get(key string) interface{} {
+func (a *altDict) Get(key string) interface{} {
 	key = "k-" + key
 	return a.data[key]
 }
 
-func (a *AltDict) put(key string, value interface{}) {
+func (a *altDict) put(key string, value interface{}) {
 	key = "k-" + key
 	a.data[key] = value
 }
 
-func (a *AltDict) values() []interface{} {
+func (a *altDict) values() []interface{} {
 	vs := make([]interface{}, len(a.data))
 	i := 0
 	for _, v := range a.data {
@@ -288,9 +288,10 @@ type DoubleDict struct {
 	data map[int]map[int]interface{}
 }
 
-func NewDoubleDict() *DoubleDict {
-	dd := new(DoubleDict)
-	dd.data = make(map[int]map[int]interface{})
+func newDoubleDict() *DoubleDict {
+	dd := &DoubleDict{
+		data: make(map[int]map[int]interface{}),
+	}
 	return dd
 }
 
@@ -315,6 +316,8 @@ func (d *DoubleDict) set(a, b int, o interface{}) {
 	data[b] = o
 }
 
+// EscapeWhitespace replaces whitespace characters in the given rune with their
+// text representations.
 func EscapeWhitespace(s string, escapeSpaces bool) string {
 
 	s = strings.Replace(s, "\t", "\\t", -1)
@@ -326,6 +329,8 @@ func EscapeWhitespace(s string, escapeSpaces bool) string {
 	return s
 }
 
+// TerminalNodeToStringArray transforms an array of terminals to an array of
+// strings.
 func TerminalNodeToStringArray(sa []TerminalNode) []string {
 	st := make([]string, len(sa))
 
@@ -336,6 +341,8 @@ func TerminalNodeToStringArray(sa []TerminalNode) []string {
 	return st
 }
 
+// PrintArrayJavaStyle returns a string representation of the given array as
+// would be done in the jvm.
 func PrintArrayJavaStyle(sa []string) string {
 	var buffer bytes.Buffer
 
@@ -379,7 +386,6 @@ func rotateLeft64(x uint64, k int) uint64 {
 	s := uint(k) & (n - 1)
 	return x<<s | x>>(n-s)
 }
-
 
 // murmur hash
 const (

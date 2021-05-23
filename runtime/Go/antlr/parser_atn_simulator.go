@@ -10,6 +10,7 @@ import (
 	"strings"
 )
 
+// ParserATNSimulator debug flags
 var (
 	ParserATNSimulatorDebug            = false
 	ParserATNSimulatorListATNDecisions = false
@@ -17,6 +18,7 @@ var (
 	ParserATNSimulatorRetryDebug       = false
 )
 
+// ParserATNSimulator interprets the abstract transition network.
 type ParserATNSimulator struct {
 	*BaseATNSimulator
 
@@ -25,49 +27,48 @@ type ParserATNSimulator struct {
 	input          TokenStream
 	startIndex     int
 	dfa            *DFA
-	mergeCache     *DoubleDict
-	outerContext   ParserRuleContext
+	// Each prediction operation uses a cache for merge of prediction contexts.
+	// Don't keep around as it wastes huge amounts of memory. DoubleKeyMap
+	// isn't Synchronized but we're ok since two threads shouldn't reuse same
+	// parser/atnsim object because it can only handle one input at a time.
+	// This maps graphs a and b to merged result c. (a,b)&rarrc. We can avoid
+	// the merge if we ever see a and b again.  Note that (b,a)&rarrc should
+	// also be examined during cache lookup.
+	mergeCache   *DoubleDict
+	outerContext ParserRuleContext
 }
 
+// NewParserATNSimulator returns a new instance of ParserATNSimulator
 func NewParserATNSimulator(parser Parser, atn *ATN, decisionToDFA []*DFA, sharedContextCache *PredictionContextCache) *ParserATNSimulator {
 
-	p := new(ParserATNSimulator)
+	p := &ParserATNSimulator{
+		BaseATNSimulator: NewBaseATNSimulator(atn, sharedContextCache),
+		parser:           parser,
+		predictionMode:   PredictionModeLL,
+		input:            nil,
+		startIndex:       0,
+		outerContext:     nil,
+		dfa:              nil,
+		mergeCache:       nil,
+	}
 
-	p.BaseATNSimulator = NewBaseATNSimulator(atn, sharedContextCache)
-
-	p.parser = parser
 	p.decisionToDFA = decisionToDFA
-	// SLL, LL, or LL + exact ambig detection?//
-	p.predictionMode = PredictionModeLL
-	// LAME globals to avoid parameters!!!!! I need these down deep in predTransition
-	p.input = nil
-	p.startIndex = 0
-	p.outerContext = nil
-	p.dfa = nil
-	// Each prediction operation uses a cache for merge of prediction contexts.
-	//  Don't keep around as it wastes huge amounts of memory. DoubleKeyMap
-	//  isn't Synchronized but we're ok since two threads shouldn't reuse same
-	//  parser/atnsim object because it can only handle one input at a time.
-	//  This maps graphs a and b to merged result c. (a,b)&rarrc. We can avoid
-	//  the merge if we ever see a and b again.  Note that (b,a)&rarrc should
-	//  also be examined during cache lookup.
-	//
-	p.mergeCache = nil
-
 	return p
 }
 
+// GetPredictionMode returns the current prediction mode
 func (p *ParserATNSimulator) GetPredictionMode() int {
 	return p.predictionMode
 }
 
+// SetPredictionMode sets the prediction mode.
 func (p *ParserATNSimulator) SetPredictionMode(v int) {
 	p.predictionMode = v
 }
 
-func (p *ParserATNSimulator) reset() {
-}
+func (p *ParserATNSimulator) reset() {}
 
+// AdaptivePredict predicts the next token in the given token stream.
 func (p *ParserATNSimulator) AdaptivePredict(input TokenStream, decision int, outerContext ParserRuleContext) int {
 	if ParserATNSimulatorDebug || ParserATNSimulatorListATNDecisions {
 		fmt.Println("AdaptivePredict decision " + strconv.Itoa(decision) +
@@ -221,7 +222,7 @@ func (p *ParserATNSimulator) execATN(dfa *DFA, s0 *DFAState, input TokenStream, 
 		}
 		if D.requiresFullContext && p.predictionMode != PredictionModeSLL {
 			// IF PREDS, MIGHT RESOLVE TO SINGLE ALT => SLL (or syntax error)
-			conflictingAlts := D.configs.GetConflictingAlts()
+			conflictingAlts := D.configs.getConflictingAlts()
 			if D.predicates != nil {
 				if ParserATNSimulatorDebug {
 					fmt.Println("DFA state has preds in DFA sim LL failover")
@@ -276,18 +277,16 @@ func (p *ParserATNSimulator) execATN(dfa *DFA, s0 *DFAState, input TokenStream, 
 			t = input.LA(1)
 		}
 	}
-
-	panic("Should not have reached p state")
 }
 
 // Get an existing target state for an edge in the DFA. If the target state
 // for the edge has not yet been computed or is otherwise not available,
-// p method returns {@code nil}.
+// p method returns nil.
 //
 // @param previousD The current DFA state
 // @param t The next input symbol
 // @return The existing target DFA state for the given input symbol
-// {@code t}, or {@code nil} if the target state for p edge is not
+// t, or nil if the target state for p edge is not
 // already cached
 
 func (p *ParserATNSimulator) getExistingTargetState(previousD *DFAState, t int) *DFAState {
@@ -307,8 +306,8 @@ func (p *ParserATNSimulator) getExistingTargetState(previousD *DFAState, t int) 
 // @param t The next input symbol
 //
 // @return The computed target DFA state for the given input symbol
-// {@code t}. If {@code t} does not lead to a valid DFA state, p method
-// returns {@link //ERROR}.
+// t. If t does not lead to a valid DFA state, p method
+// returns //ERROR.
 
 func (p *ParserATNSimulator) computeTargetState(dfa *DFA, previousD *DFAState, t int) *DFAState {
 	reach := p.computeReachSet(previousD.configs, t, false)
@@ -323,7 +322,7 @@ func (p *ParserATNSimulator) computeTargetState(dfa *DFA, previousD *DFAState, t
 	predictedAlt := p.getUniqueAlt(reach)
 
 	if ParserATNSimulatorDebug {
-		altSubSets := PredictionModegetConflictingAltSubsets(reach)
+		altSubSets := predictionModeGetConflictingAltSubsets(reach)
 		fmt.Println("SLL altSubSets=" + fmt.Sprint(altSubSets) +
 			", previous=" + previousD.configs.String() +
 			", configs=" + reach.String() +
@@ -339,11 +338,11 @@ func (p *ParserATNSimulator) computeTargetState(dfa *DFA, previousD *DFAState, t
 		D.setPrediction(predictedAlt)
 	} else if PredictionModehasSLLConflictTerminatingPrediction(p.predictionMode, reach) {
 		// MORE THAN ONE VIABLE ALTERNATIVE
-		D.configs.SetConflictingAlts(p.getConflictingAlts(reach))
+		D.configs.setConflictingAlts(p.getConflictingAlts(reach))
 		D.requiresFullContext = true
 		// in SLL-only mode, we will stop at p state and return the minimum alt
 		D.isAcceptState = true
-		D.setPrediction(D.configs.GetConflictingAlts().minValue())
+		D.setPrediction(D.configs.getConflictingAlts().minValue())
 	}
 	if D.isAcceptState && D.configs.HasSemanticContext() {
 		p.predicateDFAState(D, p.atn.getDecisionState(dfa.decision))
@@ -411,7 +410,7 @@ func (p *ParserATNSimulator) execATNWithFullContext(dfa *DFA, D *DFAState, s0 AT
 
 			panic(e)
 		}
-		altSubSets := PredictionModegetConflictingAltSubsets(reach)
+		altSubSets := predictionModeGetConflictingAltSubsets(reach)
 		if ParserATNSimulatorDebug {
 			fmt.Println("LL altSubSets=" + fmt.Sprint(altSubSets) + ", predict=" +
 				strconv.Itoa(PredictionModegetUniqueAlt(altSubSets)) + ", resolvesToJustOneViableAlt=" +
@@ -489,7 +488,7 @@ func (p *ParserATNSimulator) computeReachSet(closure ATNConfigSet, t int, fullCt
 		fmt.Println("in computeReachSet, starting closure: " + closure.String())
 	}
 	if p.mergeCache == nil {
-		p.mergeCache = NewDoubleDict()
+		p.mergeCache = newDoubleDict()
 	}
 	intermediate := NewBaseATNConfigSet(fullCtx)
 
@@ -530,7 +529,7 @@ func (p *ParserATNSimulator) computeReachSet(closure ATNConfigSet, t int, fullCt
 			trans := c.GetState().GetTransitions()[j]
 			target := p.getReachableTarget(trans, t)
 			if target != nil {
-				cfg := NewBaseATNConfig4(c, target)
+				cfg := BaseATNConfigState(c, target)
 				intermediate.Add(cfg, p.mergeCache)
 				if ParserATNSimulatorDebug {
 					fmt.Println("added " + cfg.String() + " to intermediate")
@@ -568,7 +567,7 @@ func (p *ParserATNSimulator) computeReachSet(closure ATNConfigSet, t int, fullCt
 	//
 	if reach == nil {
 		reach = NewBaseATNConfigSet(fullCtx)
-		closureBusy := NewSet(nil, nil)
+		closureBusy := newSet(nil, nil)
 		treatEOFAsEpsilon := t == TokenEOF
 		for k := 0; k < len(intermediate.configs); k++ {
 			p.closure(intermediate.configs[k], reach, closureBusy, false, fullCtx, treatEOFAsEpsilon)
@@ -616,23 +615,23 @@ func (p *ParserATNSimulator) computeReachSet(closure ATNConfigSet, t int, fullCt
 
 //
 // Return a configuration set containing only the configurations from
-// {@code configs} which are in a {@link RuleStopState}. If all
-// configurations in {@code configs} are already in a rule stop state, p
-// method simply returns {@code configs}.
+// configs which are in a RuleStopState. If all
+// configurations in configs are already in a rule stop state, p
+// method simply returns configs.
 //
-// <p>When {@code lookToEndOfRule} is true, p method uses
-// {@link ATN//NextTokens} for each configuration in {@code configs} which is
+// When lookToEndOfRule is true, p method uses
+// ATN//NextTokens for each configuration in configs which is
 // not already in a rule stop state to see if a rule stop state is reachable
-// from the configuration via epsilon-only transitions.</p>
+// from the configuration via epsilon-only transitions.
 //
 // @param configs the configuration set to update
 // @param lookToEndOfRule when true, p method checks for rule stop states
 // reachable by epsilon-only transitions from each configuration in
-// {@code configs}.
+// configs.
 //
-// @return {@code configs} if all configurations in {@code configs} are in a
+// @return configs if all configurations in configs are in a
 // rule stop state, otherwise return a Newconfiguration set containing only
-// the configurations from {@code configs} which are in a rule stop state
+// the configurations from configs which are in a rule stop state
 //
 func (p *ParserATNSimulator) removeAllConfigsNotInRuleStopState(configs ATNConfigSet, lookToEndOfRule bool) ATNConfigSet {
 	if PredictionModeallConfigsInRuleStopStates(configs) {
@@ -651,7 +650,7 @@ func (p *ParserATNSimulator) removeAllConfigsNotInRuleStopState(configs ATNConfi
 			NextTokens := p.atn.NextTokens(config.GetState(), nil)
 			if NextTokens.contains(TokenEpsilon) {
 				endOfRuleState := p.atn.ruleToStopState[config.GetState().GetRuleIndex()]
-				result.Add(NewBaseATNConfig4(config, endOfRuleState), p.mergeCache)
+				result.Add(BaseATNConfigState(config, endOfRuleState), p.mergeCache)
 			}
 		}
 	}
@@ -664,8 +663,8 @@ func (p *ParserATNSimulator) computeStartState(a ATNState, ctx RuleContext, full
 	configs := NewBaseATNConfigSet(fullCtx)
 	for i := 0; i < len(a.GetTransitions()); i++ {
 		target := a.GetTransitions()[i].getTarget()
-		c := NewBaseATNConfig6(target, i+1, initialContext)
-		closureBusy := NewSet(nil, nil)
+		c := BaseAtnConfigDefaultContext(target, i+1, initialContext)
+		closureBusy := newSet(nil, nil)
 		p.closure(c, configs, closureBusy, true, fullCtx, false)
 	}
 	return configs
@@ -673,59 +672,56 @@ func (p *ParserATNSimulator) computeStartState(a ATNState, ctx RuleContext, full
 
 //
 // This method transforms the start state computed by
-// {@link //computeStartState} to the special start state used by a
+// //computeStartState to the special start state used by a
 // precedence DFA for a particular precedence value. The transformation
 // process applies the following changes to the start state's configuration
 // set.
 //
-// <ol>
-// <li>Evaluate the precedence predicates for each configuration using
-// {@link SemanticContext//evalPrecedence}.</li>
-// <li>Remove all configurations which predict an alternative greater than
-// 1, for which another configuration that predicts alternative 1 is in the
-// same ATN state with the same prediction context. This transformation is
-// valid for the following reasons:
-// <ul>
-// <li>The closure block cannot contain any epsilon transitions which bypass
+// · Evaluate the precedence predicates for each configuration using
+// SemanticContext//evalPrecedence.
+//
+// · Remove all configurations which predict an alternative greater than 1, for
+// which another configuration that predicts alternative 1 is in the same ATN
+// state with the same prediction context.
+//
+// This last transformation is valid for the following reasons:
+//
+// · The closure block cannot contain any epsilon transitions which bypass
 // the body of the closure, so all states reachable via alternative 1 are
 // part of the precedence alternatives of the transformed left-recursive
-// rule.</li>
-// <li>The "primary" portion of a left recursive rule cannot contain an
+// rule.
+//
+// · The "primary" portion of a left recursive rule cannot contain an
 // epsilon transition, so the only way an alternative other than 1 can exist
 // in a state that is also reachable via alternative 1 is by nesting calls
 // to the left-recursive rule, with the outer calls not being at the
-// preferred precedence level.</li>
-// </ul>
-// </li>
-// </ol>
+// preferred precedence level.
 //
-// <p>
+//
 // The prediction context must be considered by p filter to address
 // situations like the following.
-// </p>
-// <code>
-// <pre>
-// grammar TA
-// prog: statement* EOF
-// statement: letterA | statement letterA 'b'
-// letterA: 'a'
-// </pre>
-// </code>
-// <p>
+//
+//
+//		grammar TA
+//		prog: statement* EOF
+//		statement: letterA | statement letterA 'b'
+//		letterA: 'a'
+//
+//
 // If the above grammar, the ATN state immediately before the token
-// reference {@code 'a'} in {@code letterA} is reachable from the left edge
+// reference 'a' in letterA is reachable from the left edge
 // of both the primary and closure blocks of the left-recursive rule
-// {@code statement}. The prediction context associated with each of these
+// statement. The prediction context associated with each of these
 // configurations distinguishes between them, and prevents the alternative
-// which stepped out to {@code prog} (and then back in to {@code statement}
+// which stepped out to prog (and then back in to statement
 // from being eliminated by the filter.
-// </p>
+//
 //
 // @param configs The configuration set computed by
-// {@link //computeStartState} as the start state for the DFA.
+// //computeStartState as the start state for the DFA.
 // @return The transformed configuration set representing the start state
 // for a precedence DFA at a particular precedence level (determined by
-// calling {@link Parser//getPrecedence}).
+// calling Parser//getPrecedence).
 //
 func (p *ParserATNSimulator) applyPrecedenceFilter(configs ATNConfigSet) ATNConfigSet {
 
@@ -744,7 +740,7 @@ func (p *ParserATNSimulator) applyPrecedenceFilter(configs ATNConfigSet) ATNConf
 		}
 		statesFromAlt1[config.GetState().GetStateNumber()] = config.GetContext()
 		if updatedContext != config.GetSemanticContext() {
-			configSet.Add(NewBaseATNConfig2(config, updatedContext), p.mergeCache)
+			configSet.Add(ATNConfigWithContext(config, updatedContext), p.mergeCache)
 		} else {
 			configSet.Add(config, p.mergeCache)
 		}
@@ -778,7 +774,7 @@ func (p *ParserATNSimulator) getReachableTarget(trans Transition, ttype int) ATN
 	return nil
 }
 
-func (p *ParserATNSimulator) getPredsForAmbigAlts(ambigAlts *BitSet, configs ATNConfigSet, nalts int) []SemanticContext {
+func (p *ParserATNSimulator) getPredsForAmbigAlts(ambigAlts *bitSet, configs ATNConfigSet, nalts int) []SemanticContext {
 
 	altToPred := make([]SemanticContext, nalts+1)
 	for _, c := range configs.GetItems() {
@@ -805,7 +801,7 @@ func (p *ParserATNSimulator) getPredsForAmbigAlts(ambigAlts *BitSet, configs ATN
 	return altToPred
 }
 
-func (p *ParserATNSimulator) getPredicatePredictions(ambigAlts *BitSet, altToPred []SemanticContext) []*PredPrediction {
+func (p *ParserATNSimulator) getPredicatePredictions(ambigAlts *bitSet, altToPred []SemanticContext) []*PredPrediction {
 	pairs := make([]*PredPrediction, 0)
 	containsPredicate := false
 	for i := 1; i < len(altToPred); i++ {
@@ -827,48 +823,47 @@ func (p *ParserATNSimulator) getPredicatePredictions(ambigAlts *BitSet, altToPre
 //
 // This method is used to improve the localization of error messages by
 // choosing an alternative rather than panicing a
-// {@link NoViableAltException} in particular prediction scenarios where the
-// {@link //ERROR} state was reached during ATN simulation.
+// NoViableAltException in particular prediction scenarios where the
+// //ERROR state was reached during ATN simulation.
 //
-// <p>
+//
 // The default implementation of p method uses the following
 // algorithm to identify an ATN configuration which successfully parsed the
 // decision entry rule. Choosing such an alternative ensures that the
-// {@link ParserRuleContext} returned by the calling rule will be complete
+// ParserRuleContext returned by the calling rule will be complete
 // and valid, and the syntax error will be Reported later at a more
-// localized location.</p>
+// localized location.
 //
-// <ul>
-// <li>If a syntactically valid path or paths reach the end of the decision rule and
-// they are semantically valid if predicated, return the min associated alt.</li>
-// <li>Else, if a semantically invalid but syntactically valid path exist
+// · If a syntactically valid path or paths reach the end of the decision rule and
+// they are semantically valid if predicated, return the min associated alt.
+//
+// · Else, if a semantically invalid but syntactically valid path exist
 // or paths exist, return the minimum associated alt.
-// </li>
-// <li>Otherwise, return {@link ATN//INVALID_ALT_NUMBER}.</li>
-// </ul>
 //
-// <p>
+// · Otherwise, return ATN//INVALID_ALT_NUMBER
+//
+//
 // In some scenarios, the algorithm described above could predict an
-// alternative which will result in a {@link FailedPredicateException} in
+// alternative which will result in a FailedPredicateException in
 // the parser. Specifically, p could occur if the <em>only</em> configuration
 // capable of successfully parsing to the end of the decision rule is
 // blocked by a semantic predicate. By choosing p alternative within
-// {@link //AdaptivePredict} instead of panicing a
-// {@link NoViableAltException}, the resulting
-// {@link FailedPredicateException} in the parser will identify the specific
+// //AdaptivePredict instead of panicing a
+// NoViableAltException, the resulting
+// FailedPredicateException in the parser will identify the specific
 // predicate which is preventing the parser from successfully parsing the
 // decision rule, which helps developers identify and correct logic errors
 // in semantic predicates.
-// </p>
+//
 //
 // @param configs The ATN configurations which were valid immediately before
-// the {@link //ERROR} state was reached
+// the //ERROR state was reached
 // @param outerContext The is the \gamma_0 initial parser context from the paper
 // or the parser stack at the instant before prediction commences.
 //
-// @return The value to return from {@link //AdaptivePredict}, or
-// {@link ATN//INVALID_ALT_NUMBER} if a suitable alternative was not
-// identified and {@link //AdaptivePredict} should Report an error instead.
+// @return The value to return from //AdaptivePredict, or
+// ATN//INVALID_ALT_NUMBER if a suitable alternative was not
+// identified and //AdaptivePredict should Report an error instead.
 //
 func (p *ParserATNSimulator) getSynValidOrSemInvalidAltThatFinishedDecisionEntryRule(configs ATNConfigSet, outerContext ParserRuleContext) int {
 	cfgs := p.splitAccordingToSemanticValidity(configs, outerContext)
@@ -888,6 +883,7 @@ func (p *ParserATNSimulator) getSynValidOrSemInvalidAltThatFinishedDecisionEntry
 	return ATNInvalidAltNumber
 }
 
+// GetAltThatFinishedDecisionEntryRule TODO: docs.
 func (p *ParserATNSimulator) GetAltThatFinishedDecisionEntryRule(configs ATNConfigSet) int {
 	alts := NewIntervalSet()
 
@@ -906,14 +902,15 @@ func (p *ParserATNSimulator) GetAltThatFinishedDecisionEntryRule(configs ATNConf
 }
 
 // Walk the list of configurations and split them according to
-//  those that have preds evaluating to true/false.  If no pred, assume
-//  true pred and include in succeeded set.  Returns Pair of sets.
+// those that have preds evaluating to true/false.  If no pred, assume
+// true pred and include in succeeded set.  Returns Pair of sets.
 //
-//  Create a NewSet so as not to alter the incoming parameter.
+// Create a NewSet so as not to alter the incoming parameter.
 //
-//  Assumption: the input stream has been restored to the starting point
-//  prediction, which is where predicates need to evaluate.
+// Assumption: the input stream has been restored to the starting point
+// prediction, which is where predicates need to evaluate.
 
+// ATNConfigSetPair TODO: delete.
 type ATNConfigSetPair struct {
 	item0, item1 ATNConfigSet
 }
@@ -938,13 +935,13 @@ func (p *ParserATNSimulator) splitAccordingToSemanticValidity(configs ATNConfigS
 }
 
 // Look through a list of predicate/alt pairs, returning alts for the
-//  pairs that win. A {@code NONE} predicate indicates an alt containing an
+//  pairs that win. A NONE predicate indicates an alt containing an
 //  unpredicated config which behaves as "always true." If !complete
 //  then we stop at the first predicate that evaluates to true. This
 //  includes pairs with nil predicates.
 //
-func (p *ParserATNSimulator) evalSemanticContext(predPredictions []*PredPrediction, outerContext ParserRuleContext, complete bool) *BitSet {
-	predictions := NewBitSet()
+func (p *ParserATNSimulator) evalSemanticContext(predPredictions []*PredPrediction, outerContext ParserRuleContext, complete bool) *bitSet {
+	predictions := newBitSet()
 	for i := 0; i < len(predPredictions); i++ {
 		pair := predPredictions[i]
 		if pair.pred == SemanticContextNone {
@@ -972,13 +969,13 @@ func (p *ParserATNSimulator) evalSemanticContext(predPredictions []*PredPredicti
 	return predictions
 }
 
-func (p *ParserATNSimulator) closure(config ATNConfig, configs ATNConfigSet, closureBusy *Set, collectPredicates, fullCtx, treatEOFAsEpsilon bool) {
+func (p *ParserATNSimulator) closure(config ATNConfig, configs ATNConfigSet, closureBusy *set, collectPredicates, fullCtx, treatEOFAsEpsilon bool) {
 	initialDepth := 0
 	p.closureCheckingStopState(config, configs, closureBusy, collectPredicates,
 		fullCtx, initialDepth, treatEOFAsEpsilon)
 }
 
-func (p *ParserATNSimulator) closureCheckingStopState(config ATNConfig, configs ATNConfigSet, closureBusy *Set, collectPredicates, fullCtx bool, depth int, treatEOFAsEpsilon bool) {
+func (p *ParserATNSimulator) closureCheckingStopState(config ATNConfig, configs ATNConfigSet, closureBusy *set, collectPredicates, fullCtx bool, depth int, treatEOFAsEpsilon bool) {
 
 	if ParserATNSimulatorDebug {
 		fmt.Println("closure(" + config.String() + ")")
@@ -996,7 +993,7 @@ func (p *ParserATNSimulator) closureCheckingStopState(config ATNConfig, configs 
 			for i := 0; i < config.GetContext().length(); i++ {
 				if config.GetContext().getReturnState(i) == BasePredictionContextEmptyReturnState {
 					if fullCtx {
-						configs.Add(NewBaseATNConfig1(config, config.GetState(), BasePredictionContextEMPTY), p.mergeCache)
+						configs.Add(ATNConfigWithStateContext(config, config.GetState(), BasePredictionContextEMPTY), p.mergeCache)
 						continue
 					} else {
 						// we have no context info, just chase follow links (if greedy)
@@ -1010,7 +1007,7 @@ func (p *ParserATNSimulator) closureCheckingStopState(config ATNConfig, configs 
 				returnState := p.atn.states[config.GetContext().getReturnState(i)]
 				newContext := config.GetContext().GetParent(i) // "pop" return state
 
-				c := NewBaseATNConfig5(returnState, config.GetAlt(), newContext, config.GetSemanticContext())
+				c := BaseATNConfigContext(returnState, config.GetAlt(), newContext, config.GetSemanticContext())
 				// While we have context to pop back from, we may have
 				// gotten that context AFTER having falling off a rule.
 				// Make sure we track that we are now out of context.
@@ -1033,7 +1030,7 @@ func (p *ParserATNSimulator) closureCheckingStopState(config ATNConfig, configs 
 }
 
 // Do the actual work of walking epsilon edges//
-func (p *ParserATNSimulator) closureWork(config ATNConfig, configs ATNConfigSet, closureBusy *Set, collectPredicates, fullCtx bool, depth int, treatEOFAsEpsilon bool) {
+func (p *ParserATNSimulator) closureWork(config ATNConfig, configs ATNConfigSet, closureBusy *set, collectPredicates, fullCtx bool, depth int, treatEOFAsEpsilon bool) {
 	state := config.GetState()
 	// optimization
 	if !state.GetEpsilonOnlyTransitions() {
@@ -1109,13 +1106,13 @@ func (p *ParserATNSimulator) getEpsilonTarget(config ATNConfig, t Transition, co
 	case TransitionACTION:
 		return p.actionTransition(config, t.(*ActionTransition))
 	case TransitionEPSILON:
-		return NewBaseATNConfig4(config, t.getTarget())
+		return BaseATNConfigState(config, t.getTarget())
 	case TransitionATOM:
 		// EOF transitions act like epsilon transitions after the first EOF
 		// transition is traversed
 		if treatEOFAsEpsilon {
 			if t.Matches(TokenEOF, 0, 1) {
-				return NewBaseATNConfig4(config, t.getTarget())
+				return BaseATNConfigState(config, t.getTarget())
 			}
 		}
 		return nil
@@ -1124,7 +1121,7 @@ func (p *ParserATNSimulator) getEpsilonTarget(config ATNConfig, t Transition, co
 		// transition is traversed
 		if treatEOFAsEpsilon {
 			if t.Matches(TokenEOF, 0, 1) {
-				return NewBaseATNConfig4(config, t.getTarget())
+				return BaseATNConfigState(config, t.getTarget())
 			}
 		}
 		return nil
@@ -1133,7 +1130,7 @@ func (p *ParserATNSimulator) getEpsilonTarget(config ATNConfig, t Transition, co
 		// transition is traversed
 		if treatEOFAsEpsilon {
 			if t.Matches(TokenEOF, 0, 1) {
-				return NewBaseATNConfig4(config, t.getTarget())
+				return BaseATNConfigState(config, t.getTarget())
 			}
 		}
 		return nil
@@ -1146,7 +1143,7 @@ func (p *ParserATNSimulator) actionTransition(config ATNConfig, t *ActionTransit
 	if ParserATNSimulatorDebug {
 		fmt.Println("ACTION edge " + strconv.Itoa(t.ruleIndex) + ":" + strconv.Itoa(t.actionIndex))
 	}
-	return NewBaseATNConfig4(config, t.getTarget())
+	return BaseATNConfigState(config, t.getTarget())
 }
 
 func (p *ParserATNSimulator) precedenceTransition(config ATNConfig,
@@ -1171,14 +1168,14 @@ func (p *ParserATNSimulator) precedenceTransition(config ATNConfig,
 			predSucceeds := pt.getPredicate().evaluate(p.parser, p.outerContext)
 			p.input.Seek(currentPosition)
 			if predSucceeds {
-				c = NewBaseATNConfig4(config, pt.getTarget()) // no pred context
+				c = BaseATNConfigState(config, pt.getTarget()) // no pred context
 			}
 		} else {
 			newSemCtx := SemanticContextandContext(config.GetSemanticContext(), pt.getPredicate())
-			c = NewBaseATNConfig3(config, pt.getTarget(), newSemCtx)
+			c = ATNConfigStateContext(config, pt.getTarget(), newSemCtx)
 		}
 	} else {
-		c = NewBaseATNConfig4(config, pt.getTarget())
+		c = BaseATNConfigState(config, pt.getTarget())
 	}
 	if ParserATNSimulatorDebug {
 		fmt.Println("config from pred transition=" + c.String())
@@ -1207,14 +1204,14 @@ func (p *ParserATNSimulator) predTransition(config ATNConfig, pt *PredicateTrans
 			predSucceeds := pt.getPredicate().evaluate(p.parser, p.outerContext)
 			p.input.Seek(currentPosition)
 			if predSucceeds {
-				c = NewBaseATNConfig4(config, pt.getTarget()) // no pred context
+				c = BaseATNConfigState(config, pt.getTarget()) // no pred context
 			}
 		} else {
 			newSemCtx := SemanticContextandContext(config.GetSemanticContext(), pt.getPredicate())
-			c = NewBaseATNConfig3(config, pt.getTarget(), newSemCtx)
+			c = ATNConfigStateContext(config, pt.getTarget(), newSemCtx)
 		}
 	} else {
-		c = NewBaseATNConfig4(config, pt.getTarget())
+		c = BaseATNConfigState(config, pt.getTarget())
 	}
 	if ParserATNSimulatorDebug {
 		fmt.Println("config from pred transition=" + c.String())
@@ -1228,12 +1225,12 @@ func (p *ParserATNSimulator) ruleTransition(config ATNConfig, t *RuleTransition)
 	}
 	returnState := t.followState
 	newContext := SingletonBasePredictionContextCreate(config.GetContext(), returnState.GetStateNumber())
-	return NewBaseATNConfig1(config, t.getTarget(), newContext)
+	return ATNConfigWithStateContext(config, t.getTarget(), newContext)
 }
 
-func (p *ParserATNSimulator) getConflictingAlts(configs ATNConfigSet) *BitSet {
-	altsets := PredictionModegetConflictingAltSubsets(configs)
-	return PredictionModeGetAlts(altsets)
+func (p *ParserATNSimulator) getConflictingAlts(configs ATNConfigSet) *bitSet {
+	altsets := predictionModeGetConflictingAltSubsets(configs)
+	return predictionModeGetAlts(altsets)
 }
 
 // Sam pointed out a problem with the previous definition, v3, of
@@ -1272,17 +1269,18 @@ func (p *ParserATNSimulator) getConflictingAlts(configs ATNConfigSet) *BitSet {
 // that we still need to pursue.
 //
 
-func (p *ParserATNSimulator) getConflictingAltsOrUniqueAlt(configs ATNConfigSet) *BitSet {
-	var conflictingAlts *BitSet
+func (p *ParserATNSimulator) getConflictingAltsOrUniqueAlt(configs ATNConfigSet) *bitSet {
+	var conflictingAlts *bitSet
 	if configs.GetUniqueAlt() != ATNInvalidAltNumber {
-		conflictingAlts = NewBitSet()
+		conflictingAlts = newBitSet()
 		conflictingAlts.add(configs.GetUniqueAlt())
 	} else {
-		conflictingAlts = configs.GetConflictingAlts()
+		conflictingAlts = configs.getConflictingAlts()
 	}
 	return conflictingAlts
 }
 
+// GetTokenName returns the name of the given token type.
 func (p *ParserATNSimulator) GetTokenName(t int) string {
 	if t == TokenEOF {
 		return "EOF"
@@ -1356,23 +1354,23 @@ func (p *ParserATNSimulator) getUniqueAlt(configs ATNConfigSet) int {
 
 //
 // Add an edge to the DFA, if possible. This method calls
-// {@link //addDFAState} to ensure the {@code to} state is present in the
-// DFA. If {@code from} is {@code nil}, or if {@code t} is outside the
+// //addDFAState to ensure the to state is present in the
+// DFA. If from is nil, or if t is outside the
 // range of edges that can be represented in the DFA tables, p method
 // returns without adding the edge to the DFA.
 //
-// <p>If {@code to} is {@code nil}, p method returns {@code nil}.
-// Otherwise, p method returns the {@link DFAState} returned by calling
-// {@link //addDFAState} for the {@code to} state.</p>
+// If to is nil, p method returns nil.
+// Otherwise, p method returns the DFAState returned by calling
+// //addDFAState for the to state.
 //
 // @param dfa The DFA
 // @param from The source state for the edge
 // @param t The input symbol
 // @param to The target state for the edge
 //
-// @return If {@code to} is {@code nil}, p method returns {@code nil}
-// otherwise p method returns the result of calling {@link //addDFAState}
-// on {@code to}
+// @return If to is nil, p method returns nil
+// otherwise p method returns the result of calling //addDFAState
+// on to
 //
 func (p *ParserATNSimulator) addDFAEdge(dfa *DFA, from *DFAState, t int, to *DFAState) *DFAState {
 	if ParserATNSimulatorDebug {
@@ -1402,18 +1400,18 @@ func (p *ParserATNSimulator) addDFAEdge(dfa *DFA, from *DFAState, t int, to *DFA
 }
 
 //
-// Add state {@code D} to the DFA if it is not already present, and return
-// the actual instance stored in the DFA. If a state equivalent to {@code D}
+// Add state D to the DFA if it is not already present, and return
+// the actual instance stored in the DFA. If a state equivalent to D
 // is already in the DFA, the existing state is returned. Otherwise p
-// method returns {@code D} after adding it to the DFA.
+// method returns D after adding it to the DFA.
 //
-// <p>If {@code D} is {@link //ERROR}, p method returns {@link //ERROR} and
-// does not change the DFA.</p>
+// If D is //ERROR, p method returns //ERROR and
+// does not change the DFA.
 //
 // @param dfa The dfa
 // @param D The DFA state to add
 // @return The state stored in the DFA. This will be either the existing
-// state if {@code D} is already in the DFA, or {@code D} itself if the
+// state if D is already in the DFA, or D itself if the
 // state was not already present.
 //
 func (p *ParserATNSimulator) addDFAState(dfa *DFA, d *DFAState) *DFAState {
@@ -1437,7 +1435,8 @@ func (p *ParserATNSimulator) addDFAState(dfa *DFA, d *DFAState) *DFAState {
 	return d
 }
 
-func (p *ParserATNSimulator) ReportAttemptingFullContext(dfa *DFA, conflictingAlts *BitSet, configs ATNConfigSet, startIndex, stopIndex int) {
+// ReportAttemptingFullContext TODO: docs.
+func (p *ParserATNSimulator) ReportAttemptingFullContext(dfa *DFA, conflictingAlts *bitSet, configs ATNConfigSet, startIndex, stopIndex int) {
 	if ParserATNSimulatorDebug || ParserATNSimulatorRetryDebug {
 		interval := NewInterval(startIndex, stopIndex+1)
 		fmt.Println("ReportAttemptingFullContext decision=" + strconv.Itoa(dfa.decision) + ":" + configs.String() +
@@ -1448,6 +1447,7 @@ func (p *ParserATNSimulator) ReportAttemptingFullContext(dfa *DFA, conflictingAl
 	}
 }
 
+// ReportContextSensitivity TODO: docs.
 func (p *ParserATNSimulator) ReportContextSensitivity(dfa *DFA, prediction int, configs ATNConfigSet, startIndex, stopIndex int) {
 	if ParserATNSimulatorDebug || ParserATNSimulatorRetryDebug {
 		interval := NewInterval(startIndex, stopIndex+1)
@@ -1459,9 +1459,9 @@ func (p *ParserATNSimulator) ReportContextSensitivity(dfa *DFA, prediction int, 
 	}
 }
 
-// If context sensitive parsing, we know it's ambiguity not conflict//
+// ReportAmbiguity if context sensitive parsing, we know it's ambiguity not conflict
 func (p *ParserATNSimulator) ReportAmbiguity(dfa *DFA, D *DFAState, startIndex, stopIndex int,
-	exact bool, ambigAlts *BitSet, configs ATNConfigSet) {
+	exact bool, ambigAlts *bitSet, configs ATNConfigSet) {
 	if ParserATNSimulatorDebug || ParserATNSimulatorRetryDebug {
 		interval := NewInterval(startIndex, stopIndex+1)
 		fmt.Println("ReportAmbiguity " + ambigAlts.String() + ":" + configs.String() +

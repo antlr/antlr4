@@ -4,22 +4,28 @@
 
 package antlr
 
-var ATNDeserializationOptionsdefaultOptions = &ATNDeserializationOptions{true, false, false}
+// ATNDeserializationDefaultOptions is the default settings for
+// deserializing abstract transition networks.
+var ATNDeserializationDefaultOptions = &ATNDeserializationOptions{true, false, false}
 
+// ATNDeserializationOptions represents the settings for deserializing abstract
+// transition networks.
 type ATNDeserializationOptions struct {
 	readOnly                      bool
 	verifyATN                     bool
 	generateRuleBypassTransitions bool
 }
 
-func NewATNDeserializationOptions(CopyFrom *ATNDeserializationOptions) *ATNDeserializationOptions {
-	o := new(ATNDeserializationOptions)
-
-	if CopyFrom != nil {
-		o.readOnly = CopyFrom.readOnly
-		o.verifyATN = CopyFrom.verifyATN
-		o.generateRuleBypassTransitions = CopyFrom.generateRuleBypassTransitions
+// NewATNDeserializationOptions returns a new instance of
+// ATNDeserializationOptions
+func NewATNDeserializationOptions(copyFrom *ATNDeserializationOptions) *ATNDeserializationOptions {
+	if copyFrom != nil {
+		return &ATNDeserializationOptions{
+			readOnly:                      copyFrom.readOnly,
+			verifyATN:                     copyFrom.verifyATN,
+			generateRuleBypassTransitions: copyFrom.generateRuleBypassTransitions,
+		}
 	}
 
-	return o
+	return &ATNDeserializationOptions{}
 }

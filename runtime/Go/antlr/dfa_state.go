@@ -14,10 +14,12 @@ type PredPrediction struct {
 	pred SemanticContext
 }
 
+// NewPredPrediction returns a new instance of PredPrediction.
 func NewPredPrediction(pred SemanticContext, alt int) *PredPrediction {
 	return &PredPrediction{alt: alt, pred: pred}
 }
 
+// String implements the Stringer interface.
 func (p *PredPrediction) String() string {
 	return "(" + fmt.Sprint(p.pred) + ", " + fmt.Sprint(p.alt) + ")"
 }
@@ -81,6 +83,7 @@ type DFAState struct {
 	predicates []*PredPrediction
 }
 
+// NewDFAState returns a new instance of DFAState
 func NewDFAState(stateNumber int, configs ATNConfigSet) *DFAState {
 	if configs == nil {
 		configs = NewBaseATNConfigSet(false)
@@ -89,9 +92,9 @@ func NewDFAState(stateNumber int, configs ATNConfigSet) *DFAState {
 	return &DFAState{configs: configs, stateNumber: stateNumber}
 }
 
-// GetAltSet gets the set of all alts mentioned by all ATN configurations in d.
-func (d *DFAState) GetAltSet() *Set {
-	alts := NewSet(nil, nil)
+// getAltSet gets the set of all alts mentioned by all ATN configurations in d.
+func (d *DFAState) getAltSet() *set {
+	alts := newSet(nil, nil)
 
 	if d.configs != nil {
 		for _, c := range d.configs.GetItems() {
@@ -131,6 +134,7 @@ func (d *DFAState) equals(other interface{}) bool {
 	return d.configs.Equals(other.(*DFAState).configs)
 }
 
+// String implements the Stringer interface.
 func (d *DFAState) String() string {
 	var s string
 	if d.isAcceptState {
@@ -141,7 +145,7 @@ func (d *DFAState) String() string {
 		}
 	}
 
-	return fmt.Sprintf("%d:%s%s", fmt.Sprint(d.configs), s)
+	return fmt.Sprintf("%s:%s", fmt.Sprint(d.configs), s)
 }
 
 func (d *DFAState) hash() int {
@@ -157,7 +161,7 @@ func (d *DFAState) hash() int {
 			}
 		} else {
 			h = murmurUpdate(h, d.prediction)
-			c += 1
+			c++
 		}
 	}
 

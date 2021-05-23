@@ -4,6 +4,7 @@
 
 package antlr
 
+// CharStream extends IntStream to be able to send text instead of just ints.
 type CharStream interface {
 	IntStream
 	GetText(int, int) string

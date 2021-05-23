@@ -9,14 +9,12 @@ import (
 	"strconv"
 )
 
-// A tree structure used to record the semantic context in which
-//  an ATN configuration is valid.  It's either a single predicate,
-//  a conjunction {@code p1&&p2}, or a sum of products {@code p1||p2}.
+// SemanticContext is a tree structure used to record the semantic context in
+// which an ATN configuration is valid.  It's either a single predicate, a
+// conjunction p1&&p2, or a sum of products p1||p2.
 //
-//  <p>I have scoped the {@link AND}, {@link OR}, and {@link Predicate} subclasses of
-//  {@link SemanticContext} within the scope of this outer class.</p>
-//
-
+// I have scoped the AND, OR, and Predicate subclasses of
+// SemanticContext within the scope of this outer class.
 type SemanticContext interface {
 	comparable
 
@@ -27,6 +25,7 @@ type SemanticContext interface {
 	String() string
 }
 
+// SemanticContextandContext TODO: docs.
 func SemanticContextandContext(a, b SemanticContext) SemanticContext {
 	if a == nil || a == SemanticContextNone {
 		return b
@@ -42,6 +41,7 @@ func SemanticContextandContext(a, b SemanticContext) SemanticContext {
 	return result
 }
 
+// SemanticContextorContext TODO: docs.
 func SemanticContextorContext(a, b SemanticContext) SemanticContext {
 	if a == nil {
 		return b
@@ -60,24 +60,24 @@ func SemanticContextorContext(a, b SemanticContext) SemanticContext {
 	return result
 }
 
+// Predicate represents a semantic predicate
 type Predicate struct {
 	ruleIndex      int
 	predIndex      int
 	isCtxDependent bool
 }
 
+// NewPredicate returns a new instance of Predicate.
 func NewPredicate(ruleIndex, predIndex int, isCtxDependent bool) *Predicate {
-	p := new(Predicate)
-
-	p.ruleIndex = ruleIndex
-	p.predIndex = predIndex
-	p.isCtxDependent = isCtxDependent // e.g., $i ref in pred
-	return p
+	return &Predicate{
+		ruleIndex:      ruleIndex,
+		predIndex:      predIndex,
+		isCtxDependent: isCtxDependent,
+	}
 }
 
-//The default {@link SemanticContext}, which is semantically equivalent to
-//a predicate of the form {@code {true}?}.
-
+// SemanticContextNone is the default SemanticContext, which is semantically
+// equivalent to a predicate of the form {true?}.
 var SemanticContextNone SemanticContext = NewPredicate(-1, -1, false)
 
 func (p *Predicate) evalPrecedence(parser Recognizer, outerContext RuleContext) SemanticContext {
@@ -115,16 +115,14 @@ func (p *Predicate) String() string {
 	return "{" + strconv.Itoa(p.ruleIndex) + ":" + strconv.Itoa(p.predIndex) + "}?"
 }
 
+// PrecedencePredicate TODO: docs
 type PrecedencePredicate struct {
 	precedence int
 }
 
+// NewPrecedencePredicate returns a new instance of PrecedencePredicate.
 func NewPrecedencePredicate(precedence int) *PrecedencePredicate {
-
-	p := new(PrecedencePredicate)
-	p.precedence = precedence
-
-	return p
+	return &PrecedencePredicate{precedence: precedence}
 }
 
 func (p *PrecedencePredicate) evaluate(parser Recognizer, outerContext RuleContext) bool {
@@ -161,10 +159,11 @@ func (p *PrecedencePredicate) String() string {
 	return "{" + strconv.Itoa(p.precedence) + ">=prec}?"
 }
 
-func PrecedencePredicatefilterPrecedencePredicates(set *Set) []*PrecedencePredicate {
+// PrecedencePredicatefilterPrecedencePredicates TODO: docs.
+func PrecedencePredicatefilterPrecedencePredicates(s *set) []*PrecedencePredicate {
 	result := make([]*PrecedencePredicate, 0)
 
-	for _, v := range set.values() {
+	for _, v := range s.values() {
 		if c2, ok := v.(*PrecedencePredicate); ok {
 			result = append(result, c2)
 		}
@@ -173,16 +172,15 @@ func PrecedencePredicatefilterPrecedencePredicates(set *Set) []*PrecedencePredic
 	return result
 }
 
-// A semantic context which is true whenever none of the contained contexts
-// is false.`
-
+// AND is true whenever none of the contained contexts is false.
 type AND struct {
 	opnds []SemanticContext
 }
 
+// NewAND returns a new instance of NewAND.
 func NewAND(a, b SemanticContext) *AND {
 
-	operands := NewSet(nil, nil)
+	operands := newSet(nil, nil)
 	if aa, ok := a.(*AND); ok {
 		for _, o := range aa.opnds {
 			operands.add(o)
@@ -218,10 +216,7 @@ func NewAND(a, b SemanticContext) *AND {
 		opnds[i] = v.(SemanticContext)
 	}
 
-	and := new(AND)
-	and.opnds = opnds
-
-	return and
+	return &AND{opnds: opnds}
 }
 
 func (a *AND) equals(other interface{}) bool {
@@ -242,9 +237,9 @@ func (a *AND) equals(other interface{}) bool {
 //
 // {@inheritDoc}
 //
-// <p>
+//
 // The evaluation of predicates by a context is short-circuiting, but
-// unordered.</p>
+// unordered.
 //
 func (a *AND) evaluate(parser Recognizer, outerContext RuleContext) bool {
 	for i := 0; i < len(a.opnds); i++ {
@@ -323,18 +318,15 @@ func (a *AND) String() string {
 	return s
 }
 
-//
-// A semantic context which is true whenever at least one of the contained
-// contexts is true.
-//
-
+// OR is true whenever at least one of the contained contexts is true.
 type OR struct {
 	opnds []SemanticContext
 }
 
+// NewOR returns a new instance of OR.
 func NewOR(a, b SemanticContext) *OR {
 
-	operands := NewSet(nil, nil)
+	operands := newSet(nil, nil)
 	if aa, ok := a.(*OR); ok {
 		for _, o := range aa.opnds {
 			operands.add(o)
@@ -371,20 +363,17 @@ func NewOR(a, b SemanticContext) *OR {
 		opnds[i] = v.(SemanticContext)
 	}
 
-	o := new(OR)
-	o.opnds = opnds
-
-	return o
+	return &OR{opnds: opnds}
 }
 
-func (o *OR) equals(other interface{}) bool {
-	if o == other {
+func (a *OR) equals(other interface{}) bool {
+	if a == other {
 		return true
 	} else if _, ok := other.(*OR); !ok {
 		return false
 	} else {
 		for i, v := range other.(*OR).opnds {
-			if !o.opnds[i].equals(v) {
+			if !a.opnds[i].equals(v) {
 				return false
 			}
 		}
@@ -392,24 +381,24 @@ func (o *OR) equals(other interface{}) bool {
 	}
 }
 
-// <p>
-// The evaluation of predicates by o context is short-circuiting, but
-// unordered.</p>
 //
-func (o *OR) evaluate(parser Recognizer, outerContext RuleContext) bool {
-	for i := 0; i < len(o.opnds); i++ {
-		if o.opnds[i].evaluate(parser, outerContext) {
+// The evaluation of predicates by o context is short-circuiting, but
+// unordered.
+//
+func (a *OR) evaluate(parser Recognizer, outerContext RuleContext) bool {
+	for i := 0; i < len(a.opnds); i++ {
+		if a.opnds[i].evaluate(parser, outerContext) {
 			return true
 		}
 	}
 	return false
 }
 
-func (o *OR) evalPrecedence(parser Recognizer, outerContext RuleContext) SemanticContext {
+func (a *OR) evalPrecedence(parser Recognizer, outerContext RuleContext) SemanticContext {
 	differs := false
 	operands := make([]SemanticContext, 0)
-	for i := 0; i < len(o.opnds); i++ {
-		context := o.opnds[i]
+	for i := 0; i < len(a.opnds); i++ {
+		context := a.opnds[i]
 		evaluated := context.evalPrecedence(parser, outerContext)
 		differs = differs || (evaluated != context)
 		if evaluated == SemanticContextNone {
@@ -421,7 +410,7 @@ func (o *OR) evalPrecedence(parser Recognizer, outerContext RuleContext) Semanti
 		}
 	}
 	if !differs {
-		return o
+		return a
 	}
 	if len(operands) == 0 {
 		// all elements were false, so the OR context is false
@@ -440,10 +429,10 @@ func (o *OR) evalPrecedence(parser Recognizer, outerContext RuleContext) Semanti
 	return result
 }
 
-func (o *OR) String() string {
+func (a *OR) String() string {
 	s := ""
 
-	for _, o := range o.opnds {
+	for _, o := range a.opnds {
 		s += "|| " + fmt.Sprint(o)
 	}
 

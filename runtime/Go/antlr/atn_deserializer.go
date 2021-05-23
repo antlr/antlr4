@@ -14,28 +14,34 @@ import (
 
 // This is the earliest supported serialized UUID.
 // stick to serialized version for now, we don't need a UUID instance
-var BaseSerializedUUID = "AADB8D7E-AEEF-4415-AD2B-8204D6CF042E"
-var AddedUnicodeSMP = "59627784-3BE5-417A-B9EB-8131A7286089"
+var (
+	BaseSerializedUUID = "AADB8D7E-AEEF-4415-AD2B-8204D6CF042E"
+	AddedUnicodeSMP    = "59627784-3BE5-417A-B9EB-8131A7286089"
+)
 
-// This list contains all of the currently supported UUIDs, ordered by when
+// SupportedUUIDs contains all of the currently supported UUIDs, ordered by when
 // the feature first appeared in this branch.
 var SupportedUUIDs = []string{BaseSerializedUUID, AddedUnicodeSMP}
 
+// SerializedVersion represents the major version of the serializer
 var SerializedVersion = 3
 
-// This is the current serialized UUID.
+// SerializedUUID is the current serialized UUID.
 var SerializedUUID = AddedUnicodeSMP
 
+// LoopEndStateIntPair TODO: delete
 type LoopEndStateIntPair struct {
 	item0 *LoopEndState
 	item1 int
 }
 
+// BlockStartStateIntPair TODO: delete
 type BlockStartStateIntPair struct {
 	item0 BlockStartState
 	item1 int
 }
 
+// ATNDeserializer deserializes ATN structs.
 type ATNDeserializer struct {
 	deserializationOptions *ATNDeserializationOptions
 	data                   []rune
@@ -43,9 +49,10 @@ type ATNDeserializer struct {
 	uuid                   string
 }
 
+// NewATNDeserializer returns a new instance of ATNDeserializer.
 func NewATNDeserializer(options *ATNDeserializationOptions) *ATNDeserializer {
 	if options == nil {
-		options = ATNDeserializationOptionsdefaultOptions
+		options = ATNDeserializationDefaultOptions
 	}
 
 	return &ATNDeserializer{deserializationOptions: options}
@@ -81,6 +88,8 @@ func (a *ATNDeserializer) isFeatureSupported(feature, actualUUID string) bool {
 	return idx2 >= idx1
 }
 
+// DeserializeFromUInt16 creates an abstract transition network from the given
+// data.
 func (a *ATNDeserializer) DeserializeFromUInt16(data []uint16) *ATN {
 	a.reset(utf16.Decode(data))
 	a.checkVersion()
@@ -98,7 +107,7 @@ func (a *ATNDeserializer) DeserializeFromUInt16(data []uint16) *ATN {
 	sets = a.readSets(atn, sets, a.readInt)
 	// Next, if the ATN was serialized with the Unicode SMP feature,
 	// deserialize sets with 32-bit arguments <= U+10FFFF.
-	if (a.isFeatureSupported(AddedUnicodeSMP, a.uuid)) {
+	if a.isFeatureSupported(AddedUnicodeSMP, a.uuid) {
 		sets = a.readSets(atn, sets, a.readInt32)
 	}
 
@@ -128,7 +137,7 @@ func (a *ATNDeserializer) reset(data []rune) {
 		} else if c > 1 {
 			temp[i] = c - 2
 		} else {
-		    temp[i] = c + 65533
+			temp[i] = c + 65533
 		}
 	}
 

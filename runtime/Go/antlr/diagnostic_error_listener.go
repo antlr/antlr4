@@ -8,41 +8,40 @@ import (
 	"strconv"
 )
 
+// DiagnosticErrorListener listens to erros produced by the parser.
 //
-// This implementation of {@link ANTLRErrorListener} can be used to identify
+// This implementation of ANTLRErrorListener can be used to identify
 // certain potential correctness and performance problems in grammars. "reports"
-// are made by calling {@link Parser//NotifyErrorListeners} with the appropriate
+// are made by calling Parser//NotifyErrorListeners with the appropriate
 // message.
 //
-// <ul>
-// <li><b>Ambiguities</b>: These are cases where more than one path through the
-// grammar can Match the input.</li>
-// <li><b>Weak context sensitivity</b>: These are cases where full-context
-// prediction resolved an SLL conflict to a unique alternative which equaled the
-// minimum alternative of the SLL conflict.</li>
-// <li><b>Strong (forced) context sensitivity</b>: These are cases where the
+// · Ambiguities: These are cases where more than one path through the grammar
+// can Match the input.
+//
+// · Weak context sensitivity: These are cases where full-context prediction
+// resolved an SLL conflict to a unique alternative which equaled the minimum
+// alternative of the SLL conflict.
+//
+// · Strong (forced) context sensitivity: These are cases where the
 // full-context prediction resolved an SLL conflict to a unique alternative,
 // <em>and</em> the minimum alternative of the SLL conflict was found to not be
 // a truly viable alternative. Two-stage parsing cannot be used for inputs where
-// d situation occurs.</li>
-// </ul>
-
+// the situation occurs.
 type DiagnosticErrorListener struct {
 	*DefaultErrorListener
 
 	exactOnly bool
 }
 
+// NewDiagnosticErrorListener returns a new instance of DiagnosticErrorListener.
+// Whether all ambiguities or only exact ambiguities are Reported is represented
+// by exactOnly
 func NewDiagnosticErrorListener(exactOnly bool) *DiagnosticErrorListener {
-
-	n := new(DiagnosticErrorListener)
-
-	// whether all ambiguities or only exact ambiguities are Reported.
-	n.exactOnly = exactOnly
-	return n
+	return &DiagnosticErrorListener{exactOnly: exactOnly}
 }
 
-func (d *DiagnosticErrorListener) ReportAmbiguity(recognizer Parser, dfa *DFA, startIndex, stopIndex int, exact bool, ambigAlts *BitSet, configs ATNConfigSet) {
+// ReportAmbiguity reports a parsing ambiguity
+func (d *DiagnosticErrorListener) ReportAmbiguity(recognizer Parser, dfa *DFA, startIndex, stopIndex int, exact bool, ambigAlts *bitSet, configs ATNConfigSet) {
 	if d.exactOnly && !exact {
 		return
 	}
@@ -55,7 +54,8 @@ func (d *DiagnosticErrorListener) ReportAmbiguity(recognizer Parser, dfa *DFA, s
 	recognizer.NotifyErrorListeners(msg, nil, nil)
 }
 
-func (d *DiagnosticErrorListener) ReportAttemptingFullContext(recognizer Parser, dfa *DFA, startIndex, stopIndex int, conflictingAlts *BitSet, configs ATNConfigSet) {
+// ReportAttemptingFullContext reports attempting full context.
+func (d *DiagnosticErrorListener) ReportAttemptingFullContext(recognizer Parser, dfa *DFA, startIndex, stopIndex int, conflictingAlts *bitSet, configs ATNConfigSet) {
 
 	msg := "reportAttemptingFullContext d=" +
 		d.getDecisionDescription(recognizer, dfa) +
@@ -64,6 +64,7 @@ func (d *DiagnosticErrorListener) ReportAttemptingFullContext(recognizer Parser,
 	recognizer.NotifyErrorListeners(msg, nil, nil)
 }
 
+// ReportContextSensitivity reports context sensitivity.
 func (d *DiagnosticErrorListener) ReportContextSensitivity(recognizer Parser, dfa *DFA, startIndex, stopIndex, prediction int, configs ATNConfigSet) {
 	msg := "reportContextSensitivity d=" +
 		d.getDecisionDescription(recognizer, dfa) +
@@ -95,15 +96,15 @@ func (d *DiagnosticErrorListener) getDecisionDescription(recognizer Parser, dfa 
 // @param ReportedAlts The set of conflicting or ambiguous alternatives, as
 // Reported by the parser.
 // @param configs The conflicting or ambiguous configuration set.
-// @return Returns {@code ReportedAlts} if it is not {@code nil}, otherwise
-// returns the set of alternatives represented in {@code configs}.
+// @return Returns ReportedAlts if it is not nil, otherwise
+// returns the set of alternatives represented in configs.
 //
-func (d *DiagnosticErrorListener) getConflictingAlts(ReportedAlts *BitSet, set ATNConfigSet) *BitSet {
+func (d *DiagnosticErrorListener) getConflictingAlts(ReportedAlts *bitSet, s ATNConfigSet) *bitSet {
 	if ReportedAlts != nil {
 		return ReportedAlts
 	}
-	result := NewBitSet()
-	for _, c := range set.GetItems() {
+	result := newBitSet()
+	for _, c := range s.GetItems() {
 		result.add(c.GetAlt())
 	}
 

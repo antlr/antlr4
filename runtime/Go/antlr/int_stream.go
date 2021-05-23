@@ -4,6 +4,7 @@
 
 package antlr
 
+// IntStream represents a channel of ints.
 type IntStream interface {
 	Consume()
 	LA(int) int

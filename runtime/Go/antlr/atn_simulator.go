@@ -4,27 +4,29 @@
 
 package antlr
 
+// ATNSimulatorError TODO: docs.
 var ATNSimulatorError = NewDFAState(0x7FFFFFFF, NewBaseATNConfigSet(false))
 
+// IATNSimulator TODO: docs.
 type IATNSimulator interface {
 	SharedContextCache() *PredictionContextCache
 	ATN() *ATN
 	DecisionToDFA() []*DFA
 }
 
+// BaseATNSimulator TODO: docs
 type BaseATNSimulator struct {
 	atn                *ATN
 	sharedContextCache *PredictionContextCache
 	decisionToDFA      []*DFA
 }
 
+// NewBaseATNSimulator TODO: docs.
 func NewBaseATNSimulator(atn *ATN, sharedContextCache *PredictionContextCache) *BaseATNSimulator {
-	b := new(BaseATNSimulator)
-
-	b.atn = atn
-	b.sharedContextCache = sharedContextCache
-
-	return b
+	return &BaseATNSimulator{
+		atn:                atn,
+		sharedContextCache: sharedContextCache,
+	}
 }
 
 func (b *BaseATNSimulator) getCachedContext(context PredictionContext) PredictionContext {
@@ -37,14 +39,17 @@ func (b *BaseATNSimulator) getCachedContext(context PredictionContext) Predictio
 	return getCachedBasePredictionContext(context, b.sharedContextCache, visited)
 }
 
+// SharedContextCache TODO: docs.
 func (b *BaseATNSimulator) SharedContextCache() *PredictionContextCache {
 	return b.sharedContextCache
 }
 
+// ATN TODO: docs.
 func (b *BaseATNSimulator) ATN() *ATN {
 	return b.atn
 }
 
+// DecisionToDFA TODO: docs.
 func (b *BaseATNSimulator) DecisionToDFA() []*DFA {
 	return b.decisionToDFA
 }

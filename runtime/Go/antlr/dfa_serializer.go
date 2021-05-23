@@ -17,6 +17,7 @@ type DFASerializer struct {
 	symbolicNames []string
 }
 
+// NewDFASerializer returns a new instance of DFASerializer.
 func NewDFASerializer(dfa *DFA, literalNames, symbolicNames []string) *DFASerializer {
 	if literalNames == nil {
 		literalNames = make([]string, 0)
@@ -79,6 +80,7 @@ func (d *DFASerializer) getEdgeLabel(i int) string {
 	return strconv.Itoa(i - 1)
 }
 
+// GetStateString returns a string representation of this serializer's state.
 func (d *DFASerializer) GetStateString(s *DFAState) string {
 	var a, b string
 
@@ -103,10 +105,12 @@ func (d *DFASerializer) GetStateString(s *DFAState) string {
 	return baseStateStr
 }
 
+// LexerDFASerializer extends DFASerializer.
 type LexerDFASerializer struct {
 	*DFASerializer
 }
 
+// NewLexerDFASerializer returns a new instance of LexerDFASerializer.
 func NewLexerDFASerializer(dfa *DFA) *LexerDFASerializer {
 	return &LexerDFASerializer{DFASerializer: NewDFASerializer(dfa, nil, nil)}
 }
@@ -115,6 +119,7 @@ func (l *LexerDFASerializer) getEdgeLabel(i int) string {
 	return "'" + string(i) + "'"
 }
 
+// String implements the Stringer interface.
 func (l *LexerDFASerializer) String() string {
 	if l.dfa.s0 == nil {
 		return ""

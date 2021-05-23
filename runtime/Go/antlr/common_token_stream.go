@@ -4,9 +4,7 @@
 
 package antlr
 
-import (
-	"strconv"
-)
+import "strconv"
 
 // CommonTokenStream is an implementation of TokenStream that loads tokens from
 // a TokenSource on-demand and places the tokens in a buffer to provide access
@@ -44,6 +42,7 @@ type CommonTokenStream struct {
 	tokens []Token
 }
 
+// NewCommonTokenStream returns a new instance of CommonTokenStream.
 func NewCommonTokenStream(lexer Lexer, channel int) *CommonTokenStream {
 	return &CommonTokenStream{
 		channel:     channel,
@@ -53,31 +52,37 @@ func NewCommonTokenStream(lexer Lexer, channel int) *CommonTokenStream {
 	}
 }
 
+// GetAllTokens return the tokens in this stream.
 func (c *CommonTokenStream) GetAllTokens() []Token {
 	return c.tokens
 }
 
+// Mark always returns 0.
 func (c *CommonTokenStream) Mark() int {
 	return 0
 }
 
+// Release does nothing.
 func (c *CommonTokenStream) Release(marker int) {}
 
 func (c *CommonTokenStream) reset() {
 	c.Seek(0)
 }
 
+// Seek the given index.
 func (c *CommonTokenStream) Seek(index int) {
 	c.lazyInit()
 	c.index = c.adjustSeekIndex(index)
 }
 
+// Get the token at the given index.
 func (c *CommonTokenStream) Get(index int) Token {
 	c.lazyInit()
 
 	return c.tokens[index]
 }
 
+// Consume the current token.
 func (c *CommonTokenStream) Consume() {
 	SkipEOFCheck := false
 
@@ -169,6 +174,7 @@ func (c *CommonTokenStream) GetTokens(start int, stop int, types *IntervalSet) [
 	return subset
 }
 
+// LA looks i tokens ahead or behind and returns it's type.
 func (c *CommonTokenStream) LA(i int) int {
 	return c.LT(i).GetTokenType()
 }
@@ -184,6 +190,7 @@ func (c *CommonTokenStream) setup() {
 	c.index = c.adjustSeekIndex(0)
 }
 
+// GetTokenSource returns the source from which the tokens are fetched.
 func (c *CommonTokenStream) GetTokenSource() TokenSource {
 	return c.tokenSource
 }
@@ -301,22 +308,27 @@ func (c *CommonTokenStream) filterForChannel(left, right, channel int) []Token {
 	return hidden
 }
 
+// GetSourceName returns the name of this stream's source.
 func (c *CommonTokenStream) GetSourceName() string {
 	return c.tokenSource.GetSourceName()
 }
 
+// Size is the number of tokens in this stream.
 func (c *CommonTokenStream) Size() int {
 	return len(c.tokens)
 }
 
+// Index returns the current index in this stream.
 func (c *CommonTokenStream) Index() int {
 	return c.index
 }
 
+// GetAllText returns the original text from which the input was fashioned.
 func (c *CommonTokenStream) GetAllText() string {
 	return c.GetTextFromInterval(nil)
 }
 
+// GetTextFromTokens returns the text between the two given tokens.
 func (c *CommonTokenStream) GetTextFromTokens(start, end Token) string {
 	if start == nil || end == nil {
 		return ""
@@ -325,10 +337,12 @@ func (c *CommonTokenStream) GetTextFromTokens(start, end Token) string {
 	return c.GetTextFromInterval(NewInterval(start.GetTokenIndex(), end.GetTokenIndex()))
 }
 
+// GetTextFromRuleContext returns the text corresponding to the given index.
 func (c *CommonTokenStream) GetTextFromRuleContext(interval RuleContext) string {
 	return c.GetTextFromInterval(interval.GetSourceInterval())
 }
 
+// GetTextFromInterval returns the text inside the given interval.
 func (c *CommonTokenStream) GetTextFromInterval(interval *Interval) string {
 	c.lazyInit()
 	c.Fill()
@@ -376,6 +390,7 @@ func (c *CommonTokenStream) adjustSeekIndex(i int) int {
 	return c.NextTokenOnChannel(i, c.channel)
 }
 
+// LB looks k tokens behind.
 func (c *CommonTokenStream) LB(k int) Token {
 	if k == 0 || c.index-k < 0 {
 		return nil
@@ -398,6 +413,7 @@ func (c *CommonTokenStream) LB(k int) Token {
 	return c.tokens[i]
 }
 
+// LT returns the token k positions ahead or behind.
 func (c *CommonTokenStream) LT(k int) Token {
 	c.lazyInit()
 

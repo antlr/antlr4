@@ -25,8 +25,10 @@ const (
 	ATNStateInvalidStateNumber = -1
 )
 
+// ATNStateInitialNumTransitions TODO: docs.
 var ATNStateInitialNumTransitions = 4
 
+// ATNState is the top of the ATN state hierarchy.
 type ATNState interface {
 	GetEpsilonOnlyTransitions() bool
 
@@ -52,6 +54,7 @@ type ATNState interface {
 	hash() int
 }
 
+// BaseATNState is the default implementation of ATNState.
 type BaseATNState struct {
 	// NextTokenWithinRule caches lookahead during parsing. Not used during construction.
 	NextTokenWithinRule *IntervalSet
@@ -72,53 +75,67 @@ type BaseATNState struct {
 	transitions []Transition
 }
 
+// NewBaseATNState returns a new instance of BaseATNState.
 func NewBaseATNState() *BaseATNState {
 	return &BaseATNState{stateNumber: ATNStateInvalidStateNumber, stateType: ATNStateInvalidType}
 }
 
+// GetRuleIndex returns the rule index for this state.
 func (as *BaseATNState) GetRuleIndex() int {
 	return as.ruleIndex
 }
 
+// SetRuleIndex sets the rule index for this state.
 func (as *BaseATNState) SetRuleIndex(v int) {
 	as.ruleIndex = v
 }
+
+// GetEpsilonOnlyTransitions TODO: docs.
 func (as *BaseATNState) GetEpsilonOnlyTransitions() bool {
 	return as.epsilonOnlyTransitions
 }
 
+// GetATN returns the atn whithin this state.
 func (as *BaseATNState) GetATN() *ATN {
 	return as.atn
 }
 
+// SetATN sets the atn whithin this state.
 func (as *BaseATNState) SetATN(atn *ATN) {
 	as.atn = atn
 }
 
+// GetTransitions returns the transitions in this state.
 func (as *BaseATNState) GetTransitions() []Transition {
 	return as.transitions
 }
 
+// SetTransitions sets the transitions whithin this state.
 func (as *BaseATNState) SetTransitions(t []Transition) {
 	as.transitions = t
 }
 
+// GetStateType returns the type of state this represents.
 func (as *BaseATNState) GetStateType() int {
 	return as.stateType
 }
 
+// GetStateNumber returns the state number.
 func (as *BaseATNState) GetStateNumber() int {
 	return as.stateNumber
 }
 
+// SetStateNumber sets the state number.
 func (as *BaseATNState) SetStateNumber(stateNumber int) {
 	as.stateNumber = stateNumber
 }
 
+// GetNextTokenWithinRule TODO: docs.
 func (as *BaseATNState) GetNextTokenWithinRule() *IntervalSet {
 	return as.NextTokenWithinRule
 }
 
+// SetNextTokenWithinRule TODO: docs.
 func (as *BaseATNState) SetNextTokenWithinRule(v *IntervalSet) {
 	as.NextTokenWithinRule = v
 }
@@ -143,6 +160,7 @@ func (as *BaseATNState) isNonGreedyExitState() bool {
 	return false
 }
 
+// AddTransition adds a transition at the given index.
 func (as *BaseATNState) AddTransition(trans Transition, index int) {
 	if len(as.transitions) == 0 {
 		as.epsilonOnlyTransitions = trans.getIsEpsilon()
@@ -158,10 +176,12 @@ func (as *BaseATNState) AddTransition(trans Transition, index int) {
 	}
 }
 
+// BasicState represents any basic state.
 type BasicState struct {
 	*BaseATNState
 }
 
+// NewBasicState returns a new instance of BasicState.
 func NewBasicState() *BasicState {
 	b := NewBaseATNState()
 
@@ -170,6 +190,7 @@ func NewBasicState() *BasicState {
 	return &BasicState{BaseATNState: b}
 }
 
+// DecisionState is the top of the decision state hierarchy.
 type DecisionState interface {
 	ATNState
 
@@ -180,12 +201,14 @@ type DecisionState interface {
 	setNonGreedy(bool)
 }
 
+// BaseDecisionState represents a decision state.
 type BaseDecisionState struct {
 	*BaseATNState
 	decision  int
 	nonGreedy bool
 }
 
+// NewBaseDecisionState returns a new instance of BaseDecisionState.
 func NewBaseDecisionState() *BaseDecisionState {
 	return &BaseDecisionState{BaseATNState: NewBaseATNState(), decision: -1}
 }
@@ -206,6 +229,7 @@ func (s *BaseDecisionState) setNonGreedy(b bool) {
 	s.nonGreedy = b
 }
 
+// BlockStartState represents the start of a block.
 type BlockStartState interface {
 	DecisionState
 
@@ -219,6 +243,7 @@ type BaseBlockStartState struct {
 	endState *BlockEndState
 }
 
+// NewBlockStartState returns a new instance of BlockStartState.
 func NewBlockStartState() *BaseBlockStartState {
 	return &BaseBlockStartState{BaseDecisionState: NewBaseDecisionState()}
 }
@@ -231,10 +256,12 @@ func (s *BaseBlockStartState) setEndState(b *BlockEndState) {
 	s.endState = b
 }
 
+// BasicBlockStartState represents the start of an (a|b|c) block.
 type BasicBlockStartState struct {
 	*BaseBlockStartState
 }
 
+// NewBasicBlockStartState returns a new instance of BasicBlockStartState.
 func NewBasicBlockStartState() *BasicBlockStartState {
 	b := NewBlockStartState()
 
@@ -249,6 +276,7 @@ type BlockEndState struct {
 	startState ATNState
 }
 
+// NewBlockEndState returns a new instance of BlockEndState.
 func NewBlockEndState() *BlockEndState {
 	b := NewBaseATNState()
 
@@ -265,6 +293,7 @@ type RuleStopState struct {
 	*BaseATNState
 }
 
+// NewRuleStopState returns a new instance of RuleStopState.
 func NewRuleStopState() *RuleStopState {
 	b := NewBaseATNState()
 
@@ -273,12 +302,14 @@ func NewRuleStopState() *RuleStopState {
 	return &RuleStopState{BaseATNState: b}
 }
 
+// RuleStartState represents the start of any rule.
 type RuleStartState struct {
 	*BaseATNState
 	stopState        ATNState
 	isPrecedenceRule bool
 }
 
+// NewRuleStartState returns a new instance of RuleStartState.
 func NewRuleStartState() *RuleStartState {
 	b := NewBaseATNState()
 
@@ -293,6 +324,7 @@ type PlusLoopbackState struct {
 	*BaseDecisionState
 }
 
+// NewPlusLoopbackState returns a new instance of PlusLoopbackState.
 func NewPlusLoopbackState() *PlusLoopbackState {
 	b := NewBaseDecisionState()
 
@@ -310,6 +342,7 @@ type PlusBlockStartState struct {
 	loopBackState ATNState
 }
 
+// NewPlusBlockStartState returns a new instance of PlusBlockStartState.
 func NewPlusBlockStartState() *PlusBlockStartState {
 	b := NewBlockStartState()
 
@@ -323,6 +356,7 @@ type StarBlockStartState struct {
 	*BaseBlockStartState
 }
 
+// NewStarBlockStartState returns a new instance of StarBlockStartState.
 func NewStarBlockStartState() *StarBlockStartState {
 	b := NewBlockStartState()
 
@@ -331,10 +365,12 @@ func NewStarBlockStartState() *StarBlockStartState {
 	return &StarBlockStartState{BaseBlockStartState: b}
 }
 
+// StarLoopbackState represents the end of a * block.
 type StarLoopbackState struct {
 	*BaseATNState
 }
 
+// NewStarLoopbackState returns a new instance of StarLoopbackState.
 func NewStarLoopbackState() *StarLoopbackState {
 	b := NewBaseATNState()
 
@@ -343,12 +379,14 @@ func NewStarLoopbackState() *StarLoopbackState {
 	return &StarLoopbackState{BaseATNState: b}
 }
 
+// StarLoopEntryState marks the start of a * loop.
 type StarLoopEntryState struct {
 	*BaseDecisionState
 	loopBackState          ATNState
 	precedenceRuleDecision bool
 }
 
+// NewStarLoopEntryState returns a new instance of StarLoopEntryState.
 func NewStarLoopEntryState() *StarLoopEntryState {
 	b := NewBaseDecisionState()
 
@@ -364,6 +402,7 @@ type LoopEndState struct {
 	loopBackState ATNState
 }
 
+// NewLoopEndState returns a new instance of LoopEndState.
 func NewLoopEndState() *LoopEndState {
 	b := NewBaseATNState()
 
@@ -377,6 +416,7 @@ type TokensStartState struct {
 	*BaseDecisionState
 }
 
+// NewTokensStartState returns a new instance of TokensStartState.
 func NewTokensStartState() *TokensStartState {
 	b := NewBaseDecisionState()
 

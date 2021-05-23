@@ -6,11 +6,10 @@ package antlr
 
 import (
 	"fmt"
-	"strings"
-
 	"strconv"
 )
 
+// Recognizer is the base type for generated lexers and parsers.
 type Recognizer interface {
 	GetLiteralNames() []string
 	GetSymbolicNames() []string
@@ -28,6 +27,7 @@ type Recognizer interface {
 	GetErrorListenerDispatch() ErrorListener
 }
 
+// BaseRecognizer is the base implementation for Recognizer.
 type BaseRecognizer struct {
 	listeners []ErrorListener
 	state     int
@@ -38,11 +38,12 @@ type BaseRecognizer struct {
 	GrammarFileName string
 }
 
+// NewBaseRecognizer returns a new instance of BaseRecognizer
 func NewBaseRecognizer() *BaseRecognizer {
-	rec := new(BaseRecognizer)
-	rec.listeners = []ErrorListener{ConsoleErrorListenerINSTANCE}
-	rec.state = -1
-	return rec
+	return &BaseRecognizer{
+		listeners: []ErrorListener{ConsoleErrorListenerINSTANCE},
+		state:     -1,
+	}
 }
 
 var tokenTypeMapCache = make(map[string]int)
@@ -55,163 +56,87 @@ func (b *BaseRecognizer) checkVersion(toolVersion string) {
 	}
 }
 
+// Action does nothing by default.
 func (b *BaseRecognizer) Action(context RuleContext, ruleIndex, actionIndex int) {
 	panic("action not implemented on Recognizer!")
 }
 
+// AddErrorListener subscribes the given listener to this recognizer.
 func (b *BaseRecognizer) AddErrorListener(listener ErrorListener) {
 	b.listeners = append(b.listeners, listener)
 }
 
+// RemoveErrorListeners removes all the listeners from this recognizer.
 func (b *BaseRecognizer) RemoveErrorListeners() {
-	b.listeners = make([]ErrorListener, 0)
+	b.listeners = b.listeners[:0]
 }
 
+// GetRuleNames returns the names for the rules in this recognizer.
 func (b *BaseRecognizer) GetRuleNames() []string {
 	return b.RuleNames
 }
 
+// GetTokenNames returns the literal names contained in this recognizer.
 func (b *BaseRecognizer) GetTokenNames() []string {
 	return b.LiteralNames
 }
 
+// GetSymbolicNames returns the symbolic names contained in this recognizer.
 func (b *BaseRecognizer) GetSymbolicNames() []string {
 	return b.SymbolicNames
 }
 
+// GetLiteralNames returns the literal names contained in this recognizer.
 func (b *BaseRecognizer) GetLiteralNames() []string {
 	return b.LiteralNames
 }
 
+// GetState returns the current state of this recognizer.
 func (b *BaseRecognizer) GetState() int {
 	return b.state
 }
 
+// SetState sets the current state of this recognizer.
 func (b *BaseRecognizer) SetState(v int) {
 	b.state = v
 }
 
-//func (b *Recognizer) GetTokenTypeMap() {
-//    var tokenNames = b.GetTokenNames()
-//    if (tokenNames==nil) {
-//        panic("The current recognizer does not provide a list of token names.")
-//    }
-//    var result = tokenTypeMapCache[tokenNames]
-//    if(result==nil) {
-//        result = tokenNames.reduce(function(o, k, i) { o[k] = i })
-//        result.EOF = TokenEOF
-//        tokenTypeMapCache[tokenNames] = result
-//    }
-//    return result
-//}
-
-// Get a map from rule names to rule indexes.
+// GetRuleIndexMap returns a map from rule names to rule indexes.
 //
-// <p>Used for XPath and tree pattern compilation.</p>
+// By default it's not implemented.
 //
+// Used for XPath and tree pattern compilation.
 func (b *BaseRecognizer) GetRuleIndexMap() map[string]int {
-
 	panic("Method not defined!")
-	//    var ruleNames = b.GetRuleNames()
-	//    if (ruleNames==nil) {
-	//        panic("The current recognizer does not provide a list of rule names.")
-	//    }
-	//
-	//    var result = ruleIndexMapCache[ruleNames]
-	//    if(result==nil) {
-	//        result = ruleNames.reduce(function(o, k, i) { o[k] = i })
-	//        ruleIndexMapCache[ruleNames] = result
-	//    }
-	//    return result
 }
 
+// GetTokenType does nothing by default.
 func (b *BaseRecognizer) GetTokenType(tokenName string) int {
 	panic("Method not defined!")
-	//    var ttype = b.GetTokenTypeMap()[tokenName]
-	//    if (ttype !=nil) {
-	//        return ttype
-	//    } else {
-	//        return TokenInvalidType
-	//    }
 }
 
-//func (b *Recognizer) GetTokenTypeMap() map[string]int {
-//    Vocabulary vocabulary = getVocabulary()
-//
-//    Synchronized (tokenTypeMapCache) {
-//        Map<String, Integer> result = tokenTypeMapCache.Get(vocabulary)
-//        if (result == null) {
-//            result = new HashMap<String, Integer>()
-//            for (int i = 0; i < GetATN().maxTokenType; i++) {
-//                String literalName = vocabulary.getLiteralName(i)
-//                if (literalName != null) {
-//                    result.put(literalName, i)
-//                }
-//
-//                String symbolicName = vocabulary.GetSymbolicName(i)
-//                if (symbolicName != null) {
-//                    result.put(symbolicName, i)
-//                }
-//            }
-//
-//            result.put("EOF", Token.EOF)
-//            result = Collections.unmodifiableMap(result)
-//            tokenTypeMapCache.put(vocabulary, result)
-//        }
-//
-//        return result
-//    }
-//}
-
-// What is the error header, normally line/character position information?//
+// GetErrorHeader returns what the error header is, normally line/character
+// position information
 func (b *BaseRecognizer) GetErrorHeader(e RecognitionException) string {
 	line := e.GetOffendingToken().GetLine()
 	column := e.GetOffendingToken().GetColumn()
 	return "line " + strconv.Itoa(line) + ":" + strconv.Itoa(column)
 }
 
-// How should a token be displayed in an error message? The default
-//  is to display just the text, but during development you might
-//  want to have a lot of information spit out.  Override in that case
-//  to use t.String() (which, for CommonToken, dumps everything about
-//  the token). This is better than forcing you to override a method in
-//  your token objects because you don't have to go modify your lexer
-//  so that it creates a NewJava type.
-//
-// @deprecated This method is not called by the ANTLR 4 Runtime. Specific
-// implementations of {@link ANTLRErrorStrategy} may provide a similar
-// feature when necessary. For example, see
-// {@link DefaultErrorStrategy//GetTokenErrorDisplay}.
-//
-func (b *BaseRecognizer) GetTokenErrorDisplay(t Token) string {
-	if t == nil {
-		return "<no token>"
-	}
-	s := t.GetText()
-	if s == "" {
-		if t.GetTokenType() == TokenEOF {
-			s = "<EOF>"
-		} else {
-			s = "<" + strconv.Itoa(t.GetTokenType()) + ">"
-		}
-	}
-	s = strings.Replace(s, "\t", "\\t", -1)
-	s = strings.Replace(s, "\n", "\\n", -1)
-	s = strings.Replace(s, "\r", "\\r", -1)
-
-	return "'" + s + "'"
-}
-
+// GetErrorListenerDispatch returns a new proxy error listener.
 func (b *BaseRecognizer) GetErrorListenerDispatch() ErrorListener {
 	return NewProxyErrorListener(b.listeners)
 }
 
 // subclass needs to override these if there are sempreds or actions
 // that the ATN interp needs to execute
+
+// Sempred always returns true.
 func (b *BaseRecognizer) Sempred(localctx RuleContext, ruleIndex int, actionIndex int) bool {
 	return true
 }
 
+// Precpred always returns true.
 func (b *BaseRecognizer) Precpred(localctx RuleContext, precedence int) bool {
 	return true
 }

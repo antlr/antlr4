@@ -8,23 +8,19 @@ import (
 	"strconv"
 )
 
-// Represents {@code $} in local context prediction, which means wildcard.
-// {@code//+x =//}.
-// /
-const (
-	BasePredictionContextEmptyReturnState = 0x7FFFFFFF
-)
+// BasePredictionContextEmptyReturnState represents $ in local context
+// prediction, which means wildcard.
+const BasePredictionContextEmptyReturnState = 0x7FFFFFFF
 
-// Represents {@code $} in an array in full context mode, when {@code $}
-// doesn't mean wildcard: {@code $ + x = [$,x]}. Here,
-// {@code $} = {@link //EmptyReturnState}.
-// /
-
+// Represents $ in an array in full context mode, when $
+// doesn't mean wildcard: $ + x = [$,x]. Here,
+// $ = EmptyReturnState.
 var (
 	BasePredictionContextglobalNodeCount = 1
 	BasePredictionContextid              = BasePredictionContextglobalNodeCount
 )
 
+// PredictionContext TODO: docs
 type PredictionContext interface {
 	hash() int
 	GetParent(int) PredictionContext
@@ -36,15 +32,14 @@ type PredictionContext interface {
 	String() string
 }
 
+// BasePredictionContext is the default implementation of PredictionContext.
 type BasePredictionContext struct {
 	cachedHash int
 }
 
+// NewBasePredictionContext returns a new instance of BasePredictionContext.
 func NewBasePredictionContext(cachedHash int) *BasePredictionContext {
-	pc := new(BasePredictionContext)
-	pc.cachedHash = cachedHash
-
-	return pc
+	return &BasePredictionContext{cachedHash: cachedHash}
 }
 
 func (b *BasePredictionContext) isEmpty() bool {
@@ -63,18 +58,18 @@ func calculateEmptyHash() int {
 	return murmurFinish(h, 0)
 }
 
-// Used to cache {@link BasePredictionContext} objects. Its used for the shared
-// context cash associated with contexts in DFA states. This cache
-// can be used for both lexers and parsers.
-
+// PredictionContextCache is used to cache BasePredictionContext objects. Its
+// used for the shared context cash associated with contexts in DFA states. This
+// cache can be used for both lexers and parsers.
 type PredictionContextCache struct {
 	cache map[PredictionContext]PredictionContext
 }
 
+// NewPredictionContextCache returns a new instance of PredictionContextCache.
 func NewPredictionContextCache() *PredictionContextCache {
-	t := new(PredictionContextCache)
-	t.cache = make(map[PredictionContext]PredictionContext)
-	return t
+	return &PredictionContextCache{
+		cache: make(map[PredictionContext]PredictionContext),
+	}
 }
 
 // Add a context to the cache and return it. If the context already exists,
@@ -93,6 +88,7 @@ func (p *PredictionContextCache) add(ctx PredictionContext) PredictionContext {
 	return ctx
 }
 
+// Get the given prediction context.
 func (p *PredictionContextCache) Get(ctx PredictionContext) PredictionContext {
 	return p.cache[ctx]
 }
@@ -101,10 +97,13 @@ func (p *PredictionContextCache) length() int {
 	return len(p.cache)
 }
 
+// SingletonPredictionContext TODO: docs.
 type SingletonPredictionContext interface {
 	PredictionContext
 }
 
+// BaseSingletonPredictionContext is the default implementation of
+// SingletonPredictionContext.
 type BaseSingletonPredictionContext struct {
 	*BasePredictionContext
 
@@ -112,10 +111,15 @@ type BaseSingletonPredictionContext struct {
 	returnState int
 }
 
+// NewBaseSingletonPredictionContext returns a new instance of
+// BaseSingletonPredictionContext.
 func NewBaseSingletonPredictionContext(parent PredictionContext, returnState int) *BaseSingletonPredictionContext {
 
-	s := new(BaseSingletonPredictionContext)
-	s.BasePredictionContext = NewBasePredictionContext(37)
+	s := &BaseSingletonPredictionContext{
+		BasePredictionContext: NewBasePredictionContext(37),
+		parentCtx:             parent,
+		returnState:           returnState,
+	}
 
 	if parent != nil {
 		s.cachedHash = calculateHash(parent, returnState)
@@ -123,12 +127,10 @@ func NewBaseSingletonPredictionContext(parent PredictionContext, returnState int
 		s.cachedHash = calculateEmptyHash()
 	}
 
-	s.parentCtx = parent
-	s.returnState = returnState
-
 	return s
 }
 
+// SingletonBasePredictionContextCreate TODO: docs.
 func SingletonBasePredictionContextCreate(parent PredictionContext, returnState int) PredictionContext {
 	if returnState == BasePredictionContextEmptyReturnState && parent == nil {
 		// someone can pass in the bits of an array ctx that mean $
@@ -142,6 +144,7 @@ func (b *BaseSingletonPredictionContext) length() int {
 	return 1
 }
 
+// GetParent of this context.
 func (b *BaseSingletonPredictionContext) GetParent(index int) PredictionContext {
 	return b.parentCtx
 }
@@ -206,25 +209,26 @@ func (b *BaseSingletonPredictionContext) String() string {
 	return strconv.Itoa(b.returnState) + " " + up
 }
 
+// BasePredictionContextEMPTY TODO: docs.
 var BasePredictionContextEMPTY = NewEmptyPredictionContext()
 
+// EmptyPredictionContext TODO: docs.
 type EmptyPredictionContext struct {
 	*BaseSingletonPredictionContext
 }
 
+// NewEmptyPredictionContext returns a new instance of EmptyPredictionContext.
 func NewEmptyPredictionContext() *EmptyPredictionContext {
-
-	p := new(EmptyPredictionContext)
-
-	p.BaseSingletonPredictionContext = NewBaseSingletonPredictionContext(nil, BasePredictionContextEmptyReturnState)
-
-	return p
+	return &EmptyPredictionContext{
+		BaseSingletonPredictionContext: NewBaseSingletonPredictionContext(nil, BasePredictionContextEmptyReturnState),
+	}
 }
 
 func (e *EmptyPredictionContext) isEmpty() bool {
 	return true
 }
 
+// GetParent always returns nil.
 func (e *EmptyPredictionContext) GetParent(index int) PredictionContext {
 	return nil
 }
@@ -241,6 +245,7 @@ func (e *EmptyPredictionContext) String() string {
 	return "$"
 }
 
+// ArrayPredictionContext TODO: docs.
 type ArrayPredictionContext struct {
 	*BasePredictionContext
 
@@ -248,25 +253,27 @@ type ArrayPredictionContext struct {
 	returnStates []int
 }
 
+// NewArrayPredictionContext returns a new instance of ArrayPredictionContext.
 func NewArrayPredictionContext(parents []PredictionContext, returnStates []int) *ArrayPredictionContext {
 	// Parent can be nil only if full ctx mode and we make an array
-	// from {@link //EMPTY} and non-empty. We merge {@link //EMPTY} by using
+	// from //EMPTY and non-empty. We merge //EMPTY by using
 	// nil parent and
-	// returnState == {@link //EmptyReturnState}.
+	// returnState == //EmptyReturnState.
 
-	c := new(ArrayPredictionContext)
-	c.BasePredictionContext = NewBasePredictionContext(37)
+	c := &ArrayPredictionContext{
+		BasePredictionContext: NewBasePredictionContext(37),
+		parents:               parents,
+		returnStates:          returnStates,
+	}
 
 	for i := range parents {
 		c.cachedHash += calculateHash(parents[i], returnStates[i])
 	}
 
-	c.parents = parents
-	c.returnStates = returnStates
-
 	return c
 }
 
+// GetReturnStates returns the return states of this object.
 func (a *ArrayPredictionContext) GetReturnStates() []int {
 	return a.returnStates
 }
@@ -285,6 +292,7 @@ func (a *ArrayPredictionContext) length() int {
 	return len(a.returnStates)
 }
 
+// GetParent returns the i-th parent.
 func (a *ArrayPredictionContext) GetParent(index int) PredictionContext {
 	return a.parents[index]
 }
@@ -315,7 +323,7 @@ func (a *ArrayPredictionContext) hash() int {
 		h = murmurUpdate(h, r)
 	}
 
-	return murmurFinish(h, 2 * len(a.parents))
+	return murmurFinish(h, 2*len(a.parents))
 }
 
 func (a *ArrayPredictionContext) String() string {
@@ -343,8 +351,8 @@ func (a *ArrayPredictionContext) String() string {
 	return s + "]"
 }
 
-// Convert a {@link RuleContext} tree to a {@link BasePredictionContext} graph.
-// Return {@link //EMPTY} if {@code outerContext} is empty or nil.
+// Convert a RuleContext tree to a BasePredictionContext graph.
+// Return //EMPTY if outerContext is empty or nil.
 // /
 func predictionContextFromRuleContext(a *ATN, outerContext RuleContext) PredictionContext {
 	if outerContext == nil {
@@ -396,33 +404,33 @@ func merge(a, b PredictionContext, rootIsWildcard bool, mergeCache *DoubleDict) 
 }
 
 //
-// Merge two {@link SingletonBasePredictionContext} instances.
+// Merge two SingletonBasePredictionContext instances.
 //
-// <p>Stack tops equal, parents merge is same return left graph.<br>
+// Stack tops equal, parents merge is same return left graph.<br>
 // <embed src="images/SingletonMerge_SameRootSamePar.svg"
-// type="image/svg+xml"/></p>
+// type="image/svg+xml"/>
 //
-// <p>Same stack top, parents differ merge parents giving array node, then
+// Same stack top, parents differ merge parents giving array node, then
 // remainders of those graphs. A Newroot node is created to point to the
 // merged parents.<br>
 // <embed src="images/SingletonMerge_SameRootDiffPar.svg"
-// type="image/svg+xml"/></p>
+// type="image/svg+xml"/>
 //
-// <p>Different stack tops pointing to same parent. Make array node for the
+// Different stack tops pointing to same parent. Make array node for the
 // root where both element in the root point to the same (original)
 // parent.<br>
 // <embed src="images/SingletonMerge_DiffRootSamePar.svg"
-// type="image/svg+xml"/></p>
+// type="image/svg+xml"/>
 //
-// <p>Different stack tops pointing to different parents. Make array node for
+// Different stack tops pointing to different parents. Make array node for
 // the root where each element points to the corresponding original
 // parent.<br>
 // <embed src="images/SingletonMerge_DiffRootDiffPar.svg"
-// type="image/svg+xml"/></p>
+// type="image/svg+xml"/>
 //
-// @param a the first {@link SingletonBasePredictionContext}
-// @param b the second {@link SingletonBasePredictionContext}
-// @param rootIsWildcard {@code true} if this is a local-context merge,
+// @param a the first SingletonBasePredictionContext
+// @param b the second SingletonBasePredictionContext
+// @param rootIsWildcard true if this is a local-context merge,
 // otherwise false to indicate a full-context merge
 // @param mergeCache
 // /
@@ -505,41 +513,41 @@ func mergeSingletons(a, b *BaseSingletonPredictionContext, rootIsWildcard bool, 
 }
 
 //
-// Handle case where at least one of {@code a} or {@code b} is
-// {@link //EMPTY}. In the following diagrams, the symbol {@code $} is used
-// to represent {@link //EMPTY}.
+// Handle case where at least one of a or b is
+// //EMPTY. In the following diagrams, the symbol $ is used
+// to represent //EMPTY.
 //
 // <h2>Local-Context Merges</h2>
 //
-// <p>These local-context merge operations are used when {@code rootIsWildcard}
-// is true.</p>
+// These local-context merge operations are used when rootIsWildcard
+// is true.
 //
-// <p>{@link //EMPTY} is superset of any graph return {@link //EMPTY}.<br>
-// <embed src="images/LocalMerge_EmptyRoot.svg" type="image/svg+xml"/></p>
+// //EMPTY is superset of any graph return //EMPTY.<br>
+// <embed src="images/LocalMerge_EmptyRoot.svg" type="image/svg+xml"/>
 //
-// <p>{@link //EMPTY} and anything is {@code //EMPTY}, so merged parent is
-// {@code //EMPTY} return left graph.<br>
-// <embed src="images/LocalMerge_EmptyParent.svg" type="image/svg+xml"/></p>
+// //EMPTY and anything is //EMPTY, so merged parent is
+// //EMPTY return left graph.<br>
+// <embed src="images/LocalMerge_EmptyParent.svg" type="image/svg+xml"/>
 //
-// <p>Special case of last merge if local context.<br>
-// <embed src="images/LocalMerge_DiffRoots.svg" type="image/svg+xml"/></p>
+// Special case of last merge if local context.<br>
+// <embed src="images/LocalMerge_DiffRoots.svg" type="image/svg+xml"/>
 //
 // <h2>Full-Context Merges</h2>
 //
-// <p>These full-context merge operations are used when {@code rootIsWildcard}
-// is false.</p>
+// These full-context merge operations are used when rootIsWildcard
+// is false.
 //
-// <p><embed src="images/FullMerge_EmptyRoots.svg" type="image/svg+xml"/></p>
+// <embed src="images/FullMerge_EmptyRoots.svg" type="image/svg+xml"/>
 //
-// <p>Must keep all contexts {@link //EMPTY} in array is a special value (and
+// Must keep all contexts //EMPTY in array is a special value (and
 // nil parent).<br>
-// <embed src="images/FullMerge_EmptyRoot.svg" type="image/svg+xml"/></p>
+// <embed src="images/FullMerge_EmptyRoot.svg" type="image/svg+xml"/>
 //
-// <p><embed src="images/FullMerge_SameRoot.svg" type="image/svg+xml"/></p>
+// <embed src="images/FullMerge_SameRoot.svg" type="image/svg+xml"/>
 //
-// @param a the first {@link SingletonBasePredictionContext}
-// @param b the second {@link SingletonBasePredictionContext}
-// @param rootIsWildcard {@code true} if this is a local-context merge,
+// @param a the first SingletonBasePredictionContext
+// @param b the second SingletonBasePredictionContext
+// @param rootIsWildcard true if this is a local-context merge,
 // otherwise false to indicate a full-context merge
 // /
 func mergeRoot(a, b SingletonPredictionContext, rootIsWildcard bool) PredictionContext {
@@ -567,24 +575,24 @@ func mergeRoot(a, b SingletonPredictionContext, rootIsWildcard bool) PredictionC
 }
 
 //
-// Merge two {@link ArrayBasePredictionContext} instances.
+// Merge two ArrayBasePredictionContext instances.
 //
-// <p>Different tops, different parents.<br>
-// <embed src="images/ArrayMerge_DiffTopDiffPar.svg" type="image/svg+xml"/></p>
+// Different tops, different parents.<br>
+// <embed src="images/ArrayMerge_DiffTopDiffPar.svg" type="image/svg+xml"/>
 //
-// <p>Shared top, same parents.<br>
-// <embed src="images/ArrayMerge_ShareTopSamePar.svg" type="image/svg+xml"/></p>
+// Shared top, same parents.<br>
+// <embed src="images/ArrayMerge_ShareTopSamePar.svg" type="image/svg+xml"/>
 //
-// <p>Shared top, different parents.<br>
-// <embed src="images/ArrayMerge_ShareTopDiffPar.svg" type="image/svg+xml"/></p>
+// Shared top, different parents.<br>
+// <embed src="images/ArrayMerge_ShareTopDiffPar.svg" type="image/svg+xml"/>
 //
-// <p>Shared top, all shared parents.<br>
+// Shared top, all shared parents.<br>
 // <embed src="images/ArrayMerge_ShareTopSharePar.svg"
-// type="image/svg+xml"/></p>
+// type="image/svg+xml"/>
 //
-// <p>Equal tops, merge parents and reduce top to
-// {@link SingletonBasePredictionContext}.<br>
-// <embed src="images/ArrayMerge_EqualTop.svg" type="image/svg+xml"/></p>
+// Equal tops, merge parents and reduce top to
+// SingletonBasePredictionContext.<br>
+// <embed src="images/ArrayMerge_EqualTop.svg" type="image/svg+xml"/>
 // /
 func mergeArrays(a, b *ArrayPredictionContext, rootIsWildcard bool, mergeCache *DoubleDict) PredictionContext {
 	if mergeCache != nil {
@@ -689,7 +697,7 @@ func mergeArrays(a, b *ArrayPredictionContext, rootIsWildcard bool, mergeCache *
 }
 
 //
-// Make pass over all <em>M</em> {@code parents} merge any {@code equals()}
+// Make pass over all <em>M</em> parents merge any equals()
 // ones.
 // /
 func combineCommonParents(parents []PredictionContext) {

@@ -6,17 +6,19 @@ package antlr
 
 import "strconv"
 
+// Lexer action types.
 const (
-	LexerActionTypeChannel  = 0 //The type of a {@link LexerChannelAction} action.
-	LexerActionTypeCustom   = 1 //The type of a {@link LexerCustomAction} action.
-	LexerActionTypeMode     = 2 //The type of a {@link LexerModeAction} action.
-	LexerActionTypeMore     = 3 //The type of a {@link LexerMoreAction} action.
-	LexerActionTypePopMode  = 4 //The type of a {@link LexerPopModeAction} action.
-	LexerActionTypePushMode = 5 //The type of a {@link LexerPushModeAction} action.
-	LexerActionTypeSkip     = 6 //The type of a {@link LexerSkipAction} action.
-	LexerActionTypeType     = 7 //The type of a {@link LexerTypeAction} action.
+	LexerActionTypeChannel  = 0 //The type of a LexerChannelAction action.
+	LexerActionTypeCustom   = 1 //The type of a LexerCustomAction action.
+	LexerActionTypeMode     = 2 //The type of a LexerModeAction action.
+	LexerActionTypeMore     = 3 //The type of a LexerMoreAction action.
+	LexerActionTypePopMode  = 4 //The type of a LexerPopModeAction action.
+	LexerActionTypePushMode = 5 //The type of a LexerPushModeAction action.
+	LexerActionTypeSkip     = 6 //The type of a LexerSkipAction action.
+	LexerActionTypeType     = 7 //The type of a LexerTypeAction action.
 )
 
+// LexerAction is the base of the lexer action hyerarchy.
 type LexerAction interface {
 	getActionType() int
 	getIsPositionDependent() bool
@@ -25,18 +27,18 @@ type LexerAction interface {
 	equals(other LexerAction) bool
 }
 
+// BaseLexerAction is the base implementation of LexerAction.
 type BaseLexerAction struct {
 	actionType          int
 	isPositionDependent bool
 }
 
+// NewBaseLexerAction returns a new instance of BaseLexerAction.
 func NewBaseLexerAction(action int) *BaseLexerAction {
-	la := new(BaseLexerAction)
-
-	la.actionType = action
-	la.isPositionDependent = false
-
-	return la
+	return &BaseLexerAction{
+		actionType:          action,
+		isPositionDependent: false,
+	}
 }
 
 func (b *BaseLexerAction) execute(lexer Lexer) {
@@ -59,22 +61,22 @@ func (b *BaseLexerAction) equals(other LexerAction) bool {
 	return b == other
 }
 
+// LexerSkipAction implements the Skip lexer action by calling Lexer//Skip.
 //
-// Implements the {@code Skip} lexer action by calling {@link Lexer//Skip}.
-//
-// <p>The {@code Skip} command does not have any parameters, so l action is
-// implemented as a singleton instance exposed by {@link //INSTANCE}.</p>
+// The Skip command does not have any parameters, so l action is
+// implemented as a singleton instance exposed by //INSTANCE.
 type LexerSkipAction struct {
 	*BaseLexerAction
 }
 
+// NewLexerSkipAction returns a new instance of LexerSkipAction.
 func NewLexerSkipAction() *LexerSkipAction {
-	la := new(LexerSkipAction)
-	la.BaseLexerAction = NewBaseLexerAction(LexerActionTypeSkip)
-	return la
+	return &LexerSkipAction{
+		BaseLexerAction: NewBaseLexerAction(LexerActionTypeSkip),
+	}
 }
 
-// Provides a singleton instance of l parameterless lexer action.
+// LexerSkipActionINSTANCE provides a singleton instance of l parameterless lexer action.
 var LexerSkipActionINSTANCE = NewLexerSkipAction()
 
 func (l *LexerSkipAction) execute(lexer Lexer) {
@@ -85,7 +87,7 @@ func (l *LexerSkipAction) String() string {
 	return "skip"
 }
 
-//  Implements the {@code type} lexer action by calling {@link Lexer//setType}
+// LexerTypeAction implements the type lexer action by calling Lexer//setType
 // with the assigned type.
 type LexerTypeAction struct {
 	*BaseLexerAction
@@ -93,11 +95,12 @@ type LexerTypeAction struct {
 	thetype int
 }
 
+// NewLexerTypeAction returns a new instance of LexerTypeAction.
 func NewLexerTypeAction(thetype int) *LexerTypeAction {
-	l := new(LexerTypeAction)
-	l.BaseLexerAction = NewBaseLexerAction(LexerActionTypeType)
-	l.thetype = thetype
-	return l
+	return &LexerTypeAction{
+		BaseLexerAction: NewBaseLexerAction(LexerActionTypeType),
+		thetype:         thetype,
+	}
 }
 
 func (l *LexerTypeAction) execute(lexer Lexer) {
@@ -125,25 +128,24 @@ func (l *LexerTypeAction) String() string {
 	return "actionType(" + strconv.Itoa(l.thetype) + ")"
 }
 
-// Implements the {@code pushMode} lexer action by calling
-// {@link Lexer//pushMode} with the assigned mode.
+// LexerPushModeAction implements the pushMode lexer action by calling
+// Lexer//pushMode with the assigned mode.
 type LexerPushModeAction struct {
 	*BaseLexerAction
 
 	mode int
 }
 
+// NewLexerPushModeAction returns a new instance of LexerPushModeAction.
 func NewLexerPushModeAction(mode int) *LexerPushModeAction {
-
-	l := new(LexerPushModeAction)
-	l.BaseLexerAction = NewBaseLexerAction(LexerActionTypePushMode)
-
-	l.mode = mode
-	return l
+	return &LexerPushModeAction{
+		BaseLexerAction: NewBaseLexerAction(LexerActionTypePushMode),
+		mode:            mode,
+	}
 }
 
-// <p>This action is implemented by calling {@link Lexer//pushMode} with the
-// value provided by {@link //getMode}.</p>
+// This action is implemented by calling Lexer//pushMode with the
+// value provided by //getMode.
 func (l *LexerPushModeAction) execute(lexer Lexer) {
 	lexer.PushMode(l.mode)
 }
@@ -169,26 +171,25 @@ func (l *LexerPushModeAction) String() string {
 	return "pushMode(" + strconv.Itoa(l.mode) + ")"
 }
 
-// Implements the {@code popMode} lexer action by calling {@link Lexer//popMode}.
+// LexerPopModeAction implements the popMode lexer action by calling Lexer//popMode.
 //
-// <p>The {@code popMode} command does not have any parameters, so l action is
-// implemented as a singleton instance exposed by {@link //INSTANCE}.</p>
+// The popMode command does not have any parameters, so l action is
+// implemented as a singleton instance exposed by //INSTANCE.
 type LexerPopModeAction struct {
 	*BaseLexerAction
 }
 
+// NewLexerPopModeAction returns a new instance of LexerPopModeAction.
 func NewLexerPopModeAction() *LexerPopModeAction {
-
-	l := new(LexerPopModeAction)
-
-	l.BaseLexerAction = NewBaseLexerAction(LexerActionTypePopMode)
-
-	return l
+	return &LexerPopModeAction{
+		BaseLexerAction: NewBaseLexerAction(LexerActionTypePopMode),
+	}
 }
 
+// LexerPopModeActionINSTANCE TODO: docs.
 var LexerPopModeActionINSTANCE = NewLexerPopModeAction()
 
-// <p>This action is implemented by calling {@link Lexer//popMode}.</p>
+// This action is implemented by calling Lexer//popMode.
 func (l *LexerPopModeAction) execute(lexer Lexer) {
 	lexer.PopMode()
 }
@@ -197,25 +198,25 @@ func (l *LexerPopModeAction) String() string {
 	return "popMode"
 }
 
-// Implements the {@code more} lexer action by calling {@link Lexer//more}.
+// LexerMoreAction implements the more lexer action by calling Lexer//more.
 //
-// <p>The {@code more} command does not have any parameters, so l action is
-// implemented as a singleton instance exposed by {@link //INSTANCE}.</p>
-
+// The more command does not have any parameters, so l action is
+// implemented as a singleton instance exposed by //INSTANCE.
 type LexerMoreAction struct {
 	*BaseLexerAction
 }
 
+// NewLexerMoreAction returns a new instance of LexerMoreAction.
 func NewLexerMoreAction() *LexerMoreAction {
-	l := new(LexerMoreAction)
-	l.BaseLexerAction = NewBaseLexerAction(LexerActionTypeMore)
-
-	return l
+	return &LexerMoreAction{
+		BaseLexerAction: NewBaseLexerAction(LexerActionTypeMore),
+	}
 }
 
+// LexerMoreActionINSTANCE TODO: docs.
 var LexerMoreActionINSTANCE = NewLexerMoreAction()
 
-// <p>This action is implemented by calling {@link Lexer//popMode}.</p>
+// This action is implemented by calling Lexer//popMode.
 func (l *LexerMoreAction) execute(lexer Lexer) {
 	lexer.More()
 }
@@ -224,7 +225,7 @@ func (l *LexerMoreAction) String() string {
 	return "more"
 }
 
-// Implements the {@code mode} lexer action by calling {@link Lexer//mode} with
+// LexerModeAction implements the mode lexer action by calling Lexer//mode with
 // the assigned mode.
 type LexerModeAction struct {
 	*BaseLexerAction
@@ -232,15 +233,16 @@ type LexerModeAction struct {
 	mode int
 }
 
+// NewLexerModeAction returns a new instance of LexerModeAction.
 func NewLexerModeAction(mode int) *LexerModeAction {
-	l := new(LexerModeAction)
-	l.BaseLexerAction = NewBaseLexerAction(LexerActionTypeMode)
-	l.mode = mode
-	return l
+	return &LexerModeAction{
+		BaseLexerAction: NewBaseLexerAction(LexerActionTypeMode),
+		mode:            mode,
+	}
 }
 
-// <p>This action is implemented by calling {@link Lexer//mode} with the
-// value provided by {@link //getMode}.</p>
+// This action is implemented by calling Lexer//mode with the
+// value provided by //getMode.
 func (l *LexerModeAction) execute(lexer Lexer) {
 	lexer.SetMode(l.mode)
 }
@@ -266,39 +268,41 @@ func (l *LexerModeAction) String() string {
 	return "mode(" + strconv.Itoa(l.mode) + ")"
 }
 
-// Executes a custom lexer action by calling {@link Recognizer//action} with the
-// rule and action indexes assigned to the custom action. The implementation of
-// a custom action is added to the generated code for the lexer in an override
-// of {@link Recognizer//action} when the grammar is compiled.
+// LexerCustomAction executes a custom lexer action by calling
+// Recognizer//action with the rule and action indexes assigned to the custom
+// action. The implementation of a custom action is added to the generated code
+// for the lexer in an override of Recognizer//action when the grammar is
+// compiled.
 //
-// <p>This class may represent embedded actions created with the <code>{...}</code>
+// This class may represent embedded actions created with the <code>{...}</code>
 // syntax in ANTLR 4, as well as actions created for lexer commands where the
-// command argument could not be evaluated when the grammar was compiled.</p>
+// command argument could not be evaluated when the grammar was compiled.
 
-// Constructs a custom lexer action with the specified rule and action
-// indexes.
+// LexerCustomAction constructs a custom lexer action with the specified rule
+// and action indexes.
 //
 // @param ruleIndex The rule index to use for calls to
-// {@link Recognizer//action}.
+// Recognizer//action.
 // @param actionIndex The action index to use for calls to
-// {@link Recognizer//action}.
-
+// Recognizer//action.
 type LexerCustomAction struct {
 	*BaseLexerAction
 	ruleIndex, actionIndex int
 }
 
+// NewLexerCustomAction returns a new instance of LexerCustomAction
 func NewLexerCustomAction(ruleIndex, actionIndex int) *LexerCustomAction {
-	l := new(LexerCustomAction)
-	l.BaseLexerAction = NewBaseLexerAction(LexerActionTypeCustom)
-	l.ruleIndex = ruleIndex
-	l.actionIndex = actionIndex
+	l := &LexerCustomAction{
+		BaseLexerAction: NewBaseLexerAction(LexerActionTypeCustom),
+		ruleIndex:       ruleIndex,
+		actionIndex:     actionIndex,
+	}
 	l.isPositionDependent = true
 	return l
 }
 
-// <p>Custom actions are implemented by calling {@link Lexer//action} with the
-// appropriate rule and action indexes.</p>
+// Custom actions are implemented by calling Lexer//action with the
+// appropriate rule and action indexes.
 func (l *LexerCustomAction) execute(lexer Lexer) {
 	lexer.Action(nil, l.ruleIndex, l.actionIndex)
 }
@@ -321,25 +325,26 @@ func (l *LexerCustomAction) equals(other LexerAction) bool {
 	}
 }
 
-// Implements the {@code channel} lexer action by calling
-// {@link Lexer//setChannel} with the assigned channel.
-// Constructs a New{@code channel} action with the specified channel value.
-// @param channel The channel value to pass to {@link Lexer//setChannel}.
+// LexerChannelAction implements the channel lexer action by calling
+// Lexer//setChannel with the assigned channel.
+// Constructs a Newchannel action with the specified channel value.
+// @param channel The channel value to pass to Lexer//setChannel.
 type LexerChannelAction struct {
 	*BaseLexerAction
 
 	channel int
 }
 
+// NewLexerChannelAction returns a new instance of LexerChannelAction.
 func NewLexerChannelAction(channel int) *LexerChannelAction {
-	l := new(LexerChannelAction)
-	l.BaseLexerAction = NewBaseLexerAction(LexerActionTypeChannel)
-	l.channel = channel
-	return l
+	return &LexerChannelAction{
+		BaseLexerAction: NewBaseLexerAction(LexerActionTypeChannel),
+		channel:         channel,
+	}
 }
 
-// <p>This action is implemented by calling {@link Lexer//setChannel} with the
-// value provided by {@link //getChannel}.</p>
+// This action is implemented by calling Lexer//setChannel with the
+// value provided by //getChannel.
 func (l *LexerChannelAction) execute(lexer Lexer) {
 	lexer.SetChannel(l.channel)
 }
@@ -365,26 +370,26 @@ func (l *LexerChannelAction) String() string {
 	return "channel(" + strconv.Itoa(l.channel) + ")"
 }
 
-// This implementation of {@link LexerAction} is used for tracking input offsets
-// for position-dependent actions within a {@link LexerActionExecutor}.
+// LexerIndexedCustomAction is used for tracking input offsets
+// for position-dependent actions within a LexerActionExecutor.
 //
-// <p>This action is not serialized as part of the ATN, and is only required for
+// This action is not serialized as part of the ATN, and is only required for
 // position-dependent lexer actions which appear at a location other than the
 // end of a rule. For more information about DFA optimizations employed for
-// lexer actions, see {@link LexerActionExecutor//append} and
-// {@link LexerActionExecutor//fixOffsetBeforeMatch}.</p>
+// lexer actions, see LexerActionExecutor//append and
+// LexerActionExecutor//fixOffsetBeforeMatch.
 
-// Constructs a Newindexed custom action by associating a character offset
-// with a {@link LexerAction}.
+// LexerIndexedCustomAction constructs a Newindexed custom action by associating
+// a character offset with a LexerAction.
 //
-// <p>Note: This class is only required for lexer actions for which
-// {@link LexerAction//isPositionDependent} returns {@code true}.</p>
+// Note: This class is only required for lexer actions for which
+// LexerAction//isPositionDependent returns true.
 //
-// @param offset The offset into the input {@link CharStream}, relative to
+// @param offset The offset into the input CharStream, relative to
 // the token start index, at which the specified lexer action should be
 // executed.
 // @param action The lexer action to execute at a particular offset in the
-// input {@link CharStream}.
+// input CharStream.
 type LexerIndexedCustomAction struct {
 	*BaseLexerAction
 
@@ -393,20 +398,19 @@ type LexerIndexedCustomAction struct {
 	isPositionDependent bool
 }
 
+// NewLexerIndexedCustomAction returns a new instance of
+// LexerIndexedCustomAction.
 func NewLexerIndexedCustomAction(offset int, lexerAction LexerAction) *LexerIndexedCustomAction {
-
-	l := new(LexerIndexedCustomAction)
-	l.BaseLexerAction = NewBaseLexerAction(lexerAction.getActionType())
-
-	l.offset = offset
-	l.lexerAction = lexerAction
-	l.isPositionDependent = true
-
-	return l
+	return &LexerIndexedCustomAction{
+		BaseLexerAction:     NewBaseLexerAction(lexerAction.getActionType()),
+		offset:              offset,
+		lexerAction:         lexerAction,
+		isPositionDependent: true,
+	}
 }
 
-// <p>This method calls {@link //execute} on the result of {@link //getAction}
-// using the provided {@code lexer}.</p>
+// This method calls //execute on the result of //getAction
+// using the provided lexer.
 func (l *LexerIndexedCustomAction) execute(lexer Lexer) {
 	// assume the input stream position was properly set by the calling code
 	l.lexerAction.execute(lexer)

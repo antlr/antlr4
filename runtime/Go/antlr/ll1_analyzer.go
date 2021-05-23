@@ -4,32 +4,29 @@
 
 package antlr
 
+// LL1Analyzer extends ATN.
 type LL1Analyzer struct {
 	atn *ATN
 }
 
+// NewLL1Analyzer returns a new instance of LL1Analizer
 func NewLL1Analyzer(atn *ATN) *LL1Analyzer {
-	la := new(LL1Analyzer)
-	la.atn = atn
-	return la
+	return &LL1Analyzer{atn: atn}
 }
 
-//* Special value added to the lookahead sets to indicate that we hit
-//  a predicate during analysis if {@code seeThruPreds==false}.
-///
-const (
-	LL1AnalyzerHitPred = TokenInvalidType
-)
+// LL1AnalyzerHitPred is a special value added to the lookahead sets to
+// indicate that we hit a predicate during analysis if seeThruPreds==false.
+const LL1AnalyzerHitPred = TokenInvalidType
 
 //*
 // Calculates the SLL(1) expected lookahead set for each outgoing transition
-// of an {@link ATNState}. The returned array has one element for each
-// outgoing transition in {@code s}. If the closure from transition
+// of an ATNState. The returned array has one element for each
+// outgoing transition in s. If the closure from transition
 // <em>i</em> leads to a semantic predicate before Matching a symbol, the
-// element at index <em>i</em> of the result will be {@code nil}.
+// element at index <em>i</em> of the result will be nil.
 //
 // @param s the ATN state
-// @return the expected symbols for each outgoing transition of {@code s}.
+// @return the expected symbols for each outgoing transition of s.
 func (la *LL1Analyzer) getDecisionLookahead(s ATNState) []*IntervalSet {
 	if s == nil {
 		return nil
@@ -38,9 +35,9 @@ func (la *LL1Analyzer) getDecisionLookahead(s ATNState) []*IntervalSet {
 	look := make([]*IntervalSet, count)
 	for alt := 0; alt < count; alt++ {
 		look[alt] = NewIntervalSet()
-		lookBusy := NewSet(nil, nil)
+		lookBusy := newSet(nil, nil)
 		seeThruPreds := false // fail to get lookahead upon pred
-		la.look1(s.GetTransitions()[alt].getTarget(), nil, BasePredictionContextEMPTY, look[alt], lookBusy, NewBitSet(), seeThruPreds, false)
+		la.look1(s.GetTransitions()[alt].getTarget(), nil, BasePredictionContextEMPTY, look[alt], lookBusy, newBitSet(), seeThruPreds, false)
 		// Wipe out lookahead for la alternative if we found nothing
 		// or we had a predicate when we !seeThruPreds
 		if look[alt].length() == 0 || look[alt].contains(LL1AnalyzerHitPred) {
@@ -50,24 +47,22 @@ func (la *LL1Analyzer) getDecisionLookahead(s ATNState) []*IntervalSet {
 	return look
 }
 
-//*
-// Compute set of tokens that can follow {@code s} in the ATN in the
-// specified {@code ctx}.
+// Look computes a set of tokens that can follow s in the ATN in the
+// specified ctx.
 //
-// <p>If {@code ctx} is {@code nil} and the end of the rule containing
-// {@code s} is reached, {@link Token//EPSILON} is added to the result set.
-// If {@code ctx} is not {@code nil} and the end of the outermost rule is
-// reached, {@link Token//EOF} is added to the result set.</p>
+// If ctx is nil and the end of the rule containing
+// s is reached, Token//EPSILON is added to the result set.
+// If ctx is not nil and the end of the outermost rule is
+// reached, Token//EOF is added to the result set.
 //
 // @param s the ATN state
 // @param stopState the ATN state to stop at. This can be a
-// {@link BlockEndState} to detect epsilon paths through a closure.
-// @param ctx the complete parser context, or {@code nil} if the context
+// BlockEndState to detect epsilon paths through a closure.
+// @param ctx the complete parser context, or nil if the context
 // should be ignored
 //
-// @return The set of tokens that can follow {@code s} in the ATN in the
-// specified {@code ctx}.
-///
+// @return The set of tokens that can follow s in the ATN in the
+// specified ctx.
 func (la *LL1Analyzer) Look(s, stopState ATNState, ctx RuleContext) *IntervalSet {
 	r := NewIntervalSet()
 	seeThruPreds := true // ignore preds get all lookahead
@@ -75,50 +70,49 @@ func (la *LL1Analyzer) Look(s, stopState ATNState, ctx RuleContext) *IntervalSet
 	if ctx != nil {
 		lookContext = predictionContextFromRuleContext(s.GetATN(), ctx)
 	}
-	la.look1(s, stopState, lookContext, r, NewSet(nil, nil), NewBitSet(), seeThruPreds, true)
+	la.look1(s, stopState, lookContext, r, newSet(nil, nil), newBitSet(), seeThruPreds, true)
 	return r
 }
 
-//*
-// Compute set of tokens that can follow {@code s} in the ATN in the
-// specified {@code ctx}.
+// Compute set of tokens that can follow s in the ATN in the
+// specified ctx.
 //
-// <p>If {@code ctx} is {@code nil} and {@code stopState} or the end of the
-// rule containing {@code s} is reached, {@link Token//EPSILON} is added to
-// the result set. If {@code ctx} is not {@code nil} and {@code addEOF} is
-// {@code true} and {@code stopState} or the end of the outermost rule is
-// reached, {@link Token//EOF} is added to the result set.</p>
+// If ctx is nil and stopState or the end of the
+// rule containing s is reached, Token//EPSILON is added to
+// the result set. If ctx is not nil and addEOF is
+// true and stopState or the end of the outermost rule is
+// reached, Token//EOF is added to the result set.
 //
 // @param s the ATN state.
 // @param stopState the ATN state to stop at. This can be a
-// {@link BlockEndState} to detect epsilon paths through a closure.
-// @param ctx The outer context, or {@code nil} if the outer context should
+// BlockEndState to detect epsilon paths through a closure.
+// @param ctx The outer context, or nil if the outer context should
 // not be used.
 // @param look The result lookahead set.
 // @param lookBusy A set used for preventing epsilon closures in the ATN
 // from causing a stack overflow. Outside code should pass
-// {@code NewSet<ATNConfig>} for la argument.
+// NewSet<ATNConfig> for la argument.
 // @param calledRuleStack A set used for preventing left recursion in the
 // ATN from causing a stack overflow. Outside code should pass
-// {@code NewBitSet()} for la argument.
-// @param seeThruPreds {@code true} to true semantic predicates as
-// implicitly {@code true} and "see through them", otherwise {@code false}
-// to treat semantic predicates as opaque and add {@link //HitPred} to the
+// NewBitSet() for la argument.
+// @param seeThruPreds true to true semantic predicates as
+// implicitly true and "see through them", otherwise false
+// to treat semantic predicates as opaque and add //HitPred to the
 // result if one is encountered.
-// @param addEOF Add {@link Token//EOF} to the result if the end of the
-// outermost context is reached. This parameter has no effect if {@code ctx}
-// is {@code nil}.
+// @param addEOF Add Token//EOF to the result if the end of the
+// outermost context is reached. This parameter has no effect if ctx
+// is nil.
 
-func (la *LL1Analyzer) look2(s, stopState ATNState, ctx PredictionContext, look *IntervalSet, lookBusy *Set, calledRuleStack *BitSet, seeThruPreds, addEOF bool, i int) {
+func (la *LL1Analyzer) look2(s, stopState ATNState, ctx PredictionContext, look *IntervalSet, lookBusy *set, calledRuleStack *bitSet, seeThruPreds, addEOF bool, i int) {
 
 	returnState := la.atn.states[ctx.getReturnState(i)]
 	la.look1(returnState, stopState, ctx.GetParent(i), look, lookBusy, calledRuleStack, seeThruPreds, addEOF)
 
 }
 
-func (la *LL1Analyzer) look1(s, stopState ATNState, ctx PredictionContext, look *IntervalSet, lookBusy *Set, calledRuleStack *BitSet, seeThruPreds, addEOF bool) {
+func (la *LL1Analyzer) look1(s, stopState ATNState, ctx PredictionContext, look *IntervalSet, lookBusy *set, calledRuleStack *bitSet, seeThruPreds, addEOF bool) {
 
-	c := NewBaseATNConfig6(s, 0, ctx)
+	c := BaseAtnConfigDefaultContext(s, 0, ctx)
 
 	if lookBusy.contains(c) {
 		return
@@ -148,13 +142,13 @@ func (la *LL1Analyzer) look1(s, stopState ATNState, ctx PredictionContext, look 
 		}
 
 		if ctx != BasePredictionContextEMPTY {
-	        removed := calledRuleStack.contains(s.GetRuleIndex())
-            defer func() {
-                if removed {
-                    calledRuleStack.add(s.GetRuleIndex())
-                }
-            }()
-        	calledRuleStack.remove(s.GetRuleIndex())
+			removed := calledRuleStack.contains(s.GetRuleIndex())
+			defer func() {
+				if removed {
+					calledRuleStack.add(s.GetRuleIndex())
+				}
+			}()
+			calledRuleStack.remove(s.GetRuleIndex())
 			// run thru all possible stack tops in ctx
 			for i := 0; i < ctx.length(); i++ {
 				returnState := la.atn.states[ctx.getReturnState(i)]
@@ -187,18 +181,18 @@ func (la *LL1Analyzer) look1(s, stopState ATNState, ctx PredictionContext, look 
 		} else if _, ok := t.(*WildcardTransition); ok {
 			look.addRange(TokenMinUserTokenType, la.atn.maxTokenType)
 		} else {
-			set := t.getLabel()
-			if set != nil {
+			s := t.getLabel()
+			if s != nil {
 				if _, ok := t.(*NotSetTransition); ok {
-					set = set.complement(TokenMinUserTokenType, la.atn.maxTokenType)
+					s = s.complement(TokenMinUserTokenType, la.atn.maxTokenType)
 				}
-				look.addSet(set)
+				look.addSet(s)
 			}
 		}
 	}
 }
 
-func (la *LL1Analyzer) look3(stopState ATNState, ctx PredictionContext, look *IntervalSet, lookBusy *Set, calledRuleStack *BitSet, seeThruPreds, addEOF bool, t1 *RuleTransition) {
+func (la *LL1Analyzer) look3(stopState ATNState, ctx PredictionContext, look *IntervalSet, lookBusy *set, calledRuleStack *bitSet, seeThruPreds, addEOF bool, t1 *RuleTransition) {
 
 	newContext := SingletonBasePredictionContextCreate(ctx, t1.followState.GetStateNumber())
 

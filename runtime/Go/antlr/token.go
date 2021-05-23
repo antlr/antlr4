@@ -9,15 +9,17 @@ import (
 	"strings"
 )
 
+// TokenSourceCharStreamPair is a tuple (TokenSource, CharStream)
 type TokenSourceCharStreamPair struct {
 	tokenSource TokenSource
 	charStream  CharStream
 }
 
+// Token is the result of lexical analysis and the input to the parser.
+//
 // A token has properties: text, type, line, character position in the line
 // (so we can ignore tabs), token channel, index, and source from which
 // we obtained this token.
-
 type Token interface {
 	GetSource() *TokenSourceCharStreamPair
 	GetTokenType() int
@@ -37,6 +39,7 @@ type Token interface {
 	GetInputStream() CharStream
 }
 
+// BaseToken is the base implementation of Token.
 type BaseToken struct {
 	source     *TokenSourceCharStreamPair
 	tokenType  int    // token type of the token
@@ -51,88 +54,104 @@ type BaseToken struct {
 }
 
 const (
+	// TokenInvalidType represents an error token.
 	TokenInvalidType = 0
 
-	// During lookahead operations, this "token" signifies we hit rule end ATN state
-	// and did not follow it despite needing to.
+	// TokenEpsilon is a utility token type. During lookahead operations, this
+	// "token" signifies we hit rule end ATN state and did not follow it despite
+	// needing to.
 	TokenEpsilon = -2
 
+	// TokenMinUserTokenType is the smallest value for a generated token type.
 	TokenMinUserTokenType = 1
 
+	// TokenEOF represents an end of input token.
 	TokenEOF = -1
 
 	// All tokens go to the parser (unless Skip() is called in that rule)
 	// on a particular "channel". The parser tunes to a particular channel
 	// so that whitespace etc... can go to the parser on a "hidden" channel.
 
+	// TokenDefaultChannel represents the default channel.
 	TokenDefaultChannel = 0
 
-	// Anything on different channel than DEFAULT_CHANNEL is not parsed
-	// by parser.
-
+	// TokenHiddenChannel represents the hidden channel.
 	TokenHiddenChannel = 1
 )
 
+// GetChannel returns the channel this token is sent through.
 func (b *BaseToken) GetChannel() int {
 	return b.channel
 }
 
+// GetStart returns the offset this token starts at.
 func (b *BaseToken) GetStart() int {
 	return b.start
 }
 
+// GetStop returns the offset this token stops at.
 func (b *BaseToken) GetStop() int {
 	return b.stop
 }
 
+// GetLine returns the line this token starts at.
 func (b *BaseToken) GetLine() int {
 	return b.line
 }
 
+// GetColumn returns the column this token starts at.
 func (b *BaseToken) GetColumn() int {
 	return b.column
 }
 
+// GetTokenType returns the kind of token this is.
 func (b *BaseToken) GetTokenType() int {
 	return b.tokenType
 }
 
+// GetSource returns the source and character stream of this token.
 func (b *BaseToken) GetSource() *TokenSourceCharStreamPair {
 	return b.source
 }
 
+// GetTokenIndex returns the index of this token
 func (b *BaseToken) GetTokenIndex() int {
 	return b.tokenIndex
 }
 
+// SetTokenIndex sets the index of this token.
 func (b *BaseToken) SetTokenIndex(v int) {
 	b.tokenIndex = v
 }
 
+// GetTokenSource returns the source of this token.
 func (b *BaseToken) GetTokenSource() TokenSource {
 	return b.source.tokenSource
 }
 
+// GetInputStream returns the character stream of this token.
 func (b *BaseToken) GetInputStream() CharStream {
 	return b.source.charStream
 }
 
+// CommonToken extends BaseToken
 type CommonToken struct {
 	*BaseToken
 }
 
+// NewCommonToken returns a new instance of CommonToken.
 func NewCommonToken(source *TokenSourceCharStreamPair, tokenType, channel, start, stop int) *CommonToken {
 
-	t := new(CommonToken)
-
-	t.BaseToken = new(BaseToken)
-
-	t.source = source
-	t.tokenType = tokenType
-	t.channel = channel
-	t.start = start
-	t.stop = stop
-	t.tokenIndex = -1
+	t := &CommonToken{
+		BaseToken: &BaseToken{
+			source:     source,
+			tokenType:  tokenType,
+			channel:    channel,
+			start:      start,
+			stop:       stop,
+			tokenIndex: -1,
+		},
+	}
 	if t.source.tokenSource != nil {
 		t.line = source.tokenSource.GetLine()
 		t.column = source.tokenSource.GetCharPositionInLine()
@@ -142,20 +161,19 @@ func NewCommonToken(source *TokenSourceCharStreamPair, tokenType, channel, start
 	return t
 }
 
-// An empty {@link Pair} which is used as the default value of
-// {@link //source} for tokens that do not have a source.
+// An empty Pair which is used as the default value of
+// //source for tokens that do not have a source.
 
 //CommonToken.EMPTY_SOURCE = [ nil, nil ]
 
-// Constructs a New{@link CommonToken} as a copy of another {@link Token}.
+// Constructs a NewCommonToken as a copy of another Token.
 //
-// <p>
-// If {@code oldToken} is also a {@link CommonToken} instance, the newly
-// constructed token will share a reference to the {@link //text} field and
-// the {@link Pair} stored in {@link //source}. Otherwise, {@link //text} will
-// be assigned the result of calling {@link //GetText}, and {@link //source}
-// will be constructed from the result of {@link Token//GetTokenSource} and
-// {@link Token//GetInputStream}.</p>
+// If oldToken is also a CommonToken instance, the newly
+// constructed token will share a reference to the //text field and
+// the Pair stored in //source. Otherwise, //text will
+// be assigned the result of calling //GetText, and //source
+// will be constructed from the result of Token//GetTokenSource and
+// Token//GetInputStream.
 //
 // @param oldToken The token to copy.
 //
@@ -168,6 +186,7 @@ func (c *CommonToken) clone() *CommonToken {
 	return t
 }
 
+// GetText returns the text contained in this token.
 func (c *CommonToken) GetText() string {
 	if c.text != "" {
 		return c.text
@@ -183,10 +202,12 @@ func (c *CommonToken) GetText() string {
 	return "<EOF>"
 }
 
+// SetText sets the text this token contains.
 func (c *CommonToken) SetText(text string) {
 	c.text = text
 }
 
+// String implements the Stringer interface.
 func (c *CommonToken) String() string {
 	txt := c.GetText()
 	if txt != "" {
