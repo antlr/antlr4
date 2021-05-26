@@ -4,8 +4,6 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
-import 'dart:io';
-
 import 'atn/atn.dart';
 import 'error/error.dart';
 import 'input_stream.dart';
@@ -723,7 +721,7 @@ abstract class Parser extends Recognizer<ParserATNSimulator> {
       if (dfa.states.isNotEmpty) {
         if (seenOne) print('');
         print('Decision ${dfa.decision}:');
-        stdout.write(dfa.toString(vocabulary));
+        print(dfa.toString(vocabulary));
         seenOne = true;
       }
     }
