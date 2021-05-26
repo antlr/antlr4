@@ -4,8 +4,6 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
-import 'dart:io';
-
 import '../../atn/atn.dart';
 import '../../dfa/dfa.dart';
 import '../../parser.dart';
@@ -237,7 +235,7 @@ class ConsoleErrorListener extends BaseErrorListener {
   /// </pre>
   @override
   void syntaxError(recognizer, offendingSymbol, line, column, msg, e) {
-    stderr.writeln('line $line:$column $msg');
+    print('line $line:$column $msg');
   }
 }
 
