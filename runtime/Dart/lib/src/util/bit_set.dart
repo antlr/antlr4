@@ -28,23 +28,23 @@ class BitSet {
   static int getBitCount(Uint32List value) {
     var data = 0;
     final size = value.length;
-    const m1 = 0x5555555555555555;
-    const m2 = 0x3333333333333333;
-    const m4 = 0x0F0F0F0F0F0F0F0F;
-    const m8 = 0x00FF00FF00FF00FF;
-    const m16 = 0x0000FFFF0000FFFF;
-    const h01 = 0x0101010101010101;
+    final m1 = BigInt.parse('0x5555555555555555');
+    final m2 = BigInt.parse('0x3333333333333333');
+    final m4 = BigInt.parse('0x0F0F0F0F0F0F0F0F');
+    final m8 = BigInt.parse('0x00FF00FF00FF00FF');
+    final m16 = BigInt.parse('0x0000FFFF0000FFFF');
+    final h01 = BigInt.parse('0x0101010101010101');
 
-    var bitCount = 0;
+    var bitCount = BigInt.from(0);
     final limit30 = size - size % 30;
 
     // 64-bit tree merging (merging3)
     for (var i = 0; i < limit30; i += 30, data += 30) {
-      var acc = 0;
+      var acc = BigInt.from(0);
       for (var j = 0; j < 30; j += 3) {
-        var count1 = value[data + j];
-        var count2 = value[data + j + 1];
-        var half1 = value[data + j + 2];
+        var count1 = BigInt.from(value[data + j]);
+        var count2 = BigInt.from(value[data + j + 1]);
+        var half1 = BigInt.from(value[data + j + 2]);
         var half2 = half1;
         half1 &= m1;
         half2 = (half2 >> 1) & m1;
@@ -68,14 +68,14 @@ class BitSet {
     // the code uses wikipedia's 64-bit popcount_3() implementation:
     // http://en.wikipedia.org/wiki/Hamming_weight#Efficient_implementation
     for (var i = 0; i < size - limit30; i++) {
-      var x = value[data + i];
+      var x = BigInt.from(value[data + i]);
       x = x - ((x >> 1) & m1);
       x = (x & m2) + ((x >> 2) & m2);
       x = (x + (x >> 4)) & m4;
       bitCount += ((x * h01) >> 56);
     }
 
-    return bitCount;
+    return bitCount.toInt();
   }
 
   static final List<int> index64 = [
@@ -148,8 +148,12 @@ class BitSet {
   static int BitScanForward(int value) {
     if (value == 0) return -1;
 
-    const debruijn64 = 0x03f79d71b4cb0a89;
-    return index64[(((value ^ (value - 1)) * debruijn64) >> 58) % 64];
+    final debruijn64 = BigInt.parse('0x03f79d71b4cb0a89');
+    final bigIntValue = BigInt.from(value);
+    var index =
+        (((bigIntValue ^ (bigIntValue - BigInt.from(1))) * debruijn64) >> 58) %
+            BigInt.from(64);
+    return index64[index.toInt()];
   }
 
   BitSet clone() {

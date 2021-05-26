@@ -1,0 +1,10 @@
+Extend=1
+ZWJ=2
+SpacingMark=3
+EmojiCoreSequence=4
+EmojiZWJSequence=5
+Prepend=6
+NonControl=7
+CRLF=8
+HangulSyllable=9
+'\u200D'=2
