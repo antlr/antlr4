@@ -128,18 +128,7 @@ private:
     T value;
 
     Base* clone() const {
-      return clone<>();
-    }
-
-  private:
-    template<int N = 0, typename std::enable_if<N == N && std::is_nothrow_copy_constructible<T>::value, int>::type = 0>
-    Base* clone() const {
       return new Derived<T>(value);
-    }
-
-    template<int N = 0, typename std::enable_if<N == N && !std::is_nothrow_copy_constructible<T>::value, int>::type = 0>
-    Base* clone() const {
-      return nullptr;
     }
 
   };
