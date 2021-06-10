@@ -170,13 +170,13 @@ class TokenStreamRewriter(object):
             if any((iop is None, not isinstance(iop, TokenStreamRewriter.InsertBeforeOp))):
                 continue
             prevInserts = [op for op in rewrites[:i] if isinstance(op, TokenStreamRewriter.InsertBeforeOp)]
-            for prev_index, prevIop in enumerate(prevInserts):
+            for prevIop in prevInserts:
                 if prevIop.index == iop.index and type(prevIop) is TokenStreamRewriter.InsertBeforeOp:
                     iop.text += prevIop.text
-                    rewrites[prev_index] = None
+                    rewrites[prevIop.instructionIndex] = None
                 elif prevIop.index == iop.index and type(prevIop) is TokenStreamRewriter.InsertAfterOp:
                     iop.text = prevIop.text + iop.text
-                    rewrites[prev_index] = None
+                    rewrites[prevIop.instructionIndex] = None
             # look for replaces where iop.index is in range; error
             prevReplaces = [op for op in rewrites[:i] if type(op) is TokenStreamRewriter.ReplaceOp]
             for rop in prevReplaces:
