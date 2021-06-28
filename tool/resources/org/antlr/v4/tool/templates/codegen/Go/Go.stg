@@ -325,6 +325,9 @@ func (l *<lexer.name>) Sempred(localctx antlr.RuleContext, ruleIndex, predIndex 
  */
 RuleActionFunction(r, actions) ::= <<
 func (l *<lexer.name>) <r.name; format="cap">_Action(localctx <if(r.factory.grammar.lexer)>antlr.RuleContext<else>*<r.ctxType><endif>, actionIndex int) {
+	this := l
+	_ = this
+
 	switch actionIndex {
 	<if(actions)>
 	<actions:{index | case <index>:
@@ -343,6 +346,9 @@ func (l *<lexer.name>) <r.name; format="cap">_Action(localctx <if(r.factory.gram
  */
 RuleSempredFunction(r, actions) ::= <<
 func (p *<r.factory.grammar.recognizerName>) <r.name; format="cap">_Sempred(localctx antlr.RuleContext, predIndex int) bool {
+	this := p
+	_ = this
+
 	switch predIndex {
 	<if(actions)>
 	<actions:{index | case <index>:
@@ -367,6 +373,9 @@ RuleFunction(currentRule, args, code, locals, ruleCtx, altLabelCtxs, namedAction
 
 <endif>
 func (p *<parser.name>) <currentRule.name; format="cap">(<currentRule.args:{a | <a.name> <a.type>}; separator=", ">) (localctx I<currentRule.ctxType>) {
+	this := p
+	_ = this
+
 	localctx = New<currentRule.ctxType>(p, p.GetParserRuleContext(), p.GetState()<currentRule.args:{a | , <a.name>}>)
 	p.EnterRule(localctx, <currentRule.startState>, <parser.name>RULE_<currentRule.name>)
 	<if(namedActions.init)>
@@ -440,6 +449,9 @@ func (p *<parser.name>) <currentRule.name; format="cap">(<args:{a | <a.name> <a.
 }
 
 func (p *<parser.name>) <currentRule.name>(_p int<args:{a | , <a.name> <a.type>}>) (localctx I<currentRule.ctxType>) {
+	this := p
+	_ = this
+
 	var _parentctx antlr.ParserRuleContext = p.GetParserRuleContext()
 	_parentState := p.GetState()
 	localctx = New<currentRule.ctxType>(p, p.GetParserRuleContext(), _parentState<args:{a | , <a.name>}>)
