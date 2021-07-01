@@ -302,3 +302,4 @@ YYYY/MM/DD, github id, Full name, email
 2021/05/04, joakker, Joaquín León, joaquinandresleon108@gmail.com
 2021/05/06, renancaraujo, Renan C. Araújo, renancaraujo@users.noreply.github.com
 2021/05/06, canastro, Ricardo Canastro, ricardocanastro@users.noreply.github.com
+2021/07/01, marcauberer, Marc Auberer, marc.auberer@chillibits.com
