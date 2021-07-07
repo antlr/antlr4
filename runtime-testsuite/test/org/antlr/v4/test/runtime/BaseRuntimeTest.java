@@ -62,7 +62,7 @@ public abstract class BaseRuntimeTest {
 	}
 
 	private static boolean requiresHeartbeat() {
-		return isTravisCI() || isAppVeyorCI() || (isCPP() && isRecursion());
+		return isTravisCI() || isAppVeyorCI() || (isCPP() && (isRecursion() || isGo()));
 	}
 
 	@AfterClass
@@ -73,6 +73,11 @@ public abstract class BaseRuntimeTest {
 	private static boolean isRecursion() {
 		String s = System.getenv("GROUP");
 		return "recursion".equalsIgnoreCase(s);
+	}
+
+	private static boolean isGo() {
+		String s = System.getenv("TARGET");
+		return "go".equalsIgnoreCase(s);
 	}
 
 	private static boolean isCPP() {
