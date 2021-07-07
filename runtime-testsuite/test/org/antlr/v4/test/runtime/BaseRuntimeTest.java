@@ -62,7 +62,7 @@ public abstract class BaseRuntimeTest {
 	}
 
 	private static boolean requiresHeartbeat() {
-		return isTravisCI() || isAppVeyorCI() || (isCircleCI() && isCPP() && isRecursion());
+		return isTravisCI() || isAppVeyorCI() || (isCPP() && isRecursion());
 	}
 
 	@AfterClass
