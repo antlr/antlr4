@@ -128,7 +128,7 @@ public class Utils {
 	 *  converting rulenames to name&rarr;ruleindex map.
 	 */
 	public static Map<String, Integer> toMap(String[] keys) {
-		Map<String, Integer> m = new HashMap<String, Integer>();
+		Map<String, Integer> m = new HashMap<String, Integer>( keys.length, 1.0f );
 		for (int i=0; i<keys.length; i++) {
 			m.put(keys[i], i);
 		}
