@@ -98,8 +98,8 @@ public class TestActionTranslation extends BaseJavaToolTest {
 		String action = "x, $ID.text+\"3242\", (*$ID).foo(21,33), 3.2+1, '\\n', "+
 						"\"a,oo\\nick\", {bl, \"fdkj\"eck}";
 		String expected =
-			"x, (((AContext)_localctx).ID!=null?((AContext)_localctx).ID.getText():null)+\"3242\", " +
-			"(*((AContext)_localctx).ID).foo(21,33), 3.2+1, '\\n', \"a,oo\\nick\", {bl, \"fdkj\"eck}";
+			"x, (_localctx.ID!=null?_localctx.ID.getText():null)+\"3242\", " +
+			"(*_localctx.ID).foo(21,33), 3.2+1, '\\n', \"a,oo\\nick\", {bl, \"fdkj\"eck}";
 		testActions(attributeTemplate, "inline", action, expected);
 	}
 
@@ -129,25 +129,25 @@ public class TestActionTranslation extends BaseJavaToolTest {
 
 	@Test public void testReturnValues() throws Exception {
 		String action = "$lab.e; $b.e; $y.e = \"\";";
-		String expected = "((AContext)_localctx).lab.e; ((AContext)_localctx).b.e; _localctx.y.e = \"\";";
+		String expected = "_localctx.lab.e; _localctx.b.e; _localctx.y.e = \"\";";
 		testActions(attributeTemplate, "inline", action, expected);
 	}
 
     @Test public void testReturnWithMultipleRuleRefs() throws Exception {
 		String action = "$c.x; $c.y;";
-		String expected = "((AContext)_localctx).c.x; ((AContext)_localctx).c.y;";
+		String expected = "_localctx.c.x; _localctx.c.y;";
 		testActions(attributeTemplate, "inline", action, expected);
     }
 
     @Test public void testTokenRefs() throws Exception {
 		String action = "$id; $ID; $id.text; $id.getText(); $id.line;";
-		String expected = "((AContext)_localctx).id; ((AContext)_localctx).ID; (((AContext)_localctx).id!=null?((AContext)_localctx).id.getText():null); ((AContext)_localctx).id.getText(); (((AContext)_localctx).id!=null?((AContext)_localctx).id.getLine():0);";
+		String expected = "_localctx.id; _localctx.ID; (_localctx.id!=null?_localctx.id.getText():null); _localctx.id.getText(); (_localctx.id!=null?_localctx.id.getLine():0);";
 		testActions(attributeTemplate, "inline", action, expected);
     }
 
     @Test public void testRuleRefs() throws Exception {
         String action = "$lab.start; $c.text;";
-		String expected = "(((AContext)_localctx).lab!=null?(((AContext)_localctx).lab.start):null); (((AContext)_localctx).c!=null?_input.getText(((AContext)_localctx).c.start,((AContext)_localctx).c.stop):null);";
+		String expected = "(_localctx.lab!=null?(_localctx.lab.start):null); (_localctx.c!=null?_input.getText(_localctx.c.start,_localctx.c.stop):null);";
 		testActions(attributeTemplate, "inline", action, expected);
     }
 
@@ -187,12 +187,12 @@ public class TestActionTranslation extends BaseJavaToolTest {
             ">>";
         // ref to value returned from recursive call to rule
         String action = "$v = $e.v;";
-		String expected = "((EContext)_localctx).v =  ((EContext)_localctx).e.v;";
+		String expected = "_localctx.v =  _localctx.e.v;";
 		testActions(recursiveTemplate, "inline", action, expected);
 		testActions(leftRecursiveTemplate, "inline", action, expected);
         // ref to predefined attribute obtained from recursive call to rule
         action = "$v = $e.text.length();";
-        expected = "((EContext)_localctx).v =  (((EContext)_localctx).e!=null?_input.getText(((EContext)_localctx).e.start,((EContext)_localctx).e.stop):null).length();";
+        expected = "_localctx.v =  (_localctx.e!=null?_input.getText(_localctx.e.start,_localctx.e.stop):null).length();";
 		testActions(recursiveTemplate, "inline", action, expected);
 		testActions(leftRecursiveTemplate, "inline", action, expected);
 	}
