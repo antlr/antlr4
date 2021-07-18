@@ -10,12 +10,18 @@ import org.antlr.v4.codegen.Target;
 import org.antlr.v4.codegen.UnicodeEscapes;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.ast.GrammarAST;
+import org.stringtemplate.v4.Interpreter;
 import org.stringtemplate.v4.NumberRenderer;
+import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STErrorListener;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupFile;
 import org.stringtemplate.v4.StringRenderer;
+import org.stringtemplate.v4.misc.MapModelAdaptor;
 import org.stringtemplate.v4.misc.STMessage;
+import org.stringtemplate.v4.misc.STNoSuchPropertyException;
+
+import java.util.Map;
 
 public class CSharpTarget extends Target {
 
@@ -60,6 +66,30 @@ public class CSharpTarget extends Target {
 	protected STGroup loadTemplates() {
 		// override the superclass behavior to put all C# templates in the same folder
 		STGroup result = new STGroupFile(CodeGenerator.TEMPLATE_ROOT+"/CSharp/"+getLanguage()+STGroup.GROUP_FILE_EXTENSION);
+		result.registerModelAdaptor(Map.class, new MapModelAdaptor() {
+			@Override
+			public Object getProperty(Interpreter interp, ST self, Object o, Object property, String propertyName) throws STNoSuchPropertyException {
+				// Override the default behavior to fix handling of 'keys' and 'values'.
+				// https://github.com/antlr/antlr4/issues/1125
+				Map<?, ?> map = (Map<?, ?>)o;
+				Object value;
+				if (map.containsKey(property)) {
+					value = map.get(property);
+				}
+				else if (map.containsKey(propertyName)) {
+					value = map.get(propertyName);
+				}
+				else {
+					return super.getProperty(interp, self, o, property, propertyName);
+				}
+
+				if (value == STGroup.DICT_KEY) {
+					value = property;
+				}
+
+				return value;
+			}
+		});
 		result.registerRenderer(Integer.class, new NumberRenderer());
 		result.registerRenderer(String.class, new StringRenderer());
 		result.setListener(new STErrorListener() {

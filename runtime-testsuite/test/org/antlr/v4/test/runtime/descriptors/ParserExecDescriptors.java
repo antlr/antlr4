@@ -778,6 +778,48 @@ public class ParserExecDescriptors {
 	}
 
 	/**
+	 * Rules named 'values' generates invalid csharp code.
+	 * https://github.com/antlr/antlr4/issues/1125
+	 */
+	public static class ReferenceToKeys extends BaseParserTestDescriptor {
+		public String input = "keys";
+		public String output = "keys\n";
+		public String errors = null;
+		public String startRule = "a";
+		public String grammarName = "T";
+
+		/**
+		 grammar T;
+		 a : keys {<writeln("$text")>} ;
+		 keys : 'keys';
+		 WS : (' '|'\n') -> skip ;
+		 */
+		@CommentHasStringValue
+		public String grammar;
+	}
+
+	/**
+	 * Rules named 'values' generates invalid csharp code.
+	 * https://github.com/antlr/antlr4/issues/1125
+	 */
+	public static class ReferenceToValues extends BaseParserTestDescriptor {
+		public String input = "values";
+		public String output = "values\n";
+		public String errors = null;
+		public String startRule = "a";
+		public String grammarName = "T";
+
+		/**
+		 grammar T;
+		 a : values {<writeln("$text")>} ;
+		 values : 'values';
+		 WS : (' '|'\n') -> skip ;
+		 */
+		@CommentHasStringValue
+		public String grammar;
+	}
+
+	/**
 	 * This is a regression test for antlr/antlr4#1545, case 1.
 	 */
 	public static class OpenDeviceStatement_Case1 extends BaseParserTestDescriptor {
