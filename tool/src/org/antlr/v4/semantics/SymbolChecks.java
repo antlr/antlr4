@@ -373,7 +373,8 @@ public class SymbolChecks {
 	}
 
 	/**
-	 * {@return} list of simple string literals for rule {@param rule}
+	 * @param rule the rule
+	 * @return list of simple string literals for the rule
 	 */
 	private List<String> getSingleTokenValues(Rule rule)
 	{

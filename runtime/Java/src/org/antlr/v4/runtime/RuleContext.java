@@ -31,10 +31,10 @@ import java.util.List;
  *  Parser._ctx.
  *
  *  public final SContext s() throws RecognitionException {
- *      SContext _localctx = new SContext(_ctx, getState()); <-- create new node
- *      enterRule(_localctx, 0, RULE_s);                     <-- push it
+ *      SContext _localctx = new SContext(_ctx, getState()); &larr; create new node
+ *      enterRule(_localctx, 0, RULE_s);                     &larr; push it
  *      ...
- *      exitRule();                                          <-- pop back to _localctx
+ *      exitRule();                                          &larr; pop back to _localctx
  *      return _localctx;
  *  }
  *
@@ -48,9 +48,9 @@ import java.util.List;
  *  symbol s then call r1, which calls r2, the  would look like
  *  this:
  *
- *     SContext[-1]   <- root node (bottom of the stack)
- *     R1Context[p]   <- p in rule s called r1
- *     R2Context[q]   <- q in rule r1 called r2
+ *     SContext[-1]   &larr; root node (bottom of the stack)
+ *     R1Context[p]   &larr; p in rule s called r1
+ *     R2Context[q]   &larr; q in rule r1 called r2
  *
  *  So the top of the stack, _ctx, represents a call to the current
  *  rule and it holds the return address from another rule that invoke
@@ -163,7 +163,7 @@ public class RuleContext implements RuleNode {
 	 */
 	public void setAltNumber(int altNumber) { }
 
-	/** @since 4.7. {@see ParseTree#setParent} comment */
+	/** @since 4.7. @see ParseTree#setParent comment */
 	@Override
 	public void setParent(RuleContext parent) {
 		this.parent = parent;

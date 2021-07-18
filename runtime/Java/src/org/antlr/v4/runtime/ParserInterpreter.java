@@ -69,7 +69,7 @@ public class ParserInterpreter extends Parser {
 	protected final Deque<Pair<ParserRuleContext, Integer>> _parentContextStack =
 		new ArrayDeque<Pair<ParserRuleContext, Integer>>();
 
-	/** We need a map from (decision,inputIndex)->forced alt for computing ambiguous
+	/** We need a map from (decision,inputIndex)&rarr;forced alt for computing ambiguous
 	 *  parse trees. For now, we allow exactly one override.
 	 */
 	protected int overrideDecision = -1;
