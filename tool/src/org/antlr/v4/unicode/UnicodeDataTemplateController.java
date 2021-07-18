@@ -78,17 +78,19 @@ public abstract class UnicodeDataTemplateController {
 		addTR35ExtendedPictographicPropertyCodesToCodePointRanges(propertyCodePointRanges);
 		addEmojiPresentationPropertyCodesToCodePointRanges(propertyCodePointRanges);
 
-		Map<String, String> propertyAliases = new LinkedHashMap<>();
-		addUnicodeCategoryCodesToNames(propertyAliases);
-		addUnicodeBinaryPropertyCodesToNames(propertyAliases);
-		addUnicodeScriptCodesToNames(propertyAliases);
-		addUnicodeBlocksToNames(propertyAliases);
-		addUnicodeIntPropertyCodesToNames(propertyAliases);
-		propertyAliases.put("EP", "Extended_Pictographic");
+		Map<String, String> propertyAliases1 = new LinkedHashMap<>();
+		addUnicodeCategoryCodesToNames(propertyAliases1);
+		addUnicodeBinaryPropertyCodesToNames(propertyAliases1);
+		addUnicodeScriptCodesToNames(propertyAliases1);
+		addUnicodeBlocksToNames(propertyAliases1);
+		Map<String, String> propertyAliases2 = new LinkedHashMap<>();
+		addUnicodeIntPropertyCodesToNames(propertyAliases2);
+		propertyAliases2.put("EP", "Extended_Pictographic");
 
 		Map<String, Object> properties = new LinkedHashMap<>();
 		properties.put("propertyCodePointRanges", propertyCodePointRanges);
-		properties.put("propertyAliases", propertyAliases);
+		properties.put("propertyAliases1", propertyAliases1);
+		properties.put("propertyAliases2", propertyAliases2);
 		return properties;
 	}
 
