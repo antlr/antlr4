@@ -2,7 +2,13 @@ cmake_minimum_required(VERSION 3.7)
 
 include(ExternalProject)
 
-set(ANTLR4_ROOT ${CMAKE_CURRENT_BINARY_DIR}/antlr4_runtime/src/antlr4_runtime)
+if(CMAKE_OBJECT_PATH_MAX LESS "300")
+    set(ANTLR4_PATH_ID a4r)
+else()
+    set(ANTLR4_PATH_ID antlr4_runtime)
+endif()
+
+set(ANTLR4_ROOT ${CMAKE_CURRENT_BINARY_DIR}/${ANTLR4_PATH_ID}/src/${ANTLR4_PATH_ID})
 set(ANTLR4_INCLUDE_DIRS ${ANTLR4_ROOT}/runtime/Cpp/runtime/src)
 set(ANTLR4_GIT_REPOSITORY https://github.com/antlr/antlr4.git)
 if(NOT DEFINED ANTLR4_TAG)
@@ -78,13 +84,12 @@ endif()
 if(ANTLR4_ZIP_REPOSITORY)
   ExternalProject_Add(
       antlr4_runtime
-      PREFIX antlr4_runtime
+      PREFIX ${ANTLR4_PATH_ID}
       URL ${ANTLR4_ZIP_REPOSITORY}
       DOWNLOAD_DIR ${CMAKE_CURRENT_BINARY_DIR}
       BUILD_COMMAND ""
       BUILD_IN_SOURCE 1
-      SOURCE_DIR ${ANTLR4_ROOT}
-      SOURCE_SUBDIR runtime/Cpp
+      SOURCE_DIR ${ANTLR4_ROOT}/runtime/Cpp
       CMAKE_CACHE_ARGS
           -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
           -DWITH_STATIC_CRT:BOOL=${ANTLR4_WITH_STATIC_CRT}
@@ -95,7 +100,7 @@ if(ANTLR4_ZIP_REPOSITORY)
 else()
   ExternalProject_Add(
       antlr4_runtime
-      PREFIX antlr4_runtime
+      PREFIX ${ANTLR4_PATH_ID}
       GIT_REPOSITORY ${ANTLR4_GIT_REPOSITORY}
       GIT_TAG ${ANTLR4_TAG}
       DOWNLOAD_DIR ${CMAKE_CURRENT_BINARY_DIR}
