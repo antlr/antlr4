@@ -83,7 +83,6 @@
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-core</artifactId>
         <version>${mavenVersion}</version>
-        <scope>test</scope>
     </dependency>
     <dependency>
         <groupId>org.apache.maven</groupId>
@@ -96,11 +95,6 @@
         <artifactId>plexus-utils</artifactId>
         <version>3.0.15</version>
         <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-project</artifactId>
-      <version>2.2.1</version>
     </dependency>
   </dependencies>
 
