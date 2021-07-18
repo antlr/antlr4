@@ -744,9 +744,15 @@ recRuleAltPredicate(ruleName,opPrec)  ::= "this.precpred(this._ctx, <opPrec>)"
 recRuleSetReturnAction(src,name)	  ::= "$<name>=$<src>.<name>"
 recRuleSetStopToken()                 ::= "this._ctx.stop = this._input.LT(-1);"
 
-recRuleAltStartAction(ruleName, ctxName, label) ::= <<
+recRuleAltStartAction(ruleName, ctxName, label, isListLabel) ::= <<
 localctx = new <ctxName>Context(this, _parentctx, _parentState);
-<if(label)>localctx.<label> = _prevctx;<endif>
+<if(label)>
+<if(isListLabel)>
+localctx.<label>.push(_prevctx);
+<else>
+localctx.<label> = _prevctx;
+<endif>
+<endif>
 this.pushNewRecursionContext(localctx, _startState, <parser.name>.RULE_<ruleName>);
 >>
 
