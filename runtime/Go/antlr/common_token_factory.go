@@ -25,6 +25,7 @@ type CommonTokenFactory struct {
 	copyText bool
 }
 
+// NewCommonTokenFactory returns a new instance of CommonTokenFactory.
 func NewCommonTokenFactory(copyText bool) *CommonTokenFactory {
 	return &CommonTokenFactory{copyText: copyText}
 }
@@ -33,6 +34,7 @@ func NewCommonTokenFactory(copyText bool) *CommonTokenFactory {
 // explicitly copy token text when constructing tokens.
 var CommonTokenFactoryDEFAULT = NewCommonTokenFactory(false)
 
+// Create creates the actual tokens.
 func (c *CommonTokenFactory) Create(source *TokenSourceCharStreamPair, ttype int, text string, channel, start, stop, line, column int) Token {
 	t := NewCommonToken(source, ttype, channel, start, stop)
 

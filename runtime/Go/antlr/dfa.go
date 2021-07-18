@@ -9,6 +9,7 @@ import (
 	"sync"
 )
 
+// DFA represents a deterministic finite automaton.
 type DFA struct {
 	// atnStartState is the ATN state in which this was created
 	atnStartState DecisionState
@@ -28,6 +29,7 @@ type DFA struct {
 	precedenceDfa bool
 }
 
+// NewDFA returns a new instance of DFA
 func NewDFA(atnStartState DecisionState, decision int) *DFA {
 	return &DFA{
 		atnStartState: atnStartState,
@@ -154,6 +156,7 @@ func (d *DFA) sortedStates() []*DFAState {
 	return vs
 }
 
+// String returns the serialized representation of this DFA.
 func (d *DFA) String(literalNames []string, symbolicNames []string) string {
 	if d.s0 == nil {
 		return ""
@@ -162,6 +165,7 @@ func (d *DFA) String(literalNames []string, symbolicNames []string) string {
 	return NewDFASerializer(d, literalNames, symbolicNames).String()
 }
 
+// ToLexerString returns the serialized representation of this DFA.
 func (d *DFA) ToLexerString() string {
 	if d.s0 == nil {
 		return ""

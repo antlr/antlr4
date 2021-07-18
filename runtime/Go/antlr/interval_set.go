@@ -5,28 +5,34 @@
 package antlr
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 )
 
+// Interval represents an interval within the input source.
 type Interval struct {
 	Start int
 	Stop  int
 }
 
 /* stop is not included! */
-func NewInterval(start, stop int) *Interval {
-	i := new(Interval)
 
-	i.Start = start
-	i.Stop = stop
-	return i
+// NewInterval returns a new instance of Interval. The stop index isn't
+// included.
+func NewInterval(start, stop int) *Interval {
+	return &Interval{
+		Start: start,
+		Stop:  stop,
+	}
 }
 
+// Contains returns true if the given index is within this interval.
 func (i *Interval) Contains(item int) bool {
 	return item >= i.Start && item < i.Stop
 }
 
+// String implements the Stringer interface.
 func (i *Interval) String() string {
 	if i.Start == i.Stop-1 {
 		return strconv.Itoa(i.Start)
@@ -39,19 +45,18 @@ func (i *Interval) length() int {
 	return i.Stop - i.Start
 }
 
+// IntervalSet is a container for intervals.
 type IntervalSet struct {
 	intervals []*Interval
 	readOnly  bool
 }
 
+// NewIntervalSet returns a new instance of IntervalSet
 func NewIntervalSet() *IntervalSet {
-
-	i := new(IntervalSet)
-
-	i.intervals = nil
-	i.readOnly = false
-
-	return i
+	return &IntervalSet{
+		intervals: nil,
+		readOnly:  false,
+	}
 }
 
 func (i *IntervalSet) first() int {
@@ -206,10 +211,12 @@ func (i *IntervalSet) removeOne(v int) {
 	}
 }
 
+// String implements the Stringer interface.
 func (i *IntervalSet) String() string {
 	return i.StringVerbose(nil, nil, false)
 }
 
+// StringVerbose returns a verbose representation of this object as a string.
 func (i *IntervalSet) StringVerbose(literalNames []string, symbolicNames []string, elemsAreChar bool) string {
 
 	if i.intervals == nil {
@@ -232,10 +239,10 @@ func (i *IntervalSet) toCharString() string {
 			if v.Start == TokenEOF {
 				names = append(names, "<EOF>")
 			} else {
-				names = append(names, ("'" + string(v.Start) + "'"))
+				names = append(names, fmt.Sprintf("'%d'", v.Start))
 			}
 		} else {
-			names = append(names, "'"+string(v.Start)+"'..'"+string(v.Stop-1)+"'")
+			names = append(names, fmt.Sprintf("'%d'..'%d'", v.Start, v.Stop-1))
 		}
 	}
 	if len(names) > 1 {

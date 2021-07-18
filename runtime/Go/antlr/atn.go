@@ -4,8 +4,11 @@
 
 package antlr
 
+// ATNInvalidAltNumber represents an invalid ATN alternative.
 var ATNInvalidAltNumber int
 
+// ATN represents the augmented translation network nodes used by the LL(*)
+// algorithm.
 type ATN struct {
 	// DecisionToState is the decision points for all rules, subrules, optional
 	// blocks, ()+, ()*, etc. Used to build DFA predictors for them.
@@ -39,6 +42,7 @@ type ATN struct {
 	states []ATNState
 }
 
+// NewATN returns a pointer to a new instance of ATN.
 func NewATN(grammarType int, maxTokenType int) *ATN {
 	return &ATN{
 		grammarType:          grammarType,
@@ -69,6 +73,8 @@ func (a *ATN) NextTokensNoContext(s ATNState) *IntervalSet {
 	return s.GetNextTokenWithinRule()
 }
 
+// NextTokens returns the next set of valid tokens that can occur in starting in
+// state s.
 func (a *ATN) NextTokens(s ATNState, ctx RuleContext) *IntervalSet {
 	if ctx == nil {
 		return a.NextTokensNoContext(s)

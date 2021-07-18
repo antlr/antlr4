@@ -4,6 +4,7 @@
 
 package antlr
 
+// InputStream implements IntStream to send the input to the lexer.
 type InputStream struct {
 	name  string
 	index int
@@ -11,22 +12,23 @@ type InputStream struct {
 	size  int
 }
 
+// NewInputStream returns a new instance of InputStream.
 func NewInputStream(data string) *InputStream {
+	inputData := []rune(data)
 
-	is := new(InputStream)
-
-	is.name = "<empty>"
-	is.index = 0
-	is.data = []rune(data)
-	is.size = len(is.data) // number of runes
-
-	return is
+	return &InputStream{
+		name:  "<empty>",
+		index: 0,
+		data:  inputData,
+		size:  len(inputData),
+	}
 }
 
 func (is *InputStream) reset() {
 	is.index = 0
 }
 
+// Consume advances the input to the next rune.
 func (is *InputStream) Consume() {
 	if is.index >= is.size {
 		// assert is.LA(1) == TokenEOF
@@ -35,6 +37,7 @@ func (is *InputStream) Consume() {
 	is.index++
 }
 
+// LA returns the rune at the given offset.
 func (is *InputStream) LA(offset int) int {
 
 	if offset == 0 {
@@ -52,26 +55,31 @@ func (is *InputStream) LA(offset int) int {
 	return int(is.data[pos])
 }
 
+// LT returns the rune at the given offset.
 func (is *InputStream) LT(offset int) int {
 	return is.LA(offset)
 }
 
+// Index returns the current index into the input.
 func (is *InputStream) Index() int {
 	return is.index
 }
 
+// Size returns the size of the input.
 func (is *InputStream) Size() int {
 	return is.size
 }
 
-// mark/release do nothing we have entire buffer
+// Mark does nothing
 func (is *InputStream) Mark() int {
 	return -1
 }
 
-func (is *InputStream) Release(marker int) {
-}
+// Release does nothing
+func (is *InputStream) Release(marker int) {}
 
+// Seek moves the index to the given position. If it is larger than the input
+// size, the latter is used instead.
 func (is *InputStream) Seek(index int) {
 	if index <= is.index {
 		is.index = index // just jump don't update stream state (line,...)
@@ -81,6 +89,7 @@ func (is *InputStream) Seek(index int) {
 	is.index = intMin(index, is.size)
 }
 
+// GetText returns the text between the given offsets.
 func (is *InputStream) GetText(start int, stop int) string {
 	if stop >= is.size {
 		stop = is.size - 1
@@ -92,6 +101,7 @@ func (is *InputStream) GetText(start int, stop int) string {
 	return string(is.data[start : stop+1])
 }
 
+// GetTextFromTokens returns the text contained between the given tokens.
 func (is *InputStream) GetTextFromTokens(start, stop Token) string {
 	if start != nil && stop != nil {
 		return is.GetTextFromInterval(NewInterval(start.GetTokenIndex(), stop.GetTokenIndex()))
@@ -100,14 +110,17 @@ func (is *InputStream) GetTextFromTokens(start, stop Token) string {
 	return ""
 }
 
+// GetTextFromInterval returns contained in the given interval.
 func (is *InputStream) GetTextFromInterval(i *Interval) string {
 	return is.GetText(i.Start, i.Stop)
 }
 
+// GetSourceName returns the name of the source
 func (*InputStream) GetSourceName() string {
 	return "Obtained from string"
 }
 
+// String implements the Stringer interface.
 func (is *InputStream) String() string {
 	return string(is.data)
 }

@@ -8,9 +8,9 @@ import "fmt"
 
 /** A set of utility routines useful for all kinds of ANTLR trees. */
 
-// Print out a whole tree in LISP form. {@link //getNodeText} is used on the
-//  node payloads to get the text for the nodes.  Detect
-//  parse trees and extract data appropriately.
+// TreesStringTree prints out a whole tree in LISP form. getNodeText is used on the
+// node payloads to get the text for the nodes.  Detect
+// parse trees and extract data appropriately.
 func TreesStringTree(tree Tree, ruleNames []string, recog Recognizer) string {
 
 	if recog != nil {
@@ -37,6 +37,8 @@ func TreesStringTree(tree Tree, ruleNames []string, recog Recognizer) string {
 	return res
 }
 
+// TreesGetNodeText returns the combined text of the given node and it's
+// descendants.
 func TreesGetNodeText(t Tree, ruleNames []string, recog Parser) string {
 	if recog != nil {
 		ruleNames = recog.GetRuleNames()
@@ -70,7 +72,7 @@ func TreesGetNodeText(t Tree, ruleNames []string, recog Parser) string {
 	return fmt.Sprint(t.GetPayload())
 }
 
-// Return ordered list of all children of this node
+// TreesGetChildren returns an ordered list of all children of this node.
 func TreesGetChildren(t Tree) []Tree {
 	list := make([]Tree, 0)
 	for i := 0; i < t.GetChildCount(); i++ {
@@ -79,9 +81,8 @@ func TreesGetChildren(t Tree) []Tree {
 	return list
 }
 
-// Return a list of all ancestors of this node.  The first node of
-//  list is the root and the last is the parent of this node.
-//
+// TreesgetAncestors returns a list of all ancestors of this node. The first node of
+// list is the root and the last is the parent of this node.
 func TreesgetAncestors(t Tree) []Tree {
 	ancestors := make([]Tree, 0)
 	t = t.GetParent()
@@ -93,14 +94,19 @@ func TreesgetAncestors(t Tree) []Tree {
 	return ancestors
 }
 
+// TreesFindAllTokenNodes returns all the tokens that are descendants of this
+// node.
 func TreesFindAllTokenNodes(t ParseTree, ttype int) []ParseTree {
 	return TreesfindAllNodes(t, ttype, true)
 }
 
+// TreesfindAllRuleNodes returns all the rule nodes that are descendants of this
+// one.
 func TreesfindAllRuleNodes(t ParseTree, ruleIndex int) []ParseTree {
 	return TreesfindAllNodes(t, ruleIndex, false)
 }
 
+// TreesfindAllNodes returns all the descendants of this node.
 func TreesfindAllNodes(t ParseTree, index int, findTokens bool) []ParseTree {
 	nodes := make([]ParseTree, 0)
 	treesFindAllNodes(t, index, findTokens, &nodes)
@@ -128,6 +134,8 @@ func treesFindAllNodes(t ParseTree, index int, findTokens bool, nodes *[]ParseTr
 	}
 }
 
+// TreesDescendants returns the given tree plus all of it's children
+// recursively.
 func TreesDescendants(t ParseTree) []ParseTree {
 	nodes := []ParseTree{t}
 	for i := 0; i < t.GetChildCount(); i++ {

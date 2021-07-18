@@ -4,6 +4,7 @@
 
 package antlr
 
+// TokenSource represents a source to get tokens from.
 type TokenSource interface {
 	NextToken() Token
 	Skip()

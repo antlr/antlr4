@@ -4,6 +4,7 @@
 
 package antlr
 
+// TokenStream is the bridge between the lexer and the parser.
 type TokenStream interface {
 	IntStream
 
