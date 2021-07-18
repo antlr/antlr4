@@ -1,5 +1,5 @@
 /// 
-/// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
+/// Copyright (c) 2012-2021 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
 /// 
@@ -19,6 +19,7 @@ open class Lexer: Recognizer<LexerATNSimulator>, TokenSource {
     public static let DEFAULT_MODE = 0
     public static let MORE = -2
     public static let SKIP = -3
+    public static let LESS = -4
 
     public static let DEFAULT_TOKEN_CHANNEL = CommonToken.DEFAULT_CHANNEL
     public static let HIDDEN = CommonToken.HIDDEN_CHANNEL
@@ -172,6 +173,12 @@ open class Lexer: Recognizer<LexerATNSimulator>, TokenSource {
                     if _type == Lexer.SKIP {
                         continue outer
                     }
+                    if _type == Lexer.LESS {
+                        try _input.seek(_tokenStartCharIndex)
+                        setCharPositionInLine(_tokenStartCharPositionInLine)
+                        setLine(_tokenStartLine)
+                        continue
+                    }
                 } while _type == Lexer.MORE
 
                 if _token == nil {
@@ -196,6 +203,10 @@ open class Lexer: Recognizer<LexerATNSimulator>, TokenSource {
 
     open func more() {
         _type = Lexer.MORE
+    }
+
+    open func less() {
+        _type = Lexer.LESS
     }
 
     open func mode(_ m: Int) {

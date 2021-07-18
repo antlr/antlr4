@@ -220,6 +220,7 @@ An alternative can have more than one command separated by commas. Here are the 
 
 * skip
 * more
+* less
 * popMode
 * mode( x )
 * pushMode( x )
@@ -270,6 +271,26 @@ TEXT : . -> more ; // collect more text for string
 ```
 
 Popping the bottom layer of a mode stack will result in an exception. Switching modes with `mode` changes the current stack top.  More than one `more` is the same as just one and the position does not matter.
+
+### less
+
+The 'less' is similar to the 'more' command; it forces the lexer to get another token without throwing out the current text. However, the 'less' command will also rewind the lexer position to the start of the token before resuming.
+
+As a comparison:
+
+More:
+
+```
+// When the PROC_INSTR mode is entered, the lexer will continue matching after the "Name"
+SPECIAL_OPEN : '<?' Name -> more, pushMode(PROC_INSTR);
+```
+
+Less:
+
+```
+// When the PROC_INSTR mode is entered, the lexer will restart matching at the opening tag ("<?")
+SPECIAL_OPEN : '<?' Name -> less, pushMode(PROC_INSTR);
+```
 
 ### type()
 

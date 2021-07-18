@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
+ * Copyright (c) 2012-2021 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -22,6 +22,7 @@ abstract class Lexer extends Recognizer<LexerATNSimulator>
   static final DEFAULT_MODE = 0;
   static final MORE = -2;
   static final SKIP = -3;
+  static final LESS = -4;
 
   static final DEFAULT_TOKEN_CHANNEL = Token.DEFAULT_CHANNEL;
   static final HIDDEN = Token.HIDDEN_CHANNEL;
@@ -136,7 +137,12 @@ abstract class Lexer extends Recognizer<LexerATNSimulator>
           if (type == SKIP) {
             continue outer;
           }
-        } while (type == MORE);
+          if (type == LESS) {
+            _input.seek(tokenStartCharIndex);
+            this.charPositionInLine = tokenStartCharPositionInLine;
+            this.line = tokenStartLine;
+          }
+        } while (type == MORE || type == LESS);
         if (_token == null) emit();
         return _token!;
       }
@@ -158,6 +164,10 @@ abstract class Lexer extends Recognizer<LexerATNSimulator>
 
   void more() {
     type = Lexer.MORE;
+  }
+
+  void less() {
+    type = Lexer.LESS;
   }
 
   void mode(int m) {

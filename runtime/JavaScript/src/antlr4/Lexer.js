@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2021 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -137,6 +137,12 @@ class Lexer extends Recognizer {
 						continueOuter = true;
 						break;
 					}
+					if (this._type === Lexer.LESS) {
+						this._input.seek(this._tokenStartCharIndex);
+						this.column = this._tokenStartColumn;
+						this.line = this._tokenStartLine;
+						continue;
+					}
 					if (this._type !== Lexer.MORE) {
 						break;
 					}
@@ -169,6 +175,10 @@ class Lexer extends Recognizer {
 
 	more() {
 		this._type = Lexer.MORE;
+	}
+
+	less() {
+		this._type = Lexer.LESS;
 	}
 
 	mode(m) {
@@ -362,6 +372,7 @@ class Lexer extends Recognizer {
 Lexer.DEFAULT_MODE = 0;
 Lexer.MORE = -2;
 Lexer.SKIP = -3;
+Lexer.LESS = -4;
 
 Lexer.DEFAULT_TOKEN_CHANNEL = Token.DEFAULT_CHANNEL;
 Lexer.HIDDEN = Token.HIDDEN_CHANNEL;

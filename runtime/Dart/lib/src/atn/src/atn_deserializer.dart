@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
+ * Copyright (c) 2012-2021 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -813,6 +813,9 @@ class ATNDeserializer {
 
       case LexerActionType.CUSTOM:
         return LexerCustomAction(data1, data2);
+
+      case LexerActionType.LESS:
+        return LexerLessAction.INSTANCE;
 
       case LexerActionType.MODE:
         return LexerModeAction(data1);
