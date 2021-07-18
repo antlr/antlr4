@@ -40,6 +40,18 @@ javaTypeInitMap ::= [
 	default:"null" // anything other than a primitive type is an object
 ]
 
+javaBoxedTypeMap ::= [
+	"int": "Integer",
+	"long": "Long",
+	"float": "Float",
+	"double": "Double",
+	"boolean": "Boolean",
+	"byte": "Byte",
+	"short": "Short",
+	"char": "Char",
+	default: key
+]
+
 // args must be <object-model-object>, <fields-resulting-in-STs>
 
 ParserFile(file, parser, namedActions, contextSuperClass) ::= <<
@@ -263,6 +275,8 @@ public class <parser.name> extends <superClass; null="Parser"> {
 	<parser:(ctor)()>
 	<funcs; separator="\n">
 
+	<ruleContextFactoryFunction(parser.rules)>
+
 <if(sempredFuncs)>
 	public boolean sempred(RuleContext _localctx, int ruleIndex, int predIndex) {
 		switch (ruleIndex) {
@@ -385,6 +399,50 @@ case <index>:
 	return <actions.(index)>;}; separator="\n">
 	}
 	return true;
+}
+>>
+
+ruleContextFactoryFunction(rules) ::= <<
+@Override
+protected ParserRuleContext createContext(int ruleIndex, ParserRuleContext parent, int invokingState, Object... arguments) {
+	switch (ruleIndex) {
+<rules:{rule|
+	case RULE_<rule.name>:
+<if(rule.args)>
+		if (arguments != null && arguments.length > 0) {
+			return new <rule.name; format="cap">Context(parent, invokingState<rule.args.attributes.values:
+{attr|, (<javaBoxedTypeMap.(attr.type)>)Utils.getArgumentOrDefault(arguments, <i0>, (<attr.type>)<attr.initValue; null={<initValue(attr.type)>}>)}>);
+		\} else {
+			return new <rule.name; format="cap">Context(parent, invokingState);
+		\}
+<else>
+		return new <rule.name; format="cap">Context(parent, invokingState);
+<endif>
+}>
+	default:
+		return super.createContext(ruleIndex, parent, invokingState, arguments);
+	}
+}
+
+@Override
+protected ParserRuleContext createAltContext(int ruleIndex, int altIndex, ParserRuleContext ruleContext) {
+	switch (ruleIndex) {
+<rules:{rule|
+<if(rule.altSpecificContexts)>
+	case RULE_<rule.name>:
+		switch (altIndex) {
+<rule.altLabels:{alt|
+		case <i>:
+			return new <alt; format="cap">Context((<rule.name; format="cap">Context)ruleContext);
+}>
+		default:
+			return ruleContext;
+		\}
+<endif>
+}>
+	default:
+		return ruleContext;
+	}
 }
 >>
 

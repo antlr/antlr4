@@ -281,7 +281,7 @@ public class SemPredEvalParserDescriptors {
 
 	public static class PredFromAltTestedInLoopBack_1 extends PredFromAltTestedInLoopBack {
 		public String input = "s\n\n\nx\n";
-		public String output = "(file_ (para (paraContent s) \\n \\n) (para (paraContent \\n x \\n)) <EOF>)\n";
+		public String output = "(file_ (para (paraContent s) \\n \\n) (para (paraContent \\n x \\n) <missing '\\n'> <missing '\\n'>) <EOF>)\n";
 		/**
 		line 5:0 mismatched input '<EOF>' expecting {'s', '
 		', 'x'}
@@ -291,7 +291,7 @@ public class SemPredEvalParserDescriptors {
 
 		@Override
 		public boolean ignore(String targetName) {
-			return !"Java".equals(targetName) && !"Swift".equals(targetName);
+			return !targetName.matches("Java");
 		}
 	}
 
