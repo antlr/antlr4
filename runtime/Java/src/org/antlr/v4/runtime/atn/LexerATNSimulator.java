@@ -221,6 +221,10 @@ public class LexerATNSimulator extends ATNSimulator {
 				if (t == IntStream.EOF) {
 					break;
 				}
+
+				if (target.isLexerTerminationState()) {
+					break;
+				}
 			}
 
 			t = input.LA(1);
@@ -673,9 +677,20 @@ public class LexerATNSimulator extends ATNSimulator {
 
 		DFAState proposed = new DFAState(configs);
 		ATNConfig firstConfigWithRuleStopState = null;
+		ATNConfig firstConfigWithoutRuleStopState = null;
 		for (ATNConfig c : configs) {
 			if ( c.state instanceof RuleStopState )	{
-				firstConfigWithRuleStopState = c;
+				if (firstConfigWithRuleStopState == null) {
+					firstConfigWithRuleStopState = c;
+				}
+			}
+			else {
+				if (firstConfigWithoutRuleStopState == null) {
+					firstConfigWithoutRuleStopState = c;
+				}
+			}
+
+			if (firstConfigWithRuleStopState != null && firstConfigWithoutRuleStopState != null) {
 				break;
 			}
 		}
@@ -684,6 +699,10 @@ public class LexerATNSimulator extends ATNSimulator {
 			proposed.isAcceptState = true;
 			proposed.lexerActionExecutor = ((LexerATNConfig)firstConfigWithRuleStopState).getLexerActionExecutor();
 			proposed.prediction = atn.ruleToTokenType[firstConfigWithRuleStopState.state.ruleIndex];
+		}
+
+		if (firstConfigWithoutRuleStopState == null) {
+			proposed.setLexerTerminationState(true);
 		}
 
 		DFA dfa = decisionToDFA[mode];
