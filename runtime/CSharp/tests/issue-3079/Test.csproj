@@ -1,0 +1,65 @@
+﻿<!-- Template generated code from Antlr4BuildTasks.dotnet-antlr v 2.2 -->
+<Project Sdk="Microsoft.NET.Sdk" >
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <Antlr4 Include="Arithmetic.g4" />
+  </ItemGroup>
+  
+  <PropertyGroup>
+    <AntlrToolPath>../../../../tool/target/antlr4-*-SNAPSHOT-complete.jar</AntlrToolPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../src/Antlr4.csproj" />
+    <PackageReference Include="Antlr4BuildTasks" Version = "8.13" PrivateAssets="all" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'" >
+    <NoWarn>1701;1702;3021</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!--
+      need the CData since this blob is just going to
+      be embedded in a mini batch file by studio/msbuild
+    -->
+    <MyTester><![CDATA[
+
+set ERR=0
+for %%G in (..\examples\*) do (
+  setlocal EnableDelayedExpansion
+  set FILE=%%G
+  set X1=%%~xG
+  set X2=%%~nG
+  set X3=%%~pG
+  if !X1! neq .errors (
+    echo !FILE!
+    cat !FILE! | bin\Debug\net5.0\Test.exe
+    if not exist !FILE!.errors (
+      if ERRORLEVEL 1 set ERR=1
+    ) else (
+      echo Expected.
+    )
+  )
+)
+EXIT %ERR%
+
+]]></MyTester>
+</PropertyGroup>
+
+  <Target Name="Test" >
+    <Message Text="testing" />
+    <Exec Command="$(MyTester)" >
+       <Output TaskParameter="ExitCode" PropertyName ="ErrorCode" />
+    </Exec>
+    <Message Importance="high" Text="$(ErrorCode)"/>
+  </Target>
+
+</Project>
