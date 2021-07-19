@@ -14,26 +14,52 @@ const Trees = {
      *  node payloads to get the text for the nodes.  Detect
      *  parse trees and extract data appropriately.
      */
-    toStringTree: function(tree, ruleNames, recog) {
+    toStringTree: function(tree, ruleNames, recog, prettyPrint, indentLvl) {
         ruleNames = ruleNames || null;
         recog = recog || null;
+        prettyPrint = prettyPrint || false;
+        indentLvl = indentLvl || 0;
+
         if(recog!==null) {
             ruleNames = recog.ruleNames;
         }
+
         let s = Trees.getNodeText(tree, ruleNames);
         s = Utils.escapeWhitespace(s, false);
         const c = tree.getChildCount();
+
         if(c===0) {
+            if (prettyPrint) {
+                return `\n${" ".repeat(indentLvl)}${s}`;
+            }
             return s;
         }
-        let res = "(" + s + ' ';
+
+        let res = "(" + s + " ";
+        if (prettyPrint) {
+            res = `\n${" ".repeat(indentLvl)}${res}`;
+        }
+
         if(c>0) {
-            s = Trees.toStringTree(tree.getChild(0), ruleNames);
+            s = Trees.toStringTree(
+                tree.getChild(0), ruleNames, recog, prettyPrint, indentLvl + 1
+            );
             res = res.concat(s);
         }
+
         for(let i=1;i<c;i++) {
-            s = Trees.toStringTree(tree.getChild(i), ruleNames);
-            res = res.concat(' ' + s);
+            s = Trees.toStringTree(
+                tree.getChild(i), ruleNames, recog, prettyPrint, indentLvl + 1
+            );
+            if (prettyPrint) {
+                res = `${res}${" ".repeat(indentLvl)}${s}`;
+            } else {
+                res = res.concat(' ' + s);
+            }
+        }
+
+        if (prettyPrint) {
+            res = `${res}\n${" ".repeat(indentLvl)}`;
         }
         res = res.concat(")");
         return res;
