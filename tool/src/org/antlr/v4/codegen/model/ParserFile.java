@@ -21,7 +21,7 @@ public class ParserFile extends OutputFile {
 	public boolean genVisitor; // from -visitor cmd-line
 	@ModelElement public Parser parser;
 	@ModelElement public Map<String, Action> namedActions;
-	@ModelElement public ActionChunk contextSuperClass;
+	@ModelElement public ActionChunk grammarContextSuperClass;
 	public String grammarName;
 
 	public ParserFile(OutputModelFactory factory, String fileName) {
@@ -29,14 +29,15 @@ public class ParserFile extends OutputFile {
 		Grammar g = factory.getGrammar();
 		namedActions = buildNamedActions(factory.getGrammar());
 		genPackage = g.tool.genPackage;
-		exportMacro = factory.getGrammar().getOptionString("exportMacro");
+		exportMacro = g.getOptionString("exportMacro");
 		// need the below members in the ST for Python, C++
 		genListener = g.tool.gen_listener;
 		genVisitor = g.tool.gen_visitor;
 		grammarName = g.name;
 
-		if (g.getOptionString("contextSuperClass") != null) {
-			contextSuperClass = new ActionText(null, g.getOptionString("contextSuperClass"));
+		final String contextSuperClassOptionString = g.getOptionString("contextSuperClass");
+		if (contextSuperClassOptionString != null) {
+			grammarContextSuperClass = new ActionText(null, contextSuperClassOptionString);
 		}
 	}
 }
