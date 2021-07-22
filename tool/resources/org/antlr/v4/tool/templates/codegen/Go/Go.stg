@@ -2,7 +2,7 @@ fileHeader(grammarFileName, ANTLRVersion) ::= <<
 // Code generated from <grammarFileName; format="java-escape"> by ANTLR <ANTLRVersion>. DO NOT EDIT.
 >>
 
-ParserFile(file, parser, namedActions, contextSuperClass) ::= <<
+ParserFile(file, parser, namedActions, grammarContextSuperClass) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 
 <if(file.genPackage)>

@@ -40,7 +40,7 @@ dartTypeInitMap ::= [
 
 // args must be <object-model-object>, <fields-resulting-in-STs>
 
-ParserFile(file, parser, namedActions, contextSuperClass) ::= <<
+ParserFile(file, parser, namedActions, grammarContextSuperClass) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 <if(file.genPackage)>
 library <file.genPackage>;
@@ -714,9 +714,9 @@ ListLabelName(label)		  ::= "<label>"
 CaptureNextToken(d) ::= "<d.varName> = tokenStream.LT(1);"
 CaptureNextTokenType(d) ::= "<d.varName> = tokenStream.LA(1)!;"
 
-StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers)
+StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers,ruleContextSuperClass)
   ::= <<
-class <struct.name> extends <if(contextSuperClass)><contextSuperClass><else>ParserRuleContext<endif><if(interfaces)> implements <interfaces; separator=", "><endif> {
+class <struct.name> extends <if(ruleContextSuperClass)><ruleContextSuperClass><else><if(grammarContextSuperClass)><grammarContextSuperClass><else>ParserRuleContext<endif><endif><if(interfaces)> implements <interfaces; separator=", "><endif> {
   <attrs:{a | <a>;}; separator="\n">
   <getters:{g | <g>}; separator="\n">
   <struct.name>([ParserRuleContext? parent, int? invokingState<ctorAttrs:{a | , <a>}>]) : super(parent, invokingState)<if(struct.ctorAttrs)> {
@@ -727,7 +727,7 @@ class <struct.name> extends <if(contextSuperClass)><contextSuperClass><else>Pars
   int get ruleIndex => RULE_<struct.derivedFromName>;
 <if(struct.provideCopyFrom)> <! don't need copy unless we have subclasses !>
   @override
-  void copyFrom(<if(contextSuperClass)><contextSuperClass><else>ParserRuleContext<endif> ctx) {
+  void copyFrom(<if(ruleContextSuperClass)><ruleContextSuperClass><else><if(grammarContextSuperClass)><grammarContextSuperClass><else>ParserRuleContext<endif><endif> ctx) {
     super.copyFrom(ctx);
     <struct.attrs:{a | if((ctx as <struct.name>).<a.name> != null) this.<a.name> = (ctx as <struct.name>).<a.name>;}; separator="\n">
   }
