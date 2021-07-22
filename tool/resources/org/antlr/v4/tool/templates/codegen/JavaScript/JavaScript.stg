@@ -46,7 +46,7 @@ javascriptTypeInitMap ::= [
 
 // args must be <object-model-object>, <fields-resulting-in-STs>
 
-ParserFile(file, parser, namedActions, contextSuperClass) ::= <<
+ParserFile(file, parser, namedActions, grammarContextSuperClass) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 import antlr4 from 'antlr4';
 <if(file.genListener)>
@@ -657,8 +657,8 @@ ListLabelName(label)		  ::= "<label>"
 CaptureNextToken(d) ::= "<d.varName> = self._input.LT(1)"
 CaptureNextTokenType(d) ::= "<d.varName> = this._input.LA(1);"
 
-StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers) ::= <<
-class <struct.escapedName> extends <if(contextSuperClass)><contextSuperClass><else>antlr4.ParserRuleContext<endif> {
+StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers,ruleContextSuperClass) ::= <<
+class <struct.escapedName> extends <if(ruleContextSuperClass)><ruleContextSuperClass><else><if(grammarContextSuperClass)><grammarContextSuperClass><else>antlr4.ParserRuleContext<endif><endif> {
 
     constructor(parser, parent, invokingState<struct.ctorAttrs:{a | , <a.escapedName>}>) {
         if(parent===undefined) {

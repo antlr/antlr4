@@ -555,7 +555,7 @@ LeftRecursiveRuleFunction(currentRule, args, code, locals, ruleCtx, altLabelCtxs
 >>
 
 StructDeclHeader(struct, ctorAttrs, attrs, getters, dispatchMethods, interfaces, extensionMembers) ::= <<
-class <file.exportMacro> <struct.escapedName> : public <if (contextSuperClass)><contextSuperClass><else>antlr4::ParserRuleContext<endif><if(interfaces)>, <interfaces; separator=", "><endif> {
+class <file.exportMacro> <struct.escapedName> : public <if(ruleContextSuperClass)><ruleContextSuperClass><else><if(grammarContextSuperClass)><grammarContextSuperClass><else>antlr4::ParserRuleContext<endif><endif><if(interfaces)>, <interfaces; separator=", "><endif> {
 public:
   <attrs: {a | <a>;}; separator = "\n">
   <if (ctorAttrs)><struct.escapedName>(antlr4::ParserRuleContext *parent, size_t invokingState);<endif>
@@ -575,17 +575,17 @@ public:
 
 >>
 
-StructDecl(struct, ctorAttrs, attrs, getters, dispatchMethods, interfaces, extensionMembers) ::= <<
+StructDecl(struct, ctorAttrs, attrs, getters, dispatchMethods, interfaces, extensionMembers, ruleContextSuperClass) ::= <<
 //----------------- <struct.escapedName> ------------------------------------------------------------------
 
 <if (ctorAttrs)>
 <parser.name>::<struct.escapedName>::<struct.escapedName>(ParserRuleContext *parent, size_t invokingState)
-  : <if (contextSuperClass)><contextSuperClass><else>ParserRuleContext<endif>(parent, invokingState) {
+  : <if(ruleContextSuperClass)><ruleContextSuperClass><else><if(grammarContextSuperClass)><grammarContextSuperClass><else>antlr4::ParserRuleContext<endif><endif>(parent, invokingState) {
 }
 <endif>
 
 <parser.name>::<struct.escapedName>::<struct.escapedName>(ParserRuleContext *parent, size_t invokingState<ctorAttrs: {a | , <a>}>)
-  : <if (contextSuperClass)><contextSuperClass><else>ParserRuleContext<endif>(parent, invokingState) {
+  : <if(ruleContextSuperClass)><ruleContextSuperClass><else><if(grammarContextSuperClass)><grammarContextSuperClass><else>antlr4::ParserRuleContext<endif><endif>(parent, invokingState) {
   <struct.ctorAttrs: {a | this-><a.escapedName> = <a.escapedName>;}; separator="\n">
 }
 
@@ -597,7 +597,7 @@ size_t <parser.name>::<struct.escapedName>::getRuleIndex() const {
 
 <if (struct.provideCopyFrom)>
 void <parser.name>::<struct.escapedName>::copyFrom(<struct.escapedName> *ctx) {
-  <if (contextSuperClass)><contextSuperClass><else>ParserRuleContext<endif>::copyFrom(ctx);
+  <if(ruleContextSuperClass)><ruleContextSuperClass><else><if(grammarContextSuperClass)><grammarContextSuperClass><else>antlr4::ParserRuleContext<endif><endif>::copyFrom(ctx);
   <struct.attrs: {a | this-><a.escapedName> = ctx-><a.escapedName>;}; separator = "\n">
 }
 <endif>

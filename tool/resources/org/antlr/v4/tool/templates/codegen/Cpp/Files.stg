@@ -73,7 +73,7 @@ using namespace antlr4;
 
 >>
 
-ParserFileHeader(file, parser, namedActions, contextSuperClass) ::= <<
+ParserFileHeader(file, parser, namedActions, grammarContextSuperClass) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion, namedActions.header)>
 
 #pragma once
@@ -93,7 +93,7 @@ ParserFileHeader(file, parser, namedActions, contextSuperClass) ::= <<
 <endif>
 >>
 
-ParserFile(file, parser, namedActions, contextSuperClass) ::= <<
+ParserFile(file, parser, namedActions, grammarContextSuperClass) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion, namedActions.header)>
 
 <namedActions.preinclude>

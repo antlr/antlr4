@@ -2,7 +2,7 @@ fileHeader(grammarFileName, ANTLRVersion) ::= <<
 // Code generated from <grammarFileName; format="java-escape"> by ANTLR <ANTLRVersion>. DO NOT EDIT.
 >>
 
-ParserFile(file, parser, namedActions, contextSuperClass) ::= <<
+ParserFile(file, parser, namedActions, grammarContextSuperClass) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
 
 <if(file.genPackage)>
@@ -1014,7 +1014,7 @@ ListLabelName(label) ::= "<label>"
 CaptureNextToken(d) ::= "<d.varName> = p.GetTokenStream().LT(1)"
 CaptureNextTokenType(d) ::= "<d.varName> = p.GetTokenStream().LA(1)"
 
-StructDecl(struct, ctorAttrs, attrs, getters, dispatchMethods, interfaces, extensionMembers) ::= <<
+StructDecl(struct, ctorAttrs, attrs, getters, dispatchMethods, interfaces, extensionMembers, ruleContextSuperClass) ::= <<
 // I<struct.escapedName> is an interface to support dynamic dispatch.
 type I<struct.escapedName> interface {
 	antlr.ParserRuleContext
@@ -1099,7 +1099,7 @@ Set<a.escapedName; format="cap">(<a.type>)}; separator="\n\n">
 }
 
 type <struct.escapedName> struct {
-	<if(contextSuperClass)>*<contextSuperClass><else>*antlr.BaseParserRuleContext<endif>
+	<if(ruleContextSuperClass)>*<ruleContextSuperClass><else><if(grammarContextSuperClass)>*<grammarContextSuperClass><else>*antlr.BaseParserRuleContext<endif><endif>
 	parser antlr.Parser
 	<if(attrs)>
 	<attrs; separator="\n">
@@ -1108,7 +1108,7 @@ type <struct.escapedName> struct {
 
 func NewEmpty<struct.escapedName>() *<struct.escapedName> {
 	var p = new(<struct.escapedName>)
-	p.<if(contextSuperClass)><contextSuperClass><else>BaseParserRuleContext<endif> = <if(contextSuperClass)>New<contextSuperClass><else>antlr.NewBaseParserRuleContext<endif>(nil, -1)
+	p.<if(ruleContextSuperClass)><ruleContextSuperClass><else><if(grammarContextSuperClass)><grammarContextSuperClass><else>BaseParserRuleContext<endif><endif> = <if(ruleContextSuperClass)>New<ruleContextSuperClass><else><if(grammarContextSuperClass)>New<grammarContextSuperClass><else>antlr.NewBaseParserRuleContext<endif><endif>(nil, -1)
 	p.RuleIndex = <parser.name>RULE_<struct.derivedFromName>
 	return p
 }
@@ -1118,7 +1118,7 @@ func (*<struct.escapedName>) Is<struct.escapedName>() {}
 func New<struct.escapedName>(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int<struct.ctorAttrs:{a | , <a.escapedName> <a.type>}>) *<struct.escapedName> {
 	var p = new(<struct.escapedName>)
 
-	p.<if(contextSuperClass)><contextSuperClass><else>BaseParserRuleContext<endif> = <if(contextSuperClass)>New<contextSuperClass><else>antlr.NewBaseParserRuleContext<endif>(parent, invokingState)
+	p.<if(ruleContextSuperClass)><ruleContextSuperClass><else><if(grammarContextSuperClass)><grammarContextSuperClass><else>BaseParserRuleContext<endif><endif> = <if(ruleContextSuperClass)>New<ruleContextSuperClass><else><if(grammarContextSuperClass)>New<grammarContextSuperClass><else>antlr.NewBaseParserRuleContext<endif><endif>(parent, invokingState)
 
 	p.parser = parser
 	p.RuleIndex = <parser.name>RULE_<struct.derivedFromName>

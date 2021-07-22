@@ -12,9 +12,12 @@ import org.antlr.v4.codegen.model.ListenerDispatchMethod;
 import org.antlr.v4.codegen.model.ModelElement;
 import org.antlr.v4.codegen.model.OutputModelObject;
 import org.antlr.v4.codegen.model.VisitorDispatchMethod;
+import org.antlr.v4.codegen.model.chunk.ActionChunk;
+import org.antlr.v4.codegen.model.chunk.ActionText;
 import org.antlr.v4.runtime.misc.OrderedHashSet;
 import org.antlr.v4.tool.Attribute;
 import org.antlr.v4.tool.Rule;
+import org.antlr.v4.tool.ast.RuleAST;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -32,6 +35,7 @@ public class StructDecl extends Decl {
 	@ModelElement public List<? super DispatchMethod> dispatchMethods;
 	@ModelElement public List<OutputModelObject> interfaces;
 	@ModelElement public List<OutputModelObject> extensionMembers;
+	@ModelElement public ActionChunk ruleContextSuperClass;
 
 	// Track these separately; Go target needs to generate getters/setters
 	// Do not make them templates; we only need the Decl object not the ST
@@ -52,6 +56,10 @@ public class StructDecl extends Decl {
 		addDispatchMethods(r);
 		derivedFromName = r.name;
 		provideCopyFrom = r.hasAltSpecificContexts();
+		final String contextSuperClassOptionString = r.ast.getOptionString("contextSuperClass");
+		if (contextSuperClassOptionString != null) {
+			ruleContextSuperClass = new ActionText(null, contextSuperClassOptionString);
+		}
 	}
 
 	public void addDispatchMethods(Rule r) {

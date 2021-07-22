@@ -89,6 +89,7 @@ public class Grammar implements AttributeResolver {
 
 	public static final Set<String> lexerRuleOptions = new HashSet<>();
 	static {
+		lexerRuleOptions.add("contextSuperClass");
 		lexerRuleOptions.add(caseInsensitiveOptionName);
 	}
 
