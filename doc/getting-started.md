@@ -138,4 +138,3 @@ The book has lots and lots of examples that should be useful too. You can downlo
 Also, there is a large collection of grammars for v4 at github:
 
 [https://github.com/antlr/grammars-v4](https://github.com/antlr/grammars-v4)
-/
