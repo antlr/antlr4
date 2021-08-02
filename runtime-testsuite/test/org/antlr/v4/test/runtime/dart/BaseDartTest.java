@@ -30,6 +30,7 @@ public class BaseDartTest extends BaseRuntimeTestSupport implements RuntimeTestS
 	);
 
 	private static String cacheDartPackages;
+	private static String cacheDartPackageConfig;
 
 	public String getPropertyPrefix() {
 		return "antlr-dart";
@@ -140,7 +141,10 @@ public class BaseDartTest extends BaseRuntimeTestSupport implements RuntimeTestS
 			"name: \"test\"\n" +
 				"dependencies:\n" +
 				"  antlr4:\n" +
-				"    path: " + runtime + "\n");
+				"    path: " + runtime + "\n" +
+				"environment:\n" +
+  				"  sdk: \">=2.12.0 <3.0.0\"\n");
+		final File dartToolDir = new File(getTempDirPath(), ".dart_tool");
 		if (cacheDartPackages == null) {
 			try {
 				final Process process = Runtime.getRuntime().exec(new String[]{locatePub(), "get"}, null, getTempTestDir());
@@ -169,8 +173,12 @@ public class BaseDartTest extends BaseRuntimeTestSupport implements RuntimeTestS
 				return false;
 			}
 			cacheDartPackages = readFile(getTempDirPath(), ".packages");
+			cacheDartPackageConfig = readFile(dartToolDir.getAbsolutePath(), "package_config.json");
 		} else {
 			writeFile(getTempDirPath(), ".packages", cacheDartPackages);
+			//noinspection ResultOfMethodCallIgnored
+			dartToolDir.mkdir();
+			writeFile(dartToolDir.getAbsolutePath(), "package_config.json", cacheDartPackageConfig);
 		}
 		return true; // allIsWell: no compile
 	}
@@ -293,7 +301,7 @@ public class BaseDartTest extends BaseRuntimeTestSupport implements RuntimeTestS
 
 		final String[] roots = isWindows()
 				? new String[]{"C:\\tools\\dart-sdk\\bin\\"}
-				: new String[]{"/usr/local/bin/", "/opt/local/bin/", "/usr/bin/", "/usr/lib/dart/bin/"};
+				: new String[]{"/usr/local/bin/", "/opt/local/bin/", "/usr/bin/", "/usr/lib/dart/bin/", "/usr/local/opt/dart/libexec"};
 
 		for (String root : roots) {
 			for (String t : tools) {
@@ -402,7 +410,7 @@ public class BaseDartTest extends BaseRuntimeTestSupport implements RuntimeTestS
 				"  @override\n" +
 				"  void enterEveryRule(ParserRuleContext ctx) {\n" +
 				"    for (var i = 0; i \\< ctx.childCount; i++) {\n" +
-				"      final parent = ctx.getChild(i).parent;\n" +
+				"      final parent = ctx.getChild(i)?.parent;\n" +
 				"      if (!(parent is RuleNode) || (parent as RuleNode).ruleContext != ctx) {\n" +
 				"        throw StateError('Invalid parse tree shape detected.');\n" +
 				"      }\n" +
@@ -444,10 +452,10 @@ public class BaseDartTest extends BaseRuntimeTestSupport implements RuntimeTestS
 				"  <lexerName> lex = <lexerName>(input);\n" +
 				"  CommonTokenStream tokens = CommonTokenStream(lex);\n" +
 				"  tokens.fill();\n" +
-				"  for (Object t in tokens.getTokens())\n" +
+				"  for (Object t in tokens.getTokens()!)\n" +
 				"    print(t);\n" +
 				"\n" +
-				(showDFA ? "stdout.write(lex.interpreter.getDFA(Lexer.DEFAULT_MODE).toLexerString());\n" : "") +
+				(showDFA ? "stdout.write(lex.interpreter!.getDFA(Lexer.DEFAULT_MODE).toLexerString());\n" : "") +
 				"}\n"
 		);
 

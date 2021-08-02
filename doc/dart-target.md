@@ -1,6 +1,6 @@
 # ANTLR4 Runtime for Dart
 
-Notice: Dart target may generate code incompatible with Dart 2.9 sound null safety. Please set the minimum SDK constraint to 2.8.4 or lower if such violation is found. Contributions are welcomed.
+From version 4.9.3 onwards antlr's dart generated code is null sound safety compatible and sets the minimum dart sdk version to 2.12.0.
 
 ### First steps
 

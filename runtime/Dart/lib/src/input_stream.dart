@@ -89,7 +89,7 @@ abstract class IntStream {
   ///
   /// @throws UnsupportedOperationException if the stream does not support
   /// retrieving the value of the specified symbol
-  int LA(int i);
+  int? LA(int i);
 
   /// A mark provides a guarantee that {@link #seek seek()} operations will be
   /// valid over a "marked range" extending from the index where {@code mark()}
@@ -221,7 +221,7 @@ abstract class CharStream extends IntStream {
 // Vacuum all input from a string and then treat it like a buffer.
 class InputStream extends CharStream {
   final name = '<empty>';
-  List<int> data;
+  late List<int> data;
   int _index = 0;
   bool decodeToUnicodeCodePoints = false;
 
