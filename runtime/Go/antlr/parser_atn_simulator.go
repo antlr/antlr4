@@ -95,13 +95,13 @@ func (p *ParserATNSimulator) AdaptivePredict(input TokenStream, decision int, ou
 	// Now we are certain to have a specific decision's DFA
 	// But, do we still need an initial state?
 	var s0 *DFAState
-	if dfa.precedenceDfa {
+	if dfa.getPrecedenceDfa() {
 		// the start state for a precedence DFA depends on the current
 		// parser precedence, and is provided by a DFA method.
 		s0 = dfa.getPrecedenceStartState(p.parser.GetPrecedence())
 	} else {
 		// the start state for a "regular" DFA is just s0
-		s0 = dfa.s0
+		s0 = dfa.getS0()
 	}
 
 	if s0 == nil {
@@ -120,7 +120,7 @@ func (p *ParserATNSimulator) AdaptivePredict(input TokenStream, decision int, ou
 
 		t2 := dfa.atnStartState
 		t, ok := t2.(*StarLoopEntryState)
-		if !dfa.precedenceDfa && ok {
+		if !dfa.getPrecedenceDfa() && ok {
 			if t.precedenceRuleDecision {
 				dfa.setPrecedenceDfa(true)
 			}
@@ -128,7 +128,7 @@ func (p *ParserATNSimulator) AdaptivePredict(input TokenStream, decision int, ou
 		fullCtx := false
 		s0Closure := p.computeStartState(dfa.atnStartState, RuleContextEmpty, fullCtx)
 
-		if dfa.precedenceDfa {
+		if dfa.getPrecedenceDfa() {
 			// If p is a precedence DFA, we use applyPrecedenceFilter
 			// to convert the computed start state to a precedence start
 			// state. We then use DFA.setPrecedenceStartState to set the
@@ -140,7 +140,7 @@ func (p *ParserATNSimulator) AdaptivePredict(input TokenStream, decision int, ou
 			dfa.setPrecedenceStartState(p.parser.GetPrecedence(), s0)
 		} else {
 			s0 = p.addDFAState(dfa, NewDFAState(-1, s0Closure))
-			dfa.s0 = s0
+			dfa.setS0(s0)
 		}
 	}
 	alt := p.execATN(dfa, s0, input, index, outerContext)
@@ -291,12 +291,12 @@ func (p *ParserATNSimulator) execATN(dfa *DFA, s0 *DFAState, input TokenStream, 
 // already cached
 
 func (p *ParserATNSimulator) getExistingTargetState(previousD *DFAState, t int) *DFAState {
-	edges := previousD.edges
+	edges := previousD.getEdges()
 	if edges == nil {
 		return nil
 	}
 
-	return edges[t+1]
+	return previousD.getIthEdge(t+1)
 }
 
 // Compute a target state for an edge in the DFA, and attempt to add the
@@ -1066,7 +1066,7 @@ func (p *ParserATNSimulator) closureWork(config ATNConfig, configs ATNConfigSet,
 					continue
 				}
 
-				if p.dfa != nil && p.dfa.precedenceDfa {
+				if p.dfa != nil && p.dfa.getPrecedenceDfa() {
 					if t.(*EpsilonTransition).outermostPrecedenceReturn == p.dfa.atnStartState.GetRuleIndex() {
 						c.setPrecedenceFilterSuppressed(true)
 					}
@@ -1385,10 +1385,10 @@ func (p *ParserATNSimulator) addDFAEdge(dfa *DFA, from *DFAState, t int, to *DFA
 	if from == nil || t < -1 || t > p.atn.maxTokenType {
 		return to
 	}
-	if from.edges == nil {
-		from.edges = make([]*DFAState, p.atn.maxTokenType+1+1)
+	if from.getEdges() == nil {
+		from.setEdges(make([]*DFAState, p.atn.maxTokenType+1+1))
 	}
-	from.edges[t+1] = to // connect
+	from.setIthEdge(t+1, to) // connect
 
 	if ParserATNSimulatorDebug {
 		var names []string
