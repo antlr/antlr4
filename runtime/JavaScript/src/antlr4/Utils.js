@@ -3,8 +3,12 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+function valueToString(v) {
+    return v === null ? "null" : v;
+}
+
 function arrayToString(a) {
-    return Array.isArray(a) ? ("[" + a.join(", ") + "]") : "null";
+    return Array.isArray(a) ? ("[" + a.map(valueToString).join(", ") + "]") : "null";
 }
 
 String.prototype.seed = String.prototype.seed || Math.round(Math.random() * Math.pow(2, 32));

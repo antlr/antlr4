@@ -19,5 +19,6 @@ export 'src/parser_rule_context.dart';
 export 'src/vocabulary.dart';
 export 'src/runtime_meta_data.dart';
 export 'src/token.dart';
+export 'src/prediction_context.dart';
 export 'src/recognizer.dart';
 export 'src/interval_set.dart';

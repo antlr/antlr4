@@ -202,12 +202,6 @@ namespace antlrcpp {
     return result;
   }
 
-  //----------------- FinallyAction ------------------------------------------------------------------------------------
-
-  FinalAction finally(std::function<void ()> f) {
-    return FinalAction(f);
-  }
-
   //----------------- SingleWriteMultipleRead --------------------------------------------------------------------------
 
   void SingleWriteMultipleReadLock::readLock() {

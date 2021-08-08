@@ -136,7 +136,9 @@ class RuntimeMetaData {
   /// compiled against. This should always be passed using a direct reference
   /// to [VERSION].
   static void checkVersion(
-      String generatingToolVersion, String compileTimeVersion) {
+    String? generatingToolVersion,
+    String compileTimeVersion,
+  ) {
     final runtimeVersion = VERSION;
     var runtimeConflictsWithGeneratingTool = false;
     var runtimeConflictsWithCompileTimeTool = false;
