@@ -4,8 +4,6 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
-import 'dart:io';
-
 import 'atn/atn.dart';
 import 'error/error.dart';
 import 'input_stream.dart';
@@ -18,6 +16,10 @@ import 'token.dart';
 import 'token_factory.dart';
 import 'token_stream.dart';
 import 'tree/tree.dart';
+
+import 'util/write_stub.dart'
+    if (dart.library.io) 'util/write_io.dart'
+    if (dart.library.html) 'util/write_html.dart' as io;
 
 /// This is all the parsing support code essentially; most of it is error recovery stuff. */
 abstract class Parser extends Recognizer<ParserATNSimulator> {
@@ -723,7 +725,7 @@ abstract class Parser extends Recognizer<ParserATNSimulator> {
       if (dfa.states.isNotEmpty) {
         if (seenOne) print('');
         print('Decision ${dfa.decision}:');
-        stdout.write(dfa.toString(vocabulary));
+        io.write(dfa.toString(vocabulary));
         seenOne = true;
       }
     }
