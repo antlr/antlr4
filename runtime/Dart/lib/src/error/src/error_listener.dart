@@ -11,6 +11,10 @@ import '../../recognizer.dart';
 import '../../util/bit_set.dart';
 import 'errors.dart';
 
+import '../../util/platform_stub.dart'
+    if (dart.library.io) '../../util/platform_io.dart'
+    if (dart.library.html) '../../util/platform_html.dart';
+
 abstract class ErrorListener {
   /// Upon syntax error, notify any interested parties. This is not how to
   /// recover from errors or compute error messages. [ANTLRErrorStrategy]
@@ -217,6 +221,26 @@ class BaseErrorListener extends ErrorListener {
     String msg,
     RecognitionException? e,
   ) {}
+}
+
+class ConsoleErrorListener extends BaseErrorListener {
+  /// Provides a default instance of [ConsoleErrorListener].
+  static final INSTANCE = ConsoleErrorListener();
+
+  /// {@inheritDoc}
+  ///
+  /// <p>
+  /// This implementation prints messages to {@link System//err} containing the
+  /// values of [line], [charPositionInLine], and [msg] using
+  /// the following format.</p>
+  ///
+  /// <pre>
+  /// line <em>line</em>:<em>charPositionInLine</em> <em>msg</em>
+  /// </pre>
+  @override
+  void syntaxError(recognizer, offendingSymbol, line, column, msg, e) {
+    stderrWriteln('line $line:$column $msg');
+  }
 }
 
 /// This implementation of [ErrorListener] dispatches all calls to a
