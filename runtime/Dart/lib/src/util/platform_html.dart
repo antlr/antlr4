@@ -1,5 +1,9 @@
 import 'dart:html';
 
+/// Creates a new independent [Stream] for the contents of the file on [path].
+Stream<List<int>> readStream(String path) => throw UnsupportedError(
+    'dart:html does not support read stream from a file');
+
 /// Prints a string representation of the object.
 void stdoutWrite(Object? object) => throw UnsupportedError(
     'dart:html does not support write without a newline');
