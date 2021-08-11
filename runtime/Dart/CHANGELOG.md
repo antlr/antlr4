@@ -3,6 +3,7 @@
 
 * Initial release
 
-## 4.9.3-SNAPSHOT
+## 4.9.3
 
-* Support multi-platform.
+* Support web platform.
+
