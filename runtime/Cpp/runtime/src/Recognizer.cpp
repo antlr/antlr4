@@ -22,9 +22,9 @@ using namespace antlr4::atn;
 std::map<const dfa::Vocabulary*, std::map<std::string, size_t>> Recognizer::_tokenTypeMapCache;
 std::map<std::vector<std::string>, std::map<std::string, size_t>> Recognizer::_ruleIndexMapCache;
 
-Recognizer::Recognizer() {
+Recognizer::Recognizer(ANTLRErrorListener *listener) {
   InitializeInstanceFields();
-  _proxListener.addErrorListener(&ConsoleErrorListener::INSTANCE);
+  _proxListener.addErrorListener(listener);
 }
 
 Recognizer::~Recognizer() {
@@ -164,4 +164,3 @@ void Recognizer::InitializeInstanceFields() {
   _stateNumber = ATNState::INVALID_STATE_NUMBER;
   _interpreter = nullptr;
 }
-

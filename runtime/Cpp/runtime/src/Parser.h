@@ -44,7 +44,7 @@ namespace antlr4 {
       virtual void exitEveryRule(ParserRuleContext *ctx) override;
     };
 
-    Parser(TokenStream *input);
+    Parser(TokenStream *input, ANTLRErrorListener *listener = &ConsoleErrorListener::INSTANCE);
     virtual ~Parser();
 
     /// reset the parser's state

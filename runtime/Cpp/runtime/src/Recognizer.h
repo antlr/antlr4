@@ -6,6 +6,7 @@
 #pragma once
 
 #include "ProxyErrorListener.h"
+#include "ConsoleErrorListener.h"
 
 namespace antlr4 {
 
@@ -19,7 +20,7 @@ namespace antlr4 {
     };
 #endif
 
-    Recognizer();
+    Recognizer(ANTLRErrorListener *listener = &ConsoleErrorListener::INSTANCE);
     Recognizer(Recognizer const&) = delete;
     virtual ~Recognizer();
 

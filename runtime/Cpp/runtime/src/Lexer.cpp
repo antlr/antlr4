@@ -20,12 +20,11 @@
 using namespace antlrcpp;
 using namespace antlr4;
 
-Lexer::Lexer() : Recognizer() {
-  InitializeInstanceFields();
-  _input = nullptr;
+Lexer::Lexer(ANTLRErrorListener *listener) : Lexer(nullptr, listener) {
 }
 
-Lexer::Lexer(CharStream *input) : Recognizer(), _input(input) {
+Lexer::Lexer(CharStream *input, ANTLRErrorListener *listener)
+    : Recognizer(listener), _input(input) {
   InitializeInstanceFields();
 }
 

@@ -88,8 +88,8 @@ namespace antlr4 {
     std::vector<size_t> modeStack;
     size_t mode;
 
-    Lexer();
-    Lexer(CharStream *input);
+    Lexer(ANTLRErrorListener *listener = &ConsoleErrorListener::INSTANCE);
+    Lexer(CharStream *input, ANTLRErrorListener *listener = &ConsoleErrorListener::INSTANCE);
     virtual ~Lexer() {}
 
     virtual void reset();

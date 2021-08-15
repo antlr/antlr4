@@ -75,7 +75,8 @@ void Parser::TrimToSizeListener::exitEveryRule(ParserRuleContext * ctx) {
   ctx->children.shrink_to_fit();
 }
 
-Parser::Parser(TokenStream *input) {
+Parser::Parser(TokenStream *input, ANTLRErrorListener *listener)
+    : Recognizer(listener) {
   InitializeInstanceFields();
   setInputStream(input);
 }
@@ -645,4 +646,3 @@ void Parser::InitializeInstanceFields() {
   _tracer = nullptr;
   _ctx = nullptr;
 }
-
