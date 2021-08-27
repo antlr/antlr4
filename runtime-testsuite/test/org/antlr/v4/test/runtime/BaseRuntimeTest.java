@@ -57,8 +57,12 @@ public abstract class BaseRuntimeTest {
 
 	@BeforeClass
 	public static void startHeartbeatToAvoidTimeout() {
-		if (isTravisCI() || isAppVeyorCI())
+		if(requiresHeartbeat())
 			startHeartbeat();
+	}
+
+	private static boolean requiresHeartbeat() {
+		return isTravisCI() || isAppVeyorCI() || (isCPP() && isRecursion()) || (isCircleCI() && isGo());
 	}
 
 	@AfterClass
@@ -66,16 +70,37 @@ public abstract class BaseRuntimeTest {
 		heartbeat = false;
 	}
 
+	private static boolean isRecursion() {
+		String s = System.getenv("GROUP");
+		return "recursion".equalsIgnoreCase(s);
+	}
+
+	private static boolean isGo() {
+		String s = System.getenv("TARGET");
+		return "go".equalsIgnoreCase(s);
+	}
+
+	private static boolean isCPP() {
+		String s = System.getenv("TARGET");
+		return "cpp".equalsIgnoreCase(s);
+	}
+
+	private static boolean isCircleCI() {
+		// see https://circleci.com/docs/2.0/env-vars/#built-in-environment-variables
+		String s = System.getenv("CIRCLECI");
+		return "true".equalsIgnoreCase(s);
+	}
+
 	private static boolean isAppVeyorCI() {
 		// see https://www.appveyor.com/docs/environment-variables/
 		String s = System.getenv("APPVEYOR");
-		return s!=null && "true".equals(s.toLowerCase());
+		return "true".equalsIgnoreCase(s);
 	}
 
 	private static boolean isTravisCI() {
 		// see https://docs.travis-ci.com/user/environment-variables/#default-environment-variables
 		String s = System.getenv("TRAVIS");
-		return s!=null && "true".equals(s.toLowerCase());
+		return "true".equalsIgnoreCase(s);
 	}
 
 	static boolean heartbeat = false;

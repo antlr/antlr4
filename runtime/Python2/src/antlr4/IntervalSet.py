@@ -28,8 +28,8 @@ class Interval(object):
 class IntervalSet(object):
 
     def __init__(self):
-        self.intervals = None
-        self.readOnly = False
+        self.intervals = None # type: list | None
+        self.readonly = False
 
     def __iter__(self):
         if self.intervals is not None:

@@ -19,7 +19,6 @@ import java.util.*;
 import static junit.framework.TestCase.*;
 import static org.antlr.v4.test.runtime.BaseRuntimeTest.readFile;
 import static org.antlr.v4.test.runtime.BaseRuntimeTest.writeFile;
-import static org.junit.Assert.assertArrayEquals;
 
 
 public class BaseDartTest extends BaseRuntimeTestSupport implements RuntimeTestSupport {
@@ -147,7 +146,9 @@ public class BaseDartTest extends BaseRuntimeTestSupport implements RuntimeTestS
 		final File dartToolDir = new File(getTempDirPath(), ".dart_tool");
 		if (cacheDartPackages == null) {
 			try {
-				final Process process = Runtime.getRuntime().exec(new String[]{locatePub(), "get"}, null, getTempTestDir());
+				final Process process =
+					Runtime.getRuntime().exec(
+						new String[]{locateDart(), "pub", "get"}, null, getTempTestDir());
 				StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
 				stderrVacuum.start();
 				Timer timer = new Timer();
@@ -207,8 +208,8 @@ public class BaseDartTest extends BaseRuntimeTestSupport implements RuntimeTestS
 		try {
 			if (compile) {
 				String[] args = new String[]{
-					locateDart2Native(),
-					className + ".dart", "-o", className
+					locateDart(),
+					"compile", "exe", className + ".dart", "-o", className
 				};
 				String cmdLine = Utils.join(args, " ");
 				System.err.println("Compile: " + cmdLine);
@@ -314,46 +315,12 @@ public class BaseDartTest extends BaseRuntimeTestSupport implements RuntimeTestS
 		throw new RuntimeException("Could not locate " + tool);
 	}
 
-	protected String locatePub() {
-		String propName = getPropertyPrefix() + "-pub";
-		String prop = System.getProperty(propName);
-
-		if (prop == null || prop.length() == 0) {
-			prop = locateTool("pub");
-		}
-
-		File file = new File(prop);
-
-		if (!file.exists()) {
-			throw new RuntimeException("Missing system property:" + propName);
-		}
-
-		return file.getAbsolutePath();
-	}
-
 	protected String locateDart() {
 		String propName = getPropertyPrefix() + "-dart";
 		String prop = System.getProperty(propName);
 
 		if (prop == null || prop.length() == 0) {
 			prop = locateTool("dart");
-		}
-
-		File file = new File(prop);
-
-		if (!file.exists()) {
-			throw new RuntimeException("Missing system property:" + propName);
-		}
-
-		return file.getAbsolutePath();
-	}
-
-	protected String locateDart2Native() {
-		String propName = getPropertyPrefix() + "-dart2native";
-		String prop = System.getProperty(propName);
-
-		if (prop == null || prop.length() == 0) {
-			prop = locateTool("dart2native");
 		}
 
 		File file = new File(prop);

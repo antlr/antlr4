@@ -528,7 +528,7 @@ class ParserATNSimulator extends ATNSimulator {
         if (this.debug) {
             const altSubSets = PredictionMode.getConflictingAltSubsets(reach);
             console.log("SLL altSubSets=" + Utils.arrayToString(altSubSets) +
-                        ", previous=" + previousD.configs +
+                        /*", previous=" + previousD.configs + */
                         ", configs=" + reach +
                         ", predict=" + predictedAlt +
                         ", allSubsetsConflict=" +
