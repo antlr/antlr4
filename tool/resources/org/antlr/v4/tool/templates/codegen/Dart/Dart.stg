@@ -46,7 +46,6 @@ ParserFile(file, parser, namedActions, contextSuperClass) ::= <<
 library <file.genPackage>;
 
 import 'package:antlr4/antlr4.dart';
-import 'dart:io';
 
 <if(file.genListener)>
 part '<file.grammarName>Listener.dart';
@@ -59,7 +58,6 @@ part '<file.grammarName>BaseVisitor.dart';
 part '<file.grammarName>Lexer.dart';
 <else>
 import 'package:antlr4/antlr4.dart';
-import 'dart:io';
 
 <if(file.genListener)>
 import '<file.grammarName>Listener.dart';

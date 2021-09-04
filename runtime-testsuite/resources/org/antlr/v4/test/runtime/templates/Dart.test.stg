@@ -1,5 +1,5 @@
 writeln(s) ::= <<print(<s>);>>
-write(s) ::= <<stdout.write(<s>);>>
+write(s) ::= <<TEST_platformStdoutWrite(<s>);>>
 writeList(s) ::= <<print(<s; separator="+">);>>
 
 False() ::= "false"
@@ -242,7 +242,7 @@ TokenGetterListener(X) ::= <<
 class LeafListener extends TBaseListener {
   void exitA(AContext ctx) {
     if (ctx.childCount==2)
-      stdout.write("${ctx.INT(0)?.symbol.text} ${ctx.INT(1)?.symbol.text} ${ctx.INTs()}");
+      TEST_platformStdoutWrite("${ctx.INT(0)?.symbol.text} ${ctx.INT(1)?.symbol.text} ${ctx.INTs()}");
     else
       print(ctx.ID()?.symbol);
   }
@@ -255,7 +255,7 @@ RuleGetterListener(X) ::= <<
 class LeafListener extends TBaseListener {
   void exitA(AContext ctx) {
     if (ctx.childCount==2) {
-      stdout.write("${ctx.b(0)?.start?.text} ${ctx.b(1)?.start?.text} ${ctx.bs()[0].start?.text}");
+      TEST_platformStdoutWrite("${ctx.b(0)?.start?.text} ${ctx.b(1)?.start?.text} ${ctx.bs()[0].start?.text}");
     } else
       print(ctx.b(0)?.start?.text);
   }
@@ -269,7 +269,7 @@ LRListener(X) ::= <<
 class LeafListener extends TBaseListener {
   void exitE(EContext ctx) {
     if (ctx.childCount==3) {
-      stdout.write("${ctx.e(0)?.start?.text} ${ctx.e(1)?.start?.text} ${ctx.es()[0].start?.text}\n");
+      print("${ctx.e(0)?.start?.text} ${ctx.e(1)?.start?.text} ${ctx.es()[0].start?.text}");
     } else
       print(ctx.INT()?.symbol.text);
   }
@@ -281,7 +281,7 @@ LRWithLabelsListener(X) ::= <<
 @parser::definitions {
 class LeafListener extends TBaseListener {
   void exitCall(CallContext ctx) {
-    stdout.write("${ctx.e()?.start?.text} ${ctx.eList()}");
+    TEST_platformStdoutWrite("${ctx.e()?.start?.text} ${ctx.eList()}");
   }
   void exitInt(IntContext ctx) {
     print(ctx.INT()?.symbol.text);
