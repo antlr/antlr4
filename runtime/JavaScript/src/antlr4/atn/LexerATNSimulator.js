@@ -4,7 +4,7 @@
  */
 
 const {Token} = require('./../Token');
-const {Lexer} = require('./../Lexer');
+const Lexer = require('./../Lexer');
 const ATN = require('./ATN');
 const ATNSimulator = require('./ATNSimulator');
 const {DFAState} = require('./../dfa/DFAState');

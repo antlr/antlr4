@@ -9,6 +9,10 @@ package org.antlr.v4.test.runtime.python2;
 import org.antlr.v4.test.runtime.python.BasePythonTest;
 import org.stringtemplate.v4.ST;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import static org.antlr.v4.test.runtime.BaseRuntimeTest.writeFile;
 
 public class BasePython2Test extends BasePythonTest {
@@ -19,8 +23,8 @@ public class BasePython2Test extends BasePythonTest {
 	}
 
 	@Override
-	protected String getPythonExecutable() {
-		return "python2.7";
+	protected List<String> getPythonExecutables() {
+		return Collections.singletonList("python2.7");
 	}
 
 	@Override
@@ -43,7 +47,7 @@ public class BasePython2Test extends BasePythonTest {
 								: "") + "\n" + "if __name__ == '__main__':\n"
 						+ "    main(sys.argv)\n" + "\n");
 		outputFileST.add("lexerName", lexerName);
-		writeFile(tmpdir, "Test.py", outputFileST.render());
+		writeFile(getTempDirPath(), "Test.py", outputFileST.render());
 	}
 
 	@Override
@@ -101,6 +105,6 @@ public class BasePython2Test extends BasePythonTest {
 		outputFileST.add("listenerName", listenerName);
 		outputFileST.add("visitorName", visitorName);
 		outputFileST.add("parserStartRuleName", parserStartRuleName);
-		writeFile(tmpdir, "Test.py", outputFileST.render());
+		writeFile(getTempDirPath(), "Test.py", outputFileST.render());
 	}
 }

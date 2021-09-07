@@ -46,7 +46,7 @@ namespace antlrcpp {
 
         case ' ':
           if (escapeSpaces) {
-            result += "·";
+            result += "\u00B7";
             break;
           }
           // else fall through
@@ -200,12 +200,6 @@ namespace antlrcpp {
 
     result += std::string(nestCount, ')');
     return result;
-  }
-
-  //----------------- FinallyAction ------------------------------------------------------------------------------------
-
-  FinalAction finally(std::function<void ()> f) {
-    return FinalAction(f);
   }
 
   //----------------- SingleWriteMultipleRead --------------------------------------------------------------------------

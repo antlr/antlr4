@@ -12,6 +12,11 @@ from antlr4.atn.ATNState import ATNState, DecisionState
 
 
 class ATN(object):
+    __slots__ = (
+        'grammarType', 'maxTokenType', 'states', 'decisionToState',
+        'ruleToStartState', 'ruleToStopState', 'modeNameToStartState',
+        'ruleToTokenType', 'lexerActions', 'modeToStartState'
+    )
 
     INVALID_ALT_NUMBER = 0
 

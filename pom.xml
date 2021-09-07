@@ -13,7 +13,7 @@
 	</parent>
 	<groupId>org.antlr</groupId>
 	<artifactId>antlr4-master</artifactId>
-	<version>4.8-2-SNAPSHOT</version>
+	<version>4.9.3-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>ANTLR 4</name>
@@ -151,7 +151,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.6.0</version>
+					<version>3.8.1</version>
 					<configuration>
 						<source>${maven.compiler.source}</source>
 						<target>${maven.compiler.target}</target>

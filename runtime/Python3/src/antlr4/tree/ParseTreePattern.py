@@ -14,6 +14,7 @@ from antlr4.xpath.XPath import XPath
 
 
 class ParseTreePattern(object):
+    __slots__ = ('matcher', 'patternRuleIndex', 'pattern', 'patternTree')
 
     # Construct a new instance of the {@link ParseTreePattern} class.
     #

@@ -103,6 +103,8 @@ PositionAdjustingLexerDef() ::= ""
 PositionAdjustingLexer() ::= <<
 func (p *PositionAdjustingLexer) NextToken() antlr.Token {
 	if _, ok := p.Interpreter.(*PositionAdjustingLexerATNSimulator); !ok {
+		lexerDeserializer := antlr.NewATNDeserializer(nil)
+		lexerAtn := lexerDeserializer.DeserializeFromUInt16(serializedLexerAtn)
 		p.Interpreter = NewPositionAdjustingLexerATNSimulator(p, lexerAtn, p.Interpreter.DecisionToDFA(), p.Interpreter.SharedContextCache())
 		p.Virt = p
 	}

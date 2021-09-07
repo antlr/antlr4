@@ -28,13 +28,27 @@ public struct LookupDictionary {
 
     private func hash(_ config: ATNConfig) -> Int {
         if type == LookupDictionaryType.lookup {
-
-            var hashCode: Int = 7
-            hashCode = 31 * hashCode + config.state.stateNumber
-            hashCode = 31 * hashCode + config.alt
-            hashCode = 31 * hashCode + config.semanticContext.hashValue
-            return hashCode
-
+            /* migrating to XCode 12.3/Swift 5.3 introduced a very weird bug
+             where reading hashValue from a SemanticContext.AND instance woul:
+                call the AND empty constructor
+                NOT call AND.hash(into)
+             Could it be a Swift compiler bug ?
+             All tests pass when using Hasher.combine()
+             Keeping the old code for reference:
+             
+                var hashCode: Int = 7
+                hashCode = 31 * hashCode + config.state.stateNumber
+                hashCode = 31 * hashCode + config.alt
+                hashCode = 31 * hashCode + config.semanticContext.hashValue // <- the crash would occur here
+                return hashCode
+             
+            */
+            var hasher = Hasher()
+            hasher.combine(7)
+            hasher.combine(config.state.stateNumber)
+            hasher.combine(config.alt)
+            hasher.combine(config.semanticContext)
+            return hasher.finalize()
         } else {
             //Ordered
             return config.hashValue

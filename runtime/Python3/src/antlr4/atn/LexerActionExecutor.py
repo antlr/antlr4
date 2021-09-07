@@ -20,6 +20,7 @@ Lexer = None
 LexerActionExecutor = None
 
 class LexerActionExecutor(object):
+    __slots__ = ('lexerActions', 'hashCode')
 
     def __init__(self, lexerActions:list=list()):
         self.lexerActions = lexerActions

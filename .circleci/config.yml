@@ -1,0 +1,66 @@
+version: 2.1
+
+jobs:
+  test_tool_and_runtime_java:
+    docker:
+      - image: cimg/openjdk:8.0
+    steps:
+      - checkout
+      - run:
+          name: build tool
+          command: mvn -B -V -DskipTests=true -Dmaven.javadoc.skip=true install
+      - run:
+          name: test runtime
+          command: |
+            cd runtime-testsuite
+            mvn -q -Dparallel=methods -DthreadCount=4 -Dtest=java.* test
+            cd ..
+      - run:
+          name: test tool
+          command: |
+            cd tool-testsuite
+            mvn -q -Dparallel=methods -DthreadCount=4 test
+            cd ..
+  test_runtime:
+    parameters:
+      test-group:
+        description: The section
+        type: string
+        default: ALL
+      target:
+        description: The target
+        type: string
+        default: java
+    docker:
+      - image: cimg/openjdk:8.0
+    environment:
+      TARGET: << parameters.target >>
+      GROUP: << parameters.test-group >>
+    steps:
+      - checkout
+      - run:
+          name: Install << parameters.target >> pre-requisites
+          command: |
+            f=".circleci/scripts/install-linux-<< parameters.target >>.sh"; ! [ -x "$f" ] || "$f"
+      - run:
+          name: Build ANTLR4 tool
+          command: mvn -B -V -DskipTests=true -Dmaven.javadoc.skip=true install
+      - run:
+          name: Test << parameters.target >> runtime
+          command: |
+            .circleci/scripts/run-tests-<< parameters.target >>.sh
+
+workflows:
+  build:
+    jobs:
+      - test_tool_and_runtime_java
+      - test_runtime:
+          matrix:
+            parameters:
+              target: [ dart, go, python2, python3, javascript, php ]
+      - test_runtime:
+          matrix:
+            parameters:
+#              target: [ cpp, dotnet, swift ]
+              target: [ cpp, dotnet, dart ]
+              test-group: [ LEXER, PARSER, RECURSION ]

@@ -192,7 +192,7 @@ std::vector<ParseTree *> Trees::getDescendants(ParseTree *t) {
   std::size_t n = t->children.size();
   for (size_t i = 0 ; i < n ; i++) {
     auto descentants = getDescendants(t->children[i]);
-    for (auto entry: descentants) {
+    for (auto *entry: descentants) {
       nodes.push_back(entry);
     }
   }

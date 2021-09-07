@@ -15,15 +15,39 @@ namespace tree {
     static ParseTreeWalker &DEFAULT;
 
     virtual ~ParseTreeWalker();
-
+    
+    /**
+    * <summary>
+    * Performs a walk on the given parse tree starting at the root and going down recursively
+	* with depth-first search. On each node, <seealso cref="ParseTreeWalker#enterRule"/> is called before
+    * recursively walking down into child nodes, then
+    * <seealso cref="ParseTreeWalker#exitRule"/> is called after the recursive call to wind up.
+	* </summary>
+    * <param name='listener'> The listener used by the walker to process grammar rules </param>
+	* <param name='t'> The parse tree to be walked on </param>
+    */
     virtual void walk(ParseTreeListener *listener, ParseTree *t) const;
 
   protected:
-    /// The discovery of a rule node, involves sending two events: the generic
-    /// <seealso cref="ParseTreeListener#enterEveryRule"/> and a
-    /// <seealso cref="RuleContext"/>-specific event. First we trigger the generic and then
-    /// the rule specific. We do them in reverse order upon finishing the node.
+    
+    /**
+    * <summary>
+    * Enters a grammar rule by first triggering the generic event <seealso cref="ParseTreeListener#enterEveryRule"/>
+	* then by triggering the event specific to the given parse tree node
+	* </summary>
+    * <param name='listener'> The listener responding to the trigger events </param>
+	* <param name='r'> The grammar rule containing the rule context </param>
+    */
     virtual void enterRule(ParseTreeListener *listener, ParseTree *r) const;
+    
+    /**
+    * <summary>
+    * Exits a grammar rule by first triggering the event specific to the given parse tree node
+	* then by triggering the generic event <seealso cref="ParseTreeListener#exitEveryRule"/>
+	* </summary>
+    * <param name='listener'> The listener responding to the trigger events </param>
+	* <param name='r'> The grammar rule containing the rule context </param>
+    */
     virtual void exitRule(ParseTreeListener *listener, ParseTree *r) const;
   };
 

@@ -1,3 +1,0 @@
-[submodule "runtime/PHP"]
-	path = runtime/PHP
-	url = https://github.com/antlr/antlr-php-runtime.git

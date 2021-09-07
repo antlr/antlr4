@@ -11,8 +11,6 @@
 
 using namespace antlr4::atn;
 
-const size_t ATNConfig::SUPPRESS_PRECEDENCE_FILTER = 0x40000000;
-
 ATNConfig::ATNConfig(ATNState *state_, size_t alt_, Ref<PredictionContext> const& context_)
   : ATNConfig(state_, alt_, context_, SemanticContext::NONE) {
 }

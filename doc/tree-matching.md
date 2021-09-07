@@ -52,15 +52,6 @@ m.setDelimiters("<<", ">>", "$"); // $ is the escape character
 
 This would allow pattern `<<ID>> = <<expr>> ;$<< ick $>>` to be interpreted as elements: `ID`, ` = `, `expr`, and ` ;<< ick >>`.
 
-```java
-String xpath = "//blockStatement/*";
-String treePattern = "int <Identifier> = <expression>;";
-ParseTreePattern p =
-parser.compileParseTreePattern(treePattern,
-JavaParser.RULE_localVariableDeclarationStatement);
-List<ParseTreeMatch> matches = p.findAll(tree, xpath);
-```
-
 ### Pattern labels
 
 The tree pattern matcher tracks the nodes in the tree at matches against the tags in a tree pattern. That way we can use the `get()` and `getAll()` methods to retrieve components of the matched subtree. For example, for pattern `<ID>`, `get("ID")` returns the node matched for that `ID`. If more than one node matched the specified token or rule tag, only the first match is returned. If there is no node associated with the label, this returns null.

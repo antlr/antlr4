@@ -95,6 +95,7 @@ def filterPrecedencePredicates(collection:set):
 
 
 class Predicate(SemanticContext):
+    __slots__ = ('ruleIndex', 'predIndex', 'isCtxDependent')
 
     def __init__(self, ruleIndex:int=-1, predIndex:int=-1, isCtxDependent:bool=False):
         self.ruleIndex = ruleIndex
@@ -153,6 +154,7 @@ class PrecedencePredicate(SemanticContext):
 # is false.
 del AND
 class AND(SemanticContext):
+    __slots__ = 'opnds'
 
     def __init__(self, a:SemanticContext, b:SemanticContext):
         operands = set()
@@ -238,6 +240,7 @@ class AND(SemanticContext):
 # contexts is true.
 del OR
 class OR (SemanticContext):
+    __slots__ = 'opnds'
 
     def __init__(self, a:SemanticContext, b:SemanticContext):
         operands = set()
