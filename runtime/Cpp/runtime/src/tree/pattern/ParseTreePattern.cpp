@@ -3,6 +3,8 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include "antlr4-common.h"
+
 #include "tree/ParseTree.h"
 #include "tree/pattern/ParseTreePatternMatcher.h"
 #include "tree/pattern/ParseTreeMatch.h"
@@ -14,8 +16,6 @@
 
 using namespace antlr4::tree;
 using namespace antlr4::tree::pattern;
-
-using namespace antlrcpp;
 
 ParseTreePattern::ParseTreePattern(ParseTreePatternMatcher *matcher, const std::string &pattern, int patternRuleIndex_,
                                    ParseTree *patternTree)

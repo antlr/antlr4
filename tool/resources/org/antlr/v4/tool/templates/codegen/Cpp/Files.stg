@@ -253,7 +253,7 @@ public:
 <namedActions.basevisitordeclarations>
 
 <file.visitorNames: { lname |
-  virtual antlrcpp::Any visit<lname; format = "cap">(<file.parserName>::<lname; format = "cap">Context *ctx) override {
+  virtual std::any visit<lname; format = "cap">(<file.parserName>::<lname; format = "cap">Context *ctx) override {
     return visitChildren(ctx);
   \}
 }; separator="\n">
@@ -312,7 +312,7 @@ public:
    * Visit parse trees produced by <file.parserName>.
    */
   <file.visitorNames: {lname |
-  virtual antlrcpp::Any visit<lname; format = "cap">(<file.parserName>::<lname; format = "cap">Context *context) = 0;
+  virtual std::any visit<lname; format = "cap">(<file.parserName>::<lname; format = "cap">Context *context) = 0;
   }; separator="\n">
 
 <if (namedActions.visitormembers)>

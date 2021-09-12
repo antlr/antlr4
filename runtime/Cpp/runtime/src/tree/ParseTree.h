@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "support/Any.h"
+#include "antlr4-common.h"
 
 namespace antlr4 {
 namespace tree {
@@ -49,8 +49,8 @@ namespace tree {
     virtual bool operator == (const ParseTree &other) const;
 
     /// The <seealso cref="ParseTreeVisitor"/> needs a double dispatch method.
-    // ml: This has been changed to use Any instead of a template parameter, to avoid the need of a virtual template function.
-    virtual antlrcpp::Any accept(ParseTreeVisitor *visitor) = 0;
+    // ml: This has been changed to use std::any instead of a template parameter, to avoid the need of a virtual template function.
+    virtual std::any accept(ParseTreeVisitor *visitor) = 0;
 
     /// Return the combined text of all leaf nodes. Does not get any
     /// off-channel tokens (if any) so won't return whitespace and

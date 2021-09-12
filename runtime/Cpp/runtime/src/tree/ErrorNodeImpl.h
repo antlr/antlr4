@@ -5,11 +5,11 @@
 
 #pragma once
 
+#include "antlr4-common.h"
+
 #include "tree/ErrorNode.h"
 #include "tree/TerminalNodeImpl.h"
 #include "misc/Interval.h"
-
-#include "support/Any.h"
 
 namespace antlr4 {
 namespace tree {
@@ -26,7 +26,7 @@ namespace tree {
     ErrorNodeImpl(Token *token);
     ~ErrorNodeImpl() override;
 
-    virtual antlrcpp::Any accept(ParseTreeVisitor *visitor) override;
+    virtual std::any accept(ParseTreeVisitor *visitor) override;
   };
 
 } // namespace tree
