@@ -111,6 +111,12 @@ public enum ErrorType {
 	 */
 	STRING_TEMPLATE_WARNING(22, "template error: <arg> <arg2><if(exception&&verbose)>: <exception>" +
 				   "<stackTrace; separator=\"\\n\"><endif>", ErrorSeverity.WARNING),
+	/**
+	 * Compiler Error 23.
+	 *
+	 * <p>invalid command-line option input <em>option</em></p>
+	 */
+	INVALID_CMDLINE_ARG_INPUT(23, "invalid command-line option input <arg>:<arg2>", ErrorSeverity.ERROR),
 
 	/*
 	 * Code generation errors
