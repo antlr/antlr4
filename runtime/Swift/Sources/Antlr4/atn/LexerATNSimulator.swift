@@ -72,16 +72,6 @@ open class LexerATNSimulator: ATNSimulator {
     public private(set) final var decisionToDFA: [DFA]
     
     internal var mode = Lexer.DEFAULT_MODE
-    
-    /// 
-    /// mutex for DFAState change
-    /// 
-    private let dfaStateMutex = Mutex()
-    
-    /// 
-    /// mutex for changes to all DFAStates map
-    /// 
-    private let dfaStatesMutex = Mutex()
 
     /// 
     /// Used during DFA/ATN exec to record the most recent accept configuration info
@@ -675,7 +665,7 @@ open class LexerATNSimulator: ATNSimulator {
             print("EDGE \(p) -> \(q) upon \(t)")
         }
 
-        dfaStateMutex.synchronized {
+        p.mutex.synchronized {
             if p.edges == nil {
                 //  make room for tokens 1..n and -1 masquerading as index 0
                 p.edges = [DFAState?](repeating: nil, count: LexerATNSimulator.MAX_DFA_EDGE - LexerATNSimulator.MIN_DFA_EDGE + 1)
@@ -709,7 +699,7 @@ open class LexerATNSimulator: ATNSimulator {
 
         let dfa = decisionToDFA[mode]
 
-        return dfaStatesMutex.synchronized {
+        return dfa.statesMutex.synchronized {
             if let existing = dfa.states[proposed] {
                 return existing
             }
