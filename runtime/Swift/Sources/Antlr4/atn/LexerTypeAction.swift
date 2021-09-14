@@ -29,7 +29,7 @@ public class LexerTypeAction: LexerAction, CustomStringConvertible {
     /// - returns: The type to assign to a token created by the lexer.
     /// 
     public func getType() -> Int {
-        return type
+        type
     }
 
     /// 
@@ -38,7 +38,7 @@ public class LexerTypeAction: LexerAction, CustomStringConvertible {
     /// 
 
     public override func getActionType() -> LexerActionType {
-        return LexerActionType.type
+        LexerActionType.type
     }
 
     /// 
@@ -47,7 +47,7 @@ public class LexerTypeAction: LexerAction, CustomStringConvertible {
     /// 
     override
     public func isPositionDependent() -> Bool {
-        return false
+        false
     }
 
     /// 
@@ -67,7 +67,7 @@ public class LexerTypeAction: LexerAction, CustomStringConvertible {
     }
 
     public var description: String {
-        return "type(\(type))"
+        "type(\(type))"
     }
 }
 

@@ -23,21 +23,21 @@ public final class AtomTransition: Transition, CustomStringConvertible {
 
     override
     public func getSerializationType() -> Int {
-        return Transition.ATOM
+        Transition.ATOM
     }
 
     override
     public func labelIntervalSet() -> IntervalSet? {
-        return IntervalSet(label)
+        IntervalSet(label)
     }
 
     override
     public func matches(_ symbol: Int, _ minVocabSymbol: Int, _ maxVocabSymbol: Int) -> Bool {
-        return label == symbol
+        label == symbol
     }
 
 
     public var description: String {
-        return String(label)
+        String(label)
     }
 }

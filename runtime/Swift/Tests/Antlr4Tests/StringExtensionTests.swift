@@ -23,8 +23,7 @@ private func doLastIndexTest(_ str: String, _ target: String, _ expectedOffset: 
     let expectedIdx: String.Index?
     if let expectedOffset = expectedOffset {
         expectedIdx = str.index(str.startIndex, offsetBy: expectedOffset)
-    }
-    else {
+    } else {
         expectedIdx = nil
     }
     XCTAssertEqual(str.lastIndex(of: target), expectedIdx)

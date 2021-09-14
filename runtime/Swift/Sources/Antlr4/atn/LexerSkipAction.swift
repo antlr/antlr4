@@ -33,7 +33,7 @@ public final class LexerSkipAction: LexerAction, CustomStringConvertible {
     /// 
     override
     public func getActionType() -> LexerActionType {
-        return LexerActionType.skip
+        LexerActionType.skip
     }
 
     /// 
@@ -42,7 +42,7 @@ public final class LexerSkipAction: LexerAction, CustomStringConvertible {
     /// 
     override
     public func isPositionDependent() -> Bool {
-        return false
+        false
     }
 
     /// 
@@ -61,10 +61,10 @@ public final class LexerSkipAction: LexerAction, CustomStringConvertible {
     }
 
     public var description: String {
-        return "skip"
+        "skip"
     }
 }
 
 public func ==(lhs: LexerSkipAction, rhs: LexerSkipAction) -> Bool {
-    return lhs === rhs
+    lhs === rhs
 }

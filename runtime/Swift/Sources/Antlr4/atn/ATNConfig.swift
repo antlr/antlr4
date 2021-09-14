@@ -111,11 +111,11 @@ public class ATNConfig: Hashable, CustomStringConvertible {
     /// _#isPrecedenceFilterSuppressed_ method.
     /// 
     public final func getOuterContextDepth() -> Int {
-        return reachesIntoOuterContext & ~SUPPRESS_PRECEDENCE_FILTER
+        reachesIntoOuterContext & ~SUPPRESS_PRECEDENCE_FILTER
     }
 
     public final func isPrecedenceFilterSuppressed() -> Bool {
-        return (reachesIntoOuterContext & SUPPRESS_PRECEDENCE_FILTER) != 0
+        (reachesIntoOuterContext & SUPPRESS_PRECEDENCE_FILTER) != 0
     }
 
     public final func setPrecedenceFilterSuppressed(_ value: Bool) {
@@ -135,7 +135,7 @@ public class ATNConfig: Hashable, CustomStringConvertible {
 
     public var description: String {
         //return "MyClass \(string)"
-        return toString(nil, true)
+        toString(nil, true)
     }
     public func toString<T>(_ recog: Recognizer<T>?, _ showAlt: Bool) -> String {
         var buf = "(\(state)"

@@ -257,7 +257,7 @@ open class Parser: Recognizer<ParserATNSimulator> {
     /// parsing, otherwise `false`
     /// 
     public func getBuildParseTree() -> Bool {
-        return _buildParseTrees
+        _buildParseTrees
     }
 
     /// 
@@ -283,11 +283,11 @@ open class Parser: Recognizer<ParserATNSimulator> {
     /// using the default _org.antlr.v4.runtime.Parser.TrimToSizeListener_ during the parse process.
     /// 
     public func getTrimParseTree() -> Bool {
-        return !getParseListeners().filter({ $0 === TrimToSizeListener.INSTANCE }).isEmpty
+        !getParseListeners().filter({ $0 === TrimToSizeListener.INSTANCE }).isEmpty
     }
 
     public func getParseListeners() -> [ParseTreeListener] {
-        return _parseListeners ?? [ParseTreeListener]()
+        _parseListeners ?? [ParseTreeListener]()
     }
 
     /// 
@@ -395,12 +395,12 @@ open class Parser: Recognizer<ParserATNSimulator> {
     /// - SeeAlso: #notifyErrorListeners
     /// 
     public func getNumberOfSyntaxErrors() -> Int {
-        return _syntaxErrors
+        _syntaxErrors
     }
 
     override
     open func getTokenFactory() -> TokenFactory {
-        return _input.getTokenSource().getTokenFactory()
+        _input.getTokenSource().getTokenFactory()
     }
 
     /// Tell our token source and error strategy about a new way to create tokens.
@@ -462,7 +462,7 @@ open class Parser: Recognizer<ParserATNSimulator> {
 
 
     public func getErrorHandler() -> ANTLRErrorStrategy {
-        return _errHandler
+        _errHandler
     }
 
     public func setErrorHandler(_ handler: ANTLRErrorStrategy) {
@@ -471,7 +471,7 @@ open class Parser: Recognizer<ParserATNSimulator> {
 
     override
     open func getInputStream() -> IntStream? {
-        return getTokenStream()
+        getTokenStream()
     }
 
     override
@@ -480,7 +480,7 @@ open class Parser: Recognizer<ParserATNSimulator> {
     }
 
     public func getTokenStream() -> TokenStream? {
-        return _input
+        _input
     }
 
     /// Set the token stream and reset the parser.
@@ -496,7 +496,7 @@ open class Parser: Recognizer<ParserATNSimulator> {
     /// 
 
     public func getCurrentToken() throws -> Token {
-        return try _input.LT(1)!
+        try _input.LT(1)!
     }
 
     public final func notifyErrorListeners(_ msg: String) {
@@ -577,7 +577,7 @@ open class Parser: Recognizer<ParserATNSimulator> {
     /// - Since: 4.7
     /// 
     public func createTerminalNode(parent: ParserRuleContext, t: Token) -> TerminalNode {
-        return TerminalNodeImpl(t)
+        TerminalNodeImpl(t)
     }
 
     /// How to create an error node, given a token, associated with a parent.
@@ -586,7 +586,7 @@ open class Parser: Recognizer<ParserATNSimulator> {
     /// - Since: 4.7
     /// 
     public func createErrorNode(parent: ParserRuleContext, t: Token) -> ErrorNode {
-        return ErrorNode(t)
+        ErrorNode(t)
     }
 
     internal func addContextToParseTree() {
@@ -730,7 +730,7 @@ open class Parser: Recognizer<ParserATNSimulator> {
     }
 
     public func getContext() -> ParserRuleContext? {
-        return _ctx
+        _ctx
     }
 
     public func setContext(_ ctx: ParserRuleContext) {
@@ -739,12 +739,12 @@ open class Parser: Recognizer<ParserATNSimulator> {
 
     override
     open func precpred(_ localctx: RuleContext?, _ precedence: Int) -> Bool {
-        return precedence >= _precedenceStack.peek()!
+        precedence >= _precedenceStack.peek()!
     }
 
     public func inContext(_ context: String) -> Bool {
         // TODO: useful in parser?
-        return false
+        false
     }
 
     /// Given an AmbiguityInfo object that contains information about an
@@ -909,7 +909,7 @@ open class Parser: Recognizer<ParserATNSimulator> {
     /// - SeeAlso: org.antlr.v4.runtime.atn.ATN#getExpectedTokens(int, org.antlr.v4.runtime.RuleContext)
     /// 
     public func getExpectedTokens() throws -> IntervalSet {
-        return try getATN().getExpectedTokens(getState(), getContext()!)
+        try getATN().getExpectedTokens(getState(), getContext()!)
     }
 
 
@@ -921,11 +921,11 @@ open class Parser: Recognizer<ParserATNSimulator> {
 
     /// Get a rule's index (i.e., `RULE_ruleName` field) or -1 if not found.
     public func getRuleIndex(_ ruleName: String) -> Int {
-        return getRuleIndexMap()[ruleName] ?? -1
+        getRuleIndexMap()[ruleName] ?? -1
     }
 
     public func getRuleContext() -> ParserRuleContext? {
-        return _ctx
+        _ctx
     }
 
     /// Return List&lt;String&gt; of the rule names in your parser instance
@@ -936,7 +936,7 @@ open class Parser: Recognizer<ParserATNSimulator> {
     /// This is very useful for error messages.
     /// 
     public func getRuleInvocationStack() -> [String] {
-        return getRuleInvocationStack(_ctx)
+        getRuleInvocationStack(_ctx)
     }
 
     public func getRuleInvocationStack(_ p: RuleContext?) -> [String] {
@@ -987,7 +987,7 @@ open class Parser: Recognizer<ParserATNSimulator> {
     }
 
     public func getSourceName() -> String {
-        return _input.getSourceName()
+        _input.getSourceName()
     }
 
     override
@@ -1041,6 +1041,6 @@ open class Parser: Recognizer<ParserATNSimulator> {
     /// - SeeAlso: #setTrace(boolean)
     /// 
     public func isTrace() -> Bool {
-        return _tracer != nil
+        _tracer != nil
     }
 }

@@ -46,7 +46,7 @@ public class InterpreterRuleContext: ParserRuleContext {
 
     override
     public func getRuleIndex() -> Int {
-        return ruleIndex
+        ruleIndex
     }
 
     /// 

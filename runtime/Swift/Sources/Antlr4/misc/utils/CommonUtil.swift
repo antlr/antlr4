@@ -17,19 +17,19 @@ func errPrint(_ msg: String) {
 }
 
 public func +(lhs: String, rhs: Int) -> String {
-    return lhs + String(rhs)
+    lhs + String(rhs)
 }
 
 public func +(lhs: Int, rhs: String) -> String {
-    return String(lhs) + rhs
+    String(lhs) + rhs
 }
 
 public func +(lhs: String, rhs: Token) -> String {
-    return lhs + rhs.description
+    lhs + rhs.description
 }
 
 public func +(lhs: Token, rhs: String) -> String {
-    return lhs.description + rhs
+    lhs.description + rhs
 }
 
 infix operator >>> : BitwiseShiftPrecedence
@@ -58,7 +58,7 @@ func >>>(lhs: Int, rhs: Int) -> Int {
 }
 
 func intChar2String(_ i: Int) -> String {
-    return String(Character(integerLiteral: i))
+    String(Character(integerLiteral: i))
 }
 
 func log(_ message: String = "", file: String = #file, function: String = #function, lineNum: Int = #line) {
@@ -71,11 +71,11 @@ func log(_ message: String = "", file: String = #file, function: String = #funct
 }
 
 func toInt(_ c: Character) -> Int {
-    return c.unicodeValue
+    c.unicodeValue
 }
 
 func toInt32(_ data: [Character], _ offset: Int) -> Int {
-    return data[offset].unicodeValue | (data[offset + 1].unicodeValue << 16)
+    data[offset].unicodeValue | (data[offset + 1].unicodeValue << 16)
 }
 
 func toLong(_ data: [Character], _ offset: Int) -> Int64 {

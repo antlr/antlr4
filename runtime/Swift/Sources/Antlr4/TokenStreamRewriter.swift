@@ -113,7 +113,7 @@ public class TokenStreamRewriter {
         /// Return the index of the next token to operate on.
         /// 
         public func execute(_ buf: inout String) throws -> Int {
-            return index
+            index
         }
 
         public var description: String {
@@ -188,11 +188,11 @@ public class TokenStreamRewriter {
         }
 
         final var count: Int {
-            return rewrites.count
+            rewrites.count
         }
 
         final var isEmpty: Bool {
-            return rewrites.isEmpty
+            rewrites.isEmpty
         }
 
         /// We need to combine operations and report invalid operations (like
@@ -396,7 +396,7 @@ public class TokenStreamRewriter {
     }
 
     public final func getTokenStream() -> TokenStream {
-        return tokens
+        tokens
     }
 
     public func rollback(_ instructionIndex: Int) {
@@ -516,11 +516,11 @@ public class TokenStreamRewriter {
     }
 
     public func getLastRewriteTokenIndex() -> Int {
-        return getLastRewriteTokenIndex(DEFAULT_PROGRAM_NAME)
+        getLastRewriteTokenIndex(DEFAULT_PROGRAM_NAME)
     }
 
     internal func getLastRewriteTokenIndex(_ programName: String) -> Int {
-        return lastRewriteTokenIndexes[programName] ?? -1
+        lastRewriteTokenIndexes[programName] ?? -1
     }
 
     internal func setLastRewriteTokenIndex(_ programName: String, _ i: Int) {
@@ -546,14 +546,14 @@ public class TokenStreamRewriter {
     /// instructions given to this rewriter.
     /// 
     public func getText() throws -> String {
-        return try getText(DEFAULT_PROGRAM_NAME, Interval.of(0, tokens.size() - 1))
+        try getText(DEFAULT_PROGRAM_NAME, Interval.of(0, tokens.size() - 1))
     }
 
     /// Return the text from the original tokens altered per the
     /// instructions given to this rewriter in programName.
     /// 
     public func getText(_ programName: String) throws -> String {
-        return try getText(programName, Interval.of(0, tokens.size() - 1))
+        try getText(programName, Interval.of(0, tokens.size() - 1))
     }
 
     /// Return the text associated with the tokens in the interval from the
@@ -566,7 +566,7 @@ public class TokenStreamRewriter {
     /// The same is true if you do an insertAfter the stop token.
     /// 
     public func getText(_ interval: Interval) throws -> String {
-        return try getText(DEFAULT_PROGRAM_NAME, interval)
+        try getText(DEFAULT_PROGRAM_NAME, interval)
     }
 
     public func getText(_ programName: String, _ interval: Interval) throws -> String {

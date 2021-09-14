@@ -12,18 +12,18 @@ public final class NotSetTransition: SetTransition {
 
     override
     public func getSerializationType() -> Int {
-        return Transition.NOT_SET
+        Transition.NOT_SET
     }
 
     override
     public func matches(_ symbol: Int, _ minVocabSymbol: Int, _ maxVocabSymbol: Int) -> Bool {
-        return symbol >= minVocabSymbol
+        symbol >= minVocabSymbol
                 && symbol <= maxVocabSymbol
                 && !super.matches(symbol, minVocabSymbol, maxVocabSymbol)
     }
 
     override
     public var description: String {
-        return "~" + super.description
+        "~" + super.description
     }
 }

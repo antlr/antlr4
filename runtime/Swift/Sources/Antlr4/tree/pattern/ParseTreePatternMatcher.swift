@@ -185,7 +185,7 @@ public class ParseTreePatternMatcher {
     /// input stream is reset.
     /// 
     public func getLexer() -> Lexer {
-        return lexer
+        lexer
     }
 
     /// 
@@ -193,7 +193,7 @@ public class ParseTreePatternMatcher {
     /// used to parse the pattern into a parse tree.
     /// 
     public func getParser() -> Parser {
-        return parser
+        parser
     }
 
     // ---- SUPPORT CODE ----

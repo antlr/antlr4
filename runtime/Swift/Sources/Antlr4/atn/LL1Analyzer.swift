@@ -67,7 +67,7 @@ public class LL1Analyzer {
     /// specified `ctx`.
     /// 
     public func LOOK(_ s: ATNState, _ ctx: RuleContext?) -> IntervalSet {
-        return LOOK(s, nil, ctx)
+        LOOK(s, nil, ctx)
     }
 
     /// 

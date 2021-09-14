@@ -34,7 +34,7 @@ public final class LexerPopModeAction: LexerAction, CustomStringConvertible {
     /// 
     override
     public func getActionType() -> LexerActionType {
-        return LexerActionType.popMode
+        LexerActionType.popMode
     }
 
     /// 
@@ -43,7 +43,7 @@ public final class LexerPopModeAction: LexerAction, CustomStringConvertible {
     /// 
 
     public override func isPositionDependent() -> Bool {
-        return false
+        false
     }
 
     /// 
@@ -62,10 +62,10 @@ public final class LexerPopModeAction: LexerAction, CustomStringConvertible {
     }
 
     public var description: String {
-        return "popMode"
+        "popMode"
     }
 }
 
 public func ==(lhs: LexerPopModeAction, rhs: LexerPopModeAction) -> Bool {
-    return lhs === rhs
+    lhs === rhs
 }

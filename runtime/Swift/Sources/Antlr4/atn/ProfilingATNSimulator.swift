@@ -215,6 +215,6 @@ public class ProfilingATNSimulator: ParserATNSimulator {
 
 
     public func getDecisionInfo() -> [DecisionInfo] {
-        return decisions
+        decisions
     }
 }

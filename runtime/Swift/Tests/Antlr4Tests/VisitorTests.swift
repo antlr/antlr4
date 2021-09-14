@@ -27,15 +27,15 @@ class VisitorTests: XCTestCase {
 
         class Visitor: VisitorBasicBaseVisitor<String> {
             override func visitTerminal(_ node: TerminalNode) -> String? {
-                return "\(node.getSymbol()!)\n"
+                "\(node.getSymbol()!)\n"
             }
 
             override func defaultResult() -> String? {
-                return ""
+                ""
             }
 
             override func aggregateResult(_ aggregate: String?, _ nextResult: String?) -> String? {
-                return aggregate! + nextResult!
+                aggregate! + nextResult!
             }
         }
 
@@ -82,15 +82,15 @@ class VisitorTests: XCTestCase {
 
         class Visitor: VisitorBasicBaseVisitor<String> {
             override func visitErrorNode(_ node: ErrorNode) -> String? {
-                return "Error encountered: \(node.getSymbol()!)"
+                "Error encountered: \(node.getSymbol()!)"
             }
 
             override func defaultResult() -> String? {
-                return ""
+                ""
             }
 
             override func aggregateResult(_ aggregate: String?, _ nextResult: String?) -> String? {
-                return aggregate! + nextResult!
+                aggregate! + nextResult!
             }
         }
 
@@ -115,11 +115,11 @@ class VisitorTests: XCTestCase {
 
         class Visitor: VisitorBasicBaseVisitor<String> {
             override func visitTerminal(_ node: TerminalNode) -> String? {
-                return "\(node.getSymbol()!)\n"
+                "\(node.getSymbol()!)\n"
             }
 
             override func shouldVisitNextChild(_ node: RuleNode, _ currentResult: String?) -> Bool {
-                return currentResult == nil || currentResult!.isEmpty
+                currentResult == nil || currentResult!.isEmpty
             }
         }
 
@@ -149,11 +149,11 @@ class VisitorTests: XCTestCase {
             }
 
             override func defaultResult() -> String? {
-                return "default result"
+                "default result"
             }
 
             override func shouldVisitNextChild(_ node: RuleNode, _ currentResult: String?) -> Bool {
-                return false
+                false
             }
         }
 
@@ -176,11 +176,11 @@ class VisitorTests: XCTestCase {
 
         class Visitor: VisitorCalcBaseVisitor<Int> {
             override func visitS(_ ctx: VisitorCalcParser.SContext) -> Int? {
-                return visit(ctx.expr()!)
+                visit(ctx.expr()!)
             }
 
             override func visitNumber(_ ctx: VisitorCalcParser.NumberContext) -> Int? {
-                return Int((ctx.INT()?.getText())!)
+                Int((ctx.INT()?.getText())!)
             }
 
             override func visitMultiply(_ ctx: VisitorCalcParser.MultiplyContext) -> Int? {

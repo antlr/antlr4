@@ -36,16 +36,16 @@ public final class RuleTransition: Transition {
 
     override
     public func getSerializationType() -> Int {
-        return Transition.RULE
+        Transition.RULE
     }
 
     override
     public func isEpsilon() -> Bool {
-        return true
+        true
     }
 
     override
     public func matches(_ symbol: Int, _ minVocabSymbol: Int, _ maxVocabSymbol: Int) -> Bool {
-        return false
+        false
     }
 }

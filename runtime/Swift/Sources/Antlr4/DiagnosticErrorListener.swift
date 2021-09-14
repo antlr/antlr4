@@ -126,7 +126,7 @@ public class DiagnosticErrorListener: BaseErrorListener {
     /// returns the set of alternatives represented in `configs`.
     /// 
     internal func getConflictingAlts(_ reportedAlts: BitSet?, _ configs: ATNConfigSet) -> BitSet {
-        return reportedAlts ?? configs.getAltBitSet()
+        reportedAlts ?? configs.getAltBitSet()
     }
 }
 

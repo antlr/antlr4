@@ -191,6 +191,6 @@ public class ListTokenSource: TokenSource {
     }
 
     public func getTokenFactory() -> TokenFactory {
-        return _factory
+        _factory
     }
 }

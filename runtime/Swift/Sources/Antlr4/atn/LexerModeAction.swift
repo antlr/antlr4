@@ -31,7 +31,7 @@ public final class LexerModeAction: LexerAction, CustomStringConvertible {
     /// - returns: The lexer mode for this `mode` command.
     /// 
     public func getMode() -> Int {
-        return mode
+        mode
     }
 
     /// 
@@ -40,7 +40,7 @@ public final class LexerModeAction: LexerAction, CustomStringConvertible {
     /// 
 
     public override func getActionType() -> LexerActionType {
-        return LexerActionType.mode
+        LexerActionType.mode
     }
 
     /// 
@@ -49,7 +49,7 @@ public final class LexerModeAction: LexerAction, CustomStringConvertible {
     /// 
 
     public override func isPositionDependent() -> Bool {
-        return false
+        false
     }
 
     /// 
@@ -68,7 +68,7 @@ public final class LexerModeAction: LexerAction, CustomStringConvertible {
     }
 
     public var description: String {
-        return "mode(\(mode))"
+        "mode(\(mode))"
     }
 }
 

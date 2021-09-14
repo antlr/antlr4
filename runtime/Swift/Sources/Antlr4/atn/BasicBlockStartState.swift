@@ -14,6 +14,6 @@
 public final class BasicBlockStartState: BlockStartState {
     override
     public func getStateType() -> Int {
-        return BlockStartState.BLOCK_START
+        BlockStartState.BLOCK_START
     }
 }

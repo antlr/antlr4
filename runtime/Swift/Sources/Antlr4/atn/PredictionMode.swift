@@ -208,7 +208,7 @@ public enum PredictionMode {
     /// 
     public static func hasConfigInRuleStopState(_ configs: ATNConfigSet) -> Bool {
 
-        return  configs.hasConfigInRuleStopState
+        configs.hasConfigInRuleStopState
     }
 
     /// 
@@ -223,7 +223,7 @@ public enum PredictionMode {
     /// 
     public static func allConfigsInRuleStopStates(_ configs: ATNConfigSet) -> Bool {
 
-        return configs.allConfigsInRuleStopStates
+        configs.allConfigsInRuleStopStates
     }
 
     /// 
@@ -364,7 +364,7 @@ public enum PredictionMode {
     /// `A={{1,2`}} or `{{1,2`,{1,2}}}, etc...
     /// 
     public static func resolvesToJustOneViableAlt(_ altsets: [BitSet]) -> Int {
-        return getSingleViableAlt(altsets)
+        getSingleViableAlt(altsets)
     }
 
     /// 
@@ -376,7 +376,7 @@ public enum PredictionMode {
     /// _java.util.BitSet#cardinality cardinality_ &gt; 1, otherwise `false`
     /// 
     public static func allSubsetsConflict(_ altsets: [BitSet]) -> Bool {
-        return !hasNonConflictingAltSet(altsets)
+        !hasNonConflictingAltSet(altsets)
     }
 
     /// 
@@ -467,7 +467,7 @@ public enum PredictionMode {
     /// Get union of all alts from configs. - Since: 4.5.1
     /// 
     public static func getAlts(_ configs: ATNConfigSet) -> BitSet {
-        return configs.getAltBitSet()
+        configs.getAltBitSet()
 
     }
 
@@ -482,7 +482,7 @@ public enum PredictionMode {
     /// 
 
     public static func getConflictingAltSubsets(_ configs: ATNConfigSet) -> [BitSet] {
-        return configs.getConflictingAltSubsets()
+        configs.getConflictingAltSubsets()
     }
 
     public static func hasStateAssociatedWithOneAlt(_ configs: ATNConfigSet) -> Bool {

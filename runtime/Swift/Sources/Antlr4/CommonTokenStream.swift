@@ -68,7 +68,7 @@ public class CommonTokenStream: BufferedTokenStream {
 
     override
     internal func adjustSeekIndex(_ i: Int) throws -> Int {
-        return try nextTokenOnChannel(i, channel)
+        try nextTokenOnChannel(i, channel)
     }
 
     override

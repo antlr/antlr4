@@ -15,6 +15,6 @@ public final class PlusLoopbackState: DecisionState {
 
     override
     public func getStateType() -> Int {
-        return ATNState.PLUS_LOOP_BACK
+        ATNState.PLUS_LOOP_BACK
     }
 }

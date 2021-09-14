@@ -18,21 +18,21 @@ public final class RangeTransition: Transition, CustomStringConvertible {
 
     override
     public func getSerializationType() -> Int {
-        return Transition.RANGE
+        Transition.RANGE
     }
 
     override
     public func labelIntervalSet() -> IntervalSet? {
-        return IntervalSet.of(from, to)
+        IntervalSet.of(from, to)
     }
 
     override
     public func matches(_ symbol: Int, _ minVocabSymbol: Int, _ maxVocabSymbol: Int) -> Bool {
-        return symbol >= from && symbol <= to
+        symbol >= from && symbol <= to
     }
 
     public var description: String {
-        return "'" + String(from) + "'..'" + String(to) + "'"
+        "'" + String(from) + "'..'" + String(to) + "'"
 
     }
 }

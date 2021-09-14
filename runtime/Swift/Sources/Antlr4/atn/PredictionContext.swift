@@ -98,11 +98,11 @@ public class PredictionContext: Hashable, CustomStringConvertible {
     /// This means only the _#EMPTY_ context is in set.
     /// 
     public func isEmpty() -> Bool {
-        return self === PredictionContext.EMPTY
+        self === PredictionContext.EMPTY
     }
 
     public func hasEmptyPath() -> Bool {
-        return getReturnState(size() - 1) == PredictionContext.EMPTY_RETURN_STATE
+        getReturnState(size() - 1) == PredictionContext.EMPTY_RETURN_STATE
     }
 
     public func hash(into hasher: inout Hasher) {
@@ -668,12 +668,12 @@ public class PredictionContext: Hashable, CustomStringConvertible {
     }
 
     public func toString<T>(_ recog: Recognizer<T>) -> String {
-        return String(describing: PredictionContext.self)
+        String(describing: PredictionContext.self)
         //		return toString(recog, ParserRuleContext.EMPTY);
     }
 
     public func toStrings<T>(_ recognizer: Recognizer<T>, _ currentState: Int) -> [String] {
-        return toStrings(recognizer, PredictionContext.EMPTY, currentState)
+        toStrings(recognizer, PredictionContext.EMPTY, currentState)
     }
 
     // FROM SAM
@@ -745,7 +745,7 @@ public class PredictionContext: Hashable, CustomStringConvertible {
     }
 
     public var description: String {
-        return String(describing: PredictionContext.self) + "@" + String(Unmanaged.passUnretained(self).toOpaque().hashValue)
+        String(describing: PredictionContext.self) + "@" + String(Unmanaged.passUnretained(self).toOpaque().hashValue)
     }
 }
 
@@ -780,21 +780,21 @@ public func ==(lhs: PredictionContext, rhs: PredictionContext) -> Bool {
 }
 
 public func ==(lhs: ArrayPredictionContext, rhs: SingletonPredictionContext) -> Bool {
-    return false
+    false
 }
 
 public func ==(lhs: SingletonPredictionContext, rhs: ArrayPredictionContext) -> Bool {
-    return false
+    false
 }
 
 public func ==(lhs: SingletonPredictionContext, rhs: EmptyPredictionContext) -> Bool {
-    return false
+    false
 }
 
 public func ==(lhs: EmptyPredictionContext, rhs: ArrayPredictionContext) -> Bool {
-    return lhs === rhs
+    lhs === rhs
 }
 
 public func ==(lhs: EmptyPredictionContext, rhs: SingletonPredictionContext) -> Bool {
-    return lhs === rhs
+    lhs === rhs
 }

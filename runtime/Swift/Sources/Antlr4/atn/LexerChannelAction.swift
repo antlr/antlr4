@@ -30,7 +30,7 @@ public final class LexerChannelAction: LexerAction, CustomStringConvertible {
     /// - returns: The channel to use for the _org.antlr.v4.runtime.Token_ created by the lexer.
     /// 
     public func getChannel() -> Int {
-        return channel
+        channel
     }
 
     /// 
@@ -39,7 +39,7 @@ public final class LexerChannelAction: LexerAction, CustomStringConvertible {
     /// 
 
     public override func getActionType() -> LexerActionType {
-        return LexerActionType.channel
+        LexerActionType.channel
     }
 
     /// 
@@ -48,7 +48,7 @@ public final class LexerChannelAction: LexerAction, CustomStringConvertible {
     /// 
 
     public override func isPositionDependent() -> Bool {
-        return false
+        false
     }
 
     /// 
@@ -69,7 +69,7 @@ public final class LexerChannelAction: LexerAction, CustomStringConvertible {
     }
 
     public var description: String {
-        return "channel\(channel)"
+        "channel\(channel)"
     }
 
 }

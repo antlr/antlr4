@@ -926,7 +926,7 @@ open class ParserATNSimulator: ATNSimulator {
     /// the configurations from `configs` which are in a rule stop state
     /// 
     final func removeAllConfigsNotInRuleStopState(_ configs: ATNConfigSet, _ lookToEndOfRule: Bool) -> ATNConfigSet {
-        return configs.removeAllConfigsNotInRuleStopState(&mergeCache,lookToEndOfRule,atn)
+        configs.removeAllConfigsNotInRuleStopState(&mergeCache, lookToEndOfRule, atn)
     }
 
 
@@ -1103,7 +1103,7 @@ open class ParserATNSimulator: ATNSimulator {
     /// calling _org.antlr.v4.runtime.Parser#getPrecedence_).
     /// 
     final internal func applyPrecedenceFilter(_ configs: ATNConfigSet) throws -> ATNConfigSet {
-        return try configs.applyPrecedenceFilter(&mergeCache,parser,_outerContext)
+        try configs.applyPrecedenceFilter(&mergeCache, parser, _outerContext)
     }
 
     final internal func getReachableTarget(_ trans: Transition, _ ttype: Int) -> ATNState? {
@@ -1225,7 +1225,7 @@ open class ParserATNSimulator: ATNSimulator {
 
     final internal func getAltThatFinishedDecisionEntryRule(_ configs: ATNConfigSet) -> Int {
 
-        return configs.getAltThatFinishedDecisionEntryRule()
+        configs.getAltThatFinishedDecisionEntryRule()
     }
 
     /// 
@@ -1242,7 +1242,7 @@ open class ParserATNSimulator: ATNSimulator {
         _ configs: ATNConfigSet,
         _ outerContext: ParserRuleContext) throws -> (ATNConfigSet, ATNConfigSet) {
 
-            return try configs.splitAccordingToSemanticValidity(outerContext, evalSemanticContext)
+        try configs.splitAccordingToSemanticValidity(outerContext, evalSemanticContext)
     }
 
     /// 
@@ -1313,7 +1313,7 @@ open class ParserATNSimulator: ATNSimulator {
     /// - since: 4.3
     /// 
     internal func evalSemanticContext(_ pred: SemanticContext, _ parserCallStack: ParserRuleContext, _ alt: Int, _ fullCtx: Bool) throws -> Bool {
-        return try pred.eval(parser, parserCallStack)
+        try pred.eval(parser, parserCallStack)
     }
 
     /// 
@@ -1887,7 +1887,7 @@ open class ParserATNSimulator: ATNSimulator {
     }
 
     public final func getLookaheadName(_ input: TokenStream) throws -> String {
-        return try getTokenName(input.LA(1))
+        try getTokenName(input.LA(1))
     }
 
     /// 
@@ -2073,10 +2073,10 @@ open class ParserATNSimulator: ATNSimulator {
 
 
     public final func getPredictionMode() -> PredictionMode {
-        return mode
+        mode
     }
 
     public final func getParser() -> Parser {
-        return parser
+        parser
     }
 }

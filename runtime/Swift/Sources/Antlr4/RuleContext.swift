@@ -91,21 +91,21 @@ open class RuleContext: RuleNode {
     /// current context.
     /// 
     open func isEmpty() -> Bool {
-        return invokingState == -1
+        invokingState == -1
     }
 
     // satisfy the ParseTree / SyntaxTree interface
 
     open func getSourceInterval() -> Interval {
-        return Interval.INVALID
+        Interval.INVALID
     }
 
     open func getRuleContext() -> RuleContext {
-        return self
+        self
     }
 
     open func getParent() -> Tree? {
-        return parent
+        parent
     }
 
     open func setParent(_ parent: RuleContext) {
@@ -113,7 +113,7 @@ open class RuleContext: RuleNode {
     }
 
     open func getPayload() -> AnyObject {
-        return self
+        self
     }
 
     /// Return the combined text of all child nodes. This method only considers
@@ -139,19 +139,21 @@ open class RuleContext: RuleNode {
     }
 
     open func getRuleIndex() -> Int {
-        return -1
+        -1
     }
 
-    open func getAltNumber() -> Int { return ATN.INVALID_ALT_NUMBER }
+    open func getAltNumber() -> Int {
+        ATN.INVALID_ALT_NUMBER
+    }
     open func setAltNumber(_ altNumber: Int) { }
 
     open func getChild(_ i: Int) -> Tree? {
-        return nil
+        nil
     }
 
 
     open func getChildCount() -> Int {
-        return 0
+        0
     }
 
 
@@ -161,7 +163,7 @@ open class RuleContext: RuleNode {
 
 
     open func accept<T>(_ visitor: ParseTreeVisitor<T>) -> T? {
-        return visitor.visitChildren(self)
+        visitor.visitChildren(self)
     }
 
     /// Print out a whole tree, not just a node, in LISP format
@@ -169,34 +171,34 @@ open class RuleContext: RuleNode {
     /// We have to know the recognizer so we can get rule names.
     ///
     open func toStringTree(_ recog: Parser) -> String {
-        return Trees.toStringTree(self, recog)
+        Trees.toStringTree(self, recog)
     }
 
     /// Print out a whole tree, not just a node, in LISP format
     /// (root child1 .. childN). Print just a node if this is a leaf.
     /// 
     public func toStringTree(_ ruleNames: [String]?) -> String {
-        return Trees.toStringTree(self, ruleNames)
+        Trees.toStringTree(self, ruleNames)
     }
 
     open func toStringTree() -> String {
-        return toStringTree(nil)
+        toStringTree(nil)
     }
 
     open var description: String {
-        return toString(nil, nil)
+        toString(nil, nil)
     }
 
      open var debugDescription: String {
-         return description
+         description
     }
 
     public final func toString<T>(_ recog: Recognizer<T>) -> String {
-        return toString(recog, ParserRuleContext.EMPTY)
+        toString(recog, ParserRuleContext.EMPTY)
     }
 
     public final func toString(_ ruleNames: [String]) -> String {
-        return toString(ruleNames, nil)
+        toString(ruleNames, nil)
     }
 
     // recog null unless ParserRuleContext, in which case we use subclass toString(...)
@@ -234,7 +236,7 @@ open class RuleContext: RuleNode {
     }
 
     open func castdown<T>(_ subType: T.Type) -> T {
-        return self as! T
+        self as! T
     }
 
 }

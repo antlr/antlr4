@@ -95,12 +95,12 @@ public class Transition {
     /// transition consumes (matches) an input symbol.
     /// 
     public func isEpsilon() -> Bool {
-        return false
+        false
     }
 
 
     public func labelIntervalSet() -> IntervalSet? {
-        return nil
+        nil
     }
 
     public func matches(_ symbol: Int, _ minVocabSymbol: Int, _ maxVocabSymbol: Int) -> Bool {

@@ -213,7 +213,7 @@ open class ParserRuleContext: RuleContext {
     }
 
     open func getRuleContext<T: ParserRuleContext>(_ ctxType: T.Type, _ i: Int) -> T? {
-        return getChild(ctxType, i: i)
+        getChild(ctxType, i: i)
     }
 
     open func getRuleContexts<T: ParserRuleContext>(_ ctxType: T.Type) -> [T] {
@@ -225,12 +225,12 @@ open class ParserRuleContext: RuleContext {
 
     override
     open func getChildCount() -> Int {
-        return children?.count ?? 0
+        children?.count ?? 0
     }
 
     override
     open subscript(index: Int) -> ParseTree {
-        return children![index]
+        children![index]
     }
 
     override
@@ -247,7 +247,7 @@ open class ParserRuleContext: RuleContext {
     /// (for example, zero length or error productions) this token may exceed stop.
     /// 
     open func getStart() -> Token? {
-        return start
+        start
     }
     /// 
     /// Get the final token in this context.
@@ -255,7 +255,7 @@ open class ParserRuleContext: RuleContext {
     /// (for example, zero length or error productions) this token may precede start.
     /// 
     open func getStop() -> Token? {
-        return stop
+        stop
     }
 
     /// Used for rule context info debugging during parse-time, not so much for ATN debugging

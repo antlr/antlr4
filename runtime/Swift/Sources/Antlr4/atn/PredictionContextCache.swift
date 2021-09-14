@@ -36,10 +36,10 @@ public final class PredictionContextCache {
     }
 
     public func get(_ ctx: PredictionContext) -> PredictionContext? {
-        return cache[ctx]
+        cache[ctx]
     }
 
     public func size() -> Int {
-        return cache.count
+        cache.count
     }
 }

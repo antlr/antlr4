@@ -192,7 +192,7 @@ public class IntervalSet: IntSet, Hashable, CustomStringConvertible {
     }
 
     public func complement(_ minElement: Int, _ maxElement: Int) -> IntSet? {
-        return complement(IntervalSet.of(minElement, maxElement))
+        complement(IntervalSet.of(minElement, maxElement))
     }
 
     ///
@@ -418,7 +418,7 @@ public class IntervalSet: IntSet, Hashable, CustomStringConvertible {
     /// 
 
     public func isNil() -> Bool {
-        return intervals.isEmpty
+        intervals.isEmpty
     }
 
     /// 
@@ -467,7 +467,7 @@ public class IntervalSet: IntSet, Hashable, CustomStringConvertible {
     /// Return a list of Interval objects.
     /// 
     public func getIntervals() -> [Interval] {
-        return intervals
+        intervals
     }
 
     public func hash(into hasher: inout Hasher) {
@@ -494,7 +494,7 @@ public class IntervalSet: IntSet, Hashable, CustomStringConvertible {
     /// 
 
     public var description: String {
-        return toString(false)
+        toString(false)
     }
 
     public func toString(_ elemAreChar: Bool) -> String {
@@ -689,7 +689,7 @@ public class IntervalSet: IntSet, Hashable, CustomStringConvertible {
     }
 
     public func isReadonly() -> Bool {
-        return readonly
+        readonly
     }
 
     public func makeReadonly() {
@@ -698,5 +698,5 @@ public class IntervalSet: IntSet, Hashable, CustomStringConvertible {
 }
 
 public func ==(lhs: IntervalSet, rhs: IntervalSet) -> Bool {
-    return lhs.intervals == rhs.intervals
+    lhs.intervals == rhs.intervals
 }

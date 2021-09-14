@@ -13,6 +13,6 @@ public final class TokensStartState: DecisionState {
 
     override
     public func getStateType() -> Int {
-        return ATNState.TOKEN_START
+        ATNState.TOKEN_START
     }
 }

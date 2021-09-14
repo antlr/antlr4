@@ -18,6 +18,6 @@ public final class PlusBlockStartState: BlockStartState {
 
     override
     public func getStateType() -> Int {
-        return ATNState.PLUS_BLOCK_START
+        ATNState.PLUS_BLOCK_START
     }
 }

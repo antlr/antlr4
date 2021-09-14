@@ -19,10 +19,10 @@
 
 public class Chunk: Equatable {
     public static func ==(lhs: Chunk, rhs: Chunk) -> Bool {
-        return lhs.isEqual(rhs)
+        lhs.isEqual(rhs)
     }
 
     public func isEqual(_ other: Chunk) -> Bool {
-        return false
+        false
     }
 }

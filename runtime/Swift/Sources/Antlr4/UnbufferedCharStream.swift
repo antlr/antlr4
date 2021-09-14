@@ -224,7 +224,7 @@ open class UnbufferedCharStream: CharStream {
     }
 
     public func index() -> Int {
-        return currentCharIndex
+        currentCharIndex
     }
 
     /** Seek to absolute character index, which might not be in the current
@@ -269,7 +269,7 @@ open class UnbufferedCharStream: CharStream {
     }
 
     public func getSourceName() -> String {
-        return name
+        name
     }
 
     public func getText(_ interval: Interval) throws -> String {
@@ -304,7 +304,7 @@ open class UnbufferedCharStream: CharStream {
     }
 
     internal func getBufferStartIndex() -> Int {
-        return currentCharIndex - p
+        currentCharIndex - p
     }
 }
 

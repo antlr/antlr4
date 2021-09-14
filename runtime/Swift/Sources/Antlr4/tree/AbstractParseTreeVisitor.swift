@@ -14,7 +14,7 @@ open class AbstractParseTreeVisitor<T>: ParseTreeVisitor<T> {
     /// specified tree.
     /// 
     open override func visit(_ tree: ParseTree) -> T? {
-        return tree.accept(self)
+        tree.accept(self)
     }
 
     ///
@@ -52,7 +52,7 @@ open class AbstractParseTreeVisitor<T>: ParseTreeVisitor<T> {
     /// _#defaultResult defaultResult_.
     /// 
     open override func visitTerminal(_ node: TerminalNode) -> T? {
-        return defaultResult()
+        defaultResult()
     }
 
     ///
@@ -61,7 +61,7 @@ open class AbstractParseTreeVisitor<T>: ParseTreeVisitor<T> {
     /// 
     override
     open func visitErrorNode(_ node: ErrorNode) -> T? {
-        return defaultResult()
+        defaultResult()
     }
 
     /// 
@@ -76,7 +76,7 @@ open class AbstractParseTreeVisitor<T>: ParseTreeVisitor<T> {
     /// - Returns: The default value returned by visitor methods.
     /// 
     open func defaultResult() -> T? {
-        return nil
+        nil
     }
 
     /// 
@@ -99,7 +99,7 @@ open class AbstractParseTreeVisitor<T>: ParseTreeVisitor<T> {
     /// - Returns: The updated aggregate result.
     /// 
     open func aggregateResult(_ aggregate: T?, _ nextResult: T?) -> T? {
-        return nextResult
+        nextResult
     }
 
     /// 
@@ -127,7 +127,7 @@ open class AbstractParseTreeVisitor<T>: ParseTreeVisitor<T> {
     /// current aggregate result from _#visitChildren_.
     /// 
     open func shouldVisitNextChild(_ node: RuleNode, _ currentResult: T?) -> Bool {
-        return true
+        true
     }
 
 }

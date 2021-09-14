@@ -71,67 +71,67 @@ public class Interval: Hashable {
     /// Does this start completely before other? Disjoint
     /// 
     public func startsBeforeDisjoint(_ other: Interval) -> Bool {
-        return self.a < other.a && self.b < other.a
+        self.a < other.a && self.b < other.a
     }
 
     /// 
     /// Does this start at or before other? Nondisjoint
     /// 
     public func startsBeforeNonDisjoint(_ other: Interval) -> Bool {
-        return self.a <= other.a && self.b >= other.a
+        self.a <= other.a && self.b >= other.a
     }
 
     /// 
     /// Does this.a start after other.b? May or may not be disjoint
     /// 
     public func startsAfter(_ other: Interval) -> Bool {
-        return self.a > other.a
+        self.a > other.a
     }
 
     /// 
     /// Does this start completely after other? Disjoint
     /// 
     public func startsAfterDisjoint(_ other: Interval) -> Bool {
-        return self.a > other.b
+        self.a > other.b
     }
 
     /// 
     /// Does this start after other? NonDisjoint
     /// 
     public func startsAfterNonDisjoint(_ other: Interval) -> Bool {
-        return self.a > other.a && self.a <= other.b // this.b>=other.b implied
+        self.a > other.a && self.a <= other.b // this.b>=other.b implied
     }
 
     /// 
     /// Are both ranges disjoint? I.e., no overlap?
     /// 
     public func disjoint(_ other: Interval) -> Bool {
-        return startsBeforeDisjoint(other) || startsAfterDisjoint(other)
+        startsBeforeDisjoint(other) || startsAfterDisjoint(other)
     }
 
     /// 
     /// Are two intervals adjacent such as 0..41 and 42..42?
     /// 
     public func adjacent(_ other: Interval) -> Bool {
-        return self.a == other.b + 1 || self.b == other.a - 1
+        self.a == other.b + 1 || self.b == other.a - 1
     }
 
     public func properlyContains(_ other: Interval) -> Bool {
-        return other.a >= self.a && other.b <= self.b
+        other.a >= self.a && other.b <= self.b
     }
 
     /// 
     /// Return the interval computed from combining this and other
     /// 
     public func union(_ other: Interval) -> Interval {
-        return Interval.of(min(a, other.a), max(b, other.b))
+        Interval.of(min(a, other.a), max(b, other.b))
     }
 
     /// 
     /// Return the interval in common between this and o
     /// 
     public func intersection(_ other: Interval) -> Interval {
-        return Interval.of(max(a, other.a), min(b, other.b))
+        Interval.of(max(a, other.a), min(b, other.b))
     }
 
     /// 
@@ -159,10 +159,10 @@ public class Interval: Hashable {
 
 
    public var description: String {
-        return "\(a)..\(b)"
+       "\(a)..\(b)"
     }
 }
 
 public func ==(lhs: Interval, rhs: Interval) -> Bool {
-    return lhs.a == rhs.a && lhs.b == rhs.b
+    lhs.a == rhs.a && lhs.b == rhs.b
 }

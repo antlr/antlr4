@@ -51,7 +51,7 @@ public final class LexerIndexedCustomAction: LexerAction {
     /// action should be executed.
     /// 
     public func getOffset() -> Int {
-        return offset
+        offset
     }
 
     /// 
@@ -60,7 +60,7 @@ public final class LexerIndexedCustomAction: LexerAction {
     /// - returns: A _org.antlr.v4.runtime.atn.LexerAction_ object which executes the lexer action.
     /// 
     public func getAction() -> LexerAction {
-        return action
+        action
     }
 
     /// 
@@ -71,7 +71,7 @@ public final class LexerIndexedCustomAction: LexerAction {
     /// 
 
     public override func getActionType() -> LexerActionType {
-        return action.getActionType()
+        action.getActionType()
     }
 
     /// 
@@ -80,7 +80,7 @@ public final class LexerIndexedCustomAction: LexerAction {
     /// 
 
     public override func isPositionDependent() -> Bool {
-        return true
+        true
     }
 
     /// 

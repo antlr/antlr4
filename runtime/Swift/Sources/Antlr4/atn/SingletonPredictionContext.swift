@@ -31,7 +31,7 @@ public class SingletonPredictionContext: PredictionContext {
 
     override
     public func size() -> Int {
-        return 1
+        1
     }
 
     override

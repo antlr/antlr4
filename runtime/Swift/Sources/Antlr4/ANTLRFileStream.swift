@@ -21,6 +21,6 @@ public class ANTLRFileStream: ANTLRInputStream {
 
     override
     public func getSourceName() -> String {
-        return fileName
+        fileName
     }
 }

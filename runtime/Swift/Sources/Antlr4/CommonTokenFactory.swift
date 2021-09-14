@@ -83,6 +83,6 @@ public class CommonTokenFactory: TokenFactory {
 
 
     public func create(_ type: Int, _ text: String) -> Token {
-        return CommonToken(type, text)
+        CommonToken(type, text)
     }
 }

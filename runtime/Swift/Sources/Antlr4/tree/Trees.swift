@@ -149,11 +149,11 @@ public class Trees {
     }
 
     public static func findAllTokenNodes(_ t: ParseTree, _ ttype: Int) -> Array<ParseTree> {
-        return findAllNodes(t, ttype, true)
+        findAllNodes(t, ttype, true)
     }
 
     public static func findAllRuleNodes(_ t: ParseTree, _ ruleIndex: Int) -> Array<ParseTree> {
-        return findAllNodes(t, ruleIndex, false)
+        findAllNodes(t, ruleIndex, false)
     }
 
     public static func findAllNodes(_ t: ParseTree, _ index: Int, _ findTokens: Bool) -> Array<ParseTree> {

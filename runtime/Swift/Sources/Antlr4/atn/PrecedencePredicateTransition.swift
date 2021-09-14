@@ -22,24 +22,24 @@ public final class PrecedencePredicateTransition: AbstractPredicateTransition, C
 
     override
     public func getSerializationType() -> Int {
-        return Transition.PRECEDENCE
+        Transition.PRECEDENCE
     }
 
     override
     public func isEpsilon() -> Bool {
-        return true
+        true
     }
 
     override
     public func matches(_ symbol: Int, _ minVocabSymbol: Int, _ maxVocabSymbol: Int) -> Bool {
-        return false
+        false
     }
 
     public func getPredicate() -> SemanticContext.PrecedencePredicate {
-        return SemanticContext.PrecedencePredicate(precedence)
+        SemanticContext.PrecedencePredicate(precedence)
     }
 
     public var description: String {
-        return "\(precedence)  >= _p"
+        "\(precedence)  >= _p"
     }
 }

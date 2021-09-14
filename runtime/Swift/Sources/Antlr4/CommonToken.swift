@@ -127,7 +127,7 @@ public class CommonToken: WritableToken {
 
 
     public func getType() -> Int {
-        return type
+        type
     }
 
 
@@ -174,12 +174,12 @@ public class CommonToken: WritableToken {
     }
 
     public func getLine() -> Int {
-        return line
+        line
     }
 
 
     public func getCharPositionInLine() -> Int {
-        return charPositionInLine
+        charPositionInLine
     }
 
 
@@ -189,7 +189,7 @@ public class CommonToken: WritableToken {
 
 
     public func getChannel() -> Int {
-        return channel
+        channel
     }
 
 
@@ -204,7 +204,7 @@ public class CommonToken: WritableToken {
 
 
     public func getStartIndex() -> Int {
-        return start
+        start
     }
 
     public func setStartIndex(_ start: Int) {
@@ -213,7 +213,7 @@ public class CommonToken: WritableToken {
 
 
     public func getStopIndex() -> Int {
-        return stop
+        stop
     }
 
     public func setStopIndex(_ stop: Int) {
@@ -222,7 +222,7 @@ public class CommonToken: WritableToken {
 
 
     public func getTokenIndex() -> Int {
-        return index
+        index
     }
 
 
@@ -232,20 +232,20 @@ public class CommonToken: WritableToken {
 
 
     public func getTokenSource() -> TokenSource? {
-        return source.tokenSource
+        source.tokenSource
     }
 
 
     public func getInputStream() -> CharStream? {
-        return source.stream
+        source.stream
     }
 
     public func getTokenSourceAndStream() -> TokenSourceAndStream {
-        return source
+        source
     }
 
     public var description: String {
-        return toString(nil)
+        toString(nil)
     }
 
     public func toString(_ r: Recognizer<ATNSimulator>?) -> String {
@@ -271,7 +271,7 @@ public class CommonToken: WritableToken {
 
     public var visited: Bool {
         get {
-            return _visited
+            _visited
         }
 
         set {

@@ -10,7 +10,7 @@ import Foundation
 extension Array {
    @discardableResult
     mutating func concat(_ addArray: [Element]) -> [Element] {
-        return self + addArray
+       self + addArray
     }
 
     mutating func removeObject<T:Equatable>(_ object: T) {
@@ -37,7 +37,7 @@ extension Array {
     /// :returns: The removed element
     /// 
     mutating func pop() -> Element {
-        return removeLast()
+        removeLast()
     }
     /// 
     /// Same as append.
@@ -104,7 +104,7 @@ extension Array {
     func slice(startIndex: Int, endIndex: Int) -> ArraySlice<Element> {
 
 
-        return self[startIndex ... endIndex]
+        self[startIndex...endIndex]
 
     }
     // func slice(index:Int,isClose:Bool = false) ->(first:Slice<Element> ,second:Slice<Element>){

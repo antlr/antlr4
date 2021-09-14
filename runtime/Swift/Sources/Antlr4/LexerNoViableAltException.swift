@@ -28,11 +28,11 @@ public class LexerNoViableAltException: RecognitionException, CustomStringConver
     }
 
     public func getStartIndex() -> Int {
-        return startIndex
+        startIndex
     }
 
     public func getDeadEndConfigs() -> ATNConfigSet {
-        return deadEndConfigs
+        deadEndConfigs
     }
 
     public var description: String {

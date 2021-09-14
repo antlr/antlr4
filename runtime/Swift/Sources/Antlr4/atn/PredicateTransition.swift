@@ -30,24 +30,24 @@ public final class PredicateTransition: AbstractPredicateTransition, CustomStrin
 
     override
     public func getSerializationType() -> Int {
-        return PredicateTransition.PREDICATE
+        PredicateTransition.PREDICATE
     }
 
     override
     public func isEpsilon() -> Bool {
-        return true
+        true
     }
 
     override
     public func matches(_ symbol: Int, _ minVocabSymbol: Int, _ maxVocabSymbol: Int) -> Bool {
-        return false
+        false
     }
 
     public func getPredicate() -> SemanticContext.Predicate {
-        return SemanticContext.Predicate(ruleIndex, predIndex, isCtxDependent)
+        SemanticContext.Predicate(ruleIndex, predIndex, isCtxDependent)
     }
 
     public var description: String {
-        return "pred_\(ruleIndex):\(predIndex)"
+        "pred_\(ruleIndex):\(predIndex)"
     }
 }

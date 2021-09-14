@@ -33,7 +33,7 @@ public class TextChunk: Chunk, CustomStringConvertible {
     /// 
 
     public final func getText() -> String {
-        return text
+        text
     }
 
     ///
@@ -41,7 +41,7 @@ public class TextChunk: Chunk, CustomStringConvertible {
     /// _#getText()_ in single quotes.
     ///
     public var description: String {
-        return "'\(text)'"
+        "'\(text)'"
     }
 
 

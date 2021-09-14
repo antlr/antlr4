@@ -229,7 +229,7 @@ open class Lexer: Recognizer<LexerATNSimulator>, TokenSource {
 
 
     open override func getTokenFactory() -> TokenFactory {
-        return _factory
+        _factory
     }
 
     /// 
@@ -246,12 +246,12 @@ open class Lexer: Recognizer<LexerATNSimulator>, TokenSource {
 
 
     open func getSourceName() -> String {
-        return _input!.getSourceName()
+        _input!.getSourceName()
     }
 
 
     open func getInputStream() -> CharStream? {
-        return _input
+        _input
     }
 
     /// 
@@ -299,12 +299,12 @@ open class Lexer: Recognizer<LexerATNSimulator>, TokenSource {
 
 
     open func getLine() -> Int {
-        return getInterpreter().getLine()
+        getInterpreter().getLine()
     }
 
 
     open func getCharPositionInLine() -> Int {
-        return getInterpreter().getCharPositionInLine()
+        getInterpreter().getCharPositionInLine()
     }
 
     open func setLine(_ line: Int) {
@@ -319,7 +319,7 @@ open class Lexer: Recognizer<LexerATNSimulator>, TokenSource {
     /// What is the index of the current character of lookahead?
     /// 
     open func getCharIndex() -> Int {
-        return _input!.index()
+        _input!.index()
     }
 
     /// 
@@ -345,7 +345,7 @@ open class Lexer: Recognizer<LexerATNSimulator>, TokenSource {
     /// Override if emitting multiple tokens.
     /// 
     open func getToken() -> Token {
-        return _token!
+        _token!
     }
 
     open func setToken(_ _token: Token) {
@@ -357,7 +357,7 @@ open class Lexer: Recognizer<LexerATNSimulator>, TokenSource {
     }
 
     open func getType() -> Int {
-        return _type
+        _type
     }
 
     open func setChannel(_ channel: Int) {
@@ -365,15 +365,15 @@ open class Lexer: Recognizer<LexerATNSimulator>, TokenSource {
     }
 
     open func getChannel() -> Int {
-        return _channel
+        _channel
     }
 
     open func getChannelNames() -> [String]? {
-        return nil
+        nil
     }
 
     open func getModeNames() -> [String]? {
-        return nil
+        nil
     }
 
     /// 
@@ -453,6 +453,6 @@ open class Lexer: Recognizer<LexerATNSimulator>, TokenSource {
     }
 
     internal func makeTokenSourceAndStream() -> TokenSourceAndStream {
-        return TokenSourceAndStream(self, _input)
+        TokenSourceAndStream(self, _input)
     }
 }

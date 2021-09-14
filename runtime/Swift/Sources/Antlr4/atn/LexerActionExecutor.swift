@@ -125,7 +125,7 @@ public class LexerActionExecutor: Hashable {
     /// - returns: The lexer actions to be executed by this executor.
     /// 
     public func getLexerActions() -> [LexerAction] {
-        return lexerActions
+        lexerActions
     }
 
     /// 

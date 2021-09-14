@@ -219,7 +219,7 @@ import Antlr4
  * \<p>The default implementation returns the result of calling
  * {@link #visitChildren\} on {@code ctx\}.\</p>
  */
-<accessLevelOpenOK(file)> func visit<lname; format="cap">(_ ctx: <file.parserName>.<lname; format="cap">Context) -> T? { return visitChildren(ctx) \}}; separator="\n">
+<accessLevelOpenOK(file)> func visit<lname; format="cap">(_ ctx: <file.parserName>.<lname; format="cap">Context) -> T? { visitChildren(ctx) \}}; separator="\n">
 }
 >>
 
@@ -268,16 +268,16 @@ Parser_(parser, funcs, atn, sempredFuncs, ctor, superClass) ::= <<
                     accessLevelNotOpen(parser))>
 
 	override <accessLevelOpenOK(parser)>
-	func getGrammarFileName() -> String { return "<parser.grammarFileName; format="java-escape">" }
+	func getGrammarFileName() -> String { "<parser.grammarFileName; format="java-escape">" }
 
 	override <accessLevelOpenOK(parser)>
-	func getRuleNames() -> [String] { return <parser.name>.ruleNames }
+	func getRuleNames() -> [String] { <parser.name>.ruleNames }
 
 	override <accessLevelOpenOK(parser)>
-	func getSerializedATN() -> String { return <parser.name>._serializedATN }
+	func getSerializedATN() -> String { <parser.name>._serializedATN }
 
 	override <accessLevelOpenOK(parser)>
-	func getATN() -> ATN { return <parser.name>._ATN }
+	func getATN() -> ATN { <parser.name>._ATN }
 
 	<namedActions.members>
 	<parser:(ctor)()>
@@ -351,7 +351,7 @@ parser_ctor(p) ::= <<
 
 override <accessLevelOpenOK(parser)>
 func getVocabulary() -> Vocabulary {
-    return <p.name>.VOCABULARY
+    <p.name>.VOCABULARY
 }
 
 override <accessLevelNotOpen(parser)>
@@ -789,31 +789,31 @@ ContextTokenGetterDecl(t) ::= <<
 ContextTokenListGetterDecl(t) ::= <<
 	<accessLevelOpenOK(parser)>
 	func <t.name>() -> [TerminalNode] {
-		return getTokens(<parser.name>.Tokens.<t.name>.rawValue)
+		getTokens(<parser.name>.Tokens.<t.name>.rawValue)
 	}
 >>
 ContextTokenListIndexedGetterDecl(t) ::= <<
 	<accessLevelOpenOK(parser)>
 	func <t.name>(_ i:Int) -> TerminalNode? {
-		return getToken(<parser.name>.Tokens.<t.name>.rawValue, i)
+		getToken(<parser.name>.Tokens.<t.name>.rawValue, i)
 	}
 >>
 ContextRuleGetterDecl(r) ::= <<
 	<accessLevelOpenOK(parser)>
 	func <r.name>() -> <r.ctxName>? {
-		return getRuleContext(<r.ctxName>.self, 0)
+		getRuleContext(<r.ctxName>.self, 0)
 	}
 >>
 ContextRuleListGetterDecl(r) ::= <<
 	<accessLevelOpenOK(parser)>
 	func <r.name>() -> [<r.ctxName>] {
-		return getRuleContexts(<r.ctxName>.self)
+		getRuleContexts(<r.ctxName>.self)
 	}
 >>
 ContextRuleListIndexedGetterDecl(r)   ::= <<
 	<accessLevelOpenOK(parser)>
 	func <r.name>(_ i: Int) -> <r.ctxName>? {
-		return getRuleContext(<r.ctxName>.self, i)
+		getRuleContext(<r.ctxName>.self, i)
 	}
 >>
 
@@ -848,7 +848,7 @@ StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMe
 
 	override <accessLevelOpenOK(parser)>
 	func getRuleIndex() -> Int {
-		return <parser.name>.RULE_<struct.derivedFromName>
+		<parser.name>.RULE_<struct.derivedFromName>
 	}
 <if(struct.provideCopyFrom && struct.attrs)> <! don't need copy unless we have subclasses !>
 	<accessLevelOpenOK(parser)>
@@ -1024,22 +1024,22 @@ Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
 	}
 
 	override <accessLevelOpenOK(lexer)>
-	func getGrammarFileName() -> String { return "<lexer.grammarFileName>" }
+	func getGrammarFileName() -> String { "<lexer.grammarFileName>" }
 
 	override <accessLevelOpenOK(lexer)>
-	func getRuleNames() -> [String] { return <lexer.name>.ruleNames }
+	func getRuleNames() -> [String] { <lexer.name>.ruleNames }
 
 	override <accessLevelOpenOK(lexer)>
-	func getSerializedATN() -> String { return <lexer.name>._serializedATN }
+	func getSerializedATN() -> String { <lexer.name>._serializedATN }
 
 	override <accessLevelOpenOK(lexer)>
-	func getChannelNames() -> [String] { return <lexer.name>.channelNames }
+	func getChannelNames() -> [String] { <lexer.name>.channelNames }
 
 	override <accessLevelOpenOK(lexer)>
-	func getModeNames() -> [String] { return <lexer.name>.modeNames }
+	func getModeNames() -> [String] { <lexer.name>.modeNames }
 
 	override <accessLevelOpenOK(lexer)>
-	func getATN() -> ATN { return <lexer.name>._ATN }
+	func getATN() -> ATN { <lexer.name>._ATN }
 
 	<dumpActions(lexer, "", actionFuncs, sempredFuncs)>
 	<atn>

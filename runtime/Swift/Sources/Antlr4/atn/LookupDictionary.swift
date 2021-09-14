@@ -86,7 +86,7 @@ public struct LookupDictionary {
     }
 
     public var isEmpty: Bool {
-        return cache.isEmpty
+        cache.isEmpty
     }
 
     public func contains(_ config: ATNConfig) -> Bool {

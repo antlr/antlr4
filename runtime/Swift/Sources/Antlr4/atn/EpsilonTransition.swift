@@ -28,26 +28,26 @@ public final class EpsilonTransition: Transition, CustomStringConvertible {
     /// -  4.4.1
     /// 
     public func outermostPrecedenceReturn() -> Int {
-        return outermostPrecedenceReturnInside
+        outermostPrecedenceReturnInside
     }
 
     override
     public func getSerializationType() -> Int {
-        return Transition.EPSILON
+        Transition.EPSILON
     }
 
     override
     public func isEpsilon() -> Bool {
-        return true
+        true
     }
 
     override
     public func matches(_ symbol: Int, _ minVocabSymbol: Int, _ maxVocabSymbol: Int) -> Bool {
-        return false
+        false
     }
 
 
     public var description: String {
-        return "epsilon"
+        "epsilon"
     }
 }

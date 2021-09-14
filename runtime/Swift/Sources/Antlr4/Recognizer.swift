@@ -45,7 +45,7 @@ open class Recognizer<ATNInterpreter: ATNSimulator>: RecognizerProtocol {
     /// Used for XPath and tree pattern compilation.
     /// 
     public func getTokenTypeMap() -> [String: Int] {
-        return tokenTypeMap
+        tokenTypeMap
     }
 
     public lazy var tokenTypeMap: [String: Int] = {
@@ -75,7 +75,7 @@ open class Recognizer<ATNInterpreter: ATNSimulator>: RecognizerProtocol {
     /// Used for XPath and tree pattern compilation.
     /// 
     public func getRuleIndexMap() -> [String : Int] {
-        return ruleIndexMap
+        ruleIndexMap
     }
 
     public lazy var ruleIndexMap: [String: Int] = {
@@ -85,7 +85,7 @@ open class Recognizer<ATNInterpreter: ATNSimulator>: RecognizerProtocol {
 
 
     public func getTokenType(_ tokenName: String) -> Int {
-        return getTokenTypeMap()[tokenName] ?? CommonToken.INVALID_TYPE
+        getTokenTypeMap()[tokenName] ?? CommonToken.INVALID_TYPE
     }
 
     /// 
@@ -121,7 +121,7 @@ open class Recognizer<ATNInterpreter: ATNSimulator>: RecognizerProtocol {
     /// - Returns: The ATN interpreter used by the recognizer for prediction.
     /// 
     open func getInterpreter() -> ATNInterpreter {
-        return _interp
+        _interp
     }
 
     /// If profiling during the parse/lex, this will return DecisionInfo records
@@ -130,7 +130,7 @@ open class Recognizer<ATNInterpreter: ATNSimulator>: RecognizerProtocol {
     /// - Since: 4.3
     /// 
     open func getParseInfo() -> ParseInfo? {
-        return nil
+        nil
     }
 
     /// 
@@ -168,28 +168,28 @@ open class Recognizer<ATNInterpreter: ATNSimulator>: RecognizerProtocol {
     }
 
     open func getErrorListeners() -> [ANTLRErrorListener] {
-        return _listeners
+        _listeners
     }
 
     open func getErrorListenerDispatch() -> ANTLRErrorListener {
-        return ProxyErrorListener(getErrorListeners())
+        ProxyErrorListener(getErrorListeners())
     }
 
     // subclass needs to override these if there are sempreds or actions
     // that the ATN interp needs to execute
     open func sempred(_ _localctx: RuleContext?, _ ruleIndex: Int, _ actionIndex: Int) throws -> Bool {
-        return true
+        true
     }
 
     open func precpred(_ localctx: RuleContext?, _ precedence: Int) -> Bool {
-        return true
+        true
     }
 
     open func action(_ _localctx: RuleContext?, _ ruleIndex: Int, _ actionIndex: Int) throws {
     }
 
     public final func getState() -> Int {
-        return _stateNumber
+        _stateNumber
     }
 
     /// Indicate that the recognizer has changed internal state that is

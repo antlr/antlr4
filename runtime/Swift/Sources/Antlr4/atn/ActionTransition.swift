@@ -26,21 +26,21 @@ public final class ActionTransition: Transition, CustomStringConvertible {
 
     override
     public func getSerializationType() -> Int {
-        return Transition.ACTION
+        Transition.ACTION
     }
 
     override
     public func isEpsilon() -> Bool {
-        return true // we are to be ignored by analysis 'cept for predicates
+        true // we are to be ignored by analysis 'cept for predicates
     }
 
     override
     public func matches(_ symbol: Int, _ minVocabSymbol: Int, _ maxVocabSymbol: Int) -> Bool {
-        return false
+        false
     }
 
     public var description: String {
-        return "action_\(ruleIndex):\(actionIndex)"
+        "action_\(ruleIndex):\(actionIndex)"
     }
 
 }

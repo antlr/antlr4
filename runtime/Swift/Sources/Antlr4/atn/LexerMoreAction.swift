@@ -33,7 +33,7 @@ public final class LexerMoreAction: LexerAction, CustomStringConvertible {
     /// 
     override
     public func getActionType() -> LexerActionType {
-        return LexerActionType.more
+        LexerActionType.more
     }
 
     /// 
@@ -42,7 +42,7 @@ public final class LexerMoreAction: LexerAction, CustomStringConvertible {
     /// 
     override
     public func isPositionDependent() -> Bool {
-        return false
+        false
     }
 
     /// 
@@ -61,10 +61,10 @@ public final class LexerMoreAction: LexerAction, CustomStringConvertible {
     }
 
     public var description: String {
-        return "more"
+        "more"
     }
 }
 
 public func ==(lhs: LexerMoreAction, rhs: LexerMoreAction) -> Bool {
-    return lhs === rhs
+    lhs === rhs
 }

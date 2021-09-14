@@ -16,7 +16,7 @@ import Foundation
 extension Token {
 
     static public var INVALID_TYPE: Int {
-        return 0
+        0
     }
 
     /// 
@@ -24,16 +24,16 @@ extension Token {
     /// and did not follow it despite needing to.
     /// 
     static public var EPSILON: Int {
-        return -2
+        -2
     }
 
 
     static public var MIN_USER_TOKEN_TYPE: Int {
-        return 1
+        1
     }
 
     static public var EOF: Int {
-        return -1
+        -1
     }
     
     ///
@@ -42,7 +42,7 @@ extension Token {
     /// so that whitespace etc... can go to the parser on a "hidden" channel.
     ///
     static public var DEFAULT_CHANNEL: Int {
-        return 0
+        0
     }
     
     /// 
@@ -50,7 +50,7 @@ extension Token {
     /// by parser.
     ///
     static public var HIDDEN_CHANNEL: Int {
-        return 1
+        1
     }
     
     /// 
@@ -65,6 +65,6 @@ extension Token {
     /// - seealso: org.antlr.v4.runtime.Token#getChannel()
     /// 
     static public var MIN_USER_CHANNEL_VALUE: Int {
-        return 2
+        2
     }
 }

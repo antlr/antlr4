@@ -55,7 +55,7 @@ public class RecognitionException {
     /// If the state number is not known, this method returns -1.
     /// 
     public func getOffendingState() -> Int {
-        return offendingState
+        offendingState
     }
 
     internal final func setOffendingState(_ offendingState: Int) {
@@ -88,7 +88,7 @@ public class RecognitionException {
     /// If the context is not available, this method returns `null`.
     /// 
     public func getCtx() -> RuleContext? {
-        return ctx
+        ctx
     }
 
     /// 
@@ -102,7 +102,7 @@ public class RecognitionException {
     /// available.
     /// 
     public func getInputStream() -> IntStream? {
-        return input
+        input
     }
 
     public func clearInputStream() {
@@ -110,7 +110,7 @@ public class RecognitionException {
     }
 
     public func getOffendingToken() -> Token {
-        return offendingToken
+        offendingToken
     }
 
     internal final func setOffendingToken(_ offendingToken: Token) {
@@ -126,7 +126,7 @@ public class RecognitionException {
     /// the recognizer is not available.
     /// 
     public func getRecognizer() -> RecognizerProtocol? {
-        return recognizer
+        recognizer
     }
 
     public func clearRecognizer() {

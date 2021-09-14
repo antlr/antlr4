@@ -68,7 +68,7 @@ public class TagChunk: Chunk, CustomStringConvertible {
     /// - Returns: The tag for the chunk.
     /// 
     public final func getTag() -> String {
-        return tag
+        tag
     }
 
     /// 
@@ -78,7 +78,7 @@ public class TagChunk: Chunk, CustomStringConvertible {
     /// assigned to the chunk.
     /// 
     public final func getLabel() -> String? {
-        return label
+        label
     }
 
     /// 

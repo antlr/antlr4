@@ -51,12 +51,12 @@ public class NoViableAltException: RecognitionException {
 
 
     public func getStartToken() -> Token {
-        return startToken
+        startToken
     }
 
 
     public func getDeadEndConfigs() -> ATNConfigSet? {
-        return deadEndConfigs
+        deadEndConfigs
     }
 
 }

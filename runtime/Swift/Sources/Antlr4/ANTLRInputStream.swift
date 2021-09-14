@@ -94,7 +94,7 @@ public class ANTLRInputStream: CharStream {
     }
 
     public func LT(_ i: Int) -> Int {
-        return LA(i)
+        LA(i)
     }
 
     /// 
@@ -103,11 +103,11 @@ public class ANTLRInputStream: CharStream {
     /// be returned from LA(1).
     /// 
     public func index() -> Int {
-        return p
+        p
     }
 
     public func size() -> Int {
-        return n
+        n
     }
 
     /// 
@@ -115,7 +115,7 @@ public class ANTLRInputStream: CharStream {
     /// 
 
     public func mark() -> Int {
-        return -1
+        -1
     }
 
     public func release(_ marker: Int) {
@@ -149,10 +149,10 @@ public class ANTLRInputStream: CharStream {
     }
 
     public func getSourceName() -> String {
-        return name ?? ANTLRInputStream.UNKNOWN_SOURCE_NAME
+        name ?? ANTLRInputStream.UNKNOWN_SOURCE_NAME
     }
 
     public func toString() -> String {
-        return String(data)
+        String(data)
     }
 }

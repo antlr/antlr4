@@ -15,24 +15,23 @@ public class SetTransition: Transition, CustomStringConvertible {
 
     // TODO (sam): should we really allow null here?
     public init(_ target: ATNState, _ set: IntervalSet) {
-
         self.set = set
         super.init(target)
     }
 
     override
     public func getSerializationType() -> Int {
-        return Transition.SET
+        Transition.SET
     }
 
     override
     public func labelIntervalSet() -> IntervalSet? {
-        return set
+        set
     }
 
     override
     public func matches(_ symbol: Int, _ minVocabSymbol: Int, _ maxVocabSymbol: Int) -> Bool {
-        return set.contains(symbol)
+        set.contains(symbol)
     }
 
     public var description: String {

@@ -95,7 +95,7 @@ public class BitSet: Hashable, CustomStringConvertible {
     /// Given a bit index, return word index containing it.
     /// 
     private static func wordIndex(_ bitIndex: Int) -> Int {
-        return bitIndex >> ADDRESS_BITS_PER_WORD
+        bitIndex >> ADDRESS_BITS_PER_WORD
     }
 
     /// 
@@ -187,7 +187,7 @@ public class BitSet: Hashable, CustomStringConvertible {
     /// of all the bits in this bit set
     /// 
     public func toLongArray() -> [Int64] {
-        return copyOf(words, wordsInUse)
+        copyOf(words, wordsInUse)
     }
 
     private func copyOf(_ words: [Int64], _ newLength: Int) -> [Int64] {
@@ -596,7 +596,7 @@ public class BitSet: Hashable, CustomStringConvertible {
     /// Equivalent to nextSetBit(0), but guaranteed not to throw an exception.
     ///
     public func firstSetBit() -> Int {
-        return try! nextSetBit(0)
+        try! nextSetBit(0)
     }
 
     ///
@@ -867,7 +867,7 @@ public class BitSet: Hashable, CustomStringConvertible {
     /// - returns: boolean indicating whether this `BitSet` is empty
     /// 
     public func isEmpty() -> Bool {
-        return wordsInUse == 0
+        wordsInUse == 0
     }
 
     /// 
@@ -1077,7 +1077,7 @@ public class BitSet: Hashable, CustomStringConvertible {
     /// - returns: the number of bits currently in this bit set
     /// 
     public func size() -> Int {
-        return words.count * BitSet.BITS_PER_WORD
+        words.count * BitSet.BITS_PER_WORD
     }
 
 

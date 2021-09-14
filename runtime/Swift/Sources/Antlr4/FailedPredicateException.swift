@@ -38,15 +38,15 @@ public class FailedPredicateException: RecognitionException {
 	}
 
 	public func getRuleIndex() -> Int {
-		return ruleIndex
+        ruleIndex
 	}
 
 	public func getPredIndex() -> Int {
-		return predicateIndex
+        predicateIndex
 	}
 
 	public func getPredicate() -> String? {
-		return predicate
+        predicate
 	}
 
 

@@ -66,17 +66,17 @@ public class BufferedTokenStream: TokenStream {
 
 
     public func getTokenSource() -> TokenSource {
-        return tokenSource
+        tokenSource
     }
 
 
     public func index() -> Int {
-        return p
+        p
     }
 
 
     public func mark() -> Int {
-        return 0
+        0
     }
 
     public func release(_ marker: Int) {
@@ -95,7 +95,7 @@ public class BufferedTokenStream: TokenStream {
 
 
     public func size() -> Int {
-        return tokens.count
+        tokens.count
     }
 
 
@@ -201,7 +201,7 @@ public class BufferedTokenStream: TokenStream {
     }
 
     public func LA(_ i: Int) throws -> Int {
-        return try LT(i)!.getType()
+        try LT(i)!.getType()
     }
 
     internal func LB(_ k: Int) throws -> Token? {
@@ -245,7 +245,7 @@ public class BufferedTokenStream: TokenStream {
     /// - returns: The adjusted target token index.
     /// 
     internal func adjustSeekIndex(_ i: Int) throws -> Int {
-        return i
+        i
     }
 
     internal final func lazyInit() throws {
@@ -270,11 +270,11 @@ public class BufferedTokenStream: TokenStream {
     }
 
     public func getTokens() -> [Token] {
-        return tokens
+        tokens
     }
 
     public func getTokens(_ start: Int, _ stop: Int) throws -> [Token]? {
-        return try getTokens(start, stop, nil)
+        try getTokens(start, stop, nil)
     }
 
     /// 
@@ -443,14 +443,14 @@ public class BufferedTokenStream: TokenStream {
 
 
     public func getSourceName() -> String {
-        return tokenSource.getSourceName()
+        tokenSource.getSourceName()
     }
 
     /// 
     /// Get the text of all tokens in this buffer.
     /// 
     public func getText() throws -> String {
-        return try getText(Interval.of(0, size() - 1))
+        try getText(Interval.of(0, size() - 1))
     }
 
     public func getText(_ interval: Interval) throws -> String {
@@ -472,7 +472,7 @@ public class BufferedTokenStream: TokenStream {
 
 
     public func getText(_ ctx: RuleContext) throws -> String {
-        return try getText(ctx.getSourceInterval())
+        try getText(ctx.getSourceInterval())
     }
 
 

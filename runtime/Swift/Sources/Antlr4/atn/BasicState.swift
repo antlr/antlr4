@@ -15,7 +15,7 @@ public final class BasicState: ATNState {
 
     override
     public func getStateType() -> Int {
-        return ATNState.BASIC
+        ATNState.BASIC
     }
 
 }

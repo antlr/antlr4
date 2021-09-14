@@ -14,7 +14,7 @@ public class TerminalNodeImpl: TerminalNode {
 
 
     public func getChild(_ i: Int) -> Tree? {
-        return nil
+        nil
     }
 
     open subscript(index: Int) -> ParseTree {
@@ -22,11 +22,11 @@ public class TerminalNodeImpl: TerminalNode {
     }
 
     public func getSymbol() -> Token? {
-        return symbol
+        symbol
     }
 
     public func getParent() -> Tree? {
-        return parent
+        parent
     }
 
     public func setParent(_ parent: RuleContext) {
@@ -34,7 +34,7 @@ public class TerminalNodeImpl: TerminalNode {
     }
 
     public func getPayload() -> AnyObject {
-        return symbol
+        symbol
     }
 
     public func getSourceInterval() -> Interval {
@@ -45,20 +45,20 @@ public class TerminalNodeImpl: TerminalNode {
     }
 
     public func getChildCount() -> Int {
-        return 0
+        0
     }
 
 
     public func accept<T>(_ visitor: ParseTreeVisitor<T>) -> T? {
-        return visitor.visitTerminal(self)
+        visitor.visitTerminal(self)
     }
 
     public func getText() -> String {
-        return (symbol.getText())!
+        (symbol.getText())!
     }
 
     public func toStringTree(_ parser: Parser) -> String {
-        return description
+        description
     }
 
     public var description: String {
@@ -71,10 +71,10 @@ public class TerminalNodeImpl: TerminalNode {
     }
 
     public var debugDescription: String {
-        return description
+        description
     }
 
     public func toStringTree() -> String {
-        return description
+        description
     }
 }

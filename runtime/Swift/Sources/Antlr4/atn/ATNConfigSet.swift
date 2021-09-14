@@ -133,7 +133,7 @@ public final class ATNConfigSet: Hashable, CustomStringConvertible {
 
     public func getOrAdd(_ config: ATNConfig) -> ATNConfig {
 
-        return configLookup.getOrAdd(config)
+        configLookup.getOrAdd(config)
     }
 
 
@@ -141,7 +141,7 @@ public final class ATNConfigSet: Hashable, CustomStringConvertible {
     /// Return a List holding list of configs
     /// 
     public func elements() -> [ATNConfig] {
-        return configs
+        configs
     }
 
     public func getStates() -> Set<ATNState> {
@@ -179,7 +179,7 @@ public final class ATNConfigSet: Hashable, CustomStringConvertible {
     }
 
     public func get(_ i: Int) -> ATNConfig {
-        return configs[i]
+        configs[i]
     }
 
     public func optimizeConfigs(_ interpreter: ATNSimulator) throws {
@@ -224,21 +224,21 @@ public final class ATNConfigSet: Hashable, CustomStringConvertible {
     }
 
     public var count: Int {
-        return configs.count
+        configs.count
     }
 
     public func size() -> Int {
-        return configs.count
+        configs.count
     }
 
 
     public func isEmpty() -> Bool {
-        return configs.isEmpty
+        configs.isEmpty
     }
 
 
     public func contains(_ o: ATNConfig) -> Bool {
-        return configLookup.contains(o)
+        configLookup.contains(o)
     }
 
 
@@ -252,7 +252,7 @@ public final class ATNConfigSet: Hashable, CustomStringConvertible {
     }
 
     public func isReadonly() -> Bool {
-        return readonly
+        readonly
     }
 
     public func setReadonly(_ readonly: Bool) {
@@ -529,11 +529,11 @@ public final class ATNConfigSet: Hashable, CustomStringConvertible {
     }
 
     public var hasConfigInRuleStopState: Bool {
-        return configs.contains(where: { $0.state is RuleStopState })
+        configs.contains(where: { $0.state is RuleStopState })
     }
 
     public var allConfigsInRuleStopStates: Bool {
-        return !configs.contains(where: { !($0.state is RuleStopState) })
+        !configs.contains(where: { !($0.state is RuleStopState) })
     }
 }
 

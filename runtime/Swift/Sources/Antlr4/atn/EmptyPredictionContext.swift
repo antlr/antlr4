@@ -12,28 +12,28 @@ public class EmptyPredictionContext: SingletonPredictionContext {
 
     override
     public func isEmpty() -> Bool {
-        return true
+        true
     }
 
     override
     public func size() -> Int {
-        return 1
+        1
     }
 
     override
     public func getParent(_ index: Int) -> PredictionContext? {
-        return nil
+        nil
     }
 
     override
     public func getReturnState(_ index: Int) -> Int {
-        return returnState
+        returnState
     }
 
 
     override
     public var description: String {
-        return "$"
+        "$"
     }
 }
 

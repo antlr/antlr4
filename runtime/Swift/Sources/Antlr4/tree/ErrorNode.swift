@@ -18,7 +18,7 @@ public class ErrorNode: TerminalNodeImpl {
 
     override
     public func accept<T>(_ visitor: ParseTreeVisitor<T>) -> T? {
-        return visitor.visitErrorNode(self)
+        visitor.visitErrorNode(self)
     }
 
 }

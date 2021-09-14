@@ -37,7 +37,7 @@ extension String {
 #if os(Linux)
 extension Substring {
     func hasPrefix(_ prefix: String) -> Bool {
-        return String(self).hasPrefix(prefix)
+        String(self).hasPrefix(prefix)
     }
 }
 #endif

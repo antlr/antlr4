@@ -15,6 +15,6 @@ public final class LoopEndState: ATNState {
 
     override
     public func getStateType() -> Int {
-        return ATNState.LOOP_END
+        ATNState.LOOP_END
     }
 }

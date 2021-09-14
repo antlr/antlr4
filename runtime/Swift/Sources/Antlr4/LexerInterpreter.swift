@@ -46,27 +46,27 @@ public class LexerInterpreter: Lexer {
 
     override
     public func getATN() -> ATN {
-        return atn
+        atn
     }
 
     override
     public func getGrammarFileName() -> String {
-        return grammarFileName
+        grammarFileName
     }
 
     override
     public func getRuleNames() -> [String] {
-        return ruleNames
+        ruleNames
     }
 
     override
     public func getChannelNames() -> [String] {
-        return channelNames
+        channelNames
     }
 
     override
     public func getModeNames() -> [String] {
-        return modeNames
+        modeNames
     }
 
     override

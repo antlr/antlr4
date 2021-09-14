@@ -116,7 +116,7 @@ public class ATN {
     }
 
     public func getNumberOfDecisions() -> Int {
-        return decisionToState.count
+        decisionToState.count
     }
 
     /// 

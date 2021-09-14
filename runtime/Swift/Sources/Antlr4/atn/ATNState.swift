@@ -128,20 +128,20 @@ public class ATNState: Hashable, CustomStringConvertible {
     }
 
     public func isNonGreedyExitState() -> Bool {
-        return false
+        false
     }
 
 
     public var description: String {
         //return "MyClass \(string)"
-        return String(stateNumber)
+        String(stateNumber)
     }
     public final func getTransitions() -> [Transition] {
-        return transitions
+        transitions
     }
 
     public final func getNumberOfTransitions() -> Int {
-        return transitions.count
+        transitions.count
     }
 
     public final func addTransition(_ e: Transition) {
@@ -175,7 +175,7 @@ public class ATNState: Hashable, CustomStringConvertible {
     }
 
     public final func transition(_ i: Int) -> Transition {
-        return transitions[i]
+        transitions[i]
     }
 
     public final func setTransition(_ i: Int, _ e: Transition) {
@@ -184,7 +184,7 @@ public class ATNState: Hashable, CustomStringConvertible {
 
     public final func removeTransition(_ index: Int) -> Transition {
 
-        return transitions.remove(at: index)
+        transitions.remove(at: index)
     }
 
     public func getStateType() -> Int {
@@ -192,7 +192,7 @@ public class ATNState: Hashable, CustomStringConvertible {
     }
 
     public final func onlyHasEpsilonTransitions() -> Bool {
-        return epsilonOnlyTransitions
+        epsilonOnlyTransitions
     }
 
     public final func setRuleIndex(_ ruleIndex: Int) {

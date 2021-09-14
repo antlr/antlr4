@@ -119,7 +119,7 @@ public class ParseTreeMatch: CustomStringConvertible {
     /// pattern did not contain any rule or token tags, this map will be empty.
     /// 
     public func getLabels() -> MultiMap<String, ParseTree> {
-        return labels
+        labels
     }
 
     /// 
@@ -129,7 +129,7 @@ public class ParseTreeMatch: CustomStringConvertible {
     /// if the match was successful.
     /// 
     public func getMismatchedNode() -> ParseTree? {
-        return mismatchedNode
+        mismatchedNode
     }
 
     /// 
@@ -139,7 +139,7 @@ public class ParseTreeMatch: CustomStringConvertible {
     /// `false`.
     /// 
     public func succeeded() -> Bool {
-        return mismatchedNode == nil
+        mismatchedNode == nil
     }
 
     /// 
@@ -148,7 +148,7 @@ public class ParseTreeMatch: CustomStringConvertible {
     /// - Returns: The tree pattern we are matching against.
     /// 
     public func getPattern() -> ParseTreePattern {
-        return pattern
+        pattern
     }
 
     /// 
@@ -157,7 +157,7 @@ public class ParseTreeMatch: CustomStringConvertible {
     /// - Returns: The _org.antlr.v4.runtime.tree.ParseTree_ we are trying to match to a pattern.
     /// 
     public func getTree() -> ParseTree {
-        return tree
+        tree
     }
 
     public var description: String {

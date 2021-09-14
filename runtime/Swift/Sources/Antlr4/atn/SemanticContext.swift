@@ -58,7 +58,7 @@ public class SemanticContext: Hashable, CustomStringConvertible {
     /// semantic context after precedence predicates are evaluated.
     /// 
     public func evalPrecedence<T>(_ parser: Recognizer<T>, _ parserCallStack: RuleContext) throws -> SemanticContext? {
-        return self
+        self
     }
 
     public func hash(into hasher: inout Hasher) {
@@ -102,7 +102,7 @@ public class SemanticContext: Hashable, CustomStringConvertible {
 
         override
         public var description: String {
-            return "{\(ruleIndex):\(predIndex)}?"
+            "{\(ruleIndex):\(predIndex)}?"
         }
 
     }
@@ -121,7 +121,7 @@ public class SemanticContext: Hashable, CustomStringConvertible {
 
         override
         public func eval<T>(_ parser: Recognizer<T>, _ parserCallStack: RuleContext) throws -> Bool {
-            return parser.precpred(parserCallStack, precedence)
+            parser.precpred(parserCallStack, precedence)
         }
 
         override
@@ -140,7 +140,7 @@ public class SemanticContext: Hashable, CustomStringConvertible {
 
         override
         public var description: String {
-            return "{" + String(precedence) + ">=prec}?"
+            "{" + String(precedence) + ">=prec}?"
 
         }
     }
@@ -203,7 +203,7 @@ public class SemanticContext: Hashable, CustomStringConvertible {
 
         override
         public func getOperands() -> [SemanticContext] {
-            return opnds
+            opnds
         }
 
 
@@ -268,7 +268,7 @@ public class SemanticContext: Hashable, CustomStringConvertible {
 
         override
         public var description: String {
-            return opnds.map({ $0.description }).joined(separator: "&&")
+            opnds.map({ $0.description }).joined(separator: "&&")
 
         }
     }
@@ -309,7 +309,7 @@ public class SemanticContext: Hashable, CustomStringConvertible {
 
         override
         public func getOperands() -> [SemanticContext] {
-            return opnds
+            opnds
         }
 
         public override func hash(into hasher: inout Hasher) {
@@ -370,7 +370,7 @@ public class SemanticContext: Hashable, CustomStringConvertible {
 
         override
         public var description: String {
-            return opnds.map({ $0.description }).joined(separator: "||")
+            opnds.map({ $0.description }).joined(separator: "||")
 
         }
     }

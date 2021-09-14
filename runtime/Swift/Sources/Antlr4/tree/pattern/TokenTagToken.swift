@@ -56,7 +56,7 @@ public class TokenTagToken: CommonToken {
     /// 
 
     public final func getTokenName() -> String {
-        return tokenName
+        tokenName
     }
 
     /// 
@@ -67,7 +67,7 @@ public class TokenTagToken: CommonToken {
     /// 
 
     public final func getLabel() -> String? {
-        return label
+        label
     }
 
     /// 
@@ -94,6 +94,6 @@ public class TokenTagToken: CommonToken {
 
     override
     public var description: String {
-        return tokenName + ":" + String(type)
+        tokenName + ":" + String(type)
     }
 }

@@ -35,22 +35,22 @@ public class ArrayPredictionContext: PredictionContext {
     final public func isEmpty() -> Bool {
         // since EMPTY_RETURN_STATE can only appear in the last position, we
         // don't need to verify that size==1
-        return returnStates[0] == PredictionContext.EMPTY_RETURN_STATE
+        returnStates[0] == PredictionContext.EMPTY_RETURN_STATE
     }
 
     override
     final public func size() -> Int {
-        return returnStates.count
+        returnStates.count
     }
 
     override
     final public func getParent(_ index: Int) -> PredictionContext? {
-        return parents[index]
+        parents[index]
     }
 
     override
     final public func getReturnState(_ index: Int) -> Int {
-        return returnStates[index]
+        returnStates[index]
     }
 
     override

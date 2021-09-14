@@ -66,7 +66,7 @@ public class DFA: CustomStringConvertible {
     /// - seealso: org.antlr.v4.runtime.Parser#getPrecedence()
     /// 
     public final func isPrecedenceDfa() -> Bool {
-        return precedenceDfa
+        precedenceDfa
     }
 
     /// 
@@ -138,7 +138,7 @@ public class DFA: CustomStringConvertible {
     }
 
     public var description: String {
-        return toString(Vocabulary.EMPTY_VOCABULARY)
+        toString(Vocabulary.EMPTY_VOCABULARY)
     }
 
     public func toString(_ vocabulary: Vocabulary) -> String {

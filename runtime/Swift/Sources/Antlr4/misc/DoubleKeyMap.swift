@@ -41,6 +41,6 @@ public struct DoubleKeyMap<Key1: Hashable, Key2: Hashable, Value> {
     }
 
     public func get(_ k1: Key1) -> [Key2: Value]? {
-        return data[k1]
+        data[k1]
     }
 }

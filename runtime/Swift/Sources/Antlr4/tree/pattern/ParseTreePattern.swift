@@ -61,7 +61,7 @@ public class ParseTreePattern {
     /// 
 
     public func match(_ tree: ParseTree) throws -> ParseTreeMatch {
-        return try matcher.match(tree, self)
+        try matcher.match(tree, self)
     }
 
     /// 
@@ -72,7 +72,7 @@ public class ParseTreePattern {
     /// pattern; otherwise, `false`.
     /// 
     public func matches(_ tree: ParseTree) throws -> Bool {
-        return try matcher.match(tree, self).succeeded()
+        try matcher.match(tree, self).succeeded()
     }
 
     /// 
@@ -107,7 +107,7 @@ public class ParseTreePattern {
     /// 
 
     public func getMatcher() -> ParseTreePatternMatcher {
-        return matcher
+        matcher
     }
 
     /// 
@@ -117,7 +117,7 @@ public class ParseTreePattern {
     /// 
 
     public func getPattern() -> String {
-        return pattern
+        pattern
     }
 
     /// 
@@ -128,7 +128,7 @@ public class ParseTreePattern {
     /// pattern.
     /// 
     public func getPatternRuleIndex() -> Int {
-        return patternRuleIndex
+        patternRuleIndex
     }
 
     /// 
@@ -140,6 +140,6 @@ public class ParseTreePattern {
     /// 
 
     public func getPatternTree() -> ParseTree {
-        return patternTree
+        patternTree
     }
 }

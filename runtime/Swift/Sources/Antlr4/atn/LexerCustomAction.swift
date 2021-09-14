@@ -43,7 +43,7 @@ public final class LexerCustomAction: LexerAction {
     /// - returns: The rule index for the custom action.
     /// 
     public func getRuleIndex() -> Int {
-        return ruleIndex
+        ruleIndex
     }
 
     /// 
@@ -52,7 +52,7 @@ public final class LexerCustomAction: LexerAction {
     /// - returns: The action index for the custom action.
     /// 
     public func getActionIndex() -> Int {
-        return actionIndex
+        actionIndex
     }
 
     /// 
@@ -62,7 +62,7 @@ public final class LexerCustomAction: LexerAction {
     /// 
 
     public override func getActionType() -> LexerActionType {
-        return LexerActionType.custom
+        LexerActionType.custom
     }
 
     /// 
@@ -78,7 +78,7 @@ public final class LexerCustomAction: LexerAction {
     /// 
     override
     public func isPositionDependent() -> Bool {
-        return true
+        true
     }
 
     /// 

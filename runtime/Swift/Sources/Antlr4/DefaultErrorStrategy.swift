@@ -70,7 +70,7 @@ open class DefaultErrorStrategy: ANTLRErrorStrategy {
     }
 
     open func inErrorRecoveryMode(_ recognizer: Parser) -> Bool {
-        return errorRecoveryMode
+        errorRecoveryMode
     }
 
     /// 
@@ -551,7 +551,7 @@ open class DefaultErrorStrategy: ANTLRErrorStrategy {
     /// override this method to create the appropriate tokens.
     /// 
     open func getTokenStream(_ recognizer: Parser) -> TokenStream {
-        return recognizer.getInputStream() as! TokenStream
+        recognizer.getInputStream() as! TokenStream
     }
 
     open func getMissingSymbol(_ recognizer: Parser) throws -> Token {
@@ -582,7 +582,7 @@ open class DefaultErrorStrategy: ANTLRErrorStrategy {
 
 
     open func getExpectedTokens(_ recognizer: Parser) throws -> IntervalSet {
-        return try recognizer.getExpectedTokens()
+        try recognizer.getExpectedTokens()
     }
 
     /// 
@@ -610,11 +610,11 @@ open class DefaultErrorStrategy: ANTLRErrorStrategy {
     }
 
     open func getSymbolText(_ symbol: Token) -> String? {
-        return symbol.getText()
+        symbol.getText()
     }
 
     open func getSymbolType(_ symbol: Token) -> Int {
-        return symbol.getType()
+        symbol.getType()
     }
 
 

@@ -12,6 +12,6 @@ public final class RuleStartState: ATNState {
 
     override
     public func getStateType() -> Int {
-        return ATNState.RULE_START
+        ATNState.RULE_START
     }
 }

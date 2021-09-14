@@ -57,7 +57,7 @@ public class LexerATNConfig: ATNConfig {
     }
 
     private static func checkNonGreedyDecision(_ source: LexerATNConfig, _ target: ATNState) -> Bool {
-        return source.passedThroughNonGreedyDecision
+        source.passedThroughNonGreedyDecision
                 || target is DecisionState && (target as! DecisionState).nonGreedy
     }
     /// 
@@ -65,11 +65,11 @@ public class LexerATNConfig: ATNConfig {
     /// action(s) for the current configuration.
     /// 
     public final func getLexerActionExecutor() -> LexerActionExecutor? {
-        return lexerActionExecutor
+        lexerActionExecutor
     }
 
     public final func hasPassedThroughNonGreedyDecision() -> Bool {
-        return passedThroughNonGreedyDecision
+        passedThroughNonGreedyDecision
     }
 
     public override func hash(into hasher: inout Hasher) {

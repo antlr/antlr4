@@ -15,6 +15,6 @@ public final class BlockEndState: ATNState {
 
     override
     public func getStateType() -> Int {
-        return ATNState.BLOCK_END
+        ATNState.BLOCK_END
     }
 }

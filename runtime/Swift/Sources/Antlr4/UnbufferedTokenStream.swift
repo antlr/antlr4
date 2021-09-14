@@ -97,27 +97,27 @@ public class UnbufferedTokenStream: TokenStream {
 
 
     public func LA(_ i: Int) throws -> Int {
-        return try LT(i)!.getType()
+        try LT(i)!.getType()
     }
 
 
     public func getTokenSource() -> TokenSource {
-        return tokenSource
+        tokenSource
     }
 
 
     public func getText() -> String {
-        return ""
+        ""
     }
 
 
     public func getText(_ ctx: RuleContext) throws -> String {
-        return try getText(ctx.getSourceInterval())
+        try getText(ctx.getSourceInterval())
     }
 
 
     public func getText(_ start: Token?, _ stop: Token?) throws -> String {
-        return try getText(Interval.of(start!.getTokenIndex(), stop!.getTokenIndex()))
+        try getText(Interval.of(start!.getTokenIndex(), stop!.getTokenIndex()))
     }
 
 
@@ -228,7 +228,7 @@ public class UnbufferedTokenStream: TokenStream {
 
 
     public func index() -> Int {
-        return currentTokenIndex
+        currentTokenIndex
     }
 
 
@@ -270,7 +270,7 @@ public class UnbufferedTokenStream: TokenStream {
 
 
     public func getSourceName() -> String {
-        return tokenSource.getSourceName()
+        tokenSource.getSourceName()
     }
 
 
@@ -295,6 +295,6 @@ public class UnbufferedTokenStream: TokenStream {
     }
 
     internal final func getBufferStartIndex() -> Int {
-        return currentTokenIndex - p
+        currentTokenIndex - p
     }
 }

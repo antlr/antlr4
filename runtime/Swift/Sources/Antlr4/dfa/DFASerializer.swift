@@ -44,7 +44,7 @@ public class DFASerializer: CustomStringConvertible {
     }
 
     internal func getEdgeLabel(_ i: Int) -> String {
-        return vocabulary.getDisplayName(i - 1)
+        vocabulary.getDisplayName(i - 1)
     }
 
 

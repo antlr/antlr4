@@ -25,11 +25,11 @@ public class MultiMap<K:Hashable, V> {
     }
 
     public func get(_ key: K) -> Array<(V)>? {
-        return mapping[key]
+        mapping[key]
     }
 
     public func size() -> Int {
-        return mapping.count
+        mapping.count
     }
 
 }

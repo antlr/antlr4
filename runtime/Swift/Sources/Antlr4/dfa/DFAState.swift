@@ -92,7 +92,7 @@ public final class DFAState: Hashable, CustomStringConvertible {
         }
 
         public var description: String {
-            return "(\(pred),\(alt))"
+            "(\(pred),\(alt))"
         }
     }
 
@@ -105,7 +105,7 @@ public final class DFAState: Hashable, CustomStringConvertible {
     /// DFA state.
     /// 
     public func getAltSet() -> Set<Int>? {
-        return configs.getAltSet()
+        configs.getAltSet()
     }
 
 

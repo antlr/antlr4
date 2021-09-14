@@ -19,7 +19,7 @@ public struct Stack<T> {
     }
     @discardableResult
     public mutating func pop() -> T {
-        return items.removeLast()
+        items.removeLast()
     }
 
     public mutating func clear() {
@@ -27,10 +27,10 @@ public struct Stack<T> {
     }
 
     public func peek() -> T? {
-        return items.last
+        items.last
     }
     public var isEmpty: Bool {
-        return items.isEmpty
+        items.isEmpty
     }
 
 }

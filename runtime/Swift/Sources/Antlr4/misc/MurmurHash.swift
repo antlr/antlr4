@@ -28,7 +28,7 @@ public final class MurmurHash {
     /// - Returns: the intermediate hash value
     /// 
     public static func initialize() -> UInt32 {
-        return initialize(DEFAULT_SEED)
+        initialize(DEFAULT_SEED)
     }
 
     /// 
@@ -38,7 +38,7 @@ public final class MurmurHash {
     /// - Returns: the intermediate hash value
     /// 
     public static func initialize(_ seed: UInt32) -> UInt32 {
-        return seed
+        seed
     }
 
     private static func calcK(_ value: UInt32) -> UInt32 {
@@ -57,7 +57,7 @@ public final class MurmurHash {
     /// - Returns: the updated intermediate hash value
     /// 
     public static func update2(_ hashIn: UInt32, _ value: Int) -> UInt32 {
-        return updateInternal(hashIn, UInt32(truncatingIfNeeded: value))
+        updateInternal(hashIn, UInt32(truncatingIfNeeded: value))
     }
 
 
@@ -79,7 +79,7 @@ public final class MurmurHash {
     /// - Returns: the updated intermediate hash value
     /// 
     public static func update<T:Hashable>(_ hash: UInt32, _ value: T?) -> UInt32 {
-        return update2(hash, value != nil ? value!.hashValue : 0)
+        update2(hash, value != nil ? value!.hashValue : 0)
     }
 
     /// 
@@ -91,7 +91,7 @@ public final class MurmurHash {
     /// - Returns: the final hash result
     /// 
     public static func finish(_ hashin: UInt32, _ numberOfWords: Int) -> Int {
-        return Int(finish(hashin, byteCount: (numberOfWords &* 4)))
+        Int(finish(hashin, byteCount: (numberOfWords &* 4)))
     }
 
     private static func finish(_ hashin: UInt32, byteCount byteCountInt: Int) -> UInt32 {

@@ -31,7 +31,7 @@ public final class LexerPushModeAction: LexerAction, CustomStringConvertible {
     /// - returns: The lexer mode for this `pushMode` command.
     /// 
     public func getMode() -> Int {
-        return mode
+        mode
     }
 
     /// 
@@ -40,7 +40,7 @@ public final class LexerPushModeAction: LexerAction, CustomStringConvertible {
     /// 
 
     public override func getActionType() -> LexerActionType {
-        return LexerActionType.pushMode
+        LexerActionType.pushMode
     }
 
     /// 
@@ -49,7 +49,7 @@ public final class LexerPushModeAction: LexerAction, CustomStringConvertible {
     /// 
 
     public override func isPositionDependent() -> Bool {
-        return false
+        false
     }
 
     /// 
@@ -68,7 +68,7 @@ public final class LexerPushModeAction: LexerAction, CustomStringConvertible {
     }
 
     public var description: String {
-        return "pushMode(\(mode))"
+        "pushMode(\(mode))"
     }
 }
 

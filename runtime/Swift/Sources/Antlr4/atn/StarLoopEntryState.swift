@@ -22,6 +22,6 @@ public final class StarLoopEntryState: DecisionState {
 
     override
     public func getStateType() -> Int {
-        return ATNState.STAR_LOOP_ENTRY
+        ATNState.STAR_LOOP_ENTRY
     }
 }

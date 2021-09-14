@@ -12,17 +12,17 @@ final public class WildcardTransition: Transition, CustomStringConvertible {
 
     override
     public func getSerializationType() -> Int {
-        return Transition.WILDCARD
+        Transition.WILDCARD
     }
 
     override
     public func matches(_ symbol: Int, _ minVocabSymbol: Int, _ maxVocabSymbol: Int) -> Bool {
-        return symbol >= minVocabSymbol && symbol <= maxVocabSymbol
+        symbol >= minVocabSymbol && symbol <= maxVocabSymbol
     }
 
     public var description: String {
 
-        return "."
+        "."
     }
 
 

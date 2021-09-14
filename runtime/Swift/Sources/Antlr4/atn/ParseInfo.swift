@@ -28,7 +28,7 @@ public class ParseInfo {
     /// number.
     /// 
     public func getDecisionInfo() -> [DecisionInfo] {
-        return atnSimulator.getDecisionInfo()
+        atnSimulator.getDecisionInfo()
     }
 
     /// 

@@ -9,7 +9,9 @@ public class ParseTreeProperty<V> {
   
   public init() {}
   
-  open func get(_ node: ParseTree) -> V? { return annotations[ObjectIdentifier(node)] }
+  open func get(_ node: ParseTree) -> V? {
+      annotations[ObjectIdentifier(node)]
+  }
   open func put(_ node: ParseTree, _ value: V) { annotations[ObjectIdentifier(node)] = value }
   open func removeFrom(_ node: ParseTree) { annotations.removeValue(forKey: ObjectIdentifier(node)) }
 }

@@ -98,22 +98,22 @@ public class ParserInterpreter: Parser {
 
     override
     public func getATN() -> ATN {
-        return atn
+        atn
     }
 
     override
     public func getVocabulary() -> Vocabulary {
-        return vocabulary
+        vocabulary
     }
 
     override
     public func getRuleNames() -> [String] {
-        return ruleNames
+        ruleNames
     }
 
     override
     public func getGrammarFileName() -> String {
-        return grammarFileName
+        grammarFileName
     }
 
     /// Begin parsing at startRuleIndex
@@ -171,7 +171,7 @@ public class ParserInterpreter: Parser {
     }
 
     internal func getATNState() -> ATNState? {
-        return atn.states[getState()]
+        atn.states[getState()]
     }
 
     internal func visitState(_ p: ATNState) throws {

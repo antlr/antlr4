@@ -161,5 +161,5 @@ public class Vocabulary: Hashable {
 }
 
 public func ==(lhs: Vocabulary, rhs: Vocabulary) -> Bool {
-    return lhs === rhs
+    lhs === rhs
 }

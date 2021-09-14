@@ -14,6 +14,6 @@ public final class StarBlockStartState: BlockStartState {
 
     override
     public func getStateType() -> Int {
-        return ATNState.STAR_BLOCK_START
+        ATNState.STAR_BLOCK_START
     }
 }

@@ -725,7 +725,7 @@ open class LexerATNSimulator: ATNSimulator {
 
 
     public final func getDFA(_ mode: Int) -> DFA {
-        return decisionToDFA[mode]
+        decisionToDFA[mode]
     }
 
     /// 
@@ -734,11 +734,11 @@ open class LexerATNSimulator: ATNSimulator {
 
     public func getText(_ input: CharStream) -> String {
         // index is first lookahead char, don't include.
-        return try! input.getText(Interval.of(startIndex, input.index() - 1))
+        try! input.getText(Interval.of(startIndex, input.index() - 1))
     }
 
     public func getLine() -> Int {
-        return line
+        line
     }
 
     public func setLine(_ line: Int) {
@@ -746,7 +746,7 @@ open class LexerATNSimulator: ATNSimulator {
     }
 
     public func getCharPositionInLine() -> Int {
-        return charPositionInLine
+        charPositionInLine
     }
 
     public func setCharPositionInLine(_ charPositionInLine: Int) {

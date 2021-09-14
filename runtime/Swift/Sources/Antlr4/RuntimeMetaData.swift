@@ -76,7 +76,7 @@ public class RuntimeMetaData {
     /// 
 
     public static func getRuntimeVersion() -> String {
-        return RuntimeMetaData.VERSION
+        RuntimeMetaData.VERSION
     }
 
     /// 

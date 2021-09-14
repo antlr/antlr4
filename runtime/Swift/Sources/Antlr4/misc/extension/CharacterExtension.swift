@@ -17,7 +17,7 @@ extension Character {
 
     //"1" -> 1 "2"  -> 2
     var integerValue: Int {
-        return Int(String(self)) ?? 0
+        Int(String(self)) ?? 0
     }
     public init(integerLiteral value: IntegerLiteralType) {
         self = Character(UnicodeScalar(value)!)
@@ -38,7 +38,7 @@ extension Character {
 
     //char ->  int
     var unicodeValue: Int {
-        return Int(String(self).unicodeScalars.first?.value ?? 0)
+        Int(String(self).unicodeScalars.first?.value ?? 0)
     }
 
     public static var MAX_VALUE: Int {
