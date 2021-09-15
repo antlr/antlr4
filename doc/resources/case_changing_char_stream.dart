@@ -24,10 +24,18 @@ class CaseChangingCharStream extends CharStream {
     if (c == null || c <= 0) {
       return c;
     }
+    String newCaseStr;
     if (upper) {
-      return String.fromCharCode(c).toUpperCase().codeUnitAt(0);
+      newCaseStr = String.fromCharCode(c).toUpperCase();
+    } else {
+      newCaseStr = String.fromCharCode(c).toLowerCase();
     }
-    return String.fromCharCode(c).toLowerCase().codeUnitAt(0);
+    // Skip changing case if length changes (e.g., ß -> SS).
+    if (newCaseStr.length != 1) {
+      return c;
+    } else {
+      return newCaseStr.codeUnitAt(0);
+    }
   }
 
   @override
