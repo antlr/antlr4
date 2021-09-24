@@ -28,7 +28,9 @@
     "ssri": ">=6.0.2",
     "hosted-git-info": ">=2.8.9",
     "browserslist": ">=4.16.5",
-    "ws": ">=7.4.6"
+    "ws": ">=7.4.6",
+    "set-value": ">=4.0.1",
+    "path-parse": ">=1.0.7"
   },
   "scripts": {
     "build": "webpack",
