@@ -14,7 +14,8 @@ class Pair<A, B> {
 
   @override
   bool operator ==(other) {
-    return identical(this, other) || other is Pair && a == other.a && b == other.b;
+    return identical(this, other) ||
+        other is Pair && a == other.a && b == other.b;
   }
 
   @override

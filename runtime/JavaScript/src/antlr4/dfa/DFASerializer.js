@@ -2,6 +2,7 @@
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
+const Utils = require('./../Utils');
 
 /**
  * A DFA walker that knows how to dump them to serialized strings.
@@ -53,7 +54,7 @@ class DFASerializer {
         const baseStateStr = ( s.isAcceptState ? ":" : "") + "s" + s.stateNumber + ( s.requiresFullContext ? "^" : "");
         if(s.isAcceptState) {
             if (s.predicates !== null) {
-                return baseStateStr + "=>" + s.predicates.toString();
+                return baseStateStr + "=>" + Utils.arrayToString(s.predicates);
             } else {
                 return baseStateStr + "=>" + s.prediction.toString();
             }

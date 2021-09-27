@@ -66,7 +66,7 @@ class RuntimeMetaData {
   /// omitted, the {@code -} (hyphen-minus) appearing before it is also
   /// omitted.</li>
   /// </ul>
-  static final String VERSION = '4.9.1';
+  static final String VERSION = '4.9.2';
 
   /// Gets the currently executing version of the ANTLR 4 runtime library.
   ///
@@ -136,7 +136,9 @@ class RuntimeMetaData {
   /// compiled against. This should always be passed using a direct reference
   /// to [VERSION].
   static void checkVersion(
-      String generatingToolVersion, String compileTimeVersion) {
+    String? generatingToolVersion,
+    String compileTimeVersion,
+  ) {
     final runtimeVersion = VERSION;
     var runtimeConflictsWithGeneratingTool = false;
     var runtimeConflictsWithCompileTimeTool = false;
