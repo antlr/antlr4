@@ -354,8 +354,8 @@ open class LexerATNSimulator: ATNSimulator {
                 let trans = c.state.transition(ti)
                 if let target = getReachableTarget(trans, t) {
                     var lexerActionExecutor = c.getLexerActionExecutor()
-                    if lexerActionExecutor != nil {
-                        lexerActionExecutor = lexerActionExecutor!.fixOffsetBeforeMatch(input.index() - startIndex)
+                    if let lex = lexerActionExecutor {
+                        lexerActionExecutor = lex.fixOffsetBeforeMatch(input.index() - startIndex)
                     }
 
                     let treatEofAsEpsilon = (t == BufferedTokenStream.EOF)
@@ -699,12 +699,11 @@ open class LexerATNSimulator: ATNSimulator {
         assert(!configs.hasSemanticContext, "Expected: !configs.hasSemanticContext")
 
         let proposed = DFAState(configs)
-        let firstConfigWithRuleStopState = configs.firstConfigWithRuleStopState
 
-        if firstConfigWithRuleStopState != nil {
+        if let rss = configs.firstConfigWithRuleStopState {
             proposed.isAcceptState = true
-            proposed.lexerActionExecutor = (firstConfigWithRuleStopState as! LexerATNConfig).getLexerActionExecutor()
-            proposed.prediction = atn.ruleToTokenType[firstConfigWithRuleStopState!.state.ruleIndex!]
+            proposed.lexerActionExecutor = (rss as! LexerATNConfig).getLexerActionExecutor()
+            proposed.prediction = atn.ruleToTokenType[rss.state.ruleIndex!]
         }
 
         let dfa = decisionToDFA[mode]
