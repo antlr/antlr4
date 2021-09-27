@@ -1,6 +1,18 @@
 grammar Threading;
 
-NUMBER : [0-9] ;
-WS : [ \r\n\t] + -> skip ;
+s
+    :   expr EOF
+    ;
 
-operation : l=NUMBER op='+' r=NUMBER ;
+expr
+    :   INT                     # number
+    |   expr (MUL | DIV) expr   # multiply
+    |   expr (ADD | SUB) expr   # add
+    ;
+
+INT : [0-9]+;
+MUL : '*';
+DIV : '/';
+ADD : '+';
+SUB : '-';
+WS : [ \t]+ -> channel(HIDDEN);
