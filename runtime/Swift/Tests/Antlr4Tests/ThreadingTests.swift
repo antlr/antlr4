@@ -24,8 +24,8 @@ class ThreadingTests: XCTestCase {
             "890",
         ]
         let expectation = expectation(description: "Waiting on async-task")
-        expectation.expectedFulfillmentCount = 77
-        for i in 0...77 {
+        expectation.expectedFulfillmentCount = 100
+        for i in 1...100 {
             DispatchQueue.global().async {
                 let lexer = ThreadingLexer(ANTLRInputStream(input[i % 7]))
                 let tokenStream = CommonTokenStream(lexer)
