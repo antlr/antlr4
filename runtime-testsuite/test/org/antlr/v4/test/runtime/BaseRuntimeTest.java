@@ -62,7 +62,11 @@ public abstract class BaseRuntimeTest {
 	}
 
 	private static boolean requiresHeartbeat() {
-		return isTravisCI() || isAppVeyorCI() || (isCPP() && isRecursion()) || (isCircleCI() && isGo())|| (isCircleCI() && isCSharp() && isRecursion());
+		return isTravisCI()
+				|| isAppVeyorCI()
+				|| (isCPP() && isRecursion()) 
+				|| (isCircleCI() && isGo())
+				|| (isCircleCI() && isDotNet() && isRecursion());
 	}
 
 	@AfterClass
@@ -85,9 +89,9 @@ public abstract class BaseRuntimeTest {
 		return "cpp".equalsIgnoreCase(s);
 	}
 
-	private static boolean isCSharp() {
+	private static boolean isDotNet() {
 		String s = System.getenv("TARGET");
-		return "csharp".equalsIgnoreCase(s);
+		return "dotnet".equalsIgnoreCase(s);
 	}
 
 	private static boolean isCircleCI() {
