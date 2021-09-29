@@ -19,7 +19,7 @@
   "devDependencies": {
     "@babel/core": "^7.13.10",
     "@babel/preset-env": "^7.13.10",
-    "ansi-regex": "^4.1.0",
+    "ansi-regex": "^5.0.1",
     "babel-loader": "^8.2.2",
     "browserslist": ">=4.16.5",
     "hosted-git-info": ">=2.8.9",
