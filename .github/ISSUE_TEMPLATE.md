@@ -1,8 +1,15 @@
 <!--
-Before submitting an issue to ANTLR, please check off these boxes:
+All ANTLR contributors provide implementation, maintenance and support for free.
+We therefore kindly require that before submitting any issue to ANTLR, you please check off these boxes:
  
-- [ ] I am not submitting a question on how to use ANTLR; instead, go to [antlr4-discussion google group](https://groups.google.com/forum/#!forum/antlr-discussion) or ask at [stackoverflow](http://stackoverflow.com/questions/tagged/antlr4)
+- [ ] I have reproduced my issue using the latest version of ANTLR
+- [ ] I have submitted my issue to [antlr4-discussion google group](https://groups.google.com/forum/#!forum/antlr-discussion) or asked at [stackoverflow](http://stackoverflow.com/questions/tagged/antlr4)
+- [ ] Responses from the above seem to indicate that my issue could be an ANTLR bug
 - [ ] I have done a search of the existing issues to make sure I'm not sending in a duplicate
 
-Please include information about the expected behavior, actual behavior, and the smallest grammar or code that reproduces the behavior. If appropriate, please indicate the code generation targets such as Java, C#, ...  Pointers into offending code regions are also very welcome.
+Please include the following information:
+ - target information (Java, C++ ...)
+ - smallest possible grammar and code that reproduces the behavior
+ - description of the expected behavior and actual behavior
+Pointers to suspicious code regions are also very welcome.
 -->
