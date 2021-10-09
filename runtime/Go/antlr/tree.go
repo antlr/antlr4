@@ -32,6 +32,8 @@ type ParseTree interface {
 	GetText() string
 
 	ToStringTree([]string, Recognizer) string
+
+	VisitWrapper(visitorInterface Visitor) interface{}
 }
 
 type RuleNode interface {
@@ -58,6 +60,10 @@ type ParseTreeVisitor interface {
 	VisitChildren(node RuleNode) interface{}
 	VisitTerminal(node TerminalNode) interface{}
 	VisitErrorNode(node ErrorNode) interface{}
+}
+
+type Visitor interface {
+	Visit(tree ParseTree) interface {}
 }
 
 type BaseParseTreeVisitor struct{}
@@ -110,6 +116,10 @@ type TerminalNodeImpl struct {
 	parentCtx RuleContext
 
 	symbol Token
+}
+
+func (n *TerminalNodeImpl) VisitWrapper(visitor Visitor) interface{} {
+	return nil
 }
 
 var _ TerminalNode = &TerminalNodeImpl{}
@@ -191,6 +201,10 @@ func (t *TerminalNodeImpl) ToStringTree(s []string, r Recognizer) string {
 
 type ErrorNodeImpl struct {
 	*TerminalNodeImpl
+}
+
+func (e *ErrorNodeImpl) VisitWrapper(visitor Visitor) interface {} {
+	return nil
 }
 
 var _ ErrorNode = &ErrorNodeImpl{}
