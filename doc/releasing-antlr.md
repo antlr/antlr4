@@ -485,7 +485,13 @@ Otherwise enter `N` to ignore the warning.
 
 ## Update javadoc for runtime and tool
 
-First, gen javadoc:
+Above build should make latest in 
+
+```
+~/.m2/repository/org/antlr/antlr4-runtime/4.9/antlr4-runtime-4.9
+```
+
+but you can regen (watch pom version!):
 
 ```bash
 $ cd antlr4
