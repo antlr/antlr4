@@ -5,11 +5,11 @@ This folder contains the C++ runtime support for ANTLR.  See [the canonical antl
 ## Authors and major contributors
 
 ANTLR 4 is the result of substantial effort of the following people:
- 
+
 * [Terence Parr](http://www.cs.usfca.edu/~parrt/), parrt@cs.usfca.edu
   ANTLR project lead and supreme dictator for life
   [University of San Francisco](http://www.usfca.edu/)
-* [Sam Harwell](http://tunnelvisionlabs.com/) 
+* [Sam Harwell](http://tunnelvisionlabs.com/)
   Tool co-author, Java and C# target)
 
 The C++ target has been the work of the following people:
@@ -40,6 +40,7 @@ The minimum C++ version to compile the ANTLR C++ runtime with is C++11. The supp
 Include the antlr4-runtime.h umbrella header in your target application to get everything needed to use the library.
 
 If you are compiling with cmake, the minimum version required is cmake 2.8.
+By default, the libraries produced by the CMake build target C++11. If you want to target a different C++ standard, you can explicitly pass the standard - e.g. `-DCMAKE_CXX_STANDARD=17`.
 
 #### Compiling on Windows with Visual Studio using he Visual Studio projects
 Simply open the VS project from the runtime folder (VS 2013+) and build it.
@@ -69,5 +70,3 @@ If the CMake variable 'ANTLR4_INSTALL' is set, CMake Packages will be build and 
 They expose two packages: antlr4_runtime and antlr4_generator which can be referenced to ease up the use of the
 ANTLR Generator and runtime.
 Use and Sample can be found [here](cmake/Antlr4Package.md)
-
-

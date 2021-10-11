@@ -76,8 +76,13 @@ endif()
 
 # Initialize CXXFLAGS.
 if("${CMAKE_VERSION}" VERSION_GREATER 3.1.0)
-  set(CMAKE_CXX_STANDARD 11)
+  if(NOT DEFINED CMAKE_CXX_STANDARD)
+    # only set CMAKE_CXX_STANDARD if not already set
+    # this allows the standard to be set by the caller, for example with -DCMAKE_CXX_STANDARD:STRING=17
+    set(CMAKE_CXX_STANDARD 11)
+  endif()
   set(CMAKE_CXX_STANDARD_REQUIRED ON)
+  set(CMAKE_CXX_EXTENSIONS OFF)
 else()
   set(CMAKE_CXX_FLAGS                "${CMAKE_CXX_FLAGS} -std=c++11")
   set(CMAKE_CXX_FLAGS_DEBUG          "${CMAKE_CXX_FLAGS_DEBUG} -std=c++11")

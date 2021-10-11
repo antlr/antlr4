@@ -26,10 +26,10 @@ public class DFA: CustomStringConvertible {
     /// 
     private let precedenceDfa: Bool
     
-    /// 
-    /// mutex for DFAState changes.
-    /// 
-    private let dfaStateMutex = Mutex()
+    ///
+    /// mutex for states changes.
+    ///
+    internal private(set) var statesMutex = Mutex()
 
     public convenience init(_ atnStartState: DecisionState) {
         self.init(atnStartState, 0)
@@ -113,7 +113,7 @@ public class DFA: CustomStringConvertible {
 
         // synchronization on s0 here is ok. when the DFA is turned into a
         // precedence DFA, s0 will be initialized once and not updated again
-        dfaStateMutex.synchronized {
+        s0.mutex.synchronized {
             // s0.edges is never null for a precedence DFA
             if precedence >= edges.count {
                 let increase = [DFAState?](repeating: nil, count: (precedence + 1 - edges.count))

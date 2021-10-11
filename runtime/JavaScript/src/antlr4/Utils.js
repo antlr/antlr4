@@ -3,8 +3,12 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+function valueToString(v) {
+    return v === null ? "null" : v;
+}
+
 function arrayToString(a) {
-    return "[" + a.join(", ") + "]";
+    return Array.isArray(a) ? ("[" + a.map(valueToString).join(", ") + "]") : "null";
 }
 
 String.prototype.seed = String.prototype.seed || Math.round(Math.random() * Math.pow(2, 32));
@@ -423,12 +427,12 @@ function titleCase(str) {
 function equalArrays(a, b) {
     if (!Array.isArray(a) || !Array.isArray(b))
         return false;
-    if (a == b)
+    if (a === b)
         return true;
-    if (a.length != b.length)
+    if (a.length !== b.length)
         return false;
     for (let i = 0; i < a.length; i++) {
-        if (a[i] == b[i])
+        if (a[i] === b[i])
             continue;
         if (!a[i].equals || !a[i].equals(b[i]))
             return false;

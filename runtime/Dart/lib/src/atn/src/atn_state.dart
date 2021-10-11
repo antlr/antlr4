@@ -94,7 +94,7 @@ abstract class ATNState {
   static final int INVALID_STATE_NUMBER = -1;
 
   /// Which ATN are we in? */
-  ATN atn;
+  late ATN atn;
 
   int stateNumber = INVALID_STATE_NUMBER;
 
@@ -106,7 +106,9 @@ abstract class ATNState {
   List<Transition> transitions = [];
 
   /// Used to cache lookahead during parsing, not used during construction */
-  IntervalSet nextTokenWithinRule;
+  IntervalSet? nextTokenWithinRule;
+
+  ATNState(this.ruleIndex);
 
   @override
   int get hashCode {
@@ -187,6 +189,8 @@ abstract class ATNState {
 }
 
 class BasicState extends ATNState {
+  BasicState(int ruleIndex) : super(ruleIndex);
+
   @override
   StateType get stateType => StateType.BASIC;
 }
@@ -195,6 +199,8 @@ class RuleStartState extends ATNState {
   var stopState;
   var isLeftRecursiveRule = false;
 
+  RuleStartState(int ruleIndex) : super(ruleIndex);
+
   @override
   StateType get stateType => StateType.RULE_START;
 }
@@ -202,14 +208,20 @@ class RuleStartState extends ATNState {
 abstract class DecisionState extends ATNState {
   int decision = 0;
   bool nonGreedy = false;
+
+  DecisionState(int ruleIndex) : super(ruleIndex);
 }
 
 //  The start of a regular {@code (...)} block.
 abstract class BlockStartState extends DecisionState {
-  BlockEndState endState;
+  BlockEndState? endState;
+
+  BlockStartState(int ruleIndex) : super(ruleIndex);
 }
 
 class BasicBlockStartState extends BlockStartState {
+  BasicBlockStartState(int ruleIndex) : super(ruleIndex);
+
   @override
   StateType get stateType => StateType.BLOCK_START;
 }
@@ -219,7 +231,9 @@ class BasicBlockStartState extends BlockStartState {
 ///  it for completeness. In reality, the [PlusLoopbackState] node is the
 ///  real decision-making note for {@code A+}.
 class PlusBlockStartState extends BlockStartState {
-  PlusLoopbackState loopBackState;
+  PlusLoopbackState? loopBackState;
+
+  PlusBlockStartState(int ruleIndex) : super(ruleIndex);
 
   @override
   StateType get stateType => StateType.PLUS_BLOCK_START;
@@ -227,12 +241,16 @@ class PlusBlockStartState extends BlockStartState {
 
 /// The block that begins a closure loop.
 class StarBlockStartState extends BlockStartState {
+  StarBlockStartState(int ruleIndex) : super(ruleIndex);
+
   @override
   StateType get stateType => StateType.STAR_BLOCK_START;
 }
 
 /// The Tokens rule start state linking to each lexer rule start state */
 class TokensStartState extends DecisionState {
+  TokensStartState(int ruleIndex) : super(ruleIndex);
+
   @override
   StateType get stateType => StateType.TOKEN_START;
 }
@@ -242,21 +260,27 @@ class TokensStartState extends DecisionState {
 ///  references to all calls to this rule to compute FOLLOW sets for
 ///  error handling.
 class RuleStopState extends ATNState {
+  RuleStopState(int ruleIndex) : super(ruleIndex);
+
   @override
   StateType get stateType => StateType.RULE_STOP;
 }
 
 /// Terminal node of a simple {@code (a|b|c)} block.
 class BlockEndState extends ATNState {
-  BlockStartState startState;
+  BlockStartState? startState;
+
+  BlockEndState(int ruleIndex) : super(ruleIndex);
 
   @override
   StateType get stateType => StateType.BLOCK_END;
 }
 
 class StarLoopbackState extends ATNState {
+  StarLoopbackState(int ruleIndex) : super(ruleIndex);
+
   StarLoopEntryState get loopEntryState {
-    return transition(0).target;
+    return transition(0).target as StarLoopEntryState;
   }
 
   @override
@@ -264,7 +288,7 @@ class StarLoopbackState extends ATNState {
 }
 
 class StarLoopEntryState extends DecisionState {
-  StarLoopbackState loopBackState;
+  StarLoopbackState? loopBackState;
 
   /// Indicates whether this state can benefit from a precedence DFA during SLL
   /// decision making.
@@ -276,6 +300,8 @@ class StarLoopEntryState extends DecisionState {
   /// @see DFA#isPrecedenceDfa()
   bool isPrecedenceDecision = false;
 
+  StarLoopEntryState(int ruleIndex) : super(ruleIndex);
+
   @override
   StateType get stateType => StateType.STAR_LOOP_ENTRY;
 }
@@ -283,13 +309,17 @@ class StarLoopEntryState extends DecisionState {
 /// Decision state for {@code A+} and {@code (A|B)+}.  It has two transitions:
 ///  one to the loop back to start of the block and one to exit.
 class PlusLoopbackState extends DecisionState {
+  PlusLoopbackState(int ruleIndex) : super(ruleIndex);
+
   @override
   StateType get stateType => StateType.PLUS_LOOP_BACK;
 }
 
 /// Mark the end of a * or + loop.
 class LoopEndState extends ATNState {
-  ATNState loopBackState;
+  ATNState? loopBackState;
+
+  LoopEndState(int ruleIndex) : super(ruleIndex);
 
   @override
   StateType get stateType => StateType.LOOP_END;
