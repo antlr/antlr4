@@ -135,7 +135,11 @@ The runtime and generated grammar should now build correctly.
 
 ### Swift Package Manager Projects
 
-add Antlr4 as a dependency to your `Package.swift` file. For more information, please see the [Swift Package Manager documentation](https://github.com/apple/swift-package-manager/tree/master/Documentation).
+Add Antlr4 as a dependency to your `Package.swift` file. For more information, please see the [Swift Package Manager documentation](https://github.com/apple/swift-package-manager/tree/master/Documentation).
+
+Since we cannot have a separate repository for Swift target (see issue [#1774](https://github.com/antlr/antlr4/issues/1774)), 
+and Swift is currently not ABI stable. We currently support SPM-based
+projects by creating temporary local repository.
 
 ```swift
 .package(name: "Antlr4", url: "https://github.com/antlr/antlr4", from: "4.9.3"

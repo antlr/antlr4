@@ -4,10 +4,10 @@ description: "New Dart runtime for ANTLR4."
 homepage: "https://github.com/antlr/antlr4"
 license: "BSD-3-Clause"
 dependencies: 
-  logging: ^0.11.4
-  collection: ^1.14.12
+  logging: ^1.0.0
+  collection: ^1.15.0
 dev_dependencies:
-  pedantic: ^1.0.0
+  pedantic: ^1.11.0
 
 environment:
-  sdk: ">=2.7.0 <3.0.0"
+  sdk: ">=2.12.0 <3.0.0"

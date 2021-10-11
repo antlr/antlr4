@@ -343,7 +343,7 @@ class ParserATNSimulator extends ATNSimulator {
             }
             const alt = this.execATN(dfa, s0, input, index, outerContext);
             if (this.debug) {
-                console.log("DFA after predictATN: " + dfa.toString(this.parser.literalNames));
+                console.log("DFA after predictATN: " + dfa.toString(this.parser.literalNames, this.parser.symbolicNames));
             }
             return alt;
         } finally {
@@ -528,7 +528,7 @@ class ParserATNSimulator extends ATNSimulator {
         if (this.debug) {
             const altSubSets = PredictionMode.getConflictingAltSubsets(reach);
             console.log("SLL altSubSets=" + Utils.arrayToString(altSubSets) +
-                        ", previous=" + previousD.configs +
+                        /*", previous=" + previousD.configs + */
                         ", configs=" + reach +
                         ", predict=" + predictedAlt +
                         ", allSubsetsConflict=" +

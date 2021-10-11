@@ -15,17 +15,17 @@ class DFA {
 
   Map<DFAState, DFAState> states = {};
 
-  DFAState s0;
+  DFAState? s0;
 
-  final int decision;
+  final int? decision;
 
   /// From which ATN state did we create this DFA? */
 
-  DecisionState atnStartState;
+  DecisionState? atnStartState;
 
   /// [true] if this DFA is for a precedence decision; otherwise,
-  /// [false]. This is the backing field for {@link #isPrecedenceDfa}.
-  bool precedenceDfa;
+  /// [false]. This is the backing field for [isPrecedenceDfa].
+  late bool precedenceDfa;
 
   DFA(this.atnStartState, [this.decision]) {
     var precedenceDfa = false;
@@ -44,8 +44,8 @@ class DFA {
   }
 
   /// Gets whether this DFA is a precedence DFA. Precedence DFAs use a special
-  /// start state {@link #s0} which is not stored in {@link #states}. The
-  /// {@link DFAState#edges} array for this start state contains outgoing edges
+  /// start state {@link #s0} which is not stored in [states]. The
+  /// [DFAState.edges] array for this start state contains outgoing edges
   /// supplying individual start states corresponding to specific precedence
   /// values.
   ///
@@ -64,18 +64,18 @@ class DFA {
   ///
   /// @throws IllegalStateException if this is not a precedence DFA.
   /// @see #isPrecedenceDfa()
-  DFAState getPrecedenceStartState(int precedence) {
+  DFAState? getPrecedenceStartState(int precedence) {
     if (!isPrecedenceDfa()) {
       throw StateError(
           'Only precedence DFAs may contain a precedence start state.');
     }
 
     // s0.edges is never null for a precedence DFA
-    if (precedence < 0 || precedence >= s0.edges.length) {
+    if (precedence < 0 || precedence >= s0!.edges!.length) {
       return null;
     }
 
-    return s0.edges[precedence];
+    return s0!.edges![precedence];
   }
 
   /// Set the start state for a specific precedence value.
@@ -99,13 +99,13 @@ class DFA {
     // synchronization on s0 here is ok. when the DFA is turned into a
     // precedence DFA, s0 will be initialized once and not updated again
     // s0.edges is never null for a precedence DFA
-    if (precedence >= s0.edges.length) {
-      final original = s0.edges;
-      s0.edges = List(precedence + 1);
-      List.copyRange(s0.edges, 0, original);
+    if (precedence >= s0!.edges!.length) {
+      final original = s0!.edges!;
+      s0!.edges = List.filled(precedence + 1, null);
+      List.copyRange(s0!.edges!, 0, original);
     }
 
-    s0.edges[precedence] = startState;
+    s0!.edges![precedence] = startState;
   }
 
   /// Return a list of all states in this DFA, ordered by state number.
@@ -120,7 +120,7 @@ class DFA {
   }
 
   @override
-  String toString([Vocabulary vocabulary]) {
+  String toString([Vocabulary? vocabulary]) {
     vocabulary = vocabulary ?? VocabularyImpl.EMPTY_VOCABULARY;
     if (s0 == null) {
       return '';

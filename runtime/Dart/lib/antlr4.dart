@@ -19,3 +19,10 @@ export 'src/parser_rule_context.dart';
 export 'src/vocabulary.dart';
 export 'src/runtime_meta_data.dart';
 export 'src/token.dart';
+export 'src/prediction_context.dart';
+
+import 'src/util/platform_stub.dart'
+    if (dart.library.io) 'src/util/platform_io.dart';
+
+/// Hack to workaround not being able to access stdout in tests.
+void TEST_platformStdoutWrite(Object? object) => stdoutWrite(object);
