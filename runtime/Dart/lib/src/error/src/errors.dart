@@ -21,14 +21,14 @@ import '../../util/utils.dart';
 ///  mismatched input errors. In each case, the parser knows where it is
 ///  in the input, where it is in the ATN, the rule invocation stack,
 ///  and what kind of problem occurred.
-class RecognitionException extends StateError {
+class RecognitionException<StreamType extends IntStream> extends StateError {
   /// Gets the [Recognizer] where this exception occurred.
   ///
   /// <p>If the recognizer is not available, this method returns null.</p>
   ///
   /// @return The recognizer where this exception occurred, or null if
   /// the recognizer is not available.
-  final Recognizer recognizer;
+  final Recognizer? recognizer;
 
   /// Gets the [RuleContext] at the time this exception was thrown.
   ///
@@ -36,7 +36,7 @@ class RecognitionException extends StateError {
   ///
   /// @return The [RuleContext] at the time this exception was thrown.
   /// If the context is not available, this method returns null.
-  final RuleContext ctx;
+  final RuleContext? ctx;
 
   /// Gets the input stream which is the symbol source for the recognizer where
   /// this exception was thrown.
@@ -46,12 +46,12 @@ class RecognitionException extends StateError {
   /// @return The input stream which is the symbol source for the recognizer
   /// where this exception was thrown, or null if the stream is not
   /// available.
-  final IntStream inputStream;
+  final StreamType inputStream;
 
   /// The current [Token] when an error occurred. Since not all streams
   /// support accessing symbols by index, we have to track the [Token]
   /// instance itself.
-  Token offendingToken;
+  late Token offendingToken;
 
   /// Get the ATN state number the parser was in at the time the error
   /// occurred. For [NoViableAltException] and
@@ -62,10 +62,13 @@ class RecognitionException extends StateError {
   /// <p>If the state number is not known, this method returns -1.</p>
   int offendingState = -1;
 
-  RecognitionException(this.recognizer, this.inputStream, this.ctx,
-      [String message = ''])
-      : super(message) {
-    if (recognizer != null) offendingState = recognizer.state;
+  RecognitionException(
+    this.recognizer,
+    this.inputStream,
+    this.ctx, [
+    String message = '',
+  ]) : super(message) {
+    if (recognizer != null) offendingState = recognizer!.state;
   }
 
   /// Gets the set of input symbols which could potentially follow the
@@ -76,15 +79,15 @@ class RecognitionException extends StateError {
   ///
   /// @return The set of token types that could potentially follow the current
   /// state in the ATN, or null if the information is not available.
-  IntervalSet get expectedTokens {
+  IntervalSet? get expectedTokens {
     if (recognizer != null) {
-      return recognizer.getATN().getExpectedTokens(offendingState, ctx);
+      return recognizer!.getATN().getExpectedTokens(offendingState, ctx);
     }
     return null;
   }
 }
 
-class LexerNoViableAltException extends RecognitionException {
+class LexerNoViableAltException extends RecognitionException<CharStream> {
   /// Matching attempted at what input index? */
   final int startIndex;
 
@@ -92,13 +95,11 @@ class LexerNoViableAltException extends RecognitionException {
   final ATNConfigSet deadEndConfigs;
 
   LexerNoViableAltException(
-      Lexer lexer, CharStream input, this.startIndex, this.deadEndConfigs)
-      : super(lexer, input, null);
-
-  @override
-  CharStream get inputStream {
-    return super.inputStream;
-  }
+    Lexer? lexer,
+    CharStream input,
+    this.startIndex,
+    this.deadEndConfigs,
+  ) : super(lexer, input, null);
 
   @override
   String toString() {
@@ -108,7 +109,7 @@ class LexerNoViableAltException extends RecognitionException {
       symbol = escapeWhitespace(symbol);
     }
 
-    return "${LexerNoViableAltException}('${symbol}')";
+    return "$LexerNoViableAltException('$symbol')";
   }
 }
 
@@ -119,7 +120,7 @@ class LexerNoViableAltException extends RecognitionException {
 class NoViableAltException extends RecognitionException {
   /// Which configurations did we try at input.index() that couldn't match input.LT(1)? */
 
-  final ATNConfigSet deadEndConfigs;
+  final ATNConfigSet? deadEndConfigs;
 
   /// The token object at the start index; the input stream might
   /// 	not be buffering tokens so get a reference to it. (At the
@@ -137,33 +138,42 @@ class NoViableAltException extends RecognitionException {
 //        recognizer._ctx);
 //  }
 
-  NoViableAltException._(Parser recognizer, TokenStream input, this.startToken,
-      Token offendingToken, this.deadEndConfigs, ParserRuleContext ctx)
-      : super(recognizer, input, ctx) {
+  NoViableAltException._(
+    Parser recognizer,
+    TokenStream input,
+    this.startToken,
+    Token offendingToken,
+    this.deadEndConfigs,
+    ParserRuleContext? ctx,
+  ) : super(recognizer, input, ctx) {
     this.offendingToken = offendingToken;
   }
 
-  NoViableAltException(Parser recognizer,
-      [TokenStream input,
-      Token startToken,
-      Token offendingToken,
-      ATNConfigSet deadEndConfigs,
-      ParserRuleContext ctx])
-      : this._(
-            recognizer,
-            input ?? recognizer.inputStream,
-            startToken ?? recognizer.currentToken,
-            offendingToken ?? recognizer.currentToken,
-            deadEndConfigs,
-            ctx ?? recognizer.context);
+  NoViableAltException(
+    Parser recognizer, [
+    TokenStream? input,
+    Token? startToken,
+    Token? offendingToken,
+    ATNConfigSet? deadEndConfigs,
+    ParserRuleContext? ctx,
+  ]) : this._(
+          recognizer,
+          input ?? recognizer.inputStream,
+          startToken ?? recognizer.currentToken,
+          offendingToken ?? recognizer.currentToken,
+          deadEndConfigs,
+          ctx ?? recognizer.context,
+        );
 }
 
 /// This signifies any kind of mismatched input exceptions such as
 ///  when the current input does not match the expected token.
 class InputMismatchException extends RecognitionException {
-  InputMismatchException(Parser recognizer,
-      [int state = -1, ParserRuleContext ctx])
-      : super(recognizer, recognizer.inputStream, ctx ?? recognizer.context) {
+  InputMismatchException(
+    Parser recognizer, [
+    int state = -1,
+    ParserRuleContext? ctx,
+  ]) : super(recognizer, recognizer.inputStream, ctx ?? recognizer.context) {
     if (state != -1 && ctx != null) {
       offendingState = state;
     }
@@ -176,17 +186,23 @@ class InputMismatchException extends RecognitionException {
 ///  Disambiguating predicate evaluation occurs when we test a predicate during
 ///  prediction.
 class FailedPredicateException extends RecognitionException {
-  int ruleIndex;
-  int predIndex;
-  final String predicate;
+  int? ruleIndex;
+  int? predIndex;
+  final String? predicate;
 
-  FailedPredicateException(Parser recognizer,
-      [this.predicate, String message])
-      : super(recognizer, recognizer.inputStream, recognizer.context,
-            formatMessage(predicate, message)) {
-    final s = recognizer.interpreter.atn.states[recognizer.state];
+  FailedPredicateException(
+    Parser recognizer, [
+    this.predicate,
+    String? message,
+  ]) : super(
+          recognizer,
+          recognizer.inputStream,
+          recognizer.context,
+          formatMessage(predicate, message),
+        ) {
+    final s = recognizer.interpreter!.atn.states[recognizer.state]!;
 
-    AbstractPredicateTransition trans = s.transition(0);
+    final trans = s.transition(0) as AbstractPredicateTransition;
     if (trans is PredicateTransition) {
       ruleIndex = trans.ruleIndex;
       predIndex = trans.predIndex;
@@ -194,7 +210,7 @@ class FailedPredicateException extends RecognitionException {
     offendingToken = recognizer.currentToken;
   }
 
-  static String formatMessage(String predicate, String message) {
+  static String formatMessage(String? predicate, String? message) {
     if (message != null) {
       return message;
     }

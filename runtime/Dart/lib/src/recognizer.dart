@@ -21,7 +21,7 @@ abstract class Recognizer<ATNInterpreter extends ATNSimulator> {
   final List<ErrorListener> _listeners = [ConsoleErrorListener.INSTANCE];
 
   /// The ATN interpreter used by the recognizer for prediction.
-  ATNInterpreter interpreter;
+  ATNInterpreter? interpreter;
   int _stateNumber = -1;
 
   List<String> get ruleNames;
@@ -65,16 +65,10 @@ abstract class Recognizer<ATNInterpreter extends ATNSimulator> {
   ///
   /// <p>Used for XPath and tree pattern compilation.</p>
   Map<String, int> get ruleIndexMap {
-    final _ruleNames = ruleNames;
-    if (_ruleNames == null) {
-      throw UnsupportedError(
-          'The current recognizer does not provide a list of rule names.');
-    }
-
-    var result = ruleIndexMapCache[_ruleNames];
+    var result = ruleIndexMapCache[ruleNames];
     if (result == null) {
-      result = Map.unmodifiable(toMap(_ruleNames));
-      ruleIndexMapCache[_ruleNames] = result;
+      result = Map.unmodifiable(toMap(ruleNames));
+      ruleIndexMapCache[ruleNames] = result;
     }
 
     return result;
@@ -91,7 +85,7 @@ abstract class Recognizer<ATNInterpreter extends ATNSimulator> {
   ///
   /// <p>For interpreters, we don't know their serialized ATN despite having
   /// created the interpreter from it.</p>
-  String get serializedATN {
+  String? get serializedATN {
     throw UnsupportedError('there is no serialized ATN');
   }
 
@@ -108,7 +102,7 @@ abstract class Recognizer<ATNInterpreter extends ATNSimulator> {
   ///  for each decision in recognizer in a ParseInfo object.
   ///
   /// @since 4.3
-  ParseInfo get parseInfo {
+  ParseInfo? get parseInfo {
     return null;
   }
 
@@ -119,12 +113,9 @@ abstract class Recognizer<ATNInterpreter extends ATNSimulator> {
     return 'line $line:$charPositionInLine';
   }
 
-  /// @exception NullPointerException if [listener] is null.
-  void addErrorListener(ErrorListener listener) {
-    if (listener == null) {
-      throw ArgumentError.notNull('listener');
-    }
-
+  void addErrorListener(
+    ErrorListener listener,
+  ) {
     _listeners.add(listener);
   }
 
@@ -146,15 +137,15 @@ abstract class Recognizer<ATNInterpreter extends ATNSimulator> {
 
   // subclass needs to override these if there are sempreds or actions
   // that the ATN interp needs to execute
-  bool sempred(RuleContext _localctx, int ruleIndex, int actionIndex) {
+  bool sempred(RuleContext? _localctx, int ruleIndex, int actionIndex) {
     return true;
   }
 
-  bool precpred(RuleContext localctx, int precedence) {
+  bool precpred(RuleContext? localctx, int precedence) {
     return true;
   }
 
-  void action(RuleContext _localctx, int ruleIndex, int actionIndex) {}
+  void action(RuleContext? _localctx, int ruleIndex, int actionIndex) {}
 
   int get state {
     return _stateNumber;
@@ -174,7 +165,7 @@ abstract class Recognizer<ATNInterpreter extends ATNSimulator> {
 
   IntStream get inputStream;
 
-  set inputStream(IntStream input);
+  set inputStream(covariant IntStream input);
 
   TokenFactory get tokenFactory;
 

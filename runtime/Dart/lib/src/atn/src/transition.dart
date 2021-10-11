@@ -38,11 +38,7 @@ abstract class Transition {
   /// The target of this transition. */
   ATNState target;
 
-  Transition(this.target) {
-    if (target == null) {
-      throw ArgumentError.notNull('target cannot be null.');
-    }
-  }
+  Transition(this.target);
 
   TransitionType get type;
 
@@ -55,7 +51,7 @@ abstract class Transition {
   /// transition consumes (matches) an input symbol.
   bool get isEpsilon => false;
 
-  IntervalSet get label => null;
+  IntervalSet? get label => null;
 
   bool matches(int symbol, int minVocabSymbol, int maxVocabSymbol);
 }
@@ -123,9 +119,12 @@ class RuleTransition extends Transition {
   /// What node to begin computations following ref to rule */
   ATNState followState;
 
-  RuleTransition(RuleStartState ruleStart, this.ruleIndex, this.precedence,
-      this.followState)
-      : super(ruleStart);
+  RuleTransition(
+    RuleStartState ruleStart,
+    this.ruleIndex,
+    this.precedence,
+    this.followState,
+  ) : super(ruleStart);
 
   @override
   bool get isEpsilon => true;
@@ -161,7 +160,6 @@ class PredicateTransition extends AbstractPredicateTransition {
   }
 
   Predicate get predicate => Predicate(ruleIndex, predIndex, isCtxDependent);
-
 
   @override
   String toString() {
@@ -226,9 +224,9 @@ class ActionTransition extends Transition {
 // A transition containing a set of values.
 class SetTransition extends Transition {
   @override
-  IntervalSet label;
+  late IntervalSet label;
 
-  SetTransition(ATNState target, [IntervalSet st]) : super(target) {
+  SetTransition(ATNState target, [IntervalSet? st]) : super(target) {
     label = st ?? IntervalSet.ofOne(Token.INVALID_TYPE);
   }
 
