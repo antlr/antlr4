@@ -15,13 +15,11 @@ import '../../token.dart';
 /// The basic notion of a tree has a parent, a payload, and a list of children.
 ///  It is the most abstract interface for all the trees used by ANTLR.
 abstract class Tree {
-  Tree get parent;
+  Tree? get parent;
 
   dynamic get payload;
 
-  Tree getChild<T>(int i);
-
-//  Tree getChild(int i);
+  Tree? getChild<T>(int i);
 
   int get childCount;
 
@@ -49,10 +47,10 @@ abstract class SyntaxTree extends Tree {
 abstract class ParseTree extends SyntaxTree {
   // the following methods narrow the return type; they are not additional methods
   @override
-  ParseTree get parent;
+  ParseTree? get parent;
 
   @override
-  ParseTree getChild<T>(int i);
+  ParseTree? getChild<T>(int i);
 
   /// Set the parent for this node.
   ///
@@ -68,15 +66,15 @@ abstract class ParseTree extends SyntaxTree {
   ///  minimal change, which is to add this method.
   ///
   ///  @since 4.7
-  set parent(RuleContext parent);
+  set parent(covariant ParseTree? parent);
 
   /// The [ParseTreeVisitor] needs a double dispatch method. */
-  T accept<T>(ParseTreeVisitor<T> visitor);
+  T? accept<T>(ParseTreeVisitor<T> visitor);
 
   /// Return the combined text of all leaf nodes. Does not get any
   ///  off-channel tokens (if any) so won't return whitespace and
   ///  comments if they are sent to parser on hidden channel.
-  String get text;
+  String? get text;
 
   /// Specialize toStringTree so that it can print out more information
   /// 	based upon the parser.
@@ -99,7 +97,7 @@ abstract class ParseTreeVisitor<T> {
   ///
   /// <p>The default implementation calls {@link ParseTree#accept} on the
   /// specified tree.</p>
-  T visit(ParseTree tree) {
+  T? visit(ParseTree tree) {
     return tree.accept(this);
   }
 
@@ -116,7 +114,7 @@ abstract class ParseTreeVisitor<T> {
   /// <p>The default implementation is not safe for use in visitors that modify
   /// the tree structure. Visitors that modify the tree should override this
   /// method to behave properly in respect to the specific algorithm in use.</p>
-  T visitChildren(RuleNode node) {
+  T? visitChildren(RuleNode node) {
     var result = defaultResult();
     final n = node.childCount;
     for (var i = 0; i < n; i++) {
@@ -124,7 +122,7 @@ abstract class ParseTreeVisitor<T> {
         break;
       }
 
-      final c = node.getChild(i);
+      final c = node.getChild(i)!;
       final childResult = c.accept(this);
       result = aggregateResult(result, childResult);
     }
@@ -137,7 +135,7 @@ abstract class ParseTreeVisitor<T> {
   /// <p>The default implementation returns the result of
   /// {@link #defaultResult defaultResult}.</p>
 
-  T visitTerminal(TerminalNode node) {
+  T? visitTerminal(TerminalNode node) {
     return defaultResult();
   }
 
@@ -146,7 +144,7 @@ abstract class ParseTreeVisitor<T> {
   /// <p>The default implementation returns the result of
   /// {@link #defaultResult defaultResult}.</p>
 
-  T visitErrorNode(ErrorNode node) {
+  T? visitErrorNode(ErrorNode node) {
     return defaultResult();
   }
 
@@ -159,7 +157,7 @@ abstract class ParseTreeVisitor<T> {
   /// <p>The base implementation returns null.</p>
   ///
   /// @return The default value returned by visitor methods.
-  T defaultResult() {
+  T? defaultResult() {
     return null;
   }
 
@@ -180,7 +178,7 @@ abstract class ParseTreeVisitor<T> {
   /// a child node.
   ///
   /// @return The updated aggregate result.
-  T aggregateResult(T aggregate, T nextResult) => nextResult;
+  T? aggregateResult(T? aggregate, T? nextResult) => nextResult;
 
   /// This method is called after visiting each child in
   /// {@link #visitChildren}. This method is first called before the first
@@ -204,7 +202,7 @@ abstract class ParseTreeVisitor<T> {
   /// @return [true] to continue visiting children. Otherwise return
   /// [false] to stop visiting children and immediately return the
   /// current aggregate result from {@link #visitChildren}.
-  bool shouldVisitNextChild(RuleNode node, T currentResult) => true;
+  bool shouldVisitNextChild(RuleNode node, T? currentResult) => true;
 }
 
 abstract class ParseTreeListener {
@@ -226,13 +224,13 @@ class TraceListener implements ParseTreeListener {
   void enterEveryRule(ParserRuleContext ctx) {
     log('enter   ' +
         parser.ruleNames[ctx.ruleIndex] +
-        ', LT(1)=${parser.inputStream.LT(1).text}');
+        ', LT(1)=${parser.inputStream.LT(1)?.text}');
   }
 
   @override
   void visitTerminal(TerminalNode node) {
     log('consume ${node.symbol} rule ' +
-        parser.ruleNames[parser.context.ruleIndex]);
+        parser.ruleNames[parser.context!.ruleIndex]);
   }
 
   @override
@@ -241,7 +239,7 @@ class TraceListener implements ParseTreeListener {
   @override
   void exitEveryRule(ParserRuleContext ctx) {
     log('exit    ${parser.ruleNames[ctx.ruleIndex]}' ', LT(1)=' +
-        parser.inputStream.LT(1).text);
+        (parser.inputStream.LT(1)?.text ?? ''));
   }
 }
 
@@ -270,21 +268,21 @@ class TerminalNodeImpl extends TerminalNode {
   @override
   Token symbol;
   @override
-  ParseTree parent;
+  ParseTree? parent;
 
   TerminalNodeImpl(this.symbol);
 
   @override
-  ParseTree getChild<T>(i) {
+  ParseTree? getChild<T>(i) {
     return null;
   }
 
   @override
-  Token get payload => symbol;
+  Token? get payload => symbol;
 
   @override
   Interval get sourceInterval {
-    if (symbol == null) return Interval.INVALID;
+    //if (symbol == null) return Interval.INVALID; Todo: review this nullability that nobody kind of defines, change here or change on to String
 
     final tokenIndex = symbol.tokenIndex;
     return Interval(tokenIndex, tokenIndex);
@@ -296,24 +294,24 @@ class TerminalNodeImpl extends TerminalNode {
   }
 
   @override
-  T accept<T>(ParseTreeVisitor<T> visitor) {
+  T? accept<T>(ParseTreeVisitor<T> visitor) {
     return visitor.visitTerminal(this);
   }
 
   @override
-  String get text {
+  String? get text {
     return symbol.text;
   }
 
   @override
-  String toStringTree({Parser parser}) {
+  String toStringTree({Parser? parser}) {
     return toString();
   }
 
   @override
   String toString() {
     if (symbol.type == Token.EOF) return '<EOF>';
-    return symbol.text;
+    return symbol.text ?? '';
   }
 }
 
@@ -328,7 +326,7 @@ class ErrorNodeImpl extends TerminalNodeImpl implements ErrorNode {
   bool isErrorNode() => true;
 
   @override
-  T accept<T>(ParseTreeVisitor<T> visitor) {
+  T? accept<T>(ParseTreeVisitor<T> visitor) {
     return visitor.visitErrorNode(this);
   }
 }
@@ -342,10 +340,10 @@ class ParseTreeWalker {
       listener.visitTerminal(t);
       return;
     }
-    RuleNode r = t;
+    final r = t as RuleNode;
     enterRule(listener, r);
     for (var i = 0; i < r.childCount; i++) {
-      walk(listener, r.getChild(i));
+      walk(listener, r.getChild(i)!);
     }
     exitRule(listener, r);
   }
@@ -355,13 +353,15 @@ class ParseTreeWalker {
   /// [RuleContext]-specific event. First we trigger the generic and then
   /// the rule specific. We to them in reverse order upon finishing the node.
   void enterRule(ParseTreeListener listener, RuleNode r) {
-    ParserRuleContext ctx = r.ruleContext;
+    var ctx = r.ruleContext
+        as ParserRuleContext; // Todo: review this cast: we have a confusion between RuleNode and ParseTree on this class
     listener.enterEveryRule(ctx);
     ctx.enterRule(listener);
   }
 
   void exitRule(ParseTreeListener listener, RuleNode r) {
-    ParserRuleContext ctx = r.ruleContext;
+    var ctx = r.ruleContext
+        as ParserRuleContext; // Todo: review this cast: we have a confusion between RuleNode and ParseTree on this class
     ctx.exitRule(listener);
     listener.exitEveryRule(ctx);
   }

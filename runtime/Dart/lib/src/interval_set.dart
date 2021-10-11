@@ -19,7 +19,8 @@ class Interval {
 
   static final Interval INVALID = Interval(-1, -2);
 
-  static List<Interval> cache = List<Interval>(INTERVAL_POOL_MAX_VALUE + 1);
+  static List<Interval?> cache =
+      List<Interval?>.filled(INTERVAL_POOL_MAX_VALUE + 1, null);
 
   int a;
   int b;
@@ -44,7 +45,7 @@ class Interval {
     if (cache[a] == null) {
       cache[a] = Interval(a, a);
     }
-    return cache[a];
+    return cache[a]!;
   }
 
   /// return number of elements between a and b inclusively. x..x is length 1.
@@ -55,11 +56,10 @@ class Interval {
   }
 
   @override
-  bool operator ==(Object o) {
-    if (o == null || !(o is Interval)) {
+  bool operator ==(Object other) {
+    if (other is! Interval) {
       return false;
     }
-    Interval other = o;
     return a == other.a && b == other.b;
   }
 
@@ -124,8 +124,8 @@ class Interval {
   ///  other must not be totally enclosed (properly contained)
   ///  within this, which would result in two disjoint intervals
   ///  instead of the single one returned by this method.
-  Interval differenceNotProperlyContained(Interval other) {
-    Interval diff;
+  Interval? differenceNotProperlyContained(Interval other) {
+    Interval? diff;
     // other.a to left of this.a (or same)
     if (other.startsBeforeNonDisjoint(this)) {
       diff = Interval.of(max(a, other.b + 1), b);
@@ -166,7 +166,7 @@ class IntervalSet {
 
   bool readonly = false;
 
-  IntervalSet([List<Interval> intervals]) {
+  IntervalSet([List<Interval>? intervals]) {
     this.intervals = intervals ?? [];
   }
 
@@ -282,7 +282,7 @@ class IntervalSet {
     return o;
   }
 
-  IntervalSet addAll(IntervalSet set) {
+  IntervalSet addAll(IntervalSet? set) {
     if (set == null) {
       return this;
     }
@@ -304,12 +304,12 @@ class IntervalSet {
     return this;
   }
 
-  IntervalSet complementRange(int minElement, int maxElement) {
+  IntervalSet? complementRange(int minElement, int maxElement) {
     return complement(IntervalSet.ofRange(minElement, maxElement));
   }
 
   /// {@inheritDoc} */
-  IntervalSet complement(IntervalSet vocabulary) {
+  IntervalSet? complement(IntervalSet? vocabulary) {
     if (vocabulary == null || vocabulary.isNil) {
       return null; // nothing in common with null set
     }
@@ -325,7 +325,7 @@ class IntervalSet {
   }
 
   IntervalSet operator -(IntervalSet a) {
-    if (a == null || a.isNil) {
+    if (a.isNil) {
       return IntervalSet.ofSet(this);
     }
 
@@ -342,12 +342,12 @@ class IntervalSet {
   /// operation is {@code left - right}. If either of the input sets is
   /// null, it is treated as though it was an empty set.
   static IntervalSet subtract(IntervalSet left, IntervalSet right) {
-    if (left == null || left.isNil) {
+    if (left.isNil) {
       return IntervalSet();
     }
 
     final result = IntervalSet.ofSet(left);
-    if (right == null || right.isNil) {
+    if (right.isNil) {
       // right set has no elements; just return the copy of the current set
       return result;
     }
@@ -371,8 +371,8 @@ class IntervalSet {
         continue;
       }
 
-      Interval beforeCurrent;
-      Interval afterCurrent;
+      Interval? beforeCurrent;
+      Interval? afterCurrent;
       if (rightInterval.a > resultInterval.a) {
         beforeCurrent = Interval(resultInterval.a, rightInterval.a - 1);
       }
@@ -417,14 +417,9 @@ class IntervalSet {
 
   /// {@inheritDoc} */
   IntervalSet operator +(IntervalSet other) {
-    if (other == null) {
-      //|| !(other is IntervalSet) ) {
-      return null; // nothing in common with null set
-    }
-
     final myIntervals = intervals;
     final theirIntervals = (other).intervals;
-    IntervalSet intersection;
+    IntervalSet? intersection;
     final mySize = myIntervals.length;
     final theirSize = theirIntervals.length;
     var i = 0;
@@ -442,15 +437,18 @@ class IntervalSet {
         j++;
       } else if (mine.properlyContains(theirs)) {
 // overlap, add intersection, get next theirs
-        intersection ??= IntervalSet();     intersection.add(mine.intersection(theirs));
+        intersection ??= IntervalSet();
+        intersection.add(mine.intersection(theirs));
         j++;
       } else if (theirs.properlyContains(mine)) {
 // overlap, add intersection, get next mine
-        intersection ??= IntervalSet();     intersection.add(mine.intersection(theirs));
+        intersection ??= IntervalSet();
+        intersection.add(mine.intersection(theirs));
         i++;
       } else if (!mine.disjoint(theirs)) {
 // overlap, add intersection
-        intersection ??= IntervalSet();     intersection.add(mine.intersection(theirs));
+        intersection ??= IntervalSet();
+        intersection.add(mine.intersection(theirs));
 // Move the iterator of lower range [a..b], but not
 // the upper range as it may contain elements that will collide
 // with the next iterator. So, if mine=[0..115] and
@@ -499,7 +497,7 @@ class IntervalSet {
   /// {@inheritDoc} */
 
   bool get isNil {
-    return intervals == null || intervals.isEmpty;
+    return intervals.isEmpty;
   }
 
   /// Returns the maximum value contained in the set if not isNil().
@@ -544,16 +542,15 @@ class IntervalSet {
 
   @override
   bool operator ==(Object obj) {
-    if (obj == null || !(obj is IntervalSet)) {
+    if (obj is! IntervalSet) {
       return false;
     }
-    IntervalSet other = obj;
-    return ListEquality().equals(intervals, other?.intervals);
+    return ListEquality().equals(intervals, obj.intervals);
   }
 
   @override
-  String toString({bool elemAreChar = false, Vocabulary vocabulary}) {
-    if (intervals == null || intervals.isEmpty) {
+  String toString({bool elemAreChar = false, Vocabulary? vocabulary}) {
+    if (intervals.isEmpty) {
       return '{}';
     }
 
@@ -628,7 +625,7 @@ class IntervalSet {
   }
 
   List<int> toIntegerList() {
-    final values = List<int>(length);
+    final values = <int>[];
     final n = intervals.length;
     for (var i = 0; i < n; i++) {
       final I = intervals[i];

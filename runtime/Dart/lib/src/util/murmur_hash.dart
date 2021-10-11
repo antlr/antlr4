@@ -11,7 +11,7 @@ class MurmurHash {
   ///
   /// @param seed the seed
   /// @return the intermediate hash value
-  static int initialize([int seed]) {
+  static int initialize([int? seed]) {
     return seed ?? DEFAULT_SEED;
   }
 

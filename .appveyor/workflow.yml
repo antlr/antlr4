@@ -58,7 +58,7 @@ for:
       only:
         - job_name: dart-runtime
     install:
-      - cinst -y dart-sdk --version=2.8.4
+      - cinst -y dart-sdk --version=2.12.1
     build_script:
       - mvn -q -DskipTests install --batch-mode
     test_script:

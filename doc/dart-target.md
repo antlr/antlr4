@@ -1,6 +1,6 @@
 # ANTLR4 Runtime for Dart
 
-Notice: Dart target may generate code incompatible with Dart 2.9 sound null safety. Please set the minimum SDK constraint to 2.8.4 or lower if such violation is found. Contributions are welcomed.
+From version 4.9.3 onwards antlr's dart generated code is null sound safety compatible and sets the minimum dart sdk version to 2.12.0.
 
 ### First steps
 
@@ -115,3 +115,16 @@ The expected output is:
 "a":1
 1
 ```
+
+### Debug
+
+We have some logs in place that can ease the debugging process, in order to turn these logs on you can enable the following environment declarations:
+
+- ANTLR_LEXER_DEBUG
+- ANTLR_LEXER_DFA_DEBUG
+- ANTLR_PARSER_DEBUG
+- ANTLR_PARSER_LIST_ATN_DECISIONS_DEBUG
+- ANTLR_PARSER_DFA_DEBUG
+- ANTLR_PARSER_RETRY_DEBUG
+
+If you're using flutter, you can define these variables by adding an `--dart-define` arguments, eg. `flutter run --dart-define LEXER_DEBUG=false`

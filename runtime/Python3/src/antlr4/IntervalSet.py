@@ -11,11 +11,11 @@ from antlr4.Token import Token
 IntervalSet = None
 
 class IntervalSet(object):
-    __slots__ = ('intervals', 'readOnly')
+    __slots__ = ('intervals', 'readonly')
 
     def __init__(self):
         self.intervals = None
-        self.readOnly = False
+        self.readonly = False
 
     def __iter__(self):
         if self.intervals is not None:

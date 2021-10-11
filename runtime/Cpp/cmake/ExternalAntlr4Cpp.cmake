@@ -38,7 +38,7 @@ else()
     set(ANTLR4_SHARED_LIBRARIES
         ${ANTLR4_OUTPUT_DIR}/libantlr4-runtime.dll.a)
     set(ANTLR4_RUNTIME_LIBRARIES
-        ${ANTLR4_OUTPUT_DIR}/cygantlr4-runtime-4.9.1.dll)
+        ${ANTLR4_OUTPUT_DIR}/cygantlr4-runtime-4.9.2.dll)
   elseif(APPLE)
     set(ANTLR4_RUNTIME_LIBRARIES
         ${ANTLR4_OUTPUT_DIR}/libantlr4-runtime.dylib)
@@ -112,7 +112,7 @@ else()
       EXCLUDE_FROM_ALL 1)
 endif()
 
-# Seperate build step as rarely people want both
+# Separate build step as rarely people want both
 set(ANTLR4_BUILD_DIR ${ANTLR4_ROOT})
 if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.14.0")
   # CMake 3.14 builds in above's SOURCE_SUBDIR when BUILD_IN_SOURCE is true
