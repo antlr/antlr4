@@ -291,6 +291,7 @@ YYYY/MM/DD, github id, Full name, email
 2021/02/02, tsotnikov, Taras Sotnikov, taras.sotnikov@gmail.com
 2021/02/10, jirislaby, Jiri Slaby, jirislaby@gmail.com
 2021/02/21, namasikanam, Xingyu Xie, namasikanam@gmail.com
+2021/02/26, ahooper, Andrew Hooper, ahooper at kos dot net
 2021/02/27, khmarbaise, Karl Heinz Marbaise, github@soebes.com
 2021/02/28, Dante-Broggi, Dante Broggi, 34220985+Dante-Broggi@users.noreply.github.com
 2021/03/02, hackeris
