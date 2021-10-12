@@ -1132,9 +1132,7 @@ open class ParserATNSimulator: ATNSimulator {
         _ altToPred: [SemanticContext?]) -> [DFAState.PredPrediction]? {
             var pairs = [DFAState.PredPrediction]()
             var containsPredicate = false
-            let length = altToPred.count
-            for i in 1..<length {
-                let pred = altToPred[i]
+            for (i, pred) in altToPred.enumerated().dropFirst() {
 
                 // unpredicated is indicated by SemanticContext.NONE
                 assert(pred != nil, "Expected: pred!=null")
