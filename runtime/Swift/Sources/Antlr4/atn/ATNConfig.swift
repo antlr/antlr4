@@ -168,8 +168,8 @@ public func ==(lhs: ATNConfig, rhs: ATNConfig) -> Bool {
         return true
     }
     
-    if (lhs is LexerATNConfig) && (rhs is LexerATNConfig) {
-        return (lhs as! LexerATNConfig) == (rhs as! LexerATNConfig)
+    if let l = lhs as? LexerATNConfig, let r = rhs as? LexerATNConfig {
+        return l == r
 
 
     }
