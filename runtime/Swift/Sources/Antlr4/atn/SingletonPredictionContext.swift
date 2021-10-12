@@ -71,16 +71,8 @@ public func ==(lhs: SingletonPredictionContext, rhs: SingletonPredictionContext)
     if lhs.returnState != rhs.returnState {
         return false
     }
-    var parentCompare = false
-    if (lhs.parent == nil) && (rhs.parent == nil) {
-        parentCompare = true
-    } else if lhs.parent == nil || rhs.parent == nil  {
-        parentCompare = false
-    } else {
-        parentCompare = (lhs.parent! == rhs.parent!)
-    }
 
-    return parentCompare
+    return lhs.parent == rhs.parent
 }
 
 
