@@ -292,11 +292,10 @@ public final class ATNConfigSet: Hashable, CustomStringConvertible {
     }
 
     public func getConflictingAltSubsets() -> [BitSet] {
-        let length = configs.count
         var configToAlts = [Int: BitSet]()
 
-        for i in 0..<length {
-            let hash = configHash(configs[i].state.stateNumber, configs[i].context)
+        for cfg in configs {
+            let hash = configHash(cfg.state.stateNumber, cfg.context)
             var alts: BitSet
             if let configToAlt = configToAlts[hash] {
                 alts = configToAlt
@@ -305,7 +304,7 @@ public final class ATNConfigSet: Hashable, CustomStringConvertible {
                 configToAlts[hash] = alts
             }
 
-            try! alts.set(configs[i].alt)
+            try! alts.set(cfg.alt)
         }
 
         return Array(configToAlts.values)

@@ -84,8 +84,8 @@ public class ArrayPredictionContext: PredictionContext {
         let length = parents.count
         var uniqueParents: Dictionary<PredictionContext, PredictionContext> =
         Dictionary<PredictionContext, PredictionContext>()
-        for p in 0..<length {
-            if let parent: PredictionContext = parents[p] {
+        for p in parents {
+            if let parent: PredictionContext = p {
                 // if !uniqueParents.keys.contains(parent) {
                 if uniqueParents[parent] == nil {
                     uniqueParents[parent] = parent  // don't replace

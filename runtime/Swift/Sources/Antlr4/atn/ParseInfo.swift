@@ -61,9 +61,8 @@ public class ParseInfo {
     public func getTotalTimeInPrediction() -> Int64 {
         let decisions: [DecisionInfo] = atnSimulator.getDecisionInfo()
         var t: Int64 = 0
-        let length = decisions.count
-        for i in 0..<length {
-            t += decisions[i].timeInPrediction
+        for d in decisions {
+            t += d.timeInPrediction
         }
         return t
     }
@@ -76,9 +75,8 @@ public class ParseInfo {
     public func getTotalSLLLookaheadOps() -> Int64 {
         let decisions: [DecisionInfo] = atnSimulator.getDecisionInfo()
         var k: Int64 = 0
-        let length = decisions.count
-        for i in 0..<length {
-            k += decisions[i].SLL_TotalLook
+        for d in decisions {
+            k += d.SLL_TotalLook
         }
         return k
     }
@@ -91,9 +89,8 @@ public class ParseInfo {
     public func getTotalLLLookaheadOps() -> Int64 {
         let decisions: [DecisionInfo] = atnSimulator.getDecisionInfo()
         var k: Int64 = 0
-        let length = decisions.count
-        for i in 0..<length {
-            k += decisions[i].LL_TotalLook
+        for d in decisions {
+            k += d.LL_TotalLook
         }
         return k
     }
@@ -105,9 +102,8 @@ public class ParseInfo {
     public func getTotalSLLATNLookaheadOps() -> Int64 {
         let decisions: [DecisionInfo] = atnSimulator.getDecisionInfo()
         var k: Int64 = 0
-        let length = decisions.count
-        for i in 0..<length {
-            k += decisions[i].SLL_ATNTransitions
+        for d in decisions {
+            k += d.SLL_ATNTransitions
         }
         return k
     }
@@ -119,9 +115,8 @@ public class ParseInfo {
     public func getTotalLLATNLookaheadOps() -> Int64 {
         let decisions: [DecisionInfo] = atnSimulator.getDecisionInfo()
         var k: Int64 = 0
-        let length = decisions.count
-        for i in 0..<length {
-            k += decisions[i].LL_ATNTransitions
+        for d in decisions {
+            k += d.LL_ATNTransitions
         }
         return k
     }
@@ -137,10 +132,9 @@ public class ParseInfo {
     public func getTotalATNLookaheadOps() -> Int64 {
         let decisions: [DecisionInfo] = atnSimulator.getDecisionInfo()
         var k: Int64 = 0
-        let length = decisions.count
-        for i in 0..<length {
-            k += decisions[i].SLL_ATNTransitions
-            k += decisions[i].LL_ATNTransitions
+        for d in decisions {
+            k += d.SLL_ATNTransitions
+            k += d.LL_ATNTransitions
         }
         return k
     }
