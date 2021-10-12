@@ -49,7 +49,7 @@ public final class DFAState: Hashable, CustomStringConvertible {
     /// This is set to _org.antlr.v4.runtime.atn.ATN#INVALID_ALT_NUMBER_ when _#predicates_`!=null` or
     /// _#requiresFullContext_.
     /// 
-    public internal(set) var prediction = 0
+    public internal(set) var prediction = ATN.INVALID_ALT_NUMBER
 
     public internal(set) var lexerActionExecutor: LexerActionExecutor?
 
