@@ -57,10 +57,10 @@ workflows:
       - test_runtime:
           matrix:
             parameters:
-              target: [ dart, go, python2, python3, javascript ]
+              target: [ dart, go, python2, python3, javascript, php ]
       - test_runtime:
           matrix:
             parameters:
 #              target: [ cpp, dotnet, swift ]
-              target: [ cpp, dotnet ]
+              target: [ cpp, dotnet, dart ]
               test-group: [ LEXER, PARSER, RECURSION ]

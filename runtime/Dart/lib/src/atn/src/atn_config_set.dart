@@ -18,6 +18,18 @@ import 'atn_config.dart';
 import 'atn_state.dart';
 import 'semantic_context.dart';
 
+final defaultConfigLookup = () => HashSet<ATNConfig>(equals: (a, b) {
+      return a.state.stateNumber == b.state.stateNumber &&
+          a.alt == b.alt &&
+          a.semanticContext == b.semanticContext;
+    }, hashCode: (ATNConfig o) {
+      var hashCode = 7;
+      hashCode = 31 * hashCode + o.state.stateNumber;
+      hashCode = 31 * hashCode + o.alt;
+      hashCode = 31 * hashCode + o.semanticContext.hashCode;
+      return hashCode;
+    });
+
 class ATNConfigSet extends Iterable<ATNConfig> {
   /// Indicates that the set of configurations is read-only. Do not
   ///  allow any code to manipulate the set; DFA states will point at
@@ -32,6 +44,8 @@ class ATNConfigSet extends Iterable<ATNConfig> {
     _readOnly = readOnly;
     if (readOnly) {
       configLookup = null; // can't mod, no need for lookup cache
+    } else {
+      configLookup = defaultConfigLookup();
     }
   }
 
@@ -43,18 +57,7 @@ class ATNConfigSet extends Iterable<ATNConfig> {
   ///
   /// All configs but hashed by (s, i, _, pi) not including context. Wiped out
   /// when we go readonly as this set becomes a DFA state.
-  Set<ATNConfig> configLookup = HashSet<ATNConfig>(equals: (a, b) {
-    if (a == null || b == null) return false;
-    return a.state.stateNumber == b.state.stateNumber &&
-        a.alt == b.alt &&
-        a.semanticContext == b.semanticContext;
-  }, hashCode: (ATNConfig o) {
-    var hashCode = 7;
-    hashCode = 31 * hashCode + o.state.stateNumber;
-    hashCode = 31 * hashCode + o.alt;
-    hashCode = 31 * hashCode + o.semanticContext.hashCode;
-    return hashCode;
-  });
+  Set<ATNConfig>? configLookup = defaultConfigLookup();
 
   /// Track the elements as they are added to the set; supports get(i) */
   final List<ATNConfig> configs = [];
@@ -67,7 +70,7 @@ class ATNConfigSet extends Iterable<ATNConfig> {
   ///  not necessarily represent the ambiguous alternatives. In fact,
   ///  I should also point out that this seems to include predicated alternatives
   ///  that have predicates that evaluate to false. Computed in computeTargetState().
-  BitSet conflictingAlts;
+  BitSet? conflictingAlts;
 
   // Used in parser and lexer. In lexer, it indicates we hit a pred
   // while computing a closure operation.  Don't make a DFA state from this.
@@ -83,13 +86,13 @@ class ATNConfigSet extends Iterable<ATNConfig> {
 
   ATNConfigSet([this.fullCtx = true]);
 
-  ATNConfigSet.dup(ATNConfigSet old) {
-    fullCtx = old.fullCtx;
+  ATNConfigSet.dup(ATNConfigSet old)
+      : fullCtx = old.fullCtx,
+        uniqueAlt = old.uniqueAlt,
+        conflictingAlts = old.conflictingAlts,
+        hasSemanticContext = old.hasSemanticContext,
+        dipsIntoOuterContext = old.dipsIntoOuterContext {
     addAll(old);
-    uniqueAlt = old.uniqueAlt;
-    conflictingAlts = old.conflictingAlts;
-    hasSemanticContext = old.hasSemanticContext;
-    dipsIntoOuterContext = old.dipsIntoOuterContext;
   }
 
   /// Adding a new config means merging contexts with existing configs for
@@ -100,9 +103,11 @@ class ATNConfigSet extends Iterable<ATNConfig> {
   ///
   /// <p>This method updates {@link #dipsIntoOuterContext} and
   /// {@link #hasSemanticContext} when necessary.</p>
-  bool add(ATNConfig config,
-      [Map<Pair<PredictionContext, PredictionContext>, PredictionContext>
-          mergeCache]) {
+  bool add(
+    ATNConfig config, [
+    Map<Pair<PredictionContext, PredictionContext>, PredictionContext>?
+        mergeCache,
+  ]) {
     if (readOnly) throw StateError('This set is readonly');
     if (config.semanticContext != SemanticContext.NONE) {
       hasSemanticContext = true;
@@ -110,18 +115,22 @@ class ATNConfigSet extends Iterable<ATNConfig> {
     if (config.outerContextDepth > 0) {
       dipsIntoOuterContext = true;
     }
-    final existing = configLookup.lookup(config) ?? config;
+    final existing = configLookup!.lookup(config) ?? config;
     if (identical(existing, config)) {
       // we added this new one
       cachedHashCode = -1;
-      configLookup.add(config);
+      configLookup!.add(config);
       configs.add(config); // track order here
       return true;
     }
     // a previous (s,i,pi,_), merge with it and save result
     final rootIsWildcard = !fullCtx;
     final merged = PredictionContext.merge(
-        existing.context, config.context, rootIsWildcard, mergeCache);
+      existing.context!,
+      config.context!,
+      rootIsWildcard,
+      mergeCache,
+    );
     // no need to check for existing.context, config.context in cache
     // since only way to create new graphs is "call rule" and here. We
     // cache at both places.
@@ -164,8 +173,8 @@ class ATNConfigSet extends Iterable<ATNConfig> {
     return alts;
   }
 
-  List<SemanticContext> get predicates {
-    final preds = <SemanticContext>[];
+  List<SemanticContext?> get predicates {
+    final preds = <SemanticContext?>[];
     for (var c in configs) {
       if (c.semanticContext != SemanticContext.NONE) {
         preds.add(c.semanticContext);
@@ -181,11 +190,11 @@ class ATNConfigSet extends Iterable<ATNConfig> {
   void optimizeConfigs(interpreter) {
     if (readOnly) throw StateError('This set is readonly');
 
-    if (configLookup.isEmpty) return;
+    if (configLookup!.isEmpty) return;
 
     for (var config in configs) {
 //			int before = PredictionContext.getAllContextNodes(config.context).length;
-      config.context = interpreter.getCachedContext(config.context);
+      config.context = interpreter!.getCachedContext(config.context);
 //			int after = PredictionContext.getAllContextNodes(config.context).length;
 //			System.out.println("configs "+before+"->"+after);
     }
@@ -202,7 +211,6 @@ class ATNConfigSet extends Iterable<ATNConfig> {
   bool operator ==(other) {
     return identical(this, other) ||
         (other is ATNConfigSet &&
-            other != null &&
             ListEquality().equals(configs, other.configs) &&
             fullCtx == other.fullCtx &&
             uniqueAlt == other.uniqueAlt &&
@@ -244,13 +252,13 @@ class ATNConfigSet extends Iterable<ATNConfig> {
   }
 
   @override
-  bool contains(Object o) {
+  bool contains(Object? o) {
     if (configLookup == null) {
       throw UnsupportedError(
           'This method is not implemented for readonly sets.');
     }
 
-    return configLookup.contains(o);
+    return configLookup!.contains(o);
   }
 
   @override
@@ -260,7 +268,7 @@ class ATNConfigSet extends Iterable<ATNConfig> {
     if (readOnly) throw StateError('This set is readonly');
     configs.clear();
     cachedHashCode = -1;
-    configLookup.clear();
+    configLookup!.clear();
   }
 
   @override

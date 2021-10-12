@@ -63,20 +63,19 @@ import 'tree/tree.dart';
 abstract class RuleContext extends RuleNode {
   /// What context invoked this rule?
   @override
-  RuleContext parent;
+  RuleContext? parent;
 
   /// What state invoked the rule associated with this context?
   /// The "return address" is the followState of invokingState
   /// If parent is null, this should be -1.
   int invokingState;
 
-  RuleContext({this.parent, this.invokingState}) {
-    invokingState = invokingState ?? -1;
-  }
+  RuleContext({this.parent, int? invokingState})
+      : invokingState = invokingState ?? -1;
 
   int depth() {
     var n = 0;
-    var p = this;
+    RuleContext? p = this;
     while (p != null) {
       p = p.parent;
       n++;
@@ -112,7 +111,7 @@ abstract class RuleContext extends RuleNode {
 
     final builder = StringBuffer();
     for (var i = 0; i < childCount; i++) {
-      builder.write(getChild(i).text);
+      builder.write(getChild(i)!.text);
     }
 
     return builder.toString();
@@ -136,7 +135,7 @@ abstract class RuleContext extends RuleNode {
   set altNumber(int altNumber) {}
 
   @override
-  ParseTree getChild<T>(int i) {
+  ParseTree? getChild<T>(int i) {
     return null;
   }
 
@@ -144,7 +143,7 @@ abstract class RuleContext extends RuleNode {
   int get childCount => 0;
 
   @override
-  T accept<T>(ParseTreeVisitor<T> visitor) {
+  T? accept<T>(ParseTreeVisitor<T> visitor) {
     return visitor.visitChildren(this);
   }
 
@@ -152,16 +151,19 @@ abstract class RuleContext extends RuleNode {
   /// (root child1 .. childN). Print just a node if this is a leaf.
   ///
   @override
-  String toStringTree({List<String> ruleNames, Parser parser}) {
+  String toStringTree({List<String>? ruleNames, Parser? parser}) {
     return Trees.toStringTree(this, ruleNames: ruleNames, recog: parser);
   }
 
   @override
-  String toString(
-      {List<String> ruleNames, Recognizer recog, RuleContext stop}) {
+  String toString({
+    List<String>? ruleNames,
+    Recognizer? recog,
+    RuleContext? stop,
+  }) {
     ruleNames = ruleNames ?? recog?.ruleNames;
     final buf = StringBuffer();
-    var p = this;
+    RuleContext? p = this;
     buf.write('[');
     while (p != null && p != stop) {
       if (ruleNames == null) {
@@ -176,8 +178,7 @@ abstract class RuleContext extends RuleNode {
         buf.write(ruleName);
       }
 
-      if (p.parent != null &&
-          (ruleNames != null || !p.parent.isEmpty)) {
+      if (p.parent != null && (ruleNames != null || !p.parent!.isEmpty)) {
         buf.write(' ');
       }
 

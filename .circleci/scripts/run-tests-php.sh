@@ -2,8 +2,10 @@
 
 set -euo pipefail
 
+php -v
+
 php_path=$(which php)
-
-composer install -d ../runtime/PHP
-
-mvn -q -DPHP_PATH="${php_path}" -Dparallel=methods -DthreadCount=4 -Dtest=php.* test
+pushd runtime-testsuite
+  echo "running maven tests..."
+  mvn -q -DPHP_PATH="${php_path}" -Dparallel=methods -DthreadCount=4 -Dtest=php.* test
+popd

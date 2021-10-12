@@ -54,7 +54,9 @@ class LexerActionExecutor {
   /// @return A [LexerActionExecutor] for executing the combine actions
   /// of [lexerActionExecutor] and [lexerAction].
   static LexerActionExecutor append(
-      LexerActionExecutor lexerActionExecutor, LexerAction lexerAction) {
+    LexerActionExecutor? lexerActionExecutor,
+    LexerAction lexerAction,
+  ) {
     if (lexerActionExecutor == null) {
       return LexerActionExecutor([lexerAction]);
     }
@@ -93,10 +95,10 @@ class LexerActionExecutor {
   /// @return A [LexerActionExecutor] which stores input stream offsets
   /// for all position-dependent lexer actions.
   LexerActionExecutor fixOffsetBeforeMatch(int offset) {
-    List<LexerAction> updatedLexerActions;
+    List<LexerAction>? updatedLexerActions;
     for (var i = 0; i < lexerActions.length; i++) {
       if (lexerActions[i].isPositionDependent &&
-          !(lexerActions[i] is LexerIndexedCustomAction)) {
+          lexerActions[i] is! LexerIndexedCustomAction) {
         updatedLexerActions ??= List.from(lexerActions);
 
         updatedLexerActions[i] =
@@ -134,9 +136,9 @@ class LexerActionExecutor {
     try {
       for (var lexerAction in lexerActions) {
         if (lexerAction is LexerIndexedCustomAction) {
-          final offset = (lexerAction as LexerIndexedCustomAction).offset;
+          final offset = lexerAction.offset;
           input.seek(startIndex + offset);
-          lexerAction = (lexerAction as LexerIndexedCustomAction).action;
+          lexerAction = lexerAction.action;
           requiresSeek = (startIndex + offset) != stopIndex;
         } else if (lexerAction.isPositionDependent) {
           input.seek(stopIndex);
@@ -153,15 +155,17 @@ class LexerActionExecutor {
   }
 
   @override
-  bool operator ==(Object obj) {
-    if (identical(obj, this)) {
+  bool operator ==(Object other) {
+    if (identical(other, this)) {
       return true;
-    } else if (!(obj is LexerActionExecutor)) {
+    } else if (other is! LexerActionExecutor) {
       return false;
     }
 
-    LexerActionExecutor other = obj;
     return hashCode == other.hashCode &&
-        ListEquality().equals(lexerActions, other.lexerActions);
+        ListEquality().equals(
+          lexerActions,
+          other.lexerActions,
+        );
   }
 }
