@@ -32,7 +32,7 @@
 /// 
 
 public final class DFAState: Hashable, CustomStringConvertible {
-    public internal(set) var stateNumber = -1
+    public internal(set) var stateNumber = ATNState.INVALID_STATE_NUMBER
 
     public internal(set) var configs: ATNConfigSet
 
