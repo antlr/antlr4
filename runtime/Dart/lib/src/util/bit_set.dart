@@ -12,7 +12,7 @@ import 'bit_operation_util.dart'
 
 class BitSet {
   static final Uint32List EmptyBits = Uint32List(0);
-  static const BitsPerElement = 8 * 32;
+  static const BitsPerElement = 32;
 
   Uint32List _data = EmptyBits;
 
@@ -48,7 +48,7 @@ class BitSet {
   }
 
   bool get(int index) {
-    if (index < 0) throw RangeError('index');
+    if (index < 0) throw RangeError.value(index, 'index');
 
     final element = (index / BitsPerElement).floor();
     if (element >= _data.length) return false;
@@ -57,7 +57,7 @@ class BitSet {
   }
 
   void set(int index) {
-    if (index < 0) throw RangeError('index');
+    if (index < 0) throw RangeError.value(index, 'index');
 
     final element = (index / BitsPerElement).floor();
     if (element >= _data.length) {
