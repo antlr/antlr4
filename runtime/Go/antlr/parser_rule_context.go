@@ -38,6 +38,10 @@ type BaseParserRuleContext struct {
 	children    []Tree
 }
 
+func (ctx *BaseParserRuleContext) VisitWrapper(visitor Visitor) interface {} {
+	return nil
+}
+
 func NewBaseParserRuleContext(parent ParserRuleContext, invokingStateNumber int) *BaseParserRuleContext {
 	prc := new(BaseParserRuleContext)
 

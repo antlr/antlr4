@@ -120,6 +120,13 @@ type <file.grammarName>Visitor interface {
 	Visit<lname; format="cap">(ctx *<lname; format="cap">Context) interface{\}
 }; separator="\n">
 }
+
+<file.visitorNames:{lname |
+// Visit<lname; format="cap"> is called when the visitor visits <lname; format="cap">
+func (v *Base<file.grammarName>Visitor) Visit<lname; format="cap">(ctx *<lname; format="cap">Context) interface{\} {
+	return v.VisitChildren(ctx)
+\}}; separator="\n\n">
+
 >>
 
 BaseVisitorFile(file, header, namedActions) ::= <<
@@ -137,11 +144,14 @@ type Base<file.grammarName>Visitor struct {
 	*antlr.BaseParseTreeVisitor
 }
 
-<file.visitorNames:{lname |
-func (v *Base<file.grammarName>Visitor) Visit<lname; format="cap">(ctx *<lname; format="cap">Context) interface{\} {
-	return v.VisitChildren(ctx)
-\}}; separator="\n\n">
+func (this *Base<file.grammarName>Visitor) Visit(tree antlr.ParseTree) interface{} {
+	return tree.VisitWrapper(this)
+}
 
+<file.visitorNames:{lname |
+func (ctx *<lname; format="cap">Context) VisitWrapper(visitor antlr.Visitor) interface{\} {
+	return visitor.(*Base<file.grammarName>Visitor).Visit<lname; format="cap">(ctx)
+\}}; separator="\n\n">
 >>
 
 Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
