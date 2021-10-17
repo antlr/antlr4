@@ -1086,4 +1086,27 @@ public class LexerExecDescriptors {
 			return !targetName.equals("PHP");
 		}
 	}
+
+	/** https://github.com/antlr/antlr4/issues/1943 */
+	public static class StackoverflowDueToNotEscapedHyphen extends BaseLexerTestDescriptor {
+		public String input = "word";
+
+		/**
+		 [@0,0:3='word',<1>,1:0]
+		 [@1,4:3='<EOF>',<-1>,1:4]
+		 */
+		@CommentHasStringValue
+		public String output;
+
+		public String errors = null;
+		public String startRule = "";
+		public String grammarName = "L";
+
+		/**
+		 lexer grammar L;
+		 WORD   : [a-z-+]+;
+		 */
+		@CommentHasStringValue
+		public String grammar;
+	}
 }

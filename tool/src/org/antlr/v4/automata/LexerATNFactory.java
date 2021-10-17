@@ -474,7 +474,7 @@ public class LexerATNFactory extends ParserATNFactory {
 				}
 				offset = escapeParseResult.parseLength;
 			}
-			else if (c == '-' && !state.inRange && i != 0 && i != n - 1) {
+			else if (c == '-' && !state.inRange && i != 0 && i != n - 1 && state.mode != CharSetParseState.Mode.NONE) {
 				if (state.mode == CharSetParseState.Mode.PREV_PROPERTY) {
 					g.tool.errMgr.grammarError(ErrorType.UNICODE_PROPERTY_NOT_ALLOWED_IN_RANGE,
 							g.fileName, charSetAST.getToken(), charSetAST.getText());
