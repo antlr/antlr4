@@ -372,6 +372,11 @@ public class LexerATNFactory extends ParserATNFactory {
 		ATNState left = newState(charSetAST);
 		ATNState right = newState(charSetAST);
 		IntervalSet set = getSetFromCharSetLiteral(charSetAST);
+
+		if (set.isNil()) {
+			g.tool.errMgr.grammarError(ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED, g.fileName, charSetAST.getToken(), "[]");
+		}
+
 		left.addTransition(new SetTransition(right, set));
 		charSetAST.atnState = left;
 		return new Handle(left, right);
@@ -440,13 +445,6 @@ public class LexerATNFactory extends ParserATNFactory {
 		String chars = charSetAST.getText();
 		chars = chars.substring(1, chars.length() - 1);
 		IntervalSet set = new IntervalSet();
-
-		if (chars.length() == 0) {
-			g.tool.errMgr.grammarError(ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED,
-					g.fileName, charSetAST.getToken(), "[]");
-			return set;
-		}
-
 		CharSetParseState state = CharSetParseState.NONE;
 
 		int n = chars.length();
