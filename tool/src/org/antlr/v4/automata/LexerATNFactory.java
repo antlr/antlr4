@@ -668,43 +668,41 @@ public class LexerATNFactory extends ParserATNFactory {
 				g.tool.errMgr.grammarError(ErrorType.DUPLICATED_COMMAND, g.fileName, commandToken, command);
 			}
 
-			if (!ruleCommands.equals("mode")) {
-				String firstCommand = null;
+			String firstCommand = null;
 
-				if (command.equals("skip")) {
-					if (ruleCommands.contains("more")) {
-						firstCommand = "more";
-					}
-					else if (ruleCommands.contains("type")) {
-						firstCommand = "type";
-					}
-					else if (ruleCommands.contains("channel")) {
-						firstCommand = "channel";
-					}
+			if (command.equals("skip")) {
+				if (ruleCommands.contains("more")) {
+					firstCommand = "more";
 				}
-				else if (command.equals("more")) {
-					if (ruleCommands.contains("skip")) {
-						firstCommand = "skip";
-					}
-					else if (ruleCommands.contains("type")) {
-						firstCommand = "type";
-					}
-					else if (ruleCommands.contains("channel")) {
-						firstCommand = "channel";
-					}
+				else if (ruleCommands.contains("type")) {
+					firstCommand = "type";
 				}
-				else if (command.equals("type") || command.equals("channel")) {
-					if (ruleCommands.contains("more")) {
-						firstCommand = "more";
-					}
-					else if (ruleCommands.contains("skip")) {
-						firstCommand = "skip";
-					}
+				else if (ruleCommands.contains("channel")) {
+					firstCommand = "channel";
 				}
+			}
+			else if (command.equals("more")) {
+				if (ruleCommands.contains("skip")) {
+					firstCommand = "skip";
+				}
+				else if (ruleCommands.contains("type")) {
+					firstCommand = "type";
+				}
+				else if (ruleCommands.contains("channel")) {
+					firstCommand = "channel";
+				}
+			}
+			else if (command.equals("type") || command.equals("channel")) {
+				if (ruleCommands.contains("more")) {
+					firstCommand = "more";
+				}
+				else if (ruleCommands.contains("skip")) {
+					firstCommand = "skip";
+				}
+			}
 
-				if (firstCommand != null) {
-					g.tool.errMgr.grammarError(ErrorType.INCOMPATIBLE_COMMANDS, g.fileName, commandToken, firstCommand, command);
-				}
+			if (firstCommand != null) {
+				g.tool.errMgr.grammarError(ErrorType.INCOMPATIBLE_COMMANDS, g.fileName, commandToken, firstCommand, command);
 			}
 		}
 
