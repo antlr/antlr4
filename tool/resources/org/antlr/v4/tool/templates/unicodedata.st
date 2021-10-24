@@ -1,4 +1,4 @@
-unicodedata(propertyCodePointRanges, propertyAliases) ::= <<
+unicodedata(propertyCodePointRanges, propertyAliases1, propertyAliases2) ::= <<
 package org.antlr.v4.unicode;
 
 import java.util.Arrays;
@@ -15,7 +15,7 @@ import org.antlr.v4.runtime.misc.Interval;
  */
 public abstract class UnicodeData {
        private static final Map\<String, IntervalSet\> propertyCodePointRanges = new HashMap\<\>(<length(propertyCodePointRanges)>);
-       private static final Map\<String, String\> propertyAliases = new HashMap\<\>(<length(propertyAliases)>);
+       private static final Map\<String, String\> propertyAliases = new HashMap\<\>(<length(propertyAliases1)> + <length(propertyAliases2)>);
 
        // Work around Java 64k bytecode method limit by splitting up static
        // initialization into one method per Unicode property
@@ -31,14 +31,19 @@ static private void addProperty<i>() {
 \}}; separator="\n\n">
 
        // Property aliases
-       static private void addPropertyAliases() {
-              <propertyAliases.keys:{ k | propertyAliases.put("<k>".toLowerCase(Locale.US), "<propertyAliases.(k)>".toLowerCase(Locale.US)); }; separator="\n">
+       static private void addPropertyAliases1() {
+              <propertyAliases1.keys:{ k | propertyAliases.put("<k>".toLowerCase(Locale.US), "<propertyAliases1.(k)>".toLowerCase(Locale.US)); }; separator="\n">
+       }
+
+       static private void addPropertyAliases2() {
+              <propertyAliases2.keys:{ k | propertyAliases.put("<k>".toLowerCase(Locale.US), "<propertyAliases2.(k)>".toLowerCase(Locale.US)); }; separator="\n">
        }
 
        // Put it all together
        static {
               <propertyCodePointRanges.keys:{ k | addProperty<i>(); }; separator="\n">
-              addPropertyAliases();
+              addPropertyAliases1();
+              addPropertyAliases2();
        }
 
        private static String normalize(String propertyCodeOrAlias) {
