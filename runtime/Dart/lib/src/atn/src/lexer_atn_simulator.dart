@@ -54,8 +54,14 @@ class SimState {
 
 /// "dup" of ParserInterpreter */
 class LexerATNSimulator extends ATNSimulator {
-  static const bool debug = false;
-  static const bool dfa_debug = false;
+  static const bool debug = bool.fromEnvironment(
+    'ANTLR_LEXER_DEBUG',
+    defaultValue: false,
+  );
+  static const bool dfa_debug = bool.fromEnvironment(
+    'ANTLR_LEXER_DFA_DEBUG',
+    defaultValue: false,
+  );
 
   static const int MIN_DFA_EDGE = 0;
   static const int MAX_DFA_EDGE = 127; // forces unicode to stay in ATN

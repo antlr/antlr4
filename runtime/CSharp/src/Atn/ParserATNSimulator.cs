@@ -284,8 +284,8 @@ namespace Antlr4.Runtime.Atn
 			this.parser = parser;
 			this.decisionToDFA = decisionToDFA;
 			//		DOTGenerator dot = new DOTGenerator(null);
-			//		ConsoleWriteLine(dot.getDOT(atn.rules.get(0), parser.getRuleNames()));
-			//		ConsoleWriteLine(dot.getDOT(atn.rules.get(1), parser.getRuleNames()));
+			//		Console.WriteLine(dot.getDOT(atn.rules.get(0), parser.getRuleNames()));
+			//		Console.WriteLine(dot.getDOT(atn.rules.get(1), parser.getRuleNames()));
 		}
 
 		public override void Reset()
@@ -306,7 +306,7 @@ namespace Antlr4.Runtime.Atn
 		{
 			if (debug || debug_list_atn_decisions)
 			{
-				ConsoleWriteLine("adaptivePredict decision " + decision +
+				Console.WriteLine("adaptivePredict decision " + decision +
 									   " exec LA(1)==" + GetLookaheadName(input) +
 								  " line " + input.LT(1).Line + ":" + input.LT(1).Column);
 			}
@@ -341,7 +341,7 @@ namespace Antlr4.Runtime.Atn
 					if (outerContext == null) outerContext = ParserRuleContext.EmptyContext;
 					if (debug || debug_list_atn_decisions)
 					{
-						ConsoleWriteLine("predictATN decision " + dfa.decision +
+						Console.WriteLine("predictATN decision " + dfa.decision +
 										   " exec LA(1)==" + GetLookaheadName(input) +
 										   ", outerContext=" + outerContext.ToString(parser));
 					}
@@ -373,7 +373,7 @@ namespace Antlr4.Runtime.Atn
 
 				int alt = ExecATN(dfa, s0, input, index, outerContext);
 				if (debug)
-					ConsoleWriteLine("DFA after predictATN: " + dfa.ToString(parser.Vocabulary));
+					Console.WriteLine("DFA after predictATN: " + dfa.ToString(parser.Vocabulary));
 				return alt;
 			}
 			finally
@@ -421,14 +421,14 @@ namespace Antlr4.Runtime.Atn
 		{
 			if (debug || debug_list_atn_decisions)
 			{
-				ConsoleWriteLine("execATN decision " + dfa.decision +
+				Console.WriteLine("execATN decision " + dfa.decision +
 								   " exec LA(1)==" + GetLookaheadName(input) +
 								   " line " + input.LT(1).Line + ":" + input.LT(1).Column);
 			}
 
 			DFAState previousD = s0;
 
-			if (debug) ConsoleWriteLine("s0 = " + s0);
+			if (debug) Console.WriteLine("s0 = " + s0);
 
 			int t = input.LA(1);
 
@@ -467,7 +467,7 @@ namespace Antlr4.Runtime.Atn
 					BitSet conflictingAlts = D.configSet.conflictingAlts;
 					if (D.predicates != null)
 					{
-						if (debug) ConsoleWriteLine("DFA state has preds in DFA sim LL failover");
+						if (debug) Console.WriteLine("DFA state has preds in DFA sim LL failover");
 						int conflictIndex = input.Index;
 						if (conflictIndex != startIndex)
 						{
@@ -477,7 +477,7 @@ namespace Antlr4.Runtime.Atn
 						conflictingAlts = EvalSemanticContext(D.predicates, outerContext, true);
 						if (conflictingAlts.Cardinality() == 1)
 						{
-							if (debug) ConsoleWriteLine("Full LL avoided");
+							if (debug) Console.WriteLine("Full LL avoided");
 							return conflictingAlts.NextSetBit(0);
 						}
 
@@ -489,7 +489,7 @@ namespace Antlr4.Runtime.Atn
 						}
 					}
 
-					if (dfa_debug) ConsoleWriteLine("ctx sensitive state " + outerContext + " in " + D);
+					if (dfa_debug) Console.WriteLine("ctx sensitive state " + outerContext + " in " + D);
 					bool fullCtx = true;
 					ATNConfigSet s0_closure =
 						ComputeStartState(dfa.atnStartState, outerContext, fullCtx);
@@ -587,7 +587,7 @@ namespace Antlr4.Runtime.Atn
 			if (debug)
 			{
 				ICollection<BitSet> altSubSets = PredictionMode.GetConflictingAltSubsets(reach.configs);
-				ConsoleWriteLine("SLL altSubSets=" + altSubSets +
+				Console.WriteLine("SLL altSubSets=" + StaticUtils.ToString(altSubSets) +
 								   ", configs=" + reach +
 								   ", predict=" + predictedAlt + ", allSubsetsConflict=" +
 									   PredictionMode.AllSubsetsConflict(altSubSets) + ", conflictingAlts=" +
@@ -656,7 +656,7 @@ namespace Antlr4.Runtime.Atn
 		{
 			if (debug || debug_list_atn_decisions)
 			{
-				ConsoleWriteLine("execATNWithFullContext " + s0);
+				Console.WriteLine("execATNWithFullContext " + s0);
 			}
 			bool fullCtx = true;
 			bool foundExactAmbig = false;
@@ -667,7 +667,7 @@ namespace Antlr4.Runtime.Atn
 			int predictedAlt;
 			while (true)
 			{ // while more work
-			  //			ConsoleWriteLine("LL REACH "+GetLookaheadName(input)+
+			  //			Console.WriteLine("LL REACH "+GetLookaheadName(input)+
 			  //							   " from configs.size="+previous.size()+
 			  //							   " line "+input.LT(1)Line+":"+input.LT(1).Column);
 				reach = ComputeReachSet(previous, t, fullCtx);
@@ -695,13 +695,13 @@ namespace Antlr4.Runtime.Atn
 				ICollection<BitSet> altSubSets = PredictionMode.GetConflictingAltSubsets(reach.configs);
 				if (debug)
 				{
-					ConsoleWriteLine("LL altSubSets=" + altSubSets +
+					Console.WriteLine("LL altSubSets=" + altSubSets +
 									   ", predict=" + PredictionMode.GetUniqueAlt(altSubSets) +
 									   ", ResolvesToJustOneViableAlt=" +
 										   PredictionMode.ResolvesToJustOneViableAlt(altSubSets));
 				}
 
-				//			ConsoleWriteLine("altSubSets: "+altSubSets);
+				//			Console.WriteLine("altSubSets: "+altSubSets);
 				//			System.err.println("reach="+reach+", "+reach.conflictingAlts);
 				reach.uniqueAlt = GetUniqueAlt(reach);
 				// unique prediction?
@@ -785,7 +785,7 @@ namespace Antlr4.Runtime.Atn
 		protected virtual ATNConfigSet ComputeReachSet(ATNConfigSet closure, int t, bool fullCtx)
 		{
 			if (debug)
-				ConsoleWriteLine("in computeReachSet, starting closure: " + closure);
+				Console.WriteLine("in computeReachSet, starting closure: " + closure);
 
 			if (mergeCache == null)
 			{
@@ -809,7 +809,7 @@ namespace Antlr4.Runtime.Atn
 			// First figure out where we can reach on input t
 			foreach (ATNConfig c in closure.configs)
 			{
-				if (debug) ConsoleWriteLine("testing " + GetTokenName(t) + " at " + c.ToString());
+				if (debug) Console.WriteLine("testing " + GetTokenName(t) + " at " + c.ToString());
 
 				if (c.state is RuleStopState)
 				{
@@ -1275,7 +1275,7 @@ namespace Antlr4.Runtime.Atn
 
 			// nonambig alts are null in altToPred
 			if (nPredAlts == 0) altToPred = null;
-			if (debug) ConsoleWriteLine("getPredsForAmbigAlts result " + Arrays.ToString(altToPred));
+			if (debug) Console.WriteLine("getPredsForAmbigAlts result " + Arrays.ToString(altToPred));
 			return altToPred;
 		}
 
@@ -1302,7 +1302,7 @@ namespace Antlr4.Runtime.Atn
 				return null;
 			}
 
-			//		ConsoleWriteLine(Arrays.toString(altToPred)+"->"+pairs);
+			//		Console.WriteLine(Arrays.toString(altToPred)+"->"+pairs);
 			return pairs.ToArray();
 		}
 
@@ -1452,12 +1452,12 @@ namespace Antlr4.Runtime.Atn
 				bool predicateEvaluationResult = EvalSemanticContext(pair.pred, outerContext, pair.alt, fullCtx);
 				if (debug || dfa_debug)
 				{
-					ConsoleWriteLine("eval pred " + pair + "=" + predicateEvaluationResult);
+					Console.WriteLine("eval pred " + pair + "=" + predicateEvaluationResult);
 				}
 
 				if (predicateEvaluationResult)
 				{
-					if (debug || dfa_debug) ConsoleWriteLine("PREDICT " + pair.alt);
+					if (debug || dfa_debug) Console.WriteLine("PREDICT " + pair.alt);
 					predictions[pair.alt] = true;
 					if (!complete)
 					{
@@ -1533,7 +1533,7 @@ namespace Antlr4.Runtime.Atn
 												bool treatEofAsEpsilon)
 		{
 			if (debug)
-				ConsoleWriteLine("closure(" + config.ToString(parser, true) + ")");
+				Console.WriteLine("closure(" + config.ToString(parser, true) + ")");
 
 			if (config.state is RuleStopState)
 			{
@@ -1552,7 +1552,7 @@ namespace Antlr4.Runtime.Atn
 							}
 							else {
 								// we have no context info, just chase follow links (if greedy)
-								if (debug) ConsoleWriteLine("FALLING off rule " +
+								if (debug) Console.WriteLine("FALLING off rule " +
 															  GetRuleName(config.state.ruleIndex));
 								Closure_(config, configSet, closureBusy, collectPredicates,
 										 fullCtx, depth, treatEofAsEpsilon);
@@ -1583,7 +1583,7 @@ namespace Antlr4.Runtime.Atn
 				}
 				else {
 					// else if we have no context info, just chase follow links (if greedy)
-					if (debug) ConsoleWriteLine("FALLING off rule " +
+					if (debug) Console.WriteLine("FALLING off rule " +
 												  GetRuleName(config.state.ruleIndex));
 				}
 			}
@@ -1608,7 +1608,7 @@ namespace Antlr4.Runtime.Atn
 				configs.Add(config, mergeCache);
 				// make sure to not return here, because EOF transitions can act as
 				// both epsilon transitions and non-epsilon transitions.
-				//            if ( debug ) ConsoleWriteLine("added config "+configs);
+				//            if ( debug ) Console.WriteLine("added config "+configs);
 			}
 
 			for (int i = 0; i < p.NumberOfTransitions; i++)
@@ -1650,7 +1650,7 @@ namespace Antlr4.Runtime.Atn
 						configs.dipsIntoOuterContext = true; // TODO: can remove? only care when we add to set per middle of this method
 						newDepth--;
 						if (debug)
-							ConsoleWriteLine("dips into outer ctx: " + c);
+							Console.WriteLine("dips into outer ctx: " + c);
 					}
 					else
 					{
@@ -1898,7 +1898,7 @@ namespace Antlr4.Runtime.Atn
 
 		protected ATNConfig ActionTransition(ATNConfig config, ActionTransition t)
 		{
-			if (debug) ConsoleWriteLine("ACTION edge " + t.ruleIndex + ":" + t.actionIndex);
+			if (debug) Console.WriteLine("ACTION edge " + t.ruleIndex + ":" + t.actionIndex);
 			return new ATNConfig(config, t.target);
 		}
 
@@ -1911,13 +1911,13 @@ namespace Antlr4.Runtime.Atn
 		{
 			if (debug)
 			{
-				ConsoleWriteLine("PRED (collectPredicates=" + collectPredicates + ") " +
+				Console.WriteLine("PRED (collectPredicates=" + collectPredicates + ") " +
 						pt.precedence + ">=_p" +
 						", ctx dependent=true");
 				if (parser != null)
 				{
-					ConsoleWriteLine("context surrounding pred is " +
-									   parser.GetRuleInvocationStack());
+					Console.WriteLine("context surrounding pred is " +
+									   StaticUtils.ToString(parser.GetRuleInvocationStack()));
 				}
 			}
 
@@ -1948,7 +1948,7 @@ namespace Antlr4.Runtime.Atn
 				c = new ATNConfig(config, pt.target);
 			}
 
-			if (debug) ConsoleWriteLine("config from pred transition=" + c);
+			if (debug) Console.WriteLine("config from pred transition=" + c);
 			return c;
 		}
 
@@ -1961,13 +1961,13 @@ namespace Antlr4.Runtime.Atn
 		{
 			if (debug)
 			{
-				ConsoleWriteLine("PRED (collectPredicates=" + collectPredicates + ") " +
+				Console.WriteLine("PRED (collectPredicates=" + collectPredicates + ") " +
 						pt.ruleIndex + ":" + pt.predIndex +
 						", ctx dependent=" + pt.isCtxDependent);
 				if (parser != null)
 				{
-					ConsoleWriteLine("context surrounding pred is " +
-									   parser.GetRuleInvocationStack());
+					Console.WriteLine("context surrounding pred is " +
+									   StaticUtils.ToString(parser.GetRuleInvocationStack()));
 				}
 			}
 
@@ -1999,7 +1999,7 @@ namespace Antlr4.Runtime.Atn
 				c = new ATNConfig(config, pt.target);
 			}
 
-			if (debug) ConsoleWriteLine("config from pred transition=" + c);
+			if (debug) Console.WriteLine("config from pred transition=" + c);
 			return c;
 		}
 
@@ -2008,7 +2008,7 @@ namespace Antlr4.Runtime.Atn
 		{
 			if (debug)
 			{
-				ConsoleWriteLine("CALL rule " + GetRuleName(t.target.ruleIndex) +
+				Console.WriteLine("CALL rule " + GetRuleName(t.target.ruleIndex) +
 								   ", ctx=" + config.context);
 			}
 
@@ -2192,7 +2192,7 @@ namespace Antlr4.Runtime.Atn
 		{
 			if (debug)
 			{
-				ConsoleWriteLine("EDGE " + from + " -> " + to + " upon " + GetTokenName(t));
+				Console.WriteLine("EDGE " + from + " -> " + to + " upon " + GetTokenName(t));
 			}
 
 			if (to == null)
@@ -2218,7 +2218,7 @@ namespace Antlr4.Runtime.Atn
 
 			if (debug)
 			{
-				ConsoleWriteLine("DFA=\n" + dfa.ToString(parser != null ? parser.Vocabulary : Vocabulary.EmptyVocabulary));
+				Console.WriteLine("DFA=\n" + dfa.ToString(parser != null ? parser.Vocabulary : Vocabulary.EmptyVocabulary));
 			}
 
 			return to;
@@ -2258,7 +2258,7 @@ namespace Antlr4.Runtime.Atn
 					D.configSet.IsReadOnly = true;
 				}
 				dfa.states.Put(D, D);
-				if (debug) ConsoleWriteLine("adding new DFA state: " + D);
+				if (debug) Console.WriteLine("adding new DFA state: " + D);
 				return D;
 			}
 		}
@@ -2268,7 +2268,7 @@ namespace Antlr4.Runtime.Atn
 			if (debug || retry_debug)
 			{
 				Interval interval = Interval.Of(startIndex, stopIndex);
-				ConsoleWriteLine("reportAttemptingFullContext decision=" + dfa.decision + ":" + configs +
+				Console.WriteLine("reportAttemptingFullContext decision=" + dfa.decision + ":" + configs +
 								   ", input=" + parser.TokenStream.GetText(interval));
 			}
 			if (parser != null)
@@ -2280,7 +2280,7 @@ namespace Antlr4.Runtime.Atn
 			if (debug || retry_debug)
 			{
 				Interval interval = Interval.Of(startIndex, stopIndex);
-				ConsoleWriteLine("ReportContextSensitivity decision=" + dfa.decision + ":" + configs +
+				Console.WriteLine("ReportContextSensitivity decision=" + dfa.decision + ":" + configs +
 								   ", input=" + parser.TokenStream.GetText(interval));
 			}
 			if (parser != null) parser.ErrorListenerDispatch.ReportContextSensitivity(parser, dfa, startIndex, stopIndex, prediction, null /*configs*/);
@@ -2297,7 +2297,7 @@ namespace Antlr4.Runtime.Atn
 			if (debug || retry_debug)
 			{
 				Interval interval = Interval.Of(startIndex, stopIndex);
-				ConsoleWriteLine("ReportAmbiguity " +
+				Console.WriteLine("ReportAmbiguity " +
 								   ambigAlts + ":" + configs +
 								   ", input=" + parser.TokenStream.GetText(interval));
 			}
