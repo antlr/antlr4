@@ -107,7 +107,7 @@
   #endif
 #endif
 
-#include "support/guid.h"
+#include "support/Guid.h"
 #include "support/Declarations.h"
 
 #if !defined(HAS_NOEXCEPT)

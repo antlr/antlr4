@@ -390,7 +390,7 @@ std::string ATNSerializer::decode(const std::wstring &inpdata) {
     throw UnsupportedOperationException("ATN Serializer" + reason);
   }
 
-  Guid uuid = ATNDeserializer::toUUID(data.data(), p);
+  antlrcpp::Guid uuid = ATNDeserializer::toUUID(data.data(), p);
   p += 8;
   if (uuid != ATNDeserializer::SERIALIZED_UUID()) {
     std::string reason = "Could not deserialize ATN with UUID " + uuid.toString() + " (expected " +
@@ -602,10 +602,10 @@ std::string ATNSerializer::getDecoded(ATN *atn, std::vector<std::string> &tokenN
   return ATNSerializer(atn, tokenNames).decode(serialized);
 }
 
-void ATNSerializer::serializeUUID(std::vector<size_t> &data, Guid uuid) {
+void ATNSerializer::serializeUUID(std::vector<size_t> &data, antlrcpp::Guid uuid) {
   unsigned int twoBytes = 0;
   bool firstByte = true;
-  for( std::vector<unsigned char>::const_reverse_iterator rit = uuid.rbegin(); rit != uuid.rend(); ++rit )
+  for(antlrcpp::Guid::const_reverse_iterator rit = uuid.rbegin(); rit != uuid.rend(); ++rit )
   {
      if (firstByte) {
        twoBytes = *rit;

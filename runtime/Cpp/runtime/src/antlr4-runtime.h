@@ -133,7 +133,7 @@
 #include "support/BitSet.h"
 #include "support/CPPUtils.h"
 #include "support/StringUtils.h"
-#include "support/guid.h"
+#include "support/Guid.h"
 #include "tree/AbstractParseTreeVisitor.h"
 #include "tree/ErrorNode.h"
 #include "tree/ErrorNodeImpl.h"

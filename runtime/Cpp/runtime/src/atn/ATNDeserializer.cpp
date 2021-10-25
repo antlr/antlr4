@@ -115,32 +115,32 @@ ATNDeserializer::~ATNDeserializer() {
  * This value should never change. Updates following this version are
  * reflected as change in the unique ID SERIALIZED_UUID.
  */
-Guid ATNDeserializer::ADDED_PRECEDENCE_TRANSITIONS() {
-  return Guid("1DA0C57D-6C06-438A-9B27-10BCB3CE0F61");
+antlrcpp::Guid ATNDeserializer::ADDED_PRECEDENCE_TRANSITIONS() {
+  return antlrcpp::Guid("1DA0C57D-6C06-438A-9B27-10BCB3CE0F61");
 }
 
-Guid ATNDeserializer::ADDED_LEXER_ACTIONS() {
-  return Guid("AADB8D7E-AEEF-4415-AD2B-8204D6CF042E");
+antlrcpp::Guid ATNDeserializer::ADDED_LEXER_ACTIONS() {
+  return antlrcpp::Guid("AADB8D7E-AEEF-4415-AD2B-8204D6CF042E");
 }
 
-Guid ATNDeserializer::ADDED_UNICODE_SMP() {
-  return Guid("59627784-3BE5-417A-B9EB-8131A7286089");
+antlrcpp::Guid ATNDeserializer::ADDED_UNICODE_SMP() {
+  return antlrcpp::Guid("59627784-3BE5-417A-B9EB-8131A7286089");
 }
 
-Guid ATNDeserializer::SERIALIZED_UUID() {
+antlrcpp::Guid ATNDeserializer::SERIALIZED_UUID() {
   return ADDED_UNICODE_SMP();
 }
 
-Guid ATNDeserializer::BASE_SERIALIZED_UUID() {
-  return Guid("33761B2D-78BB-4A43-8B0B-4F5BEE8AACF3");
+antlrcpp::Guid ATNDeserializer::BASE_SERIALIZED_UUID() {
+  return antlrcpp::Guid("33761B2D-78BB-4A43-8B0B-4F5BEE8AACF3");
 }
 
-std::vector<Guid>& ATNDeserializer::SUPPORTED_UUIDS() {
-  static std::vector<Guid> singleton = { BASE_SERIALIZED_UUID(), ADDED_PRECEDENCE_TRANSITIONS(), ADDED_LEXER_ACTIONS(), ADDED_UNICODE_SMP() };
+std::vector<antlrcpp::Guid>& ATNDeserializer::SUPPORTED_UUIDS() {
+  static std::vector<antlrcpp::Guid> singleton = { BASE_SERIALIZED_UUID(), ADDED_PRECEDENCE_TRANSITIONS(), ADDED_LEXER_ACTIONS(), ADDED_UNICODE_SMP() };
   return singleton;
 }
 
-bool ATNDeserializer::isFeatureSupported(const Guid &feature, const Guid &actualUuid) {
+bool ATNDeserializer::isFeatureSupported(const antlrcpp::Guid &feature, const antlrcpp::Guid &actualUuid) {
   auto featureIterator = std::find(SUPPORTED_UUIDS().begin(), SUPPORTED_UUIDS().end(), feature);
   if (featureIterator == SUPPORTED_UUIDS().end()) {
     return false;
@@ -169,7 +169,7 @@ ATN ATNDeserializer::deserialize(const std::vector<uint16_t>& input) {
     throw UnsupportedOperationException(reason);
   }
 
-  Guid uuid = toUUID(data.data(), p);
+  antlrcpp::Guid uuid = toUUID(data.data(), p);
   p += 8;
   auto uuidIterator = std::find(SUPPORTED_UUIDS().begin(), SUPPORTED_UUIDS().end(), uuid);
   if (uuidIterator == SUPPORTED_UUIDS().end()) {
@@ -628,8 +628,8 @@ void ATNDeserializer::checkCondition(bool condition, const std::string &message)
   }
 }
 
-Guid ATNDeserializer::toUUID(const unsigned short *data, size_t offset) {
-  return Guid((uint16_t *)data + offset, true);
+antlrcpp::Guid ATNDeserializer::toUUID(const unsigned short *data, size_t offset) {
+  return antlrcpp::Guid((uint16_t *)data + offset, true);
 }
 
 /* mem check: all created instances are freed in the d-tor of the ATNState they are added to. */
