@@ -159,7 +159,7 @@ const atn::ATN& <lexer.name>::getATN() const {
 <if (actionFuncs)>
 void <lexer.name>::action(RuleContext *context, size_t ruleIndex, size_t actionIndex) {
   switch (ruleIndex) {
-    <lexer.actionFuncs.values: {f | case <f.ruleIndex>: <f.name>Action(dynamic_cast\<<f.ctxType> *>(context), actionIndex); break;}; separator="\n">
+    <lexer.actionFuncs.values: {f | case <f.ruleIndex>: <f.name>Action(antlrcpp::downCast\<<f.ctxType> *>(context), actionIndex); break;}; separator="\n">
 
   default:
     break;
@@ -170,7 +170,7 @@ void <lexer.name>::action(RuleContext *context, size_t ruleIndex, size_t actionI
 <if (sempredFuncs)>
 bool <lexer.name>::sempred(RuleContext *context, size_t ruleIndex, size_t predicateIndex) {
   switch (ruleIndex) {
-    <lexer.sempredFuncs.values: {f | case <f.ruleIndex>: return <f.name>Sempred(dynamic_cast\<<f.ctxType> *>(context), predicateIndex);}; separator="\n">
+    <lexer.sempredFuncs.values: {f | case <f.ruleIndex>: return <f.name>Sempred(antlrcpp::downCast\<<f.ctxType> *>(context), predicateIndex);}; separator="\n">
 
   default:
     break;
@@ -361,7 +361,7 @@ dfa::Vocabulary& <parser.name>::getVocabulary() const {
 bool <parser.name>::sempred(RuleContext *context, size_t ruleIndex, size_t predicateIndex) {
   switch (ruleIndex) {
   <parser.sempredFuncs.values: {f |
-  case <f.ruleIndex>: return <f.name>Sempred(dynamic_cast\<<f.ctxType> *>(context), predicateIndex);}; separator="\n">
+  case <f.ruleIndex>: return <f.name>Sempred(antlrcpp::downCast\<<f.ctxType> *>(context), predicateIndex);}; separator="\n">
 
   default:
     break;
@@ -614,7 +614,7 @@ AltLabelStructDecl(struct, attrs, getters, dispatchMethods) ::= <<
 CodeBlockForOuterMostAltHeader(currentOuterMostAltCodeBlock, locals, preamble, ops) ::= "<! Required to exist, but unused. !>"
 CodeBlockForOuterMostAlt(currentOuterMostAltCodeBlock, locals, preamble, ops) ::= <<
 <if (currentOuterMostAltCodeBlock.altLabel)>
-_localctx = dynamic_cast\<<currentRule.ctxType> *>(_tracker.createInstance\<<parser.name>::<currentOuterMostAltCodeBlock.altLabel; format = "cap">Context>(_localctx));
+_localctx = _tracker.createInstance\<<parser.name>::<currentOuterMostAltCodeBlock.altLabel; format = "cap">Context>(_localctx);
 <endif>
 enterOuterAlt(_localctx, <currentOuterMostAltCodeBlock.alt.altNum>);
 <CodeBlockForAlt(currentAltCodeBlock = currentOuterMostAltCodeBlock, ...)>
@@ -1076,10 +1076,10 @@ AttributeDeclHeader(d) ::= "<d.type> <d.name><if(d.initValue)> = <d.initValue><e
 AttributeDecl(d) ::= "<d.type> <d.name>"
 
 /** If we don't know location of label def x, use this template */
-labelref(x) ::= "<if (!x.isLocal)>dynamic_cast\<<x.ctx.name> *>(_localctx)-><endif><x.name>"
+labelref(x) ::= "<if (!x.isLocal)>antlrcpp::downCast\<<x.ctx.name> *>(_localctx)-><endif><x.name>"
 
 /** For any action chunk, what is correctly-typed context struct ptr? */
-ctx(actionChunk) ::= "dynamic_cast\<<actionChunk.ctx.name> *>(_localctx)"
+ctx(actionChunk) ::= "antlrcpp::downCast\<<actionChunk.ctx.name> *>(_localctx)"
 
 // used for left-recursive rules
 recRuleAltPredicate(ruleName,opPrec) ::= "precpred(_ctx, <opPrec>)"
