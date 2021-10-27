@@ -23,13 +23,13 @@ namespace atn {
 
     /// This is the current serialized UUID.
     // ml: defined as function to avoid the “static initialization order fiasco”.
-    static Guid SERIALIZED_UUID();
+    static antlrcpp::Guid SERIALIZED_UUID();
 
     ATNDeserializer();
     ATNDeserializer(const ATNDeserializationOptions& dso);
     virtual ~ATNDeserializer();
 
-    static Guid toUUID(const unsigned short *data, size_t offset);
+    static antlrcpp::Guid toUUID(const unsigned short *data, size_t offset);
 
     virtual ATN deserialize(const std::vector<uint16_t> &input);
     virtual void verifyATN(const ATN &atn);
@@ -54,35 +54,35 @@ namespace atn {
     /// <returns> {@code true} if the {@code actualUuid} value represents a
     /// serialized ATN at or after the feature identified by {@code feature} was
     /// introduced; otherwise, {@code false}. </returns>
-    virtual bool isFeatureSupported(const Guid &feature, const Guid &actualUuid);
+    virtual bool isFeatureSupported(const antlrcpp::Guid &feature, const antlrcpp::Guid &actualUuid);
     void markPrecedenceDecisions(const ATN &atn);
     Ref<LexerAction> lexerActionFactory(LexerActionType type, int data1, int data2);
 
   private:
     /// This is the earliest supported serialized UUID.
-    static Guid BASE_SERIALIZED_UUID();
+    static antlrcpp::Guid BASE_SERIALIZED_UUID();
 
     /// This UUID indicates an extension of <seealso cref="BASE_SERIALIZED_UUID"/> for the
     /// addition of precedence predicates.
-    static Guid ADDED_PRECEDENCE_TRANSITIONS();
+    static antlrcpp::Guid ADDED_PRECEDENCE_TRANSITIONS();
 
     /**
      * This UUID indicates an extension of ADDED_PRECEDENCE_TRANSITIONS
      * for the addition of lexer actions encoded as a sequence of
      * LexerAction instances.
      */
-    static Guid ADDED_LEXER_ACTIONS();
+    static antlrcpp::Guid ADDED_LEXER_ACTIONS();
 
     /**
      * This UUID indicates the serialized ATN contains two sets of
      * IntervalSets, where the second set's values are encoded as
      * 32-bit integers to support the full Unicode SMP range up to U+10FFFF.
      */
-    static Guid ADDED_UNICODE_SMP();
+    static antlrcpp::Guid ADDED_UNICODE_SMP();
 
     /// This list contains all of the currently supported UUIDs, ordered by when
     /// the feature first appeared in this branch.
-    static std::vector<Guid>& SUPPORTED_UUIDS();
+    static std::vector<antlrcpp::Guid>& SUPPORTED_UUIDS();
 
     ATNDeserializationOptions deserializationOptions;
   };
