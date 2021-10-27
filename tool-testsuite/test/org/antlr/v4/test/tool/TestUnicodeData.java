@@ -140,17 +140,9 @@ public class TestUnicodeData {
 
 	@Test
 	public void testEnumeratedPropertyEquals() {
-		assertTrue(
-				"U+1F481 INFORMATION DESK PERSON is an emoji modifier base",
-				UnicodeData.getPropertyCodePoints("Grapheme_Cluster_Break=E_Base").contains(0x1F481));
-
 		assertFalse(
 				"U+1F47E ALIEN MONSTER is not an emoji modifier",
 				UnicodeData.getPropertyCodePoints("Grapheme_Cluster_Break=E_Base").contains(0x1F47E));
-
-		assertTrue(
-				"U+0E33 THAI CHARACTER SARA AM is a spacing mark",
-				UnicodeData.getPropertyCodePoints("Grapheme_Cluster_Break=E_Base").contains(0x1F481));
 
 		assertFalse(
 				"U+1038 MYANMAR SIGN VISARGA is not a spacing mark",
