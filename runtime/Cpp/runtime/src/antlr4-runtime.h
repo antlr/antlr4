@@ -131,6 +131,7 @@
 #include "support/Any.h"
 #include "support/Arrays.h"
 #include "support/BitSet.h"
+#include "support/Casts.h"
 #include "support/CPPUtils.h"
 #include "support/StringUtils.h"
 #include "support/Guid.h"

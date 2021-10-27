@@ -23,8 +23,8 @@ class ThreadingTests: XCTestCase {
             "2 + 8 + 4",
             "890",
         ]
-        let expectation = expectation(description: "Waiting on async-task")
-        expectation.expectedFulfillmentCount = 100
+        let exp = expectation(description: "Waiting on async-task")
+        exp.expectedFulfillmentCount = 100
         for i in 1...100 {
             DispatchQueue.global().async {
                 let lexer = ThreadingLexer(ANTLRInputStream(input[i % 7]))
@@ -33,7 +33,7 @@ class ThreadingTests: XCTestCase {
 
                 let _ = try? parser?.s()
 
-                expectation.fulfill()
+                exp.fulfill()
             }
         }
 
