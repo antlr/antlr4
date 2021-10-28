@@ -29,6 +29,27 @@ class Recognizer {
         this._listeners = [];
     }
 
+    getLiteralNames() {
+        return Object.getPrototypeOf(this).constructor.literalNames || [];
+    }
+
+    getSymbolicNames() {
+        return Object.getPrototypeOf(this).constructor.symbolicNames || [];
+    }
+
+    getTokenNames() {
+        if(!this.tokenNames) {
+            const literalNames = this.getLiteralNames();
+            const symbolicNames = this.getSymbolicNames();
+            const length = literalNames.length > symbolicNames.length ? literalNames.length : symbolicNames.length;
+            this.tokenNames = [];
+            for(let i=0; i<length; i++) {
+                this.tokenNames[i] = literalNames[i] || symbolicNames[i] || "<INVALID";
+            }
+        }
+        return this.tokenNames;
+    }
+
     getTokenTypeMap() {
         const tokenNames = this.getTokenNames();
         if (tokenNames===null) {
