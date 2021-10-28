@@ -98,7 +98,7 @@ bool LexerActionExecutor::operator != (const LexerActionExecutor &obj) const {
 
 size_t LexerActionExecutor::generateHashCode() const {
   size_t hash = MurmurHash::initialize();
-  for (auto lexerAction : _lexerActions) {
+  for (const auto &lexerAction : _lexerActions) {
     hash = MurmurHash::update(hash, lexerAction);
   }
   hash = MurmurHash::finish(hash, _lexerActions.size());

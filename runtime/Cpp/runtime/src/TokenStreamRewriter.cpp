@@ -93,7 +93,7 @@ TokenStreamRewriter::TokenStreamRewriter(TokenStream *tokens_) : tokens(tokens_)
 }
 
 TokenStreamRewriter::~TokenStreamRewriter() {
-  for (auto program : _programs) {
+  for (const auto &program : _programs) {
     for (auto *operation : program.second) {
       delete operation;
     }

@@ -452,7 +452,7 @@ std::unique_ptr<ATNConfigSet> ParserATNSimulator::computeReachSet(ATNConfigSet *
   std::vector<Ref<ATNConfig>> skippedStopStates;
 
   // First figure out where we can reach on input t
-  for (auto &c : closure_->configs) {
+  for (const auto &c : closure_->configs) {
     if (is<RuleStopState *>(c->state)) {
       assert(c->context->isEmpty());
 
@@ -507,7 +507,7 @@ std::unique_ptr<ATNConfigSet> ParserATNSimulator::computeReachSet(ATNConfigSet *
     ATNConfig::Set closureBusy;
 
     bool treatEofAsEpsilon = t == Token::EOF;
-    for (auto c : intermediate->configs) {
+    for (const auto &c : intermediate->configs) {
       closure(c, reach.get(), closureBusy, false, fullCtx, treatEofAsEpsilon);
     }
   }
@@ -546,7 +546,7 @@ std::unique_ptr<ATNConfigSet> ParserATNSimulator::computeReachSet(ATNConfigSet *
   if (skippedStopStates.size() > 0 && (!fullCtx || !PredictionModeClass::hasConfigInRuleStopState(reach.get()))) {
     assert(!skippedStopStates.empty());
 
-    for (auto c : skippedStopStates) {
+    for (const auto &c : skippedStopStates) {
       reach->add(c, &mergeCache);
     }
   }
@@ -565,7 +565,7 @@ ATNConfigSet* ParserATNSimulator::removeAllConfigsNotInRuleStopState(ATNConfigSe
 
   ATNConfigSet *result = new ATNConfigSet(configs->fullCtx); /* mem-check: released by caller */
 
-  for (auto &config : configs->configs) {
+  for (const auto &config : configs->configs) {
     if (is<RuleStopState*>(config->state)) {
       result->add(config, &mergeCache);
       continue;
@@ -601,7 +601,7 @@ std::unique_ptr<ATNConfigSet> ParserATNSimulator::computeStartState(ATNState *p,
 std::unique_ptr<ATNConfigSet> ParserATNSimulator::applyPrecedenceFilter(ATNConfigSet *configs) {
   std::map<size_t, Ref<PredictionContext>> statesFromAlt1;
   std::unique_ptr<ATNConfigSet> configSet(new ATNConfigSet(configs->fullCtx));
-  for (Ref<ATNConfig> &config : configs->configs) {
+  for (const auto &config : configs->configs) {
     // handle alt 1 first
     if (config->alt != 1) {
       continue;
@@ -622,7 +622,7 @@ std::unique_ptr<ATNConfigSet> ParserATNSimulator::applyPrecedenceFilter(ATNConfi
     }
   }
 
-  for (Ref<ATNConfig> &config : configs->configs) {
+  for (const auto &config : configs->configs) {
     if (config->alt == 1) {
       // already handled
       continue;
@@ -671,7 +671,7 @@ std::vector<Ref<SemanticContext>> ParserATNSimulator::getPredsForAmbigAlts(const
    */
   std::vector<Ref<SemanticContext>> altToPred(nalts + 1);
 
-  for (auto &c : configs->configs) {
+  for (const auto &c : configs->configs) {
     if (ambigAlts.test(c->alt)) {
       altToPred[c->alt] = SemanticContext::Or(altToPred[c->alt], c->semanticContext);
     }
@@ -739,7 +739,7 @@ size_t ParserATNSimulator::getSynValidOrSemInvalidAltThatFinishedDecisionEntryRu
 
 size_t ParserATNSimulator::getAltThatFinishedDecisionEntryRule(ATNConfigSet *configs) {
   misc::IntervalSet alts;
-  for (auto &c : configs->configs) {
+  for (const auto &c : configs->configs) {
     if (c->getOuterContextDepth() > 0 || (is<RuleStopState *>(c->state) && c->context->hasEmptyPath())) {
       alts.add(c->alt);
     }
@@ -756,7 +756,7 @@ std::pair<ATNConfigSet *, ATNConfigSet *> ParserATNSimulator::splitAccordingToSe
   // mem-check: both pointers must be freed by the caller.
   ATNConfigSet *succeeded(new ATNConfigSet(configs->fullCtx));
   ATNConfigSet *failed(new ATNConfigSet(configs->fullCtx));
-  for (Ref<ATNConfig> &c : configs->configs) {
+  for (const auto &c : configs->configs) {
     if (c->semanticContext != SemanticContext::NONE) {
       bool predicateEvaluationResult = evalSemanticContext(c->semanticContext, outerContext, c->alt, configs->fullCtx);
       if (predicateEvaluationResult) {
@@ -1204,7 +1204,7 @@ std::string ParserATNSimulator::getLookaheadName(TokenStream *input) {
 
 void ParserATNSimulator::dumpDeadEndConfigs(NoViableAltException &nvae) {
   std::cerr << "dead end configs: ";
-  for (auto c : nvae.getDeadEndConfigs()->configs) {
+  for (const auto &c : nvae.getDeadEndConfigs()->configs) {
     std::string trans = "no edges";
     if (c->state->transitions.size() > 0) {
       Transition *t = c->state->transitions[0];
@@ -1230,7 +1230,7 @@ NoViableAltException ParserATNSimulator::noViableAlt(TokenStream *input, ParserR
 
 size_t ParserATNSimulator::getUniqueAlt(ATNConfigSet *configs) {
   size_t alt = ATN::INVALID_ALT_NUMBER;
-  for (auto &c : configs->configs) {
+  for (const auto &c : configs->configs) {
     if (alt == ATN::INVALID_ALT_NUMBER) {
       alt = c->alt; // found first alt
     } else if (c->alt != alt) {
