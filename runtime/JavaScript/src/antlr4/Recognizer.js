@@ -15,7 +15,7 @@ class Recognizer {
     }
 
     checkVersion(toolVersion) {
-        const runtimeVersion = "4.9.2";
+        const runtimeVersion = "4.9.3";
         if (runtimeVersion!==toolVersion) {
             console.log("ANTLR runtime and generated code versions disagree: "+runtimeVersion+"!="+toolVersion);
         }

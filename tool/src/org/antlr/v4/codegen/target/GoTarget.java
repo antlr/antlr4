@@ -71,7 +71,7 @@ public class GoTarget extends Target {
 
 	@Override
 	public String getVersion() {
-		return "4.9.2";
+		return "4.9.3";
 	}
 
 	public Set<String> getBadWords() {
