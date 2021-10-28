@@ -99,8 +99,8 @@ std::vector<ATNState*> ATNConfigSet::getStates() {
 
 BitSet ATNConfigSet::getAlts() {
   BitSet alts;
-  for (ATNConfig config : configs) {
-    alts.set(config.alt);
+  for (const auto &config : configs) {
+    alts.set(config->alt);
   }
   return alts;
 }
