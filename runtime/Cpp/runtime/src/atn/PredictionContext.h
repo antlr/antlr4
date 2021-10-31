@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <atomic>
+
 #include "Recognizer.h"
 #include "atn/ATN.h"
 #include "atn/ATNState.h"
@@ -48,7 +50,7 @@ namespace atn {
 #endif
 
   public:
-    static size_t globalNodeCount;
+    static std::atomic<size_t> globalNodeCount;
     const size_t id;
 
     /// <summary>
