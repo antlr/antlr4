@@ -57,7 +57,7 @@ else()
     set(UTFCPP_DIR ${THIRDPARTY_DIR}/utfcpp)
     ExternalProject_Add(
       utf8cpp
-      GIT_REPOSITORY        "git://github.com/nemtrif/utfcpp"
+      GIT_REPOSITORY        "https://github.com/nemtrif/utfcpp"
       GIT_TAG               "v3.1.1"
       SOURCE_DIR            ${UTFCPP_DIR}
       UPDATE_DISCONNECTED   1
