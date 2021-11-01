@@ -14,8 +14,8 @@ import org.antlr.v4.runtime.misc.Interval;
  * Code-generated utility class mapping Unicode properties to Unicode code point ranges.
  */
 public abstract class UnicodeData {
-       private static final Map\<String, IntervalSet\> propertyCodePointRanges = new HashMap\<\>(<length(propertyCodePointRanges)>);
-       private static final Map\<String, String\> propertyAliases = new HashMap\<\>(<length(propertyAliases)>);
+       private static final Map\<String, IntervalSet> propertyCodePointRanges = new HashMap\<>(<length(propertyCodePointRanges)>);
+       private static final Map\<String, String> propertyAliases = new HashMap\<>(<length(propertyAliases)>);
 
        // Work around Java 64k bytecode method limit by splitting up static
        // initialization into one method per Unicode property
@@ -23,7 +23,7 @@ public abstract class UnicodeData {
        <propertyCodePointRanges.keys:{ k | // Unicode code points with property "<k>"
 static private class PropertyAdder<i> {
         static private void addProperty<i>() {
-               List\<Interval\> intervals = Arrays.asList(
+               List\<Interval> intervals = Arrays.asList(
                        <propertyCodePointRanges.(k).intervals:{ interval | Interval.of(<interval.a>, <interval.b>)}; separator=",\n">
                );
                IntervalSet codePointRanges = new IntervalSet(intervals);
