@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <string_view>
+
 #include "CharStream.h"
 
 namespace antlr4 {
@@ -26,11 +28,9 @@ namespace antlr4 {
     std::string name;
 
     ANTLRInputStream();
-    
-#if __cplusplus >= 201703L
+
     ANTLRInputStream(const std::string_view &input);
-#endif
-    
+
     ANTLRInputStream(const std::string &input);
     ANTLRInputStream(const char *data, size_t length);
     ANTLRInputStream(std::istream &stream);
