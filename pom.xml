@@ -95,8 +95,6 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <!-- add a github entry in your .m2/settings.xml, see https://stackoverflow.com/questions/28282572/maven-release-plugin-git-credentials -->
-        <project.scm.id>github</project.scm.id>
 		<antlr.testinprocess>true</antlr.testinprocess>
 		<maven.compiler.source>1.7</maven.compiler.source>
 		<maven.compiler.target>1.7</maven.compiler.target>
@@ -163,12 +161,7 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-javadoc-plugin</artifactId>
 				</plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-release-plugin</artifactId>
-                    <version>2.5.3</version>
-                </plugin>
-            </plugins>
+			</plugins>
 		</pluginManagement>
 	</build>
 </project>
