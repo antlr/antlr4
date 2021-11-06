@@ -452,8 +452,8 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 			"lexer grammar A;\n" +
 			"STRING : '\\\"' '\\\"' 'x' ;";
 		String expected =
-			"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): A.g4:2:10: invalid escape sequence \\\"\n"+
-			"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): A.g4:2:15: invalid escape sequence \\\"\n";
+			"error(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): A.g4:2:10: invalid escape sequence \\\"\n"+
+			"error(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): A.g4:2:15: invalid escape sequence \\\"\n";
 
 		String[] pair = new String[] {
 			grammar,
@@ -493,10 +493,9 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 			"lexer grammar A;\n" +
 			"RULE : 'Foo \\uAABG \\x \\u';\n";
 		String expected =
-			"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): A.g4:2:12: invalid escape sequence \\uAABG\n" +
-			"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): A.g4:2:19: invalid escape sequence \\x\n" +
-			"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): A.g4:2:22: invalid escape sequence \\u\n" +
-			"warning("+ErrorType.EPSILON_TOKEN.code+"): A.g4:2:0: non-fragment lexer rule RULE can match the empty string\n";
+			"error(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): A.g4:2:12: invalid escape sequence \\uAABG\n" +
+			"error(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): A.g4:2:19: invalid escape sequence \\x\n" +
+			"error(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): A.g4:2:22: invalid escape sequence \\u\n";
 
 		String[] pair = new String[] {
 			grammar,
@@ -536,7 +535,6 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 	@Test public void testInvalidCharSetsAndStringLiterals() {
 		String grammar =
 				"lexer grammar Test;\n" +
-				"INVALID_STRING_LITERAL:       '\\\"' | '\\]' | '\\u24';\n" +
 				"INVALID_STRING_LITERAL_RANGE: 'GH'..'LM';\n" +
 				"INVALID_CHAR_SET:             [\\u24\\uA2][\\{];\n" +  //https://github.com/antlr/antlr4/issues/1077
 				"EMPTY_STRING_LITERAL_RANGE:   'F'..'A' | 'Z';\n" +
@@ -549,21 +547,14 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 				"EMPTY_CHAR_SET_WITH_INVALID_ESCAPE_SEQUENCE: [\\'];";  // https://github.com/antlr/antlr4/issues/1556
 
 		String expected =
-				"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:2:31: invalid escape sequence \\\"\n" +
-				"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:2:38: invalid escape sequence \\]\n" +
-				"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:2:45: invalid escape sequence \\u24\n" +
-				"error(" + ErrorType.INVALID_LITERAL_IN_LEXER_SET.code + "): Test.g4:3:30: multi-character literals are not allowed in lexer sets: 'GH'\n" +
-				"error(" + ErrorType.INVALID_LITERAL_IN_LEXER_SET.code + "): Test.g4:3:36: multi-character literals are not allowed in lexer sets: 'LM'\n" +
-				"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:4:30: invalid escape sequence \\u24\\u\n" +
-				"error(" + ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED.code + "): Test.g4:4:30: string literals and sets cannot be empty: []\n" +
-				"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:4:40: invalid escape sequence \\{\n" +
-				"error(" + ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED.code + "): Test.g4:4:40: string literals and sets cannot be empty: []\n" +
-				"error(" + ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED.code + "): Test.g4:5:33: string literals and sets cannot be empty: 'F'..'A'\n" +
-				"error(" + ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED.code + "): Test.g4:6:30: string literals and sets cannot be empty: 'f'..'a'\n" +
-				"error(" + ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED.code + "): Test.g4:6:36: string literals and sets cannot be empty: []\n" +
-				"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:11:84: invalid escape sequence \\'\n" +
-				"error(" + ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED.code + "): Test.g4:11:84: string literals and sets cannot be empty: []\n" +
-				"warning("+ ErrorType.EPSILON_TOKEN.code + "): Test.g4:2:0: non-fragment lexer rule INVALID_STRING_LITERAL can match the empty string\n";
+				"error(" + ErrorType.INVALID_LITERAL_IN_LEXER_SET.code + "): Test.g4:2:30: multi-character literals are not allowed in lexer sets: 'GH'\n" +
+				"error(" + ErrorType.INVALID_LITERAL_IN_LEXER_SET.code + "): Test.g4:2:36: multi-character literals are not allowed in lexer sets: 'LM'\n" +
+				"error(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:3:30: invalid escape sequence \\u24\\u\n" +
+				"error(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:3:40: invalid escape sequence \\{\n" +
+				"error(" + ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED.code + "): Test.g4:4:33: string literals and sets cannot be empty: 'F'..'A'\n" +
+				"error(" + ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED.code + "): Test.g4:5:30: string literals and sets cannot be empty: 'f'..'a'\n" +
+				"error(" + ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED.code + "): Test.g4:5:36: string literals and sets cannot be empty: []\n" +
+				"error(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:10:84: invalid escape sequence \\'\n";
 
 		String[] pair = new String[] {
 				grammar,
@@ -587,33 +578,23 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 				"UNICODE_PROPERTY_NOT_ALLOWED_IN_RANGE: [\\p{Uppercase_Letter}-\\p{Lowercase_Letter}];\n" +
 				"UNICODE_PROPERTY_NOT_ALLOWED_IN_RANGE_2: [\\p{Letter}-Z];\n" +
 				"UNICODE_PROPERTY_NOT_ALLOWED_IN_RANGE_3: [A-\\p{Number}];\n" +
-				"INVERTED_UNICODE_PROPERTY_NOT_ALLOWED_IN_RANGE: [\\P{Uppercase_Letter}-\\P{Number}];\n";
+				"INVERTED_UNICODE_PROPERTY_NOT_ALLOWED_IN_RANGE: [\\P{Uppercase_Letter}-\\P{Number}];\n" +
+				"EMOJI_MODIFIER: [\\p{Grapheme_Cluster_Break=E_Base}];\n";
 
 		String expected =
-				"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:2:32: invalid escape sequence \\u{}\n" +
-				"error(" + ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED.code + "): Test.g4:2:32: string literals and sets cannot be empty: []\n" +
-				"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:3:41: invalid escape sequence \\u{\n" +
-				"error(" + ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED.code + "): Test.g4:3:41: string literals and sets cannot be empty: []\n" +
-				"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:4:35: invalid escape sequence \\u{110\n" +
-				"error(" + ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED.code + "): Test.g4:4:35: string literals and sets cannot be empty: []\n" +
-				"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:5:32: invalid escape sequence \\p{}\n" +
-				"error(" + ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED.code + "): Test.g4:5:32: string literals and sets cannot be empty: []\n" +
-				"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:6:41: invalid escape sequence \\p{\n" +
-				"error(" + ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED.code + "): Test.g4:6:41: string literals and sets cannot be empty: []\n" +
-				"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:7:41: invalid escape sequence \\P{}\n" +
-				"error(" + ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED.code + "): Test.g4:7:41: string literals and sets cannot be empty: []\n" +
-				"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:8:34: invalid escape sequence \\p{NotAProperty}\n" +
-				"error(" + ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED.code + "): Test.g4:8:34: string literals and sets cannot be empty: []\n" +
-				"warning(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:9:43: invalid escape sequence \\P{NotAProperty}\n" +
-				"error(" + ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED.code + "): Test.g4:9:43: string literals and sets cannot be empty: []\n" +
+				"error(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:2:32: invalid escape sequence \\u{}\n" +
+				"error(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:3:41: invalid escape sequence \\u{\n" +
+				"error(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:4:35: invalid escape sequence \\u{110\n" +
+				"error(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:5:32: invalid escape sequence \\p{}\n" +
+				"error(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:6:41: invalid escape sequence \\p{\n" +
+				"error(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:7:41: invalid escape sequence \\P{}\n" +
+				"error(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:8:34: invalid escape sequence \\p{NotAProperty}\n" +
+				"error(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:9:43: invalid escape sequence \\P{NotAProperty}\n" +
 				"error(" + ErrorType.UNICODE_PROPERTY_NOT_ALLOWED_IN_RANGE.code + "): Test.g4:10:39: unicode property escapes not allowed in lexer charset range: [\\p{Uppercase_Letter}-\\p{Lowercase_Letter}]\n" +
-				"error(" + ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED.code + "): Test.g4:10:39: string literals and sets cannot be empty: []\n" +
 				"error(" + ErrorType.UNICODE_PROPERTY_NOT_ALLOWED_IN_RANGE.code + "): Test.g4:11:41: unicode property escapes not allowed in lexer charset range: [\\p{Letter}-Z]\n" +
-				"error(" + ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED.code + "): Test.g4:11:41: string literals and sets cannot be empty: []\n" +
 				"error(" + ErrorType.UNICODE_PROPERTY_NOT_ALLOWED_IN_RANGE.code + "): Test.g4:12:41: unicode property escapes not allowed in lexer charset range: [A-\\p{Number}]\n" +
-				"error(" + ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED.code + "): Test.g4:12:41: string literals and sets cannot be empty: []\n" +
 				"error(" + ErrorType.UNICODE_PROPERTY_NOT_ALLOWED_IN_RANGE.code + "): Test.g4:13:48: unicode property escapes not allowed in lexer charset range: [\\P{Uppercase_Letter}-\\P{Number}]\n" +
-				"error(" + ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED.code + "): Test.g4:13:48: string literals and sets cannot be empty: []\n";
+				"error(" + ErrorType.INVALID_ESCAPE_SEQUENCE.code + "): Test.g4:14:16: invalid escape sequence \\p{Grapheme_Cluster_Break=E_Base}\n";
 
 		String[] pair = new String[] {
 				grammar,

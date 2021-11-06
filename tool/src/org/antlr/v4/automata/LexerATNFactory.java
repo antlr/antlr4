@@ -380,10 +380,6 @@ public class LexerATNFactory extends ParserATNFactory {
 		ATNState right = newState(charSetAST);
 		IntervalSet set = getSetFromCharSetLiteral(charSetAST);
 
-		if (set.isNil()) {
-			g.tool.errMgr.grammarError(ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED, g.fileName, charSetAST.getToken(), "[]");
-		}
-
 		left.addTransition(new SetTransition(right, set));
 		charSetAST.atnState = left;
 		return new Handle(left, right);
@@ -501,6 +497,11 @@ public class LexerATNFactory extends ParserATNFactory {
 		}
 		// Whether or not we were in a range, we'll add the last code point found to the set.
 		applyPrevState(charSetAST, set, state);
+
+		if (set.isNil()) {
+			g.tool.errMgr.grammarError(ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED, g.fileName, charSetAST.getToken(), "[]");
+		}
+
 		return set;
 	}
 
