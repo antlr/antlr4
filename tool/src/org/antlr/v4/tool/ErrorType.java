@@ -1123,6 +1123,7 @@ public enum ErrorType {
 	 * instead offers automatically generated parse tree listeners and visitors
 	 * as a more maintainable alternative.</p>
 	 */
+	@Deprecated
 	V3_TREE_GRAMMAR(200, "tree grammars are not supported in ANTLR 4", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Warning 201.

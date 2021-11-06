@@ -839,4 +839,11 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 
 		super.testErrors(pair, true);
 	}
+
+	@Test public void testRuleNamesAsTree() {
+		String grammar = "" +
+				"grammar T;\n" +
+				"tree : 'X';";
+		super.testErrors(new String[] { grammar, "" }, true);
+	}
 }

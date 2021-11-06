@@ -24,7 +24,6 @@ import org.antlr.v4.parse.GrammarASTAdaptor;
 import org.antlr.v4.parse.GrammarTreeVisitor;
 import org.antlr.v4.parse.ToolANTLRLexer;
 import org.antlr.v4.parse.ToolANTLRParser;
-import org.antlr.v4.parse.v3TreeGrammarException;
 import org.antlr.v4.runtime.RuntimeMetaData;
 import org.antlr.v4.runtime.misc.LogManager;
 import org.antlr.v4.runtime.misc.IntegerList;
@@ -657,20 +656,15 @@ public class Tool {
 			lexer.tokens = tokens;
 			ToolANTLRParser p = new ToolANTLRParser(tokens, this);
 			p.setTreeAdaptor(adaptor);
-			try {
-				ParserRuleReturnScope r = p.grammarSpec();
-				GrammarAST root = (GrammarAST)r.getTree();
-				if ( root instanceof GrammarRootAST) {
-					((GrammarRootAST)root).hasErrors = lexer.getNumberOfSyntaxErrors()>0 || p.getNumberOfSyntaxErrors()>0;
-					assert ((GrammarRootAST)root).tokenStream == tokens;
-					if ( grammarOptions!=null ) {
-						((GrammarRootAST)root).cmdLineOptions = grammarOptions;
-					}
-					return ((GrammarRootAST)root);
+			ParserRuleReturnScope r = p.grammarSpec();
+			GrammarAST root = (GrammarAST) r.getTree();
+			if (root instanceof GrammarRootAST) {
+				((GrammarRootAST) root).hasErrors = lexer.getNumberOfSyntaxErrors() > 0 || p.getNumberOfSyntaxErrors() > 0;
+				assert ((GrammarRootAST) root).tokenStream == tokens;
+				if (grammarOptions != null) {
+					((GrammarRootAST) root).cmdLineOptions = grammarOptions;
 				}
-			}
-			catch (v3TreeGrammarException e) {
-				errMgr.grammarError(ErrorType.V3_TREE_GRAMMAR, fileName, e.location);
+				return ((GrammarRootAST) root);
 			}
 			return null;
 		}
