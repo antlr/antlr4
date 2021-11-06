@@ -13,7 +13,6 @@ package parser // <file.grammarName>
 
 import (
 	"fmt"
-	"reflect"
 	"strconv"
 
 	"github.com/antlr/antlr4/runtime/Go/antlr"
@@ -26,7 +25,6 @@ import (
 
 // Suppress unused import errors
 var _ = fmt.Printf
-var _ = reflect.Copy
 var _ = strconv.Itoa
 
 <if(parser)>
@@ -932,7 +930,13 @@ ContextTokenListIndexedGetterDecl(t) ::= <<
 
 ContextRuleGetterDecl(r) ::= <<
 <r.name; format="cap">() I<r.ctxName> {
-	var t = s.GetTypedRuleContext(reflect.TypeOf((*I<r.ctxName>)(nil)).Elem(), 0)
+	var t antlr.RuleContext;
+	for _, ctx := range s.GetChildren() {
+		if _, ok := ctx.(I<r.ctxName>); ok {
+			t = ctx.(antlr.RuleContext);
+			break
+		}
+	}
 
 	if t == nil {
 		return nil
@@ -944,12 +948,20 @@ ContextRuleGetterDecl(r) ::= <<
 
 ContextRuleListGetterDecl(r) ::= <<
 All<r.name; format="cap">() []I<r.ctxName> {
-	var ts = s.GetTypedRuleContexts(reflect.TypeOf((*I<r.ctxName>)(nil)).Elem())
-	var tst = make([]I<r.ctxName>, len(ts))
+	children := s.GetChildren()
+	len := 0
+	for _, ctx := range children {
+		if _, ok := ctx.(I<r.ctxName>); ok {
+			len++
+		}
+	}
 
-	for i, t := range ts {
-		if t != nil {
+	tst := make([]I<r.ctxName>, len)
+	i := 0
+	for _, ctx := range children {
+		if t, ok := ctx.(I<r.ctxName>); ok {
 			tst[i] = t.(I<r.ctxName>)
+			i++
 		}
 	}
 
@@ -959,7 +971,17 @@ All<r.name; format="cap">() []I<r.ctxName> {
 
 ContextRuleListIndexedGetterDecl(r) ::= <<
 <r.name; format="cap">(i int) I<r.ctxName> {
-	var t = s.GetTypedRuleContext(reflect.TypeOf((*I<r.ctxName>)(nil)).Elem(), i)
+	var t antlr.RuleContext;
+	j := 0
+	for _, ctx := range s.GetChildren() {
+		if _, ok := ctx.(I<r.ctxName>); ok {
+			if j == i {
+				t = ctx.(antlr.RuleContext);
+				break
+			}
+			j++
+		}
+	}
 
 	if t == nil {
 		return nil
