@@ -95,6 +95,8 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <!-- add a github entry in your .m2/settings.xml, see https://stackoverflow.com/questions/28282572/maven-release-plugin-git-credentials -->
+        <project.scm.id>github</project.scm.id>
 		<antlr.testinprocess>true</antlr.testinprocess>
 		<maven.compiler.source>1.7</maven.compiler.source>
 		<maven.compiler.target>1.7</maven.compiler.target>
@@ -113,7 +115,7 @@
 	</issueManagement>
 
 	<scm>
-		<url>https://github.com/antlr/antlr4/tree/master</url>
+        <url>https://github.com/antlr/antlr4/tree/master</url>
 		<connection>scm:git:git://github.com/antlr/antlr4.git</connection>
 		<developerConnection>scm:git:git@github.com:antlr/antlr4.git</developerConnection>
 		<tag>HEAD</tag>
