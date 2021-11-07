@@ -341,7 +341,7 @@ public enum ErrorType {
 	 * <li>implicitly generated grammar <em>grammar</em> has no rules</li>
 	 * </ul>
 	 */
-	NO_RULES(99, "<if(arg2.implicitLexerOwner)>implicitly generated <endif>grammar <arg> has no non-fragment rules", ErrorSeverity.ERROR),
+	NO_RULES(99, "<if(arg2.implicitLexerOwner)>implicitly generated <endif>grammar <arg> has no rules", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 105.
 	 *
@@ -980,7 +980,7 @@ public enum ErrorType {
 	/**
 	 * Compiler Error 174.
 	 *
-	 * <p>empty strings not allowed</p>
+	 * <p>empty strings and sets not allowed</p>
 	 *
 	 * <pre>
 	 * A: '''test''';

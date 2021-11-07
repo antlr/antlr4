@@ -286,12 +286,15 @@ YYYY/MM/DD, github id, Full name, email
 2020/11/26, mr-c, Michael R. Crusoe, 1330696+mr-c@users.noreply.github.com
 2020/12/01, maxence-lefebvre, Maxence Lefebvre, maxence-lefebvre@users.noreply.github.com
 2020/12/03, electrum, David Phillips, david@acz.org
+2021/01/03, niw, Yoshimasa Niwa, niw@niw.at
 2021/01/25, l215884529, Qiheng Liu, 13607681+l215884529@users.noreply.github.com
 2021/02/02, tsotnikov, Taras Sotnikov, taras.sotnikov@gmail.com
 2021/02/10, jirislaby, Jiri Slaby, jirislaby@gmail.com
 2021/02/19, dkleszyk, David Kleszyk, dkleszyk@gmail.com
 2021/02/21, namasikanam, Xingyu Xie, namasikanam@gmail.com
+2021/02/26, ahooper, Andrew Hooper, ahooper at kos dot net
 2021/02/27, khmarbaise, Karl Heinz Marbaise, github@soebes.com
+2021/02/28, Dante-Broggi, Dante Broggi, 34220985+Dante-Broggi@users.noreply.github.com
 2021/03/02, hackeris
 2021/03/03, xTachyon, Damian Andrei, xTachyon@users.noreply.github.com
 2021/04/07, b1f6c1c4, Jinzheng Tu, b1f6c1c4@gmail.com
@@ -304,3 +307,17 @@ YYYY/MM/DD, github id, Full name, email
 2021/05/04, joakker, Joaquín León, joaquinandresleon108@gmail.com
 2021/05/06, renancaraujo, Renan C. Araújo, renancaraujo@users.noreply.github.com
 2021/05/06, canastro, Ricardo Canastro, ricardocanastro@users.noreply.github.com
+2021/07/01, appel1, Johan Appelgren, johan.appelgren@gmail.com
+2021/07/01, marcauberer, Marc Auberer, marc.auberer@chillibits.com
+2021/07/14, renzhentaxibaerde, Renzhentaxi Baerde, renzhentaxibaerde@gmail.com
+2021/07/29, ksyx, Qixing Xue, qixingxue@outlook.com
+2021/07/29, rachidlamouri, Rachid Lamouri, rachidlamouri@gmail.com
+2021/08/02, minjoosur, Minjoo Sur, msur@salesforce.com
+2021/08/05, jjeffcaii, Jeff Tsai, caiweiwei.cww@alibaba-inc.com
+2021/08/08, ansiemens, Yi-Hong Lin, ansiemens@gmail.com
+2021/08/25, XenoAmess, Jin Xu, xenoamess@gmail.com
+2021/09/08, jmcken8, Joel McKenzie, joel.b.mckenzie@gmail.com
+2021/09/23, skalt, Steven Kalt, kalt.steven@gmail.com
+2021/10/10, tools4origins, Erwan Guyomarc'h, contact@erwan-guyomarch.fr
+2021/10/19, jcking, Justin King, jcking@google.com
+2021/10/31, skef, Skef Iterum, github@skef.org

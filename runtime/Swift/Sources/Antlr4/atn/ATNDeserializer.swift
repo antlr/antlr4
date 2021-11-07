@@ -88,17 +88,28 @@ public class ATNDeserializer {
 
     public func deserialize(_ inData: [Character]) throws -> ATN {
         // don't adjust the first value since that's the version number
-        let data = [inData[0]] + inData[1...].map { Character(integerLiteral: $0.unicodeValue - 2) }
+        let data = [inData[0].unicodeValue] + inData[1...].map { Int(integerLiteral: $0.unicodeValue - 2) }
 
         var p = 0
-        let version = data[p].unicodeValue
+        let version = data[p]
         p += 1
         if version != ATNDeserializer.SERIALIZED_VERSION {
             let reason = "Could not deserialize ATN with version \(version) (expected \(ATNDeserializer.SERIALIZED_VERSION))."
             throw ANTLRError.unsupportedOperation(msg: reason)
         }
 
-        let uuid = toUUID(data, p)
+        let uuidChars: [Character] = data[p..<(p+8)].map{Character(UnicodeScalar($0)!)}
+        let uuidBytes: [UInt8] = [ // crude approach to get correct order!
+            UInt8(uuidChars[7].unicodeValue>>8), UInt8(uuidChars[7].unicodeValue&255),
+            UInt8(uuidChars[6].unicodeValue>>8), UInt8(uuidChars[6].unicodeValue&255),
+            UInt8(uuidChars[5].unicodeValue>>8), UInt8(uuidChars[5].unicodeValue&255),
+            UInt8(uuidChars[4].unicodeValue>>8), UInt8(uuidChars[4].unicodeValue&255),
+            UInt8(uuidChars[3].unicodeValue>>8), UInt8(uuidChars[3].unicodeValue&255),
+            UInt8(uuidChars[2].unicodeValue>>8), UInt8(uuidChars[2].unicodeValue&255),
+            UInt8(uuidChars[1].unicodeValue>>8), UInt8(uuidChars[1].unicodeValue&255),
+            UInt8(uuidChars[0].unicodeValue>>8), UInt8(uuidChars[0].unicodeValue&255)
+        ]
+        let uuid = UUID(uuidString: NSUUID(uuidBytes:uuidBytes).uuidString)!
         p += 8
         if !ATNDeserializer.SUPPORTED_UUIDS.contains(uuid) {
             let reason = "Could not deserialize ATN with UUID \(uuid) (expected \(ATNDeserializer.SERIALIZED_UUID) or a legacy UUID)."
@@ -108,9 +119,9 @@ public class ATNDeserializer {
         let supportsPrecedencePredicates = isFeatureSupported(ATNDeserializer.ADDED_PRECEDENCE_TRANSITIONS, uuid)
         let supportsLexerActions = isFeatureSupported(ATNDeserializer.ADDED_LEXER_ACTIONS, uuid)
 
-        let grammarType = ATNType(rawValue: toInt(data[p]))!
+        let grammarType = ATNType(rawValue: data[p])!
         p += 1
-        let maxTokenType = toInt(data[p])
+        let maxTokenType = data[p]
         p += 1
         let atn = ATN(grammarType, maxTokenType)
 
@@ -119,10 +130,10 @@ public class ATNDeserializer {
         //
         var loopBackStateNumbers = [(LoopEndState, Int)]()
         var endStateNumbers = [(BlockStartState, Int)]()
-        let nstates = toInt(data[p])
+        let nstates = data[p]
         p += 1
         for _ in 0..<nstates {
-            let stype = toInt(data[p])
+            let stype = data[p]
             p += 1
             // ignore bad type of states
             if stype == ATNState.INVALID_TYPE {
@@ -130,7 +141,7 @@ public class ATNDeserializer {
                 continue
             }
 
-            var ruleIndex = toInt(data[p])
+            var ruleIndex = data[p]
             p += 1
             if ruleIndex == Int.max {
                 // Character.MAX_VALUE
@@ -140,11 +151,11 @@ public class ATNDeserializer {
             let s = try stateFactory(stype, ruleIndex)!
             if stype == ATNState.LOOP_END {
                 // special case
-                let loopBackStateNumber = toInt(data[p])
+                let loopBackStateNumber = data[p]
                 p += 1
                 loopBackStateNumbers.append((s as! LoopEndState, loopBackStateNumber))
             } else if let s = s as? BlockStartState {
-                let endStateNumber = toInt(data[p])
+                let endStateNumber = data[p]
                 p += 1
                 endStateNumbers.append((s, endStateNumber))
             }
@@ -160,19 +171,19 @@ public class ATNDeserializer {
             pair.0.endState = atn.states[pair.1] as? BlockEndState
         }
 
-        let numNonGreedyStates = toInt(data[p])
+        let numNonGreedyStates = data[p]
         p += 1
         for _ in 0..<numNonGreedyStates {
-            let stateNumber = toInt(data[p])
+            let stateNumber = data[p]
             p += 1
             (atn.states[stateNumber] as! DecisionState).nonGreedy = true
         }
 
         if supportsPrecedencePredicates {
-            let numPrecedenceStates = toInt(data[p])
+            let numPrecedenceStates = data[p]
             p += 1
             for _ in 0..<numPrecedenceStates {
-                let stateNumber = toInt(data[p])
+                let stateNumber = data[p]
                 p += 1
                 (atn.states[stateNumber] as! RuleStartState).isPrecedenceRule = true
             }
@@ -181,18 +192,18 @@ public class ATNDeserializer {
         //
         // RULES
         //
-        let nrules = toInt(data[p])
+        let nrules = data[p]
         p += 1
         var ruleToTokenType = [Int]()
         var ruleToStartState = [RuleStartState]()
         for _ in 0..<nrules {
-            let s = toInt(data[p])
+            let s = data[p]
             p += 1
             let startState = atn.states[s] as! RuleStartState
             ruleToStartState.append(startState)
 
             if atn.grammarType == ATNType.lexer {
-                var tokenType = toInt(data[p])
+                var tokenType = data[p]
                 p += 1
                 if tokenType == 0xFFFF {
                     tokenType = CommonToken.EOF
@@ -203,7 +214,7 @@ public class ATNDeserializer {
                 if !isFeatureSupported(ATNDeserializer.ADDED_LEXER_ACTIONS, uuid) {
                     // this piece of unused metadata was serialized prior to the
                     // addition of LexerAction
-                    var actionIndexIgnored = toInt(data[p])
+                    var actionIndexIgnored = data[p]
                     p += 1
                     if actionIndexIgnored == 0xFFFF {
                         actionIndexIgnored = -1
@@ -221,10 +232,10 @@ public class ATNDeserializer {
         //
         // MODES
         //
-        let nmodes = toInt(data[p])
+        let nmodes = data[p]
         p += 1
         for _ in 0..<nmodes {
-            let s = toInt(data[p])
+            let s = data[p]
             p += 1
             atn.appendModeToStartState(atn.states[s] as! TokensStartState)
         }
@@ -246,15 +257,15 @@ public class ATNDeserializer {
         //
         // EDGES
         //
-        let nedges = toInt(data[p])
+        let nedges = data[p]
         p += 1
         for _ in 0..<nedges {
-            let src = toInt(data[p])
-            let trg = toInt(data[p + 1])
-            let ttype = toInt(data[p + 2])
-            let arg1 = toInt(data[p + 3])
-            let arg2 = toInt(data[p + 4])
-            let arg3 = toInt(data[p + 5])
+            let src = data[p]
+            let trg = data[p + 1]
+            let ttype = data[p + 2]
+            let arg1 = data[p + 3]
+            let arg2 = data[p + 4]
+            let arg3 = data[p + 5]
             let trans = try edgeFactory(atn, ttype, src, trg, arg1, arg2, arg3, sets)
 
             let srcState = atn.states[src]!
@@ -268,10 +279,10 @@ public class ATNDeserializer {
         //
         // DECISIONS
         //
-        let ndecisions = toInt(data[p])
+        let ndecisions = data[p]
         p += 1
         for i in 1...ndecisions {
-            let s = toInt(data[p])
+            let s = data[p]
             p += 1
             let decState = atn.states[s] as! DecisionState
             atn.appendDecisionToState(decState)
@@ -283,19 +294,19 @@ public class ATNDeserializer {
         //
         if atn.grammarType == ATNType.lexer {
             if supportsLexerActions {
-                let length = toInt(data[p])
+                let length = data[p]
                 p += 1
                 var lexerActions = [LexerAction]()
                 for _ in 0..<length {
-                    let actionType = LexerActionType(rawValue: toInt(data[p]))!
+                    let actionType = LexerActionType(rawValue: data[p])!
                     p += 1
-                    var data1 = toInt(data[p])
+                    var data1 = data[p]
                     p += 1
                     if data1 == 0xFFFF {
                         data1 = -1
                     }
 
-                    var data2 = toInt(data[p])
+                    var data2 = data[p]
                     p += 1
                     if data2 == 0xFFFF {
                         data2 = -1
@@ -317,28 +328,28 @@ public class ATNDeserializer {
     }
 
 
-    private func readUnicodeInt(_ data: [Character], _ p: inout Int) -> Int {
-        let result = toInt(data[p])
+    private func readUnicodeInt(_ data: [Int], _ p: inout Int) -> Int {
+        let result = data[p]
         p += 1
         return result
     }
 
-    private func readUnicodeInt32(_ data: [Character], _ p: inout Int) -> Int {
-        let result = toInt32(data, p)
+    private func readUnicodeInt32(_ data: [Int], _ p: inout Int) -> Int {
+        let result = toInt32(data[p..<p+2].map{Character(UnicodeScalar($0)!)}, 0)
         p += 2
         return result
     }
 
-    private func readSets(_ data: [Character], _ p: inout Int, _ sets: inout [IntervalSet], _ readUnicode: ([Character], inout Int) -> Int) {
-        let nsets = toInt(data[p])
+    private func readSets(_ data: [Int], _ p: inout Int, _ sets: inout [IntervalSet], _ readUnicode: ([Int], inout Int) -> Int) {
+        let nsets = data[p]
         p += 1
         for _ in 0..<nsets {
-            let nintervals = toInt(data[p])
+            let nintervals = data[p]
             p += 1
             let set = IntervalSet()
             sets.append(set)
 
-            let containsEof = (toInt(data[p]) != 0)
+            let containsEof = (data[p] != 0)
             p += 1
             if containsEof {
                 try! set.add(-1)

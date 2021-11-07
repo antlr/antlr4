@@ -1424,7 +1424,7 @@ var lexerRuleNames []string
 <endif>
 
 type <lexer.name> struct {
-	*<if(superClass)><superClass><else>antlr.BaseLexer<endif>
+	<if(superClass)><superClass><else>*antlr.BaseLexer<endif>
 	channelNames []string
 	modeNames []string
 	// TODO: EOF string

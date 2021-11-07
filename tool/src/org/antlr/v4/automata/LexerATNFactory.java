@@ -374,6 +374,11 @@ public class LexerATNFactory extends ParserATNFactory {
 		ATNState left = newState(charSetAST);
 		ATNState right = newState(charSetAST);
 		IntervalSet set = getSetFromCharSetLiteral(charSetAST);
+
+		if (set.isNil()) {
+			g.tool.errMgr.grammarError(ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED, g.fileName, charSetAST.getToken(), "[]");
+		}
+
 		left.addTransition(new SetTransition(right, set));
 		charSetAST.atnState = left;
 		return new Handle(left, right);
@@ -442,13 +447,6 @@ public class LexerATNFactory extends ParserATNFactory {
 		String chars = charSetAST.getText();
 		chars = chars.substring(1, chars.length() - 1);
 		IntervalSet set = new IntervalSet();
-
-		if (chars.length() == 0) {
-			g.tool.errMgr.grammarError(ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED,
-					g.fileName, charSetAST.getToken(), "[]");
-			return set;
-		}
-
 		CharSetParseState state = CharSetParseState.NONE;
 
 		int n = chars.length();
@@ -478,7 +476,7 @@ public class LexerATNFactory extends ParserATNFactory {
 				}
 				offset = escapeParseResult.parseLength;
 			}
-			else if (c == '-' && !state.inRange && i != 0 && i != n - 1) {
+			else if (c == '-' && !state.inRange && i != 0 && i != n - 1 && state.mode != CharSetParseState.Mode.NONE) {
 				if (state.mode == CharSetParseState.Mode.PREV_PROPERTY) {
 					g.tool.errMgr.grammarError(ErrorType.UNICODE_PROPERTY_NOT_ALLOWED_IN_RANGE,
 							g.fileName, charSetAST.getToken(), charSetAST.getText());
@@ -675,66 +673,64 @@ public class LexerATNFactory extends ParserATNFactory {
 				g.tool.errMgr.grammarError(ErrorType.DUPLICATED_COMMAND, g.fileName, commandToken, command);
 			}
 
-			if (!ruleCommands.equals("mode")) {
-				String firstCommand = null;
+			String firstCommand = null;
 
-				if (command.equals("skip")) {
-					if (ruleCommands.contains("more")) {
-						firstCommand = "more";
-					}
-					else if (ruleCommands.contains("less")) {
-						firstCommand = "less";
-					}
-					else if (ruleCommands.contains("type")) {
-						firstCommand = "type";
-					}
-					else if (ruleCommands.contains("channel")) {
-						firstCommand = "channel";
-					}
+			if (command.equals("skip")) {
+				if (ruleCommands.contains("more")) {
+					firstCommand = "more";
 				}
-				else if (command.equals("more")) {
-					if (ruleCommands.contains("skip")) {
-						firstCommand = "skip";
-					}
-					else if (ruleCommands.contains("less")) {
-						firstCommand = "less";
-					}
-					else if (ruleCommands.contains("type")) {
-						firstCommand = "type";
-					}
-					else if (ruleCommands.contains("channel")) {
-						firstCommand = "channel";
-					}
+				else if (ruleCommands.contains("less")) {
+					firstCommand = "less";
 				}
-				else if (command.equals("less")) {
-					if (ruleCommands.contains("more")) {
-						firstCommand = "more";
-					}
-					else if (ruleCommands.contains("skip")) {
-						firstCommand = "skip";
-					}
-					else if (ruleCommands.contains("type")) {
-						firstCommand = "type";
-					}
-					else if (ruleCommands.contains("channel")) {
-						firstCommand = "channel";
-					}
+				else if (ruleCommands.contains("type")) {
+					firstCommand = "type";
 				}
-				else if (command.equals("type") || command.equals("channel")) {
-					if (ruleCommands.contains("more")) {
-						firstCommand = "more";
-					}
-					else if (ruleCommands.contains("skip")) {
-						firstCommand = "skip";
-					}
-					else if (ruleCommands.contains("less")) {
-						firstCommand = "less";
-					}
+				else if (ruleCommands.contains("channel")) {
+					firstCommand = "channel";
 				}
+			}
+			else if (command.equals("more")) {
+				if (ruleCommands.contains("less")) {
+					firstCommand = "less";
+				}
+				else if (ruleCommands.contains("skip")) {
+					firstCommand = "skip";
+				}
+				else if (ruleCommands.contains("type")) {
+					firstCommand = "type";
+				}
+				else if (ruleCommands.contains("channel")) {
+					firstCommand = "channel";
+				}
+			}
+			else if (command.equals("less")) {
+				if (ruleCommands.contains("more")) {
+					firstCommand = "more";
+				}
+				else if (ruleCommands.contains("skip")) {
+					firstCommand = "skip";
+				}
+				else if (ruleCommands.contains("type")) {
+					firstCommand = "type";
+				}
+				else if (ruleCommands.contains("channel")) {
+					firstCommand = "channel";
+				}
+			}
+			else if (command.equals("type") || command.equals("channel")) {
+				if (ruleCommands.contains("more")) {
+					firstCommand = "more";
+				}
+				else if (ruleCommands.contains("less")) {
+					firstCommand = "less";
+				}
+				else if (ruleCommands.contains("skip")) {
+					firstCommand = "skip";
+				}
+			}
 
-				if (firstCommand != null) {
-					g.tool.errMgr.grammarError(ErrorType.INCOMPATIBLE_COMMANDS, g.fileName, commandToken, firstCommand, command);
-				}
+			if (firstCommand != null) {
+				g.tool.errMgr.grammarError(ErrorType.INCOMPATIBLE_COMMANDS, g.fileName, commandToken, firstCommand, command);
 			}
 		}
 

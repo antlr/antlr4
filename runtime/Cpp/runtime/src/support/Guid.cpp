@@ -22,7 +22,9 @@
  THE SOFTWARE.
  */
 
-#include "guid.h"
+#include <algorithm>
+
+#include "Guid.h"
 
 #ifdef GUID_LIBUUID
 #include <uuid/uuid.h>
@@ -40,93 +42,90 @@
 #include <jni.h>
 #endif
 
-using namespace std;
+namespace antlrcpp {
 
 // overload << so that it's easy to convert to a string
-ostream &operator<<(ostream &s, const Guid &guid)
-{
-  return s << hex << setfill('0')
-  << setw(2) << (int)guid._bytes[0]
-  << setw(2) << (int)guid._bytes[1]
-  << setw(2) << (int)guid._bytes[2]
-  << setw(2) << (int)guid._bytes[3]
-  << "-"
-  << setw(2) << (int)guid._bytes[4]
-  << setw(2) << (int)guid._bytes[5]
-  << "-"
-  << setw(2) << (int)guid._bytes[6]
-  << setw(2) << (int)guid._bytes[7]
-  << "-"
-  << setw(2) << (int)guid._bytes[8]
-  << setw(2) << (int)guid._bytes[9]
-  << "-"
-  << setw(2) << (int)guid._bytes[10]
-  << setw(2) << (int)guid._bytes[11]
-  << setw(2) << (int)guid._bytes[12]
-  << setw(2) << (int)guid._bytes[13]
-  << setw(2) << (int)guid._bytes[14]
-  << setw(2) << (int)guid._bytes[15];
+std::ostream &operator<<(std::ostream &s, const Guid &guid) {
+  return s << std::hex << std::setfill('0')
+    << std::setw(2) << static_cast<int>(guid.bytes_[0])
+    << std::setw(2) << static_cast<int>(guid.bytes_[1])
+    << std::setw(2) << static_cast<int>(guid.bytes_[2])
+    << std::setw(2) << static_cast<int>(guid.bytes_[3])
+    << "-"
+    << std::setw(2) << static_cast<int>(guid.bytes_[4])
+    << std::setw(2) << static_cast<int>(guid.bytes_[5])
+    << "-"
+    << std::setw(2) << static_cast<int>(guid.bytes_[6])
+    << std::setw(2) << static_cast<int>(guid.bytes_[7])
+    << "-"
+    << std::setw(2) << static_cast<int>(guid.bytes_[8])
+    << std::setw(2) << static_cast<int>(guid.bytes_[9])
+    << "-"
+    << std::setw(2) << static_cast<int>(guid.bytes_[10])
+    << std::setw(2) << static_cast<int>(guid.bytes_[11])
+    << std::setw(2) << static_cast<int>(guid.bytes_[12])
+    << std::setw(2) << static_cast<int>(guid.bytes_[13])
+    << std::setw(2) << static_cast<int>(guid.bytes_[14])
+    << std::setw(2) << static_cast<int>(guid.bytes_[15]);
 }
 
 // create a guid from vector of bytes
-Guid::Guid(const vector<unsigned char> &bytes)
-{
-  _bytes = bytes;
+Guid::Guid(const std::vector<uint8_t> &bytes) {
+  std::memcpy(bytes_.data(), bytes.data(), std::min(bytes.size(), bytes_.size()));
 }
 
+Guid::Guid(const std::array<uint8_t, 16> &bytes) : bytes_(bytes) {}
+
 // create a guid from array of bytes
-Guid::Guid(const unsigned char *bytes)
-{
-  _bytes.assign(bytes, bytes + 16);
+Guid::Guid(const uint8_t *bytes) {
+  std::memcpy(bytes_.data(), bytes, 16);
 }
 
 // create a guid from array of words
-Guid::Guid(const uint16_t *bytes, bool reverse)
-{
+Guid::Guid(const uint16_t *bytes, bool reverse) {
+  size_t j = 0;
   if (reverse) {
-    for (size_t i = 8; i > 0; --i)
-    {
-      _bytes.push_back(bytes[i - 1] >> 8);
-      _bytes.push_back(bytes[i - 1] & 0xFF);
+    for (size_t i = 8; i > 0; --i) {
+      bytes_[j++] = static_cast<uint8_t>(bytes[i - 1] >> 8);
+      bytes_[j++] = static_cast<uint8_t>(bytes[i - 1] & 0xFF);
     }
   } else {
-    for (size_t i = 0; i < 8; ++i)
-    {
-      _bytes.push_back(bytes[i] & 0xFF);
-      _bytes.push_back(bytes[i] >> 8);
+    for (size_t i = 0; i < 8; ++i) {
+      bytes_[j++] = static_cast<uint8_t>(bytes[i] & 0xFF);
+      bytes_[j++] = static_cast<uint8_t>(bytes[i] >> 8);
     }
   }
 }
 
+namespace {
+
 // converts a single hex char to a number (0 - 15)
-static unsigned char hexDigitToChar(char ch)
-{
+uint8_t hexDigitToChar(char ch) {
   if (ch > 47 && ch < 58)
-    return (unsigned char)(ch - 48);
+    return (uint8_t)(ch - 48);
 
   if (ch > 96 && ch < 103)
-    return (unsigned char)(ch - 87);
+    return (uint8_t)(ch - 87);
 
   if (ch > 64 && ch < 71)
-    return (unsigned char)(ch - 55);
+    return (uint8_t)(ch - 55);
 
   return 0;
 }
 
 // converts the two hexadecimal characters to an unsigned char (a byte)
-static unsigned char hexPairToChar(char a, char b)
-{
+uint8_t hexPairToChar(char a, char b) {
   return hexDigitToChar(a) * 16 + hexDigitToChar(b);
 }
 
-// create a guid from string
-Guid::Guid(const string &fromString)
-{
-  _bytes.clear();
+}
 
+// create a guid from string
+Guid::Guid(const std::string &fromString) {
   char charOne = 0, charTwo;
   bool lookingForFirstChar = true;
 
+  size_t i = 0;
   for (const char &ch : fromString)
   {
     if (ch == '-')
@@ -140,47 +139,13 @@ Guid::Guid(const string &fromString)
     else
     {
       charTwo = ch;
-      auto byte = hexPairToChar(charOne, charTwo);
-      _bytes.push_back(byte);
+      bytes_[i++] = hexPairToChar(charOne, charTwo);
       lookingForFirstChar = true;
     }
   }
-
 }
 
-// create empty guid
-Guid::Guid()
-{
-  _bytes = vector<unsigned char>(16, 0);
-}
-
-// copy constructor
-Guid::Guid(const Guid &other)
-{
-  _bytes = other._bytes;
-}
-
-// overload assignment operator
-Guid &Guid::operator=(const Guid &other)
-{
-  _bytes = other._bytes;
-  return *this;
-}
-
-// overload equality operator
-bool Guid::operator==(const Guid &other) const
-{
-  return _bytes == other._bytes;
-}
-
-// overload inequality operator
-bool Guid::operator!=(const Guid &other) const
-{
-  return !((*this) == other);
-}
-
-const std::string Guid::toString() const
-{
+std::string Guid::toString() const {
   std::stringstream os;
   os << *this;
   return os.str();
@@ -301,3 +266,5 @@ Guid GuidGenerator::newGuid()
   return bytes;
 }
 #endif
+
+}

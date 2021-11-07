@@ -119,7 +119,7 @@ namespace Antlr4.Runtime.Atn
 			ATNState startState = atn.modeToStartState[mode];
             if (debug)
 			{
-				ConsoleWriteLine("matchATN mode " + mode + " start: " + startState);
+				Console.WriteLine("matchATN mode " + mode + " start: " + startState);
 			}
             int old_mode = mode;
 
@@ -136,7 +136,7 @@ namespace Antlr4.Runtime.Atn
 			int predict = ExecATN(input, next);
             if (debug)
 			{
-				ConsoleWriteLine("DFA after matchATN: " + decisionToDFA[old_mode].ToString());
+				Console.WriteLine("DFA after matchATN: " + decisionToDFA[old_mode].ToString());
 			}
             return predict;
 		}
@@ -146,7 +146,7 @@ namespace Antlr4.Runtime.Atn
             //System.out.println("enter exec index "+input.index()+" from "+ds0.configs);
             if (debug)
             {
-                ConsoleWriteLine("start state closure=" + ds0.configSet);
+                Console.WriteLine("start state closure=" + ds0.configSet);
 			}
             if (ds0.isAcceptState)
 			{
@@ -162,7 +162,7 @@ namespace Antlr4.Runtime.Atn
 			{ // while more work
                 if (debug)
                 {
-                    ConsoleWriteLine("execATN loop starting closure: " + s.configSet);
+                    Console.WriteLine("execATN loop starting closure: " + s.configSet);
 				}
                 // As we move src->trg, src->trg, we keep track of the previous trg to
                 // avoid looking up the DFA state again, which is expensive.
@@ -239,7 +239,7 @@ namespace Antlr4.Runtime.Atn
 			DFAState target = s.edges[t - MIN_DFA_EDGE];
 			if (debug && target != null)
 			{
-				ConsoleWriteLine("reuse state " + s.stateNumber + " edge to " + target.stateNumber);
+				Console.WriteLine("reuse state " + s.stateNumber + " edge to " + target.stateNumber);
 			}
 
 			return target;
@@ -323,7 +323,7 @@ namespace Antlr4.Runtime.Atn
 
 				if (debug)
 				{
-					ConsoleWriteLine("testing " + GetTokenName(t) + " at " + c.ToString(recog, true));
+					Console.WriteLine("testing " + GetTokenName(t) + " at " + c.ToString(recog, true));
 				}
 
 				int n = c.state.NumberOfTransitions;
@@ -357,7 +357,7 @@ namespace Antlr4.Runtime.Atn
 		{
 			if (debug)
 			{
-				ConsoleWriteLine("ACTION " + lexerActionExecutor);
+				Console.WriteLine("ACTION " + lexerActionExecutor);
 			}
 
 			// seek to after last char in token
@@ -411,7 +411,7 @@ namespace Antlr4.Runtime.Atn
 		{
 			if (debug)
 			{
-				ConsoleWriteLine("closure(" + config.ToString(recog, true) + ")");
+				Console.WriteLine("closure(" + config.ToString(recog, true) + ")");
 			}
 
 			if (config.state is RuleStopState)
@@ -420,10 +420,10 @@ namespace Antlr4.Runtime.Atn
 				{
 					if (recog != null)
 					{
-						ConsoleWriteLine("closure at " + recog.RuleNames[config.state.ruleIndex] + " rule stop " + config);
+						Console.WriteLine("closure at " + recog.RuleNames[config.state.ruleIndex] + " rule stop " + config);
 					}
 					else {
-						ConsoleWriteLine("closure at rule stop " + config);
+						Console.WriteLine("closure at rule stop " + config);
 					}
 				}
 
@@ -523,7 +523,7 @@ namespace Antlr4.Runtime.Atn
 					PredicateTransition pt = (PredicateTransition)t;
 					if (debug)
 					{
-						ConsoleWriteLine("EVAL rule " + pt.ruleIndex + ":" + pt.predIndex);
+						Console.WriteLine("EVAL rule " + pt.ruleIndex + ":" + pt.predIndex);
 					}
 					configs.hasSemanticContext = true;
 					if (EvaluatePredicate(input, pt.ruleIndex, pt.predIndex, speculative))
@@ -682,7 +682,7 @@ namespace Antlr4.Runtime.Atn
 
 			if (debug)
 			{
-				ConsoleWriteLine("EDGE " + p + " -> " + q + " upon " + ((char)t));
+				Console.WriteLine("EDGE " + p + " -> " + q + " upon " + ((char)t));
 			}
 
 			lock (p)
