@@ -345,6 +345,24 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 		super.testErrors(pair, true);
 	}
 
+	// Test for https://github.com/antlr/antlr4/issues/2860, https://github.com/antlr/antlr4/issues/1105
+	@Test public void testEpsilonClosureInLexer() {
+		String grammar =
+				"lexer grammar T;\n" +
+				"TOKEN: '\\'' FRAGMENT '\\'';\n" +
+				"fragment FRAGMENT: ('x'|)+;";
+
+		String expected =
+			"error(" + ErrorType.EPSILON_CLOSURE.code + "): T.g4:3:9: rule FRAGMENT contains a closure with at least one alternative that can match an empty string\n";
+
+		String[] pair = new String[] {
+				grammar,
+				expected
+		};
+
+		super.testErrors(pair, true);
+	}
+
 	// Test for https://github.com/antlr/antlr4/issues/1203
 	@Test public void testEpsilonOptionalAndClosureAnalysis() {
 		String grammar =
