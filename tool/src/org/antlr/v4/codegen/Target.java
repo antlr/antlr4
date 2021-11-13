@@ -26,8 +26,6 @@ import org.stringtemplate.v4.STGroupFile;
 import org.stringtemplate.v4.StringRenderer;
 import org.stringtemplate.v4.misc.STMessage;
 
-import java.net.URL;
-
 /** */
 public abstract class Target {
 	/** For pure strings of Java 16-bit Unicode char, how can we display
@@ -44,10 +42,9 @@ public abstract class Target {
 	protected String[] targetCharValueEscape = new String[255];
 
 	protected final CodeGenerator gen;
-	private final String language;
 	private STGroup templates;
 
-	protected Target(CodeGenerator gen, String language) {
+	protected Target(CodeGenerator gen) {
 		targetCharValueEscape['\n'] = "\\n";
 		targetCharValueEscape['\r'] = "\\r";
 		targetCharValueEscape['\t'] = "\\t";
@@ -57,15 +54,12 @@ public abstract class Target {
 		targetCharValueEscape['\''] = "\\'";
 		targetCharValueEscape['"'] = "\\\"";
 		this.gen = gen;
-		this.language = language;
 	}
+
+	protected abstract TargetType getTargetType();
 
 	public CodeGenerator getCodeGenerator() {
 		return gen;
-	}
-
-	public String getLanguage() {
-		return language;
 	}
 
 	/** ANTLR tool should check output templates / target are compatible with tool code generation.
@@ -84,7 +78,7 @@ public abstract class Target {
 			if ( version==null ||
 				 !RuntimeMetaData.getMajorMinorVersion(version).equals(RuntimeMetaData.getMajorMinorVersion(Tool.VERSION)))
 			{
-				gen.tool.errMgr.toolError(ErrorType.INCOMPATIBLE_TOOL_AND_TEMPLATES, version, Tool.VERSION, language);
+				gen.tool.errMgr.toolError(ErrorType.INCOMPATIBLE_TOOL_AND_TEMPLATES, version, Tool.VERSION, getTargetType().name());
 			}
 			templates = loadTemplates();
 		}
@@ -158,7 +152,7 @@ public abstract class Target {
 				buf.append(targetCharValueEscape[c]);
 			}
 			else if (shouldUseUnicodeEscapeForCodePointInDoubleQuotedString(c)) {
-				appendUnicodeEscapedCodePoint(i, buf);
+				appendUnicodeEscapedCodePoint(i, buf, false);
 			}
 			else
 			{
@@ -176,7 +170,12 @@ public abstract class Target {
 	 * Escape the Unicode code point appropriately for this language
 	 * and append the escaped value to {@code sb}.
 	 */
-	abstract protected void appendUnicodeEscapedCodePoint(int codePoint, StringBuilder sb);
+	protected void appendUnicodeEscapedCodePoint(int codePoint, StringBuilder sb, boolean escape) {
+		if (escape) {
+			sb.append("\\");
+		}
+		UnicodeEscapes.appendEscapedCodePoint(sb, codePoint, getTargetType());
+	}
 
 	public String getTargetStringLiteralFromString(String s) {
 		return getTargetStringLiteralFromString(s, true);
@@ -249,20 +248,15 @@ public abstract class Target {
 						}
 						if ( i+toAdvance <= literal.length() ) { // we might have an invalid \\uAB or something
 							String fullEscape = literal.substring(i, i+toAdvance);
-							if (escapeSpecial) {
-								sb.append('\\');
-							}
 							appendUnicodeEscapedCodePoint(
 								CharSupport.getCharValueFromCharInGrammarLiteral(fullEscape),
-								sb);
+								sb,
+								escapeSpecial);
 						}
 						break;
 					default:
 						if (shouldUseUnicodeEscapeForCodePointInDoubleQuotedString(escapedCodePoint)) {
-							if (escapeSpecial) {
-								sb.append('\\');
-							}
-							appendUnicodeEscapedCodePoint(escapedCodePoint, sb);
+							appendUnicodeEscapedCodePoint(escapedCodePoint, sb, escapeSpecial);
 						}
 						else {
 							sb.appendCodePoint(escapedCodePoint);
@@ -277,10 +271,7 @@ public abstract class Target {
 					sb.append("\\\"");
 				}
 				else if (shouldUseUnicodeEscapeForCodePointInDoubleQuotedString(codePoint)) {
-					if (escapeSpecial) {
-						sb.append('\\');
-					}
-					appendUnicodeEscapedCodePoint(codePoint, sb);
+					appendUnicodeEscapedCodePoint(codePoint, sb, escapeSpecial);
 				}
 				else {
 					sb.appendCodePoint(codePoint);
@@ -516,21 +507,9 @@ public abstract class Target {
 
 	protected abstract boolean visibleGrammarSymbolCausesIssueInGeneratedCode(GrammarAST idNode);
 
-	public boolean templatesExist() {
-		String groupFileName = CodeGenerator.TEMPLATE_ROOT + "/" + getLanguage() + "/" + getLanguage() + STGroup.GROUP_FILE_EXTENSION;
-		STGroup result = null;
-		try {
-			result = new STGroupFile(groupFileName);
-		}
-		catch (IllegalArgumentException iae) {
-			result = null;
-		}
-		return result!=null;
-	}
-
-
 	protected STGroup loadTemplates() {
-		String groupFileName = CodeGenerator.TEMPLATE_ROOT + "/" + getLanguage() + "/" + getLanguage() + STGroup.GROUP_FILE_EXTENSION;
+		String targetName = getTargetType().name();
+		String groupFileName = CodeGenerator.TEMPLATE_ROOT + "/" + targetName + "/" + targetName + STGroup.GROUP_FILE_EXTENSION;
 		STGroup result = null;
 		try {
 			result = new STGroupFile(groupFileName);
@@ -538,7 +517,7 @@ public abstract class Target {
 		catch (IllegalArgumentException iae) {
 			gen.tool.errMgr.toolError(ErrorType.MISSING_CODE_GEN_TEMPLATES,
 						 iae,
-						 language);
+					targetName);
 		}
 		if ( result==null ) return null;
 		result.registerRenderer(Integer.class, new NumberRenderer());

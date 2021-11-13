@@ -13,6 +13,7 @@ import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.antlr.runtime.tree.Tree;
 import org.antlr.v4.Tool;
 import org.antlr.v4.codegen.CodeGenerator;
+import org.antlr.v4.codegen.TargetType;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.GrammarASTAdaptor;
 import org.antlr.v4.parse.LeftRecursiveRuleWalker;
@@ -57,17 +58,17 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 
 	public STGroup recRuleTemplates;
 	public STGroup codegenTemplates;
-	public String language;
+	public TargetType targetType;
 
 	public Map<Integer, ASSOC> altAssociativity = new HashMap<Integer, ASSOC>();
 
 	public LeftRecursiveRuleAnalyzer(GrammarAST ruleAST,
-									 Tool tool, String ruleName, String language)
+									 Tool tool, String ruleName, TargetType targetType)
 	{
 		super(new CommonTreeNodeStream(new GrammarASTAdaptor(ruleAST.token.getInputStream()), ruleAST));
 		this.tool = tool;
 		this.ruleName = ruleName;
-		this.language = language;
+		this.targetType = targetType;
 		this.tokenStream = ruleAST.g.tokenStream;
 		if (this.tokenStream == null) {
 			throw new NullPointerException("grammar must have a token stream");
@@ -84,7 +85,7 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 		}
 
 		// use codegen to get correct language templates; that's it though
-		CodeGenerator gen = new CodeGenerator(tool, null, language);
+		CodeGenerator gen = new CodeGenerator(tool, null, targetType);
 		codegenTemplates = gen.getTemplates();
 	}
 

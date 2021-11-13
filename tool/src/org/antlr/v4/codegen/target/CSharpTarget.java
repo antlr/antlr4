@@ -7,7 +7,7 @@ package org.antlr.v4.codegen.target;
 
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.codegen.Target;
-import org.antlr.v4.codegen.UnicodeEscapes;
+import org.antlr.v4.codegen.TargetType;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.stringtemplate.v4.NumberRenderer;
@@ -20,13 +20,18 @@ import org.stringtemplate.v4.misc.STMessage;
 public class CSharpTarget extends Target {
 
 	public CSharpTarget(CodeGenerator gen) {
-		super(gen, "CSharp");
+		super(gen);
 		targetCharValueEscape[0] = "\\0";
 		targetCharValueEscape[0x0007] = "\\a";
 		targetCharValueEscape[0x000B] = "\\v";
 	}
 
-    @Override
+	@Override
+	protected TargetType getTargetType() {
+		return TargetType.CSharp;
+	}
+
+	@Override
     public String getVersion() {
         return "4.9.3";
     }
@@ -59,7 +64,7 @@ public class CSharpTarget extends Target {
 	@Override
 	protected STGroup loadTemplates() {
 		// override the superclass behavior to put all C# templates in the same folder
-		STGroup result = new STGroupFile(CodeGenerator.TEMPLATE_ROOT+"/CSharp/"+getLanguage()+STGroup.GROUP_FILE_EXTENSION);
+		STGroup result = new STGroupFile(CodeGenerator.TEMPLATE_ROOT+"/CSharp/"+ getTargetType().name()+STGroup.GROUP_FILE_EXTENSION);
 		result.registerRenderer(Integer.class, new NumberRenderer());
 		result.registerRenderer(String.class, new StringRenderer());
 		result.setListener(new STErrorListener() {
@@ -89,11 +94,5 @@ public class CSharpTarget extends Target {
 		});
 
 		return result;
-	}
-
-	@Override
-	protected void appendUnicodeEscapedCodePoint(int codePoint, StringBuilder sb) {
-		// C# and Python share the same escaping style.
-		UnicodeEscapes.appendPythonStyleEscapedCodePoint(codePoint, sb);
 	}
 }

@@ -9,7 +9,7 @@ package org.antlr.v4.codegen.target;
 import org.antlr.v4.Tool;
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.codegen.Target;
-import org.antlr.v4.codegen.UnicodeEscapes;
+import org.antlr.v4.codegen.TargetType;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.StringRenderer;
@@ -47,9 +47,14 @@ public class DartTarget extends Target {
 	protected final Set<String> badWords = new HashSet<String>();
 
 	public DartTarget(CodeGenerator gen) {
-		super(gen, "Dart");
+		super(gen);
 
 		targetCharValueEscape['$'] = "\\$";
+	}
+
+	@Override
+	protected TargetType getTargetType() {
+		return TargetType.Dart;
 	}
 
 	@Override
@@ -104,10 +109,5 @@ public class DartTarget extends Target {
 		}
 
 		return String.format("\\u{%X}", v & 0xFFFF);
-	}
-
-	@Override
-	protected void appendUnicodeEscapedCodePoint(int codePoint, StringBuilder sb) {
-		UnicodeEscapes.appendJavaStyleEscapedCodePoint(codePoint, sb);
 	}
 }

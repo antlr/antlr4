@@ -8,7 +8,7 @@ package org.antlr.v4.codegen.target;
 
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.codegen.Target;
-import org.antlr.v4.codegen.UnicodeEscapes;
+import org.antlr.v4.codegen.TargetType;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.StringRenderer;
@@ -47,12 +47,16 @@ public class PHPTarget extends Target {
 	private final Set<String> badWords = new HashSet<String>();
 
 	public PHPTarget(CodeGenerator gen) {
-		super(gen, "PHP");
-
+		super(gen);
 		targetCharValueEscape['$'] = "\\$";
 	}
 
-    @Override
+	@Override
+	protected TargetType getTargetType() {
+		return TargetType.PHP;
+	}
+
+	@Override
     public String getVersion() {
         return "4.9.3";
     }
@@ -96,11 +100,6 @@ public class PHPTarget extends Target {
 	@Override
 	public boolean supportsOverloadedMethods() {
 		return false;
-	}
-
-	@Override
-	protected void appendUnicodeEscapedCodePoint(int codePoint, StringBuilder sb) {
-		UnicodeEscapes.appendPythonStyleEscapedCodePoint(codePoint, sb);
 	}
 
    @Override

@@ -6,8 +6,8 @@
 
 package org.antlr.v4.test.tool;
 
+import org.antlr.v4.codegen.TargetType;
 import org.antlr.v4.codegen.UnicodeEscapes;
-
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -15,64 +15,53 @@ import static org.junit.Assert.assertEquals;
 public class TestUnicodeEscapes {
 	@Test
 	public void latinJavaEscape() {
-		StringBuilder sb = new StringBuilder();
-		UnicodeEscapes.appendJavaStyleEscapedCodePoint(0x0061, sb);
-		assertEquals("\\u0061", sb.toString());
+		checkUnicodeEscape("\\u0061", 0x0061, TargetType.Java);
 	}
 
 	@Test
 	public void latinPythonEscape() {
-		StringBuilder sb = new StringBuilder();
-		UnicodeEscapes.appendPythonStyleEscapedCodePoint(0x0061, sb);
-		assertEquals("\\u0061", sb.toString());
+		checkUnicodeEscape("\\u0061", 0x0061, TargetType.Python2);
+		checkUnicodeEscape("\\u0061", 0x0061, TargetType.Python3);
 	}
 
 	@Test
 	public void latinSwiftEscape() {
-		StringBuilder sb = new StringBuilder();
-		UnicodeEscapes.appendSwiftStyleEscapedCodePoint(0x0061, sb);
-		assertEquals("\\u{0061}", sb.toString());
+		checkUnicodeEscape("\\u{0061}", 0x0061, TargetType.Swift);
 	}
 
 	@Test
 	public void bmpJavaEscape() {
-		StringBuilder sb = new StringBuilder();
-		UnicodeEscapes.appendJavaStyleEscapedCodePoint(0xABCD, sb);
-		assertEquals("\\uABCD", sb.toString());
+		checkUnicodeEscape("\\uABCD", 0xABCD, TargetType.Java);
 	}
 
 	@Test
 	public void bmpPythonEscape() {
-		StringBuilder sb = new StringBuilder();
-		UnicodeEscapes.appendPythonStyleEscapedCodePoint(0xABCD, sb);
-		assertEquals("\\uABCD", sb.toString());
+		checkUnicodeEscape("\\uABCD", 0xABCD, TargetType.Python2);
+		checkUnicodeEscape("\\uABCD", 0xABCD, TargetType.Python3);
 	}
 
 	@Test
 	public void bmpSwiftEscape() {
-		StringBuilder sb = new StringBuilder();
-		UnicodeEscapes.appendSwiftStyleEscapedCodePoint(0xABCD, sb);
-		assertEquals("\\u{ABCD}", sb.toString());
+		checkUnicodeEscape("\\u{ABCD}", 0xABCD, TargetType.Swift);
 	}
 
 	@Test
 	public void smpJavaEscape() {
-		StringBuilder sb = new StringBuilder();
-		UnicodeEscapes.appendJavaStyleEscapedCodePoint(0x1F4A9, sb);
-		assertEquals("\\uD83D\\uDCA9", sb.toString());
+		checkUnicodeEscape("\\uD83D\\uDCA9", 0x1F4A9, TargetType.Java);
 	}
 
 	@Test
 	public void smpPythonEscape() {
-		StringBuilder sb = new StringBuilder();
-		UnicodeEscapes.appendPythonStyleEscapedCodePoint(0x1F4A9, sb);
-		assertEquals("\\U0001F4A9", sb.toString());
+		checkUnicodeEscape("\\U0001F4A9", 0x1F4A9, TargetType.Python2);
+		checkUnicodeEscape("\\U0001F4A9", 0x1F4A9, TargetType.Python3);
 	}
 
 	@Test
 	public void smpSwiftEscape() {
-		StringBuilder sb = new StringBuilder();
-		UnicodeEscapes.appendSwiftStyleEscapedCodePoint(0x1F4A9, sb);
-		assertEquals("\\u{1F4A9}", sb.toString());
+		checkUnicodeEscape("\\u{1F4A9}", 0x1F4A9, TargetType.Swift);
+	}
+
+	private void checkUnicodeEscape(String expected, int input, TargetType targetType) {
+		assertEquals(expected, UnicodeEscapes.escapeCodePoint(input, targetType));
 	}
 }

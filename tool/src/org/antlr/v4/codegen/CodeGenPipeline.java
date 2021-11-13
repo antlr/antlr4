@@ -23,7 +23,7 @@ public class CodeGenPipeline {
 	}
 
 	public void process() {
-		if ( !CodeGenerator.targetExists(g.getOptionString("language")) ) return;
+		if (g.getTargetType() == null) return;
 
 		CodeGenerator gen = new CodeGenerator(g);
 		IntervalSet idTypes = new IntervalSet();

@@ -1,6 +1,8 @@
 package org.antlr.v4.misc;
 
 import org.antlr.runtime.Token;
+import org.antlr.v4.codegen.CodeGenerator;
+import org.antlr.v4.codegen.TargetType;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.junit.Assert;
 import org.junit.Test;
@@ -125,5 +127,13 @@ public class UtilsTest {
 
 		Utils.setSize(strings, 4);
 		Assert.assertEquals(4, strings.size());
+	}
+
+	@Test
+	public void testTargetTypeCorrespondsToTargetClass() {
+		for (TargetType value : TargetType.values()) {
+			CodeGenerator codeGenerator = new CodeGenerator(value);
+			Assert.assertNotNull(codeGenerator.getTarget());
+		}
 	}
 }

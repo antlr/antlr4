@@ -27,7 +27,6 @@ import java.util.Map;
 public class CodeGenerator {
 	public static final String TEMPLATE_ROOT = "org/antlr/v4/tool/templates/codegen";
 	public static final String VOCAB_FILE_EXTENSION = ".tokens";
-	public static final String DEFAULT_LANGUAGE = "Java";
 	public static final String vocabFilePattern =
 		"<tokens.keys:{t | <t>=<tokens.(t)>\n}>" +
 		"<literals.keys:{t | <t>=<literals.(t)>\n}>";
@@ -37,58 +36,34 @@ public class CodeGenerator {
 
 	public final Tool tool;
 
-	public final String language;
+	public final TargetType targetType;
 
 	private Target target;
 
 	public int lineWidth = 72;
 
-	private CodeGenerator(String language) {
+	public CodeGenerator(TargetType targetType) {
 		this.g = null;
 		this.tool = null;
-		this.language = language;
+		this.targetType = targetType;
 	}
 
 	public CodeGenerator(Grammar g) {
-		this(g.tool, g, g.getOptionString("language"));
+		this(g.tool, g, g.getTargetType());
 	}
 
-	public CodeGenerator(Tool tool, Grammar g, String language) {
+	public CodeGenerator(Tool tool, Grammar g, TargetType targetType) {
 		this.g = g;
 		this.tool = tool;
-		this.language = language != null ? language : DEFAULT_LANGUAGE;
+		this.targetType = targetType;
 	}
-
-	public static boolean targetExists(String language) {
-		String targetName = "org.antlr.v4.codegen.target."+language+"Target";
-		try {
-			Class<? extends Target> c = Class.forName(targetName).asSubclass(Target.class);
-			Constructor<? extends Target> ctor = c.getConstructor(CodeGenerator.class);
-			CodeGenerator gen = new CodeGenerator(language);
-			Target target = ctor.newInstance(gen);
-			return target.templatesExist();
-		}
-		catch (Exception e) { // ignore errors; we're detecting presence only
-		}
-		return false;
-	}
-
 
 	public Target getTarget() {
-		if ( target == null && targetExists(language) ) {
-			loadLanguageTarget(language);
+		if (target != null || targetType == null) {
+			return target;
 		}
-		return target;
-	}
 
-
-	public STGroup getTemplates() {
-		Target t = getTarget();
-		return t==null ? null : t.getTemplates();
-	}
-
-	protected void loadLanguageTarget(String language) {
-		String targetName = "org.antlr.v4.codegen.target."+language+"Target";
+		String targetName = "org.antlr.v4.codegen.target."+targetType.name()+"Target";
 		try {
 			Class<? extends Target> c = Class.forName(targetName).asSubclass(Target.class);
 			Constructor<? extends Target> ctor = c.getConstructor(CodeGenerator.class);
@@ -96,9 +71,16 @@ public class CodeGenerator {
 		}
 		catch (Exception e) {
 			tool.errMgr.toolError(ErrorType.CANNOT_CREATE_TARGET_GENERATOR,
-						 e,
-						 targetName);
+					e,
+					targetName);
 		}
+
+		return target;
+	}
+
+	public STGroup getTemplates() {
+		Target t = getTarget();
+		return t==null ? null : t.getTemplates();
 	}
 
 	// CREATE TEMPLATES BY WALKING MODEL

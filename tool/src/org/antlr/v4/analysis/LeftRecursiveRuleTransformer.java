@@ -12,6 +12,7 @@ import org.antlr.runtime.ParserRuleReturnScope;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.Token;
 import org.antlr.v4.Tool;
+import org.antlr.v4.codegen.TargetType;
 import org.antlr.v4.misc.OrderedHashMap;
 import org.antlr.v4.parse.ANTLRLexer;
 import org.antlr.v4.parse.ANTLRParser;
@@ -62,13 +63,13 @@ public class LeftRecursiveRuleTransformer {
 	}
 
 	public void translateLeftRecursiveRules() {
-		String language = g.getOptionString("language");
+		TargetType targetType = g.getTargetType();
 		// translate all recursive rules
 		List<String> leftRecursiveRuleNames = new ArrayList<String>();
 		for (Rule r : rules) {
 			if ( !Grammar.isTokenName(r.name) ) {
 				if ( LeftRecursiveRuleAnalyzer.hasImmediateRecursiveRuleRefs(r.ast, r.name) ) {
-					boolean fitsPattern = translateLeftRecursiveRule(ast, (LeftRecursiveRule)r, language);
+					boolean fitsPattern = translateLeftRecursiveRule(ast, (LeftRecursiveRule)r, targetType);
 					if ( fitsPattern ) {
 						leftRecursiveRuleNames.add(r.name);
 					}
@@ -93,13 +94,13 @@ public class LeftRecursiveRuleTransformer {
 	/** Return true if successful */
 	public boolean translateLeftRecursiveRule(GrammarRootAST ast,
 											  LeftRecursiveRule r,
-											  String language)
+											  TargetType targetType)
 	{
 		//tool.log("grammar", ruleAST.toStringTree());
 		GrammarAST prevRuleAST = r.ast;
 		String ruleName = prevRuleAST.getChild(0).getText();
 		LeftRecursiveRuleAnalyzer leftRecursiveRuleWalker =
-			new LeftRecursiveRuleAnalyzer(prevRuleAST, tool, ruleName, language);
+			new LeftRecursiveRuleAnalyzer(prevRuleAST, tool, ruleName, targetType);
 		boolean isLeftRec;
 		try {
 //			System.out.println("TESTING ---------------\n"+

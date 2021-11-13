@@ -8,7 +8,7 @@ package org.antlr.v4.codegen.target;
 
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.codegen.Target;
-import org.antlr.v4.codegen.UnicodeEscapes;
+import org.antlr.v4.codegen.TargetType;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.StringRenderer;
@@ -55,7 +55,12 @@ public class Python2Target extends Target {
 	protected final Set<String> badWords = new HashSet<String>();
 
 	public Python2Target(CodeGenerator gen) {
-		super(gen, "Python2");
+		super(gen);
+	}
+
+	@Override
+	protected TargetType getTargetType() {
+		return TargetType.Python2;
 	}
 
 	@Override
@@ -110,10 +115,5 @@ public class Python2Target extends Target {
 		badWords.addAll(Arrays.asList(python2Keywords));
 		badWords.add("rule");
 		badWords.add("parserRule");
-	}
-
-	@Override
-	protected void appendUnicodeEscapedCodePoint(int codePoint, StringBuilder sb) {
-		UnicodeEscapes.appendPythonStyleEscapedCodePoint(codePoint, sb);
 	}
 }

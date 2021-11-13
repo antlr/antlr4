@@ -381,7 +381,7 @@ public class Tool {
 		sem.process();
 
 		String language = g.getOptionString("language");
-		if ( !CodeGenerator.targetExists(language) ) {
+		if ( !Grammar.targetExists(language) ) {
 			errMgr.toolError(ErrorType.CANNOT_CREATE_TARGET_GENERATOR, language);
 			return;
 		}

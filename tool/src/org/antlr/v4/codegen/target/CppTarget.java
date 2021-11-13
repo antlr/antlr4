@@ -8,7 +8,7 @@ package org.antlr.v4.codegen.target;
 
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.codegen.Target;
-import org.antlr.v4.codegen.UnicodeEscapes;
+import org.antlr.v4.codegen.TargetType;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.stringtemplate.v4.NumberRenderer;
@@ -46,8 +46,13 @@ public class CppTarget extends Target {
 	protected final Set<String> badWords = new HashSet<String>();
 
 	public CppTarget(CodeGenerator gen) {
-		super(gen, "Cpp");
+		super(gen);
 		targetCharValueEscape['?'] = "\\?";
+	}
+
+	@Override
+	protected TargetType getTargetType() {
+		return TargetType.Cpp;
 	}
 
 	public String getVersion() {
@@ -170,11 +175,5 @@ public class CppTarget extends Target {
 		});
 
 		return result;
-	}
-
-	@Override
-	protected void appendUnicodeEscapedCodePoint(int codePoint, StringBuilder sb) {
-		// C99 and Python share the same escaping style.
-		UnicodeEscapes.appendPythonStyleEscapedCodePoint(codePoint, sb);
 	}
 }

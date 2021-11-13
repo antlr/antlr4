@@ -73,10 +73,9 @@ public class LexerATNFactory extends ParserATNFactory {
 	public LexerATNFactory(LexerGrammar g) {
 		super(g);
 		// use codegen to get correct language templates for lexer commands
-		String language = g.getOptionString("language");
 		String caseInsensitiveOption = g.getOptionString("caseInsensitive");
 		caseInsensitive = caseInsensitiveOption != null && caseInsensitiveOption.equals("true");
-		CodeGenerator gen = new CodeGenerator(g.tool, null, language);
+		CodeGenerator gen = new CodeGenerator(g.tool, null, g.getTargetType());
 		codegenTemplates = gen.getTemplates();
 	}
 
