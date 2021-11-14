@@ -156,7 +156,7 @@ std::vector<size_t> ATNSerializer::serialize() {
 
   size_t nsets = sets.size();
   data.push_back(nsets);
-  for (auto set : sets) {
+  for (const auto &set : sets) {
     bool containsEof = set.contains(Token::EOF);
     if (containsEof && set.getIntervals().at(0).b == -1) {
       data.push_back(set.getIntervals().size() - 1);
@@ -287,7 +287,7 @@ std::vector<size_t> ATNSerializer::serialize() {
   // LEXER ACTIONS
   if (atn->grammarType == ATNType::LEXER) {
     data.push_back(atn->lexerActions.size());
-    for (Ref<LexerAction> &action : atn->lexerActions) {
+    for (const auto &action : atn->lexerActions) {
       data.push_back(static_cast<size_t>(action->getActionType()));
       switch (action->getActionType()) {
         case LexerActionType::CHANNEL:

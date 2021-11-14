@@ -7,10 +7,10 @@
 
 namespace antlrcpp {
 
-  std::string join(std::vector<std::string> strings, const std::string &separator) {
+  std::string join(const std::vector<std::string> &strings, const std::string &separator) {
     std::string str;
     bool firstItem = true;
-    for (std::string s : strings) {
+    for (const std::string &s : strings) {
       if (!firstItem) {
         str.append(separator);
       }
@@ -72,8 +72,13 @@ namespace antlrcpp {
 
   std::string arrayToString(const std::vector<std::string> &data) {
     std::string answer;
-    for (auto sub: data) {
-      answer += sub;
+    size_t toReserve = 0;
+    for (const auto &sub : data) {
+      toReserve += sub.size();
+    }
+    answer.reserve(toReserve);
+    for (const auto &sub: data) {
+      answer.append(sub);
     }
     return answer;
   }
