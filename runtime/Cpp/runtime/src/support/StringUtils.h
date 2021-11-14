@@ -7,10 +7,6 @@
 
 #include "antlr4-common.h"
 
-#ifndef USE_CODECVT_INSTEAD_OF_UTF8
-#include "utf8.h"
-#endif
-
 namespace antlrcpp {
 
   // For all conversions utf8 <-> utf32.
@@ -27,50 +23,11 @@ namespace antlrcpp {
   #endif
 #endif
 
-  // The conversion functions fails in VS2017, so we explicitly use a workaround.
-  template<typename T>
-  inline std::string utf32_to_utf8(T const& data)
-  {
-    #ifdef USE_CODECVT_INSTEAD_OF_UTF8
-      // Don't make the converter static or we have to serialize access to it.
-      thread_local UTF32Converter converter;
-
-      #if defined(_MSC_VER) && _MSC_VER >= 1900 && _MSC_VER < 2000
-        const auto p = reinterpret_cast<const int32_t *>(data.data());
-        return converter.to_bytes(p, p + data.size());
-      #else
-        return converter.to_bytes(data);
-      #endif
-    #else
-      std::string narrow;
-      utf8::utf32to8(data.begin(), data.end(), std::back_inserter(narrow));
-      return narrow;
-    #endif
-  }
-
-  inline UTF32String utf8_to_utf32(const char* first, const char* last)
-  {
-    #ifdef USE_CODECVT_INSTEAD_OF_UTF8
-      thread_local UTF32Converter converter;
-
-      #if defined(_MSC_VER) && _MSC_VER >= 1900 && _MSC_VER < 2000
-        auto r = converter.from_bytes(first, last);
-        i32string s = reinterpret_cast<const int32_t *>(r.data());
-        return s;
-      #else
-        std::u32string s = converter.from_bytes(first, last);
-        return s;
-      #endif
-    #else
-      UTF32String wide;
-      utf8::utf8to32(first, last, std::back_inserter(wide));
-      return wide;
-    #endif
-  }
-
   void replaceAll(std::string &str, std::string const& from, std::string const& to);
 
   // string <-> wstring conversion (UTF-16), e.g. for use with Window's wide APIs.
+  std::string utf32_to_utf8(UTF32String const& data);
+  UTF32String utf8_to_utf32(const char* first, const char* last);
   ANTLR4CPP_PUBLIC std::string ws2s(std::wstring const& wstr);
   ANTLR4CPP_PUBLIC std::wstring s2ws(std::string const& str);
 }

@@ -4,6 +4,7 @@
  */
 
 #include "support/StringUtils.h"
+#include "utf8.h"
 
 namespace antlrcpp {
 
@@ -17,6 +18,45 @@ void replaceAll(std::string& str, std::string const& from, std::string const& to
     str.replace(start_pos, from.length(), to);
     start_pos += to.length(); // In case 'to' contains 'from', like replacing 'x' with 'yx'.
   }
+}
+
+std::string utf32_to_utf8(UTF32String const& data)
+{
+  #ifdef USE_CODECVT_INSTEAD_OF_UTF8
+    // Don't make the converter static or we have to serialize access to it.
+    thread_local UTF32Converter converter;
+
+    #if defined(_MSC_VER) && _MSC_VER >= 1900 && _MSC_VER < 2000
+      const auto p = reinterpret_cast<const int32_t *>(data.data());
+      return converter.to_bytes(p, p + data.size());
+    #else
+      return converter.to_bytes(data);
+    #endif
+  #else
+    std::string narrow;
+    utf8::utf32to8(data.begin(), data.end(), std::back_inserter(narrow));
+    return narrow;
+  #endif
+}
+
+UTF32String utf8_to_utf32(const char* first, const char* last)
+{
+  #ifdef USE_CODECVT_INSTEAD_OF_UTF8
+    thread_local UTF32Converter converter;
+
+    #if defined(_MSC_VER) && _MSC_VER >= 1900 && _MSC_VER < 2000
+      auto r = converter.from_bytes(first, last);
+      i32string s = reinterpret_cast<const int32_t *>(r.data());
+      return s;
+    #else
+      std::u32string s = converter.from_bytes(first, last);
+      return s;
+    #endif
+  #else
+    UTF32String wide;
+    utf8::utf8to32(first, last, std::back_inserter(wide));
+    return wide;
+  #endif
 }
 
 std::string ws2s(std::wstring const& wstr) {
