@@ -7,7 +7,7 @@
 
 #include "antlr4-common.h"
 
-#ifdef USE_UTF8_INSTEAD_OF_CODECVT
+#ifndef USE_CODECVT_INSTEAD_OF_UTF8
 #include "utf8.h"
 #endif
 
@@ -18,7 +18,7 @@ namespace antlrcpp {
   // https://en.cppreference.com/w/cpp/locale/wstring_convert,
   // wstring_convert is deprecated in C++17.
   // utfcpp (https://github.com/nemtrif/utfcpp) is a substitution.
-#ifndef USE_UTF8_INSTEAD_OF_CODECVT
+#ifdef USE_CODECVT_INSTEAD_OF_UTF8
   // VS 2015 and VS 2017 have different bugs in std::codecvt_utf8<char32_t> (VS 2013 works fine).
   #if defined(_MSC_VER) && _MSC_VER >= 1900 && _MSC_VER < 2000
     typedef std::wstring_convert<std::codecvt_utf8<__int32>, __int32> UTF32Converter;
@@ -31,7 +31,7 @@ namespace antlrcpp {
   template<typename T>
   inline std::string utf32_to_utf8(T const& data)
   {
-    #ifndef USE_UTF8_INSTEAD_OF_CODECVT
+    #ifdef USE_CODECVT_INSTEAD_OF_UTF8
       // Don't make the converter static or we have to serialize access to it.
       thread_local UTF32Converter converter;
 
@@ -50,7 +50,7 @@ namespace antlrcpp {
 
   inline UTF32String utf8_to_utf32(const char* first, const char* last)
   {
-    #ifndef USE_UTF8_INSTEAD_OF_CODECVT
+    #ifdef USE_CODECVT_INSTEAD_OF_UTF8
       thread_local UTF32Converter converter;
 
       #if defined(_MSC_VER) && _MSC_VER >= 1900 && _MSC_VER < 2000

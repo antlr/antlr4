@@ -20,7 +20,7 @@ void replaceAll(std::string& str, std::string const& from, std::string const& to
 }
 
 std::string ws2s(std::wstring const& wstr) {
-#ifndef USE_UTF8_INSTEAD_OF_CODECVT
+#ifdef USE_CODECVT_INSTEAD_OF_UTF8
   std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
   std::string narrow = converter.to_bytes(wstr);
 #else
@@ -32,7 +32,7 @@ std::string ws2s(std::wstring const& wstr) {
 }
 
 std::wstring s2ws(const std::string &str) {
-#ifndef USE_UTF8_INSTEAD_OF_CODECVT
+#ifdef USE_CODECVT_INSTEAD_OF_UTF8
   std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
   std::wstring wide = converter.from_bytes(str);
 #else
