@@ -80,10 +80,13 @@ size_t LexerATNSimulator::match(CharStream *input, size_t mode) {
   _startIndex = input->index();
   _prevAccept.reset();
   const dfa::DFA &dfa = _decisionToDFA[mode];
-  if (dfa.s0 == nullptr) {
+  _stateLock.readLock();
+  dfa::DFAState* s0 = dfa.s0;
+  _stateLock.readUnlock();
+  if (s0 == nullptr) {
     return matchATN(input);
   } else {
-    return execATN(input, dfa.s0);
+    return execATN(input, s0);
   }
 }
 
@@ -111,10 +114,7 @@ size_t LexerATNSimulator::matchATN(CharStream *input) {
   bool suppressEdge = s0_closure->hasSemanticContext;
   s0_closure->hasSemanticContext = false;
 
-  dfa::DFAState *next = addDFAState(s0_closure.release());
-  if (!suppressEdge) {
-    _decisionToDFA[_mode].s0 = next;
-  }
+  dfa::DFAState *next = addDFAState(s0_closure.release(), suppressEdge);
 
   size_t predict = execATN(input, next);
 
@@ -536,6 +536,10 @@ void LexerATNSimulator::addDFAEdge(dfa::DFAState *p, size_t t, dfa::DFAState *q)
 }
 
 dfa::DFAState *LexerATNSimulator::addDFAState(ATNConfigSet *configs) {
+  return addDFAState(configs, true);
+}
+
+dfa::DFAState *LexerATNSimulator::addDFAState(ATNConfigSet *configs, bool suppressEdge) {
   /* the lexer evaluates predicates on-the-fly; by this point configs
    * should not contain any configurations with unevaluated predicates.
    */
@@ -563,6 +567,9 @@ dfa::DFAState *LexerATNSimulator::addDFAState(ATNConfigSet *configs) {
     auto iterator = dfa.states.find(proposed);
     if (iterator != dfa.states.end()) {
       delete proposed;
+      if (!suppressEdge) {
+        _decisionToDFA[_mode].s0 = *iterator;
+      }
       _stateLock.writeUnlock();
       return *iterator;
     }
@@ -572,6 +579,9 @@ dfa::DFAState *LexerATNSimulator::addDFAState(ATNConfigSet *configs) {
   proposed->configs->setReadonly(true);
 
   dfa.states.insert(proposed);
+  if (!suppressEdge) {
+    _decisionToDFA[_mode].s0 = proposed;
+  }
   _stateLock.writeUnlock();
 
   return proposed;

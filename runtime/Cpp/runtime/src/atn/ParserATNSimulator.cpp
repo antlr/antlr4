@@ -94,14 +94,18 @@ size_t ParserATNSimulator::adaptivePredict(TokenStream *input, size_t decision, 
   });
 
   dfa::DFAState *s0;
+  _stateLock.readLock();
   if (dfa.isPrecedenceDfa()) {
     // the start state for a precedence DFA depends on the current
     // parser precedence, and is provided by a DFA method.
+    _edgeLock.readLock();
     s0 = dfa.getPrecedenceStartState(parser->getPrecedence());
+    _edgeLock.readUnlock();
   } else {
     // the start state for a "regular" DFA is just s0
     s0 = dfa.s0;
   }
+  _stateLock.readUnlock();
 
   if (s0 == nullptr) {
     bool fullCtx = false;
@@ -109,6 +113,7 @@ size_t ParserATNSimulator::adaptivePredict(TokenStream *input, size_t decision, 
                                                                  &ParserRuleContext::EMPTY, fullCtx);
 
     _stateLock.writeLock();
+    dfa::DFAState* ds0 = dfa.s0;
     if (dfa.isPrecedenceDfa()) {
       /* If this is a precedence DFA, we use applyPrecedenceFilter
        * to convert the computed start state to a precedence start
@@ -116,8 +121,8 @@ size_t ParserATNSimulator::adaptivePredict(TokenStream *input, size_t decision, 
        * appropriate start state for the precedence level rather
        * than simply setting DFA.s0.
        */
-      dfa.s0->configs = std::move(s0_closure); // not used for prediction but useful to know start configs anyway
-      dfa::DFAState *newState = new dfa::DFAState(applyPrecedenceFilter(dfa.s0->configs.get())); /* mem-check: managed by the DFA or deleted below */
+      ds0->configs = std::move(s0_closure); // not used for prediction but useful to know start configs anyway
+      dfa::DFAState *newState = new dfa::DFAState(applyPrecedenceFilter(ds0->configs.get())); /* mem-check: managed by the DFA or deleted below */
       s0 = addDFAState(dfa, newState);
       dfa.setPrecedenceStartState(parser->getPrecedence(), s0, _edgeLock);
       if (s0 != newState) {
@@ -127,8 +132,9 @@ size_t ParserATNSimulator::adaptivePredict(TokenStream *input, size_t decision, 
       dfa::DFAState *newState = new dfa::DFAState(std::move(s0_closure)); /* mem-check: managed by the DFA or deleted below */
       s0 = addDFAState(dfa, newState);
 
-      if (dfa.s0 != s0) {
-        delete dfa.s0; // Delete existing s0 DFA state, if there's any.
+      if (ds0 != s0) {
+        delete ds0; // Delete existing s0 DFA state, if there's any.
+        ds0 = nullptr;
         dfa.s0 = s0;
       }
       if (s0 != newState) {

@@ -32,13 +32,12 @@ DFA::DFA(atn::DecisionState *atnStartState, size_t decision)
   }
 }
 
-DFA::DFA(DFA &&other) : atnStartState(other.atnStartState), decision(other.decision) {
+DFA::DFA(DFA &&other) : atnStartState(other.atnStartState), s0(other.s0), decision(other.decision) {
   // Source states are implicitly cleared by the move.
   states = std::move(other.states);
 
   other.atnStartState = nullptr;
   other.decision = 0;
-  s0 = other.s0;
   other.s0 = nullptr;
   _precedenceDfa = other._precedenceDfa;
   other._precedenceDfa = false;
@@ -52,8 +51,9 @@ DFA::~DFA() {
     delete state;
   }
 
-  if (!s0InList)
+  if (!s0InList) {
     delete s0;
+  }
 }
 
 bool DFA::isPrecedenceDfa() const {
