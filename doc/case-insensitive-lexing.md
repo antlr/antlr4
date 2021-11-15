@@ -65,7 +65,7 @@ K_UPDATE : 'UPDATE';
 Then, when creating the character stream to parse from, we need a custom class that overrides methods used by the lexer. Below you will find custom character streams for a number of the targets that you can copy into your projects, but here is how to use the streams in Java as an example:
 
 ```java
-CharStream s = CharStreams.fromPath(Paths.get('test.sql'));
+CharStream s = CharStreams.fromPath(Paths.get("test.sql"));
 CaseChangingCharStream upper = new CaseChangingCharStream(s, true);
 Lexer lexer = new SomeSQLLexer(upper);
 ```
