@@ -8,6 +8,7 @@ package org.antlr.v4.codegen;
 
 import org.antlr.v4.Tool;
 import org.antlr.v4.codegen.model.OutputModelObject;
+import org.antlr.v4.codegen.target.*;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
@@ -18,7 +19,6 @@ import org.stringtemplate.v4.STWriter;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.lang.reflect.Constructor;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -63,16 +63,40 @@ public class CodeGenerator {
 			return target;
 		}
 
-		String targetName = "org.antlr.v4.codegen.target."+targetType.name()+"Target";
-		try {
-			Class<? extends Target> c = Class.forName(targetName).asSubclass(Target.class);
-			Constructor<? extends Target> ctor = c.getConstructor(CodeGenerator.class);
-			target = ctor.newInstance(this);
-		}
-		catch (Exception e) {
-			tool.errMgr.toolError(ErrorType.CANNOT_CREATE_TARGET_GENERATOR,
-					e,
-					targetName);
+		switch (targetType) {
+			case Java:
+				target = new JavaTarget(this);
+				break;
+			case CSharp:
+				target = new CSharpTarget(this);
+				break;
+			case Python2:
+				target = new Python2Target(this);
+				break;
+			case Python3:
+				target = new Python3Target(this);
+				break;
+			case JavaScript:
+				target = new JavaScriptTarget(this);
+				break;
+			case Cpp:
+				target = new CppTarget(this);
+				break;
+			case Go:
+				target = new GoTarget(this);
+				break;
+			case Swift:
+				target = new SwiftTarget(this);
+				break;
+			case PHP:
+				target = new PHPTarget(this);
+				break;
+			case Dart:
+				target = new DartTarget(this);
+				break;
+			default:
+				tool.errMgr.toolError(ErrorType.CANNOT_CREATE_TARGET_GENERATOR, targetType);
+				break;
 		}
 
 		return target;
