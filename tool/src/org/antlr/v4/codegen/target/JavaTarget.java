@@ -50,31 +50,6 @@ public class JavaTarget extends Target {
 	}
 
 	@Override
-	protected STGroup loadTemplates() {
-		STGroup result = targetTemplates.get();
-		if (result == null) {
-			result = super.loadTemplates();
-			result.registerRenderer(String.class, new JavaStringRenderer(), true);
-			targetTemplates.set(result);
-		}
-
-		return result;
-	}
-
-	protected static class JavaStringRenderer extends StringRenderer {
-
-		@Override
-		public String toString(Object o, String formatString, Locale locale) {
-			if ("java-escape".equals(formatString)) {
-				// 5C is the hex code for the \ itself
-				return ((String)o).replace("\\u", "\\u005Cu");
-			}
-
-			return super.toString(o, formatString, locale);
-		}
-	}
-
-	@Override
 	public boolean isATNSerializedAsInts() {
 		return false;
 	}

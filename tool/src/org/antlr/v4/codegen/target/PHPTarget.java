@@ -8,8 +8,6 @@ package org.antlr.v4.codegen.target;
 
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.codegen.Target;
-import org.stringtemplate.v4.STGroup;
-import org.stringtemplate.v4.StringRenderer;
 
 import java.util.*;
 
@@ -71,14 +69,6 @@ public class PHPTarget extends Target {
 	@Override
 	protected Set<String> getReservedWords() {
 		return reservedWords;
-	}
-
-	@Override
-	protected STGroup loadTemplates() {
-		STGroup result = super.loadTemplates();
-		result.registerRenderer(String.class, new StringRenderer(), true);
-
-		return result;
 	}
 
 	@Override

@@ -137,41 +137,6 @@ public class CSharpTarget extends Target {
 	}
 
 	@Override
-	protected STGroup loadTemplates() {
-		// override the superclass behavior to put all C# templates in the same folder
-		STGroup result = new STGroupFile(CodeGenerator.TEMPLATE_ROOT+"/CSharp/"+ getLanguage()+STGroup.GROUP_FILE_EXTENSION);
-		result.registerRenderer(Integer.class, new NumberRenderer());
-		result.registerRenderer(String.class, new StringRenderer());
-		result.setListener(new STErrorListener() {
-			@Override
-			public void compileTimeError(STMessage msg) {
-				reportError(msg);
-			}
-
-			@Override
-			public void runTimeError(STMessage msg) {
-				reportError(msg);
-			}
-
-			@Override
-			public void IOError(STMessage msg) {
-				reportError(msg);
-			}
-
-			@Override
-			public void internalError(STMessage msg) {
-				reportError(msg);
-			}
-
-			private void reportError(STMessage msg) {
-				getCodeGenerator().tool.errMgr.toolError(ErrorType.STRING_TEMPLATE_WARNING, msg.cause, msg.toString());
-			}
-		});
-
-		return result;
-	}
-
-	@Override
 	public boolean isATNSerializedAsInts() {
 		return true;
 	}
