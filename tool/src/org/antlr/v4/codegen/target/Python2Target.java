@@ -8,8 +8,6 @@ package org.antlr.v4.codegen.target;
 
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.codegen.Target;
-import org.stringtemplate.v4.STGroup;
-import org.stringtemplate.v4.StringRenderer;
 
 import java.util.*;
 
@@ -74,21 +72,6 @@ public class Python2Target extends Target {
 	@Override
 	protected Set<String> getReservedWords() {
 		return reservedWords;
-	}
-
-	@Override
-	protected STGroup loadTemplates() {
-		STGroup result = super.loadTemplates();
-		result.registerRenderer(String.class, new PythonStringRenderer(), true);
-		return result;
-	}
-
-	protected static class PythonStringRenderer extends StringRenderer {
-
-		@Override
-		public String toString(Object o, String formatString, Locale locale) {
-			return super.toString(o, formatString, locale);
-		}
 	}
 
 	@Override

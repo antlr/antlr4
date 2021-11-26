@@ -8,13 +8,9 @@ package org.antlr.v4.codegen.target;
 
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.codegen.Target;
-import org.antlr.v4.tool.ast.GrammarAST;
-import org.stringtemplate.v4.STGroup;
-import org.stringtemplate.v4.StringRenderer;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Locale;
 import java.util.Set;
 
 public class JavaScriptTarget extends Target {
@@ -54,27 +50,6 @@ public class JavaScriptTarget extends Target {
 	@Override
 	public int getInlineTestSetWordSize() {
 		return 32;
-	}
-
-	@Override
-	protected STGroup loadTemplates() {
-		STGroup result = super.loadTemplates();
-		result.registerRenderer(String.class, new JavaStringRenderer(), true);
-		return result;
-	}
-
-	protected static class JavaStringRenderer extends StringRenderer {
-
-		@Override
-		public String toString(Object o, String formatString, Locale locale) {
-			if ("java-escape".equals(formatString)) {
-				// 5C is the hex code for the \ itself
-				return ((String)o).replace("\\u", "\\u005Cu");
-			}
-
-			return super.toString(o, formatString, locale);
-		}
-
 	}
 
 	@Override

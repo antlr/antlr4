@@ -99,13 +99,6 @@ public class GoTarget extends Target {
 		return 32;
 	}
 
-	@Override
-	protected STGroup loadTemplates() {
-		STGroup result = super.loadTemplates();
-		result.registerRenderer(String.class, new JavaStringRenderer(), true);
-		return result;
-	}
-
 	public String getRecognizerFileName(boolean header) {
 		CodeGenerator gen = getCodeGenerator();
 		Grammar g = gen.g;
@@ -163,18 +156,5 @@ public class GoTarget extends Target {
 		Grammar g = gen.g;
 		assert g.name != null;
 		return g.name.toLowerCase()+"_base_visitor.go";
-	}
-
-	protected static class JavaStringRenderer extends StringRenderer {
-		@Override
-		public String toString(Object o, String formatString, Locale locale) {
-
-			if ("java-escape".equals(formatString)) {
-				// 5C is the hex code for the \ itself
-				return ((String)o).replace("\\u", "\\u005Cu");
-			}
-
-			return super.toString(o, formatString, locale);
-		}
 	}
 }
