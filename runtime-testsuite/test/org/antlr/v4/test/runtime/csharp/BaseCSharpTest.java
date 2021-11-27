@@ -317,20 +317,10 @@ public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTes
 			process.waitFor();
 			stdoutVacuum.join();
 			stderrVacuum.join();
-			int exitValue = process.exitValue();
+			process.exitValue();
 			String stdoutString = stdoutVacuum.toString();
 			String stderrString = stderrVacuum.toString();
 			setParseErrors(stderrString);
-			if (exitValue != 0) {
-				System.err.println("execTest command: " + Utils.join(args, " "));
-				System.err.println("execTest exitValue: " + exitValue);
-			}
-			if (!stdoutString.isEmpty()) {
-				System.err.println("execTest stdoutVacuum: " + stdoutString);
-			}
-			if (!stderrString.isEmpty()) {
-				System.err.println("execTest stderrVacuum: " + stderrString);
-			}
 			return stdoutString;
 		} catch (Exception e) {
 			System.err.println("can't exec recognizer");
