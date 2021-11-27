@@ -306,9 +306,7 @@ public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTes
 		String exec = locateExec();
 		try {
 			File tmpdirFile = new File(getTempDirPath());
-			Path output = tmpdirFile.toPath().resolve("output");
-			Path errorOutput = tmpdirFile.toPath().resolve("error-output");
-			String[] args = getExecTestArgs(exec, output, errorOutput);
+			String[] args = new String[] { "dotnet", exec, new File(getTempTestDir(), "input").getAbsolutePath() };
 			ProcessBuilder pb = new ProcessBuilder(args);
 			pb.directory(tmpdirFile);
 			Process process = pb.start();
@@ -319,11 +317,10 @@ public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTes
 			process.waitFor();
 			stdoutVacuum.join();
 			stderrVacuum.join();
-			String writtenOutput = TestOutputReading.read(output);
-			setParseErrors(TestOutputReading.read(errorOutput));
 			int exitValue = process.exitValue();
-			String stdoutString = stdoutVacuum.toString().trim();
-			String stderrString = stderrVacuum.toString().trim();
+			String stdoutString = stdoutVacuum.toString();
+			String stderrString = stderrVacuum.toString();
+			setParseErrors(stderrString);
 			if (exitValue != 0) {
 				System.err.println("execTest command: " + Utils.join(args, " "));
 				System.err.println("execTest exitValue: " + exitValue);
@@ -334,20 +331,12 @@ public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTes
 			if (!stderrString.isEmpty()) {
 				System.err.println("execTest stderrVacuum: " + stderrString);
 			}
-			return writtenOutput;
+			return stdoutString;
 		} catch (Exception e) {
 			System.err.println("can't exec recognizer");
 			e.printStackTrace(System.err);
 		}
 		return null;
-	}
-
-	private String[] getExecTestArgs(String exec, Path output, Path errorOutput) {
-		return new String[]{
-				"dotnet", exec, new File(getTempTestDir(), "input").getAbsolutePath(),
-				output.toAbsolutePath().toString(),
-				errorOutput.toAbsolutePath().toString()
-		};
 	}
 
 	protected void writeParserTestFile(String parserName,
@@ -358,46 +347,42 @@ public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTes
 				"using System;\n" +
 						"using Antlr4.Runtime;\n" +
 						"using Antlr4.Runtime.Tree;\n" +
-						"using System.IO;\n" +
 						"using System.Text;\n" +
 						"\n" +
 						"public class Test {\n" +
 						"    public static void Main(string[] args) {\n" +
+						"        Console.OutputEncoding = Encoding.UTF8;\n" +
+						"        Console.InputEncoding = Encoding.UTF8;\n" +
 						"        var input = CharStreams.fromPath(args[0]);\n" +
-						"        using (FileStream fsOut = new FileStream(args[1], FileMode.Create, FileAccess.Write))\n" +
-						"        using (FileStream fsErr = new FileStream(args[2], FileMode.Create, FileAccess.Write))\n" +
-						"        using (TextWriter output = new StreamWriter(fsOut),\n" +
-						"                          errorOutput = new StreamWriter(fsErr)) {\n" +
-						"                <lexerName> lex = new <lexerName>(input, output, errorOutput);\n" +
-						"                CommonTokenStream tokens = new CommonTokenStream(lex);\n" +
-						"                <createParser>\n" +
-						"			 parser.BuildParseTree = true;\n" +
-						"                ParserRuleContext tree = parser.<parserStartRuleName>();\n" +
-						"                ParseTreeWalker.Default.Walk(new TreeShapeListener(), tree);\n" +
-						"        }\n" +
+						"        <lexerName> lex = new <lexerName>(input);\n" +
+						"        CommonTokenStream tokens = new CommonTokenStream(lex);\n" +
+						"        <createParser>\n" +
+						"        parser.BuildParseTree = true;\n" +
+						"        ParserRuleContext tree = parser.<parserStartRuleName>();\n" +
+						"        ParseTreeWalker.Default.Walk(new TreeShapeListener(), tree);\n" +
 						"    }\n" +
 						"}\n" +
 						"\n" +
 						"class TreeShapeListener : IParseTreeListener {\n" +
-						"	public void VisitTerminal(ITerminalNode node) { }\n" +
-						"	public void VisitErrorNode(IErrorNode node) { }\n" +
-						"	public void ExitEveryRule(ParserRuleContext ctx) { }\n" +
+						"    public void VisitTerminal(ITerminalNode node) { }\n" +
+						"    public void VisitErrorNode(IErrorNode node) { }\n" +
+						"    public void ExitEveryRule(ParserRuleContext ctx) { }\n" +
 						"\n" +
-						"	public void EnterEveryRule(ParserRuleContext ctx) {\n" +
-						"		for (int i = 0; i \\< ctx.ChildCount; i++) {\n" +
-						"			IParseTree parent = ctx.GetChild(i).Parent;\n" +
-						"			if (!(parent is IRuleNode) || ((IRuleNode)parent).RuleContext != ctx) {\n" +
-						"				throw new Exception(\"Invalid parse tree shape detected.\");\n" +
-						"			}\n" +
-						"		}\n" +
-						"	}\n" +
+						"    public void EnterEveryRule(ParserRuleContext ctx) {\n" +
+						"        for (int i = 0; i \\< ctx.ChildCount; i++) {\n" +
+						"            IParseTree parent = ctx.GetChild(i).Parent;\n" +
+						"            if (!(parent is IRuleNode) || ((IRuleNode)parent).RuleContext != ctx) {\n" +
+						"                throw new Exception(\"Invalid parse tree shape detected.\");\n" +
+						"            }\n" +
+						"        }\n" +
+						"    }\n" +
 						"}"
 		);
-		ST createParserST = new ST("        <parserName> parser = new <parserName>(tokens, output, errorOutput);\n");
+		ST createParserST = new ST("<parserName> parser = new <parserName>(tokens);\n");
 		if (debug) {
 			createParserST =
 					new ST(
-							"        <parserName> parser = new <parserName>(tokens, output, errorOutput);\n" +
+							"<parserName> parser = new <parserName>(tokens);\n" +
 									"        parser.AddErrorListener(new DiagnosticErrorListener());\n");
 		}
 		outputFileST.add("createParser", createParserST);
@@ -416,19 +401,16 @@ public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTes
 						"\n" +
 						"public class Test {\n" +
 						"    public static void Main(string[] args) {\n" +
+						"        Console.OutputEncoding = Encoding.UTF8;\n" +
+						"        Console.InputEncoding = Encoding.UTF8;\n" +
 						"        var input = CharStreams.fromPath(args[0]);\n" +
-						"        using (FileStream fsOut = new FileStream(args[1], FileMode.Create, FileAccess.Write))\n" +
-						"        using (FileStream fsErr = new FileStream(args[2], FileMode.Create, FileAccess.Write))\n" +
-						"        using (TextWriter output = new StreamWriter(fsOut),\n" +
-						"                          errorOutput = new StreamWriter(fsErr)) {\n" +
-						"        <lexerName> lex = new <lexerName>(input, output, errorOutput);\n" +
+						"        <lexerName> lex = new <lexerName>(input);\n" +
 						"        CommonTokenStream tokens = new CommonTokenStream(lex);\n" +
 						"        tokens.Fill();\n" +
 						"        foreach (object t in tokens.GetTokens())\n" +
-						"			output.WriteLine(t);\n" +
-						(showDFA ? "        output.Write(lex.Interpreter.GetDFA(Lexer.DEFAULT_MODE).ToLexerString());\n" : "") +
+						"        Console.Out.WriteLine(t);\n" +
+						(showDFA ? "        Console.Out.Write(lex.Interpreter.GetDFA(Lexer.DEFAULT_MODE).ToLexerString());\n" : "") +
 						"    }\n" +
-						"}\n" +
 						"}"
 		);
 
