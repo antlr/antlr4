@@ -9,13 +9,10 @@ import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.test.runtime.*;
 import org.stringtemplate.v4.ST;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.URL;
-import java.nio.file.Path;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -27,11 +24,14 @@ import java.util.Set;
 
 import static org.antlr.v4.test.runtime.BaseRuntimeTest.antlrOnString;
 import static org.antlr.v4.test.runtime.BaseRuntimeTest.writeFile;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTestSupport {
+	private static boolean isRuntimeInitialized = false;
+	private final static String cSharpAntlrRuntimeDllName = "Antlr4.Runtime.Standard.dll";
+	private final static String testProjectFileName = "Antlr4.Test.csproj";
+	private final static boolean isDebug = false;
+	private static String cSharpTestProjectContent;
 
 	@Override
 	protected String getPropertyPrefix() {
@@ -184,44 +184,21 @@ public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTes
 	}
 
 	private String locateExec() {
-		return new File(getTempTestDir(), "bin/Release/netcoreapp3.1/Test.dll").getAbsolutePath();
+		return new File(getTempTestDir(), "bin/" + getConfig() + "/netcoreapp3.1/Test.dll").getAbsolutePath();
 	}
 
 	public boolean buildProject() {
 		try {
+			assertTrue(initializeRuntime());
+
 			// save auxiliary files
-			String pack = BaseCSharpTest.class.getPackage().getName().replace(".", "/") + "/";
-			saveResourceAsFile(pack + "Antlr4.Test.csproj", new File(getTempTestDir(), "Antlr4.Test.csproj"));
-
-			// find runtime package
-			final ClassLoader loader = Thread.currentThread().getContextClassLoader();
-			final URL runtimeProj = loader.getResource("CSharp/src/Antlr4.csproj");
-			if (runtimeProj == null) {
-				throw new RuntimeException("C# runtime project file not found!");
+			try (PrintWriter out = new PrintWriter(new File(getTempTestDir(), testProjectFileName))) {
+				out.print(cSharpTestProjectContent);
 			}
-			File runtimeProjFile = new File(runtimeProj.getFile());
-			String runtimeProjPath = runtimeProjFile.getPath();
-
-			// add Runtime project reference
-			String[] args = new String[]{
-					"dotnet",
-					"add",
-					"Antlr4.Test.csproj",
-					"reference",
-					runtimeProjPath
-			};
-			boolean success = runProcess(args, getTempDirPath());
-			assertTrue(success);
 
 			// build test
-			args = new String[]{
-					"dotnet",
-					"build",
-					"Antlr4.Test.csproj",
-					"-c",
-					"Release"
-			};
-			success = runProcess(args, getTempDirPath());
+			String[] args = new String[] { "dotnet", "build", testProjectFileName, "-c", getConfig() };
+			boolean success = runProcess(args, getTempDirPath());
 			assertTrue(success);
 		} catch (Exception e) {
 			e.printStackTrace(System.err);
@@ -229,6 +206,60 @@ public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTes
 		}
 
 		return true;
+	}
+
+	private boolean initializeRuntime() {
+		// Compile runtime project once per tests session
+		if (isRuntimeInitialized)
+			return true;
+
+		// find runtime package
+		final ClassLoader loader = Thread.currentThread().getContextClassLoader();
+		final URL runtimeProj = loader.getResource("CSharp/src/Antlr4.csproj");
+		if (runtimeProj == null) {
+			throw new RuntimeException("C# runtime project file not found!");
+		}
+		File runtimeProjFile = new File(runtimeProj.getFile());
+		String runtimeProjPath = runtimeProjFile.getPath();
+
+		RuntimeTestUtils.mkdir(cachingDirectory);
+		String[] args = new String[]{
+				"dotnet",
+				"build",
+				runtimeProjPath,
+				"-c",
+				"Release",
+				"-o",
+				cachingDirectory
+		};
+
+		boolean success;
+		try
+		{
+			String cSharpTestProjectResourceName = BaseCSharpTest.class.getPackage().getName().replace(".", "/") + "/";
+			InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(cSharpTestProjectResourceName + testProjectFileName);
+			int bufferSize = 1024;
+			char[] buffer = new char[bufferSize];
+			StringBuilder out = new StringBuilder();
+			Reader in = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
+			for (int numRead; (numRead = in.read(buffer, 0, buffer.length)) > 0; ) {
+				out.append(buffer, 0, numRead);
+			}
+			cSharpTestProjectContent = out.toString().replace(cSharpAntlrRuntimeDllName, Paths.get(cachingDirectory, cSharpAntlrRuntimeDllName).toString());
+
+			success = runProcess(args, cachingDirectory);
+		}
+		catch (Exception e) {
+			e.printStackTrace(System.err);
+			return false;
+		}
+
+		isRuntimeInitialized = true;
+		return success;
+	}
+
+	private static String getConfig() {
+		return isDebug ? "Debug" : "Release";
 	}
 
 	private boolean runProcess(String[] args, String path) throws Exception {
@@ -269,20 +300,6 @@ public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTes
 			}
 		}
 		return success;
-	}
-
-	private void saveResourceAsFile(String resourceName, File file) throws IOException {
-		InputStream input = Thread.currentThread().getContextClassLoader().getResourceAsStream(resourceName);
-		if (input == null) {
-			System.err.println("Can't find " + resourceName + " as resource");
-			throw new IOException("Missing resource:" + resourceName);
-		}
-		OutputStream output = new FileOutputStream(file.getAbsolutePath());
-		while (input.available() > 0) {
-			output.write(input.read());
-		}
-		output.close();
-		input.close();
 	}
 
 	public String execTest() {
