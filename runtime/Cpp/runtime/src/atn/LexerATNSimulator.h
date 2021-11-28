@@ -192,6 +192,8 @@ namespace atn {
     /// </summary>
     virtual dfa::DFAState *addDFAState(ATNConfigSet *configs);
 
+    virtual dfa::DFAState *addDFAState(ATNConfigSet *configs, bool suppressEdge);
+
   public:
     dfa::DFA& getDFA(size_t mode);
 

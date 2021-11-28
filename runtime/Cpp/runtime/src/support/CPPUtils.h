@@ -11,7 +11,7 @@
 
 namespace antlrcpp {
 
-  std::string join(std::vector<std::string> strings, const std::string &separator);
+  std::string join(const std::vector<std::string> &strings, const std::string &separator);
   std::map<std::string, size_t> toMap(const std::vector<std::string> &keys);
   std::string escapeWhitespace(std::string str, bool escapeSpaces);
   std::string toHexString(const int t);

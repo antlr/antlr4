@@ -13,7 +13,7 @@
 	</parent>
 	<groupId>org.antlr</groupId>
 	<artifactId>antlr4-master</artifactId>
-	<version>4.9.3-SNAPSHOT</version>
+	<version>4.9.4-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>ANTLR 4</name>
@@ -113,7 +113,7 @@
 	</issueManagement>
 
 	<scm>
-		<url>https://github.com/antlr/antlr4/tree/master</url>
+        <url>https://github.com/antlr/antlr4/tree/master</url>
 		<connection>scm:git:git://github.com/antlr/antlr4.git</connection>
 		<developerConnection>scm:git:git@github.com:antlr/antlr4.git</developerConnection>
 		<tag>HEAD</tag>
