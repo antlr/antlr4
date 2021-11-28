@@ -23,9 +23,11 @@ import static org.junit.Assert.fail;
 
 public class BaseGoTest extends BaseRuntimeTestSupport implements RuntimeTestSupport {
 	private final static String antlrTestPackageName = "antlr";
+	private static final String goModFileName = "go.mod";
 	private static final String GO_RUNTIME_IMPORT_PATH = "github.com/antlr/antlr4/runtime/Go/antlr"; // TODO: Change this before merging with upstream
 	private static boolean isRuntimeInitialized = false;
 	private static String newGoRootString;
+	private static String goModContent = null;
 
 	private File parserTempDir; // "parser" with tempDir
 
@@ -69,6 +71,7 @@ public class BaseGoTest extends BaseRuntimeTestSupport implements RuntimeTestSup
 		replaceImportPath();
 		writeFile(getTempDirPath(), "input", input);
 		writeLexerTestFile(lexerName, showDFA);
+		writeGoModFile();
 		return execModule("Test.go");
 	}
 
@@ -83,9 +86,39 @@ public class BaseGoTest extends BaseRuntimeTestSupport implements RuntimeTestSup
 		assertTrue(success);
 		replaceImportPath();
 		writeFile(getTempDirPath(), "input", input);
+		writeGoModFile();
 		rawBuildRecognizerTestFile(parserName, lexerName, listenerName,
 		                           visitorName, startRuleName, showDiagnosticErrors);
 		return execModule("Test.go");
+	}
+
+	private void writeGoModFile() {
+		if (goModContent == null) {
+			try {
+				ProcessBuilder pb = new ProcessBuilder("go", "mod", "init", "test");
+				pb.directory(getTempTestDir());
+				pb.redirectErrorStream(true);
+				Process process = pb.start();
+				StreamVacuum sucker = new StreamVacuum(process.getInputStream());
+				sucker.start();
+				int exit = process.waitFor();
+				sucker.join();
+				if (exit != 0) {
+					throw new Exception("Non-zero exit while setting up go module: " + sucker);
+				}
+				goModContent = new String(Files.readAllBytes(Paths.get(getTempDirPath(), goModFileName)), StandardCharsets.UTF_8);
+			} catch (Exception e) {
+				e.printStackTrace();
+				Assert.fail("Unable to execute go mod");
+			}
+		} else {
+			try (PrintWriter out = new PrintWriter(Paths.get(getTempDirPath(), goModFileName).toString())) {
+				out.println(goModContent);
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+				Assert.fail("Unable to write " + goModFileName);
+			}
+		}
 	}
 
 	private void replaceImportPath() {
@@ -310,7 +343,6 @@ public class BaseGoTest extends BaseRuntimeTestSupport implements RuntimeTestSup
 		outputFileST.add("listenerName", listenerName);
 		outputFileST.add("visitorName", visitorName);
 		outputFileST.add("parserStartRuleName", parserStartRuleName.substring(0, 1).toUpperCase() + parserStartRuleName.substring(1) );
-		setupGoMod();
 		writeFile(getTempDirPath(), "Test.go", outputFileST.render());
 	}
 
@@ -341,26 +373,6 @@ public class BaseGoTest extends BaseRuntimeTestSupport implements RuntimeTestSup
 				+ "}\n"
 				+ "\n");
 		outputFileST.add("lexerName", lexerName);
-		setupGoMod();
 		writeFile(getTempDirPath(), "Test.go", outputFileST.render());
-	}
-
-	private void setupGoMod(){
-		try {
-			ProcessBuilder pb = new ProcessBuilder("go", "mod", "init", "test");
-			pb.directory(getTempTestDir());
-			pb.redirectErrorStream(true);
-			Process process = pb.start();
-			StreamVacuum sucker = new StreamVacuum(process.getInputStream());
-			sucker.start();
-			int exit = process.waitFor();
-			sucker.join();
-			if (exit != 0) {
-				throw new Exception("Non-zero exit while setting up go module: " + sucker);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail("Unable to execute go mod");
-		}
 	}
 }
