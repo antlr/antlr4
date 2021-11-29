@@ -154,10 +154,11 @@ public class DFAState {
 		}
 
 		DFAState other = (DFAState)o;
-		// TODO (sam): what to do when configs==null?
-		boolean sameSet = this.configs.equals(other.configs);
-//		System.out.println("DFAState.equals: "+configs+(sameSet?"==":"!=")+other.configs);
-		return sameSet;
+		if (this.configs == null) {
+			return other.configs == null;
+		}
+
+		return this.configs.equals(other.configs);
 	}
 
 	@Override
