@@ -178,7 +178,9 @@ public class BaseGoTest extends BaseRuntimeTestSupport implements RuntimeTestSup
 		try {
 			ProcessBuilder builder = new ProcessBuilder("go", "run", modulePath, inputPath);
 			builder.directory(getTempTestDir());
-			builder.environment().put("GOROOT", newGoRootString);
+			if (isWindows()) {
+				builder.environment().put("GOROOT", newGoRootString);
+			}
 			Process process = builder.start();
 			StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
 			StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
@@ -208,13 +210,17 @@ public class BaseGoTest extends BaseRuntimeTestSupport implements RuntimeTestSup
 			return true;
 
 		String goRoot = getGoRootValue();
-		Path newGoRoot = Paths.get(cachingDirectory, "Go");
-		newGoRootString = newGoRoot.toString();
-		try {
-			copyDirectory(Paths.get(goRoot), newGoRoot, StandardCopyOption.REPLACE_EXISTING);
-		} catch (IOException e) {
-			e.printStackTrace();
-			Assert.fail("Unable to copy go system files");
+		if (isWindows()) {
+			Path newGoRoot = Paths.get(cachingDirectory, "Go");
+			newGoRootString = newGoRoot.toString();
+			try {
+				copyDirectory(Paths.get(goRoot), newGoRoot, StandardCopyOption.REPLACE_EXISTING);
+			} catch (IOException e) {
+				e.printStackTrace();
+				Assert.fail("Unable to copy go system files");
+			}
+		} else {
+			newGoRootString = goRoot;
 		}
 
 		String packageDir = Paths.get(newGoRootString, "src", antlrTestPackageName).toString();
