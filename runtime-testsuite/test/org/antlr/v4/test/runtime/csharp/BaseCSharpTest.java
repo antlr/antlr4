@@ -32,6 +32,7 @@ public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTes
 	private final static String testProjectFileName = "Antlr4.Test.csproj";
 	private final static boolean isDebug = false;
 	private static String cSharpTestProjectContent;
+	private static final String cSharpCachingDirectory = Paths.get(cachingDirectory, "CSharp").toString();
 
 	@Override
 	protected String getPropertyPrefix() {
@@ -222,7 +223,7 @@ public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTes
 		File runtimeProjFile = new File(runtimeProj.getFile());
 		String runtimeProjPath = runtimeProjFile.getPath();
 
-		RuntimeTestUtils.mkdir(cachingDirectory);
+		RuntimeTestUtils.mkdir(cSharpCachingDirectory);
 		String[] args = new String[]{
 				"dotnet",
 				"build",
@@ -230,12 +231,11 @@ public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTes
 				"-c",
 				"Release",
 				"-o",
-				cachingDirectory
+				cSharpCachingDirectory
 		};
 
 		boolean success;
-		try
-		{
+		try {
 			String cSharpTestProjectResourceName = BaseCSharpTest.class.getPackage().getName().replace(".", "/") + "/";
 			InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(cSharpTestProjectResourceName + testProjectFileName);
 			int bufferSize = 1024;
@@ -245,11 +245,10 @@ public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTes
 			for (int numRead; (numRead = in.read(buffer, 0, buffer.length)) > 0; ) {
 				out.append(buffer, 0, numRead);
 			}
-			cSharpTestProjectContent = out.toString().replace(cSharpAntlrRuntimeDllName, Paths.get(cachingDirectory, cSharpAntlrRuntimeDllName).toString());
+			cSharpTestProjectContent = out.toString().replace(cSharpAntlrRuntimeDllName, Paths.get(cSharpCachingDirectory, cSharpAntlrRuntimeDllName).toString());
 
-			success = runProcess(args, cachingDirectory);
-		}
-		catch (Exception e) {
+			success = runProcess(args, cSharpCachingDirectory);
+		} catch (Exception e) {
 			e.printStackTrace(System.err);
 			return false;
 		}
