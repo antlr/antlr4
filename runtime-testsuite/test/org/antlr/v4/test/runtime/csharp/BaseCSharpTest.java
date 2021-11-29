@@ -209,7 +209,7 @@ public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTes
 		return true;
 	}
 
-	private boolean initializeRuntime() {
+	private synchronized boolean initializeRuntime() {
 		// Compile runtime project once per tests session
 		if (isRuntimeInitialized)
 			return true;

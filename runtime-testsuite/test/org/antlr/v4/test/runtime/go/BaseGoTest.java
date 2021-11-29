@@ -203,7 +203,7 @@ public class BaseGoTest extends BaseRuntimeTestSupport implements RuntimeTestSup
 		return null;
 	}
 
-	private boolean initializeRuntime() {
+	private synchronized boolean initializeRuntime() {
 		if (isRuntimeInitialized)
 			return true;
 
