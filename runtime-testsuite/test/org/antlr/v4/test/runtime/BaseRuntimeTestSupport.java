@@ -16,9 +16,7 @@ import org.junit.runner.Description;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.LinkOption;
-import java.nio.file.Path;
-import java.util.Locale;
+import java.util.*;
 import java.util.logging.Logger;
 
 import static org.junit.Assert.assertEquals;
@@ -41,6 +39,12 @@ public abstract class BaseRuntimeTestSupport implements RuntimeTestSupport {
 
 	/** Errors found while running antlr */
 	private StringBuilder antlrToolErrors;
+
+	public static String cachingDirectory;
+
+	static {
+		cachingDirectory = new File(System.getProperty("java.io.tmpdir"), "ANTLR-runtime-testsuite-cache").getAbsolutePath();
+	}
 
 	@org.junit.Rule
 	public final TestRule testWatcher = new TestWatcher() {
