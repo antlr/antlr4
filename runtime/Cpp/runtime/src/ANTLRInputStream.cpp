@@ -23,11 +23,9 @@ ANTLRInputStream::ANTLRInputStream() {
   InitializeInstanceFields();
 }
 
-#if __cplusplus >= 201703L
 ANTLRInputStream::ANTLRInputStream(const std::string_view &input): ANTLRInputStream() {
   load(input.data(), input.length());
 }
-#endif
 
 ANTLRInputStream::ANTLRInputStream(const std::string &input): ANTLRInputStream() {
   load(input.data(), input.size());

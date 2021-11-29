@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <shared_mutex>
+
 #include "antlr4-common.h"
 
 namespace antlrcpp {
@@ -70,13 +72,7 @@ namespace antlrcpp {
     void writeUnlock();
 
   private:
-    std::condition_variable _readerGate;
-    std::condition_variable _writerGate;
-
-    std::mutex _mutex;
-    size_t _activeReaders = 0;
-    size_t _waitingWriters = 0;
-    size_t _activeWriters = 0;
+    std::shared_mutex _mutex;
   };
 
 } // namespace antlrcpp

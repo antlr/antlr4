@@ -645,12 +645,12 @@
 		276E5FBC1CDB57AA003FF4B4 /* Declarations.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5CEA1CDB57AA003FF4B4 /* Declarations.h */; };
 		276E5FBD1CDB57AA003FF4B4 /* Declarations.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5CEA1CDB57AA003FF4B4 /* Declarations.h */; };
 		276E5FBE1CDB57AA003FF4B4 /* Declarations.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5CEA1CDB57AA003FF4B4 /* Declarations.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		276E5FBF1CDB57AA003FF4B4 /* guid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5CEB1CDB57AA003FF4B4 /* guid.cpp */; };
-		276E5FC01CDB57AA003FF4B4 /* guid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5CEB1CDB57AA003FF4B4 /* guid.cpp */; };
-		276E5FC11CDB57AA003FF4B4 /* guid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5CEB1CDB57AA003FF4B4 /* guid.cpp */; };
-		276E5FC21CDB57AA003FF4B4 /* guid.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5CEC1CDB57AA003FF4B4 /* guid.h */; };
-		276E5FC31CDB57AA003FF4B4 /* guid.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5CEC1CDB57AA003FF4B4 /* guid.h */; };
-		276E5FC41CDB57AA003FF4B4 /* guid.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5CEC1CDB57AA003FF4B4 /* guid.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		276E5FBF1CDB57AA003FF4B4 /* Guid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5CEB1CDB57AA003FF4B4 /* Guid.cpp */; };
+		276E5FC01CDB57AA003FF4B4 /* Guid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5CEB1CDB57AA003FF4B4 /* Guid.cpp */; };
+		276E5FC11CDB57AA003FF4B4 /* Guid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5CEB1CDB57AA003FF4B4 /* Guid.cpp */; };
+		276E5FC21CDB57AA003FF4B4 /* Guid.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5CEC1CDB57AA003FF4B4 /* Guid.h */; };
+		276E5FC31CDB57AA003FF4B4 /* Guid.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5CEC1CDB57AA003FF4B4 /* Guid.h */; };
+		276E5FC41CDB57AA003FF4B4 /* Guid.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5CEC1CDB57AA003FF4B4 /* Guid.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		276E5FC51CDB57AA003FF4B4 /* StringUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5CED1CDB57AA003FF4B4 /* StringUtils.cpp */; };
 		276E5FC61CDB57AA003FF4B4 /* StringUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5CED1CDB57AA003FF4B4 /* StringUtils.cpp */; };
 		276E5FC71CDB57AA003FF4B4 /* StringUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5CED1CDB57AA003FF4B4 /* StringUtils.cpp */; };
@@ -1140,8 +1140,8 @@
 		276E5CE81CDB57AA003FF4B4 /* CPPUtils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CPPUtils.cpp; sourceTree = "<group>"; wrapsLines = 0; };
 		276E5CE91CDB57AA003FF4B4 /* CPPUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = CPPUtils.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		276E5CEA1CDB57AA003FF4B4 /* Declarations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Declarations.h; sourceTree = "<group>"; };
-		276E5CEB1CDB57AA003FF4B4 /* guid.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = guid.cpp; sourceTree = "<group>"; };
-		276E5CEC1CDB57AA003FF4B4 /* guid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = guid.h; sourceTree = "<group>"; };
+		276E5CEB1CDB57AA003FF4B4 /* Guid.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Guid.cpp; sourceTree = "<group>"; };
+		276E5CEC1CDB57AA003FF4B4 /* Guid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Guid.h; sourceTree = "<group>"; };
 		276E5CED1CDB57AA003FF4B4 /* StringUtils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StringUtils.cpp; sourceTree = "<group>"; };
 		276E5CEE1CDB57AA003FF4B4 /* StringUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StringUtils.h; sourceTree = "<group>"; };
 		276E5CF01CDB57AA003FF4B4 /* Token.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Token.h; sourceTree = "<group>"; };
@@ -1553,8 +1553,8 @@
 				276E5CE81CDB57AA003FF4B4 /* CPPUtils.cpp */,
 				276E5CE91CDB57AA003FF4B4 /* CPPUtils.h */,
 				276E5CEA1CDB57AA003FF4B4 /* Declarations.h */,
-				276E5CEB1CDB57AA003FF4B4 /* guid.cpp */,
-				276E5CEC1CDB57AA003FF4B4 /* guid.h */,
+				276E5CEB1CDB57AA003FF4B4 /* Guid.cpp */,
+				276E5CEC1CDB57AA003FF4B4 /* Guid.h */,
 				276E5CED1CDB57AA003FF4B4 /* StringUtils.cpp */,
 				276E5CEE1CDB57AA003FF4B4 /* StringUtils.h */,
 			);
@@ -1767,7 +1767,7 @@
 				276E5F581CDB57AA003FF4B4 /* LexerNoViableAltException.h in Headers */,
 				276E5D811CDB57AA003FF4B4 /* ATNSimulator.h in Headers */,
 				27DB44B61D0463CC007E790B /* XPathLexer.h in Headers */,
-				276E5FC41CDB57AA003FF4B4 /* guid.h in Headers */,
+				276E5FC41CDB57AA003FF4B4 /* Guid.h in Headers */,
 				276E602D1CDB57AA003FF4B4 /* TagChunk.h in Headers */,
 				276E5E951CDB57AA003FF4B4 /* RuleStopState.h in Headers */,
 				276E5F761CDB57AA003FF4B4 /* Predicate.h in Headers */,
@@ -1934,7 +1934,7 @@
 				276E60141CDB57AA003FF4B4 /* ParseTreeMatch.h in Headers */,
 				276E5F571CDB57AA003FF4B4 /* LexerNoViableAltException.h in Headers */,
 				276E5D801CDB57AA003FF4B4 /* ATNSimulator.h in Headers */,
-				276E5FC31CDB57AA003FF4B4 /* guid.h in Headers */,
+				276E5FC31CDB57AA003FF4B4 /* Guid.h in Headers */,
 				276E602C1CDB57AA003FF4B4 /* TagChunk.h in Headers */,
 				276E5E941CDB57AA003FF4B4 /* RuleStopState.h in Headers */,
 				276E5F751CDB57AA003FF4B4 /* Predicate.h in Headers */,
@@ -2092,7 +2092,7 @@
 				276E60131CDB57AA003FF4B4 /* ParseTreeMatch.h in Headers */,
 				276E5F561CDB57AA003FF4B4 /* LexerNoViableAltException.h in Headers */,
 				276E5D7F1CDB57AA003FF4B4 /* ATNSimulator.h in Headers */,
-				276E5FC21CDB57AA003FF4B4 /* guid.h in Headers */,
+				276E5FC21CDB57AA003FF4B4 /* Guid.h in Headers */,
 				276E602B1CDB57AA003FF4B4 /* TagChunk.h in Headers */,
 				276E5E931CDB57AA003FF4B4 /* RuleStopState.h in Headers */,
 				276E5F741CDB57AA003FF4B4 /* Predicate.h in Headers */,
@@ -2368,7 +2368,7 @@
 				276E5E861CDB57AA003FF4B4 /* RangeTransition.cpp in Sources */,
 				276E5D7E1CDB57AA003FF4B4 /* ATNSimulator.cpp in Sources */,
 				276E5D9C1CDB57AA003FF4B4 /* BasicState.cpp in Sources */,
-				276E5FC11CDB57AA003FF4B4 /* guid.cpp in Sources */,
+				276E5FC11CDB57AA003FF4B4 /* Guid.cpp in Sources */,
 				276E5E801CDB57AA003FF4B4 /* ProfilingATNSimulator.cpp in Sources */,
 				2793DCA91F08095F00A84290 /* ANTLRErrorStrategy.cpp in Sources */,
 				276E5F401CDB57AA003FF4B4 /* IntStream.cpp in Sources */,
@@ -2522,7 +2522,7 @@
 				276E5E851CDB57AA003FF4B4 /* RangeTransition.cpp in Sources */,
 				276E5D7D1CDB57AA003FF4B4 /* ATNSimulator.cpp in Sources */,
 				276E5D9B1CDB57AA003FF4B4 /* BasicState.cpp in Sources */,
-				276E5FC01CDB57AA003FF4B4 /* guid.cpp in Sources */,
+				276E5FC01CDB57AA003FF4B4 /* Guid.cpp in Sources */,
 				276E5E7F1CDB57AA003FF4B4 /* ProfilingATNSimulator.cpp in Sources */,
 				2793DCA81F08095F00A84290 /* ANTLRErrorStrategy.cpp in Sources */,
 				276E5F3F1CDB57AA003FF4B4 /* IntStream.cpp in Sources */,
@@ -2676,7 +2676,7 @@
 				276E5E841CDB57AA003FF4B4 /* RangeTransition.cpp in Sources */,
 				276E5D7C1CDB57AA003FF4B4 /* ATNSimulator.cpp in Sources */,
 				276E5D9A1CDB57AA003FF4B4 /* BasicState.cpp in Sources */,
-				276E5FBF1CDB57AA003FF4B4 /* guid.cpp in Sources */,
+				276E5FBF1CDB57AA003FF4B4 /* Guid.cpp in Sources */,
 				276E5E7E1CDB57AA003FF4B4 /* ProfilingATNSimulator.cpp in Sources */,
 				2793DCA71F08095F00A84290 /* ANTLRErrorStrategy.cpp in Sources */,
 				276E5F3E1CDB57AA003FF4B4 /* IntStream.cpp in Sources */,
@@ -2739,6 +2739,7 @@
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
@@ -2774,6 +2775,7 @@
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
@@ -2809,6 +2811,7 @@
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				COMBINE_HIDPI_IMAGES = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -2831,6 +2834,7 @@
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;

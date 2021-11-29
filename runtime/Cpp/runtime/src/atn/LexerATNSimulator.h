@@ -40,15 +40,8 @@ namespace atn {
 
 
   public:
-#if __cplusplus >= 201703L
     static constexpr size_t MIN_DFA_EDGE = 0;
     static constexpr size_t MAX_DFA_EDGE = 127; // forces unicode to stay in ATN
-#else
-    enum : size_t {
-      MIN_DFA_EDGE = 0,
-      MAX_DFA_EDGE = 127, // forces unicode to stay in ATN
-    };
-#endif
 
   protected:
     /// <summary>
