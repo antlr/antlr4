@@ -15,6 +15,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.EnumSet;
 
 import static junit.framework.TestCase.*;
 import static org.antlr.v4.test.runtime.BaseRuntimeTest.antlrOnString;
@@ -188,15 +189,14 @@ public class BaseGoTest extends BaseRuntimeTestSupport implements RuntimeTestSup
 			stdoutVacuum.join();
 			stderrVacuum.join();
 			String output = stdoutVacuum.toString();
-			if ( output.length()==0 ) {
+			if (output.length() == 0) {
 				output = null;
 			}
 			if (stderrVacuum.toString().length() > 0) {
 				setParseErrors(stderrVacuum.toString());
 			}
 			return output;
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			System.err.println("can't exec recognizer");
 			e.printStackTrace(System.err);
 		}
@@ -211,7 +211,10 @@ public class BaseGoTest extends BaseRuntimeTestSupport implements RuntimeTestSup
 		Path newGoRoot = Paths.get(cachingDirectory, "Go");
 		newGoRootString = newGoRoot.toString();
 		try {
-			copyDirectory(Paths.get(goRoot), newGoRoot, StandardCopyOption.REPLACE_EXISTING);
+			File newGoRootDirectory = newGoRoot.toFile();
+			if (newGoRootDirectory.exists())
+				deleteDirectory(newGoRootDirectory);
+			copyDirectory(Paths.get(goRoot), newGoRoot);
 		} catch (IOException e) {
 			e.printStackTrace();
 			Assert.fail("Unable to copy go system files");
@@ -240,7 +243,7 @@ public class BaseGoTest extends BaseRuntimeTestSupport implements RuntimeTestSup
 
 	private void copyDirectory(final Path source, final Path target, final CopyOption... options)
 			throws IOException {
-		Files.walkFileTree(source, new SimpleFileVisitor<Path>() {
+		Files.walkFileTree(source, EnumSet.of(FileVisitOption.FOLLOW_LINKS), 2147483647, new SimpleFileVisitor<Path>() {
 			@Override
 			public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs)
 					throws IOException {
@@ -255,6 +258,15 @@ public class BaseGoTest extends BaseRuntimeTestSupport implements RuntimeTestSup
 				return FileVisitResult.CONTINUE;
 			}
 		});
+	}
+
+	private void deleteDirectory(File f) throws IOException {
+		if (f.isDirectory()) {
+			for (File c : f.listFiles())
+				deleteDirectory(c);
+		}
+		if (!f.delete())
+			throw new FileNotFoundException("Failed to delete file: " + f);
 	}
 
 	private static String getGoRootValue() {
