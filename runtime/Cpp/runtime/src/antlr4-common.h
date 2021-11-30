@@ -110,25 +110,6 @@
 #include "support/Guid.h"
 #include "support/Declarations.h"
 
-#if !defined(HAS_NOEXCEPT)
-  #if defined(__clang__)
-    #if __has_feature(cxx_noexcept)
-      #define HAS_NOEXCEPT
-    #endif
-  #else
-    #if defined(__GXX_EXPERIMENTAL_CXX0X__) && __GNUC__ * 10 + __GNUC_MINOR__ >= 46 || \
-      defined(_MSC_FULL_VER) && _MSC_FULL_VER >= 190023026
-      #define HAS_NOEXCEPT
-    #endif
-  #endif
-
-  #ifdef HAS_NOEXCEPT
-    #define NOEXCEPT noexcept
-  #else
-    #define NOEXCEPT
-  #endif
-#endif
-
 // We have to undefine this symbol as ANTLR will use this name for own members and even
 // generated functions. Because EOF is a global macro we cannot use e.g. a namespace scope to disambiguate.
 #ifdef EOF
