@@ -98,15 +98,6 @@ std::vector<DFAState *> DFA::getStates() const {
   return result;
 }
 
-std::string DFA::toString(const std::vector<std::string> &tokenNames) {
-  if (s0 == nullptr) {
-    return "";
-  }
-  DFASerializer serializer(this, tokenNames);
-
-  return serializer.toString();
-}
-
 std::string DFA::toString(const Vocabulary &vocabulary) const {
   if (s0 == nullptr) {
     return "";

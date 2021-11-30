@@ -10,10 +10,6 @@
 
 using namespace antlr4::dfa;
 
-DFASerializer::DFASerializer(const DFA *dfa, const std::vector<std::string>& tokenNames)
-  : DFASerializer(dfa, Vocabulary::fromTokenNames(tokenNames)) {
-}
-
 DFASerializer::DFASerializer(const DFA *dfa, const Vocabulary &vocabulary) : _dfa(dfa), _vocabulary(vocabulary) {
 }
 

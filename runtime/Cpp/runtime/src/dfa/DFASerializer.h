@@ -13,7 +13,6 @@ namespace dfa {
   /// A DFA walker that knows how to dump them to serialized strings.
   class ANTLR4CPP_PUBLIC DFASerializer {
   public:
-    DFASerializer(const DFA *dfa, const std::vector<std::string>& tnames);
     DFASerializer(const DFA *dfa, const Vocabulary &vocabulary);
     virtual ~DFASerializer();
 
