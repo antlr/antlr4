@@ -202,7 +202,7 @@ class ProfilingATNSimulator extends ParserATNSimulator {
       alt,
       fullCtx,
     );
-    if (!(pred is PrecedencePredicate)) {
+    if (pred is! PrecedencePredicate) {
       final fullContext = _llStopIndex >= 0;
       final stopIndex = fullContext ? _llStopIndex : _sllStopIndex;
       decisions[currentDecision].predicateEvals.add(PredicateEvalInfo(
