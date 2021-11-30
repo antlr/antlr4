@@ -12,6 +12,6 @@ setup(
     license='BSD',
     author='Eric Vergnaud, Terence Parr, Sam Harwell',
     author_email='eric.vergnaud@wanadoo.fr',
-    scripts=["bin/pygrun"],
+    entry_points={'console_scripts': ['pygrun=antlr4._pygrun:main']},
     description='ANTLR 4.9.3 runtime for Python 3.7'
 )

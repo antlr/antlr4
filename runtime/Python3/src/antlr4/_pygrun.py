@@ -26,7 +26,7 @@ def beautify_lisp_string(in_string):
     return out_string
 
 
-if __name__ == '__main__':
+def main():
 
     #############################################################
     # parse options
@@ -162,3 +162,7 @@ if __name__ == '__main__':
             process(input_stream, class_lexer, class_parser)
         else:
             print("[ERROR] file {} not exist".format(os.path.normpath(file_name)))
+
+
+if __name__ == '__main__':
+    main()
