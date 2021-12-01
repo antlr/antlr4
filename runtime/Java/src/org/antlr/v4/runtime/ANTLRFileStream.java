@@ -15,6 +15,7 @@ import java.io.IOException;
  *
  * @deprecated as of 4.7 Please use {@link CharStreams} interface.
  */
+@Deprecated
 public class ANTLRFileStream extends ANTLRInputStream {
 	protected String fileName;
 
