@@ -50,11 +50,7 @@ namespace antlrcpp {
             break;
           }
           // else fall through
-#ifndef _MSC_VER
-#if __has_cpp_attribute(clang::fallthrough)
-          [[clang::fallthrough]];
-#endif
-#endif
+          [[fallthrough]];
 
         default:
           result += c;
