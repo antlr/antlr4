@@ -319,3 +319,4 @@ YYYY/MM/DD, github id, Full name, email
 2021/10/10, tools4origins, Erwan Guyomarc'h, contact@erwan-guyomarch.fr
 2021/10/19, jcking, Justin King, jcking@google.com
 2021/10/31, skef, Skef Iterum, github@skef.org
+2021/12/03, enedil, Michał Radwański, enedil@outlook.com
