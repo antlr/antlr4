@@ -442,7 +442,8 @@ LeftRecursiveRuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,
 private func <currentRule.name>(_ _p<args:{a | , <a>}>: Int) throws -> <currentRule.ctxType>   {
 	let _parentctx: ParserRuleContext? = _ctx
 	let _parentState: Int = getState()
-	var _localctx: <currentRule.ctxType> = <currentRule.ctxType>(_ctx, _parentState<currentRule.args:{a | , <a.name>}>)
+	var _localctx: <currentRule.ctxType>
+	_localctx = <currentRule.ctxType>(_ctx, _parentState<currentRule.args:{a | , <a.name>}>)
 	var _prevctx: <currentRule.ctxType> = _localctx
 	let _startState: Int = <currentRule.startState>
 	try enterRecursionRule(_localctx, <currentRule.startState>, <parser.name>.RULE_<currentRule.name>, _p)
