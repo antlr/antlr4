@@ -287,18 +287,12 @@ class IntervalSet {
       return this;
     }
 
-    if (set is IntervalSet) {
-      final other = set;
-      // walk set and add each interval
-      final n = other.intervals.length;
-      for (var i = 0; i < n; i++) {
-        final I = other.intervals[i];
-        addRange(I.a, I.b);
-      }
-    } else {
-      for (final value in set.toList()) {
-        addOne(value);
-      }
+    final other = set;
+    // walk set and add each interval
+    final n = other.intervals.length;
+    for (var i = 0; i < n; i++) {
+      final I = other.intervals[i];
+      addRange(I.a, I.b);
     }
 
     return this;
@@ -313,29 +307,14 @@ class IntervalSet {
     if (vocabulary == null || vocabulary.isNil) {
       return null; // nothing in common with null set
     }
-    IntervalSet vocabularyIS;
-    if (vocabulary is IntervalSet) {
-      vocabularyIS = vocabulary;
-    } else {
-      vocabularyIS = IntervalSet();
-      vocabularyIS.addAll(vocabulary);
-    }
-
-    return vocabularyIS - this;
+    return vocabulary - this;
   }
 
   IntervalSet operator -(IntervalSet a) {
     if (a.isNil) {
       return IntervalSet.ofSet(this);
     }
-
-    if (a is IntervalSet) {
-      return subtract(this, a);
-    }
-
-    final other = IntervalSet();
-    other.addAll(a);
-    return subtract(this, other);
+    return subtract(this, a);
   }
 
   /// Compute the set difference between two interval sets. The specific

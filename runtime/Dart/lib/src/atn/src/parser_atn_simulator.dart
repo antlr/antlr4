@@ -1264,7 +1264,7 @@ class ParserATNSimulator extends ATNSimulator {
       assert(pred != null);
 
       if (ambigAlts != null && ambigAlts[i]) {
-        pairs.add(PredPrediction(pred, i));
+        pairs.add(PredPrediction(pred!, i));
       }
       if (pred != SemanticContext.NONE) containsPredicate = true;
     }
@@ -1417,7 +1417,7 @@ class ParserATNSimulator extends ATNSimulator {
       }
 
       if (predicateEvaluationResult) {
-        if (debug || dfa_debug) log('PREDICT ' + pair.alt);
+        if (debug || dfa_debug) log('PREDICT ' + pair.alt.toString());
         predictions.set(pair.alt);
         if (!complete) {
           break;
