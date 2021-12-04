@@ -209,9 +209,9 @@ dfa::DFAState *LexerATNSimulator::computeTargetState(CharStream *input, dfa::DFA
     if (!reach->hasSemanticContext) {
       // we got nowhere on t, don't throw out this knowledge; it'd
       // cause a failover from DFA later.
-      delete reach;
       addDFAEdge(s, t, ERROR.get());
     }
+    delete reach;
 
     // stop when we can't match any more char
     return ERROR.get();
