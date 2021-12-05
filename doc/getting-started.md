@@ -12,7 +12,7 @@ If you are going to integrate ANTLR into your existing build system using mvn, a
 
 ### UNIX
 
-0. Install Java (version 1.7 or higher)
+0. Install Java (version 1.8 or higher)
 1. Download
 ```
 $ cd /usr/local/lib
@@ -38,7 +38,7 @@ $ alias grun='java -Xmx500M -cp "/usr/local/lib/antlr-4.9-complete.jar:$CLASSPAT
 
 (*Thanks to Graham Wideman*)
 
-0. Install Java (version 1.7 or higher)
+0. Install Java (version 1.8 or higher)
 1. Download antlr-4.9-complete.jar (or whatever version) from [https://www.antlr.org/download/](https://www.antlr.org/download/)
 Save to your directory for 3rd party Java libraries, say `C:\Javalib`
 2. Add `antlr-4.9-complete.jar` to CLASSPATH, either:

@@ -194,13 +194,13 @@ Uploaded: https://oss.sonatype.org/content/repositories/snapshots/org/antlr/antl
 The maven deploy lifecycle phased deploys the artifacts and the poms for the ANTLR project to the [sonatype remote staging server](https://oss.sonatype.org/content/repositories/snapshots/).
 
 ```bash
-export JAVA_HOME=`/usr/libexec/java_home -v 1.7`; mvn deploy -DskipTests
+export JAVA_HOME=`/usr/libexec/java_home -v1.8.0`; mvn deploy -DskipTests
 ```
 
-With JDK 1.7 (not 6 or 8), do this:
+With JDK 1.8, do this:
 
 ```bash
-export JAVA_HOME=`/usr/libexec/java_home -v 1.7`; mvn release:prepare -Darguments="-DskipTests"
+export JAVA_HOME=`/usr/libexec/java_home -v1.8.0`; mvn release:prepare -Darguments="-DskipTests"
 ```
 
 Hm...per https://github.com/keybase/keybase-issues/issues/1712 we need this to make gpg work:
@@ -209,27 +209,28 @@ Hm...per https://github.com/keybase/keybase-issues/issues/1712 we need this to m
 export GPG_TTY=$(tty)
 ```
 
-Side note to set jdk 1.7 on os x:
+Side note to set jdk 1.8 on os x:
 
 ```bash
-alias java="`/usr/libexec/java_home -v 1.7`/bin/java"
-alias javac="`/usr/libexec/java_home -v 1.7`/bin/javac"
-alias javadoc="`/usr/libexec/java_home -v 1.7`/bin/javadoc"
-alias jar="`/usr/libexec/java_home -v 1.7`/bin/jar"
-export JAVA_HOME=`/usr/libexec/java_home -v 1.7`
+alias javac8='`/usr/libexec/java_home -v1.8.0`/bin/javac'
+alias javac16='`/usr/libexec/java_home -v16`/bin/javac'
+alias java8='`/usr/libexec/java_home -v1.8.0`/bin/java'
+alias java16='`/usr/libexec/java_home -v16`/bin/java'
+
+export JAVA_HOME=$(/usr/libexec/java_home -v1.8.0)
 ```
 
 But I think just this on front of mvn works:
 
 ```
-export JAVA_HOME=`/usr/libexec/java_home -v 1.7`; mvn ...
+export JAVA_HOME=`/usr/libexec/java_home -v1.8.0`; mvn ...
 ```
 
-You should see 0x33 in generated .class files after 0xCAFEBABE; see [Java SE 7 = 51 (0x33 hex)](https://en.wikipedia.org/wiki/Java_class_file):
+You should see 0x34 in generated .class files after 0xCAFEBABE; see [Java SE 8 = 52 (0x34 hex)](https://en.wikipedia.org/wiki/Java_class_file):
 
 ```bash
 beast:/tmp/org/antlr/v4 $ od -h Tool.class |head -1
-0000000      feca    beba    0000    3300    fa04    0207    0ab8    0100
+0000000      feca    beba    0000    3400    d604    0007    0102    1100
 ```
 
 It will start out by asking you the version number:
