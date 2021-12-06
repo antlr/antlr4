@@ -1060,11 +1060,11 @@ void <parser.name>::<struct.name>::<if (method.isEnter)>enter<else>exit<endif>Ru
 
 VisitorDispatchMethodHeader(method) ::= <<
 
-virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
 >>
 VisitorDispatchMethod(method) ::=  <<
 
-antlrcpp::Any <parser.name>::<struct.name>::accept(tree::ParseTreeVisitor *visitor) {
+std::any <parser.name>::<struct.name>::accept(tree::ParseTreeVisitor *visitor) {
   if (auto parserVisitor = dynamic_cast\<<parser.grammarName>Visitor*>(visitor))
     return parserVisitor->visit<struct.derivedFromName; format="cap">(this);
   else
