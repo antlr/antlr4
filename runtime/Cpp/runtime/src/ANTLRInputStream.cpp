@@ -23,12 +23,8 @@ ANTLRInputStream::ANTLRInputStream() {
   InitializeInstanceFields();
 }
 
-ANTLRInputStream::ANTLRInputStream(const std::string_view &input): ANTLRInputStream() {
+ANTLRInputStream::ANTLRInputStream(std::string_view input): ANTLRInputStream() {
   load(input.data(), input.length());
-}
-
-ANTLRInputStream::ANTLRInputStream(const std::string &input): ANTLRInputStream() {
-  load(input.data(), input.size());
 }
 
 ANTLRInputStream::ANTLRInputStream(const char *data, size_t length) {
