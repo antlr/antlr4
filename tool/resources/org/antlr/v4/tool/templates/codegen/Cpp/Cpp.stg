@@ -456,7 +456,11 @@ RuleFunction(currentRule, args, code, locals, ruleCtx, altLabelCtxs, namedAction
   <namedActions.init>
   <locals; separator = "\n">
 
+#if __cplusplus > 201703L
   auto onExit = finally([=, this] {
+#else
+  auto onExit = finally([=] {
+#endif
   <finallyAction>
     exitRule();
   });
@@ -509,7 +513,11 @@ LeftRecursiveRuleFunction(currentRule, args, code, locals, ruleCtx, altLabelCtxs
     <namedActions.init>
 <! TODO: untested !>    <locals; separator = "\n">
 
+#if __cplusplus > 201703L
   auto onExit = finally([=, this] {
+#else
+  auto onExit = finally([=] {
+#endif
   <if (finallyAction)><finallyAction><endif>
     unrollRecursionContexts(parentContext);
   });
