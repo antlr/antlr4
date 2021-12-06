@@ -16,7 +16,7 @@
   <description>Maven plugin for ANTLR 4 grammars</description>
 
   <prerequisites>
-    <maven>3.1.1</maven>
+    <maven>3.8</maven>
   </prerequisites>
 
   <!-- Ancilliary information for completeness -->
