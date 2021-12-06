@@ -29,9 +29,8 @@ namespace antlr4 {
 
     ANTLRInputStream();
 
-    ANTLRInputStream(const std::string_view &input);
+    ANTLRInputStream(std::string_view input);
 
-    ANTLRInputStream(const std::string &input);
     ANTLRInputStream(const char *data, size_t length);
     ANTLRInputStream(std::istream &stream);
 
