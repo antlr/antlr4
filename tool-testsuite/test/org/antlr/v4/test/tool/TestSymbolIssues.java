@@ -392,11 +392,27 @@ public class TestSymbolIssues extends BaseJavaToolTest {
 				"TOKEN_RANGE_WITHOUT_COLLISION: '_' | [a-zA-Z];\n" +
 				"TOKEN_RANGE_WITH_ESCAPED_CHARS: [\\n-\\r] | '\\n'..'\\r';",
 
-				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4:2:18: chars 'a'..'f' used multiple times in set [aa-f]\n" +
-				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4:3:18: chars 'D'..'J' used multiple times in set [A-FD-J]\n" +
-				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4:4:13: chars 'O'..'V' used multiple times in set 'Z' | 'K'..'R' | 'O'..'V'\n" +
+				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4:2:18: chars a-f used multiple times in set [aa-f]\n" +
+				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4:3:18: chars D-J used multiple times in set [A-FD-J]\n" +
+				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4:4:13: chars O-V used multiple times in set 'Z' | 'K'..'R' | 'O'..'V'\n" +
 				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4::: chars 'g' used multiple times in set 'g'..'l'\n" +
 				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4::: chars '\\n' used multiple times in set '\\n'..'\\r'\n"
+		};
+
+		testErrors(test, false);
+	}
+
+	@Test public void testCaseInsensitiveCharsCollision() throws  Exception {
+		String[] test = {
+				"lexer grammar L;\n" +
+				"options { caseInsensitive = true; }\n" +
+				"TOKEN_RANGE:      [a-fA-F0-9];\n" +
+				"TOKEN_RANGE_2:    'g'..'l' | 'G'..'L';\n",
+
+				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4:3:18: chars a-f used multiple times in set [a-fA-F0-9]\n" +
+				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4:3:18: chars A-F used multiple times in set [a-fA-F0-9]\n" +
+				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4:4:13: chars g-l used multiple times in set 'g'..'l' | 'G'..'L'\n" +
+				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4:4:13: chars G-L used multiple times in set 'g'..'l' | 'G'..'L'\n"
 		};
 
 		testErrors(test, false);
@@ -432,6 +448,18 @@ public class TestSymbolIssues extends BaseJavaToolTest {
 				"warning(" + ErrorType.TOKEN_UNREACHABLE.code + "): Test.g4:12:0: One of the token TOKEN10 values unreachable. \\r\\n is always overlapped by token TOKEN10\n" +
 				"warning(" + ErrorType.TOKEN_UNREACHABLE.code + "): Test.g4:13:0: One of the token TOKEN11 values unreachable. \\r\\n is always overlapped by token TOKEN10\n" +
 				"warning(" + ErrorType.TOKEN_UNREACHABLE.code + "): Test.g4:13:0: One of the token TOKEN11 values unreachable. \\r\\n is always overlapped by token TOKEN10\n"
+		};
+
+		testErrors(test, false);
+	}
+
+	@Test public void testIllegalModeOption() throws  Exception {
+		String[] test = {
+				"lexer grammar L;\n" +
+				"options { caseInsensitive = badValue; }\n" +
+				"DEFAULT_TOKEN: [A-F]+;\n",
+
+				"warning(" + ErrorType.ILLEGAL_OPTION_VALUE.code + "): L.g4:2:28: unsupported option value caseInsensitive=badValue\n"
 		};
 
 		testErrors(test, false);

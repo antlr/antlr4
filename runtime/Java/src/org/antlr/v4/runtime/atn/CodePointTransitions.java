@@ -23,13 +23,8 @@ public abstract class CodePointTransitions {
 	 * If {@code codePoint} is <= U+FFFF, returns a new {@link AtomTransition}.
 	 * Otherwise, returns a new {@link SetTransition}.
 	 */
-	public static Transition createWithCodePoint(ATNState target, int codePoint) {
-		if (Character.isSupplementaryCodePoint(codePoint)) {
-			return new SetTransition(target, IntervalSet.of(codePoint));
-		}
-		else {
-			return new AtomTransition(target, codePoint);
-		}
+	public static Transition createWithCodePoint(ATNState target, int codePoint, boolean caseInsensitive) {
+		return createWithCodePointRange(target, codePoint, codePoint, caseInsensitive);
 	}
 
 	/**
@@ -40,13 +35,30 @@ public abstract class CodePointTransitions {
 	public static Transition createWithCodePointRange(
 			ATNState target,
 			int codePointFrom,
-			int codePointTo) {
-		if (Character.isSupplementaryCodePoint(codePointFrom) ||
-		    Character.isSupplementaryCodePoint(codePointTo)) {
-			return new SetTransition(target, IntervalSet.of(codePointFrom, codePointTo));
-		}
-		else {
-			return new RangeTransition(target, codePointFrom, codePointTo);
+			int codePointTo,
+			boolean caseInsensitive) {
+		if (caseInsensitive) {
+			int lowerCodePointFrom = Character.toLowerCase(codePointFrom);
+			int upperCodePointFrom = Character.toUpperCase(codePointFrom);
+			int lowerCodePointTo = Character.toLowerCase(codePointTo);
+			int upperCodePointTo = Character.toUpperCase(codePointTo);
+			if (lowerCodePointFrom == upperCodePointFrom && lowerCodePointTo == upperCodePointTo) {
+				return createWithCodePointRange(target, lowerCodePointFrom, lowerCodePointTo, false);
+			} else  {
+				IntervalSet intervalSet = new IntervalSet();
+				intervalSet.add(lowerCodePointFrom, lowerCodePointTo);
+				intervalSet.add(upperCodePointFrom, upperCodePointTo);
+				return new SetTransition(target, intervalSet);
+			}
+		} else {
+			if (Character.isSupplementaryCodePoint(codePointFrom) ||
+					Character.isSupplementaryCodePoint(codePointTo)) {
+				return new SetTransition(target, IntervalSet.of(codePointFrom, codePointTo));
+			} else {
+				return codePointFrom == codePointTo
+						? new AtomTransition(target, codePointFrom)
+						: new RangeTransition(target, codePointFrom, codePointTo);
+			}
 		}
 	}
 }

@@ -124,11 +124,11 @@ public class ATNOptimizer {
 				Transition newTransition;
 				if (matchSet.getIntervals().size() == 1) {
 					if (matchSet.size() == 1) {
-						newTransition = CodePointTransitions.createWithCodePoint(blockEndState, matchSet.getMinElement());
+						newTransition = CodePointTransitions.createWithCodePoint(blockEndState, matchSet.getMinElement(), false);
 					}
 					else {
 						Interval matchInterval = matchSet.getIntervals().get(0);
-						newTransition = CodePointTransitions.createWithCodePointRange(blockEndState, matchInterval.a, matchInterval.b);
+						newTransition = CodePointTransitions.createWithCodePointRange(blockEndState, matchInterval.a, matchInterval.b, false);
 					}
 				}
 				else {

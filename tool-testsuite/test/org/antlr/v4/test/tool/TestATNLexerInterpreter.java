@@ -380,6 +380,109 @@ public class TestATNLexerInterpreter extends BaseJavaToolTest {
 		checkLexerMatches(lg, "a", expecting);
 	}
 
+	@Test public void testLexerCaseInsensitive() throws Exception {
+		LexerGrammar lg = new LexerGrammar(
+			"lexer grammar L;\n" +
+			"\n" +
+			"options { caseInsensitive = true; }\n" +
+			"\n" +
+			"WS:             [ \\t\\r\\n] -> skip;\n" +
+			"\n" +
+			"SIMPLE_TOKEN:           'and';\n" +
+			"TOKEN_WITH_SPACES:      'as' 'd' 'f';\n" +
+			"TOKEN_WITH_DIGITS:      'INT64';\n" +
+			"TOKEN_WITH_UNDERSCORE:  'TOKEN_WITH_UNDERSCORE';\n" +
+			"BOOL:                   'true' | 'FALSE';\n" +
+			"SPECIAL:                '==';\n" +
+			"SET:                    [a-z0-9]+;\n" +   // [a-zA-Z0-9]
+			"RANGE:                  ('а'..'я')+;"
+			);
+
+		String inputString =
+			"and AND aND\n" +
+			"asdf ASDF\n" +
+			"int64\n" +
+			"token_WITH_underscore\n" +
+			"TRUE FALSE\n" +
+			"==\n" +
+			"A0bcDE93\n" +
+			"АБВабв\n";
+
+		String expecting = Utils.join(new String[] {
+			"SIMPLE_TOKEN", "SIMPLE_TOKEN", "SIMPLE_TOKEN",
+			"TOKEN_WITH_SPACES", "TOKEN_WITH_SPACES",
+			"TOKEN_WITH_DIGITS",
+			"TOKEN_WITH_UNDERSCORE",
+			"BOOL", "BOOL",
+			"SPECIAL",
+			"SET",
+			"RANGE",
+			"EOF"
+		},
+		", WS, ");
+
+		checkLexerMatches(lg, inputString, expecting);
+	}
+
+	@Test public void testLexerCaseInsensitiveWithNegation() throws  Exception {
+		String grammar =
+				"lexer grammar L;\n" +
+				"options { caseInsensitive = true; }\n" +
+				"TOKEN_WITH_NOT:   ~'f';\n";     // ~('f' | 'F)
+		execLexer("L.g4", grammar, "L", "F");
+
+		assertEquals("line 1:0 token recognition error at: 'F'\n", getParseErrors());
+	}
+
+	@Test public void testLexerCaseInsensitiveFragments() throws Exception {
+		LexerGrammar lg = new LexerGrammar(
+				"lexer grammar L;\n" +
+				"options { caseInsensitive = true; }\n" +
+				"TOKEN_0:         FRAGMENT 'd'+;\n" +
+				"TOKEN_1:         FRAGMENT 'e'+;\n" +
+				"FRAGMENT:        'abc';\n");
+
+		String inputString =
+				"ABCDDD";
+
+		String expecting = "TOKEN_0, EOF";
+
+		checkLexerMatches(lg, inputString, expecting);
+	}
+
+	@Test public void testLexerCaseInsensitiveWithDifferentCultures() throws Exception {
+		// From http://www.periodni.com/unicode_utf-8_encoding.html
+		LexerGrammar lg = new LexerGrammar(
+				"lexer grammar L;\n" +
+				"options { caseInsensitive = true; }\n" +
+				"ENGLISH_TOKEN:   [a-z]+;\n" +
+				"GERMAN_TOKEN:    [äéöüß]+;\n" +
+				"FRENCH_TOKEN:    [àâæ-ëîïôœùûüÿ]+;\n" +
+				"CROATIAN_TOKEN:  [ćčđšž]+;\n" +
+				"ITALIAN_TOKEN:   [àèéìòù]+;\n" +
+				"SPANISH_TOKEN:   [áéíñóúü¡¿]+;\n" +
+				"GREEK_TOKEN:     [α-ω]+;\n" +
+				"RUSSIAN_TOKEN:   [а-я]+;\n" +
+				"WS:              [ ]+ -> skip;"
+				);
+
+		String inputString = "abcXYZ äéöüßÄÉÖÜß àâæçÙÛÜŸ ćčđĐŠŽ àèéÌÒÙ áéÚÜ¡¿ αβγΧΨΩ абвЭЮЯ ";
+
+		String expecting = Utils.join(new String[] {
+				"ENGLISH_TOKEN",
+				"GERMAN_TOKEN",
+				"FRENCH_TOKEN",
+				"CROATIAN_TOKEN",
+				"ITALIAN_TOKEN",
+				"SPANISH_TOKEN",
+				"GREEK_TOKEN",
+				"RUSSIAN_TOKEN",
+				"EOF" },
+				", WS, ");
+
+		checkLexerMatches(lg, inputString, expecting);
+	}
+
 	protected void checkLexerMatches(LexerGrammar lg, String inputString, String expecting) {
 		ATN atn = createATN(lg, true);
 		CharStream input = CharStreams.fromString(inputString);

@@ -76,6 +76,8 @@ public class LexerATNFactory extends ParserATNFactory {
 
 	private List<String> ruleCommands = new ArrayList<String>();
 
+	private boolean caseInsensitive;
+
 	/**
 	 * Maps from an action index to a {@link LexerAction} object.
 	 */
@@ -89,6 +91,8 @@ public class LexerATNFactory extends ParserATNFactory {
 		super(g);
 		// use codegen to get correct language templates for lexer commands
 		String language = g.getOptionString("language");
+		String caseInsensitiveOption = g.getOptionString("caseInsensitive");
+		caseInsensitive = caseInsensitiveOption != null && caseInsensitiveOption.equals("true");
 		CodeGenerator gen = new CodeGenerator(g.tool, null, language);
 		codegenTemplates = gen.getTemplates();
 	}
@@ -257,7 +261,7 @@ public class LexerATNFactory extends ParserATNFactory {
 		int t1 = CharSupport.getCharValueFromGrammarCharLiteral(a.getText());
 		int t2 = CharSupport.getCharValueFromGrammarCharLiteral(b.getText());
 		checkRange(a, b, t1, t2);
-		left.addTransition(CodePointTransitions.createWithCodePointRange(right, t1, t2));
+		left.addTransition(CodePointTransitions.createWithCodePointRange(right, t1, t2, caseInsensitive));
 		a.atnState = left;
 		b.atnState = left;
 		return new Handle(left, right);
@@ -272,9 +276,8 @@ public class LexerATNFactory extends ParserATNFactory {
 			if ( t.getType()==ANTLRParser.RANGE ) {
 				int a = CharSupport.getCharValueFromGrammarCharLiteral(t.getChild(0).getText());
 				int b = CharSupport.getCharValueFromGrammarCharLiteral(t.getChild(1).getText());
-				if (checkRange((GrammarAST) t.getChild(0), (GrammarAST) t.getChild(1), a, b)) {
-					checkSetCollision(associatedAST, set, a, b);
-					set.add(a,b);
+				if (checkRange((GrammarAST)t.getChild(0), (GrammarAST)t.getChild(1), a, b)) {
+					checkRangeAndAddToSet(associatedAST, set, a, b, caseInsensitive);
 				}
 			}
 			else if ( t.getType()==ANTLRParser.LEXER_CHAR_SET ) {
@@ -283,8 +286,7 @@ public class LexerATNFactory extends ParserATNFactory {
 			else if ( t.getType()==ANTLRParser.STRING_LITERAL ) {
 				int c = CharSupport.getCharValueFromGrammarCharLiteral(t.getText());
 				if ( c != -1 ) {
-					checkSetCollision(associatedAST, set, c);
-					set.add(c);
+					checkCharAndAddToSet(associatedAST, set, c, caseInsensitive);
 				}
 				else {
 					g.tool.errMgr.grammarError(ErrorType.INVALID_LITERAL_IN_LEXER_SET,
@@ -303,7 +305,7 @@ public class LexerATNFactory extends ParserATNFactory {
 			Transition transition;
 			if (set.getIntervals().size() == 1) {
 				Interval interval = set.getIntervals().get(0);
-				transition = CodePointTransitions.createWithCodePointRange(right, interval.a, interval.b);
+				transition = CodePointTransitions.createWithCodePointRange(right, interval.a, interval.b, caseInsensitive);
 			}
 			else {
 				transition = new SetTransition(right, set);
@@ -340,6 +342,8 @@ public class LexerATNFactory extends ParserATNFactory {
 	 *  "fog" is treated as 'f' 'o' 'g' not as a single transition in
 	 *  the DFA.  Machine== o-'f'-&gt;o-'o'-&gt;o-'g'-&gt;o and has n+1 states
 	 *  for n characters.
+	 *  if "caseInsensitive" option is enabled, "fog" will be treated as
+	 *  o-('f'|'F') -> o-('o'|'O') -> o-('g'|'G')
 	 */
 	@Override
 	public Handle stringLiteral(TerminalAST stringLiteralAST) {
@@ -358,7 +362,7 @@ public class LexerATNFactory extends ParserATNFactory {
 		for (int i = 0; i < n; ) {
 			right = newState(stringLiteralAST);
 			int codePoint = s.codePointAt(i);
-			prev.addTransition(CodePointTransitions.createWithCodePoint(right, codePoint));
+			prev.addTransition(CodePointTransitions.createWithCodePoint(right, codePoint, caseInsensitive));
 			prev = right;
 			i += Character.charCount(codePoint);
 		}
@@ -466,10 +470,10 @@ public class LexerATNFactory extends ParserATNFactory {
 						state = CharSetParseState.ERROR;
 						break;
 					case CODE_POINT:
-						state = applyPrevStateAndMoveToCodePoint(charSetAST, set, state, escapeParseResult.codePoint);
+						state = applyPrevStateAndMoveToCodePoint(charSetAST, set, state, escapeParseResult.codePoint, caseInsensitive);
 						break;
 					case PROPERTY:
-						state = applyPrevStateAndMoveToProperty(charSetAST, set, state, escapeParseResult.propertyIntervalSet);
+						state = applyPrevStateAndMoveToProperty(charSetAST, set, state, escapeParseResult.propertyIntervalSet, caseInsensitive);
 						break;
 				}
 				offset = escapeParseResult.parseLength;
@@ -485,7 +489,7 @@ public class LexerATNFactory extends ParserATNFactory {
 				}
 			}
 			else {
-				state = applyPrevStateAndMoveToCodePoint(charSetAST, set, state, c);
+				state = applyPrevStateAndMoveToCodePoint(charSetAST, set, state, c, caseInsensitive);
 			}
 			i += offset;
 		}
@@ -493,7 +497,7 @@ public class LexerATNFactory extends ParserATNFactory {
 			return new IntervalSet();
 		}
 		// Whether or not we were in a range, we'll add the last code point found to the set.
-		applyPrevState(charSetAST, set, state);
+		applyPrevState(charSetAST, set, state, caseInsensitive);
 		return set;
 	}
 
@@ -501,7 +505,8 @@ public class LexerATNFactory extends ParserATNFactory {
 			GrammarAST charSetAST,
 			IntervalSet set,
 			CharSetParseState state,
-			int codePoint) {
+			int codePoint,
+			boolean caseInsensitive) {
 		if (state.inRange) {
 			if (state.prevCodePoint > codePoint) {
 				g.tool.errMgr.grammarError(
@@ -510,12 +515,11 @@ public class LexerATNFactory extends ParserATNFactory {
 						charSetAST.getToken(),
 						CharSupport.getRangeEscapedString(state.prevCodePoint, codePoint));
 			}
-			checkSetCollision(charSetAST, set, state.prevCodePoint, codePoint);
-			set.add(state.prevCodePoint, codePoint);
+			checkRangeAndAddToSet(charSetAST, set, state.prevCodePoint, codePoint, caseInsensitive);
 			state = CharSetParseState.NONE;
 		}
 		else {
-			applyPrevState(charSetAST, set, state);
+			applyPrevState(charSetAST, set, state, caseInsensitive);
 			state = new CharSetParseState(
 					CharSetParseState.Mode.PREV_CODE_POINT,
 					false,
@@ -529,14 +533,15 @@ public class LexerATNFactory extends ParserATNFactory {
 			GrammarAST charSetAST,
 			IntervalSet set,
 			CharSetParseState state,
-			IntervalSet property) {
+			IntervalSet property,
+			boolean caseInsensitive) {
 		if (state.inRange) {
 			g.tool.errMgr.grammarError(ErrorType.UNICODE_PROPERTY_NOT_ALLOWED_IN_RANGE,
 						   g.fileName, charSetAST.getToken(), charSetAST.getText());
 			return CharSetParseState.ERROR;
 		}
 		else {
-			applyPrevState(charSetAST, set, state);
+			applyPrevState(charSetAST, set, state, caseInsensitive);
 			state = new CharSetParseState(
 					CharSetParseState.Mode.PREV_PROPERTY,
 					false,
@@ -546,14 +551,13 @@ public class LexerATNFactory extends ParserATNFactory {
 		return state;
 	}
 
-	private void applyPrevState(GrammarAST charSetAST, IntervalSet set, CharSetParseState state) {
+	private void applyPrevState(GrammarAST charSetAST, IntervalSet set, CharSetParseState state, boolean caseInsensitive) {
 		switch (state.mode) {
 			case NONE:
 			case ERROR:
 				break;
 			case PREV_CODE_POINT:
-				checkSetCollision(charSetAST, set, state.prevCodePoint);
-				set.add(state.prevCodePoint);
+				checkCharAndAddToSet(charSetAST, set, state.prevCodePoint, caseInsensitive);
 				break;
 			case PREV_PROPERTY:
 				set.addAll(state.prevProperty);
@@ -561,37 +565,50 @@ public class LexerATNFactory extends ParserATNFactory {
 		}
 	}
 
-	protected void checkSetCollision(GrammarAST ast, IntervalSet set, int el) {
-		checkSetCollision(ast, set, el, el);
+	private void checkCharAndAddToSet(GrammarAST ast, IntervalSet set, int c, boolean caseInsensitive) {
+		checkRangeAndAddToSet(ast, set, c, c, caseInsensitive);
 	}
 
-	protected void checkSetCollision(GrammarAST ast, IntervalSet set, int a, int b) {
-		for (int i = a; i <= b; i++) {
-			if (set.contains(i)) {
-				String setText;
-				if (ast.getChildren() == null) {
-					setText = ast.getText();
-				}
-				else {
-					StringBuilder sb = new StringBuilder();
-					for (Object child : ast.getChildren()) {
-						if (child instanceof RangeAST) {
-							sb.append(((RangeAST) child).getChild(0).getText());
-							sb.append("..");
-							sb.append(((RangeAST) child).getChild(1).getText());
-						}
-						else {
-							sb.append(((GrammarAST)child).getText());
-						}
-						sb.append(" | ");
-					}
-					sb.replace(sb.length() - 3, sb.length(), "");
-					setText = sb.toString();
-				}
-				g.tool.errMgr.grammarError(ErrorType.CHARACTERS_COLLISION_IN_SET, g.fileName, ast.getToken(),
-						CharSupport.getRangeEscapedString(a, b), setText);
-				break;
+	private void checkRangeAndAddToSet(GrammarAST ast, IntervalSet set, int a, int b, boolean caseInsensitive) {
+		if (caseInsensitive) {
+			int lowerA = Character.toLowerCase(a);
+			int upperA = Character.toUpperCase(a);
+			int lowerB = Character.toLowerCase(b);
+			int upperB = Character.toUpperCase(b);
+			if (lowerA == upperA && upperB == lowerB) {
+				checkRangeAndAddToSet(ast, set, a, b, false);
+			} else {
+				checkRangeAndAddToSet(ast, set, lowerA, lowerB, false);
+				checkRangeAndAddToSet(ast, set, upperA, upperB, false);
 			}
+		} else {
+			for (int i = a; i <= b; i++) {
+				if (set.contains(i)) {
+					String setText;
+					if (ast.getChildren() == null) {
+						setText = ast.getText();
+					} else {
+						StringBuilder sb = new StringBuilder();
+						for (Object child : ast.getChildren()) {
+							if (child instanceof RangeAST) {
+								sb.append(((RangeAST) child).getChild(0).getText());
+								sb.append("..");
+								sb.append(((RangeAST) child).getChild(1).getText());
+							}
+							else {
+								sb.append(((GrammarAST)child).getText());
+							}
+							sb.append(" | ");
+						}
+						sb.replace(sb.length() - 3, sb.length(), "");
+						setText = sb.toString();
+					}
+					g.tool.errMgr.grammarError(ErrorType.CHARACTERS_COLLISION_IN_SET, g.fileName, ast.getToken(),
+							(char)a + "-" + (char)b, setText);
+					break;
+				}
+			}
+			set.add(a, b);
 		}
 	}
 
