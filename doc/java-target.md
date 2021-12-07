@@ -150,7 +150,7 @@ Edit the pom.xml file. Now we need to extensively modify the pom.xml file. The f
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.1</version>
         <configuration>
-          <source>1.7</source>
+          <source>1.8</source>
           <target>1.7</target>
         </configuration>
       </plugin>

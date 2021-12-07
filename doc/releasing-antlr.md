@@ -191,16 +191,18 @@ Uploaded: https://oss.sonatype.org/content/repositories/snapshots/org/antlr/antl
 
 ## Maven release
 
+We've moved to java 8 level source as of 4.9.4, although we still generate binary class files for java 7 if you are using that target.
+
 The maven deploy lifecycle phased deploys the artifacts and the poms for the ANTLR project to the [sonatype remote staging server](https://oss.sonatype.org/content/repositories/snapshots/).
 
 ```bash
-export JAVA_HOME=`/usr/libexec/java_home -v 1.7`; mvn deploy -DskipTests
+export JAVA_HOME=`/usr/libexec/java_home -v1.8.0`; mvn deploy -DskipTests
 ```
 
-With JDK 1.7 (not 6 or 8), do this:
+Then:
 
 ```bash
-export JAVA_HOME=`/usr/libexec/java_home -v 1.7`; mvn release:prepare -Darguments="-DskipTests"
+export JAVA_HOME=`/usr/libexec/java_home -v1.8.0`; mvn release:prepare -Darguments="-DskipTests"
 ```
 
 Hm...per https://github.com/keybase/keybase-issues/issues/1712 we need this to make gpg work:
@@ -209,23 +211,23 @@ Hm...per https://github.com/keybase/keybase-issues/issues/1712 we need this to m
 export GPG_TTY=$(tty)
 ```
 
-Side note to set jdk 1.7 on os x:
+Side note to set jdk 1.8 on os x:
 
 ```bash
-alias java="`/usr/libexec/java_home -v 1.7`/bin/java"
-alias javac="`/usr/libexec/java_home -v 1.7`/bin/javac"
-alias javadoc="`/usr/libexec/java_home -v 1.7`/bin/javadoc"
-alias jar="`/usr/libexec/java_home -v 1.7`/bin/jar"
-export JAVA_HOME=`/usr/libexec/java_home -v 1.7`
+alias javac8='`/usr/libexec/java_home -v1.8.0`/bin/javac'
+alias javac16='`/usr/libexec/java_home -v16`/bin/javac'
+alias java8='`/usr/libexec/java_home -v1.8.0`/bin/java'
+alias java16='`/usr/libexec/java_home -v16`/bin/java'
+export JAVA_HOME=$(/usr/libexec/java_home -v1.8.0)
 ```
 
 But I think just this on front of mvn works:
 
 ```
-export JAVA_HOME=`/usr/libexec/java_home -v 1.7`; mvn ...
+export JAVA_HOME=`/usr/libexec/java_home -v1.8.0`; mvn ...
 ```
 
-You should see 0x33 in generated .class files after 0xCAFEBABE; see [Java SE 7 = 51 (0x33 hex)](https://en.wikipedia.org/wiki/Java_class_file):
+Since we still generate java 7 class files, you should see 0x33 in generated .class files after 0xCAFEBABE; see [Java SE 7 = 51 (0x33 hex)](https://en.wikipedia.org/wiki/Java_class_file):
 
 ```bash
 beast:/tmp/org/antlr/v4 $ od -h Tool.class |head -1
