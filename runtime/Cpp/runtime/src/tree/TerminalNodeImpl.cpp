@@ -33,7 +33,7 @@ misc::Interval TerminalNodeImpl::getSourceInterval() {
   return misc::Interval(tokenIndex, tokenIndex);
 }
 
-antlrcpp::Any TerminalNodeImpl::accept(ParseTreeVisitor *visitor) {
+std::any TerminalNodeImpl::accept(ParseTreeVisitor *visitor) {
   return visitor->visitTerminal(this);
 }
 
