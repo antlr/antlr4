@@ -36,13 +36,13 @@ if [ $rc == 0 ]; then
   # run java tests
   cd runtime-testsuite/
   if [ $GROUP == "LEXER" ]; then
-      mvn -e -q -Dgroups="org.antlr.v4.test.runtime.category.LexerTests" -Dtest="swift.*" test
+      mvn -e -q -Dgroups="org.antlr.v4.test.runtime.category.LexerTests" -Dtest="swift.**" test
   elif [ $GROUP == "PARSER" ]; then
-      mvn -e -q -Dgroups="org.antlr.v4.test.runtime.category.ParserTests" -Dtest="swift.*" test
+      mvn -e -q -Dgroups="org.antlr.v4.test.runtime.category.ParserTests" -Dtest="swift.**" test
   elif [ $GROUP == "RECURSION" ]; then
-      mvn -e -q -Dgroups="org.antlr.v4.test.runtime.category.LeftRecursionTests" -Dtest="swift.*" test
+      mvn -e -q -Dgroups="org.antlr.v4.test.runtime.category.LeftRecursionTests" -Dtest="swift.**" test
   else
-      mvn -e -q -Dtest=swift.* test
+      mvn -e -q -Dtest=swift.** test
   fi
   rc=$?
   cat target/surefire-reports/*.dumpstream || true
