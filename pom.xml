@@ -25,7 +25,11 @@
 		<url>http://www.antlr.org</url>
 	</organization>
 
-	<licenses>
+    <prerequisites>
+        <maven>3.8</maven>
+    </prerequisites>
+
+    <licenses>
 		<license>
 			<name>The BSD License</name>
 			<url>http://www.antlr.org/license.html</url>
@@ -133,7 +137,7 @@
 		<plugins>
 			<plugin>
 				<artifactId>maven-clean-plugin</artifactId>
-				<version>3.0.0</version>
+				<version>3.1.0</version>
 				<configuration>
 					<filesets>
 						<fileset>
