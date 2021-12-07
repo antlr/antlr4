@@ -71,10 +71,6 @@ namespace dfa {
     /// Return a list of all states in this DFA, ordered by state number.
     virtual std::vector<DFAState *> getStates() const;
 
-    /**
-     * @deprecated Use {@link #toString(Vocabulary)} instead.
-     */
-    virtual std::string toString(const std::vector<std::string>& tokenNames);
     std::string toString(const Vocabulary &vocabulary) const;
 
     virtual std::string toLexerString();
