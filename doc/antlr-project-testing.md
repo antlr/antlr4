@@ -157,7 +157,7 @@ Running org.antlr.v4.test.runtime.cpp.TestCompositeLexers
 
 ```bash
 $ cd runtime-testsuite
-$ mvn -Dtest=java.* test
+$ mvn -Dtest=java.** test
 ...
 ```
 
