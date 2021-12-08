@@ -24,7 +24,6 @@
 
   <properties>
     <mavenVersion>3.8.4</mavenVersion>
-    <takariLifecycleVersion>2.0.7</takariLifecycleVersion>
   </properties>
 
   <!-- ============================================================================= -->
@@ -102,6 +101,16 @@
       <artifactId>maven-project</artifactId>
       <version>2.2.1</version>
     </dependency>
+      <dependency>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-api</artifactId>
+          <version>1.7.32</version>
+      </dependency>
+      <dependency>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-simple</artifactId>
+          <version>1.7.32</version>
+      </dependency>
   </dependencies>
 
   <build>
@@ -143,7 +152,6 @@
       <plugin>
          <groupId>io.takari.maven.plugins</groupId>
          <artifactId>takari-lifecycle-plugin</artifactId>
-         <version>${takariLifecycleVersion}</version>
          <extensions>true</extensions>
          <executions>
            <execution>
