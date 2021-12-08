@@ -7,7 +7,7 @@ Most programmers do not need the information on this page because they will simp
 
 I will assume that the root directory is `/tmp` for the purposes of explaining how to build ANTLR in this document.
 
-*As of 4.6, ANTLR tool and Java-target runtime requires Java 7.*
+*As of 4.6, ANTLR tool and Java-target runtime requires Java 7. As of 4.9.4, we have verified that the tool itself builds with Java 8 and 11.*
 
 # Get the source
 
@@ -43,7 +43,7 @@ $ if [[ "$?" != "0" ]]; then sudo apt install -y maven; fi
 
 # Compile
 
-The current maven build seems complicated to me because there is a dependency of the project on itself. The runtime tests naturally depend on the current version being available but it won't compile without the current version.  Once you have the generated/installed jar, mvn builds but otherwise there's a dependency on what you are going to build:
+The current maven build seems complicated to me because there is a dependency of the project on itself. The runtime tests naturally depend on the current version being available but it won't compile without the current version.  Once you have the generated/installed jar, mvn builds but otherwise there's a dependency on what you are going to build.  You will get this error when you try to clean but you can ignore it:
 
 ```
 [INFO] ANTLR 4 Runtime Tests (2nd generation) ............. FAILURE [  0.073 s]
@@ -51,27 +51,19 @@ The current maven build seems complicated to me because there is a dependency of
 [ERROR] Plugin org.antlr:antlr4-maven-plugin:4.9.4-SNAPSHOT or one of its dependencies could not be resolved: Could not find artifact org.antlr:antlr4-maven-plugin:jar:4.9.4-SNAPSHOT -> [Help 1]
 ```
 
-So, I have found that from a wiped out repository cache, the following series of commands builds the tools in the right sequence so that the final install actually works:
+To be super squeaky clean, you can wipe out the repository cache, then do the build:
 
 ```
 $ export MAVEN_OPTS="-Xmx1G"   # don't forget this on linux
 cd /tmp/antlr4 # or wherever you have the software
 rm -rf ~/.m2/repository/org/antlr*
 mvn clean
-mvn -pl .,tool,runtime/Java,antlr4-maven-plugin install
-mvn -pl runtime-testsuite/annotations,runtime-testsuite/processors install
-mvn -DskipTests -pl runtime-testsuite install
 mvn -DskipTests install
 ```
 
 **NOTE:** We do `install` not `compile` as tool tests and such refer to modules that must be pulled from the maven install local cache.
 
- Once you have completed this process once and there is a jar hanging around in the repository cache, then you can just do this from the main antlr4 directory:
-
-``` 
-mvn clean
-mvn -DskipTests install
-```
+Once you have completed this process once and there is a jar hanging around in the repository cache.
 
 # Installing libs to mvn cache locally
 
