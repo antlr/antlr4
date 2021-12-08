@@ -16,7 +16,11 @@
 	<name>ANTLR 4 Runtime Test Processors</name>
 	<description>The ANTLR 4 Runtime</description>
 
-	<dependencies>
+    <prerequisites>
+        <maven>3.8</maven>
+    </prerequisites>
+
+    <dependencies>
 		<dependency>
 			<groupId>com.github.olivergondza</groupId>
 			<artifactId>maven-jdk-tools-wrapper</artifactId>
