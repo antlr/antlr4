@@ -7,10 +7,6 @@
 
 #include "dfa/DFAState.h"
 
-namespace antlrcpp {
-  class SingleWriteMultipleReadLock;
-}
-
 namespace antlr4 {
 namespace dfa {
 
@@ -66,7 +62,7 @@ namespace dfa {
      * @throws IllegalStateException if this is not a precedence DFA.
      * @see #isPrecedenceDfa()
      */
-    void setPrecedenceStartState(int precedence, DFAState *startState, antlrcpp::SingleWriteMultipleReadLock &lock);
+    void setPrecedenceStartState(int precedence, DFAState *startState, std::shared_mutex &lock);
 
     /// Return a list of all states in this DFA, ordered by state number.
     virtual std::vector<DFAState *> getStates() const;

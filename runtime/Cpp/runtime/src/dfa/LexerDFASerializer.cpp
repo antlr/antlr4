@@ -9,7 +9,7 @@
 
 using namespace antlr4::dfa;
 
-LexerDFASerializer::LexerDFASerializer(DFA *dfa) : DFASerializer(dfa, Vocabulary::EMPTY_VOCABULARY) {
+LexerDFASerializer::LexerDFASerializer(DFA *dfa) : DFASerializer(dfa, Vocabulary()) {
 }
 
 LexerDFASerializer::~LexerDFASerializer() {
