@@ -2,6 +2,10 @@
 
 set -euo pipefail
 
+pushd runtime/Cpp
+ctest
+popd
+
 pushd runtime-testsuite
   echo "running maven tests..."
   if [ $GROUP == "LEXER" ]; then
