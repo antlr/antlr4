@@ -12,19 +12,17 @@ import org.antlr.v4.test.runtime.CommentHasStringValue;
 public class ListenersDescriptors {
 	public static class Basic extends BaseParserTestDescriptor {
 		public String input = "1 2";
-		/**
+		public String output = """
 		(a 1 2)
 		1
 		2
-		 */
-		@CommentHasStringValue
-		public String output;
+""";
 
 		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 
 		 <ImportListener("T")>
@@ -44,30 +42,26 @@ public class ListenersDescriptors {
 		 INT : [0-9]+ ;
 		 ID  : [a-z]+ ;
 		 WS : [ \t\n]+ -> skip ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
 	public static class LR extends BaseParserTestDescriptor {
 		public String input = "1+2*3";
-		/**
+		public String output = """
 		(e (e 1) + (e (e 2) * (e 3)))
 		1
 		2
 		3
 		2 3 2
 		1 2 1
-		 */
-		@CommentHasStringValue
-		public String output;
+""";
 
 		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 
 		 <ImportListener("T")>
@@ -88,29 +82,25 @@ public class ListenersDescriptors {
 		 INT : [0-9]+ ;
 		 ID  : [a-z]+ ;
 		 WS : [ \t\n]+ -> skip ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
 	public static class LRWithLabels extends BaseParserTestDescriptor {
 		public String input = "1(2,3)";
-		/**
+		public String output = """
 		(e (e 1) ( (eList (e 2) , (e 3)) ))
 		1
 		2
 		3
 		1 [13 6]
-		 */
-		@CommentHasStringValue
-		public String output;
+""";
 
 		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 
 		 <ImportListener("T")>
@@ -131,9 +121,7 @@ public class ListenersDescriptors {
 		 INT : [0-9]+ ;
 		 ID  : [a-z]+ ;
 		 WS : [ \t\n]+ -> skip ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -142,7 +130,7 @@ public class ListenersDescriptors {
 		public String startRule = "s";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 
 		 <ImportListener("T")>
@@ -163,30 +151,24 @@ public class ListenersDescriptors {
 		 INT : [0-9]+ ;
 		 ID  : [a-z]+ ;
 		 WS : [ \t\n]+ -> skip ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
 	public static class RuleGetters_1 extends RuleGetters {
 		public String input = "1 2";
-		/**
+		public String output = """
 		(a (b 1) (b 2))
 		1 2 1
-		 */
-		@CommentHasStringValue
-		public String output;
+""";
 	}
 
 	public static class RuleGetters_2 extends RuleGetters {
 		public String input = "abc";
-		/**
+		public String output = """
 		(a (b abc))
 		abc
-		 */
-		@CommentHasStringValue
-		public String output;
+""";
 	}
 
 	public static abstract class TokenGetters extends BaseParserTestDescriptor {
@@ -194,7 +176,7 @@ public class ListenersDescriptors {
 		public String startRule = "s";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 
 		 <ImportListener("T")>
@@ -214,29 +196,23 @@ public class ListenersDescriptors {
 		 INT : [0-9]+ ;
 		 ID  : [a-z]+ ;
 		 WS : [ \t\n]+ -> skip ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
 	public static class TokenGetters_1 extends TokenGetters {
 		public String input = "1 2";
-		/**
+		public String output = """
 		(a 1 2)
 		1 2 [1, 2]
-		 */
-		@CommentHasStringValue
-		public String output;
+""";
 	}
 
 	public static class TokenGetters_2 extends TokenGetters {
 		public String input = "abc";
-		/**
+		public String output = """
 		(a abc)
 		[@0,0:2='abc',<4>,1:0]
-		 */
-		@CommentHasStringValue
-		public String output;
+""";
 	}
 }

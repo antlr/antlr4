@@ -21,21 +21,17 @@ public class CompositeParsersDescriptors {
 		public String startRule = "s";
 		public String grammarName = "M";
 
-		/**
+		public String grammar = """
 		 grammar M;
 		 import S;
 		 s : a ;
 		 WS : (' '|'\n') -> skip ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
-		/**
+		public String slaveGrammarS = """
 		parser grammar S;
 		a : '=' 'a' {<write("\"S.a\"")>};
-		 */
-		@CommentHasStringValue
-		public String slaveGrammarS;
+""";
 
 		@Override
 		public List<Pair<String, String>> getSlaveGrammars() {
@@ -53,23 +49,19 @@ public class CompositeParsersDescriptors {
 		public String startRule = "s";
 		public String grammarName = "M";
 
-		/**
+		public String grammar = """
 		 grammar M;
 		 import S;
 		 s : x INT;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
-		/**
+		public String slaveGrammarS = """
 		parser grammar S;
 		tokens { A, B, C }
 		x : 'x' INT {<writeln("\"S.x\"")>};
 		INT : '0'..'9'+ ;
 		WS : (' '|'\n') -> skip ;
-		 */
-		@CommentHasStringValue
-		public String slaveGrammarS;
+""";
 
 		@Override
 		public List<Pair<String, String>> getSlaveGrammars() {
@@ -82,18 +74,16 @@ public class CompositeParsersDescriptors {
 
 	public static class DelegatesSeeSameTokenType extends BaseCompositeParserTestDescriptor {
 		public String input = "aa";
-		/**
+		public String output = """
 		S.x
 		T.y
-		 */
-		@CommentHasStringValue
-		public String output;
+""";
 
 		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "M";
 
-		/**
+		public String grammar = """
 		 // The lexer will create rules to match letters a, b, c.
 		 // The associated token types A, B, C must have the same value
 		 // and all import'd parsers.  Since ANTLR regenerates all imports
@@ -111,24 +101,18 @@ public class CompositeParsersDescriptors {
 		 A : 'a' ;
 		 C : 'c' ;
 		 WS : (' '|'\n') -> skip ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
-		/**
+		public String slaveGrammarT = """
 		parser grammar T;
 		tokens { C, B, A } // reverse order
 		y : A {<writeln("\"T.y\"")>};
-		 */
-		@CommentHasStringValue
-		public String slaveGrammarT;
-		/**
+""";
+		public String slaveGrammarS = """
 		parser grammar S;
 		tokens { A, B, C }
 		x : A {<writeln("\"S.x\"")>};
-		 */
-		@CommentHasStringValue
-		public String slaveGrammarS;
+""";
 
 		@Override
 		public List<Pair<String, String>> getSlaveGrammars() {
@@ -147,24 +131,20 @@ public class CompositeParsersDescriptors {
 		public String startRule = "s";
 		public String grammarName = "M";
 
-		/**
+		public String grammar = """
 		 grammar M; // uses no rules from the import
 		 import S;
 		 s : 'b' {<Invoke_foo()>} ; // gS is import pointer
 		 WS : (' '|'\n') -> skip ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
-		/**
+		public String slaveGrammarS = """
 		parser grammar S;
 		@parser::members {
 		<Declare_foo()>
 		}
 		a : B;
-		 */
-		@CommentHasStringValue
-		public String slaveGrammarS;
+""";
 
 		@Override
 		public List<Pair<String, String>> getSlaveGrammars() {
@@ -182,22 +162,18 @@ public class CompositeParsersDescriptors {
 		public String startRule = "s";
 		public String grammarName = "M";
 
-		/**
+		public String grammar = """
 		 grammar M;
 		 import S;
 		 s : a ;
 		 B : 'b' ; // defines B from inherited token space
 		 WS : (' '|'\n') -> skip ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
-		/**
+		public String slaveGrammarS = """
 		parser grammar S;
 		a : B {<writeln("\"S.a\"")>};
-		 */
-		@CommentHasStringValue
-		public String slaveGrammarS;
+""";
 
 		@Override
 		public List<Pair<String, String>> getSlaveGrammars() {
@@ -215,22 +191,18 @@ public class CompositeParsersDescriptors {
 		public String startRule = "s";
 		public String grammarName = "M";
 
-		/**
+		public String grammar = """
 		 grammar M;
 		 import S;
 		 s : label=a[3] {<writeln("$label.y")>} ;
 		 B : 'b' ; // defines B from inherited token space
 		 WS : (' '|'\n') -> skip ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
-		/**
+		public String slaveGrammarS = """
 		parser grammar S;
 		a[int x] returns [int y] : B {<write("\"S.a\"")>} {$y=1000;} ;
-		 */
-		@CommentHasStringValue
-		public String slaveGrammarS;
+""";
 
 		@Override
 		public List<Pair<String, String>> getSlaveGrammars() {
@@ -248,22 +220,18 @@ public class CompositeParsersDescriptors {
 		public String startRule = "s";
 		public String grammarName = "M";
 
-		/**
+		public String grammar = """
 		 grammar M;
 		 import S;
 		 s : a {<write("$a.text")>} ;
 		 B : 'b' ; // defines B from inherited token space
 		 WS : (' '|'\n') -> skip ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
-		/**
+		public String slaveGrammarS = """
 		parser grammar S;
 		a : B {<write("\"S.a\"")>} ;
-		 */
-		@CommentHasStringValue
-		public String slaveGrammarS;
+""";
 
 		@Override
 		public List<Pair<String, String>> getSlaveGrammars() {
@@ -281,29 +249,23 @@ public class CompositeParsersDescriptors {
 		public String startRule = "s";
 		public String grammarName = "M";
 
-		/**
+		public String grammar = """
 		 grammar M;
 		 import S,T;
 		 s : a ;
 		 B : 'b' ; // defines B from inherited token space
 		 WS : (' '|'\n') -> skip ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
-		/**
+		public String slaveGrammarT = """
 		parser grammar T;
 		a : B {<writeln("\"T.a\"")>};<! hidden by S.a !>
-		 */
-		@CommentHasStringValue
-		public String slaveGrammarT;
-		/**
+""";
+		public String slaveGrammarS = """
 		parser grammar S;
 		a : b {<writeln("\"S.a\"")>};
 		b : B;
-		 */
-		@CommentHasStringValue
-		public String slaveGrammarS;
+""";
 
 		@Override
 		public List<Pair<String, String>> getSlaveGrammars() {
@@ -322,22 +284,18 @@ public class CompositeParsersDescriptors {
 		public String startRule = "a";
 		public String grammarName = "M";
 
-		/**
+		public String grammar = """
 		 grammar M;
 		 import S;
 		 b : 'b'|'c';
 		 WS : (' '|'\n') -> skip ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
-		/**
+		public String slaveGrammarS = """
 		parser grammar S;
 		a : b {<write("\"S.a\"")>};
 		b : B ;
-		 */
-		@CommentHasStringValue
-		public String slaveGrammarS;
+""";
 
 		@Override
 		public List<Pair<String, String>> getSlaveGrammars() {
@@ -350,40 +308,32 @@ public class CompositeParsersDescriptors {
 
 	public static class DelegatorRuleOverridesDelegates extends BaseCompositeParserTestDescriptor {
 		public String input = "c";
-		/**
+		public String output = """
 		M.b
 		S.a
-		 */
-		@CommentHasStringValue
-		public String output;
+""";
 
 		public String errors = null;
 		public String startRule = "a";
 		public String grammarName = "M";
 
-		/**
+		public String grammar = """
 		 grammar M;
 		 import S, T;
 		 b : 'b'|'c' {<writeln("\"M.b\"")>}|B|A;
 		 WS : (' '|'\n') -> skip ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
-		/**
+		public String slaveGrammarT = """
 		parser grammar T;
 		tokens { A }
 		b : 'b' {<writeln("\"T.b\"")>};
-		 */
-		@CommentHasStringValue
-		public String slaveGrammarT;
-		/**
+""";
+		public String slaveGrammarS = """
 		parser grammar S;
 		a : b {<writeln("\"S.a\"")>};
 		b : 'b' ;
-		 */
-		@CommentHasStringValue
-		public String slaveGrammarS;
+""";
 
 		@Override
 		public List<Pair<String, String>> getSlaveGrammars() {
@@ -402,7 +352,7 @@ public class CompositeParsersDescriptors {
 		public String startRule = "prog";
 		public String grammarName = "M";
 
-		/**
+		public String grammar = """
 		 grammar M;
 		 import S;
 		 prog : decl ;
@@ -410,19 +360,15 @@ public class CompositeParsersDescriptors {
 		 ID  : 'a'..'z'+ ;
 		 INT : '0'..'9'+ ;
 		 WS : (' '|'\n') -> skip;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
-		/**
+		public String slaveGrammarS = """
 		parser grammar S;
 		type_ : 'int' ;
 		decl : type_ ID ';'
 			| type_ ID init_ ';' {<AppendStr("\"JavaDecl: \"","$text"):writeln()>};
 		init_ : '=' INT;
-		 */
-		@CommentHasStringValue
-		public String slaveGrammarS;
+""";
 
 		@Override
 		public List<Pair<String, String>> getSlaveGrammars() {
@@ -445,19 +391,16 @@ public class CompositeParsersDescriptors {
 		public String startRule = "program";
 		public String grammarName = "Test";
 
-		/**
+		public String grammar = """
 		 grammar Test;
 		 import Unicode;
 
 		 program : 'test' 'test';
 
 		 WS : (UNICODE_CLASS_Zs)+ -> skip;
+""";
 
-		 */
-		@CommentHasStringValue
-		public String grammar;
-
-		/**
+		public String slaveGrammarUnicode = """
 		lexer grammar Unicode;
 
 		fragment
@@ -465,10 +408,7 @@ public class CompositeParsersDescriptors {
 		                    | '\u2000'..'\u200A'
 		                    | '\u202F' | '\u205F' | '\u3000'
 		                    ;
-
-		 */
-		@CommentHasStringValue
-		public String slaveGrammarUnicode;
+""";
 
 		@Override
 		public List<Pair<String, String>> getSlaveGrammars() {
@@ -486,23 +426,19 @@ public class CompositeParsersDescriptors {
 		public String startRule = "s";
 		public String grammarName = "M";
 
-		/**
+		public String grammar = """
 		 grammar M;
 		 import S;
 		 s : a ;
 		 B : 'b' ;
 		 WS : (' '|'\n') -> skip ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
-		/**
+		public String slaveGrammarS = """
 		parser grammar S;
 		options {}
 		a : B ;
-		 */
-		@CommentHasStringValue
-		public String slaveGrammarS;
+""";
 
 		@Override
 		public List<Pair<String, String>> getSlaveGrammars() {
@@ -520,22 +456,18 @@ public class CompositeParsersDescriptors {
 		public String startRule = "s";
 		public String grammarName = "M";
 
-		/**
+		public String grammar = """
 		 grammar M;
 		 import S;
 		 s : a;
 		 B : 'b';
 		 WS : (' '|'\n') -> skip ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
-		/**
+		public String slaveGrammarS = """
 		parser grammar S;
 		a @after {<InitIntVar("x","0")>} : B;
-		 */
-		@CommentHasStringValue
-		public String slaveGrammarS;
+""";
 
 		@Override
 		public List<Pair<String, String>> getSlaveGrammars() {
@@ -548,33 +480,27 @@ public class CompositeParsersDescriptors {
 
 	public static class KeywordVSIDOrder extends BaseCompositeParserTestDescriptor {
 		public String input = "abc";
-		/**
+		public String output = """
 		M.A
 		M.a: [@0,0:2='abc',<1>,1:0]
-		 */
-		@CommentHasStringValue
-		public String output;
+""";
 
 		public String errors = null;
 		public String startRule = "a";
 		public String grammarName = "M";
 
-		/**
+		public String grammar = """
 		 grammar M;
 		 import S;
 		 a : A {<Append("\"M.a: \"","$A"):writeln()>};
 		 A : 'abc' {<writeln("\"M.A\"")>};
 		 WS : (' '|'\n') -> skip ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
-		/**
+		public String slaveGrammarS = """
 		lexer grammar S;
 		ID : 'a'..'z'+;
-		 */
-		@CommentHasStringValue
-		public String slaveGrammarS;
+""";
 
 		@Override
 		public List<Pair<String, String>> getSlaveGrammars() {

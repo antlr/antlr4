@@ -17,7 +17,7 @@ public class ParseTreesDescriptors {
 		public String startRule = "s";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 
 		 options { contextSuperClass=MyRuleNode; }
@@ -40,9 +40,7 @@ public class ParseTreesDescriptors {
 		   ;
 		 b : 'e' {} | 'y'
 		   ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -53,7 +51,7 @@ public class ParseTreesDescriptors {
 		public String startRule = "s";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 s
 		 @init {
@@ -67,10 +65,7 @@ public class ParseTreesDescriptors {
 		   ;
 		 Z : 'z'
 		   ;
-
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -83,7 +78,7 @@ public class ParseTreesDescriptors {
 		public String startRule = "s";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 
 		 s
@@ -106,9 +101,7 @@ public class ParseTreesDescriptors {
 		 WHITESPACE : [ \n\t\r]+ -> channel(HIDDEN) ;
 
 		 ERROR : . ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 		@Override
 		public boolean ignore(String targetName) {
@@ -123,7 +116,7 @@ public class ParseTreesDescriptors {
 		public String startRule = "s";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 s
 		 @init {
@@ -137,10 +130,7 @@ public class ParseTreesDescriptors {
 		   ;
 		 Z : 'z'
 		   ;
-
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -151,7 +141,7 @@ public class ParseTreesDescriptors {
 		public String startRule = "s";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 s
 		 @init {
@@ -165,9 +155,7 @@ public class ParseTreesDescriptors {
 		   ;
 		 b : 'y'
 		   ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -178,7 +166,7 @@ public class ParseTreesDescriptors {
 		public String startRule = "s";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 s
 		 @init {
@@ -192,9 +180,7 @@ public class ParseTreesDescriptors {
 		   ;
 		 Z : 'z'
 		   ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -205,7 +191,7 @@ public class ParseTreesDescriptors {
 		public String startRule = "s";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 s
 		 @init {
@@ -217,26 +203,22 @@ public class ParseTreesDescriptors {
 		   : r=a ;
 		 a : 'x' 'y'
 		   ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
 	public static class TokenAndRuleContextString extends BaseParserTestDescriptor {
 		public String input = "x";
-		/**
+		public String output = """
 		[a, s]
 		(a x)
-		 */
-		@CommentHasStringValue
-		public String output;
+""";
 
 		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 s
 		 @init {
@@ -249,9 +231,7 @@ public class ParseTreesDescriptors {
 		 a : 'x' {
 		 <RuleInvocationStack():writeln()>
 		 } ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -262,7 +242,7 @@ public class ParseTreesDescriptors {
 		public String startRule = "s";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 s
 		 @init {
@@ -274,9 +254,7 @@ public class ParseTreesDescriptors {
 		   : r=a ;
 		 a : ('x' | 'y')* 'z'
 		   ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -287,7 +265,7 @@ public class ParseTreesDescriptors {
 		public String startRule = "s";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 s
 		 @init {
@@ -299,9 +277,7 @@ public class ParseTreesDescriptors {
 		   : r=a ;
 		 a : 'x' | 'y'
 		   ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 }

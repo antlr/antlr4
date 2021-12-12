@@ -42,11 +42,12 @@ def update(filename, java):
 
 for filename in glob.glob("*.java"):
 # for filename in glob.glob("SetsDescriptors.java"):
-    print(filename)
+    output_filename = output_dir+"/"+filename
+    print(filename+"->"+output_filename)
     with open(filename, "r", encoding='UTF-8') as f:
         java = f.read()
     java_ = update(filename, java)
     # os.unlink("/tmp/output")
     # os.mkdir("/tmp/output")
-    with open(output_dir+filename, "w", encoding='UTF-8') as f:
+    with open(output_filename, "w", encoding='UTF-8') as f:
         f.write(java_)

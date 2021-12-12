@@ -12,44 +12,38 @@ import org.antlr.v4.test.runtime.CommentHasStringValue;
 public class FullContextParsingDescriptors {
 	public static class AmbigYieldsCtxSensitiveDFA extends BaseDiagnosticParserTestDescriptor {
 		public String input = "abc";
-		/**
+		public String output = """
 		Decision 0:
 		s0-ID->:s1^=>1
-		 */
-		@CommentHasStringValue
-		public String output;
+""";
 
 		public String errors = "line 1:0 reportAttemptingFullContext d=0 (s), input='abc'\n";
 		public String startRule = "s";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 s @after {<DumpDFA()>}
 		 	: ID | ID {} ;
 		 ID : 'a'..'z'+;
 		 WS : (' '|'\t'|'\n')+ -> skip ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 	}
 
 	public static class AmbiguityNoLoop extends BaseDiagnosticParserTestDescriptor {
 		public String input = "a@";
 		public String output = "alt 1\n";
-		/**
+		public String errors = """
 		line 1:2 reportAttemptingFullContext d=0 (prog), input='a@'
 		line 1:2 reportAmbiguity d=0 (prog): ambigAlts={1, 2}, input='a@'
 		line 1:2 reportAttemptingFullContext d=1 (expr), input='a@'
 		line 1:2 reportContextSensitivity d=1 (expr), input='a@'
-		 */
-		@CommentHasStringValue
-		public String errors;
+""";
 
 		public String startRule = "prog";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 prog
 		 @init {<LL_EXACT_AMBIG_DETECTION()>}
@@ -62,34 +56,28 @@ public class FullContextParsingDescriptors {
 		 	;
 		 ID  : [a-z]+ ;
 		 WS  : [ \r\n\t]+ -> skip ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 	}
 
 	public static class CtxSensitiveDFATwoDiffInput extends BaseDiagnosticParserTestDescriptor {
 		public String input = "$ 34 abc @ 34 abc";
-		/**
+		public String output = """
 		Decision 2:
 		s0-INT->s1
 		s1-ID->:s2^=>1
-		 */
-		@CommentHasStringValue
-		public String output;
+""";
 
-		/**
+		public String errors = """
 		line 1:5 reportAttemptingFullContext d=2 (e), input='34abc'
 		line 1:2 reportContextSensitivity d=2 (e), input='34'
 		line 1:14 reportAttemptingFullContext d=2 (e), input='34abc'
 		line 1:14 reportContextSensitivity d=2 (e), input='34abc'
-		 */
-		@CommentHasStringValue
-		public String errors;
+""";
 
 		public String startRule = "s";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 s @after {<DumpDFA()>}
 		   : ('$' a | '@' b)+ ;
@@ -99,9 +87,7 @@ public class FullContextParsingDescriptors {
 		 ID : 'a'..'z'+ ;
 		 INT : '0'..'9'+ ;
 		 WS : (' '|'\t'|'\n')+ -> skip ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -109,7 +95,7 @@ public class FullContextParsingDescriptors {
 		public String startRule = "s";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 s @after {<DumpDFA()>}
 		   : '$' a | '@' b ;
@@ -119,54 +105,44 @@ public class FullContextParsingDescriptors {
 		 ID : 'a'..'z'+ ;
 		 INT : '0'..'9'+ ;
 		 WS : (' '|'\t'|'\n')+ -> skip ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
 	public static class CtxSensitiveDFA_1 extends CtxSensitiveDFA {
 		public String input = "$ 34 abc";
-		/**
+		public String output = """
 		Decision 1:
 		s0-INT->s1
 		s1-ID->:s2^=>1
-		 */
-		@CommentHasStringValue
-		public String output;
+""";
 
-		/**
+		public String errors = """
 		line 1:5 reportAttemptingFullContext d=1 (e), input='34abc'
 		line 1:2 reportContextSensitivity d=1 (e), input='34'
-		 */
-		@CommentHasStringValue
-		public String errors;
+""";
 
 	}
 
 	public static class CtxSensitiveDFA_2 extends CtxSensitiveDFA {
 		public String input = "@ 34 abc";
-		/**
+		public String output = """
 		Decision 1:
 		s0-INT->s1
 		s1-ID->:s2^=>1
-		 */
-		@CommentHasStringValue
-		public String output;
+""";
 
-		/**
+		public String errors = """
 		line 1:5 reportAttemptingFullContext d=1 (e), input='34abc'
 		line 1:5 reportContextSensitivity d=1 (e), input='34abc'
-		 */
-		@CommentHasStringValue
-		public String errors;
+""";
 	}
 
 	public static abstract class ExprAmbiguity extends BaseDiagnosticParserTestDescriptor {
 		public String startRule = "s";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 s
 		 @init {<LL_EXACT_AMBIG_DETECTION()>}
@@ -180,34 +156,27 @@ public class FullContextParsingDescriptors {
 		 		;
 		 ID  : [a-zA-Z]+ ;
 		 WS  : [ \r\n\t]+ -> skip ;
-
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 	}
 
 	public static class ExprAmbiguity_1 extends ExprAmbiguity {
 		public String input = "a+b";
 		public String output = "(expr a + (expr b))\n";
-		/**
+		public String errors = """
 		line 1:1 reportAttemptingFullContext d=1 (expr), input='+'
 		line 1:2 reportContextSensitivity d=1 (expr), input='+b'
-		 */
-		@CommentHasStringValue
-		public String errors;
+""";
 	}
 
 	public static class ExprAmbiguity_2 extends ExprAmbiguity {
 		public String input = "a+b*c";
 		public String output = "(expr a + (expr b * (expr c)))\n";
-		/**
+		public String errors = """
 		line 1:1 reportAttemptingFullContext d=1 (expr), input='+'
 		line 1:2 reportContextSensitivity d=1 (expr), input='+b'
 		line 1:3 reportAttemptingFullContext d=1 (expr), input='*'
 		line 1:5 reportAmbiguity d=1 (expr): ambigAlts={1, 2}, input='*c'
-		 */
-		@CommentHasStringValue
-		public String errors;
+""";
 	}
 
 	public static abstract class FullContextIF_THEN_ELSEParse extends BaseDiagnosticParserTestDescriptor {
@@ -215,7 +184,7 @@ public class FullContextParsingDescriptors {
 		public String startRule = "s";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 s
 		 @init {<LL_EXACT_AMBIG_DETECTION()>}
@@ -226,126 +195,98 @@ public class FullContextParsingDescriptors {
 		 		;
 		 ID : 'a'..'z'+ ;
 		 WS : (' '|'\t'|'\n')+ -> skip ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
 	public static class FullContextIF_THEN_ELSEParse_1 extends FullContextIF_THEN_ELSEParse {
 		public String input = "{ if x then return }";
-		/**
+		public String output = """
 		Decision 1:
 		s0-'}'->:s1=>2
-		 */
-		@CommentHasStringValue
-		public String output;
+""";
 	}
 
 	public static class FullContextIF_THEN_ELSEParse_2 extends FullContextIF_THEN_ELSEParse {
 		public String input = "{ if x then return else foo }";
-		/**
+		public String output = """
 		Decision 1:
 		s0-'else'->:s1^=>1
-		 */
-		@CommentHasStringValue
-		public String output;
+""";
 
-		/**
+		public String errors = """
 		line 1:19 reportAttemptingFullContext d=1 (stat), input='else'
 		line 1:19 reportContextSensitivity d=1 (stat), input='else'
-		 */
-		@CommentHasStringValue
-		public String errors;
+""";
 	}
 
 	public static class FullContextIF_THEN_ELSEParse_3 extends FullContextIF_THEN_ELSEParse {
 		public String input = "{ if x then if y then return else foo }";
-		/**
+		public String output = """
 		Decision 1:
 		s0-'}'->:s2=>2
 		s0-'else'->:s1^=>1
-		 */
-		@CommentHasStringValue
-		public String output;
+""";
 
-		/**
+		public String errors = """
 		line 1:29 reportAttemptingFullContext d=1 (stat), input='else'
 		line 1:38 reportAmbiguity d=1 (stat): ambigAlts={1, 2}, input='elsefoo}'
-		 */
-		@CommentHasStringValue
-		public String errors;
+""";
 	}
 
 	public static class FullContextIF_THEN_ELSEParse_4 extends FullContextIF_THEN_ELSEParse {
 		public String input = "{ if x then if y then return else foo else bar }";
-		/**
+		public String output = """
 		Decision 1:
 		s0-'else'->:s1^=>1
-		 */
-		@CommentHasStringValue
-		public String output;
+""";
 
-		/**
+		public String errors = """
 		line 1:29 reportAttemptingFullContext d=1 (stat), input='else'
 		line 1:38 reportContextSensitivity d=1 (stat), input='elsefooelse'
 		line 1:38 reportAttemptingFullContext d=1 (stat), input='else'
 		line 1:38 reportContextSensitivity d=1 (stat), input='else'
-		 */
-		@CommentHasStringValue
-		public String errors;
+""";
 	}
 
 	public static class FullContextIF_THEN_ELSEParse_5 extends FullContextIF_THEN_ELSEParse {
-		/**
+		public String input = """
 		{ if x then return else foo
 		if x then if y then return else foo }
-		 */
-		@CommentHasStringValue
-		public String input;
+""";
 
-		/**
+		public String output = """
 		Decision 1:
 		s0-'}'->:s2=>2
 		s0-'else'->:s1^=>1
-		 */
-		@CommentHasStringValue
-		public String output;
+""";
 
-		/**
+		public String errors = """
 		line 1:19 reportAttemptingFullContext d=1 (stat), input='else'
 		line 1:19 reportContextSensitivity d=1 (stat), input='else'
 		line 2:27 reportAttemptingFullContext d=1 (stat), input='else'
 		line 2:36 reportAmbiguity d=1 (stat): ambigAlts={1, 2}, input='elsefoo}'
-		 */
-		@CommentHasStringValue
-		public String errors;
+""";
 	}
 
 	public static class FullContextIF_THEN_ELSEParse_6 extends FullContextIF_THEN_ELSEParse {
-		/**
+		public String input = """
 		{ if x then return else foo
 		if x then if y then return else foo }
-		 */
-		@CommentHasStringValue
-		public String input;
+""";
 
-		/**
+		public String output = """
 		Decision 1:
 		s0-'}'->:s2=>2
 		s0-'else'->:s1^=>1
-		 */
-		@CommentHasStringValue
-		public String output;
+""";
 
-		/**
+		public String errors = """
 		line 1:19 reportAttemptingFullContext d=1 (stat), input='else'
 		line 1:19 reportContextSensitivity d=1 (stat), input='else'
 		line 2:27 reportAttemptingFullContext d=1 (stat), input='else'
 		line 2:36 reportAmbiguity d=1 (stat): ambigAlts={1, 2}, input='elsefoo}'
-		 */
-		@CommentHasStringValue
-		public String errors;
+""";
 	}
 
 	/*
@@ -355,17 +296,15 @@ public class FullContextParsingDescriptors {
 	public static class LoopsSimulateTailRecursion extends BaseDiagnosticParserTestDescriptor {
 		public String input = "a(i)<-x";
 		public String output = "pass: a(i)<-x\n";
-		/**
+		public String errors = """
 		line 1:3 reportAttemptingFullContext d=3 (expr_primary), input='a(i)'
 		line 1:7 reportAmbiguity d=3 (expr_primary): ambigAlts={2, 3}, input='a(i)<-x'
-		 */
-		@CommentHasStringValue
-		public String errors;
+""";
 
 		public String startRule = "prog";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 prog
 		 @init {<LL_EXACT_AMBIG_DETECTION()>}
@@ -381,33 +320,27 @@ public class FullContextParsingDescriptors {
 		 	| ID
 		 	;
 		 ID  : [a-z]+ ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
 	public static class SLLSeesEOFInLLGrammar extends BaseDiagnosticParserTestDescriptor {
 		public String input = "34 abc";
-		/**
+		public String output = """
 		Decision 0:
 		s0-INT->s1
 		s1-ID->:s2^=>1
-		 */
-		@CommentHasStringValue
-		public String output;
+""";
 
-		/**
+		public String errors = """
 		line 1:3 reportAttemptingFullContext d=0 (e), input='34abc'
 		line 1:0 reportContextSensitivity d=0 (e), input='34'
-		 */
-		@CommentHasStringValue
-		public String errors;
+""";
 
 		public String startRule = "s";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 s @after {<DumpDFA()>}
 		   : a;
@@ -417,9 +350,7 @@ public class FullContextParsingDescriptors {
 		 ID : 'a'..'z'+ ;
 		 INT : '0'..'9'+ ;
 		 WS : (' '|'\t'|'\n')+ -> skip ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 }

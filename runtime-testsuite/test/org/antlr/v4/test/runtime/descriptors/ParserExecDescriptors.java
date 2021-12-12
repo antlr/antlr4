@@ -17,16 +17,14 @@ public class ParserExecDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 a : ID+ {
 		 <writeln("$text")>
 		 };
 		 ID : 'a'..'z'+;
 		 WS : (' '|'\n') -> skip;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -37,16 +35,14 @@ public class ParserExecDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 a : ID* {
 		 <writeln("$text")>
 		 };
 		 ID : 'a'..'z'+;
 		 WS : (' '|'\n') -> skip;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -57,16 +53,14 @@ public class ParserExecDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 a : ID* {
 		 <writeln("$text")>
 		 };
 		 ID : 'a'..'z'+;
 		 WS : (' '|'\n') -> skip;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -77,16 +71,14 @@ public class ParserExecDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 a : (ID|ID)+ {
 		 <writeln("$text")>
 		 };
 		 ID : 'a'..'z'+;
 		 WS : (' '|'\n') -> skip;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -97,16 +89,14 @@ public class ParserExecDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 a : (ID|ID)* {
 		 <writeln("$text")>
 		 };
 		 ID : 'a'..'z'+;
 		 WS : (' '|'\n') -> skip;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -117,16 +107,14 @@ public class ParserExecDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 a : (ID|ID)* {
 		 <writeln("$text")>
 		 };
 		 ID : 'a'..'z'+;
 		 WS : (' '|'\n') -> skip;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -137,7 +125,7 @@ public class ParserExecDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 a : ID {
 		 <writeln("\"alt 1\"")>
@@ -147,9 +135,7 @@ public class ParserExecDescriptors {
 		 ID : 'a'..'z'+ ;
 		 INT : '0'..'9'+;
 		 WS : (' '|'\\n') -> skip ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -160,7 +146,7 @@ public class ParserExecDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 a : (ID|INT{
 		 })+ {
@@ -169,9 +155,7 @@ public class ParserExecDescriptors {
 		 ID : 'a'..'z'+ ;
 		 INT : '0'..'9'+;
 		 WS : (' '|'\\n') -> skip ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -182,7 +166,7 @@ public class ParserExecDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 a : (ID|INT{
 		 })* {
@@ -191,9 +175,7 @@ public class ParserExecDescriptors {
 		 ID : 'a'..'z'+ ;
 		 INT : '0'..'9'+;
 		 WS : (' '|'\\n') -> skip ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -204,7 +186,7 @@ public class ParserExecDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 a : (ID|INT{
 		 })* {
@@ -213,9 +195,7 @@ public class ParserExecDescriptors {
 		 ID : 'a'..'z'+ ;
 		 INT : '0'..'9'+;
 		 WS : (' '|'\\n') -> skip ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -226,7 +206,7 @@ public class ParserExecDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 a : ID INT {
 		 <writeln("$text")>
@@ -234,13 +214,12 @@ public class ParserExecDescriptors {
 		 ID : 'a'..'z'+ ;
 		 INT : '0'..'9'+;
 		 WS : (' '|'\n') -> skip;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
-	/** Match assignments, ignore other tokens with wildcard. */
+	public String grammar = """
+ Match assignments, ignore other tokens with wildcard. */
 	public static class Wildcard extends BaseParserTestDescriptor {
 		public String input = "x=10; abc;;;; y=99;";
 		public String output = "x=10;\ny=99;\n";
@@ -248,7 +227,7 @@ public class ParserExecDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		grammar T;
 		a : (assign|.)+ EOF ;
 		assign : ID '=' INT ';' {
@@ -257,12 +236,10 @@ public class ParserExecDescriptors {
 		ID : 'a'..'z'+ ;
 		INT : '0'..'9'+;
 		WS : (' '|'\n') -> skip;
-		*/
-		@CommentHasStringValue
-		public String grammar;
+""";
 	}
 
-	/**
+	public String output = """
 	 * This test ensures that {@link org.antlr.v4.runtime.atn.ParserATNSimulator} does not produce a
 	 * {@link StackOverflowError} when it encounters an {@code EOF} transition
 	 * inside a closure.
@@ -274,30 +251,26 @@ public class ParserExecDescriptors {
 		public String startRule = "prog";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 prog : stat EOF;
 		 stat : 'x' ('y' | EOF)*?;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
 	public static class IfIfElseGreedyBinding1 extends BaseParserTestDescriptor {
 		public String input = "if y if y x else x";
-		/**
+		public String output = """
 		if y x else x
 		if y if y x else x
-		 */
-		@CommentHasStringValue
-		public String output;
+""";
 
 		public String errors = null;
 		public String startRule = "start";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 start : statement+ ;
 		 statement : 'x' | ifStatement;
@@ -306,26 +279,22 @@ public class ParserExecDescriptors {
 		 };
 		 ID : 'a'..'z'+ ;
 		 WS : (' '|'\n') -> channel(HIDDEN);
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
 	public static class IfIfElseGreedyBinding2 extends BaseParserTestDescriptor {
 		public String input = "if y if y x else x";
-		/**
+		public String output = """
 		if y x else x
 		if y if y x else x
-		 */
-		@CommentHasStringValue
-		public String output;
+""";
 
 		public String errors = null;
 		public String startRule = "start";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 start : statement+ ;
 		 statement : 'x' | ifStatement;
@@ -334,26 +303,22 @@ public class ParserExecDescriptors {
 		 };
 		 ID : 'a'..'z'+ ;
 		 WS : (' '|'\n') -> channel(HIDDEN);
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
 	public static class IfIfElseNonGreedyBinding1 extends BaseParserTestDescriptor {
 		public String input = "if y if y x else x";
-		/**
+		public String output = """
 		if y x
 		if y if y x else x
-		 */
-		@CommentHasStringValue
-		public String output;
+""";
 
 		public String errors = null;
 		public String startRule = "start";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 start : statement+ ;
 		 statement : 'x' | ifStatement;
@@ -362,26 +327,22 @@ public class ParserExecDescriptors {
 		 };
 		 ID : 'a'..'z'+ ;
 		 WS : (' '|'\n') -> channel(HIDDEN);
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
 	public static class IfIfElseNonGreedyBinding2 extends BaseParserTestDescriptor {
 		public String input = "if y if y x else x";
-		/**
+		public String grammar = """
 		if y x
 		if y if y x else x
-		 */
-		@CommentHasStringValue
-		public String output;
+""";
 
 		public String errors = null;
 		public String startRule = "start";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 start : statement+ ;
 		 statement : 'x' | ifStatement;
@@ -390,9 +351,7 @@ public class ParserExecDescriptors {
 		 };
 		 ID : 'a'..'z'+ ;
 		 WS : (' '|'\n') -> channel(HIDDEN);
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -403,7 +362,7 @@ public class ParserExecDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String output = """
 		 grammar T;
 		 a : (ID|{}INT)? {
 		 <writeln("$text")>
@@ -411,9 +370,7 @@ public class ParserExecDescriptors {
 		 ID : 'a'..'z'+;
 		 INT : '0'..'9'+ ;
 		 WS : (' '|'\n') -> skip;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -424,7 +381,7 @@ public class ParserExecDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 a : (ID|{}INT)? {
 		 <writeln("$text")>
@@ -432,31 +389,27 @@ public class ParserExecDescriptors {
 		 ID : 'a'..'z'+;
 		 INT : '0'..'9'+ ;
 		 WS : (' '|'\n') -> skip;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
-	/**
+	public String grammar = """
 	 * This is a regression test for antlr/antlr4#195 "label 'label' type
 	 * mismatch with previous definition: TOKEN_LABEL!=RULE_LABEL"
 	 * https://github.com/antlr/antlr4/issues/195
 	 */
 	public static class LabelAliasingAcrossLabeledAlternatives extends BaseParserTestDescriptor {
 		public String input = "xy";
-		/**
+		public String grammar = """
 		x
 		y
-		 */
-		@CommentHasStringValue
-		public String output;
+""";
 
 		public String errors = null;
 		public String startRule = "start";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 start : a* EOF;
 		 a
@@ -465,9 +418,7 @@ public class ParserExecDescriptors {
 		   ;
 		 subrule : 'x';
 		 WS : (' '|'\n') -> skip ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -478,20 +429,18 @@ public class ParserExecDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 a : b1=b b2+=b* b3+=';' ;
 		 b : id_=ID val+=INT*;
 		 ID : 'a'..'z'+ ;
 		 INT : '0'..'9'+;
 		 WS : (' '|'\n') -> skip ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
-	/**
+	public String grammar = """
 	 * This is a regression test for antlr/antlr4#299 "Repeating subtree not
 	 * accessible in visitor".
 	 * https://github.com/antlr/antlr4/issues/299
@@ -503,7 +452,7 @@ public class ParserExecDescriptors {
 		public String startRule = "expression";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 ifStatement
 		 @after {
@@ -524,13 +473,11 @@ public class ParserExecDescriptors {
 		 expression : 'a' ;
 		 executableStatement : 'a' ;
 		 elseStatement : 'a' ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
-	/**
+	public String grammar = """
 	 * This is a regression test for #270 "Fix operator += applied to a set of
 	 * tokens".
 	 * https://github.com/antlr/antlr4/issues/270
@@ -542,7 +489,7 @@ public class ParserExecDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 a : b b* ';' ;
 		 b : ID val+=(INT | FLOAT)*;
@@ -550,13 +497,11 @@ public class ParserExecDescriptors {
 		 INT : '0'..'9'+;
 		 FLOAT : [0-9]+ '.' [0-9]+;
 		 WS : (' '|'\n') -> skip ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
-	/**
+	public String grammar = """
 	 * This test ensures that {@link ParserATNSimulator} produces a correct
 	 * result when the grammar contains multiple explicit references to
 	 * {@code EOF} inside of parser rules.
@@ -568,16 +513,14 @@ public class ParserExecDescriptors {
 		public String startRule = "prog";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 prog : ('x' | 'x' 'y') EOF EOF;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
-	/**
+	public String grammar = """
 	 * This test is meant to detect regressions of bug antlr/antlr4#41.
 	 * https://github.com/antlr/antlr4/issues/41
 	 */
@@ -588,14 +531,12 @@ public class ParserExecDescriptors {
 		public String startRule = "stat";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 stat : ifstat | 'x';
 		 ifstat : 'if' stat ('else' stat)?;
 		 WS : [ \n\t]+ -> skip ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -606,14 +547,12 @@ public class ParserExecDescriptors {
 		public String startRule = "stat";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 stat : ifstat | 'x';
 		 ifstat : 'if' stat ('else' stat)?;
 		 WS : [ \n\t]+ -> skip ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -624,14 +563,12 @@ public class ParserExecDescriptors {
 		public String startRule = "stat";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 stat : ifstat | 'x';
 		 ifstat : 'if' stat ('else' stat)?;
 		 WS : [ \n\t]+ -> skip ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -642,14 +579,12 @@ public class ParserExecDescriptors {
 		public String startRule = "stat";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 stat : ifstat | 'x';
 		 ifstat : 'if' stat ('else' stat)?;
 		 WS : [ \n\t]+ -> skip ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -665,20 +600,18 @@ public class ParserExecDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 <ParserPropertyMember()>
 		 a : {<ParserPropertyCall({$parser}, "Property()")>}? ID {<writeln("\"valid\"")>}
 		   ;
 		 ID : 'a'..'z'+ ;
 		 WS : (' '|'\n') -> skip ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
-	/**
+	public String grammar = """
 	 * This test is meant to test the expected solution to antlr/antlr4#42.
 	 * https://github.com/antlr/antlr4/issues/42
 	 */
@@ -689,7 +622,7 @@ public class ParserExecDescriptors {
 		public String startRule = "s";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 s : stmt EOF ;
 		 stmt : ifStmt | ID;
@@ -697,9 +630,7 @@ public class ParserExecDescriptors {
 		 ELSE : 'else';
 		 ID : [a-zA-Z]+;
 		 WS : [ \\n\\t]+ -> skip;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -729,9 +660,7 @@ public class ParserExecDescriptors {
 		 A : 'a'|'A';
 		 B : 'b'|'B';
 		 WS      : [ \r\t\n]+ -> skip;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -753,9 +682,7 @@ public class ParserExecDescriptors {
 		 ID : 'a'..'z'+ ;
 		 ATN : '0'..'9'+;
 		 WS : (' '|'\n') -> skip ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -772,9 +699,7 @@ public class ParserExecDescriptors {
 		 ID : 'a'..'z'+ ;
 		 ATN : '0'..'9'+;
 		 WS : (' '|'\n') -> skip ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 	}
 
 	/**
@@ -798,9 +723,7 @@ public class ParserExecDescriptors {
 		 OPT3 : 'OPT-3';
 
 		 WS : (' '|'\n')+ -> channel(HIDDEN);
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 	}
 
 	/**
@@ -824,9 +747,7 @@ public class ParserExecDescriptors {
 		 OPT3 : 'OPT-3';
 
 		 WS : (' '|'\n')+ -> channel(HIDDEN);
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 	}
 
 	/**
@@ -850,9 +771,7 @@ public class ParserExecDescriptors {
 		 OPT3 : 'OPT-3';
 
 		 WS : (' '|'\n')+ -> channel(HIDDEN);
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 	}
 
 	/**
@@ -885,9 +804,7 @@ public class ParserExecDescriptors {
 		 | expr AT X
 		 | expr AT Y
 		 ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 	}
 
 	/**
@@ -913,8 +830,6 @@ public class ParserExecDescriptors {
 		 <writeln("$text")>
 		 };
 		 WS : (' '|'\n') -> skip;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 	}
 }

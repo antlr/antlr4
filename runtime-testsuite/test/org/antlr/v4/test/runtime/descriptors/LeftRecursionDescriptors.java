@@ -15,7 +15,7 @@ public class LeftRecursionDescriptors {
 		public String startRule = "prog";
 		public String grammarName = "Expr";
 
-		/**
+		public String grammar = """
 		 grammar Expr;
 		 prog:   stat ;
 		 stat:   expr NEWLINE                # printExpr
@@ -37,9 +37,7 @@ public class LeftRecursionDescriptors {
 		 INT :   [0-9]+ ;         // match integers
 		 NEWLINE:'\r'? '\n' ;     // return newlines to parser (is end-statement signal)
 		 WS  :   [ \t]+ -> skip ; // toss out whitespace
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 	}
 
 	public static class AmbigLR_1 extends AmbigLR {
@@ -72,7 +70,7 @@ public class LeftRecursionDescriptors {
 		public String startRule = "s";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 s @after {<ToStringTree("$ctx"):writeln()>} : declarator EOF ; // must indicate EOF can follow
 		 declarator
@@ -87,9 +85,7 @@ public class LeftRecursionDescriptors {
 		 ID : 'a'..'z'+ ;
 		 INT : '0'..'9'+ ;
 		 WS : (' '|'\n') -> skip ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -100,7 +96,7 @@ public class LeftRecursionDescriptors {
 		public String startRule = "s";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 s @after {<ToStringTree("$ctx"):writeln()>} : declarator EOF ; // must indicate EOF can follow
 		 declarator
@@ -115,9 +111,7 @@ public class LeftRecursionDescriptors {
 		 ID : 'a'..'z'+ ;
 		 INT : '0'..'9'+ ;
 		 WS : (' '|'\n') -> skip ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -176,16 +170,14 @@ public class LeftRecursionDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 a @after {<ToStringTree("$ctx"):writeln()>} : a ID
 		   | ID
 		   ;
 		 ID : 'a'..'z'+ ;
 		 WS : (' '|'\n') -> skip ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -209,7 +201,7 @@ public class LeftRecursionDescriptors {
 		public String startRule = "s";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 s @after {<ToStringTree("$ctx"):writeln()>} : e EOF ; // must indicate EOF can follow
 		 e : e '.' ID
@@ -223,9 +215,7 @@ public class LeftRecursionDescriptors {
 		 ID : 'a'..'z'+ ;
 		 INT : '0'..'9'+ ;
 		 WS : (' '|'\n') -> skip ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -269,7 +259,7 @@ public class LeftRecursionDescriptors {
 		public String startRule = "s";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 s @after {<ToStringTree("$ctx"):writeln()>} : e EOF ; // must indicate EOF can follow
 		 expressionList
@@ -327,9 +317,7 @@ public class LeftRecursionDescriptors {
 		 ID  : ('a'..'z'|'A'..'Z'|'_'|'$')+;
 		 INT : '0'..'9'+ ;
 		 WS  : (' '|'\n') -> skip ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -398,7 +386,7 @@ public class LeftRecursionDescriptors {
 		public String startRule = "s";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 s @after {<ToStringTree("$ctx"):writeln()>} : e;
 		 e : a=e op=('*'|'/') b=e  {}
@@ -407,9 +395,7 @@ public class LeftRecursionDescriptors {
 		   ;
 		 INT : '0'..'9'+ ;
 		 WS : (' '|'\n') -> skip ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -438,7 +424,7 @@ public class LeftRecursionDescriptors {
 		public String startRule = "s";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 s @after {<ToStringTree("$ctx"):writeln()>} : e ;
 		 e : a=e op=('*'|'/') b=e  {}{<True()>}?
@@ -448,9 +434,7 @@ public class LeftRecursionDescriptors {
 		   ;
 		 INT : '0'..'9'+ ;
 		 WS : (' '|'\n') -> skip;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -479,7 +463,7 @@ public class LeftRecursionDescriptors {
 		public String startRule = "s";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 s @after {<ToStringTree("$ctx"):writeln()>} : e ;
 		 e : a=e op=('*'|'/') b=e  {}{}
@@ -488,9 +472,7 @@ public class LeftRecursionDescriptors {
 		   ;
 		 INT : '0'..'9'+ ;
 		 WS : (' '|'\n') -> skip ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -521,7 +503,7 @@ public class LeftRecursionDescriptors {
 		public String grammarName = "T";
 		public String errors = null;
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 s : e {<writeln("$e.v")>};
 		 e returns [int v]
@@ -538,9 +520,7 @@ public class LeftRecursionDescriptors {
 		 INC : '++' ;
 		 DEC : '--' ;
 		 WS : (' '|'\n') -> skip;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -564,13 +544,14 @@ public class LeftRecursionDescriptors {
 		public String output = "12\n";
 	}
 
-	/** Test for https://github.com/antlr/antlr4/issues/1295 in addition to #433. */
+	public String grammar = """
+ Test for https://github.com/antlr/antlr4/issues/1295 in addition to #433. */
 	public static class MultipleAlternativesWithCommonLabel_5 extends MultipleAlternativesWithCommonLabel {
 		public String input = "(99)+3";
 		public String output = "102\n";
 	}
 
-	/**
+	public String grammar = """
 	 * This is a regression test for antlr/antlr4#509 "Incorrect rule chosen in
 	 * unambiguous grammar".
 	 * https://github.com/antlr/antlr4/issues/509
@@ -582,16 +563,14 @@ public class LeftRecursionDescriptors {
 		public String startRule = "prog";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 prog
 		 @after {<ToStringTree("$ctx"):writeln()>}
 		 : statement* EOF {};
 		 statement: letterA | statement letterA 'b' ;
 		 letterA: 'a';
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -600,7 +579,7 @@ public class LeftRecursionDescriptors {
 		public String startRule = "s";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 s @after {<ToStringTree("$ctx"):writeln()>} : expr EOF ;
 		 expr : literal
@@ -611,9 +590,7 @@ public class LeftRecursionDescriptors {
 		 op : '+' | '-' ;
 		 Integer : [0-9]+ ;
 		 WS : (' '|'\n') -> skip ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -632,7 +609,7 @@ public class LeftRecursionDescriptors {
 		public String startRule = "s";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 s : e {<writeln("$e.result")>} ;
 		 e returns [<StringType()> result]
@@ -643,9 +620,7 @@ public class LeftRecursionDescriptors {
 		 ID : 'a'..'z'+ ;
 		 INT : '0'..'9'+ ;
 		 WS : (' '|'\n') -> skip ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -669,7 +644,7 @@ public class LeftRecursionDescriptors {
 		public String startRule = "s";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 s : q=e {<writeln("$e.v")>};
 		 e returns [int v]
@@ -684,9 +659,7 @@ public class LeftRecursionDescriptors {
 		 ID : 'a'..'z'+ ;
 		 INT : '0'..'9'+ ;
 		 WS : (' '|'\n') -> skip ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -723,7 +696,7 @@ public class LeftRecursionDescriptors {
 		public String startRule = "s";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 s @after {<ToStringTree("$ctx"):writeln()>} : expr EOF;
 		 expr:
@@ -737,9 +710,7 @@ public class LeftRecursionDescriptors {
 		 ;
 
 		 WS : [ \t\n]+ -> skip ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -775,7 +746,7 @@ public class LeftRecursionDescriptors {
 		public String startRule = "s";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 s @after {<ToStringTree("$ctx"):writeln()>} : expr EOF;
 		 expr:
@@ -788,9 +759,7 @@ public class LeftRecursionDescriptors {
 		       ('a'..'z'|'A'..'Z'|'0'..'9'|'_')*
 		 ;
 		 WS : [ \t\n]+ -> skip ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -819,7 +788,7 @@ public class LeftRecursionDescriptors {
 		public String startRule = "s";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 s : e {<writeln("$e.v")>};
 		 e returns [int v, <StringList()> ignored]
@@ -830,10 +799,7 @@ public class LeftRecursionDescriptors {
 		   ;
 		 INT : '0'..'9'+ ;
 		 WS : (' '|'\n') -> skip ;
-
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -864,7 +830,7 @@ public class LeftRecursionDescriptors {
 		public String startRule = "s";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 s @after {<ToStringTree("$ctx"):writeln()>} : a ;
 		 a : a {<True()>}? ID
@@ -872,9 +838,7 @@ public class LeftRecursionDescriptors {
 		   ;
 		 ID : 'a'..'z'+ ;
 		 WS : (' '|'\n') -> skip ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -885,7 +849,7 @@ public class LeftRecursionDescriptors {
 		public String startRule = "s";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 s @after {<ToStringTree("$ctx"):writeln()>} : a ;
 		 a : a ID {<False()>}?\<fail='custom message'>
@@ -893,9 +857,7 @@ public class LeftRecursionDescriptors {
 		   ;
 		 ID : 'a'..'z'+ ;
 		 WS : (' '|'\n') -> skip ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -904,7 +866,7 @@ public class LeftRecursionDescriptors {
 		public String startRule = "s";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 s @after {<ToStringTree("$ctx"):writeln()>} : a ;
 		 a : a ID
@@ -912,9 +874,7 @@ public class LeftRecursionDescriptors {
 		   ;
 		 ID : 'a'..'z'+ ;
 		 WS : (' '|'\n') -> skip ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -933,7 +893,7 @@ public class LeftRecursionDescriptors {
 		public String output = "(s (a (a (a x) y) z))\n";
 	}
 
-	/**
+	public String grammar = """
 	 * This is a regression test for antlr/antlr4#542 "First alternative cannot
 	 * be right-associative".
 	 * https://github.com/antlr/antlr4/issues/542
@@ -954,9 +914,7 @@ public class LeftRecursionDescriptors {
 		   ;
 		 ID : 'a'..'z'+ ;
 		 WS : (' '|'\n') -> skip ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -1021,9 +979,7 @@ public class LeftRecursionDescriptors {
 		   ;
 		 ID : 'a'..'z'+ ;
 		 WS : (' '|'\n') -> skip ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -1134,9 +1090,7 @@ public class LeftRecursionDescriptors {
 		 DQ_STRING       : '"' ('\\\\"' | ~'"')* '"';
 		 WS              : [ \t\n\r]+ -> skip ;
 		 COMMENTS        : ('/*' .*? '*' '/' | '//' ~'\n'* '\n' ) -> skip;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 	}
 
 	public static class WhitespaceInfluence_1 extends WhitespaceInfluence {

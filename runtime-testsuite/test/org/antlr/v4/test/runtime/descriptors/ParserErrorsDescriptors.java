@@ -17,12 +17,10 @@ public class ParserErrorsDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 a : 'a' x='b' {<Append("\"conjured=\"","$x"):writeln()>} 'c' ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -33,16 +31,14 @@ public class ParserErrorsDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 a : 'a' x=('b'|'c') {<Append("\"conjured=\"","$x"):writeln()>} 'd' ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
-	/**
+	public String grammar = """
 	 * Regression test for "Getter for context is not a list when it should be".
 	 * https://github.com/antlr/antlr4/issues/19
 	 */
@@ -53,7 +49,7 @@ public class ParserErrorsDescriptors {
 		public String startRule = "s";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 @parser::members{
 		 <DeclareContextListGettersFunction()>
@@ -61,9 +57,7 @@ public class ParserErrorsDescriptors {
 		 s : (a | b)+;
 		 a : 'a' {<write("\"a\"")>};
 		 b : 'b' {<write("\"b\"")>};
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -73,15 +67,13 @@ public class ParserErrorsDescriptors {
 		public String startRule = "start";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 start : expr EOF;
 		 expr : 'x'
 		      | expr expr
 		      ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -101,7 +93,7 @@ public class ParserErrorsDescriptors {
 		public String input = "xxxx";
 	}
 
-	/**
+	public String grammar = """
 	 * This is a regression test for #45 "NullPointerException in ATNConfig.hashCode".
 	 * https://github.com/antlr/antlr4/issues/45
 	 * <p/>
@@ -116,19 +108,17 @@ public class ParserErrorsDescriptors {
 		public String startRule = "start";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 start : ID ':' expr;
 		 expr : primary expr? {<Pass()>} | expr '->' ID;
 		 primary : ID;
 		 ID : [a-z]+;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
-	/**
+	public String grammar = """
 	 * This is a regression test for #6 "NullPointerException in getMissingSymbol".
 	 * https://github.com/antlr/antlr4/issues/6
 	 */
@@ -139,13 +129,11 @@ public class ParserErrorsDescriptors {
 		public String startRule = "start";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 start : ID+;
 		 ID : [a-z]+;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -156,7 +144,7 @@ public class ParserErrorsDescriptors {
 		public String startRule = "start";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 start : animal (AND acClass)? service EOF;
 		 animal : (DOG | CAT );
@@ -171,9 +159,7 @@ public class ParserErrorsDescriptors {
 		 @init
 		 {<GetExpectedTokenNames():writeln()>}
 		   : ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -184,15 +170,13 @@ public class ParserErrorsDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 a : 'a' 'b'
 		   | 'a' 'c'
 		 ;
 		 q : 'e' ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -203,15 +187,13 @@ public class ParserErrorsDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 a : 'a' 'b'* 'c'
 		   | 'a' 'b' 'd'
 		 ;
 		 q : 'e' ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -222,15 +204,13 @@ public class ParserErrorsDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String errors = """
 		 grammar T;
 		 a : 'a'+ 'b'
 		   | 'a'+ 'c'
 		 ;
 		 q : 'e' ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -241,12 +221,10 @@ public class ParserErrorsDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 a : 'a' 'b'* 'c';
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -257,56 +235,46 @@ public class ParserErrorsDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String errors = """
 		 grammar T;
 		 a : 'a' ('b'|'z'{<Pass()>})* 'c';
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
 	public static class MultiTokenDeletionDuringLoop extends BaseParserTestDescriptor {
 		public String input = "abaaababc";
 		public String output = null;
-		/**
+		public String grammar = """
 		line 1:2 extraneous input 'a' expecting {'b', 'c'}
 		line 1:6 extraneous input 'a' expecting {'b', 'c'}
-		 */
-		@CommentHasStringValue
-		public String errors;
+""";
 
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 a : 'a' 'b'* 'c' ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
 	public static class MultiTokenDeletionDuringLoop2 extends BaseParserTestDescriptor {
 		public String input = "abaaababc";
 		public String output = null;
-		/**
+		public String grammar = """
 		line 1:2 extraneous input 'a' expecting {'b', 'z', 'c'}
 		line 1:6 extraneous input 'a' expecting {'b', 'z', 'c'}
-		 */
-		@CommentHasStringValue
-		public String errors;
+""";
 
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 a : 'a' ('b'|'z'{<Pass()>})* 'c' ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -317,7 +285,7 @@ public class ParserErrorsDescriptors {
 		public String startRule = "s";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 s : e '!' ;
 		 e : 'a' 'b'
@@ -325,9 +293,7 @@ public class ParserErrorsDescriptors {
 		   ;
 		 DOT : '.' ;
 		 WS : [ \t\r\n]+ -> skip;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -338,12 +304,10 @@ public class ParserErrorsDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 a : 'a' ('b'|'c') 'd' ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -354,13 +318,11 @@ public class ParserErrorsDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String errors = """
 		 grammar T;
 		 myset: ('b'|'c') ;
 		 a: 'a' myset 'd' {<writeln(Append("\"\"","$myset.stop"))>} ; <! bit complicated because of the JavaScript target !>
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -371,12 +333,10 @@ public class ParserErrorsDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 a : 'a' 'b' ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -387,59 +347,49 @@ public class ParserErrorsDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String errors = """
 		 grammar T;
 		 a : ('b' | 'c')
 		 ;
 		 q : 'a'
 		 ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
 	public static class SingleTokenDeletionBeforeLoop extends BaseParserTestDescriptor {
 		public String input = "aabc";
 		public String output = null;
-		/**
+		public String grammar = """
 		line 1:1 extraneous input 'a' expecting {<EOF>, 'b'}
 		line 1:3 token recognition error at: 'c'
-		 */
-		@CommentHasStringValue
-		public String errors;
+""";
 
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 a : 'a' 'b'* EOF ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
 	public static class SingleTokenDeletionBeforeLoop2 extends BaseParserTestDescriptor {
 		public String input = "aabc";
 		public String output = null;
-		/**
+		public String grammar = """
 		line 1:1 extraneous input 'a' expecting {<EOF>, 'b', 'z'}
 		line 1:3 token recognition error at: 'c'
-		 */
-		@CommentHasStringValue
-		public String errors;
+""";
 
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 a : 'a' ('b'|'z'{<Pass()>})* EOF ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -450,15 +400,13 @@ public class ParserErrorsDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 a : 'a'+ 'b'
 		   | 'a'+ 'c'
 		 ;
 		 q : 'e' ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -469,13 +417,11 @@ public class ParserErrorsDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 myset: ('b'|'c') ;
 		 a: 'a' myset 'd' {<writeln(Append("\"\"","$myset.stop"))>} ; <! bit complicated because of the JavaScript target !>
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -486,12 +432,10 @@ public class ParserErrorsDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 a : 'a' 'b'* 'c' ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -502,12 +446,10 @@ public class ParserErrorsDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 a : 'a' ('b'|'z'{<Pass()>})* 'c' ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -518,12 +460,10 @@ public class ParserErrorsDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 a : 'a' ('b'|'c') ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -534,12 +474,10 @@ public class ParserErrorsDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 a : 'a' 'b' 'c' ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -550,12 +488,10 @@ public class ParserErrorsDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 a : 'a' 'b' ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -576,9 +512,7 @@ public class ParserErrorsDescriptors {
 		 ID  :   [a-zA-Z]+ ;
 		 STR :   '"' ~["]* '"' ;
 		 WS  :   [ \t\r\n]+ -> skip ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -613,9 +547,7 @@ public class ParserErrorsDescriptors {
 		 ID1 : '$';
 
 		 WS  : [ \t\r\n]+ -> skip ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -633,9 +565,7 @@ public class ParserErrorsDescriptors {
 		 body : member*;
 		 file : body EOF;
 		 B : 'b';
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 		@Override
 		public boolean ignore(String targetName) {

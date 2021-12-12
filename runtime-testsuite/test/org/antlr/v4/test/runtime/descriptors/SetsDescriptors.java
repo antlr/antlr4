@@ -12,50 +12,42 @@ import org.antlr.v4.test.runtime.CommentHasStringValue;
 public class SetsDescriptors {
 	public static class CharSetLiteral extends BaseParserTestDescriptor {
 		public String input = "A a B b";
-		/**
+		public String output = """
 		A
 		a
 		B
 		b
-		 */
-		@CommentHasStringValue
-		public String output;
+""";
 
 		public String errors = null;
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 a : (A {<writeln("$A.text")>})+ ;
 		 A : [AaBb] ;
 		 WS : (' '|'\n')+ -> skip ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
 	public static class ComplementSet extends BaseParserTestDescriptor {
 		public String input = "a";
 		public String output = null;
-		/**
+		public String errors = """
 		line 1:0 token recognition error at: 'a'
 		line 1:1 missing {} at '<EOF>'
-		 */
-		@CommentHasStringValue
-		public String errors;
+""";
 
 		public String startRule = "parse";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 parse : ~NEW_LINE;
 		 NEW_LINE: '\\r'? '\\n';
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -66,13 +58,11 @@ public class SetsDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 a : A {<InputText():writeln()>} ;
 		 A : ('a'|'b')? 'c' ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -83,13 +73,11 @@ public class SetsDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 a : A {<InputText():writeln()>} ;
 		 A : ('a'|'b')+ 'c' ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -100,13 +88,11 @@ public class SetsDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 a : A {<InputText():writeln()>} ;
 		 A : ('a'|'b')* 'c' ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -117,13 +103,11 @@ public class SetsDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 a : A {<writeln("$A.text")>} ;
 		 A : ~'b' ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -134,13 +118,11 @@ public class SetsDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 a : A {<writeln("$A.text")>} ;
 		 A : ~('b'|'c') ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -151,13 +133,11 @@ public class SetsDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 a : A {<writeln("$A.text")>} ;
 		 A : h=~('b'|'c') ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -168,15 +148,13 @@ public class SetsDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 a : A {<writeln("$A.text")>} ;
 		 A : ('a'|B) ;  // this doesn't collapse to set but works
 		 fragment
 		 B : ~('a'|'c') ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -187,13 +165,11 @@ public class SetsDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 a : A {<InputText():writeln()>} ;
 		 A : 'b'? 'c' ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -204,12 +180,10 @@ public class SetsDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 a : ('a'|'b')? 'c' {<InputText():writeln()>} ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -220,13 +194,11 @@ public class SetsDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 a : A? 'c' {<InputText():writeln()>} ;
 		 A : 'b' ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -237,12 +209,10 @@ public class SetsDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 a : t=~('x'|'y') 'z' {<writeln("$t.text")>} ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -253,12 +223,10 @@ public class SetsDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 a : ~'x' 'z' {<InputText():writeln()>} ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -269,12 +237,10 @@ public class SetsDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 a : t=~'x' 'z' {<writeln("$t.text")>} ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -285,12 +251,10 @@ public class SetsDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 a : t=('x'|'y') {<writeln("$t.text")>} ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -301,13 +265,11 @@ public class SetsDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 a : A {<InputText():writeln()>} ;
 		 A : 'b'+ 'c' ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -318,12 +280,10 @@ public class SetsDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 a : ('a'|'b')+ 'c' {<InputText():writeln()>} ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -334,12 +294,10 @@ public class SetsDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 a @after {<InputText():writeln()>} : 'a' | 'b' |'c' ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -350,15 +308,13 @@ public class SetsDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 a : C {<InputText():writeln()>} ;
 		 fragment A : '1' | '2';
 		 fragment B : '3' '4';
 		 C : A | B;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -367,13 +323,11 @@ public class SetsDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 a : A {<InputText():writeln()>} ;
 		 A : 'b'* 'c' ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -394,12 +348,10 @@ public class SetsDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 a : ('a'|'b')* 'c' {<InputText():writeln()>} ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -410,15 +362,13 @@ public class SetsDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 a : LETTERS {<InputText():writeln()>} ;
 		 // These are actually not escaped -- Java passes the
 		 // raw unescaped Unicode values to the grammar compiler.
 		 LETTERS : ('a'|'\u00E4'|'\u4E9C'|'\u3042')* 'c';
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -429,15 +379,13 @@ public class SetsDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 a : LETTERS* 'd' {<InputText():writeln()>} ;
 		 // These are actually not escaped -- Java passes the
 		 // raw unescaped Unicode values to the grammar compiler.
 		 LETTERS : ('a'|'\u00E0'..'\u00E5');
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -448,15 +396,13 @@ public class SetsDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 a : LETTERS {<InputText():writeln()>} ;
 		 // Note the double-backslash to avoid Java passing
 		 // unescaped values as part of the grammar.
 		 LETTERS : ('a'|'\\u00E4'|'\\u4E9C'|'\\u3042')* 'c';
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -467,15 +413,13 @@ public class SetsDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 a : LETTERS* 'd' {<InputText():writeln()>} ;
 		 // Note the double-backslash to avoid Java passing
 		 // unescaped values as part of the grammar.
 		 LETTERS : ('a'|'\\u00E0'..'\\u00E5');
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -498,15 +442,13 @@ public class SetsDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 a : LETTERS  {<InputText():writeln()>} ;
 		 // Note the double-backslash to avoid Java passing
 		 // unescaped values as part of the grammar.
 		 LETTERS : ('a'|'\\u{1D5BA}'|'\\u{1D5BE}'|'\\u{1D5C2}'|'\\u{1D5C8}'|'\\u{1D5CE}')* 'c';
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -529,15 +471,13 @@ public class SetsDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 a : LETTERS* 'd' {<InputText():writeln()>} ;
 		 // Note the double-backslash to avoid Java passing
 		 // unescaped values as part of the grammar.
 		 LETTERS : ('a'|'\\u{1F600}'..'\\u{1F943}');
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -561,15 +501,13 @@ public class SetsDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 a : LETTERS* 'd' {<InputText():writeln()>} ;
 		 // Note the double-backslash to avoid Java passing
 		 // unescaped values as part of the grammar.
 		 LETTERS : ('a'|'\\u{1F600}'..'\\u{1F943}');
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -580,13 +518,11 @@ public class SetsDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 a : LETTERS {<InputText():writeln()>} ;
 		 LETTERS : 'a' ~('b')+ 'c';
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -597,13 +533,11 @@ public class SetsDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 a : LETTERS {<InputText():writeln()>} ;
 		 LETTERS : 'a' ~('\\u{1F600}'..'\\u{1F943}')+ 'c';
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 }

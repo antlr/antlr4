@@ -13,30 +13,26 @@ public class SemPredEvalLexerDescriptors {
 	// Test for https://github.com/antlr/antlr4/issues/958
 	public static class RuleSempredFunction extends BaseLexerTestDescriptor {
 		public String input = "aaa";
-		/**
+		public String output = """
 		 [@0,0:0='a',<1>,1:0]
 		 [@1,1:1='a',<1>,1:1]
 		 [@2,2:2='a',<1>,1:2]
 		 [@3,3:2='<EOF>',<-1>,1:3]
-		 */
-		@CommentHasStringValue
-		public String output;
+""";
 
 		public String errors = null;
 		public String startRule = "";
 		public String grammarName = "L";
 
-		/**
+		public String grammar = """
 		 lexer grammar L;
 		 T : 'a' {<True()>}? ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 	}
 
 	public static class DisableRule extends BaseLexerTestDescriptor {
 		public String input = "enum abc";
-		/**
+		public String output = """
 		[@0,0:3='enum',<2>,1:0]
 		[@1,5:7='abc',<3>,1:5]
 		[@2,8:7='<EOF>',<-1>,1:8]
@@ -47,23 +43,19 @@ public class SemPredEvalLexerDescriptors {
 		:s2=>3-'u'->:s3=>3
 		:s6=>3-'b'->:s6=>3
 		:s6=>3-'c'->:s6=>3
-		 */
-		@CommentHasStringValue
-		public String output;
+""";
 
 		public String errors = null;
 		public String startRule = "";
 		public String grammarName = "L";
 
-		/**
+		public String grammar = """
 		 lexer grammar L;
 		 E1 : 'enum' { <False()> }? ;
 		 E2 : 'enum' { <True()> }? ;  // winner not E1 or ID
 		 ID : 'a'..'z'+ ;
 		 WS : (' '|'\n') -> skip;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 		@Override
 		public boolean showDFA() { return true; }
@@ -71,7 +63,7 @@ public class SemPredEvalLexerDescriptors {
 
 	public static class EnumNotID extends BaseLexerTestDescriptor {
 		public String input = "enum abc enum";
-		/**
+		public String grammar = """
 		[@0,0:3='enum',<1>,1:0]
 		[@1,5:7='abc',<2>,1:5]
 		[@2,9:12='enum',<1>,1:9]
@@ -86,14 +78,12 @@ public class SemPredEvalLexerDescriptors {
 		public String startRule = "";
 		public String grammarName = "L";
 
-		/**
+		public String grammar = """
 		 lexer grammar L;
 		 ENUM : [a-z]+  { <TextEquals("enum")> }? ;
 		 ID : [a-z]+  ;
 		 WS : (' '|'\n') -> skip;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 		@Override
 		public boolean showDFA() { return true; }
@@ -101,7 +91,7 @@ public class SemPredEvalLexerDescriptors {
 
 	public static class IDnotEnum extends BaseLexerTestDescriptor {
 		public String input = "enum abc enum";
-		/**
+		public String grammar = """
 		[@0,0:3='enum',<2>,1:0]
 		[@1,5:7='abc',<2>,1:5]
 		[@2,9:12='enum',<2>,1:9]
@@ -116,14 +106,12 @@ public class SemPredEvalLexerDescriptors {
 		public String startRule = "";
 		public String grammarName = "L";
 
-		/**
+		public String output = """
 		 lexer grammar L;
 		 ENUM : [a-z]+  { <False()> }? ;
 		 ID : [a-z]+  ;
 		 WS : (' '|'\n') -> skip;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 		@Override
 		public boolean showDFA() { return true; }
@@ -132,7 +120,7 @@ public class SemPredEvalLexerDescriptors {
 	public static class IDvsEnum extends BaseLexerTestDescriptor {
 		public String input = "enum abc enum";
 
-		/**
+		public String grammar = """
 		[@0,0:3='enum',<2>,1:0]
 		[@1,5:7='abc',<2>,1:5]
 		[@2,9:12='enum',<2>,1:9]
@@ -152,14 +140,12 @@ public class SemPredEvalLexerDescriptors {
 		public String startRule = "";
 		public String grammarName = "L";
 
-		/**
+		public String output = """
 		 lexer grammar L;
 		 ENUM : 'enum' { <False()> }? ;
 		 ID : 'a'..'z'+ ;
 		 WS : (' '|'\n') -> skip;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 		@Override
 		public boolean showDFA() { return true; }
@@ -167,7 +153,7 @@ public class SemPredEvalLexerDescriptors {
 
 	public static class Indent extends BaseLexerTestDescriptor {
 		public String input = "abc\n  def  \n";
-		/**
+		public String grammar = """
 		INDENT
 		[@0,0:2='abc',<1>,1:0]
 		[@1,3:3='\n',<3>,1:3]
@@ -184,24 +170,20 @@ public class SemPredEvalLexerDescriptors {
 		:s1=>1-'c'->:s1=>1
 		:s1=>1-'e'->:s1=>1
 		:s1=>1-'f'->:s1=>1
-		 */
-		@CommentHasStringValue
-		public String output;
+""";
 
 		public String errors = null;
 		public String startRule = "";
 		public String grammarName = "L";
 
-		/**
+		public String output = """
 		 lexer grammar L;
 		 ID : [a-z]+  ;
 		 INDENT : [ \t]+ { <TokenStartColumnEquals("0")> }?
 		          { <writeln("\"INDENT\"")> }  ;
 		 NL : '\n';
 		 WS : [ \t]+ ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 		@Override
 		public boolean showDFA() { return true; }
@@ -209,7 +191,7 @@ public class SemPredEvalLexerDescriptors {
 
 	public static class LexerInputPositionSensitivePredicates extends BaseLexerTestDescriptor {
 		public String input = "a cde\nabcde\n";
-		/**
+		public String grammar = """
 		a
 		cde
 		ab
@@ -219,9 +201,7 @@ public class SemPredEvalLexerDescriptors {
 		[@2,6:7='ab',<1>,2:0]
 		[@3,8:10='cde',<2>,2:2]
 		[@4,12:11='<EOF>',<-1>,3:0]
-		 */
-		@CommentHasStringValue
-		public String output;
+""";
 
 		public String errors = null;
 		public String startRule = "";
@@ -234,9 +214,7 @@ public class SemPredEvalLexerDescriptors {
 		 fragment ID1 : { <Column()> \< 2 }? [a-zA-Z];
 		 fragment ID2 : { <Column()> >= 2 }? [a-zA-Z];
 		 WS : (' '|'\n') -> skip;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 		@Override
 		public boolean showDFA() { return true; }
@@ -252,9 +230,7 @@ public class SemPredEvalLexerDescriptors {
 		[@1,5:7='enu',<2>,1:5]
 		[@2,9:9='a',<2>,1:9]
 		[@3,10:9='<EOF>',<-1>,1:10]
-		 */
-		@CommentHasStringValue
-		public String output;
+""";
 
 		public String errors = null;
 		public String startRule = "";
@@ -265,8 +241,6 @@ public class SemPredEvalLexerDescriptors {
 		 ENUM : [a-z]+ { <TextEquals("enum")> }? { <writeln("\"enum!\"")> } ;
 		 ID   : [a-z]+ { <PlusText("ID "):writeln()> } ;
 		 WS   : [ \n] -> skip ;
-		 */
-		@CommentHasStringValue
-		public String grammar;
+""";
 	}
 }
