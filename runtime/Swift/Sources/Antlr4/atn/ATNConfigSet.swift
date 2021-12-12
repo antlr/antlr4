@@ -311,19 +311,18 @@ public final class ATNConfigSet: Hashable, CustomStringConvertible {
     }
 
     public func getStateToAltMap() -> [Int: BitSet] {
-        let length = configs.count
         var m = [Int: BitSet]()
 
-        for i in 0..<length {
+        for cfg in configs {
             var alts: BitSet
-            if let mAlts =  m[configs[i].state.stateNumber] {
+            if let mAlts =  m[cfg.state.stateNumber] {
                 alts = mAlts
             } else {
                 alts = BitSet()
-                m[configs[i].state.stateNumber] = alts
+                m[cfg.state.stateNumber] = alts
             }
 
-            try! alts.set(configs[i].alt)
+            try! alts.set(cfg.alt)
         }
         return m
     }
