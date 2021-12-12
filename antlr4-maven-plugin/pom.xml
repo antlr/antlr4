@@ -18,9 +18,10 @@
   <!-- Ancilliary information for completeness -->
   <inceptionYear>2009</inceptionYear>
 
-  <properties>
-    <mavenVersion>3.8.4</mavenVersion>
-  </properties>
+    <properties>
+        <mavenVersion>3.8.4</mavenVersion>
+        <maven.compiler.target>1.8</maven.compiler.target>
+    </properties>
 
   <!-- ============================================================================= -->
 
