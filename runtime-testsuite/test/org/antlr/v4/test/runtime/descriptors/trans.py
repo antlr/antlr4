@@ -5,10 +5,11 @@ import re
 import os
 import glob
 
-output_dir = "/tmp/output/"
 output_dir = "."
+output_dir = "/tmp/output/"
 
-pattern = r"/\*\*(.+?)\*/\s+@CommentHasStringValue\s+(public String \w+);"
+# pattern = r"/\*\*(.+?)\*/\s+@CommentHasStringValue\s+(public String \w+);"
+pattern = r"/\*\*(.+?)\*/.+?\n?\s+@CommentHasStringValue\s+(public String \w+);"
 
 def update(filename, java):
     # skip copyright comment
@@ -30,6 +31,11 @@ def update(filename, java):
         field = java_[span[0]:span[1]]
         #     print("span", span, ":", field)
 
+        string = string.replace(r'\<', '<')
+        string = string.replace(r'\]', r'\\]')
+        string = string.replace(r'\n', r'\\n')
+        string = string.replace(r'\"', r'\\"')
+        string = string.replace(r'"""', r'\"""')
         repl = f'''{field} = """
 {string}
 """;'''
@@ -37,7 +43,9 @@ def update(filename, java):
         match = re.search(pattern, java_, re.DOTALL)
     # print(java[0:package_idx] + java_)
     # print("-----------------------")
-    return java[0:package_idx] + java_
+    java =  java[0:package_idx] + java_
+    java = java.replace('import org.antlr.v4.test.runtime.CommentHasStringValue;\n', '')
+    return java
 
 
 for filename in glob.glob("*.java"):
