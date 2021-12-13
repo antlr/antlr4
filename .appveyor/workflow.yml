@@ -11,8 +11,6 @@ environment:
       job_depends_on: java-tool-and-runtime
     - job_name: php-runtime
       job_depends_on: java-tool-and-runtime
-    - job_name: python2-runtime
-      job_depends_on: java-tool-and-runtime
     - job_name: python3-runtime
       job_depends_on: java-tool-and-runtime
 
@@ -108,15 +106,6 @@ for:
     test_script:
       - cd runtime-testsuite
       - mvn -q -Dtest=php.** test -Dantlr-php-php="C:\tools\php\php.exe"
-
-  - matrix:
-      only:
-        - job_name: python2-runtime
-    build_script:
-      - mvn -q -DskipTests install --batch-mode
-    test_script:
-      - cd runtime-testsuite
-      - mvn -q -Dtest=python2.** test -Dantlr-python2-python="C:\Python27\python.exe"
 
   - matrix:
       only:

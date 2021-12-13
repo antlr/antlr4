@@ -1,17 +1,11 @@
-# Python (2 and 3)
+# Python 3
 
 The examples from the ANTLR 4 book converted to Python are [here](https://github.com/jszheng/py3antlr4book).
 
-There are 2 Python targets: `Python2` and `Python3`. This is because there is only limited compatibility between those 2 versions of the language. Please refer to the [Python documentation](https://wiki.python.org/moin/Python2orPython3) for full details.
+There is 1 Python target: `Python3`. `Python2` was removed when Python 2 reached end of life and was no longer being supported.
 
 How to create a Python lexer or parser?
 This is pretty much the same as creating a Java lexer or parser, except you need to specify the language target, for example:
-
-```
-$ antlr4 -Dlanguage=Python2 MyGrammar.g4
-```
-
-or
 
 ```
 $ antlr4 -Dlanguage=Python3 MyGrammar.g4
@@ -23,12 +17,11 @@ For a full list of antlr4 tool options, please visit the tool documentation page
 
 Once you've generated the lexer and/or parser code, you need to download the runtime. The Python runtimes are available from PyPI:
 
-* https://pypi.python.org/pypi/antlr4-python2-runtime/
 * https://pypi.python.org/pypi/antlr4-python3-runtime/
 
 The runtimes are provided in the form of source code, so no additional installation is required.
 
-We will not document here how to refer to the runtime from your Python project, since this would differ a lot depending on your project type and IDE. 
+We will not document here how to refer to the runtime from your Python project, since this would differ a lot depending on your project type and IDE.
 
 ## How do I run the generated lexer and/or parser?
 
@@ -42,20 +35,20 @@ Let's suppose that your grammar is named, as above, "MyGrammar". Let's suppose t
 (Developers used to Java/C# AntLR will notice that there is no base listener or visitor generated, this is because Python having no support for interfaces, the generated listener and visitor are fully fledged classes)
 
 Now a fully functioning script might look like the following:
- 
+
 ```python
 import sys
 from antlr4 import *
 from MyGrammarLexer import MyGrammarLexer
 from MyGrammarParser import MyGrammarParser
- 
+
 def main(argv):
     input_stream = FileStream(argv[1])
     lexer = MyGrammarLexer(input_stream)
     stream = CommonTokenStream(lexer)
     parser = MyGrammarParser(stream)
     tree = parser.startRule()
- 
+
 if __name__ == '__main__':
     main(sys.argv)
 ```
@@ -67,10 +60,10 @@ This program will work. But it won't be useful unless you do one of the followin
 * your grammar comprises production code (like ANTLR3)
 
 (please note that production code is target specific, so you can't have multi target grammars that include production code, except for very limited use cases, see below)
- 
+
 ## How do I create and run a custom listener?
 
-Let's suppose your MyGrammar grammar comprises 2 rules: "key" and "value". The antlr4 tool will have generated the following listener: 
+Let's suppose your MyGrammar grammar comprises 2 rules: "key" and "value". The antlr4 tool will have generated the following listener:
 
 ```python
 class MyGrammarListener(ParseTreeListener):
@@ -83,17 +76,17 @@ class MyGrammarListener(ParseTreeListener):
     def exitValue(self, ctx):
         pass
 ```
- 
+
 In order to provide custom behavior, you might want to create the following class:
-  
+
 ```python
-class KeyPrinter(MyGrammarListener):     
-    def exitKey(self, ctx):         
-        print("Oh, a key!") 
+class KeyPrinter(MyGrammarListener):
+    def exitKey(self, ctx):
+        print("Oh, a key!")
 ```
- 
+
 In order to execute this listener, you would simply add the following lines to the above code:
- 
+
 ```
        ...
        tree = parser.startRule() - only repeated here for reference
@@ -101,7 +94,7 @@ In order to execute this listener, you would simply add the following lines to t
    walker = ParseTreeWalker()
    walker.walk(printer, tree)
 ```
- 
+
 Further information can be found from the ANTLR 4 definitive guide.
 
 The Python implementation of ANTLR is as close as possible to the Java one, so you shouldn't find it difficult to adapt the examples for Python.

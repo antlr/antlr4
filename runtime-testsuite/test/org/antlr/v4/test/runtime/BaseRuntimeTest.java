@@ -51,7 +51,7 @@ public abstract class BaseRuntimeTest {
 		"Java",
 		"Node",
 		"PHP",
-		"Python2", "Python3",
+		"Python3",
 		"Swift"
 	};
 
@@ -64,7 +64,7 @@ public abstract class BaseRuntimeTest {
 	private static boolean requiresHeartbeat() {
 		return isTravisCI()
 				|| isAppVeyorCI()
-				|| (isCPP() && isRecursion()) 
+				|| (isCPP() && isRecursion())
 				|| (isCircleCI() && isGo())
 				|| (isCircleCI() && isDotNet() && isRecursion());
 	}

@@ -100,7 +100,6 @@
                         <include>**/java/Test*.java</include>
                         <include>**/go/Test*.java</include>
                         <include>**/javascript/Test*.java</include>
-                        <include>**/python2/Test*.java</include>
                         <include>**/python3/Test*.java</include>
                         <include>**/php/Test*.java</include>
                         <include>**/dart/Test*.java</include>

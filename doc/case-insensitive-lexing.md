@@ -77,4 +77,4 @@ Here are implementations of `CaseChangingCharStream` in various target languages
 * [Go](https://github.com/antlr/antlr4/blob/master/doc/resources/case_changing_stream.go)
 * [Java](https://github.com/antlr/antlr4/blob/master/doc/resources/CaseChangingCharStream.java)
 * [JavaScript](https://github.com/antlr/antlr4/blob/master/doc/resources/CaseChangingStream.js)
-* [Python2/3](https://github.com/antlr/antlr4/blob/master/doc/resources/CaseChangingStream.py)
+* [Python3](https://github.com/antlr/antlr4/blob/master/doc/resources/CaseChangingStream.py)

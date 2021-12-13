@@ -32,7 +32,7 @@ public class ParserExecDescriptors {
 
 The mysterious `@CommentHasStringValue` annotation is a bit of a hack that allows multi-line strings in Java. This kung fu is required so that we can use Java classes rather than StringTemplate group files to specify runtime tests (the legacy system used those and it was hard to get them right). Here are all the [Runtime test descriptors](https://github.com/antlr/antlr4/tree/master/runtime-testsuite/test/org/antlr/v4/test/runtime/descriptors) organized into groups.
 
-The grammars are strings representing StringTemplates (`ST` objects) so `<writeln("$text")>` will get replace when the unit test file is generated (`Test.java`, `Test.cs`, ...). The `writeln` template must be defined per target.  Here are all of the 
+The grammars are strings representing StringTemplates (`ST` objects) so `<writeln("$text")>` will get replace when the unit test file is generated (`Test.java`, `Test.cs`, ...). The `writeln` template must be defined per target.  Here are all of the
 [Target templates for runtime tests](https://github.com/antlr/antlr4/tree/master/runtime-testsuite/resources/org/antlr/v4/test/runtime/templates).
 
 ## Requirements
@@ -41,12 +41,11 @@ In order to perform the tests on all target languages, you need to have the foll
 
 * `mono` (e.g., `brew install mono`) on non-Windows boxes (on Windows it uses the Microsoft .net stack). Also must [`xbuild` the runtime](https://github.com/antlr/antlr4/blob/master/doc/releasing-antlr.md) before tests will run; see below
 * `nodejs`
-* Python 2.7
 * Python 3.6
 * Go
 * Swift 4 (via XCode 10.x) tested currently only osx
-* clang (for C++ target) 
-* 
+* clang (for C++ target)
+*
 To **install into local repository** `~/.m2/repository/org/antlr`, do this:
 
 ```bash
@@ -97,7 +96,7 @@ antlr reports warnings from [-visitor, -Dlanguage=CSharp, -o, /var/folders/s1/h3
 ...
 [INFO] ------------------------------------------------------------------------
 [INFO] Reactor Summary:
-[INFO] 
+[INFO]
 [INFO] ANTLR 4 ............................................ SUCCESS [  0.445 s]
 [INFO] ANTLR 4 Runtime .................................... SUCCESS [  3.392 s]
 [INFO] ANTLR 4 Tool ....................................... SUCCESS [  1.373 s]
@@ -215,7 +214,7 @@ To add a new runtime test, first determine which [group of tests](https://github
 Each descriptor object describes the following mandatory elements for the test:
 
  * the test type
- * the grammar 
+ * the grammar
  * the start rule
  * the input text to parse or lex
  * the expected output
@@ -247,8 +246,8 @@ public class TestX extends BaseRuntimeTest {
 }
 ```
 
-where `<TARGET>` is replaced with Java, Cpp, CSharp, Python2, ... in the various subdirectories.
- 
+where `<TARGET>` is replaced with Java, Cpp, CSharp, Python3, ... in the various subdirectories.
+
 ### Ignoring tests
 
 In order to turn off a test for a particular target, we need to use the `ignore` method. Given a target name, a descriptor object can decide whether to ignore the test. This is not always convenient but it is fully general and works well for the one case we have now where we have to ignore `Visitor` tests in all targets except JavaScript.

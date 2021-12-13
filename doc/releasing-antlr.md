@@ -51,8 +51,6 @@ cp -r ~/antlr/code/antlr-php-runtime/src PHP
 Edit the repository looking for 4.5 or whatever and update it. Bump version in the following files:
 
  * runtime/Java/src/org/antlr/v4/runtime/RuntimeMetaData.java
- * runtime/Python2/setup.py
- * runtime/Python2/src/antlr4/Recognizer.py
  * runtime/Python3/setup.py
  * runtime/Python3/src/antlr4/Recognizer.py
  * runtime/CSharp/src/Antlr4.csproj
@@ -77,13 +75,12 @@ Edit the repository looking for 4.5 or whatever and update it. Bump version in t
  * tool/src/org/antlr/v4/codegen/target/CppTarget.java
  * tool/src/org/antlr/v4/codegen/target/CSharpTarget.java
  * tool/src/org/antlr/v4/codegen/target/JavaScriptTarget.java
- * tool/src/org/antlr/v4/codegen/target/Python2Target.java
  * tool/src/org/antlr/v4/codegen/target/Python3Target.java
  * tool/src/org/antlr/v4/codegen/target/SwiftTarget.java
  * tool/src/org/antlr/v4/codegen/target/PHPTarget.java
  * tool/src/org/antlr/v4/codegen/Target.java
  * tool/resources/org/antlr/v4/tool/templates/codegen/Swift/Swift.stg
- 
+
 Here is a simple script to display any line from the critical files with, say, `4.9` in it:
 
 ```bash
@@ -107,7 +104,7 @@ ugh. apparently you have to `mvn install` and then `mvn compile` or some such or
 First, make sure you have maven set up to communicate with staging servers etc...  Create file `~/.m2/settings.xml` with appropriate username/password for staging server and gpg.keyname/passphrase for signing. Make sure it has strict visibility privileges to just you. On unix, it looks like:
 
 ```bash
-beast:~/.m2 $ ls -l settings.xml 
+beast:~/.m2 $ ls -l settings.xml
 -rw-------  1 parrt  staff  914 Jul 15 14:42 settings.xml
 ```
 
@@ -171,7 +168,7 @@ Uploading: https://oss.sonatype.org/content/repositories/snapshots/org/antlr/ant
 Uploaded: https://oss.sonatype.org/content/repositories/snapshots/org/antlr/antlr4-tool-testsuite/maven-metadata.xml (388 B at 0.9 KB/sec)
 [INFO] ------------------------------------------------------------------------
 [INFO] Reactor Summary:
-[INFO] 
+[INFO]
 [INFO] ANTLR 4 ............................................ SUCCESS [  4.073 s]
 [INFO] ANTLR 4 Runtime .................................... SUCCESS [ 13.828 s]
 [INFO] ANTLR 4 Tool ....................................... SUCCESS [ 14.032 s]
@@ -237,11 +234,11 @@ It will start out by asking you the version number:
 ```
 ...
 What is the release version for "ANTLR 4"? (org.antlr:antlr4-master) 4.9: : 4.9
-What is the release version for "ANTLR 4 Runtime"? (org.antlr:antlr4-runtime) 4.9: : 
-What is the release version for "ANTLR 4 Tool"? (org.antlr:antlr4) 4.9: : 
-What is the release version for "ANTLR 4 Maven plugin"? (org.antlr:antlr4-maven-plugin) 4.9: : 
-What is the release version for "ANTLR 4 Runtime Test Generator"? (org.antlr:antlr4-runtime-testsuite) 4.9: : 
-What is the release version for "ANTLR 4 Tool Tests"? (org.antlr:antlr4-tool-testsuite) 4.9: : 
+What is the release version for "ANTLR 4 Runtime"? (org.antlr:antlr4-runtime) 4.9: :
+What is the release version for "ANTLR 4 Tool"? (org.antlr:antlr4) 4.9: :
+What is the release version for "ANTLR 4 Maven plugin"? (org.antlr:antlr4-maven-plugin) 4.9: :
+What is the release version for "ANTLR 4 Runtime Test Generator"? (org.antlr:antlr4-runtime-testsuite) 4.9: :
+What is the release version for "ANTLR 4 Tool Tests"? (org.antlr:antlr4-tool-testsuite) 4.9: :
 What is SCM release tag or label for "ANTLR 4"? (org.antlr:antlr4-master) antlr4-master-4.9: : 4.9
 What is the new development version for "ANTLR 4"? (org.antlr:antlr4-master) 4.9.1-SNAPSHOT:
 ...
@@ -272,7 +269,7 @@ cp ~/.m2/repository/org/antlr/antlr4-runtime/4.9/antlr4-runtime-4.9.jar ~/antlr/
 cp ~/.m2/repository/org/antlr/antlr4/4.9/antlr4-4.9-complete.jar ~/antlr/sites/website-antlr4/download/antlr-4.9-complete.jar
 cd ~/antlr/sites/website-antlr4/download
 git add antlr-4.9-complete.jar
-git add antlr-runtime-4.9.jar 
+git add antlr-runtime-4.9.jar
 ```
 
 Update on site:
@@ -303,7 +300,7 @@ cd runtime/JavaScript
 cd runtime/JavaScript
 npm update
 npm install
-npm run build 
+npm run build
 npm login
 npm publish   # don't put antlr4 on there or it will try to push the old version for some reason
 ```
@@ -346,7 +343,7 @@ If everything is ok, the following command will restore nuget packages, build An
 msbuild /target:restore /target:rebuild /target:pack /property:Configuration=Release .\Antlr4.dotnet.sln /verbosity:minimal
 ```
 
-This should display something like this: 
+This should display something like this:
 
 **Creating and packaging the assembly**
 
@@ -374,7 +371,7 @@ Alternately, you can publish from the cmd line. You need to get your NuGet key f
 nuget push Antlr4.Runtime.Standard.<version>.nupkg <your-key> -Source https://www.nuget.org/api/v2/package
 ```
 
-Nuget packages are also accessible as artifacts of [AppVeyor builds](https://ci.appveyor.com/project/parrt/antlr4/build/artifacts). 
+Nuget packages are also accessible as artifacts of [AppVeyor builds](https://ci.appveyor.com/project/parrt/antlr4/build/artifacts).
 
 ### Python
 
@@ -401,14 +398,6 @@ password: xxx
 ```
 
 Then run the usual python set up stuff:
-
-```bash
-cd ~/antlr/code/antlr4/runtime/Python2
-# assume you have ~/.pypirc set up
-python2 setup.py sdist upload
-```
-
-and do again for Python 3 target
 
 ```bash
 cd ~/antlr/code/antlr4/runtime/Python3
@@ -485,7 +474,7 @@ Otherwise enter `N` to ignore the warning.
 
 ## Update javadoc for runtime and tool
 
-Above build should make latest in 
+Above build should make latest in
 
 ```
 ~/.m2/repository/org/antlr/antlr4-runtime/4.9/antlr4-runtime-4.9
