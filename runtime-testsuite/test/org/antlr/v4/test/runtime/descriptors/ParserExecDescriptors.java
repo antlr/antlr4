@@ -757,7 +757,7 @@ public class ParserExecDescriptors {
 		public String grammar = """
 		 grammar Issue2301;
 
-		 SPACES: [ \t\r\\n]+ -> skip;
+		 SPACES: [ \\t\\r\\n]+ -> skip;
 
 		 AT: 'AT';
 		 X : 'X';

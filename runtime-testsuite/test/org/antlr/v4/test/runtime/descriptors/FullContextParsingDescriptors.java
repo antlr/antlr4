@@ -312,7 +312,7 @@ public class FullContextParsingDescriptors {
 		 	: expr '++' {<writeln("\\"fail.\\"")>}
 		 	| expr {<AppendStr("\\"pass: \\"","$expr.text"):writeln()>}
 		 	;
-		 expr: expr_primary ('<-' ID)?;
+		 expr: expr_primary ('\\<-' ID)?;
 		 expr_primary
 		 	: '(' ID ')'
 		 	| ID '(' ID ')'

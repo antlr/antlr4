@@ -72,7 +72,7 @@ public class ParseTreesDescriptors {
 		public String input = "${ ? a ?}";
 		public String output = "(s ${ (v ? a) ? })\n";
 		public String errors =
-			"line 1:3 extraneous input '?' expecting {'a', 'b'}\\n"+
+			"line 1:3 extraneous input '?' expecting {'a', 'b'}\n"+
 			"line 1:7 extraneous input '?' expecting '}'\n";
 		public String startRule = "s";
 		public String grammarName = "T";

@@ -275,7 +275,7 @@ public class SemPredEvalParserDescriptors {
 		     |   {<GetMember("enumKeyword"):Not()>}? 'enum' {<writeln("\\"enum\\"")>}
 		     ;
 		 ID : [a-z]+ ;
-		 WS : [ \t\\n\r]+ -> skip ;
+		 WS : [ \\t\\n\\r]+ -> skip ;
 """;
 
 	}

@@ -423,7 +423,7 @@ public class LeftRecursionDescriptors {
 		 grammar T;
 		 s @after {<ToStringTree("$ctx"):writeln()>} : e ;
 		 e : a=e op=('*'|'/') b=e  {}{<True()>}?
-		   | a=e op=('+'|'-') b=e  {}<p=3>{<True()>}?<fail='Message'>
+		   | a=e op=('+'|'-') b=e  {}\\<p=3>{<True()>}?\\<fail='Message'>
 		   | INT {}{}
 		   | '(' x=e ')' {}{}
 		   ;
@@ -836,7 +836,7 @@ public class LeftRecursionDescriptors {
 		public String grammar = """
 		 grammar T;
 		 s @after {<ToStringTree("$ctx"):writeln()>} : a ;
-		 a : a ID {<False()>}?<fail='custom message'>
+		 a : a ID {<False()>}?\\<fail='custom message'>
 		   | ID
 		   ;
 		 ID : 'a'..'z'+ ;
