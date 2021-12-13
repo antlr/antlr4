@@ -8,7 +8,6 @@ package org.antlr.v4.test.runtime.descriptors;
 
 import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.test.runtime.BaseCompositeLexerTestDescriptor;
-import org.antlr.v4.test.runtime.CommentHasStringValue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,12 +31,12 @@ public class CompositeLexersDescriptors {
 		 lexer grammar M;
 		 import S;
 		 B : 'b';
-		 WS : (' '|'\n') -> skip ;
+		 WS : (' '|'\\n') -> skip ;
 """;
 
 		public String slaveGrammarS = """
 		lexer grammar S;
-		A : 'a' {<writeln("\"S.A\"")>};
+		A : 'a' {<writeln("\\"S.A\\"")>};
 		C : 'c' ;
 """;
 
@@ -65,14 +64,14 @@ public class CompositeLexersDescriptors {
 		public String grammar = """
 		 lexer grammar M;
 		 import S;
-		 A : 'a' B {<writeln("\"M.A\"")>} ;
-		 WS : (' '|'\n') -> skip ;
+		 A : 'a' B {<writeln("\\"M.A\\"")>} ;
+		 WS : (' '|'\\n') -> skip ;
 """;
 
 		public String slaveGrammarS = """
 		lexer grammar S;
-		A : 'a' {<writeln("\"S.A\"")>} ;
-		B : 'b' {<writeln("\"S.B\"")>} ;
+		A : 'a' {<writeln("\\"S.A\\"")>} ;
+		B : 'b' {<writeln("\\"S.B\\"")>} ;
 """;
 
 		@Override

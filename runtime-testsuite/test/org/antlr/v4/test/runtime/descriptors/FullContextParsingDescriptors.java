@@ -7,7 +7,6 @@
 package org.antlr.v4.test.runtime.descriptors;
 
 import org.antlr.v4.test.runtime.BaseDiagnosticParserTestDescriptor;
-import org.antlr.v4.test.runtime.CommentHasStringValue;
 
 public class FullContextParsingDescriptors {
 	public static class AmbigYieldsCtxSensitiveDFA extends BaseDiagnosticParserTestDescriptor {
@@ -26,7 +25,7 @@ public class FullContextParsingDescriptors {
 		 s @after {<DumpDFA()>}
 		 	: ID | ID {} ;
 		 ID : 'a'..'z'+;
-		 WS : (' '|'\t'|'\n')+ -> skip ;
+		 WS : (' '|'\t'|'\\n')+ -> skip ;
 """;
 	}
 
@@ -47,7 +46,7 @@ public class FullContextParsingDescriptors {
 		 grammar T;
 		 prog
 		 @init {<LL_EXACT_AMBIG_DETECTION()>}
-		 	: expr expr {<writeln("\"alt 1\"")>}
+		 	: expr expr {<writeln("\\"alt 1\\"")>}
 		 	| expr
 		 	;
 		 expr: '@'
@@ -55,7 +54,7 @@ public class FullContextParsingDescriptors {
 		 	| ID
 		 	;
 		 ID  : [a-z]+ ;
-		 WS  : [ \r\n\t]+ -> skip ;
+		 WS  : [ \r\\n\t]+ -> skip ;
 """;
 	}
 
@@ -86,7 +85,7 @@ public class FullContextParsingDescriptors {
 		 e : INT | ;
 		 ID : 'a'..'z'+ ;
 		 INT : '0'..'9'+ ;
-		 WS : (' '|'\t'|'\n')+ -> skip ;
+		 WS : (' '|'\t'|'\\n')+ -> skip ;
 """;
 
 	}
@@ -104,7 +103,7 @@ public class FullContextParsingDescriptors {
 		 e : INT | ;
 		 ID : 'a'..'z'+ ;
 		 INT : '0'..'9'+ ;
-		 WS : (' '|'\t'|'\n')+ -> skip ;
+		 WS : (' '|'\t'|'\\n')+ -> skip ;
 """;
 
 	}
@@ -155,7 +154,7 @@ public class FullContextParsingDescriptors {
 		 		)*
 		 		;
 		 ID  : [a-zA-Z]+ ;
-		 WS  : [ \r\n\t]+ -> skip ;
+		 WS  : [ \r\\n\t]+ -> skip ;
 """;
 	}
 
@@ -194,7 +193,7 @@ public class FullContextParsingDescriptors {
 		 		| 'return'
 		 		;
 		 ID : 'a'..'z'+ ;
-		 WS : (' '|'\t'|'\n')+ -> skip ;
+		 WS : (' '|'\t'|'\\n')+ -> skip ;
 """;
 
 	}
@@ -310,10 +309,10 @@ public class FullContextParsingDescriptors {
 		 @init {<LL_EXACT_AMBIG_DETECTION()>}
 		 	: expr_or_assign*;
 		 expr_or_assign
-		 	: expr '++' {<writeln("\"fail.\"")>}
-		 	|  expr {<AppendStr("\"pass: \"","$expr.text"):writeln()>}
+		 	: expr '++' {<writeln("\\"fail.\\"")>}
+		 	|  expr {<AppendStr("\\"pass: \\"","$expr.text"):writeln()>}
 		 	;
-		 expr: expr_primary ('\<-' ID)?;
+		 expr: expr_primary ('<-' ID)?;
 		 expr_primary
 		 	: '(' ID ')'
 		 	| ID '(' ID ')'
@@ -349,7 +348,7 @@ public class FullContextParsingDescriptors {
 		 e : INT | ;
 		 ID : 'a'..'z'+ ;
 		 INT : '0'..'9'+ ;
-		 WS : (' '|'\t'|'\n')+ -> skip ;
+		 WS : (' '|'\t'|'\\n')+ -> skip ;
 """;
 
 	}

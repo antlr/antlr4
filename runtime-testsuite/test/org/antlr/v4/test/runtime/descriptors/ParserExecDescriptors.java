@@ -7,7 +7,6 @@
 package org.antlr.v4.test.runtime.descriptors;
 
 import org.antlr.v4.test.runtime.BaseParserTestDescriptor;
-import org.antlr.v4.test.runtime.CommentHasStringValue;
 
 public class ParserExecDescriptors {
 	public static class APlus extends BaseParserTestDescriptor {
@@ -23,7 +22,7 @@ public class ParserExecDescriptors {
 		 <writeln("$text")>
 		 };
 		 ID : 'a'..'z'+;
-		 WS : (' '|'\n') -> skip;
+		 WS : (' '|'\\n') -> skip;
 """;
 
 	}
@@ -41,7 +40,7 @@ public class ParserExecDescriptors {
 		 <writeln("$text")>
 		 };
 		 ID : 'a'..'z'+;
-		 WS : (' '|'\n') -> skip;
+		 WS : (' '|'\\n') -> skip;
 """;
 
 	}
@@ -59,7 +58,7 @@ public class ParserExecDescriptors {
 		 <writeln("$text")>
 		 };
 		 ID : 'a'..'z'+;
-		 WS : (' '|'\n') -> skip;
+		 WS : (' '|'\\n') -> skip;
 """;
 
 	}
@@ -77,7 +76,7 @@ public class ParserExecDescriptors {
 		 <writeln("$text")>
 		 };
 		 ID : 'a'..'z'+;
-		 WS : (' '|'\n') -> skip;
+		 WS : (' '|'\\n') -> skip;
 """;
 
 	}
@@ -95,7 +94,7 @@ public class ParserExecDescriptors {
 		 <writeln("$text")>
 		 };
 		 ID : 'a'..'z'+;
-		 WS : (' '|'\n') -> skip;
+		 WS : (' '|'\\n') -> skip;
 """;
 
 	}
@@ -113,7 +112,7 @@ public class ParserExecDescriptors {
 		 <writeln("$text")>
 		 };
 		 ID : 'a'..'z'+;
-		 WS : (' '|'\n') -> skip;
+		 WS : (' '|'\\n') -> skip;
 """;
 
 	}
@@ -128,13 +127,13 @@ public class ParserExecDescriptors {
 		public String grammar = """
 		 grammar T;
 		 a : ID {
-		 <writeln("\"alt 1\"")>
+		 <writeln("\\"alt 1\\"")>
 		 } | INT {
-		 <writeln("\"alt 2\"")>
+		 <writeln("\\"alt 2\\"")>
 		 };
 		 ID : 'a'..'z'+ ;
 		 INT : '0'..'9'+;
-		 WS : (' '|'\\n') -> skip ;
+		 WS : (' '|'\\\n') -> skip ;
 """;
 
 	}
@@ -154,7 +153,7 @@ public class ParserExecDescriptors {
 		 };
 		 ID : 'a'..'z'+ ;
 		 INT : '0'..'9'+;
-		 WS : (' '|'\\n') -> skip ;
+		 WS : (' '|'\\\n') -> skip ;
 """;
 
 	}
@@ -174,7 +173,7 @@ public class ParserExecDescriptors {
 		 };
 		 ID : 'a'..'z'+ ;
 		 INT : '0'..'9'+;
-		 WS : (' '|'\\n') -> skip ;
+		 WS : (' '|'\\\n') -> skip ;
 """;
 
 	}
@@ -194,7 +193,7 @@ public class ParserExecDescriptors {
 		 };
 		 ID : 'a'..'z'+ ;
 		 INT : '0'..'9'+;
-		 WS : (' '|'\\n') -> skip ;
+		 WS : (' '|'\\\n') -> skip ;
 """;
 
 	}
@@ -213,20 +212,45 @@ public class ParserExecDescriptors {
 		 };
 		 ID : 'a'..'z'+ ;
 		 INT : '0'..'9'+;
-		 WS : (' '|'\n') -> skip;
+		 WS : (' '|'\\n') -> skip;
 """;
 
 	}
 
-	public String grammar = """
- Match assignments, ignore other tokens with wildcard.
+    // 	Match assignments, ignore other tokens with wildcard.
+	public static class Wildcard extends BaseParserTestDescriptor {
+		public String input = "x=10; abc;;;; y=99;";
+		public String output = "x=10;\ny=99;\n";
+		public String errors = null;
+		public String startRule = "a";
+		public String grammarName = "T";
+
+		public String grammar = """
+		grammar T;
+		a : (assign|.)+ EOF ;
+		assign : ID '=' INT ';' {
+		<writeln("$text")>
+		} ;
+		ID : 'a'..'z'+ ;
+		INT : '0'..'9'+;
+		WS : (' '|'\\n') -> skip;
 """;
 	}
 
-	public String grammar = """
-	 * This test ensures that {@link org.antlr.v4.runtime.atn.ParserATNSimulator} does not produce a
-	 * {@link StackOverflowError} when it encounters an {@code EOF} transition
-	 * inside a closure.
+    // 	 * This test ensures that {@link org.antlr.v4.runtime.atn.ParserATNSimulator} does not produce a
+    // 	 * {@link StackOverflowError} when it encounters an {@code EOF} transition
+    // 	 * inside a closure.
+	public static class EOFInClosure extends BaseParserTestDescriptor {
+		public String input = "x";
+		public String output = null;
+		public String errors = null;
+		public String startRule = "prog";
+		public String grammarName = "T";
+
+		public String grammar = """
+		 grammar T;
+		 prog : stat EOF;
+		 stat : 'x' ('y' | EOF)*?;
 """;
 
 	}
@@ -250,7 +274,7 @@ public class ParserExecDescriptors {
 		 <writeln("$text")>
 		 };
 		 ID : 'a'..'z'+ ;
-		 WS : (' '|'\n') -> channel(HIDDEN);
+		 WS : (' '|'\\n') -> channel(HIDDEN);
 """;
 
 	}
@@ -274,7 +298,7 @@ public class ParserExecDescriptors {
 		 <writeln("$text")>
 		 };
 		 ID : 'a'..'z'+ ;
-		 WS : (' '|'\n') -> channel(HIDDEN);
+		 WS : (' '|'\\n') -> channel(HIDDEN);
 """;
 
 	}
@@ -298,7 +322,7 @@ public class ParserExecDescriptors {
 		 <writeln("$text")>
 		 };
 		 ID : 'a'..'z'+ ;
-		 WS : (' '|'\n') -> channel(HIDDEN);
+		 WS : (' '|'\\n') -> channel(HIDDEN);
 """;
 
 	}
@@ -322,7 +346,7 @@ public class ParserExecDescriptors {
 		 <writeln("$text")>
 		 };
 		 ID : 'a'..'z'+ ;
-		 WS : (' '|'\n') -> channel(HIDDEN);
+		 WS : (' '|'\\n') -> channel(HIDDEN);
 """;
 
 	}
@@ -341,7 +365,7 @@ public class ParserExecDescriptors {
 		 };
 		 ID : 'a'..'z'+;
 		 INT : '0'..'9'+ ;
-		 WS : (' '|'\n') -> skip;
+		 WS : (' '|'\\n') -> skip;
 """;
 
 	}
@@ -360,15 +384,19 @@ public class ParserExecDescriptors {
 		 };
 		 ID : 'a'..'z'+;
 		 INT : '0'..'9'+ ;
-		 WS : (' '|'\n') -> skip;
+		 WS : (' '|'\\n') -> skip;
 """;
 
 	}
 
-	public String output = """
-	 * This is a regression test for antlr/antlr4#195 "label 'label' type
-	 * mismatch with previous definition: TOKEN_LABEL!=RULE_LABEL"
-	 * https://github.com/antlr/antlr4/issues/195
+    // 	 * This is a regression test for antlr/antlr4#195 "label 'label' type
+    // 	 * mismatch with previous definition: TOKEN_LABEL!=RULE_LABEL"
+    // 	 * https://github.com/antlr/antlr4/issues/195
+	public static class LabelAliasingAcrossLabeledAlternatives extends BaseParserTestDescriptor {
+		public String input = "xy";
+		public String output = """
+		x
+		y
 """;
 
 		public String errors = null;
@@ -383,7 +411,7 @@ public class ParserExecDescriptors {
 		   | label='y' {<writeln("$label.text")>} #Two
 		   ;
 		 subrule : 'x';
-		 WS : (' '|'\n') -> skip ;
+		 WS : (' '|'\\n') -> skip ;
 """;
 
 	}
@@ -401,38 +429,99 @@ public class ParserExecDescriptors {
 		 b : id_=ID val+=INT*;
 		 ID : 'a'..'z'+ ;
 		 INT : '0'..'9'+;
-		 WS : (' '|'\n') -> skip ;
+		 WS : (' '|'\\n') -> skip ;
 """;
 
 	}
 
-	public String grammar = """
-	 * This is a regression test for antlr/antlr4#299 "Repeating subtree not
-	 * accessible in visitor".
-	 * https://github.com/antlr/antlr4/issues/299
+    // 	 * This is a regression test for antlr/antlr4#299 "Repeating subtree not
+    // 	 * accessible in visitor".
+    // 	 * https://github.com/antlr/antlr4/issues/299
+	public static class ListLabelForClosureContext extends BaseParserTestDescriptor {
+		public String input = "a";
+		public String output = null;
+		public String errors = null;
+		public String startRule = "expression";
+		public String grammarName = "T";
+
+		public String grammar = """
+		 grammar T;
+		 ifStatement
+		 @after {
+		 <AssertIsList({<ContextRuleFunction("$ctx", "elseIfStatement()")>})>
+		 }
+		     : 'if' expression
+		       ( ( 'then'
+		           executableStatement*
+		           elseIfStatement*  // <--- problem is here; should yield a list not node
+		           elseStatement?
+		           'end' 'if'
+		         ) | executableStatement )
+		     ;
+
+		 elseIfStatement
+		     : 'else' 'if' expression 'then' executableStatement*
+		     ;
+		 expression : 'a' ;
+		 executableStatement : 'a' ;
+		 elseStatement : 'a' ;
 """;
 
 	}
 
-	public String grammar = """
-	 * This is a regression test for #270 "Fix operator += applied to a set of
-	 * tokens".
-	 * https://github.com/antlr/antlr4/issues/270
+    // 	 * This is a regression test for #270 "Fix operator += applied to a set of
+    // 	 * tokens".
+    // 	 * https://github.com/antlr/antlr4/issues/270
+	public static class ListLabelsOnSet extends BaseParserTestDescriptor {
+		public String input = "abc 34;";
+		public String output = null;
+		public String errors = null;
+		public String startRule = "a";
+		public String grammarName = "T";
+
+		public String grammar = """
+		 grammar T;
+		 a : b b* ';' ;
+		 b : ID val+=(INT | FLOAT)*;
+		 ID : 'a'..'z'+ ;
+		 INT : '0'..'9'+;
+		 FLOAT : [0-9]+ '.' [0-9]+;
+		 WS : (' '|'\\n') -> skip ;
 """;
 
 	}
 
-	public String grammar = """
-	 * This test ensures that {@link ParserATNSimulator} produces a correct
-	 * result when the grammar contains multiple explicit references to
-	 * {@code EOF} inside of parser rules.
+    // 	 * This test ensures that {@link ParserATNSimulator} produces a correct
+    // 	 * result when the grammar contains multiple explicit references to
+    // 	 * {@code EOF} inside of parser rules.
+	public static class MultipleEOFHandling extends BaseParserTestDescriptor {
+		public String input = "x";
+		public String output = null;
+		public String errors = null;
+		public String startRule = "prog";
+		public String grammarName = "T";
+
+		public String grammar = """
+		 grammar T;
+		 prog : ('x' | 'x' 'y') EOF EOF;
 """;
 
 	}
 
-	public String grammar = """
-	 * This test is meant to detect regressions of bug antlr/antlr4#41.
-	 * https://github.com/antlr/antlr4/issues/41
+    // 	 * This test is meant to detect regressions of bug antlr/antlr4#41.
+    // 	 * https://github.com/antlr/antlr4/issues/41
+	public static class Optional_1 extends BaseParserTestDescriptor {
+		public String input = "x";
+		public String output = null;
+		public String errors = null;
+		public String startRule = "stat";
+		public String grammarName = "T";
+
+		public String grammar = """
+		 grammar T;
+		 stat : ifstat | 'x';
+		 ifstat : 'if' stat ('else' stat)?;
+		 WS : [ \\n\t]+ -> skip ;
 """;
 
 	}
@@ -448,7 +537,7 @@ public class ParserExecDescriptors {
 		 grammar T;
 		 stat : ifstat | 'x';
 		 ifstat : 'if' stat ('else' stat)?;
-		 WS : [ \n\t]+ -> skip ;
+		 WS : [ \\n\t]+ -> skip ;
 """;
 
 	}
@@ -464,7 +553,7 @@ public class ParserExecDescriptors {
 		 grammar T;
 		 stat : ifstat | 'x';
 		 ifstat : 'if' stat ('else' stat)?;
-		 WS : [ \n\t]+ -> skip ;
+		 WS : [ \\n\t]+ -> skip ;
 """;
 
 	}
@@ -480,16 +569,14 @@ public class ParserExecDescriptors {
 		 grammar T;
 		 stat : ifstat | 'x';
 		 ifstat : 'if' stat ('else' stat)?;
-		 WS : [ \n\t]+ -> skip ;
+		 WS : [ \\n\t]+ -> skip ;
 """;
 
 	}
 
-	/*
-	 * This is a regression test for antlr/antlr4#561 "Issue with parser
-	 * generation in 4.2.2"
-	 * https://github.com/antlr/antlr4/issues/561
-	 */
+    // 	 * This is a regression test for antlr/antlr4#561 "Issue with parser
+    // 	 * generation in 4.2.2"
+    // 	 * https://github.com/antlr/antlr4/issues/561
 	public static class ParserProperty extends BaseParserTestDescriptor {
 		public String input = "abc";
 		public String output = "valid\n";
@@ -500,33 +587,79 @@ public class ParserExecDescriptors {
 		public String grammar = """
 		 grammar T;
 		 <ParserPropertyMember()>
-		 a : {<ParserPropertyCall({$parser}, "Property()")>}? ID {<writeln("\"valid\"")>}
+		 a : {<ParserPropertyCall({$parser}, "Property()")>}? ID {<writeln("\\"valid\\"")>}
 		   ;
 		 ID : 'a'..'z'+ ;
-		 WS : (' '|'\n') -> skip ;
+		 WS : (' '|'\\n') -> skip ;
 """;
 
 	}
 
-	public String grammar = """
-	 * This test is meant to test the expected solution to antlr/antlr4#42.
-	 * https://github.com/antlr/antlr4/issues/42
+    // 	 * This test is meant to test the expected solution to antlr/antlr4#42.
+    // 	 * https://github.com/antlr/antlr4/issues/42
+	public static class PredicatedIfIfElse extends BaseParserTestDescriptor {
+		public String input = "if x if x a else b";
+		public String output = null;
+		public String errors = null;
+		public String startRule = "s";
+		public String grammarName = "T";
+
+		public String grammar = """
+		 grammar T;
+		 s : stmt EOF ;
+		 stmt : ifStmt | ID;
+		 ifStmt : 'if' ID stmt ('else' stmt | { <LANotEquals("1", {T<ParserToken("Parser", "ELSE")>})> }?);
+		 ELSE : 'else';
+		 ID : [a-zA-Z]+;
+		 WS : [ \\\n\\t]+ -> skip;
 """;
 
 	}
 
-	public String grammar = """
-	 * This is a regression test for antlr/antlr4#334 "BailErrorStrategy: bails
-	 * out on proper input".
-	 * https://github.com/antlr/antlr4/issues/334
+    // 	 * This is a regression test for antlr/antlr4#334 "BailErrorStrategy: bails
+    // 	 * out on proper input".
+    // 	 * https://github.com/antlr/antlr4/issues/334
+	public static class PredictionIssue334 extends BaseParserTestDescriptor {
+		public String input = "a";
+		public String output = "(file_ (item a) <EOF>)\n";
+		public String errors = null;
+		public String startRule = "file_";
+		public String grammarName = "T";
+
+		public String grammar = """
+		 grammar T;
+		 file_ @init{
+		 <BailErrorStrategy()>
+		 }
+		 @after {
+		 <ToStringTree("$ctx"):writeln()>
+		 }
+		   :   item (SEMICOLON item)* SEMICOLON? EOF ;
+		 item : A B?;
+		 SEMICOLON: ';';
+		 A : 'a'|'A';
+		 B : 'b'|'B';
+		 WS      : [ \r\t\\n]+ -> skip;
 """;
 
 	}
 
-	public String grammar = """
-	 * This is a regression test for antlr/antlr4#561 "Issue with parser
-	 * generation in 4.2.2"
-	 * https://github.com/antlr/antlr4/issues/561
+    // 	 * This is a regression test for antlr/antlr4#561 "Issue with parser
+    // 	 * generation in 4.2.2"
+    // 	 * https://github.com/antlr/antlr4/issues/561
+	public static class ReferenceToATN_1 extends BaseParserTestDescriptor {
+		public String input = "";
+		public String output = "\n";
+		public String errors = null;
+		public String startRule = "a";
+		public String grammarName = "T";
+
+		public String grammar = """
+		 grammar T;
+		 a : (ID|ATN)* ATN? {<writeln("$text")>} ;
+		 ID : 'a'..'z'+ ;
+		 ATN : '0'..'9'+;
+		 WS : (' '|'\\n') -> skip ;
 """;
 
 	}
@@ -543,34 +676,128 @@ public class ParserExecDescriptors {
 		 a : (ID|ATN)* ATN? {<writeln("$text")>} ;
 		 ID : 'a'..'z'+ ;
 		 ATN : '0'..'9'+;
-		 WS : (' '|'\n') -> skip ;
+		 WS : (' '|'\\n') -> skip ;
 """;
 	}
 
-	public String grammar = """
-	 * This is a regression test for antlr/antlr4#1545, case 1.
+    // 	 * This is a regression test for antlr/antlr4#1545, case 1.
+	public static class OpenDeviceStatement_Case1 extends BaseParserTestDescriptor {
+		public String input = "OPEN DEVICE DEVICE";
+		public String output = "OPEN DEVICE DEVICE\n";
+		public String errors = null;
+		public String startRule = "statement";
+		public String grammarName = "OpenDeviceStatement";
+
+		public String grammar = """
+		 grammar OpenDeviceStatement;
+		 program : statement+ '.' ;
+
+		 statement : 'OPEN' ( 'DEVICE' (  OPT1  |  OPT2  |  OPT3  )? )+ {<writeln("$text")>} ;
+
+		 OPT1 : 'OPT-1';
+		 OPT2 : 'OPT-2';
+		 OPT3 : 'OPT-3';
+
+		 WS : (' '|'\\n')+ -> channel(HIDDEN);
 """;
 	}
 
-	public String grammar = """
-	 * This is a regression test for antlr/antlr4#1545, case 2.
+    // 	 * This is a regression test for antlr/antlr4#1545, case 2.
+	public static class OpenDeviceStatement_Case2 extends BaseParserTestDescriptor {
+		public String input = "OPEN DEVICE DEVICE";
+		public String output = "OPEN DEVICE DEVICE\n";
+		public String errors = null;
+		public String startRule = "statement";
+		public String grammarName = "OpenDeviceStatement";
+
+		public String grammar = """
+		 grammar OpenDeviceStatement;
+		 program : statement+ '.' ;
+
+		 statement : 'OPEN' ( 'DEVICE' (  (OPT1)  |  OPT2  |  OPT3  )? )+ {<writeln("$text")>} ;
+
+		 OPT1 : 'OPT-1';
+		 OPT2 : 'OPT-2';
+		 OPT3 : 'OPT-3';
+
+		 WS : (' '|'\\n')+ -> channel(HIDDEN);
 """;
 	}
 
-	public String grammar = """
-	 * This is a regression test for antlr/antlr4#1545, case 3.
+    // 	 * This is a regression test for antlr/antlr4#1545, case 3.
+	public static class OpenDeviceStatement_Case3 extends BaseParserTestDescriptor {
+		public String input = "OPEN DEVICE DEVICE.";
+		public String output = "OPEN DEVICE DEVICE\n";
+		public String errors = null;
+		public String startRule = "statement";
+		public String grammarName = "OpenDeviceStatement";
+
+		public String grammar = """
+		 grammar OpenDeviceStatement;
+		 program : statement+ '.' ;
+
+		 statement : 'OPEN' ( 'DEVICE' (  (OPT1)  |  OPT2  |  OPT3  )? )+ {<writeln("$text")>} ;
+
+		 OPT1 : 'OPT-1';
+		 OPT2 : 'OPT-2';
+		 OPT3 : 'OPT-3';
+
+		 WS : (' '|'\\n')+ -> channel(HIDDEN);
 """;
 	}
 
-	public String grammar = """
-	 * This is a regression test for antlr/antlr4#2301.
+    // 	 * This is a regression test for antlr/antlr4#2301.
+	public static class OrderingPredicates extends BaseParserTestDescriptor {
+		public String input = "POINT AT X";
+		public String output = null;
+		public String errors = null;
+		public String startRule = "expr";
+		public String grammarName = "Issue2301";
+
+		public String grammar = """
+		 grammar Issue2301;
+
+		 SPACES: [ \t\r\\n]+ -> skip;
+
+		 AT: 'AT';
+		 X : 'X';
+		 Y : 'Y';
+
+		 ID: [A-Z]+;
+
+		 constant
+		 : 'DUMMY'
+		 ;
+
+		 expr
+		 : ID constant?
+		 | expr AT X
+		 | expr AT Y
+		 ;
 """;
 	}
 
-	public String grammar = """
-	 * This is a regression test for antlr/antlr4#2728
-	 * It should generate correct code for grammars with more than 65 tokens.
-	 * https://github.com/antlr/antlr4/pull/2728#issuecomment-622940562
+    // 	 * This is a regression test for antlr/antlr4#2728
+    // 	 * It should generate correct code for grammars with more than 65 tokens.
+    // 	 * https://github.com/antlr/antlr4/pull/2728#issuecomment-622940562
+	public static class TokenOffset extends BaseParserTestDescriptor {
+		public String input = "12 34 56 66";
+		public String output = "12345666\n";
+
+		public String errors = null;
+		public String startRule = "a";
+		public String grammarName = "L";
+
+		public String grammar = """
+		 grammar L;
+		 a : ('1'|'2'|'3'|'4'|'5'|'6'|'7'|'8'|'9'|'10'|'11'|'12'|'13'|'14'|'15'|'16'
+		 |'17'|'18'|'19'|'20'|'21'|'22'|'23'|'24'|'25'|'26'|'27'|'28'|'29'|'30'|'31'|'32'
+		 |'33'|'34'|'35'|'36'|'37'|'38'|'39'|'40'|'41'|'42'|'43'|'44'|'45'|'46'|'47'|'48'
+		 |'49'|'50'|'51'|'52'|'53'|'54'|'55'|'56'|'57'|'58'|'59'|'60'|'61'|'62'|'63'|'64'
+		 |'65'|'66')+ {
+		 <writeln("$text")>
+		 };
+		 WS : (' '|'\\n') -> skip;
 """;
 	}
 }

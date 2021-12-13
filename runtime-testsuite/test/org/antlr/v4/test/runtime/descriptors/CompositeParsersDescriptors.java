@@ -8,7 +8,6 @@ package org.antlr.v4.test.runtime.descriptors;
 
 import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.test.runtime.BaseCompositeParserTestDescriptor;
-import org.antlr.v4.test.runtime.CommentHasStringValue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,12 +24,12 @@ public class CompositeParsersDescriptors {
 		 grammar M;
 		 import S;
 		 s : a ;
-		 WS : (' '|'\n') -> skip ;
+		 WS : (' '|'\\n') -> skip ;
 """;
 
 		public String slaveGrammarS = """
 		parser grammar S;
-		a : '=' 'a' {<write("\"S.a\"")>};
+		a : '=' 'a' {<write("\\"S.a\\"")>};
 """;
 
 		@Override
@@ -58,9 +57,9 @@ public class CompositeParsersDescriptors {
 		public String slaveGrammarS = """
 		parser grammar S;
 		tokens { A, B, C }
-		x : 'x' INT {<writeln("\"S.x\"")>};
+		x : 'x' INT {<writeln("\\"S.x\\"")>};
 		INT : '0'..'9'+ ;
-		WS : (' '|'\n') -> skip ;
+		WS : (' '|'\\n') -> skip ;
 """;
 
 		@Override
@@ -100,18 +99,18 @@ public class CompositeParsersDescriptors {
 		 B : 'b' ; // another order: B, A, C
 		 A : 'a' ;
 		 C : 'c' ;
-		 WS : (' '|'\n') -> skip ;
+		 WS : (' '|'\\n') -> skip ;
 """;
 
 		public String slaveGrammarT = """
 		parser grammar T;
 		tokens { C, B, A } // reverse order
-		y : A {<writeln("\"T.y\"")>};
+		y : A {<writeln("\\"T.y\\"")>};
 """;
 		public String slaveGrammarS = """
 		parser grammar S;
 		tokens { A, B, C }
-		x : A {<writeln("\"S.x\"")>};
+		x : A {<writeln("\\"S.x\\"")>};
 """;
 
 		@Override
@@ -135,7 +134,7 @@ public class CompositeParsersDescriptors {
 		 grammar M; // uses no rules from the import
 		 import S;
 		 s : 'b' {<Invoke_foo()>} ; // gS is import pointer
-		 WS : (' '|'\n') -> skip ;
+		 WS : (' '|'\\n') -> skip ;
 """;
 
 		public String slaveGrammarS = """
@@ -167,12 +166,12 @@ public class CompositeParsersDescriptors {
 		 import S;
 		 s : a ;
 		 B : 'b' ; // defines B from inherited token space
-		 WS : (' '|'\n') -> skip ;
+		 WS : (' '|'\\n') -> skip ;
 """;
 
 		public String slaveGrammarS = """
 		parser grammar S;
-		a : B {<writeln("\"S.a\"")>};
+		a : B {<writeln("\\"S.a\\"")>};
 """;
 
 		@Override
@@ -196,12 +195,12 @@ public class CompositeParsersDescriptors {
 		 import S;
 		 s : label=a[3] {<writeln("$label.y")>} ;
 		 B : 'b' ; // defines B from inherited token space
-		 WS : (' '|'\n') -> skip ;
+		 WS : (' '|'\\n') -> skip ;
 """;
 
 		public String slaveGrammarS = """
 		parser grammar S;
-		a[int x] returns [int y] : B {<write("\"S.a\"")>} {$y=1000;} ;
+		a[int x] returns [int y] : B {<write("\\"S.a\\"")>} {$y=1000;} ;
 """;
 
 		@Override
@@ -225,12 +224,12 @@ public class CompositeParsersDescriptors {
 		 import S;
 		 s : a {<write("$a.text")>} ;
 		 B : 'b' ; // defines B from inherited token space
-		 WS : (' '|'\n') -> skip ;
+		 WS : (' '|'\\n') -> skip ;
 """;
 
 		public String slaveGrammarS = """
 		parser grammar S;
-		a : B {<write("\"S.a\"")>} ;
+		a : B {<write("\\"S.a\\"")>} ;
 """;
 
 		@Override
@@ -254,16 +253,16 @@ public class CompositeParsersDescriptors {
 		 import S,T;
 		 s : a ;
 		 B : 'b' ; // defines B from inherited token space
-		 WS : (' '|'\n') -> skip ;
+		 WS : (' '|'\\n') -> skip ;
 """;
 
 		public String slaveGrammarT = """
 		parser grammar T;
-		a : B {<writeln("\"T.a\"")>};<! hidden by S.a !>
+		a : B {<writeln("\\"T.a\\"")>};<! hidden by S.a !>
 """;
 		public String slaveGrammarS = """
 		parser grammar S;
-		a : b {<writeln("\"S.a\"")>};
+		a : b {<writeln("\\"S.a\\"")>};
 		b : B;
 """;
 
@@ -288,12 +287,12 @@ public class CompositeParsersDescriptors {
 		 grammar M;
 		 import S;
 		 b : 'b'|'c';
-		 WS : (' '|'\n') -> skip ;
+		 WS : (' '|'\\n') -> skip ;
 """;
 
 		public String slaveGrammarS = """
 		parser grammar S;
-		a : b {<write("\"S.a\"")>};
+		a : b {<write("\\"S.a\\"")>};
 		b : B ;
 """;
 
@@ -320,18 +319,18 @@ public class CompositeParsersDescriptors {
 		public String grammar = """
 		 grammar M;
 		 import S, T;
-		 b : 'b'|'c' {<writeln("\"M.b\"")>}|B|A;
-		 WS : (' '|'\n') -> skip ;
+		 b : 'b'|'c' {<writeln("\\"M.b\\"")>}|B|A;
+		 WS : (' '|'\\n') -> skip ;
 """;
 
 		public String slaveGrammarT = """
 		parser grammar T;
 		tokens { A }
-		b : 'b' {<writeln("\"T.b\"")>};
+		b : 'b' {<writeln("\\"T.b\\"")>};
 """;
 		public String slaveGrammarS = """
 		parser grammar S;
-		a : b {<writeln("\"S.a\"")>};
+		a : b {<writeln("\\"S.a\\"")>};
 		b : 'b' ;
 """;
 
@@ -359,14 +358,14 @@ public class CompositeParsersDescriptors {
 		 type_ : 'int' | 'float' ;
 		 ID  : 'a'..'z'+ ;
 		 INT : '0'..'9'+ ;
-		 WS : (' '|'\n') -> skip;
+		 WS : (' '|'\\n') -> skip;
 """;
 
 		public String slaveGrammarS = """
 		parser grammar S;
 		type_ : 'int' ;
 		decl : type_ ID ';'
-			| type_ ID init_ ';' {<AppendStr("\"JavaDecl: \"","$text"):writeln()>};
+			| type_ ID init_ ';' {<AppendStr("\\"JavaDecl: \\"","$text"):writeln()>};
 		init_ : '=' INT;
 """;
 
@@ -431,7 +430,7 @@ public class CompositeParsersDescriptors {
 		 import S;
 		 s : a ;
 		 B : 'b' ;
-		 WS : (' '|'\n') -> skip ;
+		 WS : (' '|'\\n') -> skip ;
 """;
 
 		public String slaveGrammarS = """
@@ -461,7 +460,7 @@ public class CompositeParsersDescriptors {
 		 import S;
 		 s : a;
 		 B : 'b';
-		 WS : (' '|'\n') -> skip ;
+		 WS : (' '|'\\n') -> skip ;
 """;
 
 		public String slaveGrammarS = """
@@ -492,9 +491,9 @@ public class CompositeParsersDescriptors {
 		public String grammar = """
 		 grammar M;
 		 import S;
-		 a : A {<Append("\"M.a: \"","$A"):writeln()>};
-		 A : 'abc' {<writeln("\"M.A\"")>};
-		 WS : (' '|'\n') -> skip ;
+		 a : A {<Append("\\"M.a: \\"","$A"):writeln()>};
+		 A : 'abc' {<writeln("\\"M.A\\"")>};
+		 WS : (' '|'\\n') -> skip ;
 """;
 
 		public String slaveGrammarS = """

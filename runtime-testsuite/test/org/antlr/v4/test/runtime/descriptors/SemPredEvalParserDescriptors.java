@@ -7,7 +7,6 @@
 package org.antlr.v4.test.runtime.descriptors;
 
 import org.antlr.v4.test.runtime.BaseParserTestDescriptor;
-import org.antlr.v4.test.runtime.CommentHasStringValue;
 
 public class SemPredEvalParserDescriptors {
 	public static class ActionHidesPreds extends BaseParserTestDescriptor {
@@ -26,21 +25,25 @@ public class SemPredEvalParserDescriptors {
 		 grammar T;
 		 @parser::members {<InitIntMember("i","0")>}
 		 s : a+ ;
-		 a : {<SetMember("i","1")>} ID {<MemberEquals("i","1")>}? {<writeln("\"alt 1\"")>}
-		   | {<SetMember("i","2")>} ID {<MemberEquals("i","2")>}? {<writeln("\"alt 2\"")>}
+		 a : {<SetMember("i","1")>} ID {<MemberEquals("i","1")>}? {<writeln("\\"alt 1\\"")>}
+		   | {<SetMember("i","2")>} ID {<MemberEquals("i","2")>}? {<writeln("\\"alt 2\\"")>}
 		   ;
 		 ID : 'a'..'z'+ ;
 		 INT : '0'..'9'+;
-		 WS : (' '|'\n') -> skip ;
+		 WS : (' '|'\\n') -> skip ;
 """;
 
 	}
 
-	public String output = """
- Regular non-forced actions can create side effects used by semantic
-	 *  predicates and so we cannot evaluate any semantic predicate
-	 *  encountered after having seen a regular action. This includes
-	 *  during global follow operations.
+// 	Regular non-forced actions can create side effects used by semantic
+// 	  predicates and so we cannot evaluate any semantic predicate
+// 	  encountered after having seen a regular action. This includes
+// 	  during global follow operations.
+	public static class ActionsHidePredsInGlobalFOLLOW extends BaseParserTestDescriptor {
+		public String input = "a!";
+		public String output = """
+		eval=true
+		parse
 """;
 
 		public String errors = null;
@@ -52,27 +55,43 @@ public class SemPredEvalParserDescriptors {
 		 @parser::members {
 		 <Declare_pred()>
 		 }
-		 s : e {} {<True():Invoke_pred()>}? {<writeln("\"parse\"")>} '!' ;
+		 s : e {} {<True():Invoke_pred()>}? {<writeln("\\"parse\\"")>} '!' ;
 		 t : e {} {<False():Invoke_pred()>}? ID ;
 		 e : ID | ; // non-LL(1) so we use ATN
 		 ID : 'a'..'z'+ ;
 		 INT : '0'..'9'+;
-		 WS : (' '|'\n') -> skip ;
+		 WS : (' '|'\\n') -> skip ;
 """;
 
 	}
 
-	public String grammar = """
-	 * This is a regression test for antlr/antlr4#196
-	 * "element+ in expression grammar doesn't parse properly"
-	 * https://github.com/antlr/antlr4/issues/196
+    // 	 * This is a regression test for antlr/antlr4#196
+    // 	 * "element+ in expression grammar doesn't parse properly"
+    // 	 * https://github.com/antlr/antlr4/issues/196
+	public static class AtomWithClosureInTranslatedLRRule extends BaseParserTestDescriptor {
+		public String input = "a+b+a";
+		public String output = null;
+		public String errors = null;
+		public String startRule = "start";
+		public String grammarName = "T";
+
+		public String grammar = """
+		 grammar T;
+		 start : e[0] EOF;
+		 e[int _p]
+		     :   ( 'a' | 'b'+ ) ( {3 >= $_p}? '+' e[4] )*
+		     ;
 """;
 
 	}
 
-	public String output = """
- We cannot collect predicates that are dependent on local context if
-	 *  we are doing a global follow. They appear as if they were not there at all.
+    // 	We cannot collect predicates that are dependent on local context if
+    // 	  we are doing a global follow. They appear as if they were not there at all.
+	public static class DepedentPredsInGlobalFOLLOW extends BaseParserTestDescriptor {
+		public String input = "a!";
+		public String output = """
+		eval=true
+		parse
 """;
 
 		public String errors = null;
@@ -85,12 +104,12 @@ public class SemPredEvalParserDescriptors {
 		 <Declare_pred()>
 		 }
 		 s : a[99] ;
-		 a[int i] : e {<ValEquals("$i","99"):Invoke_pred()>}? {<writeln("\"parse\"")>} '!' ;
+		 a[int i] : e {<ValEquals("$i","99"):Invoke_pred()>}? {<writeln("\\"parse\\"")>} '!' ;
 		 b[int i] : e {<ValEquals("$i","99"):Invoke_pred()>}? ID ;
 		 e : ID | ; // non-LL(1) so we use ATN
 		 ID : 'a'..'z'+ ;
 		 INT : '0'..'9'+;
-		 WS : (' '|'\n') -> skip ;
+		 WS : (' '|'\\n') -> skip ;
 """;
 
 	}
@@ -107,19 +126,31 @@ public class SemPredEvalParserDescriptors {
 		 s : b[2] ';' |  b[2] '.' ; // decision in s drills down to ctx-dependent pred in a;
 		 b[<IntArg("i")>] : a[<VarRef("i")>] ;
 		 a[<IntArg("i")>]
-		   : {<ValEquals("$i","1")>}? ID {<writeln("\"alt 1\"")>}
-		     | {<ValEquals("$i","2")>}? ID {<writeln("\"alt 2\"")>}
+		   : {<ValEquals("$i","1")>}? ID {<writeln("\\"alt 1\\"")>}
+		     | {<ValEquals("$i","2")>}? ID {<writeln("\\"alt 2\\"")>}
 		     ;
 		 ID : 'a'..'z'+ ;
 		 INT : '0'..'9'+;
-		 WS : (' '|'\n') -> skip ;
+		 WS : (' '|'\\n') -> skip ;
 """;
 
 	}
 
-	public String grammar = """
-	 * This is a regression test for antlr/antlr4#218 "ANTLR4 EOF Related Bug".
-	 * https://github.com/antlr/antlr4/issues/218
+    // 	 * This is a regression test for antlr/antlr4#218 "ANTLR4 EOF Related Bug".
+    // 	 * https://github.com/antlr/antlr4/issues/218
+	public static class DisabledAlternative extends BaseParserTestDescriptor {
+		public String input = "hello";
+		public String output = null;
+		public String errors = null;
+		public String startRule = "cppCompilationUnit";
+		public String grammarName = "T";
+
+		public String grammar = """
+		 grammar T;
+		 cppCompilationUnit : content+ EOF;
+		 content: anything | {<False()>}? .;
+		 anything: ANY_CHAR;
+		 ANY_CHAR: [_a-zA-Z0-9];
 """;
 
 	}
@@ -136,12 +167,12 @@ public class SemPredEvalParserDescriptors {
 		 s : b ';' |  b '.' ;
 		 b : a ;
 		 a
-		   : {<False()>}? ID {<writeln("\"alt 1\"")>}
-		   | {<True()>}? ID {<writeln("\"alt 2\"")>}
+		   : {<False()>}? ID {<writeln("\\"alt 1\\"")>}
+		   | {<True()>}? ID {<writeln("\\"alt 2\\"")>}
 		  ;
 		 ID : 'a'..'z'+ ;
 		 INT : '0'..'9'+;
-		 WS : (' '|'\n') -> skip ;
+		 WS : (' '|'\\n') -> skip ;
 """;
 
 	}
@@ -156,12 +187,12 @@ public class SemPredEvalParserDescriptors {
 		public String grammar = """
 		 grammar T;
 		 s : a a;
-		 a : {<False()>}? ID INT {<writeln("\"alt 1\"")>}
-		   | {<False()>}? ID INT {<writeln("\"alt 2\"")>}
+		 a : {<False()>}? ID INT {<writeln("\\"alt 1\\"")>}
+		   | {<False()>}? ID INT {<writeln("\\"alt 2\\"")>}
 		   ;
 		 ID : 'a'..'z'+ ;
 		 INT : '0'..'9'+;
-		 WS : (' '|'\n') -> skip ;
+		 WS : (' '|'\\n') -> skip ;
 """;
 
 	}
@@ -182,18 +213,31 @@ public class SemPredEvalParserDescriptors {
 		 s : a {} a; // do 2x: once in ATN, next in DFA;
 		 // action blocks lookahead from falling off of 'a'
 		 // and looking into 2nd 'a' ref. !ctx dependent pred
-		 a : ID {<writeln("\"alt 1\"")>}
-		   | {<True()>}?  ID {<writeln("\"alt 2\"")>}
+		 a : ID {<writeln("\\"alt 1\\"")>}
+		   | {<True()>}?  ID {<writeln("\\"alt 2\\"")>}
 		   ;
 		 ID : 'a'..'z'+ ;
 		 INT : '0'..'9'+;
-		 WS : (' '|'\n') -> skip ;
+		 WS : (' '|'\\n') -> skip ;
 """;
 
 	}
 
-	public String grammar = """
- Loopback doesn't eval predicate at start of alt
+    // Loopback doesn't eval predicate at start of alt
+	public static abstract class PredFromAltTestedInLoopBack extends BaseParserTestDescriptor {
+		public String startRule = "file_";
+		public String grammarName = "T";
+
+		public String grammar = """
+		 grammar T;
+		 file_
+		 @after {<ToStringTree("$ctx"):writeln()>}
+		   : para para EOF ;
+		 para: paraContent NL NL ;
+		 paraContent : ('s'|'x'|{<LANotEquals("2",{T<ParserToken("Parser", "NL")>})>}? NL)+ ;
+		 NL : '\\n' ;
+		 s : 's' ;
+		 X : 'x' ;
 """;
 
 	}
@@ -227,11 +271,11 @@ public class SemPredEvalParserDescriptors {
 		 grammar T;
 		 @parser::members {<InitBooleanMember("enumKeyword",True())>}
 		 primary
-		     :   ID {<AppendStr("\"ID \"", "$ID.text"):writeln()>}
-		     |   {<GetMember("enumKeyword"):Not()>}? 'enum' {<writeln("\"enum\"")>}
+		     :   ID {<AppendStr("\\"ID \\"", "$ID.text"):writeln()>}
+		     |   {<GetMember("enumKeyword"):Not()>}? 'enum' {<writeln("\\"enum\\"")>}
 		     ;
 		 ID : [a-z]+ ;
-		 WS : [ \t\n\r]+ -> skip ;
+		 WS : [ \t\\n\r]+ -> skip ;
 """;
 
 	}
@@ -247,11 +291,15 @@ public class SemPredEvalParserDescriptors {
 		public String errors = "line 1:0 no viable alternative at input 'enum'\n";
 	}
 
-	public String output = """
-	 * In this case, we're passing a parameter into a rule that uses that
-	 * information to predict the alternatives. This is the special case
-	 * where we know exactly which context we are in. The context stack
-	 * is empty and we have not dipped into the outer context to make a decision.
+    // 	 * In this case, we're passing a parameter into a rule that uses that
+    // 	 * information to predict the alternatives. This is the special case
+    // 	 * where we know exactly which context we are in. The context stack
+    // 	 * is empty and we have not dipped into the outer context to make a decision.
+	public static class PredicateDependentOnArg extends BaseParserTestDescriptor {
+		public String input = "a b";
+		public String output = """
+		alt 2
+		alt 1
 """;
 
 		public String errors = null;
@@ -263,32 +311,53 @@ public class SemPredEvalParserDescriptors {
 		 @parser::members {<InitIntMember("i","0")>}
 		 s : a[2] a[1];
 		 a[int i]
-		   : {<ValEquals("$i","1")>}? ID {<writeln("\"alt 1\"")>}
-		   | {<ValEquals("$i","2")>}? ID {<writeln("\"alt 2\"")>}
+		   : {<ValEquals("$i","1")>}? ID {<writeln("\\"alt 1\\"")>}
+		   | {<ValEquals("$i","2")>}? ID {<writeln("\\"alt 2\\"")>}
 		   ;
 		 ID : 'a'..'z'+ ;
 		 INT : '0'..'9'+;
-		 WS : (' '|'\n') -> skip ;
+		 WS : (' '|'\\n') -> skip ;
 """;
 
 	}
 
-	public String grammar = """
-	 * In this case, we have to ensure that the predicates are not tested
-	 * during the closure after recognizing the 1st ID. The closure will
-	 * fall off the end of 'a' 1st time and reach into the a[1] rule
-	 * invocation. It should not execute predicates because it does not know
-	 * what the parameter is. The context stack will not be empty and so
-	 * they should be ignored. It will not affect recognition, however. We
-	 * are really making sure the ATN simulation doesn't crash with context
-	 * object issues when it encounters preds during FOLLOW.
+    // 	 * In this case, we have to ensure that the predicates are not tested
+    // 	 * during the closure after recognizing the 1st ID. The closure will
+    // 	 * fall off the end of 'a' 1st time and reach into the a[1] rule
+    // 	 * invocation. It should not execute predicates because it does not know
+    // 	 * what the parameter is. The context stack will not be empty and so
+    // 	 * they should be ignored. It will not affect recognition, however. We
+    // 	 * are really making sure the ATN simulation doesn't crash with context
+    // 	 * object issues when it encounters preds during FOLLOW.
+	public static class PredicateDependentOnArg2 extends BaseParserTestDescriptor {
+		public String input = "a b";
+		public String output = null;
+		public String errors = null;
+		public String startRule = "s";
+		public String grammarName = "T";
+
+		public String grammar = """
+		 grammar T;
+		 @parser::members {<InitIntMember("i","0")>}
+		 s : a[2] a[1];
+		 a[int i]
+		   : {<ValEquals("$i","1")>}? ID
+		   | {<ValEquals("$i","2")>}? ID
+		   ;
+		 ID : 'a'..'z'+ ;
+		 INT : '0'..'9'+;
+		 WS : (' '|'\\n') -> skip ;
 """;
 
 	}
 
-	public String output = """
- During a global follow operation, we still collect semantic
-	 *  predicates as long as they are not dependent on local context
+    // 	During a global follow operation, we still collect semantic
+    // 	predicates as long as they are not dependent on local context
+	public static class PredsInGlobalFOLLOW extends BaseParserTestDescriptor {
+		public String input = "a!";
+		public String output = """
+		eval=true
+		parse
 """;
 
 		public String errors = null;
@@ -300,12 +369,12 @@ public class SemPredEvalParserDescriptors {
 		 @parser::members {
 		 <Declare_pred()>
 		 }
-		 s : e {<True():Invoke_pred()>}? {<writeln("\"parse\"")>} '!' ;
+		 s : e {<True():Invoke_pred()>}? {<writeln("\\"parse\\"")>} '!' ;
 		 t : e {<False():Invoke_pred()>}? ID ;
 		 e : ID | ; // non-LL(1) so we use ATN
 		 ID : 'a'..'z'+ ;
 		 INT : '0'..'9'+;
-		 WS : (' '|'\n') -> skip ;
+		 WS : (' '|'\\n') -> skip ;
 """;
 
 	}
@@ -324,12 +393,12 @@ public class SemPredEvalParserDescriptors {
 		public String grammar = """
 		 grammar T;
 		 s : a a;
-		 a : {<LTEquals("1", "\"x\"")>}? ID INT {<writeln("\"alt 1\"")>}
-		   | {<LTEquals("1", "\"y\"")>}? ID INT {<writeln("\"alt 2\"")>}
+		 a : {<LTEquals("1", "\\"x\\"")>}? ID INT {<writeln("\\"alt 1\\"")>}
+		   | {<LTEquals("1", "\\"y\\"")>}? ID INT {<writeln("\\"alt 2\\"")>}
 		   ;
 		 ID : 'a'..'z'+ ;
 		 INT : '0'..'9'+;
-		 WS : (' '|'\n') -> skip ;
+		 WS : (' '|'\\n') -> skip ;
 """;
 
 	}
@@ -349,13 +418,13 @@ public class SemPredEvalParserDescriptors {
 		public String grammar = """
 		 grammar T;
 		 s : a a a; // do 3x: once in ATN, next in DFA then INT in ATN
-		 a : {<False()>}? ID {<writeln("\"alt 1\"")>}
-		   | {<True()>}?  ID {<writeln("\"alt 2\"")>}
-		   | INT         {<writeln("\"alt 3\"")>}
+		 a : {<False()>}? ID {<writeln("\\"alt 1\\"")>}
+		   | {<True()>}?  ID {<writeln("\\"alt 2\\"")>}
+		   | INT         {<writeln("\\"alt 3\\"")>}
 		   ;
 		 ID : 'a'..'z'+ ;
 		 INT : '0'..'9'+;
-		 WS : (' '|'\n') -> skip ;
+		 WS : (' '|'\\n') -> skip ;
 """;
 
 	}
@@ -370,12 +439,12 @@ public class SemPredEvalParserDescriptors {
 		public String grammar = """
 		 grammar T;
 		 s : a ;
-		 a : {<False()>}? ID  {<writeln("\"alt 1\"")>}
-		   | {<True()>}?  INT {<writeln("\"alt 2\"")>}
+		 a : {<False()>}? ID  {<writeln("\\"alt 1\\"")>}
+		   | {<True()>}?  INT {<writeln("\\"alt 2\\"")>}
 		   ;
 		 ID : 'a'..'z'+ ;
 		 INT : '0'..'9'+;
-		 WS : (' '|'\n') -> skip ;
+		 WS : (' '|'\\n') -> skip ;
 """;
 
 	}
@@ -394,12 +463,12 @@ public class SemPredEvalParserDescriptors {
 		public String grammar = """
 		 grammar T;
 		 s : a a a;
-		 a : {<False()>}? ID  {<writeln("\"alt 1\"")>}
-		   | {<True()>}?  INT {<writeln("\"alt 2\"")>}
+		 a : {<False()>}? ID  {<writeln("\\"alt 1\\"")>}
+		   | {<True()>}?  INT {<writeln("\\"alt 2\\"")>}
 		   ;
 		 ID : 'a'..'z'+ ;
 		 INT : '0'..'9'+;
-		 WS : (' '|'\n') -> skip ;
+		 WS : (' '|'\\n') -> skip ;
 """;
 
 	}
@@ -419,21 +488,29 @@ public class SemPredEvalParserDescriptors {
 		public String grammar = """
 		 grammar T;
 		 	s : a+ ;
-		 a : {<False()>}? ID {<writeln("\"alt 1\"")>}
-		   | {<True()>}?  ID {<writeln("\"alt 2\"")>}
+		 a : {<False()>}? ID {<writeln("\\"alt 1\\"")>}
+		   | {<True()>}?  ID {<writeln("\\"alt 2\\"")>}
 		   ;
 		 ID : 'a'..'z'+ ;
 		 INT : '0'..'9'+;
-		 WS : (' '|'\n') -> skip ;
+		 WS : (' '|'\\n') -> skip ;
 """;
 
 	}
 
-	public String output = """
- In this case, we use predicates that depend on global information
-	 *  like we would do for a symbol table. We simply execute
-	 *  the predicates assuming that all necessary information is available.
-	 *  The i++ action is done outside of the prediction and so it is executed.
+    //  In this case, we use predicates that depend on global information
+    //    like we would do for a symbol table. We simply execute
+    // 	  the predicates assuming that all necessary information is available.
+    // 	  The i++ action is done outside of the prediction and so it is executed.
+	public static class ToLeftWithVaryingPredicate extends BaseParserTestDescriptor {
+		public String input = "x x y";
+		public String output = """
+		i=1
+		alt 2
+		i=2
+		alt 1
+		i=3
+		alt 2
 """;
 
 		public String errors = null;
@@ -444,14 +521,14 @@ public class SemPredEvalParserDescriptors {
 		 grammar T;
 		 @parser::members {<InitIntMember("i","0")>}
 		 s : ({<AddMember("i","1")>
-		 <write("\"i=\"")>
+		 <write("\\"i=\\"")>
 		 <writeln(GetMember("i"))>} a)+ ;
-		 a : {<ModMemberEquals("i","2","0")>}? ID {<writeln("\"alt 1\"")>}
-		   | {<ModMemberNotEquals("i","2","0")>}? ID {<writeln("\"alt 2\"")>}
+		 a : {<ModMemberEquals("i","2","0")>}? ID {<writeln("\\"alt 1\\"")>}
+		   | {<ModMemberNotEquals("i","2","0")>}? ID {<writeln("\\"alt 2\\"")>}
 		   ;
 		 ID : 'a'..'z'+ ;
 		 INT : '0'..'9'+;
-		 WS : (' '|'\n') -> skip ;
+		 WS : (' '|'\\n') -> skip ;
 """;
 
 	}
@@ -476,13 +553,13 @@ public class SemPredEvalParserDescriptors {
 		public String grammar = """
 		 grammar T;
 		 s : {<LL_EXACT_AMBIG_DETECTION()>} a ';' a; // do 2x: once in ATN, next in DFA
-		 a : ID {<writeln("\"alt 1\"")>}
-		   | ID {<writeln("\"alt 2\"")>}
-		   | {<False()>}? ID {<writeln("\"alt 3\"")>}
+		 a : ID {<writeln("\\"alt 1\\"")>}
+		   | ID {<writeln("\\"alt 2\\"")>}
+		   | {<False()>}? ID {<writeln("\\"alt 3\\"")>}
 		   ;
 		 ID : 'a'..'z'+ ;
 		 INT : '0'..'9'+;
-		 WS : (' '|'\n') -> skip ;
+		 WS : (' '|'\\n') -> skip ;
 """;
 
 		@Override
@@ -510,14 +587,14 @@ public class SemPredEvalParserDescriptors {
 		public String grammar = """
 		 grammar T;
 		 s : {<LL_EXACT_AMBIG_DETECTION()>} a ';' a ';' a;
-		 a : INT {<writeln("\"alt 1\"")>}
-		   | ID {<writeln("\"alt 2\"")>} // must pick this one for ID since pred is false
-		   | ID {<writeln("\"alt 3\"")>}
-		   | {<False()>}? ID {<writeln("\"alt 4\"")>}
+		 a : INT {<writeln("\\"alt 1\\"")>}
+		   | ID {<writeln("\\"alt 2\\"")>} // must pick this one for ID since pred is false
+		   | ID {<writeln("\\"alt 3\\"")>}
+		   | {<False()>}? ID {<writeln("\\"alt 4\\"")>}
 		   ;
 		 ID : 'a'..'z'+ ;
 		 INT : '0'..'9'+;
-		 WS : (' '|'\n') -> skip ;
+		 WS : (' '|'\\n') -> skip ;
 """;
 
 		@Override
@@ -533,8 +610,8 @@ public class SemPredEvalParserDescriptors {
 
 		public String grammar = """
 		 grammar T;
-		 s : a {<writeln("\"alt 1\"")>}
-		   | b {<writeln("\"alt 2\"")>}
+		 s : a {<writeln("\\"alt 1\\"")>}
+		   | b {<writeln("\\"alt 2\\"")>}
 		   ;
 		 a : {<False()>}? ID INT
 		   | ID INT
@@ -543,7 +620,7 @@ public class SemPredEvalParserDescriptors {
 		   ;
 		 ID : 'a'..'z'+ ;
 		 INT : '0'..'9'+;
-		 WS : (' '|'\n') -> skip ;
+		 WS : (' '|'\\n') -> skip ;
 """;
 
 	}
@@ -565,12 +642,12 @@ public class SemPredEvalParserDescriptors {
 		 // ';' helps us to resynchronize without consuming
 		 // 2nd 'a' reference. We our testing that the DFA also
 		 // throws an exception if the validating predicate fails
-		 a : {<False()>}? ID  {<writeln("\"alt 1\"")>}
-		   | {<True()>}?  INT {<writeln("\"alt 2\"")>}
+		 a : {<False()>}? ID  {<writeln("\\"alt 1\\"")>}
+		   | {<True()>}?  INT {<writeln("\\"alt 2\\"")>}
 		   ;
 		 ID : 'a'..'z'+ ;
 		 INT : '0'..'9'+;
-		 WS : (' '|'\n') -> skip ;
+		 WS : (' '|'\\n') -> skip ;
 """;
 
 	}

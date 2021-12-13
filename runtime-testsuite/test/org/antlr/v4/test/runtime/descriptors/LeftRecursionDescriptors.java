@@ -7,7 +7,6 @@
 package org.antlr.v4.test.runtime.descriptors;
 
 import org.antlr.v4.test.runtime.BaseParserTestDescriptor;
-import org.antlr.v4.test.runtime.CommentHasStringValue;
 
 public class LeftRecursionDescriptors {
 	public static abstract class AmbigLR extends BaseParserTestDescriptor {
@@ -35,7 +34,7 @@ public class LeftRecursionDescriptors {
 		 SUB :   '-' ;
 		 ID  :   [a-zA-Z]+ ;      // match identifiers
 		 INT :   [0-9]+ ;         // match integers
-		 NEWLINE:'\r'? '\n' ;     // return newlines to parser (is end-statement signal)
+		 NEWLINE:'\r'? '\\n' ;     // return newlines to parser (is end-statement signal)
 		 WS  :   [ \t]+ -> skip ; // toss out whitespace
 """;
 	}
@@ -84,7 +83,7 @@ public class LeftRecursionDescriptors {
 		 e : INT ;
 		 ID : 'a'..'z'+ ;
 		 INT : '0'..'9'+ ;
-		 WS : (' '|'\n') -> skip ;
+		 WS : (' '|'\\n') -> skip ;
 """;
 
 	}
@@ -110,7 +109,7 @@ public class LeftRecursionDescriptors {
 		 e : INT ;
 		 ID : 'a'..'z'+ ;
 		 INT : '0'..'9'+ ;
-		 WS : (' '|'\n') -> skip ;
+		 WS : (' '|'\\n') -> skip ;
 """;
 
 	}
@@ -160,11 +159,9 @@ public class LeftRecursionDescriptors {
 		public String output = "(s (declarator (declarator ( (declarator * (declarator a)) )) [ ]) <EOF>)\n";
 	}
 
-	/*
-	 * This is a regression test for "Support direct calls to left-recursive
-	 * rules".
-	 * https://github.com/antlr/antlr4/issues/161
-	 */
+    // 	 This is a regression test for "Support direct calls to left-recursive
+    // 	 rules".
+    // 	 https://github.com/antlr/antlr4/issues/161
 	public static abstract class DirectCallToLeftRecursiveRule extends BaseParserTestDescriptor {
 		public String errors = null;
 		public String startRule = "a";
@@ -176,7 +173,7 @@ public class LeftRecursionDescriptors {
 		   | ID
 		   ;
 		 ID : 'a'..'z'+ ;
-		 WS : (' '|'\n') -> skip ;
+		 WS : (' '|'\\n') -> skip ;
 """;
 
 	}
@@ -214,7 +211,7 @@ public class LeftRecursionDescriptors {
 		   ;
 		 ID : 'a'..'z'+ ;
 		 INT : '0'..'9'+ ;
-		 WS : (' '|'\n') -> skip ;
+		 WS : (' '|'\\n') -> skip ;
 """;
 
 	}
@@ -284,17 +281,17 @@ public class LeftRecursionDescriptors {
 		     |   ('~'|'!') e
 		     |   e ('*'|'/'|'%') e
 		     |   e ('+'|'-') e
-		     |   e ('\<\<' | '>>>' | '>>') e
-		     |   e ('\<=' | '>=' | '>' | '\<') e
+		     |   e ('<<' | '>>>' | '>>') e
+		     |   e ('<=' | '>=' | '>' | '<') e
 		     |   e 'instanceof' e
 		     |   e ('==' | '!=') e
 		     |   e '&' e
-		     |\<assoc=right> e '^' e
+		     |<assoc=right> e '^' e
 		     |   e '|' e
 		     |   e '&&' e
 		     |   e '||' e
 		     |   e '?' e ':' e
-		     |\<assoc=right>
+		     |<assoc=right>
 		         e ('='
 		           |'+='
 		           |'-='
@@ -305,7 +302,7 @@ public class LeftRecursionDescriptors {
 		           |'^='
 		           |'>>='
 		           |'>>>='
-		           |'\<\<='
+		           |'<<='
 		           |'%=') e
 		     ;
 		 typespec
@@ -316,7 +313,7 @@ public class LeftRecursionDescriptors {
 		     ;
 		 ID  : ('a'..'z'|'A'..'Z'|'_'|'$')+;
 		 INT : '0'..'9'+ ;
-		 WS  : (' '|'\n') -> skip ;
+		 WS  : (' '|'\\n') -> skip ;
 """;
 
 	}
@@ -394,7 +391,7 @@ public class LeftRecursionDescriptors {
 		   | '(' x=e ')' {}
 		   ;
 		 INT : '0'..'9'+ ;
-		 WS : (' '|'\n') -> skip ;
+		 WS : (' '|'\\n') -> skip ;
 """;
 
 	}
@@ -414,12 +411,10 @@ public class LeftRecursionDescriptors {
 		public String output = "(s (e (e ( (e (e 1) / (e 2)) )) * (e 3)))\n";
 	}
 
-	/*
-	 * This is a regression test for antlr/antlr4#625 "Duplicate action breaks
-	 * operator precedence"
-	 * https://github.com/antlr/antlr4/issues/625
-	 */
-	public static abstract class MultipleActionsPredicatesOptions extends BaseParserTestDescriptor {
+    // 	 This is a regression test for antlr/antlr4#625 "Duplicate action breaks
+    // 	 operator precedence"
+    // 	 https://github.com/antlr/antlr4/issues/625
+ 	public static abstract class MultipleActionsPredicatesOptions extends BaseParserTestDescriptor {
 		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "T";
@@ -428,12 +423,12 @@ public class LeftRecursionDescriptors {
 		 grammar T;
 		 s @after {<ToStringTree("$ctx"):writeln()>} : e ;
 		 e : a=e op=('*'|'/') b=e  {}{<True()>}?
-		   | a=e op=('+'|'-') b=e  {}\<p=3>{<True()>}?\<fail='Message'>
+		   | a=e op=('+'|'-') b=e  {}<p=3>{<True()>}?<fail='Message'>
 		   | INT {}{}
 		   | '(' x=e ')' {}{}
 		   ;
 		 INT : '0'..'9'+ ;
-		 WS : (' '|'\n') -> skip;
+		 WS : (' '|'\\n') -> skip;
 """;
 
 	}
@@ -453,11 +448,9 @@ public class LeftRecursionDescriptors {
 		public String output = "(s (e (e ( (e (e 1) / (e 2)) )) * (e 3)))\n";
 	}
 
-	/*
-	 * This is a regression test for antlr/antlr4#625 "Duplicate action breaks
-	 * operator precedence"
-	 * https://github.com/antlr/antlr4/issues/625
-	 */
+    // 	 This is a regression test for antlr/antlr4#625 "Duplicate action breaks
+    // 	 operator precedence"
+    // 	 https://github.com/antlr/antlr4/issues/625
 	public static abstract class MultipleActions extends BaseParserTestDescriptor {
 		public String errors = null;
 		public String startRule = "s";
@@ -471,7 +464,7 @@ public class LeftRecursionDescriptors {
 		   | '(' x=e ')' {}{}
 		   ;
 		 INT : '0'..'9'+ ;
-		 WS : (' '|'\n') -> skip ;
+		 WS : (' '|'\\n') -> skip ;
 """;
 
 	}
@@ -492,12 +485,10 @@ public class LeftRecursionDescriptors {
 		public String output = "(s (e (e ( (e (e 1) / (e 2)) )) * (e 3)))\n";
 	}
 
-	/*
-	 * This is a regression test for antlr/antlr4#433 "Not all context accessor
-	 * methods are generated when an alternative rule label is used for multiple
-	 * alternatives".
-	 * https://github.com/antlr/antlr4/issues/433
-	 */
+    // 	 This is a regression test for antlr/antlr4#433 "Not all context accessor
+    // 	 methods are generated when an alternative rule label is used for multiple
+    // 	 alternatives".
+    // 	 https://github.com/antlr/antlr4/issues/433
 	public static abstract class MultipleAlternativesWithCommonLabel extends BaseParserTestDescriptor {
 		public String startRule = "s";
 		public String grammarName = "T";
@@ -519,7 +510,7 @@ public class LeftRecursionDescriptors {
 		 INT : '0'..'9'+ ;
 		 INC : '++' ;
 		 DEC : '--' ;
-		 WS : (' '|'\n') -> skip;
+		 WS : (' '|'\\n') -> skip;
 """;
 
 	}
@@ -544,8 +535,29 @@ public class LeftRecursionDescriptors {
 		public String output = "12\n";
 	}
 
-	public String grammar = """
- Test for https://github.com/antlr/antlr4/issues/1295 in addition to #433.
+	// Test for https://github.com/antlr/antlr4/issues/1295 in addition to #433. */
+	public static class MultipleAlternativesWithCommonLabel_5 extends MultipleAlternativesWithCommonLabel {
+		public String input = "(99)+3";
+		public String output = "102\n";
+	}
+
+    // 	 This is a regression test for antlr/antlr4#509 "Incorrect rule chosen in
+    // 	 unambiguous grammar".
+    // 	 https://github.com/antlr/antlr4/issues/509
+	public static class PrecedenceFilterConsidersContext extends BaseParserTestDescriptor {
+		public String input = "aa";
+		public String output = "(prog (statement (letterA a)) (statement (letterA a)) <EOF>)\n";
+		public String errors = null;
+		public String startRule = "prog";
+		public String grammarName = "T";
+
+		public String grammar = """
+		 grammar T;
+		 prog
+		 @after {<ToStringTree("$ctx"):writeln()>}
+		 : statement* EOF {};
+		 statement: letterA | statement letterA 'b' ;
+		 letterA: 'a';
 """;
 
 	}
@@ -565,7 +577,7 @@ public class LeftRecursionDescriptors {
 		 literal : '-'? Integer ;
 		 op : '+' | '-' ;
 		 Integer : [0-9]+ ;
-		 WS : (' '|'\n') -> skip ;
+		 WS : (' '|'\\n') -> skip ;
 """;
 
 	}
@@ -589,13 +601,13 @@ public class LeftRecursionDescriptors {
 		 grammar T;
 		 s : e {<writeln("$e.result")>} ;
 		 e returns [<StringType()> result]
-		     :   ID '=' e1=e    {$result = <AppendStr("\"(\"", AppendStr("$ID.text", AppendStr("\"=\"", AppendStr("$e1.result", "\")\""))))>;}
+		     :   ID '=' e1=e    {$result = <AppendStr("\\"(\\"", AppendStr("$ID.text", AppendStr("\\"=\\"", AppendStr("$e1.result", "\\")\\""))))>;}
 		     |   ID             {$result = $ID.text;}
-		     |   e1=e '+' e2=e  {$result = <AppendStr("\"(\"", AppendStr("$e1.result", AppendStr("\"+\"", AppendStr("$e2.result", "\")\""))))>;}
+		     |   e1=e '+' e2=e  {$result = <AppendStr("\\"(\\"", AppendStr("$e1.result", AppendStr("\\"+\\"", AppendStr("$e2.result", "\\")\\""))))>;}
 		     ;
 		 ID : 'a'..'z'+ ;
 		 INT : '0'..'9'+ ;
-		 WS : (' '|'\n') -> skip ;
+		 WS : (' '|'\\n') -> skip ;
 """;
 
 	}
@@ -634,7 +646,7 @@ public class LeftRecursionDescriptors {
 		   ;
 		 ID : 'a'..'z'+ ;
 		 INT : '0'..'9'+ ;
-		 WS : (' '|'\n') -> skip ;
+		 WS : (' '|'\\n') -> skip ;
 """;
 
 	}
@@ -659,14 +671,12 @@ public class LeftRecursionDescriptors {
 		public String output = "12\n";
 	}
 
-	/*
-	 * This is a regression test for antlr/antlr4#677 "labels not working in grammar
-	 * file".
-	 * https://github.com/antlr/antlr4/issues/677
-	 *
-	 * This test treats `,` and `>>` as part of a single compound operator (similar
-	 * to a ternary operator).
-	 */
+    // 	 This is a regression test for antlr/antlr4#677 "labels not working in grammar
+    // 	 file".
+    //   https://github.com/antlr/antlr4/issues/677
+    //
+    // 	 This test treats `,` and `>>` as part of a single compound operator (similar
+    // 	 to a ternary operator).
 	public static abstract class ReturnValueAndActionsList extends BaseParserTestDescriptor {
 		public String errors = null;
 		public String startRule = "s";
@@ -685,7 +695,7 @@ public class LeftRecursionDescriptors {
 		       ('a'..'z'|'A'..'Z'|'0'..'9'|'_')*
 		 ;
 
-		 WS : [ \t\n]+ -> skip ;
+		 WS : [ \t\\n]+ -> skip ;
 """;
 
 	}
@@ -710,13 +720,11 @@ public class LeftRecursionDescriptors {
 		public String output = "(s (expr (expr (expr a) * (expr b)) , (expr c) , (expr (expr x) * (expr y)) >> (expr r)) <EOF>)\n";
 	}
 
-	/*
-	 * This is a regression test for antlr/antlr4#677 "labels not working in grammar
-	 * file".
-	 * https://github.com/antlr/antlr4/issues/677
-	 *
-	 * This test treats the `,` and `>>` operators separately.
-	 */
+    // 	 This is a regression test for antlr/antlr4#677 "labels not working in grammar
+    // 	 file".
+    // 	 https://github.com/antlr/antlr4/issues/677
+    //
+    // 	 This test treats the `,` and `>>` operators separately.
 	public static abstract class ReturnValueAndActionsList2 extends BaseParserTestDescriptor {
 		public String errors = null;
 		public String startRule = "s";
@@ -734,7 +742,7 @@ public class LeftRecursionDescriptors {
 		 ID  : ('a'..'z'|'A'..'Z'|'_')
 		       ('a'..'z'|'A'..'Z'|'0'..'9'|'_')*
 		 ;
-		 WS : [ \t\n]+ -> skip ;
+		 WS : [ \t\\n]+ -> skip ;
 """;
 
 	}
@@ -774,7 +782,7 @@ public class LeftRecursionDescriptors {
 		   | '(' x=e ')' {$v = $x.v;}
 		   ;
 		 INT : '0'..'9'+ ;
-		 WS : (' '|'\n') -> skip ;
+		 WS : (' '|'\\n') -> skip ;
 """;
 
 	}
@@ -813,7 +821,7 @@ public class LeftRecursionDescriptors {
 		   | ID
 		   ;
 		 ID : 'a'..'z'+ ;
-		 WS : (' '|'\n') -> skip ;
+		 WS : (' '|'\\n') -> skip ;
 """;
 
 	}
@@ -828,11 +836,11 @@ public class LeftRecursionDescriptors {
 		public String grammar = """
 		 grammar T;
 		 s @after {<ToStringTree("$ctx"):writeln()>} : a ;
-		 a : a ID {<False()>}?\<fail='custom message'>
+		 a : a ID {<False()>}?<fail='custom message'>
 		   | ID
 		   ;
 		 ID : 'a'..'z'+ ;
-		 WS : (' '|'\n') -> skip ;
+		 WS : (' '|'\\n') -> skip ;
 """;
 
 	}
@@ -849,7 +857,7 @@ public class LeftRecursionDescriptors {
 		   | ID
 		   ;
 		 ID : 'a'..'z'+ ;
-		 WS : (' '|'\n') -> skip ;
+		 WS : (' '|'\\n') -> skip ;
 """;
 
 	}
@@ -869,10 +877,25 @@ public class LeftRecursionDescriptors {
 		public String output = "(s (a (a (a x) y) z))\n";
 	}
 
-	public String grammar = """
-	 * This is a regression test for antlr/antlr4#542 "First alternative cannot
-	 * be right-associative".
-	 * https://github.com/antlr/antlr4/issues/542
+    // 	 This is a regression test for antlr/antlr4#542 "First alternative cannot
+    // 	 be right-associative".
+    // 	 https://github.com/antlr/antlr4/issues/542
+	public static abstract class TernaryExprExplicitAssociativity extends BaseParserTestDescriptor {
+		public String errors = null;
+		public String startRule = "s";
+		public String grammarName = "T";
+
+		public String grammar = """
+		 grammar T;
+		 s @after {<ToStringTree("$ctx"):writeln()>} : e EOF; // must indicate EOF can follow or 'a<EOF>' won't match
+		 e :<assoc=right> e '*' e
+		   |<assoc=right> e '+' e
+		   |<assoc=right> e '?' e ':' e
+		   |<assoc=right> e '=' e
+		   | ID
+		   ;
+		 ID : 'a'..'z'+ ;
+		 WS : (' '|'\\n') -> skip ;
 """;
 
 	}
@@ -929,15 +952,15 @@ public class LeftRecursionDescriptors {
 
 		public String grammar = """
 		 grammar T;
-		 s @after {<ToStringTree("$ctx"):writeln()>} : e EOF ; // must indicate EOF can follow or 'a\<EOF>' won't match
+		 s @after {<ToStringTree("$ctx"):writeln()>} : e EOF ; // must indicate EOF can follow or 'a<EOF>' won't match
 		 e : e '*' e
 		   | e '+' e
-		   |\<assoc=right> e '?' e ':' e
-		   |\<assoc=right> e '=' e
+		   |<assoc=right> e '?' e ':' e
+		   |<assoc=right> e '=' e
 		   | ID
 		   ;
 		 ID : 'a'..'z'+ ;
-		 WS : (' '|'\n') -> skip ;
+		 WS : (' '|'\\n') -> skip ;
 """;
 
 	}
@@ -987,11 +1010,9 @@ public class LeftRecursionDescriptors {
 		public String output = "(s (e (e a) ? (e b) : (e (e c) ? (e d) : (e e))) <EOF>)\n";
 	}
 
-	/*
-	 * This is a regression test for #239 "recoursive parser using implicit tokens
-	 * ignore white space lexer rule".
-	 * https://github.com/antlr/antlr4/issues/239
-	 */
+    // 	 This is a regression test for #239 "recoursive parser using implicit tokens
+    // 	 ignore white space lexer rule".
+    // 	 https://github.com/antlr/antlr4/issues/239
 	public static abstract class WhitespaceInfluence extends BaseParserTestDescriptor {
 		public String input = "Test(1,3)";
 		public String output = null;
@@ -1018,8 +1039,8 @@ public class LeftRecursionDescriptors {
 		     | expression '!=' expression                            # doNotEqual
 		     | expression '>' expression                             # doGreather
 		     | expression '>=' expression                            # doGreatherEqual
-		     | expression '\<' expression                             # doLesser
-		     | expression '\<=' expression                            # doLesserEqual
+		     | expression '<' expression                             # doLesser
+		     | expression '<=' expression                            # doLesserEqual
 		     | expression K_IN '(' expression (',' expression)* ')'  # doIn
 		     | expression ( '&' | K_AND) expression                  # doAnd
 		     | expression ( '|' | K_OR) expression                   # doOr
@@ -1046,9 +1067,9 @@ public class LeftRecursionDescriptors {
 		 NUMBER          : DIGIT+ ('.' DIGIT+)? (('e'|'E')('+'|'-')? DIGIT+)?;
 		 DATE            : '\'' DIGIT DIGIT DIGIT DIGIT '-' DIGIT DIGIT '-' DIGIT DIGIT (' ' DIGIT DIGIT ':' DIGIT DIGIT ':' DIGIT DIGIT ('.' DIGIT+)?)? '\'';
 		 SQ_STRING       : '\'' ('\'\'' | ~'\'')* '\'';
-		 DQ_STRING       : '"' ('\\\\"' | ~'"')* '"';
-		 WS              : [ \t\n\r]+ -> skip ;
-		 COMMENTS        : ('/*' .*? '*' '/' | '//' ~'\n'* '\n' ) -> skip;
+		 DQ_STRING       : '"' ('\\\\\"' | ~'"')* '"';
+		 WS              : [ \t\\n\r]+ -> skip ;
+		 COMMENTS        : ('/*' .*? '*' '/' | '//' ~'\\n'* '\\n' ) -> skip;
 """;
 	}
 

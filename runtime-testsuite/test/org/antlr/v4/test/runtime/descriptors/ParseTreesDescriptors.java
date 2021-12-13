@@ -7,7 +7,6 @@
 package org.antlr.v4.test.runtime.descriptors;
 
 import org.antlr.v4.test.runtime.BaseParserTestDescriptor;
-import org.antlr.v4.test.runtime.CommentHasStringValue;
 
 public class ParseTreesDescriptors {
 	public static class AltNum extends BaseParserTestDescriptor {
@@ -98,7 +97,7 @@ public class ParseTreesDescriptors {
 		 A : 'a' ;
 		 B : 'b' ;
 
-		 WHITESPACE : [ \n\t\r]+ -> channel(HIDDEN) ;
+		 WHITESPACE : [ \\n\t\r]+ -> channel(HIDDEN) ;
 
 		 ERROR : . ;
 """;

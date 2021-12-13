@@ -7,7 +7,6 @@
 package org.antlr.v4.test.runtime.descriptors;
 
 import org.antlr.v4.test.runtime.BaseParserTestDescriptor;
-import org.antlr.v4.test.runtime.CommentHasStringValue;
 
 public class ListenersDescriptors {
 	public static class Basic extends BaseParserTestDescriptor {
@@ -41,7 +40,7 @@ public class ListenersDescriptors {
 		 ADD : '+' ;
 		 INT : [0-9]+ ;
 		 ID  : [a-z]+ ;
-		 WS : [ \t\n]+ -> skip ;
+		 WS : [ \t\\n]+ -> skip ;
 """;
 
 	}
@@ -81,7 +80,7 @@ public class ListenersDescriptors {
 		 ADD : '+' ;
 		 INT : [0-9]+ ;
 		 ID  : [a-z]+ ;
-		 WS : [ \t\n]+ -> skip ;
+		 WS : [ \t\\n]+ -> skip ;
 """;
 
 	}
@@ -120,7 +119,7 @@ public class ListenersDescriptors {
 		 ADD : '+' ;
 		 INT : [0-9]+ ;
 		 ID  : [a-z]+ ;
-		 WS : [ \t\n]+ -> skip ;
+		 WS : [ \t\\n]+ -> skip ;
 """;
 
 	}
@@ -150,7 +149,7 @@ public class ListenersDescriptors {
 		 ADD : '+' ;
 		 INT : [0-9]+ ;
 		 ID  : [a-z]+ ;
-		 WS : [ \t\n]+ -> skip ;
+		 WS : [ \t\\n]+ -> skip ;
 """;
 
 	}
@@ -195,7 +194,7 @@ public class ListenersDescriptors {
 		 ADD : '+' ;
 		 INT : [0-9]+ ;
 		 ID  : [a-z]+ ;
-		 WS : [ \t\n]+ -> skip ;
+		 WS : [ \t\\n]+ -> skip ;
 """;
 
 	}

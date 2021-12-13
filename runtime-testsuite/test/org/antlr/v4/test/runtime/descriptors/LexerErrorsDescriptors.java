@@ -7,7 +7,6 @@
 package org.antlr.v4.test.runtime.descriptors;
 
 import org.antlr.v4.test.runtime.BaseLexerTestDescriptor;
-import org.antlr.v4.test.runtime.CommentHasStringValue;
 
 public class LexerErrorsDescriptors {
 	public static class DFAToATNThatFailsBackToDFA extends BaseLexerTestDescriptor {
@@ -59,7 +58,7 @@ public class LexerErrorsDescriptors {
 		public String grammar = """
 		 lexer grammar L;
 		 ACTION : '{' (ACTION | ~[{}])* '}';
-		 WS : [ \r\n\t]+ -> skip;
+		 WS : [ \r\\n\t]+ -> skip;
 """;
 
 	}
@@ -156,9 +155,15 @@ public class LexerErrorsDescriptors {
 
 	}
 
-	public String output = """
-	 * This is a regression test for #45 "NullPointerException in LexerATNSimulator.execDFA".
-	 * https://github.com/antlr/antlr4/issues/46
+    // 	 This is a regression test for #45 "NullPointerException in LexerATNSimulator.execDFA".
+    // 	 https://github.com/antlr/antlr4/issues/46
+	public static class LexerExecDFA extends BaseLexerTestDescriptor {
+		public String input = "x : x";
+		public String output = """
+		[@0,0:0='x',<3>,1:0]
+		[@1,2:2=':',<1>,1:2]
+		[@2,4:4='x',<3>,1:4]
+		[@3,5:4='<EOF>',<-1>,1:5]
 """;
 
 		public String errors = """
@@ -187,7 +192,7 @@ public class LexerErrorsDescriptors {
 		 lexer grammar L;
 		 ACTION2 : '[' (STRING | ~'"')*? ']';
 		 STRING : '"' ('\\\\' '"' | .)*? '"';
-		 WS : [ \t\r\n]+ -> skip;
+		 WS : [ \t\r\\n]+ -> skip;
 """;
 
 	}

@@ -7,7 +7,6 @@
 package org.antlr.v4.test.runtime.descriptors;
 
 import org.antlr.v4.test.runtime.BaseParserTestDescriptor;
-import org.antlr.v4.test.runtime.CommentHasStringValue;
 
 import java.util.Arrays;
 
@@ -36,7 +35,7 @@ public class PerformanceDescriptors {
 		 	;
 
 		 ID: [a-zA-Z_][a-zA-Z_0-9]*;
-		 WS: [ \t\n\r\f]+ -> skip;
+		 WS: [ \t\\n\r\f]+ -> skip;
 		 ERROR: .;
 """;
 	}
@@ -100,7 +99,7 @@ public class PerformanceDescriptors {
 		 	;
 
 		 ID: [a-zA-Z_][a-zA-Z_0-9]*;
-		 WS: [ \t\n\r\f]+ -> skip;
+		 WS: [ \t\\n\r\f]+ -> skip;
 """;
 
 		@Override

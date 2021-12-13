@@ -8,7 +8,6 @@ package org.antlr.v4.test.runtime.descriptors;
 
 import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.test.runtime.BaseLexerTestDescriptor;
-import org.antlr.v4.test.runtime.CommentHasStringValue;
 
 import java.net.URL;
 import java.nio.file.Files;
@@ -37,7 +36,7 @@ public class LexerExecDescriptors {
 		 		'a' {<PlusText("stuff1: "):writeln()>}
 		 		'b' {<PlusText("stuff2: "):writeln()>})
 		 		{<Text():writeln()>} ;
-		 WS : (' '|'\n') -> skip ;
+		 WS : (' '|'\\n') -> skip ;
 		 J : .;
 """;
 
@@ -59,8 +58,8 @@ public class LexerExecDescriptors {
 
 		public String grammar = """
 		 lexer grammar L;
-		 I : '0'..'9'+ {<writeln("\"I\"")>} ;
-		 WS : [ \n\\u000D] -> skip ;
+		 I : '0'..'9'+ {<writeln("\\"I\\"")>} ;
+		 WS : [ \\n\\u000D] -> skip ;
 """;
 
 	}
@@ -100,8 +99,8 @@ public class LexerExecDescriptors {
 
 		public String grammar = """
 		 lexer grammar L;
-		 I : (~[ab \\n]|'a')  {<writeln("\"I\"")>} ;
-		 WS : [ \n\\u000D]+ -> skip ;
+		 I : (~[ab \\\n]|'a')  {<writeln("\\"I\\"")>} ;
+		 WS : [ \\n\\u000D]+ -> skip ;
 """;
 
 	}
@@ -120,8 +119,8 @@ public class LexerExecDescriptors {
 
 		public String grammar = """
 		 lexer grammar L;
-		 I : ~[ab \n] ~[ \ncd]* {<writeln("\"I\"")>} ;
-		 WS : [ \n\\u000D]+ -> skip ;
+		 I : ~[ab \\n] ~[ \\ncd]* {<writeln("\\"I\\"")>} ;
+		 WS : [ \\n\\u000D]+ -> skip ;
 """;
 
 	}
@@ -142,8 +141,8 @@ public class LexerExecDescriptors {
 
 		public String grammar = """
 		 lexer grammar L;
-		 I : '0'..'9'+ {<writeln("\"I\"")>} ;
-		 WS : [ \n\\u000D]+ -> skip ;
+		 I : '0'..'9'+ {<writeln("\\"I\\"")>} ;
+		 WS : [ \\n\\u000D]+ -> skip ;
 """;
 
 	}
@@ -168,9 +167,9 @@ public class LexerExecDescriptors {
 
 		public String grammar = """
 		 lexer grammar L;
-		 I : [0-9]+ {<writeln("\"I\"")>} ;
-		 ID : [a-zA-Z] [a-zA-Z0-9]* {<writeln("\"ID\"")>} ;
-		 WS : [ \n\\u0009\r]+ -> skip ;
+		 I : [0-9]+ {<writeln("\\"I\\"")>} ;
+		 ID : [a-zA-Z] [a-zA-Z0-9]* {<writeln("\\"ID\\"")>} ;
+		 WS : [ \\n\\u0009\r]+ -> skip ;
 """;
 
 	}
@@ -191,8 +190,8 @@ public class LexerExecDescriptors {
 
 		public String grammar = """
 		 lexer grammar L;
-		 DASHBRACK : [\\-\]]+ {<writeln("\"DASHBRACK\"")>} ;
-		 WS : [ \n]+ -> skip ;
+		 DASHBRACK : [\\-\\]]+ {<writeln("\\"DASHBRACK\\"")>} ;
+		 WS : [ \\n]+ -> skip ;
 """;
 
 	}
@@ -211,8 +210,8 @@ public class LexerExecDescriptors {
 
 		public String grammar = """
 		 lexer grammar L;
-		 I : [0-9]+ {<writeln("\"I\"")>} ;
-		 WS : [ \n]+ -> skip ;
+		 I : [0-9]+ {<writeln("\\"I\\"")>} ;
+		 WS : [ \\n]+ -> skip ;
 """;
 
 	}
@@ -231,8 +230,8 @@ public class LexerExecDescriptors {
 
 		public String grammar = """
 		 lexer grammar L;
-		 A : ["a-z]+ {<writeln("\"A\"")>} ;
-		 WS : [ \n\t]+ -> skip ;
+		 A : ["a-z]+ {<writeln("\\"A\\"")>} ;
+		 WS : [ \\n\t]+ -> skip ;
 """;
 
 	}
@@ -241,7 +240,7 @@ public class LexerExecDescriptors {
 		public String input = "b\"\\a";
 		public String output = """
 		A
-		[@0,0:3='b"\a',<1>,1:0]
+		[@0,0:3='b"\\a',<1>,1:0]
 		[@1,4:3='<EOF>',<-1>,1:4]
 """;
 
@@ -251,8 +250,8 @@ public class LexerExecDescriptors {
 
 		public String grammar = """
 		 lexer grammar L;
-		 A : ["\\\\ab]+ {<writeln("\"A\"")>} ;
-		 WS : [ \n\t]+ -> skip ;
+		 A : ["\\\\ab]+ {<writeln("\\"A\\"")>} ;
+		 WS : [ \\n\t]+ -> skip ;
 """;
 
 	}
@@ -310,7 +309,7 @@ public class LexerExecDescriptors {
 """;
 
 		public String output = """
-		[@0,0:13='//blah\n//blah\n',<1>,1:0]
+		[@0,0:13='//blah\\n//blah\\n',<1>,1:0]
 		[@1,14:13='<EOF>',<-1>,3:0]
 """;
 
@@ -320,7 +319,7 @@ public class LexerExecDescriptors {
 
 		public String grammar = """
 		 lexer grammar L;
-		 CMT : '//' .*? '\n' CMT*;
+		 CMT : '//' .*? '\\n' CMT*;
 		 WS : (' '|'\t')+;
 """;
 
@@ -341,7 +340,7 @@ public class LexerExecDescriptors {
 		public String grammar = """
 		 lexer grammar L;
 		 I : ('a' | 'ab') {<Text():writeln()>} ;
-		 WS : (' '|'\n') -> skip ;
+		 WS : (' '|'\\n') -> skip ;
 		 J : .;
 """;
 
@@ -354,7 +353,7 @@ public class LexerExecDescriptors {
 """;
 
 		public String output = """
-		[@0,0:13='//blah\n//blah\n',<1>,1:0]
+		[@0,0:13='//blah\\n//blah\\n',<1>,1:0]
 		[@1,14:13='<EOF>',<-1>,3:0]
 """;
 
@@ -364,7 +363,7 @@ public class LexerExecDescriptors {
 
 		public String grammar = """
 		 lexer grammar L;
-		 CMT : '//' .*? '\n' CMT?;
+		 CMT : '//' .*? '\\n' CMT?;
 		 WS : (' '|'\t')+;
 """;
 
@@ -377,7 +376,7 @@ public class LexerExecDescriptors {
 """;
 
 		public String output = """
-		[@0,0:13='//blah\n//blah\n',<1>,1:0]
+		[@0,0:13='//blah\\n//blah\\n',<1>,1:0]
 		[@1,14:13='<EOF>',<-1>,3:0]
 """;
 
@@ -387,7 +386,7 @@ public class LexerExecDescriptors {
 
 		public String grammar = """
 		 lexer grammar L;
-		 CMT : ('//' .*? '\n')+;
+		 CMT : ('//' .*? '\\n')+;
 		 WS : (' '|'\t')+;
 """;
 
@@ -424,7 +423,7 @@ public class LexerExecDescriptors {
 		 DOT : '.' ;
 		 ID : 'a'..'z'+ ;
 		 fragment HexDigit : ('0'..'9'|'a'..'f'|'A'..'F') ;
-		 WS : (' '|'\n')+;
+		 WS : (' '|'\\n')+;
 """;
 
 	}
@@ -450,7 +449,7 @@ public class LexerExecDescriptors {
 		 lexer grammar L;
 		 KEND : 'end' ; // has priority
 		 ID : 'a'..'z'+ ;
-		 WS : (' '|'\n')+;
+		 WS : (' '|'\\n')+;
 """;
 
 	}
@@ -462,8 +461,8 @@ public class LexerExecDescriptors {
 """;
 
 		public String output = """
-		[@0,0:6='//blah\n',<1>,1:0]
-		[@1,7:13='//blah\n',<1>,2:0]
+		[@0,0:6='//blah\\n',<1>,1:0]
+		[@1,7:13='//blah\\n',<1>,2:0]
 		[@2,14:13='<EOF>',<-1>,3:0]
 """;
 
@@ -473,7 +472,7 @@ public class LexerExecDescriptors {
 
 		public String grammar = """
 		 lexer grammar L;
-		 CMT : '//' .*? '\n' CMT*?;
+		 CMT : '//' .*? '\\n' CMT*?;
 		 WS : (' '|'\t')+;
 """;
 
@@ -496,7 +495,7 @@ public class LexerExecDescriptors {
 		public String grammar = """
 		 lexer grammar L;
 		 I : .*? ('a' | 'ab') {<Text():writeln()>} ;
-		 WS : (' '|'\n') -> skip ;
+		 WS : (' '|'\\n') -> skip ;
 		 J : . {<Text():writeln()>};
 """;
 
@@ -509,8 +508,8 @@ public class LexerExecDescriptors {
 """;
 
 		public String output = """
-		[@0,0:6='//blah\n',<1>,1:0]
-		[@1,7:13='//blah\n',<1>,2:0]
+		[@0,0:6='//blah\\n',<1>,1:0]
+		[@1,7:13='//blah\\n',<1>,2:0]
 		[@2,14:13='<EOF>',<-1>,3:0]
 """;
 
@@ -520,7 +519,7 @@ public class LexerExecDescriptors {
 
 		public String grammar = """
 		 lexer grammar L;
-		 CMT : '//' .*? '\n' CMT??;
+		 CMT : '//' .*? '\\n' CMT??;
 		 WS : (' '|'\t')+;
 """;
 
@@ -533,8 +532,8 @@ public class LexerExecDescriptors {
 """;
 
 		public String output = """
-		[@0,0:6='//blah\n',<1>,1:0]
-		[@1,7:13='//blah\n',<1>,2:0]
+		[@0,0:6='//blah\\n',<1>,1:0]
+		[@1,7:13='//blah\\n',<1>,2:0]
 		[@2,14:13='<EOF>',<-1>,3:0]
 """;
 
@@ -544,7 +543,7 @@ public class LexerExecDescriptors {
 
 		public String grammar = """
 		 lexer grammar L;
-		 CMT : ('//' .*? '\n')+?;
+		 CMT : ('//' .*? '\\n')+?;
 		 WS : (' '|'\t')+;
 """;
 
@@ -572,7 +571,7 @@ public class LexerExecDescriptors {
 	public static class NonGreedyTermination2 extends BaseLexerTestDescriptor {
 		public String input = "\"\"\"mom\"";
 		public String output = """
-		[@0,0:6='"""mom"',<1>,1:0]
+		[@0,0:6='\"""mom"',<1>,1:0]
 		[@1,7:6='<EOF>',<-1>,1:7]
 """;
 
@@ -672,11 +671,11 @@ public class LexerExecDescriptors {
 
 		 fragment
 		 IGNORED
-		 	:	[ \t\r\n]*
+		 	:	[ \t\r\\n]*
 		 	;
 
 		 NEWLINE
-		 	:	[\r\n]+ -> skip
+		 	:	[\r\\n]+ -> skip
 		 	;
 
 		 WS
@@ -712,7 +711,7 @@ public class LexerExecDescriptors {
 		public String grammar = """
 		 lexer grammar L;
 		 CMT : '/*' (CMT | .)+? '*' '/' ;
-		 WS : (' '|'\n')+;
+		 WS : (' '|'\\n')+;
 """;
 
 	}
@@ -758,7 +757,7 @@ public class LexerExecDescriptors {
 		public String grammar = """
 		 lexer grammar L;
 		 CMT : '/*' (CMT | .)*? '*' '/' ;
-		 WS : (' '|'\n')+;
+		 WS : (' '|'\\n')+;
 """;
 
 	}
@@ -815,7 +814,7 @@ public class LexerExecDescriptors {
 		 lexer grammar L;
 		 A : '-' I ;
 		 I : '0'..'9'+ ;
-		 WS : (' '|'\n') -> skip ;
+		 WS : (' '|'\\n') -> skip ;
 """;
 
 	}
@@ -825,7 +824,7 @@ public class LexerExecDescriptors {
 		public String output = """
 		[@0,0:0='\',<1>,1:0]
 		[@1,2:2='/',<2>,1:2]
-		[@2,4:5='\/',<3>,1:4]
+		[@2,4:5='\\/',<3>,1:4]
 		[@3,7:8='/\',<4>,1:7]
 		[@4,9:8='<EOF>',<-1>,1:9]
 """;

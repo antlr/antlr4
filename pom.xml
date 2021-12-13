@@ -91,8 +91,6 @@
 		<module>tool</module>
 		<module>antlr4-maven-plugin</module>
 		<module>tool-testsuite</module>
-		<module>runtime-testsuite/annotations</module>
-		<module>runtime-testsuite/processors</module>
 		<module>runtime-testsuite</module>
 	</modules>
 
@@ -101,7 +99,7 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<antlr.testinprocess>true</antlr.testinprocess>
 		<maven.compiler.source>16</maven.compiler.source>
-		<maven.compiler.target>1.8</maven.compiler.target>
+		<maven.compiler.target>16</maven.compiler.target>
 	</properties>
 
 	<mailingLists>
