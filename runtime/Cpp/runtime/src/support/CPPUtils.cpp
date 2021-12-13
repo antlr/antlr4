@@ -204,22 +204,4 @@ namespace antlrcpp {
     return result;
   }
 
-  //----------------- SingleWriteMultipleRead --------------------------------------------------------------------------
-
-  void SingleWriteMultipleReadLock::readLock() {
-    _mutex.lock_shared();
-  }
-
-  void SingleWriteMultipleReadLock::readUnlock() {
-    _mutex.unlock_shared();
-  }
-
-  void SingleWriteMultipleReadLock::writeLock() {
-    _mutex.lock();
-  }
-
-  void SingleWriteMultipleReadLock::writeUnlock() {
-    _mutex.unlock();
-  }
-
 } // namespace antlrcpp

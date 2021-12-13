@@ -24,6 +24,7 @@
 #include <memory>
 #include <mutex>
 #include <set>
+#include <shared_mutex>
 #include <sstream>
 #include <stack>
 #include <string>
