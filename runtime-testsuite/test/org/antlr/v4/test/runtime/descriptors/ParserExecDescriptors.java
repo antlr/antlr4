@@ -453,7 +453,7 @@ public class ParserExecDescriptors {
 		     : 'if' expression
 		       ( ( 'then'
 		           executableStatement*
-		           elseIfStatement*  // <--- problem is here; should yield a list not node
+		           elseIfStatement*  // --- problem is here; should yield a list not node
 		           elseStatement?
 		           'end' 'if'
 		         ) | executableStatement )
@@ -611,7 +611,7 @@ public class ParserExecDescriptors {
 		 ifStmt : 'if' ID stmt ('else' stmt | { <LANotEquals("1", {T<ParserToken("Parser", "ELSE")>})> }?);
 		 ELSE : 'else';
 		 ID : [a-zA-Z]+;
-		 WS : [ \\\n\\t]+ -> skip;
+		 WS : [ \\n\\t]+ -> skip;
 """;
 
 	}
@@ -639,7 +639,7 @@ public class ParserExecDescriptors {
 		 SEMICOLON: ';';
 		 A : 'a'|'A';
 		 B : 'b'|'B';
-		 WS      : [ \r\t\\n]+ -> skip;
+		 WS      : [ \\r\\t\\n]+ -> skip;
 """;
 
 	}

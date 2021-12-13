@@ -58,7 +58,7 @@ public class LexerErrorsDescriptors {
 		public String grammar = """
 		 lexer grammar L;
 		 ACTION : '{' (ACTION | ~[{}])* '}';
-		 WS : [ \r\\n\t]+ -> skip;
+		 WS : [ \\r\\n\\t]+ -> skip;
 """;
 
 	}
@@ -189,12 +189,11 @@ public class LexerErrorsDescriptors {
 
 		// ST interprets \\ as \ so we need \\\\ to get \\
 		public String grammar = """
-		 lexer grammar L;
-		 ACTION2 : '[' (STRING | ~'"')*? ']';
-		 STRING : '"' ('\\\\' '"' | .)*? '"';
-		 WS : [ \t\r\\n]+ -> skip;
-""";
-
+				 lexer grammar L;
+				 ACTION2 : '[' (STRING | ~'"')*? ']';
+				 STRING : '"' ('\\\\\\\\' '"' | .)*? '"';
+				 WS : [ \\t\\r\\n]+ -> skip;
+		""";
 	}
 
 	public static class StringsEmbeddedInActions_1 extends StringsEmbeddedInActions {

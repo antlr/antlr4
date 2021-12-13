@@ -99,7 +99,7 @@ public class LexerExecDescriptors {
 
 		public String grammar = """
 		 lexer grammar L;
-		 I : (~[ab \\\n]|'a')  {<writeln("\\"I\\"")>} ;
+		 I : (~[ab \\n]|'a')  {<writeln("\\"I\\"")>} ;
 		 WS : [ \\n\\u000D]+ -> skip ;
 """;
 
@@ -169,7 +169,7 @@ public class LexerExecDescriptors {
 		 lexer grammar L;
 		 I : [0-9]+ {<writeln("\\"I\\"")>} ;
 		 ID : [a-zA-Z] [a-zA-Z0-9]* {<writeln("\\"ID\\"")>} ;
-		 WS : [ \\n\\u0009\r]+ -> skip ;
+		 WS : [ \\n\\u0009\\r]+ -> skip ;
 """;
 
 	}
@@ -249,10 +249,10 @@ public class LexerExecDescriptors {
 		public String grammarName = "L";
 
 		public String grammar = """
-		 lexer grammar L;
-		 A : ["\\\\ab]+ {<writeln("\\"A\\"")>} ;
-		 WS : [ \\n\t]+ -> skip ;
-""";
+				 lexer grammar L;
+				 A : ["\\\\\\\\ab]+ {<writeln("\\"A\\"")>} ;
+				 WS : [ \\n\\t]+ -> skip ;
+		""";
 
 	}
 
@@ -671,15 +671,15 @@ public class LexerExecDescriptors {
 
 		 fragment
 		 IGNORED
-		 	:	[ \t\r\\n]*
+		 	:	[ \\t\\r\\n]*
 		 	;
 
 		 NEWLINE
-		 	:	[\r\\n]+ -> skip
+		 	:	[\\r\\n]+ -> skip
 		 	;
 
 		 WS
-		 	:	[ \t]+ -> skip
+		 	:	[ \\t]+ -> skip
 		 	;
 """;
 
@@ -822,25 +822,33 @@ public class LexerExecDescriptors {
 	public static class Slashes extends BaseLexerTestDescriptor {
 		public String input = "\\ / \\/ /\\";
 		public String output = """
-		[@0,0:0='\',<1>,1:0]
-		[@1,2:2='/',<2>,1:2]
-		[@2,4:5='\\/',<3>,1:4]
-		[@3,7:8='/\',<4>,1:7]
-		[@4,9:8='<EOF>',<-1>,1:9]
-""";
+				[@0,0:0='\\',<1>,1:0]
+				[@1,2:2='/',<2>,1:2]
+				[@2,4:5='\\/',<3>,1:4]
+				[@3,7:8='/\\',<4>,1:7]
+				[@4,9:8='<EOF>',<-1>,1:9]
+		""";
 
 		public String errors = null;
 		public String startRule = "";
 		public String grammarName = "L";
 
+		/* Wow. that grammar is really:
+			 lexer grammar L;
+			 Backslash : '\\\\';
+			 Slash : '/';
+			 Vee : '\\\\/';
+			 Wedge : '/\\\\';
+			 WS : [ \t] -> skip;
+		 */
 		public String grammar = """
-		 lexer grammar L;
-		 Backslash : '\\\\';
-		 Slash : '/';
-		 Vee : '\\\\/';
-		 Wedge : '/\\\\';
-		 WS : [ \t] -> skip;
-""";
+				 lexer grammar L;
+				 Backslash : '\\\\\\\\';
+				 Slash : '/';
+				 Vee : '\\\\\\\\/';
+				 Wedge : '/\\\\\\\\';
+				 WS : [ \\t] -> skip;
+		""";
 
 	}
 
@@ -865,13 +873,13 @@ public class LexerExecDescriptors {
 		public String grammar = """
 		 lexer grammar L;
 		 BeginString
-		 	:	'\'' -> more, pushMode(StringMode)
+		 	:	'\\'' -> more, pushMode(StringMode)
 		 	;
 		 mode StringMode;
 		 	StringMode_X : 'x' -> more;
 		 	StringMode_Done : -> more, mode(EndStringMode);
 		 mode EndStringMode;
-		 	EndString : '\'' -> popMode;
+		 	EndString : '\\'' -> popMode;
 """;
 	}
 

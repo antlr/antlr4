@@ -34,8 +34,8 @@ public class LeftRecursionDescriptors {
 		 SUB :   '-' ;
 		 ID  :   [a-zA-Z]+ ;      // match identifiers
 		 INT :   [0-9]+ ;         // match integers
-		 NEWLINE:'\r'? '\\n' ;     // return newlines to parser (is end-statement signal)
-		 WS  :   [ \t]+ -> skip ; // toss out whitespace
+		 NEWLINE:'\\r'? '\\n' ;     // return newlines to parser (is end-statement signal)
+		 WS  :   [ \\t]+ -> skip ; // toss out whitespace
 """;
 	}
 
@@ -281,17 +281,17 @@ public class LeftRecursionDescriptors {
 		     |   ('~'|'!') e
 		     |   e ('*'|'/'|'%') e
 		     |   e ('+'|'-') e
-		     |   e ('<<' | '>>>' | '>>') e
-		     |   e ('<=' | '>=' | '>' | '<') e
+		     |   e ('\\<\\<' | '>>>' | '>>') e
+		     |   e ('\\<=' | '>=' | '>' | '\\<') e
 		     |   e 'instanceof' e
 		     |   e ('==' | '!=') e
 		     |   e '&' e
-		     |<assoc=right> e '^' e
+		     |\\<assoc=right> e '^' e
 		     |   e '|' e
 		     |   e '&&' e
 		     |   e '||' e
 		     |   e '?' e ':' e
-		     |<assoc=right>
+		     |\\<assoc=right>
 		         e ('='
 		           |'+='
 		           |'-='
@@ -302,7 +302,7 @@ public class LeftRecursionDescriptors {
 		           |'^='
 		           |'>>='
 		           |'>>>='
-		           |'<<='
+		           |'\\<\\<='
 		           |'%=') e
 		     ;
 		 typespec
@@ -887,11 +887,11 @@ public class LeftRecursionDescriptors {
 
 		public String grammar = """
 		 grammar T;
-		 s @after {<ToStringTree("$ctx"):writeln()>} : e EOF; // must indicate EOF can follow or 'a<EOF>' won't match
-		 e :<assoc=right> e '*' e
-		   |<assoc=right> e '+' e
-		   |<assoc=right> e '?' e ':' e
-		   |<assoc=right> e '=' e
+		 s @after {<ToStringTree("$ctx"):writeln()>} : e EOF; // must indicate EOF can follow or 'a\\<EOF>' won't match
+		 e :\\<assoc=right> e '*' e
+		   |\\<assoc=right> e '+' e
+		   |\\<assoc=right> e '?' e ':' e
+		   |\\<assoc=right> e '=' e
 		   | ID
 		   ;
 		 ID : 'a'..'z'+ ;
@@ -952,11 +952,11 @@ public class LeftRecursionDescriptors {
 
 		public String grammar = """
 		 grammar T;
-		 s @after {<ToStringTree("$ctx"):writeln()>} : e EOF ; // must indicate EOF can follow or 'a<EOF>' won't match
+		 s @after {<ToStringTree("$ctx"):writeln()>} : e EOF ; // must indicate EOF can follow or 'a\\<EOF>' won't match
 		 e : e '*' e
 		   | e '+' e
-		   |<assoc=right> e '?' e ':' e
-		   |<assoc=right> e '=' e
+		   |\\<assoc=right> e '?' e ':' e
+		   |\\<assoc=right> e '=' e
 		   | ID
 		   ;
 		 ID : 'a'..'z'+ ;
@@ -1039,8 +1039,8 @@ public class LeftRecursionDescriptors {
 		     | expression '!=' expression                            # doNotEqual
 		     | expression '>' expression                             # doGreather
 		     | expression '>=' expression                            # doGreatherEqual
-		     | expression '<' expression                             # doLesser
-		     | expression '<=' expression                            # doLesserEqual
+		     | expression '\\<' expression                             # doLesser
+		     | expression '\\<=' expression                            # doLesserEqual
 		     | expression K_IN '(' expression (',' expression)* ')'  # doIn
 		     | expression ( '&' | K_AND) expression                  # doAnd
 		     | expression ( '|' | K_OR) expression                   # doOr
@@ -1065,10 +1065,10 @@ public class LeftRecursionDescriptors {
 		 // Tokens
 		 ID              : LETTER ALPHANUM*;
 		 NUMBER          : DIGIT+ ('.' DIGIT+)? (('e'|'E')('+'|'-')? DIGIT+)?;
-		 DATE            : '\'' DIGIT DIGIT DIGIT DIGIT '-' DIGIT DIGIT '-' DIGIT DIGIT (' ' DIGIT DIGIT ':' DIGIT DIGIT ':' DIGIT DIGIT ('.' DIGIT+)?)? '\'';
-		 SQ_STRING       : '\'' ('\'\'' | ~'\'')* '\'';
-		 DQ_STRING       : '"' ('\\\\\"' | ~'"')* '"';
-		 WS              : [ \t\\n\r]+ -> skip ;
+		 DATE            : '\\'' DIGIT DIGIT DIGIT DIGIT '-' DIGIT DIGIT '-' DIGIT DIGIT (' ' DIGIT DIGIT ':' DIGIT DIGIT ':' DIGIT DIGIT ('.' DIGIT+)?)? '\\'';
+		 SQ_STRING       : '\\'' ('\\'\\'' | ~'\\'')* '\\'';
+		 DQ_STRING       : '"' ('\\\\\\\\"' | ~'"')* '"';
+		 WS              : [ \\t\\n\\r]+ -> skip ;
 		 COMMENTS        : ('/*' .*? '*' '/' | '//' ~'\\n'* '\\n' ) -> skip;
 """;
 	}

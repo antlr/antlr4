@@ -34,6 +34,9 @@ def update(filename, java):
         string = string.replace(r'\<', '<')
         string = string.replace(r'\]', r'\\]')
         string = string.replace(r'\n', r'\\n')
+        string = string.replace(r'\t', r'\\n')
+        string = string.replace(r'\r', r'\\r')
+        string = string.replace(r'\f', r'\\f')
         string = string.replace(r'\"', r'\\"')
         string = string.replace(r'"""', r'\"""')
         repl = f'''{field} = """

@@ -285,7 +285,7 @@ public class ParserErrorsDescriptors {
 		   | 'a'
 		   ;
 		 DOT : '.' ;
-		 WS : [ \t\r\\n]+ -> skip;
+		 WS : [ \\t\\r\\n]+ -> skip;
 """;
 
 	}
@@ -504,7 +504,7 @@ public class ParserErrorsDescriptors {
 		 ERR :   '~FORCE_ERROR~' ;
 		 ID  :   [a-zA-Z]+ ;
 		 STR :   '"' ~["]* '"' ;
-		 WS  :   [ \t\r\\n]+ -> skip ;
+		 WS  :   [ \\t\\r\\n]+ -> skip ;
 """;
 
 	}
@@ -539,7 +539,7 @@ public class ParserErrorsDescriptors {
 		 ID  : [a-z]+;
 		 ID1 : '$';
 
-		 WS  : [ \t\r\\n]+ -> skip ;
+		 WS  : [ \\t\\r\\n]+ -> skip ;
 """;
 
 	}

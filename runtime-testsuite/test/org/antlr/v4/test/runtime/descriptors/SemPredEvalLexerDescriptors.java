@@ -173,10 +173,10 @@ public class SemPredEvalLexerDescriptors {
 		public String grammar = """
 		 lexer grammar L;
 		 ID : [a-z]+  ;
-		 INDENT : [ \t]+ { <TokenStartColumnEquals("0")> }?
+		 INDENT : [ \\t]+ { <TokenStartColumnEquals("0")> }?
 		          { <writeln("\\"INDENT\\"")> }  ;
 		 NL : '\\n';
-		 WS : [ \t]+ ;
+		 WS : [ \\t]+ ;
 """;
 
 		@Override
