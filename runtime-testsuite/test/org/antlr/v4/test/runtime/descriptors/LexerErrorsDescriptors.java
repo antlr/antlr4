@@ -159,17 +159,9 @@ public class LexerErrorsDescriptors {
 	public String output = """
 	 * This is a regression test for #45 "NullPointerException in LexerATNSimulator.execDFA".
 	 * https://github.com/antlr/antlr4/issues/46
-	 */
-	public static class LexerExecDFA extends BaseLexerTestDescriptor {
-		public String input = "x : x";
-		public String errors = """
-		[@0,0:0='x',<3>,1:0]
-		[@1,2:2=':',<1>,1:2]
-		[@2,4:4='x',<3>,1:4]
-		[@3,5:4='<EOF>',<-1>,1:5]
 """;
 
-		public String grammar = """
+		public String errors = """
 		line 1:1 token recognition error at: ' '
 		line 1:3 token recognition error at: ' '
 """;
@@ -191,7 +183,7 @@ public class LexerErrorsDescriptors {
 		public String grammarName = "L";
 
 		// ST interprets \\ as \ so we need \\\\ to get \\
-		public String output = """
+		public String grammar = """
 		 lexer grammar L;
 		 ACTION2 : '[' (STRING | ~'"')*? ']';
 		 STRING : '"' ('\\\\' '"' | .)*? '"';
@@ -202,7 +194,7 @@ public class LexerErrorsDescriptors {
 
 	public static class StringsEmbeddedInActions_1 extends StringsEmbeddedInActions {
 		public String input = "[\"foo\"]";
-		/**
+		public String output = """
 		[@0,0:6='["foo"]',<1>,1:0]
 		[@1,7:6='<EOF>',<-1>,1:7]
 """;

@@ -423,60 +423,74 @@ public class SetsDescriptors {
 
 	}
 
-	public static class UnicodeEscapedSMPSet extends BaseParserTestDescriptor {
-		public String input = new StringBuilder()
-				.append("a")
-				.appendCodePoint(0x1D5C2)
-				.appendCodePoint(0x1D5CE)
-				.appendCodePoint(0x1D5BA)
-				.append("c")
-				.toString();
-		public String output = new StringBuilder()
-				.append("a")
-				.appendCodePoint(0x1D5C2)
-				.appendCodePoint(0x1D5CE)
-				.appendCodePoint(0x1D5BA)
-				.append("c\n")
-				.toString();
-		public String errors = null;
-		public String startRule = "a";
-		public String grammarName = "T";
+	// TODO(bhamiltoncx): This needs to be an error, the V3
+	// runtime used by the tool doesn't really understand unescaped code points >
+	// U+FFFF.
+	// public static class UnicodeUnescapedSMPSet extends BaseParserTestDescriptor {
+	//	public String input = new StringBuilder()
+	//			.append("a")
+	//			.appendCodePoint(0x1D5C2)
+	//			.appendCodePoint(0x1D5CE)
+	//			.appendCodePoint(0x1D5BA)
+	//			.append("c")
+	//			.toString();
+	//	public String output = new StringBuilder()
+	//			.append("a")
+	//			.appendCodePoint(0x1D5C2)
+	//			.appendCodePoint(0x1D5CE)
+	//			.appendCodePoint(0x1D5BA)
+	//			.append("c\n")
+	//			.toString();
+	//	public String errors = null;
+	//	public String startRule = "a";
+	//	public String grammarName = "T";
 
-		public String grammar = """
-		 grammar T;
-		 a : LETTERS  {<InputText():writeln()>} ;
-		 // Note the double-backslash to avoid Java passing
-		 // unescaped values as part of the grammar.
-		 LETTERS : ('a'|'\\u{1D5BA}'|'\\u{1D5BE}'|'\\u{1D5C2}'|'\\u{1D5C8}'|'\\u{1D5CE}')* 'c';
+	//	public String grammar = """
+	//	 grammar T;
+	//	 a : LETTERS  {<InputText():writeln()>} ;
+	//	 // These are actually not escaped -- Java passes the
+	//	 // raw unescaped Unicode values to the grammar compiler.
+	//	 //
+	//	 // Each sequence is the UTF-16 encoding of a raw Unicode
+	//	 // SMP code point.
+	//	 LETTERS : ('a'|'\uD835\uDDBA'|'\uD835\uDDBE'|'\uD835\uDDC2'|'\uD835\uDDC8'|'\uD835\uDDCE')* 'c';
+	//
 """;
 
 	}
 
-	public static class UnicodeEscapedSMPRangeSet extends BaseParserTestDescriptor {
-		public String input = new StringBuilder()
-				.append("a")
-				.appendCodePoint(0x1F609)
-				.appendCodePoint(0x1F942)
-				.appendCodePoint(0x1F700)
-				.append("d")
-				.toString();
-		public String output = new StringBuilder()
-				.append("a")
-				.appendCodePoint(0x1F609)
-				.appendCodePoint(0x1F942)
-				.appendCodePoint(0x1F700)
-				.append("d\n")
-				.toString();
-		public String errors = null;
-		public String startRule = "a";
-		public String grammarName = "T";
+	// Turns out Tool.java uses ANTLR 3's runtime, which means it can't use
+	// CodePointCharStream to understand unescaped code points > U+FFFF.
+	//
+	// TODO(bhamiltoncx): This needs to be an error, since we don't currently plan
+	// to port Tool.java to use ANTLR 4's runtime.
 
-		public String grammar = """
-		 grammar T;
-		 a : LETTERS* 'd' {<InputText():writeln()>} ;
-		 // Note the double-backslash to avoid Java passing
-		 // unescaped values as part of the grammar.
-		 LETTERS : ('a'|'\\u{1F600}'..'\\u{1F943}');
+	// public static class UnicodeUnescapedSMPRangeSet extends BaseParserTestDescriptor {
+	//	public String input = new StringBuilder()
+	//			.append("a")
+	//			.appendCodePoint(0x1D5C2)
+	//			.appendCodePoint(0x1D5CE)
+	//			.appendCodePoint(0x1D5BA)
+	//			.append("d")
+	//			.toString();
+	//	public String output = new StringBuilder()
+	//			.append("a")
+	//			.appendCodePoint(0x1D5C2)
+	//			.appendCodePoint(0x1D5CE)
+	//			.appendCodePoint(0x1D5BA)
+	//			.append("d\n")
+	//			.toString();
+	//	public String errors = null;
+	//	public String startRule = "a";
+	//	public String grammarName = "T";
+
+	//	public String grammar = """
+	//	 grammar T;
+	//	 a : LETTERS* 'd' {<InputText():writeln()>} ;
+	//	 // These are actually not escaped -- Java passes the
+	//	 // raw unescaped Unicode values to the grammar compiler.
+	//	 LETTERS : ('a'|'\uD83D\uDE00'..'\uD83E\uDD43');
+	//
 """;
 
 	}

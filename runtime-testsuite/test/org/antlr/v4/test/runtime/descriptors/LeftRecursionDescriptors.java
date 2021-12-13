@@ -545,31 +545,7 @@ public class LeftRecursionDescriptors {
 	}
 
 	public String grammar = """
- Test for https://github.com/antlr/antlr4/issues/1295 in addition to #433. */
-	public static class MultipleAlternativesWithCommonLabel_5 extends MultipleAlternativesWithCommonLabel {
-		public String input = "(99)+3";
-		public String output = "102\n";
-	}
-
-	public String grammar = """
-	 * This is a regression test for antlr/antlr4#509 "Incorrect rule chosen in
-	 * unambiguous grammar".
-	 * https://github.com/antlr/antlr4/issues/509
-	 */
-	public static class PrecedenceFilterConsidersContext extends BaseParserTestDescriptor {
-		public String input = "aa";
-		public String output = "(prog (statement (letterA a)) (statement (letterA a)) <EOF>)\n";
-		public String errors = null;
-		public String startRule = "prog";
-		public String grammarName = "T";
-
-		public String grammar = """
-		 grammar T;
-		 prog
-		 @after {<ToStringTree("$ctx"):writeln()>}
-		 : statement* EOF {};
-		 statement: letterA | statement letterA 'b' ;
-		 letterA: 'a';
+ Test for https://github.com/antlr/antlr4/issues/1295 in addition to #433.
 """;
 
 	}
@@ -897,23 +873,6 @@ public class LeftRecursionDescriptors {
 	 * This is a regression test for antlr/antlr4#542 "First alternative cannot
 	 * be right-associative".
 	 * https://github.com/antlr/antlr4/issues/542
-	 */
-	public static abstract class TernaryExprExplicitAssociativity extends BaseParserTestDescriptor {
-		public String errors = null;
-		public String startRule = "s";
-		public String grammarName = "T";
-
-		/**
-		 grammar T;
-		 s @after {<ToStringTree("$ctx"):writeln()>} : e EOF; // must indicate EOF can follow or 'a\<EOF>' won't match
-		 e :\<assoc=right> e '*' e
-		   |\<assoc=right> e '+' e
-		   |\<assoc=right> e '?' e ':' e
-		   |\<assoc=right> e '=' e
-		   | ID
-		   ;
-		 ID : 'a'..'z'+ ;
-		 WS : (' '|'\n') -> skip ;
 """;
 
 	}
@@ -968,7 +927,7 @@ public class LeftRecursionDescriptors {
 		public String startRule = "s";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 s @after {<ToStringTree("$ctx"):writeln()>} : e EOF ; // must indicate EOF can follow or 'a\<EOF>' won't match
 		 e : e '*' e
@@ -1040,7 +999,7 @@ public class LeftRecursionDescriptors {
 		public String startRule = "prog";
 		public String grammarName = "Expr";
 
-		/**
+		public String grammar = """
 		 grammar Expr;
 		 prog : expression EOF;
 		 expression

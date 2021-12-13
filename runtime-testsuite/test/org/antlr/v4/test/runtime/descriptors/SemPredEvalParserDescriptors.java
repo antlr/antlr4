@@ -41,12 +41,6 @@ public class SemPredEvalParserDescriptors {
 	 *  predicates and so we cannot evaluate any semantic predicate
 	 *  encountered after having seen a regular action. This includes
 	 *  during global follow operations.
-	 */
-	public static class ActionsHidePredsInGlobalFOLLOW extends BaseParserTestDescriptor {
-		public String input = "a!";
-		public String grammar = """
-		eval=true
-		parse
 """;
 
 		public String errors = null;
@@ -68,37 +62,17 @@ public class SemPredEvalParserDescriptors {
 
 	}
 
-	public String output = """
+	public String grammar = """
 	 * This is a regression test for antlr/antlr4#196
 	 * "element+ in expression grammar doesn't parse properly"
 	 * https://github.com/antlr/antlr4/issues/196
-	 */
-	public static class AtomWithClosureInTranslatedLRRule extends BaseParserTestDescriptor {
-		public String input = "a+b+a";
-		public String output = null;
-		public String errors = null;
-		public String startRule = "start";
-		public String grammarName = "T";
-
-		public String grammar = """
-		 grammar T;
-		 start : e[0] EOF;
-		 e[int _p]
-		     :   ( 'a' | 'b'+ ) ( {3 >= $_p}? '+' e[4] )*
-		     ;
 """;
 
 	}
 
-	public String grammar = """
+	public String output = """
  We cannot collect predicates that are dependent on local context if
 	 *  we are doing a global follow. They appear as if they were not there at all.
-	 */
-	public static class DepedentPredsInGlobalFOLLOW extends BaseParserTestDescriptor {
-		public String input = "a!";
-		public String grammar = """
-		eval=true
-		parse
 """;
 
 		public String errors = null;
@@ -143,23 +117,9 @@ public class SemPredEvalParserDescriptors {
 
 	}
 
-	public String output = """
+	public String grammar = """
 	 * This is a regression test for antlr/antlr4#218 "ANTLR4 EOF Related Bug".
 	 * https://github.com/antlr/antlr4/issues/218
-	 */
-	public static class DisabledAlternative extends BaseParserTestDescriptor {
-		public String input = "hello";
-		public String output = null;
-		public String errors = null;
-		public String startRule = "cppCompilationUnit";
-		public String grammarName = "T";
-
-		public String grammar = """
-		 grammar T;
-		 cppCompilationUnit : content+ EOF;
-		 content: anything | {<False()>}? .;
-		 anything: ANY_CHAR;
-		 ANY_CHAR: [_a-zA-Z0-9];
 """;
 
 	}
@@ -193,7 +153,7 @@ public class SemPredEvalParserDescriptors {
 		public String startRule = "s";
 		public String grammarName = "T";
 
-		public String errors = """
+		public String grammar = """
 		 grammar T;
 		 s : a a;
 		 a : {<False()>}? ID INT {<writeln("\"alt 1\"")>}
@@ -208,7 +168,7 @@ public class SemPredEvalParserDescriptors {
 
 	public static class Order extends BaseParserTestDescriptor {
 		public String input = "x y";
-		public String grammar = """
+		public String output = """
 		alt 1
 		alt 1
 """;
@@ -217,7 +177,7 @@ public class SemPredEvalParserDescriptors {
 		public String startRule = "s";
 		public String grammarName = "T";
 
-		public String output = """
+		public String grammar = """
 		 grammar T;
 		 s : a {} a; // do 2x: once in ATN, next in DFA;
 		 // action blocks lookahead from falling off of 'a'
@@ -233,21 +193,7 @@ public class SemPredEvalParserDescriptors {
 	}
 
 	public String grammar = """
- Loopback doesn't eval predicate at start of alt */
-	public static abstract class PredFromAltTestedInLoopBack extends BaseParserTestDescriptor {
-		public String startRule = "file_";
-		public String grammarName = "T";
-
-		public String grammar = """
-		 grammar T;
-		 file_
-		 @after {<ToStringTree("$ctx"):writeln()>}
-		   : para para EOF ;
-		 para: paraContent NL NL ;
-		 paraContent : ('s'|'x'|{<LANotEquals("2",{T<ParserToken("Parser", "NL")>})>}? NL)+ ;
-		 NL : '\n' ;
-		 s : 's' ;
-		 X : 'x' ;
+ Loopback doesn't eval predicate at start of alt
 """;
 
 	}
@@ -255,7 +201,7 @@ public class SemPredEvalParserDescriptors {
 	public static class PredFromAltTestedInLoopBack_1 extends PredFromAltTestedInLoopBack {
 		public String input = "s\n\n\nx\n";
 		public String output = "(file_ (para (paraContent s) \\n \\n) (para (paraContent \\n x \\n)) <EOF>)\n";
-		public String output = """
+		public String errors = """
 		line 5:0 mismatched input '<EOF>' expecting {'s', '
 		', 'x'}
 """;
@@ -306,19 +252,13 @@ public class SemPredEvalParserDescriptors {
 	 * information to predict the alternatives. This is the special case
 	 * where we know exactly which context we are in. The context stack
 	 * is empty and we have not dipped into the outer context to make a decision.
-	 */
-	public static class PredicateDependentOnArg extends BaseParserTestDescriptor {
-		public String input = "a b";
-		public String grammar = """
-		alt 2
-		alt 1
 """;
 
 		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "T";
 
-		public String output = """
+		public String grammar = """
 		 grammar T;
 		 @parser::members {<InitIntMember("i","0")>}
 		 s : a[2] a[1];
@@ -342,25 +282,6 @@ public class SemPredEvalParserDescriptors {
 	 * they should be ignored. It will not affect recognition, however. We
 	 * are really making sure the ATN simulation doesn't crash with context
 	 * object issues when it encounters preds during FOLLOW.
-	 */
-	public static class PredicateDependentOnArg2 extends BaseParserTestDescriptor {
-		public String input = "a b";
-		public String output = null;
-		public String errors = null;
-		public String startRule = "s";
-		public String grammarName = "T";
-
-		public String grammar = """
-		 grammar T;
-		 @parser::members {<InitIntMember("i","0")>}
-		 s : a[2] a[1];
-		 a[int i]
-		   : {<ValEquals("$i","1")>}? ID
-		   | {<ValEquals("$i","2")>}? ID
-		   ;
-		 ID : 'a'..'z'+ ;
-		 INT : '0'..'9'+;
-		 WS : (' '|'\n') -> skip ;
 """;
 
 	}
@@ -368,19 +289,13 @@ public class SemPredEvalParserDescriptors {
 	public String output = """
  During a global follow operation, we still collect semantic
 	 *  predicates as long as they are not dependent on local context
-	 */
-	public static class PredsInGlobalFOLLOW extends BaseParserTestDescriptor {
-		public String input = "a!";
-		public String grammar = """
-		eval=true
-		parse
 """;
 
 		public String errors = null;
 		public String startRule = "s";
 		public String grammarName = "T";
 
-		public String output = """
+		public String grammar = """
 		 grammar T;
 		 @parser::members {
 		 <Declare_pred()>
@@ -397,7 +312,7 @@ public class SemPredEvalParserDescriptors {
 
 	public static class RewindBeforePredEval extends BaseParserTestDescriptor {
 		public String input = "y 3 x 4";
-		public String grammar = """
+		public String output = """
 		alt 2
 		alt 1
 """;
@@ -406,7 +321,7 @@ public class SemPredEvalParserDescriptors {
 		public String startRule = "s";
 		public String grammarName = "T";
 
-		public String output = """
+		public String grammar = """
 		 grammar T;
 		 s : a a;
 		 a : {<LTEquals("1", "\"x\"")>}? ID INT {<writeln("\"alt 1\"")>}
@@ -421,7 +336,7 @@ public class SemPredEvalParserDescriptors {
 
 	public static class Simple extends BaseParserTestDescriptor {
 		public String input = "x y 3";
-		public String grammar = """
+		public String output = """
 		alt 2
 		alt 2
 		alt 3
@@ -431,7 +346,7 @@ public class SemPredEvalParserDescriptors {
 		public String startRule = "s";
 		public String grammarName = "T";
 
-		public String output = """
+		public String grammar = """
 		 grammar T;
 		 s : a a a; // do 3x: once in ATN, next in DFA then INT in ATN
 		 a : {<False()>}? ID {<writeln("\"alt 1\"")>}
@@ -452,7 +367,7 @@ public class SemPredEvalParserDescriptors {
 		public String startRule = "s";
 		public String grammarName = "T";
 
-		public String errors = """
+		public String grammar = """
 		 grammar T;
 		 s : a ;
 		 a : {<False()>}? ID  {<writeln("\"alt 1\"")>}
@@ -467,7 +382,7 @@ public class SemPredEvalParserDescriptors {
 
 	public static class SimpleValidate2 extends BaseParserTestDescriptor {
 		public String input = "3 4 x";
-		public String grammar = """
+		public String output = """
 		alt 2
 		alt 2
 """;
@@ -476,7 +391,7 @@ public class SemPredEvalParserDescriptors {
 		public String startRule = "s";
 		public String grammarName = "T";
 
-		public String output = """
+		public String grammar = """
 		 grammar T;
 		 s : a a a;
 		 a : {<False()>}? ID  {<writeln("\"alt 1\"")>}
@@ -491,7 +406,7 @@ public class SemPredEvalParserDescriptors {
 
 	public static class ToLeft extends BaseParserTestDescriptor {
 		public String input = "x x y";
-		public String errors = """
+		public String output = """
 		alt 2
 		alt 2
 		alt 2
@@ -514,21 +429,11 @@ public class SemPredEvalParserDescriptors {
 
 	}
 
-	public String grammar = """
+	public String output = """
  In this case, we use predicates that depend on global information
 	 *  like we would do for a symbol table. We simply execute
 	 *  the predicates assuming that all necessary information is available.
 	 *  The i++ action is done outside of the prediction and so it is executed.
-	 */
-	public static class ToLeftWithVaryingPredicate extends BaseParserTestDescriptor {
-		public String input = "x x y";
-		public String errors = """
-		i=1
-		alt 2
-		i=2
-		alt 1
-		i=3
-		alt 2
 """;
 
 		public String errors = null;
@@ -553,12 +458,12 @@ public class SemPredEvalParserDescriptors {
 
 	public static class TwoUnpredicatedAlts extends BaseParserTestDescriptor {
 		public String input = "x; y";
-		/**
+		public String output = """
 		alt 1
 		alt 1
 """;
 
-		/**
+		public String errors = """
 		line 1:0 reportAttemptingFullContext d=0 (a), input='x'
 		line 1:0 reportAmbiguity d=0 (a): ambigAlts={1, 2}, input='x'
 		line 1:3 reportAttemptingFullContext d=0 (a), input='y'
@@ -568,7 +473,7 @@ public class SemPredEvalParserDescriptors {
 		public String startRule = "s";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 s : {<LL_EXACT_AMBIG_DETECTION()>} a ';' a; // do 2x: once in ATN, next in DFA
 		 a : ID {<writeln("\"alt 1\"")>}
@@ -586,13 +491,13 @@ public class SemPredEvalParserDescriptors {
 
 	public static class TwoUnpredicatedAltsAndOneOrthogonalAlt extends BaseParserTestDescriptor {
 		public String input = "34; x; y";
-		/**
+		public String output = """
 		alt 1
 		alt 2
 		alt 2
 """;
 
-		/**
+		public String errors = """
 		line 1:4 reportAttemptingFullContext d=0 (a), input='x'
 		line 1:4 reportAmbiguity d=0 (a): ambigAlts={2, 3}, input='x'
 		line 1:7 reportAttemptingFullContext d=0 (a), input='y'
@@ -602,7 +507,7 @@ public class SemPredEvalParserDescriptors {
 		public String startRule = "s";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 s : {<LL_EXACT_AMBIG_DETECTION()>} a ';' a ';' a;
 		 a : INT {<writeln("\"alt 1\"")>}
@@ -626,7 +531,7 @@ public class SemPredEvalParserDescriptors {
 		public String startRule = "s";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 s : a {<writeln("\"alt 1\"")>}
 		   | b {<writeln("\"alt 2\"")>}
@@ -646,7 +551,7 @@ public class SemPredEvalParserDescriptors {
 	public static class ValidateInDFA extends BaseParserTestDescriptor {
 		public String input = "x ; y";
 		public String output = null;
-		/**
+		public String errors = """
 		line 1:0 no viable alternative at input 'x'
 		line 1:4 no viable alternative at input 'y'
 """;
@@ -654,7 +559,7 @@ public class SemPredEvalParserDescriptors {
 		public String startRule = "s";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 		 s : a ';' a;
 		 // ';' helps us to resynchronize without consuming

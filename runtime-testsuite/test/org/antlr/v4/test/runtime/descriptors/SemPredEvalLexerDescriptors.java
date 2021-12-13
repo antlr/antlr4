@@ -63,16 +63,14 @@ public class SemPredEvalLexerDescriptors {
 
 	public static class EnumNotID extends BaseLexerTestDescriptor {
 		public String input = "enum abc enum";
-		public String grammar = """
+		// 		<! no edges in DFA for enum/id. all paths lead to pred. !>
+		public String output = """
 		[@0,0:3='enum',<1>,1:0]
 		[@1,5:7='abc',<2>,1:5]
 		[@2,9:12='enum',<1>,1:9]
 		[@3,13:12='<EOF>',<-1>,1:13]
 		s0-' '->:s3=>3
-		 */
-		@CommentHasStringValue // 		<! no edges in DFA for enum/id. all paths lead to pred. !>
-
-		public String output;
+""";
 
 		public String errors = null;
 		public String startRule = "";
@@ -91,22 +89,20 @@ public class SemPredEvalLexerDescriptors {
 
 	public static class IDnotEnum extends BaseLexerTestDescriptor {
 		public String input = "enum abc enum";
-		public String grammar = """
+        // 		<! no edges in DFA for enum/id. all paths lead to pred. !>
+		public String output = """
 		[@0,0:3='enum',<2>,1:0]
 		[@1,5:7='abc',<2>,1:5]
 		[@2,9:12='enum',<2>,1:9]
 		[@3,13:12='<EOF>',<-1>,1:13]
 		s0-' '->:s2=>3
-		 */
-		@CommentHasStringValue // 		<! no edges in DFA for enum/id. all paths lead to pred. !>
-
-		public String output;
+""";
 
 		public String errors = null;
 		public String startRule = "";
 		public String grammarName = "L";
 
-		public String output = """
+		public String grammar = """
 		 lexer grammar L;
 		 ENUM : [a-z]+  { <False()> }? ;
 		 ID : [a-z]+  ;
@@ -120,7 +116,8 @@ public class SemPredEvalLexerDescriptors {
 	public static class IDvsEnum extends BaseLexerTestDescriptor {
 		public String input = "enum abc enum";
 
-		public String grammar = """
+		// 	no 'm'-> transition...conflicts with pred
+		public String output = """
 		[@0,0:3='enum',<2>,1:0]
 		[@1,5:7='abc',<2>,1:5]
 		[@2,9:12='enum',<2>,1:9]
@@ -132,15 +129,13 @@ public class SemPredEvalLexerDescriptors {
 		:s2=>2-'u'->:s3=>2
 		:s4=>2-'b'->:s4=>2
 		:s4=>2-'c'->:s4=>2
-		 */
-		@CommentHasStringValue // 	no 'm'-> transition...conflicts with pred
-		public String output;
+""";
 
 		public String errors = null;
 		public String startRule = "";
 		public String grammarName = "L";
 
-		public String output = """
+		public String grammar = """
 		 lexer grammar L;
 		 ENUM : 'enum' { <False()> }? ;
 		 ID : 'a'..'z'+ ;
@@ -153,7 +148,7 @@ public class SemPredEvalLexerDescriptors {
 
 	public static class Indent extends BaseLexerTestDescriptor {
 		public String input = "abc\n  def  \n";
-		public String grammar = """
+		public String output = """
 		INDENT
 		[@0,0:2='abc',<1>,1:0]
 		[@1,3:3='\n',<3>,1:3]
@@ -176,7 +171,7 @@ public class SemPredEvalLexerDescriptors {
 		public String startRule = "";
 		public String grammarName = "L";
 
-		public String output = """
+		public String grammar = """
 		 lexer grammar L;
 		 ID : [a-z]+  ;
 		 INDENT : [ \t]+ { <TokenStartColumnEquals("0")> }?
@@ -191,7 +186,7 @@ public class SemPredEvalLexerDescriptors {
 
 	public static class LexerInputPositionSensitivePredicates extends BaseLexerTestDescriptor {
 		public String input = "a cde\nabcde\n";
-		public String grammar = """
+		public String output = """
 		a
 		cde
 		ab
@@ -207,7 +202,7 @@ public class SemPredEvalLexerDescriptors {
 		public String startRule = "";
 		public String grammarName = "L";
 
-		/**
+		public String grammar = """
 		 lexer grammar L;
 		 WORD1 : ID1+ { <Text():writeln()> } ;
 		 WORD2 : ID2+ { <Text():writeln()> } ;
@@ -222,7 +217,7 @@ public class SemPredEvalLexerDescriptors {
 
 	public static class PredicatedKeywords extends BaseLexerTestDescriptor {
 		public String input = "enum enu a";
-		/**
+		public String output = """
 		enum!
 		ID enu
 		ID a
@@ -236,7 +231,7 @@ public class SemPredEvalLexerDescriptors {
 		public String startRule = "";
 		public String grammarName = "L";
 
-		/**
+		public String grammar = """
 		 lexer grammar L;
 		 ENUM : [a-z]+ { <TextEquals("enum")> }? { <writeln("\"enum!\"")> } ;
 		 ID   : [a-z]+ { <PlusText("ID "):writeln()> } ;

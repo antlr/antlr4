@@ -41,22 +41,6 @@ public class ParserErrorsDescriptors {
 	public String grammar = """
 	 * Regression test for "Getter for context is not a list when it should be".
 	 * https://github.com/antlr/antlr4/issues/19
-	 */
-	public static class ContextListGetters extends BaseParserTestDescriptor {
-		public String input = "abab";
-		public String output = "abab\n";
-		public String errors = null;
-		public String startRule = "s";
-		public String grammarName = "T";
-
-		public String grammar = """
-		 grammar T;
-		 @parser::members{
-		 <DeclareContextListGettersFunction()>
-		 }
-		 s : (a | b)+;
-		 a : 'a' {<write("\"a\"")>};
-		 b : 'b' {<write("\"b\"")>};
 """;
 
 	}
@@ -100,20 +84,6 @@ public class ParserErrorsDescriptors {
 	 * The original cause of this issue was an error in the tool's ATN state optimization,
 	 * which is now detected early in {@link ATNSerializer} by ensuring that all
 	 * serialized transitions point to states which were not removed.
-	 */
-	public static class InvalidATNStateRemoval extends BaseParserTestDescriptor {
-		public String input = "x:x";
-		public String output = null;
-		public String errors = null;
-		public String startRule = "start";
-		public String grammarName = "T";
-
-		public String grammar = """
-		 grammar T;
-		 start : ID ':' expr;
-		 expr : primary expr? {<Pass()>} | expr '->' ID;
-		 primary : ID;
-		 ID : [a-z]+;
 """;
 
 	}
@@ -121,18 +91,6 @@ public class ParserErrorsDescriptors {
 	public String grammar = """
 	 * This is a regression test for #6 "NullPointerException in getMissingSymbol".
 	 * https://github.com/antlr/antlr4/issues/6
-	 */
-	public static class InvalidEmptyInput extends BaseParserTestDescriptor {
-		public String input = "";
-		public String output = null;
-		public String errors = "line 1:0 mismatched input '<EOF>' expecting ID\n";
-		public String startRule = "start";
-		public String grammarName = "T";
-
-		public String grammar = """
-		 grammar T;
-		 start : ID+;
-		 ID : [a-z]+;
 """;
 
 	}
@@ -204,7 +162,7 @@ public class ParserErrorsDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		public String errors = """
+		public String grammar = """
 		 grammar T;
 		 a : 'a'+ 'b'
 		   | 'a'+ 'c'
@@ -235,7 +193,7 @@ public class ParserErrorsDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		public String errors = """
+		public String grammar = """
 		 grammar T;
 		 a : 'a' ('b'|'z'{<Pass()>})* 'c';
 """;
@@ -245,7 +203,7 @@ public class ParserErrorsDescriptors {
 	public static class MultiTokenDeletionDuringLoop extends BaseParserTestDescriptor {
 		public String input = "abaaababc";
 		public String output = null;
-		public String grammar = """
+		public String errors = """
 		line 1:2 extraneous input 'a' expecting {'b', 'c'}
 		line 1:6 extraneous input 'a' expecting {'b', 'c'}
 """;
@@ -263,7 +221,7 @@ public class ParserErrorsDescriptors {
 	public static class MultiTokenDeletionDuringLoop2 extends BaseParserTestDescriptor {
 		public String input = "abaaababc";
 		public String output = null;
-		public String grammar = """
+		public String errors = """
 		line 1:2 extraneous input 'a' expecting {'b', 'z', 'c'}
 		line 1:6 extraneous input 'a' expecting {'b', 'z', 'c'}
 """;
@@ -318,7 +276,7 @@ public class ParserErrorsDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		public String errors = """
+		public String grammar = """
 		 grammar T;
 		 myset: ('b'|'c') ;
 		 a: 'a' myset 'd' {<writeln(Append("\"\"","$myset.stop"))>} ; <! bit complicated because of the JavaScript target !>
@@ -347,7 +305,7 @@ public class ParserErrorsDescriptors {
 		public String startRule = "a";
 		public String grammarName = "T";
 
-		public String errors = """
+		public String grammar = """
 		 grammar T;
 		 a : ('b' | 'c')
 		 ;
@@ -360,7 +318,7 @@ public class ParserErrorsDescriptors {
 	public static class SingleTokenDeletionBeforeLoop extends BaseParserTestDescriptor {
 		public String input = "aabc";
 		public String output = null;
-		public String grammar = """
+		public String errors = """
 		line 1:1 extraneous input 'a' expecting {<EOF>, 'b'}
 		line 1:3 token recognition error at: 'c'
 """;
@@ -378,7 +336,7 @@ public class ParserErrorsDescriptors {
 	public static class SingleTokenDeletionBeforeLoop2 extends BaseParserTestDescriptor {
 		public String input = "aabc";
 		public String output = null;
-		public String grammar = """
+		public String errors = """
 		line 1:1 extraneous input 'a' expecting {<EOF>, 'b', 'z'}
 		line 1:3 token recognition error at: 'c'
 """;
@@ -502,7 +460,7 @@ public class ParserErrorsDescriptors {
 		public String startRule = "stat";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 
 		 stat:   ( '(' expr? ')' )? EOF ;
@@ -523,7 +481,7 @@ public class ParserErrorsDescriptors {
 		public String startRule = "expression";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 
 		 expression
@@ -558,7 +516,7 @@ public class ParserErrorsDescriptors {
 		public String startRule = "file";
 		public String grammarName = "T";
 
-		/**
+		public String grammar = """
 		 grammar T;
 
 		 member : 'a';

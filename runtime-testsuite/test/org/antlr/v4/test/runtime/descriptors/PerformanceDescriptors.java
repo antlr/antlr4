@@ -12,11 +12,11 @@ import org.antlr.v4.test.runtime.CommentHasStringValue;
 import java.util.Arrays;
 
 public class PerformanceDescriptors {
-	/*
-	 * This is a regression test for antlr/antlr4#192 "Poor performance of
-	 * expression parsing".
-	 * https://github.com/antlr/antlr4/issues/192
-	 */
+    //
+    // 	 This is a regression test for antlr/antlr4#192 "Poor performance of
+    // 	 expression parsing".
+    // 	 https://github.com/antlr/antlr4/issues/192
+    //
 	public static abstract class ExpressionGrammar extends BaseParserTestDescriptor {
 		public String output = null;
 		public String errors = null;
@@ -74,16 +74,15 @@ public class PerformanceDescriptors {
 """;
 	}
 
-	public String grammar = """
- Test for https://github.com/antlr/antlr4/issues/1398.
-	 *  Seeing through a large expression takes 5 _minutes_ on
-	 *  my fast box to complete.  After fix, it's instantaneous.
-	 */
+    // 	Test for https://github.com/antlr/antlr4/issues/1398.
+    // 	Seeing through a large expression takes 5 _minutes_ on
+    // 	my fast box to complete.  After fix, it's instantaneous.
+    //
 	public static abstract class DropLoopEntryBranchInLRRule extends BaseParserTestDescriptor {
 		public String grammarName = "Expr";
 		public String startRule = "stat";
 
-		public String input = """
+		public String grammar = """
 		 grammar Expr;
 
 		 stat : expr ';'
@@ -134,9 +133,7 @@ public class PerformanceDescriptors {
 		 X1 and X2 and X3 and X4 and X5 and X6 and X7 or
 		 X1 and X2 and X3 and X4 and X5 and X6 and X7
 		 .
-		 */ // Different in final token
-		@CommentHasStringValue
-		public String input;
+""";
 	}
 
 	public static class DropLoopEntryBranchInLRRule_3 extends DropLoopEntryBranchInLRRule {
@@ -164,7 +161,7 @@ public class PerformanceDescriptors {
 	}
 
 	public static class DropLoopEntryBranchInLRRule_4 extends DropLoopEntryBranchInLRRule {
-		/**
+		public String input = """
 		 between X1 and X2 or between X3 and X4 and
 		 between X1 and X2 or between X3 and X4 and
 		 between X1 and X2 or between X3 and X4 and
@@ -191,7 +188,7 @@ public class PerformanceDescriptors {
 	}
 
 	public static class DropLoopEntryBranchInLRRule_5 extends DropLoopEntryBranchInLRRule {
-		/**
+		public String input = """
 		 X ? Y : Z or
 		 X ? Y : Z or
 		 X ? Y : Z or

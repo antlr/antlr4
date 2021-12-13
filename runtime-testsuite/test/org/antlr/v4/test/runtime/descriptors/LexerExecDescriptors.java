@@ -57,20 +57,18 @@ public class LexerExecDescriptors {
 		public String startRule = "";
 		public String grammarName = "L";
 
-		public String output = """
+		public String grammar = """
 		 lexer grammar L;
 		 I : '0'..'9'+ {<writeln("\"I\"")>} ;
 		 WS : [ \n\\u000D] -> skip ;
-		 */ // needs escape on u000D otherwise java converts even in comment
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
 	/* regression test for antlr/antlr4#1925 */
 	public static class UnicodeCharSet extends BaseLexerTestDescriptor {
 		public String input = "均";
-		public String grammar = """
+		public String output = """
 		 [@0,0:0='均',<1>,1:0]
 		 [@1,1:0='<EOF>',<-1>,1:1]
 """;
@@ -79,7 +77,7 @@ public class LexerExecDescriptors {
 		public String startRule = "";
 		public String grammarName = "L";
 
-		public String output = """
+		public String grammar = """
 		 lexer grammar L;
 		 ID : ([A-Z_]|'\u0100'..'\uFFFE') ([A-Z_0-9]|'\u0100'..'\uFFFE')*;
 """;
@@ -100,13 +98,11 @@ public class LexerExecDescriptors {
 		public String startRule = "";
 		public String grammarName = "L";
 
-		public String output = """
+		public String grammar = """
 		 lexer grammar L;
 		 I : (~[ab \\n]|'a')  {<writeln("\"I\"")>} ;
 		 WS : [ \n\\u000D]+ -> skip ;
-		 */ // needs escape on u000D otherwise java converts even in comment
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
@@ -122,19 +118,17 @@ public class LexerExecDescriptors {
 		public String startRule = "";
 		public String grammarName = "L";
 
-		public String output = """
+		public String grammar = """
 		 lexer grammar L;
 		 I : ~[ab \n] ~[ \ncd]* {<writeln("\"I\"")>} ;
 		 WS : [ \n\\u000D]+ -> skip ;
-		 */ // needs escape on u000D otherwise java converts even in comment
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
 	public static class CharSetPlus extends BaseLexerTestDescriptor {
 		public String input = "34\n 34";
-		public String grammar = """
+		public String output = """
 		I
 		I
 		[@0,0:1='34',<1>,1:0]
@@ -146,19 +140,17 @@ public class LexerExecDescriptors {
 		public String startRule = "";
 		public String grammarName = "L";
 
-		public String output = """
+		public String grammar = """
 		 lexer grammar L;
 		 I : '0'..'9'+ {<writeln("\"I\"")>} ;
 		 WS : [ \n\\u000D]+ -> skip ;
-		 */ // needs escape on u000D otherwise java converts even in comment
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
 	public static class CharSetRange extends BaseLexerTestDescriptor {
 		public String input = "34\n 34 a2 abc \n   ";
-		public String grammar = """
+		public String output = """
 		I
 		I
 		ID
@@ -174,20 +166,18 @@ public class LexerExecDescriptors {
 		public String startRule = "";
 		public String grammarName = "L";
 
-		public String output = """
+		public String grammar = """
 		 lexer grammar L;
 		 I : [0-9]+ {<writeln("\"I\"")>} ;
 		 ID : [a-zA-Z] [a-zA-Z0-9]* {<writeln("\"ID\"")>} ;
 		 WS : [ \n\\u0009\r]+ -> skip ;
-		 */ // needs escape on u0009 otherwise java converts even in comment
-		@CommentHasStringValue
-		public String grammar;
+""";
 
 	}
 
 	public static class CharSetWithEscapedChar extends BaseLexerTestDescriptor {
 		public String input = "- ] ";
-		public String grammar = """
+		public String output = """
 		DASHBRACK
 		DASHBRACK
 		[@0,0:0='-',<1>,1:0]
@@ -199,7 +189,7 @@ public class LexerExecDescriptors {
 		public String startRule = "";
 		public String grammarName = "L";
 
-		public String output = """
+		public String grammar = """
 		 lexer grammar L;
 		 DASHBRACK : [\\-\]]+ {<writeln("\"DASHBRACK\"")>} ;
 		 WS : [ \n]+ -> skip ;
@@ -209,7 +199,7 @@ public class LexerExecDescriptors {
 
 	public static class CharSetWithMissingEscapeChar extends BaseLexerTestDescriptor {
 		public String input = "34 ";
-		public String grammar = """
+		public String output = """
 		I
 		[@0,0:1='34',<1>,1:0]
 		[@1,3:2='<EOF>',<-1>,1:3]
@@ -219,7 +209,7 @@ public class LexerExecDescriptors {
 		public String startRule = "";
 		public String grammarName = "L";
 
-		public String output = """
+		public String grammar = """
 		 lexer grammar L;
 		 I : [0-9]+ {<writeln("\"I\"")>} ;
 		 WS : [ \n]+ -> skip ;
@@ -229,7 +219,7 @@ public class LexerExecDescriptors {
 
 	public static class CharSetWithQuote1 extends BaseLexerTestDescriptor {
 		public String input = "b\"a";
-		public String grammar = """
+		public String output = """
 		A
 		[@0,0:2='b"a',<1>,1:0]
 		[@1,3:2='<EOF>',<-1>,1:3]
@@ -259,7 +249,7 @@ public class LexerExecDescriptors {
 		public String startRule = "";
 		public String grammarName = "L";
 
-		public String input = """
+		public String grammar = """
 		 lexer grammar L;
 		 A : ["\\\\ab]+ {<writeln("\"A\"")>} ;
 		 WS : [ \n\t]+ -> skip ;
@@ -291,7 +281,7 @@ public class LexerExecDescriptors {
 		public String startRule = "";
 		public String grammarName = "L";
 
-		public String output = """
+		public String grammar = """
 		 lexer grammar L;
 		 A : 'a' EOF ;
 		 B : 'a';
@@ -307,7 +297,7 @@ public class LexerExecDescriptors {
 
 	public static class EOFSuffixInFirstRule_2 extends EOFSuffixInFirstRule {
 		public String input = "a";
-		public String grammar = """
+		public String output = """
 		[@0,0:0='a',<1>,1:0]
 		[@1,1:0='<EOF>',<-1>,1:1]
 """;
@@ -338,7 +328,7 @@ public class LexerExecDescriptors {
 
 	public static class GreedyConfigs extends BaseLexerTestDescriptor {
 		public String input = "ab";
-		public String input = """
+		public String output = """
 		ab
 		[@0,0:1='ab',<1>,1:0]
 		[@1,2:1='<EOF>',<-1>,1:2]
@@ -348,7 +338,7 @@ public class LexerExecDescriptors {
 		public String startRule = "";
 		public String grammarName = "L";
 
-		public String output = """
+		public String grammar = """
 		 lexer grammar L;
 		 I : ('a' | 'ab') {<Text():writeln()>} ;
 		 WS : (' '|'\n') -> skip ;
@@ -358,7 +348,7 @@ public class LexerExecDescriptors {
 	}
 
 	public static class GreedyOptional extends BaseLexerTestDescriptor {
-		public String grammar = """
+		public String input = """
 		//blah
 		//blah
 """;
@@ -381,12 +371,12 @@ public class LexerExecDescriptors {
 	}
 
 	public static class GreedyPositiveClosure extends BaseLexerTestDescriptor {
-		public String output = """
+		public String input = """
 		//blah
 		//blah
 """;
 
-		public String grammar = """
+		public String output = """
 		[@0,0:13='//blah\n//blah\n',<1>,1:0]
 		[@1,14:13='<EOF>',<-1>,3:0]
 """;
@@ -395,7 +385,7 @@ public class LexerExecDescriptors {
 		public String startRule = "";
 		public String grammarName = "L";
 
-		public String input = """
+		public String grammar = """
 		 lexer grammar L;
 		 CMT : ('//' .*? '\n')+;
 		 WS : (' '|'\t')+;
@@ -491,7 +481,7 @@ public class LexerExecDescriptors {
 
 	public static class NonGreedyConfigs extends BaseLexerTestDescriptor {
 		public String input = "ab";
-		public String input = """
+		public String output = """
 		a
 		b
 		[@0,0:0='a',<1>,1:0]
@@ -503,7 +493,7 @@ public class LexerExecDescriptors {
 		public String startRule = "";
 		public String grammarName = "L";
 
-		public String output = """
+		public String grammar = """
 		 lexer grammar L;
 		 I : .*? ('a' | 'ab') {<Text():writeln()>} ;
 		 WS : (' '|'\n') -> skip ;
@@ -513,7 +503,7 @@ public class LexerExecDescriptors {
 	}
 
 	public static class NonGreedyOptional extends BaseLexerTestDescriptor {
-		public String grammar = """
+		public String input = """
 		//blah
 		//blah
 """;
@@ -537,12 +527,12 @@ public class LexerExecDescriptors {
 	}
 
 	public static class NonGreedyPositiveClosure extends BaseLexerTestDescriptor {
-		public String output = """
+		public String input = """
 		//blah
 		//blah
 """;
 
-		public String grammar = """
+		public String output = """
 		[@0,0:6='//blah\n',<1>,1:0]
 		[@1,7:13='//blah\n',<1>,2:0]
 		[@2,14:13='<EOF>',<-1>,3:0]
@@ -552,7 +542,7 @@ public class LexerExecDescriptors {
 		public String startRule = "";
 		public String grammarName = "L";
 
-		public String output = """
+		public String grammar = """
 		 lexer grammar L;
 		 CMT : ('//' .*? '\n')+?;
 		 WS : (' '|'\t')+;
@@ -562,7 +552,7 @@ public class LexerExecDescriptors {
 
 	public static class NonGreedyTermination1 extends BaseLexerTestDescriptor {
 		public String input = "\"hi\"\"mom\"";
-		public String grammar = """
+		public String output = """
 		[@0,0:3='"hi"',<1>,1:0]
 		[@1,4:8='"mom"',<1>,1:4]
 		[@2,9:8='<EOF>',<-1>,1:9]
@@ -572,7 +562,7 @@ public class LexerExecDescriptors {
 		public String startRule = "";
 		public String grammarName = "L";
 
-		public String input = """
+		public String grammar = """
 		 lexer grammar L;
 		 STRING : '"' ('""' | .)*? '"';
 """;
@@ -627,7 +617,7 @@ public class LexerExecDescriptors {
 	}
 
 	public static class PositionAdjustingLexer extends BaseLexerTestDescriptor {
-		public String grammar = """
+		public String input = """
 		tokens
 		tokens {
 		notLabel
@@ -636,7 +626,7 @@ public class LexerExecDescriptors {
 		notLabel
 """;
 
-		public String errors = """
+		public String output = """
 		 [@0,0:5='tokens',<6>,1:0]
 		 [@1,7:12='tokens',<4>,2:0]
 		 [@2,14:14='{',<3>,2:7]
@@ -698,7 +688,7 @@ public class LexerExecDescriptors {
 
 	public static class QuoteTranslation extends BaseLexerTestDescriptor {
 		public String input = "\"";
-		public String errors = """
+		public String output = """
 		[@0,0:0='"',<1>,1:0]
 		[@1,1:0='<EOF>',<-1>,1:1]
 """;
@@ -707,7 +697,7 @@ public class LexerExecDescriptors {
 		public String startRule = "";
 		public String grammarName = "L";
 
-		public String output = """
+		public String grammar = """
 		 lexer grammar L;
 		 QUOTE : '"' ; // make sure this compiles
 """;
@@ -754,7 +744,7 @@ public class LexerExecDescriptors {
 			"[@3,38:38='\\n',<2>,3:17]\n"+
 			"[@4,39:38='<EOF>',<-1>,4:0]\n";
 
-		public String output = """
+		public String errors = """
 		line 1:9 token recognition error at: 'x'
 		line 3:16 token recognition error at: 'x'
 """;
@@ -800,7 +790,7 @@ public class LexerExecDescriptors {
 			"[@3,38:38='\\n',<2>,3:17]\n"+
 			"[@4,39:38='<EOF>',<-1>,4:0]\n";
 
-		public String output = """
+		public String errors = """
 		line 1:9 token recognition error at: 'x'
 		line 3:16 token recognition error at: 'x'
 """;
@@ -810,7 +800,7 @@ public class LexerExecDescriptors {
 		public String input = "34 -21 3";
 
 		// EOF has no length so range is 8:7 not 8:8
-		public String grammar = """
+		public String output = """
 		[@0,0:1='34',<2>,1:0]
 		[@1,3:5='-21',<1>,1:3]
 		[@2,7:7='3',<2>,1:7]
@@ -821,7 +811,7 @@ public class LexerExecDescriptors {
 		public String startRule = "";
 		public String grammarName = "L";
 
-		public String output = """
+		public String grammar = """
 		 lexer grammar L;
 		 A : '-' I ;
 		 I : '0'..'9'+ ;
@@ -855,13 +845,13 @@ public class LexerExecDescriptors {
 
 	}
 
-	/*
-	 * This is a regression test for antlr/antlr4#687 "Empty zero-length tokens
-	 * cannot have lexer commands" and antlr/antlr4#688 "Lexer cannot match
-	 * zero-length tokens"
-	 * https://github.com/antlr/antlr4/issues/687
-	 * https://github.com/antlr/antlr4/issues/688
-	 */
+    //
+    // 	 This is a regression test for antlr/antlr4#687 "Empty zero-length tokens
+    // 	 cannot have lexer commands" and antlr/antlr4#688 "Lexer cannot match
+    // 	 zero-length tokens"
+    // 	 https://github.com/antlr/antlr4/issues/687
+    // 	 https://github.com/antlr/antlr4/issues/688
+    //
 	public static class ZeroLengthToken extends BaseLexerTestDescriptor {
 		public String input = "'xxx'";
 		public String output = """
@@ -886,14 +876,14 @@ public class LexerExecDescriptors {
 """;
 	}
 
-	/**
-	 * This is a regression test for antlr/antlr4#76 "Serialized ATN strings
-	 * should be split when longer than 2^16 bytes (class file limitation)"
-	 * https://github.com/antlr/antlr4/issues/76
-	 */
+    //
+    // 	 This is a regression test for antlr/antlr4#76 "Serialized ATN strings
+    // 	 should be split when longer than 2^16 bytes (class file limitation)"
+    // 	 https://github.com/antlr/antlr4/issues/76
+    //
 	public static class LargeLexer extends BaseLexerTestDescriptor {
 		public String input = "KW400";
-		/**
+		public String output = """
 		[@0,0:4='KW400',<402>,1:0]
 		[@1,5:4='<EOF>',<-1>,1:5]
 """;
@@ -902,7 +892,7 @@ public class LexerExecDescriptors {
 		public String startRule = "";
 		public String grammarName = "L";
 
-		/** Look for grammar as resource */
+		// Look for grammar as resource
 		@Override
 		public Pair<String, String> getGrammar() {
 			String grammar = null;
@@ -920,13 +910,13 @@ public class LexerExecDescriptors {
 		}
 	}
 
-	/**
-	 * This is a regression test for antlr/antlr4#2709 "PHP target generates
-	 * invalid output when $ is used as part of the literal in lexer rule"
-	 * https://github.com/antlr/antlr4/issues/2709
-	 */
+    //
+    // 	 This is a regression test for antlr/antlr4#2709 "PHP target generates
+    // 	 invalid output when $ is used as part of the literal in lexer rule"
+    // 	 https://github.com/antlr/antlr4/issues/2709
+    // 	/
 	public static class EscapeTargetStringLiteral extends BaseLexerTestDescriptor {
-		/**
+		public String output = """
 		[@0,0:-1='<EOF>',<-1>,1:0]
 """;
 
@@ -934,7 +924,7 @@ public class LexerExecDescriptors {
 		public String startRule = "";
 		public String grammarName = "L";
 
-		/**
+		public String grammar = """
 		 lexer grammar L;
 		 ACTION_WITH_DOLLAR: '$ACTION';
 """;
@@ -945,11 +935,11 @@ public class LexerExecDescriptors {
 		}
 	}
 
-	/** https://github.com/antlr/antlr4/issues/1943 */
+	// https://github.com/antlr/antlr4/issues/1943
 	public static class StackoverflowDueToNotEscapedHyphen extends BaseLexerTestDescriptor {
 		public String input = "word";
 
-		/**
+		public String output = """
 		 [@0,0:3='word',<1>,1:0]
 		 [@1,4:3='<EOF>',<-1>,1:4]
 """;
@@ -958,7 +948,7 @@ public class LexerExecDescriptors {
 		public String startRule = "";
 		public String grammarName = "L";
 
-		/**
+		public String grammar = """
 		 lexer grammar L;
 		 WORD   : [a-z-+]+;
 """;
