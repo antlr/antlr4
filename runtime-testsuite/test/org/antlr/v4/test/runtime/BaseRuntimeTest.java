@@ -22,14 +22,13 @@ import org.stringtemplate.v4.StringRenderer;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.fail;
@@ -461,6 +460,94 @@ public abstract class BaseRuntimeTest {
 		}
 
 		return s;
+	}
+
+	/**  Read stuff like:
+	 [grammar]
+	 grammar T;
+	 s @after {<DumpDFA()>}
+	 : ID | ID {} ;
+	 ID : 'a'..'z'+;
+	 WS : (' '|'\t'|'\n')+ -> skip ;
+
+	 [grammarName]
+	 T
+
+	 [start]
+	 s
+
+	 [input]
+	 abc
+
+	 [output]
+	 Decision 0:
+	 s0-ID->:s1^=>1
+
+	 [errors]
+	 """line 1:0 reportAttemptingFullContext d=0 (s), input='abc'
+	 """
+
+	 Some can be missing like [errors]
+	 */
+	public static RuntimeTestDescriptor readDescriptor(Class<?> descrClass, String dtext) throws RuntimeException {
+		String g,gn,s,i,o,e = null;
+		String[] fieldNames = {"grammar","grammarName","start","input","output","errors"};
+		Set<String> fields = new HashSet<>(Arrays.asList(fieldNames));
+		Map<String,String> values = new HashMap<>();
+		String currentField = null;
+
+		String[] lines = dtext.split("\n");
+		for (String line : lines) {
+			if ( line.startsWith("[") && line.length()>2 &&
+				 fields.contains(line.substring(1, line.length() - 1)) ) {
+				currentField = line.substring(1, line.length() - 1);
+				System.out.println("set field:"+currentField);
+				values.put(currentField, "");
+			}
+			else {
+				System.out.println("Value line:"+line);
+				values.put(currentField, values.get(currentField)+line.trim()+"\n");
+			}
+		}
+		values.forEach((k,v) -> values.put(k,v.trim()));
+		System.out.println(values);
+//		try {
+//			RuntimeTestDescriptor d = (RuntimeTestDescriptor)descrClass.newInstance();
+//			Field gF = descrClass.getDeclaredField("grammar");
+//			gF.set(d, g);
+//			return d;
+//		}
+//		catch (Exception e) {
+//			e.printStackTrace(System.err);
+//		}
+		return null;
+	}
+
+	public static void main(String[] args) {
+		String dtext = "[grammar]\n" +
+				"grammar T;\n" +
+				"s @after {<DumpDFA()>}\n" +
+				": ID | ID {} ;\n" +
+				"ID : 'a'..'z'+;\n" +
+				"WS : (' '|'\\t'|'\\n')+ -> skip ;\n" +
+				"\n" +
+				"[grammarName]\n" +
+				"T\n" +
+				"\n" +
+				"[start]\n" +
+				"s\n" +
+				"\n" +
+				"[input]\n" +
+				"abc\n" +
+				"\n" +
+				"[output]\n" +
+				"Decision 0:\n" +
+				"s0-ID->:s1^=>1\n" +
+				"\n" +
+				"[errors]\n" +
+				"\"\"\"line 1:0 reportAttemptingFullContext d=0 (s), input='abc'\n" +
+				"\"\"\"\n";
+		readDescriptor(BaseRuntimeTestDescriptor.class, dtext);
 	}
 
 	public static void writeFile(String dir, String fileName, String content) {
