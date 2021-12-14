@@ -24,6 +24,9 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Modifier;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -64,7 +67,7 @@ public abstract class BaseRuntimeTest {
 	private static boolean requiresHeartbeat() {
 		return isTravisCI()
 				|| isAppVeyorCI()
-				|| (isCPP() && isRecursion()) 
+				|| (isCPP() && isRecursion())
 				|| (isCircleCI() && isGo())
 				|| (isCircleCI() && isDotNet() && isRecursion());
 	}
@@ -354,7 +357,110 @@ public abstract class BaseRuntimeTest {
 				}
 			}
 		}
+		writeDescriptors(clazz, descriptors);
 		return descriptors.toArray(new RuntimeTestDescriptor[0]);
+	}
+
+	/** Write descriptor files. */
+	private static void writeDescriptors(Class<?> clazz, List<RuntimeTestDescriptor> descriptors) {
+		new File("/tmp/descriptors").mkdir();
+		String groupName = clazz.getSimpleName();
+		groupName = groupName.replace("Descriptors", "");
+		String groupDir = "/tmp/descriptors/" + groupName;
+		new File(groupDir).mkdir();
+
+		for (RuntimeTestDescriptor d : descriptors) {
+			try {
+				Pair<String,String> g = d.getGrammar();
+				String gname = g.a;
+				String grammar = g.b;
+				String filename = d.getTestName()+".txt";
+				String content = "";
+				String input = quoteForDescriptorFile(d.getInput());
+				String output = quoteForDescriptorFile(d.getOutput());
+				String errors = quoteForDescriptorFile(d.getErrors());
+				content += "[grammar]\n";
+				content += grammar;
+				if ( !content.endsWith("\n\n") ) content += "\n";
+				content += "[grammarName]\n";
+				content += gname;
+				content += "\n\n";
+				content += "[start]\n";
+				content += d.getStartRule();
+				content += "\n\n";
+				if ( input!=null ) {
+					content += "[input]\n";
+					content += input;
+					content += "\n";
+				}
+				if ( output!=null ) {
+					content += "[output]\n";
+					content += output;
+					content += "\n";
+				}
+				if ( errors!=null ) {
+					content += "[errors]\n";
+					content += errors;
+				}
+				Files.write(Paths.get(groupDir + "/" + filename), content.getBytes());
+			}
+			catch (IOException e) {
+				//exception handling left as an exercise for the reader
+				System.err.println(e.getMessage());
+			}
+		}
+	}
+
+	/** Rules for strings look like this:
+	 *
+	 * [input]  if one line, remove all WS before/after
+	 * a b
+	 *
+	 * [input] need whitespace
+	 * """34
+	 *  34"""
+	 *
+	 * [input] single quote char, remove all WS before/after
+	 * "
+	 *
+	 * [input]  same as "b = 6\n" in java
+	 * """b = 6
+	 * """
+	 *
+	 * [input]
+	 * """a """ space and no newline inside
+	 *
+	 * [input]  same as java string "\"aaa"
+	 * "aaa
+	 *
+	 * [input] ignore front/back \n except leave last \n
+	 * a
+	 * b
+	 * c
+	 * d
+	 */
+	private static String quoteForDescriptorFile(String s) {
+		if ( s==null ) {
+			return null;
+		}
+		long nnl = s.chars().filter(ch -> ch == '\n').count();
+
+		if ( nnl==0 ) { // one line input
+			return s + "\n";
+		}
+		if ( nnl>1 && s.endsWith("\n") ) {
+			return s;
+		}
+		if ( s.endsWith(" ") ||            // whitespace matters
+			 (nnl==1&&s.endsWith("\n")) || // "b = 6\n"
+			 s.startsWith("\n") ) {        // whitespace matters
+			return "\"\"\"" + s + "\"\"\"\n";
+		}
+		if ( !s.endsWith("\n") ) { // "a\n b"
+			return "\"\"\"" + s + "\"\"\"\n";
+		}
+
+		return s;
 	}
 
 	public static void writeFile(String dir, String fileName, String content) {

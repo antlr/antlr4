@@ -13,14 +13,11 @@ import com.sun.tools.javac.tree.TreeMaker;
 import com.sun.tools.javac.util.Context;
 import com.sun.tools.javac.util.List;
 
-import javax.annotation.processing.AbstractProcessor;
-import javax.annotation.processing.ProcessingEnvironment;
-import javax.annotation.processing.RoundEnvironment;
-import javax.annotation.processing.SupportedAnnotationTypes;
-import javax.annotation.processing.SupportedSourceVersion;
+import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
+import javax.tools.Diagnostic;
 import java.lang.reflect.Field;
 import java.util.Set;
 
@@ -47,8 +44,6 @@ public class CommentHasStringValueProcessor extends AbstractProcessor {
 	@Override
 	public synchronized void init(ProcessingEnvironment processingEnv) {
 		super.init(processingEnv);
-//		Messager messager = processingEnv.getMessager();
-//		messager.printMessage(Diagnostic.Kind.NOTE, "WOW INIT--------------------");
 		utilities = (JavacElements)processingEnv.getElementUtils();
 		treeMaker = TreeMaker.instance(extractContext(utilities));
 	}
@@ -68,10 +63,10 @@ public class CommentHasStringValueProcessor extends AbstractProcessor {
 
 	@Override
 	public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-//		Messager messager = processingEnv.getMessager();
-//		messager.printMessage(Diagnostic.Kind.NOTE, "PROCESS--------------------");
+//		Messager messager = processingEnv.getMessager(); // access compilation output
 		Set<? extends Element> annotatedElements = roundEnv.getElementsAnnotatedWith(CommentHasStringValue.class);
 		for (Element annotatedElement : annotatedElements) {
+//			messager.printMessage(Diagnostic.Kind.NOTE, "element:"+annotatedElement.toString());
 			String docComment = utilities.getDocComment(annotatedElement);
 			JCTree.JCLiteral literal = treeMaker.Literal(docComment!=null ? docComment : "");
 			JCTree elementTree = utilities.getTree(annotatedElement);
