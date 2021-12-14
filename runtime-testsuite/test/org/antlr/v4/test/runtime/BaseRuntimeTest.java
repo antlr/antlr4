@@ -188,7 +188,7 @@ public abstract class BaseRuntimeTest {
 		delegate.afterTest(descriptor);
 	}
 
-	public void testParser(RuntimeTestDescriptor descriptor) throws Exception {
+	public void testParser(RuntimeTestDescriptor descriptor) {
 		RuntimeTestUtils.mkdir(delegate.getTempParserDirPath());
 
 		Pair<String, String> pair = descriptor.getGrammar();
@@ -370,19 +370,6 @@ public abstract class BaseRuntimeTest {
 				String dtext = Files.readString(Path.of("/tmp/descriptors",group,fname));
 				UniversalRuntimeTestDescriptor d = readDescriptor(dtext);
 				d.testGroup = group;
-				if ( group.contains("CompositeLexer") ) {
-					/** A type in {"Lexer", "Parser", "CompositeLexer", "CompositeParser"} */
-					d.testType = "CompositeLexer";
-				}
-				else if ( group.contains("CompositeParser") ) {
-					d.testType = "CompositeParser";
-				}
-				else if ( group.contains("Lexer") ) {
-					d.testType = "Lexer";
-				}
-				else if ( group.contains("Parser") ) {
-					d.testType = "Parser";
-				}
 				d.name = fname.replace(".txt","");
 				d.targetName = targetName;
 				descriptors.add(d);
@@ -413,6 +400,9 @@ public abstract class BaseRuntimeTest {
 				String input = quoteForDescriptorFile(d.getInput());
 				String output = quoteForDescriptorFile(d.getOutput());
 				String errors = quoteForDescriptorFile(d.getErrors());
+				content += "[type]\n";
+				content += d.getTestType();
+				content += "\n\n";
 				content += "[grammar]\n";
 				content += grammar;
 				if ( !content.endsWith("\n\n") ) content += "\n";
@@ -552,7 +542,7 @@ public abstract class BaseRuntimeTest {
 	public static UniversalRuntimeTestDescriptor readDescriptor(String dtext)
 			throws RuntimeException
 	{
-		String[] fileSections = {"notes","grammar","slaveGrammar","start","input","output","errors"};
+		String[] fileSections = {"notes","type","grammar","slaveGrammar","start","input","output","errors"};
 		Set<String> sections = new HashSet<>(Arrays.asList(fileSections));
 		String currentField = null;
 		String currentValue = null;
@@ -575,15 +565,28 @@ public abstract class BaseRuntimeTest {
 				currentValue += line.trim()+"\n";
 			}
 		}
+		// save last section
+		pairs.add(new Pair<>(currentField,currentValue));
+
 //		System.out.println(pairs);
 
 		UniversalRuntimeTestDescriptor d = new UniversalRuntimeTestDescriptor();
 		for (Pair<String,String> p : pairs) {
 			String section = p.a;
 			String value = p.b.trim();
+			if ( value.startsWith("\"\"\"") ) {
+				value = value.replace("\"\"\"", "");
+			}
+			else if ( value.indexOf('\n')>=0 ) {
+				value = value + "\n"; // if multi line and not quoted, leave \n on end.
+			}
 			switch (section) {
 				case "notes":
 					d.notes = value;
+					break;
+				case "type":
+					d.testType = value;
+					break;
 				case "grammar":
 					d.grammarName = getGrammarName(value.split("\n")[0]);
 					d.grammar = value;
