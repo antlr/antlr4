@@ -7,19 +7,16 @@
 
 #include "XPathElement.h"
 
-namespace antlr4 {
-namespace tree {
-namespace xpath {
+namespace antlr4::tree::xpath {
 
   class ANTLR4CPP_PUBLIC XPathTokenAnywhereElement : public XPathElement {
   protected:
     int tokenType = 0;
+
   public:
     XPathTokenAnywhereElement(const std::string &tokenName, int tokenType);
 
     virtual std::vector<ParseTree *> evaluate(ParseTree *t) override;
   };
 
-} // namespace xpath
-} // namespace tree
-} // namespace antlr4
+} // namespace antlr4::tree::xpath

@@ -3,21 +3,20 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
-#include "atn/PredictionContext.h"
+#include "Exceptions.h"
 #include "atn/ATNConfig.h"
 #include "atn/ATNSimulator.h"
-#include "Exceptions.h"
+#include "atn/PredictionContext.h"
 #include "atn/SemanticContext.h"
 #include "support/Arrays.h"
 
 #include "atn/ATNConfigSet.h"
 
+using namespace antlr4;
 using namespace antlr4::atn;
 using namespace antlrcpp;
 
-ATNConfigSet::ATNConfigSet(bool fullCtx) : fullCtx(fullCtx) {
-  InitializeInstanceFields();
-}
+ATNConfigSet::ATNConfigSet(bool fullCtx) : fullCtx(fullCtx) { InitializeInstanceFields(); }
 
 ATNConfigSet::ATNConfigSet(const Ref<ATNConfigSet> &old) : ATNConfigSet(old->fullCtx) {
   addAll(old);
@@ -27,12 +26,9 @@ ATNConfigSet::ATNConfigSet(const Ref<ATNConfigSet> &old) : ATNConfigSet(old->ful
   dipsIntoOuterContext = old->dipsIntoOuterContext;
 }
 
-ATNConfigSet::~ATNConfigSet() {
-}
+ATNConfigSet::~ATNConfigSet() {}
 
-bool ATNConfigSet::add(const Ref<ATNConfig> &config) {
-  return add(config, nullptr);
-}
+bool ATNConfigSet::add(const Ref<ATNConfig> &config) { return add(config, nullptr); }
 
 bool ATNConfigSet::add(const Ref<ATNConfig> &config, PredictionContextMergeCache *mergeCache) {
   if (_readonly) {
@@ -57,7 +53,8 @@ bool ATNConfigSet::add(const Ref<ATNConfig> &config, PredictionContextMergeCache
 
   // a previous (s,i,pi,_), merge with it and save result
   bool rootIsWildcard = !fullCtx;
-  Ref<PredictionContext> merged = PredictionContext::merge(existing->context, config->context, rootIsWildcard, mergeCache);
+  Ref<PredictionContext> merged =
+      PredictionContext::merge(existing->context, config->context, rootIsWildcard, mergeCache);
   // no need to check for existing.context, config.context in cache
   // since only way to create new graphs is "call rule" and here. We
   // cache at both places.
@@ -80,8 +77,8 @@ bool ATNConfigSet::addAll(const Ref<ATNConfigSet> &other) {
   return false;
 }
 
-std::vector<ATNState*> ATNConfigSet::getStates() {
-  std::vector<ATNState*> states;
+std::vector<ATNState *> ATNConfigSet::getStates() {
+  std::vector<ATNState *> states;
   for (const auto &c : configs) {
     states.push_back(c->state);
   }
@@ -115,9 +112,7 @@ std::vector<Ref<SemanticContext>> ATNConfigSet::getPredicates() {
   return preds;
 }
 
-Ref<ATNConfig> ATNConfigSet::get(size_t i) const {
-  return configs[i];
-}
+Ref<ATNConfig> ATNConfigSet::get(size_t i) const { return configs[i]; }
 
 void ATNConfigSet::optimizeConfigs(ATNSimulator *interpreter) {
   if (_readonly) {
@@ -131,7 +126,7 @@ void ATNConfigSet::optimizeConfigs(ATNSimulator *interpreter) {
   }
 }
 
-bool ATNConfigSet::operator == (const ATNConfigSet &other) {
+bool ATNConfigSet::operator==(const ATNConfigSet &other) {
   if (&other == this) {
     return true;
   }
@@ -139,8 +134,8 @@ bool ATNConfigSet::operator == (const ATNConfigSet &other) {
   if (configs.size() != other.configs.size())
     return false;
 
-  if (fullCtx != other.fullCtx || uniqueAlt != other.uniqueAlt ||
-      conflictingAlts != other.conflictingAlts || hasSemanticContext != other.hasSemanticContext ||
+  if (fullCtx != other.fullCtx || uniqueAlt != other.uniqueAlt || conflictingAlts != other.conflictingAlts ||
+      hasSemanticContext != other.hasSemanticContext ||
       dipsIntoOuterContext != other.dipsIntoOuterContext) // includes stack context
     return false;
 
@@ -158,13 +153,9 @@ size_t ATNConfigSet::hashCode() {
   return _cachedHashCode;
 }
 
-size_t ATNConfigSet::size() {
-  return configs.size();
-}
+size_t ATNConfigSet::size() { return configs.size(); }
 
-bool ATNConfigSet::isEmpty() {
-  return configs.empty();
-}
+bool ATNConfigSet::isEmpty() { return configs.empty(); }
 
 void ATNConfigSet::clear() {
   if (_readonly) {
@@ -175,9 +166,7 @@ void ATNConfigSet::clear() {
   _configLookup.clear();
 }
 
-bool ATNConfigSet::isReadonly() {
-  return _readonly;
-}
+bool ATNConfigSet::isReadonly() { return _readonly; }
 
 void ATNConfigSet::setReadonly(bool readonly) {
   _readonly = readonly;
@@ -193,7 +182,7 @@ std::string ATNConfigSet::toString() {
   ss << "]";
 
   if (hasSemanticContext) {
-    ss << ",hasSemanticContext = " <<  hasSemanticContext;
+    ss << ",hasSemanticContext = " << hasSemanticContext;
   }
   if (uniqueAlt != ATN::INVALID_ALT_NUMBER) {
     ss << ",uniqueAlt = " << uniqueAlt;

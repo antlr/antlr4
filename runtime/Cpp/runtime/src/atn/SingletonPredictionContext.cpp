@@ -7,18 +7,19 @@
 
 #include "atn/SingletonPredictionContext.h"
 
+using namespace antlr4;
 using namespace antlr4::atn;
 
-SingletonPredictionContext::SingletonPredictionContext(Ref<PredictionContext> const& parent, size_t returnState)
-  : PredictionContext(parent ? calculateHashCode(parent, returnState) : calculateEmptyHashCode()),
-    parent(parent), returnState(returnState) {
+SingletonPredictionContext::SingletonPredictionContext(Ref<PredictionContext> const &parent, size_t returnState)
+    : PredictionContext(parent ? calculateHashCode(parent, returnState) : calculateEmptyHashCode()), parent(parent),
+      returnState(returnState) {
   assert(returnState != ATNState::INVALID_STATE_NUMBER);
 }
 
-SingletonPredictionContext::~SingletonPredictionContext() {
-}
+SingletonPredictionContext::~SingletonPredictionContext() {}
 
-Ref<SingletonPredictionContext> SingletonPredictionContext::create(Ref<PredictionContext> const& parent, size_t returnState) {
+Ref<SingletonPredictionContext> SingletonPredictionContext::create(Ref<PredictionContext> const &parent,
+                                                                   size_t returnState) {
 
   if (returnState == EMPTY_RETURN_STATE && parent) {
     // someone can pass in the bits of an array ctx that mean $
@@ -27,9 +28,7 @@ Ref<SingletonPredictionContext> SingletonPredictionContext::create(Ref<Predictio
   return std::make_shared<SingletonPredictionContext>(parent, returnState);
 }
 
-size_t SingletonPredictionContext::size() const {
-  return 1;
-}
+size_t SingletonPredictionContext::size() const { return 1; }
 
 Ref<PredictionContext> SingletonPredictionContext::getParent(size_t index) const {
   assert(index == 0);
@@ -43,12 +42,12 @@ size_t SingletonPredictionContext::getReturnState(size_t index) const {
   return returnState;
 }
 
-bool SingletonPredictionContext::operator == (const PredictionContext &o) const {
+bool SingletonPredictionContext::operator==(const PredictionContext &o) const {
   if (this == &o) {
     return true;
   }
 
-  const SingletonPredictionContext *other = dynamic_cast<const SingletonPredictionContext*>(&o);
+  const SingletonPredictionContext *other = dynamic_cast<const SingletonPredictionContext *>(&o);
   if (other == nullptr) {
     return false;
   }
@@ -65,11 +64,11 @@ bool SingletonPredictionContext::operator == (const PredictionContext &o) const 
   if (!parent || !other->parent)
     return false;
 
-   return *parent == *other->parent;
+  return *parent == *other->parent;
 }
 
 std::string SingletonPredictionContext::toString() const {
-  //std::string up = !parent.expired() ? parent.lock()->toString() : "";
+  // std::string up = !parent.expired() ? parent.lock()->toString() : "";
   std::string up = parent != nullptr ? parent->toString() : "";
   if (up.length() == 0) {
     if (returnState == EMPTY_RETURN_STATE) {

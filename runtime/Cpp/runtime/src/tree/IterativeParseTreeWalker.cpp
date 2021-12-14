@@ -5,9 +5,9 @@
 
 #include "support/CPPUtils.h"
 
-#include "tree/ParseTreeListener.h"
-#include "tree/ParseTree.h"
 #include "tree/ErrorNode.h"
+#include "tree/ParseTree.h"
+#include "tree/ParseTreeListener.h"
 
 #include "IterativeParseTreeWalker.h"
 

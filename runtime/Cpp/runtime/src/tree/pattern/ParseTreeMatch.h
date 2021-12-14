@@ -7,9 +7,7 @@
 
 #include "antlr4-common.h"
 
-namespace antlr4 {
-namespace tree {
-namespace pattern {
+namespace antlr4::tree::pattern {
 
   /// Represents the result of matching a ParseTree against a tree pattern.
   class ANTLR4CPP_PUBLIC ParseTreeMatch {
@@ -34,16 +32,17 @@ namespace pattern {
     /// <param name="tree"> The parse tree to match against the pattern. </param>
     /// <param name="pattern"> The parse tree pattern. </param>
     /// <param name="labels"> A mapping from label names to collections of
-    /// <seealso cref="ParseTree"/> objects located by the tree pattern matching process. </param>
-    /// <param name="mismatchedNode"> The first node which failed to match the tree
+    /// <seealso cref="ParseTree"/> objects located by the tree pattern matching process.
+    /// </param> <param name="mismatchedNode"> The first node which failed to match the tree
     /// pattern during the matching process.
     /// </param>
     /// <exception cref="IllegalArgumentException"> if {@code tree} is {@code null} </exception>
-    /// <exception cref="IllegalArgumentException"> if {@code pattern} is {@code null} </exception>
-    /// <exception cref="IllegalArgumentException"> if {@code labels} is {@code null} </exception>
-    ParseTreeMatch(ParseTree *tree, ParseTreePattern const& pattern,
+    /// <exception cref="IllegalArgumentException"> if {@code pattern} is {@code null}
+    /// </exception> <exception cref="IllegalArgumentException"> if {@code labels} is {@code
+    /// null} </exception>
+    ParseTreeMatch(ParseTree *tree, ParseTreePattern const &pattern,
                    const std::map<std::string, std::vector<ParseTree *>> &labels, ParseTree *mismatchedNode);
-    ParseTreeMatch(ParseTreeMatch const&) = default;
+    ParseTreeMatch(ParseTreeMatch const &) = default;
     virtual ~ParseTreeMatch();
 
     /// <summary>
@@ -61,7 +60,7 @@ namespace pattern {
     /// </param>
     /// <returns> The last <seealso cref="ParseTree"/> to match a tag with the specified
     /// label, or {@code null} if no parse tree matched a tag with the label. </returns>
-    virtual ParseTree* get(const std::string &label);
+    virtual ParseTree *get(const std::string &label);
 
     /// <summary>
     /// Return all nodes matching a rule or token tag with the specified label.
@@ -96,14 +95,14 @@ namespace pattern {
     /// </summary>
     /// <returns> A mapping from labels to parse tree nodes. If the parse tree
     /// pattern did not contain any rule or token tags, this map will be empty. </returns>
-    virtual std::map<std::string, std::vector<ParseTree *>>& getLabels();
+    virtual std::map<std::string, std::vector<ParseTree *>> &getLabels();
 
     /// <summary>
     /// Get the node at which we first detected a mismatch.
     /// </summary>
     /// <returns> the node at which we first detected a mismatch, or {@code null}
     /// if the match was successful. </returns>
-    virtual ParseTree* getMismatchedNode();
+    virtual ParseTree *getMismatchedNode();
 
     /// <summary>
     /// Gets a value indicating whether the match operation succeeded.
@@ -116,17 +115,16 @@ namespace pattern {
     /// Get the tree pattern we are matching against.
     /// </summary>
     /// <returns> The tree pattern we are matching against. </returns>
-    virtual const ParseTreePattern& getPattern();
+    virtual const ParseTreePattern &getPattern();
 
     /// <summary>
     /// Get the parse tree we are trying to match to a pattern.
     /// </summary>
-    /// <returns> The <seealso cref="ParseTree"/> we are trying to match to a pattern. </returns>
-    virtual ParseTree* getTree();
+    /// <returns> The <seealso cref="ParseTree"/> we are trying to match to a pattern.
+    /// </returns>
+    virtual ParseTree *getTree();
 
     virtual std::string toString();
   };
 
-} // namespace pattern
-} // namespace tree
-} // namespace antlr4
+} // namespace antlr4::tree::pattern

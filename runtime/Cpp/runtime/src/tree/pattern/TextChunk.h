@@ -7,9 +7,7 @@
 
 #include "Chunk.h"
 
-namespace antlr4 {
-namespace tree {
-namespace pattern {
+namespace antlr4::tree::pattern {
 
   /// <summary>
   /// Represents a span of raw text (concrete syntax) between tags in a tree
@@ -26,7 +24,8 @@ namespace pattern {
     /// Constructs a new instance of <seealso cref="TextChunk"/> with the specified text.
     /// </summary>
     /// <param name="text"> The text of this chunk. </param>
-    /// <exception cref="IllegalArgumentException"> if {@code text} is {@code null}. </exception>
+    /// <exception cref="IllegalArgumentException"> if {@code text} is {@code null}.
+    /// </exception>
   public:
     TextChunk(const std::string &text);
     virtual ~TextChunk();
@@ -46,6 +45,4 @@ namespace pattern {
     virtual std::string toString() override;
   };
 
-} // namespace pattern
-} // namespace tree
-} // namespace antlr4
+} // namespace antlr4::tree::pattern

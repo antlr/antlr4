@@ -7,8 +7,7 @@
 
 #include "atn/DecisionState.h"
 
-namespace antlr4 {
-namespace atn {
+namespace antlr4::atn {
 
   class ANTLR4CPP_PUBLIC StarLoopEntryState final : public DecisionState {
   public:
@@ -31,5 +30,4 @@ namespace atn {
     virtual size_t getStateType() override;
   };
 
-} // namespace atn
-} // namespace antlr4
+} // namespace antlr4::atn

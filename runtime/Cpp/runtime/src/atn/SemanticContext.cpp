@@ -4,8 +4,8 @@
  */
 
 #include "misc/MurmurHash.h"
-#include "support/CPPUtils.h"
 #include "support/Arrays.h"
+#include "support/CPPUtils.h"
 
 #include "SemanticContext.h"
 
@@ -13,15 +13,13 @@ using namespace antlr4;
 using namespace antlr4::atn;
 using namespace antlrcpp;
 
-//------------------ Predicate -----------------------------------------------------------------------------------------
+//------------------ Predicate
+//-----------------------------------------------------------------------------------------
 
-SemanticContext::Predicate::Predicate() : Predicate(INVALID_INDEX, INVALID_INDEX, false) {
-}
+SemanticContext::Predicate::Predicate() : Predicate(INVALID_INDEX, INVALID_INDEX, false) {}
 
 SemanticContext::Predicate::Predicate(size_t ruleIndex, size_t predIndex, bool isCtxDependent)
-: ruleIndex(ruleIndex), predIndex(predIndex), isCtxDependent(isCtxDependent) {
-}
-
+    : ruleIndex(ruleIndex), predIndex(predIndex), isCtxDependent(isCtxDependent) {}
 
 bool SemanticContext::Predicate::eval(Recognizer *parser, RuleContext *parserCallStack) {
   RuleContext *localctx = nullptr;
@@ -39,11 +37,11 @@ size_t SemanticContext::Predicate::hashCode() const {
   return hashCode;
 }
 
-bool SemanticContext::Predicate::operator == (const SemanticContext &other) const {
+bool SemanticContext::Predicate::operator==(const SemanticContext &other) const {
   if (this == &other)
     return true;
 
-  const Predicate *p = dynamic_cast<const Predicate*>(&other);
+  const Predicate *p = dynamic_cast<const Predicate *>(&other);
   if (p == nullptr)
     return false;
 
@@ -51,34 +49,31 @@ bool SemanticContext::Predicate::operator == (const SemanticContext &other) cons
 }
 
 std::string SemanticContext::Predicate::toString() const {
-  return std::string("{") + std::to_string(ruleIndex) + std::string(":") + std::to_string(predIndex) + std::string("}?");
+  return std::string("{") + std::to_string(ruleIndex) + std::string(":") + std::to_string(predIndex) +
+         std::string("}?");
 }
 
-//------------------ PrecedencePredicate -------------------------------------------------------------------------------
+//------------------ PrecedencePredicate
+//-------------------------------------------------------------------------------
 
-SemanticContext::PrecedencePredicate::PrecedencePredicate() : precedence(0) {
-}
+SemanticContext::PrecedencePredicate::PrecedencePredicate() : precedence(0) {}
 
-SemanticContext::PrecedencePredicate::PrecedencePredicate(int precedence) : precedence(precedence) {
-}
+SemanticContext::PrecedencePredicate::PrecedencePredicate(int precedence) : precedence(precedence) {}
 
 bool SemanticContext::PrecedencePredicate::eval(Recognizer *parser, RuleContext *parserCallStack) {
   return parser->precpred(parserCallStack, precedence);
 }
 
 Ref<SemanticContext> SemanticContext::PrecedencePredicate::evalPrecedence(Recognizer *parser,
-  RuleContext *parserCallStack) {
+                                                                          RuleContext *parserCallStack) {
   if (parser->precpred(parserCallStack, precedence)) {
     return SemanticContext::NONE;
-  }
-  else {
+  } else {
     return nullptr;
   }
 }
 
-int SemanticContext::PrecedencePredicate::compareTo(PrecedencePredicate *o) {
-  return precedence - o->precedence;
-}
+int SemanticContext::PrecedencePredicate::compareTo(PrecedencePredicate *o) { return precedence - o->precedence; }
 
 size_t SemanticContext::PrecedencePredicate::hashCode() const {
   size_t hashCode = 1;
@@ -86,7 +81,7 @@ size_t SemanticContext::PrecedencePredicate::hashCode() const {
   return hashCode;
 }
 
-bool SemanticContext::PrecedencePredicate::operator == (const SemanticContext &other) const {
+bool SemanticContext::PrecedencePredicate::operator==(const SemanticContext &other) const {
   if (this == &other)
     return true;
 
@@ -101,9 +96,10 @@ std::string SemanticContext::PrecedencePredicate::toString() const {
   return "{" + std::to_string(precedence) + ">=prec}?";
 }
 
-//------------------ AND -----------------------------------------------------------------------------------------------
+//------------------ AND
+//-----------------------------------------------------------------------------------------------
 
-SemanticContext::AND::AND(Ref<SemanticContext> const& a, Ref<SemanticContext> const& b) {
+SemanticContext::AND::AND(Ref<SemanticContext> const &a, Ref<SemanticContext> const &b) {
   Set operands;
 
   if (is<AND>(a)) {
@@ -126,7 +122,7 @@ SemanticContext::AND::AND(Ref<SemanticContext> const& a, Ref<SemanticContext> co
 
   if (!precedencePredicates.empty()) {
     // interested in the transition with the lowest precedence
-    auto predicate = [](Ref<PrecedencePredicate> const& a, Ref<PrecedencePredicate> const& b) {
+    auto predicate = [](Ref<PrecedencePredicate> const &a, Ref<PrecedencePredicate> const &b) {
       return a->precedence < b->precedence;
     };
 
@@ -137,11 +133,9 @@ SemanticContext::AND::AND(Ref<SemanticContext> const& a, Ref<SemanticContext> co
   std::copy(operands.begin(), operands.end(), std::back_inserter(opnds));
 }
 
-std::vector<Ref<SemanticContext>> SemanticContext::AND::getOperands() const {
-  return opnds;
-}
+std::vector<Ref<SemanticContext>> SemanticContext::AND::getOperands() const { return opnds; }
 
-bool SemanticContext::AND::operator == (const SemanticContext &other) const {
+bool SemanticContext::AND::operator==(const SemanticContext &other) const {
   if (this == &other)
     return true;
 
@@ -152,9 +146,7 @@ bool SemanticContext::AND::operator == (const SemanticContext &other) const {
   return Arrays::equals(opnds, context->opnds);
 }
 
-size_t SemanticContext::AND::hashCode() const {
-  return misc::MurmurHash::hashCode(opnds, typeid(AND).hash_code());
-}
+size_t SemanticContext::AND::hashCode() const { return misc::MurmurHash::hashCode(opnds, typeid(AND).hash_code()); }
 
 bool SemanticContext::AND::eval(Recognizer *parser, RuleContext *parserCallStack) {
   for (const auto &opnd : opnds) {
@@ -205,9 +197,10 @@ std::string SemanticContext::AND::toString() const {
   return tmp;
 }
 
-//------------------ OR ------------------------------------------------------------------------------------------------
+//------------------ OR
+//------------------------------------------------------------------------------------------------
 
-SemanticContext::OR::OR(Ref<SemanticContext> const& a, Ref<SemanticContext> const& b) {
+SemanticContext::OR::OR(Ref<SemanticContext> const &a, Ref<SemanticContext> const &b) {
   Set operands;
 
   if (is<OR>(a)) {
@@ -229,7 +222,7 @@ SemanticContext::OR::OR(Ref<SemanticContext> const& a, Ref<SemanticContext> cons
   std::vector<Ref<PrecedencePredicate>> precedencePredicates = filterPrecedencePredicates(operands);
   if (!precedencePredicates.empty()) {
     // interested in the transition with the highest precedence
-    auto predicate = [](Ref<PrecedencePredicate> const& a, Ref<PrecedencePredicate> const& b) {
+    auto predicate = [](Ref<PrecedencePredicate> const &a, Ref<PrecedencePredicate> const &b) {
       return a->precedence < b->precedence;
     };
     auto reduced = std::max_element(precedencePredicates.begin(), precedencePredicates.end(), predicate);
@@ -239,11 +232,9 @@ SemanticContext::OR::OR(Ref<SemanticContext> const& a, Ref<SemanticContext> cons
   std::copy(operands.begin(), operands.end(), std::back_inserter(opnds));
 }
 
-std::vector<Ref<SemanticContext>> SemanticContext::OR::getOperands() const {
-  return opnds;
-}
+std::vector<Ref<SemanticContext>> SemanticContext::OR::getOperands() const { return opnds; }
 
-bool SemanticContext::OR::operator == (const SemanticContext &other) const {
+bool SemanticContext::OR::operator==(const SemanticContext &other) const {
   if (this == &other)
     return true;
 
@@ -254,9 +245,7 @@ bool SemanticContext::OR::operator == (const SemanticContext &other) const {
   return Arrays::equals(opnds, context->opnds);
 }
 
-size_t SemanticContext::OR::hashCode() const {
-  return misc::MurmurHash::hashCode(opnds, typeid(OR).hash_code());
-}
+size_t SemanticContext::OR::hashCode() const { return misc::MurmurHash::hashCode(opnds, typeid(OR).hash_code()); }
 
 bool SemanticContext::OR::eval(Recognizer *parser, RuleContext *parserCallStack) {
   for (const auto &opnd : opnds) {
@@ -301,28 +290,26 @@ Ref<SemanticContext> SemanticContext::OR::evalPrecedence(Recognizer *parser, Rul
 
 std::string SemanticContext::OR::toString() const {
   std::string tmp;
-  for(const auto &var : opnds) {
+  for (const auto &var : opnds) {
     tmp += var->toString() + " || ";
   }
   return tmp;
 }
 
-//------------------ SemanticContext -----------------------------------------------------------------------------------
+//------------------ SemanticContext
+//-----------------------------------------------------------------------------------
 
 const Ref<SemanticContext> SemanticContext::NONE = std::make_shared<Predicate>(INVALID_INDEX, INVALID_INDEX, false);
 
-SemanticContext::~SemanticContext() {
-}
+SemanticContext::~SemanticContext() {}
 
-bool SemanticContext::operator != (const SemanticContext &other) const {
-  return !(*this == other);
-}
+bool SemanticContext::operator!=(const SemanticContext &other) const { return !(*this == other); }
 
 Ref<SemanticContext> SemanticContext::evalPrecedence(Recognizer * /*parser*/, RuleContext * /*parserCallStack*/) {
   return shared_from_this();
 }
 
-Ref<SemanticContext> SemanticContext::And(Ref<SemanticContext> const& a, Ref<SemanticContext> const& b) {
+Ref<SemanticContext> SemanticContext::And(Ref<SemanticContext> const &a, Ref<SemanticContext> const &b) {
   if (!a || a == NONE) {
     return b;
   }
@@ -339,7 +326,7 @@ Ref<SemanticContext> SemanticContext::And(Ref<SemanticContext> const& a, Ref<Sem
   return result;
 }
 
-Ref<SemanticContext> SemanticContext::Or(Ref<SemanticContext> const& a, Ref<SemanticContext> const& b) {
+Ref<SemanticContext> SemanticContext::Or(Ref<SemanticContext> const &a, Ref<SemanticContext> const &b) {
   if (!a) {
     return b;
   }
@@ -359,7 +346,8 @@ Ref<SemanticContext> SemanticContext::Or(Ref<SemanticContext> const& a, Ref<Sema
   return result;
 }
 
-std::vector<Ref<SemanticContext::PrecedencePredicate>> SemanticContext::filterPrecedencePredicates(const Set &collection) {
+std::vector<Ref<SemanticContext::PrecedencePredicate>>
+SemanticContext::filterPrecedencePredicates(const Set &collection) {
   std::vector<Ref<SemanticContext::PrecedencePredicate>> result;
   for (const auto &context : collection) {
     if (antlrcpp::is<PrecedencePredicate>(context)) {
@@ -370,8 +358,7 @@ std::vector<Ref<SemanticContext::PrecedencePredicate>> SemanticContext::filterPr
   return result;
 }
 
+//------------------ Operator
+//-----------------------------------------------------------------------------------------
 
-//------------------ Operator -----------------------------------------------------------------------------------------
-
-SemanticContext::Operator::~Operator() {
-}
+SemanticContext::Operator::~Operator() {}

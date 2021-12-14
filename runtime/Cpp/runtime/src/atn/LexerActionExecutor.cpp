@@ -3,10 +3,10 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
-#include "misc/MurmurHash.h"
 #include "atn/LexerIndexedCustomAction.h"
-#include "support/CPPUtils.h"
+#include "misc/MurmurHash.h"
 #include "support/Arrays.h"
+#include "support/CPPUtils.h"
 
 #include "atn/LexerActionExecutor.h"
 
@@ -16,16 +16,14 @@ using namespace antlr4::misc;
 using namespace antlrcpp;
 
 LexerActionExecutor::LexerActionExecutor(const std::vector<Ref<LexerAction>> &lexerActions)
-  : _lexerActions(lexerActions), _hashCode(generateHashCode()) {
-}
+    : _lexerActions(lexerActions), _hashCode(generateHashCode()) {}
 
-LexerActionExecutor::~LexerActionExecutor() {
-}
+LexerActionExecutor::~LexerActionExecutor() {}
 
-Ref<LexerActionExecutor> LexerActionExecutor::append(Ref<LexerActionExecutor> const& lexerActionExecutor,
-                                                     Ref<LexerAction> const& lexerAction) {
+Ref<LexerActionExecutor> LexerActionExecutor::append(Ref<LexerActionExecutor> const &lexerActionExecutor,
+                                                     Ref<LexerAction> const &lexerAction) {
   if (lexerActionExecutor == nullptr) {
-    return std::make_shared<LexerActionExecutor>(std::vector<Ref<LexerAction>> { lexerAction });
+    return std::make_shared<LexerActionExecutor>(std::vector<Ref<LexerAction>>{lexerAction});
   }
 
   std::vector<Ref<LexerAction>> lexerActions = lexerActionExecutor->_lexerActions; // Make a copy.
@@ -52,9 +50,7 @@ Ref<LexerActionExecutor> LexerActionExecutor::fixOffsetBeforeMatch(int offset) {
   return std::make_shared<LexerActionExecutor>(updatedLexerActions);
 }
 
-std::vector<Ref<LexerAction>> LexerActionExecutor::getLexerActions() const {
-  return _lexerActions;
-}
+std::vector<Ref<LexerAction>> LexerActionExecutor::getLexerActions() const { return _lexerActions; }
 
 void LexerActionExecutor::execute(Lexer *lexer, CharStream *input, size_t startIndex) {
   bool requiresSeek = false;
@@ -80,11 +76,9 @@ void LexerActionExecutor::execute(Lexer *lexer, CharStream *input, size_t startI
   }
 }
 
-size_t LexerActionExecutor::hashCode() const {
-  return _hashCode;
-}
+size_t LexerActionExecutor::hashCode() const { return _hashCode; }
 
-bool LexerActionExecutor::operator == (const LexerActionExecutor &obj) const {
+bool LexerActionExecutor::operator==(const LexerActionExecutor &obj) const {
   if (&obj == this) {
     return true;
   }
@@ -92,9 +86,7 @@ bool LexerActionExecutor::operator == (const LexerActionExecutor &obj) const {
   return _hashCode == obj._hashCode && Arrays::equals(_lexerActions, obj._lexerActions);
 }
 
-bool LexerActionExecutor::operator != (const LexerActionExecutor &obj) const {
-  return !operator==(obj);
-}
+bool LexerActionExecutor::operator!=(const LexerActionExecutor &obj) const { return !operator==(obj); }
 
 size_t LexerActionExecutor::generateHashCode() const {
   size_t hash = MurmurHash::initialize();

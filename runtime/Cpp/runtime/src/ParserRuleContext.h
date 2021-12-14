@@ -75,27 +75,26 @@ namespace antlr4 {
      */
     virtual void copyFrom(ParserRuleContext *ctx);
 
-
     // Double dispatch methods for listeners
 
     virtual void enterRule(tree::ParseTreeListener *listener);
     virtual void exitRule(tree::ParseTreeListener *listener);
 
     /** Add a token leaf node child and force its parent to be this node. */
-    tree::TerminalNode* addChild(tree::TerminalNode *t);
-    RuleContext* addChild(RuleContext *ruleInvocation);
+    tree::TerminalNode *addChild(tree::TerminalNode *t);
+    RuleContext *addChild(RuleContext *ruleInvocation);
 
     /// Used by enterOuterAlt to toss out a RuleContext previously added as
     /// we entered a rule. If we have # label, we will need to remove
     /// generic ruleContext object.
     virtual void removeLastChild();
 
-    virtual tree::TerminalNode* getToken(size_t ttype, std::size_t i);
+    virtual tree::TerminalNode *getToken(size_t ttype, std::size_t i);
 
     virtual std::vector<tree::TerminalNode *> getTokens(size_t ttype);
 
-    template<typename T>
-    T* getRuleContext(size_t i) {
+    template <typename T>
+    T *getRuleContext(size_t i) {
       if (children.empty()) {
         return nullptr;
       }
@@ -111,7 +110,7 @@ namespace antlr4 {
       return nullptr;
     }
 
-    template<typename T>
+    template <typename T>
     std::vector<T *> getRuleContexts() {
       std::vector<T *> contexts;
       for (auto *child : children) {
@@ -127,20 +126,21 @@ namespace antlr4 {
 
     /**
      * Get the initial token in this context.
-     * Note that the range from start to stop is inclusive, so for rules that do not consume anything
-     * (for example, zero length or error productions) this token may exceed stop.
+     * Note that the range from start to stop is inclusive, so for rules that do not consume
+     * anything (for example, zero length or error productions) this token may exceed stop.
      */
     virtual Token *getStart();
 
     /**
      * Get the final token in this context.
-     * Note that the range from start to stop is inclusive, so for rules that do not consume anything
-     * (for example, zero length or error productions) this token may precede start.
+     * Note that the range from start to stop is inclusive, so for rules that do not consume
+     * anything (for example, zero length or error productions) this token may precede start.
      */
     virtual Token *getStop();
 
     /// <summary>
-    /// Used for rule context info debugging during parse-time, not so much for ATN debugging </summary>
+    /// Used for rule context info debugging during parse-time, not so much for ATN debugging
+    /// </summary>
     virtual std::string toInfoString(Parser *recognizer);
   };
 

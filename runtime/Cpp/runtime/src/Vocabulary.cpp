@@ -7,18 +7,18 @@
 
 #include "Vocabulary.h"
 
-using namespace antlr4::dfa;
+using namespace antlr4;
 
 const Vocabulary Vocabulary::EMPTY_VOCABULARY;
 
 Vocabulary::Vocabulary(std::vector<std::string> literalNames, std::vector<std::string> symbolicNames)
-: Vocabulary(std::move(literalNames), std::move(symbolicNames), {}) {
-}
+    : Vocabulary(std::move(literalNames), std::move(symbolicNames), {}) {}
 
-Vocabulary::Vocabulary(std::vector<std::string> literalNames,
-  std::vector<std::string> symbolicNames, std::vector<std::string> displayNames)
-  : _literalNames(std::move(literalNames)), _symbolicNames(std::move(symbolicNames)), _displayNames(std::move(displayNames)),
-    _maxTokenType(std::max(_displayNames.size(), std::max(_literalNames.size(), _symbolicNames.size())) - 1) {
+Vocabulary::Vocabulary(std::vector<std::string> literalNames, std::vector<std::string> symbolicNames,
+                       std::vector<std::string> displayNames)
+    : _literalNames(std::move(literalNames)), _symbolicNames(std::move(symbolicNames)),
+      _displayNames(std::move(displayNames)),
+      _maxTokenType(std::max(_displayNames.size(), std::max(_literalNames.size(), _symbolicNames.size())) - 1) {
   // See note here on -1 part: https://github.com/antlr/antlr4/pull/1146
 }
 

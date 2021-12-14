@@ -7,8 +7,7 @@
 
 #include "misc/IntervalSet.h"
 
-namespace antlr4 {
-namespace atn {
+namespace antlr4::atn {
 
   /// <summary>
   /// The following images show the relation of states and
@@ -82,11 +81,11 @@ namespace atn {
   class ANTLR4CPP_PUBLIC ATNState {
   public:
     ATNState();
-    ATNState(ATNState const&) = delete;
+    ATNState(ATNState const &) = delete;
 
     virtual ~ATNState();
 
-    ATNState& operator=(ATNState const&) = delete;
+    ATNState &operator=(ATNState const &) = delete;
 
     static constexpr size_t INITIAL_NUM_TRANSITIONS = 4;
     static constexpr size_t INVALID_STATE_NUMBER = std::numeric_limits<size_t>::max();
@@ -115,26 +114,25 @@ namespace atn {
 
   public:
     virtual size_t hashCode();
-    bool operator == (const ATNState &other);
+    bool operator==(const ATNState &other);
 
     /// Track the transitions emanating from this ATN state.
-    std::vector<Transition*> transitions;
+    std::vector<Transition *> transitions;
 
     virtual bool isNonGreedyExitState();
     virtual std::string toString() const;
     virtual void addTransition(Transition *e);
     virtual void addTransition(size_t index, Transition *e);
-    virtual Transition* removeTransition(size_t index);
+    virtual Transition *removeTransition(size_t index);
     virtual size_t getStateType() = 0;
 
   private:
     /// Used to cache lookahead during parsing, not used during construction.
 
     misc::IntervalSet _nextTokenWithinRule;
-    std::atomic<bool> _nextTokenUpdated { false };
+    std::atomic<bool> _nextTokenUpdated{false};
 
     friend class ATN;
   };
 
-} // namespace atn
-} // namespace antlr4
+} // namespace antlr4::atn

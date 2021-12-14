@@ -24,7 +24,7 @@ namespace antlr4 {
   public:
     virtual ~TokenStream();
 
-    virtual Token* LT(ssize_t k) = 0;
+    virtual Token *LT(ssize_t k) = 0;
 
     /// <summary>
     /// Gets the <seealso cref="Token"/> at the specified {@code index} in the stream. When
@@ -43,10 +43,10 @@ namespace antlr4 {
     /// <exception cref="IllegalArgumentException"> if {code index} is less than 0 </exception>
     /// <exception cref="UnsupportedOperationException"> if the stream does not support
     /// retrieving the token at the specified index </exception>
-    virtual Token* get(size_t index) const = 0;
+    virtual Token *get(size_t index) const = 0;
 
     /// Gets the underlying TokenSource which provides tokens for this stream.
-    virtual TokenSource* getTokenSource() const = 0;
+    virtual TokenSource *getTokenSource() const = 0;
 
     /// <summary>
     /// Return the text of all tokens within the specified {@code interval}. This

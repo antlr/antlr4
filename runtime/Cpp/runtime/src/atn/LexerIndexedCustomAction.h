@@ -8,8 +8,7 @@
 #include "RuleContext.h"
 #include "atn/LexerAction.h"
 
-namespace antlr4 {
-namespace atn {
+namespace antlr4::atn {
 
   /// <summary>
   /// This implementation of <seealso cref="LexerAction"/> is used for tracking input offsets
@@ -38,7 +37,7 @@ namespace atn {
     /// executed. </param>
     /// <param name="action"> The lexer action to execute at a particular offset in the
     /// input <seealso cref="CharStream"/>. </param>
-    LexerIndexedCustomAction(int offset, Ref<LexerAction> const& action);
+    LexerIndexedCustomAction(int offset, Ref<LexerAction> const &action);
 
     /// <summary>
     /// Gets the location in the input <seealso cref="CharStream"/> at which the lexer
@@ -52,7 +51,8 @@ namespace atn {
     /// <summary>
     /// Gets the lexer action to execute.
     /// </summary>
-    /// <returns> A <seealso cref="LexerAction"/> object which executes the lexer action. </returns>
+    /// <returns> A <seealso cref="LexerAction"/> object which executes the lexer action.
+    /// </returns>
     Ref<LexerAction> getAction() const;
 
     /// <summary>
@@ -69,7 +69,7 @@ namespace atn {
 
     virtual void execute(Lexer *lexer) override;
     virtual size_t hashCode() const override;
-    virtual bool operator == (const LexerAction &obj) const override;
+    virtual bool operator==(const LexerAction &obj) const override;
     virtual std::string toString() const override;
 
   private:
@@ -77,6 +77,4 @@ namespace atn {
     const Ref<LexerAction> _action;
   };
 
-} // namespace atn
-} // namespace antlr4
-
+} // namespace antlr4::atn

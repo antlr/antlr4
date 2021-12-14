@@ -5,16 +5,14 @@
 
 #pragma once
 
-#include "atn/ATNConfigSet.h"
 #include "atn/ATNConfig.h"
+#include "atn/ATNConfigSet.h"
 
-namespace antlr4 {
-namespace atn {
+namespace antlr4::atn {
 
   class ANTLR4CPP_PUBLIC OrderedATNConfigSet : public ATNConfigSet {
   protected:
     virtual size_t getHash(ATNConfig *c) override;
   };
 
-} // namespace atn
-} // namespace antlr4
+} // namespace antlr4::atn

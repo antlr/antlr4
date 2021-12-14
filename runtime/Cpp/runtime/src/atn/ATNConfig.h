@@ -7,8 +7,7 @@
 
 #include "antlr4-common.h"
 
-namespace antlr4 {
-namespace atn {
+namespace antlr4::atn {
 
   /// <summary>
   /// A tuple: (ATN state, predicted alt, syntactic, semantic context).
@@ -20,24 +19,18 @@ namespace atn {
   /// </summary>
   class ANTLR4CPP_PUBLIC ATNConfig {
   public:
-    struct Hasher
-    {
-      size_t operator()(ATNConfig const& k) const {
-        return k.hashCode();
-      }
+    struct Hasher {
+      size_t operator()(ATNConfig const &k) const { return k.hashCode(); }
     };
 
     struct Comparer {
-      bool operator()(ATNConfig const& lhs, ATNConfig const& rhs) const {
-        return (&lhs == &rhs) || (lhs == rhs);
-      }
+      bool operator()(ATNConfig const &lhs, ATNConfig const &rhs) const { return (&lhs == &rhs) || (lhs == rhs); }
     };
-
 
     using Set = std::unordered_set<Ref<ATNConfig>, Hasher, Comparer>;
 
     /// The ATN state associated with this configuration.
-    ATNState * state;
+    ATNState *state;
 
     /// What alt (or lexer rule) is predicted by this configuration.
     const size_t alt;
@@ -77,17 +70,19 @@ namespace atn {
     /// Can be shared between multiple ATNConfig instances.
     Ref<SemanticContext> semanticContext;
 
-    ATNConfig(ATNState *state, size_t alt, Ref<PredictionContext> const& context);
-    ATNConfig(ATNState *state, size_t alt, Ref<PredictionContext> const& context, Ref<SemanticContext> const& semanticContext);
+    ATNConfig(ATNState *state, size_t alt, Ref<PredictionContext> const &context);
+    ATNConfig(ATNState *state, size_t alt, Ref<PredictionContext> const &context,
+              Ref<SemanticContext> const &semanticContext);
 
-    ATNConfig(Ref<ATNConfig> const& c); // dup
-    ATNConfig(Ref<ATNConfig> const& c, ATNState *state);
-    ATNConfig(Ref<ATNConfig> const& c, ATNState *state, Ref<SemanticContext> const& semanticContext);
-    ATNConfig(Ref<ATNConfig> const& c, Ref<SemanticContext> const& semanticContext);
-    ATNConfig(Ref<ATNConfig> const& c, ATNState *state, Ref<PredictionContext> const& context);
-    ATNConfig(Ref<ATNConfig> const& c, ATNState *state, Ref<PredictionContext> const& context, Ref<SemanticContext> const& semanticContext);
+    ATNConfig(Ref<ATNConfig> const &c); // dup
+    ATNConfig(Ref<ATNConfig> const &c, ATNState *state);
+    ATNConfig(Ref<ATNConfig> const &c, ATNState *state, Ref<SemanticContext> const &semanticContext);
+    ATNConfig(Ref<ATNConfig> const &c, Ref<SemanticContext> const &semanticContext);
+    ATNConfig(Ref<ATNConfig> const &c, ATNState *state, Ref<PredictionContext> const &context);
+    ATNConfig(Ref<ATNConfig> const &c, ATNState *state, Ref<PredictionContext> const &context,
+              Ref<SemanticContext> const &semanticContext);
 
-    ATNConfig(ATNConfig const&) = default;
+    ATNConfig(ATNConfig const &) = default;
     virtual ~ATNConfig();
 
     virtual size_t hashCode() const;
@@ -97,15 +92,15 @@ namespace atn {
      * as it existed prior to the introduction of the
      * {@link #isPrecedenceFilterSuppressed} method.
      */
-    size_t getOuterContextDepth() const ;
+    size_t getOuterContextDepth() const;
     bool isPrecedenceFilterSuppressed() const;
     void setPrecedenceFilterSuppressed(bool value);
 
     /// An ATN configuration is equal to another if both have
     /// the same state, they predict the same alternative, and
     /// syntactic/semantic contexts are the same.
-    bool operator == (const ATNConfig &other) const;
-    bool operator != (const ATNConfig &other) const;
+    bool operator==(const ATNConfig &other) const;
+    bool operator!=(const ATNConfig &other) const;
 
     virtual std::string toString();
     std::string toString(bool showAlt);
@@ -119,27 +114,21 @@ namespace atn {
     static constexpr size_t SUPPRESS_PRECEDENCE_FILTER = 0x40000000;
   };
 
-} // namespace atn
-} // namespace antlr4
-
+} // namespace antlr4::atn
 
 // Hash function for ATNConfig.
 
 namespace std {
   using antlr4::atn::ATNConfig;
 
-  template <> struct hash<ATNConfig>
-  {
-    size_t operator() (const ATNConfig &x) const
-    {
-      return x.hashCode();
-    }
+  template <>
+  struct hash<ATNConfig> {
+    size_t operator()(const ATNConfig &x) const { return x.hashCode(); }
   };
 
-  template <> struct hash<std::vector<Ref<ATNConfig>>>
-  {
-    size_t operator() (const std::vector<Ref<ATNConfig>> &vector) const
-    {
+  template <>
+  struct hash<std::vector<antlr4::Ref<ATNConfig>>> {
+    size_t operator()(const std::vector<antlr4::Ref<ATNConfig>> &vector) const {
       std::size_t seed = 0;
       for (const auto &config : vector) {
         seed ^= config->hashCode() + 0x9e3779b9 + (seed << 6) + (seed >> 2);
@@ -147,4 +136,4 @@ namespace std {
       return seed;
     }
   };
-}
+} // namespace std

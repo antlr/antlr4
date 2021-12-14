@@ -23,7 +23,7 @@ namespace antlrcpp {
   std::map<std::string, size_t> toMap(const std::vector<std::string> &keys) {
     std::map<std::string, size_t> result;
     for (size_t i = 0; i < keys.size(); ++i) {
-      result.insert({ keys[i], i });
+      result.insert({keys[i], i});
     }
     return result;
   }
@@ -32,29 +32,29 @@ namespace antlrcpp {
     std::string result;
     for (auto c : str) {
       switch (c) {
-        case '\n':
-          result += "\\n";
-          break;
+      case '\n':
+        result += "\\n";
+        break;
 
-        case '\r':
-          result += "\\r";
-          break;
+      case '\r':
+        result += "\\r";
+        break;
 
-        case '\t':
-          result += "\\t";
-          break;
+      case '\t':
+        result += "\\t";
+        break;
 
-        case ' ':
-          if (escapeSpaces) {
-            result += "\u00B7";
-            break;
-          }
-          result += c;
+      case ' ':
+        if (escapeSpaces) {
+          result += "\u00B7";
           break;
+        }
+        result += c;
+        break;
 
-        default:
-          result += c;
-          break;
+      default:
+        result += c;
+        break;
       }
     }
 
@@ -74,7 +74,7 @@ namespace antlrcpp {
       toReserve += sub.size();
     }
     answer.reserve(toReserve);
-    for (const auto &sub: data) {
+    for (const auto &sub : data) {
       answer.append(sub);
     }
     return answer;
@@ -109,12 +109,12 @@ namespace antlrcpp {
       return parts;
 
     if (count == 0)
-      count= -1;
+      count = -1;
 
     p = ss.find(sep);
     while (!ss.empty() && p != std::string::npos && (count < 0 || count > 0)) {
       parts.push_back(ss.substr(0, p));
-      ss = ss.substr(p+sep.size());
+      ss = ss.substr(p + sep.size());
 
       --count;
       p = ss.find(sep);
@@ -144,11 +144,10 @@ namespace antlrcpp {
 #if defined(_MSC_FULL_VER) && _MSC_FULL_VER < 190023026
   // No nested exceptions before VS 2015.
   template <typename T>
-  std::exception_ptr get_nested(const T &/*e*/) {
+  std::exception_ptr get_nested(const T & /*e*/) {
     try {
       return nullptr;
-    }
-    catch (const std::bad_cast &) {
+    } catch (const std::bad_cast &) {
       return nullptr;
     }
   }
@@ -156,10 +155,9 @@ namespace antlrcpp {
   template <typename T>
   std::exception_ptr get_nested(const T &e) {
     try {
-      auto nested = dynamic_cast<const std::nested_exception&>(e);
+      auto nested = dynamic_cast<const std::nested_exception &>(e);
       return nested.nested_ptr();
-    }
-    catch (const std::bad_cast &) {
+    } catch (const std::bad_cast &) {
       return nullptr;
     }
   }
@@ -173,32 +171,28 @@ namespace antlrcpp {
     std::string result;
     std::size_t nestCount = 0;
 
-    next: {
-      try {
-        std::exception_ptr yeptr;
-        std::swap(eptr, yeptr);
-        std::rethrow_exception(yeptr);
-      }
-      catch (const std::exception &e) {
-        result += e.what();
-        eptr = get_nested(e);
-      }
-      catch (const std::string &e) {
-        result += e;
-      }
-      catch (const char *e) {
-        result += e;
-      }
-      catch (...) {
-        result += "cannot be determined";
-      }
-
-      if (eptr) {
-        result += " (";
-        ++nestCount;
-        goto next;
-      }
+  next : {
+    try {
+      std::exception_ptr yeptr;
+      std::swap(eptr, yeptr);
+      std::rethrow_exception(yeptr);
+    } catch (const std::exception &e) {
+      result += e.what();
+      eptr = get_nested(e);
+    } catch (const std::string &e) {
+      result += e;
+    } catch (const char *e) {
+      result += e;
+    } catch (...) {
+      result += "cannot be determined";
     }
+
+    if (eptr) {
+      result += " (";
+      ++nestCount;
+      goto next;
+    }
+  }
 
     result += std::string(nestCount, ')');
     return result;

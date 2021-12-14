@@ -7,8 +7,7 @@
 
 #include "atn/DecisionEventInfo.h"
 
-namespace antlr4 {
-namespace atn {
+namespace antlr4::atn {
 
   /// This class represents profiling event information for tracking the lookahead
   /// depth required in order to make a prediction.
@@ -34,9 +33,8 @@ namespace atn {
     /// <param name="fullCtx"> {@code true} if the current lookahead is part of an LL
     /// prediction; otherwise, {@code false} if the current lookahead is part of
     /// an SLL prediction </param>
-    LookaheadEventInfo(size_t decision, ATNConfigSet *configs, size_t predictedAlt, TokenStream *input, size_t startIndex,
-                       size_t stopIndex, bool fullCtx);
+    LookaheadEventInfo(size_t decision, ATNConfigSet *configs, size_t predictedAlt, TokenStream *input,
+                       size_t startIndex, size_t stopIndex, bool fullCtx);
   };
 
-} // namespace atn
-} // namespace antlr4
+} // namespace antlr4::atn

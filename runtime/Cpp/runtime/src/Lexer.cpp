@@ -3,14 +3,14 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
-#include "atn/LexerATNSimulator.h"
-#include "Exceptions.h"
-#include "misc/Interval.h"
-#include "CommonTokenFactory.h"
-#include "LexerNoViableAltException.h"
 #include "ANTLRErrorListener.h"
-#include "support/CPPUtils.h"
 #include "CommonToken.h"
+#include "CommonTokenFactory.h"
+#include "Exceptions.h"
+#include "LexerNoViableAltException.h"
+#include "atn/LexerATNSimulator.h"
+#include "misc/Interval.h"
+#include "support/CPPUtils.h"
 #include "support/StringUtils.h"
 
 #include "Lexer.h"
@@ -25,9 +25,7 @@ Lexer::Lexer() : Recognizer() {
   _input = nullptr;
 }
 
-Lexer::Lexer(CharStream *input) : Recognizer(), _input(input) {
-  InitializeInstanceFields();
-}
+Lexer::Lexer(CharStream *input) : Recognizer(), _input(input) { InitializeInstanceFields(); }
 
 void Lexer::reset() {
   // wack Lexer state variables
@@ -55,7 +53,7 @@ std::unique_ptr<Token> Lexer::nextToken() {
   // guaranteed at least have text of current token
   ssize_t tokenStartMarker = _input->mark();
 
-  auto onExit = finally([this, tokenStartMarker]{
+  auto onExit = finally([this, tokenStartMarker] {
     // make sure we release marker after match or
     // unbuffered char stream will keep buffering
     _input->release(tokenStartMarker);
@@ -101,21 +99,15 @@ std::unique_ptr<Token> Lexer::nextToken() {
   }
 }
 
-void Lexer::skip() {
-  type = SKIP;
-}
+void Lexer::skip() { type = SKIP; }
 
-void Lexer::more() {
-  type = MORE;
-}
+void Lexer::more() { type = MORE; }
 
-void Lexer::setMode(size_t m) {
-  mode = m;
-}
+void Lexer::setMode(size_t m) { mode = m; }
 
 void Lexer::pushMode(size_t m) {
 #if DEBUG_LEXER == 1
-    std::cout << "pushMode " << m << std::endl;
+  std::cout << "pushMode " << m << std::endl;
 #endif
 
   modeStack.push_back(mode);
@@ -127,7 +119,7 @@ size_t Lexer::popMode() {
     throw EmptyStackException();
   }
 #if DEBUG_LEXER == 1
-    std::cout << std::string("popMode back to ") << modeStack.back() << std::endl;
+  std::cout << std::string("popMode back to ") << modeStack.back() << std::endl;
 #endif
 
   setMode(modeStack.back());
@@ -135,60 +127,44 @@ size_t Lexer::popMode() {
   return mode;
 }
 
-
-TokenFactory<CommonToken>* Lexer::getTokenFactory() {
-  return _factory;
-}
+TokenFactory<CommonToken> *Lexer::getTokenFactory() { return _factory; }
 
 void Lexer::setInputStream(IntStream *input) {
   reset();
-  _input = dynamic_cast<CharStream*>(input);
+  _input = dynamic_cast<CharStream *>(input);
 }
 
-std::string Lexer::getSourceName() {
-  return _input->getSourceName();
-}
+std::string Lexer::getSourceName() { return _input->getSourceName(); }
 
-CharStream* Lexer::getInputStream() {
-  return _input;
-}
+CharStream *Lexer::getInputStream() { return _input; }
 
-void Lexer::emit(std::unique_ptr<Token> newToken) {
-  token = std::move(newToken);
-}
+void Lexer::emit(std::unique_ptr<Token> newToken) { token = std::move(newToken); }
 
-Token* Lexer::emit() {
-  emit(_factory->create({ this, _input }, type, _text, channel,
-    tokenStartCharIndex, getCharIndex() - 1, tokenStartLine, tokenStartCharPositionInLine));
+Token *Lexer::emit() {
+  emit(_factory->create({this, _input}, type, _text, channel, tokenStartCharIndex, getCharIndex() - 1, tokenStartLine,
+                        tokenStartCharPositionInLine));
   return token.get();
 }
 
-Token* Lexer::emitEOF() {
+Token *Lexer::emitEOF() {
   size_t cpos = getCharPositionInLine();
   size_t line = getLine();
-  emit(_factory->create({ this, _input }, EOF, "", Token::DEFAULT_CHANNEL, _input->index(), _input->index() - 1, line, cpos));
+  emit(_factory->create({this, _input}, EOF, "", Token::DEFAULT_CHANNEL, _input->index(), _input->index() - 1, line,
+                        cpos));
   return token.get();
 }
 
-size_t Lexer::getLine() const {
-  return getInterpreter<atn::LexerATNSimulator>()->getLine();
-}
+size_t Lexer::getLine() const { return getInterpreter<atn::LexerATNSimulator>()->getLine(); }
 
-size_t Lexer::getCharPositionInLine() {
-  return getInterpreter<atn::LexerATNSimulator>()->getCharPositionInLine();
-}
+size_t Lexer::getCharPositionInLine() { return getInterpreter<atn::LexerATNSimulator>()->getCharPositionInLine(); }
 
-void Lexer::setLine(size_t line) {
-  getInterpreter<atn::LexerATNSimulator>()->setLine(line);
-}
+void Lexer::setLine(size_t line) { getInterpreter<atn::LexerATNSimulator>()->setLine(line); }
 
 void Lexer::setCharPositionInLine(size_t charPositionInLine) {
   getInterpreter<atn::LexerATNSimulator>()->setCharPositionInLine(charPositionInLine);
 }
 
-size_t Lexer::getCharIndex() {
-  return _input->index();
-}
+size_t Lexer::getCharIndex() { return _input->index(); }
 
 std::string Lexer::getText() {
   if (!_text.empty()) {
@@ -197,33 +173,19 @@ std::string Lexer::getText() {
   return getInterpreter<atn::LexerATNSimulator>()->getText(_input);
 }
 
-void Lexer::setText(const std::string &text) {
-  _text = text;
-}
+void Lexer::setText(const std::string &text) { _text = text; }
 
-std::unique_ptr<Token> Lexer::getToken() {
-  return std::move(token);
-}
+std::unique_ptr<Token> Lexer::getToken() { return std::move(token); }
 
-void Lexer::setToken(std::unique_ptr<Token> newToken) {
-  token = std::move(newToken);
-}
+void Lexer::setToken(std::unique_ptr<Token> newToken) { token = std::move(newToken); }
 
-void Lexer::setType(size_t ttype) {
-  type = ttype;
-}
+void Lexer::setType(size_t ttype) { type = ttype; }
 
-size_t Lexer::getType() {
-  return type;
-}
+size_t Lexer::getType() { return type; }
 
-void Lexer::setChannel(size_t newChannel) {
-  channel = newChannel;
-}
+void Lexer::setChannel(size_t newChannel) { channel = newChannel; }
 
-size_t Lexer::getChannel() {
-  return channel;
-}
+size_t Lexer::getChannel() { return channel; }
 
 std::vector<std::unique_ptr<Token>> Lexer::getAllTokens() {
   std::vector<std::unique_ptr<Token>> tokens;
@@ -235,7 +197,7 @@ std::vector<std::unique_ptr<Token>> Lexer::getAllTokens() {
   return tokens;
 }
 
-void Lexer::recover(const LexerNoViableAltException &/*e*/) {
+void Lexer::recover(const LexerNoViableAltException & /*e*/) {
   if (_input->LA(1) != EOF) {
     // skip a char and try again
     getInterpreter<atn::LexerATNSimulator>()->consume(_input);
@@ -277,9 +239,7 @@ void Lexer::recover(RecognitionException * /*re*/) {
   _input->consume();
 }
 
-size_t Lexer::getNumberOfSyntaxErrors() {
-  return _syntaxErrors;
-}
+size_t Lexer::getNumberOfSyntaxErrors() { return _syntaxErrors; }
 
 void Lexer::InitializeInstanceFields() {
   _syntaxErrors = 0;

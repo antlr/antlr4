@@ -12,6 +12,4 @@ void DecisionState::InitializeInstanceFields() {
   nonGreedy = false;
 }
 
-std::string DecisionState::toString() const {
-  return "DECISION " + ATNState::toString();
-}
+std::string DecisionState::toString() const { return "DECISION " + ATNState::toString(); }

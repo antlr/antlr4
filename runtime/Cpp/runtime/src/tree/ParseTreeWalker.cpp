@@ -3,10 +3,10 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
-#include "tree/ErrorNode.h"
 #include "ParserRuleContext.h"
-#include "tree/ParseTreeListener.h"
 #include "support/CPPUtils.h"
+#include "tree/ErrorNode.h"
+#include "tree/ParseTreeListener.h"
 
 #include "tree/IterativeParseTreeWalker.h"
 #include "tree/ParseTreeWalker.h"
@@ -17,8 +17,7 @@ using namespace antlrcpp;
 static IterativeParseTreeWalker defaultWalker;
 ParseTreeWalker &ParseTreeWalker::DEFAULT = defaultWalker;
 
-ParseTreeWalker::~ParseTreeWalker() {
-}
+ParseTreeWalker::~ParseTreeWalker() {}
 
 void ParseTreeWalker::walk(ParseTreeListener *listener, ParseTree *t) const {
   if (is<ErrorNode *>(t)) {

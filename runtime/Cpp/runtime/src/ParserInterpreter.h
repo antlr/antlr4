@@ -5,11 +5,13 @@
 
 #pragma once
 
+#include <stack>
+
 #include "Parser.h"
-#include "atn/ATN.h"
-#include "support/BitSet.h"
-#include "atn/PredictionContext.h"
 #include "Vocabulary.h"
+#include "atn/ATN.h"
+#include "atn/PredictionContext.h"
+#include "support/BitSet.h"
 
 namespace antlr4 {
 
@@ -35,18 +37,18 @@ namespace antlr4 {
 
     virtual void reset() override;
 
-    virtual const atn::ATN& getATN() const override;
+    virtual const atn::ATN &getATN() const override;
 
-    virtual const dfa::Vocabulary& getVocabulary() const override;
+    virtual const dfa::Vocabulary &getVocabulary() const override;
 
-    virtual const std::vector<std::string>& getRuleNames() const override;
+    virtual const std::vector<std::string> &getRuleNames() const override;
     virtual std::string getGrammarFileName() const override;
 
     /// Begin parsing at startRuleIndex
-    virtual ParserRuleContext* parse(size_t startRuleIndex);
+    virtual ParserRuleContext *parse(size_t startRuleIndex);
 
-    virtual void enterRecursionRule(ParserRuleContext *localctx, size_t state, size_t ruleIndex, int precedence) override;
-
+    virtual void enterRecursionRule(ParserRuleContext *localctx, size_t state, size_t ruleIndex,
+                                    int precedence) override;
 
     /** Override this parser interpreters normal decision-making process
      *  at a particular decision and input token index. Instead of
@@ -100,7 +102,7 @@ namespace antlr4 {
      *
      * @since 4.5.1
      */
-    InterpreterRuleContext* getRootContext();
+    InterpreterRuleContext *getRootContext();
 
   protected:
     const std::string _grammarFileName;
@@ -139,7 +141,7 @@ namespace antlr4 {
      *  for an ambiguity/lookahead check.
      */
     Ref<InterpreterRuleContext> _overrideDecisionRoot;
-    InterpreterRuleContext* _rootContext;
+    InterpreterRuleContext *_rootContext;
 
     virtual atn::ATNState *getATNState();
     virtual void visitState(atn::ATNState *p);
@@ -153,7 +155,8 @@ namespace antlr4 {
     /** Provide simple "factory" for InterpreterRuleContext's.
      *  @since 4.5.1
      */
-    InterpreterRuleContext* createInterpreterRuleContext(ParserRuleContext *parent, size_t invokingStateNumber, size_t ruleIndex);
+    InterpreterRuleContext *createInterpreterRuleContext(ParserRuleContext *parent, size_t invokingStateNumber,
+                                                         size_t ruleIndex);
 
     virtual void visitRuleStopState(atn::ATNState *p);
 
@@ -162,7 +165,7 @@ namespace antlr4 {
      *  tree.
      */
     void recover(RecognitionException &e);
-    Token* recoverInline();
+    Token *recoverInline();
 
   private:
     const dfa::Vocabulary &_vocabulary;

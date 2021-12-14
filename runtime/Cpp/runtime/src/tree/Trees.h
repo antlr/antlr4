@@ -5,12 +5,11 @@
 
 #pragma once
 
-#include "tree/TerminalNode.h"
 #include "ParserRuleContext.h"
 #include "Recognizer.h"
+#include "tree/TerminalNode.h"
 
-namespace antlr4 {
-namespace tree {
+namespace antlr4::tree {
 
   /// A set of utility routines useful for all kinds of ANTLR trees.
   class ANTLR4CPP_PUBLIC Trees {
@@ -60,7 +59,7 @@ namespace tree {
      *
      *  @since 4.5.1
      */
-    static ParserRuleContext* getRootOfSubtreeEnclosingRegion(ParseTree *t,
+    static ParserRuleContext *getRootOfSubtreeEnclosingRegion(ParseTree *t,
                                                               size_t startTokenIndex, // inclusive
                                                               size_t stopTokenIndex); // inclusive
 
@@ -68,11 +67,10 @@ namespace tree {
      *
      *  @since 4.5.1
      */
-    static ParseTree* findNodeSuchThat(ParseTree *t, Ref<misc::Predicate> const& pred);
+    static ParseTree *findNodeSuchThat(ParseTree *t, Ref<misc::Predicate> const &pred);
 
   private:
     Trees();
   };
 
-} // namespace tree
-} // namespace antlr4
+} // namespace antlr4::tree

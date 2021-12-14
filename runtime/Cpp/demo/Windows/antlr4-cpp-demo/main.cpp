@@ -12,9 +12,9 @@
 
 #include <iostream>
 
-#include "antlr4-runtime.h"
 #include "TLexer.h"
 #include "TParser.h"
+#include "antlr4-runtime.h"
 
 #include <Windows.h>
 
@@ -23,7 +23,7 @@
 using namespace antlrcpptest;
 using namespace antlr4;
 
-int main(int argc, const char * argv[]) {
+int main(int argc, const char *argv[]) {
 
   ANTLRInputStream input("🍴 = 🍐 + \"😎\";(((x * π))) * µ + ∰; a + (x * (y ? 0 : 1) + z);");
   TLexer lexer(&input);
@@ -35,7 +35,7 @@ int main(int argc, const char * argv[]) {
   std::wstring s = antlrcpp::s2ws(tree->toStringTree(&parser)) + L"\n";
 
   OutputDebugString(s.data()); // Only works properly since VS 2015.
-  //std::wcout << "Parse Tree: " << s << std::endl; Unicode output in the console is very limited.
+  // std::wcout << "Parse Tree: " << s << std::endl; Unicode output in the console is very limited.
 
   return 0;
 }

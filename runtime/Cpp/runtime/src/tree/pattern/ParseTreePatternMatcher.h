@@ -7,9 +7,7 @@
 
 #include "Exceptions.h"
 
-namespace antlr4 {
-namespace tree {
-namespace pattern {
+namespace antlr4::tree::pattern {
 
   /// <summary>
   /// A tree pattern matching mechanism for ANTLR <seealso cref="ParseTree"/>s.
@@ -43,21 +41,17 @@ namespace pattern {
   /// <p/>
   /// See {@code TestParseTreeMatcher} for lots of examples.
   /// <seealso cref="ParseTreePattern"/> has two static helper methods:
-  /// <seealso cref="ParseTreePattern#findAll"/> and <seealso cref="ParseTreePattern#match"/> that
-  /// are easy to use but not super efficient because they create new
-  /// <seealso cref="ParseTreePatternMatcher"/> objects each time and have to compile the
-  /// pattern in string form before using it.
-  /// <p/>
-  /// The lexer and parser that you pass into the <seealso cref="ParseTreePatternMatcher"/>
-  /// constructor are used to parse the pattern in string form. The lexer converts
-  /// the {@code <ID> = <expr>;} into a sequence of four tokens (assuming lexer
-  /// throws out whitespace or puts it on a hidden channel). Be aware that the
-  /// input stream is reset for the lexer (but not the parser; a
-  /// <seealso cref="ParserInterpreter"/> is created to parse the input.). Any user-defined
-  /// fields you have put into the lexer might get changed when this mechanism asks
-  /// it to scan the pattern string.
-  /// <p/>
-  /// Normally a parser does not accept token {@code <expr>} as a valid
+  /// <seealso cref="ParseTreePattern#findAll"/> and <seealso cref="ParseTreePattern#match"/>
+  /// that are easy to use but not super efficient because they create new <seealso
+  /// cref="ParseTreePatternMatcher"/> objects each time and have to compile the pattern in
+  /// string form before using it. <p/> The lexer and parser that you pass into the <seealso
+  /// cref="ParseTreePatternMatcher"/> constructor are used to parse the pattern in string form.
+  /// The lexer converts the {@code <ID> = <expr>;} into a sequence of four tokens (assuming
+  /// lexer throws out whitespace or puts it on a hidden channel). Be aware that the input
+  /// stream is reset for the lexer (but not the parser; a <seealso cref="ParserInterpreter"/>
+  /// is created to parse the input.). Any user-defined fields you have put into the lexer might
+  /// get changed when this mechanism asks it to scan the pattern string. <p/> Normally a parser
+  /// does not accept token {@code <expr>} as a valid
   /// {@code expr} but, from the parser passed in, we create a special version of
   /// the underlying grammar representation (an <seealso cref="ATN"/>) that allows imaginary
   /// tokens representing rules ({@code <expr>}) to match entire rules. We call
@@ -81,14 +75,14 @@ namespace pattern {
     class StartRuleDoesNotConsumeFullPattern : public RuntimeException {
     public:
       StartRuleDoesNotConsumeFullPattern() = default;
-      StartRuleDoesNotConsumeFullPattern(StartRuleDoesNotConsumeFullPattern const&) = default;
+      StartRuleDoesNotConsumeFullPattern(StartRuleDoesNotConsumeFullPattern const &) = default;
       ~StartRuleDoesNotConsumeFullPattern();
 
-      StartRuleDoesNotConsumeFullPattern& operator=(StartRuleDoesNotConsumeFullPattern const&) = default;
+      StartRuleDoesNotConsumeFullPattern &operator=(StartRuleDoesNotConsumeFullPattern const &) = default;
     };
 
-    /// Constructs a <seealso cref="ParseTreePatternMatcher"/> or from a <seealso cref="Lexer"/> and
-    /// <seealso cref="Parser"/> object. The lexer input stream is altered for tokenizing
+    /// Constructs a <seealso cref="ParseTreePatternMatcher"/> or from a <seealso cref="Lexer"/>
+    /// and <seealso cref="Parser"/> object. The lexer input stream is altered for tokenizing
     /// the tree patterns. The parser is used as a convenient mechanism to get
     /// the grammar name, plus token, rule names.
     ParseTreePatternMatcher(Lexer *lexer, Parser *parser);
@@ -100,14 +94,17 @@ namespace pattern {
     /// </summary>
     /// <param name="start"> The start delimiter. </param>
     /// <param name="stop"> The stop delimiter. </param>
-    /// <param name="escapeLeft"> The escape sequence to use for escaping a start or stop delimiter.
+    /// <param name="escapeLeft"> The escape sequence to use for escaping a start or stop
+    /// delimiter.
     /// </param>
-    /// <exception cref="IllegalArgumentException"> if {@code start} is {@code null} or empty. </exception>
-    /// <exception cref="IllegalArgumentException"> if {@code stop} is {@code null} or empty. </exception>
+    /// <exception cref="IllegalArgumentException"> if {@code start} is {@code null} or empty.
+    /// </exception> <exception cref="IllegalArgumentException"> if {@code stop} is {@code null}
+    /// or empty. </exception>
     virtual void setDelimiters(const std::string &start, const std::string &stop, const std::string &escapeLeft);
 
     /// <summary>
-    /// Does {@code pattern} matched as rule {@code patternRuleIndex} match {@code tree}? </summary>
+    /// Does {@code pattern} matched as rule {@code patternRuleIndex} match {@code tree}?
+    /// </summary>
     virtual bool matches(ParseTree *tree, const std::string &pattern, int patternRuleIndex);
 
     /// <summary>
@@ -141,13 +138,13 @@ namespace pattern {
     /// Used to convert the tree pattern string into a series of tokens. The
     /// input stream is reset.
     /// </summary>
-    virtual Lexer* getLexer();
+    virtual Lexer *getLexer();
 
     /// <summary>
     /// Used to collect to the grammar file name, token names, rule names for
     /// used to parse the pattern into a parse tree.
     /// </summary>
-    virtual Parser* getParser();
+    virtual Parser *getParser();
 
     // ---- SUPPORT CODE ----
 
@@ -168,10 +165,11 @@ namespace pattern {
     /// a corresponding node in {@code patternTree}, or {@code null} if the match
     /// was successful. The specific node returned depends on the matching
     /// algorithm used by the implementation, and may be overridden. </returns>
-    virtual ParseTree* matchImpl(ParseTree *tree, ParseTree *patternTree, std::map<std::string, std::vector<ParseTree *>> &labels);
+    virtual ParseTree *matchImpl(ParseTree *tree, ParseTree *patternTree,
+                                 std::map<std::string, std::vector<ParseTree *>> &labels);
 
     /// Is t <expr> subtree?
-    virtual RuleTagToken* getRuleTagToken(ParseTree *t);
+    virtual RuleTagToken *getRuleTagToken(ParseTree *t);
 
   private:
     Lexer *_lexer;
@@ -180,6 +178,4 @@ namespace pattern {
     void InitializeInstanceFields();
   };
 
-} // namespace pattern
-} // namespace tree
-} // namespace antlr4
+} // namespace antlr4::tree::pattern

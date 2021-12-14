@@ -107,22 +107,22 @@ namespace antlr4 {
 
     /// Reset the program so that no instructions exist.
     virtual void deleteProgram(const std::string &programName);
-    virtual void insertAfter(Token *t, const std::string& text);
-    virtual void insertAfter(size_t index, const std::string& text);
-    virtual void insertAfter(const std::string &programName, Token *t, const std::string& text);
-    virtual void insertAfter(const std::string &programName, size_t index, const std::string& text);
+    virtual void insertAfter(Token *t, const std::string &text);
+    virtual void insertAfter(size_t index, const std::string &text);
+    virtual void insertAfter(const std::string &programName, Token *t, const std::string &text);
+    virtual void insertAfter(const std::string &programName, size_t index, const std::string &text);
 
-    virtual void insertBefore(Token *t, const std::string& text);
-    virtual void insertBefore(size_t index, const std::string& text);
-    virtual void insertBefore(const std::string &programName, Token *t, const std::string& text);
-    virtual void insertBefore(const std::string &programName, size_t index, const std::string& text);
+    virtual void insertBefore(Token *t, const std::string &text);
+    virtual void insertBefore(size_t index, const std::string &text);
+    virtual void insertBefore(const std::string &programName, Token *t, const std::string &text);
+    virtual void insertBefore(const std::string &programName, size_t index, const std::string &text);
 
-    virtual void replace(size_t index, const std::string& text);
-    virtual void replace(size_t from, size_t to, const std::string& text);
-    virtual void replace(Token *indexT, const std::string& text);
-    virtual void replace(Token *from, Token *to, const std::string& text);
-    virtual void replace(const std::string &programName, size_t from, size_t to, const std::string& text);
-    virtual void replace(const std::string &programName, Token *from, Token *to, const std::string& text);
+    virtual void replace(size_t index, const std::string &text);
+    virtual void replace(size_t from, size_t to, const std::string &text);
+    virtual void replace(Token *indexT, const std::string &text);
+    virtual void replace(Token *from, Token *to, const std::string &text);
+    virtual void replace(const std::string &programName, size_t from, size_t to, const std::string &text);
+    virtual void replace(const std::string &programName, Token *from, Token *to, const std::string &text);
 
     virtual void Delete(size_t index);
     virtual void Delete(size_t from, size_t to);
@@ -165,7 +165,7 @@ namespace antlr4 {
       size_t instructionIndex;
 
       RewriteOperation(TokenStreamRewriter *outerInstance, size_t index);
-      RewriteOperation(TokenStreamRewriter *outerInstance, size_t index, const std::string& text);
+      RewriteOperation(TokenStreamRewriter *outerInstance, size_t index, const std::string &text);
       virtual ~RewriteOperation();
 
       /// Execute the rewrite operation by possibly adding to the buffer.
@@ -184,7 +184,7 @@ namespace antlr4 {
       TokenStreamRewriter *const outerInstance;
 
     public:
-      InsertBeforeOp(TokenStreamRewriter *outerInstance, size_t index, const std::string& text);
+      InsertBeforeOp(TokenStreamRewriter *outerInstance, size_t index, const std::string &text);
 
       virtual size_t execute(std::string *buf) override;
     };
@@ -196,7 +196,7 @@ namespace antlr4 {
     public:
       size_t lastIndex;
 
-      ReplaceOp(TokenStreamRewriter *outerInstance, size_t from, size_t to, const std::string& text);
+      ReplaceOp(TokenStreamRewriter *outerInstance, size_t from, size_t to, const std::string &text);
       virtual size_t execute(std::string *buf) override;
       virtual std::string toString() override;
 
@@ -210,14 +210,14 @@ namespace antlr4 {
     /// You may have multiple, named streams of rewrite operations.
     /// I'm calling these things "programs."
     /// Maps String (name) -> rewrite (List)
-    std::map<std::string, std::vector<RewriteOperation*>> _programs;
+    std::map<std::string, std::vector<RewriteOperation *>> _programs;
 
     /// <summary>
     /// Map String (program name) -> Integer index </summary>
     std::map<std::string, size_t> _lastRewriteTokenIndexes;
     virtual size_t getLastRewriteTokenIndex(const std::string &programName);
     virtual void setLastRewriteTokenIndex(const std::string &programName, size_t i);
-    virtual std::vector<RewriteOperation*>& getProgram(const std::string &name);
+    virtual std::vector<RewriteOperation *> &getProgram(const std::string &name);
 
     /// <summary>
     /// We need to combine operations and report invalid operations (like
@@ -269,7 +269,8 @@ namespace antlr4 {
     ///
     ///  Return a map from token index to operation.
     /// </summary>
-    virtual std::unordered_map<size_t, RewriteOperation*> reduceToSingleOperationPerIndex(std::vector<RewriteOperation*> &rewrites);
+    virtual std::unordered_map<size_t, RewriteOperation *>
+    reduceToSingleOperationPerIndex(std::vector<RewriteOperation *> &rewrites);
 
     virtual std::string catOpText(std::string *a, std::string *b);
 
@@ -288,8 +289,7 @@ namespace antlr4 {
     }
 
   private:
-    std::vector<RewriteOperation *>& initializeProgram(const std::string &name);
-
+    std::vector<RewriteOperation *> &initializeProgram(const std::string &name);
   };
 
 } // namespace antlr4

@@ -7,8 +7,7 @@
 
 #include "antlr4-common.h"
 
-namespace antlr4 {
-namespace atn {
+namespace antlr4::atn {
 
   /// <summary>
   /// Represents the serialization type of a <seealso cref="LexerAction"/>.
@@ -51,5 +50,4 @@ namespace atn {
     TYPE,
   };
 
-} // namespace atn
-} // namespace antlr4
+} // namespace antlr4::atn

@@ -7,9 +7,7 @@
 
 #include "CommonToken.h"
 
-namespace antlr4 {
-namespace tree {
-namespace pattern {
+namespace antlr4::tree::pattern {
 
   /// <summary>
   /// A <seealso cref="Token"/> object representing a token of a particular type; e.g.,
@@ -34,7 +32,7 @@ namespace pattern {
     /// <param name="tokenName"> The token name. </param>
     /// <param name="type"> The token type. </param>
   public:
-    TokenTagToken(const std::string &tokenName, int type); //this(tokenName, type, nullptr);
+    TokenTagToken(const std::string &tokenName, int type); // this(tokenName, type, nullptr);
 
     /// <summary>
     /// Constructs a new instance of <seealso cref="TokenTagToken"/> with the specified
@@ -75,6 +73,4 @@ namespace pattern {
     virtual std::string toString() const override;
   };
 
-} // namespace pattern
-} // namespace tree
-} // namespace antlr4
+} // namespace antlr4::tree::pattern

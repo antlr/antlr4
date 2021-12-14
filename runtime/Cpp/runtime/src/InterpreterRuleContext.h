@@ -40,6 +40,6 @@ namespace antlr4 {
   protected:
     /** This is the backing field for {@link #getRuleIndex}. */
     const size_t _ruleIndex = INVALID_INDEX;
-};
+  };
 
 } // namespace antlr4

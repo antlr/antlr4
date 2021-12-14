@@ -5,10 +5,11 @@
 
 #pragma once
 
+#include <shared_mutex>
+
 #include "dfa/DFAState.h"
 
-namespace antlr4 {
-namespace dfa {
+namespace antlr4::dfa {
 
   class ANTLR4CPP_PUBLIC DFA {
   public:
@@ -50,7 +51,7 @@ namespace dfa {
      * @throws IllegalStateException if this is not a precedence DFA.
      * @see #isPrecedenceDfa()
      */
-    DFAState* getPrecedenceStartState(int precedence) const;
+    DFAState *getPrecedenceStartState(int precedence) const;
 
     /**
      * Set the start state for a specific precedence value.
@@ -79,5 +80,4 @@ namespace dfa {
     bool _precedenceDfa;
   };
 
-} // namespace atn
-} // namespace antlr4
+} // namespace antlr4::dfa

@@ -3,26 +3,26 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
-#include "tree/pattern/ParseTreePattern.h"
-#include "tree/pattern/ParseTreeMatch.h"
-#include "tree/TerminalNode.h"
+#include "BailErrorStrategy.h"
 #include "CommonTokenStream.h"
+#include "Lexer.h"
 #include "ParserInterpreter.h"
-#include "tree/pattern/TokenTagToken.h"
 #include "ParserRuleContext.h"
+#include "atn/ATN.h"
+#include "tree/TerminalNode.h"
+#include "tree/pattern/ParseTreeMatch.h"
+#include "tree/pattern/ParseTreePattern.h"
 #include "tree/pattern/RuleTagToken.h"
 #include "tree/pattern/TagChunk.h"
-#include "atn/ATN.h"
-#include "Lexer.h"
-#include "BailErrorStrategy.h"
+#include "tree/pattern/TokenTagToken.h"
 
-#include "ListTokenSource.h"
-#include "tree/pattern/TextChunk.h"
 #include "ANTLRInputStream.h"
-#include "support/Arrays.h"
 #include "Exceptions.h"
-#include "support/StringUtils.h"
+#include "ListTokenSource.h"
+#include "support/Arrays.h"
 #include "support/CPPUtils.h"
+#include "support/StringUtils.h"
+#include "tree/pattern/TextChunk.h"
 
 #include "tree/pattern/ParseTreePatternMatcher.h"
 
@@ -31,23 +31,21 @@ using namespace antlr4::tree;
 using namespace antlr4::tree::pattern;
 using namespace antlrcpp;
 
-ParseTreePatternMatcher::CannotInvokeStartRule::CannotInvokeStartRule(const RuntimeException &e) : RuntimeException(e.what()) {
-}
+ParseTreePatternMatcher::CannotInvokeStartRule::CannotInvokeStartRule(const RuntimeException &e)
+    : RuntimeException(e.what()) {}
 
-ParseTreePatternMatcher::CannotInvokeStartRule::~CannotInvokeStartRule() {
-}
+ParseTreePatternMatcher::CannotInvokeStartRule::~CannotInvokeStartRule() {}
 
-ParseTreePatternMatcher::StartRuleDoesNotConsumeFullPattern::~StartRuleDoesNotConsumeFullPattern() {
-}
+ParseTreePatternMatcher::StartRuleDoesNotConsumeFullPattern::~StartRuleDoesNotConsumeFullPattern() {}
 
 ParseTreePatternMatcher::ParseTreePatternMatcher(Lexer *lexer, Parser *parser) : _lexer(lexer), _parser(parser) {
   InitializeInstanceFields();
 }
 
-ParseTreePatternMatcher::~ParseTreePatternMatcher() {
-}
+ParseTreePatternMatcher::~ParseTreePatternMatcher() {}
 
-void ParseTreePatternMatcher::setDelimiters(const std::string &start, const std::string &stop, const std::string &escapeLeft) {
+void ParseTreePatternMatcher::setDelimiters(const std::string &start, const std::string &stop,
+                                            const std::string &escapeLeft) {
   if (start.empty()) {
     throw IllegalArgumentException("start cannot be null or empty");
   }
@@ -56,7 +54,7 @@ void ParseTreePatternMatcher::setDelimiters(const std::string &start, const std:
     throw IllegalArgumentException("stop cannot be null or empty");
   }
 
- _start = start;
+  _start = start;
   _stop = stop;
   _escape = escapeLeft;
 }
@@ -87,8 +85,8 @@ ParseTreePattern ParseTreePatternMatcher::compile(const std::string &pattern, in
   ListTokenSource tokenSrc(tokenize(pattern));
   CommonTokenStream tokens(&tokenSrc);
 
-  ParserInterpreter parserInterp(_parser->getGrammarFileName(), _parser->getVocabulary(),
-                                 _parser->getRuleNames(), _parser->getATNWithBypassAlts(), &tokens);
+  ParserInterpreter parserInterp(_parser->getGrammarFileName(), _parser->getVocabulary(), _parser->getRuleNames(),
+                                 _parser->getATNWithBypassAlts(), &tokens);
 
   ParserRuleContext *tree = nullptr;
   try {
@@ -121,15 +119,11 @@ ParseTreePattern ParseTreePatternMatcher::compile(const std::string &pattern, in
   return ParseTreePattern(this, pattern, patternRuleIndex, tree);
 }
 
-Lexer* ParseTreePatternMatcher::getLexer() {
-  return _lexer;
-}
+Lexer *ParseTreePatternMatcher::getLexer() { return _lexer; }
 
-Parser* ParseTreePatternMatcher::getParser() {
-  return _parser;
-}
+Parser *ParseTreePatternMatcher::getParser() { return _parser; }
 
-ParseTree* ParseTreePatternMatcher::matchImpl(ParseTree *tree, ParseTree *patternTree,
+ParseTree *ParseTreePatternMatcher::matchImpl(ParseTree *tree, ParseTree *patternTree,
                                               std::map<std::string, std::vector<ParseTree *>> &labels) {
   if (tree == nullptr) {
     throw IllegalArgumentException("tree cannot be nul");
@@ -180,7 +174,7 @@ ParseTree* ParseTreePatternMatcher::matchImpl(ParseTree *tree, ParseTree *patter
     // (expr ...) and <expr>
     RuleTagToken *ruleTagToken = getRuleTagToken(r2);
     if (ruleTagToken != nullptr) {
-      //ParseTreeMatch *m = nullptr; // unused?
+      // ParseTreeMatch *m = nullptr; // unused?
       if (r1->getRuleIndex() == r2->getRuleIndex()) {
         // track label->list-of-nodes for both rule name and label (if any)
         labels[ruleTagToken->getRuleName()].push_back(tree);
@@ -220,7 +214,7 @@ ParseTree* ParseTreePatternMatcher::matchImpl(ParseTree *tree, ParseTree *patter
   return tree;
 }
 
-RuleTagToken* ParseTreePatternMatcher::getRuleTagToken(ParseTree *t) {
+RuleTagToken *ParseTreePatternMatcher::getRuleTagToken(ParseTree *t) {
   if (t->children.size() == 1 && is<TerminalNode *>(t->children[0])) {
     TerminalNode *c = dynamic_cast<TerminalNode *>(t->children[0]);
     if (is<RuleTagToken *>(c->getSymbol())) {
@@ -238,7 +232,7 @@ std::vector<std::unique_ptr<Token>> ParseTreePatternMatcher::tokenize(const std:
   std::vector<std::unique_ptr<Token>> tokens;
   for (auto chunk : chunks) {
     if (is<TagChunk *>(&chunk)) {
-      TagChunk &tagChunk = (TagChunk&)chunk;
+      TagChunk &tagChunk = (TagChunk &)chunk;
       // add special rule token or conjure up new token from name
       if (isupper(tagChunk.getTag()[0])) {
         size_t ttype = _parser->getTokenType(tagChunk.getTag());
@@ -257,7 +251,7 @@ std::vector<std::unique_ptr<Token>> ParseTreePatternMatcher::tokenize(const std:
         throw IllegalArgumentException("invalid tag: " + tagChunk.getTag() + " in pattern: " + pattern);
       }
     } else {
-      TextChunk &textChunk = (TextChunk&)chunk;
+      TextChunk &textChunk = (TextChunk &)chunk;
       ANTLRInputStream input(textChunk.getText());
       _lexer->setInputStream(&input);
       std::unique_ptr<Token> t(_lexer->nextToken());
@@ -281,14 +275,14 @@ std::vector<Chunk> ParseTreePatternMatcher::split(const std::string &pattern) {
   std::vector<size_t> starts;
   std::vector<size_t> stops;
   while (p < n) {
-    if (p == pattern.find(_escape + _start,p)) {
+    if (p == pattern.find(_escape + _start, p)) {
       p += _escape.length() + _start.length();
-    } else if (p == pattern.find(_escape + _stop,p)) {
+    } else if (p == pattern.find(_escape + _stop, p)) {
       p += _escape.length() + _stop.length();
-    } else if (p == pattern.find(_start,p)) {
+    } else if (p == pattern.find(_start, p)) {
       starts.push_back(p);
       p += _start.length();
-    } else if (p == pattern.find(_stop,p)) {
+    } else if (p == pattern.find(_stop, p)) {
       stops.push_back(p);
       p += _stop.length();
     } else {
@@ -329,7 +323,7 @@ std::vector<Chunk> ParseTreePatternMatcher::split(const std::string &pattern) {
     std::string label = "";
     size_t colon = tag.find(':');
     if (colon != std::string::npos) {
-      label = tag.substr(0,colon);
+      label = tag.substr(0, colon);
       ruleOrToken = tag.substr(colon + 1, tag.length() - (colon + 1));
     }
     chunks.push_back(TagChunk(label, ruleOrToken));
@@ -352,7 +346,7 @@ std::vector<Chunk> ParseTreePatternMatcher::split(const std::string &pattern) {
   for (size_t i = 0; i < chunks.size(); i++) {
     Chunk &c = chunks[i];
     if (is<TextChunk *>(&c)) {
-      TextChunk &tc = (TextChunk&)c;
+      TextChunk &tc = (TextChunk &)c;
       std::string unescaped = tc.getText();
       unescaped.erase(std::remove(unescaped.begin(), unescaped.end(), '\\'), unescaped.end());
       if (unescaped.length() < tc.getText().length()) {

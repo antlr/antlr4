@@ -7,8 +7,7 @@
 
 #include "Vocabulary.h"
 
-namespace antlr4 {
-namespace dfa {
+namespace antlr4::dfa {
 
   /// A DFA walker that knows how to dump them to serialized strings.
   class ANTLR4CPP_PUBLIC DFASerializer {
@@ -27,5 +26,4 @@ namespace dfa {
     const Vocabulary &_vocabulary;
   };
 
-} // namespace atn
-} // namespace antlr4
+} // namespace antlr4::dfa

@@ -5,5 +5,4 @@
 
 #include "LexerAction.h"
 
-antlr4::atn::LexerAction::~LexerAction() {
-}
+antlr4::atn::LexerAction::~LexerAction() {}

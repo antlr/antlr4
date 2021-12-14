@@ -7,8 +7,7 @@
 
 #include "atn/DecisionState.h"
 
-namespace antlr4 {
-namespace atn {
+namespace antlr4::atn {
 
   ///  The start of a regular {@code (...)} block.
   class ANTLR4CPP_PUBLIC BlockStartState : public DecisionState {
@@ -17,5 +16,4 @@ namespace atn {
     BlockEndState *endState = nullptr;
   };
 
-} // namespace atn
-} // namespace antlr4
+} // namespace antlr4::atn

@@ -17,10 +17,10 @@ namespace antlr4 {
   class ANTLR4CPP_PUBLIC DefaultErrorStrategy : public ANTLRErrorStrategy {
   public:
     DefaultErrorStrategy();
-    DefaultErrorStrategy(DefaultErrorStrategy const& other) = delete;
+    DefaultErrorStrategy(DefaultErrorStrategy const &other) = delete;
     virtual ~DefaultErrorStrategy();
 
-    DefaultErrorStrategy& operator = (DefaultErrorStrategy const& other) = delete;
+    DefaultErrorStrategy &operator=(DefaultErrorStrategy const &other) = delete;
 
   protected:
     /**
@@ -278,7 +278,7 @@ namespace antlr4 {
      * is in the set of tokens that can follow the {@code ')'} token reference
      * in rule {@code atom}. It can assume that you forgot the {@code ')'}.
      */
-    virtual Token* recoverInline(Parser *recognizer) override;
+    virtual Token *recoverInline(Parser *recognizer) override;
 
     /// <summary>
     /// This method implements the single-token insertion inline error recovery
@@ -317,7 +317,7 @@ namespace antlr4 {
     /// <returns> the successfully matched <seealso cref="Token"/> instance if single-token
     /// deletion successfully recovers from the mismatched input, otherwise
     /// {@code null} </returns>
-    virtual Token* singleTokenDeletion(Parser *recognizer);
+    virtual Token *singleTokenDeletion(Parser *recognizer);
 
     /// <summary>
     /// Conjure up a missing token during error recovery.
@@ -339,7 +339,7 @@ namespace antlr4 {
     ///  If you change what tokens must be created by the lexer,
     ///  override this method to create the appropriate tokens.
     /// </summary>
-    virtual Token* getMissingSymbol(Parser *recognizer);
+    virtual Token *getMissingSymbol(Parser *recognizer);
 
     virtual misc::IntervalSet getExpectedTokens(Parser *recognizer);
 

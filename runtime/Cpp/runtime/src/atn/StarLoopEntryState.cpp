@@ -7,9 +7,6 @@
 
 using namespace antlr4::atn;
 
-StarLoopEntryState::StarLoopEntryState() : DecisionState(), isPrecedenceDecision(false) {
-}
+StarLoopEntryState::StarLoopEntryState() : DecisionState(), isPrecedenceDecision(false) {}
 
-size_t StarLoopEntryState::getStateType() {
-  return STAR_LOOP_ENTRY;
-}
+size_t StarLoopEntryState::getStateType() { return STAR_LOOP_ENTRY; }

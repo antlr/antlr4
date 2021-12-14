@@ -5,11 +5,10 @@
 
 #pragma once
 
-#include "atn/AbstractPredicateTransition.h"
 #include "SemanticContext.h"
+#include "atn/AbstractPredicateTransition.h"
 
-namespace antlr4 {
-namespace atn {
+namespace antlr4::atn {
 
   class ANTLR4CPP_PUBLIC PrecedencePredicateTransition final : public AbstractPredicateTransition {
   public:
@@ -22,8 +21,6 @@ namespace atn {
     virtual bool matches(size_t symbol, size_t minVocabSymbol, size_t maxVocabSymbol) const override;
     Ref<SemanticContext::PrecedencePredicate> getPredicate() const;
     virtual std::string toString() const override;
-
   };
 
-} // namespace atn
-} // namespace antlr4
+} // namespace antlr4::atn

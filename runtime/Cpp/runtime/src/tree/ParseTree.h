@@ -7,8 +7,7 @@
 
 #include "support/Any.h"
 
-namespace antlr4 {
-namespace tree {
+namespace antlr4::tree {
 
   /// An interface to access the tree of <seealso cref="RuleContext"/> objects created
   /// during a parse that makes the data structure look like a simple parse tree.
@@ -20,10 +19,10 @@ namespace tree {
   class ANTLR4CPP_PUBLIC ParseTree {
   public:
     ParseTree();
-    ParseTree(ParseTree const&) = delete;
+    ParseTree(ParseTree const &) = delete;
     virtual ~ParseTree() {}
 
-    ParseTree& operator=(ParseTree const&) = delete;
+    ParseTree &operator=(ParseTree const &) = delete;
 
     /// The parent of this node. If the return value is null, then this
     /// node is the root of the tree.
@@ -46,10 +45,11 @@ namespace tree {
     /// based upon the parser.
     virtual std::string toStringTree(Parser *parser, bool pretty = false) = 0;
 
-    virtual bool operator == (const ParseTree &other) const;
+    virtual bool operator==(const ParseTree &other) const;
 
     /// The <seealso cref="ParseTreeVisitor"/> needs a double dispatch method.
-    // ml: This has been changed to use Any instead of a template parameter, to avoid the need of a virtual template function.
+    // ml: This has been changed to use Any instead of a template parameter, to avoid the need of
+    // a virtual template function.
     virtual std::any accept(ParseTreeVisitor *visitor) = 0;
 
     /// Return the combined text of all leaf nodes. Does not get any
@@ -79,16 +79,16 @@ namespace tree {
   // A class to help managing ParseTree instances without the need of a shared_ptr.
   class ANTLR4CPP_PUBLIC ParseTreeTracker {
   public:
-    template<typename T, typename ... Args>
-    T* createInstance(Args&& ... args) {
+    template <typename T, typename... Args>
+    T *createInstance(Args &&...args) {
       static_assert(std::is_base_of<ParseTree, T>::value, "Argument must be a parse tree type");
-      T* result = new T(args...);
+      T *result = new T(args...);
       _allocated.push_back(result);
       return result;
     }
 
     void reset() {
-      for (auto * entry : _allocated)
+      for (auto *entry : _allocated)
         delete entry;
       _allocated.clear();
     }
@@ -97,6 +97,4 @@ namespace tree {
     std::vector<ParseTree *> _allocated;
   };
 
-
-} // namespace tree
-} // namespace antlr4
+} // namespace antlr4::tree

@@ -7,8 +7,7 @@
 
 #include "dfa/DFASerializer.h"
 
-namespace antlr4 {
-namespace dfa {
+namespace antlr4::dfa {
 
   class ANTLR4CPP_PUBLIC LexerDFASerializer : public DFASerializer {
   public:
@@ -19,5 +18,4 @@ namespace dfa {
     virtual std::string getEdgeLabel(size_t i) const override;
   };
 
-} // namespace atn
-} // namespace antlr4
+} // namespace antlr4::dfa

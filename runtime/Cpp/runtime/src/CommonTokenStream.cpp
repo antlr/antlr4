@@ -9,18 +9,15 @@
 
 using namespace antlr4;
 
-CommonTokenStream::CommonTokenStream(TokenSource *tokenSource) : CommonTokenStream(tokenSource, Token::DEFAULT_CHANNEL) {
-}
+CommonTokenStream::CommonTokenStream(TokenSource *tokenSource)
+    : CommonTokenStream(tokenSource, Token::DEFAULT_CHANNEL) {}
 
 CommonTokenStream::CommonTokenStream(TokenSource *tokenSource, size_t channel_)
-: BufferedTokenStream(tokenSource), channel(channel_) {
-}
+    : BufferedTokenStream(tokenSource), channel(channel_) {}
 
-ssize_t CommonTokenStream::adjustSeekIndex(size_t i) {
-  return nextTokenOnChannel(i, channel);
-}
+ssize_t CommonTokenStream::adjustSeekIndex(size_t i) { return nextTokenOnChannel(i, channel); }
 
-Token* CommonTokenStream::LB(size_t k) {
+Token *CommonTokenStream::LB(size_t k) {
   if (k == 0 || k > _p) {
     return nullptr;
   }
@@ -40,7 +37,7 @@ Token* CommonTokenStream::LB(size_t k) {
   return _tokens[i].get();
 }
 
-Token* CommonTokenStream::LT(ssize_t k) {
+Token *CommonTokenStream::LT(ssize_t k) {
   lazyInit();
   if (k == 0) {
     return nullptr;

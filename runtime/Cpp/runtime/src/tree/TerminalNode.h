@@ -7,14 +7,13 @@
 
 #include "tree/ParseTree.h"
 
-namespace antlr4 {
-namespace tree {
+namespace antlr4::tree {
 
   class ANTLR4CPP_PUBLIC TerminalNode : public ParseTree {
   public:
     ~TerminalNode() override;
 
-    virtual Token* getSymbol() = 0;
+    virtual Token *getSymbol() = 0;
 
     /** Set the parent for this leaf node.
      *
@@ -28,5 +27,4 @@ namespace tree {
     virtual void setParent(RuleContext *parent) = 0;
   };
 
-} // namespace tree
-} // namespace antlr4
+} // namespace antlr4::tree

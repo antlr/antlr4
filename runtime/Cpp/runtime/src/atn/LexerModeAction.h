@@ -8,8 +8,7 @@
 #include "atn/LexerAction.h"
 #include "atn/LexerActionType.h"
 
-namespace antlr4 {
-namespace atn {
+namespace antlr4::atn {
 
   /// <summary>
   /// Implements the {@code mode} lexer action by calling <seealso cref="Lexer#mode"/> with
@@ -50,12 +49,11 @@ namespace atn {
     virtual void execute(Lexer *lexer) override;
 
     virtual size_t hashCode() const override;
-    virtual bool operator == (const LexerAction &obj) const override;
+    virtual bool operator==(const LexerAction &obj) const override;
     virtual std::string toString() const override;
 
   private:
     const int _mode;
   };
 
-} // namespace atn
-} // namespace antlr4
+} // namespace antlr4::atn

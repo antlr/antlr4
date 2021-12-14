@@ -3,8 +3,8 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
-#include "misc/Interval.h"
 #include "Exceptions.h"
+#include "misc/Interval.h"
 #include "support/Utf8.h"
 
 #include "UnbufferedCharStream.h"
@@ -73,15 +73,13 @@ size_t UnbufferedCharStream::fill(size_t n) {
   return n;
 }
 
-char32_t UnbufferedCharStream::nextChar()  {
+char32_t UnbufferedCharStream::nextChar() {
   wchar_t result = 0;
   _input >> result;
   return result;
 }
 
-void UnbufferedCharStream::add(char32_t c) {
-  _data += c;
-}
+void UnbufferedCharStream::add(char32_t c) { _data += c; }
 
 size_t UnbufferedCharStream::LA(ssize_t i) {
   if (i == -1) { // special case
@@ -132,9 +130,7 @@ void UnbufferedCharStream::release(ssize_t marker) {
   }
 }
 
-size_t UnbufferedCharStream::index() {
-  return _currentCharIndex;
-}
+size_t UnbufferedCharStream::index() { return _currentCharIndex; }
 
 void UnbufferedCharStream::seek(size_t index) {
   if (index == _currentCharIndex) {
@@ -151,8 +147,8 @@ void UnbufferedCharStream::seek(size_t index) {
   if (i < 0) {
     throw IllegalArgumentException(std::string("cannot seek to negative index ") + std::to_string(index));
   } else if (i >= static_cast<ssize_t>(_data.size())) {
-    throw UnsupportedOperationException("Seek to index outside buffer: " + std::to_string(index) +
-                                        " not in " + std::to_string(getBufferStartIndex()) + ".." +
+    throw UnsupportedOperationException("Seek to index outside buffer: " + std::to_string(index) + " not in " +
+                                        std::to_string(getBufferStartIndex()) + ".." +
                                         std::to_string(getBufferStartIndex() + _data.size()));
   }
 
@@ -165,9 +161,7 @@ void UnbufferedCharStream::seek(size_t index) {
   }
 }
 
-size_t UnbufferedCharStream::size() {
-  throw UnsupportedOperationException("Unbuffered stream cannot know its size");
-}
+size_t UnbufferedCharStream::size() { throw UnsupportedOperationException("Unbuffered stream cannot know its size"); }
 
 std::string UnbufferedCharStream::getSourceName() const {
   if (name.empty()) {
@@ -190,8 +184,9 @@ std::string UnbufferedCharStream::getText(const misc::Interval &interval) {
   }
 
   if (interval.a < static_cast<ssize_t>(bufferStartIndex) || interval.b >= ssize_t(bufferStartIndex + _data.size())) {
-    throw UnsupportedOperationException("interval " + interval.toString() + " outside buffer: " +
-      std::to_string(bufferStartIndex) + ".." + std::to_string(bufferStartIndex + _data.size() - 1));
+    throw UnsupportedOperationException("interval " + interval.toString() +
+                                        " outside buffer: " + std::to_string(bufferStartIndex) + ".." +
+                                        std::to_string(bufferStartIndex + _data.size() - 1));
   }
   // convert from absolute to local index
   size_t i = interval.a - bufferStartIndex;
@@ -202,9 +197,7 @@ std::string UnbufferedCharStream::getText(const misc::Interval &interval) {
   return std::move(maybeUtf8).value();
 }
 
-size_t UnbufferedCharStream::getBufferStartIndex() const {
-  return _currentCharIndex - _p;
-}
+size_t UnbufferedCharStream::getBufferStartIndex() const { return _currentCharIndex - _p; }
 
 void UnbufferedCharStream::InitializeInstanceFields() {
   _p = 0;

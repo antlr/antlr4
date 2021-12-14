@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include "TokenSource.h"
 #include "CommonTokenFactory.h"
+#include "TokenSource.h"
 
 namespace antlr4 {
 
@@ -50,9 +50,9 @@ namespace antlr4 {
     /// <seealso cref="TokenSource"/>. </param>
     /// <exception cref="NullPointerException"> if {@code tokens} is {@code null} </exception>
     ListTokenSource(std::vector<std::unique_ptr<Token>> tokens);
-    ListTokenSource(const ListTokenSource& other) = delete;
+    ListTokenSource(const ListTokenSource &other) = delete;
 
-    ListTokenSource& operator = (const ListTokenSource& other) = delete;
+    ListTokenSource &operator=(const ListTokenSource &other) = delete;
 
     /// <summary>
     /// Constructs a new <seealso cref="ListTokenSource"/> instance from the specified
@@ -71,15 +71,15 @@ namespace antlr4 {
     virtual size_t getCharPositionInLine() override;
     virtual std::unique_ptr<Token> nextToken() override;
     virtual size_t getLine() const override;
-    virtual CharStream* getInputStream() override;
+    virtual CharStream *getInputStream() override;
     virtual std::string getSourceName() override;
 
-    template<typename T1>
+    template <typename T1>
     void setTokenFactory(TokenFactory<T1> *factory) {
       this->_factory = factory;
     }
 
-    virtual TokenFactory<CommonToken>* getTokenFactory() override;
+    virtual TokenFactory<CommonToken> *getTokenFactory() override;
 
   private:
     void InitializeInstanceFields();

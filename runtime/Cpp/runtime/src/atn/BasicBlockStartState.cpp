@@ -7,6 +7,4 @@
 
 using namespace antlr4::atn;
 
-size_t BasicBlockStartState::getStateType() {
-  return BLOCK_START;
-}
+size_t BasicBlockStartState::getStateType() { return BLOCK_START; }

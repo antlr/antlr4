@@ -7,8 +7,7 @@
 
 #include "atn/Transition.h"
 
-namespace antlr4 {
-namespace atn {
+namespace antlr4::atn {
 
   class ANTState;
 
@@ -17,8 +16,6 @@ namespace atn {
   public:
     AbstractPredicateTransition(ATNState *target);
     ~AbstractPredicateTransition();
-
   };
 
-} // namespace atn
-} // namespace antlr4
+} // namespace antlr4::atn

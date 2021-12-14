@@ -5,14 +5,13 @@
 
 #pragma once
 
+#include "misc/Interval.h"
 #include "tree/ErrorNode.h"
 #include "tree/TerminalNodeImpl.h"
-#include "misc/Interval.h"
 
 #include "support/Any.h"
 
-namespace antlr4 {
-namespace tree {
+namespace antlr4::tree {
 
   /// <summary>
   /// Represents a token that was consumed during resynchronization
@@ -29,5 +28,4 @@ namespace tree {
     virtual std::any accept(ParseTreeVisitor *visitor) override;
   };
 
-} // namespace tree
-} // namespace antlr4
+} // namespace antlr4::tree

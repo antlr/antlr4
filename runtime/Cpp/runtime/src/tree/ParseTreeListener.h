@@ -7,8 +7,7 @@
 
 #include "antlr4-common.h"
 
-namespace antlr4 {
-namespace tree {
+namespace antlr4::tree {
 
   /** This interface describes the minimal core of methods triggered
    *  by {@link ParseTreeWalker}. E.g.,
@@ -30,10 +29,7 @@ namespace tree {
     virtual void enterEveryRule(ParserRuleContext *ctx) = 0;
     virtual void exitEveryRule(ParserRuleContext *ctx) = 0;
 
-    bool operator == (const ParseTreeListener &other) {
-      return this == &other;
-    }
+    bool operator==(const ParseTreeListener &other) { return this == &other; }
   };
 
-} // namespace tree
-} // namespace antlr4
+} // namespace antlr4::tree

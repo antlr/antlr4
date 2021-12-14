@@ -11,4 +11,4 @@ namespace antlrcpp {
 
   void replaceAll(std::string &str, std::string_view from, std::string_view to);
 
-}
+} // namespace antlrcpp

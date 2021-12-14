@@ -7,8 +7,7 @@
 
 #include "antlr4-common.h"
 
-namespace antlr4 {
-namespace misc {
+namespace antlr4::misc {
 
   class ANTLR4CPP_PUBLIC Predicate {
   public:
@@ -17,5 +16,4 @@ namespace misc {
     virtual bool test(tree::ParseTree *t) = 0;
   };
 
-} // namespace tree
-} // namespace antlr4
+} // namespace antlr4::misc

@@ -4,8 +4,8 @@
  */
 
 #include "tree/ParseTree.h"
-#include "tree/pattern/ParseTreePatternMatcher.h"
 #include "tree/pattern/ParseTreeMatch.h"
+#include "tree/pattern/ParseTreePatternMatcher.h"
 
 #include "tree/xpath/XPath.h"
 #include "tree/xpath/XPathElement.h"
@@ -19,19 +19,13 @@ using namespace antlrcpp;
 
 ParseTreePattern::ParseTreePattern(ParseTreePatternMatcher *matcher, const std::string &pattern, int patternRuleIndex_,
                                    ParseTree *patternTree)
-  : patternRuleIndex(patternRuleIndex_), _pattern(pattern), _patternTree(patternTree), _matcher(matcher) {
-}
+    : patternRuleIndex(patternRuleIndex_), _pattern(pattern), _patternTree(patternTree), _matcher(matcher) {}
 
-ParseTreePattern::~ParseTreePattern() {
-}
+ParseTreePattern::~ParseTreePattern() {}
 
-ParseTreeMatch ParseTreePattern::match(ParseTree *tree) {
-  return _matcher->match(tree, *this);
-}
+ParseTreeMatch ParseTreePattern::match(ParseTree *tree) { return _matcher->match(tree, *this); }
 
-bool ParseTreePattern::matches(ParseTree *tree) {
-  return _matcher->match(tree, *this).succeeded();
-}
+bool ParseTreePattern::matches(ParseTree *tree) { return _matcher->match(tree, *this).succeeded(); }
 
 std::vector<ParseTreeMatch> ParseTreePattern::findAll(ParseTree *tree, const std::string &xpath) {
   xpath::XPath finder(_matcher->getParser(), xpath);
@@ -46,19 +40,10 @@ std::vector<ParseTreeMatch> ParseTreePattern::findAll(ParseTree *tree, const std
   return matches;
 }
 
+ParseTreePatternMatcher *ParseTreePattern::getMatcher() const { return _matcher; }
 
-ParseTreePatternMatcher *ParseTreePattern::getMatcher() const {
-  return _matcher;
-}
+std::string ParseTreePattern::getPattern() const { return _pattern; }
 
-std::string ParseTreePattern::getPattern() const {
-  return _pattern;
-}
+int ParseTreePattern::getPatternRuleIndex() const { return patternRuleIndex; }
 
-int ParseTreePattern::getPatternRuleIndex() const {
-  return patternRuleIndex;
-}
-
-ParseTree* ParseTreePattern::getPatternTree() const {
-  return _patternTree;
-}
+ParseTree *ParseTreePattern::getPatternTree() const { return _patternTree; }

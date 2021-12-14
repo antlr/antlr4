@@ -12,11 +12,10 @@ namespace antlr4 {
 
   class ANTLR4CPP_PUBLIC LexerNoViableAltException : public RecognitionException {
   public:
-    LexerNoViableAltException(Lexer *lexer, CharStream *input, size_t startIndex,
-                              atn::ATNConfigSet *deadEndConfigs);
+    LexerNoViableAltException(Lexer *lexer, CharStream *input, size_t startIndex, atn::ATNConfigSet *deadEndConfigs);
 
     virtual size_t getStartIndex();
-    virtual atn::ATNConfigSet* getDeadEndConfigs();
+    virtual atn::ATNConfigSet *getDeadEndConfigs();
     virtual std::string toString();
 
   private:
@@ -25,7 +24,6 @@ namespace antlr4 {
 
     /// Which configurations did we try at input.index() that couldn't match input.LA(1)?
     atn::ATNConfigSet *_deadEndConfigs;
-
   };
 
 } // namespace antlr4

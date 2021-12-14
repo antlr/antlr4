@@ -7,8 +7,7 @@
 
 #include "atn/DecisionState.h"
 
-namespace antlr4 {
-namespace atn {
+namespace antlr4::atn {
 
   /// Decision state for {@code A+} and {@code (A|B)+}. It has two transitions:
   /// one to the loop back to start of the block and one to exit.
@@ -18,5 +17,4 @@ namespace atn {
     virtual size_t getStateType() override;
   };
 
-} // namespace atn
-} // namespace antlr4
+} // namespace antlr4::atn

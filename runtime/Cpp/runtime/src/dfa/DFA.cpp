@@ -3,11 +3,11 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include "atn/ATNConfigSet.h"
+#include "atn/StarLoopEntryState.h"
 #include "dfa/DFASerializer.h"
 #include "dfa/LexerDFASerializer.h"
 #include "support/CPPUtils.h"
-#include "atn/StarLoopEntryState.h"
-#include "atn/ATNConfigSet.h"
 
 #include "dfa/DFA.h"
 
@@ -15,11 +15,10 @@ using namespace antlr4;
 using namespace antlr4::dfa;
 using namespace antlrcpp;
 
-DFA::DFA(atn::DecisionState *atnStartState) : DFA(atnStartState, 0) {
-}
+DFA::DFA(atn::DecisionState *atnStartState) : DFA(atnStartState, 0) {}
 
 DFA::DFA(atn::DecisionState *atnStartState, size_t decision)
-  : atnStartState(atnStartState), s0(nullptr), decision(decision) {
+    : atnStartState(atnStartState), s0(nullptr), decision(decision) {
 
   _precedenceDfa = false;
   if (is<atn::StarLoopEntryState *>(atnStartState)) {
@@ -56,11 +55,9 @@ DFA::~DFA() {
   }
 }
 
-bool DFA::isPrecedenceDfa() const {
-  return _precedenceDfa;
-}
+bool DFA::isPrecedenceDfa() const { return _precedenceDfa; }
 
-DFAState* DFA::getPrecedenceStartState(int precedence) const {
+DFAState *DFA::getPrecedenceStartState(int precedence) const {
   assert(_precedenceDfa); // Only precedence DFAs may contain a precedence start state.
 
   auto iterator = s0->edges.find(precedence);
@@ -91,9 +88,8 @@ std::vector<DFAState *> DFA::getStates() const {
   for (auto *state : states)
     result.push_back(state);
 
-  std::sort(result.begin(), result.end(), [](DFAState *o1, DFAState *o2) -> bool {
-    return o1->stateNumber < o2->stateNumber;
-  });
+  std::sort(result.begin(), result.end(),
+            [](DFAState *o1, DFAState *o2) -> bool { return o1->stateNumber < o2->stateNumber; });
 
   return result;
 }
@@ -115,4 +111,3 @@ std::string DFA::toLexerString() {
 
   return serializer.toString();
 }
-

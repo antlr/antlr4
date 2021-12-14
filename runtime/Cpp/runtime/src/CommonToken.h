@@ -85,7 +85,7 @@ namespace antlr4 {
      * @param type The token type.
      */
     CommonToken(size_t type);
-    CommonToken(std::pair<TokenSource*, CharStream*> source, size_t type, size_t channel, size_t start, size_t stop);
+    CommonToken(std::pair<TokenSource *, CharStream *> source, size_t type, size_t channel, size_t start, size_t stop);
 
     /**
      * Constructs a new {@link CommonToken} with the specified token type and
@@ -151,6 +151,7 @@ namespace antlr4 {
     virtual std::string toString() const override;
 
     virtual std::string toString(Recognizer *r) const;
+
   private:
     void InitializeInstanceFields();
   };

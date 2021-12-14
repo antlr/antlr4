@@ -14,8 +14,7 @@ using namespace antlr4::atn;
 using namespace antlrcpp;
 
 const std::vector<std::string> Transition::serializationNames = {
-  "INVALID", "EPSILON", "RANGE", "RULE", "PREDICATE", "ATOM", "ACTION", "SET", "NOT_SET", "WILDCARD", "PRECEDENCE"
-};
+    "INVALID", "EPSILON", "RANGE", "RULE", "PREDICATE", "ATOM", "ACTION", "SET", "NOT_SET", "WILDCARD", "PRECEDENCE"};
 
 Transition::Transition(ATNState *target) {
   if (target == nullptr) {
@@ -25,16 +24,11 @@ Transition::Transition(ATNState *target) {
   this->target = target;
 }
 
-Transition::~Transition() {
-}
+Transition::~Transition() {}
 
-bool Transition::isEpsilon() const {
-  return false;
-}
+bool Transition::isEpsilon() const { return false; }
 
-misc::IntervalSet Transition::label() const {
-  return misc::IntervalSet::EMPTY_SET;
-}
+misc::IntervalSet Transition::label() const { return misc::IntervalSet::EMPTY_SET; }
 
 std::string Transition::toString() const {
   std::stringstream ss;

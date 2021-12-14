@@ -7,6 +7,4 @@
 
 using namespace antlr4::atn;
 
-size_t TokensStartState::getStateType() {
-  return TOKEN_START;
-}
+size_t TokensStartState::getStateType() { return TOKEN_START; }

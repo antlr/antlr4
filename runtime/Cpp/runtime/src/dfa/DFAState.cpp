@@ -3,9 +3,9 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include "atn/ATNConfig.h"
 #include "atn/ATNConfigSet.h"
 #include "atn/SemanticContext.h"
-#include "atn/ATNConfig.h"
 #include "misc/MurmurHash.h"
 
 #include "dfa/DFAState.h"
@@ -18,28 +18,19 @@ DFAState::PredPrediction::PredPrediction(const Ref<SemanticContext> &pred, int a
   this->alt = alt;
 }
 
-DFAState::PredPrediction::~PredPrediction() {
-}
+DFAState::PredPrediction::~PredPrediction() {}
 
 std::string DFAState::PredPrediction::toString() {
   return std::string("(") + pred->toString() + ", " + std::to_string(alt) + ")";
 }
 
-void DFAState::PredPrediction::InitializeInstanceFields() {
-  alt = 0;
-}
+void DFAState::PredPrediction::InitializeInstanceFields() { alt = 0; }
 
-DFAState::DFAState() {
-  InitializeInstanceFields();
-}
+DFAState::DFAState() { InitializeInstanceFields(); }
 
-DFAState::DFAState(int state) : DFAState() {
-  stateNumber = state;
-}
+DFAState::DFAState(int state) : DFAState() { stateNumber = state; }
 
-DFAState::DFAState(std::unique_ptr<ATNConfigSet> configs_) : DFAState() {
-  configs = std::move(configs_);
-}
+DFAState::DFAState(std::unique_ptr<ATNConfigSet> configs_) : DFAState() { configs = std::move(configs_); }
 
 DFAState::~DFAState() {
   for (auto *predicate : predicates) {
@@ -64,7 +55,7 @@ size_t DFAState::hashCode() const {
   return hash;
 }
 
-bool DFAState::operator == (const DFAState &o) const {
+bool DFAState::operator==(const DFAState &o) const {
   // compare set of ATN configurations in this set with other
   if (this == &o) {
     return true;

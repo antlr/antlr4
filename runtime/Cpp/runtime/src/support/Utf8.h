@@ -32,7 +32,7 @@ namespace antlrcpp {
     // Encodes the given code point and appends it to the buffer. If the code point
     // is an unpaired surrogate or outside of the valid Unicode range it is replaced
     // with the replacement character, U+FFFD.
-    static std::string& encode(std::string *buffer, char32_t codePoint);
+    static std::string &encode(std::string *buffer, char32_t codePoint);
 
     // Encodes the given Unicode code point string as UTF-8.
     static std::optional<std::string> strictEncode(std::u32string_view input);
@@ -44,9 +44,9 @@ namespace antlrcpp {
   private:
     Utf8() = delete;
 
-    Utf8(const Utf8&) = delete;
+    Utf8(const Utf8 &) = delete;
 
-    Utf8& operator=(const Utf8&) = delete;
+    Utf8 &operator=(const Utf8 &) = delete;
   };
 
-}
+} // namespace antlrcpp

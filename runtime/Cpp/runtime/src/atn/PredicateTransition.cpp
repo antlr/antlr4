@@ -5,18 +5,15 @@
 
 #include "atn/PredicateTransition.h"
 
+using namespace antlr4;
 using namespace antlr4::atn;
 
-PredicateTransition::PredicateTransition(ATNState *target, size_t ruleIndex, size_t predIndex, bool isCtxDependent) : AbstractPredicateTransition(target), ruleIndex(ruleIndex), predIndex(predIndex), isCtxDependent(isCtxDependent) {
-}
+PredicateTransition::PredicateTransition(ATNState *target, size_t ruleIndex, size_t predIndex, bool isCtxDependent)
+    : AbstractPredicateTransition(target), ruleIndex(ruleIndex), predIndex(predIndex), isCtxDependent(isCtxDependent) {}
 
-Transition::SerializationType PredicateTransition::getSerializationType() const {
-  return PREDICATE;
-}
+Transition::SerializationType PredicateTransition::getSerializationType() const { return PREDICATE; }
 
-bool PredicateTransition::isEpsilon() const {
-  return true;
-}
+bool PredicateTransition::isEpsilon() const { return true; }
 
 bool PredicateTransition::matches(size_t /*symbol*/, size_t /*minVocabSymbol*/, size_t /*maxVocabSymbol*/) const {
   return false;
@@ -28,7 +25,7 @@ Ref<SemanticContext::Predicate> PredicateTransition::getPredicate() const {
 
 std::string PredicateTransition::toString() const {
   return "PREDICATE " + Transition::toString() + " { ruleIndex: " + std::to_string(ruleIndex) +
-    ", predIndex: " + std::to_string(predIndex) + ", isCtxDependent: " + std::to_string(isCtxDependent) + " }";
+         ", predIndex: " + std::to_string(predIndex) + ", isCtxDependent: " + std::to_string(isCtxDependent) + " }";
 
   // Generate and add a predicate context here?
 }

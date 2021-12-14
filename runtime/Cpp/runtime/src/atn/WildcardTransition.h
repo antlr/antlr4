@@ -7,8 +7,7 @@
 
 #include "atn/Transition.h"
 
-namespace antlr4 {
-namespace atn {
+namespace antlr4::atn {
 
   class ANTLR4CPP_PUBLIC WildcardTransition final : public Transition {
   public:
@@ -21,5 +20,4 @@ namespace atn {
     virtual std::string toString() const override;
   };
 
-} // namespace atn
-} // namespace antlr4
+} // namespace antlr4::atn

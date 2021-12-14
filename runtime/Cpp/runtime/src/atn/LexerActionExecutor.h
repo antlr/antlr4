@@ -8,8 +8,7 @@
 #include "CharStream.h"
 #include "atn/LexerAction.h"
 
-namespace antlr4 {
-namespace atn {
+namespace antlr4::atn {
 
   /// Represents an executor for a sequence of lexer actions which traversed during
   /// the matching operation of a lexer rule (token).
@@ -39,8 +38,8 @@ namespace atn {
     /// </param>
     /// <returns> A <seealso cref="LexerActionExecutor"/> for executing the combine actions
     /// of {@code lexerActionExecutor} and {@code lexerAction}. </returns>
-    static Ref<LexerActionExecutor> append(Ref<LexerActionExecutor> const& lexerActionExecutor,
-                                           Ref<LexerAction> const& lexerAction);
+    static Ref<LexerActionExecutor> append(Ref<LexerActionExecutor> const &lexerActionExecutor,
+                                           Ref<LexerAction> const &lexerAction);
 
     /// <summary>
     /// Creates a <seealso cref="LexerActionExecutor"/> which encodes the current offset
@@ -48,11 +47,10 @@ namespace atn {
     ///
     /// <para>Normally, when the executor encounters lexer actions where
     /// <seealso cref="LexerAction#isPositionDependent"/> returns {@code true}, it calls
-    /// <seealso cref="IntStream#seek"/> on the input <seealso cref="CharStream"/> to set the input
-    /// position to the <em>end</em> of the current token. This behavior provides
-    /// for efficient DFA representation of lexer actions which appear at the end
-    /// of a lexer rule, even when the lexer rule matches a variable number of
-    /// characters.</para>
+    /// <seealso cref="IntStream#seek"/> on the input <seealso cref="CharStream"/> to set the
+    /// input position to the <em>end</em> of the current token. This behavior provides for
+    /// efficient DFA representation of lexer actions which appear at the end of a lexer rule,
+    /// even when the lexer rule matches a variable number of characters.</para>
     ///
     /// <para>Prior to traversing a match transition in the ATN, the current offset
     /// from the token start index is assigned to all position-dependent lexer
@@ -98,8 +96,8 @@ namespace atn {
     virtual void execute(Lexer *lexer, CharStream *input, size_t startIndex);
 
     virtual size_t hashCode() const;
-    virtual bool operator == (const LexerActionExecutor &obj) const;
-    virtual bool operator != (const LexerActionExecutor &obj) const;
+    virtual bool operator==(const LexerActionExecutor &obj) const;
+    virtual bool operator!=(const LexerActionExecutor &obj) const;
 
   private:
     const std::vector<Ref<LexerAction>> _lexerActions;
@@ -111,5 +109,4 @@ namespace atn {
     size_t generateHashCode() const;
   };
 
-} // namespace atn
-} // namespace antlr4
+} // namespace antlr4::atn

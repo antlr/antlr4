@@ -5,21 +5,18 @@
 
 #include "atn/PrecedencePredicateTransition.h"
 
+using namespace antlr4;
 using namespace antlr4::atn;
 
 PrecedencePredicateTransition::PrecedencePredicateTransition(ATNState *target, int precedence)
-  : AbstractPredicateTransition(target), precedence(precedence) {
-}
+    : AbstractPredicateTransition(target), precedence(precedence) {}
 
-Transition::SerializationType PrecedencePredicateTransition::getSerializationType() const {
-  return PRECEDENCE;
-}
+Transition::SerializationType PrecedencePredicateTransition::getSerializationType() const { return PRECEDENCE; }
 
-bool PrecedencePredicateTransition::isEpsilon() const {
-  return true;
-}
+bool PrecedencePredicateTransition::isEpsilon() const { return true; }
 
-bool PrecedencePredicateTransition::matches(size_t /*symbol*/, size_t /*minVocabSymbol*/, size_t /*maxVocabSymbol*/) const {
+bool PrecedencePredicateTransition::matches(size_t /*symbol*/, size_t /*minVocabSymbol*/,
+                                            size_t /*maxVocabSymbol*/) const {
   return false;
 }
 

@@ -7,8 +7,7 @@
 
 #include "support/BitSet.h"
 
-namespace antlr4 {
-namespace atn {
+namespace antlr4::atn {
 
   /**
    * This enumeration defines the prediction modes available in ANTLR 4 along with
@@ -425,12 +424,11 @@ namespace atn {
     /// cref="ATNConfig#alt alt"/>
     /// </pre>
     /// </summary>
-    static std::map<ATNState*, antlrcpp::BitSet> getStateToAltMap(ATNConfigSet *configs);
+    static std::map<ATNState *, antlrcpp::BitSet> getStateToAltMap(ATNConfigSet *configs);
 
     static bool hasStateAssociatedWithOneAlt(ATNConfigSet *configs);
 
     static size_t getSingleViableAlt(const std::vector<antlrcpp::BitSet> &altsets);
   };
 
-} // namespace atn
-} // namespace antlr4
+} // namespace antlr4::atn

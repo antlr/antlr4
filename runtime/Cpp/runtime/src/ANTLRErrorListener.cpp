@@ -5,6 +5,4 @@
 
 #include "ANTLRErrorListener.h"
 
-antlr4::ANTLRErrorListener::~ANTLRErrorListener()
-{
-}
+antlr4::ANTLRErrorListener::~ANTLRErrorListener() {}

@@ -3,25 +3,24 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
-#include "atn/PredictionContext.h"
+#include "Parser.h"
 #include "atn/ATNConfig.h"
 #include "atn/ATNConfigSet.h"
-#include "Parser.h"
-#include "misc/Interval.h"
+#include "atn/PredictionContext.h"
 #include "dfa/DFA.h"
+#include "misc/Interval.h"
 
 #include "DiagnosticErrorListener.h"
 
 using namespace antlr4;
 
-DiagnosticErrorListener::DiagnosticErrorListener() : DiagnosticErrorListener(true) {
-}
+DiagnosticErrorListener::DiagnosticErrorListener() : DiagnosticErrorListener(true) {}
 
-DiagnosticErrorListener::DiagnosticErrorListener(bool exactOnly_) : exactOnly(exactOnly_) {
-}
+DiagnosticErrorListener::DiagnosticErrorListener(bool exactOnly_) : exactOnly(exactOnly_) {}
 
-void DiagnosticErrorListener::reportAmbiguity(Parser *recognizer, const dfa::DFA &dfa, size_t startIndex, size_t stopIndex,
-   bool exact, const antlrcpp::BitSet &ambigAlts, atn::ATNConfigSet *configs) {
+void DiagnosticErrorListener::reportAmbiguity(Parser *recognizer, const dfa::DFA &dfa, size_t startIndex,
+                                              size_t stopIndex, bool exact, const antlrcpp::BitSet &ambigAlts,
+                                              atn::ATNConfigSet *configs) {
   if (exactOnly && !exact) {
     return;
   }
@@ -29,14 +28,16 @@ void DiagnosticErrorListener::reportAmbiguity(Parser *recognizer, const dfa::DFA
   std::string decision = getDecisionDescription(recognizer, dfa);
   antlrcpp::BitSet conflictingAlts = getConflictingAlts(ambigAlts, configs);
   std::string text = recognizer->getTokenStream()->getText(misc::Interval(startIndex, stopIndex));
-  std::string message = "reportAmbiguity d=" + decision + ": ambigAlts=" + conflictingAlts.toString() +
-    ", input='" + text + "'";
+  std::string message =
+      "reportAmbiguity d=" + decision + ": ambigAlts=" + conflictingAlts.toString() + ", input='" + text + "'";
 
   recognizer->notifyErrorListeners(message);
 }
 
 void DiagnosticErrorListener::reportAttemptingFullContext(Parser *recognizer, const dfa::DFA &dfa, size_t startIndex,
-  size_t stopIndex, const antlrcpp::BitSet &/*conflictingAlts*/, atn::ATNConfigSet * /*configs*/) {
+                                                          size_t stopIndex,
+                                                          const antlrcpp::BitSet & /*conflictingAlts*/,
+                                                          atn::ATNConfigSet * /*configs*/) {
   std::string decision = getDecisionDescription(recognizer, dfa);
   std::string text = recognizer->getTokenStream()->getText(misc::Interval(startIndex, stopIndex));
   std::string message = "reportAttemptingFullContext d=" + decision + ", input='" + text + "'";
@@ -44,7 +45,8 @@ void DiagnosticErrorListener::reportAttemptingFullContext(Parser *recognizer, co
 }
 
 void DiagnosticErrorListener::reportContextSensitivity(Parser *recognizer, const dfa::DFA &dfa, size_t startIndex,
-  size_t stopIndex, size_t /*prediction*/, atn::ATNConfigSet * /*configs*/) {
+                                                       size_t stopIndex, size_t /*prediction*/,
+                                                       atn::ATNConfigSet * /*configs*/) {
   std::string decision = getDecisionDescription(recognizer, dfa);
   std::string text = recognizer->getTokenStream()->getText(misc::Interval(startIndex, stopIndex));
   std::string message = "reportContextSensitivity d=" + decision + ", input='" + text + "'";
@@ -53,15 +55,15 @@ void DiagnosticErrorListener::reportContextSensitivity(Parser *recognizer, const
 
 std::string DiagnosticErrorListener::getDecisionDescription(Parser *recognizer, const dfa::DFA &dfa) {
   size_t decision = dfa.decision;
-  size_t ruleIndex = (reinterpret_cast<atn::ATNState*>(dfa.atnStartState))->ruleIndex;
+  size_t ruleIndex = (reinterpret_cast<atn::ATNState *>(dfa.atnStartState))->ruleIndex;
 
-  const std::vector<std::string>& ruleNames = recognizer->getRuleNames();
+  const std::vector<std::string> &ruleNames = recognizer->getRuleNames();
   if (ruleIndex == INVALID_INDEX || ruleIndex >= ruleNames.size()) {
     return std::to_string(decision);
   }
 
   std::string ruleName = ruleNames[ruleIndex];
-  if (ruleName == "" || ruleName.empty())  {
+  if (ruleName == "" || ruleName.empty()) {
     return std::to_string(decision);
   }
 

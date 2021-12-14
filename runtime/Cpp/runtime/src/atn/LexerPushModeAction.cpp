@@ -3,8 +3,8 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
-#include "misc/MurmurHash.h"
 #include "Lexer.h"
+#include "misc/MurmurHash.h"
 
 #include "atn/LexerPushModeAction.h"
 
@@ -12,24 +12,15 @@ using namespace antlr4;
 using namespace antlr4::atn;
 using namespace antlr4::misc;
 
-LexerPushModeAction::LexerPushModeAction(int mode) : _mode(mode) {
-}
+LexerPushModeAction::LexerPushModeAction(int mode) : _mode(mode) {}
 
-int LexerPushModeAction::getMode() const {
-  return _mode;
-}
+int LexerPushModeAction::getMode() const { return _mode; }
 
-LexerActionType LexerPushModeAction::getActionType() const {
-  return LexerActionType::PUSH_MODE;
-}
+LexerActionType LexerPushModeAction::getActionType() const { return LexerActionType::PUSH_MODE; }
 
-bool LexerPushModeAction::isPositionDependent() const {
-  return false;
-}
+bool LexerPushModeAction::isPositionDependent() const { return false; }
 
-void LexerPushModeAction::execute(Lexer *lexer) {
-  lexer->pushMode(_mode);
-}
+void LexerPushModeAction::execute(Lexer *lexer) { lexer->pushMode(_mode); }
 
 size_t LexerPushModeAction::hashCode() const {
   size_t hash = MurmurHash::initialize();
@@ -38,7 +29,7 @@ size_t LexerPushModeAction::hashCode() const {
   return MurmurHash::finish(hash, 2);
 }
 
-bool LexerPushModeAction::operator == (const LexerAction &obj) const {
+bool LexerPushModeAction::operator==(const LexerAction &obj) const {
   if (&obj == this) {
     return true;
   }
@@ -51,6 +42,4 @@ bool LexerPushModeAction::operator == (const LexerAction &obj) const {
   return _mode == action->_mode;
 }
 
-std::string LexerPushModeAction::toString() const {
-  return "pushMode(" + std::to_string(_mode) + ")";
-}
+std::string LexerPushModeAction::toString() const { return "pushMode(" + std::to_string(_mode) + ")"; }

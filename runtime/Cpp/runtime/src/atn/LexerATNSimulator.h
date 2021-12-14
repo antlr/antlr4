@@ -7,12 +7,11 @@
 
 #include <atomic>
 
+#include "atn/ATNConfigSet.h"
 #include "atn/ATNSimulator.h"
 #include "atn/LexerATNConfig.h"
-#include "atn/ATNConfigSet.h"
 
-namespace antlr4 {
-namespace atn {
+namespace antlr4::atn {
 
   /// "dup" of ParserInterpreter
   class ANTLR4CPP_PUBLIC LexerATNSimulator : public ATNSimulator {
@@ -33,11 +32,8 @@ namespace atn {
       void InitializeInstanceFields();
 
     public:
-      SimState() {
-        InitializeInstanceFields();
-      }
+      SimState() { InitializeInstanceFields(); }
     };
-
 
   public:
     static constexpr size_t MIN_DFA_EDGE = 0;
@@ -87,8 +83,9 @@ namespace atn {
     static std::atomic<int> match_calls;
 
     LexerATNSimulator(const ATN &atn, std::vector<dfa::DFA> &decisionToDFA, PredictionContextCache &sharedContextCache);
-    LexerATNSimulator(Lexer *recog, const ATN &atn, std::vector<dfa::DFA> &decisionToDFA, PredictionContextCache &sharedContextCache);
-    virtual ~LexerATNSimulator () {}
+    LexerATNSimulator(Lexer *recog, const ATN &atn, std::vector<dfa::DFA> &decisionToDFA,
+                      PredictionContextCache &sharedContextCache);
+    virtual ~LexerATNSimulator() {}
 
     virtual void copyState(LexerATNSimulator *simulator);
     virtual size_t match(CharStream *input, size_t mode);
@@ -132,11 +129,12 @@ namespace atn {
     ///  we can reach upon input {@code t}. Parameter {@code reach} is a return
     ///  parameter.
     /// </summary>
-    void getReachableConfigSet(CharStream *input, ATNConfigSet *closure_, // closure_ as we have a closure() already
+    void getReachableConfigSet(CharStream *input,
+                               ATNConfigSet *closure_, // closure_ as we have a closure() already
                                ATNConfigSet *reach, size_t t);
 
-    virtual void accept(CharStream *input, const Ref<LexerActionExecutor> &lexerActionExecutor, size_t startIndex, size_t index,
-                        size_t line, size_t charPos);
+    virtual void accept(CharStream *input, const Ref<LexerActionExecutor> &lexerActionExecutor, size_t startIndex,
+                        size_t index, size_t line, size_t charPos);
 
     virtual ATNState *getReachableTarget(Transition *trans, size_t t);
 
@@ -156,7 +154,7 @@ namespace atn {
 
     // side-effect: can alter configs.hasSemanticContext
     virtual Ref<LexerATNConfig> getEpsilonTarget(CharStream *input, const Ref<LexerATNConfig> &config, Transition *t,
-      ATNConfigSet *configs, bool speculative, bool treatEofAsEpsilon);
+                                                 ATNConfigSet *configs, bool speculative, bool treatEofAsEpsilon);
 
     /// <summary>
     /// Evaluate a predicate specified in the lexer.
@@ -164,11 +162,11 @@ namespace atn {
     /// If {@code speculative} is {@code true}, this method was called before
     /// <seealso cref="#consume"/> for the matched character. This method should call
     /// <seealso cref="#consume"/> before evaluating the predicate to ensure position
-    /// sensitive values, including <seealso cref="Lexer#getText"/>, <seealso cref="Lexer#getLine"/>,
-    /// and <seealso cref="Lexer#getCharPositionInLine"/>, properly reflect the current
-    /// lexer state. This method should restore {@code input} and the simulator
-    /// to the original state before returning (i.e. undo the actions made by the
-    /// call to <seealso cref="#consume"/>.
+    /// sensitive values, including <seealso cref="Lexer#getText"/>, <seealso
+    /// cref="Lexer#getLine"/>, and <seealso cref="Lexer#getCharPositionInLine"/>, properly
+    /// reflect the current lexer state. This method should restore {@code input} and the
+    /// simulator to the original state before returning (i.e. undo the actions made by the call
+    /// to <seealso cref="#consume"/>.
     /// </summary>
     /// <param name="input"> The input stream. </param>
     /// <param name="ruleIndex"> The rule containing the predicate. </param>
@@ -181,7 +179,7 @@ namespace atn {
     virtual bool evaluatePredicate(CharStream *input, size_t ruleIndex, size_t predIndex, bool speculative);
 
     virtual void captureSimState(CharStream *input, dfa::DFAState *dfaState);
-    virtual dfa::DFAState* addDFAEdge(dfa::DFAState *from, size_t t, ATNConfigSet *q);
+    virtual dfa::DFAState *addDFAEdge(dfa::DFAState *from, size_t t, ATNConfigSet *q);
     virtual void addDFAEdge(dfa::DFAState *p, size_t t, dfa::DFAState *q);
 
     /// <summary>
@@ -195,7 +193,7 @@ namespace atn {
     virtual dfa::DFAState *addDFAState(ATNConfigSet *configs, bool suppressEdge);
 
   public:
-    dfa::DFA& getDFA(size_t mode);
+    dfa::DFA &getDFA(size_t mode);
 
     /// Get the text matched so far for the current token.
     virtual std::string getText(CharStream *input);
@@ -210,5 +208,4 @@ namespace atn {
     void InitializeInstanceFields();
   };
 
-} // namespace atn
-} // namespace antlr4
+} // namespace antlr4::atn

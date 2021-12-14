@@ -7,8 +7,7 @@
 
 #include "antlr4-common.h"
 
-namespace antlr4 {
-namespace misc {
+namespace antlr4::misc {
 
   class ANTLR4CPP_PUBLIC MurmurHash {
 
@@ -37,7 +36,7 @@ namespace misc {
      * @return the updated intermediate hash value
      */
     template <class T>
-    static size_t update(size_t hash, Ref<T> const& value) {
+    static size_t update(size_t hash, Ref<T> const &value) {
       return update(hash, value != nullptr ? value->hashCode() : 0);
     }
 
@@ -61,7 +60,7 @@ namespace misc {
     /// <param name="data"> the array data </param>
     /// <param name="seed"> the seed for the MurmurHash algorithm </param>
     /// <returns> the hash code of the data </returns>
-    template<typename T> // where T is C array type
+    template <typename T> // where T is C array type
     static size_t hashCode(const std::vector<Ref<T>> &data, size_t seed) {
       size_t hash = initialize(seed);
       for (auto entry : data) {
@@ -72,5 +71,4 @@ namespace misc {
     }
   };
 
-} // namespace atn
-} // namespace antlr4
+} // namespace antlr4::misc

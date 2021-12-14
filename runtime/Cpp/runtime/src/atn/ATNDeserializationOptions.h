@@ -7,42 +7,39 @@
 
 #include "antlr4-common.h"
 
-namespace antlr4 {
-namespace atn {
+namespace antlr4::atn {
 
-class ANTLR4CPP_PUBLIC ATNDeserializationOptions final {
-public:
-  ATNDeserializationOptions()
-    : _readOnly(false), _verifyATN(true), _generateRuleBypassTransitions(false) {}
+  class ANTLR4CPP_PUBLIC ATNDeserializationOptions final {
+  public:
+    ATNDeserializationOptions() : _readOnly(false), _verifyATN(true), _generateRuleBypassTransitions(false) {}
 
-  // TODO: Is this useful? If so we should mark it as explicit, otherwise remove it.
-  ATNDeserializationOptions(ATNDeserializationOptions *options);
+    // TODO: Is this useful? If so we should mark it as explicit, otherwise remove it.
+    ATNDeserializationOptions(ATNDeserializationOptions *options);
 
-  ATNDeserializationOptions(const ATNDeserializationOptions&) = default;
+    ATNDeserializationOptions(const ATNDeserializationOptions &) = default;
 
-  ATNDeserializationOptions& operator=(const ATNDeserializationOptions&) = default;
+    ATNDeserializationOptions &operator=(const ATNDeserializationOptions &) = default;
 
-  static const ATNDeserializationOptions& getDefaultOptions();
+    static const ATNDeserializationOptions &getDefaultOptions();
 
-  bool isReadOnly() const { return _readOnly; }
+    bool isReadOnly() const { return _readOnly; }
 
-  void makeReadOnly();
+    void makeReadOnly();
 
-  bool isVerifyATN() const { return _verifyATN; }
+    bool isVerifyATN() const { return _verifyATN; }
 
-  void setVerifyATN(bool verify);
+    void setVerifyATN(bool verify);
 
-  bool isGenerateRuleBypassTransitions() const { return _generateRuleBypassTransitions; }
+    bool isGenerateRuleBypassTransitions() const { return _generateRuleBypassTransitions; }
 
-  void setGenerateRuleBypassTransitions(bool generate);
+    void setGenerateRuleBypassTransitions(bool generate);
 
-private:
-  void throwIfReadOnly() const;
+  private:
+    void throwIfReadOnly() const;
 
-  bool _readOnly;
-  bool _verifyATN;
-  bool _generateRuleBypassTransitions;
-};
+    bool _readOnly;
+    bool _verifyATN;
+    bool _generateRuleBypassTransitions;
+  };
 
-} // namespace atn
-} // namespace antlr4
+} // namespace antlr4::atn

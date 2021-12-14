@@ -7,9 +7,7 @@
 
 #include "antlr4-common.h"
 
-namespace antlr4 {
-namespace tree {
-namespace pattern {
+namespace antlr4::tree::pattern {
 
   /// <summary>
   /// A pattern like {@code <ID> = <expr>;} converted to a <seealso cref="ParseTree"/> by
@@ -25,10 +23,11 @@ namespace pattern {
     /// <param name="pattern"> The tree pattern in concrete syntax form. </param>
     /// <param name="patternRuleIndex"> The parser rule which serves as the root of the
     /// tree pattern. </param>
-    /// <param name="patternTree"> The tree pattern in <seealso cref="ParseTree"/> form. </param>
+    /// <param name="patternTree"> The tree pattern in <seealso cref="ParseTree"/> form.
+    /// </param>
     ParseTreePattern(ParseTreePatternMatcher *matcher, const std::string &pattern, int patternRuleIndex,
                      ParseTree *patternTree);
-    ParseTreePattern(ParseTreePattern const&) = default;
+    ParseTreePattern(ParseTreePattern const &) = default;
     virtual ~ParseTreePattern();
 
     /// <summary>
@@ -85,7 +84,7 @@ namespace pattern {
     /// of type <seealso cref="RuleTagToken"/> or <seealso cref="TokenTagToken"/>.
     /// </summary>
     /// <returns> The tree pattern as a <seealso cref="ParseTree"/>. </returns>
-    virtual ParseTree* getPatternTree() const;
+    virtual ParseTree *getPatternTree() const;
 
   private:
     const int patternRuleIndex;
@@ -100,6 +99,4 @@ namespace pattern {
     ParseTreePatternMatcher *const _matcher;
   };
 
-} // namespace pattern
-} // namespace tree
-} // namespace antlr4
+} // namespace antlr4::tree::pattern

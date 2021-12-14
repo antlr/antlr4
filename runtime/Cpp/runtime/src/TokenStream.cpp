@@ -7,5 +7,4 @@
 
 using namespace antlr4;
 
-TokenStream::~TokenStream() {
-}
+TokenStream::~TokenStream() {}

@@ -7,15 +7,12 @@
 
 #include "atn/ATNState.h"
 
-namespace antlr4 {
-namespace atn {
+namespace antlr4::atn {
 
   class ANTLR4CPP_PUBLIC BasicState final : public ATNState {
 
   public:
     virtual size_t getStateType() override;
-
   };
 
-} // namespace atn
-} // namespace antlr4
+} // namespace antlr4::atn

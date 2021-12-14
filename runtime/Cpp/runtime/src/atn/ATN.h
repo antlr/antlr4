@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <mutex>
+
 #include "RuleContext.h"
 
 // GCC generates a warning when forward-declaring ATN if ATN has already been
@@ -13,8 +15,7 @@
 // Add constant that can be checked so forward-declarations can be omitted.
 #define ANTLR4CPP_ATN_DECLARED
 
-namespace antlr4 {
-namespace atn {
+namespace antlr4::atn {
 
   class ANTLR4CPP_PUBLIC ATN {
   public:
@@ -60,8 +61,8 @@ namespace atn {
 
     std::vector<TokensStartState *> modeToStartState;
 
-    ATN& operator = (ATN &other) noexcept;
-    ATN& operator = (ATN &&other) noexcept;
+    ATN &operator=(ATN &other) noexcept;
+    ATN &operator=(ATN &&other) noexcept;
 
     /// <summary>
     /// Compute the set of valid tokens that can occur starting in state {@code s}.
@@ -76,7 +77,7 @@ namespace atn {
     /// staying in same rule. <seealso cref="Token#EPSILON"/> is in set if we reach end of
     /// rule.
     /// </summary>
-    virtual misc::IntervalSet const& nextTokens(ATNState *s) const;
+    virtual misc::IntervalSet const &nextTokens(ATNState *s) const;
 
     virtual void addState(ATNState *state);
 
@@ -114,5 +115,4 @@ namespace atn {
     mutable std::mutex _mutex;
   };
 
-} // namespace atn
-} // namespace antlr4
+} // namespace antlr4::atn

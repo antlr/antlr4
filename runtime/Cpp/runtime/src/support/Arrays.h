@@ -11,7 +11,6 @@ namespace antlrcpp {
 
   class ANTLR4CPP_PUBLIC Arrays {
   public:
-
     static std::string listToString(const std::vector<std::string> &list, const std::string &separator);
 
     template <typename T>
@@ -42,7 +41,7 @@ namespace antlrcpp {
     }
 
     template <typename T>
-    static bool equals(const std::vector<Ref<T>> &a, const std::vector<Ref<T>> &b) {
+    static bool equals(const std::vector<antlr4::Ref<T>> &a, const std::vector<antlr4::Ref<T>> &b) {
       if (a.size() != b.size())
         return false;
 
@@ -76,7 +75,7 @@ namespace antlrcpp {
     }
 
     template <typename T>
-    static std::string toString(const std::vector<Ref<T>> &source) {
+    static std::string toString(const std::vector<antlr4::Ref<T>> &source) {
       std::string result = "[";
       bool firstEntry = true;
       for (auto &value : source) {
@@ -102,9 +101,8 @@ namespace antlrcpp {
       }
       return result + "]";
     }
-
   };
 
   template <>
   std::string Arrays::toString(const std::vector<antlr4::tree::ParseTree *> &source);
-}
+} // namespace antlrcpp

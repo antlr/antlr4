@@ -5,10 +5,10 @@
 
 #pragma once
 
-#include "Recognizer.h"
-#include "TokenSource.h"
 #include "CharStream.h"
+#include "Recognizer.h"
 #include "Token.h"
+#include "TokenSource.h"
 
 namespace antlr4 {
 
@@ -95,19 +95,19 @@ namespace antlr4 {
     virtual void pushMode(size_t m);
     virtual size_t popMode();
 
-    template<typename T1>
-    void setTokenFactory(TokenFactory<T1> *factory)  {
+    template <typename T1>
+    void setTokenFactory(TokenFactory<T1> *factory) {
       this->_factory = factory;
     }
 
-    virtual TokenFactory<CommonToken>* getTokenFactory() override;
+    virtual TokenFactory<CommonToken> *getTokenFactory() override;
 
     /// Set the char stream and reset the lexer
     virtual void setInputStream(IntStream *input) override;
 
     virtual std::string getSourceName() override;
 
-    virtual CharStream* getInputStream() override;
+    virtual CharStream *getInputStream() override;
 
     /// By default does not support multiple emits per nextToken invocation
     /// for efficiency reasons. Subclasses can override this method, nextToken,
@@ -120,9 +120,9 @@ namespace antlr4 {
     /// char buffer start..stop.  If there is a text override in 'text',
     /// use that to set the token's text.  Override this method to emit
     /// custom Token objects or provide a new factory.
-    virtual Token* emit();
+    virtual Token *emit();
 
-    virtual Token* emitEOF();
+    virtual Token *emitEOF();
 
     virtual size_t getLine() const override;
 
@@ -156,9 +156,9 @@ namespace antlr4 {
 
     virtual size_t getChannel();
 
-    virtual const std::vector<std::string>& getChannelNames() const = 0;
+    virtual const std::vector<std::string> &getChannelNames() const = 0;
 
-    virtual const std::vector<std::string>& getModeNames() const = 0;
+    virtual const std::vector<std::string> &getModeNames() const = 0;
 
     /// Return a list of all Token objects in input char stream.
     /// Forces load of all tokens. Does not include EOF token.

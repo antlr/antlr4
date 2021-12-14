@@ -3,8 +3,8 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
-#include "misc/MurmurHash.h"
 #include "Lexer.h"
+#include "misc/MurmurHash.h"
 
 #include "atn/LexerSkipAction.h"
 
@@ -17,20 +17,13 @@ const Ref<LexerSkipAction> LexerSkipAction::getInstance() {
   return instance;
 }
 
-LexerSkipAction::LexerSkipAction() {
-}
+LexerSkipAction::LexerSkipAction() {}
 
-LexerActionType LexerSkipAction::getActionType() const {
-  return LexerActionType::SKIP;
-}
+LexerActionType LexerSkipAction::getActionType() const { return LexerActionType::SKIP; }
 
-bool LexerSkipAction::isPositionDependent() const {
-  return false;
-}
+bool LexerSkipAction::isPositionDependent() const { return false; }
 
-void LexerSkipAction::execute(Lexer *lexer) {
-  lexer->skip();
-}
+void LexerSkipAction::execute(Lexer *lexer) { lexer->skip(); }
 
 size_t LexerSkipAction::hashCode() const {
   size_t hash = MurmurHash::initialize();
@@ -38,10 +31,6 @@ size_t LexerSkipAction::hashCode() const {
   return MurmurHash::finish(hash, 1);
 }
 
-bool LexerSkipAction::operator == (const LexerAction &obj) const {
-  return &obj == this;
-}
+bool LexerSkipAction::operator==(const LexerAction &obj) const { return &obj == this; }
 
-std::string LexerSkipAction::toString() const {
-  return "skip";
-}
+std::string LexerSkipAction::toString() const { return "skip"; }

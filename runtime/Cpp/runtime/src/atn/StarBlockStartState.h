@@ -7,8 +7,7 @@
 
 #include "atn/BlockStartState.h"
 
-namespace antlr4 {
-namespace atn {
+namespace antlr4::atn {
 
   /// The block that begins a closure loop.
   class ANTLR4CPP_PUBLIC StarBlockStartState final : public BlockStartState {
@@ -17,5 +16,4 @@ namespace atn {
     virtual size_t getStateType() override;
   };
 
-} // namespace atn
-} // namespace antlr4
+} // namespace antlr4::atn

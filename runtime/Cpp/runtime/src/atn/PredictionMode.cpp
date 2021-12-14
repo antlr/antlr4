@@ -3,11 +3,11 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
-#include "atn/RuleStopState.h"
-#include "atn/ATNConfigSet.h"
-#include "atn/ATNConfig.h"
-#include "misc/MurmurHash.h"
 #include "SemanticContext.h"
+#include "atn/ATNConfig.h"
+#include "atn/ATNConfigSet.h"
+#include "atn/RuleStopState.h"
+#include "misc/MurmurHash.h"
 
 #include "PredictionMode.h"
 
@@ -15,13 +15,12 @@ using namespace antlr4;
 using namespace antlr4::atn;
 using namespace antlrcpp;
 
-struct AltAndContextConfigHasher
-{
+struct AltAndContextConfigHasher {
   /**
    * The hash code is only a function of the {@link ATNState#stateNumber}
    * and {@link ATNConfig#context}.
    */
-  size_t operator () (ATNConfig *o) const {
+  size_t operator()(ATNConfig *o) const {
     size_t hashCode = misc::MurmurHash::initialize(7);
     hashCode = misc::MurmurHash::update(hashCode, o->state->stateNumber);
     hashCode = misc::MurmurHash::update(hashCode, o->context);
@@ -30,8 +29,7 @@ struct AltAndContextConfigHasher
 };
 
 struct AltAndContextConfigComparer {
-  bool operator()(ATNConfig *a, ATNConfig *b) const
-  {
+  bool operator()(ATNConfig *a, ATNConfig *b) const {
     if (a == b) {
       return true;
     }
@@ -84,7 +82,7 @@ bool PredictionModeClass::hasConfigInRuleStopState(ATNConfigSet *configs) {
 
 bool PredictionModeClass::allConfigsInRuleStopStates(ATNConfigSet *configs) {
   for (auto &config : configs->configs) {
-    if (!is<RuleStopState*>(config->state)) {
+    if (!is<RuleStopState *>(config->state)) {
       return false;
     }
   }
@@ -92,15 +90,15 @@ bool PredictionModeClass::allConfigsInRuleStopStates(ATNConfigSet *configs) {
   return true;
 }
 
-size_t PredictionModeClass::resolvesToJustOneViableAlt(const std::vector<antlrcpp::BitSet>& altsets) {
+size_t PredictionModeClass::resolvesToJustOneViableAlt(const std::vector<antlrcpp::BitSet> &altsets) {
   return getSingleViableAlt(altsets);
 }
 
-bool PredictionModeClass::allSubsetsConflict(const std::vector<antlrcpp::BitSet>& altsets) {
+bool PredictionModeClass::allSubsetsConflict(const std::vector<antlrcpp::BitSet> &altsets) {
   return !hasNonConflictingAltSet(altsets);
 }
 
-bool PredictionModeClass::hasNonConflictingAltSet(const std::vector<antlrcpp::BitSet>& altsets) {
+bool PredictionModeClass::hasNonConflictingAltSet(const std::vector<antlrcpp::BitSet> &altsets) {
   for (antlrcpp::BitSet alts : altsets) {
     if (alts.count() == 1) {
       return true;
@@ -109,7 +107,7 @@ bool PredictionModeClass::hasNonConflictingAltSet(const std::vector<antlrcpp::Bi
   return false;
 }
 
-bool PredictionModeClass::hasConflictingAltSet(const std::vector<antlrcpp::BitSet>& altsets) {
+bool PredictionModeClass::hasConflictingAltSet(const std::vector<antlrcpp::BitSet> &altsets) {
   for (antlrcpp::BitSet alts : altsets) {
     if (alts.count() > 1) {
       return true;
@@ -118,13 +116,13 @@ bool PredictionModeClass::hasConflictingAltSet(const std::vector<antlrcpp::BitSe
   return false;
 }
 
-bool PredictionModeClass::allSubsetsEqual(const std::vector<antlrcpp::BitSet>& altsets) {
+bool PredictionModeClass::allSubsetsEqual(const std::vector<antlrcpp::BitSet> &altsets) {
   if (altsets.empty()) {
     return true;
   }
 
-  const antlrcpp::BitSet& first = *altsets.begin();
-  for (const antlrcpp::BitSet& alts : altsets) {
+  const antlrcpp::BitSet &first = *altsets.begin();
+  for (const antlrcpp::BitSet &alts : altsets) {
     if (alts != first) {
       return false;
     }
@@ -132,7 +130,7 @@ bool PredictionModeClass::allSubsetsEqual(const std::vector<antlrcpp::BitSet>& a
   return true;
 }
 
-size_t PredictionModeClass::getUniqueAlt(const std::vector<antlrcpp::BitSet>& altsets) {
+size_t PredictionModeClass::getUniqueAlt(const std::vector<antlrcpp::BitSet> &altsets) {
   antlrcpp::BitSet all = getAlts(altsets);
   if (all.count() == 1) {
     return all.nextSetBit(0);
@@ -140,7 +138,7 @@ size_t PredictionModeClass::getUniqueAlt(const std::vector<antlrcpp::BitSet>& al
   return ATN::INVALID_ALT_NUMBER;
 }
 
-antlrcpp::BitSet PredictionModeClass::getAlts(const std::vector<antlrcpp::BitSet>& altsets) {
+antlrcpp::BitSet PredictionModeClass::getAlts(const std::vector<antlrcpp::BitSet> &altsets) {
   antlrcpp::BitSet all;
   for (antlrcpp::BitSet alts : altsets) {
     all |= alts;
@@ -158,7 +156,8 @@ antlrcpp::BitSet PredictionModeClass::getAlts(ATNConfigSet *configs) {
 }
 
 std::vector<antlrcpp::BitSet> PredictionModeClass::getConflictingAltSubsets(ATNConfigSet *configs) {
-  std::unordered_map<ATNConfig *, antlrcpp::BitSet, AltAndContextConfigHasher, AltAndContextConfigComparer> configToAlts;
+  std::unordered_map<ATNConfig *, antlrcpp::BitSet, AltAndContextConfigHasher, AltAndContextConfigComparer>
+      configToAlts;
   for (auto &config : configs->configs) {
     configToAlts[config.get()].set(config->alt);
   }
@@ -169,8 +168,8 @@ std::vector<antlrcpp::BitSet> PredictionModeClass::getConflictingAltSubsets(ATNC
   return values;
 }
 
-std::map<ATNState*, antlrcpp::BitSet> PredictionModeClass::getStateToAltMap(ATNConfigSet *configs) {
-  std::map<ATNState*, antlrcpp::BitSet> m;
+std::map<ATNState *, antlrcpp::BitSet> PredictionModeClass::getStateToAltMap(ATNConfigSet *configs) {
+  std::map<ATNState *, antlrcpp::BitSet> m;
   for (auto &c : configs->configs) {
     m[c->state].set(c->alt);
   }
@@ -178,20 +177,21 @@ std::map<ATNState*, antlrcpp::BitSet> PredictionModeClass::getStateToAltMap(ATNC
 }
 
 bool PredictionModeClass::hasStateAssociatedWithOneAlt(ATNConfigSet *configs) {
-  std::map<ATNState*, antlrcpp::BitSet> x = getStateToAltMap(configs);
-  for (std::map<ATNState*, antlrcpp::BitSet>::iterator it = x.begin(); it != x.end(); it++){
-    if (it->second.count() == 1) return true;
+  std::map<ATNState *, antlrcpp::BitSet> x = getStateToAltMap(configs);
+  for (std::map<ATNState *, antlrcpp::BitSet>::iterator it = x.begin(); it != x.end(); it++) {
+    if (it->second.count() == 1)
+      return true;
   }
   return false;
 }
 
-size_t PredictionModeClass::getSingleViableAlt(const std::vector<antlrcpp::BitSet>& altsets) {
+size_t PredictionModeClass::getSingleViableAlt(const std::vector<antlrcpp::BitSet> &altsets) {
   antlrcpp::BitSet viableAlts;
   for (antlrcpp::BitSet alts : altsets) {
     size_t minAlt = alts.nextSetBit(0);
 
     viableAlts.set(minAlt);
-    if (viableAlts.count() > 1)  // more than 1 viable alt
+    if (viableAlts.count() > 1) // more than 1 viable alt
     {
       return ATN::INVALID_ALT_NUMBER;
     }

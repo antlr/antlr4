@@ -7,8 +7,7 @@
 
 #include "atn/DecisionInfo.h"
 
-namespace antlr4 {
-namespace atn {
+namespace antlr4::atn {
 
   class ProfilingATNSimulator;
 
@@ -17,10 +16,10 @@ namespace atn {
   class ANTLR4CPP_PUBLIC ParseInfo {
   public:
     ParseInfo(ProfilingATNSimulator *atnSimulator);
-    ParseInfo(ParseInfo const&) = default;
+    ParseInfo(ParseInfo const &) = default;
     virtual ~ParseInfo();
 
-    ParseInfo& operator=(ParseInfo const&) = default;
+    ParseInfo &operator=(ParseInfo const &) = default;
 
     /// <summary>
     /// Gets an array of <seealso cref="DecisionInfo"/> instances containing the profiling
@@ -98,5 +97,4 @@ namespace atn {
     const ProfilingATNSimulator *_atnSimulator; // non-owning, we are created by this simulator.
   };
 
-} // namespace atn
-} // namespace antlr4
+} // namespace antlr4::atn

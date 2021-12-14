@@ -7,8 +7,7 @@
 
 #include "antlr4-common.h"
 
-namespace antlr4 {
-namespace tree {
+namespace antlr4::tree {
 
   /// <summary>
   /// Associate a property with a parse tree node. Useful with parse tree listeners
@@ -26,16 +25,12 @@ namespace tree {
   /// You would make one decl (values here) in the listener and use lots of times
   /// in your event methods.
   /// </summary>
-  template<typename V>
+  template <typename V>
   class ANTLR4CPP_PUBLIC ParseTreeProperty {
   public:
     virtual ~ParseTreeProperty() {}
-    virtual V get(ParseTree *node) {
-      return _annotations[node];
-    }
-    virtual void put(ParseTree *node, V value) {
-      _annotations[node] = value;
-    }
+    virtual V get(ParseTree *node) { return _annotations[node]; }
+    virtual void put(ParseTree *node, V value) { _annotations[node] = value; }
     virtual V removeFrom(ParseTree *node) {
       auto value = _annotations[node];
       _annotations.erase(node);
@@ -43,8 +38,7 @@ namespace tree {
     }
 
   protected:
-    std::map<ParseTree*, V> _annotations;
+    std::map<ParseTree *, V> _annotations;
   };
 
-} // namespace tree
-} // namespace antlr4
+} // namespace antlr4::tree

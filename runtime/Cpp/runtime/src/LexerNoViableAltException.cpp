@@ -3,10 +3,10 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
-#include "misc/Interval.h"
-#include "support/CPPUtils.h"
 #include "CharStream.h"
 #include "Lexer.h"
+#include "misc/Interval.h"
+#include "support/CPPUtils.h"
 
 #include "LexerNoViableAltException.h"
 
@@ -14,16 +14,11 @@ using namespace antlr4;
 
 LexerNoViableAltException::LexerNoViableAltException(Lexer *lexer, CharStream *input, size_t startIndex,
                                                      atn::ATNConfigSet *deadEndConfigs)
-  : RecognitionException(lexer, input, nullptr, nullptr), _startIndex(startIndex), _deadEndConfigs(deadEndConfigs) {
-}
+    : RecognitionException(lexer, input, nullptr, nullptr), _startIndex(startIndex), _deadEndConfigs(deadEndConfigs) {}
 
-size_t LexerNoViableAltException::getStartIndex() {
-  return _startIndex;
-}
+size_t LexerNoViableAltException::getStartIndex() { return _startIndex; }
 
-atn::ATNConfigSet* LexerNoViableAltException::getDeadEndConfigs() {
-  return _deadEndConfigs;
-}
+atn::ATNConfigSet *LexerNoViableAltException::getDeadEndConfigs() { return _deadEndConfigs; }
 
 std::string LexerNoViableAltException::toString() {
   std::string symbol;

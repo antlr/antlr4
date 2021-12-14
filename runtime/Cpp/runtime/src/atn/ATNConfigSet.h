@@ -5,20 +5,20 @@
 
 #pragma once
 
-#include "support/BitSet.h"
 #include "atn/PredictionContext.h"
+#include "support/BitSet.h"
 
-namespace antlr4 {
-namespace atn {
+namespace antlr4::atn {
 
-  /// Specialized set that can track info about the set, with support for combining similar configurations using a
-  /// graph-structured stack.
+  /// Specialized set that can track info about the set, with support for combining similar
+  /// configurations using a graph-structured stack.
   class ANTLR4CPP_PUBLIC ATNConfigSet {
   public:
     /// Track the elements as they are added to the set; supports get(i)
     std::vector<Ref<ATNConfig>> configs;
 
-    // TODO: these fields make me pretty uncomfortable but nice to pack up info together, saves recomputation
+    // TODO: these fields make me pretty uncomfortable but nice to pack up info together, saves
+    // recomputation
     // TODO: can we track conflicts as they are added to save scanning configs later?
     size_t uniqueAlt;
 
@@ -77,7 +77,7 @@ namespace atn {
 
     bool addAll(const Ref<ATNConfigSet> &other);
 
-    bool operator == (const ATNConfigSet &other);
+    bool operator==(const ATNConfigSet &other);
     virtual size_t hashCode();
     virtual size_t size();
     virtual bool isEmpty();
@@ -106,5 +106,4 @@ namespace atn {
     void InitializeInstanceFields();
   };
 
-} // namespace atn
-} // namespace antlr4
+} // namespace antlr4::atn

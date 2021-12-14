@@ -10,6 +10,6 @@
 using namespace antlr4;
 using namespace antlr4::atn;
 
-ErrorInfo::ErrorInfo(size_t decision, ATNConfigSet *configs, TokenStream *input, size_t startIndex, size_t stopIndex, bool fullCtx)
-  : DecisionEventInfo(decision, configs, input, startIndex, stopIndex, fullCtx) {
-}
+ErrorInfo::ErrorInfo(size_t decision, ATNConfigSet *configs, TokenStream *input, size_t startIndex, size_t stopIndex,
+                     bool fullCtx)
+    : DecisionEventInfo(decision, configs, input, startIndex, stopIndex, fullCtx) {}

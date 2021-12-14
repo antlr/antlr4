@@ -3,9 +3,8 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
-#include "support/StringUtils.h"
-
 #include "ANTLRFileStream.h"
+#include "support/StringUtils.h"
 
 using namespace antlr4;
 
@@ -24,6 +23,4 @@ void ANTLRFileStream::loadFromFile(const std::string &fileName) {
   ANTLRInputStream::load(stream);
 }
 
-std::string ANTLRFileStream::getSourceName() const {
-  return _fileName;
-}
+std::string ANTLRFileStream::getSourceName() const { return _fileName; }

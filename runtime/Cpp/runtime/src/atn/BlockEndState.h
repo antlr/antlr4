@@ -7,8 +7,7 @@
 
 #include "atn/ATNState.h"
 
-namespace antlr4 {
-namespace atn {
+namespace antlr4::atn {
 
   /// Terminal node of a simple {@code (a|b|c)} block.
   class ANTLR4CPP_PUBLIC BlockEndState final : public ATNState {
@@ -20,5 +19,4 @@ namespace atn {
     virtual size_t getStateType() override;
   };
 
-} // namespace atn
-} // namespace antlr4
+} // namespace antlr4::atn

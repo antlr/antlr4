@@ -3,31 +3,31 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
-#include "misc/IntervalSet.h"
-#include "atn/ATNType.h"
 #include "atn/ATNState.h"
+#include "atn/ATNType.h"
 #include "atn/BlockEndState.h"
+#include "misc/IntervalSet.h"
 
-#include "atn/DecisionState.h"
-#include "atn/RuleStartState.h"
-#include "atn/LoopEndState.h"
-#include "atn/BlockStartState.h"
-#include "atn/Transition.h"
-#include "atn/SetTransition.h"
 #include "Token.h"
-#include "misc/Interval.h"
 #include "atn/ATN.h"
+#include "atn/BlockStartState.h"
+#include "atn/DecisionState.h"
+#include "atn/LoopEndState.h"
+#include "atn/RuleStartState.h"
+#include "atn/SetTransition.h"
+#include "atn/Transition.h"
+#include "misc/Interval.h"
 
-#include "atn/RuleTransition.h"
+#include "atn/ATNDeserializer.h"
+#include "atn/ActionTransition.h"
+#include "atn/AtomTransition.h"
 #include "atn/PrecedencePredicateTransition.h"
 #include "atn/PredicateTransition.h"
 #include "atn/RangeTransition.h"
-#include "atn/AtomTransition.h"
-#include "atn/ActionTransition.h"
-#include "atn/ATNDeserializer.h"
+#include "atn/RuleTransition.h"
 
-#include "atn/TokensStartState.h"
 #include "Exceptions.h"
+#include "atn/TokensStartState.h"
 #include "support/CPPUtils.h"
 
 #include "atn/LexerChannelAction.h"
@@ -50,7 +50,7 @@ ATNSerializer::ATNSerializer(ATN *atn, const std::vector<std::string> &tokenName
   _tokenNames = tokenNames;
 }
 
-ATNSerializer::~ATNSerializer() { }
+ATNSerializer::~ATNSerializer() {}
 
 std::vector<size_t> ATNSerializer::serialize() {
   std::vector<size_t> data;
@@ -70,7 +70,7 @@ std::vector<size_t> ATNSerializer::serialize() {
   std::vector<size_t> precedenceStates;
   data.push_back(atn->states.size());
   for (ATNState *s : atn->states) {
-    if (s == nullptr) {  // might be optimized away
+    if (s == nullptr) { // might be optimized away
       data.push_back(ATNState::ATN_INVALID_TYPE);
       continue;
     }
@@ -88,15 +88,13 @@ std::vector<size_t> ATNSerializer::serialize() {
 
     if (s->ruleIndex == INVALID_INDEX) {
       data.push_back(0xFFFF);
-    }
-    else {
+    } else {
       data.push_back(s->ruleIndex);
     }
 
     if (s->getStateType() == ATNState::LOOP_END) {
       data.push_back((static_cast<LoopEndState *>(s))->loopBackState->stateNumber);
-    }
-    else if (is<BlockStartState *>(s)) {
+    } else if (is<BlockStartState *>(s)) {
       data.push_back((static_cast<BlockStartState *>(s))->endState->stateNumber);
     }
 
@@ -113,7 +111,7 @@ std::vector<size_t> ATNSerializer::serialize() {
         SetTransition *st = static_cast<SetTransition *>(t);
         if (setIndices.find(st->set) == setIndices.end()) {
           sets.push_back(st->set);
-          setIndices.insert({ st->set, (int)sets.size() - 1 });
+          setIndices.insert({st->set, (int)sets.size() - 1});
         }
       }
     }
@@ -139,8 +137,7 @@ std::vector<size_t> ATNSerializer::serialize() {
     if (atn->grammarType == ATNType::LEXER) {
       if (atn->ruleToTokenType[r] == Token::EOF) {
         data.push_back(0xFFFF);
-      }
-      else {
+      } else {
         data.push_back(atn->ruleToTokenType[r]);
       }
     }
@@ -160,8 +157,7 @@ std::vector<size_t> ATNSerializer::serialize() {
     bool containsEof = set.contains(Token::EOF);
     if (containsEof && set.getIntervals().at(0).b == -1) {
       data.push_back(set.getIntervals().size() - 1);
-    }
-    else {
+    } else {
       data.push_back(set.getIntervals().size());
     }
 
@@ -173,8 +169,7 @@ std::vector<size_t> ATNSerializer::serialize() {
         } else {
           data.push_back(0);
         }
-      }
-      else {
+      } else {
         data.push_back(interval.a);
       }
 
@@ -207,66 +202,59 @@ std::vector<size_t> ATNSerializer::serialize() {
       size_t arg2 = 0;
       size_t arg3 = 0;
       switch (edgeType) {
-        case Transition::RULE:
-          trg = (static_cast<RuleTransition *>(t))->followState->stateNumber;
-          arg1 = (static_cast<RuleTransition *>(t))->target->stateNumber;
-          arg2 = (static_cast<RuleTransition *>(t))->ruleIndex;
-          arg3 = (static_cast<RuleTransition *>(t))->precedence;
-          break;
-        case Transition::PRECEDENCE:
-        {
-          PrecedencePredicateTransition *ppt =
-          static_cast<PrecedencePredicateTransition *>(t);
-          arg1 = ppt->precedence;
+      case Transition::RULE:
+        trg = (static_cast<RuleTransition *>(t))->followState->stateNumber;
+        arg1 = (static_cast<RuleTransition *>(t))->target->stateNumber;
+        arg2 = (static_cast<RuleTransition *>(t))->ruleIndex;
+        arg3 = (static_cast<RuleTransition *>(t))->precedence;
+        break;
+      case Transition::PRECEDENCE: {
+        PrecedencePredicateTransition *ppt = static_cast<PrecedencePredicateTransition *>(t);
+        arg1 = ppt->precedence;
+      } break;
+      case Transition::PREDICATE: {
+        PredicateTransition *pt = static_cast<PredicateTransition *>(t);
+        arg1 = pt->ruleIndex;
+        arg2 = pt->predIndex;
+        arg3 = pt->isCtxDependent ? 1 : 0;
+      } break;
+      case Transition::RANGE:
+        arg1 = (static_cast<RangeTransition *>(t))->from;
+        arg2 = (static_cast<RangeTransition *>(t))->to;
+        if (arg1 == Token::EOF) {
+          arg1 = 0;
+          arg3 = 1;
         }
-          break;
-        case Transition::PREDICATE:
-        {
-          PredicateTransition *pt = static_cast<PredicateTransition *>(t);
-          arg1 = pt->ruleIndex;
-          arg2 = pt->predIndex;
-          arg3 = pt->isCtxDependent ? 1 : 0;
+
+        break;
+      case Transition::ATOM:
+        arg1 = (static_cast<AtomTransition *>(t))->_label;
+        if (arg1 == Token::EOF) {
+          arg1 = 0;
+          arg3 = 1;
         }
-          break;
-        case Transition::RANGE:
-          arg1 = (static_cast<RangeTransition *>(t))->from;
-          arg2 = (static_cast<RangeTransition *>(t))->to;
-          if (arg1 == Token::EOF) {
-            arg1 = 0;
-            arg3 = 1;
-          }
 
-          break;
-        case Transition::ATOM:
-          arg1 = (static_cast<AtomTransition *>(t))->_label;
-          if (arg1 == Token::EOF) {
-            arg1 = 0;
-            arg3 = 1;
-          }
-
-          break;
-        case Transition::ACTION:
-        {
-          ActionTransition *at = static_cast<ActionTransition *>(t);
-          arg1 = at->ruleIndex;
-          arg2 = at->actionIndex;
-          if (arg2 == INVALID_INDEX) {
-            arg2 = 0xFFFF;
-          }
-
-          arg3 = at->isCtxDependent ? 1 : 0;
+        break;
+      case Transition::ACTION: {
+        ActionTransition *at = static_cast<ActionTransition *>(t);
+        arg1 = at->ruleIndex;
+        arg2 = at->actionIndex;
+        if (arg2 == INVALID_INDEX) {
+          arg2 = 0xFFFF;
         }
-          break;
-        case Transition::SET:
-          arg1 = setIndices[(static_cast<SetTransition *>(t))->set];
-          break;
 
-        case Transition::NOT_SET:
-          arg1 = setIndices[(static_cast<SetTransition *>(t))->set];
-          break;
+        arg3 = at->isCtxDependent ? 1 : 0;
+      } break;
+      case Transition::SET:
+        arg1 = setIndices[(static_cast<SetTransition *>(t))->set];
+        break;
 
-        default:
-          break;
+      case Transition::NOT_SET:
+        arg1 = setIndices[(static_cast<SetTransition *>(t))->set];
+        break;
+
+      default:
+        break;
       }
 
       data.push_back(src);
@@ -290,66 +278,60 @@ std::vector<size_t> ATNSerializer::serialize() {
     for (const auto &action : atn->lexerActions) {
       data.push_back(static_cast<size_t>(action->getActionType()));
       switch (action->getActionType()) {
-        case LexerActionType::CHANNEL:
-        {
-          int channel = std::dynamic_pointer_cast<LexerChannelAction>(action)->getChannel();
-          data.push_back(channel != -1 ? channel : 0xFFFF);
-          data.push_back(0);
-          break;
-        }
+      case LexerActionType::CHANNEL: {
+        int channel = std::dynamic_pointer_cast<LexerChannelAction>(action)->getChannel();
+        data.push_back(channel != -1 ? channel : 0xFFFF);
+        data.push_back(0);
+        break;
+      }
 
-        case LexerActionType::CUSTOM:
-        {
-          size_t ruleIndex = std::dynamic_pointer_cast<LexerCustomAction>(action)->getRuleIndex();
-          size_t actionIndex = std::dynamic_pointer_cast<LexerCustomAction>(action)->getActionIndex();
-          data.push_back(ruleIndex != INVALID_INDEX ? ruleIndex : 0xFFFF);
-          data.push_back(actionIndex != INVALID_INDEX ? actionIndex : 0xFFFF);
-          break;
-        }
+      case LexerActionType::CUSTOM: {
+        size_t ruleIndex = std::dynamic_pointer_cast<LexerCustomAction>(action)->getRuleIndex();
+        size_t actionIndex = std::dynamic_pointer_cast<LexerCustomAction>(action)->getActionIndex();
+        data.push_back(ruleIndex != INVALID_INDEX ? ruleIndex : 0xFFFF);
+        data.push_back(actionIndex != INVALID_INDEX ? actionIndex : 0xFFFF);
+        break;
+      }
 
-        case LexerActionType::MODE:
-        {
-          int mode = std::dynamic_pointer_cast<LexerModeAction>(action)->getMode();
-          data.push_back(mode != -1 ? mode : 0xFFFF);
-          data.push_back(0);
-          break;
-        }
+      case LexerActionType::MODE: {
+        int mode = std::dynamic_pointer_cast<LexerModeAction>(action)->getMode();
+        data.push_back(mode != -1 ? mode : 0xFFFF);
+        data.push_back(0);
+        break;
+      }
 
-        case LexerActionType::MORE:
-          data.push_back(0);
-          data.push_back(0);
-          break;
+      case LexerActionType::MORE:
+        data.push_back(0);
+        data.push_back(0);
+        break;
 
-        case LexerActionType::POP_MODE:
-          data.push_back(0);
-          data.push_back(0);
-          break;
+      case LexerActionType::POP_MODE:
+        data.push_back(0);
+        data.push_back(0);
+        break;
 
-        case LexerActionType::PUSH_MODE:
-        {
-          int mode = std::dynamic_pointer_cast<LexerPushModeAction>(action)->getMode();
-          data.push_back(mode != -1 ? mode : 0xFFFF);
-          data.push_back(0);
-          break;
-        }
+      case LexerActionType::PUSH_MODE: {
+        int mode = std::dynamic_pointer_cast<LexerPushModeAction>(action)->getMode();
+        data.push_back(mode != -1 ? mode : 0xFFFF);
+        data.push_back(0);
+        break;
+      }
 
-        case LexerActionType::SKIP:
-          data.push_back(0);
-          data.push_back(0);
-          break;
+      case LexerActionType::SKIP:
+        data.push_back(0);
+        data.push_back(0);
+        break;
 
-        case LexerActionType::TYPE:
-        {
-          int type = std::dynamic_pointer_cast<LexerTypeAction>(action)->getType();
-          data.push_back(type != -1 ? type : 0xFFFF);
-          data.push_back(0);
-          break;
-        }
+      case LexerActionType::TYPE: {
+        int type = std::dynamic_pointer_cast<LexerTypeAction>(action)->getType();
+        data.push_back(type != -1 ? type : 0xFFFF);
+        data.push_back(0);
+        break;
+      }
 
-        default:
-          throw IllegalArgumentException("The specified lexer action type " +
-                                         std::to_string(static_cast<size_t>(action->getActionType())) +
-                                         " is not valid.");
+      default:
+        throw IllegalArgumentException("The specified lexer action type " +
+                                       std::to_string(static_cast<size_t>(action->getActionType())) + " is not valid.");
       }
     }
   }
@@ -386,7 +368,7 @@ std::string ATNSerializer::decode(const std::wstring &inpdata) {
   size_t version = data[p++];
   if (version != ATNDeserializer::SERIALIZED_VERSION) {
     std::string reason = "Could not deserialize ATN with version " + std::to_string(version) + "(expected " +
-    std::to_string(ATNDeserializer::SERIALIZED_VERSION) + ").";
+                         std::to_string(ATNDeserializer::SERIALIZED_VERSION) + ").";
     throw UnsupportedOperationException("ATN Serializer" + reason);
   }
 
@@ -394,17 +376,17 @@ std::string ATNSerializer::decode(const std::wstring &inpdata) {
   p += 8;
   if (uuid != ATNDeserializer::SERIALIZED_UUID()) {
     std::string reason = "Could not deserialize ATN with UUID " + uuid.toString() + " (expected " +
-    ATNDeserializer::SERIALIZED_UUID().toString() + ").";
+                         ATNDeserializer::SERIALIZED_UUID().toString() + ").";
     throw UnsupportedOperationException("ATN Serializer" + reason);
   }
 
-  p++;  // skip grammarType
+  p++; // skip grammarType
   size_t maxType = data[p++];
   buf.append("max type ").append(std::to_string(maxType)).append("\n");
   size_t nstates = data[p++];
   for (size_t i = 0; i < nstates; i++) {
     size_t stype = data[p++];
-    if (stype == ATNState::ATN_INVALID_TYPE) {  // ignore bad type of states
+    if (stype == ATNState::ATN_INVALID_TYPE) { // ignore bad type of states
       continue;
     }
     size_t ruleIndex = data[p++];
@@ -416,20 +398,18 @@ std::string ATNSerializer::decode(const std::wstring &inpdata) {
     if (stype == ATNState::LOOP_END) {
       int loopBackStateNumber = data[p++];
       arg = std::string(" ") + std::to_string(loopBackStateNumber);
-    }
-    else if (stype == ATNState::PLUS_BLOCK_START ||
-             stype == ATNState::STAR_BLOCK_START ||
-             stype == ATNState::BLOCK_START) {
+    } else if (stype == ATNState::PLUS_BLOCK_START || stype == ATNState::STAR_BLOCK_START ||
+               stype == ATNState::BLOCK_START) {
       int endStateNumber = data[p++];
       arg = std::string(" ") + std::to_string(endStateNumber);
     }
     buf.append(std::to_string(i))
-    .append(":")
-    .append(ATNState::serializationNames[stype])
-    .append(" ")
-    .append(std::to_string(ruleIndex))
-    .append(arg)
-    .append("\n");
+        .append(":")
+        .append(ATNState::serializationNames[stype])
+        .append(" ")
+        .append(std::to_string(ruleIndex))
+        .append(arg)
+        .append("\n");
   }
   size_t numNonGreedyStates = data[p++];
   p += numNonGreedyStates; // Instead of that useless loop below.
@@ -453,29 +433,20 @@ std::string ATNSerializer::decode(const std::wstring &inpdata) {
     if (atn->grammarType == ATNType::LEXER) {
       size_t arg1 = data[p++];
       buf.append("rule ")
-      .append(std::to_string(i))
-      .append(":")
-      .append(std::to_string(s))
-      .append(" ")
-      .append(std::to_string(arg1))
-      .append("\n");
-    }
-    else {
-      buf.append("rule ")
-      .append(std::to_string(i))
-      .append(":")
-      .append(std::to_string(s))
-      .append("\n");
+          .append(std::to_string(i))
+          .append(":")
+          .append(std::to_string(s))
+          .append(" ")
+          .append(std::to_string(arg1))
+          .append("\n");
+    } else {
+      buf.append("rule ").append(std::to_string(i)).append(":").append(std::to_string(s)).append("\n");
     }
   }
   size_t nmodes = data[p++];
   for (size_t i = 0; i < nmodes; i++) {
     size_t s = data[p++];
-    buf.append("mode ")
-    .append(std::to_string(i))
-    .append(":")
-    .append(std::to_string(s))
-    .append("\n");
+    buf.append("mode ").append(std::to_string(i)).append(":").append(std::to_string(s)).append("\n");
   }
   size_t nsets = data[p++];
   for (size_t i = 0; i < nsets; i++) {
@@ -491,9 +462,7 @@ std::string ATNSerializer::decode(const std::wstring &inpdata) {
         buf.append(", ");
       }
 
-      buf.append(getTokenName(data[p]))
-      .append("..")
-      .append(getTokenName(data[p + 1]));
+      buf.append(getTokenName(data[p])).append("..").append(getTokenName(data[p + 1]));
       p += 2;
     }
     buf.append("\n");
@@ -507,17 +476,17 @@ std::string ATNSerializer::decode(const std::wstring &inpdata) {
     size_t arg2 = data[p + 4];
     size_t arg3 = data[p + 5];
     buf.append(std::to_string(src))
-    .append("->")
-    .append(std::to_string(trg))
-    .append(" ")
-    .append(Transition::serializationNames[ttype])
-    .append(" ")
-    .append(std::to_string(arg1))
-    .append(",")
-    .append(std::to_string(arg2))
-    .append(",")
-    .append(std::to_string(arg3))
-    .append("\n");
+        .append("->")
+        .append(std::to_string(trg))
+        .append(" ")
+        .append(Transition::serializationNames[ttype])
+        .append(" ")
+        .append(std::to_string(arg1))
+        .append(",")
+        .append(std::to_string(arg2))
+        .append(",")
+        .append(std::to_string(arg3))
+        .append("\n");
     p += 6;
   }
   size_t ndecisions = data[p++];
@@ -527,9 +496,9 @@ std::string ATNSerializer::decode(const std::wstring &inpdata) {
   }
 
   if (atn->grammarType == ATNType::LEXER) {
-    //int lexerActionCount = data[p++];
+    // int lexerActionCount = data[p++];
 
-    //p += lexerActionCount * 3; // Instead of useless loop below.
+    // p += lexerActionCount * 3; // Instead of useless loop below.
     /*
     for (int i = 0; i < lexerActionCount; i++) {
       LexerActionType actionType = (LexerActionType)data[p++];
@@ -549,31 +518,31 @@ std::string ATNSerializer::getTokenName(size_t t) {
 
   if (atn->grammarType == ATNType::LEXER && t <= 0x10FFFF) {
     switch (t) {
-      case '\n':
-        return "'\\n'";
-      case '\r':
-        return "'\\r'";
-      case '\t':
-        return "'\\t'";
-      case '\b':
-        return "'\\b'";
-      case '\f':
-        return "'\\f'";
-      case '\\':
-        return "'\\\\'";
-      case '\'':
-        return "'\\''";
-      default:
-        std::string s_hex = antlrcpp::toHexString((int)t);
-        if (s_hex >= "0" && s_hex <= "7F" && !iscntrl((int)t)) {
-          return "'" + std::to_string(t) + "'";
-        }
+    case '\n':
+      return "'\\n'";
+    case '\r':
+      return "'\\r'";
+    case '\t':
+      return "'\\t'";
+    case '\b':
+      return "'\\b'";
+    case '\f':
+      return "'\\f'";
+    case '\\':
+      return "'\\\\'";
+    case '\'':
+      return "'\\''";
+    default:
+      std::string s_hex = antlrcpp::toHexString((int)t);
+      if (s_hex >= "0" && s_hex <= "7F" && !iscntrl((int)t)) {
+        return "'" + std::to_string(t) + "'";
+      }
 
-        // turn on the bit above max "\u10FFFF" value so that we pad with zeros
-        // then only take last 6 digits
-        std::string hex = antlrcpp::toHexString((int)t | 0x1000000).substr(1, 6);
-        std::string unicodeStr = std::string("'\\u") + hex + std::string("'");
-        return unicodeStr;
+      // turn on the bit above max "\u10FFFF" value so that we pad with zeros
+      // then only take last 6 digits
+      std::string hex = antlrcpp::toHexString((int)t | 0x1000000).substr(1, 6);
+      std::string unicodeStr = std::string("'\\u") + hex + std::string("'");
+      return unicodeStr;
     }
   }
 
@@ -593,9 +562,7 @@ std::wstring ATNSerializer::getSerializedAsString(ATN *atn) {
   return result;
 }
 
-std::vector<size_t> ATNSerializer::getSerialized(ATN *atn) {
-  return ATNSerializer(atn).serialize();
-}
+std::vector<size_t> ATNSerializer::getSerialized(ATN *atn) { return ATNSerializer(atn).serialize(); }
 
 std::string ATNSerializer::getDecoded(ATN *atn, std::vector<std::string> &tokenNames) {
   std::wstring serialized = getSerializedAsString(atn);
@@ -605,17 +572,16 @@ std::string ATNSerializer::getDecoded(ATN *atn, std::vector<std::string> &tokenN
 void ATNSerializer::serializeUUID(std::vector<size_t> &data, antlrcpp::Guid uuid) {
   unsigned int twoBytes = 0;
   bool firstByte = true;
-  for(antlrcpp::Guid::const_reverse_iterator rit = uuid.rbegin(); rit != uuid.rend(); ++rit )
-  {
-     if (firstByte) {
-       twoBytes = *rit;
-       firstByte = false;
-     } else {
-       twoBytes |= (*rit << 8);
-       data.push_back(twoBytes);
-       firstByte = true;
-     }
+  for (antlrcpp::Guid::const_reverse_iterator rit = uuid.rbegin(); rit != uuid.rend(); ++rit) {
+    if (firstByte) {
+      twoBytes = *rit;
+      firstByte = false;
+    } else {
+      twoBytes |= (*rit << 8);
+      data.push_back(twoBytes);
+      firstByte = true;
+    }
   }
   if (!firstByte)
-     throw IllegalArgumentException( "The UUID provided is not valid (odd number of bytes)." );
+    throw IllegalArgumentException("The UUID provided is not valid (odd number of bytes).");
 }

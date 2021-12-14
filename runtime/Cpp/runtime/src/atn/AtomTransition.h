@@ -7,8 +7,7 @@
 
 #include "atn/Transition.h"
 
-namespace antlr4 {
-namespace atn {
+namespace antlr4::atn {
 
   /// TODO: make all transitions sets? no, should remove set edges.
   class ANTLR4CPP_PUBLIC AtomTransition final : public Transition {
@@ -26,5 +25,4 @@ namespace atn {
     virtual std::string toString() const override;
   };
 
-} // namespace atn
-} // namespace antlr4
+} // namespace antlr4::atn

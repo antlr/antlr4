@@ -7,6 +7,4 @@
 
 using namespace antlr4::atn;
 
-size_t BasicState::getStateType() {
-  return BASIC;
-}
+size_t BasicState::getStateType() { return BASIC; }

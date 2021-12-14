@@ -7,13 +7,11 @@
 
 #include "tree/TerminalNode.h"
 
-namespace antlr4 {
-namespace tree {
+namespace antlr4::tree {
 
   class ANTLR4CPP_PUBLIC ErrorNode : public virtual TerminalNode {
   public:
     ~ErrorNode() override;
   };
 
-} // namespace tree
-} // namespace antlr4
+} // namespace antlr4::tree

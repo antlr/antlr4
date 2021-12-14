@@ -4,9 +4,9 @@
  */
 
 #include "Exceptions.h"
-#include "ParserRuleContext.h"
 #include "InputMismatchException.h"
 #include "Parser.h"
+#include "ParserRuleContext.h"
 
 #include "BailErrorStrategy.h"
 
@@ -33,7 +33,7 @@ void BailErrorStrategy::recover(Parser *recognizer, std::exception_ptr e) {
   }
 }
 
-Token* BailErrorStrategy::recoverInline(Parser *recognizer)  {
+Token *BailErrorStrategy::recoverInline(Parser *recognizer) {
   InputMismatchException e(recognizer);
   std::exception_ptr exception = std::make_exception_ptr(e);
 
@@ -57,5 +57,4 @@ Token* BailErrorStrategy::recoverInline(Parser *recognizer)  {
   }
 }
 
-void BailErrorStrategy::sync(Parser * /*recognizer*/) {
-}
+void BailErrorStrategy::sync(Parser * /*recognizer*/) {}

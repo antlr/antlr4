@@ -5,11 +5,10 @@
 
 #pragma once
 
-#include "misc/Interval.h"
 #include "Exceptions.h"
+#include "misc/Interval.h"
 
-namespace antlr4 {
-namespace misc {
+namespace antlr4::misc {
 
   /**
    * This class implements the {@link IntSet} backed by a sorted array of
@@ -32,22 +31,22 @@ namespace misc {
     /// The list of sorted, disjoint intervals.
     std::vector<Interval> _intervals;
 
-    explicit IntervalSet(std::vector<Interval>&& intervals);
+    explicit IntervalSet(std::vector<Interval> &&intervals);
 
   public:
     IntervalSet();
-    IntervalSet(IntervalSet const& set);
-    IntervalSet(IntervalSet&& set);
+    IntervalSet(IntervalSet const &set);
+    IntervalSet(IntervalSet &&set);
 
-    template<typename T1, typename... T_NEXT>
-    IntervalSet(int, T1 t1, T_NEXT&&... next) : IntervalSet() {
+    template <typename T1, typename... T_NEXT>
+    IntervalSet(int, T1 t1, T_NEXT &&...next) : IntervalSet() {
       // The first int argument is an ignored count for compatibility
       // with the previous varargs based interface.
       addItems(t1, std::forward<T_NEXT>(next)...);
     }
 
-    IntervalSet& operator=(IntervalSet const& set);
-    IntervalSet& operator=(IntervalSet&& set);
+    IntervalSet &operator=(IntervalSet const &set);
+    IntervalSet &operator=(IntervalSet &&set);
 
     /// Create a set with a single element, el.
     static IntervalSet of(ssize_t a);
@@ -74,10 +73,10 @@ namespace misc {
 
     // Copy on write so we can cache a..a intervals and sets of that.
     void add(const Interval &addition);
-    IntervalSet& addAll(const IntervalSet &set);
+    IntervalSet &addAll(const IntervalSet &set);
 
-    template<typename T1, typename... T_NEXT>
-    void addItems(T1 t1, T_NEXT&&... next) {
+    template <typename T1, typename... T_NEXT>
+    void addItems(T1 t1, T_NEXT &&...next) {
       add(t1);
       addItems(std::forward<T_NEXT>(next)...);
     }
@@ -140,14 +139,14 @@ namespace misc {
 
     /// <summary>
     /// Return a list of Interval objects. </summary>
-    std::vector<Interval> const& getIntervals() const;
+    std::vector<Interval> const &getIntervals() const;
 
     size_t hashCode() const;
 
     /// Are two IntervalSets equal?  Because all intervals are sorted
     ///  and disjoint, equals is a simple linear walk over both lists
     ///  to make sure they are the same.
-    bool operator == (const IntervalSet &other) const;
+    bool operator==(const IntervalSet &other) const;
     std::string toString() const;
     std::string toString(bool elemAreChar) const;
 
@@ -169,22 +168,17 @@ namespace misc {
     void remove(ssize_t el);
 
   private:
-    void addItems() { /* No-op */ }
+    void addItems() { /* No-op */
+    }
   };
 
-} // namespace atn
-} // namespace antlr4
+} // namespace antlr4::misc
 
 // Hash function for IntervalSet.
 
 namespace std {
-  using antlr4::misc::IntervalSet;
-
-  template <> struct hash<IntervalSet>
-  {
-    size_t operator() (const IntervalSet &x) const
-    {
-      return x.hashCode();
-    }
+  template <>
+  struct hash<antlr4::misc::IntervalSet> {
+    size_t operator()(const antlr4::misc::IntervalSet &x) const { return x.hashCode(); }
   };
-}
+} // namespace std

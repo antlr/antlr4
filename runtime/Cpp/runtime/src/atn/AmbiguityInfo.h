@@ -8,8 +8,7 @@
 #include "atn/DecisionEventInfo.h"
 #include "support/BitSet.h"
 
-namespace antlr4 {
-namespace atn {
+namespace antlr4::atn {
 
   /// <summary>
   /// This class represents profiling event information for an ambiguity.
@@ -51,7 +50,8 @@ namespace atn {
     /// <param name="decision"> The decision number </param>
     /// <param name="configs"> The final configuration set identifying the ambiguous
     /// alternatives for the current input </param>
-    /// <param name="ambigAlts"> The set of alternatives in the decision that lead to a valid parse.
+    /// <param name="ambigAlts"> The set of alternatives in the decision that lead to a valid
+    /// parse.
     ///                  The predicted alt is the min(ambigAlts) </param>
     /// <param name="input"> The input token stream </param>
     /// <param name="startIndex"> The start index for the current prediction </param>
@@ -64,5 +64,4 @@ namespace atn {
                   size_t startIndex, size_t stopIndex, bool fullCtx);
   };
 
-} // namespace atn
-} // namespace antlr4
+} // namespace antlr4::atn

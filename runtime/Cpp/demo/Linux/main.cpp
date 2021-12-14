@@ -12,14 +12,14 @@
 
 #include <iostream>
 
-#include "antlr4-runtime.h"
 #include "TLexer.h"
 #include "TParser.h"
+#include "antlr4-runtime.h"
 
 using namespace antlrcpptest;
 using namespace antlr4;
 
-int main(int , const char **) {
+int main(int, const char **) {
   ANTLRInputStream input(u8"🍴 = 🍐 + \"😎\";(((x * π))) * µ + ∰; a + (x * (y ? 0 : 1) + z);");
   TLexer lexer(&input);
   CommonTokenStream tokens(&lexer);
@@ -30,7 +30,7 @@ int main(int , const char **) {
   }
 
   TParser parser(&tokens);
-  tree::ParseTree* tree = parser.main();
+  tree::ParseTree *tree = parser.main();
 
   std::cout << tree->toStringTree(&parser) << std::endl << std::endl;
 

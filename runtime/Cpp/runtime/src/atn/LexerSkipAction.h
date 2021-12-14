@@ -8,8 +8,7 @@
 #include "atn/LexerAction.h"
 #include "atn/LexerActionType.h"
 
-namespace antlr4 {
-namespace atn {
+namespace antlr4::atn {
 
   /// <summary>
   /// Implements the {@code skip} lexer action by calling <seealso cref="Lexer#skip"/>.
@@ -43,7 +42,7 @@ namespace atn {
     virtual void execute(Lexer *lexer) override;
 
     virtual size_t hashCode() const override;
-    virtual bool operator == (const LexerAction &obj) const override;
+    virtual bool operator==(const LexerAction &obj) const override;
     virtual std::string toString() const override;
 
   private:
@@ -51,5 +50,4 @@ namespace atn {
     LexerSkipAction();
   };
 
-} // namespace atn
-} // namespace antlr4
+} // namespace antlr4::atn

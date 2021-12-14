@@ -5,11 +5,10 @@
 
 #pragma once
 
-#include "atn/LexerActionType.h"
 #include "atn/LexerAction.h"
+#include "atn/LexerActionType.h"
 
-namespace antlr4 {
-namespace atn {
+namespace antlr4::atn {
 
   /// Implements the {@code type} lexer action by calling <seealso cref="Lexer#setType"/>
   /// with the assigned type.
@@ -17,7 +16,8 @@ namespace atn {
   public:
     /// <summary>
     /// Constructs a new {@code type} action with the specified token type value. </summary>
-    /// <param name="type"> The type to assign to the token using <seealso cref="Lexer#setType"/>. </param>
+    /// <param name="type"> The type to assign to the token using <seealso cref="Lexer#setType"/>.
+    /// </param>
     LexerTypeAction(int type);
 
     /// <summary>
@@ -44,12 +44,11 @@ namespace atn {
     virtual void execute(Lexer *lexer) override;
 
     virtual size_t hashCode() const override;
-    virtual bool operator == (const LexerAction &obj) const override;
+    virtual bool operator==(const LexerAction &obj) const override;
     virtual std::string toString() const override;
 
   private:
     const int _type;
   };
 
-} // namespace atn
-} // namespace antlr4
+} // namespace antlr4::atn

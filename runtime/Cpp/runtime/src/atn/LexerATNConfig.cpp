@@ -3,51 +3,44 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
-#include "misc/MurmurHash.h"
-#include "atn/DecisionState.h"
-#include "atn/PredictionContext.h"
 #include "SemanticContext.h"
+#include "atn/DecisionState.h"
 #include "atn/LexerActionExecutor.h"
+#include "atn/PredictionContext.h"
+#include "misc/MurmurHash.h"
 
 #include "support/CPPUtils.h"
 
 #include "atn/LexerATNConfig.h"
 
+using namespace antlr4;
 using namespace antlr4::atn;
 using namespace antlrcpp;
 
-LexerATNConfig::LexerATNConfig(ATNState *state, int alt, Ref<PredictionContext> const& context)
-  : ATNConfig(state, alt, context, SemanticContext::NONE), _passedThroughNonGreedyDecision(false) {
-}
+LexerATNConfig::LexerATNConfig(ATNState *state, int alt, Ref<PredictionContext> const &context)
+    : ATNConfig(state, alt, context, SemanticContext::NONE), _passedThroughNonGreedyDecision(false) {}
 
-LexerATNConfig::LexerATNConfig(ATNState *state, int alt, Ref<PredictionContext> const& context,
-                               Ref<LexerActionExecutor> const& lexerActionExecutor)
-  : ATNConfig(state, alt, context, SemanticContext::NONE), _lexerActionExecutor(lexerActionExecutor),
-    _passedThroughNonGreedyDecision(false) {
-}
+LexerATNConfig::LexerATNConfig(ATNState *state, int alt, Ref<PredictionContext> const &context,
+                               Ref<LexerActionExecutor> const &lexerActionExecutor)
+    : ATNConfig(state, alt, context, SemanticContext::NONE), _lexerActionExecutor(lexerActionExecutor),
+      _passedThroughNonGreedyDecision(false) {}
 
-LexerATNConfig::LexerATNConfig(Ref<LexerATNConfig> const& c, ATNState *state)
-  : ATNConfig(c, state, c->context, c->semanticContext), _lexerActionExecutor(c->_lexerActionExecutor),
-   _passedThroughNonGreedyDecision(checkNonGreedyDecision(c, state)) {
-}
+LexerATNConfig::LexerATNConfig(Ref<LexerATNConfig> const &c, ATNState *state)
+    : ATNConfig(c, state, c->context, c->semanticContext), _lexerActionExecutor(c->_lexerActionExecutor),
+      _passedThroughNonGreedyDecision(checkNonGreedyDecision(c, state)) {}
 
-LexerATNConfig::LexerATNConfig(Ref<LexerATNConfig> const& c, ATNState *state, Ref<LexerActionExecutor> const& lexerActionExecutor)
-  : ATNConfig(c, state, c->context, c->semanticContext), _lexerActionExecutor(lexerActionExecutor),
-    _passedThroughNonGreedyDecision(checkNonGreedyDecision(c, state)) {
-}
+LexerATNConfig::LexerATNConfig(Ref<LexerATNConfig> const &c, ATNState *state,
+                               Ref<LexerActionExecutor> const &lexerActionExecutor)
+    : ATNConfig(c, state, c->context, c->semanticContext), _lexerActionExecutor(lexerActionExecutor),
+      _passedThroughNonGreedyDecision(checkNonGreedyDecision(c, state)) {}
 
-LexerATNConfig::LexerATNConfig(Ref<LexerATNConfig> const& c, ATNState *state, Ref<PredictionContext> const& context)
-  : ATNConfig(c, state, context, c->semanticContext), _lexerActionExecutor(c->_lexerActionExecutor),
-    _passedThroughNonGreedyDecision(checkNonGreedyDecision(c, state)) {
-}
+LexerATNConfig::LexerATNConfig(Ref<LexerATNConfig> const &c, ATNState *state, Ref<PredictionContext> const &context)
+    : ATNConfig(c, state, context, c->semanticContext), _lexerActionExecutor(c->_lexerActionExecutor),
+      _passedThroughNonGreedyDecision(checkNonGreedyDecision(c, state)) {}
 
-Ref<LexerActionExecutor> LexerATNConfig::getLexerActionExecutor() const {
-  return _lexerActionExecutor;
-}
+Ref<LexerActionExecutor> LexerATNConfig::getLexerActionExecutor() const { return _lexerActionExecutor; }
 
-bool LexerATNConfig::hasPassedThroughNonGreedyDecision() {
-  return _passedThroughNonGreedyDecision;
-}
+bool LexerATNConfig::hasPassedThroughNonGreedyDecision() { return _passedThroughNonGreedyDecision; }
 
 size_t LexerATNConfig::hashCode() const {
   size_t hashCode = misc::MurmurHash::initialize(7);
@@ -61,8 +54,7 @@ size_t LexerATNConfig::hashCode() const {
   return hashCode;
 }
 
-bool LexerATNConfig::operator == (const LexerATNConfig& other) const
-{
+bool LexerATNConfig::operator==(const LexerATNConfig &other) const {
   if (this == &other)
     return true;
 
@@ -75,10 +67,10 @@ bool LexerATNConfig::operator == (const LexerATNConfig& other) const
     return false;
   }
 
-  return ATNConfig::operator == (other);
+  return ATNConfig::operator==(other);
 }
 
-bool LexerATNConfig::checkNonGreedyDecision(Ref<LexerATNConfig> const& source, ATNState *target) {
+bool LexerATNConfig::checkNonGreedyDecision(Ref<LexerATNConfig> const &source, ATNState *target) {
   return source->_passedThroughNonGreedyDecision ||
-    (is<DecisionState*>(target) && (static_cast<DecisionState*>(target))->nonGreedy);
+         (is<DecisionState *>(target) && (static_cast<DecisionState *>(target))->nonGreedy);
 }

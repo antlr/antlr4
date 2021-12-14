@@ -7,9 +7,7 @@
 
 #include "antlr4-common.h"
 
-namespace antlr4 {
-namespace tree {
-namespace xpath {
+namespace antlr4::tree::xpath {
 
   /// Represent a subset of XPath XML path syntax for use in identifying nodes in
   /// parse trees.
@@ -56,7 +54,7 @@ namespace xpath {
   class ANTLR4CPP_PUBLIC XPath {
   public:
     static const std::string WILDCARD; // word not operator/separator
-    static const std::string NOT; // word for invert operator
+    static const std::string NOT;      // word for invert operator
 
     XPath(Parser *parser, const std::string &path);
     virtual ~XPath() {}
@@ -64,7 +62,7 @@ namespace xpath {
     // TODO: check for invalid token/rule names, bad syntax
     virtual std::vector<std::unique_ptr<XPathElement>> split(const std::string &path);
 
-    static std::vector<ParseTree *> findAll(ParseTree *tree, std::string const& xpath, Parser *parser);
+    static std::vector<ParseTree *> findAll(ParseTree *tree, std::string const &xpath, Parser *parser);
 
     /// Return a list of all nodes starting at {@code t} as root that satisfy the
     /// path. The root {@code /} is relative to the node passed to
@@ -81,6 +79,4 @@ namespace xpath {
     virtual std::unique_ptr<XPathElement> getXPathElement(Token *wordToken, bool anywhere);
   };
 
-} // namespace xpath
-} // namespace tree
-} // namespace antlr4
+} // namespace antlr4::tree::xpath

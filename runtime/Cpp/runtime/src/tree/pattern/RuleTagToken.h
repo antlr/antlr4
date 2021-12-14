@@ -7,9 +7,7 @@
 
 #include "Token.h"
 
-namespace antlr4 {
-namespace tree {
-namespace pattern {
+namespace antlr4::tree::pattern {
 
   /// <summary>
   /// A <seealso cref="Token"/> object representing an entire subtree matched by a parser
@@ -40,15 +38,16 @@ namespace pattern {
     /// </param>
     /// <exception cref="IllegalArgumentException"> if {@code ruleName} is {@code null}
     /// or empty. </exception>
-    RuleTagToken(const std::string &ruleName, int bypassTokenType); //this(ruleName, bypassTokenType, nullptr);
+    RuleTagToken(const std::string &ruleName,
+                 int bypassTokenType); // this(ruleName, bypassTokenType, nullptr);
 
     /// <summary>
     /// Constructs a new instance of <seealso cref="RuleTagToken"/> with the specified rule
     /// name, bypass token type, and label.
     /// </summary>
     /// <param name="ruleName"> The name of the parser rule this rule tag matches. </param>
-    /// <param name="bypassTokenType"> The bypass token type assigned to the parser rule. </param>
-    /// <param name="label"> The label associated with the rule tag, or {@code null} if
+    /// <param name="bypassTokenType"> The bypass token type assigned to the parser rule.
+    /// </param> <param name="label"> The label associated with the rule tag, or {@code null} if
     /// the rule tag is unlabeled.
     /// </param>
     /// <exception cref="IllegalArgumentException"> if {@code ruleName} is {@code null}
@@ -108,10 +107,9 @@ namespace pattern {
     /// The implementation for <seealso cref="RuleTagToken"/> always returns {@code null}.
     virtual CharStream *getInputStream() const override;
 
-    /// The implementation for <seealso cref="RuleTagToken"/> returns a string of the form {@code ruleName:bypassTokenType}.
+    /// The implementation for <seealso cref="RuleTagToken"/> returns a string of the form
+    /// {@code ruleName:bypassTokenType}.
     virtual std::string toString() const override;
   };
 
-} // namespace pattern
-} // namespace tree
-} // namespace antlr4
+} // namespace antlr4::tree::pattern

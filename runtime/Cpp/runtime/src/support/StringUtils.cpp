@@ -7,7 +7,7 @@
 
 namespace antlrcpp {
 
-  void replaceAll(std::string& str, std::string_view from, std::string_view to) {
+  void replaceAll(std::string &str, std::string_view from, std::string_view to) {
     if (from.empty())
       return;
 
@@ -18,4 +18,4 @@ namespace antlrcpp {
     }
   }
 
-} // namespace antrlcpp
+} // namespace antlrcpp

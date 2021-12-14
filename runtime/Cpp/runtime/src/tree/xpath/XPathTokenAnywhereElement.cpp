@@ -11,7 +11,8 @@
 using namespace antlr4::tree;
 using namespace antlr4::tree::xpath;
 
-XPathTokenAnywhereElement::XPathTokenAnywhereElement(const std::string &tokenName, int tokenType) : XPathElement(tokenName) {
+XPathTokenAnywhereElement::XPathTokenAnywhereElement(const std::string &tokenName, int tokenType)
+    : XPathElement(tokenName) {
   this->tokenType = tokenType;
 }
 

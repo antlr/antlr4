@@ -9,6 +9,6 @@ using namespace antlr4;
 using namespace antlr4::atn;
 
 DecisionEventInfo::DecisionEventInfo(size_t decision, ATNConfigSet *configs, TokenStream *input, size_t startIndex,
-  size_t stopIndex, bool fullCtx)
-  : decision(decision), configs(configs), input(input), startIndex(startIndex), stopIndex(stopIndex), fullCtx(fullCtx) {
-}
+                                     size_t stopIndex, bool fullCtx)
+    : decision(decision), configs(configs), input(input), startIndex(startIndex), stopIndex(stopIndex),
+      fullCtx(fullCtx) {}

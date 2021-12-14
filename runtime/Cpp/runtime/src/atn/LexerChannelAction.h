@@ -8,8 +8,7 @@
 #include "atn/LexerAction.h"
 #include "atn/LexerActionType.h"
 
-namespace antlr4 {
-namespace atn {
+namespace antlr4::atn {
 
   using antlr4::Lexer;
 
@@ -24,13 +23,15 @@ namespace atn {
   public:
     /// <summary>
     /// Constructs a new {@code channel} action with the specified channel value. </summary>
-    /// <param name="channel"> The channel value to pass to <seealso cref="Lexer#setChannel"/>. </param>
+    /// <param name="channel"> The channel value to pass to <seealso cref="Lexer#setChannel"/>.
+    /// </param>
     LexerChannelAction(int channel);
 
     /// <summary>
     /// Gets the channel to use for the <seealso cref="Token"/> created by the lexer.
     /// </summary>
-    /// <returns> The channel to use for the <seealso cref="Token"/> created by the lexer. </returns>
+    /// <returns> The channel to use for the <seealso cref="Token"/> created by the lexer.
+    /// </returns>
     int getChannel() const;
 
     /// <summary>
@@ -52,12 +53,11 @@ namespace atn {
     virtual void execute(Lexer *lexer) override;
 
     virtual size_t hashCode() const override;
-    virtual bool operator == (const LexerAction &obj) const override;
+    virtual bool operator==(const LexerAction &obj) const override;
     virtual std::string toString() const override;
 
   private:
     const int _channel;
   };
 
-} // namespace atn
-} // namespace antlr4
+} // namespace antlr4::atn

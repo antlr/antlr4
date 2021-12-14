@@ -7,8 +7,7 @@
 
 #include "atn/DecisionState.h"
 
-namespace antlr4 {
-namespace atn {
+namespace antlr4::atn {
 
   /// The Tokens rule start state linking to each lexer rule start state.
   class ANTLR4CPP_PUBLIC TokensStartState final : public DecisionState {
@@ -17,5 +16,4 @@ namespace atn {
     virtual size_t getStateType() override;
   };
 
-} // namespace atn
-} // namespace antlr4
+} // namespace antlr4::atn

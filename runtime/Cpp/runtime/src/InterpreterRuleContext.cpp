@@ -7,13 +7,9 @@
 
 using namespace antlr4;
 
-InterpreterRuleContext::InterpreterRuleContext() : ParserRuleContext() {
-}
+InterpreterRuleContext::InterpreterRuleContext() : ParserRuleContext() {}
 
 InterpreterRuleContext::InterpreterRuleContext(ParserRuleContext *parent, size_t invokingStateNumber, size_t ruleIndex)
-  : ParserRuleContext(parent, invokingStateNumber), _ruleIndex(ruleIndex) {
-}
+    : ParserRuleContext(parent, invokingStateNumber), _ruleIndex(ruleIndex) {}
 
-size_t InterpreterRuleContext::getRuleIndex() const {
-  return _ruleIndex;
-}
+size_t InterpreterRuleContext::getRuleIndex() const { return _ruleIndex; }

@@ -7,10 +7,6 @@
 
 using namespace antlr4::atn;
 
-RuleStartState::RuleStartState() {
-  isLeftRecursiveRule = false;
-}
+RuleStartState::RuleStartState() { isLeftRecursiveRule = false; }
 
-size_t RuleStartState::getStateType() {
-  return RULE_START;
-}
+size_t RuleStartState::getStateType() { return RULE_START; }

@@ -3,11 +3,11 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
-#include "atn/ATN.h"
-#include "Recognizer.h"
-#include "support/StringUtils.h"
 #include "ParserRuleContext.h"
+#include "Recognizer.h"
+#include "atn/ATN.h"
 #include "misc/IntervalSet.h"
+#include "support/StringUtils.h"
 
 #include "RecognitionException.h"
 
@@ -15,28 +15,22 @@ using namespace antlr4;
 
 RecognitionException::RecognitionException(Recognizer *recognizer, IntStream *input, ParserRuleContext *ctx,
                                            Token *offendingToken)
-  : RecognitionException("", recognizer, input, ctx, offendingToken) {
-}
+    : RecognitionException("", recognizer, input, ctx, offendingToken) {}
 
 RecognitionException::RecognitionException(const std::string &message, Recognizer *recognizer, IntStream *input,
                                            ParserRuleContext *ctx, Token *offendingToken)
-  : RuntimeException(message), _recognizer(recognizer), _input(input), _ctx(ctx), _offendingToken(offendingToken) {
+    : RuntimeException(message), _recognizer(recognizer), _input(input), _ctx(ctx), _offendingToken(offendingToken) {
   InitializeInstanceFields();
   if (recognizer != nullptr) {
     _offendingState = recognizer->getState();
   }
 }
 
-RecognitionException::~RecognitionException() {
-}
+RecognitionException::~RecognitionException() {}
 
-size_t RecognitionException::getOffendingState() const {
-  return _offendingState;
-}
+size_t RecognitionException::getOffendingState() const { return _offendingState; }
 
-void RecognitionException::setOffendingState(size_t offendingState) {
-  _offendingState = offendingState;
-}
+void RecognitionException::setOffendingState(size_t offendingState) { _offendingState = offendingState; }
 
 misc::IntervalSet RecognitionException::getExpectedTokens() const {
   if (_recognizer) {
@@ -45,22 +39,12 @@ misc::IntervalSet RecognitionException::getExpectedTokens() const {
   return misc::IntervalSet::EMPTY_SET;
 }
 
-RuleContext* RecognitionException::getCtx() const {
-  return _ctx;
-}
+RuleContext *RecognitionException::getCtx() const { return _ctx; }
 
-IntStream* RecognitionException::getInputStream() const {
-  return _input;
-}
+IntStream *RecognitionException::getInputStream() const { return _input; }
 
-Token* RecognitionException::getOffendingToken() const {
-  return _offendingToken;
-}
+Token *RecognitionException::getOffendingToken() const { return _offendingToken; }
 
-Recognizer* RecognitionException::getRecognizer() const {
-  return _recognizer;
-}
+Recognizer *RecognitionException::getRecognizer() const { return _recognizer; }
 
-void RecognitionException::InitializeInstanceFields() {
-  _offendingState = INVALID_INDEX;
-}
+void RecognitionException::InitializeInstanceFields() { _offendingState = INVALID_INDEX; }

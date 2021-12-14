@@ -7,8 +7,7 @@
 
 #include "atn/ATNState.h"
 
-namespace antlr4 {
-namespace atn {
+namespace antlr4::atn {
 
   class ANTLR4CPP_PUBLIC RuleStartState final : public ATNState {
   public:
@@ -18,8 +17,6 @@ namespace atn {
     bool isLeftRecursiveRule = false;
 
     virtual size_t getStateType() override;
-
   };
 
-} // namespace atn
-} // namespace antlr4
+} // namespace antlr4::atn

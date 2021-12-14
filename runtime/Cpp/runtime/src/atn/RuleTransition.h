@@ -7,8 +7,7 @@
 
 #include "atn/Transition.h"
 
-namespace antlr4 {
-namespace atn {
+namespace antlr4::atn {
 
   class ANTLR4CPP_PUBLIC RuleTransition : public Transition {
   public:
@@ -25,8 +24,8 @@ namespace atn {
     RuleTransition(RuleStartState *ruleStart, size_t ruleIndex, ATNState *followState);
 
     RuleTransition(RuleStartState *ruleStart, size_t ruleIndex, int precedence, ATNState *followState);
-    RuleTransition(RuleTransition const&) = delete;
-    RuleTransition& operator=(RuleTransition const&) = delete;
+    RuleTransition(RuleTransition const &) = delete;
+    RuleTransition &operator=(RuleTransition const &) = delete;
 
     virtual SerializationType getSerializationType() const override;
 
@@ -36,5 +35,4 @@ namespace atn {
     virtual std::string toString() const override;
   };
 
-} // namespace atn
-} // namespace antlr4
+} // namespace antlr4::atn

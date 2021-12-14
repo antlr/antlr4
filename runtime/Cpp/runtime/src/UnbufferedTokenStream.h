@@ -13,16 +13,16 @@ namespace antlr4 {
   public:
     UnbufferedTokenStream(TokenSource *tokenSource);
     UnbufferedTokenStream(TokenSource *tokenSource, int bufferSize);
-    UnbufferedTokenStream(const UnbufferedTokenStream& other) = delete;
+    UnbufferedTokenStream(const UnbufferedTokenStream &other) = delete;
     virtual ~UnbufferedTokenStream();
 
-    UnbufferedTokenStream& operator = (const UnbufferedTokenStream& other) = delete;
+    UnbufferedTokenStream &operator=(const UnbufferedTokenStream &other) = delete;
 
-    virtual Token* get(size_t i) const override;
-    virtual Token* LT(ssize_t i) override;
+    virtual Token *get(size_t i) const override;
+    virtual Token *LT(ssize_t i) override;
     virtual size_t LA(ssize_t i) override;
 
-    virtual TokenSource* getTokenSource() const override;
+    virtual TokenSource *getTokenSource() const override;
 
     virtual std::string getText(const misc::Interval &interval) override;
     virtual std::string getText() override;

@@ -3,11 +3,11 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
-#include "atn/ATNType.h"
 #include "atn/ATNConfigSet.h"
-#include "dfa/DFAState.h"
 #include "atn/ATNDeserializer.h"
+#include "atn/ATNType.h"
 #include "atn/EmptyPredictionContext.h"
+#include "dfa/DFAState.h"
 
 #include "atn/ATNSimulator.h"
 
@@ -20,22 +20,19 @@ std::shared_mutex ATNSimulator::_stateLock;
 std::shared_mutex ATNSimulator::_edgeLock;
 
 ATNSimulator::ATNSimulator(const ATN &atn, PredictionContextCache &sharedContextCache)
-: atn(atn), _sharedContextCache(sharedContextCache) {
-}
+    : atn(atn), _sharedContextCache(sharedContextCache) {}
 
-ATNSimulator::~ATNSimulator() {
-}
+ATNSimulator::~ATNSimulator() {}
 
 void ATNSimulator::clearDFA() {
   throw UnsupportedOperationException("This ATN simulator does not support clearing the DFA.");
 }
 
-PredictionContextCache& ATNSimulator::getSharedContextCache() {
-  return _sharedContextCache;
-}
+PredictionContextCache &ATNSimulator::getSharedContextCache() { return _sharedContextCache; }
 
-Ref<PredictionContext> ATNSimulator::getCachedContext(Ref<PredictionContext> const& context) {
-  // This function must only be called with an active state lock, as we are going to change a shared structure.
+Ref<PredictionContext> ATNSimulator::getCachedContext(Ref<PredictionContext> const &context) {
+  // This function must only be called with an active state lock, as we are going to change a shared
+  // structure.
   std::map<Ref<PredictionContext>, Ref<PredictionContext>> visited;
   return PredictionContext::getCachedContext(context, _sharedContextCache, visited);
 }
@@ -45,9 +42,7 @@ ATN ATNSimulator::deserialize(const std::vector<uint16_t> &data) {
   return deserializer.deserialize(data);
 }
 
-void ATNSimulator::checkCondition(bool condition) {
-  ATNDeserializer::checkCondition(condition);
-}
+void ATNSimulator::checkCondition(bool condition) { ATNDeserializer::checkCondition(condition); }
 
 void ATNSimulator::checkCondition(bool condition, const std::string &message) {
   ATNDeserializer::checkCondition(condition, message);
@@ -58,6 +53,4 @@ Transition *ATNSimulator::edgeFactory(const ATN &atn, int type, int src, int trg
   return ATNDeserializer::edgeFactory(atn, type, src, trg, arg1, arg2, arg3, sets);
 }
 
-ATNState *ATNSimulator::stateFactory(int type, int ruleIndex) {
-  return ATNDeserializer::stateFactory(type, ruleIndex);
-}
+ATNState *ATNSimulator::stateFactory(int type, int ruleIndex) { return ATNDeserializer::stateFactory(type, ruleIndex); }

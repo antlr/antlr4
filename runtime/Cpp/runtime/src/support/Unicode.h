@@ -18,9 +18,9 @@ namespace antlrcpp {
   private:
     Unicode() = delete;
 
-    Unicode(const Unicode&) = delete;
+    Unicode(const Unicode &) = delete;
 
-    Unicode& operator=(const Unicode&) = delete;
+    Unicode &operator=(const Unicode &) = delete;
   };
 
-}
+} // namespace antlrcpp

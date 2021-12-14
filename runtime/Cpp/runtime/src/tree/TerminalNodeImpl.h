@@ -7,8 +7,7 @@
 
 #include "tree/TerminalNode.h"
 
-namespace antlr4 {
-namespace tree {
+namespace antlr4::tree {
 
   class ANTLR4CPP_PUBLIC TerminalNodeImpl : public virtual TerminalNode {
   public:
@@ -16,7 +15,7 @@ namespace tree {
 
     TerminalNodeImpl(Token *symbol);
 
-    virtual Token* getSymbol() override;
+    virtual Token *getSymbol() override;
     virtual void setParent(RuleContext *parent) override;
     virtual misc::Interval getSourceInterval() override;
 
@@ -26,8 +25,6 @@ namespace tree {
     virtual std::string toStringTree(Parser *parser, bool pretty = false) override;
     virtual std::string toString() override;
     virtual std::string toStringTree(bool pretty = false) override;
-
   };
 
-} // namespace tree
-} // namespace antlr4
+} // namespace antlr4::tree

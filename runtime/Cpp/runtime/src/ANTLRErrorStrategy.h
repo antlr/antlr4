@@ -28,7 +28,6 @@ namespace antlr4 {
   /// </summary>
   class ANTLR4CPP_PUBLIC ANTLRErrorStrategy {
   public:
-
     /// <summary>
     /// Reset the error handler state for the specified {@code recognizer}. </summary>
     /// <param name="recognizer"> the parser instance </param>
@@ -54,7 +53,7 @@ namespace antlr4 {
      * @throws RecognitionException if the error strategy was not able to
      * recover from the unexpected input symbol
      */
-    virtual Token* recoverInline(Parser *recognizer) = 0;
+    virtual Token *recoverInline(Parser *recognizer) = 0;
 
     /// <summary>
     /// This method is called to recover from exception {@code e}. This method is

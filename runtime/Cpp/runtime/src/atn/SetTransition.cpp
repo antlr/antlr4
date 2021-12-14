@@ -12,16 +12,11 @@ using namespace antlr4;
 using namespace antlr4::atn;
 
 SetTransition::SetTransition(ATNState *target, const misc::IntervalSet &aSet)
-  : Transition(target), set(aSet.isEmpty() ? misc::IntervalSet::of(Token::INVALID_TYPE) : aSet) {
-}
+    : Transition(target), set(aSet.isEmpty() ? misc::IntervalSet::of(Token::INVALID_TYPE) : aSet) {}
 
-Transition::SerializationType SetTransition::getSerializationType() const {
-  return SET;
-}
+Transition::SerializationType SetTransition::getSerializationType() const { return SET; }
 
-misc::IntervalSet SetTransition::label() const {
-  return set;
-}
+misc::IntervalSet SetTransition::label() const { return set; }
 
 bool SetTransition::matches(size_t symbol, size_t /*minVocabSymbol*/, size_t /*maxVocabSymbol*/) const {
   return set.contains(symbol);

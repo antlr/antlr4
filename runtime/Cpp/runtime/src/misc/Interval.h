@@ -7,12 +7,11 @@
 
 #include "antlr4-common.h"
 
-namespace antlr4 {
-namespace misc {
+namespace antlr4::misc {
 
-  // Helpers to convert certain unsigned symbols (e.g. Token::EOF) to their original numeric value (e.g. -1)
-  // and vice versa. This is needed mostly for intervals to keep their original order and for toString()
-  // methods to print the original numeric value (e.g. for tests).
+  // Helpers to convert certain unsigned symbols (e.g. Token::EOF) to their original numeric value
+  // (e.g. -1) and vice versa. This is needed mostly for intervals to keep their original order
+  // and for toString() methods to print the original numeric value (e.g. for tests).
   size_t numericToSymbol(ssize_t v);
   ssize_t symbolToNumeric(size_t v);
 
@@ -33,7 +32,7 @@ namespace misc {
     ///  if b < a, then length is 0.  9..10 has length 2.
     size_t length() const;
 
-    bool operator == (const Interval &other) const;
+    bool operator==(const Interval &other) const;
 
     size_t hashCode() const;
 
@@ -80,5 +79,4 @@ namespace misc {
   private:
   };
 
-} // namespace atn
-} // namespace antlr4
+} // namespace antlr4::misc

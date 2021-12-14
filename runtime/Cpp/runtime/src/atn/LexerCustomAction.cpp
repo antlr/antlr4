@@ -3,9 +3,9 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include "Lexer.h"
 #include "misc/MurmurHash.h"
 #include "support/CPPUtils.h"
-#include "Lexer.h"
 
 #include "atn/LexerCustomAction.h"
 
@@ -13,28 +13,18 @@ using namespace antlr4;
 using namespace antlr4::atn;
 using namespace antlr4::misc;
 
-LexerCustomAction::LexerCustomAction(size_t ruleIndex, size_t actionIndex) : _ruleIndex(ruleIndex), _actionIndex(actionIndex) {
-}
+LexerCustomAction::LexerCustomAction(size_t ruleIndex, size_t actionIndex)
+    : _ruleIndex(ruleIndex), _actionIndex(actionIndex) {}
 
-size_t LexerCustomAction::getRuleIndex() const {
-  return _ruleIndex;
-}
+size_t LexerCustomAction::getRuleIndex() const { return _ruleIndex; }
 
-size_t LexerCustomAction::getActionIndex() const {
-  return _actionIndex;
-}
+size_t LexerCustomAction::getActionIndex() const { return _actionIndex; }
 
-LexerActionType LexerCustomAction::getActionType() const {
-  return LexerActionType::CUSTOM;
-}
+LexerActionType LexerCustomAction::getActionType() const { return LexerActionType::CUSTOM; }
 
-bool LexerCustomAction::isPositionDependent() const {
-  return true;
-}
+bool LexerCustomAction::isPositionDependent() const { return true; }
 
-void LexerCustomAction::execute(Lexer *lexer) {
-  lexer->action(nullptr, _ruleIndex, _actionIndex);
-}
+void LexerCustomAction::execute(Lexer *lexer) { lexer->action(nullptr, _ruleIndex, _actionIndex); }
 
 size_t LexerCustomAction::hashCode() const {
   size_t hash = MurmurHash::initialize();
@@ -44,7 +34,7 @@ size_t LexerCustomAction::hashCode() const {
   return MurmurHash::finish(hash, 3);
 }
 
-bool LexerCustomAction::operator == (const LexerAction &obj) const {
+bool LexerCustomAction::operator==(const LexerAction &obj) const {
   if (&obj == this) {
     return true;
   }
@@ -57,6 +47,4 @@ bool LexerCustomAction::operator == (const LexerAction &obj) const {
   return _ruleIndex == action->_ruleIndex && _actionIndex == action->_actionIndex;
 }
 
-std::string LexerCustomAction::toString() const {
-  return antlrcpp::toString(this);
-}
+std::string LexerCustomAction::toString() const { return antlrcpp::toString(this); }

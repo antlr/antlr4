@@ -5,5 +5,4 @@
 
 #include "Token.h"
 
-antlr4::Token::~Token() {
-}
+antlr4::Token::~Token() {}

@@ -8,15 +8,12 @@
 #include "antlr4-common.h"
 #include "atn/BlockStartState.h"
 
-namespace antlr4 {
-namespace atn {
+namespace antlr4::atn {
 
   class ANTLR4CPP_PUBLIC BasicBlockStartState final : public BlockStartState {
 
   public:
     virtual size_t getStateType() override;
-
   };
 
-} // namespace atn
-} // namespace antlr4
+} // namespace antlr4::atn

@@ -3,17 +3,18 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
-#include "tree/ErrorNode.h"
+#include <stack>
+
+#include "CommonToken.h"
 #include "Parser.h"
 #include "ParserRuleContext.h"
-#include "support/CPPUtils.h"
-#include "tree/TerminalNodeImpl.h"
+#include "Token.h"
 #include "atn/ATN.h"
 #include "misc/Interval.h"
-#include "Token.h"
-#include "CommonToken.h"
 #include "misc/Predicate.h"
-
+#include "support/CPPUtils.h"
+#include "tree/ErrorNode.h"
+#include "tree/TerminalNodeImpl.h"
 #include "tree/Trees.h"
 
 using namespace antlr4;
@@ -22,12 +23,9 @@ using namespace antlr4::tree;
 
 using namespace antlrcpp;
 
-Trees::Trees() {
-}
+Trees::Trees() {}
 
-std::string Trees::toStringTree(ParseTree *t, bool pretty) {
-  return toStringTree(t, nullptr, pretty);
-}
+std::string Trees::toStringTree(ParseTree *t, bool pretty) { return toStringTree(t, nullptr, pretty); }
 
 std::string Trees::toStringTree(ParseTree *t, Parser *recog, bool pretty) {
   if (recog == nullptr)
@@ -91,9 +89,7 @@ std::string Trees::toStringTree(ParseTree *t, const std::vector<std::string> &ru
   return ss.str();
 }
 
-std::string Trees::getNodeText(ParseTree *t, Parser *recog) {
-  return getNodeText(t, recog->getRuleNames());
-}
+std::string Trees::getNodeText(ParseTree *t, Parser *recog) { return getNodeText(t, recog->getRuleNames()); }
 
 std::string Trees::getNodeText(ParseTree *t, const std::vector<std::string> &ruleNames) {
   if (ruleNames.size() > 0) {
@@ -137,7 +133,7 @@ std::vector<ParseTree *> Trees::getAncestors(ParseTree *t) {
   return ancestors;
 }
 
-template<typename T>
+template <typename T>
 static void _findAllNodes(ParseTree *t, size_t index, bool findTokens, std::vector<T> &nodes) {
   // check this node (the root) first
   if (findTokens && is<TerminalNode *>(t)) {
@@ -172,9 +168,7 @@ bool Trees::isAncestorOf(ParseTree *t, ParseTree *u) {
   return false;
 }
 
-std::vector<ParseTree *> Trees::findAllTokenNodes(ParseTree *t, size_t ttype) {
-  return findAllNodes(t, ttype, true);
-}
+std::vector<ParseTree *> Trees::findAllTokenNodes(ParseTree *t, size_t ttype) { return findAllNodes(t, ttype, true); }
 
 std::vector<ParseTree *> Trees::findAllRuleNodes(ParseTree *t, size_t ruleIndex) {
   return findAllNodes(t, ruleIndex, false);
@@ -190,20 +184,18 @@ std::vector<ParseTree *> Trees::getDescendants(ParseTree *t) {
   std::vector<ParseTree *> nodes;
   nodes.push_back(t);
   std::size_t n = t->children.size();
-  for (size_t i = 0 ; i < n ; i++) {
+  for (size_t i = 0; i < n; i++) {
     auto descentants = getDescendants(t->children[i]);
-    for (auto *entry: descentants) {
+    for (auto *entry : descentants) {
       nodes.push_back(entry);
     }
   }
   return nodes;
 }
 
-std::vector<ParseTree *> Trees::descendants(ParseTree *t) {
-  return getDescendants(t);
-}
+std::vector<ParseTree *> Trees::descendants(ParseTree *t) { return getDescendants(t); }
 
-ParserRuleContext* Trees::getRootOfSubtreeEnclosingRegion(ParseTree *t, size_t startTokenIndex, size_t stopTokenIndex) {
+ParserRuleContext *Trees::getRootOfSubtreeEnclosingRegion(ParseTree *t, size_t startTokenIndex, size_t stopTokenIndex) {
   size_t n = t->children.size();
   for (size_t i = 0; i < n; i++) {
     ParserRuleContext *r = getRootOfSubtreeEnclosingRegion(t->children[i], startTokenIndex, stopTokenIndex);
@@ -216,20 +208,21 @@ ParserRuleContext* Trees::getRootOfSubtreeEnclosingRegion(ParseTree *t, size_t s
     ParserRuleContext *r = dynamic_cast<ParserRuleContext *>(t);
     if (startTokenIndex >= r->getStart()->getTokenIndex() && // is range fully contained in t?
         (r->getStop() == nullptr || stopTokenIndex <= r->getStop()->getTokenIndex())) {
-      // note: r.getStop()==null likely implies that we bailed out of parser and there's nothing to the right
+      // note: r.getStop()==null likely implies that we bailed out of parser and there's nothing to
+      // the right
       return r;
     }
   }
   return nullptr;
 }
 
-ParseTree * Trees::findNodeSuchThat(ParseTree *t, Ref<Predicate> const& pred) {
+ParseTree *Trees::findNodeSuchThat(ParseTree *t, Ref<Predicate> const &pred) {
   if (pred->test(t)) {
     return t;
   }
 
   size_t n = t->children.size();
-  for (size_t i = 0 ; i < n ; ++i) {
+  for (size_t i = 0; i < n; ++i) {
     ParseTree *u = findNodeSuchThat(t->children[i], pred);
     if (u != nullptr) {
       return u;
@@ -238,4 +231,3 @@ ParseTree * Trees::findNodeSuchThat(ParseTree *t, Ref<Predicate> const& pred) {
 
   return nullptr;
 }
-

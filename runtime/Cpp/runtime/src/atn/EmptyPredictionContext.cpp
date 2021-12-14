@@ -5,31 +5,19 @@
 
 #include "atn/EmptyPredictionContext.h"
 
+using namespace antlr4;
 using namespace antlr4::atn;
 
-EmptyPredictionContext::EmptyPredictionContext() : SingletonPredictionContext(nullptr, EMPTY_RETURN_STATE) {
-}
+EmptyPredictionContext::EmptyPredictionContext() : SingletonPredictionContext(nullptr, EMPTY_RETURN_STATE) {}
 
-bool EmptyPredictionContext::isEmpty() const {
-  return true;
-}
+bool EmptyPredictionContext::isEmpty() const { return true; }
 
-size_t EmptyPredictionContext::size() const {
-  return 1;
-}
+size_t EmptyPredictionContext::size() const { return 1; }
 
-Ref<PredictionContext> EmptyPredictionContext::getParent(size_t /*index*/) const {
-  return nullptr;
-}
+Ref<PredictionContext> EmptyPredictionContext::getParent(size_t /*index*/) const { return nullptr; }
 
-size_t EmptyPredictionContext::getReturnState(size_t /*index*/) const {
-  return returnState;
-}
+size_t EmptyPredictionContext::getReturnState(size_t /*index*/) const { return returnState; }
 
-bool EmptyPredictionContext::operator == (const PredictionContext &o) const {
-  return this == &o;
-}
+bool EmptyPredictionContext::operator==(const PredictionContext &o) const { return this == &o; }
 
-std::string EmptyPredictionContext::toString() const {
-  return "$";
-}
+std::string EmptyPredictionContext::toString() const { return "$"; }

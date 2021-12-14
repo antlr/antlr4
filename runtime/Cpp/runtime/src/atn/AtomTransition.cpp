@@ -3,24 +3,19 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
-#include "misc/IntervalSet.h"
 #include "atn/Transition.h"
+#include "misc/IntervalSet.h"
 
 #include "atn/AtomTransition.h"
 
 using namespace antlr4::misc;
 using namespace antlr4::atn;
 
-AtomTransition::AtomTransition(ATNState *target, size_t label) : Transition(target), _label(label) {
-}
+AtomTransition::AtomTransition(ATNState *target, size_t label) : Transition(target), _label(label) {}
 
-Transition::SerializationType AtomTransition::getSerializationType() const {
-  return ATOM;
-}
+Transition::SerializationType AtomTransition::getSerializationType() const { return ATOM; }
 
-IntervalSet AtomTransition::label() const {
-  return IntervalSet::of((int)_label);
-}
+IntervalSet AtomTransition::label() const { return IntervalSet::of((int)_label); }
 
 bool AtomTransition::matches(size_t symbol, size_t /*minVocabSymbol*/, size_t /*maxVocabSymbol*/) const {
   return _label == symbol;

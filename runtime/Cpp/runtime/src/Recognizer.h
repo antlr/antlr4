@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <mutex>
+
 #include "ProxyErrorListener.h"
 #include "support/Casts.h"
 
@@ -15,12 +17,12 @@ namespace antlr4 {
     static constexpr size_t EOF = std::numeric_limits<size_t>::max();
 
     Recognizer();
-    Recognizer(Recognizer const&) = delete;
+    Recognizer(Recognizer const &) = delete;
     virtual ~Recognizer();
 
-    Recognizer& operator=(Recognizer const&) = delete;
+    Recognizer &operator=(Recognizer const &) = delete;
 
-    virtual std::vector<std::string> const& getRuleNames() const = 0;
+    virtual std::vector<std::string> const &getRuleNames() const = 0;
 
     /**
      * Get the vocabulary used by the recognizer.
@@ -28,7 +30,7 @@ namespace antlr4 {
      * @return A {@link Vocabulary} instance providing information about the
      * vocabulary used by the grammar.
      */
-    virtual dfa::Vocabulary const& getVocabulary() const = 0;
+    virtual dfa::Vocabulary const &getVocabulary() const = 0;
 
     /// <summary>
     /// Get a map from token names to token types.
@@ -53,9 +55,7 @@ namespace antlr4 {
     /// For interpreters, we don't know their serialized ATN despite having
     /// created the interpreter from it.
     /// </summary>
-    virtual const std::vector<uint16_t> getSerializedATN() const {
-      throw "there is no serialized ATN";
-    }
+    virtual const std::vector<uint16_t> getSerializedATN() const { throw "there is no serialized ATN"; }
 
     /// <summary>
     /// For debugging and other purposes, might want the grammar name.
@@ -63,10 +63,11 @@ namespace antlr4 {
     /// </summary>
     virtual std::string getGrammarFileName() const = 0;
 
-    /// Get the ATN interpreter (in fact one of it's descendants) used by the recognizer for prediction.
+    /// Get the ATN interpreter (in fact one of it's descendants) used by the recognizer for
+    /// prediction.
     /// @returns The ATN interpreter used by the recognizer for prediction.
     template <class T>
-    T* getInterpreter() const {
+    T *getInterpreter() const {
       return antlrcpp::downCast<T *>(_interpreter);
     }
 
@@ -103,7 +104,7 @@ namespace antlr4 {
 
     virtual void removeErrorListeners();
 
-    virtual ProxyErrorListener& getErrorListenerDispatch();
+    virtual ProxyErrorListener &getErrorListenerDispatch();
 
     // subclass needs to override these if there are sempreds or actions
     // that the ATN interp needs to execute
@@ -113,10 +114,10 @@ namespace antlr4 {
 
     virtual void action(RuleContext *localctx, size_t ruleIndex, size_t actionIndex);
 
-    virtual size_t getState() const ;
+    virtual size_t getState() const;
 
     // Get the ATN used by the recognizer for prediction.
-    virtual const atn::ATN& getATN() const = 0;
+    virtual const atn::ATN &getATN() const = 0;
 
     /// <summary>
     /// Indicate that the recognizer has changed internal state that is
@@ -128,13 +129,13 @@ namespace antlr4 {
     /// </summary>
     void setState(size_t atnState);
 
-    virtual IntStream* getInputStream() = 0;
+    virtual IntStream *getInputStream() = 0;
 
     virtual void setInputStream(IntStream *input) = 0;
 
-    virtual TokenFactory<CommonToken>* getTokenFactory() = 0;
+    virtual TokenFactory<CommonToken> *getTokenFactory() = 0;
 
-    template<typename T1>
+    template <typename T1>
     void setTokenFactory(TokenFactory<T1> *input);
 
   protected:
@@ -144,7 +145,7 @@ namespace antlr4 {
     std::mutex _mutex;
 
   private:
-    static std::map<const dfa::Vocabulary*, std::map<std::string_view, size_t>> _tokenTypeMapCache;
+    static std::map<const dfa::Vocabulary *, std::map<std::string_view, size_t>> _tokenTypeMapCache;
     static std::map<std::vector<std::string>, std::map<std::string, size_t>> _ruleIndexMapCache;
 
     ProxyErrorListener _proxListener; // Manages a collection of listeners.
@@ -152,7 +153,6 @@ namespace antlr4 {
     size_t _stateNumber;
 
     void InitializeInstanceFields();
-
   };
 
 } // namespace antlr4

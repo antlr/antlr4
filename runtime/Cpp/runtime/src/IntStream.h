@@ -27,12 +27,12 @@ namespace antlr4 {
   /// </summary>
   class ANTLR4CPP_PUBLIC IntStream {
   public:
-    static constexpr size_t EOF = std::numeric_limits<size_t>::max();
+    static constexpr size_t EOF = antlr4::EOF;
 
     /// The value returned by <seealso cref="#LA LA()"/> when the end of the stream is
     /// reached.
     /// No explicit EOF definition. We got EOF on all platforms.
-    //static const size_t _EOF = std::ios::eofbit;
+    // static const size_t _EOF = std::ios::eofbit;
 
     /// <summary>
     /// The value returned by <seealso cref="#getSourceName"/> when the actual name of the

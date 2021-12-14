@@ -13,8 +13,7 @@
 using namespace antlr4::atn;
 using namespace antlrcpp;
 
-ATNState::ATNState() {
-}
+ATNState::ATNState() {}
 
 ATNState::~ATNState() {
   for (auto *transition : transitions) {
@@ -23,30 +22,19 @@ ATNState::~ATNState() {
 }
 
 const std::vector<std::string> ATNState::serializationNames = {
-  "INVALID", "BASIC", "RULE_START", "BLOCK_START",
-  "PLUS_BLOCK_START", "STAR_BLOCK_START", "TOKEN_START", "RULE_STOP",
-  "BLOCK_END", "STAR_LOOP_BACK", "STAR_LOOP_ENTRY", "PLUS_LOOP_BACK", "LOOP_END"
-};
+    "INVALID",          "BASIC",          "RULE_START", "BLOCK_START", "PLUS_BLOCK_START",
+    "STAR_BLOCK_START", "TOKEN_START",    "RULE_STOP",  "BLOCK_END",   "STAR_LOOP_BACK",
+    "STAR_LOOP_ENTRY",  "PLUS_LOOP_BACK", "LOOP_END"};
 
-size_t ATNState::hashCode() {
-  return stateNumber;
-}
+size_t ATNState::hashCode() { return stateNumber; }
 
-bool ATNState::operator == (const ATNState &other) {
-  return stateNumber == other.stateNumber;
-}
+bool ATNState::operator==(const ATNState &other) { return stateNumber == other.stateNumber; }
 
-bool ATNState::isNonGreedyExitState() {
-  return false;
-}
+bool ATNState::isNonGreedyExitState() { return false; }
 
-std::string ATNState::toString() const {
-  return std::to_string(stateNumber);
-}
+std::string ATNState::toString() const { return std::to_string(stateNumber); }
 
-void ATNState::addTransition(Transition *e) {
-  addTransition(transitions.size(), e);
-}
+void ATNState::addTransition(Transition *e) { addTransition(transitions.size(), e); }
 
 void ATNState::addTransition(size_t index, Transition *e) {
   for (Transition *transition : transitions)

@@ -7,8 +7,7 @@
 
 #include "antlr4-common.h"
 
-namespace antlr4 {
-namespace atn {
+namespace antlr4::atn {
 
   /// <summary>
   /// This is the base class for gathering detailed information about prediction
@@ -62,9 +61,8 @@ namespace atn {
     /// </summary>
     const bool fullCtx;
 
-    DecisionEventInfo(size_t decision, ATNConfigSet *configs, TokenStream *input, size_t startIndex,
-                      size_t stopIndex, bool fullCtx);
+    DecisionEventInfo(size_t decision, ATNConfigSet *configs, TokenStream *input, size_t startIndex, size_t stopIndex,
+                      bool fullCtx);
   };
 
-} // namespace atn
-} // namespace antlr4
+} // namespace antlr4::atn

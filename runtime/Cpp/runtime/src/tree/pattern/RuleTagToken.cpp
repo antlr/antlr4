@@ -9,28 +9,21 @@
 
 using namespace antlr4::tree::pattern;
 
-RuleTagToken::RuleTagToken(const std::string &/*ruleName*/, int _bypassTokenType) : bypassTokenType(_bypassTokenType) {
-}
+RuleTagToken::RuleTagToken(const std::string & /*ruleName*/, int _bypassTokenType)
+    : bypassTokenType(_bypassTokenType) {}
 
 RuleTagToken::RuleTagToken(const std::string &ruleName, size_t bypassTokenType, const std::string &label)
-  : ruleName(ruleName), bypassTokenType(bypassTokenType), label(label) {
+    : ruleName(ruleName), bypassTokenType(bypassTokenType), label(label) {
   if (ruleName.empty()) {
     throw IllegalArgumentException("ruleName cannot be null or empty.");
   }
-
 }
 
-std::string RuleTagToken::getRuleName() const {
-  return ruleName;
-}
+std::string RuleTagToken::getRuleName() const { return ruleName; }
 
-std::string RuleTagToken::getLabel() const {
-  return label;
-}
+std::string RuleTagToken::getLabel() const { return label; }
 
-size_t RuleTagToken::getChannel() const {
-  return DEFAULT_CHANNEL;
-}
+size_t RuleTagToken::getChannel() const { return DEFAULT_CHANNEL; }
 
 std::string RuleTagToken::getText() const {
   if (label != "") {
@@ -40,38 +33,20 @@ std::string RuleTagToken::getText() const {
   return std::string("<") + ruleName + std::string(">");
 }
 
-size_t RuleTagToken::getType() const {
-  return bypassTokenType;
-}
+size_t RuleTagToken::getType() const { return bypassTokenType; }
 
-size_t RuleTagToken::getLine() const {
-  return 0;
-}
+size_t RuleTagToken::getLine() const { return 0; }
 
-size_t RuleTagToken::getCharPositionInLine() const {
-  return INVALID_INDEX;
-}
+size_t RuleTagToken::getCharPositionInLine() const { return INVALID_INDEX; }
 
-size_t RuleTagToken::getTokenIndex() const {
-  return INVALID_INDEX;
-}
+size_t RuleTagToken::getTokenIndex() const { return INVALID_INDEX; }
 
-size_t RuleTagToken::getStartIndex() const {
-  return INVALID_INDEX;
-}
+size_t RuleTagToken::getStartIndex() const { return INVALID_INDEX; }
 
-size_t RuleTagToken::getStopIndex() const {
-  return INVALID_INDEX;
-}
+size_t RuleTagToken::getStopIndex() const { return INVALID_INDEX; }
 
-antlr4::TokenSource *RuleTagToken::getTokenSource() const {
-  return nullptr;
-}
+antlr4::TokenSource *RuleTagToken::getTokenSource() const { return nullptr; }
 
-antlr4::CharStream *RuleTagToken::getInputStream() const {
-  return nullptr;
-}
+antlr4::CharStream *RuleTagToken::getInputStream() const { return nullptr; }
 
-std::string RuleTagToken::toString() const {
-  return ruleName + ":" + std::to_string(bypassTokenType);
-}
+std::string RuleTagToken::toString() const { return ruleName + ":" + std::to_string(bypassTokenType); }

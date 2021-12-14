@@ -7,8 +7,7 @@
 
 #include "atn/Transition.h"
 
-namespace antlr4 {
-namespace atn {
+namespace antlr4::atn {
 
   class ANTLR4CPP_PUBLIC EpsilonTransition final : public Transition {
   public:
@@ -35,5 +34,4 @@ namespace atn {
     const size_t _outermostPrecedenceReturn; // A rule index.
   };
 
-} // namespace atn
-} // namespace antlr4
+} // namespace antlr4::atn

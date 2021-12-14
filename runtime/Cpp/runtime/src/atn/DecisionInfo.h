@@ -5,13 +5,12 @@
 
 #pragma once
 
-#include "atn/ContextSensitivityInfo.h"
 #include "atn/AmbiguityInfo.h"
-#include "atn/PredicateEvalInfo.h"
+#include "atn/ContextSensitivityInfo.h"
 #include "atn/ErrorInfo.h"
+#include "atn/PredicateEvalInfo.h"
 
-namespace antlr4 {
-namespace atn {
+namespace antlr4::atn {
 
   class LookaheadEventInfo;
 
@@ -223,5 +222,4 @@ namespace atn {
     std::string toString() const;
   };
 
-} // namespace atn
-} // namespace antlr4
+} // namespace antlr4::atn

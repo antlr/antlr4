@@ -43,12 +43,14 @@ namespace antlr4 {
   class Recognizer;
   class RuleContext;
   class Token;
-  template<typename Symbol> class TokenFactory;
+  template <typename Symbol>
+  class TokenFactory;
   class TokenSource;
   class TokenStream;
   class TokenStreamRewriter;
   class UnbufferedCharStream;
   class UnbufferedTokenStream;
+  class Vocabulary;
   class WritableToken;
 
   namespace misc {
@@ -58,7 +60,7 @@ namespace antlr4 {
     class MurmurHash;
     class Utils;
     class Predicate;
-  }
+  } // namespace misc
   namespace atn {
     class ATN;
     class ATNConfig;
@@ -114,21 +116,23 @@ namespace antlr4 {
     class TokensStartState;
     class Transition;
     class WildcardTransition;
-  }
+  } // namespace atn
+
   namespace dfa {
     class DFA;
     class DFASerializer;
     class DFAState;
     class LexerDFASerializer;
-    class Vocabulary;
-  }
+    using Vocabulary = antlr4::Vocabulary;
+  } // namespace dfa
   namespace tree {
     class AbstractParseTreeVisitor;
     class ErrorNode;
     class ErrorNodeImpl;
     class ParseTree;
     class ParseTreeListener;
-    template<typename T> class ParseTreeProperty;
+    template <typename T>
+    class ParseTreeProperty;
     class ParseTreeVisitor;
     class ParseTreeWalker;
     class SyntaxTree;
@@ -146,7 +150,7 @@ namespace antlr4 {
       class TagChunk;
       class TextChunk;
       class TokenTagToken;
-    }
+    } // namespace pattern
 
     namespace xpath {
       class XPath;
@@ -158,6 +162,6 @@ namespace antlr4 {
       class XPathTokenElement;
       class XPathWildcardAnywhereElement;
       class XPathWildcardElement;
-    }
-  }
-}
+    } // namespace xpath
+  }   // namespace tree
+} // namespace antlr4

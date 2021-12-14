@@ -11,14 +11,14 @@
 #include "atn/ATN.h"
 #include "atn/ATNState.h"
 
-namespace antlr4 {
-namespace atn {
+namespace antlr4::atn {
 
   struct PredictionContextHasher;
   struct PredictionContextComparer;
   class PredictionContextMergeCache;
 
-  typedef std::unordered_set<Ref<PredictionContext>, PredictionContextHasher, PredictionContextComparer> PredictionContextCache;
+  typedef std::unordered_set<Ref<PredictionContext>, PredictionContextHasher, PredictionContextComparer>
+      PredictionContextCache;
 
   class ANTLR4CPP_PUBLIC PredictionContext {
   public:
@@ -29,9 +29,10 @@ namespace atn {
     /// Represents $ in an array in full context mode, when $
     /// doesn't mean wildcard: $ + x = [$,x]. Here,
     /// $ = EMPTY_RETURN_STATE.
-    // ml: originally Integer.MAX_VALUE, which would be -1 for us, but this is already used in places where
-    //     -1 is converted to unsigned, so we use a different value here. Any value does the job provided it doesn't
-    //     conflict with real return states.
+    // ml: originally Integer.MAX_VALUE, which would be -1 for us, but this is already used in
+    // places where
+    //     -1 is converted to unsigned, so we use a different value here. Any value does the job
+    //     provided it doesn't conflict with real return states.
     static constexpr size_t EMPTY_RETURN_STATE = std::numeric_limits<size_t>::max() - 9;
 
   private:
@@ -50,11 +51,13 @@ namespace atn {
     ///      int hash = <seealso cref="MurmurHash#initialize"/>(<seealso cref="#INITIAL_HASH"/>);
     ///
     ///      for (int i = 0; i < <seealso cref="#size()"/>; i++) {
-    ///          hash = <seealso cref="MurmurHash#update"/>(hash, <seealso cref="#getParent"/>(i));
+    ///          hash = <seealso cref="MurmurHash#update"/>(hash, <seealso
+    ///          cref="#getParent"/>(i));
     ///      }
     ///
     ///      for (int i = 0; i < <seealso cref="#size()"/>; i++) {
-    ///          hash = <seealso cref="MurmurHash#update"/>(hash, <seealso cref="#getReturnState"/>(i));
+    ///          hash = <seealso cref="MurmurHash#update"/>(hash, <seealso
+    ///          cref="#getReturnState"/>(i));
     ///      }
     ///
     ///      hash = <seealso cref="MurmurHash#finish"/>(hash, 2 * <seealso cref="#size()"/>);
@@ -77,7 +80,7 @@ namespace atn {
     virtual Ref<PredictionContext> getParent(size_t index) const = 0;
     virtual size_t getReturnState(size_t index) const = 0;
 
-    virtual bool operator == (const PredictionContext &o) const = 0;
+    virtual bool operator==(const PredictionContext &o) const = 0;
 
     /// This means only the EMPTY (wildcard? not sure) context is in set.
     virtual bool isEmpty() const;
@@ -130,7 +133,8 @@ namespace atn {
     /// otherwise false to indicate a full-context merge </param>
     /// <param name="mergeCache"> </param>
     static Ref<PredictionContext> mergeSingletons(const Ref<SingletonPredictionContext> &a,
-      const Ref<SingletonPredictionContext> &b, bool rootIsWildcard, PredictionContextMergeCache *mergeCache);
+                                                  const Ref<SingletonPredictionContext> &b, bool rootIsWildcard,
+                                                  PredictionContextMergeCache *mergeCache);
 
     /**
      * Handle case where at least one of {@code a} or {@code b} is
@@ -171,7 +175,7 @@ namespace atn {
      * otherwise false to indicate a full-context merge
      */
     static Ref<PredictionContext> mergeRoot(const Ref<SingletonPredictionContext> &a,
-      const Ref<SingletonPredictionContext> &b, bool rootIsWildcard);
+                                            const Ref<SingletonPredictionContext> &b, bool rootIsWildcard);
 
     /**
      * Merge two {@link ArrayPredictionContext} instances.
@@ -193,7 +197,8 @@ namespace atn {
      * <embed src="images/ArrayMerge_EqualTop.svg" type="image/svg+xml"/></p>
      */
     static Ref<PredictionContext> mergeArrays(const Ref<ArrayPredictionContext> &a,
-      const Ref<ArrayPredictionContext> &b, bool rootIsWildcard, PredictionContextMergeCache *mergeCache);
+                                              const Ref<ArrayPredictionContext> &b, bool rootIsWildcard,
+                                              PredictionContextMergeCache *mergeCache);
 
   protected:
     /// Make pass over all M parents; merge any equal() ones.
@@ -204,13 +209,13 @@ namespace atn {
     static std::string toDOTString(const Ref<PredictionContext> &context);
 
     static Ref<PredictionContext> getCachedContext(const Ref<PredictionContext> &context,
-      PredictionContextCache &contextCache,
-      std::map<Ref<PredictionContext>, Ref<PredictionContext>> &visited);
+                                                   PredictionContextCache &contextCache,
+                                                   std::map<Ref<PredictionContext>, Ref<PredictionContext>> &visited);
 
     // ter's recursive version of Sam's getAllNodes()
     static std::vector<Ref<PredictionContext>> getAllContextNodes(const Ref<PredictionContext> &context);
-    static void getAllContextNodes_(const Ref<PredictionContext> &context,
-      std::vector<Ref<PredictionContext>> &nodes, std::set<PredictionContext *> &visited);
+    static void getAllContextNodes_(const Ref<PredictionContext> &context, std::vector<Ref<PredictionContext>> &nodes,
+                                    std::set<PredictionContext *> &visited);
 
     virtual std::string toString() const;
     virtual std::string toString(Recognizer *recog) const;
@@ -220,14 +225,11 @@ namespace atn {
   };
 
   struct PredictionContextHasher {
-    size_t operator () (const Ref<PredictionContext> &k) const {
-      return k->hashCode();
-    }
+    size_t operator()(const Ref<PredictionContext> &k) const { return k->hashCode(); }
   };
 
   struct PredictionContextComparer {
-    bool operator () (const Ref<PredictionContext> &lhs, const Ref<PredictionContext> &rhs) const
-    {
+    bool operator()(const Ref<PredictionContext> &lhs, const Ref<PredictionContext> &rhs) const {
       if (lhs == rhs) // Object identity.
         return true;
       return (lhs->hashCode() == rhs->hashCode()) && (*lhs == *rhs);
@@ -236,9 +238,9 @@ namespace atn {
 
   class PredictionContextMergeCache {
   public:
-    Ref<PredictionContext> put(Ref<PredictionContext> const& key1, Ref<PredictionContext> const& key2,
-                               Ref<PredictionContext> const& value);
-    Ref<PredictionContext> get(Ref<PredictionContext> const& key1, Ref<PredictionContext> const& key2);
+    Ref<PredictionContext> put(Ref<PredictionContext> const &key1, Ref<PredictionContext> const &key2,
+                               Ref<PredictionContext> const &value);
+    Ref<PredictionContext> get(Ref<PredictionContext> const &key1, Ref<PredictionContext> const &key2);
 
     void clear();
     std::string toString() const;
@@ -246,11 +248,10 @@ namespace atn {
 
   private:
     std::unordered_map<Ref<PredictionContext>,
-      std::unordered_map<Ref<PredictionContext>, Ref<PredictionContext>, PredictionContextHasher, PredictionContextComparer>,
-      PredictionContextHasher, PredictionContextComparer> _data;
-
+                       std::unordered_map<Ref<PredictionContext>, Ref<PredictionContext>, PredictionContextHasher,
+                                          PredictionContextComparer>,
+                       PredictionContextHasher, PredictionContextComparer>
+        _data;
   };
 
-} // namespace atn
-} // namespace antlr4
-
+} // namespace antlr4::atn

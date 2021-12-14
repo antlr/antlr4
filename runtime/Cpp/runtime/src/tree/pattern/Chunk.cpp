@@ -5,5 +5,4 @@
 
 #include "tree/pattern/Chunk.h"
 
-antlr4::tree::pattern::Chunk::~Chunk() {
-}
+antlr4::tree::pattern::Chunk::~Chunk() {}

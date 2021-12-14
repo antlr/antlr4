@@ -7,16 +7,12 @@
 
 #include "BaseErrorListener.h"
 
-namespace antlr4 {
-namespace tree {
-namespace xpath {
+namespace antlr4::tree::xpath {
 
   class ANTLR4CPP_PUBLIC XPathLexerErrorListener : public BaseErrorListener {
   public:
-    virtual void syntaxError(Recognizer *recognizer, Token *offendingSymbol, size_t line,
-      size_t charPositionInLine, const std::string &msg, std::exception_ptr e) override;
+    virtual void syntaxError(Recognizer *recognizer, Token *offendingSymbol, size_t line, size_t charPositionInLine,
+                             const std::string &msg, std::exception_ptr e) override;
   };
 
-} // namespace xpath
-} // namespace tree
-} // namespace antlr4
+} // namespace antlr4::tree::xpath

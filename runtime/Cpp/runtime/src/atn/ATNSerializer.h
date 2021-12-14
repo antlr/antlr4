@@ -7,8 +7,7 @@
 
 #include "antlr4-common.h"
 
-namespace antlr4 {
-namespace atn {
+namespace antlr4::atn {
 
   class ANTLR4CPP_PUBLIC ATNSerializer {
   public:
@@ -44,7 +43,7 @@ namespace atn {
     /// </summary>
     virtual std::vector<size_t> serialize();
 
-    virtual std::string decode(const std::wstring& data);
+    virtual std::string decode(const std::wstring &data);
     virtual std::string getTokenName(size_t t);
 
     /// Used by Java target to encode short/int array as chars in string.
@@ -59,5 +58,4 @@ namespace atn {
     void serializeUUID(std::vector<size_t> &data, antlrcpp::Guid uuid);
   };
 
-} // namespace atn
-} // namespace antlr4
+} // namespace antlr4::atn

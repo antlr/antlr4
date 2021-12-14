@@ -6,12 +6,11 @@
 #pragma once
 
 #include "Token.h"
-#include "support/BitSet.h"
-#include "atn/PredictionContext.h"
 #include "atn/ATNConfig.h"
+#include "atn/PredictionContext.h"
+#include "support/BitSet.h"
 
-namespace antlr4 {
-namespace atn {
+namespace antlr4::atn {
 
   class ANTLR4CPP_PUBLIC LL1Analyzer {
   public:
@@ -101,9 +100,9 @@ namespace atn {
     /// outermost context is reached. This parameter has no effect if {@code ctx}
     /// is {@code null}. </param>
   protected:
-    virtual void _LOOK(ATNState *s, ATNState *stopState, Ref<PredictionContext> const& ctx, misc::IntervalSet &look,
-      ATNConfig::Set &lookBusy, antlrcpp::BitSet &calledRuleStack, bool seeThruPreds, bool addEOF) const;
+    virtual void _LOOK(ATNState *s, ATNState *stopState, Ref<PredictionContext> const &ctx, misc::IntervalSet &look,
+                       ATNConfig::Set &lookBusy, antlrcpp::BitSet &calledRuleStack, bool seeThruPreds,
+                       bool addEOF) const;
   };
 
-} // namespace atn
-} // namespace antlr4
+} // namespace antlr4::atn

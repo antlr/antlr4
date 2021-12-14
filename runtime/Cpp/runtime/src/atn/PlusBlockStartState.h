@@ -7,8 +7,7 @@
 
 #include "atn/BlockStartState.h"
 
-namespace antlr4 {
-namespace atn {
+namespace antlr4::atn {
 
   /// Start of {@code (A|B|...)+} loop. Technically a decision state, but
   /// we don't use for code generation; somebody might need it, so I'm defining
@@ -21,5 +20,4 @@ namespace atn {
     virtual size_t getStateType() override;
   };
 
-} // namespace atn
-} // namespace antlr4
+} // namespace antlr4::atn

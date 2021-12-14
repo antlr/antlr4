@@ -7,8 +7,7 @@
 
 #include "atn/ATNState.h"
 
-namespace antlr4 {
-namespace atn {
+namespace antlr4::atn {
 
   /// The last node in the ATN for a rule, unless that rule is the start symbol.
   /// In that case, there is one transition to EOF. Later, we might encode
@@ -18,8 +17,6 @@ namespace atn {
 
   public:
     virtual size_t getStateType() override;
-
   };
 
-} // namespace atn
-} // namespace antlr4
+} // namespace antlr4::atn

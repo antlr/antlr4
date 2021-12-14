@@ -5,11 +5,10 @@
 
 #pragma once
 
-#include "atn/LexerActionType.h"
 #include "antlr4-common.h"
+#include "atn/LexerActionType.h"
 
-namespace antlr4 {
-namespace atn {
+namespace antlr4::atn {
 
   /// <summary>
   /// Represents a single action which can be executed following the successful
@@ -54,13 +53,10 @@ namespace atn {
     virtual void execute(Lexer *lexer) = 0;
 
     virtual size_t hashCode() const = 0;
-    virtual bool operator == (const LexerAction &obj) const = 0;
-    virtual bool operator != (const LexerAction &obj) const {
-      return !(*this == obj);
-    }
+    virtual bool operator==(const LexerAction &obj) const = 0;
+    virtual bool operator!=(const LexerAction &obj) const { return !(*this == obj); }
 
     virtual std::string toString() const = 0;
   };
 
-} // namespace atn
-} // namespace antlr4
+} // namespace antlr4::atn

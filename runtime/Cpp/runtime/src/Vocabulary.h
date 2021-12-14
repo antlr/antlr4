@@ -8,7 +8,6 @@
 #include "antlr4-common.h"
 
 namespace antlr4 {
-namespace dfa {
 
   /// This class provides a default implementation of the <seealso cref="Vocabulary"/>
   /// interface.
@@ -24,7 +23,7 @@ namespace dfa {
 
     Vocabulary() {}
 
-    Vocabulary(const Vocabulary&) = default;
+    Vocabulary(const Vocabulary &) = default;
 
     /// <summary>
     /// Constructs a new instance of <seealso cref="Vocabulary"/> from the specified
@@ -173,5 +172,12 @@ namespace dfa {
     const size_t _maxTokenType = 0;
   };
 
-} // namespace atn
+  namespace dfa {
+
+    // This was originally defined in antlr4::dfa. It was moved to antlr4 to match the other
+    // runtimes. This alias is here for backwards source compatbility.
+    using Vocabulary = antlr4::Vocabulary;
+
+  } // namespace dfa
+
 } // namespace antlr4

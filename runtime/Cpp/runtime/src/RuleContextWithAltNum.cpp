@@ -10,18 +10,11 @@
 using namespace antlr4;
 using namespace antlr4::atn;
 
-RuleContextWithAltNum::RuleContextWithAltNum() : ParserRuleContext() {
-  altNum = ATN::INVALID_ALT_NUMBER;
-}
+RuleContextWithAltNum::RuleContextWithAltNum() : ParserRuleContext() { altNum = ATN::INVALID_ALT_NUMBER; }
 
 RuleContextWithAltNum::RuleContextWithAltNum(ParserRuleContext *parent, int invokingStateNumber)
-  : ParserRuleContext(parent, invokingStateNumber) {
-}
+    : ParserRuleContext(parent, invokingStateNumber) {}
 
-size_t RuleContextWithAltNum::getAltNumber() const {
-  return altNum;
-}
+size_t RuleContextWithAltNum::getAltNumber() const { return altNum; }
 
-void RuleContextWithAltNum::setAltNumber(size_t number) {
-  altNum = number;
-}
+void RuleContextWithAltNum::setAltNumber(size_t number) { altNum = number; }

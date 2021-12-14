@@ -50,7 +50,6 @@
 #include "UnbufferedCharStream.h"
 #include "UnbufferedTokenStream.h"
 #include "Vocabulary.h"
-#include "Vocabulary.h"
 #include "WritableToken.h"
 #include "atn/ATN.h"
 #include "atn/ATNConfig.h"
@@ -131,10 +130,10 @@
 #include "support/Any.h"
 #include "support/Arrays.h"
 #include "support/BitSet.h"
-#include "support/Casts.h"
 #include "support/CPPUtils.h"
-#include "support/StringUtils.h"
+#include "support/Casts.h"
 #include "support/Guid.h"
+#include "support/StringUtils.h"
 #include "tree/AbstractParseTreeVisitor.h"
 #include "tree/ErrorNode.h"
 #include "tree/ErrorNodeImpl.h"
@@ -164,5 +163,3 @@
 #include "tree/xpath/XPathTokenElement.h"
 #include "tree/xpath/XPathWildcardAnywhereElement.h"
 #include "tree/xpath/XPathWildcardElement.h"
-
-

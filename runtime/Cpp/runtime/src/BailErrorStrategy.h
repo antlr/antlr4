@@ -49,7 +49,7 @@ namespace antlr4 {
 
     /// Make sure we don't attempt to recover inline; if the parser
     ///  successfully recovers, it won't throw an exception.
-    virtual Token* recoverInline(Parser *recognizer) override;
+    virtual Token *recoverInline(Parser *recognizer) override;
 
     /// <summary>
     /// Make sure we don't attempt to recover from problems in subrules. </summary>

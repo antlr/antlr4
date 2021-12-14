@@ -7,9 +7,7 @@
 
 #include "XPathElement.h"
 
-namespace antlr4 {
-namespace tree {
-namespace xpath {
+namespace antlr4::tree::xpath {
 
   /// Either {@code ID} at start of path or {@code ...//ID} in middle of path.
   class ANTLR4CPP_PUBLIC XPathRuleAnywhereElement : public XPathElement {
@@ -22,6 +20,4 @@ namespace xpath {
     int _ruleIndex = 0;
   };
 
-} // namespace xpath
-} // namespace tree
-} // namespace antlr4
+} // namespace antlr4::tree::xpath

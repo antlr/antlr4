@@ -7,8 +7,7 @@
 
 #include "misc/IntervalSet.h"
 
-namespace antlr4 {
-namespace atn {
+namespace antlr4::atn {
 
   /// <summary>
   /// An ATN transition between any two ATN states.  Subclasses define
@@ -68,9 +67,8 @@ namespace atn {
 
     virtual std::string toString() const;
 
-    Transition(Transition const&) = delete;
-    Transition& operator=(Transition const&) = delete;
+    Transition(Transition const &) = delete;
+    Transition &operator=(Transition const &) = delete;
   };
 
-} // namespace atn
-} // namespace antlr4
+} // namespace antlr4::atn

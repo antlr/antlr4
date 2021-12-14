@@ -5,5 +5,4 @@
 
 #include "WritableToken.h"
 
-antlr4::WritableToken::~WritableToken() {
-}
+antlr4::WritableToken::~WritableToken() {}

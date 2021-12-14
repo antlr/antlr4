@@ -7,9 +7,7 @@
 
 #include "Chunk.h"
 
-namespace antlr4 {
-namespace tree {
-namespace pattern {
+namespace antlr4::tree::pattern {
 
   /// <summary>
   /// Represents a placeholder tag in a tree pattern. A tag can have any of the
@@ -81,6 +79,4 @@ namespace pattern {
     const std::string _label;
   };
 
-} // namespace pattern
-} // namespace tree
-} // namespace antlr4
+} // namespace antlr4::tree::pattern

@@ -7,8 +7,7 @@
 
 #include "atn/DecisionEventInfo.h"
 
-namespace antlr4 {
-namespace atn {
+namespace antlr4::atn {
 
   /// <summary>
   /// This class represents profiling event information for a syntax error
@@ -39,5 +38,4 @@ namespace atn {
               bool fullCtx);
   };
 
-} // namespace atn
-} // namespace antlr4
+} // namespace antlr4::atn

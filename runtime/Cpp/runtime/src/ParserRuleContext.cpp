@@ -3,11 +3,11 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
-#include "tree/TerminalNode.h"
-#include "tree/ErrorNode.h"
-#include "misc/Interval.h"
 #include "Parser.h"
 #include "Token.h"
+#include "misc/Interval.h"
+#include "tree/ErrorNode.h"
+#include "tree/TerminalNode.h"
 
 #include "support/CPPUtils.h"
 
@@ -20,13 +20,10 @@ using namespace antlrcpp;
 
 ParserRuleContext ParserRuleContext::EMPTY;
 
-ParserRuleContext::ParserRuleContext()
-  : start(nullptr), stop(nullptr) {
-}
+ParserRuleContext::ParserRuleContext() : start(nullptr), stop(nullptr) {}
 
 ParserRuleContext::ParserRuleContext(ParserRuleContext *parent, size_t invokingStateNumber)
-: RuleContext(parent, invokingStateNumber), start(nullptr), stop(nullptr) {
-}
+    : RuleContext(parent, invokingStateNumber), start(nullptr), stop(nullptr) {}
 
 void ParserRuleContext::copyFrom(ParserRuleContext *ctx) {
   // from RuleContext
@@ -47,25 +44,25 @@ void ParserRuleContext::copyFrom(ParserRuleContext *ctx) {
     }
 
     // Remove the just reparented error nodes from the source context.
-    ctx->children.erase(std::remove_if(ctx->children.begin(), ctx->children.end(), [this](tree::ParseTree *e) -> bool {
-      return std::find(children.begin(), children.end(), e) != children.end();
-    }), ctx->children.end());
+    ctx->children.erase(std::remove_if(ctx->children.begin(), ctx->children.end(),
+                                       [this](tree::ParseTree *e) -> bool {
+                                         return std::find(children.begin(), children.end(), e) != children.end();
+                                       }),
+                        ctx->children.end());
   }
 }
 
-void ParserRuleContext::enterRule(tree::ParseTreeListener * /*listener*/) {
-}
+void ParserRuleContext::enterRule(tree::ParseTreeListener * /*listener*/) {}
 
-void ParserRuleContext::exitRule(tree::ParseTreeListener * /*listener*/) {
-}
+void ParserRuleContext::exitRule(tree::ParseTreeListener * /*listener*/) {}
 
-tree::TerminalNode* ParserRuleContext::addChild(tree::TerminalNode *t) {
+tree::TerminalNode *ParserRuleContext::addChild(tree::TerminalNode *t) {
   t->setParent(this);
   children.push_back(t);
   return t;
 }
 
-RuleContext* ParserRuleContext::addChild(RuleContext *ruleInvocation) {
+RuleContext *ParserRuleContext::addChild(RuleContext *ruleInvocation) {
   children.push_back(ruleInvocation);
   return ruleInvocation;
 }
@@ -76,7 +73,7 @@ void ParserRuleContext::removeLastChild() {
   }
 }
 
-tree::TerminalNode* ParserRuleContext::getToken(size_t ttype, size_t i) {
+tree::TerminalNode *ParserRuleContext::getToken(size_t ttype, size_t i) {
   if (i >= children.size()) {
     return nullptr;
   }
@@ -123,19 +120,14 @@ misc::Interval ParserRuleContext::getSourceInterval() {
   return misc::Interval(start->getTokenIndex(), stop->getTokenIndex());
 }
 
-Token* ParserRuleContext::getStart() {
-  return start;
-}
+Token *ParserRuleContext::getStart() { return start; }
 
-Token* ParserRuleContext::getStop() {
-  return stop;
-}
+Token *ParserRuleContext::getStop() { return stop; }
 
 std::string ParserRuleContext::toInfoString(Parser *recognizer) {
   std::vector<std::string> rules = recognizer->getRuleInvocationStack(this);
   std::reverse(rules.begin(), rules.end());
   std::string rulesStr = antlrcpp::arrayToString(rules);
-  return "ParserRuleContext" + rulesStr + "{start=" + std::to_string(start->getTokenIndex()) + ", stop=" +
-    std::to_string(stop->getTokenIndex()) + '}';
+  return "ParserRuleContext" + rulesStr + "{start=" + std::to_string(start->getTokenIndex()) +
+         ", stop=" + std::to_string(stop->getTokenIndex()) + '}';
 }
-

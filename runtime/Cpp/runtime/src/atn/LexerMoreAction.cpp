@@ -3,8 +3,8 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
-#include "misc/MurmurHash.h"
 #include "Lexer.h"
+#include "misc/MurmurHash.h"
 
 #include "atn/LexerMoreAction.h"
 
@@ -17,20 +17,13 @@ const Ref<LexerMoreAction> LexerMoreAction::getInstance() {
   return instance;
 }
 
-LexerMoreAction::LexerMoreAction() {
-}
+LexerMoreAction::LexerMoreAction() {}
 
-LexerActionType LexerMoreAction::getActionType() const {
-  return LexerActionType::MORE;
-}
+LexerActionType LexerMoreAction::getActionType() const { return LexerActionType::MORE; }
 
-bool LexerMoreAction::isPositionDependent() const {
-  return false;
-}
+bool LexerMoreAction::isPositionDependent() const { return false; }
 
-void LexerMoreAction::execute(Lexer *lexer) {
-  lexer->more();
-}
+void LexerMoreAction::execute(Lexer *lexer) { lexer->more(); }
 
 size_t LexerMoreAction::hashCode() const {
   size_t hash = MurmurHash::initialize();
@@ -38,10 +31,6 @@ size_t LexerMoreAction::hashCode() const {
   return MurmurHash::finish(hash, 1);
 }
 
-bool LexerMoreAction::operator == (const LexerAction &obj) const {
-  return &obj == this;
-}
+bool LexerMoreAction::operator==(const LexerAction &obj) const { return &obj == this; }
 
-std::string LexerMoreAction::toString() const {
-  return "more";
-}
+std::string LexerMoreAction::toString() const { return "more"; }

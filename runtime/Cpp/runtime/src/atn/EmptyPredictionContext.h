@@ -7,8 +7,7 @@
 
 #include "atn/SingletonPredictionContext.h"
 
-namespace antlr4 {
-namespace atn {
+namespace antlr4::atn {
 
   class ANTLR4CPP_PUBLIC EmptyPredictionContext : public SingletonPredictionContext {
   public:
@@ -20,8 +19,7 @@ namespace atn {
     virtual size_t getReturnState(size_t index) const override;
     virtual std::string toString() const override;
 
-    virtual bool operator == (const PredictionContext &o) const override;
+    virtual bool operator==(const PredictionContext &o) const override;
   };
 
-} // namespace atn
-} // namespace antlr4
+} // namespace antlr4::atn

@@ -5,13 +5,14 @@
 
 #pragma once
 
+#include <shared_mutex>
+
 #include "atn/ATN.h"
+#include "atn/PredictionContext.h"
 #include "misc/IntervalSet.h"
 #include "support/CPPUtils.h"
-#include "atn/PredictionContext.h"
 
-namespace antlr4 {
-namespace atn {
+namespace antlr4::atn {
 
   class ANTLR4CPP_PUBLIC ATNSimulator {
   public:
@@ -36,8 +37,8 @@ namespace atn {
      * @since 4.3
      */
     virtual void clearDFA();
-    virtual PredictionContextCache& getSharedContextCache();
-    virtual Ref<PredictionContext> getCachedContext(Ref<PredictionContext> const& context);
+    virtual PredictionContextCache &getSharedContextCache();
+    virtual Ref<PredictionContext> getCachedContext(Ref<PredictionContext> const &context);
 
     /// @deprecated Use <seealso cref="ATNDeserializer#deserialize"/> instead.
     static ATN deserialize(const std::vector<uint16_t> &data);
@@ -57,7 +58,7 @@ namespace atn {
 
   protected:
     static std::shared_mutex _stateLock; // Lock for DFA states.
-    static std::shared_mutex _edgeLock; // Lock for the sparse edge map in DFA states.
+    static std::shared_mutex _edgeLock;  // Lock for the sparse edge map in DFA states.
 
     /// <summary>
     /// The context cache maps all PredictionContext objects that are equals()
@@ -83,5 +84,4 @@ namespace atn {
     PredictionContextCache &_sharedContextCache;
   };
 
-} // namespace atn
-} // namespace antlr4
+} // namespace antlr4::atn

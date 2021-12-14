@@ -7,9 +7,10 @@
 
 using namespace antlr4::misc;
 
-// A variation of the MurmurHash3 implementation (https://github.com/aappleby/smhasher/blob/master/src/MurmurHash3.cpp)
-// Here we unrolled the loop used there into individual calls to update(), as we usually hash object fields
-// instead of entire buffers.
+// A variation of the MurmurHash3 implementation
+// (https://github.com/aappleby/smhasher/blob/master/src/MurmurHash3.cpp) Here we unrolled the loop
+// used there into individual calls to update(), as we usually hash object fields instead of entire
+// buffers.
 
 // Platform-specific functions and macros
 
@@ -17,60 +18,50 @@ using namespace antlr4::misc;
 
 #if defined(_MSC_VER)
 
-#define FORCE_INLINE	__forceinline
+#define FORCE_INLINE __forceinline
 
 #include <stdlib.h>
 
-#define ROTL32(x,y)	_rotl(x,y)
-#define ROTL64(x,y)	_rotl64(x,y)
+#define ROTL32(x, y) _rotl(x, y)
+#define ROTL64(x, y) _rotl64(x, y)
 
 #define BIG_CONSTANT(x) (x)
 
-#else	// defined(_MSC_VER)
+#else // defined(_MSC_VER)
 
 // Other compilers
 
-#define	FORCE_INLINE inline __attribute__((always_inline))
+#define FORCE_INLINE inline __attribute__((always_inline))
 
-inline uint32_t rotl32 (uint32_t x, int8_t r)
-{
-  return (x << r) | (x >> (32 - r));
-}
+inline uint32_t rotl32(uint32_t x, int8_t r) { return (x << r) | (x >> (32 - r)); }
 
-inline uint64_t rotl64 (uint64_t x, int8_t r)
-{
-  return (x << r) | (x >> (64 - r));
-}
+inline uint64_t rotl64(uint64_t x, int8_t r) { return (x << r) | (x >> (64 - r)); }
 
-#define	ROTL32(x,y)	rotl32(x,y)
-#define ROTL64(x,y)	rotl64(x,y)
+#define ROTL32(x, y) rotl32(x, y)
+#define ROTL64(x, y) rotl64(x, y)
 
 #define BIG_CONSTANT(x) (x##LLU)
 
 #endif // !defined(_MSC_VER)
 
-size_t MurmurHash::initialize() {
-  return initialize(DEFAULT_SEED);
-}
+size_t MurmurHash::initialize() { return initialize(DEFAULT_SEED); }
 
-size_t MurmurHash::initialize(size_t seed) {
-  return seed;
-}
+size_t MurmurHash::initialize(size_t seed) { return seed; }
 
 #if defined(_WIN32) || defined(_WIN64)
-  #if _WIN64
-    #define ENVIRONMENT64
-  #else
-    #define ENVIRONMENT32
-  #endif
+#if _WIN64
+#define ENVIRONMENT64
+#else
+#define ENVIRONMENT32
+#endif
 #endif
 
 #if defined(__GNUC__)
-  #if defined(__x86_64__) || defined(__ppc64__)
-    #define ENVIRONMENT64
-  #else
-    #define ENVIRONMENT32
-  #endif
+#if defined(__x86_64__) || defined(__ppc64__)
+#define ENVIRONMENT64
+#else
+#define ENVIRONMENT32
+#endif
 #endif
 
 #if defined(ENVIRONMENT32)
@@ -90,7 +81,6 @@ size_t MurmurHash::update(size_t hash, size_t value) {
 
   return hash;
 }
-
 
 size_t MurmurHash::finish(size_t hash, size_t entryCount) {
   hash ^= entryCount * 4;
@@ -119,7 +109,6 @@ size_t MurmurHash::update(size_t hash, size_t value) {
 
   return hash;
 }
-
 
 size_t MurmurHash::finish(size_t hash, size_t entryCount) {
   hash ^= entryCount * 8;

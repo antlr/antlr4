@@ -7,8 +7,7 @@
 
 #include "atn/DecisionEventInfo.h"
 
-namespace antlr4 {
-namespace atn {
+namespace antlr4::atn {
 
   /// <summary>
   /// This class represents profiling event information for semantic predicate
@@ -52,11 +51,11 @@ namespace atn {
     /// evaluated during LL prediction; otherwise, {@code false} if the semantic
     /// context was evaluated during SLL prediction
     /// </param>
-    /// <seealso cref= ParserATNSimulator#evalSemanticContext(SemanticContext, ParserRuleContext, int, boolean) </seealso>
-    /// <seealso cref= SemanticContext#eval(Recognizer, RuleContext) </seealso>
+    /// <seealso cref= ParserATNSimulator#evalSemanticContext(SemanticContext, ParserRuleContext,
+    /// int, boolean) </seealso> <seealso cref= SemanticContext#eval(Recognizer, RuleContext)
+    /// </seealso>
     PredicateEvalInfo(size_t decision, TokenStream *input, size_t startIndex, size_t stopIndex,
-                      Ref<SemanticContext> const& semctx, bool evalResult, size_t predictedAlt, bool fullCtx);
+                      Ref<SemanticContext> const &semctx, bool evalResult, size_t predictedAlt, bool fullCtx);
   };
 
-} // namespace atn
-} // namespace antlr4
+} // namespace antlr4::atn

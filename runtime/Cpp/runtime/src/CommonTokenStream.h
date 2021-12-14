@@ -55,11 +55,11 @@ namespace antlr4 {
      */
     CommonTokenStream(TokenSource *tokenSource, size_t channel);
 
-    virtual Token* LT(ssize_t k) override;
+    virtual Token *LT(ssize_t k) override;
 
     /// Count EOF just once.
     virtual int getNumberOfOnChannelTokens();
-    
+
   protected:
     /**
      * Specifies the channel to use for filtering tokens.
@@ -72,8 +72,7 @@ namespace antlr4 {
 
     virtual ssize_t adjustSeekIndex(size_t i) override;
 
-    virtual Token* LB(size_t k) override;
-
+    virtual Token *LB(size_t k) override;
   };
 
 } // namespace antlr4

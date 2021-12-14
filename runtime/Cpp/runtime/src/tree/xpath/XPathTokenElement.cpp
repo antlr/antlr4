@@ -3,10 +3,10 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include "Token.h"
+#include "support/CPPUtils.h"
 #include "tree/ParseTree.h"
 #include "tree/Trees.h"
-#include "support/CPPUtils.h"
-#include "Token.h"
 
 #include "XPathTokenElement.h"
 
@@ -24,7 +24,8 @@ std::vector<ParseTree *> XPathTokenElement::evaluate(ParseTree *t) {
   for (auto *c : t->children) {
     if (antlrcpp::is<TerminalNode *>(c)) {
       TerminalNode *tnode = dynamic_cast<TerminalNode *>(c);
-      if ((tnode->getSymbol()->getType() == _tokenType && !_invert) || (tnode->getSymbol()->getType() != _tokenType && _invert)) {
+      if ((tnode->getSymbol()->getType() == _tokenType && !_invert) ||
+          (tnode->getSymbol()->getType() != _tokenType && _invert)) {
         nodes.push_back(tnode);
       }
     }

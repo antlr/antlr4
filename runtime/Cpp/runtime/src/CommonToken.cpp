@@ -3,15 +3,15 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
-#include "TokenSource.h"
 #include "CharStream.h"
 #include "Recognizer.h"
+#include "TokenSource.h"
 #include "Vocabulary.h"
 
 #include "misc/Interval.h"
 
-#include "support/StringUtils.h"
 #include "support/CPPUtils.h"
+#include "support/StringUtils.h"
 
 #include "CommonToken.h"
 
@@ -20,14 +20,15 @@ using namespace antlr4::misc;
 
 using namespace antlrcpp;
 
-const std::pair<TokenSource*, CharStream*> CommonToken::EMPTY_SOURCE;
+const std::pair<TokenSource *, CharStream *> CommonToken::EMPTY_SOURCE;
 
 CommonToken::CommonToken(size_t type) {
   InitializeInstanceFields();
   _type = type;
 }
 
-CommonToken::CommonToken(std::pair<TokenSource*, CharStream*> source, size_t type, size_t channel, size_t start, size_t stop) {
+CommonToken::CommonToken(std::pair<TokenSource *, CharStream *> source, size_t type, size_t channel, size_t start,
+                         size_t stop) {
   InitializeInstanceFields();
   _source = source;
   _type = type;
@@ -63,17 +64,13 @@ CommonToken::CommonToken(Token *oldToken) {
     _source = (static_cast<CommonToken *>(oldToken))->_source;
   } else {
     _text = oldToken->getText();
-    _source = { oldToken->getTokenSource(), oldToken->getInputStream() };
+    _source = {oldToken->getTokenSource(), oldToken->getInputStream()};
   }
 }
 
-size_t CommonToken::getType() const {
-  return _type;
-}
+size_t CommonToken::getType() const { return _type; }
 
-void CommonToken::setLine(size_t line) {
-  _line = line;
-}
+void CommonToken::setLine(size_t line) { _line = line; }
 
 std::string CommonToken::getText() const {
   if (!_text.empty()) {
@@ -92,69 +89,37 @@ std::string CommonToken::getText() const {
   }
 }
 
-void CommonToken::setText(const std::string &text) {
-  _text = text;
-}
+void CommonToken::setText(const std::string &text) { _text = text; }
 
-size_t CommonToken::getLine() const {
-  return _line;
-}
+size_t CommonToken::getLine() const { return _line; }
 
-size_t CommonToken::getCharPositionInLine() const {
-  return _charPositionInLine;
-}
+size_t CommonToken::getCharPositionInLine() const { return _charPositionInLine; }
 
-void CommonToken::setCharPositionInLine(size_t charPositionInLine) {
-  _charPositionInLine = charPositionInLine;
-}
+void CommonToken::setCharPositionInLine(size_t charPositionInLine) { _charPositionInLine = charPositionInLine; }
 
-size_t CommonToken::getChannel() const {
-  return _channel;
-}
+size_t CommonToken::getChannel() const { return _channel; }
 
-void CommonToken::setChannel(size_t channel) {
-  _channel = channel;
-}
+void CommonToken::setChannel(size_t channel) { _channel = channel; }
 
-void CommonToken::setType(size_t type) {
-  _type = type;
-}
+void CommonToken::setType(size_t type) { _type = type; }
 
-size_t CommonToken::getStartIndex() const {
-  return _start;
-}
+size_t CommonToken::getStartIndex() const { return _start; }
 
-void CommonToken::setStartIndex(size_t start) {
-  _start = start;
-}
+void CommonToken::setStartIndex(size_t start) { _start = start; }
 
-size_t CommonToken::getStopIndex() const {
-  return _stop;
-}
+size_t CommonToken::getStopIndex() const { return _stop; }
 
-void CommonToken::setStopIndex(size_t stop) {
-  _stop = stop;
-}
+void CommonToken::setStopIndex(size_t stop) { _stop = stop; }
 
-size_t CommonToken::getTokenIndex() const {
-  return _index;
-}
+size_t CommonToken::getTokenIndex() const { return _index; }
 
-void CommonToken::setTokenIndex(size_t index) {
-  _index = index;
-}
+void CommonToken::setTokenIndex(size_t index) { _index = index; }
 
-antlr4::TokenSource *CommonToken::getTokenSource() const {
-  return _source.first;
-}
+antlr4::TokenSource *CommonToken::getTokenSource() const { return _source.first; }
 
-antlr4::CharStream *CommonToken::getInputStream() const {
-  return _source.second;
-}
+antlr4::CharStream *CommonToken::getInputStream() const { return _source.second; }
 
-std::string CommonToken::toString() const {
-  return toString(nullptr);
-}
+std::string CommonToken::toString() const { return toString(nullptr); }
 
 std::string CommonToken::toString(Recognizer *r) const {
   std::stringstream ss;
@@ -177,8 +142,8 @@ std::string CommonToken::toString(Recognizer *r) const {
     typeString = r->getVocabulary().getDisplayName(_type);
 
   ss << "[@" << symbolToNumeric(getTokenIndex()) << "," << symbolToNumeric(_start) << ":" << symbolToNumeric(_stop)
-    << "='" << txt << "',<" << typeString << ">" << channelStr << "," << _line << ":"
-    << getCharPositionInLine() << "]";
+     << "='" << txt << "',<" << typeString << ">" << channelStr << "," << _line << ":" << getCharPositionInLine()
+     << "]";
 
   return ss.str();
 }

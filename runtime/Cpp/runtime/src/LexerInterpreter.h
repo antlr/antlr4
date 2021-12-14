@@ -6,8 +6,8 @@
 #pragma once
 
 #include "Lexer.h"
-#include "atn/PredictionContext.h"
 #include "Vocabulary.h"
+#include "atn/PredictionContext.h"
 
 namespace antlr4 {
 
@@ -19,13 +19,13 @@ namespace antlr4 {
 
     ~LexerInterpreter();
 
-    virtual const atn::ATN& getATN() const override;
+    virtual const atn::ATN &getATN() const override;
     virtual std::string getGrammarFileName() const override;
-    virtual const std::vector<std::string>& getRuleNames() const override;
-    virtual const std::vector<std::string>& getChannelNames() const override;
-    virtual const std::vector<std::string>& getModeNames() const override;
+    virtual const std::vector<std::string> &getRuleNames() const override;
+    virtual const std::vector<std::string> &getChannelNames() const override;
+    virtual const std::vector<std::string> &getModeNames() const override;
 
-    virtual const dfa::Vocabulary& getVocabulary() const override;
+    virtual const dfa::Vocabulary &getVocabulary() const override;
 
   protected:
     const std::string _grammarFileName;

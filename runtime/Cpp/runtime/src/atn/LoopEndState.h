@@ -7,8 +7,7 @@
 
 #include "atn/ATNState.h"
 
-namespace antlr4 {
-namespace atn {
+namespace antlr4::atn {
 
   /// Mark the end of a * or + loop.
   class ANTLR4CPP_PUBLIC LoopEndState final : public ATNState {
@@ -18,5 +17,4 @@ namespace atn {
     virtual size_t getStateType() override;
   };
 
-} // namespace atn
-} // namespace antlr4
+} // namespace antlr4::atn

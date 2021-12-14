@@ -24,11 +24,11 @@ namespace antlr4 {
   class ANTLR4CPP_PUBLIC BufferedTokenStream : public TokenStream {
   public:
     BufferedTokenStream(TokenSource *tokenSource);
-    BufferedTokenStream(const BufferedTokenStream& other) = delete;
+    BufferedTokenStream(const BufferedTokenStream &other) = delete;
 
-    BufferedTokenStream& operator = (const BufferedTokenStream& other) = delete;
+    BufferedTokenStream &operator=(const BufferedTokenStream &other) = delete;
 
-    virtual TokenSource* getTokenSource() const override;
+    virtual TokenSource *getTokenSource() const override;
     virtual size_t index() override;
     virtual ssize_t mark() override;
 
@@ -39,13 +39,13 @@ namespace antlr4 {
     virtual size_t size() override;
     virtual void consume() override;
 
-    virtual Token* get(size_t i) const override;
+    virtual Token *get(size_t i) const override;
 
     /// Get all tokens from start..stop inclusively.
     virtual std::vector<Token *> get(size_t start, size_t stop);
 
     virtual size_t LA(ssize_t i) override;
-    virtual Token* LT(ssize_t k) override;
+    virtual Token *LT(ssize_t k) override;
 
     /// Reset this token stream by setting its token source.
     virtual void setTokenSource(TokenSource *tokenSource);
@@ -118,7 +118,8 @@ namespace antlr4 {
      * see the documentation of {@link IntStream} for a description of
      * Initializing Methods.</p>
      */
-    // ml: since -1 requires to make this member signed for just this single aspect we use a member _needSetup instead.
+    // ml: since -1 requires to make this member signed for just this single aspect we use a member
+    // _needSetup instead.
     //     Use bool isInitialized() to find out if this stream has started reading.
     size_t _p;
 
@@ -151,7 +152,7 @@ namespace antlr4 {
     /// <returns> The actual number of elements added to the buffer. </returns>
     virtual size_t fetch(size_t n);
 
-    virtual Token* LB(size_t k);
+    virtual Token *LB(size_t k);
 
     /// Allowed derived classes to modify the behavior of operations which change
     /// the current stream position by adjusting the target token index of a seek

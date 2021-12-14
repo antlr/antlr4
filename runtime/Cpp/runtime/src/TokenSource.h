@@ -57,7 +57,7 @@ namespace antlr4 {
     /// <returns> The <seealso cref="CharStream"/> associated with the current position in
     /// the input, or {@code null} if no input stream is available for the token
     /// source. </returns>
-    virtual CharStream* getInputStream() = 0;
+    virtual CharStream *getInputStream() = 0;
 
     /// <summary>
     /// Gets the name of the underlying input source. This method returns a
@@ -70,8 +70,9 @@ namespace antlr4 {
     /// Set the <seealso cref="TokenFactory"/> this token source should use for creating
     /// <seealso cref="Token"/> objects from the input.
     /// </summary>
-    /// <param name="factory"> The <seealso cref="TokenFactory"/> to use for creating tokens. </param>
-    template<typename T1>
+    /// <param name="factory"> The <seealso cref="TokenFactory"/> to use for creating tokens.
+    /// </param>
+    template <typename T1>
     void setTokenFactory(TokenFactory<T1> * /*factory*/) {}
 
     /// <summary>
@@ -79,7 +80,7 @@ namespace antlr4 {
     /// creating <seealso cref="Token"/> objects from the input.
     /// </summary>
     /// <returns> The <seealso cref="TokenFactory"/> currently used by this token source. </returns>
-    virtual TokenFactory<CommonToken>* getTokenFactory() = 0;
+    virtual TokenFactory<CommonToken> *getTokenFactory() = 0;
   };
 
 } // namespace antlr4

@@ -9,9 +9,7 @@ using namespace antlr4;
 
 const std::string RuntimeMetaData::VERSION = "4.9.3";
 
-std::string RuntimeMetaData::getRuntimeVersion() {
-  return VERSION;
-}
+std::string RuntimeMetaData::getRuntimeVersion() { return VERSION; }
 
 void RuntimeMetaData::checkVersion(const std::string &generatingToolVersion, const std::string &compileTimeVersion) {
   std::string runtimeVersion = VERSION;
@@ -19,20 +17,26 @@ void RuntimeMetaData::checkVersion(const std::string &generatingToolVersion, con
   bool runtimeConflictsWithCompileTimeTool = false;
 
   if (generatingToolVersion != "") {
-    runtimeConflictsWithGeneratingTool = runtimeVersion != generatingToolVersion
-      && getMajorMinorVersion(runtimeVersion) != getMajorMinorVersion(generatingToolVersion);
+    runtimeConflictsWithGeneratingTool =
+        runtimeVersion != generatingToolVersion &&
+        getMajorMinorVersion(runtimeVersion) != getMajorMinorVersion(generatingToolVersion);
   }
 
-  runtimeConflictsWithCompileTimeTool = runtimeVersion != compileTimeVersion
-    && getMajorMinorVersion(runtimeVersion) != getMajorMinorVersion(compileTimeVersion);
+  runtimeConflictsWithCompileTimeTool =
+      runtimeVersion != compileTimeVersion &&
+      getMajorMinorVersion(runtimeVersion) != getMajorMinorVersion(compileTimeVersion);
 
   if (runtimeConflictsWithGeneratingTool) {
-    std::cerr << "ANTLR Tool version " << generatingToolVersion << " used for code generation does not match "
-      "the current runtime version " << runtimeVersion << std::endl;
+    std::cerr << "ANTLR Tool version " << generatingToolVersion
+              << " used for code generation does not match "
+                 "the current runtime version "
+              << runtimeVersion << std::endl;
   }
   if (runtimeConflictsWithCompileTimeTool) {
-    std::cerr << "ANTLR Runtime version " << compileTimeVersion << " used for parser compilation does not match "
-      "the current runtime version " << runtimeVersion << std::endl;
+    std::cerr << "ANTLR Runtime version " << compileTimeVersion
+              << " used for parser compilation does not match "
+                 "the current runtime version "
+              << runtimeVersion << std::endl;
   }
 }
 

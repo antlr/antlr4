@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <bitset>
+
 #include "antlr4-common.h"
 
 namespace antlrcpp {
@@ -12,25 +14,24 @@ namespace antlrcpp {
   class ANTLR4CPP_PUBLIC BitSet : public std::bitset<2048> {
   public:
     size_t nextSetBit(size_t pos) const {
-      for (size_t i = pos; i < size(); i++){
+      for (size_t i = pos; i < size(); i++) {
         if (test(i)) {
           return i;
         }
       }
 
-      return INVALID_INDEX;
+      return antlr4::INVALID_INDEX;
     }
 
     // Prints a list of every index for which the bitset contains a bit in true.
-    friend std::wostream& operator << (std::wostream& os, const BitSet& obj)
-    {
+    friend std::wostream &operator<<(std::wostream &os, const BitSet &obj) {
       os << "{";
       size_t total = obj.count();
-      for (size_t i = 0; i < obj.size(); i++){
-        if (obj.test(i)){
+      for (size_t i = 0; i < obj.size(); i++) {
+        if (obj.test(i)) {
           os << i;
           --total;
-          if (total > 1){
+          if (total > 1) {
             os << ", ";
           }
         }
@@ -41,7 +42,7 @@ namespace antlrcpp {
     }
 
     static std::string subStringRepresentation(const std::vector<BitSet>::iterator &begin,
-                                                const std::vector<BitSet>::iterator &end) {
+                                               const std::vector<BitSet>::iterator &end) {
       std::string result;
       std::vector<BitSet>::iterator vectorIterator;
 
@@ -54,12 +55,12 @@ namespace antlrcpp {
       return result;
     }
 
-    std::string toString(){
+    std::string toString() {
       std::stringstream stream;
       stream << "{";
       bool valueAdded = false;
-      for (size_t i = 0; i < size(); ++i){
-        if (test(i)){
+      for (size_t i = 0; i < size(); ++i) {
+        if (test(i)) {
           if (valueAdded) {
             stream << ", ";
           }
@@ -71,6 +72,5 @@ namespace antlrcpp {
       stream << "}";
       return stream.str();
     }
-
   };
-}
+} // namespace antlrcpp

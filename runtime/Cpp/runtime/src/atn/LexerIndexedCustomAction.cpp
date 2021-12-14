@@ -3,8 +3,8 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
-#include "misc/MurmurHash.h"
 #include "Lexer.h"
+#include "misc/MurmurHash.h"
 #include "support/CPPUtils.h"
 
 #include "atn/LexerIndexedCustomAction.h"
@@ -13,25 +13,16 @@ using namespace antlr4;
 using namespace antlr4::atn;
 using namespace antlr4::misc;
 
-LexerIndexedCustomAction::LexerIndexedCustomAction(int offset, Ref<LexerAction> const& action)
-  : _offset(offset), _action(action) {
-}
+LexerIndexedCustomAction::LexerIndexedCustomAction(int offset, Ref<LexerAction> const &action)
+    : _offset(offset), _action(action) {}
 
-int LexerIndexedCustomAction::getOffset() const {
-  return _offset;
-}
+int LexerIndexedCustomAction::getOffset() const { return _offset; }
 
-Ref<LexerAction> LexerIndexedCustomAction::getAction() const {
-  return _action;
-}
+Ref<LexerAction> LexerIndexedCustomAction::getAction() const { return _action; }
 
-LexerActionType LexerIndexedCustomAction::getActionType() const {
-  return _action->getActionType();
-}
+LexerActionType LexerIndexedCustomAction::getActionType() const { return _action->getActionType(); }
 
-bool LexerIndexedCustomAction::isPositionDependent() const {
-  return true;
-}
+bool LexerIndexedCustomAction::isPositionDependent() const { return true; }
 
 void LexerIndexedCustomAction::execute(Lexer *lexer) {
   // assume the input stream position was properly set by the calling code
@@ -45,7 +36,7 @@ size_t LexerIndexedCustomAction::hashCode() const {
   return MurmurHash::finish(hash, 2);
 }
 
-bool LexerIndexedCustomAction::operator == (const LexerAction &obj) const {
+bool LexerIndexedCustomAction::operator==(const LexerAction &obj) const {
   if (&obj == this) {
     return true;
   }
@@ -58,6 +49,4 @@ bool LexerIndexedCustomAction::operator == (const LexerAction &obj) const {
   return _offset == action->_offset && *_action == *action->_action;
 }
 
-std::string LexerIndexedCustomAction::toString() const {
-  return antlrcpp::toString(this);
-}
+std::string LexerIndexedCustomAction::toString() const { return antlrcpp::toString(this); }

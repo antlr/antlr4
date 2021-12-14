@@ -3,49 +3,43 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
-#include "misc/MurmurHash.h"
-#include "atn/PredictionContext.h"
 #include "SemanticContext.h"
+#include "atn/PredictionContext.h"
+#include "misc/MurmurHash.h"
 
 #include "atn/ATNConfig.h"
 
 using namespace antlr4::atn;
 
-ATNConfig::ATNConfig(ATNState *state_, size_t alt_, Ref<PredictionContext> const& context_)
-  : ATNConfig(state_, alt_, context_, SemanticContext::NONE) {
-}
+ATNConfig::ATNConfig(ATNState *state_, size_t alt_, Ref<PredictionContext> const &context_)
+    : ATNConfig(state_, alt_, context_, SemanticContext::NONE) {}
 
-ATNConfig::ATNConfig(ATNState *state_, size_t alt_, Ref<PredictionContext> const& context_, Ref<SemanticContext> const& semanticContext_)
-  : state(state_), alt(alt_), context(context_), semanticContext(semanticContext_) {
+ATNConfig::ATNConfig(ATNState *state_, size_t alt_, Ref<PredictionContext> const &context_,
+                     Ref<SemanticContext> const &semanticContext_)
+    : state(state_), alt(alt_), context(context_), semanticContext(semanticContext_) {
   reachesIntoOuterContext = 0;
 }
 
-ATNConfig::ATNConfig(Ref<ATNConfig> const& c) : ATNConfig(c, c->state, c->context, c->semanticContext) {
-}
+ATNConfig::ATNConfig(Ref<ATNConfig> const &c) : ATNConfig(c, c->state, c->context, c->semanticContext) {}
 
-ATNConfig::ATNConfig(Ref<ATNConfig> const& c, ATNState *state_) : ATNConfig(c, state_, c->context, c->semanticContext) {
-}
+ATNConfig::ATNConfig(Ref<ATNConfig> const &c, ATNState *state_)
+    : ATNConfig(c, state_, c->context, c->semanticContext) {}
 
-ATNConfig::ATNConfig(Ref<ATNConfig> const& c, ATNState *state, Ref<SemanticContext> const& semanticContext)
-  : ATNConfig(c, state, c->context, semanticContext) {
-}
+ATNConfig::ATNConfig(Ref<ATNConfig> const &c, ATNState *state, Ref<SemanticContext> const &semanticContext)
+    : ATNConfig(c, state, c->context, semanticContext) {}
 
-ATNConfig::ATNConfig(Ref<ATNConfig> const& c, Ref<SemanticContext> const& semanticContext)
-  : ATNConfig(c, c->state, c->context, semanticContext) {
-}
+ATNConfig::ATNConfig(Ref<ATNConfig> const &c, Ref<SemanticContext> const &semanticContext)
+    : ATNConfig(c, c->state, c->context, semanticContext) {}
 
-ATNConfig::ATNConfig(Ref<ATNConfig> const& c, ATNState *state, Ref<PredictionContext> const& context)
-  : ATNConfig(c, state, context, c->semanticContext) {
-}
+ATNConfig::ATNConfig(Ref<ATNConfig> const &c, ATNState *state, Ref<PredictionContext> const &context)
+    : ATNConfig(c, state, context, c->semanticContext) {}
 
-ATNConfig::ATNConfig(Ref<ATNConfig> const& c, ATNState *state, Ref<PredictionContext> const& context,
-                     Ref<SemanticContext> const& semanticContext)
-  : state(state), alt(c->alt), context(context), reachesIntoOuterContext(c->reachesIntoOuterContext),
-    semanticContext(semanticContext) {
-}
+ATNConfig::ATNConfig(Ref<ATNConfig> const &c, ATNState *state, Ref<PredictionContext> const &context,
+                     Ref<SemanticContext> const &semanticContext)
+    : state(state), alt(c->alt), context(context), reachesIntoOuterContext(c->reachesIntoOuterContext),
+      semanticContext(semanticContext) {}
 
-ATNConfig::~ATNConfig() {
-}
+ATNConfig::~ATNConfig() {}
 
 size_t ATNConfig::hashCode() const {
   size_t hashCode = misc::MurmurHash::initialize(7);
@@ -57,9 +51,7 @@ size_t ATNConfig::hashCode() const {
   return hashCode;
 }
 
-size_t ATNConfig::getOuterContextDepth() const {
-  return reachesIntoOuterContext & ~SUPPRESS_PRECEDENCE_FILTER;
-}
+size_t ATNConfig::getOuterContextDepth() const { return reachesIntoOuterContext & ~SUPPRESS_PRECEDENCE_FILTER; }
 
 bool ATNConfig::isPrecedenceFilterSuppressed() const {
   return (reachesIntoOuterContext & SUPPRESS_PRECEDENCE_FILTER) != 0;
@@ -73,20 +65,15 @@ void ATNConfig::setPrecedenceFilterSuppressed(bool value) {
   }
 }
 
-bool ATNConfig::operator == (const ATNConfig &other) const {
+bool ATNConfig::operator==(const ATNConfig &other) const {
   return state->stateNumber == other.state->stateNumber && alt == other.alt &&
-    ((context == other.context) || (*context == *other.context)) &&
-    *semanticContext == *other.semanticContext &&
-    isPrecedenceFilterSuppressed() == other.isPrecedenceFilterSuppressed();
+         ((context == other.context) || (*context == *other.context)) && *semanticContext == *other.semanticContext &&
+         isPrecedenceFilterSuppressed() == other.isPrecedenceFilterSuppressed();
 }
 
-bool ATNConfig::operator != (const ATNConfig &other) const {
-  return !operator==(other);
-}
+bool ATNConfig::operator!=(const ATNConfig &other) const { return !operator==(other); }
 
-std::string ATNConfig::toString() {
-  return toString(true);
-}
+std::string ATNConfig::toString() { return toString(true); }
 
 std::string ATNConfig::toString(bool showAlt) {
   std::stringstream ss;

@@ -9,26 +9,19 @@
 
 using namespace antlr4::tree::pattern;
 
-TagChunk::TagChunk(const std::string &tag) : TagChunk("", tag) {
-}
+TagChunk::TagChunk(const std::string &tag) : TagChunk("", tag) {}
 
 TagChunk::TagChunk(const std::string &label, const std::string &tag) : _tag(tag), _label(label) {
   if (tag.empty()) {
     throw IllegalArgumentException("tag cannot be null or empty");
   }
-
 }
 
-TagChunk::~TagChunk() {
-}
+TagChunk::~TagChunk() {}
 
-std::string TagChunk::getTag() {
-  return _tag;
-}
+std::string TagChunk::getTag() { return _tag; }
 
-std::string TagChunk::getLabel() {
-  return _label;
-}
+std::string TagChunk::getLabel() { return _label; }
 
 std::string TagChunk::toString() {
   if (!_label.empty()) {

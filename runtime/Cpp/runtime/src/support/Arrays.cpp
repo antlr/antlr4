@@ -3,15 +3,14 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
-#include "tree/ParseTree.h"
 #include "Exceptions.h"
+#include "tree/ParseTree.h"
 
 #include "support/Arrays.h"
 
 using namespace antlrcpp;
 
-std::string Arrays::listToString(const std::vector<std::string> &list, const std::string &separator)
-{
+std::string Arrays::listToString(const std::vector<std::string> &list, const std::string &separator) {
   std::stringstream ss;
   bool firstEntry = true;
 
@@ -29,7 +28,7 @@ std::string Arrays::listToString(const std::vector<std::string> &list, const std
 }
 
 template <>
-std::string Arrays::toString(const std::vector<antlr4::tree::ParseTree*> &source) {
+std::string Arrays::toString(const std::vector<antlr4::tree::ParseTree *> &source) {
   std::string result = "[";
   bool firstEntry = true;
   for (auto *value : source) {

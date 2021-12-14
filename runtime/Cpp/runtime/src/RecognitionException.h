@@ -31,11 +31,11 @@ namespace antlr4 {
   public:
     RecognitionException(Recognizer *recognizer, IntStream *input, ParserRuleContext *ctx,
                          Token *offendingToken = nullptr);
-    RecognitionException(const std::string &message, Recognizer *recognizer, IntStream *input,
-                         ParserRuleContext *ctx, Token *offendingToken = nullptr);
-    RecognitionException(RecognitionException const&) = default;
+    RecognitionException(const std::string &message, Recognizer *recognizer, IntStream *input, ParserRuleContext *ctx,
+                         Token *offendingToken = nullptr);
+    RecognitionException(RecognitionException const &) = default;
     ~RecognitionException();
-    RecognitionException& operator=(RecognitionException const&) = default;
+    RecognitionException &operator=(RecognitionException const &) = default;
 
     /// Get the ATN state number the parser was in at the time the error
     /// occurred. For NoViableAltException and
@@ -67,7 +67,7 @@ namespace antlr4 {
     /// </summary>
     /// <returns> The <seealso cref="RuleContext"/> at the time this exception was thrown.
     /// If the context is not available, this method returns {@code null}. </returns>
-    virtual RuleContext* getCtx() const;
+    virtual RuleContext *getCtx() const;
 
     /// <summary>
     /// Gets the input stream which is the symbol source for the recognizer where
@@ -78,9 +78,9 @@ namespace antlr4 {
     /// <returns> The input stream which is the symbol source for the recognizer
     /// where this exception was thrown, or {@code null} if the stream is not
     /// available. </returns>
-    virtual IntStream* getInputStream() const;
+    virtual IntStream *getInputStream() const;
 
-    virtual Token* getOffendingToken() const;
+    virtual Token *getOffendingToken() const;
 
     /// <summary>
     /// Gets the <seealso cref="Recognizer"/> where this exception occurred.
@@ -89,7 +89,7 @@ namespace antlr4 {
     /// </summary>
     /// <returns> The recognizer where this exception occurred, or {@code null} if
     /// the recognizer is not available. </returns>
-    virtual Recognizer* getRecognizer() const;
+    virtual Recognizer *getRecognizer() const;
 
   private:
     void InitializeInstanceFields();

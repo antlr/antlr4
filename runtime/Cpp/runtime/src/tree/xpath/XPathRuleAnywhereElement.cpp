@@ -11,7 +11,8 @@
 using namespace antlr4::tree;
 using namespace antlr4::tree::xpath;
 
-XPathRuleAnywhereElement::XPathRuleAnywhereElement(const std::string &ruleName, int ruleIndex) : XPathElement(ruleName) {
+XPathRuleAnywhereElement::XPathRuleAnywhereElement(const std::string &ruleName, int ruleIndex)
+    : XPathElement(ruleName) {
   _ruleIndex = ruleIndex;
 }
 

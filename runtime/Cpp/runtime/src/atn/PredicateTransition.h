@@ -5,11 +5,10 @@
 
 #pragma once
 
-#include "atn/AbstractPredicateTransition.h"
 #include "SemanticContext.h"
+#include "atn/AbstractPredicateTransition.h"
 
-namespace antlr4 {
-namespace atn {
+namespace antlr4::atn {
 
   /// TODO: this is old comment:
   ///  A tree of semantic predicates from the grammar AST if label==SEMPRED.
@@ -32,8 +31,6 @@ namespace atn {
     Ref<SemanticContext::Predicate> getPredicate() const;
 
     virtual std::string toString() const override;
-
   };
 
-} // namespace atn
-} // namespace antlr4
+} // namespace antlr4::atn

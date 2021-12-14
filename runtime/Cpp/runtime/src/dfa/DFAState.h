@@ -7,8 +7,7 @@
 
 #include "antlr4-common.h"
 
-namespace antlr4 {
-namespace dfa {
+namespace antlr4::dfa {
 
   /// <summary>
   /// A DFA state represents a set of possible ATN configurations.
@@ -64,8 +63,8 @@ namespace dfa {
     bool isAcceptState;
 
     /// if accept state, what ttype do we match or alt do we predict?
-    /// This is set to <seealso cref="ATN#INVALID_ALT_NUMBER"/> when <seealso cref="#predicates"/>{@code !=null} or
-    /// <seealso cref="#requiresFullContext"/>.
+    /// This is set to <seealso cref="ATN#INVALID_ALT_NUMBER"/> when <seealso
+    /// cref="#predicates"/>{@code !=null} or <seealso cref="#requiresFullContext"/>.
     size_t prediction;
 
     Ref<atn::LexerActionExecutor> lexerActionExecutor;
@@ -81,13 +80,13 @@ namespace dfa {
     /// <summary>
     /// During SLL parsing, this is a list of predicates associated with the
     ///  ATN configurations of the DFA state. When we have predicates,
-    ///  <seealso cref="#requiresFullContext"/> is {@code false} since full context prediction evaluates predicates
-    ///  on-the-fly. If this is not null, then <seealso cref="#prediction"/> is
-    ///  <seealso cref="ATN#INVALID_ALT_NUMBER"/>.
+    ///  <seealso cref="#requiresFullContext"/> is {@code false} since full context prediction
+    ///  evaluates predicates on-the-fly. If this is not null, then <seealso cref="#prediction"/>
+    ///  is <seealso cref="ATN#INVALID_ALT_NUMBER"/>.
     /// <p/>
-    ///  We only use these for non-<seealso cref="#requiresFullContext"/> but conflicting states. That
-    ///  means we know from the context (it's $ or we don't dip into outer
-    ///  context) that it's an ambiguity not a conflict.
+    ///  We only use these for non-<seealso cref="#requiresFullContext"/> but conflicting states.
+    ///  That means we know from the context (it's $ or we don't dip into outer context) that it's
+    ///  an ambiguity not a conflict.
     /// <p/>
     ///  This list is computed by <seealso cref="ParserATNSimulator#predicateDFAState"/>.
     /// </summary>
@@ -118,27 +117,20 @@ namespace dfa {
     /// ParserATNSimulator#addDFAState we need to know if any other state
     /// exists that has this exact set of ATN configurations. The
     /// stateNumber is irrelevant.
-    bool operator == (const DFAState &o) const;
+    bool operator==(const DFAState &o) const;
 
     virtual std::string toString();
 
-    struct Hasher
-    {
-      size_t operator()(DFAState *k) const {
-        return k->hashCode();
-      }
+    struct Hasher {
+      size_t operator()(DFAState *k) const { return k->hashCode(); }
     };
 
     struct Comparer {
-      bool operator()(DFAState *lhs, DFAState *rhs) const
-      {
-        return *lhs == *rhs;
-      }
+      bool operator()(DFAState *lhs, DFAState *rhs) const { return *lhs == *rhs; }
     };
 
   private:
     void InitializeInstanceFields();
   };
 
-} // namespace atn
-} // namespace antlr4
+} // namespace antlr4::dfa

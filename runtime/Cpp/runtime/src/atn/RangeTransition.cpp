@@ -10,16 +10,11 @@
 using namespace antlr4;
 using namespace antlr4::atn;
 
-RangeTransition::RangeTransition(ATNState *target, size_t from, size_t to) : Transition(target), from(from), to(to) {
-}
+RangeTransition::RangeTransition(ATNState *target, size_t from, size_t to) : Transition(target), from(from), to(to) {}
 
-Transition::SerializationType RangeTransition::getSerializationType() const {
-  return RANGE;
-}
+Transition::SerializationType RangeTransition::getSerializationType() const { return RANGE; }
 
-misc::IntervalSet RangeTransition::label() const {
-  return misc::IntervalSet::of((int)from, (int)to);
-}
+misc::IntervalSet RangeTransition::label() const { return misc::IntervalSet::of((int)from, (int)to); }
 
 bool RangeTransition::matches(size_t symbol, size_t /*minVocabSymbol*/, size_t /*maxVocabSymbol*/) const {
   return symbol >= from && symbol <= to;

@@ -23,17 +23,20 @@ namespace antlrcpp {
   // Using RAII + a lambda to implement a "finally" replacement.
   template <typename OnEnd>
   struct FinalAction {
-    FinalAction(OnEnd f) : _cleanUp { std::move(f) } {}
-    FinalAction(FinalAction &&other) :
-	_cleanUp(std::move(other._cleanUp)), _enabled(other._enabled) {
+    FinalAction(OnEnd f) : _cleanUp{std::move(f)} {}
+    FinalAction(FinalAction &&other) : _cleanUp(std::move(other._cleanUp)), _enabled(other._enabled) {
       other._enabled = false; // Don't trigger the lambda after ownership has moved.
     }
-    ~FinalAction() { if (_enabled) _cleanUp(); }
+    ~FinalAction() {
+      if (_enabled)
+        _cleanUp();
+    }
 
     void disable() { _enabled = false; }
+
   private:
     OnEnd _cleanUp;
-    bool _enabled {true};
+    bool _enabled{true};
   };
 
   template <typename OnEnd>
@@ -48,7 +51,7 @@ namespace antlrcpp {
   }
 
   template <typename T1, typename T2>
-  inline bool is(Ref<T2> const& obj) { // For shared pointers.
+  inline bool is(antlr4::Ref<T2> const &obj) { // For shared pointers.
     return dynamic_cast<T1 *>(obj.get()) != nullptr;
   }
 

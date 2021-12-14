@@ -3,16 +3,16 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+#include "atn/ATNConfig.h"
+#include "atn/AbstractPredicateTransition.h"
+#include "atn/EmptyPredictionContext.h"
+#include "atn/NotSetTransition.h"
 #include "atn/RuleStopState.h"
-#include "atn/Transition.h"
 #include "atn/RuleTransition.h"
 #include "atn/SingletonPredictionContext.h"
-#include "atn/AbstractPredicateTransition.h"
+#include "atn/Transition.h"
 #include "atn/WildcardTransition.h"
-#include "atn/NotSetTransition.h"
 #include "misc/IntervalSet.h"
-#include "atn/ATNConfig.h"
-#include "atn/EmptyPredictionContext.h"
 
 #include "support/CPPUtils.h"
 
@@ -22,11 +22,9 @@ using namespace antlr4;
 using namespace antlr4::atn;
 using namespace antlrcpp;
 
-LL1Analyzer::LL1Analyzer(const ATN &atn) : _atn(atn) {
-}
+LL1Analyzer::LL1Analyzer(const ATN &atn) : _atn(atn) {}
 
-LL1Analyzer::~LL1Analyzer() {
-}
+LL1Analyzer::~LL1Analyzer() {}
 
 std::vector<misc::IntervalSet> LL1Analyzer::getDecisionLookahead(ATNState *s) const {
   std::vector<misc::IntervalSet> look;
@@ -41,8 +39,8 @@ std::vector<misc::IntervalSet> LL1Analyzer::getDecisionLookahead(ATNState *s) co
 
     ATNConfig::Set lookBusy;
     antlrcpp::BitSet callRuleStack;
-    _LOOK(s->transitions[alt]->target, nullptr, PredictionContext::EMPTY,
-          look[alt], lookBusy, callRuleStack, seeThruPreds, false);
+    _LOOK(s->transitions[alt]->target, nullptr, PredictionContext::EMPTY, look[alt], lookBusy, callRuleStack,
+          seeThruPreds, false);
 
     // Wipe out lookahead for this alternative if we found nothing
     // or we had a predicate when we !seeThruPreds
@@ -53,9 +51,7 @@ std::vector<misc::IntervalSet> LL1Analyzer::getDecisionLookahead(ATNState *s) co
   return look;
 }
 
-misc::IntervalSet LL1Analyzer::LOOK(ATNState *s, RuleContext *ctx) const {
-  return LOOK(s, nullptr, ctx);
-}
+misc::IntervalSet LL1Analyzer::LOOK(ATNState *s, RuleContext *ctx) const { return LOOK(s, nullptr, ctx); }
 
 misc::IntervalSet LL1Analyzer::LOOK(ATNState *s, ATNState *stopState, RuleContext *ctx) const {
   misc::IntervalSet r;
@@ -69,8 +65,9 @@ misc::IntervalSet LL1Analyzer::LOOK(ATNState *s, ATNState *stopState, RuleContex
   return r;
 }
 
-void LL1Analyzer::_LOOK(ATNState *s, ATNState *stopState, Ref<PredictionContext> const& ctx, misc::IntervalSet &look,
-  ATNConfig::Set &lookBusy, antlrcpp::BitSet &calledRuleStack, bool seeThruPreds, bool addEOF) const {
+void LL1Analyzer::_LOOK(ATNState *s, ATNState *stopState, Ref<PredictionContext> const &ctx, misc::IntervalSet &look,
+                        ATNConfig::Set &lookBusy, antlrcpp::BitSet &calledRuleStack, bool seeThruPreds,
+                        bool addEOF) const {
 
   Ref<ATNConfig> c = std::make_shared<ATNConfig>(s, 0, ctx);
 
@@ -102,12 +99,12 @@ void LL1Analyzer::_LOOK(ATNState *s, ATNState *stopState, Ref<PredictionContext>
     if (ctx != PredictionContext::EMPTY) {
       bool removed = calledRuleStack.test(s->ruleIndex);
       calledRuleStack[s->ruleIndex] = false;
-       auto onExit = finally([removed, &calledRuleStack, s] {
-                if (removed) {
-                  calledRuleStack.set(s->ruleIndex);
-                }
-              });
-       // run thru all possible stack tops in ctx
+      auto onExit = finally([removed, &calledRuleStack, s] {
+        if (removed) {
+          calledRuleStack.set(s->ruleIndex);
+        }
+      });
+      // run thru all possible stack tops in ctx
       for (size_t i = 0; i < ctx->size(); i++) {
         ATNState *returnState = _atn.states[ctx->getReturnState(i)];
         _LOOK(returnState, stopState, ctx->getParent(i), look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
@@ -121,16 +118,16 @@ void LL1Analyzer::_LOOK(ATNState *s, ATNState *stopState, Ref<PredictionContext>
     Transition *t = s->transitions[i];
 
     if (t->getSerializationType() == Transition::RULE) {
-      if (calledRuleStack[(static_cast<RuleTransition*>(t))->target->ruleIndex]) {
+      if (calledRuleStack[(static_cast<RuleTransition *>(t))->target->ruleIndex]) {
         continue;
       }
 
-      Ref<PredictionContext> newContext = SingletonPredictionContext::create(ctx, (static_cast<RuleTransition*>(t))->followState->stateNumber);
-      auto onExit = finally([t, &calledRuleStack] {
-        calledRuleStack[(static_cast<RuleTransition*>(t))->target->ruleIndex] = false;
-      });
+      Ref<PredictionContext> newContext =
+          SingletonPredictionContext::create(ctx, (static_cast<RuleTransition *>(t))->followState->stateNumber);
+      auto onExit = finally(
+          [t, &calledRuleStack] { calledRuleStack[(static_cast<RuleTransition *>(t))->target->ruleIndex] = false; });
 
-      calledRuleStack.set((static_cast<RuleTransition*>(t))->target->ruleIndex);
+      calledRuleStack.set((static_cast<RuleTransition *>(t))->target->ruleIndex);
       _LOOK(t->target, stopState, newContext, look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
 
     } else if (is<AbstractPredicateTransition *>(t)) {
@@ -146,8 +143,9 @@ void LL1Analyzer::_LOOK(ATNState *s, ATNState *stopState, Ref<PredictionContext>
     } else {
       misc::IntervalSet set = t->label();
       if (!set.isEmpty()) {
-        if (is<NotSetTransition*>(t)) {
-          set = set.complement(misc::IntervalSet::of(Token::MIN_USER_TOKEN_TYPE, static_cast<ssize_t>(_atn.maxTokenType)));
+        if (is<NotSetTransition *>(t)) {
+          set = set.complement(
+              misc::IntervalSet::of(Token::MIN_USER_TOKEN_TYPE, static_cast<ssize_t>(_atn.maxTokenType)));
         }
         look.addAll(set);
       }

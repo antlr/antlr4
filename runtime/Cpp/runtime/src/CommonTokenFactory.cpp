@@ -3,9 +3,9 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
-#include "misc/Interval.h"
-#include "CommonToken.h"
 #include "CharStream.h"
+#include "CommonToken.h"
+#include "misc/Interval.h"
 
 #include "CommonTokenFactory.h"
 
@@ -13,14 +13,13 @@ using namespace antlr4;
 
 const std::unique_ptr<TokenFactory<CommonToken>> CommonTokenFactory::DEFAULT(new CommonTokenFactory);
 
-CommonTokenFactory::CommonTokenFactory(bool copyText_) : copyText(copyText_) {
-}
+CommonTokenFactory::CommonTokenFactory(bool copyText_) : copyText(copyText_) {}
 
-CommonTokenFactory::CommonTokenFactory() : CommonTokenFactory(false) {
-}
+CommonTokenFactory::CommonTokenFactory() : CommonTokenFactory(false) {}
 
-std::unique_ptr<CommonToken> CommonTokenFactory::create(std::pair<TokenSource*, CharStream*> source, size_t type,
-  const std::string &text, size_t channel, size_t start, size_t stop, size_t line, size_t charPositionInLine) {
+std::unique_ptr<CommonToken> CommonTokenFactory::create(std::pair<TokenSource *, CharStream *> source, size_t type,
+                                                        const std::string &text, size_t channel, size_t start,
+                                                        size_t stop, size_t line, size_t charPositionInLine) {
 
   std::unique_ptr<CommonToken> t(new CommonToken(source, type, channel, start, stop));
   t->setLine(line);
