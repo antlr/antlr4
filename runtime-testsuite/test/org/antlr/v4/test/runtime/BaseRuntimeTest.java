@@ -22,12 +22,11 @@ import org.stringtemplate.v4.StringRenderer;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.util.*;
 
 import static junit.framework.TestCase.assertEquals;
@@ -337,7 +336,7 @@ public abstract class BaseRuntimeTest {
 
 	// ---- support ----
 
-	public static RuntimeTestDescriptor[] getRuntimeTestDescriptors(Class<?> clazz, String targetName) {
+	public static RuntimeTestDescriptor[] OLD_getRuntimeTestDescriptors(Class<?> clazz, String targetName) {
 		if(!TestContext.isSupportedTarget(targetName))
 			return new RuntimeTestDescriptor[0];
 		Class<?>[] nestedClasses = clazz.getClasses();
@@ -360,7 +359,43 @@ public abstract class BaseRuntimeTest {
 		return descriptors.toArray(new RuntimeTestDescriptor[0]);
 	}
 
-	/** Write descriptor files. */
+	public static RuntimeTestDescriptor[] getRuntimeTestDescriptors(Class<?> clazz, String targetName) {
+		// Walk all descriptor dirs
+		String group = clazz.getSimpleName().replace("Descriptors","");
+		String[] descriptorFilenames = new File("/tmp/descriptors/"+group).list();
+		List<RuntimeTestDescriptor> descriptors = new ArrayList<>();
+		for (String fname : descriptorFilenames) {
+			System.out.println(fname);
+			try {
+				String dtext = Files.readString(Path.of("/tmp/descriptors",group,fname));
+				UniversalRuntimeTestDescriptor d = readDescriptor(dtext);
+				d.testGroup = group;
+				if ( group.contains("CompositeLexer") ) {
+					/** A type in {"Lexer", "Parser", "CompositeLexer", "CompositeParser"} */
+					d.testType = "CompositeLexer";
+				}
+				else if ( group.contains("CompositeParser") ) {
+					d.testType = "CompositeParser";
+				}
+				else if ( group.contains("Lexer") ) {
+					d.testType = "Lexer";
+				}
+				else if ( group.contains("Parser") ) {
+					d.testType = "Parser";
+				}
+				d.name = fname.replace(".txt","");
+				d.targetName = targetName;
+				descriptors.add(d);
+				System.out.println(d);
+			}
+			catch (IOException ioe) {
+				System.err.println("Can't read descriptor file "+fname);
+			}
+		}
+		return descriptors.toArray(new RuntimeTestDescriptor[0]);
+	}
+
+		/** Write descriptor files. */
 	private static void writeDescriptors(Class<?> clazz, List<RuntimeTestDescriptor> descriptors) {
 		new File("/tmp/descriptors").mkdir();
 		String groupName = clazz.getSimpleName();
@@ -381,9 +416,14 @@ public abstract class BaseRuntimeTest {
 				content += "[grammar]\n";
 				content += grammar;
 				if ( !content.endsWith("\n\n") ) content += "\n";
-				content += "[grammarName]\n";
-				content += gname;
-				content += "\n\n";
+				if ( d.getSlaveGrammars()!=null ) {
+					for (Pair<String, String> slaveG : d.getSlaveGrammars()) {
+						String sg = quoteForDescriptorFile(slaveG.b);
+						content += "[slaveGrammar]\n";
+						content += sg;
+						content += "\n";
+					}
+				}
 				content += "[start]\n";
 				content += d.getStartRule();
 				content += "\n\n";
@@ -487,67 +527,105 @@ public abstract class BaseRuntimeTest {
 	 """line 1:0 reportAttemptingFullContext d=0 (s), input='abc'
 	 """
 
-	 Some can be missing like [errors]
-	 */
-	public static RuntimeTestDescriptor readDescriptor(Class<?> descrClass, String dtext) throws RuntimeException {
-		String g,gn,s,i,o,e = null;
-		String[] fieldNames = {"grammar","grammarName","start","input","output","errors"};
-		Set<String> fields = new HashSet<>(Arrays.asList(fieldNames));
-		Map<String,String> values = new HashMap<>();
-		String currentField = null;
+	 Some can be missing like [errors].
 
+	 Get gr names automatically "lexer grammar Unicode;" "grammar T;" "parser grammar S;"
+
+	 Also handle slave grammars:
+
+	 [grammar]
+	 grammar M;
+	 import S,T;
+	 s : a ;
+	 B : 'b' ; // defines B from inherited token space
+	 WS : (' '|'\n') -> skip ;
+
+	 [slaveGrammar]
+	 parser grammar T;
+	 a : B {<writeln("\"T.a\"")>};<! hidden by S.a !>
+
+	 [slaveGrammar]
+	 parser grammar S;
+	 a : b {<writeln("\"S.a\"")>};
+	 b : B;
+	 */
+	public static UniversalRuntimeTestDescriptor readDescriptor(String dtext)
+			throws RuntimeException
+	{
+		String[] fileSections = {"notes","grammar","slaveGrammar","start","input","output","errors"};
+		Set<String> sections = new HashSet<>(Arrays.asList(fileSections));
+		String currentField = null;
+		String currentValue = null;
+
+		List<Pair<String, String>> pairs = new ArrayList<>();
 		String[] lines = dtext.split("\n");
 		for (String line : lines) {
 			if ( line.startsWith("[") && line.length()>2 &&
-				 fields.contains(line.substring(1, line.length() - 1)) ) {
+				 sections.contains(line.substring(1, line.length() - 1)) ) {
+				if ( currentField!=null ) {
+					pairs.add(new Pair<>(currentField,currentValue));
+				}
 				currentField = line.substring(1, line.length() - 1);
-				System.out.println("set field:"+currentField);
-				values.put(currentField, "");
+				currentValue = null;
 			}
 			else {
-				System.out.println("Value line:"+line);
-				values.put(currentField, values.get(currentField)+line.trim()+"\n");
+				if ( currentValue==null ) {
+					currentValue = "";
+				}
+				currentValue += line.trim()+"\n";
 			}
 		}
-		values.forEach((k,v) -> values.put(k,v.trim()));
-		System.out.println(values);
-//		try {
-//			RuntimeTestDescriptor d = (RuntimeTestDescriptor)descrClass.newInstance();
-//			Field gF = descrClass.getDeclaredField("grammar");
-//			gF.set(d, g);
-//			return d;
-//		}
-//		catch (Exception e) {
-//			e.printStackTrace(System.err);
-//		}
-		return null;
+//		System.out.println(pairs);
+
+		UniversalRuntimeTestDescriptor d = new UniversalRuntimeTestDescriptor();
+		for (Pair<String,String> p : pairs) {
+			String section = p.a;
+			String value = p.b.trim();
+			switch (section) {
+				case "notes":
+					d.notes = value;
+				case "grammar":
+					d.grammarName = getGrammarName(value.split("\n")[0]);
+					d.grammar = value;
+					break;
+				case "slaveGrammar":
+					String gname = getGrammarName(value.split("\n")[0]);
+					d.slaveGrammars.add(new Pair<>(gname, value));
+				case "start":
+					d.startRule = value;
+					break;
+				case "input":
+					d.input = value;
+					break;
+				case "output":
+					d.output = value;
+					break;
+				case "errors":
+					d.errors = value;
+					break;
+				default:
+					throw new RuntimeException("Unknown descriptor section ignored: "+section);
+			}
+		}
+		return d;
 	}
 
-	public static void main(String[] args) {
-		String dtext = "[grammar]\n" +
-				"grammar T;\n" +
-				"s @after {<DumpDFA()>}\n" +
-				": ID | ID {} ;\n" +
-				"ID : 'a'..'z'+;\n" +
-				"WS : (' '|'\\t'|'\\n')+ -> skip ;\n" +
-				"\n" +
-				"[grammarName]\n" +
-				"T\n" +
-				"\n" +
-				"[start]\n" +
-				"s\n" +
-				"\n" +
-				"[input]\n" +
-				"abc\n" +
-				"\n" +
-				"[output]\n" +
-				"Decision 0:\n" +
-				"s0-ID->:s1^=>1\n" +
-				"\n" +
-				"[errors]\n" +
-				"\"\"\"line 1:0 reportAttemptingFullContext d=0 (s), input='abc'\n" +
-				"\"\"\"\n";
-		readDescriptor(BaseRuntimeTestDescriptor.class, dtext);
+	/** Get A, B, or C from:
+	 * "lexer grammar A;" "grammar B;" "parser grammar C;"
+	 */
+	public static String getGrammarName(String grammarDeclLine) {
+		int gi = grammarDeclLine.indexOf("grammar ");
+		if ( gi<0 ) {
+			return "<unknown grammar name>";
+		}
+		gi += "grammar ".length();
+		int gsemi = grammarDeclLine.indexOf(';');
+		return grammarDeclLine.substring(gi, gsemi);
+	}
+
+	public static void main(String[] args) throws Exception {
+		String dtext = Files.readString(Path.of("/tmp/descriptors/CompositeParsers/DelegatesSeeSameTokenType.txt"));
+		readDescriptor(dtext);
 	}
 
 	public static void writeFile(String dir, String fileName, String content) {
