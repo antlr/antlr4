@@ -23,6 +23,7 @@ import org.stringtemplate.v4.StringRenderer;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Modifier;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -382,7 +383,8 @@ public abstract class BaseRuntimeTest {
 				final URL dURL = loader.getResource("org/antlr/v4/test/runtime/new_descriptors/"+group+"/"+fname);
 				String dtext = null;
 				try {
-					dtext = Files.readString(Path.of(dURL.toURI()));
+					URI uri = dURL.toURI();
+					dtext = new String(Files.readAllBytes(Paths.get(uri)));
 				}
 				catch (URISyntaxException e) {
 					System.err.println("Bad URL:"+dURL);
@@ -665,11 +667,12 @@ public abstract class BaseRuntimeTest {
 		return grammarDeclLine.substring(gi, gsemi);
 	}
 
-	public static void main(String[] args) throws Exception {
-		String s = quoteForDescriptorFile("- ] ");
-		String dtext = Files.readString(Path.of("/tmp/descriptors/CompositeParsers/DelegatesSeeSameTokenType.txt"));
-		readDescriptor(dtext);
-	}
+//	public static void main(String[] args) throws Exception {
+//		String s = quoteForDescriptorFile("- ] ");
+//		String dtext = Files.readString(Path.of("/tmp/descriptors/CompositeParsers/DelegatesSeeSameTokenType.txt"));
+//
+//		readDescriptor(dtext);
+//	}
 
 	public static void writeFile(String dir, String fileName, String content) {
 		try {
