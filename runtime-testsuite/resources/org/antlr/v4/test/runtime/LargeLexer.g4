@@ -1,5 +1,4 @@
-/** Has to be in separate file; LexerExec group loads this as resource */
-lexer grammar L;
+lexer grammar L; // Has to be in separate file; LexerExec group loads this as resource
 WS : [ \t\r\n]+ -> skip;
 KW0 : 'KW' '0';
 KW1 : 'KW' '1';

@@ -655,10 +655,10 @@ public class LexerExecDescriptors {
 	}
 
 	public static class NonGreedyTermination1 extends BaseLexerTestDescriptor {
-		public String input = "\"hi\"\"mom\"";
+		public String input = "!hi!!mom!";
 		/**
-		[@0,0:3='"hi"',<1>,1:0]
-		[@1,4:8='"mom"',<1>,1:4]
+		[@0,0:3='!hi!',<1>,1:0]
+		[@1,4:8='!mom!',<1>,1:4]
 		[@2,9:8='<EOF>',<-1>,1:9]
 		 */
 		@CommentHasStringValue
@@ -670,7 +670,7 @@ public class LexerExecDescriptors {
 
 		/**
 		 lexer grammar L;
-		 STRING : '"' ('""' | .)*? '"';
+		 STRING : '!' ('!!' | .)*? '!';
 		 */
 		@CommentHasStringValue
 		public String grammar;
@@ -678,9 +678,9 @@ public class LexerExecDescriptors {
 	}
 
 	public static class NonGreedyTermination2 extends BaseLexerTestDescriptor {
-		public String input = "\"\"\"mom\"";
+		public String input = "!!!mom!";
 		/**
-		[@0,0:6='"""mom"',<1>,1:0]
+		[@0,0:6='!!!mom!',<1>,1:0]
 		[@1,7:6='<EOF>',<-1>,1:7]
 		 */
 		@CommentHasStringValue
@@ -692,7 +692,7 @@ public class LexerExecDescriptors {
 
 		/**
 		 lexer grammar L;
-		 STRING : '"' ('""' | .)+? '"';
+		 STRING : '!' ('!!' | .)+? '!';
 		 */
 		@CommentHasStringValue
 		public String grammar;

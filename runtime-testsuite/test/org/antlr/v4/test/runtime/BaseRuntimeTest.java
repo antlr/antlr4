@@ -365,7 +365,6 @@ public abstract class BaseRuntimeTest {
 		String[] descriptorFilenames = new File("/tmp/descriptors/"+group).list();
 		List<RuntimeTestDescriptor> descriptors = new ArrayList<>();
 		for (String fname : descriptorFilenames) {
-			System.out.println(fname);
 			try {
 				String dtext = Files.readString(Path.of("/tmp/descriptors",group,fname));
 				UniversalRuntimeTestDescriptor d = readDescriptor(dtext);
@@ -373,7 +372,6 @@ public abstract class BaseRuntimeTest {
 				d.name = fname.replace(".txt","");
 				d.targetName = targetName;
 				descriptors.add(d);
-				System.out.println(d);
 			}
 			catch (IOException ioe) {
 				System.err.println("Can't read descriptor file "+fname);
@@ -414,9 +412,11 @@ public abstract class BaseRuntimeTest {
 						content += "\n";
 					}
 				}
-				content += "[start]\n";
-				content += d.getStartRule();
-				content += "\n\n";
+				if ( d.getStartRule()!=null && d.getStartRule().length()>0 ) {
+					content += "[start]\n";
+					content += d.getStartRule();
+					content += "\n\n";
+				}
 				if ( input!=null ) {
 					content += "[input]\n";
 					content += input;
@@ -430,6 +430,13 @@ public abstract class BaseRuntimeTest {
 				if ( errors!=null ) {
 					content += "[errors]\n";
 					content += errors;
+					content += "\n";
+				}
+				if ( d.showDFA() ) {
+					content += "[showDFA]\n\n";
+				}
+				if ( d.showDiagnosticErrors() ) {
+					content += "[showDiagnosticErrors]\n\n";
 				}
 				Files.write(Paths.get(groupDir + "/" + filename), content.getBytes());
 			}
@@ -474,16 +481,19 @@ public abstract class BaseRuntimeTest {
 		}
 		long nnl = s.chars().filter(ch -> ch == '\n').count();
 
+		if ( s.endsWith(" ") ||            // whitespace matters
+			 (nnl==1&&s.endsWith("\n")) || // "b = 6\n"
+			 s.startsWith("\n") ) {        // whitespace matters
+			return "\"\"\"" + s + "\"\"\"\n";
+		}
+		if ( s.endsWith(" \n") || s.endsWith("\n\n") ) {
+			return "\"\"\"" + s + "\"\"\"\n";
+		}
 		if ( nnl==0 ) { // one line input
 			return s + "\n";
 		}
 		if ( nnl>1 && s.endsWith("\n") ) {
 			return s;
-		}
-		if ( s.endsWith(" ") ||            // whitespace matters
-			 (nnl==1&&s.endsWith("\n")) || // "b = 6\n"
-			 s.startsWith("\n") ) {        // whitespace matters
-			return "\"\"\"" + s + "\"\"\"\n";
 		}
 		if ( !s.endsWith("\n") ) { // "a\n b"
 			return "\"\"\"" + s + "\"\"\"\n";
@@ -542,7 +552,7 @@ public abstract class BaseRuntimeTest {
 	public static UniversalRuntimeTestDescriptor readDescriptor(String dtext)
 			throws RuntimeException
 	{
-		String[] fileSections = {"notes","type","grammar","slaveGrammar","start","input","output","errors"};
+		String[] fileSections = {"notes","type","grammar","slaveGrammar","start","input","output","errors","showDFA","showDiagnosticErrors"};
 		Set<String> sections = new HashSet<>(Arrays.asList(fileSections));
 		String currentField = null;
 		String currentValue = null;
@@ -562,7 +572,7 @@ public abstract class BaseRuntimeTest {
 				if ( currentValue==null ) {
 					currentValue = "";
 				}
-				currentValue += line.trim()+"\n";
+				currentValue += line + "\n";
 			}
 		}
 		// save last section
@@ -573,7 +583,10 @@ public abstract class BaseRuntimeTest {
 		UniversalRuntimeTestDescriptor d = new UniversalRuntimeTestDescriptor();
 		for (Pair<String,String> p : pairs) {
 			String section = p.a;
-			String value = p.b.trim();
+			String value = "";
+			if ( p.b!=null ) {
+				value = p.b.trim();
+			}
 			if ( value.startsWith("\"\"\"") ) {
 				value = value.replace("\"\"\"", "");
 			}
@@ -606,6 +619,12 @@ public abstract class BaseRuntimeTest {
 				case "errors":
 					d.errors = value;
 					break;
+				case "showDFA":
+					d.showDFA = true;
+					break;
+				case "showDiagnosticErrors":
+					d.showDiagnosticErrors = true;
+					break;
 				default:
 					throw new RuntimeException("Unknown descriptor section ignored: "+section);
 			}
@@ -627,6 +646,7 @@ public abstract class BaseRuntimeTest {
 	}
 
 	public static void main(String[] args) throws Exception {
+		String s = quoteForDescriptorFile("- ] ");
 		String dtext = Files.readString(Path.of("/tmp/descriptors/CompositeParsers/DelegatesSeeSameTokenType.txt"));
 		readDescriptor(dtext);
 	}

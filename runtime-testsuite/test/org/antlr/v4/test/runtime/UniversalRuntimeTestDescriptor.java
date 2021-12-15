@@ -18,6 +18,8 @@ public class UniversalRuntimeTestDescriptor extends BaseRuntimeTestDescriptor {
 
 	public String testGroup;
 	public String testType;
+	public boolean showDFA = false;
+	public boolean showDiagnosticErrors = false;
 
 	@Override
 	public String getTestName() {
@@ -38,4 +40,15 @@ public class UniversalRuntimeTestDescriptor extends BaseRuntimeTestDescriptor {
 		if ( slaveGrammars.size()==0 ) return null;
 		return slaveGrammars;
 	}
+
+	@Override
+	public boolean showDFA() {
+		return showDFA;
+	}
+
+	@Override
+	public boolean showDiagnosticErrors() {
+		return showDiagnosticErrors;
+	}
+
 }
