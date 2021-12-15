@@ -1,0 +1,13 @@
+[type]
+Parser
+
+[grammar]
+grammar T;
+prog : ('x' | 'x' 'y') EOF EOF;
+
+[start]
+prog
+
+[input]
+x
+

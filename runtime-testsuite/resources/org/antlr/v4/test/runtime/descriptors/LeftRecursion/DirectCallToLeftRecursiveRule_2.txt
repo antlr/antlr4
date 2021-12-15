@@ -1,0 +1,21 @@
+[type]
+Parser
+
+[grammar]
+grammar T;
+a @after {<ToStringTree("$ctx"):writeln()>} : a ID
+  | ID
+  ;
+ID : 'a'..'z'+ ;
+WS : (' '|'\n') -> skip ;
+
+[start]
+a
+
+[input]
+x y
+
+[output]
+"""(a (a x) y)
+"""
+

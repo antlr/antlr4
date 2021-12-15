@@ -1,0 +1,21 @@
+[type]
+Parser
+
+[grammar]
+grammar T;
+<ParserPropertyMember()>
+a : {<ParserPropertyCall({$parser}, "Property()")>}? ID {<writeln("\"valid\"")>}
+  ;
+ID : 'a'..'z'+ ;
+WS : (' '|'\n') -> skip ;
+
+[start]
+a
+
+[input]
+abc
+
+[output]
+"""valid
+"""
+

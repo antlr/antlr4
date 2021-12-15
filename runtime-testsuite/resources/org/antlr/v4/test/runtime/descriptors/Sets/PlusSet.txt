@@ -1,0 +1,17 @@
+[type]
+Parser
+
+[grammar]
+grammar T;
+a : ('a'|'b')+ 'c' {<InputText():writeln()>} ;
+
+[start]
+a
+
+[input]
+abaac
+
+[output]
+"""abaac
+"""
+

@@ -1,0 +1,28 @@
+[type]
+CompositeParser
+
+[grammar]
+grammar Test;
+import Unicode;
+
+program : 'test' 'test';
+
+WS : (UNICODE_CLASS_Zs)+ -> skip;
+
+[slaveGrammar]
+"""lexer grammar Unicode;
+
+fragment
+UNICODE_CLASS_Zs    : ' ' | ' ' | ' ' | '᠎'
+    | ' '..' '
+    | ' ' | ' ' | '　'
+    ;
+
+"""
+
+[start]
+program
+
+[input]
+test test
+

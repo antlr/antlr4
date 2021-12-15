@@ -1,0 +1,32 @@
+[type]
+CompositeParser
+
+[grammar]
+grammar M;
+import S,T;
+s : x y ; // matches AA, which should be 'aa'
+B : 'b' ; // another order: B, A, C
+A : 'a' ;
+C : 'c' ;
+WS : (' '|'\n') -> skip ;
+
+[slaveGrammar]
+parser grammar T;
+tokens { C, B, A } // reverse order
+y : A {<writeln("\"T.y\"")>};
+
+[slaveGrammar]
+parser grammar S;
+tokens { A, B, C }
+x : A {<writeln("\"S.x\"")>};
+
+[start]
+s
+
+[input]
+aa
+
+[output]
+S.x
+T.y
+

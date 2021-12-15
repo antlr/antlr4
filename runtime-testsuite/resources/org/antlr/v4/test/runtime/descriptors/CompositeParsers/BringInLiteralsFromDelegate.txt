@@ -1,0 +1,23 @@
+[type]
+CompositeParser
+
+[grammar]
+grammar M;
+import S;
+s : a ;
+WS : (' '|'\n') -> skip ;
+
+[slaveGrammar]
+parser grammar S;
+a : '=' 'a' {<write("\"S.a\"")>};
+
+[start]
+s
+
+[input]
+=a
+
+[output]
+"""S.a
+"""
+

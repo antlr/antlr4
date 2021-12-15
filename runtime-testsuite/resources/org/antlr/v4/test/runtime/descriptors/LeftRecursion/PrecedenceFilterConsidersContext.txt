@@ -1,0 +1,21 @@
+[type]
+Parser
+
+[grammar]
+grammar T;
+prog
+@after {<ToStringTree("$ctx"):writeln()>}
+: statement* EOF {};
+statement: letterA | statement letterA 'b' ;
+letterA: 'a';
+
+[start]
+prog
+
+[input]
+aa
+
+[output]
+"""(prog (statement (letterA a)) (statement (letterA a)) <EOF>)
+"""
+

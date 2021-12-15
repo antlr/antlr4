@@ -1,0 +1,26 @@
+[type]
+CompositeParser
+
+[grammar]
+grammar M; // uses no rules from the import
+import S;
+s : 'b' {<Invoke_foo()>} ; // gS is import pointer
+WS : (' '|'\n') -> skip ;
+
+[slaveGrammar]
+parser grammar S;
+@parser::members {
+<Declare_foo()>
+}
+a : B;
+
+[start]
+s
+
+[input]
+b
+
+[output]
+"""foo
+"""
+

@@ -1,0 +1,15 @@
+[type]
+Parser
+
+[grammar]
+grammar T;
+stat : ifstat | 'x';
+ifstat : 'if' stat ('else' stat)?;
+WS : [ \n\t]+ -> skip ;
+
+[start]
+stat
+
+[input]
+if x
+

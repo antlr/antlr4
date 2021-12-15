@@ -1,0 +1,18 @@
+[type]
+Lexer
+
+[grammar]
+lexer grammar L;
+I : (~[ab \\n]|'a')  {<writeln("\"I\"")>} ;
+WS : [ \n\\u000D]+ -> skip ;
+
+[input]
+a x
+
+[output]
+I
+I
+[@0,0:0='a',<1>,1:0]
+[@1,2:2='x',<1>,1:2]
+[@2,3:2='<EOF>',<-1>,1:3]
+
