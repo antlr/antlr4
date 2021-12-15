@@ -12,10 +12,10 @@
 #include "atn/RuleTransition.h"
 #include "atn/ATN.h"
 #include "atn/ATNState.h"
+#include "support/StringUtils.h"
 #include "Parser.h"
 #include "CommonToken.h"
 #include "Vocabulary.h"
-#include "support/StringUtils.h"
 
 #include "DefaultErrorStrategy.h"
 
@@ -292,11 +292,13 @@ size_t DefaultErrorStrategy::getSymbolType(Token *symbol) {
 }
 
 std::string DefaultErrorStrategy::escapeWSAndQuote(const std::string &s) const {
-  std::string result = s;
-  antlrcpp::replaceAll(result, "\n", "\\n");
-  antlrcpp::replaceAll(result, "\r","\\r");
-  antlrcpp::replaceAll(result, "\t","\\t");
-  return "'" + result + "'";
+  std::string result;
+  result.reserve(s.size() + 2);
+  result.push_back('\'');
+  antlrcpp::escapeWhitespace(result, s);
+  result.push_back('\'');
+  result.shrink_to_fit();
+  return result;
 }
 
 misc::IntervalSet DefaultErrorStrategy::getErrorRecoverySet(Parser *recognizer) {
