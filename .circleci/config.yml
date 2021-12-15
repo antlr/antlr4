@@ -3,7 +3,7 @@ version: 2.1
 jobs:
   test_tool_and_runtime_java:
     docker:
-      - image: cimg/openjdk:11.0
+      - image: cimg/openjdk:1.8
     steps:
       - checkout
       - run:
@@ -32,7 +32,7 @@ jobs:
         type: string
         default: java
     docker:
-      - image: cimg/openjdk:11.0
+      - image: cimg/openjdk:1.8
     environment:
       TARGET: << parameters.target >>
       GROUP: << parameters.test-group >>
