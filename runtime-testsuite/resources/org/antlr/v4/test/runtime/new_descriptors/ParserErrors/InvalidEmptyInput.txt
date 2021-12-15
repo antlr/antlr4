@@ -1,0 +1,18 @@
+[type]
+Parser
+
+[grammar]
+grammar T;
+start : ID+;
+ID : [a-z]+;
+
+[start]
+start
+
+[input]
+
+
+[errors]
+"""line 1:0 mismatched input '<EOF>' expecting ID
+"""
+

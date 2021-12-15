@@ -1,0 +1,21 @@
+[type]
+Lexer
+
+[grammar]
+lexer grammar L;
+A : 'ab' ;
+B : 'abc' ;
+C : 'abcd' ;
+
+[input]
+ababcx
+
+[output]
+[@0,0:1='ab',<1>,1:0]
+[@1,2:4='abc',<2>,1:2]
+[@2,6:5='<EOF>',<-1>,1:6]
+
+[errors]
+"""line 1:5 token recognition error at: 'x'
+"""
+

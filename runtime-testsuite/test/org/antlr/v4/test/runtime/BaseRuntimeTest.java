@@ -23,6 +23,7 @@ import org.stringtemplate.v4.StringRenderer;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Modifier;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -362,11 +363,30 @@ public abstract class BaseRuntimeTest {
 	public static RuntimeTestDescriptor[] getRuntimeTestDescriptors(Class<?> clazz, String targetName) {
 		// Walk all descriptor dirs
 		String group = clazz.getSimpleName().replace("Descriptors","");
-		String[] descriptorFilenames = new File("/tmp/descriptors/"+group).list();
+
+		final ClassLoader loader = Thread.currentThread().getContextClassLoader();
+		final URL descrURL = loader.getResource("org/antlr/v4/test/runtime/new_descriptors/"+group);
+		String[] descriptorFilenames = null;
+		try {
+			descriptorFilenames = new File(descrURL.toURI()).list();
+		}
+		catch (URISyntaxException e) {
+			System.err.println("Bad URL:"+descrURL);
+		}
+
+//		String[] descriptorFilenames = new File("/tmp/descriptors/"+group).list();
 		List<RuntimeTestDescriptor> descriptors = new ArrayList<>();
 		for (String fname : descriptorFilenames) {
 			try {
-				String dtext = Files.readString(Path.of("/tmp/descriptors",group,fname));
+//				String dtext = Files.readString(Path.of("/tmp/descriptors",group,fname));
+				final URL dURL = loader.getResource("org/antlr/v4/test/runtime/new_descriptors/"+group+"/"+fname);
+				String dtext = null;
+				try {
+					dtext = Files.readString(Path.of(dURL.toURI()));
+				}
+				catch (URISyntaxException e) {
+					System.err.println("Bad URL:"+dURL);
+				}
 				UniversalRuntimeTestDescriptor d = readDescriptor(dtext);
 				d.testGroup = group;
 				d.name = fname.replace(".txt","");
