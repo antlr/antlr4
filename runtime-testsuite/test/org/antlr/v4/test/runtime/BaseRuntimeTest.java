@@ -338,7 +338,7 @@ public abstract class BaseRuntimeTest {
 
 	// ---- support ----
 
-	public static RuntimeTestDescriptor[] OLD_getRuntimeTestDescriptors(Class<?> clazz, String targetName) {
+	public static RuntimeTestDescriptor[] getRuntimeTestDescriptors(Class<?> clazz, String targetName) {
 		if(!TestContext.isSupportedTarget(targetName))
 			return new RuntimeTestDescriptor[0];
 		Class<?>[] nestedClasses = clazz.getClasses();
@@ -361,7 +361,7 @@ public abstract class BaseRuntimeTest {
 		return descriptors.toArray(new RuntimeTestDescriptor[0]);
 	}
 
-	public static RuntimeTestDescriptor[] getRuntimeTestDescriptors(Class<?> clazz, String targetName) {
+	public static RuntimeTestDescriptor[] ffgetRuntimeTestDescriptors(Class<?> clazz, String targetName) {
 		// Walk all descriptor dirs
 		String group = clazz.getSimpleName().replace("Descriptors","");
 
@@ -454,11 +454,28 @@ public abstract class BaseRuntimeTest {
 					content += errors;
 					content += "\n";
 				}
-				if ( d.showDFA() ) {
-					content += "[showDFA]\n\n";
+				if ( d.showDFA() || d.showDiagnosticErrors() ) {
+					content += "[flags]\n";
+					if (d.showDFA()) {
+						content += "showDFA\n";
+					}
+					if (d.showDiagnosticErrors()) {
+						content += "showDiagnosticErrors\n";
+					}
+					content += '\n';
 				}
-				if ( d.showDiagnosticErrors() ) {
-					content += "[showDiagnosticErrors]\n\n";
+				List<String> skip = new ArrayList<>();
+				for (String target : Targets) {
+					if ( d.ignore(target) ) {
+						skip.add(target);
+					}
+				}
+				if ( skip.size()>0 ) {
+					content += "[skip]\n";
+					for (String sk : skip) {
+						content += sk+"\n";
+					}
+					content += '\n';
 				}
 				Files.write(Paths.get(groupDir + "/" + filename), content.getBytes());
 			}
