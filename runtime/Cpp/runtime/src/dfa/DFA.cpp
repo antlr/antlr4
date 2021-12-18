@@ -107,7 +107,7 @@ std::string DFA::toString(const Vocabulary &vocabulary) const {
   return serializer.toString();
 }
 
-std::string DFA::toLexerString() {
+std::string DFA::toLexerString() const {
   if (s0 == nullptr) {
     return "";
   }
