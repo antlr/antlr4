@@ -29,5 +29,6 @@ line 1:2 reportContextSensitivity d=2 (e), input='34'
 line 1:14 reportAttemptingFullContext d=2 (e), input='34abc'
 line 1:14 reportContextSensitivity d=2 (e), input='34abc'
 
-[showDiagnosticErrors]
+[flags]
+showDiagnosticErrors
 

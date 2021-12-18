@@ -32,5 +32,6 @@ s0-'d'->:s1=>1
 :s1=>1-'e'->:s1=>1
 :s1=>1-'f'->:s1=>1
 
-[showDFA]
+[flags]
+showDFA
 

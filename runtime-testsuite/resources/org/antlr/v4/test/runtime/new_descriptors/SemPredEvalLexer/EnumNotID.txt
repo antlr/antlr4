@@ -17,5 +17,6 @@ enum abc enum
 [@3,13:12='<EOF>',<-1>,1:13]
 s0-' '->:s3=>3
 
-[showDFA]
+[flags]
+showDFA
 

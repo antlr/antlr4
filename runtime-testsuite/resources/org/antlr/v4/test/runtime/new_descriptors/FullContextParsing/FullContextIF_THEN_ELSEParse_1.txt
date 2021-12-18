@@ -23,5 +23,6 @@ s
 Decision 1:
 s0-'}'->:s1=>2
 
-[showDiagnosticErrors]
+[flags]
+showDiagnosticErrors
 

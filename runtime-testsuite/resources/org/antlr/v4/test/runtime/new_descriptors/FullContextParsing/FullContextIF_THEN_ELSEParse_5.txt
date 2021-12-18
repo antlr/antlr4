@@ -31,5 +31,6 @@ line 1:19 reportContextSensitivity d=1 (stat), input='else'
 line 2:27 reportAttemptingFullContext d=1 (stat), input='else'
 line 2:36 reportAmbiguity d=1 (stat): ambigAlts={1, 2}, input='elsefoo}'
 
-[showDiagnosticErrors]
+[flags]
+showDiagnosticErrors
 

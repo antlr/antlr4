@@ -29,5 +29,6 @@ line 1:38 reportContextSensitivity d=1 (stat), input='elsefooelse'
 line 1:38 reportAttemptingFullContext d=1 (stat), input='else'
 line 1:38 reportContextSensitivity d=1 (stat), input='else'
 
-[showDiagnosticErrors]
+[flags]
+showDiagnosticErrors
 

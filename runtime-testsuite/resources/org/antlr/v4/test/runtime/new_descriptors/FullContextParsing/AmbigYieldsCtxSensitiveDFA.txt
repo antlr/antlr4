@@ -22,5 +22,6 @@ s0-ID->:s1^=>1
 """line 1:0 reportAttemptingFullContext d=0 (s), input='abc'
 """
 
-[showDiagnosticErrors]
+[flags]
+showDiagnosticErrors
 

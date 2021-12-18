@@ -23,5 +23,6 @@ s0-'e'->:s1=>3
 :s6=>3-'b'->:s6=>3
 :s6=>3-'c'->:s6=>3
 
-[showDFA]
+[flags]
+showDFA
 

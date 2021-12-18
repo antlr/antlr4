@@ -27,5 +27,6 @@ s1-ID->:s2^=>1
 line 1:3 reportAttemptingFullContext d=0 (e), input='34abc'
 line 1:0 reportContextSensitivity d=0 (e), input='34'
 
-[showDiagnosticErrors]
+[flags]
+showDiagnosticErrors
 

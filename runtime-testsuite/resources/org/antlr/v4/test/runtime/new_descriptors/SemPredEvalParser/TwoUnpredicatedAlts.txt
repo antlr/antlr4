@@ -28,5 +28,6 @@ line 1:0 reportAmbiguity d=0 (a): ambigAlts={1, 2}, input='x'
 line 1:3 reportAttemptingFullContext d=0 (a), input='y'
 line 1:3 reportAmbiguity d=0 (a): ambigAlts={1, 2}, input='y'
 
-[showDiagnosticErrors]
+[flags]
+showDiagnosticErrors
 

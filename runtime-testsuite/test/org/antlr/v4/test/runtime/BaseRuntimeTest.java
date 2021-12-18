@@ -338,7 +338,7 @@ public abstract class BaseRuntimeTest {
 
 	// ---- support ----
 
-	public static RuntimeTestDescriptor[] getRuntimeTestDescriptors(Class<?> clazz, String targetName) {
+	public static RuntimeTestDescriptor[] OLD_getRuntimeTestDescriptors(Class<?> clazz, String targetName) {
 		if(!TestContext.isSupportedTarget(targetName))
 			return new RuntimeTestDescriptor[0];
 		Class<?>[] nestedClasses = clazz.getClasses();
@@ -361,7 +361,7 @@ public abstract class BaseRuntimeTest {
 		return descriptors.toArray(new RuntimeTestDescriptor[0]);
 	}
 
-	public static RuntimeTestDescriptor[] ffgetRuntimeTestDescriptors(Class<?> clazz, String targetName) {
+	public static RuntimeTestDescriptor[] getRuntimeTestDescriptors(Class<?> clazz, String targetName) {
 		// Walk all descriptor dirs
 		String group = clazz.getSimpleName().replace("Descriptors","");
 
@@ -404,10 +404,11 @@ public abstract class BaseRuntimeTest {
 
 		/** Write descriptor files. */
 	private static void writeDescriptors(Class<?> clazz, List<RuntimeTestDescriptor> descriptors) {
-		new File("/tmp/descriptors").mkdir();
+		String descrRootDir = "/Users/parrt/antlr/code/antlr4/runtime-testsuite/resources/org/antlr/v4/test/runtime/new_descriptors";
+		new File(descrRootDir).mkdir();
 		String groupName = clazz.getSimpleName();
 		groupName = groupName.replace("Descriptors", "");
-		String groupDir = "/tmp/descriptors/" + groupName;
+		String groupDir = descrRootDir + "/" + groupName;
 		new File(groupDir).mkdir();
 
 		for (RuntimeTestDescriptor d : descriptors) {
@@ -591,7 +592,9 @@ public abstract class BaseRuntimeTest {
 	public static UniversalRuntimeTestDescriptor readDescriptor(String dtext)
 			throws RuntimeException
 	{
-		String[] fileSections = {"notes","type","grammar","slaveGrammar","start","input","output","errors","showDFA","showDiagnosticErrors"};
+		String[] fileSections = {
+				"notes","type","grammar","slaveGrammar","start","input","output","errors",
+				"flags","skip"};
 		Set<String> sections = new HashSet<>(Arrays.asList(fileSections));
 		String currentField = null;
 		String currentValue = null;
@@ -658,11 +661,21 @@ public abstract class BaseRuntimeTest {
 				case "errors":
 					d.errors = value;
 					break;
-				case "showDFA":
-					d.showDFA = true;
+				case "flags":
+					String[] flags = value.split("\n");
+					for (String f : flags) {
+						switch (f) {
+							case "showDFA":
+								d.showDFA = true;
+								break;
+							case "showDiagnosticErrors":
+								d.showDiagnosticErrors = true;
+								break;
+						}
+					}
 					break;
-				case "showDiagnosticErrors":
-					d.showDiagnosticErrors = true;
+				case "skip":
+					d.skipTargets = Arrays.asList(value.split("\n"));
 					break;
 				default:
 					throw new RuntimeException("Unknown descriptor section ignored: "+section);

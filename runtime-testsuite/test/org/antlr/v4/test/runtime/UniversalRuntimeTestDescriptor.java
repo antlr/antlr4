@@ -21,6 +21,8 @@ public class UniversalRuntimeTestDescriptor extends BaseRuntimeTestDescriptor {
 	public boolean showDFA = false;
 	public boolean showDiagnosticErrors = false;
 
+	public List<String> skipTargets = new ArrayList<>();
+
 	@Override
 	public String getTestName() {
 		return name;
@@ -51,4 +53,8 @@ public class UniversalRuntimeTestDescriptor extends BaseRuntimeTestDescriptor {
 		return showDiagnosticErrors;
 	}
 
+	@Override
+	public boolean ignore(String targetName) {
+		return skipTargets.contains(targetName);
+	}
 }
