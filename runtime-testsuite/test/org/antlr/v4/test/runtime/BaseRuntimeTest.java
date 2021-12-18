@@ -338,28 +338,28 @@ public abstract class BaseRuntimeTest {
 
 	// ---- support ----
 
-	public static RuntimeTestDescriptor[] OLD_getRuntimeTestDescriptors(Class<?> clazz, String targetName) {
-		if(!TestContext.isSupportedTarget(targetName))
-			return new RuntimeTestDescriptor[0];
-		Class<?>[] nestedClasses = clazz.getClasses();
-		List<RuntimeTestDescriptor> descriptors = new ArrayList<RuntimeTestDescriptor>();
-		for (Class<?> nestedClass : nestedClasses) {
-			int modifiers = nestedClass.getModifiers();
-			if ( RuntimeTestDescriptor.class.isAssignableFrom(nestedClass) && !Modifier.isAbstract(modifiers) ) {
-				try {
-					RuntimeTestDescriptor d = (RuntimeTestDescriptor) nestedClass.newInstance();
-					if(!d.ignore(targetName)) {
-						d.setTarget(targetName);
-						descriptors.add(d);
-					}
-				} catch (Exception e) {
-					e.printStackTrace(System.err);
-				}
-			}
-		}
-		writeDescriptors(clazz, descriptors);
-		return descriptors.toArray(new RuntimeTestDescriptor[0]);
-	}
+//	public static RuntimeTestDescriptor[] OLD_getRuntimeTestZZDescriptors(Class<?> clazz, String targetName) {
+//		if(!TestContext.isSupportedTarget(targetName))
+//			return new RuntimeTestDescriptor[0];
+//		Class<?>[] nestedClasses = clazz.getClasses();
+//		List<RuntimeTestDescriptor> descriptors = new ArrayList<RuntimeTestDescriptor>();
+//		for (Class<?> nestedClass : nestedClasses) {
+//			int modifiers = nestedClass.getModifiers();
+//			if ( RuntimeTestDescriptor.class.isAssignableFrom(nestedClass) && !Modifier.isAbstract(modifiers) ) {
+//				try {
+//					RuntimeTestDescriptor d = (RuntimeTestDescriptor) nestedClass.newInstance();
+//					if(!d.ignore(targetName)) {
+//						d.setTarget(targetName);
+//						descriptors.add(d);
+//					}
+//				} catch (Exception e) {
+//					e.printStackTrace(System.err);
+//				}
+//			}
+//		}
+//		writeDescriptors(clazz, descriptors);
+//		return descriptors.toArray(new RuntimeTestDescriptor[0]);
+//	}
 
 	public static RuntimeTestDescriptor[] getRuntimeTestDescriptors(String group, String targetName) {
 		final ClassLoader loader = Thread.currentThread().getContextClassLoader();

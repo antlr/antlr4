@@ -8,8 +8,6 @@ package org.antlr.v4.test.runtime.dart;
 
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.test.runtime.*;
-import org.antlr.v4.test.runtime.descriptors.LexerExecDescriptors;
-import org.antlr.v4.test.runtime.descriptors.PerformanceDescriptors;
 import org.stringtemplate.v4.ST;
 
 import java.io.*;
@@ -23,10 +21,12 @@ import static org.antlr.v4.test.runtime.BaseRuntimeTest.writeFile;
 
 public class BaseDartTest extends BaseRuntimeTestSupport implements RuntimeTestSupport {
 
-	private static final List<String> AOT_COMPILE_TESTS = Arrays.asList(
-		new PerformanceDescriptors.DropLoopEntryBranchInLRRule_4().input,
-		new LexerExecDescriptors.LargeLexer().input
-	);
+	// TODO: why not compile these two tests?
+//	private static final List<String> AOT_COMPILE_TESTS = Arrays.asList(
+//		new PerformanceDescriptors.DropLoopEntryBranchInLRRule_4().input,
+//		new LexerExecDescriptors.LargeLexer().input
+//	);
+	private static final List<String> AOT_COMPILE_TESTS = new ArrayList<>();
 
 	private static String cacheDartPackages;
 	private static String cacheDartPackageConfig;
