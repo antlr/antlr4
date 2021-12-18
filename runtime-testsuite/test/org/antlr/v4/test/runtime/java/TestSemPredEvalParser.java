@@ -20,6 +20,6 @@ public class TestSemPredEvalParser extends BaseRuntimeTest {
 
 	@Parameterized.Parameters(name="{0}")
 	public static RuntimeTestDescriptor[] getAllTestDescriptors() {
-		return BaseRuntimeTest.getRuntimeTestDescriptors(SemPredEvalParserDescriptors.class, "Java");
+		return BaseRuntimeTest.getRuntimeTestDescriptors("SemPredEvalParser", "Java");
 	}
 }

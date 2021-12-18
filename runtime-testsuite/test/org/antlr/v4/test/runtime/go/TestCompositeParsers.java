@@ -28,6 +28,6 @@ public class TestCompositeParsers extends BaseRuntimeTest {
 
 	@Parameterized.Parameters(name="{0}")
 	public static RuntimeTestDescriptor[] getAllTestDescriptors() {
-		return BaseRuntimeTest.getRuntimeTestDescriptors(CompositeParsersDescriptors.class, "Go");
+		return BaseRuntimeTest.getRuntimeTestDescriptors("CompositeParsers", "Go");
 	}
 }

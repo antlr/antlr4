@@ -23,6 +23,6 @@ public class TestParserExec extends BaseRuntimeTest {
 
 	@Parameterized.Parameters(name="{0}")
 	public static RuntimeTestDescriptor[] getAllTestDescriptors() {
-		return BaseRuntimeTest.getRuntimeTestDescriptors(ParserExecDescriptors.class, "CSharp");
+		return BaseRuntimeTest.getRuntimeTestDescriptors("ParserExec", "CSharp");
 	}
 }

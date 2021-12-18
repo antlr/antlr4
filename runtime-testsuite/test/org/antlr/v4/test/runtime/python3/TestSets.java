@@ -20,6 +20,6 @@ public class TestSets extends BaseRuntimeTest {
 
 	@Parameterized.Parameters(name="{0}")
 	public static RuntimeTestDescriptor[] getAllTestDescriptors() {
-		return BaseRuntimeTest.getRuntimeTestDescriptors(SetsDescriptors.class, "Python3");
+		return BaseRuntimeTest.getRuntimeTestDescriptors("Sets", "Python3");
 	}
 }

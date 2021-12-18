@@ -20,6 +20,6 @@ public class TestLeftRecursion extends BaseRuntimeTest {
 
 	@Parameterized.Parameters(name="{0}")
 	public static RuntimeTestDescriptor[] getAllTestDescriptors() {
-		return BaseRuntimeTest.getRuntimeTestDescriptors(LeftRecursionDescriptors.class, "PHP");
+		return BaseRuntimeTest.getRuntimeTestDescriptors("LeftRecursion", "PHP");
 	}
 }

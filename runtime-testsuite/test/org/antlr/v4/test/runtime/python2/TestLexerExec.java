@@ -20,6 +20,6 @@ public class TestLexerExec extends BaseRuntimeTest {
 
 	@Parameterized.Parameters(name="{0}")
 	public static RuntimeTestDescriptor[] getAllTestDescriptors() {
-		return BaseRuntimeTest.getRuntimeTestDescriptors(LexerExecDescriptors.class, "Python2");
+		return BaseRuntimeTest.getRuntimeTestDescriptors("LexerExec", "Python2");
 	}
 }

@@ -23,6 +23,6 @@ public class TestListeners extends BaseRuntimeTest {
 
 	@Parameterized.Parameters(name="{0}")
 	public static RuntimeTestDescriptor[] getAllTestDescriptors() {
-		return BaseRuntimeTest.getRuntimeTestDescriptors(ListenersDescriptors.class, "Cpp");
+		return BaseRuntimeTest.getRuntimeTestDescriptors("Listeners", "Cpp");
 	}
 }

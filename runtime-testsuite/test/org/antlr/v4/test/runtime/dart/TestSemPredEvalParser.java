@@ -21,6 +21,6 @@ public class TestSemPredEvalParser extends BaseRuntimeTest {
 
 	@Parameterized.Parameters(name="{0}")
 	public static RuntimeTestDescriptor[] getAllTestDescriptors() {
-		return BaseRuntimeTest.getRuntimeTestDescriptors(SemPredEvalParserDescriptors.class, "Dart");
+		return BaseRuntimeTest.getRuntimeTestDescriptors("SemPredEvalParser", "Dart");
 	}
 }

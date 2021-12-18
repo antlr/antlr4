@@ -21,6 +21,6 @@ public class TestParseTrees extends BaseRuntimeTest {
 
 	@Parameterized.Parameters(name="{0}")
 	public static RuntimeTestDescriptor[] getAllTestDescriptors() {
-		return BaseRuntimeTest.getRuntimeTestDescriptors(ParseTreesDescriptors.class, "Dart");
+		return BaseRuntimeTest.getRuntimeTestDescriptors("ParseTrees", "Dart");
 	}
 }

@@ -23,7 +23,7 @@ public class TestParseTrees extends BaseRuntimeTest {
 
 	@Parameterized.Parameters(name="{0}")
 	public static RuntimeTestDescriptor[] getAllTestDescriptors() {
-		return BaseRuntimeTest.getRuntimeTestDescriptors(ParseTreesDescriptors.class, "Swift");
+		return BaseRuntimeTest.getRuntimeTestDescriptors("ParseTrees", "Swift");
 	}
 }
 

@@ -20,6 +20,6 @@ public class TestLeftRecursion extends BaseRuntimeTest {
 
 	@Parameterized.Parameters(name="{0}")
 	public static RuntimeTestDescriptor[] getAllTestDescriptors() {
-		return BaseRuntimeTest.getRuntimeTestDescriptors(LeftRecursionDescriptors.class, "Python2");
+		return BaseRuntimeTest.getRuntimeTestDescriptors("LeftRecursion", "Python2");
 	}
 }

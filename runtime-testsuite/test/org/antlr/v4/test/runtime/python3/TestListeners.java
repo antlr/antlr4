@@ -20,6 +20,6 @@ public class TestListeners extends BaseRuntimeTest {
 
 	@Parameterized.Parameters(name="{0}")
 	public static RuntimeTestDescriptor[] getAllTestDescriptors() {
-		return BaseRuntimeTest.getRuntimeTestDescriptors(ListenersDescriptors.class, "Python3");
+		return BaseRuntimeTest.getRuntimeTestDescriptors("Listeners", "Python3");
 	}
 }

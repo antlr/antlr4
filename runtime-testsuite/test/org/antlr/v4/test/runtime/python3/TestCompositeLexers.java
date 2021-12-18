@@ -20,6 +20,6 @@ public class TestCompositeLexers extends BaseRuntimeTest {
 
 	@Parameterized.Parameters(name="{0}")
 	public static RuntimeTestDescriptor[] getAllTestDescriptors() {
-		return BaseRuntimeTest.getRuntimeTestDescriptors(CompositeLexersDescriptors.class, "Python3");
+		return BaseRuntimeTest.getRuntimeTestDescriptors("CompositeLexers", "Python3");
 	}
 }

@@ -28,6 +28,6 @@ public class TestParseTrees extends BaseRuntimeTest {
 
 	@Parameterized.Parameters(name="{0}")
 	public static RuntimeTestDescriptor[] getAllTestDescriptors() {
-		return BaseRuntimeTest.getRuntimeTestDescriptors(ParseTreesDescriptors.class, "Go");
+		return BaseRuntimeTest.getRuntimeTestDescriptors("ParseTrees", "Go");
 	}
 }

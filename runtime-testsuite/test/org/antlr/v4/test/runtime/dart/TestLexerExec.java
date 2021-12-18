@@ -21,6 +21,6 @@ public class TestLexerExec extends BaseRuntimeTest {
 
 	@Parameterized.Parameters(name="{0}")
 	public static RuntimeTestDescriptor[] getAllTestDescriptors() {
-		return BaseRuntimeTest.getRuntimeTestDescriptors(LexerExecDescriptors.class, "Dart");
+		return BaseRuntimeTest.getRuntimeTestDescriptors("LexerExec", "Dart");
 	}
 }

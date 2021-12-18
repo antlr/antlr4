@@ -21,6 +21,6 @@ public class TestParserErrors extends BaseRuntimeTest {
 
 	@Parameterized.Parameters(name="{0}")
 	public static RuntimeTestDescriptor[] getAllTestDescriptors() {
-		return BaseRuntimeTest.getRuntimeTestDescriptors(ParserErrorsDescriptors.class, "Dart");
+		return BaseRuntimeTest.getRuntimeTestDescriptors("ParserErrors", "Dart");
 	}
 }

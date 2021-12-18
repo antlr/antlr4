@@ -28,6 +28,6 @@ public class TestLexerExec extends BaseRuntimeTest {
 
 	@Parameterized.Parameters(name="{0}")
 	public static RuntimeTestDescriptor[] getAllTestDescriptors() {
-		return BaseRuntimeTest.getRuntimeTestDescriptors(LexerExecDescriptors.class, "Go");
+		return BaseRuntimeTest.getRuntimeTestDescriptors("LexerExec", "Go");
 	}
 }

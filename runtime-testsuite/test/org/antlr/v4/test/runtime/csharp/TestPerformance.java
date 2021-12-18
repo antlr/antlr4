@@ -23,6 +23,6 @@ public class TestPerformance extends BaseRuntimeTest {
 
 	@Parameterized.Parameters(name="{0}")
 	public static RuntimeTestDescriptor[] getAllTestDescriptors() {
-		return BaseRuntimeTest.getRuntimeTestDescriptors(PerformanceDescriptors.class, "CSharp");
+		return BaseRuntimeTest.getRuntimeTestDescriptors("Performance", "CSharp");
 	}
 }

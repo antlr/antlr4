@@ -20,6 +20,6 @@ public class TestParserExec extends BaseRuntimeTest {
 
 	@Parameterized.Parameters(name="{0}")
 	public static RuntimeTestDescriptor[] getAllTestDescriptors() {
-		return BaseRuntimeTest.getRuntimeTestDescriptors(ParserExecDescriptors.class, "Python3");
+		return BaseRuntimeTest.getRuntimeTestDescriptors("ParserExec", "Python3");
 	}
 }

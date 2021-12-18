@@ -20,6 +20,6 @@ public class TestParseTrees extends BaseRuntimeTest {
 
 	@Parameterized.Parameters(name="{0}")
 	public static RuntimeTestDescriptor[] getAllTestDescriptors() {
-		return BaseRuntimeTest.getRuntimeTestDescriptors(ParseTreesDescriptors.class, "Python3");
+		return BaseRuntimeTest.getRuntimeTestDescriptors("ParseTrees", "Python3");
 	}
 }

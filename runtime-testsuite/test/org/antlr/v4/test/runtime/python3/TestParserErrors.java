@@ -20,6 +20,6 @@ public class TestParserErrors extends BaseRuntimeTest {
 
 	@Parameterized.Parameters(name="{0}")
 	public static RuntimeTestDescriptor[] getAllTestDescriptors() {
-		return BaseRuntimeTest.getRuntimeTestDescriptors(ParserErrorsDescriptors.class, "Python3");
+		return BaseRuntimeTest.getRuntimeTestDescriptors("ParserErrors", "Python3");
 	}
 }

@@ -20,6 +20,6 @@ public class TestFullContextParsing extends BaseRuntimeTest {
 
 	@Parameterized.Parameters(name="{0}")
 	public static RuntimeTestDescriptor[] getAllTestDescriptors() {
-		return BaseRuntimeTest.getRuntimeTestDescriptors(FullContextParsingDescriptors.class, "PHP");
+		return BaseRuntimeTest.getRuntimeTestDescriptors("FullContextParsing", "PHP");
 	}
 }

@@ -21,6 +21,6 @@ public class TestPerformance extends BaseRuntimeTest {
 
 	@Parameterized.Parameters(name="{0}")
 	public static RuntimeTestDescriptor[] getAllTestDescriptors() {
-		return BaseRuntimeTest.getRuntimeTestDescriptors(PerformanceDescriptors.class, "Dart");
+		return BaseRuntimeTest.getRuntimeTestDescriptors("Performance", "Dart");
 	}
 }

@@ -23,6 +23,6 @@ public class TestSets extends BaseRuntimeTest {
 
 	@Parameterized.Parameters(name="{0}")
 	public static RuntimeTestDescriptor[] getAllTestDescriptors() {
-		return BaseRuntimeTest.getRuntimeTestDescriptors(SetsDescriptors.class, "Cpp");
+		return BaseRuntimeTest.getRuntimeTestDescriptors("Sets", "Cpp");
 	}
 }

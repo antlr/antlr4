@@ -20,6 +20,6 @@ public class TestSemPredEvalParser extends BaseRuntimeTest {
 
 	@Parameterized.Parameters(name="{0}")
 	public static RuntimeTestDescriptor[] getAllTestDescriptors() {
-		return BaseRuntimeTest.getRuntimeTestDescriptors(SemPredEvalParserDescriptors.class, "PHP");
+		return BaseRuntimeTest.getRuntimeTestDescriptors("SemPredEvalParser", "PHP");
 	}
 }

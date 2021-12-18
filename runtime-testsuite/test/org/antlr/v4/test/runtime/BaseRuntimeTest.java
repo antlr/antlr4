@@ -361,10 +361,7 @@ public abstract class BaseRuntimeTest {
 		return descriptors.toArray(new RuntimeTestDescriptor[0]);
 	}
 
-	public static RuntimeTestDescriptor[] getRuntimeTestDescriptors(Class<?> clazz, String targetName) {
-		// Walk all descriptor dirs
-		String group = clazz.getSimpleName().replace("Descriptors","");
-
+	public static RuntimeTestDescriptor[] getRuntimeTestDescriptors(String group, String targetName) {
 		final ClassLoader loader = Thread.currentThread().getContextClassLoader();
 		final URL descrURL = loader.getResource("org/antlr/v4/test/runtime/new_descriptors/"+group);
 		String[] descriptorFilenames = null;

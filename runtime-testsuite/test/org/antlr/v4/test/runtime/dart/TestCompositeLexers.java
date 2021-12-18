@@ -21,6 +21,6 @@ public class TestCompositeLexers extends BaseRuntimeTest {
 
 	@Parameterized.Parameters(name="{0}")
 	public static RuntimeTestDescriptor[] getAllTestDescriptors() {
-		return BaseRuntimeTest.getRuntimeTestDescriptors(CompositeLexersDescriptors.class, "Dart");
+		return BaseRuntimeTest.getRuntimeTestDescriptors("CompositeLexers", "Dart");
 	}
 }

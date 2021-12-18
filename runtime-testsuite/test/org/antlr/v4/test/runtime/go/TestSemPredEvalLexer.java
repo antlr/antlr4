@@ -28,6 +28,6 @@ public class TestSemPredEvalLexer extends BaseRuntimeTest {
 
 	@Parameterized.Parameters(name="{0}")
 	public static RuntimeTestDescriptor[] getAllTestDescriptors() {
-		return BaseRuntimeTest.getRuntimeTestDescriptors(SemPredEvalLexerDescriptors.class, "Go");
+		return BaseRuntimeTest.getRuntimeTestDescriptors("SemPredEvalLexer", "Go");
 	}
 }

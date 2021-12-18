@@ -20,6 +20,6 @@ public class TestSemPredEvalParser extends BaseRuntimeTest {
 
 	@Parameterized.Parameters(name="{0}")
 	public static RuntimeTestDescriptor[] getAllTestDescriptors() {
-		return BaseRuntimeTest.getRuntimeTestDescriptors(SemPredEvalParserDescriptors.class, "Python2");
+		return BaseRuntimeTest.getRuntimeTestDescriptors("SemPredEvalParser", "Python2");
 	}
 }

@@ -23,7 +23,7 @@ public class TestLexerErrors extends BaseRuntimeTest {
 
 	@Parameterized.Parameters(name="{0}")
 	public static RuntimeTestDescriptor[] getAllTestDescriptors() {
-		return BaseRuntimeTest.getRuntimeTestDescriptors(LexerErrorsDescriptors.class, "Swift");
+		return BaseRuntimeTest.getRuntimeTestDescriptors("LexerErrors", "Swift");
 	}
 }
 
