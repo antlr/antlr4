@@ -8,13 +8,13 @@ package org.antlr.v4.test.runtime.cpp;
 
 import org.antlr.v4.test.runtime.BaseRuntimeTest;
 import org.antlr.v4.test.runtime.RuntimeTestDescriptor;
-import org.antlr.v4.test.runtime.category.ParserTestsBatch1;
+import org.antlr.v4.test.runtime.category.ParserTestsGroup1;
 import org.antlr.v4.test.runtime.descriptors.FullContextParsingDescriptors;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-@Category(ParserTestsBatch1.class)
+@Category(ParserTestsGroup1.class)
 @RunWith(Parameterized.class)
 public class TestFullContextParsing extends BaseRuntimeTest {
 	public TestFullContextParsing(RuntimeTestDescriptor descriptor) {

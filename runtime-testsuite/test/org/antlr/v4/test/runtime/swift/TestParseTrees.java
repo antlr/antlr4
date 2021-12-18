@@ -8,13 +8,13 @@ package org.antlr.v4.test.runtime.swift;
 
 import org.antlr.v4.test.runtime.BaseRuntimeTest;
 import org.antlr.v4.test.runtime.RuntimeTestDescriptor;
-import org.antlr.v4.test.runtime.category.ParserTestsBatch2;
+import org.antlr.v4.test.runtime.category.ParserTestsGroup2;
 import org.antlr.v4.test.runtime.descriptors.ParseTreesDescriptors;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-@Category(ParserTestsBatch2.class)
+@Category(ParserTestsGroup2.class)
 @RunWith(Parameterized.class)
 public class TestParseTrees extends BaseRuntimeTest {
 	public TestParseTrees(RuntimeTestDescriptor descriptor) {

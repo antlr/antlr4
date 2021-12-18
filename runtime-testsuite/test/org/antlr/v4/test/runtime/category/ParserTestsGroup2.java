@@ -1,4 +1,4 @@
 package org.antlr.v4.test.runtime.category;
 
-public class ParserTestsBatch2 {
+public class ParserTestsGroup2 {
 }

@@ -17,7 +17,7 @@ if [ $rc == 0 ]; then
     if [ $GROUP == "LEXER" ]; then
         mvn -q -Dgroups="org.antlr.v4.test.runtime.category.LexerTests" -Dtest=swift.** test
     elif [ $GROUP == "PARSER1" ]; then
-        mvn -q -Dgroups="org.antlr.v4.test.runtime.category.ParserTestsBatch1" -Dtest=swift.** test
+        mvn -q -Dgroups="org.antlr.v4.test.runtime.category.ParserTestsGroup1" -Dtest=swift.** test
     elif [ $GROUP == "PARSER2" ]; then
         mvn -q -Dgroups="org.antlr.v4.test.runtime.category.ParserTestsBatch2" -Dtest=swift.** test
     elif [ $GROUP == "RECURSION" ]; then

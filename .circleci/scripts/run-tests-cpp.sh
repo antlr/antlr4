@@ -11,7 +11,7 @@ pushd runtime-testsuite
   if [ $GROUP == "LEXER" ]; then
       mvn -q -Dgroups="org.antlr.v4.test.runtime.category.LexerTests" -Dtest=cpp.** test
   elif [ $GROUP == "PARSER1" ]; then
-      mvn -q -Dgroups="org.antlr.v4.test.runtime.category.ParserTestsBatch1" -Dtest=cpp.** test
+      mvn -q -Dgroups="org.antlr.v4.test.runtime.category.ParserTestsGroup1" -Dtest=cpp.** test
   elif [ $GROUP == "PARSER2" ]; then
       mvn -q -Dgroups="org.antlr.v4.test.runtime.category.ParserTestsBatch2" -Dtest=cpp.** test
   elif [ $GROUP == "RECURSION" ]; then
