@@ -61,5 +61,5 @@ workflows:
       - test_runtime:
           matrix:
             parameters:
-              target: [ cpp, swift ]
+              target: [ cpp ]
               test-group: [ LEXER, PARSER1, PARSER2, RECURSION ]
