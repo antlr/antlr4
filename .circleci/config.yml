@@ -61,6 +61,10 @@ workflows:
       - test_runtime:
           matrix:
             parameters:
-#              target: [ cpp, dotnet, swift ]
-              target: [ cpp, dotnet, dart ]
+              target: [ cpp, swift ]
               test-group: [ LEXER, PARSER1, PARSER2, RECURSION ]
+      - test_runtime:
+          matrix:
+            parameters:
+              target: [ cpp, dotnet, dart ]
+              test-group: [ LEXER, PARSER1, RECURSION ]
