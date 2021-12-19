@@ -133,6 +133,14 @@ import "github.com/antlr/antlr4/runtime/Go/antlr"
 
 type Base<file.grammarName>Visitor struct {
 	*antlr.BaseParseTreeVisitor
+
+	rootVisitor JavaParserVisitor
+}
+
+func NewBase<file.grammarName>Visitor(root JavaParserVisitor) *Base<file.grammarName>Visitor {
+	return &Base<file.grammarName>Visitor{
+		BaseParseTreeVisitor: antlr.NewBaseParseTreeVisitor(root),
+	}
 }
 
 <file.visitorNames:{lname |
@@ -167,11 +175,11 @@ var symbolicNames []string
 
 
 <if(parser.ruleNames)>
-var ruleNames = []string{
+var RuleNames = []string{
 	<parser.ruleNames:{r | "<r>"}; separator=", ", wrap>,
 }
 <else>
-var ruleNames []string
+var RuleNames []string
 <endif>
 
 type <parser.name> struct {
@@ -195,7 +203,7 @@ func New<parser.name>(input antlr.TokenStream) *<parser.name> {
 	this.BaseParser = antlr.NewBaseParser(input)
 
 	this.Interpreter = antlr.NewParserATNSimulator(this, deserializedATN, decisionToDFA, antlr.NewPredictionContextCache())
-	this.RuleNames = ruleNames
+	this.RuleNames = RuleNames
 	this.LiteralNames = literalNames
 	this.SymbolicNames = symbolicNames
 	this.GrammarFileName = "<parser.grammarFileName; format="java-escape">"
