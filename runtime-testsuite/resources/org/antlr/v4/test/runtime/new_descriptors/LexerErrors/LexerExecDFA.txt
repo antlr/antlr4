@@ -1,3 +1,6 @@
+[notes]
+This is a regression test for #45 "NullPointerException in LexerATNSimulator.execDFA".  https://github.com/antlr/antlr4/issues/46
+
 [type]
 Lexer
 

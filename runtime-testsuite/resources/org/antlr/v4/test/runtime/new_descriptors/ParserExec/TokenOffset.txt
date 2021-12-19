@@ -1,3 +1,8 @@
+[notes]
+This is a regression test for antlr/antlr4#2728
+It should generate correct code for grammars with more than 65 tokens.
+https://github.com/antlr/antlr4/pull/2728#issuecomment-622940562
+
 [type]
 Parser
 

@@ -1,3 +1,7 @@
+[notes]
+This is a regression test for antlr/antlr4#334 "BailErrorStrategy: bails
+on proper input".  https://github.com/antlr/antlr4/issues/334
+
 [type]
 Parser
 

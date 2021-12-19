@@ -1,3 +1,8 @@
+[notes]
+This is a regression test for antlr/antlr4#196
+"element+ in expression grammar doesn't parse properly"
+https://github.com/antlr/antlr4/issues/196
+
 [type]
 Parser
 

@@ -1,3 +1,7 @@
+[notes]
+This is a regression test for antlr/antlr4#192 "Poor performance of
+expression parsing".  https://github.com/antlr/antlr4/issues/192
+
 [type]
 Parser
 

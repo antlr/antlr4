@@ -1,3 +1,7 @@
+[notes]
+This is a regression test for antlr/antlr4#509 "Incorrect rule chosen in
+unambiguous grammar".  https://github.com/antlr/antlr4/issues/509
+
 [type]
 Parser
 

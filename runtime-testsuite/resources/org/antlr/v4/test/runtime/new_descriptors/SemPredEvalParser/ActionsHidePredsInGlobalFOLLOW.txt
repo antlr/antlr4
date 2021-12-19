@@ -1,3 +1,9 @@
+[notes]
+Regular non-forced actions can create side effects used by semantic
+predicates and so we cannot evaluate any semantic predicate
+encountered after having seen a regular action. This includes
+during global follow operations.
+
 [type]
 Parser
 

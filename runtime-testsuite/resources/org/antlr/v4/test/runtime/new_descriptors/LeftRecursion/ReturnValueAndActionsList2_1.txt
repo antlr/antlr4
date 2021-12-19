@@ -1,3 +1,9 @@
+[notes]
+This is a regression test for antlr/antlr4#677 "labels not working in grammar
+file".  https://github.com/antlr/antlr4/issues/677
+This test treats `,` and `>>` as part of a single compound operator (similar
+to a ternary operator).
+
 [type]
 Parser
 

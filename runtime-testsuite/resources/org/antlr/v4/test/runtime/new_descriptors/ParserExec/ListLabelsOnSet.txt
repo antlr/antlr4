@@ -1,3 +1,7 @@
+[notes]
+This is a regression test for #270 "Fix operator += applied to a set of
+tokens".  https://github.com/antlr/antlr4/issues/270
+
 [type]
 Parser
 

@@ -1,3 +1,7 @@
+[notes]
+Tests predictions for the following case involving closures.
+http://www.antlr.org/wiki/display/~admin/2011/12/29/Flaw+in+ANTLR+v3+LL(*)+analysis+algorithm
+
 [type]
 Parser
 

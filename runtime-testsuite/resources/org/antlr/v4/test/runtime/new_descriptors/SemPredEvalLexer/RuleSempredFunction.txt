@@ -1,3 +1,6 @@
+[notes]
+Test for https://github.com/antlr/antlr4/issues/958
+
 [type]
 Lexer
 

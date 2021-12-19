@@ -1,3 +1,6 @@
+[notes]
+This is a regression test for antlr/antlr4#2301.
+
 [type]
 Parser
 

@@ -1,3 +1,7 @@
+[notes]
+During a global follow operation, we still collect semantic
+predicates as long as they are not dependent on local context
+
 [type]
 Parser
 

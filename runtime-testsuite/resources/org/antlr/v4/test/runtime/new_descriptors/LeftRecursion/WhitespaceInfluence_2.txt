@@ -1,3 +1,7 @@
+[notes]
+This is a regression test for #239 "recoursive parser using implicit tokens
+ignore white space lexer rule".  https://github.com/antlr/antlr4/issues/239
+
 [type]
 Parser
 
