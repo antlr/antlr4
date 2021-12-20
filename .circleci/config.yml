@@ -3,7 +3,10 @@ version: 2.1
 jobs:
   test_tool_and_runtime_java:
     docker:
-      - image: cimg/openjdk:8.0
+      - image: cimg/openjdk:11.0.13
+        environment:
+          MAVEN_OPTS: -Xmx512m
+    resource_class: large
     steps:
       - checkout
       - run:
@@ -13,13 +16,13 @@ jobs:
           name: test runtime
           command: |
             cd runtime-testsuite
-            mvn -q -Dparallel=methods -DthreadCount=4 -Dtest=java.** test
+            mvn -q -Dtest=java.** test
             cd ..
       - run:
           name: test tool
           command: |
             cd tool-testsuite
-            mvn -q -Dparallel=methods -DthreadCount=4 test
+            mvn -q test
             cd ..
   test_runtime:
     parameters:
@@ -32,7 +35,10 @@ jobs:
         type: string
         default: java
     docker:
-      - image: cimg/openjdk:8.0
+      - image: cimg/openjdk:11.0.13
+        environment:
+          MAVEN_OPTS: -Xmx512m
+    resource_class: large
     environment:
       TARGET: << parameters.target >>
       GROUP: << parameters.test-group >>

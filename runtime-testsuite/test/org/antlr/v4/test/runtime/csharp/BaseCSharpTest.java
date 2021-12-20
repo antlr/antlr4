@@ -209,7 +209,7 @@ public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTes
 		return true;
 	}
 
-	private synchronized boolean initializeRuntime() {
+	private static synchronized boolean initializeRuntime() {
 		// Compile runtime project once per tests session
 		if (isRuntimeInitialized)
 			return true;
@@ -247,7 +247,7 @@ public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTes
 			}
 			cSharpTestProjectContent = out.toString().replace(cSharpAntlrRuntimeDllName, Paths.get(cSharpCachingDirectory, cSharpAntlrRuntimeDllName).toString());
 
-			success = runProcess(args, cSharpCachingDirectory);
+			success = initializeRuntimeAt(args, cSharpCachingDirectory);
 		} catch (Exception e) {
 			e.printStackTrace(System.err);
 			return false;
@@ -260,6 +260,27 @@ public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTes
 	private static String getConfig() {
 		return isDebug ? "Debug" : "Release";
 	}
+
+  private static boolean initializeRuntimeAt(String[] args, String path) throws Exception {
+		ProcessBuilder pb = new ProcessBuilder(args);
+		pb.directory(new File(path));
+		Process process = pb.start();
+		StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
+		StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
+		stdoutVacuum.start();
+		stderrVacuum.start();
+		process.waitFor();
+		stdoutVacuum.join();
+		stderrVacuum.join();
+		int exitValue = process.exitValue();
+		boolean success = (exitValue == 0);
+		if (!success) {
+			System.err.println("runProcess command: " + Utils.join(args, " "));
+			System.err.println("runProcess exitValue: " + exitValue);
+			System.err.println("runProcess stdoutVacuum: " + stdoutVacuum.toString());
+		}
+		return success;
+  }
 
 	private boolean runProcess(String[] args, String path) throws Exception {
 		return runProcess(args, path, 0);

@@ -106,6 +106,9 @@
                         <include>**/dart/Test*.java</include>
                         <include>${antlr.tests.swift}</include>
                     </includes>
+					<parallel>all</parallel>
+					<useUnlimitedThreads>true</useUnlimitedThreads>
+					<forkCount>0</forkCount>
 				</configuration>
 			</plugin>
 			<plugin>
