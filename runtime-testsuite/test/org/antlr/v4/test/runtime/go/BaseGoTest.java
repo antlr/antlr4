@@ -203,7 +203,7 @@ public class BaseGoTest extends BaseRuntimeTestSupport implements RuntimeTestSup
 		return null;
 	}
 
-	private synchronized boolean initializeRuntime() {
+	private static synchronized boolean initializeRuntime() {
 		if (isRuntimeInitialized)
 			return true;
 
@@ -241,7 +241,7 @@ public class BaseGoTest extends BaseRuntimeTestSupport implements RuntimeTestSup
 		return isRuntimeInitialized;
 	}
 
-	private void copyDirectory(final Path source, final Path target, final CopyOption... options)
+	private static void copyDirectory(final Path source, final Path target, final CopyOption... options)
 			throws IOException {
 		Files.walkFileTree(source, EnumSet.of(FileVisitOption.FOLLOW_LINKS), 2147483647, new SimpleFileVisitor<Path>() {
 			@Override
@@ -260,7 +260,7 @@ public class BaseGoTest extends BaseRuntimeTestSupport implements RuntimeTestSup
 		});
 	}
 
-	private void deleteDirectory(File f) throws IOException {
+	private static void deleteDirectory(File f) throws IOException {
 		if (f.isDirectory()) {
 			for (File c : f.listFiles())
 				deleteDirectory(c);
