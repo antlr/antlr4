@@ -107,7 +107,7 @@ SemanticContext::AND::AND(Ref<SemanticContext> const& a, Ref<SemanticContext> co
   Set operands;
 
   if (is<AND>(a)) {
-    for (auto operand : std::dynamic_pointer_cast<AND>(a)->opnds) {
+    for (const auto &operand : std::dynamic_pointer_cast<AND>(a)->opnds) {
       operands.insert(operand);
     }
   } else {
@@ -115,7 +115,7 @@ SemanticContext::AND::AND(Ref<SemanticContext> const& a, Ref<SemanticContext> co
   }
 
   if (is<AND>(b)) {
-    for (auto operand : std::dynamic_pointer_cast<AND>(b)->opnds) {
+    for (const auto &operand : std::dynamic_pointer_cast<AND>(b)->opnds) {
       operands.insert(operand);
     }
   } else {
@@ -157,7 +157,7 @@ size_t SemanticContext::AND::hashCode() const {
 }
 
 bool SemanticContext::AND::eval(Recognizer *parser, RuleContext *parserCallStack) {
-  for (auto opnd : opnds) {
+  for (const auto &opnd : opnds) {
     if (!opnd->eval(parser, parserCallStack)) {
       return false;
     }
@@ -168,7 +168,7 @@ bool SemanticContext::AND::eval(Recognizer *parser, RuleContext *parserCallStack
 Ref<SemanticContext> SemanticContext::AND::evalPrecedence(Recognizer *parser, RuleContext *parserCallStack) {
   bool differs = false;
   std::vector<Ref<SemanticContext>> operands;
-  for (auto context : opnds) {
+  for (const auto &context : opnds) {
     Ref<SemanticContext> evaluated = context->evalPrecedence(parser, parserCallStack);
     differs |= (evaluated != context);
     if (evaluated == nullptr) {
@@ -199,7 +199,7 @@ Ref<SemanticContext> SemanticContext::AND::evalPrecedence(Recognizer *parser, Ru
 
 std::string SemanticContext::AND::toString() const {
   std::string tmp;
-  for (auto var : opnds) {
+  for (const auto &var : opnds) {
     tmp += var->toString() + " && ";
   }
   return tmp;
@@ -211,7 +211,7 @@ SemanticContext::OR::OR(Ref<SemanticContext> const& a, Ref<SemanticContext> cons
   Set operands;
 
   if (is<OR>(a)) {
-    for (auto operand : std::dynamic_pointer_cast<OR>(a)->opnds) {
+    for (const auto &operand : std::dynamic_pointer_cast<OR>(a)->opnds) {
       operands.insert(operand);
     }
   } else {
@@ -219,7 +219,7 @@ SemanticContext::OR::OR(Ref<SemanticContext> const& a, Ref<SemanticContext> cons
   }
 
   if (is<OR>(b)) {
-    for (auto operand : std::dynamic_pointer_cast<OR>(b)->opnds) {
+    for (const auto &operand : std::dynamic_pointer_cast<OR>(b)->opnds) {
       operands.insert(operand);
     }
   } else {
@@ -259,7 +259,7 @@ size_t SemanticContext::OR::hashCode() const {
 }
 
 bool SemanticContext::OR::eval(Recognizer *parser, RuleContext *parserCallStack) {
-  for (auto opnd : opnds) {
+  for (const auto &opnd : opnds) {
     if (opnd->eval(parser, parserCallStack)) {
       return true;
     }
@@ -270,7 +270,7 @@ bool SemanticContext::OR::eval(Recognizer *parser, RuleContext *parserCallStack)
 Ref<SemanticContext> SemanticContext::OR::evalPrecedence(Recognizer *parser, RuleContext *parserCallStack) {
   bool differs = false;
   std::vector<Ref<SemanticContext>> operands;
-  for (auto context : opnds) {
+  for (const auto &context : opnds) {
     Ref<SemanticContext> evaluated = context->evalPrecedence(parser, parserCallStack);
     differs |= (evaluated != context);
     if (evaluated == NONE) {
@@ -301,7 +301,7 @@ Ref<SemanticContext> SemanticContext::OR::evalPrecedence(Recognizer *parser, Rul
 
 std::string SemanticContext::OR::toString() const {
   std::string tmp;
-  for(auto var : opnds) {
+  for(const auto &var : opnds) {
     tmp += var->toString() + " || ";
   }
   return tmp;
@@ -361,7 +361,7 @@ Ref<SemanticContext> SemanticContext::Or(Ref<SemanticContext> const& a, Ref<Sema
 
 std::vector<Ref<SemanticContext::PrecedencePredicate>> SemanticContext::filterPrecedencePredicates(const Set &collection) {
   std::vector<Ref<SemanticContext::PrecedencePredicate>> result;
-  for (auto context : collection) {
+  for (const auto &context : collection) {
     if (antlrcpp::is<PrecedencePredicate>(context)) {
       result.push_back(std::dynamic_pointer_cast<PrecedencePredicate>(context));
     }

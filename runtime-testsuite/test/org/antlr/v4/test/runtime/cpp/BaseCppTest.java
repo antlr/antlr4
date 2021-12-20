@@ -303,7 +303,7 @@ public class BaseCppTest extends BaseRuntimeTestSupport implements RuntimeTestSu
 		}
 
 		try {
-			List<String> command2 = new ArrayList<String>(Arrays.asList("clang++", "-std=c++11", "-I", includePath, "-L.", "-lantlr4-runtime", "-o", "a.out"));
+			List<String> command2 = new ArrayList<String>(Arrays.asList("clang++", "-std=c++17", "-I", includePath, "-L.", "-lantlr4-runtime", "-pthread", "-o", "a.out"));
 			command2.addAll(allCppFiles(getTempDirPath()));
 			if (runCommand(command2.toArray(new String[0]), getTempDirPath(), "building test binary", true) == null) {
 				return null;

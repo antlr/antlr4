@@ -72,7 +72,6 @@ public:
 
   virtual const std::vector\<std::string>& getChannelNames() const override;
   virtual const std::vector\<std::string>& getModeNames() const override;
-  virtual const std::vector\<std::string>& getTokenNames() const override; // deprecated, use vocabulary instead
   virtual antlr4::dfa::Vocabulary& getVocabulary() const override;
 
   virtual const std::vector\<uint16_t> getSerializedATN() const override;
@@ -89,7 +88,6 @@ private:
   static std::vector\<antlr4::dfa::DFA> _decisionToDFA;
   static antlr4::atn::PredictionContextCache _sharedContextCache;
   static std::vector\<std::string> _ruleNames;
-  static std::vector\<std::string> _tokenNames;
   static std::vector\<std::string> _channelNames;
   static std::vector\<std::string> _modeNames;
 
@@ -136,10 +134,6 @@ const std::vector\<std::string>& <lexer.name>::getChannelNames() const {
 
 const std::vector\<std::string>& <lexer.name>::getModeNames() const {
   return _modeNames;
-}
-
-const std::vector\<std::string>& <lexer.name>::getTokenNames() const {
-  return _tokenNames;
 }
 
 dfa::Vocabulary& <lexer.name>::getVocabulary() const {
@@ -213,23 +207,7 @@ std::vector\<std::string> <lexer.name>::_symbolicNames = {
 
 dfa::Vocabulary <lexer.name>::_vocabulary(_literalNames, _symbolicNames);
 
-std::vector\<std::string> <lexer.name>::_tokenNames;
-
 <lexer.name>::Initializer::Initializer() {
-  // This code could be in a static initializer lambda, but VS doesn't allow access to private class members from there.
-	for (size_t i = 0; i \< _symbolicNames.size(); ++i) {
-		std::string name = _vocabulary.getLiteralName(i);
-		if (name.empty()) {
-			name = _vocabulary.getSymbolicName(i);
-		}
-
-		if (name.empty()) {
-			_tokenNames.push_back("\<INVALID>");
-		} else {
-      _tokenNames.push_back(name);
-    }
-	}
-
   <atn>
 }
 
@@ -295,7 +273,6 @@ public:
 
   virtual std::string getGrammarFileName() const override;
   virtual const antlr4::atn::ATN& getATN() const override { return _atn; };
-  virtual const std::vector\<std::string>& getTokenNames() const override { return _tokenNames; }; // deprecated: use vocabulary instead.
   virtual const std::vector\<std::string>& getRuleNames() const override;
   virtual antlr4::dfa::Vocabulary& getVocabulary() const override;
 
@@ -314,7 +291,6 @@ private:
   static std::vector\<antlr4::dfa::DFA> _decisionToDFA;
   static antlr4::atn::PredictionContextCache _sharedContextCache;
   static std::vector\<std::string> _ruleNames;
-  static std::vector\<std::string> _tokenNames;
 
   static std::vector\<std::string> _literalNames;
   static std::vector\<std::string> _symbolicNames;
@@ -393,22 +369,7 @@ std::vector\<std::string> <parser.name>::_symbolicNames = {
 
 dfa::Vocabulary <parser.name>::_vocabulary(_literalNames, _symbolicNames);
 
-std::vector\<std::string> <parser.name>::_tokenNames;
-
 <parser.name>::Initializer::Initializer() {
-	for (size_t i = 0; i \< _symbolicNames.size(); ++i) {
-		std::string name = _vocabulary.getLiteralName(i);
-		if (name.empty()) {
-			name = _vocabulary.getSymbolicName(i);
-		}
-
-		if (name.empty()) {
-			_tokenNames.push_back("\<INVALID>");
-		} else {
-      _tokenNames.push_back(name);
-    }
-	}
-
   <atn>
 }
 
@@ -1060,11 +1021,11 @@ void <parser.name>::<struct.name>::<if (method.isEnter)>enter<else>exit<endif>Ru
 
 VisitorDispatchMethodHeader(method) ::= <<
 
-virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
 >>
 VisitorDispatchMethod(method) ::=  <<
 
-antlrcpp::Any <parser.name>::<struct.name>::accept(tree::ParseTreeVisitor *visitor) {
+std::any <parser.name>::<struct.name>::accept(tree::ParseTreeVisitor *visitor) {
   if (auto parserVisitor = dynamic_cast\<<parser.grammarName>Visitor*>(visitor))
     return parserVisitor->visit<struct.derivedFromName; format="cap">(this);
   else

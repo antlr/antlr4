@@ -24,7 +24,7 @@ jobs:
     - name: Set up Maven
       uses: stCarolas/setup-maven@v4
       with:
-        maven-version: 3.5.4    
+        maven-version: 3.8.4
     - name: Build tool with Maven
       run: mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
     - name: Test with Maven

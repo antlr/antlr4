@@ -19,7 +19,7 @@
 using namespace antlr4;
 using namespace antlr4::atn;
 
-std::map<const dfa::Vocabulary*, std::map<std::string, size_t>> Recognizer::_tokenTypeMapCache;
+std::map<const dfa::Vocabulary*, std::map<std::string_view, size_t>> Recognizer::_tokenTypeMapCache;
 std::map<std::vector<std::string>, std::map<std::string, size_t>> Recognizer::_ruleIndexMapCache;
 
 Recognizer::Recognizer() {
@@ -30,31 +30,26 @@ Recognizer::Recognizer() {
 Recognizer::~Recognizer() {
 }
 
-dfa::Vocabulary const& Recognizer::getVocabulary() const {
-  static dfa::Vocabulary vocabulary = dfa::Vocabulary::fromTokenNames(getTokenNames());
-  return vocabulary;
-}
-
-std::map<std::string, size_t> Recognizer::getTokenTypeMap() {
+std::map<std::string_view, size_t> Recognizer::getTokenTypeMap() {
   const dfa::Vocabulary& vocabulary = getVocabulary();
 
   std::lock_guard<std::mutex> lck(_mutex);
-  std::map<std::string, size_t> result;
+  std::map<std::string_view, size_t> result;
   auto iterator = _tokenTypeMapCache.find(&vocabulary);
   if (iterator != _tokenTypeMapCache.end()) {
     result = iterator->second;
   } else {
     for (size_t i = 0; i <= getATN().maxTokenType; ++i) {
-      std::string literalName = vocabulary.getLiteralName(i);
+      std::string_view literalName = vocabulary.getLiteralName(i);
       if (!literalName.empty()) {
         result[literalName] = i;
       }
 
-      std::string symbolicName = vocabulary.getSymbolicName(i);
+      std::string_view symbolicName = vocabulary.getSymbolicName(i);
       if (!symbolicName.empty()) {
         result[symbolicName] = i;
       }
-				}
+    }
     result["EOF"] = EOF;
     _tokenTypeMapCache[&vocabulary] = result;
   }
@@ -80,8 +75,8 @@ std::map<std::string, size_t> Recognizer::getRuleIndexMap() {
   return result;
 }
 
-size_t Recognizer::getTokenType(const std::string &tokenName) {
-  const std::map<std::string, size_t> &map = getTokenTypeMap();
+size_t Recognizer::getTokenType(std::string_view tokenName) {
+  const std::map<std::string_view, size_t> &map = getTokenTypeMap();
   auto iterator = map.find(tokenName);
   if (iterator == map.end())
     return Token::INVALID_TYPE;

@@ -11,81 +11,77 @@
 namespace antlr4 {
 namespace atn {
 
-  class ANTLR4CPP_PUBLIC ATNDeserializer {
-  public:
-#if __cplusplus >= 201703L
-    static constexpr size_t SERIALIZED_VERSION = 3;
-#else
-    enum : size_t {
-      SERIALIZED_VERSION = 3,
-    };
-#endif
+class ANTLR4CPP_PUBLIC ATNDeserializer {
+public:
+  static constexpr size_t SERIALIZED_VERSION = 3;
 
-    /// This is the current serialized UUID.
-    // ml: defined as function to avoid the “static initialization order fiasco”.
-    static antlrcpp::Guid SERIALIZED_UUID();
+  /// This is the current serialized UUID.
+  // ml: defined as function to avoid the “static initialization order fiasco”.
+  static antlrcpp::Guid SERIALIZED_UUID();
 
-    ATNDeserializer();
-    ATNDeserializer(const ATNDeserializationOptions& dso);
-    virtual ~ATNDeserializer();
+  ATNDeserializer();
 
-    static antlrcpp::Guid toUUID(const unsigned short *data, size_t offset);
+  explicit ATNDeserializer(const ATNDeserializationOptions& dso);
 
-    virtual ATN deserialize(const std::vector<uint16_t> &input);
-    virtual void verifyATN(const ATN &atn);
+  virtual ~ATNDeserializer();
 
-    static void checkCondition(bool condition);
-    static void checkCondition(bool condition, const std::string &message);
+  static antlrcpp::Guid toUUID(const unsigned short *data, size_t offset);
 
-    static Transition *edgeFactory(const ATN &atn, size_t type, size_t src, size_t trg, size_t arg1, size_t arg2,
-                                   size_t arg3, const std::vector<misc::IntervalSet> &sets);
+  virtual ATN deserialize(const std::vector<uint16_t> &input);
+  virtual void verifyATN(const ATN &atn);
 
-    static ATNState *stateFactory(size_t type, size_t ruleIndex);
+  static void checkCondition(bool condition);
+  static void checkCondition(bool condition, const std::string &message);
 
-  protected:
-    /// Determines if a particular serialized representation of an ATN supports
-    /// a particular feature, identified by the <seealso cref="UUID"/> used for serializing
-    /// the ATN at the time the feature was first introduced.
-    ///
-    /// <param name="feature"> The <seealso cref="UUID"/> marking the first time the feature was
-    /// supported in the serialized ATN. </param>
-    /// <param name="actualUuid"> The <seealso cref="UUID"/> of the actual serialized ATN which is
-    /// currently being deserialized. </param>
-    /// <returns> {@code true} if the {@code actualUuid} value represents a
-    /// serialized ATN at or after the feature identified by {@code feature} was
-    /// introduced; otherwise, {@code false}. </returns>
-    virtual bool isFeatureSupported(const antlrcpp::Guid &feature, const antlrcpp::Guid &actualUuid);
-    void markPrecedenceDecisions(const ATN &atn);
-    Ref<LexerAction> lexerActionFactory(LexerActionType type, int data1, int data2);
+  static Transition *edgeFactory(const ATN &atn, size_t type, size_t src, size_t trg, size_t arg1, size_t arg2,
+                                  size_t arg3, const std::vector<misc::IntervalSet> &sets);
 
-  private:
-    /// This is the earliest supported serialized UUID.
-    static antlrcpp::Guid BASE_SERIALIZED_UUID();
+  static ATNState *stateFactory(size_t type, size_t ruleIndex);
 
-    /// This UUID indicates an extension of <seealso cref="BASE_SERIALIZED_UUID"/> for the
-    /// addition of precedence predicates.
-    static antlrcpp::Guid ADDED_PRECEDENCE_TRANSITIONS();
+protected:
+  /// Determines if a particular serialized representation of an ATN supports
+  /// a particular feature, identified by the <seealso cref="UUID"/> used for serializing
+  /// the ATN at the time the feature was first introduced.
+  ///
+  /// <param name="feature"> The <seealso cref="UUID"/> marking the first time the feature was
+  /// supported in the serialized ATN. </param>
+  /// <param name="actualUuid"> The <seealso cref="UUID"/> of the actual serialized ATN which is
+  /// currently being deserialized. </param>
+  /// <returns> {@code true} if the {@code actualUuid} value represents a
+  /// serialized ATN at or after the feature identified by {@code feature} was
+  /// introduced; otherwise, {@code false}. </returns>
+  virtual bool isFeatureSupported(const antlrcpp::Guid &feature, const antlrcpp::Guid &actualUuid);
+  void markPrecedenceDecisions(const ATN &atn) const;
+  Ref<LexerAction> lexerActionFactory(LexerActionType type, int data1, int data2) const;
 
-    /**
-     * This UUID indicates an extension of ADDED_PRECEDENCE_TRANSITIONS
-     * for the addition of lexer actions encoded as a sequence of
-     * LexerAction instances.
-     */
-    static antlrcpp::Guid ADDED_LEXER_ACTIONS();
+private:
+  /// This is the earliest supported serialized UUID.
+  static antlrcpp::Guid BASE_SERIALIZED_UUID();
 
-    /**
-     * This UUID indicates the serialized ATN contains two sets of
-     * IntervalSets, where the second set's values are encoded as
-     * 32-bit integers to support the full Unicode SMP range up to U+10FFFF.
-     */
-    static antlrcpp::Guid ADDED_UNICODE_SMP();
+  /// This UUID indicates an extension of <seealso cref="BASE_SERIALIZED_UUID"/> for the
+  /// addition of precedence predicates.
+  static antlrcpp::Guid ADDED_PRECEDENCE_TRANSITIONS();
 
-    /// This list contains all of the currently supported UUIDs, ordered by when
-    /// the feature first appeared in this branch.
-    static std::vector<antlrcpp::Guid>& SUPPORTED_UUIDS();
+  /**
+   * This UUID indicates an extension of ADDED_PRECEDENCE_TRANSITIONS
+   * for the addition of lexer actions encoded as a sequence of
+   * LexerAction instances.
+   */
+  static antlrcpp::Guid ADDED_LEXER_ACTIONS();
 
-    ATNDeserializationOptions deserializationOptions;
-  };
+  /**
+   * This UUID indicates the serialized ATN contains two sets of
+   * IntervalSets, where the second set's values are encoded as
+   * 32-bit integers to support the full Unicode SMP range up to U+10FFFF.
+   */
+  static antlrcpp::Guid ADDED_UNICODE_SMP();
+
+  /// This list contains all of the currently supported UUIDs, ordered by when
+  /// the feature first appeared in this branch.
+  static const std::vector<antlrcpp::Guid>& SUPPORTED_UUIDS();
+
+  const ATNDeserializationOptions _deserializationOptions;
+};
 
 } // namespace atn
 } // namespace antlr4

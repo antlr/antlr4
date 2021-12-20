@@ -16,7 +16,11 @@
   <name>ANTLR 4 Runtime Test Annotations</name>
   <description>The ANTLR 4 Runtime</description>
 
-  <build>
+    <prerequisites>
+        <maven>3.8</maven>
+    </prerequisites>
+
+    <build>
     <sourceDirectory>src</sourceDirectory>
     <plugins>
       <plugin>

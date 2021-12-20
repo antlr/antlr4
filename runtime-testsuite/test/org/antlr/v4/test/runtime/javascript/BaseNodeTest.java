@@ -5,20 +5,36 @@
  */
 package org.antlr.v4.test.runtime.javascript;
 
-import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.test.runtime.*;
 import org.stringtemplate.v4.ST;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
-
 import static org.antlr.v4.test.runtime.BaseRuntimeTest.antlrOnString;
 import static org.antlr.v4.test.runtime.BaseRuntimeTest.writeFile;
 import static org.junit.Assert.*;
 
 public class BaseNodeTest extends BaseRuntimeTestSupport implements RuntimeTestSupport {
+	private static String runtimeDir;
+
+	static {
+		final ClassLoader loader = Thread.currentThread().getContextClassLoader();
+		final URL runtimeSrc = loader.getResource("JavaScript");
+		if ( runtimeSrc==null ) {
+			throw new RuntimeException("Cannot find JavaScript runtime");
+		}
+		runtimeDir = runtimeSrc.getPath();
+		if(isWindows()){
+			runtimeDir = runtimeDir.replaceFirst("/", "");
+		}
+	}
 
 	@Override
 	protected String getPropertyPrefix() {
@@ -99,6 +115,21 @@ public class BaseNodeTest extends BaseRuntimeTestSupport implements RuntimeTestS
 						+ "Visitor.js");
 			}
 		}
+
+		String newImportAntlrString = "import antlr4 from 'file://" + runtimeDir + "/src/antlr4/index.js'";
+		for (String file : files) {
+			Path path = Paths.get(getTempDirPath(), file);
+			try {
+				String content = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
+				String newContent = content.replaceAll("import antlr4 from 'antlr4';", newImportAntlrString);
+				try (PrintWriter out = new PrintWriter(path.toString())) {
+					out.println(newContent);
+				}
+			} catch (IOException e) {
+				fail("File not found: " + path.toString());
+			}
+		}
+
 		return true; // allIsWell: no compile
 	}
 
@@ -121,17 +152,9 @@ public class BaseNodeTest extends BaseRuntimeTestSupport implements RuntimeTestS
 
 	public String execModule(String fileName) {
 		try {
-			String npmPath = locateNpm();
-			if(!TestContext.isCI()) {
-				installRuntime(npmPath);
-				registerRuntime(npmPath);
-			}
-			String modulePath = new File(getTempTestDir(), fileName)
-					.getAbsolutePath();
-			linkRuntime(npmPath);
+			String modulePath = new File(getTempTestDir(), fileName).getAbsolutePath();
 			String nodejsPath = locateNodeJS();
-			String inputPath = new File(getTempTestDir(), "input")
-					.getAbsolutePath();
+			String inputPath = new File(getTempTestDir(), "input").getAbsolutePath();
 			ProcessBuilder builder = new ProcessBuilder(nodejsPath, modulePath,
 					inputPath);
 			builder.environment().put("NODE_PATH", getTempDirPath());
@@ -165,60 +188,6 @@ public class BaseNodeTest extends BaseRuntimeTestSupport implements RuntimeTestS
 		}
 	}
 
-	private void installRuntime(String npmPath) throws IOException, InterruptedException {
-		String runtimePath = locateRuntime();
-		ProcessBuilder builder = new ProcessBuilder(npmPath, "install");
-		builder.directory(new File(runtimePath));
-		builder.redirectError(new File(getTempTestDir(), "error.txt"));
-		builder.redirectOutput(new File(getTempTestDir(), "output.txt"));
-		Process process = builder.start();
-		// TODO switch to jdk 8
-		process.waitFor();
-		// if(!process.waitFor(30L, TimeUnit.SECONDS))
-		// 	process.destroyForcibly();
-		int error = process.exitValue();
-		if(error!=0)
-			throw new IOException("'npm install' failed");
-	}
-
-	private void registerRuntime(String npmPath) throws IOException, InterruptedException {
-		String runtimePath = locateRuntime();
-		ProcessBuilder builder = new ProcessBuilder(npmPath, "link");
-		builder.directory(new File(runtimePath));
-		builder.redirectError(new File(getTempTestDir(), "error.txt"));
-		builder.redirectOutput(new File(getTempTestDir(), "output.txt"));
-		Process process = builder.start();
-		// TODO switch to jdk 8
-		process.waitFor();
-		// if(!process.waitFor(30L, TimeUnit.SECONDS))
-		//	process.destroyForcibly();
-		int error = process.exitValue();
-		if(error!=0)
-			throw new IOException("'npm link' failed");
-	}
-
-	private void linkRuntime(String npmPath) throws IOException, InterruptedException {
-		List<String> args = new ArrayList<>();
-		if(TestContext.isCircleCI())
-			args.add("sudo");
-		args.addAll(Arrays.asList(npmPath, "link", "antlr4"));
-		ProcessBuilder builder = new ProcessBuilder(args.toArray(new String[0]));
-		builder.directory(getTempTestDir());
-		File errorFile = new File(getTempTestDir(), "error.txt");
-		builder.redirectError(errorFile);
-		builder.redirectOutput(new File(getTempTestDir(), "output.txt"));
-		Process process = builder.start();
-		// TODO switch to jdk 8
-		process.waitFor();
-		// if(!process.waitFor(30L, TimeUnit.SECONDS))
-		//	process.destroyForcibly();
-		int error = process.exitValue();
-		if(error!=0) {
-			char[] errors = Utils.readFile(errorFile.getAbsolutePath());
-			throw new IOException("'npm link antlr4' failed: " + new String(errors));
-		}
-	}
-
 	private boolean canExecute(String tool) {
 		try {
 			ProcessBuilder builder = new ProcessBuilder(tool, "--version");
@@ -237,17 +206,6 @@ public class BaseNodeTest extends BaseRuntimeTestSupport implements RuntimeTestS
 		}
 	}
 
-	private String locateNpm() {
-		// typically /usr/local/bin/npm
-		String prop = System.getProperty("antlr-javascript-npm");
-		if ( prop!=null && prop.length()!=0 ) {
-			if(prop.contains(" "))
-				prop = "\"" + prop + "\"";
-			return prop;
-		}
-		return "npm"; // everywhere
-	}
-
 	private String locateNodeJS() {
 		// typically /usr/local/bin/node
 		String prop = System.getProperty("antlr-javascript-nodejs");
@@ -262,23 +220,11 @@ public class BaseNodeTest extends BaseRuntimeTestSupport implements RuntimeTestS
 		return "node"; // everywhere else
 	}
 
-	private String locateRuntime() {
-		final ClassLoader loader = Thread.currentThread().getContextClassLoader();
-		final URL runtimeSrc = loader.getResource("JavaScript");
-		if ( runtimeSrc==null ) {
-			throw new RuntimeException("Cannot find JavaScript runtime");
-		}
-		if(isWindows()){
-			return runtimeSrc.getPath().replaceFirst("/", "");
-		}
-		return runtimeSrc.getPath();
-	}
-
 	protected void writeParserTestFile(String parserName, String lexerName,
 			String listenerName, String visitorName,
 			String parserStartRuleName, boolean debug) {
 		ST outputFileST = new ST(
-				"import antlr4 from 'antlr4';\n"
+				"import antlr4 from 'file://<runtimeDir>/src/antlr4/index.js'\n"
 						+ "import <lexerName> from './<lexerName>.js';\n"
 						+ "import <parserName> from './<parserName>.js';\n"
 						+ "import <listenerName> from './<listenerName>.js';\n"
@@ -324,12 +270,13 @@ public class BaseNodeTest extends BaseRuntimeTestSupport implements RuntimeTestS
 		outputFileST.add("listenerName", listenerName);
 		outputFileST.add("visitorName", visitorName);
 		outputFileST.add("parserStartRuleName", parserStartRuleName);
+		outputFileST.add("runtimeDir", runtimeDir);
 		writeFile(getTempDirPath(), "Test.js", outputFileST.render());
 	}
 
 	protected void writeLexerTestFile(String lexerName, boolean showDFA) {
 		ST outputFileST = new ST(
-				"import antlr4 from 'antlr4';\n"
+				"import antlr4 from 'file://<runtimeDir>/src/antlr4/index.js'\n"
 						+ "import <lexerName> from './<lexerName>.js';\n"
 						+ "\n"
 						+ "function main(argv) {\n"
@@ -344,6 +291,7 @@ public class BaseNodeTest extends BaseRuntimeTestSupport implements RuntimeTestS
 								: "") + "}\n" + "\n" + "main(process.argv);\n"
 						+ "\n");
 		outputFileST.add("lexerName", lexerName);
+		outputFileST.add("runtimeDir", runtimeDir);
 		writeFile(getTempDirPath(), "Test.js", outputFileST.render());
 	}
 

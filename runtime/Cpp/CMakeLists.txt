@@ -1,6 +1,8 @@
 # -*- mode:cmake -*-
-cmake_minimum_required (VERSION 2.8)
-# 2.8 needed because of ExternalProject
+cmake_minimum_required (VERSION 3.14)
+# 3.14 needed because of FetchContent
+
+enable_testing()
 
 # Detect build type, fallback to release and throw a warning if use didn't specify any
 if(NOT CMAKE_BUILD_TYPE)
@@ -79,16 +81,16 @@ if("${CMAKE_VERSION}" VERSION_GREATER 3.1.0)
   if(NOT DEFINED CMAKE_CXX_STANDARD)
     # only set CMAKE_CXX_STANDARD if not already set
     # this allows the standard to be set by the caller, for example with -DCMAKE_CXX_STANDARD:STRING=17
-    set(CMAKE_CXX_STANDARD 11)
+    set(CMAKE_CXX_STANDARD 17)
   endif()
   set(CMAKE_CXX_STANDARD_REQUIRED ON)
   set(CMAKE_CXX_EXTENSIONS OFF)
 else()
-  set(CMAKE_CXX_FLAGS                "${CMAKE_CXX_FLAGS} -std=c++11")
-  set(CMAKE_CXX_FLAGS_DEBUG          "${CMAKE_CXX_FLAGS_DEBUG} -std=c++11")
-  set(CMAKE_CXX_FLAGS_MINSIZEREL     "${CMAKE_CXX_FLAGS_MINSIZEREL} -std=c++11")
-  set(CMAKE_CXX_FLAGS_RELEASE        "${CMAKE_CXX_FLAGS_RELEASE} -std=c++11")
-  set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -std=c++11")
+  set(CMAKE_CXX_FLAGS                "${CMAKE_CXX_FLAGS} -std=c++17")
+  set(CMAKE_CXX_FLAGS_DEBUG          "${CMAKE_CXX_FLAGS_DEBUG} -std=c++17")
+  set(CMAKE_CXX_FLAGS_MINSIZEREL     "${CMAKE_CXX_FLAGS_MINSIZEREL} -std=c++17")
+  set(CMAKE_CXX_FLAGS_RELEASE        "${CMAKE_CXX_FLAGS_RELEASE} -std=c++17")
+  set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -std=c++17")
 endif()
 
 set(CMAKE_CXX_FLAGS                  "${CMAKE_CXX_FLAGS} ${MY_CXX_WARNING_FLAGS}")
@@ -104,7 +106,7 @@ else()
   set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -O2 -g ${MY_CXX_WARNING_FLAGS}")
 endif()
 
-# Compiler-specific C++11 activation.
+# Compiler-specific C++17 activation.
 if("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU" OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "Intel")
     execute_process(
         COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
@@ -112,12 +114,12 @@ if("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU" OR "${CMAKE_CXX_COMPILER_ID}" MATCHE
     if(NOT (GCC_VERSION VERSION_GREATER 5.0 OR GCC_VERSION VERSION_EQUAL 5.0))
         message(FATAL_ERROR "${PROJECT_NAME} requires g++ 5.0 or greater.")
     endif ()
-elseif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang" AND ANDROID) 
+elseif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang" AND ANDROID)
 	# Need -Os cflag and cxxflags here to work with exception handling on armeabi.
 	# see  https://github.com/android-ndk/ndk/issues/573
 	# and without -stdlib=libc++ cxxflags
 elseif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang" AND APPLE)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -stdlib=libc++")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -stdlib=libc++")
 elseif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang" AND ( CMAKE_SYSTEM_NAME MATCHES "Linux" OR CMAKE_SYSTEM_NAME MATCHES "FreeBSD") )
     execute_process(
         COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE CLANG_VERSION)
@@ -129,11 +131,11 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang" AND ( CMAKE_SYSTEM_NAME MATCH
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
     endif()
 elseif(MSVC_VERSION GREATER 1800 OR MSVC_VERSION EQUAL 1800)
-  # Visual Studio 2012+ supports c++11 features 
+  # Visual Studio 2012+ supports C++17 features
 elseif(CMAKE_SYSTEM_NAME MATCHES "Emscripten")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -stdlib=libc++")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -stdlib=libc++")
 else()
-    message(FATAL_ERROR "Your C++ compiler does not support C++11.")
+    message(FATAL_ERROR "Your C++ compiler does not support C++17.")
 endif()
 
 
@@ -161,7 +163,7 @@ if (ANTLR4_INSTALL)
 
   set(ANTLR4_LIB_DIR ${CMAKE_INSTALL_LIBDIR} CACHE STRING
       "Installation directory for libraries, relative to ${CMAKE_INSTALL_PREFIX}.")
-  
+
   set(ANTLR4_INCLUDE_DIR ${CMAKE_INSTALL_INCLUDEDIR}/antlr4-runtime CACHE STRING
       "Installation directory for include files, relative to ${CMAKE_INSTALL_PREFIX}.")
 
@@ -169,18 +171,18 @@ if (ANTLR4_INSTALL)
     cmake/antlr4-runtime.cmake.in
     ${project_runtime_config}
     INSTALL_DESTINATION ${ANTLR4_CMAKE_DIR}/antlr4-runtime
-    PATH_VARS 
+    PATH_VARS
     ANTLR4_INCLUDE_DIR
     ANTLR4_LIB_DIR )
-  
+
   configure_package_config_file(
     cmake/antlr4-generator.cmake.in
     ${project_generator_config}
     INSTALL_DESTINATION ${ANTLR4_CMAKE_DIR}/antlr4-generator
-    PATH_VARS 
+    PATH_VARS
     ANTLR4_INCLUDE_DIR
     ANTLR4_LIB_DIR )
-  
+
   write_basic_package_version_file(
     ${version_runtime_config}
     VERSION ${ANTLR_VERSION}
@@ -207,12 +209,12 @@ endif(ANTLR4_INSTALL)
 if(EXISTS LICENSE.txt)
 install(FILES LICENSE.txt
         DESTINATION "share/doc/libantlr4")
-elseif(EXISTS ../../LICENSE.txt) 
+elseif(EXISTS ../../LICENSE.txt)
 install(FILES ../../LICENSE.txt
     DESTINATION "share/doc/libantlr4")
 endif()
 
-install(FILES README.md VERSION 
+install(FILES README.md VERSION
     DESTINATION "share/doc/libantlr4")
 
 set(CPACK_PACKAGE_CONTACT "antlr-discussion@googlegroups.com")
