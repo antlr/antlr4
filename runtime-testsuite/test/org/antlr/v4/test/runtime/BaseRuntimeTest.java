@@ -22,12 +22,10 @@ import org.stringtemplate.v4.StringRenderer;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Modifier;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
@@ -363,7 +361,7 @@ public abstract class BaseRuntimeTest {
 
 	public static RuntimeTestDescriptor[] getRuntimeTestDescriptors(String group, String targetName) {
 		final ClassLoader loader = Thread.currentThread().getContextClassLoader();
-		final URL descrURL = loader.getResource("org/antlr/v4/test/runtime/new_descriptors/"+group);
+		final URL descrURL = loader.getResource("org/antlr/v4/test/runtime/descriptors/" +group);
 		String[] descriptorFilenames = null;
 		try {
 			descriptorFilenames = new File(descrURL.toURI()).list();
@@ -377,7 +375,7 @@ public abstract class BaseRuntimeTest {
 		for (String fname : descriptorFilenames) {
 			try {
 //				String dtext = Files.readString(Path.of("/tmp/descriptors",group,fname));
-				final URL dURL = loader.getResource("org/antlr/v4/test/runtime/new_descriptors/"+group+"/"+fname);
+				final URL dURL = loader.getResource("org/antlr/v4/test/runtime/descriptors/" +group+"/"+fname);
 				String dtext = null;
 				try {
 					URI uri = dURL.toURI();
