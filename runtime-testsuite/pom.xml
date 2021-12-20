@@ -13,7 +13,7 @@
 		<version>4.9.4-SNAPSHOT</version>
 	</parent>
 	<artifactId>antlr4-runtime-testsuite</artifactId>
-	<name>ANTLR 4 Runtime Tests (2nd generation)</name>
+	<name>ANTLR 4 Runtime Tests (3rd generation)</name>
 	<description>A collection of tests for ANTLR 4 Runtime libraries.</description>
 
 	<prerequisites>

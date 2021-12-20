@@ -46,7 +46,7 @@ $ if [[ "$?" != "0" ]]; then sudo apt install -y maven; fi
 The current maven build seems complicated to me because there is a dependency of the project on itself. The runtime tests naturally depend on the current version being available but it won't compile without the current version.  Once you have the generated/installed jar, mvn builds but otherwise there's a dependency on what you are going to build.  You will get this error when you try to clean but you can ignore it:
 
 ```
-[INFO] ANTLR 4 Runtime Tests (2nd generation) ............. FAILURE [  0.073 s]
+[INFO] ANTLR 4 Runtime Tests (3rd generation) ............. FAILURE [  0.073 s]
 ...
 [ERROR] Plugin org.antlr:antlr4-maven-plugin:4.9.4-SNAPSHOT or one of its dependencies could not be resolved: Could not find artifact org.antlr:antlr4-maven-plugin:jar:4.9.4-SNAPSHOT -> [Help 1]
 ```
