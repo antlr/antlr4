@@ -692,13 +692,6 @@ public abstract class BaseRuntimeTest {
 		return grammarDeclLine.substring(gi, gsemi);
 	}
 
-//	public static void main(String[] args) throws Exception {
-//		String s = quoteForDescriptorFile("- ] ");
-//		String dtext = Files.readString(Path.of("/tmp/descriptors/CompositeParsers/DelegatesSeeSameTokenType.txt"));
-//
-//		readDescriptor(dtext);
-//	}
-
 	public static void writeFile(String dir, String fileName, String content) {
 		try {
 			Utils.writeFile(dir+"/"+fileName, content, "UTF-8");
