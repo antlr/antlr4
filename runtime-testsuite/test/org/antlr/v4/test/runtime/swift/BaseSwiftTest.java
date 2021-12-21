@@ -42,6 +42,13 @@ public class BaseSwiftTest extends BaseRuntimeTestSupport implements RuntimeTest
 	 */
 	private static final String SWIFT_HOME_ENV_KEY = "SWIFT_HOME";
 
+	private static final boolean isDebugAntlrRuntime = false;
+	private static final boolean isDebugTest = false;
+
+	private static String configToString(boolean isDebug) {
+		return  isDebug ? "debug" : "release";
+	}
+
 	static {
 		Map<String, String> env = System.getenv();
 		String swiftHome = env.containsKey(SWIFT_HOME_ENV_KEY) ? env.get(SWIFT_HOME_ENV_KEY) : "";
@@ -55,7 +62,7 @@ public class BaseSwiftTest extends BaseRuntimeTestSupport implements RuntimeTest
 		}
 		ANTLR_RUNTIME_PATH = swiftRuntime.getPath();
 		try {
-			fastFailRunProcess(ANTLR_RUNTIME_PATH, SWIFT_CMD, "build");
+			fastFailRunProcess(ANTLR_RUNTIME_PATH, SWIFT_CMD, "build", "-c", configToString(isDebugAntlrRuntime));
 		}
 		catch (IOException | InterruptedException e) {
 			e.printStackTrace();
@@ -124,7 +131,7 @@ public class BaseSwiftTest extends BaseRuntimeTestSupport implements RuntimeTest
 
 	private String execTest(String projectDir, String projectName) {
 		try {
-			Pair<String, String> output = runProcess(projectDir, "./.build/debug/" + projectName, "input");
+			Pair<String, String> output = runProcess(projectDir, "./.build/" + configToString(isDebugTest) + "/" + projectName, "input");
 			if (output.b.length() > 0) {
 				setParseErrors(output.b);
 			}
@@ -150,9 +157,10 @@ public class BaseSwiftTest extends BaseRuntimeTestSupport implements RuntimeTest
 			fastFailRunProcess(getTempDirPath(), "mv", "-f", absPath, projectDir + "/Sources/" + projectName);
 		}
 		fastFailRunProcess(getTempDirPath(), "mv", "-f", "input", projectDir);
-		String dylibPath = ANTLR_RUNTIME_PATH + "/.build/debug/";
+		String dylibPath = ANTLR_RUNTIME_PATH + "/.build/" + configToString(isDebugAntlrRuntime) + "/";
 //		System.err.println(dylibPath);
 		Pair<String, String> buildResult = runProcess(projectDir, SWIFT_CMD, "build",
+				"-c", configToString(isDebugTest),
 				"-Xswiftc", "-I"+dylibPath,
 				"-Xlinker", "-L"+dylibPath,
 				"-Xlinker", "-lAntlr4",
