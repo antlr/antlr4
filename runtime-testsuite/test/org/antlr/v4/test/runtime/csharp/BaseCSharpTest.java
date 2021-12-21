@@ -30,9 +30,14 @@ public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTes
 	private static boolean isRuntimeInitialized = false;
 	private final static String cSharpAntlrRuntimeDllName = "Antlr4.Runtime.Standard.dll";
 	private final static String testProjectFileName = "Antlr4.Test.csproj";
-	private final static boolean isDebug = false;
+	private final static boolean isDebugAntlrRuntime = false;
+	private final static boolean isDebugTest = false;
 	private static String cSharpTestProjectContent;
 	private static final String cSharpCachingDirectory = Paths.get(cachingDirectory, "CSharp").toString();
+
+	private static String configToString(boolean isDebug) {
+		return isDebug ? "Debug" : "Release";
+	}
 
 	@Override
 	protected String getPropertyPrefix() {
@@ -185,7 +190,7 @@ public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTes
 	}
 
 	private String locateExec() {
-		return new File(getTempTestDir(), "bin/" + getConfig() + "/netcoreapp3.1/Test.dll").getAbsolutePath();
+		return new File(getTempTestDir(), "bin/" + configToString(isDebugTest) + "/netcoreapp3.1/Test.dll").getAbsolutePath();
 	}
 
 	public boolean buildProject() {
@@ -198,7 +203,7 @@ public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTes
 			}
 
 			// build test
-			String[] args = new String[] { "dotnet", "build", testProjectFileName, "-c", getConfig() };
+			String[] args = new String[] { "dotnet", "build", testProjectFileName, "-c", configToString(isDebugTest) };
 			boolean success = runProcess(args, getTempDirPath());
 			assertTrue(success);
 		} catch (Exception e) {
@@ -229,7 +234,7 @@ public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTes
 				"build",
 				runtimeProjPath,
 				"-c",
-				"Release",
+				configToString(isDebugAntlrRuntime),
 				"-o",
 				cSharpCachingDirectory
 		};
@@ -255,10 +260,6 @@ public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTes
 
 		isRuntimeInitialized = true;
 		return success;
-	}
-
-	private static String getConfig() {
-		return isDebug ? "Debug" : "Release";
 	}
 
 	private boolean runProcess(String[] args, String path) throws Exception {
