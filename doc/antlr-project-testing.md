@@ -6,7 +6,7 @@ Because ANTLR supports multiple target languages, the unit tests are broken into
 
 The runtime tests must be specified in a generic fashion to work across language targets. Furthermore, we must test the various targets from Java. This usually means Java launching processes to compile, say, C++ and run parsers.
 
-As of 4.9.4, we use [a Java descriptor object](https://github.com/antlr/antlr4/blob/master/runtime-testsuite/test/org/antlr/v4/test/runtime/UniversalRuntimeTestDescriptor.java) to represent each runtime test. Each test is described with a text file with various sections, grouped together into categories; see [directories under descriptors dir](https://github.com/antlr/antlr4/blob/master/runtime-testsuite/resources/org/antlr/v4/test/runtime/descriptors). Here is a sample test descriptor:
+As of 4.9.4, we use a Java descriptor file held as an [UniversalRuntimeTestDescriptor.java object](https://github.com/antlr/antlr4/blob/master/runtime-testsuite/test/org/antlr/v4/test/runtime/UniversalRuntimeTestDescriptor.java) to represent each runtime test. Each test is described with a text file with various sections and resides in a group directory; see [directories under descriptors dir](https://github.com/antlr/antlr4/blob/master/runtime-testsuite/resources/org/antlr/v4/test/runtime/descriptors). Here is a sample test descriptor:
 
 ```
 [notes]
@@ -35,9 +35,11 @@ a b c
 ```
 
 The grammars are strings representing StringTemplates (`ST` objects) so `<writeln("$text")>` will get replace when the unit test file is generated (`Test.java`, `Test.cs`, ...). The `writeln` template must be defined per target.  Here are all of the 
-[Target templates for runtime tests](https://github.com/antlr/antlr4/tree/master/runtime-testsuite/resources/org/antlr/v4/test/runtime/templates).
+[Target templates for runtime tests](https://github.com/antlr/antlr4/tree/master/runtime-testsuite/resources/org/antlr/v4/test/runtime/templates).  Use triple-quotes `"""` when whitespace matters (usually input/output sections).
 
 ## Requirements
+
+*out of date, at least for mono*
 
 In order to perform the tests on all target languages, you need to have the following languages installed:
 
@@ -77,42 +79,6 @@ A single test rig is sufficient to test all targets against all descriptors usin
 And the result of testing the entire subdirectory:
 
 <img src=images/python3-tests.png width=400>
-
-From `mvn`, on the commandline, you will see:
-
-```bash
-$ cd antlr4
-$ mvn test
-...
--------------------------------------------------------
- T E S T S
--------------------------------------------------------
-...
-[INFO] ------------------------------------------------------------------------
-[INFO] Reactor Summary:
-[INFO] 
-[INFO] ANTLR 4 ............................................ SUCCESS [  0.445 s]
-[INFO] ANTLR 4 Runtime .................................... SUCCESS [  3.392 s]
-[INFO] ANTLR 4 Tool ....................................... SUCCESS [  1.373 s]
-[INFO] ANTLR 4 Maven plugin ............................... SUCCESS [  1.519 s]
-[INFO] ANTLR 4 Runtime Test Annotations ................... SUCCESS [  0.086 s]
-[INFO] ANTLR 4 Runtime Test Processors .................... SUCCESS [  0.014 s]
-[INFO] ANTLR 4 Runtime Tests (2nd generation) ............. SUCCESS [06:39 min]
-[INFO] ANTLR 4 Tool Tests ................................. SUCCESS [  6.922 s]
-[INFO] ------------------------------------------------------------------------
-[INFO] BUILD SUCCESS
-[INFO] ------------------------------------------------------------------------
-[INFO] Total time: 06:53 min
-[INFO] Finished at: 2016-11-16T15:36:56-08:00
-[INFO] Final Memory: 44M/458M
-[INFO] ------------------------------------------------------------------------
-```
-
-Note: Running in parallel is much faster:
-
-```bash
-mvn -Dparallel=classes -DthreadCount=8 test
-```
 
 ## Running test subsets
 
