@@ -155,8 +155,9 @@ public abstract class BaseRuntimeTest {
 
 	public boolean checkIgnored() {
 		boolean ignored = !TestContext.isSupportedTarget(descriptor.getTarget()) || descriptor.ignore(descriptor.getTarget());
-		if(ignored)
+		if (ignored) {
 			System.out.println("Ignore " + descriptor);
+		}
 		return ignored;
 	}
 
@@ -361,10 +362,11 @@ public abstract class BaseRuntimeTest {
 					System.err.println("Bad URL:"+dURL);
 				}
 				UniversalRuntimeTestDescriptor d = readDescriptor(dtext);
-				d.testGroup = group;
-				d.name = fname.replace(".txt","");
-				d.targetName = targetName;
-				descriptors.add(d);
+				if ( !d.ignore(targetName) ) {
+					d.name = fname.replace(".txt", "");
+					d.targetName = targetName;
+					descriptors.add(d);
+				}
 			}
 			catch (IOException ioe) {
 				System.err.println("Can't read descriptor file "+fname);

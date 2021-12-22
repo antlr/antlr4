@@ -12,7 +12,7 @@ import java.util.List;
 
 /** This interface describes everything that a runtime test
  *  descriptor can specify. Most testing descriptors will
- *  subclass {@link BaseRuntimeTestDescriptor} rather than
+ *  subclass {@link UniversalRuntimeTestDescriptor} rather than
  *  implement this directly.  The {@link BaseRuntimeTest}
  *  class pulls data from descriptors to execute tests.
  *
