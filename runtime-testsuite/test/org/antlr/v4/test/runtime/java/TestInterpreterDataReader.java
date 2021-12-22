@@ -2,6 +2,7 @@ package org.antlr.v4.test.runtime.java;
 
 import org.antlr.v4.runtime.Vocabulary;
 import org.antlr.v4.runtime.atn.ATN;
+import org.antlr.v4.runtime.atn.ATNSerializer;
 import org.antlr.v4.runtime.misc.InterpreterDataReader;
 import org.junit.Assert;
 import org.junit.Test;
@@ -12,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TestInterpreterDataReader {
+
     @Test
     public void testParseFile() throws NoSuchFieldException, IllegalAccessException {
         final ClassLoader loader = Thread.currentThread().getContextClassLoader();
@@ -38,7 +40,8 @@ public class TestInterpreterDataReader {
         List<String> channels = castList(channelsField.get(interpreterData), String.class);
         List<String> modes = castList(modesField.get(interpreterData), String.class);
 
-        Assert.assertNotNull(atn);
+        char[] atnChars = ATNSerializer.getSerializedAsChars(atn);
+        Assert.assertTrue(atnChars.length > 0);
         Assert.assertNotNull(vocabulary);
         Assert.assertEquals(11, ruleNames.size());
         Assert.assertEquals(2, channels.size());
