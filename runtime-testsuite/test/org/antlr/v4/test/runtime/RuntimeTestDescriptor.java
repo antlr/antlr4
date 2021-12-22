@@ -19,9 +19,6 @@ import java.util.List;
  *  @since 4.6
  */
 public interface RuntimeTestDescriptor {
-	/** The name of this test such as TokenAndRuleContextString (see
-	 *  {@link org.antlr.v4.test.runtime.descriptors.ParseTreesDescriptors.TokenAndRuleContextString})
-	 */
 	String getTestName();
 
 	/** A type in {"Lexer", "Parser", "CompositeLexer", "CompositeParser"} */
@@ -40,7 +37,7 @@ public interface RuntimeTestDescriptor {
 	String getANTLRToolErrors();
 
 	/** The rule at which parsing should start */
-	String getStartRule(); // TODO: alter tests to use same default start rule?
+	String getStartRule();
 
 	/** For lexical tests, dump the DFA of the default lexer mode to stdout */
 	boolean showDFA();

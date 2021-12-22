@@ -8,7 +8,6 @@ package org.antlr.v4.test.runtime.csharp;
 
 import org.antlr.v4.test.runtime.BaseRuntimeTest;
 import org.antlr.v4.test.runtime.RuntimeTestDescriptor;
-import org.antlr.v4.test.runtime.category.ParserTestsGroup1;
 import org.antlr.v4.test.runtime.category.ParserTestsGroup2;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;

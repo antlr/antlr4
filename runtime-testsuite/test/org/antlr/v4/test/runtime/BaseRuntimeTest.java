@@ -29,7 +29,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 
-import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.fail;
 import static junit.framework.TestCase.failNotEquals;
 import static org.junit.Assume.assumeFalse;
@@ -336,29 +335,6 @@ public abstract class BaseRuntimeTest {
 
 	// ---- support ----
 
-//	public static RuntimeTestDescriptor[] OLD_getRuntimeTestZZDescriptors(Class<?> clazz, String targetName) {
-//		if(!TestContext.isSupportedTarget(targetName))
-//			return new RuntimeTestDescriptor[0];
-//		Class<?>[] nestedClasses = clazz.getClasses();
-//		List<RuntimeTestDescriptor> descriptors = new ArrayList<RuntimeTestDescriptor>();
-//		for (Class<?> nestedClass : nestedClasses) {
-//			int modifiers = nestedClass.getModifiers();
-//			if ( RuntimeTestDescriptor.class.isAssignableFrom(nestedClass) && !Modifier.isAbstract(modifiers) ) {
-//				try {
-//					RuntimeTestDescriptor d = (RuntimeTestDescriptor) nestedClass.newInstance();
-//					if(!d.ignore(targetName)) {
-//						d.setTarget(targetName);
-//						descriptors.add(d);
-//					}
-//				} catch (Exception e) {
-//					e.printStackTrace(System.err);
-//				}
-//			}
-//		}
-//		writeDescriptors(clazz, descriptors);
-//		return descriptors.toArray(new RuntimeTestDescriptor[0]);
-//	}
-
 	public static RuntimeTestDescriptor[] getRuntimeTestDescriptors(String group, String targetName) {
 		final ClassLoader loader = Thread.currentThread().getContextClassLoader();
 		final URL descrURL = loader.getResource("org/antlr/v4/test/runtime/descriptors/" +group);
@@ -395,146 +371,6 @@ public abstract class BaseRuntimeTest {
 			}
 		}
 		return descriptors.toArray(new RuntimeTestDescriptor[0]);
-	}
-
-		/** Write descriptor files. */
-	private static void writeDescriptors(Class<?> clazz, List<RuntimeTestDescriptor> descriptors) {
-		String descrRootDir = "/Users/parrt/antlr/code/antlr4/runtime-testsuite/resources/org/antlr/v4/test/runtime/new_descriptors";
-		new File(descrRootDir).mkdir();
-		String groupName = clazz.getSimpleName();
-		groupName = groupName.replace("Descriptors", "");
-		String groupDir = descrRootDir + "/" + groupName;
-		new File(groupDir).mkdir();
-
-		for (RuntimeTestDescriptor d : descriptors) {
-			try {
-				Pair<String,String> g = d.getGrammar();
-				String gname = g.a;
-				String grammar = g.b;
-				String filename = d.getTestName()+".txt";
-				String content = "";
-				String input = quoteForDescriptorFile(d.getInput());
-				String output = quoteForDescriptorFile(d.getOutput());
-				String errors = quoteForDescriptorFile(d.getErrors());
-				content += "[type]\n";
-				content += d.getTestType();
-				content += "\n\n";
-				content += "[grammar]\n";
-				content += grammar;
-				if ( !content.endsWith("\n\n") ) content += "\n";
-				if ( d.getSlaveGrammars()!=null ) {
-					for (Pair<String, String> slaveG : d.getSlaveGrammars()) {
-						String sg = quoteForDescriptorFile(slaveG.b);
-						content += "[slaveGrammar]\n";
-						content += sg;
-						content += "\n";
-					}
-				}
-				if ( d.getStartRule()!=null && d.getStartRule().length()>0 ) {
-					content += "[start]\n";
-					content += d.getStartRule();
-					content += "\n\n";
-				}
-				if ( input!=null ) {
-					content += "[input]\n";
-					content += input;
-					content += "\n";
-				}
-				if ( output!=null ) {
-					content += "[output]\n";
-					content += output;
-					content += "\n";
-				}
-				if ( errors!=null ) {
-					content += "[errors]\n";
-					content += errors;
-					content += "\n";
-				}
-				if ( d.showDFA() || d.showDiagnosticErrors() ) {
-					content += "[flags]\n";
-					if (d.showDFA()) {
-						content += "showDFA\n";
-					}
-					if (d.showDiagnosticErrors()) {
-						content += "showDiagnosticErrors\n";
-					}
-					content += '\n';
-				}
-				List<String> skip = new ArrayList<>();
-				for (String target : Targets) {
-					if ( d.ignore(target) ) {
-						skip.add(target);
-					}
-				}
-				if ( skip.size()>0 ) {
-					content += "[skip]\n";
-					for (String sk : skip) {
-						content += sk+"\n";
-					}
-					content += '\n';
-				}
-				Files.write(Paths.get(groupDir + "/" + filename), content.getBytes());
-			}
-			catch (IOException e) {
-				//exception handling left as an exercise for the reader
-				System.err.println(e.getMessage());
-			}
-		}
-	}
-
-	/** Rules for strings look like this:
-	 *
-	 * [input]  if one line, remove all WS before/after
-	 * a b
-	 *
-	 * [input] need whitespace
-	 * """34
-	 *  34"""
-	 *
-	 * [input] single quote char, remove all WS before/after
-	 * "
-	 *
-	 * [input]  same as "b = 6\n" in java
-	 * """b = 6
-	 * """
-	 *
-	 * [input]
-	 * """a """ space and no newline inside
-	 *
-	 * [input]  same as java string "\"aaa"
-	 * "aaa
-	 *
-	 * [input] ignore front/back \n except leave last \n
-	 * a
-	 * b
-	 * c
-	 * d
-	 */
-	private static String quoteForDescriptorFile(String s) {
-		if ( s==null ) {
-			return null;
-		}
-		long nnl = s.chars().filter(ch -> ch == '\n').count();
-
-		if ( s.endsWith(" ") ||            // whitespace matters
-			 (nnl==1&&s.endsWith("\n")) || // "b = 6\n"
-			 s.startsWith("\n") ) {        // whitespace matters
-			return "\"\"\"" + s + "\"\"\"\n";
-		}
-		if ( s.endsWith(" \n") || s.endsWith("\n\n") ) {
-			return "\"\"\"" + s + "\"\"\"\n";
-		}
-		if ( nnl==0 ) { // one line input
-			return s + "\n";
-		}
-		if ( nnl>1 && s.endsWith("\n") ) {
-			return s;
-		}
-		if ( !s.endsWith("\n") ) { // "a\n b"
-			return "\"\"\"" + s + "\"\"\"\n";
-		}
-
-		return s;
 	}
 
 	/**  Read stuff like:
@@ -773,4 +609,174 @@ public abstract class BaseRuntimeTest {
 					">.");
 		}
 	}
+
+	// ----------------------------------------------------------------------------
+	// stuff used during conversion that I don't want to throw away yet and we might lose if
+	// I squash this branch unless I keep it around in a comment or something
+	// ----------------------------------------------------------------------------
+
+//	public static RuntimeTestDescriptor[] OLD_getRuntimeTestDescriptors(Class<?> clazz, String targetName) {
+//		if(!TestContext.isSupportedTarget(targetName))
+//			return new RuntimeTestDescriptor[0];
+//		Class<?>[] nestedClasses = clazz.getClasses();
+//		List<RuntimeTestDescriptor> descriptors = new ArrayList<RuntimeTestDescriptor>();
+//		for (Class<?> nestedClass : nestedClasses) {
+//			int modifiers = nestedClass.getModifiers();
+//			if ( RuntimeTestDescriptor.class.isAssignableFrom(nestedClass) && !Modifier.isAbstract(modifiers) ) {
+//				try {
+//					RuntimeTestDescriptor d = (RuntimeTestDescriptor) nestedClass.newInstance();
+//					if(!d.ignore(targetName)) {
+//						d.setTarget(targetName);
+//						descriptors.add(d);
+//					}
+//				} catch (Exception e) {
+//					e.printStackTrace(System.err);
+//				}
+//			}
+//		}
+//		writeDescriptors(clazz, descriptors);
+//		return descriptors.toArray(new RuntimeTestDescriptor[0]);
+//	}
+
+
+	/** Write descriptor files. */
+//	private static void writeDescriptors(Class<?> clazz, List<RuntimeTestDescriptor> descriptors) {
+//		String descrRootDir = "/Users/parrt/antlr/code/antlr4/runtime-testsuite/resources/org/antlr/v4/test/runtime/new_descriptors";
+//		new File(descrRootDir).mkdir();
+//		String groupName = clazz.getSimpleName();
+//		groupName = groupName.replace("Descriptors", "");
+//		String groupDir = descrRootDir + "/" + groupName;
+//		new File(groupDir).mkdir();
+//
+//		for (RuntimeTestDescriptor d : descriptors) {
+//			try {
+//				Pair<String,String> g = d.getGrammar();
+//				String gname = g.a;
+//				String grammar = g.b;
+//				String filename = d.getTestName()+".txt";
+//				String content = "";
+//				String input = quoteForDescriptorFile(d.getInput());
+//				String output = quoteForDescriptorFile(d.getOutput());
+//				String errors = quoteForDescriptorFile(d.getErrors());
+//				content += "[type]\n";
+//				content += d.getTestType();
+//				content += "\n\n";
+//				content += "[grammar]\n";
+//				content += grammar;
+//				if ( !content.endsWith("\n\n") ) content += "\n";
+//				if ( d.getSlaveGrammars()!=null ) {
+//					for (Pair<String, String> slaveG : d.getSlaveGrammars()) {
+//						String sg = quoteForDescriptorFile(slaveG.b);
+//						content += "[slaveGrammar]\n";
+//						content += sg;
+//						content += "\n";
+//					}
+//				}
+//				if ( d.getStartRule()!=null && d.getStartRule().length()>0 ) {
+//					content += "[start]\n";
+//					content += d.getStartRule();
+//					content += "\n\n";
+//				}
+//				if ( input!=null ) {
+//					content += "[input]\n";
+//					content += input;
+//					content += "\n";
+//				}
+//				if ( output!=null ) {
+//					content += "[output]\n";
+//					content += output;
+//					content += "\n";
+//				}
+//				if ( errors!=null ) {
+//					content += "[errors]\n";
+//					content += errors;
+//					content += "\n";
+//				}
+//				if ( d.showDFA() || d.showDiagnosticErrors() ) {
+//					content += "[flags]\n";
+//					if (d.showDFA()) {
+//						content += "showDFA\n";
+//					}
+//					if (d.showDiagnosticErrors()) {
+//						content += "showDiagnosticErrors\n";
+//					}
+//					content += '\n';
+//				}
+//				List<String> skip = new ArrayList<>();
+//				for (String target : Targets) {
+//					if ( d.ignore(target) ) {
+//						skip.add(target);
+//					}
+//				}
+//				if ( skip.size()>0 ) {
+//					content += "[skip]\n";
+//					for (String sk : skip) {
+//						content += sk+"\n";
+//					}
+//					content += '\n';
+//				}
+//				Files.write(Paths.get(groupDir + "/" + filename), content.getBytes());
+//			}
+//			catch (IOException e) {
+//				//exception handling left as an exercise for the reader
+//				System.err.println(e.getMessage());
+//			}
+//		}
+//	}
+//
+//	/** Rules for strings look like this:
+//	 *
+//	 * [input]  if one line, remove all WS before/after
+//	 * a b
+//	 *
+//	 * [input] need whitespace
+//	 * """34
+//	 *  34"""
+//	 *
+//	 * [input] single quote char, remove all WS before/after
+//	 * "
+//	 *
+//	 * [input]  same as "b = 6\n" in java
+//	 * """b = 6
+//	 * """
+//	 *
+//	 * [input]
+//	 * """a """ space and no newline inside
+//	 *
+//	 * [input]  same as java string "\"aaa"
+//	 * "aaa
+//	 *
+//	 * [input] ignore front/back \n except leave last \n
+//	 * a
+//	 * b
+//	 * c
+//	 * d
+//	 */
+//	private static String quoteForDescriptorFile(String s) {
+//		if ( s==null ) {
+//			return null;
+//		}
+//		long nnl = s.chars().filter(ch -> ch == '\n').count();
+//
+//		if ( s.endsWith(" ") ||            // whitespace matters
+//				(nnl==1&&s.endsWith("\n")) || // "b = 6\n"
+//				s.startsWith("\n") ) {        // whitespace matters
+//			return "\"\"\"" + s + "\"\"\"\n";
+//		}
+//		if ( s.endsWith(" \n") || s.endsWith("\n\n") ) {
+//			return "\"\"\"" + s + "\"\"\"\n";
+//		}
+//		if ( nnl==0 ) { // one line input
+//			return s + "\n";
+//		}
+//		if ( nnl>1 && s.endsWith("\n") ) {
+//			return s;
+//		}
+//		if ( !s.endsWith("\n") ) { // "a\n b"
+//			return "\"\"\"" + s + "\"\"\"\n";
+//		}
+//
+//		return s;
+//	}
+
 }

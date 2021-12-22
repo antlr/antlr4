@@ -56,11 +56,9 @@ import java.util.List;
 import java.util.Set;
 
 import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.assertTrue;
 import static org.antlr.v4.test.runtime.BaseRuntimeTest.writeFile;
-import static org.junit.Assert.assertArrayEquals;
 
 public class BaseJavaTest extends BaseRuntimeTestSupport implements RuntimeTestSupport {
 
@@ -127,8 +125,6 @@ public class BaseJavaTest extends BaseRuntimeTestSupport implements RuntimeTestS
 		}
 
 		JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-//		DiagnosticCollector<JavaFileObject> diagnostics =
-//			new DiagnosticCollector<JavaFileObject>();
 
 		StandardJavaFileManager fileManager =
 			compiler.getStandardFileManager(null, null, null);
@@ -189,7 +185,7 @@ public class BaseJavaTest extends BaseRuntimeTestSupport implements RuntimeTestS
 	public ParseTree execStartRule(String startRuleName, Parser parser)
 		throws IllegalAccessException, InvocationTargetException,
 		NoSuchMethodException {
-		Method startRule = null;
+		Method startRule;
 		Object[] args = null;
 		try {
 			startRule = parser.getClass().getMethod(startRuleName);

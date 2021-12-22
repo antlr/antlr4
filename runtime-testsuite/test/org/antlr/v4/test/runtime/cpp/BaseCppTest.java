@@ -21,10 +21,6 @@ import java.util.Set;
 
 import static org.antlr.v4.test.runtime.BaseRuntimeTest.antlrOnString;
 import static org.antlr.v4.test.runtime.BaseRuntimeTest.writeFile;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class BaseCppTest extends BaseRuntimeTestSupport implements RuntimeTestSupport {
@@ -168,8 +164,8 @@ public class BaseCppTest extends BaseRuntimeTestSupport implements RuntimeTestSu
 		ArrayList<String> files = new ArrayList<String>();
 		File folder = new File(path);
 		File[] listOfFiles = folder.listFiles();
-		for (int i = 0; i < listOfFiles.length; i++) {
-			String file = listOfFiles[i].getAbsolutePath();
+		for (File listOfFile : listOfFiles) {
+			String file = listOfFile.getAbsolutePath();
 			if (file.endsWith(".cpp")) {
 				files.add(file);
 			}
@@ -205,7 +201,7 @@ public class BaseCppTest extends BaseRuntimeTestSupport implements RuntimeTestSu
 		return output;
 	}
 
-	private String runCommand(String command[], String workPath, String description, boolean showStderr) throws Exception {
+	private String runCommand(String[] command, String workPath, String description, boolean showStderr) throws Exception {
 		ProcessBuilder builder = new ProcessBuilder(command);
 		builder.directory(new File(workPath));
 
@@ -218,7 +214,7 @@ public class BaseCppTest extends BaseRuntimeTestSupport implements RuntimeTestSu
 		System.out.println("Building ANTLR4 C++ runtime (if necessary) at "+ runtimePath);
 
 		try {
-			String command[] = { "cmake", ".", /*"-DCMAKE_CXX_COMPILER=clang++",*/ "-DCMAKE_BUILD_TYPE=release" };
+			String[] command = { "cmake", ".", /*"-DCMAKE_CXX_COMPILER=clang++",*/ "-DCMAKE_BUILD_TYPE=release" };
 			if (runCommand(command, runtimePath, "antlr runtime cmake", false) == null) {
 				return false;
 			}
@@ -228,7 +224,7 @@ public class BaseCppTest extends BaseRuntimeTestSupport implements RuntimeTestSu
 		}
 
 		try {
-			String command[] = { "make", "-j", "8" }; // Assuming a reasonable amount of available CPU cores.
+			String[] command = { "make", "-j", "8" }; // Assuming a reasonable amount of available CPU cores.
 			if (runCommand(command, runtimePath, "building antlr runtime", true) == null)
 				return false;
 		}
@@ -236,7 +232,7 @@ public class BaseCppTest extends BaseRuntimeTestSupport implements RuntimeTestSu
 			System.err.println("can't compile antlr cpp runtime");
 			e.printStackTrace(System.err);
 			try {
-			    String command[] = { "ls", "-la" };
+			    String[] command = { "ls", "-la" };
 					String output = runCommand(command, runtimePath + "/dist/", "printing library folder content", true);
 				System.out.println(output);
 			}
@@ -272,7 +268,7 @@ public class BaseCppTest extends BaseRuntimeTestSupport implements RuntimeTestSu
 		synchronized (runtimeBuiltOnce) {
 			if ( !runtimeBuiltOnce ) {
 				try {
-					String command[] = {"clang++", "--version"};
+					String[] command = {"clang++", "--version"};
 					String output = runCommand(command, getTempDirPath(), "printing compiler version", false);
 					System.out.println("Compiler version is: "+output);
 				}
@@ -292,7 +288,7 @@ public class BaseCppTest extends BaseRuntimeTestSupport implements RuntimeTestSu
 		// Create symlink to the runtime. Currently only used on OSX.
 		String libExtension = (getOS().equals("mac")) ? "dylib" : "so";
 		try {
-			String command[] = { "ln", "-s", runtimePath + "/dist/libantlr4-runtime." + libExtension };
+			String[] command = { "ln", "-s", runtimePath + "/dist/libantlr4-runtime." + libExtension };
 			if (runCommand(command, getTempDirPath(), "sym linking C++ runtime", true) == null)
 				return null;
 		}
@@ -356,7 +352,7 @@ public class BaseCppTest extends BaseRuntimeTestSupport implements RuntimeTestSu
 			p = Paths.get(runtimeURL.toURI()).toFile().toString();
 		}
 		catch (URISyntaxException use) {
-			p = "Can't find runtime at " + runtimeURL.toString();
+			p = "Can't find runtime at " + runtimeURL;
 		}
 		return p;
 	}

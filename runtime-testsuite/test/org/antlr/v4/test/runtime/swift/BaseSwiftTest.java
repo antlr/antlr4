@@ -194,7 +194,7 @@ public class BaseSwiftTest extends BaseRuntimeTestSupport implements RuntimeTest
 			argsWithArch.addAll(Arrays.asList("arch", "-arm64"));
 		argsWithArch.addAll(Arrays.asList(args));
 		if(VERBOSE)
-			System.err.println("Executing " + argsWithArch.toString() + " " + execPath);
+			System.err.println("Executing " + argsWithArch + " " + execPath);
 		final Process process = Runtime.getRuntime().exec(argsWithArch.toArray(new String[0]), null, new File(execPath));
 		StreamVacuum stdoutVacuum = new StreamVacuum(process.getInputStream());
 		StreamVacuum stderrVacuum = new StreamVacuum(process.getErrorStream());
@@ -216,10 +216,10 @@ public class BaseSwiftTest extends BaseRuntimeTestSupport implements RuntimeTest
 		stdoutVacuum.join();
 		stderrVacuum.join();
 		if(VERBOSE)
-			System.err.println("Done executing " + argsWithArch.toString() + " " + execPath);
+			System.err.println("Done executing " + argsWithArch + " " + execPath);
 		if (status != 0) {
 			System.err.println("Process exited with status " + status);
-			throw new IOException("Process exited with status " + status + ":\n" + stdoutVacuum.toString() + "\n" + stderrVacuum.toString());
+			throw new IOException("Process exited with status " + status + ":\n" + stdoutVacuum + "\n" + stderrVacuum);
 		}
 		return new Pair<>(stdoutVacuum.toString(), stderrVacuum.toString());
 	}
@@ -230,7 +230,7 @@ public class BaseSwiftTest extends BaseRuntimeTestSupport implements RuntimeTest
 			argsWithArch.addAll(Arrays.asList("arch", "-arm64"));
 		argsWithArch.addAll(Arrays.asList(command));
 		if(VERBOSE)
-			System.err.println("Executing " + argsWithArch.toString() + " " + workingDir);
+			System.err.println("Executing " + argsWithArch + " " + workingDir);
 		ProcessBuilder builder = new ProcessBuilder(argsWithArch.toArray(new String[0]));
 		builder.directory(new File(workingDir));
 		final Process process = builder.start();
@@ -248,7 +248,7 @@ public class BaseSwiftTest extends BaseRuntimeTestSupport implements RuntimeTest
 		int status = process.waitFor();
 		timer.cancel();
 		if(VERBOSE)
-			System.err.println("Done executing " + argsWithArch.toString() + " " + workingDir);
+			System.err.println("Done executing " + argsWithArch + " " + workingDir);
 		if (status != 0) {
 			System.err.println("Process exited with status " + status);
 			throw new IOException("Process exited with status " + status);

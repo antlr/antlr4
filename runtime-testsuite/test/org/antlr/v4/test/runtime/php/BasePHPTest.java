@@ -20,7 +20,6 @@ import org.stringtemplate.v4.ST;
 
 import static org.antlr.v4.test.runtime.BaseRuntimeTest.antlrOnString;
 import static org.antlr.v4.test.runtime.BaseRuntimeTest.writeFile;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class BasePHPTest extends BaseRuntimeTestSupport implements RuntimeTestSupport {

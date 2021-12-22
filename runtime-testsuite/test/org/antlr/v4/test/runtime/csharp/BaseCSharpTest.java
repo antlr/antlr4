@@ -282,7 +282,7 @@ public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTes
 			setParseErrors(stderrVacuum.toString());
 			System.err.println("runProcess command: " + Utils.join(args, " "));
 			System.err.println("runProcess exitValue: " + exitValue);
-			System.err.println("runProcess stdoutVacuum: " + stdoutVacuum.toString());
+			System.err.println("runProcess stdoutVacuum: " + stdoutVacuum);
 			System.err.println("runProcess stderrVacuum: " + getParseErrors());
 		}
 		if (exitValue == 132) {
