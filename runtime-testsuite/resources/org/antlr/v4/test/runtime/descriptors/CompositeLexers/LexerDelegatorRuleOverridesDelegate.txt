@@ -8,9 +8,9 @@ A : 'a' B {<writeln("\"M.A\"")>} ;
 WS : (' '|'\n') -> skip ;
 
 [slaveGrammar]
-		lexer grammar S;
-		A : 'a' {<writeln("\"S.A\"")>} ;
-		B : 'b' {<writeln("\"S.B\"")>} ;
+lexer grammar S;
+A : 'a' {<writeln("\"S.A\"")>} ;
+B : 'b' {<writeln("\"S.B\"")>} ;
 
 [input]
 ab
