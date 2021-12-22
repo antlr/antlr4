@@ -121,13 +121,18 @@ func (b *BitSet) clear(index int) {
 }
 
 func (b *BitSet) or(set *BitSet) {
-	size := intMax(b.minLen(), set.minLen())
-	if size > len(b.data) {
-		data := make([]uint64, size)
+	// Get min size necessary to represent the bits in both sets.
+	bLen := b.minLen()
+	setLen := set.minLen()
+	maxLen := intMax(bLen, setLen)
+	if maxLen > len(b.data) {
+		// Increase the size of len(b.data) to repesent the bits in both sets.
+		data := make([]uint64, maxLen)
 		copy(data, b.data)
 		b.data = data
 	}
-	for i := 0; i < size; i++ {
+	// len(b.data) is at least setLen.
+	for i := 0; i < setLen; i++ {
 		b.data[i] |= set.data[i]
 	}
 }
