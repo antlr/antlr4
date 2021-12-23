@@ -147,6 +147,9 @@ public class ParserATNFactory implements ATNFactory {
 				ErrorType errorType = pair.a instanceof LeftRecursiveRule ? ErrorType.EPSILON_LR_FOLLOW : ErrorType.EPSILON_CLOSURE;
 				g.tool.errMgr.grammarError(errorType, g.fileName, ((GrammarAST)pair.a.ast.getChild(0)).getToken(), pair.a.name);
 			}
+			if ( lookahead.contains(org.antlr.v4.runtime.Token.EOF)) {
+				g.tool.errMgr.grammarError(ErrorType.EOF_CLOSURE, g.fileName, ((GrammarAST)pair.a.ast.getChild(0)).getToken(), pair.a.name);
+			}
 		}
 	}
 

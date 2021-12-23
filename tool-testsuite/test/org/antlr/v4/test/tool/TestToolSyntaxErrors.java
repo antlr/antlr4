@@ -363,6 +363,24 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 		super.testErrors(pair, true);
 	}
 
+	// Test for https://github.com/antlr/antlr4/issues/3359
+	@Test public void testEofClosure() {
+		String grammar =
+				"lexer grammar EofClosure;\n" +
+				"EofClosure: 'x' EOF*;\n" +
+				"EofInAlternative: 'y' ('z' | EOF);";
+
+		String expected =
+			"error(" + ErrorType.EOF_CLOSURE.code + "): EofClosure.g4:2:0: rule EofClosure contains a closure with at least one alternative that can match EOF\n";
+
+		String[] pair = new String[] {
+				grammar,
+				expected
+		};
+
+		super.testErrors(pair, true);
+	}
+
 	// Test for https://github.com/antlr/antlr4/issues/1203
 	@Test public void testEpsilonOptionalAndClosureAnalysis() {
 		String grammar =

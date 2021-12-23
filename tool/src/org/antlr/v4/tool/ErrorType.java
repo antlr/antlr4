@@ -1108,6 +1108,28 @@ public enum ErrorType {
 			ErrorSeverity.WARNING
 	),
 
+	/**
+	 * <p>
+	 * rule <em>rule</em> contains a closure with at least one alternative
+	 * that can match EOF</p>
+	 *
+	 * <p>A rule contains a closure ({@code (...)*}) or positive closure
+	 * ({@code (...)+}) around EOF.</p>
+	 *
+	 * <p>The following rule produces this error.</p>
+	 *
+	 * <pre>
+	 * x : EOF*;         // error
+	 * y : EOF+;         // error
+	 * z : EOF;         // ok
+	 * </pre>
+	 */
+	EOF_CLOSURE(
+			186,
+			"rule <arg> contains a closure with at least one alternative that can match EOF",
+			ErrorSeverity.ERROR
+	),
+
 	/*
 	 * Backward incompatibility errors
 	 */
