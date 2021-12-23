@@ -30,14 +30,8 @@ public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTes
 	private static boolean isRuntimeInitialized = false;
 	private final static String cSharpAntlrRuntimeDllName = "Antlr4.Runtime.Standard.dll";
 	private final static String testProjectFileName = "Antlr4.Test.csproj";
-	private final static boolean isDebugAntlrRuntime = false;
-	private final static boolean isDebugTest = false;
 	private static String cSharpTestProjectContent;
 	private static final String cSharpCachingDirectory = Paths.get(cachingDirectory, "CSharp").toString();
-
-	private static String configToString(boolean isDebug) {
-		return isDebug ? "Debug" : "Release";
-	}
 
 	@Override
 	protected String getPropertyPrefix() {
@@ -190,7 +184,7 @@ public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTes
 	}
 
 	private String locateExec() {
-		return new File(getTempTestDir(), "bin/" + configToString(isDebugTest) + "/netcoreapp3.1/Test.dll").getAbsolutePath();
+		return new File(getTempTestDir(), "bin/Release/netcoreapp3.1/Test.dll").getAbsolutePath();
 	}
 
 	public boolean buildProject() {
@@ -203,7 +197,7 @@ public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTes
 			}
 
 			// build test
-			String[] args = new String[] { "dotnet", "build", testProjectFileName, "-c", configToString(isDebugTest) };
+			String[] args = new String[] { "dotnet", "build", testProjectFileName, "-c", "Release" };
 			boolean success = runProcess(args, getTempDirPath());
 			assertTrue(success);
 		} catch (Exception e) {
@@ -234,7 +228,7 @@ public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTes
 				"build",
 				runtimeProjPath,
 				"-c",
-				configToString(isDebugAntlrRuntime),
+				"Release",
 				"-o",
 				cSharpCachingDirectory
 		};
