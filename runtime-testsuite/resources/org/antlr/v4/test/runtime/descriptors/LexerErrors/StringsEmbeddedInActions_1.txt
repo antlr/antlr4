@@ -1,0 +1,16 @@
+[type]
+Lexer
+
+[grammar]
+lexer grammar L;
+ACTION2 : '[' (STRING | ~'"')*? ']';
+STRING : '"' ('\\\\' '"' | .)*? '"';
+WS : [ \t\r\n]+ -> skip;
+
+[input]
+["foo"]
+
+[output]
+[@0,0:6='["foo"]',<1>,1:0]
+[@1,7:6='<EOF>',<-1>,1:7]
+

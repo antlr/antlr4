@@ -1,0 +1,19 @@
+[notes]
+This test ensures that {@link org.antlr.v4.runtime.atn.ParserATNSimulator} does not produce a
+{@link StackOverflowError} when it encounters an {@code EOF} transition
+inside a closure.
+
+[type]
+Parser
+
+[grammar]
+grammar T;
+prog : stat EOF;
+stat : 'x' ('y' | EOF)*?;
+
+[start]
+prog
+
+[input]
+x
+

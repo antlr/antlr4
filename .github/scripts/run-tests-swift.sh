@@ -37,8 +37,10 @@ if [ $rc == 0 ]; then
   cd runtime-testsuite/
   if [ $GROUP == "LEXER" ]; then
       mvn -e -q -Dgroups="org.antlr.v4.test.runtime.category.LexerTests" -Dtest="swift.**" test
-  elif [ $GROUP == "PARSER" ]; then
-      mvn -e -q -Dgroups="org.antlr.v4.test.runtime.category.ParserTests" -Dtest="swift.**" test
+  elif [ $GROUP == "PARSER1" ]; then
+      mvn -e -q -Dgroups="org.antlr.v4.test.runtime.category.ParserTestsGroup1" -Dtest="swift.**" test
+  elif [ $GROUP == "PARSER2" ]; then
+      mvn -e -q -Dgroups="org.antlr.v4.test.runtime.category.ParserTestsGroup2" -Dtest="swift.**" test
   elif [ $GROUP == "RECURSION" ]; then
       mvn -e -q -Dgroups="org.antlr.v4.test.runtime.category.LeftRecursionTests" -Dtest="swift.**" test
   else

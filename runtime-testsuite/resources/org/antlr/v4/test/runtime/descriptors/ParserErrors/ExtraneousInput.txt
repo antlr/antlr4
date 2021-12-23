@@ -1,0 +1,31 @@
+[type]
+Parser
+
+[grammar]
+grammar T;
+
+member : 'a';
+body : member*;
+file : body EOF;
+B : 'b';
+
+[start]
+file
+
+[input]
+baa
+
+[output]
+
+[errors]
+"""line 1:0 mismatched input 'b' expecting {<EOF>, 'a'}
+"""
+
+[skip]
+Cpp
+CSharp
+Go
+Node
+PHP
+Python2
+Python3

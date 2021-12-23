@@ -152,10 +152,7 @@ public class BaseGoTest extends BaseRuntimeTestSupport implements RuntimeTestSup
 	                                                boolean defaultListener, String... extraOptions) {
 		ErrorQueue equeue = antlrOnString(getTempParserDirPath(), "Go", grammarFileName, grammarStr,
 		                                  defaultListener, extraOptions);
-		if (!equeue.errors.isEmpty()) {
-			return false;
-		}
-		return true;
+		return equeue.errors.isEmpty();
 	}
 
 	protected void rawBuildRecognizerTestFile(String parserName,

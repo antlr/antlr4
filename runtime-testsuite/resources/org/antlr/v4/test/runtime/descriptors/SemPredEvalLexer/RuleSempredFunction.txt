@@ -1,0 +1,19 @@
+[notes]
+Test for https://github.com/antlr/antlr4/issues/958
+
+[type]
+Lexer
+
+[grammar]
+lexer grammar L;
+T : 'a' {<True()>}? ;
+
+[input]
+aaa
+
+[output]
+[@0,0:0='a',<1>,1:0]
+[@1,1:1='a',<1>,1:1]
+[@2,2:2='a',<1>,1:2]
+[@3,3:2='<EOF>',<-1>,1:3]
+

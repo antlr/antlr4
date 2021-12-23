@@ -1,0 +1,32 @@
+[type]
+Parser
+
+[grammar]
+grammar T;
+s
+@init {
+<BuildParseTrees()>
+}
+@after {
+<ToStringTree("$r.ctx"):writeln()>
+}
+  : r=a ;
+a : 'x' 'y'* '!'
+  ;
+Z : 'z'
+  ;
+
+[start]
+s
+
+[input]
+xzyy!
+
+[output]
+"""(a x z y y !)
+"""
+
+[errors]
+"""line 1:1 extraneous input 'z' expecting {'y', '!'}
+"""
+
