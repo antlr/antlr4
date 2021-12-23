@@ -55,7 +55,7 @@ public class BaseSwiftTest extends BaseRuntimeTestSupport implements RuntimeTest
 		}
 		ANTLR_RUNTIME_PATH = swiftRuntime.getPath();
 		try {
-			fastFailRunProcess(ANTLR_RUNTIME_PATH, SWIFT_CMD, "build");
+			fastFailRunProcess(ANTLR_RUNTIME_PATH, SWIFT_CMD, "build", "-c", "release");
 		}
 		catch (IOException | InterruptedException e) {
 			e.printStackTrace();
@@ -124,7 +124,7 @@ public class BaseSwiftTest extends BaseRuntimeTestSupport implements RuntimeTest
 
 	private String execTest(String projectDir, String projectName) {
 		try {
-			Pair<String, String> output = runProcess(projectDir, "./.build/debug/" + projectName, "input");
+			Pair<String, String> output = runProcess(projectDir, "./.build/release/" + projectName, "input");
 			if (output.b.length() > 0) {
 				setParseErrors(output.b);
 			}
@@ -150,9 +150,10 @@ public class BaseSwiftTest extends BaseRuntimeTestSupport implements RuntimeTest
 			fastFailRunProcess(getTempDirPath(), "mv", "-f", absPath, projectDir + "/Sources/" + projectName);
 		}
 		fastFailRunProcess(getTempDirPath(), "mv", "-f", "input", projectDir);
-		String dylibPath = ANTLR_RUNTIME_PATH + "/.build/debug/";
+		String dylibPath = ANTLR_RUNTIME_PATH + "/.build/release/";
 //		System.err.println(dylibPath);
 		Pair<String, String> buildResult = runProcess(projectDir, SWIFT_CMD, "build",
+				"-c", "release",
 				"-Xswiftc", "-I"+dylibPath,
 				"-Xlinker", "-L"+dylibPath,
 				"-Xlinker", "-lAntlr4",
