@@ -433,7 +433,7 @@ public abstract class BaseRuntimeTest {
 		String currentValue = null;
 
 		List<Pair<String, String>> pairs = new ArrayList<>();
-		String[] lines = dtext.split("\n");
+		String[] lines = dtext.split("\r?\n");
 		for (String line : lines) {
 			if ( line.startsWith("[") && line.length()>2 &&
 				 sections.contains(line.substring(1, line.length() - 1)) ) {
