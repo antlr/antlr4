@@ -31,6 +31,7 @@ ANTLR project lead and supreme dictator for life
 * [Ben Hamilton](https://github.com/bhamiltoncx) (Full Unicode support in serialized ATN and all languages' runtimes for code points > U+FFFF)
 * [Marcos Passos](https://github.com/marcospassos) (PHP target)
 * [Lingyu Li](https://github.com/lingyv-li) (Dart target)
+* [Ivan Kochurkin](https://github.com/KvanTTT) has made major contributions to overall quality, error handling, and Target performance.
 
 ## Useful information
 
