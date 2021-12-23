@@ -201,15 +201,15 @@ public abstract class Target {
 	public String getTargetStringLiteralFromANTLRStringLiteral(
 		CodeGenerator generator,
 		String literal,
-		boolean addQuotes)
+		boolean addQuotes,
+		boolean escapeSpecial)
 	{
 		StringBuilder sb = new StringBuilder();
-		String is = literal;
 
 		if ( addQuotes ) sb.append('"');
 
-		for (int i = 1; i < is.length() -1; ) {
-			int codePoint = is.codePointAt(i);
+		for (int i = 1; i < literal.length() -1; ) {
+			int codePoint = literal.codePointAt(i);
 			int toAdvance = Character.charCount(codePoint);
 			if  (codePoint == '\\') {
 				// Anything escaped is what it is! We assume that
@@ -218,7 +218,7 @@ public abstract class Target {
 				// is what the default implementation is dealing with and remove
 				// the escape. The C target does this for instance.
 				//
-				int escapedCodePoint = is.codePointAt(i+toAdvance);
+				int escapedCodePoint = literal.codePointAt(i+toAdvance);
 				toAdvance++;
 				switch (escapedCodePoint) {
 					// Pass through any escapes that Java also needs
@@ -230,13 +230,16 @@ public abstract class Target {
 					case    'f':
 					case    '\\':
 						// Pass the escape through
+						if (escapeSpecial && escapedCodePoint != '\\') {
+							sb.append('\\');
+						}
 						sb.append('\\');
 						sb.appendCodePoint(escapedCodePoint);
 						break;
 
 					case    'u':    // Either unnnn or u{nnnnnn}
-						if (is.charAt(i+toAdvance) == '{') {
-							while (is.charAt(i+toAdvance) != '}') {
+						if (literal.charAt(i+toAdvance) == '{') {
+							while (literal.charAt(i+toAdvance) != '}') {
 								toAdvance++;
 							}
 							toAdvance++;
@@ -244,8 +247,11 @@ public abstract class Target {
 						else {
 							toAdvance += 4;
 						}
-						if ( i+toAdvance <= is.length() ) { // we might have an invalid \\uAB or something
-							String fullEscape = is.substring(i, i+toAdvance);
+						if ( i+toAdvance <= literal.length() ) { // we might have an invalid \\uAB or something
+							String fullEscape = literal.substring(i, i+toAdvance);
+							if (escapeSpecial) {
+								sb.append('\\');
+							}
 							appendUnicodeEscapedCodePoint(
 								CharSupport.getCharValueFromCharInGrammarLiteral(fullEscape),
 								sb);
@@ -253,6 +259,9 @@ public abstract class Target {
 						break;
 					default:
 						if (shouldUseUnicodeEscapeForCodePointInDoubleQuotedString(escapedCodePoint)) {
+							if (escapeSpecial) {
+								sb.append('\\');
+							}
 							appendUnicodeEscapedCodePoint(escapedCodePoint, sb);
 						}
 						else {
@@ -268,6 +277,9 @@ public abstract class Target {
 					sb.append("\\\"");
 				}
 				else if (shouldUseUnicodeEscapeForCodePointInDoubleQuotedString(codePoint)) {
+					if (escapeSpecial) {
+						sb.append('\\');
+					}
 					appendUnicodeEscapedCodePoint(codePoint, sb);
 				}
 				else {

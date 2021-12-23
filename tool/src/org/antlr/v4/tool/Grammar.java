@@ -793,8 +793,9 @@ public class Grammar implements AttributeResolver {
 		}
 
 		for (Map.Entry<String, Integer> entry : stringLiteralToTypeMap.entrySet()) {
-			if (entry.getValue() >= 0 && entry.getValue() < literalNames.length && literalNames[entry.getValue()] == null) {
-				literalNames[entry.getValue()] = entry.getKey();
+			int value = entry.getValue();
+			if (value >= 0 && value < literalNames.length && literalNames[value] == null) {
+				literalNames[value] = entry.getKey();
 			}
 		}
 
