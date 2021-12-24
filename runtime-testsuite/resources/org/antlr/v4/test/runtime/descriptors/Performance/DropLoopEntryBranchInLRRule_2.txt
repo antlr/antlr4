@@ -40,6 +40,5 @@ X1 and X2 and X3 and X4 and X5 and X6 and X7
 .
 
 [skip]
-Go
 PHP
 
