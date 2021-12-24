@@ -45,6 +45,17 @@ public interface RuntimeTestDescriptor {
 	/** For parsing, engage the DiagnosticErrorListener, dumping results to stderr */
 	boolean showDiagnosticErrors();
 
+	/** Most grammars are not using template actions like <writeln()> but I don't want to go change all
+	 *  of them.  Hence the "Not" in name.  By default grammars are ST templates unless you use:
+	 *
+	 *     [flags]
+	 *     grammarIsNotTemplate
+	 *
+	 *  in descriptor file.
+	 *
+	 */
+	boolean grammarIsNotTemplate();
+
 	/** Associates name of grammar like M in M.g4 to string (template) of grammar */
 	Pair<String,String> getGrammar();
 

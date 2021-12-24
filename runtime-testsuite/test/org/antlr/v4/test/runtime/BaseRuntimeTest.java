@@ -212,11 +212,13 @@ public abstract class BaseRuntimeTest {
 
 		String grammarName = pair.a;
 		String grammar = pair.b;
-		STGroup g = new STGroup('<', '>');
-		g.importTemplates(targetTemplates);
-		g.registerRenderer(String.class, new StringRenderer());
-		ST grammarST = new ST(g, grammar);
-		grammar = grammarST.render();
+		if ( !descriptor.grammarIsNotTemplate() ) {
+			STGroup g = new STGroup('<', '>');
+			g.importTemplates(targetTemplates);
+			g.registerRenderer(String.class, new StringRenderer());
+			ST grammarST = new ST(g, grammar);
+			grammar = grammarST.render();
+		}
 
 		String found = delegate.execParser(grammarName+".g4", grammar,
 		                                   grammarName+"Parser",
@@ -504,6 +506,11 @@ public abstract class BaseRuntimeTest {
 							case "showDiagnosticErrors":
 								d.showDiagnosticErrors = true;
 								break;
+							case "grammarIsNotTemplate":
+								d.grammarIsNotTemplate = true;
+								break;
+							default:
+								throw new RuntimeException("Unknown descriptor flag ignored: "+f);
 						}
 					}
 					break;

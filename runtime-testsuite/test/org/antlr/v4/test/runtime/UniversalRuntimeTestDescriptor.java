@@ -20,6 +20,7 @@ public class UniversalRuntimeTestDescriptor implements RuntimeTestDescriptor {
 	public String grammarName;
 	public String grammar;
 	public List<Pair<String, String>> slaveGrammars = new ArrayList<>();
+	public boolean grammarIsNotTemplate = false;
 	public boolean showDFA = false;
 	public boolean showDiagnosticErrors = false;
 
@@ -84,6 +85,11 @@ public class UniversalRuntimeTestDescriptor implements RuntimeTestDescriptor {
 	@Override
 	public boolean showDiagnosticErrors() {
 		return showDiagnosticErrors;
+	}
+
+	@Override
+	public boolean grammarIsNotTemplate() {
+		return grammarIsNotTemplate;
 	}
 
 	@Override
