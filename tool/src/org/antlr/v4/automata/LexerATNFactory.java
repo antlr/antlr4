@@ -74,9 +74,9 @@ public class LexerATNFactory extends ParserATNFactory {
 		COMMON_CONSTANTS.put("MIN_CHAR_VALUE", Lexer.MIN_CHAR_VALUE);
 	}
 
-	private List<String> ruleCommands = new ArrayList<String>();
+	private final List<String> ruleCommands = new ArrayList<String>();
 
-	private boolean caseInsensitive;
+	private final boolean caseInsensitive;
 
 	/**
 	 * Maps from an action index to a {@link LexerAction} object.
@@ -286,7 +286,7 @@ public class LexerATNFactory extends ParserATNFactory {
 			else if ( t.getType()==ANTLRParser.STRING_LITERAL ) {
 				int c = CharSupport.getCharValueFromGrammarCharLiteral(t.getText());
 				if ( c != -1 ) {
-					checkCharAndAddToSet(associatedAST, set, c, caseInsensitive);
+					checkCharAndAddToSet(associatedAST, set, c);
 				}
 				else {
 					g.tool.errMgr.grammarError(ErrorType.INVALID_LITERAL_IN_LEXER_SET,
@@ -470,10 +470,10 @@ public class LexerATNFactory extends ParserATNFactory {
 						state = CharSetParseState.ERROR;
 						break;
 					case CODE_POINT:
-						state = applyPrevStateAndMoveToCodePoint(charSetAST, set, state, escapeParseResult.codePoint, caseInsensitive);
+						state = applyPrevStateAndMoveToCodePoint(charSetAST, set, state, escapeParseResult.codePoint);
 						break;
 					case PROPERTY:
-						state = applyPrevStateAndMoveToProperty(charSetAST, set, state, escapeParseResult.propertyIntervalSet, caseInsensitive);
+						state = applyPrevStateAndMoveToProperty(charSetAST, set, state, escapeParseResult.propertyIntervalSet);
 						break;
 				}
 				offset = escapeParseResult.parseLength;
@@ -489,7 +489,7 @@ public class LexerATNFactory extends ParserATNFactory {
 				}
 			}
 			else {
-				state = applyPrevStateAndMoveToCodePoint(charSetAST, set, state, c, caseInsensitive);
+				state = applyPrevStateAndMoveToCodePoint(charSetAST, set, state, c);
 			}
 			i += offset;
 		}
@@ -497,7 +497,7 @@ public class LexerATNFactory extends ParserATNFactory {
 			return new IntervalSet();
 		}
 		// Whether or not we were in a range, we'll add the last code point found to the set.
-		applyPrevState(charSetAST, set, state, caseInsensitive);
+		applyPrevState(charSetAST, set, state);
 		return set;
 	}
 
@@ -505,8 +505,7 @@ public class LexerATNFactory extends ParserATNFactory {
 			GrammarAST charSetAST,
 			IntervalSet set,
 			CharSetParseState state,
-			int codePoint,
-			boolean caseInsensitive) {
+			int codePoint) {
 		if (state.inRange) {
 			if (state.prevCodePoint > codePoint) {
 				g.tool.errMgr.grammarError(
@@ -519,7 +518,7 @@ public class LexerATNFactory extends ParserATNFactory {
 			state = CharSetParseState.NONE;
 		}
 		else {
-			applyPrevState(charSetAST, set, state, caseInsensitive);
+			applyPrevState(charSetAST, set, state);
 			state = new CharSetParseState(
 					CharSetParseState.Mode.PREV_CODE_POINT,
 					false,
@@ -533,15 +532,14 @@ public class LexerATNFactory extends ParserATNFactory {
 			GrammarAST charSetAST,
 			IntervalSet set,
 			CharSetParseState state,
-			IntervalSet property,
-			boolean caseInsensitive) {
+			IntervalSet property) {
 		if (state.inRange) {
 			g.tool.errMgr.grammarError(ErrorType.UNICODE_PROPERTY_NOT_ALLOWED_IN_RANGE,
 						   g.fileName, charSetAST.getToken(), charSetAST.getText());
 			return CharSetParseState.ERROR;
 		}
 		else {
-			applyPrevState(charSetAST, set, state, caseInsensitive);
+			applyPrevState(charSetAST, set, state);
 			state = new CharSetParseState(
 					CharSetParseState.Mode.PREV_PROPERTY,
 					false,
@@ -551,13 +549,13 @@ public class LexerATNFactory extends ParserATNFactory {
 		return state;
 	}
 
-	private void applyPrevState(GrammarAST charSetAST, IntervalSet set, CharSetParseState state, boolean caseInsensitive) {
+	private void applyPrevState(GrammarAST charSetAST, IntervalSet set, CharSetParseState state) {
 		switch (state.mode) {
 			case NONE:
 			case ERROR:
 				break;
 			case PREV_CODE_POINT:
-				checkCharAndAddToSet(charSetAST, set, state.prevCodePoint, caseInsensitive);
+				checkCharAndAddToSet(charSetAST, set, state.prevCodePoint);
 				break;
 			case PREV_PROPERTY:
 				set.addAll(state.prevProperty);
@@ -565,7 +563,7 @@ public class LexerATNFactory extends ParserATNFactory {
 		}
 	}
 
-	private void checkCharAndAddToSet(GrammarAST ast, IntervalSet set, int c, boolean caseInsensitive) {
+	private void checkCharAndAddToSet(GrammarAST ast, IntervalSet set, int c) {
 		checkRangeAndAddToSet(ast, set, c, c, caseInsensitive);
 	}
 
