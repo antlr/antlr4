@@ -424,14 +424,24 @@ public class TestATNLexerInterpreter extends BaseJavaToolTest {
 		checkLexerMatches(lg, inputString, expecting);
 	}
 
-	@Test public void testLexerCaseInsensitiveWithNegation() throws  Exception {
+	@Test public void testLexerCaseInsensitiveLiteralWithNegation() {
 		String grammar =
 				"lexer grammar L;\n" +
 				"options { caseInsensitive = true; }\n" +
-				"TOKEN_WITH_NOT:   ~'f';\n";     // ~('f' | 'F)
+				"LITERAL_WITH_NOT:   ~'f';\n";     // ~('f' | 'F)
 		execLexer("L.g4", grammar, "L", "F");
 
 		assertEquals("line 1:0 token recognition error at: 'F'\n", getParseErrors());
+	}
+
+	@Test public void testLexerCaseInsensitiveSetWithNegation() {
+		String grammar =
+				"lexer grammar L;\n" +
+				"options { caseInsensitive = true; }\n" +
+				"SET_WITH_NOT: ~[a-c];\n";        // ~[a-cA-C]
+		execLexer("L.g4", grammar, "L", "B");
+
+		assertEquals("line 1:0 token recognition error at: 'B'\n", getParseErrors());
 	}
 
 	@Test public void testLexerCaseInsensitiveFragments() throws Exception {
@@ -481,6 +491,18 @@ public class TestATNLexerInterpreter extends BaseJavaToolTest {
 				", WS, ");
 
 		checkLexerMatches(lg, inputString, expecting);
+	}
+
+	@Test public void testNotImpliedCharactersWithEnabledCaseInsensitiveOption() throws Exception {
+		LexerGrammar lg = new LexerGrammar(
+				"lexer grammar L;\n" +
+				"options { caseInsensitive = true; }\n" +
+				"TOKEN: ('A'..'z')+;\n"
+		);
+
+		// No range transformation because of mixed character case in range borders
+		String inputString = "ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz";
+		checkLexerMatches(lg, inputString, "TOKEN, EOF");
 	}
 
 	protected void checkLexerMatches(LexerGrammar lg, String inputString, String expecting) {

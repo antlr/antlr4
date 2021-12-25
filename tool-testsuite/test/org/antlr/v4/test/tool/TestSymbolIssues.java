@@ -402,17 +402,20 @@ public class TestSymbolIssues extends BaseJavaToolTest {
 		testErrors(test, false);
 	}
 
-	@Test public void testCaseInsensitiveCharsCollision() throws  Exception {
+	@Test public void testCaseInsensitiveCharsCollision() {
 		String[] test = {
 				"lexer grammar L;\n" +
 				"options { caseInsensitive = true; }\n" +
 				"TOKEN_RANGE:      [a-fA-F0-9];\n" +
-				"TOKEN_RANGE_2:    'g'..'l' | 'G'..'L';\n",
+				"TOKEN_RANGE_2:    'g'..'l' | 'G'..'L';\n" +
+				"TOKEN_RANGE_3:    'm'..'q' | [M-Q];\n",
 
 				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4:3:18: chars a-f used multiple times in set [a-fA-F0-9]\n" +
 				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4:3:18: chars A-F used multiple times in set [a-fA-F0-9]\n" +
 				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4:4:13: chars g-l used multiple times in set 'g'..'l' | 'G'..'L'\n" +
-				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4:4:13: chars G-L used multiple times in set 'g'..'l' | 'G'..'L'\n"
+				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4:4:13: chars G-L used multiple times in set 'g'..'l' | 'G'..'L'\n" +
+				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4::: chars 'M' used multiple times in set 'M'..'Q' | 'm'..'q'\n" +
+				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4::: chars 'm' used multiple times in set 'M'..'Q' | 'm'..'q'\n"
 		};
 
 		testErrors(test, false);
@@ -453,13 +456,27 @@ public class TestSymbolIssues extends BaseJavaToolTest {
 		testErrors(test, false);
 	}
 
-	@Test public void testIllegalModeOption() throws  Exception {
+	@Test public void testIllegalModeOption() {
 		String[] test = {
 				"lexer grammar L;\n" +
 				"options { caseInsensitive = badValue; }\n" +
 				"DEFAULT_TOKEN: [A-F]+;\n",
 
 				"warning(" + ErrorType.ILLEGAL_OPTION_VALUE.code + "): L.g4:2:28: unsupported option value caseInsensitive=badValue\n"
+		};
+
+		testErrors(test, false);
+	}
+
+	@Test public void testNotImpliedCharacters() {
+		String[] test = {
+				"lexer grammar Test;\n" +
+				"TOKEN1: 'A'..'g';\n" +
+				"TOKEN2: [C-m];\n" +
+				"TOKEN3: [А-я]; // OK since range does not contain intermediate characters",
+
+				"warning(" + ErrorType.RANGE_PROBABLY_CONTAINS_NOT_IMPLIED_CHARACTERS.code + "): Test.g4:2:8: Range A..g probably contains not implied characters [\\]^_`. Both bounds should be defined in lower or UPPER case\n" +
+				"warning(" + ErrorType.RANGE_PROBABLY_CONTAINS_NOT_IMPLIED_CHARACTERS.code + "): Test.g4:3:8: Range C..m probably contains not implied characters [\\]^_`. Both bounds should be defined in lower or UPPER case\n"
 		};
 
 		testErrors(test, false);
