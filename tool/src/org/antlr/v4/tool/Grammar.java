@@ -83,6 +83,7 @@ public class Grammar implements AttributeResolver {
 		parserOptions.add("language");
 		parserOptions.add("accessLevel");
 		parserOptions.add("exportMacro");
+		parserOptions.add("caseInsensitive");
 	}
 
 	public static final Set<String> lexerOptions = parserOptions;
@@ -435,7 +436,6 @@ public class Grammar implements AttributeResolver {
 		if ( rules.get(r.name)!=null ) {
 			return false;
 		}
-
 		rules.put(r.name, r);
 		r.index = ruleNumber++;
 		indexToRule.add(r);

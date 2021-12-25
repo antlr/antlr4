@@ -8,6 +8,7 @@ package org.antlr.v4.automata;
 
 import org.antlr.runtime.CommonToken;
 import org.antlr.runtime.Token;
+import org.antlr.runtime.tree.CommonTree;
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.misc.CharSupport;
 import org.antlr.v4.misc.EscapeSequenceParsing;
@@ -74,7 +75,9 @@ public class LexerATNFactory extends ParserATNFactory {
 		COMMON_CONSTANTS.put("MIN_CHAR_VALUE", Lexer.MIN_CHAR_VALUE);
 	}
 
-	private List<String> ruleCommands = new ArrayList<String>();
+	private final List<String> ruleCommands = new ArrayList<String>();
+
+	private final boolean caseInsensitive;
 
 	/**
 	 * Maps from an action index to a {@link LexerAction} object.
@@ -89,6 +92,8 @@ public class LexerATNFactory extends ParserATNFactory {
 		super(g);
 		// use codegen to get correct language templates for lexer commands
 		String language = g.getOptionString("language");
+		String caseInsensitiveOption = g.getOptionString("caseInsensitive");
+		caseInsensitive = caseInsensitiveOption != null && caseInsensitiveOption.equals("true");
 		CodeGenerator gen = new CodeGenerator(g.tool, null, language);
 		codegenTemplates = gen.getTemplates();
 	}
@@ -256,8 +261,9 @@ public class LexerATNFactory extends ParserATNFactory {
 		ATNState right = newState(b);
 		int t1 = CharSupport.getCharValueFromGrammarCharLiteral(a.getText());
 		int t2 = CharSupport.getCharValueFromGrammarCharLiteral(b.getText());
-		checkRange(a, b, t1, t2);
-		left.addTransition(CodePointTransitions.createWithCodePointRange(right, t1, t2));
+		if (checkRange(a, b, t1, t2)) {
+			left.addTransition(createTransition(right, t1, t2, a));
+		}
 		a.atnState = left;
 		b.atnState = left;
 		return new Handle(left, right);
@@ -272,9 +278,8 @@ public class LexerATNFactory extends ParserATNFactory {
 			if ( t.getType()==ANTLRParser.RANGE ) {
 				int a = CharSupport.getCharValueFromGrammarCharLiteral(t.getChild(0).getText());
 				int b = CharSupport.getCharValueFromGrammarCharLiteral(t.getChild(1).getText());
-				if (checkRange((GrammarAST) t.getChild(0), (GrammarAST) t.getChild(1), a, b)) {
-					checkSetCollision(associatedAST, set, a, b);
-					set.add(a,b);
+				if (checkRange((GrammarAST)t.getChild(0), (GrammarAST)t.getChild(1), a, b)) {
+					checkRangeAndAddToSet(associatedAST, set, a, b, caseInsensitive);
 				}
 			}
 			else if ( t.getType()==ANTLRParser.LEXER_CHAR_SET ) {
@@ -283,8 +288,7 @@ public class LexerATNFactory extends ParserATNFactory {
 			else if ( t.getType()==ANTLRParser.STRING_LITERAL ) {
 				int c = CharSupport.getCharValueFromGrammarCharLiteral(t.getText());
 				if ( c != -1 ) {
-					checkSetCollision(associatedAST, set, c);
-					set.add(c);
+					checkCharAndAddToSet(associatedAST, set, c);
 				}
 				else {
 					g.tool.errMgr.grammarError(ErrorType.INVALID_LITERAL_IN_LEXER_SET,
@@ -327,19 +331,22 @@ public class LexerATNFactory extends ParserATNFactory {
 			g.tool.errMgr.grammarError(ErrorType.INVALID_LITERAL_IN_LEXER_SET,
 					g.fileName, rightNode.getToken(), rightNode.getText());
 		}
-		if (!result) return result;
+		if (!result) return false;
 
 		if (rightValue < leftValue) {
 			g.tool.errMgr.grammarError(ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED,
 					g.fileName, leftNode.parent.getToken(), leftNode.getText() + ".." + rightNode.getText());
+			return false;
 		}
-		return result;
+		return true;
 	}
 
 	/** For a lexer, a string is a sequence of char to match.  That is,
 	 *  "fog" is treated as 'f' 'o' 'g' not as a single transition in
 	 *  the DFA.  Machine== o-'f'-&gt;o-'o'-&gt;o-'g'-&gt;o and has n+1 states
 	 *  for n characters.
+	 *  if "caseInsensitive" option is enabled, "fog" will be treated as
+	 *  o-('f'|'F') -> o-('o'|'O') -> o-('g'|'G')
 	 */
 	@Override
 	public Handle stringLiteral(TerminalAST stringLiteralAST) {
@@ -358,7 +365,7 @@ public class LexerATNFactory extends ParserATNFactory {
 		for (int i = 0; i < n; ) {
 			right = newState(stringLiteralAST);
 			int codePoint = s.codePointAt(i);
-			prev.addTransition(CodePointTransitions.createWithCodePoint(right, codePoint));
+			prev.addTransition(createTransition(right, codePoint, codePoint, stringLiteralAST));
 			prev = right;
 			i += Character.charCount(codePoint);
 		}
@@ -510,8 +517,7 @@ public class LexerATNFactory extends ParserATNFactory {
 						charSetAST.getToken(),
 						CharSupport.getRangeEscapedString(state.prevCodePoint, codePoint));
 			}
-			checkSetCollision(charSetAST, set, state.prevCodePoint, codePoint);
-			set.add(state.prevCodePoint, codePoint);
+			checkRangeAndAddToSet(charSetAST, set, state.prevCodePoint, codePoint, caseInsensitive);
 			state = CharSetParseState.NONE;
 		}
 		else {
@@ -552,8 +558,7 @@ public class LexerATNFactory extends ParserATNFactory {
 			case ERROR:
 				break;
 			case PREV_CODE_POINT:
-				checkSetCollision(charSetAST, set, state.prevCodePoint);
-				set.add(state.prevCodePoint);
+				checkCharAndAddToSet(charSetAST, set, state.prevCodePoint);
 				break;
 			case PREV_PROPERTY:
 				set.addAll(state.prevProperty);
@@ -561,37 +566,72 @@ public class LexerATNFactory extends ParserATNFactory {
 		}
 	}
 
-	protected void checkSetCollision(GrammarAST ast, IntervalSet set, int el) {
-		checkSetCollision(ast, set, el, el);
+	private void checkCharAndAddToSet(GrammarAST ast, IntervalSet set, int c) {
+		checkRangeAndAddToSet(ast, set, c, c, caseInsensitive);
 	}
 
-	protected void checkSetCollision(GrammarAST ast, IntervalSet set, int a, int b) {
-		for (int i = a; i <= b; i++) {
-			if (set.contains(i)) {
-				String setText;
-				if (ast.getChildren() == null) {
-					setText = ast.getText();
-				}
-				else {
-					StringBuilder sb = new StringBuilder();
-					for (Object child : ast.getChildren()) {
-						if (child instanceof RangeAST) {
-							sb.append(((RangeAST) child).getChild(0).getText());
-							sb.append("..");
-							sb.append(((RangeAST) child).getChild(1).getText());
-						}
-						else {
-							sb.append(((GrammarAST)child).getText());
-						}
-						sb.append(" | ");
-					}
-					sb.replace(sb.length() - 3, sb.length(), "");
-					setText = sb.toString();
-				}
-				g.tool.errMgr.grammarError(ErrorType.CHARACTERS_COLLISION_IN_SET, g.fileName, ast.getToken(),
-						CharSupport.getRangeEscapedString(a, b), setText);
-				break;
+	private void checkRangeAndAddToSet(GrammarAST ast, IntervalSet set, int a, int b, boolean caseInsensitive) {
+		RangeBorderCharactersData charactersData = RangeBorderCharactersData.getAndCheckCharactersData(a, b, g, ast);
+		if (caseInsensitive) {
+			if (charactersData.lowerFrom == charactersData.upperFrom && charactersData.lowerTo == charactersData.upperTo ||
+					charactersData.mixOfLowerAndUpperCharCase
+			) {
+				checkRangeAndAddToSet(ast, set, a, b, false);
 			}
+			else {
+				checkRangeAndAddToSet(ast, set, charactersData.lowerFrom, charactersData.lowerTo, false);
+				checkRangeAndAddToSet(ast, set, charactersData.upperFrom, charactersData.upperTo, false);
+			}
+		}
+		else {
+			for (int i = a; i <= b; i++) {
+				if (set.contains(i)) {
+					String setText;
+					if (ast.getChildren() == null) {
+						setText = ast.getText();
+					}
+					else {
+						StringBuilder sb = new StringBuilder();
+						for (Object child : ast.getChildren()) {
+							if (child instanceof RangeAST) {
+								sb.append(((RangeAST) child).getChild(0).getText());
+								sb.append("..");
+								sb.append(((RangeAST) child).getChild(1).getText());
+							}
+							else {
+								sb.append(((GrammarAST) child).getText());
+							}
+							sb.append(" | ");
+						}
+						sb.replace(sb.length() - 3, sb.length(), "");
+						setText = sb.toString();
+					}
+					g.tool.errMgr.grammarError(ErrorType.CHARACTERS_COLLISION_IN_SET, g.fileName, ast.getToken(),
+							(char) a + "-" + (char) b, setText);
+					break;
+				}
+			}
+			set.add(a, b);
+		}
+	}
+
+	private Transition createTransition(ATNState target, int from, int to, CommonTree tree) {
+		RangeBorderCharactersData charactersData = RangeBorderCharactersData.getAndCheckCharactersData(from, to, g, tree);
+		if (caseInsensitive) {
+			if (charactersData.lowerFrom == charactersData.upperFrom && charactersData.lowerTo == charactersData.upperTo ||
+					charactersData.mixOfLowerAndUpperCharCase
+			) {
+				return CodePointTransitions.createWithCodePointRange(target, from, to);
+			}
+			else {
+				IntervalSet intervalSet = new IntervalSet();
+				intervalSet.add(charactersData.lowerFrom, charactersData.lowerTo);
+				intervalSet.add(charactersData.upperFrom, charactersData.upperTo);
+				return new SetTransition(target, intervalSet);
+			}
+		}
+		else {
+			return CodePointTransitions.createWithCodePointRange(target, from, to);
 		}
 	}
 
