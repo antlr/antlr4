@@ -574,20 +574,23 @@ public class LexerATNFactory extends ParserATNFactory {
 		RangeBorderCharactersData charactersData = RangeBorderCharactersData.getAndCheckCharactersData(a, b, g, ast);
 		if (caseInsensitive) {
 			if (charactersData.lowerFrom == charactersData.upperFrom && charactersData.lowerTo == charactersData.upperTo ||
-				charactersData.mixOfLowerAndUpperCharCase
+					charactersData.mixOfLowerAndUpperCharCase
 			) {
 				checkRangeAndAddToSet(ast, set, a, b, false);
-			} else {
+			}
+			else {
 				checkRangeAndAddToSet(ast, set, charactersData.lowerFrom, charactersData.lowerTo, false);
 				checkRangeAndAddToSet(ast, set, charactersData.upperFrom, charactersData.upperTo, false);
 			}
-		} else {
+		}
+		else {
 			for (int i = a; i <= b; i++) {
 				if (set.contains(i)) {
 					String setText;
 					if (ast.getChildren() == null) {
 						setText = ast.getText();
-					} else {
+					}
+					else {
 						StringBuilder sb = new StringBuilder();
 						for (Object child : ast.getChildren()) {
 							if (child instanceof RangeAST) {
@@ -596,7 +599,7 @@ public class LexerATNFactory extends ParserATNFactory {
 								sb.append(((RangeAST) child).getChild(1).getText());
 							}
 							else {
-								sb.append(((GrammarAST)child).getText());
+								sb.append(((GrammarAST) child).getText());
 							}
 							sb.append(" | ");
 						}
@@ -604,7 +607,7 @@ public class LexerATNFactory extends ParserATNFactory {
 						setText = sb.toString();
 					}
 					g.tool.errMgr.grammarError(ErrorType.CHARACTERS_COLLISION_IN_SET, g.fileName, ast.getToken(),
-							(char)a + "-" + (char)b, setText);
+							(char) a + "-" + (char) b, setText);
 					break;
 				}
 			}
@@ -616,16 +619,18 @@ public class LexerATNFactory extends ParserATNFactory {
 		RangeBorderCharactersData charactersData = RangeBorderCharactersData.getAndCheckCharactersData(from, to, g, tree);
 		if (caseInsensitive) {
 			if (charactersData.lowerFrom == charactersData.upperFrom && charactersData.lowerTo == charactersData.upperTo ||
-				charactersData.mixOfLowerAndUpperCharCase
+					charactersData.mixOfLowerAndUpperCharCase
 			) {
 				return CodePointTransitions.createWithCodePointRange(target, from, to);
-			} else {
+			}
+			else {
 				IntervalSet intervalSet = new IntervalSet();
 				intervalSet.add(charactersData.lowerFrom, charactersData.lowerTo);
 				intervalSet.add(charactersData.upperFrom, charactersData.upperTo);
 				return new SetTransition(target, intervalSet);
 			}
-		} else {
+		}
+		else {
 			return CodePointTransitions.createWithCodePointRange(target, from, to);
 		}
 	}

@@ -35,7 +35,8 @@ public abstract class CodePointTransitions {
 	public static Transition createWithCodePointRange(ATNState target, int codePointFrom, int codePointTo) {
 		if (Character.isSupplementaryCodePoint(codePointFrom) || Character.isSupplementaryCodePoint(codePointTo)) {
 			return new SetTransition(target, IntervalSet.of(codePointFrom, codePointTo));
-		} else {
+		}
+		else {
 			return codePointFrom == codePointTo
 					? new AtomTransition(target, codePointFrom)
 					: new RangeTransition(target, codePointFrom, codePointTo);
