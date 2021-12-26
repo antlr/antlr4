@@ -394,7 +394,7 @@ public class TestSymbolIssues extends BaseJavaToolTest {
 
 				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4:2:18: chars a-f used multiple times in set [aa-f]\n" +
 				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4:3:18: chars D-J used multiple times in set [A-FD-J]\n" +
-				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4:4:13: chars O-V used multiple times in set 'Z' | 'K'..'R' | 'O'..'V'\n" +
+				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4:4:38: chars O-V used multiple times in set 'Z' | 'K'..'R' | 'O'..'V'\n" +
 				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4::: chars 'g' used multiple times in set 'g'..'l'\n" +
 				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4::: chars '\\n' used multiple times in set '\\n'..'\\r'\n"
 		};
@@ -411,9 +411,7 @@ public class TestSymbolIssues extends BaseJavaToolTest {
 				"TOKEN_RANGE_3:    'm'..'q' | [M-Q];\n",
 
 				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4:3:18: chars a-f used multiple times in set [a-fA-F0-9]\n" +
-				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4:3:18: chars A-F used multiple times in set [a-fA-F0-9]\n" +
-				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4:4:13: chars g-l used multiple times in set 'g'..'l' | 'G'..'L'\n" +
-				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4:4:13: chars G-L used multiple times in set 'g'..'l' | 'G'..'L'\n" +
+				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4:4:32: chars g-l used multiple times in set 'g'..'l' | 'G'..'L'\n" +
 				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4::: chars 'M' used multiple times in set 'M'..'Q' | 'm'..'q'\n" +
 				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4::: chars 'm' used multiple times in set 'M'..'Q' | 'm'..'q'\n"
 		};

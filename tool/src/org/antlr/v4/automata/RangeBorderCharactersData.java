@@ -5,11 +5,11 @@ import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
 
 public class RangeBorderCharactersData {
-	public int lowerFrom;
-	public int upperFrom;
-	public int lowerTo;
-	public int upperTo;
-	public boolean mixOfLowerAndUpperCharCase;
+	public final int lowerFrom;
+	public final int upperFrom;
+	public final int lowerTo;
+	public final int upperTo;
+	public final boolean mixOfLowerAndUpperCharCase;
 
 	public RangeBorderCharactersData(int lowerFrom, int upperFrom, int lowerTo, int upperTo, boolean mixOfLowerAndUpperCharCase) {
 		this.lowerFrom = lowerFrom;
@@ -24,6 +24,7 @@ public class RangeBorderCharactersData {
 		int upperFrom = Character.toUpperCase(from);
 		int lowerTo = Character.toLowerCase(to);
 		int upperTo = Character.toUpperCase(to);
+
 		boolean isLowerFrom = lowerFrom == from;
 		boolean isLowerTo = lowerTo == to;
 		boolean mixOfLowerAndUpperCharCase = isLowerFrom && !isLowerTo || !isLowerFrom && isLowerTo;
@@ -40,5 +41,9 @@ public class RangeBorderCharactersData {
 			}
 		}
 		return new RangeBorderCharactersData(lowerFrom, upperFrom, lowerTo, upperTo, mixOfLowerAndUpperCharCase);
+	}
+
+	public boolean isSingleRange() {
+		return lowerFrom == upperFrom && lowerTo == upperTo || mixOfLowerAndUpperCharCase;
 	}
 }
