@@ -19,7 +19,9 @@ public class RangeBorderCharactersData {
 		this.mixOfLowerAndUpperCharCase = mixOfLowerAndUpperCharCase;
 	}
 
-	public static RangeBorderCharactersData getAndCheckCharactersData(int from, int to, Grammar grammar, CommonTree tree) {
+	public static RangeBorderCharactersData getAndCheckCharactersData(int from, int to, Grammar grammar, CommonTree tree,
+																	  boolean reportRangeContainsNotImpliedCharacters
+	) {
 		int lowerFrom = Character.toLowerCase(from);
 		int upperFrom = Character.toUpperCase(from);
 		int lowerTo = Character.toLowerCase(to);
@@ -28,7 +30,7 @@ public class RangeBorderCharactersData {
 		boolean isLowerFrom = lowerFrom == from;
 		boolean isLowerTo = lowerTo == to;
 		boolean mixOfLowerAndUpperCharCase = isLowerFrom && !isLowerTo || !isLowerFrom && isLowerTo;
-		if (mixOfLowerAndUpperCharCase && from <= 0x7F && to <= 0x7F) {
+		if (reportRangeContainsNotImpliedCharacters && mixOfLowerAndUpperCharCase && from <= 0x7F && to <= 0x7F) {
 			StringBuilder notImpliedCharacters = new StringBuilder();
 			for (int i = from; i < to; i++) {
 				if (!Character.isAlphabetic(i)) {

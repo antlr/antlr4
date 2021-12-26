@@ -498,4 +498,16 @@ public class TestSymbolIssues extends BaseJavaToolTest {
 
 		testErrors(test, false);
 	}
+
+	@Test public void testNotImpliedCharactersWithCaseInsensitiveOption() {
+		String[] test = {
+				"lexer grammar Test;\n" +
+				"options { caseInsensitive=true; }\n" +
+				"TOKEN: [A-z];",
+
+				"warning(" + ErrorType.RANGE_PROBABLY_CONTAINS_NOT_IMPLIED_CHARACTERS.code + "): Test.g4:3:7: Range A..z probably contains not implied characters [\\]^_`. Both bounds should be defined in lower or UPPER case\n"
+		};
+
+		testErrors(test, false);
+	}
 }

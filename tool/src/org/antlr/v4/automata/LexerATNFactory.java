@@ -279,7 +279,7 @@ public class LexerATNFactory extends ParserATNFactory {
 				int a = CharSupport.getCharValueFromGrammarCharLiteral(t.getChild(0).getText());
 				int b = CharSupport.getCharValueFromGrammarCharLiteral(t.getChild(1).getText());
 				if (checkRange((GrammarAST)t.getChild(0), (GrammarAST)t.getChild(1), a, b)) {
-					checkRangeAndAddToSet(associatedAST, t, set, a, b, caseInsensitive, true);
+					checkRangeAndAddToSet(associatedAST, t, set, a, b, caseInsensitive, null);
 				}
 			}
 			else if ( t.getType()==ANTLRParser.LEXER_CHAR_SET ) {
@@ -567,28 +567,31 @@ public class LexerATNFactory extends ParserATNFactory {
 	}
 
 	private void checkCharAndAddToSet(GrammarAST ast, IntervalSet set, int c) {
-		checkRangeAndAddToSet(ast, ast, set, c, c, caseInsensitive, true);
+		checkRangeAndAddToSet(ast, ast, set, c, c, caseInsensitive, null);
 	}
 
 	private void checkRangeAndAddToSet(GrammarAST mainAst, IntervalSet set, int a, int b) {
-		checkRangeAndAddToSet(mainAst, mainAst, set, a, b, caseInsensitive, true);
+		checkRangeAndAddToSet(mainAst, mainAst, set, a, b, caseInsensitive, null);
 	}
 
-	private boolean checkRangeAndAddToSet(GrammarAST rootAst, GrammarAST ast, IntervalSet set, int a, int b, boolean caseInsensitive, boolean reportCollision) {
-		boolean charactersCollision = false;
-		RangeBorderCharactersData charactersData = RangeBorderCharactersData.getAndCheckCharactersData(a, b, g, ast);
+	private CharactersDataCheckStatus checkRangeAndAddToSet(GrammarAST rootAst, GrammarAST ast, IntervalSet set, int a, int b, boolean caseInsensitive, CharactersDataCheckStatus previousStatus) {
+		CharactersDataCheckStatus status;
+		RangeBorderCharactersData charactersData = RangeBorderCharactersData.getAndCheckCharactersData(a, b, g, ast,
+				previousStatus == null || !previousStatus.notImpliedCharacters);
 		if (caseInsensitive) {
+			status = new CharactersDataCheckStatus(false, charactersData.mixOfLowerAndUpperCharCase);
 			if (charactersData.isSingleRange()) {
-				checkRangeAndAddToSet(rootAst, ast, set, a, b, false, true);
+				status = checkRangeAndAddToSet(rootAst, ast, set, a, b, false, status);
 			}
 			else {
-				charactersCollision = checkRangeAndAddToSet(rootAst, ast, set, charactersData.lowerFrom, charactersData.lowerTo, false, true);
+				status = checkRangeAndAddToSet(rootAst, ast, set, charactersData.lowerFrom, charactersData.lowerTo, false, status);
 				// Don't report similar warning twice
-				checkRangeAndAddToSet(rootAst, ast, set, charactersData.upperFrom, charactersData.upperTo, false, !charactersCollision);
+				status = checkRangeAndAddToSet(rootAst, ast, set, charactersData.upperFrom, charactersData.upperTo, false, status);
 			}
 		}
 		else {
-			if (reportCollision) {
+			boolean charactersCollision = previousStatus != null && previousStatus.collision;
+			if (!charactersCollision) {
 				for (int i = a; i <= b; i++) {
 					if (set.contains(i)) {
 						String setText;
@@ -611,20 +614,22 @@ public class LexerATNFactory extends ParserATNFactory {
 							sb.replace(sb.length() - 3, sb.length(), "");
 							setText = sb.toString();
 						}
+						String charsString = a == b ? String.valueOf((char)a) : (char) a + "-" + (char) b;
 						g.tool.errMgr.grammarError(ErrorType.CHARACTERS_COLLISION_IN_SET, g.fileName, ast.getToken(),
-								(char) a + "-" + (char) b, setText);
+								charsString, setText);
 						charactersCollision = true;
 						break;
 					}
 				}
 			}
+			status = new CharactersDataCheckStatus(charactersCollision, charactersData.mixOfLowerAndUpperCharCase);
 			set.add(a, b);
 		}
-		return charactersCollision;
+		return status;
 	}
 
 	private Transition createTransition(ATNState target, int from, int to, CommonTree tree) {
-		RangeBorderCharactersData charactersData = RangeBorderCharactersData.getAndCheckCharactersData(from, to, g, tree);
+		RangeBorderCharactersData charactersData = RangeBorderCharactersData.getAndCheckCharactersData(from, to, g, tree, true);
 		if (caseInsensitive) {
 			if (charactersData.isSingleRange()) {
 				return CodePointTransitions.createWithCodePointRange(target, from, to);
