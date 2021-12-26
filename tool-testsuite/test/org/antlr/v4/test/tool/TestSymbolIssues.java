@@ -489,7 +489,8 @@ public class TestSymbolIssues extends BaseJavaToolTest {
 				"lexer grammar Test;\n" +
 				"TOKEN1: 'A'..'g';\n" +
 				"TOKEN2: [C-m];\n" +
-				"TOKEN3: [А-я]; // OK since range does not contain intermediate characters",
+				"TOKEN3: [А-я]; // OK since range does not contain intermediate characters\n" +
+				"TOKEN4: '\\u0100'..'\\u1fff'; // OK since range borders are unicode characters",
 
 				"warning(" + ErrorType.RANGE_PROBABLY_CONTAINS_NOT_IMPLIED_CHARACTERS.code + "): Test.g4:2:8: Range A..g probably contains not implied characters [\\]^_`. Both bounds should be defined in lower or UPPER case\n" +
 				"warning(" + ErrorType.RANGE_PROBABLY_CONTAINS_NOT_IMPLIED_CHARACTERS.code + "): Test.g4:3:8: Range C..m probably contains not implied characters [\\]^_`. Both bounds should be defined in lower or UPPER case\n"
