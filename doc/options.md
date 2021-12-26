@@ -81,9 +81,7 @@ Java target can use `contextSuperClass=org.antlr.v4.runtime.RuleContextWithAltNu
 
 ### `caseInsensitive`
 
-Ignore character case of input stream.
-
-The parser from the following grammar:
+As of 4.9.4, ANTLR supports case-insensitive lexers using a grammar option. For example, the parser from the following grammar:
 
 ```g4
 lexer grammar L;
@@ -99,14 +97,15 @@ RUSSIAN_TOKEN:   [а-я]+;
 WS:              [ ]+ -> skip;
 ```
 
-Matches the following sequence of words:
+matches words such as the following:
 
 ```
 abcXYZ äéöüßÄÉÖÜß àâæçÙÛÜŸ ćčđĐŠŽ àèéÌÒÙ áéÚÜ¡¿ αβγΧΨΩ абвЭЮЯ
 ```
 
-ANTLR considers only one-length chars in all cases.
-For instance, german lower `ß` is not treated as upper `ss` and vice versa.
+ANTLR considers only one-length chars in all cases. For instance, german lower `ß` is not treated as upper `ss` and vice versa.
+
+The mechanism works by automatically transforming grammar references to characters to there upper/lower case equivalent; e.g., `a` to `[aA]`. This means that you do not need to convert your input characters to uppercase--token text will be as it appears in the input stream.
 
 ## Rule Options
 
