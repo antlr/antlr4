@@ -330,6 +330,30 @@ public class TestParserInterpreter extends BaseJavaToolTest {
 		testInterp(lg, g, "e", "a+a*a", "(e (e a) + (e (e a) * (e a)))");
 	}
 
+	@Test public void testCaseInsensitiveTokensInParser() throws Exception {
+		LexerGrammar lg = new LexerGrammar(
+				"lexer grammar L;\n" +
+				"options { caseInsensitive = true; }\n" +
+				"NOT: 'not';\n" +
+				"AND: 'and';\n" +
+				"NEW: 'new';\n" +
+				"LB:  '(';\n" +
+				"RB:  ')';\n" +
+				"ID: [a-z_][a-z_0-9]*;\n" +
+				"WS: [ \\t\\n\\r]+ -> skip;");
+		Grammar g = new Grammar(
+				"parser grammar T;\n" +
+				"options { caseInsensitive = true; }\n" +
+				"e\n" +
+				"    : ID\n" +
+				"    | 'not' e\n" +
+				"    | e 'and' e\n" +
+				"    | 'new' ID '(' e ')'\n" +
+				"    ;", lg);
+
+		testInterp(lg, g, "e", "NEW Abc (Not a AND not B)", "(e NEW Abc ( (e (e Not (e a)) AND (e not (e B))) ))");
+	}
+
 	ParseTree testInterp(LexerGrammar lg, Grammar g,
 					String startRule, String input,
 					String expectedParseTree)

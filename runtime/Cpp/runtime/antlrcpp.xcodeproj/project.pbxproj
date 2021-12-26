@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		270C67F31CDB4F1E00116E17 /* antlrcpp_ios.h in Headers */ = {isa = PBXBuildFile; fileRef = 270C67F21CDB4F1E00116E17 /* antlrcpp_ios.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		270C69E01CDB536A00116E17 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 270C69DF1CDB536A00116E17 /* CoreFoundation.framework */; };
 		276566E01DA93BFB000869BE /* ParseTree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276566DF1DA93BFB000869BE /* ParseTree.cpp */; };
 		276566E11DA93BFB000869BE /* ParseTree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276566DF1DA93BFB000869BE /* ParseTree.cpp */; };
 		276566E21DA93BFB000869BE /* ParseTree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276566DF1DA93BFB000869BE /* ParseTree.cpp */; };
@@ -927,7 +926,6 @@
 		270C67F01CDB4F1E00116E17 /* antlr4_ios.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = antlr4_ios.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		270C67F21CDB4F1E00116E17 /* antlrcpp_ios.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = antlrcpp_ios.h; sourceTree = "<group>"; wrapsLines = 0; };
 		270C67F41CDB4F1E00116E17 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		270C69DF1CDB536A00116E17 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS9.3.sdk/System/Library/Frameworks/CoreFoundation.framework; sourceTree = DEVELOPER_DIR; };
 		276566DF1DA93BFB000869BE /* ParseTree.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParseTree.cpp; sourceTree = "<group>"; };
 		276E5C0C1CDB57AA003FF4B4 /* ANTLRErrorListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRErrorListener.h; sourceTree = "<group>"; wrapsLines = 0; };
 		276E5C0D1CDB57AA003FF4B4 /* ANTLRErrorStrategy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRErrorStrategy.h; sourceTree = "<group>"; };
@@ -1242,7 +1240,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				270C69E01CDB536A00116E17 /* CoreFoundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1618,7 +1615,6 @@
 		27874F221CCBB34200AF1C53 /* Linked Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				270C69DF1CDB536A00116E17 /* CoreFoundation.framework */,
 				27874F1D1CCB7A0700AF1C53 /* CoreFoundation.framework */,
 			);
 			name = "Linked Frameworks";
@@ -2737,9 +2733,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
@@ -2773,9 +2769,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
@@ -2809,9 +2805,9 @@
 		37C1471F1B4D5A04008EDDDB /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				COMBINE_HIDPI_IMAGES = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -2832,9 +2828,9 @@
 		37C147201B4D5A04008EDDDB /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;

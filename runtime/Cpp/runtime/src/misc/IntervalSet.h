@@ -151,17 +151,9 @@ namespace misc {
     std::string toString() const;
     std::string toString(bool elemAreChar) const;
 
-    /**
-     * @deprecated Use {@link #toString(Vocabulary)} instead.
-     */
-    std::string toString(const std::vector<std::string> &tokenNames) const;
     std::string toString(const dfa::Vocabulary &vocabulary) const;
 
   protected:
-    /**
-     * @deprecated Use {@link #elementName(Vocabulary, int)} instead.
-     */
-    std::string elementName(const std::vector<std::string> &tokenNames, ssize_t a) const;
     std::string elementName(const dfa::Vocabulary &vocabulary, ssize_t a) const;
 
   public:

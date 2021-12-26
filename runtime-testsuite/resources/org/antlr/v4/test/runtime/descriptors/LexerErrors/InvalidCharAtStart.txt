@@ -1,0 +1,18 @@
+[type]
+Lexer
+
+[grammar]
+lexer grammar L;
+A : 'a' 'b' ;
+
+[input]
+x
+
+[output]
+"""[@0,1:0='<EOF>',<-1>,1:1]
+"""
+
+[errors]
+"""line 1:0 token recognition error at: 'x'
+"""
+

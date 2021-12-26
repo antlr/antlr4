@@ -224,6 +224,13 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	public void grammarOption(GrammarAST ID, GrammarAST valueAST) {
 		boolean ok = checkOptions(g.ast, ID.token, valueAST);
 		//if ( ok ) g.ast.setOption(ID.getText(), value);
+		if (ID.getText().equals("caseInsensitive")) {
+			String valueText = valueAST.getText();
+			if (!valueText.equals("true") && !valueText.equals("false")) {
+				g.tool.errMgr.grammarError(ErrorType.ILLEGAL_OPTION_VALUE, g.fileName, valueAST.getToken(),
+						ID.getText(), valueText);
+			}
+		}
 	}
 
 	@Override

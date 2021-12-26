@@ -1,0 +1,24 @@
+[type]
+Parser
+
+[grammar]
+grammar T;
+a : ID {
+<writeln("\"alt 1\"")>
+} | INT {
+<writeln("\"alt 2\"")>
+};
+ID : 'a'..'z'+ ;
+INT : '0'..'9'+;
+WS : (' '|'\\n') -> skip ;
+
+[start]
+a
+
+[input]
+34
+
+[output]
+"""alt 2
+"""
+

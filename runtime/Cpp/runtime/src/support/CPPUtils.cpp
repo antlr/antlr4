@@ -49,15 +49,12 @@ namespace antlrcpp {
             result += "\u00B7";
             break;
           }
-          // else fall through
-#ifndef _MSC_VER
-#if __has_cpp_attribute(clang::fallthrough)
-          [[clang::fallthrough]];
-#endif
-#endif
+          result += c;
+          break;
 
         default:
           result += c;
+          break;
       }
     }
 
@@ -205,24 +202,6 @@ namespace antlrcpp {
 
     result += std::string(nestCount, ')');
     return result;
-  }
-
-  //----------------- SingleWriteMultipleRead --------------------------------------------------------------------------
-
-  void SingleWriteMultipleReadLock::readLock() {
-    _mutex.lock_shared();
-  }
-
-  void SingleWriteMultipleReadLock::readUnlock() {
-    _mutex.unlock_shared();
-  }
-
-  void SingleWriteMultipleReadLock::writeLock() {
-    _mutex.lock();
-  }
-
-  void SingleWriteMultipleReadLock::writeUnlock() {
-    _mutex.unlock();
   }
 
 } // namespace antlrcpp

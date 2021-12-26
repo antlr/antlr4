@@ -9,7 +9,7 @@
 class  XPathLexer : public antlr4::Lexer {
 public:
   enum {
-    TOKEN_REF = 1, RULE_REF = 2, ANYWHERE = 3, ROOT = 4, WILDCARD = 5, BANG = 6, 
+    TOKEN_REF = 1, RULE_REF = 2, ANYWHERE = 3, ROOT = 4, WILDCARD = 5, BANG = 6,
     ID = 7, STRING = 8
   };
 
@@ -21,7 +21,6 @@ public:
 
   virtual const std::vector<std::string>& getChannelNames() const override;
   virtual const std::vector<std::string>& getModeNames() const override;
-  virtual const std::vector<std::string>& getTokenNames() const override; // deprecated, use vocabulary instead
   virtual antlr4::dfa::Vocabulary& getVocabulary() const override;
 
   virtual const std::vector<uint16_t> getSerializedATN() const override;
@@ -32,7 +31,6 @@ private:
   static std::vector<antlr4::dfa::DFA> _decisionToDFA;
   static antlr4::atn::PredictionContextCache _sharedContextCache;
   static std::vector<std::string> _ruleNames;
-  static std::vector<std::string> _tokenNames;
   static std::vector<std::string> _channelNames;
   static std::vector<std::string> _modeNames;
 

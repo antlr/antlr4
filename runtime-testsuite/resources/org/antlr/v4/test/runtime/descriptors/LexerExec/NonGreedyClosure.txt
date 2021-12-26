@@ -1,0 +1,17 @@
+[type]
+Lexer
+
+[grammar]
+lexer grammar L;
+CMT : '//' .*? '\n' CMT*?;
+WS : (' '|'\t')+;
+
+[input]
+//blah
+//blah
+
+[output]
+[@0,0:6='//blah\n',<1>,1:0]
+[@1,7:13='//blah\n',<1>,2:0]
+[@2,14:13='<EOF>',<-1>,3:0]
+

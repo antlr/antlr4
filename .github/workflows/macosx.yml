@@ -14,7 +14,7 @@ jobs:
       matrix:
 #        TARGET: [swift, cpp, dotnet] disabling dotnet which is unstable on M1
         TARGET: [swift, cpp]
-        GROUP: [LEXER, PARSER, RECURSION]
+        GROUP: [LEXER, PARSER1, PARSER2, RECURSION]
     steps:
     - uses: actions/checkout@v2
     - name: Set up JDK 1.8
@@ -24,7 +24,7 @@ jobs:
     - name: Set up Maven
       uses: stCarolas/setup-maven@v4
       with:
-        maven-version: 3.5.4    
+        maven-version: 3.8.4
     - name: Build tool with Maven
       run: mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
     - name: Test with Maven

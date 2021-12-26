@@ -8,13 +8,12 @@ package org.antlr.v4.test.runtime.swift;
 
 import org.antlr.v4.test.runtime.BaseRuntimeTest;
 import org.antlr.v4.test.runtime.RuntimeTestDescriptor;
-import org.antlr.v4.test.runtime.category.ParserTests;
-import org.antlr.v4.test.runtime.descriptors.SemPredEvalParserDescriptors;
+import org.antlr.v4.test.runtime.category.ParserTestsGroup2;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-@Category(ParserTests.class)
+@Category(ParserTestsGroup2.class)
 @RunWith(Parameterized.class)
 public class TestSemPredEvalParser extends BaseRuntimeTest {
 	public TestSemPredEvalParser(RuntimeTestDescriptor descriptor) {
@@ -23,7 +22,7 @@ public class TestSemPredEvalParser extends BaseRuntimeTest {
 
 	@Parameterized.Parameters(name="{0}")
 	public static RuntimeTestDescriptor[] getAllTestDescriptors() {
-		return BaseRuntimeTest.getRuntimeTestDescriptors(SemPredEvalParserDescriptors.class, "Swift");
+		return BaseRuntimeTest.getRuntimeTestDescriptors("SemPredEvalParser", "Swift");
 	}
 }
 

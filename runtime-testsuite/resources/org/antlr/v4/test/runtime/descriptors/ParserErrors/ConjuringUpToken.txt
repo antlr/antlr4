@@ -1,0 +1,21 @@
+[type]
+Parser
+
+[grammar]
+grammar T;
+a : 'a' x='b' {<Append("\"conjured=\"","$x"):writeln()>} 'c' ;
+
+[start]
+a
+
+[input]
+ac
+
+[output]
+"""conjured=[@-1,-1:-1='<missing 'b'>',<2>,1:1]
+"""
+
+[errors]
+"""line 1:1 missing 'b' at 'c'
+"""
+

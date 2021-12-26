@@ -1,0 +1,20 @@
+[type]
+Parser
+
+[grammar]
+grammar T;
+a : 'a'+ 'b'
+  | 'a'+ 'c'
+;
+q : 'e' ;
+
+[start]
+a
+
+[input]
+aaae
+
+[errors]
+"""line 1:3 no viable alternative at input 'aaae'
+"""
+

@@ -1,0 +1,34 @@
+[type]
+Parser
+
+[grammar]
+grammar T;
+s
+@init {<LL_EXACT_AMBIG_DETECTION()>}
+@after {<DumpDFA()>}
+   : '{' stat* '}' ;
+stat: 'if' ID 'then' stat ('else' ID)?
+       | 'return'
+       ;
+ID : 'a'..'z'+ ;
+WS : (' '|'\t'|'\n')+ -> skip ;
+
+[start]
+s
+
+[input]
+{ if x then if y then return else foo else bar }
+
+[output]
+Decision 1:
+s0-'else'->:s1^=>1
+
+[errors]
+line 1:29 reportAttemptingFullContext d=1 (stat), input='else'
+line 1:38 reportContextSensitivity d=1 (stat), input='elsefooelse'
+line 1:38 reportAttemptingFullContext d=1 (stat), input='else'
+line 1:38 reportContextSensitivity d=1 (stat), input='else'
+
+[flags]
+showDiagnosticErrors
+

@@ -1089,6 +1089,25 @@ public enum ErrorType {
 			"One of the token <arg> values unreachable. <arg2> is always overlapped by token <arg3>",
 			ErrorSeverity.WARNING),
 
+	/**
+	 * <p>Range probably contains not implied characters. Both bounds should be defined in lower or UPPER case
+	 * For instance, the range [A-z] (ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxy)
+	 * probably contains not implied characters: [\]^_`
+	 *
+	 * Use the following definition: [A-Za-z]
+	 * If the characters are implied, include them explicitly: [A-Za-z[\\\]^_`]
+	 * </p>
+	 *
+	 * <pre>
+	 * TOKEN: [A-z]; // warning
+	 * </pre>
+	 */
+	RANGE_PROBABLY_CONTAINS_NOT_IMPLIED_CHARACTERS(
+			185,
+			"Range <arg>..<arg2> probably contains not implied characters <arg3>. Both bounds should be defined in lower or UPPER case",
+			ErrorSeverity.WARNING
+	),
+
 	/*
 	 * Backward incompatibility errors
 	 */

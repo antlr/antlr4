@@ -13,20 +13,10 @@
 using namespace antlr4::dfa;
 using namespace antlr4::atn;
 
-DFAState::PredPrediction::PredPrediction(const Ref<SemanticContext> &pred, int alt) : pred(pred) {
-  InitializeInstanceFields();
-  this->alt = alt;
-}
+DFAState::PredPrediction::PredPrediction(Ref<SemanticContext> pred, int alt) : pred(std::move(pred)), alt(alt) {}
 
-DFAState::PredPrediction::~PredPrediction() {
-}
-
-std::string DFAState::PredPrediction::toString() {
+std::string DFAState::PredPrediction::toString() const {
   return std::string("(") + pred->toString() + ", " + std::to_string(alt) + ")";
-}
-
-void DFAState::PredPrediction::InitializeInstanceFields() {
-  alt = 0;
 }
 
 DFAState::DFAState() {
@@ -47,7 +37,7 @@ DFAState::~DFAState() {
   }
 }
 
-std::set<size_t> DFAState::getAltSet() {
+std::set<size_t> DFAState::getAltSet() const {
   std::set<size_t> alts;
   if (configs != nullptr) {
     for (size_t i = 0; i < configs->size(); i++) {
@@ -73,7 +63,7 @@ bool DFAState::operator == (const DFAState &o) const {
   return *configs == *o.configs;
 }
 
-std::string DFAState::toString() {
+std::string DFAState::toString() const {
   std::stringstream ss;
   ss << stateNumber;
   if (configs) {

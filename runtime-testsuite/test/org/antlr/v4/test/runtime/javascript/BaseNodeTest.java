@@ -126,7 +126,7 @@ public class BaseNodeTest extends BaseRuntimeTestSupport implements RuntimeTestS
 					out.println(newContent);
 				}
 			} catch (IOException e) {
-				fail("File not found: " + path.toString());
+				fail("File not found: " + path);
 			}
 		}
 

@@ -1,0 +1,25 @@
+[notes]
+This is a regression test for antlr/antlr4#224: "Parentheses without
+quantifier in lexer rules have unclear effect".
+https://github.com/antlr/antlr4/issues/224
+
+[type]
+Lexer
+
+[grammar]
+lexer grammar L;
+START_BLOCK: '-.-.-';
+ID : (LETTER SEPARATOR) (LETTER SEPARATOR)+;
+fragment LETTER: L_A|L_K;
+fragment L_A: '.-';
+fragment L_K: '-.-';
+SEPARATOR: '!';
+
+[input]
+-.-.-!
+
+[output]
+[@0,0:4='-.-.-',<1>,1:0]
+[@1,5:5='!',<3>,1:5]
+[@2,6:5='<EOF>',<-1>,1:6]
+

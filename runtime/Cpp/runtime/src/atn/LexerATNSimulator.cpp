@@ -80,9 +80,9 @@ size_t LexerATNSimulator::match(CharStream *input, size_t mode) {
   _startIndex = input->index();
   _prevAccept.reset();
   const dfa::DFA &dfa = _decisionToDFA[mode];
-  _stateLock.readLock();
+  _stateLock.lock_shared();
   dfa::DFAState* s0 = dfa.s0;
-  _stateLock.readUnlock();
+  _stateLock.unlock_shared();
   if (s0 == nullptr) {
     return matchATN(input);
   } else {
@@ -182,7 +182,7 @@ size_t LexerATNSimulator::execATN(CharStream *input, dfa::DFAState *ds0) {
 
 dfa::DFAState *LexerATNSimulator::getExistingTargetState(dfa::DFAState *s, size_t t) {
   dfa::DFAState* retval = nullptr;
-  _edgeLock.readLock();
+  _edgeLock.lock_shared();
   if (t <= MAX_DFA_EDGE) {
     auto iterator = s->edges.find(t - MIN_DFA_EDGE);
 #if DEBUG_ATN == 1
@@ -194,7 +194,7 @@ dfa::DFAState *LexerATNSimulator::getExistingTargetState(dfa::DFAState *s, size_
     if (iterator != s->edges.end())
       retval = iterator->second;
   }
-  _edgeLock.readUnlock();
+  _edgeLock.unlock_shared();
   return retval;
 }
 
@@ -209,9 +209,9 @@ dfa::DFAState *LexerATNSimulator::computeTargetState(CharStream *input, dfa::DFA
     if (!reach->hasSemanticContext) {
       // we got nowhere on t, don't throw out this knowledge; it'd
       // cause a failover from DFA later.
-      delete reach;
       addDFAEdge(s, t, ERROR.get());
     }
+    delete reach;
 
     // stop when we can't match any more char
     return ERROR.get();
@@ -530,9 +530,9 @@ void LexerATNSimulator::addDFAEdge(dfa::DFAState *p, size_t t, dfa::DFAState *q)
     return;
   }
 
-  _edgeLock.writeLock();
+  _edgeLock.lock();
   p->edges[t - MIN_DFA_EDGE] = q; // connect
-  _edgeLock.writeUnlock();
+  _edgeLock.unlock();
 }
 
 dfa::DFAState *LexerATNSimulator::addDFAState(ATNConfigSet *configs) {
@@ -562,7 +562,7 @@ dfa::DFAState *LexerATNSimulator::addDFAState(ATNConfigSet *configs, bool suppre
 
   dfa::DFA &dfa = _decisionToDFA[_mode];
 
-  _stateLock.writeLock();
+  _stateLock.lock();
   if (!dfa.states.empty()) {
     auto iterator = dfa.states.find(proposed);
     if (iterator != dfa.states.end()) {
@@ -570,7 +570,7 @@ dfa::DFAState *LexerATNSimulator::addDFAState(ATNConfigSet *configs, bool suppre
       if (!suppressEdge) {
         _decisionToDFA[_mode].s0 = *iterator;
       }
-      _stateLock.writeUnlock();
+      _stateLock.unlock();
       return *iterator;
     }
   }
@@ -582,7 +582,7 @@ dfa::DFAState *LexerATNSimulator::addDFAState(ATNConfigSet *configs, bool suppre
   if (!suppressEdge) {
     _decisionToDFA[_mode].s0 = proposed;
   }
-  _stateLock.writeUnlock();
+  _stateLock.unlock();
 
   return proposed;
 }

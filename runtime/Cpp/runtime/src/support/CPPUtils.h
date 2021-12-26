@@ -64,15 +64,4 @@ namespace antlrcpp {
   // Get the error text from an exception pointer or the current exception.
   std::string what(std::exception_ptr eptr = std::current_exception());
 
-  class SingleWriteMultipleReadLock {
-  public:
-    void readLock();
-    void readUnlock();
-    void writeLock();
-    void writeUnlock();
-
-  private:
-    std::shared_mutex _mutex;
-  };
-
 } // namespace antlrcpp
