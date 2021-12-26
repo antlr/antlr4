@@ -44,6 +44,8 @@ public class RangeBorderCharactersData {
 	}
 
 	public boolean isSingleRange() {
-		return lowerFrom == upperFrom && lowerTo == upperTo || mixOfLowerAndUpperCharCase;
+		return lowerFrom == upperFrom && lowerTo == upperTo ||
+				mixOfLowerAndUpperCharCase ||
+				lowerTo - lowerFrom != upperTo - upperFrom;
 	}
 }

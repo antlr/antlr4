@@ -419,6 +419,24 @@ public class TestSymbolIssues extends BaseJavaToolTest {
 		testErrors(test, false);
 	}
 
+	@Test public void testCaseInsensitiveWithUnicodeRanges() {
+		String[] test = {
+				"lexer grammar L;\n" +
+				"options { caseInsensitive=true; }\n" +
+				"FullWidthLetter\n" +
+				"    : '\\u00c0'..'\\u00d6' // ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ\n" +
+				"    | '\\u00f8'..'\\u00ff' // øùúûüýþÿ\n" +
+				"    ;",
+
+				""
+		};
+
+		// Don't transform øùúûüýþÿ to uppercase
+		// ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿĀāĂăĄąĆćĈĉĊċČčĎďĐđĒēĔĕĖėĘęĚěĜĝĞğĠġĢģĤĥĦħĨĩĪīĬĭĮįİıĲĳĴĵĶķĸĹĺĻļĽľĿŀŁłŃńŅņŇňŉŊŋŌōŎŏŐőŒœŔŕŖŗŘřŚśŜŝŞşŠšŢţŤťŦŧŨũŪūŬŭŮůŰűŲųŴŵŶŷŸ
+		// because of different length of lower and UPPER range
+		testErrors(test, false);
+	}
+
 	@Test public void testUnreachableTokens() {
 		String[] test = {
 				"lexer grammar Test;\n" +
