@@ -394,7 +394,7 @@ public class TestSymbolIssues extends BaseJavaToolTest {
 
 				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4:2:18: chars a-f used multiple times in set [aa-f]\n" +
 				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4:3:18: chars D-J used multiple times in set [A-FD-J]\n" +
-				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4:4:13: chars O-V used multiple times in set 'Z' | 'K'..'R' | 'O'..'V'\n" +
+				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4:4:38: chars O-V used multiple times in set 'Z' | 'K'..'R' | 'O'..'V'\n" +
 				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4::: chars 'g' used multiple times in set 'g'..'l'\n" +
 				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4::: chars '\\n' used multiple times in set '\\n'..'\\r'\n"
 		};
@@ -411,13 +411,29 @@ public class TestSymbolIssues extends BaseJavaToolTest {
 				"TOKEN_RANGE_3:    'm'..'q' | [M-Q];\n",
 
 				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4:3:18: chars a-f used multiple times in set [a-fA-F0-9]\n" +
-				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4:3:18: chars A-F used multiple times in set [a-fA-F0-9]\n" +
-				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4:4:13: chars g-l used multiple times in set 'g'..'l' | 'G'..'L'\n" +
-				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4:4:13: chars G-L used multiple times in set 'g'..'l' | 'G'..'L'\n" +
+				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4:4:32: chars g-l used multiple times in set 'g'..'l' | 'G'..'L'\n" +
 				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4::: chars 'M' used multiple times in set 'M'..'Q' | 'm'..'q'\n" +
 				"warning(" + ErrorType.CHARACTERS_COLLISION_IN_SET.code + "): L.g4::: chars 'm' used multiple times in set 'M'..'Q' | 'm'..'q'\n"
 		};
 
+		testErrors(test, false);
+	}
+
+	@Test public void testCaseInsensitiveWithUnicodeRanges() {
+		String[] test = {
+				"lexer grammar L;\n" +
+				"options { caseInsensitive=true; }\n" +
+				"FullWidthLetter\n" +
+				"    : '\\u00c0'..'\\u00d6' // ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ\n" +
+				"    | '\\u00f8'..'\\u00ff' // øùúûüýþÿ\n" +
+				"    ;",
+
+				""
+		};
+
+		// Don't transform øùúûüýþÿ to uppercase
+		// ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿĀāĂăĄąĆćĈĉĊċČčĎďĐđĒēĔĕĖėĘęĚěĜĝĞğĠġĢģĤĥĦħĨĩĪīĬĭĮįİıĲĳĴĵĶķĸĹĺĻļĽľĿŀŁłŃńŅņŇňŉŊŋŌōŎŏŐőŒœŔŕŖŗŘřŚśŜŝŞşŠšŢţŤťŦŧŨũŪūŬŭŮůŰűŲųŴŵŶŷŸ
+		// because of different length of lower and UPPER range
 		testErrors(test, false);
 	}
 
@@ -473,10 +489,23 @@ public class TestSymbolIssues extends BaseJavaToolTest {
 				"lexer grammar Test;\n" +
 				"TOKEN1: 'A'..'g';\n" +
 				"TOKEN2: [C-m];\n" +
-				"TOKEN3: [А-я]; // OK since range does not contain intermediate characters",
+				"TOKEN3: [А-я]; // OK since range does not contain intermediate characters\n" +
+				"TOKEN4: '\\u0100'..'\\u1fff'; // OK since range borders are unicode characters",
 
 				"warning(" + ErrorType.RANGE_PROBABLY_CONTAINS_NOT_IMPLIED_CHARACTERS.code + "): Test.g4:2:8: Range A..g probably contains not implied characters [\\]^_`. Both bounds should be defined in lower or UPPER case\n" +
 				"warning(" + ErrorType.RANGE_PROBABLY_CONTAINS_NOT_IMPLIED_CHARACTERS.code + "): Test.g4:3:8: Range C..m probably contains not implied characters [\\]^_`. Both bounds should be defined in lower or UPPER case\n"
+		};
+
+		testErrors(test, false);
+	}
+
+	@Test public void testNotImpliedCharactersWithCaseInsensitiveOption() {
+		String[] test = {
+				"lexer grammar Test;\n" +
+				"options { caseInsensitive=true; }\n" +
+				"TOKEN: [A-z];",
+
+				"warning(" + ErrorType.RANGE_PROBABLY_CONTAINS_NOT_IMPLIED_CHARACTERS.code + "): Test.g4:3:7: Range A..z probably contains not implied characters [\\]^_`. Both bounds should be defined in lower or UPPER case\n"
 		};
 
 		testErrors(test, false);
