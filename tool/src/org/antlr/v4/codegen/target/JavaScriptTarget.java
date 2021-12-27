@@ -87,14 +87,6 @@ public class JavaScriptTarget extends Target {
 	}
 
 	@Override
-	public int getSerializedATNSegmentLimit() {
-		// 65535 is the class file format byte limit for a UTF-8 encoded string literal
-		// 3 is the maximum number of bytes it takes to encode a value in the range 0-0xFFFF
-		// (Mimicking Java here; not sure of true limit)
-		return 65535 / 3;
-	}
-
-	@Override
 	public int getInlineTestSetWordSize() {
 		return 32;
 	}

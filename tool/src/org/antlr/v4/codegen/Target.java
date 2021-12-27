@@ -457,7 +457,10 @@ public abstract class Target {
 	 * @return the serialized ATN segment limit
 	 */
 	public int getSerializedATNSegmentLimit() {
-		return Integer.MAX_VALUE;
+		// Make strings encoding ATN fit on a single line conveniently so
+		// we can march through generated code more easily.  Only Java has
+		// an actual string len limit (16 bits).
+		return 80;
 	}
 
 	/** How many bits should be used to do inline token type tests? Java assumes
