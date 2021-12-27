@@ -56,7 +56,7 @@ public abstract class Target {
 		this.gen = gen;
 	}
 
-	protected abstract Language getLanguage();
+	protected abstract String getLanguage();
 
 	public CodeGenerator getCodeGenerator() {
 		return gen;
@@ -78,7 +78,7 @@ public abstract class Target {
 			if ( version==null ||
 				 !RuntimeMetaData.getMajorMinorVersion(version).equals(RuntimeMetaData.getMajorMinorVersion(Tool.VERSION)))
 			{
-				gen.tool.errMgr.toolError(ErrorType.INCOMPATIBLE_TOOL_AND_TEMPLATES, version, Tool.VERSION, getLanguage().name());
+				gen.tool.errMgr.toolError(ErrorType.INCOMPATIBLE_TOOL_AND_TEMPLATES, version, Tool.VERSION, getLanguage());
 			}
 			templates = loadTemplates();
 		}
@@ -152,7 +152,7 @@ public abstract class Target {
 				buf.append(targetCharValueEscape[c]);
 			}
 			else if (shouldUseUnicodeEscapeForCodePointInDoubleQuotedString(c)) {
-				appendUnicodeEscapedCodePoint(i, buf, false);
+				appendUnicodeEscapedCodePoint(i, buf);
 			}
 			else
 			{
@@ -166,14 +166,18 @@ public abstract class Target {
 		return buf.toString();
 	}
 
-	/**
-	 * Escape the Unicode code point appropriately for this language
-	 * and append the escaped value to {@code sb}.
-	 */
 	protected void appendUnicodeEscapedCodePoint(int codePoint, StringBuilder sb, boolean escape) {
 		if (escape) {
 			sb.append("\\");
 		}
+		appendUnicodeEscapedCodePoint(codePoint, sb);
+	}
+
+	/**
+	 * Escape the Unicode code point appropriately for this language
+	 * and append the escaped value to {@code sb}.
+	 */
+	protected void appendUnicodeEscapedCodePoint(int codePoint, StringBuilder sb) {
 		UnicodeEscapes.appendEscapedCodePoint(sb, codePoint, getLanguage());
 	}
 
@@ -508,7 +512,7 @@ public abstract class Target {
 	protected abstract boolean visibleGrammarSymbolCausesIssueInGeneratedCode(GrammarAST idNode);
 
 	protected STGroup loadTemplates() {
-		String targetName = getLanguage().name();
+		String targetName = getLanguage();
 		String groupFileName = CodeGenerator.TEMPLATE_ROOT + "/" + targetName + "/" + targetName + STGroup.GROUP_FILE_EXTENSION;
 		STGroup result = null;
 		try {

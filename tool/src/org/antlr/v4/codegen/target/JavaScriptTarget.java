@@ -7,7 +7,6 @@
 package org.antlr.v4.codegen.target;
 
 import org.antlr.v4.codegen.CodeGenerator;
-import org.antlr.v4.codegen.Language;
 import org.antlr.v4.codegen.Target;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.stringtemplate.v4.STGroup;
@@ -23,6 +22,7 @@ import java.util.Set;
  * @author Eric Vergnaud
  */
 public class JavaScriptTarget extends Target {
+	public final static String key = "JavaScript";
 
 	/** Source: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Lexical_grammar */
 	protected static final String[] javaScriptKeywords = {
@@ -50,8 +50,8 @@ public class JavaScriptTarget extends Target {
 	}
 
 	@Override
-	protected Language getLanguage() {
-		return Language.JavaScript;
+	protected String getLanguage() {
+		return key;
 	}
 
     @Override

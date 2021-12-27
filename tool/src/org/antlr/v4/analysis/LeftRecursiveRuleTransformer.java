@@ -12,7 +12,6 @@ import org.antlr.runtime.ParserRuleReturnScope;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.Token;
 import org.antlr.v4.Tool;
-import org.antlr.v4.codegen.Language;
 import org.antlr.v4.misc.OrderedHashMap;
 import org.antlr.v4.parse.ANTLRLexer;
 import org.antlr.v4.parse.ANTLRParser;
@@ -63,7 +62,7 @@ public class LeftRecursiveRuleTransformer {
 	}
 
 	public void translateLeftRecursiveRules() {
-		Language language = g.getLanguage();
+		String language = g.getLanguage();
 		// translate all recursive rules
 		List<String> leftRecursiveRuleNames = new ArrayList<String>();
 		for (Rule r : rules) {
@@ -94,7 +93,7 @@ public class LeftRecursiveRuleTransformer {
 	/** Return true if successful */
 	public boolean translateLeftRecursiveRule(GrammarRootAST ast,
 											  LeftRecursiveRule r,
-											  Language language)
+											  String language)
 	{
 		//tool.log("grammar", ruleAST.toStringTree());
 		GrammarAST prevRuleAST = r.ast;

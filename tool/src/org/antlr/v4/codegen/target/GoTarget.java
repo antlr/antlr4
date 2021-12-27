@@ -7,7 +7,6 @@
 package org.antlr.v4.codegen.target;
 
 import org.antlr.v4.codegen.CodeGenerator;
-import org.antlr.v4.codegen.Language;
 import org.antlr.v4.codegen.Target;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.tool.Grammar;
@@ -30,6 +29,7 @@ import java.util.Set;
  *
  * */
 public class GoTarget extends Target {
+	public final static String key = "Go";
 
 	private static final String[] goKeywords = {
 			"break", "default", "func", "interface", "select",
@@ -70,8 +70,8 @@ public class GoTarget extends Target {
 	}
 
 	@Override
-	protected Language getLanguage() {
-		return Language.Go;
+	protected String getLanguage() {
+		return key;
 	}
 
 	@Override

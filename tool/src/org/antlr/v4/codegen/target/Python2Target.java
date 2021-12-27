@@ -7,7 +7,6 @@
 package org.antlr.v4.codegen.target;
 
 import org.antlr.v4.codegen.CodeGenerator;
-import org.antlr.v4.codegen.Language;
 import org.antlr.v4.codegen.Target;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.stringtemplate.v4.STGroup;
@@ -23,6 +22,8 @@ import java.util.Set;
  * @author Eric Vergnaud
  */
 public class Python2Target extends Target {
+	public final static String key = "Python2";
+
 	protected static final String[] python2Keywords = {
 		"abs", "all", "and", "any", "apply", "as", "assert",
 		"bin", "bool", "break", "buffer", "bytearray",
@@ -59,8 +60,8 @@ public class Python2Target extends Target {
 	}
 
 	@Override
-	protected Language getLanguage() {
-		return Language.Python2;
+	protected String getLanguage() {
+		return key;
 	}
 
 	@Override

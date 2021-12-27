@@ -380,17 +380,16 @@ public class Tool {
 		SemanticPipeline sem = new SemanticPipeline(g);
 		sem.process();
 
-		String language = g.getOptionString("language");
-		if ( !Grammar.targetExists(language) ) {
-			errMgr.toolError(ErrorType.CANNOT_CREATE_TARGET_GENERATOR, language);
+		if ( errMgr.getNumErrors()>prevErrors ) return;
+
+		CodeGenerator codeGenerator = CodeGenerator.createCodeGenerator(g);
+		if (codeGenerator == null) {
 			return;
 		}
 
-		if ( errMgr.getNumErrors()>prevErrors ) return;
-
 		// BUILD ATN FROM AST
 		ATNFactory factory;
-		if ( g.isLexer() ) factory = new LexerATNFactory((LexerGrammar)g);
+		if ( g.isLexer() ) factory = new LexerATNFactory((LexerGrammar)g, codeGenerator);
 		else factory = new ParserATNFactory(g);
 		g.atn = factory.createATN();
 
@@ -408,7 +407,7 @@ public class Tool {
 
 		// GENERATE CODE
 		if ( gencode ) {
-			CodeGenPipeline gen = new CodeGenPipeline(g);
+			CodeGenPipeline gen = new CodeGenPipeline(g, codeGenerator);
 			gen.process();
 		}
 	}

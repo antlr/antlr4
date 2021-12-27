@@ -9,7 +9,6 @@ package org.antlr.v4.tool;
 import org.antlr.v4.Tool;
 import org.antlr.v4.analysis.LeftRecursiveRuleTransformer;
 import org.antlr.v4.automata.ParserATNFactory;
-import org.antlr.v4.codegen.Language;
 import org.antlr.v4.misc.CharSupport;
 import org.antlr.v4.misc.OrderedHashMap;
 import org.antlr.v4.misc.Utils;
@@ -888,7 +887,7 @@ public class Grammar implements AttributeResolver {
 	public int getMaxCharValue() {
 		return org.antlr.v4.runtime.Lexer.MAX_CHAR_VALUE;
 //		if ( generator!=null ) {
-//			return generator.target.getMaxCharValue(generator);
+//			return generator.getTarget().getMaxCharValue(generator);
 //		}
 //		else {
 //			return Label.MAX_CHAR_VALUE;
@@ -1167,21 +1166,8 @@ public class Grammar implements AttributeResolver {
         }
 	}
 
-	public Language getLanguage() {
-		return parseLanguage(getOptionString("language"));
-	}
-
-	public static boolean targetExists(String language) {
-		return parseLanguage(language) != null;
-	}
-
-	public static Language parseLanguage(String language) {
-		try {
-			return Language.valueOf(language);
-		}
-		catch (Exception e) {
-		}
-		return null;
+	public String getLanguage() {
+		return getOptionString("language");
 	}
 
 	public String getOptionString(String key) { return ast.getOptionString(key); }

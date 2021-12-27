@@ -16,16 +16,15 @@ import org.stringtemplate.v4.gui.STViz;
 import java.util.List;
 
 public class CodeGenPipeline {
-	Grammar g;
+	final Grammar g;
+	final CodeGenerator gen;
 
-	public CodeGenPipeline(Grammar g) {
+	public CodeGenPipeline(Grammar g, CodeGenerator gen) {
 		this.g = g;
+		this.gen = gen;
 	}
 
 	public void process() {
-		if (g.getLanguage() == null) return;
-
-		CodeGenerator gen = new CodeGenerator(g);
 		IntervalSet idTypes = new IntervalSet();
 		idTypes.add(ANTLRParser.ID);
 		idTypes.add(ANTLRParser.RULE_REF);

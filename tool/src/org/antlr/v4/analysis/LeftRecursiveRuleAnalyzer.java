@@ -13,7 +13,6 @@ import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.antlr.runtime.tree.Tree;
 import org.antlr.v4.Tool;
 import org.antlr.v4.codegen.CodeGenerator;
-import org.antlr.v4.codegen.Language;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.GrammarASTAdaptor;
 import org.antlr.v4.parse.LeftRecursiveRuleWalker;
@@ -58,12 +57,12 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 
 	public STGroup recRuleTemplates;
 	public STGroup codegenTemplates;
-	public Language language;
+	public String language;
 
 	public Map<Integer, ASSOC> altAssociativity = new HashMap<Integer, ASSOC>();
 
 	public LeftRecursiveRuleAnalyzer(GrammarAST ruleAST,
-									 Tool tool, String ruleName, Language language)
+									 Tool tool, String ruleName, String language)
 	{
 		super(new CommonTreeNodeStream(new GrammarASTAdaptor(ruleAST.token.getInputStream()), ruleAST));
 		this.tool = tool;
@@ -85,8 +84,7 @@ public class LeftRecursiveRuleAnalyzer extends LeftRecursiveRuleWalker {
 		}
 
 		// use codegen to get correct language templates; that's it though
-		CodeGenerator gen = new CodeGenerator(tool, null, language);
-		codegenTemplates = gen.getTemplates();
+		codegenTemplates = CodeGenerator.createCodeGenerator(tool, null, language).getTemplates();
 	}
 
 	@Override

@@ -7,7 +7,6 @@
 package org.antlr.v4.codegen.target;
 
 import org.antlr.v4.codegen.CodeGenerator;
-import org.antlr.v4.codegen.Language;
 import org.antlr.v4.codegen.Target;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.atn.ATN;
@@ -58,6 +57,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class SwiftTarget extends Target {
+	public final static String key = "Swift";
 
     /**
      * The Swift target can cache the code generation templates.
@@ -87,9 +87,7 @@ public class SwiftTarget extends Target {
     }
 
 	@Override
-	protected Language getLanguage() {
-		return Language.Swift;
-	}
+	protected String getLanguage() { return key; }
 
 	@Override
     public String getVersion() {

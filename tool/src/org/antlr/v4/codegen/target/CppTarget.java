@@ -7,7 +7,6 @@
 package org.antlr.v4.codegen.target;
 
 import org.antlr.v4.codegen.CodeGenerator;
-import org.antlr.v4.codegen.Language;
 import org.antlr.v4.codegen.Target;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.ast.GrammarAST;
@@ -23,6 +22,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class CppTarget extends Target {
+	public final static String key = "Cpp";
 
 	protected static final String[] cppKeywords = {
 		"alignas", "alignof", "and", "and_eq", "asm", "auto", "bitand",
@@ -51,9 +51,7 @@ public class CppTarget extends Target {
 	}
 
 	@Override
-	protected Language getLanguage() {
-		return Language.Cpp;
-	}
+	protected String getLanguage() { return key; }
 
 	public String getVersion() {
 		return "4.9.3";

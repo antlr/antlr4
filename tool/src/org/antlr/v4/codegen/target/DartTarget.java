@@ -8,7 +8,6 @@ package org.antlr.v4.codegen.target;
 
 import org.antlr.v4.Tool;
 import org.antlr.v4.codegen.CodeGenerator;
-import org.antlr.v4.codegen.Language;
 import org.antlr.v4.codegen.Target;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.stringtemplate.v4.STGroup;
@@ -19,6 +18,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class DartTarget extends Target {
+	public final static String key = "Dart";
 
 	/**
 	 * The Java target can cache the code generation templates.
@@ -53,8 +53,8 @@ public class DartTarget extends Target {
 	}
 
 	@Override
-	protected Language getLanguage() {
-		return Language.Dart;
+	protected String getLanguage() {
+		return key;
 	}
 
 	@Override

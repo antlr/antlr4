@@ -71,12 +71,15 @@ public class LexerATNFactory extends ParserATNFactory {
 	protected Map<LexerAction, Integer> actionToIndexMap = new HashMap<LexerAction, Integer>();
 
 	public LexerATNFactory(LexerGrammar g) {
+		this(g, null);
+	}
+
+	public LexerATNFactory(LexerGrammar g, CodeGenerator codeGenerator) {
 		super(g);
 		// use codegen to get correct language templates for lexer commands
 		String caseInsensitiveOption = g.getOptionString("caseInsensitive");
 		caseInsensitive = caseInsensitiveOption != null && caseInsensitiveOption.equals("true");
-		CodeGenerator gen = new CodeGenerator(g.tool, null, g.getLanguage());
-		codegenTemplates = gen.getTemplates();
+		codegenTemplates = (codeGenerator == null ? CodeGenerator.createCodeGenerator(g) : codeGenerator).getTemplates();
 	}
 
 	public static Set<String> getCommonConstants() {

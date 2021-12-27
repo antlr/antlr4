@@ -7,7 +7,6 @@
 package org.antlr.v4.codegen.target;
 
 import org.antlr.v4.codegen.CodeGenerator;
-import org.antlr.v4.codegen.Language;
 import org.antlr.v4.codegen.Target;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.stringtemplate.v4.STGroup;
@@ -18,6 +17,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class PHPTarget extends Target {
+	public final static String key = "PHP";
+
 	private static final String[] phpKeywords = {
 		"abstract", "and", "array", "as",
 		"break",
@@ -52,8 +53,8 @@ public class PHPTarget extends Target {
 	}
 
 	@Override
-	protected Language getLanguage() {
-		return Language.PHP;
+	protected String getLanguage() {
+		return key;
 	}
 
 	@Override
