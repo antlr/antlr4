@@ -21,19 +21,6 @@ public class UnicodeEscapes {
 
 	public static void appendEscapedCodePoint(StringBuilder sb, int codePoint, String language) {
 		switch (language) {
-			case JavaTarget.key:
-			case JavaScriptTarget.key:
-			case DartTarget.key:
-				if (Character.isSupplementaryCodePoint(codePoint)) {
-					// char is not an 'integral' type, so we have to explicitly convert
-					// to int before passing to the %X formatter or else it throws.
-					sb.append(String.format("\\u%04X", (int)Character.highSurrogate(codePoint)));
-					sb.append(String.format("\\u%04X", (int)Character.lowSurrogate(codePoint)));
-				}
-				else {
-					sb.append(String.format("\\u%04X", codePoint));
-				}
-				break;
 			case CSharpTarget.key:
 			case Python2Target.key:
 			case Python3Target.key:
@@ -45,6 +32,20 @@ public class UnicodeEscapes {
 				break;
 			case SwiftTarget.key:
 				sb.append(String.format("\\u{%04X}", codePoint));
+				break;
+			case JavaTarget.key:
+			case JavaScriptTarget.key:
+			case DartTarget.key:
+			default:
+				if (Character.isSupplementaryCodePoint(codePoint)) {
+					// char is not an 'integral' type, so we have to explicitly convert
+					// to int before passing to the %X formatter or else it throws.
+					sb.append(String.format("\\u%04X", (int)Character.highSurrogate(codePoint)));
+					sb.append(String.format("\\u%04X", (int)Character.lowSurrogate(codePoint)));
+				}
+				else {
+					sb.append(String.format("\\u%04X", codePoint));
+				}
 				break;
 		}
 	}
