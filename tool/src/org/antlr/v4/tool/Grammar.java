@@ -9,7 +9,7 @@ package org.antlr.v4.tool;
 import org.antlr.v4.Tool;
 import org.antlr.v4.analysis.LeftRecursiveRuleTransformer;
 import org.antlr.v4.automata.ParserATNFactory;
-import org.antlr.v4.codegen.TargetType;
+import org.antlr.v4.codegen.Language;
 import org.antlr.v4.misc.CharSupport;
 import org.antlr.v4.misc.OrderedHashMap;
 import org.antlr.v4.misc.Utils;
@@ -1167,17 +1167,17 @@ public class Grammar implements AttributeResolver {
         }
 	}
 
-	public TargetType getTargetType() {
-		return languageToTargetType(getOptionString("language"));
+	public Language getLanguage() {
+		return parseLanguage(getOptionString("language"));
 	}
 
 	public static boolean targetExists(String language) {
-		return languageToTargetType(language) != null;
+		return parseLanguage(language) != null;
 	}
 
-	public static TargetType languageToTargetType(String language) {
+	public static Language parseLanguage(String language) {
 		try {
-			return TargetType.valueOf(language);
+			return Language.valueOf(language);
 		}
 		catch (Exception e) {
 		}

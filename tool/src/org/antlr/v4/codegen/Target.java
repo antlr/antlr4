@@ -56,7 +56,7 @@ public abstract class Target {
 		this.gen = gen;
 	}
 
-	protected abstract TargetType getTargetType();
+	protected abstract Language getLanguage();
 
 	public CodeGenerator getCodeGenerator() {
 		return gen;
@@ -78,7 +78,7 @@ public abstract class Target {
 			if ( version==null ||
 				 !RuntimeMetaData.getMajorMinorVersion(version).equals(RuntimeMetaData.getMajorMinorVersion(Tool.VERSION)))
 			{
-				gen.tool.errMgr.toolError(ErrorType.INCOMPATIBLE_TOOL_AND_TEMPLATES, version, Tool.VERSION, getTargetType().name());
+				gen.tool.errMgr.toolError(ErrorType.INCOMPATIBLE_TOOL_AND_TEMPLATES, version, Tool.VERSION, getLanguage().name());
 			}
 			templates = loadTemplates();
 		}
@@ -174,7 +174,7 @@ public abstract class Target {
 		if (escape) {
 			sb.append("\\");
 		}
-		UnicodeEscapes.appendEscapedCodePoint(sb, codePoint, getTargetType());
+		UnicodeEscapes.appendEscapedCodePoint(sb, codePoint, getLanguage());
 	}
 
 	public String getTargetStringLiteralFromString(String s) {
@@ -508,7 +508,7 @@ public abstract class Target {
 	protected abstract boolean visibleGrammarSymbolCausesIssueInGeneratedCode(GrammarAST idNode);
 
 	protected STGroup loadTemplates() {
-		String targetName = getTargetType().name();
+		String targetName = getLanguage().name();
 		String groupFileName = CodeGenerator.TEMPLATE_ROOT + "/" + targetName + "/" + targetName + STGroup.GROUP_FILE_EXTENSION;
 		STGroup result = null;
 		try {

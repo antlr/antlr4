@@ -2,7 +2,7 @@ package org.antlr.v4.misc;
 
 import org.antlr.runtime.Token;
 import org.antlr.v4.codegen.CodeGenerator;
-import org.antlr.v4.codegen.TargetType;
+import org.antlr.v4.codegen.Language;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.junit.Assert;
 import org.junit.Test;
@@ -131,7 +131,7 @@ public class UtilsTest {
 
 	@Test
 	public void testTargetTypeCorrespondsToTargetClass() {
-		for (TargetType value : TargetType.values()) {
+		for (Language value : Language.values()) {
 			CodeGenerator codeGenerator = new CodeGenerator(value);
 			Assert.assertNotNull(codeGenerator.getTarget());
 		}

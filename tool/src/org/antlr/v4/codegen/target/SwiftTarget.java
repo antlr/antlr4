@@ -7,8 +7,8 @@
 package org.antlr.v4.codegen.target;
 
 import org.antlr.v4.codegen.CodeGenerator;
+import org.antlr.v4.codegen.Language;
 import org.antlr.v4.codegen.Target;
-import org.antlr.v4.codegen.TargetType;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNDeserializer;
@@ -87,8 +87,8 @@ public class SwiftTarget extends Target {
     }
 
 	@Override
-	protected TargetType getTargetType() {
-		return TargetType.Swift;
+	protected Language getLanguage() {
+		return Language.Swift;
 	}
 
 	@Override

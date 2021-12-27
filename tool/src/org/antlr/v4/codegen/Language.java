@@ -1,6 +1,6 @@
 package org.antlr.v4.codegen;
 
-public enum TargetType {
+public enum Language {
 	Java("Java"),
 	CSharp("C#"),
 	Python2("Python2"),
@@ -12,7 +12,7 @@ public enum TargetType {
 	PHP("PHP"),
 	Dart("Dart");
 
-	TargetType(String name) {
+	Language(String name) {
 		this.languageName = name;
 	}
 

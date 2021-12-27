@@ -6,8 +6,8 @@
 package org.antlr.v4.codegen.target;
 
 import org.antlr.v4.codegen.CodeGenerator;
+import org.antlr.v4.codegen.Language;
 import org.antlr.v4.codegen.Target;
-import org.antlr.v4.codegen.TargetType;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.stringtemplate.v4.NumberRenderer;
@@ -27,8 +27,8 @@ public class CSharpTarget extends Target {
 	}
 
 	@Override
-	protected TargetType getTargetType() {
-		return TargetType.CSharp;
+	protected Language getLanguage() {
+		return Language.CSharp;
 	}
 
 	@Override
@@ -64,7 +64,7 @@ public class CSharpTarget extends Target {
 	@Override
 	protected STGroup loadTemplates() {
 		// override the superclass behavior to put all C# templates in the same folder
-		STGroup result = new STGroupFile(CodeGenerator.TEMPLATE_ROOT+"/CSharp/"+ getTargetType().name()+STGroup.GROUP_FILE_EXTENSION);
+		STGroup result = new STGroupFile(CodeGenerator.TEMPLATE_ROOT+"/CSharp/"+ getLanguage().name()+STGroup.GROUP_FILE_EXTENSION);
 		result.registerRenderer(Integer.class, new NumberRenderer());
 		result.registerRenderer(String.class, new StringRenderer());
 		result.setListener(new STErrorListener() {

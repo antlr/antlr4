@@ -7,8 +7,8 @@
 package org.antlr.v4.codegen.target;
 
 import org.antlr.v4.codegen.CodeGenerator;
+import org.antlr.v4.codegen.Language;
 import org.antlr.v4.codegen.Target;
-import org.antlr.v4.codegen.TargetType;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.StringRenderer;
@@ -55,8 +55,8 @@ public class Python3Target extends Target {
 	}
 
 	@Override
-	protected TargetType getTargetType() {
-		return TargetType.Python3;
+	protected Language getLanguage() {
+		return Language.Python3;
 	}
 
 	@Override

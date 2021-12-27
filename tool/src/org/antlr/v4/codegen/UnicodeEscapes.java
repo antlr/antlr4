@@ -11,14 +11,14 @@ package org.antlr.v4.codegen;
  * languages' syntax.
  */
 public class UnicodeEscapes {
-	public static String escapeCodePoint(int codePoint, TargetType targetType) {
+	public static String escapeCodePoint(int codePoint, Language language) {
 		StringBuilder result = new StringBuilder();
-		appendEscapedCodePoint(result, codePoint, targetType);
+		appendEscapedCodePoint(result, codePoint, language);
 		return result.toString();
 	}
 
-	public static void appendEscapedCodePoint(StringBuilder sb, int codePoint, TargetType targetType) {
-		switch (targetType) {
+	public static void appendEscapedCodePoint(StringBuilder sb, int codePoint, Language language) {
+		switch (language) {
 			case Java:
 			case JavaScript:
 			case Dart:

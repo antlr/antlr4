@@ -36,34 +36,34 @@ public class CodeGenerator {
 
 	public final Tool tool;
 
-	public final TargetType targetType;
+	public final Language language;
 
 	private Target target;
 
 	public int lineWidth = 72;
 
-	public CodeGenerator(TargetType targetType) {
+	public CodeGenerator(Language language) {
 		this.g = null;
 		this.tool = null;
-		this.targetType = targetType;
+		this.language = language;
 	}
 
 	public CodeGenerator(Grammar g) {
-		this(g.tool, g, g.getTargetType());
+		this(g.tool, g, g.getLanguage());
 	}
 
-	public CodeGenerator(Tool tool, Grammar g, TargetType targetType) {
+	public CodeGenerator(Tool tool, Grammar g, Language language) {
 		this.g = g;
 		this.tool = tool;
-		this.targetType = targetType;
+		this.language = language;
 	}
 
 	public Target getTarget() {
-		if (target != null || targetType == null) {
+		if (target != null || language == null) {
 			return target;
 		}
 
-		switch (targetType) {
+		switch (language) {
 			case Java:
 				target = new JavaTarget(this);
 				break;
@@ -95,7 +95,7 @@ public class CodeGenerator {
 				target = new DartTarget(this);
 				break;
 			default:
-				tool.errMgr.toolError(ErrorType.CANNOT_CREATE_TARGET_GENERATOR, targetType);
+				tool.errMgr.toolError(ErrorType.CANNOT_CREATE_TARGET_GENERATOR, language);
 				break;
 		}
 
