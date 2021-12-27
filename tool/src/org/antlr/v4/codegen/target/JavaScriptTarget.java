@@ -54,11 +54,6 @@ public class JavaScriptTarget extends Target {
 		return key;
 	}
 
-    @Override
-    public String getVersion() {
-        return "4.9.3";
-    }
-
     public Set<String> getBadWords() {
 		if (badWords.isEmpty()) {
 			addBadWords();

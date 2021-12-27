@@ -70,7 +70,9 @@ public abstract class Target {
 	 *
 	 * @since 4.3
 	 */
-	public abstract String getVersion();
+	public String getVersion() {
+		return Tool.VERSION;
+	}
 
 	public STGroup getTemplates() {
 		if (templates == null) {

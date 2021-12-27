@@ -32,11 +32,6 @@ public class CSharpTarget extends Target {
 	}
 
 	@Override
-    public String getVersion() {
-        return "4.9.3";
-    }
-
-	@Override
 	public String encodeIntAsCharEscape(int v) {
 		if (v < Character.MIN_VALUE || v > Character.MAX_VALUE) {
 			throw new IllegalArgumentException(String.format("Cannot encode the specified value: %d", v));

@@ -99,11 +99,6 @@ public class Python2Target extends Target {
 		return false;
 	}
 
-	@Override
-	public String getVersion() {
-		return "4.9.3";
-	}
-
 	public Set<String> getBadWords() {
 		if (badWords.isEmpty()) {
 			addBadWords();

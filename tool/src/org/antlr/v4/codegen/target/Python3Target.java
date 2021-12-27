@@ -101,11 +101,6 @@ public class Python3Target extends Target {
 		return false;
 	}
 
-	@Override
-	public String getVersion() {
-		return "4.9.3";
-	}
-
 	/** Avoid grammar symbols in this set to prevent conflicts in gen'd code. */
 	protected final Set<String> badWords = new HashSet<String>();
 

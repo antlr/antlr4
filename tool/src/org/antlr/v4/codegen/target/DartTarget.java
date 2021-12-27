@@ -63,11 +63,6 @@ public class DartTarget extends Target {
 		return super.getTargetStringLiteralFromANTLRStringLiteral(generator, literal, addQuotes, escapeSpecial).replace("$", "\\$");
 	}
 
-	@Override
-	public String getVersion() {
-		return Tool.VERSION; // Java and tool versions move in lock step
-	}
-
 	public Set<String> getBadWords() {
 		if (badWords.isEmpty()) {
 			addBadWords();

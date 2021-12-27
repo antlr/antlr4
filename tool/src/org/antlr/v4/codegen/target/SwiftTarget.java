@@ -89,11 +89,6 @@ public class SwiftTarget extends Target {
 	@Override
 	protected String getLanguage() { return key; }
 
-	@Override
-    public String getVersion() {
-        return "4.9.3"; // Java and tool versions move in lock step
-    }
-
     public Set<String> getBadWords() {
         if (badWords.isEmpty()) {
             addBadWords();

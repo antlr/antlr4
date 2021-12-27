@@ -53,10 +53,6 @@ public class CppTarget extends Target {
 	@Override
 	protected String getLanguage() { return key; }
 
-	public String getVersion() {
-		return "4.9.3";
-	}
-
     public boolean needsHeader() { return true; }
 
 	public Set<String> getBadWords() {
