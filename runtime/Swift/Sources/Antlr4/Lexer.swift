@@ -75,7 +75,7 @@ open class Lexer: Recognizer<LexerATNSimulator>, TokenSource {
     /// 
     /// The token type for the current token
     /// 
-    public var _type = 0
+    public var _type = CommonToken.INVALID_TYPE
 
     public final var _modeStack = Stack<Int>()
     public var _mode = Lexer.DEFAULT_MODE
