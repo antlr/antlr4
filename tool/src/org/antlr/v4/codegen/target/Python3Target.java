@@ -24,6 +24,10 @@ import java.util.Set;
 public class Python3Target extends Target {
 	public final static String key = "Python3";
 
+	static {
+		checkKey(Python3Target.class, key);
+	}
+
 	protected static final String[] python3Keywords = {
 		"abs", "all", "and", "any", "apply", "as", "assert",
 		"bin", "bool", "break", "buffer", "bytearray",
@@ -53,11 +57,6 @@ public class Python3Target extends Target {
 
 	public Python3Target(CodeGenerator gen) {
 		super(gen);
-	}
-
-	@Override
-	protected String getLanguage() {
-		return key;
 	}
 
 	@Override

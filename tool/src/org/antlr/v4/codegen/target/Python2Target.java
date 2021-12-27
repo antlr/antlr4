@@ -24,6 +24,10 @@ import java.util.Set;
 public class Python2Target extends Target {
 	public final static String key = "Python2";
 
+	static {
+		checkKey(Python2Target.class, key);
+	}
+
 	protected static final String[] python2Keywords = {
 		"abs", "all", "and", "any", "apply", "as", "assert",
 		"bin", "bool", "break", "buffer", "bytearray",
@@ -57,11 +61,6 @@ public class Python2Target extends Target {
 
 	public Python2Target(CodeGenerator gen) {
 		super(gen);
-	}
-
-	@Override
-	protected String getLanguage() {
-		return key;
 	}
 
 	@Override

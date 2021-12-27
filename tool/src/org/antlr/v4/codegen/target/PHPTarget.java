@@ -19,6 +19,10 @@ import java.util.Set;
 public class PHPTarget extends Target {
 	public final static String key = "PHP";
 
+	static {
+		checkKey(PHPTarget.class, key);
+	}
+
 	private static final String[] phpKeywords = {
 		"abstract", "and", "array", "as",
 		"break",
@@ -50,11 +54,6 @@ public class PHPTarget extends Target {
 	public PHPTarget(CodeGenerator gen) {
 		super(gen);
 		targetCharValueEscape['$'] = "\\$";
-	}
-
-	@Override
-	protected String getLanguage() {
-		return key;
 	}
 
 	@Override

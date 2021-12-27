@@ -24,6 +24,10 @@ import java.util.Set;
 public class JavaScriptTarget extends Target {
 	public final static String key = "JavaScript";
 
+	static {
+		checkKey(JavaScriptTarget.class, key);
+	}
+
 	/** Source: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Lexical_grammar */
 	protected static final String[] javaScriptKeywords = {
 		"break", "case", "class", "catch", "const", "continue", "debugger",
@@ -47,11 +51,6 @@ public class JavaScriptTarget extends Target {
 
 	public JavaScriptTarget(CodeGenerator gen) {
 		super(gen);
-	}
-
-	@Override
-	protected String getLanguage() {
-		return key;
 	}
 
     public Set<String> getBadWords() {

@@ -56,7 +56,16 @@ public abstract class Target {
 		this.gen = gen;
 	}
 
-	protected abstract String getLanguage();
+	protected static void checkKey(Class clazz, String actualKey) throws ExceptionInInitializerError {
+		String expectedKeyValue = clazz.getSimpleName().replace("Target", "");
+		if (!expectedKeyValue.equals(actualKey)) {
+			throw new ExceptionInInitializerError(String.format("expected value of key is %s but actual is %s", expectedKeyValue, actualKey));
+		}
+	}
+
+	protected String getLanguage() {
+		return gen.language;
+	}
 
 	public CodeGenerator getCodeGenerator() {
 		return gen;
@@ -514,16 +523,14 @@ public abstract class Target {
 	protected abstract boolean visibleGrammarSymbolCausesIssueInGeneratedCode(GrammarAST idNode);
 
 	protected STGroup loadTemplates() {
-		String targetName = getLanguage();
-		String groupFileName = CodeGenerator.TEMPLATE_ROOT + "/" + targetName + "/" + targetName + STGroup.GROUP_FILE_EXTENSION;
+		String language = getLanguage();
+		String groupFileName = CodeGenerator.TEMPLATE_ROOT + "/" + language + "/" + language + STGroup.GROUP_FILE_EXTENSION;
 		STGroup result = null;
 		try {
 			result = new STGroupFile(groupFileName);
 		}
 		catch (IllegalArgumentException iae) {
-			gen.tool.errMgr.toolError(ErrorType.MISSING_CODE_GEN_TEMPLATES,
-						 iae,
-					targetName);
+			gen.tool.errMgr.toolError(ErrorType.MISSING_CODE_GEN_TEMPLATES, iae, language);
 		}
 		if ( result==null ) return null;
 		result.registerRenderer(Integer.class, new NumberRenderer());

@@ -59,6 +59,10 @@ import java.util.Set;
 public class SwiftTarget extends Target {
 	public final static String key = "Swift";
 
+	static {
+		checkKey(SwiftTarget.class, key);
+	}
+
     /**
      * The Swift target can cache the code generation templates.
      */
@@ -85,9 +89,6 @@ public class SwiftTarget extends Target {
     public SwiftTarget(CodeGenerator gen) {
         super(gen);
     }
-
-	@Override
-	protected String getLanguage() { return key; }
 
     public Set<String> getBadWords() {
         if (badWords.isEmpty()) {

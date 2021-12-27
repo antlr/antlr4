@@ -35,6 +35,8 @@ public class CodeGenerator {
 
 	public final Tool tool;
 
+	public final String language;
+
 	private Target target;
 
 	public int lineWidth = 72;
@@ -48,7 +50,7 @@ public class CodeGenerator {
 		try {
 			Class<? extends Target> c = Class.forName(targetName).asSubclass(Target.class);
 			Constructor<? extends Target> ctor = c.getConstructor(CodeGenerator.class);
-			CodeGenerator codeGenerator = new CodeGenerator(tool, g);
+			CodeGenerator codeGenerator = new CodeGenerator(tool, g, language);
 			codeGenerator.target = ctor.newInstance(codeGenerator);
 			return codeGenerator;
 		}
@@ -58,9 +60,10 @@ public class CodeGenerator {
 		}
 	}
 
-	private CodeGenerator(Tool tool, Grammar g) {
+	private CodeGenerator(Tool tool, Grammar g, String language) {
 		this.g = g;
 		this.tool = tool;
+		this.language = language;
 	}
 
 	public Target getTarget() {
