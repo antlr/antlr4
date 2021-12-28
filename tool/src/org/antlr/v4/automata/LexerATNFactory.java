@@ -59,8 +59,6 @@ public class LexerATNFactory extends ParserATNFactory {
 
 	private final List<String> ruleCommands = new ArrayList<String>();
 
-	private final boolean caseInsensitive;
-
 	/**
 	 * Maps from an action index to a {@link LexerAction} object.
 	 */
@@ -77,8 +75,6 @@ public class LexerATNFactory extends ParserATNFactory {
 	public LexerATNFactory(LexerGrammar g, CodeGenerator codeGenerator) {
 		super(g);
 		// use codegen to get correct language templates for lexer commands
-		String caseInsensitiveOption = g.getOptionString("caseInsensitive");
-		caseInsensitive = caseInsensitiveOption != null && caseInsensitiveOption.equals("true");
 		codegenTemplates = (codeGenerator == null ? CodeGenerator.create(g) : codeGenerator).getTemplates();
 	}
 
@@ -192,6 +188,15 @@ public class LexerATNFactory extends ParserATNFactory {
 
 	@Override
 	public Handle lexerCallCommand(GrammarAST ID, GrammarAST arg) {
+		return lexerCallCommandOrCommand(ID, arg);
+	}
+
+	@Override
+	public Handle lexerCommand(GrammarAST ID) {
+		return lexerCallCommandOrCommand(ID, null);
+	}
+
+	private Handle lexerCallCommandOrCommand(GrammarAST ID, GrammarAST arg) {
 		LexerAction lexerAction = createLexerAction(ID, arg);
 		if (lexerAction != null) {
 			return action(ID, lexerAction);
@@ -199,42 +204,24 @@ public class LexerATNFactory extends ParserATNFactory {
 
 		// fall back to standard action generation for the command
 		ST cmdST = codegenTemplates.getInstanceOf("Lexer" +
-												  CharSupport.capitalize(ID.getText())+
-												  "Command");
-		if (cmdST == null) {
-			g.tool.errMgr.grammarError(ErrorType.INVALID_LEXER_COMMAND, g.fileName, ID.token, ID.getText());
-			return epsilon(ID);
-		}
-
-		if (cmdST.impl.formalArguments == null || !cmdST.impl.formalArguments.containsKey("arg")) {
-			g.tool.errMgr.grammarError(ErrorType.UNWANTED_LEXER_COMMAND_ARGUMENT, g.fileName, ID.token, ID.getText());
-			return epsilon(ID);
-		}
-
-		cmdST.add("arg", arg.getText());
-		cmdST.add("grammar", arg.g);
-		return action(cmdST.render());
-	}
-
-	@Override
-	public Handle lexerCommand(GrammarAST ID) {
-		LexerAction lexerAction = createLexerAction(ID, null);
-		if (lexerAction != null) {
-			return action(ID, lexerAction);
-		}
-
-		// fall back to standard action generation for the command
-		ST cmdST = codegenTemplates.getInstanceOf("Lexer" +
-				CharSupport.capitalize(ID.getText()) +
+				CharSupport.capitalize(ID.getText())+
 				"Command");
 		if (cmdST == null) {
 			g.tool.errMgr.grammarError(ErrorType.INVALID_LEXER_COMMAND, g.fileName, ID.token, ID.getText());
 			return epsilon(ID);
 		}
 
-		if (cmdST.impl.formalArguments != null && cmdST.impl.formalArguments.containsKey("arg")) {
-			g.tool.errMgr.grammarError(ErrorType.MISSING_LEXER_COMMAND_ARGUMENT, g.fileName, ID.token, ID.getText());
+		boolean callCommand = arg != null;
+		boolean containsArg = cmdST.impl.formalArguments != null && cmdST.impl.formalArguments.containsKey("arg");
+		if (callCommand != containsArg) {
+			ErrorType errorType = callCommand ? ErrorType.UNWANTED_LEXER_COMMAND_ARGUMENT : ErrorType.MISSING_LEXER_COMMAND_ARGUMENT;
+			g.tool.errMgr.grammarError(errorType, g.fileName, ID.token, ID.getText());
 			return epsilon(ID);
+		}
+
+		if (callCommand) {
+			cmdST.add("arg", arg.getText());
+			cmdST.add("grammar", arg.g);
 		}
 
 		return action(cmdST.render());
@@ -264,7 +251,7 @@ public class LexerATNFactory extends ParserATNFactory {
 				int a = CharSupport.getCharValueFromGrammarCharLiteral(t.getChild(0).getText());
 				int b = CharSupport.getCharValueFromGrammarCharLiteral(t.getChild(1).getText());
 				if (checkRange((GrammarAST)t.getChild(0), (GrammarAST)t.getChild(1), a, b)) {
-					checkRangeAndAddToSet(associatedAST, t, set, a, b, caseInsensitive, null);
+					checkRangeAndAddToSet(associatedAST, t, set, a, b, currentRule.caseInsensitive, null);
 				}
 			}
 			else if ( t.getType()==ANTLRParser.LEXER_CHAR_SET ) {
@@ -553,11 +540,11 @@ public class LexerATNFactory extends ParserATNFactory {
 	}
 
 	private void checkCharAndAddToSet(GrammarAST ast, IntervalSet set, int c) {
-		checkRangeAndAddToSet(ast, ast, set, c, c, caseInsensitive, null);
+		checkRangeAndAddToSet(ast, ast, set, c, c, currentRule.caseInsensitive, null);
 	}
 
 	private void checkRangeAndAddToSet(GrammarAST mainAst, IntervalSet set, int a, int b) {
-		checkRangeAndAddToSet(mainAst, mainAst, set, a, b, caseInsensitive, null);
+		checkRangeAndAddToSet(mainAst, mainAst, set, a, b, currentRule.caseInsensitive, null);
 	}
 
 	private CharactersDataCheckStatus checkRangeAndAddToSet(GrammarAST rootAst, GrammarAST ast, IntervalSet set, int a, int b, boolean caseInsensitive, CharactersDataCheckStatus previousStatus) {
@@ -616,7 +603,7 @@ public class LexerATNFactory extends ParserATNFactory {
 
 	private Transition createTransition(ATNState target, int from, int to, CommonTree tree) {
 		RangeBorderCharactersData charactersData = RangeBorderCharactersData.getAndCheckCharactersData(from, to, g, tree, true);
-		if (caseInsensitive) {
+		if (currentRule.caseInsensitive) {
 			if (charactersData.isSingleRange()) {
 				return CodePointTransitions.createWithCodePointRange(target, from, to);
 			}

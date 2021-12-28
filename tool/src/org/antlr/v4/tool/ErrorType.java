@@ -1130,6 +1130,20 @@ public enum ErrorType {
 			ErrorSeverity.ERROR
 	),
 
+	/**
+	 * <p>Redundant caseInsensitive lexer rule option</p>
+	 *
+	 * <pre>
+	 * options { caseInsensitive=true; }
+	 * TOKEN options { caseInsensitive=true; } : [a-z]+ -> caseInsensitive(true); // warning
+	 * </pre>
+	 */
+	REDUNDANT_CASE_INSENSITIVE_LEXER_RULE_OPTION(
+			187,
+			"caseInsensitive lexer rule option is redundant because its value equals to global value (<arg>)",
+			ErrorSeverity.WARNING
+	),
+
 	/*
 	 * Backward incompatibility errors
 	 */

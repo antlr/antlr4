@@ -109,14 +109,9 @@ The mechanism works by automatically transforming grammar references to characte
 
 ## Rule Options
 
-There are currently no valid rule-level options, but the tool still supports the following syntax for future use:
+### caseInsensitive
 
-```
-rulename
-options {...}
- 	: ...
- 	;
-```
+The tool support `caseInsensitive` lexer rule option that is described in [lexer-rules.md](lexer-rules.md#caseinsensitive).
 
 ## Rule Element Options
 

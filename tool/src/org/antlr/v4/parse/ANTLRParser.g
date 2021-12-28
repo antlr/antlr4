@@ -517,9 +517,13 @@ lexerRule
 	paraphrases.pop();
 }
     : FRAGMENT?
-	  TOKEN_REF COLON lexerRuleBlock SEMI
+	  TOKEN_REF
+
+	  optionsSpec?
+
+	  COLON lexerRuleBlock SEMI
       -> ^( RULE<RuleAST> TOKEN_REF
-      		^(RULEMODIFIERS FRAGMENT)? lexerRuleBlock
+      		^(RULEMODIFIERS FRAGMENT)? optionsSpec? lexerRuleBlock
       	  )
 	;
 
