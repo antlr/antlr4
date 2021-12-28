@@ -472,13 +472,45 @@ public class TestSymbolIssues extends BaseJavaToolTest {
 		testErrors(test, false);
 	}
 
-	@Test public void testIllegalModeOption() {
+	@Test public void testIllegalCaseInsensitiveOptionValue() {
 		String[] test = {
 				"lexer grammar L;\n" +
 				"options { caseInsensitive = badValue; }\n" +
-				"DEFAULT_TOKEN: [A-F]+;\n",
+				"TOKEN_1 options { caseInsensitive = badValue; } : [A-F]+;\n",
 
-				"warning(" + ErrorType.ILLEGAL_OPTION_VALUE.code + "): L.g4:2:28: unsupported option value caseInsensitive=badValue\n"
+				"warning(" + ErrorType.ILLEGAL_OPTION_VALUE.code + "): L.g4:2:28: unsupported option value caseInsensitive=badValue\n" +
+				"warning(" + ErrorType.ILLEGAL_OPTION_VALUE.code + "): L.g4:3:36: unsupported option value caseInsensitive=badValue\n"
+		};
+
+		testErrors(test, false);
+	}
+
+	@Test public void testRedundantCaseInsensitiveLexerRuleOption() {
+		String[] test = {
+				"lexer grammar L;\n" +
+				"options { caseInsensitive = true; }\n" +
+				"TOKEN options { caseInsensitive = true; } : [A-F]+;\n",
+
+				"warning(" + ErrorType.REDUNDANT_CASE_INSENSITIVE_LEXER_RULE_OPTION.code + "): L.g4:3:16: caseInsensitive lexer rule option is redundant because its value equals to global value (true)\n"
+		};
+		testErrors(test, false);
+
+		String[] test2 = {
+				"lexer grammar L;\n" +
+				"options { caseInsensitive = false; }\n" +
+				"TOKEN options { caseInsensitive = false; } : [A-F]+;\n",
+
+				"warning(" + ErrorType.REDUNDANT_CASE_INSENSITIVE_LEXER_RULE_OPTION.code + "): L.g4:3:16: caseInsensitive lexer rule option is redundant because its value equals to global value (false)\n"
+		};
+		testErrors(test2, false);
+	}
+
+	@Test public void testCaseInsensitiveOptionInParseRule() {
+		String[] test = {
+				"grammar G;\n" +
+				"root options { caseInsensitive=true; } : 'token';",
+
+				"warning(" + ErrorType.ILLEGAL_OPTION.code + "): G.g4:2:15: unsupported option caseInsensitive\n"
 		};
 
 		testErrors(test, false);

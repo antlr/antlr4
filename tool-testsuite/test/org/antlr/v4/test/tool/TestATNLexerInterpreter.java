@@ -505,6 +505,26 @@ public class TestATNLexerInterpreter extends BaseJavaToolTest {
 		checkLexerMatches(lg, inputString, "TOKEN, EOF");
 	}
 
+	@Test public void testCaseInsensitiveInLexerRule() throws Exception {
+		LexerGrammar lg = new LexerGrammar(
+				"lexer grammar L;\n" +
+				"TOKEN1 options { caseInsensitive=true; } : [a-f]+;\n" +
+				"WS: [ ]+ -> skip;"
+		);
+
+		checkLexerMatches(lg, "ABCDEF", "TOKEN1, EOF");
+	}
+
+	@Test public void testCaseInsensitiveInLexerRuleOverridesGlobalValue() {
+		String grammar =
+				"lexer grammar L;\n" +
+				"options { caseInsensitive=true; }\n" +
+				"STRING options { caseInsensitive=false; } : 'N'? '\\'' (~'\\'' | '\\'\\'')* '\\'';\n";
+
+		execLexer("L.g4", grammar, "L", "n'sample'");
+		assertEquals("line 1:0 token recognition error at: 'n'\n", getParseErrors());
+	}
+
 	protected void checkLexerMatches(LexerGrammar lg, String inputString, String expecting) {
 		ATN atn = createATN(lg, true);
 		CharStream input = CharStreams.fromString(inputString);
