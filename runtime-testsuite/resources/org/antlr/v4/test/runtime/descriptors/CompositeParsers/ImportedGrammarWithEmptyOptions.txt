@@ -1,0 +1,21 @@
+[type]
+CompositeParser
+
+[grammar]
+grammar M;
+import S;
+s : a ;
+B : 'b' ;
+WS : (' '|'\n') -> skip ;
+
+[slaveGrammar]
+parser grammar S;
+options {}
+a : B ;
+
+[start]
+s
+
+[input]
+b
+

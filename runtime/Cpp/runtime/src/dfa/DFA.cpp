@@ -70,7 +70,7 @@ DFAState* DFA::getPrecedenceStartState(int precedence) const {
   return iterator->second;
 }
 
-void DFA::setPrecedenceStartState(int precedence, DFAState *startState, SingleWriteMultipleReadLock &lock) {
+void DFA::setPrecedenceStartState(int precedence, DFAState *startState, std::shared_mutex &lock) {
   if (!isPrecedenceDfa()) {
     throw IllegalStateException("Only precedence DFAs may contain a precedence start state.");
   }
@@ -80,9 +80,9 @@ void DFA::setPrecedenceStartState(int precedence, DFAState *startState, SingleWr
   }
 
   {
-    lock.writeLock();
+    lock.lock();
     s0->edges[precedence] = startState;
-    lock.writeUnlock();
+    lock.unlock();
   }
 }
 
@@ -98,15 +98,6 @@ std::vector<DFAState *> DFA::getStates() const {
   return result;
 }
 
-std::string DFA::toString(const std::vector<std::string> &tokenNames) {
-  if (s0 == nullptr) {
-    return "";
-  }
-  DFASerializer serializer(this, tokenNames);
-
-  return serializer.toString();
-}
-
 std::string DFA::toString(const Vocabulary &vocabulary) const {
   if (s0 == nullptr) {
     return "";
@@ -116,7 +107,7 @@ std::string DFA::toString(const Vocabulary &vocabulary) const {
   return serializer.toString();
 }
 
-std::string DFA::toLexerString() {
+std::string DFA::toLexerString() const {
   if (s0 == nullptr) {
     return "";
   }

@@ -16,7 +16,7 @@ The C++ target has been the work of the following people:
 
 * Dan McLaughlin, dan.mclaughlin@gmail.com (initial port, got code to compile)
 * David Sisson, dsisson@google.com (initial port, made the runtime C++ tests runnable)
-* [Mike Lischke](www.soft-gems.net), mike@lischke-online.de (brought the initial port to a working library, made most runtime tests passing)
+* [Mike Lischke](http://www.soft-gems.net), mike@lischke-online.de (brought the initial port to a working library, made most runtime tests passing)
 
 ## Other contributors
 

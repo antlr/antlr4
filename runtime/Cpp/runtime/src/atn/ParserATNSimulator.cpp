@@ -94,25 +94,25 @@ size_t ParserATNSimulator::adaptivePredict(TokenStream *input, size_t decision, 
   });
 
   dfa::DFAState *s0;
-  _stateLock.readLock();
+  _stateLock.lock_shared();
   if (dfa.isPrecedenceDfa()) {
     // the start state for a precedence DFA depends on the current
     // parser precedence, and is provided by a DFA method.
-    _edgeLock.readLock();
+    _edgeLock.lock_shared();
     s0 = dfa.getPrecedenceStartState(parser->getPrecedence());
-    _edgeLock.readUnlock();
+    _edgeLock.unlock_shared();
   } else {
     // the start state for a "regular" DFA is just s0
     s0 = dfa.s0;
   }
-  _stateLock.readUnlock();
+  _stateLock.unlock_shared();
 
   if (s0 == nullptr) {
     bool fullCtx = false;
     std::unique_ptr<ATNConfigSet> s0_closure = computeStartState(dynamic_cast<ATNState *>(dfa.atnStartState),
                                                                  &ParserRuleContext::EMPTY, fullCtx);
 
-    _stateLock.writeLock();
+    _stateLock.lock();
     dfa::DFAState* ds0 = dfa.s0;
     if (dfa.isPrecedenceDfa()) {
       /* If this is a precedence DFA, we use applyPrecedenceFilter
@@ -141,7 +141,7 @@ size_t ParserATNSimulator::adaptivePredict(TokenStream *input, size_t decision, 
         delete newState; // If there was already a state with this config set we don't need the new one.
       }
     }
-    _stateLock.writeUnlock();
+    _stateLock.unlock();
   }
 
   // We can start with an existing DFA.
@@ -266,10 +266,10 @@ size_t ParserATNSimulator::execATN(dfa::DFA &dfa, dfa::DFAState *s0, TokenStream
 
 dfa::DFAState *ParserATNSimulator::getExistingTargetState(dfa::DFAState *previousD, size_t t) {
   dfa::DFAState* retval;
-  _edgeLock.readLock();
+  _edgeLock.lock_shared();
   auto iterator = previousD->edges.find(t);
   retval = (iterator == previousD->edges.end()) ? nullptr : iterator->second;
-  _edgeLock.readUnlock();
+  _edgeLock.unlock_shared();
   return retval;
 }
 
@@ -1195,7 +1195,7 @@ std::string ParserATNSimulator::getTokenName(size_t t) {
     return "EOF";
   }
 
-  const dfa::Vocabulary &vocabulary = parser != nullptr ? parser->getVocabulary() : dfa::Vocabulary::EMPTY_VOCABULARY;
+  const dfa::Vocabulary &vocabulary = parser != nullptr ? parser->getVocabulary() : dfa::Vocabulary();
   std::string displayName = vocabulary.getDisplayName(t);
   if (displayName == std::to_string(t)) {
     return displayName;
@@ -1255,17 +1255,17 @@ dfa::DFAState *ParserATNSimulator::addDFAEdge(dfa::DFA &dfa, dfa::DFAState *from
     return nullptr;
   }
 
-  _stateLock.writeLock();
+  _stateLock.lock();
   to = addDFAState(dfa, to); // used existing if possible not incoming
-  _stateLock.writeUnlock();
+  _stateLock.unlock();
   if (from == nullptr || t > (int)atn.maxTokenType) {
     return to;
   }
 
   {
-    _edgeLock.writeLock();
+    _edgeLock.lock();
     from->edges[t] = to; // connect
-    _edgeLock.writeUnlock();
+    _edgeLock.unlock();
   }
 
 #if DEBUG_DFA == 1
@@ -1273,7 +1273,7 @@ dfa::DFAState *ParserATNSimulator::addDFAEdge(dfa::DFA &dfa, dfa::DFAState *from
     if (parser != nullptr) {
       dfaText = dfa.toString(parser->getVocabulary());
     } else {
-      dfaText = dfa.toString(dfa::Vocabulary::EMPTY_VOCABULARY);
+      dfaText = dfa.toString(dfa::Vocabulary());
     }
     std::cout << "DFA=\n" << dfaText << std::endl;
 #endif

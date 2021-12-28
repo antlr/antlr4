@@ -15,4 +15,10 @@
     <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Reference Include="Antlr4.Runtime">
+      <HintPath>Antlr4.Runtime.Standard.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>

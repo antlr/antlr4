@@ -24,12 +24,7 @@ public abstract class CodePointTransitions {
 	 * Otherwise, returns a new {@link SetTransition}.
 	 */
 	public static Transition createWithCodePoint(ATNState target, int codePoint) {
-		if (Character.isSupplementaryCodePoint(codePoint)) {
-			return new SetTransition(target, IntervalSet.of(codePoint));
-		}
-		else {
-			return new AtomTransition(target, codePoint);
-		}
+		return createWithCodePointRange(target, codePoint, codePoint);
 	}
 
 	/**
@@ -37,16 +32,14 @@ public abstract class CodePointTransitions {
 	 * <= U+FFFF, returns a new {@link RangeTransition}.
 	 * Otherwise, returns a new {@link SetTransition}.
 	 */
-	public static Transition createWithCodePointRange(
-			ATNState target,
-			int codePointFrom,
-			int codePointTo) {
-		if (Character.isSupplementaryCodePoint(codePointFrom) ||
-		    Character.isSupplementaryCodePoint(codePointTo)) {
+	public static Transition createWithCodePointRange(ATNState target, int codePointFrom, int codePointTo) {
+		if (Character.isSupplementaryCodePoint(codePointFrom) || Character.isSupplementaryCodePoint(codePointTo)) {
 			return new SetTransition(target, IntervalSet.of(codePointFrom, codePointTo));
 		}
 		else {
-			return new RangeTransition(target, codePointFrom, codePointTo);
+			return codePointFrom == codePointTo
+					? new AtomTransition(target, codePointFrom)
+					: new RangeTransition(target, codePointFrom, codePointTo);
 		}
 	}
 }

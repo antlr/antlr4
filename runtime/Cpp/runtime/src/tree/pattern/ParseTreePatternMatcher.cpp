@@ -21,7 +21,6 @@
 #include "ANTLRInputStream.h"
 #include "support/Arrays.h"
 #include "Exceptions.h"
-#include "support/StringUtils.h"
 #include "support/CPPUtils.h"
 
 #include "tree/pattern/ParseTreePatternMatcher.h"

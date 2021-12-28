@@ -1,0 +1,22 @@
+[type]
+Lexer
+
+[grammar]
+lexer grammar L;
+ENUM : [a-z]+  { <False()> }? ;
+ID : [a-z]+  ;
+WS : (' '|'\n') -> skip;
+
+[input]
+enum abc enum
+
+[output]
+[@0,0:3='enum',<2>,1:0]
+[@1,5:7='abc',<2>,1:5]
+[@2,9:12='enum',<2>,1:9]
+[@3,13:12='<EOF>',<-1>,1:13]
+s0-' '->:s2=>3
+
+[flags]
+showDFA
+

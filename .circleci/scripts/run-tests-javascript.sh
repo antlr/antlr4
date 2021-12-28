@@ -15,7 +15,7 @@ popd
 pushd runtime-testsuite
 
   echo "running maven tests..."
-  mvn -q -Dtest=javascript.* test
+  mvn -Dtest=javascript.** test
   RESULT+=$?
 
 popd

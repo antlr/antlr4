@@ -16,9 +16,9 @@
   <name>ANTLR 4 Tool Tests</name>
   <description>A collection of tests for ANTLR 4 Runtime libraries.</description>
 
-  <prerequisites>
-    <maven>3.0</maven>
-  </prerequisites>
+    <prerequisites>
+        <maven>3.8</maven>
+    </prerequisites>
 
   <inceptionYear>2009</inceptionYear>
 

@@ -1,0 +1,17 @@
+[type]
+Parser
+
+[grammar]
+grammar T;
+a : 'a' ('b'|'z'{<Pass()>})* 'c' ;
+
+[start]
+a
+
+[input]
+ababbc
+
+[errors]
+"""line 1:2 extraneous input 'a' expecting {'b', 'z', 'c'}
+"""
+

@@ -1,0 +1,20 @@
+[type]
+Parser
+
+[grammar]
+grammar T;
+a : A {<writeln("$A.text")>} ;
+A : ('a'|B) ;  // this doesn't collapse to set but works
+fragment
+B : ~('a'|'c') ;
+
+[start]
+a
+
+[input]
+x
+
+[output]
+"""x
+"""
+

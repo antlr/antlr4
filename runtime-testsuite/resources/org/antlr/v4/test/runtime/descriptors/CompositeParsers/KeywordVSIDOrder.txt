@@ -1,0 +1,24 @@
+[type]
+CompositeParser
+
+[grammar]
+grammar M;
+import S;
+a : A {<Append("\"M.a: \"","$A"):writeln()>};
+A : 'abc' {<writeln("\"M.A\"")>};
+WS : (' '|'\n') -> skip ;
+
+[slaveGrammar]
+lexer grammar S;
+ID : 'a'..'z'+;
+
+[start]
+a
+
+[input]
+abc
+
+[output]
+M.A
+M.a: [@0,0:2='abc',<1>,1:0]
+

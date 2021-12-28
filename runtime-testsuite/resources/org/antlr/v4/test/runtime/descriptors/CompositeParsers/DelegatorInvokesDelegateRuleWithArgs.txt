@@ -1,0 +1,24 @@
+[type]
+CompositeParser
+
+[grammar]
+grammar M;
+import S;
+s : label=a[3] {<writeln("$label.y")>} ;
+B : 'b' ; // defines B from inherited token space
+WS : (' '|'\n') -> skip ;
+
+[slaveGrammar]
+parser grammar S;
+a[int x] returns [int y] : B {<write("\"S.a\"")>} {$y=1000;} ;
+
+[start]
+s
+
+[input]
+b
+
+[output]
+"""S.a1000
+"""
+
