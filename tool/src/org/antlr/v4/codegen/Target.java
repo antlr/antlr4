@@ -56,9 +56,7 @@ public abstract class Target {
 		this.gen = gen;
 	}
 
-	protected String getLanguage() {
-		return gen.language;
-	}
+	public String getLanguage() { return gen.language; }
 
 	public CodeGenerator getCodeGenerator() {
 		return gen;
@@ -170,7 +168,7 @@ public abstract class Target {
 		return buf.toString();
 	}
 
-	protected void appendUnicodeEscapedCodePoint(int codePoint, StringBuilder sb, boolean escape) {
+	private void appendUnicodeEscapedCodePoint(int codePoint, StringBuilder sb, boolean escape) {
 		if (escape) {
 			sb.append("\\");
 		}
@@ -180,6 +178,9 @@ public abstract class Target {
 	/**
 	 * Escape the Unicode code point appropriately for this language
 	 * and append the escaped value to {@code sb}.
+	 * It exists for flexibility and backward compatibility with external targets
+	 * The static method {@link UnicodeEscapes#appendEscapedCodePoint(StringBuilder, int, String)} can be used as well
+	 * if default escaping method (Java) is used or language is officially supported
 	 */
 	protected void appendUnicodeEscapedCodePoint(int codePoint, StringBuilder sb) {
 		UnicodeEscapes.appendEscapedCodePoint(sb, codePoint, getLanguage());
@@ -187,6 +188,10 @@ public abstract class Target {
 
 	public String getTargetStringLiteralFromString(String s) {
 		return getTargetStringLiteralFromString(s, true);
+	}
+
+	public String getTargetStringLiteralFromANTLRStringLiteral(CodeGenerator generator, String literal, boolean addQuotes) {
+		return getTargetStringLiteralFromANTLRStringLiteral(generator, literal, addQuotes, false);
 	}
 
 	/**
@@ -515,17 +520,15 @@ public abstract class Target {
 
 	protected abstract boolean visibleGrammarSymbolCausesIssueInGeneratedCode(GrammarAST idNode);
 
+	public boolean templatesExist() {
+		return loadTemplatesHelper(false) != null;
+	}
+
 	protected STGroup loadTemplates() {
-		String language = getLanguage();
-		String groupFileName = CodeGenerator.TEMPLATE_ROOT + "/" + language + "/" + language + STGroup.GROUP_FILE_EXTENSION;
-		STGroup result = null;
-		try {
-			result = new STGroupFile(groupFileName);
+		STGroup result = loadTemplatesHelper(true);
+		if (result == null) {
+			return null;
 		}
-		catch (IllegalArgumentException iae) {
-			gen.tool.errMgr.toolError(ErrorType.MISSING_CODE_GEN_TEMPLATES, iae, language);
-		}
-		if ( result==null ) return null;
 		result.registerRenderer(Integer.class, new NumberRenderer());
 		result.registerRenderer(String.class, new StringRenderer());
 		result.setListener(new STErrorListener() {
@@ -555,6 +558,20 @@ public abstract class Target {
 		});
 
 		return result;
+	}
+
+	private STGroup loadTemplatesHelper(boolean reportErrorIfFail) {
+		String language = getLanguage();
+		String groupFileName = CodeGenerator.TEMPLATE_ROOT + "/" + language + "/" + language + STGroup.GROUP_FILE_EXTENSION;
+		try {
+			return new STGroupFile(groupFileName);
+		}
+		catch (IllegalArgumentException iae) {
+			if (reportErrorIfFail) {
+				gen.tool.errMgr.toolError(ErrorType.MISSING_CODE_GEN_TEMPLATES, iae, getLanguage());
+			}
+			return null;
+		}
 	}
 
 	/**
