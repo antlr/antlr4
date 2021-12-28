@@ -8,7 +8,6 @@ package org.antlr.v4.codegen.target;
 
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.codegen.Target;
-import org.antlr.v4.codegen.UnicodeEscapes;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNDeserializer;
@@ -58,7 +57,6 @@ import java.util.Map;
 import java.util.Set;
 
 public class SwiftTarget extends Target {
-
     /**
      * The Swift target can cache the code generation templates.
      */
@@ -81,13 +79,9 @@ public class SwiftTarget extends Target {
 
     public String lexerAtnJSON = null;
     public String parserAtnJSON = null;
-    public SwiftTarget(CodeGenerator gen) {
-        super(gen, "Swift");
-    }
 
-    @Override
-    public String getVersion() {
-        return "4.9.3"; // Java and tool versions move in lock step
+    public SwiftTarget(CodeGenerator gen) {
+        super(gen);
     }
 
     public Set<String> getBadWords() {
@@ -545,9 +539,4 @@ public class SwiftTarget extends Target {
         }
 
     }
-
-	@Override
-	protected void appendUnicodeEscapedCodePoint(int codePoint, StringBuilder sb) {
-		UnicodeEscapes.appendSwiftStyleEscapedCodePoint(codePoint, sb);
-	}
 }

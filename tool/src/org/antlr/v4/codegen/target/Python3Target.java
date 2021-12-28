@@ -8,7 +8,6 @@ package org.antlr.v4.codegen.target;
 
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.codegen.Target;
-import org.antlr.v4.codegen.UnicodeEscapes;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.StringRenderer;
@@ -51,7 +50,7 @@ public class Python3Target extends Target {
 	};
 
 	public Python3Target(CodeGenerator gen) {
-		super(gen, "Python3");
+		super(gen);
 	}
 
 	@Override
@@ -89,11 +88,6 @@ public class Python3Target extends Target {
 		return false;
 	}
 
-	@Override
-	public String getVersion() {
-		return "4.9.3";
-	}
-
 	/** Avoid grammar symbols in this set to prevent conflicts in gen'd code. */
 	protected final Set<String> badWords = new HashSet<String>();
 
@@ -109,10 +103,5 @@ public class Python3Target extends Target {
 		badWords.addAll(Arrays.asList(python3Keywords));
 		badWords.add("rule");
 		badWords.add("parserRule");
-	}
-
-	@Override
-	protected void appendUnicodeEscapedCodePoint(int codePoint, StringBuilder sb) {
-		UnicodeEscapes.appendPythonStyleEscapedCodePoint(codePoint, sb);
 	}
 }

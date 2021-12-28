@@ -8,7 +8,6 @@ package org.antlr.v4.codegen.target;
 
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.codegen.Target;
-import org.antlr.v4.codegen.UnicodeEscapes;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.StringRenderer;
@@ -23,7 +22,6 @@ import java.util.Set;
  * @author Eric Vergnaud
  */
 public class JavaScriptTarget extends Target {
-
 	/** Source: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Lexical_grammar */
 	protected static final String[] javaScriptKeywords = {
 		"break", "case", "class", "catch", "const", "continue", "debugger",
@@ -46,13 +44,8 @@ public class JavaScriptTarget extends Target {
 	protected final Set<String> badWords = new HashSet<String>();
 
 	public JavaScriptTarget(CodeGenerator gen) {
-		super(gen, "JavaScript");
+		super(gen);
 	}
-
-    @Override
-    public String getVersion() {
-        return "4.9.3";
-    }
 
     public Set<String> getBadWords() {
 		if (badWords.isEmpty()) {
@@ -130,11 +123,5 @@ public class JavaScriptTarget extends Target {
 	@Override
 	public boolean supportsOverloadedMethods() {
 		return false;
-	}
-
-	@Override
-	protected void appendUnicodeEscapedCodePoint(int codePoint, StringBuilder sb) {
-		// JavaScript and Java share the same escaping style.
-		UnicodeEscapes.appendJavaStyleEscapedCodePoint(codePoint, sb);
 	}
 }

@@ -793,8 +793,9 @@ public class Grammar implements AttributeResolver {
 		}
 
 		for (Map.Entry<String, Integer> entry : stringLiteralToTypeMap.entrySet()) {
-			if (entry.getValue() >= 0 && entry.getValue() < literalNames.length && literalNames[entry.getValue()] == null) {
-				literalNames[entry.getValue()] = entry.getKey();
+			int value = entry.getValue();
+			if (value >= 0 && value < literalNames.length && literalNames[value] == null) {
+				literalNames[value] = entry.getKey();
 			}
 		}
 
@@ -886,7 +887,7 @@ public class Grammar implements AttributeResolver {
 	public int getMaxCharValue() {
 		return org.antlr.v4.runtime.Lexer.MAX_CHAR_VALUE;
 //		if ( generator!=null ) {
-//			return generator.target.getMaxCharValue(generator);
+//			return generator.getTarget().getMaxCharValue(generator);
 //		}
 //		else {
 //			return Label.MAX_CHAR_VALUE;
@@ -1163,6 +1164,10 @@ public class Grammar implements AttributeResolver {
             default :
                 return "<invalid>";
         }
+	}
+
+	public String getLanguage() {
+		return getOptionString("language");
 	}
 
 	public String getOptionString(String key) { return ast.getOptionString(key); }

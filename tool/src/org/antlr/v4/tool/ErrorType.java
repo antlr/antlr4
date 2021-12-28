@@ -824,7 +824,7 @@ public enum ErrorType {
 	 *
 	 * @since 4.2.1
 	 */
-	INVALID_ESCAPE_SEQUENCE(156, "invalid escape sequence <arg>", ErrorSeverity.WARNING),
+	INVALID_ESCAPE_SEQUENCE(156, "invalid escape sequence <arg>", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Warning 157.
 	 *
@@ -1108,6 +1108,28 @@ public enum ErrorType {
 			ErrorSeverity.WARNING
 	),
 
+	/**
+	 * <p>
+	 * rule <em>rule</em> contains a closure with at least one alternative
+	 * that can match EOF</p>
+	 *
+	 * <p>A rule contains a closure ({@code (...)*}) or positive closure
+	 * ({@code (...)+}) around EOF.</p>
+	 *
+	 * <p>The following rule produces this error.</p>
+	 *
+	 * <pre>
+	 * x : EOF*;         // error
+	 * y : EOF+;         // error
+	 * z : EOF;         // ok
+	 * </pre>
+	 */
+	EOF_CLOSURE(
+			186,
+			"rule <arg> contains a closure with at least one alternative that can match EOF",
+			ErrorSeverity.ERROR
+	),
+
 	/*
 	 * Backward incompatibility errors
 	 */
@@ -1123,6 +1145,7 @@ public enum ErrorType {
 	 * instead offers automatically generated parse tree listeners and visitors
 	 * as a more maintainable alternative.</p>
 	 */
+	@Deprecated
 	V3_TREE_GRAMMAR(200, "tree grammars are not supported in ANTLR 4", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Warning 201.

@@ -461,7 +461,7 @@ public class BaseJavaTest extends BaseRuntimeTestSupport implements RuntimeTestS
             AnalysisPipeline anal = new AnalysisPipeline(g);
             anal.process();
 
-			CodeGenerator gen = new CodeGenerator(g);
+			CodeGenerator gen = CodeGenerator.create(g);
 			ST outputFileST = gen.generateParser(false);
 			String output = outputFileST.render();
 			//System.out.println(output);

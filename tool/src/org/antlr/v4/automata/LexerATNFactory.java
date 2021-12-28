@@ -15,25 +15,7 @@ import org.antlr.v4.misc.EscapeSequenceParsing;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.IntStream;
 import org.antlr.v4.runtime.Lexer;
-import org.antlr.v4.runtime.atn.ATN;
-import org.antlr.v4.runtime.atn.ATNState;
-import org.antlr.v4.runtime.atn.ActionTransition;
-import org.antlr.v4.runtime.atn.AtomTransition;
-import org.antlr.v4.runtime.atn.CodePointTransitions;
-import org.antlr.v4.runtime.atn.LexerAction;
-import org.antlr.v4.runtime.atn.LexerChannelAction;
-import org.antlr.v4.runtime.atn.LexerCustomAction;
-import org.antlr.v4.runtime.atn.LexerModeAction;
-import org.antlr.v4.runtime.atn.LexerMoreAction;
-import org.antlr.v4.runtime.atn.LexerPopModeAction;
-import org.antlr.v4.runtime.atn.LexerPushModeAction;
-import org.antlr.v4.runtime.atn.LexerSkipAction;
-import org.antlr.v4.runtime.atn.LexerTypeAction;
-import org.antlr.v4.runtime.atn.NotSetTransition;
-import org.antlr.v4.runtime.atn.RuleStartState;
-import org.antlr.v4.runtime.atn.SetTransition;
-import org.antlr.v4.runtime.atn.TokensStartState;
-import org.antlr.v4.runtime.atn.Transition;
+import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.tool.ErrorType;
@@ -89,13 +71,15 @@ public class LexerATNFactory extends ParserATNFactory {
 	protected Map<LexerAction, Integer> actionToIndexMap = new HashMap<LexerAction, Integer>();
 
 	public LexerATNFactory(LexerGrammar g) {
+		this(g, null);
+	}
+
+	public LexerATNFactory(LexerGrammar g, CodeGenerator codeGenerator) {
 		super(g);
 		// use codegen to get correct language templates for lexer commands
-		String language = g.getOptionString("language");
 		String caseInsensitiveOption = g.getOptionString("caseInsensitive");
 		caseInsensitive = caseInsensitiveOption != null && caseInsensitiveOption.equals("true");
-		CodeGenerator gen = new CodeGenerator(g.tool, null, language);
-		codegenTemplates = gen.getTemplates();
+		codegenTemplates = (codeGenerator == null ? CodeGenerator.create(g) : codeGenerator).getTemplates();
 	}
 
 	public static Set<String> getCommonConstants() {
@@ -142,6 +126,7 @@ public class LexerATNFactory extends ParserATNFactory {
 		}
 
 		ATNOptimizer.optimize(g, atn);
+		checkEpsilonClosure();
 		return atn;
 	}
 
@@ -380,10 +365,6 @@ public class LexerATNFactory extends ParserATNFactory {
 		ATNState right = newState(charSetAST);
 		IntervalSet set = getSetFromCharSetLiteral(charSetAST);
 
-		if (set.isNil()) {
-			g.tool.errMgr.grammarError(ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED, g.fileName, charSetAST.getToken(), "[]");
-		}
-
 		left.addTransition(new SetTransition(right, set));
 		charSetAST.atnState = left;
 		return new Handle(left, right);
@@ -501,6 +482,11 @@ public class LexerATNFactory extends ParserATNFactory {
 		}
 		// Whether or not we were in a range, we'll add the last code point found to the set.
 		applyPrevState(charSetAST, set, state);
+
+		if (set.isNil()) {
+			g.tool.errMgr.grammarError(ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED, g.fileName, charSetAST.getToken(), "[]");
+		}
+
 		return set;
 	}
 
