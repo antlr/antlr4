@@ -8,13 +8,12 @@ package org.antlr.v4.test.runtime.csharp;
 
 import org.antlr.v4.test.runtime.BaseRuntimeTest;
 import org.antlr.v4.test.runtime.RuntimeTestDescriptor;
-import org.antlr.v4.test.runtime.category.ParserTests;
-import org.antlr.v4.test.runtime.descriptors.ParserErrorsDescriptors;
+import org.antlr.v4.test.runtime.category.ParserTestsGroup1;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-@Category(ParserTests.class)
+@Category(ParserTestsGroup1.class)
 @RunWith(Parameterized.class)
 public class TestParserErrors extends BaseRuntimeTest {
 	public TestParserErrors(RuntimeTestDescriptor descriptor) {
@@ -23,6 +22,6 @@ public class TestParserErrors extends BaseRuntimeTest {
 
 	@Parameterized.Parameters(name="{0}")
 	public static RuntimeTestDescriptor[] getAllTestDescriptors() {
-		return BaseRuntimeTest.getRuntimeTestDescriptors(ParserErrorsDescriptors.class, "CSharp");
+		return BaseRuntimeTest.getRuntimeTestDescriptors("ParserErrors", "CSharp");
 	}
 }

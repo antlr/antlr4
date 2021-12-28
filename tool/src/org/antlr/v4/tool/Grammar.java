@@ -74,6 +74,8 @@ public class Grammar implements AttributeResolver {
 	 */
 	public static final String INVALID_RULE_NAME = "<invalid>";
 
+	public static final String caseInsensitiveOptionName = "caseInsensitive";
+
 	public static final Set<String> parserOptions = new HashSet<String>();
 	static {
 		parserOptions.add("superClass");
@@ -83,15 +85,21 @@ public class Grammar implements AttributeResolver {
 		parserOptions.add("language");
 		parserOptions.add("accessLevel");
 		parserOptions.add("exportMacro");
+		parserOptions.add(caseInsensitiveOptionName);
 	}
 
 	public static final Set<String> lexerOptions = parserOptions;
 
-	public static final Set<String> ruleOptions = new HashSet<String>();
+	public static final Set<String> lexerRuleOptions = new HashSet<>();
+	static {
+		lexerRuleOptions.add(caseInsensitiveOptionName);
+	}
 
-	public static final Set<String> ParserBlockOptions = new HashSet<String>();
+	public static final Set<String> parseRuleOptions = new HashSet<>();
 
-	public static final Set<String> LexerBlockOptions = new HashSet<String>();
+	public static final Set<String> parserBlockOptions = new HashSet<String>();
+
+	public static final Set<String> lexerBlockOptions = new HashSet<String>();
 
 	/** Legal options for rule refs like id&lt;key=value&gt; */
 	public static final Set<String> ruleRefOptions = new HashSet<String>();
@@ -435,7 +443,6 @@ public class Grammar implements AttributeResolver {
 		if ( rules.get(r.name)!=null ) {
 			return false;
 		}
-
 		rules.put(r.name, r);
 		r.index = ruleNumber++;
 		indexToRule.add(r);
@@ -793,8 +800,9 @@ public class Grammar implements AttributeResolver {
 		}
 
 		for (Map.Entry<String, Integer> entry : stringLiteralToTypeMap.entrySet()) {
-			if (entry.getValue() >= 0 && entry.getValue() < literalNames.length && literalNames[entry.getValue()] == null) {
-				literalNames[entry.getValue()] = entry.getKey();
+			int value = entry.getValue();
+			if (value >= 0 && value < literalNames.length && literalNames[value] == null) {
+				literalNames[value] = entry.getKey();
 			}
 		}
 
@@ -886,7 +894,7 @@ public class Grammar implements AttributeResolver {
 	public int getMaxCharValue() {
 		return org.antlr.v4.runtime.Lexer.MAX_CHAR_VALUE;
 //		if ( generator!=null ) {
-//			return generator.target.getMaxCharValue(generator);
+//			return generator.getTarget().getMaxCharValue(generator);
 //		}
 //		else {
 //			return Label.MAX_CHAR_VALUE;
@@ -1163,6 +1171,10 @@ public class Grammar implements AttributeResolver {
             default :
                 return "<invalid>";
         }
+	}
+
+	public String getLanguage() {
+		return getOptionString("language");
 	}
 
 	public String getOptionString(String key) { return ast.getOptionString(key); }

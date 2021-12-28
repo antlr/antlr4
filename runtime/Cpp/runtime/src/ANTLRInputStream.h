@@ -1,9 +1,11 @@
-﻿/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 
 #pragma once
+
+#include <string_view>
 
 #include "CharStream.h"
 
@@ -16,7 +18,7 @@ namespace antlr4 {
   protected:
     /// The data being scanned.
     // UTF-32
-    UTF32String _data;
+    std::u32string _data;
 
     /// 0..n-1 index into string of next char </summary>
     size_t p;
@@ -25,20 +27,20 @@ namespace antlr4 {
     /// What is name or source of this char stream?
     std::string name;
 
-#if __cplusplus >= 201703L
-    ANTLRInputStream(std::string_view input = "");
-#else
-    ANTLRInputStream(const std::string &input = "");
-#endif
-    ANTLRInputStream(const char data_[], size_t numberOfActualCharsInArray);
+    ANTLRInputStream();
+
+    ANTLRInputStream(std::string_view input);
+
+    ANTLRInputStream(const char *data, size_t length);
     ANTLRInputStream(std::istream &stream);
 
-#if __cplusplus >= 201703L
-    virtual void load(std::string_view input);
-#else
-    virtual void load(const std::string &input);
-#endif
-    virtual void load(std::istream &stream);
+    virtual void load(const std::string &input, bool lenient);
+    virtual void load(const char *data, size_t length, bool lenient);
+    virtual void load(std::istream &stream, bool lenient);
+
+    virtual void load(const std::string &input) { load(input, false); }
+    virtual void load(const char *data, size_t length) { load(data, length, false); }
+    virtual void load(std::istream &stream) { load(stream, false); }
 
     /// Reset the stream so that it's in the same state it was
     /// when the object was created *except* the data array is not

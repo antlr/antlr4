@@ -8,6 +8,14 @@ using System.Text;
 
 namespace Antlr4.Runtime.Misc
 {
+    public static class StaticUtils
+    {
+        public static string ToString<T>(this IEnumerable<T> list)
+        {
+            return "[" + Utils.Join(", ", list) + "]";
+        }
+    }
+
     public class Utils
     {
         public static string Join<T>(string separator, IEnumerable<T> items)

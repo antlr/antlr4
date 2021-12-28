@@ -177,7 +177,6 @@ public class SemanticPipeline {
 				}
 			}
 		}
-
 	}
 
 	boolean hasTypeOrMoreCommand(Rule r) {

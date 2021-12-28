@@ -4,14 +4,9 @@
 /// can be found in the LICENSE.txt file in the project root.
 ///
 public class MultiMap<K:Hashable, V> {
-    private var mapping = [K: Array < V>]()
+    private var mapping = [K: Array<V>]()
     public func map(_ key: K, _ value: V) {
-        var elementsForKey: Array<V>? = mapping[key]
-        if elementsForKey == nil {
-            elementsForKey = Array<V>()
-            mapping[key] = elementsForKey
-        }
-        elementsForKey?.append(value)
+        mapping[key, default: Array()].append(value)
     }
 
     public func getPairs() -> Array<(K, V)> {

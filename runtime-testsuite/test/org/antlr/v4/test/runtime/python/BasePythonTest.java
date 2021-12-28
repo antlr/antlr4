@@ -195,7 +195,8 @@ public abstract class BasePythonTest extends BaseRuntimeTestSupport implements R
 	private String locateTool(List<String> tools) {
 		String[] roots = {
 			"/opt/local/bin", "/usr/bin/", "/usr/local/bin/",
-		    "/Users/"+System.getProperty("user.name")+"/anaconda3/bin/"
+			"/Users/"+System.getProperty("user.name")+"/anaconda3/bin/",
+			"/Users/"+System.getProperty("user.name")+"/opt/anaconda3/bin/"
 		};
 		for(String root : roots) {
 			for (String tool : tools) {

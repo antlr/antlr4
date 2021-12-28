@@ -4,61 +4,51 @@
  */
 
 #include "atn/ATNDeserializationOptions.h"
+#include "Exceptions.h"
 
+#include <memory>
+#include <mutex>
+
+using namespace antlr4;
 using namespace antlr4::atn;
 
-ATNDeserializationOptions ATNDeserializationOptions::defaultOptions;
+namespace {
 
-ATNDeserializationOptions::ATNDeserializationOptions() {
-  InitializeInstanceFields();
+std::once_flag defaultATNDeserializationOptionsOnceFlag;
+std::unique_ptr<ATNDeserializationOptions> defaultATNDeserializationOptions;
+
+void initializeDefaultATNDeserializationOptions() {
+  defaultATNDeserializationOptions.reset(new ATNDeserializationOptions());
 }
 
-ATNDeserializationOptions::ATNDeserializationOptions(ATNDeserializationOptions *options) : ATNDeserializationOptions() {
-  this->verifyATN = options->verifyATN;
-  this->generateRuleBypassTransitions = options->generateRuleBypassTransitions;
 }
 
-ATNDeserializationOptions::~ATNDeserializationOptions() {
-}
+ATNDeserializationOptions::ATNDeserializationOptions(ATNDeserializationOptions *options)
+    : _readOnly(false), _verifyATN(options->_verifyATN),
+      _generateRuleBypassTransitions(options->_generateRuleBypassTransitions) {}
 
 const ATNDeserializationOptions& ATNDeserializationOptions::getDefaultOptions() {
-  return defaultOptions;
-}
-
-bool ATNDeserializationOptions::isReadOnly() {
-  return readOnly;
+  std::call_once(defaultATNDeserializationOptionsOnceFlag,
+                 initializeDefaultATNDeserializationOptions);
+  return *defaultATNDeserializationOptions;
 }
 
 void ATNDeserializationOptions::makeReadOnly() {
-  readOnly = true;
-}
-
-bool ATNDeserializationOptions::isVerifyATN() {
-  return verifyATN;
+  _readOnly = true;
 }
 
 void ATNDeserializationOptions::setVerifyATN(bool verify) {
   throwIfReadOnly();
-  verifyATN = verify;
-}
-
-bool ATNDeserializationOptions::isGenerateRuleBypassTransitions() {
-  return generateRuleBypassTransitions;
+  _verifyATN = verify;
 }
 
 void ATNDeserializationOptions::setGenerateRuleBypassTransitions(bool generate) {
   throwIfReadOnly();
-  generateRuleBypassTransitions = generate;
+  _generateRuleBypassTransitions = generate;
 }
 
-void ATNDeserializationOptions::throwIfReadOnly() {
+void ATNDeserializationOptions::throwIfReadOnly() const {
   if (isReadOnly()) {
-    throw "The object is read only.";
+    throw IllegalStateException("ATNDeserializationOptions is read only.");
   }
-}
-
-void ATNDeserializationOptions::InitializeInstanceFields() {
-  readOnly = false;
-  verifyATN = true;
-  generateRuleBypassTransitions = false;
 }

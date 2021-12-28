@@ -6,11 +6,12 @@
 
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 import 'dart:math';
 
 import 'interval_set.dart';
 import 'token.dart';
+
+import 'util/platform_stub.dart' if (dart.library.io) 'util/platform_io.dart';
 
 /// A simple stream of symbols whose values are represented as integers. This
 /// interface provides <em>marked ranges</em> with support for a minimum level
@@ -89,7 +90,7 @@ abstract class IntStream {
   ///
   /// @throws UnsupportedOperationException if the stream does not support
   /// retrieving the value of the specified symbol
-  int LA(int i);
+  int? LA(int i);
 
   /// A mark provides a guarantee that {@link #seek seek()} operations will be
   /// valid over a "marked range" extending from the index where {@code mark()}
@@ -221,7 +222,7 @@ abstract class CharStream extends IntStream {
 // Vacuum all input from a string and then treat it like a buffer.
 class InputStream extends CharStream {
   final name = '<empty>';
-  List<int> data;
+  late List<int> data;
   int _index = 0;
   bool decodeToUnicodeCodePoints = false;
 
@@ -248,7 +249,7 @@ class InputStream extends CharStream {
   }
 
   static Future<InputStream> fromPath(String path, {Encoding encoding = utf8}) {
-    return fromStream(File(path).openRead());
+    return fromStream(readStream(path), encoding: encoding);
   }
 
   @override

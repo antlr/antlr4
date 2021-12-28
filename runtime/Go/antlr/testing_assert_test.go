@@ -69,7 +69,7 @@ func isNil(object interface{}) bool {
 
 func (a *assert) Panics(f func()) bool {
 	if funcDidPanic, panicValue := didPanic(f); !funcDidPanic {
-		return a.Fail(fmt.Sprintf("func %#v should panic\n\r\tPanic value:\t%v", f, panicValue))
+		return a.Fail(fmt.Sprintf("func %p should panic\n\r\tPanic value:\t%v", f, panicValue))
 	}
 
 	return true

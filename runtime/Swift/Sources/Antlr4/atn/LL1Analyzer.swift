@@ -137,7 +137,7 @@ public class LL1Analyzer {
                         _ seeThruPreds: Bool,
                         _ addEOF: Bool) {
         // print ("_LOOK(\(s.stateNumber), ctx=\(ctx)");
-        let c = ATNConfig(s, 0, ctx)
+        let c = ATNConfig(s, ATN.INVALID_ALT_NUMBER, ctx)
         if lookBusy.contains(c) {
             return
         } else {

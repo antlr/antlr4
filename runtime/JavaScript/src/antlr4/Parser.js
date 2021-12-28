@@ -224,16 +224,16 @@ class Parser extends Recognizer {
 		}
 	}
 
-// Remove all parse listeners.
+	// Remove all parse listeners.
 	removeParseListeners() {
 		this._parseListeners = null;
 	}
 
-// Notify any parse listeners of an enter rule event.
+	// Notify any parse listeners of an enter rule event.
 	triggerEnterRuleEvent() {
 		if (this._parseListeners !== null) {
 			const ctx = this._ctx;
-			this._parseListeners.map(function(listener) {
+			this._parseListeners.forEach(function(listener) {
 				listener.enterEveryRule(ctx);
 				ctx.enterRule(listener);
 			});
@@ -248,7 +248,7 @@ class Parser extends Recognizer {
 		if (this._parseListeners !== null) {
 			// reverse order walk of listeners
 			const ctx = this._ctx;
-			this._parseListeners.slice(0).reverse().map(function(listener) {
+			this._parseListeners.slice(0).reverse().forEach(function(listener) {
 				ctx.exitRule(listener);
 				listener.exitEveryRule(ctx);
 			});
@@ -392,7 +392,7 @@ class Parser extends Recognizer {
 			}
 			node.invokingState = this.state;
 			if (hasListener) {
-				this._parseListeners.map(function(listener) {
+				this._parseListeners.forEach(function(listener) {
 					if (node instanceof ErrorNode || (node.isErrorNode !== undefined && node.isErrorNode())) {
 						listener.visitErrorNode(node);
 					} else if (node instanceof TerminalNode) {
@@ -422,17 +422,13 @@ class Parser extends Recognizer {
 		if (this.buildParseTrees) {
 			this.addContextToParseTree();
 		}
-		if (this._parseListeners !== null) {
-			this.triggerEnterRuleEvent();
-		}
+		this.triggerEnterRuleEvent();
 	}
 
 	exitRule() {
 		this._ctx.stop = this._input.LT(-1);
 		// trigger event on _ctx, before it reverts to parent
-		if (this._parseListeners !== null) {
-			this.triggerExitRuleEvent();
-		}
+		this.triggerExitRuleEvent();
 		this.state = this._ctx.invokingState;
 		this._ctx = this._ctx.parentCtx;
 	}
@@ -469,10 +465,7 @@ class Parser extends Recognizer {
 	   this._precedenceStack.push(precedence);
 	   this._ctx = localctx;
 	   this._ctx.start = this._input.LT(1);
-	   if (this._parseListeners !== null) {
-		   this.triggerEnterRuleEvent(); // simulates rule entry for
-		   									// left-recursive rules
-	   }
+	   this.triggerEnterRuleEvent(); // simulates rule entry for left-recursive rules
    }
 
 	// Like {@link //enterRule} but for recursive rules.
@@ -487,10 +480,7 @@ class Parser extends Recognizer {
 		if (this.buildParseTrees) {
 			this._ctx.addChild(previous);
 		}
-		if (this._parseListeners !== null) {
-			this.triggerEnterRuleEvent(); // simulates rule entry for
-											// left-recursive rules
-		}
+		this.triggerEnterRuleEvent(); // simulates rule entry for left-recursive rules
 	}
 
 	unrollRecursionContexts(parentCtx) {
@@ -498,7 +488,8 @@ class Parser extends Recognizer {
 		this._ctx.stop = this._input.LT(-1);
 		const retCtx = this._ctx; // save current ctx (return value)
 		// unroll so _ctx is as it was before call to recursive method
-		if (this._parseListeners !== null) {
+		const parseListeners = this.getParseListeners();
+		if (parseListeners !== null && parseListeners.length > 0) {
 			while (this._ctx !== parentCtx) {
 				this.triggerExitRuleEvent();
 				this._ctx = this._ctx.parentCtx;
