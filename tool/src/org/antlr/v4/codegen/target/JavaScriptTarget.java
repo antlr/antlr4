@@ -22,12 +22,6 @@ import java.util.Set;
  * @author Eric Vergnaud
  */
 public class JavaScriptTarget extends Target {
-	public final static String key = "JavaScript";
-
-	static {
-		checkKey(JavaScriptTarget.class, key);
-	}
-
 	/** Source: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Lexical_grammar */
 	protected static final String[] javaScriptKeywords = {
 		"break", "case", "class", "catch", "const", "continue", "debugger",

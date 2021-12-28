@@ -22,12 +22,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class CppTarget extends Target {
-	public final static String key = "Cpp";
-
-	static {
-		checkKey(CppTarget.class, key);
-	}
-
 	protected static final String[] cppKeywords = {
 		"alignas", "alignof", "and", "and_eq", "asm", "auto", "bitand",
 		"bitor", "bool", "break", "case", "catch", "char", "char16_t",

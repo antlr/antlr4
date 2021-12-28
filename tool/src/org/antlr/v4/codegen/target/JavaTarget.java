@@ -19,12 +19,6 @@ import java.util.Locale;
 import java.util.Set;
 
 public class JavaTarget extends Target {
-	public final static String key = "Java";
-
-	static {
-		checkKey(JavaTarget.class, key);
-	}
-
 	/**
 	 * The Java target can cache the code generation templates.
 	 */

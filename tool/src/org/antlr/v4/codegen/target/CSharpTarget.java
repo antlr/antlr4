@@ -17,12 +17,6 @@ import org.stringtemplate.v4.StringRenderer;
 import org.stringtemplate.v4.misc.STMessage;
 
 public class CSharpTarget extends Target {
-	public final static String key = "CSharp";
-
-	static {
-		checkKey(CSharpTarget.class, key);
-	}
-
 	public CSharpTarget(CodeGenerator gen) {
 		super(gen);
 		targetCharValueEscape[0] = "\\0";

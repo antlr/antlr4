@@ -29,12 +29,6 @@ import java.util.Set;
  *
  * */
 public class GoTarget extends Target {
-	public final static String key = "Go";
-
-	static {
-		checkKey(GoTarget.class, key);
-	}
-
 	private static final String[] goKeywords = {
 			"break", "default", "func", "interface", "select",
 			"case", "defer", "go", "map", "struct",

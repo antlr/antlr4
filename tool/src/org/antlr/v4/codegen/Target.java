@@ -56,13 +56,6 @@ public abstract class Target {
 		this.gen = gen;
 	}
 
-	protected static void checkKey(Class clazz, String actualKey) throws ExceptionInInitializerError {
-		String expectedKeyValue = clazz.getSimpleName().replace("Target", "");
-		if (!expectedKeyValue.equals(actualKey)) {
-			throw new ExceptionInInitializerError(String.format("expected value of key is %s but actual is %s", expectedKeyValue, actualKey));
-		}
-	}
-
 	protected String getLanguage() {
 		return gen.language;
 	}

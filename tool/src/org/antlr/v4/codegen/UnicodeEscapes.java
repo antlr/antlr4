@@ -6,8 +6,6 @@
 
 package org.antlr.v4.codegen;
 
-import org.antlr.v4.codegen.target.*;
-
 /**
  * Utility class to escape Unicode code points using various
  * languages' syntax.
@@ -21,21 +19,21 @@ public class UnicodeEscapes {
 
 	public static void appendEscapedCodePoint(StringBuilder sb, int codePoint, String language) {
 		switch (language) {
-			case CSharpTarget.key:
-			case Python2Target.key:
-			case Python3Target.key:
-			case CppTarget.key:
-			case GoTarget.key:
-			case PHPTarget.key:
+			case "CSharp":
+			case "Python2":
+			case "Python3":
+			case "Cpp":
+			case "Go":
+			case "PHP":
 				String format = Character.isSupplementaryCodePoint(codePoint) ? "\\U%08X" : "\\u%04X";
 				sb.append(String.format(format, codePoint));
 				break;
-			case SwiftTarget.key:
+			case "Swift":
 				sb.append(String.format("\\u{%04X}", codePoint));
 				break;
-			case JavaTarget.key:
-			case JavaScriptTarget.key:
-			case DartTarget.key:
+			case "Java":
+			case "JavaScript":
+			case "Dart":
 			default:
 				if (Character.isSupplementaryCodePoint(codePoint)) {
 					// char is not an 'integral' type, so we have to explicitly convert

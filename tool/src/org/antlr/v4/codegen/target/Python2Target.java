@@ -22,12 +22,6 @@ import java.util.Set;
  * @author Eric Vergnaud
  */
 public class Python2Target extends Target {
-	public final static String key = "Python2";
-
-	static {
-		checkKey(Python2Target.class, key);
-	}
-
 	protected static final String[] python2Keywords = {
 		"abs", "all", "and", "any", "apply", "as", "assert",
 		"bin", "bool", "break", "buffer", "bytearray",

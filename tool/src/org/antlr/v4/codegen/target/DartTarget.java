@@ -17,12 +17,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class DartTarget extends Target {
-	public final static String key = "Dart";
-
-	static {
-		checkKey(DartTarget.class, key);
-	}
-
 	/**
 	 * The Java target can cache the code generation templates.
 	 */

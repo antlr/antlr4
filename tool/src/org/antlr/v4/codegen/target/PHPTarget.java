@@ -17,12 +17,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class PHPTarget extends Target {
-	public final static String key = "PHP";
-
-	static {
-		checkKey(PHPTarget.class, key);
-	}
-
 	private static final String[] phpKeywords = {
 		"abstract", "and", "array", "as",
 		"break",
