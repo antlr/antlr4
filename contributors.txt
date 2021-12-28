@@ -320,5 +320,6 @@ YYYY/MM/DD, github id, Full name, email
 2021/10/19, jcking, Justin King, jcking@google.com
 2021/10/31, skef, Skef Iterum, github@skef.org
 2021/10/31, hlstwizard, h.l.s.t@163.com
+2021/11/30, bollwyvl, Nick Bollweg, bollwyvl@users.noreply.github.com
 2021/12/03, eneko, Eneko Alonso, eneko.alonso@gmail.com
 2021/12/25, Tinker1024, Tinker1024, tinker@huawei.com
