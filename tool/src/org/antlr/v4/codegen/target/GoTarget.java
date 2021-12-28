@@ -8,7 +8,6 @@ package org.antlr.v4.codegen.target;
 
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.codegen.Target;
-import org.antlr.v4.codegen.UnicodeEscapes;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.ast.GrammarAST;
@@ -30,7 +29,6 @@ import java.util.Set;
  *
  * */
 public class GoTarget extends Target {
-
 	private static final String[] goKeywords = {
 			"break", "default", "func", "interface", "select",
 			"case", "defer", "go", "map", "struct",
@@ -66,12 +64,7 @@ public class GoTarget extends Target {
 			&& !Boolean.parseBoolean(System.getProperty("antlr.go.disable-gofmt"));
 
 	public GoTarget(CodeGenerator gen) {
-		super(gen, "Go");
-	}
-
-	@Override
-	public String getVersion() {
-		return "4.9.3";
+		super(gen);
 	}
 
 	public Set<String> getBadWords() {
@@ -130,14 +123,6 @@ public class GoTarget extends Target {
 	@Override
 	public String encodeIntAsCharEscape(int v) {
 		return Integer.toString(v);
-	}
-
-	@Override
-	public int getSerializedATNSegmentLimit() {
-		// 65535 is the class file format byte limit for a UTF-8 encoded string literal
-		// 3 is the maximum number of bytes it takes to encode a value in the range 0-0xFFFF
-		// (Mimicking Java here; not sure of true limit)
-		return 65535 / 3;
 	}
 
 	@Override
@@ -229,11 +214,5 @@ public class GoTarget extends Target {
 			return super.toString(o, formatString, locale);
 		}
 
-	}
-
-	@Override
-	protected void appendUnicodeEscapedCodePoint(int codePoint, StringBuilder sb) {
-		// Go and Python share the same escaping style.
-		UnicodeEscapes.appendPythonStyleEscapedCodePoint(codePoint, sb);
 	}
 }

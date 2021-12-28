@@ -13,7 +13,7 @@
 		<version>4.9.4-SNAPSHOT</version>
 	</parent>
 	<artifactId>antlr4-runtime-testsuite</artifactId>
-	<name>ANTLR 4 Runtime Tests (2nd generation)</name>
+	<name>ANTLR 4 Runtime Tests (3rd generation)</name>
 	<description>A collection of tests for ANTLR 4 Runtime libraries.</description>
 
 	<prerequisites>
@@ -42,27 +42,15 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.antlr</groupId>
-			<artifactId>antlr4-runtime-test-annotations</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.antlr</groupId>
-			<artifactId>antlr4-runtime-test-annotation-processors</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.13.1</version>
+			<version>4.13.2</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.glassfish</groupId>
 			<artifactId>javax.json</artifactId>
-			<version>1.0.4</version>
+			<version>1.1.4</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -98,6 +86,7 @@
 					<includes>
                         <include>**/csharp/Test*.java</include>
                         <include>**/java/Test*.java</include>
+                        <include>**/java/api/Test*.java</include>
                         <include>**/go/Test*.java</include>
                         <include>**/javascript/Test*.java</include>
                         <include>**/python2/Test*.java</include>
@@ -138,7 +127,11 @@
 					</execution>
 				</executions>
 			</plugin>
-		</plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+        </plugins>
 	</build>
 
 	<profiles>

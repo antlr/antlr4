@@ -7,15 +7,32 @@
 
 namespace antlrcpp {
 
-  void replaceAll(std::string& str, std::string_view from, std::string_view to) {
-    if (from.empty())
-      return;
+  std::string escapeWhitespace(std::string_view in) {
+    std::string out;
+    escapeWhitespace(out, in);
+    out.shrink_to_fit();
+    return out;
+  }
 
-    size_t start_pos = 0;
-    while ((start_pos = str.find(from, start_pos)) != std::string::npos) {
-      str.replace(start_pos, from.length(), to);
-      start_pos += to.length(); // In case 'to' contains 'from', like replacing 'x' with 'yx'.
+  std::string& escapeWhitespace(std::string& out, std::string_view in) {
+    out.reserve(in.size());  // Best case, no escaping.
+    for (const auto &c : in) {
+      switch (c) {
+        case '\t':
+          out.append("\\t");
+          break;
+        case '\r':
+          out.append("\\r");
+          break;
+        case '\n':
+          out.append("\\n");
+          break;
+        default:
+          out.push_back(c);
+          break;
+      }
     }
+    return out;
   }
 
 } // namespace antrlcpp

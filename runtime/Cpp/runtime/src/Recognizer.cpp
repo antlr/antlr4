@@ -6,11 +6,11 @@
 #include "ConsoleErrorListener.h"
 #include "RecognitionException.h"
 #include "support/CPPUtils.h"
-#include "support/StringUtils.h"
 #include "Token.h"
 #include "atn/ATN.h"
 #include "atn/ATNSimulator.h"
 #include "support/CPPUtils.h"
+#include "support/StringUtils.h"
 
 #include "Vocabulary.h"
 
@@ -113,11 +113,13 @@ std::string Recognizer::getTokenErrorDisplay(Token *t) {
     }
   }
 
-  antlrcpp::replaceAll(s, "\n", "\\n");
-  antlrcpp::replaceAll(s, "\r","\\r");
-  antlrcpp::replaceAll(s, "\t", "\\t");
-
-  return "'" + s + "'";
+  std::string result;
+  result.reserve(s.size() + 2);
+  result.push_back('\'');
+  antlrcpp::escapeWhitespace(result, s);
+  result.push_back('\'');
+  result.shrink_to_fit();
+  return result;
 }
 
 void Recognizer::addErrorListener(ANTLRErrorListener *listener) {

@@ -5,23 +5,24 @@
 
 #pragma once
 
+#include <cstdint>
+
 #include "antlr4-common.h"
 
 namespace antlr4 {
 namespace misc {
 
-  class ANTLR4CPP_PUBLIC MurmurHash {
-
+  class ANTLR4CPP_PUBLIC MurmurHash final {
   private:
     static constexpr size_t DEFAULT_SEED = 0;
 
     /// Initialize the hash using the default seed value.
     /// Returns the intermediate hash value.
   public:
-    static size_t initialize();
+    static size_t initialize() { return initialize(DEFAULT_SEED); }
 
     /// Initialize the hash using the specified seed.
-    static size_t initialize(size_t seed);
+    static size_t initialize(size_t seed) { return seed; }
 
     /// Update the intermediate hash value for the next input {@code value}.
     /// <param name="hash"> the intermediate hash value </param>
@@ -64,12 +65,18 @@ namespace misc {
     template<typename T> // where T is C array type
     static size_t hashCode(const std::vector<Ref<T>> &data, size_t seed) {
       size_t hash = initialize(seed);
-      for (auto entry : data) {
-        hash = update(hash, entry->hashCode());
+      for (auto &entry : data) {
+        hash = update(hash, entry);
       }
-
       return finish(hash, data.size());
     }
+
+  private:
+    MurmurHash() = delete;
+
+    MurmurHash(const MurmurHash&) = delete;
+
+    MurmurHash& operator=(const MurmurHash&) = delete;
   };
 
 } // namespace atn

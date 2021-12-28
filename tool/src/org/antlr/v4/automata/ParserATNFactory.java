@@ -110,17 +110,7 @@ public class ParserATNFactory implements ATNFactory {
         addRuleFollowLinks();
 		addEOFTransitionToStartRules();
 		ATNOptimizer.optimize(g, atn);
-
-		for (Triple<Rule, ATNState, ATNState> pair : preventEpsilonClosureBlocks) {
-			LL1Analyzer analyzer = new LL1Analyzer(atn);
-			ATNState blkStart = pair.b;
-			ATNState blkStop = pair.c;
-			IntervalSet lookahead = analyzer.LOOK(blkStart, blkStop, null);
-			if ( lookahead.contains(org.antlr.v4.runtime.Token.EPSILON)) {
-				ErrorType errorType = pair.a instanceof LeftRecursiveRule ? ErrorType.EPSILON_LR_FOLLOW : ErrorType.EPSILON_CLOSURE;
-				g.tool.errMgr.grammarError(errorType, g.fileName, ((GrammarAST)pair.a.ast.getChild(0)).getToken(), pair.a.name);
-			}
-		}
+		checkEpsilonClosure();
 
 		optionalCheck:
 		for (Triple<Rule, ATNState, ATNState> pair : preventEpsilonOptionalBlocks) {
@@ -145,6 +135,22 @@ public class ParserATNFactory implements ATNFactory {
 		}
 
 		return atn;
+	}
+
+	protected void checkEpsilonClosure() {
+		for (Triple<Rule, ATNState, ATNState> pair : preventEpsilonClosureBlocks) {
+			LL1Analyzer analyzer = new LL1Analyzer(atn);
+			ATNState blkStart = pair.b;
+			ATNState blkStop = pair.c;
+			IntervalSet lookahead = analyzer.LOOK(blkStart, blkStop, null);
+			if ( lookahead.contains(org.antlr.v4.runtime.Token.EPSILON)) {
+				ErrorType errorType = pair.a instanceof LeftRecursiveRule ? ErrorType.EPSILON_LR_FOLLOW : ErrorType.EPSILON_CLOSURE;
+				g.tool.errMgr.grammarError(errorType, g.fileName, ((GrammarAST)pair.a.ast.getChild(0)).getToken(), pair.a.name);
+			}
+			if ( lookahead.contains(org.antlr.v4.runtime.Token.EOF)) {
+				g.tool.errMgr.grammarError(ErrorType.EOF_CLOSURE, g.fileName, ((GrammarAST)pair.a.ast.getChild(0)).getToken(), pair.a.name);
+			}
+		}
 	}
 
 	protected void _createATN(Collection<Rule> rules) {

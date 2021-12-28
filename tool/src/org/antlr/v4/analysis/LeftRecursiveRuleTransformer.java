@@ -62,7 +62,7 @@ public class LeftRecursiveRuleTransformer {
 	}
 
 	public void translateLeftRecursiveRules() {
-		String language = g.getOptionString("language");
+		String language = g.getLanguage();
 		// translate all recursive rules
 		List<String> leftRecursiveRuleNames = new ArrayList<String>();
 		for (Rule r : rules) {

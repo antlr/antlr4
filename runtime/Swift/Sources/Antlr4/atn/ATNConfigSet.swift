@@ -42,7 +42,7 @@ public final class ATNConfigSet: Hashable, CustomStringConvertible {
 
     // TODO: these fields make me pretty uncomfortable but nice to pack up info together, saves recomputation
     // TODO: can we track conflicts as they are added to save scanning configs later?
-    public internal(set) var uniqueAlt = 0
+    public internal(set) var uniqueAlt = ATN.INVALID_ALT_NUMBER
     //TODO no default
     /// 
     /// Currently this is only used when we detect SLL conflict; this does

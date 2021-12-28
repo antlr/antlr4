@@ -9,7 +9,6 @@ package org.antlr.v4.codegen.target;
 import org.antlr.v4.Tool;
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.codegen.Target;
-import org.antlr.v4.codegen.UnicodeEscapes;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.StringRenderer;
@@ -20,7 +19,6 @@ import java.util.Locale;
 import java.util.Set;
 
 public class JavaTarget extends Target {
-
 	/**
 	 * The Java target can cache the code generation templates.
 	 */
@@ -41,10 +39,10 @@ public class JavaTarget extends Target {
 	protected final Set<String> badWords = new HashSet<String>();
 
 	public JavaTarget(CodeGenerator gen) {
-		super(gen, "Java");
+		super(gen);
 	}
 
-    @Override
+	@Override
     public String getVersion() {
         return Tool.VERSION; // Java and tool versions move in lock step
     }
@@ -98,11 +96,5 @@ public class JavaTarget extends Target {
 
 			return super.toString(o, formatString, locale);
 		}
-
-	}
-
-	@Override
-	protected void appendUnicodeEscapedCodePoint(int codePoint, StringBuilder sb) {
-		UnicodeEscapes.appendJavaStyleEscapedCodePoint(codePoint, sb);
 	}
 }

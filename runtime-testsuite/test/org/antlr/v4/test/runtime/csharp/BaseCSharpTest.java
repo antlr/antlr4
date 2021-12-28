@@ -30,7 +30,6 @@ public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTes
 	private static boolean isRuntimeInitialized = false;
 	private final static String cSharpAntlrRuntimeDllName = "Antlr4.Runtime.Standard.dll";
 	private final static String testProjectFileName = "Antlr4.Test.csproj";
-	private final static boolean isDebug = false;
 	private static String cSharpTestProjectContent;
 	private static final String cSharpCachingDirectory = Paths.get(cachingDirectory, "CSharp").toString();
 
@@ -185,7 +184,7 @@ public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTes
 	}
 
 	private String locateExec() {
-		return new File(getTempTestDir(), "bin/" + getConfig() + "/netcoreapp3.1/Test.dll").getAbsolutePath();
+		return new File(getTempTestDir(), "bin/Release/netcoreapp3.1/Test.dll").getAbsolutePath();
 	}
 
 	public boolean buildProject() {
@@ -198,7 +197,7 @@ public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTes
 			}
 
 			// build test
-			String[] args = new String[] { "dotnet", "build", testProjectFileName, "-c", getConfig() };
+			String[] args = new String[] { "dotnet", "build", testProjectFileName, "-c", "Release" };
 			boolean success = runProcess(args, getTempDirPath());
 			assertTrue(success);
 		} catch (Exception e) {
@@ -257,10 +256,6 @@ public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTes
 		return success;
 	}
 
-	private static String getConfig() {
-		return isDebug ? "Debug" : "Release";
-	}
-
 	private boolean runProcess(String[] args, String path) throws Exception {
 		return runProcess(args, path, 0);
 	}
@@ -282,7 +277,7 @@ public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTes
 			setParseErrors(stderrVacuum.toString());
 			System.err.println("runProcess command: " + Utils.join(args, " "));
 			System.err.println("runProcess exitValue: " + exitValue);
-			System.err.println("runProcess stdoutVacuum: " + stdoutVacuum.toString());
+			System.err.println("runProcess stdoutVacuum: " + stdoutVacuum);
 			System.err.println("runProcess stderrVacuum: " + getParseErrors());
 		}
 		if (exitValue == 132) {

@@ -1,0 +1,22 @@
+[notes]
+This test is meant to test the expected solution to antlr/antlr4#42.
+https://github.com/antlr/antlr4/issues/42
+
+[type]
+Parser
+
+[grammar]
+grammar T;
+s : stmt EOF ;
+stmt : ifStmt | ID;
+ifStmt : 'if' ID stmt ('else' stmt | { <LANotEquals("1", {T<ParserToken("Parser", "ELSE")>})> }?);
+ELSE : 'else';
+ID : [a-zA-Z]+;
+WS : [ \\n\\t]+ -> skip;
+
+[start]
+s
+
+[input]
+if x if x a else b
+

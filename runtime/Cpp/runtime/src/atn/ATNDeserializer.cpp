@@ -38,7 +38,6 @@
 #include "misc/IntervalSet.h"
 #include "Exceptions.h"
 #include "support/CPPUtils.h"
-#include "support/StringUtils.h"
 #include "support/Casts.h"
 
 #include "atn/LexerCustomAction.h"

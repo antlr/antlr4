@@ -446,7 +446,6 @@ FRAGMENT     : 'fragment'             ;
 LEXER        : 'lexer'                ;
 PARSER       : 'parser'               ;
 GRAMMAR      : 'grammar'              ;
-TREE_GRAMMAR : 'tree' WSNLCHARS* 'grammar' ;
 PROTECTED    : 'protected'            ;
 PUBLIC       : 'public'               ;
 PRIVATE      : 'private'              ;

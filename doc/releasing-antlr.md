@@ -178,7 +178,7 @@ Uploaded: https://oss.sonatype.org/content/repositories/snapshots/org/antlr/antl
 [INFO] ANTLR 4 Maven plugin ............................... SUCCESS [  6.547 s]
 [INFO] ANTLR 4 Runtime Test Annotations ................... SUCCESS [  2.519 s]
 [INFO] ANTLR 4 Runtime Test Processors .................... SUCCESS [  2.385 s]
-[INFO] ANTLR 4 Runtime Tests (2nd generation) ............. SUCCESS [ 15.276 s]
+[INFO] ANTLR 4 Runtime Tests (3rd generation) ............. SUCCESS [ 15.276 s]
 [INFO] ANTLR 4 Tool Tests ................................. SUCCESS [  2.233 s]
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS

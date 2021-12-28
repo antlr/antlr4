@@ -83,6 +83,12 @@
   #endif
 #endif
 
+#ifdef __has_builtin
+#define ANTLR4_HAVE_BUILTIN(x) __has_builtin(x)
+#else
+#define ANTLR4_HAVE_BUILTIN(x) 0
+#endif
+
 #include "support/Guid.h"
 #include "support/Declarations.h"
 

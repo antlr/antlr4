@@ -1,0 +1,29 @@
+[type]
+CompositeParser
+
+[grammar]
+grammar M;
+import S;
+prog : decl ;
+type_ : 'int' | 'float' ;
+ID  : 'a'..'z'+ ;
+INT : '0'..'9'+ ;
+WS : (' '|'\n') -> skip;
+
+[slaveGrammar]
+parser grammar S;
+type_ : 'int' ;
+decl : type_ ID ';'
+    | type_ ID init_ ';' {<AppendStr("\"JavaDecl: \"","$text"):writeln()>};
+init_ : '=' INT;
+
+[start]
+prog
+
+[input]
+float x = 3;
+
+[output]
+"""JavaDecl: floatx=3;
+"""
+

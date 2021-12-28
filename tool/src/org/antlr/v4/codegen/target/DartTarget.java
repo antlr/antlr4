@@ -6,10 +6,8 @@
 
 package org.antlr.v4.codegen.target;
 
-import org.antlr.v4.Tool;
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.codegen.Target;
-import org.antlr.v4.codegen.UnicodeEscapes;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.StringRenderer;
@@ -19,7 +17,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class DartTarget extends Target {
-
 	/**
 	 * The Java target can cache the code generation templates.
 	 */
@@ -47,19 +44,15 @@ public class DartTarget extends Target {
 	protected final Set<String> badWords = new HashSet<String>();
 
 	public DartTarget(CodeGenerator gen) {
-		super(gen, "Dart");
+		super(gen);
 
 		targetCharValueEscape['$'] = "\\$";
 	}
 
 	@Override
-	public String getTargetStringLiteralFromANTLRStringLiteral(CodeGenerator generator, String literal, boolean addQuotes) {
-		return super.getTargetStringLiteralFromANTLRStringLiteral(generator, literal, addQuotes).replace("$", "\\$");
-	}
-
-	@Override
-	public String getVersion() {
-		return Tool.VERSION; // Java and tool versions move in lock step
+	public String getTargetStringLiteralFromANTLRStringLiteral(CodeGenerator generator, String literal, boolean addQuotes,
+															   boolean escapeSpecial) {
+		return super.getTargetStringLiteralFromANTLRStringLiteral(generator, literal, addQuotes, escapeSpecial).replace("$", "\\$");
 	}
 
 	public Set<String> getBadWords() {
@@ -74,13 +67,6 @@ public class DartTarget extends Target {
 		badWords.addAll(Arrays.asList(javaKeywords));
 		badWords.add("rule");
 		badWords.add("parserRule");
-	}
-
-	@Override
-	public int getSerializedATNSegmentLimit() {
-		// 65535 is the class file format byte limit for a UTF-8 encoded string literal
-		// 3 is the maximum number of bytes it takes to encode a value in the range 0-0xFFFF
-		return 65535 / 3;
 	}
 
 	@Override
@@ -103,10 +89,5 @@ public class DartTarget extends Target {
 		}
 
 		return String.format("\\u{%X}", v & 0xFFFF);
-	}
-
-	@Override
-	protected void appendUnicodeEscapedCodePoint(int codePoint, StringBuilder sb) {
-		UnicodeEscapes.appendJavaStyleEscapedCodePoint(codePoint, sb);
 	}
 }

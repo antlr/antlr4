@@ -8,31 +8,14 @@ package org.antlr.v4.automata;
 
 import org.antlr.runtime.CommonToken;
 import org.antlr.runtime.Token;
+import org.antlr.runtime.tree.CommonTree;
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.misc.CharSupport;
 import org.antlr.v4.misc.EscapeSequenceParsing;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.IntStream;
 import org.antlr.v4.runtime.Lexer;
-import org.antlr.v4.runtime.atn.ATN;
-import org.antlr.v4.runtime.atn.ATNState;
-import org.antlr.v4.runtime.atn.ActionTransition;
-import org.antlr.v4.runtime.atn.AtomTransition;
-import org.antlr.v4.runtime.atn.CodePointTransitions;
-import org.antlr.v4.runtime.atn.LexerAction;
-import org.antlr.v4.runtime.atn.LexerChannelAction;
-import org.antlr.v4.runtime.atn.LexerCustomAction;
-import org.antlr.v4.runtime.atn.LexerModeAction;
-import org.antlr.v4.runtime.atn.LexerMoreAction;
-import org.antlr.v4.runtime.atn.LexerPopModeAction;
-import org.antlr.v4.runtime.atn.LexerPushModeAction;
-import org.antlr.v4.runtime.atn.LexerSkipAction;
-import org.antlr.v4.runtime.atn.LexerTypeAction;
-import org.antlr.v4.runtime.atn.NotSetTransition;
-import org.antlr.v4.runtime.atn.RuleStartState;
-import org.antlr.v4.runtime.atn.SetTransition;
-import org.antlr.v4.runtime.atn.TokensStartState;
-import org.antlr.v4.runtime.atn.Transition;
+import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.tool.ErrorType;
@@ -74,7 +57,9 @@ public class LexerATNFactory extends ParserATNFactory {
 		COMMON_CONSTANTS.put("MIN_CHAR_VALUE", Lexer.MIN_CHAR_VALUE);
 	}
 
-	private List<String> ruleCommands = new ArrayList<String>();
+	private final List<String> ruleCommands = new ArrayList<String>();
+
+	private final boolean caseInsensitive;
 
 	/**
 	 * Maps from an action index to a {@link LexerAction} object.
@@ -86,11 +71,15 @@ public class LexerATNFactory extends ParserATNFactory {
 	protected Map<LexerAction, Integer> actionToIndexMap = new HashMap<LexerAction, Integer>();
 
 	public LexerATNFactory(LexerGrammar g) {
+		this(g, null);
+	}
+
+	public LexerATNFactory(LexerGrammar g, CodeGenerator codeGenerator) {
 		super(g);
 		// use codegen to get correct language templates for lexer commands
-		String language = g.getOptionString("language");
-		CodeGenerator gen = new CodeGenerator(g.tool, null, language);
-		codegenTemplates = gen.getTemplates();
+		String caseInsensitiveOption = g.getOptionString("caseInsensitive");
+		caseInsensitive = caseInsensitiveOption != null && caseInsensitiveOption.equals("true");
+		codegenTemplates = (codeGenerator == null ? CodeGenerator.create(g) : codeGenerator).getTemplates();
 	}
 
 	public static Set<String> getCommonConstants() {
@@ -137,6 +126,7 @@ public class LexerATNFactory extends ParserATNFactory {
 		}
 
 		ATNOptimizer.optimize(g, atn);
+		checkEpsilonClosure();
 		return atn;
 	}
 
@@ -256,8 +246,9 @@ public class LexerATNFactory extends ParserATNFactory {
 		ATNState right = newState(b);
 		int t1 = CharSupport.getCharValueFromGrammarCharLiteral(a.getText());
 		int t2 = CharSupport.getCharValueFromGrammarCharLiteral(b.getText());
-		checkRange(a, b, t1, t2);
-		left.addTransition(CodePointTransitions.createWithCodePointRange(right, t1, t2));
+		if (checkRange(a, b, t1, t2)) {
+			left.addTransition(createTransition(right, t1, t2, a));
+		}
 		a.atnState = left;
 		b.atnState = left;
 		return new Handle(left, right);
@@ -272,9 +263,8 @@ public class LexerATNFactory extends ParserATNFactory {
 			if ( t.getType()==ANTLRParser.RANGE ) {
 				int a = CharSupport.getCharValueFromGrammarCharLiteral(t.getChild(0).getText());
 				int b = CharSupport.getCharValueFromGrammarCharLiteral(t.getChild(1).getText());
-				if (checkRange((GrammarAST) t.getChild(0), (GrammarAST) t.getChild(1), a, b)) {
-					checkSetCollision(associatedAST, set, a, b);
-					set.add(a,b);
+				if (checkRange((GrammarAST)t.getChild(0), (GrammarAST)t.getChild(1), a, b)) {
+					checkRangeAndAddToSet(associatedAST, t, set, a, b, caseInsensitive, null);
 				}
 			}
 			else if ( t.getType()==ANTLRParser.LEXER_CHAR_SET ) {
@@ -283,8 +273,7 @@ public class LexerATNFactory extends ParserATNFactory {
 			else if ( t.getType()==ANTLRParser.STRING_LITERAL ) {
 				int c = CharSupport.getCharValueFromGrammarCharLiteral(t.getText());
 				if ( c != -1 ) {
-					checkSetCollision(associatedAST, set, c);
-					set.add(c);
+					checkCharAndAddToSet(associatedAST, set, c);
 				}
 				else {
 					g.tool.errMgr.grammarError(ErrorType.INVALID_LITERAL_IN_LEXER_SET,
@@ -327,19 +316,22 @@ public class LexerATNFactory extends ParserATNFactory {
 			g.tool.errMgr.grammarError(ErrorType.INVALID_LITERAL_IN_LEXER_SET,
 					g.fileName, rightNode.getToken(), rightNode.getText());
 		}
-		if (!result) return result;
+		if (!result) return false;
 
 		if (rightValue < leftValue) {
 			g.tool.errMgr.grammarError(ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED,
 					g.fileName, leftNode.parent.getToken(), leftNode.getText() + ".." + rightNode.getText());
+			return false;
 		}
-		return result;
+		return true;
 	}
 
 	/** For a lexer, a string is a sequence of char to match.  That is,
 	 *  "fog" is treated as 'f' 'o' 'g' not as a single transition in
 	 *  the DFA.  Machine== o-'f'-&gt;o-'o'-&gt;o-'g'-&gt;o and has n+1 states
 	 *  for n characters.
+	 *  if "caseInsensitive" option is enabled, "fog" will be treated as
+	 *  o-('f'|'F') -> o-('o'|'O') -> o-('g'|'G')
 	 */
 	@Override
 	public Handle stringLiteral(TerminalAST stringLiteralAST) {
@@ -358,7 +350,7 @@ public class LexerATNFactory extends ParserATNFactory {
 		for (int i = 0; i < n; ) {
 			right = newState(stringLiteralAST);
 			int codePoint = s.codePointAt(i);
-			prev.addTransition(CodePointTransitions.createWithCodePoint(right, codePoint));
+			prev.addTransition(createTransition(right, codePoint, codePoint, stringLiteralAST));
 			prev = right;
 			i += Character.charCount(codePoint);
 		}
@@ -372,10 +364,6 @@ public class LexerATNFactory extends ParserATNFactory {
 		ATNState left = newState(charSetAST);
 		ATNState right = newState(charSetAST);
 		IntervalSet set = getSetFromCharSetLiteral(charSetAST);
-
-		if (set.isNil()) {
-			g.tool.errMgr.grammarError(ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED, g.fileName, charSetAST.getToken(), "[]");
-		}
 
 		left.addTransition(new SetTransition(right, set));
 		charSetAST.atnState = left;
@@ -494,6 +482,11 @@ public class LexerATNFactory extends ParserATNFactory {
 		}
 		// Whether or not we were in a range, we'll add the last code point found to the set.
 		applyPrevState(charSetAST, set, state);
+
+		if (set.isNil()) {
+			g.tool.errMgr.grammarError(ErrorType.EMPTY_STRINGS_AND_SETS_NOT_ALLOWED, g.fileName, charSetAST.getToken(), "[]");
+		}
+
 		return set;
 	}
 
@@ -510,8 +503,7 @@ public class LexerATNFactory extends ParserATNFactory {
 						charSetAST.getToken(),
 						CharSupport.getRangeEscapedString(state.prevCodePoint, codePoint));
 			}
-			checkSetCollision(charSetAST, set, state.prevCodePoint, codePoint);
-			set.add(state.prevCodePoint, codePoint);
+			checkRangeAndAddToSet(charSetAST, set, state.prevCodePoint, codePoint);
 			state = CharSetParseState.NONE;
 		}
 		else {
@@ -552,8 +544,7 @@ public class LexerATNFactory extends ParserATNFactory {
 			case ERROR:
 				break;
 			case PREV_CODE_POINT:
-				checkSetCollision(charSetAST, set, state.prevCodePoint);
-				set.add(state.prevCodePoint);
+				checkCharAndAddToSet(charSetAST, set, state.prevCodePoint);
 				break;
 			case PREV_PROPERTY:
 				set.addAll(state.prevProperty);
@@ -561,37 +552,83 @@ public class LexerATNFactory extends ParserATNFactory {
 		}
 	}
 
-	protected void checkSetCollision(GrammarAST ast, IntervalSet set, int el) {
-		checkSetCollision(ast, set, el, el);
+	private void checkCharAndAddToSet(GrammarAST ast, IntervalSet set, int c) {
+		checkRangeAndAddToSet(ast, ast, set, c, c, caseInsensitive, null);
 	}
 
-	protected void checkSetCollision(GrammarAST ast, IntervalSet set, int a, int b) {
-		for (int i = a; i <= b; i++) {
-			if (set.contains(i)) {
-				String setText;
-				if (ast.getChildren() == null) {
-					setText = ast.getText();
-				}
-				else {
-					StringBuilder sb = new StringBuilder();
-					for (Object child : ast.getChildren()) {
-						if (child instanceof RangeAST) {
-							sb.append(((RangeAST) child).getChild(0).getText());
-							sb.append("..");
-							sb.append(((RangeAST) child).getChild(1).getText());
+	private void checkRangeAndAddToSet(GrammarAST mainAst, IntervalSet set, int a, int b) {
+		checkRangeAndAddToSet(mainAst, mainAst, set, a, b, caseInsensitive, null);
+	}
+
+	private CharactersDataCheckStatus checkRangeAndAddToSet(GrammarAST rootAst, GrammarAST ast, IntervalSet set, int a, int b, boolean caseInsensitive, CharactersDataCheckStatus previousStatus) {
+		CharactersDataCheckStatus status;
+		RangeBorderCharactersData charactersData = RangeBorderCharactersData.getAndCheckCharactersData(a, b, g, ast,
+				previousStatus == null || !previousStatus.notImpliedCharacters);
+		if (caseInsensitive) {
+			status = new CharactersDataCheckStatus(false, charactersData.mixOfLowerAndUpperCharCase);
+			if (charactersData.isSingleRange()) {
+				status = checkRangeAndAddToSet(rootAst, ast, set, a, b, false, status);
+			}
+			else {
+				status = checkRangeAndAddToSet(rootAst, ast, set, charactersData.lowerFrom, charactersData.lowerTo, false, status);
+				// Don't report similar warning twice
+				status = checkRangeAndAddToSet(rootAst, ast, set, charactersData.upperFrom, charactersData.upperTo, false, status);
+			}
+		}
+		else {
+			boolean charactersCollision = previousStatus != null && previousStatus.collision;
+			if (!charactersCollision) {
+				for (int i = a; i <= b; i++) {
+					if (set.contains(i)) {
+						String setText;
+						if (rootAst.getChildren() == null) {
+							setText = rootAst.getText();
 						}
 						else {
-							sb.append(((GrammarAST)child).getText());
+							StringBuilder sb = new StringBuilder();
+							for (Object child : rootAst.getChildren()) {
+								if (child instanceof RangeAST) {
+									sb.append(((RangeAST) child).getChild(0).getText());
+									sb.append("..");
+									sb.append(((RangeAST) child).getChild(1).getText());
+								}
+								else {
+									sb.append(((GrammarAST) child).getText());
+								}
+								sb.append(" | ");
+							}
+							sb.replace(sb.length() - 3, sb.length(), "");
+							setText = sb.toString();
 						}
-						sb.append(" | ");
+						String charsString = a == b ? String.valueOf((char)a) : (char) a + "-" + (char) b;
+						g.tool.errMgr.grammarError(ErrorType.CHARACTERS_COLLISION_IN_SET, g.fileName, ast.getToken(),
+								charsString, setText);
+						charactersCollision = true;
+						break;
 					}
-					sb.replace(sb.length() - 3, sb.length(), "");
-					setText = sb.toString();
 				}
-				g.tool.errMgr.grammarError(ErrorType.CHARACTERS_COLLISION_IN_SET, g.fileName, ast.getToken(),
-						CharSupport.getRangeEscapedString(a, b), setText);
-				break;
 			}
+			status = new CharactersDataCheckStatus(charactersCollision, charactersData.mixOfLowerAndUpperCharCase);
+			set.add(a, b);
+		}
+		return status;
+	}
+
+	private Transition createTransition(ATNState target, int from, int to, CommonTree tree) {
+		RangeBorderCharactersData charactersData = RangeBorderCharactersData.getAndCheckCharactersData(from, to, g, tree, true);
+		if (caseInsensitive) {
+			if (charactersData.isSingleRange()) {
+				return CodePointTransitions.createWithCodePointRange(target, from, to);
+			}
+			else {
+				IntervalSet intervalSet = new IntervalSet();
+				intervalSet.add(charactersData.lowerFrom, charactersData.lowerTo);
+				intervalSet.add(charactersData.upperFrom, charactersData.upperTo);
+				return new SetTransition(target, intervalSet);
+			}
+		}
+		else {
+			return CodePointTransitions.createWithCodePointRange(target, from, to);
 		}
 	}
 
