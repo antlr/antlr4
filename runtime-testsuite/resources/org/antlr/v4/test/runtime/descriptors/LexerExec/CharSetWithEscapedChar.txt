@@ -1,0 +1,18 @@
+[type]
+Lexer
+
+[grammar]
+lexer grammar L;
+DASHBRACK : [\\-\]]+ {<writeln("\"DASHBRACK\"")>} ;
+WS : [ \n]+ -> skip ;
+
+[input]
+"""- ] """
+
+[output]
+DASHBRACK
+DASHBRACK
+[@0,0:0='-',<1>,1:0]
+[@1,2:2=']',<1>,1:2]
+[@2,4:3='<EOF>',<-1>,1:4]
+

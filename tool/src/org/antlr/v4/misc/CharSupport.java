@@ -17,11 +17,11 @@ public class CharSupport {
 	/** When converting ANTLR char and string literals, here is the
 	 *  value set of escape chars.
 	 */
-	public static int ANTLRLiteralEscapedCharValue[] = new int[255];
+	public static int[] ANTLRLiteralEscapedCharValue = new int[255];
 
 	/** Given a char, we need to be able to show as an ANTLR literal.
 	 */
-	public static String ANTLRLiteralCharValueEscape[] = new String[255];
+	public static String[] ANTLRLiteralCharValueEscape = new String[255];
 
 	static {
 		ANTLRLiteralEscapedCharValue['n'] = '\n';

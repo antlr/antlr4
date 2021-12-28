@@ -30,8 +30,8 @@ public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTes
 	private static boolean isRuntimeInitialized = false;
 	private final static String cSharpAntlrRuntimeDllName = "Antlr4.Runtime.Standard.dll";
 	private final static String testProjectFileName = "Antlr4.Test.csproj";
-	private final static boolean isDebug = false;
 	private static String cSharpTestProjectContent;
+	private static final String cSharpCachingDirectory = Paths.get(cachingDirectory, "CSharp").toString();
 
 	@Override
 	protected String getPropertyPrefix() {
@@ -184,7 +184,7 @@ public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTes
 	}
 
 	private String locateExec() {
-		return new File(getTempTestDir(), "bin/" + getConfig() + "/netcoreapp3.1/Test.dll").getAbsolutePath();
+		return new File(getTempTestDir(), "bin/Release/netcoreapp3.1/Test.dll").getAbsolutePath();
 	}
 
 	public boolean buildProject() {
@@ -197,7 +197,7 @@ public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTes
 			}
 
 			// build test
-			String[] args = new String[] { "dotnet", "build", testProjectFileName, "-c", getConfig() };
+			String[] args = new String[] { "dotnet", "build", testProjectFileName, "-c", "Release" };
 			boolean success = runProcess(args, getTempDirPath());
 			assertTrue(success);
 		} catch (Exception e) {
@@ -208,7 +208,7 @@ public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTes
 		return true;
 	}
 
-	private boolean initializeRuntime() {
+	private synchronized boolean initializeRuntime() {
 		// Compile runtime project once per tests session
 		if (isRuntimeInitialized)
 			return true;
@@ -222,7 +222,7 @@ public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTes
 		File runtimeProjFile = new File(runtimeProj.getFile());
 		String runtimeProjPath = runtimeProjFile.getPath();
 
-		RuntimeTestUtils.mkdir(cachingDirectory);
+		RuntimeTestUtils.mkdir(cSharpCachingDirectory);
 		String[] args = new String[]{
 				"dotnet",
 				"build",
@@ -230,12 +230,11 @@ public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTes
 				"-c",
 				"Release",
 				"-o",
-				cachingDirectory
+				cSharpCachingDirectory
 		};
 
 		boolean success;
-		try
-		{
+		try {
 			String cSharpTestProjectResourceName = BaseCSharpTest.class.getPackage().getName().replace(".", "/") + "/";
 			InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(cSharpTestProjectResourceName + testProjectFileName);
 			int bufferSize = 1024;
@@ -245,21 +244,16 @@ public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTes
 			for (int numRead; (numRead = in.read(buffer, 0, buffer.length)) > 0; ) {
 				out.append(buffer, 0, numRead);
 			}
-			cSharpTestProjectContent = out.toString().replace(cSharpAntlrRuntimeDllName, Paths.get(cachingDirectory, cSharpAntlrRuntimeDllName).toString());
+			cSharpTestProjectContent = out.toString().replace(cSharpAntlrRuntimeDllName, Paths.get(cSharpCachingDirectory, cSharpAntlrRuntimeDllName).toString());
 
-			success = runProcess(args, cachingDirectory);
-		}
-		catch (Exception e) {
+			success = runProcess(args, cSharpCachingDirectory);
+		} catch (Exception e) {
 			e.printStackTrace(System.err);
 			return false;
 		}
 
 		isRuntimeInitialized = true;
 		return success;
-	}
-
-	private static String getConfig() {
-		return isDebug ? "Debug" : "Release";
 	}
 
 	private boolean runProcess(String[] args, String path) throws Exception {
@@ -283,7 +277,7 @@ public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTes
 			setParseErrors(stderrVacuum.toString());
 			System.err.println("runProcess command: " + Utils.join(args, " "));
 			System.err.println("runProcess exitValue: " + exitValue);
-			System.err.println("runProcess stdoutVacuum: " + stdoutVacuum.toString());
+			System.err.println("runProcess stdoutVacuum: " + stdoutVacuum);
 			System.err.println("runProcess stderrVacuum: " + getParseErrors());
 		}
 		if (exitValue == 132) {

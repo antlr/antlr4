@@ -1,0 +1,36 @@
+[notes]
+This is a regression test for antlr/antlr4#433 "Not all context accessor
+methods are generated when an alternative rule label is used for multiple
+alternatives".  https://github.com/antlr/antlr4/issues/433
+
+[type]
+Parser
+
+[grammar]
+grammar T;
+s : e {<writeln("$e.v")>};
+e returns [int v]
+  : e '*' e     {$v = <Cast("BinaryContext","$ctx"):ContextMember({<Production("e")>(0)}, {<Result("v")>})> * <Cast("BinaryContext","$ctx"):ContextMember({<Production("e")>(1)}, {<Result("v")>})>;}  # binary
+  | e '+' e     {$v = <Cast("BinaryContext","$ctx"):ContextMember({<Production("e")>(0)}, {<Result("v")>})> + <Cast("BinaryContext","$ctx"):ContextMember({<Production("e")>(1)}, {<Result("v")>})>;}  # binary
+  | INT{$v = $INT.int;} # anInt
+  | '(' e ')'   {$v = $e.v;}     # parens
+  | left=e INC  {<ContextRuleFunction(Cast("UnaryContext","$ctx"), "INC()"):Concat(" != null"):Assert()>$v = $left.v + 1;}      # unary
+  | left=e DEC  {<ContextRuleFunction(Cast("UnaryContext","$ctx"), "DEC()"):Concat(" != null"):Assert()>$v = $left.v - 1;}      # unary
+  | ID {<AssignLocal("$v","3")>}        # anID
+  ;
+ID : 'a'..'z'+ ;
+INT : '0'..'9'+ ;
+INC : '++' ;
+DEC : '--' ;
+WS : (' '|'\n') -> skip;
+
+[start]
+s
+
+[input]
+4
+
+[output]
+"""4
+"""
+

@@ -1,0 +1,22 @@
+[type]
+Parser
+
+[grammar]
+grammar T;
+a : ID INT {
+<writeln("$text")>
+};
+ID : 'a'..'z'+ ;
+INT : '0'..'9'+;
+WS : (' '|'\n') -> skip;
+
+[start]
+a
+
+[input]
+abc 34
+
+[output]
+"""abc34
+"""
+

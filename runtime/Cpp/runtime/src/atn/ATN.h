@@ -60,8 +60,8 @@ namespace atn {
 
     std::vector<TokensStartState *> modeToStartState;
 
-    ATN& operator = (ATN &other) NOEXCEPT;
-    ATN& operator = (ATN &&other) NOEXCEPT;
+    ATN& operator = (ATN &other) noexcept;
+    ATN& operator = (ATN &&other) noexcept;
 
     /// <summary>
     /// Compute the set of valid tokens that can occur starting in state {@code s}.
