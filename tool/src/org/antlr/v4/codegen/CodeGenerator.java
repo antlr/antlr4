@@ -41,11 +41,11 @@ public class CodeGenerator {
 
 	public int lineWidth = 72;
 
-	public static CodeGenerator createCodeGenerator(Grammar g) {
-		return createCodeGenerator(g.tool, g, g.getLanguage());
+	public static CodeGenerator create(Grammar g) {
+		return create(g.tool, g, g.getLanguage());
 	}
 
-	public static CodeGenerator createCodeGenerator(Tool tool, Grammar g, String language) {
+	public static CodeGenerator create(Tool tool, Grammar g, String language) {
 		String targetName = "org.antlr.v4.codegen.target."+language+"Target";
 		try {
 			Class<? extends Target> c = Class.forName(targetName).asSubclass(Target.class);

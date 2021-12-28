@@ -382,7 +382,7 @@ public class Tool {
 
 		if ( errMgr.getNumErrors()>prevErrors ) return;
 
-		CodeGenerator codeGenerator = CodeGenerator.createCodeGenerator(g);
+		CodeGenerator codeGenerator = CodeGenerator.create(g);
 		if (codeGenerator == null) {
 			return;
 		}

@@ -68,7 +68,7 @@ public class BuildDependencyGenerator {
     public BuildDependencyGenerator(Tool tool, Grammar g) {
         this.tool = tool;
 		this.g = g;
-		generator = CodeGenerator.createCodeGenerator(g);
+		generator = CodeGenerator.create(g);
     }
 
     /** From T.g return a list of File objects that

@@ -79,7 +79,7 @@ public class LexerATNFactory extends ParserATNFactory {
 		// use codegen to get correct language templates for lexer commands
 		String caseInsensitiveOption = g.getOptionString("caseInsensitive");
 		caseInsensitive = caseInsensitiveOption != null && caseInsensitiveOption.equals("true");
-		codegenTemplates = (codeGenerator == null ? CodeGenerator.createCodeGenerator(g) : codeGenerator).getTemplates();
+		codegenTemplates = (codeGenerator == null ? CodeGenerator.create(g) : codeGenerator).getTemplates();
 	}
 
 	public static Set<String> getCommonConstants() {
