@@ -212,59 +212,58 @@ public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTes
 	private boolean initializeRuntime() {
 		// Compile runtime project once per overall maven test session (assuming forkCount=0)
 		synchronized (BaseCSharpTest.class) {
-			if ( isRuntimeInitialized ) {
+			if ( isRuntimeInitialized) {
 //				System.out.println("C# runtime build REUSED\n");
 				return true;
 			}
-		}
 
-		System.out.println("Building C# runtime\n");
+			System.out.println("Building C# runtime\n");
 
-		// find runtime package
-		final ClassLoader loader = Thread.currentThread().getContextClassLoader();
-		final URL runtimeProj = loader.getResource("CSharp/src/Antlr4.csproj");
-		if (runtimeProj == null) {
-			throw new RuntimeException("C# runtime project file not found!");
-		}
-		File runtimeProjFile = new File(runtimeProj.getFile());
-		String runtimeProjPath = runtimeProjFile.getPath();
-
-		RuntimeTestUtils.mkdir(cSharpCachingDirectory);
-		String[] args = new String[]{
-				"dotnet",
-				"build",
-				runtimeProjPath,
-				"-c",
-				"Release",
-				"-o",
-				cSharpCachingDirectory
-		};
-
-		boolean success;
-		try {
-			String cSharpTestProjectResourceName = BaseCSharpTest.class.getPackage().getName().replace(".", "/") + "/";
-			InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(cSharpTestProjectResourceName + testProjectFileName);
-			int bufferSize = 1024;
-			char[] buffer = new char[bufferSize];
-			StringBuilder out = new StringBuilder();
-			Reader in = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
-			for (int numRead; (numRead = in.read(buffer, 0, buffer.length)) > 0; ) {
-				out.append(buffer, 0, numRead);
+			// find runtime package
+			final ClassLoader loader = Thread.currentThread().getContextClassLoader();
+			final URL runtimeProj = loader.getResource("CSharp/src/Antlr4.csproj");
+			if (runtimeProj == null) {
+				throw new RuntimeException("C# runtime project file not found!");
 			}
-			cSharpTestProjectContent = out.toString().replace(cSharpAntlrRuntimeDllName, Paths.get(cSharpCachingDirectory, cSharpAntlrRuntimeDllName).toString());
+			File runtimeProjFile = new File(runtimeProj.getFile());
+			String runtimeProjPath = runtimeProjFile.getPath();
 
-			success = runProcess(args, cSharpCachingDirectory);
+			RuntimeTestUtils.mkdir(cSharpCachingDirectory);
+			String[] args = new String[]{
+					"dotnet",
+					"build",
+					runtimeProjPath,
+					"-c",
+					"Release",
+					"-o",
+					cSharpCachingDirectory
+			};
+
+			boolean success;
+			try {
+				String cSharpTestProjectResourceName = BaseCSharpTest.class.getPackage().getName().replace(".", "/") + "/";
+				InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(cSharpTestProjectResourceName + testProjectFileName);
+				int bufferSize = 1024;
+				char[] buffer = new char[bufferSize];
+				StringBuilder out = new StringBuilder();
+				Reader in = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
+				for (int numRead; (numRead = in.read(buffer, 0, buffer.length)) > 0; ) {
+					out.append(buffer, 0, numRead);
+				}
+				cSharpTestProjectContent = out.toString().replace(cSharpAntlrRuntimeDllName, Paths.get(cSharpCachingDirectory, cSharpAntlrRuntimeDllName).toString());
+
+				success = runProcess(args, cSharpCachingDirectory);
+			} catch (Exception e) {
+				e.printStackTrace(System.err);
+				success = false;
+			}
+
+			if (success) System.out.println("C# runtime build succeeded\n");
+			else System.out.println("C# runtime build failed\n");
+
+			isRuntimeInitialized = true; // try only once
+			return success;
 		}
-		catch (Exception e) {
-			e.printStackTrace(System.err);
-			success = false;
-		}
-
-		if ( success ) System.out.println("C# runtime build succeeded\n");
-		else System.out.println("C# runtime build failed\n");
-
-		isRuntimeInitialized = true; // try only once
-		return success;
 	}
 
 	private boolean runProcess(String[] args, String path) throws Exception {
