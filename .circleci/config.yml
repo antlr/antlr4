@@ -33,6 +33,9 @@ jobs:
         default: java
     docker:
       - image: cimg/openjdk:8.0
+        environment:
+          MAVEN_OPTS: -Xmx512m
+    resource_class: large
     environment:
       TARGET: << parameters.target >>
       GROUP: << parameters.test-group >>
