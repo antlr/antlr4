@@ -95,7 +95,8 @@
                         <include>**/dart/Test*.java</include>
                         <include>${antlr.tests.swift}</include>
                     </includes>
-				</configuration>
+                    <forkCount>0</forkCount>
+                </configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
