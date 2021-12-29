@@ -12,11 +12,11 @@ dotnet build -c Release -f netstandard2.0 ../runtime/CSharp/src/Antlr4.csproj
 # call test
 
 if [ $GROUP == "LEXER" ]; then
-    mvn -q -Dgroups="org.antlr.v4.test.runtime.category.LexerTests" -Dparallel=classes -DthreadCount=4 -Dtest=csharp.* test
+    mvn -Dgroups="org.antlr.v4.test.runtime.category.LexerTests" -Dparallel=classes -DthreadCount=4 -Dtest=csharp.* test
 elif [ $GROUP == "PARSER" ]; then
-    mvn -q -Dgroups="org.antlr.v4.test.runtime.category.ParserTests" -Dparallel=classes -DthreadCount=4 -Dtest=csharp.* test
+    mvn -Dgroups="org.antlr.v4.test.runtime.category.ParserTests" -Dparallel=classes -DthreadCount=4 -Dtest=csharp.* test
 elif [ $GROUP == "RECURSION" ]; then
-    mvn -q -Dgroups="org.antlr.v4.test.runtime.category.LeftRecursionTests" -Dparallel=classes -DthreadCount=4 -Dtest=csharp.* test
+    mvn -Dgroups="org.antlr.v4.test.runtime.category.LeftRecursionTests" -Dparallel=classes -DthreadCount=4 -Dtest=csharp.* test
 else
-    mvn -q -Dparallel=methods -DthreadCount=4 -Dtest=csharp.* test
+    mvn -Dparallel=methods -DthreadCount=4 -Dtest=csharp.* test
 fi
