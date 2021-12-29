@@ -87,19 +87,28 @@ class RecognitionException<StreamType extends IntStream> extends StateError {
   }
 }
 
-class LexerNoViableAltException extends RecognitionException<CharStream> {
-  /// Matching attempted at what input index? */
+abstract class LexerException extends RecognitionException<CharStream> {
   final int startIndex;
+  final int length;
 
+  LexerException(Recognizer<ATNSimulator>? recognizer, CharStream inputStream, RuleContext? ctx,
+      this.startIndex, this.length)
+      : super(recognizer, inputStream, ctx);
+
+  String getErrorMessage(String input);
+}
+
+class LexerNoViableAltException extends LexerException {
   /// Which configurations did we try at input.index() that couldn't match input.LA(1)? */
   final ATNConfigSet deadEndConfigs;
 
   LexerNoViableAltException(
     Lexer? lexer,
     CharStream input,
-    this.startIndex,
-    this.deadEndConfigs,
-  ) : super(lexer, input, null);
+    int startIndex,
+    int length,
+    this.deadEndConfigs
+  ) : super(lexer, input, null, startIndex, length);
 
   @override
   String toString() {
@@ -110,6 +119,25 @@ class LexerNoViableAltException extends RecognitionException<CharStream> {
     }
 
     return "$LexerNoViableAltException('$symbol')";
+  }
+
+  @override
+  String getErrorMessage(String input) {
+    return "token recognition error at: '" + input + "'";
+  }
+}
+
+class LexerEmptyModeStackException extends LexerException {
+  LexerEmptyModeStackException(
+      Lexer? lexer,
+      CharStream input,
+      int startIndex,
+      int length,
+      ) : super(lexer, input, null, startIndex, length);
+
+  @override
+  String getErrorMessage(String input) {
+    return "Unable to pop mode because mode stack is empty at: '" + input + "'";
   }
 }
 

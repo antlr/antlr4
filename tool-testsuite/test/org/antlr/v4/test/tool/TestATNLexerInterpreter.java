@@ -525,6 +525,16 @@ public class TestATNLexerInterpreter extends BaseJavaToolTest {
 		assertEquals("line 1:0 token recognition error at: 'n'\n", getParseErrors());
 	}
 
+	@Test public void testEmptyModeStack() {
+		String grammar = "lexer grammar L;\n" +
+				"A: 'aa';\n" +
+				"B: 'bb' -> popMode;\n" +
+				"C: 'cc';";
+
+		execLexer("L.g4", grammar, "L", "aabbcc");
+		assertEquals("line 1:2 Unable to pop mode because mode stack is empty at: 'bb'\n", getParseErrors());
+	}
+
 	protected void checkLexerMatches(LexerGrammar lg, String inputString, String expecting) {
 		ATN atn = createATN(lg, true);
 		CharStream input = CharStreams.fromString(inputString);

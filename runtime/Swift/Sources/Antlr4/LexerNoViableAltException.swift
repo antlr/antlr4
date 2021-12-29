@@ -5,13 +5,8 @@
 /// 
 
 
-public class LexerNoViableAltException: RecognitionException, CustomStringConvertible {
-    /// 
-    /// Matching attempted at what input index?
-    /// 
-    private let startIndex: Int
-
-    /// 
+public class LexerNoViableAltException: LexerException, CustomStringConvertible {
+    ///
     /// Which configurations did we try at input.index() that couldn't match input.LA(1)?
     /// 
     private let deadEndConfigs: ATNConfigSet
@@ -19,20 +14,19 @@ public class LexerNoViableAltException: RecognitionException, CustomStringConver
     public init(_ lexer: Lexer?,
                 _ input: CharStream,
                 _ startIndex: Int,
+                _ length: Int,
                 _ deadEndConfigs: ATNConfigSet) {
-        let ctx: ParserRuleContext? = nil
-        self.startIndex = startIndex
         self.deadEndConfigs = deadEndConfigs
-        super.init(lexer, input as IntStream, ctx)
-
-    }
-
-    public func getStartIndex() -> Int {
-        return startIndex
+        super.init(lexer, input, startIndex, length)
     }
 
     public func getDeadEndConfigs() -> ATNConfigSet {
         return deadEndConfigs
+    }
+
+    override
+    public func getErrorMessage(_ input: String) -> String {
+        return "token recognition error at: '" + input + "'"
     }
 
     public var description: String {

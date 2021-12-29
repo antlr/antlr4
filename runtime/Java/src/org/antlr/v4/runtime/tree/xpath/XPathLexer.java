@@ -126,7 +126,7 @@ public class XPathLexer extends Lexer {
 						else t = new CommonToken(RULE_REF, id);
 					}
 					else {
-						throw new LexerNoViableAltException(this, _input, _tokenStartCharIndex, null);
+						throw new LexerNoViableAltException(this, _input, _tokenStartCharIndex, _input.index() - _tokenStartCharIndex, null);
 					}
 					break;
 			}

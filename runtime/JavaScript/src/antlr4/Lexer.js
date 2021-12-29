@@ -8,6 +8,7 @@ const Recognizer = require('./Recognizer');
 const CommonTokenFactory = require('./CommonTokenFactory');
 const {RecognitionException} = require('./error/Errors');
 const {LexerNoViableAltException} = require('./error/Errors');
+const {LexerEmptyModeStackException} = require('./error/Errors');
 
 class TokenSource {}
 
@@ -185,12 +186,14 @@ class Lexer extends Recognizer {
 
 	popMode() {
 		if (this._modeStack.length === 0) {
-			throw "Empty Stack";
+			this.notifyListeners(new LexerEmptyModeStackException(this, this._input,
+                this._tokenStartCharIndex, this._input.index - this._tokenStartCharIndex - 1));
+		} else {
+			if (this._interp.debug) {
+				console.log("popMode back to " + this._modeStack.slice(0, -1));
+			}
+			this.mode(this._modeStack.pop());
 		}
-		if (this._interp.debug) {
-			console.log("popMode back to " + this._modeStack.slice(0, -1));
-		}
-		this.mode(this._modeStack.pop());
 		return this._mode;
 	}
 
@@ -250,13 +253,10 @@ class Lexer extends Recognizer {
 	}
 
 	notifyListeners(e) {
-		const start = this._tokenStartCharIndex;
-		const stop = this._input.index;
-		const text = this._input.getText(start, stop);
-		const msg = "token recognition error at: '" + this.getErrorDisplay(text) + "'";
+		const input = this._input.getText(e.startIndex, e.startIndex + e.length);
+		const errorMessage = e.getErrorMessage(this.getErrorDisplay(input));
 		const listener = this.getErrorListenerDispatch();
-		listener.syntaxError(this, null, this._tokenStartLine,
-				this._tokenStartColumn, msg, e);
+		listener.syntaxError(this, null, this._tokenStartLine, this._tokenStartColumn, errorMessage, e);
 	}
 
 	getErrorDisplay(s) {

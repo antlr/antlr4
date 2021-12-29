@@ -73,12 +73,17 @@ class RecognitionException(Exception):
         return unicode(self)
 
 
-class LexerNoViableAltException(RecognitionException):
-
-    def __init__(self, lexer, input, startIndex, deadEndConfigs):
-        super(LexerNoViableAltException, self).__init__(message=None, recognizer=lexer, input=input, ctx=None)
+class LexerException(RecognitionException):
+    def __init__(self, lexer, input, startIndex, length):
+        super(LexerException, self).__init__(message=None, recognizer=lexer, input=input, ctx=None)
         self.startIndex = startIndex
-        self.deadEndConfigs = deadEndConfigs
+        self.length = length
+
+
+class LexerNoViableAltException(LexerException):
+    def __init__(self, lexer, input, startIndex, length, deadEndConfigs):
+        super(LexerNoViableAltException, self).__init__(lexer=lexer, input=input, startIndex=startIndex, length=length)
+        self.startIndex = startIndex
 
     def __unicode__(self):
         symbol = ""
@@ -86,6 +91,17 @@ class LexerNoViableAltException(RecognitionException):
             symbol = self.input.getText(self.startIndex,self.startIndex)
             # TODO symbol = Utils.escapeWhitespace(symbol, false);
         return u"LexerNoViableAltException" + symbol
+
+    def getErrorMessage(self, token):
+        return u"token recognition error at: '" + token + u"'"
+
+
+class LexerEmptyModeStackException(LexerException):
+    def __init__(self, lexer, input, startIndex, length):
+        super(LexerEmptyModeStackException, self).__init__(lexer=lexer, input=input, startIndex=startIndex, length=length)
+
+    def getErrorMessage(self, token):
+        return "Unable to pop mode because mode stack is empty at: '" + token + "'"
 
 # Indicates that the parser could not decide which of two or more paths
 #  to take based upon the remaining input. It tracks the starting token

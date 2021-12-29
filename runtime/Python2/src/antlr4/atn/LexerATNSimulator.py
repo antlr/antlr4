@@ -241,7 +241,7 @@ class LexerATNSimulator(ATNSimulator):
             # if no accept and EOF is first char, return EOF
             if t==Token.EOF and input.index==self.startIndex:
                 return Token.EOF
-            raise LexerNoViableAltException(self.recog, input, self.startIndex, reach)
+            raise LexerNoViableAltException(self.recog, input, self.startIndex, input.index - self.startIndex, reach)
 
     # Given a starting configuration set, figure out all ATN configurations
     #  we can reach upon input {@code t}. Parameter {@code reach} is a return

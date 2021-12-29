@@ -2,64 +2,47 @@
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
+
+using System;
 using System.Globalization;
-using Antlr4.Runtime;
 using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Misc;
-using Antlr4.Runtime.Sharpen;
 
 namespace Antlr4.Runtime
 {
-    [System.Serializable]
-    public class LexerNoViableAltException : RecognitionException
+    [Serializable]
+    public class LexerNoViableAltException : LexerException
     {
-        private const long serialVersionUID = -730999203913001726L;
-
-        /// <summary>Matching attempted at what input index?</summary>
-        private readonly int startIndex;
-
         /// <summary>Which configurations did we try at input.index() that couldn't match input.LA(1)?</summary>
         [Nullable]
         private readonly ATNConfigSet deadEndConfigs;
 
+        [Obsolete]
         public LexerNoViableAltException(Lexer lexer, ICharStream input, int startIndex, ATNConfigSet deadEndConfigs)
-            : base(lexer, input)
+            : base(lexer, input, startIndex, 1)
         {
-            this.startIndex = startIndex;
             this.deadEndConfigs = deadEndConfigs;
         }
 
-        public virtual int StartIndex
+        public LexerNoViableAltException(Lexer lexer, ICharStream input, int startIndex, int length, ATNConfigSet deadEndConfigs)
+            : base(lexer, input, startIndex, length)
         {
-            get
-            {
-                return startIndex;
-            }
+            this.deadEndConfigs = deadEndConfigs;
         }
 
         [Nullable]
-        public virtual ATNConfigSet DeadEndConfigs
-        {
-            get
-            {
-                return deadEndConfigs;
-            }
-        }
+        public virtual ATNConfigSet DeadEndConfigs => deadEndConfigs;
 
-        public override IIntStream InputStream
-        {
-            get
-            {
-                return (ICharStream)base.InputStream;
-            }
-        }
+        public override IIntStream InputStream => (ICharStream)base.InputStream;
+
+        public override string GetErrorMessage(string input) => "token recognition error at: '" + input + "'";
 
         public override string ToString()
         {
             string symbol = string.Empty;
-            if (startIndex >= 0 && startIndex < ((ICharStream)InputStream).Size)
+            if (StartIndex >= 0 && StartIndex < ((ICharStream)InputStream).Size)
             {
-                symbol = ((ICharStream)InputStream).GetText(Interval.Of(startIndex, startIndex));
+                symbol = ((ICharStream)InputStream).GetText(Interval.Of(StartIndex, StartIndex));
                 symbol = Utils.EscapeWhitespace(symbol, false);
             }
             return string.Format(CultureInfo.CurrentCulture, "{0}('{1}')", typeof(Antlr4.Runtime.LexerNoViableAltException).Name, symbol);

@@ -173,9 +173,13 @@ abstract class Lexer extends Recognizer<LexerATNSimulator>
   }
 
   int popMode() {
-    if (_modeStack.isEmpty) throw StateError('');
-    if (LexerATNSimulator.debug) log('popMode back to ${_modeStack.last}');
-    mode(_modeStack.removeLast());
+    if (_modeStack.isEmpty) {
+      notifyListeners(LexerEmptyModeStackException(this, _input,
+          tokenStartCharIndex, _input.index - tokenStartCharIndex - 1));
+    } else {
+      if (LexerATNSimulator.debug) log('popMode back to ${_modeStack.last}');
+      mode(_modeStack.removeLast());
+    }
     return mode_;
   }
 
@@ -305,17 +309,16 @@ abstract class Lexer extends Recognizer<LexerATNSimulator>
     return tokens;
   }
 
-  void notifyListeners(LexerNoViableAltException e) {
-    final text = _input.getText(Interval.of(tokenStartCharIndex, _input.index));
-    final msg = "token recognition error at: '" + getErrorDisplay(text) + "'";
-
-    final listener = errorListenerDispatch;
-    listener.syntaxError(
+  void notifyListeners(LexerException e) {
+    final inputInterval = Interval.of(e.startIndex, e.startIndex + e.length);
+    final input = getErrorDisplay(_input.getText(inputInterval));
+    final errorMessage = e.getErrorMessage(input);
+    errorListenerDispatch.syntaxError(
       this,
       null,
       tokenStartLine,
       tokenStartCharPositionInLine,
-      msg,
+      errorMessage,
       e,
     );
   }

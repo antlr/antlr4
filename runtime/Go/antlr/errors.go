@@ -96,20 +96,36 @@ func (b *BaseRecognitionException) String() string {
 	return b.message
 }
 
+type LexerException interface {
+	GetErrorMessage(token string) string
+	GetStartIndex() int
+	GetLength() int
+}
+
 type LexerNoViableAltException struct {
 	*BaseRecognitionException
 
-	startIndex     int
+	startIndex int
+	length int
+
 	deadEndConfigs ATNConfigSet
 }
 
-func NewLexerNoViableAltException(lexer Lexer, input CharStream, startIndex int, deadEndConfigs ATNConfigSet) *LexerNoViableAltException {
+type LexerEmptyModeStackException struct {
+	*BaseRecognitionException
+
+	startIndex int
+	length int
+}
+
+func NewLexerNoViableAltException(lexer Lexer, input CharStream, startIndex int, length int, deadEndConfigs ATNConfigSet) *LexerNoViableAltException {
 
 	l := new(LexerNoViableAltException)
 
 	l.BaseRecognitionException = NewBaseRecognitionException("", lexer, input, nil)
 
 	l.startIndex = startIndex
+	l.length = length
 	l.deadEndConfigs = deadEndConfigs
 
 	return l
@@ -121,6 +137,42 @@ func (l *LexerNoViableAltException) String() string {
 		symbol = l.input.(CharStream).GetTextFromInterval(NewInterval(l.startIndex, l.startIndex))
 	}
 	return "LexerNoViableAltException" + symbol
+}
+
+func (l *LexerNoViableAltException) GetErrorMessage(token string) string {
+	return "token recognition error at: '" + token + "'"
+}
+
+func (l *LexerNoViableAltException) GetStartIndex() int {
+	return l.startIndex
+}
+
+func (l *LexerNoViableAltException) GetLength() int {
+	return l.length
+}
+
+func NewLexerEmptyModeStackException(lexer Lexer, input CharStream, startIndex int, length int) *LexerEmptyModeStackException {
+
+	l := new(LexerEmptyModeStackException)
+
+	l.BaseRecognitionException = NewBaseRecognitionException("", lexer, input, nil)
+
+	l.startIndex = startIndex
+	l.length = length
+
+	return l
+}
+
+func (l *LexerEmptyModeStackException) GetErrorMessage(token string) string {
+	return "Unable to pop mode because mode stack is empty at: '" + token + "'"
+}
+
+func (l *LexerEmptyModeStackException) GetStartIndex() int {
+	return l.startIndex
+}
+
+func (l *LexerEmptyModeStackException) GetLength() int {
+	return l.length
 }
 
 type NoViableAltException struct {

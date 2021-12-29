@@ -300,7 +300,7 @@ namespace Antlr4.Runtime.Atn
 					return TokenConstants.EOF;
 				}
 
-				throw new LexerNoViableAltException(recog, input, startIndex, reach);
+				throw new LexerNoViableAltException(recog, input, startIndex, input.Index - startIndex, reach);
 			}
 		}
 
