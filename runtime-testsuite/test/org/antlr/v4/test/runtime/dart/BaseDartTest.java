@@ -81,7 +81,7 @@ public class BaseDartTest extends BaseRuntimeTestSupport implements RuntimeTestS
 			startRuleName,
 			showDiagnosticErrors,
 			profile,
-			true);
+			false);
 	}
 
 	/**
