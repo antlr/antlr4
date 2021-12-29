@@ -35,6 +35,7 @@ type Token interface {
 
 	GetTokenSource() TokenSource
 	GetInputStream() CharStream
+	String() string
 }
 
 type BaseToken struct {
