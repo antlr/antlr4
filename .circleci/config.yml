@@ -13,13 +13,13 @@ jobs:
           name: test runtime
           command: |
             cd runtime-testsuite
-            mvn -Dparallel=methods -DthreadCount=4 -Dtest=java.** test
+            mvn -Dparallel=classes -DthreadCount=4 -Dtest=java.** test
             cd ..
       - run:
           name: test tool
           command: |
             cd tool-testsuite
-            mvn -Dparallel=methods -DthreadCount=4 test
+            mvn -Dparallel=classes -DthreadCount=4 test
             cd ..
   test_runtime:
     parameters:

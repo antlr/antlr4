@@ -18,5 +18,5 @@ elif [ $GROUP == "PARSER" ]; then
 elif [ $GROUP == "RECURSION" ]; then
     mvn -Dgroups="org.antlr.v4.test.runtime.category.LeftRecursionTests" -Dparallel=classes -DthreadCount=4 -Dtest=csharp.* test
 else
-    mvn -Dparallel=methods -DthreadCount=4 -Dtest=csharp.* test
+    mvn -Dparallel=classes -DthreadCount=4 -Dtest=csharp.* test
 fi
