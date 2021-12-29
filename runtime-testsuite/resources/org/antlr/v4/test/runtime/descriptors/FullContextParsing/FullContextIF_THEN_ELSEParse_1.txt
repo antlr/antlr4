@@ -1,0 +1,28 @@
+[type]
+Parser
+
+[grammar]
+grammar T;
+s
+@init {<LL_EXACT_AMBIG_DETECTION()>}
+@after {<DumpDFA()>}
+   : '{' stat* '}' ;
+stat: 'if' ID 'then' stat ('else' ID)?
+       | 'return'
+       ;
+ID : 'a'..'z'+ ;
+WS : (' '|'\t'|'\n')+ -> skip ;
+
+[start]
+s
+
+[input]
+{ if x then return }
+
+[output]
+Decision 1:
+s0-'}'->:s1=>2
+
+[flags]
+showDiagnosticErrors
+

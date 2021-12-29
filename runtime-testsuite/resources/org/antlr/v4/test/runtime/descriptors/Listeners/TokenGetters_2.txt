@@ -1,0 +1,34 @@
+[type]
+Parser
+
+[grammar]
+grammar T;
+
+<ImportListener("T")>
+<TokenGetterListener("T")>
+
+s
+@after {
+<ContextRuleFunction("$ctx", "r"):ToStringTree():writeln()>
+<ContextRuleFunction("$ctx", "r"):WalkListener()>
+}
+  : r=a ;
+a : INT INT
+  | ID
+  ;
+MULT: '*' ;
+ADD : '+' ;
+INT : [0-9]+ ;
+ID  : [a-z]+ ;
+WS : [ \t\n]+ -> skip ;
+
+[start]
+s
+
+[input]
+abc
+
+[output]
+(a abc)
+[@0,0:2='abc',<4>,1:0]
+

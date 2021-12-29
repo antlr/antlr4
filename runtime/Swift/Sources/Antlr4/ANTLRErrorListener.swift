@@ -5,7 +5,7 @@
 /// How to emit recognition errors.
 /// 
 
-public protocol ANTLRErrorListener: class {
+public protocol ANTLRErrorListener: AnyObject {
     /// 
     /// Upon syntax error, notify any interested parties. This is not how to
     /// recover from errors or compute error messages. _org.antlr.v4.runtime.ANTLRErrorStrategy_

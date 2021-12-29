@@ -4,14 +4,16 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
-import 'dart:io';
-
 import '../../atn/atn.dart';
 import '../../dfa/dfa.dart';
 import '../../parser.dart';
 import '../../recognizer.dart';
 import '../../util/bit_set.dart';
 import 'errors.dart';
+
+import '../../util/platform_stub.dart'
+    if (dart.library.io) '../../util/platform_io.dart'
+    if (dart.library.html) '../../util/platform_html.dart';
 
 abstract class ErrorListener {
   /// Upon syntax error, notify any interested parties. This is not how to
@@ -237,7 +239,7 @@ class ConsoleErrorListener extends BaseErrorListener {
   /// </pre>
   @override
   void syntaxError(recognizer, offendingSymbol, line, column, msg, e) {
-    stderr.writeln('line $line:$column $msg');
+    stderrWriteln('line $line:$column $msg');
   }
 }
 

@@ -19,7 +19,7 @@ environment:
 matrix:
   fast_finish: false
 
-version: '4.9.1-SNAPSHOT+AppVeyor.{build}'
+version: '4.9.4-SNAPSHOT+AppVeyor.{build}'
 cache:
   - '%USERPROFILE%\.m2'
   - '%USERPROFILE%\.nuget\packages -> **\project.json'
@@ -37,7 +37,7 @@ for:
       - cd tool-testsuite
       - mvn -q test
       - cd ..\runtime-testsuite
-      - mvn -q -Dtest=java.* test
+      - mvn -q -Dtest=java.** test
 
   - matrix:
       only:
@@ -49,7 +49,7 @@ for:
       - dotnet pack runtime/CSharp/src/Antlr4.csproj -c Release
     test_script:
       - cd runtime-testsuite
-      - mvn -q -Dtest=csharp.* test
+      - mvn -q -Dtest=csharp.** test
     artifacts:
       - path: 'runtime\**\*.nupkg'
         name: NuGet
@@ -63,7 +63,7 @@ for:
       - mvn -q -DskipTests install --batch-mode
     test_script:
       - cd runtime-testsuite
-      - mvn -q -Dtest=dart.* test -Dantlr-dart-dart="C:\tools\dart-sdk\bin\dart.exe" -Dantlr-dart-pub="C:\tools\dart-sdk\bin\pub.bat" -Dantlr-dart-dart2native="C:\tools\dart-sdk\bin\dart2native.bat"
+      - mvn -q -Dtest=dart.** test -Dantlr-dart-dart="C:\tools\dart-sdk\bin\dart.exe" -Dantlr-dart-pub="C:\tools\dart-sdk\bin\pub.bat" -Dantlr-dart-dart2native="C:\tools\dart-sdk\bin\dart2native.bat"
 
   - matrix:
       only:
@@ -72,7 +72,7 @@ for:
       - mvn -q -DskipTests install --batch-mode
     test_script:
       - cd runtime-testsuite
-      - mvn -q -Dtest=go.* test
+      - mvn -q -Dtest=go.** test
 
   - matrix:
       only:
@@ -93,7 +93,7 @@ for:
       - yarn test
       - cd ..\..
       - cd runtime-testsuite
-      - mvn -q -Dtest=javascript.* test -Dantlr-javascript-npm="C:\Program Files\nodejs\npm.cmd" -Dantlr-javascript-nodejs="C:\Program Files\nodejs\node.exe"
+      - mvn -q -Dtest=javascript.** test -Dantlr-javascript-npm="C:\Program Files\nodejs\npm.cmd" -Dantlr-javascript-nodejs="C:\Program Files\nodejs\node.exe"
 
   - matrix:
       only:
@@ -107,7 +107,7 @@ for:
       - mvn -q -DskipTests install --batch-mode
     test_script:
       - cd runtime-testsuite
-      - mvn -q -Dtest=php.* test -Dantlr-php-php="C:\tools\php\php.exe"
+      - mvn -q -Dtest=php.** test -Dantlr-php-php="C:\tools\php\php.exe"
 
   - matrix:
       only:
@@ -116,7 +116,7 @@ for:
       - mvn -q -DskipTests install --batch-mode
     test_script:
       - cd runtime-testsuite
-      - mvn -q -Dtest=python2.* test -Dantlr-python2-python="C:\Python27\python.exe"
+      - mvn -q -Dtest=python2.** test -Dantlr-python2-python="C:\Python27\python.exe"
 
   - matrix:
       only:
@@ -125,4 +125,4 @@ for:
       - mvn -q -DskipTests install --batch-mode
     test_script:
       - cd runtime-testsuite
-      - mvn -q -Dtest=python3.* test -Dantlr-python3-python="C:\Python35\python.exe"
+      - mvn -q -Dtest=python3.** test -Dantlr-python3-python="C:\Python35\python.exe"

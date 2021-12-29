@@ -63,7 +63,7 @@ class ATN(object):
         if s.nextTokenWithinRule is not None:
             return s.nextTokenWithinRule
         s.nextTokenWithinRule = self.nextTokensInContext(s, None)
-        s.nextTokenWithinRule.readOnly = True
+        s.nextTokenWithinRule.readonly = True
         return s.nextTokenWithinRule
 
     def nextTokens(self, s:ATNState, ctx:RuleContext = None):

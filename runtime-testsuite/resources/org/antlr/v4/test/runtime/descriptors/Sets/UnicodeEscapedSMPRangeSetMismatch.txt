@@ -1,0 +1,24 @@
+[type]
+Parser
+
+[grammar]
+grammar T;
+a : LETTERS* 'd' {<InputText():writeln()>} ;
+// Note the double-backslash to avoid Java passing
+// unescaped values as part of the grammar.
+LETTERS : ('a'|'\\u{1F600}'..'\\u{1F943}');
+
+[start]
+a
+
+[input]
+a🗿🥄d
+
+[output]
+"""ad
+"""
+
+[errors]
+line 1:1 token recognition error at: '🗿'
+line 1:2 token recognition error at: '🥄'
+

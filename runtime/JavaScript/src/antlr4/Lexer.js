@@ -320,7 +320,7 @@ class Lexer extends Recognizer {
 	}
 
 	get type(){
-		return this.type;
+		return this._type;
 	}
 
 	set type(type) {

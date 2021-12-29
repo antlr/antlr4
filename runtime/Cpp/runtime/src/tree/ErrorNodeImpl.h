@@ -26,7 +26,7 @@ namespace tree {
     ErrorNodeImpl(Token *token);
     ~ErrorNodeImpl() override;
 
-    virtual antlrcpp::Any accept(ParseTreeVisitor *visitor) override;
+    virtual std::any accept(ParseTreeVisitor *visitor) override;
   };
 
 } // namespace tree

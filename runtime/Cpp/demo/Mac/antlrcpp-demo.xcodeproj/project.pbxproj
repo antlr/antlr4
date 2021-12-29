@@ -7,8 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		270925AC1CDB427200522D32 /* libantlr4-runtime.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 270925A71CDB409400522D32 /* libantlr4-runtime.dylib */; };
-		270925AF1CDB428A00522D32 /* libantlr4-runtime.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 270925A91CDB409400522D32 /* libantlr4-runtime.a */; };
+		2707D9C22764C11300D99A45 /* libantlr4-runtime.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 2707D9BC2764C04C00D99A45 /* libantlr4-runtime.dylib */; };
 		270925B11CDB455B00522D32 /* TLexer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 27A23EA11CC2A8D60036D8A3 /* TLexer.cpp */; };
 		2747A7131CA6C46C0030247B /* InputHandlingTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2747A7121CA6C46C0030247B /* InputHandlingTests.mm */; };
 		274FC6D91CA96B6C008D4374 /* MiscClassTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 274FC6D81CA96B6C008D4374 /* MiscClassTests.mm */; };
@@ -22,40 +21,26 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		270925A61CDB409400522D32 /* PBXContainerItemProxy */ = {
+		2707D9BB2764C04C00D99A45 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 270925A11CDB409400522D32 /* antlrcpp.xcodeproj */;
+			containerPortal = 2707D9B52764C04C00D99A45 /* antlrcpp.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = 37D727AA1867AF1E007B6D10;
-			remoteInfo = antlrcpp;
+			remoteInfo = antlr4;
 		};
-		270925A81CDB409400522D32 /* PBXContainerItemProxy */ = {
+		2707D9BD2764C04C00D99A45 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 270925A11CDB409400522D32 /* antlrcpp.xcodeproj */;
+			containerPortal = 2707D9B52764C04C00D99A45 /* antlrcpp.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = 37C147171B4D5A04008EDDDB;
-			remoteInfo = antlrcpp_static;
+			remoteInfo = antlr4_static;
 		};
-		270925AA1CDB426900522D32 /* PBXContainerItemProxy */ = {
+		2707D9BF2764C04C00D99A45 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 270925A11CDB409400522D32 /* antlrcpp.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = 37D727A91867AF1E007B6D10;
-			remoteInfo = antlrcpp;
-		};
-		270925AD1CDB428400522D32 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 270925A11CDB409400522D32 /* antlrcpp.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = 37C147161B4D5A04008EDDDB;
-			remoteInfo = antlrcpp_static;
-		};
-		273DC2BC1CDB619900DB7B2B /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 270925A11CDB409400522D32 /* antlrcpp.xcodeproj */;
+			containerPortal = 2707D9B52764C04C00D99A45 /* antlrcpp.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = 270C67F01CDB4F1E00116E17;
-			remoteInfo = antlrcpp_ios;
+			remoteInfo = antlr4_ios;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -72,7 +57,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		270925A11CDB409400522D32 /* antlrcpp.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = antlrcpp.xcodeproj; path = ../../runtime/antlrcpp.xcodeproj; sourceTree = "<group>"; };
+		2707D9B52764C04C00D99A45 /* antlrcpp.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = antlrcpp.xcodeproj; path = ../../runtime/antlrcpp.xcodeproj; sourceTree = "<group>"; };
 		2747A7121CA6C46C0030247B /* InputHandlingTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = InputHandlingTests.mm; sourceTree = "<group>"; wrapsLines = 0; };
 		274FC6D81CA96B6C008D4374 /* MiscClassTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MiscClassTests.mm; sourceTree = "<group>"; wrapsLines = 0; };
 		27874F1D1CCB7A0700AF1C53 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
@@ -102,7 +87,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				270925AC1CDB427200522D32 /* libantlr4-runtime.dylib in Frameworks */,
+				2707D9C22764C11300D99A45 /* libantlr4-runtime.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -110,21 +95,27 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				270925AF1CDB428A00522D32 /* libantlr4-runtime.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		270925A21CDB409400522D32 /* Products */ = {
+		2707D9B62764C04C00D99A45 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				270925A71CDB409400522D32 /* libantlr4-runtime.dylib */,
-				270925A91CDB409400522D32 /* libantlr4-runtime.a */,
-				273DC2BD1CDB619900DB7B2B /* antlr4_ios.framework */,
+				2707D9BC2764C04C00D99A45 /* libantlr4-runtime.dylib */,
+				2707D9BE2764C04C00D99A45 /* libantlr4-runtime.a */,
+				2707D9C02764C04C00D99A45 /* antlr4_ios.framework */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		2707D9C12764C11300D99A45 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		27874F221CCBB34200AF1C53 /* Linked Frameworks */ = {
@@ -167,12 +158,13 @@
 		37D727A11867AF1E007B6D10 = {
 			isa = PBXGroup;
 			children = (
-				270925A11CDB409400522D32 /* antlrcpp.xcodeproj */,
+				2707D9B52764C04C00D99A45 /* antlrcpp.xcodeproj */,
 				27C66A681C9591280021E494 /* antlr4-cpp-demo */,
 				37F135691B4AC02800E0CACF /* antlrcpp Tests */,
 				27C66A5C1C958EB50021E494 /* generated */,
 				27874F221CCBB34200AF1C53 /* Linked Frameworks */,
 				37D727AB1867AF1E007B6D10 /* Products */,
+				2707D9C12764C11300D99A45 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -219,7 +211,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				270925AB1CDB426900522D32 /* PBXTargetDependency */,
 			);
 			name = "antlr4-cpp-demo";
 			productName = "antlr4-cpp-demo";
@@ -237,7 +228,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				270925AE1CDB428400522D32 /* PBXTargetDependency */,
 			);
 			name = "antlrcpp Tests";
 			productName = "antlrcpp Tests";
@@ -266,6 +256,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 			);
 			mainGroup = 37D727A11867AF1E007B6D10;
@@ -273,8 +264,8 @@
 			projectDirPath = "";
 			projectReferences = (
 				{
-					ProductGroup = 270925A21CDB409400522D32 /* Products */;
-					ProjectRef = 270925A11CDB409400522D32 /* antlrcpp.xcodeproj */;
+					ProductGroup = 2707D9B62764C04C00D99A45 /* Products */;
+					ProjectRef = 2707D9B52764C04C00D99A45 /* antlrcpp.xcodeproj */;
 				},
 			);
 			projectRoot = "";
@@ -286,25 +277,25 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		270925A71CDB409400522D32 /* libantlr4-runtime.dylib */ = {
+		2707D9BC2764C04C00D99A45 /* libantlr4-runtime.dylib */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.dylib";
 			path = "libantlr4-runtime.dylib";
-			remoteRef = 270925A61CDB409400522D32 /* PBXContainerItemProxy */;
+			remoteRef = 2707D9BB2764C04C00D99A45 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		270925A91CDB409400522D32 /* libantlr4-runtime.a */ = {
+		2707D9BE2764C04C00D99A45 /* libantlr4-runtime.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = "libantlr4-runtime.a";
-			remoteRef = 270925A81CDB409400522D32 /* PBXContainerItemProxy */;
+			remoteRef = 2707D9BD2764C04C00D99A45 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		273DC2BD1CDB619900DB7B2B /* antlr4_ios.framework */ = {
+		2707D9C02764C04C00D99A45 /* antlr4_ios.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
 			path = antlr4_ios.framework;
-			remoteRef = 273DC2BC1CDB619900DB7B2B /* PBXContainerItemProxy */;
+			remoteRef = 2707D9BF2764C04C00D99A45 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
@@ -364,19 +355,6 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
-/* Begin PBXTargetDependency section */
-		270925AB1CDB426900522D32 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = antlrcpp;
-			targetProxy = 270925AA1CDB426900522D32 /* PBXContainerItemProxy */;
-		};
-		270925AE1CDB428400522D32 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = antlrcpp_static;
-			targetProxy = 270925AD1CDB428400522D32 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
-
 /* Begin XCBuildConfiguration section */
 		27C66A6C1C9591280021E494 /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -412,8 +390,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
-				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
@@ -464,7 +441,7 @@
 					../../runtime/src/atn,
 					../../runtime/src,
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MACOSX_DEPLOYMENT_TARGET = 11.1;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
 			};
@@ -474,8 +451,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
-				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
@@ -520,7 +496,7 @@
 					../../runtime/src/atn,
 					../../runtime/src,
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MACOSX_DEPLOYMENT_TARGET = 11.1;
 				SDKROOT = macosx;
 			};
 			name = Release;

@@ -8,7 +8,6 @@ package org.antlr.v4.codegen.target;
 
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.codegen.Target;
-import org.antlr.v4.codegen.UnicodeEscapes;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.StringRenderer;
@@ -47,15 +46,9 @@ public class PHPTarget extends Target {
 	private final Set<String> badWords = new HashSet<String>();
 
 	public PHPTarget(CodeGenerator gen) {
-		super(gen, "PHP");
-
+		super(gen);
 		targetCharValueEscape['$'] = "\\$";
 	}
-
-    @Override
-    public String getVersion() {
-        return "4.9.2";
-    }
 
 	@Override
 	public String encodeIntAsCharEscape(int v) {
@@ -98,16 +91,11 @@ public class PHPTarget extends Target {
 		return false;
 	}
 
-	@Override
-	protected void appendUnicodeEscapedCodePoint(int codePoint, StringBuilder sb) {
-		UnicodeEscapes.appendPythonStyleEscapedCodePoint(codePoint, sb);
-	}
-
    @Override
-   public String getTargetStringLiteralFromANTLRStringLiteral(CodeGenerator generator, String literal, boolean addQuotes) {
-	   String targetStringLiteral = super.getTargetStringLiteralFromANTLRStringLiteral(generator, literal, addQuotes);
+   public String getTargetStringLiteralFromANTLRStringLiteral(CodeGenerator generator, String literal, boolean addQuotes,
+															  boolean escapeSpecial) {
+	   String targetStringLiteral = super.getTargetStringLiteralFromANTLRStringLiteral(generator, literal, addQuotes, escapeSpecial);
 	   targetStringLiteral = targetStringLiteral.replace("$", "\\$");
-
 	   return targetStringLiteral;
    }
 }

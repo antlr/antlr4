@@ -13,7 +13,7 @@
 using namespace antlr4;
 using namespace antlr4::misc;
 
-IntervalSet const IntervalSet::COMPLETE_CHAR_SET = 
+IntervalSet const IntervalSet::COMPLETE_CHAR_SET =
     IntervalSet::of(Lexer::MIN_CHAR_VALUE, Lexer::MAX_CHAR_VALUE);
 
 IntervalSet const IntervalSet::EMPTY_SET;
@@ -379,10 +379,6 @@ std::string IntervalSet::toString(bool elemAreChar) const {
   return ss.str();
 }
 
-std::string IntervalSet::toString(const std::vector<std::string> &tokenNames) const {
-  return toString(dfa::Vocabulary::fromTokenNames(tokenNames));
-}
-
 std::string IntervalSet::toString(const dfa::Vocabulary &vocabulary) const {
   if (_intervals.empty()) {
     return "{}";
@@ -418,10 +414,6 @@ std::string IntervalSet::toString(const dfa::Vocabulary &vocabulary) const {
   }
 
   return ss.str();
-}
-
-std::string IntervalSet::elementName(const std::vector<std::string> &tokenNames, ssize_t a) const {
-  return elementName(dfa::Vocabulary::fromTokenNames(tokenNames), a);
 }
 
 std::string IntervalSet::elementName(const dfa::Vocabulary &vocabulary, ssize_t a) const {

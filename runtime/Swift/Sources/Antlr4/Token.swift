@@ -10,7 +10,7 @@
 /// we obtained this token.
 /// 
 
-public protocol Token: class, CustomStringConvertible {
+public protocol Token: AnyObject, CustomStringConvertible {
     //let INVALID_TYPE : Int = 0;
 
     /// During lookahead operations, this "token" signifies we hit rule end ATN state

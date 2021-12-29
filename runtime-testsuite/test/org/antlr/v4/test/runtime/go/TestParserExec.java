@@ -8,7 +8,6 @@ package org.antlr.v4.test.runtime.go;
 
 import org.antlr.v4.test.runtime.BaseRuntimeTest;
 import org.antlr.v4.test.runtime.RuntimeTestDescriptor;
-import org.antlr.v4.test.runtime.descriptors.ParserExecDescriptors;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
@@ -28,6 +27,6 @@ public class TestParserExec extends BaseRuntimeTest {
 
 	@Parameterized.Parameters(name="{0}")
 	public static RuntimeTestDescriptor[] getAllTestDescriptors() {
-		return BaseRuntimeTest.getRuntimeTestDescriptors(ParserExecDescriptors.class, "Go");
+		return BaseRuntimeTest.getRuntimeTestDescriptors("ParserExec", "Go");
 	}
 }

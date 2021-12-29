@@ -1,6 +1,7 @@
 package org.antlr.v4.misc;
 
 import org.antlr.runtime.Token;
+import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.junit.Assert;
 import org.junit.Test;

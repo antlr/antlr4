@@ -1,0 +1,29 @@
+[notes]
+This is a regression test for antlr/antlr4#542 "First alternative cannot
+be right-associative".  https://github.com/antlr/antlr4/issues/542
+
+[type]
+Parser
+
+[grammar]
+grammar T;
+s @after {<ToStringTree("$ctx"):writeln()>} : e EOF; // must indicate EOF can follow or 'a\<EOF>' won't match
+e :\<assoc=right> e '*' e
+  |\<assoc=right> e '+' e
+  |\<assoc=right> e '?' e ':' e
+  |\<assoc=right> e '=' e
+  | ID
+  ;
+ID : 'a'..'z'+ ;
+WS : (' '|'\n') -> skip ;
+
+[start]
+s
+
+[input]
+a?b+c:d
+
+[output]
+"""(s (e (e a) ? (e (e b) + (e c)) : (e d)) <EOF>)
+"""
+

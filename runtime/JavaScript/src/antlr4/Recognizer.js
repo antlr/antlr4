@@ -15,7 +15,7 @@ class Recognizer {
     }
 
     checkVersion(toolVersion) {
-        const runtimeVersion = "4.9.2";
+        const runtimeVersion = "4.9.3";
         if (runtimeVersion!==toolVersion) {
             console.log("ANTLR runtime and generated code versions disagree: "+runtimeVersion+"!="+toolVersion);
         }
@@ -27,6 +27,27 @@ class Recognizer {
 
     removeErrorListeners() {
         this._listeners = [];
+    }
+
+    getLiteralNames() {
+        return Object.getPrototypeOf(this).constructor.literalNames || [];
+    }
+
+    getSymbolicNames() {
+        return Object.getPrototypeOf(this).constructor.symbolicNames || [];
+    }
+
+    getTokenNames() {
+        if(!this.tokenNames) {
+            const literalNames = this.getLiteralNames();
+            const symbolicNames = this.getSymbolicNames();
+            const length = literalNames.length > symbolicNames.length ? literalNames.length : symbolicNames.length;
+            this.tokenNames = [];
+            for(let i=0; i<length; i++) {
+                this.tokenNames[i] = literalNames[i] || symbolicNames[i] || "<INVALID";
+            }
+        }
+        return this.tokenNames;
     }
 
     getTokenTypeMap() {

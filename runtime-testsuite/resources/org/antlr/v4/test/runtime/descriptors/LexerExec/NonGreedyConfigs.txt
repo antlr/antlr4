@@ -1,0 +1,19 @@
+[type]
+Lexer
+
+[grammar]
+lexer grammar L;
+I : .*? ('a' | 'ab') {<Text():writeln()>} ;
+WS : (' '|'\n') -> skip ;
+J : . {<Text():writeln()>};
+
+[input]
+ab
+
+[output]
+a
+b
+[@0,0:0='a',<1>,1:0]
+[@1,1:1='b',<3>,1:1]
+[@2,2:1='<EOF>',<-1>,1:2]
+

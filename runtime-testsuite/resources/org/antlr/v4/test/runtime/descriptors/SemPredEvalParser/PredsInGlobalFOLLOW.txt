@@ -1,0 +1,29 @@
+[notes]
+During a global follow operation, we still collect semantic
+predicates as long as they are not dependent on local context
+
+[type]
+Parser
+
+[grammar]
+grammar T;
+@parser::members {
+<Declare_pred()>
+}
+s : e {<True():Invoke_pred()>}? {<writeln("\"parse\"")>} '!' ;
+t : e {<False():Invoke_pred()>}? ID ;
+e : ID | ; // non-LL(1) so we use ATN
+ID : 'a'..'z'+ ;
+INT : '0'..'9'+;
+WS : (' '|'\n') -> skip ;
+
+[start]
+s
+
+[input]
+a!
+
+[output]
+eval=true
+parse
+

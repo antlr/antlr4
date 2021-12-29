@@ -35,20 +35,16 @@ namespace dfa {
   ///  but with different ATN contexts (with same or different alts)
   ///  meaning that state was reached via a different set of rule invocations.
   /// </summary>
-  class ANTLR4CPP_PUBLIC DFAState {
+  class ANTLR4CPP_PUBLIC DFAState final {
   public:
-    class PredPrediction {
+    class PredPrediction final {
     public:
       Ref<atn::SemanticContext> pred; // never null; at least SemanticContext.NONE
       int alt;
 
-      PredPrediction(const Ref<atn::SemanticContext> &pred, int alt);
-      virtual ~PredPrediction();
+      PredPrediction(Ref<atn::SemanticContext> pred, int alt);
 
-      virtual std::string toString();
-
-    private:
-      void InitializeInstanceFields();
+      std::string toString() const;
     };
 
     int stateNumber;
@@ -95,17 +91,17 @@ namespace dfa {
 
     /// Map a predicate to a predicted alternative.
     DFAState();
-    DFAState(int state);
-    DFAState(std::unique_ptr<atn::ATNConfigSet> configs);
-    virtual ~DFAState();
+    explicit DFAState(int state);
+    explicit DFAState(std::unique_ptr<atn::ATNConfigSet> configs);
+    ~DFAState();
 
     /// <summary>
     /// Get the set of all alts mentioned by all ATN configurations in this
     ///  DFA state.
     /// </summary>
-    virtual std::set<size_t> getAltSet();
+    std::set<size_t> getAltSet() const;
 
-    virtual size_t hashCode() const;
+    size_t hashCode() const;
 
     /// Two DFAState instances are equal if their ATN configuration sets
     /// are the same. This method is used to see if a state already exists.
@@ -118,19 +114,19 @@ namespace dfa {
     /// ParserATNSimulator#addDFAState we need to know if any other state
     /// exists that has this exact set of ATN configurations. The
     /// stateNumber is irrelevant.
-    bool operator == (const DFAState &o) const;
+    bool operator==(const DFAState &o) const;
 
-    virtual std::string toString();
+    std::string toString() const;
 
     struct Hasher
     {
-      size_t operator()(DFAState *k) const {
+      size_t operator()(const DFAState *k) const {
         return k->hashCode();
       }
     };
 
     struct Comparer {
-      bool operator()(DFAState *lhs, DFAState *rhs) const
+      bool operator()(const DFAState *lhs, const DFAState *rhs) const
       {
         return *lhs == *rhs;
       }

@@ -102,8 +102,6 @@ class DecisionEventInfo {
 ///
 /// @since 4.3
 class DecisionInfo {
-
-
   /// The decision number, which is an index into {@link ATN#decisionToState}.
   final int decision;
 

@@ -1,0 +1,22 @@
+[type]
+CompositeLexer
+
+[grammar]
+lexer grammar M;
+import S;
+A : 'a' B {<writeln("\"M.A\"")>} ;
+WS : (' '|'\n') -> skip ;
+
+[slaveGrammar]
+lexer grammar S;
+A : 'a' {<writeln("\"S.A\"")>} ;
+B : 'b' {<writeln("\"S.B\"")>} ;
+
+[input]
+ab
+
+[output]
+M.A
+[@0,0:1='ab',<1>,1:0]
+[@1,2:1='<EOF>',<-1>,1:2]
+
