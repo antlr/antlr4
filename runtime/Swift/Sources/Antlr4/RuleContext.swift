@@ -12,7 +12,7 @@
 /// as a children list so that we can turn this data structure into a
 /// tree.
 /// 
-/// The root node always has a null pointer and invokingState of -1.
+/// The root node always has a null pointer and invokingState of ATNState.INVALID_STATE_NUMBER.
 /// 
 /// Upon entry to parsing, the first invoked rule function creates a
 /// context object (asubclass specialized for that rule such as
@@ -63,10 +63,10 @@ open class RuleContext: RuleNode {
 
     /// What state invoked the rule associated with this context?
     /// The "return address" is the followState of invokingState
-    /// If parent is null, this should be -1 this context object represents
-    /// the start rule.
+    /// If parent is null, this should be ATNState.INVALID_STATE_NUMBER
+    /// this context object represents the start rule.
     /// 
-    public var invokingState = -1
+    public var invokingState = ATNState.INVALID_STATE_NUMBER
 
     public init() {
     }
@@ -91,7 +91,7 @@ open class RuleContext: RuleNode {
     /// current context.
     /// 
     open func isEmpty() -> Bool {
-        return invokingState == -1
+        return invokingState == ATNState.INVALID_STATE_NUMBER
     }
 
     // satisfy the ParseTree / SyntaxTree interface
@@ -222,7 +222,7 @@ open class RuleContext: RuleNode {
                 }
             }
 
-            if pWrap.parent != nil && (ruleNames != nil || !pWrap.parent!.isEmpty()) {
+            if let pWp = pWrap.parent, (ruleNames != nil || !pWp.isEmpty()) {
                 buf += " "
             }
 

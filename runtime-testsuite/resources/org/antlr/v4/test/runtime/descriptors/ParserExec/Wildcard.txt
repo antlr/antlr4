@@ -1,0 +1,26 @@
+[notes]
+Match assignments, ignore other tokens with wildcard.
+
+[type]
+Parser
+
+[grammar]
+grammar T;
+a : (assign|.)+ EOF ;
+assign : ID '=' INT ';' {
+<writeln("$text")>
+} ;
+ID : 'a'..'z'+ ;
+INT : '0'..'9'+;
+WS : (' '|'\n') -> skip;
+
+[start]
+a
+
+[input]
+x=10; abc;;;; y=99;
+
+[output]
+x=10;
+y=99;
+

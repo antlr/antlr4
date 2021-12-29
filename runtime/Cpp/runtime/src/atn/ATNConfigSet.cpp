@@ -74,7 +74,7 @@ bool ATNConfigSet::add(const Ref<ATNConfig> &config, PredictionContextMergeCache
 }
 
 bool ATNConfigSet::addAll(const Ref<ATNConfigSet> &other) {
-  for (auto &c : other->configs) {
+  for (const auto &c : other->configs) {
     add(c);
   }
   return false;
@@ -82,7 +82,7 @@ bool ATNConfigSet::addAll(const Ref<ATNConfigSet> &other) {
 
 std::vector<ATNState*> ATNConfigSet::getStates() {
   std::vector<ATNState*> states;
-  for (auto c : configs) {
+  for (const auto &c : configs) {
     states.push_back(c->state);
   }
   return states;
@@ -99,15 +99,15 @@ std::vector<ATNState*> ATNConfigSet::getStates() {
 
 BitSet ATNConfigSet::getAlts() {
   BitSet alts;
-  for (ATNConfig config : configs) {
-    alts.set(config.alt);
+  for (const auto &config : configs) {
+    alts.set(config->alt);
   }
   return alts;
 }
 
 std::vector<Ref<SemanticContext>> ATNConfigSet::getPredicates() {
   std::vector<Ref<SemanticContext>> preds;
-  for (auto c : configs) {
+  for (const auto &c : configs) {
     if (c->semanticContext != SemanticContext::NONE) {
       preds.push_back(c->semanticContext);
     }
@@ -126,7 +126,7 @@ void ATNConfigSet::optimizeConfigs(ATNSimulator *interpreter) {
   if (_configLookup.empty())
     return;
 
-  for (auto &config : configs) {
+  for (const auto &config : configs) {
     config->context = interpreter->getCachedContext(config->context);
   }
 }
@@ -150,7 +150,7 @@ bool ATNConfigSet::operator == (const ATNConfigSet &other) {
 size_t ATNConfigSet::hashCode() {
   if (!isReadonly() || _cachedHashCode == 0) {
     _cachedHashCode = 1;
-    for (auto &i : configs) {
+    for (const auto &i : configs) {
       _cachedHashCode = 31 * _cachedHashCode + i->hashCode(); // Same as Java's list hashCode impl.
     }
   }

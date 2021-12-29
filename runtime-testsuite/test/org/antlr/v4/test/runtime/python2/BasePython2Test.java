@@ -9,7 +9,6 @@ package org.antlr.v4.test.runtime.python2;
 import org.antlr.v4.test.runtime.python.BasePythonTest;
 import org.stringtemplate.v4.ST;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 

@@ -3,12 +3,11 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
 		270C67F31CDB4F1E00116E17 /* antlrcpp_ios.h in Headers */ = {isa = PBXBuildFile; fileRef = 270C67F21CDB4F1E00116E17 /* antlrcpp_ios.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		270C69E01CDB536A00116E17 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 270C69DF1CDB536A00116E17 /* CoreFoundation.framework */; };
 		276566E01DA93BFB000869BE /* ParseTree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276566DF1DA93BFB000869BE /* ParseTree.cpp */; };
 		276566E11DA93BFB000869BE /* ParseTree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276566DF1DA93BFB000869BE /* ParseTree.cpp */; };
 		276566E21DA93BFB000869BE /* ParseTree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276566DF1DA93BFB000869BE /* ParseTree.cpp */; };
@@ -645,12 +644,12 @@
 		276E5FBC1CDB57AA003FF4B4 /* Declarations.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5CEA1CDB57AA003FF4B4 /* Declarations.h */; };
 		276E5FBD1CDB57AA003FF4B4 /* Declarations.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5CEA1CDB57AA003FF4B4 /* Declarations.h */; };
 		276E5FBE1CDB57AA003FF4B4 /* Declarations.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5CEA1CDB57AA003FF4B4 /* Declarations.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		276E5FBF1CDB57AA003FF4B4 /* guid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5CEB1CDB57AA003FF4B4 /* guid.cpp */; };
-		276E5FC01CDB57AA003FF4B4 /* guid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5CEB1CDB57AA003FF4B4 /* guid.cpp */; };
-		276E5FC11CDB57AA003FF4B4 /* guid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5CEB1CDB57AA003FF4B4 /* guid.cpp */; };
-		276E5FC21CDB57AA003FF4B4 /* guid.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5CEC1CDB57AA003FF4B4 /* guid.h */; };
-		276E5FC31CDB57AA003FF4B4 /* guid.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5CEC1CDB57AA003FF4B4 /* guid.h */; };
-		276E5FC41CDB57AA003FF4B4 /* guid.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5CEC1CDB57AA003FF4B4 /* guid.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		276E5FBF1CDB57AA003FF4B4 /* Guid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5CEB1CDB57AA003FF4B4 /* Guid.cpp */; };
+		276E5FC01CDB57AA003FF4B4 /* Guid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5CEB1CDB57AA003FF4B4 /* Guid.cpp */; };
+		276E5FC11CDB57AA003FF4B4 /* Guid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5CEB1CDB57AA003FF4B4 /* Guid.cpp */; };
+		276E5FC21CDB57AA003FF4B4 /* Guid.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5CEC1CDB57AA003FF4B4 /* Guid.h */; };
+		276E5FC31CDB57AA003FF4B4 /* Guid.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5CEC1CDB57AA003FF4B4 /* Guid.h */; };
+		276E5FC41CDB57AA003FF4B4 /* Guid.h in Headers */ = {isa = PBXBuildFile; fileRef = 276E5CEC1CDB57AA003FF4B4 /* Guid.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		276E5FC51CDB57AA003FF4B4 /* StringUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5CED1CDB57AA003FF4B4 /* StringUtils.cpp */; };
 		276E5FC61CDB57AA003FF4B4 /* StringUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5CED1CDB57AA003FF4B4 /* StringUtils.cpp */; };
 		276E5FC71CDB57AA003FF4B4 /* StringUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 276E5CED1CDB57AA003FF4B4 /* StringUtils.cpp */; };
@@ -927,7 +926,6 @@
 		270C67F01CDB4F1E00116E17 /* antlr4_ios.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = antlr4_ios.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		270C67F21CDB4F1E00116E17 /* antlrcpp_ios.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = antlrcpp_ios.h; sourceTree = "<group>"; wrapsLines = 0; };
 		270C67F41CDB4F1E00116E17 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		270C69DF1CDB536A00116E17 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS9.3.sdk/System/Library/Frameworks/CoreFoundation.framework; sourceTree = DEVELOPER_DIR; };
 		276566DF1DA93BFB000869BE /* ParseTree.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParseTree.cpp; sourceTree = "<group>"; };
 		276E5C0C1CDB57AA003FF4B4 /* ANTLRErrorListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRErrorListener.h; sourceTree = "<group>"; wrapsLines = 0; };
 		276E5C0D1CDB57AA003FF4B4 /* ANTLRErrorStrategy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ANTLRErrorStrategy.h; sourceTree = "<group>"; };
@@ -1140,8 +1138,8 @@
 		276E5CE81CDB57AA003FF4B4 /* CPPUtils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CPPUtils.cpp; sourceTree = "<group>"; wrapsLines = 0; };
 		276E5CE91CDB57AA003FF4B4 /* CPPUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = CPPUtils.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		276E5CEA1CDB57AA003FF4B4 /* Declarations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Declarations.h; sourceTree = "<group>"; };
-		276E5CEB1CDB57AA003FF4B4 /* guid.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = guid.cpp; sourceTree = "<group>"; };
-		276E5CEC1CDB57AA003FF4B4 /* guid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = guid.h; sourceTree = "<group>"; };
+		276E5CEB1CDB57AA003FF4B4 /* Guid.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Guid.cpp; sourceTree = "<group>"; };
+		276E5CEC1CDB57AA003FF4B4 /* Guid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Guid.h; sourceTree = "<group>"; };
 		276E5CED1CDB57AA003FF4B4 /* StringUtils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StringUtils.cpp; sourceTree = "<group>"; };
 		276E5CEE1CDB57AA003FF4B4 /* StringUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StringUtils.h; sourceTree = "<group>"; };
 		276E5CF01CDB57AA003FF4B4 /* Token.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Token.h; sourceTree = "<group>"; };
@@ -1242,7 +1240,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				270C69E01CDB536A00116E17 /* CoreFoundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1553,8 +1550,8 @@
 				276E5CE81CDB57AA003FF4B4 /* CPPUtils.cpp */,
 				276E5CE91CDB57AA003FF4B4 /* CPPUtils.h */,
 				276E5CEA1CDB57AA003FF4B4 /* Declarations.h */,
-				276E5CEB1CDB57AA003FF4B4 /* guid.cpp */,
-				276E5CEC1CDB57AA003FF4B4 /* guid.h */,
+				276E5CEB1CDB57AA003FF4B4 /* Guid.cpp */,
+				276E5CEC1CDB57AA003FF4B4 /* Guid.h */,
 				276E5CED1CDB57AA003FF4B4 /* StringUtils.cpp */,
 				276E5CEE1CDB57AA003FF4B4 /* StringUtils.h */,
 			);
@@ -1618,7 +1615,6 @@
 		27874F221CCBB34200AF1C53 /* Linked Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				270C69DF1CDB536A00116E17 /* CoreFoundation.framework */,
 				27874F1D1CCB7A0700AF1C53 /* CoreFoundation.framework */,
 			);
 			name = "Linked Frameworks";
@@ -1767,7 +1763,7 @@
 				276E5F581CDB57AA003FF4B4 /* LexerNoViableAltException.h in Headers */,
 				276E5D811CDB57AA003FF4B4 /* ATNSimulator.h in Headers */,
 				27DB44B61D0463CC007E790B /* XPathLexer.h in Headers */,
-				276E5FC41CDB57AA003FF4B4 /* guid.h in Headers */,
+				276E5FC41CDB57AA003FF4B4 /* Guid.h in Headers */,
 				276E602D1CDB57AA003FF4B4 /* TagChunk.h in Headers */,
 				276E5E951CDB57AA003FF4B4 /* RuleStopState.h in Headers */,
 				276E5F761CDB57AA003FF4B4 /* Predicate.h in Headers */,
@@ -1934,7 +1930,7 @@
 				276E60141CDB57AA003FF4B4 /* ParseTreeMatch.h in Headers */,
 				276E5F571CDB57AA003FF4B4 /* LexerNoViableAltException.h in Headers */,
 				276E5D801CDB57AA003FF4B4 /* ATNSimulator.h in Headers */,
-				276E5FC31CDB57AA003FF4B4 /* guid.h in Headers */,
+				276E5FC31CDB57AA003FF4B4 /* Guid.h in Headers */,
 				276E602C1CDB57AA003FF4B4 /* TagChunk.h in Headers */,
 				276E5E941CDB57AA003FF4B4 /* RuleStopState.h in Headers */,
 				276E5F751CDB57AA003FF4B4 /* Predicate.h in Headers */,
@@ -2092,7 +2088,7 @@
 				276E60131CDB57AA003FF4B4 /* ParseTreeMatch.h in Headers */,
 				276E5F561CDB57AA003FF4B4 /* LexerNoViableAltException.h in Headers */,
 				276E5D7F1CDB57AA003FF4B4 /* ATNSimulator.h in Headers */,
-				276E5FC21CDB57AA003FF4B4 /* guid.h in Headers */,
+				276E5FC21CDB57AA003FF4B4 /* Guid.h in Headers */,
 				276E602B1CDB57AA003FF4B4 /* TagChunk.h in Headers */,
 				276E5E931CDB57AA003FF4B4 /* RuleStopState.h in Headers */,
 				276E5F741CDB57AA003FF4B4 /* Predicate.h in Headers */,
@@ -2226,7 +2222,7 @@
 		37D727A21867AF1E007B6D10 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1030;
+				LastUpgradeCheck = 1240;
 				ORGANIZATIONNAME = ANTLR;
 				TargetAttributes = {
 					270C67EF1CDB4F1E00116E17 = {
@@ -2238,7 +2234,7 @@
 				};
 			};
 			buildConfigurationList = 37D727A51867AF1E007B6D10 /* Build configuration list for PBXProject "antlrcpp" */;
-			compatibilityVersion = "Xcode 3.2";
+			compatibilityVersion = "Xcode 12.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -2368,7 +2364,7 @@
 				276E5E861CDB57AA003FF4B4 /* RangeTransition.cpp in Sources */,
 				276E5D7E1CDB57AA003FF4B4 /* ATNSimulator.cpp in Sources */,
 				276E5D9C1CDB57AA003FF4B4 /* BasicState.cpp in Sources */,
-				276E5FC11CDB57AA003FF4B4 /* guid.cpp in Sources */,
+				276E5FC11CDB57AA003FF4B4 /* Guid.cpp in Sources */,
 				276E5E801CDB57AA003FF4B4 /* ProfilingATNSimulator.cpp in Sources */,
 				2793DCA91F08095F00A84290 /* ANTLRErrorStrategy.cpp in Sources */,
 				276E5F401CDB57AA003FF4B4 /* IntStream.cpp in Sources */,
@@ -2522,7 +2518,7 @@
 				276E5E851CDB57AA003FF4B4 /* RangeTransition.cpp in Sources */,
 				276E5D7D1CDB57AA003FF4B4 /* ATNSimulator.cpp in Sources */,
 				276E5D9B1CDB57AA003FF4B4 /* BasicState.cpp in Sources */,
-				276E5FC01CDB57AA003FF4B4 /* guid.cpp in Sources */,
+				276E5FC01CDB57AA003FF4B4 /* Guid.cpp in Sources */,
 				276E5E7F1CDB57AA003FF4B4 /* ProfilingATNSimulator.cpp in Sources */,
 				2793DCA81F08095F00A84290 /* ANTLRErrorStrategy.cpp in Sources */,
 				276E5F3F1CDB57AA003FF4B4 /* IntStream.cpp in Sources */,
@@ -2676,7 +2672,7 @@
 				276E5E841CDB57AA003FF4B4 /* RangeTransition.cpp in Sources */,
 				276E5D7C1CDB57AA003FF4B4 /* ATNSimulator.cpp in Sources */,
 				276E5D9A1CDB57AA003FF4B4 /* BasicState.cpp in Sources */,
-				276E5FBF1CDB57AA003FF4B4 /* guid.cpp in Sources */,
+				276E5FBF1CDB57AA003FF4B4 /* Guid.cpp in Sources */,
 				276E5E7E1CDB57AA003FF4B4 /* ProfilingATNSimulator.cpp in Sources */,
 				2793DCA71F08095F00A84290 /* ANTLRErrorStrategy.cpp in Sources */,
 				276E5F3E1CDB57AA003FF4B4 /* IntStream.cpp in Sources */,
@@ -2737,6 +2733,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
@@ -2751,8 +2748,12 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = "antlrcpp-ios/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				MTL_ENABLE_DEBUG_INFO = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.antlr.v4.runtime.antlrcpp-ios";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -2768,6 +2769,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
@@ -2782,8 +2784,12 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = "antlrcpp-ios/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				MTL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.antlr.v4.runtime.antlrcpp-ios";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -2799,6 +2805,7 @@
 		37C1471F1B4D5A04008EDDDB /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -2821,6 +2828,7 @@
 		37C147201B4D5A04008EDDDB /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -2841,8 +2849,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
-				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
-				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_ASSIGN_ENUM = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
@@ -2857,6 +2864,7 @@
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = YES;
@@ -2889,8 +2897,12 @@
 				GCC_WARN_UNUSED_LABEL = YES;
 				GCC_WARN_UNUSED_PARAMETER = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = "src/ thirdparty/utfcpp/source/ thirdparty/utfcpp/source/utf8/";
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				HEADER_SEARCH_PATHS = (
+					src/,
+					thirdparty/utfcpp/source/,
+					thirdparty/utfcpp/source/utf8/,
+				);
+				MACOSX_DEPLOYMENT_TARGET = 11.1;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
 			};
@@ -2901,8 +2913,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
-				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
-				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_ASSIGN_ENUM = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
@@ -2917,6 +2928,7 @@
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = YES;
@@ -2945,8 +2957,12 @@
 				GCC_WARN_UNUSED_LABEL = YES;
 				GCC_WARN_UNUSED_PARAMETER = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = "src/ thirdparty/utfcpp/source/ thirdparty/utfcpp/source/utf8/";
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				HEADER_SEARCH_PATHS = (
+					src/,
+					thirdparty/utfcpp/source/,
+					thirdparty/utfcpp/source/utf8/,
+				);
+				MACOSX_DEPLOYMENT_TARGET = 11.1;
 				SDKROOT = macosx;
 			};
 			name = Release;

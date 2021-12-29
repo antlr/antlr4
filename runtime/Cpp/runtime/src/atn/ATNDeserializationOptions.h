@@ -10,41 +10,39 @@
 namespace antlr4 {
 namespace atn {
 
-  class ANTLR4CPP_PUBLIC ATNDeserializationOptions {
-  private:
-    static ATNDeserializationOptions defaultOptions;
+class ANTLR4CPP_PUBLIC ATNDeserializationOptions final {
+public:
+  ATNDeserializationOptions()
+    : _readOnly(false), _verifyATN(true), _generateRuleBypassTransitions(false) {}
 
-    bool readOnly;
-    bool verifyATN;
-    bool generateRuleBypassTransitions;
+  // TODO: Is this useful? If so we should mark it as explicit, otherwise remove it.
+  ATNDeserializationOptions(ATNDeserializationOptions *options);
 
-  public:
-    ATNDeserializationOptions();
-    ATNDeserializationOptions(ATNDeserializationOptions *options);
-    ATNDeserializationOptions(ATNDeserializationOptions const&) = default;
-    virtual ~ATNDeserializationOptions();
-    ATNDeserializationOptions& operator=(ATNDeserializationOptions const&) = default;
+  ATNDeserializationOptions(const ATNDeserializationOptions&) = default;
 
-    static const ATNDeserializationOptions& getDefaultOptions();
+  ATNDeserializationOptions& operator=(const ATNDeserializationOptions&) = default;
 
-    bool isReadOnly();
+  static const ATNDeserializationOptions& getDefaultOptions();
 
-    void makeReadOnly();
+  bool isReadOnly() const { return _readOnly; }
 
-    bool isVerifyATN();
+  void makeReadOnly();
 
-    void setVerifyATN(bool verify);
+  bool isVerifyATN() const { return _verifyATN; }
 
-    bool isGenerateRuleBypassTransitions();
+  void setVerifyATN(bool verify);
 
-    void setGenerateRuleBypassTransitions(bool generate);
+  bool isGenerateRuleBypassTransitions() const { return _generateRuleBypassTransitions; }
 
-  protected:
-    virtual void throwIfReadOnly();
+  void setGenerateRuleBypassTransitions(bool generate);
 
-  private:
-    void InitializeInstanceFields();
-  };
+private:
+  void throwIfReadOnly() const;
+
+  bool _readOnly;
+  bool _verifyATN;
+  bool _generateRuleBypassTransitions;
+};
 
 } // namespace atn
 } // namespace antlr4

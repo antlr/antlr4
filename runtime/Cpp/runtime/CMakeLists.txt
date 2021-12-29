@@ -1,19 +1,3 @@
-
-include(${CMAKE_ROOT}/Modules/ExternalProject.cmake)
-
-set(THIRDPARTY_DIR ${CMAKE_BINARY_DIR}/runtime/thirdparty)
-set(UTFCPP_DIR ${THIRDPARTY_DIR}/utfcpp)
-ExternalProject_Add(
-  utfcpp
-  GIT_REPOSITORY        "git://github.com/nemtrif/utfcpp"
-  GIT_TAG               "v3.1.1"
-  SOURCE_DIR            ${UTFCPP_DIR}
-  UPDATE_DISCONNECTED   1
-  CMAKE_ARGS            -DCMAKE_INSTALL_PREFIX=${UTFCPP_DIR}/install -Dgtest_force_shared_crt=ON
-  TEST_AFTER_INSTALL    1
-  STEP_TARGETS          build)
-
-
 include_directories(
   ${PROJECT_SOURCE_DIR}/runtime/src
   ${PROJECT_SOURCE_DIR}/runtime/src/atn
@@ -23,8 +7,6 @@ include_directories(
   ${PROJECT_SOURCE_DIR}/runtime/src/tree
   ${PROJECT_SOURCE_DIR}/runtime/src/tree/pattern
   ${PROJECT_SOURCE_DIR}/runtime/src/tree/xpath
-  ${UTFCPP_DIR}/install/include/utf8cpp
-  ${UTFCPP_DIR}/install/include/utf8cpp/utf8
 )
 
 
@@ -50,8 +32,38 @@ add_custom_target(make_lib_output_dir ALL
     COMMAND ${CMAKE_COMMAND} -E make_directory ${LIB_OUTPUT_DIR}
     )
 
-add_dependencies(antlr4_shared make_lib_output_dir utfcpp)
-add_dependencies(antlr4_static make_lib_output_dir utfcpp)
+add_dependencies(antlr4_shared make_lib_output_dir)
+add_dependencies(antlr4_static make_lib_output_dir)
+
+include(FetchContent)
+
+FetchContent_Declare(
+  googletest
+  URL https://github.com/google/googletest/archive/e2239ee6043f73722e7aa812a459f54a28552929.zip
+)
+
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+
+FetchContent_MakeAvailable(googletest)
+
+file(GLOB libantlrcpp_TESTS
+  "${PROJECT_SOURCE_DIR}/runtime/tests/*.cpp"
+)
+
+add_executable(
+  antlr4_tests
+  ${libantlrcpp_TESTS}
+)
+
+target_link_libraries(
+  antlr4_tests
+  antlr4_static
+  gtest_main
+)
+
+include(GoogleTest)
+
+gtest_discover_tests(antlr4_tests)
 
 if(CMAKE_SYSTEM_NAME MATCHES "Linux")
   target_link_libraries(antlr4_shared ${UUID_LIBRARIES})
@@ -130,14 +142,3 @@ install(DIRECTORY "${PROJECT_SOURCE_DIR}/runtime/src/"
         COMPONENT dev
         FILES_MATCHING PATTERN "*.h"
         )
-
-install(FILES "${UTFCPP_DIR}/source/utf8.h"
-        DESTINATION "include/antlr4-runtime")
-install(DIRECTORY "${UTFCPP_DIR}/source/utf8"
-        DESTINATION "include/antlr4-runtime"
-        COMPONENT dev
-        FILES_MATCHING PATTERN "*.h"
-        )
-
-
-

@@ -5,11 +5,13 @@
 
 #pragma once
 
+#include <shared_mutex>
+
 #include "antlr4-common.h"
 
 namespace antlrcpp {
 
-  std::string join(std::vector<std::string> strings, const std::string &separator);
+  std::string join(const std::vector<std::string> &strings, const std::string &separator);
   std::map<std::string, size_t> toMap(const std::vector<std::string> &keys);
   std::string escapeWhitespace(std::string str, bool escapeSpaces);
   std::string toHexString(const int t);
@@ -19,8 +21,9 @@ namespace antlrcpp {
   std::string indent(const std::string &s, const std::string &indentation, bool includingFirst = true);
 
   // Using RAII + a lambda to implement a "finally" replacement.
+  template <typename OnEnd>
   struct FinalAction {
-    FinalAction(std::function<void ()> f) : _cleanUp { f } {}
+    FinalAction(OnEnd f) : _cleanUp { std::move(f) } {}
     FinalAction(FinalAction &&other) :
 	_cleanUp(std::move(other._cleanUp)), _enabled(other._enabled) {
       other._enabled = false; // Don't trigger the lambda after ownership has moved.
@@ -29,11 +32,14 @@ namespace antlrcpp {
 
     void disable() { _enabled = false; }
   private:
-    std::function<void ()> _cleanUp;
+    OnEnd _cleanUp;
     bool _enabled {true};
   };
 
-  ANTLR4CPP_PUBLIC FinalAction finally(std::function<void ()> f);
+  template <typename OnEnd>
+  FinalAction<OnEnd> finally(OnEnd f) {
+    return FinalAction<OnEnd>(std::move(f));
+  }
 
   // Convenience functions to avoid lengthy dynamic_cast() != nullptr checks in many places.
   template <typename T1, typename T2>
@@ -57,22 +63,5 @@ namespace antlrcpp {
 
   // Get the error text from an exception pointer or the current exception.
   std::string what(std::exception_ptr eptr = std::current_exception());
-
-  class SingleWriteMultipleReadLock {
-  public:
-    void readLock();
-    void readUnlock();
-    void writeLock();
-    void writeUnlock();
-
-  private:
-    std::condition_variable _readerGate;
-    std::condition_variable _writerGate;
-
-    std::mutex _mutex;
-    size_t _activeReaders = 0;
-    size_t _waitingWriters = 0;
-    size_t _activeWriters = 0;
-  };
 
 } // namespace antlrcpp

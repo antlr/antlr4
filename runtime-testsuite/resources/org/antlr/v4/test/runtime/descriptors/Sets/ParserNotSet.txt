@@ -1,0 +1,17 @@
+[type]
+Parser
+
+[grammar]
+grammar T;
+a : t=~('x'|'y') 'z' {<writeln("$t.text")>} ;
+
+[start]
+a
+
+[input]
+zz
+
+[output]
+"""z
+"""
+

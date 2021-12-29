@@ -24,11 +24,11 @@ $ git push upstream 4.9-rc1
 
 ## Copy PHP runtime over
 
-Bump version to 4.9 in `runtime/PHP/src/RuntimeMetaData.php` in separate repository and commit plus push.
+Bump version to 4.9 in `~/antlr/code/antlr-php-runtime/src/RuntimeMetaData.php` in separate repository and commit plus push.
 
 ```
-cd ~/antlr/code/antlr-php-runtime
-... vi src/RuntimeMetaData.php ...
+cd ~/antlr/code/antlr-php-runtime/src
+... vi RuntimeMetaData.php ...
 git commit -a -m "Update PHP Runtime to latest version"
 ```
 
@@ -36,6 +36,7 @@ them back over in the ANTLR repo:
 
 ```
 cd runtime
+rm -rf PHP
 mkdir PHP
 cp ~/antlr/code/antlr-php-runtime/LICENSE PHP
 cp ~/antlr/code/antlr-php-runtime/README.md PHP
@@ -58,6 +59,7 @@ Edit the repository looking for 4.5 or whatever and update it. Bump version in t
  * runtime/PHP/src/RuntimeMetaData.php
  * runtime/JavaScript/package.json
  * runtime/JavaScript/src/antlr4/Recognizer.js
+ * runtime/JavaScript/package-lock.json
  * runtime/Cpp/VERSION
  * runtime/Cpp/runtime/src/RuntimeMetaData.cpp
  * runtime/Cpp/cmake/ExternalAntlr4Cpp.cmake
@@ -66,6 +68,11 @@ Edit the repository looking for 4.5 or whatever and update it. Bump version in t
  * runtime/Swift/Antlr4/org/antlr/v4/runtime/RuntimeMetaData.swift
  * runtime/Dart/lib/src/runtime_meta_data.dart
  * runtime/Dart/pubspec.yaml
+ * runtime/Swift/Tests/Antlr4Tests/RuntimeMetaDataTests.swift
+ * runtime/Swift/Sources/Antlr4/RuntimeMetaData.swift
+ * runtime/CSharp/src/Tree/Xpath/XPathLexer.cs
+ * runtime/CSharp/src/README.md
+ * runtime/CSharp/src/Properties/AssemblyInfo.cs
  * tool/src/org/antlr/v4/codegen/target/GoTarget.java
  * tool/src/org/antlr/v4/codegen/target/CppTarget.java
  * tool/src/org/antlr/v4/codegen/target/CSharpTarget.java
@@ -73,6 +80,7 @@ Edit the repository looking for 4.5 or whatever and update it. Bump version in t
  * tool/src/org/antlr/v4/codegen/target/Python2Target.java
  * tool/src/org/antlr/v4/codegen/target/Python3Target.java
  * tool/src/org/antlr/v4/codegen/target/SwiftTarget.java
+ * tool/src/org/antlr/v4/codegen/target/PHPTarget.java
  * tool/src/org/antlr/v4/codegen/Target.java
  * tool/resources/org/antlr/v4/tool/templates/codegen/Swift/Swift.stg
  
@@ -82,9 +90,10 @@ Here is a simple script to display any line from the critical files with, say, `
 mvn clean
 rm -rf runtime/CSharp/src/bin
 rm -rf runtime/CSharp/src/obj
+rm -rf runtime/Cpp/runtime/build
 rm -rf runtime/gen
+rm -rf runtime/JavaScript/dist
 find tool runtime -type f -exec grep -l '4\.9' {} \;
-find runtime runtime -type f -exec grep -l '4\.9' {} \;
 ```
 
 Commit to repository.
@@ -169,7 +178,7 @@ Uploaded: https://oss.sonatype.org/content/repositories/snapshots/org/antlr/antl
 [INFO] ANTLR 4 Maven plugin ............................... SUCCESS [  6.547 s]
 [INFO] ANTLR 4 Runtime Test Annotations ................... SUCCESS [  2.519 s]
 [INFO] ANTLR 4 Runtime Test Processors .................... SUCCESS [  2.385 s]
-[INFO] ANTLR 4 Runtime Tests (2nd generation) ............. SUCCESS [ 15.276 s]
+[INFO] ANTLR 4 Runtime Tests (3rd generation) ............. SUCCESS [ 15.276 s]
 [INFO] ANTLR 4 Tool Tests ................................. SUCCESS [  2.233 s]
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
@@ -351,7 +360,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
   Restore completed in 427.62 ms for C:\Code\antlr4-fork\runtime\CSharp\runtime\CSharp\Antlr4.Runtime\Antlr4.Runtime.dotnet.csproj.
   Antlr4.Runtime.dotnet -> C:\Code\antlr4-fork\runtime\CSharp\runtime\CSharp\Antlr4.Runtime\lib\Release\netstandard1.3\Antlr4.Runtime.Standard.dll
   Antlr4.Runtime.dotnet -> C:\Code\antlr4-fork\runtime\CSharp\runtime\CSharp\Antlr4.Runtime\lib\Release\net35\Antlr4.Runtime.Standard.dll
-  Successfully created package 'C:\Code\antlr4-fork\runtime\CSharp\runtime\CSharp\Antlr4.Runtime\lib\Release\Antlr4.Runtime.Standard.4.9.2.nupkg'.
+  Successfully created package 'C:\Code\antlr4-fork\runtime\CSharp\runtime\CSharp\Antlr4.Runtime\lib\Release\Antlr4.Runtime.Standard.4.9.3.nupkg'.
 ```
 
 **Publishing to NuGet**
@@ -476,7 +485,13 @@ Otherwise enter `N` to ignore the warning.
 
 ## Update javadoc for runtime and tool
 
-First, gen javadoc:
+Above build should make latest in 
+
+```
+~/.m2/repository/org/antlr/antlr4-runtime/4.9/antlr4-runtime-4.9
+```
+
+but you can regen (watch pom version!):
 
 ```bash
 $ cd antlr4

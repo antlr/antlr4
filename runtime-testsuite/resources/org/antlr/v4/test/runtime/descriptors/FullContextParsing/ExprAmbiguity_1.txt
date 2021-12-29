@@ -1,0 +1,35 @@
+[type]
+Parser
+
+[grammar]
+grammar T;
+s
+@init {<LL_EXACT_AMBIG_DETECTION()>}
+:   expr[0] {<ToStringTree("$expr.ctx"):writeln()>};
+   expr[int _p]
+       : ID
+       (
+  {5 >= $_p}? '*' expr[6]
+  | {4 >= $_p}? '+' expr[5]
+       )*
+       ;
+ID  : [a-zA-Z]+ ;
+WS  : [ \r\n\t]+ -> skip ;
+
+[start]
+s
+
+[input]
+a+b
+
+[output]
+"""(expr a + (expr b))
+"""
+
+[errors]
+line 1:1 reportAttemptingFullContext d=1 (expr), input='+'
+line 1:2 reportContextSensitivity d=1 (expr), input='+b'
+
+[flags]
+showDiagnosticErrors
+

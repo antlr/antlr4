@@ -8,7 +8,6 @@ package org.antlr.v4.test.runtime.go;
 
 import org.antlr.v4.test.runtime.BaseRuntimeTest;
 import org.antlr.v4.test.runtime.RuntimeTestDescriptor;
-import org.antlr.v4.test.runtime.descriptors.LexerErrorsDescriptors;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
@@ -28,6 +27,6 @@ public class TestLexerErrors extends BaseRuntimeTest {
 
 	@Parameterized.Parameters(name="{0}")
 	public static RuntimeTestDescriptor[] getAllTestDescriptors() {
-		return BaseRuntimeTest.getRuntimeTestDescriptors(LexerErrorsDescriptors.class, "Go");
+		return BaseRuntimeTest.getRuntimeTestDescriptors("LexerErrors", "Go");
 	}
 }

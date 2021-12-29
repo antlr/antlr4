@@ -1,0 +1,32 @@
+[notes]
+Loopback doesn't eval predicate at start of alt
+
+[type]
+Parser
+
+[grammar]
+grammar T;
+file_
+@after {<ToStringTree("$ctx"):writeln()>}
+  : para para EOF ;
+para: paraContent NL NL ;
+paraContent : ('s'|'x'|{<LANotEquals("2",{T<ParserToken("Parser", "NL")>})>}? NL)+ ;
+NL : '\n' ;
+s : 's' ;
+X : 'x' ;
+
+[start]
+file_
+
+[input]
+"""s
+
+
+x
+
+"""
+
+[output]
+"""(file_ (para (paraContent s) \n \n) (para (paraContent \n x) \n \n) <EOF>)
+"""
+

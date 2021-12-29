@@ -17,13 +17,16 @@ abstract class TokenFactory<Symbol extends Token> {
   /// This is the method used to create tokens in the lexer and in the
   ///  error handling strategy. If text!=null, than the start and stop positions
   ///  are wiped to -1 in the text override is set in the CommonToken.
-  Symbol create(int type, String text,
-      [Pair<TokenSource, CharStream> source,
-      int channel,
-      int start,
-      int stop,
-      int line,
-      int charPositionInLine]);
+  Symbol create(
+    int type,
+    String? text,
+    Pair<TokenSource?, CharStream?> source,
+    int channel,
+    int start,
+    int stop,
+    int? line,
+    int charPositionInLine,
+  );
 }
 
 /// This default implementation of [TokenFactory] creates
@@ -62,25 +65,33 @@ class CommonTokenFactory implements TokenFactory<CommonToken> {
   CommonTokenFactory([this.copyText = false]);
 
   @override
-  CommonToken create(int type, String text,
-      [Pair<TokenSource, CharStream> source,
-      int channel,
-      int start,
-      int stop,
-      int line,
-      int charPositionInLine]) {
+  CommonToken create(
+    int type,
+    String? text,
+    Pair<TokenSource?, CharStream?>? source,
+    int channel,
+    int start,
+    int stop,
+    int? line,
+    int charPositionInLine,
+  ) {
     if (source == null) {
       return CommonToken(type, text: text);
     }
 
-    final t = CommonToken(type,
-        source: source, channel: channel, startIndex: start, stopIndex: stop);
+    final t = CommonToken(
+      type,
+      source: source,
+      channel: channel,
+      startIndex: start,
+      stopIndex: stop,
+    );
     t.line = line;
     t.charPositionInLine = charPositionInLine;
     if (text != null) {
       t.text = text;
     } else if (copyText && source.b != null) {
-      t.text = source.b.getText(Interval.of(start, stop));
+      t.text = source.b!.getText(Interval.of(start, stop));
     }
 
     return t;

@@ -37,7 +37,7 @@ public class TestIntegerList {
 		// Java allows dangling surrogates, so (currently) we do
 		// as well. We could change this if desired.
 		l.add(0xDC00);
-		char expected[] = new char[] { 0xDC00 };
+		char[] expected = new char[] { 0xDC00 };
 		assertArrayEquals(expected, l.toCharArray());
 	}
 
@@ -55,7 +55,7 @@ public class TestIntegerList {
 		l.add(0x35);
 		l.add(0x4E94);
 		l.add(0xFF15);
-		char expected[] = new char[] { 0x35, 0x4E94, 0xFF15 };
+		char[] expected = new char[] { 0x35, 0x4E94, 0xFF15 };
 		assertArrayEquals(expected, l.toCharArray());
 	}
 
@@ -65,7 +65,7 @@ public class TestIntegerList {
 		l.add(0x104A5);
 		l.add(0x116C5);
 		l.add(0x1D7FB);
-		char expected[] = new char[] { 0xD801, 0xDCA5, 0xD805, 0xDEC5, 0xD835, 0xDFFB };
+		char[] expected = new char[] { 0xD801, 0xDCA5, 0xD805, 0xDEC5, 0xD835, 0xDFFB };
 		assertArrayEquals(expected, l.toCharArray());
 	}
 }

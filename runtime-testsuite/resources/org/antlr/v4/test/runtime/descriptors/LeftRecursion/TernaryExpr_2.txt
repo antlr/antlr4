@@ -1,0 +1,25 @@
+[type]
+Parser
+
+[grammar]
+grammar T;
+s @after {<ToStringTree("$ctx"):writeln()>} : e EOF ; // must indicate EOF can follow or 'a\<EOF>' won't match
+e : e '*' e
+  | e '+' e
+  |\<assoc=right> e '?' e ':' e
+  |\<assoc=right> e '=' e
+  | ID
+  ;
+ID : 'a'..'z'+ ;
+WS : (' '|'\n') -> skip ;
+
+[start]
+s
+
+[input]
+a+b
+
+[output]
+"""(s (e (e a) + (e b)) <EOF>)
+"""
+

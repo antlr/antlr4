@@ -19,14 +19,14 @@ class DFASerializer {
 
   @override
   String toString() {
-    if (dfa.s0 == null) return null;
+    if (dfa.s0 == null) return 'null';
     final buf = StringBuffer();
     final states = dfa.getStates();
     for (var s in states) {
       var n = 0;
-      if (s.edges != null) n = s.edges.length;
+      if (s.edges != null) n = s.edges!.length;
       for (var i = 0; i < n; i++) {
-        final t = s.edges[i];
+        final t = s.edges![i];
         if (t != null && t.stateNumber != 0x7FFFFFFF) {
           buf.write(getStateString(s));
           final label = getEdgeLabel(i);
@@ -40,7 +40,7 @@ class DFASerializer {
     }
 
     final output = buf.toString();
-    if (output.isEmpty) return null;
+    if (output.isEmpty) return 'null';
     //return Utils.sortLinesInString(output);
     return output;
   }
