@@ -60,9 +60,10 @@ workflows:
       - test_runtime:
           matrix:
             parameters:
-              target: [ dart, go, python2, python3, javascript, php ]
-      - test_runtime:
-          matrix:
-            parameters:
-              target: [ cpp, dotnet ]
-              test-group: [ LEXER, PARSER1, PARSER2, RECURSION ]
+#              target: [ dart, go, python2, python3, javascript, php ]
+              target: [ dart, go, python2, python3, javascript, php, cpp, dotnet ]
+#      - test_runtime:
+#          matrix:
+#            parameters:
+#              target: [ cpp, dotnet ]
+#              test-group: [ LEXER, PARSER1, PARSER2, RECURSION ]
