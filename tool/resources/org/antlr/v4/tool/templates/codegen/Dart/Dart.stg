@@ -708,7 +708,7 @@ class <struct.name> extends <if(contextSuperClass)><contextSuperClass><else>Pars
 
 AltLabelStructDecl(struct,attrs,getters,dispatchMethods) ::= <<
 class <struct.name> extends <struct.parentRule; format="cap">Context {
-  <attrs:{a | late <a>;}; separator="\n">
+  <attrs:{a | <a>;}; separator="\n">
   <getters:{g | <g>}; separator="\n">
   <struct.name>(<struct.parentRule; format="cap">Context ctx) { copyFrom(ctx); }
   <dispatchMethods; separator="\n">
