@@ -57,8 +57,9 @@ public abstract class BaseRuntimeTest {
 
 	@BeforeClass
 	public static void startHeartbeatToAvoidTimeout() {
-		if(requiresHeartbeat())
+		if(requiresHeartbeat()) {
 			startHeartbeat();
+		}
 	}
 
 	private static boolean requiresHeartbeat() {

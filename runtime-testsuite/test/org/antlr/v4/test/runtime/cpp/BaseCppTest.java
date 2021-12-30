@@ -264,8 +264,8 @@ public class BaseCppTest extends BaseRuntimeTestSupport implements RuntimeTestSu
 		String binPath = new File(getTempTestDir(), "a.out").getAbsolutePath();
 		String inputPath = new File(getTempTestDir(), "input").getAbsolutePath();
 
-		// Build runtime using cmake once.
-		synchronized (runtimeBuiltOnce) {
+		// Build runtime using cmake once per VM.
+		synchronized (BaseCppTest.class) {
 			if ( !runtimeBuiltOnce ) {
 				try {
 					String[] command = {"clang++", "--version"};

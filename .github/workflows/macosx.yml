@@ -12,9 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-#        TARGET: [swift, cpp, dotnet] disabling dotnet which is unstable on M1
         TARGET: [swift, cpp]
-        GROUP: [LEXER, PARSER1, PARSER2, RECURSION]
     steps:
     - uses: actions/checkout@v2
     - name: Set up JDK 1.8
@@ -28,7 +26,6 @@ jobs:
     - name: Build tool with Maven
       run: mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
     - name: Test with Maven
-      run: arch -x86_64 .github/scripts/run-tests-${{ matrix.TARGET }}.sh
+      run: .github/scripts/run-tests-${{ matrix.TARGET }}.sh
       env:
         TARGET: ${{ matrix.TARGET }}
-        GROUP: ${{ matrix.GROUP }}
