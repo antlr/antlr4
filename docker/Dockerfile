@@ -2,7 +2,7 @@ FROM adoptopenjdk/openjdk11:alpine AS builder
 
 WORKDIR /opt/antlr4
 
-ARG ANTLR_VERSION="4.9.4"
+ARG ANTLR_VERSION="4.10"
 ARG MAVEN_OPTS="-Xmx1G"
 
 
