@@ -7,7 +7,8 @@
 package org.antlr.v4.test.runtime.swift;
 
 import org.antlr.v4.test.runtime.BaseRuntimeTest;
-import org.antlr.v4.test.runtime.RuntimeTestDescriptor;import org.junit.runner.RunWith;
+import org.antlr.v4.test.runtime.RuntimeTestDescriptor;
+import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
