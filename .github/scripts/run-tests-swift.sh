@@ -35,17 +35,7 @@ popd
 if [ $rc == 0 ]; then
   # run java tests
   cd runtime-testsuite/
-  if [ $GROUP == "LEXER" ]; then
-      mvn -e -Dgroups="org.antlr.v4.test.runtime.category.LexerTests" -Dtest="swift.**" test
-  elif [ $GROUP == "PARSER1" ]; then
-      mvn -e -Dgroups="org.antlr.v4.test.runtime.category.ParserTestsGroup1" -Dtest="swift.**" test
-  elif [ $GROUP == "PARSER2" ]; then
-      mvn -e -Dgroups="org.antlr.v4.test.runtime.category.ParserTestsGroup2" -Dtest="swift.**" test
-  elif [ $GROUP == "RECURSION" ]; then
-      mvn -e -Dgroups="org.antlr.v4.test.runtime.category.LeftRecursionTests" -Dtest="swift.**" test
-  else
-      mvn -e -Dtest=swift.** test
-  fi
+  mvn -e -Dparallel=classes -DthreadCount=4 -Dtest=swift.** test
   rc=$?
   cat target/surefire-reports/*.dumpstream || true
 fi

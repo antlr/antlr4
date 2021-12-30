@@ -12,14 +12,6 @@ export PATH=$PATH:~/.dotnet
 dotnet build -c Release -f netstandard2.0 runtime/CSharp/Antlr4.csproj
 
 # run tests
-cd runtime-testsuite/
-
-if [ $GROUP == "LEXER" ]; then
-    mvn -Dparallel=classes -DthreadCount=4 -Dgroups="org.antlr.v4.test.runtime.category.LexerTests" -Dtest=csharp.** test
-elif [ $GROUP == "PARSER1" ]; then
-    mvn -Dparallel=classes -DthreadCount=4 -Dgroups="org.antlr.v4.test.runtime.category.ParserTestsGroup1" -Dtest=csharp.** test
-elif [ $GROUP == "RECURSION" ]; then
-    mvn -Dparallel=classes -DthreadCount=4 -Dgroups="org.antlr.v4.test.runtime.category.LeftRecursionTests" -Dtest=csharp.** test
-else
-    mvn -Dparallel=classes -DthreadCount=4 -Dtest=csharp.** test
-fi
+pushd runtime-testsuite/
+mvn -Dparallel=classes -DthreadCount=4 -Dtest=csharp.** test
+popd

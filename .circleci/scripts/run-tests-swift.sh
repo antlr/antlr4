@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Appears to be unused
+
 set -euo pipefail
 
 pushd runtime/Swift
