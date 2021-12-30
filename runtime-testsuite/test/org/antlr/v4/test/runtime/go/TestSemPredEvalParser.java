@@ -12,7 +12,6 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-
 @RunWith(Parameterized.class)
 public class TestSemPredEvalParser extends BaseRuntimeTest {
 	public TestSemPredEvalParser(RuntimeTestDescriptor descriptor) {

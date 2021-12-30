@@ -7,13 +7,8 @@
 package org.antlr.v4.test.runtime.swift;
 
 import org.antlr.v4.test.runtime.BaseRuntimeTest;
-import org.antlr.v4.test.runtime.RuntimeTestDescriptor;
-import org.antlr.v4.test.runtime.category.LexerTests;
-import org.junit.experimental.categories.Category;
-import org.junit.runner.RunWith;
+import org.antlr.v4.test.runtime.RuntimeTestDescriptor;import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-
-@Category(LexerTests.class)
 @RunWith(Parameterized.class)
 public class TestLexerErrors extends BaseRuntimeTest {
 	public TestLexerErrors(RuntimeTestDescriptor descriptor) {
