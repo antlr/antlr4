@@ -35,7 +35,9 @@ popd
 if [ $rc == 0 ]; then
   # run java tests
   cd runtime-testsuite/
-  mvn -e -Dparallel=classes -DthreadCount=4 -Dtest=swift.** test
+#  mvn -e -Dparallel=classes -DthreadCount=4 -Dtest=swift.** test
+# I don't know swift enough to make it parallel. revert to single threaded
+  mvn -e -Dtest=swift.** test
   rc=$?
   cat target/surefire-reports/*.dumpstream || true
 fi
