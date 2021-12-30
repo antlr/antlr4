@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Appears not to be used at moment
+
 set -euo pipefail
 
 export PATH=$PATH:~/.dotnet
