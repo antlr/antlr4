@@ -224,8 +224,8 @@ class Trees {
   /// Return first node satisfying the pred
   ///
   ///  @since 4.5.1
-  static Tree? findNodeSuchThat(Tree? t, Predicate<Tree> pred) {
-    if (pred.test(t)) return t;
+  static Tree? findNodeSuchThat(Tree? t, bool Function(Tree?) pred) {
+    if (pred(t)) return t;
 
     if (t == null) return null;
 
@@ -236,8 +236,4 @@ class Trees {
     }
     return null;
   }
-}
-
-abstract class Predicate<T> {
-  bool test(T? t);
 }

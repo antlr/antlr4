@@ -1,0 +1,20 @@
+---
+# This section defines defaults for all languages. Currently we derive ANTLR style from LLVM.
+BasedOnStyle: LLVM
+# Only use clang-format for C++ for now.
+DisableFormat: true
+
+---
+# This section configures C++ formatting.
+Language: Cpp
+DisableFormat: false
+Standard: c++17
+# Prevent clang-format from attempting to pick the alignment and always use right alignment.
+DerivePointerAlignment: false
+# ANTLR existing style is to right align pointers and references.
+PointerAlignment: Right
+ReferenceAlignment: Right
+# Some of ANTLR existing code is longer than the default 80, so use 100 for now.
+ColumnLimit: 100
+# Historically ANTLR has used indentation within namespaces, so replicate it.
+NamespaceIndentation: Inner

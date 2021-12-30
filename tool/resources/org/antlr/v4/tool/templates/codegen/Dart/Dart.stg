@@ -42,21 +42,6 @@ dartTypeInitMap ::= [
 
 ParserFile(file, parser, namedActions, contextSuperClass) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
-<if(file.genPackage)>
-library <file.genPackage>;
-
-import 'package:antlr4/antlr4.dart';
-
-<if(file.genListener)>
-part '<file.grammarName>Listener.dart';
-part '<file.grammarName>BaseListener.dart';
-<endif>
-<if(file.genVisitor)>
-part '<file.grammarName>Visitor.dart';
-part '<file.grammarName>BaseVisitor.dart';
-<endif>
-part '<file.grammarName>Lexer.dart';
-<else>
 import 'package:antlr4/antlr4.dart';
 
 <if(file.genListener)>
@@ -67,6 +52,8 @@ import '<file.grammarName>BaseListener.dart';
 import '<file.grammarName>Visitor.dart';
 import '<file.grammarName>BaseVisitor.dart';
 <endif>
+<if(parser.superClass)>
+import '<parser.superClass>.dart';
 <endif>
 
 <namedActions.header>
@@ -75,13 +62,9 @@ import '<file.grammarName>BaseVisitor.dart';
 
 ListenerFile(file, header, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
-<if(file.genPackage)>
-part of <file.genPackage>;
-<else>
 import 'package:antlr4/antlr4.dart';
 
 import '<file.parserName>.dart';
-<endif>
 <header>
 
 /// This abstract class defines a complete listener for a parse tree produced by
@@ -109,14 +92,10 @@ abstract class <file.grammarName>Listener extends ParseTreeListener {
 
 BaseListenerFile(file, header, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
-<if(file.genPackage)>
-part of <file.genPackage>;
-<else>
 import 'package:antlr4/antlr4.dart';
 
 import '<file.parserName>.dart';
 import '<file.grammarName>Listener.dart';
-<endif>
 
 <header>
 
@@ -155,13 +134,9 @@ class <file.grammarName>BaseListener implements <file.grammarName>Listener {
 
 VisitorFile(file, header, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
-<if(file.genPackage)>
-part of <file.genPackage>;
-<else>
 import 'package:antlr4/antlr4.dart';
 
 import '<file.parserName>.dart';
-<endif>
 <header>
 
 /// This abstract class defines a complete generic visitor for a parse tree
@@ -185,14 +160,10 @@ T? visit<lname; format="cap">(<lname; format="cap">Context ctx);}; separator="\n
 
 BaseVisitorFile(file, header, namedActions) ::= <<
 <fileHeader(file.grammarFileName, file.ANTLRVersion)>
-<if(file.genPackage)>
-part of <file.genPackage>;
-<else>
 import 'package:antlr4/antlr4.dart';
 
 import '<file.parserName>.dart';
 import '<file.grammarName>Visitor.dart';
-<endif>
 <header>
 
 /// This class provides an empty implementation of [<file.grammarName>Visitor],
@@ -813,10 +784,9 @@ _prevctx = _localctx;
 
 LexerFile(lexerFile, lexer, namedActions) ::= <<
 <fileHeader(lexerFile.grammarFileName, lexerFile.ANTLRVersion)>
-<if(lexerFile.genPackage)>
-part of <lexerFile.genPackage>;
-<else>
 import 'package:antlr4/antlr4.dart';
+<if(lexer.superClass)>
+import '<lexer.superClass>.dart';
 <endif>
 <namedActions.header>
 

@@ -1,0 +1,16 @@
+[type]
+Lexer
+
+[grammar]
+lexer grammar L;
+A : ["a-z]+ {<writeln("\"A\"")>} ;
+WS : [ \n\t]+ -> skip ;
+
+[input]
+b"a
+
+[output]
+A
+[@0,0:2='b"a',<1>,1:0]
+[@1,3:2='<EOF>',<-1>,1:3]
+

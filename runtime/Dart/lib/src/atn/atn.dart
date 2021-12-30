@@ -15,4 +15,5 @@ export 'src/lexer_action_executor.dart';
 export 'src/lexer_atn_simulator.dart';
 export 'src/parser_atn_simulator.dart';
 export 'src/profiling_atn_simulator.dart';
+export 'src/semantic_context.dart';
 export 'src/transition.dart';

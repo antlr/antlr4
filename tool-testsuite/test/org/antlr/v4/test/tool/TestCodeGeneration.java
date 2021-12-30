@@ -130,7 +130,7 @@ public class TestCodeGeneration extends BaseJavaToolTest {
 			if (g.isLexer()) factory = new LexerATNFactory((LexerGrammar) g);
 			g.atn = factory.createATN();
 
-			CodeGenerator gen = new CodeGenerator(g);
+			CodeGenerator gen = CodeGenerator.create(g);
 			ST outputFileST = gen.generateParser();
 
 //			STViz viz = outputFileST.inspect();

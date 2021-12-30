@@ -1,0 +1,20 @@
+[notes]
+This is a regression test for antlr/antlr4#218 "ANTLR4 EOF Related Bug".
+https://github.com/antlr/antlr4/issues/218
+
+[type]
+Parser
+
+[grammar]
+grammar T;
+cppCompilationUnit : content+ EOF;
+content: anything | {<False()>}? .;
+anything: ANY_CHAR;
+ANY_CHAR: [_a-zA-Z0-9];
+
+[start]
+cppCompilationUnit
+
+[input]
+hello
+

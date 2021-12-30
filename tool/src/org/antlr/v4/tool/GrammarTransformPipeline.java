@@ -276,7 +276,7 @@ public class GrammarTransformPipeline {
 			}
 
 			// COPY MODES
-			// The strategy is to copy all the mode sections rules across to any 
+			// The strategy is to copy all the mode sections rules across to any
 			// mode section in the new grammar with the same name or a new
 			// mode section if no matching mode is resolved. Rules which are
 			// already in the new grammar are ignored for copy. If the mode
@@ -311,7 +311,7 @@ public class GrammarTransformPipeline {
 						    destinationAST.addChild(r);
 							addedRules++;
 						    rootRuleNames.add(ruleName);
-					    }                        
+					    }
 					}
 					if (!rootAlreadyHasMode && addedRules > 0) {
 						rootGrammar.ast.addChild(destinationAST);

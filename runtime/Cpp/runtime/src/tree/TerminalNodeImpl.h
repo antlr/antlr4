@@ -20,7 +20,7 @@ namespace tree {
     virtual void setParent(RuleContext *parent) override;
     virtual misc::Interval getSourceInterval() override;
 
-    virtual antlrcpp::Any accept(ParseTreeVisitor *visitor) override;
+    virtual std::any accept(ParseTreeVisitor *visitor) override;
 
     virtual std::string getText() override;
     virtual std::string toStringTree(Parser *parser, bool pretty = false) override;

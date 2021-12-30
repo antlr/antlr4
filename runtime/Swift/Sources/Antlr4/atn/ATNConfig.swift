@@ -20,7 +20,7 @@ public class ATNConfig: Hashable, CustomStringConvertible {
     /// _#isPrecedenceFilterSuppressed_ property as a bit within the
     /// existing _#reachesIntoOuterContext_ field.
     /// 
-    private final let SUPPRESS_PRECEDENCE_FILTER: Int = 0x40000000
+    private static let SUPPRESS_PRECEDENCE_FILTER: Int = 0x40000000
 
     /// 
     /// The ATN state associated with this configuration
@@ -111,18 +111,18 @@ public class ATNConfig: Hashable, CustomStringConvertible {
     /// _#isPrecedenceFilterSuppressed_ method.
     /// 
     public final func getOuterContextDepth() -> Int {
-        return reachesIntoOuterContext & ~SUPPRESS_PRECEDENCE_FILTER
+        return reachesIntoOuterContext & ~Self.SUPPRESS_PRECEDENCE_FILTER
     }
 
     public final func isPrecedenceFilterSuppressed() -> Bool {
-        return (reachesIntoOuterContext & SUPPRESS_PRECEDENCE_FILTER) != 0
+        return (reachesIntoOuterContext & Self.SUPPRESS_PRECEDENCE_FILTER) != 0
     }
 
     public final func setPrecedenceFilterSuppressed(_ value: Bool) {
         if value {
-            self.reachesIntoOuterContext |= 0x40000000
+            self.reachesIntoOuterContext |= Self.SUPPRESS_PRECEDENCE_FILTER
         } else {
-            self.reachesIntoOuterContext &= ~SUPPRESS_PRECEDENCE_FILTER
+            self.reachesIntoOuterContext &= ~Self.SUPPRESS_PRECEDENCE_FILTER
         }
     }
 

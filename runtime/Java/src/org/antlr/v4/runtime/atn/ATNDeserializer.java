@@ -789,8 +789,7 @@ public class ATNDeserializer {
 			return new LexerTypeAction(data1);
 
 		default:
-			String message = String.format(Locale.getDefault(), "The specified lexer action type %d is not valid.", type);
-			throw new IllegalArgumentException(message);
+			throw new IllegalArgumentException(String.format(Locale.getDefault(), "The specified lexer action type %s is not valid.", type));
 		}
 	}
 }
