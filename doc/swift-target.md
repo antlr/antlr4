@@ -132,30 +132,15 @@ The runtime and generated grammar should now build correctly.
 
 ### Swift Package Manager Projects
 
+Add Antlr4 as a dependency to your `Package.swift` file. For more information, please see the [Swift Package Manager documentation](https://github.com/apple/swift-package-manager/tree/master/Documentation).
+
 Since we cannot have a separate repository for Swift target (see issue [#1774](https://github.com/antlr/antlr4/issues/1774)), 
 and Swift is currently not ABI stable. We currently support SPM-based
 projects by creating temporary local repository.
 
-For people using [Swift Package Manager](https://swift.org/package-manager/),
-the __boot.py__ script supports generating local repository that can be used
-as a dependency to your project. Simply run:
-
+```swift
+.package(name: "Antlr4", url: "https://github.com/antlr/antlr4", from: "4.9.3"
 ```
-python boot.py --gen-spm-module
-```
-
-The prompt will show something like below:
-
-<img src=images/gen_spm_module.png width="800">
-
-Put the SPM directive that contains the url to temporary repository to your 
-project's Package.swift. And run `swift build` in your project.
-
-The project is generated in your system's `/tmp/` directory, if you find it
-inconvenient, consider copy that generated ANTLR repository to some place 
-that won't be cleaned automatically and update `url` parameter in your 
-`Package.swift` file.
-
 ## Swift access levels
 
 You may use the `accessLevel` option to control the access levels on generated
