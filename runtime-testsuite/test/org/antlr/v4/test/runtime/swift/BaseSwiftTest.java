@@ -42,6 +42,18 @@ public class BaseSwiftTest extends BaseRuntimeTestSupport implements RuntimeTest
 	 */
 	private static final String SWIFT_HOME_ENV_KEY = "SWIFT_HOME";
 
+	private static String getParent(String resourcePath, int count) {
+		String result = resourcePath;
+		while (count > 0) {
+			int index = result.lastIndexOf('/');
+			if (index > 0) {
+				result = result.substring(0, index);
+			}
+			count -= 1;
+		}
+		return result;
+	}
+
 	static {
 		Map<String, String> env = System.getenv();
 		String swiftHome = env.containsKey(SWIFT_HOME_ENV_KEY) ? env.get(SWIFT_HOME_ENV_KEY) : "";
@@ -49,11 +61,14 @@ public class BaseSwiftTest extends BaseRuntimeTestSupport implements RuntimeTest
 
 		ClassLoader loader = Thread.currentThread().getContextClassLoader();
 		// build swift runtime
+		// path like: file:/Users/100mango/Desktop/antlr4/runtime-testsuite/target/classes/Swift
 		URL swiftRuntime = loader.getResource("Swift");
 		if (swiftRuntime == null) {
 			throw new RuntimeException("Swift runtime file not found");
 		}
-		ANTLR_RUNTIME_PATH = swiftRuntime.getPath();
+
+		//enter project root
+		ANTLR_RUNTIME_PATH = getParent(swiftRuntime.getPath(),4);
 		try {
 			fastFailRunProcess(ANTLR_RUNTIME_PATH, SWIFT_CMD, "build");
 		}
