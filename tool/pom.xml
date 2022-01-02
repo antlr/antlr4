@@ -9,13 +9,18 @@
 	<parent>
 		<groupId>org.antlr</groupId>
 		<artifactId>antlr4-master</artifactId>
-		<version>4.9.3-SNAPSHOT</version>
+		<version>4.10-SNAPSHOT</version>
 	</parent>
 	<artifactId>antlr4</artifactId>
 	<name>ANTLR 4 Tool</name>
 	<url>http://www.antlr.org</url>
 	<description>The ANTLR 4 grammar compiler.</description>
-	<dependencies>
+
+    <prerequisites>
+        <maven>3.8</maven>
+    </prerequisites>
+
+    <dependencies>
 		<dependency>
 			<groupId>org.antlr</groupId>
 			<artifactId>antlr4-runtime</artifactId>
@@ -29,7 +34,7 @@
 		<dependency>
 			<groupId>org.antlr</groupId>
 			<artifactId>ST4</artifactId>
-			<version>4.3</version>
+			<version>4.3.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.abego.treelayout</groupId>
@@ -44,7 +49,7 @@
 		<dependency>
 			<groupId>com.ibm.icu</groupId>
 			<artifactId>icu4j</artifactId>
-			<version>61.1</version>
+			<version>69.1</version>
 		</dependency>
 	</dependencies>
 	<build>
@@ -58,7 +63,7 @@
 			<plugin> <!-- create src jar -->
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
-				<version>3.0.1</version>
+				<version>3.2.1</version>
 				<executions>
 					<execution>
 						<goals>
@@ -70,7 +75,7 @@
 			<plugin> <!-- create javadoc jar -->
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>2.10.4</version>
+				<version>3.3.1</version>
 				<configuration>
 					<javadocVersion>1.7</javadocVersion>
 					<failOnError>false</failOnError>
@@ -87,7 +92,7 @@
 			<plugin> <!-- include code-generated sources -->
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>build-helper-maven-plugin</artifactId>
-				<version>3.0.0</version>
+				<version>3.2.0</version>
 				<executions>
 					<execution>
 						<phase>generate-sources</phase>
@@ -105,7 +110,7 @@
 			<plugin> <!-- this makes a fat jar with all dependencies -->
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
-				<version>2.3</version>
+				<version>3.2.4</version>
 				<executions>
 					<execution>
 						<phase>package</phase>
@@ -129,7 +134,7 @@
 			<!-- can't get this to add bundle items <plugin> <groupId>org.apache.felix</groupId> <artifactId>maven-bundle-plugin</artifactId> <version>2.5.4</version> <executions> <execution> <id>bundle-manifest</id> <phase>process-classes</phase> <configuration> <instructions> <Bundle-SymbolicName>org.antlr.antlr4-tool</Bundle-SymbolicName> </instructions> </configuration> <goals> <goal>manifest</goal> </goals> </execution> </executions> </plugin> -->
 			<plugin> <!-- this just jars up tool stuff and sets main class -->
 				<artifactId>maven-jar-plugin</artifactId>
-				<version>3.0.0</version>
+				<version>3.2.0</version>
 				<configuration>
 					<archive>
 						<manifest>

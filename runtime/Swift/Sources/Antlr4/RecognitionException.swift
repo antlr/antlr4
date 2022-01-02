@@ -28,7 +28,7 @@ public class RecognitionException {
     /// 
     private var offendingToken: Token!
 
-    private var offendingState = -1
+    private var offendingState = ATNState.INVALID_STATE_NUMBER
 
     public var message: String?
 

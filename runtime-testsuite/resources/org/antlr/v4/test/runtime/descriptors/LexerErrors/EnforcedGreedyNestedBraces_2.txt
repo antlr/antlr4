@@ -1,0 +1,19 @@
+[type]
+Lexer
+
+[grammar]
+lexer grammar L;
+ACTION : '{' (ACTION | ~[{}])* '}';
+WS : [ \r\n\t]+ -> skip;
+
+[input]
+{ { }
+
+[output]
+"""[@0,5:4='<EOF>',<-1>,1:5]
+"""
+
+[errors]
+"""line 1:0 token recognition error at: '{ { }'
+"""
+

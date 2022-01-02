@@ -78,7 +78,7 @@ This will produce a single js file containing all your parsing code. Easy to inc
 
 ## How do I run the generated lexer and/or parser?
 
-Let's suppose that your grammar is named, as above, "MyGrammar". Let's suppose this parser comprises a rule named "StartRule". The tool will have generated for you the following files:
+Let's suppose that your grammar is named, as above, "MyGrammar". Let's suppose this parser comprises a rule named "MyStartRule". The tool will have generated for you the following files:
 
 *   MyGrammarLexer.js
 *   MyGrammarParser.js
@@ -113,6 +113,13 @@ This program will work. But it won't be useful unless you do one of the followin
 (please note that production code is target specific, so you can't have multi target grammars that include production code)
  
 ## How do I create and run a visitor?
+
+Suppose your grammar is named "Query", the parser comprises a rule named "MyQuery", and the tool has generated the following files for you:
+
+*   QueryLexer.js
+*   QueryParser.js
+*   QueryListener.js (if you have not activated the -no-listener option)
+
 ```javascript
 // test.js
 import antlr4 from 'antlr4';
@@ -126,7 +133,7 @@ const lexer = new MyGrammarLexer(chars);
 const tokens = new antlr4.CommonTokenStream(lexer);
 const parser = new MyGrammarParser(tokens);
 parser.buildParseTrees = true;
-const tree = parser.query();
+const tree = parser.MyQuery();
 
 class Visitor {
   visitChildren(ctx) {
@@ -181,7 +188,7 @@ In order to execute this listener, you would simply add the following lines to t
 
 ```javascript
 ...
-tree = parser.StartRule() // only repeated here for reference
+tree = parser.MyStartRule() // assumes grammar "MyGrammar" has rule "MyStartRule"
 const printer = new KeyPrinter();
 antlr4.tree.ParseTreeWalker.DEFAULT.walk(printer, tree);
 ```

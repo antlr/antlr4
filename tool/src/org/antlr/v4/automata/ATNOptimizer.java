@@ -108,7 +108,7 @@ public class ATNOptimizer {
 						if (a != -1 && b != -1) {
 							for (int v = a; v <= b; v++) {
 								if (matchSet.contains(v)) {
-									// TODO: Token is missing (i.e. position in source will not be displayed).
+									// TODO: Token is missing (i.e. position in source is not displayed).
 									g.tool.errMgr.grammarError(ErrorType.CHARACTERS_COLLISION_IN_SET, g.fileName,
 											null,
 											CharSupport.getANTLRCharLiteralForChar(v),

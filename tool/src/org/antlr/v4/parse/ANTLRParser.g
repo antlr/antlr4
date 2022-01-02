@@ -197,7 +197,6 @@ if ( options!=null ) {
 
 grammarType
 @after {
-	if ( $tg!=null ) throw new v3TreeGrammarException(tg);
 	if ( $t!=null ) ((GrammarRootAST)$tree).grammarType = $t.type;
 	else ((GrammarRootAST)$tree).grammarType=COMBINED;
 }
@@ -207,8 +206,6 @@ grammarType
 
 		// A combined lexer and parser specification
 		| 	g=GRAMMAR          -> GRAMMAR<GrammarRootAST>[$g, "COMBINED_GRAMMAR", getTokenStream()]
-		|   tg=TREE_GRAMMAR
-
 		)
     ;
 
@@ -520,9 +517,13 @@ lexerRule
 	paraphrases.pop();
 }
     : FRAGMENT?
-	  TOKEN_REF COLON lexerRuleBlock SEMI
+	  TOKEN_REF
+
+	  optionsSpec?
+
+	  COLON lexerRuleBlock SEMI
       -> ^( RULE<RuleAST> TOKEN_REF
-      		^(RULEMODIFIERS FRAGMENT)? lexerRuleBlock
+      		^(RULEMODIFIERS FRAGMENT)? optionsSpec? lexerRuleBlock
       	  )
 	;
 

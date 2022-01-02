@@ -16,7 +16,7 @@ The C++ target has been the work of the following people:
 
 * Dan McLaughlin, dan.mclaughlin@gmail.com (initial port, got code to compile)
 * David Sisson, dsisson@google.com (initial port, made the runtime C++ tests runnable)
-* [Mike Lischke](www.soft-gems.net), mike@lischke-online.de (brought the initial port to a working library, made most runtime tests passing)
+* [Mike Lischke](http://www.soft-gems.net), mike@lischke-online.de (brought the initial port to a working library, made most runtime tests passing)
 
 ## Other contributors
 
@@ -62,7 +62,7 @@ Try run cmake -DCMAKE_ANDROID_NDK=/folder/of/android_ndkr17_and_above -DCMAKE_SY
 - make
 - DESTDIR=\<antlr4-dir\>/runtime/Cpp/run make install
 
-If you don't want to build the demo then simply run cmake without parameters.
+If you don't want to build the demo then replace the "cmake .. -DANTLR_JAR_LOCATION<...>" command in the above recipe with "cmake .." without any further parameters.
 There is another cmake script available in the subfolder cmake/ for those who prefer the superbuild cmake pattern.
 
 #### CMake Package support

@@ -1,0 +1,29 @@
+[type]
+CompositeParser
+
+[grammar]
+grammar M;
+import S, T;
+b : 'b'|'c' {<writeln("\"M.b\"")>}|B|A;
+WS : (' '|'\n') -> skip ;
+
+[slaveGrammar]
+parser grammar T;
+tokens { A }
+b : 'b' {<writeln("\"T.b\"")>};
+
+[slaveGrammar]
+parser grammar S;
+a : b {<writeln("\"S.a\"")>};
+b : 'b' ;
+
+[start]
+a
+
+[input]
+c
+
+[output]
+M.b
+S.a
+

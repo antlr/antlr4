@@ -32,7 +32,7 @@
 /// 
 
 public final class DFAState: Hashable, CustomStringConvertible {
-    public internal(set) var stateNumber = -1
+    public internal(set) var stateNumber = ATNState.INVALID_STATE_NUMBER
 
     public internal(set) var configs: ATNConfigSet
 
@@ -49,7 +49,7 @@ public final class DFAState: Hashable, CustomStringConvertible {
     /// This is set to _org.antlr.v4.runtime.atn.ATN#INVALID_ALT_NUMBER_ when _#predicates_`!=null` or
     /// _#requiresFullContext_.
     /// 
-    public internal(set) var prediction = 0
+    public internal(set) var prediction = ATN.INVALID_ALT_NUMBER
 
     public internal(set) var lexerActionExecutor: LexerActionExecutor?
 
@@ -76,6 +76,11 @@ public final class DFAState: Hashable, CustomStringConvertible {
     /// 
 
     public internal(set) var predicates: [PredPrediction]?
+    
+    ///
+    /// mutex for states changes.
+    ///
+    internal private(set) var mutex = Mutex()
 
     /// 
     /// Map a predicate to a predicted alternative.

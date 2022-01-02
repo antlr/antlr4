@@ -1,0 +1,21 @@
+[type]
+Parser
+
+[grammar]
+grammar T;
+a : (ID|ID)+ {
+<writeln("$text")>
+};
+ID : 'a'..'z'+;
+WS : (' '|'\n') -> skip;
+
+[start]
+a
+
+[input]
+a b c
+
+[output]
+"""abc
+"""
+

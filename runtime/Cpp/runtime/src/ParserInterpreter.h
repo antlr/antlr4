@@ -29,9 +29,6 @@ namespace antlr4 {
   /// </summary>
   class ANTLR4CPP_PUBLIC ParserInterpreter : public Parser {
   public:
-    // @deprecated
-    ParserInterpreter(const std::string &grammarFileName, const std::vector<std::string>& tokenNames,
-      const std::vector<std::string>& ruleNames, const atn::ATN &atn, TokenStream *input);
     ParserInterpreter(const std::string &grammarFileName, const dfa::Vocabulary &vocabulary,
                       const std::vector<std::string> &ruleNames, const atn::ATN &atn, TokenStream *input);
     ~ParserInterpreter();
@@ -39,9 +36,6 @@ namespace antlr4 {
     virtual void reset() override;
 
     virtual const atn::ATN& getATN() const override;
-
-    // @deprecated
-    virtual const std::vector<std::string>& getTokenNames() const override;
 
     virtual const dfa::Vocabulary& getVocabulary() const override;
 
@@ -110,7 +104,6 @@ namespace antlr4 {
 
   protected:
     const std::string _grammarFileName;
-    std::vector<std::string> _tokenNames;
     const atn::ATN &_atn;
 
     std::vector<std::string> _ruleNames;

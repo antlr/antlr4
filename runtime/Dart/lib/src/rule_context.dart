@@ -62,16 +62,15 @@ import 'tree/tree.dart';
 ///  @see ParserRuleContext
 abstract class RuleContext extends RuleNode {
   /// What context invoked this rule?
-  @override
-  RuleContext? parent;
+  RuleContext? _parent;
 
   /// What state invoked the rule associated with this context?
   /// The "return address" is the followState of invokingState
   /// If parent is null, this should be -1.
   int invokingState;
 
-  RuleContext({this.parent, int? invokingState})
-      : invokingState = invokingState ?? -1;
+  RuleContext({RuleContext? parent, int? invokingState})
+      : _parent=parent, invokingState = invokingState ?? -1;
 
   int depth() {
     var n = 0;
@@ -81,6 +80,18 @@ abstract class RuleContext extends RuleNode {
       n++;
     }
     return n;
+  }
+
+  @override
+  // Work around for https://github.com/antlr/antlr4/issues/3248
+  // ignore: unnecessary_getters_setters
+  RuleContext? get parent => _parent;
+
+  @override
+  // Work around for https://github.com/antlr/antlr4/issues/3248
+  // ignore: unnecessary_getters_setters
+  set parent(RuleContext? parent) {
+    _parent = parent;
   }
 
   /// A context is empty if there is no invoking state; meaning nobody call
