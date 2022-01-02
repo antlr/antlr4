@@ -72,7 +72,7 @@ class IntervalSet {
 				}
 				// contiguous range -> adjust
 				else if (toAdd.stop === existing.start) {
-					this.intervals[pos].start = toAdd.start;
+					this.intervals[pos] = new Interval(toAdd.start, existing.stop)
 					return;
 				}
 				// overlapping range -> adjust and reduce
@@ -112,7 +112,7 @@ class IntervalSet {
 
 	complement(start, stop) {
 		const result = new IntervalSet();
-		result.addInterval(new Interval(start,stop+1));
+		result.addInterval(new Interval(start, stop + 1));
 		if(this.intervals !== null)
 			this.intervals.forEach(toRemove => result.removeRange(toRemove));
 		return result;

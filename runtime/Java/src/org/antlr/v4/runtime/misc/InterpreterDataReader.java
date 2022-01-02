@@ -90,6 +90,7 @@ public class InterpreterDataReader {
 				result.ruleNames.add(line);
 		    }
 		    
+			line = br.readLine();
 			if ( line.equals("channel names:") ) { // Additional lexer data.
 				result.channels = new ArrayList<String>();
 			    while ((line = br.readLine()) != null) {

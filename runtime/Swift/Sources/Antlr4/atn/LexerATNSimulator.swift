@@ -72,16 +72,6 @@ open class LexerATNSimulator: ATNSimulator {
     public private(set) final var decisionToDFA: [DFA]
     
     internal var mode = Lexer.DEFAULT_MODE
-    
-    /// 
-    /// mutex for DFAState change
-    /// 
-    private let dfaStateMutex = Mutex()
-    
-    /// 
-    /// mutex for changes to all DFAStates map
-    /// 
-    private let dfaStatesMutex = Mutex()
 
     /// 
     /// Used during DFA/ATN exec to record the most recent accept configuration info
@@ -354,8 +344,8 @@ open class LexerATNSimulator: ATNSimulator {
                 let trans = c.state.transition(ti)
                 if let target = getReachableTarget(trans, t) {
                     var lexerActionExecutor = c.getLexerActionExecutor()
-                    if lexerActionExecutor != nil {
-                        lexerActionExecutor = lexerActionExecutor!.fixOffsetBeforeMatch(input.index() - startIndex)
+                    if let lex = lexerActionExecutor {
+                        lexerActionExecutor = lex.fixOffsetBeforeMatch(input.index() - startIndex)
                     }
 
                     let treatEofAsEpsilon = (t == BufferedTokenStream.EOF)
@@ -675,7 +665,7 @@ open class LexerATNSimulator: ATNSimulator {
             print("EDGE \(p) -> \(q) upon \(t)")
         }
 
-        dfaStateMutex.synchronized {
+        p.mutex.synchronized {
             if p.edges == nil {
                 //  make room for tokens 1..n and -1 masquerading as index 0
                 p.edges = [DFAState?](repeating: nil, count: LexerATNSimulator.MAX_DFA_EDGE - LexerATNSimulator.MIN_DFA_EDGE + 1)
@@ -699,17 +689,16 @@ open class LexerATNSimulator: ATNSimulator {
         assert(!configs.hasSemanticContext, "Expected: !configs.hasSemanticContext")
 
         let proposed = DFAState(configs)
-        let firstConfigWithRuleStopState = configs.firstConfigWithRuleStopState
 
-        if firstConfigWithRuleStopState != nil {
+        if let rss = configs.firstConfigWithRuleStopState {
             proposed.isAcceptState = true
-            proposed.lexerActionExecutor = (firstConfigWithRuleStopState as! LexerATNConfig).getLexerActionExecutor()
-            proposed.prediction = atn.ruleToTokenType[firstConfigWithRuleStopState!.state.ruleIndex!]
+            proposed.lexerActionExecutor = (rss as! LexerATNConfig).getLexerActionExecutor()
+            proposed.prediction = atn.ruleToTokenType[rss.state.ruleIndex!]
         }
 
         let dfa = decisionToDFA[mode]
 
-        return dfaStatesMutex.synchronized {
+        return dfa.statesMutex.synchronized {
             if let existing = dfa.states[proposed] {
                 return existing
             }

@@ -2,4 +2,4 @@
 
 set -euo pipefail
 
-mvn -q -Dparallel=methods -DthreadCount=4 -Dtest=go.* test
+mvn -Dparallel=classes -DthreadCount=4 -Dtest=go.* test

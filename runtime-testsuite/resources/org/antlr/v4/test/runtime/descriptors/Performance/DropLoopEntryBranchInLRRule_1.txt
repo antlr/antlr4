@@ -1,0 +1,45 @@
+[notes]
+for https://github.com/antlr/antlr4/issues/1398.
+Seeing through a large expression takes 5 _minutes_ on
+my fast box to complete.  After fix, it's instantaneous.
+
+[type]
+Parser
+
+[grammar]
+grammar Expr;
+
+stat : expr ';'
+     | expr '.'
+     ;
+
+expr
+   : ID
+   | 'not' expr
+   | expr 'and' expr
+   | expr 'or' expr
+   | '(' ID ')' expr
+   | expr '?' expr ':' expr
+   | 'between' expr 'and' expr
+   ;
+
+ID: [a-zA-Z_][a-zA-Z_0-9]*;
+WS: [ \t\n\r\f]+ -> skip;
+
+[start]
+stat
+
+[input]
+X1 and X2 and X3 and X4 and X5 and X6 and X7 or
+X1 and X2 and X3 and X4 and X5 and X6 and X7 or
+X1 and X2 and X3 and X4 and X5 and X6 and X7 or
+X1 and X2 and X3 and X4 and X5 and X6 and X7 or
+X1 and X2 and X3 and X4 and X5 and X6 and X7 or
+X1 and X2 and X3 and X4 and X5 and X6 and X7 or
+X1 and X2 and X3 and X4 and X5 and X6 and X7 or
+X1 and X2 and X3 and X4 and X5 and X6 and X7
+;
+
+[skip]
+PHP
+

@@ -12,7 +12,10 @@ where a value can be an identifier, a qualified identifier (for example, a.b.c),
 
 All grammars can use the following options. In combined grammars, all options except language pertain only to the generated parser. Options may be set either within the grammar file using the options syntax (described above) or when invoking ANTLR on the command line, using the `-D` option. (see Section 15.9, [ANTLR Tool Command Line Options](tool-options.md).) The following examples demonstrate both mechanisms; note that `-D` overrides options within the grammar.
 
-* `superClass`. Set the superclass of the generated parser or lexer. For combined grammars, it sets the superclass of the parser.
+### `superClass`
+
+Set the superclass of the generated parser or lexer. For combined grammars, it sets the superclass of the parser.
+
 ```
 $ cat Hi.g4
 grammar Hi;
@@ -23,12 +26,20 @@ public class HiParser extends XX {
 $ grep 'public class' HiLexer.java
 public class HiLexer extends Lexer {
 ```
-* `language` Generate code in the indicated language, if ANTLR is able to do so. Otherwise, you will see an error message like this:
+
+### `language`
+
+Generate code in the indicated language, if ANTLR is able to do so. Otherwise, you will see an error message like this:
+
 ```
 $ antlr4 -Dlanguage=C MyGrammar.g4
 error(31):  ANTLR cannot generate C code as of version 4.0
 ```
-* `tokenVocab` ANTLR assigns token type numbers to the tokens as it encounters them in a file. To use different token type values, such as with a separate lexer, use this option to have ANTLR pull in the <fileextension>tokens</fileextension> file. ANTLR generates a <fileextension>tokens</fileextension> file from each grammar.
+
+### `tokenVocab`
+
+ANTLR assigns token type numbers to the tokens as it encounters them in a file. To use different token type values, such as with a separate lexer, use this option to have ANTLR pull in the <fileextension>tokens</fileextension> file. ANTLR generates a <fileextension>tokens</fileextension> file from each grammar.
+
 ```
 $ cat SomeLexer.g4
 lexer grammar SomeLexer;
@@ -48,7 +59,11 @@ B=3
 C=4
 ID=1
 ```
-* `TokenLabelType` ANTLR normally uses type <class>Token</class> when it generates variables referencing tokens. If you have passed a <class>TokenFactory</class> to your parser and lexer so that they create custom tokens, you should set this option to your specific type. This ensures that the context objects know your type for fields and method return values.
+
+### `TokenLabelType`
+
+ANTLR normally uses type <class>Token</class> when it generates variables referencing tokens. If you have passed a <class>TokenFactory</class> to your parser and lexer so that they create custom tokens, you should set this option to your specific type. This ensures that the context objects know your type for fields and method return values.
+
 ```
 $ cat T2.g4
 grammar T2;
@@ -58,19 +73,45 @@ $ antlr4 T2.g4
 $ grep MyToken T2Parser.java
     public MyToken x;
 ```
-* `contextSuperClass`. Specify the super class of parse tree internal nodes. Default is `ParserRuleContext`. Should derive from ultimately `RuleContext` at minimum.
-Java target can use `contextSuperClass=org.antlr.v4.runtime.RuleContextWithAltNum` for convenience. It adds a backing field for `altNumber`, the alt matched for the associated rule node. 
+
+### `contextSuperClass`
+
+Specify the super class of parse tree internal nodes. Default is `ParserRuleContext`. Should derive from ultimately `RuleContext` at minimum.
+Java target can use `contextSuperClass=org.antlr.v4.runtime.RuleContextWithAltNum` for convenience. It adds a backing field for `altNumber`, the alt matched for the associated rule node.
+
+### `caseInsensitive`
+
+As of 4.10, ANTLR supports case-insensitive lexers using a grammar option. For example, the parser from the following grammar:
+
+```g4
+lexer grammar L;
+options { caseInsensitive = true; }
+ENGLISH_TOKEN:   [a-z]+;
+GERMAN_TOKEN:    [äéöüß]+;
+FRENCH_TOKEN:    [àâæ-ëîïôœùûüÿ]+;
+CROATIAN_TOKEN:  [ćčđšž]+;
+ITALIAN_TOKEN:   [àèéìòù]+;
+SPANISH_TOKEN:   [áéíñóúü¡¿]+;
+GREEK_TOKEN:     [α-ω]+;
+RUSSIAN_TOKEN:   [а-я]+;
+WS:              [ ]+ -> skip;
+```
+
+matches words such as the following:
+
+```
+abcXYZ äéöüßÄÉÖÜß àâæçÙÛÜŸ ćčđĐŠŽ àèéÌÒÙ áéÚÜ¡¿ αβγΧΨΩ абвЭЮЯ
+```
+
+ANTLR considers only one-length chars in all cases. For instance, german lower `ß` is not treated as upper `ss` and vice versa.
+
+The mechanism works by automatically transforming grammar references to characters to there upper/lower case equivalent; e.g., `a` to `[aA]`. This means that you do not need to convert your input characters to uppercase--token text will be as it appears in the input stream.
 
 ## Rule Options
 
-There are currently no valid rule-level options, but the tool still supports the following syntax for future use:
+### caseInsensitive
 
-```
-rulename
-options {...}
- 	: ...
- 	;
-```
+The tool support `caseInsensitive` lexer rule option that is described in [lexer-rules.md](lexer-rules.md#caseinsensitive).
 
 ## Rule Element Options
 

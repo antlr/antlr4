@@ -6,11 +6,12 @@
 
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 import 'dart:math';
 
 import 'interval_set.dart';
 import 'token.dart';
+
+import 'util/platform_stub.dart' if (dart.library.io) 'util/platform_io.dart';
 
 /// A simple stream of symbols whose values are represented as integers. This
 /// interface provides <em>marked ranges</em> with support for a minimum level
@@ -248,7 +249,7 @@ class InputStream extends CharStream {
   }
 
   static Future<InputStream> fromPath(String path, {Encoding encoding = utf8}) {
-    return fromStream(File(path).openRead());
+    return fromStream(readStream(path), encoding: encoding);
   }
 
   @override

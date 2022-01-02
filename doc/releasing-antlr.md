@@ -93,7 +93,7 @@ rm -rf runtime/CSharp/src/obj
 rm -rf runtime/Cpp/runtime/build
 rm -rf runtime/gen
 rm -rf runtime/JavaScript/dist
-find tool runtime -type f -exec grep -l '4\.9' {} \;
+find tool runtime -type f -exec grep -l '4\.9' {} \; | grep -v -E '\.o|\.a|.jar||.dylib|node_modules/|.class|tests/|CHANGELOG.zip|.gz'
 ```
 
 Commit to repository.
@@ -178,7 +178,7 @@ Uploaded: https://oss.sonatype.org/content/repositories/snapshots/org/antlr/antl
 [INFO] ANTLR 4 Maven plugin ............................... SUCCESS [  6.547 s]
 [INFO] ANTLR 4 Runtime Test Annotations ................... SUCCESS [  2.519 s]
 [INFO] ANTLR 4 Runtime Test Processors .................... SUCCESS [  2.385 s]
-[INFO] ANTLR 4 Runtime Tests (2nd generation) ............. SUCCESS [ 15.276 s]
+[INFO] ANTLR 4 Runtime Tests (3rd generation) ............. SUCCESS [ 15.276 s]
 [INFO] ANTLR 4 Tool Tests ................................. SUCCESS [  2.233 s]
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
@@ -360,7 +360,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
   Restore completed in 427.62 ms for C:\Code\antlr4-fork\runtime\CSharp\runtime\CSharp\Antlr4.Runtime\Antlr4.Runtime.dotnet.csproj.
   Antlr4.Runtime.dotnet -> C:\Code\antlr4-fork\runtime\CSharp\runtime\CSharp\Antlr4.Runtime\lib\Release\netstandard1.3\Antlr4.Runtime.Standard.dll
   Antlr4.Runtime.dotnet -> C:\Code\antlr4-fork\runtime\CSharp\runtime\CSharp\Antlr4.Runtime\lib\Release\net35\Antlr4.Runtime.Standard.dll
-  Successfully created package 'C:\Code\antlr4-fork\runtime\CSharp\runtime\CSharp\Antlr4.Runtime\lib\Release\Antlr4.Runtime.Standard.4.9.2.nupkg'.
+  Successfully created package 'C:\Code\antlr4-fork\runtime\CSharp\runtime\CSharp\Antlr4.Runtime\lib\Release\Antlr4.Runtime.Standard.4.9.3.nupkg'.
 ```
 
 **Publishing to NuGet**

@@ -21,7 +21,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-
 @RunWith(Parameterized.class)
 public class TestScopeParsing extends BaseJavaToolTest {
     static String[] argPairs = {

@@ -103,7 +103,7 @@ namespace antlr4 {
      */
     virtual void setAltNumber(size_t altNumber);
 
-    virtual antlrcpp::Any accept(tree::ParseTreeVisitor *visitor) override;
+    virtual std::any accept(tree::ParseTreeVisitor *visitor) override;
 
     /// <summary>
     /// Print out a whole tree, not just a node, in LISP format

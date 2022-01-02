@@ -156,7 +156,7 @@ std::vector<size_t> ATNSerializer::serialize() {
 
   size_t nsets = sets.size();
   data.push_back(nsets);
-  for (auto set : sets) {
+  for (const auto &set : sets) {
     bool containsEof = set.contains(Token::EOF);
     if (containsEof && set.getIntervals().at(0).b == -1) {
       data.push_back(set.getIntervals().size() - 1);
@@ -287,7 +287,7 @@ std::vector<size_t> ATNSerializer::serialize() {
   // LEXER ACTIONS
   if (atn->grammarType == ATNType::LEXER) {
     data.push_back(atn->lexerActions.size());
-    for (Ref<LexerAction> &action : atn->lexerActions) {
+    for (const auto &action : atn->lexerActions) {
       data.push_back(static_cast<size_t>(action->getActionType()));
       switch (action->getActionType()) {
         case LexerActionType::CHANNEL:
@@ -390,7 +390,7 @@ std::string ATNSerializer::decode(const std::wstring &inpdata) {
     throw UnsupportedOperationException("ATN Serializer" + reason);
   }
 
-  Guid uuid = ATNDeserializer::toUUID(data.data(), p);
+  antlrcpp::Guid uuid = ATNDeserializer::toUUID(data.data(), p);
   p += 8;
   if (uuid != ATNDeserializer::SERIALIZED_UUID()) {
     std::string reason = "Could not deserialize ATN with UUID " + uuid.toString() + " (expected " +
@@ -602,10 +602,10 @@ std::string ATNSerializer::getDecoded(ATN *atn, std::vector<std::string> &tokenN
   return ATNSerializer(atn, tokenNames).decode(serialized);
 }
 
-void ATNSerializer::serializeUUID(std::vector<size_t> &data, Guid uuid) {
+void ATNSerializer::serializeUUID(std::vector<size_t> &data, antlrcpp::Guid uuid) {
   unsigned int twoBytes = 0;
   bool firstByte = true;
-  for( std::vector<unsigned char>::const_reverse_iterator rit = uuid.rbegin(); rit != uuid.rend(); ++rit )
+  for(antlrcpp::Guid::const_reverse_iterator rit = uuid.rbegin(); rit != uuid.rend(); ++rit )
   {
      if (firstByte) {
        twoBytes = *rit;

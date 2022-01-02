@@ -144,7 +144,7 @@ public void discoverRule(RuleAST rule, GrammarAST ID, List<GrammarAST> modifiers
 						 List<GrammarAST> actions,
 						 GrammarAST block) { }
 public void finishRule(RuleAST rule, GrammarAST ID, GrammarAST block) { }
-public void discoverLexerRule(RuleAST rule, GrammarAST ID, List<GrammarAST> modifiers,
+public void discoverLexerRule(RuleAST rule, GrammarAST ID, List<GrammarAST> modifiers, GrammarAST options,
                               GrammarAST block) { }
 public void finishLexerRule(RuleAST rule, GrammarAST ID, GrammarAST block) { }
 public void ruleCatch(GrammarAST arg, ActionAST action) { }
@@ -525,7 +525,8 @@ lexerRule
 	:	^(	RULE TOKEN_REF
 			{currentRuleName=$TOKEN_REF.text; currentRuleAST=$RULE;}
 			(^(RULEMODIFIERS m=FRAGMENT {mods.add($m);}))?
-      		{discoverLexerRule((RuleAST)$RULE, $TOKEN_REF, mods, (GrammarAST)input.LT(1));}
+			opts=optionsSpec*
+      		{discoverLexerRule((RuleAST)$RULE, $TOKEN_REF, mods, $opts.start, (GrammarAST)input.LT(1));}
       		lexerRuleBlock
       		{
       		finishLexerRule((RuleAST)$RULE, $TOKEN_REF, $lexerRuleBlock.start);
