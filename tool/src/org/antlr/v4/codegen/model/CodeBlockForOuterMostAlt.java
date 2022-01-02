@@ -6,6 +6,7 @@
 package org.antlr.v4.codegen.model;
 
 import org.antlr.v4.codegen.OutputModelFactory;
+import org.antlr.v4.codegen.Target;
 import org.antlr.v4.tool.Alternative;
 
 /** The code associated with the outermost alternative of a rule.
@@ -25,6 +26,7 @@ public class CodeBlockForOuterMostAlt extends CodeBlockForAlt {
 	public CodeBlockForOuterMostAlt(OutputModelFactory factory, Alternative alt) {
 		super(factory);
 		this.alt = alt;
+		Target target = factory.getGenerator().getTarget();
 		altLabel = alt.ast.altLabel!=null ? alt.ast.altLabel.getText() : null;
 	}
 }

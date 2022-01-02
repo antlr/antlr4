@@ -399,7 +399,7 @@ RuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,namedActions,fina
 <if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else> <accessLevelOpenOK(parser)> func <endif><currentRule.name>(<if(first(args))>_ <endif><args; separator=", _">) throws -> <currentRule.ctxType> {
 	var _localctx: <currentRule.ctxType>
 	_localctx = <currentRule.ctxType>(_ctx, getState()<currentRule.args:{a | , <a.name>}>)
-	try enterRule(_localctx, <currentRule.startState>, <parser.name>.RULE_<currentRule.name>)
+	try enterRule(_localctx, <currentRule.startState>, <parser.name>.RULE_<currentRule.nameForConcat>)
 	<namedActions.init>
 	<locals; separator="\n">
 	defer {
@@ -446,7 +446,7 @@ private func <currentRule.name>(_ _p<args:{a | , <a>}>: Int) throws -> <currentR
 	_localctx = <currentRule.ctxType>(_ctx, _parentState<currentRule.args:{a | , <a.name>}>)
 	var _prevctx: <currentRule.ctxType> = _localctx
 	let _startState: Int = <currentRule.startState>
-	try enterRecursionRule(_localctx, <currentRule.startState>, <parser.name>.RULE_<currentRule.name>, _p)
+	try enterRecursionRule(_localctx, <currentRule.startState>, <parser.name>.RULE_<currentRule.nameForConcat>, _p)
 	<namedActions.init>
 	<locals; separator="\n">
 	defer {
@@ -866,12 +866,12 @@ StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMe
 >>
 
 AltLabelStructDecl(struct,attrs,getters,dispatchMethods) ::= <<
-<accessLevelNotOpen(parser)> class <struct.name>: <currentRule.name; format="cap">Context {
+<accessLevelNotOpen(parser)> class <struct.name>: <currentRule.nameForConcat; format="cap">Context {
 	<attrs:{a | <accessLevelNotOpen(parser)> var <a>}; separator="\n">
 	<getters:{g | <g>}; separator="\n">
 
 	<accessLevelNotOpen(parser)>
-	init(_ ctx: <currentRule.name; format="cap">Context) {
+	init(_ ctx: <currentRule.nameForConcat; format="cap">Context) {
 		super.init()
 		copyFrom(ctx)
 	}
@@ -989,13 +989,13 @@ Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
 	<accessLevelNotOpen(lexer)>
 	static let <lexer.channels:{k | <k>=<lexer.channels.(k)>}; separator=", ", wrap, anchor>
 	<endif>
-	<if(rest(lexer.modes))>
+	<if(rest(lexer.runtimeModeNames))>
 	<accessLevelNotOpen(lexer)>
-	static let <rest(lexer.modes):{m| <m>=<i>}; separator=", ", wrap, anchor>
+	static let <rest(lexer.runtimeModeNames):{m| <m>=<i>}; separator=", ", wrap, anchor>
 	<endif>
 	<accessLevelNotOpen(lexer)>
 	static let channelNames: [String] = [
-		"DEFAULT_TOKEN_CHANNEL", "HIDDEN"<if (lexer.channels)>, <lexer.channels:{c| "<c>"}; separator=", ", wrap, anchor><endif>
+		"DEFAULT_TOKEN_CHANNEL", "HIDDEN"<if (lexer.channelNames)>, <lexer.channelNames:{c| "<c>"}; separator=", ", wrap, anchor><endif>
 	]
 
 	<accessLevelNotOpen(lexer)>

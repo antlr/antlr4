@@ -243,7 +243,7 @@ namespace<if(file.genPackage)> <file.genPackage><endif> {
 		<endif>
 
 		<if(parser.rules)>
-		public const <parser.rules:{r | RULE_<r.name> = <r.index>}; separator=", ", wrap, anchor>;
+		public const <parser.rules:{r | RULE_<r.escapedName> = <r.index>}; separator=", ", wrap, anchor>;
 		<endif>
 
 		/**
@@ -1091,15 +1091,15 @@ namespace<if(lexerFile.genPackage)> <lexerFile.genPackage><endif> {
 		public const <lexer.channels:{c | <c> = <lexer.channels.(c)>}; separator=", ", wrap, anchor>;
 		<endif>
 
-		<if(rest(lexer.modes))>
-		public const <rest(lexer.modes):{m | <m>=<i>}; separator=", ", wrap, anchor>;
+		<if(rest(lexer.runtimeModeNames))>
+		public const <rest(lexer.runtimeModeNames):{m | <m>=<i>}; separator=", ", wrap, anchor>;
 		<endif>
 
 		/**
 		 * @var array\<string>
 		 */
 		public const CHANNEL_NAMES = [
-			'DEFAULT_TOKEN_CHANNEL', 'HIDDEN'<if (lexer.channels)>, <lexer.channels:{c| '<c>'}; separator=", ", wrap, anchor><endif>
+			'DEFAULT_TOKEN_CHANNEL', 'HIDDEN'<if (lexer.channelNames)>, <lexer.channelNames:{c| '<c>'}; separator=", ", wrap, anchor><endif>
 		];
 
 		/**

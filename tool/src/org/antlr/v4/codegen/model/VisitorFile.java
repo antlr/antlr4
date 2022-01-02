@@ -6,6 +6,7 @@
 package org.antlr.v4.codegen.model;
 
 import org.antlr.v4.codegen.OutputModelFactory;
+import org.antlr.v4.codegen.Target;
 import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.Rule;
@@ -44,17 +45,19 @@ public class VisitorFile extends OutputFile {
 		namedActions = buildNamedActions(g);
 		parserName = g.getRecognizerName();
 		grammarName = g.name;
+		Target target = factory.getGenerator().getTarget();
 		for (Rule r : g.rules.values()) {
 			Map<String, List<Pair<Integer, AltAST>>> labels = r.getAltLabels();
 			if ( labels!=null ) {
 				for (Map.Entry<String, List<Pair<Integer, AltAST>>> pair : labels.entrySet()) {
-					visitorNames.add(pair.getKey());
-					visitorLabelRuleNames.put(pair.getKey(), r.name);
+					String key = target.escapeIfWordEscapingNotSupported(pair.getKey());
+					visitorNames.add(key);
+					visitorLabelRuleNames.put(key, r.name);
 				}
 			}
 			else {
 				// if labels, must label all. no need for generic rule visitor then
-				visitorNames.add(r.name);
+				visitorNames.add(target.escapeIfWordEscapingNotSupported(r.name));
 			}
 		}
 		ActionAST ast = g.namedActions.get("header");

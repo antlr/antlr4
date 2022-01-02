@@ -22,7 +22,7 @@ public class RuleActionFunction extends OutputModelObject {
 
 	public RuleActionFunction(OutputModelFactory factory, Rule r, String ctxType) {
 		super(factory);
-		name = r.name;
+		name = r.escapedName;
 		ruleIndex = r.index;
 		this.ctxType = ctxType;
 	}

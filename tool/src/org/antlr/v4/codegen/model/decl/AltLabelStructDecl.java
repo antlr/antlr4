@@ -7,6 +7,7 @@
 package org.antlr.v4.codegen.model.decl;
 
 import org.antlr.v4.codegen.OutputModelFactory;
+import org.antlr.v4.codegen.Target;
 import org.antlr.v4.codegen.model.DispatchMethod;
 import org.antlr.v4.codegen.model.ListenerDispatchMethod;
 import org.antlr.v4.codegen.model.VisitorDispatchMethod;
@@ -23,10 +24,10 @@ public class AltLabelStructDecl extends StructDecl {
 	{
 		super(factory, r);
 		this.altNum = altNum;
-		this.name = // override name set in super to the label ctx
-			factory.getGenerator().getTarget().getAltLabelContextStructName(label);
-		this.parentRule = r.name;
-		derivedFromName = label;
+		Target target = factory.getGenerator().getTarget();
+		this.name = target.getAltLabelContextStructName(label);
+		this.parentRule = target.escapeIfWordEscapingNotSupported(r.name);
+		derivedFromName = target.escapeIfWordEscapingNotSupported(label);
 	}
 
 	@Override

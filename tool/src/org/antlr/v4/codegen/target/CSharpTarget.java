@@ -8,7 +8,6 @@ package org.antlr.v4.codegen.target;
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.codegen.Target;
 import org.antlr.v4.tool.ErrorType;
-import org.antlr.v4.tool.ast.GrammarAST;
 import org.stringtemplate.v4.NumberRenderer;
 import org.stringtemplate.v4.STErrorListener;
 import org.stringtemplate.v4.STGroup;
@@ -16,13 +15,111 @@ import org.stringtemplate.v4.STGroupFile;
 import org.stringtemplate.v4.StringRenderer;
 import org.stringtemplate.v4.misc.STMessage;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 public class CSharpTarget extends Target {
+	protected static final HashSet<String> reservedWords = new HashSet<>(Arrays.asList(
+		"abstract",
+		"as",
+		"base",
+		"bool",
+		"break",
+		"byte",
+		"case",
+		"catch",
+		"char",
+		"checked",
+		"class",
+		"const",
+		"continue",
+		"decimal",
+		"default",
+		"delegate",
+		"do",
+		"double",
+		"else",
+		"enum",
+		"event",
+		"explicit",
+		"extern",
+		"false",
+		"finally",
+		"fixed",
+		"float",
+		"for",
+		"foreach",
+		"goto",
+		"if",
+		"implicit",
+		"in",
+		"int",
+		"interface",
+		"internal",
+		"is",
+		"lock",
+		"long",
+		"namespace",
+		"new",
+		"null",
+		"object",
+		"operator",
+		"out",
+		"override",
+		"params",
+		"private",
+		"protected",
+		"public",
+		"readonly",
+		"ref",
+		"return",
+		"sbyte",
+		"sealed",
+		"short",
+		"sizeof",
+		"stackalloc",
+		"static",
+		"string",
+		"struct",
+		"switch",
+		"this",
+		"throw",
+		"true",
+		"try",
+		"typeof",
+		"uint",
+		"ulong",
+		"unchecked",
+		"unsafe",
+		"ushort",
+		"using",
+		"virtual",
+		"values",
+		"void",
+		"volatile",
+		"while"
+	));
+
 	public CSharpTarget(CodeGenerator gen) {
 		super(gen);
 		targetCharValueEscape[0] = "\\0";
 		targetCharValueEscape[0x0007] = "\\a";
 		targetCharValueEscape[0x000B] = "\\v";
 	}
+
+	@Override
+	protected Set<String> getReservedWords() {
+		return reservedWords;
+	}
+
+	@Override
+	protected String escapeWord(String word) {
+		return "@" + word;
+	}
+
+	@Override
+	public boolean supportsWordEscaping() { return true; }
 
 	@Override
 	public String encodeIntAsCharEscape(int v) {
@@ -42,11 +139,6 @@ public class CSharpTarget extends Target {
 		}
 
 		return "'" + formatted + "'";
-	}
-
-	@Override
-	protected boolean visibleGrammarSymbolCausesIssueInGeneratedCode(GrammarAST idNode) {
-		return false;
 	}
 
 	@Override

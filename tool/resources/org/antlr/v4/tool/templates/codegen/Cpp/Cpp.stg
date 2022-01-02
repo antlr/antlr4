@@ -57,9 +57,9 @@ public:
   };
 <endif>
 
-<if (rest(lexer.modes))>
+<if (rest(lexer.runtimeModeNames))>
   enum {
-    <rest(lexer.modes): {m | <m> = <i>}; separator=", ", wrap, anchor>
+    <rest(lexer.runtimeModeNames): {m | <m> = <i>}; separator=", ", wrap, anchor>
   };
 <endif>
 
@@ -190,7 +190,7 @@ std::vector\<std::string> <lexer.name>::_ruleNames = {
 };
 
 std::vector\<std::string> <lexer.name>::_channelNames = {
-  "DEFAULT_TOKEN_CHANNEL", "HIDDEN"<if (lexer.channels)>, <lexer.channels: {c | "<c>"}; separator = ", ", wrap, anchor><endif>
+  "DEFAULT_TOKEN_CHANNEL", "HIDDEN"<if (lexer.channelNames)>, <lexer.channelNames: {c | "<c>"}; separator = ", ", wrap, anchor><endif>
 };
 
 std::vector\<std::string> <lexer.name>::_modeNames = {
@@ -264,7 +264,7 @@ public:
 
 <if (parser.rules)>
   enum {
-    <parser.rules: {r | Rule<r.name; format="cap"> = <r.index>}; separator=", ", wrap, anchor>
+    <parser.rules: {r | Rule<r.escapedName; format="cap"> = <r.index>}; separator=", ", wrap, anchor>
   };
 <endif>
 

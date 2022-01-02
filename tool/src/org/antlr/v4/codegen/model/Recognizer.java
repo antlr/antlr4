@@ -7,25 +7,21 @@ package org.antlr.v4.codegen.model;
 
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.codegen.OutputModelFactory;
+import org.antlr.v4.codegen.Target;
 import org.antlr.v4.codegen.model.chunk.ActionChunk;
 import org.antlr.v4.codegen.model.chunk.ActionText;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.Rule;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public abstract class Recognizer extends OutputModelObject {
-	public String name;
-	public String grammarName;
-	public String grammarFileName;
-	public String accessLevel;
-	public Map<String,Integer> tokens;
+	public final String name;
+	public final String grammarName;
+	public final String grammarFileName;
+	public final String accessLevel;
+	public final Map<String,Integer> tokens;
 
 	/**
 	 * @deprecated This field is provided only for compatibility with code
@@ -35,14 +31,14 @@ public abstract class Recognizer extends OutputModelObject {
 	@Deprecated
 	public List<String> tokenNames;
 
-	public List<String> literalNames;
-	public List<String> symbolicNames;
-	public Set<String> ruleNames;
-	public Collection<Rule> rules;
-	@ModelElement public ActionChunk superClass;
+	public final List<String> literalNames;
+	public final List<String> symbolicNames;
+	public final List<String> ruleNames;
+	public final Collection<Rule> rules;
+	@ModelElement public final ActionChunk superClass;
 
-	@ModelElement public SerializedATN atn;
-	@ModelElement public LinkedHashMap<Rule, RuleSempredFunction> sempredFuncs =
+	@ModelElement public final SerializedATN atn;
+	@ModelElement public final LinkedHashMap<Rule, RuleSempredFunction> sempredFuncs =
 		new LinkedHashMap<Rule, RuleSempredFunction>();
 
 	public Recognizer(OutputModelFactory factory) {
@@ -61,7 +57,11 @@ public abstract class Recognizer extends OutputModelObject {
 			}
 		}
 
-		ruleNames = g.rules.keySet();
+		Target target = factory.getGenerator().getTarget();
+		ruleNames = new ArrayList<>(g.rules.size());
+		for (String ruleKey : g.rules.keySet()) {
+			ruleNames.add(target.escapeIfWordEscapingNotSupported(ruleKey));
+		}
 		rules = g.rules.values();
 		atn = new SerializedATN(factory, g.atn);
 		if (g.getOptionString("superClass") != null) {

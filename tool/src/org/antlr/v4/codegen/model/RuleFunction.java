@@ -10,6 +10,7 @@ import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.tree.CommonTree;
 import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.antlr.v4.codegen.OutputModelFactory;
+import org.antlr.v4.codegen.Target;
 import org.antlr.v4.codegen.model.decl.AltLabelStructDecl;
 import org.antlr.v4.codegen.model.decl.AttributeDecl;
 import org.antlr.v4.codegen.model.decl.ContextRuleGetterDecl;
@@ -51,6 +52,7 @@ import static org.antlr.v4.parse.ANTLRParser.TOKEN_REF;
 /** */
 public class RuleFunction extends OutputModelObject {
 	public String name;
+	public String nameForConcat;
 	public List<String> modifiers;
 	public String ctxType;
 	public Collection<String> ruleLabels;
@@ -73,7 +75,9 @@ public class RuleFunction extends OutputModelObject {
 
 	public RuleFunction(OutputModelFactory factory, Rule r) {
 		super(factory);
-		this.name = r.name;
+		Target target = factory.getGenerator().getTarget();
+		this.name = target.escapeIfNeeded(r.name);
+		this.nameForConcat = target.supportsWordEscaping() ? r.name : this.name;
 		this.rule = r;
 		if ( r.modifiers!=null && !r.modifiers.isEmpty() ) {
 			this.modifiers = new ArrayList<String>();

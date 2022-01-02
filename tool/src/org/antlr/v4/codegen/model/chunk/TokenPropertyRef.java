@@ -10,7 +10,7 @@ import org.antlr.v4.codegen.model.decl.StructDecl;
 
 /** */
 public class TokenPropertyRef extends ActionChunk {
-	public String label;
+	public final String label;
 
 	public TokenPropertyRef(StructDecl ctx, String label) {
 		super(ctx);

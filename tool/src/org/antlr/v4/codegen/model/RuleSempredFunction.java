@@ -12,5 +12,6 @@ import org.antlr.v4.tool.Rule;
 public class RuleSempredFunction extends RuleActionFunction {
 	public RuleSempredFunction(OutputModelFactory factory, Rule r, String ctxType) {
 		super(factory, r, ctxType);
+		name = factory.getGenerator().getTarget().supportsWordEscaping() ? r.name : r.escapedName;
 	}
 }

@@ -46,7 +46,7 @@ public class StructDecl extends Decl {
 	public StructDecl(OutputModelFactory factory, Rule r) {
 		super(factory, factory.getGenerator().getTarget().getRuleFunctionContextStructName(r));
 		addDispatchMethods(r);
-		derivedFromName = r.name;
+		derivedFromName = factory.getGenerator().getTarget().escapeIfWordEscapingNotSupported(r.name);
 		provideCopyFrom = r.hasAltSpecificContexts();
 	}
 

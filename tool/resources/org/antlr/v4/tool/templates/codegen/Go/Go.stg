@@ -225,12 +225,12 @@ const <parser.name>EOF = antlr.TokenEOF
 
 // <parser.name> rules.
 const (
-	<parser.rules:{r | <parser.name>RULE_<r.name> = <r.index>}; separator="\n">
+	<parser.rules:{r | <parser.name>RULE_<r.escapedName> = <r.index>}; separator="\n">
 )
 <elseif(parser.rules)>
 
-// <parser.name>RULE_<first(parser.rules).name> is the <parser.name> rule.
-const <parser.name>RULE_<first(parser.rules).name> = <first(parser.rules).index>
+// <parser.name>RULE_<first(parser.rules).escapedName> is the <parser.name> rule.
+const <parser.name>RULE_<first(parser.rules).escapedName> = <first(parser.rules).index>
 <endif>
 
 <if(funcs)>
@@ -1411,11 +1411,11 @@ var serializedLexerAtn []uint16
 
 
 var lexerChannelNames = []string{
-	"DEFAULT_TOKEN_CHANNEL", "HIDDEN"<if (lexer.channels)>, <lexer.channels:{c | "<c>"}; separator=", ", wrap><endif>,
+	"DEFAULT_TOKEN_CHANNEL", "HIDDEN"<if (lexer.channelNames)>, <lexer.channelNames:{c | "<c>"}; separator=", ", wrap><endif>,
 }
 
 var lexerModeNames = []string{
-	<lexer.modes:{m | "<m>"}; separator=", ", wrap>,
+	<lexer.runtimeModeNames:{m | "<m>"}; separator=", ", wrap>,
 }
 
 <if(lexer.literalNames)>
@@ -1502,17 +1502,17 @@ const (
 const <lexer.name><first(lexer.channels)> = <lexer.channels.(first(lexer.channels))>
 <endif>
 
-<if(rest(rest(lexer.modes)))>
+<if(rest(rest(lexer.runtimeModeNames)))>
 
 // <lexer.name> modes.
 const (
-	<first(rest(lexer.modes)):{m | <lexer.name><m> = iota + 1}>
-	<rest(rest(lexer.modes)):{m | <lexer.name><m>}; separator="\n">
+	<first(rest(lexer.runtimeModeNames)):{m | <lexer.name><m> = iota + 1}>
+	<rest(rest(lexer.runtimeModeNames)):{m | <lexer.name><m>}; separator="\n">
 )
-<elseif(rest(lexer.modes))>
+<elseif(rest(lexer.runtimeModeNames))>
 
-// <lexer.name><first(rest(lexer.modes))> is the <lexer.name> mode.
-const <lexer.name><first(rest(lexer.modes))> = 1
+// <lexer.name><first(rest(lexer.runtimeModeNames))> is the <lexer.name> mode.
+const <lexer.name><first(rest(lexer.runtimeModeNames))> = 1
 <endif>
 <if(namedActions.members)>
 

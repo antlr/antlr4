@@ -216,12 +216,14 @@ public class OutputModelController {
 			opAltsCode.add((CodeBlockForAlt)opStuff);
 		}
 
+		Target target = delegate.getGenerator().getTarget();
+		String escapedRuleName = target.escapeIfWordEscapingNotSupported(r.name);
 		// Insert code in front of each primary alt to create specialized ctx if there was a label
 		for (int i = 0; i < primaryAltsCode.size(); i++) {
 			LeftRecursiveRuleAltInfo altInfo = r.recPrimaryAlts.get(i);
 			if ( altInfo.altLabel==null ) continue;
 			ST altActionST = codegenTemplates.getInstanceOf("recRuleReplaceContext");
-			altActionST.add("ctxName", Utils.capitalize(altInfo.altLabel));
+			altActionST.add("ctxName", Utils.capitalize(target.escapeIfWordEscapingNotSupported(altInfo.altLabel)));
 			Action altAction =
 				new Action(delegate, function.altLabelCtxs.get(altInfo.altLabel), altActionST);
 			CodeBlockForAlt alt = primaryAltsCode.get(i);
@@ -246,16 +248,16 @@ public class OutputModelController {
 			if ( altInfo.altLabel!=null ) {
 				templateName = "recRuleLabeledAltStartAction";
 				altActionST = codegenTemplates.getInstanceOf(templateName);
-				altActionST.add("currentAltLabel", altInfo.altLabel);
+				altActionST.add("currentAltLabel", target.escapeIfWordEscapingNotSupported(altInfo.altLabel));
 			}
 			else {
 				templateName = "recRuleAltStartAction";
 				altActionST = codegenTemplates.getInstanceOf(templateName);
-				altActionST.add("ctxName", Utils.capitalize(r.name));
+				altActionST.add("ctxName", Utils.capitalize(escapedRuleName));
 			}
-			altActionST.add("ruleName", r.name);
+			altActionST.add("ruleName", escapedRuleName);
 			// add label of any lr ref we deleted
-			altActionST.add("label", altInfo.leftRecursiveRuleRefLabel);
+			altActionST.add("label", target.escapeIfWordEscapingNotSupported(altInfo.leftRecursiveRuleRefLabel));
 			if (altActionST.impl.formalArguments.containsKey("isListLabel")) {
 				altActionST.add("isListLabel", altInfo.isListLabel);
 			}

@@ -6,6 +6,7 @@
 package org.antlr.v4.codegen.model;
 
 import org.antlr.v4.codegen.OutputModelFactory;
+import org.antlr.v4.codegen.Target;
 import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.Rule;
@@ -47,17 +48,19 @@ public class ListenerFile extends OutputFile {
 		parserName = g.getRecognizerName();
 		grammarName = g.name;
 		namedActions = buildNamedActions(factory.getGrammar());
+		Target target = factory.getGenerator().getTarget();
 		for (Rule r : g.rules.values()) {
 			Map<String, List<Pair<Integer,AltAST>>> labels = r.getAltLabels();
 			if ( labels!=null ) {
 				for (Map.Entry<String, List<Pair<Integer, AltAST>>> pair : labels.entrySet()) {
-					listenerNames.add(pair.getKey());
-					listenerLabelRuleNames.put(pair.getKey(), r.name);
+					String key = target.escapeIfWordEscapingNotSupported(pair.getKey());
+					listenerNames.add(key);
+					listenerLabelRuleNames.put(key, r.name);
 				}
 			}
 			else {
 				// only add rule context if no labels
-				listenerNames.add(r.name);
+				listenerNames.add(target.escapeIfWordEscapingNotSupported(r.name));
 			}
 		}
 		ActionAST ast = g.namedActions.get("header");

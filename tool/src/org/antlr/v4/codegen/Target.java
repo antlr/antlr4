@@ -26,6 +26,8 @@ import org.stringtemplate.v4.STGroupFile;
 import org.stringtemplate.v4.StringRenderer;
 import org.stringtemplate.v4.misc.STMessage;
 
+import java.util.Set;
+
 /** */
 public abstract class Target {
 	/** For pure strings of Java 16-bit Unicode char, how can we display
@@ -87,6 +89,22 @@ public abstract class Target {
 
 		return templates;
 	}
+
+	protected abstract Set<String> getReservedWords();
+
+	public String escapeIfWordEscapingNotSupported(String word) {
+		return supportsWordEscaping() ? word : escapeIfNeeded(word);
+	}
+
+	public String escapeIfNeeded(String identifier) {
+		return getReservedWords().contains(identifier) ? escapeWord(identifier) : identifier;
+	}
+
+	protected String escapeWord(String word) {
+		return word + "_";
+	}
+
+	public boolean supportsWordEscaping() { return false; }
 
 	protected void genFile(Grammar g, ST outputFileST, String fileName)
 	{
@@ -344,7 +362,7 @@ public abstract class Target {
 
 	public String getListLabel(String label) {
 		ST st = getTemplates().getInstanceOf("ListLabelName");
-		st.add("label", label);
+		st.add("label", escapeIfWordEscapingNotSupported(label));
 		return st.render();
 	}
 
@@ -352,11 +370,11 @@ public abstract class Target {
 		if ( r.g.isLexer() ) {
 			return getTemplates().getInstanceOf("LexerRuleContext").render();
 		}
-		return Utils.capitalize(r.name)+getTemplates().getInstanceOf("RuleContextNameSuffix").render();
+		return Utils.capitalize(escapeIfWordEscapingNotSupported(r.name))+getTemplates().getInstanceOf("RuleContextNameSuffix").render();
 	}
 
 	public String getAltLabelContextStructName(String label) {
-		return Utils.capitalize(label)+getTemplates().getInstanceOf("RuleContextNameSuffix").render();
+		return Utils.capitalize(escapeIfWordEscapingNotSupported(label))+getTemplates().getInstanceOf("RuleContextNameSuffix").render();
 	}
 
 	/** If we know which actual function, we can provide the actual ctx type.
@@ -369,7 +387,7 @@ public abstract class Target {
 		if ( r.g.isLexer() ) {
 			return getTemplates().getInstanceOf("LexerRuleContext").render();
 		}
-		return Utils.capitalize(r.name)+getTemplates().getInstanceOf("RuleContextNameSuffix").render();
+		return Utils.capitalize(escapeIfWordEscapingNotSupported(r.name))+getTemplates().getInstanceOf("RuleContextNameSuffix").render();
 	}
 
 	// should be same for all refs to same token like ctx.ID within single rule function
@@ -388,19 +406,19 @@ public abstract class Target {
 	// x=(A|B)
 	public String getImplicitSetLabel(String id) {
 		ST st = getTemplates().getInstanceOf("ImplicitSetLabel");
-		st.add("id", id);
+		st.add("id", escapeIfWordEscapingNotSupported(id));
 		return st.render();
 	}
 
 	public String getImplicitRuleLabel(String ruleName) {
 		ST st = getTemplates().getInstanceOf("ImplicitRuleLabel");
-		st.add("ruleName", ruleName);
+		st.add("ruleName", escapeIfWordEscapingNotSupported(ruleName));
 		return st.render();
 	}
 
 	public String getElementListName(String name) {
 		ST st = getTemplates().getInstanceOf("ElementListName");
-		st.add("elemName", getElementName(name));
+		st.add("elemName", getElementName(escapeIfWordEscapingNotSupported(name)));
 		return st.render();
 	}
 
@@ -518,10 +536,13 @@ public abstract class Target {
 				break;
 		}
 
-		return visibleGrammarSymbolCausesIssueInGeneratedCode(idNode);
+		return getReservedWords().contains(idNode.getText());
 	}
 
-	protected abstract boolean visibleGrammarSymbolCausesIssueInGeneratedCode(GrammarAST idNode);
+	@Deprecated
+	protected boolean visibleGrammarSymbolCausesIssueInGeneratedCode(GrammarAST idNode) {
+		return getReservedWords().contains(idNode.getText());
+	}
 
 	public boolean templatesExist() {
 		return loadTemplatesHelper(false) != null;

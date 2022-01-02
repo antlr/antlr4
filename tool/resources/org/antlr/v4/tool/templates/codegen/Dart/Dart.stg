@@ -193,7 +193,7 @@ Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
 Parser_(parser, funcs, atn, sempredFuncs, ctor, superClass) ::= <<
 <if(namedActions.definitions)><namedActions.definitions><endif>
 <if(parser.rules)>
-const int <parser.rules:{r | RULE_<r.name> = <r.index>}; separator=", ", wrap, anchor>;
+const int <parser.rules:{r | RULE_<r.escapedName> = <r.index>}; separator=", ", wrap, anchor>;
 <endif>
 class <parser.name> extends <superClass; null="Parser"> {
   static final checkVersion = () => RuntimeMetaData.checkVersion('<file.ANTLRVersion>', RuntimeMetaData.VERSION);
@@ -810,14 +810,14 @@ class <lexer.name> extends <superClass; null="Lexer"> {
   static const int
     <lexer.channels:{c | <c> = <lexer.channels.(c)>}; separator=", ", wrap, anchor>;
   <endif>
-  <if(rest(lexer.modes))>
+  <if(rest(lexer.runtimeModeNames))>
   static const int
-    <rest(lexer.modes):{m | <m> = <i>}; separator=", ", wrap, anchor>;
+    <rest(lexer.runtimeModeNames):{m | <m> = <i>}; separator=", ", wrap, anchor>;
   <endif>
 
   @override
   final List\<String> channelNames = [
-    'DEFAULT_TOKEN_CHANNEL', 'HIDDEN'<if (lexer.channels)>, <lexer.channels:{c| '<c>'}; separator=", ", wrap, anchor><endif>
+    'DEFAULT_TOKEN_CHANNEL', 'HIDDEN'<if (lexer.channelNames)>, <lexer.channelNames:{c| '<c>'}; separator=", ", wrap, anchor><endif>
   ];
 
   @override

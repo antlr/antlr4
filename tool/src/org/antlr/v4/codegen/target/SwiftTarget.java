@@ -62,7 +62,7 @@ public class SwiftTarget extends Target {
      */
     private static final ThreadLocal<STGroup> targetTemplates = new ThreadLocal<STGroup>();
 
-    protected static final String[] swiftKeywords = {
+    protected static final HashSet<String> reservedWords = new HashSet<>(Arrays.asList(
             "associatedtype", "class", "deinit", "enum", "extension", "func", "import", "init", "inout", "internal",
             "let", "operator", "private", "protocol", "public", "static", "struct", "subscript", "typealias", "var",
             "break", "case", "continue", "default", "defer", "do", "else", "fallthrough", "for", "guard", "if",
@@ -71,11 +71,10 @@ public class SwiftTarget extends Target {
             "true", "try", "__COLUMN__", "__FILE__", "__FUNCTION__","__LINE__", "#column", "#file", "#function", "#line", "_" , "#available", "#else", "#elseif", "#endif", "#if", "#selector",
             "associativity", "convenience", "dynamic", "didSet", "final", "get", "infix", "indirect", "lazy",
             "left", "mutating", "none", "nonmutating", "optional", "override", "postfix", "precedence",
-            "prefix", "Protocol", "required", "right", "set", "Type", "unowned", "weak", "willSet"
- };
+            "prefix", "Protocol", "required", "right", "set", "Type", "unowned", "weak", "willSet",
 
-    /** Avoid grammar symbols in this set to prevent conflicts in gen'd code. */
-    protected final Set<String> badWords = new HashSet<String>();
+             "rule", "parserRule"
+	));
 
     public String lexerAtnJSON = null;
     public String parserAtnJSON = null;
@@ -84,24 +83,19 @@ public class SwiftTarget extends Target {
         super(gen);
     }
 
-    public Set<String> getBadWords() {
-        if (badWords.isEmpty()) {
-            addBadWords();
-        }
+	@Override
+	protected Set<String> getReservedWords() {
+		return reservedWords;
+	}
 
-        return badWords;
-    }
+	@Override
+	protected String escapeWord(String word) {
+		return "`" + word + "`";
+	}
 
-    protected void addBadWords() {
-        badWords.addAll(Arrays.asList(swiftKeywords));
-        badWords.add("rule");
-        badWords.add("parserRule");
-    }
+	@Override
+	public boolean supportsWordEscaping() { return true; }
 
-    @Override
-    protected boolean visibleGrammarSymbolCausesIssueInGeneratedCode(GrammarAST idNode) {
-        return getBadWords().contains(idNode.getText());
-    }
     @Override
     protected void genFile(Grammar g,
                            ST outputFileST,
