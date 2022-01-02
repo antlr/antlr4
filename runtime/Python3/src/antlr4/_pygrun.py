@@ -102,6 +102,9 @@ def main():
     sys.path.append('.')
     # print(sys.path)
 
+    # add current directory to python global namespace in case of relative imports
+    globals().update({'__package__': os.path.basename(os.getcwd())})
+
     # print("Load Lexer {}".format(lexerName))
     module_lexer = __import__(lexerName, globals(), locals(), lexerName)
     class_lexer = getattr(module_lexer, lexerName)
