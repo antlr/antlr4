@@ -77,7 +77,7 @@
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<version>3.3.1</version>
 				<configuration>
-					<javadocVersion>1.7</javadocVersion>
+					<javadocVersion>11</javadocVersion>
 					<failOnError>false</failOnError>
 				</configuration>
 				<executions>
@@ -180,8 +180,8 @@
 							<target>${basedir}/target/generated-sources/tool/src/org/antlr/v4/unicode/UnicodeData.java</target>
 							<controller>
 								<className>org.antlr.v4.unicode.UnicodeDataTemplateController</className>
-								<sourceVersion>1.7</sourceVersion>
-								<targetVersion>1.7</targetVersion>
+								<sourceVersion>11</sourceVersion>
+								<targetVersion>11</targetVersion>
 								<method>getProperties</method>
 							</controller>
 						</template>
