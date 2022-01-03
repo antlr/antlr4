@@ -324,7 +324,7 @@ namespace<if(file.genPackage)> <file.genPackage><endif> {
 			switch ($ruleIndex) {
 			<parser.sempredFuncs.values:{f|
 		case <f.ruleIndex>:
-			return $this->sempred<f.name; format="cap">($localContext, $predicateIndex);}; separator="\n\n">
+			return $this->sempred<f.originalName; format="cap">($localContext, $predicateIndex);}; separator="\n\n">
 
 				default:
 					return true;
@@ -391,7 +391,7 @@ public function sempred(?RuleContext $localContext, int $ruleIndex, int $predica
 	switch ($ruleIndex) {
 	<recog.sempredFuncs.values:{f|
     case <f.ruleIndex>:
-        return $this->sempred<f.name; format="cap">($localContext, $predicateIndex);}; separator="\n\n">
+        return $this->sempred<f.originalName; format="cap">($localContext, $predicateIndex);}; separator="\n\n">
 	}
 
 	return true;
@@ -433,7 +433,7 @@ private function action<r.name; format="cap">(?<r.ctxType> $localContext, int $a
  * an overriding implementation impossible to maintain.
  */
 RuleSempredFunction(r, actions) ::= <<
-private function sempred<r.name; format="cap">(?Context\\<r.ctxType> $localContext, int $predicateIndex) : bool
+private function sempred<r.originalName; format="cap">(?Context\\<r.ctxType> $localContext, int $predicateIndex) : bool
 {
 	switch ($predicateIndex) {
 	<actions:{index|
@@ -449,7 +449,7 @@ RuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,namedActions,fina
 /**
  * @throws RecognitionException
  */
-<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><endif>public function <currentRule.name>(<args; separator=",">) : Context\\<currentRule.ctxType>
+<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><endif>public function <currentRule.escapedName>(<args; separator=",">) : Context\\<currentRule.ctxType>
 {
     $localContext = new Context\\<currentRule.ctxType>($this->ctx, $this->getState()<currentRule.args:{a | , $<a.name>}>);
 
@@ -478,7 +478,7 @@ LeftRecursiveRuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,name
 /**
  * @throws RecognitionException
  */
-<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><endif>public function <currentRule.name>(<args; separator=", ">) : Context\\<currentRule.ctxType>
+<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><endif>public function <currentRule.escapedName>(<args; separator=", ">) : Context\\<currentRule.ctxType>
 {
 	return $this->recursive<currentRule.name; format="cap">(0<currentRule.args:{a | , <a.name>}>);
 }
@@ -703,7 +703,7 @@ cases(ttypes) ::= <<
 
 InvokeRule(r, argExprsChunks) ::= <<
 $this->setState(<r.stateNumber>);
-<if(r.labels)><r.labels:{l | <labelref(l)> = }><endif>$this-><if(r.ast.options.p)>recursive<r.name; format="cap"><else><r.name><endif>(<if(r.ast.options.p)><r.ast.options.p><if(argExprsChunks)>,<endif><endif><argExprsChunks>);
+<if(r.labels)><r.labels:{l | <labelref(l)> = }><endif>$this-><if(r.ast.options.p)>recursive<r.originalName; format="cap"><else><r.name><endif>(<if(r.ast.options.p)><r.ast.options.p><if(argExprsChunks)>,<endif><endif><argExprsChunks>);
 >>
 
 MatchToken(m) ::= <<
@@ -1091,15 +1091,15 @@ namespace<if(lexerFile.genPackage)> <lexerFile.genPackage><endif> {
 		public const <lexer.channels:{c | <c> = <lexer.channels.(c)>}; separator=", ", wrap, anchor>;
 		<endif>
 
-		<if(rest(lexer.modes))>
-		public const <rest(lexer.modes):{m | <m>=<i>}; separator=", ", wrap, anchor>;
+		<if(rest(lexer.escapedModeNames))>
+		public const <rest(lexer.escapedModeNames):{m | <m>=<i>}; separator=", ", wrap, anchor>;
 		<endif>
 
 		/**
 		 * @var array\<string>
 		 */
 		public const CHANNEL_NAMES = [
-			'DEFAULT_TOKEN_CHANNEL', 'HIDDEN'<if (lexer.channels)>, <lexer.channels:{c| '<c>'}; separator=", ", wrap, anchor><endif>
+			'DEFAULT_TOKEN_CHANNEL', 'HIDDEN'<if (lexer.channelNames)>, <lexer.channelNames:{c| '<c>'}; separator=", ", wrap, anchor><endif>
 		];
 
 		/**

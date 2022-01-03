@@ -12,18 +12,20 @@ import org.antlr.v4.codegen.model.SrcOp;
 /** */
 public class Decl extends SrcOp {
 	public String name;
-	public String decl; 	// whole thing if copied from action
+	public final String originalName;
+	public final String decl; 	// whole thing if copied from action
 	public boolean isLocal; // if local var (not in RuleContext struct)
 	public StructDecl ctx;  // which context contains us? set by addDecl
 
-	public Decl(OutputModelFactory factory, String name, String decl) {
-		this(factory, name);
-		this.decl = decl;
+	public Decl(OutputModelFactory factory, String name) {
+		this(factory, name, null);
 	}
 
-	public Decl(OutputModelFactory factory, String name) {
+	public Decl(OutputModelFactory factory, String name, String decl) {
 		super(factory);
-		this.name = name;
+		this.originalName = name;
+		this.name = factory.getGenerator().getTarget().escapeIfNeeded(name);
+		this.decl = decl;
 	}
 
 	@Override

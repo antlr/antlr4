@@ -244,9 +244,9 @@ func (p *<parser.name>) Sempred(localctx antlr.RuleContext, ruleIndex, predIndex
 	switch ruleIndex {
 	<if(parser.sempredFuncs.values)>
 	<parser.sempredFuncs.values:{f | case <f.ruleIndex>:
-		var t *<f.name; format="cap">Context = nil
-		if localctx != nil { t = localctx.(*<f.name; format="cap">Context) \}
-		return p.<f.name; format="cap">_Sempred(t, predIndex)}; separator="\n\n">
+		var t *<f.originalName; format="cap">Context = nil
+		if localctx != nil { t = localctx.(*<f.originalName; format="cap">Context) \}
+		return p.<f.originalName; format="cap">_Sempred(t, predIndex)}; separator="\n\n">
 
 
 	<endif>
@@ -269,11 +269,11 @@ func (l *<lexer.name>) Action(localctx antlr.RuleContext, ruleIndex, actionIndex
 	<if(recog.actionFuncs.values)>
 	<recog.actionFuncs.values:{f | case <f.ruleIndex>:
 		<if(f.factory.grammar.lexer)>
-		l.<f.name>_Action(localctx, actionIndex)
+		l.<f.originalName>_Action(localctx, actionIndex)
 		<else>
-		var t *<f.name; format="cap">Context = nil
+		var t *<f.originalName; format="cap">Context = nil
 		if localctx != nil { t = localctx.(*<f.ctxType>) \}
-		l.<f.name>_Action(t, actionIndex)
+		l.<f.originalName>_Action(t, actionIndex)
 		<endif>
 	}; separator="\n\n">
 
@@ -297,11 +297,11 @@ func (l *<lexer.name>) Sempred(localctx antlr.RuleContext, ruleIndex, predIndex 
 	<if(recog.sempredFuncs.values)>
 	<recog.sempredFuncs.values:{f | case <f.ruleIndex>:
 		<if(f.factory.grammar.lexer)>
-		return l.<f.name>_Sempred(localctx, predIndex)
+		return l.<f.originalName>_Sempred(localctx, predIndex)
 		<else>
-		var t *<f.name; format="cap">Context = nil
+		var t *<f.originalName; format="cap">Context = nil
 		if localctx != nil { t = localctx.(*<f.ctxType>) \}
-		return l.<f.name>_Sempred(t, predIndex)
+		return l.<f.originalName>_Sempred(t, predIndex)
 		<endif>
 	}; separator="\n\n">
 
@@ -343,7 +343,7 @@ func (l *<lexer.name>) <r.name; format="cap">_Action(localctx <if(r.factory.gram
  * overriding implementation impossible to maintain.
  */
 RuleSempredFunction(r, actions) ::= <<
-func (p *<r.factory.grammar.recognizerName>) <r.name; format="cap">_Sempred(localctx antlr.RuleContext, predIndex int) bool {
+func (p *<r.factory.grammar.recognizerName>) <r.originalName; format="cap">_Sempred(localctx antlr.RuleContext, predIndex int) bool {
 	this := p
 	_ = this
 
@@ -443,10 +443,10 @@ LeftRecursiveRuleFunction(currentRule, args, code, locals, ruleCtx, altLabelCtxs
 
 <endif>
 func (p *<parser.name>) <currentRule.name; format="cap">(<args:{a | <a.name> <a.type>}; separator=", ">) (localctx I<currentRule.ctxType>) {
-	return p.<currentRule.name>(0<args:{a | , <a.name>}>)
+	return p.<currentRule.escapedName>(0<args:{a | , <a.name>}>)
 }
 
-func (p *<parser.name>) <currentRule.name>(_p int<args:{a | , <a.name> <a.type>}>) (localctx I<currentRule.ctxType>) {
+func (p *<parser.name>) <currentRule.escapedName>(_p int<args:{a | , <a.name> <a.type>}>) (localctx I<currentRule.ctxType>) {
 	this := p
 	_ = this
 
@@ -754,7 +754,7 @@ InvokeRule(r, argExprsChunks) ::= <<
 	<if(r.ast.options.p)>
 	var _x = p.<r.name>(<r.ast.options.p><if(argExprsChunks)>, <endif><argExprsChunks>)
 	<else>
-	var _x = p.<r.name; format="cap">(<argExprsChunks>)
+	var _x = p.<r.originalName; format="cap">(<argExprsChunks>)
 	<endif>
 
 
@@ -763,7 +763,7 @@ InvokeRule(r, argExprsChunks) ::= <<
 	<if(r.ast.options.p)>
 	p.<r.name>(<r.ast.options.p><if(argExprsChunks)>, <endif><argExprsChunks>)
 	<else>
-	p.<r.name; format="cap">(<argExprsChunks>)
+	p.<r.originalName; format="cap">(<argExprsChunks>)
 	<endif>
 	<endif>
 }
@@ -929,7 +929,7 @@ ContextTokenListIndexedGetterDecl(t) ::= <<
 >>
 
 ContextRuleGetterDecl(r) ::= <<
-<r.name; format="cap">() I<r.ctxName> {
+<r.originalName; format="cap">() I<r.ctxName> {
 	var t antlr.RuleContext;
 	for _, ctx := range s.GetChildren() {
 		if _, ok := ctx.(I<r.ctxName>); ok {
@@ -947,7 +947,7 @@ ContextRuleGetterDecl(r) ::= <<
 >>
 
 ContextRuleListGetterDecl(r) ::= <<
-All<r.name; format="cap">() []I<r.ctxName> {
+All<r.originalName; format="cap">() []I<r.ctxName> {
 	children := s.GetChildren()
 	len := 0
 	for _, ctx := range children {
@@ -970,7 +970,7 @@ All<r.name; format="cap">() []I<r.ctxName> {
 >>
 
 ContextRuleListIndexedGetterDecl(r) ::= <<
-<r.name; format="cap">(i int) I<r.ctxName> {
+<r.originalName; format="cap">(i int) I<r.ctxName> {
 	var t antlr.RuleContext;
 	j := 0
 	for _, ctx := range s.GetChildren() {
@@ -1015,74 +1015,74 @@ type I<struct.name> interface {
 	GetParser() antlr.Parser
 	<if(struct.tokenDecls)>
 
-	<struct.tokenDecls:{a | // Get<a.name; format="cap"> returns the <a.name> token.
-Get<a.name; format="cap">() <TokenLabelType()> }; separator="\n\n">
+	<struct.tokenDecls:{a | // Get<a.originalName; format="cap"> returns the <a.name> token.
+Get<a.originalName; format="cap">() <TokenLabelType()> }; separator="\n\n">
 	<endif>
 
 	<if(struct.tokenDecls)>
 
-	<struct.tokenDecls:{a | // Set<a.name; format="cap"> sets the <a.name> token.
-Set<a.name; format="cap">(<TokenLabelType()>) }; separator="\n\n">
+	<struct.tokenDecls:{a | // Set<a.originalName; format="cap"> sets the <a.name> token.
+Set<a.originalName; format="cap">(<TokenLabelType()>) }; separator="\n\n">
 	<endif>
 
 	<if(struct.tokenTypeDecls)>
 
-	<struct.tokenTypeDecls:{a | // Get<a.name; format="cap"> returns the <a.name> token type.
-Get<a.name; format="cap">() int }; separator="\n\n">
+	<struct.tokenTypeDecls:{a | // Get<a.originalName; format="cap"> returns the <a.name> token type.
+Get<a.originalName; format="cap">() int }; separator="\n\n">
 	<endif>
 
 	<if(struct.tokenTypeDecls)>
 
-	<struct.tokenTypeDecls:{a | // Set<a.name; format="cap"> sets the <a.name> token type.
-Set<a.name; format="cap">(int) }; separator="\n\n">
+	<struct.tokenTypeDecls:{a | // Set<a.originalName; format="cap"> sets the <a.name> token type.
+Set<a.originalName; format="cap">(int) }; separator="\n\n">
 	<endif>
 
 	<if(struct.tokenListDecls)>
 
-	<struct.tokenListDecls:{a | // Get<a.name; format="cap"> returns the <a.name> token list.
-Get<a.name; format="cap">() []<TokenLabelType()>}; separator="\n\n">
+	<struct.tokenListDecls:{a | // Get<a.originalName; format="cap"> returns the <a.name> token list.
+Get<a.originalName; format="cap">() []<TokenLabelType()>}; separator="\n\n">
 	<endif>
 
 	<if(struct.tokenListDecls)>
 
-	<struct.tokenListDecls:{a | // Set<a.name; format="cap"> sets the <a.name> token list.
-Set<a.name; format="cap">([]<TokenLabelType()>)}; separator="\n\n">
+	<struct.tokenListDecls:{a | // Set<a.originalName; format="cap"> sets the <a.name> token list.
+Set<a.originalName; format="cap">([]<TokenLabelType()>)}; separator="\n\n">
 	<endif>
 
 	<if(struct.ruleContextDecls)>
 
-	<struct.ruleContextDecls:{a | // Get<a.name; format="cap"> returns the <a.name> rule contexts.
-Get<a.name; format="cap">() I<a.ctxName>}; separator="\n\n">
+	<struct.ruleContextDecls:{a | // Get<a.originalName; format="cap"> returns the <a.name> rule contexts.
+Get<a.originalName; format="cap">() I<a.ctxName>}; separator="\n\n">
 	<endif>
 
 	<if(struct.ruleContextDecls)>
 
-	<struct.ruleContextDecls:{a | // Set<a.name; format="cap"> sets the <a.name> rule contexts.
-Set<a.name; format="cap">(I<a.ctxName>)}; separator="\n\n">
+	<struct.ruleContextDecls:{a | // Set<a.originalName; format="cap"> sets the <a.name> rule contexts.
+Set<a.originalName; format="cap">(I<a.ctxName>)}; separator="\n\n">
 	<endif>
 
 	<if(struct.ruleContextListDecls)>
 
-	<struct.ruleContextListDecls:{a | // Get<a.name; format="cap"> returns the <a.name> rule context list.
-Get<a.name; format="cap">() []I<a.ctxName>}; separator="\n\n">
+	<struct.ruleContextListDecls:{a | // Get<a.originalName; format="cap"> returns the <a.name> rule context list.
+Get<a.originalName; format="cap">() []I<a.ctxName>}; separator="\n\n">
 	<endif>
 
 	<if(struct.ruleContextListDecls)>
 
-	<struct.ruleContextListDecls:{a | // Set<a.name; format="cap"> sets the <a.name> rule context list.
-Set<a.name; format="cap">([]I<a.ctxName>) }; separator="\n\n">
+	<struct.ruleContextListDecls:{a | // Set<a.originalName; format="cap"> sets the <a.name> rule context list.
+Set<a.originalName; format="cap">([]I<a.ctxName>) }; separator="\n\n">
 	<endif>
 
 	<if(struct.attributeDecls)>
 
-	<struct.attributeDecls:{a | // Get<a.name; format="cap"> returns the <a.name> attribute.
-Get<a.name; format="cap">() <a.type>}; separator="\n\n">
+	<struct.attributeDecls:{a | // Get<a.originalName; format="cap"> returns the <a.name> attribute.
+Get<a.originalName; format="cap">() <a.type>}; separator="\n\n">
 	<endif>
 
 	<if(struct.attributeDecls)>
 
-	<struct.attributeDecls:{a | // Set<a.name; format="cap"> sets the <a.name> attribute.
-Set<a.name; format="cap">(<a.type>)}; separator="\n\n">
+	<struct.attributeDecls:{a | // Set<a.originalName; format="cap"> sets the <a.name> attribute.
+Set<a.originalName; format="cap">(<a.type>)}; separator="\n\n">
 	<endif>
 
 
@@ -1125,62 +1125,62 @@ func New<struct.name>(parser antlr.Parser, parent antlr.ParserRuleContext, invok
 func (s *<struct.name>) GetParser() antlr.Parser { return s.parser }
 <if(struct.tokenDecls)>
 
-<struct.tokenDecls:{a | func (s *<struct.name>) Get<a.name; format="cap">() <TokenLabelType()> { return s.<a.name> \}}; separator="\n\n">
+<struct.tokenDecls:{a | func (s *<struct.name>) Get<a.originalName; format="cap">() <TokenLabelType()> { return s.<a.name> \}}; separator="\n\n">
 <endif>
 
 <if(struct.tokenDecls)>
 
-<struct.tokenDecls:{a | func (s *<struct.name>) Set<a.name; format="cap">(v <TokenLabelType()>) { s.<a.name> = v \}}; separator="\n\n">
+<struct.tokenDecls:{a | func (s *<struct.name>) Set<a.originalName; format="cap">(v <TokenLabelType()>) { s.<a.name> = v \}}; separator="\n\n">
 <endif>
 
 <if(struct.tokenTypeDecls)>
 
-<struct.tokenTypeDecls:{a | func (s *<struct.name>) Get<a.name; format="cap">() int { return s.<a.name> \}}; separator="\n\n">
+<struct.tokenTypeDecls:{a | func (s *<struct.name>) Get<a.originalName; format="cap">() int { return s.<a.name> \}}; separator="\n\n">
 <endif>
 
 <if(struct.tokenTypeDecls)>
 
-<struct.tokenTypeDecls:{a | func (s *<struct.name>) Set<a.name; format="cap">(v int) { s.<a.name> = v \}}; separator="\n\n">
+<struct.tokenTypeDecls:{a | func (s *<struct.name>) Set<a.originalName; format="cap">(v int) { s.<a.name> = v \}}; separator="\n\n">
 <endif>
 
 <if(struct.tokenListDecls)>
 
-<struct.tokenListDecls:{a | func (s *<struct.name>) Get<a.name; format="cap">() []<TokenLabelType()> { return s.<a.name> \}}; separator="\n\n">
+<struct.tokenListDecls:{a | func (s *<struct.name>) Get<a.originalName; format="cap">() []<TokenLabelType()> { return s.<a.name> \}}; separator="\n\n">
 <endif>
 
 <if(struct.tokenListDecls)>
 
-<struct.tokenListDecls:{a | func (s *<struct.name>) Set<a.name; format="cap">(v []<TokenLabelType()>) { s.<a.name> = v \}}; separator="\n\n">
+<struct.tokenListDecls:{a | func (s *<struct.name>) Set<a.originalName; format="cap">(v []<TokenLabelType()>) { s.<a.name> = v \}}; separator="\n\n">
 <endif>
 
 <if(struct.ruleContextDecls)>
 
-<struct.ruleContextDecls:{a | func (s *<struct.name>) Get<a.name; format="cap">() I<a.ctxName> { return s.<a.name> \}}; separator="\n\n">
+<struct.ruleContextDecls:{a | func (s *<struct.name>) Get<a.originalName; format="cap">() I<a.ctxName> { return s.<a.name> \}}; separator="\n\n">
 <endif>
 
 <if(struct.ruleContextDecls)>
 
-<struct.ruleContextDecls:{a | func (s *<struct.name>) Set<a.name; format="cap">(v I<a.ctxName>) { s.<a.name> = v \}}; separator="\n\n">
+<struct.ruleContextDecls:{a | func (s *<struct.name>) Set<a.originalName; format="cap">(v I<a.ctxName>) { s.<a.name> = v \}}; separator="\n\n">
 <endif>
 
 <if(struct.ruleContextListDecls)>
 
-<struct.ruleContextListDecls:{a | func (s *<struct.name>) Get<a.name; format="cap">() []I<a.ctxName> { return s.<a.name> \}}; separator="\n\n">
+<struct.ruleContextListDecls:{a | func (s *<struct.name>) Get<a.originalName; format="cap">() []I<a.ctxName> { return s.<a.name> \}}; separator="\n\n">
 <endif>
 
 <if(struct.ruleContextListDecls)>
 
-<struct.ruleContextListDecls:{a | func (s *<struct.name>) Set<a.name; format="cap">(v []I<a.ctxName>) { s.<a.name> = v \}}; separator="\n\n">
+<struct.ruleContextListDecls:{a | func (s *<struct.name>) Set<a.originalName; format="cap">(v []I<a.ctxName>) { s.<a.name> = v \}}; separator="\n\n">
 <endif>
 
 <if(struct.attributeDecls)>
 
-<struct.attributeDecls:{a | func (s *<struct.name>) Get<a.name; format="cap">() <a.type> { return s.<a.name> \}}; separator="\n\n">
+<struct.attributeDecls:{a | func (s *<struct.name>) Get<a.originalName; format="cap">() <a.type> { return s.<a.name> \}}; separator="\n\n">
 <endif>
 
 <if(struct.attributeDecls)>
 
-<struct.attributeDecls:{a | func (s *<struct.name>) Set<a.name; format="cap">(v <a.type>) { s.<a.name> = v \}}; separator="\n\n">
+<struct.attributeDecls:{a | func (s *<struct.name>) Set<a.originalName; format="cap">(v <a.type>) { s.<a.name> = v \}}; separator="\n\n">
 <endif>
 
 <if(getters)>
@@ -1235,62 +1235,62 @@ func New<struct.name>(parser antlr.Parser, ctx antlr.ParserRuleContext) *<struct
 
 <if(struct.tokenDecls)>
 
-<struct.tokenDecls:{a | func (s *<struct.name>) Get<a.name; format="cap">() <TokenLabelType()> { return s.<a.name> \}}; separator="\n\n">
+<struct.tokenDecls:{a | func (s *<struct.name>) Get<a.originalName; format="cap">() <TokenLabelType()> { return s.<a.name> \}}; separator="\n\n">
 <endif>
 
 <if(struct.tokenDecls)>
 
-<struct.tokenDecls:{a | func (s *<struct.name>) Set<a.name; format="cap">(v <TokenLabelType()>) { s.<a.name> = v \}}; separator="\n\n">
+<struct.tokenDecls:{a | func (s *<struct.name>) Set<a.originalName; format="cap">(v <TokenLabelType()>) { s.<a.name> = v \}}; separator="\n\n">
 <endif>
 
 <if(struct.tokenTypeDecls)>
 
-<struct.tokenTypeDecls:{a | func (s *<struct.name>) Get<a.name; format="cap">() int { return s.<a.name> \}}; separator="\n\n">
+<struct.tokenTypeDecls:{a | func (s *<struct.name>) Get<a.originalName; format="cap">() int { return s.<a.name> \}}; separator="\n\n">
 <endif>
 
 <if(struct.tokenTypeDecls)>
 
-<struct.tokenTypeDecls:{a | func (s *<struct.name>) Set<a.name; format="cap">(v int) { s.<a.name> = v \}}; separator="\n\n">
+<struct.tokenTypeDecls:{a | func (s *<struct.name>) Set<a.originalName; format="cap">(v int) { s.<a.name> = v \}}; separator="\n\n">
 <endif>
 
 <if(struct.tokenListDecls)>
 
-<struct.tokenListDecls:{a | func (s *<struct.name>) Get<a.name; format="cap">() []<TokenLabelType()> { return s.<a.name> \}}; separator="\n\n">
+<struct.tokenListDecls:{a | func (s *<struct.name>) Get<a.originalName; format="cap">() []<TokenLabelType()> { return s.<a.name> \}}; separator="\n\n">
 <endif>
 
 <if(struct.tokenListDecls)>
 
-<struct.tokenListDecls:{a | func (s *<struct.name>) Set<a.name; format="cap">(v []<TokenLabelType()>) { s.<a.name> = v \}}; separator="\n\n">
+<struct.tokenListDecls:{a | func (s *<struct.name>) Set<a.originalName; format="cap">(v []<TokenLabelType()>) { s.<a.name> = v \}}; separator="\n\n">
 <endif>
 
 <if(struct.ruleContextDecls)>
 
-<struct.ruleContextDecls:{a | func (s *<struct.name>) Get<a.name; format="cap">() I<a.ctxName> { return s.<a.name> \}}; separator="\n\n">
+<struct.ruleContextDecls:{a | func (s *<struct.name>) Get<a.originalName; format="cap">() I<a.ctxName> { return s.<a.name> \}}; separator="\n\n">
 <endif>
 
 <if(struct.ruleContextDecls)>
 
-<struct.ruleContextDecls:{a | func (s *<struct.name>) Set<a.name; format="cap">(v I<a.ctxName>) { s.<a.name> = v \}}; separator="\n\n">
+<struct.ruleContextDecls:{a | func (s *<struct.name>) Set<a.originalName; format="cap">(v I<a.ctxName>) { s.<a.name> = v \}}; separator="\n\n">
 <endif>
 
 <if(struct.ruleContextListDecls)>
 
-<struct.ruleContextListDecls:{a | func (s *<struct.name>) Get<a.name; format="cap">() []I<a.ctxName> { return s.<a.name> \}}; separator="\n\n">
+<struct.ruleContextListDecls:{a | func (s *<struct.name>) Get<a.originalName; format="cap">() []I<a.ctxName> { return s.<a.name> \}}; separator="\n\n">
 <endif>
 
 <if(struct.ruleContextListDecls)>
 
-<struct.ruleContextListDecls:{a | func (s *<struct.name>) Set<a.name; format="cap">(v []I<a.ctxName>) { s.<a.name> = v \}}; separator="\n\n">
+<struct.ruleContextListDecls:{a | func (s *<struct.name>) Set<a.originalName; format="cap">(v []I<a.ctxName>) { s.<a.name> = v \}}; separator="\n\n">
 <endif>
 
 <if(struct.attributeDecls)>
 
-<struct.attributeDecls:{a | func (s *<struct.name>) Get<a.name; format="cap">() <a.type> { return s.<a.name> \}}; separator="\n\n">
+<struct.attributeDecls:{a | func (s *<struct.name>) Get<a.originalName; format="cap">() <a.type> { return s.<a.name> \}}; separator="\n\n">
 <endif>
 
 <if(struct.attributeDecls)>
 
-<struct.attributeDecls:{a | func (s *<struct.name>) Set<a.name; format="cap">(v <a.type>) { s.<a.name> = v \}}; separator="\n\n">
+<struct.attributeDecls:{a | func (s *<struct.name>) Set<a.originalName; format="cap">(v <a.type>) { s.<a.name> = v \}}; separator="\n\n">
 <endif>
 
 func (s *<struct.name>) GetRuleContext() antlr.RuleContext {
@@ -1411,11 +1411,11 @@ var serializedLexerAtn []uint16
 
 
 var lexerChannelNames = []string{
-	"DEFAULT_TOKEN_CHANNEL", "HIDDEN"<if (lexer.channels)>, <lexer.channels:{c | "<c>"}; separator=", ", wrap><endif>,
+	"DEFAULT_TOKEN_CHANNEL", "HIDDEN"<if (lexer.channelNames)>, <lexer.channelNames:{c | "<c>"}; separator=", ", wrap><endif>,
 }
 
 var lexerModeNames = []string{
-	<lexer.modes:{m | "<m>"}; separator=", ", wrap>,
+	<lexer.escapedModeNames:{m | "<m>"}; separator=", ", wrap>,
 }
 
 <if(lexer.literalNames)>
@@ -1502,17 +1502,17 @@ const (
 const <lexer.name><first(lexer.channels)> = <lexer.channels.(first(lexer.channels))>
 <endif>
 
-<if(rest(rest(lexer.modes)))>
+<if(rest(rest(lexer.escapedModeNames)))>
 
 // <lexer.name> modes.
 const (
-	<first(rest(lexer.modes)):{m | <lexer.name><m> = iota + 1}>
-	<rest(rest(lexer.modes)):{m | <lexer.name><m>}; separator="\n">
+	<first(rest(lexer.escapedModeNames)):{m | <lexer.name><m> = iota + 1}>
+	<rest(rest(lexer.escapedModeNames)):{m | <lexer.name><m>}; separator="\n">
 )
-<elseif(rest(lexer.modes))>
+<elseif(rest(lexer.escapedModeNames))>
 
-// <lexer.name><first(rest(lexer.modes))> is the <lexer.name> mode.
-const <lexer.name><first(rest(lexer.modes))> = 1
+// <lexer.name><first(rest(lexer.escapedModeNames))> is the <lexer.name> mode.
+const <lexer.name><first(rest(lexer.escapedModeNames))> = 1
 <endif>
 <if(namedActions.members)>
 

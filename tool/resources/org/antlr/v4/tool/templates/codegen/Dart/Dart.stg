@@ -234,7 +234,7 @@ class <parser.name> extends <superClass; null="Parser"> {
     switch (ruleIndex) {
     <parser.sempredFuncs.values:{f|
 case <f.ruleIndex>:
-  return _<f.name>_sempred(_localctx as <f.ctxType>?, predIndex);}; separator="\n">
+  return _<f.originalName>_sempred(_localctx as <f.ctxType>?, predIndex);}; separator="\n">
     }
     return true;
   }
@@ -280,7 +280,7 @@ bool sempred(RuleContext? _localctx, int ruleIndex, int predIndex) {
   switch (ruleIndex) {
   <recog.sempredFuncs.values:{f|
 case <f.ruleIndex>:
-  return _<f.name>_sempred(_localctx, predIndex);}; separator="\n">
+  return _<f.originalName>_sempred(_localctx, predIndex);}; separator="\n">
   }
   return true;
 }
@@ -307,7 +307,7 @@ void _<r.name>_action(<r.ctxType>? _localctx, int actionIndex) {
 /// This generates a private method since the predIndex is generated, making an
 /// overriding implementation impossible to maintain.
 RuleSempredFunction(r, actions) ::= <<
-bool _<r.name>_sempred(dynamic _localctx, int predIndex) {
+bool _<r.originalName>_sempred(dynamic _localctx, int predIndex) {
   switch (predIndex) {
     <actions:{index|case <index>: return <actions.(index)>;}; separator="\n">
   }
@@ -317,7 +317,7 @@ bool _<r.name>_sempred(dynamic _localctx, int predIndex) {
 
 RuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAction,postamble,exceptions) ::= <<
 
-<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else><endif><currentRule.ctxType> <currentRule.name>(<args; separator=", ">) {
+<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else><endif><currentRule.ctxType> <currentRule.escapedName>(<args; separator=", ">) {
   dynamic _localctx = <currentRule.ctxType>(context, state<currentRule.args:{a | , <a.name>}>);
   enterRule(_localctx, <currentRule.startState>, RULE_<currentRule.name>);
   <namedActions.init>
@@ -345,7 +345,7 @@ LeftRecursiveRuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,
   namedActions,finallyAction,postamble) ::=
 <<
 
-<currentRule.ctxType> <currentRule.name>([int _p = 0]<args:{a | , <a>}>) {
+<currentRule.ctxType> <currentRule.escapedName>([int _p = 0]<args:{a | , <a>}>) {
   final _parentctx = context;
   final _parentState = state;
   dynamic _localctx = <currentRule.ctxType>(context, _parentState<currentRule.args:{a | , <a.name>}>);
@@ -810,14 +810,14 @@ class <lexer.name> extends <superClass; null="Lexer"> {
   static const int
     <lexer.channels:{c | <c> = <lexer.channels.(c)>}; separator=", ", wrap, anchor>;
   <endif>
-  <if(rest(lexer.modes))>
+  <if(rest(lexer.escapedModeNames))>
   static const int
-    <rest(lexer.modes):{m | <m> = <i>}; separator=", ", wrap, anchor>;
+    <rest(lexer.escapedModeNames):{m | <m> = <i>}; separator=", ", wrap, anchor>;
   <endif>
 
   @override
   final List\<String> channelNames = [
-    'DEFAULT_TOKEN_CHANNEL', 'HIDDEN'<if (lexer.channels)>, <lexer.channels:{c| '<c>'}; separator=", ", wrap, anchor><endif>
+    'DEFAULT_TOKEN_CHANNEL', 'HIDDEN'<if (lexer.channelNames)>, <lexer.channelNames:{c| '<c>'}; separator=", ", wrap, anchor><endif>
   ];
 
   @override

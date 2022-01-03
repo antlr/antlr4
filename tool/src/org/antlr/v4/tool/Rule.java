@@ -52,7 +52,8 @@ public class Rule implements AttributeResolver {
 		validLexerCommands.add("more");
 	}
 
-	public String name;
+	public final String name;
+	public String escapedName;
 	public List<GrammarAST> modifiers;
 
 	public RuleAST ast;
@@ -61,7 +62,7 @@ public class Rule implements AttributeResolver {
 	public AttributeDict locals;
 
 	/** In which grammar does this rule live? */
-	public Grammar g;
+	public final Grammar g;
 
 	/** If we're in a lexer grammar, we might be in a mode */
 	public final String mode;
@@ -93,7 +94,7 @@ public class Rule implements AttributeResolver {
 
 	public ActionAST finallyAction;
 
-	public int numberOfAlts;
+	public final int numberOfAlts;
 
 	public boolean isStartRule = true; // nobody calls us
 

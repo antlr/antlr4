@@ -57,9 +57,9 @@ public:
   };
 <endif>
 
-<if (rest(lexer.modes))>
+<if (rest(lexer.escapedModeNames))>
   enum {
-    <rest(lexer.modes): {m | <m> = <i>}; separator=", ", wrap, anchor>
+    <rest(lexer.escapedModeNames): {m | <m> = <i>}; separator=", ", wrap, anchor>
   };
 <endif>
 
@@ -164,7 +164,7 @@ void <lexer.name>::action(RuleContext *context, size_t ruleIndex, size_t actionI
 <if (sempredFuncs)>
 bool <lexer.name>::sempred(RuleContext *context, size_t ruleIndex, size_t predicateIndex) {
   switch (ruleIndex) {
-    <lexer.sempredFuncs.values: {f | case <f.ruleIndex>: return <f.name>Sempred(antlrcpp::downCast\<<f.ctxType> *>(context), predicateIndex);}; separator="\n">
+    <lexer.sempredFuncs.values: {f | case <f.ruleIndex>: return <f.originalName>Sempred(antlrcpp::downCast\<<f.ctxType> *>(context), predicateIndex);}; separator="\n">
 
   default:
     break;
@@ -190,7 +190,7 @@ std::vector\<std::string> <lexer.name>::_ruleNames = {
 };
 
 std::vector\<std::string> <lexer.name>::_channelNames = {
-  "DEFAULT_TOKEN_CHANNEL", "HIDDEN"<if (lexer.channels)>, <lexer.channels: {c | "<c>"}; separator = ", ", wrap, anchor><endif>
+  "DEFAULT_TOKEN_CHANNEL", "HIDDEN"<if (lexer.channelNames)>, <lexer.channelNames: {c | "<c>"}; separator = ", ", wrap, anchor><endif>
 };
 
 std::vector\<std::string> <lexer.name>::_modeNames = {
@@ -231,13 +231,13 @@ void <r.factory.grammar.name>::<r.name>Action(<r.ctxType> *context, size_t actio
 >>
 
 RuleSempredFunctionHeader(r, actions) ::= <<
-bool <r.name>Sempred(<r.ctxType> *_localctx, size_t predicateIndex);
+bool <r.originalName>Sempred(<r.ctxType> *_localctx, size_t predicateIndex);
 >>
 
 RuleSempredFunction(r, actions) ::= <<
 <! Called for both lexer and parser. But only one of them is actually available. Testing for the parser directly
    generates a warning, however. So do the check via the factory instead. !>
-bool <if (r.factory.g.lexer)><lexer.name><else><parser.name><endif>::<r.name>Sempred(<r.ctxType> *_localctx, size_t predicateIndex) {
+bool <if (r.factory.g.lexer)><lexer.name><else><parser.name><endif>::<r.originalName>Sempred(<r.ctxType> *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
     <actions: {index | case <index>: return <actions.(index)>}; separator=";\n">;
 
@@ -337,7 +337,7 @@ dfa::Vocabulary& <parser.name>::getVocabulary() const {
 bool <parser.name>::sempred(RuleContext *context, size_t ruleIndex, size_t predicateIndex) {
   switch (ruleIndex) {
   <parser.sempredFuncs.values: {f |
-  case <f.ruleIndex>: return <f.name>Sempred(antlrcpp::downCast\<<f.ctxType> *>(context), predicateIndex);}; separator="\n">
+  case <f.ruleIndex>: return <f.originalName>Sempred(antlrcpp::downCast\<<f.ctxType> *>(context), predicateIndex);}; separator="\n">
 
   default:
     break;
@@ -404,14 +404,14 @@ for (size_t i = 0; i \< count; i++) { <! Rework class ATN to allow standard iter
 RuleFunctionHeader(currentRule, args, code, locals, ruleCtx, altLabelCtxs, namedActions, finallyAction, postamble, exceptions) ::= <<
 <ruleCtx>
 <! TODO: untested !><if (altLabelCtxs)><altLabelCtxs: {l | <altLabelCtxs.(l)>}; separator="\n"><endif>
-<currentRule.ctxType>* <currentRule.name>(<args; separator=",">);
+<currentRule.ctxType>* <currentRule.escapedName>(<args; separator=",">);
 
 >>
 
 RuleFunction(currentRule, args, code, locals, ruleCtx, altLabelCtxs, namedActions, finallyAction, postamble, exceptions) ::= <<
 <ruleCtx>
 <! TODO: untested !><altLabelCtxs: {l | <altLabelCtxs.(l)>}; separator = "\n">
-<parser.name>::<currentRule.ctxType>* <parser.name>::<currentRule.name>(<args; separator=",">) {
+<parser.name>::<currentRule.ctxType>* <parser.name>::<currentRule.escapedName>(<args; separator=",">) {
   <currentRule.ctxType> *_localctx = _tracker.createInstance\<<currentRule.ctxType>\>(_ctx, getState()<currentRule.args:{a | , <a.name>}>);
   enterRule(_localctx, <currentRule.startState>, <parser.name>::Rule<currentRule.name; format = "cap">);
   <namedActions.init>
@@ -450,19 +450,19 @@ RuleFunction(currentRule, args, code, locals, ruleCtx, altLabelCtxs, namedAction
 LeftRecursiveRuleFunctionHeader(currentRule, args, code, locals, ruleCtx, altLabelCtxs, namedActions, finallyAction, postamble) ::= <<
 <ruleCtx>
 <! TODO: untested !><altLabelCtxs: {l | <altLabelCtxs.(l)>}; separator="\n">
-<currentRule.ctxType>* <currentRule.name>(<currentRule.args; separator = ", ">);
-<currentRule.ctxType>* <currentRule.name>(int precedence<currentRule.args: {a | , <a>}>);
+<currentRule.ctxType>* <currentRule.escapedName>(<currentRule.args; separator = ", ">);
+<currentRule.ctxType>* <currentRule.escapedName>(int precedence<currentRule.args: {a | , <a>}>);
 >>
 
 LeftRecursiveRuleFunction(currentRule, args, code, locals, ruleCtx, altLabelCtxs, namedActions, finallyAction, postamble) ::= <<
 <ruleCtx>
 <altLabelCtxs: {l | <altLabelCtxs.(l)>}; separator="\n">
 
-<parser.name>::<currentRule.ctxType>* <parser.name>::<currentRule.name>(<currentRule.args; separator=", ">) {
-<! TODO: currentRule.args untested !>   return <currentRule.name>(0<currentRule.args: {a | , <a.name>}>);
+<parser.name>::<currentRule.ctxType>* <parser.name>::<currentRule.escapedName>(<currentRule.args; separator=", ">) {
+<! TODO: currentRule.args untested !>   return <currentRule.escapedName>(0<currentRule.args: {a | , <a.name>}>);
 }
 
-<parser.name>::<currentRule.ctxType>* <parser.name>::<currentRule.name>(int precedence<currentRule.args:{a | , <a>}>) {
+<parser.name>::<currentRule.ctxType>* <parser.name>::<currentRule.escapedName>(int precedence<currentRule.args:{a | , <a>}>) {
   ParserRuleContext *parentContext = _ctx;
   size_t parentState = getState();
   <parser.name>::<currentRule.ctxType> *_localctx = _tracker.createInstance\<<currentRule.ctxType>\>(_ctx, parentState<currentRule.args: {a | , <a.name>}>);

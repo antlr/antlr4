@@ -1,0 +1,35 @@
+[notes]
+https://github.com/antlr/antlr4/issues/1070
+
+[type]
+Parser
+
+[grammar]
+grammar G;
+
+root
+    : {0==0}? continue+ {<writeln("$text")>}
+    ;
+
+continue returns [int return]
+    : for for? {1==1}?              #else
+    | break=BREAK BREAK+ (for | IF) #class
+    | if+=IF  if+=IF*               #int
+    | continue CONTINUE             #static
+    ;
+
+for: FOR;
+FOR: 'for_';
+BREAK: 'break_';
+IF: 'if_';
+CONTINUE: 'continue_';
+
+[start]
+root
+
+[input]
+for_for_break_break_for_if_if_for_continue_
+
+[output]
+"""for_for_break_break_for_if_if_for_continue_
+"""

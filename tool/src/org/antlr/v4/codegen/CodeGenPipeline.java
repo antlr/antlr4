@@ -5,15 +5,11 @@
  */
 package org.antlr.v4.codegen;
 
-import org.antlr.v4.parse.ANTLRParser;
-import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
-import org.antlr.v4.tool.ast.GrammarAST;
+import org.antlr.v4.tool.Rule;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.gui.STViz;
-
-import java.util.List;
 
 public class CodeGenPipeline {
 	final Grammar g;
@@ -25,23 +21,12 @@ public class CodeGenPipeline {
 	}
 
 	public void process() {
-		IntervalSet idTypes = new IntervalSet();
-		idTypes.add(ANTLRParser.ID);
-		idTypes.add(ANTLRParser.RULE_REF);
-		idTypes.add(ANTLRParser.TOKEN_REF);
-		List<GrammarAST> idNodes = g.ast.getNodesWithType(idTypes);
-		for (GrammarAST idNode : idNodes) {
-			if ( gen.getTarget().grammarSymbolCausesIssueInGeneratedCode(idNode) ) {
-				g.tool.errMgr.grammarError(ErrorType.USE_OF_BAD_WORD,
-				                           g.fileName, idNode.getToken(),
-				                           idNode.getText());
-			}
-		}
-
 		// all templates are generated in memory to report the most complete
 		// error information possible, but actually writing output files stops
 		// after the first error is reported
 		int errorCount = g.tool.errMgr.getNumErrors();
+
+		assignRuntimeRuleNames();
 
 		if ( g.isLexer() ) {
 			if (gen.getTarget().needsHeader()) {
@@ -119,6 +104,13 @@ public class CodeGenPipeline {
 			}
 		}
 		gen.writeVocabFile();
+	}
+
+	private void assignRuntimeRuleNames() {
+		Target target = gen.getTarget();
+		for (Rule rule : g.rules.values()) {
+			rule.escapedName = target.escapeIfNeeded(rule.name);
+		}
 	}
 
 	protected void writeRecognizer(ST template, CodeGenerator gen, boolean header) {

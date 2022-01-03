@@ -289,7 +289,7 @@ Parser_(parser, funcs, atn, sempredFuncs, ctor, superClass) ::= <<
 		switch (ruleIndex) {
 		<parser.sempredFuncs.values:{f|
 case  <f.ruleIndex>:
-	return try <f.name>_sempred(_localctx?.castdown(<f.ctxType>.self), predIndex)}; separator="\n">
+	return try <f.originalName>_sempred(_localctx?.castdown(<f.ctxType>.self), predIndex)}; separator="\n">
 	    default: return true
 		}
 		<!return true;!>
@@ -338,7 +338,7 @@ func sempred(_ _localctx: RuleContext?, _  ruleIndex: Int,_   predIndex: Int) th
 	switch (ruleIndex) {
 	<recog.sempredFuncs.values:{f|
 case <f.ruleIndex>:
-	return try <f.name>_sempred(_localctx?.castdown(<f.ctxType>.self), predIndex)}; separator="\n">
+	return try <f.originalName>_sempred(_localctx?.castdown(<f.ctxType>.self), predIndex)}; separator="\n">
 	default: return true
 	}
 	<!return true;!>
@@ -382,7 +382,7 @@ case <index>:
  * overriding implementation impossible to maintain.
  */
 RuleSempredFunction(r, actions) ::= <<
-private func <r.name>_sempred(_ _localctx: <r.ctxType>!,  _ predIndex: Int) throws -> Bool {
+private func <r.originalName>_sempred(_ _localctx: <r.ctxType>!,  _ predIndex: Int) throws -> Bool {
 	switch (predIndex) {
 	<actions:{index|
     case <index>:return <actions.(index)>}; separator="\n">
@@ -396,7 +396,7 @@ RuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,namedActions,fina
 <ruleCtx>
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
 @discardableResult
-<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else> <accessLevelOpenOK(parser)> func <endif><currentRule.name>(<if(first(args))>_ <endif><args; separator=", _">) throws -> <currentRule.ctxType> {
+<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else> <accessLevelOpenOK(parser)> func <endif><currentRule.escapedName>(<if(first(args))>_ <endif><args; separator=", _">) throws -> <currentRule.ctxType> {
 	var _localctx: <currentRule.ctxType>
 	_localctx = <currentRule.ctxType>(_ctx, getState()<currentRule.args:{a | , <a.name>}>)
 	try enterRule(_localctx, <currentRule.startState>, <parser.name>.RULE_<currentRule.name>)
@@ -435,11 +435,11 @@ LeftRecursiveRuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,
 <ruleCtx>
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
 
-<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else> <accessLevelNotOpen(parser)> final <endif> func <currentRule.name>( <if(first(args))>_ <endif><args; separator=", _">) throws -> <currentRule.ctxType>   {
-	return try <currentRule.name>(0<currentRule.args:{a | , <a.name>}>)
+<if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else> <accessLevelNotOpen(parser)> final <endif> func <currentRule.escapedName>( <if(first(args))>_ <endif><args; separator=", _">) throws -> <currentRule.ctxType>   {
+	return try <currentRule.escapedName>(0<currentRule.args:{a | , <a.name>}>)
 }
 @discardableResult
-private func <currentRule.name>(_ _p<args:{a | , <a>}>: Int) throws -> <currentRule.ctxType>   {
+private func <currentRule.escapedName>(_ _p<args:{a | , <a>}>: Int) throws -> <currentRule.ctxType>   {
 	let _parentctx: ParserRuleContext? = _ctx
 	let _parentState: Int = getState()
 	var _localctx: <currentRule.ctxType>
@@ -989,13 +989,13 @@ Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
 	<accessLevelNotOpen(lexer)>
 	static let <lexer.channels:{k | <k>=<lexer.channels.(k)>}; separator=", ", wrap, anchor>
 	<endif>
-	<if(rest(lexer.modes))>
+	<if(rest(lexer.escapedModeNames))>
 	<accessLevelNotOpen(lexer)>
-	static let <rest(lexer.modes):{m| <m>=<i>}; separator=", ", wrap, anchor>
+	static let <rest(lexer.escapedModeNames):{m| <m>=<i>}; separator=", ", wrap, anchor>
 	<endif>
 	<accessLevelNotOpen(lexer)>
 	static let channelNames: [String] = [
-		"DEFAULT_TOKEN_CHANNEL", "HIDDEN"<if (lexer.channels)>, <lexer.channels:{c| "<c>"}; separator=", ", wrap, anchor><endif>
+		"DEFAULT_TOKEN_CHANNEL", "HIDDEN"<if (lexer.channelNames)>, <lexer.channelNames:{c| "<c>"}; separator=", ", wrap, anchor><endif>
 	]
 
 	<accessLevelNotOpen(lexer)>

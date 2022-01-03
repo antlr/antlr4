@@ -155,7 +155,7 @@ class <parser.name> ( <if(superClass)><superClass><else>Parser<endif> ):
         if self._predicates == None:
             self._predicates = dict()
 <parser.sempredFuncs.values:{f |
-        self._predicates[<f.ruleIndex>] = self.<f.name>_sempred}; separator="\n        ">
+        self._predicates[<f.ruleIndex>] = self.<f.originalName>_sempred}; separator="\n        ">
         pred = self._predicates.get(ruleIndex, None)
         if pred is None:
             raise Exception("No predicate with index:" + str(ruleIndex))
@@ -191,7 +191,7 @@ def sempred(self, localctx, ruleIndex, predIndex):
     if self._predicates is None:
         preds = dict()
 <recog.sempredFuncs.values:{f|
-        preds[<f.ruleIndex>] = self.<f.name>_sempred}; separator="\n">
+        preds[<f.ruleIndex>] = self.<f.originalName>_sempred}; separator="\n">
         self._predicates = preds
     pred = self._predicates.get(ruleIndex, None)
     if pred is not None:
@@ -232,7 +232,7 @@ def <r.name>_action(self, localctx , actionIndex):
  * overriding implementation impossible to maintain.
  */
 RuleSempredFunction(r, actions) ::= <<
-def <r.name>_sempred(self, localctx, predIndex):
+def <r.originalName>_sempred(self, localctx, predIndex):
     <actions:{index|
 <if(first(actions))>
     if predIndex == <index>:
@@ -250,7 +250,7 @@ RuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,namedActions,fina
 
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
 
-def <currentRule.name>(self<currentRule.args:{a | , <a.name>}>):
+def <currentRule.escapedName>(self<currentRule.args:{a | , <a.name>}>):
 
     localctx = <parser.name>.<currentRule.ctxType>(self, self._ctx, self.state<currentRule.args:{a | , <a.name>}>)
     self.enterRule(localctx, <currentRule.startState>, self.RULE_<currentRule.name>)
@@ -282,7 +282,7 @@ LeftRecursiveRuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,
 <ruleCtx>
 <altLabelCtxs:{l | <altLabelCtxs.(l)>}; separator="\n">
 
-def <currentRule.name>(self, _p=0<if(currentRule.args)>, <args:{a | , <a>}><endif>):
+def <currentRule.escapedName>(self, _p=0<if(currentRule.args)>, <args:{a | , <a>}><endif>):
     _parentctx = self._ctx
     _parentState = self.state
     localctx = <parser.name>.<currentRule.ctxType>(self, self._ctx, _parentState<args:{a | , <a.name>}>)
@@ -773,15 +773,15 @@ class <lexer.name>(<if(superClass)><superClass><else>Lexer<endif>):
     <lexer.channels:{c| <c> = <lexer.channels.(c)>}; separator="\n">
 
 <endif>
-<if(rest(lexer.modes))>
-    <rest(lexer.modes):{m| <m> = <i>}; separator="\n">
+<if(rest(lexer.escapedModeNames))>
+    <rest(lexer.escapedModeNames):{m| <m> = <i>}; separator="\n">
 
 <endif>
     <if(lexer.tokens)>
     <lexer.tokens:{k | <k> = <lexer.tokens.(k)>}; separator="\n", wrap, anchor>
     <endif>
 
-    channelNames = [ u"DEFAULT_TOKEN_CHANNEL", u"HIDDEN"<if (lexer.channels)>, <lexer.channels:{c| u"<c>"}; separator=", ", wrap, anchor><endif> ]
+    channelNames = [ u"DEFAULT_TOKEN_CHANNEL", u"HIDDEN"<if (lexer.channelNames)>, <lexer.channelNames:{c| u"<c>"}; separator=", ", wrap, anchor><endif> ]
 
     modeNames = [ <lexer.modes:{m| u"<m>"}; separator=", ", wrap, anchor> ]
 
