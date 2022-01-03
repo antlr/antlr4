@@ -24,8 +24,8 @@ import java.util.List;
 
 /** */
 public class InvokeRule extends RuleElement implements LabeledOp {
-	public final String originalName;
 	public final String name;
+	public final String escapedName;
 	public final OrderedHashSet<Decl> labels = new OrderedHashSet<Decl>(); // TODO: should need just 1
 	public final String ctxName;
 
@@ -41,8 +41,8 @@ public class InvokeRule extends RuleElement implements LabeledOp {
 		Target target = gen.getTarget();
 		String identifier = ast.getText();
 		Rule r = factory.getGrammar().getRule(identifier);
-		this.originalName = r.name;
-		this.name = r.escapedName;
+		this.name = r.name;
+		this.escapedName = gen.getTarget().escapeIfNeeded(name);
 		ctxName = target.getRuleFunctionContextStructName(r);
 
 		// TODO: move to factory

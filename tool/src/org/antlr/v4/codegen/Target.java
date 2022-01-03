@@ -100,8 +100,6 @@ public abstract class Target {
 		return word + "_";
 	}
 
-	protected boolean supportsWordEscaping() { return false; }
-
 	protected void genFile(Grammar g, ST outputFileST, String fileName)
 	{
 		getCodeGenerator().write(outputFileST, fileName);

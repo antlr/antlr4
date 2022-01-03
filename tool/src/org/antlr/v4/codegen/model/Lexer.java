@@ -15,8 +15,8 @@ import org.antlr.v4.tool.Rule;
 import java.util.*;
 
 public class Lexer extends Recognizer {
-	public final Map<String, Integer> channels;
 	public final Collection<String> channelNames;
+	public final Map<String, Integer> escapedChannels;
 	public final LexerFile file;
 	public final Collection<String> modes;
 	public final Collection<String> escapedModeNames;
@@ -31,11 +31,11 @@ public class Lexer extends Recognizer {
 		Grammar g = factory.getGrammar();
 		Target target = factory.getGenerator().getTarget();
 
-		channels = new LinkedHashMap<>();
+		escapedChannels = new LinkedHashMap<>();
 		channelNames = new ArrayList<>();
 		for (String key : g.channelNameToValueMap.keySet()) {
 			Integer value = g.channelNameToValueMap.get(key);
-			channels.put(target.escapeIfNeeded(key), value);
+			escapedChannels.put(target.escapeIfNeeded(key), value);
 			channelNames.add(key);
 		}
 

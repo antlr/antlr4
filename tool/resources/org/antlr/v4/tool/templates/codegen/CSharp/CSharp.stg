@@ -309,7 +309,7 @@ public partial class <parser.name> : <superClass; null="Parser"> {
 	public override bool Sempred(RuleContext _localctx, int ruleIndex, int predIndex) {
 		switch (ruleIndex) {
 		<parser.sempredFuncs.values:{f|
-case <f.ruleIndex>: return <f.originalName>_sempred((<f.ctxType>)_localctx, predIndex);}; separator="\n">
+case <f.ruleIndex>: return <f.name>_sempred((<f.ctxType>)_localctx, predIndex);}; separator="\n">
 		}
 		return true;
 	}
@@ -353,7 +353,7 @@ case <f.ruleIndex> : <f.name>_action(<if(!recog.modes)>(<f.ctxType>)<endif>_loca
 public override bool Sempred(RuleContext _localctx, int ruleIndex, int predIndex) {
 	switch (ruleIndex) {
 	<recog.sempredFuncs.values:{f|
-case <f.ruleIndex> : return <f.originalName>_sempred(<if(!recog.modes)>(<f.ctxType>)<endif>_localctx, predIndex);}; separator="\n">
+case <f.ruleIndex> : return <f.name>_sempred(<if(!recog.modes)>(<f.ctxType>)<endif>_localctx, predIndex);}; separator="\n">
 	}
 	return true;
 }
@@ -387,7 +387,7 @@ case <index>: <actions.(index)> break;}; separator="\n">
  * overriding implementation impossible to maintain.
  */
 RuleSempredFunction(r, actions) ::= <<
-private bool <r.originalName>_sempred(<r.ctxType> _localctx, int predIndex) {
+private bool <r.name>_sempred(<r.ctxType> _localctx, int predIndex) {
 	switch (predIndex) {
 	<actions:{index|
 case <index>: return <actions.(index)>;}; separator="\n">
@@ -405,7 +405,7 @@ RuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,namedActions,fina
 
 [RuleVersion(<namedActions.version; null="0">)]
 <if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public <endif><currentRule.ctxType> <currentRule.escapedName>(<args; separator=", ">) {
-	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(Context, State<currentRule.args:{a | , <a.name>}>);
+	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(Context, State<currentRule.args:{a | , <a.escapedName>}>);
 	EnterRule(_localctx, <currentRule.startState>, RULE_<currentRule.name>);
 	<namedActions.init>
 	<locals; separator="\n">
@@ -438,7 +438,7 @@ LeftFactoredRuleFunction(currentRule,args,code,locals,namedActions,finallyAction
 <<
 
 <if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>private <endif><currentRule.ctxType> <currentRule.escapedName>(<args; separator=", ">) {
-	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(Context, State<currentRule.args:{a | , <a.name>}>);
+	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(Context, State<currentRule.args:{a | , <a.escapedName>}>);
 	EnterLeftFactoredRule(_localctx, <currentRule.startState>, RULE_<currentRule.variantOf>);
 	<namedActions.init>
 	<locals; separator="\n">
@@ -470,7 +470,7 @@ LeftUnfactoredRuleFunction(currentRule,args,code,locals,namedActions,finallyActi
 <<
 
 <if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>private <endif><currentRule.ctxType> <currentRule.escapedName>(<args; separator=", ">) {
-	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(Context, State<currentRule.args:{a | , <a.name>}>);
+	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(Context, State<currentRule.args:{a | , <a.escapedName>}>);
 	EnterRule(_localctx, <currentRule.startState>, RULE_<currentRule.variantOf>);
 	<namedActions.init>
 	<locals; separator="\n">
@@ -504,13 +504,13 @@ LeftRecursiveRuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,
 
 [RuleVersion(<namedActions.version; null="0">)]
 <if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else>public <endif><currentRule.ctxType> <currentRule.escapedName>(<args; separator=", ">) {
-	return <currentRule.escapedName>(0<currentRule.args:{a | , <a.name>}>);
+	return <currentRule.escapedName>(0<currentRule.args:{a | , <a.escapedName>}>);
 }
 
 private <currentRule.ctxType> <currentRule.escapedName>(int _p<args:{a | , <a>}>) {
 	ParserRuleContext _parentctx = Context;
 	int _parentState = State;
-	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(Context, _parentState<currentRule.args:{a | , <a.name>}>);
+	<currentRule.ctxType> _localctx = new <currentRule.ctxType>(Context, _parentState<currentRule.args:{a | , <a.escapedName>}>);
 	<currentRule.ctxType> _prevctx = _localctx;
 	int _startState = <currentRule.startState>;
 	EnterRecursionRule(_localctx, <currentRule.startState>, RULE_<currentRule.name>, _p);
@@ -709,7 +709,7 @@ cases(ttypes) ::= <<
 
 InvokeRule(r, argExprsChunks) ::= <<
 State = <r.stateNumber>;
-<if(r.labels)><r.labels:{l | <labelref(l)> = }><endif><r.name>(<if(r.ast.options.p)><r.ast.options.p><if(argExprsChunks)>,<endif><endif><argExprsChunks>);
+<if(r.labels)><r.labels:{l | <labelref(l)> = }><endif><r.escapedName>(<if(r.ast.options.p)><r.ast.options.p><if(argExprsChunks)>,<endif><endif><argExprsChunks>);
 >>
 
 MatchToken(m) ::= <<
@@ -769,15 +769,15 @@ LexerPushModeCommand(arg, grammar)  ::= "PushMode(<modeName.(arg)>);"
 
 ActionText(t) ::= "<t.text>"
 ActionTemplate(t) ::= "<t.st>"
-ArgRef(a) ::= "_localctx.<a.name>"
-LocalRef(a) ::= "_localctx.<a.name>"
-RetValueRef(a) ::= "_localctx.<a.name>"
-QRetValueRef(a) ::= "<ctx(a)>.<a.dict>.<a.name>"
+ArgRef(a) ::= "_localctx.<a.escapedName>"
+LocalRef(a) ::= "_localctx.<a.escapedName>"
+RetValueRef(a) ::= "_localctx.<a.escapedName>"
+QRetValueRef(a) ::= "<ctx(a)>.<a.dict>.<a.escapedName>"
 /** How to translate $tokenLabel */
-TokenRef(t) ::= "<ctx(t)>.<tokenType.(t.name)>"
-LabelRef(t) ::= "<ctx(t)>.<t.name>"
-ListLabelRef(t) ::= "<ctx(t)>.<ListLabelName(t.name)>"
-SetAttr(s,rhsChunks) ::= "<ctx(s)>.<s.name> = <rhsChunks>;"
+TokenRef(t) ::= "<ctx(t)>.<tokenType.(t.escapedName)>"
+LabelRef(t) ::= "<ctx(t)>.<t.escapedName>"
+ListLabelRef(t) ::= "<ctx(t)>.<ListLabelName(t.escapedName)>"
+SetAttr(s,rhsChunks) ::= "<ctx(s)>.<s.escapedName> = <rhsChunks>;"
 
 TokenLabelType() ::= "<file.TokenLabelType; null={IToken}>"
 InputSymbolType() ::= "<file.InputSymbolType; null={IToken}>"
@@ -802,17 +802,17 @@ ThisRulePropertyRef_text(r)	 ::= "TokenStream.GetText(_localctx.Start, TokenStre
 ThisRulePropertyRef_ctx(r)	 ::= "_localctx"
 ThisRulePropertyRef_parser(r)	 ::= "this"
 
-NonLocalAttrRef(s)		 ::= <%((<s.ruleName; format="cap">Context)GetInvokingContext(<s.ruleIndex>)).<s.name>%>
+NonLocalAttrRef(s)		 ::= <%((<s.ruleName; format="cap">Context)GetInvokingContext(<s.ruleIndex>)).<s.escapedName>%>
 SetNonLocalAttr(s, rhsChunks)	  ::=
-	<%((<s.ruleName; format="cap">Context)GetInvokingContext(<s.ruleIndex>)).<s.name> = <rhsChunks>;%>
+	<%((<s.ruleName; format="cap">Context)GetInvokingContext(<s.ruleIndex>)).<s.escapedName> = <rhsChunks>;%>
 
 AddToLabelList(a) ::= "<ctx(a.label)>.<a.listName>.Add(<labelref(a.label)>);"
 
-TokenDecl(t) ::= "<TokenLabelType()> <tokenType.(t.name)>"
-TokenTypeDecl(t) ::= "int <tokenType.(t.name)>;"
-TokenListDecl(t) ::= "IList\<IToken> <tokenType.(t.name)> = new List\<IToken>()"
-RuleContextDecl(r) ::= "<r.ctxName> <r.name>"
-RuleContextListDecl(rdecl) ::= "IList\<<rdecl.ctxName>> <rdecl.name> = new List\<<rdecl.ctxName>>()"
+TokenDecl(t) ::= "<TokenLabelType()> <tokenType.(t.escapedName)>"
+TokenTypeDecl(t) ::= "int <tokenType.(t.escapedName)>;"
+TokenListDecl(t) ::= "IList\<IToken> <tokenType.(t.escapedName)> = new List\<IToken>()"
+RuleContextDecl(r) ::= "<r.ctxName> <r.escapedName>"
+RuleContextListDecl(rdecl) ::= "IList\<<rdecl.ctxName>> <rdecl.escapedName> = new List\<<rdecl.ctxName>>()"
 
 contextGetterCollection(elementType) ::= <%
 <elementType>[]
@@ -829,17 +829,17 @@ ContextTokenListIndexedGetterDecl(t)  ::= <<
 }
 >>
 ContextRuleGetterDecl(r)       ::= <<
-[System.Diagnostics.DebuggerNonUserCode] public <r.ctxName> <r.name>() {
+[System.Diagnostics.DebuggerNonUserCode] public <r.ctxName> <r.escapedName>() {
 	return GetRuleContext\<<r.ctxName>\>(0);
 }
 >>
 ContextRuleListGetterDecl(r)   ::= <<
-[System.Diagnostics.DebuggerNonUserCode] public <contextGetterCollection({<r.ctxName>})> <r.name>() {
+[System.Diagnostics.DebuggerNonUserCode] public <contextGetterCollection({<r.ctxName>})> <r.escapedName>() {
 	return GetRuleContexts\<<r.ctxName>\>();
 }
 >>
 ContextRuleListIndexedGetterDecl(r)   ::= <<
-[System.Diagnostics.DebuggerNonUserCode] public <r.ctxName> <r.name>(int i) {
+[System.Diagnostics.DebuggerNonUserCode] public <r.ctxName> <r.escapedName>(int i) {
 	return GetRuleContext\<<r.ctxName>\>(i);
 }
 >>
@@ -861,21 +861,21 @@ CaptureNextTokenType(d) ::= "<d.varName> = TokenStream.LA(1);"
 
 StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers,
            superClass={ParserRuleContext}) ::= <<
-public partial class <struct.name> : <if(contextSuperClass)><contextSuperClass><else>ParserRuleContext<endif><if(interfaces)>, <interfaces; separator=", "><endif> {
+public partial class <struct.escapedName> : <if(contextSuperClass)><contextSuperClass><else>ParserRuleContext<endif><if(interfaces)>, <interfaces; separator=", "><endif> {
 	<attrs:{a | public <a>;}; separator="\n">
 	<getters:{g | <g>}; separator="\n">
-	<if(ctorAttrs)>public <struct.name>(ParserRuleContext parent, int invokingState) : base(parent, invokingState) { }<endif>
-	public <struct.name>(ParserRuleContext parent, int invokingState<ctorAttrs:{a | , <a>}>)
+	<if(ctorAttrs)>public <struct.escapedName>(ParserRuleContext parent, int invokingState) : base(parent, invokingState) { }<endif>
+	public <struct.escapedName>(ParserRuleContext parent, int invokingState<ctorAttrs:{a | , <a>}>)
 		: base(parent, invokingState)
 	{
-		<struct.ctorAttrs:{a | this.<a.name> = <a.name>;}; separator="\n">
+		<struct.ctorAttrs:{a | this.<a.escapedName> = <a.escapedName>;}; separator="\n">
 	}
 	public override int RuleIndex { get { return RULE_<struct.derivedFromName>; } }
 <if(struct.provideCopyFrom)> <! don't need copy unless we have subclasses !>
-	public <struct.name>() { }
-	public virtual void CopyFrom(<struct.name> context) {
+	public <struct.escapedName>() { }
+	public virtual void CopyFrom(<struct.escapedName> context) {
 		base.CopyFrom(context);
-		<struct.attrs:{a | this.<a.name> = context.<a.name>;}; separator="\n">
+		<struct.attrs:{a | this.<a.escapedName> = context.<a.escapedName>;}; separator="\n">
 	}
 <endif>
 	<dispatchMethods; separator="\n">
@@ -884,10 +884,10 @@ public partial class <struct.name> : <if(contextSuperClass)><contextSuperClass><
 >>
 
 AltLabelStructDecl(struct,attrs,getters,dispatchMethods) ::= <<
-public partial class <struct.name> : <currentRule.name; format="cap">Context {
+public partial class <struct.escapedName> : <currentRule.name; format="cap">Context {
 	<attrs:{a | public <a>;}; separator="\n">
 	<getters:{g | <g>}; separator="\n">
-	public <struct.name>(<currentRule.name; format="cap">Context context) { CopyFrom(context); }
+	public <struct.escapedName>(<currentRule.name; format="cap">Context context) { CopyFrom(context); }
 	<dispatchMethods; separator="\n">
 }
 >>
@@ -909,10 +909,10 @@ public override TResult Accept\<TResult>(IParseTreeVisitor\<TResult> visitor) {
 }
 >>
 
-AttributeDecl(d) ::= "<d.type> <d.name><if(d.initValue)> = <d.initValue><endif>"
+AttributeDecl(d) ::= "<d.type> <d.escapedName><if(d.initValue)> = <d.initValue><endif>"
 
 /** If we don't know location of label def x, use this template */
-labelref(x) ::= "<if(!x.isLocal)><typedContext(x.ctx)>.<endif><x.name>"
+labelref(x) ::= "<if(!x.isLocal)><typedContext(x.ctx)>.<endif><x.escapedName>"
 
 /** For any action chunk, what is correctly-typed context struct ptr? */
 ctx(actionChunk) ::= "<typedContext(actionChunk.ctx)>"
@@ -992,9 +992,9 @@ public partial class <lexer.name> : <superClass; null="Lexer"> {
 	public const int
 		<lexer.tokens:{k | <tokenType.(k)>=<lexer.tokens.(k)>}; separator=", ", wrap, anchor>;
 	<endif>
-	<if(lexer.channels)>
+	<if(lexer.escapedChannels)>
 	public const int
-		<lexer.channels:{k | <k>=<lexer.channels.(k)>}; separator=", ", wrap, anchor>;
+		<lexer.escapedChannels:{k | <k>=<lexer.escapedChannels.(k)>}; separator=", ", wrap, anchor>;
 	<endif>
 	<if(rest(lexer.escapedModeNames))>
 	public const int

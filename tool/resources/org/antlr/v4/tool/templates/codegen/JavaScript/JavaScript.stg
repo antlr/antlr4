@@ -144,7 +144,7 @@ export default class <parser.name> extends <superClass; null="antlr4.Parser"> {
     sempred(localctx, ruleIndex, predIndex) {
     	switch(ruleIndex) {
     	<parser.sempredFuncs.values:{f | case <f.ruleIndex>:
-    		return this.<f.originalName>_sempred(localctx, predIndex);}; separator="\n">
+    		return this.<f.name>_sempred(localctx, predIndex);}; separator="\n">
         default:
             throw "No predicate with index:" + ruleIndex;
        }
@@ -198,7 +198,7 @@ case <f.ruleIndex>:
 <lexer.name>.prototype.sempred = function(localctx, ruleIndex, predIndex) {
 	switch (ruleIndex) {
 		<recog.sempredFuncs.values:{f| case <f.ruleIndex>:
-	return this.<f.originalName>_sempred(localctx, predIndex);}; separator="\n">
+	return this.<f.name>_sempred(localctx, predIndex);}; separator="\n">
     	default:
     		throw "No registered predicate for:" + ruleIndex;
     }
@@ -230,7 +230,7 @@ case <index>:
  * overriding implementation impossible to maintain.
  */
 RuleSempredFunction(r, actions) ::= <<
-<if (r.factory.g.lexer)><lexer.name>.prototype.<r.originalName>_sempred = function<else><r.originalName>_sempred<endif>(localctx, predIndex) {
+<if (r.factory.g.lexer)><lexer.name>.prototype.<r.name>_sempred = function<else><r.name>_sempred<endif>(localctx, predIndex) {
 	switch(predIndex) {
 		<actions:{index| case <index>:
 	return <actions.(index)>;}; separator="\n">
@@ -244,8 +244,8 @@ RuleSempredFunction(r, actions) ::= <<
 RuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAction,postamble,exceptions) ::= <<
 
 
-<currentRule.escapedName>(<currentRule.args:{a | <a.name>}; separator=", ">) {
-    let localctx = new <currentRule.ctxType>(this, this._ctx, this.state<currentRule.args:{a | , <a.name>}>);
+<currentRule.escapedName>(<currentRule.args:{a | <a.escapedName>}; separator=", ">) {
+    let localctx = new <currentRule.ctxType>(this, this._ctx, this.state<currentRule.args:{a | , <a.escapedName>}>);
     this.enterRule(localctx, <currentRule.startState>, <parser.name>.RULE_<currentRule.name>);
     <namedActions.init>
     <locals; separator="\n">
@@ -282,7 +282,7 @@ LeftRecursiveRuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,
 	}
     const _parentctx = this._ctx;
     const _parentState = this.state;
-    let localctx = new <currentRule.ctxType>(this, this._ctx, _parentState<args:{a | , <a.name>}>);
+    let localctx = new <currentRule.ctxType>(this, this._ctx, _parentState<args:{a | , <a.escapedName>}>);
     let _prevctx = localctx;
     const _startState = <currentRule.startState>;
     this.enterRecursionRule(localctx, <currentRule.startState>, <parser.name>.RULE_<currentRule.name>, _p);
@@ -486,7 +486,7 @@ cases(ttypes) ::= <<
 
 InvokeRule(r, argExprsChunks) ::= <<
 this.state = <r.stateNumber>;
-<if(r.labels)><r.labels:{l | <labelref(l)> = }><endif>this.<r.name>(<if(r.ast.options.p)><r.ast.options.p><if(argExprsChunks)>,<endif><endif><argExprsChunks>);
+<if(r.labels)><r.labels:{l | <labelref(l)> = }><endif>this.<r.escapedName>(<if(r.ast.options.p)><r.ast.options.p><if(argExprsChunks)>,<endif><endif><argExprsChunks>);
 >>
 
 MatchToken(m) ::= <<
@@ -547,15 +547,15 @@ LexerPushModeCommand(arg, grammar)  ::= "this.pushMode(<arg>)"
 
 ActionText(t) ::= "<t.text>"
 ActionTemplate(t) ::= "<t.st>"
-ArgRef(a) ::= "localctx.<a.name>"
-LocalRef(a) ::= "localctx.<a.name>"
-RetValueRef(a) ::= "localctx.<a.name>"
-QRetValueRef(a) ::= "<ctx(a)>.<a.dict>.<a.name>"
+ArgRef(a) ::= "localctx.<a.escapedName>"
+LocalRef(a) ::= "localctx.<a.escapedName>"
+RetValueRef(a) ::= "localctx.<a.escapedName>"
+QRetValueRef(a) ::= "<ctx(a)>.<a.dict>.<a.escapedName>"
 /** How to translate $tokenLabel */
-TokenRef(t) ::= "<ctx(t)>.<t.name>"
-LabelRef(t) ::= "<ctx(t)>.<t.name>"
-ListLabelRef(t) ::= "<ctx(t)>.<ListLabelName(t.name)>"
-SetAttr(s,rhsChunks) ::= "<ctx(s)>.<s.name> = <rhsChunks>"
+TokenRef(t) ::= "<ctx(t)>.<t.escapedName>"
+LabelRef(t) ::= "<ctx(t)>.<t.escapedName>"
+ListLabelRef(t) ::= "<ctx(t)>.<ListLabelName(t.escapedName)>"
+SetAttr(s,rhsChunks) ::= "<ctx(s)>.<s.escapedName> = <rhsChunks>"
 
 TokenLabelType() ::= "<file.TokenLabelType; null={Token}>"
 InputSymbolType() ::= "<file.InputSymbolType; null={Token}>"
@@ -580,19 +580,19 @@ ThisRulePropertyRef_text(r)	 ::= "this._input.getText(new antlr4.Interval(localc
 ThisRulePropertyRef_ctx(r)	 ::= "localctx"
 ThisRulePropertyRef_parser(r)	 ::= "this"
 
-NonLocalAttrRef(s)		 	 ::= "this.getInvokingContext(<s.ruleIndex>).<s.name>"
-SetNonLocalAttr(s, rhsChunks)  ::= "this.getInvokingContext(<s.ruleIndex>).<s.name> = <rhsChunks>"
+NonLocalAttrRef(s)		 	 ::= "this.getInvokingContext(<s.ruleIndex>).<s.escapedName>"
+SetNonLocalAttr(s, rhsChunks)  ::= "this.getInvokingContext(<s.ruleIndex>).<s.escapedName> = <rhsChunks>"
 
 AddToLabelList(a) ::= "<ctx(a.label)>.<a.listName>.push(<labelref(a.label)>);"
 
-TokenDecl(t) ::= "this.<t.name> = null; // <TokenLabelType()>"
-TokenTypeDecl(t) ::= "var <t.name> = 0; // <TokenLabelType()> type"
-TokenListDecl(t) ::= "this.<t.name> = []; // of <TokenLabelType()>s"
-RuleContextDecl(r) ::= "this.<r.name> = null; // <r.ctxName>"
-RuleContextListDecl(rdecl) ::= "this.<rdecl.name> = []; // of <rdecl.ctxName>s"
+TokenDecl(t) ::= "this.<t.escapedName> = null; // <TokenLabelType()>"
+TokenTypeDecl(t) ::= "var <t.escapedName> = 0; // <TokenLabelType()> type"
+TokenListDecl(t) ::= "this.<t.escapedName> = []; // of <TokenLabelType()>s"
+RuleContextDecl(r) ::= "this.<r.escapedName> = null; // <r.ctxName>"
+RuleContextListDecl(rdecl) ::= "this.<rdecl.escapedName> = []; // of <rdecl.ctxName>s"
 
 ContextTokenGetterDecl(t)      ::= <<
-<t.name>() {
+<t.escapedName>() {
     return this.getToken(<parser.name>.<t.name>, 0);
 };
 >>
@@ -605,7 +605,7 @@ ContextTokenListGetterDecl(t)  ::= <<
 >>
 
 ContextTokenListIndexedGetterDecl(t)  ::= <<
-<t.name> = function(i) {
+<t.escapedName> = function(i) {
 	if(i===undefined) {
 		i = null;
 	}
@@ -619,7 +619,7 @@ ContextTokenListIndexedGetterDecl(t)  ::= <<
 >>
 
 ContextRuleGetterDecl(r)       ::= <<
-<r.name>() {
+<r.escapedName>() {
     return this.getTypedRuleContext(<r.ctxName>,0);
 };
 >>
@@ -632,7 +632,7 @@ ContextRuleListGetterDecl(r)   ::= <<
 >>
 
 ContextRuleListIndexedGetterDecl(r)   ::= <<
-<r.name> = function(i) {
+<r.escapedName> = function(i) {
     if(i===undefined) {
         i = null;
     }
@@ -660,9 +660,9 @@ CaptureNextToken(d) ::= "<d.varName> = self._input.LT(1)"
 CaptureNextTokenType(d) ::= "<d.varName> = this._input.LA(1);"
 
 StructDecl(struct,ctorAttrs,attrs,getters,dispatchMethods,interfaces,extensionMembers) ::= <<
-class <struct.name> extends <if(contextSuperClass)><contextSuperClass><else>antlr4.ParserRuleContext<endif> {
+class <struct.escapedName> extends <if(contextSuperClass)><contextSuperClass><else>antlr4.ParserRuleContext<endif> {
 
-    constructor(parser, parent, invokingState<struct.ctorAttrs:{a | , <a.name>}>) {
+    constructor(parser, parent, invokingState<struct.ctorAttrs:{a | , <a.escapedName>}>) {
         if(parent===undefined) {
             parent = null;
         }
@@ -673,7 +673,7 @@ class <struct.name> extends <if(contextSuperClass)><contextSuperClass><else>antl
         this.parser = parser;
         this.ruleIndex = <parser.name>.RULE_<struct.derivedFromName>;
         <attrs:{a | <a>}; separator="\n">
-        <struct.ctorAttrs:{a | this.<a.name> = <a.name> || null;}; separator="\n">
+        <struct.ctorAttrs:{a | this.<a.escapedName> = <a.escapedName> || null;}; separator="\n">
     }
 
 	<getters:{g | <g>}; separator="\n\n">
@@ -681,7 +681,7 @@ class <struct.name> extends <if(contextSuperClass)><contextSuperClass><else>antl
 	<if(struct.provideCopyFrom)> <! don't need copy unless we have subclasses !>
 	copyFrom(ctx) {
 		super.copyFrom(ctx);
-		<struct.attrs:{a | this.<a.name> = ctx.<a.name>;}; separator="\n">
+		<struct.attrs:{a | this.<a.escapedName> = ctx.<a.escapedName>;}; separator="\n">
 	}
 	<endif>
 	<dispatchMethods; separator="\n">
@@ -692,7 +692,7 @@ class <struct.name> extends <if(contextSuperClass)><contextSuperClass><else>antl
 >>
 
 AltLabelStructDecl(struct,attrs,getters,dispatchMethods) ::= <<
-class <struct.name> extends <struct.parentRule; format="cap">Context {
+class <struct.escapedName> extends <struct.parentRule; format="cap">Context {
 
     constructor(parser, ctx) {
         super(parser);
@@ -707,7 +707,7 @@ class <struct.name> extends <struct.parentRule; format="cap">Context {
 }
 
 <! Define fields of this parser to export this struct/context class !>
-<parser.name>.<struct.name> = <struct.name>;
+<parser.name>.<struct.name> = <struct.escapedName>;
 
 >>
 
@@ -731,10 +731,10 @@ accept(visitor) {
 
 >>
 
-AttributeDecl(d) ::= "this.<d.name> = <if(d.initValue)><d.initValue><else>null<endif>"
+AttributeDecl(d) ::= "this.<d.escapedName> = <if(d.initValue)><d.initValue><else>null<endif>"
 
 /** If we don't know location of label def x, use this template */
-labelref(x) ::= "<if(!x.isLocal)>localctx.<endif><x.name>"
+labelref(x) ::= "<if(!x.isLocal)>localctx.<endif><x.escapedName>"
 
 /** For any action chunk, what is correctly-typed context struct ptr? */
 ctx(actionChunk) ::= "localctx"
@@ -822,8 +822,8 @@ export default class <lexer.name> extends <if(superClass)><superClass><else>antl
 <lexer.tokens:{k | <lexer.name>.<k> = <lexer.tokens.(k)>;}; separator="\n", wrap, anchor>
 <endif>
 
-<if(lexer.channels)>
-<lexer.channels:{c| <lexer.name>.<c> = <lexer.channels.(c)>;}; separator="\n">
+<if(lexer.escapedChannels)>
+<lexer.escapedChannels:{c| <lexer.name>.<c> = <lexer.escapedChannels.(c)>;}; separator="\n">
 
 <endif>
 <if(rest(lexer.escapedModeNames))>

@@ -26,8 +26,6 @@ public class CodeGenPipeline {
 		// after the first error is reported
 		int errorCount = g.tool.errMgr.getNumErrors();
 
-		assignRuntimeRuleNames();
-
 		if ( g.isLexer() ) {
 			if (gen.getTarget().needsHeader()) {
 				ST lexer = gen.generateLexer(true); // Header file if needed.
@@ -104,13 +102,6 @@ public class CodeGenPipeline {
 			}
 		}
 		gen.writeVocabFile();
-	}
-
-	private void assignRuntimeRuleNames() {
-		Target target = gen.getTarget();
-		for (Rule rule : g.rules.values()) {
-			rule.escapedName = target.escapeIfNeeded(rule.name);
-		}
 	}
 
 	protected void writeRecognizer(ST template, CodeGenerator gen, boolean header) {

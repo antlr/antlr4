@@ -13,23 +13,27 @@ root
 
 continue returns [int return]
     : for for? {1==1}?              #else
-    | break=BREAK BREAK+ (for | IF) #class
+    | break=BREAK BREAK+ (for | IF) #else
     | if+=IF  if+=IF*               #int
-    | continue CONTINUE             #static
+    | continue CONTINUE_ {<AssignLocal("$return","0")>}   #class
+    ;
+
+args[int else] locals [int return]
+    : for
     ;
 
 for: FOR;
-FOR: 'for_';
-BREAK: 'break_';
-IF: 'if_';
-CONTINUE: 'continue_';
+FOR: 'for ';
+BREAK: 'break ';
+IF: 'if ';
+CONTINUE_: 'continue';
 
 [start]
 root
 
 [input]
-for_for_break_break_for_if_if_for_continue_
+for for break break for if if for continue
 
 [output]
-"""for_for_break_break_for_if_if_for_continue_
+"""for for break break for if if for continue
 """

@@ -53,7 +53,6 @@ public class Rule implements AttributeResolver {
 	}
 
 	public final String name;
-	public String escapedName;
 	public List<GrammarAST> modifiers;
 
 	public RuleAST ast;

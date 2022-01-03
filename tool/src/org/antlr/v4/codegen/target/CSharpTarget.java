@@ -119,9 +119,6 @@ public class CSharpTarget extends Target {
 	}
 
 	@Override
-	protected boolean supportsWordEscaping() { return true; }
-
-	@Override
 	public String encodeIntAsCharEscape(int v) {
 		if (v < Character.MIN_VALUE || v > Character.MAX_VALUE) {
 			throw new IllegalArgumentException(String.format("Cannot encode the specified value: %d", v));

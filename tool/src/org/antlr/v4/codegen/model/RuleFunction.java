@@ -75,7 +75,7 @@ public class RuleFunction extends OutputModelObject {
 	public RuleFunction(OutputModelFactory factory, Rule r) {
 		super(factory);
 		this.name = r.name;
-		this.escapedName = r.escapedName;
+		this.escapedName = factory.getGenerator().getTarget().escapeIfNeeded(r.name);
 		this.rule = r;
 		modifiers = Utils.nodesToStrings(r.modifiers);
 

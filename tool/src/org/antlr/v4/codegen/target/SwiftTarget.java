@@ -93,9 +93,6 @@ public class SwiftTarget extends Target {
 		return "`" + word + "`";
 	}
 
-	@Override
-	protected boolean supportsWordEscaping() { return true; }
-
     @Override
     protected void genFile(Grammar g,
                            ST outputFileST,
