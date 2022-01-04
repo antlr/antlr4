@@ -101,9 +101,8 @@ public abstract class Recognizer extends OutputModelObject {
 		}
 
 		if (tokenName.charAt(0) == '\'') {
-			boolean addQuotes = false;
 			String targetString =
-				gen.getTarget().getTargetStringLiteralFromANTLRStringLiteral(gen, tokenName, addQuotes);
+				gen.getTarget().getTargetStringLiteralFromANTLRStringLiteral(gen, tokenName, false, true);
 			return "\"'" + targetString + "'\"";
 		}
 		else {

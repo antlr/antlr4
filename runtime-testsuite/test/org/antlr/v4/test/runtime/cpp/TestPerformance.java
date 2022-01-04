@@ -8,13 +8,9 @@ package org.antlr.v4.test.runtime.cpp;
 
 import org.antlr.v4.test.runtime.BaseRuntimeTest;
 import org.antlr.v4.test.runtime.RuntimeTestDescriptor;
-import org.antlr.v4.test.runtime.category.ParserTests;
-import org.antlr.v4.test.runtime.descriptors.PerformanceDescriptors;
-import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-@Category(ParserTests.class)
 @RunWith(Parameterized.class)
 public class TestPerformance extends BaseRuntimeTest {
 	public TestPerformance(RuntimeTestDescriptor descriptor) {
@@ -23,6 +19,6 @@ public class TestPerformance extends BaseRuntimeTest {
 
 	@Parameterized.Parameters(name="{0}")
 	public static RuntimeTestDescriptor[] getAllTestDescriptors() {
-		return BaseRuntimeTest.getRuntimeTestDescriptors(PerformanceDescriptors.class, "Cpp");
+		return BaseRuntimeTest.getRuntimeTestDescriptors("Performance", "Cpp");
 	}
 }

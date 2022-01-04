@@ -1,0 +1,35 @@
+[notes]
+This is a regression test for antlr/antlr4#299 "Repeating subtree not
+accessible in visitor".  https://github.com/antlr/antlr4/issues/299
+
+[type]
+Parser
+
+[grammar]
+grammar T;
+ifStatement
+@after {
+<AssertIsList({<ContextRuleFunction("$ctx", "elseIfStatement()")>})>
+}
+    : 'if' expression
+      ( ( 'then'
+ executableStatement*
+ elseIfStatement*  // \<--- problem is here; should yield a list not node
+ elseStatement?
+ 'end' 'if'
+        ) | executableStatement )
+    ;
+
+elseIfStatement
+    : 'else' 'if' expression 'then' executableStatement*
+    ;
+expression : 'a' ;
+executableStatement : 'a' ;
+elseStatement : 'a' ;
+
+[start]
+expression
+
+[input]
+a
+

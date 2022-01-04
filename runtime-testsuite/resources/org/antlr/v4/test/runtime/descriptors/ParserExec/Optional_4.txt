@@ -1,0 +1,19 @@
+[notes]
+This test is meant to detect regressions of bug antlr/antlr4#41.
+https://github.com/antlr/antlr4/issues/41
+
+[type]
+Parser
+
+[grammar]
+grammar T;
+stat : ifstat | 'x';
+ifstat : 'if' stat ('else' stat)?;
+WS : [ \n\t]+ -> skip ;
+
+[start]
+stat
+
+[input]
+if if x else x
+

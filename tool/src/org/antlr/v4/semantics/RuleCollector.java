@@ -11,11 +11,7 @@ import org.antlr.v4.misc.OrderedHashMap;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.parse.GrammarTreeVisitor;
 import org.antlr.v4.parse.ScopeParser;
-import org.antlr.v4.tool.AttributeDict;
-import org.antlr.v4.tool.ErrorManager;
-import org.antlr.v4.tool.Grammar;
-import org.antlr.v4.tool.LeftRecursiveRule;
-import org.antlr.v4.tool.Rule;
+import org.antlr.v4.tool.*;
 import org.antlr.v4.tool.ast.ActionAST;
 import org.antlr.v4.tool.ast.AltAST;
 import org.antlr.v4.tool.ast.GrammarAST;
@@ -27,6 +23,8 @@ import java.util.List;
 import java.util.Map;
 
 public class RuleCollector extends GrammarTreeVisitor {
+	private boolean grammarCaseInsensitive = false;
+
 	/** which grammar are we checking */
 	public Grammar g;
 	public ErrorManager errMgr;
@@ -102,13 +100,42 @@ public class RuleCollector extends GrammarTreeVisitor {
 	}
 
 	@Override
+	public void grammarOption(GrammarAST ID, GrammarAST valueAST) {
+		Boolean caseInsensitive = getCaseInsensitiveValue(ID, valueAST);
+		if (caseInsensitive != null) {
+			grammarCaseInsensitive = caseInsensitive;
+		}
+	}
+
+	@Override
 	public void discoverLexerRule(RuleAST rule, GrammarAST ID, List<GrammarAST> modifiers,
-								  GrammarAST block)
+								  GrammarAST options, GrammarAST block)
 	{
+		boolean currentCaseInsensitive = grammarCaseInsensitive;
+		if (options != null) {
+			for (Object child : options.getChildren()) {
+				GrammarAST childAST = (GrammarAST) child;
+				Boolean caseInsensitive = getCaseInsensitiveValue((GrammarAST)childAST.getChild(0), (GrammarAST)childAST.getChild(1));
+				if (caseInsensitive != null) {
+					currentCaseInsensitive = caseInsensitive;
+				}
+			}
+		}
+
 		int numAlts = block.getChildCount();
-		Rule r = new Rule(g, ID.getText(), rule, numAlts);
-		r.mode = currentModeName;
+		Rule r = new Rule(g, ID.getText(), rule, numAlts, currentModeName, currentCaseInsensitive);
 		if ( !modifiers.isEmpty() ) r.modifiers = modifiers;
 		rules.put(r.name, r);
+	}
+
+	private Boolean getCaseInsensitiveValue(GrammarAST optionID, GrammarAST valueAST) {
+		String optionName = optionID.getText();
+		if (optionName.equals(Grammar.caseInsensitiveOptionName)) {
+			String valueText = valueAST.getText();
+			if (valueText.equals("true") || valueText.equals("false")) {
+				return Boolean.parseBoolean(valueText);
+			}
+		}
+		return null;
 	}
 }

@@ -21,18 +21,40 @@ public abstract class UnicodeData {
        // initialization into one method per Unicode property
 
        <propertyCodePointRanges.keys:{ k | // Unicode code points with property "<k>"
+static private class PropertyAdder<i> {
+        static private void addProperty<i>() {
+               List\<Interval\> intervals = Arrays.asList(
+                       <propertyCodePointRanges.(k).intervals:{ interval | Interval.of(<interval.a>, <interval.b>)}; separator=",\n">
+               );
+               IntervalSet codePointRanges = new IntervalSet(intervals);
+               codePointRanges.setReadonly(true);
+               propertyCodePointRanges.put("<k>".toLowerCase(Locale.US), codePointRanges);
+       \}
+\}
+
 static private void addProperty<i>() {
-       List\<Interval\> intervals = Arrays.asList(
-               <propertyCodePointRanges.(k).intervals:{ interval | Interval.of(<interval.a>, <interval.b>)}; separator=",\n">
-       );
-       IntervalSet codePointRanges = new IntervalSet(intervals);
-       codePointRanges.setReadonly(true);
-       propertyCodePointRanges.put("<k>".toLowerCase(Locale.US), codePointRanges);
-\}}; separator="\n\n">
+        PropertyAdder<i>.addProperty<i>();
+\}
+
+}; separator="\n\n">
+
+       static private class PropertyAliasesAdder {
+<propertyAliases.keys:{ k |
+               // Property aliases <i>
+               static private void addPropertyAliases<i>() {
+                      propertyAliases.put("<k>".toLowerCase(Locale.US), "<propertyAliases.(k)>".toLowerCase(Locale.US));
+               \}
+}; separator="\n">
+
+               // Property aliases all
+               static private void addPropertyAliasesAll() {
+<propertyAliases.keys:{ k | PropertyAliasesAdder.addPropertyAliases<i>();}; separator="\n">
+               }
+       }
 
        // Property aliases
        static private void addPropertyAliases() {
-              <propertyAliases.keys:{ k | propertyAliases.put("<k>".toLowerCase(Locale.US), "<propertyAliases.(k)>".toLowerCase(Locale.US)); }; separator="\n">
+              PropertyAliasesAdder.addPropertyAliasesAll();
        }
 
        // Put it all together

@@ -60,10 +60,7 @@ Note that even if you are otherwise using ANTLR from a binary distribution,
 you should compile the ANTLR Swift runtime from source, because the Swift
 language does not yet have a stable ABI.
 
-ANTLR uses Swift Package Manager to generate Xcode project files. Note that
-Swift Package Manager does not currently support iOS, watchOS, or tvOS, so
-if you wish to use those platforms, you will need to alter the project build
-settings manually as appropriate.
+ANTLR uses Swift Package Manager to generate Xcode project files. 
 
 #### Download source code for ANTLR
 

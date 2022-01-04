@@ -1,0 +1,22 @@
+[type]
+Parser
+
+[grammar]
+grammar T;
+s : e '!' ;
+e : 'a' 'b'
+  | 'a'
+  ;
+DOT : '.' ;
+WS : [ \t\r\n]+ -> skip;
+
+[start]
+s
+
+[input]
+a.
+
+[errors]
+"""line 1:1 mismatched input '.' expecting '!'
+"""
+

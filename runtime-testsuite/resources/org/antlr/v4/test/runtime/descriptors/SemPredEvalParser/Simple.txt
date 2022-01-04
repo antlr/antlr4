@@ -1,0 +1,25 @@
+[type]
+Parser
+
+[grammar]
+grammar T;
+s : a a a; // do 3x: once in ATN, next in DFA then INT in ATN
+a : {<False()>}? ID {<writeln("\"alt 1\"")>}
+  | {<True()>}?  ID {<writeln("\"alt 2\"")>}
+  | INT{<writeln("\"alt 3\"")>}
+  ;
+ID : 'a'..'z'+ ;
+INT : '0'..'9'+;
+WS : (' '|'\n') -> skip ;
+
+[start]
+s
+
+[input]
+x y 3
+
+[output]
+alt 2
+alt 2
+alt 3
+

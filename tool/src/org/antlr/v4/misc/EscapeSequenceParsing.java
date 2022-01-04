@@ -139,7 +139,7 @@ public abstract class EscapeSequenceParsing {
 			}
 			String propertyName = s.substring(openBraceOffset + 1, closeBraceOffset);
 			IntervalSet propertyIntervalSet = UnicodeData.getPropertyCodePoints(propertyName);
-			if (propertyIntervalSet == null) {
+			if (propertyIntervalSet == null || propertyIntervalSet.isNil()) {
 				return invalid(startOff, closeBraceOffset);
 			}
 			offset = closeBraceOffset + 1;

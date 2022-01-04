@@ -64,7 +64,10 @@ public class Rule implements AttributeResolver {
 	public Grammar g;
 
 	/** If we're in a lexer grammar, we might be in a mode */
-	public String mode;
+	public final String mode;
+
+	/** If null then use value from global option that is false by default */
+	public final boolean caseInsensitive;
 
     /** Map a name to an action for this rule like @init {...}.
      *  The code generator will use this to fill holes in the rule template.
@@ -103,12 +106,18 @@ public class Rule implements AttributeResolver {
 	public int actionIndex = -1; // if lexer; 0..n-1 for n actions in a rule
 
 	public Rule(Grammar g, String name, RuleAST ast, int numberOfAlts) {
+		this(g, name, ast, numberOfAlts, null, false);
+	}
+
+	public Rule(Grammar g, String name, RuleAST ast, int numberOfAlts, String lexerMode, boolean caseInsensitive) {
 		this.g = g;
 		this.name = name;
 		this.ast = ast;
 		this.numberOfAlts = numberOfAlts;
 		alt = new Alternative[numberOfAlts+1]; // 1..n
 		for (int i=1; i<=numberOfAlts; i++) alt[i] = new Alternative(this, i);
+		this.mode = lexerMode;
+		this.caseInsensitive = caseInsensitive;
 	}
 
 	public void defineActionInAlt(int currentAlt, ActionAST actionAST) {

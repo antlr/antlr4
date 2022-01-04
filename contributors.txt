@@ -306,12 +306,26 @@ YYYY/MM/DD, github id, Full name, email
 2021/05/04, joakker, Joaquín León, joaquinandresleon108@gmail.com
 2021/05/06, renancaraujo, Renan C. Araújo, renancaraujo@users.noreply.github.com
 2021/05/06, canastro, Ricardo Canastro, ricardocanastro@users.noreply.github.com
+2021/06/19, abe149, Abe Skolnik, abe 149 at gmail . com
 2021/07/01, appel1, Johan Appelgren, johan.appelgren@gmail.com
 2021/07/01, marcauberer, Marc Auberer, marc.auberer@chillibits.com
 2021/07/14, renzhentaxibaerde, Renzhentaxi Baerde, renzhentaxibaerde@gmail.com
+2021/07/21, skittlepox, Benjamin Spiegel, bspiegel@cs.brown.edu
 2021/07/29, ksyx, Qixing Xue, qixingxue@outlook.com
 2021/07/29, rachidlamouri, Rachid Lamouri, rachidlamouri@gmail.com
 2021/08/02, minjoosur, Minjoo Sur, msur@salesforce.com
 2021/08/05, jjeffcaii, Jeff Tsai, caiweiwei.cww@alibaba-inc.com
 2021/08/08, ansiemens, Yi-Hong Lin, ansiemens@gmail.com
+2021/08/25, XenoAmess, Jin Xu, xenoamess@gmail.com
 2021/09/08, jmcken8, Joel McKenzie, joel.b.mckenzie@gmail.com
+2021/09/23, skalt, Steven Kalt, kalt.steven@gmail.com
+2021/09/26, idraper, Isaac Draper, idraper@byu.edu
+2021/10/10, tools4origins, Erwan Guyomarc'h, contact@erwan-guyomarch.fr
+2021/10/19, jcking, Justin King, jcking@google.com
+2021/10/31, skef, Skef Iterum, github@skef.org
+2021/10/31, hlstwizard, h.l.s.t@163.com
+2021/11/30, bollwyvl, Nick Bollweg, bollwyvl@users.noreply.github.com
+2021/12/03, eneko, Eneko Alonso, eneko.alonso@gmail.com
+2021/12/16, Ketler13, Oleksandr Martyshchenko, oleksandr.martyshchenko@gmail.com
+2021/12/25, Tinker1024, Tinker1024, tinker@huawei.com
+2021/12/31, Biswa96, Biswapriyo Nath, nathbappai@gmail.com

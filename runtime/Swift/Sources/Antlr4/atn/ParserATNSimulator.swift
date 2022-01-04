@@ -646,7 +646,7 @@ open class ParserATNSimulator: ATNSimulator {
         var previous = s0
         try input.seek(startIndex)
         var t = try input.LA(1)
-        var predictedAlt = 0
+        var predictedAlt = ATN.INVALID_ALT_NUMBER
         while true {
             // while more work
             if let computeReach = try computeReachSet(previous, t, fullCtx) {

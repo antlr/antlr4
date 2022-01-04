@@ -16,7 +16,7 @@ popd
 if [ $rc == 0 ]; then
   pushd runtime-testsuite
     echo "running maven tests..."
-    mvn -q -Dtest=python3.* test
+    mvn -Dparallel=classes -DthreadCount=4 -Dtest=python3.** test
     rc=$?
   popd
 fi

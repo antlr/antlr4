@@ -824,7 +824,7 @@ public enum ErrorType {
 	 *
 	 * @since 4.2.1
 	 */
-	INVALID_ESCAPE_SEQUENCE(156, "invalid escape sequence <arg>", ErrorSeverity.WARNING),
+	INVALID_ESCAPE_SEQUENCE(156, "invalid escape sequence <arg>", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Warning 157.
 	 *
@@ -980,7 +980,7 @@ public enum ErrorType {
 	/**
 	 * Compiler Error 174.
 	 *
-	 * <p>empty strings not allowed</p>
+	 * <p>empty strings and sets not allowed</p>
 	 *
 	 * <pre>
 	 * A: '''test''';
@@ -1089,6 +1089,61 @@ public enum ErrorType {
 			"One of the token <arg> values unreachable. <arg2> is always overlapped by token <arg3>",
 			ErrorSeverity.WARNING),
 
+	/**
+	 * <p>Range probably contains not implied characters. Both bounds should be defined in lower or UPPER case
+	 * For instance, the range [A-z] (ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxy)
+	 * probably contains not implied characters: [\]^_`
+	 *
+	 * Use the following definition: [A-Za-z]
+	 * If the characters are implied, include them explicitly: [A-Za-z[\\\]^_`]
+	 * </p>
+	 *
+	 * <pre>
+	 * TOKEN: [A-z]; // warning
+	 * </pre>
+	 */
+	RANGE_PROBABLY_CONTAINS_NOT_IMPLIED_CHARACTERS(
+			185,
+			"Range <arg>..<arg2> probably contains not implied characters <arg3>. Both bounds should be defined in lower or UPPER case",
+			ErrorSeverity.WARNING
+	),
+
+	/**
+	 * <p>
+	 * rule <em>rule</em> contains a closure with at least one alternative
+	 * that can match EOF</p>
+	 *
+	 * <p>A rule contains a closure ({@code (...)*}) or positive closure
+	 * ({@code (...)+}) around EOF.</p>
+	 *
+	 * <p>The following rule produces this error.</p>
+	 *
+	 * <pre>
+	 * x : EOF*;         // error
+	 * y : EOF+;         // error
+	 * z : EOF;         // ok
+	 * </pre>
+	 */
+	EOF_CLOSURE(
+			186,
+			"rule <arg> contains a closure with at least one alternative that can match EOF",
+			ErrorSeverity.ERROR
+	),
+
+	/**
+	 * <p>Redundant caseInsensitive lexer rule option</p>
+	 *
+	 * <pre>
+	 * options { caseInsensitive=true; }
+	 * TOKEN options { caseInsensitive=true; } : [a-z]+ -> caseInsensitive(true); // warning
+	 * </pre>
+	 */
+	REDUNDANT_CASE_INSENSITIVE_LEXER_RULE_OPTION(
+			187,
+			"caseInsensitive lexer rule option is redundant because its value equals to global value (<arg>)",
+			ErrorSeverity.WARNING
+	),
+
 	/*
 	 * Backward incompatibility errors
 	 */
@@ -1104,6 +1159,7 @@ public enum ErrorType {
 	 * instead offers automatically generated parse tree listeners and visitors
 	 * as a more maintainable alternative.</p>
 	 */
+	@Deprecated
 	V3_TREE_GRAMMAR(200, "tree grammars are not supported in ANTLR 4", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Warning 201.

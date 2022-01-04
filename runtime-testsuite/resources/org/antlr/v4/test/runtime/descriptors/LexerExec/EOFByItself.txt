@@ -1,0 +1,15 @@
+[type]
+Lexer
+
+[grammar]
+lexer grammar L;
+DONE : EOF ;
+A : 'a';
+
+[input]
+
+
+[output]
+[@0,0:-1='<EOF>',<1>,1:0]
+[@1,0:-1='<EOF>',<-1>,1:0]
+
