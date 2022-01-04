@@ -137,14 +137,14 @@ public:
 <namedActions.baselistenerdeclarations>
 
 <file.listenerNames: {lname |
-  virtual void enter<lname; format="cap">(<file.parserName>::<lname; format = "cap">Context * /*ctx*/) override { \}
-  virtual void exit<lname; format="cap">(<file.parserName>::<lname; format = "cap">Context * /*ctx*/) override { \}
+  void enter<lname; format="cap">(<file.parserName>::<lname; format = "cap">Context * /*ctx*/) override { \}
+  void exit<lname; format="cap">(<file.parserName>::<lname; format = "cap">Context * /*ctx*/) override { \}
 }; separator="\n">
 
-  virtual void enterEveryRule(antlr4::ParserRuleContext * /*ctx*/) override { }
-  virtual void exitEveryRule(antlr4::ParserRuleContext * /*ctx*/) override { }
-  virtual void visitTerminal(antlr4::tree::TerminalNode * /*node*/) override { }
-  virtual void visitErrorNode(antlr4::tree::ErrorNode * /*node*/) override { }
+  void enterEveryRule(antlr4::ParserRuleContext * /*ctx*/) override { }
+  void exitEveryRule(antlr4::ParserRuleContext * /*ctx*/) override { }
+  void visitTerminal(antlr4::tree::TerminalNode * /*node*/) override { }
+  void visitErrorNode(antlr4::tree::ErrorNode * /*node*/) override { }
 
 <if (namedActions.baselistenermembers)>
 private:
@@ -253,7 +253,7 @@ public:
 <namedActions.basevisitordeclarations>
 
 <file.visitorNames: { lname |
-  virtual std::any visit<lname; format = "cap">(<file.parserName>::<lname; format = "cap">Context *ctx) override {
+  std::any visit<lname; format = "cap">(<file.parserName>::<lname; format = "cap">Context *ctx) override {
     return visitChildren(ctx);
   \}
 }; separator="\n">
