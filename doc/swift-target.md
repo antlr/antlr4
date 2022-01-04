@@ -139,7 +139,7 @@ and Swift is currently not ABI stable. We currently support SPM-based
 projects by creating temporary local repository.
 
 ```swift
-.package(name: "Antlr4", url: "https://github.com/antlr/antlr4", from: "4.9.3"
+.package(name: "Antlr4", url: "https://github.com/antlr/antlr4", from: "4.10"
 ```
 ## Swift access levels
 
