@@ -134,10 +134,10 @@ import "github.com/antlr/antlr4/runtime/Go/antlr"
 type Base<file.grammarName>Visitor struct {
 	*antlr.BaseParseTreeVisitor
 
-	rootVisitor JavaParserVisitor
+	rootVisitor <file.grammarName>Visitor
 }
 
-func NewBase<file.grammarName>Visitor(root JavaParserVisitor) *Base<file.grammarName>Visitor {
+func NewBase<file.grammarName>Visitor(root <file.grammarName>Visitor) *Base<file.grammarName>Visitor {
 	return &Base<file.grammarName>Visitor{
 		BaseParseTreeVisitor: antlr.NewBaseParseTreeVisitor(root),
 	}
