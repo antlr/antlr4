@@ -175,11 +175,11 @@ var symbolicNames []string
 
 
 <if(parser.ruleNames)>
-var RuleNames = []string{
+var ruleNames = []string{
 	<parser.ruleNames:{r | "<r>"}; separator=", ", wrap>,
 }
 <else>
-var RuleNames []string
+var ruleNames []string
 <endif>
 
 type <parser.name> struct {
@@ -203,7 +203,7 @@ func New<parser.name>(input antlr.TokenStream) *<parser.name> {
 	this.BaseParser = antlr.NewBaseParser(input)
 
 	this.Interpreter = antlr.NewParserATNSimulator(this, deserializedATN, decisionToDFA, antlr.NewPredictionContextCache())
-	this.RuleNames = RuleNames
+	this.RuleNames = ruleNames
 	this.LiteralNames = literalNames
 	this.SymbolicNames = symbolicNames
 	this.GrammarFileName = "<parser.grammarFileName; format="java-escape">"
