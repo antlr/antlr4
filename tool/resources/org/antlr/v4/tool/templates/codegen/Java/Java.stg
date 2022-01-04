@@ -967,7 +967,6 @@ public class <lexer.name> extends <superClass; null="Lexer"> {
 SerializedATN(model) ::= <<
 <if(rest(model.segments))>
 <! requires segmented representation !>
-private static final int _serializedATNSegments = <length(model.segments)>;
 <model.segments:{segment|private static final String _serializedATNSegment<i0> =
 	"<segment; wrap={"+<\n><\t>"}>";}; separator="\n">
 public static final String _serializedATN = Utils.join(

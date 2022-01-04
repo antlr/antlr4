@@ -855,7 +855,6 @@ class <lexer.name> extends <superClass; null="Lexer"> {
 SerializedATN(model) ::= <<
 <if(rest(model.segments))>
 <! requires segmented representation !>
-static const int _serializedATNSegments = <length(model.segments)>;
 <model.segments:{segment|static final String _serializedATNSegment<i0> =
   '<segment; wrap={'<\n><\t>'}>';}; separator="\n">
 static final String _serializedATN = [
