@@ -1255,7 +1255,7 @@ func (s *<struct.name>) Accept(visitor antlr.ParseTreeVisitor) interface{} {
 labelref(x) ::= "<if(!x.isLocal)>localctx.<endif><x.name>"
 
 /** For any action chunk, what is correctly-typed context struct ptr? */
-ctx(actionChunk) ::= "localctx.(*<actionChunk.ctx.name>)"
+ctx(actionChunk) ::= "localctx"
 
 // used for left-recursive rules
 recRuleAltPredicate(ruleName, opPrec) ::= "p.Precpred(p.GetParserRuleContext(), <opPrec>)"
