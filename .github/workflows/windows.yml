@@ -27,6 +27,6 @@ jobs:
     - name: Build tool with Maven
       run: mvn install -DskipTests=true -Darguments="-Dmaven.javadoc.skip=true" -B -V
     - name: Test with Maven
-      run: arch -x86_64 .github/scripts-windows/run-tests-${{ matrix.TARGET }}.cmd
+      run: .github/scripts-windows/run-tests-${{ matrix.TARGET }}.cmd
       env:
         TARGET: ${{ matrix.TARGET }}
