@@ -8,7 +8,7 @@ package org.antlr.v4.codegen.model.chunk;
 
 import org.antlr.v4.codegen.model.decl.StructDecl;
 
-public class LocalRef extends NamedActionChunk {
+public class LocalRef extends SymbolRefChunk {
 	public LocalRef(StructDecl ctx, String name, String escapedName) {
 		super(ctx, name, escapedName);
 	}

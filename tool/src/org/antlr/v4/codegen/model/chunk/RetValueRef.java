@@ -9,7 +9,7 @@ package org.antlr.v4.codegen.model.chunk;
 import org.antlr.v4.codegen.model.decl.StructDecl;
 
 /** */
-public class RetValueRef extends NamedActionChunk {
+public class RetValueRef extends SymbolRefChunk {
 	public RetValueRef(StructDecl ctx, String name, String escapedName) {
 		super(ctx, name, escapedName);
 	}

@@ -8,7 +8,7 @@ package org.antlr.v4.codegen.model.chunk;
 
 import org.antlr.v4.codegen.model.decl.StructDecl;
 
-public class NonLocalAttrRef extends NamedActionChunk {
+public class NonLocalAttrRef extends SymbolRefChunk {
 	public String ruleName;
 	public int ruleIndex;
 
