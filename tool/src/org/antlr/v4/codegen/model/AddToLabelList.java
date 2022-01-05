@@ -11,8 +11,8 @@ import org.antlr.v4.codegen.model.decl.Decl;
 
 /** */
 public class AddToLabelList extends SrcOp {
-	public Decl label;
-	public String listName;
+	public final Decl label;
+	public final String listName;
 
 	public AddToLabelList(OutputModelFactory factory, String listName, Decl label) {
 		super(factory);

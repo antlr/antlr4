@@ -515,20 +515,13 @@ public enum ErrorType {
 	 * <p>
 	 * symbol <em>symbol</em> conflicts with generated code in target language
 	 * or runtime</p>
-	 *
-	 * <p>
-	 * Note: This error has the same number as the unrelated error
-	 * {@link #UNSUPPORTED_REFERENCE_IN_LEXER_SET}.</p>
 	 */
+	@Deprecated
 	USE_OF_BAD_WORD(134, "symbol <arg> conflicts with generated code in target language or runtime", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Error 183.
 	 *
 	 * <p>rule reference <em>rule</em> is not currently supported in a set</p>
-	 *
-	 * <p>
-	 * Note: This error has the same number as the unrelated error
-	 * {@link #USE_OF_BAD_WORD}.</p>
 	 */
 	UNSUPPORTED_REFERENCE_IN_LEXER_SET(183, "rule reference <arg> is not currently supported in a set", ErrorSeverity.ERROR),
 	/**

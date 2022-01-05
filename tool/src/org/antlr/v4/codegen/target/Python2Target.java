@@ -17,12 +17,8 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 
-/**
- *
- * @author Eric Vergnaud
- */
 public class Python2Target extends Target {
-	protected static final String[] python2Keywords = {
+	protected static final HashSet<String> reservedWords = new HashSet<>(Arrays.asList(
 		"abs", "all", "and", "any", "apply", "as", "assert",
 		"bin", "bool", "break", "buffer", "bytearray",
 		"callable", "chr", "class", "classmethod", "coerce", "compile", "complex", "continue",
@@ -47,19 +43,19 @@ public class Python2Target extends Target {
 		"yield",
 		"zip",
 		"__import__",
-		"True", "False", "None"
-	};
+		"True", "False", "None",
 
-	/** Avoid grammar symbols in this set to prevent conflicts in gen'd code. */
-	protected final Set<String> badWords = new HashSet<String>();
+		// misc
+		"rule", "parserRule"
+	));
 
 	public Python2Target(CodeGenerator gen) {
 		super(gen);
 	}
 
 	@Override
-	protected boolean visibleGrammarSymbolCausesIssueInGeneratedCode(GrammarAST idNode) {
-		return getBadWords().contains(idNode.getText());
+	protected Set<String> getReservedWords() {
+		return reservedWords;
 	}
 
 	@Override
@@ -90,19 +86,5 @@ public class Python2Target extends Target {
 	@Override
 	public boolean supportsOverloadedMethods() {
 		return false;
-	}
-
-	public Set<String> getBadWords() {
-		if (badWords.isEmpty()) {
-			addBadWords();
-		}
-
-		return badWords;
-	}
-
-	protected void addBadWords() {
-		badWords.addAll(Arrays.asList(python2Keywords));
-		badWords.add("rule");
-		badWords.add("parserRule");
 	}
 }

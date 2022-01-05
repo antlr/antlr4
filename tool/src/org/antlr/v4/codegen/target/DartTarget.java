@@ -17,12 +17,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class DartTarget extends Target {
-	/**
-	 * The Java target can cache the code generation templates.
-	 */
-	private static final ThreadLocal<STGroup> targetTemplates = new ThreadLocal<STGroup>();
-
-	protected static final String[] javaKeywords = {
+	protected static final HashSet<String> reservedWords = new HashSet<>(Arrays.asList(
 		"abstract", "dynamic", "implements", "show",
 		"as", "else", "import", "static",
 		"assert", "enum", "in", "super",
@@ -38,10 +33,9 @@ public class DartTarget extends Target {
 		"default", "get", "rethrow", "while",
 		"deferred", "hide", "return", "with",
 		"do", "if", "set", "yield",
-	};
 
-	/// Avoid grammar symbols in this set to prevent conflicts in gen'd code.
-	protected final Set<String> badWords = new HashSet<String>();
+		"rule", "parserRule"
+	));
 
 	public DartTarget(CodeGenerator gen) {
 		super(gen);
@@ -55,23 +49,8 @@ public class DartTarget extends Target {
 		return super.getTargetStringLiteralFromANTLRStringLiteral(generator, literal, addQuotes, escapeSpecial).replace("$", "\\$");
 	}
 
-	public Set<String> getBadWords() {
-		if (badWords.isEmpty()) {
-			addBadWords();
-		}
-
-		return badWords;
-	}
-
-	protected void addBadWords() {
-		badWords.addAll(Arrays.asList(javaKeywords));
-		badWords.add("rule");
-		badWords.add("parserRule");
-	}
-
-	@Override
-	protected boolean visibleGrammarSymbolCausesIssueInGeneratedCode(GrammarAST idNode) {
-		return getBadWords().contains(idNode.getText());
+	public Set<String> getReservedWords() {
+		return reservedWords;
 	}
 
 	@Override

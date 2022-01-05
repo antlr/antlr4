@@ -8,7 +8,6 @@ package org.antlr.v4.codegen.target;
 
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.codegen.Target;
-import org.antlr.v4.tool.ast.GrammarAST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.StringRenderer;
 
@@ -17,7 +16,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class PHPTarget extends Target {
-	private static final String[] phpKeywords = {
+	protected static final HashSet<String> reservedWords = new HashSet<>(Arrays.asList(
 		"abstract", "and", "array", "as",
 		"break",
 		"callable", "case", "catch", "class", "clone", "const", "continue",
@@ -40,14 +39,20 @@ public class PHPTarget extends Target {
 		"xor",
 		"yield",
 		"__halt_compiler", "__CLASS__", "__DIR__", "__FILE__", "__FUNCTION__",
-		"__LINE__", "__METHOD__", "__NAMESPACE__", "__TRAIT__"
-	};
+		"__LINE__", "__METHOD__", "__NAMESPACE__", "__TRAIT__",
 
-	private final Set<String> badWords = new HashSet<String>();
+		// misc
+		"rule", "parserRule"
+	));
 
 	public PHPTarget(CodeGenerator gen) {
 		super(gen);
 		targetCharValueEscape['$'] = "\\$";
+	}
+
+	@Override
+	protected Set<String> getReservedWords() {
+		return reservedWords;
 	}
 
 	@Override
@@ -57,25 +62,6 @@ public class PHPTarget extends Target {
 		}
 
 		return String.format("\\u{%X}", v & 0xFFFF);
-	}
-
-    public Set<String> getBadWords() {
-		if (badWords.isEmpty()) {
-			addBadWords();
-		}
-
-		return badWords;
-	}
-
-	protected void addBadWords() {
-		badWords.addAll(Arrays.asList(phpKeywords));
-		badWords.add("rule");
-		badWords.add("parserRule");
-	}
-
-	@Override
-	protected boolean visibleGrammarSymbolCausesIssueInGeneratedCode(GrammarAST idNode) {
-		return getBadWords().contains(idNode.getText());
 	}
 
 	@Override
