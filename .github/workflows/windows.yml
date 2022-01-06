@@ -25,16 +25,16 @@ jobs:
       uses: stCarolas/setup-maven@v4
       with:
         maven-version: 3.5.4    
-    - name: Set up Python 2
-      uses: actions/setup-python@v2
-      with:
-        python-version: '2.x' 
-        architecture: 'x64' 
-    - name: Set up Python 3
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.x' 
-        architecture: 'x64' 
+#    - name: Set up Python 2
+#      uses: actions/setup-python@v2
+#      with:
+#        python-version: '2.x' 
+#        architecture: 'x64' 
+#    - name: Set up Python 3
+#      uses: actions/setup-python@v2
+#      with:
+#        python-version: '3.x' 
+#        architecture: 'x64' 
     - name: Build tool with Maven
       run: mvn install -DskipTests=true -Darguments="-Dmaven.javadoc.skip=true" -B -V
     - name: Test with Maven
