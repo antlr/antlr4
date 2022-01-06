@@ -1,4 +1,4 @@
-REM C:\ProgramData\chocolatey\bin\choco.exe install php --package-parameters='"/DontAddToPath""/ThreadSafe""/InstallDir:C:\Program Files\php\"'
+REM C:\ProgramData\chocolatey\bin\choco.exe install php -y --package-parameters='"/DontAddToPath"'
 
 git clone https://github.com/antlr/antlr-php-runtime.git
 move antlr-php-runtime runtime\PHP
