@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ master ]
 
+env:
+  antlr-python3-python: "C:\Python38\python.exe"
+
 jobs:
   build:
     runs-on: [self-hosted, windows, x86]
@@ -32,5 +35,4 @@ jobs:
     - name: Test with Maven
       run: .github/scripts-windows/run-tests-${{ matrix.TARGET }}.cmd
       env:
-        antlr-python3-python: "C:\Python38\python.exe"
         TARGET: ${{ matrix.TARGET }}
