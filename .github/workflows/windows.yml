@@ -16,14 +16,14 @@ jobs:
         TARGET: [java, python3]
     steps:
     - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'
     - name: Set up JDK 11
       uses: actions/setup-java@v1
       with:
         java-version: 11
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.8'
     - name: Set up Maven
       uses: stCarolas/setup-maven@v4
       with:
