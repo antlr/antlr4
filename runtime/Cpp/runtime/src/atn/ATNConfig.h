@@ -77,18 +77,19 @@ namespace atn {
     /// Can be shared between multiple ATNConfig instances.
     Ref<SemanticContext> semanticContext;
 
-    ATNConfig(ATNState *state, size_t alt, Ref<PredictionContext> const& context);
-    ATNConfig(ATNState *state, size_t alt, Ref<PredictionContext> const& context, Ref<SemanticContext> const& semanticContext);
+    ATNConfig(ATNState *state, size_t alt, Ref<PredictionContext> context);
+    ATNConfig(ATNState *state, size_t alt, Ref<PredictionContext> context, Ref<SemanticContext> semanticContext);
 
     ATNConfig(Ref<ATNConfig> const& c); // dup
     ATNConfig(Ref<ATNConfig> const& c, ATNState *state);
-    ATNConfig(Ref<ATNConfig> const& c, ATNState *state, Ref<SemanticContext> const& semanticContext);
-    ATNConfig(Ref<ATNConfig> const& c, Ref<SemanticContext> const& semanticContext);
-    ATNConfig(Ref<ATNConfig> const& c, ATNState *state, Ref<PredictionContext> const& context);
-    ATNConfig(Ref<ATNConfig> const& c, ATNState *state, Ref<PredictionContext> const& context, Ref<SemanticContext> const& semanticContext);
+    ATNConfig(Ref<ATNConfig> const& c, ATNState *state, Ref<SemanticContext> semanticContext);
+    ATNConfig(Ref<ATNConfig> const& c, Ref<SemanticContext> semanticContext);
+    ATNConfig(Ref<ATNConfig> const& c, ATNState *state, Ref<PredictionContext> context);
+    ATNConfig(Ref<ATNConfig> const& c, ATNState *state, Ref<PredictionContext> context, Ref<SemanticContext> semanticContext);
 
     ATNConfig(ATNConfig const&) = default;
-    virtual ~ATNConfig();
+
+    virtual ~ATNConfig() = default;
 
     virtual size_t hashCode() const;
 
@@ -97,18 +98,18 @@ namespace atn {
      * as it existed prior to the introduction of the
      * {@link #isPrecedenceFilterSuppressed} method.
      */
-    size_t getOuterContextDepth() const ;
+    size_t getOuterContextDepth() const;
     bool isPrecedenceFilterSuppressed() const;
     void setPrecedenceFilterSuppressed(bool value);
 
     /// An ATN configuration is equal to another if both have
     /// the same state, they predict the same alternative, and
     /// syntactic/semantic contexts are the same.
-    bool operator == (const ATNConfig &other) const;
-    bool operator != (const ATNConfig &other) const;
+    bool operator==(const ATNConfig &other) const;
+    bool operator!=(const ATNConfig &other) const;
 
-    virtual std::string toString();
-    std::string toString(bool showAlt);
+    virtual std::string toString() const;
+    std::string toString(bool showAlt) const;
 
   private:
     /**

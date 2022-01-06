@@ -13,11 +13,8 @@ namespace atn {
   class ANTState;
 
   class ANTLR4CPP_PUBLIC AbstractPredicateTransition : public Transition {
-
   public:
-    AbstractPredicateTransition(ATNState *target);
-    ~AbstractPredicateTransition();
-
+    explicit AbstractPredicateTransition(ATNState *target);
   };
 
 } // namespace atn

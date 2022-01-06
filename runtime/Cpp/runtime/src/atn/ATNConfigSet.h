@@ -39,10 +39,13 @@ namespace atn {
     /// it's a wildcard whereas it is not for LL context merge.
     const bool fullCtx;
 
-    ATNConfigSet(bool fullCtx = true);
-    ATNConfigSet(const Ref<ATNConfigSet> &old);
+    ATNConfigSet();
 
-    virtual ~ATNConfigSet();
+    explicit ATNConfigSet(bool fullCtx);
+
+    explicit ATNConfigSet(const Ref<ATNConfigSet> &old);
+
+    virtual ~ATNConfigSet() = default;
 
     virtual bool add(const Ref<ATNConfig> &config);
 
@@ -58,7 +61,7 @@ namespace atn {
     /// </summary>
     virtual bool add(const Ref<ATNConfig> &config, PredictionContextMergeCache *mergeCache);
 
-    virtual std::vector<ATNState *> getStates();
+    virtual std::vector<ATNState *> getStates() const;
 
     /**
      * Gets the complete set of represented alternatives for the configuration
@@ -68,8 +71,8 @@ namespace atn {
      *
      * @since 4.3
      */
-    antlrcpp::BitSet getAlts();
-    virtual std::vector<Ref<SemanticContext>> getPredicates();
+    antlrcpp::BitSet getAlts() const;
+    virtual std::vector<Ref<SemanticContext>> getPredicates() const;
 
     virtual Ref<ATNConfig> get(size_t i) const;
 
@@ -77,14 +80,14 @@ namespace atn {
 
     bool addAll(const Ref<ATNConfigSet> &other);
 
-    bool operator == (const ATNConfigSet &other);
-    virtual size_t hashCode();
-    virtual size_t size();
-    virtual bool isEmpty();
+    bool operator==(const ATNConfigSet &other) const;
+    virtual size_t hashCode() const;
+    virtual size_t size() const;
+    virtual bool isEmpty() const;
     virtual void clear();
-    virtual bool isReadonly();
+    virtual bool isReadonly() const;
     virtual void setReadonly(bool readonly);
-    virtual std::string toString();
+    virtual std::string toString() const;
 
   protected:
     /// Indicates that the set of configurations is read-only. Do not
@@ -94,10 +97,10 @@ namespace atn {
     /// we've made this readonly.
     bool _readonly;
 
-    virtual size_t getHash(ATNConfig *c); // Hash differs depending on set type.
+    virtual size_t getHash(const ATNConfig *c) const; // Hash differs depending on set type.
 
   private:
-    size_t _cachedHashCode;
+    mutable std::atomic<size_t> _cachedHashCode;
 
     /// All configs but hashed by (s, i, _, pi) not including context. Wiped out
     /// when we go readonly as this set becomes a DFA state.

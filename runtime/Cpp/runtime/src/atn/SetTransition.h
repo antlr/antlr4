@@ -16,7 +16,7 @@ namespace atn {
   public:
     const misc::IntervalSet set;
 
-    SetTransition(ATNState *target, const misc::IntervalSet &set);
+    SetTransition(ATNState *target, misc::IntervalSet set);
 
     virtual SerializationType getSerializationType() const override;
 

@@ -263,7 +263,7 @@ void LexerATNSimulator::getReachableConfigSet(CharStream *input, ATNConfigSet *c
 
         bool treatEofAsEpsilon = t == Token::EOF;
         Ref<LexerATNConfig> config = std::make_shared<LexerATNConfig>(std::static_pointer_cast<LexerATNConfig>(c),
-          target, lexerActionExecutor);
+          target, std::move(lexerActionExecutor));
 
         if (closure(input, config, reach, currentAltReachedAcceptState, true, treatEofAsEpsilon)) {
           // any remaining configs for this alt have a lower priority than

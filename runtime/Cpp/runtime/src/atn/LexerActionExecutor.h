@@ -22,8 +22,7 @@ namespace atn {
     /// <summary>
     /// Constructs an executor for a sequence of <seealso cref="LexerAction"/> actions. </summary>
     /// <param name="lexerActions"> The lexer actions to execute. </param>
-    LexerActionExecutor(const std::vector<Ref<LexerAction>> &lexerActions);
-    virtual ~LexerActionExecutor();
+    explicit LexerActionExecutor(std::vector<Ref<LexerAction>> lexerActions);
 
     /// <summary>
     /// Creates a <seealso cref="LexerActionExecutor"/> which executes the actions for
@@ -40,7 +39,7 @@ namespace atn {
     /// <returns> A <seealso cref="LexerActionExecutor"/> for executing the combine actions
     /// of {@code lexerActionExecutor} and {@code lexerAction}. </returns>
     static Ref<LexerActionExecutor> append(Ref<LexerActionExecutor> const& lexerActionExecutor,
-                                           Ref<LexerAction> const& lexerAction);
+                                           Ref<LexerAction> lexerAction);
 
     /// <summary>
     /// Creates a <seealso cref="LexerActionExecutor"/> which encodes the current offset
@@ -75,7 +74,7 @@ namespace atn {
     /// <summary>
     /// Gets the lexer actions to be executed by this executor. </summary>
     /// <returns> The lexer actions to be executed by this executor. </returns>
-    virtual std::vector<Ref<LexerAction>> getLexerActions() const;
+    virtual const std::vector<Ref<LexerAction>>& getLexerActions() const;
 
     /// <summary>
     /// Execute the actions encapsulated by this executor within the context of a
@@ -98,8 +97,8 @@ namespace atn {
     virtual void execute(Lexer *lexer, CharStream *input, size_t startIndex);
 
     virtual size_t hashCode() const;
-    virtual bool operator == (const LexerActionExecutor &obj) const;
-    virtual bool operator != (const LexerActionExecutor &obj) const;
+    virtual bool operator==(const LexerActionExecutor &obj) const;
+    virtual bool operator!=(const LexerActionExecutor &obj) const;
 
   private:
     const std::vector<Ref<LexerAction>> _lexerActions;

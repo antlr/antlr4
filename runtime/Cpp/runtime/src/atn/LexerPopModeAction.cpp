@@ -12,12 +12,9 @@ using namespace antlr4;
 using namespace antlr4::atn;
 using namespace antlr4::misc;
 
-const Ref<LexerPopModeAction> LexerPopModeAction::getInstance() {
+const Ref<LexerPopModeAction>& LexerPopModeAction::getInstance() {
   static Ref<LexerPopModeAction> instance(new LexerPopModeAction());
   return instance;
-}
-
-LexerPopModeAction::LexerPopModeAction() {
 }
 
 LexerActionType LexerPopModeAction::getActionType() const {
@@ -38,7 +35,7 @@ size_t LexerPopModeAction::hashCode() const {
   return MurmurHash::finish(hash, 1);
 }
 
-bool LexerPopModeAction::operator == (const LexerAction &obj) const {
+bool LexerPopModeAction::operator==(const LexerAction &obj) const {
   return &obj == this;
 }
 

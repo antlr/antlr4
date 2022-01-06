@@ -12,8 +12,6 @@ namespace atn {
 
   class ANTLR4CPP_PUBLIC RuleStartState final : public ATNState {
   public:
-    RuleStartState();
-
     RuleStopState *stopState = nullptr;
     bool isLeftRecursiveRule = false;
 

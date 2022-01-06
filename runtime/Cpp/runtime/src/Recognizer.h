@@ -113,7 +113,7 @@ namespace antlr4 {
 
     virtual void action(RuleContext *localctx, size_t ruleIndex, size_t actionIndex);
 
-    virtual size_t getState() const ;
+    size_t getState() const { return _stateNumber; }
 
     // Get the ATN used by the recognizer for prediction.
     virtual const atn::ATN& getATN() const = 0;
@@ -126,7 +126,7 @@ namespace antlr4 {
     ///  invoking rules. Combine this and we have complete ATN
     ///  configuration information.
     /// </summary>
-    void setState(size_t atnState);
+    void setState(size_t atnState) { _stateNumber = atnState; }
 
     virtual IntStream* getInputStream() = 0;
 

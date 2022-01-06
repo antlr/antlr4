@@ -218,7 +218,7 @@ namespace atn {
     /// statistics for a particular decision.
     /// </summary>
     /// <param name="decision"> The decision number </param>
-    DecisionInfo(size_t decision);
+    explicit DecisionInfo(size_t decision);
 
     std::string toString() const;
   };

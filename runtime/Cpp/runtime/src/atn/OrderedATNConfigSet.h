@@ -13,7 +13,7 @@ namespace atn {
 
   class ANTLR4CPP_PUBLIC OrderedATNConfigSet : public ATNConfigSet {
   protected:
-    virtual size_t getHash(ATNConfig *c) override;
+    size_t getHash(const ATNConfig *c) const override;
   };
 
 } // namespace atn

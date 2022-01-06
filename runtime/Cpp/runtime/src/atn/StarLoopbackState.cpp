@@ -10,7 +10,7 @@
 
 using namespace antlr4::atn;
 
-StarLoopEntryState *StarLoopbackState::getLoopEntryState() {
+StarLoopEntryState *StarLoopbackState::getLoopEntryState() const {
   return dynamic_cast<StarLoopEntryState *>(transitions[0]->target);
 }
 

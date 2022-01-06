@@ -88,7 +88,7 @@ namespace atn {
 
     LexerATNSimulator(const ATN &atn, std::vector<dfa::DFA> &decisionToDFA, PredictionContextCache &sharedContextCache);
     LexerATNSimulator(Lexer *recog, const ATN &atn, std::vector<dfa::DFA> &decisionToDFA, PredictionContextCache &sharedContextCache);
-    virtual ~LexerATNSimulator () {}
+    virtual ~LexerATNSimulator() = default;
 
     virtual void copyState(LexerATNSimulator *simulator);
     virtual size_t match(CharStream *input, size_t mode);

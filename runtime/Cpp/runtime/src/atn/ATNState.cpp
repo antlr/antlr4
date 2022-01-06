@@ -13,9 +13,6 @@
 using namespace antlr4::atn;
 using namespace antlrcpp;
 
-ATNState::ATNState() {
-}
-
 ATNState::~ATNState() {
   for (auto *transition : transitions) {
     delete transition;
@@ -28,15 +25,15 @@ const std::vector<std::string> ATNState::serializationNames = {
   "BLOCK_END", "STAR_LOOP_BACK", "STAR_LOOP_ENTRY", "PLUS_LOOP_BACK", "LOOP_END"
 };
 
-size_t ATNState::hashCode() {
+size_t ATNState::hashCode() const {
   return stateNumber;
 }
 
-bool ATNState::operator == (const ATNState &other) {
+bool ATNState::operator==(const ATNState &other) const {
   return stateNumber == other.stateNumber;
 }
 
-bool ATNState::isNonGreedyExitState() {
+bool ATNState::isNonGreedyExitState() const {
   return false;
 }
 

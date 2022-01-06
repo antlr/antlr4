@@ -137,11 +137,11 @@ SemanticContext::AND::AND(Ref<SemanticContext> const& a, Ref<SemanticContext> co
   std::copy(operands.begin(), operands.end(), std::back_inserter(opnds));
 }
 
-std::vector<Ref<SemanticContext>> SemanticContext::AND::getOperands() const {
+const std::vector<Ref<SemanticContext>>& SemanticContext::AND::getOperands() const {
   return opnds;
 }
 
-bool SemanticContext::AND::operator == (const SemanticContext &other) const {
+bool SemanticContext::AND::operator==(const SemanticContext &other) const {
   if (this == &other)
     return true;
 
@@ -239,11 +239,11 @@ SemanticContext::OR::OR(Ref<SemanticContext> const& a, Ref<SemanticContext> cons
   std::copy(operands.begin(), operands.end(), std::back_inserter(opnds));
 }
 
-std::vector<Ref<SemanticContext>> SemanticContext::OR::getOperands() const {
+const std::vector<Ref<SemanticContext>>& SemanticContext::OR::getOperands() const {
   return opnds;
 }
 
-bool SemanticContext::OR::operator == (const SemanticContext &other) const {
+bool SemanticContext::OR::operator==(const SemanticContext &other) const {
   if (this == &other)
     return true;
 
@@ -311,10 +311,7 @@ std::string SemanticContext::OR::toString() const {
 
 const Ref<SemanticContext> SemanticContext::NONE = std::make_shared<Predicate>(INVALID_INDEX, INVALID_INDEX, false);
 
-SemanticContext::~SemanticContext() {
-}
-
-bool SemanticContext::operator != (const SemanticContext &other) const {
+bool SemanticContext::operator!=(const SemanticContext &other) const {
   return !(*this == other);
 }
 
@@ -368,10 +365,4 @@ std::vector<Ref<SemanticContext::PrecedencePredicate>> SemanticContext::filterPr
   }
 
   return result;
-}
-
-
-//------------------ Operator -----------------------------------------------------------------------------------------
-
-SemanticContext::Operator::~Operator() {
 }

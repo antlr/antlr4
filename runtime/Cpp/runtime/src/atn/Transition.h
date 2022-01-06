@@ -45,10 +45,10 @@ namespace atn {
     // ml: this is a reference into the ATN.
     ATNState *target;
 
-    virtual ~Transition();
+    virtual ~Transition() = default;
 
   protected:
-    Transition(ATNState *target);
+    explicit Transition(ATNState *target);
 
   public:
     virtual SerializationType getSerializationType() const = 0;

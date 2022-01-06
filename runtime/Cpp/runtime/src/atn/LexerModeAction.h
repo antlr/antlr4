@@ -23,13 +23,13 @@ namespace atn {
     /// <summary>
     /// Constructs a new {@code mode} action with the specified mode value. </summary>
     /// <param name="mode"> The mode value to pass to <seealso cref="Lexer#mode"/>. </param>
-    LexerModeAction(int mode);
+    explicit LexerModeAction(int mode);
 
     /// <summary>
     /// Get the lexer mode this action should transition the lexer to.
     /// </summary>
     /// <returns> The lexer mode for this {@code mode} command. </returns>
-    int getMode();
+    int getMode() const;
 
     /// <summary>
     /// {@inheritDoc} </summary>

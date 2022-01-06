@@ -11,12 +11,12 @@
 
 using namespace antlr4::atn;
 
-ATNConfig::ATNConfig(ATNState *state_, size_t alt_, Ref<PredictionContext> const& context_)
-  : ATNConfig(state_, alt_, context_, SemanticContext::NONE) {
+ATNConfig::ATNConfig(ATNState *state_, size_t alt, Ref<PredictionContext> context)
+  : ATNConfig(state_, alt, std::move(context), SemanticContext::NONE) {
 }
 
-ATNConfig::ATNConfig(ATNState *state_, size_t alt_, Ref<PredictionContext> const& context_, Ref<SemanticContext> const& semanticContext_)
-  : state(state_), alt(alt_), context(context_), semanticContext(semanticContext_) {
+ATNConfig::ATNConfig(ATNState *state, size_t alt, Ref<PredictionContext> context, Ref<SemanticContext> semanticContext)
+  : state(state), alt(alt), context(std::move(context)), semanticContext(std::move(semanticContext)) {
   reachesIntoOuterContext = 0;
 }
 
@@ -26,25 +26,22 @@ ATNConfig::ATNConfig(Ref<ATNConfig> const& c) : ATNConfig(c, c->state, c->contex
 ATNConfig::ATNConfig(Ref<ATNConfig> const& c, ATNState *state_) : ATNConfig(c, state_, c->context, c->semanticContext) {
 }
 
-ATNConfig::ATNConfig(Ref<ATNConfig> const& c, ATNState *state, Ref<SemanticContext> const& semanticContext)
-  : ATNConfig(c, state, c->context, semanticContext) {
+ATNConfig::ATNConfig(Ref<ATNConfig> const& c, ATNState *state, Ref<SemanticContext> semanticContext)
+  : ATNConfig(c, state, c->context, std::move(semanticContext)) {
 }
 
-ATNConfig::ATNConfig(Ref<ATNConfig> const& c, Ref<SemanticContext> const& semanticContext)
-  : ATNConfig(c, c->state, c->context, semanticContext) {
+ATNConfig::ATNConfig(Ref<ATNConfig> const& c, Ref<SemanticContext> semanticContext)
+  : ATNConfig(c, c->state, c->context, std::move(semanticContext)) {
 }
 
-ATNConfig::ATNConfig(Ref<ATNConfig> const& c, ATNState *state, Ref<PredictionContext> const& context)
-  : ATNConfig(c, state, context, c->semanticContext) {
+ATNConfig::ATNConfig(Ref<ATNConfig> const& c, ATNState *state, Ref<PredictionContext> context)
+  : ATNConfig(c, state, std::move(context), c->semanticContext) {
 }
 
-ATNConfig::ATNConfig(Ref<ATNConfig> const& c, ATNState *state, Ref<PredictionContext> const& context,
-                     Ref<SemanticContext> const& semanticContext)
-  : state(state), alt(c->alt), context(context), reachesIntoOuterContext(c->reachesIntoOuterContext),
-    semanticContext(semanticContext) {
-}
-
-ATNConfig::~ATNConfig() {
+ATNConfig::ATNConfig(Ref<ATNConfig> const& c, ATNState *state, Ref<PredictionContext> context,
+                     Ref<SemanticContext> semanticContext)
+  : state(state), alt(c->alt), context(std::move(context)), reachesIntoOuterContext(c->reachesIntoOuterContext),
+    semanticContext(std::move(semanticContext)) {
 }
 
 size_t ATNConfig::hashCode() const {
@@ -73,22 +70,22 @@ void ATNConfig::setPrecedenceFilterSuppressed(bool value) {
   }
 }
 
-bool ATNConfig::operator == (const ATNConfig &other) const {
+bool ATNConfig::operator==(const ATNConfig &other) const {
   return state->stateNumber == other.state->stateNumber && alt == other.alt &&
     ((context == other.context) || (*context == *other.context)) &&
     *semanticContext == *other.semanticContext &&
     isPrecedenceFilterSuppressed() == other.isPrecedenceFilterSuppressed();
 }
 
-bool ATNConfig::operator != (const ATNConfig &other) const {
+bool ATNConfig::operator!=(const ATNConfig &other) const {
   return !operator==(other);
 }
 
-std::string ATNConfig::toString() {
+std::string ATNConfig::toString() const {
   return toString(true);
 }
 
-std::string ATNConfig::toString(bool showAlt) {
+std::string ATNConfig::toString(bool showAlt) const {
   std::stringstream ss;
   ss << "(";
 

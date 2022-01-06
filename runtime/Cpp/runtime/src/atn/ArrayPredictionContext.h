@@ -25,9 +25,9 @@ namespace atn {
     /// Sorted for merge, no duplicates; if present, EMPTY_RETURN_STATE is always last.
     const std::vector<size_t> returnStates;
 
-    ArrayPredictionContext(Ref<SingletonPredictionContext> const& a);
-    ArrayPredictionContext(std::vector<Ref<PredictionContext>> const& parents_, std::vector<size_t> const& returnStates);
-    virtual ~ArrayPredictionContext();
+    explicit ArrayPredictionContext(Ref<SingletonPredictionContext> const &a);
+
+    ArrayPredictionContext(std::vector<Ref<PredictionContext>> parents, std::vector<size_t> returnStates);
 
     virtual bool isEmpty() const override;
     virtual size_t size() const override;

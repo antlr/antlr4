@@ -23,7 +23,7 @@ namespace atn {
   class ANTLR4CPP_PUBLIC LexerSkipAction final : public LexerAction {
   public:
     /// Provides a singleton instance of this parameterless lexer action.
-    static const Ref<LexerSkipAction> getInstance();
+    static const Ref<LexerSkipAction>& getInstance();
 
     /// <summary>
     /// {@inheritDoc} </summary>
@@ -43,12 +43,12 @@ namespace atn {
     virtual void execute(Lexer *lexer) override;
 
     virtual size_t hashCode() const override;
-    virtual bool operator == (const LexerAction &obj) const override;
+    virtual bool operator==(const LexerAction &obj) const override;
     virtual std::string toString() const override;
 
   private:
     /// Constructs the singleton instance of the lexer {@code skip} command.
-    LexerSkipAction();
+    LexerSkipAction() = default;
   };
 
 } // namespace atn

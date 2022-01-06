@@ -15,8 +15,6 @@ namespace atn {
   public:
     BlockStartState *startState = nullptr;
 
-    BlockEndState();
-
     virtual size_t getStateType() override;
   };
 
