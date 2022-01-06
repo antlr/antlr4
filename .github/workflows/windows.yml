@@ -35,6 +35,9 @@ jobs:
 #      with:
 #        python-version: '3.x' 
 #        architecture: 'x64' 
+    - uses: actions/setup-node@v2
+      with:
+        node-version: '14'
     - name: Build tool with Maven
       run: mvn install -DskipTests=true -Darguments="-Dmaven.javadoc.skip=true" -B -V
     - name: Test with Maven
