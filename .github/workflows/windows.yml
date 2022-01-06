@@ -9,14 +9,12 @@ on:
 jobs:
   build:
     runs-on: [self-hosted, windows, x64]
-    env:
-      pwsh: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe
     strategy:
       fail-fast: false
       matrix:
 #       TARGET: [java, cpp, csharp, dart, go, javascript, php, python2, python3]
-#        TARGET: [java, python2, python3, javascript, csharp, dart, go]
-        TARGET: [php]
+        TARGET: [java, python2, python3, javascript, csharp, dart, go, php]
+#        TARGET: [php]
     steps:
     - name: Check out latest code
       uses: actions/checkout@v2
@@ -57,6 +55,7 @@ jobs:
       uses: actions/setup-go@v2
       with:
         go-version: '^1.13.1' 
+# requires manually setting up pwsh
     - name: Setup PHP 8.2
       uses: shivammathur/setup-php@v2
       with:
