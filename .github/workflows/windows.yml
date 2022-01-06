@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    runs-on: [self-hosted, windows, x86]
+    runs-on: [self-hosted, windows, x64]
     strategy:
       fail-fast: false
       matrix:
