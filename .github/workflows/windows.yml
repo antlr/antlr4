@@ -22,7 +22,7 @@ jobs:
         java-version: 11
     - uses: actions/setup-python@v2
       with:
-        python-version: [ '2.7', '3.8' ]
+        python-version: '3.8'
     - name: Set up Maven
       uses: stCarolas/setup-maven@v4
       with:
