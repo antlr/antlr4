@@ -13,8 +13,8 @@ jobs:
       fail-fast: false
       matrix:
 #       TARGET: [java, cpp, csharp, dart, go, javascript, php, python2, python3]
-        TARGET: [java, python2, python3, javascript, csharp, dart]
-#        TARGET: [dart]
+        TARGET: [java, python2, python3, javascript, csharp, dart, go]
+#        TARGET: [go]
     steps:
     - uses: actions/checkout@v2
     - name: Set up JDK 11
@@ -50,6 +50,10 @@ jobs:
 #      uses: dart-lang/setup-dart@v1
 #      with:
 #        sdk: 2.12.1
+    - name: Setup Go 1.13.1
+      uses: actions/setup-go@v2
+      with:
+        go-version: '^1.13.1' 
     - name: Build tool with Maven
       run: mvn install -DskipTests=true -Darguments="-Dmaven.javadoc.skip=true" -B -V
     - name: Test with Maven
