@@ -20,7 +20,7 @@ namespace atn {
     virtual size_t getReturnState(size_t index) const override;
     virtual std::string toString() const override;
 
-    virtual bool operator == (const PredictionContext &o) const override;
+    virtual bool operator==(const PredictionContext &o) const override;
   };
 
 } // namespace atn

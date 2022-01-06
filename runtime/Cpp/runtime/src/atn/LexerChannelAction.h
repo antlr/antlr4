@@ -25,7 +25,7 @@ namespace atn {
     /// <summary>
     /// Constructs a new {@code channel} action with the specified channel value. </summary>
     /// <param name="channel"> The channel value to pass to <seealso cref="Lexer#setChannel"/>. </param>
-    LexerChannelAction(int channel);
+    explicit LexerChannelAction(int channel);
 
     /// <summary>
     /// Gets the channel to use for the <seealso cref="Token"/> created by the lexer.
@@ -52,7 +52,7 @@ namespace atn {
     virtual void execute(Lexer *lexer) override;
 
     virtual size_t hashCode() const override;
-    virtual bool operator == (const LexerAction &obj) const override;
+    virtual bool operator==(const LexerAction &obj) const override;
     virtual std::string toString() const override;
 
   private:

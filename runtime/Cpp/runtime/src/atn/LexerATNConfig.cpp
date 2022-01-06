@@ -16,13 +16,13 @@
 using namespace antlr4::atn;
 using namespace antlrcpp;
 
-LexerATNConfig::LexerATNConfig(ATNState *state, int alt, Ref<PredictionContext> const& context)
-  : ATNConfig(state, alt, context, SemanticContext::NONE), _passedThroughNonGreedyDecision(false) {
+LexerATNConfig::LexerATNConfig(ATNState *state, int alt, Ref<PredictionContext> context)
+  : ATNConfig(state, alt, std::move(context), SemanticContext::NONE), _passedThroughNonGreedyDecision(false) {
 }
 
-LexerATNConfig::LexerATNConfig(ATNState *state, int alt, Ref<PredictionContext> const& context,
-                               Ref<LexerActionExecutor> const& lexerActionExecutor)
-  : ATNConfig(state, alt, context, SemanticContext::NONE), _lexerActionExecutor(lexerActionExecutor),
+LexerATNConfig::LexerATNConfig(ATNState *state, int alt, Ref<PredictionContext> context,
+                               Ref<LexerActionExecutor> lexerActionExecutor)
+  : ATNConfig(state, alt, std::move(context), SemanticContext::NONE), _lexerActionExecutor(std::move(lexerActionExecutor)),
     _passedThroughNonGreedyDecision(false) {
 }
 
@@ -31,21 +31,21 @@ LexerATNConfig::LexerATNConfig(Ref<LexerATNConfig> const& c, ATNState *state)
    _passedThroughNonGreedyDecision(checkNonGreedyDecision(c, state)) {
 }
 
-LexerATNConfig::LexerATNConfig(Ref<LexerATNConfig> const& c, ATNState *state, Ref<LexerActionExecutor> const& lexerActionExecutor)
-  : ATNConfig(c, state, c->context, c->semanticContext), _lexerActionExecutor(lexerActionExecutor),
+LexerATNConfig::LexerATNConfig(Ref<LexerATNConfig> const& c, ATNState *state, Ref<LexerActionExecutor> lexerActionExecutor)
+  : ATNConfig(c, state, c->context, c->semanticContext), _lexerActionExecutor(std::move(lexerActionExecutor)),
     _passedThroughNonGreedyDecision(checkNonGreedyDecision(c, state)) {
 }
 
-LexerATNConfig::LexerATNConfig(Ref<LexerATNConfig> const& c, ATNState *state, Ref<PredictionContext> const& context)
-  : ATNConfig(c, state, context, c->semanticContext), _lexerActionExecutor(c->_lexerActionExecutor),
+LexerATNConfig::LexerATNConfig(Ref<LexerATNConfig> const& c, ATNState *state, Ref<PredictionContext> context)
+  : ATNConfig(c, state, std::move(context), c->semanticContext), _lexerActionExecutor(c->_lexerActionExecutor),
     _passedThroughNonGreedyDecision(checkNonGreedyDecision(c, state)) {
 }
 
-Ref<LexerActionExecutor> LexerATNConfig::getLexerActionExecutor() const {
+const Ref<LexerActionExecutor>& LexerATNConfig::getLexerActionExecutor() const {
   return _lexerActionExecutor;
 }
 
-bool LexerATNConfig::hasPassedThroughNonGreedyDecision() {
+bool LexerATNConfig::hasPassedThroughNonGreedyDecision() const {
   return _passedThroughNonGreedyDecision;
 }
 
@@ -61,7 +61,7 @@ size_t LexerATNConfig::hashCode() const {
   return hashCode;
 }
 
-bool LexerATNConfig::operator == (const LexerATNConfig& other) const
+bool LexerATNConfig::operator==(const LexerATNConfig& other) const
 {
   if (this == &other)
     return true;
@@ -75,7 +75,7 @@ bool LexerATNConfig::operator == (const LexerATNConfig& other) const
     return false;
   }
 
-  return ATNConfig::operator == (other);
+  return ATNConfig::operator==(other);
 }
 
 bool LexerATNConfig::checkNonGreedyDecision(Ref<LexerATNConfig> const& source, ATNState *target) {

@@ -55,7 +55,7 @@ namespace atn {
     /// <seealso cref= ParserATNSimulator#evalSemanticContext(SemanticContext, ParserRuleContext, int, boolean) </seealso>
     /// <seealso cref= SemanticContext#eval(Recognizer, RuleContext) </seealso>
     PredicateEvalInfo(size_t decision, TokenStream *input, size_t startIndex, size_t stopIndex,
-                      Ref<SemanticContext> const& semctx, bool evalResult, size_t predictedAlt, bool fullCtx);
+                      Ref<SemanticContext> semctx, bool evalResult, size_t predictedAlt, bool fullCtx);
   };
 
 } // namespace atn

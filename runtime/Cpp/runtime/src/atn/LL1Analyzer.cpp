@@ -22,12 +22,6 @@ using namespace antlr4;
 using namespace antlr4::atn;
 using namespace antlrcpp;
 
-LL1Analyzer::LL1Analyzer(const ATN &atn) : _atn(atn) {
-}
-
-LL1Analyzer::~LL1Analyzer() {
-}
-
 std::vector<misc::IntervalSet> LL1Analyzer::getDecisionLookahead(ATNState *s) const {
   std::vector<misc::IntervalSet> look;
 
@@ -41,7 +35,7 @@ std::vector<misc::IntervalSet> LL1Analyzer::getDecisionLookahead(ATNState *s) co
 
     ATNConfig::Set lookBusy;
     antlrcpp::BitSet callRuleStack;
-    _LOOK(s->transitions[alt]->target, nullptr, PredictionContext::EMPTY,
+    LOOK(s->transitions[alt]->target, nullptr, PredictionContext::EMPTY,
           look[alt], lookBusy, callRuleStack, seeThruPreds, false);
 
     // Wipe out lookahead for this alternative if we found nothing
@@ -64,12 +58,12 @@ misc::IntervalSet LL1Analyzer::LOOK(ATNState *s, ATNState *stopState, RuleContex
 
   ATNConfig::Set lookBusy;
   antlrcpp::BitSet callRuleStack;
-  _LOOK(s, stopState, lookContext, r, lookBusy, callRuleStack, seeThruPreds, true);
+  LOOK(s, stopState, lookContext, r, lookBusy, callRuleStack, seeThruPreds, true);
 
   return r;
 }
 
-void LL1Analyzer::_LOOK(ATNState *s, ATNState *stopState, Ref<PredictionContext> const& ctx, misc::IntervalSet &look,
+void LL1Analyzer::LOOK(ATNState *s, ATNState *stopState, Ref<PredictionContext> const& ctx, misc::IntervalSet &look,
   ATNConfig::Set &lookBusy, antlrcpp::BitSet &calledRuleStack, bool seeThruPreds, bool addEOF) const {
 
   Ref<ATNConfig> c = std::make_shared<ATNConfig>(s, 0, ctx);
@@ -110,7 +104,7 @@ void LL1Analyzer::_LOOK(ATNState *s, ATNState *stopState, Ref<PredictionContext>
        // run thru all possible stack tops in ctx
       for (size_t i = 0; i < ctx->size(); i++) {
         ATNState *returnState = _atn.states[ctx->getReturnState(i)];
-        _LOOK(returnState, stopState, ctx->getParent(i), look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
+        LOOK(returnState, stopState, ctx->getParent(i), look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
       }
       return;
     }
@@ -131,16 +125,16 @@ void LL1Analyzer::_LOOK(ATNState *s, ATNState *stopState, Ref<PredictionContext>
       });
 
       calledRuleStack.set((static_cast<RuleTransition*>(t))->target->ruleIndex);
-      _LOOK(t->target, stopState, newContext, look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
+      LOOK(t->target, stopState, newContext, look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
 
     } else if (is<AbstractPredicateTransition *>(t)) {
       if (seeThruPreds) {
-        _LOOK(t->target, stopState, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
+        LOOK(t->target, stopState, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
       } else {
         look.add(HIT_PRED);
       }
     } else if (t->isEpsilon()) {
-      _LOOK(t->target, stopState, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
+      LOOK(t->target, stopState, ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF);
     } else if (t->getSerializationType() == Transition::WILDCARD) {
       look.addAll(misc::IntervalSet::of(Token::MIN_USER_TOKEN_TYPE, static_cast<ssize_t>(_atn.maxTokenType)));
     } else {

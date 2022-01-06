@@ -20,10 +20,10 @@ namespace atn {
     const Ref<PredictionContext> parent;
     const size_t returnState;
 
-    SingletonPredictionContext(Ref<PredictionContext> const& parent, size_t returnState);
-    virtual ~SingletonPredictionContext();
+    SingletonPredictionContext(Ref<PredictionContext> parent, size_t returnState);
+    virtual ~SingletonPredictionContext() = default;
 
-    static Ref<SingletonPredictionContext> create(Ref<PredictionContext> const& parent, size_t returnState);
+    static Ref<SingletonPredictionContext> create(Ref<PredictionContext> parent, size_t returnState);
 
     virtual size_t size() const override;
     virtual Ref<PredictionContext> getParent(size_t index) const override;

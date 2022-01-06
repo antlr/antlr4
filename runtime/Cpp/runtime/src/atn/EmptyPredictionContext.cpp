@@ -26,7 +26,7 @@ size_t EmptyPredictionContext::getReturnState(size_t /*index*/) const {
   return returnState;
 }
 
-bool EmptyPredictionContext::operator == (const PredictionContext &o) const {
+bool EmptyPredictionContext::operator==(const PredictionContext &o) const {
   return this == &o;
 }
 

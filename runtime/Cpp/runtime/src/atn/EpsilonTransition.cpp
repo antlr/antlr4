@@ -14,7 +14,7 @@ EpsilonTransition::EpsilonTransition(ATNState *target, size_t outermostPrecedenc
   : Transition(target), _outermostPrecedenceReturn(outermostPrecedenceReturn) {
 }
 
-size_t EpsilonTransition::outermostPrecedenceReturn() {
+size_t EpsilonTransition::outermostPrecedenceReturn() const {
   return _outermostPrecedenceReturn;
 }
 

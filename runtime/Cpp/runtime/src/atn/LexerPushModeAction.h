@@ -23,7 +23,7 @@ namespace atn {
     /// <summary>
     /// Constructs a new {@code pushMode} action with the specified mode value. </summary>
     /// <param name="mode"> The mode value to pass to <seealso cref="Lexer#pushMode"/>. </param>
-    LexerPushModeAction(int mode);
+    explicit LexerPushModeAction(int mode);
 
     /// <summary>
     /// Get the lexer mode this action should transition the lexer to.
@@ -50,7 +50,7 @@ namespace atn {
     virtual void execute(Lexer *lexer) override;
 
     virtual size_t hashCode() const override;
-    virtual bool operator == (const LexerAction &obj) const override;
+    virtual bool operator==(const LexerAction &obj) const override;
     virtual std::string toString() const override;
 
   private:

@@ -25,7 +25,7 @@ namespace atn {
     /// <summary>
     /// Provides a singleton instance of this parameterless lexer action.
     /// </summary>
-    static const Ref<LexerMoreAction> getInstance();
+    static const Ref<LexerMoreAction>& getInstance();
 
     /// <summary>
     /// {@inheritDoc} </summary>
@@ -45,12 +45,12 @@ namespace atn {
     virtual void execute(Lexer *lexer) override;
 
     virtual size_t hashCode() const override;
-    virtual bool operator == (const LexerAction &obj) const override;
+    virtual bool operator==(const LexerAction &obj) const override;
     virtual std::string toString() const override;
 
   private:
     /// Constructs the singleton instance of the lexer {@code more} command.
-    LexerMoreAction();
+    LexerMoreAction() = default;
   };
 
 } // namespace atn

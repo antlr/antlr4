@@ -7,9 +7,6 @@
 
 using namespace antlr4::atn;
 
-BlockEndState::BlockEndState() : startState(nullptr) {
-}
-
 size_t BlockEndState::getStateType() {
   return BLOCK_END;
 }

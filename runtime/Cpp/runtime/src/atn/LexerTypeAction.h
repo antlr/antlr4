@@ -18,7 +18,7 @@ namespace atn {
     /// <summary>
     /// Constructs a new {@code type} action with the specified token type value. </summary>
     /// <param name="type"> The type to assign to the token using <seealso cref="Lexer#setType"/>. </param>
-    LexerTypeAction(int type);
+    explicit LexerTypeAction(int type);
 
     /// <summary>
     /// Gets the type to assign to a token created by the lexer. </summary>
@@ -44,7 +44,7 @@ namespace atn {
     virtual void execute(Lexer *lexer) override;
 
     virtual size_t hashCode() const override;
-    virtual bool operator == (const LexerAction &obj) const override;
+    virtual bool operator==(const LexerAction &obj) const override;
     virtual std::string toString() const override;
 
   private:

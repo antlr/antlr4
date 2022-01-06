@@ -149,14 +149,6 @@ bool Recognizer::precpred(RuleContext * /*localctx*/, int /*precedence*/) {
 void Recognizer::action(RuleContext * /*localctx*/, size_t /*ruleIndex*/, size_t /*actionIndex*/) {
 }
 
-size_t Recognizer::getState() const {
-  return _stateNumber;
-}
-
-void Recognizer::setState(size_t atnState) {
-  _stateNumber = atnState;
-}
-
 void Recognizer::InitializeInstanceFields() {
   _stateNumber = ATNState::INVALID_STATE_NUMBER;
   _interpreter = nullptr;

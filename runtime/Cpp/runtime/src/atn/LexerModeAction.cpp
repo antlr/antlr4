@@ -15,7 +15,7 @@ using namespace antlr4::misc;
 LexerModeAction::LexerModeAction(int mode) : _mode(mode) {
 }
 
-int LexerModeAction::getMode() {
+int LexerModeAction::getMode() const {
   return _mode;
 }
 
@@ -38,7 +38,7 @@ size_t LexerModeAction::hashCode() const {
   return MurmurHash::finish(hash, 2);
 }
 
-bool LexerModeAction::operator == (const LexerAction &obj) const {
+bool LexerModeAction::operator==(const LexerAction &obj) const {
   if (&obj == this) {
     return true;
   }

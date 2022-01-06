@@ -12,12 +12,9 @@ using namespace antlr4;
 using namespace antlr4::atn;
 using namespace antlr4::misc;
 
-const Ref<LexerMoreAction> LexerMoreAction::getInstance() {
+const Ref<LexerMoreAction>& LexerMoreAction::getInstance() {
   static Ref<LexerMoreAction> instance(new LexerMoreAction());
   return instance;
-}
-
-LexerMoreAction::LexerMoreAction() {
 }
 
 LexerActionType LexerMoreAction::getActionType() const {
@@ -38,7 +35,7 @@ size_t LexerMoreAction::hashCode() const {
   return MurmurHash::finish(hash, 1);
 }
 
-bool LexerMoreAction::operator == (const LexerAction &obj) const {
+bool LexerMoreAction::operator==(const LexerAction &obj) const {
   return &obj == this;
 }
 

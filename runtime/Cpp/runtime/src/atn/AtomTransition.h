@@ -14,6 +14,7 @@ namespace atn {
   class ANTLR4CPP_PUBLIC AtomTransition final : public Transition {
   public:
     /// The token type or character value; or, signifies special label.
+    /// TODO: rename this to label
     const size_t _label;
 
     AtomTransition(ATNState *target, size_t label);

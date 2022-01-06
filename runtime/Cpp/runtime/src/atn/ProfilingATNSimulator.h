@@ -13,7 +13,7 @@ namespace atn {
 
   class ANTLR4CPP_PUBLIC ProfilingATNSimulator : public ParserATNSimulator {
   public:
-    ProfilingATNSimulator(Parser *parser);
+    explicit ProfilingATNSimulator(Parser *parser);
 
     virtual size_t adaptivePredict(TokenStream *input, size_t decision, ParserRuleContext *outerContext) override;
 

@@ -81,15 +81,19 @@ namespace atn {
 
   class ANTLR4CPP_PUBLIC ATNState {
   public:
-    ATNState();
+    static constexpr size_t INITIAL_NUM_TRANSITIONS = 4;
+    static constexpr size_t INVALID_STATE_NUMBER = std::numeric_limits<size_t>::max();
+
+    size_t stateNumber = INVALID_STATE_NUMBER;
+    size_t ruleIndex = 0; // at runtime, we don't have Rule objects
+    bool epsilonOnlyTransitions = false;
+
+    ATNState() = default;
     ATNState(ATNState const&) = delete;
 
     virtual ~ATNState();
 
     ATNState& operator=(ATNState const&) = delete;
-
-    static constexpr size_t INITIAL_NUM_TRANSITIONS = 4;
-    static constexpr size_t INVALID_STATE_NUMBER = std::numeric_limits<size_t>::max();
 
     enum {
       ATN_INVALID_TYPE = 0,
@@ -109,18 +113,13 @@ namespace atn {
 
     static const std::vector<std::string> serializationNames;
 
-    size_t stateNumber = INVALID_STATE_NUMBER;
-    size_t ruleIndex = 0; // at runtime, we don't have Rule objects
-    bool epsilonOnlyTransitions = false;
-
-  public:
-    virtual size_t hashCode();
-    bool operator == (const ATNState &other);
+    virtual size_t hashCode() const;
+    bool operator==(const ATNState &other) const;
 
     /// Track the transitions emanating from this ATN state.
     std::vector<Transition*> transitions;
 
-    virtual bool isNonGreedyExitState();
+    virtual bool isNonGreedyExitState() const;
     virtual std::string toString() const;
     virtual void addTransition(Transition *e);
     virtual void addTransition(size_t index, Transition *e);

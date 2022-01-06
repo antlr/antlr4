@@ -15,6 +15,8 @@
 using namespace antlr4::atn;
 using namespace antlrcpp;
 
+ATNConfigSet::ATNConfigSet() : ATNConfigSet(true) {}
+
 ATNConfigSet::ATNConfigSet(bool fullCtx) : fullCtx(fullCtx) {
   InitializeInstanceFields();
 }
@@ -25,9 +27,6 @@ ATNConfigSet::ATNConfigSet(const Ref<ATNConfigSet> &old) : ATNConfigSet(old->ful
   conflictingAlts = old->conflictingAlts;
   hasSemanticContext = old->hasSemanticContext;
   dipsIntoOuterContext = old->dipsIntoOuterContext;
-}
-
-ATNConfigSet::~ATNConfigSet() {
 }
 
 bool ATNConfigSet::add(const Ref<ATNConfig> &config) {
@@ -68,7 +67,7 @@ bool ATNConfigSet::add(const Ref<ATNConfig> &config, PredictionContextMergeCache
     existing->setPrecedenceFilterSuppressed(true);
   }
 
-  existing->context = merged; // replace context; no need to alt mapping
+  existing->context = std::move(merged); // replace context; no need to alt mapping
 
   return true;
 }
@@ -80,8 +79,9 @@ bool ATNConfigSet::addAll(const Ref<ATNConfigSet> &other) {
   return false;
 }
 
-std::vector<ATNState*> ATNConfigSet::getStates() {
+std::vector<ATNState*> ATNConfigSet::getStates() const {
   std::vector<ATNState*> states;
+  states.reserve(configs.size());
   for (const auto &c : configs) {
     states.push_back(c->state);
   }
@@ -97,7 +97,7 @@ std::vector<ATNState*> ATNConfigSet::getStates() {
  * @since 4.3
  */
 
-BitSet ATNConfigSet::getAlts() {
+BitSet ATNConfigSet::getAlts() const {
   BitSet alts;
   for (const auto &config : configs) {
     alts.set(config->alt);
@@ -105,8 +105,9 @@ BitSet ATNConfigSet::getAlts() {
   return alts;
 }
 
-std::vector<Ref<SemanticContext>> ATNConfigSet::getPredicates() {
+std::vector<Ref<SemanticContext>> ATNConfigSet::getPredicates() const {
   std::vector<Ref<SemanticContext>> preds;
+  preds.reserve(configs.size());
   for (const auto &c : configs) {
     if (c->semanticContext != SemanticContext::NONE) {
       preds.push_back(c->semanticContext);
@@ -131,7 +132,7 @@ void ATNConfigSet::optimizeConfigs(ATNSimulator *interpreter) {
   }
 }
 
-bool ATNConfigSet::operator == (const ATNConfigSet &other) {
+bool ATNConfigSet::operator==(const ATNConfigSet &other) const {
   if (&other == this) {
     return true;
   }
@@ -147,22 +148,23 @@ bool ATNConfigSet::operator == (const ATNConfigSet &other) {
   return Arrays::equals(configs, other.configs);
 }
 
-size_t ATNConfigSet::hashCode() {
-  if (!isReadonly() || _cachedHashCode == 0) {
-    _cachedHashCode = 1;
+size_t ATNConfigSet::hashCode() const {
+  size_t cachedHashCode = _cachedHashCode.load(std::memory_order_relaxed);
+  if (!isReadonly() || cachedHashCode == 0) {
+    cachedHashCode = 1;
     for (const auto &i : configs) {
-      _cachedHashCode = 31 * _cachedHashCode + i->hashCode(); // Same as Java's list hashCode impl.
+      cachedHashCode = 31 * cachedHashCode + i->hashCode(); // Same as Java's list hashCode impl.
     }
+    _cachedHashCode.store(cachedHashCode, std::memory_order_relaxed);
   }
-
-  return _cachedHashCode;
+  return cachedHashCode;
 }
 
-size_t ATNConfigSet::size() {
+size_t ATNConfigSet::size() const {
   return configs.size();
 }
 
-bool ATNConfigSet::isEmpty() {
+bool ATNConfigSet::isEmpty() const {
   return configs.empty();
 }
 
@@ -175,7 +177,7 @@ void ATNConfigSet::clear() {
   _configLookup.clear();
 }
 
-bool ATNConfigSet::isReadonly() {
+bool ATNConfigSet::isReadonly() const {
   return _readonly;
 }
 
@@ -184,7 +186,7 @@ void ATNConfigSet::setReadonly(bool readonly) {
   _configLookup.clear();
 }
 
-std::string ATNConfigSet::toString() {
+std::string ATNConfigSet::toString() const {
   std::stringstream ss;
   ss << "[";
   for (size_t i = 0; i < configs.size(); i++) {
@@ -210,7 +212,7 @@ std::string ATNConfigSet::toString() {
   return ss.str();
 }
 
-size_t ATNConfigSet::getHash(ATNConfig *c) {
+size_t ATNConfigSet::getHash(const ATNConfig *c) const {
   size_t hashCode = 7;
   hashCode = 31 * hashCode + c->state->stateNumber;
   hashCode = 31 * hashCode + c->alt;

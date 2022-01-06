@@ -38,7 +38,7 @@ namespace atn {
     /// executed. </param>
     /// <param name="action"> The lexer action to execute at a particular offset in the
     /// input <seealso cref="CharStream"/>. </param>
-    LexerIndexedCustomAction(int offset, Ref<LexerAction> const& action);
+    LexerIndexedCustomAction(int offset, Ref<LexerAction> action);
 
     /// <summary>
     /// Gets the location in the input <seealso cref="CharStream"/> at which the lexer
@@ -69,7 +69,7 @@ namespace atn {
 
     virtual void execute(Lexer *lexer) override;
     virtual size_t hashCode() const override;
-    virtual bool operator == (const LexerAction &obj) const override;
+    virtual bool operator==(const LexerAction &obj) const override;
     virtual std::string toString() const override;
 
   private:

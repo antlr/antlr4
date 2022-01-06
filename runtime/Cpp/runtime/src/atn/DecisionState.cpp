@@ -7,11 +7,6 @@
 
 using namespace antlr4::atn;
 
-void DecisionState::InitializeInstanceFields() {
-  decision = -1;
-  nonGreedy = false;
-}
-
 std::string DecisionState::toString() const {
   return "DECISION " + ATNState::toString();
 }
