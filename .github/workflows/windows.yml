@@ -20,6 +20,7 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 11
+        settings-path: C:\GitHub\${{ runner.name }}\.m2\settings.xml
     - name: Set up Maven
       uses: stCarolas/setup-maven@v4
       with:
