@@ -43,6 +43,10 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 3.1.x
+    - name: Setup Dart 2.12.1
+      uses: dart-lang/setup-dart@v1
+      with:
+        sdk: 2.12.1
     - name: Build tool with Maven
       run: mvn install -DskipTests=true -Darguments="-Dmaven.javadoc.skip=true" -B -V
     - name: Test with Maven
