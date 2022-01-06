@@ -6,9 +6,6 @@ on:
   pull_request:
     branches: [ master ]
 
-env:
-  antlr-python3-python: "C:\Python38\python.exe"
-
 jobs:
   build:
     runs-on: [self-hosted, windows, x86]
