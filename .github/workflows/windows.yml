@@ -12,11 +12,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-#       TARGET: [java, cpp, csharp, dart, go, javascript, php, python2, python3]
         TARGET: [java, python2, python3, javascript, csharp, dart, go, php]
-#        TARGET: [php]
     steps:
-    - name: Check out latest code
+    - name: Check out code
       uses: actions/checkout@v2
     - name: Set up JDK 11
       uses: actions/setup-java@v1
@@ -28,21 +26,25 @@ jobs:
         maven-version: 3.5.4    
 #     fails due to permissions, use global install
 #    - name: Set up Python 2
+#      if: ${{ matrix.TARGET }} == 'python2'
 #      uses: actions/setup-python@v2
 #      with:
 #        python-version: '2.x' 
 #        architecture: 'x64' 
 #     fails due to permissions, use global install
 #    - name: Set up Python 3
+#      if: ${{ matrix.TARGET }} == 'python3'
 #      uses: actions/setup-python@v2
 #      with:
 #        python-version: '3.x' 
 #        architecture: 'x64' 
     - name: Set up Node 14
+      if: matrix.TARGET == 'javascript'
       uses: actions/setup-node@v2
       with:
         node-version: '14'
     - name: Setup Dotnet 3.1
+      if: matrix.TARGET == 'csharp'
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 3.1.x
@@ -52,11 +54,13 @@ jobs:
 #      with:
 #        sdk: 2.12.1
     - name: Setup Go 1.13.1
+      if: matrix.TARGET == 'go'
       uses: actions/setup-go@v2
       with:
         go-version: '^1.13.1' 
 # requires manually setting up pwsh
     - name: Setup PHP 8.2
+      if: matrix.TARGET == 'php'
       uses: shivammathur/setup-php@v2
       with:
         php-version: '8.2'
