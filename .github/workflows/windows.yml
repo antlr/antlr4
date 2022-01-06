@@ -9,6 +9,8 @@ on:
 jobs:
   build:
     runs-on: [self-hosted, windows, x64]
+    env:
+      pwsh: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe
     strategy:
       fail-fast: false
       matrix:
