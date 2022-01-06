@@ -13,8 +13,8 @@ jobs:
       fail-fast: false
       matrix:
 #       TARGET: [java, cpp, csharp, dart, go, javascript, php, python2, python3]
-#        TARGET: [java, python2, python3, javascript, csharp]
-        TARGET: [dart]
+        TARGET: [java, python2, python3, javascript, csharp, dart]
+#        TARGET: [dart]
     steps:
     - uses: actions/checkout@v2
     - name: Set up JDK 11
@@ -25,11 +25,13 @@ jobs:
       uses: stCarolas/setup-maven@v4
       with:
         maven-version: 3.5.4    
+#     fails due to permissions, use global install
 #    - name: Set up Python 2
 #      uses: actions/setup-python@v2
 #      with:
 #        python-version: '2.x' 
 #        architecture: 'x64' 
+#     fails due to permissions, use global install
 #    - name: Set up Python 3
 #      uses: actions/setup-python@v2
 #      with:
@@ -43,6 +45,11 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 3.1.x
+#     fails due to os (Linux only), use global install
+#    - name: Setup Dart 2.12.1
+#      uses: dart-lang/setup-dart@v1
+#      with:
+#        sdk: 2.12.1
     - name: Build tool with Maven
       run: mvn install -DskipTests=true -Darguments="-Dmaven.javadoc.skip=true" -B -V
     - name: Test with Maven
