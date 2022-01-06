@@ -13,8 +13,8 @@ jobs:
       fail-fast: false
       matrix:
 #       TARGET: [java, cpp, csharp, dart, go, javascript, php, python2, python3]
-        TARGET: [java, python2, python3]
-#        TARGET: [javascript]
+#        TARGET: [java, python2, python3, javascript]
+        TARGET: [csharp]
     steps:
     - uses: actions/checkout@v2
     - name: Set up JDK 11
