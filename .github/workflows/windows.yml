@@ -13,10 +13,11 @@ jobs:
       fail-fast: false
       matrix:
 #       TARGET: [java, cpp, csharp, dart, go, javascript, php, python2, python3]
-        TARGET: [java, python2, python3, javascript, csharp, dart, go]
+        TARGET: [java, python2, python3, javascript, csharp, dart, go, php]
 #        TARGET: [php]
     steps:
-    - uses: actions/checkout@v2
+    - name: Check out latest code
+      uses: actions/checkout@v2
     - name: Set up JDK 11
       uses: actions/setup-java@v1
       with:
@@ -54,6 +55,13 @@ jobs:
       uses: actions/setup-go@v2
       with:
         go-version: '^1.13.1' 
+# requires manually setting up pwsh
+    - name: Setup PHP 8.2
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+        extensions: mbstring    
+        tools: composer
     - name: Build tool with Maven
       run: mvn install -DskipTests=true -Darguments="-Dmaven.javadoc.skip=true" -B -V
     - name: Test with Maven
