@@ -20,8 +20,6 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 11
-        settings-path: C:\GitHub\Maven\${{ runner.name }}\.m2\
-        overwrite-settings: false
     - name: Set up Maven
       uses: stCarolas/setup-maven@v4
       with:
