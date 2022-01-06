@@ -39,12 +39,12 @@ jobs:
 #        python-version: '3.x' 
 #        architecture: 'x64' 
     - name: Set up Node 14
-      if: ${{ matrix.TARGET }} == 'javascript'
+      if: matrix.TARGET == 'javascript'
       uses: actions/setup-node@v2
       with:
         node-version: '14'
     - name: Setup Dotnet 3.1
-      if: ${{ matrix.TARGET }} == 'csharp'
+      if: matrix.TARGET == 'csharp'
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 3.1.x
@@ -54,13 +54,13 @@ jobs:
 #      with:
 #        sdk: 2.12.1
     - name: Setup Go 1.13.1
-      if: ${{ matrix.TARGET }} == 'go'
+      if: matrix.TARGET == 'go'
       uses: actions/setup-go@v2
       with:
         go-version: '^1.13.1' 
 # requires manually setting up pwsh
     - name: Setup PHP 8.2
-      if: ${{ matrix.TARGET }} == 'php'
+      if: matrix.TARGET == 'php'
       uses: shivammathur/setup-php@v2
       with:
         php-version: '8.2'
