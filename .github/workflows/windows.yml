@@ -13,8 +13,8 @@ jobs:
       fail-fast: false
       matrix:
 #       TARGET: [java, cpp, csharp, dart, go, javascript, php, python2, python3]
-        TARGET: [java, python2, python3]
-#        TARGET: [javascript]
+        TARGET: [java, python2, python3, javascript, csharp]
+#        TARGET: [csharp]
     steps:
     - uses: actions/checkout@v2
     - name: Set up JDK 11
@@ -39,6 +39,10 @@ jobs:
       uses: actions/setup-node@v2
       with:
         node-version: '14'
+    - name: Setup Dotnet 3.1
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.x
     - name: Build tool with Maven
       run: mvn install -DskipTests=true -Darguments="-Dmaven.javadoc.skip=true" -B -V
     - name: Test with Maven
