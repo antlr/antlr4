@@ -21,6 +21,7 @@ jobs:
       with:
         java-version: 11
         settings-path: C:\GitHub\Maven\${{ runner.name }}\.m2\
+        localRepository: C:\GitHub\Maven\${{ runner.name }}\.m2\repository\
     - name: Set up Maven
       uses: stCarolas/setup-maven@v4
       with:
