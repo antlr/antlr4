@@ -12,7 +12,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        TARGET: [java, python2, python3, javascript, csharp, dart, go, php]
+#        TARGET: [java, python2, python3, javascript, csharp, dart, go, php]
+        TARGET: [java]
     steps:
     - name: Check out code
       uses: actions/checkout@v2
