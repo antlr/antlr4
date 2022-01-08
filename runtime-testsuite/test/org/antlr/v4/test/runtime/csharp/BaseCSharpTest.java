@@ -141,7 +141,7 @@ public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTes
 				files.add(grammarName + "BaseVisitor.cs");
 			}
 		}
-		addSourceFiles(files.toArray(new String[files.size()]));
+		addSourceFiles(files.toArray(new String[0]));
 		return true;
 	}
 

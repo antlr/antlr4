@@ -449,7 +449,7 @@ public class ATNDeserializer {
 					}
 				}
 
-				atn.lexerActions = legacyLexerActions.toArray(new LexerAction[legacyLexerActions.size()]);
+				atn.lexerActions = legacyLexerActions.toArray(new LexerAction[0]);
 			}
 		}
 
