@@ -25,15 +25,16 @@ jobs:
       uses: stCarolas/setup-maven@v4
       with:
         maven-version: 3.5.4    
-    - name: Set up Python 2
-      if: ${{ matrix.TARGET }} == 'python2'
-      uses: actions/setup-python@v2
-      with:
-        python-version: '2.x' 
-        architecture: 'x64' 
+#     fails due to permissions, use global install
+#    - name: Set up Python 2
+#      if: matrix.TARGET == 'python2'
+#      uses: actions/setup-python@v2
+#      with:
+#        python-version: '2.x' 
+#        architecture: 'x64' 
 #     fails due to permissions, use global install
 #    - name: Set up Python 3
-#      if: ${{ matrix.TARGET }} == 'python3'
+#      if: matrix.TARGET == 'python3'
 #      uses: actions/setup-python@v2
 #      with:
 #        python-version: '3.x' 
