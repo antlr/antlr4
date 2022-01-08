@@ -218,6 +218,7 @@ YYYY/MM/DD, github id, Full name, email
 2019/01/01, khoroshilov, Alexey Khoroshilov, khoroshilov@ispras.ru
 2019/01/02, wkhemir, Wail Khemir, khemirwail@gmail.com
 2019/01/16, kuegi, Markus Zancolo, markus.zancolo@roomle.com
+2019/01/29, hc-codersatlas, Harry Chan, harry.chan@codersatlas.com
 2019/02/06, ralucado, Cristina Raluca Vijulie, ralucris.v[at]gmail[dot]com
 2019/02/23, gedimitr, Gerasimos Dimitriadis, gedimitr@gmail.com
 2019/03/13, base698, Justin Thomas, justin.thomas1@gmail.com
@@ -325,4 +326,3 @@ YYYY/MM/DD, github id, Full name, email
 2021/12/16, Ketler13, Oleksandr Martyshchenko, oleksandr.martyshchenko@gmail.com
 2021/12/25, Tinker1024, Tinker1024, tinker@huawei.com
 2021/12/31, Biswa96, Biswapriyo Nath, nathbappai@gmail.com
-2019/01/29, hc-codersatlas, Harry Chan, harry.chan@codersatlas.com
