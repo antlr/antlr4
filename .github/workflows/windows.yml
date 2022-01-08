@@ -13,7 +13,7 @@ jobs:
       fail-fast: false
       matrix:
 #        TARGET: [java, python2, python3, javascript, csharp, dart, go, php]
-        TARGET: [python2]
+        TARGET: [python3]
     steps:
     - name: Check out code
       uses: actions/checkout@v2
