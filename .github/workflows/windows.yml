@@ -48,6 +48,11 @@ jobs:
       if: matrix.TARGET == 'csharp'
       uses: actions/setup-dotnet@v1
       with:
+        dotnet-version: 4.5.x
+    - name: Setup Dotnet 3.1
+      if: matrix.TARGET == 'csharp'
+      uses: actions/setup-dotnet@v1
+      with:
         dotnet-version: 3.1.x
 #     fails due to os (Linux only), use global install
 #    - name: Setup Dart 2.12.1
