@@ -183,7 +183,7 @@ T? visit<lname; format="cap">(<lname; format="cap">Context ctx) => visitChildren
 
 fileHeader(grammarFileName, ANTLRVersion) ::= <<
 // Generated from <grammarFileName> by ANTLR <ANTLRVersion>
-// ignore_for_file: unused_import, unused_local_variable, prefer_single_quotes
+// ignore_for_file: unused_import, unused_local_variable, prefer_single_quotes, file_names, directives_ordering, prefer_final_locals, avoid_catching_errors, unnecessary_parenthesis, prefer_const_declarations
 >>
 
 Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
@@ -318,7 +318,7 @@ bool _<r.name>_sempred(dynamic _localctx, int predIndex) {
 RuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,namedActions,finallyAction,postamble,exceptions) ::= <<
 
 <if(currentRule.modifiers)><currentRule.modifiers:{f | <f> }><else><endif><currentRule.ctxType> <currentRule.escapedName>(<args; separator=", ">) {
-  dynamic _localctx = <currentRule.ctxType>(context, state<currentRule.args:{a | , <a.escapedName>}>);
+  var _localctx = <currentRule.ctxType>(context, state<currentRule.args:{a | , <a.escapedName>}>);
   enterRule(_localctx, <currentRule.startState>, RULE_<currentRule.name>);
   <namedActions.init>
   <locals; separator="\n">
@@ -348,7 +348,7 @@ LeftRecursiveRuleFunction(currentRule,args,code,locals,ruleCtx,altLabelCtxs,
 <currentRule.ctxType> <currentRule.escapedName>([int _p = 0]<args:{a | , <a>}>) {
   final _parentctx = context;
   final _parentState = state;
-  dynamic _localctx = <currentRule.ctxType>(context, _parentState<currentRule.args:{a | , <a.escapedName>}>);
+  var _localctx = <currentRule.ctxType>(context, _parentState<currentRule.args:{a | , <a.escapedName>}>);
   var _prevctx = _localctx;
   var _startState = <currentRule.startState>;
   enterRecursionRule(_localctx, <currentRule.startState>, RULE_<currentRule.name>, _p);
