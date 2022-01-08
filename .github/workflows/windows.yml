@@ -62,13 +62,14 @@ jobs:
       with:
         go-version: '^1.13.1' 
 # requires manually setting up pwsh
-    - name: Setup PHP 8.2
-      if: matrix.TARGET == 'php'
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: '8.2'
-        extensions: mbstring    
-        tools: composer
+# fails due to incorrect script (missing printf)
+#    - name: Setup PHP 8.2
+#      if: matrix.TARGET == 'php'
+#      uses: shivammathur/setup-php@v2
+#      with:
+#        php-version: '8.2'
+#        extensions: mbstring    
+#        tools: composer
     - name: Build tool with Maven
       run: mvn install -DskipTests=true -Darguments="-Dmaven.javadoc.skip=true" -B -V
     - name: Test with Maven
