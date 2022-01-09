@@ -1,3 +1,3 @@
 cd runtime-testsuite
-mvn -Dtest=java.** test
+mvn -Dparallel=classes -DthreadCount=2 -Dtest=java.** test
 cd ..

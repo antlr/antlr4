@@ -1,3 +1,3 @@
 cd runtime-testsuite
-mvn -Dtest=javascript.** test 
+mvn -Dparallel=classes -DthreadCount=2 -Dtest=javascript.** test
 cd ..
