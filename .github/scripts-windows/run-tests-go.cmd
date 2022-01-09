@@ -1,3 +1,3 @@
 cd runtime-testsuite
-mvn -Dtest=go.** test
+mvn -Dparallel=classes -DthreadCount=2 -Dtest=go.** test
 cd ..
