@@ -8,7 +8,7 @@ Parser
 grammar G;
 
 root
-    : {0==0}? continue+ {<writeln("$text")>}
+    : {0==0}? continue+ {<write("$text")>}
     ;
 
 continue returns [int return]
