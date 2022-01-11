@@ -211,7 +211,7 @@ size_t ParserATNSimulator::execATN(dfa::DFA &dfa, dfa::DFAState *s0, TokenStream
             std::cout << "Full LL avoided" << std::endl;
 #endif
 
-          return conflictingAlts.nextSetBit(0);
+          return conflictingAlts.find().value_or(INVALID_INDEX);
         }
 
         if (conflictIndex != startIndex) {
@@ -245,13 +245,13 @@ size_t ParserATNSimulator::execATN(dfa::DFA &dfa, dfa::DFAState *s0, TokenStream
           throw noViableAlt(input, outerContext, D->configs.get(), startIndex, false);
 
         case 1:
-          return alts.nextSetBit(0);
+          return alts.find().value_or(INVALID_INDEX);
 
         default:
           // report ambiguity after predicate evaluation to make sure the correct
           // set of ambig alts is reported.
           reportAmbiguity(dfa, D, startIndex, stopIndex, false, alts, D->configs.get());
-          return alts.nextSetBit(0);
+          return alts.find().value_or(INVALID_INDEX);
       }
     }
 
@@ -294,7 +294,7 @@ dfa::DFAState *ParserATNSimulator::computeTargetState(dfa::DFA &dfa, dfa::DFASta
     D->requiresFullContext = true;
     // in SLL-only mode, we will stop at this state and return the minimum alt
     D->isAcceptState = true;
-    D->prediction = D->configs->conflictingAlts.nextSetBit(0);
+    D->prediction = D->configs->conflictingAlts.find().value_or(INVALID_INDEX);
   }
 
   if (D->isAcceptState && D->configs->hasSemanticContext) {
@@ -328,7 +328,7 @@ void ParserATNSimulator::predicateDFAState(dfa::DFAState *dfaState, DecisionStat
     // There are preds in configs but they might go away
     // when OR'd together like {p}? || NONE == NONE. If neither
     // alt has preds, resolve to min alt
-    dfaState->prediction = altsToCollectPredsFrom.nextSetBit(0);
+    dfaState->prediction = altsToCollectPredsFrom.find().value_or(INVALID_INDEX);
   }
 }
 

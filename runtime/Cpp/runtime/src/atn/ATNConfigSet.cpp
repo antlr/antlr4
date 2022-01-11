@@ -208,7 +208,7 @@ std::string ATNConfigSet::toString() const {
     ss << ",uniqueAlt = " << uniqueAlt;
   }
 
-  if (conflictingAlts.size() > 0) {
+  if (conflictingAlts.count() > 0) {
     ss << ",conflictingAlts = ";
     ss << conflictingAlts.toString();
   }
