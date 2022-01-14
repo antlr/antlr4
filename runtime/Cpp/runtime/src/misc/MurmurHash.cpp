@@ -25,7 +25,7 @@ using namespace antlr4::misc;
 #define ROTL32(x,y)	_rotl(x,y)
 #define ROTL64(x,y)	_rotl64(x,y)
 
-#elif ANTLR4_HAVE_BUILTIN(__builtin_rotateleft32) && ANTLR4_HAVE_BUILTIN(__builtin_rotateleft64)
+#elif ANTLR4CPP_HAVE_BUILTIN(__builtin_rotateleft32) && ANTLR4CPP_HAVE_BUILTIN(__builtin_rotateleft64)
 
 #define ROTL32(x, y) __builtin_rotateleft32(x, y)
 #define ROTL64(x, y) __builtin_rotateleft64(x, y)

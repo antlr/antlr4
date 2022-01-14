@@ -32,7 +32,9 @@
 #include <string>
 #include <vector>
 
-#ifdef GUID_ANDROID
+#include "antlr4-common.h"
+
+#ifdef ANTLR4CPP_GUID_ANDROID
 #include <jni.h>
 #endif
 
@@ -133,7 +135,7 @@ private:
 // each platform, but the use of newGuid is uniform.
 class GuidGenerator final {
 public:
-#ifdef GUID_ANDROID
+#ifdef ANTLR4CPP_GUID_ANDROID
   GuidGenerator(JNIEnv *env);
 #else
   GuidGenerator() { }
@@ -141,7 +143,7 @@ public:
 
   Guid newGuid();
 
-#ifdef GUID_ANDROID
+#ifdef ANTLR4CPP_GUID_ANDROID
 private:
   JNIEnv *_env;
   jclass _uuidClass;

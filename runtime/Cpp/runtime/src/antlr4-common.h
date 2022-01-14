@@ -49,7 +49,7 @@
     #endif
   #endif
 
-  #define GUID_WINDOWS
+  #define ANTLR4CPP_GUID_WINDOWS 1
 
   #ifdef _WIN64
     typedef __int64 ssize_t;
@@ -68,14 +68,14 @@
   #endif
 
 #elif defined(__APPLE__)
-  #define GUID_CFUUID
+  #define ANTLR4CPP_GUID_CFUUID 1
   #if __GNUC__ >= 4
     #define ANTLR4CPP_PUBLIC __attribute__ ((visibility ("default")))
   #else
     #define ANTLR4CPP_PUBLIC
   #endif
 #else
-  #define GUID_LIBUUID
+  #define ANTLR4CPP_GUID_LIBUUID 1
   #if __GNUC__ >= 6
     #define ANTLR4CPP_PUBLIC __attribute__ ((visibility ("default")))
   #else
@@ -84,9 +84,9 @@
 #endif
 
 #ifdef __has_builtin
-#define ANTLR4_HAVE_BUILTIN(x) __has_builtin(x)
+#define ANTLR4CPP_HAVE_BUILTIN(x) __has_builtin(x)
 #else
-#define ANTLR4_HAVE_BUILTIN(x) 0
+#define ANTLR4CPP_HAVE_BUILTIN(x) 0
 #endif
 
 #include "support/Guid.h"
