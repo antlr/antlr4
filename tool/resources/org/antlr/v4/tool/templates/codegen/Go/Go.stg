@@ -86,7 +86,7 @@ func (s *Base<file.grammarName>Listener) EnterEveryRule(ctx antlr.ParserRuleCont
 // ExitEveryRule is called when any rule is exited.
 func (s *Base<file.grammarName>Listener) ExitEveryRule(ctx antlr.ParserRuleContext) {}
 
-<file.listenerNames:{lname | // Enter<lname; format="cap"> is called when production <lname> is entered.
+<file.listenerNames:{lname | // Enter<file.grammarName><lname; format="cap"> is called when production <lname> is entered.
 func (s *Base<file.grammarName>Listener) Enter<lname; format="cap">(ctx *<file.grammarName><lname; format="cap">Context) {\}
 
 // Exit<lname; format="cap"> is called when production <lname> is exited.
@@ -115,7 +115,7 @@ type <file.grammarName>Visitor interface {
 
 <file.visitorNames:{lname |
 	// Visit a parse tree produced by <file.parserName>#<lname>.
-	Visit<lname; format="cap">(ctx *<lname; format="cap">Context) interface{\}
+	Visit<lname; format="cap">(ctx *<file.grammarName><lname; format="cap">Context) interface{\}
 }; separator="\n">
 }
 >>
@@ -136,7 +136,7 @@ type Base<file.grammarName>Visitor struct {
 }
 
 <file.visitorNames:{lname |
-func (v *Base<file.grammarName>Visitor) Visit<lname; format="cap">(ctx *<lname; format="cap">Context) interface{\} {
+func (v *Base<file.grammarName>Visitor) Visit<lname; format="cap">(ctx *<file.grammarName><lname; format="cap">Context) interface{\} {
 	return v.VisitChildren(ctx)
 \}}; separator="\n\n">
 
@@ -929,10 +929,10 @@ ContextTokenListIndexedGetterDecl(t) ::= <<
 >>
 
 ContextRuleGetterDecl(r) ::= <<
-<r.name; format="cap">() I<r.ctxName> {
+<r.name; format="cap">() I<parser.grammarName><r.ctxName> {
 	var t antlr.RuleContext;
 	for _, ctx := range s.GetChildren() {
-		if _, ok := ctx.(I<r.ctxName>); ok {
+		if _, ok := ctx.(I<parser.grammarName><r.ctxName>); ok {
 			t = ctx.(antlr.RuleContext);
 			break
 		}
@@ -942,25 +942,25 @@ ContextRuleGetterDecl(r) ::= <<
 		return nil
 	}
 
-	return t.(I<r.ctxName>)
+	return t.(I<parser.grammarName><r.ctxName>)
 }
 >>
 
 ContextRuleListGetterDecl(r) ::= <<
-All<r.name; format="cap">() []I<r.ctxName> {
+All<r.name; format="cap">() []I<parser.grammarName><r.ctxName> {
 	children := s.GetChildren()
 	len := 0
 	for _, ctx := range children {
-		if _, ok := ctx.(I<r.ctxName>); ok {
+		if _, ok := ctx.(I<parser.grammarName><r.ctxName>); ok {
 			len++
 		}
 	}
 
-	tst := make([]I<r.ctxName>, len)
+	tst := make([]I<parser.grammarName><r.ctxName>, len)
 	i := 0
 	for _, ctx := range children {
-		if t, ok := ctx.(I<r.ctxName>); ok {
-			tst[i] = t.(I<r.ctxName>)
+		if t, ok := ctx.(I<parser.grammarName><r.ctxName>); ok {
+			tst[i] = t.(I<parser.grammarName><r.ctxName>)
 			i++
 		}
 	}
@@ -970,11 +970,11 @@ All<r.name; format="cap">() []I<r.ctxName> {
 >>
 
 ContextRuleListIndexedGetterDecl(r) ::= <<
-<r.name; format="cap">(i int) I<r.ctxName> {
+<r.name; format="cap">(i int) I<parser.grammarName><r.ctxName> {
 	var t antlr.RuleContext;
 	j := 0
 	for _, ctx := range s.GetChildren() {
-		if _, ok := ctx.(I<r.ctxName>); ok {
+		if _, ok := ctx.(I<parser.grammarName><r.ctxName>); ok {
 			if j == i {
 				t = ctx.(antlr.RuleContext);
 				break
@@ -987,7 +987,7 @@ ContextRuleListIndexedGetterDecl(r) ::= <<
 		return nil
 	}
 
-	return t.(I<r.ctxName>)
+	return t.(I<parser.grammarName><r.ctxName>)
 }
 >>
 
@@ -1052,25 +1052,25 @@ Set<a.name; format="cap">([]<TokenLabelType()>)}; separator="\n\n">
 	<if(struct.ruleContextDecls)>
 
 	<struct.ruleContextDecls:{a | // Get<a.name; format="cap"> returns the <a.name> rule contexts.
-Get<a.name; format="cap">() I<a.ctxName>}; separator="\n\n">
+Get<a.name; format="cap">() I<parser.grammarName><a.ctxName>}; separator="\n\n">
 	<endif>
 
 	<if(struct.ruleContextDecls)>
 
 	<struct.ruleContextDecls:{a | // Set<a.name; format="cap"> sets the <a.name> rule contexts.
-Set<a.name; format="cap">(I<a.ctxName>)}; separator="\n\n">
+Set<a.name; format="cap">(I<parser.grammarName><a.ctxName>)}; separator="\n\n">
 	<endif>
 
 	<if(struct.ruleContextListDecls)>
 
 	<struct.ruleContextListDecls:{a | // Get<a.name; format="cap"> returns the <a.name> rule context list.
-Get<a.name; format="cap">() []I<a.ctxName>}; separator="\n\n">
+Get<a.name; format="cap">() []I<parser.grammarName><a.ctxName>}; separator="\n\n">
 	<endif>
 
 	<if(struct.ruleContextListDecls)>
 
 	<struct.ruleContextListDecls:{a | // Set<a.name; format="cap"> sets the <a.name> rule context list.
-Set<a.name; format="cap">([]I<a.ctxName>) }; separator="\n\n">
+Set<a.name; format="cap">([]I<parser.grammarName><a.ctxName>) }; separator="\n\n">
 	<endif>
 
 	<if(struct.attributeDecls)>
@@ -1155,22 +1155,22 @@ func (s *<parser.grammarName><struct.escapedName>) GetParser() antlr.Parser { re
 
 <if(struct.ruleContextDecls)>
 
-<struct.ruleContextDecls:{a | func (s *<parser.grammarName><struct.escapedName>) Get<a.name; format="cap">() I<a.ctxName> { return s.<a.escapedName> \}}; separator="\n\n">
+<struct.ruleContextDecls:{a | func (s *<parser.grammarName><struct.escapedName>) Get<a.name; format="cap">() I<parser.grammarName><a.ctxName> { return s.<a.escapedName> \}}; separator="\n\n">
 <endif>
 
 <if(struct.ruleContextDecls)>
 
-<struct.ruleContextDecls:{a | func (s *<parser.grammarName><struct.escapedName>) Set<a.name; format="cap">(v I<a.ctxName>) { s.<a.escapedName> = v \}}; separator="\n\n">
+<struct.ruleContextDecls:{a | func (s *<parser.grammarName><struct.escapedName>) Set<a.name; format="cap">(v I<parser.grammarName><a.ctxName>) { s.<a.escapedName> = v \}}; separator="\n\n">
 <endif>
 
 <if(struct.ruleContextListDecls)>
 
-<struct.ruleContextListDecls:{a | func (s *<parser.grammarName><struct.escapedName>) Get<a.name; format="cap">() []I<a.ctxName> { return s.<a.escapedName> \}}; separator="\n\n">
+<struct.ruleContextListDecls:{a | func (s *<parser.grammarName><struct.escapedName>) Get<a.name; format="cap">() []I<parser.grammarName><a.ctxName> { return s.<a.escapedName> \}}; separator="\n\n">
 <endif>
 
 <if(struct.ruleContextListDecls)>
 
-<struct.ruleContextListDecls:{a | func (s *<parser.grammarName><struct.escapedName>) Set<a.name; format="cap">(v []I<a.ctxName>) { s.<a.escapedName> = v \}}; separator="\n\n">
+<struct.ruleContextListDecls:{a | func (s *<parser.grammarName><struct.escapedName>) Set<a.name; format="cap">(v []I<parser.grammarName><a.ctxName>) { s.<a.escapedName> = v \}}; separator="\n\n">
 <endif>
 
 <if(struct.attributeDecls)>
@@ -1265,22 +1265,22 @@ func New<struct.name>(parser antlr.Parser, ctx antlr.ParserRuleContext) *<struct
 
 <if(struct.ruleContextDecls)>
 
-<struct.ruleContextDecls:{a | func (s *<struct.escapedName>) Get<a.name; format="cap">() I<a.ctxName> { return s.<a.escapedName> \}}; separator="\n\n">
+<struct.ruleContextDecls:{a | func (s *<struct.escapedName>) Get<a.name; format="cap">() I<parser.grammarName><a.ctxName> { return s.<a.escapedName> \}}; separator="\n\n">
 <endif>
 
 <if(struct.ruleContextDecls)>
 
-<struct.ruleContextDecls:{a | func (s *<struct.escapedName>) Set<a.name; format="cap">(v I<a.ctxName>) { s.<a.escapedName> = v \}}; separator="\n\n">
+<struct.ruleContextDecls:{a | func (s *<struct.escapedName>) Set<a.name; format="cap">(v I<parser.grammarName><a.ctxName>) { s.<a.escapedName> = v \}}; separator="\n\n">
 <endif>
 
 <if(struct.ruleContextListDecls)>
 
-<struct.ruleContextListDecls:{a | func (s *<struct.escapedName>) Get<a.name; format="cap">() []I<a.ctxName> { return s.<a.escapedName> \}}; separator="\n\n">
+<struct.ruleContextListDecls:{a | func (s *<struct.escapedName>) Get<a.name; format="cap">() []I<parser.grammarName><a.ctxName> { return s.<a.escapedName> \}}; separator="\n\n">
 <endif>
 
 <if(struct.ruleContextListDecls)>
 
-<struct.ruleContextListDecls:{a | func (s *<struct.escapedName>) Set<a.name; format="cap">(v []I<a.ctxName>) { s.<a.escapedName> = v \}}; separator="\n\n">
+<struct.ruleContextListDecls:{a | func (s *<struct.escapedName>) Set<a.name; format="cap">(v []I<parser.grammarName><a.ctxName>) { s.<a.escapedName> = v \}}; separator="\n\n">
 <endif>
 
 <if(struct.attributeDecls)>
