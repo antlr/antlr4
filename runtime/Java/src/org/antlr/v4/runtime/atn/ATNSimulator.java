@@ -98,11 +98,8 @@ public abstract class ATNSimulator {
 		if ( sharedContextCache==null ) return context;
 
 		synchronized (sharedContextCache) {
-			IdentityHashMap<PredictionContext, PredictionContext> visited =
-				new IdentityHashMap<PredictionContext, PredictionContext>();
-			return PredictionContext.getCachedContext(context,
-													  sharedContextCache,
-													  visited);
+			IdentityHashMap<PredictionContext, PredictionContext> visited = new IdentityHashMap<>();
+			return PredictionContext.getCachedContext(context, sharedContextCache, visited);
 		}
 	}
 
@@ -128,38 +125,6 @@ public abstract class ATNSimulator {
 	@Deprecated
 	public static void checkCondition(boolean condition, String message) {
 		new ATNDeserializer().checkCondition(condition, message);
-	}
-
-	/**
-	 * @deprecated Use {@link ATNDeserializer#toInt} instead.
-	 */
-	@Deprecated
-	public static int toInt(char c) {
-		return ATNDeserializer.toInt(c);
-	}
-
-	/**
-	 * @deprecated Use {@link ATNDeserializer#toInt32} instead.
-	 */
-	@Deprecated
-	public static int toInt32(char[] data, int offset) {
-		return ATNDeserializer.toInt32(data, offset);
-	}
-
-	/**
-	 * @deprecated Use {@link ATNDeserializer#toLong} instead.
-	 */
-	@Deprecated
-	public static long toLong(char[] data, int offset) {
-		return ATNDeserializer.toLong(data, offset);
-	}
-
-	/**
-	 * @deprecated Use {@link ATNDeserializer#toUUID} instead.
-	 */
-	@Deprecated
-	public static UUID toUUID(char[] data, int offset) {
-		return ATNDeserializer.toUUID(data, offset);
 	}
 
 	/**

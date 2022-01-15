@@ -366,9 +366,10 @@ public abstract class BaseRuntimeTest {
 		}
 
 		if (group.equals("LexerExec")) {
-			descriptors.add(GeneratedLexerDescriptors.getLineSeparatorLfTest(targetName));
-			descriptors.add(GeneratedLexerDescriptors.getLineSeparatorCrLfTest(targetName));
+			descriptors.add(GeneratedLexerDescriptors.getLineSeparatorLfDescriptor(targetName));
+			descriptors.add(GeneratedLexerDescriptors.getLineSeparatorCrLfDescriptor(targetName));
 			descriptors.add(GeneratedLexerDescriptors.getLargeLexerDescriptor(targetName));
+			descriptors.add(GeneratedLexerDescriptors.getAtnStatesSizeMoreThan65535Descriptor(targetName));
 		}
 
 		return descriptors.toArray(new RuntimeTestDescriptor[0]);
