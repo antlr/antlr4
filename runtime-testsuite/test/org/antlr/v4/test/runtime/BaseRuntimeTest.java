@@ -28,6 +28,8 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static junit.framework.TestCase.fail;
 import static junit.framework.TestCase.failNotEquals;
@@ -42,23 +44,16 @@ import static org.junit.Assume.assumeFalse;
  *  @since 4.6.
  */
 public abstract class BaseRuntimeTest {
-
-	public final static String[] Targets = {
-		"Cpp",
-		"CSharp",
-		"Dart",
-		"Go",
-		"Java",
-		"Node",
-		"PHP",
-		"Python2", "Python3",
-		"Swift"
-	};
+	final static Set<String> sections = new HashSet<>(Arrays.asList(
+		"notes", "type", "grammar", "slaveGrammar", "start", "input", "output", "errors", "flags", "skip"
+	));
+	final static Pattern linePattern = Pattern.compile("([^\\r\\n]*)(\r?\n)");
 
 	@BeforeClass
 	public static void startHeartbeatToAvoidTimeout() {
-		if(requiresHeartbeat())
+		if(requiresHeartbeat()) {
 			startHeartbeat();
+		}
 	}
 
 	private static boolean requiresHeartbeat() {
@@ -425,35 +420,39 @@ public abstract class BaseRuntimeTest {
 	public static UniversalRuntimeTestDescriptor readDescriptor(String dtext)
 			throws RuntimeException
 	{
-		String[] fileSections = {
-				"notes","type","grammar","slaveGrammar","start","input","output","errors",
-				"flags","skip"};
-		Set<String> sections = new HashSet<>(Arrays.asList(fileSections));
 		String currentField = null;
-		String currentValue = null;
+		StringBuilder currentValue = new StringBuilder();
 
 		List<Pair<String, String>> pairs = new ArrayList<>();
-		String[] lines = dtext.split("\r?\n");
-		for (String line : lines) {
-			if ( line.startsWith("[") && line.length()>2 &&
-				 sections.contains(line.substring(1, line.length() - 1)) ) {
-				if ( currentField!=null ) {
-					pairs.add(new Pair<>(currentField,currentValue));
+
+		Matcher matcher = linePattern.matcher(dtext);
+		boolean preserveSeparator = false;
+		int lastEnd = 0;
+		while (matcher.find()) {
+			String line = matcher.group(1);
+			lastEnd = matcher.end();
+			boolean newSection = false;
+			String sectionName = null;
+			if (line.startsWith("[") && line.length() > 2) {
+				sectionName = line.substring(1, line.length() - 1);
+				newSection = sections.contains(sectionName);
+			}
+
+			if (newSection) {
+				if (currentField!=null) {
+					pairs.add(new Pair<>(currentField, currentValue.toString()));
 				}
-				currentField = line.substring(1, line.length() - 1);
-				currentValue = null;
+				preserveSeparator = sectionName.equals("input");
+				currentField = sectionName;
+				currentValue.setLength(0);
 			}
 			else {
-				if ( currentValue==null ) {
-					currentValue = "";
-				}
-				currentValue += line + "\n";
+				currentValue.append(line);
+				currentValue.append(preserveSeparator ? matcher.group(2) : "\n");
 			}
 		}
-		// save last section
-		pairs.add(new Pair<>(currentField,currentValue));
-
-//		System.out.println(pairs);
+		currentValue.append(dtext.substring(lastEnd));
+		pairs.add(new Pair<>(currentField, currentValue.toString()));
 
 		UniversalRuntimeTestDescriptor d = new UniversalRuntimeTestDescriptor();
 		for (Pair<String,String> p : pairs) {

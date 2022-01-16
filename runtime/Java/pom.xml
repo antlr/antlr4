@@ -9,7 +9,7 @@
 	<parent>
 		<groupId>org.antlr</groupId>
 		<artifactId>antlr4-master</artifactId>
-		<version>4.9.4-SNAPSHOT</version>
+		<version>4.10-SNAPSHOT</version>
 		<relativePath>../../pom.xml</relativePath>
 	</parent>
 	<artifactId>antlr4-runtime</artifactId>
@@ -46,7 +46,6 @@
 				<version>1.0</version>
 				<executions>
 					<execution>
-						<phase>deploy</phase>
 						<goals>
 							<goal>dot</goal>
 						</goals>
@@ -63,29 +62,13 @@
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<version>3.3.1</version>
 				<configuration>
-					<javadocVersion>1.7</javadocVersion>
+					<javadocVersion>1.8</javadocVersion>
 					<failOnError>false</failOnError>
 				</configuration>
 				<executions>
 					<execution>
 						<goals>
 							<goal>javadoc</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.antlr</groupId>
-				<artifactId>antlr4-maven-plugin</artifactId>
-				<version>4.5.3</version> <!-- use older version to process XPathLexer.g4, avoiding cyclic build dependency -->
-				<executions>
-					<execution>
-						<id>antlr</id>
-						<configuration>
-							<sourceDirectory>src</sourceDirectory>
-						</configuration>
-						<goals>
-							<goal>antlr4</goal>
 						</goals>
 					</execution>
 				</executions>
@@ -122,6 +105,15 @@
 					</archive>
 				</configuration>
 			</plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
 		</plugins>
 	</build>
 </project>

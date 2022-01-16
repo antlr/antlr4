@@ -81,7 +81,7 @@ Java target can use `contextSuperClass=org.antlr.v4.runtime.RuleContextWithAltNu
 
 ### `caseInsensitive`
 
-As of 4.9.4, ANTLR supports case-insensitive lexers using a grammar option. For example, the parser from the following grammar:
+As of 4.10, ANTLR supports case-insensitive lexers using a grammar option. For example, the parser from the following grammar:
 
 ```g4
 lexer grammar L;

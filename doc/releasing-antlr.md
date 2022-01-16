@@ -93,7 +93,7 @@ rm -rf runtime/CSharp/src/obj
 rm -rf runtime/Cpp/runtime/build
 rm -rf runtime/gen
 rm -rf runtime/JavaScript/dist
-find tool runtime -type f -exec grep -l '4\.9' {} \;
+find tool runtime -type f -exec grep -l '4\.9' {} \; | grep -v -E '\.o|\.a|\.jar|\.dylib|node_modules/|\.class|tests/|CHANGELOG|\.zip|\.gz|.iml'
 ```
 
 Commit to repository.

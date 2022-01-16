@@ -1087,19 +1087,19 @@ namespace<if(lexerFile.genPackage)> <lexerFile.genPackage><endif> {
 		public const <lexer.tokens:{k | <k> = <lexer.tokens.(k)>}; separator=", ", wrap, anchor>;
 		<endif>
 
-		<if(lexer.channels)>
-		public const <lexer.channels:{c | <c> = <lexer.channels.(c)>}; separator=", ", wrap, anchor>;
+		<if(lexer.escapedChannels)>
+		public const <lexer.escapedChannels:{c | <c> = <lexer.escapedChannels.(c)>}; separator=", ", wrap, anchor>;
 		<endif>
 
-		<if(rest(lexer.modes))>
-		public const <rest(lexer.modes):{m | <m>=<i>}; separator=", ", wrap, anchor>;
+		<if(rest(lexer.escapedModeNames))>
+		public const <rest(lexer.escapedModeNames):{m | <m>=<i>}; separator=", ", wrap, anchor>;
 		<endif>
 
 		/**
 		 * @var array\<string>
 		 */
 		public const CHANNEL_NAMES = [
-			'DEFAULT_TOKEN_CHANNEL', 'HIDDEN'<if (lexer.channels)>, <lexer.channels:{c| '<c>'}; separator=", ", wrap, anchor><endif>
+			'DEFAULT_TOKEN_CHANNEL', 'HIDDEN'<if (lexer.channelNames)>, <lexer.channelNames:{c| '<c>'}; separator=", ", wrap, anchor><endif>
 		];
 
 		/**

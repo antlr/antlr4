@@ -26,6 +26,8 @@ import org.stringtemplate.v4.STGroupFile;
 import org.stringtemplate.v4.StringRenderer;
 import org.stringtemplate.v4.misc.STMessage;
 
+import java.util.Set;
+
 /** */
 public abstract class Target {
 	/** For pure strings of Java 16-bit Unicode char, how can we display
@@ -86,6 +88,16 @@ public abstract class Target {
 		}
 
 		return templates;
+	}
+
+	protected abstract Set<String> getReservedWords();
+
+	public String escapeIfNeeded(String identifier) {
+		return getReservedWords().contains(identifier) ? escapeWord(identifier) : identifier;
+	}
+
+	protected String escapeWord(String word) {
+		return word + "_";
 	}
 
 	protected void genFile(Grammar g, ST outputFileST, String fileName)
@@ -518,10 +530,13 @@ public abstract class Target {
 				break;
 		}
 
-		return visibleGrammarSymbolCausesIssueInGeneratedCode(idNode);
+		return getReservedWords().contains(idNode.getText());
 	}
 
-	protected abstract boolean visibleGrammarSymbolCausesIssueInGeneratedCode(GrammarAST idNode);
+	@Deprecated
+	protected boolean visibleGrammarSymbolCausesIssueInGeneratedCode(GrammarAST idNode) {
+		return getReservedWords().contains(idNode.getText());
+	}
 
 	public boolean templatesExist() {
 		return loadTemplatesHelper(false) != null;

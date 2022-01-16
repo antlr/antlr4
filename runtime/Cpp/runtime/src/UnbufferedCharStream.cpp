@@ -13,9 +13,8 @@ using namespace antlrcpp;
 using namespace antlr4;
 using namespace antlr4::misc;
 
-UnbufferedCharStream::UnbufferedCharStream(std::wistream &input) : _input(input) {
-  InitializeInstanceFields();
-
+UnbufferedCharStream::UnbufferedCharStream(std::wistream &input)
+    : _p(0), _numMarkers(0), _lastChar(0), _lastCharBufferStart(0), _currentCharIndex(0), _input(input) {
   // The vector's size is what used to be n in Java code.
   fill(1); // prime
 }
@@ -74,9 +73,7 @@ size_t UnbufferedCharStream::fill(size_t n) {
 }
 
 char32_t UnbufferedCharStream::nextChar()  {
-  wchar_t result = 0;
-  _input >> result;
-  return result;
+  return _input.get();
 }
 
 void UnbufferedCharStream::add(char32_t c) {
@@ -101,7 +98,7 @@ size_t UnbufferedCharStream::LA(ssize_t i) {
     return EOF;
   }
 
-  if (_data[static_cast<size_t>(index)] == 0xFFFF) {
+  if (_data[static_cast<size_t>(index)] == std::char_traits<wchar_t>::eof()) {
     return EOF;
   }
 
@@ -178,7 +175,7 @@ std::string UnbufferedCharStream::getSourceName() const {
 }
 
 std::string UnbufferedCharStream::getText(const misc::Interval &interval) {
-  if (interval.a < 0 || interval.b >= interval.a - 1) {
+  if (interval.a < 0 || interval.b < interval.a - 1) {
     throw IllegalArgumentException("invalid interval");
   }
 
@@ -202,14 +199,10 @@ std::string UnbufferedCharStream::getText(const misc::Interval &interval) {
   return std::move(maybeUtf8).value();
 }
 
-size_t UnbufferedCharStream::getBufferStartIndex() const {
-  return _currentCharIndex - _p;
+std::string UnbufferedCharStream::toString() const {
+  throw UnsupportedOperationException("Unbuffered stream cannot be materialized to a string");
 }
 
-void UnbufferedCharStream::InitializeInstanceFields() {
-  _p = 0;
-  _numMarkers = 0;
-  _lastChar = 0;
-  _lastCharBufferStart = 0;
-  _currentCharIndex = 0;
+size_t UnbufferedCharStream::getBufferStartIndex() const {
+  return _currentCharIndex - _p;
 }

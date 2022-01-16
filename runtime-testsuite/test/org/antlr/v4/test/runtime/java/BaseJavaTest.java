@@ -133,7 +133,7 @@ public class BaseJavaTest extends BaseRuntimeTestSupport implements RuntimeTestS
 			fileManager.getJavaFileObjectsFromFiles(files);
 
 		Iterable<String> compileOptions =
-			Arrays.asList("-g", "-source", "1.7", "-target", "1.7", "-implicit:class", "-Xlint:-options", "-d", getTempDirPath(), "-cp", getTempDirPath() + PATH_SEP + CLASSPATH);
+			Arrays.asList("-g", "-source", "1.8", "-target", "1.8", "-implicit:class", "-Xlint:-options", "-d", getTempDirPath(), "-cp", getTempDirPath() + PATH_SEP + CLASSPATH);
 
 		JavaCompiler.CompilationTask task =
 			compiler.getTask(null, fileManager, null, compileOptions, null,

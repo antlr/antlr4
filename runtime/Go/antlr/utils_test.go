@@ -53,4 +53,10 @@ func TestBitSet(t *testing.T) {
 	bs3.add(63)
 	bs1.or(bs3)
 	testBitSet(t, bs1, "{63, 64}", 2, []int{63, 64}, 63, 2)
+	bs1.clear(64)
+	bs4 := NewBitSet()
+	bs4.or(bs1)
+	if got, want := bs4.equals(bs1), true; got != want {
+		t.Errorf("%+v.equals(%+v) = %v, want %v", bs4, bs1, got, want)
+	}
 }

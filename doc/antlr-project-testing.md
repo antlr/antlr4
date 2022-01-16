@@ -6,7 +6,7 @@ Because ANTLR supports multiple target languages, the unit tests are broken into
 
 The runtime tests must be specified in a generic fashion to work across language targets. Furthermore, we must test the various targets from Java. This usually means Java launching processes to compile, say, C++ and run parsers.
 
-As of 4.9.4, we use a Java descriptor file held as an [UniversalRuntimeTestDescriptor.java object](https://github.com/antlr/antlr4/blob/master/runtime-testsuite/test/org/antlr/v4/test/runtime/UniversalRuntimeTestDescriptor.java) to represent each runtime test. Each test is described with a text file with various sections and resides in a group directory; see [directories under descriptors dir](https://github.com/antlr/antlr4/blob/master/runtime-testsuite/resources/org/antlr/v4/test/runtime/descriptors). Here is a sample test descriptor:
+As of 4.10, we use a Java descriptor file held as an [UniversalRuntimeTestDescriptor.java object](https://github.com/antlr/antlr4/blob/master/runtime-testsuite/test/org/antlr/v4/test/runtime/UniversalRuntimeTestDescriptor.java) to represent each runtime test. Each test is described with a text file with various sections and resides in a group directory; see [directories under descriptors dir](https://github.com/antlr/antlr4/blob/master/runtime-testsuite/resources/org/antlr/v4/test/runtime/descriptors). Here is a sample test descriptor:
 
 ```
 [notes]

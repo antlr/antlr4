@@ -27,7 +27,7 @@ import static org.antlr.v4.test.runtime.BaseRuntimeTest.writeFile;
 import static org.junit.Assert.assertTrue;
 
 public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTestSupport {
-	private static boolean isRuntimeInitialized = false;
+	private static Boolean isRuntimeInitialized = false;
 	private final static String cSharpAntlrRuntimeDllName = "Antlr4.Runtime.Standard.dll";
 	private final static String testProjectFileName = "Antlr4.Test.csproj";
 	private static String cSharpTestProjectContent;
@@ -141,7 +141,7 @@ public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTes
 				files.add(grammarName + "BaseVisitor.cs");
 			}
 		}
-		addSourceFiles(files.toArray(new String[files.size()]));
+		addSourceFiles(files.toArray(new String[0]));
 		return true;
 	}
 
@@ -177,7 +177,8 @@ public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTes
 	public boolean compile() {
 		try {
 			return buildProject();
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			e.printStackTrace(System.err);
 			return false;
 		}
@@ -190,7 +191,6 @@ public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTes
 	public boolean buildProject() {
 		try {
 			assertTrue(initializeRuntime());
-
 			// save auxiliary files
 			try (PrintWriter out = new PrintWriter(new File(getTempTestDir(), testProjectFileName))) {
 				out.print(cSharpTestProjectContent);
@@ -200,7 +200,8 @@ public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTes
 			String[] args = new String[] { "dotnet", "build", testProjectFileName, "-c", "Release" };
 			boolean success = runProcess(args, getTempDirPath());
 			assertTrue(success);
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			e.printStackTrace(System.err);
 			return false;
 		}
@@ -208,52 +209,61 @@ public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTes
 		return true;
 	}
 
-	private synchronized boolean initializeRuntime() {
-		// Compile runtime project once per tests session
-		if (isRuntimeInitialized)
-			return true;
-
-		// find runtime package
-		final ClassLoader loader = Thread.currentThread().getContextClassLoader();
-		final URL runtimeProj = loader.getResource("CSharp/src/Antlr4.csproj");
-		if (runtimeProj == null) {
-			throw new RuntimeException("C# runtime project file not found!");
-		}
-		File runtimeProjFile = new File(runtimeProj.getFile());
-		String runtimeProjPath = runtimeProjFile.getPath();
-
-		RuntimeTestUtils.mkdir(cSharpCachingDirectory);
-		String[] args = new String[]{
-				"dotnet",
-				"build",
-				runtimeProjPath,
-				"-c",
-				"Release",
-				"-o",
-				cSharpCachingDirectory
-		};
-
-		boolean success;
-		try {
-			String cSharpTestProjectResourceName = BaseCSharpTest.class.getPackage().getName().replace(".", "/") + "/";
-			InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(cSharpTestProjectResourceName + testProjectFileName);
-			int bufferSize = 1024;
-			char[] buffer = new char[bufferSize];
-			StringBuilder out = new StringBuilder();
-			Reader in = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
-			for (int numRead; (numRead = in.read(buffer, 0, buffer.length)) > 0; ) {
-				out.append(buffer, 0, numRead);
+	private boolean initializeRuntime() {
+		// Compile runtime project once per overall maven test session (assuming forkCount=0)
+		synchronized (BaseCSharpTest.class) {
+			if ( isRuntimeInitialized) {
+//				System.out.println("C# runtime build REUSED\n");
+				return true;
 			}
-			cSharpTestProjectContent = out.toString().replace(cSharpAntlrRuntimeDllName, Paths.get(cSharpCachingDirectory, cSharpAntlrRuntimeDllName).toString());
 
-			success = runProcess(args, cSharpCachingDirectory);
-		} catch (Exception e) {
-			e.printStackTrace(System.err);
-			return false;
+			System.out.println("Building C# runtime\n");
+
+			// find runtime package
+			final ClassLoader loader = Thread.currentThread().getContextClassLoader();
+			final URL runtimeProj = loader.getResource("CSharp/src/Antlr4.csproj");
+			if (runtimeProj == null) {
+				throw new RuntimeException("C# runtime project file not found!");
+			}
+			File runtimeProjFile = new File(runtimeProj.getFile());
+			String runtimeProjPath = runtimeProjFile.getPath();
+
+			RuntimeTestUtils.mkdir(cSharpCachingDirectory);
+			String[] args = new String[]{
+					"dotnet",
+					"build",
+					runtimeProjPath,
+					"-c",
+					"Release",
+					"-o",
+					cSharpCachingDirectory
+			};
+
+			boolean success;
+			try {
+				String cSharpTestProjectResourceName = BaseCSharpTest.class.getPackage().getName().replace(".", "/") + "/";
+				InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(cSharpTestProjectResourceName + testProjectFileName);
+				int bufferSize = 1024;
+				char[] buffer = new char[bufferSize];
+				StringBuilder out = new StringBuilder();
+				Reader in = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
+				for (int numRead; (numRead = in.read(buffer, 0, buffer.length)) > 0; ) {
+					out.append(buffer, 0, numRead);
+				}
+				cSharpTestProjectContent = out.toString().replace(cSharpAntlrRuntimeDllName, Paths.get(cSharpCachingDirectory, cSharpAntlrRuntimeDllName).toString());
+
+				success = runProcess(args, cSharpCachingDirectory);
+			} catch (Exception e) {
+				e.printStackTrace(System.err);
+				success = false;
+			}
+
+			if (success) System.out.println("C# runtime build succeeded\n");
+			else System.out.println("C# runtime build failed\n");
+
+			isRuntimeInitialized = true; // try only once
+			return success;
 		}
-
-		isRuntimeInitialized = true;
-		return success;
 	}
 
 	private boolean runProcess(String[] args, String path) throws Exception {
@@ -316,7 +326,8 @@ public class BaseCSharpTest extends BaseRuntimeTestSupport implements RuntimeTes
 			String stderrString = stderrVacuum.toString();
 			setParseErrors(stderrString);
 			return stdoutString;
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			System.err.println("can't exec recognizer");
 			e.printStackTrace(System.err);
 		}

@@ -12,7 +12,6 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-
 @RunWith(Parameterized.class)
 public class TestCompositeParsers extends BaseRuntimeTest {
 	public TestCompositeParsers(RuntimeTestDescriptor descriptor) {

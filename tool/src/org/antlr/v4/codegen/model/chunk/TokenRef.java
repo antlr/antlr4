@@ -9,11 +9,8 @@ package org.antlr.v4.codegen.model.chunk;
 import org.antlr.v4.codegen.model.decl.StructDecl;
 
 /** */
-public class TokenRef extends ActionChunk {
-	public String name;
-
-	public TokenRef(StructDecl ctx, String name) {
-		super(ctx);
-		this.name = name;
+public class TokenRef extends SymbolRefChunk {
+	public TokenRef(StructDecl ctx, String name, String escapedName) {
+		super(ctx, name, escapedName);
 	}
 }

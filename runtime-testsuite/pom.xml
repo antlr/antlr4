@@ -10,7 +10,7 @@
 	<parent>
 		<groupId>org.antlr</groupId>
 		<artifactId>antlr4-master</artifactId>
-		<version>4.9.4-SNAPSHOT</version>
+		<version>4.10-SNAPSHOT</version>
 	</parent>
 	<artifactId>antlr4-runtime-testsuite</artifactId>
 	<name>ANTLR 4 Runtime Tests (3rd generation)</name>
@@ -95,7 +95,7 @@
                         <include>**/dart/Test*.java</include>
                         <include>${antlr.tests.swift}</include>
                     </includes>
-				</configuration>
+                </configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -130,6 +130,9 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <release>8</release>
+                </configuration>
             </plugin>
         </plugins>
 	</build>

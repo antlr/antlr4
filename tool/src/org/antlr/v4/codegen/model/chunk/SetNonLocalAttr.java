@@ -15,10 +15,10 @@ public class SetNonLocalAttr extends SetAttr {
 	public int ruleIndex;
 
 	public SetNonLocalAttr(StructDecl ctx,
-						   String ruleName, String name, int ruleIndex,
+						   String ruleName, String name, String escapedName, int ruleIndex,
 						   List<ActionChunk> rhsChunks)
 	{
-		super(ctx, name, rhsChunks);
+		super(ctx, name, escapedName, rhsChunks);
 		this.ruleName = ruleName;
 		this.ruleIndex = ruleIndex;
 	}

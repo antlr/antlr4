@@ -110,14 +110,4 @@ public abstract class DefaultOutputModelFactory extends BlankOutputModelFactory 
 	public static List<SrcOp> list(Collection<? extends SrcOp> values) {
 		return new ArrayList<SrcOp>(values);
 	}
-
-
-	public Decl getCurrentDeclForName(String name) {
-		if ( getCurrentBlock().locals==null ) return null;
-		for (Decl d : getCurrentBlock().locals.elements()) {
-			if ( d.name.equals(name) ) return d;
-		}
-		return null;
-	}
-
 }
