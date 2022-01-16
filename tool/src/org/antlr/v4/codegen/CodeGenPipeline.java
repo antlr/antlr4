@@ -5,19 +5,21 @@
  */
 package org.antlr.v4.codegen;
 
+import org.antlr.v4.runtime.misc.IntegerList;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
-import org.antlr.v4.tool.Rule;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.gui.STViz;
 
 public class CodeGenPipeline {
 	final Grammar g;
 	final CodeGenerator gen;
+	final IntegerList atnData;
 
-	public CodeGenPipeline(Grammar g, CodeGenerator gen) {
+	public CodeGenPipeline(Grammar g, CodeGenerator gen, IntegerList atnData) {
 		this.g = g;
 		this.gen = gen;
+		this.atnData = atnData;
 	}
 
 	public void process() {
@@ -28,24 +30,24 @@ public class CodeGenPipeline {
 
 		if ( g.isLexer() ) {
 			if (gen.getTarget().needsHeader()) {
-				ST lexer = gen.generateLexer(true); // Header file if needed.
+				ST lexer = gen.generateLexer(true, atnData); // Header file if needed.
 				if (g.tool.errMgr.getNumErrors() == errorCount) {
 					writeRecognizer(lexer, gen, true);
 				}
 			}
-			ST lexer = gen.generateLexer(false);
+			ST lexer = gen.generateLexer(false, atnData);
 			if (g.tool.errMgr.getNumErrors() == errorCount) {
 				writeRecognizer(lexer, gen, false);
 			}
 		}
 		else {
 			if (gen.getTarget().needsHeader()) {
-				ST parser = gen.generateParser(true);
+				ST parser = gen.generateParser(true, atnData);
 				if (g.tool.errMgr.getNumErrors() == errorCount) {
 					writeRecognizer(parser, gen, true);
 				}
 			}
-			ST parser = gen.generateParser(false);
+			ST parser = gen.generateParser(false, atnData);
 			if (g.tool.errMgr.getNumErrors() == errorCount) {
 				writeRecognizer(parser, gen, false);
 			}

@@ -7,17 +7,18 @@
 package org.antlr.v4.codegen.model;
 
 import org.antlr.v4.codegen.OutputModelFactory;
+import org.antlr.v4.runtime.misc.IntegerList;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Parser extends Recognizer {
-	public ParserFile file;
+	public final ParserFile file;
 
-	@ModelElement public List<RuleFunction> funcs = new ArrayList<RuleFunction>();
+	@ModelElement public final List<RuleFunction> funcs = new ArrayList<RuleFunction>();
 
-	public Parser(OutputModelFactory factory, ParserFile file) {
-		super(factory);
-		this.file = file; // who contains us?
+	public Parser(OutputModelFactory factory, ParserFile file, IntegerList atnData) {
+		super(factory, atnData);
+		this.file = file;
 	}
 }

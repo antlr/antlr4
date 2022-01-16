@@ -15,6 +15,7 @@ import org.antlr.v4.codegen.model.Parser;
 import org.antlr.v4.codegen.model.ParserFile;
 import org.antlr.v4.codegen.model.RuleFunction;
 import org.antlr.v4.codegen.model.SrcOp;
+import org.antlr.v4.runtime.misc.IntegerList;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.tool.Alternative;
 import org.antlr.v4.tool.Rule;
@@ -29,7 +30,7 @@ public abstract class BlankOutputModelFactory implements OutputModelFactory {
 	public ParserFile parserFile(String fileName) { return null; }
 
 	@Override
-	public Parser parser(ParserFile file) { return null; }
+	public Parser parser(ParserFile file, IntegerList atnData) { return null; }
 
 	@Override
 	public RuleFunction rule(Rule r) { return null; }

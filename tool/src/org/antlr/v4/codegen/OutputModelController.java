@@ -33,6 +33,7 @@ import org.antlr.v4.codegen.model.decl.CodeBlock;
 import org.antlr.v4.misc.Utils;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.GrammarASTAdaptor;
+import org.antlr.v4.runtime.misc.IntegerList;
 import org.antlr.v4.tool.Alternative;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
@@ -72,9 +73,11 @@ public class OutputModelController {
 	public Alternative currentOuterMostAlt;
 	public CodeBlock currentBlock;
 	public CodeBlockForOuterMostAlt currentOuterMostAlternativeBlock;
+	public IntegerList atnData;
 
-	public OutputModelController(OutputModelFactory factory) {
+	public OutputModelController(OutputModelFactory factory, IntegerList atnData) {
 		this.delegate = factory;
+		this.atnData = atnData;
 	}
 
 	public void addExtension(CodeGeneratorExtension ext) { extensions.add(ext); }
@@ -138,7 +141,7 @@ public class OutputModelController {
 	}
 
 	public Parser parser(ParserFile file) {
-		Parser p = delegate.parser(file);
+		Parser p = delegate.parser(file, atnData);
 		for (CodeGeneratorExtension ext : extensions) p = ext.parser(p);
 		return p;
 	}
@@ -148,7 +151,7 @@ public class OutputModelController {
 	}
 
 	public Lexer lexer(LexerFile file) {
-		return new Lexer(delegate, file);
+		return new Lexer(delegate, file, atnData);
 	}
 
 	/** Create RuleFunction per rule and update sempreds,actions of parser

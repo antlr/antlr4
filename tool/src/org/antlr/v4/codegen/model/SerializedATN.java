@@ -8,18 +8,15 @@ package org.antlr.v4.codegen.model;
 
 import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.codegen.Target;
-import org.antlr.v4.runtime.atn.ATN;
-import org.antlr.v4.runtime.atn.ATNSerializer;
 import org.antlr.v4.runtime.misc.IntegerList;
 
 public class SerializedATN extends OutputModelObject {
 	public final String[] serialized;
 	public final String[][] segments;
 
-	public SerializedATN(OutputModelFactory factory, ATN atn) {
+	public SerializedATN(OutputModelFactory factory, IntegerList data) {
 		super(factory);
 		Target target = factory.getGenerator().getTarget();
-		IntegerList data = ATNSerializer.getSerialized(atn, target.getLanguage());
 		int size = data.size();
 		int segmentLimit = target.getSerializedATNSegmentLimit();
 		segments = new String[(int)(((long)size + segmentLimit - 1) / segmentLimit)][];

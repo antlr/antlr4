@@ -9,6 +9,7 @@ package org.antlr.v4.codegen;
 import org.antlr.v4.Tool;
 import org.antlr.v4.codegen.model.OutputModelObject;
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.misc.IntegerList;
 import org.antlr.v4.tool.ErrorType;
 import org.antlr.v4.tool.Grammar;
 import org.stringtemplate.v4.AutoIndentWriter;
@@ -76,9 +77,9 @@ public class CodeGenerator {
 
 	// CREATE TEMPLATES BY WALKING MODEL
 
-	private OutputModelController createController() {
+	private OutputModelController createController(IntegerList atnData) {
 		OutputModelFactory factory = new ParserFactory(this);
-		OutputModelController controller = new OutputModelController(factory);
+		OutputModelController controller = new OutputModelController(factory, atnData);
 		factory.setController(controller);
 		return controller;
 	}
@@ -88,23 +89,23 @@ public class CodeGenerator {
 		return walker.walk(outputModel, header);
 	}
 
-	public ST generateLexer() { return generateLexer(false); }
-	public ST generateLexer(boolean header) { return walk(createController().buildLexerOutputModel(header), header); }
+	public ST generateLexer(IntegerList atnData) { return generateLexer(false, atnData); }
+	public ST generateLexer(boolean header, IntegerList atnData) { return walk(createController(atnData).buildLexerOutputModel(header), header); }
 
-	public ST generateParser() { return generateParser(false); }
-	public ST generateParser(boolean header) { return walk(createController().buildParserOutputModel(header), header); }
+	public ST generateParser(IntegerList atnData) { return generateParser(false, atnData); }
+	public ST generateParser(boolean header, IntegerList atnData) { return walk(createController(atnData).buildParserOutputModel(header), header); }
 
 	public ST generateListener() { return generateListener(false); }
-	public ST generateListener(boolean header) { return walk(createController().buildListenerOutputModel(header), header); }
+	public ST generateListener(boolean header) { return walk(createController(null).buildListenerOutputModel(header), header); }
 
 	public ST generateBaseListener() { return generateBaseListener(false); }
-	public ST generateBaseListener(boolean header) { return walk(createController().buildBaseListenerOutputModel(header), header); }
+	public ST generateBaseListener(boolean header) { return walk(createController(null).buildBaseListenerOutputModel(header), header); }
 
 	public ST generateVisitor() { return generateVisitor(false); }
-	public ST generateVisitor(boolean header) { return walk(createController().buildVisitorOutputModel(header), header); }
+	public ST generateVisitor(boolean header) { return walk(createController(null).buildVisitorOutputModel(header), header); }
 
 	public ST generateBaseVisitor() { return generateBaseVisitor(false); }
-	public ST generateBaseVisitor(boolean header) { return walk(createController().buildBaseVisitorOutputModel(header), header); }
+	public ST generateBaseVisitor(boolean header) { return walk(createController(null).buildBaseVisitorOutputModel(header), header); }
 
 	/** Generate a token vocab file with all the token names/types.  For example:
 	 *  ID=7

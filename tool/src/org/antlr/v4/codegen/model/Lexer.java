@@ -8,6 +8,7 @@ package org.antlr.v4.codegen.model;
 
 import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.codegen.Target;
+import org.antlr.v4.runtime.misc.IntegerList;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
 import org.antlr.v4.tool.Rule;
@@ -21,12 +22,11 @@ public class Lexer extends Recognizer {
 	public final Collection<String> modes;
 	public final Collection<String> escapedModeNames;
 
-	@ModelElement public LinkedHashMap<Rule, RuleActionFunction> actionFuncs =
-		new LinkedHashMap<Rule, RuleActionFunction>();
+	@ModelElement public LinkedHashMap<Rule, RuleActionFunction> actionFuncs = new LinkedHashMap<>();
 
-	public Lexer(OutputModelFactory factory, LexerFile file) {
-		super(factory);
-		this.file = file; // who contains us?
+	public Lexer(OutputModelFactory factory, LexerFile file, IntegerList atnData) {
+		super(factory, atnData);
+		this.file = file;
 
 		Grammar g = factory.getGrammar();
 		Target target = factory.getGenerator().getTarget();

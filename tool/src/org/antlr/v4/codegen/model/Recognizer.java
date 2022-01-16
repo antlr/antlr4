@@ -9,6 +9,8 @@ import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.codegen.model.chunk.ActionChunk;
 import org.antlr.v4.codegen.model.chunk.ActionText;
+import org.antlr.v4.runtime.atn.ATNSerializer;
+import org.antlr.v4.runtime.misc.IntegerList;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.Rule;
 
@@ -21,11 +23,11 @@ import java.util.Map;
 import java.util.Set;
 
 public abstract class Recognizer extends OutputModelObject {
-	public String name;
-	public String grammarName;
-	public String grammarFileName;
-	public String accessLevel;
-	public Map<String,Integer> tokens;
+	public final String name;
+	public final String grammarName;
+	public final String grammarFileName;
+	public final String accessLevel;
+	public final Map<String,Integer> tokens;
 
 	/**
 	 * @deprecated This field is provided only for compatibility with code
@@ -33,19 +35,19 @@ public abstract class Recognizer extends OutputModelObject {
 	 * {@link #literalNames} and {@link #symbolicNames}.
 	 */
 	@Deprecated
-	public List<String> tokenNames;
+	public final List<String> tokenNames;
 
-	public List<String> literalNames;
-	public List<String> symbolicNames;
-	public Set<String> ruleNames;
-	public Collection<Rule> rules;
-	@ModelElement public ActionChunk superClass;
+	public final List<String> literalNames;
+	public final List<String> symbolicNames;
+	public final Set<String> ruleNames;
+	public final Collection<Rule> rules;
+	@ModelElement public final ActionChunk superClass;
 
-	@ModelElement public SerializedATN atn;
-	@ModelElement public LinkedHashMap<Rule, RuleSempredFunction> sempredFuncs =
+	@ModelElement public final SerializedATN atn;
+	@ModelElement public final LinkedHashMap<Rule, RuleSempredFunction> sempredFuncs =
 		new LinkedHashMap<Rule, RuleSempredFunction>();
 
-	public Recognizer(OutputModelFactory factory) {
+	public Recognizer(OutputModelFactory factory, IntegerList atnData) {
 		super(factory);
 
 		Grammar g = factory.getGrammar();
@@ -53,7 +55,7 @@ public abstract class Recognizer extends OutputModelObject {
 		grammarName = g.name;
 		name = g.getRecognizerName();
 		accessLevel = g.getOptionString("accessLevel");
-		tokens = new LinkedHashMap<String,Integer>();
+		tokens = new LinkedHashMap<>();
 		for (Map.Entry<String, Integer> entry : g.tokenNameToTypeMap.entrySet()) {
 			Integer ttype = entry.getValue();
 			if ( ttype>0 ) {
@@ -63,13 +65,14 @@ public abstract class Recognizer extends OutputModelObject {
 
 		ruleNames = g.rules.keySet();
 		rules = g.rules.values();
-		atn = new SerializedATN(factory, g.atn);
-		if (g.getOptionString("superClass") != null) {
-			superClass = new ActionText(null, g.getOptionString("superClass"));
-		}
-		else {
-			superClass = null;
-		}
+
+		IntegerList initializedAtnData = atnData != null
+				? atnData
+				: ATNSerializer.getSerialized(g.atn, factory.getGenerator().getTarget().getLanguage());
+		atn = new SerializedATN(factory, initializedAtnData);
+		superClass = g.getOptionString("superClass") != null
+				? new ActionText(null, g.getOptionString("superClass"))
+				: null;
 
 		CodeGenerator gen = factory.getGenerator();
 		tokenNames = translateTokenStringsToTarget(g.getTokenDisplayNames(), gen);
@@ -109,5 +112,4 @@ public abstract class Recognizer extends OutputModelObject {
 			return gen.getTarget().getTargetStringLiteralFromString(tokenName, true);
 		}
 	}
-
 }

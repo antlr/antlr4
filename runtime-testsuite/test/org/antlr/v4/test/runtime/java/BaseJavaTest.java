@@ -462,7 +462,7 @@ public class BaseJavaTest extends BaseRuntimeTestSupport implements RuntimeTestS
             anal.process();
 
 			CodeGenerator gen = CodeGenerator.create(g);
-			ST outputFileST = gen.generateParser(false);
+			ST outputFileST = gen.generateParser(false, null);
 			String output = outputFileST.render();
 			//System.out.println(output);
 			String b = "#" + actionName + "#";
