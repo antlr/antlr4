@@ -18,6 +18,7 @@ import org.antlr.v4.codegen.model.ParserFile;
 import org.antlr.v4.codegen.model.RuleFunction;
 import org.antlr.v4.codegen.model.SrcOp;
 import org.antlr.v4.codegen.model.decl.CodeBlock;
+import org.antlr.v4.runtime.misc.IntegerList;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.tool.Alternative;
 import org.antlr.v4.tool.Grammar;
@@ -39,7 +40,7 @@ public interface OutputModelFactory {
 
 	ParserFile parserFile(String fileName);
 
-	Parser parser(ParserFile file);
+	Parser parser(ParserFile file, IntegerList atnData);
 
 	LexerFile lexerFile(String fileName);
 

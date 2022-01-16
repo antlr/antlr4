@@ -7,6 +7,7 @@
 package org.antlr.v4.codegen.model;
 
 import org.antlr.v4.codegen.OutputModelFactory;
+import org.antlr.v4.codegen.Target;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNSerializer;
 import org.antlr.v4.runtime.misc.IntegerList;
@@ -16,16 +17,21 @@ import java.util.List;
 
 public class SerializedATN extends OutputModelObject {
 	// TODO: make this into a kind of decl or multiple?
-	public List<String> serialized;
+	public final List<String> serialized;
+
 	public SerializedATN(OutputModelFactory factory, ATN atn) {
+		this(factory, ATNSerializer.getSerialized(atn));
+	}
+
+	public SerializedATN(OutputModelFactory factory, IntegerList data) {
 		super(factory);
-		IntegerList data = ATNSerializer.getSerialized(atn);
-		serialized = new ArrayList<String>(data.size());
-		for (int c : data.toArray()) {
-			String encoded = factory.getGenerator().getTarget().encodeIntAsCharEscape(c == -1 ? Character.MAX_VALUE : c);
-			serialized.add(encoded);
+		int dataSize = data.size();
+		serialized = new ArrayList<>(dataSize);
+		Target target = factory.getGenerator().getTarget();
+		for (int i = 0; i < dataSize; i++) {
+			int c = data.get(i);
+			serialized.add(target.encodeIntAsCharEscape(c == -1 ? Character.MAX_VALUE : c));
 		}
-//		System.out.println(ATNSerializer.getDecoded(factory.getGrammar(), atn));
 	}
 
 	public String[][] getSegments() {

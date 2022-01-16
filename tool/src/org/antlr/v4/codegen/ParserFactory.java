@@ -42,6 +42,7 @@ import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.runtime.atn.DecisionState;
 import org.antlr.v4.runtime.atn.PlusLoopbackState;
 import org.antlr.v4.runtime.atn.StarLoopEntryState;
+import org.antlr.v4.runtime.misc.IntegerList;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.tool.Alternative;
 import org.antlr.v4.tool.LeftRecursiveRule;
@@ -63,19 +64,15 @@ public class ParserFactory extends DefaultOutputModelFactory {
 	}
 
 	@Override
-	public Parser parser(ParserFile file) {
-		return new Parser(this, file);
+	public Parser parser(ParserFile file, IntegerList atnData) {
+		return new Parser(this, file, atnData);
 	}
 
 	@Override
 	public RuleFunction rule(Rule r) {
-		if ( r instanceof LeftRecursiveRule ) {
-			return new LeftRecursiveRuleFunction(this, (LeftRecursiveRule)r);
-		}
-		else {
-			RuleFunction rf = new RuleFunction(this, r);
-			return rf;
-		}
+		return r instanceof LeftRecursiveRule
+				? new LeftRecursiveRuleFunction(this, (LeftRecursiveRule) r)
+				: new RuleFunction(this, r);
 	}
 
 	@Override

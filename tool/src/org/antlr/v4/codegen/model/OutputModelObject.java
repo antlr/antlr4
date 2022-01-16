@@ -11,10 +11,12 @@ import org.antlr.v4.tool.ast.GrammarAST;
 
 /** */
 public abstract class OutputModelObject {
-	public OutputModelFactory factory;
-	public GrammarAST ast;
+	public final OutputModelFactory factory;
+	public final GrammarAST ast;
 
-	public OutputModelObject() {}
+	public OutputModelObject() {
+		this(null);
+	}
 
 	public OutputModelObject(OutputModelFactory factory) { this(factory, null); }
 

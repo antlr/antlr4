@@ -395,19 +395,19 @@ public class Tool {
 
 		if ( generate_ATN_dot ) generateATNs(g);
 
-		if (gencode && g.tool.getNumErrors()==0 ) generateInterpreterData(g);
+		IntegerList atnData = gencode && g.tool.getNumErrors()==0
+			? generateInterpreterData(g)
+			: null;
 
 		// PERFORM GRAMMAR ANALYSIS ON ATN: BUILD DECISION DFAs
 		AnalysisPipeline anal = new AnalysisPipeline(g);
 		anal.process();
 
-		//if ( generate_DFA_dot ) generateDFAs(g);
-
 		if ( g.tool.getNumErrors()>prevErrors ) return;
 
 		// GENERATE CODE
 		if ( gencode ) {
-			CodeGenPipeline gen = new CodeGenPipeline(g, codeGenerator);
+			CodeGenPipeline gen = new CodeGenPipeline(g, codeGenerator, atnData);
 			gen.process();
 		}
 	}
@@ -695,27 +695,27 @@ public class Tool {
 		}
 	}
 
-	private void generateInterpreterData(Grammar g) {
+	private IntegerList generateInterpreterData(Grammar g) {
 		StringBuilder content = new StringBuilder();
 
 		content.append("token literal names:\n");
 		String[] names = g.getTokenLiteralNames();
 		for (String name : names) {
-			content.append(name + "\n");
+			content.append(name).append("\n");
 		}
 		content.append("\n");
 
 		content.append("token symbolic names:\n");
 		names = g.getTokenSymbolicNames();
 		for (String name : names) {
-			content.append(name + "\n");
+			content.append(name).append("\n");
 		}
 		content.append("\n");
 
 		content.append("rule names:\n");
 		names = g.getRuleNames();
 		for (String name : names) {
-			content.append(name + "\n");
+			content.append(name).append("\n");
 		}
 		content.append("\n");
 
@@ -724,33 +724,31 @@ public class Tool {
 			content.append("DEFAULT_TOKEN_CHANNEL\n");
 			content.append("HIDDEN\n");
 			for (String channel : g.channelValueToNameList) {
-				content.append(channel + "\n");
+				content.append(channel).append("\n");
 			}
 			content.append("\n");
 
 			content.append("mode names:\n");
 			for (String mode : ((LexerGrammar)g).modes.keySet()) {
-				content.append(mode + "\n");
+				content.append(mode).append("\n");
 			}
 		}
 		content.append("\n");
 
-		IntegerList serializedATN = ATNSerializer.getSerialized(g.atn);
+		IntegerList atnData = ATNSerializer.getSerialized(g.atn);
 		content.append("atn:\n");
-		content.append(serializedATN.toString());
+		content.append(atnData.toString());
 
 		try {
-			Writer fw = getOutputFileWriter(g, g.name + ".interp");
-			try {
+			try (Writer fw = getOutputFileWriter(g, g.name + ".interp")) {
 				fw.write(content.toString());
-			}
-			finally {
-				fw.close();
 			}
 		}
 		catch (IOException ioe) {
 			errMgr.toolError(ErrorType.CANNOT_WRITE_FILE, ioe);
 		}
+
+		return atnData;
 	}
 
 	/** This method is used by all code generators to create new output

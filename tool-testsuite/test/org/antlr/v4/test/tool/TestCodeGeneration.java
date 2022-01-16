@@ -131,7 +131,7 @@ public class TestCodeGeneration extends BaseJavaToolTest {
 			g.atn = factory.createATN();
 
 			CodeGenerator gen = CodeGenerator.create(g);
-			ST outputFileST = gen.generateParser();
+			ST outputFileST = gen.generateParser(null);
 
 //			STViz viz = outputFileST.inspect();
 //			try {
