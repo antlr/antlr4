@@ -5,8 +5,6 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
-using Antlr4.Runtime.Atn;
 using Antlr4.Runtime.Dfa;
 using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Sharpen;
@@ -47,6 +45,12 @@ namespace Antlr4.Runtime.Atn
         /// <summary>This is the current serialized UUID.</summary>
         /// <remarks>This is the current serialized UUID.</remarks>
         public static readonly Guid SerializedUuid;
+
+        public const int OptimizeOffset = 2;
+        public const int MaskBits = 14;
+
+        private char[] _data;
+        private int _p;
 
         static ATNDeserializer()
         {
@@ -109,7 +113,7 @@ namespace Antlr4.Runtime.Atn
         /// <see langword="false"/>
         /// .
         /// </returns>
-        protected internal virtual bool IsFeatureSupported(Guid feature, Guid actualUuid)
+        protected virtual bool IsFeatureSupported(Guid feature, Guid actualUuid)
         {
             int featureIndex = SupportedUuids.IndexOf(feature);
             if (featureIndex < 0)
@@ -119,22 +123,19 @@ namespace Antlr4.Runtime.Atn
             return SupportedUuids.IndexOf(actualUuid) >= featureIndex;
         }
 
-		char[] data;
-		int p;
-
         public virtual ATN Deserialize(char[] data)
         {
-			Reset (data);
-			CheckVersion ();
-			CheckUUID ();
+	        _data = data;
+			CheckVersion();
+			CheckUUID();
 			ATN atn = ReadATN ();
 			ReadStates (atn);
 			ReadRules (atn);
 			ReadModes (atn);
 			IList<IntervalSet> sets = new List<IntervalSet>();
-			ReadSets (atn, sets, this.ReadInt);
+			ReadSets (sets, UnicodeSerializeMode.Bmp);
 			if (IsFeatureSupported(AddedUnicodeSmp, uuid)) {
-				ReadSets (atn, sets, this.ReadInt32);
+				ReadSets (sets, UnicodeSerializeMode.Smp);
 			}
 			ReadEdges (atn, sets);
 			ReadDecisions (atn);
@@ -154,7 +155,7 @@ namespace Antlr4.Runtime.Atn
             return atn;
         }
 
-		protected internal virtual void OptimizeATN(ATN atn)
+		protected virtual void OptimizeATN(ATN atn)
 		{
 			while (true)
 			{
@@ -175,7 +176,7 @@ namespace Antlr4.Runtime.Atn
 			}
 		}
 
-		protected internal virtual void GenerateRuleBypassTransitions(ATN atn)
+		protected virtual void GenerateRuleBypassTransitions(ATN atn)
 		{
 			atn.ruleToTokenType = new int[atn.ruleToStartState.Length];
 			for (int i_10 = 0; i_10 < atn.ruleToStartState.Length; i_10++)
@@ -267,42 +268,34 @@ namespace Antlr4.Runtime.Atn
 			}
 		}
 
-		protected internal virtual void ReadLexerActions(ATN atn)
+		protected virtual void ReadLexerActions(ATN atn)
 		{
 			//
 			// LEXER ACTIONS
 			//
 			if (atn.grammarType == ATNType.Lexer)
 			{
-				atn.lexerActions = new ILexerAction[ReadInt()];
+				atn.lexerActions = new ILexerAction[Read()];
 				for (int i_10 = 0; i_10 < atn.lexerActions.Length; i_10++)
 				{
-					LexerActionType actionType = (LexerActionType)ReadInt();
-					int data1 = ReadInt();
-					if (data1 == unchecked((int)(0xFFFF)))
-					{
-						data1 = -1;
-					}
-					int data2 = ReadInt();
-					if (data2 == unchecked((int)(0xFFFF)))
-					{
-						data2 = -1;
-					}
+					LexerActionType actionType = (LexerActionType)Read();
+					int data1 = Read();
+					int data2 = Read();
 					ILexerAction lexerAction = LexerActionFactory(actionType, data1, data2);
 					atn.lexerActions[i_10] = lexerAction;
 				}
 			}
 		}
 
-		protected internal virtual void ReadDecisions(ATN atn)
+		protected virtual void ReadDecisions(ATN atn)
 		{
 			//
 			// DECISIONS
 			//
-			int ndecisions = ReadInt();
+			int ndecisions = Read();
 			for (int i_11 = 0; i_11 < ndecisions; i_11++)
 			{
-				int s = ReadInt();
+				int s = Read();
 				DecisionState decState = (DecisionState)atn.states[s];
 				atn.decisionToState.Add(decState);
 				decState.decision = i_11;
@@ -319,15 +312,15 @@ namespace Antlr4.Runtime.Atn
 			//
 			// EDGES
 			//
-			int nedges = ReadInt();
+			int nedges = Read();
 			for (int i_9 = 0; i_9 < nedges; i_9++)
 			{
-				int src = ReadInt();
-				int trg = ReadInt();
-				TransitionType ttype = (TransitionType)ReadInt();
-				int arg1 = ReadInt();
-				int arg2 = ReadInt();
-				int arg3 = ReadInt();
+				int src = Read();
+				int trg = Read();
+				TransitionType ttype = (TransitionType)Read();
+				int arg1 = Read();
+				int arg2 = Read();
+				int arg3 = Read();
 				Transition trans = EdgeFactory(atn, ttype, src, trg, arg1, arg2, arg3, sets);
 				ATNState srcState = atn.states[src];
 				srcState.AddTransition(trans);
@@ -398,38 +391,55 @@ namespace Antlr4.Runtime.Atn
 			}
 		}
 
-		protected internal virtual void ReadSets(ATN atn, IList<IntervalSet> sets, System.Func<int> readUnicode)
+		protected enum UnicodeSerializeMode
+		{
+			Bmp,
+			Smp
+		}
+
+		protected virtual void ReadSets(IList<IntervalSet> sets, UnicodeSerializeMode mode)
 		{
 			//
 			// SETS
 			//
-			int nsets = ReadInt();
+			int nsets = Read();
 			for (int i_8 = 0; i_8 < nsets; i_8++)
 			{
 				IntervalSet set = new IntervalSet();
 				sets.Add(set);
-				int nintervals = ReadInt();
-				bool containsEof = ReadInt() != 0;
+				int nintervals = Read();
+				bool containsEof = Read() != 0;
 				if (containsEof)
 				{
 					set.Add(-1);
 				}
 				for (int j = 0; j < nintervals; j++)
 				{
-					set.Add(readUnicode(), readUnicode());
+					int a, b;
+					if (mode == UnicodeSerializeMode.Bmp)
+					{
+						a = ReadUInt16();
+						b = ReadUInt16();
+					}
+					else
+					{
+						a = ReadInt32();
+						b = ReadInt32();
+					}
+					set.Add(a, b);
 				}
 			}
 		}
 
-		protected internal virtual void ReadModes(ATN atn)
+		protected virtual void ReadModes(ATN atn)
 		{
 			//
 			// MODES
 			//
-			int nmodes = ReadInt();
+			int nmodes = Read();
 			for (int i_6 = 0; i_6 < nmodes; i_6++)
 			{
-				int _i = ReadInt();
+				int _i = Read();
 				atn.modeToStartState.Add((TokensStartState)atn.states[_i]);
 			}
 			// not in Java code
@@ -440,12 +450,12 @@ namespace Antlr4.Runtime.Atn
 			}
 		}
 
-		protected internal virtual void ReadRules(ATN atn)
+		protected virtual void ReadRules(ATN atn)
 		{
 			//
 			// RULES
 			//
-			int nrules = ReadInt();
+			int nrules = Read();
 			if (atn.grammarType == ATNType.Lexer)
 			{
 				atn.ruleToTokenType = new int[nrules];
@@ -453,14 +463,11 @@ namespace Antlr4.Runtime.Atn
 			atn.ruleToStartState = new RuleStartState[nrules];
 			for (int i_5 = 0; i_5 < nrules; i_5++)
 			{
-				int s = ReadInt();
+				int s = Read();
 				RuleStartState startState = (RuleStartState)atn.states[s];
 				atn.ruleToStartState[i_5] = startState;
 				if (atn.grammarType == ATNType.Lexer) {
-					int tokenType = ReadInt ();
-					if (tokenType == unchecked((int)(0xFFFF))) {
-						tokenType = TokenConstants.EOF;
-					}
+					int tokenType = Read ();
 					atn.ruleToTokenType [i_5] = tokenType;
 				}
 			}
@@ -484,33 +491,29 @@ namespace Antlr4.Runtime.Atn
 			//
 			IList<Tuple<LoopEndState, int>> loopBackStateNumbers = new List<Tuple<LoopEndState, int>>();
 			IList<Tuple<BlockStartState, int>> endStateNumbers = new List<Tuple<BlockStartState, int>>();
-			int nstates = ReadInt();
+			int nstates = Read();
 			for (int i_1 = 0; i_1 < nstates; i_1++)
 			{
-				StateType stype = (StateType)ReadInt();
+				StateType stype = (StateType)Read();
 				// ignore bad type of states
 				if (stype == StateType.InvalidType)
 				{
 					atn.AddState(null);
 					continue;
 				}
-				int ruleIndex = ReadInt();
-				if (ruleIndex == char.MaxValue)
-				{
-					ruleIndex = -1;
-				}
+				int ruleIndex = Read();
 				ATNState s = StateFactory(stype, ruleIndex);
 				if (stype == StateType.LoopEnd)
 				{
 					// special case
-					int loopBackStateNumber = ReadInt();
+					int loopBackStateNumber = Read();
 					loopBackStateNumbers.Add(Tuple.Create((LoopEndState)s, loopBackStateNumber));
 				}
 				else
 				{
 					if (s is BlockStartState)
 					{
-						int endStateNumber = ReadInt();
+						int endStateNumber = Read();
 						endStateNumbers.Add(Tuple.Create((BlockStartState)s, endStateNumber));
 					}
 				}
@@ -525,24 +528,24 @@ namespace Antlr4.Runtime.Atn
 			{
 				pair_1.Item1.endState = (BlockEndState)atn.states[pair_1.Item2];
 			}
-			int numNonGreedyStates = ReadInt();
+			int numNonGreedyStates = Read();
 			for (int i_2 = 0; i_2 < numNonGreedyStates; i_2++)
 			{
-				int stateNumber = ReadInt();
+				int stateNumber = Read();
 				((DecisionState)atn.states[stateNumber]).nonGreedy = true;
 			}
-			int numPrecedenceStates = ReadInt();
+			int numPrecedenceStates = Read();
 			for (int i_4 = 0; i_4 < numPrecedenceStates; i_4++)
 			{
-				int stateNumber = ReadInt();
+				int stateNumber = Read();
 				((RuleStartState)atn.states[stateNumber]).isPrecedenceRule = true;
 			}
 		}
 
 		protected internal virtual ATN ReadATN()
 		{
-			ATNType grammarType = (ATNType)ReadInt();
-			int maxTokenType = ReadInt();
+			ATNType grammarType = (ATNType)Read();
+			int maxTokenType = Read();
 			return new ATN(grammarType, maxTokenType);
 		}
 
@@ -558,24 +561,12 @@ namespace Antlr4.Runtime.Atn
 
 		protected internal virtual void CheckVersion()
 		{
-			int version = ReadInt();
+			int version = ReadUInt16(false);
 			if (version != SerializedVersion)
 			{
 				string reason = string.Format(CultureInfo.CurrentCulture, "Could not deserialize ATN with version {0} (expected {1}).", version, SerializedVersion);
 				throw new NotSupportedException(reason);
 			}
-		}
-
-		protected internal virtual void Reset(char[] data)
-		{
-			this.data = new char[data.Length];
-			// don't adjust the first value since that's the version number
-			this.data[0] = data[0];
-			for (int i = 1; i < data.Length; i++)
-			{
-				this.data[i] = (char)(data[i] - 2);
-			}
-			this.p = 0;
 		}
 
         /// <summary>
@@ -1072,36 +1063,6 @@ nextTransition_continue: ;
             return true;
         }
 
-
-        protected internal int ReadInt()
-        {
-			return data[p++];
-        }
-
-        protected internal int ReadInt32()
-        {
-			return (int)data[p++] | ((int)data[p++] << 16);
-        }
-
-        protected internal long ReadLong()
-        {
-            long lowOrder = ReadInt32() & unchecked((long)(0x00000000FFFFFFFFL));
-            return lowOrder | ((long)ReadInt32() << 32);
-        }
-
-        protected internal Guid ReadUUID()
-        {
-			byte[] d = BitConverter.GetBytes (ReadLong ());
-			if(BitConverter.IsLittleEndian)
-			{
-				Array.Reverse(d);
-			}
-			short c = (short)ReadInt();
-			short b = (short)ReadInt();
-			int a = ReadInt32();
-            return new Guid(a, b, c, d);
-        }
-
         [return: NotNull]
         protected internal virtual Transition EdgeFactory(ATN atn, TransitionType type, int src, int trg, int arg1, int arg2, int arg3, IList<IntervalSet> sets)
         {
@@ -1178,7 +1139,7 @@ nextTransition_continue: ;
             throw new ArgumentException("The specified transition type is not valid.");
         }
 
-        protected internal virtual ATNState StateFactory(StateType type, int ruleIndex)
+        protected virtual ATNState StateFactory(StateType type, int ruleIndex)
         {
             ATNState s;
             switch (type)
@@ -1270,7 +1231,7 @@ nextTransition_continue: ;
             return s;
         }
 
-        protected internal virtual ILexerAction LexerActionFactory(LexerActionType type, int data1, int data2)
+        protected virtual ILexerAction LexerActionFactory(LexerActionType type, int data1, int data2)
         {
             switch (type)
             {
@@ -1320,6 +1281,63 @@ nextTransition_continue: ;
                     throw new ArgumentException(message);
                 }
             }
+        }
+
+        private int Read() {
+            int value = ReadUInt16();
+            if (value == 0xFFFF) {
+                return -1;
+            } else {
+                int mask = value >> MaskBits & 0b11;
+                return mask == 0
+                    ? value
+                    : mask == 0b01
+                        ? (ReadUInt16() << MaskBits) | (value & ((1 << MaskBits) - 1))
+                        : ReadInt32();
+            }
+        }
+
+        private Guid ReadUUID() {
+            short value = (short)ReadUInt16();
+            byte k = (byte)(value & 0xFF);
+            byte j = (byte)((value >> 8) & 0xFF);
+            value = (short)ReadUInt16();
+            byte i = (byte)(value & 0xFF);
+            byte h = (byte)((value >> 8) & 0xFF);
+            value = (short)ReadUInt16();
+            byte g = (byte)(value & 0xFF);
+            byte f = (byte)((value >> 8) & 0xFF);
+            value = (short)ReadUInt16();
+            byte e = (byte)(value & 0xFF);
+            byte d = (byte)((value >> 8) & 0xFF);
+            short c = (short)ReadUInt16();
+            short b = (short)ReadUInt16();
+            int a = ReadInt32();
+            return new Guid(a, b, c, d, e, f, g, h, i, j, k);
+        }
+
+        private  int ReadInt32() {
+            return ReadUInt16() | (ReadUInt16() << 16);
+        }
+
+        private int ReadUInt16(bool normalize = true) {
+            int result = _data[_p++];
+            // Each char value in data is shifted by +2 at the entry to this method.
+            // This is an encoding optimization targeting the serialized values 0
+            // and -1 (serialized to 0xFFFF), each of which are very common in the
+            // serialized form of the ATN. In the modified UTF-8 that Java uses for
+            // compiled string literals, these two character values have multi-byte
+            // forms. By shifting each value by +2, they become characters 2 and 1
+            // prior to writing the string, each of which have single-byte
+            // representations. Since the shift occurs in the tool during ATN
+            // serialization, each target is responsible for adjusting the values
+            // during deserialization.
+            //
+            // As a special case, note that the first element of data is not
+            // adjusted because it contains the major version number of the
+            // serialized ATN, which was fixed at 3 at the time the value shifting
+            // was implemented.
+            return normalize ? (result > 1 ? result - OptimizeOffset : result + 65534) : result;
         }
     }
 }
