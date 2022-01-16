@@ -6,9 +6,8 @@
 
 package org.antlr.v4.test.tool;
 
-import org.antlr.v4.runtime.atn.ATN;
-import org.antlr.v4.runtime.atn.ATNDeserializer;
-import org.antlr.v4.runtime.atn.ATNSerializer;
+import org.antlr.v4.runtime.atn.*;
+import org.antlr.v4.runtime.misc.IntegerList;
 import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
@@ -18,6 +17,7 @@ import org.junit.Test;
 import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
 public class TestATNDeserialization extends BaseJavaToolTest {
 	@Before
@@ -158,6 +158,51 @@ public class TestATNDeserialization extends BaseJavaToolTest {
 			"mode M2;\n" +
 			"C : 'c';\n");
 		checkDeserializationIsStable(lg);
+	}
+
+	@Test public void testATNDataWriterReaderCompact() {
+		IntegerList integerList = new IntegerList();
+		ATNDataWriter writer = new ATNDataWriter(integerList);
+		assertEquals(1, writer.write(0));
+		assertEquals(1, writer.write(-1));
+		assertEquals(1, writer.write(42));
+		assertEquals(2, writer.write(1 << 14));
+		assertEquals(2, writer.write(0xFFFF));
+		assertEquals(3, writer.write(Integer.MAX_VALUE));
+		assertThrows(UnsupportedOperationException.class, () -> writer.write(-2));
+		assertEquals(10, integerList.size());
+
+		char[] charArray = Utils.toCharArray(integerList);
+		ATNDataReader reader = new ATNDataReader(charArray);
+		assertEquals(0, reader.read());
+		assertEquals(-1, reader.read());
+		assertEquals(42, reader.read());
+		assertEquals(1 << 14, reader.read());
+		assertEquals(0xFFFF, reader.read());
+		assertEquals(Integer.MAX_VALUE, reader.read());
+	}
+
+	@Test public void testATNDataWriterReaderRaw() {
+		IntegerList integerList = new IntegerList();
+		ATNDataWriter writer = new ATNDataWriter(integerList);
+		writer.writeInt32(0);
+		writer.writeInt32(-1);
+		writer.writeInt32(42);
+		writer.writeInt32(1 << 14);
+		writer.writeInt32(0xFFFF);
+		writer.writeInt32(Integer.MAX_VALUE);
+		writer.writeInt32(Integer.MIN_VALUE);
+		assertEquals(7 * 2, integerList.size());
+
+		char[] charArray = Utils.toCharArray(integerList);
+		ATNDataReader reader = new ATNDataReader(charArray);
+		assertEquals(0, reader.readInt32());
+		assertEquals(-1, reader.readInt32());
+		assertEquals(42, reader.readInt32());
+		assertEquals(1 << 14, reader.readInt32());
+		assertEquals(0xFFFF, reader.readInt32());
+		assertEquals(Integer.MAX_VALUE, reader.readInt32());
+		assertEquals(Integer.MIN_VALUE, reader.readInt32());
 	}
 
 	protected void checkDeserializationIsStable(Grammar g) {

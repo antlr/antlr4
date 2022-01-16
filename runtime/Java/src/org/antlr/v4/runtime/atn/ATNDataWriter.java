@@ -6,6 +6,7 @@ import java.util.UUID;
 
 public class ATNDataWriter {
 	public static final int OptimizeOffset = 2;
+	public static final int MaskBits = 14;
 
 	private final IntegerList data;
 
@@ -13,27 +14,50 @@ public class ATNDataWriter {
 		this.data = data;
 	}
 
+	/* Write int in range [-1..Integer.MAX_VALUE] in compact format
+		| encoding                                                    | count | type         |
+		| ----------------------------------------------------------- | ----- | ------------ |
+		| 00xx xxxx xxxx xxxx                                         | 1     | int (14 bit) |
+		| 01xx xxxx xxxx xxxx xxxx xxxx xxxx xxxx                     | 2     | int (30 bit) |
+		| 1000 0000 0000 0000 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx | 3     | int (32 bit) |
+		| 1111 1111 1111 1111                                         | 1     | -1 (0xFFFF)  |
+	 */
+	public int write(int value) {
+		if (value == -1) {
+			writeUInt16(0xFFFF);
+			return 1;
+		}
+		else if (value >= 0) {
+			if (value < 1 << MaskBits) {
+				writeUInt16(value);
+				return 1;
+			}
+			else if (value < 1 << (MaskBits + 16)){
+				writeUInt16(value & ((1 << MaskBits) - 1) | 0b01 << MaskBits);
+				writeUInt16(value >>> MaskBits);
+				return 2;
+			} else {
+				writeUInt16(0b10 << MaskBits);
+				writeInt32(value);
+				return 3;
+			}
+		} else {
+			throw new UnsupportedOperationException("Value " + value + " out of range [-1.." + Integer.MAX_VALUE + "]");
+		}
+	}
+
 	public void writeUUID(UUID uuid) {
 		long leastSignificantBits = uuid.getLeastSignificantBits();
-		writeUInt32((int)leastSignificantBits);
-		writeUInt32((int)(leastSignificantBits >> 32));
+		writeInt32((int)leastSignificantBits);
+		writeInt32((int)(leastSignificantBits >> 32));
 		long mostSignificantBits = uuid.getMostSignificantBits();
-		writeUInt32((int)mostSignificantBits);
-		writeUInt32((int)(mostSignificantBits >> 32));
+		writeInt32((int)mostSignificantBits);
+		writeInt32((int)(mostSignificantBits >> 32));
 	}
 
-	public void writeUInt32(int value) {
+	public void writeInt32(int value) {
 		writeUInt16((char)value);
 		writeUInt16((char)(value >> 16));
-	}
-
-	public void writeCompactUInt32(int value) {
-		if (value < 0b1000_0000_0000_0000) {
-			writeUInt16(value);
-		} else {
-			writeUInt16((value & 0b0111_1111_1111_1111) | (1 << 15));
-			writeUInt16(value >>> 15);
-		}
 	}
 
 	public void writeUInt16(int value) {

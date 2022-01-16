@@ -69,8 +69,8 @@ public class ATNSerializer {
 		writer.writeUUID(ATNDeserializer.SERIALIZED_UUID);
 
 		// convert grammar type to ATN const to avoid dependence on ANTLRParser
-		writer.writeUInt16(atn.grammarType.ordinal());
-		writer.writeUInt16(atn.maxTokenType);
+		writer.write(atn.grammarType.ordinal());
+		writer.write(atn.maxTokenType);
 		int nedges = 0;
 
 		// Note that we use a LinkedHashMap as a set to
@@ -81,10 +81,10 @@ public class ATNSerializer {
 		// dump states, count edges and collect sets while doing so
 		IntegerList nonGreedyStates = new IntegerList();
 		IntegerList precedenceStates = new IntegerList();
-		writer.writeCompactUInt32(atn.states.size());
+		writer.write(atn.states.size());
 		for (ATNState s : atn.states) {
 			if ( s==null ) { // might be optimized away
-				writer.writeCompactUInt32(ATNState.INVALID_TYPE);
+				writer.write(ATNState.INVALID_TYPE);
 				continue;
 			}
 
@@ -97,15 +97,14 @@ public class ATNSerializer {
 				precedenceStates.add(s.stateNumber);
 			}
 
-			writer.writeCompactUInt32(stateType);
-
-			writer.writeUInt16(s.ruleIndex == -1 ? Character.MAX_VALUE : s.ruleIndex);
+			writer.write(stateType);
+			writer.write(s.ruleIndex);
 
 			if ( s.getStateType() == ATNState.LOOP_END ) {
-				writer.writeCompactUInt32(((LoopEndState)s).loopBackState.stateNumber);
+				writer.write(((LoopEndState)s).loopBackState.stateNumber);
 			}
 			else if ( s instanceof BlockStartState ) {
-				writer.writeCompactUInt32(((BlockStartState)s).endState.stateNumber);
+				writer.write(((BlockStartState)s).endState.stateNumber);
 			}
 
 			if (s.getStateType() != ATNState.RULE_STOP) {
@@ -124,32 +123,32 @@ public class ATNSerializer {
 		}
 
 		// non-greedy states
-		writer.writeCompactUInt32(nonGreedyStates.size());
+		writer.write(nonGreedyStates.size());
 		for (int i = 0; i < nonGreedyStates.size(); i++) {
-			writer.writeCompactUInt32(nonGreedyStates.get(i));
+			writer.write(nonGreedyStates.get(i));
 		}
 
 		// precedence states
-		writer.writeCompactUInt32(precedenceStates.size());
+		writer.write(precedenceStates.size());
 		for (int i = 0; i < precedenceStates.size(); i++) {
-			writer.writeCompactUInt32(precedenceStates.get(i));
+			writer.write(precedenceStates.get(i));
 		}
 
 		int nrules = atn.ruleToStartState.length;
-		writer.writeCompactUInt32(nrules);
+		writer.write(nrules);
 		for (int r=0; r<nrules; r++) {
 			ATNState ruleStartState = atn.ruleToStartState[r];
-			writer.writeCompactUInt32(ruleStartState.stateNumber);
+			writer.write(ruleStartState.stateNumber);
 			if (atn.grammarType == ATNType.LEXER) {
-				writer.writeUInt16(atn.ruleToTokenType[r] == Token.EOF ? Character.MAX_VALUE : atn.ruleToTokenType[r]);
+				writer.write(atn.ruleToTokenType[r]);
 			}
 		}
 
 		int nmodes = atn.modeToStartState.size();
-		writer.writeCompactUInt32(nmodes);
+		writer.write(nmodes);
 		if ( nmodes>0 ) {
 			for (ATNState modeStartState : atn.modeToStartState) {
-				writer.writeCompactUInt32(modeStartState.stateNumber);
+				writer.write(modeStartState.stateNumber);
 			}
 		}
 		List<IntervalSet> bmpSets = new ArrayList<>();
@@ -169,7 +168,7 @@ public class ATNSerializer {
 			setIndices.put(smpSet, setIndex++);
 		}
 
-		writer.writeCompactUInt32(nedges);
+		writer.write(nedges);
 		for (ATNState s : atn.states) {
 			if ( s==null ) {
 				// might be optimized away
@@ -231,10 +230,6 @@ public class ATNSerializer {
 						ActionTransition at = (ActionTransition)t;
 						arg1 = at.ruleIndex;
 						arg2 = at.actionIndex;
-						if (arg2 == -1) {
-							arg2 = 0xFFFF;
-						}
-
 						arg3 = at.isCtxDependent ? 1 : 0 ;
 						break;
 					case Transition.SET :
@@ -245,65 +240,65 @@ public class ATNSerializer {
 						break;
 				}
 
-				writer.writeCompactUInt32(src);
-				writer.writeCompactUInt32(trg);
-				writer.writeUInt16(edgeType);
-				writer.writeUInt16(arg1);
-				writer.writeUInt16(arg2);
-				writer.writeUInt16(arg3);
+				writer.write(src);
+				writer.write(trg);
+				writer.write(edgeType);
+				writer.write(arg1);
+				writer.write(arg2);
+				writer.write(arg3);
 			}
 		}
 
 		int ndecisions = atn.decisionToState.size();
-		writer.writeCompactUInt32(ndecisions);
+		writer.write(ndecisions);
 		for (DecisionState decStartState : atn.decisionToState) {
-			writer.writeCompactUInt32(decStartState.stateNumber);
+			writer.write(decStartState.stateNumber);
 		}
 
 		//
 		// LEXER ACTIONS
 		//
 		if (atn.grammarType == ATNType.LEXER) {
-			writer.writeCompactUInt32(atn.lexerActions.length);
+			writer.write(atn.lexerActions.length);
 			for (LexerAction action : atn.lexerActions) {
-				writer.writeUInt16(action.getActionType().ordinal());
+				writer.write(action.getActionType().ordinal());
 				switch (action.getActionType()) {
 				case CHANNEL:
 					int channel = ((LexerChannelAction)action).getChannel();
-					writer.writeUInt16(channel != -1 ? channel : 0xFFFF);
-					writer.writeUInt16(0);
+					writer.write(channel);
+					writer.write(0);
 					break;
 
 				case CUSTOM:
 					int ruleIndex = ((LexerCustomAction)action).getRuleIndex();
 					int actionIndex = ((LexerCustomAction)action).getActionIndex();
-					writer.writeUInt16(ruleIndex != -1 ? ruleIndex : 0xFFFF);
-					writer.writeUInt16(actionIndex != -1 ? actionIndex : 0xFFFF);
+					writer.write(ruleIndex);
+					writer.write(actionIndex);
 					break;
 
 				case MODE:
 					int mode = ((LexerModeAction)action).getMode();
-					writer.writeUInt16(mode != -1 ? mode : 0xFFFF);
-					writer.writeUInt16(0);
+					writer.write(mode);
+					writer.write(0);
 					break;
 
 				case MORE:
 				case POP_MODE:
 				case SKIP:
-					writer.writeUInt16(0);
-					writer.writeUInt16(0);
+					writer.write(0);
+					writer.write(0);
 					break;
 
 				case PUSH_MODE:
 					mode = ((LexerPushModeAction)action).getMode();
-					writer.writeUInt16(mode != -1 ? mode : 0xFFFF);
-					writer.writeUInt16(0);
+					writer.write(mode);
+					writer.write(0);
 					break;
 
 				case TYPE:
 					int type = ((LexerTypeAction)action).getType();
-					writer.writeUInt16(type != -1 ? type : 0xFFFF);
-					writer.writeUInt16(0);
+					writer.write(type);
+					writer.write(0);
 					break;
 
 				default:
@@ -318,7 +313,7 @@ public class ATNSerializer {
 
 	private static void serializeSets(ATNDataWriter writer, Collection<IntervalSet> sets, UnicodeSerializeMode mode) {
 		int nSets = sets.size();
-		writer.writeCompactUInt32(nSets);
+		writer.write(nSets);
 
 		for (IntervalSet set : sets) {
 			boolean containsEof = set.contains(Token.EOF);
@@ -326,9 +321,9 @@ public class ATNSerializer {
 			if (containsEof && set.getIntervals().get(0).b == Token.EOF) {
 				size--;
 			}
-			writer.writeCompactUInt32(size);
+			writer.write(size);
 
-			writer.writeUInt16(containsEof ? 1 : 0);
+			writer.write(containsEof ? 1 : 0);
 			for (Interval I : set.getIntervals()) {
 				int firstValue;
 				if (I.a == Token.EOF) {
@@ -347,8 +342,8 @@ public class ATNSerializer {
 					writer.writeUInt16(firstValue);
 					writer.writeUInt16(I.b);
 				} else {
-					writer.writeUInt32(firstValue);
-					writer.writeUInt32(I.b);
+					writer.writeInt32(firstValue);
+					writer.writeInt32(I.b);
 				}
 			}
 		}
@@ -369,25 +364,22 @@ public class ATNSerializer {
 			throw new UnsupportedOperationException(new InvalidClassException(ATN.class.getName(), reason));
 		}
 
-		dataReader.readUInt16(); // skip grammarType
-		int maxType = dataReader.readUInt16();
+		dataReader.read(); // skip grammarType
+		int maxType = dataReader.read();
 		buf.append("max type ").append(maxType).append("\n");
-		int nstates = dataReader.readCompactUInt32();
+		int nstates = dataReader.read();
 		for (int i=0; i<nstates; i++) {
-			int stype = dataReader.readCompactUInt32();
-            if ( stype==ATNState.INVALID_TYPE ) continue; // ignore bad type of states
-			int ruleIndex = dataReader.readUInt16();
-			if (ruleIndex == Character.MAX_VALUE) {
-				ruleIndex = -1;
-			}
+			int stype = dataReader.read();
+			if ( stype==ATNState.INVALID_TYPE ) continue; // ignore bad type of states
+			int ruleIndex = dataReader.read();
 
 			String arg = "";
 			if ( stype == ATNState.LOOP_END ) {
-				int loopBackStateNumber = dataReader.readCompactUInt32();
+				int loopBackStateNumber = dataReader.read();
 				arg = " "+loopBackStateNumber;
 			}
 			else if ( stype == ATNState.PLUS_BLOCK_START || stype == ATNState.STAR_BLOCK_START || stype == ATNState.BLOCK_START ) {
-				int endStateNumber = dataReader.readCompactUInt32();
+				int endStateNumber = dataReader.read();
 				arg = " "+endStateNumber;
 			}
 			buf.append(i).append(":")
@@ -400,47 +392,47 @@ public class ATNSerializer {
 		// and testing scenarios, so the form you see here was kept for
 		// improved maintainability.
 		// start
-		int numNonGreedyStates = dataReader.readCompactUInt32();
+		int numNonGreedyStates = dataReader.read();
 		for (int i = 0; i < numNonGreedyStates; i++) {
-			dataReader.readCompactUInt32(); // Skip stateNumber
+			dataReader.read(); // Skip stateNumber
 		}
-		int numPrecedenceStates = dataReader.readCompactUInt32();
+		int numPrecedenceStates = dataReader.read();
 		for (int i = 0; i < numPrecedenceStates; i++) {
-			dataReader.readCompactUInt32(); // Skip stateNumber
+			dataReader.read(); // Skip stateNumber
 		}
 		// finish
-		int nrules = dataReader.readCompactUInt32();
+		int nrules = dataReader.read();
 		for (int i=0; i<nrules; i++) {
-			int s = dataReader.readCompactUInt32();
+			int s = dataReader.read();
 			buf.append("rule ").append(i).append(":").append(s);
 			if (atn.grammarType == ATNType.LEXER) {
-				buf.append(" ").append(dataReader.readUInt16());
+				buf.append(" ").append(dataReader.read());
 			}
 			buf.append('\n');
 		}
-		int nmodes = dataReader.readCompactUInt32();
+		int nmodes = dataReader.read();
 		for (int i=0; i<nmodes; i++) {
-			int s = dataReader.readCompactUInt32();
+			int s = dataReader.read();
 			buf.append("mode ").append(i).append(":").append(s).append('\n');
 		}
 		int offset = appendSets(buf, dataReader, 0, UnicodeSerializeMode.UNICODE_BMP);
 		appendSets(buf, dataReader, offset, UnicodeSerializeMode.UNICODE_SMP);
-		int nedges = dataReader.readCompactUInt32();
+		int nedges = dataReader.read();
 		for (int i=0; i<nedges; i++) {
-			int src = dataReader.readCompactUInt32();
-			int trg = dataReader.readCompactUInt32();
-			int ttype = dataReader.readUInt16();
-			int arg1 = dataReader.readUInt16();
-			int arg2 = dataReader.readUInt16();
-			int arg3 = dataReader.readUInt16();
+			int src = dataReader.read();
+			int trg = dataReader.read();
+			int ttype = dataReader.read();
+			int arg1 = dataReader.read();
+			int arg2 = dataReader.read();
+			int arg3 = dataReader.read();
 			buf.append(src).append("->").append(trg)
 				.append(" ").append(Transition.serializationNames.get(ttype))
 				.append(" ").append(arg1).append(",").append(arg2).append(",").append(arg3)
 				.append("\n");
 		}
-		int ndecisions = dataReader.readCompactUInt32();
+		int ndecisions = dataReader.read();
 		for (int i=0; i<ndecisions; i++) {
-			int s = dataReader.readCompactUInt32();
+			int s = dataReader.read();
 			buf.append(i).append(":").append(s).append("\n");
 		}
 		if (atn.grammarType == ATNType.LEXER) {
@@ -449,22 +441,22 @@ public class ATNSerializer {
 			// the serialization format. The "dead" code is only used in debugging
 			// and testing scenarios, so the form you see here was kept for
 			// improved maintainability.
-			int lexerActionCount = dataReader.readCompactUInt32();
+			int lexerActionCount = dataReader.read();
 			for (int i = 0; i < lexerActionCount; i++) {
-				dataReader.readUInt16(); // Skip actionType
-				dataReader.readUInt16();
-				dataReader.readUInt16();
+				dataReader.read(); // Skip actionType
+				dataReader.read();
+				dataReader.read();
 			}
 		}
 		return buf.toString();
 	}
 
 	private int appendSets(StringBuilder buf, ATNDataReader dataReader, int setIndexOffset, UnicodeSerializeMode mode) {
-		int nsets = dataReader.readCompactUInt32();
+		int nsets = dataReader.read();
 		for (int i=0; i<nsets; i++) {
-			int nintervals = dataReader.readCompactUInt32();
+			int nintervals = dataReader.read();
 			buf.append(i + setIndexOffset).append(":");
-			boolean containsEof = dataReader.readUInt16() != 0;
+			boolean containsEof = dataReader.read() != 0;
 			if (containsEof) {
 				buf.append(getTokenName(Token.EOF));
 			}
@@ -479,8 +471,8 @@ public class ATNSerializer {
 					a = dataReader.readUInt16();
 					b = dataReader.readUInt16();
 				} else {
-					a = dataReader.readUInt32();
-					b = dataReader.readUInt32();
+					a = dataReader.readInt32();
+					b = dataReader.readInt32();
 				}
 				buf.append(getTokenName(a)).append("..").append(getTokenName(b));
 			}

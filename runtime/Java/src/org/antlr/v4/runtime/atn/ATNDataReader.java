@@ -10,21 +10,28 @@ public class ATNDataReader {
 		this.data = data;
 	}
 
+	public int read() {
+		int value = readUInt16();
+		if (value == 0xFFFF) {
+			return -1;
+		} else {
+			int mask = value >> ATNDataWriter.MaskBits & 0b11;
+			return mask == 0
+					? value
+					: mask == 0b01
+						? (readUInt16() << ATNDataWriter.MaskBits) | (value & ((1 << ATNDataWriter.MaskBits) - 1))
+						: readInt32();
+		}
+	}
+
 	public UUID readUUID() {
-		long leastSigBits = ((long) readUInt32() & 0x00000000FFFFFFFFL) | ((long) readUInt32() << 32);
-		long mostSigBits = (long) readUInt32() | ((long) readUInt32() << 32);
+		long leastSigBits = ((long) readInt32() & 0x00000000FFFFFFFFL) | ((long) readInt32() << 32);
+		long mostSigBits = (long) readInt32() | ((long) readInt32() << 32);
 		return new UUID(mostSigBits, leastSigBits);
 	}
 
-	public int readUInt32() {
+	public int readInt32() {
 		return readUInt16() | (readUInt16() << 16);
-	}
-
-	public int readCompactUInt32() {
-		int value = readUInt16();
-		return value < 0b1000_0000_0000_0000 && value >= 0
-				? value
-				: (readUInt16() << 15) | (value & 0b0111_1111_1111_1111);
 	}
 
 	public int readUInt16() {
