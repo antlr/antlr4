@@ -144,9 +144,9 @@ func (v *Base<file.grammarName>Visitor) Visit<lname; format="cap">(ctx *<file.gr
 
 Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
 <if(atn)>
-var parserATN<parser.name> = <atn>
+var parserATN<parser.grammarName> = <atn>
 <else>
-var parserATN<parser.name> []uint16
+var parserATN<parser.grammarName> []uint16
 <endif>
 
 <if(parser.literalNames)>
@@ -187,7 +187,7 @@ type <parser.name> struct {
 func New<parser.name>(input antlr.TokenStream) *<parser.name> {
 	this := new(<parser.name>)
 	deserializer := antlr.NewATNDeserializer(nil)
-	deserializedATN := deserializer.DeserializeFromUInt16(parserATN<parser.name>)
+	deserializedATN := deserializer.DeserializeFromUInt16(parserATN<parser.grammarName>)
 	decisionToDFA := make([]*antlr.DFA, len(deserializedATN.DecisionToState))
 	for index, ds := range deserializedATN.DecisionToState {
 		decisionToDFA[index] = antlr.NewDFA(ds, index)
@@ -244,8 +244,8 @@ func (p *<parser.name>) Sempred(localctx antlr.RuleContext, ruleIndex, predIndex
 	switch ruleIndex {
 	<if(parser.sempredFuncs.values)>
 	<parser.sempredFuncs.values:{f | case <f.ruleIndex>:
-		var t *<f.name; format="cap"><parser.name>Context = nil
-		if localctx != nil { t = localctx.(*<f.name; format="cap"><parser.name>Context) \}
+		var t *<parser.grammarName><f.name; format="cap">Context = nil
+		if localctx != nil { t = localctx.(*<parser.grammarName><f.name; format="cap">Context) \}
 		return p.<f.name; format="cap">_Sempred(t, predIndex)}; separator="\n\n">
 
 
@@ -442,17 +442,17 @@ LeftRecursiveRuleFunction(currentRule, args, code, locals, ruleCtx, altLabelCtxs
 
 
 <endif>
-func (p *<parser.name>) <currentRule.name; format="cap">(<args:{a | <a.escapedName> <a.type>}; separator=", ">) (localctx I<currentRule.ctxType>) {
+func (p *<parser.name>) <currentRule.name; format="cap">(<args:{a | <a.escapedName> <a.type>}; separator=", ">) (localctx I<parser.grammarName><currentRule.ctxType>) {
 	return p.<currentRule.escapedName>(0<args:{a | , <a.escapedName>}>)
 }
 
-func (p *<parser.name>) <currentRule.escapedName>(_p int<args:{a | , <a.escapedName> <a.type>}>) (localctx I<currentRule.ctxType>) {
+func (p *<parser.name>) <currentRule.escapedName>(_p int<args:{a | , <a.escapedName> <a.type>}>) (localctx I<parser.grammarName><currentRule.ctxType>) {
 	this := p
 	_ = this
 
 	var _parentctx antlr.ParserRuleContext = p.GetParserRuleContext()
 	_parentState := p.GetState()
-	localctx = New<currentRule.ctxType>(p, p.GetParserRuleContext(), _parentState<args:{a | , <a.escapedName>}>)
+	localctx = New<parser.grammarName><currentRule.ctxType>(p, p.GetParserRuleContext(), _parentState<args:{a | , <a.escapedName>}>)
 	var _prevctx I<parser.grammarName><currentRule.ctxType> = localctx
 	var _ antlr.ParserRuleContext = _prevctx // TODO: To prevent unused variable warning.
 	_startState := <currentRule.startState>
@@ -508,7 +508,7 @@ func (p *<parser.name>) <currentRule.escapedName>(_p int<args:{a | , <a.escapedN
 >>
 
 CodeBlockForOuterMostAlt(currentOuterMostAltCodeBlock, locals, preamble, ops) ::= <<
-<if(currentOuterMostAltCodeBlock.altLabel)>localctx = New<currentOuterMostAltCodeBlock.altLabel; format="cap">Context(p, localctx)<endif>
+<if(currentOuterMostAltCodeBlock.altLabel)>localctx = New<parser.grammarName><currentOuterMostAltCodeBlock.altLabel; format="cap">Context(p, localctx)<endif>
 p.EnterOuterAlt(localctx, <currentOuterMostAltCodeBlock.alt.altNum>)
 <CodeBlockForAlt(currentAltCodeBlock=currentOuterMostAltCodeBlock, ...)>
 >>
@@ -1216,19 +1216,19 @@ func (s *<parser.grammarName><struct.escapedName>) ToStringTree(ruleNames []stri
 >>
 
 AltLabelStructDecl(struct, attrs, getters, dispatchMethods, tokenDecls, tokenTypeDecls, tokenListDecls, ruleContextDecls, ruleContextListDecls, attributeDecls) ::= <<
-type <struct.escapedName> struct {
-	*<currentRule.name; format="cap">Context
+type <parser.grammarName><struct.escapedName> struct {
+	*<parser.grammarName><currentRule.name; format="cap">Context
 	<if(attrs)>
 	<attrs; separator="\n">
 	<endif>
 }
 
-func New<struct.name>(parser antlr.Parser, ctx antlr.ParserRuleContext) *<struct.escapedName> {
-	var p = new(<struct.escapedName>)
+func New<parser.grammarName><struct.name>(parser antlr.Parser, ctx antlr.ParserRuleContext) *<parser.grammarName><struct.escapedName> {
+	var p = new(<parser.grammarName><struct.escapedName>)
 
-	p.<currentRule.name; format="cap">Context = NewEmpty<currentRule.name; format="cap">Context()
+	p.<parser.grammarName><currentRule.name; format="cap">Context = NewEmpty<parser.grammarName><currentRule.name; format="cap">Context()
 	p.parser = parser
-	p.CopyFrom(ctx.(*<currentRule.name; format="cap">Context))
+	p.CopyFrom(ctx.(*<parser.grammarName><currentRule.name; format="cap">Context))
 
 	return p
 }
@@ -1293,7 +1293,7 @@ func New<struct.name>(parser antlr.Parser, ctx antlr.ParserRuleContext) *<struct
 <struct.attributeDecls:{a | func (s *<struct.escapedName>) Set<a.name; format="cap">(v <a.type>) { s.<a.escapedName> = v \}}; separator="\n\n">
 <endif>
 
-func (s *<struct.escapedName>) GetRuleContext() antlr.RuleContext {
+func (s *<parser.grammarName><struct.escapedName>) GetRuleContext() antlr.RuleContext {
 	return s
 }
 <if(getters)>
@@ -1345,7 +1345,7 @@ p.PushNewRecursionContext(localctx, _startState, RULE_<parser.grammarName><ruleN
 >>
 
 recRuleLabeledAltStartAction(ruleName, currentAltLabel, label, isListLabel) ::= <<
-localctx = New<currentAltLabel; format="cap">Context(p, New<ruleName; format="cap">Context(p, _parentctx, _parentState))
+localctx = New<parser.grammarName><currentAltLabel; format="cap">Context(p, New<ruleName; format="cap">Context(p, _parentctx, _parentState))
 <if(label)>
 <if(isListLabel)>
 localctx.(*<currentAltLabel; format="cap">Context).<label> = append(localctx.(*<currentAltLabel; format="cap">Context).<label>, _prevctx)
@@ -1359,7 +1359,7 @@ p.PushNewRecursionContext(localctx, _startState, RULE_<parser.grammarName><ruleN
 >>
 
 recRuleReplaceContext(ctxName) ::= <<
-localctx = New<ctxName>Context(p, localctx)
+localctx = New<parser.grammarName><ctxName>Context(p, localctx)
 p.SetParserRuleContext(localctx)
 _prevctx = localctx
 >>
