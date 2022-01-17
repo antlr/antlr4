@@ -370,6 +370,7 @@ public abstract class BaseRuntimeTest {
 		if (group.equals("LexerExec")) {
 			descriptors.add(ExtraTests.getLineSeparatorLfTest(targetName));
 			descriptors.add(ExtraTests.getLineSeparatorCrLfTest(targetName));
+			descriptors.add(ExtraTests.getLargeLexerDescriptor(targetName));
 		}
 
 		return descriptors.toArray(new RuntimeTestDescriptor[0]);
