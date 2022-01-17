@@ -905,8 +905,8 @@ TokenDecl(t) ::= "<t.escapedName> <TokenLabelType()>"
 TokenTypeDecl(t) ::= "<t.escapedName> int"
 TokenListDecl(t) ::= "<t.escapedName> []antlr.Token"
 
-RuleContextDecl(r) ::= "<r.escapedName> I<r.ctxName> "
-RuleContextListDecl(rdecl) ::= "<rdecl.escapedName> []I<rdecl.ctxName>"
+RuleContextDecl(r) ::= "<r.escapedName> I<parser.grammarName><r.ctxName> "
+RuleContextListDecl(rdecl) ::= "<rdecl.escapedName> []I<parser.grammarName><rdecl.ctxName>"
 
 AttributeDecl(d) ::= "<d.escapedName> <d.type><if(d.initValue)>// TODO = <d.initValue><endif>"
 
@@ -1235,62 +1235,62 @@ func New<parser.grammarName><struct.name>(parser antlr.Parser, ctx antlr.ParserR
 
 <if(struct.tokenDecls)>
 
-<struct.tokenDecls:{a | func (s *<struct.escapedName>) Get<a.name; format="cap">() <TokenLabelType()> { return s.<a.escapedName> \}}; separator="\n\n">
+<struct.tokenDecls:{a | func (s *<parser.grammarName><struct.escapedName>) Get<a.name; format="cap">() <TokenLabelType()> { return s.<a.escapedName> \}}; separator="\n\n">
 <endif>
 
 <if(struct.tokenDecls)>
 
-<struct.tokenDecls:{a | func (s *<struct.escapedName>) Set<a.name; format="cap">(v <TokenLabelType()>) { s.<a.escapedName> = v \}}; separator="\n\n">
+<struct.tokenDecls:{a | func (s *<parser.grammarName><struct.escapedName>) Set<a.name; format="cap">(v <TokenLabelType()>) { s.<a.escapedName> = v \}}; separator="\n\n">
 <endif>
 
 <if(struct.tokenTypeDecls)>
 
-<struct.tokenTypeDecls:{a | func (s *<struct.escapedName>) Get<a.name; format="cap">() int { return s.<a.escapedName> \}}; separator="\n\n">
+<struct.tokenTypeDecls:{a | func (s *<parser.grammarName><struct.escapedName>) Get<a.name; format="cap">() int { return s.<a.escapedName> \}}; separator="\n\n">
 <endif>
 
 <if(struct.tokenTypeDecls)>
 
-<struct.tokenTypeDecls:{a | func (s *<struct.escapedName>) Set<a.name; format="cap">(v int) { s.<a.escapedName> = v \}}; separator="\n\n">
+<struct.tokenTypeDecls:{a | func (s *<parser.grammarName><struct.escapedName>) Set<a.name; format="cap">(v int) { s.<a.escapedName> = v \}}; separator="\n\n">
 <endif>
 
 <if(struct.tokenListDecls)>
 
-<struct.tokenListDecls:{a | func (s *<struct.escapedName>) Get<a.name; format="cap">() []<TokenLabelType()> { return s.<a.escapedName> \}}; separator="\n\n">
+<struct.tokenListDecls:{a | func (s *<parser.grammarName><struct.escapedName>) Get<a.name; format="cap">() []<TokenLabelType()> { return s.<a.escapedName> \}}; separator="\n\n">
 <endif>
 
 <if(struct.tokenListDecls)>
 
-<struct.tokenListDecls:{a | func (s *<struct.escapedName>) Set<a.name; format="cap">(v []<TokenLabelType()>) { s.<a.escapedName> = v \}}; separator="\n\n">
+<struct.tokenListDecls:{a | func (s *<parser.grammarName><struct.escapedName>) Set<a.name; format="cap">(v []<TokenLabelType()>) { s.<a.escapedName> = v \}}; separator="\n\n">
 <endif>
 
 <if(struct.ruleContextDecls)>
 
-<struct.ruleContextDecls:{a | func (s *<struct.escapedName>) Get<a.name; format="cap">() I<parser.grammarName><a.ctxName> { return s.<a.escapedName> \}}; separator="\n\n">
+<struct.ruleContextDecls:{a | func (s *<parser.grammarName><struct.escapedName>) Get<a.name; format="cap">() I<parser.grammarName><a.ctxName> { return s.<a.escapedName> \}}; separator="\n\n">
 <endif>
 
 <if(struct.ruleContextDecls)>
 
-<struct.ruleContextDecls:{a | func (s *<struct.escapedName>) Set<a.name; format="cap">(v I<parser.grammarName><a.ctxName>) { s.<a.escapedName> = v \}}; separator="\n\n">
+<struct.ruleContextDecls:{a | func (s *<parser.grammarName><struct.escapedName>) Set<a.name; format="cap">(v I<parser.grammarName><a.ctxName>) { s.<a.escapedName> = v \}}; separator="\n\n">
 <endif>
 
 <if(struct.ruleContextListDecls)>
 
-<struct.ruleContextListDecls:{a | func (s *<struct.escapedName>) Get<a.name; format="cap">() []I<parser.grammarName><a.ctxName> { return s.<a.escapedName> \}}; separator="\n\n">
+<struct.ruleContextListDecls:{a | func (s *<parser.grammarName><struct.escapedName>) Get<a.name; format="cap">() []I<parser.grammarName><a.ctxName> { return s.<a.escapedName> \}}; separator="\n\n">
 <endif>
 
 <if(struct.ruleContextListDecls)>
 
-<struct.ruleContextListDecls:{a | func (s *<struct.escapedName>) Set<a.name; format="cap">(v []I<parser.grammarName><a.ctxName>) { s.<a.escapedName> = v \}}; separator="\n\n">
+<struct.ruleContextListDecls:{a | func (s *<parser.grammarName><struct.escapedName>) Set<a.name; format="cap">(v []I<parser.grammarName><a.ctxName>) { s.<a.escapedName> = v \}}; separator="\n\n">
 <endif>
 
 <if(struct.attributeDecls)>
 
-<struct.attributeDecls:{a | func (s *<struct.escapedName>) Get<a.name; format="cap">() <a.type> { return s.<a.escapedName> \}}; separator="\n\n">
+<struct.attributeDecls:{a | func (s *<parser.grammarName><struct.escapedName>) Get<a.name; format="cap">() <a.type> { return s.<a.escapedName> \}}; separator="\n\n">
 <endif>
 
 <if(struct.attributeDecls)>
 
-<struct.attributeDecls:{a | func (s *<struct.escapedName>) Set<a.name; format="cap">(v <a.type>) { s.<a.escapedName> = v \}}; separator="\n\n">
+<struct.attributeDecls:{a | func (s *<parser.grammarName><struct.escapedName>) Set<a.name; format="cap">(v <a.type>) { s.<a.escapedName> = v \}}; separator="\n\n">
 <endif>
 
 func (s *<parser.grammarName><struct.escapedName>) GetRuleContext() antlr.RuleContext {
@@ -1298,7 +1298,7 @@ func (s *<parser.grammarName><struct.escapedName>) GetRuleContext() antlr.RuleCo
 }
 <if(getters)>
 
-<getters:{g | func (s *<struct.escapedName>) <g>}; separator="\n\n">
+<getters:{g | func (s *<parser.grammarName><struct.escapedName>) <g>}; separator="\n\n">
 <endif>
 
 <if(dispatchMethods)>
@@ -1328,10 +1328,10 @@ func (s *<parser.grammarName><struct.escapedName>) Accept(visitor antlr.ParseTre
 >>
 
 /** If we don't know location of label def x, use this template */
-labelref(x) ::= "<if(!x.isLocal)>localctx.(*<x.ctx.name>).<endif><x.escapedName>"
+labelref(x) ::= "<if(!x.isLocal)>localctx.(*<parser.grammarName><x.ctx.name>).<endif><x.escapedName>"
 
 /** For any action chunk, what is correctly-typed context struct ptr? */
-ctx(actionChunk) ::= "localctx.(*<actionChunk.ctx.name>)"
+ctx(actionChunk) ::= "localctx.(*<parser.grammarName><actionChunk.ctx.name>)"
 
 // used for left-recursive rules
 recRuleAltPredicate(ruleName, opPrec) ::= "p.Precpred(p.GetParserRuleContext(), <opPrec>)"
@@ -1340,17 +1340,17 @@ recRuleSetStopToken() ::= "p.GetParserRuleContext().SetStop(p.GetTokenStream().L
 
 recRuleAltStartAction(ruleName, ctxName, label) ::= <<
 localctx = New<parser.grammarName><ctxName>Context(p, _parentctx, _parentState)
-<if(label)>localctx.(*<ctxName>Context).<label> = _prevctx<endif>
+<if(label)>localctx.(*<parser.grammarName><ctxName>Context).<label> = _prevctx<endif>
 p.PushNewRecursionContext(localctx, _startState, RULE_<parser.grammarName><ruleName>)
 >>
 
 recRuleLabeledAltStartAction(ruleName, currentAltLabel, label, isListLabel) ::= <<
-localctx = New<parser.grammarName><currentAltLabel; format="cap">Context(p, New<ruleName; format="cap">Context(p, _parentctx, _parentState))
+localctx = New<parser.grammarName><currentAltLabel; format="cap">Context(p, New<parser.grammarName><ruleName; format="cap">Context(p, _parentctx, _parentState))
 <if(label)>
 <if(isListLabel)>
-localctx.(*<currentAltLabel; format="cap">Context).<label> = append(localctx.(*<currentAltLabel; format="cap">Context).<label>, _prevctx)
+localctx.(*<parser.grammarName><currentAltLabel; format="cap">Context).<label> = append(localctx.(*<currentAltLabel; format="cap">Context).<label>, _prevctx)
 <else>
-localctx.(*<currentAltLabel; format="cap">Context).<label> = _prevctx
+localctx.(*<parser.grammarName><currentAltLabel; format="cap">Context).<label> = _prevctx
 <endif>
 
 <endif>
