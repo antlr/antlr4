@@ -1,6 +1,6 @@
 package org.antlr.v4.test.runtime;
 
-public class ExtraTests {
+public class GeneratedLexerDescriptors {
 	static RuntimeTestDescriptor getLineSeparatorLfTest(String targetName) {
 		UniversalRuntimeTestDescriptor result = new UniversalRuntimeTestDescriptor();
 		result.name = "LineSeparatorLf";

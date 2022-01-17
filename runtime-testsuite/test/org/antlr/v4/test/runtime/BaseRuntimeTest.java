@@ -28,8 +28,6 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static junit.framework.TestCase.fail;
 import static junit.framework.TestCase.failNotEquals;
@@ -368,9 +366,9 @@ public abstract class BaseRuntimeTest {
 		}
 
 		if (group.equals("LexerExec")) {
-			descriptors.add(ExtraTests.getLineSeparatorLfTest(targetName));
-			descriptors.add(ExtraTests.getLineSeparatorCrLfTest(targetName));
-			descriptors.add(ExtraTests.getLargeLexerDescriptor(targetName));
+			descriptors.add(GeneratedLexerDescriptors.getLineSeparatorLfTest(targetName));
+			descriptors.add(GeneratedLexerDescriptors.getLineSeparatorCrLfTest(targetName));
+			descriptors.add(GeneratedLexerDescriptors.getLargeLexerDescriptor(targetName));
 		}
 
 		return descriptors.toArray(new RuntimeTestDescriptor[0]);
