@@ -47,7 +47,6 @@ public abstract class BaseRuntimeTest {
 	final static Set<String> sections = new HashSet<>(Arrays.asList(
 		"notes", "type", "grammar", "slaveGrammar", "start", "input", "output", "errors", "flags", "skip"
 	));
-	final static Pattern linePattern = Pattern.compile("([^\\r\\n]*)(\r?\n)");
 
 	@BeforeClass
 	public static void startHeartbeatToAvoidTimeout() {
@@ -367,6 +366,12 @@ public abstract class BaseRuntimeTest {
 				System.err.println("Can't read descriptor file "+fname);
 			}
 		}
+
+		if (group.equals("LexerExec")) {
+			descriptors.add(ExtraTests.getLineSeparatorLfTest(targetName));
+			descriptors.add(ExtraTests.getLineSeparatorCrLfTest(targetName));
+		}
+
 		return descriptors.toArray(new RuntimeTestDescriptor[0]);
 	}
 
@@ -424,13 +429,9 @@ public abstract class BaseRuntimeTest {
 		StringBuilder currentValue = new StringBuilder();
 
 		List<Pair<String, String>> pairs = new ArrayList<>();
+		String[] lines = dtext.split("\r?\n");
 
-		Matcher matcher = linePattern.matcher(dtext);
-		boolean preserveSeparator = false;
-		int lastEnd = 0;
-		while (matcher.find()) {
-			String line = matcher.group(1);
-			lastEnd = matcher.end();
+		for (String line : lines) {
 			boolean newSection = false;
 			String sectionName = null;
 			if (line.startsWith("[") && line.length() > 2) {
@@ -439,19 +440,17 @@ public abstract class BaseRuntimeTest {
 			}
 
 			if (newSection) {
-				if (currentField!=null) {
+				if (currentField != null) {
 					pairs.add(new Pair<>(currentField, currentValue.toString()));
 				}
-				preserveSeparator = sectionName.equals("input");
 				currentField = sectionName;
 				currentValue.setLength(0);
 			}
 			else {
 				currentValue.append(line);
-				currentValue.append(preserveSeparator ? matcher.group(2) : "\n");
+				currentValue.append("\n");
 			}
 		}
-		currentValue.append(dtext.substring(lastEnd));
 		pairs.add(new Pair<>(currentField, currentValue.toString()));
 
 		UniversalRuntimeTestDescriptor d = new UniversalRuntimeTestDescriptor();
