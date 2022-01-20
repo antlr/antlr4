@@ -276,7 +276,7 @@ func NewLeafListener() *LeafListener {
 	return &LeafListener{BaseTListener: &BaseTListener{}}
 }
 
-func (*LeafListener) ExitE(ctx *EContext) {
+func (*LeafListener) ExitE(ctx *TEContext) {
 	if ctx.GetChildCount() == 3 {
 		fmt.Printf("%s %s %s\n", ctx.E(0).GetStart().GetText(), ctx.E(1).GetStart().GetText(), ctx.AllE()[0].GetStart().GetText())
 	} else {
@@ -296,11 +296,11 @@ func NewLeafListener() *LeafListener {
 	return &LeafListener{BaseTListener: &BaseTListener{}}
 }
 
-func (*LeafListener) ExitCall(ctx *CallContext) {
+func (*LeafListener) ExitCall(ctx *TCallContext) {
 	fmt.Printf("%s %s", ctx.E().GetStart().GetText(), ctx.EList().String(nil, nil))
 }
 
-func (*LeafListener) ExitInt(ctx *IntContext) {
+func (*LeafListener) ExitInt(ctx *TIntContext) {
 	fmt.Println(ctx.INT().GetSymbol().GetText())
 }
 }
