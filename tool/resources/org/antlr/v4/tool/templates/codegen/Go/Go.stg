@@ -1348,7 +1348,7 @@ recRuleLabeledAltStartAction(ruleName, currentAltLabel, label, isListLabel) ::= 
 localctx = New<parser.grammarName><currentAltLabel; format="cap">Context(p, New<parser.grammarName><ruleName; format="cap">Context(p, _parentctx, _parentState))
 <if(label)>
 <if(isListLabel)>
-localctx.(*<parser.grammarName><currentAltLabel; format="cap">Context).<label> = append(localctx.(*<currentAltLabel; format="cap">Context).<label>, _prevctx)
+localctx.(*<parser.grammarName><currentAltLabel; format="cap">Context).<label> = append(localctx.(*<parser.grammarName><currentAltLabel; format="cap">Context).<label>, _prevctx)
 <else>
 localctx.(*<parser.grammarName><currentAltLabel; format="cap">Context).<label> = _prevctx
 <endif>
