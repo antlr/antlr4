@@ -6,8 +6,8 @@ declare -i RESULT=0
 
 pushd runtime/JavaScript
 
-  echo "running jest tests..."
-  yarn test
+  echo "running jasmine tests..."
+  npm test
   RESULT+=$?
 
 popd
