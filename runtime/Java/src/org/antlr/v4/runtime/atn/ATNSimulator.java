@@ -104,14 +104,6 @@ public abstract class ATNSimulator {
 	}
 
 	/**
-	 * @deprecated Use {@link ATNDeserializer#deserialize} instead.
-	 */
-	@Deprecated
-	public static ATN deserialize(char[] data) {
-		return new ATNDeserializer().deserialize(data);
-	}
-
-	/**
 	 * @deprecated Use {@link ATNDeserializer#checkCondition(boolean)} instead.
 	 */
 	@Deprecated

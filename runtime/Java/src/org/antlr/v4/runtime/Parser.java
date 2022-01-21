@@ -27,11 +27,8 @@ import org.antlr.v4.runtime.tree.TerminalNodeImpl;
 import org.antlr.v4.runtime.tree.pattern.ParseTreePattern;
 import org.antlr.v4.runtime.tree.pattern.ParseTreePatternMatcher;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.WeakHashMap;
+import java.nio.ByteBuffer;
+import java.util.*;
 
 /** This is all the parsing support code essentially; most of it is error recovery stuff. */
 public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
@@ -450,7 +447,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 			if (result == null) {
 				ATNDeserializationOptions deserializationOptions = new ATNDeserializationOptions();
 				deserializationOptions.setGenerateRuleBypassTransitions(true);
-				result = new ATNDeserializer(deserializationOptions).deserialize(serializedAtn.toCharArray());
+				result = new ATNDeserializer(deserializationOptions).deserialize(serializedAtn);
 				bypassAltsAtnCache.put(serializedAtn, result);
 			}
 

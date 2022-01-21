@@ -18,7 +18,6 @@ import org.antlr.v4.codegen.model.ParserFile;
 import org.antlr.v4.codegen.model.RuleFunction;
 import org.antlr.v4.codegen.model.SrcOp;
 import org.antlr.v4.codegen.model.decl.CodeBlock;
-import org.antlr.v4.runtime.misc.IntegerList;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.tool.Alternative;
 import org.antlr.v4.tool.Grammar;
@@ -27,6 +26,7 @@ import org.antlr.v4.tool.ast.ActionAST;
 import org.antlr.v4.tool.ast.BlockAST;
 import org.antlr.v4.tool.ast.GrammarAST;
 
+import java.nio.ByteBuffer;
 import java.util.List;
 
 public interface OutputModelFactory {
@@ -40,7 +40,7 @@ public interface OutputModelFactory {
 
 	ParserFile parserFile(String fileName);
 
-	Parser parser(ParserFile file, IntegerList atnData);
+	Parser parser(ParserFile file, ByteBuffer atnData);
 
 	LexerFile lexerFile(String fileName);
 

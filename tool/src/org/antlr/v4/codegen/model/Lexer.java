@@ -13,6 +13,7 @@ import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
 import org.antlr.v4.tool.Rule;
 
+import java.nio.ByteBuffer;
 import java.util.*;
 
 public class Lexer extends Recognizer {
@@ -25,7 +26,7 @@ public class Lexer extends Recognizer {
 	@ModelElement public LinkedHashMap<Rule, RuleActionFunction> actionFuncs =
 		new LinkedHashMap<Rule, RuleActionFunction>();
 
-	public Lexer(OutputModelFactory factory, LexerFile file, IntegerList atnData) {
+	public Lexer(OutputModelFactory factory, LexerFile file, ByteBuffer atnData) {
 		super(factory, atnData);
 		this.file = file;
 

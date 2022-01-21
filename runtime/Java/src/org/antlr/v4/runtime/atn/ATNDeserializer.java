@@ -11,10 +11,8 @@ import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.Pair;
 
 import java.io.InvalidClassException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.UUID;
+import java.nio.ByteBuffer;
+import java.util.*;
 
 /**
  *
@@ -114,10 +112,14 @@ public class ATNDeserializer {
 		return SUPPORTED_UUIDS.indexOf(actualUuid) >= featureIndex;
 	}
 
-	public ATN deserialize(char[] data) {
+	public ATN deserialize(String base64String) {
+		return deserialize(ByteBuffer.wrap(Base64.getDecoder().decode(base64String)));
+	}
+
+	public ATN deserialize(ByteBuffer data) {
 		ATNDataReader reader = new ATNDataReader(data);
 
-		int version = reader.readUInt16(false);
+		int version = reader.readUInt16();
 		if (version != SERIALIZED_VERSION) {
 			String reason = String.format(Locale.getDefault(), "Could not deserialize ATN with version %d (expected %d).", version, SERIALIZED_VERSION);
 			throw new UnsupportedOperationException(new InvalidClassException(ATN.class.getName(), reason));

@@ -1,45 +1,63 @@
 package org.antlr.v4.runtime.atn;
 
-import org.antlr.v4.runtime.misc.IntegerList;
-
+import java.nio.ByteBuffer;
 import java.util.UUID;
 
 public class ATNDataWriter {
-	public static final int OptimizeOffset = 2;
-	public static final int MaskBits = 14;
+	public static final int DefaultBufferSize = 1024;
+	public static final int ValueMask     = 0b000_11111;
+	public static final int OneByteMask   = 0b000_00000;
+	public static final int TwoByteMask   = 0b100_00000;
+	public static final int ThreeByteMask = 0b101_00000;
+	public static final int FullIntMask   = 0b110_00000;
+	public static final int MinusOneMask  = 0b111_00000;
 
-	private final IntegerList data;
+	private ByteBuffer data = ByteBuffer.allocate(DefaultBufferSize);
 
-	public ATNDataWriter(IntegerList data) {
-		this.data = data;
+	public ByteBuffer getData() {
+		data.flip();
+		return data;
 	}
 
 	/* Write int in range [-1..Integer.MAX_VALUE] in compact format
-		| encoding                                                    | count | type         |
-		| ----------------------------------------------------------- | ----- | ------------ |
-		| 00xx xxxx xxxx xxxx                                         | 1     | int (14 bit) |
-		| 01xx xxxx xxxx xxxx xxxx xxxx xxxx xxxx                     | 2     | int (30 bit) |
-		| 1000 0000 0000 0000 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx | 3     | int (32 bit) |
-		| 1111 1111 1111 1111                                         | 1     | -1 (0xFFFF)  |
+		| encoding                                     | bytes count | type          |
+		| -------------------------------------------- | ----------- | ------------- |
+		| 0xxxxxxx                                     | 1           | uint (7 bit)  |
+		| 100xxxxx xxxxxxxx                            | 2           | uint (13 bit) |
+		| 101xxxxx xxxxxxxx xxxxxxxx                   | 3           | uint (21 bit) |
+		| 11000000 xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx | 5           | uint (32 bit) |
+		| 11100000                                     | 1           | -1 (0xFFFF)   |
 	 */
 	public int write(int value) {
 		if (value == -1) {
-			writeUInt16(0xFFFF);
+			writeMinusOne();
 			return 1;
 		}
 		else if (value >= 0) {
-			if (value < 1 << MaskBits) {
-				writeUInt16(value);
+			if (value < (1 << 7)) {
+				ensureCapacity(1);
+				data.put((byte)value);
 				return 1;
 			}
-			else if (value < 1 << (MaskBits + 16)){
-				writeUInt16(value & ((1 << MaskBits) - 1) | 0b01 << MaskBits);
-				writeUInt16(value >>> MaskBits);
+			else if (value < (1 << 13)) {
+				ensureCapacity(2);
+				data.put((byte)(TwoByteMask | (value >> 8) & ValueMask));
+				data.put((byte)value);
 				return 2;
-			} else {
-				writeUInt16(0b10 << MaskBits);
-				writeInt32(value);
+			} else if (value < (1 << 21)) {
+				ensureCapacity(3);
+				data.put((byte)(ThreeByteMask | (value >> 16) & ValueMask));
+				data.put((byte)(value >> 8));
+				data.put((byte)(value));
 				return 3;
+			} else {
+				ensureCapacity(5);
+				data.put((byte)FullIntMask);
+				data.put((byte)(value >> 24));
+				data.put((byte)(value >> 16));
+				data.put((byte)(value >> 8));
+				data.put((byte)(value));
+				return 5;
 			}
 		} else {
 			throw new UnsupportedOperationException("Value " + value + " out of range [-1.." + Integer.MAX_VALUE + "]");
@@ -56,22 +74,33 @@ public class ATNDataWriter {
 	}
 
 	public void writeInt32(int value) {
-		writeUInt16((char)value);
-		writeUInt16((char)(value >> 16));
+		ensureCapacity(4);
+		data.put((byte)(value));
+		data.put((byte)(value >> 8));
+		data.put((byte)(value >> 16));
+		data.put((byte)(value >> 24));
 	}
 
 	public void writeUInt16(int value) {
-		writeUInt16(value, true);
+		ensureCapacity(2);
+		data.put((byte)(value));
+		data.put((byte)(value >> 8));
 	}
 
-	public void writeUInt16(int value, boolean optimize) {
-		if (value < Character.MIN_VALUE || value > Character.MAX_VALUE) {
-			throw new UnsupportedOperationException("Serialized ATN data element "+
-					data.size() + " element " + value + " out of range "+
-					(int)Character.MIN_VALUE + ".." + (int)Character.MAX_VALUE);
+	public void writeMinusOne() {
+		ensureCapacity(1);
+		data.put((byte)MinusOneMask);
+	}
+
+	private void ensureCapacity(int elementsCount) {
+		if (data.remaining() >= elementsCount) {
+			return;
 		}
-		// Note: This value shifting loop is documented in ATNDeserializer.
-		// don't adjust the first value since that's the version number
-		data.add(optimize ? (value + OptimizeOffset) & 0xFFFF : value);
+
+		int newSize = Math.max(data.limit() + elementsCount, data.capacity() * 2);
+		ByteBuffer temp = ByteBuffer.allocate(newSize);
+		data.flip();
+		temp.put(data);
+		data = temp;
 	}
 }

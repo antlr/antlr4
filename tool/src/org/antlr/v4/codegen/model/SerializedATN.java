@@ -7,41 +7,33 @@
 package org.antlr.v4.codegen.model;
 
 import org.antlr.v4.codegen.OutputModelFactory;
-import org.antlr.v4.codegen.Target;
-import org.antlr.v4.runtime.atn.ATN;
-import org.antlr.v4.runtime.atn.ATNSerializer;
-import org.antlr.v4.runtime.misc.IntegerList;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 public class SerializedATN extends OutputModelObject {
-	// TODO: make this into a kind of decl or multiple?
-	public final List<String> serialized;
+	public final char[] serialized;
 
-	public SerializedATN(OutputModelFactory factory, ATN atn) {
-		this(factory, ATNSerializer.getSerialized(atn));
-	}
-
-	public SerializedATN(OutputModelFactory factory, IntegerList data) {
+	public SerializedATN(OutputModelFactory factory, ByteBuffer atnData) {
 		super(factory);
-		int dataSize = data.size();
-		serialized = new ArrayList<>(dataSize);
-		Target target = factory.getGenerator().getTarget();
-		for (int i = 0; i < dataSize; i++) {
-			int c = data.get(i);
-			serialized.add(target.encodeIntAsCharEscape(c == -1 ? Character.MAX_VALUE : c));
+		byte[] encoded = Base64.getEncoder().encode(atnData).array();
+		serialized = new char[encoded.length];
+		for (int i = 0; i < encoded.length; i++) {
+			serialized[i] = (char)encoded[i];
 		}
 	}
 
-	public String[][] getSegments() {
-		List<String[]> segments = new ArrayList<String[]>();
+	public char[][] getSegments() {
+		List<char[]> segments = new ArrayList<>();
 		int segmentLimit = factory.getGenerator().getTarget().getSerializedATNSegmentLimit();
-		for (int i = 0; i < serialized.size(); i += segmentLimit) {
-			List<String> currentSegment = serialized.subList(i, Math.min(i + segmentLimit, serialized.size()));
-			segments.add(currentSegment.toArray(new String[0]));
+		for (int i = 0; i < serialized.length; i += segmentLimit) {
+			char[] currentSegment = new char[Math.min(i + segmentLimit, serialized.length) - i];
+			System.arraycopy(serialized, i, currentSegment, 0, currentSegment.length);
+			segments.add(currentSegment);
 		}
 
-		return segments.toArray(new String[0][]);
+		return segments.toArray(new char[0][]);
 	}
 }

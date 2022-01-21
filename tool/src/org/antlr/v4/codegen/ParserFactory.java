@@ -52,6 +52,7 @@ import org.antlr.v4.tool.ast.BlockAST;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.antlr.v4.tool.ast.TerminalAST;
 
+import java.nio.ByteBuffer;
 import java.util.List;
 
 /** */
@@ -64,7 +65,7 @@ public class ParserFactory extends DefaultOutputModelFactory {
 	}
 
 	@Override
-	public Parser parser(ParserFile file, IntegerList atnData) {
+	public Parser parser(ParserFile file, ByteBuffer atnData) {
 		return new Parser(this, file, atnData);
 	}
 

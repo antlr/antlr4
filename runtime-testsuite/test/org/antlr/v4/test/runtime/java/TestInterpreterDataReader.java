@@ -2,7 +2,6 @@ package org.antlr.v4.test.runtime.java;
 
 import org.antlr.v4.runtime.Vocabulary;
 import org.antlr.v4.runtime.atn.ATN;
-import org.antlr.v4.runtime.atn.ATNSerializer;
 import org.antlr.v4.runtime.misc.InterpreterDataReader;
 import org.junit.Assert;
 import org.junit.Test;
@@ -40,8 +39,6 @@ public class TestInterpreterDataReader {
         List<String> channels = castList(channelsField.get(interpreterData), String.class);
         List<String> modes = castList(modesField.get(interpreterData), String.class);
 
-        char[] atnChars = ATNSerializer.getSerializedAsChars(atn);
-        Assert.assertTrue(atnChars.length > 0);
         Assert.assertNotNull(vocabulary);
         Assert.assertEquals(11, ruleNames.size());
         Assert.assertEquals(2, channels.size());
@@ -51,7 +48,7 @@ public class TestInterpreterDataReader {
     @Test
     public void testParseFileError() {
         final ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        final URL stuff = loader.getResource("org/antlr/v4/test/runtime/InterpDataReaderTest2.interp");
+        final URL stuff = loader.getResource("org/antlr/v4/test/runtime/InterpDataReaderTest.interp");
         Assert.assertNotNull(stuff);
 
         try {

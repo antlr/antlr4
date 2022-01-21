@@ -11,12 +11,14 @@ import org.antlr.v4.tool.Grammar;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.gui.STViz;
 
+import java.nio.ByteBuffer;
+
 public class CodeGenPipeline {
 	final Grammar g;
 	final CodeGenerator gen;
-	final IntegerList atnData;
+	final ByteBuffer atnData;
 
-	public CodeGenPipeline(Grammar g, CodeGenerator gen, IntegerList atnData) {
+	public CodeGenPipeline(Grammar g, CodeGenerator gen, ByteBuffer atnData) {
 		this.g = g;
 		this.gen = gen;
 		this.atnData = atnData;

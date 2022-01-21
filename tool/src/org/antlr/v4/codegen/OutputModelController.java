@@ -46,6 +46,7 @@ import org.antlr.v4.tool.ast.PredAST;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
@@ -73,9 +74,9 @@ public class OutputModelController {
 	public Alternative currentOuterMostAlt;
 	public CodeBlock currentBlock;
 	public CodeBlockForOuterMostAlt currentOuterMostAlternativeBlock;
-	public IntegerList atnData;
+	public ByteBuffer atnData;
 
-	public OutputModelController(OutputModelFactory factory, IntegerList atnData) {
+	public OutputModelController(OutputModelFactory factory, ByteBuffer atnData) {
 		this.delegate = factory;
 		this.atnData = atnData;
 	}

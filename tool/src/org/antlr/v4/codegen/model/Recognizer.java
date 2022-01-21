@@ -9,11 +9,12 @@ import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.codegen.OutputModelFactory;
 import org.antlr.v4.codegen.model.chunk.ActionChunk;
 import org.antlr.v4.codegen.model.chunk.ActionText;
-import org.antlr.v4.runtime.misc.IntegerList;
+import org.antlr.v4.runtime.atn.ATNSerializer;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.Rule;
 
 import java.io.File;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -44,9 +45,9 @@ public abstract class Recognizer extends OutputModelObject {
 
 	@ModelElement public final SerializedATN atn;
 	@ModelElement public final LinkedHashMap<Rule, RuleSempredFunction> sempredFuncs =
-		new LinkedHashMap<Rule, RuleSempredFunction>();
+		new LinkedHashMap<>();
 
-	public Recognizer(OutputModelFactory factory, IntegerList atnData) {
+	public Recognizer(OutputModelFactory factory, ByteBuffer cachedAtnData) {
 		super(factory);
 
 		Grammar g = factory.getGrammar();
@@ -64,7 +65,8 @@ public abstract class Recognizer extends OutputModelObject {
 
 		ruleNames = g.rules.keySet();
 		rules = g.rules.values();
-		atn = atnData != null ? new SerializedATN(factory, atnData) : new SerializedATN(factory, g.atn);
+		ByteBuffer atnData = cachedAtnData != null ? cachedAtnData : new ATNSerializer(g.atn).serialize();
+		atn = new SerializedATN(factory, atnData);
 		superClass = g.getOptionString("superClass") != null
 				? new ActionText(null, g.getOptionString("superClass"))
 				: null;

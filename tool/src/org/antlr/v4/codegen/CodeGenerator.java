@@ -20,6 +20,7 @@ import org.stringtemplate.v4.STWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.lang.reflect.Constructor;
+import java.nio.ByteBuffer;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -77,7 +78,7 @@ public class CodeGenerator {
 
 	// CREATE TEMPLATES BY WALKING MODEL
 
-	private OutputModelController createController(IntegerList atnData) {
+	private OutputModelController createController(ByteBuffer atnData) {
 		OutputModelFactory factory = new ParserFactory(this);
 		OutputModelController controller = new OutputModelController(factory, atnData);
 		factory.setController(controller);
@@ -89,11 +90,11 @@ public class CodeGenerator {
 		return walker.walk(outputModel, header);
 	}
 
-	public ST generateLexer(IntegerList atnData) { return generateLexer(false, atnData); }
-	public ST generateLexer(boolean header, IntegerList atnData) { return walk(createController(atnData).buildLexerOutputModel(header), header); }
+	public ST generateLexer(ByteBuffer atnData) { return generateLexer(false, atnData); }
+	public ST generateLexer(boolean header, ByteBuffer atnData) { return walk(createController(atnData).buildLexerOutputModel(header), header); }
 
-	public ST generateParser(IntegerList atnData) { return generateParser(false, atnData); }
-	public ST generateParser(boolean header, IntegerList atnData) { return walk(createController(atnData).buildParserOutputModel(header), header); }
+	public ST generateParser(ByteBuffer atnData) { return generateParser(false, atnData); }
+	public ST generateParser(boolean header, ByteBuffer atnData) { return walk(createController(atnData).buildParserOutputModel(header), header); }
 
 	public ST generateListener() { return generateListener(false); }
 	public ST generateListener(boolean header) { return walk(createController(null).buildListenerOutputModel(header), header); }

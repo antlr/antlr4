@@ -23,6 +23,7 @@ import org.antlr.v4.tool.ast.ActionAST;
 import org.antlr.v4.tool.ast.BlockAST;
 import org.antlr.v4.tool.ast.GrammarAST;
 
+import java.nio.ByteBuffer;
 import java.util.List;
 
 public abstract class BlankOutputModelFactory implements OutputModelFactory {
@@ -30,7 +31,7 @@ public abstract class BlankOutputModelFactory implements OutputModelFactory {
 	public ParserFile parserFile(String fileName) { return null; }
 
 	@Override
-	public Parser parser(ParserFile file, IntegerList atnData) { return null; }
+	public Parser parser(ParserFile file, ByteBuffer atnData) { return null; }
 
 	@Override
 	public RuleFunction rule(Rule r) { return null; }

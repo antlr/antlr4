@@ -2,19 +2,17 @@ package org.antlr.v4.test.tool;
 
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.atn.*;
-import org.antlr.v4.runtime.misc.IntegerList;
-import org.antlr.v4.runtime.misc.Utils;
 
 import java.io.InvalidClassException;
+import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
 public class ATNDeserializerHelper {
 	public static String getDecoded(ATN atn, List<String> tokenNames) {
-		IntegerList serialized = new ATNSerializer(atn).serialize();
-		char[] data = Utils.toCharArray(serialized);
-		return new ATNDeserializerHelper(atn, tokenNames).decode(data);
+		ByteBuffer serialized = new ATNSerializer(atn).serialize();
+		return new ATNDeserializerHelper(atn, tokenNames).decode(serialized);
 	}
 
 	public final ATN atn;
@@ -25,10 +23,10 @@ public class ATNDeserializerHelper {
 		this.tokenNames = tokenNames;
 	}
 
-	public String decode(char[] data) {
+	public String decode(ByteBuffer data) {
 		ATNDataReader dataReader = new ATNDataReader(data);
 		StringBuilder buf = new StringBuilder();
-		int version = dataReader.readUInt16(false);
+		int version = dataReader.readUInt16();
 		if (version != ATNDeserializer.SERIALIZED_VERSION) {
 			String reason = String.format("Could not deserialize ATN with version %d (expected %d).", version, ATNDeserializer.SERIALIZED_VERSION);
 			throw new UnsupportedOperationException(new InvalidClassException(ATN.class.getName(), reason));

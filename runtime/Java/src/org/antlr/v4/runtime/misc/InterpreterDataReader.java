@@ -10,9 +10,8 @@ import org.antlr.v4.runtime.Vocabulary;
 import org.antlr.v4.runtime.VocabularyImpl;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNDeserializer;
-import org.antlr.v4.runtime.dfa.DFA;
 
-import java.util.Collection;
+import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.ArrayList;
 import java.io.BufferedReader;
@@ -20,7 +19,7 @@ import java.io.FileReader;
 
 // A class to read plain text interpreter data produced by ANTLR.
 public class InterpreterDataReader {
-	
+
 	public static class InterpreterData {
 	  ATN atn;
 	  Vocabulary vocabulary;
@@ -28,39 +27,39 @@ public class InterpreterDataReader {
 	  List<String> channels; // Only valid for lexer grammars.
 	  List<String> modes; // ditto
 	};
-	
+
 	/**
 	 * The structure of the data file is very simple. Everything is line based with empty lines
 	 * separating the different parts. For lexers the layout is:
 	 * token literal names:
 	 * ...
-	 * 
+	 *
 	 * token symbolic names:
 	 * ...
-	 * 
+	 *
 	 * rule names:
 	 * ...
-	 * 
+	 *
 	 * channel names:
 	 * ...
-	 * 
+	 *
 	 * mode names:
 	 * ...
-	 * 
+	 *
 	 * atn:
 	 * <a single line with comma separated int values> enclosed in a pair of squared brackets.
-	 * 
+	 *
 	 * Data for a parser does not contain channel and mode names.
 	 */
 	public static InterpreterData parseFile(String fileName) {
 		InterpreterData result = new InterpreterData();
-		result.ruleNames = new ArrayList<String>();
-		
+		result.ruleNames = new ArrayList<>();
+
 		try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
 		    String line;
 		  	List<String> literalNames = new ArrayList<String>();
 		  	List<String> symbolicNames = new ArrayList<String>();
-		
+
 			line = br.readLine();
 			if ( !line.equals("token literal names:") )
 				throw new RuntimeException("Unexpected data entry");
@@ -69,7 +68,7 @@ public class InterpreterDataReader {
 					break;
 				literalNames.add(line.equals("null") ? "" : line);
 		    }
-		
+
 			line = br.readLine();
 			if ( !line.equals("token symbolic names:") )
 				throw new RuntimeException("Unexpected data entry");
@@ -89,7 +88,7 @@ public class InterpreterDataReader {
 					break;
 				result.ruleNames.add(line);
 		    }
-		    
+
 			line = br.readLine();
 			if ( line.equals("channel names:") ) { // Additional lexer data.
 				result.channels = new ArrayList<String>();
@@ -115,28 +114,20 @@ public class InterpreterDataReader {
 		  		throw new RuntimeException("Unexpected data entry");
 			line = br.readLine();
 			String[] elements = line.split(",");
-	  		char[] serializedATN = new char[elements.length];
+	  		byte[] serializedATN = new byte[elements.length];
 
 			for (int i = 0; i < elements.length; ++i) {
-				int value;
-				String element = elements[i];
-				if ( element.startsWith("[") )
-					value = Integer.parseInt(element.substring(1).trim());
-				else if ( element.endsWith("]") )
-					value = Integer.parseInt(element.substring(0, element.length() - 1).trim());
-				else
-					value = Integer.parseInt(element.trim());
-				serializedATN[i] = (char)value;					
+				serializedATN[i] = Byte.parseByte(elements[i].trim());
 			}
 
 		  	ATNDeserializer deserializer = new ATNDeserializer();
-		  	result.atn = deserializer.deserialize(serializedATN);
+		  	result.atn = deserializer.deserialize(ByteBuffer.wrap(serializedATN));
 		}
 		catch (java.io.IOException e) {
 			// We just swallow the error and return empty objects instead.
 		}
-		
+
 		return result;
 	}
-	
+
 }

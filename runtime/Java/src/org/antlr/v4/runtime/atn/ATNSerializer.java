@@ -10,8 +10,9 @@ import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.IntegerList;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.IntervalSet;
-import org.antlr.v4.runtime.misc.Utils;
 
+import java.io.InvalidClassException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -21,12 +22,9 @@ import java.util.Locale;
 import java.util.Map;
 
 public class ATNSerializer {
-	public static char[] getSerializedAsChars(ATN atn) {
-		return Utils.toCharArray(getSerialized(atn));
-	}
-
-	public static IntegerList getSerialized(ATN atn) {
-		return new ATNSerializer(atn).serialize();
+	public static ATN clone(ATN atn) {
+		ByteBuffer serialized = new ATNSerializer(atn).serialize();
+		return new ATNDeserializer().deserialize(serialized);
 	}
 
 	public final ATN atn;
@@ -59,11 +57,10 @@ public class ATNSerializer {
 	 *
 	 *  Convenient to pack into unsigned shorts to make as Java string.
 	 */
-	public IntegerList serialize() {
-		IntegerList data = new IntegerList();
-		ATNDataWriter writer = new ATNDataWriter(data);
+	public ByteBuffer serialize() {
+		ATNDataWriter writer = new ATNDataWriter();
 
-		writer.writeUInt16(ATNDeserializer.SERIALIZED_VERSION, false);
+		writer.writeUInt16(ATNDeserializer.SERIALIZED_VERSION);
 		writer.writeUUID(ATNDeserializer.SERIALIZED_UUID);
 
 		// convert grammar type to ATN const to avoid dependence on ANTLRParser
@@ -306,7 +303,7 @@ public class ATNSerializer {
 			}
 		}
 
-		return data;
+		return writer.getData();
 	}
 
 	private static void serializeSets(ATNDataWriter writer, Collection<IntervalSet> sets, UnicodeSerializeMode mode) {

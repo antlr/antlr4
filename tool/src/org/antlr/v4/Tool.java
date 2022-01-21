@@ -56,6 +56,7 @@ import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.Field;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -395,7 +396,7 @@ public class Tool {
 
 		if ( generate_ATN_dot ) generateATNs(g);
 
-		IntegerList atnData = gencode && g.tool.getNumErrors()==0
+		ByteBuffer atnData = gencode && g.tool.getNumErrors()==0
 			? generateInterpreterData(g)
 			: null;
 
@@ -695,7 +696,7 @@ public class Tool {
 		}
 	}
 
-	private IntegerList generateInterpreterData(Grammar g) {
+	private ByteBuffer generateInterpreterData(Grammar g) {
 		StringBuilder content = new StringBuilder();
 
 		content.append("token literal names:\n");
@@ -735,9 +736,14 @@ public class Tool {
 		}
 		content.append("\n");
 
-		IntegerList atnData = ATNSerializer.getSerialized(g.atn);
+		ByteBuffer atnData = new ATNSerializer(g.atn).serialize();
 		content.append("atn:\n");
-		content.append(atnData.toString());
+		byte[] array = atnData.array();
+		for (int i = 0; i < array.length; i++) {
+			content.append(array[i]);
+			if (i < array.length - 1)
+				content.append(", ");
+		}
 
 		try {
 			try (Writer fw = getOutputFileWriter(g, g.name + ".interp")) {
