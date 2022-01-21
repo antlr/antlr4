@@ -7,7 +7,6 @@
 package org.antlr.v4.test.tool;
 
 import org.antlr.v4.runtime.atn.ATN;
-import org.antlr.v4.runtime.atn.ATNSerializer;
 import org.antlr.v4.tool.DOTGenerator;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
@@ -43,7 +42,7 @@ public class TestATNSerialization extends BaseJavaToolTest {
 				"3->4 ATOM 2,0,0\n" +
 				"4->1 EPSILON 0,0,0\n";
 		ATN atn = createATN(g, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(g.getTokenNames()));
+		String result = ATNDeserializerHelper.getDecoded(atn, Arrays.asList(g.getTokenNames()));
 		assertEquals(expecting, result);
 	}
 
@@ -65,7 +64,7 @@ public class TestATNSerialization extends BaseJavaToolTest {
 				"3->4 ATOM 0,0,1\n" +
 				"4->1 EPSILON 0,0,0\n";
 		ATN atn = createATN(g, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(g.getTokenNames()));
+		String result = ATNDeserializerHelper.getDecoded(atn, Arrays.asList(g.getTokenNames()));
 		assertEquals(expecting, result);
 	}
 
@@ -86,7 +85,7 @@ public class TestATNSerialization extends BaseJavaToolTest {
 				"2->3 SET 0,0,0\n" +
 				"3->1 EPSILON 0,0,0\n";
 		ATN atn = createATN(g, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(g.getTokenNames()));
+		String result = ATNDeserializerHelper.getDecoded(atn, Arrays.asList(g.getTokenNames()));
 		assertEquals(expecting, result);
 	}
 
@@ -109,7 +108,7 @@ public class TestATNSerialization extends BaseJavaToolTest {
 			"3->1 EPSILON 0,0,0\n";
 		ATN atn = createATN(g, true);
 		DOTGenerator gen = new DOTGenerator(g);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(g.getTokenNames()));
+		String result = ATNDeserializerHelper.getDecoded(atn, Arrays.asList(g.getTokenNames()));
 		assertEquals(expecting, result);
 	}
 
@@ -130,7 +129,7 @@ public class TestATNSerialization extends BaseJavaToolTest {
 			"2->3 WILDCARD 0,0,0\n" +
 			"3->1 EPSILON 0,0,0\n";
 		ATN atn = createATN(g, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(g.getTokenNames()));
+		String result = ATNDeserializerHelper.getDecoded(atn, Arrays.asList(g.getTokenNames()));
 		assertEquals(expecting, result);
 	}
 
@@ -158,7 +157,7 @@ public class TestATNSerialization extends BaseJavaToolTest {
 				"6->1 EPSILON 0,0,0\n" +
 				"0:5\n";
 		ATN atn = createATN(g, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(g.getTokenNames()));
+		String result = ATNDeserializerHelper.getDecoded(atn, Arrays.asList(g.getTokenNames()));
 		assertEquals(expecting, result);
 	}
 
@@ -193,7 +192,7 @@ public class TestATNSerialization extends BaseJavaToolTest {
 				"9->1 EPSILON 0,0,0\n" +
 				"0:8\n";
 		ATN atn = createATN(g, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(g.getTokenNames()));
+		String result = ATNDeserializerHelper.getDecoded(atn, Arrays.asList(g.getTokenNames()));
 		assertEquals(expecting, result);
 	}
 
@@ -225,7 +224,7 @@ public class TestATNSerialization extends BaseJavaToolTest {
 				"8->1 EPSILON 0,0,0\n" +
 				"0:5\n";
 		ATN atn = createATN(g, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(g.getTokenNames()));
+		String result = ATNDeserializerHelper.getDecoded(atn, Arrays.asList(g.getTokenNames()));
 		assertEquals(expecting, result);
 	}
 
@@ -254,7 +253,7 @@ public class TestATNSerialization extends BaseJavaToolTest {
 				"6->7 ATOM 1,0,0\n" +
 				"7->3 EPSILON 0,0,0\n";
 		ATN atn = createATN(g, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(g.getTokenNames()));
+		String result = ATNDeserializerHelper.getDecoded(atn, Arrays.asList(g.getTokenNames()));
 		assertEquals(expecting, result);
 	}
 
@@ -287,7 +286,7 @@ public class TestATNSerialization extends BaseJavaToolTest {
 			"8->4 EPSILON 0,0,0\n" +
 			"0:0\n";
 		ATN atn = createATN(lg, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
+		String result = ATNDeserializerHelper.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
 		assertEquals(expecting, result);
 	}
 
@@ -311,7 +310,7 @@ public class TestATNSerialization extends BaseJavaToolTest {
 			"4->2 EPSILON 0,0,0\n" +
 			"0:0\n";
 		ATN atn = createATN(lg, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
+		String result = ATNDeserializerHelper.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
 		assertEquals(expecting, result);
 	}
 
@@ -335,7 +334,7 @@ public class TestATNSerialization extends BaseJavaToolTest {
 			"4->2 EPSILON 0,0,0\n" +
 			"0:0\n";
 		ATN atn = createATN(lg, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
+		String result = ATNDeserializerHelper.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
 		assertEquals(expecting, result);
 	}
 
@@ -370,7 +369,7 @@ public class TestATNSerialization extends BaseJavaToolTest {
 			"8->4 EPSILON 0,0,0\n" +
 			"0:0\n";
 		ATN atn = createATN(lg, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
+		String result = ATNDeserializerHelper.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
 		assertEquals(expecting, result);
 	}
 
@@ -394,7 +393,7 @@ public class TestATNSerialization extends BaseJavaToolTest {
 			"4->2 EPSILON 0,0,0\n" +
 			"0:0\n";
 		ATN atn = createATN(lg, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
+		String result = ATNDeserializerHelper.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
 		assertEquals(expecting, result);
 	}
 
@@ -417,7 +416,7 @@ public class TestATNSerialization extends BaseJavaToolTest {
 			"4->2 EPSILON 0,0,0\n" +
 			"0:0\n";
 		ATN atn = createATN(lg, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
+		String result = ATNDeserializerHelper.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
 		assertEquals(expecting, result);
 	}
 
@@ -442,7 +441,7 @@ public class TestATNSerialization extends BaseJavaToolTest {
 				"5->2 EPSILON 0,0,0\n" +
 				"0:0\n";
 		ATN atn = createATN(lg, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
+		String result = ATNDeserializerHelper.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
 		assertEquals(expecting, result);
 	}
 
@@ -471,7 +470,7 @@ public class TestATNSerialization extends BaseJavaToolTest {
 				"0:0\n" +
 				"1:5\n";
 		ATN atn = createATN(lg, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
+		String result = ATNDeserializerHelper.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
 		assertEquals(expecting, result);
 	}
 
@@ -502,7 +501,7 @@ public class TestATNSerialization extends BaseJavaToolTest {
 				"0:0\n" +
 				"1:6\n";
 		ATN atn = createATN(lg, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
+		String result = ATNDeserializerHelper.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
 		assertEquals(expecting, result);
 	}
 
@@ -549,7 +548,7 @@ public class TestATNSerialization extends BaseJavaToolTest {
 				"14->6 EPSILON 0,0,0\n" +
 				"0:0\n";
 		ATN atn = createATN(lg, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
+		String result = ATNDeserializerHelper.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
 		assertEquals(expecting, result);
 	}
 
@@ -573,7 +572,7 @@ public class TestATNSerialization extends BaseJavaToolTest {
 			"4->2 EPSILON 0,0,0\n" +
 			"0:0\n";
 		ATN atn = createATN(lg, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
+		String result = ATNDeserializerHelper.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
 		assertEquals(expecting, result);
 	}
 
@@ -597,7 +596,7 @@ public class TestATNSerialization extends BaseJavaToolTest {
 			"4->2 EPSILON 0,0,0\n" +
 			"0:0\n";
 		ATN atn = createATN(lg, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
+		String result = ATNDeserializerHelper.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
 		assertEquals(expecting, result);
 	}
 
@@ -621,7 +620,7 @@ public class TestATNSerialization extends BaseJavaToolTest {
 			"4->2 EPSILON 0,0,0\n" +
 			"0:0\n";
 		ATN atn = createATN(lg, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
+		String result = ATNDeserializerHelper.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
 		assertEquals(expecting, result);
 	}
 
@@ -645,7 +644,7 @@ public class TestATNSerialization extends BaseJavaToolTest {
 			"4->2 EPSILON 0,0,0\n" +
 			"0:0\n";
 		ATN atn = createATN(lg, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
+		String result = ATNDeserializerHelper.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
 		assertEquals(expecting, result);
 	}
 
@@ -669,7 +668,7 @@ public class TestATNSerialization extends BaseJavaToolTest {
 			"4->2 EPSILON 0,0,0\n" +
 			"0:0\n";
 		ATN atn = createATN(lg, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
+		String result = ATNDeserializerHelper.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
 		assertEquals(expecting, result);
 	}
 
@@ -693,7 +692,7 @@ public class TestATNSerialization extends BaseJavaToolTest {
 			"4->2 EPSILON 0,0,0\n" +
 			"0:0\n";
 		ATN atn = createATN(lg, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
+		String result = ATNDeserializerHelper.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
 		assertEquals(expecting, result);
 	}
 
@@ -717,7 +716,7 @@ public class TestATNSerialization extends BaseJavaToolTest {
 			"4->2 EPSILON 0,0,0\n" +
 			"0:0\n";
 		ATN atn = createATN(lg, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
+		String result = ATNDeserializerHelper.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
 		assertEquals(expecting, result);
 	}
 
@@ -741,7 +740,7 @@ public class TestATNSerialization extends BaseJavaToolTest {
 			"4->2 EPSILON 0,0,0\n" +
 			"0:0\n";
 		ATN atn = createATN(lg, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
+		String result = ATNDeserializerHelper.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
 		assertEquals(expecting, result);
 	}
 
@@ -765,7 +764,7 @@ public class TestATNSerialization extends BaseJavaToolTest {
 			"4->2 EPSILON 0,0,0\n" +
 			"0:0\n";
 		ATN atn = createATN(lg, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
+		String result = ATNDeserializerHelper.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
 		assertEquals(expecting, result);
 	}
 
@@ -789,7 +788,7 @@ public class TestATNSerialization extends BaseJavaToolTest {
 			"4->2 EPSILON 0,0,0\n" +
 			"0:0\n";
 		ATN atn = createATN(lg, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
+		String result = ATNDeserializerHelper.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
 		assertEquals(expecting, result);
 	}
 
@@ -813,7 +812,7 @@ public class TestATNSerialization extends BaseJavaToolTest {
 			"4->2 EPSILON 0,0,0\n" +
 			"0:0\n";
 		ATN atn = createATN(lg, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
+		String result = ATNDeserializerHelper.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
 		assertEquals(expecting, result);
 	}
 
@@ -837,7 +836,7 @@ public class TestATNSerialization extends BaseJavaToolTest {
 			"4->2 EPSILON 0,0,0\n" +
 			"0:0\n";
 		ATN atn = createATN(lg, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
+		String result = ATNDeserializerHelper.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
 		assertEquals(expecting, result);
 	}
 
@@ -900,7 +899,7 @@ public class TestATNSerialization extends BaseJavaToolTest {
 				"1:1\n" +
 				"2:11\n";
 		ATN atn = createATN(lg, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
+		String result = ATNDeserializerHelper.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
 		assertEquals(expecting, result);
 	}
 
@@ -927,7 +926,7 @@ public class TestATNSerialization extends BaseJavaToolTest {
 				"5->2 EPSILON 0,0,0\n" +
 				"0:0\n";
 		ATN atn = createATN(lg, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
+		String result = ATNDeserializerHelper.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
 		assertEquals(expecting, result);
 	}
 
@@ -984,7 +983,7 @@ public class TestATNSerialization extends BaseJavaToolTest {
 			"0:0\n" +
 			"1:1\n";
 		ATN atn = createATN(lg, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
+		String result = ATNDeserializerHelper.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
 		assertEquals(expecting, result);
 	}
 
@@ -1035,7 +1034,7 @@ public class TestATNSerialization extends BaseJavaToolTest {
 			"1:1\n" +
 			"2:2\n";
 		ATN atn = createATN(lg, true);
-		String result = ATNSerializer.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
+		String result = ATNDeserializerHelper.getDecoded(atn, Arrays.asList(lg.getTokenNames()));
 		assertEquals(expecting, result);
 	}
 
