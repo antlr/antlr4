@@ -1,4 +1,2 @@
 # This rule applies to all files which don't match another line below
 * text=auto
-LineSeparator_LF.txt eol=lf
-LineSeparator_CRLF.txt eol=crlf
