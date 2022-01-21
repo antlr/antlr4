@@ -113,12 +113,14 @@ public class ATNDeserializer {
 	}
 
 	public ATN deserialize(String base64String) {
-		return deserialize(ByteBuffer.wrap(Base64.getDecoder().decode(base64String)));
+		return deserialize(new ATNDataReaderBase64(base64String));
 	}
 
 	public ATN deserialize(ByteBuffer data) {
-		ATNDataReader reader = new ATNDataReader(data);
+		return deserialize(new ATNDataReaderByteBuffer(data));
+	}
 
+	private ATN deserialize(ATNDataReader reader) {
 		int version = reader.readUInt16();
 		if (version != SERIALIZED_VERSION) {
 			String reason = String.format(Locale.getDefault(), "Could not deserialize ATN with version %d (expected %d).", version, SERIALIZED_VERSION);

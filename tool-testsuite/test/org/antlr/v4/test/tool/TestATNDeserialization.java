@@ -16,6 +16,7 @@ import org.junit.Test;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -174,7 +175,7 @@ public class TestATNDeserialization extends BaseJavaToolTest {
 		ByteBuffer data = writer.getData();
 		assertEquals(13, data.limit());
 
-		ATNDataReader reader = new ATNDataReader(data);
+		ATNDataReaderByteBuffer reader = new ATNDataReaderByteBuffer(data);
 		assertEquals(0, reader.read());
 		assertEquals(-1, reader.read());
 		assertEquals(42, reader.read());
@@ -195,7 +196,7 @@ public class TestATNDeserialization extends BaseJavaToolTest {
 		ByteBuffer data = writer.getData();
 		assertEquals(7 * 4, data.limit());
 
-		ATNDataReader reader = new ATNDataReader(data);
+		ATNDataReaderByteBuffer reader = new ATNDataReaderByteBuffer(data);
 		assertEquals(0, reader.readInt32());
 		assertEquals(-1, reader.readInt32());
 		assertEquals(42, reader.readInt32());
@@ -203,6 +204,16 @@ public class TestATNDeserialization extends BaseJavaToolTest {
 		assertEquals(0xFFFF, reader.readInt32());
 		assertEquals(Integer.MAX_VALUE, reader.readInt32());
 		assertEquals(Integer.MIN_VALUE, reader.readInt32());
+	}
+
+	@Test public void testANTDataReaderBase64() {
+		byte[] byteArray = new byte[]{0, 1, 2, 3, 113, 113, 113, 127, 126, 125, 42};
+		String base64String = Base64.getEncoder().encodeToString(byteArray);
+		ATNDataReaderBase64 reader = new ATNDataReaderBase64(base64String);
+
+		for (byte b : byteArray) {
+			assertEquals(b, reader.readByte());
+		}
 	}
 
 	protected void checkDeserializationIsStable(Grammar g) {

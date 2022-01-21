@@ -24,7 +24,7 @@ public class ATNDeserializerHelper {
 	}
 
 	public String decode(ByteBuffer data) {
-		ATNDataReader dataReader = new ATNDataReader(data);
+		ATNDataReaderByteBuffer dataReader = new ATNDataReaderByteBuffer(data);
 		StringBuilder buf = new StringBuilder();
 		int version = dataReader.readUInt16();
 		if (version != ATNDeserializer.SERIALIZED_VERSION) {

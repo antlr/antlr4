@@ -1,17 +1,9 @@
 package org.antlr.v4.runtime.atn;
 
-import java.nio.ByteBuffer;
 import java.util.UUID;
 
-public class ATNDataReader {
-	private final ByteBuffer byteBuffer;
-
-	public ATNDataReader(ByteBuffer byteBuffer) {
-		this.byteBuffer = byteBuffer;
-		if (byteBuffer.position() != 0) {
-			byteBuffer.flip();
-		}
-	}
+public abstract class ATNDataReader {
+	protected abstract byte readByte();
 
 	public int read() {
 		int value = readByte();
@@ -46,9 +38,5 @@ public class ATNDataReader {
 
 	public int readUInt16()  {
 		return readByte() & 0xFF | readByte() << 8 & 0xFF00;
-	}
-
-	public byte readByte() {
-		return byteBuffer.get();
 	}
 }
