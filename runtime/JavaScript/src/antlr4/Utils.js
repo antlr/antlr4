@@ -3,6 +3,9 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
+const {BitSet} = require('./support/BitSet');
+const {Hash} = require('./support/Hash');
+
 function valueToString(v) {
     return v === null ? "null" : v;
 }
@@ -145,62 +148,6 @@ class Set {
     }
 }
 
-
-class BitSet {
-    constructor() {
-        this.data = [];
-    }
-
-    add(value) {
-        this.data[value] = true;
-    }
-
-    or(set) {
-        const bits = this;
-        Object.keys(set.data).map(function (alt) {
-            bits.add(alt);
-        });
-    }
-
-    remove(value) {
-        delete this.data[value];
-    }
-
-    contains(value) {
-        return this.data[value] === true;
-    }
-
-    values() {
-        return Object.keys(this.data);
-    }
-
-    minValue() {
-        return Math.min.apply(null, this.values());
-    }
-
-    hashCode() {
-        const hash = new Hash();
-        hash.update(this.values());
-        return hash.finish();
-    }
-
-    equals(other) {
-        if (!(other instanceof BitSet)) {
-            return false;
-        }
-        return this.hashCode() === other.hashCode();
-    }
-
-    toString() {
-        return "{" + this.values().join(", ") + "}";
-    }
-
-    get length(){
-        return this.values().length;
-    }
-}
-
-
 class Map {
     constructor(hashFunction, equalsFunction) {
         this.data = {};
@@ -342,62 +289,6 @@ class DoubleDict {
             this.cacheMap.put(a, d);
         }
         d.put(b, o);
-    }
-}
-
-class Hash {
-    constructor() {
-        this.count = 0;
-        this.hash = 0;
-    }
-
-    update() {
-        for(let i=0;i<arguments.length;i++) {
-            const value = arguments[i];
-            if (value == null)
-                continue;
-            if(Array.isArray(value))
-                this.update.apply(this, value);
-            else {
-                let k = 0;
-                switch (typeof(value)) {
-                    case 'undefined':
-                    case 'function':
-                        continue;
-                    case 'number':
-                    case 'boolean':
-                        k = value;
-                        break;
-                    case 'string':
-                        k = value.hashCode();
-                        break;
-                    default:
-                        if(value.updateHashCode)
-                            value.updateHashCode(this);
-                        else
-                            console.log("No updateHashCode for " + value.toString())
-                        continue;
-                }
-                k = k * 0xCC9E2D51;
-                k = (k << 15) | (k >>> (32 - 15));
-                k = k * 0x1B873593;
-                this.count = this.count + 1;
-                let hash = this.hash ^ k;
-                hash = (hash << 13) | (hash >>> (32 - 13));
-                hash = hash * 5 + 0xE6546B64;
-                this.hash = hash;
-            }
-        }
-    }
-
-    finish() {
-        let hash = this.hash ^ (this.count * 4);
-        hash = hash ^ (hash >>> 16);
-        hash = hash * 0x85EBCA6B;
-        hash = hash ^ (hash >>> 13);
-        hash = hash * 0xC2B2AE35;
-        hash = hash ^ (hash >>> 16);
-        return hash;
     }
 }
 
