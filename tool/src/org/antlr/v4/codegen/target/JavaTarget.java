@@ -11,10 +11,7 @@ import org.antlr.v4.codegen.Target;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.StringRenderer;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Set;
+import java.util.*;
 
 public class JavaTarget extends Target {
 	/**
@@ -40,7 +37,7 @@ public class JavaTarget extends Target {
 		super(gen);
 	}
 
-    @Override
+	@Override
     public Set<String> getReservedWords() {
 		return reservedWords;
 	}
