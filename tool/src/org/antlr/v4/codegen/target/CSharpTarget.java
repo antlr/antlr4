@@ -15,9 +15,7 @@ import org.stringtemplate.v4.STGroupFile;
 import org.stringtemplate.v4.StringRenderer;
 import org.stringtemplate.v4.misc.STMessage;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class CSharpTarget extends Target {
 	protected static final HashSet<String> reservedWords = new HashSet<>(Arrays.asList(
@@ -101,11 +99,31 @@ public class CSharpTarget extends Target {
 		"while"
 	));
 
+	protected static final Map<Character, String> targetCharValueEscape;
+	static {
+		// https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/strings/#string-escape-sequences
+		HashMap<Character, String> map = new HashMap<>();
+		addEscapedChar(map, '\'');
+		addEscapedChar(map, '\"');
+		addEscapedChar(map, '\\');
+		addEscapedChar(map, '\0', '0');
+		addEscapedChar(map, (char)0x0007, 'a');
+		addEscapedChar(map, (char)0x0008, 'b');
+		addEscapedChar(map, '\f', 'f');
+		addEscapedChar(map, '\n', 'n');
+		addEscapedChar(map, '\r', 'r');
+		addEscapedChar(map, '\t', 't');
+		addEscapedChar(map, (char)0x000B, 'v');
+		targetCharValueEscape = map;
+	}
+
 	public CSharpTarget(CodeGenerator gen) {
 		super(gen);
-		targetCharValueEscape[0] = "\\0";
-		targetCharValueEscape[0x0007] = "\\a";
-		targetCharValueEscape[0x000B] = "\\v";
+	}
+
+	@Override
+	public Map<Character, String> getTargetCharValueEscape() {
+		return targetCharValueEscape;
 	}
 
 	@Override

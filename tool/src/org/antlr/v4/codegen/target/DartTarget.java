@@ -11,11 +11,19 @@ import org.antlr.v4.codegen.Target;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.StringRenderer;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class DartTarget extends Target {
+	protected static final Map<Character, String> targetCharValueEscape;
+	static {
+		HashMap<Character, String> map = new HashMap<>();
+		for (Map.Entry<Character, String> entry : defaultCharValueEscape.entrySet()) {
+			map.put(entry.getKey(), entry.getValue());
+		}
+		addEscapedChar(map, '$');
+		targetCharValueEscape = map;
+	}
+
 	protected static final HashSet<String> reservedWords = new HashSet<>(Arrays.asList(
 		"abstract", "dynamic", "implements", "show",
 		"as", "else", "import", "static",
@@ -38,7 +46,11 @@ public class DartTarget extends Target {
 
 	public DartTarget(CodeGenerator gen) {
 		super(gen);
-		targetCharValueEscape['$'] = "\\$";
+	}
+
+	@Override
+	public Map<Character, String> getTargetCharValueEscape() {
+		return targetCharValueEscape;
 	}
 
 	@Override

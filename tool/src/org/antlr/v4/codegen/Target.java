@@ -26,36 +26,52 @@ import org.stringtemplate.v4.STGroupFile;
 import org.stringtemplate.v4.StringRenderer;
 import org.stringtemplate.v4.misc.STMessage;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 /** */
 public abstract class Target {
-	/** For pure strings of Java 16-bit Unicode char, how can we display
-	 *  it in the target language as a literal.  Useful for dumping
+	protected final CodeGenerator gen;
+	private STGroup templates;
+	private boolean isPreviousOctal = false;
+
+	protected static final Map<Character, String> defaultCharValueEscape;
+	static {
+		// https://docs.oracle.com/javase/tutorial/java/data/characters.html
+		HashMap<Character, String> map = new HashMap<>();
+		addEscapedChar(map, '\t', 't');
+		addEscapedChar(map, '\b', 'b');
+		addEscapedChar(map, '\n', 'n');
+		addEscapedChar(map, '\r', 'r');
+		addEscapedChar(map, '\f', 'f');
+		addEscapedChar(map, '\'');
+		addEscapedChar(map, '\"');
+		addEscapedChar(map, '\\');
+		defaultCharValueEscape = map;
+	}
+
+	protected Target(CodeGenerator gen) {
+		this.gen = gen;
+	}
+
+	/** For pure strings of Unicode char, how can we display
+	 *  it in the target language as a literal. Useful for dumping
 	 *  predicates and such that may refer to chars that need to be escaped
 	 *  when represented as strings.  Also, templates need to be escaped so
 	 *  that the target language can hold them as a string.
-	 *  <p>
-	 *  I have defined (via the constructor) the set of typical escapes,
-	 *  but your {@link Target} subclass is free to alter the translated chars
-	 *  or add more definitions.  This is non-static so each target can have
-	 *  a different set in memory at same time.
+	 *  Each target can have a different set in memory at same time.
 	 */
-	protected final String[] targetCharValueEscape = new String[255];
+	public Map<Character, String> getTargetCharValueEscape() {
+		return defaultCharValueEscape;
+	}
 
-	protected final CodeGenerator gen;
-	private STGroup templates;
+	protected static void addEscapedChar(HashMap<Character, String> map, char key) {
+		addEscapedChar(map, key, key);
+	}
 
-	protected Target(CodeGenerator gen) {
-		targetCharValueEscape['\n'] = "\\n";
-		targetCharValueEscape['\r'] = "\\r";
-		targetCharValueEscape['\t'] = "\\t";
-		targetCharValueEscape['\b'] = "\\b";
-		targetCharValueEscape['\f'] = "\\f";
-		targetCharValueEscape['\\'] = "\\\\";
-		targetCharValueEscape['\''] = "\\'";
-		targetCharValueEscape['"'] = "\\\"";
-		this.gen = gen;
+	protected static void addEscapedChar(HashMap<Character, String> map, char key, char representation) {
+		map.put(key, "\\" + representation);
 	}
 
 	public String getLanguage() { return gen.language; }
@@ -157,13 +173,11 @@ public abstract class Target {
 		if ( quoted ) {
 			buf.append('"');
 		}
-		for (int i=0; i<s.length(); ) {
+		for (int i=0; i < s.length(); ) {
 			int c = s.codePointAt(i);
-			if ( c!='\'' && // don't escape single quotes in strings for java
-				 c<targetCharValueEscape.length &&
-				 targetCharValueEscape[c]!=null )
-			{
-				buf.append(targetCharValueEscape[c]);
+			String escaped = c <= Character.MAX_VALUE ? getTargetCharValueEscape().get((char)c) : null;
+			if (c != '\'' && escaped != null) { // don't escape single quotes in strings for java
+				buf.append(escaped);
 			}
 			else if (shouldUseUnicodeEscapeForCodePointInDoubleQuotedString(c)) {
 				appendUnicodeEscapedCodePoint(i, buf);
@@ -334,15 +348,13 @@ public abstract class Target {
 			return Integer.toString(v);
 		}
 
-		if (v < targetCharValueEscape.length) {
-			String escaped = targetCharValueEscape[v];
-			if (escaped != null) {
-				isPreviousOctal = false;
-				return escaped;
-			}
+		char c = (char)v;
+		String escaped = getTargetCharValueEscape().get(c);
+		if (escaped != null) {
+			isPreviousOctal = false;
+			return escaped;
 		}
 
-		char c = (char)v;
 		switch (Character.getType(c))
 		{
 			case Character.CONTROL:
@@ -396,8 +408,6 @@ public abstract class Target {
 				return String.format("\\u{%X}", v);
 		}
 	}
-
-	private boolean isPreviousOctal = false;
 
 	public String getLoopLabel(GrammarAST ast) {
 		return "loop"+ ast.token.getTokenIndex();
