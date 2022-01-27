@@ -762,9 +762,9 @@ LexerSkipCommand()  ::= "Skip();"
 LexerMoreCommand()  ::= "More();"
 LexerPopModeCommand() ::= "PopMode();"
 
-LexerTypeCommand(arg, grammar)      ::= "_type = <tokenType.(arg)>;"
-LexerChannelCommand(arg, grammar)   ::= "_channel = <channelName.(arg)>;"
-LexerModeCommand(arg, grammar)      ::= "_mode = <modeName.(arg)>;"
+LexerTypeCommand(arg, grammar)      ::= "Type = <tokenType.(arg)>;"
+LexerChannelCommand(arg, grammar)   ::= "Channel = <channelName.(arg)>;"
+LexerModeCommand(arg, grammar)      ::= "CurrentMode = <modeName.(arg)>;"
 LexerPushModeCommand(arg, grammar)  ::= "PushMode(<modeName.(arg)>);"
 
 ActionText(t) ::= "<t.text>"
