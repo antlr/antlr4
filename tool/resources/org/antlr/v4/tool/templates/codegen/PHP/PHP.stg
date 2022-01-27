@@ -1209,19 +1209,8 @@ namespace<if(lexerFile.genPackage)> <lexerFile.genPackage><endif> {
 >>
 
 SerializedATN(model) ::= <<
-<if(rest(model.segments))>
-/**
- * @var string
- */
-private const SERIALIZED_ATN =
-	<model.segments:{segment| "<segment; wrap={" .<\n>"}>"}; separator=" .\n">;
-<else>
-/**
- * @var string
- */
 private const SERIALIZED_ATN =
 	"<model.serialized; wrap={" .<\n>    "}>";
-<endif>
 >>
 
 /**

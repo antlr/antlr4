@@ -66,11 +66,6 @@ public class CppTarget extends Target {
 	}
 
 	@Override
-	public String encodeIntAsCharEscape(int v) {
-		return "0x" + Integer.toHexString(v) + ", ";
-	}
-
-	@Override
 	public String getRecognizerFileName(boolean header) {
 		ST extST = getTemplates().getInstanceOf(header ? "headerFileExtension" : "codeFileExtension");
 		String recognizerName = gen.g.getRecognizerName();

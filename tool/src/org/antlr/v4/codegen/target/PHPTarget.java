@@ -48,20 +48,13 @@ public class PHPTarget extends Target {
 	public PHPTarget(CodeGenerator gen) {
 		super(gen);
 		targetCharValueEscape['$'] = "\\$";
+		targetCharValueEscape['\b'] = null;
+		targetCharValueEscape['\''] = null;
 	}
 
 	@Override
 	protected Set<String> getReservedWords() {
 		return reservedWords;
-	}
-
-	@Override
-	public String encodeIntAsCharEscape(int v) {
-		if (v < Character.MIN_VALUE || v > Character.MAX_VALUE) {
-			throw new IllegalArgumentException(String.format("Cannot encode the specified value: %d", v));
-		}
-
-		return String.format("\\u{%X}", v & 0xFFFF);
 	}
 
 	@Override

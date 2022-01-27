@@ -99,11 +99,6 @@ public class GoTarget extends Target {
 	}
 
 	@Override
-	public String encodeIntAsCharEscape(int v) {
-		return Integer.toString(v);
-	}
-
-	@Override
 	public int getInlineTestSetWordSize() {
 		return 32;
 	}

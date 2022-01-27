@@ -41,7 +41,7 @@ public abstract class Target {
 	 *  or add more definitions.  This is non-static so each target can have
 	 *  a different set in memory at same time.
 	 */
-	protected String[] targetCharValueEscape = new String[255];
+	protected final String[] targetCharValueEscape = new String[255];
 
 	protected final CodeGenerator gen;
 	private STGroup templates;
@@ -329,22 +329,74 @@ public abstract class Target {
 			throw new IllegalArgumentException(String.format("Cannot encode the specified value: %d", v));
 		}
 
-		if ( v < targetCharValueEscape.length && targetCharValueEscape[v] != null) {
-			return targetCharValueEscape[v];
+		String language = getLanguage();
+		if (language.equals("Go") || language.equals("Cpp")) {
+			return Integer.toString(v);
 		}
 
-		if (v >= 0x20 && v < 127 && (!Character.isDigit(v) || v == '8' || v == '9')) {
-			return String.valueOf((char)v);
+		if (v < targetCharValueEscape.length) {
+			String escaped = targetCharValueEscape[v];
+			if (escaped != null) {
+				isPreviousOctal = false;
+				return escaped;
+			}
 		}
 
-		if ( v<=127 ) {
-			String oct = Integer.toOctalString(v);
-			return "\\"+ oct;
-		}
+		char c = (char)v;
+		switch (Character.getType(c))
+		{
+			case Character.CONTROL:
+			case Character.LINE_SEPARATOR:
+			case Character.PARAGRAPH_SEPARATOR:
+				return escapeChar(v);
+			default:
+				if (v == 0xfffe) {
+					return escapeChar(v);
+				}
 
-		String hex = Integer.toHexString(v|0x10000).substring(1,5);
-		return "\\u"+hex;
+				if (isPreviousOctal) {
+					char upperBound = language.equals("PHP") ? '9' : '7';
+					if (c >= '0' && c <= upperBound) {
+						return escapeChar(v);
+					}
+				}
+
+				isPreviousOctal = false;
+				return String.valueOf(c);
+		}
 	}
+
+	private String escapeChar(int v) {
+		String language = getLanguage();
+
+		boolean isPhp = language.equals("PHP");
+		boolean supportsOctalEncoding = language.equals("Java")
+				|| language.equals("Python2")
+				|| language.equals("Python3")
+				|| isPhp;
+		if (supportsOctalEncoding && v <= (isPhp ? 127 : 255)) {
+			isPreviousOctal = true;
+			return String.format("\\%o", v);
+		} else {
+			isPreviousOctal = false;
+		}
+
+		switch (language) {
+			default:
+			case "Java":
+			case "JavaScript":
+			case "Python2":
+			case "Python3":
+				return String.format("\\u%04x", v);
+			case "CSharp":
+				return String.format("\\x%X", v);
+			case "Dart":
+			case "PHP":
+				return String.format("\\u{%X}", v);
+		}
+	}
+
+	private boolean isPreviousOctal = false;
 
 	public String getLoopLabel(GrammarAST ast) {
 		return "loop"+ ast.token.getTokenIndex();
@@ -627,5 +679,5 @@ public abstract class Target {
 	}
 
 	/** @since 4.6 */
-	public boolean needsHeader() { return false; }; // Override in targets that need header files.
+	public boolean needsHeader() { return false; } // Override in targets that need header files.
 }
