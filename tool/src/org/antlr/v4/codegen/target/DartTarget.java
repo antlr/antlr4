@@ -8,7 +8,6 @@ package org.antlr.v4.codegen.target;
 
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.codegen.Target;
-import org.antlr.v4.tool.ast.GrammarAST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.StringRenderer;
 
@@ -39,7 +38,6 @@ public class DartTarget extends Target {
 
 	public DartTarget(CodeGenerator gen) {
 		super(gen);
-
 		targetCharValueEscape['$'] = "\\$";
 	}
 
@@ -59,14 +57,5 @@ public class DartTarget extends Target {
 		result.registerRenderer(String.class, new StringRenderer(), true);
 
 		return result;
-	}
-
-	@Override
-	public String encodeIntAsCharEscape(int v) {
-		if (v < Character.MIN_VALUE || v > Character.MAX_VALUE) {
-			throw new IllegalArgumentException(String.format("Cannot encode the specified value: %d", v));
-		}
-
-		return String.format("\\u{%X}", v & 0xFFFF);
 	}
 }

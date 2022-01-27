@@ -383,13 +383,12 @@ static std::vector\<uint16_t> _serializedATN;
 
 // Constructs the serialized ATN and writes init code for static member vars.
 SerializedATN(model) ::= <<
-<model.segments: {segment | static const uint16_t serializedATNSegment<i0>[] = {
-  <segment; wrap={<\n>   }>
-\};}; separator="\n">
+static const uint16_t serializedATNSegment[] = {
+	<model.serialized: {s | <s>}; separator=",", wrap>
+};
 
-<model.segments: {segment | _serializedATN.insert(_serializedATN.end(), serializedATNSegment<i0>,
-  serializedATNSegment<i0> + sizeof(serializedATNSegment<i0>) / sizeof(serializedATNSegment<i0>[0]));
-}>
+_serializedATN.insert(_serializedATN.end(), serializedATNSegment,
+  serializedATNSegment + sizeof(serializedATNSegment) / sizeof(serializedATNSegment[0]));
 
 atn::ATNDeserializer deserializer;
 _atn = deserializer.deserialize(_serializedATN);

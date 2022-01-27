@@ -52,24 +52,6 @@ public class JavaScriptTarget extends Target {
 	}
 
 	@Override
-	public String encodeIntAsCharEscape(int v) {
-		if (v < Character.MIN_VALUE || v > Character.MAX_VALUE) {
-			throw new IllegalArgumentException(String.format("Cannot encode the specified value: %d", v));
-		}
-
-		if (v >= 0 && v < targetCharValueEscape.length && targetCharValueEscape[v] != null) {
-			return targetCharValueEscape[v];
-		}
-
-		if (v >= 0x20 && v < 127) {
-			return String.valueOf((char)v);
-		}
-
-		String hex = Integer.toHexString(v|0x10000).substring(1,5);
-		return "\\u"+hex;
-	}
-
-	@Override
 	public int getInlineTestSetWordSize() {
 		return 32;
 	}

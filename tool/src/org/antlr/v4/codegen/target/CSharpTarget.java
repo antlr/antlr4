@@ -119,26 +119,6 @@ public class CSharpTarget extends Target {
 	}
 
 	@Override
-	public String encodeIntAsCharEscape(int v) {
-		if (v < Character.MIN_VALUE || v > Character.MAX_VALUE) {
-			throw new IllegalArgumentException(String.format("Cannot encode the specified value: %d", v));
-		}
-
-		String formatted;
-		if (v >= 0 && v < targetCharValueEscape.length && targetCharValueEscape[v] != null) {
-			formatted = targetCharValueEscape[v];
-		}
-		else if (v >= 0x20 && v < 127 && (v < '0' || v > '9') && (v < 'a' || v > 'f') && (v < 'A' || v > 'F')) {
-			formatted = Character.toString((char)v);
-		}
-		else {
-			formatted = String.format("\\x%X", v & 0xFFFF);
-		}
-
-		return "'" + formatted + "'";
-	}
-
-	@Override
 	protected STGroup loadTemplates() {
 		// override the superclass behavior to put all C# templates in the same folder
 		STGroup result = new STGroupFile(CodeGenerator.TEMPLATE_ROOT+"/CSharp/"+ getLanguage()+STGroup.GROUP_FILE_EXTENSION);
