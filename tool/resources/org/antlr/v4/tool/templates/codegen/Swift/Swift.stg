@@ -300,10 +300,7 @@ case  <f.ruleIndex>:
 	<atn>
 
 	<accessLevelNotOpen(parser)>
-	static let _serializedATN = <parser.name>ATN().jsonString
-
-	<accessLevelNotOpen(parser)>
-	static let _ATN = ATNDeserializer().deserializeFromJson(_serializedATN)
+	static let _ATN = try! ATNDeserializer().deserialize(_serializedATN)
 }
 >>
 
@@ -1047,19 +1044,14 @@ Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
 	<atn>
 
 	<accessLevelNotOpen(lexer)>
-	static let _serializedATN: String = <lexer.name>ATN().jsonString
-
-	<accessLevelNotOpen(lexer)>
-	static let _ATN: ATN = ATNDeserializer().deserializeFromJson(_serializedATN)
+	static let _ATN: ATN = try! ATNDeserializer().deserialize(_serializedATN)
 }
 >>
 
-/** Don't need to define anything. The tool generates a XParserATN.swift file (and same for lexer)
- *  which is referenced from static field _serializedATN.  This json string is passed to
- *  deserializeFromJson(). Note this is not the "serialization as array of ints" that other targets
- *  do. It is more or less the output of ATNPrinter which gets read back in.
- */
 SerializedATN(model) ::= <<
+static let _serializedATN: String = """
+	<model.serialized; wrap={\\<\n>}>
+	"""
 >>
 
 /** Using a type to init value map, try to init a type; if not in table

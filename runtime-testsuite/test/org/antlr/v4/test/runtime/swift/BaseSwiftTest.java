@@ -396,12 +396,10 @@ public class BaseSwiftTest extends BaseRuntimeTestSupport implements RuntimeTest
 		List<String> files = new ArrayList<>();
 		if (lexerName != null) {
 			files.add(lexerName + ".swift");
-			files.add(lexerName + "ATN.swift");
 		}
 
 		if (parserName != null) {
 			files.add(parserName + ".swift");
-			files.add(parserName + "ATN.swift");
 			Set<String> optionsSet = new HashSet<>(Arrays.asList(extraOptions));
 			String grammarName = grammarFileName.substring(0, grammarFileName.lastIndexOf('.'));
 			if (!optionsSet.contains("-no-listener")) {
