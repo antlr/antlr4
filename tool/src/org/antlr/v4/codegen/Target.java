@@ -392,6 +392,7 @@ public abstract class Target {
 				return String.format("\\x%X", v);
 			case "Dart":
 			case "PHP":
+			case "Swift":
 				return String.format("\\u{%X}", v);
 		}
 	}

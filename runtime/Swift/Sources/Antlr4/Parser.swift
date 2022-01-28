@@ -423,7 +423,7 @@ open class Parser: Recognizer<ParserATNSimulator> {
 
             var opts = ATNDeserializationOptions()
             opts.generateRuleBypassTransitions = true
-            let result = try! ATNDeserializer(opts).deserialize(Array(serializedAtn))
+            let result = try! ATNDeserializer(opts).deserialize(serializedAtn)
             bypassAltsAtnCache[serializedAtn] = result
             return result
         }
