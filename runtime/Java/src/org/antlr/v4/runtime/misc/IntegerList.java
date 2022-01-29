@@ -5,9 +5,11 @@
  */
 package org.antlr.v4.runtime.misc;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.*;
 
 /**
  *
@@ -308,5 +310,30 @@ public class IntegerList {
 			result += Character.charCount(_data[i]);
 		}
 		return result;
+	}
+
+	public void writeSerializedATNIntegerHistogram(String filename) {
+		HashMap<Integer, Integer> histo = new HashMap<>();
+		for (int i : this.toArray()) {
+			if ( histo.containsKey(i) ) {
+				histo.put(i, histo.get(i) + 1);
+			}
+			else {
+				histo.put(i, 1);
+			}
+		}
+		TreeMap<Integer,Integer> sorted = new TreeMap<>(histo);
+
+		String output = "";
+		output += "value,count\n";
+		for (int key : sorted.keySet()) {
+			output += key+","+sorted.get(key)+"\n";
+		}
+		try {
+			Files.write(Paths.get(filename), output.getBytes(StandardCharsets.UTF_8));
+		}
+		catch (IOException ioe) {
+			System.err.println(ioe);
+		}
 	}
 }
