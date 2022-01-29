@@ -12,32 +12,32 @@ import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNSerializer;
 import org.antlr.v4.runtime.misc.IntegerList;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class SerializedATN extends OutputModelObject {
-	// TODO: make this into a kind of decl or multiple?
-	public List<String> serialized;
+	public final String[] serialized;
+	public final String[][] segments;
+
 	public SerializedATN(OutputModelFactory factory, ATN atn) {
 		super(factory);
 		Target target = factory.getGenerator().getTarget();
 		IntegerList data = ATNSerializer.getSerialized(atn, target.getLanguage());
-		serialized = new ArrayList<String>(data.size());
-		for (int c : data.toArray()) {
-			String encoded = target.encodeIntAsCharEscape(c == -1 ? Character.MAX_VALUE : c);
-			serialized.add(encoded);
+		int size = data.size();
+		int segmentLimit = target.getSerializedATNSegmentLimit();
+		segments = new String[(int)(((long)size + segmentLimit - 1) / segmentLimit)][];
+		int segmentIndex = 0;
+
+		for (int i = 0; i < size; i += segmentLimit) {
+			int segmentSize = Math.min(i + segmentLimit, size) - i;
+			String[] segment = new String[segmentSize];
+			segments[segmentIndex++] = segment;
+			for (int j = 0; j < segmentSize; j++) {
+				segment[j] = target.encodeIntAsCharEscape(data.get(i + j));
+			}
 		}
-//		System.out.println(ATNSerializer.getDecoded(factory.getGrammar(), atn));
+
+		serialized = segments[0];
 	}
 
 	public String[][] getSegments() {
-		List<String[]> segments = new ArrayList<String[]>();
-		int segmentLimit = factory.getGenerator().getTarget().getSerializedATNSegmentLimit();
-		for (int i = 0; i < serialized.size(); i += segmentLimit) {
-			List<String> currentSegment = serialized.subList(i, Math.min(i + segmentLimit, serialized.size()));
-			segments.add(currentSegment.toArray(new String[0]));
-		}
-
-		return segments.toArray(new String[0][]);
+		return segments;
 	}
 }
