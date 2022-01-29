@@ -56,12 +56,7 @@ import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Tool {
@@ -736,6 +731,10 @@ public class Tool {
 		content.append("\n");
 
 		IntegerList serializedATN = ATNSerializer.getSerialized(g.atn);
+		// Uncomment if you'd like to write out histogram info on the numbers of
+		// each integer value:
+		// serializedATN.writeSerializedATNIntegerHistogram(g.name+"-histo.csv");
+
 		content.append("atn:\n");
 		content.append(serializedATN.toString());
 
