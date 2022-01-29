@@ -329,7 +329,7 @@ public abstract class Target {
 			throw new IllegalArgumentException(String.format("Cannot encode the specified value: %d", v));
 		}
 
-		if (v >= 0 && v < targetCharValueEscape.length && targetCharValueEscape[v] != null) {
+		if ( v < targetCharValueEscape.length && targetCharValueEscape[v] != null) {
 			return targetCharValueEscape[v];
 		}
 
@@ -337,7 +337,7 @@ public abstract class Target {
 			return String.valueOf((char)v);
 		}
 
-		if ( v>=0 && v<=127 ) {
+		if ( v<=127 ) {
 			String oct = Integer.toOctalString(v);
 			return "\\"+ oct;
 		}
