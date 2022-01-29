@@ -44,6 +44,8 @@ public class ATNSerializer {
 	/** Serialize state descriptors, edge descriptors, and decision&rarr;state map
 	 *  into list of ints:
 	 *
+	 *      SERIALIZED_VERSION
+	 *      UUID (2 longs)
 	 * 		grammar-type, (ANTLRParser.LEXER, ...)
 	 *  	max token type,
 	 *  	num states,
