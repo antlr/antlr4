@@ -733,7 +733,7 @@ public class Tool {
 		IntegerList serializedATN = ATNSerializer.getSerialized(g.atn);
 		// Uncomment if you'd like to write out histogram info on the numbers of
 		// each integer value:
-		// serializedATN.writeSerializedATNIntegerHistogram(g.name+"-histo.csv");
+		// Utils.writeSerializedATNIntegerHistogram(g.name+"-histo.csv", serializedATN);
 
 		content.append("atn:\n");
 		content.append(serializedATN.toString());
