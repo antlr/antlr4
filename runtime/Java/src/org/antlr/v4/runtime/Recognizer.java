@@ -10,10 +10,8 @@ import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNSimulator;
 import org.antlr.v4.runtime.atn.ParseInfo;
 import org.antlr.v4.runtime.misc.Utils;
-import sun.misc.URLClassPath;
 
 import java.lang.reflect.Field;
-import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Collections;
 import java.util.HashMap;
@@ -287,7 +285,7 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 				return loadSerializedATN(loader, thisKlass, className);
 		} catch(Throwable t) {
 			throw new RuntimeException("Failed loading SerializedATN", t);
-		} 
+		}
 	}
 	public static String loadSerializedATN(URLClassLoader loader, Class<?> thisKlass, String className) throws ClassNotFoundException, NoSuchFieldException, IllegalAccessException {
 		// create a temporary class loader that can be GC'd
