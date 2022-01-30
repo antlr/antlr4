@@ -254,7 +254,7 @@ public class <parser.name> extends <superClass; null="Parser"> {
 	public String[] getRuleNames() { return ruleNames; }
 
 	@Override
-	public String getSerializedATN() { return _serializedATN; }
+	public String getSerializedATN() { return loadSerializedATN(<parser.name>.class, "SerializedATN"); }
 
 	@Override
 	public ATN getATN() { return _ATN; }
@@ -948,7 +948,7 @@ public class <lexer.name> extends <superClass; null="Lexer"> {
 	public String[] getRuleNames() { return ruleNames; }
 
 	@Override
-	public String getSerializedATN() { return _serializedATN; }
+	public String getSerializedATN() { return loadSerializedATN(<lexer.name>.class, "SerializedATN"); }
 
 	@Override
 	public String[] getChannelNames() { return channelNames; }
@@ -977,11 +977,15 @@ public static final String _serializedATN = Utils.join(
 );
 <else>
 <! only one segment, can be inlined !>
-public static final String _serializedATN =
-	"<model.serialized; wrap={"+<\n><\t>"}>";
+static class SerializedATN {
+
+	public static final String _serializedATN =
+		"<model.serialized; wrap={"+<\n><\t>"}>";
+	}
+
+
 <endif>
-public static final ATN _ATN =
-	new ATNDeserializer().deserialize(_serializedATN.toCharArray());
+public static final ATN _ATN = new ATNDeserializer().deserialize(loadSerializedATN(<parser.name><lexer.name>.class, "SerializedATN").toCharArray());
 static {
 	_decisionToDFA = new DFA[_ATN.getNumberOfDecisions()];
 	for (int i = 0; i \< _ATN.getNumberOfDecisions(); i++) {

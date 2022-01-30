@@ -10,7 +10,11 @@ import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNSimulator;
 import org.antlr.v4.runtime.atn.ParseInfo;
 import org.antlr.v4.runtime.misc.Utils;
+import sun.misc.URLClassPath;
 
+import java.lang.reflect.Field;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -273,4 +277,28 @@ public abstract class Recognizer<Symbol, ATNInterpreter extends ATNSimulator> {
 	public abstract TokenFactory<?> getTokenFactory();
 
 	public abstract void setTokenFactory(TokenFactory<?> input);
+
+	public static String loadSerializedATN(Class<?> thisKlass, String className) {
+		try {
+			ClassLoader loader = thisKlass.getClassLoader();
+			if (loader instanceof URLClassLoader)
+				return loadSerializedATN((URLClassLoader)loader, thisKlass, className);
+			else
+				return loadSerializedATN(loader, thisKlass, className);
+		} catch(Throwable t) {
+			throw new RuntimeException("Failed loading SerializedATN", t);
+		} 
+	}
+	public static String loadSerializedATN(URLClassLoader loader, Class<?> thisKlass, String className) throws ClassNotFoundException, NoSuchFieldException, IllegalAccessException {
+		// create a temporary class loader that can be GC'd
+		ClassLoader subLoader = new URLClassLoader(loader.getURLs(), loader.getParent());
+		return loadSerializedATN(subLoader, thisKlass, className);
+	}
+
+	public static String loadSerializedATN(ClassLoader loader, Class<?> thisKlass, String className) throws ClassNotFoundException, NoSuchFieldException, IllegalAccessException {
+		Class<?> klass = loader.loadClass(thisKlass.getName() + "$" + className);
+		Field field = klass.getDeclaredField("_serializedATN");
+		field.setAccessible(true);
+		return (String)field.get(null);
+	}
 }

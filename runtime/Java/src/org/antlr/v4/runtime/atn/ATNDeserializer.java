@@ -160,6 +160,7 @@ public class ATNDeserializer {
 	@SuppressWarnings("deprecation")
 	public ATN deserialize(char[] data) {
 		data = data.clone();
+		System.gc(); // presumably helps free up deserialized ATN
 
 		// Each char value in data is shifted by +2 at the entry to this method.
 		// This is an encoding optimization targeting the serialized values 0
