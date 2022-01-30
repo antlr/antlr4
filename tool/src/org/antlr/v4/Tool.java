@@ -390,7 +390,15 @@ public class Tool {
 
 		if ( generate_ATN_dot ) generateATNs(g);
 
-		if (gencode && g.tool.getNumErrors()==0 ) generateInterpreterData(g);
+		if (gencode && g.tool.getNumErrors()==0 ) {
+			String interpFile = generateInterpreterData(g);
+			try (Writer fw = getOutputFileWriter(g, g.name + ".interp")) {
+				fw.write(interpFile);
+			}
+			catch (IOException ioe) {
+				errMgr.toolError(ErrorType.CANNOT_WRITE_FILE, ioe);
+			}
+		}
 
 		// PERFORM GRAMMAR ANALYSIS ON ATN: BUILD DECISION DFAs
 		AnalysisPipeline anal = new AnalysisPipeline(g);
@@ -690,7 +698,7 @@ public class Tool {
 		}
 	}
 
-	private void generateInterpreterData(Grammar g) {
+	public static String generateInterpreterData(Grammar g) {
 		StringBuilder content = new StringBuilder();
 
 		content.append("token literal names:\n");
@@ -738,18 +746,7 @@ public class Tool {
 		content.append("atn:\n");
 		content.append(serializedATN.toString());
 
-		try {
-			Writer fw = getOutputFileWriter(g, g.name + ".interp");
-			try {
-				fw.write(content.toString());
-			}
-			finally {
-				fw.close();
-			}
-		}
-		catch (IOException ioe) {
-			errMgr.toolError(ErrorType.CANNOT_WRITE_FILE, ioe);
-		}
+		return content.toString();
 	}
 
 	/** This method is used by all code generators to create new output

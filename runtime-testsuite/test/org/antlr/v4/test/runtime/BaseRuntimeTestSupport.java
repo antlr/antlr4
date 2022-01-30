@@ -225,6 +225,7 @@ public abstract class BaseRuntimeTestSupport implements RuntimeTestSupport {
 
 		return atn;
 	}
+
 	protected void semanticProcess(Grammar g) {
 		if ( g.ast!=null && !g.ast.hasErrors ) {
 //			System.out.println(g.ast.toStringTree());
