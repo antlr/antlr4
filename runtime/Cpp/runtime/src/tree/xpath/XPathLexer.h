@@ -1,3 +1,6 @@
+
+// Generated from XPathLexer.g4 by ANTLR 4.9.3
+
 #pragma once
 
 
@@ -9,11 +12,11 @@
 class  XPathLexer : public antlr4::Lexer {
 public:
   enum {
-    TOKEN_REF = 1, RULE_REF = 2, ANYWHERE = 3, ROOT = 4, WILDCARD = 5, BANG = 6,
+    TOKEN_REF = 1, RULE_REF = 2, ANYWHERE = 3, ROOT = 4, WILDCARD = 5, BANG = 6, 
     ID = 7, STRING = 8
   };
 
-  XPathLexer(antlr4::CharStream *input);
+  explicit XPathLexer(antlr4::CharStream *input);
   ~XPathLexer();
 
   virtual std::string getGrammarFileName() const override;

@@ -61,57 +61,15 @@ using namespace antlrcpp;
 
 namespace {
 
-struct WellKnownUuids final {
-  WellKnownUuids() = default;
-
-  WellKnownUuids(const WellKnownUuids&) = delete;
-
-  WellKnownUuids(WellKnownUuids&&) = delete;
-
-  antlrcpp::Guid addedPrecedenceTransitions;
-  antlrcpp::Guid addedLexerActions;
-  antlrcpp::Guid addedUnicodeSmp;
-  antlrcpp::Guid baseSerialized;
-  std::vector<antlrcpp::Guid> supported;
-};
-
-std::once_flag wellKnownUuidsOnceFlag;
-std::unique_ptr<WellKnownUuids> wellKnownUuids;
-
-void initializeWellKnownUuids() {
-  wellKnownUuids.reset(new WellKnownUuids());
-  wellKnownUuids->addedPrecedenceTransitions = antlrcpp::Guid("1DA0C57D-6C06-438A-9B27-10BCB3CE0F61");
-  wellKnownUuids->addedLexerActions = antlrcpp::Guid("AADB8D7E-AEEF-4415-AD2B-8204D6CF042E");
-  wellKnownUuids->addedUnicodeSmp = antlrcpp::Guid("59627784-3BE5-417A-B9EB-8131A7286089");
-  wellKnownUuids->baseSerialized = antlrcpp::Guid("33761B2D-78BB-4A43-8B0B-4F5BEE8AACF3");
-  wellKnownUuids->supported.assign({
-    wellKnownUuids->baseSerialized, wellKnownUuids->addedPrecedenceTransitions,
-    wellKnownUuids->addedLexerActions, wellKnownUuids->addedUnicodeSmp});
-  wellKnownUuids->supported.shrink_to_fit();
-}
-
-// Specialized view of the serialized ATN that performs the value shift on each element as it is accessed.
-class SerializedATNView final {
-public:
-  explicit SerializedATNView(const std::vector<uint16_t>& input) : _input(&input) {}
-
-  SerializedATNView(const SerializedATNView&) = default;
-
-  uint16_t operator[](size_t index) const { return (*_input)[index] - 2; }
-
-private:
-  const std::vector<uint16_t>* _input;
-};
-
-uint32_t deserializeInt32(SerializedATNView data, size_t offset) {
+uint32_t deserializeInt32(const std::vector<uint16_t>& data, size_t offset) {
   return static_cast<uint32_t>(data[offset]) | (static_cast<uint32_t>(data[offset + 1]) << 16);
 }
 
-ssize_t readUnicodeInt(SerializedATNView data, int& p) {
+ssize_t readUnicodeInt(const std::vector<uint16_t>& data, int& p) {
   return static_cast<ssize_t>(data[p++]);
 }
 
-ssize_t readUnicodeInt32(SerializedATNView data, int& p) {
+ssize_t readUnicodeInt32(const std::vector<uint16_t>& data, int& p) {
   auto result = deserializeInt32(data, p);
   p += 2;
   return static_cast<ssize_t>(result);
@@ -121,7 +79,7 @@ ssize_t readUnicodeInt32(SerializedATNView data, int& p) {
 // the 16- or 32-bit readUnicodeInt/readUnicodeInt32 as needed.
 template <typename F>
 void deserializeSets(
-  SerializedATNView data,
+  const std::vector<uint16_t>& data,
   int& p,
   std::vector<misc::IntervalSet>& sets,
   F readUnicode) {
@@ -155,82 +113,14 @@ ATNDeserializer::ATNDeserializer(const ATNDeserializationOptions& dso): _deseria
 
 ATNDeserializer::~ATNDeserializer() {
 }
-
-/**
- * This value should never change. Updates following this version are
- * reflected as change in the unique ID SERIALIZED_UUID.
- */
-antlrcpp::Guid ATNDeserializer::ADDED_PRECEDENCE_TRANSITIONS() {
-  std::call_once(wellKnownUuidsOnceFlag, initializeWellKnownUuids);
-  return wellKnownUuids->addedPrecedenceTransitions;
-}
-
-antlrcpp::Guid ATNDeserializer::ADDED_LEXER_ACTIONS() {
-  std::call_once(wellKnownUuidsOnceFlag, initializeWellKnownUuids);
-  return wellKnownUuids->addedLexerActions;
-}
-
-antlrcpp::Guid ATNDeserializer::ADDED_UNICODE_SMP() {
-  std::call_once(wellKnownUuidsOnceFlag, initializeWellKnownUuids);
-  return wellKnownUuids->addedUnicodeSmp;
-}
-
-antlrcpp::Guid ATNDeserializer::SERIALIZED_UUID() {
-  return ADDED_UNICODE_SMP();
-}
-
-antlrcpp::Guid ATNDeserializer::BASE_SERIALIZED_UUID() {
-  std::call_once(wellKnownUuidsOnceFlag, initializeWellKnownUuids);
-  return wellKnownUuids->baseSerialized;
-}
-
-const std::vector<antlrcpp::Guid>& ATNDeserializer::SUPPORTED_UUIDS() {
-  std::call_once(wellKnownUuidsOnceFlag, initializeWellKnownUuids);
-  return wellKnownUuids->supported;
-}
-
-bool ATNDeserializer::isFeatureSupported(const antlrcpp::Guid &feature, const antlrcpp::Guid &actualUuid) {
-  auto featureIterator = std::find(SUPPORTED_UUIDS().begin(), SUPPORTED_UUIDS().end(), feature);
-  if (featureIterator == SUPPORTED_UUIDS().end()) {
-    return false;
-  }
-  auto actualIterator = std::find(SUPPORTED_UUIDS().begin(), SUPPORTED_UUIDS().end(), actualUuid);
-  if (actualIterator == SUPPORTED_UUIDS().end()) {
-    return false;
-  }
-
-  return std::distance(featureIterator, actualIterator) >= 0;
-}
-
-ATN ATNDeserializer::deserialize(const std::vector<uint16_t>& input) {
-  // Don't adjust the first value since that's the version number.
-  SerializedATNView data(input);
+ATN ATNDeserializer::deserialize(const std::vector<uint16_t>& data) {
   int p = 0;
-  int version = input[p++];
+  int version = data[p++];
   if (version != SERIALIZED_VERSION) {
     std::string reason = "Could not deserialize ATN with version" + std::to_string(version) + "(expected " + std::to_string(SERIALIZED_VERSION) + ").";
 
     throw UnsupportedOperationException(reason);
   }
-
-  antlrcpp::Guid uuid;
-  {
-    uint16_t bytes[8];
-    for (size_t i = 0; i < 8; i++) {
-      bytes[i] = data[p++];
-    }
-    uuid = toUUID(bytes, 0);
-  }
-  auto uuidIterator = std::find(SUPPORTED_UUIDS().begin(), SUPPORTED_UUIDS().end(), uuid);
-  if (uuidIterator == SUPPORTED_UUIDS().end()) {
-    std::string reason = "Could not deserialize ATN with UUID " + uuid.toString() + " (expected " +
-      SERIALIZED_UUID().toString() + " or a legacy UUID).";
-
-    throw UnsupportedOperationException(reason);
-  }
-
-  bool supportsPrecedencePredicates = isFeatureSupported(ADDED_PRECEDENCE_TRANSITIONS(), uuid);
-  bool supportsLexerActions = isFeatureSupported(ADDED_LEXER_ACTIONS(), uuid);
 
   ATNType grammarType = (ATNType)data[p++];
   size_t maxTokenType = data[p++];
@@ -288,12 +178,10 @@ ATN ATNDeserializer::deserialize(const std::vector<uint16_t>& input) {
     downCast<DecisionState*>(atn.states[stateNumber])->nonGreedy = true;
   }
 
-  if (supportsPrecedencePredicates) {
-    size_t numPrecedenceStates = data[p++];
-    for (size_t i = 0; i < numPrecedenceStates; i++) {
-      size_t stateNumber = data[p++];
-      downCast<RuleStartState*>(atn.states[stateNumber])->isLeftRecursiveRule = true;
-    }
+  size_t numPrecedenceStates = data[p++];
+  for (size_t i = 0; i < numPrecedenceStates; i++) {
+    size_t stateNumber = data[p++];
+    downCast<RuleStartState*>(atn.states[stateNumber])->isLeftRecursiveRule = true;
   }
 
   //
@@ -313,13 +201,6 @@ ATN ATNDeserializer::deserialize(const std::vector<uint16_t>& input) {
       }
 
       atn.ruleToTokenType.push_back(tokenType);
-
-      if (!isFeatureSupported(ADDED_LEXER_ACTIONS(), uuid)) {
-        // this piece of unused metadata was serialized prior to the
-        // addition of LexerAction
-        //int actionIndexIgnored = data[p++];
-        p++;
-      }
     }
   }
 
@@ -353,11 +234,8 @@ ATN ATNDeserializer::deserialize(const std::vector<uint16_t>& input) {
     // First, deserialize sets with 16-bit arguments <= U+FFFF.
     deserializeSets(data, p, sets, readUnicodeInt);
 
-    // Next, if the ATN was serialized with the Unicode SMP feature,
-    // deserialize sets with 32-bit arguments <= U+10FFFF.
-    if (isFeatureSupported(ADDED_UNICODE_SMP(), uuid)) {
-      deserializeSets(data, p, sets, readUnicodeInt32);
-    }
+    // Next, deserialize sets with 32-bit arguments <= U+10FFFF.
+    deserializeSets(data, p, sets, readUnicodeInt32);
 
     sets.shrink_to_fit();
 
@@ -454,41 +332,20 @@ ATN ATNDeserializer::deserialize(const std::vector<uint16_t>& input) {
   // LEXER ACTIONS
   //
   if (atn.grammarType == ATNType::LEXER) {
-    if (supportsLexerActions) {
-      atn.lexerActions.resize(data[p++]);
-      for (size_t i = 0; i < atn.lexerActions.size(); i++) {
-        LexerActionType actionType = static_cast<LexerActionType>(data[p++]);
-        int data1 = data[p++];
-        if (data1 == 0xFFFF) {
-          data1 = -1;
-        }
-
-        int data2 = data[p++];
-        if (data2 == 0xFFFF) {
-          data2 = -1;
-        }
-
-        atn.lexerActions[i] = lexerActionFactory(actionType, data1, data2);
+    atn.lexerActions.resize(data[p++]);
+    for (size_t i = 0; i < atn.lexerActions.size(); i++) {
+      LexerActionType actionType = static_cast<LexerActionType>(data[p++]);
+      int data1 = data[p++];
+      if (data1 == 0xFFFF) {
+        data1 = -1;
       }
-    } else {
-      // for compatibility with older serialized ATNs, convert the old
-      // serialized action index for action transitions to the new
-      // form, which is the index of a LexerCustomAction
-      for (ATNState *state : atn.states) {
-        for (size_t i = 0; i < state->transitions.size(); i++) {
-          Transition *transition = state->transitions[i];
-          if (!is<ActionTransition*>(transition)) {
-            continue;
-          }
 
-          size_t ruleIndex = static_cast<ActionTransition *>(transition)->ruleIndex;
-          size_t actionIndex = static_cast<ActionTransition *>(transition)->actionIndex;
-          Ref<LexerCustomAction> lexerAction = std::make_shared<LexerCustomAction>(ruleIndex, actionIndex);
-          state->transitions[i] = new ActionTransition(transition->target, ruleIndex, atn.lexerActions.size(), false); /* mem-check freed in ATNState d-tor */
-          delete transition; // ml: no longer needed since we just replaced it.
-          atn.lexerActions.push_back(lexerAction);
-        }
+      int data2 = data[p++];
+      if (data2 == 0xFFFF) {
+        data2 = -1;
       }
+
+      atn.lexerActions[i] = lexerActionFactory(actionType, data1, data2);
     }
   }
 
@@ -686,10 +543,6 @@ void ATNDeserializer::checkCondition(bool condition, const std::string &message)
   if (!condition) {
     throw IllegalStateException(message);
   }
-}
-
-antlrcpp::Guid ATNDeserializer::toUUID(const unsigned short *data, size_t offset) {
-  return antlrcpp::Guid((uint16_t *)data + offset, true);
 }
 
 /* mem check: all created instances are freed in the d-tor of the ATNState they are added to. */

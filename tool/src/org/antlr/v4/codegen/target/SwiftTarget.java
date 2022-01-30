@@ -169,7 +169,6 @@ public class SwiftTarget extends Target {
     public String serializeTojson(ATN atn) {
         JsonObjectBuilder builder =  Json.createObjectBuilder();
         builder.add("version", ATNDeserializer.SERIALIZED_VERSION);
-        builder.add("uuid", ATNDeserializer.SERIALIZED_UUID.toString());
 
         // convert grammar type to ATN const to avoid dependence on ANTLRParser
         builder.add("grammarType",atn.grammarType.ordinal());

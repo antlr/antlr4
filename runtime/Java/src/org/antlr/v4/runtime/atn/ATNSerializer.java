@@ -20,7 +20,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.UUID;
 
 public class ATNSerializer {
 	public ATN atn;
@@ -69,7 +68,6 @@ public class ATNSerializer {
 	public IntegerList serialize() {
 		IntegerList data = new IntegerList();
 		data.add(ATNDeserializer.SERIALIZED_VERSION);
-		serializeUUID(data, ATNDeserializer.SERIALIZED_UUID);
 
 		// convert grammar type to ATN const to avoid dependence on ANTLRParser
 		data.add(atn.grammarType.ordinal());
@@ -356,19 +354,13 @@ public class ATNSerializer {
 			}
 		}
 
-		// Note: This value shifting loop is documented in ATNDeserializer.
-		// don't adjust the first value since that's the version number
-		for (int i = 1; i < data.size(); i++) {
-			if (data.get(i) < Character.MIN_VALUE || data.get(i) > Character.MAX_VALUE) {
-				throw new UnsupportedOperationException("Serialized ATN data element "+
-					                                        data.get(i)+
-					                                        " element "+i+" out of range "+
-					                                        (int)Character.MIN_VALUE+
-					                                        ".."+
-					                                        (int)Character.MAX_VALUE);
+		for (int i = 0; i < data.size(); i++) {
+			int value = data.get(i);
+			if (value < Character.MIN_VALUE || value > Character.MAX_VALUE) {
+				throw new UnsupportedOperationException("Serialized ATN data element " +
+						value + " element " + i + " out of range " + (int) Character.MIN_VALUE + ".." + (int) Character.MAX_VALUE);
 			}
 
-			int value = (data.get(i) + 2) & 0xFFFF;
 			data.set(i, value);
 		}
 
@@ -412,24 +404,11 @@ public class ATNSerializer {
 	}
 
 	public String decode(char[] data) {
-		data = data.clone();
-		// don't adjust the first value since that's the version number
-		for (int i = 1; i < data.length; i++) {
-			data[i] = (char)(data[i] - 2);
-		}
-
 		StringBuilder buf = new StringBuilder();
 		int p = 0;
 		int version = ATNDeserializer.toInt(data[p++]);
 		if (version != ATNDeserializer.SERIALIZED_VERSION) {
 			String reason = String.format("Could not deserialize ATN with version %d (expected %d).", version, ATNDeserializer.SERIALIZED_VERSION);
-			throw new UnsupportedOperationException(new InvalidClassException(ATN.class.getName(), reason));
-		}
-
-		UUID uuid = ATNDeserializer.toUUID(data, p);
-		p += 8;
-		if (!uuid.equals(ATNDeserializer.SERIALIZED_UUID)) {
-			String reason = String.format(Locale.getDefault(), "Could not deserialize ATN with UUID %s (expected %s).", uuid, ATNDeserializer.SERIALIZED_UUID);
 			throw new UnsupportedOperationException(new InvalidClassException(ATN.class.getName(), reason));
 		}
 
@@ -611,16 +590,6 @@ public class ATNSerializer {
 		IntegerList serialized = getSerialized(atn);
 		char[] data = Utils.toCharArray(serialized);
 		return new ATNSerializer(atn, tokenNames).decode(data);
-	}
-
-	private void serializeUUID(IntegerList data, UUID uuid) {
-		serializeLong(data, uuid.getLeastSignificantBits());
-		serializeLong(data, uuid.getMostSignificantBits());
-	}
-
-	private void serializeLong(IntegerList data, long value) {
-		serializeInt(data, (int)value);
-		serializeInt(data, (int)(value >> 32));
 	}
 
 	private void serializeInt(IntegerList data, int value) {
