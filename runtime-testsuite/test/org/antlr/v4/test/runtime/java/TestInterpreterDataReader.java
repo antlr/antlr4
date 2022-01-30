@@ -1,27 +1,54 @@
 package org.antlr.v4.test.runtime.java;
 
+import org.antlr.v4.Tool;
 import org.antlr.v4.runtime.Vocabulary;
+import org.antlr.v4.runtime.VocabularyImpl;
 import org.antlr.v4.runtime.atn.ATN;
+import org.antlr.v4.runtime.atn.ATNDeserializer;
 import org.antlr.v4.runtime.atn.ATNSerializer;
 import org.antlr.v4.runtime.misc.InterpreterDataReader;
+import org.antlr.v4.runtime.misc.Utils;
+import org.antlr.v4.tool.Grammar;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
-public class TestInterpreterDataReader {
-
+/** This file represents a simple sanity checks on the parsing of the .interp file
+ *  available to the Java runtime for interpreting rather than compiling and executing parsers.
+ */
+public class TestInterpreterDataReader extends BaseJavaTest {
     @Test
-    public void testParseFile() throws NoSuchFieldException, IllegalAccessException {
-        final ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        // pay attention to the path where the InterpDataReaderTest.interp is stored.
-        final URL stuff = loader.getResource("org/antlr/v4/test/runtime/InterpDataReaderTest.interp");
-        Assert.assertNotNull(stuff);
+    public void testParseFile() throws IOException, NoSuchFieldException, IllegalAccessException, org.antlr.runtime.RecognitionException {
+		Grammar g = new Grammar(
+				"grammar Calc;\n" +
+				"s :  expr EOF\n" +
+				"  ;\n" +
+				"expr\n" +
+				"  :  INT            # number\n" +
+				"  |  expr (MUL | DIV) expr  # multiply\n" +
+				"  |  expr (ADD | SUB) expr  # add\n" +
+				"  ;\n" +
+				"\n" +
+				"INT : [0-9]+;\n" +
+				"MUL : '*';\n" +
+				"DIV : '/';\n" +
+				"ADD : '+';\n" +
+				"SUB : '-';\n" +
+				"WS : [ \\t]+ -> channel(HIDDEN);");
+		String interpString = Tool.generateInterpreterData(g);
+		Path interpFile = Files.createTempFile(null, null);
+		Files.write(interpFile, interpString.getBytes(StandardCharsets.UTF_8));
 
-        InterpreterDataReader.InterpreterData interpreterData = InterpreterDataReader.parseFile(stuff.getPath());
+        InterpreterDataReader.InterpreterData interpreterData = InterpreterDataReader.parseFile(interpFile.toString());
         Field atnField = interpreterData.getClass().getDeclaredField("atn");
         Field vocabularyField = interpreterData.getClass().getDeclaredField("vocabulary");
         Field ruleNamesField = interpreterData.getClass().getDeclaredField("ruleNames");
@@ -36,30 +63,21 @@ public class TestInterpreterDataReader {
 
         ATN atn = (ATN) atnField.get(interpreterData);
         Vocabulary vocabulary = (Vocabulary) vocabularyField.get(interpreterData);
-        List<String> ruleNames = castList(ruleNamesField.get(interpreterData), String.class);
+		String[] literalNames = ((VocabularyImpl) vocabulary).getLiteralNames();
+		String[] symbolicNames = ((VocabularyImpl) vocabulary).getSymbolicNames();
+		List<String> ruleNames = castList(ruleNamesField.get(interpreterData), String.class);
         List<String> channels = castList(channelsField.get(interpreterData), String.class);
         List<String> modes = castList(modesField.get(interpreterData), String.class);
 
+		Assert.assertEquals(6, vocabulary.getMaxTokenType());
+		Assert.assertArrayEquals(new String[]{"s","expr"}, ruleNames.toArray());
+		Assert.assertArrayEquals(new String[]{"", "", "'*'", "'/'", "'+'", "'-'", ""}, literalNames);
+		Assert.assertArrayEquals(new String[]{"", "INT", "MUL", "DIV", "ADD", "SUB", "WS"}, symbolicNames);
+		Assert.assertNull(channels);
+		Assert.assertNull(modes);
+
         char[] atnChars = ATNSerializer.getSerializedAsChars(atn);
-        Assert.assertTrue(atnChars.length > 0);
-        Assert.assertNotNull(vocabulary);
-        Assert.assertEquals(11, ruleNames.size());
-        Assert.assertEquals(2, channels.size());
-        Assert.assertEquals(1, modes.size());
-    }
-
-    @Test
-    public void testParseFileError() {
-        final ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        final URL stuff = loader.getResource("org/antlr/v4/test/runtime/InterpDataReaderTest2.interp");
-        Assert.assertNotNull(stuff);
-
-        try {
-            InterpreterDataReader.InterpreterData interpreterData = InterpreterDataReader.parseFile(stuff.getPath());
-        } catch (Exception e) {
-            Assert.assertEquals(e.getClass(), RuntimeException.class);
-            Assert.assertEquals(e.getMessage(), "Unexpected data entry");
-        }
+		Assert.assertEquals(ATNDeserializer.SERIALIZED_VERSION, atnChars[0]);
     }
 
     private <T> List<T> castList(Object obj, Class<T> clazz) {
