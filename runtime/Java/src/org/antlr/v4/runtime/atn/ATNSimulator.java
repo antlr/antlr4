@@ -11,28 +11,8 @@ import org.antlr.v4.runtime.misc.IntervalSet;
 
 import java.util.IdentityHashMap;
 import java.util.List;
-import java.util.UUID;
 
 public abstract class ATNSimulator {
-	/**
-	 * @deprecated Use {@link ATNDeserializer#SERIALIZED_VERSION} instead.
-	 */
-	@Deprecated
-	public static final int SERIALIZED_VERSION;
-	static {
-		SERIALIZED_VERSION = ATNDeserializer.SERIALIZED_VERSION;
-	}
-
-	/**
-	 * This is the current serialized UUID.
-	 * @deprecated Use {@link ATNDeserializer#checkCondition(boolean)} instead.
-	 */
-	@Deprecated
-	public static final UUID SERIALIZED_UUID;
-	static {
-		SERIALIZED_UUID = ATNDeserializer.SERIALIZED_UUID;
-	}
-
 	/** Must distinguish between missing edge and edge we know leads nowhere */
 
 	public static final DFAState ERROR;
@@ -144,22 +124,6 @@ public abstract class ATNSimulator {
 	@Deprecated
 	public static int toInt32(char[] data, int offset) {
 		return ATNDeserializer.toInt32(data, offset);
-	}
-
-	/**
-	 * @deprecated Use {@link ATNDeserializer#toLong} instead.
-	 */
-	@Deprecated
-	public static long toLong(char[] data, int offset) {
-		return ATNDeserializer.toLong(data, offset);
-	}
-
-	/**
-	 * @deprecated Use {@link ATNDeserializer#toUUID} instead.
-	 */
-	@Deprecated
-	public static UUID toUUID(char[] data, int offset) {
-		return ATNDeserializer.toUUID(data, offset);
 	}
 
 	/**
