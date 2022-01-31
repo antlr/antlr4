@@ -27,18 +27,19 @@ swift --version
 swift build --version
 
 # run swift tests
-pushd runtime/Swift
-./boot.py --test
-rc=$?
-popd
 
-if [ $rc == 0 ]; then
-  # run java tests
-  cd runtime-testsuite/
+# TODO: https://github.com/antlr/antlr4/issues/3521
+# pushd runtime/Swift
+# ./boot.py --test
+# rc=$?
+# popd
+
+# run java tests
+cd runtime-testsuite/
 #  mvn -e -Dparallel=classes -DthreadCount=4 -Dtest=swift.** test
 # I don't know swift enough to make it parallel. revert to single threaded
-  mvn -e -Dtest=swift.** test
-  rc=$?
-  cat target/surefire-reports/*.dumpstream || true
-fi
+mvn -e -Dtest=swift.** test
+rc=$?
+cat target/surefire-reports/*.dumpstream || true
+
 exit $rc
