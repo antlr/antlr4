@@ -24,6 +24,8 @@ namespace atn {
     /// <param name="lexerActions"> The lexer actions to execute. </param>
     explicit LexerActionExecutor(std::vector<Ref<LexerAction>> lexerActions);
 
+    virtual ~LexerActionExecutor() = default;
+
     /// <summary>
     /// Creates a <seealso cref="LexerActionExecutor"/> which executes the actions for
     /// the input {@code lexerActionExecutor} followed by a specified
