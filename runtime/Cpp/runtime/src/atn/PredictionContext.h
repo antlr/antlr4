@@ -65,10 +65,11 @@ namespace atn {
     const size_t cachedHashCode;
 
   protected:
-    PredictionContext(size_t cachedHashCode);
-    ~PredictionContext();
+    explicit PredictionContext(size_t cachedHashCode);
 
   public:
+    virtual ~PredictionContext() = default;
+
     /// Convert a RuleContext tree to a PredictionContext graph.
     /// Return EMPTY if outerContext is empty.
     static Ref<PredictionContext> fromRuleContext(const ATN &atn, RuleContext *outerContext);
