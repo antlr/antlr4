@@ -142,9 +142,7 @@ open class Parser: Recognizer<ParserATNSimulator> {
 
     /// reset the parser's state
     public func reset() throws {
-        if (getInputStream() != nil) {
-            try getInputStream()!.seek(0)
-        }
+        try getInputStream()?.seek(0)
         _errHandler.reset(self)
         _ctx = nil
         _syntaxErrors = 0

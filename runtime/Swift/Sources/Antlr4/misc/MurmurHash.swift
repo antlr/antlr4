@@ -79,7 +79,7 @@ public final class MurmurHash {
     /// - Returns: the updated intermediate hash value
     /// 
     public static func update<T:Hashable>(_ hash: UInt32, _ value: T?) -> UInt32 {
-        return update2(hash, value != nil ? value!.hashValue : 0)
+        return update2(hash, value?.hashValue ?? 0)
     }
 
     /// 
