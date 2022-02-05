@@ -442,9 +442,8 @@ NESTED_ACTION
 
 // Keywords
 // --------
-// keywords used to specify ANTLR v3 grammars. Keywords may not be used as
-// labels for rules or in any other context where they would be ambiguous
-// with the keyword vs some other identifier
+// Keywords may not be used as labels for rules or in any other context
+// where they would be ambiguous with the keyword vs some other identifier
 // OPTIONS, TOKENS, and CHANNELS must also consume the opening brace that captures
 // their option block, as this is the easiest way to parse it separate
 // to an ACTION block, despite it using the same {} delimiters.
@@ -458,9 +457,6 @@ FRAGMENT     : 'fragment'             ;
 LEXER        : 'lexer'                ;
 PARSER       : 'parser'               ;
 GRAMMAR      : 'grammar'              ;
-PROTECTED    : 'protected'            ;
-PUBLIC       : 'public'               ;
-PRIVATE      : 'private'              ;
 RETURNS      : 'returns'              ;
 LOCALS       : 'locals'               ;
 THROWS       : 'throws'               ;
