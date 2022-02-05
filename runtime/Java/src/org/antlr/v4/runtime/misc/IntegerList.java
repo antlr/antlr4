@@ -17,11 +17,10 @@ import java.util.*;
  */
 public class IntegerList {
 
-	private static int[] EMPTY_DATA = new int[0];
+	private static final int[] EMPTY_DATA = new int[0];
 
 	private static final int INITIAL_SIZE = 4;
 	private static final int MAX_ARRAY_SIZE = Integer.MAX_VALUE - 8;
-
 
 	private int[] _data;
 
@@ -36,12 +35,7 @@ public class IntegerList {
 			throw new IllegalArgumentException();
 		}
 
-		if (capacity == 0) {
-			_data = EMPTY_DATA;
-		}
-		else {
-			_data = new int[capacity];
-		}
+		_data = capacity == 0 ? EMPTY_DATA : new int[capacity];
 	}
 
 	public IntegerList(IntegerList list) {
@@ -258,13 +252,7 @@ public class IntegerList {
 			throw new OutOfMemoryError();
 		}
 
-		int newLength;
-		if (_data.length == 0) {
-			newLength = INITIAL_SIZE;
-		}
-		else {
-			newLength = _data.length;
-		}
+		int newLength = _data.length == 0 ? INITIAL_SIZE : _data.length;
 
 		while (newLength < capacity) {
 			newLength = newLength * 2;
