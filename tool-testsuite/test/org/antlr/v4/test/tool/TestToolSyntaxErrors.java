@@ -98,7 +98,7 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 			"lexer grammar A;\n" +
 			"A : 'a' \n" +
 			"B : 'b' ;",
-			"error(" + ErrorType.SYNTAX_ERROR.code + "): A.g4:3:0: syntax error: unterminated rule (missing ';') detected at 'B :' while looking for lexer rule element\n",
+			"error(" + ErrorType.SYNTAX_ERROR.code + "): A.g4:3:2: syntax error: unterminated rule (missing ';') detected at ': 'b'' while looking for lexer rule element\n",
 		};
 		super.testErrors(pair, true);
 	}
@@ -858,9 +858,19 @@ public class TestToolSyntaxErrors extends BaseJavaToolTest {
 	}
 
 	@Test public void testRuleNamesAsTree() {
-		String grammar = "" +
+		String grammar =
 				"grammar T;\n" +
 				"tree : 'X';";
 		super.testErrors(new String[] { grammar, "" }, true);
+	}
+
+	@Test public void testLexerRuleLabel() {
+		String grammar =
+				"grammar T;\n" +
+				"a : A;\n" +
+				"A : h=~('b'|'c') ;";
+		super.testErrors(new String[] {
+				grammar,
+				"error(" + ErrorType.SYNTAX_ERROR.code + "): T.g4:3:5: syntax error: '=' came as a complete surprise to me while looking for lexer rule element\n" }, false);
 	}
 }
