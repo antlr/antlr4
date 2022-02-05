@@ -261,9 +261,6 @@ protected void exitLexerElements(GrammarAST tree) { }
 protected void enterLexerElement(GrammarAST tree) { }
 protected void exitLexerElement(GrammarAST tree) { }
 
-protected void enterLabeledLexerElement(GrammarAST tree) { }
-protected void exitLabeledLexerElement(GrammarAST tree) { }
-
 protected void enterLexerBlock(GrammarAST tree) { }
 protected void exitLexerBlock(GrammarAST tree) { }
 
@@ -734,24 +731,13 @@ lexerElement
 @after {
 	exitLexerElement($start);
 }
-	:	labeledLexerElement
-	|	lexerAtom
+	:	lexerAtom
 	|	lexerSubrule
 	|   ACTION						{actionInAlt((ActionAST)$ACTION);}
 	|   SEMPRED						{sempredInAlt((PredAST)$SEMPRED);}
 	|   ^(ACTION elementOptions)	{actionInAlt((ActionAST)$ACTION);}
 	|   ^(SEMPRED elementOptions)	{sempredInAlt((PredAST)$SEMPRED);}
 	|	EPSILON
-	;
-
-labeledLexerElement
-@init {
-	enterLabeledLexerElement($start);
-}
-@after {
-	exitLabeledLexerElement($start);
-}
-    :   ^((ASSIGN|PLUS_ASSIGN) ID (lexerAtom|block))
 	;
 
 lexerBlock

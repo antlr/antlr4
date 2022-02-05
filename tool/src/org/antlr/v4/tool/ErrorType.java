@@ -1168,6 +1168,7 @@ public enum ErrorType {
 	 * referenced within lexer rules are not tracked independently, and cannot
 	 * be assigned to labels.</p>
 	 */
+	@Deprecated
 	V3_LEXER_LABEL(201, "labels in lexer rules are not supported in ANTLR 4; " +
 		"actions cannot reference elements of lexical rules but you can use " +
 		"getText() to get the entire text matched for the rule", ErrorSeverity.WARNING),
@@ -1187,6 +1188,7 @@ public enum ErrorType {
 	 * <strong>NOTE:</strong> ANTLR 4 does not allow a trailing comma to appear following the
 	 * last token declared in the {@code tokens{}} block.</p>
 	 */
+	@Deprecated
 	V3_TOKENS_SYNTAX(202, "tokens {A; B;} syntax is now tokens {A, B} in ANTLR 4", ErrorSeverity.WARNING),
 	/**
 	 * Compiler Error 203.
@@ -1202,6 +1204,7 @@ public enum ErrorType {
 	 * value declared in the {@code tokens{}} block should be converted to
 	 * standard lexer rules.</p>
 	 */
+	@Deprecated
 	V3_ASSIGN_IN_TOKENS(203, "assignments in tokens{} are not supported in ANTLR 4; use lexical rule <arg> : <arg2>; instead", ErrorSeverity.ERROR),
 	/**
 	 * Compiler Warning 204.
@@ -1217,6 +1220,7 @@ public enum ErrorType {
 	 * safely converted to the standard semantic predicated syntax, which is the
 	 * only form used by ANTLR 4.</p>
 	 */
+	@Deprecated
 	V3_GATED_SEMPRED(204, "{...}?=> explicitly gated semantic predicates are deprecated in ANTLR 4; use {...}? instead", ErrorSeverity.WARNING),
 	/**
 	 * Compiler Error 205.
@@ -1229,11 +1233,12 @@ public enum ErrorType {
 	 * syntactic predicates should be removed when migrating a grammar from
 	 * ANTLR 3 to ANTLR 4.</p>
 	 */
+	@Deprecated
 	V3_SYNPRED(205, "(...)=> syntactic predicates are not supported in ANTLR 4", ErrorSeverity.ERROR),
 
     // Dependency sorting errors
 
-    /** t1.g4 -> t2.g4 -> t3.g4 ->t1.g4 */
+    /* t1.g4 -> t2.g4 -> t3.g4 ->t1.g4 */
     //CIRCULAR_DEPENDENCY(200, "your grammars contain a circular dependency and cannot be sorted into a valid build order", ErrorSeverity.ERROR),
 	;
 

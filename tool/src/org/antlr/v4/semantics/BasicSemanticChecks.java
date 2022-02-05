@@ -457,15 +457,6 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	}
 
 	@Override
-	protected void enterLabeledLexerElement(GrammarAST tree) {
-		Token label = ((GrammarAST)tree.getChild(0)).getToken();
-		g.tool.errMgr.grammarError(ErrorType.V3_LEXER_LABEL,
-								   g.fileName,
-								   label,
-								   label.getText());
-	}
-
-	@Override
 	protected void enterTerminal(GrammarAST tree) {
 		String text = tree.getText();
 		if (text.equals("''")) {

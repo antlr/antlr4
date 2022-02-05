@@ -277,21 +277,6 @@ delegateGrammar
 tokensSpec
 	: TOKENS_SPEC id (COMMA id)* RBRACE -> ^(TOKENS_SPEC id+)
     | TOKENS_SPEC RBRACE ->
-    | TOKENS_SPEC^ v3tokenSpec+ RBRACE!
-      {grammarError(ErrorType.V3_TOKENS_SYNTAX, $TOKENS_SPEC);}
-	;
-
-v3tokenSpec
-	:	id
-		(	ASSIGN lit=STRING_LITERAL
-            {
-            grammarError(ErrorType.V3_ASSIGN_IN_TOKENS, $id.start,
-                         $id.text, $lit.getText());
-            }
-						            	-> id // ignore assignment
-		|								-> id
-		)
-		SEMI
 	;
 
 channelsSpec
@@ -558,11 +543,7 @@ lexerElement
 	int m = input.mark();
 }
 @after { paraphrases.pop(); }
-	:	labeledLexerElement
-		(	ebnfSuffix	-> ^( ebnfSuffix ^(BLOCK<BlockAST>[$labeledLexerElement.start,"BLOCK"] ^(ALT<AltAST> labeledLexerElement) ) )
-		|				-> labeledLexerElement
-		)
-	|	lexerAtom
+	:	lexerAtom
 		(	ebnfSuffix	-> ^( ebnfSuffix ^(BLOCK<BlockAST>[$lexerAtom.start,"BLOCK"] ^(ALT<AltAST> lexerAtom) ) )
 		|				-> lexerAtom
 		)
@@ -602,14 +583,6 @@ lexerElement
         reportError(re);
         recover(input,re);
 	}
-
-labeledLexerElement
-	:	id (ass=ASSIGN|ass=PLUS_ASSIGN)
-		(	lexerAtom	-> ^($ass id lexerAtom)
-		|	lexerBlock	-> ^($ass id lexerBlock)
-		)
-	;
-
 
 lexerBlock
 @after {
