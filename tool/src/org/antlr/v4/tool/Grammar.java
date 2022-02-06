@@ -1322,7 +1322,7 @@ public class Grammar implements AttributeResolver {
 			return implicitLexer.createLexerInterpreter(input);
 		}
 
-		char[] serializedAtn = ATNSerializer.getSerializedAsChars(atn);
+		char[] serializedAtn = ATNSerializer.getSerializedAsChars(atn, getLanguage());
 		ATN deserialized = new ATNDeserializer().deserialize(serializedAtn);
 		List<String> allChannels = new ArrayList<String>();
 		allChannels.add("DEFAULT_TOKEN_CHANNEL");
@@ -1336,7 +1336,7 @@ public class Grammar implements AttributeResolver {
 		if (this.isLexer()) {
 			throw new IllegalStateException("A parser interpreter can only be created for a parser or combined grammar.");
 		}
-		char[] serializedAtn = ATNSerializer.getSerializedAsChars(atn);
+		char[] serializedAtn = ATNSerializer.getSerializedAsChars(atn, getLanguage());
 		ATN deserialized = new ATNDeserializer().deserialize(serializedAtn);
 		return new GrammarParserInterpreter(this, deserialized, tokenStream);
 	}
@@ -1346,7 +1346,7 @@ public class Grammar implements AttributeResolver {
 			throw new IllegalStateException("A parser interpreter can only be created for a parser or combined grammar.");
 		}
 
-		char[] serializedAtn = ATNSerializer.getSerializedAsChars(atn);
+		char[] serializedAtn = ATNSerializer.getSerializedAsChars(atn, getLanguage());
 		ATN deserialized = new ATNDeserializer().deserialize(serializedAtn);
 		return new ParserInterpreter(fileName, getVocabulary(), Arrays.asList(getRuleNames()), deserialized, tokenStream);
 	}

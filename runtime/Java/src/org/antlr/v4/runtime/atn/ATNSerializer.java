@@ -65,7 +65,7 @@ public class ATNSerializer {
 	 *
 	 *  Convenient to pack into unsigned shorts to make as Java string.
 	 */
-	public IntegerList serialize() {
+	public IntegerList serialize(String language) {
 		IntegerList data = new IntegerList();
 		data.add(ATNDeserializer.SERIALIZED_VERSION);
 
@@ -354,14 +354,15 @@ public class ATNSerializer {
 			}
 		}
 
-		for (int i = 0; i < data.size(); i++) {
+		boolean isJava = language.equals("Java");
+		for (int i = 1; i < data.size(); i++) {
 			int value = data.get(i);
 			if (value < Character.MIN_VALUE || value > Character.MAX_VALUE) {
 				throw new UnsupportedOperationException("Serialized ATN data element " +
 						value + " element " + i + " out of range " + (int) Character.MIN_VALUE + ".." + (int) Character.MAX_VALUE);
 			}
 
-			data.set(i, value);
+			data.set(i, isJava ? (value + 2) & 0xFFFF : value);
 		}
 
 		return data;
@@ -404,6 +405,12 @@ public class ATNSerializer {
 	}
 
 	public String decode(char[] data) {
+		data = data.clone();
+		// don't adjust the first value since that's the version number
+		for (int i = 1; i < data.length; i++) {
+			data[i] = (char)(data[i] - 2);
+		}
+
 		StringBuilder buf = new StringBuilder();
 		int p = 0;
 		int version = ATNDeserializer.toInt(data[p++]);
@@ -574,22 +581,16 @@ public class ATNSerializer {
 	}
 
 	/** Used by Java target to encode short/int array as chars in string. */
-	public static String getSerializedAsString(ATN atn) {
-		return new String(getSerializedAsChars(atn));
+	public static String getSerializedAsString(ATN atn, String language) {
+		return new String(getSerializedAsChars(atn, language));
 	}
 
-	public static IntegerList getSerialized(ATN atn) {
-		return new ATNSerializer(atn).serialize();
+	public static IntegerList getSerialized(ATN atn, String language) {
+		return new ATNSerializer(atn).serialize(language);
 	}
 
-	public static char[] getSerializedAsChars(ATN atn) {
-		return Utils.toCharArray(getSerialized(atn));
-	}
-
-	public static String getDecoded(ATN atn, List<String> tokenNames) {
-		IntegerList serialized = getSerialized(atn);
-		char[] data = Utils.toCharArray(serialized);
-		return new ATNSerializer(atn, tokenNames).decode(data);
+	public static char[] getSerializedAsChars(ATN atn, String language) {
+		return Utils.toCharArray(getSerialized(atn, language));
 	}
 
 	private void serializeInt(IntegerList data, int value) {

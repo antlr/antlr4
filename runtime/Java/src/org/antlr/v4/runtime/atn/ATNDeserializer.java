@@ -83,6 +83,11 @@ public class ATNDeserializer {
 	}
 
 	public ATN deserialize(char[] data) {
+		data = data.clone();
+		for (int i = 1; i < data.length; i++) {
+			data[i] = (char) (data[i] - 2);
+		}
+
 		int p = 0;
 		int version = toInt(data[p++]);
 		if (version != SERIALIZED_VERSION) {
