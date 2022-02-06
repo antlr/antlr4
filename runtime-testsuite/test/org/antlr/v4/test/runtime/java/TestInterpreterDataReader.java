@@ -76,7 +76,7 @@ public class TestInterpreterDataReader extends BaseJavaTest {
 		Assert.assertNull(channels);
 		Assert.assertNull(modes);
 
-        char[] atnChars = ATNSerializer.getSerializedAsChars(atn);
+        char[] atnChars = ATNSerializer.getSerializedAsChars(atn, g.getLanguage());
 		Assert.assertEquals(ATNDeserializer.SERIALIZED_VERSION, atnChars[0]);
     }
 
