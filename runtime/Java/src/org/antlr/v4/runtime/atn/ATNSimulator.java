@@ -7,10 +7,8 @@
 package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.dfa.DFAState;
-import org.antlr.v4.runtime.misc.IntervalSet;
 
 import java.util.IdentityHashMap;
-import java.util.List;
 
 public abstract class ATNSimulator {
 	/** Must distinguish between missing edge and edge we know leads nowhere */
@@ -105,19 +103,6 @@ public abstract class ATNSimulator {
 	@Deprecated
 	public static void checkCondition(boolean condition, String message) {
 		new ATNDeserializer().checkCondition(condition, message);
-	}
-
-	/**
-	 * @deprecated Use {@link ATNDeserializer#edgeFactory} instead.
-	 */
-	@Deprecated
-
-	public static Transition edgeFactory(ATN atn,
-										 int type, int src, int trg,
-										 int arg1, int arg2, int arg3,
-										 List<IntervalSet> sets)
-	{
-		return new ATNDeserializer().edgeFactory(atn, type, src, trg, arg1, arg2, arg3, sets);
 	}
 
 	/**

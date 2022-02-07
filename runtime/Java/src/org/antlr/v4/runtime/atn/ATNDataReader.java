@@ -10,7 +10,21 @@ public class ATNDataReader {
 		this.data = data;
 	}
 
-	public int readUInt32() {
+	public int read() {
+		int value = readUInt16();
+		if (value == 0xFFFF) {
+			return -1;
+		}
+
+		int mask = value >> ATNDataWriter.MaskBits & 0b11;
+		return mask == 0
+				? value
+				: mask == 0b01
+				? (readUInt16() << ATNDataWriter.MaskBits) | (value & ((1 << ATNDataWriter.MaskBits) - 1))
+				: readInt32();
+	}
+
+	public int readInt32() {
 		return readUInt16() | (readUInt16() << 16);
 	}
 

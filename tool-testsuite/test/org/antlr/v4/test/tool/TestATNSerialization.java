@@ -921,12 +921,12 @@ public class TestATNSerialization extends BaseJavaToolTest {
 				"5:BASIC 0\n" +
 				"rule 0:1 1\n" +
 				"mode 0:0\n" +
-				"0:'a'..'b'\n" +
-				"1:'e'..'e', 'p'..'t'\n" +
+				"0:'e'..'e', 'p'..'t'\n" +
+				"1:'a'..'b'\n" +
 				"0->1 EPSILON 0,0,0\n" +
 				"1->3 EPSILON 0,0,0\n" +
-				"3->4 NOT_SET 0,0,0\n" +
-				"4->5 NOT_SET 1,0,0\n" +
+				"3->4 NOT_SET 1,0,0\n" +
+				"4->5 NOT_SET 0,0,0\n" +
 				"5->2 EPSILON 0,0,0\n" +
 				"0:0\n";
 		ATN atn = createATN(lg, true);
