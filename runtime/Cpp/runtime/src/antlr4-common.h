@@ -49,8 +49,6 @@
     #endif
   #endif
 
-  #define ANTLR4CPP_GUID_WINDOWS 1
-
   #ifdef _WIN64
     typedef __int64 ssize_t;
   #else
@@ -68,14 +66,12 @@
   #endif
 
 #elif defined(__APPLE__)
-  #define ANTLR4CPP_GUID_CFUUID 1
   #if __GNUC__ >= 4
     #define ANTLR4CPP_PUBLIC __attribute__ ((visibility ("default")))
   #else
     #define ANTLR4CPP_PUBLIC
   #endif
 #else
-  #define ANTLR4CPP_GUID_LIBUUID 1
   #if __GNUC__ >= 6
     #define ANTLR4CPP_PUBLIC __attribute__ ((visibility ("default")))
   #else
@@ -89,7 +85,6 @@
 #define ANTLR4CPP_HAVE_BUILTIN(x) 0
 #endif
 
-#include "support/Guid.h"
 #include "support/Declarations.h"
 
 // We have to undefine this symbol as ANTLR will use this name for own members and even
