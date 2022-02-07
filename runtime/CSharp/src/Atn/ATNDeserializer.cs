@@ -45,8 +45,7 @@ namespace Antlr4.Runtime.Atn
 			ReadRules (atn);
 			ReadModes (atn);
 			IList<IntervalSet> sets = new List<IntervalSet>();
-			ReadSets (atn, sets, ReadInt);
-	        ReadSets (atn, sets, ReadInt32);
+			ReadSets (sets);
 	        ReadEdges (atn, sets);
 			ReadDecisions (atn);
 			ReadLexerActions (atn);
@@ -188,18 +187,7 @@ namespace Antlr4.Runtime.Atn
 				atn.lexerActions = new ILexerAction[ReadInt()];
 				for (int i_10 = 0; i_10 < atn.lexerActions.Length; i_10++)
 				{
-					LexerActionType actionType = (LexerActionType)ReadInt();
-					int data1 = ReadInt();
-					if (data1 == unchecked((int)(0xFFFF)))
-					{
-						data1 = -1;
-					}
-					int data2 = ReadInt();
-					if (data2 == unchecked((int)(0xFFFF)))
-					{
-						data2 = -1;
-					}
-					ILexerAction lexerAction = LexerActionFactory(actionType, data1, data2);
+					ILexerAction lexerAction = LexerActionFactory((LexerActionType)ReadInt(), ReadInt(), ReadInt());
 					atn.lexerActions[i_10] = lexerAction;
 				}
 			}
@@ -309,7 +297,7 @@ namespace Antlr4.Runtime.Atn
 			}
 		}
 
-		protected internal virtual void ReadSets(ATN atn, IList<IntervalSet> sets, System.Func<int> readUnicode)
+		protected virtual void ReadSets(IList<IntervalSet> sets)
 		{
 			//
 			// SETS
@@ -327,7 +315,7 @@ namespace Antlr4.Runtime.Atn
 				}
 				for (int j = 0; j < nintervals; j++)
 				{
-					set.Add(readUnicode(), readUnicode());
+					set.Add(ReadInt(), ReadInt());
 				}
 			}
 		}
@@ -368,11 +356,7 @@ namespace Antlr4.Runtime.Atn
 				RuleStartState startState = (RuleStartState)atn.states[s];
 				atn.ruleToStartState[i_5] = startState;
 				if (atn.grammarType == ATNType.Lexer) {
-					int tokenType = ReadInt ();
-					if (tokenType == unchecked((int)(0xFFFF))) {
-						tokenType = TokenConstants.EOF;
-					}
-					atn.ruleToTokenType [i_5] = tokenType;
+					atn.ruleToTokenType [i_5] = ReadInt();
 				}
 			}
 			atn.ruleToStopState = new RuleStopState[nrules];
@@ -406,10 +390,6 @@ namespace Antlr4.Runtime.Atn
 					continue;
 				}
 				int ruleIndex = ReadInt();
-				if (ruleIndex == char.MaxValue)
-				{
-					ruleIndex = -1;
-				}
 				ATNState s = StateFactory(stype, ruleIndex);
 				if (stype == StateType.LoopEnd)
 				{
@@ -459,7 +439,7 @@ namespace Antlr4.Runtime.Atn
 
 		protected internal virtual void CheckVersion()
 		{
-			int version = ReadInt();
+			int version = ReadUInt16();
 			if (version != SerializedVersion)
 			{
 				string reason = string.Format(CultureInfo.CurrentCulture, "Could not deserialize ATN with version {0} (expected {1}).", version, SerializedVersion);
@@ -962,14 +942,30 @@ nextTransition_continue: ;
         }
 
 
-        protected internal int ReadInt()
+        private int ReadInt()
         {
-			return data[p++];
+	        int value = ReadUInt16();
+	        if (value == 0xFFFF)
+	        {
+		        return -1;
+	        }
+
+	        int mask = value >> 14 & 0b11;
+	        return mask == 0
+		        ? value
+		        : mask == 0b01
+			        ? (ReadUInt16() << 14) | (value & ((1 << 14) - 1))
+			        : ReadInt32();
         }
 
-        protected internal int ReadInt32()
+        private int ReadUInt16()
         {
-			return (int)data[p++] | ((int)data[p++] << 16);
+	        return data[p++];
+        }
+
+        private int ReadInt32()
+        {
+	        return data[p++] | (data[p++] << 16);
         }
 
         [return: NotNull]
