@@ -98,7 +98,7 @@ class DiagnosticErrorListener extends ErrorListener {
 		for (let i = 0; i < configs.items.length; i++) {
 			result.add(configs.items[i].alt);
 		}
-		return `{${result.values().join(", ")}}`;
+		return result.toString();
 	}
 }
 
