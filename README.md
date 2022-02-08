@@ -24,6 +24,8 @@ Targets such as Go that pull directly from the repository should use the `master
 $ go get github.com/antlr/antlr4/runtime/Go/antlr@master
 ```
 
+Please noticed that by default the README for this repository shows the `dev` branch, but you can jump to the latest stable release [`master`](https://github.com/antlr/antlr4/tree/master).
+
 ## Authors and major contributors
 
 * [Terence Parr](http://www.cs.usfca.edu/~parrt/), parrt@cs.usfca.edu
