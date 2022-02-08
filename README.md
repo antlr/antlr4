@@ -16,7 +16,19 @@
 
 **ANTLR** (ANother Tool for Language Recognition) is a powerful parser generator for reading, processing, executing, or translating structured text or binary files. It's widely used to build languages, tools, and frameworks. From a grammar, ANTLR generates a parser that can build parse trees and also generates a listener interface (or visitor) that makes it easy to respond to the recognition of phrases of interest.
 
-[![Donate](https://www.paypal.com/en_US/i/btn/x-click-butcc-donate.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=BF92STRXT8F8Q)
+## Repo branch structure
+
+This repository has two key branches: `master` and `dev`. The `dev` branch is the default branch and all pull requests are based off of this branch.  We actively develop in this branch in between releases, which are merged back into master and the release location is tagged (e.g., with `4.10-rc1` or `4.10`.) Visually our process looks roughly like this:
+
+<img src="doc/images/new-antlr-branches.png" width="500">
+
+Targets such as Go that pull directly from the repository should use the `master` branch not the `dev` branch. E.g.,
+
+```bash
+$ go get github.com/antlr/antlr4/runtime/Go/antlr@master
+```
+
+Please notice that by default the README for this repository shows the `dev` branch, but you can jump to the latest stable release [`master`](https://github.com/antlr/antlr4/tree/master).
 
 ## Authors and major contributors
 
