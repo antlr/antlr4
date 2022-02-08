@@ -35,18 +35,9 @@ using namespace antlr4::misc;
 
 using namespace antlrcpp;
 
-ParserInterpreter::ParserInterpreter(const std::string &grammarFileName, const std::vector<std::string>& tokenNames,
-  const std::vector<std::string>& ruleNames, const atn::ATN &atn, TokenStream *input)
-  : ParserInterpreter(grammarFileName, dfa::Vocabulary::fromTokenNames(tokenNames), ruleNames, atn, input) {
-}
-
 ParserInterpreter::ParserInterpreter(const std::string &grammarFileName, const dfa::Vocabulary &vocabulary,
   const std::vector<std::string> &ruleNames, const atn::ATN &atn, TokenStream *input)
   : Parser(input), _grammarFileName(grammarFileName), _atn(atn), _ruleNames(ruleNames), _vocabulary(vocabulary) {
-
-  for (size_t i = 0; i < atn.maxTokenType; ++i) {
-    _tokenNames.push_back(vocabulary.getDisplayName(i));
-  }
 
   // init decision DFA
   for (size_t i = 0; i < atn.getNumberOfDecisions(); ++i) {
@@ -70,10 +61,6 @@ void ParserInterpreter::reset() {
 
 const atn::ATN& ParserInterpreter::getATN() const {
   return _atn;
-}
-
-const std::vector<std::string>& ParserInterpreter::getTokenNames() const {
-  return _tokenNames;
 }
 
 const dfa::Vocabulary& ParserInterpreter::getVocabulary() const {

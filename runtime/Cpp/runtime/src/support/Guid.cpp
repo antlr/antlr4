@@ -24,21 +24,27 @@
 
 #include <algorithm>
 
-#include "Guid.h"
+#include "support/Guid.h"
 
-#ifdef GUID_LIBUUID
+#ifdef ANTLR4CPP_GUID_LIBUUID
 #include <uuid/uuid.h>
 #endif
 
-#ifdef GUID_CFUUID
+#ifdef ANTLR4CPP_GUID_CFUUID
 #include <CoreFoundation/CFUUID.h>
 #endif
 
-#ifdef GUID_WINDOWS
+#ifdef ANTLR4CPP_GUID_WINDOWS
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN 1
+#endif
+#ifndef NOMINMAX
+#define NOMINMAX 1
+#endif
 #include <objbase.h>
 #endif
 
-#ifdef GUID_ANDROID
+#ifdef ANTLR4CPP_GUID_ANDROID
 #include <jni.h>
 #endif
 
@@ -153,7 +159,7 @@ std::string Guid::toString() const {
 
 // This is the linux friendly implementation, but it could work on other
 // systems that have libuuid available
-#ifdef GUID_LIBUUID
+#ifdef ANTLR4CPP_GUID_LIBUUID
 Guid GuidGenerator::newGuid()
 {
   uuid_t id;
@@ -163,7 +169,7 @@ Guid GuidGenerator::newGuid()
 #endif
 
 // this is the mac and ios version
-#ifdef GUID_CFUUID
+#ifdef ANTLR4CPP_GUID_CFUUID
 Guid GuidGenerator::newGuid()
 {
   auto newId = CFUUIDCreate(NULL);
@@ -194,7 +200,7 @@ Guid GuidGenerator::newGuid()
 #endif
 
 // obviously this is the windows version
-#ifdef GUID_WINDOWS
+#ifdef ANTLR4CPP_GUID_WINDOWS
 Guid GuidGenerator::newGuid()
 {
   GUID newId;
@@ -228,7 +234,7 @@ Guid GuidGenerator::newGuid()
 #endif
 
 // android version that uses a call to a java api
-#ifdef GUID_ANDROID
+#ifdef ANTLR4CPP_GUID_ANDROID
 GuidGenerator::GuidGenerator(JNIEnv *env)
 {
   _env = env;

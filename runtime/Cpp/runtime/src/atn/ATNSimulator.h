@@ -56,8 +56,8 @@ namespace atn {
     static ATNState *stateFactory(int type, int ruleIndex);
 
   protected:
-    static antlrcpp::SingleWriteMultipleReadLock _stateLock; // Lock for DFA states.
-    static antlrcpp::SingleWriteMultipleReadLock _edgeLock; // Lock for the sparse edge map in DFA states.
+    static std::shared_mutex _stateLock; // Lock for DFA states.
+    static std::shared_mutex _edgeLock; // Lock for the sparse edge map in DFA states.
 
     /// <summary>
     /// The context cache maps all PredictionContext objects that are equals()

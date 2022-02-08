@@ -1,0 +1,21 @@
+[notes]
+This is a regression test for antlr/antlr4#196
+"element+ in expression grammar doesn't parse properly"
+https://github.com/antlr/antlr4/issues/196
+
+[type]
+Parser
+
+[grammar]
+grammar T;
+start : e[0] EOF;
+e[int _p]
+    :   ( 'a' | 'b'+ ) ( {3 >= $_p}? '+' e[4] )*
+    ;
+
+[start]
+start
+
+[input]
+a+b+a
+

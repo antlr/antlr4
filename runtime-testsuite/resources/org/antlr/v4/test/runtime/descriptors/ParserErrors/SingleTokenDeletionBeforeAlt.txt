@@ -1,0 +1,20 @@
+[type]
+Parser
+
+[grammar]
+grammar T;
+a : ('b' | 'c')
+;
+q : 'a'
+;
+
+[start]
+a
+
+[input]
+ac
+
+[errors]
+"""line 1:0 extraneous input 'a' expecting {'b', 'c'}
+"""
+

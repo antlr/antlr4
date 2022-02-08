@@ -8,7 +8,6 @@ package org.antlr.v4.codegen.target;
 
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.codegen.Target;
-import org.antlr.v4.codegen.UnicodeEscapes;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.StringRenderer;
@@ -18,54 +17,38 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 
-/**
- *
- * @author Eric Vergnaud
- */
 public class JavaScriptTarget extends Target {
-
 	/** Source: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Lexical_grammar */
-	protected static final String[] javaScriptKeywords = {
+	protected static final HashSet<String> reservedWords = new HashSet<>(Arrays.asList(
 		"break", "case", "class", "catch", "const", "continue", "debugger",
 		"default", "delete", "do", "else", "export", "extends", "finally", "for",
 		"function", "if", "import", "in", "instanceof", "let", "new", "return",
 		"super", "switch", "this", "throw", "try", "typeof", "var", "void",
 		"while", "with", "yield",
+
 		//future reserved
 		"enum", "await", "implements", "package", "protected", "static",
 		"interface", "private", "public",
+
 		//future reserved in older standards
 		"abstract", "boolean", "byte", "char", "double", "final", "float",
 		"goto", "int", "long", "native", "short", "synchronized", "transient",
 		"volatile",
-		//literals
-		"null", "true", "false"
-	};
 
-	/** Avoid grammar symbols in this set to prevent conflicts in gen'd code. */
-	protected final Set<String> badWords = new HashSet<String>();
+		//literals
+		"null", "true", "false",
+
+		// misc
+		"rule", "parserRule"
+	));
 
 	public JavaScriptTarget(CodeGenerator gen) {
-		super(gen, "JavaScript");
+		super(gen);
 	}
 
-    @Override
-    public String getVersion() {
-        return "4.9.3";
-    }
-
-    public Set<String> getBadWords() {
-		if (badWords.isEmpty()) {
-			addBadWords();
-		}
-
-		return badWords;
-	}
-
-	protected void addBadWords() {
-		badWords.addAll(Arrays.asList(javaScriptKeywords));
-		badWords.add("rule");
-		badWords.add("parserRule");
+	@Override
+	protected Set<String> getReservedWords() {
+		return reservedWords;
 	}
 
 	@Override
@@ -87,18 +70,8 @@ public class JavaScriptTarget extends Target {
 	}
 
 	@Override
-	public int getSerializedATNSegmentLimit() {
-		return 2 ^ 31;
-	}
-
-	@Override
 	public int getInlineTestSetWordSize() {
 		return 32;
-	}
-
-	@Override
-	protected boolean visibleGrammarSymbolCausesIssueInGeneratedCode(GrammarAST idNode) {
-		return getBadWords().contains(idNode.getText());
 	}
 
 	@Override
@@ -135,11 +108,5 @@ public class JavaScriptTarget extends Target {
 	@Override
 	public boolean supportsOverloadedMethods() {
 		return false;
-	}
-
-	@Override
-	protected void appendUnicodeEscapedCodePoint(int codePoint, StringBuilder sb) {
-		// JavaScript and Java share the same escaping style.
-		UnicodeEscapes.appendJavaStyleEscapedCodePoint(codePoint, sb);
 	}
 }

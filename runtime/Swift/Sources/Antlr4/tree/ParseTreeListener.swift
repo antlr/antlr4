@@ -17,7 +17,7 @@
 /// https://github.com/antlr/antlr4/issues/841
 /// 
 
-public protocol ParseTreeListener: class {
+public protocol ParseTreeListener: AnyObject {
     func visitTerminal(_ node: TerminalNode)
 
     func visitErrorNode(_ node: ErrorNode)

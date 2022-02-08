@@ -1,0 +1,24 @@
+[type]
+CompositeParser
+
+[grammar]
+grammar M;
+import S;
+s : a {<write("$a.text")>} ;
+B : 'b' ; // defines B from inherited token space
+WS : (' '|'\n') -> skip ;
+
+[slaveGrammar]
+parser grammar S;
+a : B {<write("\"S.a\"")>} ;
+
+[start]
+s
+
+[input]
+b
+
+[output]
+"""S.ab
+"""
+

@@ -47,7 +47,7 @@ TokenStartColumnEquals(i) ::= "tokenStartCharPositionInLine == <i>"
 
 ImportListener(X) ::= ""
 
-GetExpectedTokenNames() ::= "getExpectedTokens().toString(_tokenNames)"
+GetExpectedTokenNames() ::= "getExpectedTokens().toString(getVocabulary())"
 
 RuleInvocationStack() ::= "Arrays::listToString(getRuleInvocationStack(), \", \")"
 

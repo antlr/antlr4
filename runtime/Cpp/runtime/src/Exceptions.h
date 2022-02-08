@@ -16,7 +16,7 @@ namespace antlr4 {
   public:
     RuntimeException(const std::string &msg = "");
 
-    virtual const char* what() const NOEXCEPT override;
+    virtual const char* what() const noexcept override;
   };
 
   class ANTLR4CPP_PUBLIC IllegalStateException : public RuntimeException {
@@ -77,7 +77,7 @@ namespace antlr4 {
   public:
     IOException(const std::string &msg = "");
 
-    virtual const char* what() const NOEXCEPT override;
+    virtual const char* what() const noexcept override;
   };
 
   class ANTLR4CPP_PUBLIC CancellationException : public IllegalStateException {

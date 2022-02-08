@@ -1,0 +1,29 @@
+[type]
+Parser
+
+[grammar]
+grammar T;
+s : q=e {<writeln("$e.v")>};
+e returns [int v]
+  : a=e op='*' b=e {$v = $a.v * $b.v;}  # mult
+  | a=e '+' b=e {$v = $a.v + $b.v;}     # add
+  | INT{$v = $INT.int;}        # anInt
+  | '(' x=e ')' {$v = $x.v;}   # parens
+  | x=e '++'    {$v = $x.v+1;} # inc
+  | e '--'   # dec
+  | ID {$v = 3;}      # anID
+  ;
+ID : 'a'..'z'+ ;
+INT : '0'..'9'+ ;
+WS : (' '|'\n') -> skip ;
+
+[start]
+s
+
+[input]
+1+2*3
+
+[output]
+"""7
+"""
+

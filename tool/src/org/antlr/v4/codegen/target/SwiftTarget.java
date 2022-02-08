@@ -8,7 +8,6 @@ package org.antlr.v4.codegen.target;
 
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.codegen.Target;
-import org.antlr.v4.codegen.UnicodeEscapes;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNDeserializer;
@@ -58,13 +57,12 @@ import java.util.Map;
 import java.util.Set;
 
 public class SwiftTarget extends Target {
-
     /**
      * The Swift target can cache the code generation templates.
      */
     private static final ThreadLocal<STGroup> targetTemplates = new ThreadLocal<STGroup>();
 
-    protected static final String[] swiftKeywords = {
+    protected static final HashSet<String> reservedWords = new HashSet<>(Arrays.asList(
             "associatedtype", "class", "deinit", "enum", "extension", "func", "import", "init", "inout", "internal",
             "let", "operator", "private", "protocol", "public", "static", "struct", "subscript", "typealias", "var",
             "break", "case", "continue", "default", "defer", "do", "else", "fallthrough", "for", "guard", "if",
@@ -73,48 +71,28 @@ public class SwiftTarget extends Target {
             "true", "try", "__COLUMN__", "__FILE__", "__FUNCTION__","__LINE__", "#column", "#file", "#function", "#line", "_" , "#available", "#else", "#elseif", "#endif", "#if", "#selector",
             "associativity", "convenience", "dynamic", "didSet", "final", "get", "infix", "indirect", "lazy",
             "left", "mutating", "none", "nonmutating", "optional", "override", "postfix", "precedence",
-            "prefix", "Protocol", "required", "right", "set", "Type", "unowned", "weak", "willSet"
- };
+            "prefix", "Protocol", "required", "right", "set", "Type", "unowned", "weak", "willSet",
 
-    /** Avoid grammar symbols in this set to prevent conflicts in gen'd code. */
-    protected final Set<String> badWords = new HashSet<String>();
+             "rule", "parserRule"
+	));
 
     public String lexerAtnJSON = null;
     public String parserAtnJSON = null;
+
     public SwiftTarget(CodeGenerator gen) {
-        super(gen, "Swift");
+        super(gen);
     }
 
-    @Override
-    public String getVersion() {
-        return "4.9.3"; // Java and tool versions move in lock step
-    }
+	@Override
+	protected Set<String> getReservedWords() {
+		return reservedWords;
+	}
 
-    public Set<String> getBadWords() {
-        if (badWords.isEmpty()) {
-            addBadWords();
-        }
+	@Override
+	protected String escapeWord(String word) {
+		return "`" + word + "`";
+	}
 
-        return badWords;
-    }
-
-    protected void addBadWords() {
-        badWords.addAll(Arrays.asList(swiftKeywords));
-        badWords.add("rule");
-        badWords.add("parserRule");
-    }
-
-    @Override
-    public int getSerializedATNSegmentLimit() {
-        // 65535 is the class file format byte limit for a UTF-8 encoded string literal
-        // 3 is the maximum number of bytes it takes to encode a value in the range 0-0xFFFF
-        return 65535 / 3;
-    }
-
-    @Override
-    protected boolean visibleGrammarSymbolCausesIssueInGeneratedCode(GrammarAST idNode) {
-        return getBadWords().contains(idNode.getText());
-    }
     @Override
     protected void genFile(Grammar g,
                            ST outputFileST,
@@ -552,9 +530,4 @@ public class SwiftTarget extends Target {
         }
 
     }
-
-	@Override
-	protected void appendUnicodeEscapedCodePoint(int codePoint, StringBuilder sb) {
-		UnicodeEscapes.appendSwiftStyleEscapedCodePoint(codePoint, sb);
-	}
 }

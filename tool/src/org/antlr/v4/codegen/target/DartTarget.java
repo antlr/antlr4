@@ -6,10 +6,8 @@
 
 package org.antlr.v4.codegen.target;
 
-import org.antlr.v4.Tool;
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.codegen.Target;
-import org.antlr.v4.codegen.UnicodeEscapes;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.StringRenderer;
@@ -19,13 +17,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class DartTarget extends Target {
-
-	/**
-	 * The Java target can cache the code generation templates.
-	 */
-	private static final ThreadLocal<STGroup> targetTemplates = new ThreadLocal<STGroup>();
-
-	protected static final String[] javaKeywords = {
+	protected static final HashSet<String> reservedWords = new HashSet<>(Arrays.asList(
 		"abstract", "dynamic", "implements", "show",
 		"as", "else", "import", "static",
 		"assert", "enum", "in", "super",
@@ -41,51 +33,24 @@ public class DartTarget extends Target {
 		"default", "get", "rethrow", "while",
 		"deferred", "hide", "return", "with",
 		"do", "if", "set", "yield",
-	};
 
-	/// Avoid grammar symbols in this set to prevent conflicts in gen'd code.
-	protected final Set<String> badWords = new HashSet<String>();
+		"rule", "parserRule"
+	));
 
 	public DartTarget(CodeGenerator gen) {
-		super(gen, "Dart");
+		super(gen);
 
 		targetCharValueEscape['$'] = "\\$";
 	}
 
 	@Override
-	public String getTargetStringLiteralFromANTLRStringLiteral(CodeGenerator generator, String literal, boolean addQuotes) {
-		return super.getTargetStringLiteralFromANTLRStringLiteral(generator, literal, addQuotes).replace("$", "\\$");
+	public String getTargetStringLiteralFromANTLRStringLiteral(CodeGenerator generator, String literal, boolean addQuotes,
+															   boolean escapeSpecial) {
+		return super.getTargetStringLiteralFromANTLRStringLiteral(generator, literal, addQuotes, escapeSpecial).replace("$", "\\$");
 	}
 
-	@Override
-	public String getVersion() {
-		return Tool.VERSION; // Java and tool versions move in lock step
-	}
-
-	public Set<String> getBadWords() {
-		if (badWords.isEmpty()) {
-			addBadWords();
-		}
-
-		return badWords;
-	}
-
-	protected void addBadWords() {
-		badWords.addAll(Arrays.asList(javaKeywords));
-		badWords.add("rule");
-		badWords.add("parserRule");
-	}
-
-	@Override
-	public int getSerializedATNSegmentLimit() {
-		// 65535 is the class file format byte limit for a UTF-8 encoded string literal
-		// 3 is the maximum number of bytes it takes to encode a value in the range 0-0xFFFF
-		return 65535 / 3;
-	}
-
-	@Override
-	protected boolean visibleGrammarSymbolCausesIssueInGeneratedCode(GrammarAST idNode) {
-		return getBadWords().contains(idNode.getText());
+	public Set<String> getReservedWords() {
+		return reservedWords;
 	}
 
 	@Override
@@ -103,10 +68,5 @@ public class DartTarget extends Target {
 		}
 
 		return String.format("\\u{%X}", v & 0xFFFF);
-	}
-
-	@Override
-	protected void appendUnicodeEscapedCodePoint(int codePoint, StringBuilder sb) {
-		UnicodeEscapes.appendJavaStyleEscapedCodePoint(codePoint, sb);
 	}
 }

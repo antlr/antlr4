@@ -89,17 +89,19 @@ public class ActionTranslator implements ActionSplitterListener {
 		tokenPropToModelMap.put("int",   TokenPropertyRef_int.class);
 	}
 
-	CodeGenerator gen;
-	ActionAST node;
+	final CodeGenerator gen;
+	final Target target;
+	final ActionAST node;
 	RuleFunction rf;
-	List<ActionChunk> chunks = new ArrayList<ActionChunk>();
-	OutputModelFactory factory;
+	final List<ActionChunk> chunks = new ArrayList<ActionChunk>();
+	final OutputModelFactory factory;
 	StructDecl nodeContext;
 
 	public ActionTranslator(OutputModelFactory factory, ActionAST node) {
 		this.factory = factory;
 		this.node = node;
 		this.gen = factory.getGenerator();
+		this.target = gen.getTarget();
 	}
 
 	public static String toString(List<ActionChunk> chunks) {
@@ -151,29 +153,44 @@ public class ActionTranslator implements ActionSplitterListener {
 	public void attr(String expr, Token x) {
 		gen.g.tool.log("action-translator", "attr "+x);
 		Attribute a = node.resolver.resolveToAttribute(x.getText(), node);
+		String name = x.getText();
+		String escapedName = target.escapeIfNeeded(name);
 		if ( a!=null ) {
 			switch ( a.dict.type ) {
-				case ARG: chunks.add(new ArgRef(nodeContext,x.getText())); break;
-				case RET: chunks.add(new RetValueRef(rf.ruleCtx, x.getText())); break;
-				case LOCAL: chunks.add(new LocalRef(nodeContext,x.getText())); break;
-				case PREDEFINED_RULE: chunks.add(getRulePropertyRef(x));	break;
+				case ARG:
+					chunks.add(new ArgRef(nodeContext, name, escapedName));
+					break;
+				case RET:
+					chunks.add(new RetValueRef(rf.ruleCtx, name, escapedName));
+					break;
+				case LOCAL:
+					chunks.add(new LocalRef(nodeContext, name, escapedName));
+					break;
+				case PREDEFINED_RULE:
+					chunks.add(getRulePropertyRef(null, x));
+					break;
+				default:
+					break;
 			}
 		}
-		if ( node.resolver.resolvesToToken(x.getText(), node) ) {
-			chunks.add(new TokenRef(nodeContext,getTokenLabel(x.getText()))); // $label
+		if ( node.resolver.resolvesToToken(name, node) ) {
+			String tokenLabel = getTokenLabel(name);
+			chunks.add(new TokenRef(nodeContext, tokenLabel, target.escapeIfNeeded(tokenLabel))); // $label
 			return;
 		}
-		if ( node.resolver.resolvesToLabel(x.getText(), node) ) {
-			chunks.add(new LabelRef(nodeContext,getTokenLabel(x.getText()))); // $x for x=ID etc...
+		if ( node.resolver.resolvesToLabel(name, node) ) {
+			String tokenLabel = getTokenLabel(name);
+			chunks.add(new LabelRef(nodeContext, tokenLabel, target.escapeIfNeeded(tokenLabel))); // $x for x=ID etc...
 			return;
 		}
-		if ( node.resolver.resolvesToListLabel(x.getText(), node) ) {
-			chunks.add(new ListLabelRef(nodeContext,x.getText())); // $ids for ids+=ID etc...
+		if ( node.resolver.resolvesToListLabel(name, node) ) {
+			chunks.add(new ListLabelRef(nodeContext, name, escapedName)); // $ids for ids+=ID etc...
 			return;
 		}
-		Rule r = factory.getGrammar().getRule(x.getText());
+		Rule r = factory.getGrammar().getRule(name);
 		if ( r!=null ) {
-			chunks.add(new LabelRef(nodeContext,getRuleLabel(x.getText()))); // $r for r rule ref
+			String ruleLabel = getRuleLabel(name);
+			chunks.add(new LabelRef(nodeContext, ruleLabel, target.escapeIfNeeded(ruleLabel))); // $r for r rule ref
 		}
 	}
 
@@ -196,15 +213,17 @@ public class ActionTranslator implements ActionSplitterListener {
 			return;
 		}
 		switch ( a.dict.type ) {
-			case ARG: chunks.add(new ArgRef(nodeContext,y.getText())); break; // has to be current rule
+			case ARG: chunks.add(new ArgRef(nodeContext, y.getText(), target.escapeIfNeeded(y.getText()))); break; // has to be current rule
 			case RET:
-				chunks.add(new QRetValueRef(nodeContext, getRuleLabel(x.getText()), y.getText()));
+				chunks.add(new QRetValueRef(nodeContext, getRuleLabel(x.getText()), y.getText(), target.escapeIfNeeded(y.getText())));
 				break;
 			case PREDEFINED_RULE:
 				chunks.add(getRulePropertyRef(x, y));
 				break;
 			case TOKEN:
 				chunks.add(getTokenPropertyRef(x, y));
+				break;
+			default:
 				break;
 		}
 	}
@@ -213,7 +232,8 @@ public class ActionTranslator implements ActionSplitterListener {
 	public void setAttr(String expr, Token x, Token rhs) {
 		gen.g.tool.log("action-translator", "setAttr "+x+" "+rhs);
 		List<ActionChunk> rhsChunks = translateActionChunk(factory,rf,rhs.getText(),node);
-		SetAttr s = new SetAttr(nodeContext, x.getText(), rhsChunks);
+		String name = x.getText();
+		SetAttr s = new SetAttr(nodeContext, name, target.escapeIfNeeded(name), rhsChunks);
 		chunks.add(s);
 	}
 
@@ -221,7 +241,8 @@ public class ActionTranslator implements ActionSplitterListener {
 	public void nonLocalAttr(String expr, Token x, Token y) {
 		gen.g.tool.log("action-translator", "nonLocalAttr "+x+"::"+y);
 		Rule r = factory.getGrammar().getRule(x.getText());
-		chunks.add(new NonLocalAttrRef(nodeContext, x.getText(), y.getText(), r.index));
+		String name = y.getText();
+		chunks.add(new NonLocalAttrRef(nodeContext, x.getText(), name, target.escapeIfNeeded(name), r.index));
 	}
 
 	@Override
@@ -229,7 +250,8 @@ public class ActionTranslator implements ActionSplitterListener {
 		gen.g.tool.log("action-translator", "setNonLocalAttr "+x+"::"+y+"="+rhs);
 		Rule r = factory.getGrammar().getRule(x.getText());
 		List<ActionChunk> rhsChunks = translateActionChunk(factory,rf,rhs.getText(),node);
-		SetNonLocalAttr s = new SetNonLocalAttr(nodeContext, x.getText(), y.getText(), r.index, rhsChunks);
+		String name = y.getText();
+		SetNonLocalAttr s = new SetNonLocalAttr(nodeContext, x.getText(), name, target.escapeIfNeeded(name), r.index, rhsChunks);
 		chunks.add(s);
 	}
 
@@ -242,24 +264,7 @@ public class ActionTranslator implements ActionSplitterListener {
 		try {
 			Class<? extends TokenPropertyRef> c = tokenPropToModelMap.get(y.getText());
 			Constructor<? extends TokenPropertyRef> ctor = c.getConstructor(StructDecl.class, String.class);
-			TokenPropertyRef ref =
-				ctor.newInstance(nodeContext, getTokenLabel(x.getText()));
-			return ref;
-		}
-		catch (Exception e) {
-			factory.getGrammar().tool.errMgr.toolError(ErrorType.INTERNAL_ERROR, e);
-		}
-		return null;
-	}
-
-	// $text
-	RulePropertyRef getRulePropertyRef(Token prop) {
-		try {
-			Class<? extends RulePropertyRef> c = thisRulePropToModelMap.get(prop.getText());
-			Constructor<? extends RulePropertyRef> ctor = c.getConstructor(StructDecl.class, String.class);
-			RulePropertyRef ref =
-				ctor.newInstance(nodeContext, getRuleLabel(prop.getText()));
-			return ref;
+			return ctor.newInstance(nodeContext, getTokenLabel(x.getText()));
 		}
 		catch (Exception e) {
 			factory.getGrammar().tool.errMgr.toolError(ErrorType.INTERNAL_ERROR, e);
@@ -268,28 +273,24 @@ public class ActionTranslator implements ActionSplitterListener {
 	}
 
 	RulePropertyRef getRulePropertyRef(Token x, Token prop) {
-		Grammar g = factory.getGrammar();
 		try {
-			Class<? extends RulePropertyRef> c = rulePropToModelMap.get(prop.getText());
+			Class<? extends RulePropertyRef> c = (x != null ? rulePropToModelMap : thisRulePropToModelMap).get(prop.getText());
 			Constructor<? extends RulePropertyRef> ctor = c.getConstructor(StructDecl.class, String.class);
-			RulePropertyRef ref =
-				ctor.newInstance(nodeContext, getRuleLabel(x.getText()));
-			return ref;
+			return ctor.newInstance(nodeContext, getRuleLabel((x != null ? x : prop).getText()));
 		}
 		catch (Exception e) {
-			g.tool.errMgr.toolError(ErrorType.INTERNAL_ERROR, e, prop.getText());
+			factory.getGrammar().tool.errMgr.toolError(ErrorType.INTERNAL_ERROR, e, prop.getText());
 		}
 		return null;
 	}
 
 	public String getTokenLabel(String x) {
 		if ( node.resolver.resolvesToLabel(x, node) ) return x;
-		return factory.getGenerator().getTarget().getImplicitTokenLabel(x);
+		return target.getImplicitTokenLabel(x);
 	}
 
 	public String getRuleLabel(String x) {
 		if ( node.resolver.resolvesToLabel(x, node) ) return x;
-		return factory.getGenerator().getTarget().getImplicitRuleLabel(x);
+		return target.getImplicitRuleLabel(x);
 	}
-
 }

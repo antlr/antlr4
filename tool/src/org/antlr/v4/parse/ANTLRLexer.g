@@ -163,14 +163,26 @@ import org.antlr.v4.runtime.misc.Interval;
 	 *  Return token or null if for some reason we can't find the start.
 	 */
 	public Token getRuleOrSubruleStartToken() {
-	    if ( tokens==null ) return null;
+		if (tokens == null) return null;
 		int i = tokens.index();
-        int n = tokens.size();
-        if ( i>=n ) i = n-1; // seems index == n as we lex
-		while ( i>=0 && i<n) {
+		int n = tokens.size();
+		if (i >= n) i = n - 1; // seems index == n as we lex
+		boolean withinOptionsBlock = false;
+		while (i >= 0 && i < n) {
 			int ttype = tokens.get(i).getType();
-			if ( ttype == LPAREN || ttype == TOKEN_REF || ttype == RULE_REF ) {
-				return tokens.get(i);
+			if (withinOptionsBlock) {
+				// Ignore rule options content
+				if (ttype == OPTIONS) {
+					withinOptionsBlock = false;
+				}
+			}
+			else {
+				if (ttype == RBRACE) {
+					withinOptionsBlock = true;
+				}
+				else if (ttype == LPAREN || ttype == TOKEN_REF || ttype == RULE_REF) {
+					return tokens.get(i);
+				}
 			}
 			i--;
 		}
@@ -446,7 +458,6 @@ FRAGMENT     : 'fragment'             ;
 LEXER        : 'lexer'                ;
 PARSER       : 'parser'               ;
 GRAMMAR      : 'grammar'              ;
-TREE_GRAMMAR : 'tree' WSNLCHARS* 'grammar' ;
 PROTECTED    : 'protected'            ;
 PUBLIC       : 'public'               ;
 PRIVATE      : 'private'              ;

@@ -1,0 +1,29 @@
+[type]
+Lexer
+
+[grammar]
+lexer grammar L;
+WORD1 : ID1+ { <Text():writeln()> } ;
+WORD2 : ID2+ { <Text():writeln()> } ;
+fragment ID1 : { <Column()> \< 2 }? [a-zA-Z];
+fragment ID2 : { <Column()> >= 2 }? [a-zA-Z];
+WS : (' '|'\n') -> skip;
+
+[input]
+a cde
+abcde
+
+[output]
+a
+cde
+ab
+cde
+[@0,0:0='a',<1>,1:0]
+[@1,2:4='cde',<2>,1:2]
+[@2,6:7='ab',<1>,2:0]
+[@3,8:10='cde',<2>,2:2]
+[@4,12:11='<EOF>',<-1>,3:0]
+
+[flags]
+showDFA
+

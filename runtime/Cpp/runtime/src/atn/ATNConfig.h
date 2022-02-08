@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "antlr4-common.h"
+
 namespace antlr4 {
 namespace atn {
 
@@ -114,13 +116,7 @@ namespace atn {
      * {@link #isPrecedenceFilterSuppressed} property as a bit within the
      * existing {@link #reachesIntoOuterContext} field.
      */
-#if __cplusplus >= 201703L
     static constexpr size_t SUPPRESS_PRECEDENCE_FILTER = 0x40000000;
-#else
-    enum : size_t {
-      SUPPRESS_PRECEDENCE_FILTER = 0x40000000,
-    };
-#endif
   };
 
 } // namespace atn

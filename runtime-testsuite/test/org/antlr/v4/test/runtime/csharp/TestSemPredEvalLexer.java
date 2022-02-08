@@ -8,13 +8,9 @@ package org.antlr.v4.test.runtime.csharp;
 
 import org.antlr.v4.test.runtime.BaseRuntimeTest;
 import org.antlr.v4.test.runtime.RuntimeTestDescriptor;
-import org.antlr.v4.test.runtime.category.LexerTests;
-import org.antlr.v4.test.runtime.descriptors.SemPredEvalLexerDescriptors;
-import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-@Category(LexerTests.class)
 @RunWith(Parameterized.class)
 public class TestSemPredEvalLexer extends BaseRuntimeTest {
 	public TestSemPredEvalLexer(RuntimeTestDescriptor descriptor) {
@@ -23,6 +19,6 @@ public class TestSemPredEvalLexer extends BaseRuntimeTest {
 
 	@Parameterized.Parameters(name="{0}")
 	public static RuntimeTestDescriptor[] getAllTestDescriptors() {
-		return BaseRuntimeTest.getRuntimeTestDescriptors(SemPredEvalLexerDescriptors.class, "CSharp");
+		return BaseRuntimeTest.getRuntimeTestDescriptors("SemPredEvalLexer", "CSharp");
 	}
 }

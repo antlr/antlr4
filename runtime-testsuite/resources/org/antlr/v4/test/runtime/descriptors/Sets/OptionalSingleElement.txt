@@ -1,0 +1,18 @@
+[type]
+Parser
+
+[grammar]
+grammar T;
+a : A? 'c' {<InputText():writeln()>} ;
+A : 'b' ;
+
+[start]
+a
+
+[input]
+bc
+
+[output]
+"""bc
+"""
+

@@ -44,7 +44,11 @@ public class StructDecl extends Decl {
 	public OrderedHashSet<Decl> attributeDecls = new OrderedHashSet<Decl>();
 
 	public StructDecl(OutputModelFactory factory, Rule r) {
-		super(factory, factory.getGenerator().getTarget().getRuleFunctionContextStructName(r));
+		this(factory, r, null);
+	}
+
+	protected StructDecl(OutputModelFactory factory, Rule r, String name) {
+		super(factory, name == null ? factory.getGenerator().getTarget().getRuleFunctionContextStructName(r) : name);
 		addDispatchMethods(r);
 		derivedFromName = r.name;
 		provideCopyFrom = r.hasAltSpecificContexts();

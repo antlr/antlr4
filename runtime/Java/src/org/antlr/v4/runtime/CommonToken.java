@@ -261,8 +261,7 @@ public class CommonToken implements WritableToken, Serializable {
 		return toString(null);
 	}
 
-	public String toString(Recognizer r) {
-
+	public String toString(Recognizer<?, ?> r) {
 		String channelStr = "";
 		if ( channel>0 ) {
 			channelStr=",channel="+channel;

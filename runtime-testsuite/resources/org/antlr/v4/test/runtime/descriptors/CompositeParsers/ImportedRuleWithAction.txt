@@ -1,0 +1,20 @@
+[type]
+CompositeParser
+
+[grammar]
+grammar M;
+import S;
+s : a;
+B : 'b';
+WS : (' '|'\n') -> skip ;
+
+[slaveGrammar]
+parser grammar S;
+a @after {<InitIntVar("x","0")>} : B;
+
+[start]
+s
+
+[input]
+b
+

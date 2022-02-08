@@ -1,0 +1,32 @@
+[type]
+Parser
+
+[grammar]
+grammar T;
+s
+@init {
+<BuildParseTrees()>
+}
+@after {
+<ToStringTree("$r.ctx"):writeln()>
+}
+  : r=a ;
+a : 'x' | 'y'
+  ;
+Z : 'z'
+  ;
+
+[start]
+s
+
+[input]
+z
+
+[output]
+"""(a z)
+"""
+
+[errors]
+"""line 1:0 mismatched input 'z' expecting {'x', 'y'}
+"""
+

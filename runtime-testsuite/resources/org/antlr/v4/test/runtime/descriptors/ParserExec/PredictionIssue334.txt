@@ -1,0 +1,32 @@
+[notes]
+This is a regression test for antlr/antlr4#334 "BailErrorStrategy: bails
+on proper input".  https://github.com/antlr/antlr4/issues/334
+
+[type]
+Parser
+
+[grammar]
+grammar T;
+file_ @init{
+<BailErrorStrategy()>
+}
+@after {
+<ToStringTree("$ctx"):writeln()>
+}
+  :   item (SEMICOLON item)* SEMICOLON? EOF ;
+item : A B?;
+SEMICOLON: ';';
+A : 'a'|'A';
+B : 'b'|'B';
+WS      : [ \r\t\n]+ -> skip;
+
+[start]
+file_
+
+[input]
+a
+
+[output]
+"""(file_ (item a) <EOF>)
+"""
+
