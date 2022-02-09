@@ -7,6 +7,6 @@
 4. [Run the ANTLR project unit tests](doc/antlr-project-testing.md)
 5. Create a [pull request](https://help.github.com/articles/using-pull-requests/) with your changes and make sure you're comparing the `dev` branch in your fork to the `dev` branch from the `antlr/antlr4` repo:
 
-<img src="images/PR-on-dev.png" width="600">
+<img src="doc/images/PR-on-dev.png" width="600">
 
 **Note:** You must sign the `contributors.txt` certificate of origin with your pull request if you've not done so before.
