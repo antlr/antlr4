@@ -7,6 +7,6 @@
 
 using namespace antlr4::atn;
 
-size_t PlusLoopbackState::getStateType() {
+ATNStateType PlusLoopbackState::getStateType() const {
   return PLUS_LOOP_BACK;
 }

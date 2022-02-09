@@ -13,7 +13,7 @@
 using namespace antlr4::dfa;
 using namespace antlr4::atn;
 
-DFAState::PredPrediction::PredPrediction(Ref<SemanticContext> pred, int alt) : pred(std::move(pred)), alt(alt) {}
+DFAState::PredPrediction::PredPrediction(Ref<const SemanticContext> pred, int alt) : pred(std::move(pred)), alt(alt) {}
 
 std::string DFAState::PredPrediction::toString() const {
   return std::string("(") + pred->toString() + ", " + std::to_string(alt) + ")";

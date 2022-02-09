@@ -11,38 +11,40 @@
 
 using namespace antlr4::atn;
 
-ATNConfig::ATNConfig(ATNState *state_, size_t alt, Ref<PredictionContext> context)
-  : ATNConfig(state_, alt, std::move(context), SemanticContext::NONE) {
+namespace {
+
+/**
+ * This field stores the bit mask for implementing the
+ * {@link #isPrecedenceFilterSuppressed} property as a bit within the
+ * existing {@link #reachesIntoOuterContext} field.
+ */
+inline constexpr size_t SUPPRESS_PRECEDENCE_FILTER = 0x40000000;
+
 }
 
-ATNConfig::ATNConfig(ATNState *state, size_t alt, Ref<PredictionContext> context, Ref<SemanticContext> semanticContext)
-  : state(state), alt(alt), context(std::move(context)), semanticContext(std::move(semanticContext)) {
-  reachesIntoOuterContext = 0;
-}
+ATNConfig::ATNConfig(ATNState *state, size_t alt, Ref<const PredictionContext> context)
+    : ATNConfig(state, alt, std::move(context), 0, SemanticContext::NONE) {}
 
-ATNConfig::ATNConfig(Ref<ATNConfig> const& c) : ATNConfig(c, c->state, c->context, c->semanticContext) {
-}
+ATNConfig::ATNConfig(ATNState *state, size_t alt, Ref<const PredictionContext> context, Ref<const SemanticContext> semanticContext)
+    : ATNConfig(state, alt, std::move(context), 0, std::move(semanticContext)) {}
 
-ATNConfig::ATNConfig(Ref<ATNConfig> const& c, ATNState *state_) : ATNConfig(c, state_, c->context, c->semanticContext) {
-}
+ATNConfig::ATNConfig(ATNConfig const& other, Ref<const SemanticContext> semanticContext)
+    : ATNConfig(other.state, other.alt, other.context, other.reachesIntoOuterContext, std::move(semanticContext)) {}
 
-ATNConfig::ATNConfig(Ref<ATNConfig> const& c, ATNState *state, Ref<SemanticContext> semanticContext)
-  : ATNConfig(c, state, c->context, std::move(semanticContext)) {
-}
+ATNConfig::ATNConfig(ATNConfig const& other, ATNState *state)
+    : ATNConfig(state, other.alt, other.context, other.reachesIntoOuterContext, other.semanticContext) {}
 
-ATNConfig::ATNConfig(Ref<ATNConfig> const& c, Ref<SemanticContext> semanticContext)
-  : ATNConfig(c, c->state, c->context, std::move(semanticContext)) {
-}
+ATNConfig::ATNConfig(ATNConfig const& other, ATNState *state, Ref<const SemanticContext> semanticContext)
+    : ATNConfig(state, other.alt, other.context, other.reachesIntoOuterContext, std::move(semanticContext)) {}
 
-ATNConfig::ATNConfig(Ref<ATNConfig> const& c, ATNState *state, Ref<PredictionContext> context)
-  : ATNConfig(c, state, std::move(context), c->semanticContext) {
-}
+ATNConfig::ATNConfig(ATNConfig const& other, ATNState *state, Ref<const PredictionContext> context)
+    : ATNConfig(state, other.alt, std::move(context), other.reachesIntoOuterContext, other.semanticContext) {}
 
-ATNConfig::ATNConfig(Ref<ATNConfig> const& c, ATNState *state, Ref<PredictionContext> context,
-                     Ref<SemanticContext> semanticContext)
-  : state(state), alt(c->alt), context(std::move(context)), reachesIntoOuterContext(c->reachesIntoOuterContext),
-    semanticContext(std::move(semanticContext)) {
-}
+ATNConfig::ATNConfig(ATNConfig const& other, ATNState *state, Ref<const PredictionContext> context, Ref<const SemanticContext> semanticContext)
+    : ATNConfig(state, other.alt, std::move(context), other.reachesIntoOuterContext, std::move(semanticContext)) {}
+
+ATNConfig::ATNConfig(ATNState *state, size_t alt, Ref<const PredictionContext> context, size_t reachesIntoOuterContext, Ref<const SemanticContext> semanticContext)
+    : state(state), alt(alt), context(std::move(context)), reachesIntoOuterContext(reachesIntoOuterContext), semanticContext(std::move(semanticContext)) {}
 
 size_t ATNConfig::hashCode() const {
   size_t hashCode = misc::MurmurHash::initialize(7);
@@ -77,10 +79,6 @@ bool ATNConfig::operator==(const ATNConfig &other) const {
     isPrecedenceFilterSuppressed() == other.isPrecedenceFilterSuppressed();
 }
 
-bool ATNConfig::operator!=(const ATNConfig &other) const {
-  return !operator==(other);
-}
-
 std::string ATNConfig::toString() const {
   return toString(true);
 }
@@ -97,12 +95,12 @@ std::string ATNConfig::toString(bool showAlt) const {
     ss << ",[" << context->toString() << "]";
   }
   if (semanticContext != nullptr && semanticContext != SemanticContext::NONE) {
-    ss << "," << semanticContext.get();
+    ss << ",[" << semanticContext->toString() << "]";
   }
   if (getOuterContextDepth() > 0) {
     ss << ",up=" << getOuterContextDepth();
   }
-  ss << ')';
+  ss << ")";
 
   return ss.str();
 }

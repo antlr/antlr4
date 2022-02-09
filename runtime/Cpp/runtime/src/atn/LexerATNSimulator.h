@@ -138,7 +138,7 @@ namespace atn {
     virtual void accept(CharStream *input, const Ref<LexerActionExecutor> &lexerActionExecutor, size_t startIndex, size_t index,
                         size_t line, size_t charPos);
 
-    virtual ATNState *getReachableTarget(Transition *trans, size_t t);
+    virtual ATNState *getReachableTarget(const Transition *trans, size_t t);
 
     virtual std::unique_ptr<ATNConfigSet> computeStartState(CharStream *input, ATNState *p);
 
@@ -155,7 +155,7 @@ namespace atn {
                          bool currentAltReachedAcceptState, bool speculative, bool treatEofAsEpsilon);
 
     // side-effect: can alter configs.hasSemanticContext
-    virtual Ref<LexerATNConfig> getEpsilonTarget(CharStream *input, const Ref<LexerATNConfig> &config, Transition *t,
+    virtual Ref<LexerATNConfig> getEpsilonTarget(CharStream *input, const Ref<LexerATNConfig> &config, const Transition *t,
       ATNConfigSet *configs, bool speculative, bool treatEofAsEpsilon);
 
     /// <summary>

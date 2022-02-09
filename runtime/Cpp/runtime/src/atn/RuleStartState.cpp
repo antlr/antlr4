@@ -7,6 +7,6 @@
 
 using namespace antlr4::atn;
 
-size_t RuleStartState::getStateType() {
+ATNStateType RuleStartState::getStateType() const {
   return RULE_START;
 }

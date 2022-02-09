@@ -39,10 +39,10 @@ namespace dfa {
   public:
     class PredPrediction final {
     public:
-      Ref<atn::SemanticContext> pred; // never null; at least SemanticContext.NONE
+      Ref<const atn::SemanticContext> pred; // never null; at least SemanticContext.NONE
       int alt;
 
-      PredPrediction(Ref<atn::SemanticContext> pred, int alt);
+      PredPrediction(Ref<const atn::SemanticContext> pred, int alt);
 
       std::string toString() const;
     };

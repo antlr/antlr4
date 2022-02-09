@@ -7,6 +7,6 @@
 
 using namespace antlr4::atn;
 
-size_t StarLoopEntryState::getStateType() {
+ATNStateType StarLoopEntryState::getStateType() const {
   return STAR_LOOP_ENTRY;
 }
