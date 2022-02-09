@@ -106,10 +106,10 @@ std::vector<size_t> ATNSerializer::serialize() {
     }
 
     for (size_t i = 0; i < s->transitions.size(); i++) {
-      Transition *t = s->transitions[i];
+      const Transition *t = s->transitions[i].get();
       Transition::SerializationType edgeType = t->getSerializationType();
       if (edgeType == Transition::SET || edgeType == Transition::NOT_SET) {
-        SetTransition *st = static_cast<SetTransition *>(t);
+        const SetTransition *st = static_cast<const SetTransition *>(t);
         if (setIndices.find(st->set) == setIndices.end()) {
           sets.push_back(st->set);
           setIndices.insert({ st->set, (int)sets.size() - 1 });
@@ -193,7 +193,7 @@ std::vector<size_t> ATNSerializer::serialize() {
     }
 
     for (size_t i = 0; i < s->transitions.size(); i++) {
-      Transition *t = s->transitions[i];
+      const Transition *t = s->transitions[i].get();
 
       if (atn->states[t->target->stateNumber] == nullptr) {
         throw IllegalStateException("Cannot serialize a transition to a removed state.");
@@ -207,29 +207,29 @@ std::vector<size_t> ATNSerializer::serialize() {
       size_t arg3 = 0;
       switch (edgeType) {
         case Transition::RULE:
-          trg = (static_cast<RuleTransition *>(t))->followState->stateNumber;
-          arg1 = (static_cast<RuleTransition *>(t))->target->stateNumber;
-          arg2 = (static_cast<RuleTransition *>(t))->ruleIndex;
-          arg3 = (static_cast<RuleTransition *>(t))->precedence;
+          trg = (static_cast<const RuleTransition *>(t))->followState->stateNumber;
+          arg1 = (static_cast<const RuleTransition *>(t))->target->stateNumber;
+          arg2 = (static_cast<const RuleTransition *>(t))->ruleIndex;
+          arg3 = (static_cast<const RuleTransition *>(t))->precedence;
           break;
         case Transition::PRECEDENCE:
         {
-          PrecedencePredicateTransition *ppt =
-          static_cast<PrecedencePredicateTransition *>(t);
+          const PrecedencePredicateTransition *ppt =
+          static_cast<const PrecedencePredicateTransition *>(t);
           arg1 = ppt->precedence;
         }
           break;
         case Transition::PREDICATE:
         {
-          PredicateTransition *pt = static_cast<PredicateTransition *>(t);
+          const PredicateTransition *pt = static_cast<const PredicateTransition *>(t);
           arg1 = pt->ruleIndex;
           arg2 = pt->predIndex;
           arg3 = pt->isCtxDependent ? 1 : 0;
         }
           break;
         case Transition::RANGE:
-          arg1 = (static_cast<RangeTransition *>(t))->from;
-          arg2 = (static_cast<RangeTransition *>(t))->to;
+          arg1 = (static_cast<const RangeTransition *>(t))->from;
+          arg2 = (static_cast<const RangeTransition *>(t))->to;
           if (arg1 == Token::EOF) {
             arg1 = 0;
             arg3 = 1;
@@ -237,7 +237,7 @@ std::vector<size_t> ATNSerializer::serialize() {
 
           break;
         case Transition::ATOM:
-          arg1 = (static_cast<AtomTransition *>(t))->_label;
+          arg1 = (static_cast<const AtomTransition *>(t))->_label;
           if (arg1 == Token::EOF) {
             arg1 = 0;
             arg3 = 1;
@@ -246,7 +246,7 @@ std::vector<size_t> ATNSerializer::serialize() {
           break;
         case Transition::ACTION:
         {
-          ActionTransition *at = static_cast<ActionTransition *>(t);
+          const ActionTransition *at = static_cast<const ActionTransition *>(t);
           arg1 = at->ruleIndex;
           arg2 = at->actionIndex;
           if (arg2 == INVALID_INDEX) {
@@ -257,11 +257,11 @@ std::vector<size_t> ATNSerializer::serialize() {
         }
           break;
         case Transition::SET:
-          arg1 = setIndices[(static_cast<SetTransition *>(t))->set];
+          arg1 = setIndices[(static_cast<const SetTransition *>(t))->set];
           break;
 
         case Transition::NOT_SET:
-          arg1 = setIndices[(static_cast<SetTransition *>(t))->set];
+          arg1 = setIndices[(static_cast<const SetTransition *>(t))->set];
           break;
 
         default:

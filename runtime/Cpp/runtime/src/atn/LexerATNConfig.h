@@ -10,21 +10,21 @@
 namespace antlr4 {
 namespace atn {
 
-  class ANTLR4CPP_PUBLIC LexerATNConfig : public ATNConfig {
+  class ANTLR4CPP_PUBLIC LexerATNConfig final : public ATNConfig {
   public:
-    LexerATNConfig(ATNState *state, int alt, Ref<PredictionContext> context);
-    LexerATNConfig(ATNState *state, int alt, Ref<PredictionContext> context, Ref<LexerActionExecutor> lexerActionExecutor);
+    LexerATNConfig(ATNState *state, int alt, Ref<const PredictionContext> context);
+    LexerATNConfig(ATNState *state, int alt, Ref<const PredictionContext> context, Ref<LexerActionExecutor> lexerActionExecutor);
 
-    LexerATNConfig(Ref<LexerATNConfig> const& c, ATNState *state);
-    LexerATNConfig(Ref<LexerATNConfig> const& c, ATNState *state, Ref<LexerActionExecutor> lexerActionExecutor);
-    LexerATNConfig(Ref<LexerATNConfig> const& c, ATNState *state, Ref<PredictionContext> context);
+    LexerATNConfig(LexerATNConfig const& other, ATNState *state);
+    LexerATNConfig(LexerATNConfig const& other, ATNState *state, Ref<LexerActionExecutor> lexerActionExecutor);
+    LexerATNConfig(LexerATNConfig const& other, ATNState *state, Ref<const PredictionContext> context);
 
     /**
      * Gets the {@link LexerActionExecutor} capable of executing the embedded
      * action(s) for the current configuration.
      */
-    const Ref<LexerActionExecutor>& getLexerActionExecutor() const;
-    bool hasPassedThroughNonGreedyDecision() const;
+    const Ref<LexerActionExecutor>& getLexerActionExecutor() const { return _lexerActionExecutor; }
+    bool hasPassedThroughNonGreedyDecision() const { return _passedThroughNonGreedyDecision; }
 
     virtual size_t hashCode() const override;
 
@@ -35,9 +35,9 @@ namespace atn {
      * This is the backing field for {@link #getLexerActionExecutor}.
      */
     const Ref<LexerActionExecutor> _lexerActionExecutor;
-    const bool _passedThroughNonGreedyDecision;
+    const bool _passedThroughNonGreedyDecision = false;
 
-    static bool checkNonGreedyDecision(Ref<LexerATNConfig> const& source, ATNState *target);
+    static bool checkNonGreedyDecision(LexerATNConfig const& source, ATNState *target);
   };
 
 } // namespace atn

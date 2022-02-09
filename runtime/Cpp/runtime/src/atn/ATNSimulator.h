@@ -37,7 +37,7 @@ namespace atn {
      */
     virtual void clearDFA();
     virtual PredictionContextCache& getSharedContextCache();
-    virtual Ref<PredictionContext> getCachedContext(Ref<PredictionContext> const& context);
+    virtual Ref<const PredictionContext> getCachedContext(Ref<const PredictionContext> const& context);
 
     /// @deprecated Use <seealso cref="ATNDeserializer#deserialize"/> instead.
     static ATN deserialize(const std::vector<uint16_t> &data);
@@ -49,7 +49,7 @@ namespace atn {
     static void checkCondition(bool condition, const std::string &message);
 
     /// @deprecated Use <seealso cref="ATNDeserializer#edgeFactory"/> instead.
-    static Transition *edgeFactory(const ATN &atn, int type, int src, int trg, int arg1, int arg2, int arg3,
+    static ConstTransitionPtr edgeFactory(const ATN &atn, int type, int src, int trg, int arg1, int arg2, int arg3,
                                    const std::vector<misc::IntervalSet> &sets);
 
     /// @deprecated Use <seealso cref="ATNDeserializer#stateFactory"/> instead.

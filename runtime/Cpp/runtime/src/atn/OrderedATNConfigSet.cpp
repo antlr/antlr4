@@ -7,6 +7,10 @@
 
 using namespace antlr4::atn;
 
-size_t OrderedATNConfigSet::getHash(const ATNConfig *c) const {
-  return c->hashCode();
+size_t OrderedATNConfigSet::hashCode(const ATNConfig &atnConfig) const {
+  return atnConfig.hashCode();
+}
+
+bool OrderedATNConfigSet::equals(const ATNConfig &lhs, const ATNConfig &rhs) const {
+  return lhs == rhs;
 }

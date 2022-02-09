@@ -7,6 +7,6 @@
 
 using namespace antlr4::atn;
 
-size_t BlockEndState::getStateType() {
+ATNStateType BlockEndState::getStateType() const {
   return BLOCK_END;
 }

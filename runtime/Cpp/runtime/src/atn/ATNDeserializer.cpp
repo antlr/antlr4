@@ -250,21 +250,21 @@ ATN ATNDeserializer::deserialize(const std::vector<uint16_t>& data) {
       size_t arg1 = data[p + 3];
       size_t arg2 = data[p + 4];
       size_t arg3 = data[p + 5];
-      Transition *trans = edgeFactory(atn, ttype, src, trg, arg1, arg2, arg3, sets);
+      ConstTransitionPtr trans = edgeFactory(atn, ttype, src, trg, arg1, arg2, arg3, sets);
       ATNState *srcState = atn.states[src];
-      srcState->addTransition(trans);
+      srcState->addTransition(std::move(trans));
       p += 6;
     }
   }
   // edges for rule stop states can be derived, so they aren't serialized
   for (ATNState *state : atn.states) {
     for (size_t i = 0; i < state->transitions.size(); i++) {
-      Transition *t = state->transitions[i];
-      if (!is<RuleTransition*>(t)) {
+      const Transition *t = state->transitions[i].get();
+      if (!is<const RuleTransition*>(t)) {
         continue;
       }
 
-      RuleTransition *ruleTransition = downCast<RuleTransition*>(t);
+      const RuleTransition *ruleTransition = downCast<const RuleTransition*>(t);
       size_t outermostPrecedenceReturn = INVALID_INDEX;
       if (atn.ruleToStartState[ruleTransition->target->ruleIndex]->isLeftRecursiveRule) {
         if (ruleTransition->precedence == 0) {
@@ -272,8 +272,8 @@ ATN ATNDeserializer::deserialize(const std::vector<uint16_t>& data) {
         }
       }
 
-      EpsilonTransition *returnTransition = new EpsilonTransition(ruleTransition->followState, outermostPrecedenceReturn); /* mem check: freed in ANTState d-tor */
-      atn.ruleToStopState[ruleTransition->target->ruleIndex]->addTransition(returnTransition);
+      ConstTransitionPtr returnTransition = std::make_unique<EpsilonTransition>(ruleTransition->followState, outermostPrecedenceReturn);
+      atn.ruleToStopState[ruleTransition->target->ruleIndex]->addTransition(std::move(returnTransition));
     }
   }
 
@@ -376,7 +376,7 @@ ATN ATNDeserializer::deserialize(const std::vector<uint16_t>& data) {
       bypassStop->startState = bypassStart;
 
       ATNState *endState;
-      Transition *excludeTransition = nullptr;
+      const Transition *excludeTransition = nullptr;
       if (atn.ruleToStartState[i]->isLeftRecursiveRule) {
         // wrap from the beginning of the rule to the StarLoopEntryState
         endState = nullptr;
@@ -405,38 +405,38 @@ ATN ATNDeserializer::deserialize(const std::vector<uint16_t>& data) {
 
         }
 
-        excludeTransition = (static_cast<StarLoopEntryState*>(endState))->loopBackState->transitions[0];
+        excludeTransition = (static_cast<StarLoopEntryState*>(endState))->loopBackState->transitions[0].get();
       } else {
         endState = atn.ruleToStopState[i];
       }
 
       // all non-excluded transitions that currently target end state need to target blockEnd instead
       for (ATNState *state : atn.states) {
-        for (Transition *transition : state->transitions) {
-          if (transition == excludeTransition) {
+        for (auto &transition : state->transitions) {
+          if (transition.get() == excludeTransition) {
             continue;
           }
 
           if (transition->target == endState) {
-            transition->target = bypassStop;
+            const_cast<Transition*>(transition.get())->target = bypassStop;
           }
         }
       }
 
       // all transitions leaving the rule start state need to leave blockStart instead
       while (atn.ruleToStartState[i]->transitions.size() > 0) {
-        Transition *transition = atn.ruleToStartState[i]->removeTransition(atn.ruleToStartState[i]->transitions.size() - 1);
-        bypassStart->addTransition(transition);
+        ConstTransitionPtr transition = atn.ruleToStartState[i]->removeTransition(atn.ruleToStartState[i]->transitions.size() - 1);
+        bypassStart->addTransition(std::move(transition));
       }
 
       // link the new states
-      atn.ruleToStartState[i]->addTransition(new EpsilonTransition(bypassStart));  /* mem check: freed in ATNState d-tor */
-      bypassStop->addTransition(new EpsilonTransition(endState)); /* mem check: freed in ATNState d-tor */
+      atn.ruleToStartState[i]->addTransition(std::make_unique<EpsilonTransition>(bypassStart));
+      bypassStop->addTransition(std::make_unique<EpsilonTransition>(endState));
 
       ATNState *matchState = new BasicState(); /* mem check: freed in ATN d-tor */
       atn.addState(matchState);
-      matchState->addTransition(new AtomTransition(bypassStop, atn.ruleToTokenType[i])); /* mem check: freed in ATNState d-tor */
-      bypassStart->addTransition(new EpsilonTransition(matchState)); /* mem check: freed in ATNState d-tor */
+      matchState->addTransition(std::make_unique<AtomTransition>(bypassStop, atn.ruleToTokenType[i]));
+      bypassStart->addTransition(std::make_unique<EpsilonTransition>(matchState));
     }
 
     if (_deserializationOptions.isVerifyATN()) {
@@ -545,41 +545,40 @@ void ATNDeserializer::checkCondition(bool condition, const std::string &message)
   }
 }
 
-/* mem check: all created instances are freed in the d-tor of the ATNState they are added to. */
-Transition *ATNDeserializer::edgeFactory(const ATN &atn, size_t type, size_t /*src*/, size_t trg, size_t arg1,
+ConstTransitionPtr ATNDeserializer::edgeFactory(const ATN &atn, size_t type, size_t /*src*/, size_t trg, size_t arg1,
                                          size_t arg2, size_t arg3,
   const std::vector<misc::IntervalSet> &sets) {
 
   ATNState *target = atn.states[trg];
   switch (type) {
     case Transition::EPSILON:
-      return new EpsilonTransition(target);
+      return std::make_unique<EpsilonTransition>(target);
     case Transition::RANGE:
       if (arg3 != 0) {
-        return new RangeTransition(target, Token::EOF, arg2);
+        return std::make_unique<RangeTransition>(target, Token::EOF, arg2);
       } else {
-        return new RangeTransition(target, arg1, arg2);
+        return std::make_unique<RangeTransition>(target, arg1, arg2);
       }
     case Transition::RULE:
-      return new RuleTransition(downCast<RuleStartState*>(atn.states[arg1]), arg2, (int)arg3, target);
+      return std::make_unique<RuleTransition>(downCast<RuleStartState*>(atn.states[arg1]), arg2, (int)arg3, target);
     case Transition::PREDICATE:
-      return new PredicateTransition(target, arg1, arg2, arg3 != 0);
+      return std::make_unique<PredicateTransition>(target, arg1, arg2, arg3 != 0);
     case Transition::PRECEDENCE:
-      return new PrecedencePredicateTransition(target, (int)arg1);
+      return std::make_unique<PrecedencePredicateTransition>(target, (int)arg1);
     case Transition::ATOM:
       if (arg3 != 0) {
-        return new AtomTransition(target, Token::EOF);
+        return std::make_unique<AtomTransition>(target, Token::EOF);
       } else {
-        return new AtomTransition(target, arg1);
+        return std::make_unique<AtomTransition>(target, arg1);
       }
     case Transition::ACTION:
-      return new ActionTransition(target, arg1, arg2, arg3 != 0);
+      return std::make_unique<ActionTransition>(target, arg1, arg2, arg3 != 0);
     case Transition::SET:
-      return new SetTransition(target, sets[arg1]);
+      return std::make_unique<SetTransition>(target, sets[arg1]);
     case Transition::NOT_SET:
-      return new NotSetTransition(target, sets[arg1]);
+      return std::make_unique<NotSetTransition>(target, sets[arg1]);
     case Transition::WILDCARD:
-      return new WildcardTransition(target);
+      return std::make_unique<WildcardTransition>(target);
   }
 
   throw IllegalArgumentException("The specified transition type is not valid.");

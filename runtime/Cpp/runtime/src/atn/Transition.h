@@ -72,5 +72,7 @@ namespace atn {
     Transition& operator=(Transition const&) = delete;
   };
 
+  using ConstTransitionPtr = std::unique_ptr<const Transition>;
+
 } // namespace atn
 } // namespace antlr4

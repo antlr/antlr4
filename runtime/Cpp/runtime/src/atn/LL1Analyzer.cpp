@@ -69,7 +69,7 @@ namespace {
     /// <param name="addEOF"> Add <seealso cref="Token#EOF"/> to the result if the end of the
     /// outermost context is reached. This parameter has no effect if {@code ctx}
     /// is {@code null}. </param>
-    void LOOK(ATNState *s, ATNState *stopState, Ref<PredictionContext> const& ctx) {
+    void LOOK(ATNState *s, ATNState *stopState, Ref<const PredictionContext> const& ctx) {
       if (!_lookBusy.insert(ATNConfig(s, 0, ctx)).second) {
         return;
       }
@@ -111,20 +111,20 @@ namespace {
 
       size_t n = s->transitions.size();
       for (size_t i = 0; i < n; i++) {
-        Transition *t = s->transitions[i];
+        const Transition *t = s->transitions[i].get();
 
         if (t->getSerializationType() == Transition::RULE) {
-          if (_calledRuleStack[(static_cast<RuleTransition*>(t))->target->ruleIndex]) {
+          if (_calledRuleStack[(static_cast<const RuleTransition*>(t))->target->ruleIndex]) {
             continue;
           }
 
-          Ref<PredictionContext> newContext = SingletonPredictionContext::create(ctx, (static_cast<RuleTransition*>(t))->followState->stateNumber);
+          Ref<const PredictionContext> newContext = SingletonPredictionContext::create(ctx, (static_cast<const RuleTransition*>(t))->followState->stateNumber);
 
-          _calledRuleStack.set((static_cast<RuleTransition*>(t))->target->ruleIndex);
+          _calledRuleStack.set((static_cast<const RuleTransition*>(t))->target->ruleIndex);
           LOOK(t->target, stopState, newContext);
-          _calledRuleStack[(static_cast<RuleTransition*>(t))->target->ruleIndex] = false;
+          _calledRuleStack[(static_cast<const RuleTransition*>(t))->target->ruleIndex] = false;
 
-        } else if (is<AbstractPredicateTransition *>(t)) {
+        } else if (is<const AbstractPredicateTransition *>(t)) {
           if (_seeThruPreds) {
             LOOK(t->target, stopState, ctx);
           } else {
@@ -137,7 +137,7 @@ namespace {
         } else {
           misc::IntervalSet set = t->label();
           if (!set.isEmpty()) {
-            if (is<NotSetTransition*>(t)) {
+            if (is<const NotSetTransition*>(t)) {
               set = set.complement(misc::IntervalSet::of(Token::MIN_USER_TOKEN_TYPE, static_cast<ssize_t>(_atn.maxTokenType)));
             }
             _look.addAll(set);
@@ -182,7 +182,7 @@ misc::IntervalSet LL1Analyzer::LOOK(ATNState *s, RuleContext *ctx) const {
 }
 
 misc::IntervalSet LL1Analyzer::LOOK(ATNState *s, ATNState *stopState, RuleContext *ctx) const {
-  Ref<PredictionContext> lookContext = ctx != nullptr ? PredictionContext::fromRuleContext(_atn, ctx) : nullptr;
+  Ref<const PredictionContext> lookContext = ctx != nullptr ? PredictionContext::fromRuleContext(_atn, ctx) : nullptr;
   misc::IntervalSet r;
   LL1AnalyzerImpl impl(_atn, r, true, true);
   impl.LOOK(s, stopState, lookContext);

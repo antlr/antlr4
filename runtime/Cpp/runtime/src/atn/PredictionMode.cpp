@@ -62,7 +62,7 @@ bool PredictionModeClass::hasSLLConflictTerminatingPrediction(PredictionMode mod
     // dup configs, tossing out semantic predicates
     ATNConfigSet dup(true);
     for (auto &config : configs->configs) {
-      Ref<ATNConfig> c = std::make_shared<ATNConfig>(config, SemanticContext::NONE);
+      Ref<ATNConfig> c = std::make_shared<ATNConfig>(*config, SemanticContext::NONE);
       dup.add(c);
     }
     std::vector<antlrcpp::BitSet> altsets = getConflictingAltSubsets(&dup);
