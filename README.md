@@ -3,32 +3,29 @@
 [![Java 7+](https://img.shields.io/badge/java-7+-4c7e9f.svg)](http://java.oracle.com)
 [![License](https://img.shields.io/badge/license-BSD-blue.svg)](https://raw.githubusercontent.com/antlr/antlr4/master/LICENSE.txt)
 
-**Build status**
-
-[![Github CI Build Status (MacOSX)](https://img.shields.io/github/workflow/status/antlr/antlr4/MacOSX?label=MacOSX)](https://github.com/antlr/antlr4/actions/workflows/macosx.yml)
-[![Github CI Build Status (Windows)](https://img.shields.io/github/workflow/status/antlr/antlr4/Windows?label=Windows)](https://github.com/antlr/antlr4/actions/workflows/windows.yml)
-[![Circle CI Build Status (Linux)](https://img.shields.io/circleci/build/gh/antlr/antlr4/master?label=Linux)](https://app.circleci.com/pipelines/github/antlr/antlr4)
-
-<!---
-[![AppVeyor CI Build Status (Windows)](https://img.shields.io/appveyor/build/parrt/antlr4?label=Windows)](https://ci.appveyor.com/project/parrt/antlr4)
-[![Travis-CI Build Status (Swift-Linux)](https://img.shields.io/travis/antlr/antlr4.svg?label=Linux-Swift&branch=master)](https://travis-ci.com/github/antlr/antlr4)
--->
 
 **ANTLR** (ANother Tool for Language Recognition) is a powerful parser generator for reading, processing, executing, or translating structured text or binary files. It's widely used to build languages, tools, and frameworks. From a grammar, ANTLR generates a parser that can build parse trees and also generates a listener interface (or visitor) that makes it easy to respond to the recognition of phrases of interest.
 
+**Build status**
+
+[![Github CI Build Status (MacOSX)](https://img.shields.io/github/workflow/status/antlr/antlr4/MacOSX?label=MacOSX)](https://github.com/antlr/antlr4/actions) 
+[![AppVeyor CI Build Status (Windows)](https://img.shields.io/appveyor/build/parrt/antlr4?label=Windows)](https://ci.appveyor.com/project/parrt/antlr4) 
+[![Circle CI Build Status (Linux)](https://img.shields.io/circleci/build/gh/antlr/antlr4/master?label=Linux)](https://app.circleci.com/pipelines/github/antlr/antlr4)
+[![Travis-CI Build Status (Swift-Linux)](https://img.shields.io/travis/antlr/antlr4.svg?label=Linux-Swift&branch=master)](https://travis-ci.com/github/antlr/antlr4)
+
 ## Repo branch structure
 
-This repository has two key branches: `master` and `dev`. The `dev` branch is the default branch and all pull requests are based off of this branch.  We actively develop in this branch in between releases, which are merged back into master and the release location is tagged (e.g., with `4.10-rc1` or `4.10`.) Visually our process looks roughly like this:
+The default branch for this repo is [`master`](https://github.com/antlr/antlr4/tree/master), which is the latest stable release and has tags for the various releases; e.g., see release tag [4.9.3](https://github.com/antlr/antlr4/tree/4.9.3).  Branch [`dev`](https://github.com/antlr/antlr4/tree/dev) is where development occurs between releases and all pull requests should be derived from that branch. The `dev` branch is merged back into `master` to cut a release and the release state is tagged (e.g., with `4.10-rc1` or `4.10`.) Visually our process looks roughly like this:
 
 <img src="doc/images/new-antlr-branches.png" width="500">
 
-Targets such as Go that pull directly from the repository should use the `master` branch not the `dev` branch. E.g.,
+Targets such as Go that pull directly from the repository can use the default `master` branch but can also pull from the active `dev` branch:
 
 ```bash
-$ go get github.com/antlr/antlr4/runtime/Go/antlr@master
+$ go get github.com/antlr/antlr4/runtime/Go/antlr@dev
 ```
 
-Please notice that by default the README for this repository shows the `dev` branch, but you can jump to the latest stable release [`master`](https://github.com/antlr/antlr4/tree/master).
+
 
 ## Authors and major contributors
 
@@ -46,7 +43,6 @@ ANTLR project lead and supreme dictator for life
 * [Ben Hamilton](https://github.com/bhamiltoncx) (Full Unicode support in serialized ATN and all languages' runtimes for code points > U+FFFF)
 * [Marcos Passos](https://github.com/marcospassos) (PHP target)
 * [Lingyu Li](https://github.com/lingyv-li) (Dart target)
-* [Ivan Kochurkin](https://github.com/KvanTTT) has made major contributions to overall quality, error handling, and Target performance.
 
 ## Useful information
 
