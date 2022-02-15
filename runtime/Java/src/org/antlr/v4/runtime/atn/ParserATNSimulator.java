@@ -464,12 +464,14 @@ public class ParserATNSimulator extends ATNSimulator {
 				// ATN states in SLL implies LL will also get nowhere.
 				// If conflict in states that dip out, choose min since we
 				// will get error no matter what.
+				Token startToken = input.get(startIndex);
+				Token offendingToken = input.LT(1);				
 				input.seek(startIndex);
 				int alt = getSynValidOrSemInvalidAltThatFinishedDecisionEntryRule(previousD.configs, outerContext);
 				if ( alt!=ATN.INVALID_ALT_NUMBER ) {
 					return alt;
 				}
-				throw noViableAlt(input, outerContext, previousD.configs, startIndex);
+				throw new NoViableAltException(parser, input, startToken, offendingToken, previousD.configs, outerContext);
 			}
 
 			if ( D.requiresFullContext && mode != PredictionMode.SLL ) {
