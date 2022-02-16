@@ -562,27 +562,22 @@ dfa::DFAState *LexerATNSimulator::addDFAState(ATNConfigSet *configs, bool suppre
 
   dfa::DFA &dfa = _decisionToDFA[_mode];
 
-  _stateLock.lock();
-  if (!dfa.states.empty()) {
-    auto iterator = dfa.states.find(proposed);
-    if (iterator != dfa.states.end()) {
+  {
+    std::unique_lock<std::shared_mutex> stateLock(_stateLock);
+    auto [existing, inserted] = dfa.states.insert(proposed);
+    if (!inserted) {
       delete proposed;
-      if (!suppressEdge) {
-        _decisionToDFA[_mode].s0 = *iterator;
-      }
-      _stateLock.unlock();
-      return *iterator;
+      proposed = *existing;
+    } else {
+      // Previously we did a lookup, then set fields, then inserted. It was `dfa.states.size()`,
+      // since we already inserted we need to subtract one.
+      proposed->stateNumber = static_cast<int>(dfa.states.size() - 1);
+      proposed->configs->setReadonly(true);
+    }
+    if (!suppressEdge) {
+      dfa.s0 = proposed;
     }
   }
-
-  proposed->stateNumber = (int)dfa.states.size();
-  proposed->configs->setReadonly(true);
-
-  dfa.states.insert(proposed);
-  if (!suppressEdge) {
-    _decisionToDFA[_mode].s0 = proposed;
-  }
-  _stateLock.unlock();
 
   return proposed;
 }

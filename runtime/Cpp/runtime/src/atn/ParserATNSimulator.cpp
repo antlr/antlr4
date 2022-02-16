@@ -94,18 +94,18 @@ size_t ParserATNSimulator::adaptivePredict(TokenStream *input, size_t decision, 
   });
 
   dfa::DFAState *s0;
-  _stateLock.lock_shared();
-  if (dfa.isPrecedenceDfa()) {
-    // the start state for a precedence DFA depends on the current
-    // parser precedence, and is provided by a DFA method.
-    _edgeLock.lock_shared();
-    s0 = dfa.getPrecedenceStartState(parser->getPrecedence());
-    _edgeLock.unlock_shared();
-  } else {
-    // the start state for a "regular" DFA is just s0
-    s0 = dfa.s0;
+  {
+    std::shared_lock<std::shared_mutex> stateLock(_stateLock);
+    if (dfa.isPrecedenceDfa()) {
+      // the start state for a precedence DFA depends on the current
+      // parser precedence, and is provided by a DFA method.
+      std::shared_lock<std::shared_mutex> edgeLock(_edgeLock);
+      s0 = dfa.getPrecedenceStartState(parser->getPrecedence());
+    } else {
+      // the start state for a "regular" DFA is just s0
+      s0 = dfa.s0;
+    }
   }
-  _stateLock.unlock_shared();
 
   if (s0 == nullptr) {
     bool fullCtx = false;
@@ -1286,18 +1286,20 @@ dfa::DFAState *ParserATNSimulator::addDFAState(dfa::DFA &dfa, dfa::DFAState *D) 
     return D;
   }
 
-  auto existing = dfa.states.find(D);
-  if (existing != dfa.states.end()) {
+  // Optimizing the configs below should not alter the hash code. Thus we can just do an insert
+  // which will only succeed if an equivalent DFAState does not already exist.
+  auto [existing, inserted] = dfa.states.insert(D);
+  if (!inserted) {
     return *existing;
   }
 
-  D->stateNumber = (int)dfa.states.size();
+  // Previously we did a lookup, then set fields, then inserted. It was `dfa.states.size()`, since
+  // we already inserted we need to subtract one.
+  D->stateNumber = static_cast<int>(dfa.states.size() - 1);
   if (!D->configs->isReadonly()) {
     D->configs->optimizeConfigs(this);
     D->configs->setReadonly(true);
   }
-
-  dfa.states.insert(D);
 
 #if DEBUG_DFA == 1
   std::cout << "adding new DFA state: " << D << std::endl;
