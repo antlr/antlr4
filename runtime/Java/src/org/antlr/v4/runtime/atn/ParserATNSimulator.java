@@ -515,11 +515,13 @@ public class ParserATNSimulator extends ATNSimulator {
 				}
 
 				int stopIndex = input.index();
+				Token startToken = input.get(startIndex);
+				Token offendingToken = input.LT(1);				
 				input.seek(startIndex);
 				BitSet alts = evalSemanticContext(D.predicates, outerContext, true);
 				switch (alts.cardinality()) {
 				case 0:
-					throw noViableAlt(input, outerContext, D.configs, startIndex);
+					throw new NoViableAltException(parser, input, startToken, offendingToken, D.configs, outerContext);
 
 				case 1:
 					return alts.nextSetBit(0);
@@ -673,13 +675,14 @@ public class ParserATNSimulator extends ATNSimulator {
 				// ATN states in SLL implies LL will also get nowhere.
 				// If conflict in states that dip out, choose min since we
 				// will get error no matter what.
-				NoViableAltException e = noViableAlt(input, outerContext, previous, startIndex);
+				Token startToken = input.get(startIndex);
+				Token offendingToken = input.LT(1);
 				input.seek(startIndex);
 				int alt = getSynValidOrSemInvalidAltThatFinishedDecisionEntryRule(previous, outerContext);
 				if ( alt!=ATN.INVALID_ALT_NUMBER ) {
 					return alt;
 				}
-				throw e;
+				throw new NoViableAltException(parser, input, startToken, offendingToken, previous, outerContext);
 			}
 
 			Collection<BitSet> altSubSets = PredictionMode.getConflictingAltSubsets(reach);
@@ -2016,18 +2019,6 @@ public class ParserATNSimulator extends ATNSimulator {
 			}
 			System.err.println(c.toString(parser, true)+":"+trans);
 		}
-	}
-
-
-	protected NoViableAltException noViableAlt(TokenStream input,
-											ParserRuleContext outerContext,
-											ATNConfigSet configs,
-											int startIndex)
-	{
-		return new NoViableAltException(parser, input,
-											input.get(startIndex),
-											input.LT(1),
-											configs, outerContext);
 	}
 
 	protected static int getUniqueAlt(ATNConfigSet configs) {
