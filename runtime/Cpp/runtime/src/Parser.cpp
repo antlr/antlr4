@@ -589,12 +589,12 @@ std::string Parser::getSourceName() {
 }
 
 atn::ParseInfo Parser::getParseInfo() const {
-  atn::ProfilingATNSimulator *interp = getInterpreter<atn::ProfilingATNSimulator>();
-  return atn::ParseInfo(interp);
+  atn::ParserATNSimulator *simulator = getInterpreter<atn::ParserATNSimulator>();
+  return atn::ParseInfo(dynamic_cast<atn::ProfilingATNSimulator*>(simulator));
 }
 
 void Parser::setProfile(bool profile) {
-  atn::ParserATNSimulator *interp = getInterpreter<atn::ProfilingATNSimulator>();
+  atn::ParserATNSimulator *interp = getInterpreter<atn::ParserATNSimulator>();
   atn::PredictionMode saveMode = interp != nullptr ? interp->getPredictionMode() : atn::PredictionMode::LL;
   if (profile) {
     if (!is<atn::ProfilingATNSimulator *>(interp)) {
