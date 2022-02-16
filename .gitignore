@@ -83,6 +83,9 @@ nbactions*.xml
 /gen4/
 /tool/playground/
 tmp/
+**/generatedCode/*.interp
+**/generatedCode/*.tokens
+**/generatedCode/*.bak
 
 # Configurable build files
 bilder.py
@@ -106,6 +109,9 @@ runtime/PHP
 
 # Swift binaries
 .build/
+
+# Code coverage reports
+coverage/
 
 # Cpp generated build files
 runtime/Cpp/CMakeCache.txt

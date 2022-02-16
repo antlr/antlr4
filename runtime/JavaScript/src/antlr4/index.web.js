@@ -43,10 +43,11 @@ import DiagnosticErrorListener from "./error/DiagnosticErrorListener.js"
 import RuleNode from "./tree/RuleNode.js"
 import TerminalNode from "./tree/TerminalNode.js"
 import arrayToString from "./utils/arrayToString.js"
+import TokenStreamRewriter from './TokenStreamRewriter.js';
 
 export default {
     atn, dfa, context, misc, tree, error, Token, CommonToken, CharStreams, CharStream, InputStream, CommonTokenStream, Lexer, Parser,
-    ParserRuleContext, Interval, IntervalSet, LL1Analyzer, Utils
+    ParserRuleContext, Interval, IntervalSet, LL1Analyzer, Utils, TokenStreamRewriter
 }
 
 export {
