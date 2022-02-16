@@ -8,7 +8,6 @@ package org.antlr.v4.codegen.target;
 
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.codegen.Target;
-import org.antlr.v4.codegen.UnicodeEscapes;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.ast.GrammarAST;
@@ -24,71 +23,43 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 
-/**
- *
- * @author Peter Boyer
- *
- * */
 public class GoTarget extends Target {
+	protected static final HashSet<String> reservedWords = new HashSet<>(Arrays.asList(
+		// keywords
+		"break", "default", "func", "interface", "select",
+		"case", "defer", "go", "map", "struct",
+		"chan", "else", "goto", "package", "switch",
+		"const", "fallthrough", "if", "range", "type",
+		"continue", "for", "import", "return", "var",
 
-	private static final String[] goKeywords = {
-			"break", "default", "func", "interface", "select",
-			"case", "defer", "go", "map", "struct",
-			"chan", "else", "goto", "package", "switch",
-			"const", "fallthrough", "if", "range", "type",
-			"continue", "for", "import", "return", "var"
-	};
+		// predeclared identifiers https://golang.org/ref/spec#Predeclared_identifiers
+		"bool", "byte", "complex64", "complex128", "error", "float32", "float64",
+		"int", "int8", "int16", "int32", "int64", "rune", "string",
+		"uint", "uint8", "uint16", "uint32", "uint64", "uintptr",
+		"true", "false", "iota", "nil",
+		"append", "cap", "close", "complex", "copy", "delete", "imag", "len",
+		"make", "new", "panic", "print", "println", "real", "recover",
 
-	// predeclared identifiers https://golang.org/ref/spec#Predeclared_identifiers
-	private static final String[] goPredeclaredIdentifiers = {
-			"bool", "byte", "complex64", "complex128", "error", "float32", "float64",
-			"int", "int8", "int16", "int32", "int64", "rune", "string",
-			"uint", "uint8", "uint16", "uint32", "uint64", "uintptr",
-			"true", "false", "iota", "nil",
-			"append", "cap", "close", "complex", "copy", "delete", "imag", "len",
-			"make", "new", "panic", "print", "println", "real", "recover"
-	};
-
-	// interface definition of RuleContext from runtime/Go/antlr/rule_context.go
-	private static final String[] goRuleContextInterfaceMethods = {
+		// interface definition of RuleContext from runtime/Go/antlr/rule_context.go
 		"Accept", "GetAltNumber", "GetBaseRuleContext", "GetChild", "GetChildCount",
 		"GetChildren", "GetInvokingState", "GetParent", "GetPayload", "GetRuleContext",
 		"GetRuleIndex", "GetSourceInterval", "GetText", "IsEmpty", "SetAltNumber",
-		"SetInvokingState", "SetParent", "String"
-	};
+		"SetInvokingState", "SetParent", "String",
 
-	/** Avoid grammar symbols in this set to prevent conflicts in gen'd code. */
-	private final Set<String> badWords = new HashSet<String>(
-		goKeywords.length + goPredeclaredIdentifiers.length + goRuleContextInterfaceMethods.length + 3
-	);
+		// misc
+		"rule", "parserRule", "action"
+	));
 
 	private static final boolean DO_GOFMT = !Boolean.parseBoolean(System.getenv("ANTLR_GO_DISABLE_GOFMT"))
 			&& !Boolean.parseBoolean(System.getProperty("antlr.go.disable-gofmt"));
 
 	public GoTarget(CodeGenerator gen) {
-		super(gen, "Go");
+		super(gen);
 	}
 
 	@Override
-	public String getVersion() {
-		return "4.9.3";
-	}
-
-	public Set<String> getBadWords() {
-		if (badWords.isEmpty()) {
-			addBadWords();
-		}
-
-		return badWords;
-	}
-
-	protected void addBadWords() {
-		badWords.addAll(Arrays.asList(goKeywords));
-		badWords.addAll(Arrays.asList(goPredeclaredIdentifiers));
-		badWords.addAll(Arrays.asList(goRuleContextInterfaceMethods));
-		badWords.add("rule");
-		badWords.add("parserRule");
-		badWords.add("action");
+	protected Set<String> getReservedWords() {
+		return reservedWords;
 	}
 
 	@Override
@@ -133,18 +104,8 @@ public class GoTarget extends Target {
 	}
 
 	@Override
-	public int getSerializedATNSegmentLimit() {
-		return 2 ^ 31;
-	}
-
-	@Override
 	public int getInlineTestSetWordSize() {
 		return 32;
-	}
-
-	@Override
-	protected boolean visibleGrammarSymbolCausesIssueInGeneratedCode(GrammarAST idNode) {
-		return getBadWords().contains(idNode.getText());
 	}
 
 	@Override
@@ -226,11 +187,5 @@ public class GoTarget extends Target {
 			return super.toString(o, formatString, locale);
 		}
 
-	}
-
-	@Override
-	protected void appendUnicodeEscapedCodePoint(int codePoint, StringBuilder sb) {
-		// Go and Python share the same escaping style.
-		UnicodeEscapes.appendPythonStyleEscapedCodePoint(codePoint, sb);
 	}
 }

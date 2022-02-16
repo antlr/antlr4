@@ -25,9 +25,6 @@ Transition::Transition(ATNState *target) {
   this->target = target;
 }
 
-Transition::~Transition() {
-}
-
 bool Transition::isEpsilon() const {
   return false;
 }

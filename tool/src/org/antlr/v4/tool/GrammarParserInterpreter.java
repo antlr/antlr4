@@ -401,7 +401,7 @@ public class GrammarParserInterpreter extends ParserInterpreter {
 			}
 		}
 		else { // must've been a generated parser
-			char[] serializedAtn = ATNSerializer.getSerializedAsChars(originalParser.getATN());
+			char[] serializedAtn = ATNSerializer.getSerializedAsChars(originalParser.getATN(), g.getLanguage());
 			ATN deserialized = new ATNDeserializer().deserialize(serializedAtn);
 			parser = new ParserInterpreter(originalParser.getGrammarFileName(),
 										   originalParser.getVocabulary(),

@@ -57,8 +57,6 @@ For those using Java, here's a great [set of ANTLR in Intellij notes](https://do
 
 * [Parsing binary streams](parsing-binary-files.md)
 
-* [Case-Insensitive Lexing](case-insensitive-lexing.md)
-
 * [Parser and lexer interpreters](interpreters.md)
 
 * [Resources](resources.md)

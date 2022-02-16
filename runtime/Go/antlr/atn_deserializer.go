@@ -5,26 +5,12 @@
 package antlr
 
 import (
-	"encoding/hex"
 	"fmt"
 	"strconv"
-	"strings"
 	"unicode/utf16"
 )
 
-// This is the earliest supported serialized UUID.
-// stick to serialized version for now, we don't need a UUID instance
-var BaseSerializedUUID = "AADB8D7E-AEEF-4415-AD2B-8204D6CF042E"
-var AddedUnicodeSMP = "59627784-3BE5-417A-B9EB-8131A7286089"
-
-// This list contains all of the currently supported UUIDs, ordered by when
-// the feature first appeared in this branch.
-var SupportedUUIDs = []string{BaseSerializedUUID, AddedUnicodeSMP}
-
-var SerializedVersion = 3
-
-// This is the current serialized UUID.
-var SerializedUUID = AddedUnicodeSMP
+var SerializedVersion = 4
 
 type LoopEndStateIntPair struct {
 	item0 *LoopEndState
@@ -40,7 +26,6 @@ type ATNDeserializer struct {
 	deserializationOptions *ATNDeserializationOptions
 	data                   []rune
 	pos                    int
-	uuid                   string
 }
 
 func NewATNDeserializer(options *ATNDeserializationOptions) *ATNDeserializer {
@@ -61,30 +46,10 @@ func stringInSlice(a string, list []string) int {
 	return -1
 }
 
-// isFeatureSupported determines if a particular serialized representation of an
-// ATN supports a particular feature, identified by the UUID used for
-// serializing the ATN at the time the feature was first introduced. Feature is
-// the UUID marking the first time the feature was supported in the serialized
-// ATN. ActualUuid is the UUID of the actual serialized ATN which is currently
-// being deserialized. It returns true if actualUuid represents a serialized ATN
-// at or after the feature identified by feature was introduced, and otherwise
-// false.
-func (a *ATNDeserializer) isFeatureSupported(feature, actualUUID string) bool {
-	idx1 := stringInSlice(feature, SupportedUUIDs)
-
-	if idx1 < 0 {
-		return false
-	}
-
-	idx2 := stringInSlice(actualUUID, SupportedUUIDs)
-
-	return idx2 >= idx1
-}
-
 func (a *ATNDeserializer) DeserializeFromUInt16(data []uint16) *ATN {
-	a.reset(utf16.Decode(data))
+	a.data = utf16.Decode(data)
+	a.pos = 0
 	a.checkVersion()
-	a.checkUUID()
 
 	atn := a.readATN()
 
@@ -96,11 +61,8 @@ func (a *ATNDeserializer) DeserializeFromUInt16(data []uint16) *ATN {
 
 	// First, deserialize sets with 16-bit arguments <= U+FFFF.
 	sets = a.readSets(atn, sets, a.readInt)
-	// Next, if the ATN was serialized with the Unicode SMP feature,
-	// deserialize sets with 32-bit arguments <= U+10FFFF.
-	if (a.isFeatureSupported(AddedUnicodeSMP, a.uuid)) {
-		sets = a.readSets(atn, sets, a.readInt32)
-	}
+	// Next, deserialize sets with 32-bit arguments <= U+10FFFF.
+	sets = a.readSets(atn, sets, a.readInt32)
 
 	a.readEdges(atn, sets)
 	a.readDecisions(atn)
@@ -118,40 +80,12 @@ func (a *ATNDeserializer) DeserializeFromUInt16(data []uint16) *ATN {
 
 }
 
-func (a *ATNDeserializer) reset(data []rune) {
-	temp := make([]rune, len(data))
-
-	for i, c := range data {
-		// Don't adjust the first value since that's the version number
-		if i == 0 {
-			temp[i] = c
-		} else if c > 1 {
-			temp[i] = c - 2
-		} else {
-		    temp[i] = c + 65533
-		}
-	}
-
-	a.data = temp
-	a.pos = 0
-}
-
 func (a *ATNDeserializer) checkVersion() {
 	version := a.readInt()
 
 	if version != SerializedVersion {
 		panic("Could not deserialize ATN with version " + strconv.Itoa(version) + " (expected " + strconv.Itoa(SerializedVersion) + ").")
 	}
-}
-
-func (a *ATNDeserializer) checkUUID() {
-	uuid := a.readUUID()
-
-	if stringInSlice(uuid, SupportedUUIDs) < 0 {
-		panic("Could not deserialize ATN with UUID: " + uuid + " (expected " + SerializedUUID + " or a legacy UUID).")
-	}
-
-	a.uuid = uuid
 }
 
 func (a *ATNDeserializer) readATN() *ATN {
@@ -656,46 +590,6 @@ func (a *ATNDeserializer) readInt32() int {
 	var low = a.readInt()
 	var high = a.readInt()
 	return low | (high << 16)
-}
-
-//TODO
-//func (a *ATNDeserializer) readLong() int64 {
-//    panic("Not implemented")
-//    var low = a.readInt32()
-//    var high = a.readInt32()
-//    return (low & 0x00000000FFFFFFFF) | (high << int32)
-//}
-
-func createByteToHex() []string {
-	bth := make([]string, 256)
-
-	for i := 0; i < 256; i++ {
-		bth[i] = strings.ToUpper(hex.EncodeToString([]byte{byte(i)}))
-	}
-
-	return bth
-}
-
-var byteToHex = createByteToHex()
-
-func (a *ATNDeserializer) readUUID() string {
-	bb := make([]int, 16)
-
-	for i := 7; i >= 0; i-- {
-		integer := a.readInt()
-
-		bb[(2*i)+1] = integer & 0xFF
-		bb[2*i] = (integer >> 8) & 0xFF
-	}
-
-	return byteToHex[bb[0]] + byteToHex[bb[1]] +
-		byteToHex[bb[2]] + byteToHex[bb[3]] + "-" +
-		byteToHex[bb[4]] + byteToHex[bb[5]] + "-" +
-		byteToHex[bb[6]] + byteToHex[bb[7]] + "-" +
-		byteToHex[bb[8]] + byteToHex[bb[9]] + "-" +
-		byteToHex[bb[10]] + byteToHex[bb[11]] +
-		byteToHex[bb[12]] + byteToHex[bb[13]] +
-		byteToHex[bb[14]] + byteToHex[bb[15]]
 }
 
 func (a *ATNDeserializer) edgeFactory(atn *ATN, typeIndex, src, trg, arg1, arg2, arg3 int, sets []*IntervalSet) Transition {

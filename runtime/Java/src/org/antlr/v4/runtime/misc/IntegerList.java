@@ -5,9 +5,11 @@
  */
 package org.antlr.v4.runtime.misc;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.*;
 
 /**
  *

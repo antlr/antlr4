@@ -11,9 +11,8 @@ namespace antlr4 {
 namespace atn {
 
   class ANTLR4CPP_PUBLIC BasicState final : public ATNState {
-
   public:
-    virtual size_t getStateType() override;
+    virtual ATNStateType getStateType() const override;
 
   };
 

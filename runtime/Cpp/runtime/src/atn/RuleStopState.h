@@ -15,9 +15,8 @@ namespace atn {
   /// references to all calls to this rule to compute FOLLOW sets for
   /// error handling.
   class ANTLR4CPP_PUBLIC RuleStopState final : public ATNState {
-
   public:
-    virtual size_t getStateType() override;
+    virtual ATNStateType getStateType() const override;
 
   };
 

@@ -20,7 +20,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.UUID;
 
 public class ATNSerializer {
 	public ATN atn;
@@ -44,6 +43,8 @@ public class ATNSerializer {
 	/** Serialize state descriptors, edge descriptors, and decision&rarr;state map
 	 *  into list of ints:
 	 *
+	 *      SERIALIZED_VERSION
+	 *      UUID (2 longs)
 	 * 		grammar-type, (ANTLRParser.LEXER, ...)
 	 *  	max token type,
 	 *  	num states,
@@ -64,10 +65,9 @@ public class ATNSerializer {
 	 *
 	 *  Convenient to pack into unsigned shorts to make as Java string.
 	 */
-	public IntegerList serialize() {
+	public IntegerList serialize(String language) {
 		IntegerList data = new IntegerList();
 		data.add(ATNDeserializer.SERIALIZED_VERSION);
-		serializeUUID(data, ATNDeserializer.SERIALIZED_UUID);
 
 		// convert grammar type to ATN const to avoid dependence on ANTLRParser
 		data.add(atn.grammarType.ordinal());
@@ -354,20 +354,15 @@ public class ATNSerializer {
 			}
 		}
 
-		// Note: This value shifting loop is documented in ATNDeserializer.
-		// don't adjust the first value since that's the version number
+		boolean isJava = language.equals("Java");
 		for (int i = 1; i < data.size(); i++) {
-			if (data.get(i) < Character.MIN_VALUE || data.get(i) > Character.MAX_VALUE) {
-				throw new UnsupportedOperationException("Serialized ATN data element "+
-					                                        data.get(i)+
-					                                        " element "+i+" out of range "+
-					                                        (int)Character.MIN_VALUE+
-					                                        ".."+
-					                                        (int)Character.MAX_VALUE);
+			int value = data.get(i);
+			if (value < Character.MIN_VALUE || value > Character.MAX_VALUE) {
+				throw new UnsupportedOperationException("Serialized ATN data element " +
+						value + " element " + i + " out of range " + (int) Character.MIN_VALUE + ".." + (int) Character.MAX_VALUE);
 			}
 
-			int value = (data.get(i) + 2) & 0xFFFF;
-			data.set(i, value);
+			data.set(i, isJava ? (value + 2) & 0xFFFF : value);
 		}
 
 		return data;
@@ -421,13 +416,6 @@ public class ATNSerializer {
 		int version = ATNDeserializer.toInt(data[p++]);
 		if (version != ATNDeserializer.SERIALIZED_VERSION) {
 			String reason = String.format("Could not deserialize ATN with version %d (expected %d).", version, ATNDeserializer.SERIALIZED_VERSION);
-			throw new UnsupportedOperationException(new InvalidClassException(ATN.class.getName(), reason));
-		}
-
-		UUID uuid = ATNDeserializer.toUUID(data, p);
-		p += 8;
-		if (!uuid.equals(ATNDeserializer.SERIALIZED_UUID)) {
-			String reason = String.format(Locale.getDefault(), "Could not deserialize ATN with UUID %s (expected %s).", uuid, ATNDeserializer.SERIALIZED_UUID);
 			throw new UnsupportedOperationException(new InvalidClassException(ATN.class.getName(), reason));
 		}
 
@@ -593,32 +581,16 @@ public class ATNSerializer {
 	}
 
 	/** Used by Java target to encode short/int array as chars in string. */
-	public static String getSerializedAsString(ATN atn) {
-		return new String(getSerializedAsChars(atn));
+	public static String getSerializedAsString(ATN atn, String language) {
+		return new String(getSerializedAsChars(atn, language));
 	}
 
-	public static IntegerList getSerialized(ATN atn) {
-		return new ATNSerializer(atn).serialize();
+	public static IntegerList getSerialized(ATN atn, String language) {
+		return new ATNSerializer(atn).serialize(language);
 	}
 
-	public static char[] getSerializedAsChars(ATN atn) {
-		return Utils.toCharArray(getSerialized(atn));
-	}
-
-	public static String getDecoded(ATN atn, List<String> tokenNames) {
-		IntegerList serialized = getSerialized(atn);
-		char[] data = Utils.toCharArray(serialized);
-		return new ATNSerializer(atn, tokenNames).decode(data);
-	}
-
-	private void serializeUUID(IntegerList data, UUID uuid) {
-		serializeLong(data, uuid.getLeastSignificantBits());
-		serializeLong(data, uuid.getMostSignificantBits());
-	}
-
-	private void serializeLong(IntegerList data, long value) {
-		serializeInt(data, (int)value);
-		serializeInt(data, (int)(value >> 32));
+	public static char[] getSerializedAsChars(ATN atn, String language) {
+		return Utils.toCharArray(getSerialized(atn, language));
 	}
 
 	private void serializeInt(IntegerList data, int value) {

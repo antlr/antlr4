@@ -6,6 +6,7 @@
 #pragma once
 
 #include "misc/IntervalSet.h"
+#include "atn/Transition.h"
 
 namespace antlr4 {
 namespace atn {
@@ -79,60 +80,58 @@ namespace atn {
   class ANTLR4CPP_PUBLIC ATN;
 #endif
 
+  using ATNStateType = size_t;
+
   class ANTLR4CPP_PUBLIC ATNState {
   public:
-    ATNState();
-    ATNState(ATNState const&) = delete;
-
-    virtual ~ATNState();
-
-    ATNState& operator=(ATNState const&) = delete;
-
-#if __cplusplus >= 201703L
     static constexpr size_t INITIAL_NUM_TRANSITIONS = 4;
     static constexpr size_t INVALID_STATE_NUMBER = std::numeric_limits<size_t>::max();
-#else
-    enum : size_t {
-      INITIAL_NUM_TRANSITIONS = 4,
-      INVALID_STATE_NUMBER = static_cast<size_t>(-1), // std::numeric_limits<size_t>::max(); doesn't work in VS 2013
-    };
-#endif
 
-    enum {
-      ATN_INVALID_TYPE = 0,
-      BASIC = 1,
-      RULE_START = 2,
-      BLOCK_START = 3,
-      PLUS_BLOCK_START = 4,
-      STAR_BLOCK_START = 5,
-      TOKEN_START = 6,
-      RULE_STOP = 7,
-      BLOCK_END = 8,
-      STAR_LOOP_BACK = 9,
-      STAR_LOOP_ENTRY = 10,
-      PLUS_LOOP_BACK = 11,
-      LOOP_END = 12
-    };
-
-    static const std::vector<std::string> serializationNames;
+    static constexpr ATNStateType ATN_INVALID_TYPE = 0;
+    static constexpr ATNStateType BASIC = 1;
+    static constexpr ATNStateType RULE_START = 2;
+    static constexpr ATNStateType BLOCK_START = 3;
+    static constexpr ATNStateType PLUS_BLOCK_START = 4;
+    static constexpr ATNStateType STAR_BLOCK_START = 5;
+    static constexpr ATNStateType TOKEN_START = 6;
+    static constexpr ATNStateType RULE_STOP = 7;
+    static constexpr ATNStateType BLOCK_END = 8;
+    static constexpr ATNStateType STAR_LOOP_BACK = 9;
+    static constexpr ATNStateType STAR_LOOP_ENTRY = 10;
+    static constexpr ATNStateType PLUS_LOOP_BACK = 11;
+    static constexpr ATNStateType LOOP_END = 12;
 
     size_t stateNumber = INVALID_STATE_NUMBER;
     size_t ruleIndex = 0; // at runtime, we don't have Rule objects
     bool epsilonOnlyTransitions = false;
 
-  public:
-    virtual size_t hashCode();
-    bool operator == (const ATNState &other);
-
     /// Track the transitions emanating from this ATN state.
-    std::vector<Transition*> transitions;
+    std::vector<ConstTransitionPtr> transitions;
 
-    virtual bool isNonGreedyExitState();
+    ATNState() = default;
+
+    ATNState(ATNState const&) = delete;
+
+    ATNState(ATNState&&) = delete;
+
+    virtual ~ATNState() = default;
+
+    ATNState& operator=(ATNState const&) = delete;
+
+    ATNState& operator=(ATNState&&) = delete;
+
+    static const std::vector<std::string> serializationNames;
+
+    void addTransition(ConstTransitionPtr e);
+    void addTransition(size_t index, ConstTransitionPtr e);
+    ConstTransitionPtr removeTransition(size_t index);
+
+    virtual size_t hashCode() const;
+    virtual bool equals(const ATNState &other) const;
+
+    virtual bool isNonGreedyExitState() const;
     virtual std::string toString() const;
-    virtual void addTransition(Transition *e);
-    virtual void addTransition(size_t index, Transition *e);
-    virtual Transition* removeTransition(size_t index);
-    virtual size_t getStateType() = 0;
+    virtual ATNStateType getStateType() const = 0;
 
   private:
     /// Used to cache lookahead during parsing, not used during construction.
@@ -142,6 +141,10 @@ namespace atn {
 
     friend class ATN;
   };
+
+  inline bool operator==(const ATNState &lhs, const ATNState &rhs) { return lhs.equals(rhs); }
+
+  inline bool operator!=(const ATNState &lhs, const ATNState &rhs) { return !operator==(lhs, rhs); }
 
 } // namespace atn
 } // namespace antlr4

@@ -1,0 +1,28 @@
+[notes]
+This is a regression test for antlr/antlr4#625 "Duplicate action breaks
+operator precedence" https://github.com/antlr/antlr4/issues/625
+
+[type]
+Parser
+
+[grammar]
+grammar T;
+s @after {<ToStringTree("$ctx"):writeln()>} : e ;
+e : a=e op=('*'|'/') b=e  {}{<True()>}?
+  | a=e op=('+'|'-') b=e  {}\<p=3>{<True()>}?\<fail='Message'>
+  | INT {}{}
+  | '(' x=e ')' {}{}
+  ;
+INT : '0'..'9'+ ;
+WS : (' '|'\n') -> skip;
+
+[start]
+s
+
+[input]
+(1/2)*3
+
+[output]
+"""(s (e (e ( (e (e 1) / (e 2)) )) * (e 3)))
+"""
+

@@ -55,7 +55,6 @@ ATNSerializer::~ATNSerializer() { }
 std::vector<size_t> ATNSerializer::serialize() {
   std::vector<size_t> data;
   data.push_back(ATNDeserializer::SERIALIZED_VERSION);
-  serializeUUID(data, ATNDeserializer::SERIALIZED_UUID());
 
   // convert grammar type to ATN const to avoid dependence on ANTLRParser
   data.push_back(static_cast<size_t>(atn->grammarType));
@@ -107,10 +106,10 @@ std::vector<size_t> ATNSerializer::serialize() {
     }
 
     for (size_t i = 0; i < s->transitions.size(); i++) {
-      Transition *t = s->transitions[i];
+      const Transition *t = s->transitions[i].get();
       Transition::SerializationType edgeType = t->getSerializationType();
       if (edgeType == Transition::SET || edgeType == Transition::NOT_SET) {
-        SetTransition *st = static_cast<SetTransition *>(t);
+        const SetTransition *st = static_cast<const SetTransition *>(t);
         if (setIndices.find(st->set) == setIndices.end()) {
           sets.push_back(st->set);
           setIndices.insert({ st->set, (int)sets.size() - 1 });
@@ -156,7 +155,7 @@ std::vector<size_t> ATNSerializer::serialize() {
 
   size_t nsets = sets.size();
   data.push_back(nsets);
-  for (auto set : sets) {
+  for (const auto &set : sets) {
     bool containsEof = set.contains(Token::EOF);
     if (containsEof && set.getIntervals().at(0).b == -1) {
       data.push_back(set.getIntervals().size() - 1);
@@ -194,7 +193,7 @@ std::vector<size_t> ATNSerializer::serialize() {
     }
 
     for (size_t i = 0; i < s->transitions.size(); i++) {
-      Transition *t = s->transitions[i];
+      const Transition *t = s->transitions[i].get();
 
       if (atn->states[t->target->stateNumber] == nullptr) {
         throw IllegalStateException("Cannot serialize a transition to a removed state.");
@@ -208,29 +207,29 @@ std::vector<size_t> ATNSerializer::serialize() {
       size_t arg3 = 0;
       switch (edgeType) {
         case Transition::RULE:
-          trg = (static_cast<RuleTransition *>(t))->followState->stateNumber;
-          arg1 = (static_cast<RuleTransition *>(t))->target->stateNumber;
-          arg2 = (static_cast<RuleTransition *>(t))->ruleIndex;
-          arg3 = (static_cast<RuleTransition *>(t))->precedence;
+          trg = (static_cast<const RuleTransition *>(t))->followState->stateNumber;
+          arg1 = (static_cast<const RuleTransition *>(t))->target->stateNumber;
+          arg2 = (static_cast<const RuleTransition *>(t))->ruleIndex;
+          arg3 = (static_cast<const RuleTransition *>(t))->precedence;
           break;
         case Transition::PRECEDENCE:
         {
-          PrecedencePredicateTransition *ppt =
-          static_cast<PrecedencePredicateTransition *>(t);
+          const PrecedencePredicateTransition *ppt =
+          static_cast<const PrecedencePredicateTransition *>(t);
           arg1 = ppt->precedence;
         }
           break;
         case Transition::PREDICATE:
         {
-          PredicateTransition *pt = static_cast<PredicateTransition *>(t);
+          const PredicateTransition *pt = static_cast<const PredicateTransition *>(t);
           arg1 = pt->ruleIndex;
           arg2 = pt->predIndex;
           arg3 = pt->isCtxDependent ? 1 : 0;
         }
           break;
         case Transition::RANGE:
-          arg1 = (static_cast<RangeTransition *>(t))->from;
-          arg2 = (static_cast<RangeTransition *>(t))->to;
+          arg1 = (static_cast<const RangeTransition *>(t))->from;
+          arg2 = (static_cast<const RangeTransition *>(t))->to;
           if (arg1 == Token::EOF) {
             arg1 = 0;
             arg3 = 1;
@@ -238,7 +237,7 @@ std::vector<size_t> ATNSerializer::serialize() {
 
           break;
         case Transition::ATOM:
-          arg1 = (static_cast<AtomTransition *>(t))->_label;
+          arg1 = (static_cast<const AtomTransition *>(t))->_label;
           if (arg1 == Token::EOF) {
             arg1 = 0;
             arg3 = 1;
@@ -247,7 +246,7 @@ std::vector<size_t> ATNSerializer::serialize() {
           break;
         case Transition::ACTION:
         {
-          ActionTransition *at = static_cast<ActionTransition *>(t);
+          const ActionTransition *at = static_cast<const ActionTransition *>(t);
           arg1 = at->ruleIndex;
           arg2 = at->actionIndex;
           if (arg2 == INVALID_INDEX) {
@@ -258,11 +257,11 @@ std::vector<size_t> ATNSerializer::serialize() {
         }
           break;
         case Transition::SET:
-          arg1 = setIndices[(static_cast<SetTransition *>(t))->set];
+          arg1 = setIndices[(static_cast<const SetTransition *>(t))->set];
           break;
 
         case Transition::NOT_SET:
-          arg1 = setIndices[(static_cast<SetTransition *>(t))->set];
+          arg1 = setIndices[(static_cast<const SetTransition *>(t))->set];
           break;
 
         default:
@@ -287,7 +286,7 @@ std::vector<size_t> ATNSerializer::serialize() {
   // LEXER ACTIONS
   if (atn->grammarType == ATNType::LEXER) {
     data.push_back(atn->lexerActions.size());
-    for (Ref<LexerAction> &action : atn->lexerActions) {
+    for (const auto &action : atn->lexerActions) {
       data.push_back(static_cast<size_t>(action->getActionType()));
       switch (action->getActionType()) {
         case LexerActionType::CHANNEL:
@@ -354,14 +353,10 @@ std::vector<size_t> ATNSerializer::serialize() {
     }
   }
 
-  // don't adjust the first value since that's the version number
-  for (size_t i = 1; i < data.size(); i++) {
+  for (size_t i = 0; i < data.size(); i++) {
     if (data.at(i) > 0xFFFF) {
       throw UnsupportedOperationException("Serialized ATN data element out of range.");
     }
-
-    size_t value = (data.at(i) + 2) & 0xFFFF;
-    data.at(i) = value;
   }
 
   return data;
@@ -374,11 +369,9 @@ std::string ATNSerializer::decode(const std::wstring &inpdata) {
     throw IllegalArgumentException("Not enough data to decode");
 
   std::vector<uint16_t> data(inpdata.size());
-  data[0] = (uint16_t)inpdata[0];
 
-  // Don't adjust the first value since that's the version number.
-  for (size_t i = 1; i < inpdata.size(); ++i) {
-    data[i] = (uint16_t)inpdata[i] - 2;
+  for (size_t i = 0; i < inpdata.size(); ++i) {
+    data[i] = (uint16_t)inpdata[i];
   }
 
   std::string buf;
@@ -387,14 +380,6 @@ std::string ATNSerializer::decode(const std::wstring &inpdata) {
   if (version != ATNDeserializer::SERIALIZED_VERSION) {
     std::string reason = "Could not deserialize ATN with version " + std::to_string(version) + "(expected " +
     std::to_string(ATNDeserializer::SERIALIZED_VERSION) + ").";
-    throw UnsupportedOperationException("ATN Serializer" + reason);
-  }
-
-  antlrcpp::Guid uuid = ATNDeserializer::toUUID(data.data(), p);
-  p += 8;
-  if (uuid != ATNDeserializer::SERIALIZED_UUID()) {
-    std::string reason = "Could not deserialize ATN with UUID " + uuid.toString() + " (expected " +
-    ATNDeserializer::SERIALIZED_UUID().toString() + ").";
     throw UnsupportedOperationException("ATN Serializer" + reason);
   }
 
@@ -600,22 +585,4 @@ std::vector<size_t> ATNSerializer::getSerialized(ATN *atn) {
 std::string ATNSerializer::getDecoded(ATN *atn, std::vector<std::string> &tokenNames) {
   std::wstring serialized = getSerializedAsString(atn);
   return ATNSerializer(atn, tokenNames).decode(serialized);
-}
-
-void ATNSerializer::serializeUUID(std::vector<size_t> &data, antlrcpp::Guid uuid) {
-  unsigned int twoBytes = 0;
-  bool firstByte = true;
-  for(antlrcpp::Guid::const_reverse_iterator rit = uuid.rbegin(); rit != uuid.rend(); ++rit )
-  {
-     if (firstByte) {
-       twoBytes = *rit;
-       firstByte = false;
-     } else {
-       twoBytes |= (*rit << 8);
-       data.push_back(twoBytes);
-       firstByte = true;
-     }
-  }
-  if (!firstByte)
-     throw IllegalArgumentException( "The UUID provided is not valid (odd number of bytes)." );
 }

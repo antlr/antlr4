@@ -17,16 +17,16 @@ namespace atn {
     // owning ATNState is released. In order to avoid having this context released as well (leaving all other contexts
     // which got this one as parent with a null reference) we use a shared_ptr here instead, to keep those left alone
     // parent contexts alive.
-    const Ref<PredictionContext> parent;
+    const Ref<const PredictionContext> parent;
     const size_t returnState;
 
-    SingletonPredictionContext(Ref<PredictionContext> const& parent, size_t returnState);
-    virtual ~SingletonPredictionContext();
+    SingletonPredictionContext(Ref<const PredictionContext> parent, size_t returnState);
+    virtual ~SingletonPredictionContext() = default;
 
-    static Ref<SingletonPredictionContext> create(Ref<PredictionContext> const& parent, size_t returnState);
+    static Ref<const SingletonPredictionContext> create(Ref<const PredictionContext> parent, size_t returnState);
 
     virtual size_t size() const override;
-    virtual Ref<PredictionContext> getParent(size_t index) const override;
+    virtual Ref<const PredictionContext> getParent(size_t index) const override;
     virtual size_t getReturnState(size_t index) const override;
     virtual bool operator == (const PredictionContext &o) const override;
     virtual std::string toString() const override;

@@ -12,16 +12,10 @@ namespace atn {
 
   class ANTLR4CPP_PUBLIC DecisionState : public ATNState {
   public:
-    int decision;
-    bool nonGreedy;
+    int decision = -1;
+    bool nonGreedy = false;
 
-  private:
-    void InitializeInstanceFields();
-
-  public:
-    DecisionState() {
-      InitializeInstanceFields();
-    }
+    DecisionState() = default;
 
     virtual std::string toString() const override;
   };

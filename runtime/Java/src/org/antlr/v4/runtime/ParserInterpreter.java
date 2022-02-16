@@ -92,7 +92,7 @@ public class ParserInterpreter extends Parser {
 	@Deprecated
 	public ParserInterpreter(String grammarFileName, Collection<String> tokenNames,
 							 Collection<String> ruleNames, ATN atn, TokenStream input) {
-		this(grammarFileName, VocabularyImpl.fromTokenNames(tokenNames.toArray(new String[tokenNames.size()])), ruleNames, atn, input);
+		this(grammarFileName, VocabularyImpl.fromTokenNames(tokenNames.toArray(new String[0])), ruleNames, atn, input);
 	}
 
 	public ParserInterpreter(String grammarFileName, Vocabulary vocabulary,
@@ -106,7 +106,7 @@ public class ParserInterpreter extends Parser {
 			tokenNames[i] = vocabulary.getDisplayName(i);
 		}
 
-		this.ruleNames = ruleNames.toArray(new String[ruleNames.size()]);
+		this.ruleNames = ruleNames.toArray(new String[0]);
 		this.vocabulary = vocabulary;
 
 		// init decision DFA

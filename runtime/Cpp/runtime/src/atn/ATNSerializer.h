@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "antlr4-common.h"
+
 namespace antlr4 {
 namespace atn {
 
@@ -53,8 +55,6 @@ namespace atn {
 
   private:
     std::vector<std::string> _tokenNames;
-
-    void serializeUUID(std::vector<size_t> &data, antlrcpp::Guid uuid);
   };
 
 } // namespace atn

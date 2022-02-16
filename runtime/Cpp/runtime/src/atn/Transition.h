@@ -45,10 +45,10 @@ namespace atn {
     // ml: this is a reference into the ATN.
     ATNState *target;
 
-    virtual ~Transition();
+    virtual ~Transition() = default;
 
   protected:
-    Transition(ATNState *target);
+    explicit Transition(ATNState *target);
 
   public:
     virtual SerializationType getSerializationType() const = 0;
@@ -71,6 +71,8 @@ namespace atn {
     Transition(Transition const&) = delete;
     Transition& operator=(Transition const&) = delete;
   };
+
+  using ConstTransitionPtr = std::unique_ptr<const Transition>;
 
 } // namespace atn
 } // namespace antlr4

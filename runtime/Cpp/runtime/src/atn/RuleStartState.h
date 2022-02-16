@@ -12,12 +12,10 @@ namespace atn {
 
   class ANTLR4CPP_PUBLIC RuleStartState final : public ATNState {
   public:
-    RuleStartState();
-
     RuleStopState *stopState = nullptr;
     bool isLeftRecursiveRule = false;
 
-    virtual size_t getStateType() override;
+    virtual ATNStateType getStateType() const override;
 
   };
 

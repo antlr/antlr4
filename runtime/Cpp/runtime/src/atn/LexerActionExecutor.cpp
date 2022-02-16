@@ -15,22 +15,19 @@ using namespace antlr4::atn;
 using namespace antlr4::misc;
 using namespace antlrcpp;
 
-LexerActionExecutor::LexerActionExecutor(const std::vector<Ref<LexerAction>> &lexerActions)
-  : _lexerActions(lexerActions), _hashCode(generateHashCode()) {
-}
-
-LexerActionExecutor::~LexerActionExecutor() {
+LexerActionExecutor::LexerActionExecutor(std::vector<Ref<LexerAction>> lexerActions)
+  : _lexerActions(std::move(lexerActions)), _hashCode(generateHashCode()) {
 }
 
 Ref<LexerActionExecutor> LexerActionExecutor::append(Ref<LexerActionExecutor> const& lexerActionExecutor,
-                                                     Ref<LexerAction> const& lexerAction) {
+                                                     Ref<LexerAction> lexerAction) {
   if (lexerActionExecutor == nullptr) {
-    return std::make_shared<LexerActionExecutor>(std::vector<Ref<LexerAction>> { lexerAction });
+    return std::make_shared<LexerActionExecutor>(std::vector<Ref<LexerAction>> { std::move(lexerAction) });
   }
 
   std::vector<Ref<LexerAction>> lexerActions = lexerActionExecutor->_lexerActions; // Make a copy.
-  lexerActions.push_back(lexerAction);
-  return std::make_shared<LexerActionExecutor>(lexerActions);
+  lexerActions.push_back(std::move(lexerAction));
+  return std::make_shared<LexerActionExecutor>(std::move(lexerActions));
 }
 
 Ref<LexerActionExecutor> LexerActionExecutor::fixOffsetBeforeMatch(int offset) {
@@ -49,10 +46,10 @@ Ref<LexerActionExecutor> LexerActionExecutor::fixOffsetBeforeMatch(int offset) {
     return shared_from_this();
   }
 
-  return std::make_shared<LexerActionExecutor>(updatedLexerActions);
+  return std::make_shared<LexerActionExecutor>(std::move(updatedLexerActions));
 }
 
-std::vector<Ref<LexerAction>> LexerActionExecutor::getLexerActions() const {
+const std::vector<Ref<LexerAction>>& LexerActionExecutor::getLexerActions() const {
   return _lexerActions;
 }
 
@@ -84,7 +81,7 @@ size_t LexerActionExecutor::hashCode() const {
   return _hashCode;
 }
 
-bool LexerActionExecutor::operator == (const LexerActionExecutor &obj) const {
+bool LexerActionExecutor::operator==(const LexerActionExecutor &obj) const {
   if (&obj == this) {
     return true;
   }
@@ -92,13 +89,13 @@ bool LexerActionExecutor::operator == (const LexerActionExecutor &obj) const {
   return _hashCode == obj._hashCode && Arrays::equals(_lexerActions, obj._lexerActions);
 }
 
-bool LexerActionExecutor::operator != (const LexerActionExecutor &obj) const {
+bool LexerActionExecutor::operator!=(const LexerActionExecutor &obj) const {
   return !operator==(obj);
 }
 
 size_t LexerActionExecutor::generateHashCode() const {
   size_t hash = MurmurHash::initialize();
-  for (auto lexerAction : _lexerActions) {
+  for (const auto &lexerAction : _lexerActions) {
     hash = MurmurHash::update(hash, lexerAction);
   }
   hash = MurmurHash::finish(hash, _lexerActions.size());

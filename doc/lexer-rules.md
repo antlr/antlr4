@@ -308,3 +308,16 @@ As of 4.5, you can also define channel names like enumerations with the followin
 ```
 channels { WSCHANNEL, MYHIDDEN }
 ```
+
+## Lexer Rule Options
+
+### caseInsensitive
+
+Defines if the current lexer rule is case-insensitive.
+The argument can be `true` or `false`.
+The option rewrites `caseInsensitive` grammar option value if it's defined.
+
+```g4
+options { caseInsensitive=true; }
+STRING options { caseInsensitive=false; } : 'N'? '\'' (~'\'' | '\'\'')* '\''; // lower n is not allowed
+```

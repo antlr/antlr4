@@ -1,0 +1,24 @@
+[type]
+Lexer
+
+[grammar]
+lexer grammar L;
+CMT : '/*' (CMT | .)+? '*' '/' ;
+WS : (' '|'\n')+;
+
+[input]
+/* ick */x
+/* /* */x
+/* /*nested*/ */x
+
+[output]
+[@0,0:8='/* ick */',<1>,1:0]
+[@1,10:10='\n',<2>,1:10]
+[@2,11:36='/* /* */x\n/* /*nested*/ */',<1>,2:0]
+[@3,38:38='\n',<2>,3:17]
+[@4,39:38='<EOF>',<-1>,4:0]
+
+[errors]
+line 1:9 token recognition error at: 'x'
+line 3:16 token recognition error at: 'x'
+

@@ -38,7 +38,7 @@ size_t LexerTypeAction::hashCode() const {
   return MurmurHash::finish(hash, 2);
 }
 
-bool LexerTypeAction::operator == (const LexerAction &obj) const {
+bool LexerTypeAction::operator==(const LexerAction &obj) const {
   if (&obj == this) {
     return true;
   }

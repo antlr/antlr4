@@ -16,11 +16,11 @@ namespace atn {
 
     virtual bool isEmpty() const override;
     virtual size_t size() const override;
-    virtual Ref<PredictionContext> getParent(size_t index) const override;
+    virtual Ref<const PredictionContext> getParent(size_t index) const override;
     virtual size_t getReturnState(size_t index) const override;
     virtual std::string toString() const override;
 
-    virtual bool operator == (const PredictionContext &o) const override;
+    virtual bool operator==(const PredictionContext &o) const override;
   };
 
 } // namespace atn

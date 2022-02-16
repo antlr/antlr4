@@ -21,7 +21,7 @@ namespace atn {
   /// </summary>
   class ANTLR4CPP_PUBLIC LexerAction {
   public:
-    virtual ~LexerAction();
+    virtual ~LexerAction() = default;
 
     /// <summary>
     /// Gets the serialization type of the lexer action.

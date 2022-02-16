@@ -7,6 +7,6 @@
 
 using namespace antlr4::atn;
 
-size_t PlusBlockStartState::getStateType() {
+ATNStateType PlusBlockStartState::getStateType() const {
   return PLUS_BLOCK_START;
 }

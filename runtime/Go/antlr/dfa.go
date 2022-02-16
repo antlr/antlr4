@@ -7,6 +7,8 @@ package antlr
 import (
 	"sort"
 	"sync"
+	"sync/atomic"
+	"unsafe"
 )
 
 type DFA struct {
@@ -17,15 +19,14 @@ type DFA struct {
 
 	// states is all the DFA states. Use Map to get the old state back; Set can only
 	// indicate whether it is there.
-	states map[int]*DFAState
+	states   map[int]*DFAState
 	statesMu sync.RWMutex
 
 	s0 *DFAState
-	s0Mu sync.RWMutex
 
 	// precedenceDfa is the backing field for isPrecedenceDfa and setPrecedenceDfa.
 	// True if the DFA is for a precedence decision and false otherwise.
-	precedenceDfa bool
+	precedenceDfa   bool
 	precedenceDfaMu sync.RWMutex
 }
 
@@ -111,15 +112,11 @@ func (d *DFA) setPrecedenceDfa(precedenceDfa bool) {
 }
 
 func (d *DFA) getS0() *DFAState {
-	d.s0Mu.RLock()
-	defer d.s0Mu.RUnlock()
-	return d.s0
+	return (*DFAState)(atomic.LoadPointer((*unsafe.Pointer)(unsafe.Pointer(&d.s0))))
 }
 
 func (d *DFA) setS0(s *DFAState) {
-	d.s0Mu.Lock()
-	defer d.s0Mu.Unlock()
-	d.s0 = s
+	atomic.StorePointer((*unsafe.Pointer)(unsafe.Pointer(&d.s0)), unsafe.Pointer(s))
 }
 
 func (d *DFA) getState(hash int) (*DFAState, bool) {

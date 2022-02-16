@@ -12,7 +12,7 @@ namespace atn {
 
   class ANTLR4CPP_PUBLIC EpsilonTransition final : public Transition {
   public:
-    EpsilonTransition(ATNState *target);
+    explicit EpsilonTransition(ATNState *target);
     EpsilonTransition(ATNState *target, size_t outermostPrecedenceReturn);
 
     /**
@@ -23,7 +23,7 @@ namespace atn {
      * @see ParserATNSimulator#applyPrecedenceFilter(ATNConfigSet)
      * @since 4.4.1
      */
-    size_t outermostPrecedenceReturn();
+    size_t outermostPrecedenceReturn() const;
     virtual SerializationType getSerializationType() const override;
 
     virtual bool isEpsilon() const override;

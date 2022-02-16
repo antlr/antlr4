@@ -7,6 +7,6 @@
 
 using namespace antlr4::atn;
 
-size_t RuleStopState::getStateType() {
+ATNStateType RuleStopState::getStateType() const {
   return RULE_STOP;
 }

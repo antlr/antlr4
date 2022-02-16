@@ -35,18 +35,9 @@ using namespace antlr4::misc;
 
 using namespace antlrcpp;
 
-ParserInterpreter::ParserInterpreter(const std::string &grammarFileName, const std::vector<std::string>& tokenNames,
-  const std::vector<std::string>& ruleNames, const atn::ATN &atn, TokenStream *input)
-  : ParserInterpreter(grammarFileName, dfa::Vocabulary::fromTokenNames(tokenNames), ruleNames, atn, input) {
-}
-
 ParserInterpreter::ParserInterpreter(const std::string &grammarFileName, const dfa::Vocabulary &vocabulary,
   const std::vector<std::string> &ruleNames, const atn::ATN &atn, TokenStream *input)
   : Parser(input), _grammarFileName(grammarFileName), _atn(atn), _ruleNames(ruleNames), _vocabulary(vocabulary) {
-
-  for (size_t i = 0; i < atn.maxTokenType; ++i) {
-    _tokenNames.push_back(vocabulary.getDisplayName(i));
-  }
 
   // init decision DFA
   for (size_t i = 0; i < atn.getNumberOfDecisions(); ++i) {
@@ -70,10 +61,6 @@ void ParserInterpreter::reset() {
 
 const atn::ATN& ParserInterpreter::getATN() const {
   return _atn;
-}
-
-const std::vector<std::string>& ParserInterpreter::getTokenNames() const {
-  return _tokenNames;
 }
 
 const dfa::Vocabulary& ParserInterpreter::getVocabulary() const {
@@ -165,7 +152,7 @@ void ParserInterpreter::visitState(atn::ATNState *p) {
     predictedAlt = visitDecisionState(dynamic_cast<DecisionState *>(p));
   }
 
-  atn::Transition *transition = p->transitions[predictedAlt - 1];
+  const atn::Transition *transition = p->transitions[predictedAlt - 1].get();
   switch (transition->getSerializationType()) {
     case atn::Transition::EPSILON:
       if (p->getStateType() == ATNState::STAR_LOOP_ENTRY &&
@@ -180,7 +167,7 @@ void ParserInterpreter::visitState(atn::ATNState *p) {
       break;
 
     case atn::Transition::ATOM:
-      match(static_cast<int>(static_cast<atn::AtomTransition*>(transition)->_label));
+      match(static_cast<int>(static_cast<const atn::AtomTransition*>(transition)->_label));
       break;
 
     case atn::Transition::RANGE:
@@ -202,7 +189,7 @@ void ParserInterpreter::visitState(atn::ATNState *p) {
       size_t ruleIndex = ruleStartState->ruleIndex;
       InterpreterRuleContext *newctx = createInterpreterRuleContext(_ctx, p->stateNumber, ruleIndex);
       if (ruleStartState->isLeftRecursiveRule) {
-        enterRecursionRule(newctx, ruleStartState->stateNumber, ruleIndex, static_cast<atn::RuleTransition*>(transition)->precedence);
+        enterRecursionRule(newctx, ruleStartState->stateNumber, ruleIndex, static_cast<const atn::RuleTransition*>(transition)->precedence);
       } else {
         enterRule(newctx, transition->target->stateNumber, ruleIndex);
       }
@@ -211,7 +198,7 @@ void ParserInterpreter::visitState(atn::ATNState *p) {
 
     case atn::Transition::PREDICATE:
     {
-      atn::PredicateTransition *predicateTransition = static_cast<atn::PredicateTransition*>(transition);
+      const atn::PredicateTransition *predicateTransition = static_cast<const atn::PredicateTransition*>(transition);
       if (!sempred(_ctx, predicateTransition->ruleIndex, predicateTransition->predIndex)) {
         throw FailedPredicateException(this);
       }
@@ -220,15 +207,15 @@ void ParserInterpreter::visitState(atn::ATNState *p) {
 
     case atn::Transition::ACTION:
     {
-      atn::ActionTransition *actionTransition = static_cast<atn::ActionTransition*>(transition);
+      const atn::ActionTransition *actionTransition = static_cast<const atn::ActionTransition*>(transition);
       action(_ctx, actionTransition->ruleIndex, actionTransition->actionIndex);
     }
       break;
 
     case atn::Transition::PRECEDENCE:
     {
-      if (!precpred(_ctx, static_cast<atn::PrecedencePredicateTransition*>(transition)->precedence)) {
-        throw FailedPredicateException(this, "precpred(_ctx, " + std::to_string(static_cast<atn::PrecedencePredicateTransition*>(transition)->precedence) +  ")");
+      if (!precpred(_ctx, static_cast<const atn::PrecedencePredicateTransition*>(transition)->precedence)) {
+        throw FailedPredicateException(this, "precpred(_ctx, " + std::to_string(static_cast<const atn::PrecedencePredicateTransition*>(transition)->precedence) +  ")");
       }
     }
       break;
@@ -272,7 +259,7 @@ void ParserInterpreter::visitRuleStopState(atn::ATNState *p) {
     exitRule();
   }
 
-  atn::RuleTransition *ruleTransition = static_cast<atn::RuleTransition*>(_atn.states[getState()]->transitions[0]);
+  const atn::RuleTransition *ruleTransition = static_cast<const atn::RuleTransition*>(_atn.states[getState()]->transitions[0].get());
   setState(ruleTransition->followState->stateNumber);
 }
 

@@ -14,7 +14,6 @@ import java.io.InvalidClassException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.UUID;
 
 /**
  *
@@ -23,59 +22,7 @@ import java.util.UUID;
 public class ATNDeserializer {
 	public static final int SERIALIZED_VERSION;
 	static {
-		/* This value should never change. Updates following this version are
-		 * reflected as change in the unique ID SERIALIZED_UUID.
-		 */
-		SERIALIZED_VERSION = 3;
-	}
-
-	/**
-	 * This is the earliest supported serialized UUID.
-	 */
-	private static final UUID BASE_SERIALIZED_UUID;
-	/**
-	 * This UUID indicates an extension of {@link BASE_SERIALIZED_UUID} for the
-	 * addition of precedence predicates.
-	 */
-	private static final UUID ADDED_PRECEDENCE_TRANSITIONS;
-	/**
-	 * This UUID indicates an extension of {@link #ADDED_PRECEDENCE_TRANSITIONS}
-	 * for the addition of lexer actions encoded as a sequence of
-	 * {@link LexerAction} instances.
-	 */
-	private static final UUID ADDED_LEXER_ACTIONS;
-	/**
-	 * This UUID indicates the serialized ATN contains two sets of
-	 * IntervalSets, where the second set's values are encoded as
-	 * 32-bit integers to support the full Unicode SMP range up to U+10FFFF.
-	 */
-	private static final UUID ADDED_UNICODE_SMP;
-	/**
-	 * This list contains all of the currently supported UUIDs, ordered by when
-	 * the feature first appeared in this branch.
-	 */
-	private static final List<UUID> SUPPORTED_UUIDS;
-
-	/**
-	 * This is the current serialized UUID.
-	 */
-	public static final UUID SERIALIZED_UUID;
-	static {
-		/* WARNING: DO NOT MERGE THESE LINES. If UUIDs differ during a merge,
-		 * resolve the conflict by generating a new ID!
-		 */
-		BASE_SERIALIZED_UUID = UUID.fromString("33761B2D-78BB-4A43-8B0B-4F5BEE8AACF3");
-		ADDED_PRECEDENCE_TRANSITIONS = UUID.fromString("1DA0C57D-6C06-438A-9B27-10BCB3CE0F61");
-		ADDED_LEXER_ACTIONS = UUID.fromString("AADB8D7E-AEEF-4415-AD2B-8204D6CF042E");
-		ADDED_UNICODE_SMP = UUID.fromString("59627784-3BE5-417A-B9EB-8131A7286089");
-
-		SUPPORTED_UUIDS = new ArrayList<UUID>();
-		SUPPORTED_UUIDS.add(BASE_SERIALIZED_UUID);
-		SUPPORTED_UUIDS.add(ADDED_PRECEDENCE_TRANSITIONS);
-		SUPPORTED_UUIDS.add(ADDED_LEXER_ACTIONS);
-		SUPPORTED_UUIDS.add(ADDED_UNICODE_SMP);
-
-		SERIALIZED_UUID = ADDED_UNICODE_SMP;
+		SERIALIZED_VERSION = 4;
 	}
 
 	interface UnicodeDeserializer {
@@ -135,49 +82,10 @@ public class ATNDeserializer {
 		this.deserializationOptions = deserializationOptions;
 	}
 
-	/**
-	 * Determines if a particular serialized representation of an ATN supports
-	 * a particular feature, identified by the {@link UUID} used for serializing
-	 * the ATN at the time the feature was first introduced.
-	 *
-	 * @param feature The {@link UUID} marking the first time the feature was
-	 * supported in the serialized ATN.
-	 * @param actualUuid The {@link UUID} of the actual serialized ATN which is
-	 * currently being deserialized.
-	 * @return {@code true} if the {@code actualUuid} value represents a
-	 * serialized ATN at or after the feature identified by {@code feature} was
-	 * introduced; otherwise, {@code false}.
-	 */
-	static protected boolean isFeatureSupported(UUID feature, UUID actualUuid) {
-		int featureIndex = SUPPORTED_UUIDS.indexOf(feature);
-		if (featureIndex < 0) {
-			return false;
-		}
-
-		return SUPPORTED_UUIDS.indexOf(actualUuid) >= featureIndex;
-	}
-
-	@SuppressWarnings("deprecation")
 	public ATN deserialize(char[] data) {
 		data = data.clone();
-
-		// Each char value in data is shifted by +2 at the entry to this method.
-		// This is an encoding optimization targeting the serialized values 0
-		// and -1 (serialized to 0xFFFF), each of which are very common in the
-		// serialized form of the ATN. In the modified UTF-8 that Java uses for
-		// compiled string literals, these two character values have multi-byte
-		// forms. By shifting each value by +2, they become characters 2 and 1
-		// prior to writing the string, each of which have single-byte
-		// representations. Since the shift occurs in the tool during ATN
-		// serialization, each target is responsible for adjusting the values
-		// during deserialization.
-		//
-		// As a special case, note that the first element of data is not
-		// adjusted because it contains the major version number of the
-		// serialized ATN, which was fixed at 3 at the time the value shifting
-		// was implemented.
 		for (int i = 1; i < data.length; i++) {
-			data[i] = (char)(data[i] - 2);
+			data[i] = (char) (data[i] - 2);
 		}
 
 		int p = 0;
@@ -186,16 +94,6 @@ public class ATNDeserializer {
 			String reason = String.format(Locale.getDefault(), "Could not deserialize ATN with version %d (expected %d).", version, SERIALIZED_VERSION);
 			throw new UnsupportedOperationException(new InvalidClassException(ATN.class.getName(), reason));
 		}
-
-		UUID uuid = toUUID(data, p);
-		p += 8;
-		if (!SUPPORTED_UUIDS.contains(uuid)) {
-			String reason = String.format(Locale.getDefault(), "Could not deserialize ATN with UUID %s (expected %s or a legacy UUID).", uuid, SERIALIZED_UUID);
-			throw new UnsupportedOperationException(new InvalidClassException(ATN.class.getName(), reason));
-		}
-
-		boolean supportsPrecedencePredicates = isFeatureSupported(ADDED_PRECEDENCE_TRANSITIONS, uuid);
-		boolean supportsLexerActions = isFeatureSupported(ADDED_LEXER_ACTIONS, uuid);
 
 		ATNType grammarType = ATNType.values()[toInt(data[p++])];
 		int maxTokenType = toInt(data[p++]);
@@ -247,12 +145,10 @@ public class ATNDeserializer {
 			((DecisionState)atn.states.get(stateNumber)).nonGreedy = true;
 		}
 
-		if (supportsPrecedencePredicates) {
-			int numPrecedenceStates = toInt(data[p++]);
-			for (int i = 0; i < numPrecedenceStates; i++) {
-				int stateNumber = toInt(data[p++]);
-				((RuleStartState)atn.states.get(stateNumber)).isLeftRecursiveRule = true;
-			}
+		int numPrecedenceStates = toInt(data[p++]);
+		for (int i = 0; i < numPrecedenceStates; i++) {
+			int stateNumber = toInt(data[p++]);
+			((RuleStartState)atn.states.get(stateNumber)).isLeftRecursiveRule = true;
 		}
 
 		//
@@ -275,12 +171,6 @@ public class ATNDeserializer {
 				}
 
 				atn.ruleToTokenType[i] = tokenType;
-
-				if (!isFeatureSupported(ADDED_LEXER_ACTIONS, uuid)) {
-					// this piece of unused metadata was serialized prior to the
-					// addition of LexerAction
-					int actionIndexIgnored = toInt(data[p++]);
-				}
 			}
 		}
 
@@ -312,11 +202,8 @@ public class ATNDeserializer {
 		// First, read all sets with 16-bit Unicode code points <= U+FFFF.
 		p = deserializeSets(data, p, sets, getUnicodeDeserializer(UnicodeDeserializingMode.UNICODE_BMP));
 
-		// Next, if the ATN was serialized with the Unicode SMP feature,
-		// deserialize sets with 32-bit arguments <= U+10FFFF.
-		if (isFeatureSupported(ADDED_UNICODE_SMP, uuid)) {
-			p = deserializeSets(data, p, sets, getUnicodeDeserializer(UnicodeDeserializingMode.UNICODE_SMP));
-		}
+		// Next, deserialize sets with 32-bit arguments <= U+10FFFF.
+		p = deserializeSets(data, p, sets, getUnicodeDeserializer(UnicodeDeserializingMode.UNICODE_SMP));
 
 		//
 		// EDGES
@@ -410,46 +297,22 @@ public class ATNDeserializer {
 		// LEXER ACTIONS
 		//
 		if (atn.grammarType == ATNType.LEXER) {
-			if (supportsLexerActions) {
-				atn.lexerActions = new LexerAction[toInt(data[p++])];
-				for (int i = 0; i < atn.lexerActions.length; i++) {
-					LexerActionType actionType = LexerActionType.values()[toInt(data[p++])];
-					int data1 = toInt(data[p++]);
-					if (data1 == 0xFFFF) {
-						data1 = -1;
-					}
-
-					int data2 = toInt(data[p++]);
-					if (data2 == 0xFFFF) {
-						data2 = -1;
-					}
-
-					LexerAction lexerAction = lexerActionFactory(actionType, data1, data2);
-
-					atn.lexerActions[i] = lexerAction;
-				}
-			}
-			else {
-				// for compatibility with older serialized ATNs, convert the old
-				// serialized action index for action transitions to the new
-				// form, which is the index of a LexerCustomAction
-				List<LexerAction> legacyLexerActions = new ArrayList<LexerAction>();
-				for (ATNState state : atn.states) {
-					for (int i = 0; i < state.getNumberOfTransitions(); i++) {
-						Transition transition = state.transition(i);
-						if (!(transition instanceof ActionTransition)) {
-							continue;
-						}
-
-						int ruleIndex = ((ActionTransition)transition).ruleIndex;
-						int actionIndex = ((ActionTransition)transition).actionIndex;
-						LexerCustomAction lexerAction = new LexerCustomAction(ruleIndex, actionIndex);
-						state.setTransition(i, new ActionTransition(transition.target, ruleIndex, legacyLexerActions.size(), false));
-						legacyLexerActions.add(lexerAction);
-					}
+			atn.lexerActions = new LexerAction[toInt(data[p++])];
+			for (int i = 0; i < atn.lexerActions.length; i++) {
+				LexerActionType actionType = LexerActionType.values()[toInt(data[p++])];
+				int data1 = toInt(data[p++]);
+				if (data1 == 0xFFFF) {
+					data1 = -1;
 				}
 
-				atn.lexerActions = legacyLexerActions.toArray(new LexerAction[legacyLexerActions.size()]);
+				int data2 = toInt(data[p++]);
+				if (data2 == 0xFFFF) {
+					data2 = -1;
+				}
+
+				LexerAction lexerAction = lexerActionFactory(actionType, data1, data2);
+
+				atn.lexerActions[i] = lexerAction;
 			}
 		}
 
@@ -684,18 +547,6 @@ public class ATNDeserializer {
 		return (int)data[offset] | ((int)data[offset + 1] << 16);
 	}
 
-	protected static long toLong(char[] data, int offset) {
-		long lowOrder = toInt32(data, offset) & 0x00000000FFFFFFFFL;
-		return lowOrder | ((long)toInt32(data, offset + 2) << 32);
-	}
-
-	protected static UUID toUUID(char[] data, int offset) {
-		long leastSigBits = toLong(data, offset);
-		long mostSigBits = toLong(data, offset + 4);
-		return new UUID(mostSigBits, leastSigBits);
-	}
-
-
 	protected Transition edgeFactory(ATN atn,
 										 int type, int src, int trg,
 										 int arg1, int arg2, int arg3,
@@ -789,8 +640,7 @@ public class ATNDeserializer {
 			return new LexerTypeAction(data1);
 
 		default:
-			String message = String.format(Locale.getDefault(), "The specified lexer action type %d is not valid.", type);
-			throw new IllegalArgumentException(message);
+			throw new IllegalArgumentException(String.format(Locale.getDefault(), "The specified lexer action type %s is not valid.", type));
 		}
 	}
 }

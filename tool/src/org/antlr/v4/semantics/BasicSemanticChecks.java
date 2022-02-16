@@ -30,6 +30,7 @@ import org.stringtemplate.v4.misc.MultiMap;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /** No side-effects except for setting options into the appropriate node.
  *  TODO:  make the side effects into a separate pass this
@@ -99,6 +100,11 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	 * {@link #exitLexerRule} is called.
 	 */
 	private boolean inFragmentRule;
+
+	/**
+	 * Value of caseInsensitive option (false if not defined)
+	 */
+	private boolean grammarCaseInsensitive = false;
 
 	public BasicSemanticChecks(Grammar g, RuleCollector ruleCollector) {
 		this.g = g;
@@ -182,7 +188,7 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	}
 
 	@Override
-	public void discoverLexerRule(RuleAST rule, GrammarAST ID, List<GrammarAST> modifiers,
+	public void discoverLexerRule(RuleAST rule, GrammarAST ID, List<GrammarAST> modifiers, GrammarAST options,
 								  GrammarAST block)
 	{
 		checkInvalidRuleDef(ID.token);
@@ -211,6 +217,11 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	}
 
 	@Override
+	public void grammarOption(GrammarAST ID, GrammarAST valueAST) {
+		checkOptions(g.ast, ID.token, valueAST);
+	}
+
+	@Override
 	public void ruleOption(GrammarAST ID, GrammarAST valueAST) {
 		checkOptions((GrammarAST)ID.getAncestor(RULE), ID.token, valueAST);
 	}
@@ -221,23 +232,19 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	}
 
 	@Override
-	public void grammarOption(GrammarAST ID, GrammarAST valueAST) {
-		boolean ok = checkOptions(g.ast, ID.token, valueAST);
-		//if ( ok ) g.ast.setOption(ID.getText(), value);
-	}
-
-	@Override
 	public void defineToken(GrammarAST ID) {
 		checkTokenDefinition(ID.token);
 	}
 
 	@Override
 	protected void enterChannelsSpec(GrammarAST tree) {
-		if (g.isParser()) {
-			g.tool.errMgr.grammarError(ErrorType.CHANNELS_BLOCK_IN_PARSER_GRAMMAR, g.fileName, tree.token);
-		}
-		else if (g.isCombined()) {
-			g.tool.errMgr.grammarError(ErrorType.CHANNELS_BLOCK_IN_COMBINED_GRAMMAR, g.fileName, tree.token);
+		ErrorType errorType = g.isParser()
+				? ErrorType.CHANNELS_BLOCK_IN_PARSER_GRAMMAR
+				: g.isCombined()
+				? ErrorType.CHANNELS_BLOCK_IN_COMBINED_GRAMMAR
+				: null;
+		if (errorType != null) {
+			g.tool.errMgr.grammarError(errorType, g.fileName, tree.token);
 		}
 	}
 
@@ -248,16 +255,7 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 
 	@Override
 	public void elementOption(GrammarASTWithOptions elem, GrammarAST ID, GrammarAST valueAST) {
-		String v = null;
-		boolean ok = checkElementOptions(elem, ID, valueAST);
-//		if ( ok ) {
-//			if ( v!=null ) {
-//				t.setOption(ID.getText(), v);
-//			}
-//			else {
-//				t.setOption(TerminalAST.defaultTokenOption, v);
-//			}
-//		}
+		checkElementOptions(elem, ID, valueAST);
 	}
 
 	@Override
@@ -459,15 +457,6 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	}
 
 	@Override
-	protected void enterLabeledLexerElement(GrammarAST tree) {
-		Token label = ((GrammarAST)tree.getChild(0)).getToken();
-		g.tool.errMgr.grammarError(ErrorType.V3_LEXER_LABEL,
-								   g.fileName,
-								   label,
-								   label.getText());
-	}
-
-	@Override
 	protected void enterTerminal(GrammarAST tree) {
 		String text = tree.getText();
 		if (text.equals("''")) {
@@ -476,46 +465,52 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 	}
 
 	/** Check option is appropriate for grammar, rule, subrule */
-	boolean checkOptions(GrammarAST parent,
-						 Token optionID,
-						 GrammarAST valueAST)
-	{
-		boolean ok = true;
-		if ( parent.getType()==ANTLRParser.BLOCK ) {
-			if ( g.isLexer() && !Grammar.LexerBlockOptions.contains(optionID.getText()) ) { // block
-				g.tool.errMgr.grammarError(ErrorType.ILLEGAL_OPTION,
-										   g.fileName,
-										   optionID,
-										   optionID.getText());
-				ok = false;
-			}
-			if ( !g.isLexer() && !Grammar.ParserBlockOptions.contains(optionID.getText()) ) { // block
-				g.tool.errMgr.grammarError(ErrorType.ILLEGAL_OPTION,
-										   g.fileName,
-										   optionID,
-										   optionID.getText());
-				ok = false;
-			}
+	void checkOptions(GrammarAST parent, Token optionID, GrammarAST valueAST) {
+		Set<String> optionsToCheck = null;
+		int parentType = parent.getType();
+		switch (parentType) {
+			case ANTLRParser.BLOCK:
+				optionsToCheck = g.isLexer() ? Grammar.lexerBlockOptions : Grammar.parserBlockOptions;
+				break;
+			case ANTLRParser.RULE:
+				optionsToCheck = g.isLexer() ? Grammar.lexerRuleOptions : Grammar.parseRuleOptions;
+				break;
+			case ANTLRParser.GRAMMAR:
+				optionsToCheck = g.getType() == ANTLRParser.LEXER
+						? Grammar.lexerOptions
+						: Grammar.parserOptions;
+				break;
 		}
-		else if ( parent.getType()==ANTLRParser.RULE ) {
-			if ( !Grammar.ruleOptions.contains(optionID.getText()) ) { // rule
-				g.tool.errMgr.grammarError(ErrorType.ILLEGAL_OPTION,
-										   g.fileName,
-										   optionID,
-										   optionID.getText());
-				ok = false;
-			}
+		String optionName = optionID.getText();
+		if (optionsToCheck != null && !optionsToCheck.contains(optionName)) {
+			g.tool.errMgr.grammarError(ErrorType.ILLEGAL_OPTION, g.fileName, optionID, optionName);
 		}
-		else if ( parent.getType()==ANTLRParser.GRAMMAR &&
-				  !legalGrammarOption(optionID.getText()) ) { // grammar
-			g.tool.errMgr.grammarError(ErrorType.ILLEGAL_OPTION,
-									   g.fileName,
-									   optionID,
-									   optionID.getText());
-			ok = false;
+		else {
+			checkCaseInsensitiveOption(optionID, valueAST, parentType);
 		}
+	}
 
-		return ok;
+	private void checkCaseInsensitiveOption(Token optionID, GrammarAST valueAST, int parentType) {
+		String optionName = optionID.getText();
+		if (optionName.equals(Grammar.caseInsensitiveOptionName)) {
+			String valueText = valueAST.getText();
+			if (valueText.equals("true") || valueText.equals("false")) {
+				boolean currentValue = Boolean.parseBoolean(valueText);
+				if (parentType == ANTLRParser.GRAMMAR) {
+					grammarCaseInsensitive = currentValue;
+				}
+				else {
+					if (grammarCaseInsensitive == currentValue) {
+						g.tool.errMgr.grammarError(ErrorType.REDUNDANT_CASE_INSENSITIVE_LEXER_RULE_OPTION,
+								g.fileName, optionID, currentValue);
+					}
+				}
+			}
+			else {
+				g.tool.errMgr.grammarError(ErrorType.ILLEGAL_OPTION_VALUE, g.fileName, valueAST.getToken(),
+						optionName, valueText);
+			}
+		}
 	}
 
 	/** Check option is appropriate for elem; parent of ID is ELEMENT_OPTIONS */
@@ -585,17 +580,6 @@ public class BasicSemanticChecks extends GrammarTreeVisitor {
 		}
 		// TODO: extra checks depending on terminal kind?
 		return true;
-	}
-
-	boolean legalGrammarOption(String key) {
-		switch ( g.getType() ) {
-			case ANTLRParser.LEXER :
-				return Grammar.lexerOptions.contains(key);
-			case ANTLRParser.PARSER :
-				return Grammar.parserOptions.contains(key);
-			default :
-				return Grammar.parserOptions.contains(key);
-		}
 	}
 
 	void checkImport(Token importID) {

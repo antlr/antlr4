@@ -22,6 +22,7 @@ import java.util.Arrays;
  *
  * @deprecated as of 4.7 Please use {@link CharStreams} interface.
  */
+@Deprecated
 public class ANTLRInputStream implements CharStream {
     public static final int READ_BUFFER_SIZE = 1024;
    	public static final int INITIAL_BUFFER_SIZE = 1024;

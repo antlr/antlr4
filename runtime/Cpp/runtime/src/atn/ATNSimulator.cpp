@@ -16,8 +16,8 @@ using namespace antlr4::dfa;
 using namespace antlr4::atn;
 
 const Ref<DFAState> ATNSimulator::ERROR = std::make_shared<DFAState>(INT32_MAX);
-antlrcpp::SingleWriteMultipleReadLock ATNSimulator::_stateLock;
-antlrcpp::SingleWriteMultipleReadLock ATNSimulator::_edgeLock;
+std::shared_mutex ATNSimulator::_stateLock;
+std::shared_mutex ATNSimulator::_edgeLock;
 
 ATNSimulator::ATNSimulator(const ATN &atn, PredictionContextCache &sharedContextCache)
 : atn(atn), _sharedContextCache(sharedContextCache) {
@@ -34,9 +34,9 @@ PredictionContextCache& ATNSimulator::getSharedContextCache() {
   return _sharedContextCache;
 }
 
-Ref<PredictionContext> ATNSimulator::getCachedContext(Ref<PredictionContext> const& context) {
+Ref<const PredictionContext> ATNSimulator::getCachedContext(Ref<const PredictionContext> const& context) {
   // This function must only be called with an active state lock, as we are going to change a shared structure.
-  std::map<Ref<PredictionContext>, Ref<PredictionContext>> visited;
+  std::map<Ref<const PredictionContext>, Ref<const PredictionContext>> visited;
   return PredictionContext::getCachedContext(context, _sharedContextCache, visited);
 }
 
@@ -53,7 +53,7 @@ void ATNSimulator::checkCondition(bool condition, const std::string &message) {
   ATNDeserializer::checkCondition(condition, message);
 }
 
-Transition *ATNSimulator::edgeFactory(const ATN &atn, int type, int src, int trg, int arg1, int arg2, int arg3,
+ConstTransitionPtr ATNSimulator::edgeFactory(const ATN &atn, int type, int src, int trg, int arg1, int arg2, int arg3,
                                       const std::vector<misc::IntervalSet> &sets) {
   return ATNDeserializer::edgeFactory(atn, type, src, trg, arg1, arg2, arg3, sets);
 }

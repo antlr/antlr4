@@ -107,7 +107,8 @@ public class TestVisitors {
 
 	/**
 	 * This test verifies that {@link AbstractParseTreeVisitor#visitChildren} does not call
-	 * {@link ParseTreeVisitor#visit} after {@link AbstractParseTreeVisitor#shouldVisitNextChild} returns
+	 * {@link org.antlr.v4.runtime.tree.ParseTreeVisitor#visit} after
+	 * {@link org.antlr.v4.runtime.tree.AbstractParseTreeVisitor#shouldVisitNextChild} returns
 	 * {@code false}.
 	 */
 	@Test

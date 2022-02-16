@@ -12,7 +12,7 @@ namespace atn {
 
   class ANTLR4CPP_PUBLIC NotSetTransition final : public SetTransition {
   public:
-    NotSetTransition(ATNState *target, const misc::IntervalSet &set);
+    NotSetTransition(ATNState *target, misc::IntervalSet set);
 
     virtual SerializationType getSerializationType() const override;
 

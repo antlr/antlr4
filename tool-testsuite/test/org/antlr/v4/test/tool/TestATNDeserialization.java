@@ -162,10 +162,10 @@ public class TestATNDeserialization extends BaseJavaToolTest {
 
 	protected void checkDeserializationIsStable(Grammar g) {
 		ATN atn = createATN(g, false);
-		char[] data = Utils.toCharArray(ATNSerializer.getSerialized(atn));
-		String atnData = ATNSerializer.getDecoded(atn, Arrays.asList(g.getTokenNames()));
+		char[] data = Utils.toCharArray(ATNSerializer.getSerialized(atn, "Java"));
+		String atnData = TestATNSerialization.getDecoded(atn, Arrays.asList(g.getTokenNames()));
 		ATN atn2 = new ATNDeserializer().deserialize(data);
-		String atn2Data = ATNSerializer.getDecoded(atn2, Arrays.asList(g.getTokenNames()));
+		String atn2Data = TestATNSerialization.getDecoded(atn2, Arrays.asList(g.getTokenNames()));
 
 		assertEquals(atnData, atn2Data);
 	}

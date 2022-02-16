@@ -5,7 +5,7 @@
 
 #include "misc/Interval.h"
 #include "Exceptions.h"
-#include "support/StringUtils.h"
+#include "support/Utf8.h"
 
 #include "UnbufferedCharStream.h"
 
@@ -13,9 +13,8 @@ using namespace antlrcpp;
 using namespace antlr4;
 using namespace antlr4::misc;
 
-UnbufferedCharStream::UnbufferedCharStream(std::wistream &input) : _input(input) {
-  InitializeInstanceFields();
-
+UnbufferedCharStream::UnbufferedCharStream(std::wistream &input)
+    : _p(0), _numMarkers(0), _lastChar(0), _lastCharBufferStart(0), _currentCharIndex(0), _input(input) {
   // The vector's size is what used to be n in Java code.
   fill(1); // prime
 }
@@ -74,9 +73,7 @@ size_t UnbufferedCharStream::fill(size_t n) {
 }
 
 char32_t UnbufferedCharStream::nextChar()  {
-  wchar_t result = 0;
-  _input >> result;
-  return result;
+  return _input.get();
 }
 
 void UnbufferedCharStream::add(char32_t c) {
@@ -101,7 +98,7 @@ size_t UnbufferedCharStream::LA(ssize_t i) {
     return EOF;
   }
 
-  if (_data[static_cast<size_t>(index)] == 0xFFFF) {
+  if (_data[static_cast<size_t>(index)] == std::char_traits<wchar_t>::eof()) {
     return EOF;
   }
 
@@ -178,7 +175,7 @@ std::string UnbufferedCharStream::getSourceName() const {
 }
 
 std::string UnbufferedCharStream::getText(const misc::Interval &interval) {
-  if (interval.a < 0 || interval.b >= interval.a - 1) {
+  if (interval.a < 0 || interval.b < interval.a - 1) {
     throw IllegalArgumentException("invalid interval");
   }
 
@@ -195,17 +192,17 @@ std::string UnbufferedCharStream::getText(const misc::Interval &interval) {
   }
   // convert from absolute to local index
   size_t i = interval.a - bufferStartIndex;
-  return utf32_to_utf8(_data.substr(i, interval.length()));
+  auto maybeUtf8 = Utf8::strictEncode(std::u32string_view(_data).substr(i, interval.length()));
+  if (!maybeUtf8.has_value()) {
+    throw IllegalArgumentException("Unbuffered stream contains invalid Unicode code points");
+  }
+  return std::move(maybeUtf8).value();
+}
+
+std::string UnbufferedCharStream::toString() const {
+  throw UnsupportedOperationException("Unbuffered stream cannot be materialized to a string");
 }
 
 size_t UnbufferedCharStream::getBufferStartIndex() const {
   return _currentCharIndex - _p;
-}
-
-void UnbufferedCharStream::InitializeInstanceFields() {
-  _p = 0;
-  _numMarkers = 0;
-  _lastChar = 0;
-  _lastCharBufferStart = 0;
-  _currentCharIndex = 0;
 }

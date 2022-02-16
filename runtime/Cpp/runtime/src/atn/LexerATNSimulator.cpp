@@ -80,10 +80,13 @@ size_t LexerATNSimulator::match(CharStream *input, size_t mode) {
   _startIndex = input->index();
   _prevAccept.reset();
   const dfa::DFA &dfa = _decisionToDFA[mode];
-  if (dfa.s0 == nullptr) {
+  _stateLock.lock_shared();
+  dfa::DFAState* s0 = dfa.s0;
+  _stateLock.unlock_shared();
+  if (s0 == nullptr) {
     return matchATN(input);
   } else {
-    return execATN(input, dfa.s0);
+    return execATN(input, s0);
   }
 }
 
@@ -111,10 +114,7 @@ size_t LexerATNSimulator::matchATN(CharStream *input) {
   bool suppressEdge = s0_closure->hasSemanticContext;
   s0_closure->hasSemanticContext = false;
 
-  dfa::DFAState *next = addDFAState(s0_closure.release());
-  if (!suppressEdge) {
-    _decisionToDFA[_mode].s0 = next;
-  }
+  dfa::DFAState *next = addDFAState(s0_closure.release(), suppressEdge);
 
   size_t predict = execATN(input, next);
 
@@ -182,7 +182,7 @@ size_t LexerATNSimulator::execATN(CharStream *input, dfa::DFAState *ds0) {
 
 dfa::DFAState *LexerATNSimulator::getExistingTargetState(dfa::DFAState *s, size_t t) {
   dfa::DFAState* retval = nullptr;
-  _edgeLock.readLock();
+  _edgeLock.lock_shared();
   if (t <= MAX_DFA_EDGE) {
     auto iterator = s->edges.find(t - MIN_DFA_EDGE);
 #if DEBUG_ATN == 1
@@ -194,7 +194,7 @@ dfa::DFAState *LexerATNSimulator::getExistingTargetState(dfa::DFAState *s, size_
     if (iterator != s->edges.end())
       retval = iterator->second;
   }
-  _edgeLock.readUnlock();
+  _edgeLock.unlock_shared();
   return retval;
 }
 
@@ -209,9 +209,9 @@ dfa::DFAState *LexerATNSimulator::computeTargetState(CharStream *input, dfa::DFA
     if (!reach->hasSemanticContext) {
       // we got nowhere on t, don't throw out this knowledge; it'd
       // cause a failover from DFA later.
-      delete reach;
       addDFAEdge(s, t, ERROR.get());
     }
+    delete reach;
 
     // stop when we can't match any more char
     return ERROR.get();
@@ -241,7 +241,7 @@ void LexerATNSimulator::getReachableConfigSet(CharStream *input, ATNConfigSet *c
   // than a config that already reached an accept state for the same rule
   size_t skipAlt = ATN::INVALID_ALT_NUMBER;
 
-  for (auto c : closure_->configs) {
+  for (const auto &c : closure_->configs) {
     bool currentAltReachedAcceptState = c->alt == skipAlt;
     if (currentAltReachedAcceptState && (std::static_pointer_cast<LexerATNConfig>(c))->hasPassedThroughNonGreedyDecision()) {
       continue;
@@ -253,7 +253,7 @@ void LexerATNSimulator::getReachableConfigSet(CharStream *input, ATNConfigSet *c
 
     size_t n = c->state->transitions.size();
     for (size_t ti = 0; ti < n; ti++) { // for each transition
-      Transition *trans = c->state->transitions[ti];
+      const Transition *trans = c->state->transitions[ti].get();
       ATNState *target = getReachableTarget(trans, (int)t);
       if (target != nullptr) {
         Ref<LexerActionExecutor> lexerActionExecutor = std::static_pointer_cast<LexerATNConfig>(c)->getLexerActionExecutor();
@@ -262,8 +262,8 @@ void LexerATNSimulator::getReachableConfigSet(CharStream *input, ATNConfigSet *c
         }
 
         bool treatEofAsEpsilon = t == Token::EOF;
-        Ref<LexerATNConfig> config = std::make_shared<LexerATNConfig>(std::static_pointer_cast<LexerATNConfig>(c),
-          target, lexerActionExecutor);
+        Ref<LexerATNConfig> config = std::make_shared<LexerATNConfig>(*std::static_pointer_cast<LexerATNConfig>(c),
+          target, std::move(lexerActionExecutor));
 
         if (closure(input, config, reach, currentAltReachedAcceptState, true, treatEofAsEpsilon)) {
           // any remaining configs for this alt have a lower priority than
@@ -293,7 +293,7 @@ void LexerATNSimulator::accept(CharStream *input, const Ref<LexerActionExecutor>
   }
 }
 
-atn::ATNState *LexerATNSimulator::getReachableTarget(Transition *trans, size_t t) {
+atn::ATNState *LexerATNSimulator::getReachableTarget(const Transition *trans, size_t t) {
   if (trans->matches(t, Lexer::MIN_CHAR_VALUE, Lexer::MAX_CHAR_VALUE)) {
     return trans->target;
   }
@@ -302,7 +302,7 @@ atn::ATNState *LexerATNSimulator::getReachableTarget(Transition *trans, size_t t
 }
 
 std::unique_ptr<ATNConfigSet> LexerATNSimulator::computeStartState(CharStream *input, ATNState *p) {
-  Ref<PredictionContext> initialContext = PredictionContext::EMPTY; // ml: the purpose of this assignment is unclear
+  Ref<const PredictionContext> initialContext = PredictionContext::EMPTY; // ml: the purpose of this assignment is unclear
   std::unique_ptr<ATNConfigSet> configs(new OrderedATNConfigSet());
   for (size_t i = 0; i < p->transitions.size(); i++) {
     ATNState *target = p->transitions[i]->target;
@@ -333,7 +333,7 @@ bool LexerATNSimulator::closure(CharStream *input, const Ref<LexerATNConfig> &co
         configs->add(config);
         return true;
       } else {
-        configs->add(std::make_shared<LexerATNConfig>(config, config->state, PredictionContext::EMPTY));
+        configs->add(std::make_shared<LexerATNConfig>(*config, config->state, PredictionContext::EMPTY));
         currentAltReachedAcceptState = true;
       }
     }
@@ -341,9 +341,9 @@ bool LexerATNSimulator::closure(CharStream *input, const Ref<LexerATNConfig> &co
     if (config->context != nullptr && !config->context->isEmpty()) {
       for (size_t i = 0; i < config->context->size(); i++) {
         if (config->context->getReturnState(i) != PredictionContext::EMPTY_RETURN_STATE) {
-          std::weak_ptr<PredictionContext> newContext = config->context->getParent(i); // "pop" return state
+          Ref<const PredictionContext> newContext = config->context->getParent(i); // "pop" return state
           ATNState *returnState = atn.states[config->context->getReturnState(i)];
-          Ref<LexerATNConfig> c = std::make_shared<LexerATNConfig>(config, returnState, newContext.lock());
+          Ref<LexerATNConfig> c = std::make_shared<LexerATNConfig>(*config, returnState, newContext);
           currentAltReachedAcceptState = closure(input, c, configs, currentAltReachedAcceptState, speculative, treatEofAsEpsilon);
         }
       }
@@ -361,7 +361,7 @@ bool LexerATNSimulator::closure(CharStream *input, const Ref<LexerATNConfig> &co
 
   ATNState *p = config->state;
   for (size_t i = 0; i < p->transitions.size(); i++) {
-    Transition *t = p->transitions[i];
+    const Transition *t = p->transitions[i].get();
     Ref<LexerATNConfig> c = getEpsilonTarget(input, config, t, configs, speculative, treatEofAsEpsilon);
     if (c != nullptr) {
       currentAltReachedAcceptState = closure(input, c, configs, currentAltReachedAcceptState, speculative, treatEofAsEpsilon);
@@ -371,15 +371,15 @@ bool LexerATNSimulator::closure(CharStream *input, const Ref<LexerATNConfig> &co
   return currentAltReachedAcceptState;
 }
 
-Ref<LexerATNConfig> LexerATNSimulator::getEpsilonTarget(CharStream *input, const Ref<LexerATNConfig> &config, Transition *t,
+Ref<LexerATNConfig> LexerATNSimulator::getEpsilonTarget(CharStream *input, const Ref<LexerATNConfig> &config, const Transition *t,
   ATNConfigSet *configs, bool speculative, bool treatEofAsEpsilon) {
 
   Ref<LexerATNConfig> c = nullptr;
   switch (t->getSerializationType()) {
     case Transition::RULE: {
-      RuleTransition *ruleTransition = static_cast<RuleTransition*>(t);
-      Ref<PredictionContext> newContext = SingletonPredictionContext::create(config->context, ruleTransition->followState->stateNumber);
-      c = std::make_shared<LexerATNConfig>(config, t->target, newContext);
+      const RuleTransition *ruleTransition = static_cast<const RuleTransition*>(t);
+      Ref<const PredictionContext> newContext = SingletonPredictionContext::create(config->context, ruleTransition->followState->stateNumber);
+      c = std::make_shared<LexerATNConfig>(*config, t->target, newContext);
       break;
     }
 
@@ -405,7 +405,7 @@ Ref<LexerATNConfig> LexerATNSimulator::getEpsilonTarget(CharStream *input, const
        states reached by traversing predicates. Since this is when we
        test them, we cannot cash the DFA state target of ID.
        */
-      PredicateTransition *pt = static_cast<PredicateTransition*>(t);
+      const PredicateTransition *pt = static_cast<const PredicateTransition*>(t);
 
 #if DEBUG_ATN == 1
         std::cout << "EVAL rule " << pt->ruleIndex << ":" << pt->predIndex << std::endl;
@@ -413,7 +413,7 @@ Ref<LexerATNConfig> LexerATNSimulator::getEpsilonTarget(CharStream *input, const
 
       configs->hasSemanticContext = true;
       if (evaluatePredicate(input, pt->ruleIndex, pt->predIndex, speculative)) {
-        c = std::make_shared<LexerATNConfig>(config, t->target);
+        c = std::make_shared<LexerATNConfig>(*config, t->target);
       }
       break;
     }
@@ -433,18 +433,18 @@ Ref<LexerATNConfig> LexerATNSimulator::getEpsilonTarget(CharStream *input, const
         // additional modifications are needed before we can support
         // the split operation.
         Ref<LexerActionExecutor> lexerActionExecutor = LexerActionExecutor::append(config->getLexerActionExecutor(),
-          atn.lexerActions[static_cast<ActionTransition *>(t)->actionIndex]);
-        c = std::make_shared<LexerATNConfig>(config, t->target, lexerActionExecutor);
+          atn.lexerActions[static_cast<const ActionTransition *>(t)->actionIndex]);
+        c = std::make_shared<LexerATNConfig>(*config, t->target, lexerActionExecutor);
         break;
       }
       else {
         // ignore actions in referenced rules
-        c = std::make_shared<LexerATNConfig>(config, t->target);
+        c = std::make_shared<LexerATNConfig>(*config, t->target);
         break;
       }
 
     case Transition::EPSILON:
-      c = std::make_shared<LexerATNConfig>(config, t->target);
+      c = std::make_shared<LexerATNConfig>(*config, t->target);
       break;
 
     case Transition::ATOM:
@@ -452,7 +452,7 @@ Ref<LexerATNConfig> LexerATNSimulator::getEpsilonTarget(CharStream *input, const
     case Transition::SET:
       if (treatEofAsEpsilon) {
         if (t->matches(Token::EOF, Lexer::MIN_CHAR_VALUE, Lexer::MAX_CHAR_VALUE)) {
-          c = std::make_shared<LexerATNConfig>(config, t->target);
+          c = std::make_shared<LexerATNConfig>(*config, t->target);
           break;
         }
       }
@@ -530,12 +530,16 @@ void LexerATNSimulator::addDFAEdge(dfa::DFAState *p, size_t t, dfa::DFAState *q)
     return;
   }
 
-  _edgeLock.writeLock();
+  _edgeLock.lock();
   p->edges[t - MIN_DFA_EDGE] = q; // connect
-  _edgeLock.writeUnlock();
+  _edgeLock.unlock();
 }
 
 dfa::DFAState *LexerATNSimulator::addDFAState(ATNConfigSet *configs) {
+  return addDFAState(configs, true);
+}
+
+dfa::DFAState *LexerATNSimulator::addDFAState(ATNConfigSet *configs, bool suppressEdge) {
   /* the lexer evaluates predicates on-the-fly; by this point configs
    * should not contain any configurations with unevaluated predicates.
    */
@@ -543,7 +547,7 @@ dfa::DFAState *LexerATNSimulator::addDFAState(ATNConfigSet *configs) {
 
   dfa::DFAState *proposed = new dfa::DFAState(std::unique_ptr<ATNConfigSet>(configs)); /* mem-check: managed by the DFA or deleted below */
   Ref<ATNConfig> firstConfigWithRuleStopState = nullptr;
-  for (auto &c : configs->configs) {
+  for (const auto &c : configs->configs) {
     if (is<RuleStopState *>(c->state)) {
       firstConfigWithRuleStopState = c;
       break;
@@ -558,12 +562,15 @@ dfa::DFAState *LexerATNSimulator::addDFAState(ATNConfigSet *configs) {
 
   dfa::DFA &dfa = _decisionToDFA[_mode];
 
-  _stateLock.writeLock();
+  _stateLock.lock();
   if (!dfa.states.empty()) {
     auto iterator = dfa.states.find(proposed);
     if (iterator != dfa.states.end()) {
       delete proposed;
-      _stateLock.writeUnlock();
+      if (!suppressEdge) {
+        _decisionToDFA[_mode].s0 = *iterator;
+      }
+      _stateLock.unlock();
       return *iterator;
     }
   }
@@ -572,7 +579,10 @@ dfa::DFAState *LexerATNSimulator::addDFAState(ATNConfigSet *configs) {
   proposed->configs->setReadonly(true);
 
   dfa.states.insert(proposed);
-  _stateLock.writeUnlock();
+  if (!suppressEdge) {
+    _decisionToDFA[_mode].s0 = proposed;
+  }
+  _stateLock.unlock();
 
   return proposed;
 }

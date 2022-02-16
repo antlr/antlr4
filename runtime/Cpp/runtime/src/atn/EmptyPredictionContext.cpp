@@ -18,7 +18,7 @@ size_t EmptyPredictionContext::size() const {
   return 1;
 }
 
-Ref<PredictionContext> EmptyPredictionContext::getParent(size_t /*index*/) const {
+Ref<const PredictionContext> EmptyPredictionContext::getParent(size_t /*index*/) const {
   return nullptr;
 }
 
@@ -26,7 +26,7 @@ size_t EmptyPredictionContext::getReturnState(size_t /*index*/) const {
   return returnState;
 }
 
-bool EmptyPredictionContext::operator == (const PredictionContext &o) const {
+bool EmptyPredictionContext::operator==(const PredictionContext &o) const {
   return this == &o;
 }
 

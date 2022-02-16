@@ -3,8 +3,9 @@
     <Company>The ANTLR Organization</Company>
     <Version>4.9.3</Version>
     <NeutralLanguage>en-US</NeutralLanguage>
-    <TargetFrameworks>net45;netstandard2.0</TargetFrameworks>
-    <NoWarn>$(NoWarn);CS1591;CS1574;CS1580</NoWarn>
+    <TargetFramework Condition="'$(OS)' != 'Windows_NT'">netstandard2.0</TargetFramework>
+    <TargetFrameworks Condition="'$(OS)' == 'Windows_NT'">net45;netstandard2.0</TargetFrameworks>
+    <NoWarn>$(NoWarn);CS1591;CS1574;CS1580;CS1570;NU5048</NoWarn>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AssemblyName>Antlr4.Runtime.Standard</AssemblyName>
     <AssemblyOriginatorKeyFile>Antlr4.snk</AssemblyOriginatorKeyFile>
