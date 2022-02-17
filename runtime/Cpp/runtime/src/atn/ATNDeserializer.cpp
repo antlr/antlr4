@@ -61,59 +61,125 @@ using namespace antlrcpp;
 
 namespace {
 
-uint32_t deserializeInt32(const std::vector<uint16_t>& data, size_t offset) {
-  return static_cast<uint32_t>(data[offset]) | (static_cast<uint32_t>(data[offset + 1]) << 16);
-}
-
-ssize_t readUnicodeInt(const std::vector<uint16_t>& data, int& p) {
-  return static_cast<ssize_t>(data[p++]);
-}
-
-ssize_t readUnicodeInt32(const std::vector<uint16_t>& data, int& p) {
-  auto result = deserializeInt32(data, p);
-  p += 2;
-  return static_cast<ssize_t>(result);
-}
-
-// We templatize this on the function type so the optimizer can inline
-// the 16- or 32-bit readUnicodeInt/readUnicodeInt32 as needed.
-template <typename F>
-void deserializeSets(
-  const std::vector<uint16_t>& data,
-  int& p,
-  std::vector<misc::IntervalSet>& sets,
-  F readUnicode) {
-  size_t nsets = data[p++];
-  sets.reserve(sets.size() + nsets);
-  for (size_t i = 0; i < nsets; i++) {
-    size_t nintervals = data[p++];
-    misc::IntervalSet set;
-
-    bool containsEof = data[p++] != 0;
-    if (containsEof) {
-      set.add(-1);
+  void checkCondition(bool condition, std::string_view message) {
+    if (!condition) {
+      throw IllegalStateException(std::string(message));
     }
-
-    for (size_t j = 0; j < nintervals; j++) {
-      auto a = readUnicode(data, p);
-      auto b = readUnicode(data, p);
-      set.add(a, b);
-    }
-    sets.push_back(set);
   }
-}
+
+  void checkCondition(bool condition) {
+    checkCondition(condition, "");
+  }
+
+  /**
+   * Analyze the {@link StarLoopEntryState} states in the specified ATN to set
+   * the {@link StarLoopEntryState#isPrecedenceDecision} field to the
+   * correct value.
+   *
+   * @param atn The ATN.
+   */
+  void markPrecedenceDecisions(const ATN &atn) {
+    for (ATNState *state : atn.states) {
+      if (!is<StarLoopEntryState*>(state)) {
+        continue;
+      }
+
+      /* We analyze the ATN to determine if this ATN decision state is the
+      * decision for the closure block that determines whether a
+      * precedence rule should continue or complete.
+      */
+      if (atn.ruleToStartState[state->ruleIndex]->isLeftRecursiveRule) {
+        ATNState *maybeLoopEndState = state->transitions[state->transitions.size() - 1]->target;
+        if (is<LoopEndState *>(maybeLoopEndState)) {
+          if (maybeLoopEndState->epsilonOnlyTransitions && is<RuleStopState*>(maybeLoopEndState->transitions[0]->target)) {
+            downCast<StarLoopEntryState*>(state)->isPrecedenceDecision = true;
+          }
+        }
+      }
+    }
+  }
+
+  Ref<LexerAction> lexerActionFactory(LexerActionType type, int data1, int data2) {
+    switch (type) {
+      case LexerActionType::CHANNEL:
+        return std::make_shared<LexerChannelAction>(data1);
+
+      case LexerActionType::CUSTOM:
+        return std::make_shared<LexerCustomAction>(data1, data2);
+
+      case LexerActionType::MODE:
+        return std::make_shared< LexerModeAction>(data1);
+
+      case LexerActionType::MORE:
+        return LexerMoreAction::getInstance();
+
+      case LexerActionType::POP_MODE:
+        return LexerPopModeAction::getInstance();
+
+      case LexerActionType::PUSH_MODE:
+        return std::make_shared<LexerPushModeAction>(data1);
+
+      case LexerActionType::SKIP:
+        return LexerSkipAction::getInstance();
+
+      case LexerActionType::TYPE:
+        return std::make_shared<LexerTypeAction>(data1);
+
+      default:
+        throw IllegalArgumentException("The specified lexer action type " + std::to_string(static_cast<size_t>(type)) +
+                                      " is not valid.");
+    }
+  }
+
+  uint32_t deserializeInt32(const std::vector<uint16_t>& data, size_t offset) {
+    return static_cast<uint32_t>(data[offset]) | (static_cast<uint32_t>(data[offset + 1]) << 16);
+  }
+
+  ssize_t readUnicodeInt(const std::vector<uint16_t>& data, int& p) {
+    return static_cast<ssize_t>(data[p++]);
+  }
+
+  ssize_t readUnicodeInt32(const std::vector<uint16_t>& data, int& p) {
+    auto result = deserializeInt32(data, p);
+    p += 2;
+    return static_cast<ssize_t>(result);
+  }
+
+  // We templatize this on the function type so the optimizer can inline
+  // the 16- or 32-bit readUnicodeInt/readUnicodeInt32 as needed.
+  template <typename F>
+  void deserializeSets(
+    const std::vector<uint16_t>& data,
+    int& p,
+    std::vector<misc::IntervalSet>& sets,
+    F readUnicode) {
+    size_t nsets = data[p++];
+    sets.reserve(sets.size() + nsets);
+    for (size_t i = 0; i < nsets; i++) {
+      size_t nintervals = data[p++];
+      misc::IntervalSet set;
+
+      bool containsEof = data[p++] != 0;
+      if (containsEof) {
+        set.add(-1);
+      }
+
+      for (size_t j = 0; j < nintervals; j++) {
+        auto a = readUnicode(data, p);
+        auto b = readUnicode(data, p);
+        set.add(a, b);
+      }
+      sets.push_back(set);
+    }
+  }
 
 }
 
-ATNDeserializer::ATNDeserializer(): ATNDeserializer(ATNDeserializationOptions::getDefaultOptions()) {
-}
+ATNDeserializer::ATNDeserializer() : ATNDeserializer(ATNDeserializationOptions::getDefaultOptions()) {}
 
-ATNDeserializer::ATNDeserializer(const ATNDeserializationOptions& dso): _deserializationOptions(dso) {
-}
+ATNDeserializer::ATNDeserializer(ATNDeserializationOptions deserializationOptions) : _deserializationOptions(std::move(deserializationOptions)) {}
 
-ATNDeserializer::~ATNDeserializer() {
-}
-ATN ATNDeserializer::deserialize(const std::vector<uint16_t>& data) {
+ATN ATNDeserializer::deserialize(const std::vector<uint16_t>& data) const {
   int p = 0;
   int version = data[p++];
   if (version != SERIALIZED_VERSION) {
@@ -448,35 +514,7 @@ ATN ATNDeserializer::deserialize(const std::vector<uint16_t>& data) {
   return atn;
 }
 
-/**
- * Analyze the {@link StarLoopEntryState} states in the specified ATN to set
- * the {@link StarLoopEntryState#isPrecedenceDecision} field to the
- * correct value.
- *
- * @param atn The ATN.
- */
-void ATNDeserializer::markPrecedenceDecisions(const ATN &atn) const {
-  for (ATNState *state : atn.states) {
-    if (!is<StarLoopEntryState*>(state)) {
-      continue;
-    }
-
-    /* We analyze the ATN to determine if this ATN decision state is the
-     * decision for the closure block that determines whether a
-     * precedence rule should continue or complete.
-     */
-    if (atn.ruleToStartState[state->ruleIndex]->isLeftRecursiveRule) {
-      ATNState *maybeLoopEndState = state->transitions[state->transitions.size() - 1]->target;
-      if (is<LoopEndState *>(maybeLoopEndState)) {
-        if (maybeLoopEndState->epsilonOnlyTransitions && is<RuleStopState*>(maybeLoopEndState->transitions[0]->target)) {
-          downCast<StarLoopEntryState*>(state)->isPrecedenceDecision = true;
-        }
-      }
-    }
-  }
-}
-
-void ATNDeserializer::verifyATN(const ATN &atn) {
+void ATNDeserializer::verifyATN(const ATN &atn) const {
   // verify assumptions
   for (ATNState *state : atn.states) {
     if (state == nullptr) {
@@ -532,16 +570,6 @@ void ATNDeserializer::verifyATN(const ATN &atn) {
     } else {
       checkCondition(state->transitions.size() <= 1 || is<RuleStopState*>(state));
     }
-  }
-}
-
-void ATNDeserializer::checkCondition(bool condition) {
-  checkCondition(condition, "");
-}
-
-void ATNDeserializer::checkCondition(bool condition, const std::string &message) {
-  if (!condition) {
-    throw IllegalStateException(message);
   }
 }
 
@@ -635,34 +663,4 @@ ATNState* ATNDeserializer::stateFactory(size_t type, size_t ruleIndex) {
   return s;
 }
 
-Ref<LexerAction> ATNDeserializer::lexerActionFactory(LexerActionType type, int data1, int data2) const {
-  switch (type) {
-    case LexerActionType::CHANNEL:
-      return std::make_shared<LexerChannelAction>(data1);
 
-    case LexerActionType::CUSTOM:
-      return std::make_shared<LexerCustomAction>(data1, data2);
-
-    case LexerActionType::MODE:
-      return std::make_shared< LexerModeAction>(data1);
-
-    case LexerActionType::MORE:
-      return LexerMoreAction::getInstance();
-
-    case LexerActionType::POP_MODE:
-      return LexerPopModeAction::getInstance();
-
-    case LexerActionType::PUSH_MODE:
-      return std::make_shared<LexerPushModeAction>(data1);
-
-    case LexerActionType::SKIP:
-      return LexerSkipAction::getInstance();
-
-    case LexerActionType::TYPE:
-      return std::make_shared<LexerTypeAction>(data1);
-
-    default:
-      throw IllegalArgumentException("The specified lexer action type " + std::to_string(static_cast<size_t>(type)) +
-                                     " is not valid.");
-  }
-}
