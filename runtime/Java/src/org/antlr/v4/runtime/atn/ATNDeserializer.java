@@ -20,12 +20,9 @@ import java.util.Locale;
  * @author Sam Harwell
  */
 public class ATNDeserializer {
-	public static final int SERIALIZED_VERSION;
-	static {
-		SERIALIZED_VERSION = 4;
-	}
+	public static final int SERIALIZED_VERSION = 4;
 
-	interface UnicodeDeserializer {
+	public interface UnicodeDeserializer {
 		// Wrapper for readInt() or readInt32()
 		int readUnicode(char[] data, int p);
 
@@ -34,12 +31,12 @@ public class ATNDeserializer {
 		int size();
 	}
 
-	enum UnicodeDeserializingMode {
+	public enum UnicodeDeserializingMode {
 		UNICODE_BMP,
 		UNICODE_SMP
 	}
 
-	static UnicodeDeserializer getUnicodeDeserializer(UnicodeDeserializingMode mode) {
+	public static UnicodeDeserializer getUnicodeDeserializer(UnicodeDeserializingMode mode) {
 		if (mode == UnicodeDeserializingMode.UNICODE_BMP) {
 			return new UnicodeDeserializer() {
 				@Override
@@ -539,7 +536,7 @@ public class ATNDeserializer {
 		}
 	}
 
-	protected static int toInt(char c) {
+	public static int toInt(char c) {
 		return c;
 	}
 

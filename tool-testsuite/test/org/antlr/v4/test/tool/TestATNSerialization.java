@@ -6,8 +6,7 @@
 
 package org.antlr.v4.test.tool;
 
-import org.antlr.v4.runtime.atn.ATN;
-import org.antlr.v4.runtime.atn.ATNSerializer;
+import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.misc.IntegerList;
 import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.tool.DOTGenerator;
@@ -1045,6 +1044,6 @@ public class TestATNSerialization extends BaseJavaToolTest {
 	public static String getDecoded(ATN atn, List<String> tokenNames) {
 		IntegerList serialized = ATNSerializer.getSerialized(atn, "Java");
 		char[] data = Utils.toCharArray(serialized);
-		return new ATNSerializer(atn, tokenNames).decode(data);
+		return new ATNDeserializerHelper(atn, tokenNames).decode(data);
 	}
 }
