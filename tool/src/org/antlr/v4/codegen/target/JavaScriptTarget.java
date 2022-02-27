@@ -92,6 +92,7 @@ public class JavaScriptTarget extends Target {
 		return false;
 	}
 
+	@Override
 	public boolean isATNSerializedAsInts() {
 		return false;
 	}

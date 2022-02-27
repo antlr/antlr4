@@ -74,6 +74,7 @@ public class JavaTarget extends Target {
 		}
 	}
 
+	@Override
 	public boolean isATNSerializedAsInts() {
 		return false;
 	}
