@@ -177,8 +177,4 @@ public class GoTarget extends Target {
 			return super.toString(o, formatString, locale);
 		}
 	}
-
-	public boolean ATNSerializedAsInts() {
-		return true;
-	}
 }

@@ -343,7 +343,7 @@ public abstract class Target {
 			throw new IllegalArgumentException(String.format("Cannot encode the specified value: %d", v));
 		}
 
-		if ( ATNSerializedAsInts() ) {
+		if ( isATNSerializedAsInts() ) {
 			return Integer.toString(v);
 		}
 
@@ -689,8 +689,8 @@ public abstract class Target {
 		return true;
 	}
 
-	public boolean ATNSerializedAsInts() {
-		return false;
+	public boolean isATNSerializedAsInts() {
+		return true;
 	}
 
 	/** @since 4.6 */

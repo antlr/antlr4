@@ -73,4 +73,8 @@ public class JavaTarget extends Target {
 			return super.toString(o, formatString, locale);
 		}
 	}
+
+	public boolean isATNSerializedAsInts() {
+		return false;
+	}
 }

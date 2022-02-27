@@ -105,9 +105,5 @@ public class Python2Target extends Target {
 	public boolean supportsOverloadedMethods() {
 		return false;
 	}
-
-	public boolean ATNSerializedAsInts() {
-		return true;
-	}
 }
 

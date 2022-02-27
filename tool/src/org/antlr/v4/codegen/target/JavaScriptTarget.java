@@ -91,4 +91,8 @@ public class JavaScriptTarget extends Target {
 	public boolean supportsOverloadedMethods() {
 		return false;
 	}
+
+	public boolean isATNSerializedAsInts() {
+		return false;
+	}
 }

@@ -86,10 +86,6 @@ public class CppTarget extends Target {
 		}
 	}
 
-	public boolean ATNSerializedAsInts() {
-		return true;
-	}
-
 	@Override
 	public String getRecognizerFileName(boolean header) {
 		ST extST = getTemplates().getInstanceOf(header ? "headerFileExtension" : "codeFileExtension");
