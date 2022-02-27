@@ -166,7 +166,6 @@ public class GoTarget extends Target {
 	}
 
 	protected static class JavaStringRenderer extends StringRenderer {
-
 		@Override
 		public String toString(Object o, String formatString, Locale locale) {
 
@@ -177,6 +176,5 @@ public class GoTarget extends Target {
 
 			return super.toString(o, formatString, locale);
 		}
-
 	}
 }

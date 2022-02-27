@@ -101,4 +101,9 @@ public class SwiftTarget extends Target {
             return super.toString(o, formatString, locale);
         }
     }
+
+	@Override
+	public boolean isATNSerializedAsInts() {
+		return false;
+	}
 }

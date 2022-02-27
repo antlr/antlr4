@@ -170,4 +170,9 @@ public class CSharpTarget extends Target {
 
 		return result;
 	}
+
+	@Override
+	public boolean isATNSerializedAsInts() {
+		return false;
+	}
 }

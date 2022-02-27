@@ -809,13 +809,10 @@ class <lexer.name>(<if(superClass)><superClass><else>Lexer<endif>):
 >>
 
 SerializedATN(model) ::= <<
-<! only one segment, can be inlined !>
-
 def serializedATN():
-    with StringIO() as buf:
-        buf.write(u"<model.serialized; wrap={")<\n>        buf.write(u"}>")
-        return buf.getvalue()
-
+    return [
+        <model.serialized: {s | <s>}; separator=",", wrap>
+    ]
 >>
 
 /** Using a type to init value map, try to init a type; if not in table

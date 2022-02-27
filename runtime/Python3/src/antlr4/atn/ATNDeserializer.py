@@ -22,8 +22,8 @@ class ATNDeserializer (object):
             options = ATNDeserializationOptions.defaultOptions
         self.deserializationOptions = options
 
-    def deserialize(self, data : str):
-        self.data = [ ord(c) for c in data ]
+    def deserialize(self, data : int):
+        self.data = data
         self.pos = 0
         self.checkVersion()
         atn = self.readATN()
