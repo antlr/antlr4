@@ -21,8 +21,12 @@ class ATNDeserializer (object):
         self.stateFactories = None
         self.actionFactories = None
 
-    def deserialize(self, data):
+    def deserialize_str(self, data):
         self.data = [ ord(c) for c in data ]
+        return self.deserialize(data)
+
+    def deserialize(self, data):
+        self.data = data
         self.pos = 0
         self.checkVersion()
         atn = self.readATN()

@@ -104,4 +104,8 @@ public class Python3Target extends Target {
 	public boolean supportsOverloadedMethods() {
 		return false;
 	}
+
+	public boolean ATNSerializedAsInts() {
+		return true;
+	}
 }

@@ -343,8 +343,7 @@ public abstract class Target {
 			throw new IllegalArgumentException(String.format("Cannot encode the specified value: %d", v));
 		}
 
-		String language = getLanguage();
-		if (language.equals("Go") || language.equals("Cpp")) {
+		if ( ATNSerializedAsInts() ) {
 			return Integer.toString(v);
 		}
 
@@ -367,6 +366,7 @@ public abstract class Target {
 				}
 
 				if (isPreviousOctal) {
+					String language = getLanguage();
 					char upperBound = language.equals("PHP") ? '9' : '7';
 					if (c >= '0' && c <= upperBound) {
 						return escapeChar(v);
@@ -687,6 +687,10 @@ public abstract class Target {
 	 */
 	public boolean supportsOverloadedMethods() {
 		return true;
+	}
+
+	public boolean ATNSerializedAsInts() {
+		return false;
 	}
 
 	/** @since 4.6 */
