@@ -472,12 +472,17 @@ public class ParserATNFactory implements ATNFactory {
             if ( el.left.getNumberOfTransitions()==1 ) tr = el.left.transition(0);
             boolean isRuleTrans = tr instanceof RuleTransition;
             if ( el.left.getStateType() == ATNState.BASIC &&
+				el.right != null &&
 				el.right.getStateType()== ATNState.BASIC &&
-				tr!=null && (isRuleTrans && ((RuleTransition)tr).followState == el.right || tr.target == el.right) )
-			{
+				tr!=null && (isRuleTrans && ((RuleTransition)tr).followState == el.right || tr.target == el.right) ) {
 				// we can avoid epsilon edge to next el
-				if ( isRuleTrans ) ((RuleTransition)tr).followState = els.get(i+1).left;
-                else tr.target = els.get(i+1).left;
+				Handle handle = i + 1 < els.size() ? els.get(i + 1) : null;
+				if (handle != null) {
+					if (isRuleTrans)
+						((RuleTransition) tr).followState = handle.left;
+					else
+						tr.target = handle.left;
+				}
 				atn.removeState(el.right); // we skipped over this state
 			}
 			else { // need epsilon if previous block's right end node is complicated
@@ -485,11 +490,8 @@ public class ParserATNFactory implements ATNFactory {
 			}
 		}
 		Handle first = els.get(0);
-		Handle last = els.get(n -1);
-		if ( first==null || last==null ) {
-			g.tool.errMgr.toolError(ErrorType.INTERNAL_ERROR, "element list has first|last == null");
-		}
-		return new Handle(first.left, last.right);
+		Handle last = els.get(n - 1);
+		return new Handle(first != null ? first.left : null, last != null ? last.right : null);
 	}
 
 	/**
@@ -712,17 +714,9 @@ public class ParserATNFactory implements ATNFactory {
 			else s.setRuleIndex(currentRule.index);
 			atn.addState(s);
 			return s;
-		} catch (InstantiationException ex) {
-			cause = ex;
-		} catch (IllegalAccessException ex) {
-			cause = ex;
-		} catch (IllegalArgumentException ex) {
-			cause = ex;
-		} catch (InvocationTargetException ex) {
-			cause = ex;
-		} catch (NoSuchMethodException ex) {
-			cause = ex;
-		} catch (SecurityException ex) {
+		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException |
+				InvocationTargetException | NoSuchMethodException | SecurityException ex
+		) {
 			cause = ex;
 		}
 
@@ -743,11 +737,7 @@ public class ParserATNFactory implements ATNFactory {
 	public ATNState newState() { return newState(null); }
 
 	public boolean expectNonGreedy(BlockAST blkAST) {
-		if ( blockHasWildcardAlt(blkAST) ) {
-			return true;
-		}
-
-		return false;
+		return blockHasWildcardAlt(blkAST);
 	}
 
 	/**

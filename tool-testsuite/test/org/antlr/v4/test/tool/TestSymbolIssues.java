@@ -542,4 +542,21 @@ public class TestSymbolIssues extends BaseJavaToolTest {
 
 		testErrors(test, false);
 	}
+
+	@Test public void testUndefinedLabel() {
+		String[] test = {
+				"grammar Test;" +
+				"root\n" +
+				"    : root a\n" +
+				"    | b [error]\n" +
+				"    ;\n" +
+				"\n" +
+				"a: 'a';\n" +
+				"b: 'b';",
+
+				"error(" + ErrorType.INTERNAL_ERROR.code + "): Test.g4:2:30: internal error: Rule error undefined \n"
+		};
+
+		testErrors(test, false);
+	}
 }
