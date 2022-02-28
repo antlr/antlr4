@@ -95,11 +95,11 @@ size_t ParserATNSimulator::adaptivePredict(TokenStream *input, size_t decision, 
 
   dfa::DFAState *s0;
   {
-    std::shared_lock<std::shared_mutex> stateLock(_stateLock);
+    std::shared_lock<std::shared_mutex> stateLock(atn._stateMutex);
     if (dfa.isPrecedenceDfa()) {
       // the start state for a precedence DFA depends on the current
       // parser precedence, and is provided by a DFA method.
-      std::shared_lock<std::shared_mutex> edgeLock(_edgeLock);
+      std::shared_lock<std::shared_mutex> edgeLock(atn._edgeMutex);
       s0 = dfa.getPrecedenceStartState(parser->getPrecedence());
     } else {
       // the start state for a "regular" DFA is just s0
@@ -112,7 +112,7 @@ size_t ParserATNSimulator::adaptivePredict(TokenStream *input, size_t decision, 
     std::unique_ptr<ATNConfigSet> s0_closure = computeStartState(dfa.atnStartState,
                                                                  &ParserRuleContext::EMPTY, fullCtx);
 
-    _stateLock.lock();
+    std::unique_lock<std::shared_mutex> stateLock(atn._stateMutex);
     dfa::DFAState* ds0 = dfa.s0;
     if (dfa.isPrecedenceDfa()) {
       /* If this is a precedence DFA, we use applyPrecedenceFilter
@@ -124,7 +124,8 @@ size_t ParserATNSimulator::adaptivePredict(TokenStream *input, size_t decision, 
       ds0->configs = std::move(s0_closure); // not used for prediction but useful to know start configs anyway
       dfa::DFAState *newState = new dfa::DFAState(applyPrecedenceFilter(ds0->configs.get())); /* mem-check: managed by the DFA or deleted below */
       s0 = addDFAState(dfa, newState);
-      dfa.setPrecedenceStartState(parser->getPrecedence(), s0, _edgeLock);
+      std::unique_lock<std::shared_mutex> edgeLock(atn._edgeMutex);
+      dfa.setPrecedenceStartState(parser->getPrecedence(), s0);
       if (s0 != newState) {
         delete newState; // If there was already a state with this config set we don't need the new one.
       }
@@ -141,7 +142,6 @@ size_t ParserATNSimulator::adaptivePredict(TokenStream *input, size_t decision, 
         delete newState; // If there was already a state with this config set we don't need the new one.
       }
     }
-    _stateLock.unlock();
   }
 
   // We can start with an existing DFA.
@@ -266,10 +266,9 @@ size_t ParserATNSimulator::execATN(dfa::DFA &dfa, dfa::DFAState *s0, TokenStream
 
 dfa::DFAState *ParserATNSimulator::getExistingTargetState(dfa::DFAState *previousD, size_t t) {
   dfa::DFAState* retval;
-  _edgeLock.lock_shared();
+  std::shared_lock<std::shared_mutex> edgeLock(atn._edgeMutex);
   auto iterator = previousD->edges.find(t);
   retval = (iterator == previousD->edges.end()) ? nullptr : iterator->second;
-  _edgeLock.unlock_shared();
   return retval;
 }
 
@@ -1255,17 +1254,17 @@ dfa::DFAState *ParserATNSimulator::addDFAEdge(dfa::DFA &dfa, dfa::DFAState *from
     return nullptr;
   }
 
-  _stateLock.lock();
-  to = addDFAState(dfa, to); // used existing if possible not incoming
-  _stateLock.unlock();
+  {
+    std::unique_lock<std::shared_mutex> stateLock(atn._stateMutex);
+    to = addDFAState(dfa, to); // used existing if possible not incoming
+  }
   if (from == nullptr || t > (int)atn.maxTokenType) {
     return to;
   }
 
   {
-    _edgeLock.lock();
+    std::unique_lock<std::shared_mutex> edgeLock(atn._edgeMutex);
     from->edges[t] = to; // connect
-    _edgeLock.unlock();
   }
 
 #if DEBUG_DFA == 1

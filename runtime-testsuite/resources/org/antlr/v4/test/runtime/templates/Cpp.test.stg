@@ -93,7 +93,7 @@ public:
   virtual std::unique_ptr\<antlr4::Token> nextToken() override {
     if (dynamic_cast\<PositionAdjustingLexerATNSimulator *>(_interpreter) == nullptr) {
       delete _interpreter;
-      _interpreter = new PositionAdjustingLexerATNSimulator(this, _atn, _decisionToDFA, _sharedContextCache);
+      _interpreter = new PositionAdjustingLexerATNSimulator(this, *_atn, *_decisionToDFA, _sharedContextCache);
     }
 
     return antlr4::Lexer::nextToken();

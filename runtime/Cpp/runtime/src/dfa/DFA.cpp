@@ -70,7 +70,7 @@ DFAState* DFA::getPrecedenceStartState(int precedence) const {
   return iterator->second;
 }
 
-void DFA::setPrecedenceStartState(int precedence, DFAState *startState, std::shared_mutex &lock) {
+void DFA::setPrecedenceStartState(int precedence, DFAState *startState) {
   if (!isPrecedenceDfa()) {
     throw IllegalStateException("Only precedence DFAs may contain a precedence start state.");
   }
@@ -79,11 +79,7 @@ void DFA::setPrecedenceStartState(int precedence, DFAState *startState, std::sha
     return;
   }
 
-  {
-    lock.lock();
-    s0->edges[precedence] = startState;
-    lock.unlock();
-  }
+  s0->edges[precedence] = startState;
 }
 
 std::vector<DFAState *> DFA::getStates() const {
