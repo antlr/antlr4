@@ -2,37 +2,13 @@ lexer grammar XPathLexer;
 
 tokens { TokenRef, RuleRef }
 
-/*
-path : separator? word (separator word)* EOF ;
-
-separator
-	:	'/'  '!'
-	|	'//' '!'
-	|	'/'
-	|	'//'
-	;
-
-word:	TokenRef
-	|	RuleRef
-	|	String
-	|	'*'
-	;
-*/
-
 Anywhere : '//' ;
-Root	 : '/' ;
+Root     : '/' ;
 Wildcard : '*' ;
-Bang	 : '!' ;
+Bang     : '!' ;
 
-ID			:	NameStartChar NameChar*
-				{
-				String text = Text;
-				if ( Char.IsUpper(text[0]) ) 
-					Type = TokenRef;
-				else 
-					Type = RuleRef;
-				}
-			;
+ID          :   NameStartChar NameChar* { Type = Char.IsUpper(Text[0]) ? TokenRef : RuleRef; }
+            ;
 
 fragment
 NameChar    :   NameStartChar
@@ -45,7 +21,8 @@ NameChar    :   NameStartChar
 
 fragment
 NameStartChar
-            :   'A'..'Z' | 'a'..'z'
+            :   'A'..'Z'
+            |   'a'..'z'
             |   '\u00C0'..'\u00D6'
             |   '\u00D8'..'\u00F6'
             |   '\u00F8'..'\u02FF'
@@ -57,9 +34,6 @@ NameStartChar
             |   '\u3001'..'\uD7FF'
             |   '\uF900'..'\uFDCF'
             |   '\uFDF0'..'\uFFFD'
-            ; // ignores | ['\u10000-'\uEFFFF] ;
+            ;
 
 String : '\'' .*? '\'' ;
-
-//Ws : [ \t\r\n]+ -> skip ;
-

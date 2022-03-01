@@ -43,7 +43,7 @@ public partial class XPathLexer : Lexer {
 	};
 
 	public static readonly string[] ruleNames = {
-		"Anywhere", "Root", "Wildcard", "Bang", "ID", "NameChar", "NameStartChar", 
+		"Anywhere", "Root", "Wildcard", "Bang", "ID", "NameChar", "NameStartChar",
 		"String"
 	};
 
@@ -61,7 +61,7 @@ public partial class XPathLexer : Lexer {
 		null, null, null, "'//'", "'/'", "'*'", "'!'"
 	};
 	private static readonly string[] _SymbolicNames = {
-		null, "TokenRef", "RuleRef", "Anywhere", "Root", "Wildcard", "Bang", "ID", 
+		null, "TokenRef", "RuleRef", "Anywhere", "Root", "Wildcard", "Bang", "ID",
 		"String"
 	};
 	public static readonly IVocabulary DefaultVocabulary = new Vocabulary(_LiteralNames, _SymbolicNames);
@@ -98,13 +98,7 @@ public partial class XPathLexer : Lexer {
 	}
 	private void ID_action(RuleContext _localctx, int actionIndex) {
 		switch (actionIndex) {
-		case 0: 
-						String text = Text;
-						if ( Char.IsUpper(text[0]) ) 
-							Type = TokenRef;
-						else 
-							Type = RuleRef;
-						 break;
+		case 0:  Type = Char.IsUpper(Text[0]) ? TokenRef : RuleRef;  break;
 		}
 	}
 
