@@ -7,102 +7,60 @@
 
 using namespace antlr4;
 
+namespace {
 
-XPathLexer::XPathLexer(CharStream *input) : Lexer(input) {
-  _interpreter = new atn::LexerATNSimulator(this, *_atn, *_decisionToDFA, _sharedContextCache);
-}
+struct XPathLexerStaticData final {
+  XPathLexerStaticData(std::vector<std::string> ruleNames,
+                        std::vector<std::string> channelNames,
+                        std::vector<std::string> modeNames,
+                        std::vector<std::string> literalNames,
+                        std::vector<std::string> symbolicNames)
+      : ruleNames(std::move(ruleNames)), channelNames(std::move(channelNames)),
+        modeNames(std::move(modeNames)), literalNames(std::move(literalNames)),
+        symbolicNames(std::move(symbolicNames)),
+        vocabulary(this->literalNames, this->symbolicNames) {}
 
-XPathLexer::~XPathLexer() {
-  delete _interpreter;
-}
+  XPathLexerStaticData(const XPathLexerStaticData&) = delete;
+  XPathLexerStaticData(XPathLexerStaticData&&) = delete;
+  XPathLexerStaticData& operator=(const XPathLexerStaticData&) = delete;
+  XPathLexerStaticData& operator=(XPathLexerStaticData&&) = delete;
 
-std::string XPathLexer::getGrammarFileName() const {
-  return "XPathLexer.g4";
-}
-
-const std::vector<std::string>& XPathLexer::getRuleNames() const {
-  return _ruleNames;
-}
-
-const std::vector<std::string>& XPathLexer::getChannelNames() const {
-  return _channelNames;
-}
-
-const std::vector<std::string>& XPathLexer::getModeNames() const {
-  return _modeNames;
-}
-
-dfa::Vocabulary& XPathLexer::getVocabulary() const {
-  return _vocabulary;
-}
-
-const std::vector<uint16_t>& XPathLexer::getSerializedATN() const {
-  return _serializedATN;
-}
-
-const atn::ATN& XPathLexer::getATN() const {
-  return *_atn;
-}
-
-
-void XPathLexer::action(RuleContext *context, size_t ruleIndex, size_t actionIndex) {
-  switch (ruleIndex) {
-    case 4: IDAction(antlrcpp::downCast<antlr4::RuleContext *>(context), actionIndex); break;
-
-  default:
-    break;
-  }
-}
-
-void XPathLexer::IDAction(antlr4::RuleContext *context, size_t actionIndex) {
-  switch (actionIndex) {
-    case 0:
-    				if (isupper(getText()[0]))
-    				  setType(TOKEN_REF);
-    				else
-    				  setType(RULE_REF);
-    				 break;
-
-  default:
-    break;
-  }
-}
-
-
-
-// Static vars and initialization.
-std::vector<dfa::DFA>* XPathLexer::_decisionToDFA = nullptr;
-atn::PredictionContextCache XPathLexer::_sharedContextCache;
-
-// We own the ATN which in turn owns the ATN states.
-atn::ATN* XPathLexer::_atn = nullptr;
-std::vector<uint16_t> XPathLexer::_serializedATN;
-
-std::vector<std::string> XPathLexer::_ruleNames = {
-  "ANYWHERE", "ROOT", "WILDCARD", "BANG", "ID", "NameChar", "NameStartChar",
-  "STRING"
+  std::vector<antlr4::dfa::DFA> decisionToDFA;
+  antlr4::atn::PredictionContextCache sharedContextCache;
+  const std::vector<std::string> ruleNames;
+  const std::vector<std::string> channelNames;
+  const std::vector<std::string> modeNames;
+  const std::vector<std::string> literalNames;
+  const std::vector<std::string> symbolicNames;
+  const antlr4::dfa::Vocabulary vocabulary;
+  std::vector<uint16_t> serializedATN;
+  std::unique_ptr<antlr4::atn::ATN> atn;
 };
 
-std::vector<std::string> XPathLexer::_channelNames = {
-  "DEFAULT_TOKEN_CHANNEL", "HIDDEN"
-};
+std::once_flag XPathLexer_onceFlag;
+XPathLexerStaticData *XPathLexerstaticData = nullptr;
 
-std::vector<std::string> XPathLexer::_modeNames = {
-  "DEFAULT_MODE"
-};
-
-std::vector<std::string> XPathLexer::_literalNames = {
-  "", "", "", "'//'", "'/'", "'*'", "'!'"
-};
-
-std::vector<std::string> XPathLexer::_symbolicNames = {
-  "", "TOKEN_REF", "RULE_REF", "ANYWHERE", "ROOT", "WILDCARD", "BANG", "ID",
-  "STRING"
-};
-
-dfa::Vocabulary XPathLexer::_vocabulary(_literalNames, _symbolicNames);
-
-XPathLexer::Initializer::Initializer() {
+void XPathLexer_initialize() {
+  assert(XPathLexerstaticData == nullptr);
+  auto staticData = std::make_unique<XPathLexerStaticData>(
+    std::vector<std::string>{
+      "ANYWHERE", "ROOT", "WILDCARD", "BANG", "ID", "NameChar", "NameStartChar",
+      "STRING"
+    },
+    std::vector<std::string>{
+      "DEFAULT_TOKEN_CHANNEL", "HIDDEN"
+    },
+    std::vector<std::string>{
+      "DEFAULT_MODE"
+    },
+    std::vector<std::string>{
+      "", "", "", "'//'", "'/'", "'*'", "'!'"
+    },
+    std::vector<std::string>{
+      "", "TOKEN_REF", "RULE_REF", "ANYWHERE", "ROOT", "WILDCARD", "BANG", "ID",
+      "STRING"
+    }
+  );
   static const uint16_t serializedATNSegment0[] = {
     0x4, 0x0, 0x8, 0x32, 0x6, 0xffff, 0x2, 0x0, 0x7, 0x0, 0x2, 0x1, 0x7,
        0x1, 0x2, 0x2, 0x7, 0x2, 0x2, 0x3, 0x7, 0x3, 0x2, 0x4, 0x7, 0x4,
@@ -144,19 +102,86 @@ XPathLexer::Initializer::Initializer() {
        0x1, 0x0, 0x0, 0x0, 0x4, 0x0, 0x1e, 0x25, 0x2d, 0x1, 0x1, 0x4, 0x0,
   };
 
-  _serializedATN.insert(_serializedATN.end(), serializedATNSegment0,
+  size_t serializedATNSize = 0;
+  serializedATNSize += sizeof(serializedATNSegment0) / sizeof(serializedATNSegment0[0]);
+  staticData->serializedATN.reserve(serializedATNSize);
+
+  staticData->serializedATN.insert(staticData->serializedATN.end(), serializedATNSegment0,
     serializedATNSegment0 + sizeof(serializedATNSegment0) / sizeof(serializedATNSegment0[0]));
 
-
   atn::ATNDeserializer deserializer;
-  _atn = deserializer.deserialize(_serializedATN).release();
+  staticData->atn = deserializer.deserialize(staticData->serializedATN);
 
-  size_t count = _atn->getNumberOfDecisions();
-  _decisionToDFA = new std::vector<dfa::DFA>();
-  _decisionToDFA->reserve(count);
+  size_t count = staticData->atn->getNumberOfDecisions();
+  staticData->decisionToDFA.reserve(count);
   for (size_t i = 0; i < count; i++) {
-    _decisionToDFA->emplace_back(_atn->getDecisionState(i), i);
+    staticData->decisionToDFA.emplace_back(staticData->atn->getDecisionState(i), i);
+  }
+  XPathLexerstaticData = staticData.release();
+}
+
+}
+
+XPathLexer::XPathLexer(CharStream *input) : Lexer(input) {
+  XPathLexer::initialize();
+  _interpreter = new atn::LexerATNSimulator(this, *XPathLexerstaticData->atn, XPathLexerstaticData->decisionToDFA, XPathLexerstaticData->sharedContextCache);
+}
+
+XPathLexer::~XPathLexer() {
+  delete _interpreter;
+}
+
+std::string XPathLexer::getGrammarFileName() const {
+  return "XPathLexer.g4";
+}
+
+const std::vector<std::string>& XPathLexer::getRuleNames() const {
+  return XPathLexerstaticData->ruleNames;
+}
+
+const std::vector<std::string>& XPathLexer::getChannelNames() const {
+  return XPathLexerstaticData->channelNames;
+}
+
+const std::vector<std::string>& XPathLexer::getModeNames() const {
+  return XPathLexerstaticData->modeNames;
+}
+
+const dfa::Vocabulary& XPathLexer::getVocabulary() const {
+  return XPathLexerstaticData->vocabulary;
+}
+
+const std::vector<uint16_t>& XPathLexer::getSerializedATN() const {
+  return XPathLexerstaticData->serializedATN;
+}
+
+const atn::ATN& XPathLexer::getATN() const {
+  return *XPathLexerstaticData->atn;
+}
+
+void XPathLexer::action(RuleContext *context, size_t ruleIndex, size_t actionIndex) {
+  switch (ruleIndex) {
+    case 4: IDAction(antlrcpp::downCast<antlr4::RuleContext *>(context), actionIndex); break;
+
+  default:
+    break;
   }
 }
 
-XPathLexer::Initializer XPathLexer::_init;
+void XPathLexer::IDAction(antlr4::RuleContext *context, size_t actionIndex) {
+  switch (actionIndex) {
+    case 0:
+    				if (isupper(getText()[0]))
+    				  setType(TOKEN_REF);
+    				else
+    				  setType(RULE_REF);
+    				 break;
+
+  default:
+    break;
+  }
+}
+
+void XPathLexer::initialize() {
+  std::call_once(XPathLexer_onceFlag, XPathLexer_initialize);
+}
