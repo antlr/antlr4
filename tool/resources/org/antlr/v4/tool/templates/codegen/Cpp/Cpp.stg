@@ -142,11 +142,11 @@ struct <lexer.name>StaticData final {
   std::unique_ptr\<antlr4::atn::ATN> atn;
 };
 
-std::once_flag <lexer.name>_onceFlag;
-<lexer.name>StaticData *<lexer.name>staticData = nullptr;
+std::once_flag <lexer.grammarName; format = "lower">LexerOnceFlag;
+<lexer.name>StaticData *<lexer.grammarName; format = "lower">LexerStaticData = nullptr;
 
-void <lexer.name>_initialize() {
-  assert(<lexer.name>staticData == nullptr);
+void <lexer.grammarName; format = "lower">LexerInitialize() {
+  assert(<lexer.grammarName; format = "lower">LexerStaticData == nullptr);
   auto staticData = std::make_unique\<<lexer.name>StaticData>(
     std::vector\<std::string>{
       <lexer.ruleNames: {r | "<r>"}; separator = ", ", wrap, anchor>
@@ -165,14 +165,14 @@ void <lexer.name>_initialize() {
     }
   );
   <atn>
-  <lexer.name>staticData = staticData.release();
+  <lexer.grammarName; format = "lower">LexerStaticData = staticData.release();
 }
 
 }
 
 <lexer.name>::<lexer.name>(CharStream *input) : <superClass>(input) {
   <lexer.name>::initialize();
-  _interpreter = new atn::LexerATNSimulator(this, *<lexer.name>staticData->atn, <lexer.name>staticData->decisionToDFA, <lexer.name>staticData->sharedContextCache);
+  _interpreter = new atn::LexerATNSimulator(this, *<lexer.grammarName; format = "lower">LexerStaticData->atn, <lexer.grammarName; format = "lower">LexerStaticData->decisionToDFA, <lexer.grammarName; format = "lower">LexerStaticData->sharedContextCache);
 }
 
 <lexer.name>::~<lexer.name>() {
@@ -184,27 +184,27 @@ std::string <lexer.name>::getGrammarFileName() const {
 }
 
 const std::vector\<std::string>& <lexer.name>::getRuleNames() const {
-  return <lexer.name>staticData->ruleNames;
+  return <lexer.grammarName; format = "lower">LexerStaticData->ruleNames;
 }
 
 const std::vector\<std::string>& <lexer.name>::getChannelNames() const {
-  return <lexer.name>staticData->channelNames;
+  return <lexer.grammarName; format = "lower">LexerStaticData->channelNames;
 }
 
 const std::vector\<std::string>& <lexer.name>::getModeNames() const {
-  return <lexer.name>staticData->modeNames;
+  return <lexer.grammarName; format = "lower">LexerStaticData->modeNames;
 }
 
 const dfa::Vocabulary& <lexer.name>::getVocabulary() const {
-  return <lexer.name>staticData->vocabulary;
+  return <lexer.grammarName; format = "lower">LexerStaticData->vocabulary;
 }
 
 const std::vector\<uint16_t>& <lexer.name>::getSerializedATN() const {
-  return <lexer.name>staticData->serializedATN;
+  return <lexer.grammarName; format = "lower">LexerStaticData->serializedATN;
 }
 
 const atn::ATN& <lexer.name>::getATN() const {
-  return *<lexer.name>staticData->atn;
+  return *<lexer.grammarName; format = "lower">LexerStaticData->atn;
 }
 
 <namedActions.definitions>
@@ -237,7 +237,7 @@ bool <lexer.name>::sempred(RuleContext *context, size_t ruleIndex, size_t predic
 <sempredFuncs.values; separator="\n">
 
 void <lexer.name>::initialize() {
-  std::call_once(<lexer.name>_onceFlag, <lexer.name>_initialize);
+  std::call_once(<lexer.grammarName; format = "lower">LexerOnceFlag, <lexer.grammarName; format = "lower">LexerInitialize);
 }
 >>
 
@@ -360,11 +360,11 @@ struct <parser.name>StaticData final {
   std::unique_ptr\<antlr4::atn::ATN> atn;
 };
 
-std::once_flag <parser.name>_onceFlag;
-<parser.name>StaticData *<parser.name>staticData = nullptr;
+std::once_flag <parser.grammarName; format = "lower">ParserOnceFlag;
+<parser.name>StaticData *<parser.grammarName; format = "lower">ParserStaticData = nullptr;
 
-void <parser.name>_initialize() {
-  assert(<parser.name>staticData == nullptr);
+void <parser.grammarName; format = "lower">ParserInitialize() {
+  assert(<parser.grammarName; format = "lower">ParserStaticData == nullptr);
   auto staticData = std::make_unique\<<parser.name>StaticData>(
     std::vector\<std::string>{
       <parser.ruleNames: {r | "<r>"}; separator = ", ", wrap, anchor>
@@ -377,14 +377,14 @@ void <parser.name>_initialize() {
     }
   );
   <atn>
-  <parser.name>staticData = staticData.release();
+  <parser.grammarName; format = "lower">ParserStaticData = staticData.release();
 }
 
 }
 
 <parser.name>::<parser.name>(TokenStream *input) : <superClass>(input) {
   <parser.name>::initialize();
-  _interpreter = new atn::ParserATNSimulator(this, *<parser.name>staticData->atn, <parser.name>staticData->decisionToDFA, <parser.name>staticData->sharedContextCache);
+  _interpreter = new atn::ParserATNSimulator(this, *<parser.grammarName; format = "lower">ParserStaticData->atn, <parser.grammarName; format = "lower">ParserStaticData->decisionToDFA, <parser.grammarName; format = "lower">ParserStaticData->sharedContextCache);
 }
 
 <parser.name>::~<parser.name>() {
@@ -392,7 +392,7 @@ void <parser.name>_initialize() {
 }
 
 const atn::ATN& <parser.name>::getATN() const {
-  return *<parser.name>staticData->atn;
+  return *<parser.grammarName; format = "lower">ParserStaticData->atn;
 }
 
 std::string <parser.name>::getGrammarFileName() const {
@@ -400,15 +400,15 @@ std::string <parser.name>::getGrammarFileName() const {
 }
 
 const std::vector\<std::string>& <parser.name>::getRuleNames() const {
-  return <parser.name>staticData->ruleNames;
+  return <parser.grammarName; format = "lower">ParserStaticData->ruleNames;
 }
 
 const dfa::Vocabulary& <parser.name>::getVocabulary() const {
-  return <parser.name>staticData->vocabulary;
+  return <parser.grammarName; format = "lower">ParserStaticData->vocabulary;
 }
 
 const std::vector\<uint16_t>& <parser.name>::getSerializedATN() const {
-  return <parser.name>staticData->serializedATN;
+  return <parser.grammarName; format = "lower">ParserStaticData->serializedATN;
 }
 
 <namedActions.definitions>
@@ -430,7 +430,7 @@ bool <parser.name>::sempred(RuleContext *context, size_t ruleIndex, size_t predi
 <sempredFuncs.values; separator="\n"><endif>
 
 void <parser.name>::initialize() {
-  std::call_once(<parser.name>_onceFlag, <parser.name>_initialize);
+  std::call_once(<parser.grammarName; format = "lower">ParserOnceFlag, <parser.grammarName; format = "lower">ParserInitialize);
 }
 >>
 
