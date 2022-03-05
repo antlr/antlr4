@@ -374,7 +374,12 @@ public abstract class Target {
 				}
 
 				isPreviousOctal = false;
-				return String.valueOf(c);
+				if ( v<=127 ) {
+					return String.valueOf(c);  // ascii chars can be as-is, no encoding
+				}
+				// else must encode to ensure pure ascii chars generated
+				String hex = Integer.toHexString(v|0x10000).substring(1,5);
+				return "\\u"+hex;
 		}
 	}
 
