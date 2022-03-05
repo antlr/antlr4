@@ -86,11 +86,15 @@ public class PHPTarget extends Target {
 		return false;
 	}
 
-   @Override
-   public String getTargetStringLiteralFromANTLRStringLiteral(CodeGenerator generator, String literal, boolean addQuotes,
-															  boolean escapeSpecial) {
-	   String targetStringLiteral = super.getTargetStringLiteralFromANTLRStringLiteral(generator, literal, addQuotes, escapeSpecial);
-	   targetStringLiteral = targetStringLiteral.replace("$", "\\$");
-	   return targetStringLiteral;
-   }
+	@Override
+	public String getTargetStringLiteralFromANTLRStringLiteral(CodeGenerator generator, String literal, boolean addQuotes,
+															   boolean escapeSpecial) {
+		String targetStringLiteral = super.getTargetStringLiteralFromANTLRStringLiteral(generator, literal, addQuotes, escapeSpecial);
+		targetStringLiteral = targetStringLiteral.replace("$", "\\$");
+		return targetStringLiteral;
+	}
+
+	public boolean isATNSerializedAsInts() {
+		return false;
+	}
 }
