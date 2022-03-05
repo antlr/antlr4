@@ -366,8 +366,8 @@ public abstract class Target {
 				if ( v<=127 ) {
 					return String.valueOf(c);  // ascii chars can be as-is, no encoding
 				}
-				// else we as hex encoding to ensure pure ascii chars generated
-				return String.format("\\u%04x", v);
+				// else we use hex encoding to ensure pure ascii chars generated
+				return escapeChar(v);
 		}
 	}
 
