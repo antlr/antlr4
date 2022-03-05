@@ -352,8 +352,7 @@ public abstract class Target {
 			return escaped;
 		}
 
-		switch (Character.getType(c))
-		{
+		switch (Character.getType(c)) {
 			case Character.CONTROL:
 			case Character.LINE_SEPARATOR:
 			case Character.PARAGRAPH_SEPARATOR:

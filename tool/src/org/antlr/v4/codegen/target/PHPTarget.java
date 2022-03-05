@@ -94,6 +94,7 @@ public class PHPTarget extends Target {
 		return targetStringLiteral;
 	}
 
+	@Override
 	public boolean isATNSerializedAsInts() {
 		return false;
 	}
