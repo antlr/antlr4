@@ -19,9 +19,6 @@
 // Ambiguous reference in cref attribute
 #pragma warning disable 419
 
-
-using System; 
-
 using System;
 using System.IO;
 using System.Text;
@@ -86,7 +83,7 @@ public partial class XPathLexer : Lexer {
 
 	public override string[] ModeNames { get { return modeNames; } }
 
-	public override string SerializedAtn { get { return new string(_serializedATN); } }
+	public override int[] SerializedAtn { get { return _serializedATN; } }
 
 	static XPathLexer() {
 		decisionToDFA = new DFA[_ATN.NumberOfDecisions];

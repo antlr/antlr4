@@ -292,7 +292,7 @@ public partial class <parser.name> : <superClass; null="Parser"> {
 
 	public override string[] RuleNames { get { return ruleNames; } }
 
-	public override string SerializedAtn { get { return new string(_serializedATN); } }
+	public override int[] SerializedAtn { get { return _serializedATN; } }
 
 	static <parser.name>() {
 		decisionToDFA = new DFA[_ATN.NumberOfDecisions];
@@ -1033,7 +1033,7 @@ public partial class <lexer.name> : <superClass; null="Lexer"> {
 
 	public override string[] ModeNames { get { return modeNames; } }
 
-	public override string SerializedAtn { get { return new string(_serializedATN); } }
+	public override int[] SerializedAtn { get { return _serializedATN; } }
 
 	static <lexer.name>() {
 		decisionToDFA = new DFA[_ATN.NumberOfDecisions];
