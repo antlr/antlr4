@@ -33,10 +33,10 @@ namespace Antlr4.Runtime.Atn
             this.deserializationOptions = deserializationOptions;
         }
 
-		char[] data;
+		int[] data;
 		int p;
 
-        public virtual ATN Deserialize(char[] data)
+        public virtual ATN Deserialize(int[] data)
         {
 	        this.data = data;
 			CheckVersion ();

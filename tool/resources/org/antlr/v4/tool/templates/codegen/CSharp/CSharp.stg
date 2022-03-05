@@ -1046,9 +1046,8 @@ public partial class <lexer.name> : <superClass; null="Lexer"> {
 }
 >>
 
-
 SerializedATN(model) ::= <<
-private static char[] _serializedATN = {
+private static int[] _serializedATN = {
 	<model.serialized: {s | '<s>'}; separator=",", wrap>
 };
 
