@@ -34,7 +34,6 @@ import java.util.Set;
 public abstract class Target {
 	protected final CodeGenerator gen;
 	private STGroup templates;
-	private boolean isPreviousOctal = false;
 
 	protected static final Map<Character, String> defaultCharValueEscape;
 	static {
@@ -350,7 +349,6 @@ public abstract class Target {
 		char c = (char)v;
 		String escaped = getTargetCharValueEscape().get(c);
 		if (escaped != null) {
-			isPreviousOctal = false;
 			return escaped;
 		}
 
@@ -365,53 +363,16 @@ public abstract class Target {
 					return escapeChar(v);
 				}
 
-				if (isPreviousOctal) {
-					String language = getLanguage();
-					char upperBound = language.equals("PHP") ? '9' : '7';
-					if (c >= '0' && c <= upperBound) {
-						return escapeChar(v);
-					}
-				}
-
-				isPreviousOctal = false;
 				if ( v<=127 ) {
 					return String.valueOf(c);  // ascii chars can be as-is, no encoding
 				}
-				// else must encode to ensure pure ascii chars generated
-				String hex = Integer.toHexString(v|0x10000).substring(1,5);
-				return "\\u"+hex;
+				// else we as hex encoding to ensure pure ascii chars generated
+				return String.format("\\u%04x", v);
 		}
 	}
 
-	private String escapeChar(int v) {
-		String language = getLanguage();
-
-		boolean isPhp = language.equals("PHP");
-		boolean supportsOctalEncoding = language.equals("Java")
-				|| language.equals("Python2")
-				|| language.equals("Python3")
-				|| isPhp;
-		if (supportsOctalEncoding && v <= (isPhp ? 127 : 255)) {
-			isPreviousOctal = true;
-			return String.format("\\%o", v);
-		} else {
-			isPreviousOctal = false;
-		}
-
-		switch (language) {
-			default:
-			case "Java":
-			case "JavaScript":
-			case "Python2":
-			case "Python3":
-				return String.format("\\u%04x", v);
-			case "CSharp":
-				return String.format("\\x%X", v);
-			case "Dart":
-			case "PHP":
-			case "Swift":
-				return String.format("\\u{%X}", v);
-		}
+	protected String escapeChar(int v) {
+		return String.format("\\u%04x", v);
 	}
 
 	public String getLoopLabel(GrammarAST ast) {

@@ -97,4 +97,9 @@ public class PHPTarget extends Target {
 	public boolean isATNSerializedAsInts() {
 		return false;
 	}
+
+	@Override
+	protected String escapeChar(int v) {
+		return String.format("\\u{%X}", v);
+	}
 }

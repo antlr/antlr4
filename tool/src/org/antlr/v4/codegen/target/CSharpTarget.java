@@ -175,4 +175,9 @@ public class CSharpTarget extends Target {
 	public boolean isATNSerializedAsInts() {
 		return false;
 	}
+
+	@Override
+	protected String escapeChar(int v) {
+		return String.format("\\x%X", v);
+	}
 }
