@@ -34,7 +34,6 @@ import java.util.Set;
 public abstract class Target {
 	protected final CodeGenerator gen;
 	private STGroup templates;
-	private boolean isPreviousOctal = false;
 
 	protected static final Map<Character, String> defaultCharValueEscape;
 	static {
@@ -350,63 +349,25 @@ public abstract class Target {
 		char c = (char)v;
 		String escaped = getTargetCharValueEscape().get(c);
 		if (escaped != null) {
-			isPreviousOctal = false;
 			return escaped;
 		}
 
-		switch (Character.getType(c))
-		{
+		switch (Character.getType(c)) {
 			case Character.CONTROL:
 			case Character.LINE_SEPARATOR:
 			case Character.PARAGRAPH_SEPARATOR:
 				return escapeChar(v);
 			default:
-				if (v == 0xfffe) {
-					return escapeChar(v);
+				if ( v<=127 ) {
+					return String.valueOf(c);  // ascii chars can be as-is, no encoding
 				}
-
-				if (isPreviousOctal) {
-					String language = getLanguage();
-					char upperBound = language.equals("PHP") ? '9' : '7';
-					if (c >= '0' && c <= upperBound) {
-						return escapeChar(v);
-					}
-				}
-
-				isPreviousOctal = false;
-				return String.valueOf(c);
+				// else we use hex encoding to ensure pure ascii chars generated
+				return escapeChar(v);
 		}
 	}
 
-	private String escapeChar(int v) {
-		String language = getLanguage();
-
-		boolean isPhp = language.equals("PHP");
-		boolean supportsOctalEncoding = language.equals("Java")
-				|| language.equals("Python2")
-				|| language.equals("Python3")
-				|| isPhp;
-		if (supportsOctalEncoding && v <= (isPhp ? 127 : 255)) {
-			isPreviousOctal = true;
-			return String.format("\\%o", v);
-		} else {
-			isPreviousOctal = false;
-		}
-
-		switch (language) {
-			default:
-			case "Java":
-			case "JavaScript":
-			case "Python2":
-			case "Python3":
-				return String.format("\\u%04x", v);
-			case "CSharp":
-				return String.format("\\x%X", v);
-			case "Dart":
-			case "PHP":
-			case "Swift":
-				return String.format("\\u{%X}", v);
-		}
+	protected String escapeChar(int v) {
+		return String.format("\\u%04x", v);
 	}
 
 	public String getLoopLabel(GrammarAST ast) {
