@@ -359,10 +359,6 @@ public abstract class Target {
 			case Character.PARAGRAPH_SEPARATOR:
 				return escapeChar(v);
 			default:
-				if (v == 0xfffe) {
-					return escapeChar(v);
-				}
-
 				if ( v<=127 ) {
 					return String.valueOf(c);  // ascii chars can be as-is, no encoding
 				}
