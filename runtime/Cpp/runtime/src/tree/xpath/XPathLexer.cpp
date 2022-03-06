@@ -37,11 +37,11 @@ struct XPathLexerStaticData final {
   std::unique_ptr<antlr4::atn::ATN> atn;
 };
 
-std::once_flag XPathLexer_onceFlag;
-XPathLexerStaticData *XPathLexerstaticData = nullptr;
+std::once_flag xpathLexerOnceFlag;
+XPathLexerStaticData *xpathLexerStaticData = nullptr;
 
-void XPathLexer_initialize() {
-  assert(XPathLexerstaticData == nullptr);
+void xpathLexerInitialize() {
+  assert(xpathLexerStaticData == nullptr);
   auto staticData = std::make_unique<XPathLexerStaticData>(
     std::vector<std::string>{
       "ANYWHERE", "ROOT", "WILDCARD", "BANG", "ID", "NameChar", "NameStartChar",
@@ -117,14 +117,14 @@ void XPathLexer_initialize() {
   for (size_t i = 0; i < count; i++) {
     staticData->decisionToDFA.emplace_back(staticData->atn->getDecisionState(i), i);
   }
-  XPathLexerstaticData = staticData.release();
+  xpathLexerStaticData = staticData.release();
 }
 
 }
 
 XPathLexer::XPathLexer(CharStream *input) : Lexer(input) {
   XPathLexer::initialize();
-  _interpreter = new atn::LexerATNSimulator(this, *XPathLexerstaticData->atn, XPathLexerstaticData->decisionToDFA, XPathLexerstaticData->sharedContextCache);
+  _interpreter = new atn::LexerATNSimulator(this, *xpathLexerStaticData->atn, xpathLexerStaticData->decisionToDFA, xpathLexerStaticData->sharedContextCache);
 }
 
 XPathLexer::~XPathLexer() {
@@ -136,27 +136,27 @@ std::string XPathLexer::getGrammarFileName() const {
 }
 
 const std::vector<std::string>& XPathLexer::getRuleNames() const {
-  return XPathLexerstaticData->ruleNames;
+  return xpathLexerStaticData->ruleNames;
 }
 
 const std::vector<std::string>& XPathLexer::getChannelNames() const {
-  return XPathLexerstaticData->channelNames;
+  return xpathLexerStaticData->channelNames;
 }
 
 const std::vector<std::string>& XPathLexer::getModeNames() const {
-  return XPathLexerstaticData->modeNames;
+  return xpathLexerStaticData->modeNames;
 }
 
 const dfa::Vocabulary& XPathLexer::getVocabulary() const {
-  return XPathLexerstaticData->vocabulary;
+  return xpathLexerStaticData->vocabulary;
 }
 
 const std::vector<uint16_t>& XPathLexer::getSerializedATN() const {
-  return XPathLexerstaticData->serializedATN;
+  return xpathLexerStaticData->serializedATN;
 }
 
 const atn::ATN& XPathLexer::getATN() const {
-  return *XPathLexerstaticData->atn;
+  return *xpathLexerStaticData->atn;
 }
 
 void XPathLexer::action(RuleContext *context, size_t ruleIndex, size_t actionIndex) {
@@ -183,5 +183,5 @@ void XPathLexer::IDAction(antlr4::RuleContext *context, size_t actionIndex) {
 }
 
 void XPathLexer::initialize() {
-  std::call_once(XPathLexer_onceFlag, XPathLexer_initialize);
+  std::call_once(xpathLexerOnceFlag, xpathLexerInitialize);
 }
