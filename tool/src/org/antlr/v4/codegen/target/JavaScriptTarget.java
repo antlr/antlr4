@@ -94,6 +94,6 @@ public class JavaScriptTarget extends Target {
 
 	@Override
 	public boolean isATNSerializedAsInts() {
-		return false;
+		return true;
 	}
 }

@@ -837,9 +837,7 @@ export default class <lexer.name> extends <if(superClass)><superClass><else>antl
 >>
 
 SerializedATN(model) ::= <<
-<! only one segment, can be inlined !>
-
-const serializedATN = ["<model.serialized; wrap={",<\n>    "}>"].join("");
+const serializedATN = [<model.serialized: {s | <s>}; separator=",", wrap>];
 
 >>
 
