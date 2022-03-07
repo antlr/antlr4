@@ -114,7 +114,7 @@ using namespace antlr4;
 
 namespace {
 
-struct <lexer.name>StaticData final {
+struct <lexer.name; format = "cap">StaticData final {
   <lexer.name>StaticData(std::vector\<std::string> ruleNames,
                           std::vector\<std::string> channelNames,
                           std::vector\<std::string> modeNames,
@@ -125,10 +125,10 @@ struct <lexer.name>StaticData final {
         symbolicNames(std::move(symbolicNames)),
         vocabulary(this->literalNames, this->symbolicNames) {}
 
-  <lexer.name>StaticData(const <lexer.name>StaticData&) = delete;
-  <lexer.name>StaticData(<lexer.name>StaticData&&) = delete;
-  <lexer.name>StaticData& operator=(const <lexer.name>StaticData&) = delete;
-  <lexer.name>StaticData& operator=(<lexer.name>StaticData&&) = delete;
+  <lexer.name; format = "cap">StaticData(const <lexer.name; format = "cap">StaticData&) = delete;
+  <lexer.name; format = "cap">StaticData(<lexer.name; format = "cap">StaticData&&) = delete;
+  <lexer.name; format = "cap">StaticData& operator=(const <lexer.name; format = "cap">StaticData&) = delete;
+  <lexer.name; format = "cap">StaticData& operator=(<lexer.name; format = "cap">StaticData&&) = delete;
 
   std::vector\<antlr4::dfa::DFA> decisionToDFA;
   antlr4::atn::PredictionContextCache sharedContextCache;
@@ -143,11 +143,11 @@ struct <lexer.name>StaticData final {
 };
 
 std::once_flag <lexer.grammarName; format = "lower">LexerOnceFlag;
-<lexer.name>StaticData *<lexer.grammarName; format = "lower">LexerStaticData = nullptr;
+<lexer.name; format = "cap">StaticData *<lexer.grammarName; format = "lower">LexerStaticData = nullptr;
 
 void <lexer.grammarName; format = "lower">LexerInitialize() {
   assert(<lexer.grammarName; format = "lower">LexerStaticData == nullptr);
-  auto staticData = std::make_unique\<<lexer.name>StaticData>(
+  auto staticData = std::make_unique\<<lexer.name; format = "cap">StaticData>(
     std::vector\<std::string>{
       <lexer.ruleNames: {r | "<r>"}; separator = ", ", wrap, anchor>
     },
@@ -337,18 +337,18 @@ using namespace antlr4;
 
 namespace {
 
-struct <parser.name>StaticData final {
-  <parser.name>StaticData(std::vector\<std::string> ruleNames,
+struct <parser.name; format = "cap">StaticData final {
+  <parser.name; format = "cap">StaticData(std::vector\<std::string> ruleNames,
                         std::vector\<std::string> literalNames,
                         std::vector\<std::string> symbolicNames)
       : ruleNames(std::move(ruleNames)), literalNames(std::move(literalNames)),
         symbolicNames(std::move(symbolicNames)),
         vocabulary(this->literalNames, this->symbolicNames) {}
 
-  <parser.name>StaticData(const <parser.name>StaticData&) = delete;
-  <parser.name>StaticData(<parser.name>StaticData&&) = delete;
-  <parser.name>StaticData& operator=(const <parser.name>StaticData&) = delete;
-  <parser.name>StaticData& operator=(<parser.name>StaticData&&) = delete;
+  <parser.name; format = "cap">StaticData(const <parser.name; format = "cap">StaticData&) = delete;
+  <parser.name; format = "cap">StaticData(<parser.name; format = "cap">StaticData&&) = delete;
+  <parser.name; format = "cap">StaticData& operator=(const <parser.name; format = "cap">StaticData&) = delete;
+  <parser.name; format = "cap">StaticData& operator=(<parser.name; format = "cap">StaticData&&) = delete;
 
   std::vector\<antlr4::dfa::DFA> decisionToDFA;
   antlr4::atn::PredictionContextCache sharedContextCache;
@@ -361,11 +361,11 @@ struct <parser.name>StaticData final {
 };
 
 std::once_flag <parser.grammarName; format = "lower">ParserOnceFlag;
-<parser.name>StaticData *<parser.grammarName; format = "lower">ParserStaticData = nullptr;
+<parser.name; format = "cap">StaticData *<parser.grammarName; format = "lower">ParserStaticData = nullptr;
 
 void <parser.grammarName; format = "lower">ParserInitialize() {
   assert(<parser.grammarName; format = "lower">ParserStaticData == nullptr);
-  auto staticData = std::make_unique\<<parser.name>StaticData>(
+  auto staticData = std::make_unique\<<parser.name; format = "cap">StaticData>(
     std::vector\<std::string>{
       <parser.ruleNames: {r | "<r>"}; separator = ", ", wrap, anchor>
     },
