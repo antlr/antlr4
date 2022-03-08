@@ -7,7 +7,6 @@ package antlr
 import (
 	"fmt"
 	"strconv"
-	"unicode/utf16"
 )
 
 var SerializedVersion = 4
@@ -24,7 +23,7 @@ type BlockStartStateIntPair struct {
 
 type ATNDeserializer struct {
 	deserializationOptions *ATNDeserializationOptions
-	data                   []rune
+	data                   []uint16
 	pos                    int
 }
 
@@ -47,7 +46,7 @@ func stringInSlice(a string, list []string) int {
 }
 
 func (a *ATNDeserializer) DeserializeFromUInt16(data []uint16) *ATN {
-	a.data = utf16.Decode(data)
+	a.data = data
 	a.pos = 0
 	a.checkVersion()
 
