@@ -11,7 +11,7 @@ public protocol RecognizerProtocol {
     func getGrammarFileName() -> String
     func getParseInfo() -> ParseInfo?
     func getRuleNames() -> [String]
-    func getSerializedATN() -> String
+    func getSerializedATN() -> [Int]
     func getState() -> Int
     func getTokenType(_ tokenName: String) -> Int
     func getVocabulary() -> Vocabulary
@@ -95,7 +95,7 @@ open class Recognizer<ATNInterpreter: ATNSimulator>: RecognizerProtocol {
     /// For interpreters, we don't know their serialized ATN despite having
     /// created the interpreter from it.
     /// 
-    open func getSerializedATN() -> String {
+    open func getSerializedATN() -> [Int] {
         fatalError("there is no serialized ATN")
     }
 

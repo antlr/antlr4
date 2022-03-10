@@ -104,7 +104,7 @@ public class SwiftTarget extends Target {
 
 	@Override
 	public boolean isATNSerializedAsInts() {
-		return false;
+		return true;
 	}
 
 	@Override
