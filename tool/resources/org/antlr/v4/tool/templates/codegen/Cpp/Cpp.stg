@@ -115,7 +115,7 @@ using namespace antlr4;
 namespace {
 
 struct <lexer.name; format = "cap">StaticData final {
-  <lexer.name>StaticData(std::vector\<std::string> ruleNames,
+  <lexer.name; format = "cap">StaticData(std::vector\<std::string> ruleNames,
                           std::vector\<std::string> channelNames,
                           std::vector\<std::string> modeNames,
                           std::vector\<std::string> literalNames,
