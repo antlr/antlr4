@@ -4,13 +4,6 @@
 /// can be found in the LICENSE.txt file in the project root.
 ///
 
-
-
-///
-///
-/// -  Sam Harwell
-///
-
 import Foundation
 
 public class ATNDeserializer {
@@ -22,8 +15,8 @@ public class ATNDeserializer {
         self.deserializationOptions = deserializationOptions ?? ATNDeserializationOptions()
     }
 
-    public func deserialize(_ str: String) throws -> ATN {
-        let data = str.utf16.map { element in Int(element) }
+    public func deserialize(_ data: [Int]) throws -> ATN {
+//         let data = str.utf16.map { element in Int(element) }
         var p = 0
 
         let version = data[p]
