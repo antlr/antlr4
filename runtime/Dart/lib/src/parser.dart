@@ -27,7 +27,7 @@ abstract class Parser extends Recognizer<ParserATNSimulator> {
   /// bypass alternatives.
   ///
   /// @see ATNDeserializationOptions#isGenerateRuleBypassTransitions()
-  static final Map<String, ATN> bypassAltsAtnCache = {};
+  ATN? bypassAltsAtnCache;
 
   /// The error handling strategy for the parser. The default value is a new
   /// instance of [DefaultErrorStrategy].
@@ -295,16 +295,13 @@ abstract class Parser extends Recognizer<ParserATNSimulator> {
           'The current parser does not support an ATN with bypass alternatives.');
     }
 
-    var result = bypassAltsAtnCache[serializedATN];
-    if (result == null) {
+    if (bypassAltsAtnCache == null) {
       final deserializationOptions = ATNDeserializationOptions(false);
       deserializationOptions.setGenerateRuleBypassTransitions(true);
-      result = ATNDeserializer(deserializationOptions)
-          .deserialize(serializedATN!.codeUnits);
-      bypassAltsAtnCache[serializedATN!] = result;
+      bypassAltsAtnCache = ATNDeserializer(deserializationOptions).deserialize(serializedATN);
     }
 
-    return result;
+    return bypassAltsAtnCache!;
   }
 
   /// The preferred method of getting a tree pattern. For example, here's a

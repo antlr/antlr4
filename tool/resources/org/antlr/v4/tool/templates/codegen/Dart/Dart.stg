@@ -217,7 +217,7 @@ class <parser.name> extends <superClass; null="Parser"> {
   String get grammarFileName => '<parser.grammarFileName>';
 
   @override
-  String get serializedATN => _serializedATN;
+  List\<int> get serializedATN => _serializedATN;
 
   @override
   ATN getATN() {
@@ -839,7 +839,7 @@ class <lexer.name> extends <superClass; null="Lexer"> {
   }
 
   @override
-  String get serializedATN => _serializedATN;
+  List\<int> get serializedATN => _serializedATN;
 
   @override
   String get grammarFileName => '<lexer.grammarFileName>';
@@ -853,10 +853,12 @@ class <lexer.name> extends <superClass; null="Lexer"> {
 >>
 
 SerializedATN(model) ::= <<
-static const String _serializedATN = '<model.serialized; wrap={'<\n><\t>'}>';
+static const List\<int> _serializedATN = [
+    <model.serialized: {s | <s>}; separator=",", wrap>
+];
 
 static final ATN _ATN =
-    ATNDeserializer().deserialize(_serializedATN.codeUnits);
+    ATNDeserializer().deserialize(_serializedATN);
 >>
 
 /// Using a type to init value map, try to init a type; if not in table
