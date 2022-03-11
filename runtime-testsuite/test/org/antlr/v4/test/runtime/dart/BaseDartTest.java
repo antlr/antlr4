@@ -296,7 +296,7 @@ public class BaseDartTest extends BaseRuntimeTestSupport implements RuntimeTestS
 
 		final String[] roots = isWindows()
 				? new String[]{"C:\\tools\\dart-sdk\\bin\\"}
-				: new String[]{"/usr/local/bin/", "/opt/local/bin/", "/usr/bin/", "/usr/lib/dart/bin/", "/usr/local/opt/dart/libexec"};
+				: new String[]{"/usr/local/bin/", "/opt/local/bin/", "/opt/homebrew/bin/", "/usr/bin/", "/usr/lib/dart/bin/", "/usr/local/opt/dart/libexec"};
 
 		for (String root : roots) {
 			for (String t : tools) {
