@@ -150,7 +150,7 @@ class ErrorListener extends CalcNoLRBaseListener {
 }
 ```
 
-The exception will properly or the parser to bailout and the exception will not be thrown out:
+then the exception will properly cause the parser to bailout and the exception will not be thrown out:
 
 ```
 java.lang.NullPointerException: bail out
