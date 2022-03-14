@@ -84,8 +84,6 @@ namespace atn {
     SimState _prevAccept;
 
   public:
-    static std::atomic<int> match_calls;
-
     LexerATNSimulator(const ATN &atn, std::vector<dfa::DFA> &decisionToDFA, PredictionContextCache &sharedContextCache);
     LexerATNSimulator(Lexer *recog, const ATN &atn, std::vector<dfa::DFA> &decisionToDFA, PredictionContextCache &sharedContextCache);
     virtual ~LexerATNSimulator() = default;
