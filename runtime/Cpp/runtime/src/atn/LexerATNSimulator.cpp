@@ -47,9 +47,6 @@ void LexerATNSimulator::SimState::InitializeInstanceFields() {
   charPos = INVALID_INDEX;
 }
 
-std::atomic<int> LexerATNSimulator::match_calls(0);
-
-
 LexerATNSimulator::LexerATNSimulator(const ATN &atn, std::vector<dfa::DFA> &decisionToDFA,
                                      PredictionContextCache &sharedContextCache)
   : LexerATNSimulator(nullptr, atn, decisionToDFA, sharedContextCache) {
@@ -69,7 +66,6 @@ void LexerATNSimulator::copyState(LexerATNSimulator *simulator) {
 }
 
 size_t LexerATNSimulator::match(CharStream *input, size_t mode) {
-  match_calls.fetch_add(1, std::memory_order_relaxed);
   _mode = mode;
   ssize_t mark = input->mark();
 
