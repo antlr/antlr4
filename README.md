@@ -44,6 +44,7 @@ ANTLR project lead and supreme dictator for life
 * [Marcos Passos](https://github.com/marcospassos) (PHP target)
 * [Lingyu Li](https://github.com/lingyv-li) (Dart target)
 * [Ivan Kochurkin](https://github.com/KvanTTT) has made major contributions to overall quality, error handling, and Target performance.
+* [Justin King](https://github.com/jcking) has done a huge amount of work across multiple targets, but especially for C++.
 
 
 ## Useful information
