@@ -15,5 +15,5 @@ StarLoopEntryState *StarLoopbackState::getLoopEntryState() const {
 }
 
 ATNStateType StarLoopbackState::getStateType() const {
-  return STAR_LOOP_BACK;
+  return ATNStateType::STAR_LOOP_BACK;
 }

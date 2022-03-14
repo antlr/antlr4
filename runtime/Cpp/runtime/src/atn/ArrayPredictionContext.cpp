@@ -21,6 +21,10 @@ ArrayPredictionContext::ArrayPredictionContext(std::vector<Ref<const PredictionC
     assert(this->returnStates.size() > 0);
 }
 
+PredictionContextType ArrayPredictionContext::getContextType() const {
+  return PredictionContextType::ARRAY;
+}
+
 bool ArrayPredictionContext::isEmpty() const {
   // Since EMPTY_RETURN_STATE can only appear in the last position, we don't need to verify that size == 1.
   return returnStates[0] == EMPTY_RETURN_STATE;
@@ -42,9 +46,12 @@ bool ArrayPredictionContext::operator == (PredictionContext const& o) const {
   if (this == &o) {
     return true;
   }
+  if (o.getContextType() != PredictionContextType::ARRAY) {
+    return false;
+  }
 
-  const ArrayPredictionContext *other = dynamic_cast<const ArrayPredictionContext*>(&o);
-  if (other == nullptr || hashCode() != other->hashCode()) {
+  const ArrayPredictionContext *other = static_cast<const ArrayPredictionContext*>(&o);
+  if (hashCode() != other->hashCode()) {
     return false; // can't be same if hash is different
   }
 

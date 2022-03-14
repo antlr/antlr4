@@ -20,7 +20,7 @@ namespace atn {
 
     ActionTransition(ATNState *target, size_t ruleIndex, size_t actionIndex, bool isCtxDependent);
 
-    virtual SerializationType getSerializationType() const override;
+    TransitionType getTransitionType() const override;
 
     virtual bool isEpsilon() const override;
 

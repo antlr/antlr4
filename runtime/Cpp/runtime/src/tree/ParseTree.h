@@ -6,6 +6,7 @@
 #pragma once
 
 #include "support/Any.h"
+#include "tree/ParseTreeType.h"
 
 namespace antlr4 {
 namespace tree {
@@ -74,6 +75,8 @@ namespace tree {
      * EOF is unspecified.</p>
      */
     virtual misc::Interval getSourceInterval() = 0;
+
+    virtual ParseTreeType getTreeType() const = 0;
   };
 
   // A class to help managing ParseTree instances without the need of a shared_ptr.

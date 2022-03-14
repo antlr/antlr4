@@ -13,6 +13,8 @@ namespace tree {
   class ANTLR4CPP_PUBLIC ErrorNode : public virtual TerminalNode {
   public:
     ~ErrorNode() override;
+
+    ParseTreeType getTreeType() const final;
   };
 
 } // namespace tree

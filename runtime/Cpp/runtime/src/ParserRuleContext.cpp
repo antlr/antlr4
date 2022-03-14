@@ -9,6 +9,7 @@
 #include "Parser.h"
 #include "Token.h"
 
+#include "support/Casts.h"
 #include "support/CPPUtils.h"
 
 #include "ParserRuleContext.h"
@@ -83,8 +84,8 @@ tree::TerminalNode* ParserRuleContext::getToken(size_t ttype, size_t i) {
 
   size_t j = 0; // what token with ttype have we found?
   for (auto *o : children) {
-    if (is<tree::TerminalNode *>(o)) {
-      tree::TerminalNode *tnode = dynamic_cast<tree::TerminalNode *>(o);
+    if (o->getTreeType() == ParseTreeType::TERMINAL || o->getTreeType() == ParseTreeType::ERROR) {
+      tree::TerminalNode *tnode = downCast<tree::TerminalNode *>(o);
       Token *symbol = tnode->getSymbol();
       if (symbol->getType() == ttype) {
         if (j++ == i) {
@@ -100,8 +101,8 @@ tree::TerminalNode* ParserRuleContext::getToken(size_t ttype, size_t i) {
 std::vector<tree::TerminalNode *> ParserRuleContext::getTokens(size_t ttype) {
   std::vector<tree::TerminalNode *> tokens;
   for (auto &o : children) {
-    if (is<tree::TerminalNode *>(o)) {
-      tree::TerminalNode *tnode = dynamic_cast<tree::TerminalNode *>(o);
+    if (o->getTreeType() == ParseTreeType::TERMINAL || o->getTreeType() == ParseTreeType::ERROR) {
+      tree::TerminalNode *tnode = downCast<tree::TerminalNode *>(o);
       Token *symbol = tnode->getSymbol();
       if (symbol->getType() == ttype) {
         tokens.push_back(tnode);

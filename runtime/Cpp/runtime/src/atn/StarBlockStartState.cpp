@@ -8,5 +8,5 @@
 using namespace antlr4::atn;
 
 ATNStateType StarBlockStartState::getStateType() const {
-  return STAR_BLOCK_START;
+  return ATNStateType::STAR_BLOCK_START;
 }

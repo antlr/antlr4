@@ -14,6 +14,7 @@
 
 using namespace antlr4;
 using namespace antlr4::atn;
+using namespace antlr4::tree;
 
 RuleContext::RuleContext() {
   InitializeInstanceFields();
@@ -135,6 +136,10 @@ std::string RuleContext::toString(Recognizer *recog, RuleContext *stop) {
   if (recog == nullptr)
     return toString(std::vector<std::string>(), stop); // Don't use an initializer {} here or we end up calling ourselve recursivly.
   return toString(recog->getRuleNames(), stop);
+}
+
+ParseTreeType RuleContext::getTreeType() const {
+  return ParseTreeType::RULE;
 }
 
 void RuleContext::InitializeInstanceFields() {

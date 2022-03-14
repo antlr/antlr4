@@ -23,11 +23,6 @@ namespace atn {
     std::unique_ptr<ATN> deserialize(const std::vector<uint16_t> &input) const;
     void verifyATN(const ATN &atn) const;
 
-    static ConstTransitionPtr edgeFactory(const ATN &atn, size_t type, size_t src, size_t trg, size_t arg1, size_t arg2,
-                                          size_t arg3, const std::vector<misc::IntervalSet> &sets);
-
-    static ATNState* stateFactory(size_t type, size_t ruleIndex);
-
   private:
     const ATNDeserializationOptions _deserializationOptions;
   };

@@ -10,7 +10,7 @@
 namespace antlr4 {
 namespace atn {
 
-  class ANTLR4CPP_PUBLIC RuleTransition : public Transition {
+  class ANTLR4CPP_PUBLIC RuleTransition final : public Transition {
   public:
     /// Ptr to the rule definition object for this rule ref.
     const size_t ruleIndex; // no Rule object at runtime
@@ -28,7 +28,7 @@ namespace atn {
     RuleTransition(RuleTransition const&) = delete;
     RuleTransition& operator=(RuleTransition const&) = delete;
 
-    virtual SerializationType getSerializationType() const override;
+    TransitionType getTransitionType() const override;
 
     virtual bool isEpsilon() const override;
     virtual bool matches(size_t symbol, size_t minVocabSymbol, size_t maxVocabSymbol) const override;

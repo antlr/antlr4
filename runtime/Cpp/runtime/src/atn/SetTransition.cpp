@@ -15,8 +15,8 @@ SetTransition::SetTransition(ATNState *target, misc::IntervalSet aSet)
   : Transition(target), set(aSet.isEmpty() ? misc::IntervalSet::of(Token::INVALID_TYPE) : std::move(aSet)) {
 }
 
-Transition::SerializationType SetTransition::getSerializationType() const {
-  return SET;
+TransitionType SetTransition::getTransitionType() const {
+  return TransitionType::SET;
 }
 
 misc::IntervalSet SetTransition::label() const {

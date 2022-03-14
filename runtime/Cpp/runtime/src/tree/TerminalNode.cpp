@@ -5,5 +5,10 @@
 
 #include "tree/TerminalNode.h"
 
-antlr4::tree::TerminalNode::~TerminalNode() {
+using namespace antlr4::tree;
+
+TerminalNode::~TerminalNode() {}
+
+ParseTreeType TerminalNode::getTreeType() const {
+  return ParseTreeType::TERMINAL;
 }

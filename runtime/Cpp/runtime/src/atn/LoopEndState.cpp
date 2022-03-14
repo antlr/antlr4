@@ -8,5 +8,5 @@
 using namespace antlr4::atn;
 
 ATNStateType LoopEndState::getStateType() const {
-  return LOOP_END;
+  return ATNStateType::LOOP_END;
 }

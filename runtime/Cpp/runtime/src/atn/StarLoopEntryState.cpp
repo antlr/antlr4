@@ -8,5 +8,5 @@
 using namespace antlr4::atn;
 
 ATNStateType StarLoopEntryState::getStateType() const {
-  return STAR_LOOP_ENTRY;
+  return ATNStateType::STAR_LOOP_ENTRY;
 }
