@@ -85,7 +85,6 @@ class LexerATNSimulator extends ATNSimulator {
 	}
 
 	match(input, mode) {
-		this.match_calls += 1;
 		this.mode = mode;
 		const mark = input.mark();
 		try {
@@ -644,7 +643,5 @@ LexerATNSimulator.dfa_debug = false;
 
 LexerATNSimulator.MIN_DFA_EDGE = 0;
 LexerATNSimulator.MAX_DFA_EDGE = 127; // forces unicode to stay in ATN
-
-LexerATNSimulator.match_calls = 0;
 
 module.exports = LexerATNSimulator;

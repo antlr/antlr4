@@ -53,8 +53,6 @@ class LexerATNSimulator(ATNSimulator):
 
     ERROR = None
 
-    match_calls = 0
-
     def __init__(self, recog, atn, decisionToDFA, sharedContextCache):
         super(LexerATNSimulator, self).__init__(atn, sharedContextCache)
         self.decisionToDFA = decisionToDFA
@@ -81,7 +79,6 @@ class LexerATNSimulator(ATNSimulator):
         self.startIndex = simulator.startIndex
 
     def match(self, input , mode):
-        self.match_calls += 1
         self.mode = mode
         mark = input.mark()
         try:
