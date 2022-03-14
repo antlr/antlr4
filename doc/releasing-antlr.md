@@ -22,7 +22,13 @@ $ git push origin 4.9-rc1
 $ git push upstream 4.9-rc1
 ```
 
+### Go release tags
+
+It seems that [Go needs a `v` in the release git tag](https://go.dev/ref/mod#glos-version) so make sure that we double up with 4.9.3 and v4.9.3.
+
 ## Copy PHP runtime over
+
+(Is this only necessary to run the unittests?)
 
 Bump version to 4.9 in `~/antlr/code/antlr-php-runtime/src/RuntimeMetaData.php` in separate repository and commit plus push.
 
