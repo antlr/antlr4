@@ -832,10 +832,10 @@ public \<T> T accept(ParseTreeVisitor\<? extends T> visitor) {
 AttributeDecl(d) ::= "<d.type> <d.name><if(d.initValue)> = <d.initValue><endif>"
 
 /** If we don't know location of label def x, use this template */
-labelref(x) ::= "<if(!x.isLocal)>((<x.ctx.name>)_localctx).<endif><x.name>"
+labelref(x) ::= "<if(!x.isLocal)><ctx(x)>.<endif><x.name>"
 
 /** For any action chunk, what is correctly-typed context struct ptr? */
-ctx(actionChunk) ::= "((<actionChunk.ctx.name>)_localctx)"
+ctx(actionChunk) ::= "<if(actionChunk.ctx.provideCopyFrom)>((<actionChunk.ctx.name>)_localctx)<else>_localctx<endif>"
 
 // used for left-recursive rules
 recRuleAltPredicate(ruleName,opPrec)  ::= "precpred(_ctx, <opPrec>)"
