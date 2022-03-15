@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
+ * Copyright (c) 2012-2021 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -174,6 +174,23 @@ public class TestLexerActions extends BaseJavaToolTest {
 			"I\n" +
 			"[@0,0:1='34',<1>,1:0]\n" +
 			"[@1,2:4='#10',<1>,1:2]\n" +
+			"[@2,5:4='<EOF>',<-1>,1:5]\n";
+		assertEquals(expecting, found);
+	}
+
+	@Test public void testLessCommand() throws Exception {
+		String grammar =
+			"lexer grammar L;\n"+
+			"I : '0'..'9'+ {System.out.println(\"I\");} ;\n"+
+			"WS : '#' -> less, pushMode(ALT) ;\n"+
+			"mode ALT ;\n"+
+			"I_ALT : '#' '0'..'9'+ {System.out.println(\"I_ALT\");} ;";
+		String found = execLexer("L.g4", grammar, "L", "34#10");
+		String expecting =
+			"I\n" +
+			"I_ALT\n" +
+			"[@0,0:1='34',<1>,1:0]\n" +
+			"[@1,2:4='#10',<2>,1:2]\n" +
 			"[@2,5:4='<EOF>',<-1>,1:5]\n";
 		assertEquals(expecting, found);
 	}

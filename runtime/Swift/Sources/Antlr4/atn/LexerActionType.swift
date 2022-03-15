@@ -1,5 +1,5 @@
 /// 
-/// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
+/// Copyright (c) 2012-2021 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
 /// 
@@ -46,4 +46,8 @@ public enum LexerActionType: Int {
     /// The type of a _org.antlr.v4.runtime.atn.LexerTypeAction_ action.
     /// 
     case type
+    /// 
+    /// The type of a _org.antlr.v4.runtime.atn.LexerLessAction_ action.
+    /// 
+    case less
 }

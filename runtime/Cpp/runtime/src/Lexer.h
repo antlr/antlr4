@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
+﻿/* Copyright (c) 2012-2021 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -22,6 +22,7 @@ namespace antlr4 {
     static constexpr size_t DEFAULT_MODE = 0;
     static constexpr size_t MORE = std::numeric_limits<size_t>::max() - 1;
     static constexpr size_t SKIP = std::numeric_limits<size_t>::max() - 2;
+    static constexpr size_t LESS = std::numeric_limits<size_t>::max() - 3;
 
     static constexpr size_t DEFAULT_TOKEN_CHANNEL = Token::DEFAULT_CHANNEL;
     static constexpr size_t HIDDEN = Token::HIDDEN_CHANNEL;
@@ -32,6 +33,7 @@ namespace antlr4 {
       DEFAULT_MODE = 0,
       MORE = static_cast<size_t>(-2), // std::numeric_limits<size_t>::max() - 1; doesn't work in VS 2013
       SKIP = static_cast<size_t>(-3), // std::numeric_limits<size_t>::max() - 2; doesn't work in VS 2013
+      LESS = static_cast<size_t>(-4), // std::numeric_limits<size_t>::max() - 3; doesn't work in VS 2013
 
       DEFAULT_TOKEN_CHANNEL = Token::DEFAULT_CHANNEL,
       HIDDEN = Token::HIDDEN_CHANNEL,
@@ -104,6 +106,7 @@ namespace antlr4 {
     /// and emits it.
     virtual void skip();
     virtual void more();
+    virtual void less();
     virtual void setMode(size_t m);
     virtual void pushMode(size_t m);
     virtual size_t popMode();

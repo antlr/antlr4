@@ -854,6 +854,7 @@ catch (<catchArg>) {
 
 LexerSkipCommand() ::= "p.Skip()"
 LexerMoreCommand() ::= "p.More()"
+LexerLessCommand() ::= "p.Less()"
 LexerPopModeCommand() ::= "p.PopMode()"
 LexerTypeCommand(arg, grammar)     ::= "p.SetType(<arg>)"
 LexerChannelCommand(arg, grammar)  ::= "p.SetChannel(<arg>)"

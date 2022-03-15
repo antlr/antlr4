@@ -1,6 +1,7 @@
 /*
  * [The "BSD license"]
  *  Copyright (c) 2015 Dan McLaughlin, Mike Lischke
+ *  Copyright (c) 2021 David Kleszyk
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -869,6 +870,7 @@ catch (<catchArg>) {
 
 LexerSkipCommand()  ::= "skip();"
 LexerMoreCommand()  ::= "more();"
+LexerLessCommand()  ::= "less();"
 LexerPopModeCommand() ::= "popMode();"
 
 LexerTypeCommand(arg, grammar)      ::= "type = <grammar.name>::<arg>;"

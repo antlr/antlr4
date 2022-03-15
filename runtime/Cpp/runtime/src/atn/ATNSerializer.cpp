@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
+﻿/* Copyright (c) 2012-2021 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -306,6 +306,11 @@ std::vector<size_t> ATNSerializer::serialize() {
           data.push_back(actionIndex != INVALID_INDEX ? actionIndex : 0xFFFF);
           break;
         }
+
+        case LexerActionType::LESS:
+          data.push_back(0);
+          data.push_back(0);
+          break;
 
         case LexerActionType::MODE:
         {

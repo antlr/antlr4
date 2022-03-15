@@ -1,5 +1,5 @@
 /// 
-/// Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
+/// Copyright (c) 2012-2021 The ANTLR Project. All rights reserved.
 /// Use of this file is governed by the BSD 3-clause license that
 /// can be found in the LICENSE.txt file in the project root.
 /// 
@@ -78,6 +78,8 @@ public func ==(lhs: LexerAction, rhs: LexerAction) -> Bool {
         return (lhs as! LexerModeAction) == (rhs as! LexerModeAction)
     } else if (lhs is LexerMoreAction) && (rhs is LexerMoreAction) {
         return (lhs as! LexerMoreAction) == (rhs as! LexerMoreAction)
+    } else if (lhs is LexerLessAction) && (rhs is LexerLessAction) {
+        return (lhs as! LexerLessAction) == (rhs as! LexerLessAction)
     } else if (lhs is LexerPopModeAction) && (rhs is LexerPopModeAction) {
         return (lhs as! LexerPopModeAction) == (rhs as! LexerPopModeAction)
     } else if (lhs is LexerPushModeAction) && (rhs is LexerPushModeAction) {

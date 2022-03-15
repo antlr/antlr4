@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
+﻿/* Copyright (c) 2012-2021 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -42,6 +42,7 @@
 
 #include "atn/LexerCustomAction.h"
 #include "atn/LexerChannelAction.h"
+#include "atn/LexerLessAction.h"
 #include "atn/LexerModeAction.h"
 #include "atn/LexerMoreAction.h"
 #include "atn/LexerPopModeAction.h"
@@ -730,6 +731,9 @@ Ref<LexerAction> ATNDeserializer::lexerActionFactory(LexerActionType type, int d
 
     case LexerActionType::CUSTOM:
       return std::make_shared<LexerCustomAction>(data1, data2);
+
+    case LexerActionType::LESS:
+      return LexerLessAction::getInstance();
 
     case LexerActionType::MODE:
       return std::make_shared< LexerModeAction>(data1);

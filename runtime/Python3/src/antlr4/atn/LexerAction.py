@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
+# Copyright (c) 2012-2021 The ANTLR Project. All rights reserved.
 # Use of this file is governed by the BSD 3-clause license that
 # can be found in the LICENSE.txt file in the project root.
  #
@@ -20,6 +20,7 @@ class LexerActionType(IntEnum):
     PUSH_MODE = 5   #The type of a {@link LexerPushModeAction} action.
     SKIP = 6        #The type of a {@link LexerSkipAction} action.
     TYPE = 7        #The type of a {@link LexerTypeAction} action.
+    LESS = 8        #The type of a {@link LexerLessAction} action.
 
 class LexerAction(object):
     __slots__ = ('actionType', 'isPositionDependent')
@@ -151,6 +152,26 @@ class LexerMoreAction(LexerAction):
         return "more"
 
 LexerMoreAction.INSTANCE = LexerMoreAction()
+
+# Implements the {@code less} lexer action by calling {@link Lexer#less}.
+#
+# <p>The {@code less} command does not have any parameters, so this action is
+# implemented as a singleton instance exposed by {@link #INSTANCE}.</p>
+class LexerLessAction(LexerAction):
+
+    INSTANCE = None
+
+    def __init__(self):
+        super().__init__(LexerActionType.LESS)
+
+    # <p>This action is implemented by calling {@link Lexer#less}.</p>
+    def execute(self, lexer:Lexer):
+        lexer.less()
+
+    def __str__(self):
+        return "less"
+
+LexerLessAction.INSTANCE = LexerLessAction()
 
 # Implements the {@code mode} lexer action by calling {@link Lexer#mode} with
 # the assigned mode.

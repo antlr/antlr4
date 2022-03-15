@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2021 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -192,8 +192,14 @@ namespace Antlr4.Runtime
                         {
                             goto outer_continue;
                         }
+                        if (_type == TokenTypes.Less)
+                        {
+                            _input.Seek(_tokenStartCharIndex);
+                            this.Column = _tokenStartColumn;
+                            this.Line = _tokenStartLine;
+                        }
                     }
-                    while (_type == TokenTypes.More);
+                    while (_type == TokenTypes.More || _type == TokenTypes.Less);
                     if (_token == null)
                     {
                         Emit();
@@ -229,6 +235,11 @@ outer_continue: ;
         public virtual void More()
         {
             _type = TokenTypes.More;
+        }
+
+        public virtual void Less()
+        {
+            _type = TokenTypes.Less;
         }
 
         public virtual void Mode(int m)
