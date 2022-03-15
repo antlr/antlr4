@@ -13,14 +13,14 @@ import org.antlr.v4.runtime.misc.IntervalSet;
  * and {@link SetTransition} appropriately based on the range of the input.
  *
  * To keep the serialized ATN size small, we only inline atom and
- * range transitions for Unicode code points <= U+FFFF.
+ * range transitions for Unicode code points &le; U+FFFF.
  *
- * Whenever we encounter a Unicode code point > U+FFFF, we represent that
+ * Whenever we encounter a Unicode code point &gt; U+FFFF, we represent that
  * as a set transition (even if it is logically an atom or a range).
  */
 public abstract class CodePointTransitions {
 	/**
-	 * If {@code codePoint} is <= U+FFFF, returns a new {@link AtomTransition}.
+	 * If {@code codePoint} is &le; U+FFFF, returns a new {@link AtomTransition}.
 	 * Otherwise, returns a new {@link SetTransition}.
 	 */
 	public static Transition createWithCodePoint(ATNState target, int codePoint) {
@@ -34,7 +34,7 @@ public abstract class CodePointTransitions {
 
 	/**
 	 * If {@code codePointFrom} and {@code codePointTo} are both
-	 * <= U+FFFF, returns a new {@link RangeTransition}.
+	 * &le; U+FFFF, returns a new {@link RangeTransition}.
 	 * Otherwise, returns a new {@link SetTransition}.
 	 */
 	public static Transition createWithCodePointRange(

@@ -24,7 +24,7 @@ import java.nio.file.Paths;
 
 /** This class represents the primary interface for creating {@link CharStream}s
  *  from a variety of sources as of 4.7.  The motivation was to support
- *  Unicode code points > U+FFFF.  {@link ANTLRInputStream} and
+ *  Unicode code points &gt; U+FFFF.  {@link ANTLRInputStream} and
  *  {@link ANTLRFileStream} are now deprecated in favor of the streams created
  *  by this interface.
  *
