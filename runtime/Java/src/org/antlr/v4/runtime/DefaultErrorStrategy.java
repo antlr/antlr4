@@ -8,9 +8,13 @@ package org.antlr.v4.runtime;
 
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNState;
+import org.antlr.v4.runtime.atn.DecisionState;
 import org.antlr.v4.runtime.atn.RuleTransition;
+import org.antlr.v4.runtime.atn.Transition;
+import org.antlr.v4.runtime.misc.IntegerStack;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.Pair;
+import org.antlr.v4.runtime.tree.TerminalNodeImpl;
 
 /**
  * This is the default implementation of {@link ANTLRErrorStrategy} used for
@@ -176,6 +180,12 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 		lastErrorIndex = recognizer.getInputStream().index();
 		if ( lastErrorStates==null ) lastErrorStates = new IntervalSet();
 		lastErrorStates.add(recognizer.getState());
+
+		// Make sure the parse tree shape is valid with respect to the defined grammar
+		if (recognizer.getBuildParseTree()) {
+			buildErrorTree(recognizer);
+		}
+
 		IntervalSet followSet = getErrorRecoverySet(recognizer);
 		consumeUntil(recognizer, followSet);
 	}
@@ -766,4 +776,111 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
             ttype = recognizer.getInputStream().LA(1);
         }
     }
+
+	/**
+	 * Construct a parse tree from the current recognizer position to the end of the rule.
+	 *
+	 * <ul>
+	 * <li>Positive closures match exactly once</li>
+	 * <li>Closures match zero times</li>
+	 * <li>Optional blocks do not match</li>
+	 * <li>Decisions take the first alternative, except when one of the above applies.</li>
+	 * </ul>
+	 *
+	 * @param recognizer The recognizer.
+	 */
+	protected void buildErrorTree(Parser recognizer) {
+		final ATN atn = recognizer.getATN();
+		int state = recognizer.getState();
+		ParserRuleContext context = recognizer.getContext();
+		final IntegerStack returnStateStack = new IntegerStack();
+		while (true) {
+			ATNState p = atn.states.get(state);
+			int edge;
+			switch (p.getStateType()) {
+			case ATNState.RULE_STOP:
+				if (returnStateStack.isEmpty()) {
+					return;
+				}
+
+				state = returnStateStack.pop();
+				context = context.getParent();
+				continue;
+
+			case ATNState.STAR_LOOP_ENTRY:
+			case ATNState.PLUS_LOOP_BACK:
+				if (((DecisionState)p).nonGreedy) {
+					edge = 0;
+				}
+				else {
+					edge = 1;
+				}
+
+				break;
+
+			case ATNState.BLOCK_START:
+				if (atn.ruleToStartState[p.ruleIndex].transition(0).target == p) {
+					context = recognizer.createAltContext(p.ruleIndex, 1, context);
+				}
+
+				edge = 0;
+				break;
+
+			default:
+				edge = 0;
+				break;
+			}
+
+			if (atn.ruleToStartState[p.ruleIndex].transition(0).target == p) {
+				// Error recovery always uses the first alternative for rules
+				context.setAltNumber(1);
+			}
+
+			Transition transition = p.transition(edge);
+			if (transition.getSerializationType() == Transition.RULE) {
+				RuleTransition ruleTransition = (RuleTransition)transition;
+				returnStateStack.push(ruleTransition.followState.stateNumber);
+				context = recognizer.createContext(ruleTransition.target.ruleIndex, context, state);
+				state = ruleTransition.target.stateNumber;
+			}
+			else if (transition.isEpsilon()) {
+				state = transition.target.stateNumber;
+			}
+			else {
+				Token currentSymbol = recognizer.getCurrentToken();
+				IntervalSet expecting = transition.label();
+				int expectedTokenType = Token.INVALID_TYPE;
+				if (!expecting.isNil()) {
+					// get any element
+					expectedTokenType = expecting.getMinElement();
+				}
+
+				String tokenText;
+				if (expectedTokenType == Token.EOF) {
+					tokenText = "<missing EOF>";
+				}
+				else {
+					tokenText = "<missing " + recognizer.getVocabulary().getDisplayName(expectedTokenType) + ">";
+				}
+
+				Token current = currentSymbol;
+				Token lookback = recognizer.getInputStream().LT(-1);
+				if ( current.getType() == Token.EOF && lookback!=null ) {
+					current = lookback;
+				}
+
+				Token missingToken = recognizer.getTokenFactory().create(
+					new Pair<>(current.getTokenSource(), current.getTokenSource().getInputStream()),
+					expectedTokenType,
+					tokenText,
+					Token.DEFAULT_CHANNEL,
+					-1,
+					-1,
+					current.getLine(),
+					current.getCharPositionInLine());
+				context.addChild(new TerminalNodeImpl(missingToken));
+				state = transition.target.stateNumber;
+			}
+		}
+	}
 }

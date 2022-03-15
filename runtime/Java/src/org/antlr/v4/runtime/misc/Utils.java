@@ -203,4 +203,17 @@ public class Utils {
 		}
 		return n;
 	}
+
+	public static Object getArgumentOrDefault(Object[] arguments, int index, Object defaultValue) {
+		if (arguments == null || index >= arguments.length) {
+			return defaultValue;
+		}
+
+		Object result = arguments[index];
+		if (result == null) {
+			return defaultValue;
+		}
+
+		return result;
+	}
 }
