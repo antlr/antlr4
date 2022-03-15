@@ -276,7 +276,7 @@ public class GrammarTransformPipeline {
 			}
 
 			// COPY MODES
-			// The strategy is to copy all the mode sections rules across to any 
+			// The strategy is to copy all the mode sections rules across to any
 			// mode section in the new grammar with the same name or a new
 			// mode section if no matching mode is resolved. Rules which are
 			// already in the new grammar are ignored for copy. If the mode
@@ -311,7 +311,7 @@ public class GrammarTransformPipeline {
 						    destinationAST.addChild(r);
 							addedRules++;
 						    rootRuleNames.add(ruleName);
-					    }                        
+					    }
 					}
 					if (!rootAlreadyHasMode && addedRules > 0) {
 						rootGrammar.ast.addChild(destinationAST);
@@ -440,6 +440,7 @@ public class GrammarTransformPipeline {
 			(GrammarAST)adaptor.create(ANTLRParser.RULES, "RULES");
 		lexerAST.addChild(lexerRulesRoot);
 		List<GrammarAST> rulesWeMoved = new ArrayList<GrammarAST>();
+		HashSet<String> existingTokenNames = new HashSet<String>();
 		GrammarASTWithOptions[] rules;
 		if (combinedRulesRoot.getChildCount() > 0) {
 			rules = combinedRulesRoot.getChildren().toArray(new GrammarASTWithOptions[0]);
@@ -453,6 +454,7 @@ public class GrammarTransformPipeline {
 			if (Grammar.isTokenName(ruleName)) {
 				lexerRulesRoot.addChild((Tree)adaptor.dupTree(r));
 				rulesWeMoved.add(r);
+				existingTokenNames.add(ruleName);
 			}
 		}
 		for (GrammarAST r : rulesWeMoved) {
@@ -478,7 +480,7 @@ public class GrammarTransformPipeline {
 				}
 			}
 			// create for each literal: (RULE <uniquename> (BLOCK (ALT <lit>))
-			String rname = combinedGrammar.getStringLiteralLexerRuleName(lit);
+			String rname = combinedGrammar.getStringLiteralLexerRuleName(existingTokenNames);
 			// can't use wizard; need special node types
 			GrammarAST litRule = new RuleAST(ANTLRParser.RULE);
 			BlockAST blk = new BlockAST(ANTLRParser.BLOCK);

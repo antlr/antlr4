@@ -606,17 +606,23 @@ public class Grammar implements AttributeResolver {
         return qualifiedName+suffix;
     }
 
-	public String getStringLiteralLexerRuleName(String lit) {
-		return AUTO_GENERATED_TOKEN_NAME_PREFIX + stringLiteralRuleNumber++;
+	public String getStringLiteralLexerRuleName(HashSet<String> existingTokenNames) {
+		String newName;
+		do {
+			newName = AUTO_GENERATED_TOKEN_NAME_PREFIX + stringLiteralRuleNumber++;
+		}
+		while (existingTokenNames.contains(newName));
+		existingTokenNames.add(newName);
+		return newName;
 	}
 
-    /** Return grammar directly imported by this grammar */
-    public Grammar getImportedGrammar(String name) {
+	/** Return grammar directly imported by this grammar */
+	public Grammar getImportedGrammar(String name) {
 		for (Grammar g : importedGrammars) {
-            if ( g.name.equals(name) ) return g;
-        }
-        return null;
-    }
+			if (g.name.equals(name)) return g;
+		}
+		return null;
+	}
 
 	public int getTokenType(String token) {
 		Integer I;
