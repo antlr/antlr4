@@ -31,20 +31,8 @@ using namespace antlr4;
 using namespace antlr4::atn;
 using namespace antlrcpp;
 
-LexerATNSimulator::SimState::~SimState() {
-}
-
 void LexerATNSimulator::SimState::reset() {
-  index = INVALID_INDEX;
-  line = 0;
-  charPos = INVALID_INDEX;
-  dfaState = nullptr; // Don't delete. It's just a reference.
-}
-
-void LexerATNSimulator::SimState::InitializeInstanceFields() {
-  index = INVALID_INDEX;
-  line = 0;
-  charPos = INVALID_INDEX;
+  *this = SimState();
 }
 
 LexerATNSimulator::LexerATNSimulator(const ATN &atn, std::vector<dfa::DFA> &decisionToDFA,
