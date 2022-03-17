@@ -74,7 +74,6 @@
 #include "atn/DecisionEventInfo.h"
 #include "atn/DecisionInfo.h"
 #include "atn/DecisionState.h"
-#include "atn/EmptyPredictionContext.h"
 #include "atn/EpsilonTransition.h"
 #include "atn/ErrorInfo.h"
 #include "atn/LL1Analyzer.h"

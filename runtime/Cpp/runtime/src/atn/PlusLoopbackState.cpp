@@ -8,5 +8,5 @@
 using namespace antlr4::atn;
 
 ATNStateType PlusLoopbackState::getStateType() const {
-  return PLUS_LOOP_BACK;
+  return ATNStateType::PLUS_LOOP_BACK;
 }

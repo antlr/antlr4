@@ -12,8 +12,8 @@ using namespace antlr4::atn;
 WildcardTransition::WildcardTransition(ATNState *target) : Transition(target) {
 }
 
-Transition::SerializationType WildcardTransition::getSerializationType() const {
-  return WILDCARD;
+TransitionType WildcardTransition::getTransitionType() const {
+  return TransitionType::WILDCARD;
 }
 
 bool WildcardTransition::matches(size_t symbol, size_t minVocabSymbol, size_t maxVocabSymbol) const {

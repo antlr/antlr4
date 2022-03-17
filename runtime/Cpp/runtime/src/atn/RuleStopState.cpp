@@ -8,5 +8,5 @@
 using namespace antlr4::atn;
 
 ATNStateType RuleStopState::getStateType() const {
-  return RULE_STOP;
+  return ATNStateType::RULE_STOP;
 }

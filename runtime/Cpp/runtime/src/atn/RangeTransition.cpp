@@ -13,8 +13,8 @@ using namespace antlr4::atn;
 RangeTransition::RangeTransition(ATNState *target, size_t from, size_t to) : Transition(target), from(from), to(to) {
 }
 
-Transition::SerializationType RangeTransition::getSerializationType() const {
-  return RANGE;
+TransitionType RangeTransition::getTransitionType() const {
+  return TransitionType::RANGE;
 }
 
 misc::IntervalSet RangeTransition::label() const {

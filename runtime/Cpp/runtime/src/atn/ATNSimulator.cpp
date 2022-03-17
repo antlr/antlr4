@@ -8,7 +8,6 @@
 #include "atn/ATNConfigSet.h"
 #include "atn/ATNDeserializer.h"
 #include "atn/ATNType.h"
-#include "atn/EmptyPredictionContext.h"
 #include "dfa/DFAState.h"
 
 using namespace antlr4;

@@ -78,7 +78,6 @@ namespace antlr4 {
     class BlockEndState;
     class BlockStartState;
     class DecisionState;
-    class EmptyPredictionContext;
     class EpsilonTransition;
     class LL1Analyzer;
     class LexerAction;

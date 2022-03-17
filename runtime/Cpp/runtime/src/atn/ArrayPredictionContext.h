@@ -13,7 +13,7 @@ namespace atn {
 
   class SingletonPredictionContext;
 
-  class ANTLR4CPP_PUBLIC ArrayPredictionContext : public PredictionContext {
+  class ANTLR4CPP_PUBLIC ArrayPredictionContext final : public PredictionContext {
   public:
     /// Parent can be empty only if full ctx mode and we make an array
     /// from EMPTY and non-empty. We merge EMPTY by using null parent and
@@ -28,6 +28,8 @@ namespace atn {
     explicit ArrayPredictionContext(Ref<const SingletonPredictionContext> const &a);
 
     ArrayPredictionContext(std::vector<Ref<const PredictionContext>> parents, std::vector<size_t> returnStates);
+
+    PredictionContextType getContextType() const override;
 
     virtual bool isEmpty() const override;
     virtual size_t size() const override;

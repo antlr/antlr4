@@ -26,6 +26,8 @@ namespace tree {
      *  @since 4.7
      */
     virtual void setParent(RuleContext *parent) = 0;
+
+    ParseTreeType getTreeType() const override;
   };
 
 } // namespace tree

@@ -8,5 +8,5 @@
 using namespace antlr4::atn;
 
 ATNStateType PlusBlockStartState::getStateType() const {
-  return PLUS_BLOCK_START;
+  return ATNStateType::PLUS_BLOCK_START;
 }

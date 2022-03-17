@@ -5,5 +5,10 @@
 
 #include "tree/ErrorNode.h"
 
-antlr4::tree::ErrorNode::~ErrorNode() {
+using namespace antlr4::tree;
+
+ErrorNode::~ErrorNode() {}
+
+ParseTreeType ErrorNode::getTreeType() const {
+  return ParseTreeType::ERROR;
 }

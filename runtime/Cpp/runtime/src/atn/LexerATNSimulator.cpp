@@ -20,7 +20,6 @@
 #include "dfa/DFAState.h"
 #include "atn/LexerATNConfig.h"
 #include "atn/LexerActionExecutor.h"
-#include "atn/EmptyPredictionContext.h"
 
 #include "atn/LexerATNSimulator.h"
 
@@ -316,7 +315,7 @@ bool LexerATNSimulator::closure(CharStream *input, const Ref<LexerATNConfig> &co
     std::cout << "closure(" << config->toString(true) << ")" << std::endl;
 #endif
 
-  if (is<RuleStopState *>(config->state)) {
+  if (config->state != nullptr && config->state->getStateType() == ATNStateType::RULE_STOP) {
 #if DEBUG_ATN == 1
       if (_recog != nullptr) {
         std::cout << "closure at " << _recog->getRuleNames()[config->state->ruleIndex] << " rule stop " << config << std::endl;
@@ -372,18 +371,18 @@ Ref<LexerATNConfig> LexerATNSimulator::getEpsilonTarget(CharStream *input, const
   ATNConfigSet *configs, bool speculative, bool treatEofAsEpsilon) {
 
   Ref<LexerATNConfig> c = nullptr;
-  switch (t->getSerializationType()) {
-    case Transition::RULE: {
+  switch (t->getTransitionType()) {
+    case TransitionType::RULE: {
       const RuleTransition *ruleTransition = static_cast<const RuleTransition*>(t);
       Ref<const PredictionContext> newContext = SingletonPredictionContext::create(config->context, ruleTransition->followState->stateNumber);
       c = std::make_shared<LexerATNConfig>(*config, t->target, newContext);
       break;
     }
 
-    case Transition::PRECEDENCE:
+    case TransitionType::PRECEDENCE:
       throw UnsupportedOperationException("Precedence predicates are not supported in lexers.");
 
-    case Transition::PREDICATE: {
+    case TransitionType::PREDICATE: {
       /*  Track traversing semantic predicates. If we traverse,
        we cannot add a DFA state for this "reach" computation
        because the DFA would not test the predicate again in the
@@ -415,7 +414,7 @@ Ref<LexerATNConfig> LexerATNSimulator::getEpsilonTarget(CharStream *input, const
       break;
     }
 
-    case Transition::ACTION:
+    case TransitionType::ACTION:
       if (config->context == nullptr|| config->context->hasEmptyPath()) {
         // execute actions anywhere in the start rule for a token.
         //
@@ -440,13 +439,13 @@ Ref<LexerATNConfig> LexerATNSimulator::getEpsilonTarget(CharStream *input, const
         break;
       }
 
-    case Transition::EPSILON:
+    case TransitionType::EPSILON:
       c = std::make_shared<LexerATNConfig>(*config, t->target);
       break;
 
-    case Transition::ATOM:
-    case Transition::RANGE:
-    case Transition::SET:
+    case TransitionType::ATOM:
+    case TransitionType::RANGE:
+    case TransitionType::SET:
       if (treatEofAsEpsilon) {
         if (t->matches(Token::EOF, Lexer::MIN_CHAR_VALUE, Lexer::MAX_CHAR_VALUE)) {
           c = std::make_shared<LexerATNConfig>(*config, t->target);
@@ -544,7 +543,7 @@ dfa::DFAState *LexerATNSimulator::addDFAState(ATNConfigSet *configs, bool suppre
   dfa::DFAState *proposed = new dfa::DFAState(std::unique_ptr<ATNConfigSet>(configs)); /* mem-check: managed by the DFA or deleted below */
   Ref<ATNConfig> firstConfigWithRuleStopState = nullptr;
   for (const auto &c : configs->configs) {
-    if (is<RuleStopState *>(c->state)) {
+    if (c->state != nullptr && c->state->getStateType() == ATNStateType::RULE_STOP) {
       firstConfigWithRuleStopState = c;
       break;
     }

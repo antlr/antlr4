@@ -6,7 +6,6 @@
 #include "atn/ATNType.h"
 #include "atn/LexerATNSimulator.h"
 #include "dfa/DFA.h"
-#include "atn/EmptyPredictionContext.h"
 #include "Exceptions.h"
 #include "Vocabulary.h"
 

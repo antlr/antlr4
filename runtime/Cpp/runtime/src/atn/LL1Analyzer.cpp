@@ -12,7 +12,6 @@
 #include "atn/NotSetTransition.h"
 #include "misc/IntervalSet.h"
 #include "atn/ATNConfig.h"
-#include "atn/EmptyPredictionContext.h"
 
 #include "support/CPPUtils.h"
 
@@ -85,7 +84,7 @@ namespace {
         }
       }
 
-      if (s->getStateType() == ATNState::RULE_STOP) {
+      if (s->getStateType() == ATNStateType::RULE_STOP) {
         if (ctx == nullptr) {
           _look.add(Token::EPSILON);
           return;
@@ -112,8 +111,9 @@ namespace {
       size_t n = s->transitions.size();
       for (size_t i = 0; i < n; i++) {
         const Transition *t = s->transitions[i].get();
+        const auto tType = t->getTransitionType();
 
-        if (t->getSerializationType() == Transition::RULE) {
+        if (tType == TransitionType::RULE) {
           if (_calledRuleStack[(static_cast<const RuleTransition*>(t))->target->ruleIndex]) {
             continue;
           }
@@ -124,7 +124,7 @@ namespace {
           LOOK(t->target, stopState, newContext);
           _calledRuleStack[(static_cast<const RuleTransition*>(t))->target->ruleIndex] = false;
 
-        } else if (is<const AbstractPredicateTransition *>(t)) {
+        } else if (tType == TransitionType::PREDICATE || tType == TransitionType::PRECEDENCE) {
           if (_seeThruPreds) {
             LOOK(t->target, stopState, ctx);
           } else {
@@ -132,12 +132,12 @@ namespace {
           }
         } else if (t->isEpsilon()) {
           LOOK(t->target, stopState, ctx);
-        } else if (t->getSerializationType() == Transition::WILDCARD) {
+        } else if (tType == TransitionType::WILDCARD) {
           _look.addAll(misc::IntervalSet::of(Token::MIN_USER_TOKEN_TYPE, static_cast<ssize_t>(_atn.maxTokenType)));
         } else {
           misc::IntervalSet set = t->label();
           if (!set.isEmpty()) {
-            if (is<const NotSetTransition*>(t)) {
+            if (tType == TransitionType::NOT_SET) {
               set = set.complement(misc::IntervalSet::of(Token::MIN_USER_TOKEN_TYPE, static_cast<ssize_t>(_atn.maxTokenType)));
             }
             _look.addAll(set);

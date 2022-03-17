@@ -33,6 +33,7 @@
 #include "atn/SetTransition.h"
 #include "atn/NotSetTransition.h"
 #include "atn/WildcardTransition.h"
+#include "atn/TransitionType.h"
 #include "Token.h"
 
 #include "misc/IntervalSet.h"
@@ -51,6 +52,7 @@
 
 #include "atn/ATNDeserializer.h"
 
+#include <cassert>
 #include <mutex>
 #include <string>
 #include <vector>
@@ -131,6 +133,94 @@ namespace {
     }
   }
 
+  ConstTransitionPtr edgeFactory(const ATN &atn, TransitionType type, size_t trg, size_t arg1, size_t arg2,
+                                        size_t arg3, const std::vector<misc::IntervalSet> &sets) {
+    ATNState *target = atn.states[trg];
+    switch (type) {
+      case TransitionType::EPSILON:
+        return std::make_unique<EpsilonTransition>(target);
+      case TransitionType::RANGE:
+        if (arg3 != 0) {
+          return std::make_unique<RangeTransition>(target, Token::EOF, arg2);
+        } else {
+          return std::make_unique<RangeTransition>(target, arg1, arg2);
+        }
+      case TransitionType::RULE:
+        return std::make_unique<RuleTransition>(downCast<RuleStartState*>(atn.states[arg1]), arg2, (int)arg3, target);
+      case TransitionType::PREDICATE:
+        return std::make_unique<PredicateTransition>(target, arg1, arg2, arg3 != 0);
+      case TransitionType::PRECEDENCE:
+        return std::make_unique<PrecedencePredicateTransition>(target, (int)arg1);
+      case TransitionType::ATOM:
+        if (arg3 != 0) {
+          return std::make_unique<AtomTransition>(target, Token::EOF);
+        } else {
+          return std::make_unique<AtomTransition>(target, arg1);
+        }
+      case TransitionType::ACTION:
+        return std::make_unique<ActionTransition>(target, arg1, arg2, arg3 != 0);
+      case TransitionType::SET:
+        return std::make_unique<SetTransition>(target, sets[arg1]);
+      case TransitionType::NOT_SET:
+        return std::make_unique<NotSetTransition>(target, sets[arg1]);
+      case TransitionType::WILDCARD:
+        return std::make_unique<WildcardTransition>(target);
+    }
+
+    throw IllegalArgumentException("The specified transition type is not valid.");
+  }
+
+  /* mem check: all created instances are freed in the d-tor of the ATN. */
+  ATNState* stateFactory(ATNStateType type, size_t ruleIndex) {
+    ATNState *s;
+    switch (type) {
+      case ATNStateType::INVALID:
+        return nullptr;
+      case ATNStateType::BASIC :
+        s = new BasicState();
+        break;
+      case ATNStateType::RULE_START :
+        s = new RuleStartState();
+        break;
+      case ATNStateType::BLOCK_START :
+        s = new BasicBlockStartState();
+        break;
+      case ATNStateType::PLUS_BLOCK_START :
+        s = new PlusBlockStartState();
+        break;
+      case ATNStateType::STAR_BLOCK_START :
+        s = new StarBlockStartState();
+        break;
+      case ATNStateType::TOKEN_START :
+        s = new TokensStartState();
+        break;
+      case ATNStateType::RULE_STOP :
+        s = new RuleStopState();
+        break;
+      case ATNStateType::BLOCK_END :
+        s = new BlockEndState();
+        break;
+      case ATNStateType::STAR_LOOP_BACK :
+        s = new StarLoopbackState();
+        break;
+      case ATNStateType::STAR_LOOP_ENTRY :
+        s = new StarLoopEntryState();
+        break;
+      case ATNStateType::PLUS_LOOP_BACK :
+        s = new PlusLoopbackState();
+        break;
+      case ATNStateType::LOOP_END :
+        s = new LoopEndState();
+        break;
+      default :
+        std::string message = "The specified state type " + std::to_string(static_cast<size_t>(type)) + " is not valid.";
+        throw IllegalArgumentException(message);
+    }
+    assert(s->getStateType() == type);
+    s->ruleIndex = ruleIndex;
+    return s;
+  }
+
   uint32_t deserializeInt32(const std::vector<uint16_t>& data, size_t offset) {
     return static_cast<uint32_t>(data[offset]) | (static_cast<uint32_t>(data[offset + 1]) << 16);
   }
@@ -203,9 +293,9 @@ std::unique_ptr<ATN> ATNDeserializer::deserialize(const std::vector<uint16_t>& d
     loopBackStateNumbers.reserve(nstates);  // Reserve worst case size, its short lived.
     endStateNumbers.reserve(nstates);  // Reserve worst case size, its short lived.
     for (size_t i = 0; i < nstates; i++) {
-      size_t stype = data[p++];
+      ATNStateType stype = static_cast<ATNStateType>(data[p++]);
       // ignore bad type of states
-      if (stype == ATNState::ATN_INVALID_TYPE) {
+      if (stype == ATNStateType::INVALID) {
         atn->addState(nullptr);
         continue;
       }
@@ -216,7 +306,7 @@ std::unique_ptr<ATN> ATNDeserializer::deserialize(const std::vector<uint16_t>& d
       }
 
       ATNState *s = stateFactory(stype, ruleIndex);
-      if (stype == ATNState::LOOP_END) { // special case
+      if (stype == ATNStateType::LOOP_END) { // special case
         int loopBackStateNumber = data[p++];
         loopBackStateNumbers.push_back({ downCast<LoopEndState*>(s),  loopBackStateNumber });
       } else if (is<BlockStartState*>(s)) {
@@ -312,11 +402,11 @@ std::unique_ptr<ATN> ATNDeserializer::deserialize(const std::vector<uint16_t>& d
     for (int i = 0; i < nedges; i++) {
       size_t src = data[p];
       size_t trg = data[p + 1];
-      size_t ttype = data[p + 2];
+      TransitionType ttype = static_cast<TransitionType>(data[p + 2]);
       size_t arg1 = data[p + 3];
       size_t arg2 = data[p + 4];
       size_t arg3 = data[p + 5];
-      ConstTransitionPtr trans = edgeFactory(*atn, ttype, src, trg, arg1, arg2, arg3, sets);
+      ConstTransitionPtr trans = edgeFactory(*atn, ttype, trg, arg1, arg2, arg3, sets);
       ATNState *srcState = atn->states[src];
       srcState->addTransition(std::move(trans));
       p += 6;
@@ -572,95 +662,3 @@ void ATNDeserializer::verifyATN(const ATN &atn) const {
     }
   }
 }
-
-ConstTransitionPtr ATNDeserializer::edgeFactory(const ATN &atn, size_t type, size_t /*src*/, size_t trg, size_t arg1,
-                                         size_t arg2, size_t arg3,
-  const std::vector<misc::IntervalSet> &sets) {
-
-  ATNState *target = atn.states[trg];
-  switch (type) {
-    case Transition::EPSILON:
-      return std::make_unique<EpsilonTransition>(target);
-    case Transition::RANGE:
-      if (arg3 != 0) {
-        return std::make_unique<RangeTransition>(target, Token::EOF, arg2);
-      } else {
-        return std::make_unique<RangeTransition>(target, arg1, arg2);
-      }
-    case Transition::RULE:
-      return std::make_unique<RuleTransition>(downCast<RuleStartState*>(atn.states[arg1]), arg2, (int)arg3, target);
-    case Transition::PREDICATE:
-      return std::make_unique<PredicateTransition>(target, arg1, arg2, arg3 != 0);
-    case Transition::PRECEDENCE:
-      return std::make_unique<PrecedencePredicateTransition>(target, (int)arg1);
-    case Transition::ATOM:
-      if (arg3 != 0) {
-        return std::make_unique<AtomTransition>(target, Token::EOF);
-      } else {
-        return std::make_unique<AtomTransition>(target, arg1);
-      }
-    case Transition::ACTION:
-      return std::make_unique<ActionTransition>(target, arg1, arg2, arg3 != 0);
-    case Transition::SET:
-      return std::make_unique<SetTransition>(target, sets[arg1]);
-    case Transition::NOT_SET:
-      return std::make_unique<NotSetTransition>(target, sets[arg1]);
-    case Transition::WILDCARD:
-      return std::make_unique<WildcardTransition>(target);
-  }
-
-  throw IllegalArgumentException("The specified transition type is not valid.");
-}
-
-/* mem check: all created instances are freed in the d-tor of the ATN. */
-ATNState* ATNDeserializer::stateFactory(size_t type, size_t ruleIndex) {
-  ATNState *s;
-  switch (type) {
-    case ATNState::ATN_INVALID_TYPE:
-      return nullptr;
-    case ATNState::BASIC :
-      s = new BasicState();
-      break;
-    case ATNState::RULE_START :
-      s = new RuleStartState();
-      break;
-    case ATNState::BLOCK_START :
-      s = new BasicBlockStartState();
-      break;
-    case ATNState::PLUS_BLOCK_START :
-      s = new PlusBlockStartState();
-      break;
-    case ATNState::STAR_BLOCK_START :
-      s = new StarBlockStartState();
-      break;
-    case ATNState::TOKEN_START :
-      s = new TokensStartState();
-      break;
-    case ATNState::RULE_STOP :
-      s = new RuleStopState();
-      break;
-    case ATNState::BLOCK_END :
-      s = new BlockEndState();
-      break;
-    case ATNState::STAR_LOOP_BACK :
-      s = new StarLoopbackState();
-      break;
-    case ATNState::STAR_LOOP_ENTRY :
-      s = new StarLoopEntryState();
-      break;
-    case ATNState::PLUS_LOOP_BACK :
-      s = new PlusLoopbackState();
-      break;
-    case ATNState::LOOP_END :
-      s = new LoopEndState();
-      break;
-    default :
-      std::string message = "The specified state type " + std::to_string(type) + " is not valid.";
-      throw IllegalArgumentException(message);
-  }
-
-  s->ruleIndex = ruleIndex;
-  return s;
-}
-
-

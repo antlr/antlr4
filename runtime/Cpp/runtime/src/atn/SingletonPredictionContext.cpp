@@ -3,8 +3,6 @@
  * can be found in the LICENSE.txt file in the project root.
  */
 
-#include "atn/EmptyPredictionContext.h"
-
 #include "atn/SingletonPredictionContext.h"
 
 using namespace antlr4::atn;
@@ -22,6 +20,14 @@ Ref<const SingletonPredictionContext> SingletonPredictionContext::create(Ref<con
     return std::dynamic_pointer_cast<const SingletonPredictionContext>(EMPTY);
   }
   return std::make_shared<SingletonPredictionContext>(std::move(parent), returnState);
+}
+
+PredictionContextType SingletonPredictionContext::getContextType() const {
+  return PredictionContextType::SINGLETON;
+}
+
+bool SingletonPredictionContext::isEmpty() const {
+  return parent == nullptr && returnState == EMPTY_RETURN_STATE;
 }
 
 size_t SingletonPredictionContext::size() const {
@@ -45,11 +51,11 @@ bool SingletonPredictionContext::operator == (const PredictionContext &o) const 
     return true;
   }
 
-  const SingletonPredictionContext *other = dynamic_cast<const SingletonPredictionContext*>(&o);
-  if (other == nullptr) {
+  if (o.getContextType() != PredictionContextType::SINGLETON) {
     return false;
   }
 
+  const SingletonPredictionContext *other = static_cast<const SingletonPredictionContext*>(&o);
   if (this->hashCode() != other->hashCode()) {
     return false; // can't be same if hash is different
   }
@@ -62,7 +68,7 @@ bool SingletonPredictionContext::operator == (const PredictionContext &o) const 
   if (!parent || !other->parent)
     return false;
 
-   return *parent == *other->parent;
+   return parent == other->parent || *parent == *other->parent;
 }
 
 std::string SingletonPredictionContext::toString() const {

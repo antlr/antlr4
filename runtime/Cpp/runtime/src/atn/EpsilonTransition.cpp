@@ -18,8 +18,8 @@ size_t EpsilonTransition::outermostPrecedenceReturn() const {
   return _outermostPrecedenceReturn;
 }
 
-Transition::SerializationType EpsilonTransition::getSerializationType() const {
-  return EPSILON;
+TransitionType EpsilonTransition::getTransitionType() const {
+  return TransitionType::EPSILON;
 }
 
 bool EpsilonTransition::isEpsilon() const {

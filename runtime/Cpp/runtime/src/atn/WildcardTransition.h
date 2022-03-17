@@ -14,7 +14,7 @@ namespace atn {
   public:
     explicit WildcardTransition(ATNState *target);
 
-    virtual SerializationType getSerializationType() const override;
+    TransitionType getTransitionType() const override;
 
     virtual bool matches(size_t symbol, size_t minVocabSymbol, size_t maxVocabSymbol) const override;
 

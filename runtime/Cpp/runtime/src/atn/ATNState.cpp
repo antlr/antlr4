@@ -13,12 +13,6 @@
 using namespace antlr4::atn;
 using namespace antlrcpp;
 
-const std::vector<std::string> ATNState::serializationNames = {
-  "INVALID", "BASIC", "RULE_START", "BLOCK_START",
-  "PLUS_BLOCK_START", "STAR_BLOCK_START", "TOKEN_START", "RULE_STOP",
-  "BLOCK_END", "STAR_LOOP_BACK", "STAR_LOOP_ENTRY", "PLUS_LOOP_BACK", "LOOP_END"
-};
-
 size_t ATNState::hashCode() const {
   return stateNumber;
 }
