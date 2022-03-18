@@ -20,10 +20,10 @@ import java.util.Locale;
  * @author Sam Harwell
  */
 public class ATNDeserializer {
-
-  static final int LEGACY_SERIALIZED_VERSION = 3;
-
-	public static final int SERIALIZED_VERSION = 4;
+	public static final int SERIALIZED_VERSION;
+	static {
+		SERIALIZED_VERSION = 4;
+	}
 
 	interface UnicodeDeserializer {
 		// Wrapper for readInt() or readInt32()
@@ -90,12 +90,6 @@ public class ATNDeserializer {
 
 		int p = 0;
 		int version = toInt(data[p++]);
-    if (version == LEGACY_SERIALIZED_VERSION) {
-      // Preserve backwards compatibility for version 3. We simply skip over the UUID and assume all
-      // features were supported.
-      p += 8;
-      version = SERIALIZED_VERSION;
-    }
 		if (version != SERIALIZED_VERSION) {
 			String reason = String.format(Locale.getDefault(), "Could not deserialize ATN with version %d (expected %d).", version, SERIALIZED_VERSION);
 			throw new UnsupportedOperationException(new InvalidClassException(ATN.class.getName(), reason));
