@@ -338,7 +338,7 @@ var serializedLexerAtn = []uint16{
 }
 
 var lexerDeserializer = NewATNDeserializer(nil)
-var lexerAtn = lexerDeserializer.DeserializeFromUInt16(serializedLexerAtn)
+var lexerAtn = lexerDeserializer.Deserialize(serializedLexerAtn)
 
 var lexerChannelNames = []string{
 	"DEFAULT_TOKEN_CHANNEL", "HIDDEN",

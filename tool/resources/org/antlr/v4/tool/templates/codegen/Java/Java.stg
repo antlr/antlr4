@@ -964,7 +964,7 @@ public class <lexer.name> extends <superClass; null="Lexer"> {
 }
 >>
 
-SerializedATN(model) ::= <<
+SerializedJavaATN(model) ::= <<
 <if(rest(model.segments))>
 <! requires segmented representation !>
 <model.segments:{segment|private static final String _serializedATNSegment<i0> =

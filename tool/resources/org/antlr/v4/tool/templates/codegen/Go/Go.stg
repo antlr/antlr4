@@ -187,7 +187,7 @@ type <parser.name> struct {
 func New<parser.name>(input antlr.TokenStream) *<parser.name> {
 	this := new(<parser.name>)
 	deserializer := antlr.NewATNDeserializer(nil)
-	deserializedATN := deserializer.DeserializeFromUInt16(parserATN)
+	deserializedATN := deserializer.Deserialize(parserATN)
 	decisionToDFA := make([]*antlr.DFA, len(deserializedATN.DecisionToState))
 	for index, ds := range deserializedATN.DecisionToState {
 		decisionToDFA[index] = antlr.NewDFA(ds, index)
@@ -1406,7 +1406,7 @@ Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
 <if(atn)>
 var serializedLexerAtn = <atn>
 <else>
-var serializedLexerAtn []uint16
+var serializedLexerAtn []int
 <endif>
 
 
@@ -1460,7 +1460,7 @@ type <lexer.name> struct {
 func New<lexer.name>(input antlr.CharStream) *<lexer.name> {
 	l := new(<lexer.name>)
 	lexerDeserializer := antlr.NewATNDeserializer(nil)
-	lexerAtn := lexerDeserializer.DeserializeFromUInt16(serializedLexerAtn)
+	lexerAtn := lexerDeserializer.Deserialize(serializedLexerAtn)
 	lexerDecisionToDFA := make([]*antlr.DFA, len(lexerAtn.DecisionToState))
 	for index, ds := range lexerAtn.DecisionToState {
 		lexerDecisionToDFA[index] = antlr.NewDFA(ds, index)
@@ -1523,7 +1523,7 @@ const <lexer.name><first(rest(lexer.escapedModeNames))> = 1
 >>
 
 SerializedATN(model) ::= <<
-<if(model.serialized)>[]uint16{
+<if(model.serialized)>[]int{
 	<model.serialized; separator=", ", wrap>,
 }<endif>
 >>

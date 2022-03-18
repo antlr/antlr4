@@ -23,7 +23,7 @@ type blockStartStateIntPair struct {
 
 type ATNDeserializer struct {
 	options *ATNDeserializationOptions
-	data    []uint16
+	data    []int
 	pos     int
 }
 
@@ -45,7 +45,7 @@ func stringInSlice(a string, list []string) int {
 	return -1
 }
 
-func (a *ATNDeserializer) DeserializeFromUInt16(data []uint16) *ATN {
+func (a *ATNDeserializer) Deserialize(data []int) *ATN {
 	a.data = data
 	a.pos = 0
 	a.checkVersion()
