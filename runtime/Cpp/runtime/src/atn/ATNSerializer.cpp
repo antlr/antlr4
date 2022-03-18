@@ -369,10 +369,10 @@ std::string ATNSerializer::decode(const std::wstring &inpdata) {
   if (inpdata.size() < 10)
     throw IllegalArgumentException("Not enough data to decode");
 
-  std::vector<uint16_t> data(inpdata.size());
+  std::vector<int> data(inpdata.size());
 
   for (size_t i = 0; i < inpdata.size(); ++i) {
-    data[i] = (uint16_t)inpdata[i];
+    data[i] = (int)inpdata[i];
   }
 
   std::string buf;

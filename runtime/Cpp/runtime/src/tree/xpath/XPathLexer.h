@@ -28,7 +28,7 @@ public:
 
   virtual const antlr4::dfa::Vocabulary& getVocabulary() const override;
 
-  virtual const std::vector<uint16_t>& getSerializedATN() const override;
+  virtual const std::vector<int>& getSerializedATN() const override;
 
   virtual const antlr4::atn::ATN& getATN() const override;
 
