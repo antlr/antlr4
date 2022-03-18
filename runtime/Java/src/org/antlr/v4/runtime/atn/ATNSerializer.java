@@ -24,6 +24,7 @@ import java.util.Map;
 public class ATNSerializer {
 	public ATN atn;
 	private List<String> tokenNames;
+	private final String language;
 
 	private final IntegerList data = new IntegerList();
 	/** Note that we use a LinkedHashMap as a set to mainintain insertion order while deduplicating
@@ -36,15 +37,17 @@ public class ATNSerializer {
 		void serializeCodePoint(IntegerList data, int cp);
 	}
 
-	public ATNSerializer(ATN atn) {
+	public ATNSerializer(ATN atn, String language) {
 		assert atn.grammarType != null;
 		this.atn = atn;
+		this.language = language;
 	}
 
-	public ATNSerializer(ATN atn, List<String> tokenNames) {
+	public ATNSerializer(ATN atn, List<String> tokenNames, String language) {
 		assert atn.grammarType != null;
 		this.atn = atn;
 		this.tokenNames = tokenNames;
+		this.language = language;
 	}
 
 	/** Serialize state descriptors, edge descriptors, and decision&rarr;state map
@@ -72,14 +75,14 @@ public class ATNSerializer {
 	 *
 	 *  Convenient to pack into unsigned shorts to make as Java string.
 	 */
-	public IntegerList serialize(String language) {
+	public IntegerList serialize() {
 		if ( language.equals("Java") ) {
 			return serializeAsUInt16ForJava();
 		}
-		return serializeAsSignedInts(language);
+		return serializeAsSignedInts();
 	}
 
-	public IntegerList serializeAsSignedInts(String language) {
+	public IntegerList serializeAsSignedInts() {
 		addPreamble();
 		int nedges = addEdges();
 		addNonGreedyStates();
@@ -634,7 +637,7 @@ public class ATNSerializer {
 	}
 
 	public static IntegerList getSerialized(ATN atn, String language) {
-		return new ATNSerializer(atn).serialize(language);
+		return new ATNSerializer(atn, language).serialize();
 	}
 
 	public static char[] getSerializedAsChars(ATN atn, String language) {
