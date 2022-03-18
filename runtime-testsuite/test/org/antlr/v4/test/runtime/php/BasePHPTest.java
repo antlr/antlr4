@@ -244,7 +244,7 @@ public class BasePHPTest extends BaseRuntimeTestSupport implements RuntimeTestSu
 			return phpPath;
 		}
 
-		String[] roots = {"/usr/local/bin/", "/opt/local/bin", "/usr/bin/"};
+		String[] roots = {"/usr/local/bin/", "/opt/local/bin", "/opt/homebrew/bin/", "/usr/bin/"};
 
 		for (String root: roots) {
 			if (new File(root + tool).exists()) {

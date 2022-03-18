@@ -996,7 +996,7 @@ public function <if(method.isEnter)>enter<else>exit<endif>Rule(ParseTreeListener
 >>
 
 VisitorDispatchMethod(method) ::= <<
-public function accept(ParseTreeVisitor $visitor)
+public function accept(ParseTreeVisitor $visitor) : mixed
 {
 	if ($visitor instanceof <parser.grammarName>Visitor) {
 	    return $visitor->visit<struct.derivedFromName; format="cap">($this);
