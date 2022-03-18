@@ -8,15 +8,22 @@ package org.antlr.v4.codegen.target;
 
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.codegen.Target;
-import org.antlr.v4.tool.ast.GrammarAST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.StringRenderer;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class DartTarget extends Target {
+	protected static final Map<Character, String> targetCharValueEscape;
+	static {
+		HashMap<Character, String> map = new HashMap<>();
+		for (Map.Entry<Character, String> entry : defaultCharValueEscape.entrySet()) {
+			map.put(entry.getKey(), entry.getValue());
+		}
+		addEscapedChar(map, '$');
+		targetCharValueEscape = map;
+	}
+
 	protected static final HashSet<String> reservedWords = new HashSet<>(Arrays.asList(
 		"abstract", "dynamic", "implements", "show",
 		"as", "else", "import", "static",
@@ -39,8 +46,11 @@ public class DartTarget extends Target {
 
 	public DartTarget(CodeGenerator gen) {
 		super(gen);
+	}
 
-		targetCharValueEscape['$'] = "\\$";
+	@Override
+	public Map<Character, String> getTargetCharValueEscape() {
+		return targetCharValueEscape;
 	}
 
 	@Override
@@ -62,11 +72,12 @@ public class DartTarget extends Target {
 	}
 
 	@Override
-	public String encodeIntAsCharEscape(int v) {
-		if (v < Character.MIN_VALUE || v > Character.MAX_VALUE) {
-			throw new IllegalArgumentException(String.format("Cannot encode the specified value: %d", v));
-		}
+	public boolean isATNSerializedAsInts() {
+		return true;
+	}
 
-		return String.format("\\u{%X}", v & 0xFFFF);
+	@Override
+	protected String escapeChar(int v) {
+		return String.format("\\u{%X}", v);
 	}
 }

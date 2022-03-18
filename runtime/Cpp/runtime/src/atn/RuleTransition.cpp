@@ -17,8 +17,8 @@ RuleTransition::RuleTransition(RuleStartState *ruleStart, size_t ruleIndex, int 
   this->followState = followState;
 }
 
-Transition::SerializationType RuleTransition::getSerializationType() const {
-  return RULE;
+TransitionType RuleTransition::getTransitionType() const {
+  return TransitionType::RULE;
 }
 
 bool RuleTransition::isEpsilon() const {

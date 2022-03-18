@@ -106,10 +106,10 @@ void DefaultErrorStrategy::sync(Parser *recognizer) {
   }
 
   switch (s->getStateType()) {
-    case atn::ATNState::BLOCK_START:
-    case atn::ATNState::STAR_BLOCK_START:
-    case atn::ATNState::PLUS_BLOCK_START:
-    case atn::ATNState::STAR_LOOP_ENTRY:
+    case atn::ATNStateType::BLOCK_START:
+    case atn::ATNStateType::STAR_BLOCK_START:
+    case atn::ATNStateType::PLUS_BLOCK_START:
+    case atn::ATNStateType::STAR_LOOP_ENTRY:
       // report error and recover if possible
       if (singleTokenDeletion(recognizer) != nullptr) {
         return;
@@ -117,8 +117,8 @@ void DefaultErrorStrategy::sync(Parser *recognizer) {
 
       throw InputMismatchException(recognizer);
 
-    case atn::ATNState::PLUS_LOOP_BACK:
-    case atn::ATNState::STAR_LOOP_BACK: {
+    case atn::ATNStateType::PLUS_LOOP_BACK:
+    case atn::ATNStateType::STAR_LOOP_BACK: {
       reportUnwantedToken(recognizer);
       misc::IntervalSet expecting = recognizer->getExpectedTokens();
       misc::IntervalSet whatFollowsLoopIterationOrRule = expecting.Or(getErrorRecoverySet(recognizer));

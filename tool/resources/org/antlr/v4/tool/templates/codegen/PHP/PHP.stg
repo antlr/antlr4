@@ -297,7 +297,7 @@ namespace<if(file.genPackage)> <file.genPackage><endif> {
 			return self::RULE_NAMES;
 		}
 
-		public function getSerializedATN() : string
+		public function getSerializedATN() : array
 		{
 			return self::SERIALIZED_ATN;
 		}
@@ -1173,7 +1173,7 @@ namespace<if(lexerFile.genPackage)> <lexerFile.genPackage><endif> {
 			return self::RULE_NAMES;
 		}
 
-		public function getSerializedATN() : string
+		public function getSerializedATN() : array
 		{
 			return self::SERIALIZED_ATN;
 		}
@@ -1209,19 +1209,8 @@ namespace<if(lexerFile.genPackage)> <lexerFile.genPackage><endif> {
 >>
 
 SerializedATN(model) ::= <<
-<if(rest(model.segments))>
-/**
- * @var string
- */
 private const SERIALIZED_ATN =
-	<model.segments:{segment| "<segment; wrap={" .<\n>"}>"}; separator=" .\n">;
-<else>
-/**
- * @var string
- */
-private const SERIALIZED_ATN =
-	"<model.serialized; wrap={" .<\n>    "}>";
-<endif>
+	[<model.serialized: {s | <s>}; separator=", ", wrap={<\n>    }>];
 >>
 
 /**

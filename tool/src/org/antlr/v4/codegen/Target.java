@@ -26,36 +26,51 @@ import org.stringtemplate.v4.STGroupFile;
 import org.stringtemplate.v4.StringRenderer;
 import org.stringtemplate.v4.misc.STMessage;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 /** */
 public abstract class Target {
-	/** For pure strings of Java 16-bit Unicode char, how can we display
-	 *  it in the target language as a literal.  Useful for dumping
-	 *  predicates and such that may refer to chars that need to be escaped
-	 *  when represented as strings.  Also, templates need to be escaped so
-	 *  that the target language can hold them as a string.
-	 *  <p>
-	 *  I have defined (via the constructor) the set of typical escapes,
-	 *  but your {@link Target} subclass is free to alter the translated chars
-	 *  or add more definitions.  This is non-static so each target can have
-	 *  a different set in memory at same time.
-	 */
-	protected String[] targetCharValueEscape = new String[255];
-
 	protected final CodeGenerator gen;
 	private STGroup templates;
 
+	protected static final Map<Character, String> defaultCharValueEscape;
+	static {
+		// https://docs.oracle.com/javase/tutorial/java/data/characters.html
+		HashMap<Character, String> map = new HashMap<>();
+		addEscapedChar(map, '\t', 't');
+		addEscapedChar(map, '\b', 'b');
+		addEscapedChar(map, '\n', 'n');
+		addEscapedChar(map, '\r', 'r');
+		addEscapedChar(map, '\f', 'f');
+		addEscapedChar(map, '\'');
+		addEscapedChar(map, '\"');
+		addEscapedChar(map, '\\');
+		defaultCharValueEscape = map;
+	}
+
 	protected Target(CodeGenerator gen) {
-		targetCharValueEscape['\n'] = "\\n";
-		targetCharValueEscape['\r'] = "\\r";
-		targetCharValueEscape['\t'] = "\\t";
-		targetCharValueEscape['\b'] = "\\b";
-		targetCharValueEscape['\f'] = "\\f";
-		targetCharValueEscape['\\'] = "\\\\";
-		targetCharValueEscape['\''] = "\\'";
-		targetCharValueEscape['"'] = "\\\"";
 		this.gen = gen;
+	}
+
+	/** For pure strings of Unicode char, how can we display
+	 *  it in the target language as a literal. Useful for dumping
+	 *  predicates and such that may refer to chars that need to be escaped
+	 *  when represented as strings.  Also, templates need to be escaped so
+	 *  that the target language can hold them as a string.
+	 *  Each target can have a different set in memory at same time.
+	 */
+	public Map<Character, String> getTargetCharValueEscape() {
+		return defaultCharValueEscape;
+	}
+
+	protected static void addEscapedChar(HashMap<Character, String> map, char key) {
+		addEscapedChar(map, key, key);
+	}
+
+	protected static void addEscapedChar(HashMap<Character, String> map, char key, char representation) {
+		map.put(key, "\\" + representation);
 	}
 
 	public String getLanguage() { return gen.language; }
@@ -157,13 +172,11 @@ public abstract class Target {
 		if ( quoted ) {
 			buf.append('"');
 		}
-		for (int i=0; i<s.length(); ) {
+		for (int i=0; i < s.length(); ) {
 			int c = s.codePointAt(i);
-			if ( c!='\'' && // don't escape single quotes in strings for java
-				 c<targetCharValueEscape.length &&
-				 targetCharValueEscape[c]!=null )
-			{
-				buf.append(targetCharValueEscape[c]);
+			String escaped = c <= Character.MAX_VALUE ? getTargetCharValueEscape().get((char)c) : null;
+			if (c != '\'' && escaped != null) { // don't escape single quotes in strings for java
+				buf.append(escaped);
 			}
 			else if (shouldUseUnicodeEscapeForCodePointInDoubleQuotedString(c)) {
 				appendUnicodeEscapedCodePoint(i, buf);
@@ -329,21 +342,32 @@ public abstract class Target {
 			throw new IllegalArgumentException(String.format("Cannot encode the specified value: %d", v));
 		}
 
-		if ( v < targetCharValueEscape.length && targetCharValueEscape[v] != null) {
-			return targetCharValueEscape[v];
+		if ( isATNSerializedAsInts() ) {
+			return Integer.toString(v);
 		}
 
-		if (v >= 0x20 && v < 127 && (!Character.isDigit(v) || v == '8' || v == '9')) {
-			return String.valueOf((char)v);
+		char c = (char)v;
+		String escaped = getTargetCharValueEscape().get(c);
+		if (escaped != null) {
+			return escaped;
 		}
 
-		if ( v<=127 ) {
-			String oct = Integer.toOctalString(v);
-			return "\\"+ oct;
+		switch (Character.getType(c)) {
+			case Character.CONTROL:
+			case Character.LINE_SEPARATOR:
+			case Character.PARAGRAPH_SEPARATOR:
+				return escapeChar(v);
+			default:
+				if ( v<=127 ) {
+					return String.valueOf(c);  // ascii chars can be as-is, no encoding
+				}
+				// else we use hex encoding to ensure pure ascii chars generated
+				return escapeChar(v);
 		}
+	}
 
-		String hex = Integer.toHexString(v|0x10000).substring(1,5);
-		return "\\u"+hex;
+	protected String escapeChar(int v) {
+		return String.format("\\u%04x", v);
 	}
 
 	public String getLoopLabel(GrammarAST ast) {
@@ -626,6 +650,10 @@ public abstract class Target {
 		return true;
 	}
 
+	public boolean isATNSerializedAsInts() {
+		return true;
+	}
+
 	/** @since 4.6 */
-	public boolean needsHeader() { return false; }; // Override in targets that need header files.
+	public boolean needsHeader() { return false; } // Override in targets that need header files.
 }

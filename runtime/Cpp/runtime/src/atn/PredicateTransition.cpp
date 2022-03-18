@@ -10,8 +10,8 @@ using namespace antlr4::atn;
 PredicateTransition::PredicateTransition(ATNState *target, size_t ruleIndex, size_t predIndex, bool isCtxDependent) : AbstractPredicateTransition(target), ruleIndex(ruleIndex), predIndex(predIndex), isCtxDependent(isCtxDependent) {
 }
 
-Transition::SerializationType PredicateTransition::getSerializationType() const {
-  return PREDICATE;
+TransitionType PredicateTransition::getTransitionType() const {
+  return TransitionType::PREDICATE;
 }
 
 bool PredicateTransition::isEpsilon() const {

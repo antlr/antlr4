@@ -22,7 +22,7 @@ class ATNDeserializer (object):
         self.actionFactories = None
 
     def deserialize(self, data):
-        self.data = [ ord(c) for c in data ]
+        self.data = data
         self.pos = 0
         self.checkVersion()
         atn = self.readATN()

@@ -10,6 +10,7 @@
 #include "Recognizer.h"
 #include "atn/ATN.h"
 #include "atn/ATNState.h"
+#include "atn/PredictionContextType.h"
 
 namespace antlr4 {
 namespace atn {
@@ -69,6 +70,8 @@ namespace atn {
 
   public:
     virtual ~PredictionContext() = default;
+
+    virtual PredictionContextType getContextType() const = 0;
 
     /// Convert a RuleContext tree to a PredictionContext graph.
     /// Return EMPTY if outerContext is empty.

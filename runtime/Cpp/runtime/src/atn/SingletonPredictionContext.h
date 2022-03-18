@@ -10,7 +10,7 @@
 namespace antlr4 {
 namespace atn {
 
-  class ANTLR4CPP_PUBLIC SingletonPredictionContext : public PredictionContext {
+  class ANTLR4CPP_PUBLIC SingletonPredictionContext final : public PredictionContext {
   public:
     // Usually a parent is linked via a weak ptr. Not so here as we have kinda reverse reference chain.
     // There are no child contexts stored here and often the parent context is left dangling when it's
@@ -25,6 +25,9 @@ namespace atn {
 
     static Ref<const SingletonPredictionContext> create(Ref<const PredictionContext> parent, size_t returnState);
 
+    PredictionContextType getContextType() const override;
+
+    virtual bool isEmpty() const override;
     virtual size_t size() const override;
     virtual Ref<const PredictionContext> getParent(size_t index) const override;
     virtual size_t getReturnState(size_t index) const override;

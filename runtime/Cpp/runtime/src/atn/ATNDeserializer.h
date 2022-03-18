@@ -5,41 +5,27 @@
 
 #pragma once
 
-#include "atn/LexerAction.h"
 #include "atn/ATNDeserializationOptions.h"
+#include "atn/LexerAction.h"
 #include "atn/Transition.h"
 
 namespace antlr4 {
 namespace atn {
 
-class ANTLR4CPP_PUBLIC ATNDeserializer {
-public:
-  static constexpr size_t SERIALIZED_VERSION = 4;
+  class ANTLR4CPP_PUBLIC ATNDeserializer final {
+  public:
+    static constexpr size_t SERIALIZED_VERSION = 4;
 
-  ATNDeserializer();
+    ATNDeserializer();
 
-  explicit ATNDeserializer(const ATNDeserializationOptions& dso);
+    explicit ATNDeserializer(ATNDeserializationOptions deserializationOptions);
 
-  virtual ~ATNDeserializer();
+    std::unique_ptr<ATN> deserialize(const std::vector<uint16_t> &input) const;
+    void verifyATN(const ATN &atn) const;
 
-  virtual ATN deserialize(const std::vector<uint16_t> &input);
-  virtual void verifyATN(const ATN &atn);
-
-  static void checkCondition(bool condition);
-  static void checkCondition(bool condition, const std::string &message);
-
-  static ConstTransitionPtr edgeFactory(const ATN &atn, size_t type, size_t src, size_t trg, size_t arg1, size_t arg2,
-                                  size_t arg3, const std::vector<misc::IntervalSet> &sets);
-
-  static ATNState *stateFactory(size_t type, size_t ruleIndex);
-
-protected:
-  void markPrecedenceDecisions(const ATN &atn) const;
-  Ref<LexerAction> lexerActionFactory(LexerActionType type, int data1, int data2) const;
-
-private:
-  const ATNDeserializationOptions _deserializationOptions;
-};
+  private:
+    const ATNDeserializationOptions _deserializationOptions;
+  };
 
 } // namespace atn
 } // namespace antlr4

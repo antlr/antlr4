@@ -85,7 +85,7 @@ abstract class Recognizer<ATNInterpreter extends ATNSimulator> {
   ///
   /// <p>For interpreters, we don't know their serialized ATN despite having
   /// created the interpreter from it.</p>
-  String? get serializedATN {
+  List<int> get serializedATN {
     throw UnsupportedError('there is no serialized ATN');
   }
 

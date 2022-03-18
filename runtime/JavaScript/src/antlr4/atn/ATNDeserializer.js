@@ -74,7 +74,7 @@ class ATNDeserializer {
     }
 
     deserialize(data) {
-        this.data = data.split("").map(c => c.charCodeAt(0));
+        this.data = data
         this.pos = 0;
         this.checkVersion();
         const atn = this.readATN();

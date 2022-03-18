@@ -1,15 +1,10 @@
 # ANTLR4 Language Target, Runtime for Swift
 
-## Requirements
-
-ANTLR 4.7.2 requires Swift 4.2.  It works on Swift 4.2.1 also.
-
-ANTLR 4.7.1 requires Swift 4.0, and does not work on Swift 4.2.  (The status of
-Swift 4.1 support is unknown.)
-
 ## Performance Note
 
-To use ANTLR4 Swift target in production environment, make sure to turn on compiler optimizations by following [these instructions](https://github.com/apple/swift-package-manager/blob/master/Documentation/Usage.md#build-configurations) if you use SwiftPM to build your project. If you are using Xcode to build your project, it's unlikely you will not use `release` build for production build.
+To use ANTLR4 Swift target in production environment, make sure to turn on compiler optimizations by following [these instructions](https://github.com/apple/swift-package-manager/blob/main/Documentation/Usage.md#setting-the-build-configuration) if you use SwiftPM to build your project. 
+
+If you are using Xcode to build your project, it's unlikely you will not use `release` build for production build.
 
 Conclusion is, you need to turn on `release` mode (which will have all the optimization pre configured for you) so the ANTLR4 Swift target can have reasonable parsing speed.
 
@@ -134,9 +129,6 @@ The runtime and generated grammar should now build correctly.
 
 Add Antlr4 as a dependency to your `Package.swift` file. For more information, please see the [Swift Package Manager documentation](https://github.com/apple/swift-package-manager/tree/master/Documentation).
 
-Since we cannot have a separate repository for Swift target (see issue [#1774](https://github.com/antlr/antlr4/issues/1774)), 
-and Swift is currently not ABI stable. We currently support SPM-based
-projects by creating temporary local repository.
 
 ```swift
 .package(name: "Antlr4", url: "https://github.com/antlr/antlr4", from: "4.9.3"

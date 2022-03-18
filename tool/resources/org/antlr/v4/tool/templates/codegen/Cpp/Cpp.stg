@@ -64,38 +64,38 @@ public:
 <endif>
 
   explicit <lexer.name>(antlr4::CharStream *input);
-  ~<lexer.name>();
+
+  ~<lexer.name>() override;
 
   <namedActions.members>
-  virtual std::string getGrammarFileName() const override;
-  virtual const std::vector\<std::string>& getRuleNames() const override;
 
-  virtual const std::vector\<std::string>& getChannelNames() const override;
-  virtual const std::vector\<std::string>& getModeNames() const override;
-  virtual antlr4::dfa::Vocabulary& getVocabulary() const override;
+  std::string getGrammarFileName() const override;
 
-  virtual const std::vector\<uint16_t> getSerializedATN() const override;
+  const std::vector\<std::string>& getRuleNames() const override;
+
+  const std::vector\<std::string>& getChannelNames() const override;
+
+  const std::vector\<std::string>& getModeNames() const override;
+
+  const antlr4::dfa::Vocabulary& getVocabulary() const override;
+
+  virtual const std::vector\<uint16_t>& getSerializedATN() const override;
   virtual const antlr4::atn::ATN& getATN() const override;
 
   <if (actionFuncs)>
-  virtual void action(antlr4::RuleContext *context, size_t ruleIndex, size_t actionIndex) override;
+  void action(antlr4::RuleContext *context, size_t ruleIndex, size_t actionIndex) override;
   <endif>
+
   <if (sempredFuncs)>
-  virtual bool sempred(antlr4::RuleContext *_localctx, size_t ruleIndex, size_t predicateIndex) override;
+  bool sempred(antlr4::RuleContext *_localctx, size_t ruleIndex, size_t predicateIndex) override;
   <endif>
+
+  // By default the static state used to implement the lexer is lazily initialized during the first
+  // call to the constructor. You can call this function if you wish to initialize the static state
+  // ahead of time.
+  static void initialize();
 
 private:
-  static std::vector\<antlr4::dfa::DFA> _decisionToDFA;
-  static antlr4::atn::PredictionContextCache _sharedContextCache;
-  static std::vector\<std::string> _ruleNames;
-  static std::vector\<std::string> _channelNames;
-  static std::vector\<std::string> _modeNames;
-
-  static std::vector\<std::string> _literalNames;
-  static std::vector\<std::string> _symbolicNames;
-  static antlr4::dfa::Vocabulary _vocabulary;
-  <atn>
-
   <namedActions.declarations>
 
   // Individual action functions triggered by action() above.
@@ -104,16 +104,75 @@ private:
   // Individual semantic predicate functions triggered by sempred() above.
   <sempredFuncs.values; separator="\n">
 
-  struct Initializer {
-    Initializer();
-  };
-  static Initializer _init;
+  <atn>
 };
 >>
 
 Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass = {Lexer}) ::= <<
+
+using namespace antlr4;
+
+namespace {
+
+struct <lexer.name; format = "cap">StaticData final {
+  <lexer.name; format = "cap">StaticData(std::vector\<std::string> ruleNames,
+                          std::vector\<std::string> channelNames,
+                          std::vector\<std::string> modeNames,
+                          std::vector\<std::string> literalNames,
+                          std::vector\<std::string> symbolicNames)
+      : ruleNames(std::move(ruleNames)), channelNames(std::move(channelNames)),
+        modeNames(std::move(modeNames)), literalNames(std::move(literalNames)),
+        symbolicNames(std::move(symbolicNames)),
+        vocabulary(this->literalNames, this->symbolicNames) {}
+
+  <lexer.name; format = "cap">StaticData(const <lexer.name; format = "cap">StaticData&) = delete;
+  <lexer.name; format = "cap">StaticData(<lexer.name; format = "cap">StaticData&&) = delete;
+  <lexer.name; format = "cap">StaticData& operator=(const <lexer.name; format = "cap">StaticData&) = delete;
+  <lexer.name; format = "cap">StaticData& operator=(<lexer.name; format = "cap">StaticData&&) = delete;
+
+  std::vector\<antlr4::dfa::DFA> decisionToDFA;
+  antlr4::atn::PredictionContextCache sharedContextCache;
+  const std::vector\<std::string> ruleNames;
+  const std::vector\<std::string> channelNames;
+  const std::vector\<std::string> modeNames;
+  const std::vector\<std::string> literalNames;
+  const std::vector\<std::string> symbolicNames;
+  const antlr4::dfa::Vocabulary vocabulary;
+  std::vector\<uint16_t> serializedATN;
+  std::unique_ptr\<antlr4::atn::ATN> atn;
+};
+
+std::once_flag <lexer.grammarName; format = "lower">LexerOnceFlag;
+<lexer.name; format = "cap">StaticData *<lexer.grammarName; format = "lower">LexerStaticData = nullptr;
+
+void <lexer.grammarName; format = "lower">LexerInitialize() {
+  assert(<lexer.grammarName; format = "lower">LexerStaticData == nullptr);
+  auto staticData = std::make_unique\<<lexer.name; format = "cap">StaticData>(
+    std::vector\<std::string>{
+      <lexer.ruleNames: {r | "<r>"}; separator = ", ", wrap, anchor>
+    },
+    std::vector\<std::string>{
+      "DEFAULT_TOKEN_CHANNEL", "HIDDEN"<if (lexer.channels)>, <lexer.channels: {c | "<c>"}; separator = ", ", wrap, anchor><endif>
+    },
+    std::vector\<std::string>{
+      <lexer.modes: {m | "<m>"}; separator = ", ", wrap, anchor>
+    },
+    std::vector\<std::string>{
+      <lexer.literalNames: {t | <t>}; null = "\"\"", separator = ", ", wrap, anchor>
+    },
+    std::vector\<std::string>{
+      <lexer.symbolicNames: {t | <t>}; null = "\"\"", separator = ", ", wrap, anchor>
+    }
+  );
+  <atn>
+  <lexer.grammarName; format = "lower">LexerStaticData = staticData.release();
+}
+
+}
+
 <lexer.name>::<lexer.name>(CharStream *input) : <superClass>(input) {
-  _interpreter = new atn::LexerATNSimulator(this, _atn, _decisionToDFA, _sharedContextCache);
+  <lexer.name>::initialize();
+  _interpreter = new atn::LexerATNSimulator(this, *<lexer.grammarName; format = "lower">LexerStaticData->atn, <lexer.grammarName; format = "lower">LexerStaticData->decisionToDFA, <lexer.grammarName; format = "lower">LexerStaticData->sharedContextCache);
 }
 
 <lexer.name>::~<lexer.name>() {
@@ -125,27 +184,27 @@ std::string <lexer.name>::getGrammarFileName() const {
 }
 
 const std::vector\<std::string>& <lexer.name>::getRuleNames() const {
-  return _ruleNames;
+  return <lexer.grammarName; format = "lower">LexerStaticData->ruleNames;
 }
 
 const std::vector\<std::string>& <lexer.name>::getChannelNames() const {
-  return _channelNames;
+  return <lexer.grammarName; format = "lower">LexerStaticData->channelNames;
 }
 
 const std::vector\<std::string>& <lexer.name>::getModeNames() const {
-  return _modeNames;
+  return <lexer.grammarName; format = "lower">LexerStaticData->modeNames;
 }
 
-dfa::Vocabulary& <lexer.name>::getVocabulary() const {
-  return _vocabulary;
+const dfa::Vocabulary& <lexer.name>::getVocabulary() const {
+  return <lexer.grammarName; format = "lower">LexerStaticData->vocabulary;
 }
 
-const std::vector\<uint16_t> <lexer.name>::getSerializedATN() const {
-  return _serializedATN;
+const std::vector\<uint16_t>& <lexer.name>::getSerializedATN() const {
+  return <lexer.grammarName; format = "lower">LexerStaticData->serializedATN;
 }
 
 const atn::ATN& <lexer.name>::getATN() const {
-  return _atn;
+  return *<lexer.grammarName; format = "lower">LexerStaticData->atn;
 }
 
 <namedActions.definitions>
@@ -177,41 +236,9 @@ bool <lexer.name>::sempred(RuleContext *context, size_t ruleIndex, size_t predic
 
 <sempredFuncs.values; separator="\n">
 
-// Static vars and initialization.
-std::vector\<dfa::DFA> <lexer.name>::_decisionToDFA;
-atn::PredictionContextCache <lexer.name>::_sharedContextCache;
-
-// We own the ATN which in turn owns the ATN states.
-atn::ATN <lexer.name>::_atn;
-std::vector\<uint16_t> <lexer.name>::_serializedATN;
-
-std::vector\<std::string> <lexer.name>::_ruleNames = {
-  <lexer.ruleNames: {r | "<r>"}; separator = ", ", wrap, anchor>
-};
-
-std::vector\<std::string> <lexer.name>::_channelNames = {
-  "DEFAULT_TOKEN_CHANNEL", "HIDDEN"<if (lexer.channelNames)>, <lexer.channelNames: {c | "<c>"}; separator = ", ", wrap, anchor><endif>
-};
-
-std::vector\<std::string> <lexer.name>::_modeNames = {
-  <lexer.modes: {m | "<m>"}; separator = ", ", wrap, anchor>
-};
-
-std::vector\<std::string> <lexer.name>::_literalNames = {
-  <lexer.literalNames: {t | <t>}; null = "\"\"", separator = ", ", wrap, anchor>
-};
-
-std::vector\<std::string> <lexer.name>::_symbolicNames = {
-  <lexer.symbolicNames: {t | <t>}; null = "\"\"", separator = ", ", wrap, anchor>
-};
-
-dfa::Vocabulary <lexer.name>::_vocabulary(_literalNames, _symbolicNames);
-
-<lexer.name>::Initializer::Initializer() {
-  <atn>
+void <lexer.name>::initialize() {
+  std::call_once(<lexer.grammarName; format = "lower">LexerOnceFlag, <lexer.grammarName; format = "lower">LexerInitialize);
 }
-
-<lexer.name>::Initializer <lexer.name>::_init;
 >>
 
 RuleActionFunctionHeader(r, actions) ::= <<
@@ -269,12 +296,18 @@ public:
 <endif>
 
   explicit <parser.name>(antlr4::TokenStream *input);
-  ~<parser.name>();
 
-  virtual std::string getGrammarFileName() const override;
-  virtual const antlr4::atn::ATN& getATN() const override { return _atn; };
-  virtual const std::vector\<std::string>& getRuleNames() const override;
-  virtual antlr4::dfa::Vocabulary& getVocabulary() const override;
+  ~<parser.name>() override;
+
+  std::string getGrammarFileName() const override;
+
+  const antlr4::atn::ATN& getATN() const override;
+
+  const std::vector\<std::string>& getRuleNames() const override;
+
+  const antlr4::dfa::Vocabulary& getVocabulary() const override;
+
+  const std::vector\<uint16_t>& getSerializedATN() const override;
 
   <namedActions.members>
 
@@ -283,38 +316,83 @@ public:
   <funcs; separator = "\n">
 
   <if (sempredFuncs)>
-  virtual bool sempred(antlr4::RuleContext *_localctx, size_t ruleIndex, size_t predicateIndex) override;
+  bool sempred(antlr4::RuleContext *_localctx, size_t ruleIndex, size_t predicateIndex) override;
+
   <sempredFuncs.values; separator = "\n">
   <endif>
 
+  // By default the static state used to implement the parser is lazily initialized during the first
+  // call to the constructor. You can call this function if you wish to initialize the static state
+  // ahead of time.
+  static void initialize();
+
 private:
-  static std::vector\<antlr4::dfa::DFA> _decisionToDFA;
-  static antlr4::atn::PredictionContextCache _sharedContextCache;
-  static std::vector\<std::string> _ruleNames;
-
-  static std::vector\<std::string> _literalNames;
-  static std::vector\<std::string> _symbolicNames;
-  static antlr4::dfa::Vocabulary _vocabulary;
-  <atn>
-
   <namedActions.declarations>
-
-  struct Initializer {
-    Initializer();
-  };
-  static Initializer _init;
 };
 >>
 
 Parser(parser, funcs, atn, sempredFuncs, superClass = {Parser}) ::= <<
+
 using namespace antlr4;
 
+namespace {
+
+struct <parser.name; format = "cap">StaticData final {
+  <parser.name; format = "cap">StaticData(std::vector\<std::string> ruleNames,
+                        std::vector\<std::string> literalNames,
+                        std::vector\<std::string> symbolicNames)
+      : ruleNames(std::move(ruleNames)), literalNames(std::move(literalNames)),
+        symbolicNames(std::move(symbolicNames)),
+        vocabulary(this->literalNames, this->symbolicNames) {}
+
+  <parser.name; format = "cap">StaticData(const <parser.name; format = "cap">StaticData&) = delete;
+  <parser.name; format = "cap">StaticData(<parser.name; format = "cap">StaticData&&) = delete;
+  <parser.name; format = "cap">StaticData& operator=(const <parser.name; format = "cap">StaticData&) = delete;
+  <parser.name; format = "cap">StaticData& operator=(<parser.name; format = "cap">StaticData&&) = delete;
+
+  std::vector\<antlr4::dfa::DFA> decisionToDFA;
+  antlr4::atn::PredictionContextCache sharedContextCache;
+  const std::vector\<std::string> ruleNames;
+  const std::vector\<std::string> literalNames;
+  const std::vector\<std::string> symbolicNames;
+  const antlr4::dfa::Vocabulary vocabulary;
+  std::vector\<uint16_t> serializedATN;
+  std::unique_ptr\<antlr4::atn::ATN> atn;
+};
+
+std::once_flag <parser.grammarName; format = "lower">ParserOnceFlag;
+<parser.name; format = "cap">StaticData *<parser.grammarName; format = "lower">ParserStaticData = nullptr;
+
+void <parser.grammarName; format = "lower">ParserInitialize() {
+  assert(<parser.grammarName; format = "lower">ParserStaticData == nullptr);
+  auto staticData = std::make_unique\<<parser.name; format = "cap">StaticData>(
+    std::vector\<std::string>{
+      <parser.ruleNames: {r | "<r>"}; separator = ", ", wrap, anchor>
+    },
+    std::vector\<std::string>{
+      <parser.literalNames: {t | <t>}; null = "\"\"", separator = ", ", wrap, anchor>
+    },
+    std::vector\<std::string>{
+      <parser.symbolicNames: {t | <t>}; null = "\"\"", separator = ", ", wrap, anchor>
+    }
+  );
+  <atn>
+  <parser.grammarName; format = "lower">ParserStaticData = staticData.release();
+}
+
+}
+
 <parser.name>::<parser.name>(TokenStream *input) : <superClass>(input) {
-  _interpreter = new atn::ParserATNSimulator(this, _atn, _decisionToDFA, _sharedContextCache);
+  <parser.name>::initialize();
+  _interpreter = new atn::ParserATNSimulator(this, *<parser.grammarName; format = "lower">ParserStaticData->atn, <parser.grammarName; format = "lower">ParserStaticData->decisionToDFA, <parser.grammarName; format = "lower">ParserStaticData->sharedContextCache);
 }
 
 <parser.name>::~<parser.name>() {
   delete _interpreter;
+}
+
+const atn::ATN& <parser.name>::getATN() const {
+  return *<parser.grammarName; format = "lower">ParserStaticData->atn;
 }
 
 std::string <parser.name>::getGrammarFileName() const {
@@ -322,11 +400,15 @@ std::string <parser.name>::getGrammarFileName() const {
 }
 
 const std::vector\<std::string>& <parser.name>::getRuleNames() const {
-  return _ruleNames;
+  return <parser.grammarName; format = "lower">ParserStaticData->ruleNames;
 }
 
-dfa::Vocabulary& <parser.name>::getVocabulary() const {
-  return _vocabulary;
+const dfa::Vocabulary& <parser.name>::getVocabulary() const {
+  return <parser.grammarName; format = "lower">ParserStaticData->vocabulary;
+}
+
+const std::vector\<uint16_t>& <parser.name>::getSerializedATN() const {
+  return <parser.grammarName; format = "lower">ParserStaticData->serializedATN;
 }
 
 <namedActions.definitions>
@@ -347,57 +429,29 @@ bool <parser.name>::sempred(RuleContext *context, size_t ruleIndex, size_t predi
 
 <sempredFuncs.values; separator="\n"><endif>
 
-// Static vars and initialization.
-std::vector\<dfa::DFA> <parser.name>::_decisionToDFA;
-atn::PredictionContextCache <parser.name>::_sharedContextCache;
-
-// We own the ATN which in turn owns the ATN states.
-atn::ATN <parser.name>::_atn;
-std::vector\<uint16_t> <parser.name>::_serializedATN;
-
-std::vector\<std::string> <parser.name>::_ruleNames = {
-  <parser.ruleNames: {r | "<r>"}; separator = ", ", wrap, anchor>
-};
-
-std::vector\<std::string> <parser.name>::_literalNames = {
-  <parser.literalNames: {t | <t>}; null = "\"\"", separator = ", ", wrap, anchor>
-};
-
-std::vector\<std::string> <parser.name>::_symbolicNames = {
-  <parser.symbolicNames: {t | <t>}; null = "\"\"", separator = ", ", wrap, anchor>
-};
-
-dfa::Vocabulary <parser.name>::_vocabulary(_literalNames, _symbolicNames);
-
-<parser.name>::Initializer::Initializer() {
-  <atn>
+void <parser.name>::initialize() {
+  std::call_once(<parser.grammarName; format = "lower">ParserOnceFlag, <parser.grammarName; format = "lower">ParserInitialize);
 }
-
-<parser.name>::Initializer <parser.name>::_init;
 >>
 
 SerializedATNHeader(model) ::= <<
-static antlr4::atn::ATN _atn;
-static std::vector\<uint16_t> _serializedATN;
 >>
 
-// Constructs the serialized ATN and writes init code for static member vars.
 SerializedATN(model) ::= <<
-<model.segments: {segment | static const uint16_t serializedATNSegment<i0>[] = {
-  <segment; wrap={<\n>   }>
-\};}; separator="\n">
+static const uint16_t serializedATNSegment[] = {
+	<model.serialized: {s | <s>}; separator=",", wrap>
+};
+staticData->serializedATN.reserve(sizeof(serializedATNSegment) / sizeof(serializedATNSegment[0]));
+staticData->serializedATN.insert(staticData->serializedATN.end(), serializedATNSegment,
+  serializedATNSegment + sizeof(serializedATNSegment) / sizeof(serializedATNSegment[0]));
 
-<model.segments: {segment | _serializedATN.insert(_serializedATN.end(), serializedATNSegment<i0>,
-  serializedATNSegment<i0> + sizeof(serializedATNSegment<i0>) / sizeof(serializedATNSegment<i0>[0]));
-}>
+antlr4::atn::ATNDeserializer deserializer;
+staticData->atn = deserializer.deserialize(staticData->serializedATN);
 
-atn::ATNDeserializer deserializer;
-_atn = deserializer.deserialize(_serializedATN);
-
-size_t count = _atn.getNumberOfDecisions();
-_decisionToDFA.reserve(count);
+const size_t count = staticData->atn->getNumberOfDecisions();
+staticData->decisionToDFA.reserve(count);
 for (size_t i = 0; i \< count; i++) { <! Rework class ATN to allow standard iterations. !>
-  _decisionToDFA.emplace_back(_atn.getDecisionState(i), i);
+  staticData->decisionToDFA.emplace_back(staticData->atn->getDecisionState(i), i);
 }
 >>
 

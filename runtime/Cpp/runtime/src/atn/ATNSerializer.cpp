@@ -24,6 +24,7 @@
 #include "atn/RangeTransition.h"
 #include "atn/AtomTransition.h"
 #include "atn/ActionTransition.h"
+#include "atn/TransitionType.h"
 #include "atn/ATNDeserializer.h"
 
 #include "atn/TokensStartState.h"
@@ -70,11 +71,11 @@ std::vector<size_t> ATNSerializer::serialize() {
   data.push_back(atn->states.size());
   for (ATNState *s : atn->states) {
     if (s == nullptr) {  // might be optimized away
-      data.push_back(ATNState::ATN_INVALID_TYPE);
+      data.push_back(0);
       continue;
     }
 
-    size_t stateType = s->getStateType();
+    size_t stateType = static_cast<size_t>(s->getStateType());
     if (is<DecisionState *>(s) && (static_cast<DecisionState *>(s))->nonGreedy) {
       nonGreedyStates.push_back(s->stateNumber);
     }
@@ -92,14 +93,14 @@ std::vector<size_t> ATNSerializer::serialize() {
       data.push_back(s->ruleIndex);
     }
 
-    if (s->getStateType() == ATNState::LOOP_END) {
+    if (s->getStateType() == ATNStateType::LOOP_END) {
       data.push_back((static_cast<LoopEndState *>(s))->loopBackState->stateNumber);
     }
     else if (is<BlockStartState *>(s)) {
       data.push_back((static_cast<BlockStartState *>(s))->endState->stateNumber);
     }
 
-    if (s->getStateType() != ATNState::RULE_STOP) {
+    if (s->getStateType() != ATNStateType::RULE_STOP) {
       // the deserializer can trivially derive these edges, so there's no need
       // to serialize them
       nedges += s->transitions.size();
@@ -107,8 +108,8 @@ std::vector<size_t> ATNSerializer::serialize() {
 
     for (size_t i = 0; i < s->transitions.size(); i++) {
       const Transition *t = s->transitions[i].get();
-      Transition::SerializationType edgeType = t->getSerializationType();
-      if (edgeType == Transition::SET || edgeType == Transition::NOT_SET) {
+      TransitionType edgeType = t->getTransitionType();
+      if (edgeType == TransitionType::SET || edgeType == TransitionType::NOT_SET) {
         const SetTransition *st = static_cast<const SetTransition *>(t);
         if (setIndices.find(st->set) == setIndices.end()) {
           sets.push_back(st->set);
@@ -188,7 +189,7 @@ std::vector<size_t> ATNSerializer::serialize() {
       continue;
     }
 
-    if (s->getStateType() == ATNState::RULE_STOP) {
+    if (s->getStateType() == ATNStateType::RULE_STOP) {
       continue;
     }
 
@@ -201,25 +202,25 @@ std::vector<size_t> ATNSerializer::serialize() {
 
       size_t src = s->stateNumber;
       size_t trg = t->target->stateNumber;
-      Transition::SerializationType edgeType = t->getSerializationType();
+      TransitionType edgeType = t->getTransitionType();
       size_t arg1 = 0;
       size_t arg2 = 0;
       size_t arg3 = 0;
       switch (edgeType) {
-        case Transition::RULE:
+        case TransitionType::RULE:
           trg = (static_cast<const RuleTransition *>(t))->followState->stateNumber;
           arg1 = (static_cast<const RuleTransition *>(t))->target->stateNumber;
           arg2 = (static_cast<const RuleTransition *>(t))->ruleIndex;
           arg3 = (static_cast<const RuleTransition *>(t))->precedence;
           break;
-        case Transition::PRECEDENCE:
+        case TransitionType::PRECEDENCE:
         {
           const PrecedencePredicateTransition *ppt =
           static_cast<const PrecedencePredicateTransition *>(t);
           arg1 = ppt->precedence;
         }
           break;
-        case Transition::PREDICATE:
+        case TransitionType::PREDICATE:
         {
           const PredicateTransition *pt = static_cast<const PredicateTransition *>(t);
           arg1 = pt->ruleIndex;
@@ -227,7 +228,7 @@ std::vector<size_t> ATNSerializer::serialize() {
           arg3 = pt->isCtxDependent ? 1 : 0;
         }
           break;
-        case Transition::RANGE:
+        case TransitionType::RANGE:
           arg1 = (static_cast<const RangeTransition *>(t))->from;
           arg2 = (static_cast<const RangeTransition *>(t))->to;
           if (arg1 == Token::EOF) {
@@ -236,7 +237,7 @@ std::vector<size_t> ATNSerializer::serialize() {
           }
 
           break;
-        case Transition::ATOM:
+        case TransitionType::ATOM:
           arg1 = (static_cast<const AtomTransition *>(t))->_label;
           if (arg1 == Token::EOF) {
             arg1 = 0;
@@ -244,7 +245,7 @@ std::vector<size_t> ATNSerializer::serialize() {
           }
 
           break;
-        case Transition::ACTION:
+        case TransitionType::ACTION:
         {
           const ActionTransition *at = static_cast<const ActionTransition *>(t);
           arg1 = at->ruleIndex;
@@ -256,11 +257,11 @@ std::vector<size_t> ATNSerializer::serialize() {
           arg3 = at->isCtxDependent ? 1 : 0;
         }
           break;
-        case Transition::SET:
+        case TransitionType::SET:
           arg1 = setIndices[(static_cast<const SetTransition *>(t))->set];
           break;
 
-        case Transition::NOT_SET:
+        case TransitionType::NOT_SET:
           arg1 = setIndices[(static_cast<const SetTransition *>(t))->set];
           break;
 
@@ -270,7 +271,7 @@ std::vector<size_t> ATNSerializer::serialize() {
 
       data.push_back(src);
       data.push_back(trg);
-      data.push_back(edgeType);
+      data.push_back(static_cast<size_t>(edgeType));
       data.push_back(arg1);
       data.push_back(arg2);
       data.push_back(arg3);
@@ -388,8 +389,8 @@ std::string ATNSerializer::decode(const std::wstring &inpdata) {
   buf.append("max type ").append(std::to_string(maxType)).append("\n");
   size_t nstates = data[p++];
   for (size_t i = 0; i < nstates; i++) {
-    size_t stype = data[p++];
-    if (stype == ATNState::ATN_INVALID_TYPE) {  // ignore bad type of states
+    ATNStateType stype = static_cast<ATNStateType>(data[p++]);
+    if (stype == ATNStateType::INVALID) {  // ignore bad type of states
       continue;
     }
     size_t ruleIndex = data[p++];
@@ -398,19 +399,19 @@ std::string ATNSerializer::decode(const std::wstring &inpdata) {
     }
 
     std::string arg = "";
-    if (stype == ATNState::LOOP_END) {
+    if (stype == ATNStateType::LOOP_END) {
       int loopBackStateNumber = data[p++];
       arg = std::string(" ") + std::to_string(loopBackStateNumber);
     }
-    else if (stype == ATNState::PLUS_BLOCK_START ||
-             stype == ATNState::STAR_BLOCK_START ||
-             stype == ATNState::BLOCK_START) {
+    else if (stype == ATNStateType::PLUS_BLOCK_START ||
+             stype == ATNStateType::STAR_BLOCK_START ||
+             stype == ATNStateType::BLOCK_START) {
       int endStateNumber = data[p++];
       arg = std::string(" ") + std::to_string(endStateNumber);
     }
     buf.append(std::to_string(i))
     .append(":")
-    .append(ATNState::serializationNames[stype])
+    .append(atnStateTypeName(stype))
     .append(" ")
     .append(std::to_string(ruleIndex))
     .append(arg)
@@ -487,7 +488,7 @@ std::string ATNSerializer::decode(const std::wstring &inpdata) {
   for (size_t i = 0; i < nedges; i++) {
     size_t src = data[p];
     size_t trg = data[p + 1];
-    size_t ttype = data[p + 2];
+    TransitionType ttype = static_cast<TransitionType>(data[p + 2]);
     size_t arg1 = data[p + 3];
     size_t arg2 = data[p + 4];
     size_t arg3 = data[p + 5];
@@ -495,7 +496,7 @@ std::string ATNSerializer::decode(const std::wstring &inpdata) {
     .append("->")
     .append(std::to_string(trg))
     .append(" ")
-    .append(Transition::serializationNames[ttype])
+    .append(transitionTypeName(ttype))
     .append(" ")
     .append(std::to_string(arg1))
     .append(",")

@@ -8,5 +8,5 @@
 using namespace antlr4::atn;
 
 ATNStateType BlockEndState::getStateType() const {
-  return BLOCK_END;
+  return ATNStateType::BLOCK_END;
 }

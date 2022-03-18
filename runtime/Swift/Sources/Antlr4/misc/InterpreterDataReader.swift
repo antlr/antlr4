@@ -109,7 +109,7 @@ public class InterpreterDataReader {
         self.ruleNames = ruleNames
         self.channelNames = channelNames
         self.modeNames = modeNames
-        let atnSerialized = atnText.map{Character(UnicodeScalar(UInt16($0.trimmingCharacters(in:.whitespaces))!)!)}
+        let atnSerialized = atnText.map{Int($0.trimmingCharacters(in:.whitespaces))!}
         atn = try ATNDeserializer().deserialize(atnSerialized)
     }
         

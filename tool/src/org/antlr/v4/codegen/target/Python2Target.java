@@ -8,14 +8,10 @@ package org.antlr.v4.codegen.target;
 
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.codegen.Target;
-import org.antlr.v4.tool.ast.GrammarAST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.StringRenderer;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Set;
+import java.util.*;
 
 public class Python2Target extends Target {
 	protected static final HashSet<String> reservedWords = new HashSet<>(Arrays.asList(
@@ -49,8 +45,30 @@ public class Python2Target extends Target {
 		"rule", "parserRule"
 	));
 
+	protected static final Map<Character, String> targetCharValueEscape;
+	static {
+		// https://docs.python.org/3/reference/lexical_analysis.html#string-and-bytes-literals
+		HashMap<Character, String> map = new HashMap<>();
+		addEscapedChar(map, '\\');
+		addEscapedChar(map, '\'');
+		addEscapedChar(map, '\"');
+		addEscapedChar(map, (char)0x0007, 'a');
+		addEscapedChar(map, (char)0x0008, 'b');
+		addEscapedChar(map, '\f', 'f');
+		addEscapedChar(map, '\n', 'n');
+		addEscapedChar(map, '\r', 'r');
+		addEscapedChar(map, '\t', 't');
+		addEscapedChar(map, (char)0x000B, 'v');
+		targetCharValueEscape = map;
+	}
+
 	public Python2Target(CodeGenerator gen) {
 		super(gen);
+	}
+
+	@Override
+	public Map<Character, String> getTargetCharValueEscape() {
+		return targetCharValueEscape;
 	}
 
 	@Override
@@ -88,3 +106,4 @@ public class Python2Target extends Target {
 		return false;
 	}
 }
+

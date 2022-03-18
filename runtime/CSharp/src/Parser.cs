@@ -90,7 +90,8 @@ namespace Antlr4.Runtime
         /// bypass alternatives.
         /// </summary>
         /// <seealso cref="Antlr4.Runtime.Atn.ATNDeserializationOptions.GenerateRuleBypassTransitions()"/>
-        private static readonly IDictionary<string, ATN> bypassAltsAtnCache = new Dictionary<string, ATN>();
+//        private static readonly IDictionary<string, ATN> bypassAltsAtnCache = new Dictionary<string, ATN>();
+        private ATN bypassAltsAtnCache;
 
         /// <summary>The error handling strategy for the parser.</summary>
         /// <remarks>
@@ -562,22 +563,20 @@ namespace Antlr4.Runtime
         [return: NotNull]
         public virtual ATN GetATNWithBypassAlts()
         {
-            string serializedAtn = SerializedAtn;
+            int[] serializedAtn = SerializedAtn;
             if (serializedAtn == null)
             {
                 throw new NotSupportedException("The current parser does not support an ATN with bypass alternatives.");
             }
-            lock (bypassAltsAtnCache)
+            lock (this)
             {
-                ATN result = bypassAltsAtnCache.Get(serializedAtn);
-                if (result == null)
-                {
-                    ATNDeserializationOptions deserializationOptions = new ATNDeserializationOptions();
-                    deserializationOptions.GenerateRuleBypassTransitions = true;
-                    result = new ATNDeserializer(deserializationOptions).Deserialize(serializedAtn.ToCharArray());
-                    bypassAltsAtnCache.Put(serializedAtn, result);
+                if ( bypassAltsAtnCache!=null ) {
+                    return bypassAltsAtnCache;
                 }
-                return result;
+                ATNDeserializationOptions deserializationOptions = new ATNDeserializationOptions();
+                deserializationOptions.GenerateRuleBypassTransitions = true;
+                bypassAltsAtnCache = new ATNDeserializer(deserializationOptions).Deserialize(serializedAtn);
+                return bypassAltsAtnCache;
             }
         }
 

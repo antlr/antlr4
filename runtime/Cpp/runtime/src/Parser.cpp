@@ -28,10 +28,25 @@
 
 using namespace antlr4;
 using namespace antlr4::atn;
-
 using namespace antlrcpp;
 
-std::map<std::vector<uint16_t>, atn::ATN> Parser::bypassAltsAtnCache;
+namespace {
+
+struct BypassAltsAtnCache final {
+  std::shared_mutex mutex;
+  /// This field maps from the serialized ATN string to the deserialized <seealso cref="ATN"/> with
+  /// bypass alternatives.
+  ///
+  /// <seealso cref= ATNDeserializationOptions#isGenerateRuleBypassTransitions() </seealso>
+  std::map<std::vector<uint16_t>, std::unique_ptr<const atn::ATN>> map;
+};
+
+BypassAltsAtnCache* getBypassAltsAtnCache() {
+  static BypassAltsAtnCache* const instance = new BypassAltsAtnCache();
+  return instance;
+}
+
+}
 
 Parser::TraceListener::TraceListener(Parser *outerInstance_) : outerInstance(outerInstance_) {
 }
@@ -214,25 +229,30 @@ TokenFactory<CommonToken>* Parser::getTokenFactory() {
 
 
 const atn::ATN& Parser::getATNWithBypassAlts() {
-  std::vector<uint16_t> serializedAtn = getSerializedATN();
+  const std::vector<uint16_t> &serializedAtn = getSerializedATN();
   if (serializedAtn.empty()) {
     throw UnsupportedOperationException("The current parser does not support an ATN with bypass alternatives.");
   }
-
-  std::lock_guard<std::mutex> lck(_mutex);
-
   // XXX: using the entire serialized ATN as key into the map is a big resource waste.
   //      How large can that thing become?
-  if (bypassAltsAtnCache.find(serializedAtn) == bypassAltsAtnCache.end())
+  auto *cache = getBypassAltsAtnCache();
   {
-    atn::ATNDeserializationOptions deserializationOptions;
-    deserializationOptions.setGenerateRuleBypassTransitions(true);
-
-    atn::ATNDeserializer deserializer(deserializationOptions);
-    bypassAltsAtnCache[serializedAtn] = deserializer.deserialize(serializedAtn);
+    std::shared_lock<std::shared_mutex> lock(cache->mutex);
+    auto existing = cache->map.find(serializedAtn);
+    if (existing != cache->map.end()) {
+      return *existing->second;
+    }
   }
 
-  return bypassAltsAtnCache[serializedAtn];
+  atn::ATNDeserializationOptions deserializationOptions;
+  deserializationOptions.setGenerateRuleBypassTransitions(true);
+  atn::ATNDeserializer deserializer(deserializationOptions);
+  auto atn = deserializer.deserialize(serializedAtn);
+
+  {
+    std::unique_lock<std::shared_mutex> lock(cache->mutex);
+    return *cache->map.insert(std::make_pair(serializedAtn, std::move(atn))).first->second;
+  }
 }
 
 tree::pattern::ParseTreePattern Parser::compileParseTreePattern(const std::string &pattern, int patternRuleIndex) {
@@ -589,12 +609,12 @@ std::string Parser::getSourceName() {
 }
 
 atn::ParseInfo Parser::getParseInfo() const {
-  atn::ProfilingATNSimulator *interp = getInterpreter<atn::ProfilingATNSimulator>();
-  return atn::ParseInfo(interp);
+  atn::ParserATNSimulator *simulator = getInterpreter<atn::ParserATNSimulator>();
+  return atn::ParseInfo(dynamic_cast<atn::ProfilingATNSimulator*>(simulator));
 }
 
 void Parser::setProfile(bool profile) {
-  atn::ParserATNSimulator *interp = getInterpreter<atn::ProfilingATNSimulator>();
+  atn::ParserATNSimulator *interp = getInterpreter<atn::ParserATNSimulator>();
   atn::PredictionMode saveMode = interp != nullptr ? interp->getPredictionMode() : atn::PredictionMode::LL;
   if (profile) {
     if (!is<atn::ProfilingATNSimulator *>(interp)) {

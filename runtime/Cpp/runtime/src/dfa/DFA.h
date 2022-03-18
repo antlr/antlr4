@@ -62,7 +62,7 @@ namespace dfa {
      * @throws IllegalStateException if this is not a precedence DFA.
      * @see #isPrecedenceDfa()
      */
-    void setPrecedenceStartState(int precedence, DFAState *startState, std::shared_mutex &lock);
+    void setPrecedenceStartState(int precedence, DFAState *startState);
 
     /// Return a list of all states in this DFA, ordered by state number.
     std::vector<DFAState *> getStates() const;

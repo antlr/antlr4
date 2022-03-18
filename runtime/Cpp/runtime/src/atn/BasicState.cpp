@@ -8,5 +8,5 @@
 using namespace antlr4::atn;
 
 ATNStateType BasicState::getStateType() const {
-  return BASIC;
+  return ATNStateType::BASIC;
 }

@@ -11,9 +11,7 @@ import org.antlr.v4.codegen.Target;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.StringRenderer;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class PHPTarget extends Target {
 	protected static final HashSet<String> reservedWords = new HashSet<>(Arrays.asList(
@@ -45,23 +43,34 @@ public class PHPTarget extends Target {
 		"rule", "parserRule"
 	));
 
+	protected static final Map<Character, String> targetCharValueEscape;
+	static {
+		// https://www.php.net/manual/en/language.types.string.php
+		HashMap<Character, String> map = new HashMap<>();
+		addEscapedChar(map, '\n', 'n');
+		addEscapedChar(map, '\r', 'r');
+		addEscapedChar(map, '\t', 't');
+		addEscapedChar(map, (char)0x000B, 'v');
+		addEscapedChar(map, (char)0x001B, 'e');
+		addEscapedChar(map, '\f', 'f');
+		addEscapedChar(map, '\\');
+		addEscapedChar(map, '$');
+		addEscapedChar(map, '\"');
+		targetCharValueEscape = map;
+	}
+
 	public PHPTarget(CodeGenerator gen) {
 		super(gen);
-		targetCharValueEscape['$'] = "\\$";
+	}
+
+	@Override
+	public Map<Character, String> getTargetCharValueEscape() {
+		return targetCharValueEscape;
 	}
 
 	@Override
 	protected Set<String> getReservedWords() {
 		return reservedWords;
-	}
-
-	@Override
-	public String encodeIntAsCharEscape(int v) {
-		if (v < Character.MIN_VALUE || v > Character.MAX_VALUE) {
-			throw new IllegalArgumentException(String.format("Cannot encode the specified value: %d", v));
-		}
-
-		return String.format("\\u{%X}", v & 0xFFFF);
 	}
 
 	@Override
@@ -77,11 +86,21 @@ public class PHPTarget extends Target {
 		return false;
 	}
 
-   @Override
-   public String getTargetStringLiteralFromANTLRStringLiteral(CodeGenerator generator, String literal, boolean addQuotes,
-															  boolean escapeSpecial) {
-	   String targetStringLiteral = super.getTargetStringLiteralFromANTLRStringLiteral(generator, literal, addQuotes, escapeSpecial);
-	   targetStringLiteral = targetStringLiteral.replace("$", "\\$");
-	   return targetStringLiteral;
-   }
+	@Override
+	public String getTargetStringLiteralFromANTLRStringLiteral(CodeGenerator generator, String literal, boolean addQuotes,
+															   boolean escapeSpecial) {
+		String targetStringLiteral = super.getTargetStringLiteralFromANTLRStringLiteral(generator, literal, addQuotes, escapeSpecial);
+		targetStringLiteral = targetStringLiteral.replace("$", "\\$");
+		return targetStringLiteral;
+	}
+
+	@Override
+	public boolean isATNSerializedAsInts() {
+		return true;
+	}
+
+	@Override
+	protected String escapeChar(int v) {
+		return String.format("\\u{%X}", v);
+	}
 }

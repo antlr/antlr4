@@ -15,8 +15,8 @@ ActionTransition::ActionTransition(ATNState *target, size_t ruleIndex, size_t ac
   : Transition(target), ruleIndex(ruleIndex), actionIndex(actionIndex), isCtxDependent(isCtxDependent) {
 }
 
-Transition::SerializationType ActionTransition::getSerializationType() const {
-  return ACTION;
+TransitionType ActionTransition::getTransitionType() const {
+  return TransitionType::ACTION;
 }
 
 bool ActionTransition::isEpsilon() const {

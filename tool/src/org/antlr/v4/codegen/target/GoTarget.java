@@ -10,7 +10,6 @@ import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.codegen.Target;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.tool.Grammar;
-import org.antlr.v4.tool.ast.GrammarAST;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.StringRenderer;
@@ -18,10 +17,7 @@ import org.stringtemplate.v4.StringRenderer;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Set;
+import java.util.*;
 
 public class GoTarget extends Target {
 	protected static final HashSet<String> reservedWords = new HashSet<>(Arrays.asList(
@@ -99,11 +95,6 @@ public class GoTarget extends Target {
 	}
 
 	@Override
-	public String encodeIntAsCharEscape(int v) {
-		return Integer.toString(v);
-	}
-
-	@Override
 	public int getInlineTestSetWordSize() {
 		return 32;
 	}
@@ -175,7 +166,6 @@ public class GoTarget extends Target {
 	}
 
 	protected static class JavaStringRenderer extends StringRenderer {
-
 		@Override
 		public String toString(Object o, String formatString, Locale locale) {
 
@@ -186,6 +176,5 @@ public class GoTarget extends Target {
 
 			return super.toString(o, formatString, locale);
 		}
-
 	}
 }

@@ -16,11 +16,28 @@ import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.StringRenderer;
 import org.stringtemplate.v4.misc.STMessage;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class CppTarget extends Target {
+	protected static final Map<Character, String> targetCharValueEscape;
+	static {
+		// https://stackoverflow.com/a/10220539/1046374
+		HashMap<Character, String> map = new HashMap<>();
+		addEscapedChar(map, (char)0x0007, 'a');
+		addEscapedChar(map, (char)0x0008, 'b');
+		addEscapedChar(map, '\t', 't');
+		addEscapedChar(map, '\n', 'n');
+		addEscapedChar(map, (char)0x000B, 'v');
+		addEscapedChar(map, '\f', 'f');
+		addEscapedChar(map, '\r', 'r');
+		addEscapedChar(map, (char)0x001B, 'e');
+		addEscapedChar(map, '\"');
+		addEscapedChar(map, '\'');
+		addEscapedChar(map, '?');
+		addEscapedChar(map, '\\');
+		targetCharValueEscape = map;
+	}
+
 	protected static final HashSet<String> reservedWords =  new HashSet<>(Arrays.asList(
 		"alignas", "alignof", "and", "and_eq", "asm", "auto", "bitand",
 		"bitor", "bool", "break", "case", "catch", "char", "char16_t",
@@ -43,7 +60,11 @@ public class CppTarget extends Target {
 
 	public CppTarget(CodeGenerator gen) {
 		super(gen);
-		targetCharValueEscape['?'] = "\\?";
+	}
+
+	@Override
+	public Map<Character, String> getTargetCharValueEscape() {
+		return targetCharValueEscape;
 	}
 
 	@Override
@@ -63,11 +84,6 @@ public class CppTarget extends Target {
 		else {
 			return super.shouldUseUnicodeEscapeForCodePointInDoubleQuotedString(codePoint);
 		}
-	}
-
-	@Override
-	public String encodeIntAsCharEscape(int v) {
-		return "0x" + Integer.toHexString(v) + ", ";
 	}
 
 	@Override
