@@ -74,16 +74,12 @@ public class ATNSerializer {
 	 */
 	public IntegerList serialize(String language) {
 		if ( language.equals("Java") ) {
-			return serializeAsUInt16ForJava(language);
+			return serializeAsUInt16ForJava();
 		}
 		return serializeAsSignedInts(language);
 	}
 
 	public IntegerList serializeAsSignedInts(String language) {
-		return serializeAsUInt16ForJava(language);
-	}
-
-	public IntegerList serializeAsUInt16ForJava(String language) {
 		addPreamble();
 		int nedges = addEdges();
 		addNonGreedyStates();
@@ -95,7 +91,21 @@ public class ATNSerializer {
 		addDecisionStartStates();
 		addLexerActions();
 
-		boolean isJava = language.equals("Java");
+		return data;
+	}
+
+	public IntegerList serializeAsUInt16ForJava() {
+		addPreamble();
+		int nedges = addEdges();
+		addNonGreedyStates();
+		addPrecedenceStates();
+		addRuleStatesAndLexerTokenTypes();
+		addModeStartStates();
+		Map<IntervalSet, Integer> setIndices = addSets();
+		addEdges(nedges, setIndices);
+		addDecisionStartStates();
+		addLexerActions();
+
 		for (int i = 1; i < data.size(); i++) {
 			int value = data.get(i);
 			if (value < Character.MIN_VALUE || value > Character.MAX_VALUE) {
@@ -103,7 +113,7 @@ public class ATNSerializer {
 						value + " element " + i + " out of range " + (int) Character.MIN_VALUE + ".." + (int) Character.MAX_VALUE);
 			}
 
-			data.set(i, isJava ? (value + 2) & 0xFFFF : value);
+			data.set(i, (value + 2) & 0xFFFF);
 		}
 
 		return data;
