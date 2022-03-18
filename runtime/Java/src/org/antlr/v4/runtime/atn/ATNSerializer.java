@@ -344,12 +344,8 @@ public class ATNSerializer {
 			ATNState ruleStartState = atn.ruleToStartState[r];
 			data.add(ruleStartState.stateNumber);
 			if (atn.grammarType == ATNType.LEXER) {
-				if (atn.ruleToTokenType[r] == Token.EOF) {
-					data.add(Character.MAX_VALUE);
-				}
-				else {
-					data.add(atn.ruleToTokenType[r]);
-				}
+				assert atn.ruleToTokenType[r]>=0; // 0 implies fragment rule, other token types > 0
+				data.add(atn.ruleToTokenType[r]);
 			}
 		}
 	}

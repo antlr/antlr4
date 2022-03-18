@@ -52,21 +52,21 @@ public class TestATNSerialization extends BaseJavaToolTest {
 
 	@Test public void testEOF() throws Exception {
 		Grammar g = new Grammar(
-			"parser grammar T;\n"+
-			"a : A EOF ;");
+				"parser grammar T;\n"+
+						"a : A EOF ;");
 		String expecting =
-			"max type 1\n" +
-				"0:RULE_START 0\n" +
-				"1:RULE_STOP 0\n" +
-				"2:BASIC 0\n" +
-				"3:BASIC 0\n" +
-				"4:BASIC 0\n" +
-				"5:BASIC 0\n" +
-				"rule 0:0\n" +
-				"0->2 EPSILON 0,0,0\n" +
-				"2->3 ATOM 1,0,0\n" +
-				"3->4 ATOM 0,0,1\n" +
-				"4->1 EPSILON 0,0,0\n";
+				"max type 1\n" +
+						"0:RULE_START 0\n" +
+						"1:RULE_STOP 0\n" +
+						"2:BASIC 0\n" +
+						"3:BASIC 0\n" +
+						"4:BASIC 0\n" +
+						"5:BASIC 0\n" +
+						"rule 0:0\n" +
+						"0->2 EPSILON 0,0,0\n" +
+						"2->3 ATOM 1,0,0\n" +
+						"3->4 ATOM 0,0,1\n" +
+						"4->1 EPSILON 0,0,0\n";
 		ATN atn = createATN(g, true);
 		String result = getDecoded(atn, Arrays.asList(g.getTokenNames()));
 		assertEquals(expecting, result);
