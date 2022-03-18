@@ -113,10 +113,6 @@ func (a *ATNDeserializer) readStates(atn *ATN) {
 
 		ruleIndex := a.readInt()
 
-		if ruleIndex == 0xFFFF {
-			ruleIndex = -1
-		}
-
 		s := a.stateFactory(stype, ruleIndex)
 
 		if stype == ATNStateLoopEnd {
@@ -174,10 +170,6 @@ func (a *ATNDeserializer) readRules(atn *ATN) {
 
 		if atn.grammarType == ATNTypeLexer {
 			tokenType := a.readInt()
-
-			if tokenType == 0xFFFF {
-				tokenType = TokenEOF
-			}
 
 			atn.ruleToTokenType[i] = tokenType
 		}
@@ -330,17 +322,7 @@ func (a *ATNDeserializer) readLexerActions(atn *ATN) {
 		for i := range atn.lexerActions {
 			actionType := a.readInt()
 			data1 := a.readInt()
-
-			if data1 == 0xFFFF {
-				data1 = -1
-			}
-
 			data2 := a.readInt()
-
-			if data2 == 0xFFFF {
-				data2 = -1
-			}
-
 			atn.lexerActions[i] = a.lexerActionFactory(actionType, data1, data2)
 		}
 	}
