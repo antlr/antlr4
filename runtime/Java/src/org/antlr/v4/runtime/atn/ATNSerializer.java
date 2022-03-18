@@ -25,6 +25,13 @@ public class ATNSerializer {
 	public ATN atn;
 	private List<String> tokenNames;
 
+	private final IntegerList data = new IntegerList();
+	/** Note that we use a LinkedHashMap as a set to mainintain insertion order while deduplicating
+	    entries with the same key. */
+	private Map<IntervalSet, Boolean> sets = new LinkedHashMap<>();
+	private final IntegerList nonGreedyStates = new IntegerList();
+	private final IntegerList precedenceStates = new IntegerList();
+
 	private interface CodePointSerializer {
 		void serializeCodePoint(IntegerList data, int cp);
 	}
@@ -41,7 +48,7 @@ public class ATNSerializer {
 	}
 
 	/** Serialize state descriptors, edge descriptors, and decision&rarr;state map
-	 *  into list of ints:
+	 *  into list of ints.  Likely out of date, but keeping as it could be helpful:
 	 *
 	 *      SERIALIZED_VERSION
 	 *      UUID (2 longs)
@@ -66,140 +73,119 @@ public class ATNSerializer {
 	 *  Convenient to pack into unsigned shorts to make as Java string.
 	 */
 	public IntegerList serialize(String language) {
-		IntegerList data = new IntegerList();
+		if ( language.equals("Java") ) {
+			return serializeAsUInt16ForJava(language);
+		}
+		return serializeAsSignedInts(language);
+	}
+
+	public IntegerList serializeAsSignedInts(String language) {
+		return serializeAsUInt16ForJava(language);
+	}
+
+	public IntegerList serializeAsUInt16ForJava(String language) {
+		addPreamble();
+		int nedges = addEdges();
+		addNonGreedyStates();
+		addPrecedenceStates();
+		addRuleStatesAndLexerTokenTypes();
+		addModeStartStates();
+		Map<IntervalSet, Integer> setIndices = addSets();
+		addEdges(nedges, setIndices);
+		addDecisionStartStates();
+		addLexerActions();
+
+		boolean isJava = language.equals("Java");
+		for (int i = 1; i < data.size(); i++) {
+			int value = data.get(i);
+			if (value < Character.MIN_VALUE || value > Character.MAX_VALUE) {
+				throw new UnsupportedOperationException("Serialized ATN data element " +
+						value + " element " + i + " out of range " + (int) Character.MIN_VALUE + ".." + (int) Character.MAX_VALUE);
+			}
+
+			data.set(i, isJava ? (value + 2) & 0xFFFF : value);
+		}
+
+		return data;
+	}
+
+	private void addPreamble() {
 		data.add(ATNDeserializer.SERIALIZED_VERSION);
 
 		// convert grammar type to ATN const to avoid dependence on ANTLRParser
 		data.add(atn.grammarType.ordinal());
 		data.add(atn.maxTokenType);
-		int nedges = 0;
+	}
 
-		// Note that we use a LinkedHashMap as a set to
-		// maintain insertion order while deduplicating
-		// entries with the same key.
-		Map<IntervalSet, Boolean> sets = new LinkedHashMap<>();
+	private void addLexerActions() {
+		if (atn.grammarType == ATNType.LEXER) {
+			data.add(atn.lexerActions.length);
+			for (LexerAction action : atn.lexerActions) {
+				data.add(action.getActionType().ordinal());
+				switch (action.getActionType()) {
+				case CHANNEL:
+					int channel = ((LexerChannelAction)action).getChannel();
+					data.add(channel != -1 ? channel : 0xFFFF);
+					data.add(0);
+					break;
 
-		// dump states, count edges and collect sets while doing so
-		IntegerList nonGreedyStates = new IntegerList();
-		IntegerList precedenceStates = new IntegerList();
-		data.add(atn.states.size());
-		for (ATNState s : atn.states) {
-			if ( s==null ) { // might be optimized away
-				data.add(ATNState.INVALID_TYPE);
-				continue;
-			}
+				case CUSTOM:
+					int ruleIndex = ((LexerCustomAction)action).getRuleIndex();
+					int actionIndex = ((LexerCustomAction)action).getActionIndex();
+					data.add(ruleIndex != -1 ? ruleIndex : 0xFFFF);
+					data.add(actionIndex != -1 ? actionIndex : 0xFFFF);
+					break;
 
-			int stateType = s.getStateType();
-			if (s instanceof DecisionState && ((DecisionState)s).nonGreedy) {
-				nonGreedyStates.add(s.stateNumber);
-			}
+				case MODE:
+					int mode = ((LexerModeAction)action).getMode();
+					data.add(mode != -1 ? mode : 0xFFFF);
+					data.add(0);
+					break;
 
-			if (s instanceof RuleStartState && ((RuleStartState)s).isLeftRecursiveRule) {
-				precedenceStates.add(s.stateNumber);
-			}
+				case MORE:
+					data.add(0);
+					data.add(0);
+					break;
 
-			data.add(stateType);
+				case POP_MODE:
+					data.add(0);
+					data.add(0);
+					break;
 
-			if (s.ruleIndex == -1) {
-				data.add(Character.MAX_VALUE);
-			}
-			else {
-				data.add(s.ruleIndex);
-			}
+				case PUSH_MODE:
+					mode = ((LexerPushModeAction)action).getMode();
+					data.add(mode != -1 ? mode : 0xFFFF);
+					data.add(0);
+					break;
 
-			if ( s.getStateType() == ATNState.LOOP_END ) {
-				data.add(((LoopEndState)s).loopBackState.stateNumber);
-			}
-			else if ( s instanceof BlockStartState ) {
-				data.add(((BlockStartState)s).endState.stateNumber);
-			}
+				case SKIP:
+					data.add(0);
+					data.add(0);
+					break;
 
-			if (s.getStateType() != ATNState.RULE_STOP) {
-				// the deserializer can trivially derive these edges, so there's no need to serialize them
-				nedges += s.getNumberOfTransitions();
-			}
+				case TYPE:
+					int type = ((LexerTypeAction)action).getType();
+					data.add(type != -1 ? type : 0xFFFF);
+					data.add(0);
+					break;
 
-			for (int i=0; i<s.getNumberOfTransitions(); i++) {
-				Transition t = s.transition(i);
-				int edgeType = Transition.serializationTypes.get(t.getClass());
-				if ( edgeType == Transition.SET || edgeType == Transition.NOT_SET ) {
-					SetTransition st = (SetTransition)t;
-					sets.put(st.set, true);
+				default:
+					String message = String.format(Locale.getDefault(), "The specified lexer action type %s is not valid.", action.getActionType());
+					throw new IllegalArgumentException(message);
 				}
 			}
 		}
+	}
 
-		// non-greedy states
-		data.add(nonGreedyStates.size());
-		for (int i = 0; i < nonGreedyStates.size(); i++) {
-			data.add(nonGreedyStates.get(i));
+	private void addDecisionStartStates() {
+		int ndecisions = atn.decisionToState.size();
+		data.add(ndecisions);
+		for (DecisionState decStartState : atn.decisionToState) {
+			data.add(decStartState.stateNumber);
 		}
+	}
 
-		// precedence states
-		data.add(precedenceStates.size());
-		for (int i = 0; i < precedenceStates.size(); i++) {
-			data.add(precedenceStates.get(i));
-		}
-
-		int nrules = atn.ruleToStartState.length;
-		data.add(nrules);
-		for (int r=0; r<nrules; r++) {
-			ATNState ruleStartState = atn.ruleToStartState[r];
-			data.add(ruleStartState.stateNumber);
-			if (atn.grammarType == ATNType.LEXER) {
-				if (atn.ruleToTokenType[r] == Token.EOF) {
-					data.add(Character.MAX_VALUE);
-				}
-				else {
-					data.add(atn.ruleToTokenType[r]);
-				}
-			}
-		}
-
-		int nmodes = atn.modeToStartState.size();
-		data.add(nmodes);
-		if ( nmodes>0 ) {
-			for (ATNState modeStartState : atn.modeToStartState) {
-				data.add(modeStartState.stateNumber);
-			}
-		}
-		List<IntervalSet> bmpSets = new ArrayList<>();
-		List<IntervalSet> smpSets = new ArrayList<>();
-		for (IntervalSet set : sets.keySet()) {
-			if (!set.isNil() && set.getMaxElement() <= Character.MAX_VALUE) {
-				bmpSets.add(set);
-			}
-			else {
-				smpSets.add(set);
-			}
-		}
-		serializeSets(
-			data,
-			bmpSets,
-			new CodePointSerializer() {
-				@Override
-				public void serializeCodePoint(IntegerList data, int cp) {
-					data.add(cp);
-				}
-			});
-		serializeSets(
-			data,
-			smpSets,
-			new CodePointSerializer() {
-				@Override
-				public void serializeCodePoint(IntegerList data, int cp) {
-					serializeInt(data, cp);
-				}
-			});
-		Map<IntervalSet, Integer> setIndices = new HashMap<>();
-		int setIndex = 0;
-		for (IntervalSet bmpSet : bmpSets) {
-			setIndices.put(bmpSet, setIndex++);
-		}
-		for (IntervalSet smpSet : smpSets) {
-			setIndices.put(smpSet, setIndex++);
-		}
-
+	private void addEdges(int nedges, Map<IntervalSet, Integer> setIndices) {
 		data.add(nedges);
 		for (ATNState s : atn.states) {
 			if ( s==null ) {
@@ -286,86 +272,138 @@ public class ATNSerializer {
 				data.add(arg3);
 			}
 		}
+	}
 
-		int ndecisions = atn.decisionToState.size();
-		data.add(ndecisions);
-		for (DecisionState decStartState : atn.decisionToState) {
-			data.add(decStartState.stateNumber);
+	private Map<IntervalSet, Integer> addSets() {
+		List<IntervalSet> bmpSets = new ArrayList<>();
+		List<IntervalSet> smpSets = new ArrayList<>();
+		for (IntervalSet set : sets.keySet()) {
+			if (!set.isNil() && set.getMaxElement() <= Character.MAX_VALUE) {
+				bmpSets.add(set);
+			}
+			else {
+				smpSets.add(set);
+			}
 		}
+		serializeSets(
+			data,
+			bmpSets,
+			new CodePointSerializer() {
+				@Override
+				public void serializeCodePoint(IntegerList data, int cp) {
+					data.add(cp);
+				}
+			});
+		serializeSets(
+			data,
+			smpSets,
+			new CodePointSerializer() {
+				@Override
+				public void serializeCodePoint(IntegerList data, int cp) {
+					serializeInt(data, cp);
+				}
+			});
+		Map<IntervalSet, Integer> setIndices = new HashMap<>();
+		int setIndex = 0;
+		for (IntervalSet bmpSet : bmpSets) {
+			setIndices.put(bmpSet, setIndex++);
+		}
+		for (IntervalSet smpSet : smpSets) {
+			setIndices.put(smpSet, setIndex++);
+		}
+		return setIndices;
+	}
 
-		//
-		// LEXER ACTIONS
-		//
-		if (atn.grammarType == ATNType.LEXER) {
-			data.add(atn.lexerActions.length);
-			for (LexerAction action : atn.lexerActions) {
-				data.add(action.getActionType().ordinal());
-				switch (action.getActionType()) {
-				case CHANNEL:
-					int channel = ((LexerChannelAction)action).getChannel();
-					data.add(channel != -1 ? channel : 0xFFFF);
-					data.add(0);
-					break;
+	private void addModeStartStates() {
+		int nmodes = atn.modeToStartState.size();
+		data.add(nmodes);
+		if ( nmodes>0 ) {
+			for (ATNState modeStartState : atn.modeToStartState) {
+				data.add(modeStartState.stateNumber);
+			}
+		}
+	}
 
-				case CUSTOM:
-					int ruleIndex = ((LexerCustomAction)action).getRuleIndex();
-					int actionIndex = ((LexerCustomAction)action).getActionIndex();
-					data.add(ruleIndex != -1 ? ruleIndex : 0xFFFF);
-					data.add(actionIndex != -1 ? actionIndex : 0xFFFF);
-					break;
-
-				case MODE:
-					int mode = ((LexerModeAction)action).getMode();
-					data.add(mode != -1 ? mode : 0xFFFF);
-					data.add(0);
-					break;
-
-				case MORE:
-					data.add(0);
-					data.add(0);
-					break;
-
-				case POP_MODE:
-					data.add(0);
-					data.add(0);
-					break;
-
-				case PUSH_MODE:
-					mode = ((LexerPushModeAction)action).getMode();
-					data.add(mode != -1 ? mode : 0xFFFF);
-					data.add(0);
-					break;
-
-				case SKIP:
-					data.add(0);
-					data.add(0);
-					break;
-
-				case TYPE:
-					int type = ((LexerTypeAction)action).getType();
-					data.add(type != -1 ? type : 0xFFFF);
-					data.add(0);
-					break;
-
-				default:
-					String message = String.format(Locale.getDefault(), "The specified lexer action type %s is not valid.", action.getActionType());
-					throw new IllegalArgumentException(message);
+	private void addRuleStatesAndLexerTokenTypes() {
+		int nrules = atn.ruleToStartState.length;
+		data.add(nrules);
+		for (int r=0; r<nrules; r++) {
+			ATNState ruleStartState = atn.ruleToStartState[r];
+			data.add(ruleStartState.stateNumber);
+			if (atn.grammarType == ATNType.LEXER) {
+				if (atn.ruleToTokenType[r] == Token.EOF) {
+					data.add(Character.MAX_VALUE);
+				}
+				else {
+					data.add(atn.ruleToTokenType[r]);
 				}
 			}
 		}
+	}
 
-		boolean isJava = language.equals("Java");
-		for (int i = 1; i < data.size(); i++) {
-			int value = data.get(i);
-			if (value < Character.MIN_VALUE || value > Character.MAX_VALUE) {
-				throw new UnsupportedOperationException("Serialized ATN data element " +
-						value + " element " + i + " out of range " + (int) Character.MIN_VALUE + ".." + (int) Character.MAX_VALUE);
+	private void addPrecedenceStates() {
+		data.add(precedenceStates.size());
+		for (int i = 0; i < precedenceStates.size(); i++) {
+			data.add(precedenceStates.get(i));
+		}
+	}
+
+	private void addNonGreedyStates() {
+		data.add(nonGreedyStates.size());
+		for (int i = 0; i < nonGreedyStates.size(); i++) {
+			data.add(nonGreedyStates.get(i));
+		}
+	}
+
+	private int addEdges() {
+		int nedges = 0;
+		data.add(atn.states.size());
+		for (ATNState s : atn.states) {
+			if ( s==null ) { // might be optimized away
+				data.add(ATNState.INVALID_TYPE);
+				continue;
 			}
 
-			data.set(i, isJava ? (value + 2) & 0xFFFF : value);
-		}
+			int stateType = s.getStateType();
+			if (s instanceof DecisionState && ((DecisionState)s).nonGreedy) {
+				nonGreedyStates.add(s.stateNumber);
+			}
 
-		return data;
+			if (s instanceof RuleStartState && ((RuleStartState)s).isLeftRecursiveRule) {
+				precedenceStates.add(s.stateNumber);
+			}
+
+			data.add(stateType);
+
+			if (s.ruleIndex == -1) {
+				data.add(Character.MAX_VALUE);
+			}
+			else {
+				data.add(s.ruleIndex);
+			}
+
+			if ( s.getStateType() == ATNState.LOOP_END ) {
+				data.add(((LoopEndState)s).loopBackState.stateNumber);
+			}
+			else if ( s instanceof BlockStartState ) {
+				data.add(((BlockStartState)s).endState.stateNumber);
+			}
+
+			if (s.getStateType() != ATNState.RULE_STOP) {
+				// the deserializer can trivially derive these edges, so there's no need to serialize them
+				nedges += s.getNumberOfTransitions();
+			}
+
+			for (int i=0; i<s.getNumberOfTransitions(); i++) {
+				Transition t = s.transition(i);
+				int edgeType = Transition.serializationTypes.get(t.getClass());
+				if ( edgeType == Transition.SET || edgeType == Transition.NOT_SET ) {
+					SetTransition st = (SetTransition)t;
+					sets.put(st.set, true);
+				}
+			}
+		}
+		return nedges;
 	}
 
 	private static void serializeSets(
