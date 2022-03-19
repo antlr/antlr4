@@ -38,7 +38,7 @@ struct BypassAltsAtnCache final {
   /// bypass alternatives.
   ///
   /// <seealso cref= ATNDeserializationOptions#isGenerateRuleBypassTransitions() </seealso>
-  std::map<std::vector<uint16_t>, std::unique_ptr<const atn::ATN>> map;
+  std::map<std::vector<int32_t>, std::unique_ptr<const atn::ATN>> map;
 };
 
 BypassAltsAtnCache* getBypassAltsAtnCache() {
@@ -229,7 +229,7 @@ TokenFactory<CommonToken>* Parser::getTokenFactory() {
 
 
 const atn::ATN& Parser::getATNWithBypassAlts() {
-  const std::vector<uint16_t> &serializedAtn = getSerializedATN();
+  const std::vector<int32_t> &serializedAtn = getSerializedATN();
   if (serializedAtn.empty()) {
     throw UnsupportedOperationException("The current parser does not support an ATN with bypass alternatives.");
   }

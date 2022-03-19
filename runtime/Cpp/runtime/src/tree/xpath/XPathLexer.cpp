@@ -33,7 +33,7 @@ struct XPathLexerStaticData final {
   const std::vector<std::string> literalNames;
   const std::vector<std::string> symbolicNames;
   const antlr4::dfa::Vocabulary vocabulary;
-  std::vector<uint16_t> serializedATN;
+  std::vector<int32_t> serializedATN;
   std::unique_ptr<antlr4::atn::ATN> atn;
 };
 
@@ -61,7 +61,7 @@ void xpathLexerInitialize() {
       "STRING"
     }
   );
-  static const uint16_t serializedATNSegment0[] = {
+  static const int32_t serializedATNSegment0[] = {
     0x4, 0x0, 0x8, 0x32, 0x6, 0xffff, 0x2, 0x0, 0x7, 0x0, 0x2, 0x1, 0x7,
        0x1, 0x2, 0x2, 0x7, 0x2, 0x2, 0x3, 0x7, 0x3, 0x2, 0x4, 0x7, 0x4,
        0x2, 0x5, 0x7, 0x5, 0x2, 0x6, 0x7, 0x6, 0x2, 0x7, 0x7, 0x7, 0x1,
@@ -151,7 +151,7 @@ const dfa::Vocabulary& XPathLexer::getVocabulary() const {
   return xpathLexerStaticData->vocabulary;
 }
 
-const std::vector<uint16_t>& XPathLexer::getSerializedATN() const {
+const std::vector<int32_t>& XPathLexer::getSerializedATN() const {
   return xpathLexerStaticData->serializedATN;
 }
 

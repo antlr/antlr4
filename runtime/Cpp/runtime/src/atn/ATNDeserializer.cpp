@@ -221,15 +221,15 @@ namespace {
     return s;
   }
 
-  uint32_t deserializeInt32(const std::vector<uint16_t>& data, size_t offset) {
+  uint32_t deserializeInt32(const std::vector<int32_t>& data, size_t offset) {
     return static_cast<uint32_t>(data[offset]) | (static_cast<uint32_t>(data[offset + 1]) << 16);
   }
 
-  ssize_t readUnicodeInt(const std::vector<uint16_t>& data, int& p) {
+  ssize_t readUnicodeInt(const std::vector<int32_t>& data, int& p) {
     return static_cast<ssize_t>(data[p++]);
   }
 
-  ssize_t readUnicodeInt32(const std::vector<uint16_t>& data, int& p) {
+  ssize_t readUnicodeInt32(const std::vector<int32_t>& data, int& p) {
     auto result = deserializeInt32(data, p);
     p += 2;
     return static_cast<ssize_t>(result);
@@ -239,7 +239,7 @@ namespace {
   // the 16- or 32-bit readUnicodeInt/readUnicodeInt32 as needed.
   template <typename F>
   void deserializeSets(
-    const std::vector<uint16_t>& data,
+    const std::vector<int32_t>& data,
     int& p,
     std::vector<misc::IntervalSet>& sets,
     F readUnicode) {
@@ -269,7 +269,7 @@ ATNDeserializer::ATNDeserializer() : ATNDeserializer(ATNDeserializationOptions::
 
 ATNDeserializer::ATNDeserializer(ATNDeserializationOptions deserializationOptions) : _deserializationOptions(std::move(deserializationOptions)) {}
 
-std::unique_ptr<ATN> ATNDeserializer::deserialize(const std::vector<uint16_t>& data) const {
+std::unique_ptr<ATN> ATNDeserializer::deserialize(const std::vector<int32_t>& data) const {
   int p = 0;
   int version = data[p++];
   if (version != SERIALIZED_VERSION) {

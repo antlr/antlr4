@@ -20,7 +20,7 @@ namespace atn {
 
     explicit ATNDeserializer(ATNDeserializationOptions deserializationOptions);
 
-    std::unique_ptr<ATN> deserialize(const std::vector<uint16_t> &input) const;
+    std::unique_ptr<ATN> deserialize(const std::vector<int32_t> &input) const;
     void verifyATN(const ATN &atn) const;
 
   private:
