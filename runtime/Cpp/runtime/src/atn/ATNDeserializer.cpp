@@ -301,10 +301,6 @@ std::unique_ptr<ATN> ATNDeserializer::deserialize(const std::vector<int32_t>& da
       }
 
       size_t ruleIndex = data[p++];
-      if (ruleIndex == 0xFFFF) {
-        ruleIndex = INVALID_INDEX;
-      }
-
       ATNState *s = stateFactory(stype, ruleIndex);
       if (stype == ATNStateType::LOOP_END) { // special case
         int loopBackStateNumber = data[p++];
@@ -352,10 +348,6 @@ std::unique_ptr<ATN> ATNDeserializer::deserialize(const std::vector<int32_t>& da
     atn->ruleToStartState.push_back(startState);
     if (atn->grammarType == ATNType::LEXER) {
       size_t tokenType = data[p++];
-      if (tokenType == 0xFFFF) {
-        tokenType = Token::EOF;
-      }
-
       atn->ruleToTokenType.push_back(tokenType);
     }
   }
@@ -492,15 +484,7 @@ std::unique_ptr<ATN> ATNDeserializer::deserialize(const std::vector<int32_t>& da
     for (size_t i = 0; i < atn->lexerActions.size(); i++) {
       LexerActionType actionType = static_cast<LexerActionType>(data[p++]);
       int data1 = data[p++];
-      if (data1 == 0xFFFF) {
-        data1 = -1;
-      }
-
       int data2 = data[p++];
-      if (data2 == 0xFFFF) {
-        data2 = -1;
-      }
-
       atn->lexerActions[i] = lexerActionFactory(actionType, data1, data2);
     }
   }

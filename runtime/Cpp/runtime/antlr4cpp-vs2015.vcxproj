@@ -507,7 +507,6 @@
     <ClInclude Include="src\atn\ATNConfigSet.h" />
     <ClInclude Include="src\atn\ATNDeserializationOptions.h" />
     <ClInclude Include="src\atn\ATNDeserializer.h" />
-    <ClInclude Include="src\atn\ATNSerializer.h" />
     <ClInclude Include="src\atn\ATNSimulator.h" />
     <ClInclude Include="src\atn\ATNState.h" />
     <ClInclude Include="src\atn\ATNType.h" />
