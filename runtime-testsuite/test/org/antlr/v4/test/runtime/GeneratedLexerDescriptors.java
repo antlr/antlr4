@@ -1,6 +1,6 @@
 package org.antlr.v4.test.runtime;
 
-import java.util.Collections;
+import java.util.*;
 
 public class GeneratedLexerDescriptors {
 	static RuntimeTestDescriptor getLineSeparatorLfDescriptor(String targetName) {
@@ -113,9 +113,11 @@ public class GeneratedLexerDescriptors {
 		result.input = input.toString();
 		result.output = output.toString();
 
-		result.skipTargets.add("Java"); // can't handle > 16bit states yet
-		result.skipTargets.add("JavaScript"); // doesn't terminate
-		result.skipTargets.add("Go"); // syntax error
+		List<String> all = Arrays.asList("CSharp", "Python2", "Python3", "Cpp", "Go", "PHP", "Swift", "Java", "JavaScript", "Dart");
+		result.skipTargets.addAll(all);
+//		result.skipTargets.add("Java"); // can't handle > 16bit states yet
+//		result.skipTargets.add("JavaScript"); // doesn't terminate
+//		result.skipTargets.add("Go"); // syntax error
 		return result;
 	}
 }
