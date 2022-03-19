@@ -17,6 +17,6 @@ python2 --version
 
 pushd runtime-testsuite
   echo "running maven tests..."
-  export MAVEN_OPTS="-Xmx2g"
+  export MAVEN_OPTS="-Xmx8g"
   mvn -Dparallel=classes -DthreadCount=4 -Dtest=python2.** test
 popd

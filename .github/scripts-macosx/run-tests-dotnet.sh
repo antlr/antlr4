@@ -13,6 +13,6 @@ dotnet build -c Release -f netstandard2.0 runtime/CSharp/Antlr4.csproj
 
 # run tests
 pushd runtime-testsuite/
-export MAVEN_OPTS="-Xmx2g"
+export MAVEN_OPTS="-Xmx8g"
 mvn -Dparallel=classes -DthreadCount=4 -Dtest=csharp.** test
 popd
