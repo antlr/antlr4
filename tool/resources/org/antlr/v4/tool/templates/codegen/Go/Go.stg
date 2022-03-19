@@ -14,6 +14,7 @@ package parser // <file.grammarName>
 import (
 	"fmt"
 	"strconv"
+  "sync"
 
 	"github.com/antlr/antlr4/runtime/Go/antlr"
 )
@@ -26,6 +27,7 @@ import (
 // Suppress unused import errors
 var _ = fmt.Printf
 var _ = strconv.Itoa
+var _ = sync.Once{}
 
 <if(parser)>
 
@@ -143,61 +145,69 @@ func (v *Base<file.grammarName>Visitor) Visit<lname; format="cap">(ctx *<lname; 
 >>
 
 Parser(parser, funcs, atn, sempredFuncs, superClass) ::= <<
-<if(atn)>
-var parserATN = <atn>
-<else>
-var parserATN []uint16
-<endif>
-
-<if(parser.literalNames)>
-var literalNames = []string{
-	<parser.literalNames; null="\"\"", separator=", ", wrap>,
-}
-<else>
-var literalNames []string
-<endif>
-
-<if(parser.symbolicNames)>
-var symbolicNames = []string{
-	<parser.symbolicNames; null="\"\"", separator=", ", wrap>,
-}
-<else>
-var symbolicNames []string
-<endif>
-
-
-<if(parser.ruleNames)>
-var ruleNames = []string{
-	<parser.ruleNames:{r | "<r>"}; separator=", ", wrap>,
-}
-<else>
-var ruleNames []string
-<endif>
-
 type <parser.name> struct {
 	<superClass; null="*antlr.BaseParser">
 }
 
-// New<parser.name> produces a new parser instance for the optional input antlr.TokenStream.
-//
-// The *<parser.name> instance produced may be reused by calling the SetInputStream method.
-// The initial parser configuration is expensive to construct, and the object is not thread-safe;
-// however, if used within a Golang sync.Pool, the construction cost amortizes well and the
-// objects can be used in a thread-safe manner.
-func New<parser.name>(input antlr.TokenStream) *<parser.name> {
-	this := new(<parser.name>)
-	deserializer := antlr.NewATNDeserializer(nil)
-	deserializedATN := deserializer.DeserializeFromUInt16(parserATN)
-	decisionToDFA := make([]*antlr.DFA, len(deserializedATN.DecisionToState))
-	for index, ds := range deserializedATN.DecisionToState {
-		decisionToDFA[index] = antlr.NewDFA(ds, index)
-	}
-	this.BaseParser = antlr.NewBaseParser(input)
+var <parser.grammarName; format="lower">ParserStaticData struct {
+  once                   sync.Once
+  serializedATN          []uint16
+  literalNames           []string
+  symbolicNames          []string
+  ruleNames              []string
+  predictionContextCache *antlr.PredictionContextCache
+  atn                    *antlr.ATN
+  decisionToDFA          []*antlr.DFA
+}
 
-	this.Interpreter = antlr.NewParserATNSimulator(this, deserializedATN, decisionToDFA, antlr.NewPredictionContextCache())
-	this.RuleNames = ruleNames
-	this.LiteralNames = literalNames
-	this.SymbolicNames = symbolicNames
+func <parser.grammarName; format="lower">ParserInit() {
+  staticData := &<parser.grammarName; format="lower">ParserStaticData
+<if(parser.literalNames)>
+  staticData.literalNames = []string{
+    <parser.literalNames; null="\"\"", separator=", ", wrap>,
+  }
+<endif>
+<if(parser.symbolicNames)>
+  staticData.symbolicNames = []string{
+    <parser.symbolicNames; null="\"\"", separator=", ", wrap>,
+  }
+<endif>
+<if(parser.ruleNames)>
+  staticData.ruleNames = []string{
+    <parser.ruleNames:{r | "<r>"}; separator=", ", wrap>,
+  }
+<endif>
+  staticData.predictionContextCache = antlr.NewPredictionContextCache()
+  staticData.serializedATN = <atn>
+  deserializer := antlr.NewATNDeserializer(nil)
+  staticData.atn = deserializer.DeserializeFromUInt16(staticData.serializedATN)
+  atn := staticData.atn
+  staticData.decisionToDFA = make([]*antlr.DFA, len(atn.DecisionToState))
+  decisionToDFA := staticData.decisionToDFA
+  for index, state := range atn.DecisionToState {
+    decisionToDFA[index] = antlr.NewDFA(state, index)
+  }
+}
+
+// <parser.name>Init initializes any static state used to implement <parser.name>. By default the
+// static state used to implement the parser is lazily initialized during the first call to
+// New<parser.name>(). You can call this function if you wish to initialize the static state ahead
+// of time.
+func <parser.name>Init() {
+  staticData := &<parser.grammarName; format="lower">ParserStaticData
+  staticData.once.Do(<parser.grammarName; format="lower">ParserInit)
+}
+
+// New<parser.name> produces a new parser instance for the optional input antlr.TokenStream.
+func New<parser.name>(input antlr.TokenStream) *<parser.name> {
+  <parser.name>Init()
+	this := new(<parser.name>)
+	this.BaseParser = antlr.NewBaseParser(input)
+  staticData := &<parser.grammarName; format="lower">ParserStaticData
+	this.Interpreter = antlr.NewParserATNSimulator(this, staticData.atn, staticData.decisionToDFA, staticData.predictionContextCache)
+	this.RuleNames = staticData.ruleNames
+	this.LiteralNames = staticData.literalNames
+	this.SymbolicNames = staticData.symbolicNames
 	this.GrammarFileName = "<parser.grammarFileName; format="java-escape">"
 
 	return this
@@ -1382,6 +1392,7 @@ package parser
 
 import (
 	"fmt"
+  "sync"
 	"unicode"
 
 	"github.com/antlr/antlr4/runtime/Go/antlr"
@@ -1393,6 +1404,7 @@ import (
 
 // Suppress unused import error
 var _ = fmt.Printf
+var _ = sync.Once{}
 var _ = unicode.IsLetter
 
 <if(lexer)>
@@ -1403,47 +1415,6 @@ var _ = unicode.IsLetter
 >>
 
 Lexer(lexer, atn, actionFuncs, sempredFuncs, superClass) ::= <<
-<if(atn)>
-var serializedLexerAtn = <atn>
-<else>
-var serializedLexerAtn []uint16
-<endif>
-
-
-var lexerChannelNames = []string{
-	"DEFAULT_TOKEN_CHANNEL", "HIDDEN"<if (lexer.channelNames)>, <lexer.channelNames:{c | "<c>"}; separator=", ", wrap><endif>,
-}
-
-var lexerModeNames = []string{
-	<lexer.escapedModeNames:{m | "<m>"}; separator=", ", wrap>,
-}
-
-<if(lexer.literalNames)>
-var lexerLiteralNames = []string{
-	<lexer.literalNames; null="\"\"", separator=", ", wrap>,
-}
-<else>
-var lexerLiteralNames []string
-<endif>
-
-
-<if(lexer.symbolicNames)>
-var lexerSymbolicNames = []string{
-	<lexer.symbolicNames; null="\"\"", separator=", ", wrap>,
-}
-<else>
-var lexerSymbolicNames []string
-<endif>
-
-
-<if(lexer.ruleNames)>
-var lexerRuleNames = []string{
-	<lexer.ruleNames:{r | "<r>"}; separator=", ", wrap>,
-}
-<else>
-var lexerRuleNames []string
-<endif>
-
 type <lexer.name> struct {
 	<if(superClass)><superClass><else>*antlr.BaseLexer<endif>
 	channelNames []string
@@ -1451,28 +1422,75 @@ type <lexer.name> struct {
 	// TODO: EOF string
 }
 
-// New<lexer.name> produces a new lexer instance for the optional input antlr.CharStream.
-//
-// The *<lexer.name> instance produced may be reused by calling the SetInputStream method.
-// The initial lexer configuration is expensive to construct, and the object is not thread-safe;
-// however, if used within a Golang sync.Pool, the construction cost amortizes well and the
-// objects can be used in a thread-safe manner.
-func New<lexer.name>(input antlr.CharStream) *<lexer.name> {
-	l := new(<lexer.name>)
-	lexerDeserializer := antlr.NewATNDeserializer(nil)
-	lexerAtn := lexerDeserializer.DeserializeFromUInt16(serializedLexerAtn)
-	lexerDecisionToDFA := make([]*antlr.DFA, len(lexerAtn.DecisionToState))
-	for index, ds := range lexerAtn.DecisionToState {
-		lexerDecisionToDFA[index] = antlr.NewDFA(ds, index)
-	}
-	l.BaseLexer = antlr.NewBaseLexer(input)
-	l.Interpreter = antlr.NewLexerATNSimulator(l, lexerAtn, lexerDecisionToDFA, antlr.NewPredictionContextCache())
+var <lexer.grammarName; format="lower">LexerStaticData struct {
+  once                   sync.Once
+  serializedATN          []uint16
+  channelNames           []string
+  modeNames              []string
+  literalNames           []string
+  symbolicNames          []string
+  ruleNames              []string
+  predictionContextCache *antlr.PredictionContextCache
+  atn                    *antlr.ATN
+  decisionToDFA          []*antlr.DFA
+}
 
-	l.channelNames = lexerChannelNames
-	l.modeNames = lexerModeNames
-	l.RuleNames = lexerRuleNames
-	l.LiteralNames = lexerLiteralNames
-	l.SymbolicNames = lexerSymbolicNames
+func <lexer.grammarName; format="lower">LexerInit() {
+  staticData := &<lexer.grammarName; format="lower">LexerStaticData
+  staticData.channelNames = []string{
+    "DEFAULT_TOKEN_CHANNEL", "HIDDEN"<if (lexer.channelNames)>, <lexer.channelNames:{c | "<c>"}; separator=", ", wrap><endif>,
+  }
+  staticData.modeNames = []string{
+    <lexer.escapedModeNames:{m | "<m>"}; separator=", ", wrap>,
+  }
+<if(lexer.literalNames)>
+  staticData.literalNames = []string{
+    <lexer.literalNames; null="\"\"", separator=", ", wrap>,
+  }
+<endif>
+<if(lexer.symbolicNames)>
+  staticData.symbolicNames = []string{
+    <lexer.symbolicNames; null="\"\"", separator=", ", wrap>,
+  }
+<endif>
+<if(lexer.ruleNames)>
+  staticData.ruleNames = []string{
+    <lexer.ruleNames:{r | "<r>"}; separator=", ", wrap>,
+  }
+<endif>
+  staticData.predictionContextCache = antlr.NewPredictionContextCache()
+  staticData.serializedATN = <atn>
+  deserializer := antlr.NewATNDeserializer(nil)
+  staticData.atn = deserializer.DeserializeFromUInt16(staticData.serializedATN)
+  atn := staticData.atn
+  staticData.decisionToDFA = make([]*antlr.DFA, len(atn.DecisionToState))
+  decisionToDFA := staticData.decisionToDFA
+  for index, state := range atn.DecisionToState {
+    decisionToDFA[index] = antlr.NewDFA(state, index)
+  }
+}
+
+// <lexer.name>Init initializes any static state used to implement <lexer.name>. By default the
+// static state used to implement the lexer is lazily initialized during the first call to
+// New<lexer.name>(). You can call this function if you wish to initialize the static state ahead
+// of time.
+func <lexer.name>Init() {
+  staticData := &<lexer.grammarName; format="lower">LexerStaticData
+  staticData.once.Do(<lexer.grammarName; format="lower">LexerInit)
+}
+
+// New<lexer.name> produces a new lexer instance for the optional input antlr.CharStream.
+func New<lexer.name>(input antlr.CharStream) *<lexer.name> {
+  <lexer.name>Init()
+	l := new(<lexer.name>)
+	l.BaseLexer = antlr.NewBaseLexer(input)
+  staticData := &<lexer.grammarName; format="lower">LexerStaticData
+	l.Interpreter = antlr.NewLexerATNSimulator(l, staticData.atn, staticData.decisionToDFA, staticData.predictionContextCache)
+	l.channelNames = staticData.channelNames
+	l.modeNames = staticData.modeNames
+	l.RuleNames = staticData.ruleNames
+	l.LiteralNames = staticData.literalNames
+	l.SymbolicNames = staticData.symbolicNames
 	l.GrammarFileName = "<lexer.grammarFileName>"
 	// TODO: l.EOF = antlr.TokenEOF
 
