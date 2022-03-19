@@ -50,10 +50,6 @@ public class ATNDeserializer {
 
             var ruleIndex = data[p]
             p += 1
-            if ruleIndex == UInt16.max {
-                ruleIndex = -1
-            }
-
             let s = try stateFactory(stype, ruleIndex)!
             if stype == ATNState.LOOP_END {
                 // special case
@@ -109,10 +105,6 @@ public class ATNDeserializer {
             if atn.grammarType == ATNType.lexer {
                 var tokenType = data[p]
                 p += 1
-                if tokenType == UInt16.max {
-                    tokenType = CommonToken.EOF
-                }
-
                 ruleToTokenType.append(tokenType)
             }
         }
@@ -194,16 +186,8 @@ public class ATNDeserializer {
                 p += 1
                 var data1 = data[p]
                 p += 1
-                if data1 == UInt16.max {
-                    data1 = -1
-                }
-
                 var data2 = data[p]
                 p += 1
-                if data2 == UInt16.max {
-                    data2 = -1
-                }
-
                 let lexerAction = lexerActionFactory(actionType, data1, data2)
                 lexerActions.append(lexerAction)
             }
