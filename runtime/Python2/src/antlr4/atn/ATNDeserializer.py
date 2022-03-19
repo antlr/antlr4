@@ -30,10 +30,7 @@ class ATNDeserializer (object):
         self.readRules(atn)
         self.readModes(atn)
         sets = []
-        # First, read all sets with 16-bit Unicode code points <= U+FFFF.
-        self.readSets(atn, sets, self.readInt)
-        # Next, deserialize sets with 32-bit arguments <= U+10FFFF.
-        self.readSets(atn, sets, self.readInt32)
+        self.readSets(atn, sets)
         self.readEdges(atn, sets)
         self.readDecisions(atn)
         self.readLexerActions(atn)
@@ -121,7 +118,7 @@ class ATNDeserializer (object):
             s = self.readInt()
             atn.modeToStartState.append(atn.states[s])
 
-    def readSets(self, atn, sets, readUnicode):
+    def readSets(self, atn, sets):
         m = self.readInt()
         for i in range(0, m):
             iset = IntervalSet()
@@ -131,8 +128,8 @@ class ATNDeserializer (object):
             if containsEof!=0:
                 iset.addOne(-1)
             for j in range(0, n):
-                i1 = readUnicode()
-                i2 = readUnicode()
+                i1 = self.readInt()
+                i2 = self.readInt()
                 iset.addRange(Interval(i1, i2 + 1)) # range upper limit is exclusive
 
     def readEdges(self, atn, sets):

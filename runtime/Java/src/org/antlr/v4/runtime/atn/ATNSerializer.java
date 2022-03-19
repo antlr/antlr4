@@ -105,7 +105,7 @@ public class ATNSerializer {
 		addPrecedenceStates();
 		addRuleStatesAndLexerTokenTypes();
 		addModeStartStates();
-		Map<IntervalSet, Integer> setIndices = addSets();
+		Map<IntervalSet, Integer> setIndices = addSetsEncoded16bits();
 		addEdges(nedges, setIndices);
 		addDecisionStartStates();
 		addLexerActions();
@@ -283,6 +283,24 @@ public class ATNSerializer {
 	}
 
 	private Map<IntervalSet, Integer> addSets() {
+		serializeSets(
+				data,
+				sets.keySet(),
+				new CodePointSerializer() {
+					@Override
+					public void serializeCodePoint(IntegerList data, int cp) {
+						data.add(cp);
+					}
+				});
+		Map<IntervalSet, Integer> setIndices = new HashMap<>();
+		int setIndex = 0;
+		for (IntervalSet s : sets.keySet()) {
+			setIndices.put(s, setIndex++);
+		}
+		return setIndices;
+	}
+
+	private Map<IntervalSet, Integer> addSetsEncoded16bits() {
 		List<IntervalSet> bmpSets = new ArrayList<>();
 		List<IntervalSet> smpSets = new ArrayList<>();
 		for (IntervalSet set : sets.keySet()) {
@@ -294,23 +312,23 @@ public class ATNSerializer {
 			}
 		}
 		serializeSets(
-			data,
-			bmpSets,
-			new CodePointSerializer() {
-				@Override
-				public void serializeCodePoint(IntegerList data, int cp) {
-					data.add(cp);
-				}
-			});
+				data,
+				bmpSets,
+				new CodePointSerializer() {
+					@Override
+					public void serializeCodePoint(IntegerList data, int cp) {
+						data.add(cp);
+					}
+				});
 		serializeSets(
-			data,
-			smpSets,
-			new CodePointSerializer() {
-				@Override
-				public void serializeCodePoint(IntegerList data, int cp) {
-					serializeInt(data, cp);
-				}
-			});
+				data,
+				smpSets,
+				new CodePointSerializer() {
+					@Override
+					public void serializeCodePoint(IntegerList data, int cp) {
+						serializeInt(data, cp);
+					}
+				});
 		Map<IntervalSet, Integer> setIndices = new HashMap<>();
 		int setIndex = 0;
 		for (IntervalSet bmpSet : bmpSets) {
