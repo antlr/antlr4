@@ -113,7 +113,9 @@ public class GeneratedLexerDescriptors {
 		result.input = input.toString();
 		result.output = output.toString();
 
-		List<String> all = Arrays.asList("CSharp", "Python2", "Python3", "Cpp", "Go", "PHP", "Swift", "Java", "JavaScript", "Dart");
+		List<String> all = Arrays.asList(
+				"CSharp", "Python2", "Python3", "Cpp", "Go", "PHP", "Swift", "Java", "JavaScript", "Node", "Dart"
+		);
 		result.skipTargets.addAll(all);
 //		result.skipTargets.add("Java"); // can't handle > 16bit states yet
 //		result.skipTargets.add("JavaScript"); // doesn't terminate
