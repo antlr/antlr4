@@ -1,7 +1,9 @@
 package org.antlr.v4.test.runtime;
 
+import java.util.Collections;
+
 public class GeneratedLexerDescriptors {
-	static RuntimeTestDescriptor getLineSeparatorLfTest(String targetName) {
+	static RuntimeTestDescriptor getLineSeparatorLfDescriptor(String targetName) {
 		UniversalRuntimeTestDescriptor result = new UniversalRuntimeTestDescriptor();
 		result.name = "LineSeparatorLf";
 		result.targetName = targetName;
@@ -20,7 +22,7 @@ public class GeneratedLexerDescriptors {
 		return result;
 	}
 
-	static RuntimeTestDescriptor getLineSeparatorCrLfTest(String targetName) {
+	static RuntimeTestDescriptor getLineSeparatorCrLfDescriptor(String targetName) {
 		UniversalRuntimeTestDescriptor result = new UniversalRuntimeTestDescriptor();
 		result.name = "LineSeparatorCrLf";
 		result.targetName = targetName;
@@ -63,6 +65,57 @@ public class GeneratedLexerDescriptors {
 		result.input = "KW400";
 		result.output = "[@0,0:4='KW400',<402>,1:0]\n" +
 				"[@1,5:4='<EOF>',<-1>,1:5]\n";
+		return result;
+	}
+
+	static RuntimeTestDescriptor getAtnStatesSizeMoreThan65535Descriptor(String targetName) {
+		UniversalRuntimeTestDescriptor result = new UniversalRuntimeTestDescriptor();
+		result.name = "AtnStatesSizeMoreThan65535";
+		result.notes = "Regression for https://github.com/antlr/antlr4/issues/1863";
+		result.targetName = targetName;
+		result.testType = "Lexer";
+
+		final int tokensCount = 1024;
+		final String suffix = String.join("", Collections.nCopies(70, "_"));
+
+		String grammarName = "L";
+		StringBuilder grammar = new StringBuilder();
+		grammar.append("lexer grammar ").append(grammarName).append(";\n");
+		grammar.append('\n');
+		StringBuilder input = new StringBuilder();
+		StringBuilder output = new StringBuilder();
+		int startOffset;
+		int stopOffset = -2;
+		for (int i = 0; i < tokensCount; i++) {
+			String ruleName = String.format("T_%06d", i);
+			String value = ruleName+suffix;
+			grammar.append(ruleName).append(": '").append(value).append("';\n");
+			input.append(value).append('\n');
+
+			startOffset = stopOffset + 2;
+			stopOffset += value.length() + 1;
+
+			output.append("[@").append(i).append(',').append(startOffset).append(':').append(stopOffset)
+					.append("='").append(value).append("',<").append(i + 1).append(">,").append(i + 1)
+					.append(":0]\n");
+		}
+
+		grammar.append("\n");
+		grammar.append("WS: [ \\t\\r\\n]+ -> skip;\n");
+
+		startOffset = stopOffset + 2;
+		stopOffset = startOffset - 1;
+		output.append("[@").append(tokensCount).append(',').append(startOffset).append(':').append(stopOffset)
+				.append("='<EOF>',<-1>,").append(tokensCount + 1).append(":0]\n");
+
+		result.grammar = grammar.toString();
+		result.grammarName = grammarName;
+		result.input = input.toString();
+		result.output = output.toString();
+
+		result.skipTargets.add("Java"); // can't handle > 16bit states yet
+		result.skipTargets.add("JavaScript"); // doesn't terminate
+		result.skipTargets.add("Go"); // syntax error
 		return result;
 	}
 }

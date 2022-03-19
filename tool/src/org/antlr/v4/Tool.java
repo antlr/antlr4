@@ -19,6 +19,7 @@ import org.antlr.v4.automata.ParserATNFactory;
 import org.antlr.v4.codegen.CodeGenPipeline;
 import org.antlr.v4.codegen.CodeGenerator;
 import org.antlr.v4.misc.Graph;
+import org.antlr.v4.misc.Utils;
 import org.antlr.v4.parse.ANTLRParser;
 import org.antlr.v4.parse.GrammarASTAdaptor;
 import org.antlr.v4.parse.GrammarTreeVisitor;
@@ -741,7 +742,7 @@ public class Tool {
 		IntegerList serializedATN = ATNSerializer.getSerialized(g.atn, g.getLanguage());
 		// Uncomment if you'd like to write out histogram info on the numbers of
 		// each integer value:
-		// Utils.writeSerializedATNIntegerHistogram(g.name+"-histo.csv", serializedATN);
+		Utils.writeSerializedATNIntegerHistogram(g.name+"-histo.csv", serializedATN);
 
 		content.append("atn:\n");
 		content.append(serializedATN.toString());

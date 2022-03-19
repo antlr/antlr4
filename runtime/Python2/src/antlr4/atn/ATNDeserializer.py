@@ -67,9 +67,6 @@ class ATNDeserializer (object):
                 atn.addState(None)
                 continue
             ruleIndex = self.readInt()
-            if ruleIndex == 0xFFFF:
-                ruleIndex = -1
-
             s = self.stateFactory(stype, ruleIndex)
             if stype == ATNState.LOOP_END: # special case
                 loopBackStateNumber = self.readInt()
@@ -109,9 +106,6 @@ class ATNDeserializer (object):
             atn.ruleToStartState[i] = startState
             if atn.grammarType == ATNType.LEXER:
                 tokenType = self.readInt()
-                if tokenType == 0xFFFF:
-                    tokenType = Token.EOF
-
                 atn.ruleToTokenType[i] = tokenType
 
         atn.ruleToStopState = [0] * nrules
@@ -203,11 +197,7 @@ class ATNDeserializer (object):
             for i in range(0, count):
                 actionType = self.readInt()
                 data1 = self.readInt()
-                if data1 == 0xFFFF:
-                    data1 = -1
                 data2 = self.readInt()
-                if data2 == 0xFFFF:
-                    data2 = -1
                 lexerAction = self.lexerActionFactory(actionType, data1, data2)
                 atn.lexerActions[i] = lexerAction
 

@@ -190,15 +190,7 @@ namespace Antlr4.Runtime.Atn
 				{
 					LexerActionType actionType = (LexerActionType)ReadInt();
 					int data1 = ReadInt();
-					if (data1 == unchecked((int)(0xFFFF)))
-					{
-						data1 = -1;
-					}
 					int data2 = ReadInt();
-					if (data2 == unchecked((int)(0xFFFF)))
-					{
-						data2 = -1;
-					}
 					ILexerAction lexerAction = LexerActionFactory(actionType, data1, data2);
 					atn.lexerActions[i_10] = lexerAction;
 				}
@@ -369,9 +361,6 @@ namespace Antlr4.Runtime.Atn
 				atn.ruleToStartState[i_5] = startState;
 				if (atn.grammarType == ATNType.Lexer) {
 					int tokenType = ReadInt ();
-					if (tokenType == unchecked((int)(0xFFFF))) {
-						tokenType = TokenConstants.EOF;
-					}
 					atn.ruleToTokenType [i_5] = tokenType;
 				}
 			}

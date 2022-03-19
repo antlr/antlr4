@@ -130,9 +130,6 @@ class ATNDeserializer {
       }
 
       var ruleIndex = readInt();
-      if (ruleIndex == 0xFFFF) {
-        ruleIndex = -1;
-      }
 
       final s = stateFactory(stype, ruleIndex);
       if (s is LoopEndState) {
@@ -180,9 +177,6 @@ class ATNDeserializer {
       atn.ruleToStartState.add(startState);
       if (atn.grammarType == ATNType.LEXER) {
         var tokenType = readInt();
-        if (tokenType == 0xFFFF) {
-          tokenType = Token.EOF;
-        }
 
         atn.ruleToTokenType.add(tokenType);
       }
@@ -321,14 +315,7 @@ class ATNDeserializer {
       atn.lexerActions = List<LexerAction>.generate(readInt(), (index) {
         final actionType = LexerActionType.values[readInt()];
         var data1 = readInt();
-        if (data1 == 0xFFFF) {
-          data1 = -1;
-        }
-
         var data2 = readInt();
-        if (data2 == 0xFFFF) {
-          data2 = -1;
-        }
         final lexerAction = lexerActionFactory(actionType, data1, data2);
 
         return lexerAction;

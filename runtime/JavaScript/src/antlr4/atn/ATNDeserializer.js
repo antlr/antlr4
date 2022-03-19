@@ -125,9 +125,6 @@ class ATNDeserializer {
                 continue;
             }
             let ruleIndex = this.readInt();
-            if (ruleIndex === 0xFFFF) {
-                ruleIndex = -1;
-            }
             const  s = this.stateFactory(stype, ruleIndex);
             if (stype === ATNState.LOOP_END) { // special case
                 const  loopBackStateNumber = this.readInt();
@@ -175,9 +172,6 @@ class ATNDeserializer {
             atn.ruleToStartState[i] = atn.states[s];
             if ( atn.grammarType === ATNType.LEXER ) {
                 let tokenType = this.readInt();
-                if (tokenType === 0xFFFF) {
-                    tokenType = Token.EOF;
-                }
                 atn.ruleToTokenType[i] = tokenType;
             }
         }
@@ -301,14 +295,7 @@ class ATNDeserializer {
             for (let i=0; i<count; i++) {
                 const actionType = this.readInt();
                 let data1 = this.readInt();
-                if (data1 === 0xFFFF) {
-                    data1 = -1;
-                }
                 let data2 = this.readInt();
-                if (data2 === 0xFFFF) {
-                    data2 = -1;
-                }
-
                 atn.lexerActions[i] = this.lexerActionFactory(actionType, data1, data2);
             }
         }

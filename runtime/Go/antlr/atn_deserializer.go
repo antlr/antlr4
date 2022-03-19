@@ -553,7 +553,7 @@ func (a *ATNDeserializer) readInt() int {
 
 	a.pos++
 
-	return int(v)
+	return v
 }
 
 func (a *ATNDeserializer) readInt32() int {
