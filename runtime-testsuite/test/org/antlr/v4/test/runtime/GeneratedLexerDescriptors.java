@@ -120,10 +120,10 @@ public class GeneratedLexerDescriptors {
 //		);
 //		result.skipTargets.addAll(all);
 
-//		result.skipTargets.add("Java"); // can't handle > 16bit states yet
-//		result.skipTargets.add("Node"); // doesn't terminate
-//		result.skipTargets.add("PHP"); // "Allowed memory size of 134217728 bytes exhausted (tried to allocate 16384 bytes)..."
-//		result.skipTargets.add("Go"); // syntax error
+		result.skipTargets.add("Java"); // can't handle > 16bit states yet
+		result.skipTargets.add("Node"); // doesn't terminate
+		result.skipTargets.add("PHP"); // "Allowed memory size of 134217728 bytes exhausted (tried to allocate 16384 bytes)..."
+		result.skipTargets.add("Go"); // syntax error
 		return result;
 	}
 }
