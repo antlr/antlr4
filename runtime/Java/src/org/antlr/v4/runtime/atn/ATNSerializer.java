@@ -76,50 +76,35 @@ public class ATNSerializer {
 	 *  Convenient to pack into unsigned shorts to make as Java string.
 	 */
 	public IntegerList serialize() {
+		addPreamble();
+		int nedges = addEdges();
+		addNonGreedyStates();
+		addPrecedenceStates();
+		addRuleStatesAndLexerTokenTypes();
+		addModeStartStates();
+		Map<IntervalSet, Integer> setIndices = null;
 		if ( language.equals("Java") ) {
-			return serializeAsUInt16ForJava();
+			setIndices = addSetsEncoded16bits();
 		}
-		return serializeAsSignedInts();
-	}
-
-	public IntegerList serializeAsSignedInts() {
-		addPreamble();
-		int nedges = addEdges();
-		addNonGreedyStates();
-		addPrecedenceStates();
-		addRuleStatesAndLexerTokenTypes();
-		addModeStartStates();
-		Map<IntervalSet, Integer> setIndices = addSets();
+		else {
+			setIndices = addSets();
+		}
 		addEdges(nedges, setIndices);
 		addDecisionStartStates();
 		addLexerActions();
 
-		return data;
-	}
+		if ( language.equals("Java") ) {
+			for (int i = 1; i < data.size(); i++) {
+				int value = data.get(i);
+				if (value < Character.MIN_VALUE || value > Character.MAX_VALUE) {
+					throw new UnsupportedOperationException("Serialized ATN data element " +
+							value + " element " + i + " out of range " + (int) Character.MIN_VALUE + ".." + (int) Character.MAX_VALUE);
+				}
 
-	public IntegerList serializeAsUInt16ForJava() {
-		// TODO: reuse serializeAsSignedInts() entirely?
-		addPreamble();
-		int nedges = addEdges();
-		addNonGreedyStates();
-		addPrecedenceStates();
-		addRuleStatesAndLexerTokenTypes();
-		addModeStartStates();
-		Map<IntervalSet, Integer> setIndices = addSetsEncoded16bits();
-		addEdges(nedges, setIndices);
-		addDecisionStartStates();
-		addLexerActions();
-
-		for (int i = 1; i < data.size(); i++) {
-			int value = data.get(i);
-			if (value < Character.MIN_VALUE || value > Character.MAX_VALUE) {
-				throw new UnsupportedOperationException("Serialized ATN data element " +
-						value + " element " + i + " out of range " + (int) Character.MIN_VALUE + ".." + (int) Character.MAX_VALUE);
+				// Shift by 2, to avoid inefficient modified utf-8 and coding done by java class files
+				data.set(i, (value + 2) & 0xFFFF);
 			}
-
-			data.set(i, (value + 2) & 0xFFFF);
 		}
-
 		return data;
 	}
 
