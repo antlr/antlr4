@@ -75,6 +75,8 @@ public class GeneratedLexerDescriptors {
 		result.targetName = targetName;
 		result.testType = "Lexer";
 
+		// I tried playing around with different sizes and I think 1002 works but 1003 does not;
+		// the executing lexer gets a token syntax error for T208 or something like that
 		final int tokensCount = 1024;
 		final String suffix = String.join("", Collections.nCopies(70, "_"));
 
