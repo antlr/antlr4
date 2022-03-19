@@ -17,5 +17,6 @@ python3 --version
 
 pushd runtime-testsuite
   echo "running maven tests..."
+  export MAVEN_OPTS="-Xmx2g"
   mvn -Dparallel=classes -DthreadCount=4 -Dtest=python3.** test
 popd
