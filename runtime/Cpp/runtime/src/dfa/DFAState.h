@@ -37,7 +37,7 @@ namespace dfa {
   /// </summary>
   class ANTLR4CPP_PUBLIC DFAState final {
   public:
-    class PredPrediction final {
+    class ANTLR4CPP_PUBLIC PredPrediction final {
     public:
       Ref<const atn::SemanticContext> pred; // never null; at least SemanticContext.NONE
       int alt;

@@ -17,27 +17,14 @@ namespace atn {
   /// "dup" of ParserInterpreter
   class ANTLR4CPP_PUBLIC LexerATNSimulator : public ATNSimulator {
   protected:
-    class SimState {
-    public:
-      virtual ~SimState();
+    struct ANTLR4CPP_PUBLIC SimState final {
+      size_t index = INVALID_INDEX;
+      size_t line = 0;
+      size_t charPos = INVALID_INDEX;
+      dfa::DFAState *dfaState = nullptr;
 
-    protected:
-      size_t index;
-      size_t line;
-      size_t charPos;
-      dfa::DFAState *dfaState;
-      virtual void reset();
-      friend class LexerATNSimulator;
-
-    private:
-      void InitializeInstanceFields();
-
-    public:
-      SimState() {
-        InitializeInstanceFields();
-      }
+      void reset();
     };
-
 
   public:
     static constexpr size_t MIN_DFA_EDGE = 0;

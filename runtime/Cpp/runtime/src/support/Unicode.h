@@ -5,9 +5,11 @@
 
 #pragma once
 
+#include "antlr4-common.h"
+
 namespace antlrcpp {
 
-  class Unicode final {
+  class ANTLR4CPP_PUBLIC Unicode final {
   public:
     static constexpr char32_t REPLACEMENT_CHARACTER = 0xfffd;
 
@@ -17,10 +19,10 @@ namespace antlrcpp {
 
   private:
     Unicode() = delete;
-
     Unicode(const Unicode&) = delete;
-
+    Unicode(Unicode&&) = delete;
     Unicode& operator=(const Unicode&) = delete;
+    Unicode& operator=(Unicode&&) = delete;
   };
 
 }

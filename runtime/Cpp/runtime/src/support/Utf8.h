@@ -10,9 +10,11 @@
 #include <string_view>
 #include <tuple>
 
+#include "antlr4-common.h"
+
 namespace antlrcpp {
 
-  class Utf8 final {
+  class ANTLR4CPP_PUBLIC Utf8 final {
   public:
     // Decodes the next code point, returning the decoded code point and the number
     // of code units (a.k.a. bytes) consumed. In the event that an invalid code unit
@@ -43,10 +45,10 @@ namespace antlrcpp {
 
   private:
     Utf8() = delete;
-
     Utf8(const Utf8&) = delete;
-
+    Utf8(Utf8&&) = delete;
     Utf8& operator=(const Utf8&) = delete;
+    Utf8& operator=(Utf8&&) = delete;
   };
 
 }

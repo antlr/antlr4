@@ -9,8 +9,8 @@
 
 namespace antlrcpp {
 
-  std::string escapeWhitespace(std::string_view in);
+  ANTLR4CPP_PUBLIC std::string escapeWhitespace(std::string_view in);
 
-  std::string& escapeWhitespace(std::string& out, std::string_view in);
+  ANTLR4CPP_PUBLIC std::string& escapeWhitespace(std::string& out, std::string_view in);
 
 }
