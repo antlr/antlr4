@@ -23,7 +23,7 @@ type blockStartStateIntPair struct {
 
 type ATNDeserializer struct {
 	options *ATNDeserializationOptions
-	data    []int
+	data    []int32
 	pos     int
 }
 
@@ -45,7 +45,7 @@ func stringInSlice(a string, list []string) int {
 	return -1
 }
 
-func (a *ATNDeserializer) Deserialize(data []int) *ATN {
+func (a *ATNDeserializer) Deserialize(data []int32) *ATN {
 	a.data = data
 	a.pos = 0
 	a.checkVersion()
@@ -56,10 +56,7 @@ func (a *ATNDeserializer) Deserialize(data []int) *ATN {
 	a.readRules(atn)
 	a.readModes(atn)
 
-	// First, deserialize sets with 16-bit arguments <= U+FFFF.
-	sets := a.readSets(atn, nil, a.readInt)
-	// Next, deserialize sets with 32-bit arguments <= U+10FFFF.
-	sets = a.readSets(atn, sets, a.readInt32)
+	sets := a.readSets(atn, nil)
 
 	a.readEdges(atn, sets)
 	a.readDecisions(atn)
@@ -196,7 +193,7 @@ func (a *ATNDeserializer) readModes(atn *ATN) {
 	}
 }
 
-func (a *ATNDeserializer) readSets(atn *ATN, sets []*IntervalSet, readUnicode func() int) []*IntervalSet {
+func (a *ATNDeserializer) readSets(atn *ATN, sets []*IntervalSet) []*IntervalSet {
 	m := a.readInt()
 
 	// Preallocate the needed capacity.
@@ -219,8 +216,8 @@ func (a *ATNDeserializer) readSets(atn *ATN, sets []*IntervalSet, readUnicode fu
 		}
 
 		for j := 0; j < n; j++ {
-			i1 := readUnicode()
-			i2 := readUnicode()
+			i1 := a.readInt()
+			i2 := a.readInt()
 
 			iset.addRange(i1, i2)
 		}
@@ -553,13 +550,7 @@ func (a *ATNDeserializer) readInt() int {
 
 	a.pos++
 
-	return v
-}
-
-func (a *ATNDeserializer) readInt32() int {
-	var low = a.readInt()
-	var high = a.readInt()
-	return low | (high << 16)
+	return int(v) // data is 32 bits but int is at least that big
 }
 
 func (a *ATNDeserializer) edgeFactory(atn *ATN, typeIndex, src, trg, arg1, arg2, arg3 int, sets []*IntervalSet) Transition {

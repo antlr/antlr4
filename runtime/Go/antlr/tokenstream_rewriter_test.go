@@ -328,7 +328,7 @@ func TestLexerA(t *testing.T){
 var _ = fmt.Printf
 var _ = unicode.IsLetter
 
-var serializedLexerAtn = []uint16{
+var serializedLexerAtn = []int32{
 	4, 0, 3, 13, 6, 65535, 2, 0, 7, 0, 2, 1, 7, 1, 2, 2, 7, 2, 1, 0, 1, 0,
 	1, 1, 1, 1, 1, 2, 1, 2, 0, 0, 3, 1, 1, 3, 2, 5, 3, 1, 0, 0, 0, 12, 0, 1,
 	1, 0, 0, 0, 0, 3, 1, 0, 0, 0, 0, 5, 1, 0, 0, 0, 1, 7, 1, 0, 0, 0, 3, 9,

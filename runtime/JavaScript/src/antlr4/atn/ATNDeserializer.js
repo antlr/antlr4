@@ -82,10 +82,7 @@ class ATNDeserializer {
         this.readRules(atn);
         this.readModes(atn);
         const sets = [];
-        // First, deserialize sets with 16-bit arguments <= U+FFFF.
-        this.readSets(atn, sets, this.readInt.bind(this));
-        // Next, deserialize sets with 32-bit arguments <= U+10FFFF.
-        this.readSets(atn, sets, this.readInt32.bind(this));
+        this.readSets(atn, sets);
         this.readEdges(atn, sets);
         this.readDecisions(atn);
         this.readLexerActions(atn);
@@ -194,7 +191,7 @@ class ATNDeserializer {
         }
     }
 
-    readSets(atn, sets, readUnicode) {
+    readSets(atn, sets) {
         const m = this.readInt();
         for (let i=0; i<m; i++) {
             const iset = new IntervalSet();
@@ -205,8 +202,8 @@ class ATNDeserializer {
                 iset.addOne(-1);
             }
             for (let j=0; j<n; j++) {
-                const i1 = readUnicode();
-                const i2 = readUnicode();
+                const i1 = this.readInt();
+                const i2 = this.readInt();
                 iset.addRange(i1, i2);
             }
         }
@@ -482,12 +479,6 @@ class ATNDeserializer {
 
     readInt() {
         return this.data[this.pos++];
-    }
-
-    readInt32() {
-        const low = this.readInt();
-        const high = this.readInt();
-        return low | (high << 16);
     }
 
     edgeFactory(atn, type, src, trg, arg1, arg2, arg3, sets) {

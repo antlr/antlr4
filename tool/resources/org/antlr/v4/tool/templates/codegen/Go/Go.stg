@@ -151,7 +151,7 @@ type <parser.name> struct {
 
 var <parser.grammarName; format="lower">ParserStaticData struct {
   once                   sync.Once
-  serializedATN          []uint16
+  serializedATN          []int32
   literalNames           []string
   symbolicNames          []string
   ruleNames              []string
@@ -180,7 +180,7 @@ func <parser.grammarName; format="lower">ParserInit() {
   staticData.predictionContextCache = antlr.NewPredictionContextCache()
   staticData.serializedATN = <atn>
   deserializer := antlr.NewATNDeserializer(nil)
-  staticData.atn = deserializer.DeserializeFromUInt16(staticData.serializedATN)
+  staticData.atn = deserializer.Deserialize(staticData.serializedATN)
   atn := staticData.atn
   staticData.decisionToDFA = make([]*antlr.DFA, len(atn.DecisionToState))
   decisionToDFA := staticData.decisionToDFA
@@ -1424,7 +1424,7 @@ type <lexer.name> struct {
 
 var <lexer.grammarName; format="lower">LexerStaticData struct {
   once                   sync.Once
-  serializedATN          []uint16
+  serializedATN          []int32
   channelNames           []string
   modeNames              []string
   literalNames           []string
@@ -1461,7 +1461,7 @@ func <lexer.grammarName; format="lower">LexerInit() {
   staticData.predictionContextCache = antlr.NewPredictionContextCache()
   staticData.serializedATN = <atn>
   deserializer := antlr.NewATNDeserializer(nil)
-  staticData.atn = deserializer.DeserializeFromUInt16(staticData.serializedATN)
+  staticData.atn = deserializer.Deserialize(staticData.serializedATN)
   atn := staticData.atn
   staticData.decisionToDFA = make([]*antlr.DFA, len(atn.DecisionToState))
   decisionToDFA := staticData.decisionToDFA
@@ -1541,7 +1541,7 @@ const <lexer.name><first(rest(lexer.escapedModeNames))> = 1
 >>
 
 SerializedATN(model) ::= <<
-<if(model.serialized)>[]uint16{
+<if(model.serialized)>[]int32{
 	<model.serialized; separator=", ", wrap>,
 }<endif>
 >>

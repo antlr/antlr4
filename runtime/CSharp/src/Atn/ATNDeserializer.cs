@@ -45,8 +45,7 @@ namespace Antlr4.Runtime.Atn
 			ReadRules (atn);
 			ReadModes (atn);
 			IList<IntervalSet> sets = new List<IntervalSet>();
-			ReadSets (atn, sets, ReadInt);
-	        ReadSets (atn, sets, ReadInt32);
+			ReadSets (atn, sets);
 	        ReadEdges (atn, sets);
 			ReadDecisions (atn);
 			ReadLexerActions (atn);
@@ -301,7 +300,7 @@ namespace Antlr4.Runtime.Atn
 			}
 		}
 
-		protected internal virtual void ReadSets(ATN atn, IList<IntervalSet> sets, System.Func<int> readUnicode)
+		protected internal virtual void ReadSets(ATN atn, IList<IntervalSet> sets)
 		{
 			//
 			// SETS
@@ -319,7 +318,7 @@ namespace Antlr4.Runtime.Atn
 				}
 				for (int j = 0; j < nintervals; j++)
 				{
-					set.Add(readUnicode(), readUnicode());
+					set.Add(ReadInt(), ReadInt());
 				}
 			}
 		}
@@ -954,11 +953,6 @@ nextTransition_continue: ;
         protected internal int ReadInt()
         {
 			return data[p++];
-        }
-
-        protected internal int ReadInt32()
-        {
-			return (int)data[p++] | ((int)data[p++] << 16);
         }
 
         [return: NotNull]

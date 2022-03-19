@@ -16,7 +16,6 @@ public class ATNDeserializer {
     }
 
     public func deserialize(_ data: [Int]) throws -> ATN {
-//         let data = str.utf16.map { element in Int(element) }
         var p = 0
 
         let version = data[p]
@@ -131,11 +130,7 @@ public class ATNDeserializer {
         //
         var sets = [IntervalSet]()
 
-        // First, deserialize sets with 16-bit arguments <= U+FFFF.
-        readSets(data, &p, &sets, readUnicodeInt)
-
-        // Next, deserialize sets with 32-bit arguments <= U+10FFFF.
-        readSets(data, &p, &sets, readUnicodeInt32)
+        readSets(data, &p, &sets, readInt)
 
         //
         // EDGES
@@ -198,15 +193,9 @@ public class ATNDeserializer {
         return atn
     }
 
-    private func readUnicodeInt(_ data: [Int], _ p: inout Int) -> Int {
+    private func readInt(_ data: [Int], _ p: inout Int) -> Int {
         let result = data[p]
         p += 1
-        return result
-    }
-
-    private func readUnicodeInt32(_ data: [Int], _ p: inout Int) -> Int {
-        let result = toInt32(data[p..<p+2].map{Character(UnicodeScalar($0)!)}, 0)
-        p += 2
         return result
     }
 
