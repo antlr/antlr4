@@ -15,6 +15,22 @@ public class SerializedJavaATN extends SerializedATN {
 		super(factory);
 		Target target = factory.getGenerator().getTarget();
 		IntegerList data = ATNSerializer.getSerialized(atn, target.getLanguage());
+
+		// Flip -1 to 0xFFFF and shift by 2
+		for (int i = 1; i < data.size(); i++) {
+			int value = data.get(i);
+			if ( value==-1 ) {
+				value = 0xFFFF;
+			}
+			if (value < Character.MIN_VALUE || value > Character.MAX_VALUE) {
+				throw new UnsupportedOperationException("Serialized ATN data element " +
+						value + " element " + i + " out of range " + (int) Character.MIN_VALUE + ".." + (int) Character.MAX_VALUE);
+			}
+
+			// Shift by 2, to avoid inefficient modified utf-8 and coding done by java class files
+			data.set(i, (value + 2) & 0xFFFF);
+		}
+
 		int size = data.size();
 		int segmentLimit = target.getSerializedATNSegmentLimit();
 		segments = new String[(int)(((long)size + segmentLimit - 1) / segmentLimit)][];

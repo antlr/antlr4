@@ -93,18 +93,6 @@ public class ATNSerializer {
 		addDecisionStartStates();
 		addLexerActions();
 
-		if ( language.equals("Java") ) {
-			for (int i = 1; i < data.size(); i++) {
-				int value = data.get(i);
-				if (value < Character.MIN_VALUE || value > Character.MAX_VALUE) {
-					throw new UnsupportedOperationException("Serialized ATN data element " +
-							value + " element " + i + " out of range " + (int) Character.MIN_VALUE + ".." + (int) Character.MAX_VALUE);
-				}
-
-				// Shift by 2, to avoid inefficient modified utf-8 and coding done by java class files
-				data.set(i, (value + 2) & 0xFFFF);
-			}
-		}
 		return data;
 	}
 
@@ -124,20 +112,20 @@ public class ATNSerializer {
 				switch (action.getActionType()) {
 				case CHANNEL:
 					int channel = ((LexerChannelAction)action).getChannel();
-					data.add(encodeInt(channel));
+					data.add(channel);
 					data.add(0);
 					break;
 
 				case CUSTOM:
 					int ruleIndex = ((LexerCustomAction)action).getRuleIndex();
 					int actionIndex = ((LexerCustomAction)action).getActionIndex();
-					data.add(encodeInt(ruleIndex));
-					data.add(encodeInt(actionIndex));
+					data.add(ruleIndex);
+					data.add(actionIndex);
 					break;
 
 				case MODE:
 					int mode = ((LexerModeAction)action).getMode();
-					data.add(encodeInt(mode));
+					data.add(mode);
 					data.add(0);
 					break;
 
@@ -153,7 +141,7 @@ public class ATNSerializer {
 
 				case PUSH_MODE:
 					mode = ((LexerPushModeAction)action).getMode();
-					data.add(encodeInt(mode));
+					data.add(mode);
 					data.add(0);
 					break;
 
@@ -164,7 +152,7 @@ public class ATNSerializer {
 
 				case TYPE:
 					int type = ((LexerTypeAction)action).getType();
-					data.add(encodeInt(type));
+					data.add(type);
 					data.add(0);
 					break;
 
@@ -244,7 +232,7 @@ public class ATNSerializer {
 					case Transition.ACTION :
 						ActionTransition at = (ActionTransition)t;
 						arg1 = at.ruleIndex;
-						arg2 = encodeInt(at.actionIndex);
+						arg2 = at.actionIndex;
 						arg3 = at.isCtxDependent ? 1 : 0 ;
 						break;
 					case Transition.SET :
@@ -382,7 +370,7 @@ public class ATNSerializer {
 
 			data.add(stateType);
 
-			data.add(encodeInt(s.ruleIndex));
+			data.add(s.ruleIndex);
 
 			if ( s.getStateType() == ATNState.LOOP_END ) {
 				data.add(((LoopEndState)s).loopBackState.stateNumber);
@@ -444,6 +432,7 @@ public class ATNSerializer {
 		}
 	}
 
+	/** For testing really;Gives a human readable version of the ATN */
 	public String decode(char[] data) {
 		data = data.clone();
 		// don't adjust the first value since that's the version number
@@ -636,12 +625,5 @@ public class ATNSerializer {
 	private void serializeInt(IntegerList data, int value) {
 		data.add((char)value);
 		data.add((char)(value >> 16));
-	}
-
-	private int encodeInt(int v) {
-		if ( language.equals("Java") && v==-1 ) {
-			return 0xFFFF;
-		}
-		return v;
 	}
 }

@@ -15,7 +15,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-/**
+/** Deserialize ATNs for JavaTarget; it's complicated by the fact that java requires
+ *  that we serialize the list of integers as 16 bit characters in a string. Other
+ *  targets will have an array of editors generated and can simply decode the ints
+ *  back into an ATN.
  *
  * @author Sam Harwell
  */
@@ -27,6 +30,7 @@ public class ATNDeserializer {
 
 	interface UnicodeDeserializer {
 		// Wrapper for readInt() or readInt32()
+		int readUnicode(int[] data, int p);
 		int readUnicode(char[] data, int p);
 
 		// Work around Java not allowing mutation of captured variables
@@ -46,6 +50,10 @@ public class ATNDeserializer {
 				public int readUnicode(char[] data, int p) {
 					return toInt(data[p]);
 				}
+				@Override
+				public int readUnicode(int[] data, int p) {
+					return data[p];
+				}
 
 				@Override
 				public int size() {
@@ -57,6 +65,10 @@ public class ATNDeserializer {
 			return new UnicodeDeserializer() {
 				@Override
 				public int readUnicode(char[] data, int p) {
+					return toInt32(data, p);
+				}
+				@Override
+				public int readUnicode(int[] data, int p) {
 					return toInt32(data, p);
 				}
 
@@ -83,20 +95,26 @@ public class ATNDeserializer {
 	}
 
 	public ATN deserialize(char[] data) {
-		data = data.clone();
+		// Convert to ints, 0xFFFF -> -1, shift back down by 2
+		int[] dataI = new int[data.length];
+		dataI[0] = data[0]; // don't mess with version num
 		for (int i = 1; i < data.length; i++) {
-			data[i] = (char) (data[i] - 2);
+			int v = data[i];
+			dataI[i] = (v==0xFFFF) ? -1 : v - 2;
 		}
+		return deserialize(dataI);
+	}
 
+	public ATN deserialize(int[] data) {
 		int p = 0;
-		int version = toInt(data[p++]);
+		int version = data[p++];
 		if (version != SERIALIZED_VERSION) {
 			String reason = String.format(Locale.getDefault(), "Could not deserialize ATN with version %d (expected %d).", version, SERIALIZED_VERSION);
 			throw new UnsupportedOperationException(new InvalidClassException(ATN.class.getName(), reason));
 		}
 
-		ATNType grammarType = ATNType.values()[toInt(data[p++])];
-		int maxTokenType = toInt(data[p++]);
+		ATNType grammarType = ATNType.values()[data[p++]];
+		int maxTokenType = data[p++];
 		ATN atn = new ATN(grammarType, maxTokenType);
 
 		//
@@ -104,27 +122,23 @@ public class ATNDeserializer {
 		//
 		List<Pair<LoopEndState, Integer>> loopBackStateNumbers = new ArrayList<Pair<LoopEndState, Integer>>();
 		List<Pair<BlockStartState, Integer>> endStateNumbers = new ArrayList<Pair<BlockStartState, Integer>>();
-		int nstates = toInt(data[p++]);
+		int nstates = data[p++];
 		for (int i=0; i<nstates; i++) {
-			int stype = toInt(data[p++]);
+			int stype = data[p++];
 			// ignore bad type of states
 			if ( stype==ATNState.INVALID_TYPE ) {
 				atn.addState(null);
 				continue;
 			}
 
-			int ruleIndex = toInt(data[p++]);
-			if (ruleIndex == Character.MAX_VALUE) {
-				ruleIndex = -1;
-			}
-
+			int ruleIndex = data[p++];
 			ATNState s = stateFactory(stype, ruleIndex);
 			if ( stype == ATNState.LOOP_END ) { // special case
-				int loopBackStateNumber = toInt(data[p++]);
+				int loopBackStateNumber = data[p++];
 				loopBackStateNumbers.add(new Pair<LoopEndState, Integer>((LoopEndState)s, loopBackStateNumber));
 			}
 			else if (s instanceof BlockStartState) {
-				int endStateNumber = toInt(data[p++]);
+				int endStateNumber = data[p++];
 				endStateNumbers.add(new Pair<BlockStartState, Integer>((BlockStartState)s, endStateNumber));
 			}
 			atn.addState(s);
@@ -139,37 +153,33 @@ public class ATNDeserializer {
 			pair.a.endState = (BlockEndState)atn.states.get(pair.b);
 		}
 
-		int numNonGreedyStates = toInt(data[p++]);
+		int numNonGreedyStates = data[p++];
 		for (int i = 0; i < numNonGreedyStates; i++) {
-			int stateNumber = toInt(data[p++]);
+			int stateNumber = data[p++];
 			((DecisionState)atn.states.get(stateNumber)).nonGreedy = true;
 		}
 
-		int numPrecedenceStates = toInt(data[p++]);
+		int numPrecedenceStates = data[p++];
 		for (int i = 0; i < numPrecedenceStates; i++) {
-			int stateNumber = toInt(data[p++]);
+			int stateNumber = data[p++];
 			((RuleStartState)atn.states.get(stateNumber)).isLeftRecursiveRule = true;
 		}
 
 		//
 		// RULES
 		//
-		int nrules = toInt(data[p++]);
+		int nrules = data[p++];
 		if ( atn.grammarType == ATNType.LEXER ) {
 			atn.ruleToTokenType = new int[nrules];
 		}
 
 		atn.ruleToStartState = new RuleStartState[nrules];
 		for (int i=0; i<nrules; i++) {
-			int s = toInt(data[p++]);
+			int s = data[p++];
 			RuleStartState startState = (RuleStartState)atn.states.get(s);
 			atn.ruleToStartState[i] = startState;
 			if ( atn.grammarType == ATNType.LEXER ) {
-				int tokenType = toInt(data[p++]);
-				if (tokenType == 0xFFFF) {
-					tokenType = Token.EOF;
-				}
-
+				int tokenType = data[p++];
 				atn.ruleToTokenType[i] = tokenType;
 			}
 		}
@@ -188,9 +198,9 @@ public class ATNDeserializer {
 		//
 		// MODES
 		//
-		int nmodes = toInt(data[p++]);
+		int nmodes = data[p++];
 		for (int i=0; i<nmodes; i++) {
-			int s = toInt(data[p++]);
+			int s = data[p++];
 			atn.modeToStartState.add((TokensStartState)atn.states.get(s));
 		}
 
@@ -208,14 +218,14 @@ public class ATNDeserializer {
 		//
 		// EDGES
 		//
-		int nedges = toInt(data[p++]);
+		int nedges = data[p++];
 		for (int i=0; i<nedges; i++) {
-			int src = toInt(data[p]);
-			int trg = toInt(data[p+1]);
-			int ttype = toInt(data[p+2]);
-			int arg1 = toInt(data[p+3]);
-			int arg2 = toInt(data[p+4]);
-			int arg3 = toInt(data[p+5]);
+			int src = data[p];
+			int trg = data[p+1];
+			int ttype = data[p+2];
+			int arg1 = data[p+3];
+			int arg2 = data[p+4];
+			int arg3 = data[p+5];
 			Transition trans = edgeFactory(atn, ttype, src, trg, arg1, arg2, arg3, sets);
 //			System.out.println("EDGE "+trans.getClass().getSimpleName()+" "+
 //							   src+"->"+trg+
@@ -285,9 +295,9 @@ public class ATNDeserializer {
 		//
 		// DECISIONS
 		//
-		int ndecisions = toInt(data[p++]);
+		int ndecisions = data[p++];
 		for (int i=1; i<=ndecisions; i++) {
-			int s = toInt(data[p++]);
+			int s = data[p++];
 			DecisionState decState = (DecisionState)atn.states.get(s);
 			atn.decisionToState.add(decState);
 			decState.decision = i-1;
@@ -297,18 +307,11 @@ public class ATNDeserializer {
 		// LEXER ACTIONS
 		//
 		if (atn.grammarType == ATNType.LEXER) {
-			atn.lexerActions = new LexerAction[toInt(data[p++])];
+			atn.lexerActions = new LexerAction[data[p++]];
 			for (int i = 0; i < atn.lexerActions.length; i++) {
-				LexerActionType actionType = LexerActionType.values()[toInt(data[p++])];
-				int data1 = toInt(data[p++]);
-				if (data1 == 0xFFFF) {
-					data1 = -1;
-				}
-
-				int data2 = toInt(data[p++]);
-				if (data2 == 0xFFFF) {
-					data2 = -1;
-				}
+				LexerActionType actionType = LexerActionType.values()[data[p++]];
+				int data1 = data[p++];
+				int data2 = data[p++];
 
 				LexerAction lexerAction = lexerActionFactory(actionType, data1, data2);
 
@@ -415,15 +418,15 @@ public class ATNDeserializer {
 		return atn;
 	}
 
-	private int deserializeSets(char[] data, int p, List<IntervalSet> sets, UnicodeDeserializer unicodeDeserializer) {
-		int nsets = toInt(data[p++]);
+	private int deserializeSets(int[] data, int p, List<IntervalSet> sets, UnicodeDeserializer unicodeDeserializer) {
+		int nsets = data[p++];
 		for (int i=0; i<nsets; i++) {
-			int nintervals = toInt(data[p]);
+			int nintervals = data[p];
 			p++;
 			IntervalSet set = new IntervalSet();
 			sets.add(set);
 
-			boolean containsEof = toInt(data[p++]) != 0;
+			boolean containsEof = data[p++] != 0;
 			if (containsEof) {
 				set.add(-1);
 			}
@@ -545,6 +548,10 @@ public class ATNDeserializer {
 
 	protected static int toInt32(char[] data, int offset) {
 		return (int)data[offset] | ((int)data[offset + 1] << 16);
+	}
+
+	protected static int toInt32(int[] data, int offset) {
+		return data[offset] | (data[offset + 1] << 16);
 	}
 
 	protected Transition edgeFactory(ATN atn,
