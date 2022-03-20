@@ -16,7 +16,7 @@ public class SerializedJavaATN extends SerializedATN {
 		Target target = factory.getGenerator().getTarget();
 		IntegerList data = ATNSerializer.getSerialized(atn, target.getLanguage());
 
-		// Flip -1 to 0xFFFF and shift by 2
+		// Flip -1 to 0xFFFF and shift by 2 (except version number)
 		for (int i = 1; i < data.size(); i++) {
 			int value = data.get(i);
 			if ( value==-1 ) {

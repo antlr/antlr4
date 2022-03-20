@@ -9,6 +9,7 @@ package org.antlr.v4.test.tool;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNDeserializer;
 import org.antlr.v4.runtime.atn.ATNSerializer;
+import org.antlr.v4.runtime.misc.IntegerList;
 import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
@@ -162,9 +163,10 @@ public class TestATNDeserialization extends BaseJavaToolTest {
 
 	protected void checkDeserializationIsStable(Grammar g) {
 		ATN atn = createATN(g, false);
-		char[] data = Utils.toCharArray(ATNSerializer.getSerialized(atn, "Java"));
 		String atnData = TestATNSerialization.getDecoded(atn, Arrays.asList(g.getTokenNames()));
-		ATN atn2 = new ATNDeserializer().deserialize(data);
+
+		IntegerList serialized = ATNSerializer.getSerialized(atn, "Java");
+		ATN atn2 = new ATNDeserializer().deserialize(serialized.toArray());
 		String atn2Data = TestATNSerialization.getDecoded(atn2, Arrays.asList(g.getTokenNames()));
 
 		assertEquals(atnData, atn2Data);
