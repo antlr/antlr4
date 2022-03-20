@@ -443,7 +443,7 @@ public class ATNSerializer {
 		return decode(dataI);
 	}
 
-	/** For testing really;Gives a human readable version of the ATN */
+	/** For testing really; gives a human readable version of the ATN */
 	public String decode(int[] data) {
 //		data = data.clone();
 //		// don't adjust the first value since that's the version number
@@ -620,17 +620,8 @@ public class ATNSerializer {
 		return String.valueOf(t);
 	}
 
-	/** Used by Java target to encode short/int array as chars in string. */
-	public static String getSerializedAsString(ATN atn, String language) {
-		return new String(getSerializedAsChars(atn, language));
-	}
-
 	public static IntegerList getSerialized(ATN atn, String language) {
 		return new ATNSerializer(atn, language).serialize();
-	}
-
-	public static char[] getSerializedAsChars(ATN atn, String language) {
-		return Utils.toCharArray(getSerialized(atn, language));
 	}
 
 	private void serializeInt(IntegerList data, int value) {

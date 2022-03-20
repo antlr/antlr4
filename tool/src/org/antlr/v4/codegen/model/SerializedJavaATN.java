@@ -20,15 +20,16 @@ public class SerializedJavaATN extends SerializedATN {
 		for (int i = 1; i < data.size(); i++) {
 			int value = data.get(i);
 			if ( value==-1 ) {
-				value = 0xFFFF;
+				data.set(i, 0xFFFF);
 			}
-			if (value < Character.MIN_VALUE || value > Character.MAX_VALUE) {
-				throw new UnsupportedOperationException("Serialized ATN data element " +
-						value + " element " + i + " out of range " + (int) Character.MIN_VALUE + ".." + (int) Character.MAX_VALUE);
+			else {
+				if (value < Character.MIN_VALUE || value > Character.MAX_VALUE) {
+					throw new UnsupportedOperationException("Serialized ATN data element " +
+							value + " element " + i + " out of range " + (int) Character.MIN_VALUE + ".." + (int) Character.MAX_VALUE);
+				}
+				// Shift by 2, to avoid inefficient modified utf-8 and coding done by java class files
+				data.set(i, (value + 2) & 0xFFFF);
 			}
-
-			// Shift by 2, to avoid inefficient modified utf-8 and coding done by java class files
-			data.set(i, (value + 2) & 0xFFFF);
 		}
 
 		int size = data.size();

@@ -6,6 +6,7 @@ import org.antlr.v4.runtime.VocabularyImpl;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNDeserializer;
 import org.antlr.v4.runtime.atn.ATNSerializer;
+import org.antlr.v4.runtime.misc.IntegerList;
 import org.antlr.v4.runtime.misc.InterpreterDataReader;
 import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.tool.Grammar;
@@ -76,8 +77,8 @@ public class TestInterpreterDataReader extends BaseJavaTest {
 		Assert.assertNull(channels);
 		Assert.assertNull(modes);
 
-        char[] atnChars = ATNSerializer.getSerializedAsChars(atn, g.getLanguage());
-		Assert.assertEquals(ATNDeserializer.SERIALIZED_VERSION, atnChars[0]);
+		IntegerList serialized = ATNSerializer.getSerialized(atn, g.getLanguage());
+		Assert.assertEquals(ATNDeserializer.SERIALIZED_VERSION, serialized.get(0));
     }
 
     private <T> List<T> castList(Object obj, Class<T> clazz) {

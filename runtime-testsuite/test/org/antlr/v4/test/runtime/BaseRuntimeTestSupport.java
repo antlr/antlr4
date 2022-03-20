@@ -6,6 +6,7 @@ import org.antlr.v4.automata.ParserATNFactory;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNDeserializer;
 import org.antlr.v4.runtime.atn.ATNSerializer;
+import org.antlr.v4.runtime.misc.IntegerList;
 import org.antlr.v4.semantics.SemanticPipeline;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
@@ -219,8 +220,8 @@ public abstract class BaseRuntimeTestSupport implements RuntimeTestSupport {
 
 		ATN atn = g.atn;
 		if ( useSerializer ) {
-			char[] serialized = ATNSerializer.getSerializedAsChars(atn, g.getLanguage());
-			return new ATNDeserializer().deserialize(serialized);
+			IntegerList serialized = ATNSerializer.getSerialized(atn, g.getLanguage());
+			return new ATNDeserializer().deserialize(serialized.toArray());
 		}
 
 		return atn;
