@@ -1044,6 +1044,6 @@ public class TestATNSerialization extends BaseJavaToolTest {
 
 	public static String getDecoded(ATN atn, List<String> tokenNames) {
 		IntegerList serialized = ATNSerializer.getSerialized(atn, "Java");
-		return new ATNSerializer(atn, tokenNames, "Java").decode(serialized.toArray());
+		return new ATNDescriber(atn, tokenNames).decode(serialized.toArray());
 	}
 }

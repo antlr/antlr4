@@ -28,7 +28,7 @@ public class ATNDeserializer {
 		SERIALIZED_VERSION = 4;
 	}
 
-	interface UnicodeDeserializer {
+	public interface UnicodeDeserializer {
 		// Wrapper for readInt() or readInt32()
 		int readUnicode(int[] data, int p);
 		int readUnicode(char[] data, int p);
@@ -38,12 +38,12 @@ public class ATNDeserializer {
 		int size();
 	}
 
-	enum UnicodeDeserializingMode {
+	public enum UnicodeDeserializingMode {
 		UNICODE_BMP,
 		UNICODE_SMP
 	}
 
-	static UnicodeDeserializer getUnicodeDeserializer(UnicodeDeserializingMode mode) {
+	public static UnicodeDeserializer getUnicodeDeserializer(UnicodeDeserializingMode mode) {
 		if (mode == UnicodeDeserializingMode.UNICODE_BMP) {
 			return new UnicodeDeserializer() {
 				@Override
