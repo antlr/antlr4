@@ -100,9 +100,7 @@ public class ATNDescriber {
 			buf.append("mode ").append(i).append(":").append(s).append('\n');
 		}
 		int numBMPSets = data[p++];
-		p = appendSets(buf, data, p, numBMPSets, 0, ATNDeserializer.getUnicodeDeserializer(ATNDeserializer.UnicodeDeserializingMode.UNICODE_BMP));
-		int numSMPSets = data[p++];
-		p = appendSets(buf, data, p, numSMPSets, numBMPSets, ATNDeserializer.getUnicodeDeserializer(ATNDeserializer.UnicodeDeserializingMode.UNICODE_SMP));
+		p = appendSets(buf, data, p, numBMPSets);
 		int nedges = data[p++];
 		for (int i=0; i<nedges; i++) {
 			int src = data[p];
@@ -138,10 +136,10 @@ public class ATNDescriber {
 		return buf.toString();
 	}
 
-	private int appendSets(StringBuilder buf, int[] data, int p, int nsets, int setIndexOffset, ATNDeserializer.UnicodeDeserializer unicodeDeserializer) {
+	private int appendSets(StringBuilder buf, int[] data, int p, int nsets) {
 		for (int i=0; i<nsets; i++) {
 			int nintervals = data[p++];
-			buf.append(i+setIndexOffset).append(":");
+			buf.append(i).append(":");
 			boolean containsEof = data[p++] != 0;
 			if (containsEof) {
 				buf.append(getTokenName(Token.EOF));
@@ -152,10 +150,8 @@ public class ATNDescriber {
 					buf.append(", ");
 				}
 
-				int a = unicodeDeserializer.readUnicode(data, p);
-				p += unicodeDeserializer.size();
-				int b = unicodeDeserializer.readUnicode(data, p);
-				p += unicodeDeserializer.size();
+				int a = data[p++];
+				int b = data[p++];
 				buf.append(getTokenName(a)).append("..").append(getTokenName(b));
 			}
 			buf.append("\n");

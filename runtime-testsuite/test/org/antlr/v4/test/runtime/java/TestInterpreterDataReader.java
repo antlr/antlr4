@@ -8,19 +8,16 @@ import org.antlr.v4.runtime.atn.ATNDeserializer;
 import org.antlr.v4.runtime.atn.ATNSerializer;
 import org.antlr.v4.runtime.misc.IntegerList;
 import org.antlr.v4.runtime.misc.InterpreterDataReader;
-import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.tool.Grammar;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 /** This file represents a simple sanity checks on the parsing of the .interp file
@@ -77,7 +74,7 @@ public class TestInterpreterDataReader extends BaseJavaTest {
 		Assert.assertNull(channels);
 		Assert.assertNull(modes);
 
-		IntegerList serialized = ATNSerializer.getSerialized(atn, g.getLanguage());
+		IntegerList serialized = ATNSerializer.getSerialized(atn);
 		Assert.assertEquals(ATNDeserializer.SERIALIZED_VERSION, serialized.get(0));
     }
 

@@ -10,7 +10,6 @@ import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNDeserializer;
 import org.antlr.v4.runtime.atn.ATNSerializer;
 import org.antlr.v4.runtime.misc.IntegerList;
-import org.antlr.v4.runtime.misc.Utils;
 import org.antlr.v4.tool.Grammar;
 import org.antlr.v4.tool.LexerGrammar;
 import org.junit.Before;
@@ -18,6 +17,9 @@ import org.junit.Test;
 
 import java.util.Arrays;
 
+import static org.antlr.v4.runtime.atn.ATNDeserializer.encodeIntsWith16BitWords;
+import static org.antlr.v4.runtime.atn.ATNDeserializer.decodeIntsEncodedAs16BitWords;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 public class TestATNDeserialization extends BaseJavaToolTest {
@@ -152,22 +154,40 @@ public class TestATNDeserialization extends BaseJavaToolTest {
 
 	@Test public void test2ModesInLexer() throws Exception {
 		LexerGrammar lg = new LexerGrammar(
-			"lexer grammar L;\n"+
-			"A : 'a'\n ;\n" +
-			"mode M;\n" +
-			"B : 'b';\n" +
-			"mode M2;\n" +
-			"C : 'c';\n");
+				"lexer grammar L;\n"+
+						"A : 'a'\n ;\n" +
+						"mode M;\n" +
+						"B : 'b';\n" +
+						"mode M2;\n" +
+						"C : 'c';\n");
+		checkDeserializationIsStable(lg);
+	}
+
+	@Test public void testLastValidBMPCharInSet() throws Exception {
+		LexerGrammar lg = new LexerGrammar(
+				"lexer grammar L;\n" +
+						"ID : 'Ā'..'\\uFFFC'; // FFFD+ are not valid char\n");
 		checkDeserializationIsStable(lg);
 	}
 
 	protected void checkDeserializationIsStable(Grammar g) {
 		ATN atn = createATN(g, false);
-		String atnData = TestATNSerialization.getDecoded(atn, Arrays.asList(g.getTokenNames()));
+		IntegerList serialized = ATNSerializer.getSerialized(atn);
+		String atnData = new ATNDescriber(atn, Arrays.asList(g.getTokenNames())).decode(serialized.toArray());
 
-		IntegerList serialized = ATNSerializer.getSerialized(atn, "Java");
+		IntegerList serialized16 = encodeIntsWith16BitWords(serialized);
+		int[] ints16 = serialized16.toArray();
+		char[] chars = new char[ints16.length];
+		for (int i = 0; i < ints16.length; i++) {
+			chars[i] = (char)ints16[i];
+		}
+		IntegerList serialized32 = decodeIntsEncodedAs16BitWords(chars);
+
+		assertArrayEquals(serialized.toArray(), serialized32.toArray());
+
 		ATN atn2 = new ATNDeserializer().deserialize(serialized.toArray());
-		String atn2Data = TestATNSerialization.getDecoded(atn2, Arrays.asList(g.getTokenNames()));
+		IntegerList serialized1 = ATNSerializer.getSerialized(atn2);
+		String atn2Data = new ATNDescriber(atn2, Arrays.asList(g.getTokenNames())).decode(serialized1.toArray());
 
 		assertEquals(atnData, atn2Data);
 	}

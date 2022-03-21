@@ -337,7 +337,7 @@ public abstract class Target {
 	}
 
 	/** Assume 16-bit char */
-	public String encodeIntAsCharEscape(int v) {
+	public String encodeInt16AsCharEscape(int v) {
 		if (v < Character.MIN_VALUE || v > Character.MAX_VALUE) {
 			throw new IllegalArgumentException(String.format("Cannot encode the specified value: %d", v));
 		}

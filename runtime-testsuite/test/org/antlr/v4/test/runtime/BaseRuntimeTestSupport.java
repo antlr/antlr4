@@ -220,7 +220,8 @@ public abstract class BaseRuntimeTestSupport implements RuntimeTestSupport {
 
 		ATN atn = g.atn;
 		if ( useSerializer ) {
-			IntegerList serialized = ATNSerializer.getSerialized(atn, g.getLanguage());
+			// sets some flags in ATN
+			IntegerList serialized = ATNSerializer.getSerialized(atn);
 			return new ATNDeserializer().deserialize(serialized.toArray());
 		}
 

@@ -7,6 +7,7 @@
 package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.misc.IntegerList;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.Pair;
 
@@ -17,7 +18,7 @@ import java.util.Locale;
 
 /** Deserialize ATNs for JavaTarget; it's complicated by the fact that java requires
  *  that we serialize the list of integers as 16 bit characters in a string. Other
- *  targets will have an array of editors generated and can simply decode the ints
+ *  targets will have an array of ints generated and can simply decode the ints
  *  back into an ATN.
  *
  * @author Sam Harwell
@@ -26,58 +27,6 @@ public class ATNDeserializer {
 	public static final int SERIALIZED_VERSION;
 	static {
 		SERIALIZED_VERSION = 4;
-	}
-
-	public interface UnicodeDeserializer {
-		// Wrapper for readInt() or readInt32()
-		int readUnicode(int[] data, int p);
-		int readUnicode(char[] data, int p);
-
-		// Work around Java not allowing mutation of captured variables
-		// by returning amount by which to increment p after each read
-		int size();
-	}
-
-	public enum UnicodeDeserializingMode {
-		UNICODE_BMP,
-		UNICODE_SMP
-	}
-
-	public static UnicodeDeserializer getUnicodeDeserializer(UnicodeDeserializingMode mode) {
-		if (mode == UnicodeDeserializingMode.UNICODE_BMP) {
-			return new UnicodeDeserializer() {
-				@Override
-				public int readUnicode(char[] data, int p) {
-					return toInt(data[p]);
-				}
-				@Override
-				public int readUnicode(int[] data, int p) {
-					return data[p];
-				}
-
-				@Override
-				public int size() {
-					return 1;
-				}
-			};
-		}
-		else {
-			return new UnicodeDeserializer() {
-				@Override
-				public int readUnicode(char[] data, int p) {
-					return toInt32(data, p);
-				}
-				@Override
-				public int readUnicode(int[] data, int p) {
-					return toInt32(data, p);
-				}
-
-				@Override
-				public int size() {
-					return 2;
-				}
-			};
-		}
 	}
 
 	private final ATNDeserializationOptions deserializationOptions;
@@ -96,13 +45,14 @@ public class ATNDeserializer {
 
 	public ATN deserialize(char[] data) {
 		// Convert to ints, 0xFFFF -> -1, shift back down by 2
-		int[] dataI = new int[data.length];
-		dataI[0] = data[0]; // don't mess with version num
-		for (int i = 1; i < data.length; i++) {
-			int v = data[i];
-			dataI[i] = (v==0xFFFF) ? -1 : v - 2;
-		}
-		return deserialize(dataI);
+//		int[] dataI = new int[data.length];
+//		dataI[0] = data[0]; // don't mess with version num
+//		for (int i = 1; i < data.length; i++) {
+//			int v = data[i];
+////			dataI[i] = (v==0xFFFF) ? -1 : v - 2;
+//			dataI[i] = (v==0xFFFF) ? -1 : v;
+//		}
+		return deserialize(decodeIntsEncodedAs16BitWords(data).toArray());
 	}
 
 	public ATN deserialize(int[] data) {
@@ -208,12 +158,7 @@ public class ATNDeserializer {
 		// SETS
 		//
 		List<IntervalSet> sets = new ArrayList<IntervalSet>();
-
-		// First, read all sets with 16-bit Unicode code points <= U+FFFF.
-		p = deserializeSets(data, p, sets, getUnicodeDeserializer(UnicodeDeserializingMode.UNICODE_BMP));
-
-		// Next, deserialize sets with 32-bit arguments <= U+10FFFF.
-		p = deserializeSets(data, p, sets, getUnicodeDeserializer(UnicodeDeserializingMode.UNICODE_SMP));
+		p = deserializeSets(data, p, sets);
 
 		//
 		// EDGES
@@ -418,7 +363,7 @@ public class ATNDeserializer {
 		return atn;
 	}
 
-	private int deserializeSets(int[] data, int p, List<IntervalSet> sets, UnicodeDeserializer unicodeDeserializer) {
+	private int deserializeSets(int[] data, int p, List<IntervalSet> sets) {
 		int nsets = data[p++];
 		for (int i=0; i<nsets; i++) {
 			int nintervals = data[p];
@@ -432,10 +377,8 @@ public class ATNDeserializer {
 			}
 
 			for (int j=0; j<nintervals; j++) {
-				int a = unicodeDeserializer.readUnicode(data, p);
-				p += unicodeDeserializer.size();
-				int b = unicodeDeserializer.readUnicode(data, p);
-				p += unicodeDeserializer.size();
+				int a = data[p++];
+				int b = data[p++];
 				set.add(a, b);
 			}
 		}
@@ -649,5 +592,70 @@ public class ATNDeserializer {
 		default:
 			throw new IllegalArgumentException(String.format(Locale.getDefault(), "The specified lexer action type %s is not valid.", type));
 		}
+	}
+
+	/** Given a list of integers representing a serialized ATN, encode values too large to fit into 15 bits
+	 *  as two 16bit values. We use the high bit (0x8000_0000) to indicate values requiring two 16 bit words.
+	 *  If the high bit is set, we grab the next value and combine them to get a 31-bit value. The possible
+	 *  input int values are [-1,0x7FFF_FFFF].
+	 *
+	 * 		| compression/encoding                         | bytes count | type            |
+	 * 		| -------------------------------------------- | ----------- | --------------- |
+	 * 		| 0xxxxxxx xxxxxxxx                            | 1           | uint (15 bit)   |
+	 * 		| 1xxxxxxx xxxxxxxx yyyyyyyy yyyyyyyy          | 2           | uint (16+ bits) |
+	 * 		| 11111111 11111111 11111111 11111111          | 2           | int value -1    |
+	 *
+	 * 	This is only used (other than for testing) by {@link org.antlr.v4.codegen.model.SerializedJavaATN}
+	 * 	to encode ints as char values for the java target, but it is convenient to combine it with the
+	 * 	#decodeIntsEncodedAs16BitWords that follows as they are a pair (I did not want to introduce a new class
+	 * 	into the runtime). Used only for Java Target.
+	 */
+	public static IntegerList encodeIntsWith16BitWords(IntegerList data) {
+		IntegerList data16 = new IntegerList((int)(data.size()*1.5));
+		for (int i = 0; i < data.size(); i++) {
+			int v = data.get(i);
+			if ( v==-1 ) { // use two max uint16 for -1
+				data16.add(0xFFFF);
+				data16.add(0xFFFF);
+			}
+			else if (v <= 0x7FFF) {
+				data16.add((char)v);
+			}
+			else { // v > 0x7FFF
+				if ( v>=0x7FFF_FFFF ) { // too big to fit in 15 bits + 16 bits? (+1 would be 8000_0000 which is bad encoding)
+					throw new UnsupportedOperationException("Serialized ATN data element["+i+"] = "+v+" doesn't fit in 31 bits");
+				}
+				v = v & 0x7FFF_FFFF;			// strip high bit (sentinel) if set
+				data16.add((char)(v >> 16) | 0x8000);   	// store high 15-bit word first and set high bit to say word follows
+				data16.add((char)(v & 0xFFFF)); // then store lower 16-bit word
+			}
+		}
+		return data16;
+	}
+
+	/** Convert a list of chars (16 uint) that represent a serialized and compressed list of ints for an ATN.
+	 *  This method pairs with {@link #encodeIntsWith16BitWords(IntegerList)} above. Used only for Java Target.
+	 */
+	public static IntegerList decodeIntsEncodedAs16BitWords(char[] data16) {
+		IntegerList data = new IntegerList(data16.length);
+		int i = 0;
+		while ( i < data16.length ) {
+			char v = data16[i];
+			if ( (v & 0x8000) == 0 ) { // hi bit not set? Implies 1-word value
+				data.add(v); // 7 bit int
+				i++;
+			}
+			else { // hi bit set. Implies 2-word value
+				char vnext = data16[i+1];
+				if ( v==0xFFFF && vnext == 0xFFFF ) { // is it -1?
+					data.add(-1);
+				}
+				else { // 31-bit int
+					data.add((v & 0x7FFF) << 16 | (vnext & 0xFFFF));
+				}
+				i += 2;
+			}
+		}
+		return data;
 	}
 }

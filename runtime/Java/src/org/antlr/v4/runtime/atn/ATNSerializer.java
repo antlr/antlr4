@@ -10,26 +10,27 @@ import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.IntegerList;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.IntervalSet;
-import org.antlr.v4.runtime.misc.Utils;
 
-import java.io.InvalidClassException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+/** This class represents a target neutral serializer for ATNs. An ATN is converted to a list of integers
+ *  that can be converted back to and ATN. We compute the list of integers and then generate an array
+ *  into the target language for a particular lexer or parser.  Java is a special case where we must
+ *  generate strings instead of arrays, but that is handled outside of this class.
+ *  See {@link ATNDeserializer#encodeIntsWith16BitWords(IntegerList)} and
+ *  {@link org.antlr.v4.codegen.model.SerializedJavaATN}.
+ */
 public class ATNSerializer {
 	public ATN atn;
-	private List<String> tokenNames;
-	private final String language;
 
 	private final IntegerList data = new IntegerList();
 	/** Note that we use a LinkedHashMap as a set to mainintain insertion order while deduplicating
 	    entries with the same key. */
-	private Map<IntervalSet, Boolean> sets = new LinkedHashMap<>();
+	private final Map<IntervalSet, Boolean> sets = new LinkedHashMap<>();
 	private final IntegerList nonGreedyStates = new IntegerList();
 	private final IntegerList precedenceStates = new IntegerList();
 
@@ -37,17 +38,9 @@ public class ATNSerializer {
 		void serializeCodePoint(IntegerList data, int cp);
 	}
 
-	public ATNSerializer(ATN atn, String language) {
+	public ATNSerializer(ATN atn) {
 		assert atn.grammarType != null;
 		this.atn = atn;
-		this.language = language;
-	}
-
-	public ATNSerializer(ATN atn, List<String> tokenNames, String language) {
-		assert atn.grammarType != null;
-		this.atn = atn;
-		this.tokenNames = tokenNames;
-		this.language = language;
 	}
 
 	/** Serialize state descriptors, edge descriptors, and decision&rarr;state map
@@ -83,12 +76,7 @@ public class ATNSerializer {
 		addRuleStatesAndLexerTokenTypes();
 		addModeStartStates();
 		Map<IntervalSet, Integer> setIndices = null;
-		if ( language.equals("Java") ) {
-			setIndices = addSetsEncoded16bits();
-		}
-		else {
-			setIndices = addSets();
-		}
+		setIndices = addSets();
 		addEdges(nedges, setIndices);
 		addDecisionStartStates();
 		addLexerActions();
@@ -256,59 +244,11 @@ public class ATNSerializer {
 	}
 
 	private Map<IntervalSet, Integer> addSets() {
-		serializeSets(
-				data,
-				sets.keySet(),
-				new CodePointSerializer() {
-					@Override
-					public void serializeCodePoint(IntegerList data, int cp) {
-						data.add(cp);
-					}
-				});
+		serializeSets(data,	sets.keySet());
 		Map<IntervalSet, Integer> setIndices = new HashMap<>();
 		int setIndex = 0;
 		for (IntervalSet s : sets.keySet()) {
 			setIndices.put(s, setIndex++);
-		}
-		return setIndices;
-	}
-
-	private Map<IntervalSet, Integer> addSetsEncoded16bits() {
-		List<IntervalSet> bmpSets = new ArrayList<>();
-		List<IntervalSet> smpSets = new ArrayList<>();
-		for (IntervalSet set : sets.keySet()) {
-			if (!set.isNil() && set.getMaxElement() <= Character.MAX_VALUE) {
-				bmpSets.add(set);
-			}
-			else {
-				smpSets.add(set);
-			}
-		}
-		serializeSets(
-				data,
-				bmpSets,
-				new CodePointSerializer() {
-					@Override
-					public void serializeCodePoint(IntegerList data, int cp) {
-						data.add(cp);
-					}
-				});
-		serializeSets(
-				data,
-				smpSets,
-				new CodePointSerializer() {
-					@Override
-					public void serializeCodePoint(IntegerList data, int cp) {
-						serializeInt(data, cp);
-					}
-				});
-		Map<IntervalSet, Integer> setIndices = new HashMap<>();
-		int setIndex = 0;
-		for (IntervalSet bmpSet : bmpSets) {
-			setIndices.put(bmpSet, setIndex++);
-		}
-		for (IntervalSet smpSet : smpSets) {
-			setIndices.put(smpSet, setIndex++);
 		}
 		return setIndices;
 	}
@@ -396,11 +336,7 @@ public class ATNSerializer {
 		return nedges;
 	}
 
-	private static void serializeSets(
-			IntegerList data,
-			Collection<IntervalSet> sets,
-			CodePointSerializer codePointSerializer)
-	{
+	private static void serializeSets(IntegerList data, Collection<IntervalSet> sets) {
 		int nSets = sets.size();
 		data.add(nSets);
 
@@ -420,25 +356,18 @@ public class ATNSerializer {
 						continue;
 					}
 					else {
-						codePointSerializer.serializeCodePoint(data, 0);
+						data.add(0);
 					}
 				}
 				else {
-					codePointSerializer.serializeCodePoint(data, I.a);
+					data.add(I.a);
 				}
-
-				codePointSerializer.serializeCodePoint(data, I.b);
+				data.add(I.b);
 			}
 		}
 	}
 
-
-	public static IntegerList getSerialized(ATN atn, String language) {
-		return new ATNSerializer(atn, language).serialize();
-	}
-
-	private void serializeInt(IntegerList data, int value) {
-		data.add((char)value);
-		data.add((char)(value >> 16));
+	public static IntegerList getSerialized(ATN atn) {
+		return new ATNSerializer(atn).serialize();
 	}
 }
