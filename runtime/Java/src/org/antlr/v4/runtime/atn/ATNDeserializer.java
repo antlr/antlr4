@@ -13,6 +13,7 @@ import org.antlr.v4.runtime.misc.Pair;
 
 import java.io.InvalidClassException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -44,15 +45,13 @@ public class ATNDeserializer {
 	}
 
 	public ATN deserialize(char[] data) {
-		// Convert to ints, 0xFFFF -> -1, shift back down by 2
+		// shift back down by 2
 //		int[] dataI = new int[data.length];
 //		dataI[0] = data[0]; // don't mess with version num
 //		for (int i = 1; i < data.length; i++) {
-//			int v = data[i];
-////			dataI[i] = (v==0xFFFF) ? -1 : v - 2;
-//			dataI[i] = (v==0xFFFF) ? -1 : v;
+//			dataI[i] = data[i] - 2;
 //		}
-		return deserialize(decodeIntsEncodedAs16BitWords(data).toArray());
+		return deserialize(decodeIntsEncodedAs16BitWords(data));
 	}
 
 	public ATN deserialize(int[] data) {
@@ -625,36 +624,45 @@ public class ATNDeserializer {
 				if ( v>=0x7FFF_FFFF ) { // too big to fit in 15 bits + 16 bits? (+1 would be 8000_0000 which is bad encoding)
 					throw new UnsupportedOperationException("Serialized ATN data element["+i+"] = "+v+" doesn't fit in 31 bits");
 				}
-				v = v & 0x7FFF_FFFF;			// strip high bit (sentinel) if set
-				data16.add((char)(v >> 16) | 0x8000);   	// store high 15-bit word first and set high bit to say word follows
-				data16.add((char)(v & 0xFFFF)); // then store lower 16-bit word
+				v = v & 0x7FFF_FFFF;					// strip high bit (sentinel) if set
+				data16.add((char)(v >> 16) | 0x8000);   // store high 15-bit word first and set high bit to say word follows
+				data16.add((char)(v & 0xFFFF)); 		// then store lower 16-bit word
 			}
 		}
 		return data16;
 	}
 
+	public static int[] decodeIntsEncodedAs16BitWords(char[] data16) {
+		return decodeIntsEncodedAs16BitWords(data16, false);
+	}
+
 	/** Convert a list of chars (16 uint) that represent a serialized and compressed list of ints for an ATN.
 	 *  This method pairs with {@link #encodeIntsWith16BitWords(IntegerList)} above. Used only for Java Target.
 	 */
-	public static IntegerList decodeIntsEncodedAs16BitWords(char[] data16) {
-		IntegerList data = new IntegerList(data16.length);
+	public static int[] decodeIntsEncodedAs16BitWords(char[] data16, boolean trimToSize) {
+		// will be strictly smaller but we waste bit of space to avoid copying during initialization of parsers
+		int[] data = new int[data16.length];
 		int i = 0;
+		int i2 = 0;
 		while ( i < data16.length ) {
 			char v = data16[i];
 			if ( (v & 0x8000) == 0 ) { // hi bit not set? Implies 1-word value
-				data.add(v); // 7 bit int
+				data[i2++] = v; // 7 bit int
 				i++;
 			}
 			else { // hi bit set. Implies 2-word value
 				char vnext = data16[i+1];
 				if ( v==0xFFFF && vnext == 0xFFFF ) { // is it -1?
-					data.add(-1);
+					data[i2++] = -1;
 				}
 				else { // 31-bit int
-					data.add((v & 0x7FFF) << 16 | (vnext & 0xFFFF));
+					data[i2++] = (v & 0x7FFF) << 16 | (vnext & 0xFFFF);
 				}
 				i += 2;
 			}
+		}
+		if ( trimToSize ) {
+			return Arrays.copyOf(data, i2);
 		}
 		return data;
 	}

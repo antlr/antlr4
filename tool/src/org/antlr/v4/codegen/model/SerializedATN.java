@@ -24,7 +24,6 @@ public class SerializedATN extends OutputModelObject {
 
 	public SerializedATN(OutputModelFactory factory, ATN atn) {
 		super(factory);
-		Target target = factory.getGenerator().getTarget();
 		IntegerList data = ATNSerializer.getSerialized(atn);
 		serialized = data.toArray();
 	}

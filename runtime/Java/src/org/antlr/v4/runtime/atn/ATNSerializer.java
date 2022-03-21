@@ -34,10 +34,6 @@ public class ATNSerializer {
 	private final IntegerList nonGreedyStates = new IntegerList();
 	private final IntegerList precedenceStates = new IntegerList();
 
-	private interface CodePointSerializer {
-		void serializeCodePoint(IntegerList data, int cp);
-	}
-
 	public ATNSerializer(ATN atn) {
 		assert atn.grammarType != null;
 		this.atn = atn;

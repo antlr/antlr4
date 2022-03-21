@@ -181,9 +181,9 @@ public class TestATNDeserialization extends BaseJavaToolTest {
 		for (int i = 0; i < ints16.length; i++) {
 			chars[i] = (char)ints16[i];
 		}
-		IntegerList serialized32 = decodeIntsEncodedAs16BitWords(chars);
+		int[] serialized32 = decodeIntsEncodedAs16BitWords(chars, true);
 
-		assertArrayEquals(serialized.toArray(), serialized32.toArray());
+		assertArrayEquals(serialized.toArray(), serialized32);
 
 		ATN atn2 = new ATNDeserializer().deserialize(serialized.toArray());
 		IntegerList serialized1 = ATNSerializer.getSerialized(atn2);

@@ -106,7 +106,6 @@ public class TestATNSerialization extends BaseJavaToolTest {
 			"2->3 NOT_SET 0,0,0\n" +
 			"3->1 EPSILON 0,0,0\n";
 		ATN atn = createATN(g, true);
-		DOTGenerator gen = new DOTGenerator(g);
 		IntegerList serialized = ATNSerializer.getSerialized(atn);
 		String result = new ATNDescriber(atn, Arrays.asList(g.getTokenNames())).decode(serialized.toArray());
 		assertEquals(expecting, result);
@@ -1104,8 +1103,8 @@ public class TestATNSerialization extends BaseJavaToolTest {
 		for (int i = 0; i < ints16.length; i++) {
 			chars[i] = (char)ints16[i];
 		}
-		IntegerList serialized32 = decodeIntsEncodedAs16BitWords(chars);
+		int[] serialized32 = decodeIntsEncodedAs16BitWords(chars, true);
 
-		assertArrayEquals(serialized32.toArray(), serialized.toArray());
+		assertArrayEquals(serialized.toArray(), serialized32);
 	}
 }
