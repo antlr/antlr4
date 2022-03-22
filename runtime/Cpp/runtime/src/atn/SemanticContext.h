@@ -19,24 +19,6 @@ namespace atn {
   ///  SemanticContext within the scope of this outer class.
   class ANTLR4CPP_PUBLIC SemanticContext : public std::enable_shared_from_this<SemanticContext> {
   public:
-    struct Hasher
-    {
-      size_t operator()(Ref<const SemanticContext> const& k) const {
-        return k->hashCode();
-      }
-    };
-
-    struct Comparer {
-      bool operator()(Ref<const SemanticContext> const& lhs, Ref<const SemanticContext> const& rhs) const {
-        if (lhs == rhs)
-          return true;
-        return (lhs->hashCode() == rhs->hashCode()) && (*lhs == *rhs);
-      }
-    };
-
-
-    using Set = std::unordered_set<Ref<const SemanticContext>, Hasher, Comparer>;
-
     /**
      * The default {@link SemanticContext}, which is semantically equivalent to
      * a predicate of the form {@code {true}?}.
@@ -95,9 +77,6 @@ namespace atn {
     class Operator;
     class AND;
     class OR;
-
-  private:
-    static std::vector<Ref<const PrecedencePredicate>> filterPrecedencePredicates(const Set &collection);
   };
 
   class ANTLR4CPP_PUBLIC SemanticContext::Predicate : public SemanticContext {
