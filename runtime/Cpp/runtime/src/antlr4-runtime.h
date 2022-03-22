@@ -60,7 +60,6 @@
 #include "atn/ATNSimulator.h"
 #include "atn/ATNState.h"
 #include "atn/ATNType.h"
-#include "atn/AbstractPredicateTransition.h"
 #include "atn/ActionTransition.h"
 #include "atn/AmbiguityInfo.h"
 #include "atn/ArrayPredictionContext.h"

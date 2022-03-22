@@ -1088,7 +1088,7 @@ Ref<ATNConfig> ParserATNSimulator::actionTransition(Ref<ATNConfig> const& config
 Ref<ATNConfig> ParserATNSimulator::precedenceTransition(Ref<ATNConfig> const& config, const PrecedencePredicateTransition *pt,
     bool collectPredicates, bool inContext, bool fullCtx) {
 #if DEBUG_DFA == 1
-    std::cout << "PRED (collectPredicates=" << collectPredicates << ") " << pt->precedence << ">=_p" << ", ctx dependent=true" << std::endl;
+    std::cout << "PRED (collectPredicates=" << collectPredicates << ") " << pt->getPrecedence() << ">=_p" << ", ctx dependent=true" << std::endl;
     if (parser != nullptr) {
       std::cout << "context surrounding pred is " << Arrays::listToString(parser->getRuleInvocationStack(), ", ") << std::endl;
     }
@@ -1096,7 +1096,7 @@ Ref<ATNConfig> ParserATNSimulator::precedenceTransition(Ref<ATNConfig> const& co
 
   Ref<ATNConfig> c;
   if (collectPredicates && inContext) {
-    Ref<SemanticContext::PrecedencePredicate> predicate = pt->getPredicate();
+    const auto &predicate = pt->getPredicate();
 
     if (fullCtx) {
       // In full context mode, we can evaluate predicates on-the-fly
@@ -1105,14 +1105,14 @@ Ref<ATNConfig> ParserATNSimulator::precedenceTransition(Ref<ATNConfig> const& co
       // later during conflict resolution.
       size_t currentPosition = _input->index();
       _input->seek(_startIndex);
-      bool predSucceeds = evalSemanticContext(pt->getPredicate(), _outerContext, config->alt, fullCtx);
+      bool predSucceeds = evalSemanticContext(predicate, _outerContext, config->alt, fullCtx);
       _input->seek(currentPosition);
       if (predSucceeds) {
         c = std::make_shared<ATNConfig>(*config, pt->target); // no pred context
       }
     } else {
       Ref<const SemanticContext> newSemCtx = SemanticContext::And(config->semanticContext, predicate);
-      c = std::make_shared<ATNConfig>(*config, pt->target, newSemCtx);
+      c = std::make_shared<ATNConfig>(*config, pt->target, std::move(newSemCtx));
     }
   } else {
     c = std::make_shared<ATNConfig>(*config, pt->target);
@@ -1128,15 +1128,15 @@ Ref<ATNConfig> ParserATNSimulator::precedenceTransition(Ref<ATNConfig> const& co
 Ref<ATNConfig> ParserATNSimulator::predTransition(Ref<ATNConfig> const& config, const PredicateTransition *pt,
   bool collectPredicates, bool inContext, bool fullCtx) {
 #if DEBUG_DFA == 1
-    std::cout << "PRED (collectPredicates=" << collectPredicates << ") " << pt->ruleIndex << ":" << pt->predIndex << ", ctx dependent=" << pt->isCtxDependent << std::endl;
+    std::cout << "PRED (collectPredicates=" << collectPredicates << ") " << pt->getRuleIndex() << ":" << pt->getPredIndex() << ", ctx dependent=" << pt->isCtxDependent() << std::endl;
     if (parser != nullptr) {
       std::cout << "context surrounding pred is " << Arrays::listToString(parser->getRuleInvocationStack(), ", ") << std::endl;
     }
 #endif
 
   Ref<ATNConfig> c = nullptr;
-  if (collectPredicates && (!pt->isCtxDependent || (pt->isCtxDependent && inContext))) {
-    Ref<SemanticContext::Predicate> predicate = pt->getPredicate();
+  if (collectPredicates && (!pt->isCtxDependent() || (pt->isCtxDependent() && inContext))) {
+    const auto &predicate = pt->getPredicate();
     if (fullCtx) {
       // In full context mode, we can evaluate predicates on-the-fly
       // during closure, which dramatically reduces the size of
@@ -1144,14 +1144,14 @@ Ref<ATNConfig> ParserATNSimulator::predTransition(Ref<ATNConfig> const& config, 
       // later during conflict resolution.
       size_t currentPosition = _input->index();
       _input->seek(_startIndex);
-      bool predSucceeds = evalSemanticContext(pt->getPredicate(), _outerContext, config->alt, fullCtx);
+      bool predSucceeds = evalSemanticContext(predicate, _outerContext, config->alt, fullCtx);
       _input->seek(currentPosition);
       if (predSucceeds) {
         c = std::make_shared<ATNConfig>(*config, pt->target); // no pred context
       }
     } else {
       Ref<const SemanticContext> newSemCtx = SemanticContext::And(config->semanticContext, predicate);
-      c = std::make_shared<ATNConfig>(*config, pt->target, newSemCtx);
+      c = std::make_shared<ATNConfig>(*config, pt->target, std::move(newSemCtx));
     }
   } else {
     c = std::make_shared<ATNConfig>(*config, pt->target);

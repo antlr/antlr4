@@ -5,24 +5,27 @@
 
 #pragma once
 
-#include "atn/AbstractPredicateTransition.h"
-#include "SemanticContext.h"
+#include "atn/Transition.h"
+#include "atn/SemanticContext.h"
 
 namespace antlr4 {
 namespace atn {
 
-  class ANTLR4CPP_PUBLIC PrecedencePredicateTransition final : public AbstractPredicateTransition {
+  class ANTLR4CPP_PUBLIC PrecedencePredicateTransition final : public Transition {
   public:
-    const int precedence;
-
     PrecedencePredicateTransition(ATNState *target, int precedence);
 
-    TransitionType getTransitionType() const override;
-    virtual bool isEpsilon() const override;
-    virtual bool matches(size_t symbol, size_t minVocabSymbol, size_t maxVocabSymbol) const override;
-    Ref<SemanticContext::PrecedencePredicate> getPredicate() const;
-    virtual std::string toString() const override;
+    int getPrecedence() const { return _predicate->precedence; }
 
+    TransitionType getTransitionType() const override;
+    bool isEpsilon() const override;
+    bool matches(size_t symbol, size_t minVocabSymbol, size_t maxVocabSymbol) const override;
+    std::string toString() const override;
+
+    const Ref<const SemanticContext::PrecedencePredicate>& getPredicate() const { return _predicate; }
+
+  private:
+    const std::shared_ptr<const SemanticContext::PrecedencePredicate> _predicate;
   };
 
 } // namespace atn

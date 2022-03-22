@@ -392,11 +392,11 @@ Ref<LexerATNConfig> LexerATNSimulator::getEpsilonTarget(CharStream *input, const
       const PredicateTransition *pt = static_cast<const PredicateTransition*>(t);
 
 #if DEBUG_ATN == 1
-        std::cout << "EVAL rule " << pt->ruleIndex << ":" << pt->predIndex << std::endl;
+        std::cout << "EVAL rule " << pt->getRuleIndex() << ":" << pt->getPredIndex() << std::endl;
 #endif
 
       configs->hasSemanticContext = true;
-      if (evaluatePredicate(input, pt->ruleIndex, pt->predIndex, speculative)) {
+      if (evaluatePredicate(input, pt->getRuleIndex(), pt->getPredIndex(), speculative)) {
         c = std::make_shared<LexerATNConfig>(*config, t->target);
       }
       break;
