@@ -17,18 +17,6 @@ public class SerializedJavaATN extends SerializedATN {
 		IntegerList data = ATNSerializer.getSerialized(atn);
 		data = ATNDeserializer.encodeIntsWith16BitWords(data);
 
-		// TODO: Because of the modified UTF-8 encoding used by the java class files, we
-		// normally shift up by 2 so that 0 and 1, which are very common, are not encoded in
-		// multiple bytes.  This could really screw up the compression I'm using to get 32 bit ints
-		// though.  Not sure it's worth messing around with.  Maybe the idea is too use the shift
-		// for the common case where there are no large (32 bit) values?
-//		// shift by 2 (except version number)
-//		for (int i = 1; i < data.size(); i++) {
-//			int value = data.get(i);
-//			data.set(i, (value + 2) & 0xFFFF);
-//			}
-//		}
-
 		int size = data.size();
 		Target target = factory.getGenerator().getTarget();
 		int segmentLimit = target.getSerializedATNSegmentLimit();

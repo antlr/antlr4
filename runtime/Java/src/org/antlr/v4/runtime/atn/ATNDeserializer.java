@@ -45,12 +45,6 @@ public class ATNDeserializer {
 	}
 
 	public ATN deserialize(char[] data) {
-		// shift back down by 2
-//		int[] dataI = new int[data.length];
-//		dataI[0] = data[0]; // don't mess with version num
-//		for (int i = 1; i < data.length; i++) {
-//			dataI[i] = data[i] - 2;
-//		}
 		return deserialize(decodeIntsEncodedAs16BitWords(data));
 	}
 
