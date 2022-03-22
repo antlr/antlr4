@@ -1,5 +1,11 @@
 <!--
-Thank you for proposing a contribution to the ANTLR project. In order to accept changes from the outside world, all contributors must "sign" the  [contributors.txt](https://github.com/antlr/antlr4/blob/master/contributors.txt) contributors certificate of origin. It's an unfortunate reality of today's fuzzy and bizarre world of open-source ownership.
+Thank you for proposing a contribution to the ANTLR project!
 
-Make sure you are already in the contributors.txt file or add a commit to this pull request with the appropriate change. Thanks!
+As of 4.10, ANTLR uses the Linux Foundation's Developer
+Certificate of Origin, DCO, version 1.1. See either
+https://developercertificate.org/ or the
+developer-certificate-of-origin.txt file in the main directory.
+You have nothing to sign but be aware that this DCO is operative,
+even if you have signed the previous ANTLR contributor's
+certificate of origin.
 -->
