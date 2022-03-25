@@ -612,15 +612,15 @@ public class ATNDeserializer {
 				data16.add(0xFFFF);
 			}
 			else if (v <= 0x7FFF) {
-				data16.add((char)v);
+				data16.add(v);
 			}
 			else { // v > 0x7FFF
 				if ( v>=0x7FFF_FFFF ) { // too big to fit in 15 bits + 16 bits? (+1 would be 8000_0000 which is bad encoding)
 					throw new UnsupportedOperationException("Serialized ATN data element["+i+"] = "+v+" doesn't fit in 31 bits");
 				}
 				v = v & 0x7FFF_FFFF;					// strip high bit (sentinel) if set
-				data16.add((char)(v >> 16) | 0x8000);   // store high 15-bit word first and set high bit to say word follows
-				data16.add((char)(v & 0xFFFF)); 		// then store lower 16-bit word
+				data16.add((v >> 16) | 0x8000);   // store high 15-bit word first and set high bit to say word follows
+				data16.add((v & 0xFFFF)); 		// then store lower 16-bit word
 			}
 		}
 		return data16;
@@ -639,20 +639,18 @@ public class ATNDeserializer {
 		int i = 0;
 		int i2 = 0;
 		while ( i < data16.length ) {
-			char v = data16[i];
+			char v = data16[i++];
 			if ( (v & 0x8000) == 0 ) { // hi bit not set? Implies 1-word value
 				data[i2++] = v; // 7 bit int
-				i++;
 			}
 			else { // hi bit set. Implies 2-word value
-				char vnext = data16[i+1];
+				char vnext = data16[i++];
 				if ( v==0xFFFF && vnext == 0xFFFF ) { // is it -1?
 					data[i2++] = -1;
 				}
 				else { // 31-bit int
 					data[i2++] = (v & 0x7FFF) << 16 | (vnext & 0xFFFF);
 				}
-				i += 2;
 			}
 		}
 		if ( trimToSize ) {
