@@ -91,7 +91,7 @@ func NewDFAState(stateNumber int, configs ATNConfigSet) *DFAState {
 
 // GetAltSet gets the set of all alts mentioned by all ATN configurations in d.
 func (d *DFAState) GetAltSet() Set {
-	alts := NewArray2DHashSet(nil, nil)
+	alts := newArray2DHashSet(nil, nil)
 
 	if d.configs != nil {
 		for _, c := range d.configs.GetItems() {
