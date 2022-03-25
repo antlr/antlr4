@@ -592,11 +592,11 @@ public class ATNDeserializer {
 	 *  If the high bit is set, we grab the next value and combine them to get a 31-bit value. The possible
 	 *  input int values are [-1,0x7FFF_FFFF].
 	 *
-	 * 		| compression/encoding                         | bytes count | type            |
-	 * 		| -------------------------------------------- | ----------- | --------------- |
-	 * 		| 0xxxxxxx xxxxxxxx                            | 1           | uint (15 bit)   |
-	 * 		| 1xxxxxxx xxxxxxxx yyyyyyyy yyyyyyyy          | 2           | uint (16+ bits) |
-	 * 		| 11111111 11111111 11111111 11111111          | 2           | int value -1    |
+	 * 		| compression/encoding                         | uint16 count | type            |
+	 * 		| -------------------------------------------- | ------------ | --------------- |
+	 * 		| 0xxxxxxx xxxxxxxx                            | 1            | uint (15 bit)   |
+	 * 		| 1xxxxxxx xxxxxxxx yyyyyyyy yyyyyyyy          | 2            | uint (16+ bits) |
+	 * 		| 11111111 11111111 11111111 11111111          | 2            | int value -1    |
 	 *
 	 * 	This is only used (other than for testing) by {@link org.antlr.v4.codegen.model.SerializedJavaATN}
 	 * 	to encode ints as char values for the java target, but it is convenient to combine it with the
