@@ -118,7 +118,7 @@ public class GeneratedLexerDescriptors {
 		// We seem to get memory errors and so I am turning this off during CI
 		List<String> all = Arrays.asList(
 //				"CSharp", "Python2", "Python3", "Cpp", "Go", "PHP", "Swift", "Java", "JavaScript", "Node", "Dart"
-				"CSharp", "Python2", "Python3", "Cpp", "Go", "PHP", "Swift", "JavaScript", "Node", "Dart"
+				"CSharp", "Python2", "Python3", "Go", "PHP", "Swift", "JavaScript", "Node", "Dart"
 		);
 		result.skipTargets.addAll(all);
 
