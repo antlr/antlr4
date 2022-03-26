@@ -15,6 +15,7 @@ popd
 pushd runtime-testsuite
 
   echo "running maven tests..."
+  export MAVEN_OPTS="-Xmx8g"
   mvn -Dtest=javascript.** test
   RESULT+=$?
 

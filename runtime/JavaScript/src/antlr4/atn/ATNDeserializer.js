@@ -82,10 +82,7 @@ class ATNDeserializer {
         this.readRules(atn);
         this.readModes(atn);
         const sets = [];
-        // First, deserialize sets with 16-bit arguments <= U+FFFF.
-        this.readSets(atn, sets, this.readInt.bind(this));
-        // Next, deserialize sets with 32-bit arguments <= U+10FFFF.
-        this.readSets(atn, sets, this.readInt32.bind(this));
+        this.readSets(atn, sets);
         this.readEdges(atn, sets);
         this.readDecisions(atn);
         this.readLexerActions(atn);
@@ -125,9 +122,6 @@ class ATNDeserializer {
                 continue;
             }
             let ruleIndex = this.readInt();
-            if (ruleIndex === 0xFFFF) {
-                ruleIndex = -1;
-            }
             const  s = this.stateFactory(stype, ruleIndex);
             if (stype === ATNState.LOOP_END) { // special case
                 const  loopBackStateNumber = this.readInt();
@@ -175,9 +169,6 @@ class ATNDeserializer {
             atn.ruleToStartState[i] = atn.states[s];
             if ( atn.grammarType === ATNType.LEXER ) {
                 let tokenType = this.readInt();
-                if (tokenType === 0xFFFF) {
-                    tokenType = Token.EOF;
-                }
                 atn.ruleToTokenType[i] = tokenType;
             }
         }
@@ -200,7 +191,7 @@ class ATNDeserializer {
         }
     }
 
-    readSets(atn, sets, readUnicode) {
+    readSets(atn, sets) {
         const m = this.readInt();
         for (let i=0; i<m; i++) {
             const iset = new IntervalSet();
@@ -211,8 +202,8 @@ class ATNDeserializer {
                 iset.addOne(-1);
             }
             for (let j=0; j<n; j++) {
-                const i1 = readUnicode();
-                const i2 = readUnicode();
+                const i1 = this.readInt();
+                const i2 = this.readInt();
                 iset.addRange(i1, i2);
             }
         }
@@ -301,14 +292,7 @@ class ATNDeserializer {
             for (let i=0; i<count; i++) {
                 const actionType = this.readInt();
                 let data1 = this.readInt();
-                if (data1 === 0xFFFF) {
-                    data1 = -1;
-                }
                 let data2 = this.readInt();
-                if (data2 === 0xFFFF) {
-                    data2 = -1;
-                }
-
                 atn.lexerActions[i] = this.lexerActionFactory(actionType, data1, data2);
             }
         }
@@ -495,12 +479,6 @@ class ATNDeserializer {
 
     readInt() {
         return this.data[this.pos++];
-    }
-
-    readInt32() {
-        const low = this.readInt();
-        const high = this.readInt();
-        return low | (high << 16);
     }
 
     edgeFactory(atn, type, src, trg, arg1, arg2, arg3, sets) {

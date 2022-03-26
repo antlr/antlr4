@@ -57,7 +57,6 @@
 #include "atn/ATNConfigSet.h"
 #include "atn/ATNDeserializationOptions.h"
 #include "atn/ATNDeserializer.h"
-#include "atn/ATNSerializer.h"
 #include "atn/ATNSimulator.h"
 #include "atn/ATNState.h"
 #include "atn/ATNType.h"

@@ -1,15 +1,14 @@
-package org.antlr.v4.misc;
+package org.antlr.v4.test.tool;
 
 import org.antlr.runtime.Token;
-import org.antlr.v4.codegen.CodeGenerator;
+import org.antlr.v4.misc.Utils;
 import org.antlr.v4.tool.ast.GrammarAST;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.ArrayList;
 
-public class UtilsTest {
-
+public class TestUtils {
 	@Test
 	public void testStripFileExtension() {
 		Assert.assertNull(Utils.stripFileExtension(null));

@@ -11,8 +11,7 @@ import org.antlr.v4.runtime.misc.IntervalSet;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class CharSupportTest {
-
+public class TestCharSupport {
 	@Test
 	public void testGetANTLRCharLiteralForChar() {
 		Assert.assertEquals("'<INVALID>'",

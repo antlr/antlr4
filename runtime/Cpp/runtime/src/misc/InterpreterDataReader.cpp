@@ -101,7 +101,7 @@ InterpreterData InterpreterDataReader::parseFile(std::string const& fileName) {
     };
   }
 
-  std::vector<uint16_t> serializedATN;
+  std::vector<int32_t> serializedATN;
 
   std::getline(input, line, '\n');
   assert(line == "atn:");
@@ -115,7 +115,7 @@ InterpreterData InterpreterDataReader::parseFile(std::string const& fileName) {
       number = std::strtoul(&value[1], nullptr, 10);
     else
       number = std::strtoul(value.c_str(), nullptr, 10);
-    serializedATN.push_back(static_cast<uint16_t>(number));
+    serializedATN.push_back(static_cast<int32_t>(number));
   }
 
   ATNDeserializer deserializer;

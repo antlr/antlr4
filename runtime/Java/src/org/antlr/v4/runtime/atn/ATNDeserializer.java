@@ -7,15 +7,20 @@
 package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.misc.IntegerList;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.Pair;
 
 import java.io.InvalidClassException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-/**
+/** Deserialize ATNs for JavaTarget; it's complicated by the fact that java requires
+ *  that we serialize the list of integers as 16 bit characters in a string. Other
+ *  targets will have an array of ints generated and can simply decode the ints
+ *  back into an ATN.
  *
  * @author Sam Harwell
  */
@@ -23,49 +28,6 @@ public class ATNDeserializer {
 	public static final int SERIALIZED_VERSION;
 	static {
 		SERIALIZED_VERSION = 4;
-	}
-
-	interface UnicodeDeserializer {
-		// Wrapper for readInt() or readInt32()
-		int readUnicode(char[] data, int p);
-
-		// Work around Java not allowing mutation of captured variables
-		// by returning amount by which to increment p after each read
-		int size();
-	}
-
-	enum UnicodeDeserializingMode {
-		UNICODE_BMP,
-		UNICODE_SMP
-	}
-
-	static UnicodeDeserializer getUnicodeDeserializer(UnicodeDeserializingMode mode) {
-		if (mode == UnicodeDeserializingMode.UNICODE_BMP) {
-			return new UnicodeDeserializer() {
-				@Override
-				public int readUnicode(char[] data, int p) {
-					return toInt(data[p]);
-				}
-
-				@Override
-				public int size() {
-					return 1;
-				}
-			};
-		}
-		else {
-			return new UnicodeDeserializer() {
-				@Override
-				public int readUnicode(char[] data, int p) {
-					return toInt32(data, p);
-				}
-
-				@Override
-				public int size() {
-					return 2;
-				}
-			};
-		}
 	}
 
 	private final ATNDeserializationOptions deserializationOptions;
@@ -83,20 +45,19 @@ public class ATNDeserializer {
 	}
 
 	public ATN deserialize(char[] data) {
-		data = data.clone();
-		for (int i = 1; i < data.length; i++) {
-			data[i] = (char) (data[i] - 2);
-		}
+		return deserialize(decodeIntsEncodedAs16BitWords(data));
+	}
 
+	public ATN deserialize(int[] data) {
 		int p = 0;
-		int version = toInt(data[p++]);
+		int version = data[p++];
 		if (version != SERIALIZED_VERSION) {
 			String reason = String.format(Locale.getDefault(), "Could not deserialize ATN with version %d (expected %d).", version, SERIALIZED_VERSION);
 			throw new UnsupportedOperationException(new InvalidClassException(ATN.class.getName(), reason));
 		}
 
-		ATNType grammarType = ATNType.values()[toInt(data[p++])];
-		int maxTokenType = toInt(data[p++]);
+		ATNType grammarType = ATNType.values()[data[p++]];
+		int maxTokenType = data[p++];
 		ATN atn = new ATN(grammarType, maxTokenType);
 
 		//
@@ -104,27 +65,23 @@ public class ATNDeserializer {
 		//
 		List<Pair<LoopEndState, Integer>> loopBackStateNumbers = new ArrayList<Pair<LoopEndState, Integer>>();
 		List<Pair<BlockStartState, Integer>> endStateNumbers = new ArrayList<Pair<BlockStartState, Integer>>();
-		int nstates = toInt(data[p++]);
+		int nstates = data[p++];
 		for (int i=0; i<nstates; i++) {
-			int stype = toInt(data[p++]);
+			int stype = data[p++];
 			// ignore bad type of states
 			if ( stype==ATNState.INVALID_TYPE ) {
 				atn.addState(null);
 				continue;
 			}
 
-			int ruleIndex = toInt(data[p++]);
-			if (ruleIndex == Character.MAX_VALUE) {
-				ruleIndex = -1;
-			}
-
+			int ruleIndex = data[p++];
 			ATNState s = stateFactory(stype, ruleIndex);
 			if ( stype == ATNState.LOOP_END ) { // special case
-				int loopBackStateNumber = toInt(data[p++]);
+				int loopBackStateNumber = data[p++];
 				loopBackStateNumbers.add(new Pair<LoopEndState, Integer>((LoopEndState)s, loopBackStateNumber));
 			}
 			else if (s instanceof BlockStartState) {
-				int endStateNumber = toInt(data[p++]);
+				int endStateNumber = data[p++];
 				endStateNumbers.add(new Pair<BlockStartState, Integer>((BlockStartState)s, endStateNumber));
 			}
 			atn.addState(s);
@@ -139,37 +96,33 @@ public class ATNDeserializer {
 			pair.a.endState = (BlockEndState)atn.states.get(pair.b);
 		}
 
-		int numNonGreedyStates = toInt(data[p++]);
+		int numNonGreedyStates = data[p++];
 		for (int i = 0; i < numNonGreedyStates; i++) {
-			int stateNumber = toInt(data[p++]);
+			int stateNumber = data[p++];
 			((DecisionState)atn.states.get(stateNumber)).nonGreedy = true;
 		}
 
-		int numPrecedenceStates = toInt(data[p++]);
+		int numPrecedenceStates = data[p++];
 		for (int i = 0; i < numPrecedenceStates; i++) {
-			int stateNumber = toInt(data[p++]);
+			int stateNumber = data[p++];
 			((RuleStartState)atn.states.get(stateNumber)).isLeftRecursiveRule = true;
 		}
 
 		//
 		// RULES
 		//
-		int nrules = toInt(data[p++]);
+		int nrules = data[p++];
 		if ( atn.grammarType == ATNType.LEXER ) {
 			atn.ruleToTokenType = new int[nrules];
 		}
 
 		atn.ruleToStartState = new RuleStartState[nrules];
 		for (int i=0; i<nrules; i++) {
-			int s = toInt(data[p++]);
+			int s = data[p++];
 			RuleStartState startState = (RuleStartState)atn.states.get(s);
 			atn.ruleToStartState[i] = startState;
 			if ( atn.grammarType == ATNType.LEXER ) {
-				int tokenType = toInt(data[p++]);
-				if (tokenType == 0xFFFF) {
-					tokenType = Token.EOF;
-				}
-
+				int tokenType = data[p++];
 				atn.ruleToTokenType[i] = tokenType;
 			}
 		}
@@ -188,9 +141,9 @@ public class ATNDeserializer {
 		//
 		// MODES
 		//
-		int nmodes = toInt(data[p++]);
+		int nmodes = data[p++];
 		for (int i=0; i<nmodes; i++) {
-			int s = toInt(data[p++]);
+			int s = data[p++];
 			atn.modeToStartState.add((TokensStartState)atn.states.get(s));
 		}
 
@@ -198,24 +151,19 @@ public class ATNDeserializer {
 		// SETS
 		//
 		List<IntervalSet> sets = new ArrayList<IntervalSet>();
-
-		// First, read all sets with 16-bit Unicode code points <= U+FFFF.
-		p = deserializeSets(data, p, sets, getUnicodeDeserializer(UnicodeDeserializingMode.UNICODE_BMP));
-
-		// Next, deserialize sets with 32-bit arguments <= U+10FFFF.
-		p = deserializeSets(data, p, sets, getUnicodeDeserializer(UnicodeDeserializingMode.UNICODE_SMP));
+		p = deserializeSets(data, p, sets);
 
 		//
 		// EDGES
 		//
-		int nedges = toInt(data[p++]);
+		int nedges = data[p++];
 		for (int i=0; i<nedges; i++) {
-			int src = toInt(data[p]);
-			int trg = toInt(data[p+1]);
-			int ttype = toInt(data[p+2]);
-			int arg1 = toInt(data[p+3]);
-			int arg2 = toInt(data[p+4]);
-			int arg3 = toInt(data[p+5]);
+			int src = data[p];
+			int trg = data[p+1];
+			int ttype = data[p+2];
+			int arg1 = data[p+3];
+			int arg2 = data[p+4];
+			int arg3 = data[p+5];
 			Transition trans = edgeFactory(atn, ttype, src, trg, arg1, arg2, arg3, sets);
 //			System.out.println("EDGE "+trans.getClass().getSimpleName()+" "+
 //							   src+"->"+trg+
@@ -285,9 +233,9 @@ public class ATNDeserializer {
 		//
 		// DECISIONS
 		//
-		int ndecisions = toInt(data[p++]);
+		int ndecisions = data[p++];
 		for (int i=1; i<=ndecisions; i++) {
-			int s = toInt(data[p++]);
+			int s = data[p++];
 			DecisionState decState = (DecisionState)atn.states.get(s);
 			atn.decisionToState.add(decState);
 			decState.decision = i-1;
@@ -297,18 +245,11 @@ public class ATNDeserializer {
 		// LEXER ACTIONS
 		//
 		if (atn.grammarType == ATNType.LEXER) {
-			atn.lexerActions = new LexerAction[toInt(data[p++])];
+			atn.lexerActions = new LexerAction[data[p++]];
 			for (int i = 0; i < atn.lexerActions.length; i++) {
-				LexerActionType actionType = LexerActionType.values()[toInt(data[p++])];
-				int data1 = toInt(data[p++]);
-				if (data1 == 0xFFFF) {
-					data1 = -1;
-				}
-
-				int data2 = toInt(data[p++]);
-				if (data2 == 0xFFFF) {
-					data2 = -1;
-				}
+				LexerActionType actionType = LexerActionType.values()[data[p++]];
+				int data1 = data[p++];
+				int data2 = data[p++];
 
 				LexerAction lexerAction = lexerActionFactory(actionType, data1, data2);
 
@@ -415,24 +356,22 @@ public class ATNDeserializer {
 		return atn;
 	}
 
-	private int deserializeSets(char[] data, int p, List<IntervalSet> sets, UnicodeDeserializer unicodeDeserializer) {
-		int nsets = toInt(data[p++]);
+	private int deserializeSets(int[] data, int p, List<IntervalSet> sets) {
+		int nsets = data[p++];
 		for (int i=0; i<nsets; i++) {
-			int nintervals = toInt(data[p]);
+			int nintervals = data[p];
 			p++;
 			IntervalSet set = new IntervalSet();
 			sets.add(set);
 
-			boolean containsEof = toInt(data[p++]) != 0;
+			boolean containsEof = data[p++] != 0;
 			if (containsEof) {
 				set.add(-1);
 			}
 
 			for (int j=0; j<nintervals; j++) {
-				int a = unicodeDeserializer.readUnicode(data, p);
-				p += unicodeDeserializer.size();
-				int b = unicodeDeserializer.readUnicode(data, p);
-				p += unicodeDeserializer.size();
+				int a = data[p++];
+				int b = data[p++];
 				set.add(a, b);
 			}
 		}
@@ -547,6 +486,10 @@ public class ATNDeserializer {
 		return (int)data[offset] | ((int)data[offset + 1] << 16);
 	}
 
+	protected static int toInt32(int[] data, int offset) {
+		return data[offset] | (data[offset + 1] << 16);
+	}
+
 	protected Transition edgeFactory(ATN atn,
 										 int type, int src, int trg,
 										 int arg1, int arg2, int arg3,
@@ -642,5 +585,77 @@ public class ATNDeserializer {
 		default:
 			throw new IllegalArgumentException(String.format(Locale.getDefault(), "The specified lexer action type %s is not valid.", type));
 		}
+	}
+
+	/** Given a list of integers representing a serialized ATN, encode values too large to fit into 15 bits
+	 *  as two 16bit values. We use the high bit (0x8000_0000) to indicate values requiring two 16 bit words.
+	 *  If the high bit is set, we grab the next value and combine them to get a 31-bit value. The possible
+	 *  input int values are [-1,0x7FFF_FFFF].
+	 *
+	 * 		| compression/encoding                         | uint16 count | type            |
+	 * 		| -------------------------------------------- | ------------ | --------------- |
+	 * 		| 0xxxxxxx xxxxxxxx                            | 1            | uint (15 bit)   |
+	 * 		| 1xxxxxxx xxxxxxxx yyyyyyyy yyyyyyyy          | 2            | uint (16+ bits) |
+	 * 		| 11111111 11111111 11111111 11111111          | 2            | int value -1    |
+	 *
+	 * 	This is only used (other than for testing) by {@link org.antlr.v4.codegen.model.SerializedJavaATN}
+	 * 	to encode ints as char values for the java target, but it is convenient to combine it with the
+	 * 	#decodeIntsEncodedAs16BitWords that follows as they are a pair (I did not want to introduce a new class
+	 * 	into the runtime). Used only for Java Target.
+	 */
+	public static IntegerList encodeIntsWith16BitWords(IntegerList data) {
+		IntegerList data16 = new IntegerList((int)(data.size()*1.5));
+		for (int i = 0; i < data.size(); i++) {
+			int v = data.get(i);
+			if ( v==-1 ) { // use two max uint16 for -1
+				data16.add(0xFFFF);
+				data16.add(0xFFFF);
+			}
+			else if (v <= 0x7FFF) {
+				data16.add(v);
+			}
+			else { // v > 0x7FFF
+				if ( v>=0x7FFF_FFFF ) { // too big to fit in 15 bits + 16 bits? (+1 would be 8000_0000 which is bad encoding)
+					throw new UnsupportedOperationException("Serialized ATN data element["+i+"] = "+v+" doesn't fit in 31 bits");
+				}
+				v = v & 0x7FFF_FFFF;					// strip high bit (sentinel) if set
+				data16.add((v >> 16) | 0x8000);   // store high 15-bit word first and set high bit to say word follows
+				data16.add((v & 0xFFFF)); 		// then store lower 16-bit word
+			}
+		}
+		return data16;
+	}
+
+	public static int[] decodeIntsEncodedAs16BitWords(char[] data16) {
+		return decodeIntsEncodedAs16BitWords(data16, false);
+	}
+
+	/** Convert a list of chars (16 uint) that represent a serialized and compressed list of ints for an ATN.
+	 *  This method pairs with {@link #encodeIntsWith16BitWords(IntegerList)} above. Used only for Java Target.
+	 */
+	public static int[] decodeIntsEncodedAs16BitWords(char[] data16, boolean trimToSize) {
+		// will be strictly smaller but we waste bit of space to avoid copying during initialization of parsers
+		int[] data = new int[data16.length];
+		int i = 0;
+		int i2 = 0;
+		while ( i < data16.length ) {
+			char v = data16[i++];
+			if ( (v & 0x8000) == 0 ) { // hi bit not set? Implies 1-word value
+				data[i2++] = v; // 7 bit int
+			}
+			else { // hi bit set. Implies 2-word value
+				char vnext = data16[i++];
+				if ( v==0xFFFF && vnext == 0xFFFF ) { // is it -1?
+					data[i2++] = -1;
+				}
+				else { // 31-bit int
+					data[i2++] = (v & 0x7FFF) << 16 | (vnext & 0xFFFF);
+				}
+			}
+		}
+		if ( trimToSize ) {
+			return Arrays.copyOf(data, i2);
+		}
+		return data;
 	}
 }
