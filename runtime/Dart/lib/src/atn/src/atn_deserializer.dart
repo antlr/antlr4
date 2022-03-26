@@ -86,10 +86,7 @@ class ATNDeserializer {
     readRules(atn);
     readModes(atn);
     final sets = <IntervalSet>[];
-    // First, deserialize sets with 16-bit arguments <= U+FFFF.
-    readSets(atn, sets, () => readInt());
-    // Next, deserialize sets with 32-bit arguments <= U+10FFFF.
-    readSets(atn, sets, () => readInt32());
+    readSets(atn, sets);
     readEdges(atn, sets);
     readDecisions(atn);
     readLexerActions(atn);
@@ -130,9 +127,6 @@ class ATNDeserializer {
       }
 
       var ruleIndex = readInt();
-      if (ruleIndex == 0xFFFF) {
-        ruleIndex = -1;
-      }
 
       final s = stateFactory(stype, ruleIndex);
       if (s is LoopEndState) {
@@ -180,9 +174,6 @@ class ATNDeserializer {
       atn.ruleToStartState.add(startState);
       if (atn.grammarType == ATNType.LEXER) {
         var tokenType = readInt();
-        if (tokenType == 0xFFFF) {
-          tokenType = Token.EOF;
-        }
 
         atn.ruleToTokenType.add(tokenType);
       }
@@ -208,7 +199,7 @@ class ATNDeserializer {
     }
   }
 
-  void readSets(ATN atn, List<IntervalSet> sets, readUnicode) {
+  void readSets(ATN atn, List<IntervalSet> sets) {
     final nsets = readInt();
     for (var i = 0; i < nsets; i++) {
       final nintervals = readInt();
@@ -221,8 +212,8 @@ class ATNDeserializer {
       }
 
       for (var j = 0; j < nintervals; j++) {
-        int a = readUnicode();
-        int b = readUnicode();
+        int a = readInt();
+        int b = readInt();
         set.addRange(a, b);
       }
     }
@@ -321,14 +312,7 @@ class ATNDeserializer {
       atn.lexerActions = List<LexerAction>.generate(readInt(), (index) {
         final actionType = LexerActionType.values[readInt()];
         var data1 = readInt();
-        if (data1 == 0xFFFF) {
-          data1 = -1;
-        }
-
         var data2 = readInt();
-        if (data2 == 0xFFFF) {
-          data2 = -1;
-        }
         final lexerAction = lexerActionFactory(actionType, data1, data2);
 
         return lexerAction;
@@ -535,12 +519,6 @@ class ATNDeserializer {
 
   int readInt() {
     return data[pos++];
-  }
-
-  int readInt32() {
-    final low = readInt();
-    final high = readInt();
-    return low | (high << 16);
   }
 
   Transition edgeFactory(

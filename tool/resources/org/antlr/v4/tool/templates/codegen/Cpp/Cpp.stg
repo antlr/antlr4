@@ -79,7 +79,7 @@ public:
 
   const antlr4::dfa::Vocabulary& getVocabulary() const override;
 
-  virtual const std::vector\<uint16_t>& getSerializedATN() const override;
+  virtual const std::vector\<int32_t>& getSerializedATN() const override;
   virtual const antlr4::atn::ATN& getATN() const override;
 
   <if (actionFuncs)>
@@ -138,7 +138,7 @@ struct <lexer.name; format = "cap">StaticData final {
   const std::vector\<std::string> literalNames;
   const std::vector\<std::string> symbolicNames;
   const antlr4::dfa::Vocabulary vocabulary;
-  std::vector\<uint16_t> serializedATN;
+  std::vector\<int32_t> serializedATN;
   std::unique_ptr\<antlr4::atn::ATN> atn;
 };
 
@@ -199,7 +199,7 @@ const dfa::Vocabulary& <lexer.name>::getVocabulary() const {
   return <lexer.grammarName; format = "lower">LexerStaticData->vocabulary;
 }
 
-const std::vector\<uint16_t>& <lexer.name>::getSerializedATN() const {
+const std::vector\<int32_t>& <lexer.name>::getSerializedATN() const {
   return <lexer.grammarName; format = "lower">LexerStaticData->serializedATN;
 }
 
@@ -307,7 +307,7 @@ public:
 
   const antlr4::dfa::Vocabulary& getVocabulary() const override;
 
-  const std::vector\<uint16_t>& getSerializedATN() const override;
+  const std::vector\<int32_t>& getSerializedATN() const override;
 
   <namedActions.members>
 
@@ -356,7 +356,7 @@ struct <parser.name; format = "cap">StaticData final {
   const std::vector\<std::string> literalNames;
   const std::vector\<std::string> symbolicNames;
   const antlr4::dfa::Vocabulary vocabulary;
-  std::vector\<uint16_t> serializedATN;
+  std::vector\<int32_t> serializedATN;
   std::unique_ptr\<antlr4::atn::ATN> atn;
 };
 
@@ -407,7 +407,7 @@ const dfa::Vocabulary& <parser.name>::getVocabulary() const {
   return <parser.grammarName; format = "lower">ParserStaticData->vocabulary;
 }
 
-const std::vector\<uint16_t>& <parser.name>::getSerializedATN() const {
+const std::vector\<int32_t>& <parser.name>::getSerializedATN() const {
   return <parser.grammarName; format = "lower">ParserStaticData->serializedATN;
 }
 
@@ -438,7 +438,7 @@ SerializedATNHeader(model) ::= <<
 >>
 
 SerializedATN(model) ::= <<
-static const uint16_t serializedATNSegment[] = {
+static const int32_t serializedATNSegment[] = {
 	<model.serialized: {s | <s>}; separator=",", wrap>
 };
 staticData->serializedATN.reserve(sizeof(serializedATNSegment) / sizeof(serializedATNSegment[0]));

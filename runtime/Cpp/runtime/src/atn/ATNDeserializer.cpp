@@ -221,28 +221,14 @@ namespace {
     return s;
   }
 
-  uint32_t deserializeInt32(const std::vector<uint16_t>& data, size_t offset) {
-    return static_cast<uint32_t>(data[offset]) | (static_cast<uint32_t>(data[offset + 1]) << 16);
-  }
-
-  ssize_t readUnicodeInt(const std::vector<uint16_t>& data, int& p) {
+  ssize_t readUnicodeInt32(const std::vector<int32_t>& data, int& p) {
     return static_cast<ssize_t>(data[p++]);
   }
 
-  ssize_t readUnicodeInt32(const std::vector<uint16_t>& data, int& p) {
-    auto result = deserializeInt32(data, p);
-    p += 2;
-    return static_cast<ssize_t>(result);
-  }
-
-  // We templatize this on the function type so the optimizer can inline
-  // the 16- or 32-bit readUnicodeInt/readUnicodeInt32 as needed.
-  template <typename F>
   void deserializeSets(
-    const std::vector<uint16_t>& data,
+    const std::vector<int32_t>& data,
     int& p,
-    std::vector<misc::IntervalSet>& sets,
-    F readUnicode) {
+    std::vector<misc::IntervalSet>& sets) {
     size_t nsets = data[p++];
     sets.reserve(sets.size() + nsets);
     for (size_t i = 0; i < nsets; i++) {
@@ -255,8 +241,8 @@ namespace {
       }
 
       for (size_t j = 0; j < nintervals; j++) {
-        auto a = readUnicode(data, p);
-        auto b = readUnicode(data, p);
+        auto a = readUnicodeInt32(data, p);
+        auto b = readUnicodeInt32(data, p);
         set.add(a, b);
       }
       sets.push_back(set);
@@ -269,7 +255,7 @@ ATNDeserializer::ATNDeserializer() : ATNDeserializer(ATNDeserializationOptions::
 
 ATNDeserializer::ATNDeserializer(ATNDeserializationOptions deserializationOptions) : _deserializationOptions(std::move(deserializationOptions)) {}
 
-std::unique_ptr<ATN> ATNDeserializer::deserialize(const std::vector<uint16_t>& data) const {
+std::unique_ptr<ATN> ATNDeserializer::deserialize(const std::vector<int32_t>& data) const {
   int p = 0;
   int version = data[p++];
   if (version != SERIALIZED_VERSION) {
@@ -301,10 +287,6 @@ std::unique_ptr<ATN> ATNDeserializer::deserialize(const std::vector<uint16_t>& d
       }
 
       size_t ruleIndex = data[p++];
-      if (ruleIndex == 0xFFFF) {
-        ruleIndex = INVALID_INDEX;
-      }
-
       ATNState *s = stateFactory(stype, ruleIndex);
       if (stype == ATNStateType::LOOP_END) { // special case
         int loopBackStateNumber = data[p++];
@@ -352,10 +334,6 @@ std::unique_ptr<ATN> ATNDeserializer::deserialize(const std::vector<uint16_t>& d
     atn->ruleToStartState.push_back(startState);
     if (atn->grammarType == ATNType::LEXER) {
       size_t tokenType = data[p++];
-      if (tokenType == 0xFFFF) {
-        tokenType = Token::EOF;
-      }
-
       atn->ruleToTokenType.push_back(tokenType);
     }
   }
@@ -387,12 +365,7 @@ std::unique_ptr<ATN> ATNDeserializer::deserialize(const std::vector<uint16_t>& d
   {
     std::vector<misc::IntervalSet> sets;
 
-    // First, deserialize sets with 16-bit arguments <= U+FFFF.
-    deserializeSets(data, p, sets, readUnicodeInt);
-
-    // Next, deserialize sets with 32-bit arguments <= U+10FFFF.
-    deserializeSets(data, p, sets, readUnicodeInt32);
-
+    deserializeSets(data, p, sets);
     sets.shrink_to_fit();
 
     //
@@ -492,15 +465,7 @@ std::unique_ptr<ATN> ATNDeserializer::deserialize(const std::vector<uint16_t>& d
     for (size_t i = 0; i < atn->lexerActions.size(); i++) {
       LexerActionType actionType = static_cast<LexerActionType>(data[p++]);
       int data1 = data[p++];
-      if (data1 == 0xFFFF) {
-        data1 = -1;
-      }
-
       int data2 = data[p++];
-      if (data2 == 0xFFFF) {
-        data2 = -1;
-      }
-
       atn->lexerActions[i] = lexerActionFactory(actionType, data1, data2);
     }
   }

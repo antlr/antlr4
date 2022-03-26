@@ -12,32 +12,21 @@ import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNSerializer;
 import org.antlr.v4.runtime.misc.IntegerList;
 
+/** Represents a serialized ATN that is just a list of signed integers; works for all targets
+ *  except for java, which requires a 16-bit char encoding. See {@link SerializedJavaATN}.
+ */
 public class SerializedATN extends OutputModelObject {
-	public final String[] serialized;
-	public final String[][] segments;
+	public int[] serialized;
+
+	public SerializedATN(OutputModelFactory factory) {
+		super(factory);
+	}
 
 	public SerializedATN(OutputModelFactory factory, ATN atn) {
 		super(factory);
-		Target target = factory.getGenerator().getTarget();
-		IntegerList data = ATNSerializer.getSerialized(atn, target.getLanguage());
-		int size = data.size();
-		int segmentLimit = target.getSerializedATNSegmentLimit();
-		segments = new String[(int)(((long)size + segmentLimit - 1) / segmentLimit)][];
-		int segmentIndex = 0;
-
-		for (int i = 0; i < size; i += segmentLimit) {
-			int segmentSize = Math.min(i + segmentLimit, size) - i;
-			String[] segment = new String[segmentSize];
-			segments[segmentIndex++] = segment;
-			for (int j = 0; j < segmentSize; j++) {
-				segment[j] = target.encodeIntAsCharEscape(data.get(i + j));
-			}
-		}
-
-		serialized = segments[0];
+		IntegerList data = ATNSerializer.getSerialized(atn);
+		serialized = data.toArray();
 	}
 
-	public String[][] getSegments() {
-		return segments;
-	}
+	public Object getSerialized() { return serialized; }
 }

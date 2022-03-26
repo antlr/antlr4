@@ -45,8 +45,7 @@ namespace Antlr4.Runtime.Atn
 			ReadRules (atn);
 			ReadModes (atn);
 			IList<IntervalSet> sets = new List<IntervalSet>();
-			ReadSets (atn, sets, ReadInt);
-	        ReadSets (atn, sets, ReadInt32);
+			ReadSets (atn, sets);
 	        ReadEdges (atn, sets);
 			ReadDecisions (atn);
 			ReadLexerActions (atn);
@@ -190,15 +189,7 @@ namespace Antlr4.Runtime.Atn
 				{
 					LexerActionType actionType = (LexerActionType)ReadInt();
 					int data1 = ReadInt();
-					if (data1 == unchecked((int)(0xFFFF)))
-					{
-						data1 = -1;
-					}
 					int data2 = ReadInt();
-					if (data2 == unchecked((int)(0xFFFF)))
-					{
-						data2 = -1;
-					}
 					ILexerAction lexerAction = LexerActionFactory(actionType, data1, data2);
 					atn.lexerActions[i_10] = lexerAction;
 				}
@@ -309,7 +300,7 @@ namespace Antlr4.Runtime.Atn
 			}
 		}
 
-		protected internal virtual void ReadSets(ATN atn, IList<IntervalSet> sets, System.Func<int> readUnicode)
+		protected internal virtual void ReadSets(ATN atn, IList<IntervalSet> sets)
 		{
 			//
 			// SETS
@@ -327,7 +318,7 @@ namespace Antlr4.Runtime.Atn
 				}
 				for (int j = 0; j < nintervals; j++)
 				{
-					set.Add(readUnicode(), readUnicode());
+					set.Add(ReadInt(), ReadInt());
 				}
 			}
 		}
@@ -369,9 +360,6 @@ namespace Antlr4.Runtime.Atn
 				atn.ruleToStartState[i_5] = startState;
 				if (atn.grammarType == ATNType.Lexer) {
 					int tokenType = ReadInt ();
-					if (tokenType == unchecked((int)(0xFFFF))) {
-						tokenType = TokenConstants.EOF;
-					}
 					atn.ruleToTokenType [i_5] = tokenType;
 				}
 			}
@@ -965,11 +953,6 @@ nextTransition_continue: ;
         protected internal int ReadInt()
         {
 			return data[p++];
-        }
-
-        protected internal int ReadInt32()
-        {
-			return (int)data[p++] | ((int)data[p++] << 16);
         }
 
         [return: NotNull]

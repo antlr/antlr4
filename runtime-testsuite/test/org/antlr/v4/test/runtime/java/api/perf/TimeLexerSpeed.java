@@ -55,7 +55,7 @@ Warming up Java compiler....
  *
  *  Sample output on OS X with 4 GHz Intel Core i7 (us == microseconds, 1/1000 of a millisecond):
  *
- Java VM args: -Xms2G -Xmx2G
+ Java VM args: -Xms2G -Xmx8g
  Warming up Java compiler....
  load_legacy_java_ascii_file average time    53us size  58384b over 3500 loads of 29038 symbols from Parser.java
  load_legacy_java_ascii_file average time    27us size  15568b over 3500 loads of  7625 symbols from RuleContext.java

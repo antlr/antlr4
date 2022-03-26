@@ -38,6 +38,7 @@ swift build --version
 cd runtime-testsuite/
 #  mvn -e -Dparallel=classes -DthreadCount=4 -Dtest=swift.** test
 # I don't know swift enough to make it parallel. revert to single threaded
+export MAVEN_OPTS="-Xmx8g"
 mvn -e -Dtest=swift.** test
 rc=$?
 cat target/surefire-reports/*.dumpstream || true

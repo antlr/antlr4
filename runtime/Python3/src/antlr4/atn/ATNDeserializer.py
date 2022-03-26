@@ -31,10 +31,7 @@ class ATNDeserializer (object):
         self.readRules(atn)
         self.readModes(atn)
         sets = []
-        # First, read all sets with 16-bit Unicode code points <= U+FFFF.
-        self.readSets(atn, sets, self.readInt)
-        # Next, deserialize sets with 32-bit arguments <= U+10FFFF.
-        self.readSets(atn, sets, self.readInt32)
+        self.readSets(atn, sets)
         self.readEdges(atn, sets)
         self.readDecisions(atn)
         self.readLexerActions(atn)
@@ -69,9 +66,6 @@ class ATNDeserializer (object):
                 atn.addState(None)
                 continue
             ruleIndex = self.readInt()
-            if ruleIndex == 0xFFFF:
-                ruleIndex = -1
-
             s = self.stateFactory(stype, ruleIndex)
             if stype == ATNState.LOOP_END: # special case
                 loopBackStateNumber = self.readInt()
@@ -111,9 +105,6 @@ class ATNDeserializer (object):
             atn.ruleToStartState[i] = startState
             if atn.grammarType == ATNType.LEXER:
                 tokenType = self.readInt()
-                if tokenType == 0xFFFF:
-                    tokenType = Token.EOF
-
                 atn.ruleToTokenType[i] = tokenType
 
         atn.ruleToStopState = [0] * nrules
@@ -129,7 +120,7 @@ class ATNDeserializer (object):
             s = self.readInt()
             atn.modeToStartState.append(atn.states[s])
 
-    def readSets(self, atn:ATN, sets:list, readUnicode:Callable[[], int]):
+    def readSets(self, atn:ATN, sets:list):
         m = self.readInt()
         for i in range(0, m):
             iset = IntervalSet()
@@ -139,8 +130,8 @@ class ATNDeserializer (object):
             if containsEof!=0:
                 iset.addOne(-1)
             for j in range(0, n):
-                i1 = readUnicode()
-                i2 = readUnicode()
+                i1 = self.readInt()
+                i2 = self.readInt()
                 iset.addRange(range(i1, i2 + 1)) # range upper limit is exclusive
 
     def readEdges(self, atn:ATN, sets:list):
@@ -205,11 +196,7 @@ class ATNDeserializer (object):
             for i in range(0, count):
                 actionType = self.readInt()
                 data1 = self.readInt()
-                if data1 == 0xFFFF:
-                    data1 = -1
                 data2 = self.readInt()
-                if data2 == 0xFFFF:
-                    data2 = -1
                 lexerAction = self.lexerActionFactory(actionType, data1, data2)
                 atn.lexerActions[i] = lexerAction
 
@@ -378,11 +365,6 @@ class ATNDeserializer (object):
         i = self.data[self.pos]
         self.pos += 1
         return i
-
-    def readInt32(self):
-        low = self.readInt()
-        high = self.readInt()
-        return low | (high << 16)
 
     edgeFactories = [ lambda args : None,
                       lambda atn, src, trg, arg1, arg2, arg3, sets, target : EpsilonTransition(target),

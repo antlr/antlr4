@@ -20,7 +20,7 @@ MULT : '*';
 WS : ' '+;
 */
 
-var lexerB_serializedLexerAtn = []uint16{
+var lexerB_serializedLexerAtn = []int32{
 	4, 0, 7, 38, 6, 65535, 2, 0, 7, 0, 2, 1, 7, 1, 2, 2, 7, 2, 2, 3, 7, 3,
 	2, 4, 7, 4, 2, 5, 7, 5, 2, 6, 7, 6, 1, 0, 4, 0, 17, 8, 0, 11, 0, 12, 0,
 	18, 1, 1, 4, 1, 22, 8, 1, 11, 1, 12, 1, 23, 1, 2, 1, 2, 1, 3, 1, 3, 1,
@@ -40,7 +40,7 @@ var lexerB_serializedLexerAtn = []uint16{
 }
 
 var lexerB_lexerDeserializer = NewATNDeserializer(nil)
-var lexerB_lexerAtn = lexerB_lexerDeserializer.DeserializeFromUInt16(lexerB_serializedLexerAtn)
+var lexerB_lexerAtn = lexerB_lexerDeserializer.Deserialize(lexerB_serializedLexerAtn)
 
 var lexerB_lexerChannelNames = []string{
 	"DEFAULT_TOKEN_CHANNEL", "HIDDEN",
