@@ -4,6 +4,14 @@
 
 Create a pre-release or full release at github; [Example 4.5-rc-1](https://github.com/antlr/antlr4/releases/tag/4.5-rc-1).
 
+### Turn on DCO Enforcement
+
+As of 4.10, we will be using the Linux DCO not the previous contributors license agreement that required signing the file. Now, we use the DCO and contributors must use `-s` on each commit to the branch associated with a pull request.
+
+See [GitHub App DCO](https://github.com/apps/dco).
+
+Make sure this has turned on for the `dev` and `master` branch.
+
 ### Delete existing release tag
 
 Wack any existing tag as mvn will create one and it fails if already there.
