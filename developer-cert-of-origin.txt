@@ -3,16 +3,16 @@ Certificate of Origin, DCO, version 1.1. See either
 https://developercertificate.org/ or the text below.
 
 Each commit requires a "signature", which is simple as
-adding `-s` to the git commit command: 
+using `-s` (not `-S`) to the git commit command: 
 
 git commit -s -m 'This is my commit message'
 
 Github's pull request process enforces the sig and gives
-instructions on how to fix if any commits lack the sig.
+instructions on how to fix any commits that lack the sig.
 See https://github.com/apps/dco for more info.
 
-No signature is required in this file (like we required with
-the previous ANTLR contributor's certificate of origin.)
+No signature is required in this file (unlike the
+previous ANTLR contributor's certificate of origin.)
 
 ----- https://developercertificate.org/ ------
 
