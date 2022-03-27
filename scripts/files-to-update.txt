@@ -2,6 +2,8 @@
 # generated initially from:
 # $ mvn clean
 # $ find tool runtime -type f -exec grep -l '4\.9' {} \; | grep -v -E '\.o|\.a|\.jar|\.dylib|node_modules/|\.class|tests/|CHANGELOG|\.zip|\.gz|.iml|.svg'
+#
+# Lines starting with '*' allow multiple changes in single file
 
 runtime/Go/antlr/recognizer.go
 runtime/Python3/setup.py
@@ -18,7 +20,6 @@ runtime/Cpp/cmake/ExternalAntlr4Cpp.cmake
 runtime/Cpp/cmake/FindANTLR.cmake
 runtime/Cpp/runtime/src/RuntimeMetaData.cpp
 runtime/Cpp/VERSION
-#runtime/Swift/Tests/Antlr4Tests/RuntimeMetaDataTests.swift  This is special so must manually edit
 runtime/Swift/Sources/Antlr4/RuntimeMetaData.swift
 runtime/CSharp/src/README.md
 runtime/CSharp/src/Properties/AssemblyInfo.cs
@@ -26,3 +27,8 @@ runtime/CSharp/src/Antlr4.csproj
 runtime/JavaScript/package-lock.json
 runtime/JavaScript/package.json
 runtime/JavaScript/src/antlr4/Recognizer.js
+
+doc/swift-target.md
+* doc/getting-started.md
+
+#runtime/Swift/Tests/Antlr4Tests/RuntimeMetaDataTests.swift  This is special so must manually edit

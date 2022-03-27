@@ -27,16 +27,20 @@ def freshen(ROOT):
 
 
 def get_change_list(fname):
-    files = []
+    files = {}
     with open(fname, "r") as f:
         for line in f.readlines():
             line = line.strip()
             if len(line)>0 and not line.startswith("#"):
-                files.append(line)
+                if line.startswith('*'): # '*' implies change multiple lines
+                    files[line[1:].strip()] = True
+                else:
+                    files[line] = False
+
     return files
 
 
-def update_file(qfname, before, after):
+def update_file(qfname, multi, before, after):
     with open(qfname, "r", encoding="UTF-8") as f:
         text = f.read()
 
@@ -47,7 +51,7 @@ def update_file(qfname, before, after):
     # Don't update if on > 1 line; too complex for tool
     lines = text.split('\n')
     count = sum(before in line for line in lines)
-    if count>1:
+    if count>1 and not multi:
         print(f"{before} appears on {count} lines so _not_ updating {qfname}")
 
     print(f"{before} => {after} in {qfname}")
@@ -58,8 +62,8 @@ def update_file(qfname, before, after):
 
 def update_files(ROOT, before, after):
     files = get_change_list(f"{ROOT}/scripts/files-to-update.txt")
-    for fname in files:
-        update_file(f"{ROOT}/{fname}", before, after)
+    for fname,multi in files.items():
+        update_file(f"{ROOT}/{fname}", multi, before, after)
 
 
 def find_remaining(ROOT, before):
@@ -78,10 +82,6 @@ if __name__ == '__main__':
     root = input(f"Set ANTLR repo root (default {ROOT}): ")
     if len(root.strip())>0:
         ROOT = root
-
-    troot = input(f"Set _target_ ANTLR repo root (default {ROOT}): ")
-    if len(troot.strip())>0:
-        ROOT = troot
 
     freshen(ROOT)
 
