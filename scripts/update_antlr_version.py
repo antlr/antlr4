@@ -83,7 +83,7 @@ if __name__ == '__main__':
     if len(troot.strip())>0:
         ROOT = troot
 
-    freshen()
+    freshen(ROOT)
 
     update_files(ROOT, before, after)
 
