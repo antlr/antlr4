@@ -1,8 +1,10 @@
 from setuptools import setup
 
+v = '4.9.3'
+
 setup(
     name='antlr4-python3-runtime',
-    version='4.9.3',
+    version=v,
     packages=['antlr4', 'antlr4.atn', 'antlr4.dfa', 'antlr4.tree', 'antlr4.error', 'antlr4.xpath'],
     package_dir={'': 'src'},
     install_requires=[
@@ -13,5 +15,5 @@ setup(
     author='Eric Vergnaud, Terence Parr, Sam Harwell',
     author_email='eric.vergnaud@wanadoo.fr',
     entry_points={'console_scripts': ['pygrun=antlr4._pygrun:main']},
-    description='ANTLR 4.9.3 runtime for Python 3.7'
+    description=f'ANTLR {v} runtime for Python 2.7.12'
 )
