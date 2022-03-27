@@ -5,7 +5,6 @@
 
 runtime/Go/antlr/recognizer.go
 runtime/Python3/setup.py
-runtime/Python3/src/antlr4/xpath/XPath.py
 runtime/Python3/src/antlr4/Recognizer.py
 runtime/Python2/setup.py
 runtime/Python2/src/antlr4/Recognizer.py
@@ -17,13 +16,10 @@ runtime/Cpp/cmake/Antlr4Package.md
 runtime/Cpp/cmake/README.md
 runtime/Cpp/cmake/ExternalAntlr4Cpp.cmake
 runtime/Cpp/cmake/FindANTLR.cmake
-runtime/Cpp/runtime/src/tree/xpath/XPathLexer.cpp
-runtime/Cpp/runtime/src/tree/xpath/XPathLexer.h
 runtime/Cpp/runtime/src/RuntimeMetaData.cpp
 runtime/Cpp/VERSION
-runtime/Swift/Tests/Antlr4Tests/RuntimeMetaDataTests.swift
+#runtime/Swift/Tests/Antlr4Tests/RuntimeMetaDataTests.swift  This is special so must manually edit
 runtime/Swift/Sources/Antlr4/RuntimeMetaData.swift
-runtime/CSharp/src/Tree/Xpath/XPathLexer.cs
 runtime/CSharp/src/README.md
 runtime/CSharp/src/Properties/AssemblyInfo.cs
 runtime/CSharp/src/Antlr4.csproj

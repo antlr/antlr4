@@ -12,7 +12,7 @@ def runme(cmd):
     return subprocess.check_output(cmd.split(' '))
 
 
-def freshen():
+def freshen(ROOT):
     ok = input("Perform antlr4 `mvn clean` and wipe build dirs Y/N? (default no): ")
     ok = ok.lower()
     if ok.lower() != 'y' and ok !='yes':
@@ -39,26 +39,37 @@ def get_change_list(fname):
 def update_file(qfname, before, after):
     with open(qfname, "r", encoding="UTF-8") as f:
         text = f.read()
+
     if before not in text:
         print(f"{before} not in {qfname}")
         return
-    base = os.path.basename(qfname)
-    print(f"{before} => {after} in {base}")
+
+    # Don't update if on > 1 line; too complex for tool
+    lines = text.split('\n')
+    count = sum(before in line for line in lines)
+    if count>1:
+        print(f"{before} appears on {count} lines so _not_ updating {qfname}")
+
+    print(f"{before} => {after} in {qfname}")
     text = text.replace(before, after)
-    # with open(qfname, "w", encoding="UTF-8") as f:
-    #     f.write(text)
+    with open(qfname, "w", encoding="UTF-8") as f:
+        f.write(text)
 
 
-def update_files(ROOT, TARGET_ROOT, before, after):
-    files = get_change_list(f"{TARGET_ROOT}/scripts/files-to-update.txt")
+def update_files(ROOT, before, after):
+    files = get_change_list(f"{ROOT}/scripts/files-to-update.txt")
     for fname in files:
         update_file(f"{ROOT}/{fname}", before, after)
+
+
+def find_remaining(ROOT, before):
+    return
 
 
 if __name__ == '__main__':
     # This is where parrt puts antlr
     ROOT = f"{os.path.expanduser('~')}/antlr/code/antlr4"
-    TARGET_ROOT = f"/tmp/antlr4" # for testing, it's nice to have diff target
+    ROOT = f"/tmp/antlr4" # for testing, it's nice to have diff target
 
     before = sys.argv[1]
     after = sys.argv[2]
@@ -68,9 +79,12 @@ if __name__ == '__main__':
     if len(root.strip())>0:
         ROOT = root
 
-    troot = input(f"Set _target_ ANTLR repo root (default {TARGET_ROOT}): ")
+    troot = input(f"Set _target_ ANTLR repo root (default {ROOT}): ")
     if len(troot.strip())>0:
-        TARGET_ROOT = troot
+        ROOT = troot
 
-    update_files(ROOT, TARGET_ROOT, before, after)
     freshen()
+
+    update_files(ROOT, before, after)
+
+    find_remaining(ROOT, before)
