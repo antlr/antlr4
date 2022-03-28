@@ -184,8 +184,7 @@ public class Trees {
     }
 
     public static func descendants(_ t: ParseTree) -> Array<ParseTree> {
-        var nodes: Array<ParseTree> = Array<ParseTree>()
-        nodes.append(t)
+        var nodes: Array<ParseTree> = [t]
 
         let n: Int = t.getChildCount()
         for i in 0..<n {

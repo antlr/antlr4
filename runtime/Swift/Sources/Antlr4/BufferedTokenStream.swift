@@ -309,9 +309,7 @@ public class BufferedTokenStream: TokenStream {
     }
 
     public func getTokens(_ start: Int, _ stop: Int, _ ttype: Int) throws -> [Token]? {
-        var s = Set<Int>()
-        s.insert(ttype)
-        return try getTokens(start, stop, s)
+        return try getTokens(start, stop, [ttype])
     }
 
     /// 
