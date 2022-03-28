@@ -58,6 +58,7 @@ import java.io.Writer;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.regex.Pattern;
 
 public class Tool {
 	public static final String VERSION;
@@ -97,6 +98,7 @@ public class Tool {
 	public File inputDirectory; // used by mvn plugin but not set by tool itself.
 	public String outputDirectory;
 	public String libDirectory;
+  public String[] libDirectories;
 	public boolean generate_ATN_dot = false;
 	public String grammarEncoding = null; // use default locale's encoding
 	public String msgFormat = "antlr";
@@ -254,18 +256,23 @@ public class Tool {
 			outputDirectory = ".";
 		}
 		if ( libDirectory!=null ) {
-			if (libDirectory.endsWith("/") ||
-				libDirectory.endsWith("\\")) {
-				libDirectory = libDirectory.substring(0, libDirectory.length() - 1);
-			}
-			File outDir = new File(libDirectory);
-			if (!outDir.exists()) {
-				errMgr.toolError(ErrorType.DIR_NOT_FOUND, libDirectory);
-				libDirectory = ".";
-			}
+      libDirectories = libDirectory.split(Pattern.quote(File.pathSeparator));
+      for (int index = 0; index < libDirectories.length; index++) {
+        String libDirectory = libDirectories[index];
+        while (libDirectory.endsWith("/") ||
+          libDirectory.endsWith("\\")) {
+          libDirectory = libDirectory.substring(0, libDirectory.length() - 1);
+        }
+        libDirectories[index] = libDirectory;
+        File outDir = new File(libDirectory);
+        if (!outDir.exists()) {
+          errMgr.toolError(ErrorType.DIR_NOT_FOUND, libDirectory);
+          libDirectories[index] = ".";
+        }
+      }
 		}
 		else {
-			libDirectory = ".";
+      libDirectories = new String[]{"."};
 		}
 		if ( launch_ST_inspector ) {
 			STGroup.trackCreationEvents = true;
@@ -796,10 +803,13 @@ public class Tool {
 			String parentDir = gfile.getParent();
 			importedFile = new File(parentDir, fileName);
 			if ( !importedFile.exists() ) { // try in lib dir
-				importedFile = new File(libDirectory, fileName);
-				if ( !importedFile.exists() ) {
-					return null;
-				}
+        for (String libDirectory : libDirectories) {
+          importedFile = new File(libDirectory, fileName);
+          if ( importedFile.exists() ) {
+            return importedFile;
+          }
+        }
+        return null;
 			}
 		}
 		return importedFile;
