@@ -89,18 +89,3 @@ func toUUID(_ data: [Character], _ offset: Int) -> UUID {
     let mostSigBits: Int64 = toLong(data, offset + 4)
     return UUID(mostSigBits: mostSigBits, leastSigBits: leastSigBits)
 }
-
-func ==<T:Equatable>(_ lhs: [T?], _ rhs: [T?]) -> Bool {
-
-    if lhs.count != rhs.count {
-        return false
-    }
-
-    for i in 0..<lhs.count {
-        if lhs[i] != rhs[i] {
-            return false
-        }
-    }
-
-    return true
-}
