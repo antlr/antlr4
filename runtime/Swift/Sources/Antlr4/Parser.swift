@@ -378,12 +378,9 @@ open class Parser: Recognizer<ParserATNSimulator> {
     public func triggerExitRuleEvent() throws {
         // reverse order walk of listeners
         if let _parseListeners = _parseListeners, let _ctx = _ctx {
-            var i = _parseListeners.count - 1
-            while i >= 0 {
-                let listener = _parseListeners[i]
+            for listener in _parseListeners.reversed() {
                 _ctx.exitRule(listener)
                 try listener.exitEveryRule(_ctx)
-                i -= 1
             }
         }
     }
