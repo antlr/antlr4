@@ -645,41 +645,7 @@ public class BitSet: Hashable, CustomStringConvertible {
     }
 
     public static func numberOfTrailingZeros(_ i: Int64) -> Int {
-        // HD, Figure 5-14
-        var x: Int32, y: Int32
-        if i == 0 {
-            return 64
-        }
-        var n: Int32 = 63
-        y = Int32(truncatingIfNeeded: i)
-        if y != 0 {
-            n = n - 32
-            x = y
-        } else {
-            x = Int32(truncatingIfNeeded: i >>> 32)
-        }
-
-        y = x << 16
-        if y != 0 {
-            n = n - 16
-            x = y
-        }
-        y = x << 8
-        if y != 0 {
-            n = n - 8
-            x = y
-        }
-        y = x << 4
-        if y != 0 {
-            n = n - 4
-            x = y
-        }
-        y = x << 2
-        if y != 0 {
-            n = n - 2
-            x = y
-        }
-        return Int(n - ((x << 1) >>> 31))
+        return i.trailingZeroBitCount
     }
 
     /// 
@@ -814,35 +780,7 @@ public class BitSet: Hashable, CustomStringConvertible {
     }
 
     public static func numberOfLeadingZeros(_ i: Int64) -> Int {
-        // HD, Figure 5-6
-        if i == 0 {
-            return 64
-        }
-        var n: Int32 = 1
-        var x = Int32(i >>> 32)
-        if x == 0 {
-            n += 32
-            x = Int32(i)
-        }
-        if x >>> 16 == 0 {
-            n += 16
-            x <<= 16
-        }
-        if x >>> 24 == 0 {
-            n += 8
-            x <<= 8
-        }
-        if x >>> 28 == 0 {
-            n += 4
-            x <<= 4
-        }
-        if x >>> 30 == 0 {
-            n += 2
-            x <<= 2
-        }
-        n -= x >>> 31
-
-        return Int(n)
+        return i.leadingZeroBitCount
     }
     /// 
     /// Returns the "logical size" of this `BitSet`: the index of
@@ -903,16 +841,7 @@ public class BitSet: Hashable, CustomStringConvertible {
     }
 
     public static func bitCount(_ i: Int64) -> Int {
-        var i = i
-        // HD, Figure 5-14
-        i = i - ((i >>> 1) & 0x5555555555555555)
-        i = (i & 0x3333333333333333) + ((i >>> 2) & 0x3333333333333333)
-        i = (i + (i >>> 4)) & 0x0f0f0f0f0f0f0f0f
-        i = i + (i >>> 8)
-        i = i + (i >>> 16)
-        i = i + (i >>> 32)
-
-        return Int(i) & 0x7f
+        return i.nonzeroBitCount
     }
 
     /// 

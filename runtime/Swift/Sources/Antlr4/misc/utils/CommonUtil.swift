@@ -35,15 +35,15 @@ public func +(lhs: Token, rhs: String) -> String {
 infix operator >>> : BitwiseShiftPrecedence
 
 func >>>(lhs: Int32, rhs: Int32) -> Int32 {
-    return left &>> right
+    return lhs &>> rhs
 }
 
 func >>>(lhs: Int64, rhs: Int64) -> Int64 {
-    return left &>> right
+    return lhs &>> rhs
 }
 
 func >>>(lhs: Int, rhs: Int) -> Int {
-    return left &>> right
+    return lhs &>> rhs
 }
 
 func intChar2String(_ i: Int) -> String {
