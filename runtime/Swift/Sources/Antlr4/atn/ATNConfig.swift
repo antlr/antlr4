@@ -168,8 +168,8 @@ public func ==(lhs: ATNConfig, rhs: ATNConfig) -> Bool {
         return true
     }
     
-    if (lhs is LexerATNConfig) && (rhs is LexerATNConfig) {
-        return (lhs as! LexerATNConfig) == (rhs as! LexerATNConfig)
+    if let l = lhs as? LexerATNConfig, let r = rhs as? LexerATNConfig {
+        return l == r
 
 
     }
@@ -185,19 +185,7 @@ public func ==(lhs: ATNConfig, rhs: ATNConfig) -> Bool {
         return false
     }
 
-    var contextCompare = false
-
-    if lhs.context == nil && rhs.context == nil {
-        contextCompare = true
-    } else if lhs.context == nil && rhs.context != nil {
-        contextCompare = false
-    } else if lhs.context != nil && rhs.context == nil {
-        contextCompare = false
-    } else {
-        contextCompare = (lhs.context! == rhs.context!)
-    }
-
-    if !contextCompare {
+    if lhs.context != rhs.context {
         return false
     }
 
